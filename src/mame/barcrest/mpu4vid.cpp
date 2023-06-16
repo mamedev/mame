@@ -207,9 +207,11 @@ TODO:
 #include "v4psi.lh"
 #include "v4strike.lh"
 
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 #define VIDEO_MASTER_CLOCK          XTAL(10'000'000)
-
 
 namespace {
 
@@ -299,21 +301,21 @@ private:
 	int8_t m_cur[2];
 
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
-	DECLARE_WRITE_LINE_MEMBER(m6809_acia_irq);
-	DECLARE_WRITE_LINE_MEMBER(m68k_acia_irq);
-	DECLARE_WRITE_LINE_MEMBER(cpu1_ptm_irq);
-	DECLARE_WRITE_LINE_MEMBER(vid_o1_callback);
-	DECLARE_WRITE_LINE_MEMBER(vid_o2_callback);
-	DECLARE_WRITE_LINE_MEMBER(vid_o3_callback);
+	void m6809_acia_irq(int state);
+	void m68k_acia_irq(int state);
+	void cpu1_ptm_irq(int state);
+	void vid_o1_callback(int state);
+	void vid_o2_callback(int state);
+	void vid_o3_callback(int state);
 	uint8_t pia_ic5_porta_track_r();
-	DECLARE_WRITE_LINE_MEMBER(update_mpu68_interrupts);
+	void update_mpu68_interrupts(int state);
 	uint16_t mpu4_vid_vidram_r(offs_t offset);
 	void mpu4_vid_vidram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	EF9369_COLOR_UPDATE(ef9369_color_update);
 
 	void vidcharacteriser_w(offs_t offset, uint8_t data);
 	uint8_t vidcharacteriser_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(mpu_video_reset);
+	void mpu_video_reset(int state);
 	void vram_w(offs_t offset, uint8_t data);
 	uint8_t vram_r(offs_t offset);
 	void ic3ss_vid_w(offs_t offset, uint8_t data);
@@ -366,7 +368,7 @@ private:
 */
 
 
-WRITE_LINE_MEMBER(mpu4vid_state::update_mpu68_interrupts)
+void mpu4vid_state::update_mpu68_interrupts(int state)
 {
 	m_videocpu->set_input_line(1, m_m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	m_videocpu->set_input_line(2, m_m6850_irq_state ? ASSERT_LINE : CLEAR_LINE);
@@ -374,13 +376,13 @@ WRITE_LINE_MEMBER(mpu4vid_state::update_mpu68_interrupts)
 
 /* Communications with 6809 board */
 
-WRITE_LINE_MEMBER(mpu4vid_state::m6809_acia_irq)
+void mpu4vid_state::m6809_acia_irq(int state)
 {
 	m_acia_1->write_cts(state);
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
 
-WRITE_LINE_MEMBER(mpu4vid_state::m68k_acia_irq)
+void mpu4vid_state::m68k_acia_irq(int state)
 {
 	m_acia_0->write_cts(state);
 	m_m6850_irq_state = state;
@@ -388,14 +390,14 @@ WRITE_LINE_MEMBER(mpu4vid_state::m68k_acia_irq)
 }
 
 
-WRITE_LINE_MEMBER(mpu4vid_state::cpu1_ptm_irq)
+void mpu4vid_state::cpu1_ptm_irq(int state)
 {
 	m_m6840_irq_state = state;
 	update_mpu68_interrupts(1);
 }
 
 
-WRITE_LINE_MEMBER(mpu4vid_state::vid_o1_callback)
+void mpu4vid_state::vid_o1_callback(int state)
 {
 	m_ptm->set_c2(state); /* this output is the clock for timer2 */
 
@@ -406,13 +408,13 @@ WRITE_LINE_MEMBER(mpu4vid_state::vid_o1_callback)
 }
 
 
-WRITE_LINE_MEMBER(mpu4vid_state::vid_o2_callback)
+void mpu4vid_state::vid_o2_callback(int state)
 {
 	m_ptm->set_c3(state); /* this output is the clock for timer3 */
 }
 
 
-WRITE_LINE_MEMBER(mpu4vid_state::vid_o3_callback)
+void mpu4vid_state::vid_o3_callback(int state)
 {
 	m_ptm->set_c1(state); /* this output is the clock for timer1 */
 }
@@ -548,7 +550,7 @@ uint8_t mpu4vid_state::pia_ic5_porta_track_r()
 	We invert the X and Y data at source due to the use of Schmitt triggers in the interface, which
 	clean up the pulses and flip the active phase.*/
 
-	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",machine().describe_context()));
+	LOG("%s: IC5 PIA Read of Port A (AUX1)\n",machine().describe_context());
 
 
 	uint8_t data = m_aux1_port->read();
@@ -1858,7 +1860,7 @@ static INPUT_PORTS_START( v4cybcas )
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER(mpu4vid_state::mpu_video_reset)
+void mpu4vid_state::mpu_video_reset(int state)
 {
 	m_ptm->reset();
 	m_acia_1->reset();

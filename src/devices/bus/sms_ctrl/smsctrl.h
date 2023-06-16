@@ -118,7 +118,7 @@ protected:
 	template <typename T> void configure_screen(T &&act) { if (m_port) act(std::as_const(m_port->m_screen)); }
 
 	screen_device *screen() const { return m_port ? m_port->m_screen.target() : nullptr; }
-	DECLARE_WRITE_LINE_MEMBER(th_w) { if (m_port) m_port->m_th_handler(state); }
+	void th_w(int state) { if (m_port) m_port->m_th_handler(state); }
 
 private:
 	sms_control_port_device *const m_port;

@@ -45,8 +45,8 @@ public:
 private:
 	virtual void machine_start() override;
 
-	DECLARE_WRITE_LINE_MEMBER(sod_w);
-	DECLARE_WRITE_LINE_MEMBER(cols_w);
+	void sod_w(int state);
+	void cols_w(int state);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
 	void cit220p_mem_map(address_map &map);
@@ -75,12 +75,12 @@ void cit220_state::machine_start()
 }
 
 
-WRITE_LINE_MEMBER(cit220_state::sod_w)
+void cit220_state::sod_w(int state)
 {
 	// probably asserts PBREQ on SCN2674 to access memory at Exxx
 }
 
-WRITE_LINE_MEMBER(cit220_state::cols_w)
+void cit220_state::cols_w(int state)
 {
 	if (state == m_132_cols)
 	{

@@ -796,12 +796,12 @@ void x1_state::x1_fdc_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(x1_state::fdc_drq_w)
+void x1_state::fdc_drq_w(int state)
 {
 	m_dma->rdy_w(state ^ 1);
 }
 
-WRITE_LINE_MEMBER(x1_state::hdl_w)
+void x1_state::hdl_w(int state)
 {
 	if (state)
 		m_floppy[m_fdc_ctrl & 0x03]->get_device()->mon_w(CLEAR_LINE);

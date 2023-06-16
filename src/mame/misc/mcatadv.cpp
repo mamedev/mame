@@ -215,7 +215,7 @@ private:
 	void sound_banking_w(u8 data);
 	template<int Chip> void get_banked_color(bool tiledim, u32 &color, u32 &pri, u32 &code);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_tilemap_part(screen_device &screen, int layer, int i, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void main_map(address_map &map);

@@ -123,22 +123,22 @@ private:
 	uint32_t m_dafb_colors[3]{}, m_dafb_count = 0, m_dafb_clutoffs = 0, m_dafb_montype = 0, m_dafb_vbltime = 0;
 	uint32_t m_dafb_palette[256]{};
 
-	DECLARE_WRITE_LINE_MEMBER(nubus_irq_9_w);
-	DECLARE_WRITE_LINE_MEMBER(nubus_irq_a_w);
-	DECLARE_WRITE_LINE_MEMBER(nubus_irq_b_w);
-	DECLARE_WRITE_LINE_MEMBER(nubus_irq_c_w);
-	DECLARE_WRITE_LINE_MEMBER(nubus_irq_d_w);
-	DECLARE_WRITE_LINE_MEMBER(nubus_irq_e_w);
+	void nubus_irq_9_w(int state);
+	void nubus_irq_a_w(int state);
+	void nubus_irq_b_w(int state);
+	void nubus_irq_c_w(int state);
+	void nubus_irq_d_w(int state);
+	void nubus_irq_e_w(int state);
 	void nubus_slot_interrupt(uint8_t slot, uint32_t state);
 	int m_via2_ca1_hack = 0, m_nubus_irq_state = 0;
 
-	WRITE_LINE_MEMBER(adb_irq_w) { m_adb_irq_pending = state; }
+	void adb_irq_w(int state) { m_adb_irq_pending = state; }
 	int m_adb_irq_pending = 0;
 
-	DECLARE_WRITE_LINE_MEMBER(irq_539x_1_w);
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(irq_539x_2_w);
-	DECLARE_WRITE_LINE_MEMBER(drq_539x_1_w);
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(drq_539x_2_w);
+	void irq_539x_1_w(int state);
+	[[maybe_unused]] void irq_539x_2_w(int state);
+	void drq_539x_1_w(int state);
+	[[maybe_unused]] void drq_539x_2_w(int state);
 
 	floppy_image_device *m_cur_floppy = nullptr;
 	int m_hdsel = 0;
@@ -157,8 +157,8 @@ private:
 	void mac_via2_out_b(uint8_t data);
 	void mac_via_sync();
 	void field_interrupts();
-	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);
-	DECLARE_WRITE_LINE_MEMBER(mac_via2_irq);
+	void mac_via_irq(int state);
+	void mac_via2_irq(int state);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	int m_via_interrupt = 0, m_via2_interrupt = 0, m_scc_interrupt = 0, m_last_taken_interrupt = 0;
 
@@ -327,12 +327,12 @@ void macquadra_state::nubus_slot_interrupt(uint8_t slot, uint32_t state)
 	}
 }
 
-WRITE_LINE_MEMBER(macquadra_state::nubus_irq_9_w) { nubus_slot_interrupt(9, state); }
-WRITE_LINE_MEMBER(macquadra_state::nubus_irq_a_w) { nubus_slot_interrupt(0xa, state); }
-WRITE_LINE_MEMBER(macquadra_state::nubus_irq_b_w) { nubus_slot_interrupt(0xb, state); }
-WRITE_LINE_MEMBER(macquadra_state::nubus_irq_c_w) { nubus_slot_interrupt(0xc, state); }
-WRITE_LINE_MEMBER(macquadra_state::nubus_irq_d_w) { nubus_slot_interrupt(0xd, state); }
-WRITE_LINE_MEMBER(macquadra_state::nubus_irq_e_w) { nubus_slot_interrupt(0xe, state); }
+void macquadra_state::nubus_irq_9_w(int state) { nubus_slot_interrupt(9, state); }
+void macquadra_state::nubus_irq_a_w(int state) { nubus_slot_interrupt(0xa, state); }
+void macquadra_state::nubus_irq_b_w(int state) { nubus_slot_interrupt(0xb, state); }
+void macquadra_state::nubus_irq_c_w(int state) { nubus_slot_interrupt(0xc, state); }
+void macquadra_state::nubus_irq_d_w(int state) { nubus_slot_interrupt(0xd, state); }
+void macquadra_state::nubus_irq_e_w(int state) { nubus_slot_interrupt(0xe, state); }
 
 // DAFB: video for Quadra 700/900
 
@@ -630,17 +630,17 @@ uint32_t macquadra_state::screen_update_dafb(screen_device &screen, bitmap_rgb32
 	return 0;
 }
 
-WRITE_LINE_MEMBER(macquadra_state::drq_539x_1_w)
+void macquadra_state::drq_539x_1_w(int state)
 {
 	m_dafb_scsi1_drq = state;
 }
 
-WRITE_LINE_MEMBER(macquadra_state::drq_539x_2_w)
+void macquadra_state::drq_539x_2_w(int state)
 {
 	m_dafb_scsi2_drq = state;
 }
 
-WRITE_LINE_MEMBER(macquadra_state::irq_539x_1_w)
+void macquadra_state::irq_539x_1_w(int state)
 {
 	if (state)  // make sure a CB1 transition occurs
 	{
@@ -649,7 +649,7 @@ WRITE_LINE_MEMBER(macquadra_state::irq_539x_1_w)
 	}
 }
 
-WRITE_LINE_MEMBER(macquadra_state::irq_539x_2_w)
+void macquadra_state::irq_539x_2_w(int state)
 {
 }
 
@@ -681,13 +681,13 @@ void macquadra_state::mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_via1->write(offset, (data >> 8) & 0xff);
 }
 
-WRITE_LINE_MEMBER(macquadra_state::mac_via_irq)
+void macquadra_state::mac_via_irq(int state)
 {
 	m_via_interrupt = state;
 	field_interrupts();
 }
 
-WRITE_LINE_MEMBER(macquadra_state::mac_via2_irq)
+void macquadra_state::mac_via2_irq(int state)
 {
 	m_via2_interrupt = state;
 	field_interrupts();

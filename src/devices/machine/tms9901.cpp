@@ -154,7 +154,6 @@ Clock mode:
 
 #include <cmath>
 
-#define LOG_GENERAL  (1U << 0)
 #define LOG_PINS     (1U << 1)
 #define LOG_MASK     (1U << 2)
 #define LOG_MODE     (1U << 3)

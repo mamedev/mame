@@ -677,7 +677,6 @@ LVS-DG2
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 
-#define LOG_GENERAL         (1U << 0)
 #define LOG_COMRW           (1U << 1)
 #define LOG_SNDCOM_UNKNWN   (1U << 2)
 #define LOG_DMA             (1U << 3)
@@ -2517,7 +2516,7 @@ void hng64_state::ioport4_w(uint8_t data)
 
 // there are also serial reads, TLCS870 core doesn't support them yet
 
-WRITE_LINE_MEMBER( hng64_state::sio0_w )
+void hng64_state::sio0_w(int state)
 {
 	// tlcs870 core provides better logging than anything we could put here at the moment
 }

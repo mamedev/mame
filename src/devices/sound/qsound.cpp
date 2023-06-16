@@ -102,7 +102,6 @@
 #include <algorithm>
 #include <fstream>
 
-#define LOG_GENERAL     (1U << 0)
 #define LOG_COMMAND     (1U << 1)
 #define LOG_SAMPLE      (1U << 2)
 
@@ -289,7 +288,7 @@ u16 qsound_device::dsp_sample_r(offs_t offset)
 	return u16(byte) << 8;
 }
 
-WRITE_LINE_MEMBER(qsound_device::dsp_ock_w)
+void qsound_device::dsp_ock_w(int state)
 {
 	// detect active edge
 	if (bool(state) == bool(m_ock))

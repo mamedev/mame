@@ -1437,7 +1437,7 @@ u32 imagetek_i4100_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	return 0;
 }
 
-WRITE_LINE_MEMBER(imagetek_i4100_device::screen_eof)
+void imagetek_i4100_device::screen_eof(int state)
 {
 	if (state)
 	{

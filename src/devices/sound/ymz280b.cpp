@@ -69,14 +69,16 @@ void ymz280b_device::update_irq_state()
 		m_irq_state = 1;
 		if (!m_irq_handler.isnull())
 			m_irq_handler(1);
-		else logerror("YMZ280B: IRQ generated, but no callback specified!\n");
+		else
+			logerror("YMZ280B: IRQ generated, but no callback specified!\n");
 	}
 	else if (!irq_bits && m_irq_state)
 	{
 		m_irq_state = 0;
 		if (!m_irq_handler.isnull())
 			m_irq_handler(0);
-		else logerror("YMZ280B: IRQ generated, but no callback specified!\n");
+		else
+			logerror("YMZ280B: IRQ generated, but no callback specified!\n");
 	}
 }
 

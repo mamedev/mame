@@ -46,7 +46,7 @@ protected:
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual void mreq_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
-	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
+	virtual int romcs() override;
 
 	// passthru
 	virtual void pre_opcode_fetch(offs_t offset) override { m_exp->pre_opcode_fetch(offset); }
@@ -57,7 +57,7 @@ protected:
 private:
 	void pia_out_a(uint8_t data);
 	void pia_out_b(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(busy_w);
+	void busy_w(int state);
 
 	required_ioport m_joy;
 	required_memory_region m_rom;

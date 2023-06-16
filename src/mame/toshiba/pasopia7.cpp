@@ -109,7 +109,7 @@ private:
 	void nmi_reg_w(uint8_t data);
 	uint8_t nmi_porta_r();
 	uint8_t nmi_portb_r();
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	void speaker_w(int state);
 	TIMER_CALLBACK_MEMBER(pio_timer);
 	void p7_lcd_palette(palette_device &palette) const;
 	MC6845_UPDATE_ROW(update_row);
@@ -752,7 +752,7 @@ uint8_t pasopia7_state::nmi_portb_r()
 	return 0xd9 | data | m_nmi_trap | m_nmi_reset;
 }
 
-WRITE_LINE_MEMBER( pasopia7_state::speaker_w )
+void pasopia7_state::speaker_w(int state)
 {
 	if (state)
 	{

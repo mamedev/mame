@@ -31,7 +31,7 @@ public:
 	uint32_t ide_cs1_r(offs_t offset, uint32_t mem_mask = ~0);
 	void ide_cs0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void ide_cs1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(ide_irq);
+	void ide_irq(int state);
 
 protected:
 	virtual void device_start() override;

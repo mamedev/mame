@@ -111,10 +111,10 @@ private:
 	void lc80_2_mem(address_map &map);
 	void lc80_io(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER(halt_w) { m_halt_led = state; }
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
+	void halt_w(int state) { m_halt_led = state; }
+	void ctc_z0_w(int state);
+	void ctc_z1_w(int state);
+	void ctc_z2_w(int state);
 	void pio1_pa_w(u8 data);
 	u8 pio1_pb_r();
 	void pio1_pb_w(u8 data);
@@ -218,15 +218,15 @@ INPUT_PORTS_END
 
 // Z80-CTC Interface
 
-WRITE_LINE_MEMBER(lc80_state::ctc_z0_w)
+void lc80_state::ctc_z0_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(lc80_state::ctc_z1_w)
+void lc80_state::ctc_z1_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(lc80_state::ctc_z2_w)
+void lc80_state::ctc_z2_w(int state)
 {
 }
 

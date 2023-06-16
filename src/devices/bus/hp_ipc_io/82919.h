@@ -27,18 +27,18 @@ public:
 	uint8_t read(offs_t addr);
 	void write(offs_t addr , uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(uart_irq);
-	DECLARE_WRITE_LINE_MEMBER(uart_a_tx);
-	DECLARE_WRITE_LINE_MEMBER(uart_b_tx);
+	void uart_irq(int state);
+	void uart_a_tx(int state);
+	void uart_b_tx(int state);
 	void uart_output(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(prim_rxd);
-	DECLARE_WRITE_LINE_MEMBER(prim_dcd);
-	DECLARE_WRITE_LINE_MEMBER(prim_dsr);
-	DECLARE_WRITE_LINE_MEMBER(prim_ri);
-	DECLARE_WRITE_LINE_MEMBER(prim_cts);
-	DECLARE_WRITE_LINE_MEMBER(sec_rxd);
-	DECLARE_WRITE_LINE_MEMBER(sec_dcd);
-	DECLARE_WRITE_LINE_MEMBER(sec_cts);
+	void prim_rxd(int state);
+	void prim_dcd(int state);
+	void prim_dsr(int state);
+	void prim_ri(int state);
+	void prim_cts(int state);
+	void sec_rxd(int state);
+	void sec_dcd(int state);
+	void sec_cts(int state);
 
 protected:
 	virtual void device_start() override;

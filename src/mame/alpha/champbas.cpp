@@ -97,12 +97,12 @@ TODO:
  *
  *************************************/
 
-READ_LINE_MEMBER(champbas_state::watchdog_bit2)
+int champbas_state::watchdog_bit2()
 {
 	return (0x10 - m_watchdog->get_vblank_counter()) >> 2 & 1;
 }
 
-WRITE_LINE_MEMBER(champbas_state::irq_enable_w)
+void champbas_state::irq_enable_w(int state)
 {
 	m_irq_mask = state;
 
@@ -512,7 +512,7 @@ void champbas_state::machine_start()
 	save_item(NAME(m_gfx_bank));
 }
 
-WRITE_LINE_MEMBER(champbas_state::vblank_irq)
+void champbas_state::vblank_irq(int state)
 {
 	if (state && m_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);

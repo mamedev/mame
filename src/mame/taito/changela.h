@@ -64,11 +64,11 @@ public:
 	uint8_t changela_31_r();
 	uint8_t changela_2c_r();
 	uint8_t changela_2d_r();
-	DECLARE_WRITE_LINE_MEMBER(mcu_pc_0_w);
-	DECLARE_WRITE_LINE_MEMBER(collision_reset_0_w);
-	DECLARE_WRITE_LINE_MEMBER(collision_reset_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	void mcu_pc_0_w(int state);
+	void collision_reset_0_w(int state);
+	void collision_reset_1_w(int state);
+	void coin_counter_1_w(int state);
+	void coin_counter_2_w(int state);
 	void changela_colors_w(offs_t offset, uint8_t data);
 	void changela_mem_device_select_w(uint8_t data);
 	void changela_mem_device_w(offs_t offset, uint8_t data);

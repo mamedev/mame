@@ -62,8 +62,8 @@ protected:
 	MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row );
 	MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row );
 
-	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
-	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
+	void hsync_changed(int state);
+	void vsync_changed(int state);
 
 	required_device<palette_device> m_palette;
 	required_device<mc6845_device> m_mc6845;

@@ -323,7 +323,7 @@ void v1050_keyboard_device::device_reset()
 //  si_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( v1050_keyboard_device::si_w )
+void v1050_keyboard_device::si_w(int state)
 {
 	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }

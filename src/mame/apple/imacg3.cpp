@@ -22,6 +22,7 @@
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/dimm_spd.h"
+#include "machine/i2cmem.h"
 #include "machine/input_merger.h"
 #include "machine/mpc106.h"
 #include "machine/opti82c861.h"
@@ -46,29 +47,30 @@ public:
 	required_device<cuda_device> m_cuda;
 	required_device<macadb_device> m_macadb;
 	required_device<dimm_spd_device> m_dimm0, m_dimm1;
+	required_device<i2c_24c01_device> m_edid;
 	required_device<ram_device> m_ram;
 
 private:
-	u32 m_sense;
+	u16 m_sense;
 
 	void imac_map(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	WRITE_LINE_MEMBER(cuda_reset_w)
+	void cuda_reset_w(int state)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 	}
 
-	WRITE_LINE_MEMBER(irq_w)
+	void irq_w(int state)
 	{
 		m_maincpu->set_input_line(PPC_IRQ, state);
 	}
 
-	u32 read_sense();
-	void write_sense(u32 data);
+	u16 read_sense();
+	void write_sense(u16 data);
 };
 
 imac_state::imac_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -79,6 +81,7 @@ imac_state::imac_state(const machine_config &mconfig, device_type type, const ch
 	m_macadb(*this, "macadb"),
 	m_dimm0(*this, "dimm0"),
 	m_dimm1(*this, "dimm1"),
+	m_edid(*this, "edid"),
 	m_ram(*this, RAM_TAG)
 {
 }
@@ -86,6 +89,8 @@ imac_state::imac_state(const machine_config &mconfig, device_type type, const ch
 void imac_state::machine_start()
 {
 	m_sense = 0;
+
+	m_edid->set_address(0x50<<1);
 
 	m_mpc106->set_ram_info((u8 *)m_ram->pointer(), m_ram->size());
 
@@ -125,13 +130,21 @@ void imac_state::imac_map(address_map &map)
 	map.unmap_value_high();
 }
 
-u32 imac_state::read_sense()
+// EDID sense.  Rage sends a u32 where the top 16 bits are DDR, the bottom 16 bits are data.
+// The return value only needs the data (the lower 16 bits) filled in.
+u16 imac_state::read_sense()
 {
-	// ID as a 640x480 13" for now (needs EDID, the old Apple protocol isn't supported)
-	return (m_sense & 0xffff00ff) | (6 << 8);
+	const u8 out = (m_sense >> 12) & 0xff;
+	const u8 scl = ((out & 2) >> 1);
+	const u8 sda = (out & 1);
+
+	m_edid->write_sda(sda);
+	m_edid->write_scl(scl);
+
+	return (m_edid->read_sda() ? 0x1000 : 0) | (scl ? 0x2000 : 0);
 }
 
-void imac_state::write_sense(u32 data)
+void imac_state::write_sense(u16 data)
 {
 	m_sense = data;
 }
@@ -153,6 +166,9 @@ void imac_state::imac(machine_config &config)
 	atirage_device &ati(ATI_RAGEIIC(config, "pci:12.0", 14.318181_MHz_XTAL));
 	ati.gpio_get_cb().set(FUNC(imac_state::read_sense));
 	ati.gpio_set_cb().set(FUNC(imac_state::write_sense));
+	ati.set_gpio_pullups(0x3000);   // bits 8 & 9 are the I2C bus
+
+	I2C_24C01(config, m_edid);
 
 	OPTI_82C861(config, "pci:14.0", 0);
 
@@ -206,6 +222,9 @@ void imac_state::imac(machine_config &config)
 ROM_START(imac)
 	ROM_REGION(0x100000, "bootrom", ROMREGION_64BIT | ROMREGION_BE)
 	ROM_LOAD( "imacboot.u3",  0x000000, 0x100000, CRC(80d3174b) SHA1(e7a0c71822ec1e08435099af87b38bc82d315ed5) )
+
+	ROM_REGION(0x80, "edid", 0)
+	ROM_LOAD( "imac_16843009.edid", 0x000000, 0x000080, CRC(ea3051d1) SHA1(a0b0338cdd8f364135e1496b9a33f7509f0bb104) )
 ROM_END
 
 static INPUT_PORTS_START(imac)

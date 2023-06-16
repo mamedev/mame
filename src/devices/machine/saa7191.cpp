@@ -14,11 +14,11 @@
 #include "emu.h"
 #include "saa7191.h"
 
-#define LOG_UNKNOWN     (1 << 0)
-#define LOG_READS       (1 << 1)
-#define LOG_WRITES      (1 << 2)
-#define LOG_ERRORS      (1 << 3)
-#define LOG_I2C_IGNORES (1 << 4)
+#define LOG_UNKNOWN     (1U << 1)
+#define LOG_READS       (1U << 2)
+#define LOG_WRITES      (1U << 3)
+#define LOG_ERRORS      (1U << 4)
+#define LOG_I2C_IGNORES (1U << 5)
 #define LOG_DEFAULT     (LOG_READS | LOG_WRITES | LOG_ERRORS | LOG_I2C_IGNORES | LOG_UNKNOWN)
 
 #define VERBOSE         (LOG_DEFAULT)
@@ -120,13 +120,13 @@ uint8_t saa7191_device::i2c_data_r()
 	return 0;
 }
 
-WRITE_LINE_MEMBER(saa7191_device::i2c_stop_w)
+void saa7191_device::i2c_stop_w(int state)
 {
 	if (state)
 		m_i2c_state = I2C_STATE_IDLE;
 }
 
-WRITE_LINE_MEMBER(saa7191_device::iicsa_w)
+void saa7191_device::iicsa_w(int state)
 {
 	m_i2c_write_addr = state ? 0x8e : 0x8a;
 	m_i2c_read_addr = m_i2c_write_addr | 1;

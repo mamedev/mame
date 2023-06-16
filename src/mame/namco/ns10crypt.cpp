@@ -124,13 +124,23 @@ really exist.
 DEFINE_DEVICE_TYPE(MRDRILR2_DECRYPTER, mrdrilr2_decrypter_device, "mrdrilr2_decrypter", "Mr Driller 2 decrypter")
 
 DEFINE_DEVICE_TYPE(NS10_TYPE2_DECRYPTER, ns10_type2_decrypter_device, "ns10_type2_decrypter", "Namco System 10 Type 2 decrypter")
+DEFINE_DEVICE_TYPE(NS10_TYPE2_DECRYPTER_NONLINEAR, ns10_type2_decrypter_nonlinear_device, "ns10_type2_decrypter_nonlinear", "Namco System 10 Type 2 decrypter (non-linear bit lookup table)")
 
 // base class
 
 ns10_decrypter_device::ns10_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_active(false)
 {
+}
+
+void ns10_decrypter_device::device_start()
+{
+	save_item(NAME(m_active));
+}
+
+void ns10_decrypter_device::device_reset()
+{
+	m_active = false;
 }
 
 void ns10_decrypter_device::activate(int iv)
@@ -157,9 +167,23 @@ const int ns10_type1_decrypter_device::INIT_SBOX[16]{U, U, U, 0, 4, 9, U, U, U, 
 
 ns10_type1_decrypter_device::ns10_type1_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: ns10_decrypter_device(mconfig, type, tag, owner, clock)
-	, m_mask(0)
-	, m_counter(0)
 {
+}
+
+void ns10_type1_decrypter_device::device_start()
+{
+	ns10_decrypter_device::device_start();
+
+	save_item(NAME(m_mask));
+	save_item(NAME(m_counter));
+}
+
+void ns10_type1_decrypter_device::device_reset()
+{
+	ns10_decrypter_device::device_reset();
+
+	m_mask = 0;
+	m_counter = 0;
 }
 
 uint16_t ns10_type1_decrypter_device::decrypt(uint16_t cipherword)
@@ -193,11 +217,6 @@ void ns10_type1_decrypter_device::init(int iv)
 	m_counter = 0;
 }
 
-void ns10_type1_decrypter_device::device_start()
-{
-	m_active = false;
-}
-
 mrdrilr2_decrypter_device::mrdrilr2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ns10_type1_decrypter_device(mconfig, MRDRILR2_DECRYPTER, tag, owner, clock)
 {
@@ -210,9 +229,6 @@ const int ns10_type2_decrypter_device::INIT_SBOX[16]{0, 12, 13, 6, 2, 4, 9, 8, 1
 
 ns10_type2_decrypter_device::ns10_type2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ns10_decrypter_device(mconfig, NS10_TYPE2_DECRYPTER, tag, owner, clock)
-	, m_mask(0)
-	, m_previous_cipherwords(0)
-	, m_previous_plainwords(0)
 {
 }
 
@@ -257,8 +273,100 @@ void ns10_type2_decrypter_device::init(int iv)
 
 void ns10_type2_decrypter_device::device_start()
 {
-	// If the logic isn't initialized then this will just fail
-	assert(m_logic_initialized == true);
+	ns10_decrypter_device::device_start();
 
-	m_active = false;
+	// If the logic isn't initialized then this will just fail, this is a programmer error
+	if (!m_logic_initialized)
+		fatalerror("ns10_type2_decrypter_device: Required logic data for decrypter device not initialized");
+
+	save_item(NAME(m_mask));
+	save_item(NAME(m_previous_cipherwords));
+	save_item(NAME(m_previous_plainwords));
+}
+
+void ns10_type2_decrypter_device::device_reset()
+{
+	ns10_decrypter_device::device_reset();
+
+	m_mask = 0;
+	m_previous_cipherwords = 0;
+	m_previous_plainwords = 0;
+}
+
+// type-2 decrypter with a table for the non-linear bits
+const int ns10_type2_decrypter_nonlinear_device::INIT_SBOX[16]{0, 12, 13, 6, 2, 4, 9, 8, 11, 1, 7, 15, 10, 5, 14, 3};
+
+ns10_type2_decrypter_nonlinear_device::ns10_type2_decrypter_nonlinear_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ns10_decrypter_device(mconfig, NS10_TYPE2_DECRYPTER_NONLINEAR, tag, owner, clock)
+	, m_nonlinear_region(*this, "nonlinear_table")
+{
+}
+
+ns10_type2_decrypter_nonlinear_device::ns10_type2_decrypter_nonlinear_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, ns10_crypto_logic &&logic)
+	: ns10_decrypter_device(mconfig, NS10_TYPE2_DECRYPTER_NONLINEAR, tag, owner, clock)
+	, m_nonlinear_region(*this, "nonlinear_table")
+	, m_logic(std::move(logic))
+{
+	m_logic_initialized = true;
+}
+
+uint16_t ns10_type2_decrypter_nonlinear_device::decrypt(uint16_t cipherword)
+{
+	uint16_t const plainword = cipherword ^ m_mask;
+
+	m_previous_cipherwords <<= 16;
+	m_previous_cipherwords ^= cipherword;
+	m_previous_plainwords <<= 16;
+	m_previous_plainwords ^= plainword;
+
+	m_mask = 0;
+	for (int j = 15; j >= 0; --j)
+	{
+		m_mask <<= 1;
+		m_mask ^= gf2_reduce(m_logic.eMask[j] & m_previous_cipherwords);
+		m_mask ^= gf2_reduce(m_logic.dMask[j] & m_previous_plainwords);
+	}
+	m_mask ^= m_logic.xMask;
+
+	uint8_t nonlinear_bit = BIT(m_nonlinear_region->base()[m_nonlinear_count / 8], 7 - (m_nonlinear_count % 8));
+	m_nonlinear_count++;
+	if (m_nonlinear_count >= m_nonlinear_region->bytes() * 8)
+		m_nonlinear_count = 0;
+	m_mask ^= m_logic.nonlinear_calculation(nonlinear_bit);
+
+	return plainword;
+}
+
+void ns10_type2_decrypter_nonlinear_device::init(int iv)
+{
+	if (m_logic.iv_calculation)
+		m_previous_cipherwords = m_logic.iv_calculation(iv);
+	else
+		m_previous_cipherwords = bitswap(INIT_SBOX[iv], 3, 16, 16, 2, 1, 16, 16, 0, 16, 16, 16, 16, 16, 16, 16, 16);
+	m_previous_plainwords = 0;
+	m_mask = 0;
+}
+
+void ns10_type2_decrypter_nonlinear_device::device_start()
+{
+	ns10_decrypter_device::device_start();
+
+	// If the logic isn't initialized then this will just fail, this is a programmer error
+	if (!m_logic_initialized)
+		fatalerror("ns10_type2_decrypter_nonlinear_device: Required logic data for decrypter device not initialized");
+
+	save_item(NAME(m_mask));
+	save_item(NAME(m_previous_cipherwords));
+	save_item(NAME(m_previous_plainwords));
+	save_item(NAME(m_nonlinear_count));
+}
+
+void ns10_type2_decrypter_nonlinear_device::device_reset()
+{
+	ns10_decrypter_device::device_reset();
+
+	m_mask = 0;
+	m_previous_cipherwords = 0;
+	m_previous_plainwords = 0;
+	m_nonlinear_count = 0;
 }

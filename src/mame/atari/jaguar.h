@@ -268,9 +268,9 @@ private:
 	TIMER_CALLBACK_MEMBER(pit_update);
 	TIMER_CALLBACK_MEMBER(gpu_sync);
 
-	DECLARE_WRITE_LINE_MEMBER( gpu_cpu_int );
-	DECLARE_WRITE_LINE_MEMBER( dsp_cpu_int );
-	DECLARE_WRITE_LINE_MEMBER( external_int );
+	void gpu_cpu_int(int state);
+	void dsp_cpu_int(int state);
+	void external_int(int state);
 
 	std::pair<std::error_condition, std::string> quickload_cb(snapshot_image_device &image);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
@@ -311,9 +311,9 @@ private:
 
 	/* from jagobj.cpp */
 	void jagobj_init();
-	uint32_t *process_bitmap(uint16_t *scanline, uint32_t *objdata, int vc, bool logit);
-	uint32_t *process_scaled_bitmap(uint16_t *scanline, uint32_t *objdata, int vc, bool logit);
-	uint32_t *process_branch(uint32_t *objdata, int vc, bool logit);
+	uint32_t *process_bitmap(uint16_t *scanline, uint32_t *objdata, int vc);
+	uint32_t *process_scaled_bitmap(uint16_t *scanline, uint32_t *objdata, int vc);
+	uint32_t *process_branch(uint32_t *objdata, int vc);
 	void process_object_list(int vc, uint16_t *_scanline);
 	void bitmap_4_draw(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint8_t flags, int32_t dxpos, uint16_t *clutbase);
 	void bitmap_4_0(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase);

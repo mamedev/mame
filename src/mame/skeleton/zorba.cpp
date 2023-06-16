@@ -341,13 +341,13 @@ void zorba_state::intmask_w(uint8_t data)
 	irq_w<5>(BIT(m_intmask & m_tx_rx_rdy, 4) | BIT(m_intmask & m_tx_rx_rdy, 5));
 }
 
-template <unsigned N> WRITE_LINE_MEMBER( zorba_state::tx_rx_rdy_w )
+template <unsigned N> void zorba_state::tx_rx_rdy_w(int state)
 {
 	m_tx_rx_rdy = (m_tx_rx_rdy & ~(1 << N)) | ((state ? 1 : 0) << N);
 	irq_w<(N >> 1) + 3>(BIT(m_intmask & m_tx_rx_rdy, N & ~1) | BIT(m_intmask & m_tx_rx_rdy, N | 1));
 }
 
-template <unsigned N> WRITE_LINE_MEMBER( zorba_state::irq_w )
+template <unsigned N> void zorba_state::irq_w(int state)
 {
 	m_irq = (m_irq & ~(1 << N)) | ((state ? 1 : 0) << N);
 
@@ -375,7 +375,7 @@ template <unsigned N> WRITE_LINE_MEMBER( zorba_state::irq_w )
 //  DMA controller handlers
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( zorba_state::busreq_w )
+void zorba_state::busreq_w(int state)
 {
 // since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
@@ -413,7 +413,7 @@ void zorba_state::io_write_byte(offs_t offset, uint8_t data)
 //  PIT handlers
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( zorba_state::br1_w )
+void zorba_state::br1_w(int state)
 {
 	// TODO: these can be jumpered to inputs from J2 so a modem can generate Baud rates
 	// TODO: receive clock is exposed on J2 for external devices without Baud rate generators
@@ -513,7 +513,7 @@ I8275_DRAW_CHARACTER_MEMBER( zorba_state::zorba_update_chr )
 //  Printer port glue
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( zorba_state::printer_fault_w )
+void zorba_state::printer_fault_w(int state)
 {
 	// connects to CB1 for Centronics
 	m_printer_fault = state;
@@ -521,7 +521,7 @@ WRITE_LINE_MEMBER( zorba_state::printer_fault_w )
 		m_pia0->cb1_w(state);
 }
 
-WRITE_LINE_MEMBER( zorba_state::printer_select_w )
+void zorba_state::printer_select_w(int state)
 {
 	// connects to CB1 for Prowriter
 	m_printer_select = state;

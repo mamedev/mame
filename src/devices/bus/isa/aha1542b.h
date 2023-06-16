@@ -41,8 +41,8 @@ public:
 
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
-	DECLARE_READ_LINE_MEMBER(host_int_r);
-	DECLARE_READ_LINE_MEMBER(scsi_rstreq_r);
+	int host_int_r();
+	int scsi_rstreq_r();
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;

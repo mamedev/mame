@@ -36,7 +36,7 @@ private:
 	output_finder<> m_contrast;
 	output_finder<6> m_led_outputs;
 
-	DECLARE_WRITE_LINE_MEMBER(render_w);
+	void render_w(int state);
 };
 
 DECLARE_DEVICE_TYPE(MULCD, mulcd_device)

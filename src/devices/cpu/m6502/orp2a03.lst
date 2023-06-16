@@ -2,15 +2,19 @@
 # copyright-holders:Olivier Galibert
 # rp2a03 opcodes - same as 6502 but with d disabled
 adc_nd_aba
-	TMP = read_pc();
-	TMP = set_h(TMP, read_pc());
+	TMP = read(PC);
+	PC++;
+	TMP = set_h(TMP, read(PC));
+	PC++;
 	TMP2 = read(TMP);
 	do_adc_nd(TMP2);
 	prefetch();
 
 adc_nd_abx
-	TMP = read_pc();
-	TMP = set_h(TMP, read_pc());
+	TMP = read(PC);
+	PC++;
+	TMP = set_h(TMP, read(PC));
+	PC++;
 	if(page_changing(TMP, X)) {
 		read(set_l(TMP, TMP+X));
 	}
@@ -20,8 +24,10 @@ adc_nd_abx
 	prefetch();
 
 adc_nd_aby
-	TMP = read_pc();
-	TMP = set_h(TMP, read_pc());
+	TMP = read(PC);
+	PC++;
+	TMP = set_h(TMP, read(PC));
+	PC++;
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
@@ -31,50 +37,61 @@ adc_nd_aby
 	prefetch();
 
 adc_nd_idx
-	TMP2 = read_pc();
+	TMP2 = read(PC);
+	PC++;
 	read(TMP2);
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
-	do_adc_nd(read(TMP));
+	TMP2 = read(TMP);
+	do_adc_nd(TMP2);
 	prefetch();
 
 adc_nd_idy
-	TMP2 = read_pc();
+	TMP2 = read(PC);
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
-	do_adc_nd(read(TMP+Y));
+	TMP2 = read(TMP+Y);
+	do_adc_nd(TMP2);
 	prefetch();
 
 adc_nd_imm
-	TMP = read_pc();
+	TMP = read(PC);
+	PC++;
 	do_adc_nd(TMP);
 	prefetch();
 
 adc_nd_zpg
-	TMP = read_pc();
+	TMP = read(PC);
+	PC++;
 	TMP2 = read(TMP);
 	do_adc_nd(TMP2);
 	prefetch();
 
 adc_nd_zpx
-	TMP = read_pc();
+	TMP = read(PC);
+	PC++;
 	read(TMP);
 	TMP2 = read(uint8_t(TMP+X));
 	do_adc_nd(TMP2);
 	prefetch();
 
 arr_nd_imm
-	A &= read_pc();
+	TMP = read(PC);
+	A &= TMP;
+	PC++;
 	do_arr_nd();
 	prefetch();
 
 rra_nd_aba
-	TMP = read_pc();
-	TMP = set_h(TMP, read_pc());
+	TMP = read(PC);
+	PC++;
+	TMP = set_h(TMP, read(PC));
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2 = do_ror(TMP2);
@@ -83,8 +100,10 @@ rra_nd_aba
 	prefetch();
 
 rra_nd_abx
-	TMP = read_pc();
-	TMP = set_h(TMP, read_pc());
+	TMP = read(PC);
+	PC++;
+	TMP = set_h(TMP, read(PC));
+	PC++;
 	read(set_l(TMP, TMP+X));
 	TMP += X;
 	TMP2 = read(TMP);
@@ -95,8 +114,10 @@ rra_nd_abx
 	prefetch();
 
 rra_nd_aby
-	TMP = read_pc();
-	TMP = set_h(TMP, read_pc());
+	TMP = read(PC);
+	PC++;
+	TMP = set_h(TMP, read(PC));
+	PC++;
 	read(set_l(TMP, TMP+Y));
 	TMP += Y;
 	TMP2 = read(TMP);
@@ -107,7 +128,8 @@ rra_nd_aby
 	prefetch();
 
 rra_nd_idx
-	TMP2 = read_pc();
+	TMP2 = read(PC);
+	PC++;
 	read(TMP2);
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
@@ -120,7 +142,8 @@ rra_nd_idx
 	prefetch();
 
 rra_nd_idy
-	TMP2 = read_pc();
+	TMP2 = read(PC);
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	read(set_l(TMP, TMP+Y));
@@ -133,7 +156,8 @@ rra_nd_idy
 	prefetch();
 
 rra_nd_zpg
-	TMP = read_pc();
+	TMP = read(PC);
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2 = do_ror(TMP2);
@@ -142,7 +166,8 @@ rra_nd_zpg
 	prefetch();
 
 rra_nd_zpx
-	TMP = read_pc();
+	TMP = read(PC);
+	PC++;
 	read(TMP);
 	TMP = uint8_t(TMP+X);
 	TMP2 = read(TMP);
@@ -153,15 +178,19 @@ rra_nd_zpx
 	prefetch();
 
 sbc_nd_aba
-	TMP = read_pc();
-	TMP = set_h(TMP, read_pc());
+	TMP = read(PC);
+	PC++;
+	TMP = set_h(TMP, read(PC));
+	PC++;
 	TMP2 = read(TMP);
 	do_sbc_nd(TMP2);
 	prefetch();
 
 sbc_nd_abx
-	TMP = read_pc();
-	TMP = set_h(TMP, read_pc());
+	TMP = read(PC);
+	PC++;
+	TMP = set_h(TMP, read(PC));
+	PC++;
 	if(page_changing(TMP, X)) {
 		read(set_l(TMP, TMP+X));
 	}
@@ -171,8 +200,10 @@ sbc_nd_abx
 	prefetch();
 
 sbc_nd_aby
-	TMP = read_pc();
-	TMP = set_h(TMP, read_pc());
+	TMP = read(PC);
+	PC++;
+	TMP = set_h(TMP, read(PC));
+	PC++;
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
@@ -182,45 +213,54 @@ sbc_nd_aby
 	prefetch();
 
 sbc_nd_idx
-	TMP2 = read_pc();
+	TMP2 = read(PC);
+	PC++;
 	read(TMP2);
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
-	do_sbc_nd(read(TMP));
+	TMP2 = read(TMP);
+	do_sbc_nd(TMP2);
 	prefetch();
 
 sbc_nd_idy
-	TMP2 = read_pc();
+	TMP2 = read(PC);
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
-	do_sbc_nd(read(TMP+Y));
+	TMP2 = read(TMP+Y);
+	do_sbc_nd(TMP2);
 	prefetch();
 
 sbc_nd_imm
-	TMP = read_pc();
+	TMP = read(PC);
+	PC++;
 	do_sbc_nd(TMP);
 	prefetch();
 
 sbc_nd_zpg
-	TMP = read_pc();
+	TMP = read(PC);
+	PC++;
 	TMP2 = read(TMP);
 	do_sbc_nd(TMP2);
 	prefetch();
 
 sbc_nd_zpx
-	TMP = read_pc();
+	TMP = read(PC);
+	PC++;
 	read(TMP);
 	TMP2 = read(uint8_t(TMP+X));
 	do_sbc_nd(TMP2);
 	prefetch();
 
 isb_nd_aba
-	TMP = read_pc();
-	TMP = set_h(TMP, read_pc());
+	TMP = read(PC);
+	PC++;
+	TMP = set_h(TMP, read(PC));
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2++;
@@ -229,8 +269,10 @@ isb_nd_aba
 	prefetch();
 
 isb_nd_abx
-	TMP = read_pc();
-	TMP = set_h(TMP, read_pc());
+	TMP = read(PC);
+	PC++;
+	TMP = set_h(TMP, read(PC));
+	PC++;
 	read(set_l(TMP, TMP+X));
 	TMP += X;
 	TMP2 = read(TMP);
@@ -241,8 +283,10 @@ isb_nd_abx
 	prefetch();
 
 isb_nd_aby
-	TMP = read_pc();
-	TMP = set_h(TMP, read_pc());
+	TMP = read(PC);
+	PC++;
+	TMP = set_h(TMP, read(PC));
+	PC++;
 	read(set_l(TMP, TMP+Y));
 	TMP += Y;
 	TMP2 = read(TMP);
@@ -253,7 +297,8 @@ isb_nd_aby
 	prefetch();
 
 isb_nd_idx
-	TMP2 = read_pc();
+	TMP2 = read(PC);
+	PC++;
 	read(TMP2);
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
@@ -266,7 +311,8 @@ isb_nd_idx
 	prefetch();
 
 isb_nd_idy
-	TMP2 = read_pc();
+	TMP2 = read(PC);
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	read(set_l(TMP, TMP+Y));
@@ -279,7 +325,8 @@ isb_nd_idy
 	prefetch();
 
 isb_nd_zpg
-	TMP = read_pc();
+	TMP = read(PC);
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2++;
@@ -288,7 +335,8 @@ isb_nd_zpg
 	prefetch();
 
 isb_nd_zpx
-	TMP = read_pc();
+	TMP = read(PC);
+	PC++;
 	read(TMP);
 	TMP = uint8_t(TMP+X);
 	TMP2 = read(TMP);

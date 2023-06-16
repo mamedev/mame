@@ -131,7 +131,7 @@ void kc_m011_device::write(offs_t offset, uint8_t data)
    MEI line write
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( kc_m011_device::mei_w )
+void kc_m011_device::mei_w(int state)
 {
 	m_mei = state;
 

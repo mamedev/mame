@@ -263,7 +263,7 @@ void xain_state::irqB_clear_w(uint8_t data)
 	m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-READ_LINE_MEMBER(xain_state::vblank_r)
+int xain_state::vblank_r()
 {
 	return m_vblank;
 }

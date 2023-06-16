@@ -58,7 +58,7 @@ ttl74148_device::ttl74148_device(const machine_config &mconfig, const char *tag,
 	, m_last_output_valid(0)
 	, m_last_enable_output(0)
 {
-	for (auto & elem : m_input_lines)
+	for (auto &elem : m_input_lines)
 		elem = 0;
 }
 

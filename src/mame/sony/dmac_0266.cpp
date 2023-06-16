@@ -18,7 +18,6 @@
 #include "emu.h"
 #include "dmac_0266.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_DATA    (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL)

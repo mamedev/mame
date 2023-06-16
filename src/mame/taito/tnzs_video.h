@@ -25,7 +25,7 @@ protected:
 
 	void prompalette(palette_device &palette) const;
 	uint32_t screen_update_tnzs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_tnzs);
+	void screen_vblank_tnzs(int state);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<x1_001_device> m_spritegen;

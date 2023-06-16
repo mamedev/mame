@@ -270,7 +270,7 @@ INTERRUPT_GEN_MEMBER(bzone_state::bzone_interrupt)
  *
  *************************************/
 
-READ_LINE_MEMBER(bzone_state::clock_r)
+int bzone_state::clock_r()
 {
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
 }

@@ -24,23 +24,23 @@
 DEFINE_DEVICE_TYPE(UPD7725,  upd7725_device,  "upd7725",  "NEC uPD7725")
 DEFINE_DEVICE_TYPE(UPD96050, upd96050_device, "upd96050", "NEC uPD96050")
 
-necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits)
-	: cpu_device(mconfig, type, tag, owner, clock),
-		m_program_config("program", ENDIANNESS_BIG, 32, abits, -2), // data bus width, address bus width, -2 means DWORD-addressable
-		m_data_config("data", ENDIANNESS_BIG, 16, dbits, -1), m_icount(0),   // -1 for WORD-addressable
-		m_irq(0),
-		m_irq_firing(0),
-		m_in_int_cb(*this),
-		//m_in_si_cb(*this),
-		//m_in_sck_cb(*this),
-		//m_in_sien_cb(*this),
-		//m_in_soen_cb(*this),
-		//m_in_dack_cb(*this),
-		m_out_p0_cb(*this),
-		m_out_p1_cb(*this)
-		//m_out_so_cb(*this),
-		//m_out_sorq_cb(*this),
-		//m_out_drq_cb(*this)
+necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits) :
+	cpu_device(mconfig, type, tag, owner, clock),
+	m_program_config("program", ENDIANNESS_BIG, 32, abits, -2), // data bus width, address bus width, -2 means DWORD-addressable
+	m_data_config("data", ENDIANNESS_BIG, 16, dbits, -1), m_icount(0),   // -1 for WORD-addressable
+	m_irq(0),
+	m_irq_firing(0),
+	m_in_int_cb(*this),
+	//m_in_si_cb(*this),
+	//m_in_sck_cb(*this),
+	//m_in_sien_cb(*this),
+	//m_in_soen_cb(*this),
+	//m_in_dack_cb(*this),
+	m_out_p0_cb(*this),
+	m_out_p1_cb(*this)
+	//m_out_so_cb(*this),
+	//m_out_sorq_cb(*this),
+	//m_out_drq_cb(*this)
 {
 }
 

@@ -18,7 +18,6 @@
 
 #include "screen.h"
 
-#define LOG_GENERAL      (1U << 0)
 #define LOG_CONTROL_REGS (1U << 1)
 #define LOG_GRAPHICS_OPS (1U << 2)
 

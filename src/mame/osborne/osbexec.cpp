@@ -125,13 +125,13 @@ private:
 	void osbexec_pia0_a_w(uint8_t data);
 	uint8_t osbexec_pia0_b_r();
 	void osbexec_pia0_b_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(osbexec_pia0_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(osbexec_pia0_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(modem_txclk_w);
-	DECLARE_WRITE_LINE_MEMBER(modem_rxclk_w);
-	DECLARE_WRITE_LINE_MEMBER(modem_dsr_w);
-	DECLARE_WRITE_LINE_MEMBER(modem_ri_w);
-	DECLARE_WRITE_LINE_MEMBER(comm_clk_a_w);
+	void osbexec_pia0_ca2_w(int state);
+	void osbexec_pia0_cb2_w(int state);
+	void modem_txclk_w(int state);
+	void modem_rxclk_w(int state);
+	void modem_dsr_w(int state);
+	void modem_ri_w(int state);
+	void comm_clk_a_w(int state);
 	void osbexec_io(address_map &map);
 	void osbexec_mem(address_map &map);
 };
@@ -391,33 +391,33 @@ void osbexec_state::osbexec_pia0_b_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(osbexec_state::osbexec_pia0_ca2_w)
+void osbexec_state::osbexec_pia0_ca2_w(int state)
 {
 	logerror("osbexec_pia0_ca2_w: state = %d\n", state);
 }
 
 
-WRITE_LINE_MEMBER(osbexec_state::osbexec_pia0_cb2_w)
+void osbexec_state::osbexec_pia0_cb2_w(int state)
 {
 	m_pia0_cb2 = state;
 }
 
 
-WRITE_LINE_MEMBER(osbexec_state::modem_txclk_w)
+void osbexec_state::modem_txclk_w(int state)
 {
 	if (BIT(m_pia0_portb, 5))
 		m_sio->txca_w(state);
 }
 
 
-WRITE_LINE_MEMBER(osbexec_state::modem_rxclk_w)
+void osbexec_state::modem_rxclk_w(int state)
 {
 	if (BIT(m_pia0_portb, 4))
 		m_sio->rxca_w(state);
 }
 
 
-WRITE_LINE_MEMBER(osbexec_state::modem_dsr_w)
+void osbexec_state::modem_dsr_w(int state)
 {
 	if (state)
 		m_pia0_portb |= 0x40;
@@ -426,7 +426,7 @@ WRITE_LINE_MEMBER(osbexec_state::modem_dsr_w)
 }
 
 
-WRITE_LINE_MEMBER(osbexec_state::modem_ri_w)
+void osbexec_state::modem_ri_w(int state)
 {
 	if (state)
 		m_pia0_portb |= 0x80;
@@ -435,7 +435,7 @@ WRITE_LINE_MEMBER(osbexec_state::modem_ri_w)
 }
 
 
-WRITE_LINE_MEMBER(osbexec_state::comm_clk_a_w)
+void osbexec_state::comm_clk_a_w(int state)
 {
 	if (!BIT(m_pia0_portb, 5))
 		m_sio->txca_w(state);

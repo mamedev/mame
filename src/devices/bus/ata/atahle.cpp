@@ -512,17 +512,17 @@ void ata_hle_device::finished_diagnostic()
 }
 
 
-WRITE_LINE_MEMBER( ata_hle_device::write_csel )
+void ata_hle_device::write_csel(int state)
 {
 	m_csel = state;
 }
 
-WRITE_LINE_MEMBER( ata_hle_device::write_dasp )
+void ata_hle_device::write_dasp(int state)
 {
 	m_daspin = state;
 }
 
-WRITE_LINE_MEMBER( ata_hle_device::write_dmack )
+void ata_hle_device::write_dmack(int state)
 {
 	if (state && !m_dmack && single_word_dma_mode() >= 0)
 		set_dmarq(CLEAR_LINE);
@@ -530,7 +530,7 @@ WRITE_LINE_MEMBER( ata_hle_device::write_dmack )
 	m_dmack = state;
 }
 
-WRITE_LINE_MEMBER( ata_hle_device::write_pdiag )
+void ata_hle_device::write_pdiag(int state)
 {
 	m_pdiagin = state;
 

@@ -33,7 +33,6 @@
 #include "i82586.h"
 #include "hashing.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_FRAMES  (1U << 1)
 #define LOG_FILTER  (1U << 2)
 #define LOG_CONFIG  (1U << 3)
@@ -214,7 +213,7 @@ device_memory_interface::space_config_vector i82586_base_device::memory_space_co
 	};
 }
 
-WRITE_LINE_MEMBER(i82586_base_device::ca)
+void i82586_base_device::ca(int state)
 {
 	LOG("channel attention %s (%s)\n", state ? "asserted" : "cleared", machine().describe_context());
 
@@ -228,7 +227,7 @@ WRITE_LINE_MEMBER(i82586_base_device::ca)
 	}
 }
 
-WRITE_LINE_MEMBER(i82586_base_device::reset_w)
+void i82586_base_device::reset_w(int state)
 {
 	LOG("reset %s (%s)\n", state ? "asserted" : "cleared", machine().describe_context());
 

@@ -16,11 +16,11 @@ public:
 
 	void write(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( st_w );
-	DECLARE_WRITE_LINE_MEMBER( ch2_w );
+	void st_w(int state);
+	void ch2_w(int state);
 
-	DECLARE_READ_LINE_MEMBER( busy_r );
-	DECLARE_READ_LINE_MEMBER( nar_r );
+	int busy_r();
+	int nar_r();
 
 protected:
 	okim6376_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits);
@@ -86,7 +86,7 @@ class okim6650_device : public okim6376_device
 public:
 	okim6650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER( cmd_w );
+	void cmd_w(int state);
 
 protected:
 	virtual offs_t get_start_position(int channel) override;

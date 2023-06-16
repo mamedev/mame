@@ -25,7 +25,6 @@
 #include "bus/rs232/rs232.h"
 #include "formats/ap_dsk35.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_IRQ     (1U << 1)
 
 #define VERBOSE (0)
@@ -354,7 +353,7 @@ u8 macio_device::via_in_b()
 	return read_pb3() << 3;
 }
 
-WRITE_LINE_MEMBER(macio_device::via_out_cb2)
+void macio_device::via_out_cb2(int state)
 {
 	write_cb2(state & 1);
 }
@@ -378,12 +377,12 @@ void macio_device::via_out_b(u8 data)
 	write_pb5(BIT(data, 5));
 }
 
-WRITE_LINE_MEMBER(macio_device::cb1_w)
+void macio_device::cb1_w(int state)
 {
 	m_via1->write_cb1(state);
 }
 
-WRITE_LINE_MEMBER(macio_device::cb2_w)
+void macio_device::cb2_w(int state)
 {
 	m_via1->write_cb2(state);
 }
@@ -576,7 +575,7 @@ void macio_device::recalc_irqs()
 	}
 }
 
-template<int bit> WRITE_LINE_MEMBER(macio_device::set_irq_line)
+template<int bit> void macio_device::set_irq_line(int state)
 {
 	if (bit < 32)
 	{

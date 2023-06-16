@@ -8,10 +8,13 @@
 
 #include "emu.h"
 #include "machine/dp8573.h"
+
 #include "machine/timehelp.h"
 
-#define LOG_GENERAL (1 << 0)
-#define LOG_TICKS   (1 << 1)
+#include <algorithm>
+#include <iterator>
+
+#define LOG_TICKS   (1U << 1)
 #define LOG_ALL     (LOG_GENERAL | LOG_TICKS)
 
 #define VERBOSE (0)
@@ -42,7 +45,7 @@ void dp8573_device::device_start()
 	m_intr_cb.resolve_safe();
 	m_mfo_cb.resolve_safe();
 
-	memset(m_ram, 0, 32);
+	std::fill(std::begin(m_ram), std::end(m_ram), 0);
 
 	m_tscr = 0;
 
@@ -217,7 +220,7 @@ void dp8573_device::clear_interrupt(uint8_t mask)
 
 void dp8573_device::write(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "%s: DP8573 - Register Write: %02x = %02x\n", machine().describe_context(), offset, data);
+	LOG("%s: DP8573 - Register Write: %02x = %02x\n", machine().describe_context(), offset, data);
 
 	switch (offset)
 	{
@@ -333,7 +336,7 @@ u8 dp8573_device::read(offs_t offset)
 		}
 	}
 
-	LOGMASKED(LOG_GENERAL, "%s: DP8573 - Register Read: %02x = %02x\n", machine().describe_context(), offset, ret);
+	LOG("%s: DP8573 - Register Read: %02x = %02x\n", machine().describe_context(), offset, ret);
 	return ret;
 }
 

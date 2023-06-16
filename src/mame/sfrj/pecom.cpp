@@ -60,11 +60,11 @@ private:
 	uint8_t keyboard_r();
 	void cdp1869_w(offs_t offset, uint8_t data);
 	TIMER_CALLBACK_MEMBER(reset_tick);
-	DECLARE_READ_LINE_MEMBER(clear_r);
-	DECLARE_READ_LINE_MEMBER(ef2_r);
-	DECLARE_WRITE_LINE_MEMBER(q_w);
+	int clear_r();
+	int ef2_r();
+	void q_w(int state);
 	void sc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(prd_w);
+	void prd_w(int state);
 	CDP1869_CHAR_RAM_READ_MEMBER(char_ram_r);
 	CDP1869_CHAR_RAM_WRITE_MEMBER(char_ram_w);
 	CDP1869_PCB_READ_MEMBER(pcb_r);
@@ -153,12 +153,12 @@ uint8_t pecom_state::keyboard_r()
 
 /* CDP1802 Interface */
 
-READ_LINE_MEMBER(pecom_state::clear_r)
+int pecom_state::clear_r()
 {
 	return m_reset;
 }
 
-READ_LINE_MEMBER(pecom_state::ef2_r)
+int pecom_state::ef2_r()
 {
 	bool shift = BIT(m_io_cnt->read(), 1);
 	double cas = false;//m_cassette->input();
@@ -166,7 +166,7 @@ READ_LINE_MEMBER(pecom_state::ef2_r)
 	return (cas < -0.02) | shift; // touching shift kills cassette load
 }
 
-WRITE_LINE_MEMBER(pecom_state::q_w)
+void pecom_state::q_w(int state)
 {
 	m_cassette->output(state ? -1.0 : +1.0);
 }
@@ -234,7 +234,7 @@ CDP1869_PCB_READ_MEMBER(pecom_state::pcb_r )
 	return BIT(pmd, 7);
 }
 
-WRITE_LINE_MEMBER(pecom_state::prd_w)
+void pecom_state::prd_w(int state)
 {
 	// every other PRD triggers a DMAOUT request
 	if (m_dma)

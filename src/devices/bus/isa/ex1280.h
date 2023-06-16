@@ -39,7 +39,7 @@ protected:
 	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t regs_r(offs_t offset, uint16_t mem_mask = ~0);
 	void regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 
 	required_device<tms34010_device> m_cpu;
 	required_device<bt451_device> m_ramdac;

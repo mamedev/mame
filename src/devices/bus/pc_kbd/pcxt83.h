@@ -40,16 +40,16 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// device_pc_kbd_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( clock_write ) override;
-	virtual DECLARE_WRITE_LINE_MEMBER( data_write ) override;
+	virtual void clock_write(int state) override;
+	virtual void data_write(int state) override;
 
 private:
 	uint8_t bus_r();
 	void bus_w(uint8_t data);
 	void p1_w(uint8_t data);
 	void p2_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( t0_r );
-	DECLARE_READ_LINE_MEMBER( t1_r );
+	int t0_r();
+	int t1_r();
 
 	required_device<i8048_device> m_maincpu;
 	required_ioport_array<12> m_md;

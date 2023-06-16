@@ -128,7 +128,7 @@ public:
 	void init_kungfu();
 	void init_kungfua();
 
-	DECLARE_READ_LINE_MEMBER(hopper_r);
+	int hopper_r();
 
 protected:
 	virtual void machine_start() override { m_led.resolve(); m_lamps.resolve(); }
@@ -397,7 +397,7 @@ void igspoker_state::custom_io_w(uint8_t data)
 	}
 }
 
-READ_LINE_MEMBER(igspoker_state::hopper_r)
+int igspoker_state::hopper_r()
 {
 	if (m_hopper) return !(m_screen->frame_number()%10);
 	return machine().input().code_pressed(KEYCODE_H);

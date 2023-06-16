@@ -3112,7 +3112,7 @@ uint32_t cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-WRITE_LINE_MEMBER(cps_state::screen_vblank_cps1)
+void cps_state::screen_vblank_cps1(int state)
 {
 	// rising edge
 	if (state)

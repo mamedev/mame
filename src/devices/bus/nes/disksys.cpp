@@ -24,12 +24,11 @@
 #include "speaker.h"
 
 #ifdef NES_PCB_DEBUG
-	#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-	#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-----------------------------------------------
@@ -184,7 +183,7 @@ void nes_disksys_device::pcb_reset()
 
 void nes_disksys_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("Famicom Disk System write_h, offset %04x, data: %02x\n", offset, data));
+	LOG("Famicom Disk System write_h, offset %04x, data: %02x\n", offset, data);
 
 	if (offset < 0x6000)
 		m_prgram[offset + 0x2000] = data;
@@ -192,7 +191,7 @@ void nes_disksys_device::write_h(offs_t offset, uint8_t data)
 
 uint8_t nes_disksys_device::read_h(offs_t offset)
 {
-	LOG_MMC(("Famicom Disk System read_h, offset: %04x\n", offset));
+	LOG("Famicom Disk System read_h, offset: %04x\n", offset);
 
 	if (offset < 0x6000)
 		return m_prgram[offset + 0x2000];
@@ -202,13 +201,13 @@ uint8_t nes_disksys_device::read_h(offs_t offset)
 
 void nes_disksys_device::write_m(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("Famicom Disk System write_m, offset: %04x, data: %02x\n", offset, data));
+	LOG("Famicom Disk System write_m, offset: %04x, data: %02x\n", offset, data);
 	m_prgram[offset] = data;
 }
 
 uint8_t nes_disksys_device::read_m(offs_t offset)
 {
-	LOG_MMC(("Famicom Disk System read_m, offset: %04x\n", offset));
+	LOG("Famicom Disk System read_m, offset: %04x\n", offset);
 	return m_prgram[offset];
 }
 
@@ -224,7 +223,7 @@ void nes_disksys_device::hblank_irq(int scanline, bool vblank, bool blanked)
 
 void nes_disksys_device::write_ex(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("Famicom Disk System write_ex, offset: %04x, data: %02x\n", offset, data));
+	LOG("Famicom Disk System write_ex, offset: %04x, data: %02x\n", offset, data);
 
 	if (offset >= 0x20 && offset < 0x60)
 	{
@@ -317,7 +316,7 @@ void nes_disksys_device::write_ex(offs_t offset, uint8_t data)
 
 uint8_t nes_disksys_device::read_ex(offs_t offset)
 {
-	LOG_MMC(("Famicom Disk System read_ex, offset: %04x\n", offset));
+	LOG("Famicom Disk System read_ex, offset: %04x\n", offset);
 	uint8_t ret = 0x00;
 
 	if (offset >= 0x20 && offset < 0x60)

@@ -65,7 +65,6 @@
 
 #define SWITCH_CONFIG_TAG   "switch"
 
-//#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
 #define LOG_CART   (1U << 1) // shows cart line changes
 #define LOG_SWITCH (1U << 2) // shows switch changes
 //#define VERBOSE (LOG_CART|LOG_SWITCH)

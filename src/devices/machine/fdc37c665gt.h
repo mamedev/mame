@@ -48,36 +48,36 @@ public:
 	auto nrts2() { return m_nrts2_callback.bind(); }
 
 	// chip pins for uarts
-	DECLARE_WRITE_LINE_MEMBER(rxd1_w);
-	DECLARE_WRITE_LINE_MEMBER(ndcd1_w);
-	DECLARE_WRITE_LINE_MEMBER(ndsr1_w);
-	DECLARE_WRITE_LINE_MEMBER(nri1_w);
-	DECLARE_WRITE_LINE_MEMBER(ncts1_w);
-	DECLARE_WRITE_LINE_MEMBER(rxd2_w);
-	DECLARE_WRITE_LINE_MEMBER(ndcd2_w);
-	DECLARE_WRITE_LINE_MEMBER(ndsr2_w);
-	DECLARE_WRITE_LINE_MEMBER(nri2_w);
-	DECLARE_WRITE_LINE_MEMBER(ncts2_w);
+	void rxd1_w(int state);
+	void ndcd1_w(int state);
+	void ndsr1_w(int state);
+	void nri1_w(int state);
+	void ncts1_w(int state);
+	void rxd2_w(int state);
+	void ndcd2_w(int state);
+	void ndsr2_w(int state);
+	void nri2_w(int state);
+	void ncts2_w(int state);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
 	// for the internal floppy controller
-	DECLARE_WRITE_LINE_MEMBER(irq_floppy_w);
+	void irq_floppy_w(int state);
 
 	// for the internal parallel port
-	DECLARE_WRITE_LINE_MEMBER(irq_parallel_w);
+	void irq_parallel_w(int state);
 
 	// for the internal uarts
-	DECLARE_WRITE_LINE_MEMBER(irq_serial1_w);
-	DECLARE_WRITE_LINE_MEMBER(txd_serial1_w);
-	DECLARE_WRITE_LINE_MEMBER(dtr_serial1_w);
-	DECLARE_WRITE_LINE_MEMBER(rts_serial1_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_serial2_w);
-	DECLARE_WRITE_LINE_MEMBER(txd_serial2_w);
-	DECLARE_WRITE_LINE_MEMBER(dtr_serial2_w);
-	DECLARE_WRITE_LINE_MEMBER(rts_serial2_w);
+	void irq_serial1_w(int state);
+	void txd_serial1_w(int state);
+	void dtr_serial1_w(int state);
+	void rts_serial1_w(int state);
+	void irq_serial2_w(int state);
+	void txd_serial2_w(int state);
+	void dtr_serial2_w(int state);
+	void rts_serial2_w(int state);
 
 private:
 	// put your private members here

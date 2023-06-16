@@ -240,13 +240,13 @@ private:
 	void lamp_data_w(uint8_t data);
 	uint8_t kbd_r();
 	uint32_t screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_maygayv1);
+	void screen_vblank_maygayv1(int state);
 	uint8_t sound_p1_r();
 	void sound_p1_w(uint8_t data);
 	uint8_t sound_p3_r();
 	void sound_p3_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(duart_txa);
+	void duart_irq_handler(int state);
+	void duart_txa(int state);
 	void main_map(address_map &map);
 	void cpu_space_map(address_map &map);
 
@@ -448,7 +448,7 @@ uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE_LINE_MEMBER(maygayv1_state::screen_vblank_maygayv1)
+void maygayv1_state::screen_vblank_maygayv1(int state)
 {
 	// rising edge
 	if (state)
@@ -798,13 +798,13 @@ void maygayv1_state::cpu_space_map(address_map &map)
 	map(0xfffffa, 0xfffffb).lr16(NAME([this] () -> u16 { return m_duart68681->get_irq_vector(); }));
 }
 
-WRITE_LINE_MEMBER(maygayv1_state::duart_irq_handler)
+void maygayv1_state::duart_irq_handler(int state)
 {
 	m_maincpu->set_input_line(5, state);
 }
 
 
-WRITE_LINE_MEMBER(maygayv1_state::duart_txa)
+void maygayv1_state::duart_txa(int state)
 {
 	if (state)
 		m_p3 |= 1;

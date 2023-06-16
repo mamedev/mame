@@ -21,13 +21,13 @@
 #include "emu.h"
 #include "bq4847.h"
 
-#define LOG_WARN         (1U<<1)    // Warnings
-#define LOG_CLOCK        (1U<<2)    // Clock operation
-#define LOG_REG          (1U<<3)    // Register write
-#define LOG_WATCHDOG     (1U<<4)    // Watchdog
-#define LOG_TRANSFER     (1U<<5)    // Transfer
+#define LOG_WARN         (1U << 1)    // Warnings
+#define LOG_CLOCK        (1U << 2)    // Clock operation
+#define LOG_REG          (1U << 3)    // Register write
+#define LOG_WATCHDOG     (1U << 4)    // Watchdog
+#define LOG_TRANSFER     (1U << 5)    // Transfer
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 #include "logmacro.h"
 
 // device type definition
@@ -405,7 +405,7 @@ void bq4847_device::set_wdo(int state)
 	}
 }
 
-WRITE_LINE_MEMBER(bq4847_device::write_wdi)
+void bq4847_device::write_wdi(int state)
 {
 	if (m_wdi_state != state)
 	{

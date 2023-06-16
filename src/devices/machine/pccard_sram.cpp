@@ -10,7 +10,6 @@
 #include "pccard_sram.h"
 #include "machine/nvram.h"
 
-//#define LOG_GENERAL (1U << 0)
 #define LOG_ATTRIBUTE (1U << 1)
 
 #define VERBOSE (LOG_GENERAL | LOG_ATTRIBUTE)

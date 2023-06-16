@@ -27,6 +27,15 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	auto read_port1()  { return m_read_port [PORT_1].bind(); }
+	auto write_port1() { return m_write_port[PORT_1].bind(); }
+	auto read_port2()  { return m_read_port [PORT_2].bind(); }
+	auto write_port2() { return m_write_port[PORT_2].bind(); }
+	auto read_port3()  { return m_read_port [PORT_3].bind(); }
+	auto write_port3() { return m_write_port[PORT_3].bind(); }
+	auto read_port4()  { return m_read_port [PORT_4].bind(); }
+	auto write_port4() { return m_write_port[PORT_4].bind(); }
+
 	void uart_rate_w(uint8_t data);
 	void uart_control_w(offs_t offset, uint8_t data);
 	uint8_t uart_control_r(offs_t offset);
@@ -79,7 +88,7 @@ protected:
 
 	required_memory_region        m_rom;
 
-	address_space_config data_config;
+	address_space_config m_data_config;
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::specific m_data;
 	uint16_t m_banknum;
 	uint8_t m_syscr;
@@ -94,9 +103,6 @@ protected:
 
 	/* misc. I/O (timers, ADCs) */
 	required_device<gt913_io_hle_device> m_io_hle;
-
-	/* serial port */
-	required_device_array<h8_sci_device, 2> m_sci;
 
 	/* 3x 8-bit I/O ports */
 	required_device_array<h8_port_device, 3> m_port;

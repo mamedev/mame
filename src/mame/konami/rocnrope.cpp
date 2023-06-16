@@ -66,15 +66,15 @@ private:
 	uint8_t m_irq_mask = 0;
 
 	void interrupt_vector_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
+	void irq_mask_w(int state);
+	template <uint8_t Which> void coin_counter_w(int state);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void main_map(address_map &map);
 };
@@ -221,7 +221,7 @@ void rocnrope_state::interrupt_vector_w(offs_t offset, uint8_t data)
 	m_vectors[offset] = data;
 }
 
-WRITE_LINE_MEMBER(rocnrope_state::irq_mask_w)
+void rocnrope_state::irq_mask_w(int state)
 {
 	m_irq_mask = state;
 	if (!m_irq_mask)
@@ -229,7 +229,7 @@ WRITE_LINE_MEMBER(rocnrope_state::irq_mask_w)
 }
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(rocnrope_state::coin_counter_w)
+void rocnrope_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);
 }
@@ -384,7 +384,7 @@ GFXDECODE_END
  *
  *************************************/
 
-WRITE_LINE_MEMBER(rocnrope_state::vblank_irq)
+void rocnrope_state::vblank_irq(int state)
 {
 	if (state && m_irq_mask)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);

@@ -123,7 +123,7 @@ public:
 			m_screen(*this, "screen")
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
+	void write_monochrome(int state);
 
 	void st(machine_config &config);
 
@@ -148,7 +148,7 @@ protected:
 
 	void psg_pa_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
+	void reset_w(int state);
 
 	static void floppy_formats(format_registration &fr);
 
@@ -203,7 +203,7 @@ public:
 	uint16_t microwire_mask_r();
 	void microwire_mask_w(uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
+	void write_monochrome(int state);
 
 	void dmasound_set_state(int level);
 	TIMER_CALLBACK_MEMBER(dmasound_tick);
@@ -299,15 +299,18 @@ void st_state::fpu_w(uint16_t data)
 {
 }
 
-WRITE_LINE_MEMBER( st_state::write_monochrome )
+void st_state::write_monochrome(int state)
 {
 	m_monochrome = state;
 	m_mfp->i7_w(m_monochrome);
 }
 
-WRITE_LINE_MEMBER( st_state::reset_w )
+void st_state::reset_w(int state)
 {
-	m_video->reset();
+	if (m_video.found())
+		m_video->reset();
+	if (m_videox.found())
+		m_videox->reset();
 	if (m_stb.found())
 		m_stb->reset();
 	m_mfp->reset();
@@ -345,7 +348,7 @@ void ste_state::dmasound_set_state(int level)
 }
 
 
-WRITE_LINE_MEMBER( ste_state::write_monochrome )
+void ste_state::write_monochrome(int state)
 {
 	m_monochrome = state;
 	m_mfp->i7_w(m_monochrome ^ m_dmasnd_active);

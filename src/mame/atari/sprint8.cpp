@@ -76,8 +76,8 @@ private:
 	uint8_t collision_r();
 	uint8_t input_r(offs_t offset);
 	void lockout_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(int_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(team_w);
+	void int_reset_w(int state);
+	void team_w(int state);
 	void video_ram_w(offs_t offset, uint8_t data);
 
 	void palette(palette_device &palette) const;
@@ -85,7 +85,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	TIMER_CALLBACK_MEMBER(collision_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(input_callback);
 
@@ -249,7 +249,7 @@ uint32_t sprint8_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-WRITE_LINE_MEMBER(sprint8_state::screen_vblank)
+void sprint8_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
@@ -335,7 +335,7 @@ void sprint8_state::lockout_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(sprint8_state::int_reset_w)
+void sprint8_state::int_reset_w(int state)
 {
 	m_collision_reset = !state;
 
@@ -343,7 +343,7 @@ WRITE_LINE_MEMBER(sprint8_state::int_reset_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(sprint8_state::team_w)
+void sprint8_state::team_w(int state)
 {
 	m_team = state;
 }

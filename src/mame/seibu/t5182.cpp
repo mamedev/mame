@@ -234,7 +234,7 @@ void t5182_device::cpu_irq_ack_w(uint8_t data)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(t5182_device::setirq_callback), this), CPU_CLEAR);
 }
 
-WRITE_LINE_MEMBER(t5182_device::ym2151_irq_handler)
+void t5182_device::ym2151_irq_handler(int state)
 {
 	if (state)
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(t5182_device::setirq_callback), this), YM2151_ASSERT);

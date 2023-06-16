@@ -84,7 +84,7 @@ private:
 	void rotate_control_w(offs_t offset, u16 data);
 	void motor_control_w(u8 data);
 	void cbombers_cpua_ctrl_w(u32 data);
-	DECLARE_READ_LINE_MEMBER(frame_counter_r);
+	int frame_counter_r();
 	u32 screen_update_undrfire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_cbombers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(undrfire_interrupt);

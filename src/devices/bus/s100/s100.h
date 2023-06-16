@@ -163,23 +163,23 @@ public:
 	uint8_t sinp_r(offs_t offset);
 	void sout_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
-	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
-	DECLARE_WRITE_LINE_MEMBER( vi0_w ) { m_write_vi0(state); }
-	DECLARE_WRITE_LINE_MEMBER( vi1_w ) { m_write_vi1(state); }
-	DECLARE_WRITE_LINE_MEMBER( vi2_w ) { m_write_vi2(state); }
-	DECLARE_WRITE_LINE_MEMBER( vi3_w ) { m_write_vi3(state); }
-	DECLARE_WRITE_LINE_MEMBER( vi4_w ) { m_write_vi4(state); }
-	DECLARE_WRITE_LINE_MEMBER( vi5_w ) { m_write_vi5(state); }
-	DECLARE_WRITE_LINE_MEMBER( vi6_w ) { m_write_vi6(state); }
-	DECLARE_WRITE_LINE_MEMBER( vi7_w ) { m_write_vi7(state); }
-	DECLARE_WRITE_LINE_MEMBER( dma0_w ) { m_write_dma0(state); }
-	DECLARE_WRITE_LINE_MEMBER( dma1_w ) { m_write_dma1(state); }
-	DECLARE_WRITE_LINE_MEMBER( dma2_w ) { m_write_dma2(state); }
-	DECLARE_WRITE_LINE_MEMBER( dma3_w ) { m_write_dma3(state); }
-	DECLARE_WRITE_LINE_MEMBER( rdy_w ) { m_write_rdy(state); }
-	DECLARE_WRITE_LINE_MEMBER( hold_w ) { m_write_hold(state); }
-	DECLARE_WRITE_LINE_MEMBER( error_w ) { m_write_error(state); }
+	void irq_w(int state) { m_write_irq(state); }
+	void nmi_w(int state) { m_write_nmi(state); }
+	void vi0_w(int state) { m_write_vi0(state); }
+	void vi1_w(int state) { m_write_vi1(state); }
+	void vi2_w(int state) { m_write_vi2(state); }
+	void vi3_w(int state) { m_write_vi3(state); }
+	void vi4_w(int state) { m_write_vi4(state); }
+	void vi5_w(int state) { m_write_vi5(state); }
+	void vi6_w(int state) { m_write_vi6(state); }
+	void vi7_w(int state) { m_write_vi7(state); }
+	void dma0_w(int state) { m_write_dma0(state); }
+	void dma1_w(int state) { m_write_dma1(state); }
+	void dma2_w(int state) { m_write_dma2(state); }
+	void dma3_w(int state) { m_write_dma3(state); }
+	void rdy_w(int state) { m_write_rdy(state); }
+	void hold_w(int state) { m_write_hold(state); }
+	void error_w(int state) { m_write_error(state); }
 
 protected:
 	// device_t implementation

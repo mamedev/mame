@@ -46,23 +46,23 @@ public:
 	required_device<atirage_device> m_atirage;
 
 private:
-	u32 m_sense;
+	u16 m_sense;
 
 	void pwrmacg3_map(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	u32 read_sense();
-	void write_sense(u32 data);
+	u16 read_sense();
+	void write_sense(u16 data);
 
-	WRITE_LINE_MEMBER(cuda_reset_w)
+	void cuda_reset_w(int state)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 	}
 
-	WRITE_LINE_MEMBER(irq_w)
+	void irq_w(int state)
 	{
 		m_maincpu->set_input_line(PPC_IRQ, state);
 	}
@@ -127,13 +127,13 @@ void pwrmacg3_state::pwrmacg3_map(address_map &map)
 	map.unmap_value_high();
 }
 
-u32 pwrmacg3_state::read_sense()
+u16 pwrmacg3_state::read_sense()
 {
 	// ID as a 640x480 13" for now
-	return (m_sense & 0xffff00ff) | (6 << 8);
+	return (6 << 8);
 }
 
-void pwrmacg3_state::write_sense(u32 data)
+void pwrmacg3_state::write_sense(u16 data)
 {
 	m_sense = data;
 }

@@ -160,7 +160,7 @@ REF. 970429
 #define LOG             0
 
 
-WRITE_LINE_MEMBER(gaelco3d_state::ser_irq)
+void gaelco3d_state::ser_irq(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(6, ASSERT_LINE);
@@ -307,13 +307,13 @@ void gaelco3d_state::sound_status_w(uint16_t data)
  *************************************/
 
 template <int N>
-READ_LINE_MEMBER(gaelco3d_state::analog_bit_r)
+int gaelco3d_state::analog_bit_r()
 {
 	return (m_analog_ports[N] >> 7) & 0x01;
 }
 
 
-WRITE_LINE_MEMBER(gaelco3d_state::analog_port_clock_w)
+void gaelco3d_state::analog_port_clock_w(int state)
 {
 	// A zero/one combo is written here to clock the next analog port bit
 	if (!state)
@@ -326,7 +326,7 @@ WRITE_LINE_MEMBER(gaelco3d_state::analog_port_clock_w)
 }
 
 
-WRITE_LINE_MEMBER(gaelco3d_state::analog_port_latch_w)
+void gaelco3d_state::analog_port_latch_w(int state)
 {
 	// A zero is written here to read the analog ports, and a one is written when finished
 	if (!state)
@@ -339,12 +339,12 @@ WRITE_LINE_MEMBER(gaelco3d_state::analog_port_latch_w)
 }
 
 template <int N>
-READ_LINE_MEMBER(gaelco3d_state::fp_analog_bit_r)
+int gaelco3d_state::fp_analog_bit_r()
 {
 	return (m_fp_analog_ports[N] >> m_fp_clock) & 1;
 }
 
-WRITE_LINE_MEMBER(gaelco3d_state::fp_analog_clock_w)
+void gaelco3d_state::fp_analog_clock_w(int state)
 {
 	if (state != m_fp_state)
 	{
@@ -414,7 +414,7 @@ void gaelco3d_state::tms_iack_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(gaelco3d_state::tms_reset_w)
+void gaelco3d_state::tms_reset_w(int state)
 {
 	/* this is set to 0 while data is uploaded, then set to $ffff after it is done.
 	   It does not ever appear to be touched after that */
@@ -424,7 +424,7 @@ WRITE_LINE_MEMBER(gaelco3d_state::tms_reset_w)
 }
 
 
-WRITE_LINE_MEMBER(gaelco3d_state::tms_irq_w)
+void gaelco3d_state::tms_irq_w(int state)
 {
 	/* This is written twice, 0,1, in quick succession.
 	   Done after uploading, and after modifying the comm area */
@@ -434,7 +434,7 @@ WRITE_LINE_MEMBER(gaelco3d_state::tms_irq_w)
 }
 
 
-WRITE_LINE_MEMBER(gaelco3d_state::tms_control3_w)
+void gaelco3d_state::tms_control3_w(int state)
 {
 	if (LOG)
 		logerror("%06X:tms_control3_w = %d\n", m_maincpu->pc(), state);
@@ -641,19 +641,19 @@ void gaelco3d_state::adsp_tx_callback(offs_t offset, uint32_t data)
  *************************************/
 
 
-WRITE_LINE_MEMBER(gaelco3d_state::radikalb_lamp_w)
+void gaelco3d_state::radikalb_lamp_w(int state)
 {
 	// Arbitrary data written
 	logerror("%06X:unknown_127_w = %d\n", m_maincpu->pc(), state);
 }
 
-WRITE_LINE_MEMBER(gaelco3d_state::unknown_137_w)
+void gaelco3d_state::unknown_137_w(int state)
 {
 	// Only written $00 or $ff
 	logerror("%06X:unknown_137_w = %d\n", m_maincpu->pc(), state);
 }
 
-WRITE_LINE_MEMBER(gaelco3d_state::unknown_13a_w)
+void gaelco3d_state::unknown_13a_w(int state)
 {
 	// Only written $0000 or $0001
 	logerror("%06X:unknown_13a_w = %04X\n", m_maincpu->pc(), state);

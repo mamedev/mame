@@ -11,7 +11,11 @@
 
 #include <functional>
 
-//#define LOG_AUDIO
+#define LOG_AUDIO (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 /*
  * Host
@@ -355,7 +359,7 @@ void mcpx_isalpc_device::boot_state_w(uint8_t data)
 		m_boot_state_hook((offs_t)0, data);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::interrupt_ouptut_changed)
+void mcpx_isalpc_device::interrupt_ouptut_changed(int state)
 {
 	m_interrupt_output(state);
 }
@@ -367,49 +371,49 @@ uint8_t mcpx_isalpc_device::get_slave_ack(offs_t offset)
 	return 0x00;
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::pit8254_out0_changed)
+void mcpx_isalpc_device::pit8254_out0_changed(int state)
 {
 	pic8259_1->ir0_w(state);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::pit8254_out1_changed)
+void mcpx_isalpc_device::pit8254_out1_changed(int state)
 {
 	if (state)
 		m_refresh = !m_refresh;
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::pit8254_out2_changed)
+void mcpx_isalpc_device::pit8254_out2_changed(int state)
 {
 	m_pit_out2 = state ? 1 : 0;
 	//xbox_speaker_set_input(m_at_spkrdata & m_pit_out2);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::irq1)
+void mcpx_isalpc_device::irq1(int state)
 {
 	pic8259_1->ir1_w(state);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::irq3)
+void mcpx_isalpc_device::irq3(int state)
 {
 	pic8259_1->ir3_w(state);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::irq10)
+void mcpx_isalpc_device::irq10(int state)
 {
 	pic8259_2->ir2_w(state);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::irq11)
+void mcpx_isalpc_device::irq11(int state)
 {
 	pic8259_2->ir3_w(state);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::irq14)
+void mcpx_isalpc_device::irq14(int state)
 {
 	pic8259_2->ir6_w(state);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::irq15)
+void mcpx_isalpc_device::irq15(int state)
 {
 	pic8259_2->ir7_w(state);
 }
@@ -1109,9 +1113,7 @@ TIMER_CALLBACK_MEMBER(mcpx_apu_device::audio_update)
 
 uint32_t mcpx_apu_device::apu_r(offs_t offset, uint32_t mem_mask)
 {
-#ifdef LOG_AUDIO
-	logerror("Audio_APU: read from %08X mask %08X\n", 0xfe800000 + offset * 4, mem_mask);
-#endif
+	LOGMASKED(LOG_AUDIO, "Audio_APU: read from %08X mask %08X\n", 0xfe800000 + offset * 4, mem_mask);
 	if (offset == 0x20010 / 4) // some kind of internal counter or state value
 		return 0x20 + 4 + 8 + 0x48 + 0x80;
 	return apust.memory[offset];
@@ -1121,9 +1123,7 @@ void mcpx_apu_device::apu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t v;
 
-#ifdef LOG_AUDIO
-	logerror("Audio_APU: write at %08X mask %08X value %08X\n", 0xfe800000 + offset * 4, mem_mask, data);
-#endif
+	LOGMASKED(LOG_AUDIO, "Audio_APU: write at %08X mask %08X value %08X\n", 0xfe800000 + offset * 4, mem_mask, data);
 	apust.memory[offset] = data;
 	if (offset == 0x02040 / 4) // address of memory area with scatter-gather info (gpdsp scratch dma)
 		apust.gpdsp_sgaddress = data;
@@ -1288,9 +1288,7 @@ uint32_t mcpx_ac97_audio_device::ac97_audio_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 
-#ifdef LOG_AUDIO
-	logerror("Audio_AC3: read from %08X mask %08X\n", 0xfec00000 + offset * 4, mem_mask);
-#endif
+	LOGMASKED(LOG_AUDIO, "Audio_AC3: read from %08X mask %08X\n", 0xfec00000 + offset * 4, mem_mask);
 	if (offset < 0x80 / 4)
 	{
 		ret = ac97st.mixer_regs[offset];
@@ -1317,9 +1315,7 @@ uint32_t mcpx_ac97_audio_device::ac97_audio_r(offs_t offset, uint32_t mem_mask)
 
 void mcpx_ac97_audio_device::ac97_audio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-#ifdef LOG_AUDIO
-	logerror("Audio_AC3: write at %08X mask %08X value %08X\n", 0xfec00000 + offset * 4, mem_mask, data);
-#endif
+	LOGMASKED(LOG_AUDIO, "Audio_AC3: write at %08X mask %08X value %08X\n", 0xfec00000 + offset * 4, mem_mask, data);
 	if (offset < 0x80 / 4)
 	{
 		COMBINE_DATA(ac97st.mixer_regs + offset);
@@ -1524,12 +1520,12 @@ void mcpx_ide_device::sec_write_cs1_w(uint8_t data)
 	m_sec->write_cs1(1, data << 16, 0xff0000);
 }
 
-WRITE_LINE_MEMBER(mcpx_ide_device::ide_pri_interrupt)
+void mcpx_ide_device::ide_pri_interrupt(int state)
 {
 	m_pri_interrupt_handler(state);
 }
 
-WRITE_LINE_MEMBER(mcpx_ide_device::ide_sec_interrupt)
+void mcpx_ide_device::ide_sec_interrupt(int state)
 {
 	m_sec_interrupt_handler(state);
 }

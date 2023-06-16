@@ -89,13 +89,13 @@ private:
 	required_device<palette_device> m_palette;
 
 	void bankswitch_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ym_reset_w);
+	void ym_reset_w(int state);
 	uint8_t diamond_hack_r();
 	void fgvideoram_w(offs_t offset, uint8_t data);
 	void bgvideoram_w(offs_t offset, uint8_t data);
 	void bgscrollx_w(offs_t offset, uint8_t data);
 	void bgscrolly_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	void flipscreen_w(int state);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -190,7 +190,7 @@ void gng_state::bgscrolly_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(gng_state::flipscreen_w)
+void gng_state::flipscreen_w(int state)
 {
 	flip_screen_set(!state);
 }
@@ -252,7 +252,7 @@ void gng_state::bankswitch_w(uint8_t data)
 		m_mainbank->set_entry(data & 0x03);
 }
 
-WRITE_LINE_MEMBER(gng_state::ym_reset_w)
+void gng_state::ym_reset_w(int state)
 {
 	if (!state)
 	{

@@ -2387,7 +2387,7 @@ MACHINE_RESET_MEMBER(naomi_state,naomi)
 	naomi_state::machine_reset();
 }
 
-WRITE_LINE_MEMBER(naomi_state::external_reset)
+void naomi_state::external_reset(int state)
 {
 	// routine called by the dimm board to reboot the naomi mainboard
 	logerror("Received reset fromm dimm board !\n");

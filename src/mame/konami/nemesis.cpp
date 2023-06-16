@@ -124,19 +124,19 @@ initials
 #include "konamigt.lh"
 
 
-WRITE_LINE_MEMBER(nemesis_state::nemesis_vblank_irq)
+void nemesis_state::nemesis_vblank_irq(int state)
 {
 	if (state && m_irq_on)
 		m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
-WRITE_LINE_MEMBER(nemesis_state::blkpnthr_vblank_irq)
+void nemesis_state::blkpnthr_vblank_irq(int state)
 {
 	if (state && m_irq_on)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-WRITE_LINE_MEMBER(nemesis_state::bubsys_vblank_irq)
+void nemesis_state::bubsys_vblank_irq(int state)
 {
 	if (state && m_irq_on)
 		m_maincpu->set_input_line(4, HOLD_LINE);
@@ -207,44 +207,44 @@ TIMER_DEVICE_CALLBACK_MEMBER(nemesis_state::gx400_interrupt)
 }
 
 
-WRITE_LINE_MEMBER(nemesis_state::irq_enable_w)
+void nemesis_state::irq_enable_w(int state)
 {
 	m_irq_on = state;
 }
 
-WRITE_LINE_MEMBER(nemesis_state::irq1_enable_w)
+void nemesis_state::irq1_enable_w(int state)
 {
 	m_irq1_on = state;
 }
 
-WRITE_LINE_MEMBER(nemesis_state::irq2_enable_w)
+void nemesis_state::irq2_enable_w(int state)
 {
 	m_irq2_on = state;
 }
 
-WRITE_LINE_MEMBER(nemesis_state::irq4_enable_w)
+void nemesis_state::irq4_enable_w(int state)
 {
 	m_irq4_on = state;
 }
 
-WRITE_LINE_MEMBER(nemesis_state::coin1_lockout_w)
+void nemesis_state::coin1_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(0, state);
 }
 
-WRITE_LINE_MEMBER(nemesis_state::coin2_lockout_w)
+void nemesis_state::coin2_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(1, state);
 }
 
-WRITE_LINE_MEMBER(nemesis_state::sound_irq_w)
+void nemesis_state::sound_irq_w(int state)
 {
 	// This asserts the Z80 /irq pin by setting a 74ls74 latch; the Z80 pulses /IOREQ low during servicing of the interrupt, which clears the latch automatically, so HOLD_LINE is correct in this case
 	if (state)
 		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
-WRITE_LINE_MEMBER(nemesis_state::sound_nmi_w)
+void nemesis_state::sound_nmi_w(int state)
 {
 	// On Bubble System at least, this goes to an LS02 NOR before the Z80, whose other input is tied to ???, acting as an inverter. Effectively, if the bit is 1, NMI is asserted, otherwise it is cleared. This is also cleared on reset.
 	// the ??? input is likely either tied to VBLANK or 256V, or tied to one of those two through a 74ls74 enable latch, controlled by something else (probably either the one of the two output/int enable latches of the 68k, or by exx0/exx7 address-latched accesses from the sound z80, though technically it could be anything, even the /BS signal from the mcu to the 68k)

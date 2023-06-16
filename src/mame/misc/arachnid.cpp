@@ -178,18 +178,18 @@ private:
 	virtual void machine_start() override;
 	uint8_t pia_u4_pa_r();
 	uint8_t pia_u4_pb_r();
-	DECLARE_READ_LINE_MEMBER( pia_u4_pca_r );
-	DECLARE_READ_LINE_MEMBER( pia_u4_pcb_r );
+	int pia_u4_pca_r();
+	int pia_u4_pcb_r();
 	void pia_u4_pa_w(uint8_t data);
 	void pia_u4_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pia_u4_pca_w );
-	DECLARE_WRITE_LINE_MEMBER( pia_u4_pcb_w );
+	void pia_u4_pca_w(int state);
+	void pia_u4_pcb_w(int state);
 
 	uint8_t pia_u17_pa_r();
 	void pia_u17_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pia_u17_pcb_w );
+	void pia_u17_pcb_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(ptm_o1_callback);
+	void ptm_o1_callback(int state);
 
 	uint8_t read_keyboard(int pa);
 	void arachnid_map(address_map &map);
@@ -334,7 +334,7 @@ INPUT_PORTS_END
     ptm6840_interface ptm_intf
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER(arachnid_state::ptm_o1_callback)
+void arachnid_state::ptm_o1_callback(int state)
 {
 	m_speaker->level_w(state);
 }
@@ -402,7 +402,7 @@ uint8_t arachnid_state::pia_u4_pb_r()
 	return data;
 }
 
-READ_LINE_MEMBER( arachnid_state::pia_u4_pca_r )
+int arachnid_state::pia_u4_pca_r()
 {
 	// CA1 - SW1 Coin In (Coin Door)
 
@@ -412,7 +412,7 @@ READ_LINE_MEMBER( arachnid_state::pia_u4_pca_r )
 	return data;
 }
 
-READ_LINE_MEMBER( arachnid_state::pia_u4_pcb_r )
+int arachnid_state::pia_u4_pcb_r()
 {
 	// CB1 - SW2 Test Mode (Coin Door)
 
@@ -446,12 +446,12 @@ void arachnid_state::pia_u4_pb_w(uint8_t data)
 	// PA0 thru PA7 Pulses to Switch Matrix Part II
 }
 
-WRITE_LINE_MEMBER( arachnid_state::pia_u4_pca_w )
+void arachnid_state::pia_u4_pca_w(int state)
 {
 	// CA1 - Remove Darts Lamp
 }
 
-WRITE_LINE_MEMBER( arachnid_state::pia_u4_pcb_w )
+void arachnid_state::pia_u4_pcb_w(int state)
 {
 	// CB2 - Throw Darts Lamp
 }
@@ -468,7 +468,7 @@ void arachnid_state::pia_u17_pb_w(uint8_t data)
 	// PB7 - N/C
 }
 
-WRITE_LINE_MEMBER( arachnid_state::pia_u17_pcb_w )
+void arachnid_state::pia_u17_pcb_w(int state)
 {
 	// CB2 - Target Lamp
 }

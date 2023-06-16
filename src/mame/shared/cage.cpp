@@ -83,10 +83,12 @@
 #include "emu.h"
 #include "cage.h"
 
+#define LOG_COMM            (1U << 1)
+#define LOG_32031_IOPORTS   (1U << 2)
+#define LOG_WARNINGS        (1U << 3)
 
-#define LOG_COMM            (0)
-#define LOG_32031_IOPORTS   (0)
-
+#define VERBOSE (LOG_WARNINGS)
+#include "logmacro.h"
 
 
 /*************************************
@@ -293,9 +295,9 @@ void atari_cage_device::update_dma_state()
 
 		/* make sure our assumptions are correct */
 		if (m_tms32031_io_regs[DMA_DEST_ADDR] != 0x808048)
-			logerror("CAGE DMA: unexpected dest address %08X!\n", m_tms32031_io_regs[DMA_DEST_ADDR]);
+			LOGMASKED(LOG_WARNINGS, "CAGE DMA: unexpected dest address %08X!\n", m_tms32031_io_regs[DMA_DEST_ADDR]);
 		if ((m_tms32031_io_regs[DMA_GLOBAL_CTL] & 0xfef) != 0xe03)
-			logerror("CAGE DMA: unexpected transfer params %08X!\n", m_tms32031_io_regs[DMA_GLOBAL_CTL]);
+			LOGMASKED(LOG_WARNINGS, "CAGE DMA: unexpected transfer params %08X!\n", m_tms32031_io_regs[DMA_GLOBAL_CTL]);
 
 		/* do the DMA up front */
 		addr = m_tms32031_io_regs[DMA_SOURCE_ADDR];
@@ -363,7 +365,7 @@ void atari_cage_device::update_timer(int which)
 
 		/* make sure our assumptions are correct */
 		if (m_tms32031_io_regs[base + TIMER0_GLOBAL_CTL] != 0x2c1)
-			logerror("CAGE TIMER%d: unexpected timer config %08X!\n", which, m_tms32031_io_regs[base + TIMER0_GLOBAL_CTL]);
+			LOGMASKED(LOG_WARNINGS, "CAGE TIMER%d: unexpected timer config %08X!\n", which, m_tms32031_io_regs[base + TIMER0_GLOBAL_CTL]);
 
 		m_timer[which]->adjust(period, which);
 	}
@@ -438,8 +440,7 @@ uint32_t atari_cage_device::tms32031_io_r(offs_t offset)
 			break;
 	}
 
-	if (LOG_32031_IOPORTS)
-		logerror("%s CAGE:%s read -> %08X\n", machine().describe_context(), register_names[offset & 0x7f], result);
+	LOGMASKED(LOG_32031_IOPORTS, "%s CAGE:%s read -> %08X\n", machine().describe_context(), register_names[offset & 0x7f], result);
 	return result;
 }
 
@@ -448,8 +449,7 @@ void atari_cage_device::tms32031_io_w(offs_t offset, uint32_t data, uint32_t mem
 {
 	COMBINE_DATA(&m_tms32031_io_regs[offset]);
 
-	if (LOG_32031_IOPORTS)
-		logerror("%s CAGE:%s write = %08X\n", machine().describe_context(), register_names[offset & 0x7f], m_tms32031_io_regs[offset]);
+	LOGMASKED(LOG_32031_IOPORTS, "%s CAGE:%s write = %08X\n", machine().describe_context(), register_names[offset & 0x7f], m_tms32031_io_regs[offset]);
 
 	switch (offset)
 	{
@@ -525,8 +525,7 @@ void atari_cage_device::update_control_lines()
 
 uint32_t atari_cage_device::cage_from_main_r()
 {
-	if (LOG_COMM)
-		logerror("%s CAGE read command = %04X\n", machine().describe_context(), m_from_main);
+	LOGMASKED(LOG_COMM, "%s CAGE read command = %04X\n", machine().describe_context(), m_from_main);
 	m_cpu_to_cage_ready = 0;
 	update_control_lines();
 	m_cpu->set_input_line(TMS3203X_IRQ0, CLEAR_LINE);
@@ -536,17 +535,13 @@ uint32_t atari_cage_device::cage_from_main_r()
 
 void atari_cage_device::cage_from_main_ack_w(uint32_t data)
 {
-	if (LOG_COMM)
-	{
-			logerror("%s CAGE ack command = %04X\n", machine().describe_context(), m_from_main);
-	}
+	LOGMASKED(LOG_COMM, "%s CAGE ack command = %04X\n", machine().describe_context(), m_from_main);
 }
 
 
 void atari_cage_device::cage_to_main_w(uint32_t data)
 {
-	if (LOG_COMM)
-		logerror("%s Data from CAGE = %04X\n", machine().describe_context(), data);
+	LOGMASKED(LOG_COMM, "%s Data from CAGE = %04X\n", machine().describe_context(), data);
 	m_soundlatch->write(data);
 	m_cage_to_cpu_ready = 1;
 	update_control_lines();
@@ -566,8 +561,7 @@ uint32_t atari_cage_device::cage_io_status_r()
 
 uint16_t atari_cage_device::main_r()
 {
-	if (LOG_COMM)
-		logerror("%s:main read data = %04X\n", machine().describe_context(), m_soundlatch->read());
+	LOGMASKED(LOG_COMM, "%s:main read data = %04X\n", machine().describe_context(), m_soundlatch->read());
 	m_cage_to_cpu_ready = 0;
 	update_control_lines();
 	return m_soundlatch->read();
@@ -585,8 +579,7 @@ TIMER_CALLBACK_MEMBER( atari_cage_device::cage_deferred_w )
 
 void atari_cage_device::main_w(uint16_t data)
 {
-	if (LOG_COMM)
-		logerror("%s:Command to CAGE = %04X\n", machine().describe_context(), data);
+	LOGMASKED(LOG_COMM, "%s:Command to CAGE = %04X\n", machine().describe_context(), data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(atari_cage_device::cage_deferred_w),this), data);
 }
 

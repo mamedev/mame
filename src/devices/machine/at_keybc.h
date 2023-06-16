@@ -36,8 +36,8 @@ public:
 	void command_w(uint8_t data);
 
 	// inputs from keyboard
-	DECLARE_WRITE_LINE_MEMBER(kbd_clk_w);
-	DECLARE_WRITE_LINE_MEMBER(kbd_data_w);
+	void kbd_clk_w(int state);
+	void kbd_data_w(int state);
 
 protected:
 	// trampoline constructor
@@ -116,8 +116,8 @@ public:
 	virtual uint8_t status_r() override;
 
 	// inputs from aux
-	DECLARE_WRITE_LINE_MEMBER(aux_clk_w);
-	DECLARE_WRITE_LINE_MEMBER(aux_data_w);
+	void aux_clk_w(int state);
+	void aux_data_w(int state);
 
 	// standard constructor
 	ps2_keyboard_controller_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);

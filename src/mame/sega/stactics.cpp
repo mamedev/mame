@@ -85,10 +85,10 @@ public:
 
 	void stactics(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(frame_count_d3_r);
-	DECLARE_READ_LINE_MEMBER(shot_standby_r);
-	DECLARE_READ_LINE_MEMBER(not_shot_arrive_r);
-	DECLARE_READ_LINE_MEMBER(motor_not_ready_r);
+	int frame_count_d3_r();
+	int shot_standby_r();
+	int not_shot_arrive_r();
+	int motor_not_ready_r();
 	DECLARE_CUSTOM_INPUT_MEMBER(get_rng);
 
 protected:
@@ -98,19 +98,19 @@ protected:
 private:
 	uint8_t vert_pos_r();
 	uint8_t horiz_pos_r();
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
-	DECLARE_WRITE_LINE_MEMBER(palette_bank_w);
+	template <uint8_t Which> void coin_lockout_w(int state);
+	void palette_bank_w(int state);
 	void scroll_ram_w(offs_t offset, uint8_t data);
 	void speed_latch_w(uint8_t data);
 	void shot_trigger_w(uint8_t data);
 	void shot_flag_clear_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
+	void motor_w(int state);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 
-	DECLARE_WRITE_LINE_MEMBER(barrier_lamp_w);
-	DECLARE_WRITE_LINE_MEMBER(start_lamp_w);
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(base_lamp_w) { m_base_lamps[N] = state; }
+	void barrier_lamp_w(int state);
+	void start_lamp_w(int state);
+	template <unsigned N> void base_lamp_w(int state) { m_base_lamps[N] = state; }
 
 	void palette(palette_device &palette) const;
 
@@ -244,7 +244,7 @@ void stactics_state::palette(palette_device &palette) const
 }
 
 
-WRITE_LINE_MEMBER(stactics_state::palette_bank_w)
+void stactics_state::palette_bank_w(int state)
 {
 	m_palette_bank = m_outlatch->q6_r() | (m_outlatch->q7_r() << 1);
 }
@@ -278,7 +278,7 @@ void stactics_state::scroll_ram_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-READ_LINE_MEMBER(stactics_state::frame_count_d3_r)
+int stactics_state::frame_count_d3_r()
 {
 	return (m_frame_count >> 3) & 0x01;
 }
@@ -327,13 +327,13 @@ void stactics_state::shot_flag_clear_w(uint8_t data)
 }
 
 
-READ_LINE_MEMBER(stactics_state::shot_standby_r)
+int stactics_state::shot_standby_r()
 {
 	return m_shot_standby;
 }
 
 
-READ_LINE_MEMBER(stactics_state::not_shot_arrive_r)
+int stactics_state::not_shot_arrive_r()
 {
 	return !m_shot_arrive;
 }
@@ -454,14 +454,14 @@ template <unsigned N> void stactics_state::set_indicator_leds(unsigned offset, o
 }
 
 
-WRITE_LINE_MEMBER(stactics_state::barrier_lamp_w)
+void stactics_state::barrier_lamp_w(int state)
 {
 	// this needs to flash on/off, not implemented
 	m_barrier_lamp = state;
 }
 
 
-WRITE_LINE_MEMBER(stactics_state::start_lamp_w)
+void stactics_state::start_lamp_w(int state)
 {
 	m_start_lamp = state;
 }
@@ -576,13 +576,13 @@ uint32_t stactics_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
  *
  *************************************/
 
-WRITE_LINE_MEMBER(stactics_state::motor_w)
+void stactics_state::motor_w(int state)
 {
 	m_motor_on = state;
 }
 
 
-READ_LINE_MEMBER(stactics_state::motor_not_ready_r)
+int stactics_state::motor_not_ready_r()
 {
 	// if the motor is self-centering, but not centered yet
 	return (!m_motor_on && (m_horiz_pos != 0 || m_vert_pos != 0));
@@ -664,7 +664,7 @@ CUSTOM_INPUT_MEMBER(stactics_state::get_rng)
  *************************************/
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(stactics_state::coin_lockout_w)
+void stactics_state::coin_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(Which, !state);
 }

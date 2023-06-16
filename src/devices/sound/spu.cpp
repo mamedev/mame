@@ -2536,6 +2536,13 @@ void spu_device::update_reverb()
 {
 	if (dirty_flags&dirtyflag_reverb)
 	{
+		// TODO: Handle cases where reverb present can't be found better
+		// If a save state is loaded and has reverb values that don't match a preset
+		// then spu_reverb_cfg is never set so the reverb settings won't be the same as
+		// when the save state was created.
+		// This only becomes an issue when loading save states from the command line
+		// because if you load a save state from within MAME it will hold the last used
+		// spu_reverb_cfg and reuse that value.
 		cur_reverb_preset=find_reverb_preset((unsigned short *)&reg[0x1c0]);
 
 		if (cur_reverb_preset==nullptr)

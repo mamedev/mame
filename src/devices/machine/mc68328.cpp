@@ -353,7 +353,7 @@ void mc68328_base_device::device_resolve_objects()
 	m_out_lsclk_cb.resolve_safe();
 	m_out_ld_cb.resolve_safe();
 
-	m_lcd_info_changed_cb.resolve();
+	m_lcd_info_changed_cb.resolve_safe();
 }
 
 void mc68328_device::device_resolve_objects()
@@ -1299,7 +1299,7 @@ u32 mc68328_device::get_irq_mask_for_level(int level)
 	return 0;
 }
 
-WRITE_LINE_MEMBER(mc68328_base_device::irq5_w)
+void mc68328_base_device::irq5_w(int state)
 {
 	set_interrupt_line(INT_IRQ5, state);
 }
@@ -3115,10 +3115,7 @@ void mc68328_device::lcd_update_info()
 	LOGMASKED(LOG_LCD, "lxmax %d, lymax %d, divisor %d, lrra %02x, lpxcd %02x\n", m_lxmax, m_lymax + 1, sysclk_divisor, m_lpxcd + 1);
 
 	constexpr u8 BIT_WIDTHS[4] = { 1, 2, 4, 0xff };
-	if (!m_lcd_info_changed_cb.isnull())
-	{
-		m_lcd_info_changed_cb(lcd_frame_duration.as_hz(), lcd_get_width(), m_lymax + 1, BIT_WIDTHS[(m_lpicf & LPICF_PBSIZ) >> LPICF_PBSIZ_SHIFT], BIT_WIDTHS[m_lpicf & LPICF_GS]);
-	}
+	m_lcd_info_changed_cb(lcd_frame_duration.as_hz(), lcd_get_width(), m_lymax + 1, BIT_WIDTHS[(m_lpicf & LPICF_PBSIZ) >> LPICF_PBSIZ_SHIFT], BIT_WIDTHS[m_lpicf & LPICF_GS]);
 
 	m_lcd_update_pending = false;
 }
@@ -3574,10 +3571,7 @@ void mc68ez328_device::lcd_update_info()
 	attotime lcd_frame_duration = (lcd_scan_duration + lcd_dma_duration) * (m_lymax + 1) * 2;
 
 	constexpr u8 BIT_WIDTHS[4] = { 1, 2, 4, 0xff };
-	if (!m_lcd_info_changed_cb.isnull())
-	{
-		m_lcd_info_changed_cb(lcd_frame_duration.as_hz(), lcd_get_width(), m_lymax + 1, BIT_WIDTHS[(m_lpicf & LPICF_PBSIZ) >> LPICF_PBSIZ_SHIFT], BIT_WIDTHS[m_lpicf & LPICF_GS]);
-	}
+	m_lcd_info_changed_cb(lcd_frame_duration.as_hz(), lcd_get_width(), m_lymax + 1, BIT_WIDTHS[(m_lpicf & LPICF_PBSIZ) >> LPICF_PBSIZ_SHIFT], BIT_WIDTHS[m_lpicf & LPICF_GS]);
 
 	m_lcd_update_pending = false;
 }

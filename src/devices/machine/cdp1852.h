@@ -40,7 +40,7 @@ public:
 	uint8_t read();
 	void write(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	void clock_w(int state);
 
 	uint8_t do_r() { return m_data; }
 

@@ -16,7 +16,6 @@
 #include "mips1dsm.h"
 #include "softfloat3/source/include/softfloat.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_TLB     (1U << 1)
 #define LOG_IOP     (1U << 2)
 #define LOG_RISCOS  (1U << 3)
@@ -645,12 +644,12 @@ device_memory_interface::space_config_vector mips1core_device_base::memory_space
 bool mips1core_device_base::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
 	target_space = &space(spacenum);
-	if(spacenum != AS_PROGRAM)
+	if (spacenum != AS_PROGRAM)
 		return true;
-	return memory_translate(intention, address, true);
+	return translate(intention, address, true);
 }
 
-bool mips1core_device_base::memory_translate(int intention, offs_t &address, bool debug)
+bool mips1core_device_base::translate(int intention, offs_t &address, bool debug)
 {
 	// check for kernel memory address
 	if (BIT(address, 31))
@@ -887,7 +886,7 @@ void mips1core_device_base::address_error(int intention, u32 const address)
 
 		m_cop0[COP0_BadVAddr] = address;
 
-		generate_exception((intention & TR_WRITE) ? EXCEPTION_ADDRSTORE : EXCEPTION_ADDRLOAD);
+		generate_exception((intention == TR_WRITE) ? EXCEPTION_ADDRSTORE : EXCEPTION_ADDRLOAD);
 
 		// address errors shouldn't typically occur, so a breakpoint is handy
 		machine().debug_break();
@@ -1109,7 +1108,7 @@ template <typename T, bool Aligned, typename U> std::enable_if_t<std::is_convert
 		return;
 	}
 
-	if (memory_translate(TR_READ, address, false))
+	if (translate(TR_READ, address, false))
 	{
 		// align address for ld[lr] instructions
 		if (!Aligned)
@@ -1139,7 +1138,7 @@ template <typename T, bool Aligned, typename U> std::enable_if_t<std::is_convert
 		return;
 	}
 
-	if (memory_translate(TR_WRITE, address, false))
+	if (translate(TR_WRITE, address, false))
 	{
 		// align address for sd[lr] instructions
 		if (!Aligned)
@@ -1163,7 +1162,7 @@ bool mips1core_device_base::fetch(u32 address, std::function<void(u32)> &&apply)
 		return false;
 	}
 
-	if (memory_translate(TR_FETCH, address, false))
+	if (translate(TR_FETCH, address, false))
 	{
 		u32 const data = space(AS_PROGRAM).read_dword(address);
 
@@ -1953,15 +1952,7 @@ template <typename T> void mips1_device_base::set_cop1_reg(unsigned const reg, T
 		m_f[reg] = data;
 }
 
-bool mips1_device_base::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
-{
-	target_space = &space(spacenum);
-	if(spacenum != AS_PROGRAM)
-		return true;
-	return memory_translate(intention, address, true);
-}
-
-bool mips1_device_base::memory_translate(int intention, offs_t &address, bool debug)
+bool mips1_device_base::translate(int intention, offs_t &address, bool debug)
 {
 	// check for kernel memory address
 	if (BIT(address, 31))
@@ -2015,7 +2006,7 @@ bool mips1_device_base::memory_translate(int intention, offs_t &address, bool de
 		}
 
 		// test dirty
-		if ((intention & TR_WRITE) && !(entry[1] & EL_D))
+		if ((intention == TR_WRITE) && !(entry[1] & EL_D))
 		{
 			refill = false;
 			modify = true;
@@ -2042,7 +2033,7 @@ bool mips1_device_base::memory_translate(int intention, offs_t &address, bool de
 					(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, address, machine().describe_context());
 			else
 				LOGMASKED(LOG_TLB, "asid %2d tlb miss %c address 0x%08x (%s)\n",
-					(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, (intention & TR_WRITE) ? 'w' : 'r', address, machine().describe_context());
+					(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, (intention == TR_WRITE) ? 'w' : 'r', address, machine().describe_context());
 		}
 
 		// load tlb exception registers
@@ -2050,7 +2041,7 @@ bool mips1_device_base::memory_translate(int intention, offs_t &address, bool de
 		m_cop0[COP0_EntryHi] = key;
 		m_cop0[COP0_Context] = (m_cop0[COP0_Context] & PTE_BASE) | ((address >> 10) & BAD_VPN);
 
-		generate_exception(modify ? EXCEPTION_TLBMOD : (intention & TR_WRITE) ? EXCEPTION_TLBSTORE : EXCEPTION_TLBLOAD, refill);
+		generate_exception(modify ? EXCEPTION_TLBMOD : (intention == TR_WRITE) ? EXCEPTION_TLBSTORE : EXCEPTION_TLBLOAD, refill);
 	}
 
 	return false;

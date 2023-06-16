@@ -134,18 +134,18 @@ private:
 	uint8_t pia0_pb_r();
 	void pia0_pa_w(uint8_t data);
 	void pia0_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w);
+	void pia0_cb2_w(int state);
 
 	// Clocks
-	DECLARE_WRITE_LINE_MEMBER(write_f1_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f2_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f4_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f5_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f7_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f8_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f9_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f11_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f13_clock);
+	void write_f1_clock(int state);
+	void write_f2_clock(int state);
+	void write_f4_clock(int state);
+	void write_f5_clock(int state);
+	void write_f7_clock(int state);
+	void write_f8_clock(int state);
+	void write_f9_clock(int state);
+	void write_f11_clock(int state);
+	void write_f13_clock(int state);
 
 	TIMER_CALLBACK_MEMBER(bit_rate);
 	TIMER_CALLBACK_MEMBER(bit_rate_half);
@@ -270,7 +270,7 @@ void mekd1_state::pia0_pb_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(mekd1_state::pia0_cb2_w)
+void mekd1_state::pia0_cb2_w(int state)
 {
 	// This is a tape reader control line.
 }
@@ -285,7 +285,7 @@ TIMER_CALLBACK_MEMBER(mekd1_state::bit_rate_half)
 	m_bit_rate_half_out = 1;
 }
 
-WRITE_LINE_MEMBER(mekd1_state::write_f1_clock)
+void mekd1_state::write_f1_clock(int state)
 {
 	if (m_acia_baud_rate->read() == 1)
 	{
@@ -294,7 +294,7 @@ WRITE_LINE_MEMBER(mekd1_state::write_f1_clock)
 	}
 }
 
-WRITE_LINE_MEMBER(mekd1_state::write_f2_clock)
+void mekd1_state::write_f2_clock(int state)
 {
 	if (m_acia_baud_rate->read() == 2)
 	{
@@ -303,7 +303,7 @@ WRITE_LINE_MEMBER(mekd1_state::write_f2_clock)
 	}
 }
 
-WRITE_LINE_MEMBER(mekd1_state::write_f4_clock)
+void mekd1_state::write_f4_clock(int state)
 {
 	if (m_acia_baud_rate->read() == 4)
 	{
@@ -312,7 +312,7 @@ WRITE_LINE_MEMBER(mekd1_state::write_f4_clock)
 	}
 }
 
-WRITE_LINE_MEMBER(mekd1_state::write_f5_clock)
+void mekd1_state::write_f5_clock(int state)
 {
 	if (m_acia_baud_rate->read() == 5)
 	{
@@ -321,7 +321,7 @@ WRITE_LINE_MEMBER(mekd1_state::write_f5_clock)
 	}
 }
 
-WRITE_LINE_MEMBER(mekd1_state::write_f7_clock)
+void mekd1_state::write_f7_clock(int state)
 {
 	if (m_acia_baud_rate->read() == 7)
 	{
@@ -330,7 +330,7 @@ WRITE_LINE_MEMBER(mekd1_state::write_f7_clock)
 	}
 }
 
-WRITE_LINE_MEMBER(mekd1_state::write_f8_clock)
+void mekd1_state::write_f8_clock(int state)
 {
 	if (m_acia_baud_rate->read() == 8)
 	{
@@ -339,7 +339,7 @@ WRITE_LINE_MEMBER(mekd1_state::write_f8_clock)
 	}
 }
 
-WRITE_LINE_MEMBER(mekd1_state::write_f9_clock)
+void mekd1_state::write_f9_clock(int state)
 {
 	if (m_acia_baud_rate->read() == 9)
 	{
@@ -348,7 +348,7 @@ WRITE_LINE_MEMBER(mekd1_state::write_f9_clock)
 	}
 }
 
-WRITE_LINE_MEMBER(mekd1_state::write_f11_clock)
+void mekd1_state::write_f11_clock(int state)
 {
 	if (m_acia_baud_rate->read() == 11)
 	{
@@ -357,7 +357,7 @@ WRITE_LINE_MEMBER(mekd1_state::write_f11_clock)
 	}
 }
 
-WRITE_LINE_MEMBER(mekd1_state::write_f13_clock)
+void mekd1_state::write_f13_clock(int state)
 {
 	if (m_acia_baud_rate->read() == 13)
 	{

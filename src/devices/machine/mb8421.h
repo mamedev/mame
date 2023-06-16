@@ -147,7 +147,7 @@ public:
 		return m_ram[offset];
 	}
 
-	DECLARE_READ_LINE_MEMBER(busy_r) { return 0; } // _BUSY pin - not emulated
+	int busy_r() { return 0; } // _BUSY pin - not emulated
 
 protected:
 	dual_port_mailbox_ram_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)

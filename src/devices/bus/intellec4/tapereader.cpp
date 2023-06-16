@@ -41,7 +41,7 @@ private:
 	u8 rom6_in() { return ~m_data & 0x0fU; }
 	u8 rom7_in() { return (~m_data >> 4) & 0x0fU; }
 	void rom4_out(u8 data) { advance(BIT(data, 3)); }
-	DECLARE_WRITE_LINE_MEMBER(advance);
+	void advance(int state);
 	TIMER_CALLBACK_MEMBER(step);
 
 	emu_timer   *m_step_timer;
@@ -99,7 +99,7 @@ void imm4_90_device::device_start()
 }
 
 
-DECLARE_WRITE_LINE_MEMBER(imm4_90_device::advance)
+void imm4_90_device::advance(int state)
 {
 	// this is edge-sensitive - CPU sends the narrowest pulse it can
 	if (!m_advance && !bool(state) && !m_stepping)

@@ -36,7 +36,7 @@ To Do:
 #include "tetrisp2.h"
 
 
-WRITE_LINE_MEMBER(tetrisp2_state::flipscreen_w)
+void tetrisp2_state::flipscreen_w(int state)
 {
 	machine().tilemap().set_flip_all(state ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	// TODO: sprite device(s)
@@ -44,7 +44,7 @@ WRITE_LINE_MEMBER(tetrisp2_state::flipscreen_w)
 	m_rot_ofsy = state ? 0x04df : 0x400;
 }
 
-WRITE_LINE_MEMBER(rocknms_state::sub_flipscreen_w)
+void rocknms_state::sub_flipscreen_w(int state)
 {
 	// ...
 }

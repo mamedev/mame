@@ -89,8 +89,8 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(speaker_en_w);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	void speaker_en_w(int state);
+	void speaker_w(int state);
 	u8 pb_r();
 	void pa_w(u8 data);
 	void videoram_w(u8 data);
@@ -273,12 +273,12 @@ void v6809_state::pa_w(u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER( v6809_state::speaker_en_w )
+void v6809_state::speaker_en_w(int state)
 {
 	m_speaker_en = state;
 }
 
-WRITE_LINE_MEMBER( v6809_state::speaker_w )
+void v6809_state::speaker_w(int state)
 {
 	if (m_speaker_en)
 		m_speaker->level_w(state);

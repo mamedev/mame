@@ -48,14 +48,14 @@ public:
 	virtual const char *file_extensions() const noexcept override { return "mdv,mdr"; }
 
 	// specific implementation
-	DECLARE_WRITE_LINE_MEMBER( clk_w );
-	DECLARE_WRITE_LINE_MEMBER( comms_in_w );
-	DECLARE_WRITE_LINE_MEMBER( erase_w );
-	DECLARE_WRITE_LINE_MEMBER( read_write_w );
-	DECLARE_WRITE_LINE_MEMBER( data1_w );
-	DECLARE_WRITE_LINE_MEMBER( data2_w );
-	DECLARE_READ_LINE_MEMBER ( data1_r );
-	DECLARE_READ_LINE_MEMBER ( data2_r );
+	void clk_w(int state);
+	void comms_in_w(int state);
+	void erase_w(int state);
+	void read_write_w(int state);
+	void data1_w(int state);
+	void data2_w(int state);
+	int data1_r();
+	int data2_r();
 
 protected:
 	// device_t implementation

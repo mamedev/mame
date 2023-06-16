@@ -95,7 +95,7 @@ private:
 	void msc_w(uint8_t data) { machine_reset(); }
 	void addrmap_w(offs_t offset, uint8_t data);
 	void ppi_pb_w(uint8_t data) { m_centronics->write_strobe(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE); }
-	DECLARE_WRITE_LINE_MEMBER(centronics_busy_w) { if (state) m_ppi_pc |= 1; else m_ppi_pc &= ~1; }
+	void centronics_busy_w(int state) { if (state) m_ppi_pc |= 1; else m_ppi_pc &= ~1; }
 	int ppi_pc_r() { return m_ppi_pc; }
 	uint8_t s100_r(offs_t offset) { return m_s100->sinp_r(offset+0x20); }
 	void s100_w(offs_t offset, uint8_t data) { m_s100->sout_w(offset+0x20, data); }

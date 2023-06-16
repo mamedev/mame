@@ -71,7 +71,7 @@ public:
 
 	auto nand_read_callback() { return m_nand_read_cb.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(vblank) { m_spg_video->vblank(state); }
+	void vblank(int state) { m_spg_video->vblank(state); }
 
 	virtual void device_add_mconfig(machine_config& config) override;
 
@@ -347,8 +347,8 @@ private:
 	void unkarea_7961_w(uint16_t data);
 
 
-	DECLARE_WRITE_LINE_MEMBER(videoirq_w);
-	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
+	void videoirq_w(int state);
+	void audioirq_w(int state);
 
 	uint16_t system_7a35_r();
 	uint16_t system_7a37_r();

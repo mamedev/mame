@@ -78,7 +78,7 @@ private:
 	void tmaddr_w(u8 data);
 	void tminc_w(u8);
 	u8 tmdata_r();
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	void clock_w(int state);
 	void cpu2_map(address_map &map);
 	void audio_main_map(address_map &map);
 	void audio_io_map(address_map &map);
@@ -430,7 +430,7 @@ void jeutel_state::machine_reset()
 	m_tmbit = 0U;
 }
 
-WRITE_LINE_MEMBER( jeutel_state::clock_w )
+void jeutel_state::clock_w(int state)
 {
 	m_cpu2->set_input_line(0, (state) ? ASSERT_LINE : CLEAR_LINE);
 	if (m_cpu2->state_int(Z80_HALT))

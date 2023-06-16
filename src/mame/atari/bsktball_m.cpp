@@ -13,7 +13,7 @@
     bsktball_nmion_w
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(bsktball_state::nmion_w)
+void bsktball_state::nmion_w(int state)
 {
 	m_nmi_on = state;
 }
@@ -34,12 +34,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(bsktball_state::bsktball_scanline)
     bsktball_ld_w
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(bsktball_state::ld1_w)
+void bsktball_state::ld1_w(int state)
 {
 	m_ld1 = state;
 }
 
-WRITE_LINE_MEMBER(bsktball_state::ld2_w)
+void bsktball_state::ld2_w(int state)
 {
 	m_ld2 = state;
 }

@@ -95,7 +95,7 @@ void cit101_keyboard_device::device_start()
 	save_item(NAME(m_kbid_enabled));
 }
 
-WRITE_LINE_MEMBER(cit101_keyboard_device::write_rxd)
+void cit101_keyboard_device::write_rxd(int state)
 {
 	m_mcu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }

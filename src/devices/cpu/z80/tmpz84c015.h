@@ -28,8 +28,8 @@ public:
 	tmpz84c015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <int Channel> void set_clk_trg(u32 clock) { subdevice<z80ctc_device>(m_ctc.finder_tag())->set_clk<Channel>(clock); }
-	template <int Channel> void set_clk_trg(const XTAL &xtal) { subdevice<z80ctc_device>(m_ctc.finder_tag())->set_clk<Channel>(xtal); }
+	template <int Channel> void set_clk_trg(u32 clock) { m_ctc.lookup()->set_clk<Channel>(clock); }
+	template <int Channel> void set_clk_trg(const XTAL &xtal) { m_ctc.lookup()->set_clk<Channel>(xtal); }
 
 	// SIO callbacks
 	auto out_txda_callback() { return m_out_txda_cb.bind(); }
@@ -64,51 +64,51 @@ public:
 	auto out_brdy_callback() { return m_out_brdy_cb.bind(); }
 
 	// SIO public interface
-	DECLARE_WRITE_LINE_MEMBER( rxa_w ) { m_sio->rxa_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rxb_w ) { m_sio->rxb_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( ctsa_w ) { m_sio->ctsa_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( ctsb_w ) { m_sio->ctsb_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( dcda_w ) { m_sio->dcda_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( dcdb_w ) { m_sio->dcdb_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rxca_w ) { m_sio->rxca_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rxcb_w ) { m_sio->rxcb_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( txca_w ) { m_sio->txca_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( txcb_w ) { m_sio->txcb_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( synca_w ) { m_sio->synca_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( syncb_w ) { m_sio->syncb_w(state); }
+	void rxa_w(int state) { m_sio->rxa_w(state); }
+	void rxb_w(int state) { m_sio->rxb_w(state); }
+	void ctsa_w(int state) { m_sio->ctsa_w(state); }
+	void ctsb_w(int state) { m_sio->ctsb_w(state); }
+	void dcda_w(int state) { m_sio->dcda_w(state); }
+	void dcdb_w(int state) { m_sio->dcdb_w(state); }
+	void rxca_w(int state) { m_sio->rxca_w(state); }
+	void rxcb_w(int state) { m_sio->rxcb_w(state); }
+	void txca_w(int state) { m_sio->txca_w(state); }
+	void txcb_w(int state) { m_sio->txcb_w(state); }
+	void synca_w(int state) { m_sio->synca_w(state); }
+	void syncb_w(int state) { m_sio->syncb_w(state); }
 
 	// CTC public interface
-	DECLARE_WRITE_LINE_MEMBER( trg0 ) { m_ctc->trg0(state); }
-	DECLARE_WRITE_LINE_MEMBER( trg1 ) { m_ctc->trg1(state); }
-	DECLARE_WRITE_LINE_MEMBER( trg2 ) { m_ctc->trg2(state); }
-	DECLARE_WRITE_LINE_MEMBER( trg3 ) { m_ctc->trg3(state); }
+	void trg0(int state) { m_ctc->trg0(state); }
+	void trg1(int state) { m_ctc->trg1(state); }
+	void trg2(int state) { m_ctc->trg2(state); }
+	void trg3(int state) { m_ctc->trg3(state); }
 
 	// PIO public interface
-	DECLARE_READ_LINE_MEMBER( rdy_a ) { return m_pio->rdy_a(); }
-	DECLARE_READ_LINE_MEMBER( rdy_b ) { return m_pio->rdy_b(); }
-	DECLARE_WRITE_LINE_MEMBER( strobe_a ) { m_pio->strobe_a(state); }
-	DECLARE_WRITE_LINE_MEMBER( strobe_b ) { m_pio->strobe_b(state); }
+	int rdy_a() { return m_pio->rdy_a(); }
+	int rdy_b() { return m_pio->rdy_b(); }
+	void strobe_a(int state) { m_pio->strobe_a(state); }
+	void strobe_b(int state) { m_pio->strobe_b(state); }
 
 	void pa_w(uint8_t data) { m_pio->port_a_write(data); }
 	uint8_t pa_r() { return m_pio->port_a_read(); }
 	void pb_w(uint8_t data) { m_pio->port_b_write(data); }
 	uint8_t pb_r() { return m_pio->port_b_read(); }
-	DECLARE_WRITE_LINE_MEMBER( pa0_w ) { m_pio->pa0_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( pa1_w ) { m_pio->pa1_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( pa2_w ) { m_pio->pa2_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( pa3_w ) { m_pio->pa3_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( pa4_w ) { m_pio->pa4_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( pa5_w ) { m_pio->pa5_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( pa6_w ) { m_pio->pa6_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( pa7_w ) { m_pio->pa7_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( pb0_w ) { m_pio->pb0_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( pb1_w ) { m_pio->pb1_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( pb2_w ) { m_pio->pb2_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( pb3_w ) { m_pio->pb3_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( pb4_w ) { m_pio->pb4_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( pb5_w ) { m_pio->pb5_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( pb6_w ) { m_pio->pb6_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( pb7_w ) { m_pio->pb7_w(state); }
+	void pa0_w(int state) { m_pio->pa0_w(state); }
+	void pa1_w(int state) { m_pio->pa1_w(state); }
+	void pa2_w(int state) { m_pio->pa2_w(state); }
+	void pa3_w(int state) { m_pio->pa3_w(state); }
+	void pa4_w(int state) { m_pio->pa4_w(state); }
+	void pa5_w(int state) { m_pio->pa5_w(state); }
+	void pa6_w(int state) { m_pio->pa6_w(state); }
+	void pa7_w(int state) { m_pio->pa7_w(state); }
+	void pb0_w(int state) { m_pio->pb0_w(state); }
+	void pb1_w(int state) { m_pio->pb1_w(state); }
+	void pb2_w(int state) { m_pio->pb2_w(state); }
+	void pb3_w(int state) { m_pio->pb3_w(state); }
+	void pb4_w(int state) { m_pio->pb4_w(state); }
+	void pb5_w(int state) { m_pio->pb5_w(state); }
+	void pb6_w(int state) { m_pio->pb6_w(state); }
+	void pb7_w(int state) { m_pio->pb7_w(state); }
 
 	/////////////////////////////////////////////////////////
 
@@ -175,32 +175,32 @@ private:
 
 	void irq_priority_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( out_txda_cb_trampoline_w ) { m_out_txda_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_dtra_cb_trampoline_w ) { m_out_dtra_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_rtsa_cb_trampoline_w ) { m_out_rtsa_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_wrdya_cb_trampoline_w ) { m_out_wrdya_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_synca_cb_trampoline_w ) { m_out_synca_cb(state); }
+	void out_txda_cb_trampoline_w(int state) { m_out_txda_cb(state); }
+	void out_dtra_cb_trampoline_w(int state) { m_out_dtra_cb(state); }
+	void out_rtsa_cb_trampoline_w(int state) { m_out_rtsa_cb(state); }
+	void out_wrdya_cb_trampoline_w(int state) { m_out_wrdya_cb(state); }
+	void out_synca_cb_trampoline_w(int state) { m_out_synca_cb(state); }
 
-	DECLARE_WRITE_LINE_MEMBER( out_txdb_cb_trampoline_w ) { m_out_txdb_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_dtrb_cb_trampoline_w ) { m_out_dtrb_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_rtsb_cb_trampoline_w ) { m_out_rtsb_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_wrdyb_cb_trampoline_w ) { m_out_wrdyb_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_syncb_cb_trampoline_w ) { m_out_syncb_cb(state); }
+	void out_txdb_cb_trampoline_w(int state) { m_out_txdb_cb(state); }
+	void out_dtrb_cb_trampoline_w(int state) { m_out_dtrb_cb(state); }
+	void out_rtsb_cb_trampoline_w(int state) { m_out_rtsb_cb(state); }
+	void out_wrdyb_cb_trampoline_w(int state) { m_out_wrdyb_cb(state); }
+	void out_syncb_cb_trampoline_w(int state) { m_out_syncb_cb(state); }
 
-	DECLARE_WRITE_LINE_MEMBER( out_rxdrqa_cb_trampoline_w ) { m_out_rxdrqa_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_txdrqa_cb_trampoline_w ) { m_out_txdrqa_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_rxdrqb_cb_trampoline_w ) { m_out_rxdrqb_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_txdrqb_cb_trampoline_w ) { m_out_txdrqb_cb(state); }
+	void out_rxdrqa_cb_trampoline_w(int state) { m_out_rxdrqa_cb(state); }
+	void out_txdrqa_cb_trampoline_w(int state) { m_out_txdrqa_cb(state); }
+	void out_rxdrqb_cb_trampoline_w(int state) { m_out_rxdrqb_cb(state); }
+	void out_txdrqb_cb_trampoline_w(int state) { m_out_txdrqb_cb(state); }
 
-	template<unsigned N> DECLARE_WRITE_LINE_MEMBER( zc_cb_trampoline_w ) { m_zc_cb[N](state); }
+	template<unsigned N> void zc_cb_trampoline_w(int state) { m_zc_cb[N](state); }
 
 	uint8_t in_pa_cb_trampoline_r() { return m_in_pa_cb(); }
 	void out_pa_cb_trampoline_w(uint8_t data) { m_out_pa_cb(data); }
-	DECLARE_WRITE_LINE_MEMBER( out_ardy_cb_trampoline_w ) { m_out_ardy_cb(state); }
+	void out_ardy_cb_trampoline_w(int state) { m_out_ardy_cb(state); }
 
 	uint8_t in_pb_cb_trampoline_r() { return m_in_pb_cb(); }
 	void out_pb_cb_trampoline_w(uint8_t data) { m_out_pb_cb(data); }
-	DECLARE_WRITE_LINE_MEMBER( out_brdy_cb_trampoline_w ) { m_out_brdy_cb(state); }
+	void out_brdy_cb_trampoline_w(int state) { m_out_brdy_cb(state); }
 };
 
 

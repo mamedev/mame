@@ -250,9 +250,9 @@ private:
 	uint8_t collision_r();
 	void collision_clear_w(uint8_t data);
 	void analog_reset_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(coin_meter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_meter_2_w);
-	DECLARE_WRITE_LINE_MEMBER(start_lamp_w);
+	void coin_meter_1_w(int state);
+	void coin_meter_2_w(int state);
+	void start_lamp_w(int state);
 	void ppi0a_w(uint8_t data);
 	void ppi0b_w(uint8_t data);
 	void ppi0c_w(uint8_t data);

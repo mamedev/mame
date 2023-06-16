@@ -340,7 +340,7 @@ uint32_t gaiden_state::screen_update_drgnbowl(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-WRITE_LINE_MEMBER(gaiden_state::screen_vblank_raiga)
+void gaiden_state::screen_vblank_raiga(int state)
 {
 	if (state)
 	{

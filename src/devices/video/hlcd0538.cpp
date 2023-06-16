@@ -78,7 +78,7 @@ TIMER_CALLBACK_MEMBER(hlcd0538_device::toggle_lcd)
 	lcd_w(!m_lcd);
 }
 
-WRITE_LINE_MEMBER(hlcd0538_device::clk_w)
+void hlcd0538_device::clk_w(int state)
 {
 	state = (state) ? 1 : 0;
 
@@ -89,7 +89,7 @@ WRITE_LINE_MEMBER(hlcd0538_device::clk_w)
 	m_clk = state;
 }
 
-WRITE_LINE_MEMBER(hlcd0538_device::lcd_w)
+void hlcd0538_device::lcd_w(int state)
 {
 	state = (state) ? 1 : 0;
 

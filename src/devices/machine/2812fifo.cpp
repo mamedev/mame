@@ -46,7 +46,7 @@ fifo2812_device::fifo2812_device(machine_config const &mconfig, char const *tag,
 }
 
 
-WRITE_LINE_MEMBER(fifo2812_device::mr_w)
+void fifo2812_device::mr_w(int state)
 {
 	if (bool(state) != bool(m_mr))
 	{
@@ -56,7 +56,7 @@ WRITE_LINE_MEMBER(fifo2812_device::mr_w)
 	}
 }
 
-WRITE_LINE_MEMBER(fifo2812_device::pl_w)
+void fifo2812_device::pl_w(int state)
 {
 	if (bool(state) != bool(m_pl))
 	{
@@ -104,7 +104,7 @@ WRITE_LINE_MEMBER(fifo2812_device::pl_w)
 	}
 }
 
-WRITE_LINE_MEMBER(fifo2812_device::pd_w)
+void fifo2812_device::pd_w(int state)
 {
 	if (bool(state) != bool(m_pd))
 	{
@@ -151,7 +151,7 @@ WRITE_LINE_MEMBER(fifo2812_device::pd_w)
 	}
 }
 
-WRITE_LINE_MEMBER(fifo2812_device::oe_w)
+void fifo2812_device::oe_w(int state)
 {
 	if (bool(state) != bool(m_oe))
 	{

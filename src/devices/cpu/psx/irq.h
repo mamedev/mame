@@ -26,17 +26,17 @@ public:
 	uint32_t read(offs_t offset);
 	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE_LINE_MEMBER( intin0 );
-	DECLARE_WRITE_LINE_MEMBER( intin1 );
-	DECLARE_WRITE_LINE_MEMBER( intin2 );
-	DECLARE_WRITE_LINE_MEMBER( intin3 );
-	DECLARE_WRITE_LINE_MEMBER( intin4 );
-	DECLARE_WRITE_LINE_MEMBER( intin5 );
-	DECLARE_WRITE_LINE_MEMBER( intin6 );
-	DECLARE_WRITE_LINE_MEMBER( intin7 );
-	DECLARE_WRITE_LINE_MEMBER( intin8 );
-	DECLARE_WRITE_LINE_MEMBER( intin9 );
-	DECLARE_WRITE_LINE_MEMBER( intin10 );
+	void intin0(int state);
+	void intin1(int state);
+	void intin2(int state);
+	void intin3(int state);
+	void intin4(int state);
+	void intin5(int state);
+	void intin6(int state);
+	void intin7(int state);
+	void intin8(int state);
+	void intin9(int state);
+	void intin10(int state);
 
 protected:
 	virtual void device_start() override;

@@ -10,10 +10,10 @@
 
 #include "screen.h"
 
-#define LOG_IR      (1 << 0)
-#define LOG_COMMAND (1 << 1)
-#define LOG_INTR    (1 << 2)
-#define LOG_READ    (1 << 3)
+#define LOG_IR      (1U << 1)
+#define LOG_COMMAND (1U << 2)
+#define LOG_INTR    (1U << 3)
+#define LOG_READ    (1U << 4)
 #define VERBOSE     (0)
 #include "logmacro.h"
 
@@ -106,7 +106,7 @@ device_memory_interface::space_config_vector scn2674_device::memory_space_config
 void scn2674_device::device_start()
 {
 	// resolve callbacks
-	m_display_cb.resolve();
+	m_display_cb.resolve_safe();
 	m_intr_cb.resolve_safe();
 	m_breq_cb.resolve_safe();
 	m_mbc_cb.resolve_safe();
@@ -1149,7 +1149,7 @@ TIMER_CALLBACK_MEMBER(scn2674_device::scanline_timer)
 				attrcode = m_attr_space->read_byte(address);
 		}
 
-		if (m_display_enabled && !m_display_cb.isnull())
+		if (m_display_enabled)
 		{
 			bool cursor_on = ((address & 0x3fff) == m_cursor_address)
 				&& m_cursor_enabled

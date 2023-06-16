@@ -27,18 +27,16 @@
 #include "68153bim.h"
 #include "cpu/m68000/m68000.h"
 
-//#define LOG_GENERAL (1U <<  0)
-#define LOG_SETUP   (1U <<  1)
-#define LOG_INT     (1U <<  2)
-#define LOG_READ    (1U <<  3)
-#define LOG_IACK    (1U <<  4)
+#define LOG_SETUP   (1U << 1)
+#define LOG_INT     (1U << 2)
+#define LOG_READ    (1U << 3)
+#define LOG_IACK    (1U << 4)
 
 //#define VERBOSE ( LOG_SETUP | LOG_INT | LOG_IACK | LOG_GENERAL | LOG_READ)
 //#define LOG_OUTPUT_FUNC printf
 
 #include "logmacro.h"
 
-//#define LOG(...)      LOGMASKED(LOG_GENERAL, __VA_ARGS__)
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
 #define LOGINT(...)   LOGMASKED(LOG_INT,     __VA_ARGS__)
 #define LOGR(...)     LOGMASKED(LOG_READ,    __VA_ARGS__)
@@ -364,7 +362,7 @@ void bim68153_channel::device_reset()
 }
 
 /* Trigger an interrupt */
-WRITE_LINE_MEMBER( bim68153_channel::int_w )
+void bim68153_channel::int_w(int state)
 {
 	LOGINT("%s Ch %d: %s\n",FUNCNAME, m_index, state == CLEAR_LINE ? "Cleared" : "Asserted");
 	if (state == ASSERT_LINE)

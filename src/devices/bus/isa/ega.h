@@ -50,10 +50,10 @@ protected:
 	uint8_t alu_op( uint8_t data, uint8_t latch_data );
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(de_changed);
-	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(vblank_changed);
+	void de_changed(int state);
+	void hsync_changed(int state);
+	void vsync_changed(int state);
+	void vblank_changed(int state);
 
 	CRTC_EGA_PIXEL_UPDATE(ega_update_row);
 

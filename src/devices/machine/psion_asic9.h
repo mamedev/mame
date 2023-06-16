@@ -47,10 +47,10 @@ public:
 
 	IRQ_CALLBACK_MEMBER(inta_cb);
 
-	DECLARE_WRITE_LINE_MEMBER(eint0_w);
-	DECLARE_WRITE_LINE_MEMBER(eint1_w);
-	DECLARE_WRITE_LINE_MEMBER(eint2_w);
-	DECLARE_WRITE_LINE_MEMBER(medchng_w);
+	void eint0_w(int state);
+	void eint1_w(int state);
+	void eint2_w(int state);
+	void medchng_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

@@ -36,7 +36,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( busy_w );
+	void busy_w(int state);
 
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;

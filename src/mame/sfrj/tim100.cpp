@@ -47,7 +47,7 @@ protected:
 
 private:
 	u8 dma_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(sod_w);
+	void sod_w(int state);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
 	void mem_map(address_map &map);
@@ -161,7 +161,7 @@ I8275_DRAW_CHARACTER_MEMBER( tim100_state::crtc_display_pixels )
 	}
 }
 
-WRITE_LINE_MEMBER( tim100_state::sod_w )
+void tim100_state::sod_w(int state)
 {
 	if (state)
 		m_dma_view.select(0);

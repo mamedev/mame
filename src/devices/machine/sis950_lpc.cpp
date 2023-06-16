@@ -102,7 +102,7 @@ void sis950_lpc_device::device_reset()
 	remap_cb();
 }
 
-WRITE_LINE_MEMBER(sis950_lpc_device::cpu_a20_w)
+void sis950_lpc_device::cpu_a20_w(int state)
 {
 	// TODO: confirm "A20M# being always high"
 //  if (BIT(m_init_reg, 1))
@@ -110,7 +110,7 @@ WRITE_LINE_MEMBER(sis950_lpc_device::cpu_a20_w)
 	m_host_cpu->set_input_line(INPUT_LINE_A20, state);
 }
 
-WRITE_LINE_MEMBER(sis950_lpc_device::cpu_reset_w)
+void sis950_lpc_device::cpu_reset_w(int state)
 {
 	// TODO: masked via INIT $46 bit 0
 	m_host_cpu->set_input_line(INPUT_LINE_RESET, state);
@@ -420,7 +420,7 @@ void sis950_lpc_device::io_map(address_map &map)
 	// map(0x0000, 0x000f) DMA1
 	map(0x0000, 0x001f).rw(m_dmac_master, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	// map(0x0020, 0x0021) INT1
-	map(0x0020, 0x003f).rw(m_pic_master, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0020, 0x0021).rw(m_pic_master, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	// map(0x0040, 0x0043) PIT
 	map(0x0040, 0x0043).rw(m_pit, FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x0060, 0x0060).rw(m_keybc, FUNC(ps2_keyboard_controller_device::data_r), FUNC(ps2_keyboard_controller_device::data_w));
@@ -436,7 +436,7 @@ void sis950_lpc_device::io_map(address_map &map)
 	// map(0x0092, 0x0092) INIT and A20
 	map(0x0092, 0x0092).rw(FUNC(sis950_lpc_device::lpc_fast_init_r), FUNC(sis950_lpc_device::lpc_fast_init_w));
 	// map(0x00a0, 0x00a1) INT2
-	map(0x00a0, 0x00bf).rw(m_pic_slave, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x00a0, 0x00a1).rw(m_pic_slave, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	// map(0x00c0, 0x00df) DMA2
 	map(0x00c0, 0x00df).lrw8(
 		NAME([this] (offs_t offset) { return m_dmac_slave->read( offset / 2 ); }),
@@ -569,18 +569,18 @@ void sis950_lpc_device::unmap_log_w(offs_t offset, u8 data)
  * Start of legacy handling, to be moved out
  */
 
-WRITE_LINE_MEMBER( sis950_lpc_device::pit_out0 )
+void sis950_lpc_device::pit_out0(int state)
 {
 	m_pic_master->ir0_w(state);
 }
 
-WRITE_LINE_MEMBER( sis950_lpc_device::pit_out1 )
+void sis950_lpc_device::pit_out1(int state)
 {
 	if(state)
 		m_refresh = !m_refresh;
 }
 
-WRITE_LINE_MEMBER( sis950_lpc_device::pit_out2 )
+void sis950_lpc_device::pit_out2(int state)
 {
 	m_pit_out2 = state ? 1 : 0;
 	m_speaker->level_w(m_at_spkrdata & m_pit_out2);
@@ -697,7 +697,7 @@ void sis950_lpc_device::at_page8_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( sis950_lpc_device::pc_dma_hrq_changed )
+void sis950_lpc_device::pc_dma_hrq_changed(int state)
 {
 	m_host_cpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -706,7 +706,7 @@ WRITE_LINE_MEMBER( sis950_lpc_device::pc_dma_hrq_changed )
 }
 
 #if 0
-WRITE_LINE_MEMBER( sis950_lpc_device::iochck_w )
+void sis950_lpc_device::iochck_w(int state)
 {
 //  if (!state && !m_channel_check && m_nmi_enabled)
 	if (!state && !m_channel_check)

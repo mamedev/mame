@@ -182,7 +182,7 @@ private:
 	void slave_com_w(uint8_t data);
 	uint8_t rng_r();
 
-	DECLARE_WRITE_LINE_MEMBER(vclk_cb);
+	void vclk_cb(int state);
 
 	void jngolady_cpu0_map(address_map &map);
 	void jngolady_cpu1_io(address_map &map);
@@ -323,7 +323,7 @@ void jngolady_state::adpcm_w(uint8_t data)
 	m_adpcm_byte = data;
 }
 
-WRITE_LINE_MEMBER(jngolady_state::vclk_cb)
+void jngolady_state::vclk_cb(int state)
 {
 	if (!m_msm5205_vclk_toggle)
 	{

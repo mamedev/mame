@@ -105,8 +105,7 @@ void ccpu_cpu_device::device_start()
 {
 	/* copy input params */
 	m_external_input.resolve_safe(0);
-	m_vector_callback.resolve();
-	assert(!m_vector_callback.isnull());
+	m_vector_callback.resolve_safe();
 
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);

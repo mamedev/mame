@@ -250,16 +250,14 @@ device_memory_interface::space_config_vector i8085a_cpu_device::memory_space_con
 
 void i8085a_cpu_device::device_config_complete()
 {
-	m_clk_out_func.resolve();
-	if (!m_clk_out_func.isnull())
-		m_clk_out_func(clock() / 2);
+	m_clk_out_func.resolve_safe();
+	m_clk_out_func(clock() / 2);
 }
 
 
 void i8085a_cpu_device::device_clock_changed()
 {
-	if (!m_clk_out_func.isnull())
-		m_clk_out_func(clock() / 2);
+	m_clk_out_func(clock() / 2);
 }
 
 

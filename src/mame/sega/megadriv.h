@@ -44,7 +44,7 @@ protected:
 	void megadriv_tas_callback(offs_t offset, uint8_t data);
 
 	uint32_t screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_megadriv);
+	void screen_vblank_megadriv(int state);
 
 	required_device<m68000_device> m_maincpu;
 	required_device<timer_device> m_scan_timer;
@@ -56,8 +56,8 @@ protected:
 private:
 	IRQ_CALLBACK_MEMBER(genesis_int_callback);
 
-	WRITE_LINE_MEMBER(vdp_lv6irqline_callback_genesis_68k);
-	WRITE_LINE_MEMBER(vdp_lv4irqline_callback_genesis_68k);
+	void vdp_lv6irqline_callback_genesis_68k(int state);
+	void vdp_lv4irqline_callback_genesis_68k(int state);
 
 	void megadriv_timers(machine_config &config);
 };
@@ -108,7 +108,7 @@ protected:
 	uint8_t megadriv_z80_unmapped_read();
 	TIMER_CALLBACK_MEMBER(megadriv_z80_run_state);
 
-	WRITE_LINE_MEMBER(vdp_sndirqline_callback_genesis_z80);
+	void vdp_sndirqline_callback_genesis_z80(int state);
 
 	void megadriv_stop_scanline_timer();
 

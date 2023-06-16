@@ -81,12 +81,12 @@ private:
 	void mem_w(offs_t offset, u8 data);
 	u8 in_r(offs_t offset);
 	void out_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(phantom_disable_w);
+	void phantom_disable_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(printer_select_w);
-	DECLARE_WRITE_LINE_MEMBER(usart_txd_w);
-	DECLARE_WRITE_LINE_MEMBER(crt_rts_w);
-	DECLARE_WRITE_LINE_MEMBER(printer_rts_w);
+	void printer_select_w(int state);
+	void usart_txd_w(int state);
+	void crt_rts_w(int state);
+	void printer_rts_w(int state);
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
@@ -199,13 +199,13 @@ void sb8085_state::out_w(offs_t offset, u8 data)
 		m_s100->sout_w(offset, data);
 }
 
-WRITE_LINE_MEMBER(sb8085_state::phantom_disable_w)
+void sb8085_state::phantom_disable_w(int state)
 {
 	if (!state)
 		m_phantom = true;
 }
 
-WRITE_LINE_MEMBER(sb8085_state::printer_select_w)
+void sb8085_state::printer_select_w(int state)
 {
 	if (state && m_printer_select)
 	{
@@ -223,7 +223,7 @@ WRITE_LINE_MEMBER(sb8085_state::printer_select_w)
 	}
 }
 
-WRITE_LINE_MEMBER(sb8085_state::usart_txd_w)
+void sb8085_state::usart_txd_w(int state)
 {
 	m_usart_txd = state;
 	if (m_printer_select)
@@ -232,14 +232,14 @@ WRITE_LINE_MEMBER(sb8085_state::usart_txd_w)
 		m_crt->write_txd(state);
 }
 
-WRITE_LINE_MEMBER(sb8085_state::crt_rts_w)
+void sb8085_state::crt_rts_w(int state)
 {
 	m_crt_rts = state;
 	if (!m_printer_select)
 		m_usart->write_cts(state);
 }
 
-WRITE_LINE_MEMBER(sb8085_state::printer_rts_w)
+void sb8085_state::printer_rts_w(int state)
 {
 	m_printer_rts = state;
 	if (m_printer_select)

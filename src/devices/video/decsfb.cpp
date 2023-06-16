@@ -26,7 +26,6 @@
 #define MODE_TRANSPARENTLINE    6
 #define MODE_COPY       7
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_REG     (1U << 1)
 #define LOG_IRQ     (1U << 2)
 
@@ -36,8 +35,8 @@
 
 DEFINE_DEVICE_TYPE(DECSFB, decsfb_device, "decsfb", "Digital Equipment Corporation Smart Frame Buffer")
 
-decsfb_device::decsfb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DECSFB, tag, owner, clock),
+decsfb_device::decsfb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, DECSFB, tag, owner, clock),
 	m_int_cb(*this)
 {
 }

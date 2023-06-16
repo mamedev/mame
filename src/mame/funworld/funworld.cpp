@@ -822,7 +822,7 @@ void funworld_state::funworld_lamp_b_w(uint8_t data)
 //  popmessage("Lamps B: %02X", data);
 }
 
-WRITE_LINE_MEMBER(funworld_state::pia1_ca2_w)
+void funworld_state::pia1_ca2_w(int state)
 {
 // TAB and Impera games are writing 0x01 constantly, and 0x00 with each screen change.
 // This line is tied to some sort of reset circuitery.
@@ -6572,7 +6572,7 @@ ROM_END
 /*
   Jolly Joker (Otti Karl logo)
   Original Impera program.
-  
+
   Both sets have graphics ROMs data interleaved
   inside the second half of a 16bit 27C210 EPROM.
   The second set has full garbage in the first half.
@@ -7095,7 +7095,7 @@ ROM_END
   Mega Card (MC3).
   Ver. 0053.
   Fun World, 1992.
-  
+
   Poker game with encrypted CPU: F - 10/03/1992.
 
 */
@@ -7643,8 +7643,8 @@ ROM_START( novoplaya )
 	ROM_LOAD( "np4-ch2_9250.bin", 0x0000, 0x8000, CRC(7223471c) SHA1(785c6af6cf7e06978bc178a5c1c6b21f9db58a88) )
 	ROM_LOAD( "np4-ch1_9250.bin", 0x8000, 0x8000, CRC(c57bac23) SHA1(5b329ece7a0682b8ef5f9a13abb0312f7c885339) )
 
-//	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
-//	ROM_LOAD( "novoplaya_nvram.bin", 0x0000, 0x0800, CRC(92019972) SHA1(e6d1e231cd2ce27e718ed9482dbe9ddc8612eb67) )
+//  ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
+//  ROM_LOAD( "novoplaya_nvram.bin", 0x0000, 0x0800, CRC(92019972) SHA1(e6d1e231cd2ce27e718ed9482dbe9ddc8612eb67) )
 
 	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "n82s147an.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )
@@ -7664,8 +7664,8 @@ ROM_START( novoplayb )
 	ROM_REGION( 0x0800, "ds1220", 0 )    // Dallas DS1220 to analize.
 	ROM_LOAD( "ds1220.bin", 0x0000, 0x0800, CRC(f6c65329) SHA1(b64ca34661b9690aa9b69a20a7f6683954bbe76a) )
 
-//	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
-//	ROM_LOAD( "novoplayb_nvram.bin", 0x0000, 0x0800, CRC(92019972) SHA1(e6d1e231cd2ce27e718ed9482dbe9ddc8612eb67) )
+//  ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
+//  ROM_LOAD( "novoplayb_nvram.bin", 0x0000, 0x0800, CRC(92019972) SHA1(e6d1e231cd2ce27e718ed9482dbe9ddc8612eb67) )
 
 	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "am27s29.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )

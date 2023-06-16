@@ -31,12 +31,12 @@ TODO:
 #include "coreutil.h"
 #include "pce_cd.h"
 
-#define LOG_CMD            (1U <<  1)
-#define LOG_CDDA           (1U <<  2)
-#define LOG_SCSI           (1U <<  3)
-#define LOG_FADER          (1U <<  4)
-#define LOG_IRQ            (1U <<  5)
-#define LOG_SCSIXFER       (1U <<  6) // single byte transfers, verbose
+#define LOG_CMD            (1U << 1)
+#define LOG_CDDA           (1U << 2)
+#define LOG_SCSI           (1U << 3)
+#define LOG_FADER          (1U << 4)
+#define LOG_IRQ            (1U << 5)
+#define LOG_SCSIXFER       (1U << 6) // single byte transfers, verbose
 
 #define VERBOSE (LOG_GENERAL | LOG_CMD | LOG_CDDA | LOG_FADER)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -308,7 +308,7 @@ void pce_cd_device::adpcm_play()
   the MSM5205. Currently we can only use static clocks for the
   MSM5205.
  */
-WRITE_LINE_MEMBER( pce_cd_device::msm5205_int )
+void pce_cd_device::msm5205_int(int state)
 {
 	uint8_t msm_data;
 
@@ -877,7 +877,7 @@ void pce_cd_device::handle_data_output()
 	}
 }
 
-WRITE_LINE_MEMBER(pce_cd_device::cdda_end_mark_cb)
+void pce_cd_device::cdda_end_mark_cb(int state)
 {
 	if (state != ASSERT_LINE)
 		return;

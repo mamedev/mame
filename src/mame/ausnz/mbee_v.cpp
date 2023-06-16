@@ -38,7 +38,7 @@ See drivers\mbee.cpp for any issues.
 #include "emu.h"
 #include "mbee.h"
 
-WRITE_LINE_MEMBER( mbee_state::crtc_vs )
+void mbee_state::crtc_vs(int state)
 {
 	m_b7_vs = state;
 	if ((m_io_config->read() & 0xc0) == 0) // VS selected in config menu

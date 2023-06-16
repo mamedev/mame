@@ -57,11 +57,11 @@ public:
 
 	void firetrk(machine_config &config);
 
-	template <int P> DECLARE_READ_LINE_MEMBER(steer_dir_r);
-	template <int P> DECLARE_READ_LINE_MEMBER(steer_flag_r);
-	template <int P> DECLARE_READ_LINE_MEMBER(skid_r);
-	template <int P> DECLARE_READ_LINE_MEMBER(crash_r);
-	template <int P> DECLARE_READ_LINE_MEMBER(gear_r);
+	template <int P> int steer_dir_r();
+	template <int P> int steer_flag_r();
+	template <int P> int skid_r();
+	template <int P> int crash_r();
+	template <int P> int gear_r();
 	DECLARE_INPUT_CHANGED_MEMBER(service_mode_switch_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(firetrk_horn_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(gear_changed);
@@ -839,21 +839,21 @@ uint8_t montecar_state::dip_r(offs_t offset)
 
 
 template <int P>
-READ_LINE_MEMBER(firetrk_state::steer_dir_r)
+int firetrk_state::steer_dir_r()
 {
 	return m_steer_dir[P];
 }
 
 
 template <int P>
-READ_LINE_MEMBER(firetrk_state::steer_flag_r)
+int firetrk_state::steer_flag_r()
 {
 	return m_steer_flag[P];
 }
 
 
 template <int P>
-READ_LINE_MEMBER(firetrk_state::skid_r)
+int firetrk_state::skid_r()
 {
 	uint32_t ret;
 
@@ -867,7 +867,7 @@ READ_LINE_MEMBER(firetrk_state::skid_r)
 
 
 template <int P>
-READ_LINE_MEMBER(firetrk_state::crash_r)
+int firetrk_state::crash_r()
 {
 	uint32_t ret;
 
@@ -881,7 +881,7 @@ READ_LINE_MEMBER(firetrk_state::crash_r)
 
 
 template <int P>
-READ_LINE_MEMBER(firetrk_state::gear_r)
+int firetrk_state::gear_r()
 {
 	return (m_gear == P) ? 1 : 0;
 }

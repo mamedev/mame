@@ -46,7 +46,7 @@ bool gamate_protection_device::is_protection_passed()
 	return m_is_protection_passed;
 }
 
-WRITE_LINE_MEMBER(gamate_protection_device::prot_w)
+void gamate_protection_device::prot_w(int state)
 {
 	LOG("write to protection %01x\n", state);
 
@@ -88,7 +88,7 @@ WRITE_LINE_MEMBER(gamate_protection_device::prot_w)
 	}
 }
 
-READ_LINE_MEMBER(gamate_protection_device::prot_r)
+int gamate_protection_device::prot_r()
 {
 
 	if (m_passed_write)

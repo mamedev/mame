@@ -281,7 +281,7 @@ void hp9825_tape_device::tape_w(offs_t offset, uint16_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(hp9825_tape_device::short_gap_w)
+void hp9825_tape_device::short_gap_w(int state)
 {
 	LOG_DBG("Short gap %d\n" , state);
 	m_short_gap_out = state;
@@ -295,7 +295,7 @@ WRITE_LINE_MEMBER(hp9825_tape_device::short_gap_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hp9825_tape_device::long_gap_w)
+void hp9825_tape_device::long_gap_w(int state)
 {
 	LOG_DBG("Long gap %d\n" , state);
 	if (m_long_gap_out && !state && !BIT(m_cmd_reg , CMD_REG_DMA_EN_BIT)) {
@@ -318,7 +318,7 @@ void hp9825_tape_device::set_flg(bool state)
 	}
 }
 
-WRITE_LINE_MEMBER(hp9825_tape_device::cart_out_w)
+void hp9825_tape_device::cart_out_w(int state)
 {
 	LOG_DBG("cart_out_w %d\n" , state);
 	if (state) {
@@ -337,7 +337,7 @@ WRITE_LINE_MEMBER(hp9825_tape_device::cart_out_w)
 	update_sts();
 }
 
-WRITE_LINE_MEMBER(hp9825_tape_device::hole_w)
+void hp9825_tape_device::hole_w(int state)
 {
 	if (state) {
 		LOG_DBG("hole_w\n");
@@ -346,7 +346,7 @@ WRITE_LINE_MEMBER(hp9825_tape_device::hole_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hp9825_tape_device::tacho_tick_w)
+void hp9825_tape_device::tacho_tick_w(int state)
 {
 	if (state) {
 		LOG_DBG("tacho_tick_w\n");
@@ -356,7 +356,7 @@ WRITE_LINE_MEMBER(hp9825_tape_device::tacho_tick_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hp9825_tape_device::motion_w)
+void hp9825_tape_device::motion_w(int state)
 {
 	if (state) {
 		LOG_DBG("motion_w\n");
@@ -376,7 +376,7 @@ WRITE_LINE_MEMBER(hp9825_tape_device::motion_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hp9825_tape_device::rd_bit_w)
+void hp9825_tape_device::rd_bit_w(int state)
 {
 	m_short_gap_timer->b_w(1);
 	m_short_gap_timer->b_w(0);
@@ -398,7 +398,7 @@ WRITE_LINE_MEMBER(hp9825_tape_device::rd_bit_w)
 	}
 }
 
-READ_LINE_MEMBER(hp9825_tape_device::wr_bit_r)
+int hp9825_tape_device::wr_bit_r()
 {
 	if (BIT(m_cmd_reg , CMD_REG_FLG_SEL_BIT)) {
 		set_flg(true);

@@ -229,17 +229,17 @@ INPUT_PORTS_END
 
 /* CDP1802 Interface */
 
-READ_LINE_MEMBER( tmc600_state::ef2_r )
+int tmc600_state::ef2_r()
 {
 	return m_cassette->input() < 0;
 }
 
-READ_LINE_MEMBER( tmc600_state::ef3_r )
+int tmc600_state::ef3_r()
 {
 	return !BIT(m_key_row[(m_out3 >> 3) & 0x07]->read(), m_out3 & 0x07);
 }
 
-WRITE_LINE_MEMBER( tmc600_state::q_w )
+void tmc600_state::q_w(int state)
 {
 	m_cassette->output(state ? +1.0 : -1.0);
 }

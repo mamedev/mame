@@ -221,19 +221,19 @@ u8 deco_irq_device::status_r()
 	return data;
 }
 
-WRITE_LINE_MEMBER( deco_irq_device::lightgun1_trigger_w )
+void deco_irq_device::lightgun1_trigger_w(int state)
 {
 	if (state)
 		m_lightgun_latch = m_lightgun1_cb();
 }
 
-WRITE_LINE_MEMBER( deco_irq_device::lightgun2_trigger_w )
+void deco_irq_device::lightgun2_trigger_w(int state)
 {
 	if (state)
 		m_lightgun_latch = m_lightgun2_cb();
 }
 
-WRITE_LINE_MEMBER( deco_irq_device::lightgun_irq_ack_w )
+void deco_irq_device::lightgun_irq_ack_w(int state)
 {
 	m_lightgun_irq = false;
 	m_lightgun_irq_cb(CLEAR_LINE);

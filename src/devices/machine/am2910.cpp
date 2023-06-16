@@ -14,9 +14,9 @@
 #include "emu.h"
 #include "am2910.h"
 
-#define LOG_INSN    (1 << 0)
-#define LOG_STACK   (1 << 1)
-#define LOG_ERROR   (1 << 2)
+#define LOG_INSN    (1U << 1)
+#define LOG_STACK   (1U << 2)
+#define LOG_ERROR   (1U << 3)
 #define LOG_ALL     (LOG_INSN | LOG_STACK | LOG_ERROR)
 
 #define VERBOSE     (0)
@@ -91,27 +91,27 @@ TIMER_CALLBACK_MEMBER(am2910_device::clock_tick)
 	cp_w(m_cp ? 0 : 1);
 }
 
-WRITE_LINE_MEMBER(am2910_device::cc_w)
+void am2910_device::cc_w(int state)
 {
 	m_cc = state;
 }
 
-WRITE_LINE_MEMBER(am2910_device::ccen_w)
+void am2910_device::ccen_w(int state)
 {
 	m_ccen = state;
 }
 
-WRITE_LINE_MEMBER(am2910_device::ci_w)
+void am2910_device::ci_w(int state)
 {
 	m_ci = state;
 }
 
-WRITE_LINE_MEMBER(am2910_device::rld_w)
+void am2910_device::rld_w(int state)
 {
 	m_rld = state;
 }
 
-WRITE_LINE_MEMBER(am2910_device::cp_w)
+void am2910_device::cp_w(int state)
 {
 	int old_state = m_cp;
 	m_cp = state;

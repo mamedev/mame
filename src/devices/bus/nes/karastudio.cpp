@@ -32,7 +32,7 @@
 #include "karastudio.h"
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
 #define VERBOSE 0
 #endif

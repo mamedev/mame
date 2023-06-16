@@ -270,7 +270,7 @@ Regular game cartridges
 |   XX   | 80-092185(FR)     | Les Bisounours - Le Monde Merveilleux des Bisounours                                           |
 |   XX   | 80-092187(SP)     | Osos Amorosos - Una Lección de Amor (92187 on PCB)                                             |
 +========+===================+================================================================================================+
-|        | 80-092200(US)     | Aladdin - Aladdin's Wonders of the World                                                       |
+|   XX   | 80-092200(US)     | Aladdin - Aladdin's Wonders of the World                                                       |
 |   XX   | 80-092201(IT)     | Aladdin - Il magico mondo di Aladdin                                                           |
 |   XX   | 80-092202(NL)     | Aladdin - De wonderwereld van Aladdin                                                          |
 |   XX   | 80-092203(UK)     | Aladdin - Aladdin's Wonders of the World                                                       |
@@ -354,8 +354,7 @@ Regular game cartridges
 |        |          (NO)     | Byggmester Bob - Bobs travle dag                                                               |
 |        |          (FI)     | Puuha-Pete - Peten kiirenes päivä                                                              |
 +========+===================+================================================================================================+
-|        | 80-092320(US)     | The Wiggles - It's Wiggle Time!                                                                |
-|   XX   |          (US)     | The Wiggles - It's Wiggle Time! (may be the one above, but no cart pic)                        |
+|   XX   | 80-092320(US)     | The Wiggles - It's Wiggle Time!                                                                |
 |        | 80-092323(UK)     | The Wiggles - It's Wiggle Time!                                                                |
 +========+===================+================================================================================================+
 |   XX   | 80-092340(US)     | Thomas The Tank - Engines Working Together                                                     |
@@ -412,7 +411,7 @@ Regular game cartridges
 |   XX   | 80-092445(FR)     | Bob L'éponge - Une journée dans la vie d'une éponge                                            |
 |   XX   | 80-092447(SP)     | Bob Esponja - Un día en la vida de una esponja (52-92447(SP) on back label)                    |
 +========+===================+================================================================================================+
-|        | 80-092460(US)     | Sesame Street - Bert and Ernie's Imagination Adventure                                         |
+|   XX   | 80-092460(US)     | Sesame Street - Bert and Ernie's Imagination Adventure                                         |
 |        | 80-092462(NL)     | Sesamstraat - Bert and Ernie's Fantasie Avontuur                                               |
 |   XX   | 80-092464(GE)     | Sesame Street - Ernie and Berts Fantastisches Abenteuer                                        |
 |   XX   | 80-092465(FR)     | 5, Rue Sesame - Les Aventures Imaginaires d'Ernest et Bert                                     |
@@ -457,18 +456,18 @@ Regular game cartridges
 |        | 80-092560(US)     | 101 Dalmations (one pic on german site with USA code)                                          |
 |        | 80-092564(GE)     | 101 Dalmatiner (EAN on german site with USA pic... wtf)                                        |
 +========+===================+================================================================================================+
-|        | 80-092580(US)     | Backyardigans - Viking Voyage                                                                  |
+|   XX   | 80-092580(US)     | Backyardigans - Viking Voyage                                                                  |
 |        | 80-092580-201(US) | Backyardigans - Viking Voyage (rev. 201)                                                       |
 |        | 80-092583(UK)     | Backyardigans - Viking Voyage                                                                  |
 |   XX   | 80-092585(FR)     | Les Melodilous - Les explorateurs vikings                                                      |
 +========+===================+================================================================================================+
-|        | 80-092600(US)     | Shrek - Dragon's Tale                                                                          |
+|   XX   | 80-092600(US)     | Shrek - Dragon's Tale                                                                          |
 |   XX   | 80-092602(NL)     | Shrek - Het verhaal van Draakje                                                                |
 |   XX   | 80-092604(GE)     | Shrek - Die Geschichte des Drachen                                                             |
 |   XX   | 80-092605(FR)     | Shrek - Le Rhume de Dragonne                                                                   |
 |   XX   | 80-092607(SP)     | Shrek - El Cuento de la Dragona                                                                |
 +========+===================+================================================================================================+
-|        | 80-092620(US)     | Lil' Bratz - Friends, Fashion and Fun                                                          |
+|   XX   | 80-092620(US)     | Lil' Bratz - Friends, Fashion and Fun                                                          |
 |        | 80-092623(UK)     | Lil' Bratz - Friends, Fashion and Fun                                                          |
 |   XX   | 80-092627(SP)     | Lil' Bratz - Amigos, Moda y Diversión                                                          |
 |   XX   | 80-092625(FR)     | Lil' Bratz - Complices, Cools et Class'                                                        |
@@ -534,7 +533,7 @@ Regular game cartridges
 |   XX   | 80-092865-105(FR) | Shrek Le Troisième - L'aventure d'Arthur (rev. 105)                                            |
 |        | 80-092867(SP)     | Shrek Tercero - En Busca de Arturo                                                             |
 +========+===================+================================================================================================+
-|        | 80-092880(US)     | Ratatouille - Remy's New Recipes                                                               |
+|   XX   | 80-092880(US)     | Ratatouille - Remy's New Recipes                                                               |
 |   XX   | 80-092881(IT)     | Ratatouille - Le nuove Ricette di Remy                                                         |
 |   XX   | 80-092882(NL)     | Ratatouille - Remy's Nieuwe Recepten (52-092882(NL) on back label)                             |
 |        | 80-092883(UK)     | Ratatouille - Remy's New Recipes                                                               |
@@ -600,7 +599,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 <softwarelist name="vsmile_cart" description="VTech V.Smile cartridges">
 
-	<software name="aladdinit" cloneof="aladdinuk">
+	<software name="aladdin">
+		<description>Disney's Aladdin - Aladdin's Wonders of the World (USA)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092200(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Disneys Aladdin - Aladdins Wonders of the World (USA).bin" size="0x800000" crc="6bd75183" sha1="83626fa943a4c866952f58beb3f4ece93eeed5af" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aladdinit" cloneof="aladdin">
 		<description>Disney Aladdin - Il magico mondo di Aladdin (Italy)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
@@ -614,7 +628,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="aladdinnl" cloneof="aladdinuk">
+	<software name="aladdinnl" cloneof="aladdin">
 		<description>Disney's Aladdin - De wonderwereld van Aladdin (Netherlands)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
@@ -631,8 +645,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- Parent until the USA version is found and dumped. -->
-	<software name="aladdinuk">
+	<software name="aladdinuk" cloneof="aladdin">
 		<description>Disney's Aladdin - Aladdin's Wonders of the World (UK)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
@@ -647,7 +660,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="aladdinge" cloneof="aladdinuk">
+	<software name="aladdinge" cloneof="aladdin">
 		<description>Disneys Aladdin - Aladdins Welt der Wunder (Germany)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -664,7 +677,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="aladdinfr" cloneof="aladdinuk">
+	<software name="aladdinfr" cloneof="aladdin">
 		<description>Disney Aladdin - Les fabuleuses aventures d'Aladdin (France)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
@@ -679,7 +692,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="aladdinsp" cloneof="aladdinuk">
+	<software name="aladdinsp" cloneof="aladdin">
 		<description>Disney Aladdin - El Maravilloso Mundo de Aladdin (Spain)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
@@ -1041,7 +1054,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="backyardigfr"> <!-- Will be clone of "backyardig" once found and dumped. -->
+	<software name="backyardig">
+		<description>Nick Jr The Backyardigans - Viking Voyage (USA)</description>
+		<year>2006</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092580(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Backyardigans, The - Viking Voyage (USA).bin" size="0x800000" crc="68e3129b" sha1="bf70c4b601fc19008a434b0cbf6b8ad0a2106e89" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backyardigfr" cloneof="backyardig">
 		<description>Nickelodeon Les Mélodilous - Les explorateurs vikings (France)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -2599,7 +2627,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="lbratzfr">
+	<software name="lbratz">
+		<description>Lil' Bratz Dressed Up - Friends, Fashion and Fun (USA)</description>
+		<year>2008?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092620(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Lil Bratz - Friends, Fashion and Fun (USA).bin" size="0x800000" crc="f8e3beac" sha1="4874bdf5a437ab26cf7418ea9ffb4ee9e167316a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lbratzfr" cloneof="lbratz">
 		<description>Lil' Bratz Au Top de la Mode - Complices, Cools et Class' (France)</description>
 		<year>2008?</year>
 		<publisher>VTech</publisher>
@@ -2614,7 +2657,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="lbratzsp" cloneof="lbratzfr">
+	<software name="lbratzsp" cloneof="lbratz">
 		<description>Lil' Bratz Estrellas De La Moda - Amigos, Moda y Diversión (Spain)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -3295,7 +3338,20 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="ratatit">
+	<software name="ratat">
+		<description>Disney/Pixar Ratatouille - Remy's New Recipes (USA)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092880(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Ratatouille - Remys New Recipes (USA).bin" size="0x800000" crc="dc949431" sha1="885e2fa8d3731cc60bf121a945cd56c9790c457a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ratatit" cloneof="ratat">
 		<description>Disney/Pixar Ratatouille - Le nuove ricette di Remy (Italy)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -3308,7 +3364,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="ratatnl" cloneof="ratatit">
+	<software name="ratatnl" cloneof="ratat">
 		<description>Disney/Pixar Ratatouille - Remy's Nieuwe Recepten (Netherlands)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -3325,7 +3381,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="ratatge" cloneof="ratatit">
+	<software name="ratatge" cloneof="ratat">
 		<description>Disney/Pixar Ratatouille - Remys neue Rezepte (Germany)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -3342,7 +3398,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="ratatfr" cloneof="ratatit">
+	<software name="ratatfr" cloneof="ratat">
 		<description>Disney/Pixar Ratatouille - Les nouvelles recettes de Rémy (France)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -3357,7 +3413,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="ratatsp" cloneof="ratatit">
+	<software name="ratatsp" cloneof="ratat">
 		<description>Disney/Pixar Ratatouille - Las recetas del Remy (Spain)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -3592,7 +3648,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="erniebrtge">
+	<software name="erniebrt">
+		<description>Bert &amp; Ernie's Imagination Adventure (USA)</description>
+		<year>2006</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092460(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Sesame Street - Bert and Ernies Imagination Adventure (USA).bin" size="0x800000" crc="6ca0e5ad" sha1="4461254635d1b4e78258dc051b8a117b9ed6adab" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="erniebrtge" cloneof="erniebrt">
 		<description>Ernies &amp; Berts Fantastisches Abenteuer (Germany)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -3609,7 +3680,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="erniebrtfr" cloneof="erniebrtge">
+	<software name="erniebrtfr" cloneof="erniebrt">
 		<description>Les aventures de imagniares d'Ernest et Bart (France)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
@@ -3624,7 +3695,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="erniebrtsp" cloneof="erniebrtge">
+	<software name="erniebrtsp" cloneof="erniebrt">
 		<description>Barrio Sésamo - El Mundo Fantástico de Epi y Blas (Spain)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
@@ -3753,7 +3824,21 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="shreknl">
+	<software name="shrek">
+		<description>DreamWorks Shrek - Dragon's Tale (USA)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092600(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Shrek - Dragons Tale (USA).bin" size="0x800000" crc="78f90774" sha1="d5e76eaa1d7e257e21e25c54db28aa04e6b74397" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shreknl" cloneof="shrek">
 		<description>DreamWorks Shrek - Het Verhaal Van Draakje (Netherlands)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -3767,7 +3852,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="shrekge" cloneof="shreknl">
+	<software name="shrekge" cloneof="shrek">
 		<description>DreamWorks Shrek - Die Geschichte des Drachen (Germany)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -3784,7 +3869,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="shrekfr" cloneof="shreknl">
+	<software name="shrekfr" cloneof="shrek">
 		<description>DreamWorks Shrek - Le Rhume de Dragonne (France)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -3801,7 +3886,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="shreksp" cloneof="shreknl">
+	<software name="shreksp" cloneof="shrek">
 		<description>DreamWorks Shrek - El Cuento de la Dragona (Spain)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>

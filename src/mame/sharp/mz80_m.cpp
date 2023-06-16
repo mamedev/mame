@@ -59,7 +59,7 @@ void mz80_state::mz80k_8255_portc_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER( mz80_state::pit_out0_changed )
+void mz80_state::pit_out0_changed(int state)
 {
 	if(!m_prev_state && state)
 		m_speaker_level++;
@@ -68,7 +68,7 @@ WRITE_LINE_MEMBER( mz80_state::pit_out0_changed )
 	m_speaker->level_w(BIT(m_speaker_level, 1));
 }
 
-WRITE_LINE_MEMBER( mz80_state::pit_out2_changed )
+void mz80_state::pit_out2_changed(int state)
 {
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }

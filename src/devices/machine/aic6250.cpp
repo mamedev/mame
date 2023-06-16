@@ -29,7 +29,6 @@
 #include "emu.h"
 #include "aic6250.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_REG     (1U << 1)
 #define LOG_STATE   (1U << 2)
 #define LOG_CONFIG  (1U << 3)
@@ -1015,7 +1014,7 @@ void aic6250_device::set_int_state(bool asserted)
  * the DMA transfer count falls below 8, data is transferred via individual
  * cycles on demand rather than prefetched.
  */
-WRITE_LINE_MEMBER(aic6250_device::back_w)
+void aic6250_device::back_w(int state)
 {
 	LOGMASKED(LOG_DMA, "back_w %d\n", state);
 

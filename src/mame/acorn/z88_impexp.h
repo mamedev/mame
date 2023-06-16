@@ -20,9 +20,9 @@ class z88_impexp_device : public device_t,
 public:
 	z88_impexp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual WRITE_LINE_MEMBER( input_txd ) override { device_serial_interface::rx_w(state); }
-	virtual WRITE_LINE_MEMBER( input_rts ) override;
-	virtual WRITE_LINE_MEMBER( input_dtr ) override { m_dtr = state; }
+	virtual void input_txd(int state) override { device_serial_interface::rx_w(state); }
+	virtual void input_rts(int state) override;
+	virtual void input_dtr(int state) override { m_dtr = state; }
 
 protected:
 	virtual void device_start() override;

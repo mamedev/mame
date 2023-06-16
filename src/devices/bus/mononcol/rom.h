@@ -19,7 +19,7 @@ public:
 	mononcol_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	uint8_t read() override { return m_spi->read(); }
-	DECLARE_WRITE_LINE_MEMBER(dir_w) override { m_spi->dir_w(state); }
+	void dir_w(int state) override { m_spi->dir_w(state); }
 	void write(uint8_t data) override { m_spi->write(data); }
 	void set_ready() override { m_spi->set_ready(); }
 

@@ -84,11 +84,11 @@ private:
 	void sol3_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[i] = BIT(data, i); }; // solenoids 0-7
 	u8 switch_r();
 	void switch_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { } // dummy to stop error log filling up
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { m_comma34 = state; } // comma3&4
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { m_comma12 = state; } // comma1&2
-	DECLARE_WRITE_LINE_MEMBER(pia_irq);
+	void pia21_cb2_w(int state) { } // enable solenoids
+	void pia24_cb2_w(int state) { } // dummy to stop error log filling up
+	void pia28_ca2_w(int state) { m_comma34 = state; } // comma3&4
+	void pia28_cb2_w(int state) { m_comma12 = state; } // comma1&2
+	void pia_irq(int state);
 
 	void main_map(address_map &map);
 
@@ -295,7 +295,7 @@ void s9_state::switch_w(u8 data)
 	m_row = data;
 }
 
-WRITE_LINE_MEMBER( s9_state::pia_irq )
+void s9_state::pia_irq(int state)
 {
 	if(state == CLEAR_LINE)
 	{

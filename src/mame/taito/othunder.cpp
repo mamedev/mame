@@ -308,13 +308,13 @@ void othunder_state::irq_ack_w(offs_t offset, u16 data)
 	}
 }
 
-WRITE_LINE_MEMBER( othunder_state::vblank_w )
+void othunder_state::vblank_w(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(5, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( othunder_state::adc_eoc_w )
+void othunder_state::adc_eoc_w(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(6, ASSERT_LINE);

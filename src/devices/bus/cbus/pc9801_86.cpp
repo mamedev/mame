@@ -44,7 +44,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(PC9801_86, pc9801_86_device, "pc9801_86", "NEC PC-9801-86")
 
-WRITE_LINE_MEMBER(pc9801_86_device::sound_irq)
+void pc9801_86_device::sound_irq(int state)
 {
 	m_fmirq = state ? true : false;
 	// TODO: sometimes misfired irq causes sound or even host hang

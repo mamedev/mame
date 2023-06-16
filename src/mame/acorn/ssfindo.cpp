@@ -233,10 +233,10 @@ private:
 
 	void tetfight_map(address_map &map);
 
-	DECLARE_READ_LINE_MEMBER(iocr_od0_r);
-	DECLARE_READ_LINE_MEMBER(iocr_od1_r);
-	DECLARE_WRITE_LINE_MEMBER(iocr_od0_w);
-	DECLARE_WRITE_LINE_MEMBER(iocr_od1_w);
+	int iocr_od0_r();
+	int iocr_od1_r();
+	void iocr_od0_w(int state);
+	void iocr_od1_w(int state);
 	uint32_t tetfight_unk_r();
 };
 
@@ -263,19 +263,19 @@ void ssfindo_state::iolines_w(uint8_t data)
 
 // inverted compared to riscpc.cpp
 // TODO: simplify hookup over i2cmem having AND 1 on state for a writeline (?)
-READ_LINE_MEMBER(tetfight_state::iocr_od1_r)
+int tetfight_state::iocr_od1_r()
 {
 	// TODO: completely get rid of this speedup fn or move anywhere else
 	//if (m_speedup) (this->*m_speedup)();
 	return (m_i2cmem->read_sda() ? 1 : 0); //eeprom read
 }
 
-READ_LINE_MEMBER(tetfight_state::iocr_od0_r)
+int tetfight_state::iocr_od0_r()
 {
 	return (m_i2cmem_clock == true ? 1 : 0); //eeprom read
 }
 
-WRITE_LINE_MEMBER(tetfight_state::iocr_od1_w)
+void tetfight_state::iocr_od1_w(int state)
 {
 	// TODO: i2c cares about the order of this!?
 	// tetfight reaches PC=0x106c if initialization has success
@@ -285,7 +285,7 @@ WRITE_LINE_MEMBER(tetfight_state::iocr_od1_w)
 	//m_i2cmem->write_sda(state == true ? 1 : 0);
 }
 
-WRITE_LINE_MEMBER(tetfight_state::iocr_od0_w)
+void tetfight_state::iocr_od0_w(int state)
 {
 	m_i2cmem_clock = state;
 	m_i2cmem->write_scl(state == true ? 1 : 0);

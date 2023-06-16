@@ -245,18 +245,18 @@ class delegate_mfp_compatible
 {
 public:
 	// default constructor
-	delegate_mfp_compatible()
+	delegate_mfp_compatible() noexcept
 		: m_rawdata(s_null_mfp)
 		, m_realobject(nullptr)
 		, m_stubfunction(nullptr)
 	{ }
 
 	// copy constructor
-	delegate_mfp_compatible(const delegate_mfp_compatible &src) = default;
+	delegate_mfp_compatible(const delegate_mfp_compatible &src) noexcept = default;
 
 	// construct from any member function pointer
 	template <typename MemberFunctionType, class MemberFunctionClass, typename ReturnType, typename StaticFunctionType>
-	delegate_mfp_compatible(MemberFunctionType mfp, MemberFunctionClass *, ReturnType *, StaticFunctionType)
+	delegate_mfp_compatible(MemberFunctionType mfp, MemberFunctionClass *, ReturnType *, StaticFunctionType) noexcept
 		: m_rawdata(s_null_mfp)
 		, m_realobject(nullptr)
 		, m_stubfunction(make_generic<StaticFunctionType>(&delegate_mfp_compatible::method_stub<MemberFunctionClass, ReturnType>))
@@ -266,21 +266,21 @@ public:
 	}
 
 	// comparison helpers
-	bool operator==(const delegate_mfp_compatible &rhs) const { return m_rawdata == rhs.m_rawdata; }
-	bool isnull() const { return m_rawdata == s_null_mfp; }
+	bool operator==(const delegate_mfp_compatible &rhs) const noexcept { return m_rawdata == rhs.m_rawdata; }
+	bool isnull() const noexcept { return m_rawdata == s_null_mfp; }
 
 	// getters
-	delegate_generic_class *real_object(delegate_generic_class *original) const
+	delegate_generic_class *real_object(delegate_generic_class *original) const noexcept
 	{
 		return m_realobject;
 	}
 
 	// binding helpers
 	template <typename FunctionType>
-	void update_after_bind(FunctionType &funcptr, delegate_generic_class *&object);
+	void update_after_bind(FunctionType &funcptr, delegate_generic_class *&object) noexcept;
 
 	template <typename FunctionType>
-	void update_after_copy(FunctionType &funcptr, delegate_generic_class *&object);
+	void update_after_copy(FunctionType &funcptr, delegate_generic_class *&object) noexcept;
 
 private:
 	// helper stubs for calling encased member function pointers
@@ -290,7 +290,7 @@ private:
 	// helper to convert a function of a given type to a generic function, forcing template
 	// instantiation to match the source type
 	template <typename SourceType>
-	static delegate_generic_function make_generic(SourceType funcptr)
+	static delegate_generic_function make_generic(SourceType funcptr) noexcept
 	{
 		return reinterpret_cast<delegate_generic_function>(funcptr);
 	}
@@ -303,7 +303,7 @@ private:
 #else // all other cases - for MSVC maximum size is one pointer, plus 3 ints; all other implementations seem to be smaller
 		int data[((sizeof(void *) + 3 * sizeof(int)) + (sizeof(int) - 1)) / sizeof(int)];
 #endif
-		bool operator==(const raw_mfp_data &rhs) const { return !std::memcmp(data, rhs.data, sizeof(data)); }
+		bool operator==(const raw_mfp_data &rhs) const noexcept { return !std::memcmp(data, rhs.data, sizeof(data)); }
 	};
 
 	// internal state
@@ -316,7 +316,7 @@ private:
 
 
 template <typename FunctionType>
-void delegate_mfp_compatible::update_after_bind(FunctionType &funcptr, delegate_generic_class *&object)
+void delegate_mfp_compatible::update_after_bind(FunctionType &funcptr, delegate_generic_class *&object) noexcept
 {
 	m_realobject = object;
 	object = reinterpret_cast<delegate_generic_class *>(this);
@@ -325,7 +325,7 @@ void delegate_mfp_compatible::update_after_bind(FunctionType &funcptr, delegate_
 
 
 template <typename FunctionType>
-void delegate_mfp_compatible::update_after_copy(FunctionType &funcptr, delegate_generic_class *&object)
+void delegate_mfp_compatible::update_after_copy(FunctionType &funcptr, delegate_generic_class *&object) noexcept
 {
 	assert(reinterpret_cast<FunctionType>(m_stubfunction) == funcptr);
 	object = reinterpret_cast<delegate_generic_class *>(this);
@@ -375,26 +375,26 @@ class delegate_mfp_itanium
 {
 public:
 	// default constructor
-	delegate_mfp_itanium() = default;
+	delegate_mfp_itanium() noexcept = default;
 
 	// copy constructor
-	delegate_mfp_itanium(const delegate_mfp_itanium &src) = default;
+	delegate_mfp_itanium(const delegate_mfp_itanium &src) noexcept = default;
 
 	// construct from any member function pointer
 	template <typename MemberFunctionType, class MemberFunctionClass, typename ReturnType, typename StaticFunctionType>
-	delegate_mfp_itanium(MemberFunctionType mfp, MemberFunctionClass *, ReturnType *, StaticFunctionType)
+	delegate_mfp_itanium(MemberFunctionType mfp, MemberFunctionClass *, ReturnType *, StaticFunctionType) noexcept
 	{
 		static_assert(sizeof(mfp) == sizeof(*this), "Unsupported member function pointer size");
 		*reinterpret_cast<MemberFunctionType *>(this) = mfp;
 	}
 
 	// comparison helpers
-	bool operator==(const delegate_mfp_itanium &rhs) const
+	bool operator==(const delegate_mfp_itanium &rhs) const noexcept
 	{
 		return (isnull() && rhs.isnull()) || ((m_function == rhs.m_function) && (m_this_delta == rhs.m_this_delta));
 	}
 
-	bool isnull() const
+	bool isnull() const noexcept
 	{
 		if (MAME_ABI_CXX_ITANIUM_MFP_TYPE == MAME_ABI_CXX_ITANIUM_MFP_ARM)
 			return !reinterpret_cast<void (*)()>(m_function) && !(m_this_delta & 1);
@@ -403,7 +403,7 @@ public:
 	}
 
 	// getters
-	static delegate_generic_class *real_object(delegate_generic_class *original)
+	static delegate_generic_class *real_object(delegate_generic_class *original) noexcept
 	{
 		return original;
 	}
@@ -416,7 +416,7 @@ public:
 	}
 
 	template <typename FunctionType>
-	void update_after_copy(FunctionType &funcptr, delegate_generic_class *&object)
+	void update_after_copy(FunctionType &funcptr, delegate_generic_class *&object) noexcept
 	{
 	}
 
@@ -465,14 +465,14 @@ class delegate_mfp_msvc
 
 public:
 	// default constructor
-	delegate_mfp_msvc() = default;
+	delegate_mfp_msvc() noexcept = default;
 
 	// copy constructor
-	delegate_mfp_msvc(const delegate_mfp_msvc &src) = default;
+	delegate_mfp_msvc(const delegate_mfp_msvc &src) noexcept = default;
 
 	// construct from any member function pointer
 	template <typename MemberFunctionType, class MemberFunctionClass, typename ReturnType, typename StaticFunctionType>
-	delegate_mfp_msvc(MemberFunctionType mfp, MemberFunctionClass *, ReturnType *, StaticFunctionType)
+	delegate_mfp_msvc(MemberFunctionType mfp, MemberFunctionClass *, ReturnType *, StaticFunctionType) noexcept
 	{
 		// FIXME: this doesn't actually catch the unsupported virtual inheritance case on 64-bit targets
 		// alignment of the pointer means sizeof gives the same value for multiple inheritance and virtual inheritance cases
@@ -485,7 +485,7 @@ public:
 	}
 
 	// comparison helpers
-	bool operator==(const delegate_mfp_msvc &rhs) const
+	bool operator==(const delegate_mfp_msvc &rhs) const noexcept
 	{
 		if (m_function != rhs.m_function)
 		{
@@ -512,13 +512,13 @@ public:
 		}
 	}
 
-	bool isnull() const
+	bool isnull() const noexcept
 	{
 		return !reinterpret_cast<void (*)()>(m_function);
 	}
 
 	// getters
-	static delegate_generic_class *real_object(delegate_generic_class *original) { return original; }
+	static delegate_generic_class *real_object(delegate_generic_class *original) noexcept { return original; }
 
 	// binding helpers
 	template <typename FunctionType>
@@ -528,7 +528,7 @@ public:
 	}
 
 	template <typename FunctionType>
-	void update_after_copy(FunctionType &funcptr, delegate_generic_class *&object)
+	void update_after_copy(FunctionType &funcptr, delegate_generic_class *&object) noexcept
 	{
 	}
 
@@ -630,14 +630,14 @@ class delegate_late_bind_helper
 {
 public:
 	// make it default constructible and copyable
-	delegate_late_bind_helper() = default;
-	delegate_late_bind_helper(delegate_late_bind_helper const &) = default;
-	delegate_late_bind_helper(delegate_late_bind_helper &&) = default;
-	delegate_late_bind_helper &operator=(delegate_late_bind_helper const &) = default;
-	delegate_late_bind_helper &operator=(delegate_late_bind_helper &&) = default;
+	delegate_late_bind_helper() noexcept = default;
+	delegate_late_bind_helper(delegate_late_bind_helper const &) noexcept = default;
+	delegate_late_bind_helper(delegate_late_bind_helper &&) noexcept = default;
+	delegate_late_bind_helper &operator=(delegate_late_bind_helper const &) noexcept = default;
+	delegate_late_bind_helper &operator=(delegate_late_bind_helper &&) noexcept = default;
 
 	template <class FunctionClass>
-	delegate_late_bind_helper(FunctionClass *)
+	delegate_late_bind_helper(FunctionClass *) noexcept
 		: m_latebinder(&delegate_late_bind_helper::late_bind_helper<FunctionClass>)
 	{
 	}
@@ -647,7 +647,7 @@ public:
 	explicit operator bool() const noexcept { return bool(m_latebinder); }
 
 private:
-	using late_bind_func = delegate_generic_class*(*)(LateBindBase &object);
+	using late_bind_func = delegate_generic_class *(*)(LateBindBase &object);
 
 	template <class FunctionClass> static delegate_generic_class *late_bind_helper(LateBindBase &object);
 
@@ -681,7 +681,7 @@ public:
 	typedef MAME_ABI_CXX_MEMBER_CALL generic_static_func generic_member_func;
 
 	// generic constructor
-	delegate_base() = default;
+	delegate_base() noexcept = default;
 
 	// copy constructor
 	delegate_base(const delegate_base &src)
@@ -751,7 +751,7 @@ public:
 	}
 
 	// comparison helper
-	bool operator==(const delegate_base &rhs) const
+	bool operator==(const delegate_base &rhs) const noexcept
 	{
 		return (m_raw_function == rhs.m_raw_function) && (object() == rhs.object()) && (m_raw_mfp == rhs.m_raw_mfp);
 	}
@@ -766,9 +766,9 @@ public:
 	}
 
 	// getters
-	bool has_object() const { return object() != nullptr; }
-	bool isnull() const { return !m_raw_function && m_raw_mfp.isnull(); }
-	bool is_mfp() const { return !m_raw_mfp.isnull(); }
+	bool has_object() const noexcept { return object() != nullptr; }
+	bool isnull() const noexcept { return !m_raw_function && m_raw_mfp.isnull(); }
+	bool is_mfp() const noexcept { return !m_raw_mfp.isnull(); }
 
 	// late binding
 	void late_bind(LateBindBase &object)
@@ -779,7 +779,7 @@ public:
 
 protected:
 	// return the actual object (not the one we use for calling)
-	delegate_generic_class *object() const { return is_mfp() ? m_raw_mfp.real_object(m_object) : m_object; }
+	delegate_generic_class *object() const noexcept { return is_mfp() ? m_raw_mfp.real_object(m_object) : m_object; }
 
 	// bind the actual object
 	template <typename FunctionClass>
@@ -886,7 +886,7 @@ protected:
 	template <typename T> using suitable_functoid = std::is_invocable_r<ReturnType, T, Params...>;
 
 public:
-	delegate() : basetype() { }
+	delegate() noexcept : basetype() { }
 
 	delegate(delegate const &src)
 		: basetype(src.m_functoid.has_value() ? static_cast<const basetype &>(basetype()) : src)

@@ -4,7 +4,9 @@
 
     SED1200
 
-    A LCD controller.
+    A LCD controller similar to HD44780/SED1278 that drives a 20-character
+    display. Data input is 4 bits at a time. (SED1210 has a 40-character
+    display and 8-bit data input.)
 
     The D/F variants have a packaging difference (QFP80 vs. bare chip).
 
@@ -16,10 +18,10 @@
 #include "emu.h"
 #include "sed1200.h"
 
-DEFINE_DEVICE_TYPE(SED1200D0A, sed1200d0a_device, "sed1200da", "Epson SED1200D-0A")
-DEFINE_DEVICE_TYPE(SED1200F0A, sed1200f0a_device, "sed1200fa", "Epson SED1200F-0A")
-DEFINE_DEVICE_TYPE(SED1200D0B, sed1200d0b_device, "sed1200db", "Epson SED1200D-0B")
-DEFINE_DEVICE_TYPE(SED1200F0B, sed1200f0b_device, "sed1200fb", "Epson SED1200F-0B")
+DEFINE_DEVICE_TYPE(SED1200D0A, sed1200d0a_device, "sed1200da", "Epson SED1200D-0A LCD Controller")
+DEFINE_DEVICE_TYPE(SED1200F0A, sed1200f0a_device, "sed1200fa", "Epson SED1200F-0A LCD Controller")
+DEFINE_DEVICE_TYPE(SED1200D0B, sed1200d0b_device, "sed1200db", "Epson SED1200D-0B LCD Controller")
+DEFINE_DEVICE_TYPE(SED1200F0B, sed1200f0b_device, "sed1200fb", "Epson SED1200F-0B LCD Controller")
 
 ROM_START( sed1200x0a )
 	ROM_REGION( 0x800, "cgrom", 0 )
@@ -31,28 +33,40 @@ ROM_START( sed1200x0b )
 	ROM_LOAD( "sed1200-b.bin", 0x000, 0x800, CRC(d0741f51) SHA1(c8c856f1357286a2c8c806af81724a828345357e))
 ROM_END
 
-sed1200_device::sed1200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock), cursor_direction(false), cursor_blinking(false), cursor_full(false), cursor_on(false), display_on(false), cursor_address(0), cgram_address(0), cgrom(nullptr)
+sed1200_device::sed1200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, cursor_direction(false)
+	, cursor_blinking(false)
+	, cursor_full(false)
+	, cursor_on(false)
+	, display_on(false)
+	, two_lines(false)
+	, cursor_address(0)
+	, cgram_address(0)
+	, cgrom(nullptr)
+	, chip_select(false)
+	, first_input(false)
+	, first_data(0)
 {
 }
 
-sed1200d0a_device::sed1200d0a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	sed1200_device(mconfig, SED1200D0A, tag, owner, clock)
+sed1200d0a_device::sed1200d0a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sed1200_device(mconfig, SED1200D0A, tag, owner, clock)
 {
 }
 
-sed1200f0a_device::sed1200f0a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	sed1200_device(mconfig, SED1200F0A, tag, owner, clock)
+sed1200f0a_device::sed1200f0a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sed1200_device(mconfig, SED1200F0A, tag, owner, clock)
 {
 }
 
-sed1200d0b_device::sed1200d0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	sed1200_device(mconfig, SED1200D0B, tag, owner, clock)
+sed1200d0b_device::sed1200d0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sed1200_device(mconfig, SED1200D0B, tag, owner, clock)
 {
 }
 
-sed1200f0b_device::sed1200f0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	sed1200_device(mconfig, SED1200F0B, tag, owner, clock)
+sed1200f0b_device::sed1200f0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sed1200_device(mconfig, SED1200F0B, tag, owner, clock)
 {
 }
 
@@ -85,7 +99,31 @@ void sed1200_device::device_start()
 	else
 		cgrom = nullptr;
 
+	chip_select = false;
+
+	save_item(NAME(cgram));
+	save_item(NAME(ddram));
+	save_item(NAME(cursor_direction));
+	save_item(NAME(cursor_blinking));
+	save_item(NAME(cursor_full));
+	save_item(NAME(cursor_on));
+	save_item(NAME(display_on));
+	save_item(NAME(two_lines));
+	save_item(NAME(cursor_address));
+	save_item(NAME(cgram_address));
+	save_item(NAME(chip_select));
+	save_item(NAME(first_input));
+	save_item(NAME(first_data));
+
 	soft_reset();
+}
+
+void sed1200_device::cs_w(int state)
+{
+	if (chip_select != !state) {
+		chip_select = !state;
+		first_input = true;
+	}
 }
 
 void sed1200_device::soft_reset()
@@ -95,11 +133,23 @@ void sed1200_device::soft_reset()
 	cursor_full = false;
 	cursor_on = false;
 	display_on = false;
+	two_lines = false;
 	cursor_address = 0x00;
 	cgram_address = 0x00;
 }
 
 void sed1200_device::control_w(uint8_t data)
+{
+	if(chip_select) {
+		if(first_input)
+			first_data = data & 0x0f;
+		else
+			control_write(first_data << 4 | (data & 0x0f));
+		first_input = !first_input;
+	}
+}
+
+void sed1200_device::control_write(uint8_t data)
 {
 	switch(data) {
 	case 0x04: case 0x05:
@@ -124,7 +174,8 @@ void sed1200_device::control_w(uint8_t data)
 		soft_reset();
 		break;
 	case 0x12: case 0x13:
-		break; // Number of lines selection
+		two_lines = data & 0x01;
+		break;
 	default:
 		if((data & 0xf0) == 0x20)
 			cgram_address = (data & 3)*8;
@@ -133,19 +184,34 @@ void sed1200_device::control_w(uint8_t data)
 			if(cgram_address == 4*8)
 				cgram_address = 0;
 		} else if(data & 0x80) {
-			cursor_address = data & 0x40 ? 10 : 0;
-			cursor_address += (data & 0x3f) >= 10 ? 9 : data & 0x3f;
+			if (two_lines) {
+				cursor_address = data & 0x40 ? 10 : 0;
+				cursor_address += (data & 0x3f) >= 10 ? 9 : data & 0x3f;
+			} else
+				cursor_address = (data & 0x3f) >= 20 ? 19 : data & 0x3f;
 		}
 		break;
 	}
 }
 
-uint8_t sed1200_device::control_r()
+uint8_t sed1200_device::busy_r()
 {
+	// TODO: bit 3 = busy flag
 	return 0x00;
 }
 
 void sed1200_device::data_w(uint8_t data)
+{
+	if(chip_select) {
+		if(first_input)
+			first_data = data & 0x0f;
+		else
+			data_write(first_data << 4 | (data & 0x0f));
+		first_input = !first_input;
+	}
+}
+
+void sed1200_device::data_write(uint8_t data)
 {
 	ddram[cursor_address] = data;
 	cursor_step();
@@ -154,14 +220,10 @@ void sed1200_device::data_w(uint8_t data)
 void sed1200_device::cursor_step()
 {
 	if(cursor_direction) {
-		if(cursor_address == 0 || cursor_address == 10)
-			cursor_address += 9;
-		else
+		if(cursor_address != 0 && (!two_lines || cursor_address != 10))
 			cursor_address --;
 	} else {
-		if(cursor_address == 9 || cursor_address == 19)
-			cursor_address -= 9;
-		else
+		if((!two_lines || cursor_address != 9) && cursor_address != 19)
 			cursor_address ++;
 	}
 }

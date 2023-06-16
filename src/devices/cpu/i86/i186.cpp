@@ -739,7 +739,7 @@ void i80186_cpu_device::device_start()
 	m_out_chip_select_func.resolve_safe();
 	m_irmx_irq_cb.resolve_safe();
 	m_irqa_cb.resolve_safe();
-	m_irmx_irq_ack.resolve();
+	m_irmx_irq_ack.resolve_safe(0);
 }
 
 void i80186_cpu_device::device_reset()
@@ -907,11 +907,7 @@ IRQ_CALLBACK_MEMBER(i80186_cpu_device::inta_callback)
 		m_irqa_cb(CLEAR_LINE);
 	}
 	if (BIT(m_reloc, 14))
-	{
-		if (!m_irmx_irq_ack.isnull())
-			return m_irmx_irq_ack(device, irqline);
-		return 0;
-	}
+		return m_irmx_irq_ack(device, irqline);
 	return int_callback(device, irqline);
 }
 

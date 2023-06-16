@@ -48,7 +48,7 @@ protected:
 
 private:
 	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
-	DECLARE_WRITE_LINE_MEMBER(mbc_attr_clock_w);
+	void mbc_attr_clock_w(int state);
 	u8 mbc_char_r(offs_t offset);
 	u8 mbc_attr_r(offs_t offset);
 
@@ -59,7 +59,7 @@ private:
 
 	void p1_w(u8 data);
 	u8 p1_r();
-	DECLARE_WRITE_LINE_MEMBER(ea_w);
+	void ea_w(int state);
 
 	void prog_map(address_map &map);
 	void ext_map(address_map &map);
@@ -137,7 +137,7 @@ SCN2672_DRAW_CHARACTER_MEMBER(wy60_state::draw_character)
 	std::fill_n(&bitmap.pix(y, x), m_is_132 ? 2 : 3, BIT(dots, 7) ? fg : rgb_t::black());
 }
 
-WRITE_LINE_MEMBER(wy60_state::mbc_attr_clock_w)
+void wy60_state::mbc_attr_clock_w(int state)
 {
 	if (state)
 		m_last_row_attr = m_cur_attr;
@@ -208,7 +208,7 @@ u8 wy60_state::p1_r()
 	return (m_eeprom->read_sda() << 1) | (m_keyboard->data_r() ? 0 : 0x40) | 0xad;
 }
 
-WRITE_LINE_MEMBER(wy60_state::ea_w)
+void wy60_state::ea_w(int state)
 {
 	if (state)
 		m_internal_view.select(0);

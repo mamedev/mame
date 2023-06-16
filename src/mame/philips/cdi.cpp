@@ -67,11 +67,11 @@ TODO:
 // TODO: NTSC system clock is 30.2098 MHz; additional 4.9152 MHz XTAL provided for UART
 #define CLOCK_A 30_MHz_XTAL
 
-#define LOG_DVC             (1 << 1)
-#define LOG_QUIZARD_READS   (1 << 2)
-#define LOG_QUIZARD_WRITES  (1 << 3)
-#define LOG_QUIZARD_OTHER   (1 << 4)
-#define LOG_UART            (1 << 5)
+#define LOG_DVC             (1U << 1)
+#define LOG_QUIZARD_READS   (1U << 2)
+#define LOG_QUIZARD_WRITES  (1U << 3)
+#define LOG_QUIZARD_OTHER   (1U << 4)
+#define LOG_UART            (1U << 5)
 
 #define VERBOSE         (0)
 #include "logmacro.h"
@@ -209,7 +209,7 @@ void quizard_state::machine_reset()
 
 	m_boot_press = false;
 	m_boot_timer->adjust(attotime::from_seconds(13), 1);
-	m_mcu_p3 = 0x04;
+	m_mcu_p3 = 0x05; // RTS|RXD
 }
 
 
@@ -458,7 +458,9 @@ void cdi_state::cdimono1_base(machine_config &config)
 	CDI_SLAVE_HLE(config, m_slave_hle, 0);
 	m_slave_hle->int_callback().set(m_maincpu, FUNC(scc68070_device::in2_w));
 
-	CDROM(config, "cdrom").set_interface("cdi_cdrom");
+	cdrom_image_device &cdrom(CDROM(config, "cdrom"));
+	cdrom.set_interface("cdi_cdrom");
+	cdrom.add_region("cdrom");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

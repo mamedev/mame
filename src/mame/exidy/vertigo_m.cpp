@@ -38,7 +38,7 @@ void vertigo_state::update_irq_encoder(int line, int state)
 }
 
 
-WRITE_LINE_MEMBER(vertigo_state::v_irq4_w)
+void vertigo_state::v_irq4_w(int state)
 {
 	update_irq_encoder(INPUT_LINE_IRQ4, state);
 	vertigo_vproc(m_maincpu->attotime_to_cycles(machine().time() - m_irq4_time), state);
@@ -46,7 +46,7 @@ WRITE_LINE_MEMBER(vertigo_state::v_irq4_w)
 }
 
 
-WRITE_LINE_MEMBER(vertigo_state::v_irq3_w)
+void vertigo_state::v_irq3_w(int state)
 {
 	m_custom->sound_interrupt_w(state);
 
@@ -61,7 +61,7 @@ WRITE_LINE_MEMBER(vertigo_state::v_irq3_w)
  *
  *************************************/
 
-WRITE_LINE_MEMBER( vertigo_state::adc_eoc_w )
+void vertigo_state::adc_eoc_w(int state)
 {
 	update_irq_encoder(INPUT_LINE_IRQ2, state ? ASSERT_LINE : CLEAR_LINE);
 }

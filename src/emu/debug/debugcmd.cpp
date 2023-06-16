@@ -170,7 +170,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 		if ((valcount == 1) && (blockcount == 1) && strstr(name, "/globals/"))
 		{
 			char symname[100];
-			sprintf(symname, ".%s", strrchr(name, '/') + 1);
+			snprintf(symname, 100, ".%s", strrchr(name, '/') + 1);
 			m_global_array[itemnum].base = base;
 			m_global_array[itemnum].size = valsize;
 			symtable.add(

@@ -239,32 +239,32 @@ tms9914_device::tms9914_device(const machine_config &mconfig, const char *tag, d
 }
 
 // Signal inputs
-WRITE_LINE_MEMBER(tms9914_device::eoi_w)
+void tms9914_device::eoi_w(int state)
 {
 	set_ext_signal(IEEE_488_EOI , state);
 }
 
-WRITE_LINE_MEMBER(tms9914_device::dav_w)
+void tms9914_device::dav_w(int state)
 {
 	set_ext_signal(IEEE_488_DAV , state);
 }
 
-WRITE_LINE_MEMBER(tms9914_device::nrfd_w)
+void tms9914_device::nrfd_w(int state)
 {
 	set_ext_signal(IEEE_488_NRFD , state);
 }
 
-WRITE_LINE_MEMBER(tms9914_device::ndac_w)
+void tms9914_device::ndac_w(int state)
 {
 	set_ext_signal(IEEE_488_NDAC , state);
 }
 
-WRITE_LINE_MEMBER(tms9914_device::ifc_w)
+void tms9914_device::ifc_w(int state)
 {
 	set_ext_signal(IEEE_488_IFC , state);
 }
 
-WRITE_LINE_MEMBER(tms9914_device::srq_w)
+void tms9914_device::srq_w(int state)
 {
 	bool prev_srq = get_signal(IEEE_488_SRQ);
 	set_ext_signal(IEEE_488_SRQ , state);
@@ -273,12 +273,12 @@ WRITE_LINE_MEMBER(tms9914_device::srq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(tms9914_device::atn_w)
+void tms9914_device::atn_w(int state)
 {
 	set_ext_signal(IEEE_488_ATN , state);
 }
 
-WRITE_LINE_MEMBER(tms9914_device::ren_w)
+void tms9914_device::ren_w(int state)
 {
 	set_ext_signal(IEEE_488_REN , state);
 }
@@ -467,7 +467,7 @@ uint8_t tms9914_device::read(offs_t offset)
 	return res;
 }
 
-READ_LINE_MEMBER(tms9914_device::cont_r)
+int tms9914_device::cont_r()
 {
 	return m_c_state != FSM_C_CIDS && m_c_state != FSM_C_CADS;
 }

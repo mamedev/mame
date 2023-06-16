@@ -69,7 +69,7 @@ void dec8_state::dec8_mxc06_karn_buffer_spriteram_w(uint8_t data)
 }
 
 /* Only used by ghostb, gondo, garyoret, other games can control buffering */
-WRITE_LINE_MEMBER(dec8_state::screen_vblank_dec8)
+void dec8_state::screen_vblank_dec8(int state)
 {
 	// rising edge
 	if (state)
@@ -216,7 +216,7 @@ void dec8_state::dec8_sound_w(uint8_t data)
 	m_m6502_timer->adjust(m_audiocpu->cycles_to_attotime(3));
 }
 
-WRITE_LINE_MEMBER(csilver_state::csilver_adpcm_int)
+void csilver_state::csilver_adpcm_int(int state)
 {
 	m_toggle ^= 1;
 	if (m_toggle)
@@ -1763,7 +1763,7 @@ GFXDECODE_END
 /******************************************************************************/
 
 /* Coins generate NMI's */
-WRITE_LINE_MEMBER(dec8_state::oscar_coin_irq)
+void dec8_state::oscar_coin_irq(int state)
 {
 	if (state && !m_coin_state)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -1775,7 +1775,7 @@ void dec8_state::oscar_coin_clear_w(uint8_t data)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(dec8_state::shackled_coin_irq)
+void dec8_state::shackled_coin_irq(int state)
 {
 	if (state && !m_coin_state)
 		m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);

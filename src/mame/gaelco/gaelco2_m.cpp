@@ -189,22 +189,22 @@ void gaelco2_state::wrally2_latch_w(offs_t offset, u16 data)
 	m_mainlatch->write_bit(offset >> 2, BIT(data, 0));
 }
 
-WRITE_LINE_MEMBER(gaelco2_state::coin1_counter_w)
+void gaelco2_state::coin1_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(gaelco2_state::coin2_counter_w)
+void gaelco2_state::coin2_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE_LINE_MEMBER(gaelco2_state::coin3_counter_w)
+void gaelco2_state::coin3_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(2, state);
 }
 
-WRITE_LINE_MEMBER(gaelco2_state::coin4_counter_w)
+void gaelco2_state::coin4_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(3, state);
 }

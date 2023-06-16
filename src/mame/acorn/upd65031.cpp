@@ -763,7 +763,7 @@ void upd65031_device::rcv_complete()
 	update_uart_interrupt();
 }
 
-WRITE_LINE_MEMBER( upd65031_device::cts_w )
+void upd65031_device::cts_w(int state)
 {
 	if (state == BIT(m_uit, 0))
 	{
@@ -776,7 +776,7 @@ WRITE_LINE_MEMBER( upd65031_device::cts_w )
 	}
 }
 
-WRITE_LINE_MEMBER( upd65031_device::dcd_w )
+void upd65031_device::dcd_w(int state)
 {
 	if (state == BIT(m_uit, 1))
 	{
@@ -793,7 +793,7 @@ WRITE_LINE_MEMBER( upd65031_device::dcd_w )
 //  flp line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd65031_device::flp_w )
+void upd65031_device::flp_w(int state)
 {
 	if (!(m_sta & STA_FLAPOPEN) && state)
 	{
@@ -813,7 +813,7 @@ WRITE_LINE_MEMBER( upd65031_device::flp_w )
 //  battery low line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd65031_device::btl_w )
+void upd65031_device::btl_w(int state)
 {
 	if (state)
 		m_sta |= STA_BTL;

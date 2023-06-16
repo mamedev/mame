@@ -109,7 +109,7 @@ private:
 		m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
 	}
 
-	WRITE_LINE_MEMBER(cuda_reset_w)
+	void cuda_reset_w(int state)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
@@ -122,15 +122,15 @@ private:
 	void devsel_w(uint8_t devsel);
 	uint16_t swim_r(offs_t offset, u16 mem_mask);
 	void swim_w(offs_t offset, u16 data, u16 mem_mask);
-	WRITE_LINE_MEMBER(hdsel_w);
+	void hdsel_w(int state);
 
-	WRITE_LINE_MEMBER(egret_reset_w)
+	void egret_reset_w(int state)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 	}
 
-	WRITE_LINE_MEMBER(set_hmmu)
+	void set_hmmu(int state)
 	{
 		m_maincpu->set_hmmu_enable((state == ASSERT_LINE) ? M68K_HMMU_DISABLE : M68K_HMMU_ENABLE_LC);
 	}
@@ -273,7 +273,7 @@ void maclc_state::devsel_w(uint8_t devsel)
 		m_cur_floppy->ss_w(m_hdsel);
 }
 
-WRITE_LINE_MEMBER(maclc_state::hdsel_w)
+void maclc_state::hdsel_w(int state)
 {
 	if (state != m_hdsel)
 	{

@@ -115,7 +115,6 @@ protected:
 
 private:
 	void map(address_map &map);
-	void io_map(address_map &map);
 
 	template <int Port> uint16_t port_r();
 	template <int Port> void port_w(uint16_t data);

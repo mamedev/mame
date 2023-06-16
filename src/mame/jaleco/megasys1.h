@@ -148,7 +148,7 @@ private:
 	// soldam
 	u16 *m_spriteram = nullptr;
 
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	void sound_irq(int state);
 	u16 ip_select_r();
 	void ip_select_w(u16 data);
 	u16 protection_peekaboo_r();
@@ -183,7 +183,7 @@ private:
 	DECLARE_MACHINE_RESET(megasys1_hachoo);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	INTERRUPT_GEN_MEMBER(megasys1D_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_iganinju_scanline);

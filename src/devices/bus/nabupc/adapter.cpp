@@ -232,7 +232,7 @@ ioport_constructor network_adapter::device_input_ports() const
 //  SERIAL PROTOCOL
 //**************************************************************************
 
-WRITE_LINE_MEMBER(network_adapter::input_txd)
+void network_adapter::input_txd(int state)
 {
 	device_buffered_serial_interface::rx_w(state);
 }

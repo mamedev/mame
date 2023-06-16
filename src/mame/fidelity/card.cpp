@@ -240,8 +240,8 @@ private:
 	void speech_w(u8 data);
 	void mcu_p1_w(u8 data);
 	u8 mcu_p2_r();
-	DECLARE_READ_LINE_MEMBER(mcu_t0_r);
-	DECLARE_READ_LINE_MEMBER(mcu_t1_r);
+	int mcu_t0_r();
+	int mcu_t1_r();
 	template<int P> void ioexp_port_w(uint8_t data);
 };
 
@@ -347,13 +347,13 @@ u8 card_state::mcu_p2_r()
 	return data ^ 0xf0;
 }
 
-READ_LINE_MEMBER(card_state::mcu_t0_r)
+int card_state::mcu_t0_r()
 {
 	// T0: card scanner light sensor (1=white, 0=black/none)
 	return m_barcode & 1;
 }
 
-READ_LINE_MEMBER(card_state::mcu_t1_r)
+int card_state::mcu_t1_r()
 {
 	// T1: xtal / 4 (do *2 for high-low transitions)
 	return (machine().time().as_ticks(5_MHz_XTAL / 4 * 2)) & 1;

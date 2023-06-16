@@ -71,8 +71,8 @@ public:
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_pos_r);
-	DECLARE_READ_LINE_MEMBER(lightgun_trigger_r);
-	DECLARE_READ_LINE_MEMBER(lightgun_holster_r);
+	int lightgun_trigger_r();
+	int lightgun_holster_r();
 
 	void init_aplatoon();
 	void init_palr3();
@@ -177,14 +177,14 @@ CUSTOM_INPUT_MEMBER(alg_state::lightgun_pos_r)
 }
 
 
-READ_LINE_MEMBER(alg_state::lightgun_trigger_r)
+int alg_state::lightgun_trigger_r()
 {
 	// Read the trigger control based on the input select
 	return (m_triggers->read() >> m_input_select) & 1;
 }
 
 
-READ_LINE_MEMBER(alg_state::lightgun_holster_r)
+int alg_state::lightgun_holster_r()
 {
 	// Read the holster control based on the input select
 	return (m_triggers->read() >> (2 + m_input_select)) & 1;

@@ -180,6 +180,13 @@ Notes:
 #include "video/poly.h"
 #include "screen.h"
 
+#define LOG_PPC_TO_TLCS_COMMANDS (1U << 1)
+#define LOG_TLCS_TO_PPC_COMMANDS (1U << 2)
+
+#define VERBOSE (LOG_PPC_TO_TLCS_COMMANDS | LOG_TLCS_TO_PPC_COMMANDS)
+#include "logmacro.h"
+
+
 /*
     Interesting mem areas
 
@@ -511,10 +518,6 @@ Notes:
 
 namespace {
 
-#define LOG_PPC_TO_TLCS_COMMANDS        1
-#define LOG_TLCS_TO_PPC_COMMANDS        1
-
-#define LOG_DISPLAY_LIST                0
 #define ENABLE_LIGHTING                 1
 
 #define PPC_TLCS_COMM_TRIGGER           12345
@@ -625,7 +628,7 @@ private:
 	INTERRUPT_GEN_MEMBER(taitotz_vbi);
 	uint16_t tlcs_ide0_r(offs_t offset, uint16_t mem_mask = ~0);
 	uint16_t tlcs_ide1_r(offs_t offset, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	void ide_interrupt(int state);
 	void draw_tile(uint32_t pos, uint32_t tile);
 	uint32_t video_mem_r(uint32_t address);
 	void video_mem_w(uint32_t address, uint32_t data);
@@ -1945,7 +1948,6 @@ void taitotz_state::ppc_common_w(offs_t offset, uint64_t data, uint64_t mem_mask
 
 	if (offset == 0x7ff)
 	{
-#if LOG_PPC_TO_TLCS_COMMANDS
 		if (m_io_share_ram[0xfff] != 0x0000 &&
 			m_io_share_ram[0xfff] != 0x1010 &&
 			m_io_share_ram[0xfff] != 0x1020 &&
@@ -1956,12 +1958,12 @@ void taitotz_state::ppc_common_w(offs_t offset, uint64_t data, uint64_t mem_mask
 			m_io_share_ram[0xfff] != 0x4002 &&
 			m_io_share_ram[0xfff] != 0x4003)
 		{
-			printf("PPC -> TLCS cmd %04X\n", m_io_share_ram[0xfff]);
+			LOGMASKED(LOG_PPC_TO_TLCS_COMMANDS, "PPC -> TLCS cmd %04X\n", m_io_share_ram[0xfff]);
 		}
 
 		if (m_io_share_ram[0xfff] == 0x4000)
 		{
-			printf("   %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X\n",
+			LOGMASKED(LOG_PPC_TO_TLCS_COMMANDS, "   %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X\n",
 					m_io_share_ram[0x1c34/2],
 					m_io_share_ram[0x1c36/2],
 					m_io_share_ram[0x1c38/2],
@@ -1973,7 +1975,7 @@ void taitotz_state::ppc_common_w(offs_t offset, uint64_t data, uint64_t mem_mask
 					m_io_share_ram[0x1c24/2],
 					m_io_share_ram[0x1c26/2]
 					);
-			printf("   %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X\n",
+			LOGMASKED(LOG_PPC_TO_TLCS_COMMANDS, "   %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X\n",
 					m_io_share_ram[0x1c28/2],
 					m_io_share_ram[0x1c2a/2],
 					m_io_share_ram[0x1c1c/2],
@@ -1990,11 +1992,9 @@ void taitotz_state::ppc_common_w(offs_t offset, uint64_t data, uint64_t mem_mask
 		/*
 		if (m_io_share_ram[0xfff] == 0x1010)
 		{
-		    printf("PPC -> TLCS cmd 1010:   %04X %04X %04X %04X\n", m_io_share_ram[0x1a02/2], m_io_share_ram[0x1a04/2], m_io_share_ram[0x1a06/2], m_io_share_ram[0x1a08/2]);
+		    LOGMASKED(LOG_PPC_TO_TLCS_COMMANDS, "PPC -> TLCS cmd 1010:   %04X %04X %04X %04X\n", m_io_share_ram[0x1a02/2], m_io_share_ram[0x1a04/2], m_io_share_ram[0x1a06/2], m_io_share_ram[0x1a08/2]);
 		}
 		*/
-
-#endif
 
 
 		// hacky way to handle some commands for now
@@ -2119,16 +2119,14 @@ void taitotz_state::tlcs_common_w(offs_t offset, uint8_t data)
 
 	if (offset == 0x1ffd)
 	{
-#if LOG_TLCS_TO_PPC_COMMANDS
 		if (m_io_share_ram[0xffe] != 0xd000 &&
 			m_io_share_ram[0xffe] != 0x1011 &&
 			m_io_share_ram[0xffe] != 0x1012 &&
 			m_io_share_ram[0xffe] != 0x1022)
 		{
-			printf("TLCS -> PPC cmd %04X\n", m_io_share_ram[0xffe]);
-			//printf("0x40080104 = %08X\n", (uint32_t)(m_work_ram[0x80104/8]));
+			LOGMASKED(LOG_TLCS_TO_PPC_COMMANDS, "TLCS -> PPC cmd %04X\n", m_io_share_ram[0xffe]);
+			//LOGMASKED(LOG_TLCS_TO_PPC_COMMANDS, "0x40080104 = %08X\n", (uint32_t)(m_work_ram[0x80104/8]));
 		}
-#endif
 
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		m_iocpu->set_input_line(TLCS900_INT0, CLEAR_LINE);
@@ -2627,7 +2625,7 @@ INTERRUPT_GEN_MEMBER(taitotz_state::taitotz_vbi)
 	m_iocpu->set_input_line(TLCS900_INT3, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(taitotz_state::ide_interrupt)
+void taitotz_state::ide_interrupt(int state)
 {
 	m_iocpu->set_input_line(TLCS900_INT2, state);
 }

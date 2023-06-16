@@ -85,7 +85,7 @@ public:
 	void update_timer_count();
 	TIMER_DEVICE_CALLBACK_MEMBER( internal_timer_callback );
 	void reset_timer();
-	DECLARE_WRITE_LINE_MEMBER(timer_enable_callback);
+	void timer_enable_callback(int state);
 	uint16_t adsp_control_r(offs_t offset);
 	void adsp_control_w(offs_t offset, uint16_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER( dcs_irq );

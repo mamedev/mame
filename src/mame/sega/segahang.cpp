@@ -27,7 +27,7 @@
 
 #include "speaker.h"
 
-#define LOG_MCU (1 << 1)
+#define LOG_MCU (1U << 1)
 //#define VERBOSE (LOG_MCU)
 #include "logmacro.h"
 

@@ -57,12 +57,12 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define LOG_FBITS   (1U <<  1)
-#define LOG_VBITS   (1U <<  2)
-#define LOG_PBITS   (1U <<  3)
-#define LOG_TBITS   (1U <<  4)
-#define LOG_MBITS   (1U <<  5)
-#define LOG_RBITS   (1U <<  6)
+#define LOG_FBITS   (1U << 1)
+#define LOG_VBITS   (1U << 2)
+#define LOG_PBITS   (1U << 3)
+#define LOG_TBITS   (1U << 4)
+#define LOG_MBITS   (1U << 5)
+#define LOG_RBITS   (1U << 6)
 
 #define VERBOSE (0)
 // #define VERBOSE (LOG_FBITS)
@@ -482,7 +482,7 @@ void sam6883_device::horizontal_sync()
 //  hs_w
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( sam6883_device::hs_w )
+void sam6883_device::hs_w(int state)
 {
 	if (state)
 	{

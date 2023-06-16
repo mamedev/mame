@@ -209,18 +209,13 @@
 #include "hyprdriv.lh"
 #include "sfrush.lh"
 
+#define LOG_WIDGET (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 namespace {
-
-/*************************************
- *
- *  Debugging constants
- *
- *************************************/
-
-#define LOG_WIDGET          (0)
-
-
 
 /*************************************
  *
@@ -430,11 +425,11 @@ private:
 	void wheel_board_w(offs_t offset, uint32_t data);
 
 
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
+	void ide_interrupt(int state);
+	void vblank_assert(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(ethernet_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
+	void ethernet_interrupt(int state);
+	void ioasic_irq(int state);
 	void update_vblank_irq();
 	void update_galileo_irqs();
 	void widget_reset();
@@ -534,7 +529,7 @@ void seattle_state::machine_reset()
 *
 *************************************/
 
-WRITE_LINE_MEMBER(seattle_state::ethernet_interrupt)
+void seattle_state::ethernet_interrupt(int state)
 {
 	m_ethernet_irq_state = state;
 	if (m_board_config == FLAGSTAFF_CONFIG)
@@ -553,7 +548,7 @@ WRITE_LINE_MEMBER(seattle_state::ethernet_interrupt)
 *
 *************************************/
 
-WRITE_LINE_MEMBER(seattle_state::ioasic_irq)
+void seattle_state::ioasic_irq(int state)
 {
 	m_maincpu->set_input_line(IOASIC_IRQ_NUM, state);
 }
@@ -680,7 +675,7 @@ void seattle_state::vblank_clear_w(uint32_t data)
 }
 
 
-WRITE_LINE_MEMBER(seattle_state::vblank_assert)
+void seattle_state::vblank_assert(int state)
 {
 	// cache the raw state
 	m_vblank_state = state;
@@ -1053,16 +1048,14 @@ uint32_t seattle_state::widget_r(offs_t offset, uint32_t mem_mask)
 			break;
 	}
 
-	if (LOG_WIDGET)
-		logerror("Widget read (%02X) = %08X & %08X\n", offset*4, result, mem_mask);
+	LOGMASKED(LOG_WIDGET, "Widget read (%02X) = %08X & %08X\n", offset*4, result, mem_mask);
 	return result;
 }
 
 
 void seattle_state::widget_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if (LOG_WIDGET)
-		logerror("Widget write (%02X) = %08X & %08X\n", offset*4, data, mem_mask);
+	LOGMASKED(LOG_WIDGET, "Widget write (%02X) = %08X & %08X\n", offset*4, data, mem_mask);
 
 	switch (offset)
 	{

@@ -461,7 +461,7 @@ void mb88_cpu_device::update_pio( int cycles )
 	}
 }
 
-WRITE_LINE_MEMBER( mb88_cpu_device::clock_w )
+void mb88_cpu_device::clock_w(int state)
 {
 	if (state != m_ctr)
 	{

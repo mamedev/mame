@@ -78,7 +78,7 @@ public:
 	uint8_t io_read(offs_t offset);
 	void io_write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(int_w);
+	void int_w(int state);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

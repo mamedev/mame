@@ -37,14 +37,14 @@
 #include "emu.h"
 #include "newport.h"
 
-#define LOG_UNKNOWN     (1 << 0)
-#define LOG_VC2         (1 << 1)
-#define LOG_CMAP        (1 << 2)
-#define LOG_XMAP        (1 << 4)
-#define LOG_REX3        (1 << 6)
-#define LOG_RAMDAC      (1 << 7)
-#define LOG_COMMANDS    (1 << 8)
-#define LOG_REJECTS     (1 << 9)
+#define LOG_UNKNOWN     (1U << 1)
+#define LOG_VC2         (1U << 2)
+#define LOG_CMAP        (1U << 3)
+#define LOG_XMAP        (1U << 4)
+#define LOG_REX3        (1U << 5)
+#define LOG_RAMDAC      (1U << 6)
+#define LOG_COMMANDS    (1U << 7)
+#define LOG_REJECTS     (1U << 8)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_VC2 | LOG_CMAP | LOG_XMAP | LOG_REX3 | LOG_RAMDAC | LOG_COMMANDS | LOG_REJECTS)
 
 #define VERBOSE         (0)
@@ -816,7 +816,7 @@ uint8_t vc2_device::get_cursor_pixel(int x, int y)
 	}
 }
 
-WRITE_LINE_MEMBER(vc2_device::vblank_w)
+void vc2_device::vblank_w(int state)
 {
 	if (state)
 	{
@@ -1706,7 +1706,7 @@ void newport_base_device::ramdac_write(uint32_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(newport_base_device::vrint_w)
+void newport_base_device::vrint_w(int state)
 {
 	if (state)
 	{
@@ -1716,7 +1716,7 @@ WRITE_LINE_MEMBER(newport_base_device::vrint_w)
 }
 
 // TOOD: Figure out a better way of doing this
-WRITE_LINE_MEMBER(newport_base_device::update_screen_size)
+void newport_base_device::update_screen_size(int state)
 {
 	const int x_start = m_vc2->readout_x0();
 	const int y_start = m_vc2->readout_y0();

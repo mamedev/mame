@@ -23,10 +23,10 @@ DEFINE_DEVICE_TYPE(VSYSTEM_GGA, vsystem_gga_device, "vsystem_gga", "Video System
 //  vsystem_gga_device - constructor
 //-------------------------------------------------
 
-vsystem_gga_device::vsystem_gga_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, VSYSTEM_GGA, tag, owner, clock),
-		device_video_interface(mconfig, *this, false),
-		m_write_cb(*this)
+vsystem_gga_device::vsystem_gga_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, VSYSTEM_GGA, tag, owner, clock),
+	device_video_interface(mconfig, *this, false),
+	m_write_cb(*this)
 {
 }
 

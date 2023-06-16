@@ -117,7 +117,9 @@ March 2013 NPW:
 //  PARAMETERS
 //**************************************************************************
 
-#define LOG_INTERRUPTS  0
+#define LOG_INTERRUPTS (1U << 1)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 // turn off 'unreferenced label' errors
 #if defined(__GNUC__)
@@ -454,8 +456,7 @@ uint32_t m6809_base_device::execute_input_lines() const noexcept
 
 void m6809_base_device::execute_set_input(int inputnum, int state)
 {
-	if (LOG_INTERRUPTS)
-		logerror("%s: inputnum=%s state=%d totalcycles=%d\n", machine().describe_context(), inputnum_string(inputnum), state, (int) attotime_to_clocks(machine().time()));
+	LOGMASKED(LOG_INTERRUPTS, "%s: inputnum=%s state=%d totalcycles=%d\n", machine().describe_context(), inputnum_string(inputnum), state, attotime_to_clocks(machine().time()));
 
 	switch(inputnum)
 	{

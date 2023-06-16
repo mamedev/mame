@@ -600,6 +600,12 @@ public:
 		return device;
 	}
 
+	/// \brief Look up target during configuration
+	/// Look up the current target device during configuration, before
+	/// resolution.
+	/// \return Pointer to target device if found, or nullptr otherwise.
+	DeviceClass *lookup() const { return this->m_base.get().template subdevice<DeviceClass>(this->m_tag); }
+
 private:
 	/// \brief Check that device implementation has expected tag
 	/// \param [in] device Reference to device.

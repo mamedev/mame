@@ -66,7 +66,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	template <unsigned Lamp> DECLARE_WRITE_LINE_MEMBER(pia_lamp_w) { m_lamps[Lamp] = state; }
+	template <unsigned Lamp> void pia_lamp_w(int state) { m_lamps[Lamp] = state; }
 
 	void pia1_portb_w(uint8_t data);
 	void pia1_portb_lg_w(uint8_t data);

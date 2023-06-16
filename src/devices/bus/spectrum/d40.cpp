@@ -211,7 +211,7 @@ void spectrum_d40base_device::device_reset()
 //  IMPLEMENTATION  spectrum_d40base_device
 //**************************************************************************
 
-READ_LINE_MEMBER(spectrum_d40base_device::romcs)
+int spectrum_d40base_device::romcs()
 {
 	return m_romcs;
 }

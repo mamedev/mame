@@ -34,7 +34,7 @@ DIP-SWs
       1  irq7
 */
 
-WRITE_LINE_MEMBER( isa8_mpu401_device::mpu_irq_out )
+void isa8_mpu401_device::mpu_irq_out(int state)
 {
 }
 

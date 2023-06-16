@@ -71,7 +71,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	void pia0_porta_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia0_irq_w);
+	void pia0_irq_w(int state);
 	void pia1_porta_w(uint8_t data);
 	uint8_t pia1_portb_r();
 
@@ -434,7 +434,7 @@ void zwackery_state::pia0_porta_w(uint8_t data)
 		m_watchdog->watchdog_reset();
 }
 
-WRITE_LINE_MEMBER(zwackery_state::pia0_irq_w)
+void zwackery_state::pia0_irq_w(int state)
 {
 	int irq_state = m_pia0->irq_a_state() | m_pia0->irq_b_state();
 	m_maincpu->set_input_line(5, irq_state ? ASSERT_LINE : CLEAR_LINE);

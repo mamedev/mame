@@ -12,10 +12,10 @@
 #include "emu.h"
 #include "tsb12lv01a.h"
 
-#define LOG_READS       (1 << 1)
-#define LOG_WRITES      (1 << 2)
-#define LOG_UNKNOWNS    (1 << 3)
-#define LOG_IRQS        (1 << 4)
+#define LOG_READS       (1U << 1)
+#define LOG_WRITES      (1U << 2)
+#define LOG_UNKNOWNS    (1U << 3)
+#define LOG_IRQS        (1U << 4)
 #define LOG_ALL         (LOG_READS | LOG_WRITES | LOG_UNKNOWNS | LOG_IRQS)
 
 #define VERBOSE         (LOG_ALL)
@@ -69,7 +69,7 @@ void tsb12lv01a_device::device_reset()
 	m_grf_status = 0x00000000;
 }
 
-WRITE_LINE_MEMBER(tsb12lv01a_device::phy_reset_w)
+void tsb12lv01a_device::phy_reset_w(int state)
 {
 	if (state)
 	{

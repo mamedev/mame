@@ -139,7 +139,7 @@ private:
 	uint8_t k53936_rom_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_rng_936_tile_info);
-	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
+	void k054539_nmi_gen(int state);
 	uint16_t palette_read(offs_t offset);
 	void palette_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
@@ -493,7 +493,7 @@ void rungun_state::sound_ctrl_w(uint8_t data)
 	m_sound_ctrl = data;
 }
 
-WRITE_LINE_MEMBER(rungun_state::k054539_nmi_gen)
+void rungun_state::k054539_nmi_gen(int state)
 {
 	if (m_sound_ctrl & 0x10)
 	{

@@ -125,7 +125,7 @@ u8 cinemat_state::coin_input_r()
  *
  *************************************/
 
-WRITE_LINE_MEMBER(cinemat_state::coin_reset_w)
+void cinemat_state::coin_reset_w(int state)
 {
 	// on the rising edge of a coin reset, clear the coin_detected flag
 	if (state)
@@ -133,7 +133,7 @@ WRITE_LINE_MEMBER(cinemat_state::coin_reset_w)
 }
 
 
-WRITE_LINE_MEMBER(cinemat_state::mux_select_w)
+void cinemat_state::mux_select_w(int state)
 {
 	m_mux_select = state;
 }
@@ -1106,7 +1106,7 @@ void cinemat_state::barrier(machine_config &config)
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-WRITE_LINE_MEMBER(cinemat_state::speedfrk_start_led_w)
+void cinemat_state::speedfrk_start_led_w(int state)
 {
 	// start LED is controlled by bit 0x02
 	m_led = !state;

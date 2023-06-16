@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "generic_spi_flash.h"
 
-#define LOG_SPI (1U <<  1)
+#define LOG_SPI (1U << 1)
 
 #define VERBOSE     (0)
 

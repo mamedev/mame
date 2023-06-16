@@ -240,17 +240,17 @@ uint8_t heath_tlb_device::kbd_flags_r()
 	return rv;
 }
 
-READ_LINE_MEMBER(heath_tlb_device::mm5740_shift_r)
+int heath_tlb_device::mm5740_shift_r()
 {
 	return ((m_kbspecial->read() ^ 0x120) & 0x120) ? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(heath_tlb_device::mm5740_control_r)
+int heath_tlb_device::mm5740_control_r()
 {
 	return ((m_kbspecial->read() ^ 0x10) & 0x10) ? ASSERT_LINE: CLEAR_LINE;
 }
 
-WRITE_LINE_MEMBER(heath_tlb_device::mm5740_data_ready_w)
+void heath_tlb_device::mm5740_data_ready_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -694,7 +694,7 @@ void heath_tlb_device::serial_out_b(uint8_t data)
 	m_write_sd(data);
 }
 
-WRITE_LINE_MEMBER(heath_tlb_device::cb1_w)
+void heath_tlb_device::cb1_w(int state)
 {
 	m_ace->rx_w(state);
 }
@@ -744,7 +744,7 @@ void heath_tlb_device::device_add_mconfig(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, H19_BEEP_FRQ).add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_beep, H19_BEEP_FRQ).add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 heath_super19_tlb_device::heath_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

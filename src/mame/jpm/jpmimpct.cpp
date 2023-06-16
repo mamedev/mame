@@ -1104,7 +1104,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-WRITE_LINE_MEMBER(jpmimpct_video_state::tms_irq)
+void jpmimpct_video_state::tms_irq(int state)
 {
 	m_tms_irq = state;
 	update_irqs();
@@ -1126,7 +1126,7 @@ WRITE_LINE_MEMBER(jpmimpct_video_state::tms_irq)
 // B2 = Hopper Low
 // B3 = 20p Hopper Opto
 
-READ_LINE_MEMBER( jpmimpct_state::hopper_b_0_r )
+int jpmimpct_state::hopper_b_0_r()
 {
 	uint8_t retval = 0x01;
 
@@ -1147,7 +1147,7 @@ READ_LINE_MEMBER( jpmimpct_state::hopper_b_0_r )
 	return retval;
 }
 
-READ_LINE_MEMBER( jpmimpct_state::hopper_b_3_r )
+int jpmimpct_state::hopper_b_3_r()
 {
 	uint8_t retval = 0x01;
 
@@ -1181,7 +1181,7 @@ READ_LINE_MEMBER( jpmimpct_state::hopper_b_3_r )
 //    if (StatBtns & 0x20) // Top Up switch
 //    retval &= ~0x20;
 
-READ_LINE_MEMBER(jpmimpct_state::hopper_c_4_r)
+int jpmimpct_state::hopper_c_4_r()
 {
 	uint8_t retval = 0x01;
 
@@ -1193,7 +1193,7 @@ READ_LINE_MEMBER(jpmimpct_state::hopper_c_4_r)
 	return retval;
 }
 
-READ_LINE_MEMBER(jpmimpct_state::hopper_c_6_r)
+int jpmimpct_state::hopper_c_6_r()
 {
 	uint8_t retval = 0x01;
 
@@ -1205,7 +1205,7 @@ READ_LINE_MEMBER(jpmimpct_state::hopper_c_6_r)
 	return retval;
 }
 
-READ_LINE_MEMBER(jpmimpct_state::hopper_c_7_r)
+int jpmimpct_state::hopper_c_7_r()
 {
 	uint8_t retval = 0x01;
 
@@ -1286,7 +1286,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(jpmimpct_state::duart_set_ip5)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(jpmimpct_state::duart_irq_handler)
+void jpmimpct_state::duart_irq_handler(int state)
 {
 	// triggers IRQ 5
 	m_maincpu->set_input_line(5, state);

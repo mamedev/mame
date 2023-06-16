@@ -295,17 +295,18 @@
 
 #include "sf2049.lh"
 
+#define LOG_TIMEKEEPER       (1U << 1)
+#define LOG_TIMEKEEPER_LOCKS (1U << 2)
+#define LOG_SIO              (1U << 3)
+#define LOG_SIO_VERBOSE      (1U << 4)
+#define LOG_WATCHDOG         (1U << 5)
+#define LOG_UNKNOWN          (1U << 6)
+
+#define VERBOSE (LOG_UNKNOWN)
+#include "logmacro.h"
+
 
 namespace {
-
-/*************************************
- *
- *  Debugging constants
- *
- *************************************/
-
-#define LOG_TIMEKEEPER      (0)
-#define LOG_SIO             (0)
 
 /*************************************
  *
@@ -434,13 +435,13 @@ private:
 	uint32_t m_keypad_select;
 	uint32_t m_gear;
 
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_cb);
-	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
+	void duart_irq_cb(int state);
+	void vblank_assert(int state);
 
 	void update_sio_irqs();
 
-	DECLARE_WRITE_LINE_MEMBER(watchdog_reset);
-	DECLARE_WRITE_LINE_MEMBER(watchdog_irq);
+	void watchdog_reset(int state);
+	void watchdog_irq(int state);
 	void timekeeper_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t timekeeper_r(offs_t offset, uint32_t mem_mask = ~0);
 	void reset_sio(void);
@@ -454,8 +455,8 @@ private:
 	uint32_t ethernet_r(offs_t offset, uint32_t mem_mask = ~0);
 	void ethernet_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void dcs3_fifo_full_w(uint32_t data);
-	DECLARE_WRITE_LINE_MEMBER(ethernet_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
+	void ethernet_interrupt(int state);
+	void ioasic_irq(int state);
 	uint32_t unknown_r(offs_t offset, uint32_t mem_mask = ~0);
 	uint8_t parallel_r(offs_t offset);
 	void parallel_w(offs_t offset, uint8_t data);
@@ -513,18 +514,15 @@ void vegas_state::machine_start()
 	/* identify our sound board */
 	if (m_dcs->get_rev() == dcs_audio_device::REV_DSIO) {
 		m_dcs_idma_cs = 6;
-		if (LOG_SIO)
-			logerror("Found dsio\n");
+		LOGMASKED(LOG_SIO, "Found dsio\n");
 	}
 	else if (m_dcs->get_rev() == dcs_audio_device::REV_DENV) {
 		m_dcs_idma_cs = 7;
-		if (LOG_SIO)
-			logerror("Found denver\n");
+		LOGMASKED(LOG_SIO, "Found denver\n");
 	}
 	else {
 		m_dcs_idma_cs = 0;
-		if (LOG_SIO)
-			logerror("Did not find dcs2 sound board\n");
+		LOGMASKED(LOG_SIO, "Did not find dcs2 sound board\n");
 	}
 
 	m_cmos_unlocked = 0;
@@ -554,15 +552,15 @@ void vegas_state::machine_reset()
 *  Watchdog interrupts
 *************************************/
 #define WD_IRQ 0x1
-WRITE_LINE_MEMBER(vegas_state::watchdog_irq)
+void vegas_state::watchdog_irq(int state)
 {
 	if (state && !(m_sio_irq_state & WD_IRQ)) {
-		logerror("%s: vegas_state::watchdog_irq state = %i\n", machine().describe_context(), state);
+		LOGMASKED(LOG_WATCHDOG, "%s: vegas_state::watchdog_irq state = %i\n", machine().describe_context(), state);
 		m_sio_irq_state |= WD_IRQ;
 		update_sio_irqs();
 	}
 	else if (!state && (m_sio_irq_state & WD_IRQ)) {
-		logerror("%s: vegas_state::watchdog_irq state = %i\n", machine().describe_context(), state);
+		LOGMASKED(LOG_WATCHDOG, "%s: vegas_state::watchdog_irq state = %i\n", machine().describe_context(), state);
 		m_sio_irq_state &= ~WD_IRQ;
 		update_sio_irqs();
 	}
@@ -571,11 +569,10 @@ WRITE_LINE_MEMBER(vegas_state::watchdog_irq)
 /*************************************
 *  Watchdog Reset
 *************************************/
-WRITE_LINE_MEMBER(vegas_state::watchdog_reset)
+void vegas_state::watchdog_reset(int state)
 {
 	if (state) {
-		printf("vegas_state::watchdog_reset!!!\n");
-		logerror("vegas_state::watchdog_reset!!!\n");
+		LOGMASKED(LOG_WATCHDOG, "vegas_state::watchdog_reset!!!\n");
 		machine().schedule_soft_reset();
 	}
 }
@@ -599,11 +596,11 @@ void vegas_state::timekeeper_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		if (ACCESSING_BITS_24_31)
 			m_timekeeper->write(offset * 4 + 3, data >> 24);
 		if (offset*4 >= 0x7ff0)
-			if (LOG_TIMEKEEPER) logerror("%s timekeeper_w(%04X & %08X) = %08X\n", machine().describe_context(), offset*4, mem_mask, data);
+			LOGMASKED(LOG_TIMEKEEPER, "%s timekeeper_w(%04X & %08X) = %08X\n", machine().describe_context(), offset*4, mem_mask, data);
 		m_cmos_unlocked = 0;
 	}
 	else
-		logerror("%s: timekeeper_w(%04X,%08X & %08X) without CMOS unlocked\n", machine().describe_context(), offset, data, mem_mask);
+		LOGMASKED(LOG_TIMEKEEPER_LOCKS, "%s: timekeeper_w(%04X,%08X & %08X) without CMOS unlocked\n", machine().describe_context(), offset, data, mem_mask);
 }
 
 
@@ -621,7 +618,7 @@ uint32_t vegas_state::timekeeper_r(offs_t offset, uint32_t mem_mask)
 	if (offset * 4 >= 0x7ff0) {
 		// Initial RTC check expects reads to the RTC to take some time
 		m_maincpu->eat_cycles(30);
-		if (LOG_TIMEKEEPER) logerror("%s: timekeeper_r(%04X & %08X) = %08X\n", machine().describe_context(), offset * 4, mem_mask, result);
+		LOGMASKED(LOG_TIMEKEEPER, "%s: timekeeper_r(%04X & %08X) = %08X\n", machine().describe_context(), offset * 4, mem_mask, result);
 	}
 	return result;
 }
@@ -653,14 +650,13 @@ void vegas_state::update_sio_irqs()
 	else {
 		m_nile->pci_intr_c(CLEAR_LINE);
 	}
-	if (LOG_SIO) {
-		std::string sioEnable = sioIRQString(m_sio_irq_enable);
-		std::string sioState = sioIRQString(m_sio_irq_state);
-		logerror("update_sio_irqs: irq_enable: %02x %s irq_state: %02x %s\n", m_sio_irq_enable, sioEnable, m_sio_irq_state, sioState);
-	}
+
+	std::string sioEnable = sioIRQString(m_sio_irq_enable);
+	std::string sioState = sioIRQString(m_sio_irq_state);
+	LOGMASKED(LOG_SIO, "update_sio_irqs: irq_enable: %02x %s irq_state: %02x %s\n", m_sio_irq_enable, sioEnable, m_sio_irq_state, sioState);
 }
 
-WRITE_LINE_MEMBER(vegas_state::duart_irq_cb)
+void vegas_state::duart_irq_cb(int state)
 {
 	// Duart shares IRQ with SIO
 	if (state ^ m_duart_irq_state) {
@@ -669,10 +665,9 @@ WRITE_LINE_MEMBER(vegas_state::duart_irq_cb)
 	}
 }
 
-WRITE_LINE_MEMBER(vegas_state::vblank_assert)
+void vegas_state::vblank_assert(int state)
 {
-	if (LOG_SIO)
-		logerror("vblank_assert: m_sio_reset_ctrl: %04x state: %d\n", m_sio_reset_ctrl, state);
+	LOGMASKED(LOG_SIO, "vblank_assert: m_sio_reset_ctrl: %04x state: %d\n", m_sio_reset_ctrl, state);
 	// latch on the correct polarity transition
 	if ((m_sio_irq_enable & 0x20) && ((state && !(m_sio_reset_ctrl & 0x10)) || (!state && (m_sio_reset_ctrl & 0x10))))
 	{
@@ -682,7 +677,7 @@ WRITE_LINE_MEMBER(vegas_state::vblank_assert)
 }
 
 
-WRITE_LINE_MEMBER(vegas_state::ioasic_irq)
+void vegas_state::ioasic_irq(int state)
 {
 	if (state)
 		m_sio_irq_state |= 0x04;
@@ -691,7 +686,7 @@ WRITE_LINE_MEMBER(vegas_state::ioasic_irq)
 	update_sio_irqs();
 }
 
-WRITE_LINE_MEMBER(vegas_state::ethernet_interrupt)
+void vegas_state::ethernet_interrupt(int state)
 {
 	if (state)
 		m_sio_irq_state |= 0x10;
@@ -723,27 +718,18 @@ uint8_t vegas_state::sio_r(offs_t offset)
 	case 1:
 		// Interrupt Enable
 		result = m_sio_irq_enable;
-		if (LOG_SIO) {
-			std::string sioBitSel = sioIRQString(result);
-			logerror("%s: sio_r: INTR ENABLE 0x%02x %s\n", machine().describe_context(), result, sioBitSel);
-		}
+		LOGMASKED(LOG_SIO, "%s: sio_r: INTR ENABLE 0x%02x %s\n", machine().describe_context(), result, sioIRQString(result).c_str());
 		break;
 	case 2:
 		// Interrupt Cause
 		result = m_sio_irq_state & m_sio_irq_enable;
-		if (LOG_SIO) {
-			std::string sioBitSel = sioIRQString(result);
-			logerror("%s: sio_r: INTR CAUSE 0x%02x %s\n", machine().describe_context(), result, sioBitSel);
-		}
+		LOGMASKED(LOG_SIO, "%s: sio_r: INTR CAUSE 0x%02x %s\n", machine().describe_context(), result, sioIRQString(result).c_str());
 		//m_sio_irq_state &= ~0x02;
 		break;
 	case 3:
 		// Interrupt Status
 		result = m_sio_irq_state;
-		if (LOG_SIO) {
-			std::string sioBitSel = sioIRQString(result);
-			logerror("%s: sio_r: INTR STATUS 0x%02x %s\n", machine().describe_context(), result, sioBitSel);
-		}
+		LOGMASKED(LOG_SIO, "%s: sio_r: INTR STATUS 0x%02x %s\n", machine().describe_context(), result, sioIRQString(result).c_str());
 		break;
 	case 4:
 		// LED
@@ -790,12 +776,12 @@ uint8_t vegas_state::sio_r(offs_t offset)
 			result = (((m_io_8way[2]->read() & 0x40) >> 3) | ((m_io_8way[3]->read() & 0x7000) >> 8));
 			break;
 		}
-		if (LOG_SIO) logerror("%s: sio_r: offset: %08x index: %d result: %02X\n", machine().describe_context(), offset, index, result);
+		LOGMASKED(LOG_SIO, "%s: sio_r: offset: %08x index: %d result: %02X\n", machine().describe_context(), offset, index, result);
 		break;
 	}
 	}
-	if (LOG_SIO && (index < 0x1 || index > 0x4))
-		logerror("%s: sio_r: offset: %08x index: %d result: %02X\n", machine().describe_context(), offset, index, result);
+	if (index < 0x1 || index > 0x4)
+		LOGMASKED(LOG_SIO, "%s: sio_r: offset: %08x index: %d result: %02X\n", machine().describe_context(), offset, index, result);
 	return result;
 }
 
@@ -807,8 +793,7 @@ void vegas_state::sio_w(offs_t offset, uint8_t data)
 		int index = offset >> 12;
 		switch (index) {
 		case 0:
-			if (LOG_SIO)
-				logerror("sio_w: Reset Control offset: %08x index: %d data: %02X\n", offset, index, data);
+			LOGMASKED(LOG_SIO, "sio_w: Reset Control offset: %08x index: %d data: %02X\n", offset, index, data);
 			// Reset Control:  Bit 0=>Reset IOASIC, Bit 1=>Reset NSS Connection, Bit 2=>Reset SMC, Bit 3=>Reset VSYNC, Bit 4=>VSYNC Polarity
 			/* bit 0 is used to reset the IOASIC */
 			if (!(data & (1 << 0)))
@@ -834,18 +819,13 @@ void vegas_state::sio_w(offs_t offset, uint8_t data)
 			// Bit 3 => NSS / Hi-Link
 			// Bit 4 => Ethernet
 			// Bit 5 => Vsync
-			if (LOG_SIO) {
-				std::string sioBitSel = sioIRQString(data);
-				logerror("sio_w: Interrupt Enable 0x%02x %s\n", data, sioBitSel);
-				//logerror("sio_w: Interrupt Enable offset: %08x index: %d data: %02X\n", offset, index, data);
-			}
+			LOGMASKED(LOG_SIO, "sio_w: Interrupt Enable 0x%02x %s\n", data, sioIRQString(data).c_str());
 			m_sio_irq_enable = data;
 			update_sio_irqs();
 			break;
 		case 4:
 			// LED
-			if (LOG_SIO)
-				logerror("sio_w: LED offset: %08x index: %d data: %02X\n", offset, index, data);
+			LOGMASKED(LOG_SIO, "sio_w: LED offset: %08x index: %d data: %02X\n", offset, index, data);
 			m_sio_led_state = data;
 			break;
 		case 6:
@@ -855,8 +835,7 @@ void vegas_state::sio_w(offs_t offset, uint8_t data)
 		case 7:
 			// Watchdog
 			m_timekeeper->watchdog_write();
-			if (0 && LOG_SIO)
-				logerror("sio_w: Watchdog: %08x index: %d data: %02X\n", offset, index, data);
+			LOGMASKED(LOG_SIO_VERBOSE, "sio_w: Watchdog: %08x index: %d data: %02X\n", offset, index, data);
 			//m_maincpu->eat_cycles(100);
 			break;
 		}
@@ -880,37 +859,35 @@ void vegas_state::cpu_io_w(offs_t offset, uint8_t data)
 	case 0:
 	{
 		m_system_led = ~data & 0xff;
-		if (LOG_SIO) {
-			char digit = 'U';
-			switch (data & 0xff) {
-			case 0xc0: digit = '0'; break;
-			case 0xf9: digit = '1'; break;
-			case 0xa4: digit = '2'; break;
-			case 0xb0: digit = '3'; break;
-			case 0x99: digit = '4'; break;
-			case 0x92: digit = '5'; break;
-			case 0x82: digit = '6'; break;
-			case 0xf8: digit = '7'; break;
-			case 0x80: digit = '8'; break;
-			case 0x90: digit = '9'; break;
-			case 0x88: digit = 'A'; break;
-			case 0x83: digit = 'B'; break;
-			case 0xc6: digit = 'C'; break;
-			case 0xa7: digit = 'c'; break;
-			case 0xa1: digit = 'D'; break;
-			case 0x86: digit = 'E'; break;
-			case 0x87: digit = 'F'; break;
-			case 0x7f: digit = '.'; break;
-			case 0xf7: digit = '_'; break;
-			case 0xbf: digit = '|'; break;
-			case 0xfe: digit = '-'; break;
-			case 0xff: digit = 'Z'; break;
-			}
-			//popmessage("System LED: %C", digit);
-			logerror("%s: cpu_io_w System LED offset %X = %02X '%c'\n", machine().describe_context(), offset, data, digit);
+		char digit = 'U';
+		switch (data & 0xff) {
+		case 0xc0: digit = '0'; break;
+		case 0xf9: digit = '1'; break;
+		case 0xa4: digit = '2'; break;
+		case 0xb0: digit = '3'; break;
+		case 0x99: digit = '4'; break;
+		case 0x92: digit = '5'; break;
+		case 0x82: digit = '6'; break;
+		case 0xf8: digit = '7'; break;
+		case 0x80: digit = '8'; break;
+		case 0x90: digit = '9'; break;
+		case 0x88: digit = 'A'; break;
+		case 0x83: digit = 'B'; break;
+		case 0xc6: digit = 'C'; break;
+		case 0xa7: digit = 'c'; break;
+		case 0xa1: digit = 'D'; break;
+		case 0x86: digit = 'E'; break;
+		case 0x87: digit = 'F'; break;
+		case 0x7f: digit = '.'; break;
+		case 0xf7: digit = '_'; break;
+		case 0xbf: digit = '|'; break;
+		case 0xfe: digit = '-'; break;
+		case 0xff: digit = 'Z'; break;
 		}
-	}
+		//popmessage("System LED: %C", digit);
+		LOGMASKED(LOG_SIO, "%s: cpu_io_w System LED offset %X = %02X '%c'\n", machine().describe_context(), offset, data, digit);
 		break;
+	}
 	case 1:
 		m_cpuio_data[2] = (m_cpuio_data[2] & ~0x02) | ((m_cpuio_data[1] & 0x01) << 1) | (m_cpuio_data[1] & 0x01);
 		if (!(data & 0x1)) {
@@ -919,20 +896,18 @@ void vegas_state::cpu_io_w(offs_t offset, uint8_t data)
 			// Reset the SIO registers
 			reset_sio();
 		}
-		if (LOG_SIO)
-			logerror("%s: cpu_io_w PLD Config offset %X = %02X\n", machine().describe_context(), offset, data);
+		LOGMASKED(LOG_SIO, "%s: cpu_io_w PLD Config offset %X = %02X\n", machine().describe_context(), offset, data);
 		break;
 	case 2:
-		if (LOG_SIO && (m_cpuio_data[3] & 0x1))
-			logerror("%s: cpu_io_w PLD Status / Jamma Serial Sense offset %X = %02X\n", machine().describe_context(), offset, data);
+		if (m_cpuio_data[3] & 0x1)
+			LOGMASKED(LOG_SIO, "%s: cpu_io_w PLD Status / Jamma Serial Sense offset %X = %02X\n", machine().describe_context(), offset, data);
 		break;
 	case 3:
 		// Bit 0: Enable SIO, Bit 1: Enable SIO_R0/IDE, Bit 2: Enable PCI
-		if (LOG_SIO)
-			logerror("%s: cpu_io_w System Reset offset %X = %02X\n", machine().describe_context(), offset, data);
+		LOGMASKED(LOG_SIO, "%s: cpu_io_w System Reset offset %X = %02X\n", machine().describe_context(), offset, data);
 		break;
 	default:
-		logerror("%s: cpu_io_w unknown offset %X = %02X\n", machine().describe_context(), offset, data);
+		LOGMASKED(LOG_UNKNOWN, "%s: cpu_io_w unknown offset %X = %02X\n", machine().describe_context(), offset, data);
 		break;
 	}
 }
@@ -942,8 +917,8 @@ uint8_t vegas_state::cpu_io_r(offs_t offset)
 	uint32_t result = 0;
 	if (offset < 4)
 		result = m_cpuio_data[offset];
-	if (LOG_SIO && !(!(m_cpuio_data[3] & 0x1)))
-		logerror("%s:cpu_io_r offset %X = %02X\n", machine().describe_context(), offset, result);
+	if (m_cpuio_data[3] & 0x1)
+		LOGMASKED(LOG_SIO, "%s:cpu_io_r offset %X = %02X\n", machine().describe_context(), offset, result);
 	return result;
 }
 

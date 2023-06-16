@@ -22,6 +22,7 @@ ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, device
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_matrix_keyboard_interface(mconfig, *this, "TERM_LINE0", "TERM_LINE1", "TERM_LINE2", "TERM_LINE3")
 	, m_io_kbdc(*this, "TERM_LINEC")
+	, m_rom(*this, "ie15kbd")
 	, m_keyboard_cb(*this)
 	, m_sdv_cb(*this)
 {
@@ -84,8 +85,6 @@ void ie15_keyboard_device::device_start()
 {
 	m_keyboard_cb.resolve_safe();
 	m_sdv_cb.resolve_safe();
-
-	m_rom = (uint8_t *)memregion("ie15kbd")->base();
 }
 
 void ie15_keyboard_device::device_reset()

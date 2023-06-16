@@ -778,12 +778,12 @@ INPUT_PORTS_END
 //  PC1512_KEYBOARD_INTERFACE( kb_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( pc1512_base_state::kbdata_w )
+void pc1512_base_state::kbdata_w(int state)
 {
 	m_kbdata = state;
 }
 
-WRITE_LINE_MEMBER( pc1512_base_state::kbclk_w )
+void pc1512_base_state::kbclk_w(int state)
 {
 	if (!BIT(m_port61, 7) && m_kbclk && !state)
 	{
@@ -833,14 +833,14 @@ void pc1512_base_state::update_fdc_tc()
 		m_fdc->tc_w(false);
 }
 
-WRITE_LINE_MEMBER( pc1512_base_state::hrq_w )
+void pc1512_base_state::hrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	m_dmac->hack_w(state);
 }
 
-WRITE_LINE_MEMBER( pc1512_base_state::eop_w )
+void pc1512_base_state::eop_w(int state)
 {
 	if (m_dma_channel == 2)
 	{
@@ -907,22 +907,22 @@ void pc1512_base_state::iow3_w(uint8_t data)
 	m_bus->dack_w(3, data);
 }
 
-WRITE_LINE_MEMBER( pc1512_base_state::dack0_w )
+void pc1512_base_state::dack0_w(int state)
 {
 	if (!state) m_dma_channel = 0;
 }
 
-WRITE_LINE_MEMBER( pc1512_base_state::dack1_w )
+void pc1512_base_state::dack1_w(int state)
 {
 	if (!state) m_dma_channel = 1;
 }
 
-WRITE_LINE_MEMBER( pc1512_base_state::dack2_w )
+void pc1512_base_state::dack2_w(int state)
 {
 	if (!state) m_dma_channel = 2;
 }
 
-WRITE_LINE_MEMBER( pc1512_base_state::dack3_w )
+void pc1512_base_state::dack3_w(int state)
 {
 	if (!state) m_dma_channel = 3;
 }
@@ -936,7 +936,7 @@ void pc1512_base_state::update_speaker()
 	m_speaker->level_w(m_speaker_drive & m_pit2);
 }
 
-WRITE_LINE_MEMBER( pc1512_base_state::pit1_w )
+void pc1512_base_state::pit1_w(int state)
 {
 	if (!m_pit1 && state && !m_dreq0)
 	{
@@ -947,7 +947,7 @@ WRITE_LINE_MEMBER( pc1512_base_state::pit1_w )
 	m_pit1 = state;
 }
 
-WRITE_LINE_MEMBER( pc1512_base_state::pit2_w )
+void pc1512_base_state::pit2_w(int state)
 {
 	m_pit2 = state;
 	update_speaker();
@@ -973,13 +973,13 @@ void pc1512_base_state::update_fdc_drq()
 		m_dmac->dreq2_w(0);
 }
 
-WRITE_LINE_MEMBER( pc1512_base_state::fdc_int_w )
+void pc1512_base_state::fdc_int_w(int state)
 {
 	m_dint = state;
 	update_fdc_int();
 }
 
-WRITE_LINE_MEMBER( pc1512_base_state::fdc_drq_w )
+void pc1512_base_state::fdc_drq_w(int state)
 {
 	m_ddrq = state;
 	update_fdc_drq();
@@ -1013,28 +1013,28 @@ void pc1512_base_state::update_ack()
 		m_pic->ir7_w(CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( pc1512_base_state::write_centronics_ack )
+void pc1512_base_state::write_centronics_ack(int state)
 {
 	m_centronics_ack = state;
 	update_ack();
 }
 
-WRITE_LINE_MEMBER( pc1512_base_state::write_centronics_busy )
+void pc1512_base_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER( pc1512_base_state::write_centronics_perror )
+void pc1512_base_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
 
-WRITE_LINE_MEMBER( pc1512_base_state::write_centronics_select )
+void pc1512_base_state::write_centronics_select(int state)
 {
 	m_centronics_select = state;
 }
 
-WRITE_LINE_MEMBER( pc1512_base_state::write_centronics_fault )
+void pc1512_base_state::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 }

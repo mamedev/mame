@@ -70,7 +70,7 @@ public:
 private:
 	virtual void machine_start() override;
 	void pipbug_ctrl_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(serial_r);
+	int serial_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	required_device<rs232_port_device> m_rs232;
 	required_device<s2650_device> m_maincpu;
@@ -111,7 +111,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( pipbug_state::kansas_r )
 	}
 }
 
-READ_LINE_MEMBER( pipbug_state::serial_r )
+int pipbug_state::serial_r()
 {
 	return m_rs232->rxd_r() & m_cassinbit;
 }

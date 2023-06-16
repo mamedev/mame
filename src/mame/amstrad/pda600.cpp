@@ -124,7 +124,7 @@ public:
 	}
 
 	void pda600(machine_config &config);
-	DECLARE_WRITE_LINE_MEMBER(power_off_w) { m_maincpu->set_input_line(Z180_INPUT_LINE_IRQ1, state); }
+	void power_off_w(int state) { m_maincpu->set_input_line(Z180_INPUT_LINE_IRQ1, state); }
 
 private:
 	required_device<z180_device> m_maincpu;

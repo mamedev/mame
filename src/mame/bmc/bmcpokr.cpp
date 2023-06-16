@@ -47,7 +47,7 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_READ_LINE_MEMBER(hopper_r);
+	int hopper_r();
 
 	void bmcpokr(machine_config &config);
 	void mjmaglmp(machine_config &config);
@@ -339,7 +339,7 @@ uint16_t bmcpokr_state::dsw_r()
 	return 0xff << 8;
 }
 
-READ_LINE_MEMBER(bmcpokr_state::hopper_r)
+int bmcpokr_state::hopper_r()
 {
 	// motor off should clear the sense bit (I guess ticket.c should actually do this).
 	// Otherwise a hopper bit stuck low will prevent several keys from being registered.

@@ -43,10 +43,10 @@ public:
 
 	uint16_t read(offs_t offset);
 	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(drq0_w);
-	DECLARE_WRITE_LINE_MEMBER(drq1_w);
-	DECLARE_WRITE_LINE_MEMBER(drq2_w);
-	DECLARE_WRITE_LINE_MEMBER(drq3_w);
+	void drq0_w(int state);
+	void drq1_w(int state);
+	void drq2_w(int state);
+	void drq3_w(int state);
 	uint8_t iack();
 
 	enum {

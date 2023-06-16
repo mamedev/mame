@@ -335,7 +335,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-WRITE_LINE_MEMBER(raiden_state::vblank_irq)
+void raiden_state::vblank_irq(int state)
 {
 	if (state)
 	{
