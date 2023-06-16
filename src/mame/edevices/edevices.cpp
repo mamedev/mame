@@ -172,9 +172,22 @@ int edevices_device::get_priority(const uint16_t *source)
 }
 
 // the Steel Force type hardware uses an entirely different bit for priority and only appears to have 2 levels
+// Mortal Race uses additional priorities
 int edevices_sforce_device::get_priority(const uint16_t *source)
 {
-	return (source[1] & 0x0020) ? 0xc : 0x2;
+	switch (source[1] & 0x0030)
+	{
+	case 0x00:
+		return 0x02;
+	case 0x10:
+		return 0x04;
+	case 0x20:
+		return 0x0c;
+	case 0x30:
+		return 0x0e;
+	}
+
+	return 0x00;
 }
 
 void edevices_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
