@@ -2,51 +2,51 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
-
-  To investigate:
-    - Gargoyle's Quest - Ghosts'n Goblins (rev 1)   <-  Unreleased in USA?
-
-  Undumped pirate carts:
-    - GOWIN carts (see below the list of known games)
-
-
- Info on the PCB codes, based on Tauwasser's notes and research
-
-
- DMG-****-NN
-
- where
-     NN   = PCB revision
-     **** = 3 or 4 letter descriptor (+ possibly an optional letter code in parenthesis)
-
- Letters have the following meaning
-
- Code     MBC / Battery                   ROM size   RAM size
- -        -                               -          -             QFP
- A        none                            256kbit    none          -
- B        MBC1A/MBC1B/MBC1B1              512kbit    -?            -
- C        -                               1Mbit      64kbit        COB
- D        MBC1A/MBC1B/MBC1B1 + CR1616     2Mbit      256kbit       -
- E        -                               4Mbit      512kbit       -
- F        -                               8Mbit      -             -
- G        MBC2A + CR1616                  16Mbit     -             -
- H        -                               32Mbit     -             -
- K        MBC3/MBC3A/MBC3B w/X + CR2025   -          -             -
- L        MBC3/MBC3A/MBC3B w/oX + CR2025  -          -             -
- M        MBC30 w/ X + CR2025             -          -             -
- N        -                               -          -             SOP
- P        MMM01                           -          -             -
- S        MMM01 + CR1616                  -          -             -
- T        HuC1/HuC1A + CR1616             -          -             TSOP I
- U        HuC3A + CR2025                  -          -             TSOP II
-
-
- So that, for instance, DMG-BEAN-02 stands for a PCB with MBC1A/MBC1B/MBC1B1 and no battery,
- up to 256kbit ROM, no SRAM and roms in SOP
-
 -->
 
 <softwarelist name="gameboy" description="Nintendo Game Boy cartridges">
+	<!--
+		To investigate:
+		- Gargoyle's Quest - Ghosts'n Goblins (rev 1)   <-  Unreleased in USA?
+
+		Undumped pirate carts:
+		- GOWIN carts (see below the list of known games)
+
+
+		Info on the PCB codes, based on Tauwasser's notes and research
+
+
+		DMG-****-NN
+
+		where
+		 NN   = PCB revision
+		 **** = 3 or 4 letter descriptor (+ possibly an optional letter code in parenthesis)
+
+		Letters have the following meaning
+
+		Code     MBC / Battery                   ROM size   RAM size
+		-        -                               -          -             QFP
+		A        none                            256kbit    none          -
+		B        MBC1A/MBC1B/MBC1B1              512kbit    -?            -
+		C        -                               1Mbit      64kbit        COB
+		D        MBC1A/MBC1B/MBC1B1 + CR1616     2Mbit      256kbit       -
+		E        -                               4Mbit      512kbit       -
+		F        -                               8Mbit      -             -
+		G        MBC2A + CR1616                  16Mbit     -             -
+		H        -                               32Mbit     -             -
+		K        MBC3/MBC3A/MBC3B w/X + CR2025   -          -             -
+		L        MBC3/MBC3A/MBC3B w/oX + CR2025  -          -             -
+		M        MBC30 w/ X + CR2025             -          -             -
+		N        -                               -          -             SOP
+		P        MMM01                           -          -             -
+		S        MMM01 + CR1616                  -          -             -
+		T        HuC1/HuC1A + CR1616             -          -             TSOP I
+		U        HuC3A + CR2025                  -          -             TSOP II
+
+
+		So that, for instance, DMG-BEAN-02 stands for a PCB with MBC1A/MBC1B/MBC1B1 and no battery,
+		up to 256kbit ROM, no SRAM and roms in SOP.
+	-->
 
 	<software name="tamafrnd">
 		<description>3 Choume no Tama - Tama and Friends - 3 Choume Obake Panic!! (Japan)</description>
@@ -21538,8 +21538,8 @@ license:CC0-1.0
 		<description>Shanghai Pocket (Japan)</description>
 		<year>1998</year>
 		<publisher>Sunsoft</publisher>
-		<info name="serial" value="DMG-ASEJ-JPN?"/>
-		<info name="release" value="19980806"/>
+		<info name="serial" value="DMG-ASEJ-JPN?" />
+		<info name="release" value="19980806" />
 		<info name="alt_title" value="上海 ポケット" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="enhancement" value="sgb" />
@@ -23845,7 +23845,7 @@ license:CC0-1.0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="0x20000">
-				<rom name="scrabble.bin" size="0x20000" crc="10ecadbf" sha1="9deab55c1074c0182bac775b9e984afa170f57b0"/>
+				<rom name="scrabble.bin" size="0x20000" crc="10ecadbf" sha1="9deab55c1074c0182bac775b9e984afa170f57b0" />
 			</dataarea>
 		</part>
 	</software>
@@ -24943,7 +24943,7 @@ license:CC0-1.0
 		<description>Tintin in Tibet (Europe, En / Es / It / Sv)</description>
 		<year>1994</year>
 		<publisher>Infogrames</publisher>
-		<info name="serial" value="DMG-AT6X-?"/>
+		<info name="serial" value="DMG-AT6X-?" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
@@ -24970,7 +24970,7 @@ license:CC0-1.0
 		<description>Tintin in Tibet (Europe, En / Fr / De / Nl)</description>
 		<year>1994</year>
 		<publisher>Infogrames</publisher>
-		<info name="serial" value="DMG-AT6P-?"/>
+		<info name="serial" value="DMG-AT6P-?" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
@@ -28114,7 +28114,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 			<feature name="batt" value="Batt CR2025" />
 			<feature name="slot" value="rom_camera" />
 			<dataarea name="rom" size="0x100000">
-				<rom name="gbd-impact8m.u1" size="0x100000" crc="15726D8C" sha1="5ffcda6fa1a3d87c5cbb8ddf743ddbc18242443b" />
+				<rom name="gbd-impact8m.u1" size="0x100000" crc="15726d8c" sha1="5ffcda6fa1a3d87c5cbb8ddf743ddbc18242443b" />
 			</dataarea>
 			<dataarea name="nvram" size="0x20000">
 			</dataarea>
