@@ -98,6 +98,7 @@ public:
 	void mortalr(machine_config &config);
 
 	void program_map(address_map &map);
+	void mortalr_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 
@@ -169,12 +170,18 @@ void stlforce_state::program_map(address_map &map)
 	map(0x108000, 0x1087ff).ram().share("spriteram");
 	map(0x108800, 0x108fff).ram();
 	map(0x109000, 0x11ffff).ram();
-	map(0x120000, 0x12ffff).ram(); // mortal race needs this, probably a mirror (or larger RAM chip?)
 	map(0x400000, 0x400001).portr("INPUT");
 	map(0x400002, 0x400003).portr("SYSTEM");
 	map(0x400011, 0x400011).w(FUNC(stlforce_state::eeprom_w));
 	map(0x40001e, 0x40001f).w("video", FUNC(edevices_device::sprites_commands_w));
 	map(0x410001, 0x410001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
+
+void stlforce_state::mortalr_map(address_map& map)
+{
+	stlforce_state::program_map(map);
+
+	map(0x120000, 0x12ffff).ram(); // mortal race has piggybacked RAM chips to double RAM capacity
 }
 
 void twinbrat_state::program_map(address_map &map)
@@ -345,6 +352,8 @@ void stlforce_state::mortalr(machine_config &config)
 {
 	stlforce(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &stlforce_state::mortalr_map);
+
 	m_gfxdecode->set_info(gfx_mortalr);
 }
 
@@ -391,10 +400,10 @@ ROM_START( mortalr )
 
 	ROM_REGION( 0x200000, "tiles", ROMREGION_ERASE00 ) // 16x16 bg tiles
 	// 2 pairs of piggyback ROMs to give double usual capacity
-	ROM_LOAD16_BYTE( "9_bot.u28", 0x000001, 0x080000, CRC(ab330185) SHA1(6403d472499897395e47a05f73e3760ef632ab8a) )
-	ROM_LOAD16_BYTE( "bot.u29",   0x000000, 0x080000, NO_DUMP )
-	ROM_LOAD16_BYTE( "13_top.u28",0x100001, 0x080000, CRC(f2342348) SHA1(0f197e88a1911715d3b98af9e303fd1f137e5fe3) )
-	ROM_LOAD16_BYTE( "top.u29",   0x100000, 0x080000, NO_DUMP )
+	ROM_LOAD16_BYTE( "8_bot.u27",  0x000001, 0x080000, CRC(042297f3) SHA1(08640cb7997d10baae776f377a605fa70499f6ef) )
+	ROM_LOAD16_BYTE( "12_top.u27", 0x100001, 0x080000, CRC(fa95773c) SHA1(849f3ab4950b34200e3043d849273622e4bdbfa3) )
+	ROM_LOAD16_BYTE( "9_bot.u28",  0x000000, 0x080000, CRC(ab330185) SHA1(6403d472499897395e47a05f73e3760ef632ab8a) )
+	ROM_LOAD16_BYTE( "13_top.u28", 0x100000, 0x080000, CRC(f2342348) SHA1(0f197e88a1911715d3b98af9e303fd1f137e5fe3) )
 
 	ROM_REGION( 0x100000, "tiles2", ROMREGION_ERASE00 ) // 16x16 bg tiles & 8x8 tx tiles merged
 	ROM_LOAD16_BYTE( "10.u29", 0x000001, 0x080000, CRC(fb39b032) SHA1(c2dfb24fccd4b588d92214addee2a9bbb6e45065) )
