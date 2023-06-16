@@ -418,6 +418,10 @@ ROM_START( mt32 )
 	ROMX_LOAD(       "mt32_2.0.4.ic28",              0,   0x10000, CRC(59a49d5c) SHA1(2c16432b6c73dd2a3947cba950a0f4c19d6180eb), ROM_BIOS(6) )
 	ROM_IGNORE(0x10000)  // banking needs to be implemented
 
+	ROM_SYSTEM_BIOS( 7, "207", "Firmware 2.0.7" )
+	ROMX_LOAD(       "mt32_2.0.7.ic28",              0,   0x10000, CRC(a016b607) SHA1(47b52adefedaec475c925e54340e37673c11707c), ROM_BIOS(7) )
+	ROM_IGNORE(0x10000)  // banking needs to be implemented
+
 // We need a bios-like selection for these too
 	ROM_REGION( 0x80000, "la32", 0 )
 	// separate PCM Mask ROMs from the MT-32 1.x older PCB
