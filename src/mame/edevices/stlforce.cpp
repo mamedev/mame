@@ -230,7 +230,7 @@ static INPUT_PORTS_START( stlforce )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static const gfx_layout stlforce_bg_full_layout =
+static const gfx_layout stlforce_bglayout =
 {
 	16,16,
 	RGN_FRAC(1,1),
@@ -241,22 +241,10 @@ static const gfx_layout stlforce_bg_full_layout =
 	32*32
 };
 
-static const gfx_layout stlforce_bglayout =
-{
-	16,16,
-	RGN_FRAC(1,2),
-	4,
-	{0,1,2,3},
-	{12,8,4,0,28,24,20,16,16*32+12,16*32+8,16*32+4,16*32+0,16*32+28,16*32+24,16*32+20,16*32+16},
-	{0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32,8*32,9*32,10*32,11*32,12*32,13*32,14*32,15*32},
-	32*32
-};
-
-
 static const gfx_layout stlforce_txlayout =
 {
 	8,8,
-	RGN_FRAC(1,2),
+	RGN_FRAC(1,1),
 	4,
 	{0,1,2,3},
 	{12,8,4,0,28,24,20,16},
@@ -276,23 +264,12 @@ static const gfx_layout stlforce_splayout =
 };
 
 static GFXDECODE_START( gfx_stlforce )
-	GFXDECODE_ENTRY( "sprites",0x000000, stlforce_splayout, 1024,  16 )
-	GFXDECODE_ENTRY( "tiles2", 0x080000, stlforce_txlayout, 384,   8  )
-	GFXDECODE_ENTRY( "tiles2", 0x000000, stlforce_bg_full_layout, 256,   8  )
-
-	GFXDECODE_ENTRY( "tiles",  0x080000, stlforce_bglayout, 128,   8  )
-	GFXDECODE_ENTRY( "tiles",  0x000000, stlforce_bglayout, 0,     8  )
+	GFXDECODE_ENTRY( "sprites",     0x000000, stlforce_splayout, 1024,  16 )
+	GFXDECODE_ENTRY( "txtile",      0x000000, stlforce_txlayout, 384,   8  )
+	GFXDECODE_ENTRY( "midhightile", 0x000000, stlforce_bglayout, 256,   8  )
+	GFXDECODE_ENTRY( "midlowtile",  0x000000, stlforce_bglayout, 128,   8  )
+	GFXDECODE_ENTRY( "bgtile",      0x000000, stlforce_bglayout, 0,     8  )
 GFXDECODE_END
-
-static GFXDECODE_START( gfx_mortalr )
-	GFXDECODE_ENTRY( "sprites",0x000000, stlforce_splayout, 1024,  16 )
-	GFXDECODE_ENTRY( "tiles2", 0x080000, stlforce_txlayout, 384,   8  ) // doesn't actually use this layer?
-	GFXDECODE_ENTRY( "tiles2", 0x000000, stlforce_bg_full_layout, 256,   8  )
-
-	GFXDECODE_ENTRY( "tiles",  0x100000, stlforce_bglayout, 128,   8  )
-	GFXDECODE_ENTRY( "tiles",  0x000000, stlforce_bglayout, 0,     8  )
-GFXDECODE_END
-
 
 void stlforce_state::stlforce(machine_config &config)
 {
@@ -355,8 +332,6 @@ void stlforce_state::mortalr(machine_config &config)
 	stlforce(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &stlforce_state::mortalr_map);
-
-	m_gfxdecode->set_info(gfx_mortalr);
 }
 
 
@@ -365,13 +340,23 @@ ROM_START( stlforce )
 	ROM_LOAD16_BYTE( "stlforce.105", 0x00000, 0x20000, CRC(3ec804ca) SHA1(4efcf3321b7111644ac3ee0a83ad95d0571a4021) )
 	ROM_LOAD16_BYTE( "stlforce.104", 0x00001, 0x20000, CRC(69b5f429) SHA1(5bd20fad91a22f4d62f85a5190d72dd824ee26a5) )
 
-	ROM_REGION( 0x100000, "tiles", 0 ) // 16x16 bg tiles
+	ROM_REGION( 0x200000, "tiles", 0 ) // 16x16 bg tiles & 8x8 tx tiles merged
 	ROM_LOAD16_BYTE( "stlforce.u27", 0x000001, 0x080000, CRC(c42ef365) SHA1(40e9ee29ea14b3bc2fbfa4e6acb7d680cf72f01a) )
 	ROM_LOAD16_BYTE( "stlforce.u28", 0x000000, 0x080000, CRC(6a4b7c98) SHA1(004d7f3c703c6abc79286fa58a4c6793d66fca39) )
+	ROM_LOAD16_BYTE( "stlforce.u29", 0x100001, 0x080000, CRC(30488f44) SHA1(af0d92d8952ce3cd893ab9569afdda12e17795e7) )
+	ROM_LOAD16_BYTE( "stlforce.u30", 0x100000, 0x080000, CRC(cf19d43a) SHA1(dc04930548ac5b7e2b74c6041325eac06e773ed5) )
 
-	ROM_REGION( 0x100000, "tiles2", 0 ) // 16x16 bg tiles & 8x8 tx tiles merged
-	ROM_LOAD16_BYTE( "stlforce.u29", 0x000001, 0x080000, CRC(30488f44) SHA1(af0d92d8952ce3cd893ab9569afdda12e17795e7) )
-	ROM_LOAD16_BYTE( "stlforce.u30", 0x000000, 0x080000, CRC(cf19d43a) SHA1(dc04930548ac5b7e2b74c6041325eac06e773ed5) )
+	ROM_REGION( 0x080000, "bgtile", 0 )
+	ROM_COPY( "tiles", 0x000000, 0x000000, 0x080000)
+
+	ROM_REGION( 0x080000, "midlowtile", 0 )
+	ROM_COPY( "tiles", 0x080000, 0x000000, 0x080000)
+
+	ROM_REGION( 0x080000, "midhightile", 0 )
+	ROM_COPY( "tiles", 0x100000, 0x000000, 0x080000)
+
+	ROM_REGION( 0x080000, "txtile", 0 )
+	ROM_COPY( "tiles", 0x180000, 0x000000, 0x080000)
 
 	ROM_REGION( 0x100000, "sprites", 0 ) // 16x16
 	ROM_LOAD( "stlforce.u36", 0x00000, 0x40000, CRC(037dfa9f) SHA1(224f5cd1a95d55b065aef5c0bd03b50cabcb619b) )
@@ -400,16 +385,26 @@ ROM_START( mortalr )
 	ROM_LOAD16_BYTE( "2.u105", 0x00000, 0x80000, CRC(550c48e3) SHA1(cdd2a00a6377273c73f37944f1ee6acfb4d41e82) )
 	ROM_LOAD16_BYTE( "3.u104", 0x00001, 0x80000, CRC(92fad747) SHA1(0b41f31e2f14607b572ef56751b3cb201cec1bf2) )
 
-	ROM_REGION( 0x200000, "tiles", ROMREGION_ERASE00 ) // 16x16 bg tiles
+	ROM_REGION( 0x300000, "tiles", ROMREGION_ERASE00 ) // 16x16 bg tiles
 	// 2 pairs of piggyback ROMs to give double usual capacity
 	ROM_LOAD16_BYTE( "8_bot.u27",  0x000001, 0x080000, CRC(042297f3) SHA1(08640cb7997d10baae776f377a605fa70499f6ef) )
-	ROM_LOAD16_BYTE( "12_top.u27", 0x100001, 0x080000, CRC(fa95773c) SHA1(849f3ab4950b34200e3043d849273622e4bdbfa3) )
 	ROM_LOAD16_BYTE( "9_bot.u28",  0x000000, 0x080000, CRC(ab330185) SHA1(6403d472499897395e47a05f73e3760ef632ab8a) )
+	ROM_LOAD16_BYTE( "12_top.u27", 0x100001, 0x080000, CRC(fa95773c) SHA1(849f3ab4950b34200e3043d849273622e4bdbfa3) )
 	ROM_LOAD16_BYTE( "13_top.u28", 0x100000, 0x080000, CRC(f2342348) SHA1(0f197e88a1911715d3b98af9e303fd1f137e5fe3) )
+	ROM_LOAD16_BYTE( "10.u29",     0x200001, 0x080000, CRC(fb39b032) SHA1(c2dfb24fccd4b588d92214addee2a9bbb6e45065) )
+	ROM_LOAD16_BYTE( "11.u30",     0x200000, 0x080000, CRC(a82f2421) SHA1(b0787decd1b668af5b2ed032947ca5c0ccc020e8) )
 
-	ROM_REGION( 0x100000, "tiles2", ROMREGION_ERASE00 ) // 16x16 bg tiles & 8x8 tx tiles merged
-	ROM_LOAD16_BYTE( "10.u29", 0x000001, 0x080000, CRC(fb39b032) SHA1(c2dfb24fccd4b588d92214addee2a9bbb6e45065) )
-	ROM_LOAD16_BYTE( "11.u30", 0x000000, 0x080000, CRC(a82f2421) SHA1(b0787decd1b668af5b2ed032947ca5c0ccc020e8) )
+	ROM_REGION( 0x100000, "bgtile", 0 )
+	ROM_COPY( "tiles", 0x000000, 0x000000, 0x100000)
+
+	ROM_REGION( 0x100000, "midlowtile", 0 )
+	ROM_COPY( "tiles", 0x100000, 0x000000, 0x100000)
+
+	ROM_REGION( 0x100000, "midhightile", 0 )
+	ROM_COPY( "tiles", 0x200000, 0x000000, 0x100000)
+
+	ROM_REGION( 0x100000, "txtile", ROMREGION_ERASE00 )
+	// no 8x8 tiles present, but layer gets enabled if you turn on the debug mode
 
 	ROM_REGION( 0x200000, "sprites", 0 ) // 16x16
 	ROM_LOAD( "4.u36", 0x000000, 0x80000, CRC(6d1e6367) SHA1(4e6d315206b4ebc75abe9cbec1a53a9ca0b29128) )
@@ -465,13 +460,23 @@ ROM_START( twinbrat )
 	ROM_LOAD16_BYTE( "12.u105", 0x00000, 0x20000, CRC(552529b1) SHA1(bf23680335e1c5b05b80ab139609bee9f239b910) ) // higher numbers are newer??
 	ROM_LOAD16_BYTE( "13.u104", 0x00001, 0x20000, CRC(9805ba90) SHA1(cdc188fa38220d18c60c9f438520ee574e6ce0f7) ) // higher numbers are newer??
 
-	ROM_REGION( 0x100000, "tiles", 0 )
+	ROM_REGION( 0x200000, "tiles", 0 )
 	ROM_LOAD16_BYTE( "6.bin", 0x000000, 0x80000, CRC(af10ddfd) SHA1(e5e83044f20d6cbbc1b4ef1812ac57b6dc958a8a) )
 	ROM_LOAD16_BYTE( "7.bin", 0x000001, 0x80000, CRC(3696345a) SHA1(ea38be3586757527b2a1aad2e22b83937f8602da) )
+	ROM_LOAD16_BYTE( "4.bin", 0x100000, 0x80000, CRC(1ae8a751) SHA1(5f30306580c6ab4af0ddbdc4519eb4e0ab9bd23a) )
+	ROM_LOAD16_BYTE( "5.bin", 0x100001, 0x80000, CRC(cf235eeb) SHA1(d067e2dd4f28a8986dd76ec0eba90e1adbf5787c) )
 
-	ROM_REGION( 0x100000, "tiles2", 0 )
-	ROM_LOAD16_BYTE( "4.bin", 0x000000, 0x80000, CRC(1ae8a751) SHA1(5f30306580c6ab4af0ddbdc4519eb4e0ab9bd23a) )
-	ROM_LOAD16_BYTE( "5.bin", 0x000001, 0x80000, CRC(cf235eeb) SHA1(d067e2dd4f28a8986dd76ec0eba90e1adbf5787c) )
+	ROM_REGION( 0x080000, "bgtile", 0 )
+	ROM_COPY( "tiles", 0x000000, 0x000000, 0x080000)
+
+	ROM_REGION( 0x080000, "midlowtile", 0 )
+	ROM_COPY( "tiles", 0x080000, 0x000000, 0x080000)
+
+	ROM_REGION( 0x080000, "midhightile", 0 )
+	ROM_COPY( "tiles", 0x100000, 0x000000, 0x080000)
+
+	ROM_REGION( 0x080000, "txtile", 0 )
+	ROM_COPY( "tiles", 0x180000, 0x000000, 0x080000)
 
 	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD( "11.bin", 0x000000, 0x40000, CRC(00eecb03) SHA1(5913da4d2ad97c1ce5e8e601a22b499cd93af744) )
@@ -491,9 +496,23 @@ ROM_START( twinbrata )
 	ROM_LOAD16_BYTE( "2.u105", 0x00000, 0x20000, CRC(33a9bb82) SHA1(0f54239397c93e264b9b211f67bf626acf1246a9) )
 	ROM_LOAD16_BYTE( "3.u104", 0x00001, 0x20000, CRC(b1186a67) SHA1(502074063101885874db76ae707db1082313efcf) )
 
-	ROM_REGION( 0x100000, "tiles", 0 )
+	ROM_REGION( 0x200000, "tiles", 0 )
 	ROM_LOAD16_BYTE( "6.bin", 0x000000, 0x80000, CRC(af10ddfd) SHA1(e5e83044f20d6cbbc1b4ef1812ac57b6dc958a8a) )
 	ROM_LOAD16_BYTE( "7.bin", 0x000001, 0x80000, CRC(3696345a) SHA1(ea38be3586757527b2a1aad2e22b83937f8602da) )
+	ROM_LOAD16_BYTE( "4.bin", 0x100000, 0x80000, CRC(1ae8a751) SHA1(5f30306580c6ab4af0ddbdc4519eb4e0ab9bd23a) )
+	ROM_LOAD16_BYTE( "5.bin", 0x100001, 0x80000, CRC(cf235eeb) SHA1(d067e2dd4f28a8986dd76ec0eba90e1adbf5787c) )
+
+	ROM_REGION( 0x080000, "bgtile", 0 )
+	ROM_COPY( "tiles", 0x000000, 0x000000, 0x080000)
+
+	ROM_REGION( 0x080000, "midlowtile", 0 )
+	ROM_COPY( "tiles", 0x080000, 0x000000, 0x080000)
+
+	ROM_REGION( 0x080000, "midhightile", 0 )
+	ROM_COPY( "tiles", 0x100000, 0x000000, 0x080000)
+
+	ROM_REGION( 0x080000, "txtile", 0 )
+	ROM_COPY( "tiles", 0x180000, 0x000000, 0x080000)
 
 	ROM_REGION( 0x100000, "tiles2", 0 )
 	ROM_LOAD16_BYTE( "4.bin", 0x000000, 0x80000, CRC(1ae8a751) SHA1(5f30306580c6ab4af0ddbdc4519eb4e0ab9bd23a) )
@@ -517,9 +536,23 @@ ROM_START( twinbratb )
 	ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x20000, CRC(5e75f568) SHA1(f42d2a73d737e6b01dd049eea2a10fc8c8096d8f) )
 	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x20000, CRC(0e3fa9b0) SHA1(0148cc616eac84dc16415e1557ec6040d14392d4) )
 
-	ROM_REGION( 0x100000, "tiles", 0 )
+	ROM_REGION( 0x200000, "tiles", 0 )
 	ROM_LOAD16_BYTE( "6.bin", 0x000000, 0x80000, CRC(af10ddfd) SHA1(e5e83044f20d6cbbc1b4ef1812ac57b6dc958a8a) )
 	ROM_LOAD16_BYTE( "7.bin", 0x000001, 0x80000, CRC(3696345a) SHA1(ea38be3586757527b2a1aad2e22b83937f8602da) )
+	ROM_LOAD16_BYTE( "4.bin", 0x100000, 0x80000, CRC(1ae8a751) SHA1(5f30306580c6ab4af0ddbdc4519eb4e0ab9bd23a) )
+	ROM_LOAD16_BYTE( "5.bin", 0x100001, 0x80000, CRC(cf235eeb) SHA1(d067e2dd4f28a8986dd76ec0eba90e1adbf5787c) )
+
+	ROM_REGION( 0x080000, "bgtile", 0 )
+	ROM_COPY( "tiles", 0x000000, 0x000000, 0x080000)
+
+	ROM_REGION( 0x080000, "midlowtile", 0 )
+	ROM_COPY( "tiles", 0x080000, 0x000000, 0x080000)
+
+	ROM_REGION( 0x080000, "midhightile", 0 )
+	ROM_COPY( "tiles", 0x100000, 0x000000, 0x080000)
+
+	ROM_REGION( 0x080000, "txtile", 0 )
+	ROM_COPY( "tiles", 0x180000, 0x000000, 0x080000)
 
 	ROM_REGION( 0x100000, "tiles2", 0 )
 	ROM_LOAD16_BYTE( "4.bin", 0x000000, 0x80000, CRC(1ae8a751) SHA1(5f30306580c6ab4af0ddbdc4519eb4e0ab9bd23a) )
