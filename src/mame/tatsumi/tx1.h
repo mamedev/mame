@@ -100,7 +100,7 @@ private:
 #else
 			struct { int16_t Z; uint16_t W; } as16bit;
 #endif
-			int32_t ZW32;
+			int32_t ZW32 = 0;
 		} ZW;
 
 		int     code = 0;
@@ -208,9 +208,9 @@ private:
 
 	void tx1_draw_char(uint8_t *bitmap);
 	void tx1_draw_road_pixel(int screen, uint8_t *bmpaddr,
-								uint8_t apix[3], uint8_t bpix[3], uint32_t pixnuma, uint32_t pixnumb,
-								uint8_t stl, uint8_t sld, uint8_t selb,
-								uint8_t bnk, uint8_t rorev, uint8_t eb, uint8_t r, uint8_t delr);
+			uint8_t apix[3], uint8_t bpix[3], uint32_t pixnuma, uint32_t pixnumb,
+			uint8_t stl, uint8_t sld, uint8_t selb,
+			uint8_t bnk, uint8_t rorev, uint8_t eb, uint8_t r, uint8_t delr);
 	void tx1_draw_road(uint8_t *bitmap);
 	void tx1_draw_objects(uint8_t *bitmap);
 	void tx1_update_layers();
@@ -218,7 +218,7 @@ private:
 
 	void buggyboy_draw_char(uint8_t *bitmap, bool wide);
 	void buggyboy_get_roadpix(int screen, int ls161, uint8_t rva0_6, uint8_t sld, uint32_t *_rorev,
-								uint8_t *rc0, uint8_t *rc1, uint8_t *rc2, uint8_t *rc3);
+			uint8_t *rc0, uint8_t *rc1, uint8_t *rc2, uint8_t *rc3);
 	void buggyboy_draw_road(uint8_t *bitmap);
 	void buggybjr_draw_road(uint8_t *bitmap);
 	void buggyboy_draw_objs(uint8_t *bitmap, bool wide);
