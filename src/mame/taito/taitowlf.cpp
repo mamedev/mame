@@ -12,8 +12,9 @@ TODO:
   is it specific to the (unavailable) ECS P5TX-LA BIOS?
 - p5txla: Rage VGA chip sets up screen with 8x1, making MAME unresponsive.
           Needs x86 VGA legacy map bridge to fix.
-- pf2012: cannot be coined in (lockout read? ISA irq? sound CPU comms?)
-          Enters into gameplay if set to free play;
+- pf2012: verify ISA irq 7 source (particularly ACK, PORT_IMPULSE(1) won't work),
+          pinpoint coin counters output and verify tc0510nio write 4 EEPROM style write
+          on coin insertion;
 - pf2012: Should show bootscreen when Voodoo fbiInit0 bit 0 is off (vga_pass), cfr. GH #11343;
 - pf2012: boots in service mode the first time around, needs default EEPROM set;
 - pf2012: service mode RTC item always initializes to 0 for hour count;
@@ -107,6 +108,9 @@ public:
 	template <typename T> void set_program_rom_tag(T &&tag) { m_program_rom.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_data_rom_tag(T &&tag) { m_data_rom.set_tag(std::forward<T>(tag)); }
 
+	// TODO: confirm routing
+	DECLARE_INPUT_CHANGED_MEMBER(coin_irq) { m_isa->irq7_w(ASSERT_LINE); };
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -133,6 +137,9 @@ private:
 	void remap(int space_id, offs_t start, offs_t end) override;
 
 	void bankdev_map(address_map &map);
+
+	void nio3_w(u8 data);
+	void nio4_w(u8 data);
 };
 
 DEFINE_DEVICE_TYPE(ISA16_TAITO_ROM_DISK, isa16_taito_rom_disk, "isa16_taito_rom_disk", "ISA16 Taito Wolf System ROM DISK")
@@ -159,9 +166,8 @@ void isa16_taito_rom_disk::device_add_mconfig(machine_config &config)
 	m_tc0510nio->read_1_callback().set_ioport("IN1");
 	m_tc0510nio->read_2_callback().set_ioport("IN2");
 	m_tc0510nio->read_3_callback().set_ioport("IN3");
-	// TODO: check me
-	//m_tc0510nio->write_3_callback().set
-	//m_tc0510nio->write_4_callback().set
+	m_tc0510nio->write_3_callback().set(FUNC(isa16_taito_rom_disk::nio3_w));
+	m_tc0510nio->write_4_callback().set(FUNC(isa16_taito_rom_disk::nio4_w));
 	m_tc0510nio->read_7_callback().set_ioport("IN7");
 
 	// TODO: verify erase/write times
@@ -180,7 +186,7 @@ void isa16_taito_rom_disk::io_map(address_map &map)
 	map(0x080, 0x081).rw(FUNC(isa16_taito_rom_disk::read_bank), FUNC(isa16_taito_rom_disk::write_bank));
 	// writes watchdog to port 1, in 8-bit fashion
 	map(0x200, 0x207).lrw8(
-		NAME([this] (offs_t offset) { return m_tc0510nio->read(offset ^ 1); }),
+		NAME([this] (offs_t offset) { m_isa->irq7_w(CLEAR_LINE); return m_tc0510nio->read(offset ^ 1); }),
 		NAME([this] (offs_t offset, u8 data) { m_tc0510nio->write(offset ^ 1, data); })
 	);
 
@@ -247,14 +253,25 @@ u8 isa16_taito_rom_disk::read_bank(offs_t offset)
 
 void isa16_taito_rom_disk::write_bank(offs_t offset, u8 data)
 {
-	//printf("%02x %02x\n", offset, data);
-
 	if (!offset)
 		m_program_bank = data;
 	else
 		m_program_select = data;
 
 	m_bankdev->set_bank(m_program_select << 8 | m_program_bank);
+}
+
+// may be unconnected
+void isa16_taito_rom_disk::nio3_w(u8 data)
+{
+	logerror("NIO3 %02x state\n", data);
+}
+
+// TODO: reacts to each coin trigger
+// Game has individual coin counters, this rather looks an i2c/EEPROM serial protocol at bits 3-0?
+void isa16_taito_rom_disk::nio4_w(u8 data)
+{
+	logerror("NIO4 %02x state\n", data);
 }
 
 static INPUT_PORTS_START(pf2012)
@@ -266,7 +283,7 @@ static INPUT_PORTS_START(pf2012)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) // marked as セレクト (Select) in test mode
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, isa16_taito_rom_disk, coin_irq, 0)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -276,7 +293,7 @@ static INPUT_PORTS_START(pf2012)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 ) // as above
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, isa16_taito_rom_disk, coin_irq, 0)
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )
@@ -295,7 +312,7 @@ static INPUT_PORTS_START(pf2012)
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	// service mode doesn't explicitly tell, but goes service sw error if left on during boot
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, isa16_taito_rom_disk, coin_irq, 0)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
