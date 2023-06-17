@@ -68,6 +68,7 @@ Taito W Rom Board:
 */
 
 #include "emu.h"
+#include "speaker.h"
 
 #include "bus/isa/isa_cards.h"
 #include "bus/rs232/hlemouse.h"
@@ -88,6 +89,7 @@ Taito W Rom Board:
 // Specific to taitowlf
 #include "machine/bankdev.h"
 #include "machine/eepromser.h"
+#include "sound/taito_zoom.h"
 #include "video/voodoo_pci.h"
 #include "taitoio.h"
 
@@ -121,6 +123,8 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_ioport m_eepromin;
 	required_ioport m_eepromout;
+	required_device<taito_zoom_device> m_zoom;
+	required_device<cpu_device> m_mn10200;
 
 	void io_map(address_map &map);
 
@@ -147,6 +151,8 @@ isa16_taito_rom_disk::isa16_taito_rom_disk(const machine_config &mconfig, const 
 	, m_eeprom(*this, "eeprom")
 	, m_eepromin(*this, "EEPROMIN")
 	, m_eepromout(*this, "EEPROMOUT")
+	, m_zoom(*this, "taito_zoom")
+	, m_mn10200(*this, "taito_zoom:mn10200")
 {
 }
 
@@ -169,8 +175,12 @@ void isa16_taito_rom_disk::device_add_mconfig(machine_config &config)
 		.erase_time(attotime::from_usec(250))
 		.write_time(attotime::from_usec(250));
 
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	// TODO: sound CPU et al.
+	TAITO_ZOOM(config, m_zoom);
+	m_zoom->add_route(0, "lspeaker", 1.0);
+	m_zoom->add_route(1, "rspeaker", 1.0);
 }
 
 void isa16_taito_rom_disk::io_map(address_map &map)
@@ -184,7 +194,7 @@ void isa16_taito_rom_disk::io_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) { m_tc0510nio->write(offset ^ 1, data); })
 	);
 
-	//map(0x400, 0x4ff) sound CPU shared RAM?
+	map(0x400, 0x4ff).rw(m_zoom, FUNC(taito_zoom_device::shared_ram_r), FUNC(taito_zoom_device::shared_ram_w)); // M66220FP for comms with the MN10200
 
 	map(0x600, 0x600).lw8(
 		NAME([this] (offs_t offset, u8 data) {
@@ -192,14 +202,31 @@ void isa16_taito_rom_disk::io_map(address_map &map)
 			// 0x3d in-game
 			// 0xf3 in service mode, 0xff when accessing sound volume/panning settings
 			logerror("Write %02x to $600\n", data);
+			const bool sound_reset = bool(BIT(data, 3));
+			logerror("\tSound reset %s\n", sound_reset ? "clear" : "assert");
+			if (sound_reset)
+				machine().debug_break();
+
+			m_mn10200->set_input_line(INPUT_LINE_RESET, sound_reset ? CLEAR_LINE : ASSERT_LINE);
 		})
 	);
 	map(0x601, 0x601).lrw8(
 		NAME([this] (offs_t offset) { return m_eepromin->read(); }),
 		NAME([this] (offs_t offset, u8 data) { m_eepromout->write(data, 0xff); })
 	);
-
-	//map(0x602, 0x603) to/from sound CPU
+	// TODO: ZOOM interface should really be 8-bit
+	map(0x602, 0x602).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			const u16 data_expand = data | (data << 8);
+			m_zoom->reg_data_w(data_expand);
+		})
+	);
+	map(0x603, 0x603).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			const u16 data_expand = data | (data << 8);
+			m_zoom->reg_address_w(data_expand);
+		})
+	);
 }
 
 void isa16_taito_rom_disk::bankdev_map(address_map &map)
@@ -222,6 +249,7 @@ void isa16_taito_rom_disk::device_start()
 
 void isa16_taito_rom_disk::device_reset()
 {
+	m_mn10200->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 void isa16_taito_rom_disk::remap(int space_id, offs_t start, offs_t end)
@@ -656,13 +684,13 @@ ROM_START(pf2012)
 	ROM_LOAD("e59-07.u22", 0x3000000, 0x800000, CRC(1f0ddcdc) SHA1(72ffe08f5effab093bdfe9863f8a11f80e914272) )
 	ROM_LOAD("e59-08.u25", 0x3800000, 0x800000, CRC(8db38ffd) SHA1(4b71ea86fb774ba6a8ac45abf4191af64af007e7) )
 
-	ROM_REGION(0x180000, "board1:taito_zoom:mn10200", 0) // MN10200 program
-	ROM_LOAD("e59-12.u13", 0x000000, 0x80000, CRC(9a473a7e) SHA1(b0ec7b0ae2b33a32da98899aa79d44e8e318ceb7) )
-	ROM_LOAD("e59-13.u15", 0x080000, 0x80000, CRC(77719880) SHA1(8382dd2dfb0dae60a3831ed6d3ff08539e2d94eb) )
-	ROM_LOAD("e59-14.u14", 0x100000, 0x40000, CRC(d440887c) SHA1(d965871860d757bc9111e9adb2303a633c662d6b) )
-	ROM_LOAD("e59-15.u16", 0x140000, 0x40000, CRC(eae8e523) SHA1(8a054d3ded7248a7906c4f0bec755ddce53e2023) )
+	ROM_REGION16_LE(0x180000, "board1:taito_romdisk:taito_zoom:mn10200", 0) // MN10200 program
+	ROM_LOAD16_BYTE("e59-12.u13", 0x000000, 0x80000, CRC(9a473a7e) SHA1(b0ec7b0ae2b33a32da98899aa79d44e8e318ceb7) )
+	ROM_LOAD16_BYTE("e59-13.u15", 0x000001, 0x80000, CRC(77719880) SHA1(8382dd2dfb0dae60a3831ed6d3ff08539e2d94eb) )
+	ROM_LOAD16_BYTE("e59-14.u14", 0x100000, 0x40000, CRC(d440887c) SHA1(d965871860d757bc9111e9adb2303a633c662d6b) )
+	ROM_LOAD16_BYTE("e59-15.u16", 0x100001, 0x40000, CRC(eae8e523) SHA1(8a054d3ded7248a7906c4f0bec755ddce53e2023) )
 
-	ROM_REGION(0x1400000, "board1:taito_zoom:zsg2", 0) // ZOOM sample data
+	ROM_REGION32_LE(0x1400000, "board1:taito_romdisk:taito_zoom:zsg2", 0) // ZOOM sample data
 	ROM_LOAD("e59-09.u29", 0x0000000, 0x800000, CRC(d0da5c50) SHA1(56fb3c38f35244720d32a44fed28e6b58c7851f7) )
 	ROM_LOAD("e59-10.u32", 0x0800000, 0x800000, CRC(4c0e0a5c) SHA1(6454befa3a1dd532eb2a760129dcd7e611508730) )
 	ROM_LOAD("e59-11.u33", 0x1000000, 0x400000, CRC(c90a896d) SHA1(2b62992f20e4ca9634e7953fe2c553906de44f04) )
