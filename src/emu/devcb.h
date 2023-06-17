@@ -861,6 +861,7 @@ devcb_read<Result, DefaultMask>::devcb_read(device_t &owner, Result dflt)
 template <typename Result, std::make_unsigned_t<Result> DefaultMask>
 typename devcb_read<Result, DefaultMask>::binder devcb_read<Result, DefaultMask>::bind()
 {
+	assert(m_functions.empty());
 	return binder(*this);
 }
 
@@ -2380,6 +2381,7 @@ devcb_write<Input, DefaultMask>::devcb_write(device_t &owner)
 template <typename Input, std::make_unsigned_t<Input> DefaultMask>
 typename devcb_write<Input, DefaultMask>::binder devcb_write<Input, DefaultMask>::bind()
 {
+	assert(m_functions.empty());
 	return binder(*this);
 }
 
