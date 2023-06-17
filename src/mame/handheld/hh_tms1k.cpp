@@ -329,6 +329,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "starwbc.lh" // clickable
 #include "starwlb.lh" // clickable
 #include "stopthief.lh" // clickable
+#include "strobe.lh" // clickable
 #include "subwars.lh"
 #include "t3in1sa.lh"
 #include "tbreakup.lh"
@@ -7683,8 +7684,13 @@ ROM_END
   * TMS1470NLHL MP1133 (die label: TMS1400, MP1133, 28H 01D D000 R000)
   * 9-digit 7seg VFD + 8 LEDs(4 green, 4 yellow), no sound
 
-  This is an astrological calculator, and also supports 4-function
-  calculations. Refer to the official manual on how to use this device.
+  This is an astrological calculator, and also supports 4-function calculations.
+  Refer to the official manual on how to use this device.
+
+  known releases:
+  - World: Astro, published by Kosmos
+  - USA: Astro (model EC-312), published by Tandy (Radio Shack)
+  - Japan: Astrostar, published by Bandai
 
 *******************************************************************************/
 
@@ -7821,6 +7827,7 @@ ROM_END
 /*******************************************************************************
 
   Lakeside Strobe
+  * PCB label: Lakeside, REVN 3, MODEL 9020-1099, PART 9504-3007, TCI-A4H 94HB
   * TMS1100NLLE MCU, label MP3487-N1 (die label: 1100E, MP3487)
   * SN75492, 4 lamps, 1-bit sound
 
@@ -7900,24 +7907,24 @@ static INPUT_PORTS_START( strobe )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.4") // R5
-	PORT_CONFNAME( 0x05, 0x01, "Game" )
-	PORT_CONFSETTING(    0x01, "1" )
-	PORT_CONFSETTING(    0x00, "2" )
+	PORT_CONFNAME( 0x05, 0x00, "Game" )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x01, "2" )
 	PORT_CONFSETTING(    0x04, "3" )
 	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.5") // R6
-	PORT_CONFNAME( 0x07, 0x01, DEF_STR( Players ) )
-	PORT_CONFSETTING(    0x01, "1" )
-	PORT_CONFSETTING(    0x00, "2" )
+	PORT_CONFNAME( 0x07, 0x00, DEF_STR( Players ) )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x01, "2" )
 	PORT_CONFSETTING(    0x02, "3" )
 	PORT_CONFSETTING(    0x04, "4" )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.6") // R7
-	PORT_CONFNAME( 0x06, 0x02, "Speed" )
-	PORT_CONFSETTING(    0x02, "1" )
-	PORT_CONFSETTING(    0x00, "2" )
+	PORT_CONFNAME( 0x06, 0x00, "Speed" )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
 	PORT_CONFSETTING(    0x04, "3" )
 	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -7941,7 +7948,7 @@ void strobe_state::strobe(machine_config &config)
 	m_maincpu->write_o().set(FUNC(strobe_state::write_o));
 
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
-	//config.set_default_layout(layout_strobe);
+	config.set_default_layout(layout_strobe);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -16964,7 +16971,7 @@ SYST( 1980, liveafb,    0,         0,      liveafb,   liveafb,   liveafb_state, 
 
 SYST( 1979, astro,      0,         0,      astro,     astro,     astro_state,     empty_init, "Kosmos", "Astro", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-SYST( 1980, strobe,     0,         0,      strobe,    strobe,    strobe_state,    empty_init, "Lakeside", "Strobe", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+SYST( 1980, strobe,     0,         0,      strobe,    strobe,    strobe_state,    empty_init, "Lakeside", "Strobe", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 SYST( 1978, elecbowl,   0,         0,      elecbowl,  elecbowl,  elecbowl_state,  empty_init, "Marx", "Electronic Bowling (Marx)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_CONTROLS | MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // ***
 

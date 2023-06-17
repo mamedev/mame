@@ -37,8 +37,7 @@ sm510_base_device::sm510_base_device(const machine_config &mconfig, device_type 
 	m_read_b(*this, 1),
 	m_write_s(*this),
 	m_write_r(*this)
-{
-}
+{ }
 
 
 //-------------------------------------------------

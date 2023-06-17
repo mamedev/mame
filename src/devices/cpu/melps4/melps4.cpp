@@ -42,29 +42,29 @@
 #include "melps4d.h"
 
 
-melps4_cpu_device::melps4_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, int d_pins, u8 sm_page, u8 int_page)
-	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, -1, program)
-	, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
-	, m_prgwidth(prgwidth)
-	, m_datawidth(datawidth)
-	, m_d_pins(d_pins)
-	, m_sm_page(sm_page)
-	, m_int_page(int_page)
-	, m_xami_mask(0xf)
-	, m_sp_mask(0x7<<4)
-	, m_ba_op(0x01)
-	, m_stack_levels(3)
-	, m_read_k(*this, 0)
-	, m_read_d(*this, 0)
-	, m_read_s(*this, 0)
-	, m_read_f(*this, 0)
-	, m_write_d(*this)
-	, m_write_s(*this)
-	, m_write_f(*this)
-	, m_write_g(*this)
-	, m_write_u(*this)
-	, m_write_t(*this)
+melps4_cpu_device::melps4_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, int d_pins, u8 sm_page, u8 int_page) :
+	cpu_device(mconfig, type, tag, owner, clock),
+	m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, -1, program),
+	m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data),
+	m_prgwidth(prgwidth),
+	m_datawidth(datawidth),
+	m_d_pins(d_pins),
+	m_sm_page(sm_page),
+	m_int_page(int_page),
+	m_xami_mask(0xf),
+	m_sp_mask(0x7 << 4),
+	m_ba_op(0x01),
+	m_stack_levels(3),
+	m_read_k(*this, 0),
+	m_read_d(*this, 0),
+	m_read_s(*this, 0),
+	m_read_f(*this, 0),
+	m_write_d(*this),
+	m_write_s(*this),
+	m_write_f(*this),
+	m_write_g(*this),
+	m_write_u(*this),
+	m_write_t(*this)
 { }
 
 // disasm
