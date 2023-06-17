@@ -2399,7 +2399,6 @@ void m68000_musashi_device::clear_all()
 
 void m68000_musashi_device::device_start()
 {
-	m_reset_cb.resolve_safe();
 }
 
 void m68000_musashi_device::device_stop()

@@ -14,7 +14,7 @@ DEFINE_DEVICE_TYPE(OTI111,     oak_oti111_vga_device,  "oti111_vga",  "Oak Techn
 xga_copro_device::xga_copro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, XGA_COPRO, tag, owner, clock)
 	, m_var(TYPE::XGA)
-	, m_mem_read_cb(*this)
+	, m_mem_read_cb(*this, 0)
 	, m_mem_write_cb(*this)
 {
 }
@@ -750,8 +750,6 @@ void xga_copro_device::xga_write(offs_t offset, u8 data)
 
 void xga_copro_device::device_start()
 {
-	m_mem_read_cb.resolve_safe(0);
-	m_mem_write_cb.resolve_safe();
 }
 
 void xga_copro_device::device_reset()

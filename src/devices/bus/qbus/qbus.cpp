@@ -75,12 +75,6 @@ void qbus_slot_device::device_start()
 	device_qbus_card_interface *dev = dynamic_cast<device_qbus_card_interface *>(get_card_device());
 	if (dev)
 		m_bus->add_card(*dev);
-
-	m_write_birq4.resolve_safe();
-	m_write_birq5.resolve_safe();
-	m_write_birq6.resolve_safe();
-	m_write_birq7.resolve_safe();
-	m_write_bdmr.resolve_safe();
 }
 
 
@@ -120,12 +114,6 @@ device_memory_interface::space_config_vector qbus_device::memory_space_config() 
 
 void qbus_device::device_start()
 {
-	// resolve callbacks
-	m_out_birq4_cb.resolve_safe();
-	m_out_birq5_cb.resolve_safe();
-	m_out_birq6_cb.resolve_safe();
-	m_out_birq7_cb.resolve_safe();
-	m_out_bdmr_cb.resolve_safe();
 }
 
 

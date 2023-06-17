@@ -35,8 +35,6 @@ k057714_device::k057714_device(const machine_config &mconfig, const char *tag, d
 
 void k057714_device::device_start()
 {
-	m_irq.resolve_safe();
-
 	m_vram = std::make_unique<uint32_t[]>(VRAM_SIZE/4);
 
 	save_pointer(NAME(m_vram), VRAM_SIZE/4);
@@ -229,10 +227,7 @@ void k057714_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 			/* it enables bits 0x41, but 0x01 seems to be the one it cares about */
 			if (ACCESSING_BITS_16_31 && (data & 0x00010000) == 0)
 			{
-				if (!m_irq.isnull())
-				{
-					m_irq(CLEAR_LINE);
-				}
+				m_irq(CLEAR_LINE);
 			}
 			if (ACCESSING_BITS_0_15)
 			{

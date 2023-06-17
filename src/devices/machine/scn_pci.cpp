@@ -260,39 +260,14 @@ scn2641_device::scn2641_device(const machine_config &mconfig, const char *tag, d
 
 void scn2641_device::device_validity_check(validity_checker &valid) const
 {
-	if (!m_dtr_callback.isnull())
+	if (!m_dtr_callback.isunset())
 		osd_printf_error("Nonexistent DTR output configured on SCN2641\n");
-	if (!m_txemt_dschg_callback.isnull())
+	if (!m_txemt_dschg_callback.isunset())
 		osd_printf_error("Nonexistent TxEMT/DSCHG output configured on SCN2641 (use INTR instead)\n");
-	if (!m_txrdy_callback.isnull())
+	if (!m_txrdy_callback.isunset())
 		osd_printf_error("Nonexistent TxRDY output configured on SCN2641 (use INTR instead)\n");
-	if (!m_rxrdy_callback.isnull())
+	if (!m_rxrdy_callback.isunset())
 		osd_printf_error("Nonexistent RxRDY output configured on SCN2641 (use INTR instead)\n");
-}
-
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void scn_pci_device::device_resolve_objects()
-{
-	m_dtr_callback.resolve_safe();
-	m_rts_callback.resolve_safe();
-	m_txemt_dschg_callback.resolve_safe();
-	m_txc_callback.resolve_safe();
-	m_rxc_callback.resolve_safe();
-	m_txd_callback.resolve_safe();
-	m_txrdy_callback.resolve_safe();
-	m_rxrdy_callback.resolve_safe();
-}
-
-void scn2641_device::device_resolve_objects()
-{
-	scn_pci_device::device_resolve_objects();
-	m_intr_callback.resolve_safe();
 }
 
 

@@ -271,7 +271,6 @@ void xerox_820_keyboard_device::device_start()
 
 void xerox_820_keyboard_device::device_reset()
 {
-	m_kbstb_cb.resolve_safe();
 }
 
 void xerox_820_keyboard_device::device_reset_after_children()

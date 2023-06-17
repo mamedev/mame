@@ -49,8 +49,6 @@ void wpc_dmd_device::device_add_mconfig(machine_config &config)
 
 void wpc_dmd_device::device_start()
 {
-	scanline_cb.resolve_safe();
-
 	ram.resize(0x2000);
 	screen_buffer.resize(128*32);
 	bitcounts.resize(256);

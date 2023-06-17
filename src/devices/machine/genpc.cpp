@@ -16,6 +16,7 @@
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
+
 #include "speaker.h"
 
 
@@ -552,21 +553,6 @@ void ibm5160_mb_device::map(address_map &map)
 	map(0x0060, 0x006f).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x0080, 0x008f).w(FUNC(ibm5160_mb_device::pc_page_w));
 	map(0x00a0, 0x00a1).w(FUNC(ibm5160_mb_device::nmi_enable_w));
-}
-
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void ibm5160_mb_device::device_resolve_objects()
-{
-	m_int_callback.resolve_safe();
-	m_nmi_callback.resolve_safe();
-	m_kbdclk_callback.resolve_safe();
-	m_kbddata_callback.resolve_safe();
 }
 
 

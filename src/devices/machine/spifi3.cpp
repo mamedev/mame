@@ -325,9 +325,6 @@ void spifi3_device::device_start()
 	save_item(STRUCT_MEMBER(m_odd_fifo, size));
 	save_item(STRUCT_MEMBER(m_odd_fifo, fifo));
 
-	m_irq_handler.resolve_safe();
-	m_drq_handler.resolve_safe();
-
 	bus_id = 0;
 	tm = timer_alloc(FUNC(spifi3_device::tick), this);
 }

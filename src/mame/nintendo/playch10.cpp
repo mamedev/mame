@@ -2039,9 +2039,9 @@ void playch10_state::playch10_k(machine_config &config)
 #define BIOS_CPU                                            \
 	ROM_SYSTEM_BIOS( 0, "dual",    "Dual Monitor Version" ) \
 	ROM_SYSTEM_BIOS( 1, "single",  "Single Monitor Version" ) \
-	ROM_SYSTEM_BIOS( 2, "alt",     "Alt Bios" ) /* this bios doesn't work properly, selecting service mode causes it to hang, is it good? maybe different hw? */ \
+	ROM_SYSTEM_BIOS( 2, "alt",     "Alternate BIOS" ) /* this bios doesn't work properly, selecting service mode causes it to hang, is it good? maybe different hw? */ \
 	ROM_SYSTEM_BIOS( 3, "singleb", "Single Monitor Version (Newer?)" ) /* Newer single screen? Four bytes different, reported bugfix in freeplay */ \
-	ROM_SYSTEM_BIOS( 4, "dualb",   "Dual Monitor Version (alternate)" ) /* this bios doesn't work properly, was found on a PCH1-03-CPU PCB */ \
+	ROM_SYSTEM_BIOS( 4, "dualb",   "Dual Monitor Version (alternate)" ) /* this BIOS doesn't work properly, was found on a PCH1-03-CPU PCB */ \
 	ROM_REGION( 0x10000, "maincpu", 0 )                     \
 	ROM_LOAD_BIOS( 0, "pch1-c__8t_e-2.8t", 0x00000, 0x4000, CRC(d52fa07a) SHA1(55cabf52ae10c050c2229081a80b9fe5454ab8c5) ) \
 	ROM_LOAD_BIOS( 1, "pck1-c.8t",         0x00000, 0x4000, CRC(503ee8b1) SHA1(3bd20bc71cac742d1b8c1430a6426d0a19db7ad0) ) \

@@ -22,10 +22,10 @@ const std::string_view applepic_device::s_interrupt_names[8] = { "0", "DMA 1", "
 applepic_device::applepic_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, APPLEPIC, tag, owner, clock)
 	, m_iopcpu(*this, "iopcpu")
-	, m_prd_callback(*this)
+	, m_prd_callback(*this, 0)
 	, m_pwr_callback(*this)
 	, m_hint_callback(*this)
-	, m_gpin_callback(*this)
+	, m_gpin_callback(*this, 0)
 	, m_gpout_callback(*this)
 	, m_timer1(nullptr)
 	, m_timer_last_expired(attotime::zero)
@@ -66,16 +66,6 @@ void applepic_device::device_add_mconfig(machine_config &config)
 {
 	R65C02(config, m_iopcpu, DERIVED_CLOCK(1, 8));
 	m_iopcpu->set_addrmap(AS_PROGRAM, &applepic_device::internal_map);
-}
-
-void applepic_device::device_resolve_objects()
-{
-	// Resolve callbacks
-	m_prd_callback.resolve_safe(0);
-	m_pwr_callback.resolve_safe();
-	m_hint_callback.resolve_safe();
-	m_gpin_callback.resolve_safe(0);
-	m_gpout_callback.resolve_all_safe();
 }
 
 void applepic_device::device_start()

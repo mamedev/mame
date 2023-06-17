@@ -50,8 +50,6 @@ keyboard_port_device::keyboard_port_device(const machine_config &mconfig, const 
 
 void keyboard_port_device::device_start()
 {
-	// resolve callbacks
-	m_txd_handler.resolve_safe();
 }
 
 //-------------------------------------------------

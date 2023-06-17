@@ -51,9 +51,6 @@
 class m50734_device : public m740_device
 {
 public:
-	//enum {
-	//};
-
 	m50734_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// port callback configuration
@@ -78,16 +75,16 @@ public:
 	void set_p3_3state(u8 value) { assert(!configured()); m_port_3state[3] = value; }
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
+	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); }
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	space_config_vector memory_space_config() const override;
 
 	// m740_device overrides

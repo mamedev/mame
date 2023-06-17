@@ -36,7 +36,7 @@ epic12_device::epic12_device(const machine_config &mconfig, const char *tag, dev
 	, m_ram16(nullptr), m_gfx_size(0), m_bitmaps(nullptr), m_use_ram(nullptr)
 	, m_main_ramsize(0), m_main_rammask(0), m_ram16_copy(nullptr), m_work_queue(nullptr)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
-	, m_port_r_cb(*this)
+	, m_port_r_cb(*this, 0)
 {
 	m_blitter_request = nullptr;
 	m_blitter_delay_timer = nullptr;
@@ -61,8 +61,6 @@ TIMER_CALLBACK_MEMBER(epic12_device::blitter_delay_callback)
 
 void epic12_device::device_start()
 {
-	m_port_r_cb.resolve_safe(0);
-
 	m_gfx_size = 0x2000 * 0x1000;
 	m_bitmaps = std::make_unique<bitmap_rgb32>(0x2000, 0x1000);
 	m_clip = m_bitmaps->cliprect();

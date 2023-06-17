@@ -18,8 +18,8 @@ x68k_crtc_device::x68k_crtc_device(const machine_config &mconfig, device_type ty
 	, m_vdisp_callback(*this)
 	, m_rint_callback(*this)
 	, m_hsync_callback(*this)
-	, m_tvram_read_callback(*this)
-	, m_gvram_read_callback(*this)
+	, m_tvram_read_callback(*this, 0)
+	, m_gvram_read_callback(*this, 0)
 	, m_tvram_write_callback(*this)
 	, m_gvram_write_callback(*this)
 	, m_clock_69m(0)
@@ -53,17 +53,6 @@ vinas_device::vinas_device(const machine_config &mconfig, const char *tag, devic
 vicon_device::vicon_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: x68k_crtc_device(mconfig, VICON, tag, owner, clock)
 {
-}
-
-void x68k_crtc_device::device_resolve_objects()
-{
-	m_vdisp_callback.resolve_safe();
-	m_rint_callback.resolve_safe();
-	m_hsync_callback.resolve_safe();
-	m_tvram_read_callback.resolve_safe(0);
-	m_gvram_read_callback.resolve_safe(0);
-	m_tvram_write_callback.resolve_safe();
-	m_gvram_write_callback.resolve_safe();
 }
 
 void x68k_crtc_device::device_start()

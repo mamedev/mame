@@ -56,8 +56,6 @@ void ks0164_device::device_start()
 	space().cache(m_mem_cache);
 	m_timer = timer_alloc(FUNC(ks0164_device::irq_timer_tick), this);
 
-	m_midi_tx.resolve_safe();
-
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_rate(clock(), 542);
 

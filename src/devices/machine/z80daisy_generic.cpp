@@ -39,9 +39,6 @@ z80daisy_generic_device::z80daisy_generic_device(const machine_config &mconfig, 
 
 void z80daisy_generic_device::device_start()
 {
-	// resolve callbacks
-	m_int_handler.resolve_safe();
-
 	// register for save states
 	save_item(NAME(m_int));
 	save_item(NAME(m_mask));

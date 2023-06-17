@@ -64,8 +64,6 @@ void uda1344_device::device_start()
 	save_item(NAME(m_dac_enable));
 	save_item(NAME(m_adc_enable));
 
-	m_l3_ack_out.resolve_safe();
-
 	m_buffer[0].resize(BUFFER_SIZE);
 	m_buffer[1].resize(BUFFER_SIZE);
 }

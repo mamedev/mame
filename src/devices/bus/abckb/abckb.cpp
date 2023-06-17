@@ -61,11 +61,6 @@ abc_keyboard_port_device::abc_keyboard_port_device(const machine_config &mconfig
 void abc_keyboard_port_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_out_rx_handler.resolve_safe();
-	m_out_trxc_handler.resolve_safe();
-	m_out_keydown_handler.resolve_safe();
 }
 
 

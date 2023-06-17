@@ -75,11 +75,6 @@ void tdc1008_device::device_start()
 	save_item(NAME(m_x.u));
 	save_item(NAME(m_y.u));
 	save_item(NAME(m_p_out.u));
-
-	m_xtp.resolve_safe();
-	m_msp.resolve_safe();
-	m_lsp.resolve_safe();
-	m_p.resolve_safe();
 }
 
 void tdc1008_device::device_reset()

@@ -104,8 +104,6 @@ void at45db041_device::device_start()
 	save_item(NAME(m_pin.wp));
 	save_item(NAME(m_pin.reset));
 	save_item(NAME(m_pin.busy));
-
-	write_so.resolve_safe();
 }
 
 

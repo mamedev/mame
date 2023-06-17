@@ -619,7 +619,7 @@ ROM_START(apfm1000)
 	ROM_SYSTEM_BIOS( 1, "trash", "Trash II" ) // In Rocket Patrol, the ships are replaced by garbage trucks
 	ROMX_LOAD("trash-ii.bin", 0x0000, 0x1000, CRC(3bd8640a) SHA1(da4cd8163990adbc5acd3eab604b41e1066bb832), ROM_BIOS(1) )
 
-	ROM_SYSTEM_BIOS( 2, "mod", "Mod Bios" ) // (c) 1982 W.Lunquist - In Basic, CALL 18450 to get a machine-language monitor
+	ROM_SYSTEM_BIOS( 2, "mod", "Mod BIOS" ) // (c) 1982 W.Lunquist - In Basic, CALL 18450 to get a machine-language monitor
 	ROMX_LOAD("mod_bios.bin", 0x0000, 0x1000, CRC(f320aba6) SHA1(9442349fca8b001a5765e2fe8b84db4ece7886c1), ROM_BIOS(2) )
 ROM_END
 

@@ -87,13 +87,13 @@ inline void i8355_device::write_port(int port, u8 data)
 //  i8355_device - constructor
 //-------------------------------------------------
 
-i8355_device::i8355_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, I8355, tag, owner, clock),
-		m_in_pa_cb(*this),
-		m_out_pa_cb(*this),
-		m_in_pb_cb(*this),
-		m_out_pb_cb(*this),
-		m_rom(*this, DEVICE_SELF)
+i8355_device::i8355_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, I8355, tag, owner, clock),
+	m_in_pa_cb(*this, 0),
+	m_out_pa_cb(*this),
+	m_in_pb_cb(*this, 0),
+	m_out_pb_cb(*this),
+	m_rom(*this, DEVICE_SELF)
 {
 }
 
@@ -103,12 +103,6 @@ i8355_device::i8355_device(const machine_config &mconfig, const char *tag, devic
 
 void i8355_device::device_start()
 {
-	// resolve callbacks
-	m_in_pa_cb.resolve_safe(0);
-	m_in_pb_cb.resolve_safe(0);
-	m_out_pa_cb.resolve_safe();
-	m_out_pb_cb.resolve_safe();
-
 	// register for state saving
 	save_item(NAME(m_output));
 	save_item(NAME(m_ddr));

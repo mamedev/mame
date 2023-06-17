@@ -184,13 +184,6 @@ ioport_constructor ampex230_keyboard_device::device_input_ports() const
 //  DEVICE INITIALIZATION AND STARTUP
 //**************************************************************************
 
-void ampex230_keyboard_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_data_out_callback.resolve_safe();
-	m_clock_out_callback.resolve_safe();
-}
-
 void ampex230_keyboard_device::device_start()
 {
 	save_item(NAME(m_key_scan));

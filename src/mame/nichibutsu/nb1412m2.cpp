@@ -161,8 +161,6 @@ void nb1412m2_device::device_start()
 	m_timer = timer_alloc(FUNC(nb1412m2_device::main_timer_tick), this);
 	m_timer->adjust(attotime::never);
 	m_dac_timer = timer_alloc(FUNC(nb1412m2_device::update_dac), this);
-
-	m_dac_cb.resolve_safe();
 }
 
 

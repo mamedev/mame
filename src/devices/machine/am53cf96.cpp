@@ -155,8 +155,6 @@ void am53cf96_device::device_start()
 {
 	legacy_scsi_host_adapter::device_start();
 
-	m_irq_handler.resolve_safe();
-
 	memset(scsi_regs, 0, sizeof(scsi_regs));
 
 	fptr = 0;

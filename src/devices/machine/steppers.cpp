@@ -95,9 +95,6 @@ void stepper_device::update_optic()
 
 void stepper_device::device_start()
 {
-	/* resolve callbacks */
-	m_optic_cb.resolve_safe();
-
 	/* register for state saving */
 	save_item(NAME(m_index_start));
 	save_item(NAME(m_index_end));

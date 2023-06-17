@@ -190,12 +190,11 @@ public:
 	dma_regs_t& dma() { return m_dma; }
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 2); }
 

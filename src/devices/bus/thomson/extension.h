@@ -44,7 +44,6 @@ public:
 	void io_map(address_space_installer &space, offs_t start, offs_t end);
 
 protected:
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 	devcb_write_line m_firq_callback;

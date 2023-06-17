@@ -35,30 +35,10 @@ psion_asic2_device::psion_asic2_device(const machine_config &mconfig, const char
 	, m_buz_cb(*this)
 	, m_buzvol_cb(*this)
 	, m_dr_cb(*this)
-	, m_col_cb(*this)
-	, m_data_r(*this)
+	, m_col_cb(*this, 0xff)
+	, m_data_r(*this, 0x00)
 	, m_data_w(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void psion_asic2_device::device_resolve_objects()
-{
-	m_int_cb.resolve_safe();
-	m_nmi_cb.resolve_safe();
-	m_cbusy_cb.resolve_safe();
-	m_buz_cb.resolve_safe();
-	m_buzvol_cb.resolve_safe();
-	m_dr_cb.resolve_safe();
-	m_col_cb.resolve_safe(0xff);
-	m_data_r.resolve_all_safe(0x00);
-	m_data_w.resolve_all_safe();
 }
 
 //-------------------------------------------------

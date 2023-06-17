@@ -43,8 +43,6 @@ decsfb_device::decsfb_device(const machine_config &mconfig, const char *tag, dev
 
 void decsfb_device::device_start()
 {
-	m_int_cb.resolve_safe();
-
 	save_item(NAME(m_vram));
 	save_item(NAME(m_regs));
 	save_item(NAME(m_copy_src));

@@ -306,9 +306,6 @@ vc2_device::vc2_device(const machine_config &mconfig, const char *tag, device_t 
 
 void vc2_device::device_start()
 {
-	m_vert_int.resolve_safe();
-	m_screen_timing_changed.resolve_safe();
-
 	m_ram = std::make_unique<uint16_t[]>(RAM_SIZE);
 	m_vt_table = make_unique_clear<uint32_t[]>(2048 * 2048);
 
@@ -1092,7 +1089,7 @@ newport_base_device::newport_base_device(const machine_config &mconfig, device_t
 	, m_draw_flags_w(*this)
 	, m_set_address(*this)
 	, m_write_pixel(*this)
-	, m_read_pixel(*this)
+	, m_read_pixel(*this, 0)
 {
 }
 
@@ -1203,12 +1200,6 @@ void newport_base_device::device_start()
 	save_item(NAME(m_ramdac_lut_g));
 	save_item(NAME(m_ramdac_lut_b));
 	save_item(NAME(m_ramdac_lut_index));
-
-	m_write_mask_w.resolve_safe();
-	m_draw_flags_w.resolve_safe();
-	m_set_address.resolve_safe();
-	m_write_pixel.resolve_safe();
-	m_read_pixel.resolve_safe(0);
 }
 
 //-------------------------------------------------

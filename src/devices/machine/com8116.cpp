@@ -134,13 +134,8 @@ k1135ab_device::k1135ab_device(const machine_config &mconfig, const char *tag, d
 
 void com8116_device::device_start()
 {
-	// resolve callbacks
-	m_fx4_handler.resolve();
-	m_fr_handler.resolve_safe();
-	m_ft_handler.resolve_safe();
-
 	// allocate timers
-	if (!m_fx4_handler.isnull())
+	if (!m_fx4_handler.isunset())
 	{
 		m_fx4_timer = timer_alloc(FUNC(com8116_device::fx4_tick), this);
 		m_fx4_timer->adjust(attotime::from_hz((clock() / 4) * 2), 0, attotime::from_hz((clock() / 4)) * 2);

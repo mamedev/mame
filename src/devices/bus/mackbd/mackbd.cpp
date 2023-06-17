@@ -118,12 +118,6 @@ void mac_keyboard_port_device::data_w(int state)
 		m_peripheral->data_w(state);
 }
 
-void mac_keyboard_port_device::device_resolve_objects()
-{
-	m_clock_cb.resolve_safe();
-	m_data_cb.resolve_safe();
-}
-
 void mac_keyboard_port_device::device_start()
 {
 	m_peripheral = dynamic_cast<device_mac_keyboard_interface *>(get_card_device());

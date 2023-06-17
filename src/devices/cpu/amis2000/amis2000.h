@@ -39,22 +39,7 @@ public:
 
 protected:
 	// construction/destruction
-	amis2000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bu_bits, u8 callstack_bits, u8 callstack_depth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
-		: cpu_device(mconfig, type, tag, owner, clock)
-		, m_program_config("program", ENDIANNESS_BIG, 8, prgwidth, 0, program)
-		, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)
-		, m_bu_bits(bu_bits)
-		, m_callstack_bits(callstack_bits)
-		, m_callstack_depth(callstack_depth)
-		, m_7seg_table(nullptr)
-		, m_read_k(*this)
-		, m_read_i(*this)
-		, m_read_d(*this)
-		, m_write_d(*this)
-		, m_write_a(*this)
-		, m_write_f(*this)
-	{
-	}
+	amis2000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bu_bits, u8 callstack_bits, u8 callstack_depth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	// device-level overrides
 	virtual void device_start() override;

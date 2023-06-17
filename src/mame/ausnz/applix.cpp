@@ -29,7 +29,7 @@
     - Audio: it could be better
     - DAC output is used to compare against analog inputs; core doesn't permit
       audio outputs to be used for non-speaker purposes.
-    - Bios 5 crashes MAME after scrolling about half a screen
+    - BIOS 5 crashes MAME after scrolling about half a screen
 
 ****************************************************************************/
 

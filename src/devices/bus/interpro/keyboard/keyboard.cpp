@@ -24,7 +24,6 @@ void interpro_keyboard_port_device::device_config_complete()
 
 void interpro_keyboard_port_device::device_start()
 {
-	m_rxd_handler.resolve_safe();
 }
 
 void interpro_keyboard_port_device::write_txd(int state)

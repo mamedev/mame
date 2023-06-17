@@ -226,9 +226,6 @@ void pinsnd88_device::device_start()
 	m_cpubank->configure_entries(0, 8, &rom[0x0], 0x8000);
 	m_cpubank->set_entry(0);
 
-	/* resolve lines */
-	m_syncq_cb.resolve_safe();
-
 	/* timer */
 	m_sync_timer = timer_alloc(FUNC(pinsnd88_device::sync_callback), this);
 	m_sync_timer->adjust(attotime::never);

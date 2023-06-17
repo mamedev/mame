@@ -1040,7 +1040,6 @@ void namcos10_state::machine_reset()
 
 void namcos10_state::device_resolve_objects()
 {
-	m_io_update_interrupt.resolve_safe();
 	m_mgexio_outputs.resolve();
 }
 

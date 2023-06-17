@@ -27,33 +27,6 @@ public:
 	{
 	}
 
-	sunplus_gcm394_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, address_map_constructor internal) :
-		unsp_20_device(mconfig, type, tag, owner, clock, internal),
-		device_mixer_interface(mconfig, *this, 2),
-		m_screen(*this, finder_base::DUMMY_TAG),
-		m_spg_video(*this, "spgvideo"),
-		m_spg_audio(*this, "spgaudio"),
-		m_internalrom(*this, "internal"),
-		m_mainram(*this, "mainram"),
-		m_porta_in(*this),
-		m_portb_in(*this),
-		m_portc_in(*this),
-		m_portd_in(*this),
-		m_porta_out(*this),
-		m_portb_out(*this),
-		m_portc_out(*this),
-		m_portd_out(*this),
-		m_nand_read_cb(*this),
-		m_csbase(0x20000),
-		m_cs_space(nullptr),
-		m_romtype(0),
-		m_space_read_cb(*this),
-		m_space_write_cb(*this),
-		m_boot_mode(0),
-		m_cs_callback(*this, DEVICE_SELF, FUNC(sunplus_gcm394_base_device::default_cs_callback))
-	{
-	}
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return m_spg_video->screen_update(screen, bitmap, cliprect); }
 
 	auto porta_in() { return m_porta_in.bind(); }
@@ -95,6 +68,7 @@ public:
 	inline uint16_t get_ram_addr(uint32_t addr) { return m_mainram[addr]; }
 
 protected:
+	sunplus_gcm394_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, address_map_constructor internal);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

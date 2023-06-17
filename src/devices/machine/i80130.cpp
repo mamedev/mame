@@ -144,13 +144,6 @@ i80130_device::i80130_device(const machine_config &mconfig, const char *tag, dev
 
 void i80130_device::device_start()
 {
-	// resolve callbacks
-	m_write_irq.resolve_safe();
-	m_write_ack.resolve_safe();
-	m_write_lir.resolve_safe();
-	m_write_systick.resolve_safe();
-	m_write_delay.resolve_safe();
-	m_write_baud.resolve_safe();
 }
 
 

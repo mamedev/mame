@@ -42,7 +42,7 @@ DEFINE_DEVICE_TYPE(VS9209, vs9209_device, "vs9209", "VS9209 I/O")
 
 vs9209_device::vs9209_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, VS9209, tag, owner, clock)
-	, m_input_cb(*this)
+	, m_input_cb(*this, 0xff)
 	, m_output_cb(*this)
 {
 }
@@ -53,10 +53,6 @@ vs9209_device::vs9209_device(const machine_config &mconfig, const char *tag, dev
 
 void vs9209_device::device_start()
 {
-	// resolve callbacks
-	m_input_cb.resolve_all();
-	m_output_cb.resolve_all();
-
 	std::fill(std::begin(m_data_latch), std::end(m_data_latch), 0);
 
 	// save state
@@ -89,7 +85,7 @@ u8 vs9209_device::read(address_space &space, offs_t offset)
 			input_mask &= 0x0f;
 
 		// read through callback if port not configured entirely for output
-		if (input_mask != 0 && !m_input_cb[port].isnull())
+		if (input_mask != 0 && !m_input_cb[port].isunset())
 			input_data = m_input_cb[port](0, input_mask) & input_mask;
 		else if (m_data_dir[port] == 0)
 			logerror("%s: Read from undefined input port %c\n", machine().describe_context(), 'A' + port);
@@ -127,12 +123,12 @@ void vs9209_device::write(offs_t offset, u8 data)
 			u8 dataout = data & m_data_dir[port];
 
 			// send output through callback
-			if (!m_output_cb[port].isnull())
+			if (!m_output_cb[port].isunset())
 				m_output_cb[port](0, dataout, m_data_dir[port]);
 			else
 				logerror("%s: Writing %02X to undefined output port %c\n", machine().describe_context(), dataout, 'A' + port);
 		}
-		else if (m_output_cb[port].isnull())
+		else if (m_output_cb[port].isunset())
 			logerror("%s: Writing %02X to input-only port %c\n", machine().describe_context(), data, 'A' + port);
 	}
 	else
@@ -148,7 +144,7 @@ void vs9209_device::write(offs_t offset, u8 data)
 			logerror("Port %c & %02X configured for output\n", 'A' + port, data);
 
 			// if direction changed to output, begin output from latch
-			if ((data & ~old_data_dir) != 0 && !m_output_cb[port].isnull())
+			if ((data & ~old_data_dir) != 0 && !m_output_cb[port].isunset())
 				m_output_cb[port](0, m_data_latch[port], data);
 		}
 	}

@@ -67,7 +67,7 @@ void ymz280b_device::update_irq_state()
 	if (irq_bits && !m_irq_state)
 	{
 		m_irq_state = 1;
-		if (!m_irq_handler.isnull())
+		if (!m_irq_handler.isunset())
 			m_irq_handler(1);
 		else
 			logerror("YMZ280B: IRQ generated, but no callback specified!\n");
@@ -75,7 +75,7 @@ void ymz280b_device::update_irq_state()
 	else if (!irq_bits && m_irq_state)
 	{
 		m_irq_state = 0;
-		if (!m_irq_handler.isnull())
+		if (!m_irq_handler.isunset())
 			m_irq_handler(0);
 		else
 			logerror("YMZ280B: IRQ generated, but no callback specified!\n");
@@ -554,7 +554,6 @@ void ymz280b_device::device_start()
 
 	/* initialize the rest of the structure */
 	m_master_clock = (double)clock() / 384.0;
-	m_irq_handler.resolve();
 
 	for (int i = 0; i < 8; i++)
 	{

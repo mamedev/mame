@@ -171,6 +171,7 @@ i80286_cpu_device::i80286_cpu_device(const machine_config &mconfig, const char *
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0)
 	, m_opcodes_config("opcodes", ENDIANNESS_LITTLE, 16, 24, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, 0)
+	, m_a20_callback(*this)
 	, m_out_shutdown_func(*this)
 {
 	memcpy(m_timing, m_i80286_timing, sizeof(m_i80286_timing));
@@ -221,6 +222,7 @@ void i80286_cpu_device::device_reset()
 void i80286_cpu_device::device_start()
 {
 	i8086_common_cpu_device::device_start();
+
 	save_item(NAME(m_trap_level));
 	save_item(NAME(m_msw));
 	save_item(NAME(m_base));
@@ -277,7 +279,7 @@ void i80286_cpu_device::device_start()
 	state_add<uint32_t>( STATE_GENPCBASE, "CURPC", [this] { return m_base[CS] + m_prev_ip; }).mask(0xffffff).noshow();
 	state_add( I8086_HALT, "HALT", m_halt ).mask(1);
 
-	m_out_shutdown_func.resolve_safe();
+	m_a20_callback.resolve_safe(0xffffff);
 }
 
 device_memory_interface::space_config_vector i80286_cpu_device::memory_space_config() const
@@ -393,7 +395,7 @@ void i80286_cpu_device::execute_set_input(int inptnum, int state)
 		}
 	}
 	else if(inptnum == INPUT_LINE_A20)
-		m_amask = m_a20_callback.isnull() ? 0xffffff : m_a20_callback(state);
+		m_amask = m_a20_callback(state);
 	else
 	{
 		m_irq_state = state;
@@ -1341,7 +1343,7 @@ m_limit[sreg] = LIMIT(desc); }
 							LOADDESC(0x842, SS);
 							LOADDESC(0x848, DS);
 #undef LOADDESC
-							// void cast supresses warning
+							// void cast suppresses warning
 #define LOADDESC(addr, reg, r) { desc[1] = read_word(addr); desc[2] = read_word(addr + 2); desc[0] = read_word(addr + 4); \
 reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 							LOADDESC(0x84e, m_gdtr, 1);

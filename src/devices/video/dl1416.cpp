@@ -214,8 +214,6 @@ dl1416_device::dl1416_device(
 
 void dl1414_device::device_start()
 {
-	m_update_cb.resolve_safe();
-
 	// register for state saving
 	save_item(NAME(m_digit_ram));
 	save_item(NAME(m_cursor_state));

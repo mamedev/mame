@@ -75,14 +75,6 @@ void upc82c710_device::device_start()
 	irq = drq = false;
 	fdc_irq = fdc_drq = false;
 
-	m_fintr_callback.resolve_safe();
-	m_fdrq_callback.resolve_safe();
-	m_pintr_callback.resolve_safe();
-	m_sintr_callback.resolve_safe();
-	m_txd_callback.resolve_safe();
-	m_dtr_callback.resolve_safe();
-	m_rts_callback.resolve_safe();
-
 	// default addresses
 	device_address[DEVICE_CFG] = 0x390;
 	device_address[DEVICE_IDE] = 0x1f0;

@@ -54,7 +54,7 @@ ripple_counter_device::ripple_counter_device(const machine_config &mconfig, cons
 
 device_memory_interface::space_config_vector ripple_counter_device::memory_space_config() const
 {
-	if (m_rom_out_cb.isnull())
+	if (m_rom_out_cb.isunset())
 		return space_config_vector();
 	else
 		return device_rom_interface::memory_space_config();
@@ -70,20 +70,6 @@ void ripple_counter_device::device_validity_check(validity_checker &valid) const
 {
 	if (m_count_mask == 0)
 		osd_printf_error("No counting stages configured\n");
-}
-
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void ripple_counter_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_count_out_cb.resolve_safe();
-	m_rom_out_cb.resolve();
 }
 
 
@@ -135,7 +121,7 @@ void ripple_counter_device::set_count(u32 count)
 {
 	m_count = count;
 	m_count_out_cb(count);
-	if (!m_rom_out_cb.isnull())
+	if (!m_rom_out_cb.isunset())
 		m_rom_out_cb(read_byte(count));
 }
 

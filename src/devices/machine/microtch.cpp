@@ -138,7 +138,7 @@ void microtouch_device::send_touch_packet()
 	int tx = m_touchx->read();
 	int ty = m_touchy->read();
 
-	if (m_out_touch_cb.isnull() || m_out_touch_cb(&tx, &ty) != 0)
+	if (m_out_touch_cb(&tx, &ty) != 0)
 	{
 		ty = 0x4000 - ty;
 
@@ -241,8 +241,7 @@ void microtouch_device::device_start()
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1); //8N1?
 	set_tra_rate(clock());
 	set_rcv_rate(clock());
-	m_out_touch_cb.resolve();
-	m_out_stx_func.resolve_safe();
+	m_out_touch_cb.resolve_safe(1);
 	m_output_valid = false;
 
 	save_item(NAME(m_output_valid));

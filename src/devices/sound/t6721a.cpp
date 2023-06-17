@@ -49,12 +49,6 @@ t6721a_device::t6721a_device(const machine_config &mconfig, const char *tag, dev
 
 void t6721a_device::device_start()
 {
-	// resolve callbacks
-	m_write_eos.resolve_safe();
-	m_write_phi2.resolve_safe();
-	m_write_dtrd.resolve_safe();
-	m_write_apd.resolve_safe();
-
 	// create sound stream
 	m_stream = stream_alloc(0, 1, machine().sample_rate());
 }

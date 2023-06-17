@@ -57,9 +57,6 @@ tms34061_device::tms34061_device(const machine_config &mconfig, const char *tag,
 
 void tms34061_device::device_start()
 {
-	/* resolve callbak */
-	m_interrupt_cb.resolve();
-
 	/* reset the data */
 	m_vrammask = m_vramsize - 1;
 
@@ -139,15 +136,11 @@ static const char *const regnames[] =
 
 void tms34061_device::update_interrupts()
 {
-	/* if we have a callback, process it */
-	if (!m_interrupt_cb.isnull())
-	{
-		/* if the status bit is set, and ints are enabled, turn it on */
-		if ((m_regs[TMS34061_STATUS] & 0x0001) && (m_regs[TMS34061_CONTROL1] & 0x0400))
-			m_interrupt_cb(ASSERT_LINE);
-		else
-			m_interrupt_cb(CLEAR_LINE);
-	}
+	/* if the status bit is set, and ints are enabled, turn it on */
+	if ((m_regs[TMS34061_STATUS] & 0x0001) && (m_regs[TMS34061_CONTROL1] & 0x0400))
+		m_interrupt_cb(ASSERT_LINE);
+	else
+		m_interrupt_cb(CLEAR_LINE);
 }
 
 

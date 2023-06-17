@@ -268,26 +268,26 @@ inline void i8155_device::write_port(int port, uint8_t data)
 //  i8155_device - constructor
 //-------------------------------------------------
 
-i8155_device::i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8155_device(mconfig, I8155, tag, owner, clock)
+i8155_device::i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i8155_device(mconfig, I8155, tag, owner, clock)
 {
 }
 
-i8155_device::i8155_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		m_in_pa_cb(*this),
-		m_in_pb_cb(*this),
-		m_in_pc_cb(*this),
-		m_out_pa_cb(*this),
-		m_out_pb_cb(*this),
-		m_out_pc_cb(*this),
-		m_out_to_cb(*this),
-		m_command(0),
-		m_status(0),
-		m_count_length(0),
-		m_count_loaded(0),
-		m_to(0),
-		m_count_even_phase(false)
+i8155_device::i8155_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_in_pa_cb(*this, 0),
+	m_in_pb_cb(*this, 0),
+	m_in_pc_cb(*this, 0),
+	m_out_pa_cb(*this),
+	m_out_pb_cb(*this),
+	m_out_pc_cb(*this),
+	m_out_to_cb(*this),
+	m_command(0),
+	m_status(0),
+	m_count_length(0),
+	m_count_loaded(0),
+	m_to(0),
+	m_count_even_phase(false)
 {
 }
 
@@ -296,8 +296,8 @@ i8155_device::i8155_device(const machine_config &mconfig, device_type type, cons
 //  i8156_device - constructor
 //-------------------------------------------------
 
-i8156_device::i8156_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8155_device(mconfig, I8156, tag, owner, clock)
+i8156_device::i8156_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i8155_device(mconfig, I8156, tag, owner, clock)
 {
 }
 
@@ -308,15 +308,6 @@ i8156_device::i8156_device(const machine_config &mconfig, const char *tag, devic
 
 void i8155_device::device_start()
 {
-	// resolve callbacks
-	m_in_pa_cb.resolve_safe(0);
-	m_in_pb_cb.resolve_safe(0);
-	m_in_pc_cb.resolve_safe(0);
-	m_out_pa_cb.resolve_safe();
-	m_out_pb_cb.resolve_safe();
-	m_out_pc_cb.resolve_safe();
-	m_out_to_cb.resolve_safe();
-
 	// allocate RAM
 	m_ram = make_unique_clear<uint8_t[]>(256);
 

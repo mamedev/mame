@@ -168,10 +168,10 @@ model1io_device::model1io_device(const machine_config &mconfig, const char *tag,
 	m_eeprom(*this, "eeprom"),
 	m_buttons(*this, "buttons"),
 	m_dsw(*this, "dsw%u", 1U),
-	m_read_cb(*this), m_write_cb(*this),
-	m_in_cb(*this),
-	m_drive_read_cb(*this), m_drive_write_cb(*this),
-	m_an_cb(*this),
+	m_read_cb(*this, 0xff), m_write_cb(*this),
+	m_in_cb(*this, 0xff),
+	m_drive_read_cb(*this, 0xff), m_drive_write_cb(*this),
+	m_an_cb(*this, 0xff),
 	m_output_cb(*this),
 	m_secondary_controls(false)
 {
@@ -183,15 +183,6 @@ model1io_device::model1io_device(const machine_config &mconfig, const char *tag,
 
 void model1io_device::device_start()
 {
-	// resolve callbacks
-	m_read_cb.resolve_safe(0xff);
-	m_write_cb.resolve_safe();
-	m_in_cb.resolve_all_safe(0xff);
-	m_drive_read_cb.resolve_safe(0xff);
-	m_drive_write_cb.resolve_safe();
-	m_an_cb.resolve_all_safe(0xff);
-	m_output_cb.resolve_safe();
-
 	// register for save states
 	save_item(NAME(m_secondary_controls));
 }

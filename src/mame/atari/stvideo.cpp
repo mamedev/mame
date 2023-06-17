@@ -318,10 +318,6 @@ void st_video_device::device_config_complete()
 
 void st_video_device::device_start()
 {
-	m_de_cb.resolve();
-	m_hsync_cb.resolve();
-	m_vsync_cb.resolve();
-
 	m_event_timer = timer_alloc(FUNC(st_video_device::timer_event), this);
 	m_de_timer    = timer_alloc(FUNC(st_video_device::de_event   ), this);
 

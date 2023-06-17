@@ -68,8 +68,6 @@ catseye_device::catseye_device(const machine_config &mconfig, const char *tag, d
 
 void catseye_device::device_start()
 {
-	m_int_write_func.resolve_safe();
-
 	m_blink_timer = timer_alloc(FUNC(catseye_device::blink_callback), this);
 	m_blink_timer->adjust(attotime::from_hz(3));
 

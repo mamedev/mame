@@ -86,7 +86,6 @@ Michelangelo II - Soshisha
 MIDI Recorder - Yamaha
 MSX Basic Plus - Ascii
 MSX Comunication Cartridge - Sony
-MSX Pasocalc - Tokai Create
 MSX View - ASCII
 MSX-AID - ASCII
 MSX-BASIC kun - ASCII
@@ -100,7 +99,6 @@ Oushou ~ 王将 - MicroCabin (apparently a cart version existed)
 Picture Painter - ASCII
 Playcard Program - Yamaha
 Plotter ~ プロッ太 - Sony
-Print Lab ~ プリンターソフトプリントラボ - Sony/HAL
 PS Editor ~ ＰＳエディタ - Yamaha
 Pyroman ~ ピロマン - HAL
 Rally ~ ラリー - Brother
@@ -288,11 +286,6 @@ Skooter - Al Alamiah
 Snake It - [GA004] Al Alamiah
 Time Curb - [GA003] Al Alamiah
 Ultra Chess - [K085] Al Alamiah
-
-=Methali=
-- dump probably existing already (emu snaps exist)
-Perfect Math For First Preparatory Class Part 1-1
-Perfect Science For First Preparatory Class Part 1-2
 
 
 Softcards:
@@ -9665,6 +9658,19 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="pasocalc">
+		<description>MSX Pasocalc (Japan)</description>
+		<year>1984</year>
+		<publisher>Tokai Create</publisher>
+		<info name="alt_title" value="ＭＳＸパソカルク" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="pasocalc - tokai create (1984).rom" size="0x4000" crc="35475be5" sha1="32aea489126aae4a5d97ea58be88a8e3db9dd116" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="passball">
 		<description>Pass Ball (Japan)</description>
 		<year>1983</year>
@@ -9836,6 +9842,35 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x2000">
 				<rom name="pico pico (japan).rom" size="0x2000" crc="ba3e62d3" sha1="683478868f6c6423cc3e9c6aabe1868b30b1e47d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Bundled with Toshiba HX-J800 and Canon VG-200 graphic tablets. -->
+	<software name="picpaint">
+		<description>Picture Painter (Japan)</description>
+		<year>1984</year>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="ピクチャーペインター" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="picture puzzle (japan).rom" size="0x8000" crc="aa9ab049" sha1="553ec1a0948db29a490683db6ff1c9f889046182" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Bundled with Toshiba HX-J800 and Canon VG-200 graphic tablets. -->
+	<software name="picpainta" cloneof="picpaint">
+		<description>Picture Painter (Japan, alt)</description>
+		<year>1984</year>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="ピクチャーペインター" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="picture puzzle (japan, alt).rom" size="0x8000" crc="ed1fe458" sha1="8605ffcb79fba22091276e1886106af708251917" />
+				<rom size="0x8000" offset="0x8000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -10142,6 +10177,25 @@ kept for now until finding out what those bytes affect...
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="0x10000">
 				<rom name="price of magik, the (europe).rom" size="0x10000" crc="b43e7881" sha1="ac109dac24df4dae813ca5d9f0938cc48a162bb1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="printlab">
+		<description>Printer Soft Print Lab (Japan)</description>
+		<year>1985</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="プリンターソフトプリントラボ"/>
+		<info name="serial" value="HBS-H012C"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="print lab - sony (1985).rom" size="0x8000" crc="89e6d5f3" sha1="74a507a5a20c23f1d1a5b43360bacb46f81d47d1" />
+			</dataarea>
+		</part>
+		<part name="cass" interface="msx_cass">
+			<dataarea name="cass" size="0">
+				<rom name="cass" size="0" status="nodump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17446,6 +17500,19 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="math11">
+		<description>Perfect Math for First Preparatory Class - Part 1-1 (Arab)</description>
+		<year>1988</year>
+		<publisher>Methali</publisher>
+		<info name="alt_title" value="الكامل في الرياضيات للأول متوسط ج1"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="perfect math For first preparatory class part 1-1 - methali (1988).rom" size="0x8000" crc="882e3a71" sha1="86ca113359e2246b01258d9a2ff5a126df804194" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="math12">
 		<description>Perfect Math for First Preparatory Class - Part 1-2 (Arab)</description>
 		<year>1988</year>
@@ -17520,6 +17587,19 @@ legacy FM implementations cannot find it.
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="m_olom1-1.rom" size="0x8000" crc="52864334" sha1="18b50a5dc9bba07a7bcc9982a21b799289e72859" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scienc12">
+		<description>Perfect Science for First Preparatory Class - Part 1-2 (Arab)</description>
+		<year>1988</year>
+		<publisher>Methali</publisher>
+		<info name="alt_title" value="الكامل في العلوم للأول المتوسط ج2"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="perfect science For first preparatory class part 1-2 - methali (1988).rom" size="0x8000" crc="c344f230" sha1="33baef6332ee7f2d5208a3e28899c0e7fb585902" />
 			</dataarea>
 		</part>
 	</software>
@@ -18059,6 +18139,710 @@ legacy FM implementations cannot find it.
 
 
 <!-- Homebrew / Doujin software -->
+
+	<software name="o">
+		<description>O</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Cobinee"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="o - cobinee (2020).rom" size="0x8000" crc="ae143f49" sha1="94f966c7bb15569edc87f6a0e971f1c5d8f46253" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="olion">
+		<description>Olion</description>
+		<year>2018</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Tiny Yarou"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x6000">
+				<rom name="olion - tiny yarou (2018).rom" size="0x6000" crc="ee3a0554" sha1="987c709827ae5730dc765b93676383426ebe1d50" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="openwide">
+		<description>Open Wide!</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Hakogame"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="open wide - hakogame (2021).rom" size="0x20000" crc="286a11a6" sha1="6c31e335447f6e7e1be2e34286c495b6cbef696c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="opwolf">
+		<description>Operation Wolf (v3)</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Toybox"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="operation wolf - toybox (2006) [msx-dev06 v3].rom" size="0xc000" crc="94a0f409" sha1="6287c1f05ea958e1abe86b87de073bef50977478" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="opwolfv1" cloneof="opwolf">
+		<description>Operation Wolf (v1)</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Toybox"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="operation wolf - toybox (2006) [msx-dev06 v1].rom" size="0x8000" crc="e9492c87" sha1="366cc928a5dd5948bf6cf2ab1e00efcb2b6a8fd8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="othelcp">
+		<description>Othello Competicao (Portuguese)</description>
+		<year>2003</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="A&amp;L Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="othello Ccmpeticao - a&amp;l soft (2003).rom" size="0x4000" crc="0f0e7119" sha1="bb8f2d98925c0d407c78b88f77a9c0e3a759c021" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pac01">
+		<description>PAC-01</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Arc8"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="pac-01 - arc8 (2021).rom" size="0x8000" crc="c22e6f4f" sha1="623bcc57d6ac6aaa18f2e374ce32b482f5d7894b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacific">
+		<description>Pacific (v1.2.4)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="André Baptista"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="pacific - andre baptista (2020) [msxdev2020 v1.2.4].rom" size="0x4000" crc="0811de0a" sha1="04a1b140cdbdb63bfd5f11058cf48da00f63a8c3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacific120" cloneof="pacific">
+		<description>Pacific (v1.2.0)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="André Baptista"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="pacific - andre baptista (2020) [msxdev2020 v1.2.0].rom" size="0x4000" crc="823d5782" sha1="14749e9f754dcb98a8d3202fe4e2bc53538f04d6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacific110" cloneof="pacific">
+		<description>Pacific (v1.1.0)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="André Baptista"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="pacific - andre baptista (2020) [msxdev2020 v1.1.0].rom" size="0x4000" crc="28cd54e2" sha1="47e819a165bad6e6b05c8168c13690502304709c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacific100" cloneof="pacific">
+		<description>Pacific (v1.0.0)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="André Baptista"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="pacific - andre baptista (2020) [msxdev2020 v1.0.0].rom" size="0x4000" crc="48d513d5" sha1="dafa370d4164ca01cef0db8b18e86266e993ae3a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacobomb">
+		<description>Paco el Bombas</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Physical Dreams"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="paco el bombas - physical dreams (2020).rom" size="0x8000" crc="c9ed1e76" sha1="704e9cf74c416de774ddf76d68705c6dcfa1e3f8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacobomr">
+		<description>Paco el Bombas REDUX (English)</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Physical Dreams"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="paco el bombas redux - physical dreams (english) (2021).rom" size="0x8000" crc="6b75a9a9" sha1="17adadc4ba5722bd27f5f8add9f5c1d2ff1d243f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacobomri" cloneof="pacobomr">
+		<description>Paco el Bombas REDUX (Italian)</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Physical Dreams"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="paco el bombas redux - physical dreams (italian) (2021).rom" size="0x8000" crc="f3989636" sha1="549a53c976456ba242b6ae5627da226fb9230f20" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacobomrs" cloneof="pacobomr">
+		<description>Paco el Bombas REDUX (Spanish)</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Physical Dreams"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="paco el bombas redux - physical dreams (spanish) (2021).rom" size="0x8000" crc="5c34c76e" sha1="0c39be6006e5cd7f28b25312cac6d19eda4403a6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacobomrso" cloneof="pacobomr">
+		<description>Paco el Bombas REDUX (Spanish, older)</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Physical Dreams"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="paco el bombas redux - physical dreams (spanish, older) (2021).rom" size="0x8000" crc="0a216b77" sha1="35f3d0b7a06881cce8006483de9604a0e9c04514" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacotime">
+		<description>Paco Time Attack (v1.1)</description>
+		<year>2022</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Physical Dreams"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="paco time attack - physical dreams (v1.1) (2022).rom" size="0x8000" crc="745d7a2d" sha1="342cf0303b505093031f5a1e0db7dac1aacf1bdf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacotime10" cloneof="pacotime">
+		<description>Paco Time Attack (v1.0)</description>
+		<year>2022</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Physical Dreams"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="paco time attack - physical dreams (v1.0) (2022).rom" size="0x8000" crc="85e3cff7" sha1="3b99a513cbace53aaedf21e8d956050444dab8d2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pairlgc">
+		<description>Pair Logic</description>
+		<year>2005</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="AG Software"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="pair logic - ag software (2005) [msx-dev05].rom" size="0x2000" crc="e03cb45d" sha1="9ab584be0a054e76d345ca937917f1ea195f7967" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pakpak">
+		<description>Pak Pak</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Ochixn"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="pak pak - ochixn (2019).rom" size="0x4000" crc="14e000c2" sha1="3a61c10de5471d80ca8c89d0107ac6b3c0e1f6bd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="paracjoe">
+		<description>Parachuteless Joe</description>
+		<year>2005</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Paxanga Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="parachuteless joe - paxanga soft (2005) [msx-dev05].rom" size="0x8000" crc="bff072fe" sha1="f0b65b71c505c68019e2285d3b8afcf068a74b9f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="peekaboo">
+		<description>Peek-A-Boo</description>
+		<year>2008</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="DVIK &amp; Joyrex Productions"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="peek-a-boo - dvik &amp; joyrex productions (2008) [msx-dev08].rom" size="0x8000" crc="0ee996cb" sha1="a0b45f208df3091e461e15f6182896d2716c2a11" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="peekabooo" cloneof="peekaboo">
+		<description>Peek-A-Boo (older)</description>
+		<year>2008</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="DVIK &amp; Joyrex Productions"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="peek-a-boo - dvik &amp; joyrex productions (2008) [msx-dev08] (older).rom" size="0x8000" crc="150e01c8" sha1="d92c82e155cb34f65587d472d4eb5ed1b9e68018" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pegged">
+		<description>Pegged</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Under4Mhz"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="pegged - under4mhz (2021).rom" size="0x8000" crc="d6f7a336" sha1="1d5e7a29e62441e234d2646080e7d93fcf16ad49" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pngncafe">
+		<description>Penguin Café (English)</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="MSX Café"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="penguin cafe - the msx cafe (2006) (english).rom" size="0x8000" crc="ba41efb1" sha1="058af0079b868387ad39c6b8a390b18b936d0e48" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pngncafefr" cloneof="pngncafe">
+		<description>Penguin Café (French)</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="MSX Café"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="penguin cafe - the msx cafe (2006) (french).rom" size="0x8000" crc="48062210" sha1="bfa533c539035345cee719b4bbc7b30989e97372" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pngnmind">
+		<description>Penguin Mind</description>
+		<year>2007</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="MSX Café"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="penguin mind - the msx cafe (2007) [msx-dev07].rom" size="0x10000" crc="d2de6ec4" sha1="8c218c317e1e213e1c5e9439870929009d645a47" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pngnrace">
+		<description>Penguin Race</description>
+		<year>2003</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Dioniso"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="penguin race - dioniso (2003).rom" size="0x4000" crc="ac456cfa" sha1="a2d2e98f68042b32f3225b58c9989529d5efacdc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pengnrun">
+		<description>Penguin Run</description>
+		<year>2022</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Patrick's Retro Tech"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="penguin run - patricks retro tech (2022).rom" size="0x4000" crc="c60709ea" sha1="ead75f59292e72347ca03c906b7f1fa2fcf6e4d8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prfctfit">
+		<description>Perfect Fit</description>
+		<year>2008</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Paxanga Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="perfect fit - paxanga soft (2008).rom" size="0x8000" crc="91f8b81f" sha1="7ec25356abf3720806b2b97cbabdc1f19ed698f8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phansaga">
+		<description>Phantomas Saga Infinity</description>
+		<year>2006</year>
+		<publisher>Matra</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<info name="serial" value="RK710"/>
+		<info name="barcode" value="08275455549486"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="phantomas saga infinity - karoshi corporation (2006).rom" size="0x8000" crc="ffb9f1df" sha1="e59d739ecd56a11ecf4020430585ea4cc61b02a6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="photon">
+		<description>Photon</description>
+		<year>2009</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Ola Andersson"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="photon - ola andersson (2009).rom" size="0x2000" crc="e2735add" sha1="c10d2a3dc77816cfb5b5d4b983323284f4a4aef5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pickinx">
+		<description>PickinX</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Amaury Carvalho"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="pickinx - amaury carvalho (2021).rom" size="0x8000" crc="ecc050e8" sha1="ab1fbe0b810dbee24dc5f8cf79c505cdc54d3217" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pictpuzk">
+		<description>Picture Puzzle</description>
+		<year>2004</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="picture puzzle - karoshi corporation (2004).rom" size="0x2000" crc="01b3239f" sha1="27e56fbec7fa39ce19d045b0dbc4217d290f92e2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pihkal">
+		<description>PIHKAL</description>
+		<year>2009</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Hackers"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="pihkal - hackers (2009) [wild demo entry].rom" size="0x4000" crc="895badaa" sha1="65fa1c37e541d66398a2786a8baadecb363a1565" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pipposco">
+		<description>Pippo La Scopa Ficcanaso</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Gamecast Entertainment"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="pippo la scopa ficcanaso - gamecast (2021).rom" size="0x4000" crc="ee9b213d" sha1="a8e25103b97b1fca6aa7dabd65380a552ab49220" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pitman">
+		<description>Pitman</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Under4Mhz"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="pitman - under4mhz (2021).rom" size="0x8000" crc="c896e810" sha1="cd15b681a4426a29a46ac49c187044777601d528" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plumber">
+		<description>Plumber</description>
+		<year>2009</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="AG Software"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="plumber - ag software (2009) [msxdev09].rom" size="0x4000" crc="745eb792" sha1="788ce4ba8d7e881dd2d3cc697c2dd88f44e27798" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pntplat">
+		<description>Pointless Platform (release 2)</description>
+		<year>2007</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="The New Image"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="pointless platform - the new image (2007) [msxdev06] (release 2).rom" size="0x8000" crc="e3cb91d9" sha1="31706b3fc6cf6ab1d2e3670ddead564564e96c45" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pntplatr1" cloneof="pntplat">
+		<description>Pointless Platform (release 1)</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="The New Image"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="pointless platform - the new image (2006) [msxdev06] (release 1).rom" size="0x8000" crc="d4956551" sha1="08d5a55b80726fb9c793be20e36f6d88beb643a6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pntshoot">
+		<description>Pointless Shooting</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="The New Image"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="pointless shooting - the new image (2006) [msxdev06].rom" size="0x8000" crc="594654fc" sha1="85d305e3e5d065427b8eda986736b19f930abfd8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxpong">
+		<description>MSX Pong!</description>
+		<year>2015</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="NightFox &amp; Co."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="pong - cesar rincon (2015).rom" size="0x4000" crc="a7935543" sha1="8435bf4fd322268b1bd2a5cb5d03b35fb957eeae" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prtkngdm">
+		<description>Pretty Kingdom</description>
+		<year>2014</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Nerlaska Studio"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="pretty kingdom - nerlaska studio (2014) [msxdev14].rom" size="0x8000" crc="cb2d148c" sha1="bb23232a5d3d4c1d78647cce520a9accecb3cb4f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prtkngdmo" cloneof="prtkngdm">
+		<description>Pretty Kingdom (older)</description>
+		<year>2014</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Nerlaska Studio"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="pretty kingdom - nerlaska studio (2014) [msxdev14] (older).rom" size="0x8000" crc="1d14e338" sha1="cb07324ae94c2546156badbcb5c1ff3c5ff4d041" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psged">
+		<description>PSGed (v0.82b)</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="aorante/303bcn"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="psged - aorante-303bcn (2012) [v0.82b].rom" size="0x8000" crc="36c2469a" sha1="a84dff41ba8980590941f77e27e74df457eb2ba6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psged08" cloneof="psged">
+		<description>PSGed (v0.8b)</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="aorante/303bcn"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="psged - aorante-303bcn (2012) [v0.8b].rom" size="0x8000" crc="3be1ae30" sha1="23af545a914a061d9bae22542e480139b4a60ec9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psged04" cloneof="psged">
+		<description>PSGed (v0.4b)</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="aorante/303bcn"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8001">
+				<rom name="psged - aorante-303bcn (2012) [v0.4b].rom" size="0x8001" crc="135b3416" sha1="f848ad905a22e177b80069f0497bb60ff4205485" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puzzybox">
+		<description>Puzzybox</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Gamecast Entertainment"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="puzzybox - gamecast (2021).rom" size="0x10000" crc="454381e4" sha1="92d4601310eead197877835ff035a2ca6b10e1b6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pwnd">
+		<description>PWND - Of je worst lust</description>
+		<year>2009</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Metal Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="pwnd - of je worst lust - metal soft (2009).rom" size="0x4000" crc="69274ba7" sha1="681c30c7539ec738be2e36ddca408eed392f3b6d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pwnda" cloneof="pwnd">
+		<description>PWND - Of je worst lust (alt)</description>
+		<year>2009</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Metal Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="pwnd - of je worst lust - metal soft (2009) (alt).rom" size="0x4000" crc="51f201b3" sha1="2164c6ee1819f7fe763dbcc9ef366b62bf04aec6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pwnd2">
+		<description>PWND part 2 - Of je assembly lust</description>
+		<year>2011</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Metal Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="pwnd part 2 - of je assembly lust - metal soft (2011).rom" size="0x2000" crc="8e9f4013" sha1="6ac076f0c5dd09186fef2ebbee2b74221882538f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pwnd2a" cloneof="pwnd2">
+		<description>PWND part 2 - Of je assembly lust (alt)</description>
+		<year>2011</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Metal Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="pwnd part 2 - of je assembly lust - metal soft (2011) (alt).rom" size="0x2000" crc="572b9afb" sha1="478a75ad54417b1abf95be7a706d971a0d6cff0f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pwnd3">
+		<description>PWND part 3 - Full Metal Snake (v1.1)</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Metal Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="pwnd part 3 - full metal snake - metal soft (2018) (v1.1).rom" size="0x4000" crc="6d0c0508" sha1="030f6462d91831aa0ef838c353e20c44f528693b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pwnd310">
+		<description>PWND part 3 - Full Metal Snake (v1.0)</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Metal Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="pwnd part 3 - full metal snake - metal soft (2018) (v1.0).rom" size="0x4000" crc="cfb6d644" sha1="9735b2b165d22c7f99c49b90079ca663c94ea065" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="qbiqs">
 		<description>QBIQS (v1.2)</description>

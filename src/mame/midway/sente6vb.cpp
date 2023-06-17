@@ -182,8 +182,6 @@ sente6vb_device::sente6vb_device(const machine_config &mconfig, const char *tag,
 
 void sente6vb_device::device_start()
 {
-	m_send_cb.resolve_safe();
-	m_clock_out_cb.resolve_safe();
 	m_uart->write_cts(0);
 	m_uart->write_dcd(0);
 

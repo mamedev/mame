@@ -19,9 +19,9 @@ DEFINE_DEVICE_TYPE(VT_VT1682_UIO, vrt_vt1682_uio_device, "vt1682uio", "VRT VT168
 vrt_vt1682_uio_device::vrt_vt1682_uio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VT_VT1682_UIO, tag, owner, clock),
 	m_porta_out(*this),
-	m_porta_in(*this),
+	m_porta_in(*this, 0),
 	m_portb_out(*this),
-	m_portb_in(*this)
+	m_portb_in(*this, 0)
 {
 }
 
@@ -109,11 +109,6 @@ void vrt_vt1682_uio_device::inteact_214b_uio_b_attribute_w(uint8_t data)
 
 void vrt_vt1682_uio_device::device_start()
 {
-	m_porta_out.resolve_safe();
-	m_porta_in.resolve_safe(0);
-	m_portb_out.resolve_safe();
-	m_portb_in.resolve_safe(0);
-
 	save_item(NAME(m_2129_uio_a_data));
 	save_item(NAME(m_212a_uio_a_direction));
 	save_item(NAME(m_212b_uio_a_attribute));

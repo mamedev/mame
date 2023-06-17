@@ -242,7 +242,7 @@ atari_jsa_base_device::atari_jsa_base_device(const machine_config &mconfig, devi
 		m_ym2151(*this, "ym2151"),
 		m_cpu_region(*this, "cpu"),
 		m_cpu_bank(*this, "cpubank"),
-		m_test_read_cb(*this),
+		m_test_read_cb(*this, 0),
 		m_main_int_cb(*this),
 		m_timed_int(false),
 		m_ym2151_int(false),
@@ -262,10 +262,6 @@ void atari_jsa_base_device::device_start()
 {
 	// configure CPU bank
 	m_cpu_bank->configure_entries(0, 4, m_cpu_region->base(), 0x1000);
-
-	// resolve devices
-	m_test_read_cb.resolve_safe(0);
-	m_main_int_cb.resolve_safe();
 
 	// save states
 	save_item(NAME(m_timed_int));

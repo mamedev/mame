@@ -73,9 +73,6 @@ void z88cart_slot_device::device_start()
 {
 	m_cart = get_card_device();
 
-	// resolve callbacks
-	m_out_flp_cb.resolve_safe();
-
 	m_flp_timer = timer_alloc(FUNC(z88cart_slot_device::close_flap), this);
 	m_flp_timer->reset();
 }

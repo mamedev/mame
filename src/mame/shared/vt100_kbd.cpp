@@ -217,18 +217,6 @@ ioport_constructor vt100_keyboard_device::device_input_ports() const
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void vt100_keyboard_device::device_resolve_objects()
-{
-	m_signal_out_cb.resolve_safe();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

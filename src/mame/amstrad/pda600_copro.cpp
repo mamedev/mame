@@ -226,14 +226,6 @@ ioport_constructor pda600_copro_device::device_input_ports() const
 }
 
 
-void pda600_copro_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_tx_cb.resolve_safe();
-	m_tone_cb.resolve_safe();
-}
-
-
 void pda600_copro_device::device_start()
 {
 	// parameters used by the MAINCPU to configure the Z180 ASCI1

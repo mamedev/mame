@@ -18,7 +18,7 @@ hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, HD63450, tag, owner, clock)
 	, m_irq_callback(*this)
 	, m_dma_end(*this)
-	, m_dma_read(*this)
+	, m_dma_read(*this, 0)
 	, m_dma_write(*this)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 {
@@ -42,12 +42,6 @@ hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, d
 
 void hd63450_device::device_start()
 {
-	// resolve callbacks
-	m_irq_callback.resolve_safe();
-	m_dma_end.resolve_safe();
-	m_dma_read.resolve_all();
-	m_dma_write.resolve_all();
-
 	// Initialise timers and registers
 	for (int x = 0; x < 4; x++)
 		m_timer[x] = timer_alloc(FUNC(hd63450_device::dma_transfer_timer), this);
@@ -368,7 +362,7 @@ void hd63450_device::single_transfer(int x)
 
 	if (m_reg[x].ocr & 0x80)  // direction: 1 = device -> memory
 	{
-		if (!m_dma_read[x].isnull())
+		if (!m_dma_read[x].isunset())
 		{
 			data = m_dma_read[x](m_reg[x].mar);
 			if (data == -1)
@@ -408,7 +402,7 @@ void hd63450_device::single_transfer(int x)
 	}
 	else  // memory -> device
 	{
-		if (!m_dma_write[x].isnull())
+		if (!m_dma_write[x].isunset())
 		{
 			data = space.read_byte(m_reg[x].mar);
 			m_dma_write[x]((offs_t)m_reg[x].mar,data);

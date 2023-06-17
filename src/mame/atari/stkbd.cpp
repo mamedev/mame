@@ -66,7 +66,6 @@ st_kbd_device::st_kbd_device(const machine_config &mconfig, const char *tag, dev
 void st_kbd_device::device_start()
 {
 	m_led.resolve();
-	m_rx_cb.resolve();
 
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_mouse));

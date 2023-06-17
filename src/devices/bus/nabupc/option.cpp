@@ -88,7 +88,6 @@ void option_bus_device::add_slot(option_slot_device &slot)
 //-------------------------------------------------
 void option_bus_device::device_start()
 {
-	m_int_cb.resolve_all_safe();
 }
 
 //-------------------------------------------------

@@ -30,15 +30,13 @@ namcos10_exio_device::namcos10_exio_device(const machine_config &mconfig, const 
 	namcos10_exio_base_device(mconfig, NAMCOS10_EXIO, tag, owner, clock, 0x30),
 	m_maincpu(*this, "exio_mcu"),
 	m_ram(*this, "exio_ram"),
-	m_analog_cb(*this)
+	m_analog_cb(*this, 0)
 {
 }
 
 void namcos10_exio_device::device_start()
 {
 	namcos10_exio_base_device::device_start();
-
-	m_analog_cb.resolve_safe(0);
 
 	save_item(NAME(m_is_active));
 	save_item(NAME(m_analog_idx));
@@ -172,7 +170,7 @@ namcos10_mgexio_device::namcos10_mgexio_device(const machine_config &mconfig, co
 	m_maincpu(*this, "exio_mcu"),
 	m_ram(*this, "exio_ram"),
 	m_nvram(*this, "nvram"),
-	m_port_read(*this),
+	m_port_read(*this, 0),
 	m_port_write(*this)
 {
 }
@@ -182,9 +180,6 @@ void namcos10_mgexio_device::device_start()
 	save_item(NAME(m_is_active));
 	save_item(NAME(m_bus_req));
 	save_item(NAME(m_ctrl));
-
-	m_port_read.resolve_all_safe(0);
-	m_port_write.resolve_all_safe();
 
 	m_cpu_reset_timer = timer_alloc(FUNC(namcos10_mgexio_device::cpu_reset_timeout), this);
 

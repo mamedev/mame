@@ -124,7 +124,7 @@ DEFINE_DEVICE_TYPE(NAMCO_59XX, namco59xx_device, "namco59", "Namco 59xx I/O")
 
 namcoio_device::namcoio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int device_type)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_in_cb(*this)
+	, m_in_cb(*this, 0)
 	, m_out_cb(*this)
 	//, m_device_type(device_type)
 {
@@ -151,9 +151,6 @@ namco59xx_device::namco59xx_device(const machine_config &mconfig, const char *ta
 
 void namcoio_device::device_start()
 {
-	m_in_cb.resolve_all_safe(0);
-	m_out_cb.resolve_all_safe();
-
 	save_item(NAME(m_ram));
 	save_item(NAME(m_reset));
 	save_item(NAME(m_lastcoins));

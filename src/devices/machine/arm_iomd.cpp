@@ -141,9 +141,9 @@ arm_iomd_device::arm_iomd_device(const machine_config &mconfig, device_type type
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
 	, m_vidc(*this, finder_base::DUMMY_TAG)
 	, m_kbdc(*this, finder_base::DUMMY_TAG)
-	, m_iocr_read_od_cb(*this)
+	, m_iocr_read_od_cb(*this, 1)
 	, m_iocr_write_od_cb(*this)
-	, m_iocr_read_id_cb(*this)
+	, m_iocr_read_id_cb(*this, 1)
 	, m_iocr_write_id_cb(*this)
 	, m_sndcur(0)
 	, m_sndend(0)
@@ -206,7 +206,7 @@ void arm7500fe_iomd_device::map(address_map &map)
 
 arm7500fe_iomd_device::arm7500fe_iomd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: arm_iomd_device(mconfig, ARM7500FE_IOMD, tag, owner, clock)
-	, m_iolines_read_cb(*this)
+	, m_iolines_read_cb(*this, 0xff)
 	, m_iolines_write_cb(*this)
 {
 	m_id = 0xaa7c;
@@ -239,11 +239,6 @@ void arm7500fe_iomd_device::device_add_mconfig(machine_config &config)
 
 void arm_iomd_device::device_start()
 {
-	m_iocr_read_od_cb.resolve_all_safe(1);
-	m_iocr_write_od_cb.resolve_all_safe();
-	m_iocr_read_id_cb.resolve_safe(1);
-	m_iocr_write_id_cb.resolve_safe();
-
 	save_item(NAME(m_iocr_ddr));
 	save_item(NAME(m_video_enable));
 	save_item(NAME(m_vidinita));
@@ -282,8 +277,6 @@ void arm7500fe_iomd_device::device_start()
 {
 	arm_iomd_device::device_start();
 
-	m_iolines_read_cb.resolve_safe(0xff);
-	m_iolines_write_cb.resolve_safe();
 	save_item(NAME(m_iolines_ddr));
 
 	save_item(NAME(m_cpuclk_divider));

@@ -465,8 +465,7 @@ class device_t : public delegate_late_bind
 
 	friend class simple_list<device_t>;
 	friend class running_machine;
-	friend class finder_base;
-	friend class devcb_base;
+	friend class device_resolver_base;
 
 	class subdevice_list
 	{
@@ -850,8 +849,7 @@ protected:
 	void pre_save();
 	void post_load();
 	void notify_clock_changed(bool sync_on_new_clock_domain = false);
-	finder_base *register_auto_finder(finder_base &autodev);
-	void register_callback(devcb_base &callback);
+	device_resolver_base *register_auto_finder(device_resolver_base &autodev);
 
 	//------------------- begin derived class overrides
 
@@ -1030,9 +1028,8 @@ private:
 	std::string             m_basetag;              // base part of the tag
 	bool                    m_config_complete;      // have we completed our configuration?
 	bool                    m_started;              // true if the start function has succeeded
-	finder_base *           m_auto_finder_list;     // list of objects to auto-find
+	device_resolver_base *  m_auto_finder_list;     // list of objects to auto-find
 	mutable std::vector<rom_entry>  m_rom_entries;
-	std::list<devcb_base *> m_callbacks;
 	std::vector<memory_view *> m_viewlist;          // list of views
 
 	// string formatting buffer for logerror

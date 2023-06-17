@@ -1311,13 +1311,13 @@ ROM_END
 // Apricot LANstation (Krypton Motherboard) - no display
 ROM_START( aplanst )
 	ROM_REGION32_LE(0x20000, "bios", 0)
-	ROM_SYSTEM_BIOS(0, "31024", "Bios 3-10-24")
+	ROM_SYSTEM_BIOS(0, "31024", "BIOS 3-10-24")
 	ROMX_LOAD( "31024.lo", 0x10000, 0x8000, CRC(e52b59e1) SHA1(cfcaa4d8d658df8df463108ef30695bd4ee7a617), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD( "31024.hi", 0x10001, 0x8000, CRC(7286aefa) SHA1(dfc0e3f4936780fa62ae9ec392ce17aa65e717cd), ROM_SKIP(1) | ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "31025", "Bios 3-10-25")
+	ROM_SYSTEM_BIOS(1, "31025", "BIOS 3-10-25")
 	ROMX_LOAD( "31025.lo", 0x10000, 0x8000, CRC(1aec09bc) SHA1(51d56c97c7c1674554aa89b68945329ea967a8bc), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD( "31025.hi", 0x10001, 0x8000, CRC(0763caa5) SHA1(48510a933dcd6efea3b14d04444f584c3e6fefeb), ROM_SKIP(1) | ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(2, "31026", "Bios 3-10-26i")
+	ROM_SYSTEM_BIOS(2, "31026", "BIOS 3-10-26i")
 	ROMX_LOAD( "31026i.lo", 0x10000, 0x8000, CRC(670b6ab4) SHA1(8d61a0edf187f99b67eb58f5e11276deee801d17), ROM_SKIP(1) | ROM_BIOS(2))
 	ROMX_LOAD( "31026i.hi", 0x10001, 0x8000, CRC(ef01c54f) SHA1(911f95d65ab96878e5e7ebccfc4b329db47a1351), ROM_SKIP(1) | ROM_BIOS(2))
 ROM_END
@@ -1369,7 +1369,7 @@ ROM_END
 ROM_START( apxeni )
 	ROM_REGION32_LE(0x20000, "bios", 0)
 	// 0: Phoenix 80386 ROM BIOS PLUS Version 1.10.01 / XEN-i 386 Business Microcomputer / VR 1.2.1 22nd July 1988
-	ROM_SYSTEM_BIOS(0, "lep121", "Rom Bios 1.2.1")
+	ROM_SYSTEM_BIOS(0, "lep121", "ROM BIOS 1.2.1")
 	ROMX_LOAD( "lep121.bin", 0x18000, 0x8000, CRC(948c1927) SHA1(d06bdbd6292db73c815ad1060daf055293dfddf5), ROM_BIOS(0))
 	// 1: Phoenix 80386 ROM BIOS PLUS Version 1.10.01 / XEN-i 386 Business Microcomputer / VR 1.2.1 22nd January 1991
 	ROM_SYSTEM_BIOS(1, "lep121s", "SCSI-Enabling ROMs")
@@ -1738,7 +1738,7 @@ ROM_START( at )
 	ROM_SYSTEM_BIOS(15, "mitph307", "Mitac Phoenix v3.07") /* (BIOS release date:: 30-07-1987) */
 	ROMX_LOAD( "mitac_phoenix_v3.07_even.bin", 0x10000, 0x8000, CRC(1c4becc9) SHA1(bfdea3f2a248312ed8cf4765a1a7dc1a2f7cecd8), ROM_SKIP(1) | ROM_BIOS(15) )
 	ROMX_LOAD( "mitac_phoenix_v3.07_odd.bin", 0x10001, 0x8000, CRC(3ee16ed1) SHA1(b77e18e10e9187a01cb55c05b2a6e5311981ab56), ROM_SKIP(1) | ROM_BIOS(15) )
-	// 16: BIOS-String: Pyramid Software Development Personal Computer AT Bios Version 2.14
+	// 16: BIOS-String: Pyramid Software Development Personal Computer AT BIOS Version 2.14
 	ROM_SYSTEM_BIOS(16, "precise", "Precise")  /* (no regular BIOS release date) */
 	ROMX_LOAD( "precise 860407_low.bin", 0x10000, 0x8000, CRC(d839c074) SHA1(473ca7b42914ce12f2d6c91afb0b2c2e65194489), ROM_SKIP(1) | ROM_BIOS(16) )
 	ROMX_LOAD( "precise 860407_high.bin", 0x10001, 0x8000, CRC(b5e13c54) SHA1(07f5806fb53d0cb7ef7b54312fd6aa163d58b9a5), ROM_SKIP(1) | ROM_BIOS(16) )
@@ -2031,10 +2031,10 @@ ROM_START( neat )
 	ROMX_LOAD( "286-chips ami78384 even.bin", 0x10000, 0x8000, CRC(5280fee0) SHA1(25051ad6bbccddc0738861b614dbafbca5c3bff5), ROM_SKIP(1) | ROM_BIOS(6) )
 	ROMX_LOAD( "286-chips ami78384 odd.bin", 0x10001, 0x8000, CRC(24526bf3) SHA1(8f8b46fe2e708fa53d0eeb44a16924cd878bdd33), ROM_SKIP(1) | ROM_BIOS(6) )
 	// 7: BIOS-String: ENET-1107-040990-K0
-	ROM_SYSTEM_BIOS(7, "ami211", "AMI 21.1") /*(Motherboard Manufacturer: Dataexpert Corp. Motherboard) (Neat 286 Bios, 82c21x Chipset ) (BIOS release date:: 09-04-1990)*/
+	ROM_SYSTEM_BIOS(7, "ami211", "AMI 21.1") /*(Motherboard Manufacturer: Dataexpert Corp. Motherboard) (Neat 286 BIOS, 82c21x Chipset ) (BIOS release date:: 09-04-1990)*/
 	ROMX_LOAD( "ami211.bin",     0x10000, 0x10000,CRC(a0b5d269) SHA1(44db8227d35a09e39b93ed944f85dcddb0dd0d39), ROM_BIOS(7))
 	// 8: BIOS-String: ENET-1230-043089-K0
-	ROM_SYSTEM_BIOS(8, "amic21", "AMI C 21.1") /* (Motherboard Manufacturer: Unknown.) (Neat 286 Bios, 82c21x Chipset ) (BIOS release date:: 30-04-1989) */
+	ROM_SYSTEM_BIOS(8, "amic21", "AMI C 21.1") /* (Motherboard Manufacturer: Unknown.) (Neat 286 BIOS, 82c21x Chipset ) (BIOS release date:: 30-04-1989) */
 	ROMX_LOAD( "amic21-2.bin",  0x10001, 0x8000, CRC(8ffe7752) SHA1(68215f07a170ee7bdcb3e52b370d470af1741f7e),ROM_SKIP(1) | ROM_BIOS(8) )
 	ROMX_LOAD( "amic21-1.bin",  0x10000, 0x8000, CRC(a76497f6) SHA1(91b47d86967426945b2916cb40e76a8da2d31d54),ROM_SKIP(1) | ROM_BIOS(8) )
 	// 9: BIOS-String: - AGC N286 - CPU: AMD N80L286-16/S, FPU socket provided - RAM: 36xTMC64C1024-80N (18pin), 36x16pin sockets provided as an alternative (2xBank 0, 2xBank 1), 4xSIPP30 (2xBank 0/2 and 2xBank 1/3)
@@ -2150,7 +2150,7 @@ ROM_START( headg2 )
 	ROMX_LOAD( "286-headland 4530-high_32k.bin", 0x10001, 0x8000, CRC(f84c0e75) SHA1(42dc068d1cd5105cd576b023e2ccfe0f0646d4e3), ROM_SKIP(1) | ROM_BIOS(1) )
 	ROMX_LOAD( "286-headland 4530-low_32k.bin", 0x10000, 0x8000, CRC(0856dde8) SHA1(cee5d6002c405df984f3c7fa83c4f3e034f1e586), ROM_SKIP(1) | ROM_BIOS(1) )
 	// 2: Quadtel Enhanced 286 BIOS Version 3.04.02 - Headland HT101, HT102
-	ROM_SYSTEM_BIOS(2, "ami101", "AMI HT 101.1") /* (Quadtel Enhanced 286 Bios Version 3.04.02) (BIOS release date:: 09/11/1989) */
+	ROM_SYSTEM_BIOS(2, "ami101", "AMI HT 101.1") /* (Quadtel Enhanced 286 BIOS Version 3.04.02) (BIOS release date:: 09/11/1989) */
 	ROMX_LOAD( "amiht-h.bin",   0x10001, 0x8000, CRC(8022545f) SHA1(42541d4392ad00b0e064b3a8ccf2786d875c7c19),ROM_SKIP(1) | ROM_BIOS(2) )
 	ROMX_LOAD( "amiht-l.bin",   0x10000, 0x8000, CRC(285f6b8f) SHA1(2fce4ec53b68c9a7580858e16c926dc907820872),ROM_SKIP(1) | ROM_BIOS(2) )
 ROM_END
@@ -2407,7 +2407,7 @@ ROM_END
 
 // SIIG MiniSys 2000 - Motherboard ID: Labway MS101V1.2 - This is a tiny 286 system, the width of a 3.5" disk drive with an external power supply.
 // A physical switch allows to change between VGA and composite video output.
-// CPU: Intel 286-12 - BIOS: AMIBIOS - Bios string: DH12-1422-061390-K0 - Chipset: Headland HT12/A, Acer M5105 - RAM: 2xSIMM30
+// CPU: Intel 286-12 - BIOS: AMIBIOS - BIOS string: DH12-1422-061390-K0 - Chipset: Headland HT12/A, Acer M5105 - RAM: 2xSIMM30
 // OSC: 14.31818MHz, 24.000MHz, 24.000, another unreadable - ISA16: 1 (on riser board) - on board: IDE, Floppy, 2xser, par, game, composite, VGA,
 // ext. FDD (motherboard and I/O board connected with a riser board - Mass storage: 3.5" FDD, 3.5" HDD (e.g. Seagate ST351A/X in AT mode)
 ROM_START( minisys2k )
@@ -4377,7 +4377,7 @@ ROM_START( ar4glx3 ) // BIOS-String: 40-0101-006666-00101111-011094-CTQ-596A / K
 	ROM_LOAD( "4glx3_bios.bin", 0x10000, 0x10000, CRC(3367e0b2) SHA1(8dbe58ed783c56ca2cb61ded6f603314739dcfb8))
 ROM_END
 
-// TMC PAT48AV 1.4 - ALi M1429 A1, M1431 A2 - Bios: AMI 486DX ISA BIOS AB4179743 - Keyboard BIOS: AMI-KB-H-WP - CPU: 486DX socket
+// TMC PAT48AV 1.4 - ALi M1429 A1, M1431 A2 - BIOS: AMI 486DX ISA BIOS AB4179743 - Keyboard BIOS: AMI-KB-H-WP - CPU: 486DX socket
 // RAM: 8xSIMM30 - Cache: 8xIS61C256AH-20N - OSC: 14.31818 - ISA16: 4, ISA16/VLB: 3
 ROM_START( tmpat48av ) // screen remains blank - BIOS-String: 40-0106-001291-00101111-080893-ALI1429 / 486DX-AC-WBu-25/33/40/50-L6-ZZ
 	ROM_REGION32_LE(0x20000, "bios", 0)
@@ -5033,7 +5033,7 @@ ROM_START( atc1425b ) // Boot block - BIOS String: 04/18/96-SiS-496-497/A/B-2A4I
 	ROM_LOAD( "1425b231.rom", 0x00000, 0x20000, CRC(1a19f34d) SHA1(09bb5e35ef07b57942cbca933f2a0334615a687e))
 ROM_END
 
-// Abit AB-PI4(T) - Bios: 32pin - Keyboard-BIOS: Winbond 83C42 - CPU: Socket 3 - ISA16: 4, PCI: 3 - Chipset: SiS 85C495, 85C497
+// Abit AB-PI4(T) - BIOS: 32pin - Keyboard-BIOS: Winbond 83C42 - CPU: Socket 3 - ISA16: 4, PCI: 3 - Chipset: SiS 85C495, 85C497
 // RAM: 4xSIMM72, Cache: 9x32pin (occupied: 4xW24512AK-20, 1xW2457AK) - On board: 2xIDE
 ROM_START( abpi4 )
 	ROM_REGION32_LE(0x20000, "bios", 0)
@@ -5650,7 +5650,7 @@ ROM_START( hot433 )
 	// 6: Latest AMI BIOS for rev 1-3
 	ROM_SYSTEM_BIOS(6, "aus2c", "AUS2C")
 	ROMX_LOAD( "433aus2c.rom", 0x00000, 0x20000, CRC(bdc65766) SHA1(e87cc4aed14ae7fcdf6423063b0ababe65b41044), ROM_BIOS(6))
-	// 7: AMI Bios for rev 1-3 w/mouse support
+	// 7: AMI BIOS for rev 1-3 w/mouse support
 	ROM_SYSTEM_BIOS(7, "aus26", "AUS26")
 	ROMX_LOAD( "433aus36.rom", 0x00000, 0x20000, CRC(8f864716) SHA1(0bf4b8114cbb406646d89eed7833556611e1fbe6), ROM_BIOS(7))
 	// 8: Latest AMI BIOS for rev4 of the Shuttle HOT-433 motherboard.

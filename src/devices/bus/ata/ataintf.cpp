@@ -230,10 +230,6 @@ ata_interface_device::ata_interface_device(const machine_config &mconfig, const 
 
 void abstract_ata_interface_device::device_start()
 {
-	m_irq_handler.resolve_safe();
-	m_dmarq_handler.resolve_safe();
-	m_dasp_handler.resolve_safe();
-
 	for (int i = 0; i < 2; i++)
 	{
 		m_irq[i] = 0;

@@ -293,7 +293,7 @@ void sfkick_state::sfkick_io_map(address_map &map)
 	map(0xa0, 0xa7).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x98, 0x9b).rw("v9938", FUNC(v9938_device::read), FUNC(v9938_device::write));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xb4, 0xb5).ram(); // loopback ? req by sfkicka (MSX Bios leftover)
+	map(0xb4, 0xb5).ram(); // loopback ? req by sfkicka (MSX BIOS leftover)
 }
 
 void sfkick_state::sfkick_sound_map(address_map &map)

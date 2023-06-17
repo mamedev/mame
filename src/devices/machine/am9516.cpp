@@ -200,16 +200,8 @@ void am9516_device::device_start()
 	save_item(STRUCT_MEMBER(m_channel, cmh));
 	save_item(STRUCT_MEMBER(m_channel, iv));
 
-	m_int.resolve_safe();
-	m_eop.resolve_safe();
-
 	for (channel &ch : m_channel)
 	{
-		ch.flyby_byte_r.resolve_safe(0);
-		ch.flyby_byte_w.resolve_safe();
-		ch.flyby_word_r.resolve_safe(0);
-		ch.flyby_word_w.resolve_safe();
-
 		ch.cabl = 0;
 		ch.babl = 0;
 		ch.caal = 0;

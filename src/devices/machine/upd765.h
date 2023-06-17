@@ -61,7 +61,6 @@ public:
 protected:
 	upd765_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -574,9 +573,6 @@ public:
 	virtual void map(address_map &map) override;
 	uint8_t input_r();
 
-protected:
-	virtual void device_start() override;
-
 private:
 	devcb_read8 m_input_handler;
 };
@@ -609,7 +605,6 @@ public:
 
 protected:
 	virtual void soft_reset() override;
-	virtual void device_start() override;
 
 private:
 	virtual int check_command() override;

@@ -20,7 +20,7 @@
 DEFINE_DEVICE_TYPE(COP452, cop452_device, "cop452", "National Semiconductor COP452 frequency generator")
 
 cop452_device::cop452_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-: device_t(mconfig, COP452, tag, owner, clock)
+	: device_t(mconfig, COP452, tag, owner, clock)
 	, m_out_handlers(*this)
 {
 }
@@ -145,8 +145,6 @@ int cop452_device::do_r()
 
 void cop452_device::device_start()
 {
-	m_out_handlers.resolve_all_safe();
-
 	m_timers[0] = timer_alloc(FUNC(cop452_device::timer_tick), this);
 	m_timers[1] = timer_alloc(FUNC(cop452_device::timer_tick), this);
 

@@ -103,9 +103,9 @@ hmcs40_cpu_device::hmcs40_cpu_device(const machine_config &mconfig, device_type 
 	, m_family(family)
 	, m_polarity(polarity)
 	, m_stack_levels(stack_levels)
-	, m_read_r(*this)
+	, m_read_r(*this, polarity & 0xf)
 	, m_write_r(*this)
-	, m_read_d(*this)
+	, m_read_d(*this, polarity)
 	, m_write_d(*this)
 {
 }
@@ -204,12 +204,6 @@ void hmcs40_cpu_device::device_start()
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
 	m_pcmask = (1 << m_pcwidth) - 1;
-
-	// resolve callbacks
-	m_read_r.resolve_all_safe(m_polarity & 0xf);
-	m_write_r.resolve_all_safe();
-	m_read_d.resolve_safe(m_polarity);
-	m_write_d.resolve_safe();
 
 	// zerofill
 	memset(m_stack, 0, sizeof(m_stack));

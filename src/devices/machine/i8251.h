@@ -15,8 +15,7 @@
 
 #include "diserial.h"
 
-class i8251_device :  public device_t,
-	public device_serial_interface
+class i8251_device : public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
@@ -66,8 +65,7 @@ protected:
 			device_t *owner,
 			uint32_t clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -149,7 +147,7 @@ private:
 	u8 m_data_bits_count;
 };
 
-class v5x_scu_device :  public i8251_device
+class v5x_scu_device : public i8251_device
 {
 public:
 	// construction/destruction
@@ -159,6 +157,7 @@ public:
 	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

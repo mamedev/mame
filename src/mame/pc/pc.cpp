@@ -1707,7 +1707,7 @@ ROM_END
 
 /******************************************************Leading Edge Model M ***
 
-aka the Sperry PC, the "Sperry HT - 4.71 Bios" that can be found online is identical to the v.4.71 below
+aka the Sperry PC, the "Sperry HT - 4.71 BIOS" that can be found online is identical to the v.4.71 below
 E-TD10 - TOD Error
 acording to http://www.o3one.org/hwdocs/bios_doc/dosref22.html this machine had AT-like RTC services
 The "M" stood for a Mitsubishi made machine, the "Leading Edge Model D" was made by Daewoo

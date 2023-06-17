@@ -182,10 +182,7 @@ void esrip_device::make_ops()
 void esrip_device::device_start()
 {
 	/* Register configuration structure callbacks */
-	m_fdt_r.resolve_safe(0);
-	m_fdt_w.resolve_safe();
 	m_lbrm = (uint8_t*)machine().root_device().memregion(m_lbrm_prom)->base();
-	m_status_in.resolve_safe(0);
 	m_draw.resolve();
 
 	/* Allocate image pointer table RAM */
@@ -1670,9 +1667,9 @@ DEFINE_DEVICE_TYPE(ESRIP, esrip_device, "esrip", "Entertainment Sciences RIP")
 esrip_device::esrip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, ESRIP, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 64, 9, -3)
-	, m_fdt_r(*this)
+	, m_fdt_r(*this, 0)
 	, m_fdt_w(*this)
-	, m_status_in(*this)
+	, m_status_in(*this, 0)
 	, m_draw(*this)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_lbrm_prom(nullptr)

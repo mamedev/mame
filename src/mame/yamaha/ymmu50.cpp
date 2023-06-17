@@ -5,7 +5,6 @@
     Yamaha MU-50 : 16-voice polyphonic/multitimbral General MIDI/GS/XG tone modules
     Preliminary driver by R. Belmont and O. Galibert
 
-
 **************************************************************************************/
 
 #include "emu.h"

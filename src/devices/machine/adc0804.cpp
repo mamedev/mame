@@ -59,7 +59,7 @@ ALLOW_SAVE_TYPE(adc0804_device::read_mode);
 
 adc0804_device::adc0804_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_vin_callback(*this)
+	, m_vin_callback(*this, 0)
 	, m_intr_callback(*this)
 	, m_res(0.0)
 	, m_cap(0.0)
@@ -97,9 +97,6 @@ adc0803_device::adc0803_device(const machine_config &mconfig, const char *tag, d
 
 void adc0804_device::device_resolve_objects()
 {
-	m_vin_callback.resolve_safe(0);
-	m_intr_callback.resolve_safe();
-
 	if (m_rd_mode == RD_GROUNDED)
 		m_rd_active = true;
 }

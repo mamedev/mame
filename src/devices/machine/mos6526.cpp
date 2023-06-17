@@ -587,20 +587,20 @@ void mos6526_device::synchronize()
 //  mos6526_device - constructor
 //-------------------------------------------------
 
-mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
-	: device_t(mconfig, type, tag, owner, clock),
-		device_execute_interface(mconfig, *this),
-		m_icount(0),
-		m_variant(variant),
-		m_tod_clock(0),
-		m_write_irq(*this),
-		m_write_pc(*this),
-		m_write_cnt(*this),
-		m_write_sp(*this),
-		m_read_pa(*this),
-		m_write_pa(*this),
-		m_read_pb(*this),
-		m_write_pb(*this)
+mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_execute_interface(mconfig, *this),
+	m_icount(0),
+	m_variant(variant),
+	m_tod_clock(0),
+	m_write_irq(*this),
+	m_write_pc(*this),
+	m_write_cnt(*this),
+	m_write_sp(*this),
+	m_read_pa(*this, 0xff),
+	m_write_pa(*this),
+	m_read_pb(*this, 0xff),
+	m_write_pb(*this)
 {
 }
 
@@ -630,16 +630,6 @@ void mos6526_device::device_start()
 	m_flag = 1;
 	m_cnt = 1;
 	m_cra = 0;
-
-	// resolve callbacks
-	m_write_irq.resolve_safe();
-	m_write_pc.resolve_safe();
-	m_write_cnt.resolve_safe();
-	m_write_sp.resolve_safe();
-	m_read_pa.resolve_safe(0xff);
-	m_write_pa.resolve_safe();
-	m_read_pb.resolve_safe(0xff);
-	m_write_pb.resolve_safe();
 
 	// allocate timer
 	if (m_tod_clock != 0)

@@ -127,12 +127,6 @@ void st6228_device::device_start()
 	m_data_rom_bank->configure_entries(0, 128, m_rom->base(), 0x40);
 
 	m_data_bank->set_base(&m_regs[0x80]);
-
-	m_porta_out.resolve_all_safe();
-	m_portb_out.resolve_all_safe();
-	m_portc_out.resolve_all_safe();
-	m_portd_out.resolve_all_safe();
-	m_timer_out.resolve_safe();
 }
 
 void st6228_device::device_reset()

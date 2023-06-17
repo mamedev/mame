@@ -39,8 +39,6 @@ void cdp1879_device::device_start()
 	m_clock_timer = timer_alloc(FUNC(cdp1879_device::clock_tick), this);
 	m_clock_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 
-	m_irq_w.resolve_safe();
-
 	// state saving
 	save_item(NAME(m_regs));
 	save_item(NAME(m_comparator_state));

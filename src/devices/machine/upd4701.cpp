@@ -35,7 +35,7 @@ upd4701_device::upd4701_device(const machine_config &mconfig, const char *tag, d
 	, m_cf(true)
 	, m_cf_cb(*this)
 	, m_sf_cb(*this)
-	, m_open_bus_cb(*this)
+	, m_open_bus_cb(*this, 0)
 {
 }
 
@@ -45,11 +45,6 @@ upd4701_device::upd4701_device(const machine_config &mconfig, const char *tag, d
 
 void upd4701_device::device_start()
 {
-	// resolve callbacks
-	m_cf_cb.resolve_safe();
-	m_sf_cb.resolve_safe();
-	m_open_bus_cb.resolve_safe(0);
-
 	// register state for saving
 	save_item(NAME(m_cs));
 	save_item(NAME(m_xy));

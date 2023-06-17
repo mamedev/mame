@@ -255,11 +255,6 @@ void victor_9000_fdc_device::device_start()
 {
 	m_leds.resolve();
 
-	// resolve callbacks
-	m_irq_cb.resolve_safe();
-	m_syn_cb.resolve_safe();
-	m_lbrdy_cb.resolve_safe();
-
 	// allocate timer
 	t_gen = timer_alloc(FUNC(victor_9000_fdc_device::gen_tick), this);
 	t_tach[0] = timer_alloc(FUNC(victor_9000_fdc_device::tach0_tick), this);

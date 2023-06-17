@@ -671,7 +671,6 @@ void legacy_floppy_image_device::device_start()
 	m_active = false;
 
 	/* resolve callbacks */
-	m_out_idx_func.resolve_safe();
 	//m_in_mon_func.resolve(m_config->in_mon_func, *this);
 	//m_out_tk00_func.resolve(m_config->out_tk00_func, *this);
 	//m_out_wpt_func.resolve(m_config->out_wpt_func, *this);

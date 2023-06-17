@@ -42,7 +42,6 @@ private:
 	required_device<wd2793_device> m_fdc;
 };
 
-// device type declaration
 DECLARE_DEVICE_TYPE(ATARI1050, atari1050_device)
 
 #endif // MAME_BUS_A800_ATARI1050

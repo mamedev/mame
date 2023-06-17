@@ -40,8 +40,6 @@ void cdda_device::device_start()
 	m_audio_bptr = 0;
 	m_sequence_counter = 0;
 
-	m_audio_end_cb.resolve_safe();
-
 	save_item( NAME(m_audio_playing) );
 	save_item( NAME(m_audio_pause) );
 	save_item( NAME(m_audio_ended_normally) );

@@ -90,7 +90,6 @@ void keytronic_l2207_device::device_resolve_objects()
 {
 	m_leds.resolve();
 	m_all_caps.resolve();
-	m_ser_out_callback.resolve_safe();
 }
 
 void keytronic_l2207_device::device_start()

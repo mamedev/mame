@@ -47,7 +47,6 @@ public:
 	void ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

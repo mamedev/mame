@@ -87,7 +87,6 @@ public:
 	rsp_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 	virtual ~rsp_device() override;
 
-	void resolve_cb();
 	auto dp_reg_r() { return m_dp_reg_r_func.bind(); }
 	auto dp_reg_w() { return m_dp_reg_w_func.bind(); }
 	auto sp_reg_r() { return m_sp_reg_r_func.bind(); }

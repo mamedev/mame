@@ -54,7 +54,7 @@ sun4_mmu_base_device::sun4_mmu_base_device(const machine_config &mconfig, device
 	, m_rom(*this, finder_base::DUMMY_TAG)
 	, m_scc(*this, finder_base::DUMMY_TAG)
 	, m_host(nullptr)
-	, m_type1_r(*this)
+	, m_type1_r(*this, 0xffffffff)
 	, m_type1_w(*this)
 	, m_rom_ptr(nullptr)
 	, m_ram_ptr(nullptr)
@@ -81,9 +81,6 @@ sun4c_mmu_device::sun4c_mmu_device(const machine_config &mconfig, const char *ta
 
 void sun4_mmu_base_device::device_start()
 {
-	m_type1_r.resolve_safe(0xffffffff);
-	m_type1_w.resolve_safe();
-
 	// allocate timer for system reset
 	m_reset_timer = timer_alloc(FUNC(sun4_mmu_base_device::reset_off_tick), this);
 	m_reset_timer->adjust(attotime::never);

@@ -136,20 +136,6 @@ void z80ctc_device::device_add_mconfig(machine_config &config)
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void z80ctc_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_intr_cb.resolve_safe();
-	m_zc_cb.resolve_all_safe();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

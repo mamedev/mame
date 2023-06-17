@@ -193,10 +193,8 @@ void h83003_device::device_add_mconfig(machine_config &config)
 
 void h83003_device::execute_set_input(int inputnum, int state)
 {
-	if(inputnum >= H8_INPUT_LINE_TEND0 && inputnum <= H8_INPUT_LINE_TEND3) {
-		if(!m_tend_cb[inputnum - H8_INPUT_LINE_TEND0].isnull())
-			m_tend_cb[inputnum - H8_INPUT_LINE_TEND0](state);
-	}
+	if(inputnum >= H8_INPUT_LINE_TEND0 && inputnum <= H8_INPUT_LINE_TEND3)
+		m_tend_cb[inputnum - H8_INPUT_LINE_TEND0](state);
 	else if(inputnum >= H8_INPUT_LINE_DREQ0 && inputnum <= H8_INPUT_LINE_DREQ3)
 		m_dma->set_input(inputnum, state);
 	else
@@ -266,8 +264,6 @@ void h83003_device::device_start()
 {
 	h8h_device::device_start();
 	m_dma_device = m_dma;
-
-	m_tend_cb.resolve_all();
 }
 
 void h83003_device::device_reset()

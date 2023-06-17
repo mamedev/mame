@@ -72,8 +72,6 @@ astrocade_ctrl_port_device::~astrocade_ctrl_port_device()
 void astrocade_ctrl_port_device::device_resolve_objects()
 {
 	m_device = get_card_device();
-
-	m_ltpen_handler.resolve_safe();
 }
 
 void astrocade_ctrl_port_device::device_start()

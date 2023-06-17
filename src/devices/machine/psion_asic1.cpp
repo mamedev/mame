@@ -59,20 +59,6 @@ device_memory_interface::space_config_vector psion_asic1_device::memory_space_co
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void psion_asic1_device::device_resolve_objects()
-{
-	m_int_cb.resolve_safe();
-	m_nmi_cb.resolve_safe();
-	m_frcovl_cb.resolve_safe();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

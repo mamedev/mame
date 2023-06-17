@@ -21,7 +21,7 @@ void latch8_device::update(uint8_t new_val, uint8_t mask)
 	{
 		uint8_t changed = old_val ^ m_value;
 		for (int i = 0; i < 8; i++)
-			if (BIT(changed, i) && !m_write_cb[i].isnull())
+			if (BIT(changed, i))
 				m_write_cb[i](BIT(m_value, i));
 	}
 }
@@ -45,7 +45,7 @@ uint8_t latch8_device::read(offs_t offset)
 	{
 		for (int i = 0; i < 8; i++)
 		{
-			if (!m_read_cb[i].isnull())
+			if (!m_read_cb[i].isunset())
 				res = (res & ~(1 << i)) | (m_read_cb[i]() << i);
 		}
 	}
@@ -102,7 +102,7 @@ DEFINE_DEVICE_TYPE(LATCH8, latch8_device, "latch8", "8-bit latch")
 latch8_device::latch8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LATCH8, tag, owner, clock)
 	, m_write_cb(*this)
-	, m_read_cb(*this)
+	, m_read_cb(*this, 0)
 	, m_value(0)
 	, m_has_write(false)
 	, m_has_read(false)
@@ -121,7 +121,7 @@ latch8_device::latch8_device(const machine_config &mconfig, const char *tag, dev
 void latch8_device::device_validity_check(validity_checker &valid) const
 {
 	for (int i = 0; i < 8; i++)
-		if (!m_read_cb[i].isnull() && !m_write_cb[i].isnull())
+		if (!m_read_cb[i].isunset() && !m_write_cb[i].isunset())
 			osd_printf_error("Device %s: Bit %d already has a handler.\n", tag(), i);
 }
 
@@ -134,17 +134,15 @@ void latch8_device::device_start()
 	// setup nodemap
 	for (auto &cb : m_write_cb)
 	{
-		if (!cb.isnull())
+		if (!cb.isunset())
 			m_has_write = true;
-		cb.resolve();
 	}
 
 	// setup device read handlers
 	for (auto &cb : m_read_cb)
 	{
-		if (!cb.isnull())
+		if (!cb.isunset())
 			m_has_read = true;
-		cb.resolve();
 	}
 
 	save_item(NAME(m_value));

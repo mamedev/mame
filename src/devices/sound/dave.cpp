@@ -77,11 +77,6 @@ dave_device::dave_device(const machine_config &mconfig, const char *tag, device_
 
 void dave_device::device_start()
 {
-	// resolve callbacks
-	m_write_irq.resolve_safe();
-	m_write_lh.resolve_safe();
-	m_write_rh.resolve_safe();
-
 	// allocate timers
 	m_timer_1hz = timer_alloc(FUNC(dave_device::update_1hz_timer), this);
 	m_timer_1hz->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));

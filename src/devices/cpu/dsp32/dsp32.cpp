@@ -185,8 +185,6 @@ dsp32c_device::dsp32c_device(const machine_config &mconfig, const char *tag, dev
 
 void dsp32c_device::device_start()
 {
-	m_output_pins_changed.resolve_safe();
-
 	// get our address spaces
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);

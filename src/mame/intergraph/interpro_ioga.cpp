@@ -141,13 +141,13 @@ interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, device
 	, m_force_state(0)
 	, m_softint(0)
 	, m_dma_channel{
-		{ 0,0,0,0,CLEAR_LINE, {*this}, {*this}, ARBCTL_BGR_PLOT, DMA_PLOTTER, "plotter" },
-		{ 0,0,0,0,CLEAR_LINE, {*this}, {*this}, ARBCTL_BGR_SCSI, DMA_SCSI, "scsi" },
-		{ 0,0,0,0,CLEAR_LINE, {*this}, {*this}, ARBCTL_BGR_FDC, DMA_FLOPPY, "floppy" } }
+		{ 0,0,0,0,CLEAR_LINE, {*this, 0}, {*this}, ARBCTL_BGR_PLOT, DMA_PLOTTER, "plotter" },
+		{ 0,0,0,0,CLEAR_LINE, {*this, 0}, {*this}, ARBCTL_BGR_SCSI, DMA_SCSI, "scsi" },
+		{ 0,0,0,0,CLEAR_LINE, {*this, 0}, {*this}, ARBCTL_BGR_FDC, DMA_FLOPPY, "floppy" } }
 	, m_serial_dma_channel{
-		{ 0,0,CLEAR_LINE, {*this}, {*this}, ARBCTL_BGR_SER0, 0, "serial0" },
-		{ 0,0,CLEAR_LINE, {*this}, {*this}, ARBCTL_BGR_SER1, 1, "serial1" },
-		{ 0,0,CLEAR_LINE, {*this}, {*this}, ARBCTL_BGR_SER2, 2, "serial2" } }
+		{ 0,0,CLEAR_LINE, {*this, 0}, {*this}, ARBCTL_BGR_SER0, 0, "serial0" },
+		{ 0,0,CLEAR_LINE, {*this, 0}, {*this}, ARBCTL_BGR_SER1, 1, "serial1" },
+		{ 0,0,CLEAR_LINE, {*this, 0}, {*this}, ARBCTL_BGR_SER2, 2, "serial2" } }
 {
 }
 
@@ -171,26 +171,7 @@ void interpro_ioga_device::device_start()
 {
 	m_memory_space->cache(m_memory);
 
-	// resolve callbacks
-	m_out_nmi_func.resolve();
-	m_out_irq_func.resolve();
-	m_out_irq_vector_func.resolve();
-	m_fdc_tc_func.resolve();
-	m_eth_ca_func.resolve();
-
 	m_hwicr = std::make_unique<u16[]>(get_int_count());
-
-	for (dma_channel_t &dma_channel : m_dma_channel)
-	{
-		dma_channel.device_r.resolve();
-		dma_channel.device_w.resolve();
-	}
-
-	for (serial_dma_channel_t &dma_channel : m_serial_dma_channel)
-	{
-		dma_channel.device_r.resolve();
-		dma_channel.device_w.resolve();
-	}
 
 	// allocate timers
 	m_interrupt_timer = timer_alloc(FUNC(interpro_ioga_device::interrupt_check), this);

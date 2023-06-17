@@ -464,14 +464,12 @@ void rtc65271_device::field_interrupts()
 	if (m_regs[reg_C] & m_regs[reg_B] & (reg_C_PF | reg_C_AF | reg_C_UF))
 	{
 		m_regs[reg_C] |= reg_C_IRQF;
-		if (!m_interrupt_cb.isnull())
-			m_interrupt_cb(1);
+		m_interrupt_cb(1);
 	}
 	else
 	{
 		m_regs[reg_C] &= ~reg_C_IRQF;
-		if (!m_interrupt_cb.isnull())
-			m_interrupt_cb(0);
+		m_interrupt_cb(0);
 	}
 }
 
@@ -688,7 +686,6 @@ void rtc65271_device::device_start()
 	m_end_update_timer = timer_alloc(FUNC(rtc65271_device::rtc_end_update_cb), this);
 	m_end_update_timer->adjust(attotime::never);
 	m_SQW_timer = timer_alloc(FUNC(rtc65271_device::rtc_SQW_cb), this);
-	m_interrupt_cb.resolve();
 
 	save_item(NAME(m_regs));
 	save_item(NAME(m_cur_reg));

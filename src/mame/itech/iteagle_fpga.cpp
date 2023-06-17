@@ -49,11 +49,11 @@ iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const ch
 	m_scc1(*this, AM85C30_TAG),
 	m_screen(*this, finder_base::DUMMY_TAG),
 	m_cpu(*this, finder_base::DUMMY_TAG),
-	m_in_cb(*this),
-	m_trackx_cb(*this),
-	m_tracky_cb(*this),
-	m_gunx_cb(*this),
-	m_guny_cb(*this),
+	m_in_cb(*this, 0xffff),
+	m_trackx_cb(*this, 0xff),
+	m_tracky_cb(*this, 0xff),
+	m_gunx_cb(*this, 0xffff),
+	m_guny_cb(*this, 0xffff),
 	m_version(0),
 	m_seq_init(0)
 {
@@ -123,15 +123,6 @@ void iteagle_fpga_device::device_start()
 	bank_infos[2].adr = 0x000e0000 & (~(bank_infos[2].size - 1));
 
 	m_timer = timer_alloc(FUNC(iteagle_fpga_device::assert_vblank_irq), this);
-
-	// Switch IO
-	m_in_cb.resolve_all_safe(0xffff);
-	// Track IO
-	m_trackx_cb.resolve_safe(0xff);
-	m_tracky_cb.resolve_safe(0xff);
-	// Gun IO
-	m_gunx_cb.resolve_safe(0xffff);
-	m_guny_cb.resolve_safe(0xffff);
 
 	// Save states
 	save_item(NAME(m_fpga_regs));

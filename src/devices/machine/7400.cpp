@@ -22,8 +22,6 @@ ttl7400_device::ttl7400_device(const machine_config &mconfig, const char *tag, d
 
 void ttl7400_device::device_start()
 {
-	m_y_func.resolve_all_safe();
-
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));
 	save_item(NAME(m_y));

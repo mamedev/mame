@@ -47,7 +47,6 @@ protected:
 	emu_timer *m_timer;
 
 	devcb_write_line    m_tout_out_cb;
-	devcb_write_line    m_tin_in_cb;
 	devcb_write_line    m_tgate_in_cb;
 	void do_timer_irq();
 	void do_timer_tick();

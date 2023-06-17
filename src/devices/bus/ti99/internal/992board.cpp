@@ -139,13 +139,13 @@ DEFINE_DEVICE_TYPE(TI992_RAM32K, bus::ti99::internal::ti992_expram_device, "ti99
 
 namespace bus::ti99::internal {
 
-video992_device::video992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-	  device_video_interface(mconfig, *this),
-	  m_mem_read_cb(*this),
-	  m_hold_cb(*this),
-	  m_int_cb(*this),
-	  m_videna(true)
+video992_device::video992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_video_interface(mconfig, *this),
+	m_mem_read_cb(*this, 0),
+	m_hold_cb(*this),
+	m_int_cb(*this),
+	m_videna(true)
 {
 }
 
@@ -295,10 +295,6 @@ void video992_device::device_start()
 	m_border_color = rgb_t::black();
 	m_background_color = rgb_t::white();
 	m_text_color = rgb_t::black();
-
-	m_mem_read_cb.resolve();
-	m_hold_cb.resolve();
-	m_int_cb.resolve();
 }
 
 void video992_device::device_reset()
@@ -444,8 +440,6 @@ void io992_device::device_start()
 
 	// Establish callback for inbound propagations
 	m_hexbus_outbound->set_chain_element(this);
-
-	m_set_rom_bank.resolve();
 }
 
 uint8_t io992_device::cruread(offs_t offset)

@@ -47,12 +47,6 @@ void psxsio_device::device_post_load()
 
 void psxsio_device::device_start()
 {
-	m_irq_handler.resolve_safe();
-	m_sck_handler.resolve_safe();
-	m_txd_handler.resolve_safe();
-	m_dtr_handler.resolve_safe();
-	m_rts_handler.resolve_safe();
-
 	m_timer = timer_alloc(FUNC( psxsio_device::sio_tick ), this);
 	m_mode = 0;
 	m_control = 0;

@@ -21,11 +21,6 @@ tv950kb_device::tv950kb_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void tv950kb_device::device_resolve_objects()
-{
-	m_tx_cb.resolve_safe();
-}
-
 void tv950kb_device::device_start()
 {
 }

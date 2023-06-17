@@ -85,8 +85,6 @@ void ide_pci_device::device_start()
 	pci_bar[3] = 0x374;
 	pci_bar[4] = 0xf00;
 
-	m_irq_handler.resolve_safe();
-
 	intr_pin = 0x1;
 	intr_line = 0xe;
 

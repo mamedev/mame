@@ -42,7 +42,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_resolve_objects() override;
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);

@@ -191,9 +191,6 @@ econet_device::econet_device(const machine_config &mconfig, const char *tag, dev
 
 void econet_device::device_start()
 {
-	// resolve callbacks
-	m_write_clk.resolve_safe();
-	m_write_data.resolve_safe();
 }
 
 

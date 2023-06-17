@@ -83,8 +83,6 @@ void smc91c9x_device::device_start()
 	// TX timer
 	m_tx_poll = timer_alloc(FUNC(smc91c9x_device::tx_poll), this);
 
-	m_irq_handler.resolve_safe();
-
 	// These registers don't get cleared on reset
 	m_reg[B1_CONFIG] = 0x0030;   m_regmask[B1_CONFIG] = 0x17c6;
 	m_reg[B1_BASE]   = 0x1866;   m_regmask[B1_BASE] = 0xfffe;

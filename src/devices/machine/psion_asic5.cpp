@@ -53,8 +53,8 @@ psion_asic5_device::psion_asic5_device(const machine_config &mconfig, const char
 	: device_t(mconfig, PSION_ASIC5, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, m_mode(~uint8_t(0))
-	, m_in_a_handler(*this)
-	, m_in_b_handler(*this)
+	, m_in_a_handler(*this, 0)
+	, m_in_b_handler(*this, 0)
 	, m_out_a_handler(*this)
 	, m_out_b_handler(*this)
 	, m_out_c_handler(*this)
@@ -81,14 +81,6 @@ void psion_asic5_device::device_validity_check(validity_checker &valid) const
 
 void psion_asic5_device::device_start()
 {
-	m_in_a_handler.resolve();
-	m_in_b_handler.resolve();
-	m_out_a_handler.resolve_safe();
-	m_out_b_handler.resolve_safe();
-	m_out_c_handler.resolve_safe();
-	m_out_d_handler.resolve_safe();
-	m_out_e_handler.resolve_safe();
-
 	save_item(NAME(m_port_b_counter));
 	save_item(NAME(m_port_b_latch));
 	save_item(NAME(m_port_b_mode));

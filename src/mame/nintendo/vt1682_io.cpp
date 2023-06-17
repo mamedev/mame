@@ -20,24 +20,15 @@ vrt_vt1682_io_device::vrt_vt1682_io_device(const machine_config &mconfig, const 
 	m_portb_out(*this),
 	m_portc_out(*this),
 	m_portd_out(*this),
-	m_porta_in(*this),
-	m_portb_in(*this),
-	m_portc_in(*this),
-	m_portd_in(*this)
+	m_porta_in(*this, 0),
+	m_portb_in(*this, 0),
+	m_portc_in(*this, 0),
+	m_portd_in(*this, 0)
 {
 }
 
 void vrt_vt1682_io_device::device_start()
 {
-	m_porta_out.resolve_safe();
-	m_portb_out.resolve_safe();
-	m_portc_out.resolve_safe();
-	m_portd_out.resolve_safe();
-	m_porta_in.resolve_safe(0);
-	m_portb_in.resolve_safe(0);
-	m_portc_in.resolve_safe(0);
-	m_portd_in.resolve_safe(0);
-
 	save_item(NAME(m_210d_ioconfig));
 }
 

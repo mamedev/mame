@@ -121,10 +121,6 @@ bml3bus_device::bml3bus_device(const machine_config &mconfig, device_type type, 
 
 void bml3bus_device::device_start()
 {
-	// resolve callbacks
-	m_out_nmi_cb.resolve_safe();
-	m_out_irq_cb.resolve_safe();
-	m_out_firq_cb.resolve_safe();
 }
 
 //-------------------------------------------------

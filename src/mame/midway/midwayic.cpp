@@ -765,10 +765,6 @@ void midway_ioasic_device::device_start()
 	}
 
 	m_shuffle_map = &shuffle_maps[m_shuffle_type][0];
-	// resolve callbacks
-	m_irq_callback.resolve_safe();
-	m_serial_tx_cb.resolve_safe();
-	m_aux_output_cb.resolve();
 
 	/* initialize the PIC */
 	midway_serial_pic2_device::device_start();
@@ -831,8 +827,7 @@ void midway_ioasic_device::update_ioasic_irq()
 	if (new_state != m_irq_state)
 	{
 		m_irq_state = new_state;
-		if (!m_irq_callback.isnull())
-			m_irq_callback(m_irq_state ? ASSERT_LINE : CLEAR_LINE);
+		m_irq_callback(m_irq_state ? ASSERT_LINE : CLEAR_LINE);
 		if (m_irq_state && (m_reg[IOASIC_UARTIN] & 0x1000))
 			LOGIRQ("IOASIC: Asserting IRQ INTCTRL=%04x INTSTAT=%04X\n", m_reg[IOASIC_INTCTL], m_reg[IOASIC_INTSTAT]);
 	}
@@ -1231,8 +1226,7 @@ void midway_ioasic_device::write(offs_t offset, uint32_t data, uint32_t mem_mask
 
 		case IOASIC_PICIN:
 			/* This is P15 on vegas boards */
-			if (!m_aux_output_cb.isnull())
-				m_aux_output_cb(data);
+			m_aux_output_cb(data);
 			break;
 
 		case IOASIC_INTCTL:

@@ -39,14 +39,6 @@ void mc68000_sysbus_device::add_card(int slot, device_mc68000_sysbus_card_interf
 
 void mc68000_sysbus_device::device_start()
 {
-	// resolve callbacks
-	m_irq1_cb.resolve_safe();
-	m_irq2_cb.resolve_safe();
-	m_irq3_cb.resolve_safe();
-	m_irq4_cb.resolve_safe();
-	m_irq5_cb.resolve_safe();
-	m_irq6_cb.resolve_safe();
-	m_irq7_cb.resolve_safe();
 
 	// clear slots
 	std::fill(std::begin(m_device_list), std::end(m_device_list), nullptr);

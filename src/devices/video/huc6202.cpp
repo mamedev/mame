@@ -17,17 +17,17 @@ DEFINE_DEVICE_TYPE(HUC6202, huc6202_device, "huc6202", "Hudson HuC6202 VPC")
 
 huc6202_device::huc6202_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HUC6202, tag, owner, clock)
-	, m_next_pixel_0_cb(*this)
-	, m_time_til_next_event_0_cb(*this)
+	, m_next_pixel_0_cb(*this, 0)
+	, m_time_til_next_event_0_cb(*this, 1)
 	, m_vsync_changed_0_cb(*this)
 	, m_hsync_changed_0_cb(*this)
-	, m_read_0_cb(*this)
+	, m_read_0_cb(*this, 0)
 	, m_write_0_cb(*this)
-	, m_next_pixel_1_cb(*this)
-	, m_time_til_next_event_1_cb(*this)
+	, m_next_pixel_1_cb(*this, 0)
+	, m_time_til_next_event_1_cb(*this, 1)
 	, m_vsync_changed_1_cb(*this)
 	, m_hsync_changed_1_cb(*this)
-	, m_read_1_cb(*this)
+	, m_read_1_cb(*this, 0)
 	, m_write_1_cb(*this)
 	, m_window1(0), m_window2(0), m_io_device(0), m_map_index(0), m_map_dirty(0)
 {
@@ -297,34 +297,15 @@ void huc6202_device::io_write(offs_t offset, u8 data)
 
 void huc6202_device::device_start()
 {
-	/* Resolve callbacks */
-	m_next_pixel_0_cb.resolve();
-	m_time_til_next_event_0_cb.resolve();
-	m_hsync_changed_0_cb.resolve();
-	m_vsync_changed_0_cb.resolve();
-	m_read_0_cb.resolve();
-	m_write_0_cb.resolve();
-
-	m_next_pixel_1_cb.resolve();
-	m_time_til_next_event_1_cb.resolve();
-	m_hsync_changed_1_cb.resolve();
-	m_vsync_changed_1_cb.resolve();
-	m_read_1_cb.resolve();
-	m_write_1_cb.resolve();
-
 	/* We want all our callbacks to be resolved */
-	assert( ! m_next_pixel_0_cb.isnull() );
-	assert( ! m_time_til_next_event_0_cb.isnull() );
-	assert( ! m_hsync_changed_0_cb.isnull() );
-	assert( ! m_vsync_changed_0_cb.isnull() );
-	assert( ! m_read_0_cb.isnull() );
-	assert( ! m_write_0_cb.isnull() );
-	assert( ! m_next_pixel_1_cb.isnull() );
-	assert( ! m_time_til_next_event_1_cb.isnull() );
-	assert( ! m_hsync_changed_1_cb.isnull() );
-	assert( ! m_vsync_changed_1_cb.isnull() );
-	assert( ! m_read_1_cb.isnull() );
-	assert( ! m_write_1_cb.isnull() );
+	assert(!m_next_pixel_0_cb.isunset());
+	assert(!m_time_til_next_event_0_cb.isunset());
+	assert(!m_read_0_cb.isunset());
+	assert(!m_write_0_cb.isunset());
+	assert(!m_next_pixel_1_cb.isunset());
+	assert(!m_time_til_next_event_1_cb.isunset());
+	assert(!m_read_1_cb.isunset());
+	assert(!m_write_1_cb.isunset());
 
 	/* Register save items */
 	save_item(NAME(m_prio[0].prio_type));

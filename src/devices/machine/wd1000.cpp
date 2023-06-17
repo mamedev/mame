@@ -57,10 +57,6 @@ void wd1000_device::set_sector_base(uint32_t base)
 
 void wd1000_device::device_start()
 {
-	// Resolve callbacks
-	m_intrq_cb.resolve_safe();
-	m_drq_cb.resolve();
-
 	// Allocate timers
 	m_seek_timer = timer_alloc(FUNC(wd1000_device::update_seek), this);
 	m_drq_timer = timer_alloc(FUNC(wd1000_device::delayed_drq), this);
@@ -185,8 +181,7 @@ void wd1000_device::set_drq()
 	if ((m_status & S_DRQ) == 0)
 	{
 		m_status |= S_DRQ;
-		if (!m_drq_cb.isnull())
-			m_drq_cb(true);
+		m_drq_cb(true);
 	}
 }
 
@@ -195,8 +190,7 @@ void wd1000_device::drop_drq()
 	if (m_status & S_DRQ)
 	{
 		m_status &= ~S_DRQ;
-		if (!m_drq_cb.isnull())
-			m_drq_cb(false);
+		m_drq_cb(false);
 	}
 }
 
