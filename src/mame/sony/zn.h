@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "taito_zm.h"
 #include "znmcu.h"
 
 #include "rax.h"
@@ -31,6 +30,7 @@
 #include "sound/okim6295.h"
 #include "sound/qsound.h"
 #include "sound/spu.h"
+#include "sound/taito_zoom.h"
 #include "sound/ymopn.h"
 #include "sound/ymf271.h"
 #include "sound/ymz280b.h"

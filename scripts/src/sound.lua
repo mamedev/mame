@@ -982,6 +982,18 @@ if (SOUNDS["S14001A"]~=null) then
 end
 
 
+---------------------------------------------------
+-- Taito ZOOM ZSG-2
+--@src/devices/sound/taito_zoom.h,SOUNDS["TAITO_ZOOM"] = true
+---------------------------------------------------
+
+if (SOUNDS["TAITO_ZOOM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/taito_zoom.cpp",
+		MAME_DIR .. "src/devices/sound/taito_zoom.h",
+	}
+end
+
 
 ---------------------------------------------------
 -- Texas Instruments SN76477 analog chip
