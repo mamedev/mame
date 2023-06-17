@@ -38,8 +38,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void device_resolve_objects() override;
-
 	devcb_write8 m_irq_line;
 
 	uint8_t m_intr_lines;
