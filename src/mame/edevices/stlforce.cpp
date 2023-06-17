@@ -61,12 +61,13 @@ lev 7 : 0x7c : 0000 0100 - just rte
 
 TO DO :
   - unknown registers
-  - clipping issues?
+  - clipping issues? (maybe visible area should just be 384 wide, with glitches expected at edges?)
+  - layer offsets (need verifying in different situations for each game, might also be based on layer enables?)
   - priority issues?
   - same sprites buffer used in Mighty Warriors
   - clocks don't match on the games?
   - in mortalr turning on 'TEST MODE' in Service Mode causes game to use the 8x8 tilemap for some kind of debugging info, but no tiles for it exist
-    (likely not meant to work, but might render nothing there on PCB instead of using unsuitable tiles covering the display)
+    (should it render a corrupt layer or not?)
 
 */
 
@@ -304,6 +305,7 @@ void stlforce_state::stlforce(machine_config &config)
 	video.set_spriteram_tag("spriteram");
 	video.set_gfxdecode_tag("gfxdecode");
 	video.set_palette_tag("palette");
+	video.set_spritexoffset(7);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -321,7 +323,7 @@ void twinbrat_state::twinbrat(machine_config &config)
 
 	subdevice<screen_device>("screen")->set_visarea(3*8, 44*8-1, 0*8, 30*8-1);
 
-	subdevice<edevices_sforce_device>("video")->set_spritexoffset(10);
+	subdevice<edevices_sforce_device>("video")->set_spritexoffset(-2);
 
 	subdevice<okim6295_device>("oki")->set_clock(XTAL(30'000'000) / 32); // verified on 2 PCBs
 	subdevice<okim6295_device>("oki")->set_addrmap(0, &twinbrat_state::oki_map);
