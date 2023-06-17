@@ -203,7 +203,6 @@ void tx1_sound_device::tx1_coin_cnt_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 	machine().bookkeeping().coin_counter_w(1, data & 0x40);
-//  machine().bookkeeping().coin_counter_w(2, data & 0x40);
 }
 
 void buggyboy_sound_device::bb_coin_cnt_w(uint8_t data)
@@ -490,7 +489,6 @@ INPUT_PORTS_START( tx1_inputs )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear Change") PORT_TOGGLE
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 )
 
 	PORT_START("PPI_PORTD")
 	/* Wire jumper setting on sound PCB - actually unpopulated 4 switch DS.3 */
@@ -560,6 +558,7 @@ void tx1_sound_device::device_add_mconfig(machine_config &config)
 	m_ppi->in_pb_callback().set(FUNC(tx1_sound_device::tx1_ppi_portb_r));
 	m_ppi->in_pc_callback().set_ioport("PPI_PORTC");
 	m_ppi->out_pc_callback().set(FUNC(tx1_sound_device::tx1_coin_cnt_w));
+	m_ppi->tri_pc_callback().set_constant(0);
 
 	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
 	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);
@@ -930,7 +929,7 @@ INPUT_PORTS_START( buggyboy_inputs )
 	PORT_START("PPI_PORTA")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear Change") PORT_TOGGLE
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
@@ -1019,7 +1018,7 @@ INPUT_PORTS_START( buggyboyjr_inputs )
 	PORT_START("YM2149_IC19_A")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear Change") PORT_TOGGLE
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
@@ -1062,6 +1061,7 @@ void buggyboy_sound_device::device_add_mconfig(machine_config &config)
 	/* Buggy Boy uses an 8255 PPI instead of YM2149 ports for inputs! */
 	m_ppi->in_pa_callback().set_ioport("PPI_PORTA");
 	m_ppi->out_pb_callback().set(FUNC(buggyboy_sound_device::bb_coin_cnt_w));
+	m_ppi->tri_pb_callback().set_constant(0);
 	m_ppi->in_pc_callback().set_ioport("PPI_PORTC");
 
 	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);

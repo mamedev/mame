@@ -30,8 +30,7 @@ public:
 		, m_subcpu(*this, "subcpu")
 		, m_soundcpu(*this, "soundcpu")
 		, m_mcu(*this, "mcu")
-		, m_i8255_1(*this, "i8255_1")
-		, m_i8255_2(*this, "i8255_2")
+		, m_i8255(*this, "i8255%u", 0U)
 		, m_adc(*this, "adc")
 		, m_screen(*this, "screen")
 		, m_sprites(*this, "sprites")
@@ -123,8 +122,7 @@ private:
 	required_device<m68000_device> m_subcpu;
 	required_device<z80_device> m_soundcpu;
 	optional_device<i8751_device> m_mcu;
-	required_device<i8255_device> m_i8255_1;
-	required_device<i8255_device> m_i8255_2;
+	required_device_array<i8255_device, 2> m_i8255;
 	required_device<adc0804_device> m_adc;
 	required_device<screen_device> m_screen;
 	required_device<sega_16bit_sprite_device> m_sprites;
