@@ -283,12 +283,15 @@ void heath_tlb_device::check_for_reset()
 	if (m_reset_key && m_right_shift)
 	{
 		m_reset_pending = true;
+		m_reset(ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 	else if (m_reset_pending)
 	{
 		m_reset_pending = false;
 		reset();
-		m_reset(ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_reset(CLEAR_LINE);
 	}
 }
 

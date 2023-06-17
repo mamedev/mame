@@ -395,6 +395,7 @@ void h89_state::reset_line(int data)
 	{
 		reset();
 	}
+	m_maincpu->set_input_line(INPUT_LINE_RESET, data);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(h89_state::h89_irq_timer)
