@@ -260,7 +260,7 @@ namespace bx
 			right = normalize(uxv);
 		}
 
-		up = cross(right, view);
+		up = cross(view, right);
 
 		_result[ 0] = right.x;
 		_result[ 1] = up.x;
