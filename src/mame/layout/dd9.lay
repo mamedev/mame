@@ -6,29 +6,24 @@ license:CC0-1.0
 	<!-- general grey backdrop -->
 	<element name="greyback">
 		<rect>
-			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="0.1" green="0.1" blue="0.1" />
 		</rect>
 	</element>
 
 	<element name="border">
 		<rect>
-			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="0.05" green="0.05" blue="0.05" />
 		</rect>
 	</element>
 
 	<element name="black">
 		<rect>
-			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="0" green="0" blue="0" />
 		</rect>
 	</element>
 
 	<element name="white">
-		<rect>
-			<bounds left="0" top="0" right="1" bottom="1" />
-		</rect>
+		<rect />
 	</element>
 
 	<!-- text elements -->
