@@ -234,21 +234,21 @@ license:CC0-1.0
 	</software>
 
 	<software name="8progs">
+		<!--
+			Programs included:
+				FAI				LOAD "A"
+				Geodrifter		LOAD "B"
+				RA+DEC			LOAD "C"
+				Moontrack		LOAD "D"
+				Yankee Clipper	LOAD "E"
+				Tensat			LOAD "F"
+				Oscar10			LOAD "G"
+				TenPlan			LOAD "H"
+		-->
 		<description>8 Programmes by GM4IHJ</description>
 		<year>198?</year>
 		<publisher>AMSAT-UK Software Service</publisher>
 		<info name="usage" value="Load with LOAD &quot;A&quot;, LOAD &quot;B&quot;, etc" />
-		<notes><![CDATA[
-Programs included:
-	FAI				LOAD "A"
-	Geodrifter		LOAD "B"
-	RA+DEC			LOAD "C"
-	Moontrack		LOAD "D"
-	Yankee Clipper	LOAD "E"
-	Tensat			LOAD "F"
-	Oscar10			LOAD "G"
-	TenPlan			LOAD "H"
-]]></notes>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="56578">
 				<rom name="8Programs.tzx" size="56578" crc="bb788390" sha1="e2185c5962d8c89bb020028a22e25470405bef0f" />
@@ -429,12 +429,10 @@ Programs included:
 	</software>
 
 	<software name="ams81">
+		<!--	Code in both sides is identical.	-->
 		<description>AMSAT AMS-81 Tracking System (Version N5BF 1.4)</description>
 		<year>1983</year>
 		<publisher>The Radio Amateur Satellite Corporation</publisher>
-		<notes><![CDATA[
-Code in both sides is identical.
-]]></notes>
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="A" />
 			<dataarea name="cass" size="13817">
