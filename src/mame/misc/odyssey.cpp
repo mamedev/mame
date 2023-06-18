@@ -70,11 +70,8 @@
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
-#include "machine/i82443bx_host.h"
-#include "machine/i82371eb_isa.h"
-#include "machine/i82371eb_ide.h"
-#include "machine/i82371eb_acpi.h"
-#include "machine/i82371eb_usb.h"
+#include "machine/i82371sb.h"
+#include "machine/i82439hx.h"
 #include "video/virge_pci.h"
 #include "bus/isa/isa_cards.h"
 //#include "bus/rs232/hlemouse.h"
@@ -123,7 +120,7 @@ INPUT_PORTS_END
 
 static void isa_internal_devices(device_slot_interface &device)
 {
-	// TODO: should be a National Semiconductor PC87306B Super I/O
+	// TODO: should be a National Semiconductor PC87306B Super I/O (at I/O ports $2e-$2f)
 	device.option_add("fdc37c93x", FDC37C93X);
 }
 
@@ -156,6 +153,7 @@ static void isa_com(device_slot_interface &device)
 }
 
 // This emulates a Tucson / Triton-II chipset, earlier i430fx TBD
+// PCI config space is trusted by Intel TC430HX "Technical Product Specification"
 void odyssey_state::odyssey(machine_config &config)
 {
 	PENTIUM(config, m_maincpu, 133'000'000); 	// a Celeron at 1.70 GHz on the MB I checked. <- doesn't match being a Triton/Triton-II ... -AS
@@ -167,6 +165,7 @@ void odyssey_state::odyssey(machine_config &config)
 	PCI_ROOT(config, "pci", 0);
 	I82439HX(config, "pci:00.0", 0, m_maincpu, 64*1024*1024);
 
+	// TODO: 82371FB
 	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0, "maincpu"));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
@@ -175,8 +174,15 @@ void odyssey_state::odyssey(machine_config &config)
 	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
 
+	// TODO: 82371FB USB at 07.2
+
 	// On-board Virge or Virge/DX
-	VIRGE_PCI(config, "pci:12.0", 0);
+	VIRGE_PCI(config, "pci:08.0", 0);
+
+	// pci:0d.0 (J4E1) PCI expansion slot 1
+	// pci:0e.0 (J4D2) PCI expansion slot 2
+	// pci:0f.0 (J4D1) PCI expansion slot 3
+	// pci:10.0 (J4C1) PCI expansion slot 4
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", smc_superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
