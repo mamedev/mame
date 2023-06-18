@@ -15884,9 +15884,12 @@ cncchess
 
 @source:chess/conchess.cpp
 conc
+conca
 concams
 concams5
 concgla
+concglap
+concglapa
 concvicp
 
 @source:chess/conic_cchess2.cpp
