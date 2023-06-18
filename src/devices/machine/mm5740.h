@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: R. Belmont
+// copyright-holders: R. Belmont, Mark Garlanger
 /**********************************************************************
 
     MM5740 Keyboard Encoder emulation
@@ -33,7 +33,7 @@ Name                 Pin No.     Function
 X1-X9                4-12        Output - Drives the key switch matrix.
 
 Y1-Y10               22-31       Inputs - connect to the X drive lines with
-                 the key switch matrix.
+                                 the key switch matrix.
 
 B1-B9                1,33-40     Tri-stated data outputs.
 
@@ -44,10 +44,10 @@ Data Strobe Control  14          Input to control data strobe output pulse width
 Output Enable        15          Input to control the chip's TRI-STATE output
 
 Repeat               16          Each cycle of this signal will issue
-                 a new data strobe for the pressed key.
+                                 a new data strobe for the pressed key.
 
 Key-Bounce Mask      17          Use capacitor on this chip to provide
-                 key debouncing
+                                 key debouncing
 
 Shift                21          Shift key pressed
 
@@ -68,7 +68,6 @@ Vgg                  18          -12V
 
 /* TODO:
     Support Key-bounce mask
-    Support Repeat function
     Support shift lock
     Support additional internal ROMs
 */
@@ -92,14 +91,16 @@ public:
 	mm5740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// public interface
-	uint16_t b_r();
+	u16 b_r();
 
 	template <unsigned N> auto x_cb() { return m_read_x[N - 1].bind(); }
 	auto shift_cb() { return m_read_shift.bind(); }
 	auto control_cb() { return m_read_control.bind(); }
 	auto data_ready_cb() { return m_write_data_ready.bind(); }
 
-	static uint32_t calc_effective_clock_key_debounce(uint32_t capacitance);
+	void repeat_line_w(int state);
+
+	static u32 calc_effective_clock_key_debounce(u32 capacitance);
 
 protected:
 	// device-level overrides
@@ -121,6 +122,8 @@ private:
 	int m_b;                    // output buffer
 
 	int m_x_mask[9];            // mask of what keys are down
+	int m_repeat;               // state of the 'repeat' input.
+	bool m_trigger_repeat;
 
 	// timers
 	emu_timer *m_scan_timer;    // keyboard scan timer
