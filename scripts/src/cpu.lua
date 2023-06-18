@@ -3833,3 +3833,13 @@ if opt_tool(CPUS, "INTERDATA16") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/interdata16/dasm16.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/interdata16/dasm16.h")
 end
+
+--------------------------------------------------
+-- SGS-Thomson ST9, disassembler only
+--@src/devices/cpu/st9/st9.h,CPUS["ST9"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "ST9") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/st9/st9dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/st9/st9dasm.h")
+end
