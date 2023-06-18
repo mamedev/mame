@@ -9375,9 +9375,9 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="nnprowrsk" cloneof="nnprowrs">
-		<description>Nyan Nyan Pro Wrestling (Korea)</description>
+		<description>Yeoja Wres (Korea)</description>
 		<year>1986</year>
-		<publisher>Sammy</publisher>
+		<publisher>Sammi Computer</publisher>
 		<info name="alt_title" value="여자 레스" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
