@@ -28400,7 +28400,23 @@ license:CC0-1.0
 
 <!-- Aftermarket games -->
 
-	<software name="grimacesc">
+	<software name="grimacesd">
+		<description>Grimace's Birthday (v1.4)</description>
+		<year>2023</year>
+		<publisher>Krool Toys</publisher>
+		<info name="release" value="20230617" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="bX4TvUeiUEfKRw8bkPGaB.gb" size="0x100000" crc="9baa5f46" sha1="d247c03119ac14f97fdeeaa6bf0defa98e35fa17" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grimacesc" cloneof="grimacesd">
 		<description>Grimace's Birthday (v1.3)</description>
 		<year>2023</year>
 		<publisher>Krool Toys</publisher>
@@ -28416,7 +28432,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="grimacesb" cloneof="grimacesc">
+	<software name="grimacesb" cloneof="grimacesd">
 		<description>Grimace's Birthday (v1.2)</description>
 		<year>2023</year>
 		<publisher>Krool Toys</publisher>
@@ -28432,7 +28448,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="grimacesa" cloneof="grimacesc">
+	<software name="grimacesa" cloneof="grimacesd">
 		<description>Grimace's Birthday (v1.1)</description>
 		<year>2023</year>
 		<publisher>Krool Toys</publisher>
@@ -28448,7 +28464,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="grimaces" cloneof="grimacesc">
+	<software name="grimaces" cloneof="grimacesd">
 		<description>Grimace's Birthday</description>
 		<year>2023</year>
 		<publisher>Krool Toys</publisher>
