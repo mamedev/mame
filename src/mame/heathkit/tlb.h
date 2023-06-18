@@ -27,8 +27,12 @@ public:
 
 	// interface routines
 	auto serial_data_callback() { return m_write_sd.bind(); }
+	auto reset_cb() { return m_reset.bind(); }
 
 	void cb1_w(int state);
+
+	void reset_key_w(int state);
+	void right_shift_w(int state);
 
 protected:
 	heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -36,6 +40,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	void mem_map(address_map &map);
@@ -46,6 +51,7 @@ protected:
 private:
 	void key_click_w(uint8_t data);
 	void bell_w(uint8_t data);
+	void check_for_reset();
 	uint8_t kbd_key_r();
 	uint8_t kbd_flags_r();
 	uint16_t translate_mm5740_b(uint16_t b);
@@ -67,6 +73,7 @@ private:
 	emu_timer *m_bell_timer;
 
 	devcb_write_line m_write_sd;
+	devcb_write_line m_reset;
 
 	required_device<palette_device> m_palette;
 	required_device<mc6845_device>  m_crtc;
@@ -82,7 +89,9 @@ private:
 	bool     m_strobe;
 	bool     m_keyclickactive;
 	bool     m_bellactive;
-
+	bool     m_reset_pending;
+	bool     m_right_shift;
+	bool     m_reset_key;
 };
 
 class heath_super19_tlb_device : public heath_tlb_device
