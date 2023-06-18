@@ -89,6 +89,7 @@ protected:
 		uint8_t m_octave = 0;
 		uint16_t m_pitch = 0;
 		uint32_t m_step = 0;
+		bool m_reverse = false;
 		uint32_t m_pan = 0;
 		uint32_t m_total_level = 0;
 		uint32_t m_dest_total_level = 0;

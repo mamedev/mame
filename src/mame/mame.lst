@@ -45470,6 +45470,7 @@ psr60                           // 1985 PSR-60
 psr70                           // 1985 PSR-70
 
 @source:yamaha/ympsr150.cpp
+dd9                             // 1994
 psr110                          // 1993
 psr150                          // 1992
 psr180                          // 1994
