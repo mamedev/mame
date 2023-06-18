@@ -5202,7 +5202,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="SG-6034"/>
-		<info name="disk_ring" value="SG-6034-R1M V"/>
+		<info name="cd_matrix" value="SG-6034-R1M V"/>
 		<info name="alt_title" value="ヘブンリー シンフォニー フォームラワン ワールド チャンピオンシップ 1993 非売品"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -5234,7 +5234,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="CDS-222"/>
-		<info name="disk_ring" value="CDS-222-R1M V"/>
+		<info name="cd_matrix" value="CDS-222-R1M V"/>
 		<info name="alt_title" value="慶応遊撃隊 体験版 非売品"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -5301,7 +5301,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="ST-45074"/>
-		<info name="disk_ring" value="ST-45074 MT B01"/>
+		<info name="cd_matrix" value="ST-45074 MT B01"/>
 		<info name="alt_title" value="ルナ-エターナルブルー 非売品 オートデモ"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -5327,7 +5327,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="CDS-10003"/>
-		<info name="disk_ring" value="CDS-10003-R1M V"/>
+		<info name="cd_matrix" value="CDS-10003-R1M V"/>
 		<info name="alt_title" value="マイクロコズム デモCD"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -5346,7 +5346,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="SG-6025"/>
-		<info name="disk_ring" value="SG-6025-R1M V"/>
+		<info name="cd_matrix" value="SG-6025-R1M V"/>
 		<info name="alt_title" value="ナイトトラップ 非売品"/>
 		<part name="cdrom1" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -5395,7 +5395,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="SG-6029"/>
-		<info name="disk_ring" value="SG-6029-R1M V"/>
+		<info name="cd_matrix" value="SG-6029-R1M V"/>
 		<info name="alt_title" value="ぽっぷるメイル 体験版 非売品"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -5415,7 +5415,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Data West</publisher>
 		<info name="serial" value="T-84024 DWMD2905"/>
-		<info name="disk_ring" value="DWMD-2905"/>
+		<info name="cd_matrix" value="DWMD-2905"/>
 		<info name="alt_title" value="サイキック・ディテクティブ・シリーズ Vol.3 AYA AUTO DEMO"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -5435,7 +5435,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="ST-45054"/>
-		<info name="disk_ring" value="ST-45054 MT 1B1 +"/>
+		<info name="cd_matrix" value="ST-45054 MT 1B1 +"/>
 		<info name="alt_title" value="シルフィード 非売品"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -5454,7 +5454,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="ST-45054"/>
-		<info name="disk_ring" value="ST-45054 MT 1B1 +"/>
+		<info name="cd_matrix" value="ST-45054 MT 1B1 +"/>
 		<info name="alt_title" value="シルフィード 非売品"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -5509,7 +5509,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 Game will not boot if the system backup RAM is not formatted.
 ]]></notes>
 		<info name="serial" value="SG-6021"/>
-		<info name="disk_ring" value="SG-6021-R3M V"/>
+		<info name="cd_matrix" value="SG-6021-R3M V"/>
 		<info name="alt_title" value="ソニック・ザ・ヘッジホッグCD 非売品"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -5546,7 +5546,7 @@ Game will not boot if the system backup RAM is not formatted.
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="CDS-10002"/>
-		<info name="disk_ring" value="CDS-10002-R1M V"/>
+		<info name="cd_matrix" value="CDS-10002-R1M V"/>
 		<info name="alt_title" value="サンダーホーク 非売品"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -5566,7 +5566,7 @@ Game will not boot if the system backup RAM is not formatted.
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="ST-45064"/>
-		<info name="disk_ring" value="ST-45064P MT B01"/>
+		<info name="cd_matrix" value="ST-45064P MT B01"/>
 		<info name="alt_title" value="うる星やつら ディア マイ フレンズ 非売品"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -5585,7 +5585,7 @@ Game will not boot if the system backup RAM is not formatted.
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="SG-6027"/>
-		<info name="disk_ring" value="SG-6027-R1M V"/>
+		<info name="cd_matrix" value="SG-6027-R1M V"/>
 		<info name="alt_title" value="夢見館の物語 非売品"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -5637,7 +5637,7 @@ Game will not boot if the system backup RAM is not formatted.
 		<year>1992</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="CDS-135"/>
-		<info name="disk_ring" value="CDS-135-3-R1M V"/>
+		<info name="cd_matrix" value="CDS-135-3-R1M V"/>
 		<info name="alt_title" value="ワンダーメガ コレクション"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">

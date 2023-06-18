@@ -778,7 +778,7 @@ See: http://rawdump.net/
 		<description>Compton's Interactive Encyclopedia v2.00S (USA)</description>
 			<year>1994</year>
 		<publisher>Compton's NewMedia</publisher>
-		<info name="ring_code" value="CIESEGAV200 R1C MFD BY JVC"/>
+		<info name="cd_matrix" value="CIESEGAV200 R1C MFD BY JVC"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="compton's interactive encyclopedia v2.00s (usa)" sha1="2d9abe1a456af0a230670e870353d41f330f8d90"/>
@@ -3524,7 +3524,6 @@ Requires [disc swap]
 Requires [32X] add-on, game asks you to plug it in if not present
 ]]></notes>
 		<info name="serial" value="157036"/>
-		<info name="release" value="199601xx" />
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="surgical strike (bra, 32x)" sha1="857e0602e35e4b45ec3660d8639fb88d2a014230"/>
@@ -3816,7 +3815,7 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		<year>1994</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="SMJ-4110"/>
-		<info name="ring_code" value="SMJ-4110-R1M V"/>
+		<info name="disk_ring" value="SMJ-4110-R1M V"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="what is x'eye multi entertainment system (usa)" sha1="926143f74d8bad9cda401bbf651051396e96aa54"/>
