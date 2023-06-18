@@ -11,6 +11,7 @@
 #include <stdint.h> // intXX_t
 #include <limits.h> // UCHAR_*
 
+#if !BX_PLATFORM_BSD
 TEST_CASE("isFinite, isInfinite, isNan", "[math]")
 {
 	for (uint64_t ii = 0; ii < UINT32_MAX; ii += rand()%(1<<13)+1)
@@ -33,6 +34,7 @@ TEST_CASE("isFinite, isInfinite, isNan", "[math]")
 #endif // BX_PLATFORM_OSX
 	}
 }
+#endif // !BX_PLATFORM_BSD
 
 bool log2_test(float _a)
 {
