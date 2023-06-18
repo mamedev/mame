@@ -337,6 +337,7 @@ void mwarr_state::mwarr(machine_config &config)
 	m_video->set_spriteram_tag("spriteram");
 	m_video->set_gfxdecode_tag("gfxdecode");
 	m_video->set_palette_tag("palette");
+	m_video->set_spritexoffset(9);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
