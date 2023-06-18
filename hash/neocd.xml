@@ -473,7 +473,7 @@ license:CC0-1.0
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ダブルドラゴン" />
 		<info name="serial" value="NGCD-082" />
-		<info name="disk_ring" value="NGCD-082 MT B06 (JPN)"/>
+		<info name="cd_matrix" value="NGCD-082 MT B06 (JPN)"/>
 		<info name="release" value="19950602 (JPN)" />
 		<part name="cdrom" interface="neocd_cdrom">
 			<diskarea name="cdrom">
