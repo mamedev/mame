@@ -9,6 +9,24 @@ TODO:
 - ASUS CUBX fails reading RTC, needs virtualizing thru ISA.
 - Needs Riva TNT2 to be a proper PCI device;
 
+- In pcipc ez2d2m HDD boots to a Korean Windows 98SE, it will error out with a
+  "Error 7 : Set up the system correctly." after driver installation. Follows dump heuristics:
+  \- Disables Windows splash screen, instead it prints "Amuseworld System IV" (edited from autoexec.bat)
+  \- Contain a driver for a 3Com 3C90x EtherLink
+  \- "C:\Hardware Tools" contains diagnostic DOS .exe files testing ISA range I/Os;
+  \- "C:\ez2dancer" is the bulk of game, mostly with *.abm compressed files;
+  \- "C:\Drivers" and "C:\Install" contains various BIOSes and install programs,
+        is former for earlier HW?
+    \-  "C:\Install\Bios1006" contains a "1006cu.awd" file
+    \- There are VIA and ALi AGP references (interchangeable?)
+    \- "C:\Drivers\BIOSji438" , "fic_437" & "fic_438" all contains FIC PA-2013 BIOSes (original HW?)
+    \- "C:\Drivers\Basic" contains Microsoft Tweak UI install files, this looks used by the changes in
+       "This PC" icon on bottom right of desktop and for HW cursor when system is in SVGA mode to a dot.
+    \- "C:\Drivers\BIOS991026" contains a Riva TNT2 dump (W2137.rom)
+    \- "C:\Drivers\monitor" contains a video/monitor test;
+  \- Windows reboot and shutdown screens are customized so that former displays the game title, latter
+    just goes black screen.
+
 Thanks to Guru for hardware infos and pics for Ez2dancer 2nd Move.
 Later games in the series might run on newer, beefier hardware.
 
