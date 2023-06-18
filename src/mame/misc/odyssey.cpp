@@ -66,8 +66,23 @@
 ******************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
+#include "machine/pci-ide.h"
+#include "machine/i82443bx_host.h"
+#include "machine/i82371eb_isa.h"
+#include "machine/i82371eb_ide.h"
+#include "machine/i82371eb_acpi.h"
+#include "machine/i82371eb_usb.h"
+#include "video/virge_pci.h"
+#include "bus/isa/isa_cards.h"
+//#include "bus/rs232/hlemouse.h"
+//#include "bus/rs232/null_modem.h"
+//#include "bus/rs232/rs232.h"
+//#include "bus/rs232/sun_kbd.h"
+#include "bus/rs232/terminal.h"
+#include "machine/fdc37c93x.h"
 
 
 namespace {
@@ -76,37 +91,113 @@ class odyssey_state : public driver_device
 {
 public:
 	odyssey_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void odyssey(machine_config &config);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<pentium_device> m_maincpu;
 
 	void odyssey_map(address_map &map);
+	void odyssey_io(address_map &map);
+
+	static void smc_superio_config(device_t *device);
 };
 
 
 
 void odyssey_state::odyssey_map(address_map &map)
 {
-	map(0x00000000, 0x0009ffff).ram();
-	map(0x000e0000, 0x000fffff).rom().region("pmb", 0x60000);
-	map(0xfff80000, 0xffffffff).rom().region("pmb", 0);
+	map.unmap_value_high();
+}
+
+void odyssey_state::odyssey_io(address_map &map)
+{
+	map.unmap_value_high();
 }
 
 static INPUT_PORTS_START( odyssey )
 INPUT_PORTS_END
 
+static void isa_internal_devices(device_slot_interface &device)
+{
+	// TODO: should be a National Semiconductor PC87306B Super I/O
+	device.option_add("fdc37c93x", FDC37C93X);
+}
+
+void odyssey_state::smc_superio_config(device_t *device)
+{
+	fdc37c93x_device &fdc = *downcast<fdc37c93x_device *>(device);
+	fdc.set_sysopt_pin(1);
+	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.irq1().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
+	fdc.irq8().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq8n_w));
+	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+}
+
+static void isa_com(device_slot_interface &device)
+{
+//	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+//	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+//	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+//	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+//	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
+	device.option_add("terminal", SERIAL_TERMINAL);
+//	device.option_add("null_modem", NULL_MODEM);
+//	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
+}
+
+// This emulates a Tucson / Triton-II chipset, earlier i430fx TBD
 void odyssey_state::odyssey(machine_config &config)
 {
-	PENTIUM(config, m_maincpu, 133'000'000); // a Celeron at 1.70 GHz on the MB I checked. <- doesn't match being a Triton/Triton-II ... -AS
+	PENTIUM(config, m_maincpu, 133'000'000); 	// a Celeron at 1.70 GHz on the MB I checked. <- doesn't match being a Triton/Triton-II ... -AS
 	m_maincpu->set_addrmap(AS_PROGRAM, &odyssey_state::odyssey_map);
+	m_maincpu->set_addrmap(AS_IO, &odyssey_state::odyssey_io);
+	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
+	m_maincpu->smiact().set("pci:00.0", FUNC(i82439hx_host_device::smi_act_w));
 
 	PCI_ROOT(config, "pci", 0);
-	// ...
+	I82439HX(config, "pci:00.0", 0, m_maincpu, 64*1024*1024);
+
+	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0, "maincpu"));
+	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
+	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+
+	i82371sb_ide_device &ide(I82371SB_IDE(config, "pci:07.1", 0, "maincpu"));
+	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
+	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
+
+	// On-board Virge or Virge/DX
+	VIRGE_PCI(config, "pci:12.0", 0);
+
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", smc_superio_config);
+	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+
+	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr)); // "microsoft_mouse"));
+	serport0.rxd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::rxd1_w));
+	serport0.dcd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndcd1_w));
+	serport0.dsr_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndsr1_w));
+	serport0.ri_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::nri1_w));
+	serport0.cts_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ncts1_w));
+
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::rxd2_w));
+	serport1.dcd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndcd2_w));
+	serport1.dsr_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndsr2_w));
+	serport1.ri_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::nri2_w));
+	serport1.cts_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ncts2_w));
 }
 
 
@@ -135,20 +226,21 @@ ROM_START( odyssey )
 
 //  ODYSSEY_BIOS
 
-	ROM_REGION( 0x80000, "bios", 0 )  // main BIOS
-	// TODO: doesn't seem to have valid x86 boot vectors, may be reused later.
-	ROM_LOAD( "sgi_bios_76.bin", 0x000000, 0x80000, CRC(00592222) SHA1(29281d25aaf2051e0794dece8be146bb63d5c488) )
-
-	ROM_REGION( 0x500000, "other", 0 )  // remaining BIOS
-	ROM_LOAD( "sgi_bios_65.bin", 0x000000, 0x80000, CRC(af970c2a) SHA1(0fb49bca34dbd0725b5abb9c876bb849be31b3ed) )
-	ROM_LOAD( "sgi_bios_55.bin", 0x080000, 0x80000, CRC(0138ef08) SHA1(fad1c0edf37042fffcb5a4006fd69ac59b55ab33) )
-	ROM_LOAD( "sgi_bios_46.bin", 0x100000, 0x80000, CRC(37090b87) SHA1(431c0a1954d5bf7fd4fa6f2b983010fbf3c8ce13) )
-	ROM_LOAD( "sgi_bios_31.bin", 0x180000, 0x80000, CRC(0954278b) SHA1(dc04a0604159ddd3d24bdd292b2947cc443054f8) )
-	ROM_LOAD( "sgi_bios_00.bin", 0x200000, 0x80000, CRC(41480fb5) SHA1(073596d3ba40ae67e3be3f410d7b29c77988df47) )
-
 	ROM_REGION32_LE( 0x100000, "pmb", ROMREGION_ERASE00 )   // Peripheral Memory Board (II) ROMS
 	ROM_LOAD( "sgi_u13_165_0017_0_rev_a_l97_1352.bin", 0x00000, 0x80000, CRC(31ca868c) SHA1(d1db4ef12add336e25374fcf5d3238b8fbca05dd) )  // U13 - 165-0017 BIOS (27C040/27C4001 EPROM)
 	ROM_LOAD( "sgi_u5_165_0030_0_at28c010.bin",        0x80000, 0x20000, CRC(75a80169) SHA1(a8ece0f82a49f721fb178dbe25fc859bd65ce44f) )  // U5 - 165-0030 CONFIG (Atmel 28C010-12PC EEPROM)
+
+	ROM_REGION32_LE( 0x80000, "pci:07.0", 0 )
+	ROM_COPY( "pmb", 0x00000, 0x00000, 0x80000 )
+
+	ROM_REGION( 0x300000, "other", 0 )  // remaining BIOS
+	// doesn't seem to have valid x86 boot vectors, may be reused later.
+	ROM_LOAD( "sgi_bios_76.bin", 0x000000, 0x80000, CRC(00592222) SHA1(29281d25aaf2051e0794dece8be146bb63d5c488) )
+	ROM_LOAD( "sgi_bios_65.bin", 0x080000, 0x80000, CRC(af970c2a) SHA1(0fb49bca34dbd0725b5abb9c876bb849be31b3ed) )
+	ROM_LOAD( "sgi_bios_55.bin", 0x100000, 0x80000, CRC(0138ef08) SHA1(fad1c0edf37042fffcb5a4006fd69ac59b55ab33) )
+	ROM_LOAD( "sgi_bios_46.bin", 0x180000, 0x80000, CRC(37090b87) SHA1(431c0a1954d5bf7fd4fa6f2b983010fbf3c8ce13) )
+	ROM_LOAD( "sgi_bios_31.bin", 0x200000, 0x80000, CRC(0954278b) SHA1(dc04a0604159ddd3d24bdd292b2947cc443054f8) )
+	ROM_LOAD( "sgi_bios_00.bin", 0x280000, 0x80000, CRC(41480fb5) SHA1(073596d3ba40ae67e3be3f410d7b29c77988df47) )
 
 	ROM_REGION( 0x10000, "vbios", 0 )   // video card BIOS
 	ROM_LOAD( "videobios", 0x000000, 0x00d000, NO_DUMP )
