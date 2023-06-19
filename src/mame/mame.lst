@@ -34642,6 +34642,12 @@ moguchan                        // (c) 1982 Orca + Eastern Commerce Inc. license
 percuss                         // (c) 1981 Orca
 zodiack                         // (c) 1983 Orca + Esco Trading Co license
 
+@source:orla/hk1000.cpp
+hk1000                          //
+
+@source:orla/xm200.cpp
+xm200                           //
+
 @source:osborne/osbexec.cpp
 osbexec                         // 1982 Osborne Executive
 
