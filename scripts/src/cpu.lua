@@ -3835,9 +3835,16 @@ if opt_tool(CPUS, "INTERDATA16") then
 end
 
 --------------------------------------------------
--- SGS-Thomson ST9, disassembler only
+-- SGS-Thomson ST9
 --@src/devices/cpu/st9/st9.h,CPUS["ST9"] = true
 --------------------------------------------------
+
+if CPUS["ST9"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/st9/st905x.cpp",
+		MAME_DIR .. "src/devices/cpu/st9/st905x.h",
+	}
+end
 
 if opt_tool(CPUS, "ST9") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/st9/st9dasm.cpp")
