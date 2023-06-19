@@ -26626,7 +26626,11 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic2p2" cloneof="sonic2">
-		<!--	Presumedly built sometime between June and early August of 1992	-->
+		<!--
+			Presumably built sometime between June and early August of 1992.
+			Originally found in a pirate cartridge, an official prototype with this build has been found and proved to match.
+			TODO: Dump needs to be further documented and split accordingly.
+		-->
 		<description>Sonic The Hedgehog 2 (prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -26706,8 +26710,9 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 
 	<software name="sonic2p12" cloneof="sonic2">
 		<!--
+			Earlier than "Beta 4" build.
 			Scene release with cracktro, no official unaltered build of this prototype has been found.
-			Original release was in smd format, converted to raw binary due to softlists not supporting smd files.
+			Dump originally in smd format, converted to raw binary due to softlists not supporting smd files.
 		-->
 		<description>Sonic The Hedgehog 2 (prototype, pirate)</description>
 		<year>1992</year>
