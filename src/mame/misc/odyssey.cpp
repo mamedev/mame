@@ -78,8 +78,8 @@
 //#include "bus/rs232/null_modem.h"
 //#include "bus/rs232/rs232.h"
 //#include "bus/rs232/sun_kbd.h"
-#include "bus/rs232/terminal.h"
-#include "machine/fdc37c93x.h"
+//#include "bus/rs232/terminal.h"
+#include "machine/pc87306.h"
 
 
 namespace {
@@ -100,7 +100,7 @@ private:
 	void odyssey_map(address_map &map);
 	void odyssey_io(address_map &map);
 
-	static void smc_superio_config(device_t *device);
+	static void national_superio_config(device_t *device);
 };
 
 
@@ -120,16 +120,16 @@ INPUT_PORTS_END
 
 static void isa_internal_devices(device_slot_interface &device)
 {
-	// TODO: should be a National Semiconductor PC87306B Super I/O (at I/O ports $2e-$2f)
-	device.option_add("fdc37c93x", FDC37C93X);
+	device.option_add("pc87306", PC87306);
 }
 
-void odyssey_state::smc_superio_config(device_t *device)
+void odyssey_state::national_superio_config(device_t *device)
 {
-	fdc37c93x_device &fdc = *downcast<fdc37c93x_device *>(device);
-	fdc.set_sysopt_pin(1);
+	pc87306_device &fdc = *downcast<pc87306_device *>(device);
+	//fdc.set_sysopt_pin(1);
 	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
 	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+#if 0
 	fdc.irq1().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
 	fdc.irq8().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq8n_w));
 	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
@@ -138,8 +138,10 @@ void odyssey_state::smc_superio_config(device_t *device)
 	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
 	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
 	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+#endif
 }
 
+#if 0
 static void isa_com(device_slot_interface &device)
 {
 //	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
@@ -147,10 +149,11 @@ static void isa_com(device_slot_interface &device)
 //	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
 //	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
 //	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
-	device.option_add("terminal", SERIAL_TERMINAL);
+//	device.option_add("terminal", SERIAL_TERMINAL);
 //	device.option_add("null_modem", NULL_MODEM);
 //	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
 }
+#endif
 
 // This emulates a Tucson / Triton-II chipset, earlier i430fx TBD
 // PCI config space is trusted by Intel TC430HX "Technical Product Specification"
@@ -184,13 +187,14 @@ void odyssey_state::odyssey(machine_config &config)
 	// pci:0f.0 (J4D1) PCI expansion slot 3
 	// pci:10.0 (J4C1) PCI expansion slot 4
 
-	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", smc_superio_config);
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "pc87306", true).set_option_machine_config("pc87306", national_superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa4", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa5", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
+#if 0
 	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr)); // "microsoft_mouse"));
 	serport0.rxd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::rxd1_w));
 	serport0.dcd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndcd1_w));
@@ -204,6 +208,7 @@ void odyssey_state::odyssey(machine_config &config)
 	serport1.dsr_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndsr2_w));
 	serport1.ri_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::nri2_w));
 	serport1.cts_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ncts2_w));
+#endif
 }
 
 
