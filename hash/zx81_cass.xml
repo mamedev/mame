@@ -47,7 +47,7 @@ license:CC0-1.0
 		<description>1K Games Pack</description>
 		<year>198?</year>
 		<publisher>Artic</publisher>
-		<info name="author" value="Adam Waring"/>
+		<info name="author" value="Adam Waring" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="8576">
 				<rom name="1KGames.tzx" size="8576" crc="2648f563" sha1="11562494bb40cef9bcea606b1bd2ad375f47ef75"/>
