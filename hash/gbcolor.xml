@@ -28404,7 +28404,7 @@ license:CC0-1.0
 		<description>Grimace's Birthday (v1.5)</description>
 		<year>2023</year>
 		<publisher>Krool Toys</publisher>
-		<info name="release" value="20230617" />
+		<info name="release" value="20230619" />
 		<sharedfeat name="compatibility" value="GBC" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
