@@ -2,51 +2,51 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
+
+  To investigate:
+    - Gargoyle's Quest - Ghosts'n Goblins (Rev 1)   <-  Unreleased in USA?
+
+  Undumped pirate carts:
+    - GOWIN carts (see below the list of known games)
+
+
+ Info on the PCB codes, based on Tauwasser's notes and research
+
+
+ DMG-****-NN
+
+ where
+     NN   = PCB revision
+     **** = 3 or 4 letter descriptor (+ possibly an optional letter code in parenthesis)
+
+ Letters have the following meaning
+
+ Code     MBC / Battery                   ROM size   RAM size
+ -        -                               -          -             QFP
+ A        none                            256kbit    none          -
+ B        MBC1A/MBC1B/MBC1B1              512kbit    -?            -
+ C        -                               1Mbit      64kbit        COB
+ D        MBC1A/MBC1B/MBC1B1 + CR1616     2Mbit      256kbit       -
+ E        -                               4Mbit      512kbit       -
+ F        -                               8Mbit      -             -
+ G        MBC2A + CR1616                  16Mbit     -             -
+ H        -                               32Mbit     -             -
+ K        MBC3/MBC3A/MBC3B w/X + CR2025   -          -             -
+ L        MBC3/MBC3A/MBC3B w/oX + CR2025  -          -             -
+ M        MBC30 w/ X + CR2025             -          -             -
+ N        -                               -          -             SOP
+ P        MMM01                           -          -             -
+ S        MMM01 + CR1616                  -          -             -
+ T        HuC1/HuC1A + CR1616             -          -             TSOP I
+ U        HuC3A + CR2025                  -          -             TSOP II
+
+
+ So that, for instance, DMG-BEAN-02 stands for a PCB with MBC1A/MBC1B/MBC1B1 and no battery,
+ up to 256kbit ROM, no SRAM and roms in SOP
+
 -->
 
 <softwarelist name="gameboy" description="Nintendo Game Boy cartridges">
-	<!--
-		To investigate:
-		- Gargoyle's Quest - Ghosts'n Goblins (rev 1)   <-  Unreleased in USA?
-
-		Undumped pirate carts:
-		- GOWIN carts (see below the list of known games)
-
-
-		Info on the PCB codes, based on Tauwasser's notes and research
-
-
-		DMG-****-NN
-
-		where
-		 NN   = PCB revision
-		 **** = 3 or 4 letter descriptor (+ possibly an optional letter code in parenthesis)
-
-		Letters have the following meaning
-
-		Code     MBC / Battery                   ROM size   RAM size
-		-        -                               -          -             QFP
-		A        none                            256kbit    none          -
-		B        MBC1A/MBC1B/MBC1B1              512kbit    -?            -
-		C        -                               1Mbit      64kbit        COB
-		D        MBC1A/MBC1B/MBC1B1 + CR1616     2Mbit      256kbit       -
-		E        -                               4Mbit      512kbit       -
-		F        -                               8Mbit      -             -
-		G        MBC2A + CR1616                  16Mbit     -             -
-		H        -                               32Mbit     -             -
-		K        MBC3/MBC3A/MBC3B w/X + CR2025   -          -             -
-		L        MBC3/MBC3A/MBC3B w/oX + CR2025  -          -             -
-		M        MBC30 w/ X + CR2025             -          -             -
-		N        -                               -          -             SOP
-		P        MMM01                           -          -             -
-		S        MMM01 + CR1616                  -          -             -
-		T        HuC1/HuC1A + CR1616             -          -             TSOP I
-		U        HuC3A + CR2025                  -          -             TSOP II
-
-
-		So that, for instance, DMG-BEAN-02 stands for a PCB with MBC1A/MBC1B/MBC1B1 and no battery,
-		up to 256kbit ROM, no SRAM and roms in SOP.
-	-->
 
 	<software name="tamafrnd">
 		<description>3 Choume no Tama - Tama and Friends - 3 Choume Obake Panic!! (Japan)</description>
@@ -28105,7 +28105,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="GBD-IMPACT8M" />
-		<info name="alt_title" value="デバガメテスター SECOND IMPACT Ver10.24" />
+		<info name="alt_title" value="デバガメテスター SECOND IMPACT" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="MGB-MGBD-X2" />
 			<feature name="u1" value="U1 [MAC-GBD 9744 S]" />
