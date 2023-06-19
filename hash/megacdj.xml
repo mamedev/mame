@@ -27,10 +27,10 @@ license:CC0-1.0
 		<year>1992</year>
 		<publisher>CRI</publisher>
 		<info name="serial" value="T-68014"/>
-		<info name="disk_ring" value="T-68014P-00039-R2M V, T-68014P-00039-R1M V"/>
 		<info name="release" value="19921218"/>
 		<info name="alt_title" value="アフターバーナーⅢ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-68014P-00039-R2M V, T-68014P-00039-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="after burner iii (japan)" sha1="679964728d2ccc9ddbb298b96d9cd9ebb09bb9db"/>
 			</diskarea>
@@ -47,10 +47,10 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6031"/>
-		<info name="disk_ring" value="G-6031P-00174 1"/>
 		<info name="release" value="19940325"/>
 		<info name="alt_title" value="AX-101"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6031P-00174 1"/>
 			<diskarea name="cdrom">
 				<disk name="ax-101 (japan)" sha1="0307a310f28bdca4407eea6424ab59750581be57"/>
 			</diskarea>
@@ -84,10 +84,10 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Human Entertainment</publisher>
 		<info name="serial" value="T-43024"/>
-		<info name="disk_ring" value="T-43024P-00077-R2M V"/>
 		<info name="release" value="19930730"/>
 		<info name="alt_title" value="バリ・アーム"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-43024P-00077-R2M V"/>
 			<diskarea name="cdrom">
 				<disk name="bari-arm (japan)" sha1="a14d376efd556bf05f37e696c01664b7dfa13dbe"/>
 			</diskarea>
@@ -144,10 +144,10 @@ license:CC0-1.0
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6004"/>
-		<info name="disk_ring" value="G-6004P-00012-R2M V"/>
 		<info name="release" value="19920911"/>
 		<info name="alt_title" value="ブライ 八玉の勇士伝説"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6004P-00012-R2M V"/>
 			<diskarea name="cdrom">
 				<disk name="burai - hachigyoku no yuushi densetsu (japan)" sha1="fb036bacef4520c93cd3b9d3d2aaa64975e4a113"/>
 			</diskarea>
@@ -220,10 +220,10 @@ license:CC0-1.0
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="T-49014"/>
-		<info name="disk_ring" value="T-49014P-00010-R2K V, T-49014P-00010-R1K V"/>
 		<info name="release" value="19920327"/>
 		<info name="alt_title" value="コズミックファンタジー Stories"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-49014P-00010-R2K V, T-49014P-00010-R1K V"/>
 			<diskarea name="cdrom">
 				<disk name="cosmic fantasy stories (japan)" sha1="62bed0d8e461b8b118ce9d7dfc49d7944edf1c23"/>
 			</diskarea>
@@ -271,10 +271,10 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="T-49054"/>
-		<info name="disk_ring" value="T-49054P-00081-R1M V"/>
 		<info name="release" value="19930730"/>
 		<info name="alt_title" value="サイボーグ009"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-49054P-00081-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="cyborg 009 (japan)" sha1="19cdb90db8c92f6baafc188b83e8ea7a67adb6f1"/>
 			</diskarea>
@@ -314,10 +314,10 @@ license:CC0-1.0
 		<year>1992</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="T-66014"/>
-		<info name="disk_ring" value="T-66014P-00035-R2M V"/>
 		<info name="release" value="19921127"/>
 		<info name="alt_title" value="電忍アレスタ Nobunaga and his Ninja force"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-66014P-00035-R2M V"/>
 			<diskarea name="cdrom">
 				<disk name="dennin aleste - nobunaga and his ninja force (japan)" sha1="3c8289dc95e288e1d2e720828cef2177543100f2"/>
 			</diskarea>
@@ -343,10 +343,10 @@ license:CC0-1.0
 		<year>1992</year>
 		<publisher>Hot-B</publisher>
 		<info name="serial" value="T-28014"/>
-		<info name="disk_ring" value="T28014P-00019-R1M V"/>
 		<info name="release" value="19920731"/>
 		<info name="alt_title" value="デトネイター・オーガン"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T28014P-00019-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="detonator orgun (japan)" sha1="80a99c378610c903453fbb8efac9325f04db7700"/>
 			</diskarea>
@@ -372,10 +372,10 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32074"/>
-		<info name="disk_ring" value="T-32074P-00063-R1M V"/>
 		<info name="release" value="19930528"/>
 		<info name="alt_title" value="デバステイター"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-32074P-00063-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="devastator (japan)" sha1="3859b4eed02a3b9ccbddfe750285f755d85316cb"/>
 			</diskarea>
@@ -392,10 +392,10 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6035"/>
-		<info name="disk_ring" value="G-6035P-00191 4"/>
 		<info name="release" value="19940603"/>
 		<info name="alt_title" value="ドラゴンズ・レア"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6035P-00191 4"/>
 			<diskarea name="cdrom">
 				<disk name="dragon's lair (japan) (en,ja,fr,de,it)" sha1="2277ebfb61ac13ba4c63b7a24c7e9d546c1923be"/>
 			</diskarea>
@@ -423,10 +423,10 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6017"/>
-		<info name="disk_ring" value="G-6017P-00076-R1M V"/>
 		<info name="release" value="19930716"/>
 		<info name="alt_title" value="ダイナミックカントリークラブ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6017P-00076-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="dynamic country club (japan)" sha1="04e213ea91c03b9aa8a354a2b5f9d42003ca5dbf"/>
 			</diskarea>
@@ -466,10 +466,10 @@ license:CC0-1.0
 		<year>1991</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32014"/>
-		<info name="disk_ring" value="T-32014P-00007-R1K V"/>
 		<info name="release" value="19911220"/>
 		<info name="alt_title" value="アーネストエバンス"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-32014P-00007-R1K V"/>
 			<diskarea name="cdrom">
 				<disk name="earnest evans (japan)" sha1="9f0e70f629e32134a529b2784786cdac07e55780"/>
 			</diskarea>
@@ -519,10 +519,10 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6019"/>
-		<info name="disk_ring" value="G-6019P-00083-R1M V"/>
 		<info name="release" value="19930806"/>
 		<info name="alt_title" value="江川卓のスーパーリーグCD"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6019P-00083-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="egawa suguru no super league cd (japan)" sha1="4062f8fbc43963cc9305e14530379989f9543a30"/>
 			</diskarea>
@@ -566,10 +566,10 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Nichibutsu</publisher>
 		<info name="serial" value="T-71014"/>
-		<info name="disk_ring" value="T-71014P-00121 1"/>
 		<info name="release" value="19940318"/>
 		<info name="alt_title" value="F1サーカスCD"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-71014P-00121 1"/>
 			<diskarea name="cdrom">
 				<disk name="f1 circus cd (japan)" sha1="e13e963d3386cd38143334011b6a4c239a871bfa"/>
 			</diskarea>
@@ -613,10 +613,10 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6013"/>
-		<info name="disk_ring" value="G-6013P-00059-R1M V"/>
 		<info name="release" value="19930402"/>
 		<info name="alt_title" value="ファイナルファイトCD"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6013P-00059-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="final fight cd (japan)" sha1="a67ff6f71659ad6159ab220fa977ea9316ac9f3a"/>
 			</diskarea>
@@ -681,10 +681,10 @@ license:CC0-1.0
 		<year>1992</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45044"/>
-		<info name="disk_ring" value="T-45044P-00037-R2M V"/>
 		<info name="release" value="19921225"/>
 		<info name="alt_title" value="ぎゅわんぶらあ自己中心派2 激闘! 東京マージャンランド編"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45044P-00037-R2M V"/>
 			<diskarea name="cdrom">
 				<disk name="gambler jiko chuushinha 2 - gekitou tokyo mahjongland hen (japan)" sha1="12cb45fafb9f63b41551150dc313eba51fa639c9"/>
 			</diskarea>
@@ -730,10 +730,10 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6032"/>
-		<info name="disk_ring" value="G-6032P-00165 1"/>
 		<info name="release" value="19940318"/>
 		<info name="alt_title" value="ゲームのかんづめ VOL.1"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6032P-00165 1"/>
 			<diskarea name="cdrom">
 				<disk name="game no kandume vol.1 (japan)" sha1="88a441b47cc53a088de1b95cc624176895882478"/>
 			</diskarea>
@@ -772,10 +772,10 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6033"/>
-		<info name="disk_ring" value="G-6033P-00166 1"/>
 		<info name="release" value="19940318"/>
 		<info name="alt_title" value="ゲームのかんづめ VOL.2"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6033P-00166 1"/>
 			<diskarea name="cdrom">
 				<disk name="game no kandume vol.2 (japan)" sha1="093b5a17ea088fe6714e4a095f5240cb6d918fcd"/>
 			</diskarea>
@@ -828,10 +828,10 @@ license:CC0-1.0
 		<year>1995</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60214"/>
-		<info name="disk_ring" value="T-60214P-R1C V"/>
 		<info name="release" value="19950321"/>
 		<info name="alt_title" value="餓狼伝説スペシャル"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60214P-R1C V"/>
 			<diskarea name="cdrom">
 				<disk name="garou densetsu special (japan)" sha1="f1cf0e587163a0df04e2f8b4c35c2607ec1e1182"/>
 			</diskarea>
@@ -883,10 +883,10 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6034"/>
-		<info name="disk_ring" value="G-6034P-00194-R1M V"/>
 		<info name="release" value="19940423"/>
 		<info name="alt_title" value="ヘブンリー シンフォニー フォームラワン ワールド チャンピオンシップ 1993"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6034P-00194-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="heavenly symphony (japan)" sha1="0b2cbbb78603bd1b9110ffaa6035f89dbb78085a"/>
 			</diskarea>
@@ -917,10 +917,10 @@ license:CC0-1.0
 		<year>1991</year>
 		<publisher>Micronet</publisher>
 		<info name="serial" value="T-22014"/>
-		<info name="disk_ring" value="T-22014P-00004-R1K V"/>
 		<info name="release" value="19911212"/>
 		<info name="alt_title" value="ヘビーノバ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-22014P-00004-R1K V"/>
 			<diskarea name="cdrom">
 				<disk name="heavy nova (japan)" sha1="aa7a040fc2b8c8d8264f82573dc5e16d31e2ed57"/>
 			</diskarea>
@@ -959,10 +959,10 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60154"/>
-		<info name="disk_ring" value="T-60054P-00178-R1M V"/>
 		<info name="release" value="19940318"/>
 		<info name="alt_title" value="ハイムドール"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60054P-00178-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="heimdall (japan)" sha1="88033b6ffa90da2f8f4c0f7df58c6f1697508a56"/>
 			</diskarea>
@@ -990,10 +990,10 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60094"/>
-		<info name="disk_ring" value="T-60094P-00056-R1M V"/>
 		<info name="release" value="19930326"/>
 		<info name="alt_title" value="ジャガーXJ220"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60094P-00056-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="jaguar xj220 (japan) (en,ja)" sha1="ff48724c0c0c7cc4fd831cc8954497c8da8448cb"/>
 			</diskarea>
@@ -1025,10 +1025,10 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60124"/>
-		<info name="disk_ring" value="T-60124P-00119 1"/>
 		<info name="release" value="19930827"/>
 		<info name="alt_title" value="雀豪ワールドカップ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60124P-00119 1"/>
 			<diskarea name="cdrom">
 				<disk name="jangou world cup (japan)" sha1="5ce7ade2f0d4ca8b2919db189f5f9e8bfb7aebe4"/>
 			</diskarea>
@@ -1048,10 +1048,10 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Toei Animation</publisher>
 		<info name="serial" value="T-141013"/>
-		<info name="disk_ring" value="T-141014P-00192-R1M V"/>
 		<info name="release" value="19940513"/>
 		<info name="alt_title" value="仮面ライダーZO"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-141014P-00192-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="kamen rider zo (japan)" sha1="c5129e3a90f4456bd76fac0f460281da18f8003c"/>
 			</diskarea>
@@ -1091,10 +1091,10 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60114"/>
-		<info name="disk_ring" value="T-60114-00082-R1M V"/>
 		<info name="release" value="19930806"/>
 		<info name="alt_title" value="慶応遊撃隊"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60114-00082-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="keiou yuugekitai (japan)" sha1="ef5af443f78c67caba7ec02590a3f3f0af93d387"/>
 			</diskarea>
@@ -1123,10 +1123,10 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6024"/>
-		<info name="disk_ring" value="G-6024P-00198-R2M V"/>
 		<info name="release" value="19940520"/>
 		<info name="alt_title" value="ロードス島戦記 英雄戦争"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6024P-00198-R2M V"/>
 			<diskarea name="cdrom">
 				<disk name="lodoss tou senki - eiyuu sensou (japan)" sha1="15ed554b0a63e78648cf496c8b249be35c18420c"/>
 			</diskarea>
@@ -1145,10 +1145,10 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45074"/>
-		<info name="disk_ring" value="T-45074P-00271-R1M V"/>
 		<info name="release" value="19941222"/>
 		<info name="alt_title" value="ルナ-エターナルブルー"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45074P-00271-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="lunar - eternal blue (japan)" sha1="86472573584d0d94bfb8f13e0f08bc2401d110da"/>
 			</diskarea>
@@ -1215,10 +1215,10 @@ license:CC0-1.0
 		<year>1992</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45014"/>
-		<info name="disk_ring" value="T-45014P-00017-R1M V"/>
 		<info name="release" value="19920626"/>
 		<info name="alt_title" value="ルナ ザ・シルバースター"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45014P-00017-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="lunar - the silver star (japan)" sha1="ec2bfebf47f6b894f8add0d78962a4e491e4e3ca"/>
 			</diskarea>
@@ -1242,10 +1242,10 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60164"/>
-		<info name="disk_ring" value="T-60164P-00171-R1M V"/>
 		<info name="release" value="19940225"/>
 		<info name="alt_title" value="マイクロコズム"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60164P-00171-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="microcosm (japan)" sha1="7caf9207625e436f1c738e5d3e8705f9a3ed8e1c"/>
 			</diskarea>
@@ -1299,10 +1299,10 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-11014"/>
-		<info name="disk_ring" value="T-11014P-00062-R1M V"/>
 		<info name="release" value="19930528"/>
 		<info name="alt_title" value="ナイトストライカー"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-11014P-00062-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="night striker (japan, korea)" sha1="0c8ba1a5ca12ec52de6b2febac14abd5d1126c84"/>
 			</diskarea>
@@ -1326,16 +1326,18 @@ license:CC0-1.0
 Requires [disc swap]
 ]]></notes>
 		<info name="serial" value="G-6025"/>
-		<info name="disk_ring" value="G-6025P-00148 1 (Disc 1), G-6025P-00149 1 (Disc 2)"/>
 		<info name="release" value="19931119"/>
 		<info name="alt_title" value="ナイトトラップ"/>
 		<part name="cdrom1" interface="scd_cdrom">
+			<feature name="part_id" value="Disc 1"/>
+			<feature name="cd_matrix" value="G-6025P-00148 1"/>
 			<diskarea name="cdrom">
 				<disk name="night trap (japan) (disc 1)" sha1="1d2bd06468ce64f34e06a1ff36cdcf5a8652d65e"/>
 			</diskarea>
 		</part>
-
 		<part name="cdrom2" interface="scd_cdrom">
+			<feature name="part_id" value="Disc 2"/>
+			<feature name="cd_matrix" value="G-6025P-00149 1"/>
 			<diskarea name="cdrom">
 				<disk name="night trap (japan) (disc 2)" sha1="5d208bbfc2fbe233d53bd9dc6ef2e6d07e2cbc74"/>
 			</diskarea>
@@ -1353,10 +1355,10 @@ Requires [disc swap]
 		<year>1991</year>
 		<publisher>Takeru</publisher>
 		<info name="serial" value="T-77014"/>
-		<info name="disk_ring" value="T-77014P-00006-R1K V"/>
 		<info name="release" value="19911214"/>
 		<info name="alt_title" value="ノスタルジア1907"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-77014P-00006-R1K V"/>
 			<diskarea name="cdrom">
 				<disk name="nostalgia 1907 (japan)" sha1="c6718f18b5720b3c48abf9c8accdf6d7572e4a63"/>
 			</diskarea>
@@ -1374,10 +1376,10 @@ Requires [disc swap]
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6029"/>
-		<info name="disk_ring" value="G-6029P-00190-R1M V"/>
 		<info name="release" value="19940401"/>
 		<info name="alt_title" value="ぽっぷるメイル"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6029P-00190-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="popful mail (japan)" sha1="319c69ab64d586ef46a6a2f9c8790c7e94722674"/>
 			</diskarea>
@@ -1417,10 +1419,10 @@ Requires [disc swap]
 		<year>1992</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60014"/>
-		<info name="disk_ring" value="T60014P-00020-R1M V"/>
 		<info name="release" value="19920807"/>
 		<info name="alt_title" value="プリンス・オブ・ペルシャ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T60014P-00020-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="prince of persia (japan)" sha1="db90a82cc35f49356218aa649929d4b1f588ed8b"/>
 			</diskarea>
@@ -1458,10 +1460,10 @@ Requires [disc swap]
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6010"/>
-		<info name="disk_ring" value="G-6010P-00029-R1M V"/>
 		<info name="release" value="19921030"/>
 		<info name="alt_title" value="プロ野球スーパーリーグCD"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6010P-00029-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="pro yakyuu super league cd (japan)" sha1="87cf208ad060b8ef6ace3db18824152f45dc91b5"/>
 			</diskarea>
@@ -1517,10 +1519,10 @@ Requires [disc swap]
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6003"/>
-		<info name="disk_ring" value="G-6003P-00014B-R2M V"/>
 		<info name="release" value="19920529"/>
 		<info name="alt_title" value="クイズスクランブルスペシャル"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6003P-00014B-R2M V"/>
 			<diskarea name="cdrom">
 				<disk name="quiz scramble special (japan) (rev b)" sha1="cc636ce3a99a01cdf3d34d93df74b143b6d239b7"/>
 			</diskarea>
@@ -1537,10 +1539,10 @@ Requires [disc swap]
 		<year>1992</year>
 		<publisher>SIMS</publisher>
 		<info name="serial" value="T-44024"/>
-		<info name="disk_ring" value="T-44024P-00034-R1M V"/>
 		<info name="release" value="19921225"/>
 		<info name="alt_title" value="クイズ殿様の野望"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-44024P-00034-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="capcom no quiz - tonosama no yabou (japan)" sha1="9f09efae7369a1439cd85616c89f5d42a2eb741a"/>
 			</diskarea>
@@ -1580,10 +1582,10 @@ Requires [disc swap]
 		<year>1993</year>
 		<publisher>NCS</publisher>
 		<info name="serial" value="T-25014"/>
-		<info name="disk_ring" value="T-25014P-00060-R3M V, T-25014P-00060-R2M V"/>
 		<info name="release" value="19930423"/>
 		<info name="alt_title" value="らんま½ 白蘭愛歌"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-25014P-00060-R3M V, T-25014P-00060-R2M V"/>
 			<diskarea name="cdrom">
 				<disk name="ranma 1-2 - byakuranaika (japan)" sha1="89f733676137b26b304d21eab6c5e50c4ee48389"/>
 			</diskarea>
@@ -1603,10 +1605,10 @@ Requires [disc swap]
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6002"/>
-		<info name="disk_ring" value="G-6002P-00023-R1M V"/>
 		<info name="release" value="19920925"/>
 		<info name="alt_title" value="ライズ オブ ザ ドラゴン −ブレイド・ハンター・ミステリ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6002P-00023-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="rise of the dragon - a blade hunter mystery (japan)" sha1="24a8afdc4f413494cd8efd78b035dbdbe25c679c"/>
 			</diskarea>
@@ -1671,10 +1673,10 @@ Requires [disc swap]
 		<year>1993</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-76014"/>
-		<info name="disk_ring" value="T-76014P-00057-R1M V"/>
 		<info name="release" value="19930423"/>
 		<info name="alt_title" value="三國志III"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-76014P-00057-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="sangokushi iii (japan)" sha1="4745bf0906999474645e1b4d515bc1b1902ca422"/>
 			</diskarea>
@@ -1701,10 +1703,10 @@ Requires [disc swap]
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6012"/>
-		<info name="disk_ring" value="G-6012P-00024-2-R2M V, G-6012P-00024-2-R1M V"/>
 		<info name="release" value="19930423"/>
 		<info name="alt_title" value="セガクラシック"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6012P-00024-2-R2M V, G-6012P-00024-2-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="sega classic arcade collection (japan)" sha1="c69c436b0159b2e1e5ffaadad37167d2210d8767"/>
 			</diskarea>
@@ -1766,10 +1768,10 @@ Requires [disc swap]
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6007"/>
-		<info name="disk_ring" value="G-6007P-00078-R1M V"/>
 		<info name="release" value="19930723"/>
 		<info name="alt_title" value="聖魔伝説 3×3EYES"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6007P-00078-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="seima densetsu 3x3 eyes (japan)" sha1="8a850d7cf8db54c48adb8ae8f485143cd27df8c6"/>
 			</diskarea>
@@ -1869,10 +1871,10 @@ Requires [disc swap]
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32034"/>
-		<info name="disk_ring" value="T-32034P-00009-R2K V, T-32034P-00009-R1K V"/>
 		<info name="release" value="19920218"/>
 		<info name="alt_title" value="精霊神世紀フェイエリア"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-32034P-00009-R2K V, T-32034P-00009-R1K V"/>
 			<diskarea name="cdrom">
 				<disk name="seirei shinseiki - fhey area (japan)" sha1="0eb59654214bf37e8493ec48f6d4f6cd5077fbb2"/>
 			</diskarea>
@@ -1901,10 +1903,10 @@ Requires [disc swap]
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60034"/>
-		<info name="disk_ring" value="T-60034P-00233-R2M V"/>
 		<info name="release" value="19940729"/>
 		<info name="alt_title" value="シャドー・オブ・ザ・ビーストII 獣神の呪縛"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60034P-00233-R2M V"/>
 			<diskarea name="cdrom">
 				<disk name="shadow of the beast ii - juushin no jubaku (japan)" sha1="87dffb24d18d1e0f61907fd8b25f85c25f1968d8"/>
 			</diskarea>
@@ -1948,10 +1950,10 @@ Requires [disc swap]
 		<year>1994</year>
 		<publisher>SIMS</publisher>
 		<info name="serial" value="T-44044"/>
-		<info name="disk_ring" value="T-44044P-00163 1"/>
 		<info name="release" value="19940225"/>
 		<info name="alt_title" value="真・女神転生"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-44044P-00163 1"/>
 			<diskarea name="cdrom">
 				<disk name="shin megami tensei (japan)" sha1="4ef3c263e909471ac27757c16423e66009726544"/>
 			</diskarea>
@@ -2001,10 +2003,10 @@ Requires [disc swap]
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6036"/>
-		<info name="disk_ring" value="G-6036P-00226-R1M V"/>
 		<info name="release" value="19940722"/>
 		<info name="alt_title" value="シャイニング・フォースCD"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6036P-00226-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="shining force cd (japan)" sha1="b6b05a27fddbb742149216961f6e9b917442b768"/>
 			</diskarea>
@@ -2027,10 +2029,10 @@ Requires [disc swap]
 		<year>1993</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45054"/>
-		<info name="disk_ring" value="T-45054P-00080-R1M V"/>
 		<info name="release" value="19930730"/>
 		<info name="alt_title" value="シルフィード"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45054P-00080-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="silpheed (japan)" sha1="3f06c3f2b13f28312748336d324d1b8563a30d86"/>
 			</diskarea>
@@ -2067,10 +2069,10 @@ Requires [disc swap]
 		<year>1991</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32024"/>
-		<info name="disk_ring" value="T-32024P-00003-R1K V"/>
 		<info name="release" value="19911212"/>
 		<info name="alt_title" value="ソル・フィース"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-32024P-00003-R1K V"/>
 			<diskarea name="cdrom">
 				<disk name="sol-feace (japan)" sha1="953987cbb5031e1bc6b4efc2f0e25ced3ca79b1e"/>
 			</diskarea>
@@ -2120,10 +2122,10 @@ Requires [disc swap]
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6021"/>
-		<info name="disk_ring" value="G-6021P-00128-R1M V"/>
 		<info name="release" value="19930923"/>
 		<info name="alt_title" value="ソニック・ザ・ヘッジホッグCD"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6021P-00128-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="sonic the hedgehog cd (japan)" sha1="5501a5b2b4d324558918f22f9dca0ef8080d0836"/>
 			</diskarea>
@@ -2140,10 +2142,10 @@ Requires [disc swap]
 		<year>19??</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60174"/>
-		<info name="disk_ring" value="T-60174P-00232-R1M V"/>
 		<info name="release" value="19940922"/>
 		<info name="alt_title" value="スターウォーズ・レベル・アサルト"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60174P-00232-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="star wars - rebel assault (japan)" sha1="5bcc151caa5257bd7bf98bb881069a6fa218c01b"/>
 			</diskarea>
@@ -2160,10 +2162,10 @@ Requires [disc swap]
 		<year>1994</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="T-14014"/>
-		<info name="disk_ring" value="T-14014P-00246-R1M V"/>
 		<info name="release" value="19941028"/>
 		<info name="alt_title" value="スターブレード"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-14014P-00246-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="starblade (japan)" sha1="bb1b7beb8e9b20dc18e1031ed57930eaae78c8cb"/>
 			</diskarea>
@@ -2224,10 +2226,10 @@ Requires [disc swap]
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6009"/>
-		<info name="disk_ring" value="G-6009P-00061-R1M V"/>
 		<info name="release" value="19930423"/>
 		<info name="alt_title" value="スイッチ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6009P-00061-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="switch (japan)" sha1="19fcbae4e4089774fb76b66592b634f15a77765f"/>
 			</diskarea>
@@ -2251,10 +2253,10 @@ Requires [disc swap]
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32084"/>
-		<info name="disk_ring" value="T-32084P-00044-R1M V"/>
 		<info name="release" value="19921225"/>
 		<info name="alt_title" value="天舞メガCDスペシャル"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-32084P-00044-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="tenbu mega cd special (japan)" sha1="e973a5a3d51455b394eecccd99c7b62d407c1a82"/>
 			</diskarea>
@@ -2288,10 +2290,10 @@ Requires [disc swap]
 		<year>1991</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45024"/>
-		<info name="disk_ring" value="T-45024P-00008-R2K V"/>
 		<info name="release" value="19911228"/>
 		<info name="alt_title" value="天下布武 英雄たちの咆哮"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45024P-00008-R2K V"/>
 			<diskarea name="cdrom">
 				<disk name="tenkafubu - eiyuutachi no houkou (japan)" sha1="9a97b0c278d0a5ba7c2df8e7343811f9a0ccd3f2"/>
 			</diskarea>
@@ -2308,10 +2310,10 @@ Requires [disc swap]
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32064"/>
-		<info name="disk_ring" value="T-32064P-00022-R2M V, T-32064P-00022-R1M V"/>
 		<info name="release" value="19920828"/>
 		<info name="alt_title" value="サンダーストームFX"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-32064P-00022-R2M V, T-32064P-00022-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="thunder storm fx (japan)" sha1="8fa31b15432af06c7471b0ec63c5c9a11a00f2af"/>
 			</diskarea>
@@ -2337,10 +2339,10 @@ Requires [disc swap]
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60134"/>
-		<info name="disk_ring" value="T-60134P-00126 2"/>
 		<info name="release" value="19930917"/>
 		<info name="alt_title" value="サンダーホーク"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60134P-00126 2"/>
 			<diskarea name="cdrom">
 				<disk name="thunderhawk (japan)" sha1="0e729497bb3ab8c0614c32d1a3f4668584518356"/>
 			</diskarea>
@@ -2360,10 +2362,10 @@ Requires [disc swap]
 Black screen, requires sub CPU to be overclocked by 1.5x
 ]]></notes>
 		<info name="serial" value="T-32114"/>
-		<info name="disk_ring" value="T-32114P-00031-R1M V"/>
 		<info name="release" value="19921113"/>
 		<info name="alt_title" value="タイムギャル"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-32114P-00031-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="time gal (japan)" sha1="32fffda2ccc83602a0e6d96a18bb3355a4c3d3d5"/>
 			</diskarea>
@@ -2381,10 +2383,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45064"/>
-		<info name="disk_ring" value="T-45064P-00195-R1M V"/>
 		<info name="release" value="19940415"/>
 		<info name="alt_title" value="うる星やつら ディア マイ フレンズ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45064P-00195-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="urusei yatsura - dear my friends (japan)" sha1="3d3e05daf5f3c4fe36c1d08eec1017daaac06c9e"/>
 			</diskarea>
@@ -2416,10 +2418,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>SIMS</publisher>
 		<info name="serial" value="T-44014"/>
-		<info name="disk_ring" value="T-44014P-00141 1"/>
 		<info name="release" value="19931022"/>
 		<info name="alt_title" value="Vay 流星の鎧"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-44014P-00141 1"/>
 			<diskarea name="cdrom">
 				<disk name="vay - ryuusei no yoroi (japan)" sha1="6579a8763ae92f61e363b389f4bf1e4da9eb57e8"/>
 			</diskarea>
@@ -2439,10 +2441,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6001"/>
-		<info name="disk_ring" value="G-6001P-00001-R1K V"/>
 		<info name="release" value="19911220"/>
 		<info name="alt_title" value="惑星ウッドストック ファンキーホラーバンド"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6001P-00001-R1K V"/>
 			<diskarea name="cdrom">
 				<disk name="wakusei woodstock - funky horror band (japan)" sha1="1bc0d49763960db4e7cd53661f07e9a4cd9f2f7b"/>
 			</diskarea>
@@ -2463,10 +2465,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6011"/>
-		<info name="disk_ring" value="G-6011P-00175-R1M V"/>
 		<info name="release" value="19940325"/>
 		<info name="alt_title" value="ウイングコマンダー"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6011P-00175-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="wing commander (japan)" sha1="3056c26fda647bc377c9f266df9bc7bda2cd10e4"/>
 			</diskarea>
@@ -2500,10 +2502,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-76044"/>
-		<info name="disk_ring" value="T-76044P-00123 1"/>
 		<info name="release" value="19930917"/>
 		<info name="alt_title" value="ウイニングポスト"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-76044P-00123 1"/>
 			<diskarea name="cdrom">
 				<disk name="winning post (japan)" sha1="85f6dfa7125b37f9471206898d3b51e0ea2857f7"/>
 			</diskarea>
@@ -2529,10 +2531,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60104"/>
-		<info name="disk_ring" value="T-60104P-00054-R1M V"/>
 		<info name="release" value="19930319"/>
 		<info name="alt_title" value="ウルフチャイルド"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60104P-00054-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="wolfchild (japan)" sha1="42a1505540c34d268809f0199152deaea1ac85dc"/>
 			</diskarea>
@@ -2568,10 +2570,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1992</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60074"/>
-		<info name="disk_ring" value="T-60074P-00028-R1M V"/>
 		<info name="release" value="19920925"/>
 		<info name="alt_title" value="ワンダードッグ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60074P-00028-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="wonder dog (japan)" sha1="04abf554ddfb92e80593787d38018e1673437a99"/>
 			</diskarea>
@@ -2588,10 +2590,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6027"/>
-		<info name="disk_ring" value="G-6027P-00142-R1M V"/>
 		<info name="release" value="19931210"/>
 		<info name="alt_title" value="夢見館の物語"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6027P-00142-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="yumemi yakata no monogatari (japan)" sha1="dc7c2fbcdb1de77601d4f447a88f0ca6cc9a63f1"/>
 			</diskarea>
@@ -2610,10 +2612,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45034"/>
-		<info name="disk_ring" value="T-45034P-00047-R1M V"/>
 		<info name="release" value="19930129"/>
 		<info name="alt_title" value="ゆみみみっくす"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45034P-00047-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="yumimi mix (japan)" sha1="4adc66b222b7a26a3f00be9692a81ad343b07b41"/>
 			</diskarea>
@@ -3454,10 +3456,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-51014"/>
-		<info name="disk_ring" value="T-51014P-00066-R2M"/>
 		<info name="release" value="19930528"/>
 		<info name="alt_title" value="幻影都市 -ILLUSION CITY-"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-51014P-00066-R2M"/>
 			<diskarea name="cdrom">
 				<disk name="denei toshi - illusion city (1993)(micro cabin)(ntsc)(jp)[t-51014p-00066-r2m]" sha1="8035db298e1d4b5713443a07b1285377c5b59cab"/>
 			</diskarea>
@@ -3891,10 +3893,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45074"/>
-		<info name="disk_ring" value="T-45074P-00271-R1M"/>
 		<info name="release" value="19941222"/>
 		<info name="alt_title" value="ルナ-エターナルブルー"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45074P-00271-R1M"/>
 			<diskarea name="cdrom">
 				<disk name="lunar - eternal blue (1994)(game arts)(ntsc)(jp)[t-45074p-00271-r1m]" sha1="1aae24f5646879641f47273db530093648093699"/>
 			</diskarea>
@@ -3913,10 +3915,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45074"/>
-		<info name="disk_ring" value="T-45074P-00271A-R1M"/>
 		<info name="release" value="19941222"/>
 		<info name="alt_title" value="ルナ-エターナルブルー"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45074P-00271A-R1M"/>
 			<diskarea name="cdrom">
 				<disk name="lunar - eternal blue (1994)(game arts)(ntsc)(jp)[t-45074p-00271a-r1m]" sha1="dfe1a6c27af88d8202f5b77aaa81c6661ce8e05f"/>
 			</diskarea>
@@ -3984,10 +3986,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1992</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45014"/>
-		<info name="disk_ring" value="T-45014P-00017-R1M"/>
 		<info name="release" value="19920626"/>
 		<info name="alt_title" value="ルナ ザ・シルバースター"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45014P-00017-R1M"/>
 			<diskarea name="cdrom">
 				<disk name="lunar - the silver star (1992)(game arts)(ntsc)(jp)[t-45014p-00017-r1m]" sha1="5edd3e7a2f928f830abc682375309e78c6b74b1e"/>
 			</diskarea>
@@ -4054,10 +4056,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1992</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45014"/>
-		<info name="disk_ring" value="T-45014P-00017-R2"/>
 		<info name="release" value="19920626"/>
 		<info name="alt_title" value="ルナ ザ・シルバースター"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45014P-00017-R2"/>
 			<diskarea name="cdrom">
 				<disk name="lunar - the silver star (1992)(game arts)(ntsc)(jp)[t-45014p-00017-r2m]" sha1="ee5947838910555eedbe419705ecbda732ff641b"/>
 			</diskarea>
@@ -4107,10 +4109,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="T-49024"/>
-		<info name="disk_ring" value="T-49024P-00016-R2M"/>
 		<info name="release" value="19920619"/>
 		<info name="alt_title" value="魔法の少女シルキーリップ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-49024P-00016-R2M"/>
 			<diskarea name="cdrom">
 				<disk name="mahou no shoujo - silky lip (1992)(riot)(ntsc)(jp)[t-49024p-00016-r2m]" sha1="38f2f195e4c95e27ff7ceb2f8a554ca71f61b004"/>
 			</diskarea>
@@ -4160,10 +4162,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="T-49024"/>
-		<info name="disk_ring" value="T-49024P-00016-R1M"/>
 		<info name="release" value="19920619"/>
 		<info name="alt_title" value="魔法の少女シルキーリップ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-49024P-00016-R1M"/>
 			<diskarea name="cdrom">
 				<disk name="mahou no shoujo - silky lip (1992)(riot)(ntsc)(jp)[t-49024p-00016-r1m]" sha1="a432d30104f55e6fc051cc40e0ce6d416bd7b3fc"/>
 			</diskarea>
@@ -4528,10 +4530,10 @@ Requires [disc swap]
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6003"/>
-		<info name="disk_ring" value="G-6003P-00014B-R1M"/>
 		<info name="release" value="19920529"/>
 		<info name="alt_title" value="クイズスクランブルスペシャル"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6003P-00014B-R1M"/>
 			<diskarea name="cdrom">
 				<disk name="quiz scramble special (1992)(sega)(ntsc)(jp)[g-6003p-00014b-r1m]" sha1="48f5a84eca3432e0a7d145f7543f300ed326b01a"/>
 			</diskarea>
@@ -4587,10 +4589,10 @@ Requires [disc swap]
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6003"/>
-		<info name="disk_ring" value="G-6003P-00014B-R2M"/>
 		<info name="release" value="19920529"/>
 		<info name="alt_title" value="クイズスクランブルスペシャル"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6003P-00014B-R2M"/>
 			<diskarea name="cdrom">
 				<disk name="quiz scramble special (1992)(sega)(ntsc)(jp)[g-6003p-00014b-r2m]" sha1="6b39a0b8ea9ee7860b228e5cdb0109421b9a89e9"/>
 			</diskarea>
@@ -4686,10 +4688,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6012"/>
-		<info name="disk_ring" value="G-6012P-00024-2-R1M"/>
 		<info name="release" value="19930423"/>
 		<info name="alt_title" value="セガクラシック"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6012P-00024-2-R1M"/>
 			<diskarea name="cdrom">
 				<disk name="sega classic arcade collection - limited edition (1992)(sega)(ntsc)(jp)[compilation][r1m]" sha1="95a970944ed0dd6a27d3795cbf695b0b2b0647e4"/>
 			</diskarea>
@@ -4716,10 +4718,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6012"/>
-		<info name="disk_ring" value="G-6012P-00024-2-R2M"/>
 		<info name="release" value="19930423"/>
 		<info name="alt_title" value="セガクラシック"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6012P-00024-2-R2M"/>
 			<diskarea name="cdrom">
 				<disk name="sega classic arcade collection - limited edition (1992)(sega)(ntsc)(jp)[compilation][r2m]" sha1="7f7e5172ee1263bd3eaf927cf488ec2d6657cbff"/>
 			</diskarea>
@@ -4820,10 +4822,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32034"/>
-		<info name="disk_ring" value="T-32034P-00009-R1K"/>
 		<info name="release" value="19920218"/>
 		<info name="alt_title" value="精霊神世紀フェイエリア"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-32034P-00009-R1K"/>
 			<diskarea name="cdrom">
 				<disk name="seirei shinseiki - fhey area (1992)(wolf team)(ntsc)(jp)[t-32034p-00009-r1k]" sha1="ade3853c78d5b6a0fb12b07377f470875b253609"/>
 			</diskarea>
@@ -4923,10 +4925,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32034"/>
-		<info name="disk_ring" value="T-32034P-00009-R2K"/>
 		<info name="release" value="19920218"/>
 		<info name="alt_title" value="精霊神世紀フェイエリア"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-32034P-00009-R2K"/>
 			<diskarea name="cdrom">
 				<disk name="seirei shinseiki - fhey area (1992)(wolf team)(ntsc)(jp)[t-32034p-00009-r2k]" sha1="5d0fe93b926309238040c94f55c010fb3673851a"/>
 			</diskarea>
@@ -5085,10 +5087,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>19??</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="T-32064"/>
-		<info name="disk_ring" value="T32064P-00022-R1M"/>
 		<info name="release" value="19920828"/>
 		<info name="alt_title" value="サンダーストームFX"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T32064P-00022-R1M"/>
 			<diskarea name="cdrom">
 				<disk name="thunder storm fx (1992)(wolf team)(ntsc)(jp)(en)[t32064p-00022-r1m]" sha1="ffbb3832ad9873afa1e5d257e2f93fb3d07ca3e3"/>
 			</diskarea>
@@ -5105,10 +5107,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32064"/>
-		<info name="disk_ring" value="T32064P-00022-R2M"/>
 		<info name="release" value="19920828"/>
 		<info name="alt_title" value="サンダーストームFX"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T32064P-00022-R2M"/>
 			<diskarea name="cdrom">
 				<disk name="thunder storm fx (1992)(wolf team)(ntsc)(jp)(en)[t32064p-00022-r2m]" sha1="992cb2f5fd2209dd959b351c5d2f7cc548981dc7"/>
 			</diskarea>
@@ -5202,9 +5204,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="SG-6034"/>
-		<info name="cd_matrix" value="SG-6034-R1M V"/>
 		<info name="alt_title" value="ヘブンリー シンフォニー フォームラワン ワールド チャンピオンシップ 1993 非売品"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="SG-6034-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="heavenly symphony - formula one world championship 1993 hibaihin (japan)" sha1="42524a8b0f0232df1519551e492a89300f772ff3"/>
 			</diskarea>
@@ -5234,9 +5236,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="CDS-222"/>
-		<info name="cd_matrix" value="CDS-222-R1M V"/>
 		<info name="alt_title" value="慶応遊撃隊 体験版 非売品"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="CDS-222-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="keiou yuugekitai taikenban hibaihin (japan)" sha1="51cc65015c31d30d75eddef7aa2c1bfaeb2f48bf"/>
 			</diskarea>
@@ -5301,9 +5303,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="ST-45074"/>
-		<info name="cd_matrix" value="ST-45074 MT B01"/>
 		<info name="alt_title" value="ルナ-エターナルブルー 非売品 オートデモ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="ST-45074 MT B01"/>
 			<diskarea name="cdrom">
 				<disk name="lunar - eternal blue hibaihin auto demo (japan)" sha1="cc87b4610877d135207100c2eff7affa572ef56c"/>
 			</diskarea>
@@ -5327,9 +5329,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="CDS-10003"/>
-		<info name="cd_matrix" value="CDS-10003-R1M V"/>
 		<info name="alt_title" value="マイクロコズム デモCD"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="CDS-10003-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="microcosm demo cd (japan)" sha1="2983f32c9c63753cc3acbd5160cd830b8b844090"/>
 			</diskarea>
@@ -5346,9 +5348,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="SG-6025"/>
-		<info name="cd_matrix" value="SG-6025-R1M V"/>
 		<info name="alt_title" value="ナイトトラップ 非売品"/>
 		<part name="cdrom1" interface="scd_cdrom">
+			<feature name="cd_matrix" value="SG-6025-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="night trap hibaihin (japan)" sha1="b852a032c5e49655a060cad7f6e18a205578be1f"/>
 			</diskarea>
@@ -5395,9 +5397,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="SG-6029"/>
-		<info name="cd_matrix" value="SG-6029-R1M V"/>
 		<info name="alt_title" value="ぽっぷるメイル 体験版 非売品"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="SG-6029-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="popful mail taikenban hibaihin (japan)" sha1="c09abf833cb576503c745affbfd3d091ccc76a27"/>
 			</diskarea>
@@ -5415,9 +5417,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Data West</publisher>
 		<info name="serial" value="T-84024 DWMD2905"/>
-		<info name="cd_matrix" value="DWMD-2905"/>
 		<info name="alt_title" value="サイキック・ディテクティブ・シリーズ Vol.3 AYA AUTO DEMO"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="DWMD-2905"/>
 			<diskarea name="cdrom">
 				<disk name="psychic detective series vol. 3 - aya auto demo (japan)" sha1="5402ed98cd6f980e97473071630362d6f63c5f0e"/>
 			</diskarea>
@@ -5435,9 +5437,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="ST-45054"/>
-		<info name="cd_matrix" value="ST-45054 MT 1B1 +"/>
 		<info name="alt_title" value="シルフィード 非売品"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="ST-45054 MT 1B1 +"/>
 			<diskarea name="cdrom">
 				<disk name="silpheed hibaihin (japan)" sha1="18f438c6fce0f143046fc4eeb15eec6fb47a1631"/>
 			</diskarea>
@@ -5454,9 +5456,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="ST-45054"/>
-		<info name="cd_matrix" value="ST-45054 MT 1B1 +"/>
 		<info name="alt_title" value="シルフィード 非売品"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="ST-45054 MT 1B1 +"/>
 			<diskarea name="cdrom">
 				<disk name="silpheed hibaihin (japan) (fixed)" sha1="12c371524399e53978e57b17673265a3d9cf9b80"/>
 			</diskarea>
@@ -5509,9 +5511,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 Game will not boot if the system backup RAM is not formatted.
 ]]></notes>
 		<info name="serial" value="SG-6021"/>
-		<info name="cd_matrix" value="SG-6021-R3M V"/>
 		<info name="alt_title" value="ソニック・ザ・ヘッジホッグCD 非売品"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="SG-6021-R3M V"/>
 			<diskarea name="cdrom">
 				<disk name="sonic the hedgehog cd hibaihin (japan)" sha1="fc5d4690bfc10e4fe6bb81a753c7750b99c2cb46"/>
 			</diskarea>
@@ -5546,9 +5548,9 @@ Game will not boot if the system backup RAM is not formatted.
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="CDS-10002"/>
-		<info name="cd_matrix" value="CDS-10002-R1M V"/>
 		<info name="alt_title" value="サンダーホーク 非売品"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="CDS-10002-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="thunderhawk hibaihin (japan)" sha1="533205e617a7514de1d9e877c3cc0597ca92e4ea"/>
 			</diskarea>
@@ -5566,9 +5568,9 @@ Game will not boot if the system backup RAM is not formatted.
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="ST-45064"/>
-		<info name="cd_matrix" value="ST-45064P MT B01"/>
 		<info name="alt_title" value="うる星やつら ディア マイ フレンズ 非売品"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="ST-45064P MT B01"/>
 			<diskarea name="cdrom">
 				<disk name="urusei yatsura - dear my friends hibaihin (japan)" sha1="7a96e2445094a93d14934ab454585d4077ecc3ca"/>
 			</diskarea>
@@ -5585,9 +5587,9 @@ Game will not boot if the system backup RAM is not formatted.
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="SG-6027"/>
-		<info name="cd_matrix" value="SG-6027-R1M V"/>
 		<info name="alt_title" value="夢見館の物語 非売品"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="SG-6027-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="yumemi yakata no monogatari hibaihin (japan)" sha1="b7ac1185ea75ec042e8be9e1bdce091bfb0b906b"/>
 			</diskarea>
@@ -5637,9 +5639,9 @@ Game will not boot if the system backup RAM is not formatted.
 		<year>1992</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="CDS-135"/>
-		<info name="cd_matrix" value="CDS-135-3-R1M V"/>
 		<info name="alt_title" value="ワンダーメガ コレクション"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="CDS-135-3-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="wondermega collection - game garden (japan) (alt)" sha1="968f935a26ed155318382bccf86218a7da5c065b"/>
 			</diskarea>

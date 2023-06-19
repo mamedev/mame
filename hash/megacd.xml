@@ -27,8 +27,8 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4412"/>
-		<info name="ring_code" value="MK-4412P-00154 1"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4412P-00154 1"/>
 			<diskarea name="cdrom">
 				<disk name="amazing spider-man vs. the kingpin, the (europe)" sha1="1e8feaeed3d77290796b33a87ff3ad40fb5e330f"/>
 			</diskarea>
@@ -64,8 +64,8 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4401"/>
-		<info name="ring_code" value="MK-4401P-00084 4"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4401P-00084 4"/>
 			<diskarea name="cdrom">
 				<disk name="batman returns (europe)" sha1="55b308f7659ab8bb4a25f450c93032c6f20d74e7"/>
 			</diskarea>
@@ -101,8 +101,8 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4401"/>
-		<info name="ring_code" value="MK-4401P-00084 3"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4401P-00084 3"/>
 			<diskarea name="cdrom">
 				<disk name="batman returns (europe) (alt)" sha1="f555bac913565f8f2408df6e8016dad1641a88cf"/>
 			</diskarea>
@@ -197,8 +197,8 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Core Design</publisher>
 		<info name="serial" value="T-115075-50"/>
-		<info name="ring_code" value="CDD5661 T-115075-50"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="CDD5661 T-115075-50"/>
 			<diskarea name="cdrom">
 				<disk name="bc racers (europe) (en,fr,de)" sha1="70846d7b219407714d2760345ecc9f819c4afbe3"/>
 			</diskarea>
@@ -236,8 +236,8 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4405"/>
-		<info name="ring_code" value="MK-4405P-00046-R1M"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4405P-00046-R1M"/>
 			<diskarea name="cdrom">
 				<disk name="blackhole assault (europe)" sha1="398803262717642a8aab1676933d5e41f3136fee"/>
 			</diskarea>
@@ -254,8 +254,8 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4402"/>
-		<info name="ring_code" value="MK-4402P-00032-R1M V, MK-4402P-00032 2"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4402P-00032-R1M V, MK-4402P-00032 2"/>
 			<diskarea name="cdrom">
 				<disk name="cobra command (europe)" sha1="ada1606091cdd644bbc05cf2bf00bc22fcd7535f"/>
 			</diskarea>
@@ -272,8 +272,8 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
 		<info name="serial" value="T-162055-50"/>
-		<info name="ring_code" value="GW 02312 SRCR##01 M1S2"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="GW 02312 SRCR##01 M1S2"/>
 			<diskarea name="cdrom">
 				<disk name="corpse killer (europe)" sha1="dabe064bf2cc0a43dd162d3cf2da09af53f2515f"/>
 			</diskarea>
@@ -294,13 +294,16 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK-4420-50"/>
-		<info name="ring_code" value="CDD4154 MK-4420P-00168 (Disc 1), CDD4153 MK-4420P-00169 (Disc 2)"/>
 		<part name="cdrom1" interface="scd_cdrom">
+			<feature name="part_id" value="Disc 1"/>
+			<feature name="cd_matrix" value="CDD4154 MK-4420P-00168"/>
 			<diskarea name="cdrom">
 				<disk name="dracula unleashed (europe) (disc 1)" sha1="6080b9f81aefa5dfe7d1cdd6e2b467ca67d254a3"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="scd_cdrom">
+			<feature name="part_id" value="Disc 2"/>
+			<feature name="cd_matrix" value="CDD4153 MK-4420P-00169"/>
 			<diskarea name="cdrom">
 				<disk name="dracula unleashed (europe) (disc 2)" sha1="a52630cea25c0660f695d1f30566adeede946226"/>
 			</diskarea>
@@ -317,8 +320,8 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70035-50"/>
-		<info name="ring_code" value="CDD4095 T-70065-50"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="CDD4095 T-70065-50"/>
 			<diskarea name="cdrom">
 				<disk name="dune (europe) (en,fr,de,es,it,ar)" sha1="50a9cec0b1bcd0b240837032b3f2d0547dd5b4b2"/>
 			</diskarea>
@@ -393,8 +396,8 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4441"/>
-		<info name="ring_code" value="CDD6956 MK-4441P-00318"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="CDD6956 MK-4441P-00318"/>
 			<diskarea name="cdrom">
 				<disk name="ecco - the tides of time (europe) (en,fr,de,es)" sha1="6eb9d229b1425bed9e7657d11649f32523012346"/>
 			</diskarea>
@@ -425,8 +428,8 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4408"/>
-		<info name="ring_code" value="MK-4408P-00135 1"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4408P-00135 1"/>
 			<diskarea name="cdrom">
 				<disk name="ecco the dolphin (europe)" sha1="30aec664151e134514fc71de0686c68f88094274"/>
 			</diskarea>
@@ -443,8 +446,8 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="T-93115-50"/>
-		<info name="ring_code" value="T-93115-50 15 A2"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-93115-50 15 A2"/>
 			<diskarea name="cdrom">
 				<disk name="espn baseball tonight (europe)" sha1="7cc9125369e1743239573a1b297e00106dade115"/>
 			</diskarea>
@@ -502,8 +505,8 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4410"/>
-		<info name="ring_code" value="MK-4410P-00067-R1M V"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4410P-00067-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="final fight cd (europe)" sha1="bc70692b148144ae27b2e89072d2f8b77f48ce8c"/>
 			</diskarea>
@@ -524,13 +527,16 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="T-93145-50"/>
-		<info name="ring_code" value="1-T-93145-50 31 A3 (Disc 1), 2-T-93145-50 11 A5 (Disc 2)"/>
 		<part name="cdrom1" interface="scd_cdrom">
+			<feature name="part_id" value="Disc 1"/>
+			<feature name="cd_matrix" value="1-T-93145-50 31 A3"/>
 			<diskarea name="cdrom">
 				<disk name="ground zero texas (europe) (disc 1)" sha1="499cbb316915b5c006277f5591eff36dacbb7f52"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="scd_cdrom">
+			<feature name="part_id" value="Disc 2"/>
+			<feature name="cd_matrix" value="2-T-93145-50 11 A5"/>
 			<diskarea name="cdrom">
 				<disk name="ground zero texas (europe) (disc 2)" sha1="4eefbaabeb7cc4c1ced4dcbc1722e5c5330a3759"/>
 			</diskarea>
@@ -558,8 +564,8 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4602"/>
-		<info name="ring_code" value="MK-4602P-00052-R1M V"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4602P-00052-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="jaguar xj220 (europe) (en,ja)" sha1="41435c07da25ab9d0bff3aa67712cf8e5bf91c81"/>
 			</diskarea>
@@ -606,8 +612,8 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4783"/>
-		<info name="ring_code" value="MK-4411P-00202 I-5461 A"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4411P-00202 I-5461 A"/>
 			<diskarea name="cdrom">
 				<disk name="jurassic park (europe)" sha1="5d6e495dc16938bad7f0b53a77c1b35a8a1dbfd5"/>
 			</diskarea>
@@ -645,8 +651,8 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-95025-50"/>
-		<info name="ring_code" value="IFPI L274 T90525-E12 2"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="IFPI L274 T90525-E12 2"/>
 			<diskarea name="cdrom">
 				<disk name="lethal enforcers ii - gun fighters (europe)" sha1="e2e9d2555ed76026fecc127337abd073fa3206e0"/>
 			</diskarea>
@@ -689,8 +695,8 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="T-93305-50"/>
-		<info name="ring_code" value="T-93305-50 51 A4"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-93305-50 51 A4"/>
 			<diskarea name="cdrom">
 				<disk name="mickey mania (europe)" sha1="d2f59f10d53cb71ccd1622c81d12c12c431ac710"/>
 			</diskarea>
@@ -726,8 +732,8 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Arena</publisher>
 		<info name="serial" value="T-81025-50"/>
-		<info name="ring_code" value="CDD3792"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="CDD3792"/>
 			<diskarea name="cdrom">
 				<disk name="mortal kombat (europe)" sha1="6d5b3ec89f993737ff0febbb4ee49fbbca151bdc"/>
 			</diskarea>
@@ -751,8 +757,8 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-81035-50"/>
-		<info name="ring_code" value="DADC AUSTRIA NBA-JAM 23"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="DADC AUSTRIA NBA-JAM 23"/>
 			<diskarea name="cdrom">
 				<disk name="nba jam (europe)" sha1="f837d3aff74dbc304b8714365a5abe562c448211"/>
 			</diskarea>
@@ -773,13 +779,16 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4903"/>
-		<info name="ring_code" value="MK-4903P-00068-R1M V (Disc 1), MK-4903P-00069-R1M V (Disc 2)"/>
 		<part name="cdrom1" interface="scd_cdrom">
+			<feature name="part_id" value="Disc 1"/>
+			<feature name="cd_matrix" value="MK-4903P-00068-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="night trap (europe) (disc 1)" sha1="a37dfcb50ba5ee52871a0ebc0a73350daab26747"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="scd_cdrom">
+			<feature name="part_id" value="Disc 2"/>
+			<feature name="cd_matrix" value="MK-4903P-00069-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="night trap (europe) (disc 2)" sha1="206bcdea91e03fc684b8d7fa10c3dce8152468da"/>
 			</diskarea>
@@ -819,8 +828,8 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4652"/>
-		<info name="ring_code" value="MK-4652P-00043-R2M V"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4652P-00043-R2M V"/>
 			<diskarea name="cdrom">
 				<disk name="prince of persia (europe)" sha1="701b6b57b2cc1a3409260255123a531ce4aada62"/>
 			</diskarea>
@@ -842,8 +851,8 @@ license:CC0-1.0
 Black screen, requires sub CPU to be overclocked by 1.5x
 ]]></notes>
 		<info name="serial" value="4603"/>
-		<info name="ring_code" value="MK-4603P-00053-R1M V"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4603P-00053-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="road avenger (europe)" sha1="6e5d48a8654138d246a500810826126d0b9884ef"/>
 			</diskarea>
@@ -870,8 +879,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4127"/>
-		<info name="ring_code" value="6105411P-00036A-R1M V"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="6105411P-00036A-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="sega classics arcade collection (europe)" sha1="a5a715cecd3209fc125abd200746721bdc40856a"/>
 			</diskarea>
@@ -888,8 +897,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1992</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="T-93015-50"/>
-		<info name="ring_code" value="T-93015-50 14"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-93015-50 14"/>
 			<diskarea name="cdrom">
 				<disk name="sewer shark (europe)" sha1="158fbd44790f66c5ed7af626876a62f1c7c20934"/>
 			</diskarea>
@@ -918,8 +927,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Shadow of the Beast II (Europe)</description>
 		<year>19??</year>
 		<publisher>Sega</publisher>
-		<info name="ring_code" value="T-113045-50 21"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-113045-50 21"/>
 			<diskarea name="cdrom">
 				<disk name="shadow of the beast ii (europe)" sha1="afdb5c237bbee870756142487c3bdc958256f7d4"/>
 			</diskarea>
@@ -935,8 +944,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4650"/>
-		<info name="ring_code" value="MK-4650P-00051-R1M 1 2 V"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4650P-00051-R1M 1 2 V"/>
 			<diskarea name="cdrom">
 				<disk name="sherlock holmes - consulting detective vol. i (europe)" sha1="c8748f146a49aa8c7692d66a85aaed324f88210c"/>
 			</diskarea>
@@ -959,8 +968,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4423"/>
-		<info name="ring_code" value="MK-4423P-00150 1"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4423P-00150 1"/>
 			<diskarea name="cdrom">
 				<disk name="silpheed (europe)" sha1="f5e58c0216adae49575fc6ff3e30843e9437d592"/>
 			</diskarea>
@@ -982,13 +991,16 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
 		<info name="serial" value="T-162035-50"/>
-		<info name="ring_code" value="GW 027112.1 SRCR**01 (Disc 1), GW 02712.2 SRCR**01 (Disc 2)"/>
 		<part name="cdrom1" interface="scd_cdrom">
+			<feature name="part_id" value="Disc 1"/>
+			<feature name="cd_matrix" value="GW 027112.1 SRCR**01"/>
 			<diskarea name="cdrom">
 				<disk name="slam city with scottie pippen (europe) (disc 1)" sha1="6dbbbac0e2a17b7a453132b4e2387d8fd71328bd"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="scd_cdrom">
+			<feature name="part_id" value="Disc 2"/>
+			<feature name="cd_matrix" value="GW 02712.2 SRCR**01"/>
 			<diskarea name="cdrom">
 				<disk name="slam city with scottie pippen (europe) (disc 2)" sha1="e2991e6762f7de02d8e0654f6a7b515374089121"/>
 			</diskarea>
@@ -1024,8 +1036,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1994</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="T-151015-50"/>
-		<info name="ring_code" value="DADC AUSTRIA SCHTRMO2500 25"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="DADC AUSTRIA SCHTRMO2500 25"/>
 			<diskarea name="cdrom">
 				<disk name="smurfs, the (europe) (en,fr,de,es,it)" sha1="ada0f992b04984aa20da0336e5e4ddf435c7c8f6"/>
 			</diskarea>
@@ -1058,8 +1070,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4130"/>
-		<info name="ring_code" value="MK-4130P-00033-R1M V"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4130P-00033-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="sol-feace (europe)" sha1="63994895abe2c84c4a3a8e95779d72f06369943b"/>
 			</diskarea>
@@ -1109,8 +1121,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4407"/>
-		<info name="ring_code" value="MK-4407P-00131 2"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4407P-00131 2"/>
 			<diskarea name="cdrom">
 				<disk name="sonic cd (europe)" sha1="a7e16fdc30c2d0ef6ceb78ab2bda3a220a4a8316"/>
 			</diskarea>
@@ -1142,8 +1154,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="T-115035-50"/>
-		<info name="ring_code" value="CDD5051 T-115035-50"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="CDD5051 T-115035-50"/>
 			<diskarea name="cdrom">
 				<disk name="soulstar (europe) (en,fr,de)" sha1="f4b22f514e8e324e8488e9c79d5afe1d87d462b1"/>
 			</diskarea>
@@ -1163,8 +1175,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1995</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="T-143015-50"/>
-		<info name="ring_code" value="CDD8023 SPACE ADVENTURE"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="CDD8023 SPACE ADVENTURE"/>
 			<diskarea name="cdrom">
 				<disk name="space adventure, the - cobra - the legendary bandit (europe)" sha1="c71b0e00967f6f8cbaf04320597ee352eea9d801"/>
 			</diskarea>
@@ -1181,8 +1193,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1994</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="T-60075-50"/>
-		<info name="ring_code" value="CDD4414 T-60075-50"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="CDD4414 T-60075-50"/>
 			<diskarea name="cdrom">
 				<disk name="star wars - rebel assault (europe)" sha1="2027d03f068c90d8f01da0c53a27be7d1d75013a"/>
 			</diskarea>
@@ -1209,8 +1221,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Core Design</publisher>
 		<info name="serial" value="T-115015-50"/>
-		<info name="ring_code" value="SEGAT115015RE R5C"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="SEGAT115015RE R5C"/>
 			<diskarea name="cdrom">
 				<disk name="thunderhawk (europe) (en,fr,de,es)" sha1="904664afa73921a86355e3130b7169c763d15181"/>
 			</diskarea>
@@ -1227,8 +1239,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4417"/>
-		<info name="ring_code" value="MK-4417P-00064 1"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4417P-00064 1"/>
 			<diskarea name="cdrom">
 				<disk name="time gal (europe)" sha1="840678ee6bc879ec58a2a80d49fc0e5c8faba12a"/>
 			</diskarea>
@@ -1245,8 +1257,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4429"/>
-		<info name="ring_code" value="CDD4003"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="CDD4003"/>
 			<diskarea name="cdrom">
 				<disk name="tomcat alley (europe)" sha1="7577af7c7e357159468e726c5f68e69754fcf45c"/>
 			</diskarea>
@@ -1263,8 +1275,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4429-18"/>
-		<info name="ring_code" value="CDD6921 MK-4429P-00301"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="CDD6921 MK-4429P-00301"/>
 			<diskarea name="cdrom">
 				<disk name="tomcat alley (germany)" sha1="1e9b5447352519d09c4f717995c17f8143a44824"/>
 			</diskarea>
@@ -1290,8 +1302,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4404"/>
-		<info name="ring_code" value="MK-4404P-00050-R1M V"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4404P-00050-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="wolfchild (europe)" sha1="ab3e00347753327a46206acdf5ae16d0645b008a"/>
 			</diskarea>
@@ -1507,8 +1519,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4402"/>
-		<info name="ring_code" value="MK-4402P-00032 2"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4402P-00032 2"/>
 			<diskarea name="cdrom">
 				<disk name="cobra command (1993)(sega)(pal)[mk-4402p-00032 2]" sha1="a24ad79b1d0b7acfabe7bbc43fd8e39aaebec7d2"/>
 			</diskarea>
@@ -1525,8 +1537,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4402"/>
-		<info name="ring_code" value="MK-4402P-00032-R1M"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4402P-00032-R1M"/>
 			<diskarea name="cdrom">
 				<disk name="cobra command (1993)(sega)(pal)[mk-4402p-00032-r1m]" sha1="4f439e01d4d9827cabb1f730271e60293476fd5a"/>
 			</diskarea>
@@ -1641,8 +1653,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4408"/>
-		<info name="ring_code" value="I-2647 A"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="I-2647 A"/>
 			<diskarea name="cdrom">
 				<disk name="ecco the dolphin (1993)(sega)(pal)[i-2647 a]" sha1="963e35f70becc35a8d5bf0edf3424a2552e9efd1"/>
 			</diskarea>
@@ -1673,8 +1685,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4408"/>
-		<info name="ring_code" value="MK-4408P-00135 1"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4408P-00135 1"/>
 			<diskarea name="cdrom">
 				<disk name="ecco the dolphin (1993)(sega)(pal)[mk-4408p-00135 1]" sha1="21819efcb7698eb4614ec78ac71cebcf5b36e865"/>
 			</diskarea>
@@ -2251,8 +2263,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Psygnosis</publisher>
 		<info name="serial" value="T-113015-50"/>
-		<info name="ring_code" value="T-113015-50 14"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-113015-50 14"/>
 			<diskarea name="cdrom">
 				<disk name="microcosm (1993)(psygnosis)(pal)[t-113015-50 14]" sha1="2b9ebf7221f6385bf7b3c05969d7eabad28375ec"/>
 			</diskarea>
@@ -2276,8 +2288,8 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<year>1993</year>
 		<publisher>Psygnosis</publisher>
 		<info name="serial" value="T-113015-50"/>
-		<info name="ring_code" value="T-113015-50 24"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-113015-50 24"/>
 			<diskarea name="cdrom">
 				<disk name="microcosm (1993)(psygnosis)(pal)[t-113015-50 24]" sha1="259f8c1870cd2b8ff4b2028259c302c275cdc129"/>
 			</diskarea>
@@ -2709,8 +2721,8 @@ Requires [disc swap]
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4127"/>
-		<info name="ring_code" value="610-5411P-00036A 2"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="610-5411P-00036A 2"/>
 			<diskarea name="cdrom">
 				<disk name="sega classics arcade collection - limited edition (1993)(sega)(pal)[compilation][610-5411p-00036a 2]" sha1="8ff8cd77cb561454096993135cdf8fdc675b1871"/>
 			</diskarea>
@@ -3076,8 +3088,8 @@ Requires [disc swap]
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4130"/>
-		<info name="ring_code" value="MK-4130P-00033 2"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4130P-00033 2"/>
 			<diskarea name="cdrom">
 				<disk name="sol-feace (1993)(sega)(pal)[mk-4130p-00033 2]" sha1="6fa54dd518e6e5d8db870ce0bdbf88457868ffb7"/>
 			</diskarea>
@@ -3110,8 +3122,8 @@ Requires [disc swap]
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4130"/>
-		<info name="ring_code" value="MK-4130P-00033-R1M"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="MK-4130P-00033-R1M"/>
 			<diskarea name="cdrom">
 				<disk name="sol-feace (1993)(sega)(pal)[mk-4130p-00033-r1m]" sha1="cc28ad9a944fc808141546d69dcb8e7b3f754dd3"/>
 			</diskarea>
@@ -3316,8 +3328,8 @@ Requires [disc swap]
 		<year>1993</year>
 		<publisher>Core Design</publisher>
 		<info name="serial" value="T-115015-50"/>
-		<info name="ring_code" value="SEGAT115015RE R4C"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="SEGAT115015RE R4C"/>
 			<diskarea name="cdrom">
 				<disk name="thunderhawk (1993)(core)(pal)(m4)[segat115015re r4c]" sha1="eb2891baf1df4a55124eef0cbe9ebed6b96c4cac"/>
 			</diskarea>
@@ -3344,8 +3356,8 @@ Requires [disc swap]
 		<year>1993</year>
 		<publisher>Core Design</publisher>
 		<info name="serial" value="T-115015-50"/>
-		<info name="ring_code" value="SEGAT115015RE R5C"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="SEGAT115015RE R5C"/>
 			<diskarea name="cdrom">
 				<disk name="thunderhawk (1993)(core)(pal)(m4)[segat115015re r5c]" sha1="dd4cfe52d595a38109b20c03b21e869b1be54f3a"/>
 			</diskarea>
