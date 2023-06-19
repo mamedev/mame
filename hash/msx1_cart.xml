@@ -9374,6 +9374,19 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="nnprowrsk" cloneof="nnprowrs">
+		<description>Yeoja Wres (Korea)</description>
+		<year>1986</year>
+		<publisher>Sammi Computer</publisher>
+		<info name="alt_title" value="여자 레스" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="nyannyan pro wrestling (korea).rom" size="0x8000" crc="6d8ba818" sha1="bd1d59403b9e57ea25eb24ea7c2248aeec9bf34b" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nyorols">
 		<description>Nyorols (Japan)</description>
 		<year>1983</year>
@@ -17903,7 +17916,8 @@ legacy FM implementations cannot find it.
 	</software>
 
 	<!-- TODO possibility to add a second drive -->
-	<software name="hb3600">
+	<!-- CP/M image not recognized. -->
+	<software name="hb3600" supported="partial">
 		<description>HB-3600 Controller + HB-6000 5.25" DSDD floppy drive (Brazil)</description>
 		<year>19??</year>
 		<publisher>Sharp</publisher>
@@ -17911,6 +17925,20 @@ legacy FM implementations cannot find it.
 			<feature name="slot" value="disk_hb3600" />
 			<dataarea name="rom" size="0x4000">
 				<rom name="hb3600_disk.rom" size="0x4000" crc="af445c3d" sha1="608e8e9ab91c67f7015a67ea12f52ea3b0d609cd" />
+			</dataarea>
+		</part>
+		<!-- MSX-DOS compatible -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="HB-DOS v1.2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="hb-dos1.2.dsk" size="368640" crc="3ea857bd" sha1="e96ced3c056d476e637f56b3057d29b71599a32f"/>
+			</dataarea>
+		</part>
+		<!-- CP/M compatible, image not recognized by MAME. -->
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="HB-MCP v1.1"/>
+			<dataarea name="flop" size="365568">
+				<rom name="hb-mcp1.1.dsk" size="365568" crc="467214bf" sha1="08ac814adec095ec4be62fb72fcb4e9741e91856"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18139,6 +18167,253 @@ legacy FM implementations cannot find it.
 
 
 <!-- Homebrew / Doujin software -->
+
+	<software name="namakebd">
+		<description>Namake's Bridgedrome</description>
+		<year>2005</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Buresto Faiya"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="namake's bridgedrome - buresto faiya (2005).rom" size="0x4000" crc="92aee975" sha1="05b8109f4f0a4d9c1bcb837982abb573236be936" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nayaders">
+		<description>Nayade Resistance - Episode I</description>
+		<year>2014</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Pentacour"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="nayade resistance - pentacour (2014).rom" size="0x8000" crc="3587844a" sha1="8ee50f92db170a3cfa48d7cafd91e555f43c6406" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nayadersa" cloneof="nayaders">
+		<description>Nayade Resistance - Episode I (alt)</description>
+		<year>2014</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Pentacour"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="nayade resistance - pentacour (2014) (alt).rom" size="0x8000" crc="168b335d" sha1="d7e4a4481390b6a8a399ece9557b776ad2eac86a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neopong">
+		<description>NeoPONG512 (v1.1)</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Z80ST-Software"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="neopong512 - z80st (2010) (v1.1).rom" size="0x8000" crc="39c6cd68" sha1="e110e7165e571c64d268efa1f811d62f1a8da769" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neopong10" cloneof="neopong">
+		<description>NeoPONG512 (v1.0)</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Z80ST-Software"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="neopong512 - z80st (2010) (v1.0).rom" size="0x8000" crc="3ff6fdcc" sha1="328bf269bc38a706f1b6dec688d4f47e4a830199" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neuras">
+		<description>Neuras</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Inufuto"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="neuras (inufuto)(2021).rom" size="0x4000" crc="d9f77083" sha1="e40b6cc6349d719505527e4afa5453be6e00763e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="niceswc">
+		<description>Nice Soccer World Cup</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Yermani Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="nice soccer world cup - yermani soft (2010).rom" size="0x4000" crc="7635105a" sha1="50c8a1f1298b48cd3e325a859ea68d5739d87a01" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nightcit">
+		<description>Night City (English)</description>
+		<year>2005</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Yermani Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="night city - yermani soft (2005) (english).rom" size="0x10000" crc="7990a7f8" sha1="ce3f9356eaa5fd6c1b5ff1ade244ebd9130f1ceb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nightcits" cloneof="nightcit">
+		<description>Night City (Spanish)</description>
+		<year>2005</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Yermani Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="night city - yermani soft (2005) (spanish).rom" size="0x10000" crc="f976849e" sha1="76b7a5e75d5091f0482746e5a0c0a71de07ddf83" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nightdrv">
+		<description>Night Driver</description>
+		<year>2007</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="night driver - karoshi corporation (2007).rom" size="0x2000" crc="28610b8a" sha1="fcc1cf816657e90bb1e0a93898fd17a8325c2cd3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nightesc">
+		<description>Night Escape</description>
+		<year>2011</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Sherif Hashem"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="night escape - sherif hashem (2011).rom" size="0x4000" crc="9c5bcb6b" sha1="1ebbc94d106c995ad9499a4e1ff5848ffe3b509a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ninjasav">
+		<description>Ninja Savior</description>
+		<year>2015</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="RELEVO Videogames"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="ninja savior - relevo videogames (2015).rom" size="0x4000" crc="c059ffba" sha1="0a8c3bbe9ed26e25658ec99192056b5a50571041" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="no">
+		<description>No (Japan)</description>
+		<year>20??</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<!-- developer unknown -->
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="no - unknown.rom" size="0x4000" crc="54b26edd" sha1="7bcce7814582b6b5d84eb5972a310a9e2e3a81c5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nobckdwn">
+		<description>No Back Down</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="SoCal"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="no back down - socal (2021).rom" size="0x10000" crc="a78fdb26" sha1="d47e20d83063cd6bbda8566177a53baff358e5f5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="noboruno">
+		<description>Noborunoca (v1.0.0)</description>
+		<year>2022</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Hiromasa Tanaka"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="noborunoca (v1.0.0) - hiromasa tanaka (2022).rom" size="0x8000" crc="2f8ffb68" sha1="1be491de6825107a096fdad7db0dc6e6ba8e4a3b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="noboruno070" cloneof="noboruno">
+		<description>Noborunoca (v0.7.0)</description>
+		<year>2022</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Hiromasa Tanaka"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="noborunoca (v0.7.0) - hiromasa tanaka (2022).rom" size="0x8000" crc="bf6c059f" sha1="d7dcd5008fe2c1f65cb91d833842024f7ba3527b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nogaliod">
+		<description>Nogalious (demo)</description>
+		<year>2019</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="LUEGOLU3GO Studio"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="nogalious (demo) - luegolu3go studio (2019).rom" size="0x80000" crc="8728e3e9" sha1="678be67c55ba0f0bc7eeb4b53b79a0c4d6597f72" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nohzdyve">
+		<description>Nohzdyve</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Giovanni Nunes"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="nohzdyve - giovanni nunes (2019).rom" size="0x2000" crc="4e6fb8ea" sha1="d1ddce52395fd794a0fd6dcde96b4912f3528e74" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="numbrman">
+		<description>Numberman</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="anemotionalfish"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="numberman - anemotionalfish (2020).rom" size="0x8000" crc="71c4ea78" sha1="aa676faf793140a80755c741738332e57e9186d2" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="o">
 		<description>O</description>
