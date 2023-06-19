@@ -5157,6 +5157,92 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 
 	<!-- Tosec Demos, Bonus Discs etc. -->
 
+	<software name="heavenlydemo" cloneof="heavenly">
+		<!-- source redump.org
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo).cue" size="6110" crc="7096405f" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 01).bin" size="202408416" crc="9b3fb252" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 02).bin" size="16014768" crc="129ed3da" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 03).bin" size="19707408" crc="fc68a898" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 04).bin" size="16753296" crc="32337abf" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 05).bin" size="11658864" crc="93860f87" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 06).bin" size="11228448" crc="56096ca3" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 07).bin" size="17433024" crc="dcfa821f" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 08).bin" size="12324480" crc="d395cb4d" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 09).bin" size="15462048" crc="c2eb664c" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 10).bin" size="26107200" crc="5686998d" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 11).bin" size="11529504" crc="7c24ea79" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 12).bin" size="15377376" crc="3aa5bdc5" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 13).bin" size="21337344" crc="bdbc2d65" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 14).bin" size="2996448" crc="70b00db4" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 15).bin" size="2493120" crc="3f35ceb6" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 16).bin" size="7168896" crc="7707f5e0" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 17).bin" size="3706752" crc="8b741032" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 18).bin" size="2911776" crc="0d2c6519" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 19).bin" size="1117200" crc="421f466c" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 20).bin" size="13032432" crc="7fc3c5a7" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 21).bin" size="10499328" crc="4b6cc7ce" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 22).bin" size="9885456" crc="dad1304f" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 23).bin" size="11228448" crc="c73e18cb" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 24).bin" size="10861536" crc="57a73fc5" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 25).bin" size="13220592" crc="58acd55f" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 26).bin" size="11663568" crc="bd80964d" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 27).bin" size="11440128" crc="ac0f53d6" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 28).bin" size="11531856" crc="82dc6f50" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 29).bin" size="11195520" crc="4df9fad1" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 30).bin" size="11717664" crc="0cd8fd9b" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 31).bin" size="11865840" crc="18b4441d" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 32).bin" size="11376624" crc="356a93b0" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 33).bin" size="12517344" crc="1b43de31" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 34).bin" size="11983440" crc="7bd0c837" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 35).bin" size="16186464" crc="950b6a34" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 36).bin" size="14866992" crc="108f5a17" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 37).bin" size="43267392" crc="e55cb55b" />
+		-->
+		<description>Heavenly Symphony - Formula One World Championship 1993 Hibaihin (Japan)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="SG-6034"/>
+		<info name="cd_matrix" value="SG-6034-R1M V"/>
+		<info name="alt_title" value="ヘブンリー シンフォニー フォームラワン ワールド チャンピオンシップ 1993 非売品"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="heavenly symphony - formula one world championship 1993 hibaihin (japan)" sha1="42524a8b0f0232df1519551e492a89300f772ff3"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="keiodemo" cloneof="keio">
+		<!-- source redump.org
+		<rom name="Keiou Yuugekitai (Japan) (Demo).cue" size="1895" crc="6a5d99f2" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 01).bin" size="75790848" crc="04c07f7e" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 02).bin" size="1117200" crc="6cdfd209" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 03).bin" size="40720176" crc="1bcab310" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 04).bin" size="45922800" crc="ad73e1e6" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 05).bin" size="49062720" crc="ddb213e4" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 06).bin" size="10125360" crc="bbb14bc6" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 07).bin" size="9974832" crc="f2d4e9f4" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 08).bin" size="7441728" crc="f686ad16" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 09).bin" size="1114848" crc="b370237d" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 10).bin" size="25944912" crc="da153759" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 11).bin" size="19977888" crc="e1c594c9" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 12).bin" size="1756944" crc="0d1c28ad" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 13).bin" size="6851376" crc="9dbc18b5" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 14).bin" size="19714464" crc="cc90cc4f" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 15).bin" size="26805744" crc="abbb53dd" />
+		-->
+		<description>Keiou Yuugekitai Taikenban Hibaihin (Japan)</description>
+		<year>1993</year>
+		<publisher>Victor Entertainment</publisher>
+		<info name="serial" value="CDS-222"/>
+		<info name="cd_matrix" value="CDS-222-R1M V"/>
+		<info name="alt_title" value="慶応遊撃隊 体験版 非売品"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="keiou yuugekitai taikenban hibaihin (japan)" sha1="51cc65015c31d30d75eddef7aa2c1bfaeb2f48bf"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="lodossdemo" cloneof="lodoss">
 		<!-- source toseciso
 		<rom name="Lodoss Tou Senki - Eiyuu Sensou - Record of Lodoss War (demo) (1994)(Sega)(NTSC)(JP)[!].cue" size="2595" crc="accdf24a" />
@@ -5205,6 +5291,70 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
+	<software name="lunar2demo" cloneof="lunar2">
+		<!-- source redump.org
+		<rom name="Lunar - Eternal Blue (Japan) (Demo).cue" size="240" crc="e130f104" />
+		<rom name="Lunar - Eternal Blue (Japan) (Demo) (Track 1).bin" size="38706864" crc="66c67434" />
+		<rom name="Lunar - Eternal Blue (Japan) (Demo) (Track 2).bin" size="1611120" crc="18661dfb" />
+		-->
+		<description>Lunar - Eternal Blue Hibaihin Auto Demo (Japan)</description>
+		<year>1994</year>
+		<publisher>Game Arts</publisher>
+		<info name="serial" value="ST-45074"/>
+		<info name="cd_matrix" value="ST-45074 MT B01"/>
+		<info name="alt_title" value="ルナ-エターナルブルー 非売品 オートデモ"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="lunar - eternal blue hibaihin auto demo (japan)" sha1="cc87b4610877d135207100c2eff7affa572ef56c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="microcosdemo" cloneof="microcos">
+		<!-- source redump.org
+		<rom name="Microcosm (Japan) (Demo).cue" size="1067" crc="512f02d3" />
+		<rom name="Microcosm (Japan) (Demo) (Track 1).bin" size="274203216" crc="5c4ae0c1" />
+		<rom name="Microcosm (Japan) (Demo) (Track 2).bin" size="20993952" crc="5a892270" />
+		<rom name="Microcosm (Japan) (Demo) (Track 3).bin" size="22755600" crc="d4110a7d" />
+		<rom name="Microcosm (Japan) (Demo) (Track 4).bin" size="21873600" crc="2beb48b8" />
+		<rom name="Microcosm (Japan) (Demo) (Track 5).bin" size="35985600" crc="708877db" />
+		<rom name="Microcosm (Japan) (Demo) (Track 6).bin" size="24519600" crc="aa292aba" />
+		<rom name="Microcosm (Japan) (Demo) (Track 7).bin" size="22755600" crc="03a29b6f" />
+		<rom name="Microcosm (Japan) (Demo) (Track 8).bin" size="21873600" crc="bba6b7c9" />
+		<rom name="Microcosm (Japan) (Demo) (Track 9).bin" size="23988048" crc="9956dc95" />
+		-->
+		<description>Microcosm Demo CD (Japan)</description>
+		<year>1994</year>
+		<publisher>Victor Entertainment</publisher>
+		<info name="serial" value="CDS-10003"/>
+		<info name="cd_matrix" value="CDS-10003-R1M V"/>
+		<info name="alt_title" value="マイクロコズム デモCD"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="microcosm demo cd (japan)" sha1="2983f32c9c63753cc3acbd5160cd830b8b844090"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ntrapdemo" cloneof="ntrap">
+		<!-- source redump.org
+		<rom name="Night Trap (Japan) (Demo).cue" size="243" crc="9dce8d3d" />
+		<rom name="Night Trap (Japan) (Demo) (Track 1).bin" size="615875904" crc="03e24407" />
+		<rom name="Night Trap (Japan) (Demo) (Track 2).bin" size="2587200" crc="1cc25944" />
+		-->
+		<description>Night Trap Hibaihin (Japan)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="SG-6025"/>
+		<info name="cd_matrix" value="SG-6025-R1M V"/>
+		<info name="alt_title" value="ナイトトラップ 非売品"/>
+		<part name="cdrom1" interface="scd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="night trap hibaihin (japan)" sha1="b852a032c5e49655a060cad7f6e18a205578be1f"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="nost1907bonus" cloneof="nost1907">
 		<!-- source toseciso
 		<rom name="Nostalgia 1907 in North Atlantic Sea (1991)(Takeru)(NTSC)(Jp)[!][Original Sound Track Ver. 2][audio cd].cue" size="2969" crc="3fc1b976" />
@@ -5234,6 +5384,140 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
+	<software name="popmaildemo" cloneof="popmail">
+		<!-- source redump.org
+		<rom name="PopfulMail (Japan) (Demo).cue" size="362" crc="9a2711d1" />
+		<rom name="PopfulMail (Japan) (Demo) (Track 1).bin" size="353736096" crc="6ec9ff55" />
+		<rom name="PopfulMail (Japan) (Demo) (Track 2).bin" size="25133472" crc="4afcdca3" />
+		<rom name="PopfulMail (Japan) (Demo) (Track 3).bin" size="42778176" crc="f64659a4" />
+		-->
+		<description>Popful Mail Taikenban Hibaihin (Japan)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="SG-6029"/>
+		<info name="cd_matrix" value="SG-6029-R1M V"/>
+		<info name="alt_title" value="ぽっぷるメイル 体験版 非売品"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="popful mail taikenban hibaihin (japan)" sha1="c09abf833cb576503c745affbfd3d091ccc76a27"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Disc hangs after booting. -->
+	<software name="psychic3demo" cloneof="psychic3" supported="no">
+		<!-- Source: Redump
+		<rom name="Psychic Detective Series Vol. 3 - Aya (Japan) (Demo).cue" size="274" crc="12b48e06" />
+		<rom name="Psychic Detective Series Vol. 3 - Aya (Japan) (Demo) (Track 1).bin" size="17324832" crc="91c8008c" />
+		<rom name="Psychic Detective Series Vol. 3 - Aya (Japan) (Demo) (Track 2).bin" size="6037584" crc="b036819f" />
+		-->
+		<description>Psychic Detective Series vol.3 - AYA Auto Demo (Japan)</description>
+		<year>1993</year>
+		<publisher>Data West</publisher>
+		<info name="serial" value="T-84024 DWMD2905"/>
+		<info name="cd_matrix" value="DWMD-2905"/>
+		<info name="alt_title" value="サイキック・ディテクティブ・シリーズ Vol.3 AYA AUTO DEMO"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series vol. 3 - aya auto demo (japan)" sha1="5402ed98cd6f980e97473071630362d6f63c5f0e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Disc does not boot due to improper mastering. More info can be found at the Redump link. -->
+	<software name="silpheeddemo" cloneof="silpheed" supported="no">
+		<!-- source redump.org - http://redump.org/disc/39378/
+		<rom name="Silpheed (Japan) (Demo).cue" size="216" crc="84cd95f7" />
+		<rom name="Silpheed (Japan) (Demo) (Track 1).bin" size="369174624" crc="70ab8271" />
+		<rom name="Silpheed (Japan) (Demo) (Track 2).bin" size="1058400" crc="b22e5a2a" />
+		-->
+		<description>Silpheed Hibaihin (Japan)</description>
+		<year>1993</year>
+		<publisher>Game Arts</publisher>
+		<info name="serial" value="ST-45054"/>
+		<info name="cd_matrix" value="ST-45054 MT 1B1 +"/>
+		<info name="alt_title" value="シルフィード 非売品"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="silpheed hibaihin (japan)" sha1="18f438c6fce0f143046fc4eeb15eec6fb47a1631"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="silpheeddemof" cloneof="silpheed" supported="no">
+		<!-- source redump.org
+		<rom name="Silpheed (Japan) (Demo) (Fixed Dump).cue" size="242" crc="87d9d2bb" />
+		<rom name="Silpheed (Japan) (Demo) (Fixed Dump) (Track 1).bin" size="369174624" crc="6b59f551" />
+		<rom name="Silpheed (Japan) (Demo) (Fixed Dump) (Track 2).bin" size="1058400" crc="648c227c" />
+		-->
+		<description>Silpheed Hibaihin (Japan) (Fixed)</description>
+		<year>1993</year>
+		<publisher>Game Arts</publisher>
+		<info name="serial" value="ST-45054"/>
+		<info name="cd_matrix" value="ST-45054 MT 1B1 +"/>
+		<info name="alt_title" value="シルフィード 非売品"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="silpheed hibaihin (japan) (fixed)" sha1="12c371524399e53978e57b17673265a3d9cf9b80"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="soniccddemo" cloneof="soniccd">
+		<!-- source redump.org
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo).cue" size="4590" crc="c5f52249" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 01).bin" size="129592848" crc="128ac97f" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 02).bin" size="1093680" crc="b5575d36" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 03).bin" size="19077072" crc="fc6ec59e" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 04).bin" size="14231952" crc="fb6c1ae5" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 05).bin" size="14827008" crc="1e0d8f87" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 06).bin" size="17567088" crc="acd1383f" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 07).bin" size="13980288" crc="293daff5" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 08).bin" size="14342496" crc="038ddf9e" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 09).bin" size="20278944" crc="e4932318" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 10).bin" size="14041440" crc="a583cc24" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 11).bin" size="13653360" crc="c0b8e3ef" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 12).bin" size="18016320" crc="021318e0" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 13).bin" size="13573392" crc="68d8d7de" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 14).bin" size="11411904" crc="ea181442" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 15).bin" size="16231152" crc="092b16d8" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 16).bin" size="10932096" crc="4bd4f694" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 17).bin" size="14048496" crc="9c978637" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 18).bin" size="20137824" crc="ecf914a0" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 19).bin" size="12881904" crc="96c5de23" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 20).bin" size="11783520" crc="6c51ddc6" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 21).bin" size="14942256" crc="98e7a25e" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 22).bin" size="11607120" crc="874c1767" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 23).bin" size="12816048" crc="9ec4920e" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 24).bin" size="14088480" crc="a55590e6" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 25).bin" size="14660016" crc="a48ca9dd" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 26).bin" size="5294352" crc="dab24994" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 27).bin" size="5296704" crc="b7a17d88" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 28).bin" size="1458240" crc="6b3db1ca" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 29).bin" size="3988992" crc="c69de397" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 30).bin" size="3869040" crc="7142a282" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 31).bin" size="2008608" crc="59e1254d" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 32).bin" size="21513744" crc="725d71e3" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 33).bin" size="21873600" crc="646b66ee" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 34).bin" size="16214688" crc="ad32fc11" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 35).bin" size="32104800" crc="e63f110d" />
+		-->
+		<description>Sonic The Hedgehog CD Hibaihin (Japan)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Game will not boot if the system backup RAM is not formatted.
+]]></notes>
+		<info name="serial" value="SG-6021"/>
+		<info name="cd_matrix" value="SG-6021-R3M V"/>
+		<info name="alt_title" value="ソニック・ザ・ヘッジホッグCD 非売品"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sonic the hedgehog cd hibaihin (japan)" sha1="fc5d4690bfc10e4fe6bb81a753c7750b99c2cb46"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="tenbubonus" cloneof="tenbu">
 		<!-- source toseciso
 		<rom name="Tenbu Mega CD Special (1992)(Wolf Team)(NTSC)(Jp)[!][audio cd].cue" size="316" crc="6d4e8500" />
@@ -5251,6 +5535,116 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
+	<software name="thawkdemo" cloneof="thawk">
+		<!-- source redump.org
+		<rom name="Thunderhawk (Japan) (Demo).cue" size="365" crc="9a4d410f" />
+		<rom name="Thunderhawk (Japan) (Demo) (Track 1).bin" size="23204832" crc="be4dae9e" />
+		<rom name="Thunderhawk (Japan) (Demo) (Track 2).bin" size="38539872" crc="89ddd6fb" />
+		<rom name="Thunderhawk (Japan) (Demo) (Track 3).bin" size="40710768" crc="52b325f7" />
+		-->
+		<description>Thunderhawk Hibaihin (Japan)</description>
+		<year>1993</year>
+		<publisher>Victor Entertainment</publisher>
+		<info name="serial" value="CDS-10002"/>
+		<info name="cd_matrix" value="CDS-10002-R1M V"/>
+		<info name="alt_title" value="サンダーホーク 非売品"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="thunderhawk hibaihin (japan)" sha1="533205e617a7514de1d9e877c3cc0597ca92e4ea"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="uruseiyademo" cloneof="uruseiya">
+		<!-- source redump.org
+		<rom name="Urusei Yatsura - Dear My Friends (Japan) (Demo).cue" size="474" crc="d3d46675" />
+		<rom name="Urusei Yatsura - Dear My Friends (Japan) (Demo) (Track 1).bin" size="6077568" />
+		<rom name="Urusei Yatsura - Dear My Friends (Japan) (Demo) (Track 2).bin" size="21080976" />
+		<rom name="Urusei Yatsura - Dear My Friends (Japan) (Demo) (Track 3).bin" size="6787872" />
+		-->
+		<description>Urusei Yatsura - Dear My Friends Hibaihin (Japan)</description>
+		<year>1994</year>
+		<publisher>Game Arts</publisher>
+		<info name="serial" value="ST-45064"/>
+		<info name="cd_matrix" value="ST-45064P MT B01"/>
+		<info name="alt_title" value="うる星やつら ディア マイ フレンズ 非売品"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="urusei yatsura - dear my friends hibaihin (japan)" sha1="7a96e2445094a93d14934ab454585d4077ecc3ca"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="yumemidemo" cloneof="yumemi">
+		<!-- Source: Redump.org
+		<rom name="Yumemi Yakata no Monogatari (Japan) (Demo).cue" size="277" crc="bf0d9c31" />
+		<rom name="Yumemi Yakata no Monogatari (Japan) (Demo) (Track 1).bin" size="625389744" crc="7ed0b9bc" />
+		<rom name="Yumemi Yakata no Monogatari (Japan) (Demo) (Track 2).bin" size="7190064" crc="1d6aa9a6" />
+		-->
+		<description>Yumemi Yakata no Monogatari Hibaihin (Japan)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="SG-6027"/>
+		<info name="cd_matrix" value="SG-6027-R1M V"/>
+		<info name="alt_title" value="夢見館の物語 非売品"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="yumemi yakata no monogatari hibaihin (japan)" sha1="b7ac1185ea75ec042e8be9e1bdce091bfb0b906b"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="wmcolb" cloneof="wmcol">
+		<!-- Source: Redump.org
+		<rom name="WonderMega Collection (Japan) (Rev 2).cue" size="4625" crc="cce652f6" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 01).bin" size="67032000" crc="45fdc758" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 02).bin" size="41103552" crc="4dfccbd1" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 03).bin" size="53978400" crc="2fef586a" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 04).bin" size="50274000" crc="d1302737" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 05).bin" size="44100000" crc="43d25389" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 06).bin" size="16981440" crc="0a87a971" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 07).bin" size="10372320" crc="a78f862a" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 08).bin" size="17068464" crc="b055c714" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 09).bin" size="12634944" crc="e2234b67" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 10).bin" size="20290704" crc="4a0f521b" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 11).bin" size="15612576" crc="fe87ea56" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 12).bin" size="11538912" crc="1b7cac73" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 13).bin" size="11513040" crc="2688ac43" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 14).bin" size="15419712" crc="4845e480" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 15).bin" size="12310368" crc="ec5673c0" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 16).bin" size="23233056" crc="0f93eb7d" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 17).bin" size="22715616" crc="67851c47" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 18).bin" size="8676528" crc="e00850f4" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 19).bin" size="19406352" crc="f61f2ec8" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 20).bin" size="14177856" crc="a6cc0a6c" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 21).bin" size="12350352" crc="855bbd39" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 22).bin" size="13307616" crc="a9c9cfb8" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 23).bin" size="16400496" crc="22c61e2a" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 24).bin" size="6505632" crc="01f7b9bd" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 25).bin" size="18987696" crc="eb170a21" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 26).bin" size="5047392" crc="ff978679" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 27).bin" size="9732576" crc="ec68257e" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 28).bin" size="10941504" crc="94d58ebd" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 29).bin" size="6009360" crc="5d1b2db2" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 30).bin" size="7321776" crc="a087de5f" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 31).bin" size="3944304" crc="853af7cd" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 32).bin" size="3756144" crc="dd717c44" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 33).bin" size="3203424" crc="4f8838eb" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 34).bin" size="5738880" crc="92ee9a3c" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 35).bin" size="3154032" crc="b70def8c" />
+		-->
+		<description>WonderMega Collection - Game Garden (Alt)</description>
+		<year>1992</year>
+		<publisher>Victor Entertainment</publisher>
+		<info name="serial" value="CDS-135"/>
+		<info name="cd_matrix" value="CDS-135-3-R1M V"/>
+		<info name="alt_title" value="ワンダーメガ コレクション"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="wondermega collection - game garden (japan) (alt)" sha1="968f935a26ed155318382bccf86218a7da5c065b"/>
+			</diskarea>
+		</part>
+	</software>
 
 	<!-- Misc sourced dumps -->
 

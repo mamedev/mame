@@ -24,8 +24,6 @@ Currently undumped discs that are known to still exist:
 | Android Assault (Prototype 19940308)                        |                                                                   |
 | Black Hole Assault (Prototype 19921006)                     |                                                                   |
 | Burning Fists (Prototype 19xx0108)                          |                                                                   |
-| Color Mechanica                                             |                                                                   |
-| Compton's Interactive Encyclopedia 2.00S                    | Version 2.00S is undumped.                                        |
 | Eternal Champions (Prototype)                               |                                                                   |
 | Fahrenheit (Prototype, 32X)                                 |                                                                   |
 | Fatal Fury Special (Prototype)                              |                                                                   |
@@ -36,12 +34,10 @@ Currently undumped discs that are known to still exist:
 | Music from the Sega CD Games: Jurassic Park, Batman Returns |                                                                   |
 | Shadow of the Beast II (Prototype 19940611)                 |                                                                   |
 | SoulStar (Prototype 19940905)                               |                                                                   |
-| Surgical Strike (32X)                                       | 32X version was only released in Brazil.                          |
 | The Secret of Monkey Island (Prototype 19930319)            |                                                                   |
 | The Smurfs (Prototype)                                      | US / Good Deal Games version.                                     |
 | The Terminator (Prototype)                                  |                                                                   |
 | Vay (Prototype 19941006)                                    |                                                                   |
-| What is X'Eye Multi Entertainment System                    |                                                                   |
 +=============================================================+===================================================================+
 
 Announced but never relased games. Probably lost forever:
@@ -714,6 +710,78 @@ See: http://rawdump.net/
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="cobra command (usa)" sha1="2d7c32591cec389f6d5feb5f0301495ff8021307"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	    Released by Good Deal Games in 2014. Track 1 contains a text file that says this is Version 1.1
+	    built on 01/13/2014, plus a folder containing the music in MP3 format.
+	-->
+	<software name="colormec">
+		<!-- Source: redump.org
+		<rom name="Note! Color Mechanica (USA) (Unl).cue" size="837" crc="d57bf1bb" />
+		<rom name="Note! Color Mechanica (USA) (Unl) (Track 1).bin" size="218914752" crc="9c9cea01" />
+		<rom name="Note! Color Mechanica (USA) (Unl) (Track 2).bin" size="59992464" crc="44561a10" />
+		<rom name="Note! Color Mechanica (USA) (Unl) (Track 3).bin" size="50807904" crc="ad7c5f47" />
+		<rom name="Note! Color Mechanica (USA) (Unl) (Track 4).bin" size="34508544" crc="0eb05bf5" />
+		<rom name="Note! Color Mechanica (USA) (Unl) (Track 5).bin" size="50353968" crc="a54eafa7" />
+		<rom name="Note! Color Mechanica (USA) (Unl) (Track 6).bin" size="53449200" crc="325b574e" />
+		<rom name="Note! Color Mechanica (USA) (Unl) (Track 7).bin" size="57153600" crc="c90c3ac5" />
+		<rom name="Note! Color Mechanica (USA) (Unl) (Track 8).bin" size="40633152" crc="5b633865" />
+		-->
+		<description>Note! Color Mechanica (USA)</description>
+		<year>2014</year>
+		<publisher>Good Deal Games</publisher>
+		<info name="release" value="2014" />
+		<part name="cdrom" interface="scd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="note color mechanica (usa)" sha1="117afb5a656039570a203620c7ba4384d19617bf"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	    Released by Good Deal Games in 2014. Tracks 1 and 2 are slightly larger than the other build.
+	    Track 1 contains a text file that says this is Version 1.1, built on 01/13/2014, plus a folder containing the music in MP3 format.
+	-->
+	<software name="colormeca" cloneof="colormec">
+		<!-- Source: redump.org
+		<rom name="Note! Color Mechanica (USA) (Unl) (Alt).cue" size="908" crc="065af004" />
+		<rom name="Note! Color Mechanica (USA) (Unl) (Alt) (Track 1).bin" size="218561952" />
+		<rom name="Note! Color Mechanica (USA) (Unl) (Alt) (Track 2).bin" size="60345264" />
+		<rom name="Note! Color Mechanica (USA) (Unl) (Alt) (Track 3).bin" size="50807904" />
+		<rom name="Note! Color Mechanica (USA) (Unl) (Alt) (Track 4).bin" size="34508544" />
+		<rom name="Note! Color Mechanica (USA) (Unl) (Alt) (Track 5).bin" size="50353968" />
+		<rom name="Note! Color Mechanica (USA) (Unl) (Alt) (Track 6).bin" size="53449200" />
+		<rom name="Note! Color Mechanica (USA) (Unl) (Alt) (Track 7).bin" size="57153600" />
+		<rom name="Note! Color Mechanica (USA) (Unl) (Alt) (Track 8).bin" size="40633152" />
+		-->
+		<description>Note! Color Mechanica (USA, alt)</description>
+		<year>2014</year>
+		<publisher>Good Deal Games</publisher>
+		<info name="release" value="2014" />
+		<part name="cdrom" interface="scd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="note color mechanica (usa) (alt)" sha1="6de2359fc0ad8dc7d8206515a0fdcd67bd9e43ab"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- This was exclusively bundled with the JVC X'Eye console -->
+	<software name="comptons200s" cloneof="comptons">
+		<!-- Source: redump.org
+		<rom name="Compton's Interactive Encyclopedia (USA) (Version 2.00S).cue" size="305" crc="f3c220f6" />
+		<rom name="Compton's Interactive Encyclopedia (USA) (Version 2.00S) (Track 1).bin" size="225806112" crc="ebb612cc" />
+		<rom name="Compton's Interactive Encyclopedia (USA) (Version 2.00S) (Track 2).bin" size="2765952" crc="45fccb44" />
+		-->
+		<description>Compton's Interactive Encyclopedia v2.00S (USA)</description>
+			<year>1994</year>
+		<publisher>Compton's NewMedia</publisher>
+		<info name="cd_matrix" value="CIESEGAV200 R1C MFD BY JVC"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="compton's interactive encyclopedia v2.00s (usa)" sha1="2d9abe1a456af0a230670e870353d41f330f8d90"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3442,6 +3510,27 @@ Requires [disc swap]
 		</part>
 	</software>
 
+	<software name="surgical32" cloneof="surgical" supported="no">
+		<!-- Source: redump.org
+		<rom name="Surgical Strike (Brazil) (Sega CD 32X).cue" size="378" crc="5046e80c" />
+		<rom name="Surgical Strike (Brazil) (Sega CD 32X) (Track 1).bin" size="438499824" crc="2356dcc6" />
+		<rom name="Surgical Strike (Brazil) (Sega CD 32X) (Track 2).bin" size="43210944" crc="87b19436" />
+		<rom name="Surgical Strike (Brazil) (Sega CD 32X) (Track 3).bin" size="1985088" crc="d00d9864" />
+		-->
+		<description>Surgical Strike (Brazil, 32X)</description>
+		<year>1996</year>
+		<publisher>Tec Toy</publisher>
+		<notes><![CDATA[
+Requires [32X] add-on, game asks you to plug it in if not present
+]]></notes>
+		<info name="serial" value="157036"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="surgical strike (bra, 32x)" sha1="857e0602e35e4b45ec3660d8639fb88d2a014230"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="advbatr">
 		<!-- Source: redump.org - http://redump.org/disc/16136/
 		<rom name="Adventures of Batman and Robin, The (USA).cue" size="927" crc="28438349" />
@@ -3705,6 +3794,31 @@ Requires [disc swap]
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="vay (usa)" sha1="099e4c43d8ca5eb57854db25cbcbfc3139e41a9e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- This disc was bundled with the JVC X'Eye system in the USA. -->
+	<software name="wixeye">
+		<!-- Source: redump.org
+		<rom name="What is X'Eye Multi Entertainment System (USA).cue" size="1125" crc="ad4993c3" />
+		<rom name="What is X'Eye Multi Entertainment System (USA) (Track 1).bin" size="49316736" crc="7def0d97" />
+		<rom name="What is X'Eye Multi Entertainment System (USA) (Track 2).bin" size="6738480" crc="4865c4cf" />
+		<rom name="What is X'Eye Multi Entertainment System (USA) (Track 3).bin" size="9904272" crc="2435b213" />
+		<rom name="What is X'Eye Multi Entertainment System (USA) (Track 4).bin" size="12712560" crc="3cafa2e8" />
+		<rom name="What is X'Eye Multi Entertainment System (USA) (Track 5).bin" size="11400144" crc="6ee4f4be" />
+		<rom name="What is X'Eye Multi Entertainment System (USA) (Track 6).bin" size="16426368" crc="03e0c09d" />
+		<rom name="What is X'Eye Multi Entertainment System (USA) (Track 7).bin" size="24832416" crc="4abb85d7" />
+		<rom name="What is X'Eye Multi Entertainment System (USA) (Track 8).bin" size="6733776" crc="5576161c" />
+		-->
+		<description>What is X'Eye Multi Entertainment System (USA)</description>
+		<year>1994</year>
+		<publisher>JVC</publisher>
+		<info name="serial" value="SMJ-4110"/>
+		<info name="disk_ring" value="SMJ-4110-R1M V"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="what is x'eye multi entertainment system (usa)" sha1="926143f74d8bad9cda401bbf651051396e96aa54"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5351,35 +5465,6 @@ Requires [disc swap]
 		</part>
 	</software>
 
-<!--
-    <software name="colrmech">
-        <description>Color Mechanica (USA)</description>
-        <year>2013</year>
-        <publisher>&lt;unlicensed&gt;</publisher>
-        <info name="release" value="20131227" />
-        <part name="cdrom" interface="scd_cdrom">
-            <diskarea name="cdrom">
-                <disk name="color mechanica (usa)" status="nodump"/>
-            </diskarea>
-        </part>
-    </software>
--->
-
-	<!-- This was exclusively bundled with the JVC X'Eye console -->
-<!--
-    <software name="comptons200s" cloneof="comptons">
-        <description>Compton's Interactive Encyclopedia v2.00S (USA)</description>
-        <year>1994</year>
-        <publisher>Compton's NewMedia</publisher>
-        <info name="serial" value="T-118025"/>
-        <part name="cdrom" interface="scd_cdrom">
-            <diskarea name="cdrom">
-                <disk name="compton's interactive encyclopedia v2.00s (usa)" status="nodump"/>
-            </diskarea>
-        </part>
-    </software>
--->
-
 	<!-- This was exclusively bundled with the JVC X'Eye console -->
 	<software name="comptons201s" cloneof="comptons">
 		<!-- Source: TruRip
@@ -5834,21 +5919,6 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<!--
-	<software name="surgical32" cloneof="surgical">
-	    <description>Surgical Strike (Bra, 32X)</description>
-	    <year>1996</year>
-	    <publisher>Sega</publisher>
-	    <info name="serial" value="157036"/>
-	    <info name="release" value="199601xx" />
-	    <part name="cdrom" interface="scd_cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="surgical strike (bra, 32x)" status="nodump" />
-	        </diskarea>
-	    </part>
-	</software>
-	-->
-
 	<!-- Sourced from the hiddenpalace forums - http://hiddenpalace.org/forums/viewtopic.php?t=2880 -->
 	<!-- Marked as bad dump as it's an MP3-based dump. -->
 	<software name="shinfrcep" cloneof="shinfrce">
@@ -5961,20 +6031,6 @@ Requires [disc swap]
 			</diskarea>
 		</part>
 	</software>
-
-<!--
-    <software name="wixeye">
-        <description>What is X'Eye Multi Entertainment System (USA)</description>
-        <year>1993?</year>
-        <publisher>JVC</publisher>
-        <info name="serial" value="SMJ-4110"/>
-        <part name="cdrom" interface="scd_cdrom">
-            <diskarea name="cdrom">
-                <disk name="what is x'eye multi entertainment system (usa)" status="nodump"/>
-            </diskarea>
-        </part>
-    </software>
--->
 
 	<software name="wolfchld">
 		<!-- Source: TruRip
