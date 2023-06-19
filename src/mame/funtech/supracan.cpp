@@ -2141,7 +2141,6 @@ void supracan_state::supracan(machine_config &config)
 }
 
 ROM_START( supracan )
-
 	ROM_REGION16_BE(0x1000, "internal68", ROMREGION_ERASEFF)
 	// 68k internal ROM (security related, not currently used by driver)
 	ROM_LOAD( "internal_68k.bin", 0x0000,  0x1000, CRC(8d575662) SHA1(a8e75633662978d0a885f16a4ed0f898f278a10a) )
