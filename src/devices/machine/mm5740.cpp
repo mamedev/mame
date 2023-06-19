@@ -93,7 +93,6 @@ void mm5740_device::device_start()
 
 void mm5740_device::device_reset()
 {
-	m_b = -1;
 	m_repeat = 0;
 	m_trigger_repeat = false;
 }
