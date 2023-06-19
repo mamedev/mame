@@ -3836,7 +3836,7 @@ end
 
 --------------------------------------------------
 -- SGS-Thomson ST9
---@src/devices/cpu/st9/st9.h,CPUS["ST9"] = true
+--@src/devices/cpu/st9/st905x.h,CPUS["ST9"] = true
 --------------------------------------------------
 
 if CPUS["ST9"] then
