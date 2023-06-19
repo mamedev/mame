@@ -33138,7 +33138,7 @@ Jumps to invalid address, needs own slot type with mountable carts
             </dataarea>
         </part>
     </software>
-	<!--
+
 	<software name="pga2hb" cloneof="pga2" supported="no">
 		<description>PGA Tour Golf II (HeartBeat Personal Trainer)</description>
 		<year>1995</year>
@@ -33153,7 +33153,7 @@ Jumps to invalid address, needs own slot type with mountable carts
 			</dataarea>
 		</part>
 	</software>
-	-->
+
 
 
 	<!--	Freeware releases	-->
