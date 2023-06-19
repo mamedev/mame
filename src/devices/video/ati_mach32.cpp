@@ -47,7 +47,7 @@ mach32_device::mach32_device(const machine_config &mconfig, const char *tag, dev
 }
 
 mach32_device::mach32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: ati_vga_device(mconfig, type, tag, owner, clock), m_8514a(*this,"8514a")
+	: ati_vga_device(mconfig, type, tag, owner, clock), m_8514a(*this,"8514a"), m_cursor_enable(false)
 {
 }
 
@@ -116,10 +116,10 @@ void mach32_8514a_device::device_reset()
 }
 
 void mach32_8514a_device::mach32_mem_boundary_w(uint16_t data)
-{ 
+{
 	m_membounds = data;
 	if(data & 0x10)
-		LOG("ATI: Unimplemented memory boundary activated.\n"); 
+		LOG("ATI: Unimplemented memory boundary activated.\n");
 }
 
 
