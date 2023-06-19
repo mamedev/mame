@@ -167,14 +167,14 @@ license:CC0-1.0
 	</software>
 
 	<software name="cyrus">
-		<description>Cyrus</description>
+		<!-- marketed as "CHESS" - the boot screen says "CYRUS" while the manual says "CYRUS CHESS PROGRAM" -->
+		<description>Chess</description>
 		<year>1982</year>
 		<publisher>Dragon Data</publisher>
 		<info name="developer" value="Intelligent Software" />
 		<info name="author" value="David Levy &amp; Richard Lang" />
 		<info name="serial" value="A0108" />
-		<info name="alt_title" value="Cyrus Chess Program (manual)" />
-		<info name="alt_title" value="Chess (cartridge, box)" />
+		<info name="alt_title" value="Cyrus Chess Program" />
 		<part name="cart" interface="coco_cart">
 			<feature name="pcb" value="21-83" />
 			<feature name="ic1" value="TMS 2532JL-45 MEP8332" />
