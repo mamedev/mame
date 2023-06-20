@@ -9,15 +9,15 @@
   Additional work by Roberto Fresca.
 
   Notes:
-  - To init chsuper3, chmpnum & chmpnuma, just keep pressed both service keys (9 & 0),
-    and do a soft-reset (F3).
+  - To init chsuper3, chmpnum & chmpnuma, losttrea, just keep pressed both service keys
+    (9 & 0), and do a soft-reset (F3).
 
   TODO:
   - sound.
   - ticket dispenser.
   - Trace the hold3 lamp line on the pcb,
     for a proper implementation.
-  - proper GFX decode / descramble for lstislnd (game seems to run after init above).
+  - Verify losttrea inputs and promote to working if they are ok.
 
 *******************************************************************************************/
 
@@ -50,11 +50,12 @@ public:
 	{ }
 
 	void chsuper(machine_config &config);
+	void losttrea(machine_config &config);
 
 	void init_chsuper3();
 	void init_chmpnum();
 	void init_chsuper2();
-	void init_lstislnd();
+	void init_losttrea();
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
@@ -77,6 +78,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void losttrea_portmap(address_map &map);
 	void portmap(address_map &map);
 	void prg_map(address_map &map);
 	void ramdac_map(address_map &map);
@@ -227,12 +229,11 @@ void chsuper_state::prg_map(address_map &map)
 	map(0xfb000, 0xfbfff).ram().share("nvram");
 }
 
-void chsuper_state::portmap(address_map &map)
+void chsuper_state::losttrea_portmap(address_map &map)
 {
 	map(0x0000, 0x003f).ram(); // Z180 internal regs
 	map(0x00e8, 0x00e8).portr("IN0");
 	map(0x00e9, 0x00e9).portr("IN1");
-	map(0x00ea, 0x00ea).portr("DSW");
 	map(0x00ed, 0x00ed).nopw(); // mirror of EFh, but with bit0 active...
 	map(0x00ee, 0x00ee).w(FUNC(chsuper_state::outporta_w));
 	map(0x00ef, 0x00ef).w(FUNC(chsuper_state::outportb_w));
@@ -241,6 +242,13 @@ void chsuper_state::portmap(address_map &map)
 	map(0x00fe, 0x00fe).w("ramdac", FUNC(ramdac_device::mask_w));
 	map(0x8300, 0x8300).portr("IN2");  // valid input port present in test mode.
 	map(0xff20, 0xff3f).w("dac", FUNC(dac_byte_interface::data_w)); // unk writes
+}
+
+void chsuper_state::portmap(address_map &map)
+{
+	losttrea_portmap(map);
+
+	map(0x00ea, 0x00ea).portr("DSW");
 }
 
 void chsuper_state::ramdac_map(address_map &map)
@@ -342,9 +350,41 @@ static INPUT_PORTS_START( chsuper )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( losttrea )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_Q) PORT_NAME("IN0-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1 / Black (Nero) / Bet Max")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_NAME("Bet / Cancel All / Take (Ritira)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )      PORT_NAME("Start / Double (Radoppio)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5 / Red (Rosso) / Double (Radoppio)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )    PORT_NAME("Service 2 - Statistica Parziale")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )    PORT_NAME("Service 1 - Management")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4 / High (Alta)")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2 / Low (Bassa)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("IN1-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN1-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN1-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )  // ticket-in in chmpnum
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN1-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // ticket out / payout in chsuper2
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("IN2-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("IN2-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("IN2-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("IN2-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN2-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("IN2-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("IN2-8")
+
+	// no dips on PCB
+INPUT_PORTS_END
 
 /*****************************
 *  Graphics Decode Routines  *
@@ -399,6 +439,13 @@ void chsuper_state::chsuper(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 74HC273 latch + R2R network (unknown values)
+}
+
+void chsuper_state::losttrea(machine_config &config)
+{
+	chsuper(config);
+
+	m_maincpu->set_addrmap(AS_IO, &chsuper_state::losttrea_portmap);
 }
 
 
@@ -481,7 +528,7 @@ ROM_START( chmpnuma )
 	ROM_COPY( "maincpu", 0x10000, 0x00000, 0x70000 )
 ROM_END
 
-ROM_START( lstislnd ) // on a slightly newer PCB with more GFX ROM space
+ROM_START( losttrea ) // on a slightly newer PCB with more GFX ROM space. Labels are Lost Island, there's still Lost Island GFX in ROMs but title screen is Lost Treasure
 	ROM_REGION( 0x80000, "maincpu", 0 ) // code + samples
 	ROM_LOAD( "lost_island_1.ic10", 0x00000, 0x80000, CRC(4444cf61) SHA1(d3d84a05042e3cf66c53648148f5e78035800cb9) )
 
@@ -559,12 +606,12 @@ void chsuper_state::init_chmpnum()
 	memcpy(rom, buffer.get(), 0x100000);
 }
 
-void chsuper_state::init_lstislnd()
+void chsuper_state::init_losttrea()
 {
 	std::unique_ptr<uint8_t[]> buffer;
 	uint8_t *rom = memregion("chars")->base();
 
-	m_tilexor = 0x1500; // TODO
+	m_tilexor = 0x1900;
 
 	buffer = std::make_unique<uint8_t[]>(0x200000);
 
@@ -572,7 +619,7 @@ void chsuper_state::init_lstislnd()
 	{
 		int j = i ^ (m_tilexor << 5);
 
-		j = bitswap<24>(j , 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0); // TODO
+		j = bitswap<24>(j , 23, 22, 21, 20, 19, 18, 17, 15, 13, 14, 16, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 
 		buffer[j] = rom[i];
 	}
@@ -587,9 +634,9 @@ void chsuper_state::init_lstislnd()
 *      Game Drivers      *
 *************************/
 
-//     YEAR  NAME      PARENT    MACHINE  INPUT    CLASS          INIT           ROT   COMPANY         FULLNAME                    FLAGS                                                                 LAYOUT
-GAMEL( 1999, chsuper3, 0,        chsuper, chsuper, chsuper_state, init_chsuper3, ROT0, "<unknown>",    "Champion Super 3 (V0.35)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE,                      layout_chsuper ) //24/02/99
-GAMEL( 1999, chsuper2, chsuper3, chsuper, chsuper, chsuper_state, init_chsuper2, ROT0, "<unknown>",    "Champion Super 2 (V0.13)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE,                      layout_chsuper ) //26/01/99
-GAME(  1999, chmpnum,  chsuper3, chsuper, chsuper, chsuper_state, init_chmpnum,  ROT0, "<unknown>",    "Champion Number (V0.74)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )                                      //10/11/99
-GAME(  1999, chmpnuma, chsuper3, chsuper, chsuper, chsuper_state, init_chmpnum,  ROT0, "<unknown>",    "Champion Number (V0.67)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )                                      //21/10/99
-GAME(  2001, lstislnd, 0,        chsuper, chsuper, chsuper_state, init_lstislnd, ROT0, "<unknown>",    "Lost Island (V1.03)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )                //04/05/01, there's also a Lost Treasure string
+//     YEAR  NAME      PARENT    MACHINE   INPUT     CLASS          INIT           ROT   COMPANY         FULLNAME                    FLAGS                                                                 LAYOUT
+GAMEL( 1999, chsuper3, 0,        chsuper,  chsuper,  chsuper_state, init_chsuper3, ROT0, "<unknown>",    "Champion Super 3 (V0.35)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE,                      layout_chsuper ) //24/02/99
+GAMEL( 1999, chsuper2, chsuper3, chsuper,  chsuper,  chsuper_state, init_chsuper2, ROT0, "<unknown>",    "Champion Super 2 (V0.13)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE,                      layout_chsuper ) //26/01/99
+GAME(  1999, chmpnum,  chsuper3, chsuper,  chsuper,  chsuper_state, init_chmpnum,  ROT0, "<unknown>",    "Champion Number (V0.74)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )                                      //10/11/99
+GAME(  1999, chmpnuma, chsuper3, chsuper,  chsuper,  chsuper_state, init_chmpnum,  ROT0, "<unknown>",    "Champion Number (V0.67)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )                                      //21/10/99
+GAME(  2001, losttrea, 0,        losttrea, losttrea, chsuper_state, init_losttrea, ROT0, "<unknown>",    "Lost Treasure (V1.03)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )                                      //04/05/01, there's also a Lost Island string
