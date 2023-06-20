@@ -58,17 +58,29 @@ private:
 //	devcb_write_line m_ndtr2_callback;
 //	devcb_write_line m_nrts2_callback;
 
-	void config_map(address_map &map);
+	void request_irq(int irq, int state);
 
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
+	void config_map(address_map &map);
+
 	u8 keybc_status_r(offs_t offset);
 	void keybc_command_w(offs_t offset, u8 data);
 
+	void kbdp21_gp25_gatea20_w(int state);
+	void kbdp20_gp20_reset_w(int state);
+
+	void irq_keyboard_w(int state);
+	void irq_mouse_w(int state);
+
+	u8 krr_r(offs_t offset);
+	void krr_w(offs_t offset, u8 data);
+
 	u8 m_index = 0;
 
-	u8 m_locked_state;
+	u8 m_locked_state = 2;
+	u8 m_krr = 0;
 };
 
 DECLARE_DEVICE_TYPE(PC87306, pc87306_device);

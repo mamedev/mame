@@ -129,9 +129,9 @@ void odyssey_state::national_superio_config(device_t *device)
 	//fdc.set_sysopt_pin(1);
 	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
 	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
-#if 0
 	fdc.irq1().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
 	fdc.irq8().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq8n_w));
+#if 0
 	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
 	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
 	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
@@ -159,7 +159,9 @@ static void isa_com(device_slot_interface &device)
 // PCI config space is trusted by Intel TC430HX "Technical Product Specification"
 void odyssey_state::odyssey(machine_config &config)
 {
-	PENTIUM(config, m_maincpu, 133'000'000); 	// a Celeron at 1.70 GHz on the MB I checked. <- doesn't match being a Triton/Triton-II ... -AS
+	// a Celeron at 1.70 GHz on the MB I checked. <- doesn't match being a Triton/Triton-II ... -AS
+	// It also fails refresh check if it's 133 MHz
+	PENTIUM(config, m_maincpu, 66'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &odyssey_state::odyssey_map);
 	m_maincpu->set_addrmap(AS_IO, &odyssey_state::odyssey_io);
 	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
@@ -180,6 +182,7 @@ void odyssey_state::odyssey(machine_config &config)
 	// TODO: 82371FB USB at 07.2
 
 	// On-board Virge or Virge/DX
+	// TODO: actually a S3 Vision 968
 	VIRGE_PCI(config, "pci:08.0", 0);
 
 	// pci:0d.0 (J4E1) PCI expansion slot 1
