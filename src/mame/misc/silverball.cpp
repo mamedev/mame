@@ -27,14 +27,28 @@
     TODO:
     - Existing dumps all punts at dongle checks in sis630.cpp, requiring an emulation of the
       parallel port device.
+    - i440zx BIOSes crashes when writing Flash ROM sequences at PC=61C51 onward.
 
 **************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
+#include "machine/pci-ide.h"
+#include "machine/pci-smbus.h"
+#include "machine/i82443bx_host.h"
+#include "machine/i82371eb_isa.h"
+#include "machine/i82371eb_ide.h"
+#include "machine/i82371eb_acpi.h"
+#include "machine/i82371eb_usb.h"
+#include "video/virge_pci.h"
+#include "bus/isa/isa.h"
+#include "bus/isa/isa_cards.h"
+#include "machine/w83977tf.h"
 
 namespace {
+
+#define PCI_IDE_ID "pci:07.1"
 
 class silverball_state : public driver_device
 {
@@ -45,37 +59,101 @@ public:
 	{
 	}
 
-	void silverball(machine_config &config);
+	void silverball_i440zx(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void silverball_map(address_map &map);
+	void silverball_io(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<pentium_device> m_maincpu;
+
+	static void i440zx_superio_config(device_t *device);
 };
 
-void silverball_state::mem_map(address_map &map)
+void silverball_state::silverball_map(address_map &map)
 {
-	map(0x00000000, 0x0009ffff).ram();
-	map(0x000e0000, 0x000fffff).rom().region("bios", 0x20000);
-	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
+	map.unmap_value_high();
 }
+
+void silverball_state::silverball_io(address_map &map)
+{
+	map.unmap_value_high();
+}
+
 
 static INPUT_PORTS_START(silverball)
 INPUT_PORTS_END
 
-void silverball_state::silverball(machine_config &config)
+static void isa_internal_devices(device_slot_interface &device)
 {
-	PENTIUM(config, m_maincpu, 133'000'000); // Pentium-S minimum, up to a Pentium II
-	m_maincpu->set_addrmap(AS_PROGRAM, &silverball_state::mem_map);
+	// TODO: additional Winbond W83783 for HW monitoring
+	device.option_add("w83977tf", W83977TF);
+}
+
+void silverball_state::i440zx_superio_config(device_t *device)
+{
+	// TODO: unknown sub-type
+	w83977tf_device &fdc = *downcast<w83977tf_device *>(device);
+//	fdc.set_sysopt_pin(1);
+	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
+	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
+//	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+//	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+//	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+//	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+//	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+//	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+}
+
+// SY-7IZB+
+void silverball_state::silverball_i440zx(machine_config &config)
+{
+	PENTIUM2(config, m_maincpu, 133'000'000); // Pentium-S minimum, up to a Pentium II / Celeron Socket 370
+	m_maincpu->set_addrmap(AS_PROGRAM, &silverball_state::silverball_map);
+	m_maincpu->set_addrmap(AS_IO, &silverball_state::silverball_io);
+	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
+	m_maincpu->smiact().set("pci:00.0", FUNC(i82443bx_host_device::smi_act_w));
 
 	PCI_ROOT(config, "pci", 0);
-	// ...
+	// i440ZX (BX equivalent)
+	// TODO: unknown RAM size
+	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 32*1024*1024);
+	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
+	//I82443BX_AGP   (config, "pci:01.0:00.0");
+
+	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, m_maincpu));
+	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
+	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+
+	i82371eb_ide_device &ide(I82371EB_IDE(config, PCI_IDE_ID, 0, m_maincpu));
+	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
+	ide.irq_sec().set("pci:07.0", FUNC(i82371eb_isa_device::pc_mirq0_w));
+
+	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_default_option("cdrom");
+//  ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_fixed(true);
+
+	ide.subdevice<bus_master_ide_controller_device>("ide2")->slot(0).set_default_option(nullptr);
+
+	I82371EB_USB (config, "pci:07.2", 0);
+	I82371EB_ACPI(config, "pci:07.3", 0);
+	LPC_ACPI     (config, "pci:07.3:acpi", 0);
+	SMBUS        (config, "pci:07.3:smbus", 0);
+
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", i440zx_superio_config);
+	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+
+	// TODO: actually a Trio64V2
+	VIRGE_PCI(config, "pci:0e.0", 0);
 }
 
 
 // Silverball machines used different motherboards. By now, we're adding all the known BIOSes here
+// TODO: should be separated by MB type
 #define SILVERBALL_BIOS \
-	ROM_REGION32_LE(0x40000, "bios", 0) \
+	ROM_REGION32_LE(0x40000, "pci:07.0", 0) \
 	/* Acorp 694XT/694XT1 (all of them from the Silverball software update files) */ \
 	ROM_SYSTEM_BIOS(0, "bios47", "BIOS47 (Acorp 694XT/694XT1)") \
 	ROMX_LOAD("bios47.bin", 0x00000, 0x40000, CRC(248910ed) SHA1(2901c94fb003e5eaea7e91127ad1f7953826a248), ROM_BIOS(0)) /* 09/03/2001-694X-686A-6A6LJX3AC-00 */ \
@@ -125,34 +203,38 @@ void silverball_state::silverball(machine_config &config)
 
 ROM_START(slvrball806)
 	SILVERBALL_BIOS
-	ROM_DEFAULT_BIOS("bios29") // The one dumped from the actual machine
+//	ROM_DEFAULT_BIOS("bios29") // The one dumped from the actual machine
+	ROM_DEFAULT_BIOS("bios33")
 
-	DISK_REGION( "ide:0:hdd" ) // 16383 cylinders, 16 heads, 63 sectors
+	DISK_REGION( PCI_IDE_ID"ide:0:hdd" ) // 16383 cylinders, 16 heads, 63 sectors
 	DISK_IMAGE("silverball_8.06", 0, BAD_DUMP SHA1(4bd03240229a2f59d457e95e04837422c423111b)) // May contain operator data
 ROM_END
 
 ROM_START(slvrball720)
 	SILVERBALL_BIOS
-	ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
+//	ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
+	ROM_DEFAULT_BIOS("bios33")
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( PCI_IDE_ID"ide:0:hdd" )
 	DISK_IMAGE("silverball_7.20", 0, BAD_DUMP SHA1(008d0146b579793f9ba2aa2e43ffa7ec1401f752)) // May contain operator data
 ROM_END
 
 ROM_START(slvrball632)
 	SILVERBALL_BIOS
-	ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
+//	ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
+	ROM_DEFAULT_BIOS("bios33")
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( PCI_IDE_ID"ide:0:hdd" )
 	DISK_IMAGE("silverball_6.32", 0, BAD_DUMP SHA1(0193fbc3b27e0b3ad6139830dfec04172eb3089a)) // May contain operator data
 ROM_END
 
 // SilverBall V4.09 BULOVA: Windows 3.1, HardLock parallel dongle and two VGA drivers loaded, S3 Trio and Chips and Technologies 6555x (mm55x16) Accelerator
 ROM_START(slvrballbu409)
 	SILVERBALL_BIOS
-	ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
+//	ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
+	ROM_DEFAULT_BIOS("bios33")
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( PCI_IDE_ID"ide:0:hdd" )
 	DISK_IMAGE("silverball_bulova_4.09_1", 0, BAD_DUMP SHA1(da838ddccf285fb4e06d7f752949e745e6b4e2e7)) // May contain operator data
 ROM_END
 
@@ -160,18 +242,19 @@ ROM_END
 // Probably the same as set 1, just with different operator data / configuration
 ROM_START(slvrballbu409b)
 	SILVERBALL_BIOS
-	ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
+//	ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
+	ROM_DEFAULT_BIOS("bios33")
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( PCI_IDE_ID"ide:0:hdd" )
 	DISK_IMAGE("silverball_bulova_4.09_2", 0, BAD_DUMP SHA1(86bf947b39cabcd207f79b7d6132199819e1fed7)) // May contain operator data
 ROM_END
 
 
 } // Anonymous namespace
 
-GAME(1997?, slvrball806,    0,           silverball, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (8.01)",               MACHINE_IS_SKELETON)
-GAME(1997?, slvrball720,    slvrball806, silverball, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (7.20)",               MACHINE_IS_SKELETON)
-GAME(1997?, slvrball632,    slvrball806, silverball, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (6.32)",               MACHINE_IS_SKELETON)
+GAME(1997?, slvrball806,    0,           silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (8.01)",               MACHINE_IS_SKELETON)
+GAME(1997?, slvrball720,    slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (7.20)",               MACHINE_IS_SKELETON)
+GAME(1997?, slvrball632,    slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (6.32)",               MACHINE_IS_SKELETON)
 
-GAME(199?,  slvrballbu409,  slvrball806, silverball, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 1)", MACHINE_IS_SKELETON)
-GAME(199?,  slvrballbu409b, slvrball806, silverball, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 2)", MACHINE_IS_SKELETON) // Probably the same as set 1
+GAME(199?,  slvrballbu409,  slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 1)", MACHINE_IS_SKELETON)
+GAME(199?,  slvrballbu409b, slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 2)", MACHINE_IS_SKELETON) // Probably the same as set 1
