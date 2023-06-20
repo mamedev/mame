@@ -7,7 +7,7 @@
     driver by Phil Bennett
 
     Games supported:
-        * Turbo Sub [3 sets]
+        * Turbo Sub [7 sets]
 
     ROMs wanted:
         * Bouncer
@@ -460,46 +460,12 @@ static INPUT_PORTS_START( turbosub )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( turbosubb8 )
-	PORT_START("KEYPAD_A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Keypad 0") PORT_CHANGED_MEMBER(DEVICE_SELF, esripsys_state,keypad_interrupt, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Keypad 1") PORT_CHANGED_MEMBER(DEVICE_SELF, esripsys_state,keypad_interrupt, 0)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Keypad 2") PORT_CHANGED_MEMBER(DEVICE_SELF, esripsys_state,keypad_interrupt, 0)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Keypad 3") PORT_CHANGED_MEMBER(DEVICE_SELF, esripsys_state,keypad_interrupt, 0)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Keypad 4") PORT_CHANGED_MEMBER(DEVICE_SELF, esripsys_state,keypad_interrupt, 0)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Keypad 5") PORT_CHANGED_MEMBER(DEVICE_SELF, esripsys_state,keypad_interrupt, 0)
-
-	PORT_START("KEYPAD_B")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Keypad 6") PORT_CHANGED_MEMBER(DEVICE_SELF, esripsys_state,keypad_interrupt, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Keypad 7") PORT_CHANGED_MEMBER(DEVICE_SELF, esripsys_state,keypad_interrupt, 0)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Keypad 8") PORT_CHANGED_MEMBER(DEVICE_SELF, esripsys_state,keypad_interrupt, 0)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("Keypad 9") PORT_CHANGED_MEMBER(DEVICE_SELF, esripsys_state,keypad_interrupt, 0)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME("Keypad *") PORT_CHANGED_MEMBER(DEVICE_SELF, esripsys_state,keypad_interrupt, 0)
-
-	PORT_START("COINS")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, esripsys_state,coin_interrupt, 0)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, esripsys_state,coin_interrupt, 0)
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IO_1")
+	PORT_INCLUDE( turbosub )
+	PORT_MODIFY("IO_1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Neutralizer")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Fire")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Button 3")	// Buttons 3 and 4 unused in game, but used in Input Test
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Button 4")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	/* Mirror of IO_1 (unused) */
-	PORT_START("IO_2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("STICKX")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30)
-
-	PORT_START("STICKY")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) // Buttons 3 and 4 unused in game, but used in Input Test
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 )
 INPUT_PORTS_END
 
 /*************************************
@@ -1216,26 +1182,26 @@ ROM_END
 
 ROM_START( turbosubb8 )
 	ROM_REGION( 0xc0000, "main_code", 0) /* Non-bankswitched, 6809 #0 code */
-	ROM_LOAD( "tsb8.u85",    0x18000, 0x4000, CRC(cd920709) SHA1(50c7755be4c37b1b59660c28b859293a71017bc3) )
+	ROM_LOAD( "tsb8.u85", 0x18000, 0x4000, CRC(cd920709) SHA1(50c7755be4c37b1b59660c28b859293a71017bc3) )
 
 	ROM_REGION( 0x48000, "game_cpu", 0 ) /* Bankswitched 6809 code */
-	ROM_LOAD( "tsb8.u82",    0x10000, 0x2000, CRC(9af7c67c) SHA1(55e243c05989cbba5a60404f699292adf4e389e6) )
-	ROM_CONTINUE(                0x20000, 0x2000 )
-	ROM_LOAD( "tsb8.u81",    0x12000, 0x2000, CRC(4ba55138) SHA1(515ad97e958fe5bf7f8a896eb2a52abc6bb27c29) )
-	ROM_CONTINUE(                0x22000, 0x2000 )
-	ROM_LOAD( "tsb8.u87",    0x14000, 0x2000, CRC(392c57c3) SHA1(8d69c9d08cc54ce321164d8067bed33ff37e0c11) )
-	ROM_CONTINUE(                0x24000, 0x2000 )
-	ROM_LOAD( "tsb8.u86",    0x16000, 0x2000, CRC(0bcaa52e) SHA1(0a379adedfc9254b26e4d952093ebba27cadf5fa) )
-	ROM_CONTINUE(                0x26000, 0x2000 )
+	ROM_LOAD( "tsb8.u82", 0x10000, 0x2000, CRC(9af7c67c) SHA1(55e243c05989cbba5a60404f699292adf4e389e6) )
+	ROM_CONTINUE(         0x20000, 0x2000 )
+	ROM_LOAD( "tsb8.u81", 0x12000, 0x2000, CRC(4ba55138) SHA1(515ad97e958fe5bf7f8a896eb2a52abc6bb27c29) )
+	ROM_CONTINUE(         0x22000, 0x2000 )
+	ROM_LOAD( "tsb8.u87", 0x14000, 0x2000, CRC(392c57c3) SHA1(8d69c9d08cc54ce321164d8067bed33ff37e0c11) )
+	ROM_CONTINUE(         0x24000, 0x2000 )
+	ROM_LOAD( "tsb8.u86", 0x16000, 0x2000, CRC(0bcaa52e) SHA1(0a379adedfc9254b26e4d952093ebba27cadf5fa) )
+	ROM_CONTINUE(         0x26000, 0x2000 )
 
-	ROM_LOAD( "tsb8.u80",    0x30000, 0x2000, CRC(e7efa4bf) SHA1(0468ac565b8783a6374eba6c941c273d32f0dd49) )
-	ROM_CONTINUE(                0x40000, 0x2000 )
-	ROM_LOAD( "tsb8.u79",    0x32000, 0x2000, CRC(c74702dc) SHA1(82d4242fdb1100d6fbec4a60933d629cc4e3db11) )
-	ROM_CONTINUE(                0x42000, 0x2000 )
-	ROM_LOAD( "tsb8.u84",    0x34000, 0x2000, CRC(5af1f8fc) SHA1(a0389b84101e2bc498e1efe64900ae23e121a883) )
-	ROM_CONTINUE(                0x44000, 0x2000 )
-	ROM_LOAD( "tsb8.u83",    0x36000, 0x2000, CRC(24c3877a) SHA1(8e287a61c01a684af858d1ad6f0082137437a6c1) )
-	ROM_CONTINUE(                0x46000, 0x2000 )
+	ROM_LOAD( "tsb8.u80", 0x30000, 0x2000, CRC(e7efa4bf) SHA1(0468ac565b8783a6374eba6c941c273d32f0dd49) )
+	ROM_CONTINUE(         0x40000, 0x2000 )
+	ROM_LOAD( "tsb8.u79", 0x32000, 0x2000, CRC(c74702dc) SHA1(82d4242fdb1100d6fbec4a60933d629cc4e3db11) )
+	ROM_CONTINUE(         0x42000, 0x2000 )
+	ROM_LOAD( "tsb8.u84", 0x34000, 0x2000, CRC(5af1f8fc) SHA1(a0389b84101e2bc498e1efe64900ae23e121a883) )
+	ROM_CONTINUE(         0x44000, 0x2000 )
+	ROM_LOAD( "tsb8.u83", 0x36000, 0x2000, CRC(24c3877a) SHA1(8e287a61c01a684af858d1ad6f0082137437a6c1) )
+	ROM_CONTINUE(         0x46000, 0x2000 )
 
 	/* e000 - ffff = Upper half of U85 (lower half is blank) */
 	ROM_COPY( "main_code", 0x18000 + 0x2000, 0xe000, 0x2000 )
@@ -1568,10 +1534,10 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, turbosub,  0,        esripsys, turbosub, esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSCA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, turbosubc5, turbosub, esripsys, turbosub, esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, turbosubc5s, turbosub, esripsys, turbosub, esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC5*)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, turbosub6, turbosub, esripsys, turbosub, esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, turbosub7, turbosub, esripsys, turbosub, esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC7)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, turbosub8, turbosub, esripsys, turbosub, esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC8)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, turbosubb8, turbosub, esripsys, turbosubb8, esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSB8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, turbosub,    0,        esripsys, turbosub,   esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSCA)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, turbosubc5,  turbosub, esripsys, turbosub,   esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC5)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, turbosubc5s, turbosub, esripsys, turbosub,   esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC5*)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, turbosub6,   turbosub, esripsys, turbosub,   esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, turbosub7,   turbosub, esripsys, turbosub,   esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC7)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, turbosub8,   turbosub, esripsys, turbosub,   esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC8)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, turbosubb8,  turbosub, esripsys, turbosubb8, esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSB8)",  MACHINE_SUPPORTS_SAVE )
