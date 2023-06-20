@@ -606,6 +606,12 @@ void dec8_state::oscar_s_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
+// Used by the bootleg which has a standard M6502 with predecrypted opcodes
+void dec8_state::oscarbl_s_opcodes_map(address_map &map)
+{
+	map(0x8000, 0xffff).rom().region("audiocpu", 0x10000);
+}
+
 /* Used by Last Mission, Shackled & Breywood */
 void dec8_state::ym3526_s_map(address_map &map)
 {
@@ -2288,6 +2294,15 @@ void dec8_state::oscar(machine_config &config)
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
 }
 
+void dec8_state::oscarbl(machine_config &config)
+{
+	oscar(config);
+
+	M6502(config.replace(), m_audiocpu, XTAL(12'000'000)/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::oscar_s_map); /* NMIs are caused by the main CPU */
+	m_audiocpu->set_addrmap(AS_OPCODES, &dec8_state::oscarbl_s_opcodes_map);
+}
+
 void dec8_state::srdarwin(machine_config &config)
 {
 	/* basic machine hardware */
@@ -3367,6 +3382,33 @@ ROM_START( oscar )
 	ROM_LOAD( "ed02", 0x60000, 0x10000, CRC(7ddc5651) SHA1(f5ec5245cf3d9d4d9c1df6a8128c24565e331317) )
 ROM_END
 
+ROM_START( oscarbl )  // very similar to the original, main difference it's it uses a standard M6502 for sound with predecrypted opcodes.
+	ROM_REGION( 0x20000, "maincpu", 0 ) // same as the original
+	ROM_LOAD( "m27c256.3",  0x08000, 0x08000, CRC(120040d8) SHA1(22d5f84f3ca724cbf39dfc4790f2175ba4945aaf) )
+	ROM_LOAD( "at27c512.2", 0x10000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "at27c512.4", 0x00000, 0x10000, CRC(2ad9ef5d) SHA1(19db4446a6a5f75c7ddb2807b69d7c40d8b2d55a) )
+
+	ROM_REGION( 2*0x10000, "audiocpu", 0 )
+	ROM_LOAD( "at27c512.1", 0x08000, 0x10000, CRC(302ff92c) SHA1(222cc1e4673a5439da1cdd07cc65dc23f522da1c) ) // data in the first half, opcodes in the second
+
+	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
+	ROM_LOAD( "ed08", 0x00000, 0x04000, BAD_DUMP CRC(308ac264) SHA1(fd1c4ec4e4f99c33e93cd15e178c4714251a9b7e) ) // not included in this set, probably same
+
+	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_LOAD( "at27c512.6", 0x00000, 0x10000, CRC(967315b5) SHA1(b7a081241477ab8e62fe3df1b7025b50ceaba180) )
+	ROM_LOAD( "at27c512.7", 0x20000, 0x10000, CRC(fcdba431) SHA1(0be2194519c36ddf136610f60890506eda1faf0b) )
+	ROM_LOAD( "at27c512.8", 0x40000, 0x10000, CRC(7d50bebc) SHA1(06375f3273c48c7c7d81f1c15cbc5d3f3e05b8ed) )
+	ROM_LOAD( "at27c512.9", 0x60000, 0x10000, CRC(8fdf0fa5) SHA1(2b4d1ca1436864e89b13b3fa151a4a3708592e0a) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles */
+	ROM_LOAD( "at27c512.10", 0x00000, 0x10000, CRC(98cb4ffc) SHA1(75465a1e7c113db766e14d22b31bf999c520a8bf) )
+	ROM_LOAD( "at27c512.11", 0x20000, 0x10000, CRC(bff7fddc) SHA1(129e99fa99920e647a53b9af64c9c288c1e8ad57) )
+	ROM_LOAD( "at27c512.12", 0x40000, 0x10000, CRC(eff3b56c) SHA1(427d3aa053fa81ef004019eb8bb0aa97787f283e) )
+	ROM_LOAD( "at27c512.13", 0x60000, 0x10000, CRC(7ddc5651) SHA1(f5ec5245cf3d9d4d9c1df6a8128c24565e331317) )
+ROM_END
+
 ROM_START( oscaru )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "ed10", 0x08000, 0x08000, CRC(f9b0d4d4) SHA1(dc2aba978ba96f365027c7be5714728d5d7fb802) )
@@ -3823,6 +3865,7 @@ GAME( 1987, csilver,    0,        csilver,  csilver,   csilver_state, empty_init
 GAME( 1987, csilverj,   csilver,  csilver,  csilverj,  csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, csilverja,  csilver,  csilver,  csilverj,  csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, oscar,      0,        oscar,    oscar,     dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarbl,    oscar,    oscarbl,  oscar,     dec8_state,    empty_init, ROT0,   "bootleg",               "Psycho-Nics Oscar (World revision 0, bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, oscaru,     oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East USA",         "Psycho-Nics Oscar (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, oscarj1,    oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, oscarj2,    oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
