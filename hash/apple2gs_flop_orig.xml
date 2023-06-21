@@ -4086,4 +4086,150 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="sinbadfal">
+		<description>Sinbad and the Throne of the Falcon</description>
+		<year>1990</year>
+		<publisher>Cinemaware</publisher>
+		<info name="release" value="2022-11-20" />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--It requires a 768K Apple IIgs ROM1 or later.-->
+		<!--"Sinbad and the Throne of the Falcon" is a 1990 action game developed by Curt Toumanian (art director), Steve Quinn (original art), Jeff Hilbers (art), Rob Landeros (art), Russ Truelove (art), Bill Williams (music & story), Jim Simmons (orchestration), Andrew Caldwell (orchestration), Douglass Sharp (computagraphy), and distributed by Cinemaware.-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 Reel 1" />
+			<dataarea name="flop" size="1296414">
+				<rom name="sinbad and the throne of the falcon - reel 1.woz" size="1296414" crc="a3056453" sha1="f90a3f48445f80abe28ba368ff9de51deb55930a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 Reel 2 " />
+			<dataarea name="flop" size="1296381">
+				<rom name="sinbad and the throne of the falcon - reel 2.woz" size="1296381" crc="3eb2b298" sha1="1920ab0321f8bcf85a607baf2b3a0778251c3747" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magmyths">
+		<description>Magical Myths</description>
+		<year>1988</year>
+		<publisher>Unicorn Software</publisher>
+		<info name="release" value="2022-11-24" />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--It requires a 768K Apple IIgs.-->
+		<!--"Magical Myths" is a 1988 educational program developed by Stan Brewster, Joseph B. Hewitt IV (graphics), and June Stark, and distributed by Unicorn Software.-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk  Side " />
+			<dataarea name="flop" size="1296701">
+				<rom name="magical myths iigs disk 1.woz" size="1296701" crc="681789c6" sha1="6f65fcfe7f25eeac365e17fe00fb9c044048dc04" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk  Side " />
+			<dataarea name="flop" size="1296189">
+				<rom name="magical myths iigs disk 2.woz" size="1296189" crc="aff8db40" sha1="e9fb62fb6006938b101cde428bd9252d333944e4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rockrang">
+		<description>Rocket Ranger</description>
+		<year>1989</year>
+		<publisher>Cinemaware</publisher>
+		<info name="release" value="2023-05-27" />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--It requires a 768K Apple IIgs.-->
+		<!--"Rocket Ranger" is a 1989 action/strategy game developed by Ed Magnin, Russell Truelove, Patrick Cook, Jim Simmons, Matt Kazanowski, Allen McPheeters, Robert Jacob, John Cutter, Kellyn Beck, Tom McWilliams, Peter Kaminski, Jeffrey Hilbers, Bob Lindstrom, Phyllis Jacob, and distributed by Cinemaware.-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1296356">
+				<rom name="rocket ranger iigs disk 1.woz" size="1296356" crc="aef39321" sha1="2fb326d5b98273ebbe73feed2b4052bfb5d9c96b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1296356">
+				<rom name="rocket ranger iigs disk 2.woz" size="1296356" crc="00ab9881" sha1="97b36202be824793cd6caf5de674ed17f33443d6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mancala">
+		<description>Mancala</description>
+		<year>1988</year>
+		<publisher>California Dreams</publisher>
+		<info name="release" value="2023-05-27" />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--It requires a 512K Apple IIgs.-->
+		<!--"Mancala" is a 1988 board game developed by Jarek Olszewski, Maciej Markuszewski, Marcin Szostakowski, and Dorota Błaszczak, and distributed by Calfornia Dreams.-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345347">
+				<rom name="mancala iigs.woz" size="1345347" crc="83ffa2e2" sha1="6ba3f3af0ea25fabdac13ffda9ae28d424b9977e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathwizd">
+		<description>Math Wizard</description>
+		<year>1988</year>
+		<publisher>Unicorn Software</publisher>
+		<info name="release" value="2023-05-27" />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--It requires a 768K Apple IIgs.-->
+		<!--"Math Wizard" is a 1988 educational game developed by William Demas, June Stark, and Joseph B. Hewitt IV, and distributed by Unicorn Software.-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1296713">
+				<rom name="math wizard iigs disk 1.woz" size="1296713" crc="11a11e65" sha1="3fc9cb27440bcca67e0ac156eac18396cac69c37" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1296198">
+				<rom name="math wizard iigs disk 2.woz" size="1296198" crc="61759ebf" sha1="9e8e1dd7c03ee46650a0d1ee8f62efb14a00a8ba" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geometry">
+		<description>Geometry</description>
+		<year>1988</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="release" value="2023-05-27" />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--It requires a 768K Apple IIgs.-->
+		<!--"Geometry" is a 1988 educational program developed by Sensei Software and distributed by Broderbund Software.-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1296186">
+				<rom name="geometry iigs disk 1.woz" size="1296186" crc="b9600e62" sha1="fa8657f69989d75924ba2925dca65eeecbbe1490" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1296186">
+				<rom name="geometry iigs disk 2.woz" size="1296186" crc="3fd1d7b6" sha1="b039a01bcee85aecd29d445779fdb5b126316884" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1296698">
+				<rom name="geometry iigs disk 3.woz" size="1296698" crc="e0a229bd" sha1="59bb79b5d3e14f32750b002e3765310ae0a26f1c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strippkr2">
+		<description>Strip Poker II</description>
+		<year>1986</year>
+		<publisher>Artworx</publisher>
+		<info name="release" value="2023-05-27" />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--It requires a 512K Apple IIgs.-->
+		<!--"Strip Poker II" is a 1986 card game developed by R. Harnish and R. Couch, and distributed by Artworx.-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345297">
+				<rom name="strip poker ii iigs.woz" size="1345297" crc="835d6724" sha1="05a280b8663ee6add694e0f7d2900745bd53fdad" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
