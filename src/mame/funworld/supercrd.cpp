@@ -652,6 +652,43 @@ ROM_END
 
 
 /*
+  Red Line
+  v808
+
+  CPU:
+
+  Lfnd. Nr. 4076
+  Type: C89
+  Datum: 19.09.89
+
+  Also there are other identical sets labelled:
+
+  Lfnd. Nr. 4011
+  Type: C89
+  Datum: 22.5.89
+
+  Lfnd. Nr. 4028
+  Type: C89
+  Datum: 6.6.89
+
+*/
+ROM_START( redline )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "redl_808_cc1-g.ic37", 0x00000, 0x08000, CRC(67aeda4f) SHA1(b2c2498833fad45acbfedfd8e9a4bd61904abbf5) )
+	ROM_CONTINUE(                    0x00000, 0x08000 )
+	ROM_LOAD( "redl_808_cc2-g.ic51", 0x08000, 0x08000, CRC(15940276) SHA1(359cdfb8f9c05ffd5fa1d184ab81d9ecc79c2ea5) )
+	ROM_IGNORE(                      0x8000)
+
+	ROM_REGION( 0x10000, "tiles", 0 )
+	ROM_LOAD( "redl_808_zg2-g.ic11", 0x00000, 0x08000, CRC(56b78d6d) SHA1(5f4613ff9112659daae6b698cf95e0c87293a6a7) )
+	ROM_LOAD( "redl_808_zg1-g.ic10", 0x08000, 0x08000, CRC(fa413560) SHA1(16ef0d323c742e5fa78969da6ed25286ab0c6bf3) )
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "am27s29.ic9", 0x0000, 0x0200, CRC(dfeabd11) SHA1(21e8bbcf4aba5e4d672e5585890baf8c5bc77c98) )
+ROM_END
+
+
+/*
   Encryption observations:
 
   - only opcodes are encrypted;
@@ -797,3 +834,4 @@ GAME( 1992, supercrd, 0,      supercrd, supercrd, supercrd_state, init_supercrd,
 GAME( 1992, fruitstr, 0,      supercrd, supercrd, supercrd_state, init_fruitstr, ROT0,  "Fun World", "Fruit Star (encrypted)",        MACHINE_NOT_WORKING )
 GAME( 1994, supst839, 0,      supercrd, supercrd, supercrd_state, empty_init,    ROT90, "Fun World", "Super Stars (v839, encrypted)", MACHINE_NOT_WORKING )
 GAME( 1990, supst834, 0,      supercrd, supercrd, supercrd_state, empty_init,    ROT90, "Fun World", "Super Stars (v834, encrypted)", MACHINE_NOT_WORKING )
+GAME( 1989, redline,  0,      supercrd, supercrd, supercrd_state, empty_init,    ROT90, "Fun World", "Red Line (v808, encrypted)",    MACHINE_NOT_WORKING )
