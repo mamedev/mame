@@ -86,7 +86,7 @@ INPUT_PORTS_END
 
 static void isa_internal_devices(device_slot_interface &device)
 {
-	// TODO: additional Winbond W83783 for HW monitoring
+	// TODO: additional Winbond W83782M for HW monitoring
 	device.option_add("w83977tf", W83977TF);
 }
 
