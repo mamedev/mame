@@ -256,8 +256,6 @@ void m68340_cpu_device::set_modck(int state)
 
 void m68340_cpu_device::device_start()
 {
-	reset_cb().append(*this, FUNC(m68340_cpu_device::reset_peripherals));
-
 	fscpu32_device::device_start();
 
 	m_m68340SIM    = new m68340_sim();
@@ -273,11 +271,23 @@ void m68340_cpu_device::device_start()
 	m_internal = &space(AS_PROGRAM);
 }
 
+
+void m68340_cpu_device::device_config_complete()
+{
+	fscpu32_device::device_config_complete();
+
+	reset_cb().append(*this, FUNC(m68340_cpu_device::reset_peripherals));
+}
+
+
 void m68340_cpu_device::reset_peripherals(int state)
 {
-	m_m68340SIM->module_reset();
-	m_m68340DMA->module_reset();
-	m_serial->module_reset();
-	m_timer[0]->module_reset();
-	m_timer[1]->module_reset();
+	if (state)
+	{
+		m_m68340SIM->module_reset();
+		m_m68340DMA->module_reset();
+		m_serial->module_reset();
+		m_timer[0]->module_reset();
+		m_timer[1]->module_reset();
+	}
 }
