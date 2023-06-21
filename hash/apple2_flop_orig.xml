@@ -25654,7 +25654,7 @@ license:CC0-1.0
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2 Side 1" />
 			<dataarea name="flop" size="235301">
-				<rom name="microzine jr. no. 1 (1988)(scholastic) - disk 2, side 1- safari!.woz" size="235301" crc="aafb1278" sha1="e6c04e1c37802524a23e2719ee16da561ad39625" />
+				<rom name="microzine jr. no. 1 (1988)(scholastic) - disk 2, side 1- safari.woz" size="235301" crc="aafb1278" sha1="e6c04e1c37802524a23e2719ee16da561ad39625" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
@@ -26536,7 +26536,7 @@ license:CC0-1.0
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2 Side 1" />
 			<dataarea name="flop" size="235238">
-				<rom name="microzine jr. no. 8 (1989)(scholastic) - disk 2, side 1- let's celebrate!.woz" size="235238" crc="924a2da5" sha1="10f483af4eed715ba523fe704acc1b88804748c5" />
+				<rom name="microzine jr. no. 8 (1989)(scholastic) - disk 2, side 1- let's celebrate.woz" size="235238" crc="924a2da5" sha1="10f483af4eed715ba523fe704acc1b88804748c5" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
@@ -28120,7 +28120,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="lurkhorr203M">
+	<software name="lurkhorr203m">
 		<description>The Lurking Horror r203-870506-M</description>
 		<year>1987</year>
 		<publisher>Infocom</publisher>
