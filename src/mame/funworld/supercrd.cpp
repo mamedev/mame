@@ -20,8 +20,12 @@
 
   * Super Card (encrypted),           Fun World, 1992.
   * Fruit Star (encrypted),           Fun World, 1992.
+  * Gamble Poker (v816, encrypted),   Fun World, 1990.
+  * Gamble Poker (v812, encrypted),   Fun World, 1990.
   * Super Stars (v839, encrypted),    Fun World, 1996.
   * Super Stars (v834, encrypted),    Fun World, 1990.
+  * Red Line (v808, encrypted),       Fun World, 1989.
+
 
 ***********************************************************************************
 
@@ -687,6 +691,64 @@ ROM_START( redline )
 	ROM_LOAD( "am27s29.ic9", 0x0000, 0x0200, CRC(dfeabd11) SHA1(21e8bbcf4aba5e4d672e5585890baf8c5bc77c98) )
 ROM_END
 
+/*
+  Gamble Poker
+  v816
+
+  CPU:
+
+  Lfnd. Nr. 9018
+  Type: F90
+  Datum: 22.10.90
+
+  Also another identical set has:
+
+  Lfnd. Nr. 9060
+  Type: F90
+  Datum: 12.12.90
+
+*/
+ROM_START( gampo816 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "gampo_816_cf1.ic37", 0x00000, 0x08000, CRC(f82308d3) SHA1(cb50011033e4797646de04201ca34a0380402c15) )
+	ROM_CONTINUE(                   0x00000, 0x08000 )
+	ROM_LOAD( "gampo_816_cf2.ic51", 0x08000, 0x08000, CRC(ffa3f6be) SHA1(adda3fc0ca8a490ac68e6c285bfa4d2285fc5d0f) )
+	ROM_IGNORE(                     0x8000)
+
+	ROM_REGION( 0x10000, "tiles", 0 )
+	ROM_LOAD( "gampo_807_zg2.ic11", 0x00000, 0x08000, CRC(dbc83c74) SHA1(1cf27c4946fdde1af5ae0f4f1803957a575461f3) )
+	ROM_LOAD( "gampo_807_zg1.ic10", 0x08000, 0x08000, CRC(52cf8211) SHA1(8d871d658a33a98fc6408373dd60db0b7d3ad3b4) )
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "n82s147.ic9", 0x0000, 0x0200, CRC(a28ccbf1) SHA1(fd46d39bb4031148b7a13481fafc909b76e7bdde) )
+ROM_END
+
+/*
+  Gamble Poker
+  v812
+
+  CPU:
+
+  Lfnd. Nr. 9041
+  Type: F90
+  Datum: 21.11.90
+
+*/
+ROM_START( gampo812 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "gampo_812_cf1.ic37", 0x00000, 0x08000, CRC(bcd2429c) SHA1(876349a83db78fce52e05ec458da7636c12100fb) )
+	ROM_CONTINUE(                   0x00000, 0x08000 )
+	ROM_LOAD( "gampo_812_cf2.ic51", 0x08000, 0x08000, CRC(1e6f2a30) SHA1(bc2adce26cf926d01acad4e30bd5999568f2384a) )
+	ROM_IGNORE(                     0x8000)
+
+	ROM_REGION( 0x10000, "tiles", 0 )
+	ROM_LOAD( "gampo_807_zg2.ic11", 0x00000, 0x08000, CRC(dbc83c74) SHA1(1cf27c4946fdde1af5ae0f4f1803957a575461f3) )
+	ROM_LOAD( "gampo_807_zg1.ic10", 0x08000, 0x08000, CRC(52cf8211) SHA1(8d871d658a33a98fc6408373dd60db0b7d3ad3b4) )
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "n82s147.ic9", 0x0000, 0x0200, CRC(a28ccbf1) SHA1(fd46d39bb4031148b7a13481fafc909b76e7bdde) )
+ROM_END
+
 
 /*
   Encryption observations:
@@ -829,9 +891,11 @@ void supercrd_state::init_fruitstr() // TODO: check unknown opcodes
 } // anonymous namespace
 
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT           ROT    COMPANY      FULLNAME                         FLAGS
-GAME( 1992, supercrd, 0,      supercrd, supercrd, supercrd_state, init_supercrd, ROT0,  "Fun World", "Super Card (encrypted)",        MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
-GAME( 1992, fruitstr, 0,      supercrd, supercrd, supercrd_state, init_fruitstr, ROT0,  "Fun World", "Fruit Star (encrypted)",        MACHINE_NOT_WORKING )
-GAME( 1994, supst839, 0,      supercrd, supercrd, supercrd_state, empty_init,    ROT90, "Fun World", "Super Stars (v839, encrypted)", MACHINE_NOT_WORKING )
-GAME( 1990, supst834, 0,      supercrd, supercrd, supercrd_state, empty_init,    ROT90, "Fun World", "Super Stars (v834, encrypted)", MACHINE_NOT_WORKING )
-GAME( 1989, redline,  0,      supercrd, supercrd, supercrd_state, empty_init,    ROT90, "Fun World", "Red Line (v808, encrypted)",    MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT           ROT    COMPANY      FULLNAME                          FLAGS
+GAME( 1992, supercrd, 0,      supercrd, supercrd, supercrd_state, init_supercrd, ROT0,  "Fun World", "Super Card (encrypted)",         MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
+GAME( 1992, fruitstr, 0,      supercrd, supercrd, supercrd_state, init_fruitstr, ROT0,  "Fun World", "Fruit Star (encrypted)",         MACHINE_NOT_WORKING )
+GAME( 1990, gampo816, 0,      supercrd, supercrd, supercrd_state, empty_init,    ROT0,  "Fun World", "Gamble Poker (v816, encrypted)", MACHINE_NOT_WORKING )
+GAME( 1990, gampo812, 0,      supercrd, supercrd, supercrd_state, empty_init,    ROT0,  "Fun World", "Gamble Poker (v812, encrypted)", MACHINE_NOT_WORKING )
+GAME( 1994, supst839, 0,      supercrd, supercrd, supercrd_state, empty_init,    ROT90, "Fun World", "Super Stars (v839, encrypted)",  MACHINE_NOT_WORKING )
+GAME( 1990, supst834, 0,      supercrd, supercrd, supercrd_state, empty_init,    ROT90, "Fun World", "Super Stars (v834, encrypted)",  MACHINE_NOT_WORKING )
+GAME( 1989, redline,  0,      supercrd, supercrd, supercrd_state, empty_init,    ROT90, "Fun World", "Red Line (v808, encrypted)",     MACHINE_NOT_WORKING )
