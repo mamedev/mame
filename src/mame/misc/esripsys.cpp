@@ -15,14 +15,16 @@
 
     Notes:
         * 'turbosub' executes a series of hardware tests on startup.
-        To skip, hold down keypad '*' on reset.
+          To skip, hold down keypad '*' on reset.
         * Hold '*' during the game to access the operator menu.
 
     BTANB:
         * Missing lines occur on real hardware.
 
-    To do:
+    TODO:
         * Implement collision detection hardware (unused by Turbo Sub).
+        * turbosubb8/c5/c5s lock up at hardware tests, see note above on
+          how to skip.
 
 ****************************************************************************/
 
@@ -241,6 +243,7 @@ uint8_t esripsys_state::rip_status_in()
 			| (m_f_status & 0x80);
 }
 
+
 /*************************************
  *
  *  I/O
@@ -410,6 +413,7 @@ INPUT_CHANGED_MEMBER(esripsys_state::coin_interrupt)
 	}
 }
 
+
 /*************************************
  *
  *  Port definitions
@@ -461,12 +465,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( turbosubb8 )
 	PORT_INCLUDE( turbosub )
+
 	PORT_MODIFY("IO_1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) // Buttons 3 and 4 unused in game, but used in Input Test
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 )
 INPUT_PORTS_END
+
 
 /*************************************
  *
@@ -564,6 +570,7 @@ void esripsys_state::esripsys_dac_w(offs_t offset, uint8_t data)
 		m_dac->write(dac_data);
 	}
 }
+
 
 /*************************************
  *
@@ -844,7 +851,7 @@ ROM_START( turbosub )
 	ROM_LOAD( "6331_vid.u155", 0x0240, 0x0020, CRC(63371737) SHA1(f08c03c81322c0de9ee64b4a9f11a1422c5bd463) )
 ROM_END
 
-ROM_START( turbosub7 )
+ROM_START( turbosubc7 )
 	ROM_REGION( 0xc0000, "main_code", 0) /* Non-bankswitched, 6809 #0 code */
 	ROM_LOAD( "mem6u85.bin", 0x18000, 0x4000, CRC(30016c8b) SHA1(0cd2dd7052de0eaa451ff8b0b2224180764c26de) )
 
@@ -954,7 +961,7 @@ ROM_START( turbosub7 )
 	ROM_LOAD( "6331_vid.u155", 0x0240, 0x0020, CRC(63371737) SHA1(f08c03c81322c0de9ee64b4a9f11a1422c5bd463) )
 ROM_END
 
-ROM_START( turbosub6 )
+ROM_START( turbosubc6 )
 	ROM_REGION( 0xc0000, "main_code", 0) /* Non-bankswitched, 6809 #0 code */
 	ROM_LOAD( "u85", 0x18000, 0x4000, CRC(d37ccb06) SHA1(445df1caa4dd4901e474bb0903bf28e536edf493) )
 
@@ -1070,7 +1077,7 @@ ROM_START( turbosub6 )
 	ROM_LOAD( "6331_vid.u155", 0x0240, 0x0020, CRC(63371737) SHA1(f08c03c81322c0de9ee64b4a9f11a1422c5bd463) )
 ROM_END
 
-ROM_START( turbosub8 )
+ROM_START( turbosubc8 )
 	ROM_REGION( 0xc0000, "main_code", 0) /* Non-bankswitched, 6809 #0 code */
 	ROM_LOAD( "tsc8.u85", 0x18000, 0x4000, CRC(f27d048e) SHA1(a98dc42fb8eb7ee320c7b77f9be272448ec8ec9b) )
 
@@ -1528,6 +1535,7 @@ ROM_START( turbosubc5 )
 	ROM_LOAD( "6331_vid.u155", 0x0240, 0x0020, CRC(63371737) SHA1(f08c03c81322c0de9ee64b4a9f11a1422c5bd463) )
 ROM_END
 
+
 /*************************************
  *
  *  Game drivers
@@ -1537,7 +1545,7 @@ ROM_END
 GAME( 1985, turbosub,    0,        esripsys, turbosub,   esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSCA)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1985, turbosubc5,  turbosub, esripsys, turbosub,   esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC5)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1985, turbosubc5s, turbosub, esripsys, turbosub,   esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC5*)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, turbosub6,   turbosub, esripsys, turbosub,   esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1985, turbosub7,   turbosub, esripsys, turbosub,   esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC7)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1985, turbosub8,   turbosub, esripsys, turbosub,   esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC8)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, turbosubc6,  turbosub, esripsys, turbosub,   esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, turbosubc7,  turbosub, esripsys, turbosub,   esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC7)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, turbosubc8,  turbosub, esripsys, turbosub,   esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC8)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1985, turbosubb8,  turbosub, esripsys, turbosubb8, esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSB8)",  MACHINE_SUPPORTS_SAVE )

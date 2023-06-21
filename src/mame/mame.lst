@@ -29414,12 +29414,12 @@ eshb                            // (c) 1984 Funai / Gakken
 
 @source:misc/esripsys.cpp
 turbosub                        // (c) 1985 Entertainment Sciences
-turbosub6                       // (c) 1985 Entertainment Sciences
-turbosub7                       // (c) 1985 Entertainment Sciences
-turbosub8
 turbosubb8                      // (c) 1985 Entertainment Sciences
 turbosubc5                      // (c) 1985 Entertainment Sciences
 turbosubc5s                     // (c) 1985 Entertainment Sciences
+turbosubc6                      // (c) 1985 Entertainment Sciences
+turbosubc7                      // (c) 1985 Entertainment Sciences
+turbosubc8                      // (c) 1985 Entertainment Sciences
 
 @source:misc/ettrivia.cpp
 promutrv                        // (c) 1985 Enerdyne Technologies Inc
