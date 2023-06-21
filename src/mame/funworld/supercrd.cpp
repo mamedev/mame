@@ -18,9 +18,10 @@
 
   Games running on this hardware:
 
-  * Super Card (encrypted),    Fun World, 1992.
-  * Fruit Star (encrypted),    Fun World, 1992.
-
+  * Super Card (encrypted),           Fun World, 1992.
+  * Fruit Star (encrypted),           Fun World, 1992.
+  * Super Stars (v839, encrypted),    Fun World, 1996.
+  * Super Stars (v834, encrypted),    Fun World, 1990.
 
 ***********************************************************************************
 
@@ -597,6 +598,58 @@ ROM_START( fruitstr )
 	ROM_LOAD( "tbp24s10n.ic6",  0x0200, 0x0200, NO_DUMP )  // missing bipolar PROM...
 ROM_END
 
+/*
+  Super Stars
+  v839
+
+  CPU:
+
+  Lfnd. Nr. 839
+  Type: "C"
+  Datum: 6.9.94
+
+*/
+ROM_START( supst839 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "supst_839_cc1.ic37", 0x00000, 0x08000, CRC(48257f23) SHA1(cd46cea9b42ccfceb2841792856bc46363c47295) )
+	ROM_CONTINUE(                   0x00000, 0x08000 )
+	ROM_LOAD( "supst_839_cc2.ic51", 0x08000, 0x08000, CRC(06ab5bd5) SHA1(1e8a4a5b83cea8516bc981b7a4a6f8cfedaa9d8b) )
+	ROM_IGNORE(                     0x8000)
+
+	ROM_REGION( 0x10000, "tiles", 0 )
+	ROM_LOAD( "zg2.ic11", 0x00000, 0x8000, CRC(5cafeec2) SHA1(1a527d25009e2cd53d30d660539d0e2615f597ed) )
+	ROM_LOAD( "zg1.ic10", 0x08000, 0x8000, CRC(884f32dc) SHA1(ce0ab1a7b7d70cd18016118d98afefec6d25b937) )
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "n82s147.ic9", 0x0000, 0x0200, CRC(dfeabd11) SHA1(21e8bbcf4aba5e4d672e5585890baf8c5bc77c98) )
+ROM_END
+
+/*
+  Super Stars
+  v834
+
+  CPU:
+
+  Lfnd. Nr. 4153
+  Type: C90
+  Datum: 2.5.90
+
+*/
+ROM_START( supst834 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "supst_834_cc1.ic37", 0x00000, 0x08000, CRC(875a09ec) SHA1(b6f5718f3268613f32d41e74d15d17f1dabe8515) )
+	ROM_CONTINUE(                   0x00000, 0x08000 )
+	ROM_LOAD( "supst_834_cc2.ic51", 0x08000, 0x08000, CRC(4c132d75) SHA1(40dc3bd219714a6b1c7187075b5d17852073051d) )
+	ROM_IGNORE(                     0x8000)
+
+	ROM_REGION( 0x10000, "tiles", 0 )
+	ROM_LOAD( "super_050_zg2.ic11", 0x00000, 0x08000, CRC(5cafeec2) SHA1(1a527d25009e2cd53d30d660539d0e2615f597ed) )
+	ROM_LOAD( "super_050_zg1.ic10", 0x08000, 0x08000, CRC(884f32dc) SHA1(ce0ab1a7b7d70cd18016118d98afefec6d25b937) )
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "fp30a.ic9", 0x0000, 0x0200, CRC(dfeabd11) SHA1(21e8bbcf4aba5e4d672e5585890baf8c5bc77c98) )
+ROM_END
+
 
 /*
   Encryption observations:
@@ -739,6 +792,8 @@ void supercrd_state::init_fruitstr() // TODO: check unknown opcodes
 } // anonymous namespace
 
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT           ROT   COMPANY      FULLNAME                  FLAGS
-GAME( 1992, supercrd, 0,      supercrd, supercrd, supercrd_state, init_supercrd, ROT0, "Fun World", "Super Card (encrypted)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
-GAME( 1992, fruitstr, 0,      supercrd, supercrd, supercrd_state, init_fruitstr, ROT0, "Fun World", "Fruit Star (encrypted)", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT           ROT    COMPANY      FULLNAME                         FLAGS
+GAME( 1992, supercrd, 0,      supercrd, supercrd, supercrd_state, init_supercrd, ROT0,  "Fun World", "Super Card (encrypted)",        MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
+GAME( 1992, fruitstr, 0,      supercrd, supercrd, supercrd_state, init_fruitstr, ROT0,  "Fun World", "Fruit Star (encrypted)",        MACHINE_NOT_WORKING )
+GAME( 1994, supst839, 0,      supercrd, supercrd, supercrd_state, empty_init,    ROT90, "Fun World", "Super Stars (v839, encrypted)", MACHINE_NOT_WORKING )
+GAME( 1990, supst834, 0,      supercrd, supercrd, supercrd_state, empty_init,    ROT90, "Fun World", "Super Stars (v834, encrypted)", MACHINE_NOT_WORKING )
