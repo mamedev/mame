@@ -454,7 +454,7 @@ void h89_state::h89(machine_config & config)
 	HEATH_TLB(config, m_tlb);
 
 	// Connect the console port on CPU board to serial port on TLB
-	m_console->out_tx_callback().set(m_tlb, FUNC(heath_tlb_device::cb1_w));
+	m_console->out_tx_callback().set(m_tlb, FUNC(heath_tlb_device::serial_in_w));
 	m_tlb->serial_data_callback().set(m_console, FUNC(ins8250_uart_device::rx_w));
 
 	m_tlb->reset_cb().set(FUNC(h89_state::reset_line));

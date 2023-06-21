@@ -760,7 +760,7 @@ void heath_tlb_device::serial_out_b(uint8_t data)
 	m_write_sd(data);
 }
 
-void heath_tlb_device::cb1_w(int state)
+void heath_tlb_device::serial_in_w(int state)
 {
 	m_ace->rx_w(state);
 }

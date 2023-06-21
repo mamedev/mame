@@ -30,7 +30,7 @@ public:
 	auto serial_data_callback() { return m_write_sd.bind(); }
 	auto reset_cb() { return m_reset.bind(); }
 
-	void cb1_w(int state);
+	void serial_in_w(int state);
 
 	void reset_key_w(int state);
 	void right_shift_w(int state);
