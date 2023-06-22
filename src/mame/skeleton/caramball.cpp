@@ -44,12 +44,10 @@ Skeleton driver for electromechanical air hockey hardware from the Spanish compa
 
 #include "speaker.h"
 
-namespace
-{
+namespace {
 
 class caramball_state : public driver_device
 {
-
 public:
 	caramball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
