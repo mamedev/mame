@@ -44,6 +44,8 @@
  The MCU on the older PCBs can differ between 80C32 compatible models
  (found with a Winbond W78C32C-40 and with a TS80C32X2-MCA).
 
+ V2 uses a 24C16 SEEPROM, while later models use a 24C64.
+
  "GANCHONEW" V1 PCB has a different layout.
 
 ***************************************************************************/
