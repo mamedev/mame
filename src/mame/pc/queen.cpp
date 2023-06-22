@@ -14,10 +14,14 @@ VT8231 South Bridge
 VIA Eden Processor
 VIA EPIA Companion Chip VT1612A (Audio CODEC)
 VIA EPIA Companion Chip VT6103 (Networking)
-processor speed is 533MHz <- likely to be a Celeron or a Pentium III class CPU -AS
+processor speed is 533MHz <- likely to be a Celeron / Pentium III Socket 370 -AS
 
  it's a 2002 era PC at least based on the BIOS,
   almost certainly newer than the standard 'PENTIUM' CPU
+
+- In shutms11 HDD will boot to a STBOX / STG splash screen at 800x600 res,
+  eventually with blinking cursor then full screen blink (?).
+  TODO dig the dump for serial/text debugging, and refs for what video card is used here.
 
 - update by Peter Ferrie:
 - split BIOS region into 64kb blocks and implement missing PAM registers
