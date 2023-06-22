@@ -15061,6 +15061,7 @@ pang3j                          // 11/05/1995 (c) 1995 Mitchell (Japan) not list
 pang3r1                         // 11/05/1995 (c) 1995 Mitchell (Euro) not listed on Capcom's site
 pang3b4                         // bootleg
 pang3b5                         // bootleg
+pmonster                        // 19/05/1999 (c) 1999 (Japan)
 pnickj                          // 08/06/1994 (c) 1994 Compile + Capcom license (Japan) not listed on Capcom's site
 punisher                        // 22/04/1993 (c) 1993 (World) (CPS1 + QSound)
 punisherbz                      // bootleg
@@ -15884,9 +15885,12 @@ cncchess
 
 @source:chess/conchess.cpp
 conc
+conca
 concams
 concams5
 concgla
+concglap
+concglapa
 concvicp
 
 @source:chess/conic_cchess2.cpp
@@ -15923,6 +15927,7 @@ boxingb                         // (c) 1981
 demon                           // (c) 1982 Rock-ola
 qb3                             // (c) 1982 Rock-ola - prototype
 ripoff                          // (c) 1980
+skyfire                         // bootleg
 solarq                          // (c) 1981
 spaceftr                        // (c) 1981 Zaccaria
 spaceshp                        // (c) 1978 Cinematronics (Sega licence)
@@ -16537,6 +16542,7 @@ makyosen                        // (c) 1987 Data East Corporation (Japan)
 meikyuh                         // (c) 1987 Data East Corporation (Japan)
 meikyuha                        // (c) 1987 Data East Corporation (Japan)
 oscar                           // (c) 1988 Data East Corporation (World)
+oscarbl                         // bootleg
 oscarj1                         // (c) 1987 Data East Corporation (Japan)
 oscarj2                         // (c) 1987 Data East Corporation (Japan)
 oscaru                          // (c) 1987 Data East USA (US)
@@ -17305,6 +17311,7 @@ ppmast93                        // (c) 1993 Electronic Devices S.R.L.
 pzletime                        //
 
 @source:edevices/stlforce.cpp
+mortalr
 stlforce                        // (c) 1994 Electronic Devices (Italy) / Ecogames S.L. (Spain)
 twinbrat                        // (c) 1995
 twinbrata                       // (c) 1995
@@ -17999,7 +18006,13 @@ crystalca                       // 1998 JCD srl
 
 @source:funworld/supercrd.cpp
 fruitstr                        // (c) 1992 Fun World
+fruitstra                       // (c) 1992 Fun World
+gampo816                        // (c) 1990 Fun World
+gampo812                        // (c) 1990 Fun World
+redline                         // (c) 1989 Fun World
 supercrd                        // (c) 1992 Fun World
+supst839                        // (c) 1994 Fun World
+supst834                        // (c) 1990 Fun World
 
 @source:fuuki/fuukifg2.cpp
 gogomile                        // (c) 1995
@@ -28157,8 +28170,9 @@ sanma                           // 2001, ANES
 tonpuu                          // 200?, ANES
 
 @source:misc/arachnid.cpp
-arac6000                        // (c) 1987/88/89/90 Arachnid Inc.
-arac6spa                        // (c) 1987/88/89/90 Arachnid Inc.
+arac6k27                        // (c) 1987/88/89/90 Arachnid Inc.
+arac6k28sp                      // (c) 1987/88/89/90 Arachnid Inc.
+arac6k33                        // (c) 1987/88/89/94 Arachnid Inc.
 
 @source:misc/artmagic.cpp
 cheesech                        // (c) 1994
@@ -28647,10 +28661,11 @@ changyu2
 dmodrbcc                        // (c) 1976 Chicago Coin
 
 @source:misc/chsuper.cpp
-chsuper2                        // 1999, unknown
-chsuper3                        // 1999, unknown
 chmpnum                         // 1999, unknown
 chmpnuma                        // 1999, unknown
+chsuper2                        // 1999, unknown
+chsuper3                        // 1999, unknown
+losttrea                        // 1999, unknown
 
 @source:misc/cleartone.cpp
 bnstlkr                         //
@@ -28694,6 +28709,7 @@ comebaby                        // (c) 2000 ExPotato
 mastcrane                       // (c) 199? Compumatic
 mastcranea                      // (c) 199? Compumatic
 mastcraneb                      // (c) 199? Compumatic
+octopussy                       // (c) 1990 Covielsa
 
 @source:misc/coolpool.cpp
 9ballsht                        // (c) 1993 E-Scape EnterMedia + "marketed by Bundra Games"
@@ -29407,8 +29423,12 @@ eshb                            // (c) 1984 Funai / Gakken
 
 @source:misc/esripsys.cpp
 turbosub                        // (c) 1985 Entertainment Sciences
-turbosub6                       // (c) 1985 Entertainment Sciences
-turbosub7                       // (c) 1985 Entertainment Sciences
+turbosubb8                      // (c) 1985 Entertainment Sciences
+turbosubc5                      // (c) 1985 Entertainment Sciences
+turbosubc5s                     // (c) 1985 Entertainment Sciences
+turbosubc6                      // (c) 1985 Entertainment Sciences
+turbosubc7                      // (c) 1985 Entertainment Sciences
+turbosubc8                      // (c) 1985 Entertainment Sciences
 
 @source:misc/ettrivia.cpp
 promutrv                        // (c) 1985 Enerdyne Technologies Inc
@@ -31653,6 +31673,9 @@ unkhorse                        //
 
 @source:misc/unkpoker.cpp
 unkpoker                         //
+
+@source:misc/unktop.cpp
+unktop
 
 @source:misc/usbilliards.cpp
 sharkusb                        // (c) 1975 US Billiards
@@ -34638,6 +34661,12 @@ moguchan                        // (c) 1982 Orca + Eastern Commerce Inc. license
 percuss                         // (c) 1981 Orca
 zodiack                         // (c) 1983 Orca + Esco Trading Co license
 
+@source:orla/hk1000.cpp
+hk1000                          //
+
+@source:orla/xm200.cpp
+xm200                           //
+
 @source:osborne/osbexec.cpp
 osbexec                         // 1982 Osborne Executive
 
@@ -35509,6 +35538,7 @@ capitol                         // bootleg?
 cityatta                        // bootleg (Petaco S.A.)
 condor                          // bootleg (Sidam)
 condorn                         // bootleg (S C Novar)
+condorva                        // bootleg (Valadon Automation)
 falcon                          // bootleg
 falconz                         // bootleg
 fenix                           // bootleg (Orio)
@@ -40970,6 +41000,9 @@ c2color
 can09t                          //
 can09                           //
 
+@source:skeleton/caramball.cpp
+caramball                       // (c) 1992 Inconel SL
+
 @source:skeleton/cardinal.cpp
 cardinal                        // (c) 1984 Standard Microsystems Corp.
 
@@ -43515,11 +43548,12 @@ twcup90c                        // (c) 1989 Tecmo
 twcup90t                        // (c) 1989 Tecmo
 
 @source:tecmo/wc90b.cpp
+eurogael                        // bootleg
 twcup90b1                       // bootleg
 twcup90b2                       // bootleg
+twcup90b3                       // bootleg
 twcup90ba                       // bootleg
 twcup90bb                       // bootleg
-eurogael                        // bootleg
 
 @source:tektronix/tek405x.cpp
 tek4051                         //
@@ -45466,6 +45500,7 @@ psr60                           // 1985 PSR-60
 psr70                           // 1985 PSR-70
 
 @source:yamaha/ympsr150.cpp
+dd9                             // 1994
 psr110                          // 1993
 psr150                          // 1992
 psr180                          // 1994

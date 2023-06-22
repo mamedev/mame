@@ -5,7 +5,7 @@
   Heathkit H19
 
     A smart terminal designed and manufactured by Heath Company. This
-        is identical to the Zenith Data Systems Z-19.
+    is identical to the Zenith Data Systems Z-19.
 
 ****************************************************************************/
 
@@ -69,7 +69,7 @@ ROM_START( ultra19 )
 ROM_END
 } // anonymous namespace
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE       INPUT  CLASS      INIT        COMPANY      FULLNAME                         FLAGS
+//    YEAR  NAME     PARENT  COMPAT  MACHINE       INPUT   CLASS      INIT        COMPANY          FULLNAME                         FLAGS
 COMP( 1979, h19,     0,      0,      h19,             0,   h19_state, empty_init, "Heath Company", "Heathkit H-19",                 MACHINE_SUPPORTS_SAVE )
 //Super-19 ROM - ATG Systems, Inc - Adv in Sextant Issue 4, Winter 1983. With the magazine lead-time, likely released late 1982.
 COMP( 1982, super19, h19,    0,      h19_superh19,    0,   h19_state, empty_init, "Heath Company", "Heathkit H-19 w/ Super-19 ROM", MACHINE_SUPPORTS_SAVE )

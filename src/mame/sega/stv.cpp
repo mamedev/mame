@@ -143,14 +143,11 @@ void stv_state::stv_ioga_w(offs_t offset, uint8_t data)
 	switch(offset * 2 + 1)
 	{
 		case 0x07:
-//          if (data != m_system_output)
-//              logerror("OUT %02x\n", data);
 			m_system_output = data;
-			/*Why does the BIOS test these as ACTIVE HIGH? A program bug?*/
-			machine().bookkeeping().coin_counter_w(0,~data & 0x01);
-			machine().bookkeeping().coin_counter_w(1,~data & 0x02);
-			machine().bookkeeping().coin_lockout_w(0,~data & 0x04);
-			machine().bookkeeping().coin_lockout_w(1,~data & 0x08);
+			machine().bookkeeping().coin_counter_w(0, data & 0x01);
+			machine().bookkeeping().coin_counter_w(1, data & 0x02);
+			machine().bookkeeping().coin_lockout_w(0, ~data & 0x04);
+			machine().bookkeeping().coin_lockout_w(1, ~data & 0x08);
 			break;
 		case 0x09:
 			m_billboard->write(data);
@@ -3882,7 +3879,7 @@ GAME( 1999, sanjeon,   sasissu, stv,      stv,      stv_state,   init_sanjeon,  
 GAME( 1997, seabass,   stvbios, stv,      stv,      stv_state,   init_seabass,    ROT0,   "A wave inc. (Able license)",   "Sea Bass Fishing (JUET 971110 V0.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, shanhigw,  stvbios, stv,      stv,      stv_state,   init_shanhigw,   ROT0,   "Sunsoft / Activision",         "Shanghai - The Great Wall / Shanghai Triple Threat (JUE 950623 V1.005)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, shienryu,  stvbios, shienryu, stv,      stv_state,   init_shienryu,   ROT270, "Warashi",                      "Shienryu (JUET 961226 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, sss,       stvbios, stv_5881, stv,      stv_state,   init_sss,        ROT0,   "Capcom / Cave / Victor Interactive Software",       "Steep Slope Sliders (JUET 981110 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Also credited as Pack In Soft in ending screen
+GAME( 1998, sss,       stvbios, stv_5881, stv,      stv_state,   init_sss,        ROT0,   "Capcom / Cave / Victor Interactive Software", "Steep Slope Sliders (JUET 981110 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Also credited as Pack In Soft in ending screen
 GAME( 1995, sandor,    stvbios, stv,      stv,      stv_state,   init_sandor,     ROT0,   "Sega",                         "Puzzle & Action: Sando-R (J 951114 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, thunt,     sandor,  stv,      stv,      stv_state,   init_thunt,      ROT0,   "Sega",                         "Puzzle & Action: Treasure Hunt (JUET 970901 V2.00E)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, thuntk,    sandor,  stv,      stv,      stv_state,   init_sandor,     ROT0,   "Sega / Deniam",                "Puzzle & Action: BoMulEul Chajara (JUET 970125 V2.00K)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
@@ -3925,12 +3922,10 @@ GAME( 1998, prc298su,  stvbios, stv,      stv,      stvpc_state, init_stv,      
 GAME( 1998, prc298au,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Autumn Ver (J 980827 V1.000)", MACHINE_NOT_WORKING )
 GAME( 2000, prc2ksu,   stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 2000 Summer (J 000509 V1.000)", MACHINE_NOT_WORKING ) // internal string 2000_SUMMER
 
-
 GAME( 1999, pclubor,   stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club Goukakenran (J 991104 V1.000)", MACHINE_NOT_WORKING )
 GAME( 1999, pclubol,   stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club Olive (J 980717 V1.000)", MACHINE_NOT_WORKING )
 GAME( 1997, pclub2kc,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club Kome Kome Club (J 970203 V1.000)", MACHINE_NOT_WORKING )
 GAME( 1997, pclubyo2,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club Yoshimoto V2 (J 970422 V1.100)", MACHINE_NOT_WORKING )
-
 
 GAME( 1997, pclove,    stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club LoveLove (J 970421 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
 GAME( 1997, pclove2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club LoveLove Ver 2 (J 970825 V1.000)", MACHINE_NOT_WORKING ) // ^
@@ -3943,9 +3938,6 @@ GAME( 1996, nameclub,  stvbios, stv_5838, stv,      stvpc_state, init_decathlt_n
 GAME( 1996, nclubv2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Sega",                         "Name Club Ver.2 (J 960315 V1.000)", MACHINE_NOT_WORKING ) // ^  (has the same datecode as nameclub, probably incorrect unless both were released the same day)
 GAME( 1997, nclubv3,   stvbios, stv,      stv,      stvpc_state, init_nameclv3,         ROT0,   "Sega",                         "Name Club Ver.3 (J 970723 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no protection
 GAME( 1998, nclubdis,  stvbios, stv,      stv,      stvpc_state, init_stv,              ROT0,   "Sega",                         "Name Club Disney (J 980614 V1.000)", MACHINE_NOT_WORKING ) // errors due to missing security card
-
-
-
 
 /* Doing something.. but not enough yet */
 GAME( 1995, vfremix,   stvbios, stv,      stv,      stv_state,   init_vfremix,    ROT0,   "Sega",                         "Virtua Fighter Remix (JUETBKAL 950428 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

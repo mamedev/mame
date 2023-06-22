@@ -486,7 +486,7 @@ class a5200_state : public a400_state
 public:
 	a5200_state(const machine_config &mconfig, device_type type, const char *tag)
 		: a400_state(mconfig, type, tag)
-		, m_cart(*this, "cart")
+		, m_cart(*this, "cartslot")
 	{ }
 
 	void a5200(machine_config &config);

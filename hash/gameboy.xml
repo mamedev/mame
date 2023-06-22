@@ -1607,6 +1607,7 @@ license:CC0-1.0
 		<info name="release" value="19930226" />
 		<info name="alt_title" value="バートのサバイバルキャンプ ~ Bart no Survival Camp (Box)" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="bart no survival camp (japan).bin" size="0x20000" crc="0fd66b1a" sha1="f0d855bba656b628c7dd9ed9e586853be75b790f" />
 			</dataarea>
@@ -21537,8 +21538,8 @@ license:CC0-1.0
 		<description>Shanghai Pocket (Japan)</description>
 		<year>1998</year>
 		<publisher>Sunsoft</publisher>
-		<info name="serial" value="DMG-ASEJ-JPN?"/>
-		<info name="release" value="19980806"/>
+		<info name="serial" value="DMG-ASEJ-JPN?" />
+		<info name="release" value="19980806" />
 		<info name="alt_title" value="上海 ポケット" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="enhancement" value="sgb" />
@@ -23844,7 +23845,7 @@ license:CC0-1.0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="0x20000">
-				<rom name="scrabble.bin" size="0x20000" crc="10ecadbf" sha1="9deab55c1074c0182bac775b9e984afa170f57b0"/>
+				<rom name="scrabble.bin" size="0x20000" crc="10ecadbf" sha1="9deab55c1074c0182bac775b9e984afa170f57b0" />
 			</dataarea>
 		</part>
 	</software>
@@ -24942,7 +24943,7 @@ license:CC0-1.0
 		<description>Tintin in Tibet (Europe, En / Es / It / Sv)</description>
 		<year>1994</year>
 		<publisher>Infogrames</publisher>
-		<info name="serial" value="DMG-AT6X-?"/>
+		<info name="serial" value="DMG-AT6X-?" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
@@ -24969,7 +24970,7 @@ license:CC0-1.0
 		<description>Tintin in Tibet (Europe, En / Fr / De / Nl)</description>
 		<year>1994</year>
 		<publisher>Infogrames</publisher>
-		<info name="serial" value="DMG-AT6P-?"/>
+		<info name="serial" value="DMG-AT6P-?" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
@@ -28098,6 +28099,27 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 		</part>
 	</software>
 
+	<software name="debagame" supported="partial">
+		<description>Debagame Tester: Second Impact (Ver 10.24)</description>
+		<!-- S/N PP00000897 -->
+		<year>1997</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="GBD-IMPACT8M" />
+		<info name="alt_title" value="デバガメテスター SECOND IMPACT" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="MGB-MGBD-X2" />
+			<feature name="u1" value="U1 [MAC-GBD 9744 S]" />
+			<feature name="u2" value="U2 [MX23C8004-12]" />
+			<feature name="u3" value="U3 [52CV1000SF85LL]" />
+			<feature name="batt" value="Batt CR2025" />
+			<feature name="slot" value="rom_camera" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="gbd-impact8m.u1" size="0x100000" crc="15726d8c" sha1="5ffcda6fa1a3d87c5cbb8ddf743ddbc18242443b" />
+			</dataarea>
+			<dataarea name="nvram" size="0x20000">
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- unemulated M64282FP processing features, uses unemulated printer -->
 	<software name="gboycam" supported="partial">

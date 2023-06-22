@@ -2141,6 +2141,14 @@ void supracan_state::supracan(machine_config &config)
 }
 
 ROM_START( supracan )
+	ROM_REGION16_BE(0x1000, "internal68", ROMREGION_ERASEFF)
+	// 68k internal ROM (security related, not currently used by driver)
+	ROM_LOAD( "internal_68k.bin", 0x0000,  0x1000, CRC(8d575662) SHA1(a8e75633662978d0a885f16a4ed0f898f278a10a) )
+
+	ROM_REGION(0x2000, "internal6502", ROMREGION_ERASEFF)
+	// 2 additional blocks of ROM(?) can be seen next to the 68k ROM on a die shot from Furrtek
+	ROM_LOAD( "internal_6502_1.bin", 0x0000,  0x1000, NO_DUMP )
+	ROM_LOAD( "internal_6502_2.bin", 0x1000,  0x1000, NO_DUMP )
 ROM_END
 
 } // Anonymous namespace
