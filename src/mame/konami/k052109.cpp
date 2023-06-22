@@ -223,12 +223,8 @@ void k052109_device::device_start()
 		screen().register_vblank_callback(vblank_state_delegate(&k052109_device::vblank_callback, this));
 	}
 
-	// resolve callbacks
+	// resolve delegates
 	m_k052109_cb.resolve();
-
-	m_irq_handler.resolve_safe();
-	m_firq_handler.resolve_safe();
-	m_nmi_handler.resolve_safe();
 
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());

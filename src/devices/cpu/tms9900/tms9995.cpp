@@ -198,11 +198,6 @@ void tms9995_device::device_start()
 	m_setaddr = has_space(AS_SETADDRESS) ? &space(AS_SETADDRESS) : nullptr;
 	m_cru = &space(AS_IO);
 
-	// Resolve our external connections
-	m_external_operation.resolve();
-	m_clock_out_line.resolve();
-	m_holda_line.resolve();
-
 	// set our instruction counter
 	set_icountptr(m_icount);
 
@@ -1362,9 +1357,9 @@ void tms9995_device::pulse_clock(int count)
 {
 	for (int i=0; i < count; i++)
 	{
-		if (!m_clock_out_line.isnull()) m_clock_out_line(ASSERT_LINE);
+		if (!m_clock_out_line.isunset()) m_clock_out_line(ASSERT_LINE);
 		m_ready = m_ready_bufd && !m_request_auto_wait_state;                // get the latched READY state
-		if (!m_clock_out_line.isnull()) m_clock_out_line(CLEAR_LINE);
+		if (!m_clock_out_line.isunset()) m_clock_out_line(CLEAR_LINE);
 		m_icount--;                         // This is the only location where we count down the cycles.
 
 		if (m_check_ready)
@@ -1392,7 +1387,7 @@ void tms9995_device::hold_line(int state)
 	LOGMASKED(LOG_HOLD, "set HOLD = %d\n", state);
 	if (!m_hold_requested)
 	{
-		if (!m_holda_line.isnull()) m_holda_line(CLEAR_LINE);
+		if (!m_holda_line.isunset()) m_holda_line(CLEAR_LINE);
 	}
 }
 
@@ -1436,7 +1431,7 @@ void tms9995_device::abort_operation()
 void tms9995_device::set_hold_state(bool state)
 {
 	if (m_hold_state != state)
-		if (!m_holda_line.isnull()) m_holda_line(state? ASSERT_LINE : CLEAR_LINE);
+		if (!m_holda_line.isunset()) m_holda_line(state? ASSERT_LINE : CLEAR_LINE);
 	m_hold_state = state;
 }
 
@@ -2745,7 +2740,7 @@ void tms9995_device::alu_external()
 		LOGMASKED(LOG_OP, "RSET, new ST = %04x\n", ST);
 	}
 
-	if (!m_external_operation.isnull())
+	if (!m_external_operation.isunset())
 		m_external_operation((IR >> 5) & 0x07, 1, 0xff);
 }
 

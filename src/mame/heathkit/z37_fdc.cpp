@@ -170,6 +170,18 @@ void heath_z37_fdc_device::device_start()
 	m_access_track_sector = false;
 }
 
+void heath_z37_fdc_device::device_reset()
+{
+	m_control_reg = 0;
+	m_interface_reg = 0;
+
+	m_intrq_allowed = false;
+	m_drq_allowed = false;
+	m_access_track_sector = false;
+	m_fd_irq_cb(CLEAR_LINE);
+	m_drq_cb(CLEAR_LINE);
+}
+
 static void z37_floppies(device_slot_interface &device)
 {
 	// H-17-1
@@ -196,13 +208,6 @@ void heath_z37_fdc_device::device_add_mconfig(machine_config &config)
 	m_floppies[2]->enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppies[3], z37_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 	m_floppies[3]->enable_sound(true);
-}
-
-void heath_z37_fdc_device::device_resolve_objects()
-{
-	m_fd_irq_cb.resolve_safe();
-	m_drq_cb.resolve_safe();
-	m_block_interrupt_cb.resolve_safe();
 }
 
 void heath_z37_fdc_device::set_irq(uint8_t data)

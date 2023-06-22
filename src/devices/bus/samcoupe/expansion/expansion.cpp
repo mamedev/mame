@@ -51,9 +51,6 @@ void samcoupe_expansion_device::device_start()
 {
 	// get inserted module
 	m_module = get_card_device();
-
-	// resolve callbacks
-	m_int_handler.resolve_safe();
 }
 
 //-------------------------------------------------

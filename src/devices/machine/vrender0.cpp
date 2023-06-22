@@ -167,8 +167,6 @@ void vrender0soc_device::device_start()
 	m_Timer[2] = timer_alloc(FUNC(vrender0soc_device::Timercb<2>), this);
 	m_Timer[3] = timer_alloc(FUNC(vrender0soc_device::Timercb<3>), this);
 
-	write_tx.resolve_all_safe();
-
 	for (int i = 0; i < 2; i++)
 	{
 		m_uart[i]->set_channel_num(i);

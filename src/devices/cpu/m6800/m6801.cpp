@@ -315,7 +315,7 @@ m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, const char *ta
 
 m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const op_func *insn, const uint8_t *cycles, address_map_constructor internal)
 	: m6800_cpu_device(mconfig, type, tag, owner, clock, insn, cycles, internal)
-	, m_in_port_func(*this)
+	, m_in_port_func(*this, 0xff)
 	, m_out_port_func(*this)
 	, m_out_sc2_func(*this)
 	, m_out_sertx_func(*this)
@@ -355,7 +355,7 @@ hd6303r_cpu_device::hd6303r_cpu_device(const machine_config &mconfig, const char
 
 hd6301x_cpu_device::hd6301x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: hd6301_cpu_device(mconfig, type, tag, owner, clock, hd63701_insn, cycles_63701)
-	, m_in_portx_func(*this)
+	, m_in_portx_func(*this, 0xff)
 	, m_out_portx_func(*this)
 {
 	m_sclk_divider = 16;
@@ -1015,39 +1015,46 @@ void hd6301y_cpu_device::execute_set_input(int irqline, int state)
 
 
 
-void m6801_cpu_device::device_resolve_objects()
-{
-	m6800_cpu_device::device_resolve_objects();
-
-	m_in_port_func.resolve_all_safe(0xff);
-	m_out_port_func.resolve_all_safe();
-	m_out_sc2_func.resolve_safe();
-	m_out_sertx_func.resolve_safe();
-}
-
-void hd6301x_cpu_device::device_resolve_objects()
-{
-	m6801_cpu_device::device_resolve_objects();
-
-	m_in_portx_func.resolve_all_safe(0xff);
-	m_out_portx_func.resolve_all_safe();
-}
-
-
 void m6801_cpu_device::device_start()
 {
 	m6800_cpu_device::device_start();
 
 	m_sci_timer = timer_alloc(FUNC(m6801_cpu_device::sci_tick), this);
 
-	m_irq_state[M6801_IS_LINE] = 0;
-	m_port_ddr[3] = 0;
-	m_port_data[3] = 0;
+	std::fill(std::begin(m_port_ddr), std::end(m_port_ddr), 0);
+	std::fill(std::begin(m_port_data), std::end(m_port_data), 0);
+	m_p3csr = 0;
+	m_tcsr = 0;
+	m_pending_tcsr = 0;
+	m_irq2 = 0;
+	m_ram_ctrl = 0;
+	m_counter.d = 0;
+	m_output_compare.d = 0;
 	m_input_capture = 0;
+	m_pending_isf_clear = false;
+	m_port3_latched = 0;
+	m_port2_written = false;
+
+	m_trcsr = 0;
+	m_rmcr = 0;
 	m_rdr = 0;
 	m_tdr = 0;
-	m_rmcr = 0;
-	m_ram_ctrl = 0;
+	m_rsr = 0;
+	m_tsr = 0;
+	m_rxbits = 0;
+	m_txbits = 0;
+	m_txstate = 0;
+	m_trcsr_read_tdre = 0;
+	m_trcsr_read_orfe = 0;
+	m_trcsr_read_rdrf = 0;
+	m_tx = 0;
+	m_ext_serclock = 0;
+	m_use_ext_serclock = false;
+
+	m_latch09 = 0;
+	m_timer_over.d = 0;
+	m_timer_next = 0;
+	m_sc1_state = 0;
 
 	save_item(NAME(m_port_ddr));
 	save_item(NAME(m_port_data));
@@ -1090,7 +1097,17 @@ void hd6301x_cpu_device::device_start()
 {
 	m6801_cpu_device::device_start();
 
+	std::fill(std::begin(m_portx_ddr), std::end(m_portx_ddr), 0);
 	std::fill(std::begin(m_portx_data), std::end(m_portx_data), 0);
+	m_tcsr2 = 0;
+	m_pending_tcsr2 = 0;
+	m_output_compare2.d = 0;
+
+	m_t2cnt = 0;
+	m_tconr = 0;
+	m_tcsr3 = 0;
+	m_tout3 = false;
+	m_t2cnt_written = false;
 
 	save_item(NAME(m_portx_ddr));
 	save_item(NAME(m_portx_data));
@@ -1109,6 +1126,7 @@ void hd6301y_cpu_device::device_start()
 {
 	hd6301x_cpu_device::device_start();
 
+	m_p6csr = 0;
 	save_item(NAME(m_p6csr));
 }
 

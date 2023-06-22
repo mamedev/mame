@@ -2043,8 +2043,6 @@ void i386_device::i386_common_init()
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(i386_device::i386_postload), this));
 
-	m_smiact.resolve_safe();
-	m_ferr_handler.resolve_safe();
 	m_ferr_handler(0);
 
 	set_icountptr(m_cycles);
@@ -2547,8 +2545,7 @@ void i386_device::enter_smm()
 
 	m_cr[0] &= ~(0x8000000d);
 	set_flags(2);
-	if(!m_smiact.isnull())
-		m_smiact(true);
+	m_smiact(true);
 	m_smm = true;
 	m_smi_latched = false;
 
@@ -2699,8 +2696,7 @@ void i386_device::leave_smm()
 			m_sreg[i].valid = true;
 	}
 
-	if (!m_smiact.isnull())
-		m_smiact(false);
+	m_smiact(false);
 	m_smm = false;
 
 	CHANGE_PC(m_eip);

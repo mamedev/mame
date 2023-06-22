@@ -142,8 +142,6 @@ void ticket_dispenser_device::device_start()
 
 	m_output.resolve();
 
-	m_dispense_handler.resolve_safe();
-
 	save_item(NAME(m_status));
 	save_item(NAME(m_power));
 }

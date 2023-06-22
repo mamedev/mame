@@ -294,11 +294,6 @@ ioport_constructor v550_keyboard_device::device_input_ports() const
 	return INPUT_PORTS_NAME(v550_keyboard);
 }
 
-void visual_mcs48_keyboard_device::device_resolve_objects()
-{
-	m_txd_callback.resolve_safe();
-}
-
 void visual_mcs48_keyboard_device::device_start()
 {
 	m_key_select = 0x0f;

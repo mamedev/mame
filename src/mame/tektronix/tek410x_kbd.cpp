@@ -154,12 +154,6 @@ tek410x_keyboard_device::tek410x_keyboard_device(const machine_config &mconfig, 
 {
 }
 
-void tek410x_keyboard_device::device_resolve_objects()
-{
-	m_tdata_callback.resolve_safe();
-	m_rdata_callback.resolve_safe();
-}
-
 void tek410x_keyboard_device::device_start()
 {
 	save_item(NAME(m_select));

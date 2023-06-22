@@ -76,9 +76,6 @@ pet_datassette_port_device::~pet_datassette_port_device()
 void pet_datassette_port_device::device_start()
 {
 	m_cart = get_card_device();
-
-	// resolve callbacks
-	m_read_handler.resolve_safe();
 }
 
 

@@ -35,9 +35,6 @@ void ttl74543_device::device_start()
 	save_item(NAME(m_oeba));
 
 	save_item(NAME(m_latch));
-
-	m_output_a.resolve_safe();
-	m_output_b.resolve_safe();
 }
 
 void ttl74543_device::device_reset()

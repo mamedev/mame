@@ -31,8 +31,6 @@ void vrt_vt1682_timer_device::device_start()
 	save_item(NAME(m_timer_preload_7_0));
 	save_item(NAME(m_timer_preload_15_8));
 	save_item(NAME(m_timer_enable));
-
-	m_irq_cb.resolve();
 }
 
 void vrt_vt1682_timer_device::device_reset()

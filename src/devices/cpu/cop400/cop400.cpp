@@ -176,17 +176,17 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, program_addr_bits, 0, internal_map_program)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_addr_bits, 0, internal_map_data) // data width is really 4
-	, m_read_l(*this)
-	, m_read_l_tristate(*this)
+	, m_read_l(*this, 0)
+	, m_read_l_tristate(*this, 0)
 	, m_write_l(*this)
-	, m_read_g(*this)
+	, m_read_g(*this, 0)
 	, m_write_g(*this)
 	, m_write_d(*this)
-	, m_read_in(*this)
-	, m_read_si(*this)
+	, m_read_in(*this, 0)
+	, m_read_si(*this, 0)
 	, m_write_so(*this)
 	, m_write_sk(*this)
-	, m_read_cko(*this)
+	, m_read_cko(*this, 0)
 	, m_cki(COP400_CKI_DIVISOR_16)
 	, m_cko(COP400_CKO_OSCILLATOR_OUTPUT)
 	, m_has_microbus(false)
@@ -1068,19 +1068,6 @@ void cop400_cpu_device::device_start()
 	/* find address spaces */
 	space(AS_PROGRAM).cache(m_program);
 	space(AS_DATA).specific(m_data);
-
-	/* find i/o handlers */
-	m_read_l.resolve_safe(0);
-	m_read_l_tristate.resolve_safe(0);
-	m_write_l.resolve_safe();
-	m_read_g.resolve_safe(0);
-	m_write_g.resolve_safe();
-	m_write_d.resolve_safe();
-	m_read_in.resolve_safe(0);
-	m_read_si.resolve_safe(0);
-	m_write_so.resolve_safe();
-	m_write_sk.resolve_safe();
-	m_read_cko.resolve_safe(0);
 
 	/* allocate counter timer */
 	m_counter_timer = nullptr;

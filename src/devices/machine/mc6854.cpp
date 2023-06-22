@@ -186,13 +186,7 @@ mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, dev
 
 void mc6854_device::device_start()
 {
-	m_out_irq_cb.resolve_safe();
-	m_out_rdsr_cb.resolve_safe();
-	m_out_tdsr_cb.resolve_safe();
-	m_out_txd_cb.resolve();
-	m_out_frame_cb.resolve();
-	m_out_rts_cb.resolve_safe();
-	m_out_dtr_cb.resolve_safe();
+	m_out_frame_cb.resolve_safe();
 
 	m_ttimer = timer_alloc(FUNC(mc6854_device::tfifo_cb), this);
 
@@ -273,11 +267,8 @@ void mc6854_device::send_bits( uint32_t data, int len, int zi )
 		m_tones = 0;
 
 	/* send bits */
-	if ( !m_out_txd_cb.isnull() )
-	{
-		for ( i = 0; i < len; i++, data >>= 1 )
-			m_out_txd_cb( data & 1 );
-	}
+	for ( i = 0; i < len; i++, data >>= 1 )
+		m_out_txd_cb( data & 1 );
 
 	/* schedule when to ask the MC6854 for more bits */
 	expire = m_ttimer ->remaining( );
@@ -434,8 +425,7 @@ TIMER_CALLBACK_MEMBER(mc6854_device::tfifo_cb)
 			m_tstate = 0;
 
 		m_flen = 0;
-		if ( !m_out_frame_cb.isnull() )
-			m_out_frame_cb( m_frame, len );
+		m_out_frame_cb( m_frame, len );
 	}
 }
 

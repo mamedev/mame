@@ -751,8 +751,8 @@ avr8_device::avr8_device(const machine_config &mconfig, const char *tag, device_
 	, m_pc(0)
 	, m_num_timers(num_timers)
 	, m_gpio_out_cb(*this)
-	, m_gpio_in_cb(*this)
-	, m_adc_in_cb(*this)
+	, m_gpio_in_cb(*this, 0)
+	, m_adc_in_cb(*this, 0)
 	, m_adc_timer(nullptr)
 	, m_spi_active(false)
 	, m_spi_prescale(0)
@@ -849,10 +849,6 @@ void avr8_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
 
-	m_gpio_out_cb.resolve_all_safe();
-	m_gpio_in_cb.resolve_all_safe(0);
-
-	m_adc_in_cb.resolve_all_safe(0);
 	m_adc_timer = timer_alloc(FUNC(avr8_device::adc_conversion_complete), this);
 
 	// register our state for the debugger

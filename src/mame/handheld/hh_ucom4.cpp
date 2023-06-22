@@ -10,7 +10,7 @@ known chips:
 
   serial  device   etc.
 ----------------------------------------------------------------
-  055     uPD546C  1978, Fidelity Checker Challenger (CR) -> fidel_checkc2.cpp
+  055     uPD546C  1978, Fidelity Checker Challenger (CR) -> fidelity/checkc2.cpp
 
  @017     uPD552C  1979, Bambino UFO Master-Blaster Station (ET-02)
  @042     uPD552C  1980, Tomy Cosmic Combat (TN-??)
@@ -45,10 +45,10 @@ known chips:
  @513     uPD557LC 1980, Castle Toy Name That Tune
 
  @060     uPD650C  1979, Mattel Computer Gin
-  085     uPD650C  1980, Roland TR-808 -> roland_tr808.cpp
+  085     uPD650C  1980, Roland TR-808 -> roland/roland_tr808.cpp
  *127     uPD650C  198?, Sony OA-S1100 Typecorder (subcpu, have dump)
-  128     uPD650C  1981, Roland TR-606 -> roland_tr606.cpp
-  133     uPD650C  1982, Roland TB-303 -> roland_tb303.cpp
+  128     uPD650C  1981, Roland TR-606 -> roland/roland_tr606.cpp
+  133     uPD650C  1982, Roland TB-303 -> roland/roland_tb303.cpp
 
   (* means undumped unless noted, @ denotes it's in this driver)
 

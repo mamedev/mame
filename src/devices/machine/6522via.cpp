@@ -169,27 +169,27 @@ void via6522_device::map(address_map &map)
 //  via6522_device - constructor
 //-------------------------------------------------
 
-via6522_device::via6522_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		m_in_a_handler(*this),
-		m_in_b_handler(*this),
-		m_out_a_handler(*this),
-		m_out_b_handler(*this),
-		m_ca2_handler(*this),
-		m_cb1_handler(*this),
-		m_cb2_handler(*this),
-		m_irq_handler(*this),
-		m_in_a(0xff),
-		m_in_ca1(0),
-		m_in_ca2(0),
-		m_out_ca2(0),
-		m_in_b(0xff),
-		m_in_cb1(0),
-		m_in_cb2(0),
-		m_pcr(0),
-		m_acr(0),
-		m_ier(0),
-		m_ifr(0)
+via6522_device::via6522_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_in_a_handler(*this, 0xff),
+	m_in_b_handler(*this, 0xff),
+	m_out_a_handler(*this),
+	m_out_b_handler(*this),
+	m_ca2_handler(*this),
+	m_cb1_handler(*this),
+	m_cb2_handler(*this),
+	m_irq_handler(*this),
+	m_in_a(0xff),
+	m_in_ca1(0),
+	m_in_ca2(0),
+	m_out_ca2(0),
+	m_in_b(0xff),
+	m_in_cb1(0),
+	m_in_cb2(0),
+	m_pcr(0),
+	m_acr(0),
+	m_ier(0),
+	m_ifr(0)
 {
 }
 
@@ -240,15 +240,6 @@ w65c22s_device::w65c22s_device(const machine_config &mconfig, const char *tag, d
 
 void via6522_device::device_start()
 {
-	m_in_a_handler.resolve();
-	m_in_b_handler.resolve();
-	m_out_a_handler.resolve_safe();
-	m_out_b_handler.resolve_safe();
-	m_cb1_handler.resolve_safe();
-	m_ca2_handler.resolve_safe();
-	m_cb2_handler.resolve_safe();
-	m_irq_handler.resolve_safe();
-
 	m_t1ll = 0xf3; /* via at 0x9110 in vic20 show these values */
 	m_t1lh = 0xb5; /* ports are not written by kernel! */
 	m_t2ll = 0xff; /* taken from vice */
@@ -551,7 +542,7 @@ TIMER_CALLBACK_MEMBER(via6522_device::ca2_tick)
 uint8_t via6522_device::input_pa()
 {
 	// HACK: port a in the real 6522 does not mask off the output pins, but you can't trust handlers.
-	if (!m_in_a_handler.isnull())
+	if (!m_in_a_handler.isunset())
 		return (m_in_a & ~m_ddr_a & m_in_a_handler()) | (m_out_a & m_ddr_a);
 	else
 		return (m_out_a | ~m_ddr_a) & m_in_a;
@@ -573,7 +564,7 @@ uint8_t via6522_device::input_pb()
 	uint8_t pb = m_in_b & ~m_ddr_b;
 
 	/// TODO: REMOVE THIS
-	if (m_ddr_b != 0xff && !m_in_b_handler.isnull())
+	if (m_ddr_b != 0xff && !m_in_b_handler.isunset())
 	{
 		pb &= m_in_b_handler();
 	}

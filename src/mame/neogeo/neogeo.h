@@ -29,6 +29,12 @@
 #include "screen.h"
 
 
+#define NEOGEO_MASTER_CLOCK                     (24000000)
+#define NEOGEO_MAIN_CPU_CLOCK                   (NEOGEO_MASTER_CLOCK / 2)
+#define NEOGEO_AUDIO_CPU_CLOCK                  (NEOGEO_MASTER_CLOCK / 6)
+#define NEOGEO_YM2610_CLOCK                     (NEOGEO_MASTER_CLOCK / 3)
+#define NEOGEO_PIXEL_CLOCK                      (NEOGEO_MASTER_CLOCK / 4)
+
 // On scanline 224, /VBLANK goes low 56 mclks (14 pixels) from the rising edge of /HSYNC.
 // Two mclks after /VBLANK goes low, the hardware sets a pending IRQ1 flip-flop.
 #define NEOGEO_VBLANK_IRQ_HTIM (attotime::from_ticks(56+2, NEOGEO_MASTER_CLOCK))

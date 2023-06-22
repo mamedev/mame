@@ -939,13 +939,6 @@ void tms57002_device::sound_stream_update(sound_stream &stream, std::vector<read
 	sync_w(1);
 }
 
-void tms57002_device::device_resolve_objects()
-{
-	m_dready_callback.resolve_safe();
-	m_pc0_callback.resolve_safe();
-	m_empty_callback.resolve_safe();
-}
-
 void tms57002_device::device_start()
 {
 	sti = S_IDLE;

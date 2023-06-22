@@ -105,11 +105,6 @@ c2040_fdc_device::c2040_fdc_device(const machine_config &mconfig, const char *ta
 
 void c2040_fdc_device::device_start()
 {
-	// resolve callbacks
-	m_write_sync.resolve_safe();
-	m_write_ready.resolve_safe();
-	m_write_error.resolve_safe();
-
 	// allocate timer
 	t_gen = timer_alloc(FUNC(c2040_fdc_device::update_state), this);
 

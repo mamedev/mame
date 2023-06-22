@@ -43,8 +43,9 @@ void at_mb_device::device_reset()
 
 void at_mb_device::device_start()
 {
+	// FIXME: this is gross and should be done in machine configuration
 	if(!strncmp(m_maincpu->shortname(), "i80286", 6))
-		downcast<i80286_cpu_device *>(m_maincpu.target())->set_a20_callback(i80286_cpu_device::a20_cb(&at_mb_device::a20_286, this));
+		downcast<i80286_cpu_device *>(m_maincpu.target())->set_a20_callback(*this, FUNC(at_mb_device::a20_286));
 }
 
 void at_mb_device::at_softlists(machine_config &config)

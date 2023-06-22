@@ -33,7 +33,6 @@ hlcd0488_device::hlcd0488_device(const machine_config &mconfig, const char *tag,
 
 void hlcd0488_device::device_start()
 {
-	m_write_cols.resolve_safe();
 	m_sync_timer = timer_alloc(FUNC(hlcd0488_device::sync_update), this);
 
 	// zerofill

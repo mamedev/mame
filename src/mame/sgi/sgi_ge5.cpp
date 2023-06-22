@@ -134,9 +134,9 @@ sgi_ge5_device::sgi_ge5_device(machine_config const &mconfig, char const *tag, d
 	, m_data_config("data", ENDIANNESS_BIG, 32, 13, -2, address_map_constructor(FUNC(sgi_ge5_device::data_map), this))
 	, m_fpu(*this, "fpu")
 	, m_int_cb(*this)
-	, m_fifo_empty(*this)
-	, m_fifo_read(*this)
-	, m_re_r(*this)
+	, m_fifo_empty(*this, 0)
+	, m_fifo_read(*this, 0)
+	, m_re_r(*this, 0)
 	, m_re_w(*this)
 	, m_icount(0)
 {
@@ -162,12 +162,6 @@ void sgi_ge5_device::data_map(address_map &map)
 
 void sgi_ge5_device::device_start()
 {
-	m_int_cb.resolve_safe();
-	m_fifo_empty.resolve();
-	m_fifo_read.resolve();
-	m_re_r.resolve();
-	m_re_w.resolve();
-
 	// TODO: save state
 	state_add(STATE_GENPC,     "GENPC", m_pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();

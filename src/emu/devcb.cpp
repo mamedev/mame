@@ -341,7 +341,8 @@ template class devcb_write_line::creator_impl<devcb_write_line::log_builder>;
 
 
 devcb_base::devcb_base(device_t &owner)
-	: m_owner(owner)
+	: device_resolver_base(owner)
+	, m_owner(owner)
 {
 }
 

@@ -158,20 +158,7 @@ protected:
 	{
 	}
 
-	// device-level overrides
-
-	//-------------------------------------------------
-	//  device_resolve_objects - resolve objects that
-	//  may be needed for other devices to set
-	//  initial conditions at start time
-	//-------------------------------------------------
-
-	virtual void device_resolve_objects() override
-	{
-		// resolve callbacks
-		m_intl_callback.resolve_safe();
-		m_intr_callback.resolve_safe();
-	}
+	// device_t implementation
 
 	//-------------------------------------------------
 	//  device_start - device-specific startup
@@ -179,7 +166,7 @@ protected:
 
 	virtual void device_start() override
 	{
-		m_ram = make_unique_clear<Type[]>(RAM_SIZE);
+		m_ram = make_unique_clear<Type []>(RAM_SIZE);
 
 		// state save
 		save_pointer(NAME(m_ram), RAM_SIZE);

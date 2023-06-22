@@ -38,9 +38,8 @@ public:
 	auto int5_callback() { return m_int5_cb.bind(); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
-	virtual void device_resolve_objects() override;
 
 private:
 	required_address_space m_iospace;

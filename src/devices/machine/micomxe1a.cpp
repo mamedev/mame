@@ -158,8 +158,8 @@ micom_xe_1a_device::micom_xe_1a_device(
 		device_t *owner,
 		u32 clock):
 	device_t(mconfig, MICOM_XE_1A, tag, owner, clock),
-	m_buttons_callback(*this),
-	m_analog_callback(*this),
+	m_buttons_callback(*this, 0xffff),
+	m_analog_callback(*this, 0x00),
 	m_output_timer(nullptr),
 	m_req(1),
 	m_mode(1),
@@ -317,9 +317,6 @@ void micom_xe_1a_device::interface_w(int state)
 
 void micom_xe_1a_device::device_start()
 {
-	m_buttons_callback.resolve_safe(0xffff);
-	m_analog_callback.resolve_safe(0x00);
-
 	m_output_timer = timer_alloc(FUNC(micom_xe_1a_device::step_output), this);
 
 	std::fill(std::begin(m_data), std::end(m_data), 0x00);

@@ -35,10 +35,6 @@ void psxrcnt_device::device_post_load()
 
 void psxrcnt_device::device_start()
 {
-	m_irq0_handler.resolve_safe();
-	m_irq1_handler.resolve_safe();
-	m_irq2_handler.resolve_safe();
-
 	save_item(STRUCT_MEMBER(root_counter, n_count));
 	save_item(STRUCT_MEMBER(root_counter, n_mode));
 	save_item(STRUCT_MEMBER(root_counter, n_target));

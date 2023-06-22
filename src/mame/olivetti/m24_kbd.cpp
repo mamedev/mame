@@ -215,7 +215,6 @@ m24_keyboard_device::m24_keyboard_device(const machine_config &mconfig, const ch
 
 void m24_keyboard_device::device_start()
 {
-	m_out_data.resolve_safe();
 	m_out_data(1);
 	m_reset_timer = timer_alloc(FUNC(m24_keyboard_device::reset_mcu), this);
 }

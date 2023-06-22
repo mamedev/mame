@@ -5298,6 +5298,9 @@ ROM_START( sc2majes )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "majestic.p1", 0x0000, 0x010000, CRC(37289a5f) SHA1(a9d86ed16fc2ff2b83b60e48a1704b4e189c3ac7) )
 
+	ROM_REGION( 0x80000, "upd", 0 )
+	ROM_LOAD( "majesticsnd.bin", 0x0000, 0x080000, CRC(3ee3fee3) SHA1(6a5e72e8a808d870a84a0e3523eebfadfab6d5df) )
+
 
 	sc2_plds
 ROM_END

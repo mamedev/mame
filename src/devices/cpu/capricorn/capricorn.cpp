@@ -138,12 +138,12 @@ static constexpr uint8_t E_MASK = 0xf;
 
 DEFINE_DEVICE_TYPE(HP_CAPRICORN , capricorn_cpu_device , "capricorn" , "HP-Capricorn")
 
-capricorn_cpu_device::capricorn_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, HP_CAPRICORN, tag, owner, clock),
+capricorn_cpu_device::capricorn_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	cpu_device(mconfig, HP_CAPRICORN, tag, owner, clock),
 	m_program_config("program" , ENDIANNESS_LITTLE , 8 , 16),
 	m_opcode_func(*this),
 	m_lma_out(*this),
-	m_intack_in(*this)
+	m_intack_in(*this, 0)
 {
 }
 
@@ -181,10 +181,6 @@ void capricorn_cpu_device::device_start()
 	save_item(NAME(m_flags));
 
 	set_icountptr(m_icount);
-
-	m_opcode_func.resolve_safe();
-	m_lma_out.resolve_safe();
-	m_intack_in.resolve_safe(0);
 }
 
 void capricorn_cpu_device::device_reset()

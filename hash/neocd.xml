@@ -444,6 +444,44 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="doubledra" cloneof="doubledr">
+		<!-- Source: Redump
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1).cue" size="2622" crc="713f879b" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 01).bin" size="22988448" crc="3bddb81a" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 02).bin" size="17903424" crc="5e1138f0" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 03).bin" size="17823456" crc="f865e94f" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 04).bin" size="5089728" crc="6f243990" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 05).bin" size="3539760" crc="e76047ad" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 06).bin" size="45224256" crc="fed1ed7d" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 07).bin" size="38913840" crc="25093ae8" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 08).bin" size="47686800" crc="f74c501a" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 09).bin" size="43472016" crc="e6b0116f" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 10).bin" size="45160752" crc="b5319c17" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 11).bin" size="47818512" crc="af19e471" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 12).bin" size="44036496" crc="3d711524" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 13).bin" size="48046656" crc="4c94d4ad" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 14).bin" size="46390848" crc="a139597c" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 15).bin" size="48945120" crc="385af469" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 16).bin" size="47051760" crc="d3df36c1" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 17).bin" size="47188176" crc="90d9fdde" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 18).bin" size="42719376" crc="f053c8ca" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 19).bin" size="26862192" crc="44a21c02" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 20).bin" size="27984096" crc="2b16ee70" />
+		-->
+		<description>Double Dragon (Japan)</description>
+		<year>1995</year>
+		<publisher>SNK</publisher>
+		<info name="alt_title" value="ダブルドラゴン" />
+		<info name="serial" value="NGCD-082" />
+		<info name="cd_matrix" value="NGCD-082 MT B06 (JPN)"/>
+		<info name="release" value="19950602 (JPN)" />
+		<part name="cdrom" interface="neocd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="double dragon (1995)(snk)(jp)[ngcd-082 mt b06]" sha1="64bf06de31105900dacbdd927ef635f71d264725"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="fatfury1">
 		<description>Fatal Fury - The Battle of Fury (USA) ~ Garou Densetsu - Shukumei no Tatakai (Japan)</description>
 		<year>1994</year>

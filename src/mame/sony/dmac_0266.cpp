@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(DMAC_0266, dmac_0266_device, "dmac_0266", "Sony 0266 DMA Cont
 dmac_0266_device::dmac_0266_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, DMAC_0266, tag, owner, clock)
 	, m_bus(*this, finder_base::DUMMY_TAG, -1, 32)
-	, m_dma_r(*this)
+	, m_dma_r(*this, 0)
 	, m_dma_w(*this)
 {
 }
@@ -45,9 +45,6 @@ void dmac_0266_device::map(address_map &map)
 
 void dmac_0266_device::device_start()
 {
-	m_dma_r.resolve_safe(0);
-	m_dma_w.resolve_safe();
-
 	save_item(NAME(m_control));
 	save_item(NAME(m_status));
 	save_item(NAME(m_tcount));

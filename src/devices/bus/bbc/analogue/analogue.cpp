@@ -57,9 +57,6 @@ bbc_analogue_slot_device::bbc_analogue_slot_device(const machine_config &mconfig
 void bbc_analogue_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_lpstb_handler.resolve_safe();
 }
 
 uint8_t bbc_analogue_slot_device::ch_r(int channel)

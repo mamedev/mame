@@ -95,17 +95,6 @@ tms9981_device::tms9981_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-/*
-    External connections
-*/
-void tms9980a_device::resolve_lines()
-{
-	// Resolve our external connections
-	m_external_operation.resolve();
-	m_clock_out_line.resolve();
-	m_holda_line.resolve();
-}
-
 uint16_t tms9980a_device::read_workspace_register_debug(int reg)
 {
 	int temp = m_icount;

@@ -3436,6 +3436,92 @@ static INPUT_PORTS_START( wofhfh )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Coin 3 (P3 Button 3 in-game)")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( pmonster )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 ) // medal switch in test mode
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) // hopper switch in test mode
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) // select switch in test mode
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, "Medal Setup" )                   PORT_DIPLOCATION("SW(A):1")
+	PORT_DIPSETTING(    0x01, "1 Medal 1 Credit" )
+	PORT_DIPSETTING(    0x00, "Don't use" )
+	PORT_DIPNAME( 0x02, 0x02, "Coin Setup" )                    PORT_DIPLOCATION("SW(A):2")
+	PORT_DIPSETTING(    0x02, "100 Yen" )
+	PORT_DIPSETTING(    0x00, "10 Yen" )
+	PORT_DIPNAME( 0x1c, 0x1c, "Change Setup" )                  PORT_DIPLOCATION("SW(A):3,4,5")
+	PORT_DIPSETTING(    0x04, "12" )
+	PORT_DIPSETTING(    0x00, "11" )
+	PORT_DIPSETTING(    0x1c, "10" )
+	PORT_DIPSETTING(    0x18, "8" )
+	PORT_DIPSETTING(    0x14, "7" )
+	PORT_DIPSETTING(    0x10, "6" )
+	PORT_DIPSETTING(    0x0c, "5" )
+	PORT_DIPSETTING(    0x08, "No change" )
+	PORT_DIPNAME( 0x60, 0x60, "10 Yen Setup" )                  PORT_DIPLOCATION("SW(A):6,7")
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x00, "Don't use" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW(A):8" )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x07, 0x07, "Payout Rate Setup" )             PORT_DIPLOCATION("SW(B):1,2,3")
+	PORT_DIPSETTING(    0x01, "90%" )
+	PORT_DIPSETTING(    0x00, "85%" )
+	PORT_DIPSETTING(    0x07, "80%" )
+	PORT_DIPSETTING(    0x06, "75%" )
+	PORT_DIPSETTING(    0x05, "70%" )
+	PORT_DIPSETTING(    0x04, "65%" )
+	PORT_DIPSETTING(    0x03, "60%" )
+	PORT_DIPSETTING(    0x02, "55%" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW(B):4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW(B):5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW(B):6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW(B):7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW(B):8" )
+
+	PORT_START("DSWC")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW(C):1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, "Every second sound" )
+	PORT_DIPSETTING(    0x01, "Every third sound" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW(C):3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW(C):4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW(C):5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW(C):6" )
+	PORT_DIPNAME( 0x40, 0x40, "Clear RAM" )                     PORT_DIPLOCATION("SW(C):7")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, "Tes Mode Display" )              PORT_DIPLOCATION("SW(C):8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( ganbare )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -13925,6 +14011,49 @@ ROM_START( ganbare )
 ROM_END
 
 
+/* B-Board 91634B-2 */
+ROM_START( pmonster )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "gbpj_23a.8f", 0x00000, 0x80000, CRC(52ef2d85) SHA1(e6ec80159474e974987c6057a989d71ccb9b1b89) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD64_WORD( "gbpj_01.3a",  0x000000, 0x80000, CRC(a7bea5bb) SHA1(57b594afcc4b42d7c61bab90574d45a53c2a4237) )
+	ROM_LOAD64_WORD( "gbpj_02.4a",  0x000002, 0x80000, CRC(357b76ec) SHA1(247e18e0a289d833d6c0268265f775148c498378) )
+	ROM_LOAD64_WORD( "gbpj_03.5a",  0x000004, 0x80000, CRC(bcbc1881) SHA1(15793dda4b72125a2c9e14b1d931648e4fb490fe) )
+	ROM_LOAD64_WORD( "gbpj_04.6a",  0x000006, 0x80000, CRC(b1126fde) SHA1(5258226018ab8233d245f3b2f8fbe205dd338f27) )
+	ROM_LOAD64_WORD( "gbpj_05.7a",  0x200000, 0x80000, CRC(bb5be4b0) SHA1(7febfb78606912419a65d66aef89772fa2fdd26c) ) // x1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD64_WORD( "gbpj_06.8a",  0x200002, 0x80000, CRC(1be8fd86) SHA1(4b1dac47c15dd08e60f47c36d110844937a18c14) ) // x1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD64_WORD( "gbpj_07.9a",  0x200004, 0x80000, CRC(deb8ef02) SHA1(25217e988ea26c8af1ba877f914185abd3bd70b2) ) // x1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD64_WORD( "gbpj_08.10a", 0x200006, 0x80000, CRC(9f90359d) SHA1(cb673c9d902a75ed833248e5abacba4bb785930d) ) // x1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "gbpj_09.12a",  0x00000, 0x08000,  CRC(fc431024) SHA1(58e90c1b98cd3c2e2597f2f11374395952b8a8f3) )
+	ROM_CONTINUE(             0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "gbpj_18.11c",  0x00000, 0x20000, CRC(cc54778d) SHA1(bc31397d6b0ae7357c1df9e537bbe5acbea430b2) )
+	ROM_LOAD( "gbpj_19.12c",  0x20000, 0x20000, CRC(ea8b56d8) SHA1(ac0b2a32f5ac1c624bf7a80636a6b0e3944b9acc) )
+
+	ROM_REGION( 0x8000, "timekeeper", ROMREGION_ERASE00 )
+	ROM_LOAD( "m48t35y-70pc1.9n", 0x00000, 0x8000, NO_DUMP )
+
+	ROM_REGION( 0x0200, "aboardplds", 0 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "gbp63b.1a",    0x0000, 0x0117, CRC(5077d37e) SHA1(7ec45f246e525f8d59624ff297ba264aeea9cb2b) )
+	ROM_LOAD( "iob1.12d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
+	ROM_LOAD( "bprg1.11d",    0x0000, 0x0117, CRC(31793da7) SHA1(400fa7ac517421c978c1ee7773c30b9ed0c5d3f3) )
+
+	ROM_REGION( 0x0200, "cboardplds", 0 )
+	ROM_LOAD( "ioc1.ic7",     0x0000, 0x0104, CRC(a399772d) SHA1(55471189db573dd61e3087d12c55564291672c77) )
+	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
+ROM_END
+
 ROM_START( pokonyan )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "xmqq-12f.bin", 0x00000, 0x20000, CRC(196297bf) SHA1(4724c4ccb755d3d457f5224d4c4ea860664d3b10) )
@@ -14831,6 +14960,7 @@ GAME( 1995, qtono2j,     0,        cps1_12MHz, qtono2j,  cps_state, init_cps1,  
 GAME( 1995, megaman,     0,        cps1_12MHz, megaman,  cps_state, init_cps1,     ROT0,   "Capcom", "Mega Man: The Power Battle (CPS1, USA 951006)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, megamana,    megaman,  cps1_12MHz, megaman,  cps_state, init_cps1,     ROT0,   "Capcom", "Mega Man: The Power Battle (CPS1, Asia 951006)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, rockmanj,    megaman,  cps1_12MHz, rockmanj, cps_state, init_cps1,     ROT0,   "Capcom", "Rockman: The Power Battle (CPS1, Japan 950922)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, pmonster,    0,        ganbare,    pmonster, cps_state, init_ganbare,  ROT0,   "Capcom", "Gamushara Battle! Puchi Monster (Japan 990519)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Needs hopper emulation
 GAME( 2000, ganbare,     0,        ganbare,    ganbare,  cps_state, init_ganbare,  ROT0,   "Capcom", "Ganbare! Marine Kun (Japan 2K0411)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, pokonyan,    0,        cps1_10MHz, pokonyan, cps_state, init_cps1,     ROT0,   "Capcom", "Pokonyan! Balloon (Japan 940322)", MACHINE_SUPPORTS_SAVE ) // 2002-10-24 was on the ROM labels, 940322 on the startup screen... take your pick
 GAME( 1996, mpumpkin,    0,        cps1_10MHz, mpumpkin, cps_state, init_cps1,     ROT0,   "Capcom", "Magical Pumpkin: Puroland de Daibouken (Japan 960712)", MACHINE_SUPPORTS_SAVE )

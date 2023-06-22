@@ -73,10 +73,6 @@ ns32202_device::ns32202_device(machine_config const &mconfig, char const *tag, d
 
 void ns32202_device::device_start()
 {
-	m_out_int.resolve_safe();
-	m_out_cout.resolve_safe();
-	m_out_port.resolve_safe();
-
 	save_item(NAME(m_hvct));
 	save_item(NAME(m_eltg));
 	save_item(NAME(m_tpl));

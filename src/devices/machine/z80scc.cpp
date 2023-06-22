@@ -480,24 +480,6 @@ scc8523l_device::scc8523l_device(const machine_config &mconfig, const char *tag,
 }
 
 //-------------------------------------------------
-//  device_resolve_objects - device-specific setup
-//-------------------------------------------------
-void z80scc_device::device_resolve_objects()
-{
-	LOG("%s\n", FUNCNAME);
-
-	// resolve callbacks
-	m_out_txd_cb.resolve_all_safe();
-	m_out_dtr_cb.resolve_all_safe();
-	m_out_rts_cb.resolve_all_safe();
-	m_out_wreq_cb.resolve_all_safe();
-	m_out_sync_cb.resolve_all_safe();
-	m_out_rxdrq_cb.resolve_all_safe();
-	m_out_txdrq_cb.resolve_all_safe();
-	m_out_int_cb.resolve_safe();
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 void z80scc_device::device_start()

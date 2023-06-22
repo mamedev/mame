@@ -68,7 +68,6 @@ public:
 	void scsi1_drq(int state);
 
 protected:
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

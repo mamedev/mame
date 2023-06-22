@@ -738,8 +738,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( by133_state::u11_timer )
 void by133_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_sound_select_handler.resolve();
-	m_sound_int_handler.resolve();
 	m_io_outputs.resolve();
 
 	save_item(NAME(m_mpu_to_vid));

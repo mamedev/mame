@@ -369,16 +369,6 @@ scc2698b_device::scc2698b_device(const machine_config &mconfig, const char *tag,
 
 void scc2698b_device::device_start()
 {
-	write_intr_A.resolve_safe();
-	write_intr_B.resolve_safe();
-	write_intr_C.resolve_safe();
-	write_intr_D.resolve_safe();
-
-	write_tx.resolve_all_safe();
-	write_mpp1.resolve_all_safe();
-	write_mpp2.resolve_all_safe();
-	write_mpo.resolve_all_safe();
-
 	for (int i = 0; i < 8; i++)
 	{
 		m_channel[i]->channel_port = i;

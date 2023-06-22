@@ -10,7 +10,7 @@ Undocumented buttons:
 - holding CLEAR on boot clears battery backed RAM
 
 TODO:
-- does it have ROM waitstates like mephisto_modular?
+- does it have ROM waitstates like modular.cpp?
 
 *******************************************************************************/
 

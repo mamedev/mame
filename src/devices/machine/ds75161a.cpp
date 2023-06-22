@@ -29,14 +29,14 @@ DEFINE_DEVICE_TYPE(DS75161A, ds75161a_device, "ds75161a", "DS75161A GPIB Transce
 
 ds75161a_device::ds75161a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, DS75161A, tag, owner, clock),
-	m_in_ren_cb(*this),
-	m_in_ifc_cb(*this),
-	m_in_ndac_cb(*this),
-	m_in_nrfd_cb(*this),
-	m_in_dav_cb(*this),
-	m_in_eoi_cb(*this),
-	m_in_atn_cb(*this),
-	m_in_srq_cb(*this),
+	m_in_ren_cb(*this, 0),
+	m_in_ifc_cb(*this, 0),
+	m_in_ndac_cb(*this, 0),
+	m_in_nrfd_cb(*this, 0),
+	m_in_dav_cb(*this, 0),
+	m_in_eoi_cb(*this, 0),
+	m_in_atn_cb(*this, 0),
+	m_in_srq_cb(*this, 0),
 	m_out_ren_cb(*this),
 	m_out_ifc_cb(*this),
 	m_out_ndac_cb(*this),
@@ -64,25 +64,6 @@ ds75161a_device::ds75161a_device(const machine_config &mconfig, const char *tag,
 
 void ds75161a_device::device_start()
 {
-	// resolve callbacks
-	m_in_ren_cb.resolve_safe(0);
-	m_in_ifc_cb.resolve_safe(0);
-	m_in_ndac_cb.resolve_safe(0);
-	m_in_nrfd_cb.resolve_safe(0);
-	m_in_dav_cb.resolve_safe(0);
-	m_in_eoi_cb.resolve_safe(0);
-	m_in_atn_cb.resolve_safe(0);
-	m_in_srq_cb.resolve_safe(0);
-
-	m_out_ren_cb.resolve_safe();
-	m_out_ifc_cb.resolve_safe();
-	m_out_ndac_cb.resolve_safe();
-	m_out_nrfd_cb.resolve_safe();
-	m_out_dav_cb.resolve_safe();
-	m_out_eoi_cb.resolve_safe();
-	m_out_atn_cb.resolve_safe();
-	m_out_srq_cb.resolve_safe();
-
 	// register for state saving
 	save_item(NAME(m_ren));
 	save_item(NAME(m_ifc));

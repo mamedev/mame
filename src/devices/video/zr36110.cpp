@@ -27,8 +27,6 @@ zr36110_device::zr36110_device(const machine_config &mconfig, char const *tag, d
 
 void zr36110_device::device_start()
 {
-	m_drq_w.resolve_safe();
-
 	save_item(NAME(m_mc1_adr));
 	save_item(NAME(m_mc23_adr));
 	save_item(NAME(m_setup_adr));

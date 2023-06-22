@@ -68,12 +68,6 @@ mc6852_device::mc6852_device(const machine_config &mconfig, const char *tag, dev
 
 void mc6852_device::device_start()
 {
-	// resolve callbacks
-	m_write_tx_data.resolve_safe();
-	m_write_irq.resolve_safe();
-	m_write_sm_dtr.resolve_safe();
-	m_write_tuf.resolve_safe();
-
 	set_rcv_rate(m_rx_clock);
 	set_tra_rate(m_tx_clock);
 

@@ -295,7 +295,7 @@ uint8_t riot6532_device::reg_r(uint8_t offset, bool debugger_access)
 		else
 		{
 			/* call the input callback if it exists */
-			if (!(*port->m_in_cb).isnull())
+			if (!(*port->m_in_cb).isunset())
 			{
 				port->m_in = (*port->m_in_cb)(0);
 
@@ -413,21 +413,21 @@ void riot6532_device::pb7_w(int state) { portb_in_set(state ? 0x80 : 0x00, 0x80)
 //  riot6532_device - constructor
 //-------------------------------------------------
 
-riot6532_device::riot6532_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, RIOT6532, tag, owner, clock),
-		m_in_pa_cb(*this),
-		m_out_pa_cb(*this),
-		m_in_pb_cb(*this),
-		m_out_pb_cb(*this),
-		m_irq_cb(*this),
-		m_irqstate(0),
-		m_irqenable(0),
-		m_irq(CLEAR_LINE),
-		m_pa7dir(0),
-		m_pa7prev(0),
-		m_timershift(0),
-		m_timerstate(0),
-		m_timer(nullptr)
+riot6532_device::riot6532_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, RIOT6532, tag, owner, clock),
+	m_in_pa_cb(*this, 0),
+	m_out_pa_cb(*this),
+	m_in_pb_cb(*this, 0),
+	m_out_pb_cb(*this),
+	m_irq_cb(*this),
+	m_irqstate(0),
+	m_irqenable(0),
+	m_irq(CLEAR_LINE),
+	m_pa7dir(0),
+	m_pa7prev(0),
+	m_timershift(0),
+	m_timerstate(0),
+	m_timer(nullptr)
 {
 	memset(m_port, 0x00, sizeof(m_port));
 }
@@ -439,15 +439,10 @@ riot6532_device::riot6532_device(const machine_config &mconfig, const char *tag,
 void riot6532_device::device_start()
 {
 	/* resolve callbacks */
-	m_in_pa_cb.resolve();
 	m_port[0].m_in_cb = &m_in_pa_cb;
-	m_out_pa_cb.resolve_safe();
 	m_port[0].m_out_cb = &m_out_pa_cb;
-	m_in_pb_cb.resolve();
 	m_port[1].m_in_cb = &m_in_pb_cb;
-	m_out_pb_cb.resolve_safe();
 	m_port[1].m_out_cb = &m_out_pb_cb;
-	m_irq_cb.resolve_safe();
 
 	/* allocate timers */
 	m_timer = timer_alloc(FUNC(riot6532_device::timer_end), this);

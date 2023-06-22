@@ -86,11 +86,6 @@ c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, d
 
 void c64h156_device::device_start()
 {
-	// resolve callbacks
-	m_write_atn.resolve_safe();
-	m_write_sync.resolve_safe();
-	m_write_byte.resolve_safe();
-
 	// allocate timer
 	t_gen = timer_alloc(FUNC(c64h156_device::update_tick), this);
 

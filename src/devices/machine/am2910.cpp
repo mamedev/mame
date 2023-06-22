@@ -63,12 +63,6 @@ void am2910_device::device_start()
 	save_item(NAME(m_d));
 	save_item(NAME(m_i));
 
-	m_y.resolve_safe();
-	m_full.resolve_safe();
-	m_pl.resolve_safe();
-	m_map.resolve_safe();
-	m_vect.resolve_safe();
-
 	if (clock())
 		m_execute_timer = timer_alloc(FUNC(am2910_device::clock_tick), this);
 	else

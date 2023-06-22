@@ -73,9 +73,6 @@ bool upd1990a_device::is_serial_mode()
 void upd1990a_device::device_start()
 {
 	(void)m_variant;
-	// resolve callbacks
-	m_write_data.resolve_safe();
-	m_write_tp.resolve_safe();
 
 	for (auto & elem : m_shift_reg)
 		elem = 0;

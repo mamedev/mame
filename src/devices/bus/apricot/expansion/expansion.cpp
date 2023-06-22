@@ -86,13 +86,6 @@ apricot_expansion_bus_device::~apricot_expansion_bus_device()
 
 void apricot_expansion_bus_device::device_start()
 {
-	// resolve callbacks
-	m_dma1_handler.resolve_safe();
-	m_dma2_handler.resolve_safe();
-	m_ext1_handler.resolve_safe();
-	m_ext2_handler.resolve_safe();
-	m_int2_handler.resolve_safe();
-	m_int3_handler.resolve_safe();
 }
 
 //-------------------------------------------------

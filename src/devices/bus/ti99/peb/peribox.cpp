@@ -452,13 +452,7 @@ void peribox_device::set_slot_loaded(int slot, peribox_slot_device* slotdev)
 
 void peribox_device::device_start()
 {
-	// Resolve the callback lines to the console
-	m_slot1_inta.resolve();
-	m_slot1_intb.resolve();
-	m_slot1_lcp.resolve();
-	m_slot1_ready.resolve();
-
-	m_ioport_connected = (m_slot1_inta.isnull()); // TODO: init
+	m_ioport_connected = (m_slot1_inta.isunset()); // TODO: init
 
 	LOGMASKED(LOG_CONFIG, "AMA/B/C address prefix set to %05x\n", m_address_prefix);
 	for (int i=2; i < 9; i++)

@@ -419,7 +419,6 @@ void pcd_video_device::map(address_map &map)
 void pcx_video_device::device_start()
 {
 	m_maincpu->space(AS_IO).install_readwrite_handler(0xfb00, 0xfb01, read8smo_delegate(*this, FUNC(pcdx_video_device::detect_r)), write8smo_delegate(*this, FUNC(pcdx_video_device::detect_w)), 0x00ff);
-	m_txd_handler.resolve_safe();
 
 	decode_gfx(gfx_pcx);
 }

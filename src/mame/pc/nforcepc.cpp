@@ -409,14 +409,6 @@ it8703f_device::it8703f_device(const machine_config &mconfig, const char *tag, d
 
 void it8703f_device::device_start()
 {
-	pin_reset_callback.resolve_safe();
-	pin_gatea20_callback.resolve_safe();
-	m_txd1_callback.resolve_safe();
-	m_ndtr1_callback.resolve_safe();
-	m_nrts1_callback.resolve_safe();
-	m_txd2_callback.resolve_safe();
-	m_ndtr2_callback.resolve_safe();
-	m_nrts2_callback.resolve_safe();
 }
 
 void it8703f_device::internal_memory_map(address_map &map)

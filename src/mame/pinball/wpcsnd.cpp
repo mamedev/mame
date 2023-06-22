@@ -119,8 +119,6 @@ void wpcsnd_device::device_add_mconfig(machine_config &config)
 
 void wpcsnd_device::device_start()
 {
-	// resolve callback
-	m_reply_cb.resolve_safe();
 	// save states
 	save_item(NAME(m_latch));
 	save_item(NAME(m_reply));

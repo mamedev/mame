@@ -712,8 +712,6 @@ void tms340x0_device::device_start()
 {
 	m_scanline_ind16_cb.resolve();
 	m_scanline_rgb32_cb.resolve();
-	m_output_int_cb.resolve();
-	m_ioreg_pre_write_cb.resolve();
 	m_to_shiftreg_cb.resolve();
 	m_from_shiftreg_cb.resolve();
 
@@ -1244,7 +1242,7 @@ static const char *const ioreg_name[] =
 
 void tms34010_device::io_register_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (!m_ioreg_pre_write_cb.isnull())
+	if (!m_ioreg_pre_write_cb.isunset())
 		m_ioreg_pre_write_cb(offset, data, mem_mask);
 
 	int oldreg, newreg;
@@ -1319,15 +1317,9 @@ void tms34010_device::io_register_w(offs_t offset, u16 data, u16 mem_mask)
 
 				/* the TMS34010 can set output interrupt? */
 				if (!(oldreg & 0x0080) && (newreg & 0x0080))
-				{
-					if (!m_output_int_cb.isnull())
-						m_output_int_cb(1);
-				}
+					m_output_int_cb(1);
 				else if ((oldreg & 0x0080) && !(newreg & 0x0080))
-				{
-					if (!m_output_int_cb.isnull())
-						m_output_int_cb(0);
-				}
+					m_output_int_cb(0);
 
 				/* input interrupt? (should really be state-based, but the functions don't exist!) */
 				if (!(oldreg & 0x0008) && (newreg & 0x0008))
@@ -1395,7 +1387,7 @@ static const char *const ioreg020_name[] =
 
 void tms34020_device::io_register_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (!m_ioreg_pre_write_cb.isnull())
+	if (!m_ioreg_pre_write_cb.isunset())
 		m_ioreg_pre_write_cb(offset, data, mem_mask);
 
 	int oldreg, newreg;
@@ -1471,15 +1463,9 @@ void tms34020_device::io_register_w(offs_t offset, u16 data, u16 mem_mask)
 
 			/* the TMS34010 can set output interrupt? */
 			if (!(oldreg & 0x0080) && (newreg & 0x0080))
-			{
-				if (!m_output_int_cb.isnull())
-					m_output_int_cb(1);
-			}
+				m_output_int_cb(1);
 			else if ((oldreg & 0x0080) && !(newreg & 0x0080))
-			{
-				if (!m_output_int_cb.isnull())
-					m_output_int_cb(0);
-			}
+				m_output_int_cb(0);
 
 			/* input interrupt? (should really be state-based, but the functions don't exist!) */
 			if (!(oldreg & 0x0008) && (newreg & 0x0008))

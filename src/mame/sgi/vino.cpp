@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(VINO, vino_device, "vino", "SGI VINO Controller")
 vino_device::vino_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VINO, tag, owner, clock)
 	, m_i2c_data_out(*this)
-	, m_i2c_data_in(*this)
+	, m_i2c_data_in(*this, 0x00)
 	, m_i2c_stop(*this)
 	, m_interrupt_cb(*this)
 	, m_picture(*this, "srcimg")
@@ -93,11 +93,6 @@ void vino_device::device_start()
 
 		m_channels[i].m_fetch_timer->adjust(attotime::never);
 	}
-
-	m_i2c_data_out.resolve_safe();
-	m_i2c_data_in.resolve_safe(0x00);
-	m_i2c_stop.resolve_safe();
-	m_interrupt_cb.resolve_safe();
 }
 
 void vino_device::device_reset()

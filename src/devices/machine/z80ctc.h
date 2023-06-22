@@ -50,7 +50,7 @@ public:
 	z80ctc_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -100,13 +100,12 @@ public:
 	u16 get_channel_constant(int ch) const { return m_channel[ch]->m_tconst; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset_after_children() override;
 
-	// z80daisy_interface overrides
+	// z80daisy_interface implementation
 	virtual int z80daisy_irq_state() override;
 	virtual int z80daisy_irq_ack() override;
 	virtual void z80daisy_irq_reti() override;

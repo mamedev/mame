@@ -68,7 +68,7 @@ f8_cpu_device::f8_cpu_device(const machine_config &mconfig, const char *tag, dev
 	m_program_config("program", ENDIANNESS_BIG, 8, 16, 0),
 	m_regs_config("register", ENDIANNESS_BIG, 8, 6, 0, address_map_constructor(FUNC(f8_cpu_device::regs_map), this)),
 	m_io_config("io", ENDIANNESS_BIG, 8, 8, 0),
-	m_romc08_callback(*this)
+	m_romc08_callback(*this, 0)
 { }
 
 void f8_cpu_device::regs_map(address_map &map)
@@ -104,11 +104,6 @@ void f8_cpu_device::state_string_export(const device_state_entry &entry, std::st
 					m_w & 0x01 ? 'S':'.');
 			break;
 	}
-}
-
-void f8_cpu_device::device_resolve_objects()
-{
-	m_romc08_callback.resolve_safe(0);
 }
 
 void f8_cpu_device::device_start()

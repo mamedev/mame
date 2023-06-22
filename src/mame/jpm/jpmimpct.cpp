@@ -124,8 +124,6 @@ jpmtouch_device::jpmtouch_device(const machine_config &mconfig, device_type type
 
 void jpmtouch_device::device_start()
 {
-	m_rxd_handler.resolve_safe();
-
 	save_item(NAME(m_touch_data));
 	save_item(NAME(m_sendpos));
 	save_item(NAME(m_sending));

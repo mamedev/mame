@@ -80,11 +80,6 @@ void tatung_pipe_device::device_start()
 {
 	// get inserted module
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_int_handler.resolve_safe();
-	m_nmi_handler.resolve_safe();
-	m_reset_handler.resolve_safe();
 }
 
 //-------------------------------------------------

@@ -34,8 +34,6 @@ ioport_constructor msx_matsushita_device::device_input_ports() const
 
 void msx_matsushita_device::device_start()
 {
-	m_turbo_out_cb.resolve_safe();
-
 	m_sram.resize(0x800);
 
 	save_item(NAME(m_selected));

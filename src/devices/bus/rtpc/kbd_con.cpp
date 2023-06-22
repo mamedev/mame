@@ -35,12 +35,6 @@ void rtpc_kbd_con_device::device_config_complete()
 	m_keyboard = get_card_device();
 }
 
-void rtpc_kbd_con_device::device_resolve_objects()
-{
-	m_out_clock_cb.resolve_safe();
-	m_out_data_cb.resolve_safe();
-}
-
 void rtpc_kbd_con_device::device_start()
 {
 	save_item(NAME(m_clock_state));

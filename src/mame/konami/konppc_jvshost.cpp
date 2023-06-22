@@ -20,8 +20,6 @@ void konppc_jvs_host_device::device_start()
 {
 	jvs_host::device_start();
 
-	output_cb.resolve_safe();
-
 	m_jvs_sdata = make_unique_clear<uint8_t[]>(JVS_BUFFER_SIZE);
 	m_jvs_is_escape_byte = false;
 	m_jvs_sdata_ptr = 0;

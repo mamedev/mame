@@ -28,9 +28,9 @@ static constexpr u16 STATUS_ACTIVE  = 0x0400;
 //  dbdma_device - constructor
 //-------------------------------------------------
 
-dbdma_device::dbdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DBDMA_CHANNEL, tag, owner, clock),
-	  write_irq(*this)
+dbdma_device::dbdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, DBDMA_CHANNEL, tag, owner, clock),
+	write_irq(*this)
 {
 }
 
@@ -40,8 +40,6 @@ dbdma_device::dbdma_device(const machine_config &mconfig, const char *tag, devic
 
 void dbdma_device::device_start()
 {
-	write_irq.resolve_safe();
-
 	save_item(NAME(m_status));
 	save_item(NAME(m_command_pointer));
 	save_item(NAME(m_intselect));

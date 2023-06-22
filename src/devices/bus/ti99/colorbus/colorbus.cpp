@@ -51,14 +51,13 @@ void v9938_colorbus_device::buttons(int bstate)
 
 void v9938_colorbus_device::device_start()
 {
-	m_extra_button.resolve_safe();
 }
 
 /*****************************************************************************/
 
-device_v9938_colorbus_interface::device_v9938_colorbus_interface(const machine_config &mconfig, device_t &device)
-	:   device_interface(device, "v9938colorbus"),
-		m_colorbus(nullptr)
+device_v9938_colorbus_interface::device_v9938_colorbus_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "v9938colorbus"),
+	m_colorbus(nullptr)
 {
 }
 

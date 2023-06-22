@@ -204,10 +204,6 @@ void i82357_device::map(address_map &map)
 
 void i82357_device::device_start()
 {
-	m_out_rtc.resolve_safe();
-	m_out_nmi.resolve_safe();
-	m_out_spkr.resolve_safe();
-
 	m_nmi_check = timer_alloc(FUNC(i82357_device::nmi_check), this);
 }
 

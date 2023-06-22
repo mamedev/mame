@@ -1125,10 +1125,7 @@ void by35_state::u10_cb2_w(int state)
 void by35_state::u11_cb2_w(int state)
 {
 	// Handle sound
-	if (!m_sound_int_handler.isnull())
-	{
-		m_sound_int_handler(state);
-	}
+	m_sound_int_handler(state);
 
 	m_u11_cb2 = state;
 }
@@ -1259,11 +1256,8 @@ void by35_state::u11_a_w(uint8_t data)
 	}
 
 	// Handle sound
-	if (!m_sound_select_handler.isnull())
-	{
-		int sound = (m_u11b & 0x0f) | ((data & 0x02) << 3);
-		m_sound_select_handler(sound);
-	}
+	const int sound = (m_u11b & 0x0f) | ((data & 0x02) << 3);
+	m_sound_select_handler(sound);
 
 	m_u11a = data;
 }
@@ -1341,11 +1335,8 @@ void by35_state::u11_b_w(uint8_t data)
 	}
 
 	// Handle sound
-	if (!m_sound_select_handler.isnull())
-	{
-		int sound = (data & 0x0f) | ((m_u11a & 0x02) << 3);
-		m_sound_select_handler(sound);
-	}
+	const int sound = (data & 0x0f) | ((m_u11a & 0x02) << 3);
+	m_sound_select_handler(sound);
 
 	m_u11b = data;
 }
@@ -1462,8 +1453,6 @@ void by35_state::machine_start()
 	m_lamps.resolve();
 	m_digits.resolve();
 	m_solenoids.resolve();
-	m_sound_select_handler.resolve();
-	m_sound_int_handler.resolve();
 
 	save_item(NAME(m_u10a));
 	save_item(NAME(m_u10b));

@@ -243,7 +243,6 @@ archimedes_keyboard_device::archimedes_keyboard_device(const machine_config &mco
 
 void archimedes_keyboard_device::device_resolve_objects()
 {
-	m_kout.resolve_safe();
 	m_leds.resolve();
 }
 

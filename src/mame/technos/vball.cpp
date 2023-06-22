@@ -668,7 +668,7 @@ void vball_state::vball(machine_config &config)
 
 ROM_START( vball ) // US version
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "25a2-4.124",   0x00000, 0x10000, CRC(06d0c013) SHA1(e818ae0ffb32bcf97da2651a9b8efbd4859b2f4c) ) // First 0x8000 banked, second 0x8000 fixed
+	ROM_LOAD( "25a2-4.124",   0x00000, 0x10000, CRC(be04c2b5) SHA1(40fed4ae272719e940f1796ef35420ab451ab7b6) ) // First 0x8000 banked, second 0x8000 fixed
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "25j1-0.47",    0x00000, 0x8000,  CRC(10ca79ad) SHA1(aad4a09d6745ca0b5665cb00ff7a4e08ea434068) )
@@ -750,7 +750,7 @@ ROM_START( vballb ) // bootleg
 	ROM_LOAD(          "25j7-0.160",   0x0800,  0x00800, CRC(2ffb68b3) SHA1(d560fdcd5e5c79d37e5b5bde22fbaf662fe89252) )
 ROM_END
 
-ROM_START( vball2pjb ) // bootleg of the Japan set with unmoddified program ROM
+ROM_START( vball2pjb ) // bootleg of the Japan set with unmodified program ROM
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.124", 0x00000, 0x10000, CRC(432509c4) SHA1(6de50e21d279f4ac9674bc91990ba9535e80908c) )// First 0x8000 banked, second 0x8000 fixed  == 25j2-2-5.124 from vball2pj
 

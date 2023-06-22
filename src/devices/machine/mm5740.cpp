@@ -45,9 +45,9 @@ const tiny_rom_entry *mm5740_device::device_rom_region() const
 
 mm5740_device::mm5740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MM5740, tag, owner, clock),
-	m_read_x(*this),
-	m_read_shift(*this),
-	m_read_control(*this),
+	m_read_x(*this, 0x3ff),
+	m_read_shift(*this, 0),
+	m_read_control(*this, 0),
 	m_write_data_ready(*this),
 	m_rom(*this, "internal")
 {
@@ -72,12 +72,6 @@ uint32_t mm5740_device::calc_effective_clock_key_debounce(uint32_t capacitance)
 
 void mm5740_device::device_start()
 {
-	// resolve callbacks
-	m_read_x.resolve_all_safe(0x3ff);
-	m_read_shift.resolve_safe(0);
-	m_read_control.resolve_safe(0);
-	m_write_data_ready.resolve_safe();
-
 	// allocate timers
 	m_scan_timer = timer_alloc(FUNC(mm5740_device::perform_scan), this);
 	m_scan_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));

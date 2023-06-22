@@ -79,10 +79,6 @@ void hp_hil_mlc_device::add_hp_hil_device(device_hp_hil_interface *device)
 //-------------------------------------------------
 void hp_hil_mlc_device::device_start()
 {
-	// resolve callbacks
-	int_cb.resolve_safe();
-	nmi_cb.resolve_safe();
-
 	save_item(NAME(m_r2));
 	save_item(NAME(m_r3));
 	save_item(NAME(m_w1));

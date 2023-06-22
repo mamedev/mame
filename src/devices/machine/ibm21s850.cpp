@@ -44,8 +44,6 @@ void ibm21s85x_base_device::device_start()
 	save_item(NAME(m_regs));
 
 	m_reset_timer = timer_alloc(FUNC(ibm21s85x_base_device::reset_tick), this);
-
-	m_reset_cb.resolve_safe();
 }
 
 void ibm21s85x_base_device::device_reset()

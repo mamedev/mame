@@ -193,7 +193,7 @@ snes_ppu_device::snes_ppu_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, SNES_PPU, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
-	, m_openbus_cb(*this)
+	, m_openbus_cb(*this, 0)
 	, m_options(*this, ":OPTIONS")
 	, m_debug1(*this, ":DEBUG1")
 	, m_debug2(*this, ":DEBUG2")
@@ -208,8 +208,6 @@ snes_ppu_device::snes_ppu_device(const machine_config &mconfig, const char *tag,
 
 void snes_ppu_device::device_start()
 {
-	m_openbus_cb.resolve_safe(0);
-
 	m_vram = std::make_unique<uint8_t[]>(SNES_VRAM_SIZE);
 	m_cgram = std::make_unique<uint16_t[]>(SNES_CGRAM_SIZE/2);
 

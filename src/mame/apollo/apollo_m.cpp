@@ -1274,7 +1274,7 @@ void apollo_stdio_device::device_start()
 {
 	CLOG1(("device_start"));
 
-	m_tx_w.resolve_safe();
+	m_tx_w.resolve();
 
 	m_poll_timer = timer_alloc(FUNC(apollo_stdio_device::poll_timer), this);
 }

@@ -60,7 +60,7 @@ am7990_device_base::am7990_device_base(const machine_config &mconfig, device_typ
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_network_interface(mconfig, *this, 10)
 	, m_intr_out_cb(*this)
-	, m_dma_in_cb(*this)
+	, m_dma_in_cb(*this, 0)
 	, m_dma_out_cb(*this)
 	, m_transmit_poll(nullptr)
 	, m_intr_out_state(1)
@@ -82,10 +82,6 @@ constexpr attotime am7990_device_base::TX_POLL_PERIOD;
 
 void am7990_device_base::device_start()
 {
-	m_intr_out_cb.resolve_safe();
-	m_dma_in_cb.resolve_safe(0);
-	m_dma_out_cb.resolve_safe();
-
 	m_transmit_poll = timer_alloc(FUNC(am7990_device_base::transmit_poll), this);
 	m_transmit_poll->adjust(TX_POLL_PERIOD, 0, TX_POLL_PERIOD);
 

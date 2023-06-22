@@ -53,8 +53,6 @@ void m6502_device::init()
 			space(AS_PROGRAM).specific(mintf->program14);
 	}
 
-	sync_w.resolve_safe();
-
 	XPC = 0;
 
 	state_add(STATE_GENPC,     "GENPC",     XPC).callexport().noshow();

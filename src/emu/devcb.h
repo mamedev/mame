@@ -64,11 +64,8 @@ template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write_
 ///
 /// Provides utilities for supporting multiple read/write/transform
 /// signatures, and the base exclusive-or/mask transform methods.
-class devcb_base
+class devcb_base : protected device_resolver_base
 {
-public:
-	virtual void validity_check(validity_checker &valid) const = 0;
-
 protected:
 	// This is in C++17 but not C++14
 	template <typename... T> struct void_wrapper { using type = void; };
@@ -174,9 +171,9 @@ protected:
 	class array : public std::array<T, Count>
 	{
 	private:
-		template <unsigned... V>
-		array(device_t &owner, std::integer_sequence<unsigned, V...> const &)
-			: std::array<T, Count>{{ { make_one<V>(owner) }... }}
+		template <unsigned... V, typename... Params>
+		array(device_t &owner, std::integer_sequence<unsigned, V...>, Params &&... args)
+			: std::array<T, Count>{{ { make_one<V>(owner), std::forward<Params>(args)... }... }}
 		{
 		}
 
@@ -185,12 +182,10 @@ protected:
 	public:
 		using std::array<T, Count>::array;
 
-		array(device_t &owner) : array(owner, std::make_integer_sequence<unsigned, Count>()) { }
-
-		void resolve_all()
+		template <typename... Params>
+		array(device_t &owner, Params &&... args)
+			: array(owner, std::make_integer_sequence<unsigned, Count>(), std::forward<Params>(args)...)
 		{
-			for (T &elem : *this)
-				elem.resolve();
 		}
 	};
 
@@ -336,7 +331,7 @@ private:
 		using ptr = std::unique_ptr<creator>;
 
 		virtual ~creator() { }
-		virtual void validity_check(validity_checker &valid) const = 0;
+		virtual bool validity_check(validity_checker &valid) const = 0;
 		virtual func_t create() = 0;
 
 		std::make_unsigned_t<Result> mask() const { return m_mask; }
@@ -353,7 +348,7 @@ private:
 	public:
 		creator_impl(T &&builder) : creator(builder.mask()), m_builder(std::move(builder)) { }
 
-		virtual void validity_check(validity_checker &valid) const override { m_builder.validity_check(valid); }
+		virtual bool validity_check(validity_checker &valid) const override { return m_builder.validity_check(valid); }
 
 		virtual func_t create() override
 		{
@@ -371,7 +366,7 @@ private:
 	public:
 		log_creator(device_t &devbase, std::string &&message) : creator(0U), m_devbase(devbase), m_message(std::move(message)) { }
 
-		virtual void validity_check(validity_checker &valid) const override { }
+		virtual bool validity_check(validity_checker &valid) const override { return true; }
 
 		virtual func_t create() override
 		{
@@ -467,7 +462,7 @@ private:
 			return transform_builder<transform_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, std::move(*this), std::forward<T>(cb), m);
 		}
 
-		void validity_check(validity_checker &valid) const { m_src.validity_check(valid); }
+		bool validity_check(validity_checker &valid) const { return m_src.validity_check(valid); }
 
 		template <typename T>
 		void build(T &&chain)
@@ -535,7 +530,7 @@ private:
 			return transform_builder<functoid_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, std::move(*this), std::forward<T>(cb), m);
 		}
 
-		void validity_check(validity_checker &valid) const { }
+		bool validity_check(validity_checker &valid) const { return true; }
 
 		template <typename T>
 		void build(T &&chain)
@@ -595,11 +590,15 @@ private:
 			return transform_builder<delegate_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, std::move(*this), std::forward<T>(cb), m);
 		}
 
-		void validity_check(validity_checker &valid) const
+		bool validity_check(validity_checker &valid) const
 		{
 			auto const target(m_delegate.finder_target());
 			if (target.second && !target.first.subdevice(target.second))
+			{
 				osd_printf_error("Read callback bound to non-existent object tag %s (%s)\n", target.first.subtag(target.second), m_delegate.name());
+				return false;
+			}
+			return true;
 		}
 
 		template <typename T>
@@ -655,7 +654,7 @@ private:
 			return transform_builder<ioport_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, std::move(*this), std::forward<T>(cb), m);
 		}
 
-		void validity_check(validity_checker &valid) const { }
+		bool validity_check(validity_checker &valid) const { return true; }
 
 		template <typename T>
 		void build(T &&chain)
@@ -823,47 +822,46 @@ private:
 
 	std::vector<func_t> m_functions;
 	std::vector<typename creator::ptr> m_creators;
+	Result const m_default;
+	bool m_unset = false;
+
+protected:
+	virtual bool findit(validity_checker *valid) override;
+	virtual void end_configuration() override;
 
 public:
 	template <unsigned Count>
 	class array : public devcb_read_base::array<devcb_read<Result, DefaultMask>, Count>
 	{
 	public:
-		using devcb_read_base::array<devcb_read<Result, DefaultMask>, Count>::array;
-
-		void resolve_all_safe(Result dflt)
+		array(device_t &owner, Result dflt)
+			: devcb_read_base::array<devcb_read<Result, DefaultMask>, Count>::array(owner, dflt)
 		{
-			for (devcb_read<Result, DefaultMask> &elem : *this)
-				elem.resolve_safe(dflt);
 		}
 	};
 
-	devcb_read(device_t &owner);
+	devcb_read(device_t &owner, Result dflt);
 
 	binder bind();
 	void reset();
 
-	virtual void validity_check(validity_checker &valid) const override;
-
-	void resolve();
-	void resolve_safe(Result dflt);
-
 	Result operator()(offs_t offset, std::make_unsigned_t<Result> mem_mask = DefaultMask);
 	Result operator()();
 
-	bool isnull() const { return m_functions.empty() && m_creators.empty(); }
-	explicit operator bool() const { return !m_functions.empty(); }
+	bool isunset() const noexcept { return m_unset || (m_functions.empty() && m_creators.empty()); }
 };
 
 template <typename Result, std::make_unsigned_t<Result> DefaultMask>
-devcb_read<Result, DefaultMask>::devcb_read(device_t &owner)
+devcb_read<Result, DefaultMask>::devcb_read(device_t &owner, Result dflt)
 	: devcb_read_base(owner)
+	, m_default(dflt & DefaultMask)
 {
 }
 
 template <typename Result, std::make_unsigned_t<Result> DefaultMask>
 typename devcb_read<Result, DefaultMask>::binder devcb_read<Result, DefaultMask>::bind()
 {
+	assert(m_functions.empty());
 	return binder(*this);
 }
 
@@ -875,38 +873,48 @@ void devcb_read<Result, DefaultMask>::reset()
 }
 
 template <typename Result, std::make_unsigned_t<Result> DefaultMask>
-void devcb_read<Result, DefaultMask>::validity_check(validity_checker &valid) const
+bool devcb_read<Result, DefaultMask>::findit(validity_checker *valid)
 {
 	assert(m_functions.empty());
-	for (typename std::vector<typename creator::ptr>::const_iterator i = m_creators.begin(); m_creators.end() != i; ++i)
+	if (!valid)
 	{
-		(*i)->validity_check(valid);
-		std::make_unsigned_t<Result> const m((*i)->mask());
-		for (typename std::vector<typename creator::ptr>::const_iterator j = std::next(i); m_creators.end() != j; ++j)
+		// FIXME: report errors by returning false rather than throwing fatal errors
+		m_functions.reserve(m_creators.size());
+		for (typename creator::ptr const &c : m_creators)
+			m_functions.emplace_back(c->create());
+		m_creators.clear();
+		if (m_functions.empty())
 		{
-			std::make_unsigned_t<Result> const n((*j)->mask());
-			if (m & n)
-				osd_printf_error("Read callback masks %lX and %lX overlap\n", static_cast<unsigned long>(m), static_cast<unsigned long>(n)); // FIXME: doesn't work with u64
+			m_functions.emplace_back([dflt = m_default] (offs_t offset, std::make_unsigned_t<Result> mem_mask) { return dflt; });
+			m_unset = true;
 		}
+		return true;
+	}
+	else
+	{
+		bool success(true);
+		for (typename std::vector<typename creator::ptr>::const_iterator i = m_creators.begin(); m_creators.end() != i; ++i)
+		{
+			if (!(*i)->validity_check(*valid))
+				success = false;
+			std::make_unsigned_t<Result> const m((*i)->mask());
+			for (typename std::vector<typename creator::ptr>::const_iterator j = std::next(i); m_creators.end() != j; ++j)
+			{
+				std::make_unsigned_t<Result> const n((*j)->mask());
+				if (m & n)
+				{
+					osd_printf_error("Read callback masks 0x%X and 0x%X overlap\n", m, n);
+					success = false;
+				}
+			}
+		}
+		return success;
 	}
 }
 
 template <typename Result, std::make_unsigned_t<Result> DefaultMask>
-void devcb_read<Result, DefaultMask>::resolve()
+void devcb_read<Result, DefaultMask>::end_configuration()
 {
-	assert(m_functions.empty());
-	m_functions.reserve(m_creators.size());
-	for (typename creator::ptr const &c : m_creators)
-		m_functions.emplace_back(c->create());
-	m_creators.clear();
-}
-
-template <typename Result, std::make_unsigned_t<Result> DefaultMask>
-void devcb_read<Result, DefaultMask>::resolve_safe(Result dflt)
-{
-	resolve();
-	if (m_functions.empty())
-		m_functions.emplace_back([dflt] (offs_t offset, std::make_unsigned_t<Result> mem_mask) { return dflt; });
 }
 
 template <typename Result, std::make_unsigned_t<Result> DefaultMask>
@@ -944,7 +952,7 @@ private:
 		using ptr = std::unique_ptr<creator>;
 
 		virtual ~creator() { }
-		virtual void validity_check(validity_checker &valid) const = 0;
+		virtual bool validity_check(validity_checker &valid) const = 0;
 		virtual func_t create() = 0;
 	};
 
@@ -954,7 +962,7 @@ private:
 	public:
 		creator_impl(T &&builder) : m_builder(std::move(builder)) { }
 
-		virtual void validity_check(validity_checker &valid) const override { m_builder.validity_check(valid); }
+		virtual bool validity_check(validity_checker &valid) const override { return m_builder.validity_check(valid); }
 
 		virtual func_t create() override
 		{
@@ -968,7 +976,7 @@ private:
 	class nop_creator : public creator
 	{
 	public:
-		virtual void validity_check(validity_checker &valid) const override { }
+		virtual bool validity_check(validity_checker &valid) const override { return true; }
 		virtual func_t create() override { return [] (offs_t offset, Input data, std::make_unsigned_t<Input> mem_mask) { }; }
 	};
 
@@ -1067,7 +1075,7 @@ private:
 					});
 		}
 
-		void validity_check(validity_checker &valid) const { m_src.validity_check(valid); }
+		bool validity_check(validity_checker &valid) const { return m_src.validity_check(valid); }
 
 	private:
 		transform_builder(transform_builder const &) = delete;
@@ -1124,7 +1132,7 @@ private:
 		}
 		~first_transform_builder() { this->template register_creator<first_transform_builder>(); }
 
-		void validity_check(validity_checker &valid) const { m_sink.validity_check(valid); }
+		bool validity_check(validity_checker &valid) const { return m_sink.validity_check(valid); }
 
 		template <typename T>
 		std::enable_if_t<is_transform<output_t, output_t, T>::value, transform_builder<first_transform_builder, std::remove_reference_t<T> > > transform(T &&cb)
@@ -1191,7 +1199,7 @@ private:
 			wrapped_builder(functoid_builder &&that) : builder_base(std::move(that)), m_cb(std::move(that.m_cb)) { that.consume(); that.built(); }
 			wrapped_builder(wrapped_builder &&that) : builder_base(std::move(that)), m_cb(std::move(that.m_cb)) { that.consume(); that.built(); }
 
-			void validity_check(validity_checker &valid) const { }
+			bool validity_check(validity_checker &valid) const { return true; }
 
 			auto build()
 			{
@@ -1241,7 +1249,7 @@ private:
 			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
 
-		void validity_check(validity_checker &valid) const { }
+		bool validity_check(validity_checker &valid) const { return true; }
 
 		auto build()
 		{
@@ -1279,11 +1287,15 @@ private:
 				that.built();
 			}
 
-			void validity_check(validity_checker &valid) const
+			bool validity_check(validity_checker &valid) const
 			{
 				auto const target(m_delegate.finder_target());
 				if (target.second && !target.first.subdevice(target.second))
+				{
 					osd_printf_error("Write callback bound to non-existent object tag %s (%s)\n", target.first.subtag(target.second), m_delegate.name());
+					return false;
+				}
+				return true;
 			}
 
 			auto build()
@@ -1345,11 +1357,15 @@ private:
 			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), in_mask, out_mask);
 		}
 
-		void validity_check(validity_checker &valid) const
+		bool validity_check(validity_checker &valid) const
 		{
 			auto const target(m_delegate.finder_target());
 			if (target.second && !target.first.subdevice(target.second))
+			{
 				osd_printf_error("Write callback bound to non-existent object tag %s (%s)\n", target.first.subtag(target.second), m_delegate.name());
+				return false;
+			}
+			return true;
 		}
 
 		auto build()
@@ -1394,16 +1410,23 @@ private:
 				that.built();
 			}
 
-			void validity_check(validity_checker &valid) const
+			bool validity_check(validity_checker &valid) const
 			{
 				if (!m_exec)
 				{
 					device_t *const device(m_devbase.subdevice(m_tag));
 					if (!device)
+					{
 						osd_printf_error("Write callback bound to non-existent object tag %s\n", m_tag);
+						return false;
+					}
 					else if (!dynamic_cast<device_execute_interface *>(device))
+					{
 						osd_printf_error("Write callback bound to device %s (%s) that does not implement device_execute_interface\n", device->tag(), device->name());
+						return false;
+					}
 				}
+				return true;
 			}
 
 			auto build()
@@ -1485,16 +1508,23 @@ private:
 			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), in_mask, 1U);
 		}
 
-		void validity_check(validity_checker &valid) const
+		bool validity_check(validity_checker &valid) const
 		{
 			if (!m_exec)
 			{
 				device_t *const device(m_devbase.subdevice(m_tag));
 				if (!device)
+				{
 					osd_printf_error("Write callback bound to non-existent object tag %s\n", m_tag);
+					return false;
+				}
 				else if (!dynamic_cast<device_execute_interface *>(device))
+				{
 					osd_printf_error("Write callback bound to device %s (%s) that does not implement device_execute_interface\n", device->tag(), device->name());
+					return false;
+				}
 			}
+			return true;
 		}
 
 		auto build()
@@ -1549,16 +1579,23 @@ private:
 				that.built();
 			}
 
-			void validity_check(validity_checker &valid) const
+			bool validity_check(validity_checker &valid) const
 			{
 				if (!m_exec)
 				{
 					device_t *const device(m_devbase.subdevice(m_tag));
 					if (!device)
+					{
 						osd_printf_error("Write callback bound to non-existent object tag %s\n", m_tag);
+						return false;
+					}
 					else if (!dynamic_cast<device_execute_interface *>(device))
+					{
 						osd_printf_error("Write callback bound to device %s (%s) that does not implement device_execute_interface\n", device->tag(), device->name());
+						return false;
+					}
 				}
+				return true;
 			}
 
 			auto build()
@@ -1644,16 +1681,23 @@ private:
 			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
 
-		void validity_check(validity_checker &valid) const
+		bool validity_check(validity_checker &valid) const
 		{
 			if (!m_exec)
 			{
 				device_t *const device(m_devbase.subdevice(m_tag));
 				if (!device)
+				{
 					osd_printf_error("Write callback bound to non-existent object tag %s\n", m_tag);
+					return false;
+				}
 				else if (!dynamic_cast<device_execute_interface *>(device))
+				{
 					osd_printf_error("Write callback bound to device %s (%s) that does not implement device_execute_interface\n", device->tag(), device->name());
+					return false;
+				}
 			}
+			return true;
 		}
 
 		auto build()
@@ -1702,7 +1746,7 @@ private:
 				that.built();
 			}
 
-			void validity_check(validity_checker &valid) const { }
+			bool validity_check(validity_checker &valid) const { return true; }
 
 			auto build()
 			{
@@ -1760,7 +1804,7 @@ private:
 			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
 
-		void validity_check(validity_checker &valid) const { }
+		bool validity_check(validity_checker &valid) const { return true; }
 
 		auto build()
 		{
@@ -1802,7 +1846,7 @@ private:
 				that.built();
 			}
 
-			void validity_check(validity_checker &valid) const { }
+			bool validity_check(validity_checker &valid) const { return true; }
 
 			auto build()
 			{
@@ -1860,7 +1904,7 @@ private:
 			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
 
-		void validity_check(validity_checker &valid) const { }
+		bool validity_check(validity_checker &valid) const { return true; }
 
 		auto build()
 		{
@@ -1902,7 +1946,7 @@ private:
 				that.built();
 			}
 
-			void validity_check(validity_checker &valid) const { }
+			bool validity_check(validity_checker &valid) const { return true; }
 
 			auto build()
 			{
@@ -1957,7 +2001,7 @@ private:
 			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
 
-		void validity_check(validity_checker &valid) const { }
+		bool validity_check(validity_checker &valid) const { return true; }
 
 		auto build()
 		{
@@ -1996,7 +2040,7 @@ private:
 				that.built();
 			}
 
-			void validity_check(validity_checker &valid) const { }
+			bool validity_check(validity_checker &valid) const { return true; }
 
 			auto build()
 			{
@@ -2051,7 +2095,7 @@ private:
 			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
 
-		void validity_check(validity_checker &valid) const { }
+		bool validity_check(validity_checker &valid) const { return true; }
 
 		auto build()
 		{
@@ -2300,18 +2344,20 @@ private:
 
 	std::vector<func_t> m_functions;
 	std::vector<typename creator::ptr> m_creators;
+	bool m_unset = false;
+
+protected:
+	virtual bool findit(validity_checker *valid) override;
+	virtual void end_configuration() override;
 
 public:
 	template <unsigned Count>
 	class array : public devcb_write_base::array<devcb_write<Input, DefaultMask>, Count>
 	{
 	public:
-		using devcb_write_base::array<devcb_write<Input, DefaultMask>, Count>::array;
-
-		void resolve_all_safe()
+		array(device_t &owner)
+			: devcb_write_base::array<devcb_write<Input, DefaultMask>, Count>::array(owner)
 		{
-			for (devcb_write<Input, DefaultMask> &elem : *this)
-				elem.resolve_safe();
 		}
 	};
 
@@ -2320,16 +2366,10 @@ public:
 	binder bind();
 	void reset();
 
-	virtual void validity_check(validity_checker &valid) const override;
-
-	void resolve();
-	void resolve_safe();
-
 	void operator()(offs_t offset, Input data, std::make_unsigned_t<Input> mem_mask = DefaultMask);
 	void operator()(Input data);
 
-	bool isnull() const { return m_functions.empty() && m_creators.empty(); }
-	explicit operator bool() const { return !m_functions.empty(); }
+	bool isunset() const noexcept { return m_unset || (m_functions.empty() && m_creators.empty()); }
 };
 
 template <typename Input, std::make_unsigned_t<Input> DefaultMask>
@@ -2341,6 +2381,7 @@ devcb_write<Input, DefaultMask>::devcb_write(device_t &owner)
 template <typename Input, std::make_unsigned_t<Input> DefaultMask>
 typename devcb_write<Input, DefaultMask>::binder devcb_write<Input, DefaultMask>::bind()
 {
+	assert(m_functions.empty());
 	return binder(*this);
 }
 
@@ -2352,29 +2393,38 @@ void devcb_write<Input, DefaultMask>::reset()
 }
 
 template <typename Input, std::make_unsigned_t<Input> DefaultMask>
-void devcb_write<Input, DefaultMask>::validity_check(validity_checker &valid) const
+bool devcb_write<Input, DefaultMask>::findit(validity_checker *valid)
 {
 	assert(m_functions.empty());
-	for (typename creator::ptr const &c : m_creators)
-		c->validity_check(valid);
+	if (!valid)
+	{
+		// FIXME: report errors by returning false rather than throwing fatal errors
+		m_functions.reserve(m_creators.size());
+		for (typename creator::ptr const &c : m_creators)
+			m_functions.emplace_back(c->create());
+		m_creators.clear();
+		if (m_functions.empty())
+		{
+			m_functions.emplace_back([] (offs_t offset, Input data, std::make_unsigned_t<Input> mem_mask) { });
+			m_unset = true;
+		}
+		return true;
+	}
+	else
+	{
+		bool success(true);
+		for (typename creator::ptr const &c : m_creators)
+		{
+			if (!c->validity_check(*valid))
+				success = false;
+		}
+		return success;
+	}
 }
 
 template <typename Input, std::make_unsigned_t<Input> DefaultMask>
-void devcb_write<Input, DefaultMask>::resolve()
+void devcb_write<Input, DefaultMask>::end_configuration()
 {
-	assert(m_functions.empty());
-	m_functions.reserve(m_creators.size());
-	for (typename creator::ptr const &c : m_creators)
-		m_functions.emplace_back(c->create());
-	m_creators.clear();
-}
-
-template <typename Input, std::make_unsigned_t<Input> DefaultMask>
-void devcb_write<Input, DefaultMask>::resolve_safe()
-{
-	resolve();
-	if (m_functions.empty())
-		m_functions.emplace_back([] (offs_t offset, Input data, std::make_unsigned_t<Input> mem_mask) { });
 }
 
 template <typename Input, std::make_unsigned_t<Input> DefaultMask>

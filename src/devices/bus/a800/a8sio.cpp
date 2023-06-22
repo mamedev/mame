@@ -41,7 +41,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A8SIO, a8sio_device, "a8sio", "Atari 8 bit SIO Slot")
+DEFINE_DEVICE_TYPE(A8SIO, a8sio_device, "a8sio", "Atari 8-bit SIO Slot")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -74,13 +74,6 @@ void a8sio_device::device_resolve_objects()
 	m_device = get_card_device();
 	if (m_device)
 		m_device->set_a8sio_device(this);
-
-	// resolve callbacks
-	m_out_clock_in_cb.resolve_safe();
-	m_out_data_in_cb.resolve_safe();
-	m_out_proceed_cb.resolve_safe();
-	m_out_audio_in_cb.resolve_safe();
-	m_out_interrupt_cb.resolve_safe();
 }
 
 //-------------------------------------------------

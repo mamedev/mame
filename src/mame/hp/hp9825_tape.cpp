@@ -122,11 +122,6 @@ void hp9825_tape_device::device_add_mconfig(machine_config &config)
 void hp9825_tape_device::device_start()
 {
 	LOG_DBG("start\n");
-	m_flg_handler.resolve_safe();
-	m_sts_handler.resolve_safe();
-	m_dmar_handler.resolve_safe();
-	m_led_handler.resolve_safe();
-	m_cart_in_handler.resolve_safe();
 
 	save_item(NAME(m_cmd_reg));
 	save_item(NAME(m_stat_reg));

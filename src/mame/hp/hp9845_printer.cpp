@@ -145,10 +145,6 @@ void hp9845_printer_device::device_add_mconfig(machine_config &config)
 
 void hp9845_printer_device::device_start()
 {
-	m_irl_handler.resolve_safe();
-	m_flg_handler.resolve_safe();
-	m_sts_handler.resolve_safe();
-
 	save_item(NAME(m_display_mode));
 	save_item(NAME(m_shifted));
 	save_item(NAME(m_current_u_l));

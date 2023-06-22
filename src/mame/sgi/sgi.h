@@ -37,8 +37,7 @@ public:
 	uint32_t get_mem_config(int channel) const { return m_mem_config[channel]; }
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

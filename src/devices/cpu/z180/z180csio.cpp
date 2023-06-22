@@ -54,10 +54,6 @@ z180csio_device::z180csio_device(const machine_config &mconfig, const char *tag,
 
 void z180csio_device::device_resolve_objects()
 {
-	// resolve callbacks
-	m_cks_cb.resolve_safe();
-	m_txs_cb.resolve_safe();
-
 	// set default input line state
 	m_cks_in = 1;
 	m_rxs_in = 1;

@@ -30,9 +30,9 @@ option_slot_device::option_slot_device(const machine_config &mconfig, const char
 	device_single_card_slot_interface<device_option_expansion_interface>(mconfig, *this),
 	m_bus(*this, finder_base::DUMMY_TAG),
 	m_dmas_w_cb(*this),
-	m_dmas_r_cb(*this),
+	m_dmas_r_cb(*this, 0xff),
 	m_dmaf_w_cb(*this),
-	m_dmaf_r_cb(*this),
+	m_dmaf_r_cb(*this, 0),
 	m_eopf_cb(*this),
 	m_eops_cb(*this),
 	m_slot(-1)
@@ -44,14 +44,6 @@ option_slot_device::option_slot_device(const machine_config &mconfig, const char
 //-------------------------------------------------
 void option_slot_device::device_start()
 {
-	m_dmas_w_cb.resolve_safe();
-	m_dmas_r_cb.resolve_safe(0xff);
-	m_dmaf_w_cb.resolve();
-	m_dmaf_r_cb.resolve();
-
-	m_eopf_cb.resolve_safe();
-	m_eops_cb.resolve_safe();
-
 	device_option_expansion_interface *const intf(get_card_device());
 	if (intf) {
 		intf->set_option_bus(*m_bus, m_slot);
@@ -108,13 +100,6 @@ void option_bus_device::add_slot(option_slot_device &slot)
 //-------------------------------------------------
 void option_bus_device::device_start()
 {
-	m_inth1_cb.resolve_safe();
-	m_inth2_cb.resolve_safe();
-	m_intl_cb.resolve_all_safe();
-	m_drqf_cb.resolve_safe();
-	m_drqs_cb.resolve_all_safe();
-	m_rdyf_cb.resolve_safe();
-	m_rdys_cb.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -132,9 +117,7 @@ void option_bus_device::device_reset()
 void option_bus_device::dackf_w(uint8_t data)
 {
 	for (int i = 0; i < m_slot_list.size(); ++i) {
-		if (!m_slot_list[i]->m_dmaf_w_cb.isnull()) {
-			m_slot_list[i]->m_dmaf_w_cb(data);
-		}
+		m_slot_list[i]->m_dmaf_w_cb(data);
 	}
 }
 
@@ -143,7 +126,7 @@ uint8_t option_bus_device::dackf_r()
 	uint8_t value = 0;
 	bool found = false;
 	for (int i = 0; i < m_slot_list.size(); ++i) {
-		if (!m_slot_list[i]->m_dmaf_r_cb.isnull()) {
+		if (!m_slot_list[i]->m_dmaf_r_cb.isunset()) {
 			found = true;
 			value |= m_slot_list[i]->m_dmaf_r_cb();
 		}

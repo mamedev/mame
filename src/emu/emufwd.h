@@ -93,6 +93,7 @@ class devcb_base;
 template <typename Input, std::make_unsigned_t<Input> DefaultMask> class devcb_write;
 
 // declared in devfind.h
+class device_resolver_base;
 class finder_base;
 template <class DeviceClass, bool Required> class device_finder;
 

@@ -56,10 +56,6 @@ pcf8573_device::pcf8573_device(const machine_config &mconfig, const char *tag, d
 
 void pcf8573_device::device_start()
 {
-	m_comp_cb.resolve_safe();
-	m_min_cb.resolve_safe();
-	m_sec_cb.resolve_safe();
-
 	// allocate timers
 	m_clock_timer = timer_alloc(FUNC(pcf8573_device::clock_tick), this);
 	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));

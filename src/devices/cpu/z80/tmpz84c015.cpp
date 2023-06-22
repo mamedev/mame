@@ -61,11 +61,11 @@ tmpz84c015_device::tmpz84c015_device(const machine_config &mconfig, device_type 
 
 	m_zc_cb(*this),
 
-	m_in_pa_cb(*this),
+	m_in_pa_cb(*this, 0),
 	m_out_pa_cb(*this),
 	m_out_ardy_cb(*this),
 
-	m_in_pb_cb(*this),
+	m_in_pb_cb(*this, 0),
 	m_out_pb_cb(*this),
 	m_out_brdy_cb(*this),
 
@@ -88,36 +88,6 @@ device_memory_interface::space_config_vector tmpz84c015_device::memory_space_con
 void tmpz84c015_device::device_start()
 {
 	z80_device::device_start();
-
-	// resolve callbacks
-	m_out_txda_cb.resolve_safe();
-	m_out_dtra_cb.resolve_safe();
-	m_out_rtsa_cb.resolve_safe();
-	m_out_wrdya_cb.resolve_safe();
-	m_out_synca_cb.resolve_safe();
-
-	m_out_txdb_cb.resolve_safe();
-	m_out_dtrb_cb.resolve_safe();
-	m_out_rtsb_cb.resolve_safe();
-	m_out_wrdyb_cb.resolve_safe();
-	m_out_syncb_cb.resolve_safe();
-
-	m_out_rxdrqa_cb.resolve_safe();
-	m_out_txdrqa_cb.resolve_safe();
-	m_out_rxdrqb_cb.resolve_safe();
-	m_out_txdrqb_cb.resolve_safe();
-
-	m_zc_cb.resolve_all_safe();
-
-	m_in_pa_cb.resolve_safe(0);
-	m_out_pa_cb.resolve_safe();
-	m_out_ardy_cb.resolve_safe();
-
-	m_in_pb_cb.resolve_safe(0);
-	m_out_pb_cb.resolve_safe();
-	m_out_brdy_cb.resolve_safe();
-
-	m_wdtout_cb.resolve();
 
 	// setup watchdog timer
 	m_watchdog_timer = timer_alloc(FUNC(tmpz84c015_device::watchdog_timeout), this);
@@ -238,8 +208,7 @@ void tmpz84c015_device::wdtcr_w(uint8_t data)
 
 void tmpz84c015_device::watchdog_clear()
 {
-	if (!m_wdtout_cb.isnull())
-		m_wdtout_cb(CLEAR_LINE);
+	m_wdtout_cb(CLEAR_LINE);
 
 	if (BIT(m_wdtmr, 7))
 		m_watchdog_timer->adjust(cycles_to_attotime(0x10000 << (BIT(m_wdtmr, 5, 2) * 2)));
@@ -247,10 +216,8 @@ void tmpz84c015_device::watchdog_clear()
 
 TIMER_CALLBACK_MEMBER(tmpz84c015_device::watchdog_timeout)
 {
-	if (!m_wdtout_cb.isnull())
-		m_wdtout_cb(ASSERT_LINE);
-	else
-		logerror("Watchdog timeout\n");
+	logerror("Watchdog timeout\n");
+	m_wdtout_cb(ASSERT_LINE);
 }
 
 

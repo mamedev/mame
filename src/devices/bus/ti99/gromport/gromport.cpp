@@ -205,8 +205,6 @@ void gromport_device::set_gromlines(line_state mline, line_state moline, line_st
 
 void gromport_device::device_start()
 {
-	m_console_ready.resolve();
-	m_console_reset.resolve();
 
 	save_item(NAME(m_romgq));
 }

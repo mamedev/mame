@@ -192,9 +192,6 @@ dw_keyboard_device::dw_keyboard_device(const machine_config &mconfig, const char
 
 void dw_keyboard_device::device_start()
 {
-	m_out_data.resolve_safe();
-	m_out_clock.resolve_safe();
-	m_out_strobe.resolve_safe();
 }
 
 void dw_keyboard_device::device_reset()

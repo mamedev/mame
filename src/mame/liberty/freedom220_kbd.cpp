@@ -251,9 +251,6 @@ freedom220_kbd_device::freedom220_kbd_device(const machine_config &mconfig, cons
 
 void freedom220_kbd_device::device_start()
 {
-	// resolve callbacks
-	m_tx_handler.resolve_safe();
-
 	// register for save states
 	save_item(NAME(m_select));
 }

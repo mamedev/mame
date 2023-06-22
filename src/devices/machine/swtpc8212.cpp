@@ -368,13 +368,6 @@ void swtpc8212_device::write_rts(int state)
 	m_rs232_conn_rts_handler(state);
 }
 
-void swtpc8212_device::device_resolve_objects()
-{
-	m_rs232_conn_dtr_handler.resolve_safe();
-	m_rs232_conn_rts_handler.resolve_safe();
-	m_rs232_conn_txd_handler.resolve_safe();
-}
-
 void swtpc8212_device::device_start()
 {
 	m_bell_timer = timer_alloc(FUNC(swtpc8212_device::bell_off), this);

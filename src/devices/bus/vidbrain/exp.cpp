@@ -95,9 +95,6 @@ videobrain_expansion_slot_device::videobrain_expansion_slot_device(const machine
 void videobrain_expansion_slot_device::device_start()
 {
 	m_cart = get_card_device();
-
-	// resolve callbacks
-	m_write_extres.resolve_safe();
 }
 
 

@@ -505,7 +505,7 @@ ROM_END
 
 } // anonymous namespace
 
-GAME(1977,  recel,       0,       recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Recel Bios",       MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
+GAME(1977,  recel,       0,       recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Recel BIOS",       MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
 
 GAME(1978,  r_alaska,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Interflip", "Alaska",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1978,  r_hotcold,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Inder",     "Hot & Cold",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

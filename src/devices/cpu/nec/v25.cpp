@@ -57,10 +57,10 @@ v25_common_device::v25_common_device(const machine_config &mconfig, device_type 
 	, m_io_config("io", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 16, 0)
 	, m_internal_ram(*this, "internal_ram")
 	, m_PCK(8)
-	, m_pt_in(*this)
-	, m_p0_in(*this)
-	, m_p1_in(*this)
-	, m_p2_in(*this)
+	, m_pt_in(*this, 0xff)
+	, m_p0_in(*this, 0xff)
+	, m_p1_in(*this, 0xff)
+	, m_p2_in(*this, 0xff)
 	, m_p0_out(*this)
 	, m_p1_out(*this)
 	, m_p2_out(*this)
@@ -632,15 +632,6 @@ void v25_common_device::device_start()
 	}
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
-
-	m_pt_in.resolve_safe(0xff);
-	m_p0_in.resolve_safe(0xff);
-	m_p1_in.resolve_safe(0xff);
-	m_p2_in.resolve_safe(0xff);
-
-	m_p0_out.resolve_safe();
-	m_p1_out.resolve_safe();
-	m_p2_out.resolve_safe();
 
 	state_add( V25_PC,  "PC", m_ip).formatstr("%04X");
 	state_add<uint16_t>( V25_PSW, "PSW", [this]() { return CompressFlags(); }, [this](uint16_t data) { ExpandFlags(data); });

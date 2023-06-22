@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(UPD7001, upd7001_device, "upd7001", "NEC uPD7001 A/D Converte
 
 upd7001_device::upd7001_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, UPD7001, tag, owner, clock)
-	, m_an_callback(*this)
+	, m_an_callback(*this, 0)
 	, m_eoc_callback(*this)
 	, m_res(0.0)
 	, m_cap(0.0)
@@ -57,18 +57,6 @@ upd7001_device::upd7001_device(const machine_config &mconfig, const char *tag, d
 	, m_sr(0)
 	, m_mpx(0)
 {
-}
-
-
-//-------------------------------------------------
-//  device_resolve_objects -
-//-------------------------------------------------
-
-void upd7001_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_an_callback.resolve_all_safe(0);
-	m_eoc_callback.resolve_safe();
 }
 
 

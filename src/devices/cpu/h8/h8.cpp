@@ -18,8 +18,8 @@
 h8_device::h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_BIG, 16, 16, 0, map_delegate),
-	m_read_adc(*this),
-	m_read_port(*this),
+	m_read_adc(*this, 0),
+	m_read_port(*this, 0),
 	m_write_port(*this),
 	m_sci(*this, "sci%u", 0),
 	m_sci_tx(*this),
@@ -54,7 +54,7 @@ const char h8_device::port_names[] = "123456789abcdefg";
 
 u8 h8_device::port_default_r(int port)
 {
-	logerror("read of un-hooked port %c\n", port_names[port]);
+	logerror("read of un-hooked port %c (PC=%X)\n", port_names[port], m_PPC);
 	return 0;
 }
 
@@ -73,12 +73,6 @@ void h8_device::device_start()
 {
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
-
-	m_read_adc.resolve_all();
-	m_read_port.resolve_all();
-	m_write_port.resolve_all();
-	m_sci_tx.resolve_all_safe();
-	m_sci_clk.resolve_all_safe();
 
 	uint32_t pcmask = m_mode_advanced ? 0xffffff : 0xffff;
 	state_add<uint32_t>(H8_PC, "PC",
@@ -415,6 +409,9 @@ void h8_device::state_string_export(const device_state_entry &entry, std::string
 	}
 }
 
+// FIXME: one-state bus cycles are only provided for on-chip ROM & RAM in H8S/2000 and H8S/2600.
+// All other accesses take *at least* two states each, and additional wait states are often programmed for external memory!
+
 uint16_t h8_device::read16i(uint32_t adr)
 {
 	m_icount--;
@@ -492,6 +489,10 @@ void h8_device::set_irq(int irq_vector, int irq_level, bool irq_nmi)
 void h8_device::internal(int cycles)
 {
 	m_icount -= cycles;
+
+	// All internal operations take an even number of states (at least 2 each) on H8/300L and H8/300H
+	if(!m_has_exr)
+		m_icount--;
 }
 
 void h8_device::illegal()

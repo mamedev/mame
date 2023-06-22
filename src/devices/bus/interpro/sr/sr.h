@@ -37,9 +37,6 @@ protected:
 	{
 	}
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
-
 	// internal state
 	required_address_space m_main_space;
 	required_address_space m_io_space;
@@ -87,7 +84,7 @@ public:
 	}
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:
@@ -112,7 +109,7 @@ public:
 	cbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
@@ -199,7 +196,7 @@ public:
 	}
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:
@@ -224,7 +221,7 @@ public:
 	srx_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
