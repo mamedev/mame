@@ -2550,19 +2550,19 @@ void spectar_state::init_sidetrac()
 
 void targ_state::init_targ()
 {
-	// hard-coded palette controlled via 8x3 DIP switches on the board
-	m_color_latch[2] = 0x5c;
-	m_color_latch[1] = 0xee;
-	m_color_latch[0] = 0x6b;
+	// hard-coded palette controlled via 8x3 jumpers on the color adapter board
+	m_color_latch[2] = 0x54; // Red
+	m_color_latch[1] = 0xee; // Green
+	m_color_latch[0] = 0x6b; // Blue
 }
 
 
 void spectar_state::init_spectar()
 {
-	// hard-coded palette controlled via 8x3 DIP switches on the board
-	m_color_latch[2] = 0x58;
-	m_color_latch[1] = 0xee;
-	m_color_latch[0] = 0x09;
+	// hard-coded palette controlled via 8x3 jumpers on the color adapter board
+	m_color_latch[2] = 0xda; // Red
+	m_color_latch[1] = 0xee; // Green
+	m_color_latch[0] = 0x61; // Blue
 }
 
 } // anonymous namespace
