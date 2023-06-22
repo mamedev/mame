@@ -41000,6 +41000,9 @@ c2color
 can09t                          //
 can09                           //
 
+@source:skeleton/caramball.cpp
+caramball                       // (c) 1992 Inconel SL
+
 @source:skeleton/cardinal.cpp
 cardinal                        // (c) 1984 Standard Microsystems Corp.
 
