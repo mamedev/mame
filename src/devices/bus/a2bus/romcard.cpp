@@ -12,6 +12,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "a2bus.h"
 #include "romcard.h"
 #include <errno.h>

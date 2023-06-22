@@ -14,6 +14,7 @@ TODO:
 
 **************************************************************************************************/
 
+#include "emu.h"
 #include "a5200_supercart.h"
 
 DEFINE_DEVICE_TYPE(A5200_ROM_SUPERCART, a5200_rom_supercart_device, "a5200_supercart", "Atari 5200 Super Cart")

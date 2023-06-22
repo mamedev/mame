@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli, Angelo Salese
 
+#include "emu.h"
 #include "a800_carts.h"
 
 // (#num) denotes the canonical number from .car specs for unemulated/undumped variants
