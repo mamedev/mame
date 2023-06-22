@@ -94,7 +94,7 @@ ROM_START(caramball)
 	ROM_LOAD("crmbal_4.0.i7", 0x0000, 0x8000, CRC(6ff5eca9) SHA1(8a926509c6143aced4d2d3a024965d8e33ef1074))
 
 	ROM_REGION(0x800, "nvram", 0)
-	ROM_LOAD( "mk48z02b-20.i8", 0x000, 0x800, CRC(8125cb9d) SHA1(ac76f81edb092e8f16fae577a0702a1ec4ab4503) )
+	ROM_LOAD("mk48z02b-20.i8", 0x000, 0x800, CRC(8125cb9d) SHA1(ac76f81edb092e8f16fae577a0702a1ec4ab4503))
 
 	ROM_REGION(0x117, "plds", 0)
 	ROM_LOAD("palce16v8h.i9", 0x000, 0x117, NO_DUMP) // Protected and registered
@@ -102,5 +102,5 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME       PARENT  MACHINE    INPUT      CLASS            INIT        ROT   COMPANY    FULLNAME     FLAGS
-GAME( 1992, caramball, 0,      caramball, caramball, caramball_state, empty_init, ROT0, "Inconel", "Caramball", MACHINE_IS_SKELETON_MECHANICAL )
+//   YEAR  NAME       PARENT  MACHINE    INPUT      CLASS            INIT        ROT   COMPANY    FULLNAME     FLAGS
+GAME(1992, caramball, 0,      caramball, caramball, caramball_state, empty_init, ROT0, "Inconel", "Caramball", MACHINE_IS_SKELETON_MECHANICAL)
