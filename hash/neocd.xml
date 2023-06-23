@@ -473,9 +473,9 @@ license:CC0-1.0
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ダブルドラゴン" />
 		<info name="serial" value="NGCD-082" />
-		<info name="cd_matrix" value="NGCD-082 MT B06 (JPN)"/>
 		<info name="release" value="19950602 (JPN)" />
 		<part name="cdrom" interface="neocd_cdrom">
+			<feature name="cd_matrix" value="NGCD-082 MT B06 (JPN)"/>
 			<diskarea name="cdrom">
 				<disk name="double dragon (1995)(snk)(jp)[ngcd-082 mt b06]" sha1="64bf06de31105900dacbdd927ef635f71d264725"/>
 			</diskarea>
