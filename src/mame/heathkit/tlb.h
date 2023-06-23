@@ -84,22 +84,22 @@ private:
 	required_device<mc6845_device>  m_crtc;
 	required_device<ins8250_device> m_ace;
 	required_device<beep_device>    m_beep;
-	required_shared_ptr<u8>         m_p_videoram;
-	required_region_ptr<u8>         m_p_chargen;
+	required_shared_ptr<uint8_t>    m_p_videoram;
+	required_region_ptr<uint8_t>    m_p_chargen;
 	required_device<mm5740_device>  m_mm5740;
 	required_memory_region          m_kbdrom;
 	required_ioport                 m_kbspecial;
 	required_device<clock_device>   m_repeat_clock;
 
-	u8    m_transchar;
-	bool  m_strobe;
-	bool  m_key_click_active;
-	bool  m_bell_active;
-	bool  m_reset_pending;
-	bool  m_right_shift;
-	bool  m_reset_key;
-	bool  m_keyboard_irq_raised;
-	bool  m_serial_irq_raised;
+	uint8_t  m_transchar;
+	bool     m_strobe;
+	bool     m_key_click_active;
+	bool     m_bell_active;
+	bool     m_reset_pending;
+	bool     m_right_shift;
+	bool     m_reset_key;
+	bool     m_keyboard_irq_raised;
+	bool     m_serial_irq_raised;
 };
 
 class heath_super19_tlb_device : public heath_tlb_device

@@ -88,7 +88,7 @@ class mm5740_device : public device_t
 {
 public:
 	// construction/destruction
-	mm5740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mm5740_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// public interface
 	u16 b_r();
@@ -105,7 +105,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 

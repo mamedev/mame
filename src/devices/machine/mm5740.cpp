@@ -43,7 +43,7 @@ const tiny_rom_entry *mm5740_device::device_rom_region() const
 //  mm5740_device - constructor
 //-------------------------------------------------
 
-mm5740_device::mm5740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mm5740_device::mm5740_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, MM5740, tag, owner, clock),
 	m_read_x(*this, 0x3ff),
 	m_read_shift(*this, 0),
@@ -88,16 +88,6 @@ void mm5740_device::device_start()
 }
 
 //-------------------------------------------------
-//  device_start - device-specific reset
-//-------------------------------------------------
-
-void mm5740_device::device_reset()
-{
-	m_repeat = 0;
-	m_trigger_repeat = false;
-}
-
-//-------------------------------------------------
 //  perform_scan - scan the keyboard matrix
 //-------------------------------------------------
 
@@ -108,6 +98,17 @@ TIMER_CALLBACK_MEMBER(mm5740_device::perform_scan)
 	for (int x = 0; x < 9; x++)
 	{
 		u16 data = m_read_x[x]() ^ 0x3ff;
+
+		if (data)
+		{
+			ako = true;
+		}
+
+		if ((data ^ m_x_mask[x]) == 0)
+		{
+			// bail early if nothing has changed.
+			continue;
+		}
 
 		for (int y = 0; y < 10; y++)
 		{
@@ -125,8 +126,6 @@ TIMER_CALLBACK_MEMBER(mm5740_device::perform_scan)
 
 				u16 b = (((common & 0x10) << 4) | ((uniq & 0x0f) << 4) | (common & 0x0f)) ^ 0x1ff;
 
-				ako = true;
-
 				// Check for a new keypress
 				if (!BIT(m_x_mask[x], y))
 				{
@@ -139,17 +138,6 @@ TIMER_CALLBACK_MEMBER(mm5740_device::perform_scan)
 						return;
 					}
 				}
-				else
-				{
-					// check for repeat functionality
-					if (m_trigger_repeat)
-					{
-						m_write_data_ready(ASSERT_LINE);
-						m_trigger_repeat = false;
-
-						return;
-					}
-				}
 			}
 			else
 			{
@@ -157,6 +145,12 @@ TIMER_CALLBACK_MEMBER(mm5740_device::perform_scan)
 				m_x_mask[x] &= ~(1 << y);
 			}
 		}
+	}
+
+	if (m_trigger_repeat && (m_b != -1))
+	{
+		m_write_data_ready(ASSERT_LINE);
+		m_trigger_repeat = false;
 	}
 
 	if (!ako)
