@@ -13,6 +13,7 @@ HD63B03XP CPU
 NEC D7759C ADPCM speech synthesizer
 
 Maybe just the sound PCB for something else?
+Listening to the UPD samples it seems to be for some kind of vending machine?
 */
 
 #include "emu.h"
