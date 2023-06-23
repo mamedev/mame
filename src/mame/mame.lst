@@ -35230,7 +35230,6 @@ pwaih4077d                      // Mitac PWA-IH4077D
 px486p3                         // QDI PX486P3 motherboard (486)
 qi900                           // 1990 Apricot Qi 900 (Scorpion Motherboard)
 sis85c471                       // 486 motherboards using the SiS 85C471/85C407 chipset
-sis85c496                       // 486 motherboards using the SiS 85C496/85C497 chipset
 sm48650usc                      // Vintage Sprite SM 486-50USC motherboard (486)
 so025d2                         // SOYO 486 VESA 025D2
 so025k2                         // SOYO 025K2 motherboard (486)
@@ -35409,6 +35408,9 @@ pcipc                           //
 pcinv3                          //
 pcipctx                         //
 pciagp                          //
+
+@source:pc/pcipc_sis.cpp
+sis85c496                       // 486 motherboards using the SiS 85C496/85C497 chipset
 
 @source:pc/pcxt.cpp
 filetto                         // (c) 1990 Novamatic

@@ -17,7 +17,7 @@
 #include "bus/pc_kbd/keyboards.h"
 #include "speaker.h"
 
-DEFINE_DEVICE_TYPE(SIS85C496, sis85c496_host_device, "sis85c496", "SiS 85C496/497 chipset")
+DEFINE_DEVICE_TYPE(SIS85C496_HOST, sis85c496_host_device, "sis85c496", "SiS 85C496/497 chipset")
 
 void sis85c496_host_device::config_map(address_map &map)
 {
@@ -119,7 +119,7 @@ void sis85c496_host_device::device_add_mconfig(machine_config &config)
 
 
 sis85c496_host_device::sis85c496_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_host_device(mconfig, SIS85C496, tag, owner, clock),
+	: pci_host_device(mconfig, SIS85C496_HOST, tag, owner, clock),
 	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_pic8259_master(*this, "pic8259_master"),
 	m_pic8259_slave(*this, "pic8259_slave"),

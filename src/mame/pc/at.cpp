@@ -5286,13 +5286,6 @@ ROM_START( so30h )
 	ROM_LOAD( "30h-b2.bin", 0x00000, 0x20000, CRC(1dd22cef) SHA1(dd0ac15e7a792e8fba2f55d6a1b35256e74bcf4e))
 ROM_END
 
-ROM_START( sis85c496 )
-	ROM_REGION32_LE(0x20000, "bios", 0)
-	// Chipset: SiS 85C496/85C497 - CPU: Socket 3 - RAM: 2xSIMM72, Cache - Keyboard-BIOS: JETkey V5.0
-	// ISA16: 3, PCI: 3 - BIOS: SST29EE010 (128k) AMI 486DX ISA BIOS AA2558003 - screen remains blank
-	ROM_LOAD( "4sim002.bin", 0x00000, 0x20000, CRC(ea898f85) SHA1(7236cd2fc985985f21979e4808cb708be8d0445f))
-ROM_END
-
 
 // ***** 486 motherboards using the SiS 85C471 + 85C407 chipset
 
@@ -6370,7 +6363,6 @@ COMP( 199?, pwaih4077d,ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, px486p3,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "QDI", "PX486P3", MACHINE_NOT_WORKING )
 COMP( 1990, qi900,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot Qi 900 (Scorpion Motherboard)", MACHINE_NOT_WORKING )
 COMP( 199?, sis85c471, ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the SiS 85C471/85C407 chipset", MACHINE_NOT_WORKING )
-COMP( 199?, sis85c496, ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the SiS 85C496/85C497 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, sm48650usc,ibm5170, 0,       at486,     0,     at_state,     init_at,        "Vintage Sprite", "SM 486-50USC", MACHINE_NOT_WORKING )
 COMP( 199?, so025d2,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "SOYO", "025D2", MACHINE_NOT_WORKING )
 COMP( 199?, so025k2,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "SOYO", "025K2", MACHINE_NOT_WORKING )
