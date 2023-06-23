@@ -17,7 +17,7 @@
 #include "bus/pc_kbd/keyboards.h"
 #include "speaker.h"
 
-DEFINE_DEVICE_TYPE(SIS85C496_HOST, sis85c496_host_device, "sis85c496", "SiS 85C496/497 chipset")
+DEFINE_DEVICE_TYPE(SIS85C496_HOST, sis85c496_host_device, "sis85c496_host", "SiS 85C496/497 chipset")
 
 void sis85c496_host_device::config_map(address_map &map)
 {
