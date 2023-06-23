@@ -39,6 +39,12 @@
 
 * MS90C385B is a +3.3V, 150 MHz, 24-Bit LVDS Flat Panel Display Transmitter.
 
+PCB silkscreen says:
+2018.08_08
+CK_RB1808P_V4.1
+
+Labeled with a sticker "单8"
+
 The PCB was found without any USB mass storage on the USB port.  It is unknown if it needs one
 (the serial EEPROM contents refers to files that are not on the MK25V4GL).
 

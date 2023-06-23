@@ -48,8 +48,8 @@ namespace {
 class pkspirit_state : public driver_device
 {
 public:
-	pkspirit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pkspirit_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_bg_videoram(*this, "bg_videoram"),
@@ -68,6 +68,9 @@ private:
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_shared_ptr<uint16_t> m_fg_videoram;
 
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -78,10 +81,6 @@ private:
 
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
-
-	tilemap_t *m_bg_tilemap = nullptr;
-	tilemap_t *m_fg_tilemap = nullptr;
-
 };
 
 void pkspirit_state::bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)

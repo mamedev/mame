@@ -139,26 +139,23 @@
 
 	// calculate the optimal size for everything
 	NSSize const breakDesired = [NSScrollView frameSizeForContentSize:[breakView maximumFrameSize]
-											horizontalScrollerClass:[NSScroller class]
-											verticalScrollerClass:[NSScroller class]
-											borderType:[breakScroll borderType]
-											controlSize: NSControlSizeRegular
-											scrollerStyle: NSScrollerStyleOverlay
-											];
+											  horizontalScrollerClass:[NSScroller class]
+												verticalScrollerClass:[NSScroller class]
+														   borderType:[breakScroll borderType]
+														  controlSize:NSControlSizeRegular
+														scrollerStyle:NSScrollerStyleOverlay];
 	NSSize const watchDesired = [NSScrollView frameSizeForContentSize:[watchView maximumFrameSize]
-											horizontalScrollerClass:[NSScroller class]
-											verticalScrollerClass:[NSScroller class]
-											borderType:[watchScroll borderType]
-											controlSize: NSControlSizeRegular
-											scrollerStyle: NSScrollerStyleOverlay
-											];
+											  horizontalScrollerClass:[NSScroller class]
+												verticalScrollerClass:[NSScroller class]
+														   borderType:[watchScroll borderType]
+														  controlSize:NSControlSizeRegular
+														scrollerStyle:NSScrollerStyleOverlay];
 	NSSize const registerDesired = [NSScrollView frameSizeForContentSize:[registerView maximumFrameSize]
-											horizontalScrollerClass:[NSScroller class]
-											verticalScrollerClass:[NSScroller class]
-											borderType:[registerScroll borderType]
-											controlSize: NSControlSizeRegular
-											scrollerStyle: NSScrollerStyleOverlay
-											];
+												 horizontalScrollerClass:[NSScroller class]
+												   verticalScrollerClass:[NSScroller class]
+															  borderType:[registerScroll borderType]
+															 controlSize:NSControlSizeRegular
+														   scrollerStyle:NSScrollerStyleOverlay];
 	NSSize const desired = NSMakeSize(std::max({ breakDesired.width, watchDesired.width, registerDesired.width }),
 									  std::max({ breakDesired.height, watchDesired.height, registerDesired.height }));
 	[self cascadeWindowWithDesiredSize:desired forView:tabs];

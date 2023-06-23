@@ -7,7 +7,7 @@
 // 0 = no messages
 // 1 = timer setup
 // 2 = everything
-const int V = 1;
+static constexpr int V = 1;
 
 DEFINE_DEVICE_TYPE(H8_TIMER8_CHANNEL,  h8_timer8_channel_device,  "h8_timer8_channel",  "H8 8-bit timer channel")
 DEFINE_DEVICE_TYPE(H8H_TIMER8_CHANNEL, h8h_timer8_channel_device, "h8h_timer8_channel", "H8H 8-bit timer channel")
