@@ -263,7 +263,7 @@ TIMER_CALLBACK_MEMBER(pda600_copro_device::update_timer)
 		m_tone_cb(m_buf[0]);
 		m_update_timer->adjust(attotime::from_msec(m_buf[1] * 10));
 		m_buf_size -= 2;
-		std::memmove(m_buf.begin(), m_buf.begin() + 2, m_buf_size);
+		std::memmove(&m_buf[0], &m_buf[2], m_buf_size);
 	}
 	else
 	{
@@ -445,7 +445,7 @@ void pda600_copro_device::exec_beep()
 	m_resp_type = m_resp_data = 0;  // Empty response
 	m_state = STATE_PLAY_TONE;
 	m_buf_size -= 4;
-	std::memmove(m_buf.begin(), m_buf.begin() + 3, m_buf_size);
+	std::memmove(&m_buf[0], &m_buf[3], m_buf_size);
 	m_update_timer->adjust(attotime::zero);
 }
 
