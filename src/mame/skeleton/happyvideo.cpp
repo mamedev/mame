@@ -2,7 +2,10 @@
 // copyright-holders:
 /***********************************************************************************************
 
- Skeleton driver for "Happy Video" kiddie ride coinop machine (unknown Chinese manufacturer).
+ Skeleton driver for "Happy Video" coin operated "yaoyaoche" machine (摇摇车, kiddie ride,
+ literally "rocking car") with video screen.  Machine has a builder's plate with the text
+ "LEYAOYAO HAPPY KIDS" and a logo depicting two birds in flight surrounded by a crescent moon,
+ in silhouette.  Seems to be unrelated to Guangzhou Leyaoyao Information Technology.
 
    ________________________________________________________________________
   |                          _______                                      |
@@ -30,12 +33,13 @@
     NC/GND/RX/TX/12V  GND/VDD/AVIN                               |_|_|_|
 
 
-* The CS8822 is a single-cycle 8051-based MCU with 64K-byte mask ROM and 10K-byte data SRAM for controlling
-  USB 2.0 mass storage devices, flash card reader controller, ATA/ATAPI drive controller and MP3 player decoder.
+* The CS8822 is a single-cycle 8051-based MCU with 64K-byte mask ROM and 10K-byte data SRAM
+  for controlling USB 2.0 mass storage devices, Flash card reader controller, ATA/ATAPI drive
+  controller and MP3 audio decoder.
 
 * MS90C385B is a +3.3V, 150 MHz, 24-Bit LVDS Flat Panel Display Transmitter.
 
-The PCB was found without any USB mass storage on the USB port. It is unknown if it needs one
+The PCB was found without any USB mass storage on the USB port.  It is unknown if it needs one
 (the serial EEPROM contents refers to files that are not on the MK25V4GL).
 
 ***********************************************************************************************/
@@ -94,5 +98,5 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME       PARENT  MACHINE    INPUT      CLASS            INIT        ROT   COMPANY    FULLNAME       FLAGS
-GAME( 20??, hppyvideo, 0,      hppyvideo, hppyvideo, hppyvideo_state, empty_init, ROT0, "unknown", "Happy Video", MACHINE_IS_SKELETON )
+//    YEAR  NAME       PARENT  MACHINE    INPUT      CLASS            INIT        ROT   COMPANY                 FULLNAME       FLAGS
+GAME( 20??, hppyvideo, 0,      hppyvideo, hppyvideo, hppyvideo_state, empty_init, ROT0, "Leyaoyao Happy Kids?", "Happy Video", MACHINE_IS_SKELETON )
