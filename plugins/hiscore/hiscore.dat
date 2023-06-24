@@ -151,6 +151,37 @@ exctsccrb:
 
 ;@s:alpha/equites.cpp
 
+;(bull fighter) (by GeoMan)
+;bullfgtrs:******Bull Fighter (Sega)
+bullfgtr:
+bullfgtrs:
+@:maincpu,program,40700,40,41,00
+@:maincpu,program,40012,6,00,00
+@:maincpu,program,800b0,1c,00,11
+
+
+;(equites) and clones (by GeoMan)
+equites:
+equitess:
+@:maincpu,program,40020,4,0,0
+@:maincpu,program,40a30,a0,00,09
+
+
+;(koukouyakyuh, the) (by GeoMan)
+kouyakyu:
+@:maincpu,program,40a01,70,0,0
+@:maincpu,program,40010,4,0,0
+@:maincpu,program,8070d,1,20,20
+@:maincpu,program,8078d,1,20,20
+@:maincpu,program,8080d,1,2,2
+@:maincpu,program,8088d,1,0,0
+@:maincpu,program,8090d,1,0,0
+@:maincpu,program,8098d,1,0,0
+@:maincpu,program,80a0d,1,0,0
+
+
+;@s:alpha/splendor.cpp
+
 ;*** Splendor Blast II - you must exit game with top score on screen for save to work *** 
 splndrbt2:
 @:maincpu,program,40020,3,01,00
@@ -184,35 +215,6 @@ hvoltage:
 @:maincpu,program,201815,1,0,0
 @:maincpu,program,201895,1,0,0
 @:maincpu,program,201915,1,0,0
-
-
-;(bull fighter) (by GeoMan)
-;bullfgtrs:******Bull Fighter (Sega)
-bullfgtr:
-bullfgtrs:
-@:maincpu,program,40700,40,41,00
-@:maincpu,program,40012,6,00,00
-@:maincpu,program,800b0,1c,00,11
-
-
-;(equites) and clones (by GeoMan)
-equites:
-equitess:
-@:maincpu,program,40020,4,0,0
-@:maincpu,program,40a30,a0,00,09
-
-
-;(koukouyakyuh, the) (by GeoMan)
-kouyakyu:
-@:maincpu,program,40a01,70,0,0
-@:maincpu,program,40010,4,0,0
-@:maincpu,program,8070d,1,20,20
-@:maincpu,program,8078d,1,20,20
-@:maincpu,program,8080d,1,2,2
-@:maincpu,program,8088d,1,0,0
-@:maincpu,program,8090d,1,0,0
-@:maincpu,program,8098d,1,0,0
-@:maincpu,program,80a0d,1,0,0
 
 
 ;@s:amiga/upscope.cpp
@@ -1940,8 +1942,8 @@ sectionza:
 ;@s:capcom/mitchell.cpp
 
 ;mstworld:******monsters world
-mstworld2:
 mstworld:
+mstworld2:
 @:maincpu,program,fc01,9e,00,07
 @:maincpu,program,e154,3,00,00
 
@@ -8122,12 +8124,6 @@ sflush:
 @:maincpu,program,53bd,1,00,00
 
 
-;@s:midw8080/m79amb.cpp
-
-m79amb:
-@:maincpu,program,4008,1,00,00
-
-
 ;@s:midw8080/mw8080bw.cpp
 
 ;seawolf:[Special thanks to Cananas for enhancing this entry]
@@ -8865,60 +8861,6 @@ hotblockb:
 @delay=3.5
 
 
-;@s:misc/kyugo.cpp
-
-;(flash gal) (by GeoMan)
-flashgal:
-flashgala:
-flashgalk:
-@:maincpu,program,f690,5e,00,40
-
-
-;99lstwark:******'99: The Last War (Kyugo)
-99lstwar:
-99lstwara:
-99lstwarb:
-99lstwark:
-repulse:
-sonofphx:
-@:maincpu,program,f660,5f,00,ff
-
-
-buzzard:
-gyrodine:
-gyrodinet:
-@:maincpu,program,f300,45,00,0b
-@:maincpu,program,94e2,1,01,01
-@:maincpu,program,94a2,1,01,01
-@:maincpu,program,9462,1,03,03
-@:maincpu,program,9422,1,06,06
-@:maincpu,program,93e2,1,04,04
-@:maincpu,program,93a2,1,00,00
-@:maincpu,program,9362,1,00,00
-@:maincpu,program,9322,1,00,00
-
-
-;(s.r.d. mission) (by GeoMan)
-fx:
-srdmissn:
-@:maincpu,program,e6ef,5f,00,ff
-
-
-;airwolfa:******Airwolf (US)
-airwolf:
-airwolfa:
-skywolf:
-skywolf2:
-skywolf3:
-@:maincpu,program,e71a,5f,00,ff
-
-
-;********(legend)
-legend:
-legendb:
-@:maincpu,program,e70c,5d,00,40
-
-
 ;@s:misc/ladyfrog.cpp
 
 ;*******lady frog
@@ -9258,10 +9200,10 @@ xeviousa:
 ; ** no way around this **
 ; ** highscore table ok though !! ,0)      **
 bosco:
-boscomd:
-boscomdo:
 bosco1:
 bosco1o:
+boscomd:
+boscomdo:
 @:maincpu,program,8bc5,f,17,18
 @:maincpu,program,8be4,10,00,00
 @:maincpu,program,885c,4,00,00
@@ -11338,6 +11280,60 @@ funkybeeb:
 @:maincpu,program,828b,2d,00,0c
 
 
+;@s:orca/kyugo.cpp
+
+;(flash gal) (by GeoMan)
+flashgal:
+flashgala:
+flashgalk:
+@:maincpu,program,f690,5e,00,40
+
+
+;99lstwark:******'99: The Last War (Kyugo)
+99lstwar:
+99lstwara:
+99lstwarb:
+99lstwark:
+repulse:
+sonofphx:
+@:maincpu,program,f660,5f,00,ff
+
+
+buzzard:
+gyrodine:
+gyrodinet:
+@:maincpu,program,f300,45,00,0b
+@:maincpu,program,94e2,1,01,01
+@:maincpu,program,94a2,1,01,01
+@:maincpu,program,9462,1,03,03
+@:maincpu,program,9422,1,06,06
+@:maincpu,program,93e2,1,04,04
+@:maincpu,program,93a2,1,00,00
+@:maincpu,program,9362,1,00,00
+@:maincpu,program,9322,1,00,00
+
+
+;(s.r.d. mission) (by GeoMan)
+fx:
+srdmissn:
+@:maincpu,program,e6ef,5f,00,ff
+
+
+;airwolfa:******Airwolf (US)
+airwolf:
+airwolfa:
+skywolf:
+skywolf2:
+skywolf3:
+@:maincpu,program,e71a,5f,00,ff
+
+
+;********(legend)
+legend:
+legendb:
+@:maincpu,program,e70c,5d,00,40
+
+
 ;@s:orca/marineb.cpp
 
 changes:
@@ -11399,6 +11395,12 @@ springer:
 @:maincpu,program,8b7a,5,00,00
 @:maincpu,program,8b9a,5,00,00
 @:maincpu,program,8bba,5,00,00
+
+
+;@s:orca/sub.cpp
+
+sub:
+@:maincpu,program,b727,5a,24,24
 
 
 ;@s:orca/vastar.cpp
@@ -11856,9 +11858,9 @@ lizwiz:
 ;@s:pacman/pengo.cpp
 
 ;pengob:******pengo (bootleg)
-pengo:
-pengo6:
-pengob:
+pengoja:
+pengojb:
+pengojbl:
 pengojpm:
 pengomc1:
 pengomc2:
@@ -11868,23 +11870,23 @@ penta:
 @:maincpu,program,880c,2,d0,07
 
 
-;pengo4:******Pengo (set 4)
-pengo2:
-pengo2u:
-pengo4:
-pengo5:
-@:maincpu,program,8840,1e,00,4d
-@:maincpu,program,880c,2,00,00
-
-
 jrpacmbl:
 @:maincpu,program,8e88,3,00,00
 @:maincpu,program,876d,6,40,40
 @:maincpu,program,8dce,1,03,03
 
 
+;pengo4:******Pengo (set 4)
+pengo:
+pengoa:
+pengob:
+pengoc:
+@:maincpu,program,8840,1e,00,4d
+@:maincpu,program,880c,2,00,00
+
+
 ;******pengo (set 3 not encrypted)
-pengo3u:
+pengoj:
 @:maincpu,program,8840,1e,d0,4d
 @:maincpu,program,880c,2,d0,07
 
@@ -12194,6 +12196,12 @@ sbomber:
 @:maincpu,program,600c95d,1,01,01
 
 
+;@s:ramtek/m79amb.cpp
+
+m79amb:
+@:maincpu,program,4008,1,00,00
+
+
 ;@s:sanritsu/appoooh.cpp
 
 ;*******Robo Wres 2001 & bootleg
@@ -12337,8 +12345,8 @@ vf:
 ;@s:sega/puckpkmn.cpp
 
 ;*******puckman pockimon
+jingling:
 puckpkmn:
-puckpkmna:
 puckpkmnb:
 @:maincpu,program,ff0020,30,38,36
 
@@ -13813,7 +13821,7 @@ raidenua:
 
 
 raiden:
-raidena:
+raidenj:
 raidenk:
 raidenkb:
 raident:
@@ -14022,6 +14030,25 @@ kungfuta:
 @:maincpu,program,c1d3,2c,00,1f
 
 
+;@s:seta/downtown.cpp
+
+tndrcade:
+tndrcadej:
+@:maincpu,program,e00301,96,00,2e
+
+
+arbalest:
+@:maincpu,program,f018cd,8b,00,14
+
+
+twineagl:
+@:maincpu,program,ffc09c,3b,00,2e
+
+
+metafox:
+@:maincpu,program,f014e6,8c,00,14
+
+
 ;@s:seta/seta.cpp
 
 thunderl:
@@ -14057,11 +14084,6 @@ blandia:
 stg:
 @:maincpu,program,ffda3e,28,42,00
 @:maincpu,program,ffda64,1,31,31
-
-
-tndrcade:
-tndrcadej:
-@:maincpu,program,e00301,96,00,2e
 
 
 ;orbs:******Orbs (10/7/94 prototype?)
@@ -14109,10 +14131,6 @@ neobattl:
 krzybowl:
 @:maincpu,program,800105,63,00,00
 @:maincpu,program,c00080,1,05,05
-
-
-arbalest:
-@:maincpu,program,f018cd,8b,00,14
 
 
 ;(wits (japan))
@@ -14189,17 +14207,9 @@ daioha:
 @:maincpu,program,10748f,1,e8,e8
 
 
-twineagl:
-@:maincpu,program,ffc09c,3b,00,2e
-
-
 ;(blandia (prototype))
 blandiap:
 @:maincpu,program,201056,62,09,17
-
-
-metafox:
-@:maincpu,program,f014e6,8c,00,14
 
 
 ;******pairs love:
@@ -14360,12 +14370,6 @@ spiders:
 spiders2:
 @:maincpu,program,1c13,3,0,0
 @:maincpu,program,1e42,f,0,0
-
-
-;@s:sigma/sub.cpp
-
-sub:
-@:maincpu,program,b727,5a,24,24
 
 
 ;@s:snk/bbusters.cpp
@@ -14712,7 +14716,6 @@ strider2u:
 
 
 ;@s:source not found
-
 
 ddpsdoj:  ; missing
 @:maincpu,program,c7d0808,194f,05,00
@@ -15613,7 +15616,7 @@ fgoala:
 
 ;(fairyland story)
 flstory:
-flstoryj:
+flstoryo:
 @:maincpu,program,e74e,23,00,44
 
 
