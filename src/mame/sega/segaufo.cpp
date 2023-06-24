@@ -617,9 +617,9 @@ static INPUT_PORTS_START( newufo )
 	PORT_DIPSETTING(    0x08, "SETTING 1" )
 	PORT_DIPSETTING(    0x00, "SETTING 2" )
 	// Manual states "5 ~ 8 must be set OFF."
-	PORT_DIPNAME( 0x10, 0x10, "Avoid Prize Sensor Error" )			PORT_DIPLOCATION("SW2:5") // Manual states "Fanfare and CPanel Digit will not work though."
+	PORT_DIPNAME( 0x10, 0x10, "Avoid Prize Sensor Error" )			PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) ) // Manual states "Fanfare and CPanel Digit will not work though."
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )							PORT_DIPLOCATION("SW2:6")
 	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )							PORT_DIPLOCATION("SW2:7")
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )							PORT_DIPLOCATION("SW2:8")
