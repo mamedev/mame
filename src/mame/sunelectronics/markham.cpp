@@ -593,9 +593,10 @@ void markham_state::markham(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SN76496(config, m_sn[0], CPU_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.75);
-
-	SN76496(config, m_sn[1], CPU_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.75);
+	// volume balance based on the OST release of Pettan Pyuu,
+	// "LEGEND OF GAME MUSIC 2 PLATINUM BOX" (SCDC-00473~82)
+	SN76496(config, m_sn[0], CPU_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.2);
+	SN76496(config, m_sn[1], CPU_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void markham_state::strnskil(machine_config &config)
