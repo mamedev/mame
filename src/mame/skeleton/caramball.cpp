@@ -40,6 +40,7 @@ Skeleton driver for electromechanical air hockey hardware from the Spanish compa
 
 #include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 
 #include "speaker.h"
@@ -58,8 +59,45 @@ public:
 	void caramball(machine_config &config);
 
 private:
+	void i8155_pa_w(u8 data);
+	void i8155_pb_w(u8 data);
+	void i8155_pc_w(u8 data);
+	void f000_w(u8 data);
+	void mem_map(address_map &map);
+
 	required_device<i8085a_cpu_device> m_maincpu;
 };
+
+void caramball_state::i8155_pa_w(u8 data)
+{
+	logerror("%s: 8155 Port A <- %02X\n", machine().describe_context(), data);
+}
+
+void caramball_state::i8155_pb_w(u8 data)
+{
+	logerror("%s: 8155 Port B <- %02X\n", machine().describe_context(), data);
+}
+
+void caramball_state::i8155_pc_w(u8 data)
+{
+	logerror("%s: 8155 Port C <- %02X\n", machine().describe_context(), data);
+}
+
+void caramball_state::f000_w(u8 data)
+{
+	logerror("%s: F000 <- %02X\n", machine().describe_context(), data);
+}
+
+void caramball_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8000, 0x87ff).ram().share("nvram");
+	map(0xa000, 0xa0ff).rw("i8155", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+	map(0xa100, 0xa107).rw("i8155", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0xc000, 0xc000).rw("psg", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xd000, 0xd000).w("psg", FUNC(ay8910_device::address_w));
+	map(0xf000, 0xf000).w(FUNC(caramball_state::f000_w));
+}
 
 // 1 x 8-dips bank
 INPUT_PORTS_START(caramball)
@@ -72,18 +110,29 @@ INPUT_PORTS_START(caramball)
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
+
+	PORT_START("UNK")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
 INPUT_PORTS_END
 
 void caramball_state::caramball(machine_config &config)
 {
 	I8085A(config, m_maincpu, 6.144_MHz_XTAL); // OKI M80C85A
+	m_maincpu->set_addrmap(AS_PROGRAM, &caramball_state::mem_map);
 
-	I8155(config, "i8155", 6.144_MHz_XTAL); // NEC D8155HC
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MK48Z02B-20
+
+	i8155_device &i8155(I8155(config, "i8155", 6.144_MHz_XTAL / 2)); // NEC D8155HC
+	i8155.out_pa_callback().set(FUNC(caramball_state::i8155_pa_w));
+	i8155.out_pb_callback().set(FUNC(caramball_state::i8155_pb_w));
+	i8155.out_pc_callback().set(FUNC(caramball_state::i8155_pc_w));
+	i8155.out_to_callback().set_inputline(m_maincpu, I8085_RST65_LINE).invert();
 
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &psg(AY8910(config, "psg", 6_MHz_XTAL / 4)); // Divider unknown
+	ay8910_device &psg(AY8910(config, "psg", 6.144_MHz_XTAL / 4)); // Divider unknown
 	psg.port_a_read_callback().set_ioport("DSW");
+	psg.port_b_read_callback().set_ioport("UNK");
 	psg.add_route(ALL_OUTPUTS, "mono", 1.0); // Guess
 }
 
