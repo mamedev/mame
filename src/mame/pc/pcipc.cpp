@@ -529,8 +529,8 @@ void pcipc_state::winbond_superio_config(device_t *device)
 //  fdc.set_sysopt_pin(1);
 	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
 	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
-	fdc.irq1().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
-	fdc.irq8().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq8n_w));
+	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
+	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
 //  fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
 //  fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
 //  fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
