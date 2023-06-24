@@ -4879,7 +4879,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="zork2r7">
-		<description>Zork II (Revision 7)</description>
+		<description>Zork II (Revision 7 / UG3AU5)</description>
 		<year>1981</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 32K."/>
@@ -5066,7 +5066,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cutthr23">
-		<description>Cutthroats (Release 23)</description>
+		<description>Cutthroats (Release 23 / 840809)</description>
 		<year>1984</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 48K."/>
@@ -5081,7 +5081,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="trinr11">
-		<description>Trinity (Release 11)</description>
+		<description>Trinity (Release 11 / 860509-2B)</description>
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Requires a 128K Apple //e, //c, or IIgs."/>
@@ -5101,7 +5101,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sfall107">
-		<description>Stationfall (Release 107)</description>
+		<description>Stationfall (Release 107 / 870430)</description>
 		<year>1987</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 48K."/>
@@ -9314,7 +9314,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="arthurqe">
-		<description>Arthur: The Quest for Excalibur</description>
+		<description>Arthur: The Quest for Excalibur (Version 17)</description>
 		<year>1989</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Requires a 128K Apple //e or later."/>
@@ -9611,7 +9611,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="shogun">
-		<description>Shogun</description>
+		<description>Shogun (Version 09)</description>
 		<year>1988</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Requires a 128K Apple //e or later."/>
@@ -9651,7 +9651,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="zorkzero">
-		<description>Zork Zero</description>
+		<description>Zork Zero (Version 14)</description>
 		<year>1989</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Requires a 128K Apple //e or later."/>
@@ -13854,7 +13854,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="timenav">
+	<software name="tmnavaw10">
 		<description>Time Navigator Around The World (Version 1.0)</description>
 		<year>1991</year>
 		<publisher>MECC</publisher>
@@ -25924,7 +25924,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="timenav10">
+	<software name="tmnav810">
 		<description>Time Navigator (Version 1.0) (800K 3.5")</description>
 		<year>1989</year>
 		<publisher>MECC</publisher>
@@ -26636,7 +26636,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="zork1r15">
-		<description>Zork I r15-UG3AU5</description>
+		<description>Zork I (Release 15 / UG3AU5)</description>
 		<year>1980</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 32K."/>
@@ -26651,7 +26651,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="zork1r26">
-		<description>Zork I r26-820803</description>
+		<description>Zork I (Release 26 / 820803)</description>
 		<year>1982</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 32K."/>
@@ -26666,7 +26666,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="zork1r75">
-		<description>Zork I r75-830929</description>
+		<description>Zork I (Release 75 / 830929)</description>
 		<year>1983</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 32K."/>
@@ -26681,7 +26681,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="zork1r75a">
-		<description>Zork I r75-830929-A</description>
+		<description>Zork I (Release 75 / 830929-A)</description>
 		<year>1983</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 32K."/>
@@ -26696,7 +26696,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="zork1r88b">
-		<description>Zork I r88-840726-B</description>
+		<description>Zork I (Release 88 / 840726-B)</description>
 		<year>1984</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 32K."/>
@@ -26711,7 +26711,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="zork1r88f">
-		<description>Zork I r88-840726-F</description>
+		<description>Zork I (Release 88 / 840726-F)</description>
 		<year>1984</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Requires a 48K Apple ][+ or later."/>
@@ -26726,7 +26726,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="zork1r88k">
-		<description>Zork I r88-840726-K</description>
+		<description>Zork I (Release 88 / 840726-K)</description>
 		<year>1984</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 48K."/>
@@ -26741,7 +26741,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="zork1r52e">
-		<description>Zork I r52-871125-2-E</description>
+		<description>Zork I (Release 52 / 871125-2-E)</description>
 		<year>1987</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Requires a 128K Apple //e or later."/>
@@ -26756,7 +26756,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="zorkiir22">
-		<description>Zork II r22-830331</description>
+		<description>Zork II (Release 22 / 830331)</description>
 		<year>1983</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 32K."/>
@@ -26771,7 +26771,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="zorkiir48b">
-		<description>Zork II r48-840904-B</description>
+		<description>Zork II (Release 48 / 840904-B)</description>
 		<year>1984</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 32K."/>
@@ -26786,7 +26786,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="zorkiiir10">
-		<description>Zork III r10-820818</description>
+		<description>Zork III (Release 10 / 820818)</description>
 		<year>1982</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 32K."/>
@@ -26801,7 +26801,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="zorkiiir15">
-		<description>Zork III r15-830331</description>
+		<description>Zork III (Release 15 / 830331)</description>
 		<year>1982</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 32K."/>
@@ -26816,7 +26816,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="zorkiiir16a">
-		<description>Zork III r16-830410-A</description>
+		<description>Zork III (Release 16 / 830410-A)</description>
 		<year>1983</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 32K."/>
@@ -26831,7 +26831,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="zorkiiir17b">
-		<description>Zork III r17-840727-B</description>
+		<description>Zork III (Release 17 / 840727-B)</description>
 		<year>1983</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 32K."/>
@@ -26846,7 +26846,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="zorkiiir17k">
-		<description>Zork III r17-840727-K</description>
+		<description>Zork III (Release 17 / 840727-K)</description>
 		<year>1983</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 48K."/>
@@ -26861,7 +26861,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="deadliner18">
-		<description>Deadline r18-820311</description>
+		<description>Deadline (Release 18 / 820311)</description>
 		<year>1982</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 32K."/>
@@ -26876,7 +26876,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="enchantr10">
-		<description>Enchanter r10-830810</description>
+		<description>Enchanter (Release 10 / 830810)</description>
 		<year>1983</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 32K."/>
@@ -26891,7 +26891,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="enchantr29k">
-		<description>Enchanter r29-860820-K</description>
+		<description>Enchanter (Release 29 / 860820-K)</description>
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 48K."/>
@@ -26906,7 +26906,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="lgophr59k">
-		<description>Leather Goddesses of Phobos r59-860730-K</description>
+		<description>Leather Goddesses of Phobos (Release 59 / 860730-K)</description>
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 48K."/>
@@ -26921,7 +26921,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="lgophr42h">
-		<description>Leather Goddesses of Phobos r4-880405-2H</description>
+		<description>Leather Goddesses of Phobos (Release 4 / 880405-2H)</description>
 		<year>1988</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Requires a 128K Apple //e or later."/>
@@ -26943,7 +26943,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="moonmistr4k">
-		<description>Moonmist r4-860918-K</description>
+		<description>Moonmist (Release 4 / 860918-K)</description>
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 48K."/>
@@ -26958,7 +26958,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="plfallr20">
-		<description>Planetfall r20-830708</description>
+		<description>Planetfall (Release 20 / 830708)</description>
 		<year>1983</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 48K."/>
@@ -26973,7 +26973,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="plfallr26">
-		<description>Planetfall r26-831014</description>
+		<description>Planetfall (Release 26 / 831014)</description>
 		<year>1983</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 48K."/>
@@ -26988,7 +26988,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="plfallr37h">
-		<description>Planetfall r37-851003-H</description>
+		<description>Planetfall (Release 37 / 851003-H)</description>
 		<year>1985</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Requires a 48K Apple ][+ or later."/>
@@ -27003,7 +27003,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="seastalkr15b">
-		<description>Seastalker r15-840501-B</description>
+		<description>Seastalker (Release 15 / 840501-B)</description>
 		<year>1984</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 48K."/>
@@ -27018,7 +27018,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="seastalkr16m">
-		<description>Seastalker r16-850515-M</description>
+		<description>Seastalker (Release 16 / 850515-M)</description>
 		<year>1985</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 48K."/>
@@ -27033,7 +27033,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sherlockr212f">
-		<description>Sherlock r21-871214-2F</description>
+		<description>Sherlock (Release 21 / 871214-2F)</description>
 		<year>1987</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Requires a 128K Apple //e or later."/>
@@ -27055,7 +27055,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sorcererr4a">
-		<description>Sorcerer r4-840131-A</description>
+		<description>Sorcerer (Release 4 / 840131-A)</description>
 		<year>1984</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 48K."/>
@@ -27070,7 +27070,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sorcererr6f">
-		<description>Sorcerer r6-840508-F</description>
+		<description>Sorcerer (Release 6 / 840508-F)</description>
 		<year>1984</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Requires a 48K Apple ][+ or later."/>
@@ -27085,7 +27085,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sorcererr18k">
-		<description>Sorcerer r18-860904-K</description>
+		<description>Sorcerer (Release 18-860904-K)</description>
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 48K."/>
@@ -27100,7 +27100,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="spellbr63h">
-		<description>Spellbreaker r63-850916-H</description>
+		<description>Spellbreaker (Release 63 / 850916-H)</description>
 		<year>1985</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Requires a 48K Apple ][+ or later."/>
@@ -27115,7 +27115,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="starcrr15">
-		<description>Starcross r15-820901</description>
+		<description>Starcross (Release 15 / 820901)</description>
 		<year>1982</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 32K."/>
@@ -27130,7 +27130,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="suspendr5">
-		<description>Suspended r5-830222</description>
+		<description>Suspended (Release 5 / 830222)</description>
 		<year>1983</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 32K."/>
@@ -27145,7 +27145,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="witnessr13">
-		<description>Witness r13-830524</description>
+		<description>Witness (Release 13 / 830524)</description>
 		<year>1983</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 32K."/>
@@ -27160,7 +27160,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="witnessr18">
-		<description>Witness r18-830910</description>
+		<description>Witness (Release 18 / 830910)</description>
 		<year>1983</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 32K."/>
@@ -27976,7 +27976,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="lurkhorr203m">
-		<description>The Lurking Horror r203-870506-M</description>
+		<description>The Lurking Horror (Release 203 / 870506-M)</description>
 		<year>1987</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Runs on any Apple II with 48K."/>
@@ -28586,6 +28586,1034 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234805">
 				<rom name="the three rs of microcomputing v1.1.woz" size="234805" crc="f0d6f661" sha1="cc919a1cd7bb44873c9655bd51f9dbbcf0947451" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arithcrit10">
+		<description>Arithmetic Critters (Version 1.0)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Arithmetic Critters" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234809">
+				<rom name="arithmetic critters v1.0.woz" size="234809" crc="ad004a17" sha1="2dbf87feabeccfc6807069171a8b0e29e4196ef6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clockwrks10">
+		<description>Clock Works (Version 1.0)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Clock Works" is a 1986 educational program developed and distributed by MECC.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234801">
+				<rom name="clock works v1.0.woz" size="234801" crc="64e041b5" sha1="309e2bdd0b16b203391c454fdd4fe545ba26a1cd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="countcrit10">
+		<description>Counting Critters (Version 1.0)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Counting Critters" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234776">
+				<rom name="counting critters v1.0.woz" size="234776" crc="83110c9b" sha1="8a9d33e555c289c261a5020fa3e2d747d2151651" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="funatoz10">
+		<description>Fun from A to Z (Version 1.0)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Fun from A to Z" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234774">
+				<rom name="fun from a to z v1.0.woz" size="234774" crc="d57016f2" sha1="a67f38e5902073441677389a85411b15d13171e6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jennyj10">
+		<description>Jenny's Journeys (Version 1.0)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Jenny's Journeys" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234791">
+				<rom name="jenny's journeys v1.0.woz" size="234791" crc="ae68b965" sha1="9fa21d8a2f54cf35dd7aeb4ed3d40d0ffa043b9e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdqpres11">
+		<description>MECC Dataquest: The Presidents (Version 1.1)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"MECC Dataquest: The Presidents" is a 1985 educational program developed and distributed by MECC. This is version 1.1.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side a" />
+			<dataarea name="flop" size="234805">
+				<rom name="mecc dataquest- the presidents v1.1 side a.woz" size="234805" crc="474553d5" sha1="9a6e9b4d2f1a2abc56f2344afb5eeed17194bc26" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side b" />
+			<dataarea name="flop" size="234805">
+				<rom name="mecc dataquest- the presidents v1.1 side b.woz" size="234805" crc="0918cfff" sha1="0648dea58422b86c7a8472e8d8614177825c3a7f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdqpres12">
+		<description>MECC Dataquest: The Presidents (Version 1.2)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"MECC Dataquest: The Presidents" is a 1985 educational program developed and distributed by MECC. This is version 1.2.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side a" />
+			<dataarea name="flop" size="234805">
+				<rom name="mecc dataquest- the presidents v1.2 side a.woz" size="234805" crc="6e3d2c1b" sha1="46e45f560d98fcd300224659608c65c6b463dcaa" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side b" />
+			<dataarea name="flop" size="234805">
+				<rom name="mecc dataquest- the presidents v1.2 side b.woz" size="234805" crc="23bcdad9" sha1="9c4c5bafeb5f3401a278fca30b919b548d15a6e5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mgraph11">
+		<description>MECC Graph (Version 1.1)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"MECC Graph" is a 1985 educational program developed and distributed by MECC. This is version 1.1.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234785">
+				<rom name="mecc graph v1.1.woz" size="234785" crc="0b0b5bd5" sha1="5e5dc9cb4caacd388969c0e60f910af353ccabad" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mgraphp10">
+		<description>MECC Graphing Primer (Version 1.0)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"MECC Graphing Primer" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234795">
+				<rom name="mecc graphing primer v1.0.woz" size="234795" crc="a09867de" sha1="248293b746d709e1ee6377c036590d78082c351b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multpuzz10">
+		<description>Multiplication Puzzles (Version 1.0)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Multiplication Puzzles" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234812">
+				<rom name="multiplication puzzles v1.0.woz" size="234812" crc="a3e348ab" sha1="21e2538ba892f887e414733e88709afafb0ea9b0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="odelllk10">
+		<description>Odell Lake (Version 1.0)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Odell Lake" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234785">
+				<rom name="odell lake v1.0.woz" size="234785" crc="17d9c15b" sha1="37dca60c701ca34e3afd07d796bafbcbf25d2ffc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="odelllk12">
+		<description>Odell Lake (Version 1.2)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Odell Lake" is a 1986 educational program developed and distributed by MECC. This is version 1.2.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234800">
+				<rom name="odell lake v1.2.woz" size="234800" crc="da755acd" sha1="39f21ca32089b8ea5258bcc297df6a72268d1de8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quotqst10">
+		<description>Quotient Quest (Version 1.0)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Quotient Quest" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234773">
+				<rom name="quotient quest v1.0.woz" size="234773" crc="fbae3f5c" sha1="3f20307128fcfd1362ada613557920de54af6281" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcsub10">
+		<description>Space Subtraction (Version 1.0)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Space Subtraction" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234776">
+				<rom name="space subtraction v1.0.woz" size="234776" crc="7d14fcef" sha1="31a2ddfca98b5e36219ea40d194e747c26461227" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="studygui15">
+		<description>Study Guide (Version 1.5)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Study Guide" is a 1984 educational program developed and distributed by MECC. This is version 1.5.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="241442">
+				<rom name="study guide v1.5 disk 1 - program.woz" size="241442" crc="df0ee4ff" sha1="33bded9178a6364841753f6bc32651468bb2e393" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="241442">
+				<rom name="study guide v1.5 disk 2 - data master.woz" size="241442" crc="12ede32a" sha1="78f1f86b7c9d4c2d20047cb3017f05e5f76b35bf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="subpuzz10">
+		<description>Subtraction Puzzles (Version 1.0)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Subtraction Puzzles" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234778">
+				<rom name="subtraction puzzles v1.0.woz" size="234778" crc="1d963eea" sha1="c7f6824c3b021851332b50b16f3d8baa44540642" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="markplac10">
+		<description>The Market Place (Version 1.0)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"The Market Place" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234806">
+				<rom name="the market place v1.0.woz" size="234806" crc="08f7bb5f" sha1="f7c23246934ecf57fc1f941e6e413ddedf0fb508" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oregontr14">
+		<description>The Oregon Trail (Version 1.4)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"The Oregon Trail" is a 1985 educational program developed and distributed by MECC. This is version 1.4.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side a" />
+			<dataarea name="flop" size="234806">
+				<rom name="the oregon trail v1.4 side a.woz" size="234806" crc="8c97c45a" sha1="bba76a312ec2da8a59d8bbd71ea7f06dc04075c1" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side b" />
+			<dataarea name="flop" size="234806">
+				<rom name="the oregon trail v1.4 side b.woz" size="234806" crc="2e324af6" sha1="70e1b9074e12e750e246c9c00241c31ae3eab7ad" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wpappl20">
+		<description>Word Processing on the Apple (Version 2.0)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Word Processing on the Apple" is a 1984 educational program developed and distributed by MECC. This is version 2.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side a" />
+			<dataarea name="flop" size="234803">
+				<rom name="word processing on the apple v2.0 side a - prodos.woz" size="234803" crc="d2f837b0" sha1="59abacf7555ab1cc6797313e01b1290b1114bc60" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side b" />
+			<dataarea name="flop" size="234803">
+				<rom name="word processing on the apple v2.0 side b - dos 3.3.woz" size="234803" crc="81bddcaa" sha1="987dc8e8041bc0e76d2fad40c99a15f251299f9a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arizmix10">
+		<description>Arizona Mix (Version 1.0)</description>
+		<year>1993</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Arizona Mix" is a 1993 educational program developed by Rich Bergeron, Greg S. Johnson, Sheila Kelly, Lon Koenig, John Persoon, and Elizabeth Wendland, and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side a" />
+			<dataarea name="flop" size="234880">
+				<rom name="arizona mix v1.0 side a.woz" size="234880" crc="fe2aeca3" sha1="aeea8ab575747e2995438540e20e665710b135d1" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side b" />
+			<dataarea name="flop" size="234880">
+				<rom name="arizona mix v1.0 side b.woz" size="234880" crc="02901e10" sha1="f3fd29c945af0ec3ba7862a6c2053883e9b28239" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chembaleq10">
+		<description>Chemistry: Balancing Equations (Version 1.0)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Chemistry: Balancing Equations" is a 1990 educational program developed by Beth Bell, Gene Breault, Scott Jensen, and Elizabeth Wendland, and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234852">
+				<rom name="chemistry- balancing equations v1.0.woz" size="234852" crc="435e15cb" sha1="013df30277d6d734d6c5e25ef0c58569fb60fcef" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chempertab10">
+		<description>Chemistry: The Periodic Table (Version 1.0)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Chemistry: The Periodic Table" is a 1988 educational program developed by Gene Breault, Charolyn Kapplinger, Kevin W. Neff, John Persoon, and James L. Thompson, and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234890">
+				<rom name="chemistry- the periodic table v1.0.woz" size="234890" crc="232c6255" sha1="e52f576c864fe325dcb705513b53ebafb628a430" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commkeys10">
+		<description>CommuniKeys (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-23-->
+		<!--"CommuniKeys" is a 1989 educational program developed by Beth Bell, Vincent Erickson, Charolyn Kapplinger, Sherry Luedloff, Michael Palmquist, John Persoon, and Paul Weiser, and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234900">
+				<rom name="communikeys v1.0.woz" size="234900" crc="ba6bf6fa" sha1="11b60fa9f5d4e142dc5cdb5f8d3275d154e2088f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conqmwg10">
+		<description>Conquering Math Worksheet Generator (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Conquering Math Worksheet Generator" is a 1989 educational program developed by Sue Gabrys, Shari Glenn, Scott Jensen, and Kevin Neff, and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234865">
+				<rom name="conquering math worksheet generator v1.0.woz" size="234865" crc="94c8465b" sha1="85a29fdf171ffabd8c0c08d80851da17260a7554" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conqper10">
+		<description>Conquering Percents (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Conquering Percents" is a 1989 educational program developed by Sheila Dols, Susan Gabrys, Shari Glenn, Scott Jensen, Charolyn Kapplinger, Pat Korn, Jane Peterson, Craig Solomonson, and James L. Thompson, and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234930">
+				<rom name="conquering percents v1.0.woz" size="234930" crc="74e99302" sha1="a45fe02e8ac0d8a0587202ddc21bd546fb25b46a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conqratpr11">
+		<description>Conquering Ratios and Proportions (Version 1.1)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Conquering Ratios and Proportions" is a 1989 educational program developed by Sheila Dols, Shari Glenn, Scott Jensen, Charolyn Kapplinger, Diana Lin, Jane Peterson, and Craig Solomonson, and distributed by MECC. This is version 1.1.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234914">
+				<rom name="conquering ratios and proportions v1.1.woz" size="234914" crc="fb6f1075" sha1="c4740f1acc2acd6146aad597ef3a37e7f1459555" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="coordmath10">
+		<description>Coordinate Math (Version 1.0)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Coordinate Math" is a 1987 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234788">
+				<rom name="coordinate math v1.0.woz" size="234788" crc="63fbfbc8" sha1="cc7a29b9765f212f32b99117da00fa0bf99e880d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqsamp10">
+		<description>Dataquest: Sampler (Version 1.0)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Dataquest: Sampler" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234791">
+				<rom name="dataquest- sampler v1.0.woz" size="234791" crc="4614b4ca" sha1="0990bc15bdec596603cb4d6f632f29547df9d795" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dogsleda10">
+		<description>Dog Sled Ambassadors (Version 1.0)</description>
+		<year>1993</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Dog Sled Ambassadors" is a 1993 educational program developed by Beth Bell, Beth Daniels, Sheila Dols, Sheila Kelly, Kevin Neff, Korey Schulz, and John P. Wlazlo, and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side a" />
+			<dataarea name="flop" size="234890">
+				<rom name="dog sled ambassadors v1.0 side a.woz" size="234890" crc="cc3a97ec" sha1="748921d1d7a6e855c7d89b994025693389939773" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side b" />
+			<dataarea name="flop" size="234890">
+				<rom name="dog sled ambassadors v1.0 side b.woz" size="234890" crc="38fc607d" sha1="eac6fc6e2e3ae9e3c808c80d2a71605c86678a28" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="equatmath10">
+		<description>Equation Math (Version 1.0)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Equation Math" is a 1987 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234786">
+				<rom name="equation math v1.0.woz" size="234786" crc="0c7e78eb" sha1="f5fbc707abd3d361d8f2b9b9f513003b80ecc843" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="estqcksolii10">
+		<description>Estimation: Quick Solve II (Version 1.0)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Estimation: Quick Solve II" is a 1990 educational program developed by Beth Bell, Vincent Erickson, Shari Glenn, Charolyn Kapplinger, Sherry Luedloff, and Elizabeth Wendland, and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234903">
+				<rom name="estimation- quick solve ii v1.0.woz" size="234903" crc="5378dd49" sha1="05ed9d2968c1ad7b237bd8b7caba3a457634e58a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fractcon12">
+		<description>Fraction Concepts, Inc. (Version 1.2)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Fraction Concepts, Inc." is a 1987 educational program developed and distributed by MECC. This is version 1.2.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234796">
+				<rom name="fraction concepts, inc. v1.2.woz" size="234796" crc="4afaa0fa" sha1="1b47dbd1863b26d72afe0261b916357a24edcabe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fractpru10">
+		<description>Fraction Practice Unlimited (Version 1.0)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-23-->
+		<!--"Fraction Practice Unlimited" is a 1987 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234800">
+				<rom name="fraction practice unlimited v1.0.woz" size="234800" crc="7ca86529" sha1="f715773fcf8ad4e84a30b0b4ee4776f05ad99979" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghostwr10">
+		<description>Ghost Writer (Version 1.0)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Ghost Writer" is a 1985 educational program developed by Robert Bortnick, Ph.D., and Thomas R. Lundeen, and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234836">
+				<rom name="ghost writer v1.0.woz" size="234836" crc="5b99ad15" sha1="a25ea6ff9d2081a508587c5e28497e0edbc8ba33" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="instsurv10">
+		<description>Instant Survey (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Instant Survey" is a 1989 educational program developed by Mark Dostal, Cathy Grittner, Greg Holey, Sherry Luedloff, Jean Sharp, Roger Shimada, Craig Solomonson, Jim Thompson, Debra Vonk, and Brian Walker, and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="234930">
+				<rom name="instant survey v1.0 disk 1 - program.woz" size="234930" crc="e91954ea" sha1="34513b9a7dbc6e386a54c27c387969796e85c657" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="234930">
+				<rom name="instant survey v1.0 disk 2 - sampler.woz" size="234930" crc="0e0350d7" sha1="b0d2c559bbc70b1a40276c79984d926f5371c623" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keybdmas10">
+		<description>Keyboarding Master (Version 1.0)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Keyboarding Master" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234775">
+				<rom name="keyboarding master v1.0.woz" size="234775" crc="cb33bd28" sha1="3a1899634a7ba0820058bfb04fa764583a9058c2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lblmaker10">
+		<description>LabelMaker (Version 1.0)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"LabelMaker" is a 1988 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234783">
+				<rom name="labelmaker v1.0.woz" size="234783" crc="28ee6f64" sha1="590ca5072665f17298e585e008c2a460fde2f5e8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdqeurosu10">
+		<description>MECC Dataquest: Europe and the Soviet Union (Version 1.0)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"MECC Dataquest: Europe and the Soviet Union" is a 1990 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234815">
+				<rom name="mecc dataquest- europe and soviet union v1.0.woz" size="234815" crc="621b13b8" sha1="753b7c954fa6efc00635aabf8090916d0d7ebf7e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdqlatam10">
+		<description>MECC Dataquest: Latin America (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"MECC Dataquest: Latin America" is a 1989 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234801">
+				<rom name="mecc dataquest- latin america v1.0.woz" size="234801" crc="5a8fcffb" sha1="05d8f27ca3ef4a3ed4209896a7963df93a48518a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdqmidenoraf10">
+		<description>MECC Dataquest: Middle East and North Africa (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"MECC Dataquest: Middle East and North Africa" is a 1989 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234816">
+				<rom name="mecc dataquest- middle east and north africa v1.0.woz" size="234816" crc="70ec9f6a" sha1="ee827a254969f42fc3a498099477028e1bf4cdf9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdqnamam11">
+		<description>MECC Dataquest: North American Mammals (Version 1.1)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"MECC Dataquest: North American Mammals" is a 1988 educational program developed and distributed by MECC. This is version 1.1.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234810">
+				<rom name="mecc dataquest- north american mammals v1.1.woz" size="234810" crc="c137c398" sha1="4266b7f7d9e753bb29998343912788460c262d2b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdqwrdcom11">
+		<description>MECC Dataquest: The World Community (Version 1.1)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"MECC Dataquest: The World Community" is a 1987 educational program developed and distributed by MECC. This is version 1.1.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234807">
+				<rom name="mecc dataquest- the world community v1.1.woz" size="234807" crc="111b1a2f" sha1="ec49795df3aaabfab0eb0e3499704ba50d2e1015" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meccedit10">
+		<description>MECC Editor (Version 1.0)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"MECC Editor" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234784">
+				<rom name="mecc editor v1.0.woz" size="234784" crc="2f035c50" sha1="e0c188d295c96ed393d0e6d7c8036acb4dd0addf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meccoutl10">
+		<description>MECC Outliner (Version 1.0)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"MECC Outliner" is a 1988 educational program developed by Miryam Acevedo-Bouchard, John J. Krenz, Mark Paquette, Larry Phenow, Roger Shimada, Steve Taffee, and Paul Wieser, and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234900">
+				<rom name="mecc outliner v1.0.woz" size="234900" crc="7a63c166" sha1="a732682e502f6b9674952e6bff9d5634ceda384d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meccstfet10">
+		<description>MECC Stuff and Fetch (Version 1.0)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"MECC Stuff and Fetch" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234793">
+				<rom name="mecc stuff and fetch v1.0.woz" size="234793" crc="825a8765" sha1="586d8d7f572c532de1b0a5815ec0d9a0460f5c6f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meccwrst12">
+		<description>MECC Write Start (Version 1.2)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"MECC Write Start" is a 1985 educational program developed and distributed by MECC. This is version 1.2.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234790">
+				<rom name="mecc write start v1.2.woz" size="234790" crc="bb1db1f2" sha1="5adce7f4e3fe500e8e86264ab2f724175243fdd9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meccwrit12">
+		<description>MECC Writer (Version 1.2)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"MECC Writer" is a 1985 educational program developed and distributed by MECC. This is version 1.2.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234817">
+				<rom name="mecc writer v1.2.woz" size="234817" crc="ea821ab1" sha1="36d12dd728c792bbc822409936e13d8350588636" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mystmatt10">
+		<description>Mystery Matter (Version 1.0)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Mystery Matter" is a 1988 educational program developed by Greg Holey, Nan Leekly, Sherry Luedloff, John Persoon, Jane Peterson, Diane Portner, and Jim Thompson, and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234889">
+				<rom name="mystery matter v1.0.woz" size="234889" crc="84fb30ba" sha1="6f1008d961dfa34ce40949f23ec83b4f44c9483f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mystobjs10">
+		<description>Mystery Objects (Version 1.0)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Mystery Objects" is a 1988 educational program developed by Greg Holey, Liz Husebye, Charolyn Kapplinger, John Krenz, Nan Leekly, Sherry Luedloff, Kevin Neff, and Diane Portner, and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234904">
+				<rom name="mystery objects v1.0.woz" size="234904" crc="4da9ea38" sha1="2c788d6c2dcfcd5d50c3f64bef3c2f57a10e4484" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="patterns10">
+		<description>Patterns (Version 1.0)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Patterns" is a 1988 educational program developed by Miryam Acevedo-Bouchard, Rich Childers, Susan Gabrys, Charolyn Kapplinger, Sherry Luedloff, Jane Peterson, and Larry Phenow, and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234920">
+				<rom name="patterns v1.0.woz" size="234920" crc="cf7d086b" sha1="19e0fda0d137589435383bd36a971dafb60c75ec" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quiltbee10">
+		<description>Quilting Bee (Version 1.0)</description>
+		<year>1994</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Quilting Bee" is a 1994 educational program developed by Beth Daniels, Dave Denninger, Sheila Dols, Craig Solomonson, and Claudio Valenzuela, and distributed by MECC. This is version 1.0. It has in-app controls to toggle the user interface language between English and Spanish.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234807">
+				<rom name="quilting bee v1.0.woz" size="234807" crc="ca2f3e60" sha1="06487c7426193707f75bc8523850d99aef5962c6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="showtime11">
+		<description>Show Time (Version 1.1)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--"Show Time" is a 1986 educational program developed and distributed by MECC. This is version 1.1.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side a" />
+			<dataarea name="flop" size="234782">
+				<rom name="show time v1.1 side a.woz" size="234782" crc="e4e19090" sha1="4b169386362763fbf86f1d396f2e7491f468cbbc" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side b" />
+			<dataarea name="flop" size="234782">
+				<rom name="show time v1.1 side b.woz" size="234782" crc="0e92e491" sha1="b43accc4cfec757422868d00c745298edb9e2ce8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcsfree10">
+		<description>Space Station Freedom (Version 1.0)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-23-->
+		<!--"Space Station Freedom" is a 1990 educational program developed by Mark Hanson, Charolyn Kapplinger, Mike Palmquist, Jane Peterson, and John P. Wlazlo, and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side a" />
+			<dataarea name="flop" size="234880">
+				<rom name="space station freedom v1.0 side a.woz" size="234880" crc="111e0a80" sha1="cbb7296917482de22f96625f2bfb47b5a681bfdc" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side b" />
+			<dataarea name="flop" size="234880">
+				<rom name="space station freedom v1.0 side b.woz" size="234880" crc="440e9416" sha1="53ae773b5920501b0e1dfaa68fd375e1155f43b2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spellpr11">
+		<description>Spelling Press (Version 1.1)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-23-->
+		<!--"Spelling Press" is a 1988 educational program developed by Susan Gabrys, Charolyn Kapplinger, Larry Phenow, Roger Shimada, Caren Stelson, and Brian Walker, and distributed by MECC. This is version 1.1.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234884">
+				<rom name="spelling press v1.1.woz" size="234884" crc="67c25967" sha1="d3a72e002121b64120cf9e9a684abd92f4e01aef" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teachoo11">
+		<description>Teacher Option Organizer (Version 1.1)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-23-->
+		<!--"Teacher Option Organizer" is a 1988 educational program developed by Kevin Neff, Larry Phenow, Diane Portner, Jim Thompson, Brian Walker, and Nelson Whyatt, and distributed by MECC. This is version 1.1.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234869">
+				<rom name="teacher option organizer v1.1.woz" size="234869" crc="d178180a" sha1="e220ff8120f67613d169cf18b705b37e108a592c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teachscin10">
+		<description>Teaching Scientific Inquiry (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-23-->
+		<!--"Teaching Scientific Inquiry" is a 1989 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234800">
+				<rom name="teaching scientific inquiry v1.0.woz" size="234800" crc="0056061a" sha1="7b625dbec398211d39c34ff2b2a0495d5d891ba0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmnavlb10">
+		<description>Time Navigator Leaps Back (Version 1.0)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-23-->
+		<!--"Time Navigator Leaps Back" is a 1990 educational program developed by Beth Bell, Vincent Erickson, John J. Krenz, Nan Leekley, Brian Nesse, Mark Paquette, Diane Portner, and Wayne Studer, and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side a" />
+			<dataarea name="flop" size="234914">
+				<rom name="time navigator leaps back v1.0 side a.woz" size="234914" crc="1ff83681" sha1="13dca1caca38e75a5951baddfce05deaaea1498c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side b" />
+			<dataarea name="flop" size="234914">
+				<rom name="time navigator leaps back v1.0 side b.woz" size="234914" crc="ea1cc92a" sha1="ac48ac737bcdef4adbc7b3978895502bbc373111" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmnav10">
+		<description>Time Navigator (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-23-->
+		<!--"Time Navigator" is a 1989 educational program developed by Beth Bell, Vincent Erickson, Charolyn Kapplinger, John J. Krenz, Nan Leekley, Brian Nesse, Mark Paquette, Diane Portner, and Wayne Studer, and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side a" />
+			<dataarea name="flop" size="234923">
+				<rom name="time navigator v1.0 side a.woz" size="234923" crc="93a87311" sha1="4ca9a74f4f46c6bef92259d0261eeb1f5897a9c9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side b" />
+			<dataarea name="flop" size="234923">
+				<rom name="time navigator v1.0 side b.woz" size="234923" crc="89a881bf" sha1="fec13816b6ccdbd488ff0743d7524df73006645d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vacnattr10">
+		<description>Vacation Nation Travel (Version 1.0)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-23-->
+		<!--"Vacation Nation Travel" is a 1991 educational program developed by John Ojanen, Mike Palmquist, Dee Dee Roedel, and John P. Wlazlo, and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side a" />
+			<dataarea name="flop" size="234862">
+				<rom name="vacation nation travel v1.0 side a.woz" size="234862" crc="7fd8b5e2" sha1="cb9d2830ef3f6d5137ba7fbb2d4b27d4ee07077e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side b" />
+			<dataarea name="flop" size="234862">
+				<rom name="vacation nation travel v1.0 side b.woz" size="234862" crc="630aecc7" sha1="953ecdc580d7945c9222f0cbe8053a59fc821bb8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="woodcarr10">
+		<description>Wood Car Rally (Version 1.0)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-23-->
+		<!--"Wood Car Rally" is a 1988 educational program developed by Gene Breault, Greg Holey, Kevin Neff, John Persoon, and Diane Portner, and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234874">
+				<rom name="wood car rally v1.0.woz" size="234874" crc="8b408e80" sha1="0d0ef3a10f38adbe8311b4d17ebf20a3976fa739" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="woollybnc10">
+		<description>Woolly Bounce (Version 1.0)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-23-->
+		<!--"Woolly Bounce" is a 1991 educational program developed by Gene Breault, Scott Jensen, Charolyn Kapplinger, and Kim D. Smith, and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234839">
+				<rom name="woolly bounce v1.0.woz" size="234839" crc="0e7e1e71" sha1="559c452f4bf4388900cf6db6539f045772489634" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoyonpat10">
+		<description>Zoyon Patrol (Version 1.0)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-23-->
+		<!--"Zoyon Patrol" is a 1987 educational program developed and distributed by MECC. This is version 1.0.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side a" />
+			<dataarea name="flop" size="234785">
+				<rom name="zoyon patrol v1.0 side a.woz" size="234785" crc="bbc55637" sha1="a08f8bc01e4c29f842715e5f95d799338a4da29a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side b" />
+			<dataarea name="flop" size="234785">
+				<rom name="zoyon patrol v1.0 side b.woz" size="234785" crc="3d07b6c2" sha1="dfbaa413a575e90d3724be8ba61074573bbad47a" />
 			</dataarea>
 		</part>
 	</software>
