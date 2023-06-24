@@ -10,9 +10,9 @@
 #include "machine/8042kbdc.h"
 #include "machine/ds128x.h"
 
-class pc87306_device : public device_t, 
-                       public device_isa16_card_interface,
-                       public device_memory_interface
+class pc87306_device : public device_t,
+					   public device_isa16_card_interface,
+					   public device_memory_interface
 {
 public:
 	pc87306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -25,12 +25,12 @@ public:
 	auto irq1() { return m_irq1_callback.bind(); }
 	auto irq8() { return m_irq8_callback.bind(); }
 	auto irq9() { return m_irq9_callback.bind(); }
-//	auto txd1() { return m_txd1_callback.bind(); }
-//	auto ndtr1() { return m_ndtr1_callback.bind(); }
-//	auto nrts1() { return m_nrts1_callback.bind(); }
-//	auto txd2() { return m_txd2_callback.bind(); }
-//	auto ndtr2() { return m_ndtr2_callback.bind(); }
-//	auto nrts2() { return m_nrts2_callback.bind(); }
+//  auto txd1() { return m_txd1_callback.bind(); }
+//  auto ndtr1() { return m_ndtr1_callback.bind(); }
+//  auto nrts1() { return m_nrts1_callback.bind(); }
+//  auto txd2() { return m_txd2_callback.bind(); }
+//  auto ndtr2() { return m_ndtr2_callback.bind(); }
+//  auto nrts2() { return m_nrts2_callback.bind(); }
 
 protected:
 	virtual void device_start() override;
@@ -44,19 +44,19 @@ private:
 
 	required_device<kbdc8042_device> m_kbdc;
 	required_device<ds12885_device> m_rtc;
-//	memory_view m_logical_view;
+//  memory_view m_logical_view;
 
 	devcb_write_line m_gp20_reset_callback;
 	devcb_write_line m_gp25_gatea20_callback;
 	devcb_write_line m_irq1_callback;
 	devcb_write_line m_irq8_callback;
 	devcb_write_line m_irq9_callback;
-//	devcb_write_line m_txd1_callback;
-//	devcb_write_line m_ndtr1_callback;
-//	devcb_write_line m_nrts1_callback;
-//	devcb_write_line m_txd2_callback;
-//	devcb_write_line m_ndtr2_callback;
-//	devcb_write_line m_nrts2_callback;
+//  devcb_write_line m_txd1_callback;
+//  devcb_write_line m_ndtr1_callback;
+//  devcb_write_line m_nrts1_callback;
+//  devcb_write_line m_txd2_callback;
+//  devcb_write_line m_ndtr2_callback;
+//  devcb_write_line m_nrts2_callback;
 
 	void request_irq(int irq, int state);
 

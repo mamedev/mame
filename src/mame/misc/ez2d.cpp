@@ -127,17 +127,17 @@ void ez2d_state::winbond_superio_config(device_t *device)
 {
 	// TODO: Winbond w83977ef
 	w83977tf_device &fdc = *downcast<w83977tf_device *>(device);
-//	fdc.set_sysopt_pin(1);
+//  fdc.set_sysopt_pin(1);
 	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
 	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
 	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
 	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
-//	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
-//	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
-//	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
-//	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
-//	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
-//	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+//  fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+//  fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+//  fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+//  fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+//  fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+//  fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 }
 
 void ez2d_state::ez2d(machine_config &config)
@@ -203,7 +203,7 @@ void ez2d_state::ez2d(machine_config &config)
 ROM_START( ez2d2m )
 	ROM_REGION32_LE(0x40000, "pci:07.0", 0)
 	ROM_LOAD("ez2dancer2ndmove_motherboard_v29c51002t_award_bios", 0x00000, 0x40000, BAD_DUMP CRC(02a5e84b) SHA1(94b341d268ce9d42597c68bc98c3b8b62e137205) ) // 29f020
-//	ROM_LOAD("cubx1007.awd", 0x00000, 0x40000, CRC(42a35507) SHA1(4e428e8419e533424d9564b290e2d7f4931744ff) )
+//  ROM_LOAD("cubx1007.awd", 0x00000, 0x40000, CRC(42a35507) SHA1(4e428e8419e533424d9564b290e2d7f4931744ff) )
 
 	ROM_REGION( 0x10000, "vbios", 0 )
 	// nVidia TNT2 Model 64 video BIOS (not from provided dump)

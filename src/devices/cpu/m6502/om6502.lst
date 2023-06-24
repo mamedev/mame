@@ -2204,7 +2204,7 @@ asr_imm
 arr_imm
 	TMP = read_pc();
 	PC++;
-    A &= TMP;
+	A &= TMP;
 	do_arr();
 	prefetch();
 

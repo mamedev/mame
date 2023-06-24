@@ -578,7 +578,7 @@ ROM_END
 
 GAME( 1994, stlforce,  0,        stlforce, stlforce, stlforce_state, empty_init, ROT0, "Electronic Devices Italy / Ecogames S.L. Spain", "Steel Force", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, mortalr,   0,        mortalr,  stlforce, stlforce_state, empty_init, ROT0, "New Dream Games", "Mortal Race", MACHINE_SUPPORTS_SAVE ) // based on the same rough codebase as Top Driving tch/topdrive.cpp but not the same game, so not a clone 
+GAME( 1995, mortalr,   0,        mortalr,  stlforce, stlforce_state, empty_init, ROT0, "New Dream Games", "Mortal Race", MACHINE_SUPPORTS_SAVE ) // based on the same rough codebase as Top Driving tch/topdrive.cpp but not the same game, so not a clone
 
 GAME( 1995, twinbrat,  0,        twinbrat, stlforce, twinbrat_state, empty_init, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, twinbrata, twinbrat, twinbrat, stlforce, twinbrat_state, empty_init, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 2)", MACHINE_SUPPORTS_SAVE )

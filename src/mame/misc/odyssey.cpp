@@ -144,14 +144,14 @@ void odyssey_state::national_superio_config(device_t *device)
 #if 0
 static void isa_com(device_slot_interface &device)
 {
-//	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
-//	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
-//	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
-//	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
-//	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
-//	device.option_add("terminal", SERIAL_TERMINAL);
-//	device.option_add("null_modem", NULL_MODEM);
-//	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
+//  device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+//  device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+//  device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+//  device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+//  device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
+//  device.option_add("terminal", SERIAL_TERMINAL);
+//  device.option_add("null_modem", NULL_MODEM);
+//  device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
 }
 #endif
 

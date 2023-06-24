@@ -94,17 +94,17 @@ void silverball_state::i440zx_superio_config(device_t *device)
 {
 	// TODO: unknown sub-type
 	w83977tf_device &fdc = *downcast<w83977tf_device *>(device);
-//	fdc.set_sysopt_pin(1);
+//  fdc.set_sysopt_pin(1);
 	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
 	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
 	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
 	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
-//	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
-//	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
-//	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
-//	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
-//	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
-//	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+//  fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+//  fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+//  fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+//  fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+//  fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+//  fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 }
 
 // SY-7IZB+
@@ -203,7 +203,7 @@ void silverball_state::silverball_i440zx(machine_config &config)
 
 ROM_START(slvrball806)
 	SILVERBALL_BIOS
-//	ROM_DEFAULT_BIOS("bios29") // The one dumped from the actual machine
+//  ROM_DEFAULT_BIOS("bios29") // The one dumped from the actual machine
 	ROM_DEFAULT_BIOS("bios33")
 
 	DISK_REGION( PCI_IDE_ID"ide:0:hdd" ) // 16383 cylinders, 16 heads, 63 sectors
@@ -212,7 +212,7 @@ ROM_END
 
 ROM_START(slvrball720)
 	SILVERBALL_BIOS
-//	ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
+//  ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
 	ROM_DEFAULT_BIOS("bios33")
 
 	DISK_REGION( PCI_IDE_ID"ide:0:hdd" )
@@ -221,7 +221,7 @@ ROM_END
 
 ROM_START(slvrball632)
 	SILVERBALL_BIOS
-//	ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
+//  ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
 	ROM_DEFAULT_BIOS("bios33")
 
 	DISK_REGION( PCI_IDE_ID"ide:0:hdd" )
@@ -231,7 +231,7 @@ ROM_END
 // SilverBall V4.09 BULOVA: Windows 3.1, HardLock parallel dongle and two VGA drivers loaded, S3 Trio and Chips and Technologies 6555x (mm55x16) Accelerator
 ROM_START(slvrballbu409)
 	SILVERBALL_BIOS
-//	ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
+//  ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
 	ROM_DEFAULT_BIOS("bios33")
 
 	DISK_REGION( PCI_IDE_ID"ide:0:hdd" )
@@ -242,7 +242,7 @@ ROM_END
 // Probably the same as set 1, just with different operator data / configuration
 ROM_START(slvrballbu409b)
 	SILVERBALL_BIOS
-//	ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
+//  ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
 	ROM_DEFAULT_BIOS("bios33")
 
 	DISK_REGION( PCI_IDE_ID"ide:0:hdd" )

@@ -33,12 +33,12 @@ w83977tf_device::w83977tf_device(const machine_config &mconfig, const char *tag,
 	, m_irq1_callback(*this)
 	, m_irq8_callback(*this)
 	, m_irq9_callback(*this)
-//	, m_txd1_callback(*this)
-//	, m_ndtr1_callback(*this)
-//	, m_nrts1_callback(*this)
-//	, m_txd2_callback(*this)
-//	, m_ndtr2_callback(*this)
-//	, m_nrts2_callback(*this)
+//  , m_txd1_callback(*this)
+//  , m_ndtr1_callback(*this)
+//  , m_nrts1_callback(*this)
+//  , m_txd2_callback(*this)
+//  , m_ndtr2_callback(*this)
+//  , m_nrts2_callback(*this)
 { }
 
 void w83977tf_device::device_start()
@@ -72,7 +72,7 @@ void w83977tf_device::device_add_mconfig(machine_config &config)
 	DS12885(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(FUNC(w83977tf_device::irq_rtc_w));
 	m_rtc->set_century_index(0x32);
-	
+
 	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);
 	m_kbdc->set_interrupt_type(kbdc8042_device::KBDC8042_DOUBLE);
@@ -125,7 +125,7 @@ void w83977tf_device::write(offs_t offset, u8 data)
 			{
 				m_lock_sequence --;
 				//if (m_lock_sequence == 0)
-				//	LOG("Config unlocked\n");
+				//  LOG("Config unlocked\n");
 			}
 		}
 		else
@@ -148,20 +148,20 @@ void w83977tf_device::write(offs_t offset, u8 data)
 
 void w83977tf_device::config_map(address_map &map)
 {
-//	map(0x02, 0x02) configuration control (bit 0 soft reset)
+//  map(0x02, 0x02) configuration control (bit 0 soft reset)
 	map(0x07, 0x07).lr8(NAME([this] () { return m_logical_index; })).w(FUNC(w83977tf_device::logical_device_select_w));
 	map(0x20, 0x20).lr8(NAME([] () { return 0x97; })); // device ID
 	map(0x21, 0x21).lr8(NAME([] () { return 0x73; })); // revision
-//	map(0x22, 0x22) device power down control
-//	map(0x23, 0x23) global immediate power down
-//	map(0x24, 0x24)
-//	map(0x25, 0x25)
+//  map(0x22, 0x22) device power down control
+//  map(0x23, 0x23) global immediate power down
+//  map(0x24, 0x24)
+//  map(0x25, 0x25)
 	map(0x26, 0x26).rw(FUNC(w83977tf_device::cr26_r), FUNC(w83977tf_device::cr26_w));
-//	map(0x28, 0x28)
-//	map(0x2a, 0x2a)
-//	map(0x2b, 0x2b)
-//	map(0x2c, 0x2c)
-//	map(0x2d, 0x2f) Test Modes
+//  map(0x28, 0x28)
+//  map(0x2a, 0x2a)
+//  map(0x2b, 0x2b)
+//  map(0x2c, 0x2c)
+//  map(0x2d, 0x2f) Test Modes
 
 	map(0x30, 0xff).view(m_logical_view);
 	// FDC

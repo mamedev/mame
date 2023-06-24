@@ -1837,7 +1837,7 @@ Side B has a copy of Hardball for the Amstrad CPC, was this edition accidentally
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="aztcaslt">
 		<description>Aztec Assault</description>
 		<year>1992</year>
@@ -16833,7 +16833,7 @@ The floppy disks don't load after choosing the "Loader" option menu.
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="td2tduel_a" cloneof="td2tduel">
 		<description>The Duel - Test Drive II (Dro Soft)</description>
 		<year>1990</year>

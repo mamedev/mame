@@ -80,7 +80,7 @@ private:
 void gammagic_state::gammagic_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
-//	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
+//  map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
 	map(0x000e0000, 0x000fffff).rom().region("isa", 0x20000);/* System BIOS */
 	map(0x00100000, 0x07ffffff).ram();
 	map(0x08000000, 0xfffdffff).noprw();
@@ -93,9 +93,9 @@ void gammagic_state::gammagic_io(address_map &map)
 	map(0x00e8, 0x00ef).noprw();
 //  map(0x00f0, 0x01ef).noprw();
 //  map(0x01f8, 0x03af).noprw();
-//	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
-//	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
-//	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
+//  map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
+//  map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
+//  map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
 //  map(0x03e0, 0x03ef).noprw();
 //  map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
 //  map(0x0400, 0xffff).noprw();

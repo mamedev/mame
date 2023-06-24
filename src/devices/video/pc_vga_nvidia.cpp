@@ -84,16 +84,16 @@ void nvidia_nv3_vga_device::device_start()
 	// Start address ends at 20 bits so 0x1fffff mask / 2,097,151 bytes / 2MB window is (theorically) given
 	// we assume that is really 4 MB, VESA tests extensively tests with 0x7f banks
 	vga.svga_intf.vram_size = 4*1024*1024;
-	
+
 	for (int i = 0; i < 0x100; i++)
 		set_pen_color(i, pal1bit(i & 1), pal1bit((i & 2) >> 1), pal1bit((i & 4) >> 2));
 
-//	vga.miscellaneous_output = 0;
+//  vga.miscellaneous_output = 0;
 	m_ext_offset = 0;
 	save_item(NAME(m_ext_offset));
 }
 
-// TODO: should really calculate the access bit internally 
+// TODO: should really calculate the access bit internally
 uint8_t nvidia_nv3_vga_device::port_03b0_r(offs_t offset)
 {
 	uint8_t res = 0xff;

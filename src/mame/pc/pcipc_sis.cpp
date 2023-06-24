@@ -4,7 +4,7 @@
  * Sandbox for SiS based x86 PCs, targeting the new PCI model
  *
  * Notes:
- * - sis85c471 doesn't belong here, it 
+ * - sis85c471 doesn't belong here, it
  *
  * TODO:
  * - Identify motherboard name(s)
@@ -49,7 +49,7 @@ void sis496_state::sis496(machine_config &config)
 	I486DX4(config, m_maincpu, 75000000); // I486DX4, 75 or 100 Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &sis496_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &sis496_state::main_io);
-//	m_maincpu->set_irq_acknowledge_callback("pci:01.0:pic_master", FUNC(pic8259_device::inta_cb));
+//  m_maincpu->set_irq_acknowledge_callback("pci:01.0:pic_master", FUNC(pic8259_device::inta_cb));
 
 	PCI_ROOT(config, "pci", 0);
 	SIS85C496_HOST(config, "pci:00.0", 0, "maincpu", 32*1024*1024);

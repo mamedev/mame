@@ -10,7 +10,7 @@
  * \- Unsupported True Color modes;
  * - ET4000/W32 (2d accelerator)
  * - ET4000/W32p (PCI version)
- * 
+ *
  */
 
 #include "emu.h"

@@ -145,7 +145,7 @@ void isa16_svga_tgui9680_device::device_start()
 //  m_isa->install_memory(0x4400000, 0x45fffff, read8sm_delegate(*m_vga, FUNC(trident_vga_device::vram_r)), write8sm_delegate(*m_vga, FUNC(trident_vga_device::vram_w)));
 
 	// win95 drivers
-// 	m_isa->install_memory(0x4000000, 0x41fffff, read8sm_delegate(*m_vga, FUNC(trident_vga_device::vram_r)), write8sm_delegate(*m_vga, FUNC(trident_vga_device::vram_w)));
+//  m_isa->install_memory(0x4000000, 0x41fffff, read8sm_delegate(*m_vga, FUNC(trident_vga_device::vram_r)), write8sm_delegate(*m_vga, FUNC(trident_vga_device::vram_w)));
 
 	// acceleration ports
 	m_isa->install_device(0x2120, 0x21ff, read8sm_delegate(*m_vga, FUNC(trident_vga_device::accel_r)), write8sm_delegate(*m_vga, FUNC(trident_vga_device::accel_w)));

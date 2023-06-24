@@ -588,10 +588,10 @@ u32 downtown_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		/* the hardware wants different scroll values when flipped */
 
 		/*  bg x scroll      flip
-			metafox     0000 025d = 0, $400-$1a3 = $400 - $190 - $13
-			eightfrc    ffe8 0272
-			            fff0 0260 = -$10, $400-$190 -$10
-			            ffe8 0272 = -$18, $400-$190 -$18 + $1a      */
+		    metafox     0000 025d = 0, $400-$1a3 = $400 - $190 - $13
+		    eightfrc    ffe8 0272
+		                fff0 0260 = -$10, $400-$190 -$10
+		                ffe8 0272 = -$18, $400-$190 -$18 + $1a      */
 
 		m_tiles->update_scroll(vis_dimy, flip);
 

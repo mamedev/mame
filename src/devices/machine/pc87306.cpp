@@ -37,12 +37,12 @@ pc87306_device::pc87306_device(const machine_config &mconfig, const char *tag, d
 	, m_irq1_callback(*this)
 	, m_irq8_callback(*this)
 	, m_irq9_callback(*this)
-//	, m_txd1_callback(*this)
-//	, m_ndtr1_callback(*this)
-//	, m_nrts1_callback(*this)
-//	, m_txd2_callback(*this)
-//	, m_ndtr2_callback(*this)
-//	, m_nrts2_callback(*this)
+//  , m_txd1_callback(*this)
+//  , m_ndtr1_callback(*this)
+//  , m_nrts1_callback(*this)
+//  , m_txd2_callback(*this)
+//  , m_ndtr2_callback(*this)
+//  , m_nrts2_callback(*this)
 { }
 
 
@@ -74,9 +74,9 @@ void pc87306_device::device_add_mconfig(machine_config &config)
 {
 	// TODO: can bank thru bit 5 of KRR
 	DS12885(config, m_rtc, 32.768_kHz_XTAL);
-//	m_rtc->irq().set(FUNC(pc87306_device::irq_rtc_w));
+//  m_rtc->irq().set(FUNC(pc87306_device::irq_rtc_w));
 	m_rtc->set_century_index(0x32);
-	
+
 	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);
 	m_kbdc->set_interrupt_type(kbdc8042_device::KBDC8042_SINGLE);
@@ -135,35 +135,35 @@ void pc87306_device::write(offs_t offset, u8 data)
 
 void pc87306_device::config_map(address_map &map)
 {
-//	map(0x00, 0x00) FER Function Enable Register
-//	map(0x01, 0x01) FAR Function Address Register
-//	map(0x02, 0x02) PTR Power and Test Register
-//	map(0x03, 0x03) FCR Function Control Register
-//	map(0x04, 0x04) PCR Printer Control Register
+//  map(0x00, 0x00) FER Function Enable Register
+//  map(0x01, 0x01) FAR Function Address Register
+//  map(0x02, 0x02) PTR Power and Test Register
+//  map(0x03, 0x03) FCR Function Control Register
+//  map(0x04, 0x04) PCR Printer Control Register
 	map(0x05, 0x05).rw(FUNC(pc87306_device::krr_r), FUNC(pc87306_device::krr_w));
-//	map(0x06, 0x06) PMC Power Management Control Register
-//	map(0x07, 0x07) TUP Tape, UART and Parallel Port Configuration Register
+//  map(0x06, 0x06) PMC Power Management Control Register
+//  map(0x07, 0x07) TUP Tape, UART and Parallel Port Configuration Register
 	// SID Super I/O Identification Register
 	// bits 7-3 -> 01110 TL/C/12379-27
 	// bits 2-0 -> <undefined>
 	map(0x08, 0x08).lr8(
 		NAME([] (offs_t offset) { return 0x70; })
 	);
-//	map(0x09, 0x09) ASC Advanced Super I/O Configuration Register
-//	map(0x0a, 0x0a) CS0LA Chip Select 0 Low Address
-//	map(0x0b, 0x0b) CS0CF Chip Select 0 Configuration Address
-//	map(0x0c, 0x0c) CS1LA Chip Select 1 Low Address
-//	map(0x0d, 0x0d) CS1CF Chip Select 1 Configuration Address
-//	map(0x0e, 0x0e) IRC InfraRed Configuration Register
-//	map(0x0f, 0x0f) GPBA General Purpose I/O Port Base Address
-//	map(0x10, 0x10) CS0HA Chip Select 0 High Address
-//	map(0x11, 0x11) CS1HA Chip Select 1 High Address
-//	map(0x12, 0x12) SCF0 Super I/O Configuration Register 0
-//	map(0x18, 0x18) SCF1 Super I/O Configuration Register 1
-//	map(0x19, 0x19) LPTBA LPT Base Address
+//  map(0x09, 0x09) ASC Advanced Super I/O Configuration Register
+//  map(0x0a, 0x0a) CS0LA Chip Select 0 Low Address
+//  map(0x0b, 0x0b) CS0CF Chip Select 0 Configuration Address
+//  map(0x0c, 0x0c) CS1LA Chip Select 1 Low Address
+//  map(0x0d, 0x0d) CS1CF Chip Select 1 Configuration Address
+//  map(0x0e, 0x0e) IRC InfraRed Configuration Register
+//  map(0x0f, 0x0f) GPBA General Purpose I/O Port Base Address
+//  map(0x10, 0x10) CS0HA Chip Select 0 High Address
+//  map(0x11, 0x11) CS1HA Chip Select 1 High Address
+//  map(0x12, 0x12) SCF0 Super I/O Configuration Register 0
+//  map(0x18, 0x18) SCF1 Super I/O Configuration Register 1
+//  map(0x19, 0x19) LPTBA LPT Base Address
 
-//	map(0x1b, 0x1b) PNP0 Plug and Play Configuration 0 Register
-//	map(0x1c, 0x1c) PNP1 Plug and Play Configuration 1 Register
+//  map(0x1b, 0x1b) PNP0 Plug and Play Configuration 0 Register
+//  map(0x1c, 0x1c) PNP1 Plug and Play Configuration 1 Register
 }
 
 // [0x05] KRR KBC and RTC Control Register

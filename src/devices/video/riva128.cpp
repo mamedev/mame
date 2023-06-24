@@ -107,11 +107,11 @@ void riva128_device::config_map(address_map &map)
 	pci_device::config_map(map);
 	map(0x34, 0x34).lr8(NAME([] () { return 0x44; }));
 
-//	map(0x40, 0x43) subsystem ID alias (writeable)
-//	map(0x44, 0x4f) AGP i/f
-//	map(0x50, 0x53) ROM shadow enable
+//  map(0x40, 0x43) subsystem ID alias (writeable)
+//  map(0x44, 0x4f) AGP i/f
+//  map(0x50, 0x53) ROM shadow enable
 	map(0x54, 0x57).lrw8(
-		NAME([this] (offs_t offset) { return m_vga_legacy_enable; }), 
+		NAME([this] (offs_t offset) { return m_vga_legacy_enable; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			if (ACCESSING_BITS_0_7)
 			{
@@ -139,33 +139,33 @@ void riva128_device::mmio_map(address_map &map)
 			COMBINE_DATA(&m_main_scratchpad_id);
 		})
 	);
-//	map(0x00000000, 0x00000fff) PMC card master control
-//	map(0x00001000, 0x00001fff) PBUS bus control
-//	map(0x00002000, 0x00003fff) PFIFO
-//	map(0x00007000, 0x00007***) PRMA real mode BAR Access
-//	map(0x00009000, 0x00009***) PTIMER
-//	map(0x000a0000, 0x000bffff) PRMFB legacy VGA memory
-//	map(0x000c0000, 0x000c****) PRMVIO VGA sequencer & VGA gfx regs (multiple on NV40+)
-//	map(0x00100000, 0x0010*fff) PFB memory interface
-//	map(0x00110000, 0x0011ffff) PROM ROM access window
-//	map(0x00120000, 0x0012ffff) PALT External memory access window
-//	map(0x00400000, 0x00400fff) PGRAPH 2d/3d graphics engine
-//	map(0x00401000, 0x00401***) PDMA system memory DMA engine (NV3/NV4 only)
-//	map(0x00600000, 0x00600***) PCRTC CRTC controls (on NV4+ only?)
-//	map(0x00601000, 0x0060****) PRMCIO VGA CRTC controls
-//	map(0x00680000, 0x0068****) PRAMDAC
-//	map(0x00681000, 0x00681***) VGA DAC registers
-//	map(0x00800000, 0x00******) PFIFO MMIO submission area
+//  map(0x00000000, 0x00000fff) PMC card master control
+//  map(0x00001000, 0x00001fff) PBUS bus control
+//  map(0x00002000, 0x00003fff) PFIFO
+//  map(0x00007000, 0x00007***) PRMA real mode BAR Access
+//  map(0x00009000, 0x00009***) PTIMER
+//  map(0x000a0000, 0x000bffff) PRMFB legacy VGA memory
+//  map(0x000c0000, 0x000c****) PRMVIO VGA sequencer & VGA gfx regs (multiple on NV40+)
+//  map(0x00100000, 0x0010*fff) PFB memory interface
+//  map(0x00110000, 0x0011ffff) PROM ROM access window
+//  map(0x00120000, 0x0012ffff) PALT External memory access window
+//  map(0x00400000, 0x00400fff) PGRAPH 2d/3d graphics engine
+//  map(0x00401000, 0x00401***) PDMA system memory DMA engine (NV3/NV4 only)
+//  map(0x00600000, 0x00600***) PCRTC CRTC controls (on NV4+ only?)
+//  map(0x00601000, 0x0060****) PRMCIO VGA CRTC controls
+//  map(0x00680000, 0x0068****) PRAMDAC
+//  map(0x00681000, 0x00681***) VGA DAC registers
+//  map(0x00800000, 0x00******) PFIFO MMIO submission area
 }
 
 void riva128_device::vram_aperture_map(address_map &map)
 {
-	
+
 }
 
 void riva128_device::indirect_io_map(address_map &map)
 {
-	
+
 }
 
 u32 riva128_device::unmap_log_r(offs_t offset, u32 mem_mask)

@@ -205,7 +205,7 @@ protected:
 class h8h_dma_channel_device : public h8gen_dma_channel_device
 {
 public:
-	h8h_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);	
+	h8h_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	template<typename T, typename U, typename V> h8h_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner,
 																		T &&cpu, U &&dma, V &&intc, bool has_adc, bool targets_sci1)
@@ -243,10 +243,10 @@ protected:
 class h8s_dma_channel_device : public h8gen_dma_channel_device
 {
 public:
-	h8s_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);	
+	h8s_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	template<typename T, typename U, typename V> h8s_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner,
-																		T &&cpu, U &&dma, V &&intc)														   
+																		T &&cpu, U &&dma, V &&intc)
 		: h8s_dma_channel_device(mconfig, tag, owner)
 	{
 		m_cpu.set_tag(std::forward<T>(cpu));

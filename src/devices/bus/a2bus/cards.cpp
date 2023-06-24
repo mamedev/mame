@@ -76,9 +76,9 @@ void apple2_slot0_cards(device_slot_interface &device)
 {
 	device.option_add("lang", A2BUS_RAMCARD16K);      // Apple II RAM Language Card
 	device.option_add("ssram", A2BUS_RAMCARD128K);    // Saturn Systems 128K extended language card
-	device.option_add("romcard", A2BUS_ROMCARDUSER);	// Apple II ROM Card that loads a custom ROM image
-	device.option_add("romcardfp", A2BUS_ROMCARDFP);	// Apple II ROM Card with Autostart Monitor + Applesoft BASIC
-	device.option_add("romcardint", A2BUS_ROMCARDINT);	// Apple II ROM Card with Autostart Monitor + Integer BASIC
+	device.option_add("romcard", A2BUS_ROMCARDUSER);    // Apple II ROM Card that loads a custom ROM image
+	device.option_add("romcardfp", A2BUS_ROMCARDFP);    // Apple II ROM Card with Autostart Monitor + Applesoft BASIC
+	device.option_add("romcardint", A2BUS_ROMCARDINT);  // Apple II ROM Card with Autostart Monitor + Integer BASIC
 }
 
 void apple2_cards(device_slot_interface &device)

@@ -61,7 +61,7 @@ u8 a5200_rom_supercart_device::bank_r(offs_t offset)
 
 		m_bank &= m_bank_mask;
 	}
-	
+
 	return m_rom[(offset & 0x3f) + (m_bank * 0x8000) + 0x7fc0];
 }
 
