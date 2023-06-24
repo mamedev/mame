@@ -604,9 +604,9 @@ static INPUT_PORTS_START( newufo )
 	PORT_DIPSETTING(	0x00, DEF_STR( 5C_1C ) )	PORT_CONDITION("DSW2",0x08,EQUALS,0x00)
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )				PORT_DIPLOCATION("SW2:1") // Manuals states "Sounds (サウンド)"
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )						                          // Manuals states "Always (常時)"
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                                                // Manuals states "Only During Play (ゲーム中のみ)"
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )				PORT_DIPLOCATION("SW2:1") // Manual states "Sounds"
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )						                          // Manual states "Always"
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                                                // Manual states "Only During Play"
 	PORT_DIPNAME( 0x02, 0x02, "Arm X, Y-Move" )						PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, "Each Once" )
 	PORT_DIPSETTING(    0x00, "Limitless" )
@@ -616,7 +616,8 @@ static INPUT_PORTS_START( newufo )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )					PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, "SETTING 1" )
 	PORT_DIPSETTING(    0x00, "SETTING 2" )
-	PORT_DIPNAME( 0x10, 0x10, "Avoid Prize Sensor Error" )			PORT_DIPLOCATION("SW2:5")
+	// Manual states "5 ~ 8 must be set OFF."
+	PORT_DIPNAME( 0x10, 0x10, "Avoid Prize Sensor Error" )			PORT_DIPLOCATION("SW2:5") // Manual states "Fanfare and CPanel Digit will not work though."
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )							PORT_DIPLOCATION("SW2:6")
