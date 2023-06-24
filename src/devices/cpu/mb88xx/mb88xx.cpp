@@ -429,9 +429,6 @@ void mb88_cpu_device::update_pio( int cycles )
 		{
 			/* if we have a live external source, call the irqcallback */
 			standard_irq_callback( 0, intpc );
-			/* The datasheet doesn't mention if the interrupt flag
-			 * is cleared, but it seems to be only for this case. */
-			m_pio &= ~INT_CAUSE_EXTERNAL;
 			m_PC = 0x02;
 		}
 		else if (m_pending_interrupt & m_pio & INT_CAUSE_TIMER)

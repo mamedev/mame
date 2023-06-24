@@ -109,7 +109,7 @@ void namco_54xx_device::chip_select(int state)
 
 ROM_START( namco_54xx )
 	ROM_REGION( 0x400, "mcu", 0 )
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(3697dff5) SHA1(2d4c60660c6eff6051d809c0317564168837edf3) )
 ROM_END
 
 DEFINE_DEVICE_TYPE(NAMCO_54XX, namco_54xx_device, "namco54", "Namco 54xx")
