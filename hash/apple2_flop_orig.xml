@@ -8054,8 +8054,8 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>Micro Lab</publisher>
 		<info name="release" value="2019-10-14"/>
-		<sharedfeat name="compatibility" value="A2,A2P" />
 		<info name="usage" value="Requires a 48K Apple II or Apple II+. Due to compatibility issues created by the copy protection, it will not run on later models."/>
+		<sharedfeat name="compatibility" value="A2,A2P" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="188158">
@@ -12882,8 +12882,8 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2020-05-25"/>
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
 		<info name="usage" value="Requires a 48K Apple ][+ or later."/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234789">
@@ -25876,8 +25876,8 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2023-03-27" />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<info name="usage" value="Requires an Apple IIgs, Apple //c+, Apple //e or 64K Apple ][+ with a compatible drive controller card."/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--"Coordinate Math" is a 1987 educational program developed and distributed by MECC. This is version 1.1. It is distributed on a single 3.5-inch (800K) disk.-->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1345305">
