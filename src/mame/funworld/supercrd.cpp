@@ -18,8 +18,8 @@
 
   Games running on this hardware:
 
-  * Super Card (encrypted),           Fun World, 1992.
-  * Fruit Star (encrypted),           Fun World, 1992.
+  * Super Card (v417, encrypted),     Fun World, 1992.
+  * Fruit Star (T10S, encrypted),     Fun World, 1992.
   * Fruit Star (v810, encrypted),     Fun World, 1992.
   * Gamble Poker (v816, encrypted),   Fun World, 1990.
   * Gamble Poker (v812, encrypted),   Fun World, 1990.
@@ -177,7 +177,11 @@
 
   NOTE: The 74LS374 could be replaced by a 74HCT373.
 
+
+***********************************************************************************
+
   TODO:
+
   - merge with misc/amaticmg.cpp. Hardware is almost identical and software has
     definitely a common origin.
   - supercrd stops with 'ELEKTRONIK DEFEKT 5'. Problem with the decryption or missing
@@ -325,7 +329,8 @@ TILE_GET_INFO_MEMBER(supercrd_state::get_bg_tile_info)
 	int const offs = tile_index;
 	int const attr = m_videoram[offs] + (m_colorram[offs] << 8);
 	int const code = attr & 0xfff;
-	int const color = m_colorram[offs] >> 4;  // 4 bits for color.
+//	int const color = m_colorram[offs] >> 4;  // 4 bits for color.
+	int const color = m_colorram[offs] >> 3;  // 4 bits for color.
 
 	tileinfo.set(0, code, color, 0);
 }
@@ -489,7 +494,7 @@ static const gfx_layout charlayout =
 */
 
 static GFXDECODE_START( gfx_supercrd )  // Addressing the first half of the palette
-	GFXDECODE_ENTRY( "tiles", 0, charlayout, 0, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, charlayout, 0, 32 )  // formerly 16
 GFXDECODE_END
 
 
@@ -1066,12 +1071,12 @@ void supercrd_state::init_supst() // TODO: check unknown opcodes
 } // anonymous namespace
 
 
-//    YEAR  NAME       PARENT  MACHINE   INPUT     STATE           INIT           ROT    COMPANY      FULLNAME                          FLAGS
-GAME( 1992, supercrd,  0,      supercrd, supercrd, supercrd_state, init_supercrd, ROT0,  "Fun World", "Super Card (encrypted)",         MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
-GAME( 1992, fruitstr,  0,      supercrd, supercrd, supercrd_state, init_fruitstr, ROT0,  "Fun World", "Fruit Star (encrypted)",         MACHINE_NOT_WORKING )
-GAME( 1992, fruitstra, 0,      supercrd, supercrd, supercrd_state, init_fruitstr, ROT0,  "Fun World", "Fruit Star (v810, encrypted)",   MACHINE_NOT_WORKING )
-GAME( 1990, gampo816,  0,      supercrd, supercrd, supercrd_state, init_gampo,    ROT0,  "Fun World", "Gamble Poker (v816, encrypted)", MACHINE_NOT_WORKING )
-GAME( 1990, gampo812,  0,      supercrd, supercrd, supercrd_state, init_gampo,    ROT0,  "Fun World", "Gamble Poker (v812, encrypted)", MACHINE_NOT_WORKING )
-GAME( 1994, supst839,  0,      supercrd, supercrd, supercrd_state, init_supst,    ROT90, "Fun World", "Super Stars (v839, encrypted)",  MACHINE_NOT_WORKING )
-GAME( 1990, supst834,  0,      supercrd, supercrd, supercrd_state, init_supst,    ROT90, "Fun World", "Super Stars (v834, encrypted)",  MACHINE_NOT_WORKING )
-GAME( 1989, redline,   0,      supercrd, supercrd, supercrd_state, init_supst,    ROT90, "Fun World", "Red Line (v808, encrypted)",     MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY      FULLNAME                          FLAGS
+GAME( 1992, supercrd,  0,        supercrd, supercrd, supercrd_state, init_supercrd, ROT0,  "Fun World", "Super Card (v417, encrypted)",   MACHINE_NOT_WORKING )
+GAME( 1992, fruitstr,  0,        supercrd, supercrd, supercrd_state, init_fruitstr, ROT0,  "Fun World", "Fruit Star (T10S, encrypted)",   MACHINE_NOT_WORKING )
+GAME( 1992, fruitstra, fruitstr, supercrd, supercrd, supercrd_state, init_fruitstr, ROT0,  "Fun World", "Fruit Star (v810, encrypted)",   MACHINE_NOT_WORKING )
+GAME( 1990, gampo816,  0,        supercrd, supercrd, supercrd_state, init_gampo,    ROT0,  "Fun World", "Gamble Poker (v816, encrypted)", MACHINE_NOT_WORKING )
+GAME( 1990, gampo812,  gampo816, supercrd, supercrd, supercrd_state, init_gampo,    ROT0,  "Fun World", "Gamble Poker (v812, encrypted)", MACHINE_NOT_WORKING )
+GAME( 1994, supst839,  0,        supercrd, supercrd, supercrd_state, init_supst,    ROT90, "Fun World", "Super Stars (v839, encrypted)",  MACHINE_NOT_WORKING )
+GAME( 1990, supst834,  supst839, supercrd, supercrd, supercrd_state, init_supst,    ROT90, "Fun World", "Super Stars (v834, encrypted)",  MACHINE_NOT_WORKING )
+GAME( 1989, redline,   0,        supercrd, supercrd, supercrd_state, init_supst,    ROT90, "Fun World", "Red Line (v808, encrypted)",     MACHINE_NOT_WORKING )
