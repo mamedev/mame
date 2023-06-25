@@ -40,15 +40,6 @@ public:
 	void cdi910(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-
-	void cdimono1_mem(address_map &map);
-
-	required_device<scc68070_device> m_maincpu;
-	required_region_ptr<uint16_t> m_main_rom;
-	optional_device<screen_device> m_lcd;
-	optional_device<cdislave_hle_device> m_slave_hle;
-
 	enum servo_portc_bit_t
 	{
 		INV_JUC_OUT = (1 << 2),
@@ -56,7 +47,23 @@ protected:
 		INV_CADDYSWITCH_IN = (1 << 7)
 	};
 
+	required_device<scc68070_device> m_maincpu;
+	required_region_ptr<uint16_t> m_main_rom;
+	optional_device<screen_device> m_lcd;
+	optional_device<cdislave_hle_device> m_slave_hle;
+	required_shared_ptr_array<uint16_t, 2> m_plane_ram;
+	optional_device<m68hc05c8_device> m_servo;
+	optional_device<m68hc05c8_device> m_slave;
+	optional_device<cdicdic_device> m_cdic;
+	required_device<cdrom_image_device> m_cdrom;
+	required_device<mcd212_device> m_mcd212;
+
+	required_device_array<dmadac_sound_device, 2> m_dmadac;
+
 	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual void machine_reset() override;
+
+	void cdimono1_mem(address_map &map);
 
 	void cdi910_mem(address_map &map);
 	void cdimono2_mem(address_map &map);
@@ -72,15 +79,6 @@ protected:
 
 	uint16_t bus_error_r(offs_t offset);
 	void bus_error_w(offs_t offset, uint16_t data);
-
-	required_shared_ptr_array<uint16_t, 2> m_plane_ram;
-	optional_device<m68hc05c8_device> m_servo;
-	optional_device<m68hc05c8_device> m_slave;
-	optional_device<cdicdic_device> m_cdic;
-	required_device<cdrom_image_device> m_cdrom;
-	required_device<mcd212_device> m_mcd212;
-
-	required_device_array<dmadac_sound_device, 2> m_dmadac;
 };
 
 class quizard_state : public cdi_state, public device_serial_interface
