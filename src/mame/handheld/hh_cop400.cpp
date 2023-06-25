@@ -444,7 +444,7 @@ ROM_END
   * COP444L MCU label /B138 COPL444-HRZ/N INV II (die label HRZ COP 444L/A)
   * 3 7seg LEDs, LED matrix and overlay mask, 1-bit sound
 
-  The first version was on TMS1100 (see hh_tms1k.c), this is the reprogrammed
+  The first version was on TMS1100 (see hh_tms1k.cpp), this is the reprogrammed
   second release with a gray case instead of black.
 
 *******************************************************************************/
