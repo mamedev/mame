@@ -1154,6 +1154,12 @@ ROM_START( fruitstbf )
 	ROM_LOAD( "fu_2.ic38",  0x10000, 0x10000, CRC(0a7126aa) SHA1(28a05ca824922bb362b86f25f300833db30a91ae) )
 	ROM_LOAD( "fu_1.ic37",  0x20000, 0x10000, CRC(eaa231ad) SHA1(6c6d708a05b23b8b3f1f5844a587ae6d06940486) )
 
+	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbf_817_nvram.bin",  0x0000, 0x1000, CRC(08dd5a3e) SHA1(f8f6775a0ece56ffd9c1c2e3384f2da405cc6c60) )
+
+	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbf_817_nvram2.bin", 0x0000, 0x0800, CRC(0907a8dd) SHA1(14b54a753aef94543ee97c5022f5664863eebb8a) )
+
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "am27s29.ic46",  0x0000, 0x0200, CRC(ee576268) SHA1(8964526fa253f484d784aec46c4c31358bc1667b) )
 
@@ -1183,6 +1189,12 @@ ROM_START( fruitstbg )
 	ROM_LOAD( "fu3.ic39",  0x00000, 0x10000, CRC(81ad7752) SHA1(b5be715c9c1e0c20f63bfb2f9dcbadafe758a098) )
 	ROM_LOAD( "fu2.ic38",  0x10000, 0x10000, CRC(0a7126aa) SHA1(28a05ca824922bb362b86f25f300833db30a91ae) )
 	ROM_LOAD( "fu1.ic37",  0x20000, 0x10000, CRC(eaa231ad) SHA1(6c6d708a05b23b8b3f1f5844a587ae6d06940486) )
+
+	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbg_817_nvram.bin",  0x0000, 0x1000, CRC(ff3e8883) SHA1(a6603d825b8298cba8b16005485a57acdd6243c0) )
+
+	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbg_817_nvram2.bin", 0x0000, 0x0800, CRC(6efbfb43) SHA1(0a6e36ea47683baa2b502ea9e17e1847cee65b45) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "am27s29.ic46",  0x0000, 0x0200, CRC(ee576268) SHA1(8964526fa253f484d784aec46c4c31358bc1667b) )
