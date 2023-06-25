@@ -33,8 +33,8 @@ public:
 	template <typename T> void set_cputag(T &&tag)
 	{
 		m_maincpu.set_tag(std::forward<T>(tag));
-		subdevice<isa8_device>("isa")->set_memspace(std::forward<T>(tag), AS_PROGRAM);
-		subdevice<isa8_device>("isa")->set_iospace(std::forward<T>(tag), AS_IO);
+		m_isabus.lookup()->set_memspace(std::forward<T>(tag), AS_PROGRAM);
+		m_isabus.lookup()->set_iospace(std::forward<T>(tag), AS_IO);
 	}
 
 	auto int_callback() { return m_int_callback.bind(); }
@@ -63,11 +63,9 @@ public:
 protected:
 	ibm5160_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -102,12 +100,12 @@ protected:
 	int                     m_ppi_portc_switch_high;
 	int                     m_ppi_speaker;
 	int                     m_ppi_keyboard_clear;
-	uint8_t                   m_ppi_keyb_clock;
-	uint8_t                   m_ppi_portb;
-	uint8_t                   m_ppi_clock_signal;
-	uint8_t                   m_ppi_data_signal;
-	uint8_t                   m_ppi_shift_register;
-	uint8_t                   m_ppi_shift_enable;
+	uint8_t                 m_ppi_keyb_clock;
+	uint8_t                 m_ppi_portb;
+	uint8_t                 m_ppi_clock_signal;
+	uint8_t                 m_ppi_data_signal;
+	uint8_t                 m_ppi_shift_register;
+	uint8_t                 m_ppi_shift_enable;
 
 	uint8_t pc_ppi_porta_r();
 	uint8_t pc_ppi_portc_r();
@@ -152,7 +150,7 @@ public:
 protected:
 	ibm5150_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 

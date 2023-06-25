@@ -68,8 +68,7 @@ void sp0250_device::device_start()
 
 	// if a DRQ callback is offered, run a timer at the frame rate
 	// to ensure the DRQ gets picked up in a timely manner
-	m_drq.resolve_safe();
-	if (!m_drq.isnull())
+	if (!m_drq.isunset())
 	{
 		m_drq(ASSERT_LINE);
 		attotime period = attotime::from_hz(frame_rate);

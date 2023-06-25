@@ -189,7 +189,6 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 	// device_image_interface implementation
@@ -235,7 +234,6 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 	// device_image_interface implementation
@@ -278,7 +276,6 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 	// device_image_interface implementation

@@ -79,9 +79,6 @@ void zeus2_device::device_start()
 	/* initialize polygon engine */
 	poly = std::make_unique<zeus2_renderer>(this);
 
-	m_vblank.resolve_safe();
-	m_irq.resolve_safe();
-
 	/* we need to cleanup on exit */
 	//machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&zeus2_device::exit_handler2, this));
 

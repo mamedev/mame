@@ -6,7 +6,7 @@
 // Verbosity level
 // 0 = no messages
 // 1 = everything
-const int V = 0;
+static constexpr int V = 0;
 
 DEFINE_DEVICE_TYPE(H8_ADC_3337, h8_adc_3337_device, "h8_adc_3337", "H8/3337 ADC")
 DEFINE_DEVICE_TYPE(H8_ADC_3006, h8_adc_3006_device, "h8_adc_3006", "H8/3006 ADC")
@@ -17,18 +17,13 @@ DEFINE_DEVICE_TYPE(H8_ADC_2655, h8_adc_2655_device, "h8_adc_2655", "H8/2655 ADC"
 
 h8_adc_device::h8_adc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_cpu(*this, DEVICE_SELF_OWNER),
-	m_intc(nullptr), m_io(nullptr), m_intc_tag(nullptr), m_intc_vector(0), m_adcsr(0), m_adcr(0), m_register_mask(0), m_trigger(0), m_start_mode(0), m_start_channel(0),
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_intc(*this, finder_base::DUMMY_TAG),
+	m_intc_vector(0), m_adcsr(0), m_adcr(0), m_register_mask(0), m_trigger(0), m_start_mode(0), m_start_channel(0),
 	m_end_channel(0), m_start_count(0), m_mode(0), m_channel(0), m_count(0), m_analog_powered(false), m_adtrg(false), m_next_event(0)
 {
 	m_suspend_on_interrupt = false;
 	m_analog_power_control = false;
-}
-
-void h8_adc_device::set_info(const char *_intc_tag, int _intc_vector)
-{
-	m_intc_tag = _intc_tag;
-	m_intc_vector = _intc_vector;
 }
 
 uint8_t h8_adc_device::addr8_r(offs_t offset)
@@ -100,8 +95,6 @@ void h8_adc_device::set_suspend(bool suspend)
 
 void h8_adc_device::device_start()
 {
-	m_io = &m_cpu->space(AS_IO);
-	m_intc = siblingdevice<h8_intc_device>(m_intc_tag);
 	save_item(NAME(m_addr));
 	save_item(NAME(m_buf));
 	save_item(NAME(m_adcsr));
@@ -168,7 +161,7 @@ void h8_adc_device::conversion_wait(bool first, bool poweron, uint64_t current_t
 
 void h8_adc_device::buffer_value(int port, int buffer)
 {
-	m_buf[buffer] = m_io->read_word(h8_device::ADC_0 + port);
+	m_buf[buffer] = m_cpu->do_read_adc(port);
 	if(V>=1) logerror("adc buffer %d -> %d:%03x\n", port, buffer, m_buf[buffer]);
 }
 

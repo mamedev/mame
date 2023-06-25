@@ -139,8 +139,6 @@ k573dio_device::k573dio_device(const machine_config &mconfig, const char *tag, d
 
 void k573dio_device::device_start()
 {
-	output_cb.resolve_safe();
-
 	save_item(NAME(ram_adr));
 	save_item(NAME(ram_read_adr));
 	save_item(NAME(output_data));

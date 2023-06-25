@@ -3320,11 +3320,23 @@ void z80_device::take_interrupt()
 					PCD = irq_vector & 0xffff;
 					break;
 				default:        /* rst (or other opcodes?) */
-					/* RST $xx cycles */
-					CC(op, 0xff);
-					T(m_icount_executing - MTM * 2);
-					wm16_sp(m_pc);
-					PCD = irq_vector & 0x0038;
+					if (irq_vector == 0xfb)
+					{
+						// EI
+						CC(op, 0xfb);
+						T(m_icount_executing);
+						ei();
+					}
+					else if ((irq_vector & 0xc7) == 0xc7)
+					{
+						/* RST $xx cycles */
+						CC(op, 0xff);
+						T(m_icount_executing - MTM * 2);
+						wm16_sp(m_pc);
+						PCD = irq_vector & 0x0038;
+					}
+					else
+						logerror("take_interrupt: unexpected opcode in im0 mode: 0x%02x\n", irq_vector);
 					break;
 			}
 		}
@@ -3579,16 +3591,12 @@ void z80_device::device_start()
 	m_cc_xy = cc_xy;
 	m_cc_xycb = cc_xycb;
 	m_cc_ex = cc_ex;
-
-	m_irqack_cb.resolve_safe();
-	m_refresh_cb.resolve_safe();
-	m_nomreq_cb.resolve_safe();
-	m_halt_cb.resolve_safe();
 }
 
 void nsc800_device::device_start()
 {
 	z80_device::device_start();
+
 	save_item(NAME(m_nsc800_irq_state));
 }
 

@@ -164,6 +164,7 @@ using util::BIT;
 #include "cpu/ssem/ssemdasm.h"
 #include "cpu/ssp1601/ssp1601d.h"
 #include "cpu/st62xx/st62xx_dasm.h"
+#include "cpu/st9/st9dasm.h"
 #include "cpu/superfx/sfx_dasm.h"
 #include "cpu/t11/t11dasm.h"
 #include "cpu/tlcs870/tlcs870d.h"
@@ -605,6 +606,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "ssem",            le,  0, []() -> util::disasm_interface * { return new ssem_disassembler; } },
 	{ "ssp1601",         be, -1, []() -> util::disasm_interface * { return new ssp1601_disassembler; } },
 	{ "st62xx",          le,  0, []() -> util::disasm_interface * { return new st62xx_disassembler; } },
+	{ "st9",             be,  0, []() -> util::disasm_interface * { return new st9_disassembler; } },
+	{ "st9p",            be,  0, []() -> util::disasm_interface * { return new st9p_disassembler; } },
 	{ "superfx",         le,  0, []() -> util::disasm_interface * { return new superfx_disassembler(&superfx_unidasm); } },
 	{ "t11",             le,  0, []() -> util::disasm_interface * { return new t11_disassembler; } },
 	{ "tlcs870",         le,  0, []() -> util::disasm_interface * { return new tlcs870_disassembler; } },

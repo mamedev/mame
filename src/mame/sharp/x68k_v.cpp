@@ -202,7 +202,7 @@ bool x68k_state::get_text_pixel(int line, int pixel, uint16_t *pix)
 						+ (((m_tvram[loc+0x20000] >> bit) & 0x01) ? 4 : 0)
 						+ (((m_tvram[loc+0x30000] >> bit) & 0x01) ? 8 : 0);
 	// Colour 0 is displayable if the text layer is at the priority level 2
-	if(*pix || (m_crtc->gfx_color_mode() == 3) || ((m_video.reg[1] & 0x0c00) == 0x0800))
+	if(*pix || ((m_video.reg[1] & 0x0c00) == 0x0800))
 		return true;
 	return false;
 }
@@ -775,7 +775,6 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	}
 
 	bool blend = (((m_video.reg[2] & 0x1900) == 0x1900) && (m_video.gfx_pri != 2));
-	bool bgen = (m_spritereg[0x404] & 0x0008) || (m_spritereg[0x404] & 0x0001);
 	for(scanline=rect.min_y;scanline<=rect.max_y;scanline++)
 	{
 		for(pixel=m_crtc->hbegin();pixel<=m_crtc->hend();pixel++)
@@ -813,7 +812,7 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 							pix = m_pcgpalette->pen(colour);
 							pcgpix = true;
 						}
-						else if(outpix && bgen && (pcgprio > textprio))
+						else if(outpix && (pcgprio > textprio) && (textprio != -1))
 							pix = outpix;
 					}
 					else if(priority == gfxprio)
@@ -846,7 +845,7 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 							pix = m_pcgpalette->pen(colour);
 							pcgpix = true;
 						}
-						else if(outpix && bgen && (pcgprio > textprio))
+						else if(outpix && (pcgprio > textprio) && (textprio != -1))
 							pix = outpix;
 					}
 					else if(priority == gfxprio)

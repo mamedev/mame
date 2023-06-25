@@ -23,8 +23,10 @@
 
 #include "emu.h"
 #include "akiko.h"
-#include "coreutil.h"
+
 #include "romload.h"
+
+#include "coreutil.h"
 
 #define LOG_WARN        (1U << 1) // Show warnings
 #define LOG_REGS        (1U << 2) // Show register r/w
@@ -93,8 +95,8 @@ akiko_device::akiko_device(const machine_config &mconfig, const char *tag, devic
 	, m_cdrom_toc(nullptr)
 	, m_dma_timer(nullptr)
 	, m_frame_timer(nullptr)
-	, m_mem_r(*this), m_mem_w(*this), m_int_w(*this)
-	, m_scl_w(*this), m_sda_r(*this), m_sda_w(*this)
+	, m_mem_r(*this, 0xffff), m_mem_w(*this), m_int_w(*this)
+	, m_scl_w(*this), m_sda_r(*this, 1), m_sda_w(*this)
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -115,14 +117,6 @@ akiko_device::akiko_device(const machine_config &mconfig, const char *tag, devic
 
 void akiko_device::device_start()
 {
-	// resolve callbacks
-	m_mem_r.resolve_safe(0xffff);
-	m_mem_w.resolve_safe();
-	m_int_w.resolve_safe();
-	m_scl_w.resolve_safe();
-	m_sda_r.resolve_safe(1);
-	m_sda_w.resolve_safe();
-
 	m_c2p_input_index = 0;
 	m_c2p_output_index = 0;
 

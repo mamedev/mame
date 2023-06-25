@@ -375,9 +375,9 @@ void x68k_state::fdc_w(offs_t offset, uint16_t data)
 		x = data & 0x0f;
 		for(drive=0;drive<4;drive++)
 		{
-			if(m_fdc.control_drives & (1 << drive))
+			if(BIT(m_fdc.control_drives, drive) && m_fdc.floppy[drive])
 			{
-				if(!(x & (1 << drive)))  // functions take place on 1->0 transitions of drive bits only
+				if(!BIT(x, drive))  // functions take place on 1->0 transitions of drive bits only
 				{
 					m_fdc.led_ctrl[drive] = data & 0x80;  // blinking drive LED if no disk inserted
 					m_fdc.led_eject[drive] = data & 0x40;  // eject button LED (on when set to 0)
@@ -397,7 +397,7 @@ void x68k_state::fdc_w(offs_t offset, uint16_t data)
 		m_fdc.motor = data & 0x80;
 
 		for(int i = 0; i < 4; i++)
-			if(m_fdc.floppy[i]->exists())
+			if(m_fdc.floppy[i] && m_fdc.floppy[i]->exists())
 				m_fdc.floppy[i]->mon_w(!BIT(data, 7));
 
 		m_access_drv_out[x] = 0;
@@ -421,10 +421,10 @@ uint16_t x68k_state::fdc_r(offs_t offset)
 		ret = 0x00;
 		for(x=0;x<4;x++)
 		{
-			if(m_fdc.control_drives & (1 << x))
+			if(BIT(m_fdc.control_drives, x))
 			{
 				ret = 0x00;
-				if(m_fdc.floppy[x]->exists())
+				if(m_fdc.floppy[x] && m_fdc.floppy[x]->exists())
 				{
 					ret |= 0x80;
 				}

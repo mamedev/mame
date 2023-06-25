@@ -63,9 +63,6 @@ sgi_re2_device::sgi_re2_device(machine_config const &mconfig, char const *tag, d
 
 void sgi_re2_device::device_start()
 {
-	m_rdy_cb.resolve();
-	m_drq_cb.resolve();
-
 	m_vram = std::make_unique<u32[]>(1280 * 1024);
 	m_dram = std::make_unique<u32[]>(1280 * 1024);
 

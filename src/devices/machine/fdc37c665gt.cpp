@@ -47,18 +47,6 @@ fdc37c665gt_device::fdc37c665gt_device(const machine_config &mconfig, const char
 
 void fdc37c665gt_device::device_start()
 {
-	m_fintr_callback.resolve_safe();
-	m_fdrq_callback.resolve_safe();
-	m_pintr1_callback.resolve_safe();
-	m_irq3_callback.resolve_safe();
-	m_irq4_callback.resolve_safe();
-	m_txd1_callback.resolve_safe();
-	m_ndtr1_callback.resolve_safe();
-	m_nrts1_callback.resolve_safe();
-	m_txd2_callback.resolve_safe();
-	m_ndtr2_callback.resolve_safe();
-	m_nrts2_callback.resolve_safe();
-
 	// Configuration registers and related bits aren't affected by soft resets
 	// Default addresses
 	com_addresses[0] = 0x3f8;

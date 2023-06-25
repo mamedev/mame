@@ -93,18 +93,6 @@ void am2901b_device::device_start()
 	save_item(NAME(m_f0_out));
 	save_item(NAME(m_f3_out));
 	save_item(NAME(m_co_out));
-
-	m_y.resolve_safe();
-	m_g.resolve_safe();
-	m_p.resolve_safe();
-	m_q0.resolve_safe();
-	m_q3.resolve_safe();
-	m_ram0.resolve_safe();
-	m_ram3.resolve_safe();
-	m_ovr.resolve_safe();
-	m_f0.resolve_safe();
-	m_f3.resolve_safe();
-	m_co.resolve_safe();
 }
 
 void am2901b_device::device_reset()

@@ -70,8 +70,7 @@ public:
 	int output_comp_r();    // NOT strictly the same as !output_r()
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

@@ -2140,7 +2140,7 @@ void cps3_state::colourram_w(offs_t offset, u16 data, u16 mem_mask)
 /* there are more unknown writes, but you get the idea */
 void cps3_state::cps3_map(address_map &map)
 {
-	map(0x00000000, 0x0007ffff).rom().region("bios", 0); // Bios ROM
+	map(0x00000000, 0x0007ffff).rom().region("bios", 0); // BIOS ROM
 	map(0x02000000, 0x0207ffff).ram().share("mainram"); // Main RAM
 	map(0x03000000, 0x030003ff).ram(); // 'FRAM' (sfiii and warzard memory test mode ONLY, and only odd bytes)
 
@@ -2189,7 +2189,7 @@ void cps3_state::cps3_map(address_map &map)
 
 void cps3_state::decrypted_opcodes_map(address_map &map)
 {
-	map(0x00000000, 0x0007ffff).rom().region("bios", 0); // Bios ROM
+	map(0x00000000, 0x0007ffff).rom().region("bios", 0); // BIOS ROM
 	map(0x06000000, 0x06ffffff).rom().share("decrypted_gamerom");
 	map(0xc0000000, 0xc00003ff).rom().share("sh2cache_ram_decrypted");
 }
@@ -4062,8 +4062,8 @@ GAME( 1997, sfiiiu,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii, 
 GAME( 1997, sfiiia,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, sfiiij,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Japan 970204)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, sfiiih,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Hispanic 970204)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, sfiiin,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD, bios set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, sfiiina,     sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD, bios set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sfiiin,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD, BIOS set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sfiiina,     sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD, BIOS set 2)", MACHINE_SUPPORTS_SAVE )
 
 /* Street Fighter III 2nd Impact: Giant Attack */
 

@@ -200,25 +200,27 @@ macro jsr32 %opc %spreg
 	prefetch_noirq
 
 10003 dma
-	if(m_current_dma->m_count == 1)
-		m_dma_device->count_last(m_current_dma->m_id);
-	if(m_current_dma->m_mode_16) {
-		m_TMP1 = read16(m_current_dma->m_source);
-		write16(m_current_dma->m_dest, m_TMP1);
+	m_TMP2 = m_current_dma;
+	if(m_dma_channel[m_TMP2]->m_flags & h8_dma_state::MODE_16) {
+		m_TMP1 = read16(m_dma_channel[m_TMP2]->m_source);
+		if(m_dma_channel[m_TMP2]->m_count == 1 && !(m_dma_channel[m_TMP2]->m_flags & (h8_dma_state::BLOCK|h8_dma_state::REPEAT)))
+			m_dma_device->count_last(m_dma_channel[m_TMP2]->m_id);
+		write16(m_dma_channel[m_TMP2]->m_dest, m_TMP1);
 	} else {
-		m_TMP1 = read8(m_current_dma->m_source);
-		write8(m_current_dma->m_dest, m_TMP1);
+		m_TMP1 = read8(m_dma_channel[m_TMP2]->m_source);
+		if(m_dma_channel[m_TMP2]->m_count == 1 && !(m_dma_channel[m_TMP2]->m_flags & (h8_dma_state::BLOCK|h8_dma_state::REPEAT)))
+			m_dma_device->count_last(m_dma_channel[m_TMP2]->m_id);
+		write8(m_dma_channel[m_TMP2]->m_dest, m_TMP1);
 	}
-	m_current_dma->m_source += m_current_dma->m_incs;
-	m_current_dma->m_dest   += m_current_dma->m_incd;
-	m_current_dma->m_count--;
-	if(!m_current_dma->m_autoreq)
-		m_current_dma->m_suspended = true;
-	if(!m_current_dma->m_count) {
-		uint8_t id = m_current_dma->m_id;
-		m_current_dma = nullptr;
-		m_dma_device->count_done(id);
+	m_dma_channel[m_TMP2]->m_source += m_dma_channel[m_TMP2]->m_incs;
+	m_dma_channel[m_TMP2]->m_dest   += m_dma_channel[m_TMP2]->m_incd;
+	m_dma_channel[m_TMP2]->m_count--;
+	if(m_dma_channel[m_TMP2]->m_flags & h8_dma_state::SUSPEND_AFTER_TRANSFER) {
+		m_dma_channel[m_TMP2]->m_flags |= h8_dma_state::SUSPENDED;
+		update_active_dma_channel();
 	}
+	if(!m_dma_channel[m_TMP2]->m_count)
+		m_dma_device->count_done(m_TMP2);
 	prefetch_done();
 
 10004 dtc s20

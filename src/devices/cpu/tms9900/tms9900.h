@@ -71,12 +71,10 @@ protected:
 	virtual void        device_stop() override;
 	virtual void        device_reset() override;
 
-	virtual void        resolve_lines();
-
 	// device_execute_interface overrides
-	virtual uint32_t      execute_min_cycles() const noexcept override;
-	virtual uint32_t      execute_max_cycles() const noexcept override;
-	virtual uint32_t      execute_input_lines() const noexcept override;
+	virtual uint32_t    execute_min_cycles() const noexcept override;
+	virtual uint32_t    execute_max_cycles() const noexcept override;
+	virtual uint32_t    execute_input_lines() const noexcept override;
 	virtual void        execute_set_input(int irqline, int state) override;
 	virtual void        execute_run() override;
 
@@ -86,9 +84,9 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// Let these methods be overloaded by the TMS9980.
-	virtual void        mem_read(void);
-	virtual void        mem_write(void);
-	virtual void        acquire_instruction(void);
+	virtual void        mem_read();
+	virtual void        mem_write();
+	virtual void        acquire_instruction();
 	void                decode(uint16_t inst);
 
 	const address_space_config  m_program_config;
@@ -234,7 +232,7 @@ private:
 	typedef const uint8_t* microprogram;
 
 	// Method pointer
-	typedef void (tms99xx_device::*ophandler)(void);
+	typedef void (tms99xx_device::*ophandler)();
 
 	// Opcode list entry
 	struct tms_instruction
@@ -262,54 +260,54 @@ private:
 	static const tms99xx_device::tms_instruction s_command[];
 
 	// Micro-operation declarations
-	void    register_read(void);
-	void    register_write(void);
-	void    cru_input_operation(void);
-	void    cru_output_operation(void);
-	void    data_derivation_subprogram(void);
-	void    return_from_subprogram(void);
-	void    command_completed(void);
+	void    register_read();
+	void    register_write();
+	void    cru_input_operation();
+	void    cru_output_operation();
+	void    data_derivation_subprogram();
+	void    return_from_subprogram();
+	void    command_completed();
 
-	void    alu_nop(void);
-	void    alu_clear(void);
-	void    alu_source(void);
-	void    alu_setaddr(void);
-	void    alu_addone(void);
-	void    alu_setaddr_addone(void);
-	void    alu_pcaddr_advance(void);
-	void    alu_add_register(void);
+	void    alu_nop();
+	void    alu_clear();
+	void    alu_source();
+	void    alu_setaddr();
+	void    alu_addone();
+	void    alu_setaddr_addone();
+	void    alu_pcaddr_advance();
+	void    alu_add_register();
 
-	void    alu_imm(void);
-	void    alu_reg(void);
+	void    alu_imm();
+	void    alu_reg();
 
-	void    alu_f1(void);
-	void    alu_comp(void);
-	void    alu_f3(void);
-	void    alu_multiply(void);
-	void    alu_divide(void);
-	void    alu_xop(void);
-	void    alu_clr_swpb(void);
-	void    alu_abs(void);
-	void    alu_x(void);
-	void    alu_b(void);
-	void    alu_blwp(void);
-	void    alu_ldcr(void);
-	void    alu_stcr(void);
-	void    alu_sbz_sbo(void);
-	void    alu_tb(void);
-	void    alu_jmp(void);
-	void    alu_shift(void);
-	void    alu_ai_ori(void);
-	void    alu_ci(void);
-	void    alu_li(void);
-	void    alu_lwpi(void);
-	void    alu_limi(void);
-	void    alu_stwp_stst(void);
-	void    alu_external(void);
-	void    alu_rtwp(void);
-	void    alu_int(void);
+	void    alu_f1();
+	void    alu_comp();
+	void    alu_f3();
+	void    alu_multiply();
+	void    alu_divide();
+	void    alu_xop();
+	void    alu_clr_swpb();
+	void    alu_abs();
+	void    alu_x();
+	void    alu_b();
+	void    alu_blwp();
+	void    alu_ldcr();
+	void    alu_stcr();
+	void    alu_sbz_sbo();
+	void    alu_tb();
+	void    alu_jmp();
+	void    alu_shift();
+	void    alu_ai_ori();
+	void    alu_ci();
+	void    alu_li();
+	void    alu_lwpi();
+	void    alu_limi();
+	void    alu_stwp_stst();
+	void    alu_external();
+	void    alu_rtwp();
+	void    alu_int();
 
-	void    abort_operation(void);
+	void    abort_operation();
 
 	// Micro-operation program counter (as opposed to the program counter PC)
 	int     MPC;

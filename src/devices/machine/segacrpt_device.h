@@ -172,6 +172,12 @@ public:
 	sega_315_5096_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
 };
 
+class sega_315_5111_device : public sega_315_5006_device
+{
+public:
+	sega_315_5111_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
+};
+
 class sega_315_5015_device : public segacrpt_z80_device
 {
 public:
@@ -272,6 +278,7 @@ DECLARE_DEVICE_TYPE(SEGA_315_5093, sega_315_5093_device)
 DECLARE_DEVICE_TYPE(SEGA_315_5099, sega_315_5099_device)
 DECLARE_DEVICE_TYPE(SEGA_315_5006, sega_315_5006_device)
 DECLARE_DEVICE_TYPE(SEGA_315_5096, sega_315_5096_device)
+DECLARE_DEVICE_TYPE(SEGA_315_5111, sega_315_5111_device)
 DECLARE_DEVICE_TYPE(SEGA_315_5015, sega_315_5015_device)
 DECLARE_DEVICE_TYPE(SEGA_315_5133, sega_315_5133_device)
 DECLARE_DEVICE_TYPE(SEGA_315_5014, sega_315_5014_device)

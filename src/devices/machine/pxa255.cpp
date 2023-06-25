@@ -38,9 +38,9 @@ pxa255_periphs_device::pxa255_periphs_device(const machine_config &mconfig, cons
 	, m_gpio0_w(*this)
 	, m_gpio1_w(*this)
 	, m_gpio2_w(*this)
-	, m_gpio0_r(*this)
-	, m_gpio1_r(*this)
-	, m_gpio2_r(*this)
+	, m_gpio0_r(*this, 0xffffffff)
+	, m_gpio1_r(*this, 0xffffffff)
+	, m_gpio2_r(*this, 0xffffffff)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_dmadac(*this, "dac%u", 1U)
 	, m_palette(*this, "palette")
@@ -1520,13 +1520,6 @@ void pxa255_periphs_device::device_start()
 	m_lcd_palette = make_unique_clear<uint32_t[]>(0x100);
 	m_lcd_framebuffer = make_unique_clear<uint8_t[]>(0x100000);
 	m_samples = make_unique_clear<int16_t[]>(0x1000);
-
-	m_gpio0_w.resolve_safe();
-	m_gpio1_w.resolve_safe();
-	m_gpio2_w.resolve_safe();
-	m_gpio0_r.resolve_safe(0xffffffff);
-	m_gpio1_r.resolve_safe(0xffffffff);
-	m_gpio2_r.resolve_safe(0xffffffff);
 
 	m_rtc_regs.timer = timer_alloc(FUNC(pxa255_periphs_device::rtc_tick), this);
 }

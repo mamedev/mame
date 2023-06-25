@@ -337,8 +337,8 @@ ROM_START(zidav630e)
 	ROM_SYSTEM_BIOS(0, "award_v108",  "Award BIOS v1.08")
 	ROMX_LOAD( "v630108e.bin",     0x040000, 0x040000, CRC(25c91274) SHA1(95ff37ad0cfb39bb4ceff2db1cd47f13849ea53a), ROM_BIOS(0) )
 	// Corrupt file
-//	ROM_SYSTEM_BIOS(1, "award_v104",  "Award BIOS v1.04")
-//	ROMX_LOAD( "V630e104.bin",     0x040000, 0x040000, CRC(?) SHA1(?), ROM_BIOS(1) )
+//  ROM_SYSTEM_BIOS(1, "award_v104",  "Award BIOS v1.04")
+//  ROMX_LOAD( "V630e104.bin",     0x040000, 0x040000, CRC(?) SHA1(?), ROM_BIOS(1) )
 ROM_END
 
 /*

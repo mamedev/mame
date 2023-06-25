@@ -1025,11 +1025,6 @@ void mainboard8_device::ggrdy_in(int state)
 
 void mainboard8_device::device_start()
 {
-	// Lines going to the main driver class, then to the CPU
-	m_ready.resolve_safe();         // READY
-	m_console_reset.resolve_safe(); // RESET
-	m_hold_line.resolve_safe();     // HOLD
-
 	m_rom0  = machine().root_device().memregion(TI998_ROM0_REG)->base();
 	m_rom1  = machine().root_device().memregion(TI998_ROM1_REG)->base();
 	m_pascalrom  = machine().root_device().memregion(TI998_PASCAL_REG)->base();
@@ -2739,7 +2734,6 @@ void oso_device::hexbus_value_changed(uint8_t data)
 void oso_device::device_start()
 {
 	m_status = m_xmit = m_control = m_data = 0;
-	m_int.resolve_safe();
 
 	// Establish the downstream link in the parent class hexbus_chained_device
 	set_outbound_hexbus(m_hexbusout);

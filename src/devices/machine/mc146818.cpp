@@ -86,9 +86,6 @@ void mc146818_device::device_start()
 	m_update_timer = timer_alloc(FUNC(mc146818_device::time_tick), this);
 	m_periodic_timer = timer_alloc(FUNC(mc146818_device::periodic_tick), this);
 
-	m_write_irq.resolve_safe();
-	m_write_sqw.resolve_safe();
-
 	save_pointer(NAME(m_data), data_size());
 	save_item(NAME(m_index));
 	save_item(NAME(m_sqw_state));

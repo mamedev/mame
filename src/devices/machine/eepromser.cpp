@@ -190,9 +190,6 @@ void eeprom_serial_base_device::device_start()
 	// start the base class
 	eeprom_base_device::device_start();
 
-	// resolve callback
-	m_do_cb.resolve_safe();
-
 	// save the current state
 	save_item(NAME(m_state));
 	save_item(NAME(m_cs_state));

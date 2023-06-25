@@ -417,15 +417,9 @@ cuda_device::cuda_device(const machine_config &mconfig, const char *tag, device_
 
 void cuda_device::device_start()
 {
-	write_reset.resolve_safe();
-	write_linechange.resolve_safe();
-	write_via_clock.resolve_safe();
-	write_via_data.resolve_safe();
-	write_iic_scl.resolve_safe();
-	write_iic_sda.resolve_safe();
-
 	m_timer = timer_alloc(FUNC(cuda_device::seconds_tick), this);
 	m_prog_timer = timer_alloc(FUNC(cuda_device::timer_tick), this);
+
 	save_item(NAME(ddrs[0]));
 	save_item(NAME(ddrs[1]));
 	save_item(NAME(ddrs[2]));

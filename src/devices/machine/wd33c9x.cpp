@@ -388,8 +388,6 @@ wd33c9x_base_device::wd33c9x_base_device(const machine_config &mconfig, device_t
 
 void wd33c9x_base_device::device_start()
 {
-	m_irq_cb.resolve_safe();
-	m_drq_cb.resolve_safe();
 	m_timer = timer_alloc(FUNC(wd33c9x_base_device::update_step), this);
 	save_item(NAME(m_addr));
 	save_item(NAME(m_regs));

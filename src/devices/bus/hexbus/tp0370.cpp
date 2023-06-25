@@ -347,9 +347,6 @@ void ibc_device::update_lines(bool bav, bool hsk)
 
 void ibc_device::device_start()
 {
-	m_int.resolve_safe();
-	m_hexout.resolve_safe();
-	m_latch.resolve_safe();
 }
 
 void ibc_device::device_reset()

@@ -42,6 +42,7 @@ on the CSC. Also seen with 101-1025A04 label, same ROM contents.
 101-1025A03 might be optional, one (untampered) Spanish PCB was seen with a socket
 instead of this ROM. Most of the opening book is in here.
 
+PCB label: 510-1326B01
 CPU is a 6502 running at 1.95MHz (3.9MHz resonator, divided by 2)
 
 NMI is not used.
@@ -162,6 +163,7 @@ Elite Champion Challenger (ELITE)
 This is a limited-release chess computer based on the CSC. They removed the PIAs
 and did the I/O with TTL instead (PIAs will still work from software point of view).
 ---------------------------------
+PCB label: 510-1041B01
 MPS 6502C CPU @ 4MHz
 20KB total ROM size, 4KB RAM(8*HM6147P)
 
@@ -190,11 +192,11 @@ The 1st version came out in 1980, a program revision was released in 1981.
 Another distinction is the board color and layout, the 1981 version is green.
 Not sure if the 1st version was even released, or just a prototype.
 ---------------------------------
-8*(8+1) buttons, 8*8+1 LEDs
-1KB RAM(2*2114), 4KB ROM
+PCB label: 510-1035A01
 MOS MPS 6502B CPU, frequency unknown
 MOS MPS 6520 PIA, I/O is nearly same as CSC's PIA 0
-PCB label 510-1035A01
+1KB RAM(2*2114), 4KB ROM
+8*(8+1) buttons, 8*8+1 LEDs
 
 To play it on MAME with the sensorboard device, it is recommended to set up
 keyboard shortcuts for the spawn inputs. Then hold the spawn input down while

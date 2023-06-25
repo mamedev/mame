@@ -89,12 +89,6 @@ im6402_device::im6402_device(const machine_config &mconfig, const char *tag, dev
 
 void im6402_device::device_start()
 {
-	// resolve callbacks
-	m_write_tro.resolve_safe();
-	m_write_dr.resolve_safe();
-	m_write_tbre.resolve_safe();
-	m_write_tre.resolve_safe();
-
 	// create the timers
 	if (m_rrc > 0)
 	{

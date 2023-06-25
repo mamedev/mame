@@ -57,9 +57,6 @@ dw_fdc_device::dw_fdc_device(const machine_config &mconfig, const char *tag, dev
 
 void dw_fdc_device::device_start()
 {
-	m_out_data.resolve_safe();
-	m_out_clock.resolve_safe();
-	m_out_strobe.resolve_safe();
 	m_reset_timer = timer_alloc(FUNC(dw_fdc_device::assert_reset_line), this);
 }
 

@@ -470,13 +470,6 @@ void ie15_device::kbd_sdv(int state)
 	m_kbd_sdv = state;
 }
 
-void ie15_device::device_resolve_objects()
-{
-	m_rs232_conn_dtr_handler.resolve_safe();
-	m_rs232_conn_rts_handler.resolve_safe();
-	m_rs232_conn_txd_handler.resolve_safe();
-}
-
 void ie15_device::device_start()
 {
 	m_lat_led.resolve();

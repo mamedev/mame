@@ -157,7 +157,6 @@ cammu_device::cammu_device(const machine_config &mconfig, device_type type, cons
 
 void cammu_device::device_start()
 {
-	m_exception_func.resolve();
 }
 
 void cammu_device::device_reset()

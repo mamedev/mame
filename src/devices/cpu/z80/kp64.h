@@ -36,8 +36,7 @@ public:
 	void gate_w(int state);
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

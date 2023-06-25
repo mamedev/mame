@@ -61,7 +61,6 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(vbl_interrupt);
 
 	void main_map(address_map &map) ATTR_COLD;
-	void io_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<h83003_device> m_maincpu;
@@ -163,12 +162,6 @@ void lw700i_state::main_map(address_map &map)
 	map(0x600000, 0x63ffff).ram().share("mainram"); // 256K of main RAM
 	map(0xe00000, 0xe00003).m(m_fdc, FUNC(hd63266f_device::map));
 	map(0xf00048, 0xf00049).ram();
-}
-
-void lw700i_state::io_map(address_map &map)
-{
-	map(h83003_device::PORT_7, h83003_device::PORT_7).r(FUNC(lw700i_state::p7_r));
-	map(h83003_device::PORT_B, h83003_device::PORT_B).rw(FUNC(lw700i_state::pb_r), FUNC(lw700i_state::pb_w));
 }
 
 // row 0:   | 4 | 3 | W | E | D | X | ? | Enter? |
@@ -283,7 +276,10 @@ void lw700i_state::lw700i(machine_config &config)
 {
 	H83003(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &lw700i_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &lw700i_state::io_map);
+	m_maincpu->read_port7().set(FUNC(lw700i_state::p7_r));
+	m_maincpu->read_portb().set(FUNC(lw700i_state::pb_r));
+	m_maincpu->write_portb().set(FUNC(lw700i_state::pb_w));
+
 	m_maincpu->tend2().set(m_fdc, FUNC(hd63266f_device::tc_line_w));
 	TIMER(config, "scantimer").configure_scanline(FUNC(lw700i_state::vbl_interrupt), "screen", 0, 1);
 

@@ -85,14 +85,6 @@ z180asci_channel_base::z180asci_channel_base(const machine_config &mconfig, devi
 }
 
 
-void z180asci_channel_base::device_resolve_objects()
-{
-	// resolve callbacks
-	m_txa_handler.resolve_safe();
-	m_rts_handler.resolve_safe();
-	m_cka_handler.resolve_safe();
-}
-
 void z180asci_channel_base::device_start()
 {
 	save_item(NAME(m_asci_cntla));

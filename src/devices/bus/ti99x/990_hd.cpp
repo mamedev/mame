@@ -275,10 +275,9 @@ int ti990_hdc_device::cur_disk_unit()
 */
 void ti990_hdc_device::update_interrupt()
 {
-	if (!m_interrupt_callback.isnull())
-		m_interrupt_callback((m_w[7] & w7_idle)
-									&& (((m_w[7] & w7_int_enable) && (m_w[7] & (w7_complete | w7_error)))
-										|| ((m_w[0] & (m_w[0] >> 4)) & w0_attn_mask)));
+	m_interrupt_callback((m_w[7] & w7_idle)
+								&& (((m_w[7] & w7_int_enable) && (m_w[7] & (w7_complete | w7_error)))
+									|| ((m_w[0] & (m_w[0] >> 4)) & w0_attn_mask)));
 }
 
 /*
@@ -942,11 +941,9 @@ ti990_hdc_device::ti990_hdc_device(const machine_config &mconfig, const char *ta
 
 void ti990_hdc_device::device_start()
 {
-	int i;
-
 	/* initialize harddisk information */
 	/* attention lines will be set by DEVICE_IMAGE_LOAD */
-	for (i=0; i<MAX_DISK_UNIT; i++)
+	for (int i=0; i<MAX_DISK_UNIT; i++)
 	{
 		m_d[i].format = format_mame;
 		m_d[i].wp = 1;
@@ -960,8 +957,6 @@ void ti990_hdc_device::device_start()
 	m_d[1].img = dynamic_cast<harddisk_image_device *>(subdevice("harddisk2"));
 	m_d[2].img = dynamic_cast<harddisk_image_device *>(subdevice("harddisk3"));
 	m_d[3].img = dynamic_cast<harddisk_image_device *>(subdevice("harddisk4"));
-
-	m_interrupt_callback.resolve_safe();
 
 	update_interrupt();
 }

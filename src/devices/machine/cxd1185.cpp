@@ -73,10 +73,6 @@ void cxd1185_device::map(address_map &map)
 
 void cxd1185_device::device_start()
 {
-	m_irq_out_cb.resolve_safe();
-	m_drq_out_cb.resolve_safe();
-	m_port_out_cb.resolve_safe();
-
 	save_item(NAME(m_state));
 	save_item(NAME(m_irq_asserted));
 	save_item(NAME(m_drq_asserted));

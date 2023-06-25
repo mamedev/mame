@@ -230,8 +230,6 @@ trs80m2_keyboard_device::trs80m2_keyboard_device(const machine_config &mconfig, 
 void trs80m2_keyboard_device::device_start()
 {
 	m_leds.resolve();
-	// resolve callbacks
-	m_write_clock.resolve_safe();
 
 	// state saving
 	save_item(NAME(m_busy));

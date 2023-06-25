@@ -51,9 +51,6 @@ einstein_userport_device::~einstein_userport_device()
 
 void einstein_userport_device::device_start()
 {
-	// resolve callbacks
-	m_bstb_handler.resolve_safe();
-
 	m_card = get_card_device();
 }
 

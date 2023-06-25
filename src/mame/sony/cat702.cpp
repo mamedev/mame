@@ -118,8 +118,6 @@ void cat702_device::device_start()
 		memcpy(m_transform, m_region->base(), sizeof(m_transform));
 	}
 
-	m_dataout_handler.resolve_safe();
-
 	save_item(NAME(m_select));
 	save_item(NAME(m_clock));
 	save_item(NAME(m_datain));

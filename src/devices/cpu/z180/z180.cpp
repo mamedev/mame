@@ -167,12 +167,6 @@ z80182_device::z80182_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-void z180_device::device_resolve_objects()
-{
-	m_tend0_cb.resolve_safe();
-	m_tend1_cb.resolve_safe();
-}
-
 #define CF  0x01
 #define NF  0x02
 #define PF  0x04

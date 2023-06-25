@@ -77,16 +77,16 @@ nes_vt02_vt03_soc_device::nes_vt02_vt03_soc_device(const machine_config& mconfig
 	m_chrram(nullptr),
 	m_space_config("program", ENDIANNESS_LITTLE, 8, 25, 0, address_map_constructor(FUNC(nes_vt02_vt03_soc_device::program_map), this)),
 	m_write_0_callback(*this),
-	m_read_0_callback(*this),
-	m_read_1_callback(*this),
+	m_read_0_callback(*this, 0xff),
+	m_read_1_callback(*this, 0xff),
 	m_extra_write_0_callback(*this),
 	m_extra_write_1_callback(*this),
 	m_extra_write_2_callback(*this),
 	m_extra_write_3_callback(*this),
-	m_extra_read_0_callback(*this),
-	m_extra_read_1_callback(*this),
-	m_extra_read_2_callback(*this),
-	m_extra_read_3_callback(*this)
+	m_extra_read_0_callback(*this, 0xff),
+	m_extra_read_1_callback(*this, 0xff),
+	m_extra_read_2_callback(*this, 0xff),
+	m_extra_read_3_callback(*this, 0xff)
 {
 	// 'no scramble' configuration
 	for (int i = 0; i < 6; i++)
@@ -155,20 +155,6 @@ void nes_vt02_vt03_soc_device::device_start()
 	//m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8sm_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_r)), write8sm_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_w)));
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(nes_vt02_vt03_soc_device::nt_r)), write8sm_delegate(*this, FUNC(nes_vt02_vt03_soc_device::nt_w)));
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8sm_delegate(*this, FUNC(nes_vt02_vt03_soc_device::chr_r)), write8sm_delegate(*this, FUNC(nes_vt02_vt03_soc_device::chr_w)));
-
-	m_write_0_callback.resolve_safe();
-	m_read_0_callback.resolve_safe(0xff);
-	m_read_1_callback.resolve_safe(0xff);
-
-	m_extra_write_0_callback.resolve_safe();
-	m_extra_write_1_callback.resolve_safe();
-	m_extra_write_2_callback.resolve_safe();
-	m_extra_write_3_callback.resolve_safe();
-
-	m_extra_read_0_callback.resolve_safe(0xff);
-	m_extra_read_1_callback.resolve_safe(0xff);
-	m_extra_read_2_callback.resolve_safe(0xff);
-	m_extra_read_3_callback.resolve_safe(0xff);
 }
 
 void nes_vt02_vt03_soc_device::device_reset()

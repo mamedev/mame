@@ -455,24 +455,6 @@ void z80sio_device::device_validity_check(validity_checker &valid) const
 }
 
 //-------------------------------------------------
-//  device_resolve_objects - device-specific setup
-//-------------------------------------------------
-void z80sio_device::device_resolve_objects()
-{
-	LOG("%s\n", FUNCNAME);
-
-	// resolve callbacks
-	m_out_txd_cb.resolve_all_safe();
-	m_out_dtr_cb.resolve_all_safe();
-	m_out_rts_cb.resolve_all_safe();
-	m_out_wrdy_cb.resolve_all_safe();
-	m_out_sync_cb.resolve_all_safe();
-	m_out_int_cb.resolve_safe();
-	m_out_rxdrq_cb.resolve_all_safe();
-	m_out_txdrq_cb.resolve_all_safe();
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 void z80sio_device::device_start()

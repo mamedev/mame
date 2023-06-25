@@ -103,8 +103,7 @@ public:
 	int irq_b_state() const { return m_irq_b_state; }
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

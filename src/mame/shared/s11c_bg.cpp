@@ -308,7 +308,7 @@ void s11c_bg_device::s11c_bgs_map(address_map &map)
 
 TIMER_CALLBACK_MEMBER(s11c_bg_device::deferred_cb2_w)
 {
-	if (!m_cb2_cb.isnull())
+	if (!m_cb2_cb.isunset())
 		m_cb2_cb(param);
 	else
 		logerror("S11C_BG CB2 writeback called with state %x, but callback is not registered!\n", param);
@@ -316,7 +316,7 @@ TIMER_CALLBACK_MEMBER(s11c_bg_device::deferred_cb2_w)
 
 TIMER_CALLBACK_MEMBER(s11c_bg_device::deferred_pb_w)
 {
-	if (!m_pb_cb.isnull())
+	if (!m_pb_cb.isunset())
 		m_pb_cb(param);
 	else
 		logerror("S11C_BG PB writeback called with state 0x%2X, but callback is not registered!\n", param);
@@ -501,9 +501,7 @@ void s11c_bg_device::device_start()
 	u8 *rom = memregion("cpu")->base();
 	m_cpubank->configure_entries(0, 16, &rom[0x0], 0x8000);
 	m_cpubank->set_entry(0);
-	/* resolve lines */
-	m_cb2_cb.resolve();
-	m_pb_cb.resolve();
+
 	save_item(NAME(m_old_resetq_state));
 }
 

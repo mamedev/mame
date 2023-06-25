@@ -52,9 +52,9 @@ psion_asic9_device::psion_asic9_device(const machine_config &mconfig, device_typ
 	, m_rtc_timer(nullptr)
 	, m_buz_cb(*this)
 	, m_col_cb(*this)
-	, m_port_ab_r(*this)
+	, m_port_ab_r(*this, 0)
 	, m_port_ab_w(*this)
-	, m_data_r(*this)
+	, m_data_r(*this, 0x00)
 	, m_data_w(*this)
 {
 }
@@ -105,23 +105,6 @@ device_memory_interface::space_config_vector psion_asic9_device::memory_space_co
 		std::make_pair(AS_A9_RAM, &m_ram_config),
 		std::make_pair(AS_A9_ROM, &m_rom_config)
 	};
-}
-
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void psion_asic9_device::device_resolve_objects()
-{
-	m_buz_cb.resolve_safe();
-	m_col_cb.resolve_safe();
-	m_port_ab_r.resolve_safe(0);
-	m_port_ab_w.resolve_safe();
-	m_data_r.resolve_all_safe(0x00);
-	m_data_w.resolve_all_safe();
 }
 
 

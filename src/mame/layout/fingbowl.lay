@@ -82,7 +82,7 @@ license:CC0-1.0
 		<text string="SLIDE OVER ALL NUMBERS - 2" align="2"><color red="0.02" green="0.47" blue="0.72" /></text>
 	</element>
 	<element name="text_i3d">
-		<text string="HANDS, 1 HAND PER LAP - 2 LAPS TOTAL" align="2"><color red="0.02" green="0.47" blue="0.72" /></text>
+		<text string="HANDS, 1 HAND PER LAP - 2 LAPS TOTAL." align="2"><color red="0.02" green="0.47" blue="0.72" /></text>
 	</element>
 
 	<element name="text_i4a">
@@ -376,7 +376,7 @@ license:CC0-1.0
 			<element ref="white"><bounds xc="63" yc="50" width="26" height="~r2~" /></element>
 		</repeat>
 
-		<element ref="white"><bounds xc="42.25" y="65" width="1" height="30" /></element>
+		<element ref="white"><bounds xc="42.25" y="64" width="1" height="30" /></element>
 
 		<element ref="oranged"><bounds xc="50" yc="50" width="39" height="39" /></element>
 		<element ref="oranged"><bounds xc="76" yc="50" width="39" height="39" /></element>

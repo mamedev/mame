@@ -19,7 +19,7 @@
         Star Wars - Jedi Trials
 -->
 
-<softwarelist name="leapfrog_didj_cart" description="LeapFrog Didj Cartridges">
+<softwarelist name="leapfrog_didj_cart" description="LeapFrog Didj cartridges">
 	<!-- NAND ROMs, dumps not yet verified as good, although they do contain a filesystem -->
 
 	<software name="andinvasn" supported="no">

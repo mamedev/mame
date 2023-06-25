@@ -177,7 +177,7 @@ const tiny_rom_entry *saa5057_device::device_rom_region() const
 saa5050_device::saa5050_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_char_rom(*this, "chargen"),
-	m_read_d(*this),
+	m_read_d(*this, 0),
 	m_frame_count(0),
 	m_cols(0),
 	m_rows(0),
@@ -233,9 +233,6 @@ saa5057_device::saa5057_device(const machine_config &mconfig, const char *tag, d
 
 void saa5050_device::device_start()
 {
-	// resolve callbacks
-	m_read_d.resolve_safe(0);
-
 	// register for state saving
 	save_item(NAME(m_code));
 	save_item(NAME(m_held_char));

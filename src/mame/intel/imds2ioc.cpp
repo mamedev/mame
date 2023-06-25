@@ -392,12 +392,6 @@ void imds2ioc_device::pio_master_w(offs_t offset, uint8_t data)
 	m_iocpio->upi41_master_w(offset, data);
 }
 
-void imds2ioc_device::device_resolve_objects()
-{
-	m_master_intr_cb.resolve_safe();
-	m_parallel_int_cb.resolve_safe();
-}
-
 void imds2ioc_device::device_start()
 {
 	m_iocfdc->set_ready_line_connected(true);

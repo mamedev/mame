@@ -155,9 +155,6 @@ mc6847_friend_device::mc6847_friend_device(const machine_config &mconfig, device
 
 void mc6847_friend_device::device_start()
 {
-	m_write_hsync.resolve_safe();
-	m_write_fsync.resolve_safe();
-
 	/* create the timers */
 	m_frame_timer = timer_alloc(FUNC(mc6847_friend_device::new_frame), this);
 	m_hsync_on_timer = timer_alloc(FUNC(mc6847_friend_device::change_horizontal_sync), this);
@@ -518,7 +515,7 @@ std::string mc6847_friend_device::describe_context() const
 
 mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs) :
 	mc6847_friend_device(mconfig, type, tag, owner, clock, fontdata, (type == MC6847T1_NTSC) || (type == MC6847T1_PAL), tpfs, 25+191, 1, true),
-	m_input_cb(*this),
+	m_input_cb(*this, 0),
 	m_black_and_white(false),
 	m_fixed_mode(0),
 	m_fixed_mode_mask(0)
@@ -587,7 +584,6 @@ void mc6847_base_device::device_start()
 	memset(m_data, 0, sizeof(m_data));
 
 	/* resolve callbacks */
-	m_input_cb.resolve_safe(0);
 	m_charrom_cb.resolve();
 
 	/* set up fixed mode */

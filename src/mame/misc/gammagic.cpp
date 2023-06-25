@@ -80,7 +80,7 @@ private:
 void gammagic_state::gammagic_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
-//	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
+//  map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
 	map(0x000e0000, 0x000fffff).rom().region("isa", 0x20000);/* System BIOS */
 	map(0x00100000, 0x07ffffff).ram();
 	map(0x08000000, 0xfffdffff).noprw();

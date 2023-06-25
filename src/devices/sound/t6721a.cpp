@@ -31,14 +31,14 @@ DEFINE_DEVICE_TYPE(T6721A, t6721a_device, "t6721a", "Toshiba T6721A")
 //  t6721a_device - constructor
 //-------------------------------------------------
 
-t6721a_device::t6721a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, T6721A, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_write_eos(*this),
-		m_write_phi2(*this),
-		m_write_dtrd(*this),
-		m_write_apd(*this),
-		m_stream(nullptr)
+t6721a_device::t6721a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, T6721A, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_write_eos(*this),
+	m_write_phi2(*this),
+	m_write_dtrd(*this),
+	m_write_apd(*this),
+	m_stream(nullptr)
 {
 }
 
@@ -49,12 +49,6 @@ t6721a_device::t6721a_device(const machine_config &mconfig, const char *tag, dev
 
 void t6721a_device::device_start()
 {
-	// resolve callbacks
-	m_write_eos.resolve_safe();
-	m_write_phi2.resolve_safe();
-	m_write_dtrd.resolve_safe();
-	m_write_apd.resolve_safe();
-
 	// create sound stream
 	m_stream = stream_alloc(0, 1, machine().sample_rate());
 }

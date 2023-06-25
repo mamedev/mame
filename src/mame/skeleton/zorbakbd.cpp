@@ -301,7 +301,6 @@ void zorba_keyboard_device::mcu_pc_w(u8 data)
 
 void zorba_keyboard_device::device_start()
 {
-	m_rxd_cb.resolve_safe();
 	m_led_key_caps_lock.resolve();
 	m_led_key_shift_lock.resolve();
 

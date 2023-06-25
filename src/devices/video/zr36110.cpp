@@ -27,8 +27,6 @@ zr36110_device::zr36110_device(const machine_config &mconfig, char const *tag, d
 
 void zr36110_device::device_start()
 {
-	m_drq_w.resolve_safe();
-
 	save_item(NAME(m_mc1_adr));
 	save_item(NAME(m_mc23_adr));
 	save_item(NAME(m_setup_adr));
@@ -301,7 +299,7 @@ void zr36110_device::cmdx_w(u16 data)
 
 void zr36110_device::dma8_w(u8 data)
 {
-	logerror("dna %02x\n", data);
+	//  logerror("dma %02x\n", data);
 }
 
 void zr36110_device::dma_w(u16 data)

@@ -61,9 +61,6 @@ void pc_kbdc_device::device_resolve_objects()
 	device_pc_kbd_interface *const pc_kbd = get_card_device();
 	if (pc_kbd)
 		pc_kbd->set_pc_kbdc(this);
-
-	m_out_clock_cb.resolve_safe();
-	m_out_data_cb.resolve_safe();
 }
 
 void pc_kbdc_device::device_start()

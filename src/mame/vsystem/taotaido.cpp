@@ -146,7 +146,8 @@ private:
 	uint8_t m_bgbank[8]{};
 	tilemap_t *m_bg_tilemap = nullptr;
 
-	uint16_t pending_command_r();
+	uint16_t soundlatch_pending_r();
+	void soundlatch_pending_w(int state);
 	void unknown_output_w(uint8_t data);
 	void sh_bankswitch_w(uint8_t data);
 	void spritebank_w(offs_t offset, uint8_t data);
@@ -296,10 +297,20 @@ void taotaido_state::machine_start()
 }
 
 
-uint16_t taotaido_state::pending_command_r()
+uint16_t taotaido_state::soundlatch_pending_r()
 {
 	// Only bit 0 is tested
 	return m_soundlatch->pending_r();
+}
+
+void taotaido_state::soundlatch_pending_w(int state)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+
+	// sound comms is 2-way (see soundlatch_pending_r),
+	// NMI routine is very short, so briefly set perfect_quantum to make sure that the timing is right
+	if (state)
+		machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 void taotaido_state::unknown_output_w(uint8_t data)
@@ -325,7 +336,7 @@ void taotaido_state::main_map(address_map &map)
 	map(0xffff20, 0xffff21).nopw(); // unknown - flip screen related
 	map(0xffff40, 0xffff47).w(FUNC(taotaido_state::spritebank_w));
 	map(0xffffc1, 0xffffc1).w(m_soundlatch, FUNC(generic_latch_8_device::write)); // seems right
-	map(0xffffe0, 0xffffe1).r(FUNC(taotaido_state::pending_command_r)); // guess - seems to be needed for all the sounds to work
+	map(0xffffe0, 0xffffe1).r(FUNC(taotaido_state::soundlatch_pending_r)); // guess - seems to be needed for all the sounds to work
 }
 
 // sound CPU - same as aerofgt
@@ -596,7 +607,7 @@ void taotaido_state::taotaido(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->data_pending_callback().set(FUNC(taotaido_state::soundlatch_pending_w));
 	m_soundlatch->set_separate_acknowledge(true);
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8'000'000));

@@ -108,6 +108,8 @@ class psx_controller_port_device :  public device_t,
 									public device_single_card_slot_interface<device_psx_controller_interface>
 {
 public:
+	typedef device_delegate<void ()> void_cb;
+
 	template <typename T>
 	psx_controller_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: psx_controller_port_device(mconfig, tag, owner, (uint32_t)0)
@@ -119,9 +121,10 @@ public:
 	}
 	psx_controller_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	typedef delegate<void ()> void_cb;
-	void ack() { if(!ack_cb.isnull()) ack_cb(); }
-	void setup_ack_cb(void_cb cb) { ack_cb = cb; }
+	template <typename... T>
+	void set_ack_cb(T &&... args) { m_ack_cb.set(std::forward<T>(args)...); }
+
+	void ack() { m_ack_cb(); }
 
 	void tx_w(int state) { m_tx = state; }
 	void sel_w(int state) { if(m_dev) m_dev->sel_w(state); m_card->sel_w(state); }
@@ -134,14 +137,14 @@ public:
 	void disable_card(bool status);
 
 protected:
-	virtual void device_start() override {}
+	virtual void device_start() override { m_ack_cb.resolve_safe(); }
 	virtual void device_reset() override { m_tx = true; }
 	virtual void device_config_complete() override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	void_cb ack_cb;
+	void_cb m_ack_cb;
 	bool m_tx;
 
 	device_psx_controller_interface *m_dev;

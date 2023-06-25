@@ -110,13 +110,13 @@ class z180_device : public cpu_device, public z80_daisy_chain_interface
 public:
 	auto tend0_wr_callback() { return m_tend0_cb.bind(); }
 	auto tend1_wr_callback() { return m_tend1_cb.bind(); }
-	auto txa0_wr_callback() { return subdevice<z180asci_channel_base>("asci_0")->txa_handler(); }
-	auto txa1_wr_callback() { return subdevice<z180asci_channel_base>("asci_1")->txa_handler(); }
-	auto rts0_wr_callback() { return subdevice<z180asci_channel_base>("asci_0")->rts_handler(); }
-	auto cka0_wr_callback() { return subdevice<z180asci_channel_base>("asci_0")->cka_handler(); }
-	auto cka1_wr_callback() { return subdevice<z180asci_channel_base>("asci_1")->cka_handler(); }
-	auto cks_wr_callback() { return subdevice<z180csio_device>("csio")->cks_handler(); }
-	auto txs_wr_callback() { return subdevice<z180csio_device>("csio")->txs_handler(); }
+	auto txa0_wr_callback() { return m_asci[0].lookup()->txa_handler(); }
+	auto txa1_wr_callback() { return m_asci[1].lookup()->txa_handler(); }
+	auto rts0_wr_callback() { return m_asci[0].lookup()->rts_handler(); }
+	auto cka0_wr_callback() { return m_asci[0].lookup()->cka_handler(); }
+	auto cka1_wr_callback() { return m_asci[1].lookup()->cka_handler(); }
+	auto cks_wr_callback() { return m_csio.lookup()->cks_handler(); }
+	auto txs_wr_callback() { return m_csio.lookup()->txs_handler(); }
 
 	bool get_tend0();
 	bool get_tend1();
@@ -134,13 +134,12 @@ protected:
 	// construction/destruction
 	z180_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool extended_io, address_map_constructor internal_map);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_resolve_objects() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 16; }
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
@@ -152,16 +151,16 @@ protected:
 	virtual void execute_burn(int32_t cycles) override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
-	// device_state_interface overrides
+	// device_state_interface implementation
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual uint8_t z180_internal_port_read(uint8_t port);
@@ -1834,13 +1833,13 @@ public:
 protected:
 	z8s180_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return BIT(m_cmr, 7) ? (clocks * 2) : BIT(m_ccr, 7) ? clocks : (clocks + 2 - 1) / 2; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return BIT(m_cmr, 7) ? (cycles + 2 - 1) / 2 : BIT(m_ccr, 7) ? cycles : (cycles * 2); }
 

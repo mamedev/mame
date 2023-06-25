@@ -568,13 +568,10 @@ void tms5220_device::printbits(long data, int num)
 ***********************************************************************************************/
 void tms5220_device::new_int_write(uint8_t rc, uint8_t m0, uint8_t m1, uint8_t addr)
 {
-	if (!m_m0_cb.isnull())
-		m_m0_cb(m0);
-	if (!m_m1_cb.isnull())
-		m_m1_cb(m1);
-	if (!m_addr_cb.isnull())
-		m_addr_cb((offs_t)0, addr);
-	if (!m_romclk_cb.isnull())
+	m_m0_cb(m0);
+	m_m1_cb(m1);
+	m_addr_cb(offs_t(0), addr);
+	if (!m_romclk_cb.isunset())
 	{
 		//printf("rc %d\n", rc);
 		m_romclk_cb(rc);
@@ -605,7 +602,7 @@ uint8_t tms5220_device::new_int_read()
 	new_int_write(0, 1, 0, 0); // romclk 0, m0 1, m1 0, addr bus nybble = 0/open bus
 	new_int_write(1, 0, 0, 0); // romclk 1, m0 0, m1 0, addr bus nybble = 0/open bus
 	new_int_write(0, 0, 0, 0); // romclk 0, m0 0, m1 0, addr bus nybble = 0/open bus
-	if (!m_data_cb.isnull())
+	if (!m_data_cb.isunset())
 		return m_data_cb();
 	LOG("WARNING: CALLBACK MISSING, RETURNING 0!\n");
 	return 0;
@@ -1581,8 +1578,7 @@ void tms5220_device::update_ready_state()
 	if (m_ready_pin != state)
 	{
 		LOGMASKED(LOG_PIN_READS, "ready pin set to state %d\n", state);
-		if (!m_readyq_handler.isnull())
-			m_readyq_handler(!state);
+		m_readyq_handler(!state);
 		m_ready_pin = state;
 	}
 }
@@ -1638,15 +1634,6 @@ void tms5220_device::device_start()
 	default:
 		fatalerror("Unknown variant in tms5220_set_variant\n");
 	}
-
-	/* resolve callbacks */
-	m_irq_handler.resolve_safe();
-	m_readyq_handler.resolve();
-	m_m0_cb.resolve();
-	m_m1_cb.resolve();
-	m_romclk_cb.resolve();
-	m_addr_cb.resolve();
-	m_data_cb.resolve();
 
 	/* initialize a stream */
 	m_stream = stream_alloc(0, 1, clock() / 80);
@@ -2104,7 +2091,7 @@ tms5220_device::tms5220_device(const machine_config &mconfig, device_type type, 
 	, m_m0_cb(*this)
 	, m_m1_cb(*this)
 	, m_addr_cb(*this)
-	, m_data_cb(*this)
+	, m_data_cb(*this, 0)
 	, m_romclk_cb(*this)
 {
 }

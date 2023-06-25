@@ -25,11 +25,11 @@ DEFINE_DEVICE_TYPE(V9938_COLORBUS, bus::ti99::colorbus::v9938_colorbus_device, "
 
 namespace bus::ti99::colorbus {
 
-v9938_colorbus_device::v9938_colorbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	:   device_t(mconfig, V9938_COLORBUS, tag, owner, clock),
-		device_single_card_slot_interface<device_v9938_colorbus_interface>(mconfig, *this),
-		m_v9938(*owner, TIGEN_V9938_TAG),
-		m_extra_button(*this)
+v9938_colorbus_device::v9938_colorbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, V9938_COLORBUS, tag, owner, clock),
+	device_single_card_slot_interface<device_v9938_colorbus_interface>(mconfig, *this),
+	m_v9938(*owner, TIGEN_V9938_TAG),
+	m_extra_button(*this)
 {
 }
 
@@ -51,14 +51,13 @@ void v9938_colorbus_device::buttons(int bstate)
 
 void v9938_colorbus_device::device_start()
 {
-	m_extra_button.resolve_safe();
 }
 
 /*****************************************************************************/
 
-device_v9938_colorbus_interface::device_v9938_colorbus_interface(const machine_config &mconfig, device_t &device)
-	:   device_interface(device, "v9938colorbus"),
-		m_colorbus(nullptr)
+device_v9938_colorbus_interface::device_v9938_colorbus_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "v9938colorbus"),
+	m_colorbus(nullptr)
 {
 }
 

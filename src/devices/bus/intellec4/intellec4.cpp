@@ -109,11 +109,6 @@ void univ_bus_device::cpu_reset_in(int state)
 
 void univ_bus_device::device_start()
 {
-	m_test_out_cb.resolve_safe();
-	m_stop_out_cb.resolve_safe();
-	m_reset_4002_out_cb.resolve_safe();
-	m_user_reset_out_cb.resolve_safe();
-
 	save_item(NAME(m_test));
 	save_item(NAME(m_stop));
 	save_item(NAME(m_reset_4002));

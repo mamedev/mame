@@ -334,7 +334,6 @@ void tmc0430_device::write(uint8_t data)
 
 void tmc0430_device::device_start()
 {
-	m_gromready.resolve_safe();
 	save_item(NAME(m_current_clock_level));
 	save_item(NAME(m_current_ident));
 	save_item(NAME(m_phase));

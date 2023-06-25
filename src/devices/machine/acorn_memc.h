@@ -51,12 +51,11 @@ public:
 	void vidrq_w(int state);
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
 private:

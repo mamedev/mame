@@ -68,11 +68,6 @@ vip_expansion_slot_device::vip_expansion_slot_device(const machine_config &mconf
 void vip_expansion_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_write_int.resolve_safe();
-	m_write_dma_out.resolve_safe();
-	m_write_dma_in.resolve_safe();
 }
 
 

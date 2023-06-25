@@ -50,12 +50,6 @@ void prom82s129_base_device::device_start()
 	save_item(NAME(m_ce2));
 	save_item(NAME(m_a));
 	save_item(NAME(m_out));
-
-	m_out_func.resolve_safe();
-	m_o1_func.resolve_safe();
-	m_o2_func.resolve_safe();
-	m_o3_func.resolve_safe();
-	m_o4_func.resolve_safe();
 }
 
 void prom82s129_base_device::device_reset()

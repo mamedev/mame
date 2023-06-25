@@ -45,7 +45,6 @@ generic_latch_base_device::generic_latch_base_device(const machine_config &mconf
 
 void generic_latch_base_device::device_start()
 {
-	m_data_pending_cb.resolve_safe();
 	save_item(NAME(m_latch_written));
 
 	// synchronization is needed since other devices may not be initialized yet

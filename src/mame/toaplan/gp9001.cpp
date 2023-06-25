@@ -278,7 +278,6 @@ void gp9001vdp_device::device_start()
 	create_tilemaps();
 
 	m_gp9001_cb.resolve();
-	m_vint_out_cb.resolve();
 
 	m_raise_irq_timer = timer_alloc(FUNC(gp9001vdp_device::raise_irq), this);
 
@@ -336,8 +335,7 @@ void gp9001vdp_device::device_reset()
 
 	init_scroll_regs();
 
-	if (!m_vint_out_cb.isnull())
-		m_vint_out_cb(0);
+	m_vint_out_cb(0);
 	m_raise_irq_timer->adjust(attotime::never);
 }
 
@@ -489,7 +487,7 @@ void gp9001vdp_device::scroll_reg_data_w(u16 data, u16 mem_mask)
 
 		case 0x0e:  /******* Initialise video controller register ? *******/
 
-		case 0x0f: if (!m_vint_out_cb.isnull()) m_vint_out_cb(0); break;
+		case 0x0f: m_vint_out_cb(0); break;
 
 
 		default:    logerror("Hmmm, writing %08x to unknown video control register (%08x) !!!\n",data,m_scroll_reg);
@@ -885,7 +883,7 @@ void gp9001vdp_device::screen_eof(void)
 	if (m_sp.use_sprite_buffer) m_spriteram->copy();
 
 	// the IRQ appears to fire at line 0xe6
-	if (!m_vint_out_cb.isnull())
+	if (!m_vint_out_cb.isunset())
 		m_raise_irq_timer->adjust(screen().time_until_pos(0xe6));
 }
 

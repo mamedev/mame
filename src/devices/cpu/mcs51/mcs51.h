@@ -132,7 +132,7 @@ protected:
 		uint8_t   data_in;
 		uint8_t   txbit;
 		uint8_t   rxbit;
-		bool      rxb8;
+		uint8_t   rxb8;
 
 		int     smod_div;       /* signal divided by 2^SMOD */
 		int     rx_clk;         /* rx clock */
@@ -147,7 +147,7 @@ protected:
 	virtual void sfr_write(size_t offset, uint8_t data);
 	virtual uint8_t sfr_read(size_t offset);
 
-	void transmit(bool state);
+	void transmit(int state);
 
 	/* Memory spaces */
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_program;

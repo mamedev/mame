@@ -209,7 +209,7 @@ void quizard_state::machine_reset()
 
 	m_boot_press = false;
 	m_boot_timer->adjust(attotime::from_seconds(13), 1);
-	m_mcu_p3 = 0x04;
+	m_mcu_p3 = 0x05; // RTS|RXD
 }
 
 
@@ -458,7 +458,9 @@ void cdi_state::cdimono1_base(machine_config &config)
 	CDI_SLAVE_HLE(config, m_slave_hle, 0);
 	m_slave_hle->int_callback().set(m_maincpu, FUNC(scc68070_device::in2_w));
 
-	CDROM(config, "cdrom").set_interface("cdi_cdrom");
+	cdrom_image_device &cdrom(CDROM(config, "cdrom"));
+	cdrom.set_interface("cdi_cdrom");
+	cdrom.add_region("cdrom");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

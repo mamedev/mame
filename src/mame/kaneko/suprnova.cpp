@@ -298,7 +298,7 @@ void skns_state::hit2_w(uint32_t data)
 {
 	hit_t &hit = m_hit;
 
-	// Decide to unlock on country char of string "FOR xxxxx" in Bios ROM at offset 0x420
+	// Decide to unlock on country char of string "FOR xxxxx" in BIOS ROM at offset 0x420
 	// this code simulates behaviour of protection PLD
 	data>>= 24;
 	hit.disconnect = 1;

@@ -380,21 +380,6 @@ void gf1_device::device_start()
 {
 	acia6850_device::device_start();
 
-	int i;
-	double out = (double)(1 << 13);
-
-	m_txirq_handler.resolve_safe();
-	m_rxirq_handler.resolve_safe();
-	m_wave_irq_handler.resolve_safe();
-	m_ramp_irq_handler.resolve_safe();
-	m_timer1_irq_handler.resolve_safe();
-	m_timer2_irq_handler.resolve_safe();
-	m_sb_irq_handler.resolve_safe();
-	m_dma_irq_handler.resolve_safe();
-	m_drq1_handler.resolve_safe();
-	m_drq2_handler.resolve_safe();
-	m_nmi_handler.resolve_safe();
-
 	// TODO: make DRAM size configurable.  Can be 256k, 512k, 768k, or 1024k
 	m_wave_ram.resize(1024*1024);
 	memset(&m_wave_ram[0], 0, 1024*1024);
@@ -416,9 +401,10 @@ void gf1_device::device_start()
 	m_gf1_irq = 0;
 	m_midi_irq = 0;
 
-	for (i=4095;i>=0;i--)
+	double out = double(1 << 13);
+	for (int i = 4095; i >= 0; i--)
 	{
-		m_volume_table[i] = (int16_t)out;
+		m_volume_table[i] = int16_t(out);
 		out /= 1.002709201; /* 0.0235 dB Steps */
 	}
 

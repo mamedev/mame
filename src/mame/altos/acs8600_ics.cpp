@@ -198,13 +198,6 @@ void acs8600_ics_device::device_add_mconfig(machine_config &config)
 	rs2324b.cts_handler().set("sio4", FUNC(z80sio_device::ctsb_w));
 }
 
-void acs8600_ics_device::device_resolve_objects()
-{
-	m_out_irq1_func.resolve_safe();
-	m_out_irq2_func.resolve_safe();
-}
-
 void acs8600_ics_device::device_start()
 {
 }
-

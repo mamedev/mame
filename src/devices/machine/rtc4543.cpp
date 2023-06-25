@@ -70,8 +70,6 @@ rtc4543_device::rtc4543_device(const machine_config &mconfig, device_type type, 
 
 void rtc4543_device::device_start()
 {
-	m_data_cb.resolve_safe();
-
 	// allocate timers
 	m_clock_timer = timer_alloc(FUNC(rtc4543_device::advance_clock), this);
 	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));

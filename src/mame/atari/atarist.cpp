@@ -307,7 +307,10 @@ void st_state::write_monochrome(int state)
 
 void st_state::reset_w(int state)
 {
-	m_video->reset();
+	if (m_video.found())
+		m_video->reset();
+	if (m_videox.found())
+		m_videox->reset();
 	if (m_stb.found())
 		m_stb->reset();
 	m_mfp->reset();

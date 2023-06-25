@@ -71,18 +71,6 @@ abcbus_slot_device::abcbus_slot_device(const machine_config &mconfig, const char
 void abcbus_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_write_irq.resolve_safe();
-	m_write_nmi.resolve_safe();
-	m_write_rdy.resolve_safe();
-	m_write_resin.resolve_safe();
-	m_write_pren.resolve_safe();
-	m_write_trrq.resolve_safe();
-	m_write_xint2.resolve_safe();
-	m_write_xint3.resolve_safe();
-	m_write_xint4.resolve_safe();
-	m_write_xint5.resolve_safe();
 }
 
 

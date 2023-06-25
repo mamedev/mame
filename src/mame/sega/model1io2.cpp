@@ -220,10 +220,10 @@ model1io2_device::model1io2_device(const machine_config &mconfig, const char *ta
 	m_lcd(*this, "lcd"),
 	m_led_comm_err(*this, "led_comm_err"),
 	m_lightgun_ports(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG}),
-	m_read_cb(*this), m_write_cb(*this),
-	m_in_cb(*this),
-	m_drive_read_cb(*this), m_drive_write_cb(*this),
-	m_an_cb(*this),
+	m_read_cb(*this, 0xff), m_write_cb(*this),
+	m_in_cb(*this, 0xff),
+	m_drive_read_cb(*this, 0xff), m_drive_write_cb(*this),
+	m_an_cb(*this, 0xff),
 	m_output_cb(*this),
 	m_secondary_controls(false),
 	m_lcd_data(0),
@@ -237,16 +237,8 @@ model1io2_device::model1io2_device(const machine_config &mconfig, const char *ta
 
 void model1io2_device::device_start()
 {
-	// resolve callbacks
+	// resolve outputs
 	m_led_comm_err.resolve();
-
-	m_read_cb.resolve_safe(0xff);
-	m_write_cb.resolve_safe();
-	m_in_cb.resolve_all_safe(0xff);
-	m_drive_read_cb.resolve_safe(0xff);
-	m_drive_write_cb.resolve_safe();
-	m_an_cb.resolve_all_safe(0xff);
-	m_output_cb.resolve_safe();
 
 	// register for save states
 	save_item(NAME(m_secondary_controls));

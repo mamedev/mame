@@ -1,11 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Uki
-/*************************************************************************
-
-    Markham (c) 1983 Sun Electronics
-    Strength & Skill (c) 1984 Sun Electronics
-
-*************************************************************************/
 
 #ifndef MAME_SUNELECTRONICS_MARKHAM_H
 #define MAME_SUNELECTRONICS_MARKHAM_H

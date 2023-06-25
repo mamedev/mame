@@ -358,6 +358,7 @@ void midzeus2_state::disk_asic_w(offs_t offset, uint32_t data)
  *  Disk ASIC JR registers
  *
  *************************************/
+
 uint32_t midzeus_state::disk_asic_jr_r(offs_t offset)
 {
 	uint32_t retVal = m_disk_asic_jr[offset];
@@ -366,19 +367,21 @@ uint32_t midzeus_state::disk_asic_jr_r(offs_t offset)
 		// miscellaneous hw wait states
 		case 1:
 			break;
+
 		/* CMOS/ZPRAM write enable; only low bit is used */
 		case 2:
+			//return m_disk_asic_jr[offset] | ~1;
 			break;
-			//  return m_disk_asic_jr[offset] | ~1;
 
 		/* reset status; bit 0 is watchdog reset; mk4/invasn/thegrid read at startup; invasn freaks if it is 1 at startup */
 		case 3:
+			//return m_disk_asic_jr[offset] | ~1;
 			break;
-		//  return m_disk_asic_jr[offset] | ~1;
 
 		/* ROM bank selection on Zeus 2; two bits are used */
 		case 5:
-		//  return m_disk_asic_jr[offset] | ~3;
+			//return m_disk_asic_jr[offset] | ~3;
+			break;
 
 		/* disk asic jr id; crusnexo reads at startup: if (val & 0xf0) == 0xa0 it affects */
 		/* how the Zeus is used (reg 0x5d is set to 0x54580006) */
@@ -478,29 +481,27 @@ uint32_t midzeus2_state::crusnexo_leds_r(offs_t offset)
 
 void midzeus2_state::crusnexo_leds_w(offs_t offset, uint32_t data)
 {
-	int bit, led;
-
 	switch (offset)
 	{
 		case 0: /* unknown purpose */
 			break;
 
 		case 1: /* controls lamps */
-			for (bit = 0; bit < 8; bit++)
+			for (int bit = 0; bit < 8; bit++)
 				m_lamps[bit] = BIT(data, bit);
 			break;
 
 		case 2: /* sets state of selected LEDs */
 
 			/* selection bits 4-6 select the 3 7-segment LEDs */
-			for (bit = 4; bit < 7; bit++)
+			for (int bit = 4; bit < 7; bit++)
 				if ((m_crusnexo_leds_select & (1 << bit)) == 0)
 					m_digits[bit] = ~data & 0xff;
 
 			/* selection bits 0-2 select the tachometer LEDs */
-			for (bit = 0; bit < 3; bit++)
+			for (int bit = 0; bit < 3; bit++)
 				if ((m_crusnexo_leds_select & (1 << bit)) == 0)
-					for (led = 0; led < 8; led++)
+					for (int led = 0; led < 8; led++)
 						m_leds[bit * 8 + led] = BIT(~data, led);
 			break;
 

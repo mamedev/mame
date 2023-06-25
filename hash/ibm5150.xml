@@ -15029,25 +15029,6 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 		</part>
 	</software>
 
-	<software name="riskywd">
-		<description>Risky Woods</description>
-		<year>1992</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="copy_protection" value="Manual required" />
-		<info name="developer" value="Dinamic Software / Zeus Software" />
-		<info name="version" value="v1.1 (1/9/92)" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size = "368640">
-				<rom name="Risky Woods [Electronic Arts] [1992] [5.25DD] [Disk 1 of 2].ima" size="368640" crc="3d1ee514" sha1="9ee5930d182b38cfb6104b43f4ed685af4188910"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size = "368640">
-				<rom name="Risky Woods [Electronic Arts] [1992] [5.25DD] [Disk 2 of 2].ima" size="368640" crc="911c6137" sha1="75ec08599bda5dbe5233d211b4b930b598618f11"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="robocop" supported="no">
 		<description>RoboCop</description>
 		<year>1989</year>

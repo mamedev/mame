@@ -66,8 +66,8 @@ void voyager_state::voyager(machine_config &config)
 {
 	PENTIUM3(config, m_maincpu, 133000000); // actually AMD Duron CPU of unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &voyager_state::voyager_map);
-//	m_maincpu->set_addrmap(AS_IO, &voyager_state::voyager_io);
-//	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
+//  m_maincpu->set_addrmap(AS_IO, &voyager_state::voyager_io);
+//  m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	PCI_ROOT(config, "pci", 0);
 	// ...

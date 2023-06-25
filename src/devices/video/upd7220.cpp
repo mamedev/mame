@@ -665,13 +665,8 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 void upd7220_device::device_start()
 {
 	// resolve callbacks
-	m_display_cb.resolve();
-	m_draw_text_cb.resolve();
-
-	m_write_drq.resolve_safe();
-	m_write_hsync.resolve_safe();
-	m_write_vsync.resolve_safe();
-	m_write_blank.resolve_safe();
+	m_display_cb.resolve_safe();
+	m_draw_text_cb.resolve_safe();
 
 	// allocate timers
 	m_vsync_timer = timer_alloc(FUNC(upd7220_device::vsync_update), this);
@@ -1707,9 +1702,7 @@ void upd7220_device::update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		for (y = sy; y < sy + len; y++)
 		{
 			uint32_t const addr = sad + (y * m_pitch);
-
-			if (!m_draw_text_cb.isnull())
-				m_draw_text_cb(bitmap, addr, (y * m_lr) + m_vbp, wd, m_pitch, m_lr, m_dc, m_ead);
+			m_draw_text_cb(bitmap, addr, (y * m_lr) + m_vbp, wd, m_pitch, m_lr, m_dc, m_ead);
 		}
 
 		sy = y + 1;
@@ -1782,7 +1775,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 				for(int z = 0; z <= m_disp; ++z)
 				{
 					int yval = (y*zoom)+z + (bsy + m_vbp);
-					if(!m_display_cb.isnull() && yval <= cliprect.bottom())
+					if(yval <= cliprect.bottom())
 						draw_graphics_line(bitmap, addr, yval, wd, (m_pitch >> (mixed ? 1 : 0)));
 				}
 			}
@@ -1795,8 +1788,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 				{
 					uint32_t const addr = (sad & 0x3ffff) + ((y / m_lr) * m_pitch);
 					int yval = y * zoom + (tsy + m_vbp);
-					if (!m_draw_text_cb.isnull() && yval <= cliprect.bottom())
-						m_draw_text_cb(bitmap, addr, yval, wd, m_pitch, m_lr, m_dc, m_ead);
+					m_draw_text_cb(bitmap, addr, yval, wd, m_pitch, m_lr, m_dc, m_ead);
 				}
 			}
 		}

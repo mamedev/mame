@@ -265,7 +265,7 @@ void isa16_oksan_lpc::device_add_mconfig(machine_config &config)
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	m_kbdc->system_reset_callback().set_inputline(":maincpu", INPUT_LINE_RESET);
 	m_kbdc->gate_a20_callback().set_inputline(":maincpu", INPUT_LINE_A20);
-	m_kbdc->input_buffer_full_callback().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
+	m_kbdc->input_buffer_full_callback().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
 }
 
 

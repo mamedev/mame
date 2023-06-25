@@ -70,8 +70,6 @@ void k007232_device::device_start()
 	space(0).cache(m_cache);
 
 	/* Set up the chips */
-	m_port_write_handler.resolve_safe();
-
 	for (int i = 0; i < KDAC_A_PCM_MAX; i++)
 	{
 		m_channel[i].addr = 0;

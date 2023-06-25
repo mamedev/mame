@@ -14,45 +14,17 @@
 
 #pragma once
 
-class h8_dma_device;
+class h8gen_dma_device;
 class h8_dtc_device;
 struct h8_dma_state;
 struct h8_dtc_state;
 
+class h8_device;
+
+#include "h8_sci.h"
+
 class h8_device : public cpu_device {
 public:
-	enum {
-		// digital I/O ports
-		// ports 4-B are valid on 16-bit H8/3xx, ports 1-9 on 8-bit H8/3xx
-		// H8S/2394 has 12 ports named 1-6 and A-G
-		PORT_1,  // 0
-		PORT_2,  // 1
-		PORT_3,  // 2
-		PORT_4,  // 3
-		PORT_5,  // 4
-		PORT_6,  // 5
-		PORT_7,  // 6
-		PORT_8,  // 7
-		PORT_9,  // 8
-		PORT_A,  // 9
-		PORT_B,  // A
-		PORT_C,  // B
-		PORT_D,  // C
-		PORT_E,  // D
-		PORT_F,  // E
-		PORT_G,  // F
-
-		// analog inputs
-		ADC_0,
-		ADC_1,
-		ADC_2,
-		ADC_3,
-		ADC_4,
-		ADC_5,
-		ADC_6,
-		ADC_7
-	};
-
 	enum {
 		STATE_RESET              = 0x10000,
 		STATE_IRQ                = 0x10001,
@@ -63,15 +35,58 @@ public:
 		STATE_DTC_WRITEBACK      = 0x10006
 	};
 
+	template<int Port> auto read_adc() { return m_read_adc[Port].bind(); }
+	template<int Sci> auto write_sci_tx() { return m_sci_tx[Sci].bind(); }
+	template<int Sci> auto write_sci_clk() { return m_sci_clk[Sci].bind(); }
+
+	void sci_set_external_clock_period(int sci, const attotime &period) {
+		m_sci[sci].lookup()->do_set_external_clock_period(period);
+	}
+
+	template<int Sci> void sci_rx_w(int state) { m_sci[Sci]->do_rx_w(state); }
+	template<int Sci> void sci_clk_w(int state) { m_sci[Sci]->do_clk_w(state); }
+
 	void internal_update();
 	void set_irq(int irq_vector, int irq_level, bool irq_nmi);
 	bool trigger_dma(int vector);
-	void set_current_dma(h8_dma_state *state);
+	void set_dma_channel(h8_dma_state *state);
+	void update_active_dma_channel();
 	void set_current_dtc(h8_dtc_state *state);
 	void request_state(int state);
 	bool access_is_dma() const { return m_inst_state == STATE_DMA || m_inst_state == STATE_DTC; }
 
+	u16 do_read_adc(int port) { return m_read_adc[port](); }
+	u8 do_read_port(int port) { return m_read_port[port](); }
+	void do_write_port(int port, u8 data) { return m_write_port[port](data); }
+	void do_sci_tx(int sci, int state) { m_sci_tx[sci](state); }
+	void do_sci_clk(int sci, int state) { m_sci_clk[sci](state); }
+
 protected:
+	enum {
+		// digital I/O ports
+		// ports 4-B are valid on 16-bit H8/3xx, ports 1-9 on 8-bit H8/3xx
+		// H8S/2394 has 12 ports named 1-6 and A-G
+		PORT_1,
+		PORT_2,
+		PORT_3,
+		PORT_4,
+		PORT_5,
+		PORT_6,
+		PORT_7,
+		PORT_8,
+		PORT_9,
+		PORT_A,
+		PORT_B,
+		PORT_C,
+		PORT_D,
+		PORT_E,
+		PORT_F,
+		PORT_G,
+		PORT_COUNT
+	};
+
+	static const char port_names[];
+
 	enum {
 		F_I  = 0x80,
 		F_UI = 0x40,
@@ -113,13 +128,19 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	address_space_config m_program_config, m_io_config;
+	address_space_config m_program_config;
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::specific m_program;
-	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_io;
-	h8_dma_device *m_dma_device;
+	devcb_read16::array<8> m_read_adc;
+	devcb_read8::array<PORT_COUNT> m_read_port;
+	devcb_write8::array<PORT_COUNT> m_write_port;
+	optional_device_array<h8_sci_device, 3> m_sci;
+	devcb_write_line::array<3> m_sci_tx, m_sci_clk;
+
+	h8gen_dma_device *m_dma_device;
 	h8_dtc_device *m_dtc_device;
-	h8_dma_state *m_current_dma;
+	h8_dma_state *m_dma_channel[8];
+	int m_current_dma;
 	h8_dtc_state *m_current_dtc;
 
 	uint32_t  m_PPC;                    /* previous program counter */
@@ -167,6 +188,9 @@ protected:
 	void prefetch_done_noirq();
 	void prefetch_done_noirq_notrace();
 	void illegal();
+	u16 adc_default(int adc);
+	u8 port_default_r(int port);
+	void port_default_w(int port, u8 data);
 
 	uint8_t do_addx8(uint8_t a, uint8_t b);
 	uint8_t do_subx8(uint8_t a, uint8_t b);

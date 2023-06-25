@@ -196,7 +196,6 @@ void mpu4_oki_sampled_sound::device_add_mconfig(machine_config &config)
 
 void mpu4_oki_sampled_sound::device_start()
 {
-	m_cb2_handler.resolve_safe();
 	save_item(NAME(m_expansion_latch));
 	save_item(NAME(m_global_volume));
 	save_item(NAME(m_t1));

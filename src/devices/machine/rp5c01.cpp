@@ -198,9 +198,6 @@ rp5c01_device::rp5c01_device(const machine_config &mconfig, device_type type, co
 
 void rp5c01_device::device_start()
 {
-	// resolve callbacks
-	m_out_alarm_cb.resolve_safe();
-
 	// allocate timers
 	if (clock() > 0)
 	{

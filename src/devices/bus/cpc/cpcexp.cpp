@@ -65,13 +65,6 @@ cpc_expansion_slot_device::~cpc_expansion_slot_device()
 void cpc_expansion_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_out_irq_cb.resolve_safe();
-	m_out_nmi_cb.resolve_safe();
-	m_out_reset_cb.resolve_safe();
-	m_out_romdis_cb.resolve_safe();
-	m_out_rom_select.resolve_safe();
 }
 
 //-------------------------------------------------

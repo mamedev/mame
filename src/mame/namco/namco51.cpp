@@ -163,7 +163,7 @@ namco_51xx_device::namco_51xx_device(const machine_config &mconfig, const char *
 	, m_cpu(*this, "mcu")
 	, m_portO(0)
 	, m_rw(0)
-	, m_in(*this)
+	, m_in(*this, 0)
 	, m_out(*this)
 	, m_lockout(*this)
 {
@@ -175,13 +175,6 @@ namco_51xx_device::namco_51xx_device(const machine_config &mconfig, const char *
 
 void namco_51xx_device::device_start()
 {
-	/* resolve our read callbacks */
-	m_in.resolve_all_safe(0);
-
-	/* resolve our write callbacks */
-	m_out.resolve_safe();
-	m_lockout.resolve_safe();
-
 	save_item(NAME(m_portO));
 	save_item(NAME(m_rw));
 }

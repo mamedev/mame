@@ -33,7 +33,6 @@ printer_image_device::printer_image_device(const machine_config &mconfig, const 
 
 void printer_image_device::device_start()
 {
-	m_online_cb.resolve();
 }
 
 /***************************************************************************
@@ -79,8 +78,7 @@ std::pair<std::error_condition, std::string> printer_image_device::call_create(i
 std::pair<std::error_condition, std::string> printer_image_device::call_load()
 {
 	// send notify that the printer is now online
-	if (!m_online_cb.isnull())
-		m_online_cb(true);
+	m_online_cb(true);
 
 	// we don't need to do anything special
 	return std::make_pair(std::error_condition(), std::string());
@@ -92,7 +90,6 @@ std::pair<std::error_condition, std::string> printer_image_device::call_load()
 -------------------------------------------------*/
 void printer_image_device::call_unload()
 {
-	/* send notify that the printer is now offline */
-	if (!m_online_cb.isnull())
-		m_online_cb(false);
+	// send notify that the printer is now offline
+	m_online_cb(false);
 }

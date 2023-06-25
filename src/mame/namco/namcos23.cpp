@@ -1747,9 +1747,7 @@ private:
 	void gmen_sh2_map(address_map &map);
 	void gorgon_map(address_map &map);
 	void s23_map(address_map &map);
-	void s23h8iomap(address_map &map);
 	void s23h8rwmap(address_map &map);
-	void s23iobrdiomap(address_map &map);
 	void s23iobrdmap(address_map &map);
 	void motoxgo_exio_map(address_map &map);
 	void timecrs2iobrdmap(address_map &map);
@@ -3320,20 +3318,6 @@ void namcos23_state::s23h8rwmap(address_map &map)
 }
 
 
-void namcos23_state::s23h8iomap(address_map &map)
-{
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(namcos23_state::mcu_p6_r), FUNC(namcos23_state::mcu_p6_w));
-	map(h8_device::PORT_8, h8_device::PORT_8).rw(FUNC(namcos23_state::mcu_p8_r), FUNC(namcos23_state::mcu_p8_w));
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(namcos23_state::mcu_pa_r), FUNC(namcos23_state::mcu_pa_w));
-	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(namcos23_state::mcu_pb_r), FUNC(namcos23_state::mcu_pb_w));
-	map(h8_device::ADC_0, h8_device::ADC_0).noprw();
-	map(h8_device::ADC_1, h8_device::ADC_1).noprw();
-	map(h8_device::ADC_2, h8_device::ADC_2).noprw();
-	map(h8_device::ADC_3, h8_device::ADC_3).noprw();
-}
-
-
-
 
 
 /***************************************************************************
@@ -3384,23 +3368,6 @@ void namcos23_state::s23iobrdmap(address_map &map)
 	map(0x6004, 0x6005).nopw();
 	map(0x6006, 0x6007).noprw();
 	map(0xc000, 0xfb7f).ram();
-}
-
-void namcos23_state::s23iobrdiomap(address_map &map)
-{
-	map(h8_device::PORT_4, h8_device::PORT_4).rw(FUNC(namcos23_state::iob_p4_r), FUNC(namcos23_state::iob_p4_w));
-	map(h8_device::PORT_5, h8_device::PORT_5).noprw();   // bit 2 = status LED to indicate transmitting packet to main
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(namcos23_state::iob_p6_r), FUNC(namcos23_state::iob_p6_w));
-	map(h8_device::PORT_8, h8_device::PORT_8).noprw();   // unknown - used on ASCA-5 only
-	map(h8_device::PORT_9, h8_device::PORT_9).noprw();   // unknown - used on ASCA-5 only
-	map(h8_device::ADC_0, h8_device::ADC_0).portr("ADC0");
-	map(h8_device::ADC_1, h8_device::ADC_1).portr("ADC1");
-	map(h8_device::ADC_2, h8_device::ADC_2).portr("ADC2");
-	map(h8_device::ADC_3, h8_device::ADC_3).portr("ADC3");
-	map(h8_device::ADC_4, h8_device::ADC_4).portr("ADC4");
-	map(h8_device::ADC_5, h8_device::ADC_5).portr("ADC5");
-	map(h8_device::ADC_6, h8_device::ADC_6).portr("ADC6");
-	map(h8_device::ADC_7, h8_device::ADC_7).portr("ADC7");
 }
 
 
@@ -3529,8 +3496,7 @@ static INPUT_PORTS_START( rapidrvr )
 
 	PORT_MODIFY("ADC1")
 	PORT_BIT( 0x3ff, 0x0200, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Pitch")
-
-	INPUT_PORTS_END
+INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( rapidrvrp )
@@ -3826,30 +3792,53 @@ void namcos23_state::gorgon(machine_config &config)
 
 	H83002(config, m_subcpu, H8CLOCK);
 	m_subcpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23h8rwmap);
-	m_subcpu->set_addrmap(AS_IO, &namcos23_state::s23h8iomap);
+	m_subcpu->read_adc<0>().set_constant(0);
+	m_subcpu->read_adc<1>().set_constant(0);
+	m_subcpu->read_adc<2>().set_constant(0);
+	m_subcpu->read_adc<3>().set_constant(0);
+	m_subcpu->read_port6().set(FUNC(namcos23_state::mcu_p6_r));
+	m_subcpu->write_port6().set(FUNC(namcos23_state::mcu_p6_w));
+	m_subcpu->read_port8().set(FUNC(namcos23_state::mcu_p8_r));
+	m_subcpu->write_port8().set(FUNC(namcos23_state::mcu_p8_w));
+	m_subcpu->read_porta().set(FUNC(namcos23_state::mcu_pa_r));
+	m_subcpu->write_porta().set(FUNC(namcos23_state::mcu_pa_w));
+	m_subcpu->read_portb().set(FUNC(namcos23_state::mcu_pb_r));
+	m_subcpu->write_portb().set(FUNC(namcos23_state::mcu_pb_w));
 
 	// Timer at 115200*16 for the jvs serial clock
-	m_subcpu->subdevice<h8_sci_device>("sci0")->set_external_clock_period(attotime::from_hz(JVSCLOCK/8));
+	m_subcpu->sci_set_external_clock_period(0, attotime::from_hz(JVSCLOCK/8));
 
 	H83334(config, m_iocpu, JVSCLOCK);
 	m_iocpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23iobrdmap);
-	m_iocpu->set_addrmap(AS_IO, &namcos23_state::s23iobrdiomap);
+	m_iocpu->read_adc<0>().set_ioport("ADC0");
+	m_iocpu->read_adc<1>().set_ioport("ADC1");
+	m_iocpu->read_adc<2>().set_ioport("ADC2");
+	m_iocpu->read_adc<3>().set_ioport("ADC3");
+	m_iocpu->read_adc<4>().set_ioport("ADC4");
+	m_iocpu->read_adc<5>().set_ioport("ADC5");
+	m_iocpu->read_adc<6>().set_ioport("ADC6");
+	m_iocpu->read_adc<7>().set_ioport("ADC7");
+	m_iocpu->read_port4().set(FUNC(namcos23_state::iob_p4_r));
+	m_iocpu->write_port4().set(FUNC(namcos23_state::iob_p4_w));
+	m_iocpu->write_port5().set_nop();   // bit 2 = status LED to indicate transmitting packet to main
+	m_iocpu->read_port6().set(FUNC(namcos23_state::iob_p6_r));
+	m_iocpu->write_port6().set(FUNC(namcos23_state::iob_p6_w));
+	m_iocpu->write_port8().set_nop();   // unknown - used on ASCA-5 only
+	m_iocpu->write_port9().set_nop();   // unknown - used on ASCA-5 only
 
-	m_iocpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("subcpu:sci0", FUNC(h8_sci_device::rx_w));
-	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
+	m_iocpu->write_sci_tx<0>().set(m_subcpu, FUNC(h8_device::sci_rx_w<0>));
+	m_subcpu->write_sci_tx<0>().set(m_iocpu, FUNC(h8_device::sci_rx_w<0>));
 
 	config.set_maximum_quantum(attotime::from_hz(2*115200));
 
 	NAMCO_SETTINGS(config, m_settings, 0);
 
 	RTC4543(config, m_rtc, XTAL(32'768));
-	m_rtc->data_cb().set("subcpu:sci1", FUNC(h8_sci_device::rx_w));
+	m_rtc->data_cb().set(m_subcpu, FUNC(h8_device::sci_rx_w<1>));
 
-	// FIXME: need better syntax for configuring H8 onboard devices
-	h8_sci_device &subcpu_sci1(*m_subcpu->subdevice<h8_sci_device>("sci1"));
-	subcpu_sci1.tx_handler().set(m_settings, FUNC(namco_settings_device::data_w));
-	subcpu_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
-	subcpu_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
+	m_subcpu->write_sci_tx<1>().set(m_settings, FUNC(namco_settings_device::data_w));
+	m_subcpu->write_sci_clk<1>().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
+	m_subcpu->write_sci_clk<1>().append(m_settings, FUNC(namco_settings_device::clk_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -3888,30 +3877,53 @@ void namcos23_state::s23(machine_config &config)
 
 	H83002(config, m_subcpu, H8CLOCK);
 	m_subcpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23h8rwmap);
-	m_subcpu->set_addrmap(AS_IO, &namcos23_state::s23h8iomap);
+	m_subcpu->read_adc<0>().set_constant(0);
+	m_subcpu->read_adc<1>().set_constant(0);
+	m_subcpu->read_adc<2>().set_constant(0);
+	m_subcpu->read_adc<3>().set_constant(0);
+	m_subcpu->read_port6().set(FUNC(namcos23_state::mcu_p6_r));
+	m_subcpu->write_port6().set(FUNC(namcos23_state::mcu_p6_w));
+	m_subcpu->read_port8().set(FUNC(namcos23_state::mcu_p8_r));
+	m_subcpu->write_port8().set(FUNC(namcos23_state::mcu_p8_w));
+	m_subcpu->read_porta().set(FUNC(namcos23_state::mcu_pa_r));
+	m_subcpu->write_porta().set(FUNC(namcos23_state::mcu_pa_w));
+	m_subcpu->read_portb().set(FUNC(namcos23_state::mcu_pb_r));
+	m_subcpu->write_portb().set(FUNC(namcos23_state::mcu_pb_w));
 
 	// Timer at 115200*16 for the jvs serial clock
-	m_subcpu->subdevice<h8_sci_device>("sci0")->set_external_clock_period(attotime::from_hz(JVSCLOCK/8));
+	m_subcpu->sci_set_external_clock_period(0, attotime::from_hz(JVSCLOCK/8));
 
 	H83334(config, m_iocpu, JVSCLOCK);
 	m_iocpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23iobrdmap);
-	m_iocpu->set_addrmap(AS_IO, &namcos23_state::s23iobrdiomap);
+	m_iocpu->read_adc<0>().set_ioport("ADC0");
+	m_iocpu->read_adc<1>().set_ioport("ADC1");
+	m_iocpu->read_adc<2>().set_ioport("ADC2");
+	m_iocpu->read_adc<3>().set_ioport("ADC3");
+	m_iocpu->read_adc<4>().set_ioport("ADC4");
+	m_iocpu->read_adc<5>().set_ioport("ADC5");
+	m_iocpu->read_adc<6>().set_ioport("ADC6");
+	m_iocpu->read_adc<7>().set_ioport("ADC7");
+	m_iocpu->read_port4().set(FUNC(namcos23_state::iob_p4_r));
+	m_iocpu->write_port4().set(FUNC(namcos23_state::iob_p4_w));
+	m_iocpu->write_port5().set_nop();   // bit 2 = status LED to indicate transmitting packet to main
+	m_iocpu->read_port6().set(FUNC(namcos23_state::iob_p6_r));
+	m_iocpu->write_port6().set(FUNC(namcos23_state::iob_p6_w));
+	m_iocpu->write_port8().set_nop();   // unknown - used on ASCA-5 only
+	m_iocpu->write_port9().set_nop();   // unknown - used on ASCA-5 only
 
-	m_iocpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("subcpu:sci0", FUNC(h8_sci_device::rx_w));
-	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
+	m_iocpu->write_sci_tx<0>().set(m_subcpu, FUNC(h8_device::sci_rx_w<0>));
+	m_subcpu->write_sci_tx<0>().set(m_iocpu, FUNC(h8_device::sci_rx_w<0>));
 
 	config.set_maximum_quantum(attotime::from_hz(2*115200));
 
 	NAMCO_SETTINGS(config, m_settings, 0);
 
 	RTC4543(config, m_rtc, XTAL(32'768));
-	m_rtc->data_cb().set("subcpu:sci1", FUNC(h8_sci_device::rx_w));
+	m_rtc->data_cb().set(m_subcpu, FUNC(h8_device::sci_rx_w<1>));
 
-	// FIXME: need better syntax for configuring H8 onboard devices
-	h8_sci_device &subcpu_sci1(*m_subcpu->subdevice<h8_sci_device>("sci1"));
-	subcpu_sci1.tx_handler().set(m_settings, FUNC(namco_settings_device::data_w));
-	subcpu_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
-	subcpu_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
+	m_subcpu->write_sci_tx<1>().set(m_settings, FUNC(namco_settings_device::data_w));
+	m_subcpu->write_sci_clk<1>().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
+	m_subcpu->write_sci_clk<1>().append(m_settings, FUNC(namco_settings_device::clk_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

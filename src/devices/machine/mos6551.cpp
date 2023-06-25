@@ -72,13 +72,6 @@ void mos6551_device::device_add_mconfig(machine_config &config)
 
 void mos6551_device::device_start()
 {
-	// resolve callbacks
-	m_irq_handler.resolve_safe();
-	m_txd_handler.resolve_safe();
-	m_rxc_handler.resolve_safe();
-	m_rts_handler.resolve_safe();
-	m_dtr_handler.resolve_safe();
-
 	// state saving
 	save_item(NAME(m_control));
 	save_item(NAME(m_command));

@@ -931,7 +931,7 @@ void rainbow_base_state::rainbow8088_base_map(address_map &map)
 	// There is a 2212 (256 x 4 bit) NVRAM from 0xed000 to 0xed0ff (*)
 	// shadowed at $ec000 - $ecfff and from $ed100 - $edfff.
 
-	// (*) ED000 - ED0FF is the area the DEC-100-B Bios accesses and checks
+	// (*) ED000 - ED0FF is the area the DEC-100-B BIOS accesses and checks
 
 	//  - Specs say that the CPU has direct access to volatile RAM only.
 	//    So NVRAM is hidden and loads & saves are triggered within the

@@ -71,13 +71,13 @@ void rbv_device::device_add_mconfig(machine_config &config)
 //  rbv_device - constructor
 //-------------------------------------------------
 
-rbv_device::rbv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, RBV, tag, owner, clock),
-	  write_6015(*this),
-	  write_irq(*this),
-	  m_montype(*this, "MONTYPE"),
-	  m_screen(*this, "screen"),
-	  m_palette(*this, "palette")
+rbv_device::rbv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, RBV, tag, owner, clock),
+	write_6015(*this),
+	write_irq(*this),
+	m_montype(*this, "MONTYPE"),
+	m_screen(*this, "screen"),
+	m_palette(*this, "palette")
 {
 }
 
@@ -87,9 +87,6 @@ rbv_device::rbv_device(const machine_config &mconfig, const char *tag, device_t 
 
 void rbv_device::device_start()
 {
-	write_6015.resolve_safe();
-	write_irq.resolve_safe();
-
 	m_6015_timer = timer_alloc(FUNC(rbv_device::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
 

@@ -215,11 +215,6 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(mjflove_blitter_r);
 
 protected:
-	virtual void device_resolve_objects() override
-	{
-		m_blitter_irq_handler.resolve_safe();
-	}
-
 	auto blitter_irq() { return m_blitter_irq_handler.bind(); }
 
 	DECLARE_MACHINE_START(ddenlovr);

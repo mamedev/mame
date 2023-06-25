@@ -79,8 +79,6 @@ void dp83932c_device::map(address_map &map)
 
 void dp83932c_device::device_start()
 {
-	m_out_int.resolve();
-
 	m_command = timer_alloc(FUNC(dp83932c_device::command), this);
 
 	save_item(NAME(m_int_state));

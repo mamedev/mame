@@ -106,12 +106,6 @@ c8050_fdc_device::c8050_fdc_device(const machine_config &mconfig, const char *ta
 
 void c8050_fdc_device::device_start()
 {
-	// resolve callbacks
-	m_write_sync.resolve_safe();
-	m_write_ready.resolve_safe();
-	m_write_brdy.resolve_safe();
-	m_write_error.resolve_safe();
-
 	// allocate timer
 	t_gen = timer_alloc(FUNC(c8050_fdc_device::update_state), this);
 

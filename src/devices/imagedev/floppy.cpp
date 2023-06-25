@@ -130,10 +130,8 @@ DEFINE_DEVICE_TYPE(SONY_OA_D32V, sony_oa_d32v, "sony_oa_d32v", "Sony OA-D32V Mic
 DEFINE_DEVICE_TYPE(TEAC_FD_30A, teac_fd_30a, "teac_fd_30a", "TEAC FD-30A FDD")
 
 // TEAC 5.25" drives
-#if 0
 DEFINE_DEVICE_TYPE(TEAC_FD_55A, teac_fd_55a, "teac_fd_55a", "TEAC FD-55A FDD")
 DEFINE_DEVICE_TYPE(TEAC_FD_55B, teac_fd_55b, "teac_fd_55b", "TEAC FD-55B FDD")
-#endif
 DEFINE_DEVICE_TYPE(TEAC_FD_55E, teac_fd_55e, "teac_fd_55e", "TEAC FD-55E FDD")
 DEFINE_DEVICE_TYPE(TEAC_FD_55F, teac_fd_55f, "teac_fd_55f", "TEAC FD-55F FDD")
 DEFINE_DEVICE_TYPE(TEAC_FD_55G, teac_fd_55g, "teac_fd_55g", "TEAC FD-55G FDD")
@@ -2571,6 +2569,68 @@ void teac_fd_30a::setup_characteristics()
 	set_rpm(300);
 
 	variants.push_back(floppy_image::SSDD);
+}
+
+//-------------------------------------------------
+//  TEAC FD-55A
+//
+//  track to track: 6 ms
+//  average: 93 ms
+//  setting time: 15 ms
+//  motor start time: 400 ms
+//
+//-------------------------------------------------
+
+teac_fd_55a::teac_fd_55a(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: floppy_image_device(mconfig, TEAC_FD_55A, tag, owner, clock)
+{
+}
+
+teac_fd_55a::~teac_fd_55a()
+{
+}
+
+void teac_fd_55a::setup_characteristics()
+{
+	form_factor = floppy_image::FF_525;
+	tracks = 40;
+	sides = 1;
+	set_rpm(300);
+
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
+}
+
+//-------------------------------------------------
+//  TEAC FD-55B
+//
+//  track to track: 6 ms
+//  average: 93 ms
+//  setting time: 15 ms
+//  motor start time: 400 ms
+//
+//-------------------------------------------------
+
+teac_fd_55b::teac_fd_55b(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: floppy_image_device(mconfig, TEAC_FD_55B, tag, owner, clock)
+{
+}
+
+teac_fd_55b::~teac_fd_55b()
+{
+}
+
+void teac_fd_55b::setup_characteristics()
+{
+	form_factor = floppy_image::FF_525;
+	tracks = 40;
+	sides = 2;
+	set_rpm(300);
+
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
+	variants.push_back(floppy_image::DSSD);
+	variants.push_back(floppy_image::DSDD);
 }
 
 //-------------------------------------------------

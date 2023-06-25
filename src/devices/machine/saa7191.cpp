@@ -28,8 +28,8 @@ DEFINE_DEVICE_TYPE(SAA7191, saa7191_device, "saa7191", "Philips SAA7191 DMSD")
 
 saa7191_device::saa7191_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SAA7191, tag, owner, clock)
-	, m_chr_in(*this)
-	, m_cvbs_in(*this)
+	, m_chr_in(*this, 0)
+	, m_cvbs_in(*this, 0)
 	, m_y_out(*this)
 	, m_uv_out(*this)
 	, m_hs_out(*this)
@@ -45,14 +45,6 @@ void saa7191_device::device_start()
 	save_item(NAME(m_i2c_read_addr));
 	save_item(NAME(m_i2c_subaddr));
 	save_item(NAME(m_i2c_state));
-
-	m_chr_in.resolve_safe(0);
-	m_cvbs_in.resolve_safe(0);
-
-	m_y_out.resolve_safe();
-	m_uv_out.resolve_safe();
-	m_hs_out.resolve_safe();
-	m_vs_out.resolve_safe();
 }
 
 void saa7191_device::device_reset()

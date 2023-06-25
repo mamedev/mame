@@ -88,13 +88,13 @@ mos6530_device_base::mos6530_device_base(const machine_config &mconfig, device_t
 	m_ram(*this, finder_base::DUMMY_TAG, rsize, ENDIANNESS_LITTLE),
 	m_rom(*this, DEVICE_SELF),
 	m_irq_cb(*this),
-	m_in8_pa_cb(*this),
+	m_in8_pa_cb(*this, 0),
 	m_out8_pa_cb(*this),
-	m_in8_pb_cb(*this),
+	m_in8_pb_cb(*this, 0),
 	m_out8_pb_cb(*this),
-	m_in_pa_cb(*this),
+	m_in_pa_cb(*this, 0),
 	m_out_pa_cb(*this),
-	m_in_pb_cb(*this),
+	m_in_pb_cb(*this, 0),
 	m_out_pb_cb(*this),
 	m_pa_in(0xff),
 	m_pa_out(0),
@@ -137,17 +137,6 @@ mos6532_new_device::mos6532_new_device(const machine_config &mconfig, const char
 
 void mos6530_device_base::device_start()
 {
-	// resolve callbacks
-	m_irq_cb.resolve_safe();
-	m_in8_pa_cb.resolve();
-	m_out8_pa_cb.resolve();
-	m_in8_pb_cb.resolve();
-	m_out8_pb_cb.resolve();
-	m_in_pa_cb.resolve_all();
-	m_out_pa_cb.resolve_all_safe();
-	m_in_pb_cb.resolve_all();
-	m_out_pb_cb.resolve_all_safe();
-
 	// allocate timer
 	t_gen = timer_alloc(FUNC(mos6530_device_base::update), this);
 
@@ -224,7 +213,7 @@ void mos6530_device_base::update_pa()
 	uint8_t ddr = m_pa_ddr;
 	uint8_t data = (out & ddr) | (ddr ^ 0xff);
 
-	if (m_out8_pa_cb.isnull())
+	if (m_out8_pa_cb.isunset())
 	{
 		m_out_pa_cb[0](BIT(data, 0));
 		m_out_pa_cb[1](BIT(data, 1));
@@ -252,7 +241,7 @@ void mos6530_device_base::update_pb()
 	uint8_t ddr = m_pb_ddr;
 	uint8_t data = (out & ddr) | (ddr ^ 0xff);
 
-	if (m_out8_pb_cb.isnull())
+	if (m_out8_pb_cb.isunset())
 	{
 		m_out_pb_cb[0](BIT(data, 0));
 		m_out_pb_cb[1](BIT(data, 1));
@@ -284,7 +273,7 @@ void mos6530_new_device::update_pb()
 		}
 	}
 
-	if (m_out8_pb_cb.isnull())
+	if (m_out8_pb_cb.isunset())
 	{
 		m_out_pb_cb[0](BIT(data, 0));
 		m_out_pb_cb[1](BIT(data, 1));
@@ -405,16 +394,16 @@ uint8_t mos6530_device_base::pa_data_r()
 {
 	uint8_t in = 0;
 
-	if (m_in8_pa_cb.isnull())
+	if (m_in8_pa_cb.isunset())
 	{
-		in |= (m_in_pa_cb[0].isnull() ? BIT(m_pa_in, 0) : m_in_pa_cb[0]());
-		in |= (m_in_pa_cb[1].isnull() ? BIT(m_pa_in, 1) : m_in_pa_cb[1]()) << 1;
-		in |= (m_in_pa_cb[2].isnull() ? BIT(m_pa_in, 2) : m_in_pa_cb[2]()) << 2;
-		in |= (m_in_pa_cb[3].isnull() ? BIT(m_pa_in, 3) : m_in_pa_cb[3]()) << 3;
-		in |= (m_in_pa_cb[4].isnull() ? BIT(m_pa_in, 4) : m_in_pa_cb[4]()) << 4;
-		in |= (m_in_pa_cb[5].isnull() ? BIT(m_pa_in, 5) : m_in_pa_cb[5]()) << 5;
-		in |= (m_in_pa_cb[6].isnull() ? BIT(m_pa_in, 6) : m_in_pa_cb[6]()) << 6;
-		in |= (m_in_pa_cb[7].isnull() ? BIT(m_pa_in, 7) : m_in_pa_cb[7]()) << 7;
+		in |= (m_in_pa_cb[0].isunset() ? BIT(m_pa_in, 0) : m_in_pa_cb[0]());
+		in |= (m_in_pa_cb[1].isunset() ? BIT(m_pa_in, 1) : m_in_pa_cb[1]()) << 1;
+		in |= (m_in_pa_cb[2].isunset() ? BIT(m_pa_in, 2) : m_in_pa_cb[2]()) << 2;
+		in |= (m_in_pa_cb[3].isunset() ? BIT(m_pa_in, 3) : m_in_pa_cb[3]()) << 3;
+		in |= (m_in_pa_cb[4].isunset() ? BIT(m_pa_in, 4) : m_in_pa_cb[4]()) << 4;
+		in |= (m_in_pa_cb[5].isunset() ? BIT(m_pa_in, 5) : m_in_pa_cb[5]()) << 5;
+		in |= (m_in_pa_cb[6].isunset() ? BIT(m_pa_in, 6) : m_in_pa_cb[6]()) << 6;
+		in |= (m_in_pa_cb[7].isunset() ? BIT(m_pa_in, 7) : m_in_pa_cb[7]()) << 7;
 	}
 	else
 	{
@@ -470,16 +459,16 @@ uint8_t mos6530_device_base::pb_data_r()
 {
 	uint8_t in = 0;
 
-	if (m_in8_pb_cb.isnull())
+	if (m_in8_pb_cb.isunset())
 	{
-		in |= (m_in_pb_cb[0].isnull() ? BIT(m_pb_in, 0) : m_in_pb_cb[0]());
-		in |= (m_in_pb_cb[1].isnull() ? BIT(m_pb_in, 1) : m_in_pb_cb[1]()) << 1;
-		in |= (m_in_pb_cb[2].isnull() ? BIT(m_pb_in, 2) : m_in_pb_cb[2]()) << 2;
-		in |= (m_in_pb_cb[3].isnull() ? BIT(m_pb_in, 3) : m_in_pb_cb[3]()) << 3;
-		in |= (m_in_pb_cb[4].isnull() ? BIT(m_pb_in, 4) : m_in_pb_cb[4]()) << 4;
-		in |= (m_in_pb_cb[5].isnull() ? BIT(m_pb_in, 5) : m_in_pb_cb[5]()) << 5;
-		in |= (m_in_pb_cb[6].isnull() ? BIT(m_pb_in, 6) : m_in_pb_cb[6]()) << 6;
-		in |= (m_in_pb_cb[7].isnull() ? BIT(m_pb_in, 7) : m_in_pb_cb[7]()) << 7;
+		in |= (m_in_pb_cb[0].isunset() ? BIT(m_pb_in, 0) : m_in_pb_cb[0]());
+		in |= (m_in_pb_cb[1].isunset() ? BIT(m_pb_in, 1) : m_in_pb_cb[1]()) << 1;
+		in |= (m_in_pb_cb[2].isunset() ? BIT(m_pb_in, 2) : m_in_pb_cb[2]()) << 2;
+		in |= (m_in_pb_cb[3].isunset() ? BIT(m_pb_in, 3) : m_in_pb_cb[3]()) << 3;
+		in |= (m_in_pb_cb[4].isunset() ? BIT(m_pb_in, 4) : m_in_pb_cb[4]()) << 4;
+		in |= (m_in_pb_cb[5].isunset() ? BIT(m_pb_in, 5) : m_in_pb_cb[5]()) << 5;
+		in |= (m_in_pb_cb[6].isunset() ? BIT(m_pb_in, 6) : m_in_pb_cb[6]()) << 6;
+		in |= (m_in_pb_cb[7].isunset() ? BIT(m_pb_in, 7) : m_in_pb_cb[7]()) << 7;
 	}
 	else
 	{

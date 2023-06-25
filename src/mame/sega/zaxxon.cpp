@@ -926,6 +926,9 @@ void zaxxon_state::root(machine_config &config)
 	m_ppi->out_pa_callback().set(FUNC(zaxxon_state::zaxxon_sound_a_w));
 	m_ppi->out_pb_callback().set(FUNC(zaxxon_state::zaxxon_sound_b_w));
 	m_ppi->out_pc_callback().set(FUNC(zaxxon_state::zaxxon_sound_c_w));
+	m_ppi->tri_pa_callback().set_constant(0);
+	m_ppi->tri_pb_callback().set_constant(0);
+	m_ppi->tri_pc_callback().set_constant(0);
 
 	LS259(config, m_mainlatch[0]); // U55 on Zaxxon IC Board A
 	m_mainlatch[0]->q_out_cb<0>().set(FUNC(zaxxon_state::coin_enable_w)); // COIN EN A
@@ -989,7 +992,6 @@ void zaxxon_state::futspye(machine_config &config)
 	maincpu.set_addrmap(AS_OPCODES, &zaxxon_state::decrypted_opcodes_map);
 	maincpu.set_decrypted_tag(":decrypted_opcodes");
 	maincpu.set_size(0x6000);
-
 
 	/* video hardware */
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(zaxxon_state::screen_update_futspy));

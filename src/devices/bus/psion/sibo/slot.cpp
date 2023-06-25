@@ -58,9 +58,6 @@ psion_sibo_slot_device::psion_sibo_slot_device(const machine_config &mconfig, co
 void psion_sibo_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_int_cb.resolve_safe();
 }
 
 

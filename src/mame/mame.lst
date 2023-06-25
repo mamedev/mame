@@ -2005,6 +2005,7 @@ sprint2h                        // 005922 romkit
 @source:atari/sprint4.cpp
 sprint4                         // 008716           1977/12 [6502]
 sprint4a                        // 008716           1977/12 [6502]
+sprint4b                        // 008716           1977/12 [6502]
 
 @source:atari/sprint8.cpp
 sprint8                         // ??????           1977/05 [6800]
@@ -15060,6 +15061,7 @@ pang3j                          // 11/05/1995 (c) 1995 Mitchell (Japan) not list
 pang3r1                         // 11/05/1995 (c) 1995 Mitchell (Euro) not listed on Capcom's site
 pang3b4                         // bootleg
 pang3b5                         // bootleg
+pmonster                        // 19/05/1999 (c) 1999 (Japan)
 pnickj                          // 08/06/1994 (c) 1994 Compile + Capcom license (Japan) not listed on Capcom's site
 punisher                        // 22/04/1993 (c) 1993 (World) (CPS1 + QSound)
 punisherbz                      // bootleg
@@ -15883,9 +15885,12 @@ cncchess
 
 @source:chess/conchess.cpp
 conc
+conca
 concams
 concams5
 concgla
+concglap
+concglapa
 concvicp
 
 @source:chess/conic_cchess2.cpp
@@ -15922,6 +15927,7 @@ boxingb                         // (c) 1981
 demon                           // (c) 1982 Rock-ola
 qb3                             // (c) 1982 Rock-ola - prototype
 ripoff                          // (c) 1980
+skyfire                         // bootleg
 solarq                          // (c) 1981
 spaceftr                        // (c) 1981 Zaccaria
 spaceshp                        // (c) 1978 Cinematronics (Sega licence)
@@ -16536,6 +16542,7 @@ makyosen                        // (c) 1987 Data East Corporation (Japan)
 meikyuh                         // (c) 1987 Data East Corporation (Japan)
 meikyuha                        // (c) 1987 Data East Corporation (Japan)
 oscar                           // (c) 1988 Data East Corporation (World)
+oscarbl                         // bootleg
 oscarj1                         // (c) 1987 Data East Corporation (Japan)
 oscarj2                         // (c) 1987 Data East Corporation (Japan)
 oscaru                          // (c) 1987 Data East USA (US)
@@ -17304,6 +17311,7 @@ ppmast93                        // (c) 1993 Electronic Devices S.R.L.
 pzletime                        //
 
 @source:edevices/stlforce.cpp
+mortalr
 stlforce                        // (c) 1994 Electronic Devices (Italy) / Ecogames S.L. (Spain)
 twinbrat                        // (c) 1995
 twinbrata                       // (c) 1995
@@ -17998,7 +18006,13 @@ crystalca                       // 1998 JCD srl
 
 @source:funworld/supercrd.cpp
 fruitstr                        // (c) 1992 Fun World
+fruitstra                       // (c) 1992 Fun World
+gampo816                        // (c) 1990 Fun World
+gampo812                        // (c) 1990 Fun World
+redline                         // (c) 1989 Fun World
 supercrd                        // (c) 1992 Fun World
+supst839                        // (c) 1994 Fun World
+supst834                        // (c) 1990 Fun World
 
 @source:fuuki/fuukifg2.cpp
 gogomile                        // (c) 1995
@@ -18656,7 +18670,7 @@ mbaskb2                         // Mattel
 mdallas                         // Mattel
 msoccer2                        // Mattel
 plus1                           // Milton Bradley
-qkracer                         // National Semiconductor
+qkracera                        // National Semiconductor
 solution                        // SCAT
 unkeinv                         // Gordon Barlow Design
 vidchal                         // Select Merchandise
@@ -18667,7 +18681,7 @@ mbaskb                          // Mattel
 mhockey                         // Mattel
 mhockeya                        // Mattel
 msoccer                         // Mattel
-qkracerm                        // National Semiconductor
+qkracer                         // National Semiconductor
 qkspeller                       // National Semiconductor
 
 @source:handheld/hh_hmcs40.cpp
@@ -18740,6 +18754,7 @@ us2pfball                       // US Games
 uspbball                        // US Games
 
 @source:handheld/hh_pps41.cpp
+addocalc                        // Addometer Company
 brainbaf                        // Mattel
 dunksunk                        // Kmart
 ftri1                           // Fonas
@@ -19020,6 +19035,7 @@ starwbcp                        // Kenner (patent)
 starwlb                         // Kenner
 stopthief                       // Parker Bros
 stopthiefp                      // Parker Bros (patent)
+strobe                          // Lakeside
 subwars                         // Tiger Electronics
 t3in1sa                         // Tandy Corporation
 t7in1ss                         // Tiger Electronics
@@ -20102,6 +20118,7 @@ pc679cy                         // (c) 1987 IGT - International Game Technology
 pc714vz                         // (c) 1987 IGT - International Game Technology
 pc716vy                         // (c) 1987 IGT - International Game Technology
 pc718vy                         // (c) 1987 IGT - International Game Technology
+pebe0013                        // (c) 1994 IGT - International Game Technology
 pebe0014                        // (c) 1994 IGT - International Game Technology
 pebe0014a                       // (c) 1994 IGT - International Game Technology
 peip0028                        // (c) 1987 IGT - International Game Technology
@@ -20130,6 +20147,7 @@ peke0004a                       // (c) 1994 IGT - International Game Technology
 peke0004b                       // (c) 1994 IGT - International Game Technology
 peke0017                        // (c) 1994 IGT - International Game Technology
 peke0017a                       // (c) 1994 IGT - International Game Technology
+peke0026                        // (c) 1994 IGT - International Game Technology
 peke1001                        // (c) 1994 IGT - International Game Technology
 peke1006                        // (c) 1994 IGT - International Game Technology
 peke1012                        // (c) 1994 IGT - International Game Technology
@@ -20153,6 +20171,7 @@ pemg0026                        // (c) 1994 IGT - International Game Technology
 pemg0182                        // (c) 1994 IGT - International Game Technology
 pemg0183                        // (c) 1994 IGT - International Game Technology
 pemg0213                        // (c) 1994 IGT - International Game Technology
+pemg0225                        // (c) 1994 IGT - International Game Technology
 pemg0252                        // (c) 1994 IGT - International Game Technology
 pepk0719                        // (c) 1987 IGT - International Game Technology
 pepk0719a                       // (c) 1987 IGT - International Game Technology
@@ -20166,6 +20185,8 @@ pepk0757                        // (c) 1987 IGT - International Game Technology
 pepk0758                        // (c) 1987 IGT - International Game Technology
 pepk0769                        // (c) 1987 IGT - International Game Technology
 pepk0773                        // (c) 1987 IGT - International Game Technology
+pepk0785                        // (c) 1987 IGT - International Game Technology
+pepk0788                        // (c) 1987 IGT - International Game Technology
 pepk0810                        // (c) 1987 IGT - International Game Technology
 pepk0810a                       // (c) 1987 IGT - International Game Technology
 pepk0811                        // (c) 1987 IGT - International Game Technology
@@ -20183,13 +20204,16 @@ pepk0930a                       // (c) 1987 IGT - International Game Technology
 pepk1002                        // (c) 1987 IGT - International Game Technology
 pepk1004                        // (c) 1987 IGT - International Game Technology
 pepk1013                        // (c) 1987 IGT - International Game Technology
+pepk1015                        // (c) 1987 IGT - International Game Technology
 pepk1020                        // (c) 1987 IGT - International Game Technology
 pepk1024                        // (c) 1987 IGT - International Game Technology
 pepk1030                        // (c) 1987 IGT - International Game Technology
+pepk1031                        // (c) 1987 IGT - International Game Technology
 pepk1069                        // (c) 1987 IGT - International Game Technology
 pepp0001                        // (c) 1987 IGT - International Game Technology
 pepp0002                        // (c) 1987 IGT - International Game Technology
 pepp0002a                       // (c) 1987 IGT - International Game Technology
+pepp0005                        // (c) 1987 IGT - International Game Technology
 pepp0006                        // (c) 1987 IGT - International Game Technology
 pepp0008                        // (c) 1987 IGT - International Game Technology
 pepp0008a                       // (c) 1987 IGT - International Game Technology
@@ -20207,6 +20231,7 @@ pepp0040b                       // (c) 1987 IGT - International Game Technology
 pepp0041                        // (c) 1987 IGT - International Game Technology
 pepp0042                        // (c) 1987 IGT - International Game Technology
 pepp0042a                       // (c) 1987 IGT - International Game Technology
+pepp0042b                       // (c) 1987 IGT - International Game Technology
 pepp0043                        // (c) 1987 IGT - International Game Technology
 pepp0043a                       // (c) 1987 IGT - International Game Technology
 pepp0043b                       // (c) 1987 IGT - International Game Technology
@@ -20249,10 +20274,13 @@ pepp0063                        // (c) 1987 IGT - International Game Technology
 pepp0064                        // (c) 1987 IGT - International Game Technology
 pepp0065                        // (c) 1987 IGT - International Game Technology
 pepp0078                        // (c) 1987 IGT - International Game Technology
+pepp0079                        // (c) 1987 IGT - International Game Technology
 pepp0083                        // (c) 1987 IGT - International Game Technology
+pepp0083a                       // (c) 1987 IGT - International Game Technology
 pepp0085                        // (c) 1987 IGT - International Game Technology
 pepp0089                        // (c) 1987 IGT - International Game Technology
 pepp0094                        // (c) 1987 IGT - International Game Technology
+pepp0094a                       // (c) 1987 IGT - International Game Technology
 pepp0103                        // (c) 1987 IGT - International Game Technology
 pepp0103a                       // (c) 1987 IGT - International Game Technology
 pepp0103b                       // (c) 1987 IGT - International Game Technology
@@ -20261,9 +20289,12 @@ pepp0104                        // (c) 1987 IGT - International Game Technology
 pepp0104a                       // (c) 1987 IGT - International Game Technology
 pepp0116                        // (c) 1987 IGT - International Game Technology
 pepp0116a                       // (c) 1987 IGT - International Game Technology
+pepp0117                        // (c) 1987 IGT - International Game Technology
 pepp0118                        // (c) 1987 IGT - International Game Technology
 pepp0120                        // (c) 1987 IGT - International Game Technology
-pepp0125                        // (c) 1987 IGT - International Game Technology
+pepp0122                        // (c) 1987 IGT - International Game Technology
+pepp0125                        // (c) 1987 IGT - International Game Technolog
+pepp0125a                       // (c) 1987 IGT - International Game Technology
 pepp0126                        // (c) 1987 IGT - International Game Technology
 pepp0126a                       // (c) 1987 IGT - International Game Technology
 pepp0126b                       // (c) 1987 IGT - International Game Technology
@@ -20273,6 +20304,7 @@ pepp0127b                       // (c) 1987 IGT - International Game Technology
 pepp0129                        // (c) 1987 IGT - International Game Technology
 pepp0130                        // (c) 1987 IGT - International Game Technology
 pepp0132                        // (c) 1987 IGT - International Game Technology
+pepp0143                        // (c) 1987 IGT - International Game Technology
 pepp0150                        // (c) 1987 IGT - International Game Technology
 pepp0158                        // (c) 1987 IGT - International Game Technology
 pepp0158a                       // (c) 1987 IGT - International Game Technology
@@ -20338,19 +20370,23 @@ pepp0410a                       // (c) 1987 IGT - International Game Technology
 pepp0417                        // (c) 1987 IGT - International Game Technology
 pepp0417a                       // (c) 1987 IGT - International Game Technology
 pepp0418                        // (c) 1987 IGT - International Game Technology
+pepp0418a                       // (c) 1987 IGT - International Game Technology
 pepp0419                        // (c) 1987 IGT - International Game Technology
 pepp0419a                       // (c) 1987 IGT - International Game Technology
 pepp0419b                       // (c) 1987 IGT - International Game Technology
 pepp0420                        // (c) 1987 IGT - International Game Technology
+pepp0420a                       // (c) 1987 IGT - International Game Technology
 pepp0423                        // (c) 1987 IGT - International Game Technology
 pepp0423a                       // (c) 1987 IGT - International Game Technology
 pepp0423b                       // (c) 1987 IGT - International Game Technology
 pepp0423c                       // (c) 1987 IGT - International Game Technology
+pepp0425                        // (c) 1987 IGT - International Game Technology
 pepp0426                        // (c) 1987 IGT - International Game Technology
 pepp0428                        // (c) 1987 IGT - International Game Technology
 pepp0429                        // (c) 1987 IGT - International Game Technology
 pepp0429a                       // (c) 1987 IGT - International Game Technology
 pepp0430                        // (c) 1987 IGT - International Game Technology
+pepp0430a                       // (c) 1987 IGT - International Game Technology
 pepp0431                        // (c) 1987 IGT - International Game Technology
 pepp0434                        // (c) 1987 IGT - International Game Technology
 pepp0434a                       // (c) 1987 IGT - International Game Technology
@@ -20361,6 +20397,7 @@ pepp0447b                       // (c) 1987 IGT - International Game Technology
 pepp0449                        // (c) 1987 IGT - International Game Technology
 pepp0449a                       // (c) 1987 IGT - International Game Technology
 pepp0450                        // (c) 1995 IGT - International Game Technology
+pepp0451                        // (c) 1995 IGT - International Game Technology
 pepp0452                        // (c) 1987 IGT - International Game Technology
 pepp0452a                       // (c) 1987 IGT - International Game Technology
 pepp0453                        // (c) 1987 IGT - International Game Technology
@@ -20369,10 +20406,13 @@ pepp0454a                       // (c) 1987 IGT - International Game Technology
 pepp0455                        // (c) 1987 IGT - International Game Technology
 pepp0458                        // (c) 1987 IGT - International Game Technology
 pepp0459                        // (c) 1987 IGT - International Game Technology
+pepp0459a                       // (c) 1987 IGT - International Game Technology
 pepp0467                        // (c) 1987 IGT - International Game Technology
+pepp0469                        // (c) 1987 IGT - International Game Technology
 pepp0472                        // (c) 1987 IGT - International Game Technology
 pepp0488                        // (c) 1987 IGT - International Game Technology
 pepp0508                        // (c) 1987 IGT - International Game Technology
+pepp0508a                       // (c) 1987 IGT - International Game Technology
 pepp0509                        // (c) 1987 IGT - International Game Technology
 pepp0510                        // (c) 1987 IGT - International Game Technology
 pepp0514                        // (c) 1987 IGT - International Game Technology
@@ -20391,6 +20431,7 @@ pepp0531                        // (c) 1987 IGT - International Game Technology
 pepp0536                        // (c) 1987 IGT - International Game Technology
 pepp0538                        // (c) 1987 IGT - International Game Technology
 pepp0540                        // (c) 1987 IGT - International Game Technology
+pepp0540a                       // (c) 1987 IGT - International Game Technology
 pepp0542                        // (c) 1987 IGT - International Game Technology
 pepp0542a                       // (c) 1987 IGT - International Game Technology
 pepp0542b                       // (c) 1987 IGT - International Game Technology
@@ -20411,13 +20452,16 @@ pepp0725                        // (c) 1987 IGT - International Game Technology
 pepp0725a                       // (c) 1987 IGT - International Game Technology
 pepp0726                        // (c) 1987 IGT - International Game Technology
 pepp0728                        // (c) 1987 IGT - International Game Technology
+pepp0729                        // (c) 1987 IGT - International Game Technology
 pepp0733                        // (c) 1987 IGT - International Game Technology
 pepp0750                        // (c) 1987 IGT - International Game Technology
+pepp0750a                       // (c) 1987 IGT - International Game Technology
 pepp0757                        // (c) 1987 IGT - International Game Technology
 pepp0760                        // (c) 1987 IGT - International Game Technology
 pepp0763                        // (c) 1987 IGT - International Game Technology
 pepp0764                        // (c) 1987 IGT - International Game Technology
 pepp0775                        // (c) 1987 IGT - International Game Technology
+pepp0777                        // (c) 1987 IGT - International Game Technology
 pepp0797                        // (c) 1987 IGT - International Game Technology
 pepp0812                        // (c) 1987 IGT - International Game Technology
 pepp0816                        // (c) 1987 IGT - International Game Technology
@@ -20482,6 +20526,7 @@ pex0006k                        // (c) 1997 IGT - International Game Technology
 pex0006p                        // (c) 1995 IGT - International Game Technology
 pex0013k                        // (c) 1997 IGT - International Game Technology
 pex0013ka                       // (c) 1997 IGT - International Game Technology
+pex0014p                        // (c) 1995 IGT - International Game Technology
 pex0040p                        // (c) 1995 IGT - International Game Technology
 pex0042p                        // (c) 1995 IGT - International Game Technology
 pex0045p                        // (c) 1995 IGT - International Game Technology
@@ -20519,6 +20564,7 @@ pex0057pf                       // (c) 1995 IGT - International Game Technology
 pex0057pg                       // (c) 1995 IGT - International Game Technology
 pex0060p                        // (c) 1995 IGT - International Game Technology
 pex0124p                        // (c) 1995 IGT - International Game Technology
+pex0127p                        // (c) 1995 IGT - International Game Technology
 pex0150p                        // (c) 1995 IGT - International Game Technology
 pex0158p                        // (c) 1995 IGT - International Game Technology
 pex0171p                        // (c) 1995 IGT - International Game Technology
@@ -20571,6 +20617,7 @@ pex0846s                        // (c) 1997 IGT - International Game Technology
 pex0998s                        // (c) 1997 IGT - International Game Technology
 pex1087s                        // (c) 1997 IGT - International Game Technology
 pex2002p                        // (c) 1995 IGT - International Game Technology
+pex2004p                        // (c) 1995 IGT - International Game Technology
 pex2010p                        // (c) 1995 IGT - International Game Technology
 pex2016p                        // (c) 1995 IGT - International Game Technology
 pex2017p                        // (c) 1995 IGT - International Game Technology
@@ -20595,6 +20642,7 @@ pex2042p                        // (c) 1995 IGT - International Game Technology
 pex2043p                        // (c) 1995 IGT - International Game Technology
 pex2044p                        // (c) 1995 IGT - International Game Technology
 pex2045p                        // (c) 1995 IGT - International Game Technology
+pex2046p                        // (c) 1995 IGT - International Game Technology
 pex2066p                        // (c) 1995 IGT - International Game Technology
 pex2067p                        // (c) 1995 IGT - International Game Technology
 pex2068p                        // (c) 1995 IGT - International Game Technology
@@ -23696,7 +23744,7 @@ kpontoon                        // (c) 1993 Konami
 
 @source:konami/kpython.cpp
 dogstdx                         // (c) 2002 Konami. dogstation Deluxe
-kpython                         // (c) 2002 Konami. Python Bios
+kpython                         // (c) 2002 Konami. Python BIOS
 pesta                           // (c) 2002 Konami. Pro Evolution Soccer The Arcade
 popn9                           // (c) 2003 Konami. Pop'n Music 9
 wswe                            // (c) 2002 Konami. World Soccer Winning Eleven
@@ -24479,6 +24527,7 @@ turboex
 
 @source:leapfrog/leappad.cpp
 leappad                         // (c) 2001 LeapFrog / Knowledge Kids Enterprises, Inc.
+leappadmic                      // (c) 2004 LeapFrog
 mfleappad                       // (c) 2002 LeapFrog
 ltleappad                       // (c) 2005 LeapFrog
 
@@ -28121,8 +28170,9 @@ sanma                           // 2001, ANES
 tonpuu                          // 200?, ANES
 
 @source:misc/arachnid.cpp
-arac6000                        // (c) 1987/88/89/90 Arachnid Inc.
-arac6spa                        // (c) 1987/88/89/90 Arachnid Inc.
+arac6k27                        // (c) 1987/88/89/90 Arachnid Inc.
+arac6k28sp                      // (c) 1987/88/89/90 Arachnid Inc.
+arac6k33                        // (c) 1987/88/89/94 Arachnid Inc.
 
 @source:misc/artmagic.cpp
 cheesech                        // (c) 1994
@@ -28611,10 +28661,11 @@ changyu2
 dmodrbcc                        // (c) 1976 Chicago Coin
 
 @source:misc/chsuper.cpp
-chsuper2                        // 1999, unknown
-chsuper3                        // 1999, unknown
 chmpnum                         // 1999, unknown
 chmpnuma                        // 1999, unknown
+chsuper2                        // 1999, unknown
+chsuper3                        // 1999, unknown
+losttrea                        // 2001, unknown
 
 @source:misc/cleartone.cpp
 bnstlkr                         //
@@ -28645,6 +28696,8 @@ cmkenospa                       // (c) 2000 Coinmaster-Gaming, Ltd.
 cmrltv75                        // (c) 2001 Coinmaster-Gaming, Ltd.
 colorama                        // (c) 2000 Coinmaster-Gaming, Ltd.
 coloramas                       // (c) 2000 Coinmaster-Gaming, Ltd.
+wof_v11                         // (c) 2000 Coinmaster-Gaming, Ltd.
+wof_v16                         // (c) 2000 Coinmaster-Gaming, Ltd.
 
 @source:misc/cointek.cpp
 unkct                           //
@@ -28656,6 +28709,7 @@ comebaby                        // (c) 2000 ExPotato
 mastcrane                       // (c) 199? Compumatic
 mastcranea                      // (c) 199? Compumatic
 mastcraneb                      // (c) 199? Compumatic
+octopussy                       // (c) 1990 Covielsa
 
 @source:misc/coolpool.cpp
 9ballsht                        // (c) 1993 E-Scape EnterMedia + "marketed by Bundra Games"
@@ -29369,8 +29423,12 @@ eshb                            // (c) 1984 Funai / Gakken
 
 @source:misc/esripsys.cpp
 turbosub                        // (c) 1985 Entertainment Sciences
-turbosub6                       // (c) 1985 Entertainment Sciences
-turbosub7                       // (c) 1985 Entertainment Sciences
+turbosubb8                      // (c) 1985 Entertainment Sciences
+turbosubc5                      // (c) 1985 Entertainment Sciences
+turbosubc5s                     // (c) 1985 Entertainment Sciences
+turbosubc6                      // (c) 1985 Entertainment Sciences
+turbosubc7                      // (c) 1985 Entertainment Sciences
+turbosubc8                      // (c) 1985 Entertainment Sciences
 
 @source:misc/ettrivia.cpp
 promutrv                        // (c) 1985 Enerdyne Technologies Inc
@@ -29414,6 +29472,7 @@ strlink                         // Strong Link (Ukraine)
 strlinka                        //
 
 @source:misc/ez2d.cpp
+asuscubx                        // 2000/2001 ASUS
 ez2d2m                          // 2001 Amuse World
 
 @source:misc/falgas_m89.cpp
@@ -30355,6 +30414,9 @@ fruitstba                       // 199? Webak
 fruitstbb                       // 1997 Webak
 fruitstbc                       // 1997 Webak
 fruitstbd                       // 1997 Webak
+fruitstbe                       // 1999 Webak
+fruitstbf                       // 1997 Webak
+fruitstbg                       // 1997 Webak
 
 @source:misc/mtu130.cpp
 mtu130
@@ -31616,6 +31678,9 @@ unkhorse                        //
 @source:misc/unkpoker.cpp
 unkpoker                         //
 
+@source:misc/unktop.cpp
+unktop
+
 @source:misc/usbilliards.cpp
 sharkusb                        // (c) 1975 US Billiards
 
@@ -32547,6 +32612,7 @@ taiko3                          // 2002.03 Taiko no Tatsujin 3 (Japan, TK31 Ver.
 taiko4                          // 2002.12 Taiko no Tatsujin 4 (Japan, TK41 Ver.A)
 taiko5                          // 2003.10 Taiko no Tatsujin 5 (Japan, TK51 Ver.A)
 taiko6                          // 2004.07 Taiko no Tatsujin 6 (Japan, TK61 Ver.A)
+taikort                         // 2004.11 Taiko no Tatsujin RT: Nippon no Kokoro (Japan, TKN1 Ver.A)
 
 @source:namco/namcos11.cpp
 danceyes                        // 1996.09 Dancing Eyes (World, DC2/VER.B)
@@ -34599,6 +34665,12 @@ moguchan                        // (c) 1982 Orca + Eastern Commerce Inc. license
 percuss                         // (c) 1981 Orca
 zodiack                         // (c) 1983 Orca + Esco Trading Co license
 
+@source:orla/hk1000.cpp
+hk1000                          //
+
+@source:orla/xm200.cpp
+xm200                           //
+
 @source:osborne/osbexec.cpp
 osbexec                         // 1982 Osborne Executive
 
@@ -34807,7 +34879,7 @@ asst128                         //
 
 @source:pc/at.cpp
 asi100b0                        // ASI 100B0, identified as "HAM 12 TI 286 Motherboard ZERO WAIT" ab hier 286
-at                              // 1987 AMI Bios and Diagnostics
+at                              // 1987 AMI BIOS and Diagnostics
 ataripc4                        // Atari PC4 (286)
 atariabc286                     // Atari ABC-286/30
 atturbo                         // 19?? AT 12 MHz
@@ -34897,8 +34969,8 @@ v286c                           // Victor V286c
 vlsi5                           // 286 motherboards using the 5-chip VLSI chipset
 wpc250                          // Wang PC-250/16 (286)
 wy220001                        // WYSEpc 286
-xb42639                         // 1989 Apricot XEN-S (Venus I Motherboard 286) (Bios:3.10.17i)
-xb42639a                        // 1990 Apricot XEN-S (Venus II Motherboard 286) (Bios:1.02.17)
+xb42639                         // 1989 Apricot XEN-S (Venus I Motherboard 286) (BIOS:3.10.17i)
+xb42639a                        // 1990 Apricot XEN-S (Venus II Motherboard 286) (BIOS:1.02.17)
 zdz248                          // Zenith Z-248 ab hier 386sx
 386sxvhcom                      // 80386SX-VH-COM
 3siud                           // 3SIUD-1.1 motherboard (386sx)
@@ -35026,8 +35098,8 @@ um82c493f                       // motherboards using the UMC UM82C491F + UM82C4
 uni386w                         // UNICHIP 386W 367C REV 1.0 motherboard (386)
 walk386dx                       // 1992 Triumph-Adler Walkstation 386 DX
 xb42663                         // 1988 Apricot Qi 300 (Rev D,E & F Motherboard)
-xb42664                         // 1989 Apricot XEN-S (Venus I Motherboard 386) (Bios:3.10.17i)
-xb42664a                        // 1990 Apricot XEN-S (Venus II Motherboard 386) (Bios:1.02.17) ab hier 486
+xb42664                         // 1989 Apricot XEN-S (Venus I Motherboard 386) (BIOS:3.10.17i)
+xb42664a                        // 1990 Apricot XEN-S (Venus II Motherboard 386) (BIOS:1.02.17) ab hier 486
 486apio                         // EFA 486 APIO motherboard
 486ccv                          // Diamond Flower, Inc. (DFI) 486-CCV motherboard (486)
 486igb21                        // 486IG-B-2-1 motherboard (486)
@@ -35162,7 +35234,6 @@ pwaih4077d                      // Mitac PWA-IH4077D
 px486p3                         // QDI PX486P3 motherboard (486)
 qi900                           // 1990 Apricot Qi 900 (Scorpion Motherboard)
 sis85c471                       // 486 motherboards using the SiS 85C471/85C407 chipset
-sis85c496                       // 486 motherboards using the SiS 85C496/85C497 chipset
 sm48650usc                      // Vintage Sprite SM 486-50USC motherboard (486)
 so025d2                         // SOYO 486 VESA 025D2
 so025k2                         // SOYO 025K2 motherboard (486)
@@ -35342,6 +35413,9 @@ pcinv3                          //
 pcipctx                         //
 pciagp                          //
 
+@source:pc/pcipc_sis.cpp
+sis85c496                       // 486 motherboards using the SiS 85C496/85C497 chipset
+
 @source:pc/pcxt.cpp
 filetto                         // (c) 1990 Novamatic
 tetriskr                        // (c) 1988? bootleg
@@ -35470,6 +35544,7 @@ capitol                         // bootleg?
 cityatta                        // bootleg (Petaco S.A.)
 condor                          // bootleg (Sidam)
 condorn                         // bootleg (S C Novar)
+condorva                        // bootleg (Valadon Automation)
 falcon                          // bootleg
 falconz                         // bootleg
 fenix                           // bootleg (Orio)
@@ -36398,6 +36473,7 @@ scrpn_t1                        //
 @source:pinball/s7.cpp
 barra_l1                        //
 bk_f4                           //
+bk_l2                           //
 bk_l3                           //
 bk_l4                           //
 csmic_l1                        //
@@ -37992,6 +38068,9 @@ tb303                           // Roland
 @source:roland/roland_tnsc1.cpp
 rlndtnsc1                       // Roland TN-SC1 ROM cards
 
+@source:roland/roland_tnsc2.cpp
+rlndtnsc2                       // Roland TN-SC2 ROM cards
+
 @source:roland/roland_tr505.cpp
 tr505                           //
 
@@ -38799,7 +38878,7 @@ mvsc2                           // 2000.03 Marvel Vs. Capcom 2 New Age of Heroes
 mvsc2u                          // 2000.03 Marvel Vs. Capcom 2 New Age of Heroes (USA) (Rev A)
 naomi                           // 1998.?? Naomi BIOS
 naomi2                          // 2001.?? Naomi 2 BIOS
-naomigd                         // 2001.?? Naomi GD-ROM Bios
+naomigd                         // 2001.?? Naomi GD-ROM BIOS
 ndcfboxa                        // 2009.04.01 DIMM Firmware Updater for CF-BOX (Rev A)
 ngdup23a                        // DIMM Firmware Updater (Rev A)
 ngdup23c                        // DIMM Firmware Updater (Rev C)
@@ -39821,6 +39900,7 @@ starjacks                       // (c) 1983 Stern (S1)
 swat                            // 834-5388 (c) 1984 Coreland / Sega (S1)
 teddybb                         // 834-5712 (c) 1985 (S1)
 teddybbo                        // 834-5712 (c) 1985 (S1)
+teddybboa                       // 834-5712 (c) 1985 (S1)
 teddybbobl                      // bootleg
 thetogyu                        // 834-5478 (c) 1984 Sega / Coreland (S1)
 tokisens                        // (c) 1987
@@ -40144,7 +40224,7 @@ zerotm2k                        // (c) 2000 Seibu Kaihatsu
 
 @source:seibu/raiden.cpp
 raiden                          // (c) 1990 Seibu Kaihatsu
-raidena                         // (c) 1990 Seibu Kaihatsu
+raidenj                         // (c) 1990 Seibu Kaihatsu
 raidenb                         // (c) 1990 Seibu Kaihatsu
 raidenk                         // (c) 1990 Seibu Kaihatsu + IBL Corporation license
 raidenkb                        // (c) bootleg
@@ -40315,6 +40395,19 @@ prpht600                        // 1983 Sequential Circuits
 @source:seta/albazc.cpp
 hanaroku                        // (c) 1988 Alba
 
+@source:seta/downtown.cpp
+arbalest                        // UK   (c) 1989 + Jordan, Romstar or Taito license (DSW)
+calibr50                        // UH   (c) 1989 + Romstar or Taito license (DSW)
+downtown                        // UD-2 (c) 1989 + Romstar or Taito license (DSW)
+downtown2                       // UD-2 (c) 1989 + Romstar or Taito license (DSW)
+downtownj                       // UD-2 (c) 1989 + Romstar or Taito license (DSW)
+downtownp                       // UD-2 (c) 1989 + Romstar or Taito license (DSW)
+metafox                         // UP   (c) 1989 + Jordan, Romstar or Taito license (DSW)
+tndrcade                        // UA-0 (c) 1987 Taito
+tndrcadej                       // UA-0 (c) 1987 Taito
+twineagl                        // UA-2 (c) 1988 + Taito license
+usclssic                        // UE   (c) 1989 + Romstar or Taito license (DSW)
+
 @source:seta/hanaawas.cpp
 hanaawas                        // (c) SetaKikaku
 
@@ -40345,23 +40438,17 @@ yujan                           // (C) 1999 Yubis
 yuka                            // (c) 1999 Yubis
 
 @source:seta/seta.cpp
-arbalest                        // UK   (c) 1989 + Jordan, Romstar or Taito license (DSW)
 atehate                         // (C) 1993 Athena
 blandia                         // (c) 1992 Allumer
 blandiap                        // (c) 1992 Allumer
 blockcar                        // (c) 1992 Visco
 blockcarb                       // bootleg
-calibr50                        // UH   (c) 1989 + Romstar or Taito license (DSW)
 crazyfgt                        // (c) 1998 Subsino
 daioh                           // (C) 1993 Athena
 daioha                          // (C) 1993 Athena
 daiohc                          // (C) 1993 Athena (93111A PCB conversion)
 daiohp                          // (C) 1993 Athena (prototype)
 daiohp2                         // (C) 1993 Athena (prototype, earlier)
-downtown                        // UD-2 (c) 1989 + Romstar or Taito license (DSW)
-downtown2                       // UD-2 (c) 1989 + Romstar or Taito license (DSW)
-downtownj                       // UD-2 (c) 1989 + Romstar or Taito license (DSW)
-downtownp                       // UD-2 (c) 1989 + Romstar or Taito license (DSW)
 drgnunit                        // (c) 1989 Athena / Seta + Romstar or Taito license (DSW)
 eightfrc                        // (c) 1994 Tecmo
 extdwnhl                        // (c) 1995 Sammy Japan
@@ -40381,7 +40468,6 @@ krzybowl                        // (c) 1994 American Sammy
 madshark                        // (c) 1993 Allumer
 madsharkbl                      // bootleg
 magspeed                        // (c) 1994 Allumer
-metafox                         // UP   (c) 1989 + Jordan, Romstar or Taito license (DSW)
 msgundam                        // (c) 1993 Banpresto
 msgundam1                       // (c) 1993 Banpresto
 msgundamb                       // bootleg
@@ -40402,12 +40488,8 @@ thunderl                        // (c) 1990 Seta + Romstar or Visco license (DSW
 thunderla                       // (c) 1990 Seta + Romstar or Visco license (DSW)
 thunderlbl                      // (c) 1991 Hyogo bootleg with Tetris sound
 thunderlbl2                     // (c) 1990 bootleg with Tetris sound
-tndrcade                        // UA-0 (c) 1987 Taito
-tndrcadej                       // UA-0 (c) 1987 Taito
 triplfun                        // bootleg
-twineagl                        // UA-2 (c) 1988 + Taito license
 umanclub                        // (c) 1992 Tsuburaya Prod. / Banpresto
-usclssic                        // UE   (c) 1989 + Romstar or Taito license (DSW)
 utoukond                        // (c) 1993 Banpresto + Tsuburaya Prod.
 wiggie                          // (c) 1994 Promat (not genuine seta hardware, but based on thunderl code)
 wits                            // (c) 1989 Athena (Visco license)
@@ -40924,6 +41006,9 @@ c2color
 can09t                          //
 can09                           //
 
+@source:skeleton/caramball.cpp
+caramball                       // (c) 1992 Inconel SL
+
 @source:skeleton/cardinal.cpp
 cardinal                        // (c) 1984 Standard Microsystems Corp.
 
@@ -41102,6 +41187,9 @@ goupilg2                        //
 @source:skeleton/grfd2301.cpp
 grfd2301                        //
 
+@source:skeleton/happyvideo.cpp
+hppyvideo                       //
+
 @source:skeleton/hazeltin.cpp
 hazl1500                        // Hazeltine 1500 (c) 1977
 hazl1552                        // Hazeltine 1552 (c) 1979
@@ -41241,6 +41329,9 @@ mini2440                        //
 
 @source:skeleton/miniframe.cpp
 minifram
+
+@source:skeleton/minihock.cpp
+minihockey                      // (c) 1991 Rumatic
 
 @source:skeleton/miuchiz.cpp
 miuchiz                         // (c) 2006 MGA Entertainment
@@ -42211,6 +42302,7 @@ arkanoidja                      // A75 (c) 1986 Taito Corporation (Japan)
 arkanoidjb                      // A75 (c) 1986 Taito Corporation (Japan)
 arkanoidjbl                     // bootleg
 arkanoidjbl2                    // bootleg (Beta)
+arkanoidpe                      // A75 (c) 1986 Taito America Corporation + Phoenix Electronics license
 arkanoidu                       // A75 (c) 1986 Taito America Corporation + Romstar license (US)
 arkanoiduo                      // A75 (c) 1986 Taito America Corporation + Romstar license (US)
 arkatayt                        // bootleg
@@ -42500,6 +42592,7 @@ othunderuo                      // B67 (c) 1988 Taito America Corporation (US)
 jumpkun                         // prototype
 pitnrun                         // PR  (c) 1984 Taito Corporation
 pitnruna                        // PR  (c) 1984 Taito Corporation
+pitnrunb                        // PR  (c) 1984 Taito Corporation
 
 @source:taito/pkspirit.cpp
 pkspirit                        // D41
@@ -43016,6 +43109,7 @@ styphp                          // E98 (c) 2000 Taito
 taitotz                         //
 
 @source:taito/taitowlf.cpp
+p5txla
 pf2012                          // E59 (c) 1997 Taito
 
 @source:taito/tnzs.cpp
@@ -43460,11 +43554,12 @@ twcup90c                        // (c) 1989 Tecmo
 twcup90t                        // (c) 1989 Tecmo
 
 @source:tecmo/wc90b.cpp
+eurogael                        // bootleg
 twcup90b1                       // bootleg
 twcup90b2                       // bootleg
+twcup90b3                       // bootleg
 twcup90ba                       // bootleg
 twcup90bb                       // bootleg
-eurogael                        // bootleg
 
 @source:tektronix/tek405x.cpp
 tek4051                         //
@@ -45167,6 +45262,11 @@ las3000                         // 1983 Laser 3000
 @source:vtech/lcmate2.cpp
 lcmate2                         //
 
+@source:vtech/pc1000.cpp
+misterx                         // 1988 (Yeno) MisterX
+ordisava                        // 1988 Ordisavant (France)
+pc1000                          // 1988 PreComputer 1000
+
 @source:vtech/pc2000.cpp
 gbs5505x                        // 2001 Genius BrainStation 5505X (Germany)
 gl2000                          // 1993 Genius Leader 2000
@@ -45180,9 +45280,6 @@ gl5005x                         // Genius Leader 5005X (Germany)
 glpn                            // Genius Leader Power Notebook (Germany)
 gmtt                            // 1998 Genius Master Table Top (Germany)
 lexipcm                         // LexiPC Mega 2000 (Germany)
-misterx                         // 1988 (Yeno) MisterX
-ordisava                        // 1988 Ordisavant (France)
-pc1000                          // 1988 PreComputer 1000
 pc2000                          // 1993 PreComputer 2000
 pc2000s                         // 1993 PreComputer 2000 (Spain)
 primusex                        // 198? Yeno Primus Expert mit Stimme (Germany)
@@ -45409,6 +45506,7 @@ psr60                           // 1985 PSR-60
 psr70                           // 1985 PSR-70
 
 @source:yamaha/ympsr150.cpp
+dd9                             // 1994
 psr110                          // 1993
 psr150                          // 1992
 psr180                          // 1994

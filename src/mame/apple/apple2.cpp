@@ -322,6 +322,13 @@ void apple2_state::machine_reset()
 	m_inh_slot = 0;
 	m_cnxx_slot = -1;
 	m_anykeydown = false;
+
+	// reset the cards
+	m_a2bus->reset_bus();
+	// reset the 6502 now as a card may have pulled /INH on the reset vector
+	printf("machine_reset\n");
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 /***************************************************************************
@@ -335,52 +342,47 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt)
 	if (scanline == 192)
 	{
 		// check reset
-		if (m_resetdip.found()) // if reset DIP is present, use it
+		if ((m_resetdip.found()) && (m_resetdip->read() & 1)) // if reset DIP is present, use it
 		{
-			if (m_resetdip->read() & 1)
-			{       // CTRL-RESET
-				if ((m_kbspecial->read() & 0x88) == 0x88)
+			// CTRL-RESET
+			if ((m_kbspecial->read() & 0x88) == 0x88)
+			{
+				if (!m_reset_latch)
 				{
-					if (!m_reset_latch)
-					{
-						m_reset_latch = true;
-						m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-					}
-				}
-				else
-				{
-					if (m_reset_latch)
-					{
-						m_reset_latch = false;
-						m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-					}
+					m_reset_latch = true;
+					m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 				}
 			}
-			else    // plain RESET
+			else
 			{
-				if (m_kbspecial->read() & 0x80)
+				if (m_reset_latch)
 				{
-					if (!m_reset_latch)
-					{
-						m_reset_latch = true;
-						m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-					}
-				}
-				else
-				{
-					if (m_reset_latch)
-					{
-						m_reset_latch = false;
-						m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-					}
+					m_reset_latch = false;
+					// allow cards to see reset
+					m_a2bus->reset_bus();
+					m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 				}
 			}
 		}
-		else    // no DIP, so always plain RESET
+		else    // plain RESET
 		{
 			if (m_kbspecial->read() & 0x80)
 			{
-				m_maincpu->reset();
+				if (!m_reset_latch)
+				{
+					m_reset_latch = true;
+					m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+				}
+			}
+			else
+			{
+				if (m_reset_latch)
+				{
+					m_reset_latch = false;
+					// allow cards to see reset
+					m_a2bus->reset_bus();
+					m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+				}
 			}
 		}
 	}

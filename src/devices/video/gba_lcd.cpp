@@ -1654,16 +1654,11 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_hbl)
 	if (scanline < 160)
 	{
 		draw_scanline(scanline);
-
-		if (!m_dma_hblank_cb.isnull())
-			m_dma_hblank_cb(ASSERT_LINE);
+		m_dma_hblank_cb(ASSERT_LINE);
 	}
 
 	if (is_set(dispstat::hblank_irq_en))
-	{
-		if (!m_int_hblank_cb.isnull())
-			m_int_hblank_cb(ASSERT_LINE);
-	}
+		m_int_hblank_cb(ASSERT_LINE);
 
 	set(dispstat::hblank);
 
@@ -1686,13 +1681,9 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_scan)
 		if (scanline == 160)
 		{
 			if (is_set(dispstat::vblank_irq_en))
-			{
-				if (!m_int_vblank_cb.isnull())
-					m_int_vblank_cb(ASSERT_LINE);
-			}
+				m_int_vblank_cb(ASSERT_LINE);
 
-			if (!m_dma_vblank_cb.isnull())
-				m_dma_vblank_cb(ASSERT_LINE);
+			m_dma_vblank_cb(ASSERT_LINE);
 		}
 	}
 	else
@@ -1706,10 +1697,7 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_scan)
 		set(dispstat::vcount);
 
 		if (is_set(dispstat::vcount_irq_en))
-		{
-			if (!m_int_vcount_cb.isnull())
-				m_int_vcount_cb(ASSERT_LINE);
-		}
+			m_int_vcount_cb(ASSERT_LINE);
 	}
 
 	m_hbl_timer->adjust(screen().time_until_pos(scanline, 240));
@@ -1739,13 +1727,6 @@ uint32_t gba_lcd_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void gba_lcd_device::device_start()
 {
-	/* resolve callbacks */
-	m_int_hblank_cb.resolve();
-	m_int_vblank_cb.resolve();
-	m_int_vcount_cb.resolve();
-	m_dma_hblank_cb.resolve();
-	m_dma_vblank_cb.resolve();
-
 	m_pram = make_unique_clear<uint32_t[]>(0x400 / 4);
 	m_vram = make_unique_clear<uint32_t[]>(0x18000 / 4);
 	m_oam = make_unique_clear<uint32_t[]>(0x400 / 4);

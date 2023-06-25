@@ -17,36 +17,25 @@
 
 DEFINE_DEVICE_TYPE(WPCASIC, wpc_device, "wpc", "Williams WPC ASIC")
 
-wpc_device::wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, WPCASIC, tag, owner, clock),
-		m_dmd_visiblepage(0),
-		m_irq_cb(*this),
-		m_firq_cb(*this),
-		m_sounddata_r(*this),
-		m_sounddata_w(*this),
-		m_soundctrl_r(*this),
-		m_soundctrl_w(*this),
-		m_sounds11_w(*this),
-		m_bank_w(*this),
-		m_dmdbank_w(*this),
-		m_io_keyboard(*this, ":X%d", 0U)
+wpc_device::wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, WPCASIC, tag, owner, clock),
+	m_dmd_visiblepage(0),
+	m_irq_cb(*this),
+	m_firq_cb(*this),
+	m_sounddata_r(*this, 0),
+	m_sounddata_w(*this),
+	m_soundctrl_r(*this, 0),
+	m_soundctrl_w(*this),
+	m_sounds11_w(*this),
+	m_bank_w(*this),
+	m_dmdbank_w(*this),
+	m_io_keyboard(*this, ":X%d", 0U)
 {
 }
 
 
 void wpc_device::device_start()
 {
-	// resolve callbacks
-	m_irq_cb.resolve_safe();
-	m_firq_cb.resolve_safe();
-	m_sounddata_r.resolve_safe(0);
-	m_sounddata_w.resolve_safe();
-	m_soundctrl_r.resolve_safe(0);
-	m_soundctrl_w.resolve_safe();
-	m_sounds11_w.resolve_safe();
-	m_bank_w.resolve_safe();
-	m_dmdbank_w.resolve_safe();
-
 	m_zc_timer = timer_alloc(FUNC(wpc_device::zerocross_set), this);
 	m_zc_timer->adjust(attotime::from_hz(120),0,attotime::from_hz(120));
 }

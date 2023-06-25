@@ -127,16 +127,6 @@ dio16_device::dio16_device(const machine_config &mconfig, device_type type, cons
 
 void dio16_device::device_start()
 {
-	m_irq1_out_cb.resolve_safe();
-	m_irq2_out_cb.resolve_safe();
-	m_irq3_out_cb.resolve_safe();
-	m_irq4_out_cb.resolve_safe();
-	m_irq5_out_cb.resolve_safe();
-	m_irq6_out_cb.resolve_safe();
-	m_irq7_out_cb.resolve_safe();
-	m_dmar0_out_cb.resolve_safe();
-	m_dmar1_out_cb.resolve_safe();
-
 	m_prgwidth = m_prgspace->data_width();
 
 	save_item(NAME(m_irq));

@@ -162,9 +162,6 @@ fp6000_kbd_device::fp6000_kbd_device(const machine_config &mconfig, const char *
 
 void fp6000_kbd_device::device_start()
 {
-	// resolve callbacks
-	m_int_handler.resolve_safe();
-
 	// register for state saving
 	save_item(NAME(m_status));
 	save_item(NAME(m_data));

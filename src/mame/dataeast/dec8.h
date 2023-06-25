@@ -49,6 +49,7 @@ public:
 	void srdarwin(machine_config &config);
 	void ghostb(machine_config &config);
 	void oscar(machine_config &config);
+	void oscarbl(machine_config &config);
 	void gondo(machine_config &config);
 
 protected:
@@ -207,6 +208,7 @@ private:
 	void meikyuh_map(address_map &map);
 	void oscar_map(address_map &map);
 	void oscar_s_map(address_map &map);
+	void oscarbl_s_opcodes_map(address_map &map);
 	void oscar_sub_map(address_map &map);
 	void shackled_map(address_map &map);
 	void shackled_sub_map(address_map &map);

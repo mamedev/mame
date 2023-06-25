@@ -25,12 +25,13 @@
         - PSS-12: 32 mini keys, mono, 2Mbit ROM
         - PSS-6: 32 "ultra mini" keys, mono, 1Mbit ROM, some tone differences
 
+    - DD-9 Digital Percussion (1994), later released as DD-20 (2003)
+
     - LCD with large icons, metronome, volume display (1996)
         - PSR-190: 61 keys, stereo
         - PSR-78: 49 keys, mono
 
     Other known undumped models:
-    - DD-9 Digital Percussion (1994, later released as DD-20)
     - PSR-130 (1997, 61 keys, two dials for tone & rhythm selection)
 
 */
@@ -44,6 +45,7 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "dd9.lh"
 #include "psr110.lh"
 #include "psr150.lh"
 #include "psr180.lh"
@@ -67,9 +69,11 @@ public:
 		, m_lcdc(*this, "lcdc")
 		, m_port(*this, "P%c", 'A')
 		, m_keys(*this, "KEY%u", 0U)
+		, m_dial(*this, "DIAL")
 		, m_outputs(*this, "%02x.%d.%d", 0U, 0U, 0U)
 		, m_switch(*this, "switch_pos")
 		, m_led(*this, "led%u", 0U)
+		, m_digit(*this, "digit%u", 0U)
 	{ }
 
 	void psr150(machine_config &config);
@@ -78,6 +82,7 @@ public:
 	void pss31(machine_config &config);
 	void psr75(machine_config &config);
 	void pss11(machine_config &config);
+	void dd9(machine_config &config);
 	void psr180_base(machine_config &config);
 	void psr180(machine_config &config);
 	void psr76(machine_config &config);
@@ -97,6 +102,8 @@ public:
 	template <unsigned StartBit>
 	DECLARE_CUSTOM_INPUT_MEMBER(keys_r);
 
+	DECLARE_CUSTOM_INPUT_MEMBER(dial_r);
+
 	DECLARE_INPUT_CHANGED_MEMBER(switch_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(switch_r) { return m_switch; }
 
@@ -109,6 +116,9 @@ public:
 	void pwm_row_w(int state);
 	template <unsigned Bit>
 	void pwm_col_w(int state);
+
+	template <unsigned Num>
+	void digit_w(u8 state) { m_digit[Num] = state ^ 0xff; }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(lcd_r) { return m_lcdc->db_r() >> 4; }
 	void lcd_w(int state) { m_lcdc->db_w(state << 4); }
@@ -124,9 +134,11 @@ private:
 
 	optional_ioport_array<6> m_port;
 	optional_ioport_array<19> m_keys;
+	optional_ioport m_dial;
 	output_finder<64, 8, 5> m_outputs;
 	output_finder<> m_switch;
 	output_finder<4> m_led;
+	output_finder<2> m_digit;
 
 	ioport_value m_key_sel{};
 	ioport_value m_pwm_col{};
@@ -158,6 +170,13 @@ CUSTOM_INPUT_MEMBER(psr150_state::keys_r)
 			result |= m_keys[i].read_safe(0);
 
 	return result >> StartBit;
+}
+
+CUSTOM_INPUT_MEMBER(psr150_state::dial_r)
+{
+	// return the dial position as a 2-bit gray code
+	const u8 val = m_dial->read();
+	return (val >> 6) ^ (val >> 7);
 }
 
 INPUT_CHANGED_MEMBER(psr150_state::switch_w)
@@ -202,6 +221,7 @@ void psr150_state::driver_start()
 {
 	m_outputs.resolve();
 	m_led.resolve();
+	m_digit.resolve();
 	m_switch.resolve();
 
 	m_switch = 0x2; // "Voice Play" mode
@@ -299,6 +319,23 @@ void psr150_state::pss11(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	config.set_default_layout(layout_pss11);
+}
+
+void psr150_state::dd9(machine_config &config)
+{
+	GEW7(config, m_maincpu, 8'000'000);
+	m_maincpu->port_out_cb<0>().set_ioport("PA");
+	m_maincpu->port_out_cb<1>().set(FUNC(psr150_state::digit_w<0>));
+	m_maincpu->port_out_cb<2>().set(FUNC(psr150_state::digit_w<1>));
+	m_maincpu->port_in_cb<5>().set_ioport("PF");
+	m_maincpu->add_route(1, "speaker", 1.0);
+
+	// TODO: there is also a RLC lowpass with R=150, L=3.3mH, C=0.33uF
+	// (AC filter not really needed since this doesn't output a "dummy" DC offset sample, unlike the keyboards)
+
+	SPEAKER(config, "speaker").front_center();
+
+	config.set_default_layout(layout_dd9);
 }
 
 void psr150_state::psr180_base(machine_config &config)
@@ -1007,6 +1044,50 @@ INPUT_PORTS_START(pss11)
 	PORT_BIT( 0x400, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( dd9 )
+	PORT_START("PA")
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(psr150_state, KEY_OUT_BITS(0, 5))
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("PF")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Drum Pad 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Drum Pad 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_NAME("Drum Pad 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_NAME("Drum Pad 4")
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW,  IPT_CUSTOM  ) PORT_CUSTOM_MEMBER(psr150_state, keys_r<0>)
+
+	PORT_START("KEY0")
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Style")
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Perc. Set")
+	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("Tempo")
+	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Start/Stop")
+
+	PORT_START("KEY1")
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_NAME("Demo")
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_NAME("Tap Start")
+	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_NAME("SE Select")
+	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Auto Roll")
+
+	PORT_START("KEY2")
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_NAME("Volume Up")
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Volume Down")
+	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_NAME("Pad Assign +")
+	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_NAME("Pad Assign -")
+
+	PORT_START("KEY3")
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("SE Pad 1")
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("SE Pad 2")
+	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("SE Pad 3")
+	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("SE Pad 4")
+
+	PORT_START("KEY4")
+	PORT_BIT( 0x3, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(psr150_state, dial_r)
+	PORT_BIT( 0xc, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("DIAL")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(75)
+INPUT_PORTS_END
+
 INPUT_PORTS_START( pss12 )
 	PORT_START("PA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_CUSTOM_MEMBER(psr150_state, keys_r<0>)
@@ -1682,6 +1763,11 @@ ROM_END
 #define rom_pss21 rom_psr75
 #define rom_pss31 rom_psr75
 
+ROM_START( dd9 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "xp170b00.ic2", 0x00000, 0x40000, CRC(66f09612) SHA1(7b106dc3717992c5b1a96bd5b27417bd98b38f7f))
+ROM_END
+
 ROM_START( psr180 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "xp687a00.ic6", 0x00000, 0x80000, CRC(df3a568d) SHA1(ddc260d55d874987950817817117df141668f1f2))
@@ -1727,6 +1813,7 @@ SYST( 1992, psr75,   psr150, 0,      psr75,   psr75,  psr150_state,  empty_init,
 SYST( 1992, pss11,   psr150, 0,      pss11,   pss11,  psr150_state,  empty_init,  "Yamaha", "PSS-11",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1992, pss21,   psr150, 0,      pss21,   pss21,  psr150_state,  empty_init,  "Yamaha", "PSS-21",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1992, pss31,   psr150, 0,      pss31,   pss31,  psr150_state,  empty_init,  "Yamaha", "PSS-31",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1994, dd9,     0,      0,      dd9,     dd9,    psr150_state,  empty_init,  "Yamaha", "DD-9 Digital Percussion", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1994, psr180,  0,      0,      psr180,  psr180, psr150_state,  empty_init,  "Yamaha", "PSR-180", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1994, psr76,   psr180, 0,      psr76,   psr76,  psr150_state,  empty_init,  "Yamaha", "PSR-76",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1994, pss12,   0,      0,      pss12,   pss12,  psr150_state,  empty_init,  "Yamaha", "PSS-12",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

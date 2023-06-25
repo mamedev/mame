@@ -19,7 +19,7 @@ DEFINE_DEVICE_TYPE(DMAC3, dmac3_device, "dmac3", "Sony CXD8403Q DMAC3 DMA Contro
 dmac3_device::dmac3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, DMAC3, tag, owner, clock), m_bus(*this, finder_base::DUMMY_TAG, -1, 64),
 	m_irq_handler(*this),
-	m_dma_r(*this),
+	m_dma_r(*this, 0),
 	m_dma_w(*this),
 	m_apbus_virt_to_phys_callback(*this)
 {
@@ -28,9 +28,6 @@ dmac3_device::dmac3_device(machine_config const &mconfig, char const *tag, devic
 void dmac3_device::device_start()
 {
 	m_apbus_virt_to_phys_callback.resolve();
-	m_irq_handler.resolve_safe();
-	m_dma_r.resolve_all_safe(0);
-	m_dma_w.resolve_all_safe();
 
 	m_irq_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dmac3_device::irq_check), this));
 	m_dma_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dmac3_device::dma_check), this));

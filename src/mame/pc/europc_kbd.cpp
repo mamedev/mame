@@ -49,9 +49,6 @@ europc_keyboard_device::europc_keyboard_device(const machine_config &mconfig, co
 
 void europc_keyboard_device::device_resolve_objects()
 {
-	m_kbdata_callback.resolve_safe();
-	m_kbclk_callback.resolve_safe();
-	m_reset_callback.resolve_safe();
 	m_leds.resolve();
 }
 

@@ -52,7 +52,7 @@ static inline void ATTR_PRINTF( 3, 4 ) verboselog( device_t *device, int n_level
 		va_list v;
 		char buf[ 32768 ];
 		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
+		vsnprintf( buf, 32768, s_fmt, v );
 		va_end( v );
 		device->logerror( "%s: I2CMEM %s", device->machine().describe_context(), buf );
 	}

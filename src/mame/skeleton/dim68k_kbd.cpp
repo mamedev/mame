@@ -46,7 +46,6 @@ void dim68k_keyboard_device::device_resolve_objects()
 {
 	m_capslock_led.resolve();
 	m_numlock_led.resolve();
-	m_txd_callback.resolve_safe();
 }
 
 void dim68k_keyboard_device::device_start()

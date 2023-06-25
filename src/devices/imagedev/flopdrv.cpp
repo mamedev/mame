@@ -108,7 +108,7 @@ void legacy_floppy_image_device::log_readwrite(const char *name, int head, int t
 	char membuf[1024];
 	int i;
 	for (i = 0; i < length; i++)
-		sprintf(membuf + i*2, "%02x", (int) (uint8_t) buf[i]);
+		snprintf(membuf + i*2, 1024 - (i*2), "%02x", (int) (uint8_t) buf[i]);
 	logerror("%s:  head=%i track=%i sector=%i buffer='%s'\n", name, head, track, sector, membuf);
 }
 
@@ -671,7 +671,6 @@ void legacy_floppy_image_device::device_start()
 	m_active = false;
 
 	/* resolve callbacks */
-	m_out_idx_func.resolve_safe();
 	//m_in_mon_func.resolve(m_config->in_mon_func, *this);
 	//m_out_tk00_func.resolve(m_config->out_tk00_func, *this);
 	//m_out_wpt_func.resolve(m_config->out_wpt_func, *this);

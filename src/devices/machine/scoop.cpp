@@ -27,8 +27,6 @@ scoop_device::scoop_device(const machine_config &mconfig, const char *tag, devic
 
 void scoop_device::device_start()
 {
-	m_gpio_out.resolve_all_safe();
-
 	save_item(NAME(m_gpwr));
 	save_item(NAME(m_gpio_in_latch));
 	save_item(NAME(m_gpcr));

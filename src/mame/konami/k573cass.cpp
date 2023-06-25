@@ -197,15 +197,6 @@ void konami573_cassette_y_device::device_add_mconfig(machine_config &config)
 
 void konami573_cassette_y_device::device_start()
 {
-	m_d0_handler.resolve_safe();
-	m_d1_handler.resolve_safe();
-	m_d2_handler.resolve_safe();
-	m_d3_handler.resolve_safe();
-	m_d4_handler.resolve_safe();
-	m_d5_handler.resolve_safe();
-	m_d6_handler.resolve_safe();
-	m_d7_handler.resolve_safe();
-
 	output_dsr(0);
 }
 
@@ -354,8 +345,6 @@ konami573_cassette_slot_device::konami573_cassette_slot_device(const machine_con
 
 void konami573_cassette_slot_device::device_start()
 {
-	m_dsr_handler.resolve_safe();
-
 	m_dev = get_card_device();
 }
 

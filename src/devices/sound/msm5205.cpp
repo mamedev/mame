@@ -91,9 +91,6 @@ msm6585_device::msm6585_device(const machine_config &mconfig, const char *tag, d
 
 void msm5205_device::device_start()
 {
-	m_vck_cb.resolve_safe();
-	m_vck_legacy_cb.resolve();
-
 	/* compute the difference tables */
 	compute_tables();
 
@@ -190,7 +187,7 @@ TIMER_CALLBACK_MEMBER(msm5205_device::update_adpcm)
 	int new_signal;
 
 	// callback user handler and latch next data
-	if (!m_vck_legacy_cb.isnull())
+	if (!m_vck_legacy_cb.isunset())
 		m_vck_legacy_cb(1);
 
 	// reset check at last hiedge of VCK

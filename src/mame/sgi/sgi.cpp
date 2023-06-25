@@ -32,7 +32,7 @@ sgi_mc_device::sgi_mc_device(const machine_config &mconfig, const char *tag, dev
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_eeprom(*this, finder_base::DUMMY_TAG)
 	, m_int_dma_done_cb(*this)
-	, m_eisa_present(*this)
+	, m_eisa_present(*this, true)
 	, m_dma_timer(nullptr)
 	, m_last_update_time(attotime::zero)
 	, m_watchdog(0)
@@ -66,12 +66,6 @@ sgi_mc_device::sgi_mc_device(const machine_config &mconfig, const char *tag, dev
 	, m_dma_run(0)
 	, m_eeprom_ctrl(0)
 {
-}
-
-void sgi_mc_device::device_resolve_objects()
-{
-	m_int_dma_done_cb.resolve_safe();
-	m_eisa_present.resolve_safe(true);
 }
 
 //-------------------------------------------------

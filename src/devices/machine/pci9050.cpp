@@ -41,7 +41,7 @@ void pci9050_device::map(address_map &map)
 
 pci9050_device::pci9050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, PCI9050, tag, owner, clock)
-	, m_user_input_handler(*this), m_user_output_handler(*this)
+	, m_user_input_handler(*this, 0), m_user_output_handler(*this)
 {
 	set_ids(0x10b59050, 0x01, 0x06800000, 0x10b59050);
 	for(int i=0; i<4; i++) {
@@ -69,8 +69,6 @@ void pci9050_device::device_start()
 		else
 			add_map(0, M_MEM | M_DISABLED, address_map_constructor(), nullptr);
 
-	m_user_input_handler.resolve();
-	m_user_output_handler.resolve();
 	// Save states
 	save_item(NAME(m_lasrr));
 	save_item(NAME(m_lasba));
@@ -267,7 +265,7 @@ void pci9050_device::intcsr_w(uint32_t data)
 
 uint32_t pci9050_device::cntrl_r()
 {
-	if (!m_user_input_handler.isnull())
+	if (!m_user_input_handler.isunset())
 	{
 		int readData = m_user_input_handler();
 		for (int userIndex = 0; userIndex < 4; userIndex++)
@@ -288,7 +286,7 @@ void pci9050_device::cntrl_w(uint32_t data)
 	remap_rom();
 	if ((oldData ^ m_cntrl) & 0x3000)
 		remap_cb();
-	if (!m_user_output_handler.isnull()) {
+	if (!m_user_output_handler.isunset()) {
 		int userData = 0;
 		for (int userIndex = 0; userIndex < 4; userIndex++)
 			userData |= ((m_cntrl >> (2 + userIndex * 3)) & 1) << userIndex;

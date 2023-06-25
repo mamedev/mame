@@ -45,7 +45,6 @@ public:
 	void reset_w(int state);
 
 protected:
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

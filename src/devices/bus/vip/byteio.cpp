@@ -58,9 +58,6 @@ vip_byteio_port_device::vip_byteio_port_device(const machine_config &mconfig, co
 void vip_byteio_port_device::device_start()
 {
 	m_cart = get_card_device();
-
-	// resolve callbacks
-	m_write_inst.resolve_safe();
 }
 
 

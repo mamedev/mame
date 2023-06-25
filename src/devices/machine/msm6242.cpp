@@ -95,8 +95,6 @@ msm6242_device::msm6242_device(const machine_config &mconfig, device_type type, 
 
 void msm6242_device::device_start()
 {
-	m_out_int_handler.resolve();
-
 	// let's call the timer callback every tick
 	m_timer = timer_alloc(FUNC(msm6242_device::rtc_timer_callback), this);
 	m_timer->adjust(attotime::zero);
@@ -174,7 +172,7 @@ void msm6242_device::set_irq(bool active)
 	else
 		m_reg[0] &= 0x0b;
 
-	if (!m_out_int_handler.isnull())
+	if (!m_out_int_handler.isunset())
 		m_out_int_handler(active ? ASSERT_LINE : CLEAR_LINE);
 
 	if (active)
@@ -311,7 +309,7 @@ void msm6242_device::update_timer()
 	attotime callback_time = attotime::never;
 
 	// we only need to call back if the IRQ flag is on, and we have a handler
-	if (!m_out_int_handler.isnull() && m_irq_flag == 1)
+	if (!m_out_int_handler.isunset() && m_irq_flag == 1)
 	{
 		switch(m_irq_type)
 		{

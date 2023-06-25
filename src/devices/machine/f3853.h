@@ -86,7 +86,7 @@ public:
 protected:
 	f3853_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -135,8 +135,6 @@ public:
 
 protected:
 	f3851_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual void device_resolve_objects() override;
 
 	devcb_read8::array<2> m_read_port;
 	devcb_write8::array<2> m_write_port;

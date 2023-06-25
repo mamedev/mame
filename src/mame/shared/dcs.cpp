@@ -599,7 +599,6 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::dcs_reset )
 
 	/* reset the HLE transfer states */
 	m_transfer.dcs_state = m_transfer.state = 0;
-
 }
 
 

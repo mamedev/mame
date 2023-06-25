@@ -68,13 +68,6 @@ st2202_device::st2202_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-void st2204_device::device_resolve_objects()
-{
-	st2xxx_device::device_resolve_objects();
-
-	m_dac_callback.resolve_safe();
-}
-
 void st2204_device::device_start()
 {
 	std::unique_ptr<mi_st2204> intf = std::make_unique<mi_st2204>();

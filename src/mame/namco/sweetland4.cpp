@@ -51,7 +51,6 @@ private:
 	void lcdc_w(u8 data);
 
 	void program_map(address_map &map);
-	void io_map(address_map &map);
 };
 
 
@@ -67,10 +66,6 @@ void sweetland4_state::program_map(address_map &map)
 	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
 	map(0x200000, 0x20000f).rw("rtc", FUNC(rtc72423_device::read), FUNC(rtc72423_device::write));
 	map(0x40000f, 0x40000f).w(FUNC(sweetland4_state::lcdc_w));
-}
-
-void sweetland4_state::io_map(address_map &map)
-{
 }
 
 
@@ -115,7 +110,6 @@ void sweetland4_state::sweetland4(machine_config &config)
 {
 	H83007(config, m_maincpu, 14.7456_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sweetland4_state::program_map);
-	m_maincpu->set_addrmap(AS_IO, &sweetland4_state::io_map);
 
 	RTC72423(config, "rtc", 32'768); // no evident XTAL on PCB
 

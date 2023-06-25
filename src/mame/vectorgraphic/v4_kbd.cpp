@@ -145,7 +145,6 @@ void vector4_keyboard_device::device_start()
 
 void vector4_keyboard_device::device_resolve_objects()
 {
-	m_txd_cb.resolve_safe();
 	m_led.resolve();
 }
 

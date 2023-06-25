@@ -63,11 +63,6 @@ dl11_device::dl11_device(const machine_config &mconfig, const char *tag, device_
 
 void dl11_device::device_start()
 {
-	// resolve callbacks
-	m_write_txd.resolve_safe();
-	m_write_rxrdy.resolve_safe();
-	m_write_txrdy.resolve_safe();
-
 	// save state
 	save_item(NAME(m_rcsr));
 	save_item(NAME(m_rbuf));

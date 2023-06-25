@@ -38,13 +38,12 @@ public:
 	u32 count() const { return m_count; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_clock_changed() override;
 
-	// device_rom_interface overrides
+	// device_rom_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 	virtual void rom_bank_post_change() override;
 

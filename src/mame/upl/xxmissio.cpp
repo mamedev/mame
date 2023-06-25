@@ -2,7 +2,7 @@
 // copyright-holders:Uki
 /*****************************************************************************
 
-XX Mission (c) 1986 UPL
+    XX Mission (c) 1986 UPL
 
     Driver by Uki
 
@@ -59,10 +59,10 @@ private:
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	uint8_t m_status;
-	uint8_t m_xscroll;
-	uint8_t m_yscroll;
-	uint8_t m_flipscreen;
+	uint8_t m_status = 0;
+	uint8_t m_xscroll = 0;
+	uint8_t m_yscroll = 0;
+	uint8_t m_flipscreen = 0;
 
 	void bank_sel_w(uint8_t data);
 	void status_m_w(uint8_t data);

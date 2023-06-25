@@ -28,9 +28,6 @@ am9519_device::am9519_device(const machine_config &mconfig, const char *tag, dev
 
 void am9519_device::device_start()
 {
-	// resolve callbacks
-	m_out_int_func.resolve_safe();
-
 	// Register save state items
 	save_item(NAME(m_isr));
 	save_item(NAME(m_irr));

@@ -144,8 +144,7 @@ protected:
 	void write(uint16_t adr, uint8_t val) { mintf->write(adr, val); }
 	void write_9(uint16_t adr, uint8_t val) { mintf->write_9(adr, val); }
 	uint8_t read_arg(uint16_t adr) { return mintf->read_arg(adr); }
-	uint8_t read_pc() { return mintf->read_arg(PC++); }
-	uint8_t read_pc_noinc() { return mintf->read_arg(PC); }
+	uint8_t read_pc() { return mintf->read_arg(PC); }
 	void prefetch_start();
 	void prefetch_end();
 	void prefetch_end_noirq();

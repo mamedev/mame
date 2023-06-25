@@ -50,7 +50,7 @@ wd1010_device::wd1010_device(const machine_config &mconfig, const char *tag, dev
 	m_out_bcr_cb(*this),
 	m_out_dirin_cb(*this),
 	m_out_wg_cb(*this),
-	m_in_data_cb(*this),
+	m_in_data_cb(*this, 0),
 	m_out_data_cb(*this),
 	m_intrq(0),
 	m_brdy(0),
@@ -83,16 +83,6 @@ void wd1010_device::device_start()
 		m_drives[i].cylinder = 0;
 		m_drives[i].sector = 0;
 	}
-
-	// resolve callbacks
-	m_out_intrq_cb.resolve_safe();
-	m_out_bdrq_cb.resolve_safe();
-	m_out_bcs_cb.resolve_safe();
-	m_out_bcr_cb.resolve_safe();
-	m_out_dirin_cb.resolve_safe();
-	m_out_wg_cb.resolve_safe();
-	m_in_data_cb.resolve_safe(0);
-	m_out_data_cb.resolve_safe();
 
 	// allocate timer
 	m_seek_timer = timer_alloc(FUNC(wd1010_device::update_seek), this);

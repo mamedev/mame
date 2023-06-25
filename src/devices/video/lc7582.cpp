@@ -34,9 +34,6 @@ lc7582_device::lc7582_device(const machine_config &mconfig, const char *tag, dev
 
 void lc7582_device::device_start()
 {
-	// resolve callbacks
-	m_write_segs.resolve_safe();
-
 	// zerofill
 	m_data = 0;
 	m_ce = 0;

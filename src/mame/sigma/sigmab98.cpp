@@ -2298,7 +2298,7 @@ GAME( 2000, dashhero, 0,        sigmab98, sigma_1b, sigmab98_state, init_dashher
 // Banpresto Medal Games
 GAME( 2001, lufykzku, 0,        lufykzku, lufykzku, lufykzku_state, init_lufykzku, ROT0, "Banpresto / Eiichiro Oda / Shueisha - Fuji TV - Toho Animation", "Otakara Itadaki Luffy Kaizoku-Dan! (Japan, v1.02)", 0 )
 // Sammy Medal Games:
-GAME( 2000, sammymdl, 0,        sammymdl, sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Sammy Medal Game System Bios",         MACHINE_IS_BIOS_ROOT )
+GAME( 2000, sammymdl, 0,        sammymdl, sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Sammy Medal Game System BIOS",         MACHINE_IS_BIOS_ROOT )
 GAME( 2000, animalc,  sammymdl, animalc,  sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Animal Catch",                         0 )
 GAME( 2000, itazuram, sammymdl, itazuram, sammymdl, sammymdl_state, init_itazuram, ROT0, "Sammy",             "Itazura Monkey",                       0 )
 GAME( 2000, pyenaget, sammymdl, pyenaget, sammymdl, sammymdl_state, init_haekaka,  ROT0, "Sammy",             "Pye-nage Taikai",                      0 )

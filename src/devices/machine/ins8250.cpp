@@ -637,12 +637,6 @@ void ins8250_uart_device::rx_w(int state)
 
 void ins8250_uart_device::device_start()
 {
-	m_out_tx_cb.resolve_safe();
-	m_out_dtr_cb.resolve_safe();
-	m_out_rts_cb.resolve_safe();
-	m_out_int_cb.resolve_safe();
-	m_out_out1_cb.resolve_safe();
-	m_out_out2_cb.resolve_safe();
 	set_tra_rate(0);
 	set_rcv_rate(0);
 

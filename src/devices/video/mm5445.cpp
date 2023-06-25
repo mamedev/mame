@@ -51,9 +51,6 @@ mm5448_device::mm5448_device(const machine_config &mconfig, const char *tag, dev
 
 void mm5445_device::device_start()
 {
-	// resolve callbacks
-	m_write_output.resolve_safe();
-
 	// zerofill
 	m_clk = 0;
 	m_enable = 0;

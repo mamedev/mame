@@ -101,23 +101,6 @@ nubus_device::~nubus_device()
 }
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void nubus_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_out_irq9_cb.resolve_safe();
-	m_out_irqa_cb.resolve_safe();
-	m_out_irqb_cb.resolve_safe();
-	m_out_irqc_cb.resolve_safe();
-	m_out_irqd_cb.resolve_safe();
-	m_out_irqe_cb.resolve_safe();
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

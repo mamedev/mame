@@ -18,7 +18,6 @@ public:
 protected:
 	visual_mcs48_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner);
 
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 	u8 p1_r();

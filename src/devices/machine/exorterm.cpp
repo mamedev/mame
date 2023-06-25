@@ -729,13 +729,6 @@ TIMER_CALLBACK_MEMBER(exorterm155_device::kbd_repeat)
 
 
 
-void exorterm155_device::device_resolve_objects()
-{
-	m_rs232_conn_dtr_handler.resolve_safe();
-	m_rs232_conn_rts_handler.resolve_safe();
-	m_rs232_conn_txd_handler.resolve_safe();
-}
-
 void exorterm155_device::device_start()
 {
 	m_online_led.resolve();

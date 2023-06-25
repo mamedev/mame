@@ -11,7 +11,7 @@ and Johan Enroth. After Consumenta went under in 1983, the Conchess brand was
 continued by Systemhuset.
 
 TODO:
-- dump/add Plymate Glasgow Plus version
+- concglap/concglapa rom labels
 - dump/add concvicp library module (L/L16 don't work, manual says it has its own add-on)
 - concvicp unmapped reads/writes
 - verify irq/beeper for concvicp, though it is probably correct
@@ -318,17 +318,37 @@ void conchess_state::concvicp(machine_config &config)
     ROM Definitions
 *******************************************************************************/
 
-ROM_START( conc )
+ROM_START( conc ) // 2 bytes different (bookrom fix)
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD("ccp2.a", 0xa000, 0x1000, CRC(fddd155b) SHA1(ccb67543f4d680b47d2956b284d5c6b7a8d21520) ) // MBM2732A-30
+	ROM_LOAD("ccp2.b", 0xb000, 0x1000, CRC(81cf6b20) SHA1(7f6e30e50c6f9b633767a04b7d7a9c291d301614) ) // "
+	ROM_LOAD("ccp2.c", 0xc000, 0x1000, CRC(151eca1a) SHA1(40b97bce2ff0cae528efa3a9bab5767d5d15d369) ) // "
+	ROM_LOAD("ccp2.d", 0xd000, 0x1000, CRC(ed5dafeb) SHA1(3f0cea45bf26d9a1d120963480fc883a00185224) ) // "
+	ROM_LOAD("ccp2.e", 0xe000, 0x1000, CRC(f07bf0e2) SHA1(e4f2f415144ed5e43f4940c7c9618e89707d19e9) ) // "
+	ROM_LOAD("ccp2.f", 0xf000, 0x1000, CRC(7a04b000) SHA1(72d702b91adc643201ac6cea7aeb9394a3afc8be) ) // "
+ROM_END
+
+ROM_START( conca ) // 6 EPROMs version also exists, same rom contents
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD("c87011.b3", 0xa000, 0x2000, CRC(915e414c) SHA1(80c94712d1c79fa469576c37b80ab66f77c77cc4) )
 	ROM_LOAD("c87010.b2", 0xc000, 0x2000, CRC(088c8737) SHA1(9f841b3c47de9ef1da8ce98c0a33a919cba873c6) )
 	ROM_LOAD("c87009.b1", 0xe000, 0x2000, CRC(e1c648e2) SHA1(725a6ac1c69f788a7bba0573e5609b55b12899ac) )
 ROM_END
 
-ROM_START( concgla )
+ROM_START( concgla ) // 8 EPROMs version also exists, same rom contents
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("9128c-0133", 0x8000, 0x4000, CRC(a6ac88eb) SHA1(d1fcd990e5196c00210d380e0e04155a5ea19824) ) // GI 9128C
 	ROM_LOAD("9128c-0134", 0xc000, 0x4000, CRC(b694a275) SHA1(e4e49379b4eb45402ca8bb82c20d0169db62ed7a) ) // "
+ROM_END
+
+ROM_START( concglap ) // 2 bytes different
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("ccplus", 0x8000, 0x8000, CRC(c62e522b) SHA1(28ea9af35f9f4e96e52c19597d62e0af135c7672) )
+ROM_END
+
+ROM_START( concglapa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("ccplus", 0x8000, 0x8000, CRC(0bf4d2d0) SHA1(0ce670d3be1ae4da5467be6b062cfe73dcfbf229) )
 ROM_END
 
 ROM_START( concams )
@@ -355,9 +375,15 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1982, conc,     0,       0,      conc,     conchess, conchess_state, empty_init, "Consumenta Computer / Loproc", "Conchess (standard)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1984, concgla,  0,       0,      concgla,  conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Princhess Glasgow", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1985, concams,  0,       0,      concams,  conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Amsterdam", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1985, concams5, concams, 0,      concams5, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Amsterdam 5.5MHz", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, concvicp, 0,       0,      concvicp, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Victoria (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1982, conc,      0,        0,      conc,     conchess, conchess_state, empty_init, "Consumenta Computer / Loproc", "Conchess (standard, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, conca,     conc,     0,      conc,     conchess, conchess_state, empty_init, "Consumenta Computer / Loproc", "Conchess (standard, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+SYST( 1984, concgla,   0,        0,      concgla,  conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Princhess Glasgow", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, concglap,  0,        0,      concgla,  conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Glasgow Plus (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, concglapa, concglap, 0,      concgla,  conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Glasgow Plus (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+SYST( 1985, concams,   0,        0,      concams,  conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Amsterdam", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, concams5,  concams,  0,      concams5, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Amsterdam 5.5MHz", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+SYST( 1990, concvicp,  0,        0,      concvicp, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Victoria (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

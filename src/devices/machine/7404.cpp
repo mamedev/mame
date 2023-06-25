@@ -21,8 +21,6 @@ ttl7404_device::ttl7404_device(const machine_config &mconfig, const char *tag, d
 
 void ttl7404_device::device_start()
 {
-	m_y_func.resolve_all_safe();
-
 	save_item(NAME(m_a));
 	save_item(NAME(m_y));
 }

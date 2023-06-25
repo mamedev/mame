@@ -64,25 +64,24 @@ protected:
 	// construction/destruction
 	dp8344_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-specific overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual u32 execute_min_cycles() const noexcept override { return 2; }
 	virtual u32 execute_max_cycles() const noexcept override { return 4; }
 	virtual u32 execute_input_lines() const noexcept override { return 3; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int irqline, int state) override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
-	// device_state_interface overrides
+	// device_state_interface implementation
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 private:

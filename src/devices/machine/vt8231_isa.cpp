@@ -40,11 +40,6 @@ void vt8231_isa_device::device_start()
 {
 	pci_device::device_start();
 
-	// resolve callbacks
-	m_com1_txd_cb.resolve_safe();
-	m_com1_dtr_cb.resolve_safe();
-	m_com1_rts_cb.resolve_safe();
-
 	// register for save states (TODO)
 }
 

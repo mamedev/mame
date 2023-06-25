@@ -11,9 +11,9 @@
 
 tsconfdma_device::tsconfdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TSCONF_DMA, tag, owner, clock),
-	  m_in_mreq_cb(*this),
+	  m_in_mreq_cb(*this, 0),
 	  m_out_mreq_cb(*this),
-	  m_in_mspi_cb(*this),
+	  m_in_mspi_cb(*this, 0),
 	  m_out_cram_cb(*this),
 	  m_out_sfile_cb(*this),
 	  m_on_ready_cb(*this)
@@ -23,13 +23,6 @@ tsconfdma_device::tsconfdma_device(const machine_config &mconfig, const char *ta
 void tsconfdma_device::device_start()
 {
 	m_dma_clock = timer_alloc(FUNC(tsconfdma_device::dma_clock), this);
-
-	m_in_mreq_cb.resolve_safe(0);
-	m_out_mreq_cb.resolve_safe();
-	m_in_mspi_cb.resolve_safe(0);
-	m_out_cram_cb.resolve_safe();
-	m_out_sfile_cb.resolve_safe();
-	m_on_ready_cb.resolve_safe();
 
 	save_item(NAME(m_ready));
 	save_item(NAME(m_address_s));

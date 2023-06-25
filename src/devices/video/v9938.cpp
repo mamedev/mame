@@ -608,7 +608,6 @@ void v99x8_device::register_w(uint8_t data)
 
 void v99x8_device::device_start()
 {
-	m_int_callback.resolve_safe();
 	m_vdp_ops_count = 1;
 	m_vdp_engine = nullptr;
 

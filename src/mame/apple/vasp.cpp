@@ -97,21 +97,21 @@ void vasp_device::device_add_mconfig(machine_config &config)
 //  vasp_device - constructor
 //-------------------------------------------------
 
-vasp_device::vasp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VASP, tag, owner, clock),
-	  write_pb4(*this),
-	  write_pb5(*this),
-	  write_cb2(*this),
-	  write_hdsel(*this),
-	  read_pb3(*this),
-	  m_maincpu(*this, finder_base::DUMMY_TAG),
-	  m_montype(*this, "MONTYPE"),
-	  m_screen(*this, "screen"),
-	  m_palette(*this, "palette"),
-	  m_via1(*this, "via1"),
-	  m_asc(*this, "asc"),
-	  m_rom(*this, finder_base::DUMMY_TAG),
-	  m_overlay(false)
+vasp_device::vasp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, VASP, tag, owner, clock),
+	write_pb4(*this),
+	write_pb5(*this),
+	write_cb2(*this),
+	write_hdsel(*this),
+	read_pb3(*this, 0),
+	m_maincpu(*this, finder_base::DUMMY_TAG),
+	m_montype(*this, "MONTYPE"),
+	m_screen(*this, "screen"),
+	m_palette(*this, "palette"),
+	m_via1(*this, "via1"),
+	m_asc(*this, "asc"),
+	m_rom(*this, finder_base::DUMMY_TAG),
+	m_overlay(false)
 {
 }
 
@@ -122,12 +122,6 @@ vasp_device::vasp_device(const machine_config &mconfig, const char *tag, device_
 void vasp_device::device_start()
 {
 	m_vram = std::make_unique<u32[]>(0x100000 / sizeof(u32));
-
-	write_pb4.resolve_safe();
-	write_pb5.resolve_safe();
-	write_cb2.resolve_safe();
-	write_hdsel.resolve_safe();
-	read_pb3.resolve_safe(0);
 
 	m_6015_timer = timer_alloc(FUNC(vasp_device::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);

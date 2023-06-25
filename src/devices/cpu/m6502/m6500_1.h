@@ -77,7 +77,6 @@ protected:
 		M6500_1_LC
 	};
 
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

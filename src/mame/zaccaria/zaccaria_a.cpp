@@ -493,8 +493,6 @@ void zac1b11142_audio_device::device_start()
 {
 	zac1b111xx_melody_base::device_start();
 
-	m_acs_cb.resolve_safe();
-
 	save_item(NAME(m_host_command));
 }
 

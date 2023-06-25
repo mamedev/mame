@@ -25,14 +25,21 @@
 #include "cpu/i386/i386.h"
 #include "machine/at.h"
 
-#define SIS85C496_HOST(_config, _tag, _cpu_tag, _ram_size)  \
-	pci_host_device &pcihost(PCI_HOST(_config, _tag, SIS85C496, 0x10390496, 0x03, 0x00000000)); \
-	pcihost.set_cpu_tag(_cpu_tag); \
-	pcihost.set_ram_size(_ram_size);
-
 class sis85c496_host_device : public pci_host_device {
 public:
 	sis85c496_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T> sis85c496_host_device(
+		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
+		T &&cpu_tag, int ram_size
+	) : sis85c496_host_device(mconfig, tag, owner, clock)
+	{
+		// Revision 3
+		set_ids(0x10390496, 0x03, 0x060000, 0x00);
+		//set_multifunction_device(true);
+		set_cpu_tag(std::forward<T>(cpu_tag));
+		set_ram_size(ram_size);
+	}
 
 	void set_cpu_tag(const char *tag);
 	void set_ram_size(int ram_size);
@@ -147,6 +154,6 @@ private:
 	void cpu_reset_w(int state);
 };
 
-DECLARE_DEVICE_TYPE(SIS85C496, sis85c496_host_device)
+DECLARE_DEVICE_TYPE(SIS85C496_HOST, sis85c496_host_device)
 
 #endif

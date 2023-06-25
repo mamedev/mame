@@ -60,10 +60,6 @@ void i8089_device::device_start()
 	// set our instruction counter
 	set_icountptr(m_icount);
 
-	// resolve callbacks
-	m_write_sintr1.resolve_safe();
-	m_write_sintr2.resolve_safe();
-
 	// register debugger states
 	state_add(SYSBUS, "SYSBUS", m_sysbus).mask(0x01).formatstr("%1s");
 	state_add(SCB, "SCB", m_scb).mask(0xfffff);

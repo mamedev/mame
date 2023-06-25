@@ -286,7 +286,7 @@ protected:
 			uint32_t clock,
 			uint8_t rr1_auto_reset);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -528,14 +528,13 @@ public:
 protected:
 	z80sio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	// device_z80daisy_interface overrides
+	// device_z80daisy_interface implementation
 	virtual int z80daisy_irq_state() override;
 	virtual int z80daisy_irq_ack() override;
 	virtual void z80daisy_irq_reti() override;
@@ -599,10 +598,10 @@ public:
 protected:
 	i8274_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device_t overrides
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	// device_z80daisy_interface overrides
+	// device_z80daisy_interface implementation
 	virtual int z80daisy_irq_ack() override;
 	virtual void z80daisy_irq_reti() override;
 
@@ -628,7 +627,7 @@ public:
 	void write(offs_t offset, uint8_t data);
 
 protected:
-	// device_t overrides
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:

@@ -21,8 +21,6 @@ oricext_connector::~oricext_connector()
 
 void oricext_connector::device_start()
 {
-	irq_handler.resolve_safe();
-	reset_handler.resolve_safe();
 }
 
 void oricext_connector::irq_w(int state)
