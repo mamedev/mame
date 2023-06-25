@@ -10,11 +10,12 @@
 
   Games running on this hardware:
 
-  * Fruit Star Bonus (Ver 8.2.00ITL),     199?, Webak Elektronik.
-  * Fruit Star Bonus (Ver 8.27PVIE),      199?, Webak Elektronik.
-  * Fruit Star Bonus (Ver 8.20PIR),       1997, Webak Elektronik.
-  * Fruit Star Bonus (Ver 8.36UNG-1100),  1996, Webak Elektronik.
-  * Fruit Star Bonus (Ver 8.30UNG-200),   1996, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.2.00ITL),             199?, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.27PVIE),              199?, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.20PIR),               1997, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.36UNG-1100),          1996, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.30UNG-200),           1996, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.23PSTK, Steiermark),  199?, Webak Elektronik.
 
 
 *****************************************************************************************
@@ -1094,6 +1095,36 @@ ROM_START( fruitstbd )
 	ROM_LOAD( "82s131.ic47",  0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )
 ROM_END
 
+/*
+  Fruit Star Bonus (Ver 8.23PSTK, Steiermark)
+  MPU11 Number: 6218.
+
+  Program flash ROM is inside a CPU epoxy block
+  with M6809 CPU and one PLD.
+  
+  STK => Steiermark, Austria.
+
+*/
+ROM_START( fruitstbe )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "am28f512_8.23pstk_box.ic2",  0x8000, 0x8000, CRC(7c719e75) SHA1(67218db219eb4b7c229c66cce45dbf55fb594ff9) )
+	ROM_IGNORE(                             0x8000 )  // second half is filled with 0xff, vectors are at the end of the 1st half.
+
+	ROM_REGION( 0x30000, "gfx1", 0 )  // double sized roms.
+	ROM_LOAD( "fu_3.ic39",  0x00000, 0x10000, CRC(70efbf69) SHA1(32bb019db5aaff4d3f3f98a30cdca422cca7b598) )
+	ROM_IGNORE(                      0x10000 )    // identical halves.
+	ROM_LOAD( "fu_2.ic38",  0x10000, 0x10000, CRC(82c196b8) SHA1(ea1a74a6b13dbea253a804b88f22bd124fb1a3e6) )
+	ROM_IGNORE(                      0x10000 )    // identical halves.
+	ROM_LOAD( "fu_1.ic37",  0x20000, 0x10000, CRC(11ee9747) SHA1(19931a8c99e4c521cd7aed42398a9557a0d7579a) )
+	ROM_IGNORE(                      0x10000 )    // identical halves.
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "am27s29.ic46",  0x0000, 0x0200, CRC(ee576268) SHA1(8964526fa253f484d784aec46c4c31358bc1667b) )
+
+	ROM_REGION( 0x0200, "proms2", 0 )
+	ROM_LOAD( "82s131.ic47",  0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )
+ROM_END
+
 
 /********************************
 *          Driver Init          *
@@ -1111,9 +1142,10 @@ void mpu12wbk_state::init_mpu12wbk()
 *         Game Drivers          *
 ********************************/
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY             FULLNAME                              FLAGS   LAYOUT
-GAMEL( 199?, fruitstb,  0,        mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.2.00ITL)",    0,      layout_fruitstb )
-GAMEL( 199?, fruitstba, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.27PVIE)",     0,      layout_fruitstb )
-GAMEL( 1997, fruitstbb, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.20PIR)",      0,      layout_fruitstb )
-GAMEL( 1996, fruitstbc, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.36UNG-1100)", 0,      layout_fruitstb )
-GAMEL( 1996, fruitstbd, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.30UNG-200)",  0,      layout_fruitstb )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY             FULLNAME                                      FLAGS   LAYOUT
+GAMEL( 199?, fruitstb,  0,        mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.2.00ITL)",            0,      layout_fruitstb )
+GAMEL( 199?, fruitstba, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.27PVIE)",             0,      layout_fruitstb )
+GAMEL( 1997, fruitstbb, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.20PIR)",              0,      layout_fruitstb )
+GAMEL( 1996, fruitstbc, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.36UNG-1100)",         0,      layout_fruitstb )
+GAMEL( 1996, fruitstbd, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.30UNG-200)",          0,      layout_fruitstb )
+GAMEL( 199?, fruitstbe, 0,        mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.23PSTK, Steiermark)", 0,      layout_fruitstb )
