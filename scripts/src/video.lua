@@ -953,6 +953,20 @@ if (VIDEOS["PC_XGA"]~=null) then
 	}
 end
 
+
+--------------------------------------------------
+--
+--@src/devices/video/clgd546x_laguna.h,VIDEOS["CLGD546X_LAGUNA"] = true
+--------------------------------------------------
+
+if (VIDEOS["CLGD546X_LAGUNA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/clgd546x_laguna.cpp",
+		MAME_DIR .. "src/devices/video/clgd546x_laguna.h",
+	}
+end
+
+
 --------------------------------------------------
 --
 --@src/devices/video/virge_pci.h,VIDEOS["VIRGE_PCI"] = true
@@ -964,6 +978,7 @@ if (VIDEOS["VIRGE_PCI"]~=null) then
 		MAME_DIR .. "src/devices/video/virge_pci.h",
 	}
 end
+
 
 --------------------------------------------------
 --

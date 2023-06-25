@@ -41,6 +41,7 @@
 #include "video/mga2064w.h"
 #include "video/virge_pci.h"
 #include "video/riva128.h"
+#include "video/clgd546x_laguna.h"
 
 namespace {
 
@@ -661,8 +662,8 @@ void pcipc_state::pciagp(machine_config &config)
 	serport1.cts_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ncts2_w));
 #endif
 
-	// TODO: temp, to be converted to a proper AGP card once we make this to boot
-	VIRGE_PCI(config, "pci:0e.0", 0); // J4C1
+	// TODO: temp link, to be moved to quakeat.cpp
+	CIRRUS_GD5465_LAGUNA3D(config, "pci:01.0:00.0", 0);
 }
 
 ROM_START(pcipc)
