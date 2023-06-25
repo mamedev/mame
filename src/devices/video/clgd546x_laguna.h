@@ -48,7 +48,6 @@ private:
 //	void unmap_log_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	bool m_vga_legacy_enable = false;
-	u32 m_main_scratchpad_id = 0;
 };
 
 DECLARE_DEVICE_TYPE(CIRRUS_GD5465_LAGUNA3D, cirrus_gd5465_laguna3d_device)
