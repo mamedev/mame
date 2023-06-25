@@ -1098,6 +1098,7 @@ ROM_END
 /*
   Fruit Star Bonus (Ver 8.23PSTK, Steiermark)
   MPU11 Number: 6218.
+  Date: 1/99?
 
   Program flash ROM is inside a CPU epoxy block
   with M6809 CPU and one PLD.
@@ -1117,6 +1118,12 @@ ROM_START( fruitstbe )
 	ROM_IGNORE(                      0x10000 )    // identical halves.
 	ROM_LOAD( "fu_1.ic37",  0x20000, 0x10000, CRC(11ee9747) SHA1(19931a8c99e4c521cd7aed42398a9557a0d7579a) )
 	ROM_IGNORE(                      0x10000 )    // identical halves.
+
+	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbe_823_nvram.bin",  0x0000, 0x1000, CRC(4255e21c) SHA1(055f2e1e507993184a15ec3133fbb1d8fafd6c22) )
+
+	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbe_823_nvram2.bin", 0x0000, 0x0800, CRC(ad6d8b59) SHA1(79de1b8e44bb2fc8e8dbd3210c0d1d26e641da4b) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "am27s29.ic46",  0x0000, 0x0200, CRC(ee576268) SHA1(8964526fa253f484d784aec46c4c31358bc1667b) )
@@ -1148,4 +1155,4 @@ GAMEL( 199?, fruitstba, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12
 GAMEL( 1997, fruitstbb, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.20PIR)",              0,      layout_fruitstb )
 GAMEL( 1996, fruitstbc, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.36UNG-1100)",         0,      layout_fruitstb )
 GAMEL( 1996, fruitstbd, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.30UNG-200)",          0,      layout_fruitstb )
-GAMEL( 199?, fruitstbe, 0,        mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.23PSTK, Steiermark)", 0,      layout_fruitstb )
+GAMEL( 1999, fruitstbe, 0,        mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.23PSTK, Steiermark)", 0,      layout_fruitstb )
