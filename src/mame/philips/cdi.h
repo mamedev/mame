@@ -29,6 +29,7 @@ public:
 		, m_servo(*this, "servo")
 		, m_slave(*this, "slave")
 		, m_cdic(*this, "cdic")
+		, m_cdrom(*this, "cdrom")
 		, m_mcd212(*this, "mcd212")
 		, m_dmadac(*this, "dac%u", 1U)
 	{ }
@@ -48,7 +49,6 @@ protected:
 	optional_device<screen_device> m_lcd;
 	optional_device<cdislave_hle_device> m_slave_hle;
 
-private:
 	enum servo_portc_bit_t
 	{
 		INV_JUC_OUT = (1 << 2),
@@ -77,6 +77,7 @@ private:
 	optional_device<m68hc05c8_device> m_servo;
 	optional_device<m68hc05c8_device> m_slave;
 	optional_device<cdicdic_device> m_cdic;
+	required_device<cdrom_image_device> m_cdrom;
 	required_device<mcd212_device> m_mcd212;
 
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
