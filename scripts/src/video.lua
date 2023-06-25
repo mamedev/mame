@@ -295,6 +295,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/rivatnt.h,VIDEOS["RIVATNT"] = true
+--------------------------------------------------
+
+if (VIDEOS["RIVATNT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/rivatnt.cpp",
+		MAME_DIR .. "src/devices/video/rivatnt.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/gf4500.h,VIDEOS["GF4500"] = true
 --------------------------------------------------
 

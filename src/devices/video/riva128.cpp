@@ -30,8 +30,8 @@ References:
 
 DEFINE_DEVICE_TYPE(RIVA128, riva128_device, "riva128", "SGS-Thompson/nVidia Riva 128 (NV3)")
 
-riva128_device::riva128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, RIVA128, tag, owner, clock)
+riva128_device::riva128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, type, tag, owner, clock)
 	, m_svga(*this, "svga")
 	, m_vga_rom(*this, "vga_rom")
 {
@@ -40,6 +40,11 @@ riva128_device::riva128_device(const machine_config &mconfig, const char *tag, d
 	// 0x0019 RIVA 128 ZX (NV3T)
 	// TODO: STB uses 0x10b4xxxx, unknown for ASUS
 	set_ids_agp(0x12d20018, 0x00, 0x10921092);
+}
+
+riva128_device::riva128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: riva128_device(mconfig, RIVA128, tag, owner, clock)
+{
 }
 
 ROM_START( riva128 )

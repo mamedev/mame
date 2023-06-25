@@ -18,6 +18,8 @@ public:
 	void legacy_io_map(address_map &map);
 
 protected:
+	riva128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -32,10 +34,12 @@ protected:
 	virtual void mmio_map(address_map &map);
 	virtual void vram_aperture_map(address_map &map);
 	virtual void indirect_io_map(address_map &map);
-private:
+
 	required_device<nvidia_nv3_vga_device> m_svga;
 	required_memory_region m_vga_rom;
 
+	bool m_vga_legacy_enable = false;
+private:
 	u8 vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
 	u32 vga_3b0_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -48,7 +52,6 @@ private:
 	u32 unmap_log_r(offs_t offset, u32 mem_mask = ~0);
 	void unmap_log_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	bool m_vga_legacy_enable = false;
 	u32 m_main_scratchpad_id = 0;
 };
 

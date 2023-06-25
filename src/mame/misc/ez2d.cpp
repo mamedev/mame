@@ -73,7 +73,7 @@ Ez2DJ series:
 #include "machine/i82371eb_ide.h"
 #include "machine/i82371eb_acpi.h"
 #include "machine/i82371eb_usb.h"
-#include "video/riva128.h"
+#include "video/rivatnt.h"
 #include "bus/isa/isa_cards.h"
 //#include "bus/rs232/hlemouse.h"
 //#include "bus/rs232/null_modem.h"
@@ -93,6 +93,7 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	void cubx(machine_config &config);
 	void ez2d(machine_config &config);
 
 private:
@@ -140,7 +141,7 @@ void ez2d_state::winbond_superio_config(device_t *device)
 //  fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 }
 
-void ez2d_state::ez2d(machine_config &config)
+void ez2d_state::cubx(machine_config &config)
 {
 	// actually a Celeron at 533 MHz
 	PENTIUM2(config, m_maincpu, 90'000'000);
@@ -188,9 +189,14 @@ void ez2d_state::ez2d(machine_config &config)
 	serport1.cts_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ncts2_w));
 #endif
 
-	// TODO: Riva TNT2
-	RIVA128(config, "pci:01.0:00.0", 0);
+	RIVATNT(config, "pci:01.0:00.0", 0);
+}
 
+void ez2d_state::ez2d(machine_config &config)
+{
+	ez2d_state::cubx(config);
+
+	// TODO: Riva TNT2
 	// TODO: Sound Blaster Live CT4830
 }
 
@@ -200,10 +206,18 @@ void ez2d_state::ez2d(machine_config &config)
 
 ***************************************************************************/
 
+ROM_START( asuscubx )
+	ROM_REGION32_LE(0x40000, "pci:07.0", 0)
+	ROM_LOAD("cubx1007.awd", 0x00000, 0x40000, CRC(42a35507) SHA1(4e428e8419e533424d9564b290e2d7f4931744ff) )
+ROM_END
+
 ROM_START( ez2d2m )
 	ROM_REGION32_LE(0x40000, "pci:07.0", 0)
-	ROM_LOAD("ez2dancer2ndmove_motherboard_v29c51002t_award_bios", 0x00000, 0x40000, BAD_DUMP CRC(02a5e84b) SHA1(94b341d268ce9d42597c68bc98c3b8b62e137205) ) // 29f020
-//  ROM_LOAD("cubx1007.awd", 0x00000, 0x40000, CRC(42a35507) SHA1(4e428e8419e533424d9564b290e2d7f4931744ff) )
+	ROM_SYSTEM_BIOS( 0, "1006cu", "OEM" )
+	// From HDD "C:\Install\Bios1006"
+	ROMX_LOAD("1006cu.awd", 0x00000, 0x40000, CRC(086c320a) SHA1(4b4c07e594602c467e678187f80e3a5c1445bd30), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "award", "Award (unknown rev)" )
+	ROMX_LOAD("ez2dancer2ndmove_motherboard_v29c51002t_award_bios", 0x00000, 0x40000, BAD_DUMP CRC(02a5e84b) SHA1(94b341d268ce9d42597c68bc98c3b8b62e137205), ROM_BIOS(1) ) // 29f020
 
 	ROM_REGION( 0x10000, "vbios", 0 )
 	// nVidia TNT2 Model 64 video BIOS (not from provided dump)
@@ -217,4 +231,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2001, ez2d2m, 0, ez2d, ez2d, ez2d_state, empty_init, ROT0, "Amuse World", "Ez2dancer 2nd Move",  MACHINE_IS_SKELETON )
+COMP( 2000, asuscubx, 0,   0, cubx, 0, ez2d_state, empty_init, "ASUS",        "CUBX", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+
+GAME( 2001, ez2d2m, 0, ez2d, ez2d, ez2d_state, empty_init, ROT0,   "Amuse World", "Ez2dancer 2nd Move",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
