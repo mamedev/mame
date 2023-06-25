@@ -1155,4 +1155,4 @@ GAMEL( 199?, fruitstba, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12
 GAMEL( 1997, fruitstbb, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.20PIR)",              0,      layout_fruitstb )
 GAMEL( 1996, fruitstbc, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.36UNG-1100)",         0,      layout_fruitstb )
 GAMEL( 1996, fruitstbd, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.30UNG-200)",          0,      layout_fruitstb )
-GAMEL( 1999, fruitstbe, 0,        mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.23PSTK, Steiermark)", 0,      layout_fruitstb )
+GAMEL( 1999, fruitstbe, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.23PSTK, Steiermark)", 0,      layout_fruitstb )
