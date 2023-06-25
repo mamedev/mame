@@ -41,9 +41,8 @@
   For Super Star and Red Line sets...
 
   1) Let the initial test ends.
-  2) Turn ON Service A Key (key 9).
-  3) Press once Hold3 key (key C).
-  4) Turn OFF Service A Key (key 9).
+  2) Turn ON Service Key (key F2).
+  3) Press once Start key (key 1).
 
 
 ***********************************************************************************
@@ -517,30 +516,30 @@ static INPUT_PORTS_START( suprstar )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "DSW1")                   PORT_DIPLOCATION("DSW:1")
+	PORT_DIPSETTING(    0x01, "Off (Aus)" )
+	PORT_DIPSETTING(    0x00, "On (Ein)" )
+	PORT_DIPNAME( 0x02, 0x02, "DSW2")                   PORT_DIPLOCATION("DSW:2")
+	PORT_DIPSETTING(    0x02, "Off (Aus)" )
+	PORT_DIPSETTING(    0x00, "On (Ein)" )
+	PORT_DIPNAME( 0x04, 0x04, "Coin 1 (Muenzen 1)" )    PORT_DIPLOCATION("DSW:3")
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x08, 0x08, "Coin 2 (Muenzen 2)" )    PORT_DIPLOCATION("DSW:4")
+	PORT_DIPSETTING(    0x08, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x10, 0x10, "Jackpot")                PORT_DIPLOCATION("DSW:5")
+	PORT_DIPSETTING(    0x10, "Jackpot KZB")
+	PORT_DIPSETTING(    0x00, "Jackpot LZB")
+	PORT_DIPNAME( 0x20, 0x20, "Fruechtebonus" )         PORT_DIPLOCATION("DSW:6")
+	PORT_DIPSETTING(    0x20, "Fruechtebonus Bleibt" )
+	PORT_DIPSETTING(    0x00, "Fruechtebonus Clear" )
+	PORT_DIPNAME( 0x40, 0x40, "DSW7")                   PORT_DIPLOCATION("DSW:7")
+	PORT_DIPSETTING(    0x40, "Off (Aus)" )
+	PORT_DIPSETTING(    0x00, "On (Ein)" )
+	PORT_DIPNAME( 0x80, 0x80, "BH")                     PORT_DIPLOCATION("DSW:8")
+	PORT_DIPSETTING(    0x80, "Dreifachschluessel")
+	PORT_DIPSETTING(    0x00, "Normalgeraet")
 INPUT_PORTS_END
 
 
