@@ -550,6 +550,23 @@ static INPUT_PORTS_START( supst834 )
 	PORT_DIPSETTING(    0x00, "On (Ein)" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( redline )
+	PORT_INCLUDE( suprstar )
+	PORT_MODIFY("SW1")
+	PORT_DIPNAME( 0x04, 0x04, "DSW3")                   PORT_DIPLOCATION("DSW:3")
+	PORT_DIPSETTING(    0x04, "Off (Aus)" )
+	PORT_DIPSETTING(    0x00, "On (Ein)" )
+	PORT_DIPNAME( 0x08, 0x08, "DSW4")                   PORT_DIPLOCATION("DSW:4")
+	PORT_DIPSETTING(    0x08, "Off (Aus)" )
+	PORT_DIPSETTING(    0x00, "On (Ein)" )
+	PORT_DIPNAME( 0x10, 0x10, "Remote" )                PORT_DIPLOCATION("DSW:5")
+	PORT_DIPSETTING(    0x10, "100" )
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPNAME( 0x20, 0x20, "DSW6")                   PORT_DIPLOCATION("DSW:6")
+	PORT_DIPSETTING(    0x20, "Off (Aus)" )
+	PORT_DIPSETTING(    0x00, "On (Ein)" )
+INPUT_PORTS_END
+
 
 /*************************
 *    Graphics Layouts    *
@@ -1162,4 +1179,4 @@ GAME( 1990, gampo816,  0,        supercrd, supercrd, supercrd_state, init_gampo,
 GAME( 1990, gampo812,  gampo816, supercrd, supercrd, supercrd_state, init_gampo,    ROT0,  "Fun World", "Gamble Poker (v812, encrypted)", MACHINE_NOT_WORKING )
 GAME( 1994, supst839,  0,        supercrd, suprstar, supercrd_state, init_supst,    ROT90, "Fun World", "Super Stars (v839, encrypted)",  MACHINE_NOT_WORKING )
 GAME( 1990, supst834,  supst839, supercrd, supst834, supercrd_state, init_supst,    ROT90, "Fun World", "Super Stars (v834, encrypted)",  MACHINE_NOT_WORKING )
-GAME( 1989, redline,   0,        supercrd, suprstar, supercrd_state, init_supst,    ROT90, "Fun World", "Red Line (v808, encrypted)",     MACHINE_NOT_WORKING )
+GAME( 1989, redline,   0,        supercrd, redline,  supercrd_state, init_supst,    ROT90, "Fun World", "Red Line (v808, encrypted)",     MACHINE_NOT_WORKING )
