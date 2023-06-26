@@ -21,7 +21,7 @@ public:
 	heath_z37_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void write(offs_t reg, u8 val);
-	u8 read(offs_t reg);
+	u8   read(offs_t reg);
 	auto irq_cb() { return m_fd_irq_cb.bind(); }
 	auto drq_cb() { return m_drq_cb.bind(); }
 
@@ -38,10 +38,10 @@ protected:
 	void intf_w(u8 val);
 
 	void cmd_w(u8 val);
-	u8 stat_r();
+	u8   stat_r();
 
 	void data_w(u8 val);
-	u8 data_r();
+	u8   data_r();
 
 	void set_irq(u8 data);
 	void set_drq(u8 data);
@@ -70,7 +70,6 @@ private:
 
 	/// Bits to set alternate registers on InterfaceControl_c - DK.INT
 	static constexpr u8 if_SelectSectorTrack_c = 0;
-
 };
 
 DECLARE_DEVICE_TYPE(HEATH_Z37_FDC, heath_z37_fdc_device)

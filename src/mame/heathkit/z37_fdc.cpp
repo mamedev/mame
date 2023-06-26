@@ -12,7 +12,25 @@
 
 #include "z37_fdc.h"
 
+#define LOG_REG (1U << 1)    // Shows register setup
+#define LOG_LINES (1U << 2)  // Show control lines
+#define LOG_DRIVE (1U << 3)  // Show drive select
+#define LOG_FUNC (1U << 4)   // Function calls
+
+#define VERBOSE (0)
+
 #include "logmacro.h"
+
+#define LOGREG(...)        LOGMASKED(LOG_REG, __VA_ARGS__)
+#define LOGLINES(...)      LOGMASKED(LOG_LINES, __VA_ARGS__)
+#define LOGDRIVE(...)      LOGMASKED(LOG_DRIVE, __VA_ARGS__)
+#define LOGFUNC(...)       LOGMASKED(LOG_FUNC, __VA_ARGS__)
+
+#ifdef _MSC_VER
+#define FUNCNAME __func__
+#else
+#define FUNCNAME __PRETTY_FUNCTION__
+#endif
 
 DEFINE_DEVICE_TYPE(HEATH_Z37_FDC, heath_z37_fdc_device, "heath_z37_fdc", "Heath H/Z-37 Soft-sectored Controller");
 
@@ -35,6 +53,9 @@ void heath_z37_fdc_device::ctrl_w(u8 val)
 	m_drq_allowed = bool(BIT(val, ctrl_EnableDrqInt_c));
 	m_fdc->dden_w(BIT(val, ctrl_SetMFMRecording_c) ? CLEAR_LINE : ASSERT_LINE);
 
+	LOGREG("%s: motor on: %d, intrq allowed: %d, drq allowed: %d\n",
+		FUNCNAME, motor_on, m_intrq_allowed, m_drq_allowed);
+
 	if (m_drq_allowed)
 	{
 		m_block_interrupt_cb(ASSERT_LINE);
@@ -48,22 +69,27 @@ void heath_z37_fdc_device::ctrl_w(u8 val)
 	if (BIT(val, ctrl_Drive_0_c))
 	{
 		m_fdc->set_floppy(m_floppies[0]->get_device());
+		LOGDRIVE("Drive selected: 0\n");
 	}
 	else if (BIT(val, ctrl_Drive_1_c))
 	{
 		m_fdc->set_floppy(m_floppies[1]->get_device());
+		LOGDRIVE("Drive selected: 1\n");
 	}
 	else if (BIT(val, ctrl_Drive_2_c))
 	{
 		m_fdc->set_floppy(m_floppies[2]->get_device());
+		LOGDRIVE("Drive selected: 2\n");
 	}
 	else if (BIT(val, ctrl_Drive_3_c))
 	{
 		m_fdc->set_floppy(m_floppies[3]->get_device());
+		LOGDRIVE("Drive selected: 3\n");
 	}
 	else
 	{
 		m_fdc->set_floppy(nullptr);
+		LOGDRIVE("Drive selected: none\n");
 	}
 
 	for (auto &elem : m_floppies)
@@ -79,6 +105,8 @@ void heath_z37_fdc_device::ctrl_w(u8 val)
 void heath_z37_fdc_device::intf_w(u8 val)
 {
 	m_access_track_sector = bool(BIT(val, if_SelectSectorTrack_c));
+
+	LOGREG("access track/sector: %d\n", m_access_track_sector);
 }
 
 void heath_z37_fdc_device::cmd_w(u8 val)
@@ -103,6 +131,8 @@ u8 heath_z37_fdc_device::data_r()
 
 void heath_z37_fdc_device::write(offs_t reg, u8 val)
 {
+	LOGFUNC("%s: reg: %d val: %d\n", FUNCNAME, reg, val);
+
 	switch (reg)
 	{
 	case 0:
@@ -138,6 +168,8 @@ u8 heath_z37_fdc_device::read(offs_t reg)
 		value = data_r();
 		break;
 	}
+
+	LOGFUNC("%s: reg: %d val: %d\n", FUNCNAME, reg, value);
 
 	return value;
 }
@@ -194,10 +226,14 @@ void heath_z37_fdc_device::device_add_mconfig(machine_config &config)
 
 void heath_z37_fdc_device::set_irq(u8 data)
 {
+	LOGLINES("set irq, allowed: %d data: %d\n", m_intrq_allowed, data);
+
 	m_fd_irq_cb(m_intrq_allowed ? data : CLEAR_LINE);
 }
 
 void heath_z37_fdc_device::set_drq(u8 data)
 {
+	LOGLINES("set drq, allowed: %d data: %d\n", m_intrq_allowed, data);
+
 	m_drq_cb(m_drq_allowed ? data : CLEAR_LINE);
 }
