@@ -133,6 +133,7 @@
 #include "spacezap.lh"
 #include "tenpindx.lh"
 
+
 /*************************************
  *
  *  Protected RAM
@@ -1201,7 +1202,7 @@ void astrocde_state::astrocade_base(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(ASTROCADE_CLOCK, 455, 0, 352, 262, 0, 240);
-	m_screen->set_default_position(1.1, 0.0, 1.18, -0.018);    /* clip out borders */
+	m_screen->set_default_position(1.1, 0.0, 1.18, -0.018); // clip out borders
 	m_screen->set_screen_update(FUNC(astrocde_state::screen_update_astrocde));
 	m_screen->set_palette(m_palette);
 }
@@ -1268,23 +1269,23 @@ void seawolf2_state::seawolf2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &seawolf2_state::seawolf2_map);
 	m_maincpu->set_addrmap(AS_IO, &seawolf2_state::port_map_discrete);
 
-	output_latch_device &lamplatch1(OUTPUT_LATCH(config, "lamplatch0")); // 74174 on game board at N2
-	lamplatch1.bit_handler<0>().set_output("lamp6"); // right player torpedo 4 available
-	lamplatch1.bit_handler<1>().set_output("lamp5"); // right player torpedo 3 available
-	lamplatch1.bit_handler<2>().set_output("lamp4"); // right player torpedo 2 available
-	lamplatch1.bit_handler<3>().set_output("lamp3"); // right player torpedo 1 available
-	lamplatch1.bit_handler<4>().set_output("lamp2"); // right player ready
-	lamplatch1.bit_handler<4>().append_output("lamp1").invert(); // right player reload (active low)
-	lamplatch1.bit_handler<5>().set_output("lamp0"); // right player explosion (hit)
+	output_latch_device &lamplatch0(OUTPUT_LATCH(config, "lamplatch0")); // 74174 on game board at N2
+	lamplatch0.bit_handler<0>().set_output("lamp6"); // right player torpedo 4 available
+	lamplatch0.bit_handler<1>().set_output("lamp5"); // right player torpedo 3 available
+	lamplatch0.bit_handler<2>().set_output("lamp4"); // right player torpedo 2 available
+	lamplatch0.bit_handler<3>().set_output("lamp3"); // right player torpedo 1 available
+	lamplatch0.bit_handler<4>().set_output("lamp2"); // right player ready
+	lamplatch0.bit_handler<4>().append_output("lamp1").invert(); // right player reload (active low)
+	lamplatch0.bit_handler<5>().set_output("lamp0"); // right player explosion (hit)
 
-	output_latch_device &lamplatch2(OUTPUT_LATCH(config, "lamplatch1")); // 74174 on game board at P2
-	lamplatch2.bit_handler<0>().set_output("lamp13"); // left player torpedo 4 available
-	lamplatch2.bit_handler<1>().set_output("lamp12"); // left player torpedo 3 available
-	lamplatch2.bit_handler<2>().set_output("lamp11"); // left player torpedo 2 available
-	lamplatch2.bit_handler<3>().set_output("lamp10"); // left player torpedo 1 available
-	lamplatch2.bit_handler<4>().set_output("lamp9"); // left player ready
-	lamplatch2.bit_handler<4>().append_output("lamp8").invert(); // left player reload (active low)
-	lamplatch2.bit_handler<5>().set_output("lamp7"); // left player explosion (hit)
+	output_latch_device &lamplatch1(OUTPUT_LATCH(config, "lamplatch1")); // 74174 on game board at P2
+	lamplatch1.bit_handler<0>().set_output("lamp13"); // left player torpedo 4 available
+	lamplatch1.bit_handler<1>().set_output("lamp12"); // left player torpedo 3 available
+	lamplatch1.bit_handler<2>().set_output("lamp11"); // left player torpedo 2 available
+	lamplatch1.bit_handler<3>().set_output("lamp10"); // left player torpedo 1 available
+	lamplatch1.bit_handler<4>().set_output("lamp9"); // left player ready
+	lamplatch1.bit_handler<4>().append_output("lamp8").invert(); // left player reload (active low)
+	lamplatch1.bit_handler<5>().set_output("lamp7"); // left player explosion (hit)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1357,8 +1358,8 @@ void astrocde_state::wow(machine_config &config)
 	outlatch.q_out_cb<7>().set(FUNC(astrocde_state::coin_counter_w<2>));
 
 	/* video hardware */
-	m_screen->set_default_position(1.0, 0.0, 1.0, 0.0);    /* adjusted to match screenshots */
-//  m_screen->set_default_position(1.066, -0.004, 1.048, -0.026);  /* adjusted to match flyer */
+	m_screen->set_default_position(1.0, 0.0, 1.0, 0.0); // adjusted to match screenshots
+//  m_screen->set_default_position(1.066, -0.004, 1.048, -0.026); // adjusted to match flyer
 
 	/* sound hardware */
 	SPEAKER(config, "center").front_center();
@@ -1406,7 +1407,7 @@ void astrocde_state::gorf(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // MC14024 on CPU board at U18, CLK = VERTDR, Q7 used for RESET
 
 	/* video hardware */
-	m_screen->set_default_position(1.0, 0.0, 1.0, 0.0);    /* adjusted to match flyer */
+	m_screen->set_default_position(1.0, 0.0, 1.0, 0.0); // adjusted to match flyer
 
 	/* sound hardware */
 	SPEAKER(config, "upper", 0.0, 0.0, 1.0);
@@ -1466,12 +1467,12 @@ void astrocde_state::profpac(machine_config &config)
 	outlatch.bit_handler<3>().set_output("led1");
 
 	output_latch_device &lamplatch(OUTPUT_LATCH(config, "lamplatch", 0)); // 74LS174 on game board at U7
-	lamplatch.bit_handler<0>().set_output("lamp0");    // left lamp A
-	lamplatch.bit_handler<1>().set_output("lamp1");    // left lamp B
-	lamplatch.bit_handler<2>().set_output("lamp2");    // left lamp C
-	lamplatch.bit_handler<4>().set_output("lamp3");   // right lamp A
-	lamplatch.bit_handler<5>().set_output("lamp4");   // right lamp B
-	lamplatch.bit_handler<6>().set_output("lamp5");   // right lamp C
+	lamplatch.bit_handler<0>().set_output("lamp0"); // left lamp A
+	lamplatch.bit_handler<1>().set_output("lamp1"); // left lamp B
+	lamplatch.bit_handler<2>().set_output("lamp2"); // left lamp C
+	lamplatch.bit_handler<4>().set_output("lamp3"); // right lamp A
+	lamplatch.bit_handler<5>().set_output("lamp4"); // right lamp B
+	lamplatch.bit_handler<6>().set_output("lamp5"); // right lamp C
 
 	m_astrocade_sound[0]->so_cb<4>().set("outlatch", FUNC(output_latch_device::write));
 	m_astrocade_sound[0]->so_cb<5>().set("lamplatch", FUNC(output_latch_device::write));
@@ -1507,7 +1508,7 @@ void tenpindx_state::tenpindx(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tenpindx_state::profpac_map);
 	m_maincpu->set_addrmap(AS_IO, &tenpindx_state::port_map_16col_pattern_tenpindx);
 
-	Z80(config, m_subcpu, ASTROCADE_CLOCK/4); /* real clock unknown */
+	Z80(config, m_subcpu, ASTROCADE_CLOCK/4); // real clock unknown
 	m_subcpu->set_daisy_config(tenpin_daisy_chain);
 	m_subcpu->set_addrmap(AS_PROGRAM, &tenpindx_state::sub_map);
 	m_subcpu->set_addrmap(AS_IO, &tenpindx_state::sub_io_map);
@@ -1521,7 +1522,7 @@ void tenpindx_state::tenpindx(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
 
-	ay8912_device &aysnd(AY8912(config, "aysnd", ASTROCADE_CLOCK/4));  /* real clock unknown */
+	ay8912_device &aysnd(AY8912(config, "aysnd", ASTROCADE_CLOCK/4)); // real clock unknown
 	aysnd.port_a_read_callback().set_ioport("DIPSW");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.33);
 }

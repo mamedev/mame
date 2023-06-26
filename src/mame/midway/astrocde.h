@@ -16,6 +16,7 @@
 #include "sound/astrocde.h"
 #include "sound/samples.h"
 #include "sound/votrax.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -233,9 +234,9 @@ private:
 class demndrgn_state : public astrocde_state
 {
 public:
-	demndrgn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: astrocde_state(mconfig, type, tag)
-		, m_trackball(*this, {"MOVEX", "MOVEY"})
+	demndrgn_state(const machine_config &mconfig, device_type type, const char *tag) :
+		astrocde_state(mconfig, type, tag),
+		m_trackball(*this, {"MOVEX", "MOVEY"})
 	{ }
 
 	void demndrgn(machine_config &config);
