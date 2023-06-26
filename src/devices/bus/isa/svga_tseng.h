@@ -6,8 +6,11 @@
 #pragma once
 
 #include "isa.h"
+
 #include "video/pc_vga_tseng.h"
+
 #include "screen.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -13,10 +13,10 @@
 
 #pragma once
 
-#include "screen.h"
 #include "ibm8514a.h"
 
-class ibm8514a_device;
+#include "screen.h"
+
 
 // ======================> vga_device
 

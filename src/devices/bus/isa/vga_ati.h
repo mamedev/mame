@@ -1,11 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * isa_vga_ati.h
+ * isa/vga_ati.h
  *
  *  Header for ATi Graphics Ultra/Graphics Ultra Pro ISA video cards
- *
- *  Created on: 9/09/2012
  */
 #ifndef MAME_BUS_ISA_VGA_ATI_H
 #define MAME_BUS_ISA_VGA_ATI_H
@@ -13,9 +11,11 @@
 #pragma once
 
 #include "isa.h"
-#include "video/pc_vga_ati.h"
-#include "video/ati_mach8.h"
+
 #include "video/ati_mach32.h"
+#include "video/ati_mach8.h"
+#include "video/pc_vga_ati.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS

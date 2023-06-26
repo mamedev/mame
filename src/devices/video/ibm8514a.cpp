@@ -55,8 +55,10 @@ void ibm8514a_device::ibm8514_write_fg(uint32_t offset)
 			return;  // do nothing
 	}
 	else
+	{
 		if(ibm8514.curr_x < ibm8514.scissors_left || ibm8514.curr_x > ibm8514.scissors_right || ibm8514.curr_y < ibm8514.scissors_top || ibm8514.curr_y > ibm8514.scissors_bottom)
 			return;  // do nothing
+	}
 
 	// determine source
 	switch(ibm8514.fgmix & 0x0060)
@@ -291,7 +293,7 @@ uint16_t ibm8514a_device::ibm8514_line_error_r()
 void ibm8514a_device::ibm8514_line_error_w(uint16_t data)
 {
 	ibm8514.line_errorterm = data;
-	LOG( "8514/A: Line Parameter/Error Term write %04x\n",data);
+	LOG("8514/A: Line Parameter/Error Term write %04x\n", data);
 }
 
 /*
@@ -319,7 +321,7 @@ uint16_t ibm8514a_device::ibm8514_gpstatus_r()
 {
 	uint16_t ret = 0x0000;
 
-	//LOG( "S3: 9AE8 read\n");
+	//LOG("S3: 9AE8 read\n");
 	if(ibm8514.gpbusy == true)
 		ret |= 0x0200;
 	if(ibm8514.data_avail == true)
@@ -471,7 +473,7 @@ void ibm8514a_device::ibm8514_cmd_w(uint16_t data)
 	case 0x0000:  // NOP (for "Short Stroke Vectors")
 		ibm8514.state = IBM8514_IDLE;
 		ibm8514.gpbusy = false;
-		LOG( "8514/A: Command (%04x) - NOP (Short Stroke Vector)\n",ibm8514.current_cmd);
+		LOG("8514/A: Command (%04x) - NOP (Short Stroke Vector)\n", ibm8514.current_cmd);
 		break;
 	case 0x2000:  // Line
 		ibm8514.state = IBM8514_IDLE;
@@ -482,12 +484,12 @@ void ibm8514a_device::ibm8514_cmd_w(uint16_t data)
 			{
 				ibm8514.state = IBM8514_DRAWING_LINE;
 				ibm8514.data_avail = true;
-				LOG( "8514/A: Command (%04x) - Vector Line (WAIT) %i,%i \n",ibm8514.current_cmd,ibm8514.curr_x,ibm8514.curr_y);
+				LOG("8514/A: Command (%04x) - Vector Line (WAIT) %i,%i \n", ibm8514.current_cmd, ibm8514.curr_x, ibm8514.curr_y);
 			}
 			else
 			{
 				ibm8514_draw_vector(ibm8514.rect_width,(data & 0x00e0) >> 5,(data & 0010) ? true : false);
-				LOG( "8514/A: Command (%04x) - Vector Line - %i,%i \n",ibm8514.current_cmd,ibm8514.curr_x,ibm8514.curr_y);
+				LOG("8514/A: Command (%04x) - Vector Line - %i,%i \n", ibm8514.current_cmd, ibm8514.curr_x, ibm8514.curr_y);
 			}
 		}
 		else
@@ -501,8 +503,8 @@ void ibm8514a_device::ibm8514_cmd_w(uint16_t data)
 			int count = 0;
 			int16_t temp;
 
-			LOG( "8514/A: Command (%04x) - Line (Bresenham) - %i,%i  Axial %i, Diagonal %i, Error %i, Major Axis %i, Minor Axis %i\n",ibm8514.current_cmd,
-				ibm8514.curr_x,ibm8514.curr_y,ibm8514.line_axial_step,ibm8514.line_diagonal_step,ibm8514.line_errorterm,ibm8514.rect_width,ibm8514.rect_height);
+			LOG("8514/A: Command (%04x) - Line (Bresenham) - %i,%i  Axial %i, Diagonal %i, Error %i, Major Axis %i, Minor Axis %i\n",
+					ibm8514.current_cmd, ibm8514.curr_x, ibm8514.curr_y, ibm8514.line_axial_step, ibm8514.line_diagonal_step, ibm8514.line_errorterm, ibm8514.rect_width, ibm8514.rect_height);
 
 			if((data & 0x0040))
 			{
@@ -533,12 +535,12 @@ void ibm8514a_device::ibm8514_cmd_w(uint16_t data)
 			//ibm8514.gpbusy = true;  // DirectX 5 keeps waiting for the busy bit to be clear...
 			ibm8514.bus_size = (data & 0x0600) >> 9;
 			ibm8514.data_avail = true;
-			LOG( "8514/A: Command (%04x) - Rectangle Fill (WAIT) %i,%i Width: %i Height: %i Colour: %08x\n",ibm8514.current_cmd,ibm8514.curr_x,
-					ibm8514.curr_y,ibm8514.rect_width,ibm8514.rect_height,ibm8514.fgcolour);
+			LOG("8514/A: Command (%04x) - Rectangle Fill (WAIT) %i,%i Width: %i Height: %i Colour: %08x\n",
+					ibm8514.current_cmd, ibm8514.curr_x, ibm8514.curr_y, ibm8514.rect_width, ibm8514.rect_height, ibm8514.fgcolour);
 			break;
 		}
-		LOG( "8514/A: Command (%04x) - Rectangle Fill %i,%i Width: %i Height: %i Colour: %08x\n",ibm8514.current_cmd,ibm8514.curr_x,
-			ibm8514.curr_y,ibm8514.rect_width,ibm8514.rect_height,ibm8514.fgcolour);
+		LOG("8514/A: Command (%04x) - Rectangle Fill %i,%i Width: %i Height: %i Colour: %08x\n",
+				ibm8514.current_cmd, ibm8514.curr_x, ibm8514.curr_y, ibm8514.rect_width, ibm8514.rect_height, ibm8514.fgcolour);
 		off = 0;
 		off += (IBM8514_LINE_LENGTH * ibm8514.curr_y);
 		off += ibm8514.curr_x;
@@ -587,8 +589,8 @@ void ibm8514a_device::ibm8514_cmd_w(uint16_t data)
 		break;
 	case 0xc000:  // BitBLT
 		// TODO: a10cuba sets up blantantly invalid parameters here, CPU core bug maybe?
-		LOG( "8514/A: Command (%04x) - BitBLT from %i,%i to %i,%i  Width: %i  Height: %i\n",ibm8514.current_cmd,
-			ibm8514.curr_x,ibm8514.curr_y,ibm8514.dest_x,ibm8514.dest_y,ibm8514.rect_width,ibm8514.rect_height);
+		LOG("8514/A: Command (%04x) - BitBLT from %i,%i to %i,%i  Width: %i  Height: %i\n",
+				ibm8514.current_cmd, ibm8514.curr_x, ibm8514.curr_y, ibm8514.dest_x, ibm8514.dest_y, ibm8514.rect_width, ibm8514.rect_height);
 		off = 0;
 		off += (IBM8514_LINE_LENGTH * ibm8514.dest_y);
 		off += ibm8514.dest_x;
@@ -664,8 +666,8 @@ void ibm8514a_device::ibm8514_cmd_w(uint16_t data)
 		ibm8514.curr_y = ibm8514.prev_y;
 		break;
 	case 0xe000:  // Pattern Fill
-		LOG( "8514/A: Command (%04x) - Pattern Fill - source %i,%i  dest %i,%i  Width: %i Height: %i\n",ibm8514.current_cmd,
-			ibm8514.curr_x,ibm8514.curr_y,ibm8514.dest_x,ibm8514.dest_y,ibm8514.rect_width,ibm8514.rect_height);
+		LOG("8514/A: Command (%04x) - Pattern Fill - source %i,%i  dest %i,%i  Width: %i Height: %i\n",
+				ibm8514.current_cmd, ibm8514.curr_x, ibm8514.curr_y, ibm8514.dest_x, ibm8514.dest_y, ibm8514.rect_width, ibm8514.rect_height);
 		off = 0;
 		off += (IBM8514_LINE_LENGTH * ibm8514.dest_y);
 		off += ibm8514.dest_x;
@@ -735,7 +737,7 @@ void ibm8514a_device::ibm8514_cmd_w(uint16_t data)
 	default:
 		ibm8514.state = IBM8514_IDLE;
 		ibm8514.gpbusy = false;
-		LOG( "8514/A: Unknown command: %04x\n",data);
+		LOG("8514/A: Unknown command: %04x\n", data);
 		break;
 	}
 }
@@ -761,7 +763,7 @@ void ibm8514a_device::ibm8514_desty_w(uint16_t data)
 {
 	ibm8514.line_axial_step = data;
 	ibm8514.dest_y = data;
-	LOG( "8514/A: Line Axial Step / Destination Y write %04x\n",data);
+	LOG("8514/A: Line Axial Step / Destination Y write %04x\n", data);
 }
 
 /*
@@ -786,7 +788,7 @@ void ibm8514a_device::ibm8514_destx_w(uint16_t data)
 {
 	ibm8514.line_diagonal_step = data;
 	ibm8514.dest_x = data;
-	LOG( "8514/A: Line Diagonal Step / Destination X write %04x\n",data);
+	LOG("8514/A: Line Diagonal Step / Destination X write %04x\n", data);
 }
 
 /*
@@ -938,7 +940,7 @@ void ibm8514a_device::ibm8514_ssv_w(uint16_t data)
 		ibm8514_draw_ssv(data >> 8);
 		ibm8514_draw_ssv(data & 0xff);
 	}
-	LOG( "8514/A: Short Stroke Vector write %04x\n",data);
+	LOG("8514/A: Short Stroke Vector write %04x\n", data);
 }
 
 void ibm8514a_device::ibm8514_wait_draw_vector()
@@ -1028,7 +1030,7 @@ uint16_t ibm8514a_device::ibm8514_width_r()
 void ibm8514a_device::ibm8514_width_w(uint16_t data)
 {
 	ibm8514.rect_width = data & 0x1fff;
-	LOG( "8514/A: Major Axis Pixel Count / Rectangle Width write %04x\n",data);
+	LOG("8514/A: Major Axis Pixel Count / Rectangle Width write %04x\n", data);
 }
 
 uint16_t ibm8514a_device::ibm8514_currentx_r()
@@ -1040,7 +1042,7 @@ void ibm8514a_device::ibm8514_currentx_w(uint16_t data)
 {
 	ibm8514.curr_x = data;
 	ibm8514.prev_x = data;
-	LOG( "8514/A: Current X set to %04x (%i)\n",data,ibm8514.curr_x);
+	LOG("8514/A: Current X set to %04x (%i)\n", data, ibm8514.curr_x);
 }
 
 uint16_t ibm8514a_device::ibm8514_currenty_r()
@@ -1052,7 +1054,7 @@ void ibm8514a_device::ibm8514_currenty_w(uint16_t data)
 {
 	ibm8514.curr_y = data;
 	ibm8514.prev_y = data;
-	LOG( "8514/A: Current Y set to %04x (%i)\n",data,ibm8514.curr_y);
+	LOG("8514/A: Current Y set to %04x (%i)\n", data, ibm8514.curr_y);
 }
 
 uint16_t ibm8514a_device::ibm8514_fgcolour_r()
@@ -1063,7 +1065,7 @@ uint16_t ibm8514a_device::ibm8514_fgcolour_r()
 void ibm8514a_device::ibm8514_fgcolour_w(uint16_t data)
 {
 	ibm8514.fgcolour = data;
-	LOG( "8514/A: Foreground Colour write %04x\n",data);
+	LOG("8514/A: Foreground Colour write %04x\n", data);
 }
 
 uint16_t ibm8514a_device::ibm8514_bgcolour_r()
@@ -1074,7 +1076,7 @@ uint16_t ibm8514a_device::ibm8514_bgcolour_r()
 void ibm8514a_device::ibm8514_bgcolour_w(uint16_t data)
 {
 	ibm8514.bgcolour = data;
-	LOG( "8514/A: Background Colour write %04x\n",data);
+	LOG("8514/A: Background Colour write %04x\n", data);
 }
 
 /*
@@ -1096,7 +1098,7 @@ uint16_t ibm8514a_device::ibm8514_read_mask_r()
 void ibm8514a_device::ibm8514_read_mask_w(uint16_t data)
 {
 	ibm8514.read_mask = (ibm8514.read_mask & 0xffff0000) | data;
-	LOG( "8514/A: Read Mask (Low) write = %08x\n",ibm8514.read_mask);
+	LOG("8514/A: Read Mask (Low) write = %08x\n", ibm8514.read_mask);
 }
 
 /*
@@ -1117,7 +1119,7 @@ uint16_t ibm8514a_device::ibm8514_write_mask_r()
 void ibm8514a_device::ibm8514_write_mask_w(uint16_t data)
 {
 	ibm8514.write_mask = (ibm8514.write_mask & 0xffff0000) | data;
-	LOG( "8514/A: Write Mask (Low) write = %08x\n",ibm8514.write_mask);
+	LOG("8514/A: Write Mask (Low) write = %08x\n", ibm8514.write_mask);
 }
 
 uint16_t ibm8514a_device::ibm8514_multifunc_r()
@@ -1136,7 +1138,7 @@ uint16_t ibm8514a_device::ibm8514_multifunc_r()
 		return ibm8514.scissors_right;
 		// TODO: remaining functions
 	default:
-		LOG( "8514/A: Unimplemented multifunction register %i selected\n",ibm8514.multifunc_sel);
+		LOG("8514/A: Unimplemented multifunction register %i selected\n", ibm8514.multifunc_sel);
 		return 0xff;
 	}
 }
@@ -1153,7 +1155,7 @@ bit  0-10  (911/924) Rectangle Height. Height of BITBLT or rectangle command.
 */
 	case 0x0000:
 		ibm8514.rect_height = data & 0x0fff;
-		LOG( "8514/A: Minor Axis Pixel Count / Rectangle Height write %04x\n",data);
+		LOG("8514/A: Minor Axis Pixel Count / Rectangle Height write %04x\n", data);
 		break;
 /*
 BEE8h index 01h W(R/W):  Top Scissors Register (SCISSORS_T).
@@ -1178,19 +1180,19 @@ bit  0-10  (911,924) Clipping Right Limit. Defines the right bound of the
  */
 	case 0x1000:
 		ibm8514.scissors_top = data & 0x0fff;
-		LOG( "S3: Scissors Top write %04x\n",data);
+		LOG("S3: Scissors Top write %04x\n", data);
 		break;
 	case 0x2000:
 		ibm8514.scissors_left = data & 0x0fff;
-		LOG( "S3: Scissors Left write %04x\n",data);
+		LOG("S3: Scissors Left write %04x\n", data);
 		break;
 	case 0x3000:
 		ibm8514.scissors_bottom = data & 0x0fff;
-		LOG( "S3: Scissors Bottom write %04x\n",data);
+		LOG("S3: Scissors Bottom write %04x\n", data);
 		break;
 	case 0x4000:
 		ibm8514.scissors_right = data & 0x0fff;
-		LOG( "S3: Scissors Right write %04x\n",data);
+		LOG("S3: Scissors Right write %04x\n", data);
 		break;
 /*
 BEE8h index 0Ah W(R/W):  Pixel Control Register (PIX_CNTL).
@@ -1204,11 +1206,11 @@ BIT     2  (911-928) Pack Data. If set image read data is a monochrome bitmap,
  */
 	case 0xa000:
 		ibm8514.pixel_control = data;
-		LOG( "S3: Pixel control write %04x\n",data);
+		LOG("S3: Pixel control write %04x\n", data);
 		break;
 	case 0xe000:
 		ibm8514.multifunc_misc = data;
-		LOG( "S3: Multifunction Miscellaneous write %04x\n",data);
+		LOG("S3: Multifunction Miscellaneous write %04x\n", data);
 		break;
 /*
 BEE8h index 0Fh W(W):  Read Register Select Register (READ_SEL)    (801/5,928)
@@ -1230,10 +1232,10 @@ bit   0-2  (911-928) READ-REG-SEL. Read Register Select. Selects the register
  */
 	case 0xf000:
 		ibm8514.multifunc_sel = data & 0x000f;
-		LOG( "S3: Multifunction select write %04x\n",data);
+		LOG("S3: Multifunction select write %04x\n", data);
 		break;
 	default:
-		LOG( "S3: Unimplemented multifunction register %i write %03x\n",data >> 12,data & 0x0fff);
+		LOG("S3: Unimplemented multifunction register %i write %03x\n", data >> 12, data & 0x0fff);
 		break;
 	}
 }
@@ -1430,7 +1432,7 @@ uint16_t ibm8514a_device::ibm8514_backmix_r()
 void ibm8514a_device::ibm8514_backmix_w(uint16_t data)
 {
 	ibm8514.bgmix = data;
-	LOG( "8514/A: BG Mix write %04x\n",data);
+	LOG("8514/A: BG Mix write %04x\n", data);
 }
 
 uint16_t ibm8514a_device::ibm8514_foremix_r()
@@ -1441,7 +1443,7 @@ uint16_t ibm8514a_device::ibm8514_foremix_r()
 void ibm8514a_device::ibm8514_foremix_w(uint16_t data)
 {
 	ibm8514.fgmix = data;
-	LOG( "8514/A: FG Mix write %04x\n",data);
+	LOG("8514/A: FG Mix write %04x\n", data);
 }
 
 uint16_t ibm8514a_device::ibm8514_pixel_xfer_r(offs_t offset)
@@ -1468,7 +1470,7 @@ void ibm8514a_device::ibm8514_pixel_xfer_w(offs_t offset, uint16_t data)
 	if(ibm8514.state == IBM8514_DRAWING_LINE)
 		ibm8514_wait_draw_vector();
 
-	LOG( "8514/A: Pixel Transfer = %08x\n",ibm8514.pixel_xfer);
+	LOG("8514/A: Pixel Transfer = %08x\n", ibm8514.pixel_xfer);
 }
 
 /*
@@ -1510,20 +1512,20 @@ void ibm8514a_device::ibm8514_htotal_w(offs_t offset, uint8_t data)
 			ibm8514.htotal = data & 0xff;
 			break;
 		case 2:
-			m_vga->port_03c0_w(6,data);
+			m_vga->port_03c0_w(6, data);
 			break;
 		case 3:
-			m_vga->port_03c0_w(7,data);
+			m_vga->port_03c0_w(7, data);
 			break;
 		case 4:
-			m_vga->port_03c0_w(8,data);
+			m_vga->port_03c0_w(8, data);
 			break;
 		case 5:
-			m_vga->port_03c0_w(9,data);
+			m_vga->port_03c0_w(9, data);
 			break;
 	}
 	//vga.crtc.horz_total = data & 0x01ff;
-	LOG( "8514/A: Horizontal total write %04x\n",data);
+	LOG("8514/A: Horizontal total write %04x\n", data);
 }
 
 /*
@@ -1575,7 +1577,7 @@ void ibm8514a_device::ibm8514_subcontrol_w(uint16_t data)
 {
 	ibm8514.subctrl = data;
 	ibm8514.substatus &= ~(data & 0x0f);  // reset interrupts
-//  LOG( "8514/A: Subsystem control write %04x\n",data);
+//  LOG("8514/A: Subsystem control write %04x\n", data);
 }
 
 uint16_t ibm8514a_device::ibm8514_subcontrol_r()
@@ -1627,7 +1629,7 @@ void ibm8514a_device::ibm8514_vtotal_w(uint16_t data)
 {
 	ibm8514.vtotal = data;
 //  vga.crtc.vert_total = data;
-	LOG( "8514/A: Vertical total write %04x\n",data);
+	LOG("8514/A: Vertical total write %04x\n", data);
 }
 
 uint16_t ibm8514a_device::ibm8514_vdisp_r()
@@ -1639,7 +1641,7 @@ void ibm8514a_device::ibm8514_vdisp_w(uint16_t data)
 {
 	ibm8514.vdisp = data;
 //  vga.crtc.vert_disp_end = data >> 3;
-	LOG( "8514/A: Vertical Displayed write %04x\n",data);
+	LOG("8514/A: Vertical Displayed write %04x\n", data);
 }
 
 uint16_t ibm8514a_device::ibm8514_vsync_r()
@@ -1650,7 +1652,7 @@ uint16_t ibm8514a_device::ibm8514_vsync_r()
 void ibm8514a_device::ibm8514_vsync_w(uint16_t data)
 {
 	ibm8514.vsync = data;
-	LOG( "8514/A: Vertical Sync write %04x\n",data);
+	LOG("8514/A: Vertical Sync write %04x\n", data);
 }
 
 void ibm8514a_device::enabled()

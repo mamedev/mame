@@ -4,8 +4,10 @@
 #ifndef MAME_VIDEO_PC_XGA_H
 #define MAME_VIDEO_PC_XGA_H
 
-#include "screen.h"
 #include "pc_vga.h"
+
+#include "screen.h"
+
 
 class xga_copro_device : public device_t
 {

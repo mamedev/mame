@@ -2,15 +2,15 @@
 // copyright-holders:Barry Rodewald
 /*
  * svga_trident.h
- *
- *  Created on: 6/09/2014
  */
 
 #ifndef MAME_BUS_ISA_SVGA_TRIDENT_H
 #define MAME_BUS_ISA_SVGA_TRIDENT_H
 
 #include "isa.h"
+
 #include "video/pc_vga_trident.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -35410,10 +35410,10 @@ streetg2r5                      // (c) 1993
 streetgr3                       // (c) 1993
 
 @source:pc/pcipc.cpp
-pcipc                           //
-pcinv3                          //
-pcipctx                         //
 pciagp                          //
+pcinv3                          //
+pcipc                           //
+pcipctx                         //
 
 @source:pc/pcipc_sis.cpp
 sis85c496                       // 486 motherboards using the SiS 85C496/85C497 chipset

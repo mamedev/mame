@@ -24,19 +24,21 @@ If the output isn't satisfactory, it prints "I/O BOARD FAILURE".
 
 #include "pcshare.h"
 
+#include "bus/isa/isa.h"
+#include "bus/isa/sblaster.h"
+#include "bus/rs232/hlemouse.h"
+#include "bus/rs232/rs232.h"
+
 #include "cpu/i386/i386.h"
+
 #include "machine/ds128x.h"
 #include "machine/ins8250.h"
 #include "machine/nvram.h"
 #include "sound/ad1848.h"
-
-#include "bus/isa/isa.h"
-#include "bus/isa/sblaster.h"
 #include "video/pc_vga_trident.h"
-#include "bus/rs232/hlemouse.h"
-#include "bus/rs232/rs232.h"
 
 #include "screen.h"
+
 
 namespace {
 
@@ -48,7 +50,8 @@ public:
 		, m_isabus(*this, "isa")
 		, m_prgbank(*this, "prgbank")
 		, m_nvram_bank(*this, "nvram_bank")
-		, m_nvram_mem(0x2000){ }
+		, m_nvram_mem(0x2000)
+	{ }
 
 	void pcat_dyn(machine_config &config);
 
