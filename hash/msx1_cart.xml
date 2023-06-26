@@ -9394,7 +9394,6 @@ kept for now until finding out what those bytes affect...
 		<description>Ninja Kopimaru Kun (Japan)</description>
 		<year>1986</year>
 		<publisher>Micro Vox</publisher>
-		<info name="alt_title" value="忍者こぴ丸くん" />
 		<notes><![CDATA[
 To open menu, push SELECT when the first title is displayed otherwise the emulated system keeps rebooting.
 
@@ -9404,6 +9403,7 @@ Extended BASIC applicable: type CALL CPM, _CPM, CALL COPIMARU, or _COPIMARU to o
 
 Right/left cursor keys select tape baud rate 1200/2400 respectively.
 ]]></notes>
+		<info name="alt_title" value="忍者こぴ丸くん" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
