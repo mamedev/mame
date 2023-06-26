@@ -813,7 +813,7 @@ ROM_START( bingor1 )    // Strings: Big Roll / Bingo Roll / 1991 AWR / 1992 Rose
 	ROM_LOAD( "bingor1_24c04a.bin", 0x000000, 0x200, CRC(b169df46) SHA1(ebafc81c6918aae9daa6b90df16161751cfd2590) )
 ROM_END
 
-ROM_START( bingor2 )    // Strings: Euro Bingo / 1988-1992 Rosenauer Electronic Austria.
+ROM_START( bingor2 )    // Strings: Euro Bingo / 1988-1992 Rosenauer Electronic Austria / Paloma elektronik (c)1997.
 	ROM_REGION16_LE( 0x20000, "boot_prg", ROMREGION_ERASE00 )   // i186 code
 	ROM_LOAD16_BYTE( "bingo roll vip2 v26.02.02_l.bin", 0x00000, 0x10000, CRC(40df6ee8) SHA1(1e90ef906e47f95ebde85b6dd32fdfe50c0564fc) )
 	ROM_LOAD16_BYTE( "bingo roll vip2 v26.02.02_h.bin", 0x00001, 0x10000, CRC(9154c183) SHA1(a4060294295a9b8df07ce9fcfeefcf009e129817) )
@@ -916,6 +916,32 @@ ROM_START( bingor6 )    // Strings: 1988-1992 AWR Hard & Soft Austria.
 	ROM_LOAD( "bingor6_24c04a.bin", 0x000000, 0x200, CRC(9d271c5f) SHA1(8ac5c4848fb8d9a156ba760324022839fefcbb72) )
 ROM_END
 
+/* Bell Star Plus
+   1998 Paloma Elektronik.
+
+   Play Star Austria 0316/821193.
+   CBA-Design, Lyon France.
+   
+   Same PCB layout than bingor2, 3, 4
+
+   Serial: 9837
+*/
+ROM_START( bellstrp )  // Strings: Copyright (c) 1998 Paloma Elektronik. Play Star Austria.
+	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )   // i186 code
+	ROM_LOAD16_BYTE( "bellstar+_l.bin", 0x00000, 0x08000, CRC(3fba44ba) SHA1(00d7dae8d3c348dc9dcba4e8a8c6ff9c905471c5) )
+	ROM_LOAD16_BYTE( "bellstar+_h.bin", 0x00001, 0x08000, CRC(c075a069) SHA1(04be952e9c76a43363db7f1f81ad8ba36e925e11) )
+
+	ROM_REGION16_LE( 0x10000, "gfx", ROMREGION_ERASE00 )    // blitter data?
+	ROM_LOAD16_BYTE( "bell_star_plus_-_zgs_l.bin", 0x000000, 0x08000, CRC(2dca3f89) SHA1(dc9ed2793601b161e0afd64d2f5752a9cd2204e7) )
+	ROM_LOAD16_BYTE( "bell_star_plus_-_zgs_h.bin", 0x000001, 0x08000, CRC(fc863c7d) SHA1(487fbbbf7e0be3261e33e81476532ced7c5d9c87) )
+
+	ROM_REGION( 0x1fff, "pic", 0 ) // need decap
+	ROM_LOAD( "pic16c54rc.bin", 0x0000, 0x1fff, NO_DUMP )
+
+	ROM_REGION( 0x20000, "eeprom", 0 )  // eeprom
+	ROM_LOAD( "24c04a.bin", 0x000000, 0x200, CRC(76f2281a) SHA1(bbce75582533747b1eb188ebc1af5eec6075e637) )
+ROM_END
+
 
 ROM_START( vip2000 )
 	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )   // i186 code
@@ -941,12 +967,13 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME     PARENT   MACHINE   INPUT   STATE         INIT        ROT    COMPANY                          FULLNAME                             FLAGS
-GAME( 1992, bingor1, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria?", "Bingo Roll / Bell Star? (set 1)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1992, bingor2, 0,       bingor2,  bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria?", "Bingo Roll / Bell Star? (set 2)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, bingor3, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bingo Roll / Bell Star? (set 3)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, bingor4, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bingo Roll / Bell Star? (set 4)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, bingor5, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bingo Roll / Bell Star V3? (set 5)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1991, bingor6, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "AWR Hard & Soft Austria?",      "Bingo Roll / Turbo Bingo?",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT   MACHINE   INPUT   STATE         INIT        ROT    COMPANY                          FULLNAME                             FLAGS
+GAME( 1992, bingor1,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria?", "Bingo Roll / Bell Star? (set 1)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1992, bingor2,  0,       bingor2,  bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria?", "Bingo Roll / Bell Star? (set 2)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bingor3,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bingo Roll / Bell Star? (set 3)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bingor4,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bingo Roll / Bell Star? (set 4)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bingor5,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bingo Roll / Bell Star V3? (set 5)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1991, bingor6,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "AWR Hard & Soft Austria?",      "Bingo Roll / Turbo Bingo?",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, bellstrp, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bell Star Plus",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2001, vip2000, 0,       vip2000,  bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "unknown 'VIP 2000' game",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2001, vip2000,  0,       vip2000,  bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "unknown 'VIP 2000' game",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
