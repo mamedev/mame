@@ -73,7 +73,8 @@ void konmedal020_state::gs471_main(address_map &map)
 	map(0xe00078, 0xe00079).lrw8([this](offs_t a){ return m_vga->xga_read(0x78 + (a ^ 1)); }, "dstxr",
 			[this](offs_t a, u8 data){ m_vga->xga_write(0x78 + (a ^ 1), data); }, "dstxw");
 	map(0xf003b0, 0xf003df).m(m_vga, FUNC(oak_oti111_vga_device::io_map));
-	map(0xf021e0, 0xf021e9).m(m_vga, FUNC(oak_oti111_vga_device::ramdac_mmio_map));
+	// was 0xf021e0-0xf021e9 (fails -validate)
+	map(0xf021e0, 0xf021ef).m(m_vga, FUNC(oak_oti111_vga_device::ramdac_mmio_map));
 }
 
 static INPUT_PORTS_START( gs471 )
