@@ -55,6 +55,16 @@ private:
 	u32 m_main_scratchpad_id = 0;
 };
 
-DECLARE_DEVICE_TYPE(RIVA128, riva128_device)
+class riva128zx_device : public riva128_device
+{
+public:
+	riva128zx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+DECLARE_DEVICE_TYPE(RIVA128,   riva128_device)
+DECLARE_DEVICE_TYPE(RIVA128ZX, riva128zx_device)
 
 #endif // MAME_VIDEO_RIVA128_H
