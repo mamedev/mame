@@ -14,6 +14,7 @@
 
 #include "emu.h"
 #include "sis85c496.h"
+
 #include "bus/pc_kbd/keyboards.h"
 #include "speaker.h"
 
@@ -24,6 +25,13 @@ void sis85c496_host_device::config_map(address_map &map)
 	pci_host_device::config_map(map);
 	map(0x40, 0x40).rw(FUNC(sis85c496_host_device::dram_config_r), FUNC(sis85c496_host_device::dram_config_w));
 	map(0x44, 0x45).rw(FUNC(sis85c496_host_device::shadow_config_r), FUNC(sis85c496_host_device::shadow_config_w));
+	map(0x48, 0x4f).lrw8(
+		NAME([this] (offs_t offset) { return m_dram_boundary[offset]; }),
+		NAME([this] (offs_t offset, u8 data) {
+			logerror("SiS496: DRAM boundary [%02x] set %02x\n", offset, data);
+			m_dram_boundary[offset] = data;
+		})
+	);
 	map(0x5a, 0x5a).rw(FUNC(sis85c496_host_device::smram_ctrl_r), FUNC(sis85c496_host_device::smram_ctrl_w));
 	map(0xc8, 0xcb).rw(FUNC(sis85c496_host_device::mailbox_r), FUNC(sis85c496_host_device::mailbox_w));
 	map(0xd0, 0xd0).rw(FUNC(sis85c496_host_device::bios_config_r), FUNC(sis85c496_host_device::bios_config_w));
@@ -112,6 +120,11 @@ void sis85c496_host_device::device_add_mconfig(machine_config &config)
 	m_ds12885->irq().set(m_pic8259_slave, FUNC(pic8259_device::ir0_w));
 	m_ds12885->set_century_index(0x32);
 
+	// TODO: ISA bus clock, irqs
+	ISA16(config, m_isabus, 0);
+	m_isabus->set_memspace(m_maincpu, AS_PROGRAM);
+	m_isabus->set_iospace(m_maincpu, AS_IO);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -130,6 +143,7 @@ sis85c496_host_device::sis85c496_host_device(const machine_config &mconfig, cons
 	m_speaker(*this, "speaker"),
 	m_ds12885(*this, "rtc"),
 	m_pc_kbdc(*this, "kbd"),
+	m_isabus(*this, "isabus"),
 	m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_at_speaker(0), m_refresh(false), m_channel_check(0), m_nmi_enabled(0)
 {
 }
@@ -166,6 +180,8 @@ void sis85c496_host_device::device_start()
 	m_smramctrl = 0;
 
 	ram.resize(ram_size/4);
+
+	save_item(NAME(m_shadctrl));
 }
 
 void sis85c496_host_device::reset_all_mappings()
@@ -189,6 +205,15 @@ void sis85c496_host_device::device_reset()
 	m_isa_decoder = 0xff;
 	m_shadctrl = 0;
 	m_smramctrl = 0;
+}
+
+void sis85c496_host_device::device_config_complete()
+{
+	auto isabus = m_isabus.finder_target();
+	isabus.first.subdevice<isa16_device>(isabus.second)->set_memspace(m_maincpu, AS_PROGRAM);
+	isabus.first.subdevice<isa16_device>(isabus.second)->set_iospace(m_maincpu, AS_IO);
+
+	pci_device::device_config_complete();
 }
 
 void sis85c496_host_device::map_bios(address_space *memory_space, uint32_t start, uint32_t end)
@@ -221,12 +246,12 @@ void sis85c496_host_device::map_extra(uint64_t memory_window_start, uint64_t mem
 		if (m_smramctrl & 0x08)
 		{
 			memory_space->install_ram(0x000e0000, 0x000effff, &ram[0x000b0000/4]);
-			logerror("Sis496: SMRAM at Exxxx, phys Bxxxx\n");
+			logerror("SiS496: SMRAM at Exxxx, phys Bxxxx\n");
 		}
 		else
 		{
 			memory_space->install_ram(0x000e0000, 0x000effff, &ram[0x000a0000/4]);
-			logerror("Sis496: SMRAM at Exxxx, phys Axxxx\n");
+			logerror("SiS496: SMRAM at Exxxx, phys Axxxx\n");
 		}
 
 		// map the high BIOS at FFFExxxx if enabled
@@ -312,8 +337,12 @@ void sis85c496_host_device::map_extra(uint64_t memory_window_start, uint64_t mem
 	// is SMRAM enabled at 6xxxx?
 	if ((m_smramctrl & 0x12) == 0x02)
 	{
-		fatalerror("Sis486: SMRAM enabled at 6xxxx, not yet supported!\n");
+		throw emu_fatalerror("SiS496: SMRAM enabled at 6xxxx, not yet supported!\n");
 	}
+
+	// TODO: determined by ISA decoder
+	m_isabus->remap(AS_PROGRAM, 0, 1 << 24);
+	m_isabus->remap(AS_IO, 0, 0xffff);
 
 	if (m_isa_decoder & 0x01)
 	{

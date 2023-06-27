@@ -12,6 +12,7 @@
 #include "machine/pit8253.h"
 
 #include "bus/ata/ataintf.h"
+#include "bus/isa/isa.h"
 #include "machine/at_keybc.h"
 
 #include "sound/spkrdev.h"
@@ -48,6 +49,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_config_complete() override;
 
 	void map_bios(address_space *memory_space, uint32_t start, uint32_t end);
 	void map_shadowram(address_space *memory_space, offs_t addrstart, offs_t addrend, void *baseptr);
@@ -70,6 +72,7 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ds12885_device> m_ds12885;
 	required_device<pc_kbdc_device> m_pc_kbdc;
+	required_device<isa16_device> m_isabus;
 
 	uint8_t m_at_spkrdata;
 	uint8_t m_pit_out2;
@@ -91,6 +94,7 @@ private:
 	uint8_t m_bios_config, m_dram_config, m_isa_decoder;
 	uint16_t m_shadctrl;
 	uint8_t m_smramctrl;
+	u8 m_dram_boundary[8]{};
 
 	void internal_io_map(address_map &map);
 
