@@ -28474,6 +28474,9 @@ bingor3                         // (c) 2002 Unknown
 bingor4                         // (c) 2002 Unknown
 bingor5                         // (c) 2002 Unknown
 bingor6                         // (c) 1991 AWR Hard & Soft
+roljokr1                        // (c) 1999 Paloma-Elektronik
+roljokr2                        // (c) 1997 Paloma-Elektronik
+roljokr3                        // (c) 1999 Paloma-Elektronik
 vip2000                         // (c) Paloma-Elektronik
 
 @source:misc/blitz68k.cpp

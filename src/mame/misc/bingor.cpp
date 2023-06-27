@@ -964,6 +964,79 @@ ROM_START( vip2000 )
 	ROM_LOAD( "24c04a.bin", 0x000, 0x200, CRC(4e231420) SHA1(24dcfc90ef9903692030be7de0f04fc9370021fd) )
 ROM_END
 
+
+/* Rolling Joker
+   1998 Paloma Elektronik.
+
+   Same PCB layout than bingor2, 3, 4
+
+   Serial: 9813
+*/
+ROM_START( roljokr1 )  // Strings: 
+	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )   // i186 code
+	ROM_LOAD16_BYTE( "rol_l.bin", 0x00000, 0x08000, CRC(df4b5758) SHA1(88dfc7a623e4f200d4c90e6118e1a101242cb8ab) )
+	ROM_LOAD16_BYTE( "rol_h.bin", 0x00001, 0x08000, CRC(02bf6d89) SHA1(57f0bfeb6ad579b7bb0a022b2c1acd217ccae995) )
+
+	ROM_REGION16_LE( 0x10000, "gfx", ROMREGION_ERASE00 )    // blitter data?
+	ROM_LOAD16_BYTE( "rolling_joker_grafik_l.bin", 0x000000, 0x08000, CRC(82069002) SHA1(7b5717b79a691e6ba13664f6fa275fcdda449e9f) )
+	ROM_LOAD16_BYTE( "rolling_joker_grafik_h.bin", 0x000001, 0x08000, CRC(3bc2e264) SHA1(25d35a399b3f60dd37b12461eede21c0a3fb5fb2) )
+
+	ROM_REGION( 0x1fff, "pic", 0 ) // need decap
+	ROM_LOAD( "pic16c54rc.bin", 0x0000, 0x1fff, NO_DUMP )
+
+	ROM_REGION( 0x20000, "eeprom", 0 )  // eeprom
+	ROM_LOAD( "24c04a.bin", 0x000000, 0x200, CRC(a40d8847) SHA1(9856a70a2def59057129fa84dc1a446cdb8e0b76) )
+ROM_END
+
+/* Rolling Joker (v23.11.91)
+   1997 Paloma Elektronik.
+   CBA-Design, Lyon France.
+
+   Same PCB layout than bingor2, 3, 4
+
+   Serial: 9813
+*/
+ROM_START( roljokr2 )  // Strings: 1993-1997 Karmen International. (c) 1997 Paloma elektronik. CBA-Design, Lyon France.
+	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )   // i186 code
+	ROM_LOAD16_BYTE( "rolling_joker_v23.11.91_l.bin", 0x00000, 0x08000, CRC(fbc47b7f) SHA1(d672835e6a05606aee741514994f93d45ef8cd57) )
+	ROM_LOAD16_BYTE( "rolling_joker_v23.11.91_h.bin", 0x00001, 0x08000, CRC(9fecbda3) SHA1(22c1f03197034e36f2881b784965a81b461d5427) )
+
+	ROM_REGION16_LE( 0x10000, "gfx", ROMREGION_ERASE00 )    // blitter data?
+	ROM_LOAD16_BYTE( "rolling_joker_grafik_l.bin", 0x000000, 0x08000, CRC(82069002) SHA1(7b5717b79a691e6ba13664f6fa275fcdda449e9f) )
+	ROM_LOAD16_BYTE( "rolling_joker_grafik_h.bin", 0x000001, 0x08000, CRC(3bc2e264) SHA1(25d35a399b3f60dd37b12461eede21c0a3fb5fb2) )
+
+	ROM_REGION( 0x1fff, "pic", 0 ) // need decap
+	ROM_LOAD( "pic16c54rc.bin", 0x0000, 0x1fff, NO_DUMP )
+
+	ROM_REGION( 0x20000, "eeprom", 0 )  // eeprom
+	ROM_LOAD( "24c04a.bin", 0x000000, 0x200, CRC(50386e87) SHA1(5f179cc3c5ff43957b2489b97c4227ee9bf16fc2) )
+ROM_END
+
+/* Rolling Joker (v.99.7)
+   1999 Paloma Elektronik.
+   CBA-Design, Lyon France.
+
+   Same PCB layout than bingor2, 3, 4
+
+   Serial: 9730
+*/
+ROM_START( roljokr3 )  // Strings: (c) 1999 Paloma elektronik. CBA-Design, Lyon France.
+	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )   // i186 code
+	ROM_LOAD16_BYTE( "rolling_joker_v.99.7_l.bin", 0x00000, 0x08000, CRC(4f9aca58) SHA1(e524b85d30b6625eec4afd9b19023e6baca1d5f3) )
+	ROM_LOAD16_BYTE( "rolling_joker_v.99.7_h.bin", 0x00001, 0x08000, CRC(2fe68133) SHA1(c44c778b5495c9545ca77efec1cb875844c0cbb3) )
+
+	ROM_REGION16_LE( 0x10000, "gfx", ROMREGION_ERASE00 )    // blitter data?
+	ROM_LOAD16_BYTE( "rolling_joker_grafik_l.bin", 0x000000, 0x08000, CRC(82069002) SHA1(7b5717b79a691e6ba13664f6fa275fcdda449e9f) )
+	ROM_LOAD16_BYTE( "rolling_joker_grafik_h.bin", 0x000001, 0x08000, CRC(3bc2e264) SHA1(25d35a399b3f60dd37b12461eede21c0a3fb5fb2) )
+
+	ROM_REGION( 0x1fff, "pic", 0 ) // need decap
+	ROM_LOAD( "pic16c54rc.bin", 0x0000, 0x1fff, NO_DUMP )
+
+	ROM_REGION( 0x20000, "eeprom", 0 )  // eeprom
+	ROM_LOAD( "24c04a.bin", 0x000000, 0x200, CRC(33cb4f30) SHA1(bd48d4194237c60bdc0108daf26a8689428b38f0) )
+ROM_END
+
+
 } // anonymous namespace
 
 
@@ -977,3 +1050,7 @@ GAME( 1991, bingor6,  0,       bingor,   bingor, bingor_state, empty_init, ROT0,
 GAME( 1998, bellstrp, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bell Star Plus",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 GAME( 2001, vip2000,  0,       vip2000,  bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "unknown 'VIP 2000' game",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+GAME( 1999, roljokr1, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Rolling Joker",                      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, roljokr2, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Rolling Joker (v23.11.91)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, roljokr3, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Rolling Joker (v.99.7)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
