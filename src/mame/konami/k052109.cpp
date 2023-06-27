@@ -118,8 +118,8 @@ EXTRA ADDRESSING SPACE USED BY X-MEN:
 4800-4fff: layer A tilemap (code high bits)
 5000-57ff: layer B tilemap (code high bits)
 
-The main CPU doesn't have direct acces to the RAM used by the 052109, it has
-to through the chip.
+The main CPU doesn't have direct access to the RAM used by the 052109; it has
+to go through the chip (8 bits at a time, even on 68000-based systems).
 */
 
 #include "emu.h"
@@ -484,19 +484,6 @@ void k052109_device::write(offs_t offset, u8 data)
 		}
 		//else logerror("%s: write %02x to unknown 052109 address %04x\n",machine().describe_context(),data,offset);
 	}
-}
-
-u16 k052109_device::word_r(offs_t offset)
-{
-	return read(offset + 0x2000) | (read(offset) << 8);
-}
-
-void k052109_device::word_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	if (ACCESSING_BITS_8_15)
-		write(offset, (data >> 8) & 0xff);
-	if (ACCESSING_BITS_0_7)
-		write(offset + 0x2000, data & 0xff);
 }
 
 void k052109_device::set_rmrd_line( int state )
