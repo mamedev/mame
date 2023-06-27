@@ -567,6 +567,68 @@ static INPUT_PORTS_START( redline )
 	PORT_DIPSETTING(    0x00, "On (Ein)" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( fruitstr )
+	PORT_INCLUDE( supercrd )
+	PORT_MODIFY("SW1")
+	PORT_DIPNAME( 0x01, 0x01, "Hopper")                 PORT_DIPLOCATION("DSW:1")
+	PORT_DIPSETTING(    0x01, "Off (Aus)" )
+	PORT_DIPSETTING(    0x00, "On (Ein)" )
+	PORT_DIPNAME( 0x02, 0x02, "Max. Win")               PORT_DIPLOCATION("DSW:2")
+	PORT_DIPSETTING(    0x02, "200" )
+	PORT_DIPSETTING(    0x00, "300" )
+
+	PORT_DIPNAME( 0x04, 0x04, "Coin 1 (Muenzen 1)" )    PORT_DIPLOCATION("DSW:3")
+	PORT_DIPSETTING(    0x04, "5" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPNAME( 0x08, 0x08, "Coin 2 (Muenzen 2)" )    PORT_DIPLOCATION("DSW:4")
+	PORT_DIPSETTING(    0x08, "5" )
+	PORT_DIPSETTING(    0x00, "2" )
+
+	PORT_DIPNAME( 0x10, 0x10, "Remote")                 PORT_DIPLOCATION("DSW:5")
+	PORT_DIPSETTING(    0x10, "100" )
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPNAME( 0x20, 0x20, "DSW6")                   PORT_DIPLOCATION("DSW:6")
+	PORT_DIPSETTING(    0x20, "Off (Aus)" )
+	PORT_DIPSETTING(    0x00, "On (Ein)" )
+	PORT_DIPNAME( 0x40, 0x40, "DSW7")                   PORT_DIPLOCATION("DSW:7")
+	PORT_DIPSETTING(    0x40, "Off (Aus)" )
+	PORT_DIPSETTING(    0x00, "On (Ein)" )
+	PORT_DIPNAME( 0x80, 0x80, "BH")                     PORT_DIPLOCATION("DSW:8")
+	PORT_DIPSETTING(    0x80, "Dreifach")
+	PORT_DIPSETTING(    0x00, "Normalg")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( fruitstra )
+	PORT_INCLUDE( supercrd )
+	PORT_MODIFY("SW1")
+	PORT_DIPNAME( 0x01, 0x01, "Hopper")                 PORT_DIPLOCATION("DSW:1")
+	PORT_DIPSETTING(    0x01, "Off (Aus)" )
+	PORT_DIPSETTING(    0x00, "On (Ein)" )
+	PORT_DIPNAME( 0x02, 0x02, "DSW2")                   PORT_DIPLOCATION("DSW:2")
+	PORT_DIPSETTING(    0x02, "Off (Aus)" )
+	PORT_DIPSETTING(    0x00, "On (Ein)" )
+
+	PORT_DIPNAME( 0x04, 0x04, "Coin 1 (Muenzen 1)" )    PORT_DIPLOCATION("DSW:3")
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x08, 0x08, "Coin 2 (Muenzen 2)" )    PORT_DIPLOCATION("DSW:4")
+	PORT_DIPSETTING(    0x08, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+
+	PORT_DIPNAME( 0x10, 0x10, "DSW5")                   PORT_DIPLOCATION("DSW:5")
+	PORT_DIPSETTING(    0x10, "Off (Aus)" )
+	PORT_DIPSETTING(    0x00, "On (Ein)" )
+	PORT_DIPNAME( 0x20, 0x20, "Wechsler" )              PORT_DIPLOCATION("DSW:6")
+	PORT_DIPSETTING(    0x20, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x40, 0x40, "DSW7")                   PORT_DIPLOCATION("DSW:7")
+	PORT_DIPSETTING(    0x40, "Off (Aus)" )
+	PORT_DIPSETTING(    0x00, "On (Ein)" )
+	PORT_DIPNAME( 0x80, 0x80, "BH")                     PORT_DIPLOCATION("DSW:8")
+	PORT_DIPSETTING(    0x80, "Dreifach")
+	PORT_DIPSETTING(    0x00, "Normal")
+INPUT_PORTS_END
+
 
 /*************************
 *    Graphics Layouts    *
@@ -1171,12 +1233,12 @@ void supercrd_state::init_supst() // TODO: check unknown opcodes
 } // anonymous namespace
 
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY      FULLNAME                          FLAGS
-GAME( 1992, supercrd,  0,        supercrd, supercrd, supercrd_state, init_supercrd, ROT0,  "Fun World", "Super Card (v417, encrypted)",   MACHINE_NOT_WORKING )
-GAME( 1992, fruitstr,  0,        supercrd, supercrd, supercrd_state, init_fruitstr, ROT0,  "Fun World", "Fruit Star (T10S, encrypted)",   MACHINE_NOT_WORKING )
-GAME( 1992, fruitstra, fruitstr, supercrd, supercrd, supercrd_state, init_fruitstr, ROT0,  "Fun World", "Fruit Star (v810, encrypted)",   MACHINE_NOT_WORKING )
-GAME( 1990, gampo816,  0,        supercrd, supercrd, supercrd_state, init_gampo,    ROT0,  "Fun World", "Gamble Poker (v816, encrypted)", MACHINE_NOT_WORKING )
-GAME( 1990, gampo812,  gampo816, supercrd, supercrd, supercrd_state, init_gampo,    ROT0,  "Fun World", "Gamble Poker (v812, encrypted)", MACHINE_NOT_WORKING )
-GAME( 1994, supst839,  0,        supercrd, suprstar, supercrd_state, init_supst,    ROT90, "Fun World", "Super Stars (v839, encrypted)",  MACHINE_NOT_WORKING )
-GAME( 1990, supst834,  supst839, supercrd, supst834, supercrd_state, init_supst,    ROT90, "Fun World", "Super Stars (v834, encrypted)",  MACHINE_NOT_WORKING )
-GAME( 1989, redline,   0,        supercrd, redline,  supercrd_state, init_supst,    ROT90, "Fun World", "Red Line (v808, encrypted)",     MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT           ROT    COMPANY      FULLNAME                          FLAGS
+GAME( 1992, supercrd,  0,        supercrd, supercrd,  supercrd_state, init_supercrd, ROT0,  "Fun World", "Super Card (v417, encrypted)",   MACHINE_NOT_WORKING )
+GAME( 1992, fruitstr,  0,        supercrd, fruitstr,  supercrd_state, init_fruitstr, ROT0,  "Fun World", "Fruit Star (T10S, encrypted)",   MACHINE_NOT_WORKING )
+GAME( 1992, fruitstra, fruitstr, supercrd, fruitstra, supercrd_state, init_fruitstr, ROT0,  "Fun World", "Fruit Star (v810, encrypted)",   MACHINE_NOT_WORKING )
+GAME( 1990, gampo816,  0,        supercrd, supercrd,  supercrd_state, init_gampo,    ROT0,  "Fun World", "Gamble Poker (v816, encrypted)", MACHINE_NOT_WORKING )
+GAME( 1990, gampo812,  gampo816, supercrd, supercrd,  supercrd_state, init_gampo,    ROT0,  "Fun World", "Gamble Poker (v812, encrypted)", MACHINE_NOT_WORKING )
+GAME( 1994, supst839,  0,        supercrd, suprstar,  supercrd_state, init_supst,    ROT90, "Fun World", "Super Stars (v839, encrypted)",  MACHINE_NOT_WORKING )
+GAME( 1990, supst834,  supst839, supercrd, supst834,  supercrd_state, init_supst,    ROT90, "Fun World", "Super Stars (v834, encrypted)",  MACHINE_NOT_WORKING )
+GAME( 1989, redline,   0,        supercrd, redline,   supercrd_state, init_supst,    ROT90, "Fun World", "Red Line (v808, encrypted)",     MACHINE_NOT_WORKING )
