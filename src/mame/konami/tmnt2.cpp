@@ -236,7 +236,6 @@ public:
 	void glfgreat(machine_config &config);
 
 private:
-	void k053251_glfgreat_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t controller_r();
 	uint16_t glfgreat_rom_r(offs_t offset);
 	void glfgreat_122000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -1236,10 +1235,6 @@ void tmnt2_state::screen_vblank_blswhstl(int state)
 	}
 }
 
-
-
-
-
 void tmnt2_state::punkshot_main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
@@ -1304,25 +1299,6 @@ void tmnt2_state::blswhstl_main_map(address_map &map)
 	map(0x780600, 0x780603).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x780604, 0x780605).w(FUNC(tmnt2_state::ssriders_soundkludge_w));
 	map(0x780700, 0x78071f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
-}
-
-void glfgreat_state::k053251_glfgreat_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (ACCESSING_BITS_8_15)
-	{
-		m_k053251->write(offset, (data >> 8) & 0xff);
-
-		/* FIXME: in the old code k052109 tilemaps were tilemaps 2,3,4 for k053251
-		and got marked as dirty in the write above... how was the original hardware working?!? */
-		for (int i = 0; i < 3; i++)
-		{
-			if (m_k053251->get_tmap_dirty(2 + i))
-			{
-				m_k052109->tilemap_mark_dirty(i);
-				m_k053251->set_tmap_dirty(2 + i, 0);
-			}
-		}
-	}
 }
 
 uint8_t glfgreat_state::controller_r()

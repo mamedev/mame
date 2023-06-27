@@ -497,12 +497,6 @@ int k052109_device::get_rmrd_line( )
 }
 
 
-void k052109_device::tilemap_mark_dirty( int tmap_num )
-{
-	m_tilemap[tmap_num]->mark_all_dirty();
-}
-
-
 void k052109_device::tilemap_update( )
 {
 	int xscroll, yscroll, offs;

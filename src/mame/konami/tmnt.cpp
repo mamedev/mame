@@ -158,7 +158,7 @@ private:
 	// misc
 	int        m_tmnt_soundlatch = 0;
 	int        m_last = 0;
-	uint16_t   m_cuebrick_nvram[0x400 * 0x20 / 2];  // 32k paged in a 1k window
+	uint16_t   m_cuebrick_nvram[0x400 * 0x20 / 2]{}; // 32k paged in a 1k window
 
 	// devices
 	required_device<cpu_device> m_maincpu;
