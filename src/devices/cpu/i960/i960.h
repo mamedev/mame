@@ -110,7 +110,12 @@ union ExtendedReal {
      * @brief The underlying three register's worth of space required for correctness.
      */
     Ordinal storage[3];
+    ExtendedReal& operator=(const int value) noexcept {
+        floatValue = value;
+        return *this;
+    }
 };
+
 
 class i960_cpu_device :  public cpu_device
 {
