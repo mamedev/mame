@@ -1751,7 +1751,7 @@ GAME( 1989, tmntu,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,  
 GAME( 1989, tmntua,      tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version N)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1989, tmntub,      tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version J)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1989, tmntuc,      tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version H)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmntucbl,    tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "bootleg", "Teenage Mutant Ninja Turtles (bootleg, US 4 Players, version H)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Needs MC68705R3P / Oki M5205 hook up
+GAME( 1989, tmntucbl,    tmnt,     tmntucbl, tmnt,      tmnt_state, init_tmnt,   ROT0,   "bootleg", "Teenage Mutant Ninja Turtles (bootleg, US 4 Players, version H)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Needs MC68705R3P / Oki M5205 hook up
 GAME( 1989, tmht,        tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version F)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1989, tmhta,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version S)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1989, tmhtb,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version ?)",           MACHINE_SUPPORTS_SAVE )
