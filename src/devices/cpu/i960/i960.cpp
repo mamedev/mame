@@ -2370,24 +2370,32 @@ std::unique_ptr<util::disasm_interface> i960_cpu_device::create_disassembler()
 	return std::make_unique<i960_disassembler>();
 }
 
-void i960_cpu_device::movre() 
+void i960_cpu_device::movre(uint32_t opcode) 
 {
     uint32_t *src=nullptr, *dst=nullptr;
 
+    /// @todo figure out why we are subtracting not adding
     m_icount -= 8;
 
     if(!(opcode & 0x00000800)) {
-        src = (uint32_t *)&m_r[opcode & 0x1e];
+        /// @todo I don't believe that the i960SB does auto alignment of
+        /// registers to quad register boundaries. Check and see with real
+        /// hardware if that is the case.
+        src = static_cast<uint32_t*>(&m_r[opcode & 0x1e]);
     } else {
-        int idx = opcode & 0x1f;
-        if(idx < 4)
-            src = (uint32_t *)&m_fp[idx];
+        if(auto idx = opcode & 0x1f; idx < 4) {
+            src = static_cast<uint32_t*>(&m_fp[idx]);
+        }
     }
 
-    if(!(opcode & 0x00002000)) {
-        dst = (uint32_t *)&m_r[(opcode>>19) & 0x1e];
-    } else if(!(opcode & 0x00e00000))
-        dst = (uint32_t *)&m_fp[(opcode>>19) & 3];
+    if(auto srcDestIndex = opcode >> 19 & 0x1f; !(opcode & 0x00002000)) {
+        /// @todo I don't believe that the i960SB does auto alignment of
+        /// registers to quad register boundaries. Check and see with real
+        /// hardware if that is the case.
+        dst = static_cast<uint32_t*>(&m_r[srcDestIndex & 0b11100]);
+    } else if(!(opcode & 0x00e00000)) {
+        dst = static_cast<uint32_t*>(&m_fp[srcDestIndex & 0b00011]);
+    }
 
     dst[0] = src[0];
     dst[1] = src[1];

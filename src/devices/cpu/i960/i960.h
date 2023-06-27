@@ -227,7 +227,7 @@ private:
 	void do_ret_0();
 	void do_ret();
 private:
-    void movre();
+    void movre(uint32_t opcode);
 };
 
 
