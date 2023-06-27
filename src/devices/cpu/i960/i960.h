@@ -4,7 +4,6 @@
 #define MAME_CPU_I960_I960_H
 
 #pragma once
-#include <type_traits>
 #include <cstdint>
 
 enum
