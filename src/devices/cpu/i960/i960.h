@@ -103,6 +103,8 @@ public:
      * space is always available.
      */
     union ExtendedReal {
+        constexpr ExtendedReal() : floatValue(0.0) { }
+        explicit constexpr ExtendedReal(long double fval) : floatValue(fval) { }
         /**
          * @brief the float as a long double in all cases, on non x86 platforms
          * this usually is an alias for double so it will be safe to just use
