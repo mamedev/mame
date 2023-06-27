@@ -4502,6 +4502,12 @@ Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
 
 	<!-- The Sega Direct version shares the same disc as the regular edition (T-47801M) but comes with a bonus CD. -->
 	<software name="cfieldsd" cloneof="cfield" supported="no">
+		<!--
+		<rom name="Chaos Field v1.003 (2004)(Milestone)(NTSC)(JP)(en)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
+		<rom name="track01.bin" size="705600" md5="b00f57ae7e87793842232c5079006103" sha1="fc642d6e85015273870c4aa49d7cd50cca842195"/>
+		<rom name="track02.raw" size="1949808" md5="c3d6946b633e1f28e565e7f8b04c9fef" sha1="febb49adb703b3735a0161964388d527d3c4875c"/>
+		<rom name="track03.bin" size="1185760800" md5="4ebdadcf6dcc58f8d953ba3eeb7e91af" sha1="7b1a382a46516d72b53f7ab4d8d516383d247635"/>
+		-->
 		<description>Chaos Field (Japan, Sega Direct)</description>
 		<year>2004</year>
 		<publisher>Milestone Inc.</publisher>
@@ -4527,6 +4533,12 @@ Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
 
 	<!-- The Sega Direct version shares the same disc as the regular edition (T-47801M) but comes with a bonus CD. -->
 	<software name="cfieldsd1" cloneof="cfield" supported="no">
+		<!--
+		<rom name="Chaos Field v1.003 (2004)(Milestone)(NTSC)(JP)(en)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
+		<rom name="track01.bin" size="705600" md5="b00f57ae7e87793842232c5079006103" sha1="fc642d6e85015273870c4aa49d7cd50cca842195"/>
+		<rom name="track02.raw" size="1949808" md5="c3d6946b633e1f28e565e7f8b04c9fef" sha1="febb49adb703b3735a0161964388d527d3c4875c"/>
+		<rom name="track03.bin" size="1185760800" md5="4ebdadcf6dcc58f8d953ba3eeb7e91af" sha1="7b1a382a46516d72b53f7ab4d8d516383d247635"/>
+		-->
 		<description>Chaos Field (Japan, Sega Direct, rev. 1)</description>
 		<year>2004</year>
 		<publisher>Milestone Inc.</publisher>
