@@ -317,7 +317,7 @@ void i960_cpu_device::set_rif(uint32_t opcode, RawExtendedReal val)
 	if(!(opcode & 0x00002000))
 		m_r[(opcode>>19) & 0x1f] = f2u(val);
 	else if(!(opcode & 0x00e00000))
-		m_fp[(opcode>>19) & 3] = val;
+		m_fp[(opcode>>19) & 3].floatValue = val;
 	else
 		fatalerror("I960: %x: set_rif on literal?\n", m_PIP);
 }
@@ -385,7 +385,7 @@ void i960_cpu_device::set_rifl(uint32_t opcode, RawExtendedReal val)
 		m_r[(opcode>>19) & 0x1e] = v;
 		m_r[((opcode>>19) & 0x1e)+1] = v>>32;
 	} else if(!(opcode & 0x00e00000))
-		m_fp[(opcode>>19) & 3] = val;
+		m_fp[(opcode>>19) & 3].floatValue = val;
 	else
 		fatalerror("I960: %x: set_rifl on literal?\n", m_PIP);
 }
@@ -2432,7 +2432,8 @@ void i960_cpu_device::movre(uint32_t opcode)
         src = static_cast<uint32_t*>(&m_r[opcode & 0x1e]);
     } else {
         if(auto idx = opcode & 0x1f; idx < 4) {
-            src = static_cast<uint32_t*>(&m_fp[idx]);
+            // allow pointer decay
+            src = m_fp[idx].storage;
         }
     }
 
@@ -2442,7 +2443,7 @@ void i960_cpu_device::movre(uint32_t opcode)
         /// hardware if that is the case.
         dst = static_cast<uint32_t*>(&m_r[srcDestIndex & 0b11100]);
     } else if(!(opcode & 0x00e00000)) {
-        dst = static_cast<uint32_t*>(&m_fp[srcDestIndex & 0b00011]);
+        dst = m_fp[srcDestIndex & 0b00011].storage;
     }
 
     dst[0] = src[0];
