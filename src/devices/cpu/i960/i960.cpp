@@ -260,35 +260,59 @@ void i960_cpu_device::set_ri64(uint32_t opcode, uint64_t val)
 		fatalerror("I960: %x: set_ri64 on literal?\n", m_PIP);
 }
 
-double i960_cpu_device::get_1_rif(uint32_t opcode)
+RawExtendedReal i960_cpu_device::get_1_rif(uint32_t opcode)
 {
 	if(!(opcode & 0x00000800))
 		return u2f(m_r[opcode & 0x1f]);
 	else {
 		int idx = opcode & 0x1f;
 		if(idx < 4)
-			return m_fp[idx];
+			return m_fp[idx].floatValue;
 		if(idx == 0x16)
 			return 1.0;
+        /// @todo only respond with 0.0 with specific opcode, otherwise
+        /// generate an invalid operand fault (or an undefined value). 
+        /// From 80960MC Programmers Reference Manual July88 page B3:
+        ///
+        /// For floating-point instructions, if the mode bit is set to 0, the respective src1 or src2 field
+        /// specifies a global or local register (just as it does for non-floating-point instructions). If the
+        /// mode bit is set to 1, the field specifies either a floating-point register or one of two real-number
+        /// literals (+0.0 or + 1.0). All of the other encoding when the mode bit is set to 1 are reserved.
+        /// When a reserved encoding is used as a source, the processor either signals an invalid opcode
+        /// fault or produces an undefined value.
+        /// 
+        /// @todo what does the i960SB do? Will need to check on my board.
 		return 0.0;
 	}
 }
 
-double i960_cpu_device::get_2_rif(uint32_t opcode)
+RawExtendedReal i960_cpu_device::get_2_rif(uint32_t opcode)
 {
 	if(!(opcode & 0x00001000))
 		return u2f(m_r[(opcode>>14) & 0x1f]);
 	else {
 		int idx = (opcode>>14) & 0x1f;
 		if(idx < 4)
-			return m_fp[idx];
+			return m_fp[idx].floatValue;
 		if(idx == 0x16)
 			return 1.0;
+        /// @todo only respond with 0.0 with specific opcode, otherwise
+        /// generate an invalid operand fault (or an undefined value). 
+        /// From 80960MC Programmers Reference Manual July88 page B3:
+        ///
+        /// For floating-point instructions, if the mode bit is set to 0, the respective src1 or src2 field
+        /// specifies a global or local register (just as it does for non-floating-point instructions). If the
+        /// mode bit is set to 1, the field specifies either a floating-point register or one of two real-number
+        /// literals (+0.0 or + 1.0). All of the other encoding when the mode bit is set to 1 are reserved.
+        /// When a reserved encoding is used as a source, the processor either signals an invalid opcode
+        /// fault or produces an undefined value.
+        /// 
+        /// @todo what does the i960SB do? Will need to check on my board.
 		return 0.0;
 	}
 }
 
-void i960_cpu_device::set_rif(uint32_t opcode, double val)
+void i960_cpu_device::set_rif(uint32_t opcode, RawExtendedReal val)
 {
 	if(!(opcode & 0x00002000))
 		m_r[(opcode>>19) & 0x1f] = f2u(val);
@@ -298,7 +322,7 @@ void i960_cpu_device::set_rif(uint32_t opcode, double val)
 		fatalerror("I960: %x: set_rif on literal?\n", m_PIP);
 }
 
-double i960_cpu_device::get_1_rifl(uint32_t opcode)
+RawExtendedReal i960_cpu_device::get_1_rifl(uint32_t opcode)
 {
 	if(!(opcode & 0x00000800)) {
 		uint64_t v = m_r[opcode & 0x1e];
@@ -307,14 +331,26 @@ double i960_cpu_device::get_1_rifl(uint32_t opcode)
 	} else {
 		int idx = opcode & 0x1f;
 		if(idx < 4)
-			return m_fp[idx];
+			return m_fp[idx].floatValue;
 		if(idx == 0x16)
 			return 1.0;
+        /// @todo only respond with 0.0 with specific opcode, otherwise
+        /// generate an invalid operand fault (or an undefined value). 
+        /// From 80960MC Programmers Reference Manual July88 page B3:
+        ///
+        /// For floating-point instructions, if the mode bit is set to 0, the respective src1 or src2 field
+        /// specifies a global or local register (just as it does for non-floating-point instructions). If the
+        /// mode bit is set to 1, the field specifies either a floating-point register or one of two real-number
+        /// literals (+0.0 or + 1.0). All of the other encoding when the mode bit is set to 1 are reserved.
+        /// When a reserved encoding is used as a source, the processor either signals an invalid opcode
+        /// fault or produces an undefined value.
+        /// 
+        /// @todo what does the i960SB do? Will need to check on my board.
 		return 0.0;
 	}
 }
 
-double i960_cpu_device::get_2_rifl(uint32_t opcode)
+RawExtendedReal i960_cpu_device::get_2_rifl(uint32_t opcode)
 {
 	if(!(opcode & 0x00001000)) {
 		uint64_t v = m_r[(opcode >> 14) & 0x1e];
@@ -323,14 +359,26 @@ double i960_cpu_device::get_2_rifl(uint32_t opcode)
 	} else {
 		int idx = (opcode>>14) & 0x1f;
 		if(idx < 4)
-			return m_fp[idx];
+			return m_fp[idx].floatValue;
 		if(idx == 0x16)
 			return 1.0;
+        /// @todo only respond with 0.0 with specific opcode, otherwise
+        /// generate an invalid operand fault (or an undefined value). 
+        /// From 80960MC Programmers Reference Manual July88 page B3:
+        ///
+        /// For floating-point instructions, if the mode bit is set to 0, the respective src1 or src2 field
+        /// specifies a global or local register (just as it does for non-floating-point instructions). If the
+        /// mode bit is set to 1, the field specifies either a floating-point register or one of two real-number
+        /// literals (+0.0 or + 1.0). All of the other encoding when the mode bit is set to 1 are reserved.
+        /// When a reserved encoding is used as a source, the processor either signals an invalid opcode
+        /// fault or produces an undefined value.
+        /// 
+        /// @todo what does the i960SB do? Will need to check on my board.
 		return 0.0;
 	}
 }
 
-void i960_cpu_device::set_rifl(uint32_t opcode, double val)
+void i960_cpu_device::set_rifl(uint32_t opcode, RawExtendedReal val)
 {
 	if(!(opcode & 0x00002000)) {
 		uint64_t v = d2u(val);
@@ -405,7 +453,7 @@ void i960_cpu_device::concmp_u(uint32_t v1, uint32_t v2)
 		m_AC |= 1;
 }
 
-void i960_cpu_device::cmp_d(double v1, double v2)
+void i960_cpu_device::cmp_d(RawExtendedReal v1, RawExtendedReal v2)
 {
 	m_AC &= ~7;
 	if(v1<v2)
@@ -693,7 +741,7 @@ void i960_cpu_device::execute_burst_stall_op(uint32_t opcode)
 void i960_cpu_device::execute_op(uint32_t opcode)
 {
 	uint32_t t1, t2;
-	double t1f, t2f;
+	RawExtendedReal t1f, t2f;
 
 	switch(opcode >> 24) {
 		case 0x08: // b
@@ -1556,27 +1604,27 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			case 0x4: // cvtir
 				m_icount -= 30;
 				t1 = get_1_ri(opcode);
-				set_rif(opcode, (double)(int32_t)t1);
+				set_rif(opcode, (RawExtendedReal)(int32_t)t1);
 				break;
 
 			case 0x5: // cvtilr
 				m_icount -= 30;
 				t1 = get_1_ri(opcode);
-				set_rifl(opcode, (double)(int32_t)t1);
+				set_rifl(opcode, (RawExtendedReal)(int32_t)t1);
 				break;
 
 			case 0x6: // scalerl
 				m_icount -= 30;
 				t1 = get_1_ri(opcode);
 				t2f = get_2_rifl(opcode);
-				set_rifl(opcode, t2f * pow(2.0, (double)(int32_t)t1));
+				set_rifl(opcode, t2f * pow(2.0, (RawExtendedReal)(int32_t)t1));
 				break;
 
 			case 0x7: // scaler
 				m_icount -= 30;
 				t1 = get_1_ri(opcode);
 				t2f = get_2_rif(opcode);
-			set_rif(opcode, t2f * pow(2.0, (double)(int32_t)t1));
+			set_rif(opcode, t2f * pow(2.0, (RawExtendedReal)(int32_t)t1));
 				break;
 
 			default:
@@ -1642,7 +1690,7 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				{
 					int32_t st1 = get_1_rif(opcode);
 					m_icount -= 69;
-					set_rif(opcode, (double)st1);
+					set_rif(opcode, (RawExtendedReal)st1);
 				}
 				break;
 
@@ -1713,7 +1761,7 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				{
 					int32_t st1 = get_1_rifl(opcode);
 					m_icount -= 70;
-					set_rifl(opcode, (double)st1);
+					set_rifl(opcode, (RawExtendedReal)st1);
 				}
 				break;
 
@@ -1797,7 +1845,7 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 		case 0x6e:
 			switch((opcode >> 7) & 0xf) {
 			case 0x1: // movre
-                movre();
+                movre(opcode);
 				break;
 			case 0x2: // cpysre
 				m_icount -= 8;

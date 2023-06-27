@@ -96,6 +96,7 @@ public:
      * @brief The name given to 64-bit IEEE754 floating point numbers inside the 80960MC Reference Manual
      */
     using LongReal = double;
+    using RawExtendedReal = long double;
     /**
      * @brief The i960KB/SB/MC/XA all use the same floating point unit as the 80386 processor (in fact, the FPU came from the i960). 
      * Because of this, the i960 supports Intel's Extended Real format (fp80);
@@ -109,7 +110,7 @@ public:
          * @brief the float as a long double in all cases, on non x86 platforms
          * this usually is an alias for double so it will be safe to just use
          */
-        long double floatValue;
+        RawExtendedReal floatValue;
         /**
          * @brief The underlying three register's worth of space required for correctness.
          */
@@ -169,7 +170,7 @@ private:
 	// I960_RCACHE_SIZE or greater means out of cache, must save to memory.
 	int32_t m_rcache_pos;
 
-	double m_fp[4];
+    ExtendedReal m_fp[4];
 
 	uint32_t m_SAT;
 	uint32_t m_PRCB;
@@ -202,12 +203,12 @@ private:
 	void set_ri(uint32_t opcode, uint32_t val);
 	void set_ri2(uint32_t opcode, uint32_t val, uint32_t val2);
 	void set_ri64(uint32_t opcode, uint64_t val);
-	double get_1_rif(uint32_t opcode);
-	double get_2_rif(uint32_t opcode);
-	void set_rif(uint32_t opcode, double val);
-	double get_1_rifl(uint32_t opcode);
-	double get_2_rifl(uint32_t opcode);
-	void set_rifl(uint32_t opcode, double val);
+	RawExtendedReal get_1_rif(uint32_t opcode);
+	RawExtendedReal get_2_rif(uint32_t opcode);
+	void set_rif(uint32_t opcode, RawExtendedReal val);
+	RawExtendedReal get_1_rifl(uint32_t opcode);
+	RawExtendedReal get_2_rifl(uint32_t opcode);
+	void set_rifl(uint32_t opcode, RawExtendedReal val);
 	uint32_t get_1_ci(uint32_t opcode);
 	uint32_t get_2_ci(uint32_t opcode);
 	uint32_t get_disp(uint32_t opcode);
@@ -216,7 +217,7 @@ private:
 	void cmp_u(uint32_t v1, uint32_t v2);
 	void concmp_s(int32_t v1, int32_t v2);
 	void concmp_u(uint32_t v1, uint32_t v2);
-	void cmp_d(double v1, double v2);
+	void cmp_d(RawExtendedReal v1, RawExtendedReal v2);
 	void bxx(uint32_t opcode, int mask);
 	void bxx_s(uint32_t opcode, int mask);
 	void fxx(uint32_t opcode, int mask);
