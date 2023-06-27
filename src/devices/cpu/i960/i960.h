@@ -179,6 +179,8 @@ private:
 	void do_call(uint32_t adr, int type, uint32_t stack);
 	void do_ret_0();
 	void do_ret();
+private:
+    void movre();
 };
 
 

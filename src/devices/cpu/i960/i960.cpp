@@ -1797,28 +1797,7 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 		case 0x6e:
 			switch((opcode >> 7) & 0xf) {
 			case 0x1: // movre
-				{
-					uint32_t *src=nullptr, *dst=nullptr;
-
-					m_icount -= 8;
-
-					if(!(opcode & 0x00000800)) {
-						src = (uint32_t *)&m_r[opcode & 0x1e];
-					} else {
-						int idx = opcode & 0x1f;
-						if(idx < 4)
-							src = (uint32_t *)&m_fp[idx];
-					}
-
-					if(!(opcode & 0x00002000)) {
-						dst = (uint32_t *)&m_r[(opcode>>19) & 0x1e];
-					} else if(!(opcode & 0x00e00000))
-						dst = (uint32_t *)&m_fp[(opcode>>19) & 3];
-
-					dst[0] = src[0];
-					dst[1] = src[1];
-					dst[2] = src[2]&0xffff;
-				}
+                movre();
 				break;
 			case 0x2: // cpysre
 				m_icount -= 8;
@@ -2389,4 +2368,28 @@ void i960_cpu_device::device_reset()
 std::unique_ptr<util::disasm_interface> i960_cpu_device::create_disassembler()
 {
 	return std::make_unique<i960_disassembler>();
+}
+
+void i960_cpu_device::movre() 
+{
+    uint32_t *src=nullptr, *dst=nullptr;
+
+    m_icount -= 8;
+
+    if(!(opcode & 0x00000800)) {
+        src = (uint32_t *)&m_r[opcode & 0x1e];
+    } else {
+        int idx = opcode & 0x1f;
+        if(idx < 4)
+            src = (uint32_t *)&m_fp[idx];
+    }
+
+    if(!(opcode & 0x00002000)) {
+        dst = (uint32_t *)&m_r[(opcode>>19) & 0x1e];
+    } else if(!(opcode & 0x00e00000))
+        dst = (uint32_t *)&m_fp[(opcode>>19) & 3];
+
+    dst[0] = src[0];
+    dst[1] = src[1];
+    dst[2] = src[2]&0xffff;
 }
