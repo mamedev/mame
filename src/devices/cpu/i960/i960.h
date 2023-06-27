@@ -64,16 +64,6 @@ enum
 };
 
 /**
- * @brief While not 100% safe, we can usually assume that if long double
- * is 10 bytes in size then it is probably intel's fp80 format.
- */
-static constexpr bool ExtendedRealIsProbablyIntelFormat = sizeof(long double) == 10;
-/**
- * @brief A compile time flag to denote if double and long double are the
- * same type
- */
-static constexpr bool ExtendedRealIsTheSameAsDouble = std::is_same_v<double, long double>;
-/**
  * @brief According to the 80960MC programmers reference (and all other i960 references), Ordinals are 32-bit unsigned numbers
  */
 using Ordinal = uint32_t;
@@ -83,13 +73,10 @@ using Ordinal = uint32_t;
  */
 using Integer = int32_t;
 /**
- * @brief The name given to 32-bit IEEE754 floating point numbers inside the 80960MC Reference Manual
+ * @brief the underlying type (conceptually) of the real extended on i960 based
+ * processors supporting the Numerics architecture. On non-x86 platforms, this
+ * will usually just be an alias to double
  */
-using Real = float;
-/**
- * @brief The name given to 64-bit IEEE754 floating point numbers inside the 80960MC Reference Manual
- */
-using LongReal = double;
 using RawExtendedReal = long double;
 /**
  * @brief The i960KB/SB/MC/XA all use the same floating point unit as the 80386 processor (in fact, the FPU came from the i960). 
