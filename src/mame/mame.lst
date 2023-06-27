@@ -24220,9 +24220,28 @@ timeplta                        // GX393 (c) 1982 + Atari license
 timepltc                        // GX393 (c) 1982 + Centuri license
 
 @source:konami/tmnt.cpp
+cuebrick                        // GX903 (c) 1989
+mia                             // GX808 (c) 1989
+mia2                            // GX808 (c) 1989
+tmht                            // GX963 (c) 1989 (UK)
+tmht2p                          // GX963 (c) 1989 (UK)
+tmht2pa                         // GX963 (c) 1989 (UK)
+tmhta                           // GX963 (c) 1989 (UK)
+tmhtb                           // GX963 (c) 1989 (UK?)
+tmnt                            // GX963 (c) 1989 (World)
+tmnta                           // GX963 (c) 1989 (Asia)
+tmnt2pj                         // GX963 (c) 1990 (Japan)
+tmnt2po                         // GX963 (c) 1989 (Oceania)
+tmntj                           // GX963 (c) 1990 (Japan)
+tmntu                           // GX963 (c) 1989 (US)
+tmntua                          // GX963 (c) 1989 (US)
+tmntub                          // GX963 (c) 1989 (US)
+tmntuc                          // GX963 (c) 1989 (US)
+tmntucbl                        // bootleg
+
+@source:konami/tmnt2.cpp
 blswhstl                        // GX060 (c) 1991 (World)
 blswhstla                       // GX060 (c) 1991 (Asia)
-cuebrick                        // GX903 (c) 1989
 detatwin                        // GX060 (c) 1991 (Japan)
 glfgreat                        // GX061 (c) 1991
 glfgreatu                       // GX061 (c) 1991
@@ -24230,8 +24249,6 @@ glfgreatj                       // GX061 (c) 1991 (Japan)
 lgtnfght                        // GX939 (c) 1990 (World)
 lgtnfghta                       // GX939 (c) 1990 (Asia)
 lgtnfghtu                       // GX939 (c) 1990 (US)
-mia                             // GX808 (c) 1989
-mia2                            // GX808 (c) 1989
 prmrsocr                        // GX101 (c) 1993 (Europe)
 prmrsocrj                       // GX101 (c) 1993 (Japan)
 punkshot                        // GX907 (c) 1990 (US)
@@ -24257,27 +24274,12 @@ ssridersuda                     // GX064 (c) 1991 (US)
 thndrx2                         // GX073 (c) 1991 (World)
 thndrx2a                        // GX073 (c) 1991 (Asia)
 thndrx2j                        // GX073 (c) 1991 (Japan)
-tmht                            // GX963 (c) 1989 (UK)
-tmht2p                          // GX963 (c) 1989 (UK)
-tmht2pa                         // GX963 (c) 1989 (UK)
-tmhta                           // GX963 (c) 1989 (UK)
-tmhtb                           // GX963 (c) 1989 (UK?)
-tmnt                            // GX963 (c) 1989 (World)
-tmnta                           // GX963 (c) 1989 (Asia)
 tmnt2                           // GX063 (c) 1991 (US)
 tmnt22pu                        // GX063 (c) 1991 (US)
 tmnt24pu                        // GX063 (c) 1991 (US)
 tmht22pe                        // GX063 (c) 1991 (UK)
 tmht24pe                        // GX063 (c) 1991 (UK)
 tmnt2a                          // GX063 (c) 1991 (Asia)
-tmnt2pj                         // GX963 (c) 1990 (Japan)
-tmnt2po                         // GX963 (c) 1989 (Oceania)
-tmntj                           // GX963 (c) 1990 (Japan)
-tmntu                           // GX963 (c) 1989 (US)
-tmntua                          // GX963 (c) 1989 (US)
-tmntub                          // GX963 (c) 1989 (US)
-tmntuc                          // GX963 (c) 1989 (US)
-tmntucbl                        // bootleg
 trigon                          // GX939 (c) 1990 (Japan)
 
 @source:konami/tp84.cpp
