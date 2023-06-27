@@ -18384,6 +18384,45 @@ legacy FM implementations cannot find it.
 
 <!-- Homebrew / Doujin software -->
 
+	<software name="labbaye">
+		<description>l'Abbaye des Morts (v1.2)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="RetroDeluxe"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x40000">
+				<rom name="l'abbaye des morts - retrodeluxe (2020) (v1.2).rom" size="0x40000" crc="c5aef269" sha1="3b417dd6e2debf80f898e681f1c6a754dfaed2e1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="labbaye11" cloneof="labbaye">
+		<description>l'Abbaye des Morts (v1.1)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="RetroDeluxe"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x40000">
+				<rom name="l'abbaye des morts - retrodeluxe (2020) (v1.1).rom" size="0x40000" crc="38e9bdb2" sha1="f37f8b8f32b546a866497834dcb4ed8cde638009" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="labbaye01" cloneof="labbaye">
+		<description>l'Abbaye des Morts (v0.1)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="RetroDeluxe"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x40000">
+				<rom name="l'abbaye des morts - retrodeluxe (2020) (v0.1).rom" size="0x40000" crc="ec5490d0" sha1="ef4e555c470849eafddae40b07cea01ef3239c6e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lacorenc">
 		<description>La Corona Encantada (English)</description>
 		<year>2009</year>
