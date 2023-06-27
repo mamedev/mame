@@ -64,58 +64,58 @@ enum
 	I960_IRQ3 = 3
 };
 
+/**
+ * @brief While not 100% safe, we can usually assume that if long double
+ * is 10 bytes in size then it is probably intel's fp80 format.
+ */
+static constexpr bool ExtendedRealIsProbablyIntelFormat = sizeof(long double) == 10;
+/**
+ * @brief A compile time flag to denote if double and long double are the
+ * same type
+ */
+static constexpr bool ExtendedRealIsTheSameAsDouble = std::is_same_v<double, long double>;
+/**
+ * @brief According to the 80960MC programmers reference (and all other i960 references), Ordinals are 32-bit unsigned numbers
+ */
+using Ordinal = uint32_t;
+
+/**
+ * @brief According to the 80960MC programmers reference (and all other i960 references), Integers are 32-bit unsigned numbers
+ */
+using Integer = int32_t;
+/**
+ * @brief The name given to 32-bit IEEE754 floating point numbers inside the 80960MC Reference Manual
+ */
+using Real = float;
+/**
+ * @brief The name given to 64-bit IEEE754 floating point numbers inside the 80960MC Reference Manual
+ */
+using LongReal = double;
+using RawExtendedReal = long double;
+/**
+ * @brief The i960KB/SB/MC/XA all use the same floating point unit as the 80386 processor (in fact, the FPU came from the i960). 
+ * Because of this, the i960 supports Intel's Extended Real format (fp80);
+ * This struct provides a hack to make sure that three ordinal's worth of
+ * space is always available.
+ */
+union ExtendedReal {
+    constexpr ExtendedReal() : floatValue(0.0) { }
+    explicit constexpr ExtendedReal(long double fval) : floatValue(fval) { }
+    /**
+     * @brief the float as a long double in all cases, on non x86 platforms
+     * this usually is an alias for double so it will be safe to just use
+     */
+    RawExtendedReal floatValue;
+    /**
+     * @brief The underlying three register's worth of space required for correctness.
+     */
+    Ordinal storage[3];
+};
 
 class i960_cpu_device :  public cpu_device
 {
 public:
 	static constexpr uint16_t BURST = 0x0001;
-    /**
-     * @brief While not 100% safe, we can usually assume that if long double
-     * is 10 bytes in size then it is probably intel's fp80 format.
-     */
-    static constexpr bool ExtendedRealIsProbablyIntelFormat = sizeof(long double) == 10;
-    /**
-     * @brief A compile time flag to denote if double and long double are the
-     * same type
-     */
-    static constexpr bool ExtendedRealIsTheSameAsDouble = std::is_same_v<double, long double>;
-    /**
-     * @brief According to the 80960MC programmers reference (and all other i960 references), Ordinals are 32-bit unsigned numbers
-     */
-    using Ordinal = uint32_t;
-
-    /**
-     * @brief According to the 80960MC programmers reference (and all other i960 references), Integers are 32-bit unsigned numbers
-     */
-    using Integer = int32_t;
-    /**
-     * @brief The name given to 32-bit IEEE754 floating point numbers inside the 80960MC Reference Manual
-     */
-    using Real = float;
-    /**
-     * @brief The name given to 64-bit IEEE754 floating point numbers inside the 80960MC Reference Manual
-     */
-    using LongReal = double;
-    using RawExtendedReal = long double;
-    /**
-     * @brief The i960KB/SB/MC/XA all use the same floating point unit as the 80386 processor (in fact, the FPU came from the i960). 
-     * Because of this, the i960 supports Intel's Extended Real format (fp80);
-     * This struct provides a hack to make sure that three ordinal's worth of
-     * space is always available.
-     */
-    union ExtendedReal {
-        constexpr ExtendedReal() : floatValue(0.0) { }
-        explicit constexpr ExtendedReal(long double fval) : floatValue(fval) { }
-        /**
-         * @brief the float as a long double in all cases, on non x86 platforms
-         * this usually is an alias for double so it will be safe to just use
-         */
-        RawExtendedReal floatValue;
-        /**
-         * @brief The underlying three register's worth of space required for correctness.
-         */
-        Ordinal storage[3];
-    };
 
     
 	// construction/destruction
