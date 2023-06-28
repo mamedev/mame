@@ -35117,20 +35117,15 @@ a433cc                          // J-Bond A433C-C/A450C-C
 a486ap4                         // ASUS PVI-486AP4
 a486isa                         // ASUS ISA-486
 a486sio                         // ASUS ISA-486SIO rev. 1.2
-a486sp3                         // ASUS PVI-486SP3
 a486sp3g                        // ASUS PCI/I-486SP3G
 a486sv1                         // ASUS VL/EISA-486SV1
 a486sv2                         // ASUS ISA-486SV2 motherboard (486)
 a486sv2g                        // ASUS VL/I-486SV2G
-aa486s                          // ASUS PCI/I-A486S
 abae4                           // Abit 486 EISA-AE4 motherboard (486)
 abah4                           // Abit AH4(T) motherboard (486)
 abav4                           // Abit AB-AV4 (aka VL-BUS 486)
 abax4                           // Abit AB-AX4 motherboard (486)
 abpb4                           // Abit AB-PB4 motherboard (486)
-abpi4                           // Abit PI4(T) motherboard (486)
-abpm4                           // Abit AB-PM4 motherboard (486)
-abpv4                           // Abit AB-PM4 motherboard (486)
 abpw4                           // Abit AB-PW4 motherboard (486)
 alator2                         // Alaris Tornado 2 motherboard (486)
 alim1489                        // 486 motherboards using the ALi 1487/1489 chipset
@@ -35141,7 +35136,6 @@ amisvpci2                       // AMI Super Voyager PCI-II motherboard (486)
 amisvvlb                        // AMI Super Voyager VLB motherboard (486)
 amisvvlb2                       // AMI Super Voyager VLB-II motherboard (486)
 amisvvlb3                       // AMI Super Voyager VLB-III motherboard (486)
-aoap43                          // Aopen AP43 motherboard (486)
 aovi15g                         // Aopen VI15G motherboard (486)
 aplsbon                         // 1992 Apricot LS Pro (Bonsai Motherboard)
 aprfte                          // Apricot FT//ex (J3 motherboard)
@@ -35155,8 +35149,6 @@ ar4glx3                         // Addtech Research 4GLX3 Green-B 4GPV3.1
 as496                           // Arstoria AS496 motherboard (486)
 at486                           // 19?? IBM AT 486
 atc1415                         // A-Trend ATC-1415 motherboard (486)
-atc1425a                        // A-Trend ATC-1425A
-atc1425b                        // A-Trend ATC-1425B
 bluenote                        // Highscreen Colani Blue Note (486)
 ch48633c                        // Chicony CH-486-33C motherboard (486)
 ch486spm                        // Chaintech 486SPM motherboard (486)
@@ -35421,6 +35413,14 @@ pcipc                           //
 pcipctx                         //
 
 @source:pc/pcipc_sis.cpp
+atc1425a                        // A-Trend ATC-1425A
+atc1425b                        // A-Trend ATC-1425B
+abpi4                           // Abit PI4(T) motherboard (486)
+abpm4                           // Abit AB-PM4 motherboard (486)
+abpv4                           // Abit AB-PV4 motherboard (486)
+aoap43                          // Aopen AP43 motherboard (486)
+a486sp3                         // ASUS PVI-486SP3
+aa486s                          // ASUS PCI/I-A486S
 sis85c496                       // 486 motherboards using the SiS 85C496/85C497 chipset
 
 @source:pc/pcxt.cpp
