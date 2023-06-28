@@ -81,6 +81,8 @@ end
 		MAME_DIR .. "src/lib/util/hashing.h",
 		MAME_DIR .. "src/lib/util/huffman.cpp",
 		MAME_DIR .. "src/lib/util/huffman.h",
+		MAME_DIR .. "src/lib/util/internet_checksum.cpp",
+		MAME_DIR .. "src/lib/util/internet_checksum.h",
 		MAME_DIR .. "src/lib/util/ioprocs.cpp",
 		MAME_DIR .. "src/lib/util/ioprocs.h",
 		MAME_DIR .. "src/lib/util/ioprocsfill.h",

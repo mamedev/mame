@@ -2907,6 +2907,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/uniprint.h",
 		MAME_DIR .. "src/devices/bus/a2bus/uthernet.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/uthernet.h",
+		MAME_DIR .. "src/devices/bus/a2bus/uthernet2.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/uthernet2.h",
 	}
 end
 

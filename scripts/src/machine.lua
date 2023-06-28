@@ -5209,6 +5209,20 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/w5100.h,MACHINES["W5100"] = true
+---------------------------------------------------
+
+if (MACHINES["W5100"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/w5100.cpp",
+		MAME_DIR .. "src/devices/machine/w5100.h",
+		MAME_DIR .. "src/devices/machine/w5100_socket.cpp",
+		MAME_DIR .. "src/devices/machine/w5100_socket.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/segacrpt_device.h,MACHINES["SEGACRPT"] = true
 ---------------------------------------------------
 if (MACHINES["SEGACRPT"]~=null) then
