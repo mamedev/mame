@@ -1086,6 +1086,29 @@ ROM_START( bingor8 )  // Strings: (c) 1988, 1989, 1990, 1991, 1992 Rosenauer Ele
 	ROM_LOAD( "24c04a.bin", 0x000000, 0x200, CRC(8dc17c0a) SHA1(bb5c9c013c324089e22dc8ef1b11172d6f38cf64) )
 ROM_END
 
+/* Bingo Roll (Vip2 v26.02.02).
+   Rosenauer Electronic Austria.
+
+   Same PCB layout than bingor2, 3, 4
+
+*/
+ROM_START( bingor9 )  // Strings: (c) 1988, 1989, 1990, 1991, 1992 Rosenauer Electronic Austria.
+	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )   // i186 code
+	ROM_LOAD16_BYTE( "bingo_roll_vip2_v26.02.02_l.bin", 0x00001, 0x08000, CRC(995dbf58) SHA1(f628cd6b5bdc35839045cbffb9df3a6a731cc465) )
+	ROM_LOAD16_BYTE( "bingo_roll_vip2_v26.02.02_h.bin", 0x00000, 0x08000, CRC(1fd01166) SHA1(063240ea20303edfb1744abddac63587d6f40db7) )
+
+	ROM_REGION16_LE( 0x10000, "gfx", ROMREGION_ERASE00 )    // blitter data?
+	ROM_LOAD16_BYTE( "bingo_roll_+_euro_grafik_l.bin", 0x000000, 0x08000, CRC(15715c10) SHA1(1a7506ce3b9ddbacebb5a4501ed19f8fdfb3029b) )
+	ROM_LOAD16_BYTE( "bingo_roll_+_euro_grafik_h.bin", 0x000001, 0x08000, CRC(f0564e9e) SHA1(f322cf4587f56db15052a437d6cfc5c7cc6999ab) )
+
+	ROM_REGION( 0x1fff, "pic", 0 ) // need verification
+	ROM_LOAD( "pic16c54.bin", 0x0000, 0x200, CRC(21e8a699) SHA1(8a22292fa3669105d52a9d681d5be345fcfe6607) )
+
+	ROM_REGION( 0x20000, "eeprom", 0 )  // eeprom
+	ROM_LOAD( "24c04a.bin",     0x000000, 0x200, CRC(116ef31e) SHA1(8f9e47e4e70fa4831e257d33e7b17f556887abe8) )
+	ROM_LOAD( "24c04a_alt.bin", 0x000200, 0x200, CRC(a5c37a1e) SHA1(3bf9e26b1c4c13679d9cb4f2dfdf2e27b7187aba) )  // from another identical set.
+ROM_END
+
 
 } // anonymous namespace
 
@@ -1105,6 +1128,7 @@ GAME( 1991, bingor6,  0,       bingor,   bingor, bingor_state, empty_init, ROT0,
 
 GAME( 1995, bingor7,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria",  "Bingo Roll (209 / 19-1-95)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2001, bingor8,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria",  "Bingo Roll 2001 (v22.1)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1992, bingor9,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria",  "Bingo Roll (Vip2 v26.02.02)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 GAME( 1998, bellstrp, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bell Star Plus",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
