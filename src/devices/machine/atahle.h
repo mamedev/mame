@@ -7,31 +7,15 @@
     ATA Device HLE
 
 ***************************************************************************/
-
-#ifndef MAME_BUS_ATA_ATAHLE_H
-#define MAME_BUS_ATA_ATAHLE_H
+#ifndef MAME_MACHINE_ATAHLE_H
+#define MAME_MACHINE_ATAHLE_H
 
 #pragma once
 
-#include "atadev.h"
-
-class ata_hle_device : public device_t, public device_ata_interface
+class ata_hle_device_base : public device_t
 {
-public:
-	virtual uint16_t read_dma() override;
-	virtual uint16_t read_cs0(offs_t offset, uint16_t mem_mask = 0xffff) override;
-	virtual uint16_t read_cs1(offs_t offset, uint16_t mem_mask = 0xffff) override;
-
-	virtual void write_dma(uint16_t data) override;
-	virtual void write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
-	virtual void write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
-	virtual void write_csel(int state) override;
-	virtual void write_dasp(int state) override;
-	virtual void write_dmack(int state) override;
-	virtual void write_pdiag(int state) override;
-
 protected:
-	ata_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ata_hle_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -39,10 +23,54 @@ protected:
 	TIMER_CALLBACK_MEMBER(busy_tick);
 	TIMER_CALLBACK_MEMBER(empty_tick);
 
-	void set_irq(int state);
-	void set_dmarq(int state);
-	void set_dasp(int state);
-	void set_pdiag(int state);
+	uint16_t dma_r();
+	uint16_t command_r(offs_t offset);
+	uint16_t control_r(offs_t offset);
+
+	void dma_w(uint16_t data);
+	void command_w(offs_t offset, uint16_t data);
+	void control_w(offs_t offset, uint16_t data);
+
+	void set_csel_in(int state) { m_csel = state; }
+	void set_dasp_in(int state) { m_daspin = state; }
+	void set_dmack_in(int state);
+	void set_pdiag_in(int state);
+
+	void set_irq(int state)
+	{
+		if (m_irq != state)
+		{
+			m_irq = state;
+			update_irq();
+		}
+	}
+
+	void set_dmarq(int state)
+	{
+		if (m_dmarq != state)
+		{
+			m_dmarq = state;
+			set_dmarq_out(state);
+		}
+	}
+
+	void set_dasp(int state)
+	{
+		if (m_daspout != state)
+		{
+			m_daspout = state;
+			set_dasp_out(state);
+		}
+	}
+
+	void set_pdiag(int state)
+	{
+		if (m_pdiagout != state)
+		{
+			m_pdiagout = state;
+			set_pdiag_out(state);
+		}
+	}
 
 	void start_busy(const attotime &time, int param);
 	void stop_busy();
@@ -197,6 +225,11 @@ protected:
 	bool m_8bit_data_transfers;
 
 private:
+	virtual void set_irq_out(int state) = 0;
+	virtual void set_dmarq_out(int state) = 0;
+	virtual void set_dasp_out(int state) = 0;
+	virtual void set_pdiag_out(int state) = 0;
+
 	void update_irq();
 	void write_buffer_full();
 	void start_diagnostic();
@@ -220,4 +253,4 @@ private:
 	emu_timer *m_buffer_empty_timer;
 };
 
-#endif // MAME_BUS_ATA_ATAHLE_H
+#endif // MAME_MACHINE_ATAHLE_H

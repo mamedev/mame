@@ -496,8 +496,6 @@ if (BUSES["ATA"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/ata/atadev.cpp",
 		MAME_DIR .. "src/devices/bus/ata/atadev.h",
-		MAME_DIR .. "src/devices/bus/ata/atahle.cpp",
-		MAME_DIR .. "src/devices/bus/ata/atahle.h",
 		MAME_DIR .. "src/devices/bus/ata/ataintf.cpp",
 		MAME_DIR .. "src/devices/bus/ata/ataintf.h",
 		MAME_DIR .. "src/devices/bus/ata/atapicdr.cpp",
@@ -508,10 +506,10 @@ if (BUSES["ATA"]~=null) then
 		MAME_DIR .. "src/devices/bus/ata/cp2024.h",
 		MAME_DIR .. "src/devices/bus/ata/cr589.cpp",
 		MAME_DIR .. "src/devices/bus/ata/cr589.h",
+		MAME_DIR .. "src/devices/bus/ata/hdd.cpp",
+		MAME_DIR .. "src/devices/bus/ata/hdd.h",
 		MAME_DIR .. "src/devices/bus/ata/gdrom.cpp",
 		MAME_DIR .. "src/devices/bus/ata/gdrom.h",
-		MAME_DIR .. "src/devices/bus/ata/idehd.cpp",
-		MAME_DIR .. "src/devices/bus/ata/idehd.h",
 		MAME_DIR .. "src/devices/bus/ata/px320a.cpp",
 		MAME_DIR .. "src/devices/bus/ata/px320a.h",
 	}
