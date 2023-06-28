@@ -158,7 +158,6 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 
 	// TODO: selectable between PCI clock / 4 (33 MHz) or 7.159 MHz, via reg $47 bit 5
 	KBDC8042(config, m_keybc);
-	m_keybc->set_default_bios_tag("compaq");
 	m_keybc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);
 	m_keybc->set_interrupt_type(kbdc8042_device::KBDC8042_DOUBLE);
 	m_keybc->input_buffer_full_callback().set(m_pic_master, FUNC(pic8259_device::ir1_w));
