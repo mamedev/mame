@@ -4,10 +4,13 @@
  * Sandbox for SiS based x86 PCs, targeting the new PCI model
  *
  * Notes:
- * - sis85c471 doesn't belong here, it
+ * - sis85c471 doesn't belong here, it's a full on ISA PC/AT
  *
  * TODO:
- * - Identify motherboard name(s)
+ * - Finish porting sis85c496 from at.cpp;
+ * - Reports slower CPU speeds in Award BIOSes (i.e. "66 MHz" for actual 75);
+ * - (Hack Inc.) Glue in a Voodoo 1 hookup;
+ * - (Hack Inc.) Identify motherboard name(s);
  *
  */
 
@@ -50,7 +53,7 @@ void sis496_state::sis496(machine_config &config)
 	I486DX4(config, m_maincpu, 75000000); // I486DX4, 75 or 100 Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &sis496_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &sis496_state::main_io);
-//  m_maincpu->set_irq_acknowledge_callback("pci:01.0:pic_master", FUNC(pic8259_device::inta_cb));
+	m_maincpu->set_irq_acknowledge_callback("pci:05.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	PCI_ROOT(config, "pci", 0);
 	SIS85C496_HOST(config, "pci:05.0", 0, "maincpu", 32*1024*1024);
@@ -178,7 +181,7 @@ ROM_START( a486sp3 )
 	ROMX_LOAD( "si4i0305.awd", 0x00000, 0x20000, CRC(2f90e63e) SHA1(a4f16753b5a57d65fba7702ca28e44f10bd5bb6c), ROM_BIOS(8))
 ROM_END
 
-COMP( 199?, sis85c496, 0, 0, sis496, 0, sis496_state, empty_init, "<unknown>", "486 motherboards using the SiS 85C496/85C497 chipset", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // photoply hangs during irq check, 4sim002 crashes while enabling cache?
+COMP( 199?, sis85c496, 0, 0, sis496, 0, sis496_state, empty_init, "Hack Inc.", "486 motherboards using the SiS 85C496/85C497 chipset", MACHINE_NOT_WORKING ) // 4sim002 crashes while enabling cache?
 
 COMP( 1995, atc1425a,  0, 0, sis496, 0, sis496_state, empty_init, "A-Trend", "ATC-1425A (SiS 85C496/85C497)", MACHINE_NOT_WORKING ) // -bios 2 punts to Award BootBlock, -bios 0 and 1 crashes
 COMP( 1996, atc1425b,  0, 0, sis496, 0, sis496_state, empty_init, "A-Trend", "ATC-1425B (SiS 85C496/85C497)", MACHINE_NOT_WORKING ) // punts to Award BootBlock

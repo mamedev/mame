@@ -117,7 +117,6 @@ private:
 	uint8_t at_portb_r();
 	void at_portb_w(uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
-	void at_pit8254_out0_changed(int state);
 	void at_pit8254_out1_changed(int state);
 	void at_pit8254_out2_changed(int state);
 	void pc_dma_hrq_changed(int state);
@@ -153,7 +152,6 @@ private:
 	void pc_dma_write_byte(offs_t offset, uint8_t data);
 	uint8_t pc_dma_read_word(offs_t offset);
 	void pc_dma_write_word(offs_t offset, uint8_t data);
-	void cpu_int_w(int state);
 	void cpu_a20_w(int state);
 	void cpu_reset_w(int state);
 };

@@ -55,14 +55,6 @@ void sis85c496_host_device::internal_io_map(address_map &map)
 
 void sis85c496_host_device::device_add_mconfig(machine_config &config)
 {
-	PIT8254(config, m_pit8254, 0);
-	m_pit8254->set_clk<0>(4772720/4); // heartbeat IRQ
-	m_pit8254->out_handler<0>().set(FUNC(sis85c496_host_device::at_pit8254_out0_changed));
-	m_pit8254->set_clk<1>(4772720/4); // DRAM refresh
-	m_pit8254->out_handler<1>().set(FUNC(sis85c496_host_device::at_pit8254_out1_changed));
-	m_pit8254->set_clk<2>(4772720/4); // PIO port C pin 4, and speaker polling enough
-	m_pit8254->out_handler<2>().set(FUNC(sis85c496_host_device::at_pit8254_out2_changed));
-
 	AM9517A(config, m_dma8237_1, XTAL(14'318'181)/3);
 	m_dma8237_1->out_hreq_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq0_w));
 	m_dma8237_1->out_eop_callback().set(FUNC(sis85c496_host_device::at_dma8237_out_eop));
@@ -97,7 +89,7 @@ void sis85c496_host_device::device_add_mconfig(machine_config &config)
 	m_dma8237_2->out_dack_callback<3>().set(FUNC(sis85c496_host_device::pc_dack7_w));
 
 	PIC8259(config, m_pic8259_master, 0);
-	m_pic8259_master->out_int_callback().set(FUNC(sis85c496_host_device::cpu_int_w));
+	m_pic8259_master->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic8259_master->in_sp_callback().set_constant(1);
 	m_pic8259_master->read_slave_ack_callback().set(FUNC(sis85c496_host_device::get_slave_ack));
 
@@ -105,10 +97,19 @@ void sis85c496_host_device::device_add_mconfig(machine_config &config)
 	m_pic8259_slave->out_int_callback().set(m_pic8259_master, FUNC(pic8259_device::ir2_w));
 	m_pic8259_slave->in_sp_callback().set_constant(0);
 
+	PIT8254(config, m_pit8254, 0);
+	m_pit8254->set_clk<0>(4772720/4); // heartbeat IRQ
+	m_pit8254->out_handler<0>().set(m_pic8259_master, FUNC(pic8259_device::ir0_w));
+	m_pit8254->set_clk<1>(4772720/4); // DRAM refresh
+	m_pit8254->out_handler<1>().set(FUNC(sis85c496_host_device::at_pit8254_out1_changed));
+	m_pit8254->set_clk<2>(4772720/4); // PIO port C pin 4, and speaker polling enough
+	m_pit8254->out_handler<2>().set(FUNC(sis85c496_host_device::at_pit8254_out2_changed));
+
+	// TODO: PS/2
 	AT_KEYBOARD_CONTROLLER(config, m_keybc, XTAL(12'000'000));
 	m_keybc->hot_res().set(FUNC(sis85c496_host_device::cpu_reset_w));
 	m_keybc->gate_a20().set(FUNC(sis85c496_host_device::cpu_a20_w));
-	m_keybc->kbd_irq().set("pic8259_master", FUNC(pic8259_device::ir1_w));
+	m_keybc->kbd_irq().set(m_pic8259_master, FUNC(pic8259_device::ir1_w));
 	m_keybc->kbd_clk().set(m_pc_kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_keybc->kbd_data().set(m_pc_kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
 
@@ -369,14 +370,6 @@ void sis85c496_host_device::at_speaker_set_spkrdata(uint8_t data)
 	m_speaker->level_w(m_at_spkrdata & m_pit_out2);
 }
 
-
-
-void sis85c496_host_device::at_pit8254_out0_changed(int state)
-{
-	if (m_pic8259_master)
-		m_pic8259_master->ir0_w(state);
-}
-
 void sis85c496_host_device::at_pit8254_out1_changed(int state)
 {
 	if(state)
@@ -611,11 +604,6 @@ void sis85c496_host_device::write_rtc(offs_t offset, uint8_t data)
 	else {
 		m_ds12885->write(offset,data);
 	}
-}
-
-void sis85c496_host_device::cpu_int_w(int state)
-{
-	m_maincpu->set_input_line(0, state);
 }
 
 void sis85c496_host_device::cpu_a20_w(int state)
