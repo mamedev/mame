@@ -3,6 +3,7 @@
 #include "emu.h"
 #include "i960.h"
 #include "i960dis.h"
+#include <cmath>
 
 #ifdef _MSC_VER
 /* logb prototype is different for MS Visual C */
@@ -1854,9 +1855,9 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				t2f = get_2_rifl(opcode);
 
 				if (t2f >= 0.0)
-					set_rifl(opcode, fabs(t1f));
+					set_rifl(opcode, std::abs(t1f));
 				else
-					set_rifl(opcode, -fabs(t1f));
+					set_rifl(opcode, -std::abs(t1f));
 				break;
 			default:
 				fatalerror("I960: %x: Unhandled 6e.%x\n", m_PIP, (opcode >> 7) & 0xf);
