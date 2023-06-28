@@ -794,7 +794,12 @@ void bingor_state::vip2000(machine_config &config)
 }
 
 
+/**************************************
+*              ROM Load               *
+**************************************/
+
 // I doubt we need to load the EEPROMs
+// for now are included till know if there are critical registers inside
 
 ROM_START( bingor1 )    // Strings: Big Roll / Bingo Roll / 1991 AWR / 1992 Rosenauer Electronic Austria.
 	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )   // i186 code
@@ -1058,10 +1063,37 @@ ROM_START( bingor7 )  // Strings: (c) 1988, 1989, 1990, 1991, 1992 Rosenauer Ele
 	ROM_REGION( 0x20000, "eeprom", 0 )  // eeprom
 	ROM_LOAD( "24c04a.bin", 0x000000, 0x200, CRC(6f0daa7f) SHA1(98bffadb0fcc983d451b859cf73c619909daa6d8) )
 ROM_END
-	   
+
+/* Bingo Roll 2001 (v22.1)
+   Rosenauer Electronic Austria?.
+
+   Same PCB layout than bingor2, 3, 4
+
+*/
+ROM_START( bingor8 )  // Strings: (c) 1988, 1989, 1990, 1991, 1992 Rosenauer Electronic Austria.
+	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )   // i186 code
+	ROM_LOAD16_BYTE( "bingo_roll_2001_v_22.1_l.bin", 0x00000, 0x08000, CRC(2b36d5ce) SHA1(bdb9a14d53fa0c662eee7ab0f0dd56e0b66b33ab) )
+	ROM_LOAD16_BYTE( "bingo_roll_2001_v_22.1_h.bin", 0x00001, 0x08000, CRC(23d148f5) SHA1(43a4409727b8caa0d8b12c35b6f85099134af4a6) )
+
+	ROM_REGION16_LE( 0x10000, "gfx", ROMREGION_ERASE00 )    // blitter data?
+	ROM_LOAD16_BYTE( "bingo_roll_grafik_l.bin", 0x000000, 0x08000, CRC(15715c10) SHA1(1a7506ce3b9ddbacebb5a4501ed19f8fdfb3029b) )
+	ROM_LOAD16_BYTE( "bingo_roll_grafik_h.bin", 0x000001, 0x08000, CRC(f0564e9e) SHA1(f322cf4587f56db15052a437d6cfc5c7cc6999ab) )
+
+	ROM_REGION( 0x1fff, "pic", 0 ) // need verification
+	ROM_LOAD( "pic16c54.bin", 0x0000, 0x200, CRC(21e8a699) SHA1(8a22292fa3669105d52a9d681d5be345fcfe6607) )
+
+	ROM_REGION( 0x20000, "eeprom", 0 )  // eeprom
+	ROM_LOAD( "24c04a.bin", 0x000000, 0x200, CRC(8dc17c0a) SHA1(bb5c9c013c324089e22dc8ef1b11172d6f38cf64) )
+ROM_END
+
 
 } // anonymous namespace
 
+
+/**************************************
+*           Game Driver(s)            *
+**************************************/
+// parent-clone relationship will be set as soon as we have the sets working and could corroborate the gamenames/versions.
 
 //    YEAR  NAME      PARENT   MACHINE   INPUT   STATE         INIT        ROT    COMPANY                          FULLNAME                             FLAGS
 GAME( 1992, bingor1,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria?", "Bingo Roll / Bell Star? (set 1)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
@@ -1071,7 +1103,8 @@ GAME( 2002, bingor4,  0,       bingor,   bingor, bingor_state, empty_init, ROT0,
 GAME( 2002, bingor5,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bingo Roll / Bell Star V3? (set 5)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1991, bingor6,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "AWR Hard & Soft Austria?",      "Bingo Roll / Turbo Bingo?",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 1995, bingor7,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria?", "Bingo Roll (209 / 19-1-95)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1995, bingor7,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria",  "Bingo Roll (209 / 19-1-95)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2001, bingor8,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria",  "Bingo Roll 2001 (v22.1)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 GAME( 1998, bellstrp, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bell Star Plus",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
