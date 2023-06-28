@@ -29618,6 +29618,549 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="calendar">
+		<description>Calendar</description>
+		<year>1988</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Calendar" is a 1988 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234766">
+				<rom name="calendar.woz" size="234766" crc="9d0c7d47" sha1="bc721113db6312ab669ded9254fddc37917a45cc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bblsadjadv">
+		<description>Building Better Language Skills: Adjectives and Adverbs</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Building Better Language Skills: Adjectives and Adverbs" is a 1991 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234821">
+				<rom name="building better language skills- adjectives and adverbs.woz" size="234821" crc="80941ab0" sha1="ec0fc4c98bb98c750c7089a6834e545b18e8a2ec" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bblsnouns">
+		<description>Building Better Language Skills: Nouns</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Building Better Language Skills: Nouns" is a 1991 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234804">
+				<rom name="building better language skills- nouns.woz" size="234804" crc="9794170b" sha1="28c6dcfcc73b7ba06c8dad17ec0c0d42442e1862" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bblscapit">
+		<description>Capitalization</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Capitalization" is a 1991 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234756">
+				<rom name="capitalization.woz" size="234756" crc="aea53d17" sha1="9b773a8c049dd18baa74f4ae4c0beb0056004e42" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cntcoins">
+		<description>Counting Coins</description>
+		<year>1987</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Counting Coins" is a 1987 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234772">
+				<rom name="counting coins.woz" size="234772" crc="e2ef9068" sha1="30b4e130e12e3786fc671b1c7e0729d1ca0b789a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dsktopzoo">
+		<description>Desktop Zoo</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Desktop Zoo" is a 1989 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234769">
+				<rom name="desktop zoo.woz" size="234769" crc="da8ff2f6" sha1="331e190e56226476fd8431e6b2ba150ce6dd1fbd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="itsabttm">
+		<description>It's About Time</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"It's About Time" is a 1989 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234773">
+				<rom name="it's about time.woz" size="234773" crc="b5905f9d" sha1="536a2bd895f941b2ae54cdb06f80e7a13e13cc7c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kcaddphn">
+		<description>Kinder Critters: Address and Phone Number</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Kinder Critters: Address and Phone Number" is a 1991 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234807">
+				<rom name="kinder critters- address and phone number.woz" size="234807" crc="9a1f8a9f" sha1="8a338ce20ff4328d2f5c4b82b0f511c749dbc57a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kcletpat">
+		<description>Kinder Critters: Letters and Patterns</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Kinder Critters: Letters and Patterns" is a 1991 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234803">
+				<rom name="kinder critters- letters and patterns.woz" size="234803" crc="cc43ebbe" sha1="495ff9e15d607f7db830a5c651a70153303740c2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msaurcomp">
+		<description>Mathosaurus: Computation</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Mathosaurus: Computation" is a 1989 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234790">
+				<rom name="mathosaurus- computation.woz" size="234790" crc="2e275172" sha1="262ba4c9e8ab922999f81c9e7d1afe107ea01b91" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="olvcword">
+		<description>Oliver's Crosswords</description>
+		<year>1990</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Oliver's Crosswords" is a 1990 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side a" />
+			<dataarea name="flop" size="234777">
+				<rom name="oliver's crosswords side a.woz" size="234777" crc="69a602e3" sha1="f943186b0ec801e36da67b4e42c402c7fce82c8a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side b" />
+			<dataarea name="flop" size="234777">
+				<rom name="oliver's crosswords side b.woz" size="234777" crc="a3b0570f" sha1="ad398cff43b42998c8ac9a140a7d044d13274a1b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rdtrchst">
+		<description>Reader's Treasure Chest</description>
+		<year>1987</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Reader's Treasure Chest" is a 1987 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234781">
+				<rom name="reader's treasure chest.woz" size="234781" crc="2c9fc291" sha1="33ef1b383500179830dd91f6bacb2f4433191904" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anmstoriv">
+		<description>Animal Stories IV</description>
+		<year>1990</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Animal Stories IV" is a 1990 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234756">
+				<rom name="animal stories iv.woz" size="234756" crc="4b3134d1" sha1="4147b9f8a20b1f40ab30c0f40681c71928370815" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rmlev1">
+		<description>Real Math: Level I</description>
+		<year>1988</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Real Math: Level I" is a 1988 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234781">
+				<rom name="real math- level i.woz" size="234781" crc="a0765a0d" sha1="f6006bd41c5fb98dde3caf8d3c981232526c7d0f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rmlev2">
+		<description>Real Math: Level II</description>
+		<year>1988</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Real Math: Level II" is a 1988 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234782">
+				<rom name="real math- level ii.woz" size="234782" crc="75a0e505" sha1="1a0d2e9fbc2ad223f70fe9895ab7ff4ba3cdc296" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rmlev3">
+		<description>Real Math: Level III</description>
+		<year>1988</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Real Math: Level III" is a 1988 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234783">
+				<rom name="real math- level iii.woz" size="234783" crc="a6127c37" sha1="4542622a48b9f62c0c7f2157067c5cde39a05771" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shpspatt">
+		<description>Shapes and Patterns</description>
+		<year>1988</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Shapes and Patterns" is a 1988 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234774">
+				<rom name="shapes and patterns.woz" size="234774" crc="d716cc89" sha1="a055cff882adc289c45d60a89b81971898f0eb88" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trcgd2">
+		<description>Top Readers' Club: Grade 2</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Top Readers' Club: Grade 2" is a 1989 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234789">
+				<rom name="top readers' club- grade 2.woz" size="234789" crc="ad824184" sha1="8feb5cdf2502b54205587db9fc2423d8a45037e0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trcgd3">
+		<description>Top Readers' Club: Grade 3</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Top Readers' Club: Grade 3" is a 1989 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234789">
+				<rom name="top readers' club- grade 3.woz" size="234789" crc="71252654" sha1="b4dc1b8aa2c563b15ef86ee19874c0431fc6fa42" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trcgd4">
+		<description>Top Readers' Club: Grade 4</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Top Readers' Club: Grade 4" is a 1989 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234789">
+				<rom name="top readers' club- grade 4.woz" size="234789" crc="899c9c19" sha1="8cd7e25a9f72e36b49da80b9fefe6e435d0cb2aa" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trcgd5">
+		<description>Top Readers' Club: Grade 5</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Top Readers' Club: Grade 5" is a 1989 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234789">
+				<rom name="top readers' club- grade 5.woz" size="234789" crc="f7220442" sha1="de62a19842c881a49f96b658a3094f169e811acb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grancook">
+		<description>Granny Applebee's Cookie Factory</description>
+		<year>1993</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Granny Applebee's Cookie Factory" is a 1993 educational program developed and distributed by Micrograms Publishing-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234788">
+				<rom name="granny applebee's cookie factory.woz" size="234788" crc="f1349cbb" sha1="57c0b3a9ce886f22c834310195d769c110678cac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hugohound">
+		<description>Hugo Hound's Vowel Sounds: Long Vowels</description>
+		<year>1993</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Hugo Hound's Vowel Sounds: Long Vowels" is a 1993 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234802">
+				<rom name="hugo hound's vowel sounds- long vowels.woz" size="234802" crc="780ba877" sha1="3167aa6f35b598cf400a07d6d6722e284f2efcf8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="infannel2">
+		<description>Inferential Anne: Level II</description>
+		<year>1987</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Inferential Anne: Level II" is a 1987 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234790">
+				<rom name="inferential anne- level ii.woz" size="234790" crc="405375dc" sha1="f4745fdbc748d01ed457ef2737be962f456aeb8b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="martyfrd">
+		<description>Marty's Family Reader</description>
+		<year>1992</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Marty's Family Reader" is a 1992 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="234795">
+				<rom name="marty's family reader - disk 1.woz" size="234795" crc="51c46b95" sha1="58d3b9120e913e140984f5e89d756adcb992bba4" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="234795">
+				<rom name="marty's family reader - disk 2.woz" size="234795" crc="08e83c2c" sha1="290e5bd096d1d444a6c9559043fc1b6d3cbd5230" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="234795">
+				<rom name="marty's family reader - disk 3.woz" size="234795" crc="d6590d18" sha1="5837af795cff24db8cf791d3a09612edb6064353" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="234795">
+				<rom name="marty's family reader - disk 4.woz" size="234795" crc="ebb16406" sha1="e20547f132df1feb0abafd9df40050812421d091" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="234795">
+				<rom name="marty's family reader - disk 5.woz" size="234795" crc="63bbddbd" sha1="826b7623f9b7e6360a13621d9e397e78153f5111" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="234795">
+				<rom name="marty's family reader - disk 6.woz" size="234795" crc="ed3788ab" sha1="2b2332d84ded516115f5020159ba2b773590f198" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="234795">
+				<rom name="marty's family reader - disk 7.woz" size="234795" crc="5ebb03c6" sha1="6b80083af9da670e22ae460fa318863a6f30ca38" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 8" />
+			<dataarea name="flop" size="234787">
+				<rom name="marty's family reader - disk 8.woz" size="234787" crc="ed4c85ac" sha1="d2fc51ca77785dd869ab41e90aa0d5a2ac4b43e0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="martyrdwk">
+		<description>Marty's Reading Workout</description>
+		<year>1992</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Marty's Reading Workout" is a 1992 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="234797">
+				<rom name="marty's reading workout - disk 1.woz" size="234797" crc="5fcaa755" sha1="5dd2d140615fba1973c9647577acdcf2c2764e7b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="234797">
+				<rom name="marty's reading workout - disk 2.woz" size="234797" crc="1bba4690" sha1="1005a002cb9212e9bfc7a9490cb8ef5323e3fd3e" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="234797">
+				<rom name="marty's reading workout - disk 3.woz" size="234797" crc="ac0d0491" sha1="79fa8161faeee1be4f665c0924c176a1b7fc842b" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="234797">
+				<rom name="marty's reading workout - disk 4.woz" size="234797" crc="3ee5110e" sha1="bdf0180783e4bf6fd2f034cf471874eb8522e4b9" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="234797">
+				<rom name="marty's reading workout - disk 5.woz" size="234797" crc="3375fd76" sha1="90dc7f78fd2655c16a7e83fdd404cc5bd102f708" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="234797">
+				<rom name="marty's reading workout - disk 6.woz" size="234797" crc="fec5c180" sha1="e0d9f241c2e1ae67cf75334b0b78efd84e231267" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="234797">
+				<rom name="marty's reading workout - disk 7.woz" size="234797" crc="049e0d67" sha1="0d8bcb14950092b17f55c878111ba5a6ed270f82" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 8" />
+			<dataarea name="flop" size="234797">
+				<rom name="marty's reading workout - disk 8.woz" size="234797" crc="610a2d0b" sha1="e24f02ba03c3e6afdae59b2e54df3dbd5f538d9b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="numbball">
+		<description>Numberball</description>
+		<year>1994</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Numberball" is a 1994 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234766">
+				<rom name="numberball.woz" size="234766" crc="161a93e1" sha1="9fd7357972fbaaf16609e2b8fa8f987be08b53cd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uccsbcon">
+		<description>Uncle Clyde's Consonant Slides: Beginning Consonants</description>
+		<year>1993</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Uncle Clyde's Consonant Slides: Beginning Consonants" is a 1993 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234816">
+				<rom name="uncle clyde's consonant slides- beginning consonants.woz" size="234816" crc="88348c39" sha1="52540c0a55312cee61423de49d25f26c79aed449" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uccsbldg">
+		<description>Uncle Clyde's Consonant Slides: Blends and Digraphs</description>
+		<year>1993</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Uncle Clyde's Consonant Slides: Blends and Digraphs" is a 1993 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234815">
+				<rom name="uncle clyde's consonant slides- blends and digraphs.woz" size="234815" crc="4ac31653" sha1="7f965a68ed1350390196324319ca45c209c3bd9f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uccsecon">
+		<description>Uncle Clyde's Consonant Slides: Ending Consonants</description>
+		<year>1993</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--"Uncle Clyde's Consonant Slides: Ending Consonants" is a 1993 educational program developed and distributed by Micrograms Publishing.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234813">
+				<rom name="uncle clyde's consonant slides- ending consonants.woz" size="234813" crc="bfe6adfe" sha1="bc12cd855cf9687cfd10031ede34ebb60f17f7f2" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
 
 
