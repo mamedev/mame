@@ -19,8 +19,7 @@
   272736-002  i960 Rx I/O Microprocessor Developer's Manual (April 1997)
   273353-001  Intel 80303 I/O Processor Developer's Manual (May 2000)
 */
-/// @todo reimplement the disassembler mnemonic list with another feature like
-/// X-macros (or similar) to cut down on opcode offset problems
+// TODO: make this table more legible?
 const i960_disassembler::mnemonic_t i960_disassembler::mnemonic[256] = {
 	{ "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, // 00
 	{ "b", 1, 1 }, { "call", 1, 1 }, { "ret", 1, 0 }, { "bal", 1, 1 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 },
