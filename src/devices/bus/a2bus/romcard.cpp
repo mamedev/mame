@@ -273,4 +273,4 @@ std::pair<std::error_condition, std::string> a2bus_romcarduser_device::call_load
 
 DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_ROMCARDUSER, device_a2bus_card_interface, a2bus_romcarduser_device, "a2romusr", "Apple II ROM Card (Custom)")
 DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_ROMCARDFP, device_a2bus_card_interface, a2bus_romcardfp_device, "a2romfp", "Apple II ROM Card (Applesoft BASIC)")
-DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_ROMCARDINT, device_a2bus_card_interface, a2bus_romcardint_device, "a2romint", "Apple II ROM Card (Integer BASIC))")
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_ROMCARDINT, device_a2bus_card_interface, a2bus_romcardint_device, "a2romint", "Apple II ROM Card (Integer BASIC)")
