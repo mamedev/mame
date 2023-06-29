@@ -284,6 +284,9 @@ ROM_START(pc)
 	// Phoenix ROM BIOS Ver 2.52
 	ROM_SYSTEM_BIOS(46, "vipmxm10", "VIP M X M/10")
 	ROMX_LOAD( "xt-vip-mxm-10.bin", 0x8000, 0x8000, CRC(6fd64a0a) SHA1(43808f758e9e92d8920e8c3590c3050ec68415aa), ROM_BIOS(46))
+	// 47: JUKO BABY XT BXM/12
+	ROM_SYSTEM_BIOS(47, "bxm12", "JUKO Baby XT BXM/12")
+	ROMX_LOAD("juko_baby_xt_bxm_12.bin", 0xe000, 0x2000, CRC(22d29b06) SHA1(75a504f50e4779d7fc0f0e0b0b1c17d3705cab42), ROM_BIOS(47))
 ROM_END
 
 // BIOS versions specifically for NEC V20 CPUs, these don't run on plain 8088
@@ -300,6 +303,9 @@ ROM_START( pcv20 )
 	ROM_SYSTEM_BIOS(2, "v365", "c't v3.65")
 	ROMX_LOAD( "xt_ls-1720_u52.bin", 0xe000, 0x2000, CRC(7082371a) SHA1(9965dbae5fa4355bc6325ac27a9acc176cc454c3), ROM_BIOS(2))
 	// ROM_LOAD( "xt_ls-1720_u8.bin", 0x0000, 0x2000, CRC(aa1d3916) SHA1(bb1723fc637d5d8a9af82b2bdd9e3b11689f0cb9)))
+	ROM_SYSTEM_BIOS(3, "glabios_0.24", "GLaBIOS 0.24") // Open Source XT clone BIOS under GPL3 https://github.com/640-KB/GLaBIOS
+	// Versions of this BIOS exist for 8088, V20, pure emulation, homebrew projects, XT chipsets and genuine IBM 5150/5160 machines
+	ROMX_LOAD( "glabios_0.2.4_vt.rom", 0xe000, 0x2000, CRC(7c173fe3) SHA1(4ac6ca07453890e02c203617fbbdeefb53098cdb), ROM_BIOS(3))
 ROM_END
 
 

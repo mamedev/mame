@@ -2401,6 +2401,17 @@ ROM_START( kma202f )
 ROM_END
 
 
+// ***** unknown chipset
+
+// Octek XT-286 V1.1 - "Keyboard error or locked"
+ROM_START( ocxt286 )
+	ROM_REGION16_LE(0x20000, "bios", 0)
+	ROM_SYSTEM_BIOS(0, "ocxt286_1", "Octek XT-286 V1.1")
+	ROMX_LOAD( "xt286-328.bin", 0x1e000, 0x2000, CRC(d9caefcc) SHA1(dab3403678feb023362df614596d1306ef7f85db), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "ocxt286_2", "Hedaka HED-919")
+	ROMX_LOAD( "hed919-328f.bin", 0x1e000, 0x2000, CRC(15117381) SHA1(d9dfa796edf7e94b9dacf984763ac046cf80f26d), ROM_BIOS(1))
+ROM_END
+
 //**************************************************************************
 //  80286 Desktop
 //**************************************************************************
@@ -4122,6 +4133,18 @@ ROM_END
 //**************************************************************************
 //  80386 SX and DX Laptop/Notebook
 //**************************************************************************
+
+// Nixdorf N8810/20 - CPU: Intel 80386DX-20 clocked at 20MHz or 8MHz, Motherboard: FT-3 DFUP0279ZAB3
+// Chipset: VLSI 9021BT 201141 VL16C452-QC, G2 GC132-PC, SED1345F, Headland HT133/A1A4324, Bt476KP50 128 9020
+// RAM: 1MB, upgradeable via memory cards, this example has 4MB ROM: Phoenix keyboard ROM (missing dump)
+// Mass storage: Floppy 3.5" 1.44MB, 3.5" HDD 40MB JVC JDE 3848V10-1A, Video: Paradise PVGA1A-JK
+// Display: 12" bw double supertwisted LCD VGA, Ports: 2xser, Par, beeper, Bus: ISA16bit: 1, OSC: 28.6838M, 40.000MHz
+// Origin: Software dump of the upper 256K
+ROM_START( n8810m20 ) // "Keyboard clock line failure", but keyboard works
+	ROM_REGION32_LE(0x20000, "bios", 0 )
+	ROM_LOAD( "n8810m20_trim.bin", 0x00000, 0x20000, CRC(21b5394d) SHA1(691f50e65398e5c775dedbd9bda71a95ba6a6a29))
+	// LCD Parameter Copyright MEI 1989 DAFT3C1 (missing dump), Keyboard-BIOS: Compability Software Phoenix Technologies LTD RBIOS Even 3ND1A4 Odd 3N1B4 (missing dump)
+ROM_END
 
 // Toshiba T3200SXC - CPU: 80386sx-20 - Floppy - 120 MB Hard disk - 1 MB RAM on board, 4 MB extra memory already installed. Can be upgraded to a total of 13 MB.
 // TFT Display, 640x480, 256 colors - WD 90C21 video chip, 256 KB RAM - ISA8: 1, ISA16: 1
@@ -5968,6 +5991,7 @@ COMP( 1986, necapciv,  ibm5170, 0,       atturbo,   0,     at_state,     init_at
 COMP( 198?, o286foxii, ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Octek",       "Fox II", MACHINE_NOT_WORKING )
 COMP( 1990, ocfoxm,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Octek", "Fox M 286", MACHINE_NOT_WORKING )
 COMP( 199?, octekg2,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Octek", "286 motherboard with Headland G2 chipset", MACHINE_NOT_WORKING )
+COMP( 198?, ocxt286,   ibm5170, 0,       ibm5170,   0,     at_state,     init_at,        "Octek", "XT-286 motherboard", MACHINE_NOT_WORKING )
 COMP( 199?, olim203,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Olivetti", "M203 motherboard", MACHINE_NOT_WORKING )
 COMP( 1988, pc30iii,   ibm5170, 0,       pc30iii,   0,     at_state,     init_at,        "Commodore Business Machines",  "PC 30-III", MACHINE_NOT_WORKING )
 COMP( 1988, pc40iii,   ibm5170, 0,       pc40iii,   0,     at_state,     init_at,        "Commodore Business Machines",  "PC 40-III", MACHINE_NOT_WORKING )
@@ -6094,6 +6118,7 @@ COMP( 199?, megapcpla, megapc,  0,       megapcpla, 0,     at_vrom_fix_state, in
 COMP( 199?, mokp386,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Morse", "KP920121523 V2.20", MACHINE_NOT_WORKING )
 COMP( 199?, mom3v3,    ibm5170, 0,       at386,     0,     at_state,     init_at,        "Morse", "M3 V3.0", MACHINE_NOT_WORKING )
 COMP( 199?, mx83c305,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>", "386 motherboards using the MX83C305(A)(FC)/MX83C05(A)(FC) chipset", MACHINE_NOT_WORKING )
+COMP( 1989, n8810m20,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Nixdorf", "8810/20", MACHINE_NOT_WORKING )
 COMP( 1992, ocjagii,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Octek",       "Jaguar II", MACHINE_NOT_WORKING )
 COMP( 1992, ocjagv,    ibm5170, 0,       at386,     0,     at_state,     init_at,        "Octek",       "Jaguar V v1.4", MACHINE_NOT_WORKING )
 COMP( 199?, op82c381,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>",   "386 motherboards using the OPTi 82C381 chipset", MACHINE_NOT_WORKING )
