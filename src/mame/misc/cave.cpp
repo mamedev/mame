@@ -2230,7 +2230,12 @@ void cave_state::gaia(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,spr_8bpp)
 
 	/* sound hardware */
-	add_ymz(config);
+	SPEAKER(config, "mono").front_center();
+
+	// Unlike other games also using ymz, gaia (and theroes) has 16MHz clock for it
+	ymz280b_device &ymz(YMZ280B(config, "ymz", 16_MHz_XTAL));
+	ymz.irq_handler().set(FUNC(cave_state::sound_irq_gen));
+	ymz.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
