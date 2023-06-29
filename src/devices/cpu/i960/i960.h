@@ -5,6 +5,7 @@
 
 #pragma once
 #include <cstdint>
+#include <type_traits>
 #include "softfloat3/source/include/softfloat.h"
 
 enum
@@ -122,9 +123,15 @@ private:
 	// rcache_pos = how deep in the stack we are.  0-(I960_RCACHE_SIZE-1) means in-cache.
 	// I960_RCACHE_SIZE or greater means out of cache, must save to memory.
 	int32_t m_rcache_pos;
+	// TODO: redefine RawExtendedReal to use an extFloat80_t once sin/cos/tan/log/etc support is reliabily implemented in softfloat3
+	using RawExtendedReal = double;
 	union ExtendedReal {
-		extFloat80_t m_floatValue;
+		RawExtendedReal m_floatValue;
 		uint32_t m_ordinals[3];
+		ExtendedReal& operator=(const int value) noexcept {
+			m_floatValue = value;
+			return *this;
+		}
 	};
 	ExtendedReal m_fp[4];
 

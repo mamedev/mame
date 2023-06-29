@@ -268,7 +268,7 @@ double i960_cpu_device::get_1_rif(uint32_t opcode)
 	else {
 		int idx = opcode & 0x1f;
 		if(idx < 4)
-			return m_fp[idx].floatValue;
+			return m_fp[idx].m_floatValue;
 		if(idx == 0x16)
 			return 1.0;
 		// TODO: only respond with 0.0 with specific opcode, otherwise
@@ -294,7 +294,7 @@ double i960_cpu_device::get_2_rif(uint32_t opcode)
 	else {
 		int idx = (opcode>>14) & 0x1f;
 		if(idx < 4)
-			return m_fp[idx].floatValue;
+			return m_fp[idx].m_floatValue;
 		if(idx == 0x16)
 			return 1.0;
 		// TODO: only respond with 0.0 with specific opcode, otherwise
@@ -318,7 +318,7 @@ void i960_cpu_device::set_rif(uint32_t opcode, double val)
 	if(!(opcode & 0x00002000))
 		m_r[(opcode>>19) & 0x1f] = f2u(val);
 	else if(!(opcode & 0x00e00000))
-		m_fp[(opcode>>19) & 3].floatValue = val;
+		m_fp[(opcode>>19) & 3].m_floatValue = val;
 	else
 		fatalerror("I960: %x: set_rif on literal?\n", m_PIP);
 }
@@ -332,7 +332,7 @@ double i960_cpu_device::get_1_rifl(uint32_t opcode)
 	} else {
 		int idx = opcode & 0x1f;
 		if(idx < 4)
-			return m_fp[idx].floatValue;
+			return m_fp[idx].m_floatValue;
 		if(idx == 0x16)
 			return 1.0;
 		// TODO: only respond with 0.0 with specific opcode, otherwise
@@ -360,7 +360,7 @@ double i960_cpu_device::get_2_rifl(uint32_t opcode)
 	} else {
 		int idx = (opcode>>14) & 0x1f;
 		if(idx < 4)
-			return m_fp[idx].floatValue;
+			return m_fp[idx].m_floatValue;
 		if(idx == 0x16)
 			return 1.0;
 		// TODO: only respond with 0.0 with specific opcode, otherwise
@@ -386,7 +386,7 @@ void i960_cpu_device::set_rifl(uint32_t opcode, double val)
 		m_r[(opcode>>19) & 0x1e] = v;
 		m_r[((opcode>>19) & 0x1e)+1] = v>>32;
 	} else if(!(opcode & 0x00e00000))
-		m_fp[(opcode>>19) & 3].floatValue = val;
+		m_fp[(opcode>>19) & 3].m_floatValue = val;
 	else
 		fatalerror("I960: %x: set_rifl on literal?\n", m_PIP);
 }
@@ -2434,7 +2434,7 @@ void i960_cpu_device::movre(uint32_t opcode)
 	} else {
 		if(auto idx = opcode & 0x1f; idx < 4) {
 			// allow pointer decay
-			src = m_fp[idx].storage;
+			src = m_fp[idx].m_ordinals;
 		}
 	}
 
@@ -2444,10 +2444,15 @@ void i960_cpu_device::movre(uint32_t opcode)
 		// hardware if that is the case.
 		dst = static_cast<uint32_t*>(&m_r[srcDestIndex & 0b11100]);
 	} else if(!(opcode & 0x00e00000)) {
-		dst = m_fp[srcDestIndex & 0b00011].storage;
+		dst = m_fp[srcDestIndex & 0b00011].m_ordinals;
 	}
 
 	dst[0] = src[0];
 	dst[1] = src[1];
+	// NOTE: The upper word will actually not be touched by fp instructions
+	// until we get support for sin/cos/tan/ etc in softfloat3. So the upper
+	// most word will not be correctly touched
+	// TODO: until we have support for sin/cos/tan in softfloat3, should we
+	// just make this zero?
 	dst[2] = src[2]&0xffff;
 }
