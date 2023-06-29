@@ -4,6 +4,9 @@
 
     Exidy 6502 hardware
 
+    TODO:
+    - use ptm6840_device and pit8253_device
+
 *************************************************************************/
 
 #include "emu.h"
@@ -24,7 +27,7 @@
  *
  *************************************/
 
-#define CRYSTAL_OSC             (XTAL(3'579'545))
+#define CRYSTAL_OSC             (3.579545_MHz_XTAL)
 #define SH8253_CLOCK            (CRYSTAL_OSC / 2)
 #define SH6840_CLOCK            (CRYSTAL_OSC / 4)
 #define SH6532_CLOCK            (CRYSTAL_OSC / 4)
@@ -168,6 +171,7 @@ void exidy_sound_device::sh6840_register_state_globals()
 	save_item(NAME(m_sh6840_timer[2].counter.w));
 }
 
+
 /*************************************
  *
  *  Audio startup routines
@@ -194,32 +198,32 @@ exidy_sound_device::exidy_sound_device(const machine_config &mconfig, const char
 }
 
 exidy_sh8253_sound_device::exidy_sh8253_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: exidy_sound_device(mconfig, type, tag, owner, clock),
-		m_riot(*this, "riot"),
-		m_cvsd(*this, "cvsd"),
-		m_cvsd_filter(*this, "cvsd_filter"),
-		m_cvsd_filter2(*this, "cvsd_filter2"),
-		m_cvsdcpu(*this, "cvsdcpu"),
-		m_tms(*this, "tms"),
-		m_pia(*this, "pia")
+	: exidy_sound_device(mconfig, type, tag, owner, clock)
+	, m_riot(*this, "riot")
+	, m_cvsd(*this, "cvsd")
+	, m_cvsd_filter(*this, "cvsd_filter")
+	, m_cvsd_filter2(*this, "cvsd_filter2")
+	, m_cvsdcpu(*this, "cvsdcpu")
+	, m_tms(*this, "tms")
+	, m_pia(*this, "pia")
 {
 }
 
 exidy_sound_device::exidy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_stream(nullptr),
-		m_freq_to_step(0),
-		m_sh6840_MSB_latch(0),
-		m_sh6840_LSB_latch(0),
-		m_sh6840_LFSR_oldxor(0),
-		m_sh6840_LFSR_0(0xffffffff),
-		m_sh6840_LFSR_1(0xffffffff),
-		m_sh6840_LFSR_2(0xffffffff),
-		m_sh6840_LFSR_3(0xffffffff),
-		m_sh6840_clocks_per_sample(0),
-		m_sh6840_clock_count(0),
-		m_sfxctrl(0)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_stream(nullptr)
+	, m_freq_to_step(0)
+	, m_sh6840_MSB_latch(0)
+	, m_sh6840_LSB_latch(0)
+	, m_sh6840_LFSR_oldxor(0)
+	, m_sh6840_LFSR_0(0xffffffff)
+	, m_sh6840_LFSR_1(0xffffffff)
+	, m_sh6840_LFSR_2(0xffffffff)
+	, m_sh6840_LFSR_3(0xffffffff)
+	, m_sh6840_clocks_per_sample(0)
+	, m_sh6840_clock_count(0)
+	, m_sfxctrl(0)
 {
 }
 
@@ -444,7 +448,6 @@ uint8_t exidy_sh8253_sound_device::r6532_portb_r()
  *
  *************************************/
 
-
 void exidy_sh8253_sound_device::sh8253_register_state_globals()
 {
 	save_item(NAME(m_sh8253_timer[0].clstate));
@@ -463,6 +466,7 @@ void exidy_sh8253_sound_device::sh8253_register_state_globals()
 	save_item(NAME(m_sh8253_timer[2].step));
 	save_item(NAME(m_sh8253_timer[2].fraction));
 }
+
 
 /*************************************
  *
@@ -639,7 +643,6 @@ void venture_sound_device::filter_w(uint8_t data)
  *
  *************************************/
 
-
 DEFINE_DEVICE_TYPE(EXIDY_VENTURE, venture_sound_device, "venture_sound", "Exidy SFX+PSG")
 
 venture_sound_device::venture_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -737,7 +740,7 @@ void venture_sound_device::venture_audio_map(address_map &map)
 	map(0x0000, 0x007f).mirror(0x0780).ram();
 	map(0x0800, 0x087f).mirror(0x0780).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
 	map(0x1000, 0x1003).mirror(0x07fc).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1800, 0x1803).mirror(0x07fc).w(FUNC(venture_sound_device::sh8253_w));
+	map(0x1800, 0x1803).mirror(0x07fc).w(FUNC(venture_sound_device::sh8253_w)).nopr(); // no /RD
 	map(0x2000, 0x27ff).w(FUNC(venture_sound_device::filter_w));
 	map(0x2800, 0x2807).mirror(0x07f8).rw(FUNC(venture_sound_device::sh6840_r), FUNC(venture_sound_device::sh6840_w));
 	map(0x3000, 0x3003).mirror(0x07fc).w(FUNC(venture_sound_device::sfxctrl_w));
@@ -747,7 +750,7 @@ void venture_sound_device::venture_audio_map(address_map &map)
 
 void venture_sound_device::device_add_mconfig(machine_config &config)
 {
-	m6502_device &audiocpu(M6502(config, "audiocpu", 3579545/4));
+	m6502_device &audiocpu(M6502(config, "audiocpu", 3.579545_MHz_XTAL / 4));
 	audiocpu.set_addrmap(AS_PROGRAM, &venture_sound_device::venture_audio_map);
 
 	RIOT6532(config, m_riot, SH6532_CLOCK);
@@ -762,7 +765,7 @@ void venture_sound_device::device_add_mconfig(machine_config &config)
 	m_pia->writepb_handler().set(FUNC(venture_sound_device::pia_pb_w));
 	m_pia->ca2_handler().set(FUNC(venture_sound_device::pia_ca2_w));
 	m_pia->cb2_handler().set(FUNC(venture_sound_device::pia_cb2_w));
-	m_pia->irqb_handler().set("audioirq", FUNC(input_merger_device::in_w<1>));
+	m_pia->irqa_handler().set("audioirq", FUNC(input_merger_device::in_w<1>));
 
 	INPUT_MERGER_ANY_HIGH(config, "audioirq").output_handler().set_inputline("audiocpu", m6502_device::IRQ_LINE); // open collector
 
@@ -883,9 +886,8 @@ void mtrap_sound_device::device_add_mconfig(machine_config &config)
  *
  *************************************/
 
-#define VICTORY_AUDIO_CPU_CLOCK     (XTAL(3'579'545) / 4)
+#define VICTORY_AUDIO_CPU_CLOCK     (3.579545_MHz_XTAL / 4)
 #define VICTORY_LOG_SOUND           0
-
 
 
 uint8_t victory_sound_device::response_r()
@@ -960,6 +962,8 @@ DEFINE_DEVICE_TYPE(EXIDY_VICTORY, victory_sound_device, "victory_sound", "Exidy 
 victory_sound_device::victory_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: exidy_sh8253_sound_device(mconfig, EXIDY_VICTORY, tag, owner, clock)
 	, m_victory_sound_response_ack_clk(0)
+	, m_pia_ca1(0)
+	, m_pia_cb1(0)
 {
 }
 
@@ -1002,7 +1006,7 @@ void victory_sound_device::victory_audio_map(address_map &map)
 	map(0x0000, 0x00ff).mirror(0x0f00).ram();
 	map(0x1000, 0x107f).mirror(0x0f80).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
 	map(0x2000, 0x2003).mirror(0x0ffc).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x3000, 0x3003).mirror(0x0ffc).w(FUNC(victory_sound_device::sh8253_w));
+	map(0x3000, 0x3003).mirror(0x0ffc).w(FUNC(victory_sound_device::sh8253_w)).nopr(); // no /RD
 	map(0x4000, 0x4fff).noprw();
 	map(0x5000, 0x5007).mirror(0x0ff8).rw(FUNC(victory_sound_device::sh6840_r), FUNC(victory_sound_device::sh6840_w));
 	map(0x6000, 0x6003).mirror(0x0ffc).w(FUNC(victory_sound_device::sfxctrl_w));
@@ -1026,7 +1030,7 @@ void victory_sound_device::device_add_mconfig(machine_config &config)
 	PIA6821(config, m_pia, 0);
 	m_pia->ca2_handler().set(FUNC(victory_sound_device::irq_clear_w));
 	m_pia->cb2_handler().set(FUNC(victory_sound_device::main_ack_w));
-	m_pia->irqb_handler().set("audioirq", FUNC(input_merger_device::in_w<1>));
+	m_pia->irqa_handler().set("audioirq", FUNC(input_merger_device::in_w<1>));
 
 	INPUT_MERGER_ANY_HIGH(config, "audioirq").output_handler().set_inputline("audiocpu", m6502_device::IRQ_LINE); // open collector
 
