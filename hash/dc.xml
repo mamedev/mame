@@ -4502,6 +4502,12 @@ Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
 
 	<!-- The Sega Direct version shares the same disc as the regular edition (T-47801M) but comes with a bonus CD. -->
 	<software name="cfieldsd" cloneof="cfield" supported="no">
+		<!--
+		<rom name="Chaos Field v1.003 (2004)(Milestone)(NTSC)(JP)(en)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
+		<rom name="track01.bin" size="705600" md5="b00f57ae7e87793842232c5079006103" sha1="fc642d6e85015273870c4aa49d7cd50cca842195"/>
+		<rom name="track02.raw" size="1949808" md5="c3d6946b633e1f28e565e7f8b04c9fef" sha1="febb49adb703b3735a0161964388d527d3c4875c"/>
+		<rom name="track03.bin" size="1185760800" md5="4ebdadcf6dcc58f8d953ba3eeb7e91af" sha1="7b1a382a46516d72b53f7ab4d8d516383d247635"/>
+		-->
 		<description>Chaos Field (Japan, Sega Direct)</description>
 		<year>2004</year>
 		<publisher>Milestone Inc.</publisher>
@@ -4527,6 +4533,12 @@ Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
 
 	<!-- The Sega Direct version shares the same disc as the regular edition (T-47801M) but comes with a bonus CD. -->
 	<software name="cfieldsd1" cloneof="cfield" supported="no">
+		<!--
+		<rom name="Chaos Field v1.003 (2004)(Milestone)(NTSC)(JP)(en)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
+		<rom name="track01.bin" size="705600" md5="b00f57ae7e87793842232c5079006103" sha1="fc642d6e85015273870c4aa49d7cd50cca842195"/>
+		<rom name="track02.raw" size="1949808" md5="c3d6946b633e1f28e565e7f8b04c9fef" sha1="febb49adb703b3735a0161964388d527d3c4875c"/>
+		<rom name="track03.bin" size="1185760800" md5="4ebdadcf6dcc58f8d953ba3eeb7e91af" sha1="7b1a382a46516d72b53f7ab4d8d516383d247635"/>
+		-->
 		<description>Chaos Field (Japan, Sega Direct, rev. 1)</description>
 		<year>2004</year>
 		<publisher>Milestone Inc.</publisher>
@@ -13603,31 +13615,31 @@ Too fast ADX logo transition
 
 	<software name="ssr" cloneof="flgtoflg" supported="no">
 		<!--
-		<rom name="track13.raw" size="42455952" md5="bf84a883b7ee9ca061b688cd54321b22" sha1="ae3333b6756bd81f0688c5360063288e32f7f01e"/>
-		<rom name="track07.raw" size="56313936" md5="82c941f3fb1450bb9ac7565e6e187338" sha1="02647f1c00ec69cfdb1b79cd62670df08c086f98"/>
-		<rom name="track06.raw" size="51224208" md5="8e17d6aa497819372c1011c7680d1702" sha1="7d4b6d39b7a64fa24c8e8e24543f69c82fd0142f"/>
-		<rom name="track17.raw" size="24378480" md5="452b04b80853af6b39be7b1506966af4" sha1="5e5331dfce7db654b3d9e23d51163194536ac5e1"/>
-		<rom name="track08.raw" size="47931408" md5="3d7ccd499d67763943403d12dbac3d28" sha1="d9f65b0cf262cb6fb086230ad305c9c7a23eecaf"/>
-		<rom name="track20.raw" size="10405248" md5="0fa59dc46c654275a7a26c8d627dff86" sha1="f986a62c5f2dc524ca6efb5e703be59bf94aab04"/>
-		<rom name="track12.raw" size="50408064" md5="edcaf90ea51ca75eddc597682f81fdc7" sha1="8e41b53c242853f88a0e0620c12b333e4e799cd2"/>
-		<rom name="track02.raw" size="1949808" md5="c28a4d0b40eee409fe201f3c1c47a0b1" sha1="437a4512cac2d8dc384ab8e7240790925158f1d9"/>
-		<rom name="track19.raw" size="22673280" md5="0f6f83dd5382dc1ddd6de509887604bb" sha1="f674b45666f66909cbef3a980b3a582b74ebc856"/>
-		<rom name="track21.raw" size="8624784" md5="08cc9355558a9da3c9168dc5dbbdaa59" sha1="bd73deced716de3f8c31e858bcbfff0e9bc4c937"/>
-		<rom name="track04.raw" size="1853376" md5="407cb08f947bb5d8a19178217950697e" sha1="b36994ab352f591593d313c0ae813987b39a466b"/>
 		<rom name="Super Speed Racing v1.004 (1999)(Sega)(NTSC)(JP)[!].gdi" size="754" md5="e5b0662fbb275e3ed9a5e332542b247f" sha1="5d73c8d93f6787fda5e22620e7647cba6b0dd747"/>
-		<rom name="track15.raw" size="30190272" md5="cb28b5c19fe7f3819588e4181802dc1c" sha1="f6ea94eb25114fb21030536cfb1dfd3a01a612ff"/>
 		<rom name="track01.bin" size="1620528" md5="c86252c64c89aee5008aa3c5c66ea220" sha1="53ada8b36a7f69152ba8c74ddff58417e038f7f2"/>
-		<rom name="track24.bin" size="397457424" md5="cf663cdc3476078f2d7b013e63a2dec5" sha1="e211b5cd4f0c4426c6f6ea5bd8b834c0af644d95"/>
-		<rom name="track18.raw" size="5651856" md5="843cee56f220a6a2f431cc0e92eb3fe8" sha1="05f45e53233691f1b3b0e4ed3458e061b3325b55"/>
+		<rom name="track02.raw" size="1949808" md5="c28a4d0b40eee409fe201f3c1c47a0b1" sha1="437a4512cac2d8dc384ab8e7240790925158f1d9"/>
+		<rom name="track03.bin" size="165604320" md5="93eacb57feb6f5590d96a4d9e0075112" sha1="322d430e98b3b4e045713a9e96b5859f42754d4e"/>
+		<rom name="track04.raw" size="1853376" md5="407cb08f947bb5d8a19178217950697e" sha1="b36994ab352f591593d313c0ae813987b39a466b"/>
+		<rom name="track05.raw" size="42587664" md5="20927a41063b8eec4938001bef770837" sha1="86cfcb9b14fb4e97090e91288958af18c396c1ee"/>
+		<rom name="track06.raw" size="51224208" md5="8e17d6aa497819372c1011c7680d1702" sha1="7d4b6d39b7a64fa24c8e8e24543f69c82fd0142f"/>
+		<rom name="track07.raw" size="56313936" md5="82c941f3fb1450bb9ac7565e6e187338" sha1="02647f1c00ec69cfdb1b79cd62670df08c086f98"/>
+		<rom name="track08.raw" size="47931408" md5="3d7ccd499d67763943403d12dbac3d28" sha1="d9f65b0cf262cb6fb086230ad305c9c7a23eecaf"/>
+		<rom name="track09.raw" size="36533616" md5="684dcee7e864c0bf466150d7ccbb2413" sha1="607771ceeb515880b3b2521c41f99937e72c7caf"/>
 		<rom name="track10.raw" size="42359520" md5="7052997bb04759ce150e5dc768f5049a" sha1="5ec50d3bd822332c8523508bdbf469a0ac5805ae"/>
 		<rom name="track11.raw" size="51318288" md5="4e09b272c7fee74f8d1e364ead954e90" sha1="d8b5a4fc1fbbc56613fa69cd158d6db9f188d555"/>
+		<rom name="track12.raw" size="50408064" md5="edcaf90ea51ca75eddc597682f81fdc7" sha1="8e41b53c242853f88a0e0620c12b333e4e799cd2"/>
+		<rom name="track13.raw" size="42455952" md5="bf84a883b7ee9ca061b688cd54321b22" sha1="ae3333b6756bd81f0688c5360063288e32f7f01e"/>
 		<rom name="track14.raw" size="46012176" md5="7e9761d7bc433907ec27d561d9ce6f71" sha1="06990a580ae03db57000d35a226799ba6025ed36"/>
-		<rom name="track23.raw" size="6082272" md5="cf869000eec622c1a72a60ac9dbc5f24" sha1="a12cacfcdabfa52f3ae006e93a5abecd45a8c5e8"/>
-		<rom name="track09.raw" size="36533616" md5="684dcee7e864c0bf466150d7ccbb2413" sha1="607771ceeb515880b3b2521c41f99937e72c7caf"/>
+		<rom name="track15.raw" size="30190272" md5="cb28b5c19fe7f3819588e4181802dc1c" sha1="f6ea94eb25114fb21030536cfb1dfd3a01a612ff"/>
 		<rom name="track16.raw" size="30851184" md5="4c10484b9aaa29b4ae897c95ae33c427" sha1="e8b27635c98e7123b45c695f608c6baa6c9ba880"/>
+		<rom name="track17.raw" size="24378480" md5="452b04b80853af6b39be7b1506966af4" sha1="5e5331dfce7db654b3d9e23d51163194536ac5e1"/>
+		<rom name="track18.raw" size="5651856" md5="843cee56f220a6a2f431cc0e92eb3fe8" sha1="05f45e53233691f1b3b0e4ed3458e061b3325b55"/>
+		<rom name="track19.raw" size="22673280" md5="0f6f83dd5382dc1ddd6de509887604bb" sha1="f674b45666f66909cbef3a980b3a582b74ebc856"/>
+		<rom name="track20.raw" size="10405248" md5="0fa59dc46c654275a7a26c8d627dff86" sha1="f986a62c5f2dc524ca6efb5e703be59bf94aab04"/>
+		<rom name="track21.raw" size="8624784" md5="08cc9355558a9da3c9168dc5dbbdaa59" sha1="bd73deced716de3f8c31e858bcbfff0e9bc4c937"/>
 		<rom name="track22.raw" size="14137872" md5="9934886537e619b6ecec0b40b4979ba9" sha1="404f290ae3f3107736cd7c150bbb8cf673baa101"/>
-		<rom name="track05.raw" size="42587664" md5="20927a41063b8eec4938001bef770837" sha1="86cfcb9b14fb4e97090e91288958af18c396c1ee"/>
-		<rom name="track03.bin" size="165604320" md5="93eacb57feb6f5590d96a4d9e0075112" sha1="322d430e98b3b4e045713a9e96b5859f42754d4e"/>
+		<rom name="track23.raw" size="6082272" md5="cf869000eec622c1a72a60ac9dbc5f24" sha1="a12cacfcdabfa52f3ae006e93a5abecd45a8c5e8"/>
+		<rom name="track24.bin" size="397457424" md5="cf663cdc3476078f2d7b013e63a2dec5" sha1="e211b5cd4f0c4426c6f6ea5bd8b834c0af644d95"/>
 		-->
 		<description>Super Speed Racing (Japan)</description>
 		<year>1999</year>
@@ -14071,10 +14083,6 @@ Corrupted [PVR] render ingame when selecting a map location, bump mapping
 
 	<software name="yamazaki" supported="no">
 		<!--
-		<rom name="track18.raw" size="1067808" md5="c091da8132c95d11183e344297f2fd14" sha1="8da33e13407a367672f7a5002b6ccb63af8da3ac"/>
-		<rom name="track38.raw" size="1072512" md5="c564ea47c9f8bbed56788459af9f839c" sha1="6b754e652c5c7fa1157c64b4eb78a90ea0655193"/>
-		<rom name="track58.raw" size="2399040" md5="21eb80fbed099bce52b9eb1ee36874ee" sha1="c517341ec5845bd467d7efc77cca235d4711fe59"/>
-		<rom name="track78.raw" size="1067808" md5="066bb02d9ffca8048bef3fe46ab582b0" sha1="a807d14fae33ac99fa3db1aa2d991e8b573e31ab"/>
 		<rom name="Gakkyu wo Yamazaki - Yamazaki Oukoku Dai Fun So! v1.005 (1999)(Sega)(NTSC)(JP)[!].gdi" size="3154" md5="9712251c438080b38614c5dae03089d5" sha1="a14e8969c93711d0e2c5af07b6460c5c9967cddc"/>
 		<rom name="track01.bin" size="1058400" md5="7002e24b43123159dc87c5cff3dd5994" sha1="88c45ca8fa086632054c688e09a81f2cbb4ceb9f"/>
 		<rom name="track02.raw" size="1735776" md5="8659426a29f58924f5f0458cc720098b" sha1="e12b9ae5ebc79b7da5271bce29df450671ce5d93"/>
@@ -14093,6 +14101,7 @@ Corrupted [PVR] render ingame when selecting a map location, bump mapping
 		<rom name="track15.raw" size="1070160" md5="fcffde38bae4a843f2e89ca58ade8179" sha1="5ae8772f787307a3952f44d3aeb3d8d86ac8feca"/>
 		<rom name="track16.raw" size="1077216" md5="341ee52d7dcbea29539040c9f1d64a48" sha1="e152d237bba894f5a948149fa255a8788c90a005"/>
 		<rom name="track17.raw" size="1067808" md5="fc6531f1f80acb5a501b50ab64410b32" sha1="b5442727bf09741add9920e5d497ca98448712e5"/>
+		<rom name="track18.raw" size="1067808" md5="c091da8132c95d11183e344297f2fd14" sha1="8da33e13407a367672f7a5002b6ccb63af8da3ac"/>
 		<rom name="track19.raw" size="1074864" md5="3ee8ab43fe96a06ab2334053163c8ec9" sha1="e571f13da162a1a9dc73367ef0172f665c7a8b78"/>
 		<rom name="track20.raw" size="1086624" md5="3c60dab64991d2ba24168cee22f1d802" sha1="72a90fa550c3dac9b937b4fbdf63eeee610b5fd9"/>
 		<rom name="track21.raw" size="1067808" md5="77f3ed02edce82a351ebde9158221e3b" sha1="a085d6849fd3300cad6c5154f61405636f8c241f"/>
@@ -14112,6 +14121,7 @@ Corrupted [PVR] render ingame when selecting a map location, bump mapping
 		<rom name="track35.raw" size="1067808" md5="cee76b3acaa55b9e1c9f2a4efea6048d" sha1="97808054e82aa3a4c1f0fd780d9b1f4dce5d1304"/>
 		<rom name="track36.raw" size="1074864" md5="65d3e8451e997d2c4f2366b13b60b0a1" sha1="50a696e5ee0dd10317d25f16a69731ea6a269f1a"/>
 		<rom name="track37.raw" size="1070160" md5="89b9f40223caaa5a69476441a144cb1e" sha1="e1f5dcc846e0cdca01b4d73f349f29771ee037be"/>
+		<rom name="track38.raw" size="1072512" md5="c564ea47c9f8bbed56788459af9f839c" sha1="6b754e652c5c7fa1157c64b4eb78a90ea0655193"/>
 		<rom name="track39.raw" size="1072512" md5="e0f1aba35a37ed4066d81ca9122ae499" sha1="df594f71a4cd5d433ca3346a8c1f261e978c9874"/>
 		<rom name="track40.raw" size="1077216" md5="1e8400d0edb1be44d833085a0c187c3e" sha1="44016b9fcc1f4c05fdc689024232c9e908278db9"/>
 		<rom name="track41.raw" size="1070160" md5="809579ad9189d7b878ea110d85bac9fa" sha1="962ef2f773f4c7adb48c4328375050fef227d577"/>
@@ -14131,6 +14141,7 @@ Corrupted [PVR] render ingame when selecting a map location, bump mapping
 		<rom name="track55.raw" size="2177952" md5="63b48460aca8aca3aa5614e7b257eec4" sha1="9391d60e895db6f4584d8b9b10e882433e06e435"/>
 		<rom name="track56.raw" size="1408848" md5="d7ae386c0dc131f470002772d9401c96" sha1="7e5f43205e3241f5a5dbe88f706d09e10fa5cf7a"/>
 		<rom name="track57.raw" size="2638944" md5="04e783b5dd08a927a1f779d7f84d9662" sha1="69cb65236f0d24fbca391f7439b258d318ac797e"/>
+		<rom name="track58.raw" size="2399040" md5="21eb80fbed099bce52b9eb1ee36874ee" sha1="c517341ec5845bd467d7efc77cca235d4711fe59"/>
 		<rom name="track59.raw" size="1606416" md5="14c466274a33435a9e3abc8cad2f99a0" sha1="28b17c9c076a4779814bff054362debcc3ed7732"/>
 		<rom name="track60.raw" size="2067408" md5="a3d97b6e806dcef400d796d168363e13" sha1="f99d1d691ff01e49c33a84ee9a346b8b98834363"/>
 		<rom name="track61.raw" size="2963520" md5="1440825c47965ebef33e3d0d970bad29" sha1="0f5394c35c1e5e8c30d442995ab7b21372845829"/>
@@ -14150,6 +14161,7 @@ Corrupted [PVR] render ingame when selecting a map location, bump mapping
 		<rom name="track75.raw" size="1067808" md5="d9eae4a92bb1ba9af7d64e828c8834b1" sha1="8522a10b4eb4e95fb8ccb1b031895a86562abd78"/>
 		<rom name="track76.raw" size="1065456" md5="6ff8f7a9bebf58e934d87b45ecc1de85" sha1="5ea46be7da38a61181950024ddc8ad303ed91bbd"/>
 		<rom name="track77.raw" size="1093680" md5="e40a4480849a36c057f537311ab557f8" sha1="b4de2100b7139ed4a1161ed0d31c5c1836e419f8"/>
+		<rom name="track78.raw" size="1067808" md5="066bb02d9ffca8048bef3fe46ab582b0" sha1="a807d14fae33ac99fa3db1aa2d991e8b573e31ab"/>
 		<rom name="track79.raw" size="1070160" md5="1d61c6fd99729f71e451f91aaef4c56c" sha1="72f03e3615e3ba34ce3301fb2fa6d450da06d51f"/>
 		<rom name="track80.raw" size="1063104" md5="1f9d73f3f9c6b427d9ccc91aee68c13f" sha1="41475bfe949fbeb4032ead82bcb1fdc331fc6f4e"/>
 		<rom name="track81.raw" size="1072512" md5="6d3bc8ecca9fcd2ca3ad5f16c97ba4ac" sha1="1fb66ff6b81fde0894db13ddc8c5e0f411780e9b"/>
@@ -18356,8 +18368,6 @@ Built on Windows CE, requires [MMU] support
 
 	<software name="kao" supported="no">
 		<!--
-		<rom name="track18.raw" size="12449136" md5="8cb7202deb2124ae2dbfa68593b7d183" sha1="e7e5ce7b0ab6cf529f1a5a0a67a1f3a89b18c90a"/>
-		<rom name="track38.raw" size="13902672" md5="44a207f542241062f13c8d59578aed05" sha1="75d27ba691e49eae837ea8bad3534a5fe1d761ed"/>
 		<rom name="KAO the Kangaroo v1.002 (2000)(Titus)(NTSC)(US)(en-es)[!].gdi" size="1842" md5="983ce4b8203a1a2abbe0477066f726ee" sha1="e5c6e4f8cea7bb4bcd767038bd02242937f0d5e4"/>
 		<rom name="track01.bin" size="1425312" md5="623b23ea5b6641bb1e5fbe5ee545bee0" sha1="c38b641adb8944938a9e601dd80c11829d5bf3c1"/>
 		<rom name="track02.raw" size="1237152" md5="87af6d21a8b10aeffb90874118531e29" sha1="b0d28980a64765c022b4b3e47244aad32a345270"/>
@@ -18376,6 +18386,7 @@ Built on Windows CE, requires [MMU] support
 		<rom name="track15.raw" size="13055952" md5="40be89267716738b1f38211b787ba795" sha1="506244d72439a8d516f59d57bfaeea8c59f374a8"/>
 		<rom name="track16.raw" size="12451488" md5="37a107c5471a5d9095dfedc47e1dff4b" sha1="97bb897db5595fb89c6c595a2cdfdbe76e05af92"/>
 		<rom name="track17.raw" size="13258224" md5="7995eb5c51529eb19961a17ff1f505df" sha1="fafec4a2c81193edf3e74b44945b0d86a45c9f30"/>
+		<rom name="track18.raw" size="12449136" md5="8cb7202deb2124ae2dbfa68593b7d183" sha1="e7e5ce7b0ab6cf529f1a5a0a67a1f3a89b18c90a"/>
 		<rom name="track19.raw" size="11190816" md5="c4ac1853cc5c68f542425b2375f1429c" sha1="0ae2ef53811c5220b20b67be31150d9a79ba1270"/>
 		<rom name="track20.raw" size="13180608" md5="e3aa8cf0905688420b9847a04171ed52" sha1="682cf0cf236fbf87a016d8d8352ad207720531cd"/>
 		<rom name="track21.raw" size="13902672" md5="211440f97e5c58d88a552baa6f7f5471" sha1="3ffc07527be24f55989c432c89409fc51b509bd6"/>
@@ -18395,6 +18406,7 @@ Built on Windows CE, requires [MMU] support
 		<rom name="track35.raw" size="10395840" md5="e9b2ca401f30e439e09c314e378523e9" sha1="01e07bd8010be327b29566f4f68fb91037cbd5a5"/>
 		<rom name="track36.raw" size="14812896" md5="ae24259ad323756bd100a1e27f57a1b7" sha1="a3200b4dbe48b7ee0ee476a287f45631d0cf9172"/>
 		<rom name="track37.raw" size="13180608" md5="859071b98c183a3a99a957f985117886" sha1="88ec068ce73b7bf1abfd1d2b4eb706b743229881"/>
+		<rom name="track38.raw" size="13902672" md5="44a207f542241062f13c8d59578aed05" sha1="75d27ba691e49eae837ea8bad3534a5fe1d761ed"/>
 		<rom name="track39.raw" size="12547920" md5="e254d0115ef39a678251a59fc7b0e757" sha1="7fc35e0f34118c24c32926105782ffcbc9f385c4"/>
 		<rom name="track40.raw" size="13897968" md5="4a25dcd98efccb3d293bac3b8bfa8305" sha1="c0d4160e51c0b431211dea65c83fe1ddd4dca410"/>
 		<rom name="track41.raw" size="13053600" md5="4e9a57d2a250e7a88fe4fd293c76faad" sha1="12070e7ccfa4c029247b33dff5f7f3401d0c284e"/>
@@ -18431,8 +18443,6 @@ Built on Windows CE, requires [MMU] support
 	<!-- A promo version exists (P830-0197-50 T-22902D-50), it is most likely the same as retail. -->
 	<software name="kaoe" cloneof="kao" supported="no">
 		<!--
-		<rom name="track18.raw" size="12449136" md5="8cb7202deb2124ae2dbfa68593b7d183" sha1="e7e5ce7b0ab6cf529f1a5a0a67a1f3a89b18c90a"/>
-		<rom name="track38.raw" size="13902672" md5="44a207f542241062f13c8d59578aed05" sha1="75d27ba691e49eae837ea8bad3534a5fe1d761ed"/>
 		<rom name="KAO the Kangaroo v1.001 (2000)(Titus)(PAL)(M5)[!].gdi" size="1843" md5="780988f87ee0e6d35dbd6bb2849cf560" sha1="c5fa6d85c6f990698b2240f023a6602ceaac48ac"/>
 		<rom name="track01.bin" size="16075920" md5="ca93f351c33f2deeebc473948b94c8cf" sha1="84b049207401b0c669b58f513842d3fe9b2f23f5"/>
 		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
@@ -18451,6 +18461,7 @@ Built on Windows CE, requires [MMU] support
 		<rom name="track15.raw" size="13055952" md5="40be89267716738b1f38211b787ba795" sha1="506244d72439a8d516f59d57bfaeea8c59f374a8"/>
 		<rom name="track16.raw" size="12451488" md5="37a107c5471a5d9095dfedc47e1dff4b" sha1="97bb897db5595fb89c6c595a2cdfdbe76e05af92"/>
 		<rom name="track17.raw" size="13258224" md5="7995eb5c51529eb19961a17ff1f505df" sha1="fafec4a2c81193edf3e74b44945b0d86a45c9f30"/>
+		<rom name="track18.raw" size="12449136" md5="8cb7202deb2124ae2dbfa68593b7d183" sha1="e7e5ce7b0ab6cf529f1a5a0a67a1f3a89b18c90a"/>
 		<rom name="track19.raw" size="11190816" md5="c4ac1853cc5c68f542425b2375f1429c" sha1="0ae2ef53811c5220b20b67be31150d9a79ba1270"/>
 		<rom name="track20.raw" size="13180608" md5="e3aa8cf0905688420b9847a04171ed52" sha1="682cf0cf236fbf87a016d8d8352ad207720531cd"/>
 		<rom name="track21.raw" size="13902672" md5="211440f97e5c58d88a552baa6f7f5471" sha1="3ffc07527be24f55989c432c89409fc51b509bd6"/>
@@ -18470,6 +18481,7 @@ Built on Windows CE, requires [MMU] support
 		<rom name="track35.raw" size="10395840" md5="e9b2ca401f30e439e09c314e378523e9" sha1="01e07bd8010be327b29566f4f68fb91037cbd5a5"/>
 		<rom name="track36.raw" size="14812896" md5="ae24259ad323756bd100a1e27f57a1b7" sha1="a3200b4dbe48b7ee0ee476a287f45631d0cf9172"/>
 		<rom name="track37.raw" size="13180608" md5="859071b98c183a3a99a957f985117886" sha1="88ec068ce73b7bf1abfd1d2b4eb706b743229881"/>
+		<rom name="track38.raw" size="13902672" md5="44a207f542241062f13c8d59578aed05" sha1="75d27ba691e49eae837ea8bad3534a5fe1d761ed"/>
 		<rom name="track39.raw" size="12547920" md5="e254d0115ef39a678251a59fc7b0e757" sha1="7fc35e0f34118c24c32926105782ffcbc9f385c4"/>
 		<rom name="track40.raw" size="13897968" md5="4a25dcd98efccb3d293bac3b8bfa8305" sha1="c0d4160e51c0b431211dea65c83fe1ddd4dca410"/>
 		<rom name="track41.raw" size="13053600" md5="4e9a57d2a250e7a88fe4fd293c76faad" sha1="12070e7ccfa4c029247b33dff5f7f3401d0c284e"/>
@@ -23415,6 +23427,7 @@ Crashes at the end of FMV
 		<rom name="track15.raw" size="2467248" md5="87231690aa471430d3ee89d9a25c4d25" sha1="cf632142d12ff764f849587058c8749feb62dd56"/>
 		<rom name="track16.raw" size="2467248" md5="87231690aa471430d3ee89d9a25c4d25" sha1="cf632142d12ff764f849587058c8749feb62dd56"/>
 		<rom name="track17.raw" size="1084272" md5="25b80ba0a1ce3010a397adfb3c0355f6" sha1="5ed63f5c402600a4847d6be84e2b04f423fdd47b"/>
+		<rom name="track18.raw" size="3528000" md5="c2ce25835ddc6c9936fa87294c150f8e" sha1="5208d3d25f89bb669dd8f1fca291bb9627b9eeb7"/>
 		<rom name="track19.raw" size="1237152" md5="d566b3d8cfab13512e137f2fbf3e0066" sha1="ebe1998b2cccded7413ae27d2e564e7b7eccb9b9"/>
 		<rom name="track20.raw" size="2648352" md5="5ac527092e97362ee385949c20efc52d" sha1="16e018ebb9482d18e974d21b3ede596d316c501b"/>
 		<rom name="track21.raw" size="3001152" md5="1e2dc50b3560e5f5189a925808f4e9f0" sha1="e256f05c10c23f2f28104410c543f3e29a11b399"/>
@@ -23434,6 +23447,7 @@ Crashes at the end of FMV
 		<rom name="track35.raw" size="3353952" md5="0b9ba48f275eaf617d1e24b8ce53a4e9" sha1="009a69b955ee5ad8a1e57b4f2646c6f31f10ba4e"/>
 		<rom name="track36.raw" size="1942752" md5="6ec34aa74db04241aae8c4afb8ff0ed0" sha1="7099c6e4770eb7e9097421e15988905e9238967a"/>
 		<rom name="track37.raw" size="2119152" md5="2c684efd9bdf54500cfed7db6d6cef37" sha1="d8a1d35589f457d7ab3185c2d01ba4f5cfaae916"/>
+		<rom name="track38.raw" size="1237152" md5="c5165ad0901029ae1ea0ce629ee4c25c" sha1="a57c8bd0842ec516d2d7a9daed2defd39018f529"/>
 		<rom name="track39.raw" size="3353952" md5="f72db0bbd5f5b4cbeb958ced1adfe0f6" sha1="dd0f8a4d458d04e3e1e57da437c8d7875e794bca"/>
 		<rom name="track40.raw" size="1589952" md5="398965ccb2db1aa71caff619c7783677" sha1="6598c732209e8a6ae41daf52597d599cde8d7871"/>
 		<rom name="track41.raw" size="2822400" md5="eb92fb57acaced1500a28583f0f92cc6" sha1="d2d75f79e30702e4d583c6915315cb1f0a72f164"/>
@@ -23453,6 +23467,7 @@ Crashes at the end of FMV
 		<rom name="track55.raw" size="3353952" md5="313ddc0e5ea084eb35f9e70901a338a1" sha1="bafc23cbb073a478059760800a9b0b66d343b31c"/>
 		<rom name="track56.raw" size="3883152" md5="57c0cb3e639fee8122de3acd7de3970c" sha1="add841d5cf1638583c7149344ab53a25e15edf28"/>
 		<rom name="track57.raw" size="3353952" md5="bfe9ccb2697e817591e9b0bf25115f65" sha1="7cf93598570b1376c5ba83f704f0f31201c7dd21"/>
+		<rom name="track58.raw" size="1060752" md5="aefeb9b0e1aa056577193b4db220af14" sha1="bc6b9e87667ab5484625b8d259996503ab84db06"/>
 		<rom name="track59.raw" size="3001152" md5="17cdc398cf30cce3722fbb33dfbfe17a" sha1="0cc958d4e66b33c0db716ca1181512f4c914b0b1"/>
 		<rom name="track60.raw" size="2646000" md5="2e278e73856e97a57e979dbd94ed635d" sha1="e48d1a42d45e44bfdfaba3f47e2ff2b48d8d19d1"/>
 		<rom name="track61.raw" size="2648352" md5="3be2a7a523fe8cc27fb988baa122265c" sha1="843383d71af8fb4135a685d2ed25d4d7f81dd24d"/>
@@ -23484,9 +23499,6 @@ Crashes at the end of FMV
 		<rom name="track87.raw" size="1942752" md5="66d8fd661aab68e5e88edf498a2acc51" sha1="26751a96a6c213d92d9eb6dd14d8472bec0be596"/>
 		<rom name="track88.raw" size="2469600" md5="3af390fea354f4d7f3538e31e928fde4" sha1="b28bcc529868a3227882fcbfa1ff16bc3770b21f"/>
 		<rom name="track89.bin" size="645845088" md5="4a62c134eba4b5cfd6429a31b850db23" sha1="394b34843f3422abf36bf236e59de28d6217761b"/>
-		<rom name="track18.raw" size="3528000" md5="c2ce25835ddc6c9936fa87294c150f8e" sha1="5208d3d25f89bb669dd8f1fca291bb9627b9eeb7"/>
-		<rom name="track38.raw" size="1237152" md5="c5165ad0901029ae1ea0ce629ee4c25c" sha1="a57c8bd0842ec516d2d7a9daed2defd39018f529"/>
-		<rom name="track58.raw" size="1060752" md5="aefeb9b0e1aa056577193b4db220af14" sha1="bc6b9e87667ab5484625b8d259996503ab84db06"/>
 		-->
 		<description>Nightmare Creatures II (USA)</description>
 		<year>2000</year>
@@ -23521,6 +23533,7 @@ Crashes at the end of FMV
 		<rom name="track15.raw" size="2467248" md5="83d40510e01ac292db9c5a0340bcab4a" sha1="1c534dba15ca158cf44479e60ee23b01f6bcd55c"/>
 		<rom name="track16.raw" size="2467248" md5="83d40510e01ac292db9c5a0340bcab4a" sha1="1c534dba15ca158cf44479e60ee23b01f6bcd55c"/>
 		<rom name="track17.raw" size="1084272" md5="359c22b47142ba129c5c3e2034bac7ae" sha1="3204fb42df2374a0ade768696e7da5b755985e87"/>
+		<rom name="track18.raw" size="3528000" md5="515b7115d10800b9a0d4e30f178ab1d5" sha1="b3b7af5c11ed1ea9afa4e21e8ddbf3c4f0af2160"/>
 		<rom name="track19.raw" size="1237152" md5="e311d903fb00ae2853a7015e694ea696" sha1="561b2598dd60b21132c57a517fd0ac3781b0bb7a"/>
 		<rom name="track20.raw" size="2648352" md5="456e16c7315fa5c4be169d50143f0d6b" sha1="642985b06baeeeaf49df8a070194b612d2ca9d66"/>
 		<rom name="track21.raw" size="3001152" md5="8664bba9ad9eaac38328766001e32766" sha1="bb50a94b8855a817c41e936da8c455f556b1b3a2"/>
@@ -23540,6 +23553,7 @@ Crashes at the end of FMV
 		<rom name="track35.raw" size="3353952" md5="3e35fdc04bcc5e739fad3f7e906d4037" sha1="858f1dff9a0b63e6eac4efb8a68221fc7d7c0d64"/>
 		<rom name="track36.raw" size="1942752" md5="2ef656b963396d5c8938103f3e32011c" sha1="c8fa39338303b569988a0e40f1cf1e9fd2a32d18"/>
 		<rom name="track37.raw" size="2119152" md5="22a0d59ee7ca556462ed764fa082b8d2" sha1="993dd06a664d8dbfff0631140efc6cb1b76de38f"/>
+		<rom name="track38.raw" size="1237152" md5="da1f1026a6f60923ea0f45c900b73d00" sha1="fe11284852b4bd85b8f94f48f75afa696267a532"/>
 		<rom name="track39.raw" size="3353952" md5="82012b789f61d3293bd94209d359ec36" sha1="03e2de94e117c8b5edecc20d6bedce28d1493247"/>
 		<rom name="track40.raw" size="1589952" md5="2fcac2d584ef02f6155730614c9c502f" sha1="7218b447b0144fbdea82e9174510fc126d18f8a9"/>
 		<rom name="track41.raw" size="2822400" md5="f4abdf8cef57c3169e381d5d6579b439" sha1="7e44d4fecec51db789826dcc1780a321a00b2dfb"/>
@@ -23559,6 +23573,7 @@ Crashes at the end of FMV
 		<rom name="track55.raw" size="3353952" md5="469ef19b6d726b045c8e12ae8f3731c0" sha1="c70be784a412d66623935799f530fb2ebfcdf8c4"/>
 		<rom name="track56.raw" size="3883152" md5="fce2f35ebfcbd124e70401d1f4f3d886" sha1="f31461e7b94583ec192da1fc25381a4c68cd5a90"/>
 		<rom name="track57.raw" size="3353952" md5="de4f69748b74c75a6cbe681807ac19ce" sha1="fdf74d1a88dad61b73e9881fb112497ec9cd7d2f"/>
+		<rom name="track58.raw" size="1060752" md5="0222f498cbb1ddb8014c0b3cd6d64396" sha1="7a883c1b1d5f5e172c44201630810ea07881ae63"/>
 		<rom name="track59.raw" size="3001152" md5="60a5d5cac305de12a6882bc3fb881874" sha1="fc51184b690280cde90ae1d1c9170ccb02d204a3"/>
 		<rom name="track60.raw" size="2646000" md5="ead56370293049b59fe6522b7f55aaca" sha1="faf700d5a80c14f94db389da05fcbe25781e3acb"/>
 		<rom name="track61.raw" size="2648352" md5="4ed21875269c0aa8472895717fccbd57" sha1="4ca98ef3fd018279ae9a7d3db9f79ab16c16deec"/>
@@ -23591,9 +23606,6 @@ Crashes at the end of FMV
 		<rom name="track88.raw" size="2646000" md5="98f9d4a7cb7c14936e60f6f55eb152fe" sha1="ba0169690d8b8454db9046bcf8bdffecc6491ce7"/>
 		<rom name="track89.raw" size="2116800" md5="8ac57390fa4ba17b0e138055267b3f6e" sha1="a74409044d54e3348432b3abaa4b99eb9fca08c7"/>
 		<rom name="track90.bin" size="709358496" md5="0cfe721462e028aa5419ab20e0a71906" sha1="f8c0effe1e5d7f8bf4d8363108fe918952073287"/>
-		<rom name="track18.raw" size="3528000" md5="515b7115d10800b9a0d4e30f178ab1d5" sha1="b3b7af5c11ed1ea9afa4e21e8ddbf3c4f0af2160"/>
-		<rom name="track38.raw" size="1237152" md5="da1f1026a6f60923ea0f45c900b73d00" sha1="fe11284852b4bd85b8f94f48f75afa696267a532"/>
-		<rom name="track58.raw" size="1060752" md5="0222f498cbb1ddb8014c0b3cd6d64396" sha1="7a883c1b1d5f5e172c44201630810ea07881ae63"/>
 		-->
 		<description>Nightmare Creatures II (Europe)</description>
 		<year>2000</year>
