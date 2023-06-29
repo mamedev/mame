@@ -12331,9 +12331,9 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 
 	<software name="shinevo2" cloneof="evltion2" supported="no">
 		<!--
-		<rom name="track02.raw" size="1735776" md5="8659426a29f58924f5f0458cc720098b" sha1="e12b9ae5ebc79b7da5271bce29df450671ce5d93"/>
 		<rom name="Shinki Sekai Evolution 2 - Tooi Yakusoku v1.002 (1999)(ESP)(NTSC)(JP)[!].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
 		<rom name="track01.bin" size="1058400" md5="7713a0ebd50731da0c4ba8d45ab4cfbc" sha1="a04238edd82a18ca22d291f7f2176c948b7c8ede"/>
+		<rom name="track02.raw" size="1735776" md5="8659426a29f58924f5f0458cc720098b" sha1="e12b9ae5ebc79b7da5271bce29df450671ce5d93"/>
 		<rom name="track03.bin" size="1185760800" md5="93f70fbcca79c7a47275898399827cb9" sha1="702863d1b492ab95519428085ef5126bbe7343c8"/>
 		-->
 		<description>Shinkisekai Evolution 2: Tooi Yakusoku (Japan)</description>
