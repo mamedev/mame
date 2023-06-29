@@ -3067,6 +3067,26 @@ ROM_START( nclubv3 )
 	ROM_LOAD( "nclubv3.nv", 0x0000, 0x0080, CRC(9122a9e9) SHA1(5318994905e005567709c41449547c545182bece) )
 ROM_END
 
+ROM_START( nclubv4 ) // 837-12765-11 sticker
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+
+	ROM_LOAD16_WORD_SWAP( "ic22", 0x0200000, 0x0200000, CRC(80eba7e9) SHA1(d9f90a1aa508451bdd52fddda5ac65adc15f4764) ) // OK
+	ROM_LOAD16_WORD_SWAP( "ic24", 0x0400000, 0x0200000, CRC(6bbb1b0c) SHA1(ec4b0d49a3704804818d370458913e6ac443ea3e) ) // OK
+	ROM_LOAD16_WORD_SWAP( "ic26", 0x0600000, 0x0200000, CRC(5352ade3) SHA1(a5e060e98bfa7334152602e3568c89ff588926b8) ) // OK
+	ROM_LOAD16_WORD_SWAP( "ic28", 0x0800000, 0x0200000, CRC(44f4b15a) SHA1(e9e9e6dad4354e5bbad18efdc8ea0843a087cd59) ) // OK
+	ROM_LOAD16_WORD_SWAP( "ic30", 0x0a00000, 0x0200000, CRC(fc4e56e6) SHA1(63ff37eafcf854f33bd20c3c12950834fa10807f) ) // OK
+	ROM_LOAD16_WORD_SWAP( "ic32", 0x0c00000, 0x0200000, CRC(6f825b87) SHA1(7a69cc54d4ef42edddeb9fc0a199d0abc93e54df) ) // OK
+	ROM_LOAD16_WORD_SWAP( "ic34", 0x0e00000, 0x0200000, CRC(62114a08) SHA1(b44205b217fd982946b8446c7456afd97618a344) ) // OK
+	ROM_LOAD16_WORD_SWAP( "ic36", 0x1000000, 0x0200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) ) // FIXED BITS (11111111), but present
+	ROM_LOAD16_WORD_SWAP( "ic23", 0x1200000, 0x0200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) ) // FIXED BITS (11111111), but present
+	ROM_LOAD16_WORD_SWAP( "ic25", 0x1400000, 0x0200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) ) // FIXED BITS (11111111), but present
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
+	ROM_LOAD( "nclubv4.nv", 0x0000, 0x0080, CRC(7efc9c6a) SHA1(3d44940b7497b07151908a0a6bc2809c7e15f4a8) )
+ROM_END
+
 ROM_START( nclubdis ) // 837-12765-11 sticker
 	STV_BIOS
 
@@ -3937,6 +3957,7 @@ GAME( 1998, stress,    stvbios, stv,      stv,      stvpc_state, init_stv,      
 GAME( 1996, nameclub,  stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Sega",                         "Name Club (J 960315 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
 GAME( 1996, nclubv2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Sega",                         "Name Club Ver.2 (J 960315 V1.000)", MACHINE_NOT_WORKING ) // ^  (has the same datecode as nameclub, probably incorrect unless both were released the same day)
 GAME( 1997, nclubv3,   stvbios, stv,      stv,      stvpc_state, init_nameclv3,         ROT0,   "Sega",                         "Name Club Ver.3 (J 970723 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no protection
+GAME( 1997, nclubv4,   stvbios, stv,      stv,      stvpc_state, init_nameclv3,         ROT0,   "Sega",                         "Name Club Ver.4 (J 971202 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no protection
 GAME( 1998, nclubdis,  stvbios, stv,      stv,      stvpc_state, init_stv,              ROT0,   "Sega",                         "Name Club Disney (J 980614 V1.000)", MACHINE_NOT_WORKING ) // errors due to missing security card
 
 /* Doing something.. but not enough yet */
