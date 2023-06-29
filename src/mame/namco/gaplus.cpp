@@ -220,7 +220,7 @@ TIMER_CALLBACK_MEMBER(gaplus_base_state::namcoio1_run)
 	m_namco56xx->customio_run();
 }
 
-WRITE_LINE_MEMBER(gaplus_base_state::vblank_irq)
+void gaplus_base_state::vblank_irq(int state)
 {
 	if (!state)
 		return;
@@ -241,7 +241,7 @@ WRITE_LINE_MEMBER(gaplus_base_state::vblank_irq)
 		m_subcpu2->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(gapluso_state::vblank_irq)
+void gapluso_state::vblank_irq(int state)
 {
 	if (!state)
 		return;

@@ -350,8 +350,8 @@ private:
 	void output1_w(uint8_t data);
 	void output2_w(uint8_t data);
 	uint8_t qc_b8_r();
-	DECLARE_WRITE_LINE_MEMBER(dwarfd_sod_callback);
-	DECLARE_WRITE_LINE_MEMBER(drq_w);
+	void dwarfd_sod_callback(int state);
+	void drq_w(int state);
 	void dwarfd_palette(palette_device &palette) const;
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(pesp_display_pixels);
@@ -676,12 +676,12 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::qc_display_pixels)
 	}
 }
 
-WRITE_LINE_MEMBER(dwarfd_state::dwarfd_sod_callback)
+void dwarfd_state::dwarfd_sod_callback(int state)
 {
 	m_crt_access = state;
 }
 
-WRITE_LINE_MEMBER(dwarfd_state::drq_w)
+void dwarfd_state::drq_w(int state)
 {
 	if(state && !m_crt_access)
 		m_maincpu->set_input_line(I8085_RST65_LINE, ASSERT_LINE);

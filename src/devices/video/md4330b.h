@@ -48,11 +48,11 @@ public:
 	auto write_q() { return m_write_q.bind(); }
 	auto write_do() { return m_write_do.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(clk_w);
-	DECLARE_WRITE_LINE_MEMBER(tc_w) { m_tc = (state) ? 1 : 0; update_output(); }
-	DECLARE_WRITE_LINE_MEMBER(di_w) { m_di = (state) ? 1 : 0; }
-	DECLARE_WRITE_LINE_MEMBER(rst_w) { m_rst = (state) ? 1 : 0; }
-	DECLARE_READ_LINE_MEMBER(do_r) { return m_do; }
+	void clk_w(int state);
+	void tc_w(int state) { m_tc = (state) ? 1 : 0; update_output(); }
+	void di_w(int state) { m_di = (state) ? 1 : 0; }
+	void rst_w(int state) { m_rst = (state) ? 1 : 0; }
+	int do_r() { return m_do; }
 
 protected:
 	md4330b_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 qmax);

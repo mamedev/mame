@@ -56,10 +56,10 @@ public:
 	using opcode_delegate = device_delegate<void (uint16_t)>;
 	using int_delegate = device_delegate<uint8_t (offs_t)>;
 
-	DECLARE_WRITE_LINE_MEMBER(dmar_w);
-	DECLARE_WRITE_LINE_MEMBER(halt_w);
-	DECLARE_WRITE_LINE_MEMBER(status_w);
-	DECLARE_WRITE_LINE_MEMBER(flag_w);
+	void dmar_w(int state);
+	void halt_w(int state);
+	void status_w(int state);
+	void flag_w(int state);
 
 	uint8_t pa_r() const { return m_reg_PA[0]; }
 

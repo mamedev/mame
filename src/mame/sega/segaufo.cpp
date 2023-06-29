@@ -98,9 +98,9 @@ public:
 private:
 	void motor_tick(int p, int m);
 
-	DECLARE_WRITE_LINE_MEMBER(pit_out0);
-	DECLARE_WRITE_LINE_MEMBER(pit_out1);
-	DECLARE_WRITE_LINE_MEMBER(pit_out2);
+	void pit_out0(int state);
+	void pit_out1(int state);
+	void pit_out2(int state);
 	uint8_t crane_limits_r(offs_t offset);
 	void stepper_w(uint8_t data);
 	void cp_lamps_w(uint8_t data);
@@ -207,19 +207,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(ufo_state::update_info)
 
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(ufo_state::pit_out0)
+void ufo_state::pit_out0(int state)
 {
 	// ?
 }
 
-WRITE_LINE_MEMBER(ufo_state::pit_out1)
+void ufo_state::pit_out1(int state)
 {
 	// NMI?
 	if (state)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE_LINE_MEMBER(ufo_state::pit_out2)
+void ufo_state::pit_out2(int state)
 {
 	// ?
 }

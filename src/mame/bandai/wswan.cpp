@@ -556,7 +556,7 @@ u16 wswan_state::port_r(offs_t offset, u16 mem_mask)
 			return m_vdp->reg_r(offset, mem_mask);
 		case 0xa0 / 2:
 			// Hardware type
-			// Bit 0 - Disable/enable Bios
+			// Bit 0 - Disable/enable BIOS
 			// Bit 1 - Determine mono/color
 			// Bit 2 - Unknown, used to determine color/crystal
 			// Bit 3 - Unknown

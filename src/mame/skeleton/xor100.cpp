@@ -354,12 +354,12 @@ INPUT_PORTS_END
 
 /* Printer 8255A Interface */
 
-WRITE_LINE_MEMBER( xor100_state::write_centronics_busy )
+void xor100_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER( xor100_state::write_centronics_select )
+void xor100_state::write_centronics_select(int state)
 {
 	m_centronics_select = state;
 }
@@ -394,15 +394,15 @@ uint8_t xor100_state::i8255_pc_r()
 
 /* Z80-CTC Interface */
 
-WRITE_LINE_MEMBER( xor100_state::ctc_z0_w )
+void xor100_state::ctc_z0_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( xor100_state::ctc_z1_w )
+void xor100_state::ctc_z1_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( xor100_state::ctc_z2_w )
+void xor100_state::ctc_z2_w(int state)
 {
 }
 

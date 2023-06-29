@@ -163,7 +163,7 @@ void votrtnt_state::votrtnt(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	VOTRAX_SC01(config, m_votrax, 720000); // 720kHz? needs verify
+	VOTRAX_SC01A(config, m_votrax, 720000); // 720kHz? needs verify
 	m_votrax->ar_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_votrax->add_route(ALL_OUTPUTS, "mono", 1.00);
 }

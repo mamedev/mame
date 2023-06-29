@@ -36,6 +36,24 @@ class h83337_device : public h8_device {
 public:
 	h83337_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto read_port1()  { return m_read_port [PORT_1].bind(); }
+	auto write_port1() { return m_write_port[PORT_1].bind(); }
+	auto read_port2()  { return m_read_port [PORT_2].bind(); }
+	auto write_port2() { return m_write_port[PORT_2].bind(); }
+	auto read_port3()  { return m_read_port [PORT_3].bind(); }
+	auto write_port3() { return m_write_port[PORT_3].bind(); }
+	auto read_port4()  { return m_read_port [PORT_4].bind(); }
+	auto write_port4() { return m_write_port[PORT_4].bind(); }
+	auto read_port5()  { return m_read_port [PORT_5].bind(); }
+	auto write_port5() { return m_write_port[PORT_5].bind(); }
+	auto read_port6()  { return m_read_port [PORT_6].bind(); }
+	auto write_port6() { return m_write_port[PORT_6].bind(); }
+	auto read_port7()  { return m_read_port [PORT_7].bind(); }
+	auto read_port8()  { return m_read_port [PORT_8].bind(); }
+	auto write_port8() { return m_write_port[PORT_8].bind(); }
+	auto read_port9()  { return m_read_port [PORT_9].bind(); }
+	auto write_port9() { return m_write_port[PORT_9].bind(); }
+
 	uint8_t wscr_r();
 	void wscr_w(uint8_t data);
 	uint8_t stcr_r();
@@ -48,27 +66,25 @@ public:
 protected:
 	h83337_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start);
 
-	required_device<h8_intc_device> intc;
-	required_device<h8_adc_device> adc;
-	required_device<h8_port_device> port1;
-	required_device<h8_port_device> port2;
-	required_device<h8_port_device> port3;
-	required_device<h8_port_device> port4;
-	required_device<h8_port_device> port5;
-	required_device<h8_port_device> port6;
-	required_device<h8_port_device> port7;
-	required_device<h8_port_device> port8;
-	required_device<h8_port_device> port9;
-	required_device<h8_timer8_channel_device> timer8_0;
-	required_device<h8_timer8_channel_device> timer8_1;
-	required_device<h8_timer16_device> timer16;
-	required_device<h8_timer16_channel_device> timer16_0;
-	required_device<h8_sci_device> sci0;
-	required_device<h8_sci_device> sci1;
-	required_device<h8_watchdog_device> watchdog;
+	required_device<h8_intc_device> m_intc;
+	required_device<h8_adc_device> m_adc;
+	required_device<h8_port_device> m_port1;
+	required_device<h8_port_device> m_port2;
+	required_device<h8_port_device> m_port3;
+	required_device<h8_port_device> m_port4;
+	required_device<h8_port_device> m_port5;
+	required_device<h8_port_device> m_port6;
+	required_device<h8_port_device> m_port7;
+	required_device<h8_port_device> m_port8;
+	required_device<h8_port_device> m_port9;
+	required_device<h8_timer8_channel_device> m_timer8_0;
+	required_device<h8_timer8_channel_device> m_timer8_1;
+	required_device<h8_timer16_device> m_timer16;
+	required_device<h8_timer16_channel_device> m_timer16_0;
+	required_device<h8_watchdog_device> m_watchdog;
 
-	uint8_t syscr;
-	uint32_t ram_start;
+	uint8_t m_syscr;
+	uint32_t m_ram_start;
 
 	virtual void update_irq_filter() override;
 	virtual void interrupt_taken() override;

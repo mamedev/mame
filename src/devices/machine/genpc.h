@@ -33,8 +33,8 @@ public:
 	template <typename T> void set_cputag(T &&tag)
 	{
 		m_maincpu.set_tag(std::forward<T>(tag));
-		subdevice<isa8_device>("isa")->set_memspace(std::forward<T>(tag), AS_PROGRAM);
-		subdevice<isa8_device>("isa")->set_iospace(std::forward<T>(tag), AS_IO);
+		m_isabus.lookup()->set_memspace(std::forward<T>(tag), AS_PROGRAM);
+		m_isabus.lookup()->set_iospace(std::forward<T>(tag), AS_IO);
 	}
 
 	auto int_callback() { return m_int_callback.bind(); }
@@ -49,25 +49,23 @@ public:
 	void pc_page_w(offs_t offset, uint8_t data);
 	void nmi_enable_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata );
+	void pc_speaker_set_spkrdata(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out1_changed );
-	virtual DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out2_changed );
+	void pc_pit8253_out1_changed(int state);
+	virtual void pc_pit8253_out2_changed(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( pic_int_w );
+	void pic_int_w(int state);
 
 	// interface to the keyboard
-	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
-	DECLARE_WRITE_LINE_MEMBER( keyboard_data_w );
+	void keyboard_clock_w(int state);
+	void keyboard_data_w(int state);
 
 protected:
 	ibm5160_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -102,19 +100,19 @@ protected:
 	int                     m_ppi_portc_switch_high;
 	int                     m_ppi_speaker;
 	int                     m_ppi_keyboard_clear;
-	uint8_t                   m_ppi_keyb_clock;
-	uint8_t                   m_ppi_portb;
-	uint8_t                   m_ppi_clock_signal;
-	uint8_t                   m_ppi_data_signal;
-	uint8_t                   m_ppi_shift_register;
-	uint8_t                   m_ppi_shift_enable;
+	uint8_t                 m_ppi_keyb_clock;
+	uint8_t                 m_ppi_portb;
+	uint8_t                 m_ppi_clock_signal;
+	uint8_t                 m_ppi_data_signal;
+	uint8_t                 m_ppi_shift_register;
+	uint8_t                 m_ppi_shift_enable;
 
 	uint8_t pc_ppi_porta_r();
 	uint8_t pc_ppi_portc_r();
 	void pc_ppi_portb_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( pc_dma_hrq_changed );
-	DECLARE_WRITE_LINE_MEMBER( pc_dma8237_out_eop );
+	void pc_dma_hrq_changed(int state);
+	void pc_dma8237_out_eop(int state);
 	uint8_t pc_dma_read_byte(offs_t offset);
 	void pc_dma_write_byte(offs_t offset, uint8_t data);
 	uint8_t pc_dma8237_1_dack_r();
@@ -124,11 +122,11 @@ protected:
 	void pc_dma8237_2_dack_w(uint8_t data);
 	void pc_dma8237_3_dack_w(uint8_t data);
 	void pc_dma8237_0_dack_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pc_dack0_w );
-	DECLARE_WRITE_LINE_MEMBER( pc_dack1_w );
-	DECLARE_WRITE_LINE_MEMBER( pc_dack2_w );
-	DECLARE_WRITE_LINE_MEMBER( pc_dack3_w );
-	DECLARE_WRITE_LINE_MEMBER( iochck_w );
+	void pc_dack0_w(int state);
+	void pc_dack1_w(int state);
+	void pc_dack2_w(int state);
+	void pc_dack3_w(int state);
+	void iochck_w(int state);
 
 	void pc_select_dma_channel(int channel, bool state);
 };
@@ -145,14 +143,14 @@ public:
 	// construction/destruction
 	ibm5150_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
+	void keyboard_clock_w(int state);
 
-	virtual DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out2_changed ) override;
+	virtual void pc_pit8253_out2_changed(int state) override;
 
 protected:
 	ibm5150_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -175,7 +173,7 @@ public:
 	// construction/destruction
 	ec1841_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
+	void keyboard_clock_w(int state);
 
 protected:
 	ec1841_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

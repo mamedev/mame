@@ -70,7 +70,7 @@ private:
 	uint8_t keys_hi_r();
 	uint8_t keys_lo_r();
 	uint8_t keys_mod_r();
-	DECLARE_WRITE_LINE_MEMBER(pv2000_vdp_interrupt);
+	void pv2000_vdp_interrupt(int state);
 	uint8_t cass_in();
 	void cass_out(uint8_t data);
 	bool m_last_state = false;
@@ -317,7 +317,7 @@ static INPUT_PORTS_START( pv2000 )
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER(pv2000_state::pv2000_vdp_interrupt)
+void pv2000_state::pv2000_vdp_interrupt(int state)
 {
 	// only if it goes up
 	if (state && !m_last_state)

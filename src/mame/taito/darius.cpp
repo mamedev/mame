@@ -445,7 +445,7 @@ void darius_state::darius_sound2_map(address_map &map)
 }
 
 
-WRITE_LINE_MEMBER(darius_state::adpcm_int)
+void darius_state::adpcm_int(int state)
 {
 	if (m_nmi_enable)
 		m_adpcm->pulse_input_line(INPUT_LINE_NMI, attotime::zero);

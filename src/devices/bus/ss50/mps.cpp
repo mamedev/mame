@@ -43,15 +43,15 @@ protected:
 	// interface-specific overrides
 	virtual u8 register_read(offs_t offset) override;
 	virtual void register_write(offs_t offset, u8 data) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(f110_w) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(f150_9600_w) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(f300_w) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(f600_4800_w) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(f600_1200_w) override;
+	virtual void f110_w(int state) override;
+	virtual void f150_9600_w(int state) override;
+	virtual void f300_w(int state) override;
+	virtual void f600_4800_w(int state) override;
+	virtual void f600_1200_w(int state) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(acia_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(route_cts);
+	void acia_irq_w(int state);
+	void route_cts(int state);
 
 	required_device<acia6850_device> m_acia;
 	required_ioport m_irq_jumper;
@@ -143,7 +143,7 @@ void ss50_mps_device::register_write(offs_t offset, u8 data)
 	m_acia->write(offset & 1, data);
 }
 
-WRITE_LINE_MEMBER(ss50_mps_device::f110_w)
+void ss50_mps_device::f110_w(int state)
 {
 	if (!BIT(m_rate_jumper->read(), 0))
 	{
@@ -152,7 +152,7 @@ WRITE_LINE_MEMBER(ss50_mps_device::f110_w)
 	}
 }
 
-WRITE_LINE_MEMBER(ss50_mps_device::f150_9600_w)
+void ss50_mps_device::f150_9600_w(int state)
 {
 	if (!BIT(m_rate_jumper->read(), 1))
 	{
@@ -161,7 +161,7 @@ WRITE_LINE_MEMBER(ss50_mps_device::f150_9600_w)
 	}
 }
 
-WRITE_LINE_MEMBER(ss50_mps_device::f300_w)
+void ss50_mps_device::f300_w(int state)
 {
 	if (!BIT(m_rate_jumper->read(), 2))
 	{
@@ -170,7 +170,7 @@ WRITE_LINE_MEMBER(ss50_mps_device::f300_w)
 	}
 }
 
-WRITE_LINE_MEMBER(ss50_mps_device::f600_4800_w)
+void ss50_mps_device::f600_4800_w(int state)
 {
 	if (!BIT(m_rate_jumper->read(), 3))
 	{
@@ -179,7 +179,7 @@ WRITE_LINE_MEMBER(ss50_mps_device::f600_4800_w)
 	}
 }
 
-WRITE_LINE_MEMBER(ss50_mps_device::f600_1200_w)
+void ss50_mps_device::f600_1200_w(int state)
 {
 	if (!BIT(m_rate_jumper->read(), 4))
 	{
@@ -188,13 +188,13 @@ WRITE_LINE_MEMBER(ss50_mps_device::f600_1200_w)
 	}
 }
 
-WRITE_LINE_MEMBER(ss50_mps_device::acia_irq_w)
+void ss50_mps_device::acia_irq_w(int state)
 {
 	if (!m_irq_jumper->read())
 		write_irq(state);
 }
 
-WRITE_LINE_MEMBER(ss50_mps_device::route_cts)
+void ss50_mps_device::route_cts(int state)
 {
 	if (m_cts_route->read())
 		m_acia->write_cts(state);

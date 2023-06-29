@@ -33,12 +33,12 @@ public:
 	void crureadz(offs_t offset, uint8_t *value);
 	void cruwrite(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(ready_line);
-	DECLARE_WRITE_LINE_MEMBER(romgq_line);
+	void ready_line(int state);
+	void romgq_line(int state);
 
 	void set_gromlines(line_state mline, line_state moline, line_state gsq);
 
-	DECLARE_WRITE_LINE_MEMBER(gclock_in);
+	void gclock_in(int state);
 
 	bool    is_available() { return m_pcb != nullptr; }
 	void    set_slot(int i);
@@ -144,9 +144,9 @@ protected:
 	virtual void crureadz(offs_t offset, uint8_t *value);
 	virtual void cruwrite(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(romgq_line);
+	void romgq_line(int state);
 	virtual void set_gromlines(line_state mline, line_state moline, line_state gsq);
-	DECLARE_WRITE_LINE_MEMBER(gclock_in);
+	void gclock_in(int state);
 
 	void gromreadz(uint8_t* value);
 	void gromwrite(uint8_t data);

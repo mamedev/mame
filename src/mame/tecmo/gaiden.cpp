@@ -908,7 +908,7 @@ void gaiden_state::mastninj_sound_map(address_map &map)
 	map(0xf000, 0xf7ff).ram();
 }
 
-WRITE_LINE_MEMBER(gaiden_state::vck_flipflop_w)
+void gaiden_state::vck_flipflop_w(int state)
 {
 	if (!state)
 		return;

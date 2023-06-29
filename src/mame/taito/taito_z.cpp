@@ -3631,6 +3631,8 @@ void spacegun_state::spacegun(machine_config &config) //OSC: 26.686, 24.000, 16.
 	m_subcpu->set_addrmap(AS_PROGRAM, &spacegun_state::spacegun_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(spacegun_state::irq4_line_hold));
 
+	config.set_maximum_quantum(attotime::from_hz(6000));
+
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	adc0809_device &adc(ADC0809(config, "adc", 500000)); // clock unknown

@@ -28,10 +28,16 @@ void i82439hx_host_device::config_map(address_map &map)
 	map(0x92, 0x92).r(FUNC(i82439hx_host_device::errsyn_r));
 }
 
-i82439hx_host_device::i82439hx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_host_device(mconfig, I82439HX, tag, owner, clock)
+i82439hx_host_device::i82439hx_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: pci_host_device(mconfig, type, tag, owner, clock)
 	, cpu(*this, finder_base::DUMMY_TAG)
 {
+}
+
+i82439hx_host_device::i82439hx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i82439hx_host_device(mconfig, I82439HX, tag, owner, clock)
+{
+	set_ids_host(0x80861250, 0x03, 0x00000000);
 }
 
 void i82439hx_host_device::set_ram_size(int _ram_size)
@@ -86,18 +92,27 @@ void i82439hx_host_device::device_reset()
 	smiact_n = 1;
 }
 
+std::tuple<bool, bool> i82439hx_host_device::read_memory_holes()
+{
+	const bool lower_hole = (dramc & 0xc0) == 0x40;
+	const bool upper_hole = (dramc & 0xc0) != 0x80;
+	return std::make_tuple(lower_hole, upper_hole);
+}
+
 void i82439hx_host_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 									 uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	io_space->install_device(0, 0xffff, *static_cast<pci_host_device *>(this), &pci_host_device::io_configuration_access_map);
 
+	auto [memory_hole_lower, memory_hole_upper] = read_memory_holes();
+
 	// memory hole at 512-640 kbytes
-	if((dramc & 0xc0) == 0x40)
+	if(memory_hole_lower)
 		memory_space->install_ram      (0x00000000, 0x0007ffff, &ram[0x00000000/4]);
 	else
 		memory_space->install_ram      (0x00000000, 0x0009ffff, &ram[0x00000000/4]);
 
-	// assume that map_extra of the northbridge is called after the video card has mepped its memory here
+	// assume that map_extra of the northbridge is called after the video card has mapped its memory here
 	if (smram & 0x08)
 	{
 		if (smiact_n == 0)
@@ -163,7 +178,7 @@ void i82439hx_host_device::map_extra(uint64_t memory_window_start, uint64_t memo
 
 	memory_space->install_ram          (0x00100000, 0x00efffff, &ram[0x00100000/4]);
 	// memory hole at 15-16 mbytes
-	if((dramc & 0xc0) != 0x80)
+	if(memory_hole_upper)
 		memory_space->install_ram      (0x00f00000, 0x00ffffff, &ram[0x00f00000/4]);
 
 	memory_space->install_ram          (0x01000000, ram_size-1, &ram[0x01000000/4]);
@@ -384,7 +399,7 @@ uint8_t i82439hx_host_device::errsyn_r()
 	return errsyn;
 }
 
-WRITE_LINE_MEMBER(i82439hx_host_device::smi_act_w)
+void i82439hx_host_device::smi_act_w(int state)
 {
 	// state is 0 when smm is not active
 	// but smiact_n reflects the state of the SMIACT# pin

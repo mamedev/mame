@@ -171,15 +171,15 @@ public:
 	// public interfaces
 	offs_t get_memory_address();
 
-	DECLARE_WRITE_LINE_MEMBER( wait_w ) { set_input_line(COSMAC_INPUT_LINE_WAIT, state); }
-	DECLARE_WRITE_LINE_MEMBER( clear_w ) { set_input_line(COSMAC_INPUT_LINE_CLEAR, state); }
-	DECLARE_WRITE_LINE_MEMBER( int_w ) { set_input_line(COSMAC_INPUT_LINE_INT, state); }
-	DECLARE_WRITE_LINE_MEMBER( dma_in_w ) { set_input_line(COSMAC_INPUT_LINE_DMAIN, state); }
-	DECLARE_WRITE_LINE_MEMBER( dma_out_w ) { set_input_line(COSMAC_INPUT_LINE_DMAOUT, state); }
-	DECLARE_WRITE_LINE_MEMBER( ef1_w ) { set_input_line(COSMAC_INPUT_LINE_EF1, state); }
-	DECLARE_WRITE_LINE_MEMBER( ef2_w ) { set_input_line(COSMAC_INPUT_LINE_EF2, state); }
-	DECLARE_WRITE_LINE_MEMBER( ef3_w ) { set_input_line(COSMAC_INPUT_LINE_EF3, state); }
-	DECLARE_WRITE_LINE_MEMBER( ef4_w ) { set_input_line(COSMAC_INPUT_LINE_EF4, state); }
+	void wait_w(int state) { set_input_line(COSMAC_INPUT_LINE_WAIT, state); }
+	void clear_w(int state) { set_input_line(COSMAC_INPUT_LINE_CLEAR, state); }
+	void int_w(int state) { set_input_line(COSMAC_INPUT_LINE_INT, state); }
+	void dma_in_w(int state) { set_input_line(COSMAC_INPUT_LINE_DMAIN, state); }
+	void dma_out_w(int state) { set_input_line(COSMAC_INPUT_LINE_DMAOUT, state); }
+	void ef1_w(int state) { set_input_line(COSMAC_INPUT_LINE_EF1, state); }
+	void ef2_w(int state) { set_input_line(COSMAC_INPUT_LINE_EF2, state); }
+	void ef3_w(int state) { set_input_line(COSMAC_INPUT_LINE_EF3, state); }
+	void ef4_w(int state) { set_input_line(COSMAC_INPUT_LINE_EF4, state); }
 
 protected:
 	// construction/destruction

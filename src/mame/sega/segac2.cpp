@@ -90,16 +90,18 @@
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_PROTECTION (1U << 1)
+#define LOG_PALETTE    (1U << 2)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 namespace {
 
 #define XL1_CLOCK           XTAL(640'000)
 #define XL2_CLOCK           XTAL(53'693'175)
 
-
-#define LOG_PROTECTION      0
-#define LOG_PALETTE         0
-#define LOG_IOCHIP          0
 
 typedef device_delegate<int (int in)> segac2_prot_delegate;
 
@@ -184,9 +186,9 @@ protected:
 	int m_segac2_sp_pal_lookup[4];
 	void recompute_palette_tables();
 
-	DECLARE_WRITE_LINE_MEMBER(vdp_sndirqline_callback_c2);
-	DECLARE_WRITE_LINE_MEMBER(vdp_lv6irqline_callback_c2);
-	DECLARE_WRITE_LINE_MEMBER(vdp_lv4irqline_callback_c2);
+	void vdp_sndirqline_callback_c2(int state);
+	void vdp_lv6irqline_callback_c2(int state);
+	void vdp_lv4irqline_callback_c2(int state);
 	IRQ_CALLBACK_MEMBER(int_callback);
 
 	uint8_t io_portc_r();
@@ -201,7 +203,7 @@ protected:
 	void prot_w(uint8_t data);
 	void counter_timer_w(uint8_t data);
 	uint16_t ichirjbl_prot_r();
-	DECLARE_WRITE_LINE_MEMBER(segac2_irq2_interrupt);
+	void segac2_irq2_interrupt(int state);
 
 	int prot_func_dummy(int in);
 	int prot_func_columns(int in);
@@ -561,7 +563,7 @@ void segac2_state::control_w(uint8_t data)
 /* protection chip reads */
 uint8_t segac2_state::prot_r()
 {
-	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", m_maincpu->pcbase(), m_prot_read_buf);
+	LOGMASKED(LOG_PROTECTION, "%06X:protection r=%02X\n", m_maincpu->pcbase(), m_prot_read_buf);
 	return m_prot_read_buf | 0xf0;
 }
 
@@ -581,7 +583,7 @@ void segac2_state::prot_w(uint8_t data)
 
 	/* determine the value to return, should a read occur */
 	m_prot_read_buf = m_prot_func(table_index);
-	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", m_maincpu->pcbase(), data & 0x0f, m_prot_read_buf);
+	LOGMASKED(LOG_PROTECTION, "%06X:protection w=%02X, new result=%02X\n", m_maincpu->pcbase(), data & 0x0f, m_prot_read_buf);
 
 	/* if the palette changed, force an update */
 	if (new_sp_palbase != m_sp_palbase || new_bg_palbase != m_bg_palbase)
@@ -590,7 +592,7 @@ void segac2_state::prot_w(uint8_t data)
 		m_sp_palbase = new_sp_palbase;
 		m_bg_palbase = new_bg_palbase;
 		recompute_palette_tables();
-		if (LOG_PALETTE && m_screen) logerror("Set palbank: %d/%d (scan=%d)\n", m_bg_palbase, m_sp_palbase, m_screen->vpos());
+		if (m_screen) LOGMASKED(LOG_PALETTE, "Set palbank: %d/%d (scan=%d)\n", m_bg_palbase, m_sp_palbase, m_screen->vpos());
 	}
 }
 
@@ -1717,27 +1719,27 @@ uint32_t segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rg
     Interrupt handling
 ******************************************************************************/
 
-WRITE_LINE_MEMBER(segac2_state::segac2_irq2_interrupt)
+void segac2_state::segac2_irq2_interrupt(int state)
 {
 	//printf("sound irq %d\n", state);
 	m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 // the main interrupt on C2 comes from the vdp line used to drive the z80 interrupt on a regular genesis(!)
-WRITE_LINE_MEMBER(segac2_state::vdp_sndirqline_callback_c2)
+void segac2_state::vdp_sndirqline_callback_c2(int state)
 {
 	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 // the line usually used to drive irq6 is not connected
-WRITE_LINE_MEMBER(segac2_state::vdp_lv6irqline_callback_c2)
+void segac2_state::vdp_lv6irqline_callback_c2(int state)
 {
 	//
 }
 
 // the scanline interrupt seems connected as usual
-WRITE_LINE_MEMBER(segac2_state::vdp_lv4irqline_callback_c2)
+void segac2_state::vdp_lv4irqline_callback_c2(int state)
 {
 	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(4, HOLD_LINE);

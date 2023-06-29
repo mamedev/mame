@@ -37,7 +37,7 @@ public:
 
 	void wolfpack(machine_config &config);
 
-	template <int Bit> DECLARE_READ_LINE_MEMBER(dial_r);
+	template <int Bit> int dial_r();
 
 protected:
 	virtual void machine_start() override;
@@ -78,7 +78,7 @@ private:
 	void wolfpack_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	TIMER_CALLBACK_MEMBER(periodic_callback);
 	void draw_ship(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_torpedo(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -366,7 +366,7 @@ uint32_t wolfpack_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-WRITE_LINE_MEMBER(wolfpack_state::screen_vblank)
+void wolfpack_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
@@ -426,7 +426,7 @@ void wolfpack_state::machine_reset()
 
 
 template <int Bit>
-READ_LINE_MEMBER(wolfpack_state::dial_r)
+int wolfpack_state::dial_r()
 {
 	return ((m_dial->read() + Bit) / 2) & 0x01;
 }

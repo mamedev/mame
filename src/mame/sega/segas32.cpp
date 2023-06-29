@@ -624,7 +624,6 @@ segas32_state::segas32_state(const machine_config &mconfig, device_type type, co
 
 
 
-
 /*************************************
  *
  *  Machine init
@@ -814,7 +813,6 @@ INTERRUPT_GEN_MEMBER(segas32_state::start_of_vblank_int)
  *
  *************************************/
 
-
 void segas32_state::misc_output_0_w(uint8_t data)
 {
 	if (m_sw1_output)
@@ -859,7 +857,7 @@ void segas32_state::tilebank_external_w(uint8_t data)
 }
 
 template<int Which>
-WRITE_LINE_MEMBER(segas32_state::display_enable_w)
+void segas32_state::display_enable_w(int state)
 {
 	m_system32_displayenable[Which] = state;
 }
@@ -967,7 +965,7 @@ void segas32_state::sound_int_control_hi_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(segas32_state::ym3438_irq_handler)
+void segas32_state::ym3438_irq_handler(int state)
 {
 	if (state)
 		signal_sound_irq(SOUND_IRQ_YM3438);
@@ -1263,6 +1261,7 @@ void segas32_state::multipcm_map(address_map &map)
 	map(0x180000, 0x1fffff).bankr("multipcmbankhi");
 }
 
+
 /*************************************
  *
  *  V25 Protection CPU memory handlers
@@ -1299,7 +1298,6 @@ void segas32_state::upd7725_data_map(address_map &map)
  *  Generic port definitions
  *
  *************************************/
-
 
 static INPUT_PORTS_START( system32_generic )
 	PORT_START("mainpcb:P1_A")
@@ -2235,13 +2233,11 @@ GFXDECODE_END
 
 
 
-
 /*************************************
  *
  *  Machine driver
  *
  *************************************/
-
 
 void segas32_state::device_add_mconfig(machine_config &config)
 {
@@ -2497,13 +2493,13 @@ void segas32_cd_state::lamps2_w(uint8_t data)
 		m_lamps[8 + i] = BIT(data, i);
 }
 
-WRITE_LINE_MEMBER(segas32_cd_state::scsi_irq_w)
+void segas32_cd_state::scsi_irq_w(int state)
 {
 	//printf("%02x IRQ\n",state);
 	// TODO: sent!
 }
 
-WRITE_LINE_MEMBER(segas32_cd_state::scsi_drq_w)
+void segas32_cd_state::scsi_drq_w(int state)
 {
 	//printf("%02x DRQ\n",state);
 }
@@ -5913,7 +5909,7 @@ void segas32_state::init_sonic()
 	segas32_common_init();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20E5C4, 0x20E5C5, write16s_delegate(*this, FUNC(segas32_state::sonic_level_load_protection)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20e5c4, 0x20e5c5, write16s_delegate(*this, FUNC(segas32_state::sonic_level_load_protection)));
 }
 
 
@@ -5938,7 +5934,7 @@ void segas32_state::init_svf()
 void segas32_state::init_jleague()
 {
 	segas32_common_init();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20F700, 0x20F705, write16_delegate(*this, FUNC(segas32_state::jleague_protection_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20f700, 0x20f705, write16_delegate(*this, FUNC(segas32_state::jleague_protection_w)));
 }
 
 
@@ -5974,7 +5970,7 @@ GAME( 1992, brivalj,   brival,   sega_system32_4p,          brival,   segas32_ne
 GAME( 1992, darkedge,  0,        sega_system32_4p,          darkedge, segas32_new_state, init_darkedge, ROT0, "Sega",   "Dark Edge (World)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, darkedgej, darkedge, sega_system32_4p,          darkedge, segas32_new_state, init_darkedge, ROT0, "Sega",   "Dark Edge (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, dbzvrvs,   0,        sega_system32_analog,      dbzvrvs,  segas32_new_state, init_dbzvrvs,  ROT0, "Sega / Banpresto", "Dragon Ball Z V.R.V.S. (Japan, Rev A)", MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1994, dbzvrvs,   0,        sega_system32_analog,      dbzvrvs,  segas32_new_state, init_dbzvrvs,  ROT0, "Sega / Banpresto", "Dragon Ball Z: V.R. V.S. (Japan, Rev A)", MACHINE_IMPERFECT_GRAPHICS)
 
 GAME( 1991, f1en,      0,        sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (World, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1991, f1enu,     f1en,     sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (US, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
@@ -6022,7 +6018,7 @@ GAME( 1994, svs,       svf,      sega_system32,             svf,      segas32_ne
 GAME( 1994, jleague,   svf,      sega_system32,             svf,      segas32_new_state, init_jleague,  ROT0, "Sega",   "The J.League 1994 (Japan, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, jleagueo,  svf,      sega_system32,             svf,      segas32_new_state, init_jleague,  ROT0, "Sega",   "The J.League 1994 (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-
+// System Multi32
 GAME( 1994, harddunk,  0,        sega_multi32_6p,           harddunk, segas32_new_state, init_harddunk, ROT0, "Sega",   "Hard Dunk (World)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, harddunkj, harddunk, sega_multi32_6p,           harddunk, segas32_new_state, init_harddunk, ROT0, "Sega",   "Hard Dunk (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 

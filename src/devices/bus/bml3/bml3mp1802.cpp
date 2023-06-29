@@ -30,7 +30,7 @@ static void mp1802_floppies(device_slot_interface &device)
 	device.option_add("dd", FLOPPY_525_DD);
 }
 
-WRITE_LINE_MEMBER( bml3bus_mp1802_device::nmi_w )
+void bml3bus_mp1802_device::nmi_w(int state)
 {
 	if (state)
 		raise_slot_nmi();

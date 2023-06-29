@@ -101,17 +101,17 @@ private:
 	// video rendering
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(vdp_sndirqline_callback_s18);
-	DECLARE_WRITE_LINE_MEMBER(vdp_lv6irqline_callback_s18);
-	DECLARE_WRITE_LINE_MEMBER(vdp_lv4irqline_callback_s18);
+	void vdp_sndirqline_callback_s18(int state);
+	void vdp_lv6irqline_callback_s18(int state);
+	void vdp_lv4irqline_callback_s18(int state);
 
 	uint16_t genesis_vdp_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0) { return m_vdp->vdp_r(offset, mem_mask); }
 	void genesis_vdp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_vdp->vdp_w(offset, data, mem_mask); }
 	void tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_segaic16vid->tileram_w(offset, data, mem_mask); }
 	void textram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_segaic16vid->textram_w(offset, data, mem_mask); }
 
-	DECLARE_WRITE_LINE_MEMBER(set_grayscale);
-	DECLARE_WRITE_LINE_MEMBER(set_vdp_enable);
+	void set_grayscale(int state);
+	void set_vdp_enable(int state);
 
 	void decrypted_opcodes_map(address_map &map);
 	void mcu_io_map(address_map &map);

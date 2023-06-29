@@ -22,7 +22,6 @@
 #include "emu.h"
 #include "a2sd.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_SPI     (1U << 1)
 
 //#define VERBOSE (LOG_COMMAND)
@@ -238,7 +237,7 @@ void a2bus_a2sd_device::write_c0nx(u8 offset, u8 data)
 			m_c0n3 |= (data & 0x91);
 
 			m_sdcard->spi_ss_w(BIT(data, C0N3_BIT_SS));
-			LOGMASKED(LOG_GENERAL, "/SS is %x\n", BIT(data, C0N3_BIT_SS));
+			LOG("/SS is %x\n", BIT(data, C0N3_BIT_SS));
 			break;
 
 		default:

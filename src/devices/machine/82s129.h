@@ -55,24 +55,24 @@ public:
 	auto o3_callback() { return m_o3_func.bind(); }
 	auto o4_callback() { return m_o4_func.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( ce1_w );
-	DECLARE_WRITE_LINE_MEMBER( ce2_w );
+	void ce1_w(int state);
+	void ce2_w(int state);
 
 	void a_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( a0_w );
-	DECLARE_WRITE_LINE_MEMBER( a1_w );
-	DECLARE_WRITE_LINE_MEMBER( a2_w );
-	DECLARE_WRITE_LINE_MEMBER( a3_w );
-	DECLARE_WRITE_LINE_MEMBER( a4_w );
-	DECLARE_WRITE_LINE_MEMBER( a5_w );
-	DECLARE_WRITE_LINE_MEMBER( a6_w );
-	DECLARE_WRITE_LINE_MEMBER( a7_w );
+	void a0_w(int state);
+	void a1_w(int state);
+	void a2_w(int state);
+	void a3_w(int state);
+	void a4_w(int state);
+	void a5_w(int state);
+	void a6_w(int state);
+	void a7_w(int state);
 
 	uint8_t output_r();
-	DECLARE_READ_LINE_MEMBER( o1_r );
-	DECLARE_READ_LINE_MEMBER( o2_r );
-	DECLARE_READ_LINE_MEMBER( o3_r );
-	DECLARE_READ_LINE_MEMBER( o4_r );
+	int o1_r();
+	int o2_r();
+	int o3_r();
+	int o4_r();
 
 	uint8_t get_output() const { return m_out; }
 

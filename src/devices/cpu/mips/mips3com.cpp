@@ -143,7 +143,7 @@ generate_tlb_index - generate a random tlb index
 uint32_t mips3_device::generate_tlb_index()
 {
 	// Actual hardware uses a free running counter to generate the index.
-	// This impementation uses a linear congruential generator so that DRC and non-DRC code sequences match.
+	// This implementation uses a linear congruential generator so that DRC and non-DRC code sequences match.
 	m_tlb_seed = 214013 * m_tlb_seed + 2531011;
 	return (m_tlb_seed >> 16) & 0x3f;
 }
@@ -336,8 +336,10 @@ uint32_t mips3_device::compute_prid_register()
 			return 0x5500;
 
 		case MIPS3_TYPE_R4600:
+			return 0x2020;
+
 		case MIPS3_TYPE_R4650:
-			return 0x2000;
+			return 0x2200;
 
 		case MIPS3_TYPE_R4700:
 			return 0x2100;
@@ -362,6 +364,12 @@ uint32_t mips3_device::compute_prid_register()
 	}
 	// never executed
 	//return 0x2000;
+}
+
+uint32_t mips3_device::compute_fpu_prid_register()
+{
+	/* For most CPUs they are same */
+	return compute_prid_register();
 }
 
 /*-------------------------------------------------

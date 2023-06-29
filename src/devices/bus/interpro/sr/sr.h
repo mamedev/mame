@@ -19,10 +19,10 @@ public:
 	auto out_irq2_cb() { return m_out_irq2_cb.bind(); }
 	auto out_irq3_cb() { return m_out_irq3_cb.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(irq0_w) { m_out_irq0_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(irq1_w) { m_out_irq1_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(irq2_w) { m_out_irq2_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(irq3_w) { m_out_irq3_cb(state); }
+	void irq0_w(int state) { m_out_irq0_cb(state); }
+	void irq1_w(int state) { m_out_irq1_cb(state); }
+	void irq2_w(int state) { m_out_irq2_cb(state); }
+	void irq3_w(int state) { m_out_irq3_cb(state); }
 
 protected:
 	// construction/destruction
@@ -36,9 +36,6 @@ protected:
 		, m_out_irq3_cb(*this)
 	{
 	}
-
-	// device-level overrides
-	virtual void device_resolve_objects() override;
 
 	// internal state
 	required_address_space m_main_space;
@@ -87,7 +84,7 @@ public:
 	}
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:
@@ -112,7 +109,7 @@ public:
 	cbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
@@ -126,10 +123,10 @@ protected:
 	friend class cbus_slot_device;
 
 public:
-	DECLARE_WRITE_LINE_MEMBER(irq0) { m_bus->irq0_w(state); }
-	DECLARE_WRITE_LINE_MEMBER(irq1) { m_bus->irq1_w(state); }
-	DECLARE_WRITE_LINE_MEMBER(irq2) { m_bus->irq2_w(state); }
-	DECLARE_WRITE_LINE_MEMBER(irq3) { m_bus->irq3_w(state); }
+	void irq0(int state) { m_bus->irq0_w(state); }
+	void irq1(int state) { m_bus->irq1_w(state); }
+	void irq2(int state) { m_bus->irq2_w(state); }
+	void irq3(int state) { m_bus->irq3_w(state); }
 
 protected:
 	device_cbus_card_interface(const machine_config &mconfig, device_t &device, const char *idprom_region = "idprom")
@@ -199,7 +196,7 @@ public:
 	}
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:
@@ -224,7 +221,7 @@ public:
 	srx_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
@@ -238,10 +235,10 @@ protected:
 	friend class srx_slot_device;
 
 public:
-	DECLARE_WRITE_LINE_MEMBER(irq0) { m_bus->irq0_w(state); }
-	DECLARE_WRITE_LINE_MEMBER(irq1) { m_bus->irq1_w(state); }
-	DECLARE_WRITE_LINE_MEMBER(irq2) { m_bus->irq2_w(state); }
-	DECLARE_WRITE_LINE_MEMBER(irq3) { m_bus->irq3_w(state); }
+	void irq0(int state) { m_bus->irq0_w(state); }
+	void irq1(int state) { m_bus->irq1_w(state); }
+	void irq2(int state) { m_bus->irq2_w(state); }
+	void irq3(int state) { m_bus->irq3_w(state); }
 
 protected:
 	device_srx_card_interface(const machine_config &mconfig, device_t &device, const char *idprom_region = "idprom")

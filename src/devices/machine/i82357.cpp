@@ -22,8 +22,6 @@
 #include "emu.h"
 #include "i82357.h"
 
-#define LOG_GENERAL (1U << 0)
-
 //#define VERBOSE (LOG_GENERAL)
 
 #include "logmacro.h"
@@ -206,10 +204,6 @@ void i82357_device::map(address_map &map)
 
 void i82357_device::device_start()
 {
-	m_out_rtc.resolve_safe();
-	m_out_nmi.resolve_safe();
-	m_out_spkr.resolve_safe();
-
 	m_nmi_check = timer_alloc(FUNC(i82357_device::nmi_check), this);
 }
 
@@ -267,7 +261,7 @@ void i82357_device::nmi_ext_w(u8 data)
 	m_nmi_check->adjust(attotime::zero);
 }
 
-WRITE_LINE_MEMBER(i82357_device::in_iochk)
+void i82357_device::in_iochk(int state)
 {
 	if (!state && !(m_nmi_reg & NMI_PARITY_DISABLE))
 	{
@@ -279,7 +273,7 @@ WRITE_LINE_MEMBER(i82357_device::in_iochk)
 		m_nmi_reg &= ~NMI_IOCHK;
 }
 
-WRITE_LINE_MEMBER(i82357_device::in_parity)
+void i82357_device::in_parity(int state)
 {
 	if (!state && !(m_nmi_reg & NMI_IOCHK_DISABLE))
 	{

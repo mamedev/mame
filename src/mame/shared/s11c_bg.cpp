@@ -308,7 +308,7 @@ void s11c_bg_device::s11c_bgs_map(address_map &map)
 
 TIMER_CALLBACK_MEMBER(s11c_bg_device::deferred_cb2_w)
 {
-	if (!m_cb2_cb.isnull())
+	if (!m_cb2_cb.isunset())
 		m_cb2_cb(param);
 	else
 		logerror("S11C_BG CB2 writeback called with state %x, but callback is not registered!\n", param);
@@ -316,14 +316,14 @@ TIMER_CALLBACK_MEMBER(s11c_bg_device::deferred_cb2_w)
 
 TIMER_CALLBACK_MEMBER(s11c_bg_device::deferred_pb_w)
 {
-	if (!m_pb_cb.isnull())
+	if (!m_pb_cb.isunset())
 		m_pb_cb(param);
 	else
 		logerror("S11C_BG PB writeback called with state 0x%2X, but callback is not registered!\n", param);
 }
 
 
-WRITE_LINE_MEMBER( s11c_bg_device::pia40_cb2_w)
+void s11c_bg_device::pia40_cb2_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(s11c_bg_device::deferred_cb2_w),this), state);
 }
@@ -334,12 +334,12 @@ void s11c_bg_device::pia40_pb_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER( s11c_bg_device::extra_w )
+void s11c_bg_device::extra_w(int state)
 {
 	m_pia40->cb2_w(state);
 }
 
-WRITE_LINE_MEMBER( s11c_bg_device::ctrl_w )
+void s11c_bg_device::ctrl_w(int state)
 {
 	m_pia40->cb1_w(state);
 }
@@ -349,7 +349,7 @@ void s11c_bg_device::data_w(uint8_t data)
 	m_pia40->portb_w(data);
 }
 
-WRITE_LINE_MEMBER( s11c_bg_device::resetq_w )
+void s11c_bg_device::resetq_w(int state)
 {
 	if ((m_old_resetq_state != CLEAR_LINE) && (state == CLEAR_LINE))
 	{
@@ -501,9 +501,7 @@ void s11c_bg_device::device_start()
 	u8 *rom = memregion("cpu")->base();
 	m_cpubank->configure_entries(0, 16, &rom[0x0], 0x8000);
 	m_cpubank->set_entry(0);
-	/* resolve lines */
-	m_cb2_cb.resolve();
-	m_pb_cb.resolve();
+
 	save_item(NAME(m_old_resetq_state));
 }
 

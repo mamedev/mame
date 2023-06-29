@@ -25,11 +25,28 @@ struct CBoolPair
     Val = true;
     Def = true;
   }
+
+  void SetVal_as_Defined(bool val)
+  {
+    Val = val;
+    Def = true;
+  }
 };
 
 #define CLASS_NO_COPY(cls) \
   private: \
   cls(const cls &); \
   cls &operator=(const cls &);
+
+class CUncopyable
+{
+protected:
+  CUncopyable() {} // allow constructor
+  // ~CUncopyable() {}
+CLASS_NO_COPY(CUncopyable)
+};
+
+#define MY_UNCOPYABLE  :private CUncopyable
+// #define MY_UNCOPYABLE
 
 #endif

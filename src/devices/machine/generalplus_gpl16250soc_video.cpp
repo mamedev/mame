@@ -33,7 +33,7 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	m_video_irq_cb(*this),
 	m_palette(*this, "palette"),
 	m_gfxdecode(*this, "gfxdecode"),
-	m_space_read_cb(*this),
+	m_space_read_cb(*this, 0),
 	m_rowscroll(*this, "^rowscroll"),
 	m_rowzoom(*this, "^rowzoom"),
 	m_alt_extrasprite_hack(0),
@@ -200,15 +200,11 @@ void gcm394_base_video_device::decodegfx(const char* tag)
 
 void gcm394_base_video_device::device_start()
 {
-	m_video_irq_cb.resolve();
-
 	m_maxgfxelement = 0;
 
 	// debug helper only
 	if (memregion(":maincpu"))
 		decodegfx(":maincpu");
-
-	m_space_read_cb.resolve_safe(0);
 
 	m_screenpos_timer = timer_alloc(FUNC(gcm394_base_video_device::screen_pos_reached), this);
 	m_screenpos_timer->adjust(attotime::never);
@@ -1112,7 +1108,7 @@ void gcm394_base_video_device::check_video_irq()
 	m_video_irq_cb((m_video_irq_status & m_video_irq_enable) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(gcm394_base_video_device::vblank)
+void gcm394_base_video_device::vblank(int state)
 {
 	if (!state)
 	{

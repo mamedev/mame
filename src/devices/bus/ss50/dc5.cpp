@@ -74,9 +74,9 @@ protected:
 	virtual void register_write(offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_sso_w );
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
+	void fdc_sso_w(int state);
 
 	static void floppy_formats(format_registration &fr);
 	uint8_t m_fdc_status;              // for floppy controller
@@ -503,7 +503,7 @@ uint8_t ss50_dc5_device::validate_fdc_sector_size(uint8_t cmd)
 	return cmd;
 }
 
-WRITE_LINE_MEMBER( ss50_dc5_device::fdc_intrq_w )
+void ss50_dc5_device::fdc_intrq_w(int state)
 {
 	if (state)
 		m_fdc_status |= 0x40;
@@ -518,7 +518,7 @@ WRITE_LINE_MEMBER( ss50_dc5_device::fdc_intrq_w )
 		write_firq(state);
 }
 
-WRITE_LINE_MEMBER( ss50_dc5_device::fdc_drq_w )
+void ss50_dc5_device::fdc_drq_w(int state)
 {
 	if (state)
 		m_fdc_status |= 0x80;
@@ -526,7 +526,7 @@ WRITE_LINE_MEMBER( ss50_dc5_device::fdc_drq_w )
 		m_fdc_status &= 0x7f;
 }
 
-WRITE_LINE_MEMBER( ss50_dc5_device::fdc_sso_w )
+void ss50_dc5_device::fdc_sso_w(int state)
 {
 	// The DC4 and DC5 invert the SSO output and wire it to the DDEN input
 	// to allow selection of single or double density.

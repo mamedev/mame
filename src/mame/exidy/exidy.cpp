@@ -241,8 +241,7 @@ private:
 	required_shared_ptr<uint8_t> m_sprite_enable;
 	optional_shared_ptr<uint8_t> m_characterram;
 
-	emu_timer *m_collision_mob_timer = nullptr;
-	emu_timer *m_collision_bg_timer = nullptr;
+	emu_timer *m_collision_timer[128];
 	uint8_t m_collision_mask = 0;
 	uint8_t m_collision_invert = 0;
 	int m_is_2bpp = 0;
@@ -370,7 +369,7 @@ protected:
 
 private:
 	required_ioport m_dial;
-	uint8_t m_last_dial;
+	uint8_t m_last_dial = 0;
 };
 
 
@@ -598,7 +597,7 @@ void fax_state::fax_map(address_map &map)
 	map(0x2000, 0x2000).w(FUNC(fax_state::fax_bank_select_w));
 	map(0x2000, 0x3fff).bankr(m_rom_bank);
 	map(0x5200, 0x520f).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x5213, 0x5217).nopw();        /* empty control lines on color/sound board */
+	map(0x5213, 0x5217).nopw(); // empty control lines on color/sound board
 	map(0x6000, 0x6fff).ram().share("characterram");
 	map(0x8000, 0xffff).rom();
 }
@@ -1155,11 +1154,11 @@ INTERRUPT_GEN_MEMBER(exidy_state::exidy_vblank_interrupt)
 }
 
 
-
 uint8_t exidy_state::exidy_interrupt_r()
 {
 	/* clear any interrupts */
-	m_maincpu->set_input_line(0, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 
 	/* return the latched condition */
 	return m_int_condition;
@@ -1176,9 +1175,9 @@ uint8_t exidy_state::exidy_interrupt_r()
 inline void exidy_state::set_1_color(int index, int which)
 {
 	m_palette->set_pen_color(index,
-							pal1bit(m_color_latch[2] >> which),
-							pal1bit(m_color_latch[1] >> which),
-							pal1bit(m_color_latch[0] >> which));
+			pal1bit(m_color_latch[2] >> which),
+			pal1bit(m_color_latch[1] >> which),
+			pal1bit(m_color_latch[0] >> which));
 }
 
 void exidy_state::set_colors()
@@ -1310,7 +1309,6 @@ void exidy_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				(*m_spriteno & 0x0f) + 16 * sprite_set_1, 0,
 				0, 0, sx, sy, 0);
 	}
-
 }
 
 
@@ -1403,16 +1401,22 @@ void exidy_state::check_collision()
 					current_collision_mask |= 0x10;
 
 				/* if we got one, trigger an interrupt */
-				if ((current_collision_mask & m_collision_mask) && (count++ < 128))
-					m_collision_mob_timer->adjust(m_screen->time_until_pos(org_1_x + sx, org_1_y + sy), current_collision_mask);
+				if ((current_collision_mask & m_collision_mask) && count < 128)
+				{
+					m_collision_timer[count]->adjust(m_screen->time_until_pos(org_1_x + sx, org_1_y + sy), current_collision_mask);
+					count++;
+				}
 			}
 
 			if (m_motion_object_2_vid.pix(sy, sx) != 0xff)
 			{
 				/* check for background collision (M2CHAR) */
 				if (m_background_bitmap.pix(org_2_y + sy, org_2_x + sx) != 0)
-					if ((m_collision_mask & 0x08) && (count++ < 128))
-						m_collision_bg_timer->adjust(m_screen->time_until_pos(org_2_x + sx, org_2_y + sy), 0x08);
+					if ((m_collision_mask & 0x08) && count < 128)
+					{
+						m_collision_timer[count]->adjust(m_screen->time_until_pos(org_2_x + sx, org_2_y + sy), 0x08);
+						count++;
+					}
 			}
 		}
 }
@@ -1453,16 +1457,13 @@ uint32_t exidy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 void exidy_state::machine_start()
 {
-	m_collision_mob_timer = timer_alloc(FUNC(exidy_state::latch_collision), this);
-	m_collision_bg_timer = timer_alloc(FUNC(exidy_state::latch_collision), this);
+	for (int i = 0; i < 128; i++)
+		m_collision_timer[i] = timer_alloc(FUNC(exidy_state::latch_collision), this);
 }
 
 void spectar_state::machine_start()
 {
 	exidy_state::machine_start();
-
-	m_tone_freq = 0;
-	m_tone_active = 0;
 
 	/* start_raw can't be called here: chan.source will be set by
 	samples_device::device_start and then nulled out by samples_device::device_reset
@@ -1480,8 +1481,6 @@ void spectar_state::machine_start()
 void targ_state::machine_start()
 {
 	spectar_state::machine_start();
-
-	m_tone_pointer = 0;
 
 	save_item(NAME(m_port_2_last));
 	save_item(NAME(m_tone_pointer));
@@ -1688,6 +1687,7 @@ void fax_state::fax(machine_config &config)
 	// video hardware
 	exidy_video_config(0x04, 0x04, true);
 }
+
 
 /*************************************************************************
 
@@ -2470,7 +2470,7 @@ ROM_START( fax )
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "fxl1-11d.32",  0x0000, 0x0800, CRC(62083db2) SHA1(0c6e90b73419bff53f991e66d4faa9495c7d8e09) )
 
-// loaded, but not hooked up
+	// loaded, but not hooked up
 	ROM_REGION( 0x0240, "proms", 0 )
 	ROM_LOAD( "fxl-6b",   0x0000, 0x0100, CRC(e1e867ae) SHA1(fe4cb560860579102aedad2c81fd7bed5825f484) )
 	ROM_LOAD( "fxl-8b",   0x0100, 0x0020, CRC(0da1bdf9) SHA1(0c2d85da59cf86f2d9cf5f33bdc63902ca5507d3) )
@@ -2523,7 +2523,7 @@ ROM_START( fax2 )
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "fxl1-11d.32",   0x0000, 0x0800, CRC(62083db2) SHA1(0c6e90b73419bff53f991e66d4faa9495c7d8e09) )
 
-// loaded, but not hooked up
+	// loaded, but not hooked up
 	ROM_REGION( 0x0240, "proms", 0 )
 	ROM_LOAD( "fxl-6b",   0x0000, 0x0100, CRC(e1e867ae) SHA1(fe4cb560860579102aedad2c81fd7bed5825f484) )
 	ROM_LOAD( "fxl-8b",   0x0100, 0x0020, CRC(0da1bdf9) SHA1(0c2d85da59cf86f2d9cf5f33bdc63902ca5507d3) )
@@ -2550,19 +2550,19 @@ void spectar_state::init_sidetrac()
 
 void targ_state::init_targ()
 {
-	// hard-coded palette controlled via 8x3 DIP switches on the board
-	m_color_latch[2] = 0x5c;
-	m_color_latch[1] = 0xee;
-	m_color_latch[0] = 0x6b;
+	// hard-coded palette controlled via 8x3 jumpers on the color adapter board
+	m_color_latch[2] = 0x54; // Red
+	m_color_latch[1] = 0xee; // Green
+	m_color_latch[0] = 0x6b; // Blue
 }
 
 
 void spectar_state::init_spectar()
 {
-	// hard-coded palette controlled via 8x3 DIP switches on the board
-	m_color_latch[2] = 0x58;
-	m_color_latch[1] = 0xee;
-	m_color_latch[0] = 0x09;
+	// hard-coded palette controlled via 8x3 jumpers on the color adapter board
+	m_color_latch[2] = 0xda; // Red
+	m_color_latch[1] = 0xee; // Green
+	m_color_latch[0] = 0x61; // Blue
 }
 
 } // anonymous namespace

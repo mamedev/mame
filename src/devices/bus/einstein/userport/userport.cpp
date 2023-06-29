@@ -51,9 +51,6 @@ einstein_userport_device::~einstein_userport_device()
 
 void einstein_userport_device::device_start()
 {
-	// resolve callbacks
-	m_bstb_handler.resolve_safe();
-
 	m_card = get_card_device();
 }
 
@@ -76,7 +73,7 @@ void einstein_userport_device::write(uint8_t data)
 		m_card->write(data);
 }
 
-WRITE_LINE_MEMBER( einstein_userport_device::brdy_w )
+void einstein_userport_device::brdy_w(int state)
 {
 	if (m_card)
 		m_card->brdy_w(state);

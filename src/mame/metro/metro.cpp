@@ -138,7 +138,7 @@ TIMER_CALLBACK_MEMBER(metro_state::mouja_irq)
 	if (m_vdp3) m_vdp3->set_irq(0);
 }
 
-WRITE_LINE_MEMBER(metro_state::vblank_irq)
+void metro_state::vblank_irq(int state)
 {
 	if (state)
 	{
@@ -173,7 +173,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(metro_state::bangball_scanline)
 }
 
 /* lev 2-7 (lev 1 seems sound related) */
-WRITE_LINE_MEMBER(metro_state::karatour_vblank_irq)
+void metro_state::karatour_vblank_irq(int state)
 {
 //  printf("%d %d %lld\n", state, m_screen->vpos(), m_screen->frame_number());
 
@@ -198,7 +198,7 @@ WRITE_LINE_MEMBER(metro_state::karatour_vblank_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(metro_state::ext_irq5_enable_w)
+void metro_state::ext_irq5_enable_w(int state)
 {
 	m_ext_irq_enable = state;
 }
@@ -210,7 +210,7 @@ void metro_state::mouja_irq_timer_ctrl_w(u16 data)
 	m_mouja_irq_timer->adjust(attotime::zero, 0, attotime::from_hz(freq));
 }
 
-WRITE_LINE_MEMBER(metro_state::puzzlet_vblank_irq)
+void metro_state::puzzlet_vblank_irq(int state)
 {
 	if (state)
 	{
@@ -230,7 +230,7 @@ WRITE_LINE_MEMBER(metro_state::puzzlet_vblank_irq)
 
 ***************************************************************************/
 
-READ_LINE_MEMBER(metro_state::rxd_r)
+int metro_state::rxd_r()
 {
 	u8 data = m_sound_data;
 
@@ -259,7 +259,7 @@ u8 metro_state::soundstatus_r()
 	return (m_busy_sndcpu ? 0x00 : 0x01);
 }
 
-READ_LINE_MEMBER(metro_state::custom_soundstatus_r)
+int metro_state::custom_soundstatus_r()
 {
 	return (m_busy_sndcpu ? 1 : 0);
 }
@@ -1070,13 +1070,6 @@ void metro_state::puzzlet_portb_w(u16 data)
 //  popmessage("PORTB %02x", data);
 }
 
-void metro_state::puzzlet_io_map(address_map &map)
-{
-	map(h8_device::PORT_7, h8_device::PORT_7).portr("IN2");
-	map(h8_device::PORT_B, h8_device::PORT_B).portr("DSW0").w(FUNC(metro_state::puzzlet_portb_w));
-}
-
-
 /***************************************************************************
                                 Varia Metal
 ***************************************************************************/
@@ -1110,7 +1103,7 @@ void metro_state::es8712_reset_w(u8 data)
 	m_essnd->reset();
 }
 
-WRITE_LINE_MEMBER(metro_state::vmetal_es8712_irq)
+void metro_state::vmetal_es8712_irq(int state)
 {
 	if (m_essnd_gate)
 		m_maincpu->set_input_line(3, state);
@@ -3492,17 +3485,19 @@ void metro_state::gstrik2(machine_config &config)
 void metro_state::puzzlet(machine_config &config)
 {
 	/* basic machine hardware */
-	H83007(config, m_maincpu, 20_MHz_XTAL); // H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::puzzlet_map);
-	m_maincpu->set_addrmap(AS_IO, &metro_state::puzzlet_io_map);
+	auto &maincpu(H83007(config, m_maincpu, 20_MHz_XTAL)); // H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
+	maincpu.set_addrmap(AS_PROGRAM, &metro_state::puzzlet_map);
+	maincpu.read_port7().set_ioport("IN2");
+	maincpu.read_portb().set_ioport("DSW0");
+	maincpu.write_portb().set(FUNC(metro_state::puzzlet_portb_w));
 
 	/* Coins/service */
 	z8_device &coinmcu(Z86E02(config, "coinmcu", 20_MHz_XTAL/5)); // clock divider guessed
 	coinmcu.p0_in_cb().set_ioport("COIN");
 	coinmcu.p2_in_cb().set_ioport("START");
-	coinmcu.p2_out_cb().set("maincpu:sci1", FUNC(h8_sci_device::rx_w)).bit(6);
-	subdevice<h8_sci_device>("maincpu:sci1")->tx_handler().set_inputline("coinmcu", INPUT_LINE_IRQ2).invert();
-	subdevice<h8_sci_device>("maincpu:sci1")->clk_handler().set_inputline("coinmcu", INPUT_LINE_IRQ0).invert();
+	coinmcu.p2_out_cb().set(maincpu, FUNC(h83007_device::sci_rx_w<1>)).bit(6);
+	maincpu.write_sci_tx<1>().set_inputline("coinmcu", INPUT_LINE_IRQ2).invert();
+	maincpu.write_sci_clk<1>().set_inputline("coinmcu", INPUT_LINE_IRQ0).invert();
 
 	/* video hardware */
 	// TODO: looks like game is running in i4220 compatibility mode, $778000 seems to be an id for the chip?

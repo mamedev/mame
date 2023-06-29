@@ -43,41 +43,6 @@ template <typename Signature, unsigned Count> class device_delegate_array;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-namespace detail {
-
-// ======================> device_delegate_helper
-
-// device_delegate_helper does non-template work
-class device_delegate_helper
-{
-public:
-	// accessors
-	char const *finder_tag() const { return m_tag; }
-	std::pair<device_t &, char const *> finder_target() const { return std::make_pair(m_base, m_tag); }
-
-protected:
-	// construct/assign
-	device_delegate_helper(device_t &owner, char const *tag = nullptr) : m_base(owner), m_tag(tag) { }
-	template <class DeviceClass, bool Required> device_delegate_helper(device_finder<DeviceClass, Required> const &finder);
-	device_delegate_helper(device_delegate_helper const &) = default;
-	device_delegate_helper &operator=(device_delegate_helper const &) = default;
-
-	// internal helpers
-	delegate_late_bind &bound_object() const;
-	void set_tag(device_t &object) { m_base = object; m_tag = nullptr; }
-	void set_tag(device_t &base, char const *tag) { m_base = base; m_tag = tag; }
-	void set_tag(char const *tag);
-	template <class DeviceClass, bool Required> void set_tag(device_finder<DeviceClass, Required> const &finder);
-
-private:
-	std::reference_wrapper<device_t> m_base;
-	char const *m_tag;
-};
-
-} // namespace detail
-
-
-// ======================> named_delegate
 template <typename Signature>
 class named_delegate : public delegate<Signature>
 {
@@ -104,8 +69,8 @@ public:
 	template <typename T> named_delegate(T &&funcptr, std::enable_if_t<suitable_functoid<T>::value, char const *> name) : basetype(std::forward<T>(funcptr)), m_name(name) { }
 
 	// allow assignment
-	named_delegate &operator=(named_delegate const &src) = default;
-	named_delegate &operator=(named_delegate &&src) = default;
+	named_delegate &operator=(named_delegate const &) = default;
+	named_delegate &operator=(named_delegate &&) = default;
 	named_delegate &operator=(std::nullptr_t) noexcept { reset(); return *this; }
 
 	// getters
@@ -125,14 +90,43 @@ template <class FunctionClass, typename ReturnType, typename... Params>
 named_delegate(ReturnType (*)(FunctionClass &, Params...), char const *, FunctionClass *) -> named_delegate<ReturnType (Params...)>;
 
 
-// ======================> device_delegate
+namespace detail {
 
-// device_delegate is a delegate that wraps with a device tag and can be easily
-// late bound without replicating logic everywhere
-template <typename Signature> class device_delegate;
+// device_delegate_helper does non-template work
+
+class device_delegate_helper
+{
+public:
+	// accessors
+	char const *finder_tag() const { return m_tag; }
+	std::pair<device_t &, char const *> finder_target() const { return std::make_pair(m_base, m_tag); }
+
+protected:
+	// construct/assign
+	device_delegate_helper(device_t &owner, char const *tag = nullptr) : m_base(owner), m_tag(tag) { }
+	template <class DeviceClass, bool Required> device_delegate_helper(device_finder<DeviceClass, Required> const &finder);
+	device_delegate_helper(device_delegate_helper const &) = default;
+	device_delegate_helper &operator=(device_delegate_helper const &) = default;
+
+	// internal helpers
+	delegate_late_bind &bound_object() const;
+	void set_tag(device_t &object) { m_base = object; m_tag = nullptr; }
+	void set_tag(device_t &base, char const *tag) { m_base = base; m_tag = tag; }
+	void set_tag(char const *tag);
+	template <class DeviceClass, bool Required> void set_tag(device_finder<DeviceClass, Required> const &finder);
+
+private:
+	std::reference_wrapper<device_t> m_base;
+	char const *m_tag;
+};
+
+
+// device_delegate_base doesn't need to be specialised on return type
+
+template <typename Signature> class device_delegate_base;
 
 template <typename ReturnType, typename... Params>
-class device_delegate<ReturnType (Params...)> : protected named_delegate<ReturnType (Params...)>, public detail::device_delegate_helper
+class device_delegate_base<ReturnType (Params...)> : protected named_delegate<ReturnType (Params...)>, public device_delegate_helper
 {
 private:
 	using basetype = named_delegate<ReturnType (Params...)>;
@@ -151,76 +145,71 @@ private:
 	template <class T> static std::enable_if_t<is_related_device_interface<T, T>::value, device_t &> get_device(T &object) { return object.device(); }
 
 public:
-	template <unsigned Count> using array = device_delegate_array<ReturnType (Params...), Count>;
-
-	template <typename T>
-	using supports_callback = std::bool_constant<std::is_constructible_v<device_delegate, device_t &, char const *, T, char const *> >;
-
 	// construct/assign
-	explicit device_delegate(device_t &owner) : basetype(), detail::device_delegate_helper(owner) { }
-	device_delegate(device_delegate const &) = default;
-	device_delegate &operator=(device_delegate const &) = default;
+	explicit device_delegate_base(device_t &owner) : basetype(), device_delegate_helper(owner) { }
+	device_delegate_base(device_delegate_base const &) = default;
+	device_delegate_base &operator=(device_delegate_base const &) = default;
 
 	// construct with prototype and target
-	device_delegate(basetype const &proto, device_t &object) : basetype(proto, object), detail::device_delegate_helper(object) { }
-	device_delegate(device_delegate const &proto, device_t &object) : basetype(proto, object), detail::device_delegate_helper(object) { }
+	device_delegate_base(basetype const &proto, device_t &object) : basetype(proto, object), device_delegate_helper(object) { }
+	device_delegate_base(device_delegate_base const &proto, device_t &object) : basetype(proto, object), device_delegate_helper(object) { }
 
 	// construct with base and tag
 	template <class D>
-	device_delegate(device_t &base, char const *tag, ReturnType (D::*funcptr)(Params...), char const *name)
+	device_delegate_base(device_t &base, char const *tag, ReturnType (D::*funcptr)(Params...), char const *name)
 		: basetype(funcptr, name, static_cast<D *>(nullptr))
-		, detail::device_delegate_helper(base, tag)
+		, device_delegate_helper(base, tag)
 	{ }
 	template <class D>
-	device_delegate(device_t &base, char const *tag, ReturnType (D::*funcptr)(Params...) const, char const *name)
+	device_delegate_base(device_t &base, char const *tag, ReturnType (D::*funcptr)(Params...) const, char const *name)
 		: basetype(funcptr, name, static_cast<D *>(nullptr))
-		, detail::device_delegate_helper(base, tag)
+		, device_delegate_helper(base, tag)
 	{ }
 	template <class D>
-	device_delegate(device_t &base, char const *tag, ReturnType (*funcptr)(D &, Params...), char const *name)
+	device_delegate_base(device_t &base, char const *tag, ReturnType (*funcptr)(D &, Params...), char const *name)
 		: basetype(funcptr, name, static_cast<D *>(nullptr))
-		, detail::device_delegate_helper(base, tag)
+		, device_delegate_helper(base, tag)
 	{ }
 
 	// construct with device finder
 	template <class D, bool R, class E>
-	device_delegate(device_finder<D, R> const &finder, ReturnType (E::*funcptr)(Params...), char const *name)
+	device_delegate_base(device_finder<D, R> const &finder, ReturnType (E::*funcptr)(Params...), char const *name)
 		: basetype(funcptr, name, static_cast<E *>(nullptr))
-		, detail::device_delegate_helper(finder)
+		, device_delegate_helper(finder)
 	{ }
 	template <class D, bool R, class E>
-	device_delegate(device_finder<D, R> const &finder, ReturnType (E::*funcptr)(Params...) const, char const *name)
+	device_delegate_base(device_finder<D, R> const &finder, ReturnType (E::*funcptr)(Params...) const, char const *name)
 		: basetype(funcptr, name, static_cast<E *>(nullptr))
-		, detail::device_delegate_helper(finder)
+		, device_delegate_helper(finder)
 	{ }
 	template <class D, bool R, class E>
-	device_delegate(device_finder<D, R> const &finder, ReturnType (*funcptr)(E &, Params...), char const *name)
+	device_delegate_base(device_finder<D, R> const &finder, ReturnType (*funcptr)(E &, Params...), char const *name)
 		: basetype(funcptr, name, static_cast<E *>(nullptr))
-		, detail::device_delegate_helper(finder)
+		, device_delegate_helper(finder)
 	{ }
 
 	// construct with target object
 	template <class T, class D>
-	device_delegate(T &object, ReturnType (D::*funcptr)(Params...), std::enable_if_t<is_related_device<D, T>::value, char const *> name)
+	device_delegate_base(T &object, ReturnType (D::*funcptr)(Params...), std::enable_if_t<is_related_device<D, T>::value, char const *> name)
 		: basetype(funcptr, name, static_cast<D *>(&object))
-		, detail::device_delegate_helper(get_device(object))
+		, device_delegate_helper(get_device(object))
 	{ }
 	template <class T, class D>
-	device_delegate(T &object, ReturnType (D::*funcptr)(Params...) const, std::enable_if_t<is_related_device<D, T>::value, char const *> name)
+	device_delegate_base(T &object, ReturnType (D::*funcptr)(Params...) const, std::enable_if_t<is_related_device<D, T>::value, char const *> name)
 		: basetype(funcptr, name, static_cast<D *>(&object))
-		, detail::device_delegate_helper(get_device(object))
+		, device_delegate_helper(get_device(object))
 	{ }
 	template <class T, class D>
-	device_delegate(T &object, ReturnType (*funcptr)(D &, Params...), std::enable_if_t<is_related_device<D, T>::value, char const *> name)
+	device_delegate_base(T &object, ReturnType (*funcptr)(D &, Params...), std::enable_if_t<is_related_device<D, T>::value, char const *> name)
 		: basetype(funcptr, name, static_cast<D *>(&object))
-		, detail::device_delegate_helper(get_device(object))
+		, device_delegate_helper(get_device(object))
 	{ }
 
 	// construct with callable object
 	template <typename T>
-	device_delegate(device_t &owner, T &&funcptr, std::enable_if_t<suitable_functoid<T>::value, char const *> name)
+	device_delegate_base(device_t &owner, T &&funcptr, std::enable_if_t<suitable_functoid<T>::value, char const *> name)
 		: basetype(std::forward<T>(funcptr), name)
-		, detail::device_delegate_helper(owner)
+		, device_delegate_helper(owner)
 	{ }
 
 	// setters that implicitly bind to the current device
@@ -257,18 +246,117 @@ public:
 	void reset()
 	{ basetype::reset(); set_tag(finder_target().first); }
 
-	// perform the binding
-	void resolve() { if (!basetype::isnull() && !basetype::has_object()) basetype::late_bind(bound_object()); }
-
 	// accessors
 	using basetype::operator();
 	using basetype::isnull;
 	using basetype::has_object;
 	using basetype::name;
+
+	// perform the binding
+	void resolve()
+	{
+		if (!this->isnull() && !this->has_object())
+			this->late_bind(bound_object());
+	}
+};
+
+} // namespace detail
+
+
+// device_delegate is a delegate that can be late bound to a device specification
+
+template <typename Signature> class device_delegate;
+
+template <typename ReturnType, typename... Params>
+class device_delegate<ReturnType (Params...)> : protected detail::device_delegate_base<ReturnType (Params...)>
+{
+public:
+	template <unsigned Count> using array = device_delegate_array<ReturnType (Params...), Count>;
+
+	template <typename T>
+	using supports_callback = std::bool_constant<std::is_constructible_v<device_delegate, device_t &, char const *, T, char const *> >;
+
+	// constructors
+	using detail::device_delegate_base<ReturnType (Params...)>::device_delegate_base;
+	device_delegate(device_delegate const &) = default;
+	device_delegate(device_delegate const &proto, device_t &object) : detail::device_delegate_base<ReturnType (Params...)>(proto, object) { }
+
+	// assignment
+	device_delegate &operator=(device_delegate const &) = default;
+	device_delegate &operator=(std::nullptr_t) { this->reset(); }
+
+	// setters/unsetters
+	void set(device_delegate const &src) { operator=(src); }
+	using detail::device_delegate_base<ReturnType (Params...)>::set;
+	using detail::device_delegate_base<ReturnType (Params...)>::reset;
+
+	// accessors
+	using detail::device_delegate_base<ReturnType (Params...)>::operator();
+	using detail::device_delegate_base<ReturnType (Params...)>::isnull;
+	using detail::device_delegate_base<ReturnType (Params...)>::has_object;
+	using detail::device_delegate_base<ReturnType (Params...)>::name;
+	using detail::device_delegate_base<ReturnType (Params...)>::finder_tag;
+	using detail::device_delegate_base<ReturnType (Params...)>::finder_target;
+
+	// perform the binding
+	using detail::device_delegate_base<ReturnType (Params...)>::resolve;
+
+	template <typename T>
+	void resolve_safe(T &&dflt)
+	{
+		if (this->isnull())
+			this->set([result = std::decay_t<T>(std::forward<T>(dflt))] (Params...) { return ReturnType(result); }, "default");
+		else if (!this->has_object())
+			this->late_bind(this->bound_object());
+	}
+};
+
+template <typename... Params>
+class device_delegate<void (Params...)> : protected detail::device_delegate_base<void (Params...)>
+{
+public:
+	template <unsigned Count> using array = device_delegate_array<void (Params...), Count>;
+
+	template <typename T>
+	using supports_callback = std::bool_constant<std::is_constructible_v<device_delegate, device_t &, char const *, T, char const *> >;
+
+	// constructors
+	using detail::device_delegate_base<void (Params...)>::device_delegate_base;
+	device_delegate(device_delegate const &) = default;
+	device_delegate(device_delegate const &proto, device_t &object) : detail::device_delegate_base<void (Params...)>(proto, object) { }
+
+	// assignment
+	device_delegate &operator=(device_delegate const &) = default;
+	device_delegate &operator=(std::nullptr_t) { this->reset(); }
+
+	// setters/unsetters
+	void set(device_delegate const &src) { operator=(src); }
+	using detail::device_delegate_base<void (Params...)>::set;
+	using detail::device_delegate_base<void (Params...)>::reset;
+
+	// accessors
+	using detail::device_delegate_base<void (Params...)>::operator();
+	using detail::device_delegate_base<void (Params...)>::isnull;
+	using detail::device_delegate_base<void (Params...)>::has_object;
+	using detail::device_delegate_base<void (Params...)>::name;
+	using detail::device_delegate_base<void (Params...)>::finder_tag;
+	using detail::device_delegate_base<void (Params...)>::finder_target;
+
+	// perform the binding
+	using detail::device_delegate_base<void (Params...)>::resolve;
+
+	void resolve_safe()
+	{
+		if (this->isnull())
+			this->set([] (Params...) { }, "default");
+		else if (!this->has_object())
+			this->late_bind(this->bound_object());
+	}
 };
 
 
 // simplifies constructing an array of delegates with a single owner
+
 template <typename Signature, unsigned Count>
 class device_delegate_array : public std::array<device_delegate<Signature>, Count>
 {
@@ -297,6 +385,13 @@ public:
 	{
 		for (device_delegate<Signature> &elem : *this)
 			elem.resolve();
+	}
+
+	template <typename... T>
+	void resolve_all_safe(T &&... args)
+	{
+		for (device_delegate<Signature> &elem : *this)
+			elem.resolve_safe(args...);
 	}
 };
 

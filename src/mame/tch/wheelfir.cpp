@@ -208,7 +208,7 @@ public:
 	{ }
 
 	void wheelfir(machine_config &config);
-	DECLARE_READ_LINE_MEMBER(adc_eoc_r);
+	int adc_eoc_r();
 
 protected:
 	virtual void machine_start() override;
@@ -254,9 +254,9 @@ private:
 	void wheelfir_7c0000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t wheelfir_7c0000_r(offs_t offset, uint16_t mem_mask = ~0);
 	void coin_cnt_w(uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(adc_eoc_w);
+	void adc_eoc_w(int state);
 	uint32_t screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_wheelfir);
+	void screen_vblank_wheelfir(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer_callback);
 	void ramdac_map(address_map &map);
 	void wheelfir_main(address_map &map);
@@ -512,7 +512,7 @@ uint32_t wheelfir_state::screen_update_wheelfir(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE_LINE_MEMBER(wheelfir_state::screen_vblank_wheelfir)
+void wheelfir_state::screen_vblank_wheelfir(int state)
 {
 	// rising edge
 	if (state)
@@ -638,12 +638,12 @@ static INPUT_PORTS_START( wheelfir )
 	PORT_BIT(0xff, 0x00, IPT_PEDAL2) PORT_INVERT PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal") PORT_MINMAX(0x00, 0xff) PORT_REVERSE
 INPUT_PORTS_END
 
-READ_LINE_MEMBER( wheelfir_state::adc_eoc_r )
+int wheelfir_state::adc_eoc_r()
 {
 	return m_adc_eoc;
 }
 
-WRITE_LINE_MEMBER( wheelfir_state::adc_eoc_w )
+void wheelfir_state::adc_eoc_w(int state)
 {
 	m_adc_eoc = state;
 }

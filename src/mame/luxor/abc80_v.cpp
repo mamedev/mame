@@ -16,7 +16,7 @@ void tkn80_state::set_screen_params(void)
 	{
 		m_screen->set_raw(XTAL(11'980'800), ABC80_HTOTAL*2, ABC80_HBEND*2, ABC80_HBSTART*2, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART);
 		m_scanline_timer->adjust(m_screen->time_until_pos(0, ABC80_HBEND*2), 0, m_screen->scan_period());
-	}	
+	}
 	else
 	{
 		m_screen->set_raw(XTAL(11'980'800)/2, ABC80_HTOTAL, ABC80_HBEND, ABC80_HBSTART, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART);
@@ -33,7 +33,7 @@ uint8_t tkn80_state::in3_r()
 		set_screen_params();
 	}
 
-	return 0xff; 
+	return 0xff;
 };
 
 uint8_t tkn80_state::in4_r()
@@ -196,12 +196,12 @@ offs_t abc80_state::get_videoram_addr()
 {
 	/*
 
-		Video RAM Addressing Scheme
+	    Video RAM Addressing Scheme
 
-		A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
-		R2 R1 R0 xx xx xx xx C2 C1 C0
+	    A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
+	    R2 R1 R0 xx xx xx xx C2 C1 C0
 
-		         A6 A5 A4 A3 = 00 C5 C4 C3 + R4 R3 R4 R3
+	             A6 A5 A4 A3 = 00 C5 C4 C3 + R4 R3 R4 R3
 
 	*/
 
@@ -218,15 +218,15 @@ offs_t tkn80_state::get_videoram_addr()
 	{
 		/*
 
-			Video RAM Addressing Scheme
+		    Video RAM Addressing Scheme
 
-			A10 A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
-			R2 R1 R0 xx xx xx xx C3 C2 C1 C0
+		    A10 A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
+		    R2 R1 R0 xx xx xx xx C3 C2 C1 C0
 
-					 A7 A6 A5 A4 = 00 C6 C5 C4 + R4 R3 R4 R3
+		             A7 A6 A5 A4 = 00 C6 C5 C4 + R4 R3 R4 R3
 
 		*/
-		
+
 		int a = (m_c >> 4) & 0x07;
 		int b = ((m_r >> 1) & 0x0c) | ((m_r >> 3) & 0x03);
 		int s = (a + b) & 0x1f;
@@ -237,12 +237,12 @@ offs_t tkn80_state::get_videoram_addr()
 	{
 		/*
 
-			Video RAM Addressing Scheme
+		    Video RAM Addressing Scheme
 
-			A10 A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
-			  1 R2 R1 R0 xx xx xx xx C2 C1 C0
+		    A10 A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
+		      1 R2 R1 R0 xx xx xx xx C2 C1 C0
 
-						 A6 A5 A4 A3 = 00 C5 C4 C3 + R4 R3 R4 R3
+		                 A6 A5 A4 A3 = 00 C5 C4 C3 + R4 R3 R4 R3
 
 		*/
 

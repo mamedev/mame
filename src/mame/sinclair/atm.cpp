@@ -14,7 +14,8 @@ NOTES:
 #include "atm.h"
 
 #include "bus/ata/atapicdr.h"
-#include "bus/ata/idehd.h"
+#include "bus/ata/hdd.h"
+#include "sound/ay8910.h"
 
 #define LOG_MEM   (1U << 1)
 #define LOG_VIDEO (1U << 2)

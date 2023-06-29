@@ -62,13 +62,12 @@ public:
 	void write(offs_t offset, u8 data);
 
 	// line write handlers
-	DECLARE_WRITE_LINE_MEMBER(dtr_w);
-	DECLARE_WRITE_LINE_MEMBER(txd_w);
-	DECLARE_WRITE_LINE_MEMBER(rts_w);
+	void dtr_w(int state);
+	void txd_w(int state);
+	void rts_w(int state);
 
 protected:
-	// device-specific overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

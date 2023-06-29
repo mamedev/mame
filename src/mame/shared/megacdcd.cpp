@@ -10,6 +10,15 @@
 #include "emu.h"
 #include "megacdcd.h"
 
+#define LOG_WARN           (1U << 1)
+
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+
+#include "logmacro.h"
+
+#define LOGWARN(...)         LOGMASKED(LOG_WARN, __VA_ARGS__)
+
 #define READ_MAIN (0x0200)
 #define READ_SUB  (0x0300)
 
@@ -256,7 +265,7 @@ void lc89510_temp_device::CDD_Export(bool neocd_hack)
 		CDD_RX[0] = (CDD_STATUS  & 0xff00)>>8;
 	else
 	{
-	//  printf("was %02x returning %02x\n", (CDD_STATUS  & 0xff00)>>8, NeoCD_StatusHack);
+	//  LOG("was %02x returning %02x\n", (CDD_STATUS  & 0xff00)>>8, NeoCD_StatusHack);
 		CDD_RX[0] = NeoCD_StatusHack;
 	}
 
@@ -311,7 +320,7 @@ void lc89510_temp_device::CDD_GetPos(void)
 	CLEAR_CDD_RESULT
 	uint32_t msf;
 	CDD_STATUS &= 0xFF;
-	if(segacd.cd == nullptr) // no CD is there, bail out
+	if(!m_cdrom->exists()) // no CD is there, bail out
 		return;
 	CDD_STATUS |= SCD_STATUS;
 	msf = cdrom_file::lba_to_msf_alt(SCD_CURLBA+150);
@@ -327,12 +336,12 @@ void lc89510_temp_device::CDD_GetTrackPos(void)
 	uint32_t msf;
 	CDD_STATUS &= 0xFF;
 	//  uint32_t end_msf = ;
-	if(segacd.cd == nullptr) // no CD is there, bail out
+	if(!m_cdrom->exists()) // no CD is there, bail out
 		return;
 	CDD_STATUS |= SCD_STATUS;
-	elapsedlba = SCD_CURLBA - segacd.toc->tracks[ segacd.cd->get_track(SCD_CURLBA) ].logframeofs;
+	elapsedlba = SCD_CURLBA - segacd.toc->tracks[ m_cdrom->get_track(SCD_CURLBA) ].logframeofs;
 	msf = cdrom_file::lba_to_msf_alt (elapsedlba);
-	//popmessage("%08x %08x",SCD_CURLBA,segacd.toc->tracks[ cdrom_get_track(segacd.cd, SCD_CURLBA) + 1 ].logframeofs);
+	//popmessage("%08x %08x",SCD_CURLBA,segacd.toc->tracks[ cdrom_get_track(m_cdrom, SCD_CURLBA) + 1 ].logframeofs);
 	CDD_MIN = to_bcd(((msf & 0x00ff0000)>>16),false);
 	CDD_SEC = to_bcd(((msf & 0x0000ff00)>>8),false);
 	CDD_FRAME = to_bcd(((msf & 0x000000ff)>>0),false);
@@ -342,10 +351,10 @@ void lc89510_temp_device::CDD_GetTrack(void)
 {
 	CLEAR_CDD_RESULT
 	CDD_STATUS &= 0xFF;
-	if(segacd.cd == nullptr) // no CD is there, bail out
+	if(!m_cdrom->exists()) // no CD is there, bail out
 		return;
 	CDD_STATUS |= SCD_STATUS;
-	SCD_CURTRK = segacd.cd->get_track(SCD_CURLBA)+1;
+	SCD_CURTRK = m_cdrom->get_track(SCD_CURLBA)+1;
 	CDD_MIN = to_bcd(SCD_CURTRK, false);
 }
 
@@ -353,11 +362,11 @@ void lc89510_temp_device::CDD_Length(void)
 {
 	CLEAR_CDD_RESULT
 	CDD_STATUS &= 0xFF;
-	if(segacd.cd == nullptr) // no CD is there, bail out
+	if(!m_cdrom->exists()) // no CD is there, bail out
 		return;
 	CDD_STATUS |= SCD_STATUS;
 
-	uint32_t startlba = (segacd.toc->tracks[segacd.cd->get_last_track()].logframeofs);
+	uint32_t startlba = (segacd.toc->tracks[m_cdrom->get_last_track()].logframeofs);
 	uint32_t startmsf = cdrom_file::lba_to_msf_alt( startlba );
 
 	CDD_MIN = to_bcd((startmsf&0x00ff0000)>>16,false);
@@ -370,11 +379,11 @@ void lc89510_temp_device::CDD_FirstLast(void)
 {
 	CLEAR_CDD_RESULT
 	CDD_STATUS &= 0xFF;
-	if(segacd.cd == nullptr) // no CD is there, bail out
+	if(!m_cdrom->exists()) // no CD is there, bail out
 		return;
 	CDD_STATUS |= SCD_STATUS;
 	CDD_MIN = 1; // first
-	CDD_SEC = to_bcd(segacd.cd->get_last_track(),false); // last
+	CDD_SEC = to_bcd(m_cdrom->get_last_track(),false); // last
 }
 
 void lc89510_temp_device::CDD_GetTrackAdr(void)
@@ -382,11 +391,11 @@ void lc89510_temp_device::CDD_GetTrackAdr(void)
 	CLEAR_CDD_RESULT
 
 	CDD_STATUS &= 0xFF;
-	if(segacd.cd == nullptr) // no CD is there, bail out
+	if(!m_cdrom->exists()) // no CD is there, bail out
 		return;
 
 	int track = (CDD_TX[5] & 0xF) + (CDD_TX[4] & 0xF) * 10;
-	int last_track = segacd.cd->get_last_track();
+	int last_track = m_cdrom->get_last_track();
 
 	CDD_STATUS |= SCD_STATUS;
 
@@ -415,11 +424,11 @@ void lc89510_temp_device::CDD_GetTrackType(void)
 	CLEAR_CDD_RESULT
 
 	CDD_STATUS &= 0xFF;
-	if(segacd.cd == nullptr) // no CD is there, bail out
+	if(!m_cdrom->exists()) // no CD is there, bail out
 		return;
 
 	int track = (CDD_TX[5] & 0xF) + (CDD_TX[4] & 0xF) * 10;
-	int last_track = segacd.cd->get_last_track();
+	int last_track = m_cdrom->get_last_track();
 
 	CDD_STATUS |= SCD_STATUS;
 
@@ -455,15 +464,17 @@ void lc89510_temp_device::CDD_Play()
 	CLEAR_CDD_RESULT
 	uint32_t msf = getmsf_from_regs();
 	SCD_CURLBA = cdrom_file::msf_to_lba(msf)-150;
-	if(segacd.cd == nullptr) // no CD is there, bail out
+	if(!m_cdrom->exists()) // no CD is there, bail out
 		return;
-	uint32_t track_length = segacd.toc->tracks[ segacd.cd->get_track(SCD_CURLBA) ].logframes;
-	SCD_CURTRK = segacd.cd->get_track(SCD_CURLBA)+1;
+	// TODO: audio CD player stops after first track
+	// should really read the full CD length rather than one track only
+	uint32_t track_length = segacd.toc->tracks[ m_cdrom->get_track(SCD_CURLBA) ].logframes;
+	SCD_CURTRK = m_cdrom->get_track(SCD_CURLBA)+1;
 	LC8951UpdateHeader();
 	SCD_STATUS = CDD_PLAYINGCDDA;
 	CDD_STATUS = 0x0102;
 	set_data_audio_mode();
-	printf("%d Track played\n",SCD_CURTRK);
+	LOG("%d Track played\n",SCD_CURTRK);
 	CDD_MIN = to_bcd(SCD_CURTRK, false);
 	if(!(CURRENT_TRACK_IS_DATA))
 		m_cdda->start_audio(SCD_CURLBA, SCD_CURLBA + track_length);
@@ -480,9 +491,9 @@ void lc89510_temp_device::CDD_Seek(void)
 	CLEAR_CDD_RESULT
 	uint32_t msf = getmsf_from_regs();
 	SCD_CURLBA = cdrom_file::msf_to_lba(msf)-150;
-	if(segacd.cd == nullptr) // no CD is there, bail out
+	if(!m_cdrom->exists()) // no CD is there, bail out
 		return;
-	SCD_CURTRK = segacd.cd->get_track(SCD_CURLBA)+1;
+	SCD_CURTRK = m_cdrom->get_track(SCD_CURLBA)+1;
 	LC8951UpdateHeader();
 	STOP_CDC_READ
 	SCD_STATUS = CDD_READY;
@@ -513,9 +524,9 @@ void lc89510_temp_device::CDD_Resume()
 {
 	CLEAR_CDD_RESULT
 	STOP_CDC_READ
-	if(segacd.cd == nullptr) // no CD is there, bail out
+	if(!m_cdrom->exists()) // no CD is there, bail out
 		return;
-	SCD_CURTRK = segacd.cd->get_track(SCD_CURLBA)+1;
+	SCD_CURTRK = m_cdrom->get_track(SCD_CURLBA)+1;
 	SCD_STATUS = CDD_PLAYINGCDDA;
 	CDD_STATUS = 0x0102;
 	set_data_audio_mode();
@@ -881,12 +892,12 @@ bool lc89510_temp_device::CDD_Import()
 	// don't execute the command if the checksum isn't valid
 	if (!CDD_Check_TX_Checksum())
 	{
-		printf("invalid checksum\n");
+		LOG("invalid checksum\n");
 		return false;
 	}
 
 	if(CDD_TX[0] != 2 && CDD_TX[0] != 0)
-		printf("%s\n",CDD_import_cmdnames[CDD_TX[0]]);
+		LOG("%s\n",CDD_import_cmdnames[CDD_TX[0]]);
 
 	switch (CDD_TX[0])
 	{
@@ -969,7 +980,7 @@ void lc89510_temp_device::segacd_irq_mask_w(offs_t offset, uint16_t data, uint16
 	{
 		uint16_t control = CDD_CONTROL;
 
-	//  printf("segacd_irq_mask_w %04x %04x (CDD control is %04x)\n",data, mem_mask, control);
+	//  LOG("segacd_irq_mask_w %04x %04x (CDD control is %04x)\n",data, mem_mask, control);
 
 		if (data & 0x10)
 		{
@@ -988,7 +999,7 @@ void lc89510_temp_device::segacd_irq_mask_w(offs_t offset, uint16_t data, uint16
 	}
 	else
 	{
-		printf("segacd_irq_mask_w only MSB written\n");
+		LOG("segacd_irq_mask_w only MSB written\n");
 
 	}
 }
@@ -1006,7 +1017,7 @@ void lc89510_temp_device::segacd_cdd_ctrl_w(offs_t offset, uint16_t data, uint16
 		uint16_t control = CDD_CONTROL;
 
 
-		//printf("segacd_cdd_ctrl_w %04x %04x (control %04x irq %04x\n", data, mem_mask, control, segacd_irq_mask);
+		//LOG("segacd_cdd_ctrl_w %04x %04x (control %04x irq %04x\n", data, mem_mask, control, segacd_irq_mask);
 
 		data &=0x4; // only HOCK bit is writable
 
@@ -1025,7 +1036,7 @@ void lc89510_temp_device::segacd_cdd_ctrl_w(offs_t offset, uint16_t data, uint16
 	}
 	else
 	{
-		printf("segacd_cdd_ctrl_w only MSB written\n");
+		LOG("segacd_cdd_ctrl_w only MSB written\n");
 	}
 }
 
@@ -1055,7 +1066,7 @@ uint8_t lc89510_temp_device::segacd_cdd_rx_r(offs_t offset)
 // mapped as serial
 void lc89510_temp_device::neocd_cdd_tx_w(uint8_t data)
 {
-	//printf("neocd_cdd_tx_w %d, %02x\n", NeoCDCommsWordCount, data);
+	//LOG("neocd_cdd_tx_w %d, %02x\n", NeoCDCommsWordCount, data);
 
 	if (NeoCDCommsWordCount >= 0 && NeoCDCommsWordCount < 10) {
 		CDD_TX[NeoCDCommsWordCount] = data & 0x0F;
@@ -1086,7 +1097,7 @@ void  lc89510_temp_device::segacd_cdfader_w(uint16_t data)
 {
 	static double cdfader_vol;
 	if(data & 0x800f)
-		printf("CD Fader register write %04x\n",data);
+		LOG("CD Fader register write %04x\n",data);
 
 	cdfader_vol = (double)((data & 0x3ff0) >> 4);
 
@@ -1095,7 +1106,7 @@ void  lc89510_temp_device::segacd_cdfader_w(uint16_t data)
 	else
 		cdfader_vol = cdfader_vol / 1024.0;
 
-	//printf("%f\n",cdfader_vol);
+	//LOG("%f\n",cdfader_vol);
 
 	m_cdda->set_output_gain(ALL_OUTPUTS, cdfader_vol);
 }
@@ -1107,19 +1118,12 @@ void lc89510_temp_device::reset_cd(void)
 	lc89510_Reset();
 
 	{
-		segacd.cd = m_cdrom->get_cdrom_file();
-		if ( segacd.cd )
+		if ( m_cdrom->exists() )
 		{
-			segacd.toc = &segacd.cd->get_toc();
-			m_cdda->set_cdrom(segacd.cd);
+			segacd.toc = &m_cdrom->get_toc();
 			m_cdda->stop_audio(); //stop any pending CD-DA
 		}
 	}
-
-
-
-//  if (segacd.cd)
-//      printf("cd found\n");
 }
 
 
@@ -1159,6 +1163,7 @@ void lc89510_temp_device::device_add_mconfig(machine_config &config)
 	cdda_device &cdda(CDDA(config, "cdda"));
 	cdda.add_route(0, ":lspeaker", 0.50); // TODO: accurate volume balance
 	cdda.add_route(1, ":rspeaker", 0.50);
+	cdda.set_cdrom_tag(m_cdrom);
 }
 
 
@@ -1233,16 +1238,15 @@ void lc89510_temp_device::LC8951UpdateHeader() // neocd
 char* lc89510_temp_device::LC8915InitTransfer(int NeoCDDMACount)
 {
 	if (!LC8951RegistersW[REG_W_DTTRG]) {
-		//bprintf(PRINT_ERROR, _T("    LC8951 DTTRG status invalid\n"));
+		LOGWARN("LC8951 DTTRG status invalid\n");
 		return nullptr;
 	}
 	if (!(LC8951RegistersW[REG_W_IFCTRL] & 0x02)) {
-		//bprintf(PRINT_ERROR, _T("    LC8951 DOUTEN status invalid\n"));
+		LOGWARN("LC8951 DOUTEN status invalid\n");
 		return nullptr;
 	}
 	if (((LC8951RegistersW[REG_W_DACH] << 8) | LC8951RegistersW[REG_W_DACL]) + (NeoCDDMACount << 1) > EXTERNAL_BUFFER_SIZE) {
-		//bprintf(PRINT_ERROR, _T("    DMA transfer exceeds current sector in LC8951 external buffer\n"));
-
+		LOGWARN("DMA transfer exceeds current sector in LC8951 external buffer\n");
 		return nullptr;
 	}
 
@@ -1335,7 +1339,7 @@ int lc89510_temp_device::Read_LBA_To_Buffer()
 	if (CDD_CONTROL & 0x0100) data_track = true;
 
 	if (data_track)
-		segacd.cd->read_data(SCD_CURLBA, SCD_BUFFER, cdrom_file::CD_TRACK_MODE1);
+		m_cdrom->read_data(SCD_CURLBA, SCD_BUFFER, cdrom_file::CD_TRACK_MODE1);
 
 	LC8951UpdateHeader();
 

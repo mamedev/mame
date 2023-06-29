@@ -94,7 +94,7 @@ protected:
 
 	void oki_bank_w(uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 	void vblank_ack_w(uint16_t data);
 };
 
@@ -260,7 +260,7 @@ void pktgaldx_state::protection_region_f_104_w(offs_t offset, uint16_t data, uin
 	m_deco104->write_data(real_address & 0x7fff, data, mem_mask, cs);
 }
 
-WRITE_LINE_MEMBER(base_state::vblank_w)
+void base_state::vblank_w(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(6, ASSERT_LINE);

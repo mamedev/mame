@@ -9,9 +9,9 @@
 #include "emu.h"
 #include "scoop.h"
 
-#define LOG_UNKNOWN     (1 << 1)
-#define LOG_READS       (1 << 2)
-#define LOG_WRITES      (1 << 3)
+#define LOG_UNKNOWN     (1U << 1)
+#define LOG_READS       (1U << 2)
+#define LOG_WRITES      (1U << 3)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_READS | LOG_WRITES)
 
 #define VERBOSE         (LOG_ALL)
@@ -27,8 +27,6 @@ scoop_device::scoop_device(const machine_config &mconfig, const char *tag, devic
 
 void scoop_device::device_start()
 {
-	m_gpio_out.resolve_all_safe();
-
 	save_item(NAME(m_gpwr));
 	save_item(NAME(m_gpio_in_latch));
 	save_item(NAME(m_gpcr));

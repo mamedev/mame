@@ -16,13 +16,13 @@
 
 #define VICTORY_MAIN_CPU_CLOCK      (XTAL(8'000'000) / 2)
 
-#define VICTORY_PIXEL_CLOCK             (XTAL(11'289'000) / 2)
-#define VICTORY_HTOTAL                  (0x150)
-#define VICTORY_HBEND                       (0x000)
-#define VICTORY_HBSTART                 (0x100)
-#define VICTORY_VTOTAL                  (0x118)
-#define VICTORY_VBEND                       (0x000)
-#define VICTORY_VBSTART                 (0x100)
+#define VICTORY_PIXEL_CLOCK         (XTAL(11'289'000) / 2)
+#define VICTORY_HTOTAL              (0x150)
+#define VICTORY_HBEND               (0x000)
+#define VICTORY_HBSTART             (0x100)
+#define VICTORY_VTOTAL              (0x118)
+#define VICTORY_VBEND               (0x000)
+#define VICTORY_VBSTART             (0x100)
 
 
 class victory_state : public driver_device
@@ -107,7 +107,7 @@ private:
 	uint8_t m_scrolly = 0;
 	uint8_t m_video_control = 0;
 	micro_t m_micro;
-	emu_timer *m_bgcoll_irq_timer = nullptr;
+	emu_timer *m_bgcoll_irq_timer[128];
 };
 
 #endif // MAME_EXIDY_VICTORY_H

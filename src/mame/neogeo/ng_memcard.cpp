@@ -107,17 +107,17 @@ void ng_memcard_device::write(offs_t offset, uint16_t data)
 }
 
 
-WRITE_LINE_MEMBER(ng_memcard_device::lock1_w)
+void ng_memcard_device::lock1_w(int state)
 {
 	m_lock1 = state;
 }
 
-WRITE_LINE_MEMBER(ng_memcard_device::unlock2_w)
+void ng_memcard_device::unlock2_w(int state)
 {
 	m_unlock2 = state;
 }
 
-WRITE_LINE_MEMBER(ng_memcard_device::regsel_w)
+void ng_memcard_device::regsel_w(int state)
 {
 	m_regsel = state;
 }

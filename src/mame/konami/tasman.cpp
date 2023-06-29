@@ -86,8 +86,8 @@ private:
 	uint8_t m_irq_mask = 0;
 
 	uint32_t screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	WRITE_LINE_MEMBER(vblank_irq_ack_w);
-	WRITE_LINE_MEMBER(hblank_irq_ack_w);
+	void vblank_irq_ack_w(int state);
+	void hblank_irq_ack_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(kongambl_vblank);
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
@@ -620,12 +620,12 @@ static GFXDECODE_START( gfx_tasman )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(kongambl_state::vblank_irq_ack_w)
+void kongambl_state::vblank_irq_ack_w(int state)
 {
 	m_maincpu->set_input_line(1, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(kongambl_state::hblank_irq_ack_w)
+void kongambl_state::hblank_irq_ack_w(int state)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }

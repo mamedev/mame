@@ -44,10 +44,10 @@ license:CC0-1.0
 		<description>The 7th Guest (Europe)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="8110033V113 50404169 02" />
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom1" interface="cdi_cdrom">
 			<feature name="part_id" value="The Game" />
+			<feature name="cd_matrix" value="8110033V113 50404169 02" />
 			<diskarea name="cdrom">
 				<disk name="7th guest, the (1994)(philips)(eu)(disc 1 of 2)[the game][dvc][8110033v113 50404169 02]" sha1="df0e66f45e7731870d6ceda8f943d1341f6fbfdd"/>
 			</diskarea>
@@ -77,10 +77,10 @@ license:CC0-1.0
 		<description>The 7th Guest (Europe, alt)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="8111033V113 50404169 01" />
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom1" interface="cdi_cdrom">
 			<feature name="part_id" value="The Game" />
+			<feature name="cd_matrix" value="8111033V113 50404169 01" />
 			<diskarea name="cdrom">
 				<disk name="7th guest, the (1994)(philips)(eu)(disc 1 of 2)[the game][dvc][8111033v113 50404169 01]" sha1="b0da1a5b88cae2a47d00c64520775ff9840a7ad9"/>
 			</diskarea>
@@ -570,8 +570,8 @@ license:CC0-1.0
 		<description>Caesars World of Boxing (USA)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="18621209 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="18621209 01" />
 			<diskarea name="cdrom">
 				<disk name="caesars world of boxing (1993)(philips)(us)[18621209 01]" sha1="e39bc2ee3e35f15fdf4b31ed6700797569f86891"/>
 			</diskarea>
@@ -587,8 +587,8 @@ license:CC0-1.0
 		<description>Caesars World of Boxing (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="18621217 03" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="18621217 03" />
 			<diskarea name="cdrom">
 				<disk name="caesars world of boxing (1993)(philips)(us)[18621217 03]" sha1="c4f6bf539e6ab64e91128e27025abcd4ba78cc0d"/>
 			</diskarea>
@@ -976,9 +976,9 @@ license:CC0-1.0
 		<description>Dragon's Lair II - Time Warp (USA)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="13920805 02" />
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="13920805 02" />
 			<diskarea name="cdrom">
 				<disk name="dragon's lair ii - time warp (1994)(philips)(us)[dvc][13920805 02]" sha1="7b7201b6a84b451cc215a809658009f217580020"/>
 			</diskarea>
@@ -994,9 +994,9 @@ license:CC0-1.0
 		<description>Dragon's Lair II - Time Warp (USA, alt)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="13920805 01" />
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="13920805 01" />
 			<diskarea name="cdrom">
 				<disk name="dragon's lair ii - time warp (1994)(philips)(us)[dvc][13920805 01]" sha1="ff2c4737ac06696d77be2f25e390da3979138728"/>
 			</diskarea>
@@ -1302,8 +1302,8 @@ license:CC0-1.0
 		<description>Inca (Europe)</description>
 		<year>1993</year>
 		<publisher>Coktel Vision ~ Philips</publisher>
-		<info name="cd_matrix" value="8100126 50341 698 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="8100126 50341 698 01" />
 			<diskarea name="cdrom">
 				<disk name="inca (1993)(coktel vision - philips)(eu)(m4)[en-de-fr-nl][8100126 50341 698 01]" sha1="01af974debc2d397186213e95a4753fb6c0c4e55"/>
 			</diskarea>
@@ -1335,8 +1335,8 @@ license:CC0-1.0
 		<description>Inca (Europe, alt 1)</description>
 		<year>1994</year>
 		<publisher>Coktel Vision ~ Philips</publisher>
-		<info name="cd_matrix" value="8100126V206 50399445 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="8100126V206 50399445 01" />
 			<diskarea name="cdrom">
 				<disk name="inca (1994)(coktel vision - philips)(eu)(m4)[en-de-fr-nl][8100126v206 50399445 01]" sha1="38c7edc97b9d4af71f6da69436ab96de30ddb9e4"/>
 			</diskarea>
@@ -1723,8 +1723,8 @@ license:CC0-1.0
 		<description>Laser Lords (USA)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="07420911 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="07420911 01" />
 			<diskarea name="cdrom">
 				<disk name="laser lords (1992)(philips)(us)[07420911 01]" sha1="1d0ccff1350d6a7959fed16522b86390bbac27ae"/>
 			</diskarea>
@@ -1740,8 +1740,8 @@ license:CC0-1.0
 		<description>Laser Lords (USA, alt)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="3106900742 50273 097 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="3106900742 50273 097 01" />
 			<diskarea name="cdrom">
 				<disk name="laser lords (1992)(philips)(us)[3106900742 50273 097 01]" sha1="1a6889ddbe78d48f0d8bcd7bce43bd75c37e7b3e"/>
 			</diskarea>
@@ -2055,9 +2055,9 @@ license:CC0-1.0
 		<description>Mad Dog McCree (USA)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="05820818 N01" />
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="05820818 N01" />
 			<diskarea name="cdrom">
 				<disk name="mad dog mccree (1994)(philips)(us)[dvc][05820818 n01]" sha1="db80f64fc5942e8eedb4206f7c5e7c3a8fe6878e"/>
 			</diskarea>
@@ -2073,9 +2073,9 @@ license:CC0-1.0
 		<description>Mad Dog McCree (USA, alt)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="05820826 01" />
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="05820826 01" />
 			<diskarea name="cdrom">
 				<disk name="mad dog mccree (1994)(philips)(us)[dvc][05820826 01]" sha1="fb75e07a927b39effb31b4284591f1da7e22bda7"/>
 			</diskarea>
@@ -2546,8 +2546,8 @@ license:CC0-1.0
 		<description>Pinball (USA)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="3106900342 50238 037 03" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="3106900342 50238 037 03" />
 			<diskarea name="cdrom">
 				<disk name="pinball (1992)(philips)(us)[3106900342 50238 037 03]" sha1="9e77974b1cf5499044e994712dec837df6e64bee"/>
 			</diskarea>
@@ -2563,8 +2563,8 @@ license:CC0-1.0
 		<description>Pinball (USA, alt)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="3106900342 50238 037 04" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="3106900342 50238 037 04" />
 			<diskarea name="cdrom">
 				<disk name="pinball (1992)(philips)(us)[3106900342 50238 037 04]" sha1="66d801ad823f32ae1fd0058fd5162d5acca1bf23"/>
 			</diskarea>
@@ -2596,8 +2596,8 @@ license:CC0-1.0
 		<description>Power Hitter (USA)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="08120804 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="08120804 01" />
 			<diskarea name="cdrom">
 				<disk name="power hitter (1993)(philips)(us)[08120804 01]" sha1="2598ee8feeff8f2bae372717c45f79311a332a0f"/>
 			</diskarea>
@@ -2613,8 +2613,8 @@ license:CC0-1.0
 		<description>Power Hitter (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="08120908 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="08120908 01" />
 			<diskarea name="cdrom">
 				<disk name="power hitter (1993)(philips)(us)[08120908 01]" sha1="4c42959a6ab95a69771274e8d7f397546ca2e02a"/>
 			</diskarea>
@@ -2647,8 +2647,8 @@ license:CC0-1.0
 		<description>Sargon Chess (USA)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="690 030-2 50253 278 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="690 030-2 50253 278 01" />
 			<diskarea name="cdrom">
 				<disk name="sargon chess (1992)(philips)(us)[690 030-2 50253 278 01]" sha1="de79986b70aa19c8427d55a153e8bb38399b0e42"/>
 			</diskarea>
@@ -2664,8 +2664,8 @@ license:CC0-1.0
 		<description>Sargon Chess (USA, alt)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="03020320 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="03020320 01" />
 			<diskarea name="cdrom">
 				<disk name="sargon chess (1992)(philips)(us)[03020320 01]" sha1="d20e612d4ec05dd48add004bf77c64796e4b5df4"/>
 			</diskarea>
@@ -3208,9 +3208,9 @@ license:CC0-1.0
 		<description>Voyeur ...Don't Get Caught (USA)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="11220909 01" />
 		<info name="usage" value="Access code 3333" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="11220909 01" />
 			<diskarea name="cdrom">
 				<disk name="voyeur ...don't get caught (1993)(philips)(us)[adult, access code 3333][11220909 01]" sha1="557e81e664fd11830fcfedb55f2b9326f24bba1c"/>
 			</diskarea>
@@ -3226,9 +3226,9 @@ license:CC0-1.0
 		<description>Voyeur ...Don't Get Caught (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="11220928 03" />
 		<info name="usage" value="Access code 3333" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="11220928 03" />
 			<diskarea name="cdrom">
 				<disk name="voyeur ...don't get caught (1993)(philips)(us)[adult, access code 3333][11220928 03]" sha1="a93dff003441435bb6062c6c38a71cb9ad0f22b1"/>
 			</diskarea>
@@ -3720,8 +3720,8 @@ license:CC0-1.0
 		<description>A Visit To Sesame Street - Numbers (USA)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="3106900632 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="3106900632 01" />
 			<diskarea name="cdrom">
 				<disk name="a visit to sesame street - numbers (1991)(philips)(us)[3106900632 01]" sha1="621f29a4aac2ae311768963e809c891de1f8c5f4"/>
 			</diskarea>
@@ -3737,8 +3737,8 @@ license:CC0-1.0
 		<description>A Visit To Sesame Street - Numbers (USA, alt)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="3106900192 50239 141 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="3106900192 50239 141 01" />
 			<diskarea name="cdrom">
 				<disk name="a visit to sesame street - numbers (1992)(philips)(us)[3106900192 50239 141 01]" sha1="4e5bb335795dd88b967741a276797d9be182f364"/>
 			</diskarea>
@@ -4753,8 +4753,8 @@ license:CC0-1.0
 		<description>BURN-CYCLE - The Music (Europe)[CD-Audio]</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="810 0114, 813 0118, 815 0102, 816 0056" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="810 0114, 813 0118, 815 0102, 816 0056" />
 			<diskarea name="cdrom">
 				<disk name="burn-cycle - the music (1994)(philips)(eu)[burn-cycle, 810 0114, 813 0118, 815 0102, 816 0056][cd-audio]" sha1="15a23f92b1a5f2d8faacb7b7c09d3c8da54d991c"/>
 			</diskarea>
@@ -4819,8 +4819,8 @@ license:CC0-1.0
 		<description>Cartoon Jukebox (USA, alt)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="310690001-2 50228 730 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="310690001-2 50228 730 01" />
 			<diskarea name="cdrom">
 				<disk name="cartoon jukebox (1991)(philips)(us)[310690001-2 50228 730 01]" sha1="517e49b138e6f305f541108968fb9640454f32e2"/>
 			</diskarea>
@@ -4836,8 +4836,8 @@ license:CC0-1.0
 		<description>Cartoon Jukebox (USA)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="3106900012 01!" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="3106900012 01!" />
 			<diskarea name="cdrom">
 				<disk name="cartoon jukebox (1991)(philips)(us)[3106900012 01]" sha1="581e145098f868360ddfa19b6cdf5fe8a542b484"/>
 			</diskarea>
@@ -5099,8 +5099,8 @@ license:CC0-1.0
 		<description>Children's Musical Theatre (USA)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="00821015 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="00821015 01" />
 			<diskarea name="cdrom">
 				<disk name="children's musical theatre (1992)(philips)(us)[00821015 01]" sha1="1f3ae0281fc2370a3c1c575dd8b790827134e98f"/>
 			</diskarea>
@@ -5116,8 +5116,8 @@ license:CC0-1.0
 		<description>Children's Musical Theatre (USA, alt 1)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="0082914 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="0082914 01" />
 			<diskarea name="cdrom">
 				<disk name="children's musical theatre (1992)(philips)(us)[0082914 01]" sha1="124718460f65bb41fe8dcb76102b47fcac1963df"/>
 			</diskarea>
@@ -5133,8 +5133,8 @@ license:CC0-1.0
 		<description>Children's Musical Theatre (USA, alt 2)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="3106900082 50268 090 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="3106900082 50268 090 01" />
 			<diskarea name="cdrom">
 				<disk name="children's musical theatre (1992)(philips)(us)[3106900082 50268 090 01]" sha1="d3fc0b97d46e24eb2d1631f24b3ea0679575f118"/>
 			</diskarea>
@@ -5372,8 +5372,8 @@ license:CC0-1.0
 		<description>Create your own Caricature with Spitting Image (Europe)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="8110001 50274 188 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="8110001 50274 188 01" />
 			<diskarea name="cdrom">
 				<disk name="create your own caricature with spitting image (1992)(philips)(eu)[8110001 50274 188 01]" sha1="5733d619ef9d5d31ffdfc002d97aeee554ea5fd6"/>
 			</diskarea>
@@ -5389,8 +5389,8 @@ license:CC0-1.0
 		<description>Create your own Caricature with Spitting Image (Europe, alt)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="8110001 50274 188 02" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="8110001 50274 188 02" />
 			<diskarea name="cdrom">
 				<disk name="create your own caricature with spitting image (1992)(philips)(eu)[8110001 50274 188 02]" sha1="a0bcd9c06f0a414bcc741342849f36e6a8ec3bd8"/>
 			</diskarea>
@@ -6124,8 +6124,8 @@ license:CC0-1.0
 		<description>Golden Oldies Jukebox (USA)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="310690006-2 50240 109 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="310690006-2 50240 109 01" />
 			<diskarea name="cdrom">
 				<disk name="golden oldies jukebox (1991)(philips)(us)[310690006-2 50240 109 01]" sha1="53217cf52ab46a92618402bf72f168b157b8f225"/>
 			</diskarea>
@@ -6141,8 +6141,8 @@ license:CC0-1.0
 		<description>Golden Oldies Jukebox (USA, alt)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="0062919 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="0062919 01" />
 			<diskarea name="cdrom">
 				<disk name="golden oldies jukebox (1991)(philips)(us)[0062919 01]" sha1="2f855b39631a1a24e836cc3006a847c6abc1be1c"/>
 			</diskarea>
@@ -6284,8 +6284,8 @@ license:CC0-1.0
 		<description>Harvest of the Sun - Vincent Van Gogh Revisited (USA)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="028294 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="028294 01" />
 			<diskarea name="cdrom">
 				<disk name="harvest of the sun - vincent van gogh revisited (1991)(philips)(us)[028294 01]" sha1="bc489d6490285ab62923ab3d2299b1ca9d70c9b2"/>
 			</diskarea>
@@ -6301,8 +6301,8 @@ license:CC0-1.0
 		<description>Harvest of the Sun - Vincent Van Gogh Revisited (USA, alt 1)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="310690028-2 50239 148 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="310690028-2 50239 148 01" />
 			<diskarea name="cdrom">
 				<disk name="harvest of the sun - vincent van gogh revisited (1992)(philips)(us)[310690028-2 50239 148 01]" sha1="72848a648e009730e59fe4b28521a5762ac0f343"/>
 			</diskarea>
@@ -6318,8 +6318,8 @@ license:CC0-1.0
 		<description>Harvest of the Sun - Vincent Van Gogh Revisited (USA, alt 2)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="310690028-2 50239 148 02" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="310690028-2 50239 148 02" />
 			<diskarea name="cdrom">
 				<disk name="harvest of the sun - vincent van gogh revisited (1992)(philips)(us)[310690028-2 50239 148 02]" sha1="2ab0ff3f672c2ee652eaa291a463af7d39af6311"/>
 			</diskarea>
@@ -6648,8 +6648,8 @@ license:CC0-1.0
 		<description>How the Rhinoceros got his Skin (USA)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="3106900232 02!" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="3106900232 02!" />
 			<diskarea name="cdrom">
 				<disk name="how the rhinoceros got his skin (1992)(philips)(us)(en-es)[3106900232 02]" sha1="fbffc12e6246c8ae26239e7c1933223a038b3684"/>
 			</diskarea>
@@ -6665,8 +6665,8 @@ license:CC0-1.0
 		<description>How the Rhinoceros got his Skin (USA, alt)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="3106900232 50237 962 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="3106900232 50237 962 01" />
 			<diskarea name="cdrom">
 				<disk name="how the rhinoceros got his skin (1992)(philips)(us)(en-es)[3106900232 50237 962 01]" sha1="569fb461684ee8abd294e3feb4c8f6414784ce1b"/>
 			</diskarea>
@@ -6785,9 +6785,9 @@ license:CC0-1.0
 		<description>Internetten op je TV! - Demo Disc (Netherlands)</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="8140154" />
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="8140154" />
 			<diskarea name="cdrom">
 				<disk name="internetten op je tv - demo disc (1996)(philips)(nl)[dvc][8140154]" sha1="1620b35d3b7f36d5066734694d7baf948cd776a8"/>
 			</diskarea>
@@ -6803,9 +6803,9 @@ license:CC0-1.0
 		<description>Internetten op je TV! - Demo Disc (Netherlands, alt)</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="8100330" />
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="8100330" />
 			<diskarea name="cdrom">
 				<disk name="internetten op je tv - demo disc (1996)(philips)(nl)[dvc][8100330]" sha1="908ea704879b1a50e8f5e9d5fb3cf6a72c5b84f4"/>
 			</diskarea>
@@ -7889,8 +7889,8 @@ license:CC0-1.0
 		<description>Mother Goose - Hidden Pictures (USA)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="0152911 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="0152911 01" />
 			<diskarea name="cdrom">
 				<disk name="mother goose - hidden pictures (1991)(philips)(us)[0152911 01]" sha1="779d5e20f6d7105321addf45a368587bc0025518"/>
 			</diskarea>
@@ -7906,8 +7906,8 @@ license:CC0-1.0
 		<description>Mother Goose - Hidden Pictures (USA, alt)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="3106900152 50228 843 03" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="3106900152 50228 843 03" />
 			<diskarea name="cdrom">
 				<disk name="mother goose - hidden pictures (1991)(philips)(us)[3106900152 50228 843 03]" sha1="172e5b31c74f93cd210442323462705ca7a88c51"/>
 			</diskarea>
@@ -7923,8 +7923,8 @@ license:CC0-1.0
 		<description>Mother Goose - Rhymes to Color (USA)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="3106900162 50228 839 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="3106900162 50228 839 01" />
 			<diskarea name="cdrom">
 				<disk name="mother goose - rhymes to color (1991)(philips)(us)[3106900162 50228 839 01]" sha1="646cc3fd29800a541123f521fd1de9c1df5deaa0"/>
 			</diskarea>
@@ -7940,8 +7940,8 @@ license:CC0-1.0
 		<description>Mother Goose - Rhymes to Color (USA, alt)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="MGRTC392 03!" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="MGRTC392 03!" />
 			<diskarea name="cdrom">
 				<disk name="mother goose - rhymes to color (1991)(philips)(us)[mgrtc392 03]" sha1="283726728e161712428f3080f51ea0f03bd0412b"/>
 			</diskarea>
@@ -8650,8 +8650,8 @@ license:CC0-1.0
 		<description>Rand McNally's America - United States Atlas (USA)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="01420320 03" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="01420320 03" />
 			<diskarea name="cdrom">
 				<disk name="rand mcnally's america - united states atlas (1991)(philips)(us)[01420320 03]" sha1="e6eeef531442470ab7d481f9bc7910e56607e08b"/>
 			</diskarea>
@@ -8667,8 +8667,8 @@ license:CC0-1.0
 		<description>Rand McNally's America - United States Atlas (USA, alt)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="3106900142 50239 896 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="3106900142 50239 896 01" />
 			<diskarea name="cdrom">
 				<disk name="rand mcnally's america - united states atlas (1991)(philips)(us)[3106900142 50239 896 01]" sha1="1a6232b12dfbabf722bf65ebad79ddb7033bf02d"/>
 			</diskarea>
@@ -8716,8 +8716,8 @@ license:CC0-1.0
 		<description>The Renaissance Gallery (USA)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="0362911 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="0362911 01" />
 			<diskarea name="cdrom">
 				<disk name="renaissance gallery, the (1991)(philips)(us)[0362911 01]" sha1="6d4e4fb8065b7d2ca7449a130deacf2e9b59b644"/>
 			</diskarea>
@@ -8733,8 +8733,8 @@ license:CC0-1.0
 		<description>The Renaissance Gallery (USA, alt)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="310690 0442 50260 353 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="310690 0442 50260 353 01" />
 			<diskarea name="cdrom">
 				<disk name="renaissance gallery, the (1992)(philips)(us)[310690 0442 50260 353 01]" sha1="e5faa80fba864da1ce7c1513f6a489dcfd2e79b3"/>
 			</diskarea>
@@ -8750,8 +8750,8 @@ license:CC0-1.0
 		<description>The Renaissance of Florence (USA)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="0442397 01, 0442397 02" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="0442397 01, 0442397 02" />
 			<diskarea name="cdrom">
 				<disk name="renaissance of florence, the (1991)(philips)(us)[0442397 01, 0442397 02]" sha1="44c3c3dac949a3750ef90c496ea6528effdfe015"/>
 			</diskarea>
@@ -8767,8 +8767,8 @@ license:CC0-1.0
 		<description>The Renaissance of Florence (USA, alt)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="310690036-2 50239 145 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="310690036-2 50239 145 01" />
 			<diskarea name="cdrom">
 				<disk name="renaissance of florence, the (1992)(philips)(us)[310690036-2 50239 145 01]" sha1="dc3eb49b3107333da965046771eada67fe6dba15"/>
 			</diskarea>
@@ -8880,8 +8880,8 @@ license:CC0-1.0
 		<description>Rhythm Maker (USA)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="17220326 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="17220326 01" />
 			<diskarea name="cdrom">
 				<disk name="rhythm maker (1993)(philips)(us)[17220326 01]" sha1="5b35856739b2d85fa24fd5a0ced711b6087de886"/>
 			</diskarea>
@@ -8897,8 +8897,8 @@ license:CC0-1.0
 		<description>Rhythm Maker (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="17220409 02" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="17220409 02" />
 			<diskarea name="cdrom">
 				<disk name="rhythm maker (1993)(philips)(us)[17220409 02]" sha1="321b63f29c7e8eb71adf6a37205eeda7a3180029"/>
 			</diskarea>
@@ -8978,8 +8978,8 @@ license:CC0-1.0
 		<description>Richard Scarry's Busiest Neighborhood Disc Ever! (USA)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="0382911 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="0382911 01" />
 			<diskarea name="cdrom">
 				<disk name="richard scarry's busiest neighborhood disc ever (1991)(philips)(us)[0382911 01]" sha1="88df1839736343d84431a6d907a9e4f2d14808ee"/>
 			</diskarea>
@@ -8995,8 +8995,8 @@ license:CC0-1.0
 		<description>Richard Scarry's Busiest Neighborhood Disc Ever! (USA, alt 1)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="03820201 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="03820201 01" />
 			<diskarea name="cdrom">
 				<disk name="richard scarry's busiest neighborhood disc ever (1992)(philips)(us)[03820201 01]" sha1="1ff04341f934316d26aa3f6e10f4e5dcfd2d3b72"/>
 			</diskarea>
@@ -9012,8 +9012,8 @@ license:CC0-1.0
 		<description>Richard Scarry's Busiest Neighborhood Disc Ever! (USA, alt 2)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="3106900382 50257 831 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="3106900382 50257 831 01" />
 			<diskarea name="cdrom">
 				<disk name="richard scarry's busiest neighborhood disc ever (1992)(philips)(us)[3106900382 50257 831 01]" sha1="2ee6cec5c95319d8b6da2bc79e4898db3f6e1665"/>
 			</diskarea>
@@ -9197,8 +9197,8 @@ license:CC0-1.0
 		<description>Sandy's Circus Avontuur (Netherlands)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="814 0008 50260 053 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="814 0008 50260 053 01" />
 			<diskarea name="cdrom">
 				<disk name="sandy's circus avontuur (1992)(philips)(nl)[814 0008 50260 053 01]" sha1="0f4731199e992fb095a9ba1d94f60d0821c52591"/>
 			</diskarea>
@@ -9214,8 +9214,8 @@ license:CC0-1.0
 		<description>Sandy's Circus Avontuur (Netherlands, alt)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="8140008 50260 053 02" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="8140008 50260 053 02" />
 			<diskarea name="cdrom">
 				<disk name="sandy's circus avontuur (1992)(philips)(nl)[8140008 50260 053 02]" sha1="60f6b1a3a99a1539681f0e807fcbe9e027ffa391"/>
 			</diskarea>
@@ -9280,9 +9280,9 @@ license:CC0-1.0
 		<description>Sciamo con Alberto Tomba - Let's Go Skiing With Alberto Tomba (Europe)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="8100236V103 50461390 01" />
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="8100236V103 50461390 01" />
 			<diskarea name="cdrom">
 				<disk name="sciamo con alberto tomba - let's go skiing with alberto tomba (1994)(philips)(eu)(en-it)[dvc][8100236v103 50461390 01]" sha1="118887eebba2ed2e14b910ae14e0403d86cdbe58"/>
 			</diskarea>
@@ -9298,9 +9298,9 @@ license:CC0-1.0
 		<description>Sciamo con Alberto Tomba - Let's Go Skiing With Alberto Tomba (Europe, alt)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="991953100049 1445-A" />
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="991953100049 1445-A" />
 			<diskarea name="cdrom">
 				<disk name="sciamo con alberto tomba - let's go skiing with alberto tomba (1994)(philips)(eu)(en-it)[dvc][991953100049 1445-a]" sha1="5c55eb5987e506dff0870364daa35cb37d4705ca"/>
 			</diskarea>
@@ -9926,8 +9926,8 @@ license:CC0-1.0
 		<description>Time-Life - 35mm Photography (USA)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="310690017-2 50240 104 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="310690017-2 50240 104 01" />
 			<diskarea name="cdrom">
 				<disk name="time-life - 35mm photography (1991)(philips)(us)[310690017-2 50240 104 01]" sha1="37f6893beae2fcb0d11dd4e860f135c90bb05251"/>
 			</diskarea>
@@ -9943,8 +9943,8 @@ license:CC0-1.0
 		<description>Time-Life - 35mm Photography (USA, alt)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="3106900642 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="3106900642 01" />
 			<diskarea name="cdrom">
 				<disk name="time-life - 35mm photography (1991)(philips)(us)[3106900642 01]" sha1="39223320b3792b71f4aacea032da12a23d405ec6"/>
 			</diskarea>
@@ -10073,8 +10073,8 @@ license:CC0-1.0
 		<description>Tom le Maximagier v1.0 (France)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="8120021 50262 231 03" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="8120021 50262 231 03" />
 			<diskarea name="cdrom">
 				<disk name="tom le maximagier v1.0 (1992)(philips)(fr)(m3)[8120021 50262 231 03]" sha1="868abb5aa095d6591277a5918e09ebaf045008ff"/>
 			</diskarea>
@@ -10090,8 +10090,8 @@ license:CC0-1.0
 		<description>Tom le Maximagier v1.0 (France, alt)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="8120021V203 50262231 05" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="8120021V203 50262231 05" />
 			<diskarea name="cdrom">
 				<disk name="tom le maximagier v1.0 (1992)(philips)(fr)(m3)[8120021v203 50262231 05]" sha1="645b94e590294e8b235a15fb2c3e3eca442b40ca"/>
 			</diskarea>
@@ -10124,8 +10124,8 @@ license:CC0-1.0
 		<description>TR-I - No World Order (USA)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="26720805 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="26720805 01" />
 			<diskarea name="cdrom">
 				<disk name="tr-i - no world order (1993)(philips)(us)[26720805 01]" sha1="f9f8231e7ebb24c2c93c8bd2c909bade07e25caf"/>
 			</diskarea>
@@ -10141,8 +10141,8 @@ license:CC0-1.0
 		<description>TR-I - No World Order (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="6902672 50378963 01" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="6902672 50378963 01" />
 			<diskarea name="cdrom">
 				<disk name="tr-i - no world order (1993)(philips)(us)[6902672 50378963 01]" sha1="d1649ecfd8058f20414631968ba077bbf4386cdf"/>
 			</diskarea>
@@ -10240,9 +10240,9 @@ license:CC0-1.0
 		<description>USA '94 - World Cup (Europe, German / French / Dutch)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="8100101V104 50404061 01" />
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="8100101V104 50404061 01" />
 			<diskarea name="cdrom">
 				<disk name="usa '94 - world cup (1994)(philips)(eu)(m3)[de-fr-nl][dvc enhanced][8100101v104 50404061 01]" sha1="fc40fd4e77f88fc4297a08ca0f6decb567d50f7f"/>
 			</diskarea>
@@ -10258,9 +10258,9 @@ license:CC0-1.0
 		<description>USA '94 - World Cup (Europe, English / Spanish / Italian)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="8100103V105 50404055 01" />
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="8100103V105 50404055 01" />
 			<diskarea name="cdrom">
 				<disk name="usa '94 - world cup (1994)(philips)(eu)(m3)[a][en-es-it][dvc enhanced][8100103v105 50404055 01]" sha1="a18e2308a98049c50deeb05ba42550a08b85e6b2"/>
 			</diskarea>
@@ -10276,9 +10276,9 @@ license:CC0-1.0
 		<description>USA '94 - World Cup (Europe, English / Spanish / Italian, alt)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="8100103V105 50404055 01" />
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="8100103V105 50404055 01" />
 			<diskarea name="cdrom">
 				<disk name="usa '94 - world cup (1994)(philips)(eu)(m3)[en-es-it][dvc enhanced][8100103v105 50404055 01]" sha1="ecf3c13399d8f5a9bb89094c48e8ce138841fbd7"/>
 			</diskarea>
@@ -10929,8 +10929,8 @@ license:CC0-1.0
 		<publisher>Japan Interactive Media</publisher>
 		<info name="serial" value="PCIM-00018" />
 		<info name="alt_title" value="CD-i ゴルゴ１３" />
-		<info name="cd_matrix" value="PCIM-00018" />
 		<part name="cdrom" interface="cdi_cdrom">
+			<feature name="cd_matrix" value="PCIM-00018" />
 			<diskarea name="cdrom">
 				<disk name="golgo 13 (1992)(japan interactive media)(jp)" sha1="c8767a7864e139e50af9f121c7f944285b5763f0"/>
 			</diskarea>

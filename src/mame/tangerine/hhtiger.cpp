@@ -95,7 +95,7 @@ private:
 	uint8_t disable_rom_r();
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(busreq_w);
+	void busreq_w(int state);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	uint8_t io_read_byte(offs_t offset);
@@ -108,19 +108,19 @@ private:
 	uint8_t pio_pa_r();
 	void pio_pa_w(uint8_t data);
 	void pio_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ardy_w);
-	DECLARE_WRITE_LINE_MEMBER(brdy_w);
+	void ardy_w(int state);
+	void brdy_w(int state);
 
 	uint8_t via_0_in_a();
 	void via_0_out_a(uint8_t data);
 	void via_0_out_b(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via_0_out_ca2);
-	DECLARE_WRITE_LINE_MEMBER(via_0_out_cb2);
+	void via_0_out_ca2(int state);
+	void via_0_out_cb2(int state);
 
 	void via_1_out_a(uint8_t data);
 	void via_1_out_b(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via_1_out_ca2);
-	DECLARE_WRITE_LINE_MEMBER(via_1_out_cb2);
+	void via_1_out_ca2(int state);
+	void via_1_out_cb2(int state);
 
 	void z80_mem(address_map &map);
 	void z80_io(address_map &map);
@@ -273,7 +273,7 @@ void hhtiger_state::write(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(hhtiger_state::busreq_w)
+void hhtiger_state::busreq_w(int state)
 {
 	// since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
@@ -384,13 +384,13 @@ void hhtiger_state::pio_pb_w(uint8_t data)
 	m_via[0]->write_pb(data);
 }
 
-WRITE_LINE_MEMBER(hhtiger_state::ardy_w)
+void hhtiger_state::ardy_w(int state)
 {
 	LOG("ardy_w %d\n", state);
 	m_via[0]->write_ca1(state);
 }
 
-WRITE_LINE_MEMBER(hhtiger_state::brdy_w)
+void hhtiger_state::brdy_w(int state)
 {
 	LOG("brdy_w %d\n", state);
 	m_via[0]->write_cb1(state);
@@ -417,13 +417,13 @@ void hhtiger_state::via_0_out_b(uint8_t data)
 	LOG("via0_out_b %02X\n", data);
 }
 
-WRITE_LINE_MEMBER(hhtiger_state::via_0_out_ca2)
+void hhtiger_state::via_0_out_ca2(int state)
 {
 	LOG("via0_out_ca2 %d\n", state);
 	m_pio->strobe_a(state);
 }
 
-WRITE_LINE_MEMBER(hhtiger_state::via_0_out_cb2)
+void hhtiger_state::via_0_out_cb2(int state)
 {
 	LOG("via0_out_cb2 %d\n", state);
 }
@@ -439,12 +439,12 @@ void hhtiger_state::via_1_out_b(uint8_t data)
 	LOG("via1_out_b %02X\n", data);
 }
 
-WRITE_LINE_MEMBER(hhtiger_state::via_1_out_ca2)
+void hhtiger_state::via_1_out_ca2(int state)
 {
 	LOG("via1_out_ca2 %d\n", state);
 }
 
-WRITE_LINE_MEMBER(hhtiger_state::via_1_out_cb2)
+void hhtiger_state::via_1_out_cb2(int state)
 {
 	LOG("via1_out_cb2 %d\n", state);
 }

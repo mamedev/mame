@@ -10,7 +10,7 @@ known chips:
 
   serial  device   etc.
 ----------------------------------------------------------------
-  055     uPD546C  1978, Fidelity Checker Challenger (CR) -> fidel_checkc2.cpp
+  055     uPD546C  1978, Fidelity Checker Challenger (CR) -> fidelity/checkc2.cpp
 
  @017     uPD552C  1979, Bambino UFO Master-Blaster Station (ET-02)
  @042     uPD552C  1980, Tomy Cosmic Combat (TN-??)
@@ -45,10 +45,10 @@ known chips:
  @513     uPD557LC 1980, Castle Toy Name That Tune
 
  @060     uPD650C  1979, Mattel Computer Gin
-  085     uPD650C  1980, Roland TR-808 -> roland_tr808.cpp
+  085     uPD650C  1980, Roland TR-808 -> roland/roland_tr808.cpp
  *127     uPD650C  198?, Sony OA-S1100 Typecorder (subcpu, have dump)
-  128     uPD650C  1981, Roland TR-606 -> roland_tr606.cpp
-  133     uPD650C  1982, Roland TB-303 -> roland_tb303.cpp
+  128     uPD650C  1981, Roland TR-606 -> roland/roland_tr606.cpp
+  133     uPD650C  1982, Roland TB-303 -> roland/roland_tb303.cpp
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
@@ -202,7 +202,7 @@ u8 hh_ucom4_state::read_inputs(int columns)
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
-		if (m_inp_mux >> i & 1)
+		if (BIT(m_inp_mux, i))
 			ret |= m_inputs[i]->read();
 
 	return ret;
@@ -2549,7 +2549,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tomy(tronic) Cosmic Combat (manufactured in Japan)
+  Tomy Cosmic Combat (manufactured in Japan)
   * PCB label: 2E1019-E01
   * NEC uCOM-44 MCU, label D552C 042
   * cyan VFD NEC FIP32AM18Y tube no. 0E, with blue window
@@ -2664,7 +2664,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tomy(tronic) Tennis (manufactured in Japan)
+  Tomy Tennis (manufactured in Japan)
   * PCB label: TOMY TN-04 TENNIS
   * NEC uCOM-44 MCU, label D552C 048
   * cyan VFD NEC FIP11AM15T tube no. 0F, with overlay
@@ -2838,7 +2838,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tomy(tronic) Pac-Man (manufactured in Japan)
+  Tomy Pac-Man (manufactured in Japan)
   * PCB label: TN-08 2E108E01
   * NEC uCOM-43 MCU, label D553C 160
   * cyan/red/green VFD NEC FIP8AM18T no. 2-21
@@ -2959,7 +2959,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tomy(tronic) Scramble (manufactured in Japan)
+  Tomy Scramble (manufactured in Japan)
   * PCB label: TN-10 2E114E01
   * NEC uCOM-43 MCU, label D553C 192
   * cyan/red/green VFD NEC FIP10CM20T no. 2-41
@@ -3075,7 +3075,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tomy(tronic) Caveman (manufactured in Japan)
+  Tomy Caveman (manufactured in Japan)
   * PCB label: TN-12 2E114E03
   * NEC uCOM-43 MCU, label D553C 209
   * cyan/red/green VFD NEC FIP8AM20T no. 2-42
@@ -3365,7 +3365,7 @@ SYST( 1979, mcompgin, 0,        0,      mcompgin, mcompgin, mcompgin_state, empt
 
 SYST( 1979, mvbfree,  0,        0,      mvbfree,  mvbfree,  mvbfree_state,  empty_init, "Mego", "Mini-Vid: Break Free", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, grobot9,  0,        0,      grobot9,  grobot9,  grobot9_state,  empty_init, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
+SYST( 1980, grobot9,  0,        0,      grobot9,  grobot9,  grobot9_state,  empty_init, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the games: ***
 
 SYST( 1980, tccombat, 0,        0,      tccombat, tccombat, tccombat_state, empty_init, "Tomy", "Cosmic Combat", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, tmtennis, 0,        0,      tmtennis, tmtennis, tmtennis_state, empty_init, "Tomy", "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE )

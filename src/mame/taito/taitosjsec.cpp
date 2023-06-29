@@ -14,7 +14,7 @@ taito_sj_security_mcu_device::taito_sj_security_mcu_device(
 	: device_t(mconfig,TAITO_SJ_SECURITY_MCU, tag, owner, clock)
 	, m_mcu(*this, "mcu")
 	, m_int_mode(int_mode::NONE)
-	, m_68read_cb(*this)
+	, m_68read_cb(*this, 0xff)
 	, m_68write_cb(*this)
 	, m_68intrq_cb(*this)
 	, m_busrq_cb(*this)
@@ -70,12 +70,12 @@ void taito_sj_security_mcu_device::data_w(offs_t offset, u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER(taito_sj_security_mcu_device::busak_w)
+void taito_sj_security_mcu_device::busak_w(int state)
 {
 	m_busak = (ASSERT_LINE == state);
 }
 
-WRITE_LINE_MEMBER(taito_sj_security_mcu_device::reset_w)
+void taito_sj_security_mcu_device::reset_w(int state)
 {
 	m_reset = (ASSERT_LINE == state);
 	if (CLEAR_LINE != state)
@@ -90,11 +90,6 @@ WRITE_LINE_MEMBER(taito_sj_security_mcu_device::reset_w)
 
 void taito_sj_security_mcu_device::device_start()
 {
-	m_68read_cb.resolve_safe(0xff);
-	m_68write_cb.resolve_safe();
-	m_68intrq_cb.resolve_safe();
-	m_busrq_cb.resolve_safe();
-
 	save_item(NAME(m_addr));
 	save_item(NAME(m_mcu_data));
 	save_item(NAME(m_host_data));

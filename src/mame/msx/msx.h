@@ -34,22 +34,16 @@ public:
 	bool has_printer_port() const { return m_has_printer_port; }
 	bool has_cartslot() const { return m_has_cartslot; }
 	bool has_fdc() const { return m_has_fdc; }
-	bool has_caps_led() const { return m_has_caps_led; }
-	bool has_code_led() const { return m_has_code_led; }
 	msx_hw_def &has_cassette(bool has_cassette) { m_has_cassette = has_cassette; return *this;}
 	msx_hw_def &has_printer_port(bool has_printer_port) { m_has_printer_port = has_printer_port; return *this; }
 	msx_hw_def &has_cartslot(bool has_cartslot) { m_has_cartslot = has_cartslot; return *this; }
 	msx_hw_def &has_fdc(bool has_fdc) { m_has_fdc = has_fdc; return *this; }
-	msx_hw_def &no_caps_led() { m_has_caps_led = false; return *this; }
-	msx_hw_def &no_code_led() { m_has_code_led = false; return *this; }
 
 private:
 	bool m_has_cassette = true;
 	bool m_has_printer_port = true;
 	bool m_has_cartslot = false;
 	bool m_has_fdc = false;
-	bool m_has_caps_led = true;
-	bool m_has_code_led = true;
 };
 
 class msx_state : public driver_device
@@ -74,18 +68,8 @@ protected:
 		VDP_TMS9929A
 	};
 
-	enum region_type
-	{
-		REGION_UNKNOWN = 0,
-		REGION_INTERNATIONAL = 1,
-		REGION_JAPAN = 2,
-		REGION_KOREA = 3,
-		REGION_ARAB = 4,
-		REGION_RUSSIA = 5
-	};
-
-	void msx_base(ay8910_type ay8910_type, machine_config &config, region_type region);
-	void msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config, region_type region);
+	void msx_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
 	void msx1_add_softlists(machine_config &config);
 
 	// configuration helpers
@@ -258,10 +242,7 @@ protected:
 	u8 m_port_c_old;
 	u8 m_keylatch;
 	output_finder<> m_caps_led;
-	output_finder<> m_caps_led_name;
 	output_finder<> m_code_led;
-	output_finder<> m_code_led_name;
-	region_type m_region;
 	const XTAL m_main_xtal;
 	const int m_cpu_xtal_divider;
 
@@ -358,13 +339,13 @@ protected:
 
 	virtual void machine_start() override;
 
-	void msx2_base(ay8910_type ay8910_type, machine_config &config, region_type region);
-	void msx2(ay8910_type ay8910_type, machine_config &config, region_type region);
-	void msx2_pal(ay8910_type ay8910_type, machine_config &config, region_type region);
-	void msx2plus_base(ay8910_type ay8910_type, machine_config &config, region_type region);
-	void msx2plus(ay8910_type ay8910_type, machine_config &config, region_type region);
-	void msx2plus_pal(ay8910_type ay8910_type, machine_config &config, region_type region);
-	void turbor(ay8910_type ay8910_type, machine_config &config, region_type region);
+	void msx2_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void msx2(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void msx2_pal(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void msx2plus_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void msx2plus(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void msx2plus_pal(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void turbor(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
 	void msx2_add_softlists(machine_config &config);
 	void msx2plus_add_softlists(machine_config &config);
 	void turbor_add_softlists(machine_config &config);
@@ -375,7 +356,7 @@ protected:
 	void rtc_latch_w(u8 data);
 	u8 switched_r(offs_t offset);
 	void switched_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(turbo_w);
+	void turbo_w(int state);
 	void msx2_base_io_map(address_map &map);
 	void msx2_io_map(address_map &map);
 	void msx2plus_io_map(address_map &map);

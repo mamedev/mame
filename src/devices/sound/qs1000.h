@@ -40,11 +40,9 @@ public:
 	auto p1_out() { return m_out_p1_cb.bind(); }
 	auto p2_out() { return m_out_p2_cb.bind(); }
 	auto p3_out() { return m_out_p3_cb.bind(); }
-	//auto serial_w() { return m_serial_w_cb.bind(); }
 
 	// external
 	i8052_device &cpu() const { return *m_cpu; }
-	void serial_in(uint8_t data);
 	void set_irq(int state);
 
 	void wave_w(offs_t offset, uint8_t data);
@@ -101,14 +99,11 @@ private:
 	devcb_write8            m_out_p2_cb;
 	devcb_write8            m_out_p3_cb;
 
-	//devcb_write8            m_serial_w_cb;
-
 	// Internal state
 	sound_stream *                  m_stream;
 	required_device<i8052_device>   m_cpu;
 
 	// Wavetable engine
-	uint8_t                           m_serial_data_in;
 	uint8_t                           m_wave_regs[18];
 
 	struct qs1000_channel
@@ -129,8 +124,6 @@ private:
 	};
 
 	qs1000_channel                  m_channels[QS1000_CHANNELS];
-
-	uint8_t data_to_i8052();
 };
 
 

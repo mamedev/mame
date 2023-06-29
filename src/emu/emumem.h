@@ -2394,6 +2394,7 @@ public:
 	virtual void remove_passthrough(std::unordered_set<handler_entry *> &handlers) = 0;
 
 	u64 unmap() const { return m_unmap; }
+	void unmap_value_high() { m_unmap = ~0; }
 
 	std::shared_ptr<emu::detail::memory_passthrough_handler_impl> make_mph(memory_passthrough_handler *mph);
 	std::shared_ptr<emu::detail::memory_passthrough_handler_impl> get_default_mpl() { return m_default_mpl; }

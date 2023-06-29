@@ -107,7 +107,7 @@ void c64_4cga_device::update_output()
 //  c64_pb_w - port B write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c64_4cga_device::input_l )
+void c64_4cga_device::input_l(int state)
 {
 	m_port = state;
 	update_output();

@@ -75,9 +75,6 @@ void fmscsi_device::device_start()
 	m_target = 0;
 	m_phase = SCSI_PHASE_BUS_FREE;
 
-	m_irq_handler.resolve_safe();
-	m_drq_handler.resolve_safe();
-
 	// allocate read timer
 	m_transfer_timer = timer_alloc(FUNC(fmscsi_device::update_transfer), this);
 	m_phase_timer = timer_alloc(FUNC(fmscsi_device::set_phase), this);

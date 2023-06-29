@@ -1005,6 +1005,30 @@ ROM_START( condorn ) // verified single PCB, single PROM
 	ROM_LOAD( "sn74s471n.bin",   0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )
 ROM_END
 
+// PCB marked "VA 250.291"
+ROM_START( condorva )  // Single PCB, single PROM
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.1i", 0x0000, 0x0800, CRC(351984b6) SHA1(c46f988001dd3c4e5c8bc8d472558993ec33384e) )
+	ROM_LOAD( "2.1h", 0x0800, 0x0800, CRC(cbf2d29e) SHA1(0897fd69cf7d4e15321b4b7bc8766ebb89b3385c) )
+	ROM_LOAD( "3.1f", 0x1000, 0x0800, CRC(b6f3e6ec) SHA1(d1c71da30b00fdc3be7060bb41f37e0f59e01061) )
+	ROM_LOAD( "4.1e", 0x1800, 0x0800, CRC(104cb55c) SHA1(b044b339e8908b3a8f45410f63a1a771fbb4a68c) )
+	ROM_LOAD( "5.1d", 0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
+	ROM_LOAD( "6.1c", 0x2800, 0x0800, CRC(0de92138) SHA1(d6eba691d1da453cfd00f01a86d1421794df44e4) )
+	ROM_LOAD( "7.1b", 0x3000, 0x0800, CRC(bbf12d54) SHA1(3c8ac7dd1abe22fd0469e0f374edc0fbd189019e) )
+	ROM_LOAD( "7.1a", 0x3800, 0x0800, CRC(e9816604) SHA1(b8576fa0405db202dba203e97d853b14da1c6749) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "0a.2f", 0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "1a.2e", 0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "0b.4f", 0x0000, 0x0800, CRC(53c52eb0) SHA1(19624ca359996b77d3c65ef78a7af90eeb092377) )
+	ROM_LOAD( "1b.4e", 0x0800, 0x0800, CRC(eba42f0f) SHA1(378282cb2c4e10c23179ae3c605ae7bf691150f6) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "sn74s471.b9", 0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )
+ROM_END
+
 ROM_START( falcon )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "falcon.45",    0x0000, 0x0800, CRC(80382b6c) SHA1(47e24f04b5dd8aa8258ce324a0e4ef68a75dc168) )
@@ -1663,6 +1687,7 @@ GAME( 1981, phoenixi,   phoenix, condor,   condor,   phoenix_state, init_oneprom
 GAME( 1980, fenixn,     phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Niemer)",                       "Fenix (Niemer bootleg of Phoenix)",                          MACHINE_SUPPORTS_SAVE )
 GAME( 1981, condor,     phoenix, condor,   condor,   phoenix_state, init_coindsw,         ROT90, "bootleg (Sidam)",                        "Condor (Sidam bootleg of Phoenix)",                          MACHINE_SUPPORTS_SAVE )
 GAME( 1981, condorn,    phoenix, condor,   condor,   phoenix_state, init_oneprom_coindsw, ROT90, "bootleg (S C Novar)",                    "Condor (S C Novar bootleg of Phoenix)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1980, condorva,   phoenix, condor,   phoenix,  phoenix_state, init_oneprom,         ROT90, "bootleg (Valadon Automation)",           "Condor (Valadon Automation bootleg of Phoenix)",             MACHINE_SUPPORTS_SAVE )
 // the following 2 were common bootlegs in England & France respectively
 GAME( 1980, falcon,     phoenix, phoenix,  phoenixt, phoenix_state, empty_init,           ROT90, "bootleg",                                "Falcon (bootleg of Phoenix) (8085A CPU)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1980, vautour,    phoenix, phoenix,  phoenixt, phoenix_state, empty_init,           ROT90, "bootleg (Jeutel)",                       "Vautour (bootleg of Phoenix) (8085A CPU)",                   MACHINE_SUPPORTS_SAVE )

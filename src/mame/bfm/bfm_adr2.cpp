@@ -103,9 +103,9 @@ E000-FFFF  | R | D D D D D D D D | 8K ROM
 #include "screen.h"
 
 // configurable logging
-#define LOG_CTRL     (1U <<  1)
-#define LOG_C001     (1U <<  2)
-#define LOG_SERIAL   (1U <<  3)
+#define LOG_CTRL     (1U << 1)
+#define LOG_C001     (1U << 2)
+#define LOG_SERIAL   (1U << 3)
 
 //#define VERBOSE (LOG_GENERAL | LOG_CTRL | LOG_C001 | LOG_SERIAL)
 
@@ -219,7 +219,7 @@ uint32_t bfm_adder2_device::screen_update(screen_device &screen, bitmap_ind16 &b
 }
 
 
-WRITE_LINE_MEMBER(bfm_adder2_device::vbl_w)
+void bfm_adder2_device::vbl_w(int state)
 {
 	if (state && BIT(m_c101, 0))
 	{

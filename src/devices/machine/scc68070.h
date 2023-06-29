@@ -58,14 +58,14 @@ public:
 	auto i2c_sda_w() { return m_i2c_sdaw_callback.bind(); }
 	auto i2c_sda_r() { return m_i2c_sdar_callback.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(in2_w);
-	DECLARE_WRITE_LINE_MEMBER(in4_w);
-	DECLARE_WRITE_LINE_MEMBER(in5_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(int1_w);
-	DECLARE_WRITE_LINE_MEMBER(int2_w);
+	void in2_w(int state);
+	void in4_w(int state);
+	void in5_w(int state);
+	void nmi_w(int state);
+	void int1_w(int state);
+	void int2_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(write_scl);
+	void write_scl(int state);
 
 	TIMER_CALLBACK_MEMBER(timer0_callback);
 	TIMER_CALLBACK_MEMBER(rx_callback);
@@ -190,12 +190,12 @@ public:
 	dma_regs_t& dma() { return m_dma; }
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_config_complete() override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 2); }
 
@@ -203,7 +203,7 @@ private:
 	void internal_map(address_map &map);
 	void cpu_space_map(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER(reset_peripherals);
+	void reset_peripherals(int state);
 
 	void update_ipl();
 	uint8_t iack_r(offs_t offset);

@@ -51,7 +51,6 @@ void interpro_mouse_port_device::device_config_complete()
 
 void interpro_mouse_port_device::device_start()
 {
-	m_state_func.resolve_safe();
 }
 
 device_interpro_mouse_port_interface::device_interpro_mouse_port_interface(machine_config const &mconfig, device_t &device)

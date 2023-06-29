@@ -380,25 +380,25 @@ void hd6345_device::register_w(uint8_t data)
 }
 
 
-READ_LINE_MEMBER( mc6845_device::de_r )
+int mc6845_device::de_r()
 {
 	return m_de;
 }
 
 
-READ_LINE_MEMBER( mc6845_device::cursor_r )
+int mc6845_device::cursor_r()
 {
 	return m_cur;
 }
 
 
-READ_LINE_MEMBER( mc6845_device::hsync_r )
+int mc6845_device::hsync_r()
 {
 	return m_hsync;
 }
 
 
-READ_LINE_MEMBER( mc6845_device::vsync_r )
+int mc6845_device::vsync_r()
 {
 	return m_vsync;
 }
@@ -976,8 +976,6 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	if (m_has_valid_parameters)
 	{
-		assert(!m_update_row_cb.isnull());
-
 		if (m_display_disabled_msg_shown == true)
 		{
 			logerror("M6845: Valid screen parameters - display reenabled!!!\n");
@@ -985,8 +983,7 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		}
 
 		/* call the set up function if any */
-		if (!m_begin_update_cb.isnull())
-			m_begin_update_cb(bitmap, cliprect);
+		m_begin_update_cb(bitmap, cliprect);
 
 		if (cliprect.min_y == 0)
 		{
@@ -1001,8 +998,7 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		}
 
 		/* call the tear down function if any */
-		if (!m_end_update_cb.isnull())
-			m_end_update_cb(bitmap, cliprect);
+		m_end_update_cb(bitmap, cliprect);
 	}
 	else
 	{
@@ -1024,16 +1020,10 @@ void mc6845_device::device_start()
 
 	/* bind delegates */
 	m_reconfigure_cb.resolve();
-	m_begin_update_cb.resolve();
-	m_update_row_cb.resolve();
-	m_end_update_cb.resolve();
+	m_begin_update_cb.resolve_safe();
+	m_update_row_cb.resolve_safe();
+	m_end_update_cb.resolve_safe();
 	m_on_update_addr_changed_cb.resolve();
-
-	/* resolve callbacks */
-	m_out_de_cb.resolve_safe();
-	m_out_cur_cb.resolve_safe();
-	m_out_hsync_cb.resolve_safe();
-	m_out_vsync_cb.resolve_safe();
 
 	/* create the timers */
 	m_line_timer = timer_alloc(FUNC(mc6845_device::handle_line_timer), this);

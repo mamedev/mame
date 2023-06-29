@@ -133,27 +133,27 @@ uint8_t changela_state::changela_2d_r()
 	return (ioport("IN1")->read() & 0x20) | gas | (v8 << 4);
 }
 
-WRITE_LINE_MEMBER(changela_state::mcu_pc_0_w)
+void changela_state::mcu_pc_0_w(int state)
 {
 	m_mcu->pc_w(0xfe | state);
 }
 
-WRITE_LINE_MEMBER(changela_state::collision_reset_0_w)
+void changela_state::collision_reset_0_w(int state)
 {
 	m_collision_reset = state;
 }
 
-WRITE_LINE_MEMBER(changela_state::collision_reset_1_w)
+void changela_state::collision_reset_1_w(int state)
 {
 	m_tree_collision_reset = state;
 }
 
-WRITE_LINE_MEMBER(changela_state::coin_counter_1_w)
+void changela_state::coin_counter_1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(changela_state::coin_counter_2_w)
+void changela_state::coin_counter_2_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }

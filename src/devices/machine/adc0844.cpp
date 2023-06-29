@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(ADC0848, adc0848_device, "adc0848", "ADC0848 A/D Converter")
 adc0844_device::adc0844_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_intr_cb(*this),
-	m_ch1_cb(*this), m_ch2_cb(*this), m_ch3_cb(*this), m_ch4_cb(*this),
+	m_ch1_cb(*this, 0xff), m_ch2_cb(*this, 0xff), m_ch3_cb(*this, 0xff), m_ch4_cb(*this, 0xff),
 	m_conversion_timer(nullptr),
 	m_channel(0x0f),
 	m_result(0xff)
@@ -49,7 +49,7 @@ adc0844_device::adc0844_device(const machine_config &mconfig, const char *tag, d
 
 adc0848_device::adc0848_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	adc0844_device(mconfig, ADC0848, tag, owner, clock),
-	m_ch5_cb(*this), m_ch6_cb(*this), m_ch7_cb(*this), m_ch8_cb(*this)
+	m_ch5_cb(*this, 0xff), m_ch6_cb(*this, 0xff), m_ch7_cb(*this, 0xff), m_ch8_cb(*this, 0xff)
 {
 }
 
@@ -59,30 +59,12 @@ adc0848_device::adc0848_device(const machine_config &mconfig, const char *tag, d
 
 void adc0844_device::device_start()
 {
-	// resolve callbacks
-	m_intr_cb.resolve_safe();
-	m_ch1_cb.resolve_safe(0xff);
-	m_ch2_cb.resolve_safe(0xff);
-	m_ch3_cb.resolve_safe(0xff);
-	m_ch4_cb.resolve_safe(0xff);
-
 	// allocate timers
 	m_conversion_timer = timer_alloc(FUNC(adc0844_device::conversion_complete), this);
 
 	// register for save states
 	save_item(NAME(m_channel));
 	save_item(NAME(m_result));
-}
-
-void adc0848_device::device_start()
-{
-	adc0844_device::device_start();
-
-	// resolve callbacks
-	m_ch5_cb.resolve_safe(0xff);
-	m_ch6_cb.resolve_safe(0xff);
-	m_ch7_cb.resolve_safe(0xff);
-	m_ch8_cb.resolve_safe(0xff);
 }
 
 //-------------------------------------------------

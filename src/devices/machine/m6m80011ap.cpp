@@ -99,17 +99,17 @@ bool m6m80011ap_device::nvram_write(util::write_stream &file)
 //**************************************************************************
 
 
-READ_LINE_MEMBER( m6m80011ap_device::read_bit )
+int m6m80011ap_device::read_bit()
 {
 	return m_read_latch;
 }
 
-READ_LINE_MEMBER( m6m80011ap_device::ready_line )
+int m6m80011ap_device::ready_line()
 {
 	return 1; // TODO
 }
 
-WRITE_LINE_MEMBER( m6m80011ap_device::set_cs_line )
+void m6m80011ap_device::set_cs_line(int state)
 {
 	m_reset_line = state;
 
@@ -122,12 +122,12 @@ WRITE_LINE_MEMBER( m6m80011ap_device::set_cs_line )
 }
 
 
-WRITE_LINE_MEMBER( m6m80011ap_device::write_bit )
+void m6m80011ap_device::write_bit(int state)
 {
 	m_latch = state;
 }
 
-WRITE_LINE_MEMBER( m6m80011ap_device::set_clock_line )
+void m6m80011ap_device::set_clock_line(int state)
 {
 	if (m_reset_line == CLEAR_LINE)
 	{

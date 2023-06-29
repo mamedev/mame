@@ -87,7 +87,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	TIMER_CALLBACK_MEMBER(delayed_bank_swap);
 	void swap_linecpu_banks();
 	void cubeqst(machine_config &config);
@@ -206,7 +206,7 @@ uint16_t cubeqst_state::line_r()
 	return m_screen->vpos();
 }
 
-WRITE_LINE_MEMBER(cubeqst_state::vblank_irq)
+void cubeqst_state::vblank_irq(int state)
 {
 	if (state)
 	{

@@ -46,15 +46,6 @@ rc2014_bus_device::~rc2014_bus_device()
 
 void rc2014_bus_device::device_start()
 {
-	// resolve callbacks
-	m_clk.resolve_safe();
-	m_int.resolve_safe();
-	m_tx.resolve_safe();
-	m_rx.resolve_safe();
-	m_user1.resolve_safe();
-	m_user2.resolve_safe();
-	m_user3.resolve_safe();
-	m_user4.resolve_safe();
 }
 
 void rc2014_bus_device::device_reset()
@@ -164,20 +155,6 @@ rc2014_ext_bus_device::rc2014_ext_bus_device(const machine_config &mconfig, devi
 	, m_user7(*this)
 	, m_user8(*this)
 {
-}
-
-void rc2014_ext_bus_device::device_start()
-{
-	rc2014_bus_device::device_start();
-	m_clk2.resolve_safe();
-	m_page.resolve_safe();
-	m_nmi.resolve_safe();
-	m_tx2.resolve_safe();
-	m_rx2.resolve_safe();
-	m_user5.resolve_safe();
-	m_user6.resolve_safe();
-	m_user7.resolve_safe();
-	m_user8.resolve_safe();
 }
 
 //-------------------------------------------------

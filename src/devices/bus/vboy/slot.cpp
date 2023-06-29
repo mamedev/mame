@@ -95,12 +95,6 @@ void vboy_cart_slot_device::device_validity_check(validity_checker &valid) const
 }
 
 
-void vboy_cart_slot_device::device_resolve_objects()
-{
-	m_intcro.resolve_safe();
-}
-
-
 void vboy_cart_slot_device::device_start()
 {
 	if (!m_exp_space && ((m_exp_space.finder_tag() != finder_base::DUMMY_TAG) || (m_exp_space.spacenum() >= 0)))

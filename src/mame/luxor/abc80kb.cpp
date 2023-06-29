@@ -189,8 +189,6 @@ abc80_keyboard_device::abc80_keyboard_device(const machine_config &mconfig, cons
 
 void abc80_keyboard_device::device_start()
 {
-	// resolve callbacks
-	m_write_keydown.resolve_safe();
 }
 
 

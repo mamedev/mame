@@ -15,8 +15,8 @@ nes_vt09_soc_device::nes_vt09_soc_device(const machine_config& mconfig, const ch
 nes_vt09_soc_device::nes_vt09_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
 	nes_vt02_vt03_soc_device(mconfig, type, tag, owner, clock),
 	m_upper_write_412c_callback(*this),
-	m_upper_read_412c_callback(*this),
-	m_upper_read_412d_callback(*this)
+	m_upper_read_412c_callback(*this, 0xff),
+	m_upper_read_412d_callback(*this, 0xff)
 {
 }
 
@@ -28,15 +28,6 @@ void nes_vt09_soc_device::device_add_mconfig(machine_config& config)
 {
 	nes_vt02_vt03_soc_device::device_add_mconfig(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt09_soc_device::nes_vt_4k_ram_map);
-}
-
-void nes_vt09_soc_device::device_start()
-{
-	nes_vt02_vt03_soc_device::device_start();
-
-	m_upper_write_412c_callback.resolve_safe();
-	m_upper_read_412c_callback.resolve_safe(0xff);
-	m_upper_read_412d_callback.resolve_safe(0xff);
 }
 
 void nes_vt09_soc_device::nes_vt_4k_ram_map(address_map &map)

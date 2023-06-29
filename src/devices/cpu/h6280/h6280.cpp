@@ -172,7 +172,7 @@ h6280_device::h6280_device(const machine_config &mconfig, const char *tag, devic
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 21, 0, 16, 0, address_map_constructor(FUNC(h6280_device::internal_map), this))
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 2)
-	, m_port_in_cb(*this)
+	, m_port_in_cb(*this, 0)
 	, m_port_out_cb(*this)
 	, m_psg(*this, "psg")
 	, m_timer_scale(1)
@@ -238,9 +238,6 @@ void h6280_device::device_add_mconfig(machine_config &config)
 
 void h6280_device::device_start()
 {
-	m_port_in_cb.resolve();
-	m_port_out_cb.resolve_safe();
-
 	// register our state for the debugger
 	state_add(STATE_GENPC,      "GENPC",        m_pc.w.l).noshow();
 	state_add(STATE_GENPCBASE,  "CURPC",        m_pc.w.l).noshow();
@@ -2582,7 +2579,7 @@ void h6280_device::timer_w(offs_t offset, uint8_t data)
 
 uint8_t h6280_device::port_r()
 {
-	if (!m_port_in_cb.isnull())
+	if (!m_port_in_cb.isunset())
 		return m_port_in_cb();
 	else
 		return m_io_buffer;

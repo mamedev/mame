@@ -58,7 +58,7 @@ protected:
 
 	void video_data_w(uint8_t data);
 	void gameplan_video_command_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(video_command_trigger_w);
+	void video_command_trigger_w(int state);
 	uint32_t screen_update_gameplan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
@@ -82,11 +82,11 @@ private:
 
 	void io_select_w(uint8_t data);
 	uint8_t io_port_r();
-	DECLARE_WRITE_LINE_MEMBER(coin_w);
-	DECLARE_WRITE_LINE_MEMBER(audio_reset_w);
+	void coin_w(int state);
+	void audio_reset_w(int state);
 	void audio_cmd_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(audio_trigger_w);
-	DECLARE_WRITE_LINE_MEMBER(r6532_irq);
+	void audio_trigger_w(int state);
+	void r6532_irq(int state);
 
 	uint32_t screen_update_leprechn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(clear_screen_done_callback);
@@ -119,8 +119,8 @@ private:
 	required_region_ptr<uint8_t> m_questions_region;
 
 	uint8_t question_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(coin_w);
-	DECLARE_WRITE_LINE_MEMBER(misc_w);
+	void coin_w(int state);
+	void misc_w(int state);
 
 	void cpu_map(address_map &map);
 };

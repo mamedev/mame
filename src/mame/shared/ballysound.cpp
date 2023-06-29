@@ -104,7 +104,7 @@ TIMER_CALLBACK_MEMBER(bally_as2888_device::sound_select_sync)
 //  sound_int - handle an external sound interrupt to the board
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(bally_as2888_device::sound_int)
+void bally_as2888_device::sound_int(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_as2888_device::sound_int_sync), this), state);
 }
@@ -211,7 +211,7 @@ TIMER_CALLBACK_MEMBER(bally_as3022_device::sound_select_sync)
 //  sound_int - handle an external sound interrupt to the board
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(bally_as3022_device::sound_int)
+void bally_as3022_device::sound_int(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_as3022_device::sound_int_sync), this), state);
 }
@@ -225,7 +225,7 @@ TIMER_CALLBACK_MEMBER(bally_as3022_device::sound_int_sync)
 //  pia_irq_w - IRQ line state changes
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(bally_as3022_device::pia_irq_w)
+void bally_as3022_device::pia_irq_w(int state)
 {
 	int combined_state = m_pia->irq_a_state() | m_pia->irq_b_state();
 	m_cpu->set_input_line(M6802_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -342,7 +342,7 @@ void bally_as3022_device::pia_portb_w(uint8_t data)
 //  pia_cb2_w - PIA CB2 writes
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(bally_as3022_device::pia_cb2_w)
+void bally_as3022_device::pia_cb2_w(int state)
 {
 	// This pin is hooked up to the amp, and disables sounds when hi
 	if (state)
@@ -493,7 +493,7 @@ TIMER_CALLBACK_MEMBER(bally_cheap_squeak_device::sound_select_sync)
 //-------------------------------------------------
 //  sound_int - handle an external sound interrupt to the board
 //-------------------------------------------------
-WRITE_LINE_MEMBER(bally_cheap_squeak_device::sound_int)
+void bally_cheap_squeak_device::sound_int(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_cheap_squeak_device::sound_int_sync), this), state);
 }
@@ -537,7 +537,6 @@ void bally_cheap_squeak_device::device_add_mconfig(machine_config &config)
 
 void bally_cheap_squeak_device::device_start()
 {
-	m_sound_ack_w_handler.resolve();
 	m_leds.resolve();
 
 	save_item(NAME(m_sound_select));
@@ -570,10 +569,7 @@ uint8_t bally_cheap_squeak_device::in_p2_cb()
 void bally_cheap_squeak_device::out_p2_cb(uint8_t data)
 {
 	m_sound_ack = BIT(data, 0);
-	if (!m_sound_ack_w_handler.isnull())
-	{
-		m_sound_ack_w_handler(m_sound_ack);
-	}
+	m_sound_ack_w_handler(m_sound_ack);
 	update_led();
 }
 
@@ -660,7 +656,7 @@ TIMER_CALLBACK_MEMBER(bally_squawk_n_talk_device::sound_select_sync)
 //  sound_int - handle an external sound interrupt to the board
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(bally_squawk_n_talk_device::sound_int)
+void bally_squawk_n_talk_device::sound_int(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_squawk_n_talk_device::sound_int_sync), this), state);
 }
@@ -756,7 +752,7 @@ uint8_t bally_squawk_n_talk_device::pia2_porta_r()
 //-------------------------------------------------
 //  pia_irq_w - IRQ line state changes
 //-------------------------------------------------
-WRITE_LINE_MEMBER(bally_squawk_n_talk_device::pia_irq_w)
+void bally_squawk_n_talk_device::pia_irq_w(int state)
 {
 	int combined_state = m_pia1->irq_a_state() | m_pia1->irq_b_state() | m_pia2->irq_a_state() | m_pia2->irq_b_state();
 	m_cpu->set_input_line(M6802_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -850,7 +846,7 @@ void bally_squawk_n_talk_ay_device::pia2_portb_w(uint8_t data)
 //-------------------------------------------------
 //  pia2_cb2_w - PIA 2 CB2 writes
 //-------------------------------------------------
-WRITE_LINE_MEMBER(bally_squawk_n_talk_ay_device::pia2_cb2_w)
+void bally_squawk_n_talk_ay_device::pia2_cb2_w(int state)
 {
 	// This pin is hooked up to the amp, and disables sounds when hi
 	if (state)

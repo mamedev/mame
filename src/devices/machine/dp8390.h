@@ -22,7 +22,7 @@ public:
 	void cs_write(offs_t offset, uint8_t data);
 	uint16_t remote_read();
 	uint8_t cs_read(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER( dp8390_reset );
+	void dp8390_reset(int state);
 	void recv_cb(uint8_t *buf, int len) override;
 
 protected:

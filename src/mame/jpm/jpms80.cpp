@@ -66,10 +66,10 @@ public:
 private:
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER(int1_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(int2_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(watchdog_w);
-	DECLARE_WRITE_LINE_MEMBER(io_enable_w);
+	void int1_enable_w(int state);
+	void int2_enable_w(int state);
+	void watchdog_w(int state);
+	void io_enable_w(int state);
 
 	void jpms80_io_map(address_map &map);
 	void jpms80_map(address_map &map);
@@ -79,19 +79,19 @@ private:
 	required_device<tms9902_device> m_acc;
 };
 
-WRITE_LINE_MEMBER(jpms80_state::int1_enable_w)
+void jpms80_state::int1_enable_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(jpms80_state::int2_enable_w)
+void jpms80_state::int2_enable_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(jpms80_state::watchdog_w)
+void jpms80_state::watchdog_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(jpms80_state::io_enable_w)
+void jpms80_state::io_enable_w(int state)
 {
 }
 

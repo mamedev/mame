@@ -143,7 +143,7 @@ private:
 	void ram_w(offs_t offset, uint8_t data);
 	uint8_t pia_keyboard_r();
 	void pia_display_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_display_gate_w);
+	void pia_display_gate_w(int state);
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	TIMER_CALLBACK_MEMBER(ready_start_cb);
 	TIMER_CALLBACK_MEMBER(ready_end_cb);
@@ -194,7 +194,7 @@ SNAPSHOT_LOAD_MEMBER(apple1_state::snapshot_cb)
 		return std::make_pair(image_error::UNSPECIFIED, "Internal error loading snapshot");
 
 	if ((memcmp(hd1, &data[0], 5)) || (memcmp(hd2, &data[7], 5)))
-		return std::make_pair(image_error::INVALIDIMAGE, "Snapshot is invalid\n");
+		return std::make_pair(image_error::INVALIDIMAGE, "Snapshot is invalid");
 
 	uint16_t start = (data[5]<<8) | data[6];
 	uint16_t end = (snapsize - 12) + start;
@@ -216,7 +216,7 @@ SNAPSHOT_LOAD_MEMBER(apple1_state::snapshot_cb)
 	{
 		return std::make_pair(
 				image_error::INVALIDIMAGE,
-				util::string_format("Snapshot has invalid load address %04x\n", start));
+				util::string_format("Snapshot has invalid load address %04x", start));
 	}
 
 	return std::make_pair(std::error_condition(), std::string());
@@ -475,7 +475,7 @@ void apple1_state::pia_display_w(uint8_t data)
 
 // CB2 here is connected two places: Port B bit 7 for CPU readback,
 // and to the display hardware
-WRITE_LINE_MEMBER(apple1_state::pia_display_gate_w)
+void apple1_state::pia_display_gate_w(int state)
 {
 	m_pia->portb_w((state << 7) ^ 0x80);
 

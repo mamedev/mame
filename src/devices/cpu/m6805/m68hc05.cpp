@@ -28,11 +28,10 @@ determines both the COP watchdog timeout and the real-time interrupt rate
  * Configurable logging
  ****************************************************************************/
 
-#define LOG_GENERAL (1U <<  0)
-#define LOG_INT     (1U <<  1)
-#define LOG_IOPORT  (1U <<  2)
-#define LOG_TIMER   (1U <<  3)
-#define LOG_COP     (1U <<  4)
+#define LOG_INT     (1U << 1)
+#define LOG_IOPORT  (1U << 2)
+#define LOG_TIMER   (1U << 3)
+#define LOG_COP     (1U << 4)
 
 //#define VERBOSE (LOG_GENERAL | LOG_INT | LOG_IOPORT | LOG_TIMER | LOG_COP)
 //#define LOG_OUTPUT_FUNC printf
@@ -151,7 +150,7 @@ m68hc05_device::m68hc05_device(
 			type,
 			{ addr_width > 13 ? s_hc_b_ops : s_hc_s_ops, s_hc_cycles, addr_width, 0x00ff, 0x00c0, vector_mask, M68HC05_VECTOR_SWI },
 			internal_map)
-	, m_port_cb_r(*this)
+	, m_port_cb_r(*this, 0xff)
 	, m_port_cb_w(*this)
 	, m_port_bits{ 0xff, 0xff, 0xff, 0xff }
 	, m_port_interrupt{ 0x00, 0x00, 0x00, 0x00 }
@@ -195,7 +194,7 @@ void m68hc05_device::set_port_interrupt(std::array<u8, PORT_COUNT> const &interr
 	{
 		diff |= (m_port_interrupt[i] ^ interrupt[i]) & ~m_port_ddr[i];
 		m_port_interrupt[i] = interrupt[i];
-		if (interrupt[i] && !m_port_cb_r[i].isnull())
+		if (interrupt[i] && !m_port_cb_r[i].isunset())
 			logerror("PORT%c has interrupts enabled with pulled inputs, behaviour may be incorrect\n", 'A' + i);
 	}
 	if (diff) update_port_irq();
@@ -204,7 +203,7 @@ void m68hc05_device::set_port_interrupt(std::array<u8, PORT_COUNT> const &interr
 u8 m68hc05_device::port_read(offs_t offset)
 {
 	offset &= PORT_COUNT - 1;
-	if (!machine().side_effects_disabled() && !m_port_cb_r[offset].isnull())
+	if (!machine().side_effects_disabled() && !m_port_cb_r[offset].isunset())
 	{
 		u8 const newval(m_port_cb_r[offset](0, ~m_port_ddr[offset] & m_port_bits[offset]) & m_port_bits[offset]);
 		u8 const diff(newval ^ m_port_input[offset]);
@@ -251,7 +250,7 @@ void m68hc05_device::port_ddr_w(offs_t offset, u8 data)
 		m_port_ddr[offset] = data;
 		if (diff & m_port_interrupt[offset])
 		{
-			if (!m_port_cb_r[offset].isnull())
+			if (!m_port_cb_r[offset].isunset())
 			{
 				u8 const newval(m_port_cb_r[offset](0, ~m_port_ddr[offset] & m_port_bits[offset]) & m_port_bits[offset]);
 				u8 const diff(newval ^ m_port_input[offset]);
@@ -454,11 +453,6 @@ void m68hc05_device::copr_w(u8 data)
 void m68hc05_device::device_start()
 {
 	m6805_base_device::device_start();
-
-	// resolve callbacks
-	m_port_cb_r.resolve_all();
-	m_port_cb_w.resolve_all_safe();
-	m_tcmp_cb.resolve_safe();
 
 	// save digital I/O
 	save_item(NAME(m_port_interrupt));

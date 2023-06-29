@@ -13,8 +13,16 @@ class CStdOutStream
   FILE *_stream;
   bool _streamIsOpen;
 public:
-  CStdOutStream(): _stream(0), _streamIsOpen(false) {};
-  CStdOutStream(FILE *stream): _stream(stream), _streamIsOpen(false) {};
+  bool IsTerminalMode;
+  int CodePage;
+
+  CStdOutStream(FILE *stream = 0):
+      _stream(stream),
+      _streamIsOpen(false),
+      IsTerminalMode(false),
+      CodePage(-1)
+      {};
+
   ~CStdOutStream() { Close(); }
 
   // void AttachStdStream(FILE *stream) { _stream  = stream; _streamIsOpen = false; }
@@ -50,13 +58,19 @@ public:
 
   CStdOutStream & operator<<(const wchar_t *s);
   void PrintUString(const UString &s, AString &temp);
+  void Convert_UString_to_AString(const UString &src, AString &dest);
+
+  void Normalize_UString__LF_Allowed(UString &s);
+  void Normalize_UString(UString &s);
+
+  void NormalizePrint_UString(const UString &s, UString &tempU, AString &tempA);
+  void NormalizePrint_UString(const UString &s);
+  void NormalizePrint_wstr(const wchar_t *s);
 };
 
 CStdOutStream & endl(CStdOutStream & outStream) throw();
 
 extern CStdOutStream g_StdOut;
 extern CStdOutStream g_StdErr;
-
-void StdOut_Convert_UString_to_AString(const UString &s, AString &temp);
 
 #endif

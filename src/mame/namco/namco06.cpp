@@ -201,7 +201,7 @@ TIMER_CALLBACK_MEMBER( namco_06xx_device::ctrl_w_sync )
 	else
 	{
 		// NMI is cleared immediately if this is a read
-		// It will be supressed the next clock cycle.
+		// It will be suppressed the next clock cycle.
 		if (BIT(m_control, 4))
 		{
 			set_nmi(CLEAR_LINE);
@@ -244,7 +244,7 @@ namco_06xx_device::namco_06xx_device(const machine_config &mconfig, const char *
 	, m_nmicpu(*this, finder_base::DUMMY_TAG)
 	, m_chipsel(*this)
 	, m_rw(*this)
-	, m_read(*this)
+	, m_read(*this, 0xff)
 	, m_write(*this)
 {
 }
@@ -255,11 +255,6 @@ namco_06xx_device::namco_06xx_device(const machine_config &mconfig, const char *
 
 void namco_06xx_device::device_start()
 {
-	m_chipsel.resolve_all_safe();
-	m_rw.resolve_all_safe();
-	m_read.resolve_all_safe(0xff);
-	m_write.resolve_all_safe();
-
 	/* allocate a timer */
 	m_nmi_timer = timer_alloc(FUNC(namco_06xx_device::nmi_generate), this);
 

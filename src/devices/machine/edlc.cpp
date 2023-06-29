@@ -25,7 +25,6 @@
 #include "edlc.h"
 #include "hashing.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_FRAMES  (1U << 1)
 #define LOG_FILTER  (1U << 2)
 
@@ -53,10 +52,6 @@ seeq8003_device::seeq8003_device(machine_config const &mconfig, char const *tag,
 
 void seeq8003_device::device_start()
 {
-	m_out_int.resolve_safe();
-	m_out_rxrdy.resolve_safe();
-	m_out_txrdy.resolve_safe();
-
 	save_item(NAME(m_int_state));
 	save_item(NAME(m_reset_state));
 	save_item(NAME(m_station_address));

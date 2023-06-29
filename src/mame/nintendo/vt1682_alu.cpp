@@ -6,9 +6,9 @@
 
 #define LOG_ALU     (1U << 1)
 
-#define LOG_ALL           ( LOG_ALU )
+#define LOG_ALL     (LOG_ALU)
 
-#define VERBOSE             (0)
+#define VERBOSE     (0)
 #include "logmacro.h"
 
 

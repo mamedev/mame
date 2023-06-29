@@ -584,7 +584,7 @@ TIMER_CALLBACK_MEMBER(ds1994_device::clock_tick)
 /*                   */
 /*********************/
 
-WRITE_LINE_MEMBER(ds1994_device::write)
+void ds1994_device::write(int state)
 {
 	LOGMASKED(LOG_WRITES, "write(%d)\n", state);
 	if (!state && m_rx)
@@ -723,7 +723,7 @@ WRITE_LINE_MEMBER(ds1994_device::write)
 /*                   */
 /*********************/
 
-READ_LINE_MEMBER(ds1994_device::read)
+int ds1994_device::read()
 {
 	LOGMASKED(LOG_READS, "read %d\n", m_tx && m_rx);
 	return m_tx && m_rx;

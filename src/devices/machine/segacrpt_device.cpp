@@ -131,6 +131,7 @@
   315-5099      Spatter
   315-5102      Sega Ninja              unencrypted version available
   315-5110      I'm Sorry               used My Hero for k.p.a.
+  315-5111      TeddyBoy Blues          same as 315-5006
   315-5114      Champion Pro Wrestling  same key as Regulus
   315-5115      TeddyBoy Blues
   315-5128      Pinball Action          game by Tehkan; also has a simple bitswap on top
@@ -279,6 +280,7 @@ DEFINE_DEVICE_TYPE(SEGA_315_5098, sega_315_5098_device, "sega_315_5098", "Sega 3
 DEFINE_DEVICE_TYPE(SEGA_315_5099, sega_315_5099_device, "sega_315_5099", "Sega 315-5099")
 DEFINE_DEVICE_TYPE(SEGA_315_5102, sega_315_5102_device, "sega_315_5102", "Sega 315-5102")
 DEFINE_DEVICE_TYPE(SEGA_315_5110, sega_315_5110_device, "sega_315_5110", "Sega 315-5110")
+DEFINE_DEVICE_TYPE(SEGA_315_5111, sega_315_5111_device, "sega_315_5111", "Sega 315-5111") // exactly the same as Sega 315-5006?
 DEFINE_DEVICE_TYPE(SEGA_315_5128, sega_315_5128_device, "sega_315_5128", "Sega 315-5128")
 DEFINE_DEVICE_TYPE(SEGA_315_5132, sega_315_5132_device, "sega_315_5132", "Sega 315-5132")
 DEFINE_DEVICE_TYPE(SEGA_315_5133, sega_315_5133_device, "sega_315_5133", "Sega 315-5133") // exactly the same as Sega 315-5048?
@@ -792,6 +794,9 @@ void sega_315_5006_device::decrypt()
 }
 
 sega_315_5096_device::sega_315_5096_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : sega_315_5006_device(mconfig, SEGA_315_5096, tag, owner, clock) {}
+// == sega_315_5006_device
+
+sega_315_5111_device::sega_315_5111_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : sega_315_5006_device(mconfig, SEGA_315_5111, tag, owner, clock) {}
 // == sega_315_5006_device
 
 sega_315_5015_device::sega_315_5015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : segacrpt_z80_device(mconfig, SEGA_315_5015, tag, owner, clock) {}

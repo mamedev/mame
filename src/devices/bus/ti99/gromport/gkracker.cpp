@@ -97,11 +97,11 @@
 #include "emu.h"
 #include "gkracker.h"
 
-#define LOG_WARN         (1U<<1)   // Warnings
-#define LOG_CHANGE       (1U<<2)   // Cartridge change
-#define LOG_GKRACKER     (1U<<3)   // Gram Kracker operation
+#define LOG_WARN         (1U << 1)   // Warnings
+#define LOG_CHANGE       (1U << 2)   // Cartridge change
+#define LOG_GKRACKER     (1U << 3)   // Gram Kracker operation
 
-#define VERBOSE ( LOG_WARN )
+#define VERBOSE (LOG_WARN)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TI99_GROMPORT_GK, bus::ti99::gromport::ti99_gkracker_device,         "ti99_gkracker",  "Miller's Graphics GRAM Kracker")
@@ -145,7 +145,7 @@ ti99_gkracker_device::ti99_gkracker_device(const machine_config &mconfig, const 
 {
 }
 
-WRITE_LINE_MEMBER(ti99_gkracker_device::romgq_line)
+void ti99_gkracker_device::romgq_line(int state)
 {
 	m_romspace_selected = (state==ASSERT_LINE);
 	// Propagate to the guest
@@ -161,7 +161,7 @@ void ti99_gkracker_device::set_gromlines(line_state mline, line_state moline, li
 	if (m_cartridge != nullptr) m_cartridge->set_gromlines(mline, moline, gsq);
 }
 
-WRITE_LINE_MEMBER(ti99_gkracker_device::gclock_in)
+void ti99_gkracker_device::gclock_in(int state)
 {
 	if (m_cartridge != nullptr) m_cartridge->gclock_in(state);
 }

@@ -44,10 +44,10 @@ protected:
 	virtual void write_cb2(int state) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(cb1a_w);
-	DECLARE_WRITE_LINE_MEMBER(cb2a_w);
-	DECLARE_WRITE_LINE_MEMBER(cb1b_w);
-	DECLARE_WRITE_LINE_MEMBER(cb2b_w);
+	void cb1a_w(int state);
+	void cb2a_w(int state);
+	void cb1b_w(int state);
+	void cb2b_w(int state);
 
 	required_device_array<bbc_userport_slot_device, 2> m_userport;
 	uint8_t m_selected;

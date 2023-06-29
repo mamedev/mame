@@ -104,7 +104,7 @@ void williams_cvsd_sound_device::write(u16 data)
 //  reset_write - write to the reset line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(williams_cvsd_sound_device::reset_write)
+void williams_cvsd_sound_device::reset_write(int state)
 {
 	// going high halts the CPU
 	if (state)
@@ -314,7 +314,7 @@ void williams_narc_sound_device::write(u16 data)
 //  reset_write - write to the reset line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(williams_narc_sound_device::reset_write)
+void williams_narc_sound_device::reset_write(int state)
 {
 	// going high halts the CPU
 	if (state)
@@ -654,7 +654,7 @@ void williams_adpcm_sound_device::write(u16 data)
 //  reset_write - write to the reset line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(williams_adpcm_sound_device::reset_write)
+void williams_adpcm_sound_device::reset_write(int state)
 {
 	// going high halts the CPU
 	if (state)
@@ -674,7 +674,7 @@ WRITE_LINE_MEMBER(williams_adpcm_sound_device::reset_write)
 //  irq_read - read the sound IRQ state
 //-------------------------------------------------
 
-READ_LINE_MEMBER(williams_adpcm_sound_device::irq_read)
+int williams_adpcm_sound_device::irq_read()
 {
 	return m_sound_int_state;
 }
@@ -1101,7 +1101,7 @@ void williams_s9_sound_device::write(u8 data)
 //-------------------------------------------------
 //  strobe - tell PIA to process the input
 //-------------------------------------------------
-WRITE_LINE_MEMBER(williams_s9_sound_device::strobe)
+void williams_s9_sound_device::strobe(int state)
 {
 	m_pia->ca1_w(state);
 }
@@ -1205,7 +1205,7 @@ void williams_s11_sound_device::write(u8 data)
 //-------------------------------------------------
 //  strobe - tell PIA to process the input
 //-------------------------------------------------
-WRITE_LINE_MEMBER(williams_s11_sound_device::strobe)
+void williams_s11_sound_device::strobe(int state)
 {
 	m_pia->ca1_w(state);
 }

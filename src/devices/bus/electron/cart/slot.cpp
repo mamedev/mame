@@ -111,10 +111,6 @@ electron_cartslot_device::electron_cartslot_device(const machine_config &mconfig
 void electron_cartslot_device::device_start()
 {
 	m_cart = get_card_device();
-
-	// resolve callbacks
-	m_irq_handler.resolve_safe();
-	m_nmi_handler.resolve_safe();
 }
 
 

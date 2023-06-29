@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "melps4d.h"
 
-const char *const melps4_disassembler::em_name[] =
+const char *const melps4_disassembler::s_name[] =
 {
 	"?",
 	"TAB", "TBA", "TAY", "TYA", "TEAB", "TABE", "TEPA", "TXA", "TAX",
@@ -28,7 +28,7 @@ const char *const melps4_disassembler::em_name[] =
 };
 
 // number of bits per opcode parameter
-const u8 melps4_disassembler::em_bits[] =
+const u8 melps4_disassembler::s_bits[] =
 {
 	0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -43,7 +43,7 @@ const u8 melps4_disassembler::em_bits[] =
 	0, 0, 0, 0, 0
 };
 
-const u32 melps4_disassembler::em_flags[] =
+const u32 melps4_disassembler::s_flags[] =
 {
 	0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -64,19 +64,21 @@ const u32 melps4_disassembler::em_flags[] =
 
 const u8 melps4_disassembler::m58846_opmap[0xc0] =
 {
-//  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F
-	em_NOP,  em_BA,   em_INY,  em_DEY,  em_DI,   em_EI,   em_RU,   em_SU,   0,       em_TABE, em_AM,   em_OSE,  em_TYA,  0,       0,       em_CMA,  // 0x
-	em_CLS,  em_CLDS, 0,       em_CLD,  em_RD,   em_SD,   em_TEPA, em_OSPA, em_RL,   em_RR,   em_TEAB, em_OSAB, em_TBA,  em_TAY,  em_TAB,  0,       // 1x
-	em_SZB,  em_SZB,  em_SZB,  em_SZB,  0,       0,       em_SEAM, 0,       0,       0,       0,       em_SZD,  0,       0,       0,       em_SZC,  // 2x
-	em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  // 3x
-	em_LCPS, em_LCPS, 0,       em_AMC,  em_RT,   em_RTS,  em_RTI,  0,       em_RC,   em_SC,   em_LZ,   em_LZ,   em_SB,   em_SB,   em_SB,   em_SB,   // 4x
-	0,       0,       0,       em_AMCS, em_IAS,  em_IAS,  0,       em_IAK,  em_SZK,  em_SZK,  em_SZK,  em_SZK,  em_RB,   em_RB,   em_RB,   em_RB,   // 5x
-	em_XAM,  em_XAM,  em_XAM,  em_XAM,  em_TAM,  em_TAM,  em_TAM,  em_TAM,  em_XAMD, em_XAMD, em_XAMD, em_XAMD, em_XAMI, em_XAMI, em_XAMI, em_XAMI, // 6x
-	em_SP,   em_SP,   em_SP,   em_SP,   em_SP,   em_SP,   em_SP,   em_SP,   em_SP,   em_SP,   em_SP,   em_SP,   em_SP,   em_SP,   em_SP,   em_SP,   // 7x
-	0,       em_OFA,  em_SNZ1, em_SNZ2, em_OGA,  em_T2AB, em_TVA,  0,       0,       0,       em_TAB2, 0,       em_IAF,  0,       0,       0,       // 8x
-	0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       // 9x
-	em_A,    em_A,    em_A,    em_A,    em_A,    em_A,    em_A,    em_A,    em_A,    em_A,    em_A,    em_A,    em_A,    em_A,    em_A,    em_A,    // Ax
-	em_LA,   em_LA,   em_LA,   em_LA,   em_LA,   em_LA,   em_LA,   em_LA,   em_LA,   em_LA,   em_LA,   em_LA,   em_LA,   em_LA,   em_LA,   em_LA    // Bx
+//  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F
+	mNOP,  mBA,   mINY,  mDEY,  mDI,   mEI,   mRU,   mSU,   0,     mTABE, mAM,   mOSE,  mTYA,  0,     0,     mCMA,  // 0x
+	mCLS,  mCLDS, 0,     mCLD,  mRD,   mSD,   mTEPA, mOSPA, mRL,   mRR,   mTEAB, mOSAB, mTBA,  mTAY,  mTAB,  0,     // 1x
+	mSZB,  mSZB,  mSZB,  mSZB,  0,     0,     mSEAM, 0,     0,     0,     0,     mSZD,  0,     0,     0,     mSZC,  // 2x
+	mSEY,  mSEY,  mSEY,  mSEY,  mSEY,  mSEY,  mSEY,  mSEY,  mSEY,  mSEY,  mSEY,  mSEY,  mSEY,  mSEY,  mSEY,  mSEY,  // 3x
+
+	mLCPS, mLCPS, 0,     mAMC,  mRT,   mRTS,  mRTI,  0,     mRC,   mSC,   mLZ,   mLZ,   mSB,   mSB,   mSB,   mSB,   // 4x
+	0,     0,     0,     mAMCS, mIAS,  mIAS,  0,     mIAK,  mSZK,  mSZK,  mSZK,  mSZK,  mRB,   mRB,   mRB,   mRB,   // 5x
+	mXAM,  mXAM,  mXAM,  mXAM,  mTAM,  mTAM,  mTAM,  mTAM,  mXAMD, mXAMD, mXAMD, mXAMD, mXAMI, mXAMI, mXAMI, mXAMI, // 6x
+	mSP,   mSP,   mSP,   mSP,   mSP,   mSP,   mSP,   mSP,   mSP,   mSP,   mSP,   mSP,   mSP,   mSP,   mSP,   mSP,   // 7x
+
+	0,     mOFA,  mSNZ1, mSNZ2, mOGA,  mT2AB, mTVA,  0,     0,     0,     mTAB2, 0,     mIAF,  0,     0,     0,     // 8x
+	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     // 9x
+	mA,    mA,    mA,    mA,    mA,    mA,    mA,    mA,    mA,    mA,    mA,    mA,    mA,    mA,    mA,    mA,    // Ax
+	mLA,   mLA,   mLA,   mLA,   mLA,   mLA,   mLA,   mLA,   mLA,   mLA,   mLA,   mLA,   mLA,   mLA,   mLA,   mLA    // Bx
 };
 
 offs_t melps4_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
@@ -86,22 +88,22 @@ offs_t melps4_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	// get opcode
 	u8 instr;
 	if (op >= 0x180)
-		instr = em_B;
+		instr = mB;
 	else if (op >= 0x100)
-		instr = em_BM;
+		instr = mBM;
 	else if (op >= 0xc0)
-		instr = em_LXY;
+		instr = mLXY;
 	else
 		instr = m58846_opmap[op];
 
-	u32 flags = em_flags[instr];
-	util::stream_format(stream, "%-6s", em_name[instr]);
+	u32 flags = s_flags[instr];
+	util::stream_format(stream, "%-6s", s_name[instr]);
 
 	// get immediate param
-	u8 bits = em_bits[instr];
+	u8 bits = s_bits[instr];
 
 	// special case for LXY x,y
-	if (instr == em_LXY)
+	if (instr == mLXY)
 	{
 		u8 x = op >> 4 & 3;
 		u8 y = op & 0xf;
@@ -111,7 +113,7 @@ offs_t melps4_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	{
 		u8 param = op & ((1 << bits) - 1);
 
-		if (instr == em_A && param == 6)
+		if (instr == mA && param == 6)
 			flags &= ~STEP_COND;
 
 		if (bits > 4)

@@ -25,7 +25,7 @@ dmac_0448_device::dmac_0448_device(machine_config const &mconfig, char const *ta
 	: device_t(mconfig, DMAC_0448, tag, owner, clock)
 	, m_bus(*this, finder_base::DUMMY_TAG, -1, 32)
 	, m_out_int(*this)
-	, m_dma_r(*this)
+	, m_dma_r(*this, 0)
 	, m_dma_w(*this)
 {
 }
@@ -49,11 +49,6 @@ void dmac_0448_device::map(address_map &map)
 
 void dmac_0448_device::device_start()
 {
-	m_out_int.resolve();
-
-	m_dma_r.resolve_all_safe(0);
-	m_dma_w.resolve_all_safe();
-
 	m_irq_check = timer_alloc(FUNC(dmac_0448_device::irq_check), this);
 	m_dma_check = timer_alloc(FUNC(dmac_0448_device::dma_check), this);
 

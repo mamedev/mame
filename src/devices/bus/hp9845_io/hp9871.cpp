@@ -59,7 +59,7 @@ void hp9871_device::ext_control_w(uint8_t data)
 	// N/U
 }
 
-WRITE_LINE_MEMBER(hp9871_device::pctl_w)
+void hp9871_device::pctl_w(int state)
 {
 	if (!state) {
 		m_ibf = true;
@@ -69,12 +69,12 @@ WRITE_LINE_MEMBER(hp9871_device::pctl_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hp9871_device::io_w)
+void hp9871_device::io_w(int state)
 {
 	// N/U
 }
 
-WRITE_LINE_MEMBER(hp9871_device::preset_w)
+void hp9871_device::preset_w(int state)
 {
 	// N/U
 }
@@ -96,7 +96,7 @@ void hp9871_device::device_reset()
 	psts_w(1);
 }
 
-WRITE_LINE_MEMBER(hp9871_device::printer_online)
+void hp9871_device::printer_online(int state)
 {
 	output(state);
 }

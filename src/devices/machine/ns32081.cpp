@@ -16,7 +16,6 @@
 
 #include "softfloat3/source/include/softfloat.h"
 
-#define LOG_GENERAL (1U << 0)
 //#define VERBOSE (LOG_GENERAL)
 
 #include "logmacro.h"
@@ -629,7 +628,7 @@ void ns32081_device::execute()
 
 	m_state = STATUS;
 
-	if (m_out_scb)
+	if (!m_out_scb.isunset())
 		m_complete->adjust(attotime::from_ticks(m_tcy, clock()));
 }
 

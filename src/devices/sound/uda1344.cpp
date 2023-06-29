@@ -9,11 +9,11 @@
 #include "emu.h"
 #include "sound/uda1344.h"
 
-#define LOG_ADDR            (1 << 1)
-#define LOG_STATUS_REG      (1 << 2)
-#define LOG_DATA_REG        (1 << 3)
-#define LOG_INPUT           (1 << 4)
-#define LOG_OVERRUNS        (1 << 5)
+#define LOG_ADDR            (1U << 1)
+#define LOG_STATUS_REG      (1U << 2)
+#define LOG_DATA_REG        (1U << 3)
+#define LOG_INPUT           (1U << 4)
+#define LOG_OVERRUNS        (1U << 5)
 #define LOG_ALL             (LOG_ADDR | LOG_STATUS_REG | LOG_DATA_REG | LOG_INPUT | LOG_OVERRUNS)
 
 #define VERBOSE             (0)
@@ -63,8 +63,6 @@ void uda1344_device::device_start()
 	save_item(NAME(m_power_reg));
 	save_item(NAME(m_dac_enable));
 	save_item(NAME(m_adc_enable));
-
-	m_l3_ack_out.resolve_safe();
 
 	m_buffer[0].resize(BUFFER_SIZE);
 	m_buffer[1].resize(BUFFER_SIZE);

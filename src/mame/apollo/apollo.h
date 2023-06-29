@@ -242,19 +242,19 @@ private:
 	u16 apollo_irq_acknowledge(offs_t offset);
 	u16 apollo_pic_get_vector();
 	void apollo_bus_error();
-	DECLARE_READ_LINE_MEMBER( apollo_kbd_is_german );
-	DECLARE_WRITE_LINE_MEMBER( apollo_dma8237_out_eop );
-	DECLARE_WRITE_LINE_MEMBER( apollo_dma_1_hrq_changed );
-	DECLARE_WRITE_LINE_MEMBER( apollo_dma_2_hrq_changed );
-	DECLARE_WRITE_LINE_MEMBER( apollo_pic8259_master_set_int_line );
-	DECLARE_WRITE_LINE_MEMBER( apollo_pic8259_slave_set_int_line );
-	DECLARE_WRITE_LINE_MEMBER( sio_irq_handler );
+	int apollo_kbd_is_german();
+	void apollo_dma8237_out_eop(int state);
+	void apollo_dma_1_hrq_changed(int state);
+	void apollo_dma_2_hrq_changed(int state);
+	void apollo_pic8259_master_set_int_line(int state);
+	void apollo_pic8259_slave_set_int_line(int state);
+	void sio_irq_handler(int state);
 	void sio_output(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( sio2_irq_handler );
-	DECLARE_WRITE_LINE_MEMBER( apollo_ptm_irq_function );
-	DECLARE_WRITE_LINE_MEMBER( apollo_ptm_timer_tick );
+	void sio2_irq_handler(int state);
+	void apollo_ptm_irq_function(int state);
+	void apollo_ptm_timer_tick(int state);
 	uint8_t apollo_pic8259_get_slave_ack(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER( apollo_rtc_irq_function );
+	void apollo_rtc_irq_function(int state);
 
 	uint8_t pc_dma8237_0_dack_r();
 	uint8_t pc_dma8237_1_dack_r();
@@ -270,19 +270,19 @@ private:
 	void pc_dma8237_5_dack_w(uint8_t data);
 	void pc_dma8237_6_dack_w(uint8_t data);
 	void pc_dma8237_7_dack_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack4_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack5_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack6_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack7_w);
+	void pc_dack0_w(int state);
+	void pc_dack1_w(int state);
+	void pc_dack2_w(int state);
+	void pc_dack3_w(int state);
+	void pc_dack4_w(int state);
+	void pc_dack5_w(int state);
+	void pc_dack6_w(int state);
+	void pc_dack7_w(int state);
 
 	void apollo_pic_set_irq_line(int irq, int state);
 	void select_dma_channel(int channel, bool state);
 
-	DECLARE_WRITE_LINE_MEMBER(apollo_reset_instr_callback);
+	void apollo_reset_instr_callback(int state);
 
 	void common(machine_config &config);
 	void apollo(machine_config &config);

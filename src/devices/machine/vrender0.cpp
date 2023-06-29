@@ -130,7 +130,8 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(vrender0soc_device::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	VIDEO_VRENDER0(config, m_vr0vid, 14318180);
+	// runs at double speed wrt of the CPU clock
+	VIDEO_VRENDER0(config, m_vr0vid, DERIVED_CLOCK(2, 1));
 
 	PALETTE(config, m_palette, palette_device::RGB_565);
 
@@ -165,8 +166,6 @@ void vrender0soc_device::device_start()
 	m_Timer[1] = timer_alloc(FUNC(vrender0soc_device::Timercb<1>), this);
 	m_Timer[2] = timer_alloc(FUNC(vrender0soc_device::Timercb<2>), this);
 	m_Timer[3] = timer_alloc(FUNC(vrender0soc_device::Timercb<3>), this);
-
-	write_tx.resolve_all_safe();
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -323,7 +322,7 @@ uint8_t vrender0soc_device::irq_callback()
 }
 
 
-WRITE_LINE_MEMBER(vrender0soc_device::soundirq_cb)
+void vrender0soc_device::soundirq_cb(int state)
 {
 	if (state)
 	{
@@ -707,14 +706,15 @@ uint32_t vrender0soc_device::screen_update(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-WRITE_LINE_MEMBER(vrender0soc_device::screen_vblank)
+void vrender0soc_device::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
 	{
 		if (crt_active_vblank_irq() == true)
+		{
 			IntReq(24);      //VRender0 VBlank
-
-		m_vr0vid->execute_flipping();
+			m_vr0vid->execute_flipping();
+		}
 	}
 }

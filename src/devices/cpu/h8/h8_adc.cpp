@@ -6,7 +6,7 @@
 // Verbosity level
 // 0 = no messages
 // 1 = everything
-const int V = 0;
+static constexpr int V = 0;
 
 DEFINE_DEVICE_TYPE(H8_ADC_3337, h8_adc_3337_device, "h8_adc_3337", "H8/3337 ADC")
 DEFINE_DEVICE_TYPE(H8_ADC_3006, h8_adc_3006_device, "h8_adc_3006", "H8/3006 ADC")
@@ -17,54 +17,49 @@ DEFINE_DEVICE_TYPE(H8_ADC_2655, h8_adc_2655_device, "h8_adc_2655", "H8/2655 ADC"
 
 h8_adc_device::h8_adc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	cpu(*this, DEVICE_SELF_OWNER),
-	intc(nullptr), io(nullptr), intc_tag(nullptr), intc_vector(0), adcsr(0), adcr(0), register_mask(0), trigger(0), start_mode(0), start_channel(0),
-	end_channel(0), start_count(0), mode(0), channel(0), count(0), analog_powered(false), adtrg(false), next_event(0)
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_intc(*this, finder_base::DUMMY_TAG),
+	m_intc_vector(0), m_adcsr(0), m_adcr(0), m_register_mask(0), m_trigger(0), m_start_mode(0), m_start_channel(0),
+	m_end_channel(0), m_start_count(0), m_mode(0), m_channel(0), m_count(0), m_analog_powered(false), m_adtrg(false), m_next_event(0)
 {
-	suspend_on_interrupt = false;
-	analog_power_control = false;
-}
-
-void h8_adc_device::set_info(const char *_intc_tag, int _intc_vector)
-{
-	intc_tag = _intc_tag;
-	intc_vector = _intc_vector;
+	m_suspend_on_interrupt = false;
+	m_analog_power_control = false;
 }
 
 uint8_t h8_adc_device::addr8_r(offs_t offset)
 {
-	if(V>=1) logerror("addr8_r %d %03x\n", offset, addr[offset >> 1]);
-	return offset & 1 ? addr[offset >> 1] << 6 : addr[offset >> 1] >> 2;
+	if(V>=1) logerror("addr8_r %d %03x\n", offset, m_addr[offset >> 1]);
+	return offset & 1 ? m_addr[offset >> 1] << 6 : m_addr[offset >> 1] >> 2;
 }
 
 uint16_t h8_adc_device::addr16_r(offs_t offset)
 {
-	if(V>=1) logerror("addr16_r %d %03x\n", offset, addr[offset]);
-	return addr[offset];
+	if(V>=1) logerror("addr16_r %d %03x\n", offset, m_addr[offset]);
+	return m_addr[offset];
 }
 
 uint8_t h8_adc_device::adcsr_r()
 {
-	if(V>=1) logerror("adcsr_r %02x\n", adcsr);
-	return adcsr;
+	if(V>=1) logerror("adcsr_r %02x\n", m_adcsr);
+	return m_adcsr;
 }
 
 uint8_t h8_adc_device::adcr_r()
 {
-	if(V>=1) logerror("adcr_r %02x\n", adcr);
-	return adcr;
+	if(V>=1) logerror("adcr_r %02x\n", m_adcr);
+	return m_adcr;
 }
 
 void h8_adc_device::adcsr_w(uint8_t data)
 {
 	if(V>=1) logerror("adcsr_w %02x\n", data);
-	uint8_t prev = adcsr;
-	adcsr = (data & 0x7f) | (adcsr & data & F_ADF);
+	uint8_t prev = m_adcsr;
+	m_adcsr = (data & 0x7f) | (m_adcsr & data & F_ADF);
 	mode_update();
-	if((prev & F_ADF) && !(adcsr & F_ADF)) {
-		if(mode & HALTED) {
-			mode &= ~HALTED;
-			if(!(adcsr & F_ADST)) {
+	if((prev & F_ADF) && !(m_adcsr & F_ADF)) {
+		if(m_mode & HALTED) {
+			m_mode &= ~HALTED;
+			if(!(m_adcsr & F_ADST)) {
 				sampling();
 				conversion_wait(false, false);
 			} else
@@ -72,23 +67,23 @@ void h8_adc_device::adcsr_w(uint8_t data)
 		}
 	}
 
-	if(!(prev & F_ADST) && (adcsr & F_ADST))
+	if(!(prev & F_ADST) && (m_adcsr & F_ADST))
 		start_conversion();
 }
 
 void h8_adc_device::adcr_w(uint8_t data)
 {
 	if(V>=1) logerror("adcr_w %02x\n", data);
-	adcr = data;
+	m_adcr = data;
 	mode_update();
 }
 
-WRITE_LINE_MEMBER(h8_adc_device::adtrg_w)
+void h8_adc_device::adtrg_w(int state)
 {
-	if(state != adtrg) {
-		adtrg = state;
-		if(!adtrg && (trigger & T_EXT) && !(adcsr & F_ADST)) {
-			adcsr |= F_ADST;
+	if(state != m_adtrg) {
+		m_adtrg = state;
+		if(!m_adtrg && (m_trigger & T_EXT) && !(m_adcsr & F_ADST)) {
+			m_adcsr |= F_ADST;
 			start_conversion();
 		}
 	}
@@ -100,159 +95,157 @@ void h8_adc_device::set_suspend(bool suspend)
 
 void h8_adc_device::device_start()
 {
-	io = &cpu->space(AS_IO);
-	intc = siblingdevice<h8_intc_device>(intc_tag);
-	save_item(NAME(addr));
-	save_item(NAME(buf));
-	save_item(NAME(adcsr));
-	save_item(NAME(adcr));
-	save_item(NAME(trigger));
-	save_item(NAME(start_mode));
-	save_item(NAME(start_channel));
-	save_item(NAME(end_channel));
-	save_item(NAME(start_count));
-	save_item(NAME(suspend_on_interrupt));
-	save_item(NAME(analog_power_control));
-	save_item(NAME(mode));
-	save_item(NAME(channel));
-	save_item(NAME(count));
-	save_item(NAME(analog_powered));
-	save_item(NAME(next_event));
-	save_item(NAME(adtrg));
+	save_item(NAME(m_addr));
+	save_item(NAME(m_buf));
+	save_item(NAME(m_adcsr));
+	save_item(NAME(m_adcr));
+	save_item(NAME(m_trigger));
+	save_item(NAME(m_start_mode));
+	save_item(NAME(m_start_channel));
+	save_item(NAME(m_end_channel));
+	save_item(NAME(m_start_count));
+	save_item(NAME(m_suspend_on_interrupt));
+	save_item(NAME(m_analog_power_control));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_channel));
+	save_item(NAME(m_count));
+	save_item(NAME(m_analog_powered));
+	save_item(NAME(m_next_event));
+	save_item(NAME(m_adtrg));
 }
 
 void h8_adc_device::device_reset()
 {
-	memset(addr, 0, sizeof(addr));
-	memset(buf, 0, sizeof(buf));
-	adcsr = adcr = 0;
-	trigger = T_SOFT;
-	start_mode = IDLE;
-	start_channel = end_channel = 0;
-	start_count = 1;
-	mode = IDLE;
-	channel = 0;
-	count = 0;
-	next_event = 0;
+	memset(m_addr, 0, sizeof(m_addr));
+	memset(m_buf, 0, sizeof(m_buf));
+	m_adcsr = m_adcr = 0;
+	m_trigger = T_SOFT;
+	m_start_mode = IDLE;
+	m_start_channel = m_end_channel = 0;
+	m_start_count = 1;
+	m_mode = IDLE;
+	m_channel = 0;
+	m_count = 0;
+	m_next_event = 0;
 	mode_update();
-	analog_powered = !analog_power_control;
-	adtrg = true;
+	m_analog_powered = !m_analog_power_control;
+	m_adtrg = true;
 }
 
 void h8_adc_device::done()
 {
-	mode = IDLE;
-	adcsr &= ~F_ADST;
-	if(analog_power_control)
-		analog_powered = false;
+	m_mode = IDLE;
+	m_adcsr &= ~F_ADST;
+	if(m_analog_power_control)
+		m_analog_powered = false;
 }
 
 uint64_t h8_adc_device::internal_update(uint64_t current_time)
 {
-	if(next_event && next_event <= current_time) {
-		next_event = 0;
+	if(m_next_event && m_next_event <= current_time) {
+		m_next_event = 0;
 		timeout(current_time);
 	}
-	return next_event;
+	return m_next_event;
 }
 
 void h8_adc_device::conversion_wait(bool first, bool poweron, uint64_t current_time)
 {
 	if(current_time)
-		next_event = current_time + conversion_time(first, poweron);
+		m_next_event = current_time + conversion_time(first, poweron);
 	else {
-		next_event = cpu->total_cycles() + conversion_time(first, poweron);
-		cpu->internal_update();
+		m_next_event = m_cpu->total_cycles() + conversion_time(first, poweron);
+		m_cpu->internal_update();
 	}
 }
 
 void h8_adc_device::buffer_value(int port, int buffer)
 {
-	buf[buffer] = io->read_word(h8_device::ADC_0 + port);
-	if(V>=1) logerror("adc buffer %d -> %d:%03x\n", port, buffer, buf[buffer]);
+	m_buf[buffer] = m_cpu->do_read_adc(port);
+	if(V>=1) logerror("adc buffer %d -> %d:%03x\n", port, buffer, m_buf[buffer]);
 }
 
 void h8_adc_device::commit_value(int reg, int buffer)
 {
-	reg &= register_mask;
-	if(V>=1) logerror("adc commit %d -> %d:%03x\n", buffer, reg, buf[buffer]);
-	addr[reg] = buf[buffer];
+	reg &= m_register_mask;
+	if(V>=1) logerror("adc commit %d -> %d:%03x\n", buffer, reg, m_buf[buffer]);
+	m_addr[reg] = m_buf[buffer];
 }
 
 void h8_adc_device::sampling()
 {
-	if(mode & COUNTED)
-		channel = get_channel_index(start_count - count);
-	if(mode & DUAL) {
-		buffer_value(channel, 0);
-		buffer_value(channel+1, 1);
+	if(m_mode & COUNTED)
+		m_channel = get_channel_index(m_start_count - m_count);
+	if(m_mode & DUAL) {
+		buffer_value(m_channel, 0);
+		buffer_value(m_channel+1, 1);
 	} else
-		buffer_value(channel);
+		buffer_value(m_channel);
 }
 
 void h8_adc_device::start_conversion()
 {
-	mode = start_mode;
-	channel = start_channel;
-	count = start_count;
+	m_mode = m_start_mode;
+	m_channel = m_start_channel;
+	m_count = m_start_count;
 	sampling();
-	conversion_wait(true, !analog_powered);
-	analog_powered = true;
+	conversion_wait(true, !m_analog_powered);
+	m_analog_powered = true;
 }
 
 void h8_adc_device::timeout(uint64_t current_time)
 {
-	if(mode & BUFFER) {
-		do_buffering((mode & DUAL) && (channel & 1));
-		if((mode & DUAL) && !(channel & 1)) {
-			channel++;
+	if(m_mode & BUFFER) {
+		do_buffering((m_mode & DUAL) && (m_channel & 1));
+		if((m_mode & DUAL) && !(m_channel & 1)) {
+			m_channel++;
 			conversion_wait(false, false, current_time);
 			return;
 		}
 	} else {
-		if(mode & DUAL) {
-			if(channel & 1)
-				commit_value(channel, 1);
+		if(m_mode & DUAL) {
+			if(m_channel & 1)
+				commit_value(m_channel, 1);
 			else {
-				commit_value(channel, 0);
-				channel++;
+				commit_value(m_channel, 0);
+				m_channel++;
 				conversion_wait(false, false, current_time);
 				return;
 			}
 		} else
-			commit_value(channel);
+			commit_value(m_channel);
 	}
 
-	if(mode & ROTATE) {
-		if(channel != end_channel) {
-			channel++;
+	if(m_mode & ROTATE) {
+		if(m_channel != m_end_channel) {
+			m_channel++;
 			sampling();
 			conversion_wait(false, false, current_time);
 			return;
 		}
-		channel = start_channel;
+		m_channel = m_start_channel;
 	}
 
-	if(mode & COUNTED) {
-		count--;
-		if(count) {
+	if(m_mode & COUNTED) {
+		m_count--;
+		if(m_count) {
 			sampling();
 			conversion_wait(false, false, current_time);
 			return;
 		}
 	}
 
-	adcsr |= F_ADF;
-	if(adcsr & F_ADIE)
-		intc->internal_interrupt(intc_vector);
+	m_adcsr |= F_ADF;
+	if(m_adcsr & F_ADIE)
+		m_intc->internal_interrupt(m_intc_vector);
 
-	if(mode & REPEAT) {
-		if(suspend_on_interrupt && (adcsr & F_ADIE)) {
-			mode |= HALTED;
+	if(m_mode & REPEAT) {
+		if(m_suspend_on_interrupt && (m_adcsr & F_ADIE)) {
+			m_mode |= HALTED;
 			return;
 		}
-		channel = start_channel;
-		count = start_count;
+		m_channel = m_start_channel;
+		m_count = m_start_count;
 		sampling();
 		conversion_wait(false, false, current_time);
 		return;
@@ -275,30 +268,30 @@ int h8_adc_device::get_channel_index(int count)
 h8_adc_3337_device::h8_adc_3337_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_adc_device(mconfig, H8_ADC_3337, tag, owner, clock)
 {
-	register_mask = 3;
+	m_register_mask = 3;
 }
 
 int h8_adc_3337_device::conversion_time(bool first, bool poweron)
 {
 	int tm;
 	if(first)
-		tm = adcsr & 0x08 ? 134 : 266;
+		tm = m_adcsr & 0x08 ? 134 : 266;
 	else
-		tm = adcsr & 0x08 ? 128 : 256;
+		tm = m_adcsr & 0x08 ? 128 : 256;
 	return tm;
 }
 
 void h8_adc_3337_device::mode_update()
 {
-	trigger = adcr & 0x80 ? T_EXT : T_SOFT;
+	m_trigger = m_adcr & 0x80 ? T_EXT : T_SOFT;
 
-	if(adcsr & 0x10) {
-		start_mode = ACTIVE | ROTATE;
-		start_channel = adcsr & 4;
-		end_channel = adcsr & 7;
+	if(m_adcsr & 0x10) {
+		m_start_mode = ACTIVE | ROTATE;
+		m_start_channel = m_adcsr & 4;
+		m_end_channel = m_adcsr & 7;
 	} else {
-		start_mode = ACTIVE;
-		start_channel = end_channel = adcsr & 7;
+		m_start_mode = ACTIVE;
+		m_start_channel = m_end_channel = m_adcsr & 7;
 	}
 }
 
@@ -306,30 +299,30 @@ void h8_adc_3337_device::mode_update()
 h8_adc_3006_device::h8_adc_3006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_adc_device(mconfig, H8_ADC_3006, tag, owner, clock)
 {
-	register_mask = 3;
+	m_register_mask = 3;
 }
 
 int h8_adc_3006_device::conversion_time(bool first, bool poweron)
 {
 	int tm;
 	if(first)
-		tm = adcsr & 0x08 ? 70 : 134;
+		tm = m_adcsr & 0x08 ? 70 : 134;
 	else
-		tm = adcsr & 0x08 ? 66 : 128;
+		tm = m_adcsr & 0x08 ? 66 : 128;
 	return tm;
 }
 
 void h8_adc_3006_device::mode_update()
 {
-	trigger = adcr & 0x80 ? T_EXT|T_TIMER : T_SOFT;
+	m_trigger = m_adcr & 0x80 ? T_EXT|T_TIMER : T_SOFT;
 
-	if(adcsr & 0x10) {
-		start_mode = ACTIVE | ROTATE;
-		start_channel = adcsr & 4;
-		end_channel = adcsr & 7;
+	if(m_adcsr & 0x10) {
+		m_start_mode = ACTIVE | ROTATE;
+		m_start_channel = m_adcsr & 4;
+		m_end_channel = m_adcsr & 7;
 	} else {
-		start_mode = ACTIVE;
-		start_channel = end_channel = adcsr & 7;
+		m_start_mode = ACTIVE;
+		m_start_channel = m_end_channel = m_adcsr & 7;
 	}
 }
 
@@ -337,30 +330,30 @@ void h8_adc_3006_device::mode_update()
 h8_adc_2245_device::h8_adc_2245_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_adc_device(mconfig, H8_ADC_2245, tag, owner, clock)
 {
-	register_mask = 3;
+	m_register_mask = 3;
 }
 
 int h8_adc_2245_device::conversion_time(bool first, bool poweron)
 {
 	int tm;
 	if(first)
-		tm = adcsr & 0x08 ? 134 : 266;
+		tm = m_adcsr & 0x08 ? 134 : 266;
 	else
-		tm = adcsr & 0x08 ? 128 : 256;
+		tm = m_adcsr & 0x08 ? 128 : 256;
 	return tm;
 }
 
 void h8_adc_2245_device::mode_update()
 {
-	trigger = 1 << ((adcr >> 6) & 3);
+	m_trigger = 1 << ((m_adcr >> 6) & 3);
 
-	if(adcsr & 0x10) {
-		start_mode = ACTIVE | ROTATE;
-		start_channel = 0;
-		end_channel = adcsr & 3;
+	if(m_adcsr & 0x10) {
+		m_start_mode = ACTIVE | ROTATE;
+		m_start_channel = 0;
+		m_end_channel = m_adcsr & 3;
 	} else {
-		start_mode = ACTIVE;
-		start_channel = end_channel = adcsr & 3;
+		m_start_mode = ACTIVE;
+		m_start_channel = m_end_channel = m_adcsr & 3;
 	}
 }
 
@@ -368,36 +361,36 @@ void h8_adc_2245_device::mode_update()
 h8_adc_2320_device::h8_adc_2320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_adc_device(mconfig, H8_ADC_2320, tag, owner, clock)
 {
-	register_mask = 3;
+	m_register_mask = 3;
 }
 
 int h8_adc_2320_device::conversion_time(bool first, bool poweron)
 {
 	int tm;
 	if(first)
-		if(adcr & 0x04)
-			tm = adcsr & 0x08 ? 134 : 266;
+		if(m_adcr & 0x04)
+			tm = m_adcsr & 0x08 ? 134 : 266;
 		else
-			tm = adcsr & 0x08 ? 68 : 580;
+			tm = m_adcsr & 0x08 ? 68 : 580;
 	else
-		if(adcr & 0x04)
-			tm = adcsr & 0x08 ? 128 : 256;
+		if(m_adcr & 0x04)
+			tm = m_adcsr & 0x08 ? 128 : 256;
 		else
-			tm = adcsr & 0x08 ? 64 : 512;
+			tm = m_adcsr & 0x08 ? 64 : 512;
 	return tm;
 }
 
 void h8_adc_2320_device::mode_update()
 {
-	trigger = 1 << ((adcr >> 6) & 3);
+	m_trigger = 1 << ((m_adcr >> 6) & 3);
 
-	if(adcsr & 0x10) {
-		start_mode = ACTIVE | ROTATE;
-		start_channel = adcsr & 4;
-		end_channel = adcsr & 7;
+	if(m_adcsr & 0x10) {
+		m_start_mode = ACTIVE | ROTATE;
+		m_start_channel = m_adcsr & 4;
+		m_end_channel = m_adcsr & 7;
 	} else {
-		start_mode = ACTIVE;
-		start_channel = end_channel = adcsr & 7;
+		m_start_mode = ACTIVE;
+		m_start_channel = m_end_channel = m_adcsr & 7;
 	}
 }
 
@@ -405,30 +398,30 @@ void h8_adc_2320_device::mode_update()
 h8_adc_2357_device::h8_adc_2357_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_adc_device(mconfig, H8_ADC_2357, tag, owner, clock)
 {
-	register_mask = 3;
+	m_register_mask = 3;
 }
 
 int h8_adc_2357_device::conversion_time(bool first, bool poweron)
 {
 	int tm;
 	if(first)
-		tm = adcsr & 0x08 ? 134 : 266;
+		tm = m_adcsr & 0x08 ? 134 : 266;
 	else
-		tm = adcsr & 0x08 ? 128 : 256;
+		tm = m_adcsr & 0x08 ? 128 : 256;
 	return tm;
 }
 
 void h8_adc_2357_device::mode_update()
 {
-	trigger = 1 << ((adcr >> 6) & 3);
+	m_trigger = 1 << ((m_adcr >> 6) & 3);
 
-	if(adcsr & 0x10) {
-		start_mode = ACTIVE | ROTATE;
-		start_channel = adcsr & 4;
-		end_channel = adcsr & 7;
+	if(m_adcsr & 0x10) {
+		m_start_mode = ACTIVE | ROTATE;
+		m_start_channel = m_adcsr & 4;
+		m_end_channel = m_adcsr & 7;
 	} else {
-		start_mode = ACTIVE;
-		start_channel = end_channel = adcsr & 7;
+		m_start_mode = ACTIVE;
+		m_start_channel = m_end_channel = m_adcsr & 7;
 	}
 }
 
@@ -436,15 +429,15 @@ void h8_adc_2357_device::mode_update()
 h8_adc_2655_device::h8_adc_2655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_adc_device(mconfig, H8_ADC_2655, tag, owner, clock)
 {
-	suspend_on_interrupt = true;
-	register_mask = 7;
+	m_suspend_on_interrupt = true;
+	m_register_mask = 7;
 }
 
 int h8_adc_2655_device::conversion_time(bool first, bool poweron)
 {
-	int tm = adcsr & 0x10 ? 44 : 24;
+	int tm = m_adcsr & 0x10 ? 44 : 24;
 	if(first)
-		tm += adcsr & 0x10 ? 20 : 10;
+		tm += m_adcsr & 0x10 ? 20 : 10;
 	if(poweron)
 		tm += 200;
 	return tm;
@@ -452,51 +445,51 @@ int h8_adc_2655_device::conversion_time(bool first, bool poweron)
 
 void h8_adc_2655_device::mode_update()
 {
-	trigger = 1 << ((adcr >> 4) & 3);
-	analog_power_control = !(adcr & 0x40);
+	m_trigger = 1 << ((m_adcr >> 4) & 3);
+	m_analog_power_control = !(m_adcr & 0x40);
 
-	mode = ACTIVE | (adcr & 0x08 ? REPEAT : 0);
+	m_mode = ACTIVE | (m_adcr & 0x08 ? REPEAT : 0);
 
-	if(adcsr & 0x03) {
-		mode |= BUFFER;
+	if(m_adcsr & 0x03) {
+		m_mode |= BUFFER;
 
 	}
 
-	if(adcsr & 0x08) {
-		mode |= ROTATE;
-		start_channel = 0;
-		if(adcr & 0x04) {
-			mode |= DUAL;
-			end_channel = (adcsr & 6)+1;
+	if(m_adcsr & 0x08) {
+		m_mode |= ROTATE;
+		m_start_channel = 0;
+		if(m_adcr & 0x04) {
+			m_mode |= DUAL;
+			m_end_channel = (m_adcsr & 6)+1;
 		} else
-			end_channel = adcsr & 7;
+			m_end_channel = m_adcsr & 7;
 	} else
-		start_channel = end_channel = adcsr & 7;
+		m_start_channel = m_end_channel = m_adcsr & 7;
 
 }
 
 void h8_adc_2655_device::do_buffering(int buffer)
 {
-	if((mode & COUNTED) && channel >= 2) {
-		commit_value(channel, buffer);
+	if((m_mode & COUNTED) && m_channel >= 2) {
+		commit_value(m_channel, buffer);
 		return;
 	}
-	switch(adcsr & 3) {
+	switch(m_adcsr & 3) {
 	case 0:
-		commit_value(channel, buffer);
+		commit_value(m_channel, buffer);
 		break;
 	case 1:
-		addr[1] = addr[0];
+		m_addr[1] = m_addr[0];
 		commit_value(0, buffer);
 		break;
 	case 2:
-		addr[2+buffer] = addr[buffer];
+		m_addr[2+buffer] = m_addr[buffer];
 		commit_value(buffer, buffer);
 		break;
 	case 3:
-		addr[3] = addr[2];
-		addr[2] = addr[1];
-		addr[1] = addr[0];
+		m_addr[3] = m_addr[2];
+		m_addr[2] = m_addr[1];
+		m_addr[1] = m_addr[0];
 		commit_value(0, buffer);
 		break;
 	}

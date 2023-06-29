@@ -100,7 +100,7 @@ void avigo_state::refresh_ints()
 }
 
 /* does not do anything yet */
-WRITE_LINE_MEMBER( avigo_state::tc8521_alarm_int )
+void avigo_state::tc8521_alarm_int(int state)
 {
 //#if 0
 	m_irq &=~(1<<5);
@@ -114,7 +114,7 @@ WRITE_LINE_MEMBER( avigo_state::tc8521_alarm_int )
 //#endif
 }
 
-WRITE_LINE_MEMBER( avigo_state::com_interrupt )
+void avigo_state::com_interrupt(int state)
 {
 	LOG(("com int\r\n"));
 

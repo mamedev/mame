@@ -24,7 +24,9 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define LOG_SLIDER                  0
+#define LOG_SLIDER (1U << 1)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
 
@@ -474,8 +476,7 @@ void laserdisc_device::set_slider_speed(int32_t tracks_per_vsync)
 		m_attospertrack = -(vsyncperiod / -tracks_per_vsync).as_attoseconds();
 	}
 
-	if (LOG_SLIDER)
-		printf("Slider speed = %d\n", tracks_per_vsync);
+	LOGMASKED(LOG_SLIDER, "Slider speed = %d\n", tracks_per_vsync);
 }
 
 
@@ -491,8 +492,7 @@ void laserdisc_device::advance_slider(int32_t numtracks)
 
 	// then update the track position
 	add_and_clamp_track(numtracks);
-	if (LOG_SLIDER)
-		printf("Advance by %d\n", numtracks);
+	LOGMASKED(LOG_SLIDER, "Advance by %d\n", numtracks);
 }
 
 

@@ -176,7 +176,6 @@ Touchscreen
 
 Remaining Video issues
  - mmpork startup screen flicker - the FOR USE IN JAPAN screen doesn't appear on the real PCB until after the graphics are fully loaded, it still displays 'please wait' until that point.
- - is the use of the 'scroll' registers 100% correct? (related to above?)
  - Sometimes the 'sprites' in mushisam lag by a frame vs the 'backgrounds' is this a timing problem, does the real game do it?
  - End of Blit should send IRQ1. (one game has a valid irq routine that looks like it was used for profiling, but nothing depends on it)
 

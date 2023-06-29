@@ -78,7 +78,6 @@ protected:
 
 private:
 	output_finder<4> m_internal_drive_led;
-	output_finder<4> m_internal_drive_name;
 	int m_nr_drives;
 };
 

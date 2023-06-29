@@ -168,7 +168,7 @@ private:
 	SH2_DMA_KLUDGE_CB(dma_callback);
 	void draw_fg_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	WRITE_LINE_MEMBER(vbl_interrupt);
+	void vbl_interrupt(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(dma_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(sprite_dma_cb);
 	u16 rotate_left(u16 value, int n);

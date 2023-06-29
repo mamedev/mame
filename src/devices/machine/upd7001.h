@@ -53,17 +53,16 @@ public:
 	void set_rc(double res, double cap) { assert(!configured()); m_res = res; m_cap = cap; }
 
 	// serial interface
-	DECLARE_WRITE_LINE_MEMBER(cs_w);
-	DECLARE_WRITE_LINE_MEMBER(sck_w);
-	DECLARE_WRITE_LINE_MEMBER(si_w) { m_si = state; }
-	DECLARE_WRITE_LINE_MEMBER(dl_w);
-	DECLARE_READ_LINE_MEMBER(so_r) { return m_oe ? m_so : 1; }
-	DECLARE_READ_LINE_MEMBER(eoc_r) { return m_eoc_active ? 0 : 1; }
-	DECLARE_READ_LINE_MEMBER(eoc_so_r) { return eoc_r() && so_r(); }
+	void cs_w(int state);
+	void sck_w(int state);
+	void si_w(int state) { m_si = state; }
+	void dl_w(int state);
+	int so_r() { return m_oe ? m_so : 1; }
+	int eoc_r() { return m_eoc_active ? 0 : 1; }
+	int eoc_so_r() { return eoc_r() && so_r(); }
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 
 private:

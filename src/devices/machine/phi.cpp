@@ -187,14 +187,14 @@ constexpr uint8_t CONTROLLER_ADDR   = 0x1e; // PHI always has this address when 
 DEFINE_DEVICE_TYPE(PHI, phi_device, "hp_phi", "HP Processor-to-HPIB Interface")
 
 // Constructors
-phi_device::phi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-	  m_dio_read_func(*this),
-	  m_dio_write_func(*this),
-	  m_signal_wr_fns(*this),
-	  m_int_write_func(*this),
-	  m_dmarq_write_func(*this),
-	  m_sys_cntrl_read_func(*this)
+phi_device::phi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_dio_read_func(*this, 0xff),
+	m_dio_write_func(*this),
+	m_signal_wr_fns(*this),
+	m_int_write_func(*this),
+	m_dmarq_write_func(*this),
+	m_sys_cntrl_read_func(*this, 0)
 {
 }
 
@@ -203,42 +203,42 @@ phi_device::phi_device(const machine_config &mconfig, const char *tag, device_t 
 {
 }
 
-WRITE_LINE_MEMBER(phi_device::eoi_w)
+void phi_device::eoi_w(int state)
 {
 	set_ext_signal(PHI_488_EOI, state);
 }
 
-WRITE_LINE_MEMBER(phi_device::dav_w)
+void phi_device::dav_w(int state)
 {
 	set_ext_signal(PHI_488_DAV, state);
 }
 
-WRITE_LINE_MEMBER(phi_device::nrfd_w)
+void phi_device::nrfd_w(int state)
 {
 	set_ext_signal(PHI_488_NRFD, state);
 }
 
-WRITE_LINE_MEMBER(phi_device::ndac_w)
+void phi_device::ndac_w(int state)
 {
 	set_ext_signal(PHI_488_NDAC, state);
 }
 
-WRITE_LINE_MEMBER(phi_device::ifc_w)
+void phi_device::ifc_w(int state)
 {
 	set_ext_signal(PHI_488_IFC, state);
 }
 
-WRITE_LINE_MEMBER(phi_device::srq_w)
+void phi_device::srq_w(int state)
 {
 	set_ext_signal(PHI_488_SRQ, state);
 }
 
-WRITE_LINE_MEMBER(phi_device::atn_w)
+void phi_device::atn_w(int state)
 {
 	set_ext_signal(PHI_488_ATN, state);
 }
 
-WRITE_LINE_MEMBER(phi_device::ren_w)
+void phi_device::ren_w(int state)
 {
 	set_ext_signal(PHI_488_REN, state);
 }
@@ -373,13 +373,6 @@ void phi_device::device_start()
 	save_item(NAME(m_reg_control));
 	save_item(NAME(m_reg_address));
 	save_item(NAME(m_nba_origin));
-
-	m_dio_read_func.resolve_safe(0xff);
-	m_dio_write_func.resolve_safe();
-	m_signal_wr_fns.resolve_all_safe();
-	m_int_write_func.resolve_safe();
-	m_dmarq_write_func.resolve_safe();
-	m_sys_cntrl_read_func.resolve_safe(0);
 
 	m_sh_dly_timer = timer_alloc(FUNC(phi_device::delayed_update), this);
 	m_c_dly_timer = timer_alloc(FUNC(phi_device::delayed_update), this);

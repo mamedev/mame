@@ -30,8 +30,20 @@ void scsicd_device::device_start()
 	scsihle_device::device_start();
 }
 
+void scsicd_device::device_reset()
+{
+	scsihle_device::device_reset();
+}
+
 void scsicd_device::device_add_mconfig(machine_config &config)
 {
 	CDROM(config, "image").set_interface("cdrom");
-	CDDA(config, "cdda");
+	CDDA(config, "cdda").set_cdrom_tag("image");
 }
+
+bool scsicd_device::exists() const
+{
+	// cd drive is visible even if there's no cd in it
+	return true;
+}
+

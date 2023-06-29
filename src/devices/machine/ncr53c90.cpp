@@ -10,7 +10,6 @@
 #include "emu.h"
 #include "ncr53c90.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_STATE   (1U << 1)
 #define LOG_FIFO    (1U << 2)
 #define LOG_COMMAND (1U << 3)
@@ -239,9 +238,6 @@ void ncr53c90_device::device_start()
 	save_item(NAME(irq));
 	save_item(NAME(drq));
 	save_item(NAME(test_mode));
-
-	m_irq_handler.resolve_safe();
-	m_drq_handler.resolve_safe();
 
 	config = 0;
 	bus_id = 0;

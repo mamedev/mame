@@ -143,7 +143,7 @@ private:
 	void scroll_w(uint16_t data);
 	void via_a_out(uint8_t data);
 	void via_b_out(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via_ca2_out);
+	void via_ca2_out(int state);
 	uint8_t dips1_r();
 	void input_mux_w(uint8_t data);
 	void int_ack_w(uint8_t data);
@@ -249,7 +249,7 @@ void bmcbowl_state::via_b_out(uint8_t data)
 	//used
 }
 
-WRITE_LINE_MEMBER(bmcbowl_state::via_ca2_out)
+void bmcbowl_state::via_ca2_out(int state)
 {
 	//used
 }

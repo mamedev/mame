@@ -48,7 +48,7 @@ protected:
 
 	virtual space_config_vector memory_space_config() const override;
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 	void int_w(offs_t offset, uint8_t data);
 
 	const address_space_config m_space_config;

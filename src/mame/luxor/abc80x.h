@@ -125,12 +125,12 @@ public:
 	uint8_t pling_r();
 	void hrs_w(uint8_t data);
 	void hrc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
-	DECLARE_WRITE_LINE_MEMBER( sio_txdb_w );
-	DECLARE_WRITE_LINE_MEMBER( sio_dtrb_w );
-	DECLARE_WRITE_LINE_MEMBER( sio_rtsb_w );
-	DECLARE_WRITE_LINE_MEMBER( keydtr_w );
+	void ctc_z0_w(int state);
+	void ctc_z1_w(int state);
+	void sio_txdb_w(int state);
+	void sio_dtrb_w(int state);
+	void sio_rtsb_w(int state);
+	void keydtr_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER( ctc_tick );
 	TIMER_DEVICE_CALLBACK_MEMBER( cassette_input_tick );
 
@@ -245,9 +245,9 @@ public:
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( lrs_w );
-	DECLARE_WRITE_LINE_MEMBER( mux80_40_w );
-	DECLARE_WRITE_LINE_MEMBER( vs_w );
+	void lrs_w(int state);
+	void mux80_40_w(int state);
+	void vs_w(int state);
 	MC6845_UPDATE_ROW( abc802_update_row );
 
 	// cpu state
@@ -316,14 +316,14 @@ public:
 	void sso_w(uint8_t data);
 	uint8_t sti_r();
 	void sto_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( eme_w );
-	DECLARE_WRITE_LINE_MEMBER( _40_w );
-	DECLARE_WRITE_LINE_MEMBER( hru2_a8_w );
-	DECLARE_WRITE_LINE_MEMBER( prot_ini_w );
-	DECLARE_WRITE_LINE_MEMBER( txoff_w );
-	DECLARE_WRITE_LINE_MEMBER( prot_din_w );
-	DECLARE_WRITE_LINE_MEMBER( hs_w );
-	DECLARE_WRITE_LINE_MEMBER( vs_w );
+	void eme_w(int state);
+	void _40_w(int state);
+	void hru2_a8_w(int state);
+	void prot_ini_w(int state);
+	void txoff_w(int state);
+	void prot_din_w(int state);
+	void hs_w(int state);
+	void vs_w(int state);
 	void abc806_palette(palette_device &palette) const;
 	MC6845_UPDATE_ROW( abc806_update_row );
 

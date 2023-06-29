@@ -17,13 +17,7 @@ public:
 	// construction/destruction
 	nand_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	virtual void device_resolve_objects() override;
-
-	// device_nvram_interface overrides
+	// device_nvram_interface implementation
 	virtual void nvram_default() override;
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
@@ -61,6 +55,10 @@ protected:
 	};
 
 	nand_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device_t implementation
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	optional_memory_region m_region;
 

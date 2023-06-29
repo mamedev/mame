@@ -9,11 +9,11 @@
 #include "emu.h"
 #include "machine/upc82c710.h"
 
-#define LOG_CFG (1 << 0)
-#define LOG_FDC (1 << 1)
-#define LOG_IDE (1 << 2)
-#define LOG_LPT (1 << 3)
-#define LOG_SER (1 << 4)
+#define LOG_CFG (1U << 1)
+#define LOG_FDC (1U << 2)
+#define LOG_IDE (1U << 3)
+#define LOG_LPT (1U << 4)
+#define LOG_SER (1U << 5)
 
 #define VERBOSE (0)
 
@@ -74,14 +74,6 @@ void upc82c710_device::device_start()
 
 	irq = drq = false;
 	fdc_irq = fdc_drq = false;
-
-	m_fintr_callback.resolve_safe();
-	m_fdrq_callback.resolve_safe();
-	m_pintr_callback.resolve_safe();
-	m_sintr_callback.resolve_safe();
-	m_txd_callback.resolve_safe();
-	m_dtr_callback.resolve_safe();
-	m_rts_callback.resolve_safe();
 
 	// default addresses
 	device_address[DEVICE_CFG] = 0x390;
@@ -325,13 +317,13 @@ void upc82c710_device::dor_w(uint8_t data)
 	m_fdc->reset_w(!BIT(dor, 2));
 }
 
-WRITE_LINE_MEMBER(upc82c710_device::fdc_irq_w)
+void upc82c710_device::fdc_irq_w(int state)
 {
 	fdc_irq = state;
 	check_irq();
 }
 
-WRITE_LINE_MEMBER(upc82c710_device::fdc_drq_w)
+void upc82c710_device::fdc_drq_w(int state)
 {
 	fdc_drq = state;
 	check_drq();
@@ -393,27 +385,27 @@ void upc82c710_device::write_cfg(int index, u8 data)
 }
 
 
-WRITE_LINE_MEMBER(upc82c710_device::rxd_w)
+void upc82c710_device::rxd_w(int state)
 {
 	m_serial->rx_w(state);
 }
 
-WRITE_LINE_MEMBER(upc82c710_device::dcd_w)
+void upc82c710_device::dcd_w(int state)
 {
 	m_serial->dcd_w(state);
 }
 
-WRITE_LINE_MEMBER(upc82c710_device::dsr_w)
+void upc82c710_device::dsr_w(int state)
 {
 	m_serial->dsr_w(state);
 }
 
-WRITE_LINE_MEMBER(upc82c710_device::ri_w)
+void upc82c710_device::ri_w(int state)
 {
 	m_serial->ri_w(state);
 }
 
-WRITE_LINE_MEMBER(upc82c710_device::cts_w)
+void upc82c710_device::cts_w(int state)
 {
 	m_serial->cts_w(state);
 }

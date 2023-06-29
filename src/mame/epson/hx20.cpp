@@ -795,7 +795,7 @@ INPUT_PORTS_END
 //  mc146818_interface rtc_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( hx20_state::rtc_irq_w )
+void hx20_state::rtc_irq_w(int state)
 {
 	m_rtc_irq = state;
 

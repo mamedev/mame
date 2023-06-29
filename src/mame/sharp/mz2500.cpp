@@ -1746,7 +1746,7 @@ void mz2500_state::mz2500_palette(palette_device &palette) const
 
 /* PIT8253 Interface */
 
-WRITE_LINE_MEMBER(mz2500_state::pit8253_clk0_irq)
+void mz2500_state::pit8253_clk0_irq(int state)
 {
 	if(m_irq_mask[1] && state & 1)
 	{
@@ -1755,7 +1755,7 @@ WRITE_LINE_MEMBER(mz2500_state::pit8253_clk0_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(mz2500_state::mz2500_rtc_alarm_irq)
+void mz2500_state::mz2500_rtc_alarm_irq(int state)
 {
 	/* TODO: doesn't work yet */
 //  if(m_irq_mask[3] && state & 1)

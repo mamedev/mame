@@ -81,7 +81,7 @@ void wd7600_device::device_add_mconfig(machine_config & config)
 
 wd7600_device::wd7600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WD7600, tag, owner, clock),
-	m_read_ior(*this),
+	m_read_ior(*this, 0),
 	m_write_iow(*this),
 	m_write_tc(*this),
 	m_write_hold(*this),
@@ -120,17 +120,6 @@ void wd7600_device::device_start()
 	// make sure the ram device is already running
 	if (!m_ram->started())
 		throw device_missing_dependencies();
-
-	// resolve callbacks
-	m_read_ior.resolve_safe(0);
-	m_write_iow.resolve_safe();
-	m_write_tc.resolve_safe();
-	m_write_hold.resolve_safe();
-	m_write_nmi.resolve_safe();
-	m_write_intr.resolve_safe();
-	m_write_cpureset.resolve_safe();
-	m_write_a20m.resolve_safe();
-	m_write_spkr.resolve_safe();
 
 	m_space = &m_cpu->space(AS_PROGRAM);
 	m_space_io = &m_cpu->space(AS_IO);
@@ -219,7 +208,7 @@ void wd7600_device::device_reset()
 }
 
 
-WRITE_LINE_MEMBER( wd7600_device::iochck_w )
+void wd7600_device::iochck_w(int state)
 {
 	if (BIT(m_portb, 3) == 0)
 	{
@@ -275,13 +264,13 @@ uint8_t wd7600_device::pic1_slave_ack_r(offs_t offset)
 }
 
 // Timer outputs
-WRITE_LINE_MEMBER( wd7600_device::ctc_out1_w )
+void wd7600_device::ctc_out1_w(int state)
 {
 	m_refresh_toggle ^= state;
 	m_portb = (m_portb & 0xef) | (m_refresh_toggle << 4);
 }
 
-WRITE_LINE_MEMBER( wd7600_device::ctc_out2_w )
+void wd7600_device::ctc_out2_w(int state)
 {
 	m_write_spkr(!(state));
 	m_portb = (m_portb & 0xdf) | (state << 5);
@@ -387,12 +376,12 @@ void wd7600_device::dma_write_word(offs_t offset, uint8_t data)
 	m_space->write_word((page_offset() & 0xfe0000) | (offset << 1), (m_dma_high_byte << 8) | data);
 }
 
-WRITE_LINE_MEMBER( wd7600_device::dma2_dack0_w )
+void wd7600_device::dma2_dack0_w(int state)
 {
 	m_dma1->hack_w(state ? 0 : 1); // inverted?
 }
 
-WRITE_LINE_MEMBER( wd7600_device::dma1_eop_w )
+void wd7600_device::dma1_eop_w(int state)
 {
 	m_dma_eop = state;
 	if (m_dma_channel != -1)
@@ -420,12 +409,12 @@ void wd7600_device::set_dma_channel(int channel, bool state)
 	}
 }
 
-WRITE_LINE_MEMBER( wd7600_device::gatea20_w )
+void wd7600_device::gatea20_w(int state)
 {
 	keyboard_gatea20(state);
 }
 
-WRITE_LINE_MEMBER( wd7600_device::kbrst_w )
+void wd7600_device::kbrst_w(int state)
 {
 	// convert to active low signal (gets inverted in at_keybc.c)
 	state = (state == ASSERT_LINE ? 0 : 1);

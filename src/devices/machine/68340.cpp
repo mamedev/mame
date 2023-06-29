@@ -229,9 +229,9 @@ m68340_cpu_device::m68340_cpu_device(const machine_config &mconfig, const char *
 	, m_crystal(0)
 	, m_extal(0)
 	, m_pa_out_cb(*this)
-	, m_pa_in_cb(*this)
+	, m_pa_in_cb(*this, 0)
 	, m_pb_out_cb(*this)
-	, m_pb_in_cb(*this)
+	, m_pb_in_cb(*this, 0)
 {
 	m_m68340SIM = nullptr;
 	m_m68340DMA = nullptr;
@@ -247,7 +247,7 @@ void m68340_cpu_device::device_reset()
 
 // Some hardwares pulls this low when resetting peripherals, most just ties this line to GND or VCC
 // TODO: Support Limp mode and external clock with no PLL
-WRITE_LINE_MEMBER( m68340_cpu_device::set_modck )
+void m68340_cpu_device::set_modck(int state)
 {
 	m_modck = state;
 	m_clock_mode &= ~(m68340_sim::CLOCK_MODCK | m68340_sim::CLOCK_PLL);
@@ -256,8 +256,6 @@ WRITE_LINE_MEMBER( m68340_cpu_device::set_modck )
 
 void m68340_cpu_device::device_start()
 {
-	reset_cb().append(*this, FUNC(m68340_cpu_device::reset_peripherals));
-
 	fscpu32_device::device_start();
 
 	m_m68340SIM    = new m68340_sim();
@@ -273,11 +271,23 @@ void m68340_cpu_device::device_start()
 	m_internal = &space(AS_PROGRAM);
 }
 
-WRITE_LINE_MEMBER(m68340_cpu_device::reset_peripherals)
+
+void m68340_cpu_device::device_config_complete()
 {
-	m_m68340SIM->module_reset();
-	m_m68340DMA->module_reset();
-	m_serial->module_reset();
-	m_timer[0]->module_reset();
-	m_timer[1]->module_reset();
+	fscpu32_device::device_config_complete();
+
+	reset_cb().append(*this, FUNC(m68340_cpu_device::reset_peripherals));
+}
+
+
+void m68340_cpu_device::reset_peripherals(int state)
+{
+	if (state)
+	{
+		m_m68340SIM->module_reset();
+		m_m68340DMA->module_reset();
+		m_serial->module_reset();
+		m_timer[0]->module_reset();
+		m_timer[1]->module_reset();
+	}
 }

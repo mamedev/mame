@@ -39,7 +39,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	WRITE_LINE_MEMBER(pc_cpu_line);
+	void pc_cpu_line(int state);
 
 	// internal state
 	bool m_is_primary;

@@ -85,8 +85,8 @@ public:
 	void rex6000_palettte(palette_device &palette) const;
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_rex6000);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
-	DECLARE_WRITE_LINE_MEMBER(serial_irq);
-	DECLARE_WRITE_LINE_MEMBER(alarm_irq);
+	void serial_irq(int state);
+	void alarm_irq(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer1);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer2);
@@ -708,7 +708,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(rex6000_state::sec_timer)
 	}
 }
 
-WRITE_LINE_MEMBER( rex6000_state::alarm_irq )
+void rex6000_state::alarm_irq(int state)
 {
 	if (!(m_irq_mask & IRQ_FLAG_ALARM) && state)
 	{
@@ -717,7 +717,7 @@ WRITE_LINE_MEMBER( rex6000_state::alarm_irq )
 	}
 }
 
-WRITE_LINE_MEMBER( rex6000_state::serial_irq )
+void rex6000_state::serial_irq(int state)
 {
 	if (!(m_irq_mask & IRQ_FLAG_SERIAL))
 	{

@@ -654,7 +654,7 @@ void lethal_state::lethalen(machine_config &config)
 	constexpr XTAL SOUND_CLOCK = 18.432_MHz_XTAL;
 
 	/* basic machine hardware */
-	HD6309(config, m_maincpu, MAIN_CLOCK/2);    /* verified on pcb */
+	HD6309E(config, m_maincpu, MAIN_CLOCK/8);    /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &lethal_state::le_main);
 	m_maincpu->set_vblank_int("screen", FUNC(lethal_state::lethalen_interrupt));
 

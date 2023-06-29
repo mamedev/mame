@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "vt8231_isa.h"
 
-//#define LOG_GENERAL (1U << 0)
 #define LOG_MAPPING (1U << 1)
 #define LOG_REG     (1U << 2)
 #define LOG_SUPERIO (1U << 3)
@@ -40,11 +39,6 @@ void vt8231_isa_device::device_add_mconfig(machine_config &config)
 void vt8231_isa_device::device_start()
 {
 	pci_device::device_start();
-
-	// resolve callbacks
-	m_com1_txd_cb.resolve_safe();
-	m_com1_dtr_cb.resolve_safe();
-	m_com1_rts_cb.resolve_safe();
 
 	// register for save states (TODO)
 }

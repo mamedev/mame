@@ -41,8 +41,8 @@ private:
 	virtual void machine_start() override;
 	void keyscan_w(u8 data);
 	u8 keyboard_r();
-	DECLARE_WRITE_LINE_MEMBER(shift_data_w);
-	DECLARE_WRITE_LINE_MEMBER(shift_clock_w);
+	void shift_data_w(int state);
+	void shift_clock_w(int state);
 	void update_shift_output();
 	void rtc_w(u8 data);
 
@@ -89,12 +89,12 @@ u8 textelcomp_state::keyboard_r()
 	return m_keys[m_keyscan & 0x0f]->read();
 }
 
-WRITE_LINE_MEMBER(textelcomp_state::shift_data_w)
+void textelcomp_state::shift_data_w(int state)
 {
 	m_shift_data = state;
 }
 
-WRITE_LINE_MEMBER(textelcomp_state::shift_clock_w)
+void textelcomp_state::shift_clock_w(int state)
 {
 	if (state && !m_shift_clock)
 	{

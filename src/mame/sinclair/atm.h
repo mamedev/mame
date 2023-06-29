@@ -9,7 +9,6 @@
 #include "beta_m.h"
 #include "bus/ata/ataintf.h"
 #include "bus/centronics/ctronics.h"
-#include "sound/ay8910.h"
 
 class atm_state : public spectrum_128_state
 {

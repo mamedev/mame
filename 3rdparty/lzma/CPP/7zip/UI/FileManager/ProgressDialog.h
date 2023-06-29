@@ -137,7 +137,7 @@ public:
   {
     _title = title;
     INT_PTR res = CModalDialog::Create(IDD_PROGRESS, wndParent);
-    thread.Wait();
+    thread.Wait_Close();
     return res;
   }
 

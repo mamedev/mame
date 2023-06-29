@@ -149,7 +149,7 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#define LOG_POST (1 << 0)
+#define LOG_POST (1U << 1)
 
 #define VERBOSE (LOG_POST)
 #include "logmacro.h"
@@ -1701,7 +1701,7 @@ ROM_START( aa500d )
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
 	ROMX_LOAD( "cmos_arthur.bin",  0x0000, 0x0100, CRC(4fc66ddc) SHA1(f0eae9a535505d82ba3488ddb7895434df940d73), ROM_BIOS(0) )
 
-	//DISK_REGION( "hdc:0:harddisk:image" )
+	//DISK_REGION( "hdc:0:harddisk" )
 	//DISK_IMAGE( "a500_domesday", 0, SHA1(094ff299d6564d7b04bed4562f52aaa4cfd503b3) )
 ROM_END
 
@@ -1953,7 +1953,7 @@ ROM_START( aa5000 )
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
 	ROM_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(96ed59b2) SHA1(9dab30b4c3305e1142819687889fca334b532679) )
 
-	DISK_REGION( "upc:ide:0:hdd:image" )
+	DISK_REGION( "upc:ide:0:hdd" )
 	DISK_IMAGE( "riscos311_apps", 0, SHA1(d69e2fb15d82f83d32786a29dd3321a37a9dbb36) )
 ROM_END
 
@@ -1972,7 +1972,7 @@ ROM_START( aa4 )
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
 	ROM_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(96ed59b2) SHA1(9dab30b4c3305e1142819687889fca334b532679) )
 
-	DISK_REGION( "upc:ide:0:hdd:image" )
+	DISK_REGION( "upc:ide:0:hdd" )
 	DISK_IMAGE( "riscos311_apps", 0, SHA1(d69e2fb15d82f83d32786a29dd3321a37a9dbb36) )
 ROM_END
 
@@ -1995,7 +1995,7 @@ ROM_START( aa3020 )
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
 	ROM_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(96ed59b2) SHA1(9dab30b4c3305e1142819687889fca334b532679) )
 
-	DISK_REGION( "upc:ide:0:hdd:image" )
+	DISK_REGION( "upc:ide:0:hdd" )
 	DISK_IMAGE( "riscos311_apps", 0, SHA1(d69e2fb15d82f83d32786a29dd3321a37a9dbb36) )
 ROM_END
 

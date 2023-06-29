@@ -45,12 +45,13 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 	set_process_flags(PROCESS_LR_ALWAYS | PROCESS_CUSTOM_NAV);
 	for (device_image_interface& image : image_interface_enumerator(mui.machine().root_device()))
 	{
-		if (image.filename())
+		if (image.loaded_through_softlist())
 		{
-			m_list = strensure(image.software_list_name());
+			m_list = image.software_list_name();
 			m_short = image.software_entry()->shortname();
 			m_long = image.software_entry()->longname();
 			m_parent = image.software_entry()->parentname();
+			break;
 		}
 	}
 	std::vector<std::string> lua_list;

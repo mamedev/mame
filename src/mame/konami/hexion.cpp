@@ -95,9 +95,9 @@ Notes:
 
 
 // configurable logging
-#define LOG_UNKWRITE     (1U <<  1)
-#define LOG_BANKEDRAM    (1U <<  2)
-#define LOG_CCU          (1U <<  3)
+#define LOG_UNKWRITE     (1U << 1)
+#define LOG_BANKEDRAM    (1U << 2)
+#define LOG_CCU          (1U << 3)
 
 //#define VERBOSE (LOG_GENERAL | LOG_UNKWRITE | LOG_BANKEDRAM | LOG_CCU)
 
@@ -156,8 +156,8 @@ private:
 	void bankedram_w(offs_t offset, uint8_t data);
 	void bankctrl_w(uint8_t data);
 	void gfxrom_select_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(irq_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_ack_w);
+	void irq_ack_w(int state);
+	void nmi_ack_w(int state);
 	void ccu_int_time_w(uint8_t data);
 
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
@@ -342,12 +342,12 @@ void hexion_state::coincntr_w(uint8_t data)
 	if ((data & 0xdc) != 0x10) LOGUNKWRITE("coincntr %02x", data);
 }
 
-WRITE_LINE_MEMBER(hexion_state::irq_ack_w)
+void hexion_state::irq_ack_w(int state)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(hexion_state::nmi_ack_w)
+void hexion_state::nmi_ack_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }

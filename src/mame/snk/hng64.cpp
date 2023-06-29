@@ -677,7 +677,6 @@ LVS-DG2
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 
-#define LOG_GENERAL         (1U << 0)
 #define LOG_COMRW           (1U << 1)
 #define LOG_SNDCOM_UNKNWN   (1U << 2)
 #define LOG_DMA             (1U << 3)
@@ -699,8 +698,9 @@ LVS-DG2
 
 void hng64_state::hng_comm_map(address_map &map)
 {
-	map(0x00000, 0x7ffff).rom().region("user2", 0);
-	map(0xf0000, 0xfffff).ram();
+	map(0x00000, 0x1ffff).rom().region("comm", 0);
+	map(0x20000, 0x3ffff).bankr(m_com_bank);
+	map(0x40000, 0x47fff).mirror(0xb8000).ram();
 }
 
 void hng64_state::hng_comm_io_map(address_map &map)
@@ -720,8 +720,10 @@ void hng64_state::hng_comm_io_map(address_map &map)
 //  map(0x3c, 0x3f).noprw();              /* Reserved */
 
 	/* General IO */
+//  map(0x40, 0x47).rw("ulanc", FUNC(com20020_device::read), FUNC(com20020_device::write));
 	map(0x50, 0x57).rw(FUNC(hng64_state::hng64_com_share_r), FUNC(hng64_state::hng64_com_share_w));
-//  map(0x72, 0x72).w(hng64_state::));            /* dunno yet */
+	map(0x72, 0x72).w(FUNC(hng64_state::hng64_com_bank_w));
+//  map(0x73, 0x73).w(hng64_state::));            /* dunno yet */
 }
 
 
@@ -773,6 +775,11 @@ uint8_t hng64_state::hng64_com_share_r(offs_t offset)
 		return m_com_shared[offset] | 1; // some busy flag?
 
 	return m_com_shared[offset];
+}
+
+void hng64_state::hng64_com_bank_w(uint8_t data)
+{
+	m_com_bank->set_entry(data & 0x03);
 }
 
 
@@ -2173,6 +2180,9 @@ void hng64_state::machine_start()
 	m_3dfifo_timer = timer_alloc(FUNC(hng64_state::hng64_3dfifo_processed), this);
 	m_comhack_timer = timer_alloc(FUNC(hng64_state::comhack_callback), this);
 
+	m_com_bank->configure_entries(0, 4, memregion("comm")->base(), 0x20000);
+	m_com_bank->set_entry(0);
+
 	init_io();
 
 	save_pointer(NAME(m_com_virtual_mem), 0x100000);
@@ -2318,7 +2328,6 @@ hng64_lamps_device::hng64_lamps_device(const machine_config &mconfig, const char
 
 void hng64_lamps_device::device_start()
 {
-	m_lamps_out_cb.resolve_all_safe();
 }
 
 void hng64_state::hng64_drive_lamps7_w(uint8_t data)
@@ -2506,7 +2515,7 @@ void hng64_state::ioport4_w(uint8_t data)
 
 // there are also serial reads, TLCS870 core doesn't support them yet
 
-WRITE_LINE_MEMBER( hng64_state::sio0_w )
+void hng64_state::sio0_w(int state)
 {
 	// tlcs870 core provides better logging than anything we could put here at the moment
 }
@@ -2669,7 +2678,7 @@ void hng64_state::hng64_fight(machine_config &config)
 	ROM_SYSTEM_BIOS( 3, "korea", "Korea" ) \
 	ROM_LOAD_HNG64_BIOS( 3, "bios_korea.bin",    0x00000, 0x080000, CRC(ac953e2e) SHA1(f502188ef252b7c9d04934c4b525730a116de48b) ) \
 	/* KL5C80 BIOS (network CPU) */ \
-	ROM_REGION( 0x0100000, "user2", 0 ) \
+	ROM_REGION( 0x080000, "comm", 0 ) \
 	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) ) \
 	/* FPGA (unknown) */ \
 	ROM_REGION( 0x0100000, "fpga", 0 ) /* FPGA data  */ \
@@ -3201,8 +3210,8 @@ ROM_START( buriki )
 	ROM_LOAD( "007sd04a.80", 0x0c00000, 0x400000, CRC(dabfbbad) SHA1(7d58d5181705618e0e2d69c6fdb81b9b3d2b9e0f) )
 ROM_END
 
-/* Bios */
-GAME( 1997, hng64,    0,     hng64_default, hng64,          hng64_state, init_hng64,       ROT0, "SNK",       "Hyper NeoGeo 64 Bios", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND|MACHINE_IS_BIOS_ROOT )
+/* BIOS */
+GAME( 1997, hng64,    0,     hng64_default, hng64,          hng64_state, init_hng64,       ROT0, "SNK",       "Hyper NeoGeo 64 BIOS", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND|MACHINE_IS_BIOS_ROOT )
 
 /* Games */
 GAME( 1997, roadedge, hng64, hng64_drive,   hng64_drive,    hng64_state, init_roadedge,    ROT0, "SNK",       "Roads Edge / Round Trip RV (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 001 */

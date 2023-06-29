@@ -582,28 +582,28 @@ TODO:
 
 /***************************************************************************/
 
-WRITE_LINE_MEMBER(mappy_state::int_on_w)
+void mappy_state::int_on_w(int state)
 {
 	m_main_irq_mask = state;
 	if (!state)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(mappy_state::int_on_2_w)
+void mappy_state::int_on_2_w(int state)
 {
 	m_sub_irq_mask = state;
 	if (!state)
 		m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(mappy_state::int_on_3_w)
+void mappy_state::int_on_3_w(int state)
 {
 	m_sub2_irq_mask = state;
 	if (!state)
 		m_subcpu2->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(mappy_state::mappy_flip_w)
+void mappy_state::mappy_flip_w(int state)
 {
 	flip_screen_set(state);
 }
@@ -615,7 +615,7 @@ TIMER_CALLBACK_MEMBER(mappy_state::namcoio_run_timer)
 	m_namcoio[Chip]->customio_run();
 }
 
-WRITE_LINE_MEMBER(mappy_state::vblank_irq)
+void mappy_state::vblank_irq(int state)
 {
 	if (!state)
 		return;

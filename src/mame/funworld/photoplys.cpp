@@ -68,7 +68,7 @@ ROM_START( photoply2k1sp )
 	ROM_REGION(0x4000, "dongle", 0)
 	ROM_LOAD("sx28ac_dp_g.bin", 0x0000, 0x4000, NO_DUMP ) // 2Kbytes flash
 
-	DISK_REGION( "ide:0:hdd:image" ) // 06/06/2001
+	DISK_REGION( "ide:0:hdd" ) // 06/06/2001
 	DISK_IMAGE( "photoplay2001es", 0, BAD_DUMP SHA1(43aa4e38d57bfe4c6decddadf77d322bf30426a5) ) // May contain operator data / configuration
 ROM_END
 

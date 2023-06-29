@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Mike Coates
+// copyright-holders: Mike Coates
+
 /*
  * Signetics 2650 CPU Games
  *
@@ -15,28 +16,284 @@
  */
 
 #include "emu.h"
-#include "zac2650.h"
 
 #include "cpu/s2650/s2650.h"
+#include "machine/s2636.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "tinv2650.lh"
 
+
+namespace {
+
+class zac2650_state : public driver_device
+{
+public:
+	zac2650_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_s2636(*this, "s2636"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_videoram(*this, "videoram"),
+		m_s2636_0_ram(*this, "s2636_0_ram"),
+		m_1e80(*this, "1E80")
+	{ }
+
+	void tinvader(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<s2636_device> m_s2636;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_s2636_0_ram;
+
+	required_ioport m_1e80;
+
+	bitmap_ind16 m_bitmap;
+	bitmap_ind16 m_spritebitmap;
+	uint8_t m_collision_background = 0;
+	uint8_t m_collision_sprite = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+
+	void sound_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	uint8_t s2636_r(offs_t offset);
+	void s2636_w(offs_t offset, uint8_t data);
+	uint8_t port_0_r();
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	int sprite_collision(int first, int second);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map);
+};
+
+
+// video
+
+void zac2650_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+uint8_t zac2650_state::s2636_r(offs_t offset)
+{
+	if (offset != 0xcb) return m_s2636_0_ram[offset];
+	else return m_collision_sprite;
+}
+
+void zac2650_state::s2636_w(offs_t offset, uint8_t data)
+{
+	m_s2636_0_ram[offset] = data;
+	m_gfxdecode->gfx(1)->mark_dirty(offset / 8);
+	m_gfxdecode->gfx(2)->mark_dirty(offset / 8);
+	if (offset == 0xc7)
+	{
+		m_s2636->write_data(offset, data);
+	}
+}
+
+uint8_t zac2650_state::port_0_r()
+{
+	return m_1e80->read() - m_collision_background;
+}
+
+/*****************************************/
+/* Check for collision between 2 sprites */
+/*****************************************/
+
+int zac2650_state::sprite_collision(int first, int second)
+{
+	int checksum = 0;
+	const rectangle &visarea = m_screen->visible_area();
+
+	if ((m_s2636_0_ram[first * 0x10 + 10] < 0xf0) && (m_s2636_0_ram[second * 0x10 + 10] < 0xf0))
+	{
+		int const fx = (m_s2636_0_ram[first * 0x10 + 10] * 4 )- 22;
+		int const fy = (m_s2636_0_ram[first * 0x10 + 12] * 3) + 3;
+		int const expand = (first == 1) ? 2 : 1;
+
+		// Draw first sprite
+
+		m_gfxdecode->gfx(expand)->opaque(m_spritebitmap, m_spritebitmap.cliprect(),
+				first * 2,
+				0,
+				0, 0,
+				fx, fy);
+
+		// Get fingerprint
+
+		for (int x = fx; x < fx + m_gfxdecode->gfx(expand)->width(); x++)
+		{
+			for (int y = fy; y < fy + m_gfxdecode->gfx(expand)->height(); y++)
+			{
+				if (visarea.contains(x, y))
+					checksum += m_spritebitmap.pix(y, x);
+			}
+		}
+
+		// Blackout second sprite
+
+		m_gfxdecode->gfx(1)->transpen(m_spritebitmap, m_spritebitmap.cliprect(),
+				second * 2,
+				1,
+				0, 0,
+				(m_s2636_0_ram[second * 0x10 + 10] * 4) - 22, (m_s2636_0_ram[second * 0x10 + 12] * 3) + 3, 0);
+
+		// Remove fingerprint
+
+		for (int x = fx; x < fx + m_gfxdecode->gfx(expand)->width(); x++)
+		{
+			for (int y = fy; y < fy + m_gfxdecode->gfx(expand)->height(); y++)
+			{
+				if (visarea.contains(x, y))
+					checksum -= m_spritebitmap.pix(y, x);
+			}
+		}
+
+		// Zero bitmap
+
+		m_gfxdecode->gfx(expand)->opaque(m_spritebitmap, m_spritebitmap.cliprect(),
+				first * 2,
+				1,
+				0, 0,
+				fx, fy);
+	}
+
+	return checksum;
+}
+
+TILE_GET_INFO_MEMBER(zac2650_state::get_bg_tile_info)
+{
+	int const code = m_videoram[tile_index];
+
+	tileinfo.set(0, code, 0, 0);
+}
+
+void zac2650_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(zac2650_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 24, 24, 32, 32);
+
+	m_screen->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_spritebitmap);
+
+	m_gfxdecode->gfx(1)->set_source(m_s2636_0_ram);
+	m_gfxdecode->gfx(2)->set_source(m_s2636_0_ram);
+
+	save_item(NAME(m_bitmap));
+	save_item(NAME(m_spritebitmap));
+	save_item(NAME(m_collision_background));
+	save_item(NAME(m_collision_sprite));
+}
+
+void zac2650_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	const rectangle &visarea = m_screen->visible_area();
+
+	/* -------------------------------------------------------------- */
+	/* There seems to be a strange setup with this board, in that it  */
+	/* appears that the S2636 runs from a different clock than the    */
+	/* background generator. When the program maps sprite position to */
+	/* character position it only has 6 pixels of sprite for 8 pixels */
+	/* of character.                                                  */
+	/* -------------------------------------------------------------- */
+	/* n.b. The original has several graphic glitches as well, so it  */
+	/* does not seem to be a fault of the emulation!                  */
+	/* -------------------------------------------------------------- */
+
+	m_collision_background = 0;   // Read from 0x1e80 bit 7
+
+	// for collision detection checking
+	copybitmap(m_bitmap, bitmap, 0, 0, 0, 0, visarea);
+
+	for (int offs = 0; offs < 0x50; offs += 0x10)
+	{
+		if ((m_s2636_0_ram[offs + 10] < 0xf0) && (offs != 0x30))
+		{
+			int const spriteno = (offs / 8);
+			int const expand = ((m_s2636_0_ram[0xc0] & (spriteno * 2)) != 0) ? 2 : 1;
+			int const bx = (m_s2636_0_ram[offs + 10] * 4) - 22;
+			int const by = (m_s2636_0_ram[offs + 12] * 3) + 3;
+
+			// Sprite->Background collision detection
+			m_gfxdecode->gfx(expand)->transpen(bitmap, cliprect,
+					spriteno,
+					1,
+					0, 0,
+					bx, by, 0);
+
+			for (int x = bx; x < bx + m_gfxdecode->gfx(expand)->width(); x++)
+			{
+				for (int y = by; y < by + m_gfxdecode->gfx(expand)->height(); y++)
+				{
+					if (visarea.contains(x, y))
+						if (bitmap.pix(y, x) != m_bitmap.pix(y, x))
+						{
+							m_collision_background = 0x80;
+							break;
+						}
+				}
+			}
+
+			m_gfxdecode->gfx(expand)->transpen(bitmap, cliprect,
+					spriteno,
+					0,
+					0, 0,
+					bx, by, 0);
+		}
+	}
+
+	// Sprite->Sprite collision detection
+	m_collision_sprite = 0;
+//  if(sprite_collision(0, 1)) m_collision_sprite |= 0x20;   // Not used
+	if(sprite_collision(0, 2)) m_collision_sprite |= 0x10;
+	if(sprite_collision(0, 4)) m_collision_sprite |= 0x08;
+	if(sprite_collision(1, 2)) m_collision_sprite |= 0x04;
+	if(sprite_collision(1, 4)) m_collision_sprite |= 0x02;
+//  if(sprite_collision(2, 4)) m_collision_sprite |= 0x01;   // Not used
+}
+
+uint32_t zac2650_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect);
+	return 0;
+}
+
+
+// machine
 
 /***********************************************************************************************/
 
 void zac2650_state::main_map(address_map &map)
 {
 	map(0x0000, 0x17ff).rom();
-	map(0x1800, 0x1bff).ram().w(FUNC(zac2650_state::tinvader_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(zac2650_state::videoram_w)).share(m_videoram);
 	map(0x1c00, 0x1cff).ram();
 	map(0x1d00, 0x1dff).ram();
-	map(0x1e80, 0x1e80).r(FUNC(zac2650_state::tinvader_port_0_r)).w(FUNC(zac2650_state::tinvader_sound_w));
+	map(0x1e80, 0x1e80).r(FUNC(zac2650_state::port_0_r)).w(FUNC(zac2650_state::sound_w));
 	map(0x1e81, 0x1e81).portr("1E81");
 	map(0x1e82, 0x1e82).portr("1E82");
-	map(0x1e85, 0x1e85).portr("1E85");                   /* Dodgem Only */
-	map(0x1e86, 0x1e86).portr("1E86").nopw();       /* Dodgem Only */
-	map(0x1f00, 0x1fff).rw(FUNC(zac2650_state::zac_s2636_r), FUNC(zac2650_state::zac_s2636_w)).share("s2636_0_ram");
+	map(0x1e85, 0x1e85).portr("1E85"); // Dodgem only
+	map(0x1e86, 0x1e86).portr("1E86").nopw(); // Dodgem only
+	map(0x1f00, 0x1fff).rw(FUNC(zac2650_state::s2636_r), FUNC(zac2650_state::s2636_w)).share(m_s2636_0_ram);
 }
 
 static INPUT_PORTS_START( tinvader )
@@ -48,13 +305,13 @@ static INPUT_PORTS_START( tinvader )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Missile-Background Collision */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Missile-background collision
 
 	PORT_START("1E81")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPNAME( 0x02, 0x00, "Lightning Speed" )   /* Velocita Laser Inv */
+	PORT_DIPNAME( 0x02, 0x00, "Lightning Speed" )   // Velocita Laser Inv
 	PORT_DIPSETTING(    0x00, "Slow" )
 	PORT_DIPSETTING(    0x02, "Fast" )
 	PORT_DIPNAME( 0x1C, 0x04, DEF_STR( Coinage ) )
@@ -90,7 +347,7 @@ static INPUT_PORTS_START( tinvader )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-/* Almost identical, no number of bases selection */
+// Almost identical, no number of bases selection
 static INPUT_PORTS_START( sinvader )
 	PORT_INCLUDE( tinvader )
 
@@ -110,7 +367,7 @@ static INPUT_PORTS_START( dodgem )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Missile-Background Collision */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Missile-background collision
 
 	PORT_START("1E81")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )
@@ -180,7 +437,7 @@ static INPUT_PORTS_START( dodgem )
 INPUT_PORTS_END
 
 
-void zac2650_state::zac2650_palette(palette_device &palette) const
+void zac2650_state::palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t::white());
@@ -201,18 +458,6 @@ void zac2650_state::zac2650_palette(palette_device &palette) const
 ************************************************************************************************/
 
 
-static const gfx_layout tinvader_character =
-{
-	8,8,
-	128,
-	1,
-	{ 0 },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
-
 static const gfx_layout s2636_character =
 {
 	8,10,
@@ -225,48 +470,48 @@ static const gfx_layout s2636_character =
 };
 
 static GFXDECODE_START( gfx_tinvader )
-	GFXDECODE_SCALE( "gfx1", 0, tinvader_character,   0, 2, 3, 3 )
-	GFXDECODE_SCALE( nullptr,   0x1f00, s2636_character, 0, 2, 4, 3 )  // dynamic
-	GFXDECODE_SCALE( nullptr,   0x1f00, s2636_character, 0, 2, 8, 6 )  // dynamic
+	GFXDECODE_SCALE( "gfx1", 0, gfx_8x8x1, 0, 2, 3, 3 )
+	GFXDECODE_SCALE( nullptr, 0x1f00, s2636_character, 0, 2, 4, 3 )  // dynamic
+	GFXDECODE_SCALE( nullptr, 0x1f00, s2636_character, 0, 2, 8, 6 )  // dynamic
 GFXDECODE_END
 
 void zac2650_state::tinvader(machine_config &config)
 {
-	/* basic machine hardware */
-	s2650_device &maincpu(S2650(config, m_maincpu, 3800000/4));
+	// basic machine hardware
+	s2650_device &maincpu(S2650(config, m_maincpu, 3'800'000 / 4));
 	maincpu.set_addrmap(AS_PROGRAM, &zac2650_state::main_map);
 	maincpu.sense_handler().set(m_screen, FUNC(screen_device::vblank)).invert();
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(55);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1041));
 	m_screen->set_size(30*24, 32*24);
 	m_screen->set_visarea(0, 719, 0, 767);
-	m_screen->set_screen_update(FUNC(zac2650_state::screen_update_tinvader));
+	m_screen->set_screen_update(FUNC(zac2650_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tinvader);
-	PALETTE(config, m_palette, FUNC(zac2650_state::zac2650_palette), 4);
+	PALETTE(config, m_palette, FUNC(zac2650_state::palette), 4);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	S2636(config, m_s2636, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-void zac2650_state::tinvader_sound_w(uint8_t data)
+void zac2650_state::sound_w(uint8_t data)
 {
-	/* sounds are NOT the same as space invaders */
+	// sounds are NOT the same as space invaders
 
-	logerror("Register %x = Data %d\n",data & 0xfe,data & 0x01);
+	logerror("Register %x = Data %d\n", data & 0xfe, data & 0x01);
 
-	/* 08 = hit invader */
-	/* 20 = bonus (extra base) */
-	/* 40 = saucer */
-	/* 84 = fire */
-	/* 90 = die */
-	/* c4 = hit saucer */
+	// 08 = hit invader
+	// 20 = bonus (extra base)
+	// 40 = saucer
+	// 84 = fire
+	// 90 = die
+	// c4 = hit saucer
 }
 
 ROM_START( sia2650 )
@@ -287,6 +532,9 @@ ROM_START( tinv2650 )
 
 	ROM_REGION( 0x400, "gfx1", 0 )
 	ROM_LOAD( "06_inv.bin", 0x0000, 0x0400, CRC(7bfed23e) SHA1(f754f0a4d6c8f9812bf333c30fa433b63d49a750) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // SYNC
+	ROM_LOAD( "82s130.ic31", 0x0000, 0x0200, CRC(c9f62cb3) SHA1(d972602e632cca5ebd2074b2e8d493ab6d1628eb) ) // N82S130 BPROM
 ROM_END
 
 ROM_START( dodgem )
@@ -301,12 +549,13 @@ ROM_START( dodgem )
 	ROM_REGION( 0x400, "gfx1", 0 )
 	ROM_LOAD( "93451.bin",    0x0000, 0x0400, CRC(004b26d2) SHA1(0b825510e7a8afa9db589f87ec93467ab8c73f93) )
 
-	/* unknown */
-	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_REGION( 0x0200, "proms", 0 ) // SYNC
 	ROM_LOAD( "74s571",       0x0000, 0x0200, CRC(cc0b407e) SHA1(e675e3d7ff82e1cff9001e367620208bffa8b42f) )
 ROM_END
 
+} // anonymous namespace
 
-GAMEL( 1979?, tinv2650, 0,        tinvader, tinvader, zac2650_state, empty_init, ROT270, "Zaccaria / Zelco", "The Invaders", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_tinv2650 )
+
+GAMEL( 1979?, tinv2650, 0,        tinvader, tinvader, zac2650_state, empty_init, ROT270, "Zaccaria / Zelco", "The Invaders",                                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_tinv2650 )
 GAME(  1979?, sia2650,  tinv2650, tinvader, sinvader, zac2650_state, empty_init, ROT270, "bootleg (Sidam)",  "Super Invader Attack (bootleg of The Invaders)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 1980?
-GAME(  1979,  dodgem,   0,        tinvader, dodgem,   zac2650_state, empty_init, ROT0,   "Zaccaria",         "Dodgem", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1979,  dodgem,   0,        tinvader, dodgem,   zac2650_state, empty_init, ROT0,   "Zaccaria",         "Dodgem",                                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

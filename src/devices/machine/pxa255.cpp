@@ -15,17 +15,17 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define LOG_UNKNOWN     (1 << 1)
-#define LOG_I2S         (1 << 2)
-#define LOG_DMA         (1 << 3)
-#define LOG_OSTIMER     (1 << 4)
-#define LOG_INTC        (1 << 5)
-#define LOG_GPIO        (1 << 6)
-#define LOG_LCD_DMA     (1 << 7)
-#define LOG_LCD         (1 << 8)
-#define LOG_POWER       (1 << 9)
-#define LOG_RTC         (1 << 10)
-#define LOG_CLOCKS      (1 << 11)
+#define LOG_UNKNOWN     (1U << 1)
+#define LOG_I2S         (1U << 2)
+#define LOG_DMA         (1U << 3)
+#define LOG_OSTIMER     (1U << 4)
+#define LOG_INTC        (1U << 5)
+#define LOG_GPIO        (1U << 6)
+#define LOG_LCD_DMA     (1U << 7)
+#define LOG_LCD         (1U << 8)
+#define LOG_POWER       (1U << 9)
+#define LOG_RTC         (1U << 10)
+#define LOG_CLOCKS      (1U << 11)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_I2S | LOG_DMA | LOG_OSTIMER | LOG_INTC | LOG_GPIO | LOG_LCD_DMA | LOG_LCD | LOG_POWER | LOG_RTC | LOG_CLOCKS)
 
 #define VERBOSE         (LOG_ALL)
@@ -38,9 +38,9 @@ pxa255_periphs_device::pxa255_periphs_device(const machine_config &mconfig, cons
 	, m_gpio0_w(*this)
 	, m_gpio1_w(*this)
 	, m_gpio2_w(*this)
-	, m_gpio0_r(*this)
-	, m_gpio1_r(*this)
-	, m_gpio2_r(*this)
+	, m_gpio0_r(*this, 0xffffffff)
+	, m_gpio1_r(*this, 0xffffffff)
+	, m_gpio2_r(*this, 0xffffffff)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_dmadac(*this, "dac%u", 1U)
 	, m_palette(*this, "palette")
@@ -1520,13 +1520,6 @@ void pxa255_periphs_device::device_start()
 	m_lcd_palette = make_unique_clear<uint32_t[]>(0x100);
 	m_lcd_framebuffer = make_unique_clear<uint8_t[]>(0x100000);
 	m_samples = make_unique_clear<int16_t[]>(0x1000);
-
-	m_gpio0_w.resolve_safe();
-	m_gpio1_w.resolve_safe();
-	m_gpio2_w.resolve_safe();
-	m_gpio0_r.resolve_safe(0xffffffff);
-	m_gpio1_r.resolve_safe(0xffffffff);
-	m_gpio2_r.resolve_safe(0xffffffff);
 
 	m_rtc_regs.timer = timer_alloc(FUNC(pxa255_periphs_device::rtc_tick), this);
 }

@@ -44,7 +44,7 @@ public:
 	auto l3_data_out() { return m_l3_data_out.bind(); }
 	auto i2s_out() { return m_i2s_out.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(l3wd_in);
+	void l3wd_in(int state);
 
 	void map(address_map &map);
 

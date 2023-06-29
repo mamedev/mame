@@ -112,10 +112,10 @@ void z80ctc_device::write(offs_t offset, uint8_t data)
 //  trigger
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80ctc_device::trg0 ) { m_channel[0]->trigger(state != 0); }
-WRITE_LINE_MEMBER( z80ctc_device::trg1 ) { m_channel[1]->trigger(state != 0); }
-WRITE_LINE_MEMBER( z80ctc_device::trg2 ) { m_channel[2]->trigger(state != 0); }
-WRITE_LINE_MEMBER( z80ctc_device::trg3 ) { m_channel[3]->trigger(state != 0); }
+void z80ctc_device::trg0(int state) { m_channel[0]->trigger(state != 0); }
+void z80ctc_device::trg1(int state) { m_channel[1]->trigger(state != 0); }
+void z80ctc_device::trg2(int state) { m_channel[2]->trigger(state != 0); }
+void z80ctc_device::trg3(int state) { m_channel[3]->trigger(state != 0); }
 
 
 //-------------------------------------------------
@@ -132,20 +132,6 @@ void z80ctc_device::device_add_mconfig(machine_config &config)
 		// assign channel index
 		m_channel[ch]->m_index = ch;
 	}
-}
-
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void z80ctc_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_intr_cb.resolve_safe();
-	m_zc_cb.resolve_all_safe();
 }
 
 

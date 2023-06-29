@@ -7,7 +7,6 @@
 
 #include "debugger.h"
 
-//#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
 #define LOG_SETUP   (1U << 1) // Shows register setup
 #define LOG_SHIFT   (1U << 2) // Shows shift register contents
 #define LOG_COMP    (1U << 3) // Shows operations on the CPU side
@@ -154,7 +153,7 @@ wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_typ
 	enp_cb(*this),
 	sso_cb(*this),
 	ready_cb(*this), // actually output by the drive, not by the FDC
-	enmf_cb(*this),
+	enmf_cb(*this, 0),
 	mon_cb(*this)
 {
 	force_ready = false;
@@ -176,16 +175,7 @@ void wd_fdc_device_base::set_disable_motor_control(bool _disable_motor_control)
 
 void wd_fdc_device_base::device_start()
 {
-	intrq_cb.resolve();
-	drq_cb.resolve();
-	hld_cb.resolve();
-	enp_cb.resolve();
-	sso_cb.resolve();
-	ready_cb.resolve();
-	enmf_cb.resolve();
-	mon_cb.resolve_safe();
-
-	if (!has_enmf && !enmf_cb.isnull())
+	if (!has_enmf && !enmf_cb.isunset())
 		logerror("Warning, this chip doesn't have an ENMF line.\n");
 
 	t_gen = timer_alloc(FUNC(wd_fdc_device_base::generic_tick), this);
@@ -237,7 +227,7 @@ void wd_fdc_device_base::soft_reset()
 	}
 }
 
-WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
+void wd_fdc_device_base::mr_w(int state)
 {
 	if(mr && !state) {
 		command = 0x03;
@@ -253,19 +243,16 @@ WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
 		mr = false;
 
 		// gnd == enmf enabled, otherwise disabled (default)
-		if (!enmf_cb.isnull() && has_enmf)
+		if (!enmf_cb.isunset() && has_enmf)
 			enmf = enmf_cb() ? false : true;
 
 		intrq = false;
-		if (!intrq_cb.isnull())
-			intrq_cb(intrq);
+		intrq_cb(intrq);
 		drq = false;
-		if (!drq_cb.isnull())
-			drq_cb(drq);
+		drq_cb(drq);
 		if(head_control) {
 			hld = false;
-			if(!hld_cb.isnull())
-				hld_cb(hld);
+			hld_cb(hld);
 		}
 
 		mon_cb(1); // Clear the MON* line
@@ -315,7 +302,7 @@ void wd_fdc_device_base::set_floppy(floppy_image_device *_floppy)
 		ready_callback(floppy, next_ready);
 }
 
-WRITE_LINE_MEMBER(wd_fdc_device_base::dden_w)
+void wd_fdc_device_base::dden_w(int state)
 {
 	if(disable_mfm) {
 		logerror("Error, this chip does not have a dden line\n");
@@ -371,8 +358,7 @@ void wd_fdc_device_base::command_end()
 			status &= ~S_BUSY;
 		}
 		intrq = true;
-		if(!intrq_cb.isnull())
-			intrq_cb(intrq);
+		intrq_cb(intrq);
 	}
 }
 
@@ -933,9 +919,9 @@ void wd_fdc_device_base::write_track_continue()
 			if(format_last_byte_count) {
 				char buf[32];
 				if(format_last_byte_count > 1)
-					sprintf(buf, "%dx%02x", format_last_byte_count, format_last_byte);
+					snprintf(buf, 32, "%dx%02x", format_last_byte_count, format_last_byte);
 				else
-					sprintf(buf, "%02x", format_last_byte);
+					snprintf(buf, 32, "%02x", format_last_byte);
 				format_description_string += buf;
 			}
 			LOGDESC("track description %s\n", format_description_string.c_str());
@@ -1101,8 +1087,7 @@ void wd_fdc_device_base::interrupt_start()
 
 	if(!intrq && (command & I_IMM)) {
 		intrq = true;
-		if(!intrq_cb.isnull())
-			intrq_cb(intrq);
+		intrq_cb(intrq);
 	}
 
 	if(spinup_on_interrupt) { // see notes in FD1771 and WD1772 constructors, might be true for other FDC types as well.
@@ -1286,8 +1271,7 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 	// No other logic present in real chips, descriptions of "Forced interrupt" (Dx) command in datasheets are wrong.
 	if (intrq) {
 		intrq = false;
-		if(!intrq_cb.isnull())
-			intrq_cb(intrq);
+		intrq_cb(intrq);
 	}
 
 	// No more than one write in flight, but interrupts take priority
@@ -1314,8 +1298,7 @@ uint8_t wd_fdc_device_base::status_r()
 {
 	if(intrq && !(intrq_cond & I_IMM) && !machine().side_effects_disabled()) {
 		intrq = false;
-		if(!intrq_cb.isnull())
-			intrq_cb(intrq);
+		intrq_cb(intrq);
 	}
 
 	if(status_type_1) {
@@ -1489,8 +1472,7 @@ void wd_fdc_device_base::spinup()
 
 void wd_fdc_device_base::ready_callback(floppy_image_device *floppy, int state)
 {
-	if(!ready_cb.isnull())
-		ready_cb(state);
+	ready_cb(state);
 
 	// why is this even possible?
 	if (!floppy)
@@ -1502,8 +1484,7 @@ void wd_fdc_device_base::ready_callback(floppy_image_device *floppy, int state)
 
 	if(!intrq && (((intrq_cond & I_RDY) && !state) || ((intrq_cond & I_NRDY) && state))) {
 		intrq = true;
-		if(!intrq_cb.isnull())
-			intrq_cb(intrq);
+		intrq_cb(intrq);
 	}
 }
 
@@ -1534,8 +1515,7 @@ void wd_fdc_device_base::index_callback(floppy_image_device *floppy, int state)
 
 		if(!intrq && (intrq_cond & I_IDX)) {
 			intrq = true;
-			if(!intrq_cb.isnull())
-				intrq_cb(intrq);
+			intrq_cb(intrq);
 		}
 		break;
 
@@ -1597,27 +1577,27 @@ void wd_fdc_device_base::index_callback(floppy_image_device *floppy, int state)
 	general_continue();
 }
 
-READ_LINE_MEMBER(wd_fdc_device_base::intrq_r)
+int wd_fdc_device_base::intrq_r()
 {
 	return intrq;
 }
 
-READ_LINE_MEMBER(wd_fdc_device_base::drq_r)
+int wd_fdc_device_base::drq_r()
 {
 	return drq;
 }
 
-READ_LINE_MEMBER(wd_fdc_device_base::hld_r)
+int wd_fdc_device_base::hld_r()
 {
 	return hld;
 }
 
-WRITE_LINE_MEMBER(wd_fdc_device_base::hlt_w)
+void wd_fdc_device_base::hlt_w(int state)
 {
 	hlt = bool(state);
 }
 
-READ_LINE_MEMBER(wd_fdc_device_base::enp_r)
+int wd_fdc_device_base::enp_r()
 {
 	return enp;
 }
@@ -1637,7 +1617,7 @@ void wd_fdc_device_base::live_start(int state)
 	cur_live.data_bit_context = false;
 	cur_live.byte_counter = 0;
 
-	if (!enmf_cb.isnull() && has_enmf)
+	if (!enmf_cb.isunset() && has_enmf)
 		enmf = enmf_cb() ? false : true;
 
 	pll_reset(dden, enmf, cur_live.tm);
@@ -2047,7 +2027,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 				//FM Prefix match
 				if(cur_live.shift_reg_low<17>() == 0xabd5) { // 17-bit match
 					cur_live.data_separator_phase = false;
-					cur_live.bit_counter = 5*2;	// prefix is 5 of 8 bits
+					cur_live.bit_counter = 5*2; // prefix is 5 of 8 bits
 					cur_live.data_reg = 0xff;
 					break;
 				} else if(cur_live.bit_counter == 16) {
@@ -2105,9 +2085,9 @@ void wd_fdc_device_base::live_run(attotime limit)
 				if(format_last_byte_count) {
 					char buf[32];
 					if(format_last_byte_count > 1)
-						sprintf(buf, "%dx%02x ", format_last_byte_count, format_last_byte);
+						snprintf(buf, 32, "%dx%02x ", format_last_byte_count, format_last_byte);
 					else
-						sprintf(buf, "%02x ", format_last_byte);
+						snprintf(buf, 32, "%02x ", format_last_byte);
 					format_description_string += buf;
 				}
 				format_last_byte = data;
@@ -2380,8 +2360,7 @@ void wd_fdc_device_base::set_drq()
 		status |= S_LOST;
 	} else if(!(status & S_LOST)) {
 		drq = true;
-		if(!drq_cb.isnull())
-			drq_cb(true);
+		drq_cb(true);
 	}
 }
 
@@ -2389,13 +2368,11 @@ void wd_fdc_device_base::drop_drq()
 {
 	if(drq) {
 		drq = false;
-		if(!drq_cb.isnull())
-			drq_cb(false);
+		drq_cb(false);
 		if(main_state == IDLE && (status & S_BUSY)) {
 			status &= ~S_BUSY;
 			intrq = true;
-			if(!intrq_cb.isnull())
-				intrq_cb(intrq);
+			intrq_cb(intrq);
 		}
 	}
 }
@@ -2406,8 +2383,7 @@ void wd_fdc_device_base::set_hld()
 		hld = true;
 		int temp = sub_state;
 		sub_state = DUMMY;
-		if(!hld_cb.isnull())
-			hld_cb(hld);
+		hld_cb(hld);
 		sub_state = temp;
 	}
 }
@@ -2418,8 +2394,7 @@ void wd_fdc_device_base::drop_hld()
 		hld = false;
 		int temp = sub_state;
 		sub_state = DUMMY;
-		if(!hld_cb.isnull())
-			hld_cb(hld);
+		hld_cb(hld);
 		sub_state = temp;
 	}
 }
@@ -2436,7 +2411,7 @@ void wd_fdc_device_base::update_sso()
 	// If a SSO callback is defined then it is assumed that this callback
 	// will update the floppy side if that is the connection. There are
 	// some machines that use the SSO output for other purposes.
-	if(!sso_cb.isnull()) {
+	if(!sso_cb.isunset()) {
 		sso_cb(side);
 		return;
 	}

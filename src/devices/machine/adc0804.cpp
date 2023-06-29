@@ -59,7 +59,7 @@ ALLOW_SAVE_TYPE(adc0804_device::read_mode);
 
 adc0804_device::adc0804_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_vin_callback(*this)
+	, m_vin_callback(*this, 0)
 	, m_intr_callback(*this)
 	, m_res(0.0)
 	, m_cap(0.0)
@@ -97,9 +97,6 @@ adc0803_device::adc0803_device(const machine_config &mconfig, const char *tag, d
 
 void adc0804_device::device_resolve_objects()
 {
-	m_vin_callback.resolve_safe(0);
-	m_intr_callback.resolve_safe();
-
 	if (m_rd_mode == RD_GROUNDED)
 		m_rd_active = true;
 }
@@ -244,7 +241,7 @@ u8 adc0804_device::read_and_write()
 //  rd_w - enable data bus by line write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(adc0804_device::rd_w)
+void adc0804_device::rd_w(int state)
 {
 	assert(m_rd_mode == RD_BITBANGED);
 
@@ -263,7 +260,7 @@ WRITE_LINE_MEMBER(adc0804_device::rd_w)
 //  wr_w - begin conversion by line write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(adc0804_device::wr_w)
+void adc0804_device::wr_w(int state)
 {
 	// WR input is active low
 	if (!state && !m_wr_active)

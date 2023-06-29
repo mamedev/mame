@@ -134,7 +134,7 @@ DEFINE_DEVICE_TYPE(HP_5061_3001, hp_5061_3001_cpu_device, "5061_3001", "Hewlett-
 DEFINE_DEVICE_TYPE(HP_5061_3011, hp_5061_3011_cpu_device, "5061_3011", "Hewlett-Packard HP-5061-3011")
 DEFINE_DEVICE_TYPE(HP_09825_67907, hp_09825_67907_cpu_device, "09825_67907", "Hewlett-Packard HP-09825-67907")
 
-WRITE_LINE_MEMBER(hp_hybrid_cpu_device::dmar_w)
+void hp_hybrid_cpu_device::dmar_w(int state)
 {
 	if (state)
 		BIT_SET(m_flags, HPHYBRID_DMAR_BIT);
@@ -142,7 +142,7 @@ WRITE_LINE_MEMBER(hp_hybrid_cpu_device::dmar_w)
 		BIT_CLR(m_flags, HPHYBRID_DMAR_BIT);
 }
 
-WRITE_LINE_MEMBER(hp_hybrid_cpu_device::halt_w)
+void hp_hybrid_cpu_device::halt_w(int state)
 {
 	if (state)
 		BIT_SET(m_flags, HPHYBRID_HALT_BIT);
@@ -150,7 +150,7 @@ WRITE_LINE_MEMBER(hp_hybrid_cpu_device::halt_w)
 		BIT_CLR(m_flags, HPHYBRID_HALT_BIT);
 }
 
-WRITE_LINE_MEMBER(hp_hybrid_cpu_device::status_w)
+void hp_hybrid_cpu_device::status_w(int state)
 {
 	if (state)
 		BIT_SET(m_flags, HPHYBRID_STS_BIT);
@@ -158,7 +158,7 @@ WRITE_LINE_MEMBER(hp_hybrid_cpu_device::status_w)
 		BIT_CLR(m_flags, HPHYBRID_STS_BIT);
 }
 
-WRITE_LINE_MEMBER(hp_hybrid_cpu_device::flag_w)
+void hp_hybrid_cpu_device::flag_w(int state)
 {
 	if (state)
 		BIT_SET(m_flags, HPHYBRID_FLG_BIT);
@@ -236,7 +236,6 @@ void hp_hybrid_cpu_device::device_start()
 
 	set_icountptr(m_icount);
 
-	m_pa_changed_func.resolve_safe();
 	m_opcode_func.resolve();
 	m_stm_func.resolve();
 	m_int_func.resolve();

@@ -108,7 +108,7 @@ uint32_t snowbros_state::screen_update_snowbros(screen_device &screen, bitmap_in
 }
 
 
-WRITE_LINE_MEMBER(snowbros_state::screen_vblank_snowbros)
+void snowbros_state::screen_vblank_snowbros(int state)
 {
 	// rising edge
 	if (state)

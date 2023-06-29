@@ -620,7 +620,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(1999, lindbios,  0,        lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Sega Lindbergh Bios",                      MACHINE_IS_BIOS_ROOT)
+GAME(1999, lindbios,  0,        lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Sega Lindbergh BIOS",                      MACHINE_IS_BIOS_ROOT)
 GAME(2005, hotd4,     lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "The House of the Dead 4 (Export) (Rev B)", MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
 GAME(2005, hotd4a,    hotd4,    lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "The House of the Dead 4 (Export) (Rev A)", MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
 GAME(2005, vf5,       lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Virtua Fighter 5 (Export)",                MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
@@ -638,4 +638,4 @@ GAME(2008, hotdex,    lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0,
 GAME(2008, primevah,  lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Primeval Hunt",                            MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
 GAME(2008, rambo,     lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Rambo (Export)",                           MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
 GAME(2009, hummerxt,  lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Hummer Extreme",                           MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(200?, lbvbiosu,  lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "VBios updater",                            MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(200?, lbvbiosu,  lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "VBIOS updater",                            MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)

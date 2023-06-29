@@ -126,124 +126,6 @@ TODO: find self-test; verify RAM address map
 
 ***************************************************************************/
 
-class lw30_beep_device : public device_t, public device_sound_interface
-{
-public:
-	lw30_beep_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	// device-level overrides
-	void device_start() override ATTR_COLD;
-
-	// sound stream update overrides
-	void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
-
-public:
-	DECLARE_WRITE_LINE_MEMBER(set_state);   // enable/disable sound output
-	void set_clock(uint32_t frequency);       // output frequency
-
-private:
-	sound_stream *m_stream;   /* stream number */
-	uint8_t m_state;          /* enable beep */
-	int m_frequency;          /* set frequency - this can be changed using the appropriate function */
-	int m_incr;               /* initial wave state */
-	int8_t m_signal;         /* current signal */
-};
-
-DEFINE_DEVICE_TYPE(BROTHER_BEEP, lw30_beep_device, "lw30_beep", "Brother LW-30 Beeper")
-
-static constexpr auto BROTHER_BEEP_RATE = 48000;
-
-lw30_beep_device::lw30_beep_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BROTHER_BEEP, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
-	, m_stream(nullptr)
-	, m_state(0xff)
-	, m_frequency(clock)
-{
-}
-
-void lw30_beep_device::device_start()
-{
-	m_stream = stream_alloc(0, 1, BROTHER_BEEP_RATE);
-	m_state = 0xff;
-	m_signal = 0x01;
-
-	// register for savestates
-	save_item(NAME(m_state));
-	save_item(NAME(m_frequency));
-	save_item(NAME(m_incr));
-	save_item(NAME(m_signal));
-}
-
-void lw30_beep_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
-{
-	auto &buffer = outputs[0];
-	auto signal = m_signal;
-	int clock = 0, rate = BROTHER_BEEP_RATE / 2;
-
-	/* get progress through wave */
-	int incr = m_incr;
-
-	if(m_frequency > 0)
-		clock = m_frequency;
-
-	/* if we're not enabled, just fill with 0 */
-	if(m_state == 0xff || clock == 0)
-	{
-		buffer.fill(0);
-		return;
-	}
-
-	/* fill in the sample */
-	for(int sampindex = 0; sampindex < buffer.samples(); sampindex++)
-	{
-		if(BIT(m_state, 7) != 0)
-			buffer.put(sampindex, signal > 0 ? 1.f : -1.f);
-		else
-			buffer.put(sampindex, 0.f);
-
-		incr -= clock;
-		while(incr < 0)
-		{
-			incr += rate;
-			signal = -signal;
-		}
-	}
-
-	/* store progress through wave */
-	m_incr = incr;
-	m_signal = signal;
-}
-
-WRITE_LINE_MEMBER(lw30_beep_device::set_state)
-{
-	// only update if new state is not the same as old state
-	if(m_state == state)
-		return;
-
-	m_stream->update();
-
-	if(m_state == 0) {
-		// restart wave from beginning
-		m_incr = 0;
-		m_signal = 0x01;
-	}
-	m_state = state;
-}
-
-void lw30_beep_device::set_clock(uint32_t frequency)
-{
-	if(m_frequency == frequency)
-		return;
-
-	m_stream->update();
-	m_frequency = frequency;
-	m_signal = 0x01;
-	m_incr = 0;
-}
-
-
 namespace {
 
 class lw30_state : public driver_device
@@ -276,7 +158,7 @@ private:
 	required_device<screen_device> screen;
 
 	required_device<floppy_connector> floppy;
-	required_device<lw30_beep_device> beeper;
+	required_device<beep_device> beeper;
 	required_ioport_array<9> m_io_kbrow;
 	required_region_ptr<uint8_t> rom, font_normal, font_bold;
 
@@ -529,7 +411,7 @@ private:
 
 	void beeper_w(uint8_t data) // F0
 	{
-		beeper->set_state(data);
+		beeper->set_state(~data & 0x01);
 	}
 
 	void irqack_w(uint8_t) // F8
@@ -906,7 +788,7 @@ void lw30_state::lw30(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	BROTHER_BEEP(config, beeper, 4'000).add_route(ALL_OUTPUTS, "mono", 1.0); // 4.0 kHz
+	BEEP(config, beeper, 4'000).add_route(ALL_OUTPUTS, "mono", 1.0); // 4.0 kHz
 
 	// timers
 	TIMER(config, "timer_1khz").configure_periodic(FUNC(lw30_state::int1_timer_callback), attotime::from_hz(1000));
@@ -920,13 +802,13 @@ void lw30_state::lw30(machine_config &config)
 
 ROM_START( lw30 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD("ua5362-a", 0x00000, 0x40000, CRC(DAC77867) SHA1(5c7ab30dec55a24eb1b7f241e5015e3836ebf077))
+	ROM_LOAD("ua5362-a", 0x00000, 0x40000, CRC(dac77867) SHA1(5c7ab30dec55a24eb1b7f241e5015e3836ebf077))
 	ROM_REGION(0x80000, "dictionary", 0)
-	ROM_LOAD("ua2849-a", 0x00000, 0x80000, CRC(FA8712EB) SHA1(2d3454138c79e75604b30229c05ed8fb8e7d15fe))
+	ROM_LOAD("ua2849-a", 0x00000, 0x80000, CRC(fa8712eb) SHA1(2d3454138c79e75604b30229c05ed8fb8e7d15fe))
 	ROM_REGION(0x800, "font_normal", 0)
-	ROM_LOAD("font-normal", 0x00000, 0x800, CRC(56A8B45D) SHA1(3f2860667ee56944cf5a79bfd4e80bebf532b51a))
+	ROM_LOAD("font-normal", 0x00000, 0x800, CRC(56a8b45d) SHA1(3f2860667ee56944cf5a79bfd4e80bebf532b51a))
 	ROM_REGION(0x800, "font_bold", 0)
-	ROM_LOAD("font-bold", 0x00000, 0x800, CRC(D81B79C4) SHA1(fa6be6f9dd0d7ae6d001802778272ecce8f425bc))
+	ROM_LOAD("font-bold", 0x00000, 0x800, CRC(d81b79c4) SHA1(fa6be6f9dd0d7ae6d001802778272ecce8f425bc))
 ROM_END
 
 } // anonymous namespace

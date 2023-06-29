@@ -186,7 +186,7 @@ void chesster_state::chesster(machine_config &config)
 	R65C02(config, m_maincpu, 5_MHz_XTAL); // RP65C02G
 	m_maincpu->set_addrmap(AS_PROGRAM, &chesster_state::main_map);
 
-	auto &irq_clock(CLOCK(config, "irq_clock", 9500)); // from 555 timer, measured (9.6kHz on a Chesster, 9.3kHz on a Kishon)
+	auto &irq_clock(CLOCK(config, "irq_clock", 9600)); // from 555 timer, measured (9.6kHz on a Chesster, 9.3kHz on a Kishon)
 	irq_clock.set_pulse_width(attotime::from_nsec(2600)); // active for 2.6us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 

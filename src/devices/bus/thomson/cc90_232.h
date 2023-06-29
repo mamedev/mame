@@ -27,10 +27,10 @@ private:
 	// write data register
 	void porta_out(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(write_rxd);
-	DECLARE_WRITE_LINE_MEMBER(write_cts);
-	DECLARE_WRITE_LINE_MEMBER(write_dsr);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_rxd(int state);
+	void write_cts(int state);
+	void write_dsr(int state);
+	void write_centronics_busy(int state);
 
 	required_device<pia6821_device> m_pia_io;
 	required_device<rs232_port_device> m_rs232;

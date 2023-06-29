@@ -756,7 +756,7 @@ void mips3_device::static_generate_exception(uint8_t exception, int recover, con
 		UML_MOV(block, CPR032(COP0_BadVAddr), I0);                              // mov     [BadVAddr],i0
 	}
 
-	if (exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE)
+	if (exception == EXCEPTION_TLBMOD || exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE)
 	{
 		/* set the upper bits of EntryHi and the lower bits of Context to the fault page */
 		UML_ROLINS(block, CPR032(COP0_EntryHi), I0, 0, 0xffffe000); // rolins  [EntryHi],i0,0,0xffffe000
@@ -2610,7 +2610,7 @@ bool mips3_device::generate_set_cop0_reg(drcuml_block &block, compiler_state &co
 	{
 		case COP0_Cause:
 			UML_ROLINS(block, CPR032(COP0_Cause), I0, 0, ~0xfc00);              // rolins  [Cause],i0,0,~0xfc00
-			compiler.checksoftints = true;
+			compiler.checkints = true;
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, true);
 			return true;

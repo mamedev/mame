@@ -11,20 +11,14 @@ elan_eu3a05gpio_device::elan_eu3a05gpio_device(const machine_config &mconfig, co
 	m_write_0_callback(*this),
 	m_write_1_callback(*this),
 	m_write_2_callback(*this),
-	m_read_0_callback(*this),
-	m_read_1_callback(*this),
-	m_read_2_callback(*this)
+	m_read_0_callback(*this, 0xff),
+	m_read_1_callback(*this, 0xff),
+	m_read_2_callback(*this, 0xff)
 {
 }
 
 void elan_eu3a05gpio_device::device_start()
 {
-	m_write_0_callback.resolve_safe();
-	m_write_1_callback.resolve_safe();
-	m_write_2_callback.resolve_safe();
-	m_read_0_callback.resolve_safe(0xff);
-	m_read_1_callback.resolve_safe(0xff);
-	m_read_2_callback.resolve_safe(0xff);
 }
 
 void elan_eu3a05gpio_device::device_reset()

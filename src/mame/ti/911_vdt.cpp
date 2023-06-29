@@ -164,9 +164,6 @@ void vdt911_device::device_start()
 	m_display_enable = false;
 	m_blink_state = false;
 
-	m_keyint_line.resolve();
-	m_lineint_line.resolve();
-
 	/* set up cursor blink clock.  2Hz frequency -> .25s half-period. */
 	/*m_blink_clock =*/
 

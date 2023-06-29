@@ -44,17 +44,17 @@ public:
 
 	void crureadz(offs_t offset, uint8_t *value) override;
 	void cruwrite(offs_t offset, uint8_t data) override;
-	DECLARE_WRITE_LINE_MEMBER(clock_in) override;
+	void clock_in(int state) override;
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_hld_w );
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
+	void fdc_hld_w(int state);
 	uint8_t tms9901_input(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER( select_dsk );
-	DECLARE_WRITE_LINE_MEMBER( side_select );
-	DECLARE_WRITE_LINE_MEMBER( motor_w );
-	DECLARE_WRITE_LINE_MEMBER( select_card );
-	DECLARE_WRITE_LINE_MEMBER( select_bank );
+	void select_dsk(int state);
+	void side_select(int state);
+	void motor_w(int state);
+	void select_card(int state);
+	void select_bank(int state);
 
 protected:
 	corcomp_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -141,10 +141,10 @@ private:
 class ccfdc_dec_pal_device : public device_t
 {
 public:
-	DECLARE_READ_LINE_MEMBER(addresswdc);
-	DECLARE_READ_LINE_MEMBER(address4);
-	DECLARE_READ_LINE_MEMBER(addressram);
-	virtual DECLARE_READ_LINE_MEMBER(address9901);
+	int addresswdc();
+	int address4();
+	int addressram();
+	virtual int address9901();
 
 protected:
 	ccfdc_dec_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -161,10 +161,10 @@ protected:
 class ccfdc_sel_pal_device : public device_t
 {
 public:
-	DECLARE_READ_LINE_MEMBER(selectram);
-	virtual DECLARE_READ_LINE_MEMBER(selectwdc);
-	virtual DECLARE_READ_LINE_MEMBER(selectdsr);
-	virtual DECLARE_READ_LINE_MEMBER(ready_out) =0;
+	int selectram();
+	virtual int selectwdc();
+	virtual int selectdsr();
+	virtual int ready_out() =0;
 
 protected:
 	ccfdc_sel_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -193,7 +193,7 @@ class ccdcc_palu1_device : public ccfdc_sel_pal_device
 {
 public:
 	ccdcc_palu1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_READ_LINE_MEMBER(ready_out) override;
+	int ready_out() override;
 
 private:
 	void device_config_complete() override;
@@ -222,7 +222,7 @@ class ccfdc_palu12_device : public ccfdc_dec_pal_device
 {
 public:
 	ccfdc_palu12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_READ_LINE_MEMBER(address9901) override;
+	int address9901() override;
 };
 
 // =========== Specific selector PAL circuit of the CCFDC ================
@@ -231,10 +231,10 @@ class ccfdc_palu6_device : public ccfdc_sel_pal_device
 {
 public:
 	ccfdc_palu6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_READ_LINE_MEMBER(selectwdc) override;
-	DECLARE_READ_LINE_MEMBER(selectdsr) override;
+	int selectwdc() override;
+	int selectdsr() override;
 
-	DECLARE_READ_LINE_MEMBER(ready_out) override;
+	int ready_out() override;
 
 private:
 	void device_config_complete() override;

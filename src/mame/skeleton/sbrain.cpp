@@ -107,13 +107,13 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(kbd_scan);
 
-	DECLARE_WRITE_LINE_MEMBER(crtc_lrc_w);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vblank_w);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_w);
+	void crtc_lrc_w(int state);
+	void crtc_vblank_w(int state);
+	void crtc_vsync_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(external_txc_w);
-	DECLARE_WRITE_LINE_MEMBER(external_rxc_w);
-	DECLARE_WRITE_LINE_MEMBER(internal_txc_rxc_w);
+	void external_txc_w(int state);
+	void external_rxc_w(int state);
+	void internal_txc_rxc_w(int state);
 
 	void main_io_map(address_map &map);
 	void main_mem_map(address_map &map);
@@ -356,19 +356,19 @@ void sbrain_state::ppi_pc_w(u8 data)
 	m_busak = BIT(data, 5);
 }
 
-WRITE_LINE_MEMBER(sbrain_state::external_txc_w)
+void sbrain_state::external_txc_w(int state)
 {
 	if (!BIT(m_serial_sw->read(), 0))
 		m_usart[1]->write_txc(state);
 }
 
-WRITE_LINE_MEMBER(sbrain_state::external_rxc_w)
+void sbrain_state::external_rxc_w(int state)
 {
 	if (!BIT(m_serial_sw->read(), 2))
 		m_usart[1]->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(sbrain_state::internal_txc_rxc_w)
+void sbrain_state::internal_txc_rxc_w(int state)
 {
 	if (!BIT(m_serial_sw->read(), 1))
 		m_usart[1]->write_txc(state);
@@ -564,20 +564,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(sbrain_state::kbd_scan)
 	m_key_data = 0xff;
 }
 
-WRITE_LINE_MEMBER(sbrain_state::crtc_lrc_w)
+void sbrain_state::crtc_lrc_w(int state)
 {
 	// TODO: actually triggered by BUSACK and taken after DMA burst finishes
 	if (state && !m_crtc->lbre_r() && !m_crtc->vblank_r())
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(sbrain_state::crtc_vblank_w)
+void sbrain_state::crtc_vblank_w(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(sbrain_state::crtc_vsync_w)
+void sbrain_state::crtc_vsync_w(int state)
 {
 	// TODO: internal to the CRT8002
 	if (!state)

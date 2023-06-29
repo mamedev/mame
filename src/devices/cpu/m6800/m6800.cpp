@@ -535,13 +535,16 @@ void m6800_cpu_device::device_start()
 	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(m_copcodes);
 	space(AS_PROGRAM).specific(m_program);
 
+	m_ppc.d = 0;
 	m_pc.d = 0;
 	m_s.d = 0;
 	m_x.d = 0;
 	m_d.d = 0;
 	m_cc = 0;
 	m_wai_state = 0;
-	m_irq_state[0] = m_irq_state[1] = m_irq_state[2] = 0;
+	m_nmi_state = 0;
+	m_nmi_pending = 0;
+	std::fill(std::begin(m_irq_state), std::end(m_irq_state), 0);
 
 	save_item(NAME(m_ppc.w.l));
 	save_item(NAME(m_pc.w.l));

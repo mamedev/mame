@@ -130,12 +130,12 @@ DEFINE_DEVICE_TYPE(SCC66470, scc66470_device, "scc66470", "Philips SCC66470")
 //  scc66470_device - constructor
 //-------------------------------------------------
 
-scc66470_device::scc66470_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: device_t(mconfig, SCC66470, tag, owner, clock),
-		device_memory_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		m_irqcallback(*this),
-		m_space_config("videoram", ENDIANNESS_BIG, 16, 21, 0, address_map_constructor(FUNC(scc66470_device::scc66470_vram), this))
+scc66470_device::scc66470_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, SCC66470, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
+	device_video_interface(mconfig, *this),
+	m_irqcallback(*this),
+	m_space_config("videoram", ENDIANNESS_BIG, 16, 21, 0, address_map_constructor(FUNC(scc66470_device::scc66470_vram), this))
 {
 }
 
@@ -145,8 +145,6 @@ scc66470_device::scc66470_device(const machine_config &mconfig, const char *tag,
 
 void scc66470_device::device_start()
 {
-	m_irqcallback.resolve_safe();
-
 	m_ica_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scc66470_device::process_ica), this));
 
 	m_dca_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scc66470_device::process_dca), this));
@@ -341,11 +339,7 @@ uint8_t scc66470_device::csr_r(offs_t offset)
 	if(!machine().side_effects_disabled())
 	{
 		m_csr_r &= ~(CSR_R_IT1 | CSR_R_IT2);
-
-		if(!m_irqcallback.isnull())
-		{
-			m_irqcallback(CLEAR_LINE);
-		}
+		m_irqcallback(CLEAR_LINE);
 	}
 
 	int scanline = screen().vpos();
@@ -680,10 +674,7 @@ TIMER_CALLBACK_MEMBER(scc66470_device::process_ica)
 
 					if(!BIT(CSR_REG, CSR_DI1))
 					{
-						if(!m_irqcallback.isnull())
-						{
-							m_irqcallback(ASSERT_LINE);
-						}
+						m_irqcallback(ASSERT_LINE);
 					}
 
 					break;
@@ -786,10 +777,7 @@ TIMER_CALLBACK_MEMBER(scc66470_device::process_dca)
 
 					if(!BIT(CSR_REG, CSR_DI1))
 					{
-						if(!m_irqcallback.isnull())
-						{
-							m_irqcallback(ASSERT_LINE);
-						}
+						m_irqcallback(ASSERT_LINE);
 					}
 
 					break;

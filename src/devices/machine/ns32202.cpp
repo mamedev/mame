@@ -15,7 +15,6 @@
 #include "emu.h"
 #include "ns32202.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_STATE   (1U << 1)
 #define LOG_REGW    (1U << 2)
 #define LOG_REGR    (1U << 3)
@@ -74,10 +73,6 @@ ns32202_device::ns32202_device(machine_config const &mconfig, char const *tag, d
 
 void ns32202_device::device_start()
 {
-	m_out_int.resolve_safe();
-	m_out_cout.resolve_safe();
-	m_out_port.resolve_safe();
-
 	save_item(NAME(m_hvct));
 	save_item(NAME(m_eltg));
 	save_item(NAME(m_tpl));

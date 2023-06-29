@@ -100,7 +100,7 @@ uv201_device::uv201_device(const machine_config &mconfig, const char *tag, devic
 	device_video_interface(mconfig, *this),
 	m_write_ext_int(*this),
 	m_write_hblank(*this),
-	m_read_db(*this)
+	m_read_db(*this, 0)
 {
 }
 
@@ -111,11 +111,6 @@ uv201_device::uv201_device(const machine_config &mconfig, const char *tag, devic
 
 void uv201_device::device_start()
 {
-	// resolve callbacks
-	m_write_ext_int.resolve_safe();
-	m_write_hblank.resolve_safe();
-	m_read_db.resolve_safe(0);
-
 	// allocate timers
 	m_timer_y_odd = timer_alloc(FUNC(uv201_device::y_update_tick), this);
 	m_timer_y_even = timer_alloc(FUNC(uv201_device::y_update_tick), this);
@@ -450,7 +445,7 @@ void uv201_device::write(offs_t offset, uint8_t data)
 //  ext_int_w - external interrupt write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( uv201_device::ext_int_w )
+void uv201_device::ext_int_w(int state)
 {
 	if (!state && (m_cmd & COMMAND_FRZ))
 	{
@@ -464,7 +459,7 @@ WRITE_LINE_MEMBER( uv201_device::ext_int_w )
 //  kbd_r - keyboard select read
 //-------------------------------------------------
 
-READ_LINE_MEMBER( uv201_device::kbd_r )
+int uv201_device::kbd_r()
 {
 	return (m_cmd & COMMAND_KBD) ? 1 : 0;
 }

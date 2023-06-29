@@ -147,7 +147,7 @@ public:
 		return m_ram[offset];
 	}
 
-	DECLARE_READ_LINE_MEMBER(busy_r) { return 0; } // _BUSY pin - not emulated
+	int busy_r() { return 0; } // _BUSY pin - not emulated
 
 protected:
 	dual_port_mailbox_ram_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
@@ -158,20 +158,7 @@ protected:
 	{
 	}
 
-	// device-level overrides
-
-	//-------------------------------------------------
-	//  device_resolve_objects - resolve objects that
-	//  may be needed for other devices to set
-	//  initial conditions at start time
-	//-------------------------------------------------
-
-	virtual void device_resolve_objects() override
-	{
-		// resolve callbacks
-		m_intl_callback.resolve_safe();
-		m_intr_callback.resolve_safe();
-	}
+	// device_t implementation
 
 	//-------------------------------------------------
 	//  device_start - device-specific startup
@@ -179,7 +166,7 @@ protected:
 
 	virtual void device_start() override
 	{
-		m_ram = make_unique_clear<Type[]>(RAM_SIZE);
+		m_ram = make_unique_clear<Type []>(RAM_SIZE);
 
 		// state save
 		save_pointer(NAME(m_ram), RAM_SIZE);

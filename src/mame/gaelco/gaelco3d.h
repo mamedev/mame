@@ -57,8 +57,8 @@ public:
 	void gaelco3d2(machine_config &config);
 	void gaelco3d(machine_config &config);
 
-	template <int N> DECLARE_READ_LINE_MEMBER(analog_bit_r);
-	template <int N> DECLARE_READ_LINE_MEMBER(fp_analog_bit_r);
+	template <int N> int analog_bit_r();
+	template <int N> int fp_analog_bit_r();
 
 private:
 	virtual void machine_start() override;
@@ -145,23 +145,23 @@ private:
 	void irq_ack_w(uint16_t data);
 	uint16_t sound_status_r(offs_t offset, uint16_t mem_mask = ~0);
 	void sound_status_w(uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(analog_port_clock_w);
-	DECLARE_WRITE_LINE_MEMBER(analog_port_latch_w);
+	void analog_port_clock_w(int state);
+	void analog_port_latch_w(int state);
 	uint32_t tms_m68k_ram_r(offs_t offset);
 	void tms_m68k_ram_w(offs_t offset, uint32_t data);
 	void tms_iack_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(tms_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(tms_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(tms_control3_w);
+	void tms_reset_w(int state);
+	void tms_irq_w(int state);
+	void tms_control3_w(int state);
 	void adsp_control_w(offs_t offset, uint16_t data);
 	void adsp_rombank_w(offs_t offset, uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(radikalb_lamp_w);
-	DECLARE_WRITE_LINE_MEMBER(unknown_137_w);
-	DECLARE_WRITE_LINE_MEMBER(unknown_13a_w);
+	void radikalb_lamp_w(int state);
+	void unknown_137_w(int state);
+	void unknown_13a_w(int state);
 	void gaelco3d_render_w(uint32_t data);
 	void gaelco3d_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gaelco3d_paletteram_020_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(ser_irq);
+	void ser_irq(int state);
 	uint16_t eeprom_data_r(offs_t offset, uint16_t mem_mask = ~0);
 
 	DECLARE_MACHINE_RESET(gaelco3d2);
@@ -171,7 +171,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(adsp_autobuffer_irq);
 	void gaelco3d_render(screen_device &screen);
 	void adsp_tx_callback(offs_t offset, uint32_t data);
-	DECLARE_WRITE_LINE_MEMBER(fp_analog_clock_w);
+	void fp_analog_clock_w(int state);
 
 	void adsp_data_map(address_map &map);
 	void adsp_program_map(address_map &map);

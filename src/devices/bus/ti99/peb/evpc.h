@@ -62,9 +62,9 @@ protected:
 	virtual bool nvram_write(util::write_stream &file) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( ready_line );
+	void ready_line(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( video_interrupt_in );
+	void video_interrupt_in(int state);
 
 	int     m_address;
 	int     m_dsr_page;

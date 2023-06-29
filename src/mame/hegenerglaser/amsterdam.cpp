@@ -8,7 +8,7 @@ The base hardware components are the same as Glasgow, but the 32-bit versions
 have more RAM and a faster CPU.
 
 TODO:
-- waitstates, same as mephisto_glasgow.cpp
+- waitstates, same as glasgow.cpp
 
 *******************************************************************************/
 

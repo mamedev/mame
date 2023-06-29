@@ -161,14 +161,13 @@ TODO: - Distinguish door switches using manual
 #include "m3winstr.lh"
 #include "m3xchngg.lh"
 
-
 #ifdef MAME_DEBUG
-#define MPU3VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define MPU3VERBOSE 0
+#define VERBOSE (0)
 #endif
 
-#define LOG(x)  do { if (MPU3VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 namespace {
@@ -203,26 +202,26 @@ protected:
 	required_device<cpu_device> m_maincpu;
 
 private:
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
+	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
 	void mpu3ptm_w(offs_t offset, uint8_t data);
 	uint8_t mpu3ptm_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(ic2_o1_callback);
-	DECLARE_WRITE_LINE_MEMBER(ic2_o2_callback);
-	DECLARE_WRITE_LINE_MEMBER(ic2_o3_callback);
+	void ic2_o1_callback(int state);
+	void ic2_o2_callback(int state);
+	void ic2_o3_callback(int state);
 	uint8_t pia_ic3_porta_r();
 	void pia_ic3_portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic3_ca2_w);
+	void pia_ic3_ca2_w(int state);
 	uint8_t pia_ic4_porta_r();
 	void pia_ic4_porta_w(uint8_t data);
 	void pia_ic4_portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic4_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic4_cb2_w);
+	void pia_ic4_ca2_w(int state);
+	void pia_ic4_cb2_w(int state);
 	void pia_ic5_porta_w(uint8_t data);
 	uint8_t pia_ic5_portb_r();
 	void pia_ic5_portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic5_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic5_cb2_w);
+	void pia_ic5_ca2_w(int state);
+	void pia_ic5_cb2_w(int state);
 	uint8_t pia_ic6_porta_r();
 	uint8_t pia_ic6_portb_r();
 	void pia_ic6_porta_w(uint8_t data);
@@ -330,17 +329,17 @@ void mpu3_state::machine_reset()
 
 
 /* IC2 6840 PTM handler probably clocked from elsewhere*/
-WRITE_LINE_MEMBER(mpu3_state::ic2_o1_callback)
+void mpu3_state::ic2_o1_callback(int state)
 {
 }
 
 //FIXME FROM HERE
-WRITE_LINE_MEMBER(mpu3_state::ic2_o2_callback)
+void mpu3_state::ic2_o2_callback(int state)
 {
 }
 
 
-WRITE_LINE_MEMBER(mpu3_state::ic2_o3_callback)
+void mpu3_state::ic2_o3_callback(int state)
 {
 }
 
@@ -424,7 +423,7 @@ uint8_t mpu3_state::pia_ic3_porta_r()
 {
 	static const char *const portnames[] = { "ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "DIL1", "DIL1", "DIL2", "DIL2" };
 	int data=0,swizzle;
-	LOG(("%s: IC3 PIA Read of Port A (MUX input data)\n", machine().describe_context()));
+	LOG("%s: IC3 PIA Read of Port A (MUX input data)\n", machine().describe_context());
 	//popmessage("%x",m_input_strobe);
 	switch (m_input_strobe)
 	{
@@ -465,14 +464,14 @@ uint8_t mpu3_state::pia_ic3_porta_r()
 
 void mpu3_state::pia_ic3_portb_w(uint8_t data)
 {
-	LOG(("%s: IC3 PIA Port B Set to %2x (Triac)\n", machine().describe_context(),data));
+	LOG("%s: IC3 PIA Port B Set to %2x (Triac)\n", machine().describe_context(),data);
 	m_triac_ic3 =data;
 }
 
 
-WRITE_LINE_MEMBER(mpu3_state::pia_ic3_ca2_w)
+void mpu3_state::pia_ic3_ca2_w(int state)
 {
-	LOG(("%s: IC3 PIA Port CA2 Set to %2x (input A)\n", machine().describe_context(),state));
+	LOG("%s: IC3 PIA Port CA2 Set to %2x (input A)\n", machine().describe_context(),state);
 	m_IC11GA = state;
 	ic21_setup();
 	ic11_update();
@@ -494,7 +493,7 @@ uint8_t mpu3_state::pia_ic4_porta_r()
 /*  IC4, 7 seg leds */
 void mpu3_state::pia_ic4_porta_w(uint8_t data)
 {
-	LOG(("%s: IC4 PIA Port A Set to %2x (DISPLAY PORT)\n", machine().describe_context(),data));
+	LOG("%s: IC4 PIA Port A Set to %2x (DISPLAY PORT)\n", machine().describe_context(),data);
 	m_ic4_input_a=data;
 	switch (m_disp_func)
 	{
@@ -527,7 +526,7 @@ void mpu3_state::pia_ic4_porta_w(uint8_t data)
 
 void mpu3_state::pia_ic4_portb_w(uint8_t data)
 {
-	LOG(("%s: IC4 PIA Port B Set to %2x (Lamp)\n", machine().describe_context(),data));
+	LOG("%s: IC4 PIA Port B Set to %2x (Lamp)\n", machine().describe_context(),data);
 	if (m_ic11_active)
 	{
 		if (m_lamp_strobe != m_input_strobe)
@@ -544,23 +543,23 @@ void mpu3_state::pia_ic4_portb_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(mpu3_state::pia_ic4_ca2_w)
+void mpu3_state::pia_ic4_ca2_w(int state)
 {
-	LOG(("%s: IC4 PIA Port CA2 Set to %2x (Input B)\n", machine().describe_context(),state));
+	LOG("%s: IC4 PIA Port CA2 Set to %2x (Input B)\n", machine().describe_context(),state);
 	m_IC11GB = state;
 	ic11_update();
 }
 
-WRITE_LINE_MEMBER(mpu3_state::pia_ic4_cb2_w)
+void mpu3_state::pia_ic4_cb2_w(int state)
 {
-	LOG(("%s: IC4 PIA Port CA2 Set to %2x (Triac)\n", machine().describe_context(),state));
+	LOG("%s: IC4 PIA Port CA2 Set to %2x (Triac)\n", machine().describe_context(),state);
 	m_triac_ic4=state;
 }
 
 /* IC5, AUX ports, coin lockouts and AY sound chip select (MODs below 4 only) */
 void mpu3_state::pia_ic5_porta_w(uint8_t data)
 {
-	LOG(("%s: IC5 PIA Port A Set to %2x (Reel)\n", machine().describe_context(),data));
+	LOG("%s: IC5 PIA Port A Set to %2x (Reel)\n", machine().describe_context(),data);
 	m_reels[0]->update( data     & 0x03);
 	m_reels[1]->update((data>>2) & 0x03);
 	m_reels[2]->update((data>>4) & 0x03);
@@ -590,16 +589,16 @@ void mpu3_state::pia_ic5_portb_w(uint8_t data)
 	m_ic3_data = data;
 }
 
-WRITE_LINE_MEMBER(mpu3_state::pia_ic5_ca2_w)
+void mpu3_state::pia_ic5_ca2_w(int state)
 {
-	LOG(("%s: IC5 PIA Port CA2 Set to %2x (C)\n", machine().describe_context(),state));
+	LOG("%s: IC5 PIA Port CA2 Set to %2x (C)\n", machine().describe_context(),state);
 	m_IC11GC = state;
 	ic11_update();
 }
 
-WRITE_LINE_MEMBER(mpu3_state::pia_ic5_cb2_w)
+void mpu3_state::pia_ic5_cb2_w(int state)
 {
-	LOG(("%s: IC5 PIA Port CB2 Set to %2x (Triac)\n", machine().describe_context(),state));
+	LOG("%s: IC5 PIA Port CB2 Set to %2x (Triac)\n", machine().describe_context(),state);
 	m_triac_ic5 = state;
 }
 
@@ -618,7 +617,7 @@ uint8_t mpu3_state::pia_ic6_portb_r()
 
 void mpu3_state::pia_ic6_porta_w(uint8_t data)
 {
-	LOG(("%s: IC6 PIA Port A Set to %2x (Alpha)\n", machine().describe_context(),data));
+	LOG("%s: IC6 PIA Port A Set to %2x (Alpha)\n", machine().describe_context(),data);
 	m_vfd->por((data & 0x08));
 	m_vfd->data((data & 0x20) >> 5);
 	m_vfd->sclk((data & 0x10) >>4);
@@ -626,7 +625,7 @@ void mpu3_state::pia_ic6_porta_w(uint8_t data)
 
 void mpu3_state::pia_ic6_portb_w(uint8_t data)
 {
-	LOG(("%s: IC6 PIA Port B Set to %2x (AUX2)\n", machine().describe_context(),data));
+	LOG("%s: IC6 PIA Port B Set to %2x (AUX2)\n", machine().describe_context(),data);
 	m_aux2_input = data;
 }
 

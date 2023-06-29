@@ -5,8 +5,8 @@
 
 DEFINE_DEVICE_TYPE(XAVIX_MTRK_WHEEL, xavix_mtrk_wheel_device, "xavix_mtrk_wheel", "XaviX / Radica Monster Truck Steering Wheel")
 
-xavix_mtrk_wheel_device::xavix_mtrk_wheel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, XAVIX_MTRK_WHEEL, tag, owner, clock),
+xavix_mtrk_wheel_device::xavix_mtrk_wheel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, XAVIX_MTRK_WHEEL, tag, owner, clock),
 	m_event_out_cb(*this),
 	m_in(*this, "WHEEL")
 {
@@ -74,7 +74,6 @@ ioport_constructor xavix_mtrk_wheel_device::device_input_ports() const
 
 void xavix_mtrk_wheel_device::device_start()
 {
-	m_event_out_cb.resolve_safe();
 	m_event_timer = timer_alloc(FUNC(xavix_mtrk_wheel_device::event_timer), this);
 }
 

@@ -9497,6 +9497,7 @@ license:CC0-1.0
 		<description>1830 - Railroads &amp; Robber Barons</description>
 		<year>1995</year>
 		<publisher>Avalon Hill</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Simtex" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -9654,19 +9655,22 @@ license:CC0-1.0
 		<description>Aces Over Europe (French)</description>
 		<year>1993</year>
 		<publisher>Dynamix</publisher>
+		<notes><![CDATA[
+The disks have had their OEM IDs modified by Windows
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Aces Over Europe (France) (Disk 1).img" size="1474560" crc="4659ac93" sha1="f1296c37734f6a2cc5d6bcfa55a810535413795a"/>
+				<rom name="Aces Over Europe (France) (Disk 1).img" size="1474560" crc="4659ac93" sha1="f1296c37734f6a2cc5d6bcfa55a810535413795a" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Aces Over Europe (France) (Disk 2).img" size="1474560" crc="cffa9daa" sha1="8a0aa92aed613de44b157d38b2b0fec94d0ffca3"/>
+				<rom name="Aces Over Europe (France) (Disk 2).img" size="1474560" crc="cffa9daa" sha1="8a0aa92aed613de44b157d38b2b0fec94d0ffca3" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Aces Over Europe (France) (Disk 3).img" size="1474560" crc="945f95f5" sha1="ee1ecf7bbb8577f81a6bd1bfd4206c8b50bf2de9"/>
+				<rom name="Aces Over Europe (France) (Disk 3).img" size="1474560" crc="945f95f5" sha1="ee1ecf7bbb8577f81a6bd1bfd4206c8b50bf2de9" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10253,7 +10257,10 @@ license:CC0-1.0
 		<description>Alone in the Dark 2 - Secret Doors (USA)</description>
 		<year>1994</year>
 		<publisher>I·Motion</publisher>
-		<notes>This bonus cheat disk "Secret Doors" was included with later floppy releases of Alone in the Dark 2. This disk contains 6 packages of 6 saved games.</notes>
+		<notes><![CDATA[
+This bonus cheat disk "Secret Doors" was included with later floppy releases of Alone in the Dark 2.
+This disk contains 6 packages of 6 saved games.
+]]></notes>
 		<info name="developer" value="Infogrames" />
 		<info name="usage" value="Requires 'Alone in the Dark 2 (USA)' previously installed" />
 		<part name="flop1" interface="floppy_3_5">
@@ -10502,6 +10509,18 @@ license:CC0-1.0
 		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="B.A.T. II [Ubi Soft] [1992] [3.5HD] [Disk 7 of 7].img" size="1474560" crc="f03aba54" sha1="9d027dfcec389d8a9412ee21facc684e4be1e0a8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basketpo">
+		<description>Basket Playoff (re-release)</description>
+		<year>1997</year>
+		<publisher>Simulmondo</publisher>
+		<info name="copy_protection" value="Manual required" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Basket Playoff [1997] [Simulmondo] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="d9ff0157" sha1="46487910992b32a355b26c23721dbeff7e3acd73"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10877,6 +10896,29 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="pawsfury">
+		<description>Brutal: Paws of Fury</description>
+		<year>1995</year>
+		<publisher>GameTek</publisher>
+		<info name="developer" value="Eurocom Developments / GameTek" />
+		<info name="language" value="English/French/German" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Brutal - Paws of Fury [GameTek] [1995] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="ea97fa6e" sha1="faa5de473bbdee62d4c229ad657fe25a256463f5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Brutal - Paws of Fury [GameTek] [1995] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="3a8ace6b" sha1="b02e50af890d8b3c9f66a386451f08e4c1d41f68"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Brutal - Paws of Fury [GameTek] [1995] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="5777c63d" sha1="d66868bd4fd99ad2b1599b570865c940e1653e31"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bundliga">
 		<description>Bundesliga Manager Professional</description>
 		<year>1991</year>
@@ -11082,6 +11124,26 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Classics Arcade [Impressions] [1995] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="0c94a2a1" sha1="dc63331d32b4cd5a6927e1b9e84babb9a5a691f8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="laurabw">
+		<description>The Colonel's Bequest (Futura release)</description>
+		<year>1996</year>
+		<publisher>Futura Publishing</publisher>
+		<info name="copy_protection" value="Misty Acres Plantation map with fingerprints required" />
+		<info name="developer" value="Sierra On-Line" />
+		<info name="region" value="Italy" />
+		<info name="version" value="1.000.046" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Colonel's Bequest [Futura Games] [1996] [Disk 1 of 2].img" size="1474560" crc="4f241b04" sha1="92e55b52c2ac2b45dd050f1876812de25bec9823"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Colonel's Bequest [Futura Games] [1996] [Disk 2 of 2].img" size="1474560" crc="45c8dd13" sha1="1ca7a770066c1afa6a102c526f7587ceecf6f03d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11338,7 +11400,7 @@ license:CC0-1.0
 		<info name="developer" value="Destiny Software Productions" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="creepers [Psynosis] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="47fee7f4" sha1="82562eebd8457e61f63862bfa64f552ade3866d0" />
+				<rom name="creepers [Psygnosis] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="47fee7f4" sha1="82562eebd8457e61f63862bfa64f552ade3866d0" />
 			</dataarea>
 		</part>
 	</software>
@@ -11653,6 +11715,88 @@ license:CC0-1.0
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="Descent (shareware v1.1) [Interplay] [1995] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="e4479266" sha1="2ff4ff7565c56c43fb4fdc5f3e76e3f89c14b0c5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="discwrld">
+		<description>Discworld</description>
+		<year>1995</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="Perfect 10 Productions / Teeny Weeny Games" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Discworld [Psygnosis] [1995] [3.5HD] [Disk 01 of 15].img" size="1474560" crc="b46e380c" sha1="091b862d08311e36cbc7698f4ccadad28a26b0ed"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Discworld [Psygnosis] [1995] [3.5HD] [Disk 02 of 15].img" size="1474560" crc="047ce631" sha1="a7eeff577fefeac3ab0005a858e6f4cf5ed5717c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Discworld [Psygnosis] [1995] [3.5HD] [Disk 03 of 15].img" size="1474560" crc="a33c9af8" sha1="7483009179a9446f9deb516962da10574910d455"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Discworld [Psygnosis] [1995] [3.5HD] [Disk 04 of 15].img" size="1474560" crc="f4482731" sha1="3fe8e8319ef112e9b5f35bdf02c3d93c90e3d868"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Discworld [Psygnosis] [1995] [3.5HD] [Disk 05 of 15].img" size="1474560" crc="fdf9aeb6" sha1="997d682be8f9cb88241741728051b68716f31bc8"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Discworld [Psygnosis] [1995] [3.5HD] [Disk 06 of 15].img" size="1474560" crc="6b6f1478" sha1="e9edb5bebb4ee17934f9acf82d2ad91f542f1dcd"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Discworld [Psygnosis] [1995] [3.5HD] [Disk 07 of 15].img" size="1474560" crc="dfeceb45" sha1="3267e8280e926431d1addcc1407e0b0eda32af35"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Discworld [Psygnosis] [1995] [3.5HD] [Disk 08 of 15].img" size="1474560" crc="9d0bba27" sha1="47a64a164598b427170a594843a912b183831dfb"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Discworld [Psygnosis] [1995] [3.5HD] [Disk 09 of 15].img" size="1474560" crc="8d050707" sha1="50afc017ac08a9c4c8f69ae508eb57422c86f635"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Discworld [Psygnosis] [1995] [3.5HD] [Disk 10 of 15].img" size="1474560" crc="82dff67c" sha1="e07ac1c676478b9f96283e02adc9c7e178b732c9"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Discworld [Psygnosis] [1995] [3.5HD] [Disk 11 of 15].img" size="1474560" crc="3b96c643" sha1="315f40cb93d942adb1d706b0e920b363f9c58b5a"/>
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Discworld [Psygnosis] [1995] [3.5HD] [Disk 12 of 15].img" size="1474560" crc="a51ea52c" sha1="f702592f778c6a31622e480d982782c35d8f9ff7"/>
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Discworld [Psygnosis] [1995] [3.5HD] [Disk 13 of 15].img" size="1474560" crc="9edfabc9" sha1="8e1282ebaa3070fa43fba00e7e9ea10430113d1b"/>
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Discworld [Psygnosis] [1995] [3.5HD] [Disk 14 of 15].img" size="1474560" crc="ef4f0281" sha1="07b984a8adc91af88c00910ea6c7ae3bb559da10"/>
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Discworld [Psygnosis] [1995] [3.5HD] [Disk 15 of 15].img" size="1474560" crc="bb698e6a" sha1="8332c771b9b8846d91553a6595cc27b4b62a1a2e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12598,6 +12742,68 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="dmaster2">
+		<description>Dungeon Master II: The Legend of Skullkeep</description>
+		<year>1995</year>
+		<publisher>Interplay</publisher>
+		<info name="developer" value="FTL Games" />
+		<info name="version" value="V1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dungeon Master II [Interplay] [1995] [3.5HD] [Disk 1 of 9].img" size="1474560" crc="af2c06f0" sha1="95107577ae694c04551134ee51a9e4eabaeb56a7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dungeon Master II [Interplay] [1995] [3.5HD] [Disk 2 of 9].img" size="1474560" crc="a784f08d" sha1="b32a16fc3fd9c6b09c875e9de4b2eee4eb38ba79"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk3" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dungeon Master II [Interplay] [1995] [3.5HD] [Disk 3 of 9].img" size="1474560" crc="457e9e83" sha1="30df13b49cf50fad6038cea04caa3371969add5d"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk4" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dungeon Master II [Interplay] [1995] [3.5HD] [Disk 4 of 9].img" size="1474560" crc="c8c0c422" sha1="71c437b6fc88c519ac3f70861cbebc54c43bcfab"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk5" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dungeon Master II [Interplay] [1995] [3.5HD] [Disk 5 of 9].img" size="1474560" crc="bd24c4e9" sha1="e45656e00a2e9bed8cb9727581181c19bfc7cf33"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk6" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dungeon Master II [Interplay] [1995] [3.5HD] [Disk 6 of 9].img" size="1474560" crc="bd90323b" sha1="31782b329477f656d79fea8fb52e53b93e20c037"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk7" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dungeon Master II [Interplay] [1995] [3.5HD] [Disk 7 of 9].img" size="1474560" crc="d1e38549" sha1="68377cf5e3ffd933fc90ef36b16b325ece98c83e"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk8" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dungeon Master II [Interplay] [1995] [3.5HD] [Disk 8 of 9].img" size="1474560" crc="146a7967" sha1="e326ed15d33c62c6f4889fb258dc8ecc2221a30f"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Disk9" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dungeon Master II [Interplay] [1995] [3.5HD] [Disk 9 of 9].img" size="1474560" crc="8ca341a8" sha1="442f8fe7099eb450e29fd275c2108759ff6cd635"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dynablst" supported="no">
 		<description>Dyna Blaster</description>
 		<year>1992</year>
@@ -12952,7 +13158,7 @@ Prompts user to "press fire" but no correlated keyboard bind, requires unemulate
 	</software>
 
 	<software name="eyebeho3">
-		<description>Eye of the Beholder 3: Assault on Myth Drannor</description>
+		<description>Eye of the Beholder III: Assault on Myth Drannor</description>
 		<year>1993</year>
 		<publisher>SSI</publisher>
 		<info name="developer" value="Strategic Simulations Inc" />
@@ -12979,36 +13185,8 @@ Prompts user to "press fire" but no correlated keyboard bind, requires unemulate
 		</part>
 	</software>
 
-	<software name="eyebeho3a" cloneof="eyebeho3">
-		<description>Eye of the Beholder 3: Assault on Myth Drannor (Eye of Beholder Trilogy release)</description>
-		<year>1993</year>
-		<publisher>SSI</publisher>
-		<info name="developer" value="Strategic Simulations Inc" />
-		<info name="version" value="1.0" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="Eye of the Beholder 3 (Trilogy) [SSI] [1993] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="6e585dfa" sha1="98b646cec495a4f1ce27c53ea1d3c9209911080b"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="Eye of the Beholder 3 (Trilogy) [SSI] [1993] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="641a2891" sha1="6e6038a0c4df870dda6f7b9f0a79a839dd9bb7c3"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="Eye of the Beholder 3 (Trilogy) [SSI] [1993] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="cb7004bf" sha1="c3704132bb7c14a50107df11595342d9dff8e7c2"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="Eye of the Beholder 3 (Trilogy) [SSI] [1993] [3.5DD] [Disk 4 of 4].img" size="737280" crc="a0e5934b" sha1="c3d7fef4f2019b2e23de543dbc33efb9487c0d90"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="eyebeho3b" cloneof="eyebeho3">
-		<description>Eye of the Beholder 3: Assault on Myth Drannor (Kixx release)</description>
+		<description>Eye of the Beholder III: Assault on Myth Drannor (Kixx release)</description>
 		<year>1993</year>
 		<publisher>SSI</publisher>
 		<info name="developer" value="Strategic Simulations Inc" />
@@ -13036,7 +13214,7 @@ Prompts user to "press fire" but no correlated keyboard bind, requires unemulate
 	</software>
 
 	<software name="eyebeho3fr" cloneof="eyebeho3">
-		<description>Eye of the Beholder 3: A l'assaut de Myth Drannor (France)</description>
+		<description>Eye of the Beholder III: A l'assaut de Myth Drannor (France)</description>
 		<year>1993</year>
 		<publisher>SSI</publisher>
 		<info name="alt_title" value="Eye of the Beholder 3: Assaut sur Myth Drannor" />
@@ -13065,7 +13243,7 @@ Prompts user to "press fire" but no correlated keyboard bind, requires unemulate
 	</software>
 
 	<software name="eyebeho3de" cloneof="eyebeho3">
-		<description>Eye of the Beholder 3: Sturm auf Myth Drannor (Germany)</description>
+		<description>Eye of the Beholder III: Sturm auf Myth Drannor (Germany)</description>
 		<year>1993</year>
 		<publisher>SSI</publisher>
 		<info name="developer" value="Strategic Simulations Inc" />
@@ -13088,6 +13266,60 @@ Prompts user to "press fire" but no correlated keyboard bind, requires unemulate
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="Eye of the Beholder 3 (Germany) [SSI] [1993] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="a519d0f7" sha1="de2d0548ada08cfe75c8082c2b061aef315b73a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eyebehtri">
+		<description>Eye of the Beholder: Trilogy</description>
+		<year>1995</year>
+		<publisher>SSI</publisher>
+		<notes><![CDATA[
+Eye of the Beholder (v1.7)
+Eye of the Beholder II: The Legend of Darkmoon
+Eye of the Beholder III: Assault on Myth Drannor
+]]></notes>
+		<info name="developer" value="Strategic Simulations Inc" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="EoB I - II disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Eye of the Beholder Trilogy (EoBI_II disk1) [SSI] [1995] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="1d80fc3f" sha1="9f6b76e866e08932d473a8f6a703940aee852a01"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="EoB I - II disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Eye of the Beholder Trilogy (EoBI_II disk2) [SSI] [1995] [3.5HD] [Disk 2 of 7].img" size="1474560" crc="1bc8ae2c" sha1="88654129561a8b4510e4f79cf348b8900410cec5"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="EoB II disk 3" />
+			<dataarea name="flop" size="737280">
+				<rom name="Eye of the Beholder Trilogy (EoBII disk3) [SSI] [1995] [3.5DD] [Disk 3 of 7].img" size="737280" crc="8d206bb2" sha1="8726b27139d134062adf7c47dbd49bcd54c9861c"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="EoB III disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Eye of the Beholder Trilogy (EoBIII disk1) [SSI] [1995] [3.5HD] [Disk 4 of 7].img" size="1474560" crc="6e585dfa" sha1="98b646cec495a4f1ce27c53ea1d3c9209911080b"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="EoB III disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Eye of the Beholder Trilogy (EoBIII disk2) [SSI] [1995] [3.5HD] [Disk 5 of 7].img" size="1474560" crc="641a2891" sha1="6e6038a0c4df870dda6f7b9f0a79a839dd9bb7c3"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="EoB III disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Eye of the Beholder Trilogy (EoBIII disk3) [SSI] [1995] [3.5HD] [Disk 6 of 7].img" size="1474560" crc="cb7004bf" sha1="c3704132bb7c14a50107df11595342d9dff8e7c2"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="EoB III disk 4" />
+			<dataarea name="flop" size="737280">
+				<rom name="Eye of the Beholder Trilogy (EoBIII disk4) [SSI] [1995] [3.5DD] [Disk 7 of 7].img" size="737280" crc="a0e5934b" sha1="c3d7fef4f2019b2e23de543dbc33efb9487c0d90"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14497,6 +14729,27 @@ Prompts user to "press fire" but no correlated keyboard bind, requires unemulate
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk3.img" size="737280" crc="d4bd135f" sha1="78c48f2551f469aedcc80883f8555810e587285f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hoylev3">
+		<description>Hoyle: Official Book of Games - Volume 3 (VGA, Futura release)</description>
+		<year>1996</year>
+		<publisher>Futura Publishing</publisher>
+		<notes>Volume 3 includes: "Checkers", "Dominoes", "Snakes &amp; Ladders", "Backgammon", "Yacht", "Pachisi"</notes>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="Version 1.000" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Startup Disk" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Hoyle Book of Games - Vol 3 (256 color) [Futura] [1996] [3.5HD] [Disk 1 of 2] [Startup Disk].img" size="1474560" crc="81873d98" sha1="86c31735231357f3f20bfbba39b9a57e052bc7e2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Game Disk 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Hoyle Book of Games - Vol 3 (256 color) [Futura] [1996] [3.5HD] [Disk 2 of 2] [Game Disk 1].img" size="1474560" crc="466a749d" sha1="a4f577c54695aa3a3eccb9daff373f0ef0e1aca9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16694,12 +16947,14 @@ Prompts user to "press fire" but no correlated keyboard bind, requires unemulate
 		</part>
 	</software>
 
-	<!-- Bad Dump: the disk has a modified LOTUS.CFG configuration file -->
 	<software name="lotus3_es" cloneof="lotus3">
 		<description>Lotus - The Ultimate Challenge (Spain, Maxi Juegos Erbe №3)</description>
 		<year>1994</year>
 		<publisher>Erbe/Altaya</publisher>
-		<notes>This release doesn't have a copy protection check</notes>
+		<notes><![CDATA[
+This release doesn't have a copy protection check
+Bad Dump: the disk has a modified LOTUS.CFG configuration file
+]]></notes>
 		<info name="developer" value="Magnetic Fields" />
 		<info name="language" value="English" />
 		<info name="region" value="Spain" />
@@ -18559,7 +18814,7 @@ Prompts user to "press fire" but no correlated keyboard bind, requires unemulate
 		<year>1994</year>
 		<publisher>The Hit Squad</publisher>
 		<info name="developer" value="Red Rat Software" />
-		<info name="language" value="Deustch, English, Français, Español" />
+		<info name="language" value="English/French/German/Spanish" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Push-Over [Hit Squad] [1994] [3.5DD] [Disk 1 of 3].img" size="737280" crc="15fc80ce" sha1="c92559f8e13b481e144e819c42f3bd2fafbb98d8" />
@@ -19166,6 +19421,40 @@ Prompts user to "press fire" but no correlated keyboard bind, requires unemulate
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Rise of the Triad [Apogee] [1995] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="6652c413" sha1="d45dee8251dbcb20e96397905f823642ac00624f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="riskywd">
+		<description>Risky Woods (Futura release)</description>
+		<year>1996</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="copy_protection" value="Manual required" />
+		<info name="developer" value="Dinamic Software / Zeus Software" />
+		<info name="region" value="Italy" />
+		<info name="version" value="v1.1 (1/9/92)" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Risky Woods [Futura] [1996] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="7738d091" sha1="671e4d430bfcda092907450946bf1f1c7e64e827"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="riskywd525" cloneof="riskywd">
+		<description>Risky Woods (5.25" DD)</description>
+		<year>1992</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="copy_protection" value="Manual required" />
+		<info name="developer" value="Dinamic Software / Zeus Software" />
+		<info name="version" value="v1.1 (1/9/92)" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Risky Woods [Electronic Arts] [1992] [5.25DD] [Disk 1 of 2].img" size="368640" crc="3d1ee514" sha1="9ee5930d182b38cfb6104b43f4ed685af4188910"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Risky Woods [Electronic Arts] [1992] [5.25DD] [Disk 2 of 2].img" size="368640" crc="911c6137" sha1="75ec08599bda5dbe5233d211b4b930b598618f11"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21147,6 +21436,23 @@ Prompts user to "press fire" but no correlated keyboard bind, requires unemulate
 		</part>
 	</software>
 
+	<software name="ssinv">
+		<description>Super Space Invaders (Big Games release)</description>
+		<year>1996</year>
+		<publisher>Big Games</publisher>
+		<info name="developer" value="Taito Corporation" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Super Space Invaders [Big Games] [1996] [3.5DD] [Disk 1 of 2].img" size="737280" crc="08be0178" sha1="8adbb946c77f4e043e85b1bcd01b8bc7e9686f41"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Super Space Invaders [Big Games] [1996] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="56b0e4e3" sha1="90ea4c9e4dd2ace8c66c2f9d6db810d18272393f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sw2050">
 		<description>Subwar 2050 - The Underwater Combat Simulation</description>
 		<year>1993</year>
@@ -21385,6 +21691,28 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="Tetris Trio [Spectrum Holobyte] [1992] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="6712ff24" sha1="af81fe820d987146519c4b5f4ade306e5e04f4b9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thomasepb">
+		<description>Thomas the Tank Engine &amp; Friends - Electronic Paint Box</description>
+		<year>1996</year>
+		<publisher>Alternative Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Thomas the Tank Engine's Electronic Paint Box [Alternative] [1996] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="d01bc372" sha1="db8ac1e662b26d43a7b1d5ddc3eefda2b1cd0127"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thomasc">
+		<description>Thomas the Tank Engine &amp; Friends - The Collection</description>
+		<year>1996</year>
+		<publisher>Alternative Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Thomas the Tank Engine and Friends - The Collection [Alternative] [1996] [3.5HD] [Disk 1 of 1].img" size="737280" crc="3a646f1a" sha1="e17d82ace6bc1e102673940a72e3837b65541606"/>
 			</dataarea>
 		</part>
 	</software>

@@ -245,10 +245,10 @@ private:
 	static constexpr uint8_t NUM_PENS = 0x18;
 
 	void output_latch_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
+	void coin_counter_left_w(int state);
+	void coin_counter_right_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(trackball_reset_w);
+	void trackball_reset_w(int state);
 	uint8_t port0_r();
 
 	void bitmap_w(offs_t offset, uint8_t data);
@@ -575,13 +575,13 @@ void liberatr_state::output_latch_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(liberatr_state::coin_counter_left_w)
+void liberatr_state::coin_counter_left_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
 
-WRITE_LINE_MEMBER(liberatr_state::coin_counter_right_w)
+void liberatr_state::coin_counter_right_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
@@ -594,7 +594,7 @@ WRITE_LINE_MEMBER(liberatr_state::coin_counter_right_w)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(liberatr_state::trackball_reset_w)
+void liberatr_state::trackball_reset_w(int state)
 {
 	/* on the rising edge of /ctrld, the /ld signal on the LS191 is released and the value of the switches
 	   input becomes the starting point for the trackball counters */

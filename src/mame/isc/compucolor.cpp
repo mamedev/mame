@@ -78,7 +78,7 @@ public:
 
 	uint8_t xi_r();
 	void xo_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( xmt_w );
+	void xmt_w(int state);
 
 	IRQ_CALLBACK_MEMBER( int_ack );
 
@@ -364,7 +364,7 @@ void compucolor2_state::xo_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( compucolor2_state::xmt_w )
+void compucolor2_state::xmt_w(int state)
 {
 	switch ((m_xo >> 4) & 0x03)
 	{

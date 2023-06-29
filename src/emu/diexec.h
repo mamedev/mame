@@ -161,10 +161,10 @@ public:
 	void abort_timeslice() noexcept;
 
 	// input and interrupt management
-	void set_input_line(int linenum, int state) { m_input[linenum].set_state_synced(state); }
-	void set_input_line_vector(int linenum, int vector) { m_input[linenum].set_vector(vector); }
-	void set_input_line_and_vector(int linenum, int state, int vector) { m_input[linenum].set_state_synced(state, vector); }
-	int input_state(int linenum) const { return m_input[linenum].m_curstate; }
+	void set_input_line(int linenum, int state) { assert(device().started()); m_input[linenum].set_state_synced(state); }
+	void set_input_line_vector(int linenum, int vector) { assert(device().started()); m_input[linenum].set_vector(vector); }
+	void set_input_line_and_vector(int linenum, int state, int vector) { assert(device().started()); m_input[linenum].set_state_synced(state, vector); }
+	int input_state(int linenum) const { assert(device().started()); return m_input[linenum].m_curstate; }
 	void pulse_input_line(int irqline, const attotime &duration);
 
 	// suspend/resume

@@ -370,7 +370,7 @@ void fastlane_state::machine_start()
 void fastlane_state::fastlane(machine_config &config)
 {
 	// basic machine hardware
-	HD6309(config, m_maincpu, XTAL(24'000'000) / 2); // 3 MHz(XTAL(24'000'000) / 8) internally
+	HD6309E(config, m_maincpu, XTAL(24'000'000) / 8); // HD63C09EP, 3 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &fastlane_state::prg_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(fastlane_state::scanline), "screen", 0, 1);
 

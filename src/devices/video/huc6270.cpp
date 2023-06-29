@@ -484,7 +484,7 @@ u16 huc6270_device::next_pixel()
 //}
 
 
-WRITE_LINE_MEMBER( huc6270_device::vsync_changed )
+void huc6270_device::vsync_changed(int state)
 {
 	state &= 0x01;
 	if ( m_vsync != state )
@@ -510,7 +510,7 @@ WRITE_LINE_MEMBER( huc6270_device::vsync_changed )
 }
 
 
-WRITE_LINE_MEMBER( huc6270_device::hsync_changed )
+void huc6270_device::hsync_changed(int state)
 {
 	state &= 0x01;
 
@@ -536,8 +536,8 @@ WRITE_LINE_MEMBER( huc6270_device::hsync_changed )
 			m_byr_latched += 1;
 			m_raster_count += 1;
 			// raster count VSW latch happens one line earlier (cfr. +2 on assignment)
-			// This has been confirmed on real HW, where the last possible RCR with 
-			// 240 VDW is 0x130 (i.e. 64 + 240). m_vert_to_go == 1 will also 
+			// This has been confirmed on real HW, where the last possible RCR with
+			// 240 VDW is 0x130 (i.e. 64 + 240). m_vert_to_go == 1 will also
 			// cause several side effects, namely:
 			// - draculax Stage 4' "all blue" Richter;
 			// - faussete Stage 2 excessive slowdown;
@@ -846,9 +846,6 @@ void huc6270_device::write(offs_t offset, u8 data)
 
 void huc6270_device::device_start()
 {
-	/* Resolve callbacks */
-	m_irq_changed_cb.resolve_safe();
-
 	m_vram = make_unique_clear<uint16_t[]>(m_vram_size/sizeof(uint16_t));
 	m_vram_mask = (m_vram_size >> 1) - 1;
 

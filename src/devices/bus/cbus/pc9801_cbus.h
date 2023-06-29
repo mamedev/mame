@@ -116,10 +116,9 @@ public:
 	void flush_install_io(const char *client_tag, u16 old_io, u16 new_io, u16 size, read8sm_delegate rhandler, write8sm_delegate whandler);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
-	virtual void device_resolve_objects() override;
 
 private:
 //  device_pc9801_slot_card_interface *m_card;

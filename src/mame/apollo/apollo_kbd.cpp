@@ -193,7 +193,7 @@ apollo_kbd_device::apollo_kbd_device(const machine_config &mconfig, const char *
 	, m_io_keyboard(*this, "keyboard%u", 1U)
 	, m_io_mouse(*this, "mouse%u", 1U)
 	, m_tx_w(*this)
-	, m_german_r(*this)
+	, m_german_r(*this, 0)
 {
 }
 
@@ -216,16 +216,6 @@ void apollo_kbd_device::device_add_mconfig(machine_config &config)
 ioport_constructor apollo_kbd_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(apollo_kbd);
-}
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects
-//-------------------------------------------------
-
-void apollo_kbd_device::device_resolve_objects()
-{
-	m_tx_w.resolve_safe();
-	m_german_r.resolve_safe(0);
 }
 
 //-------------------------------------------------

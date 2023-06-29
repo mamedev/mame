@@ -131,11 +131,11 @@ protected:
 	virtual void hack_eeprom() {}
 	virtual void hack_usb() {}
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_callback);
+	void vblank_callback(int state);
 	uint32_t screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;
-	DECLARE_WRITE_LINE_MEMBER(maincpu_interrupt);
+	void maincpu_interrupt(int state);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	nv2a_renderer *nvidia_nv2a;

@@ -723,7 +723,7 @@ void norautp_state::counterlamps_w(uint8_t data)
 //}
 
 
-WRITE_LINE_MEMBER(norautp_state::ppi2_obf_w)
+void norautp_state::ppi2_obf_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(norautp_state::ppi2_ack), this), state);
 }

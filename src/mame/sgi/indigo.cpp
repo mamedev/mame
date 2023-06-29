@@ -24,9 +24,9 @@
 #include "sgi.h"
 #include "light.h"
 
-#define LOG_UNKNOWN     (1 << 0)
-#define LOG_INT         (1 << 1)
-#define LOG_DSP         (1 << 2)
+#define LOG_UNKNOWN     (1U << 1)
+#define LOG_INT         (1U << 2)
+#define LOG_DSP         (1U << 3)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_INT | LOG_DSP)
 
 #define VERBOSE         (LOG_UNKNOWN)
@@ -222,7 +222,7 @@ void indigo4k_state::indigo4k(machine_config &config)
 	//m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_addrmap(AS_PROGRAM, &indigo4k_state::mem_map);
 
-	SGI_MC(config, m_mem_ctrl, m_maincpu, m_eeprom);
+	SGI_MC(config, m_mem_ctrl, m_maincpu, m_eeprom, 50000000);
 	m_mem_ctrl->eisa_present().set_constant(0);
 	SGI_HPC1(config, m_hpc, m_maincpu, m_eeprom);
 }

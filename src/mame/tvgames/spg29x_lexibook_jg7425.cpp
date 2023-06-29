@@ -105,7 +105,7 @@ ROM_START( lx_jg7425 )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_32BIT | ROMREGION_LE )
 	ROM_LOAD32_DWORD( "mx29lv160.u6", 0x000000, 0x200000, CRC(43c90080) SHA1(4c9e5c8f880d40bd684357ce67ae45c3f5d24b62) )
 
-	DISK_REGION( "ata:0:hdd:image" ) /* 4GB SD Card */
+	DISK_REGION( "ata:0:hdd" ) /* 4GB SD Card */
 	DISK_IMAGE( "lexibook_jg7425_4gbsd", 0, SHA1(dc0985103edec3992efdd493feef6185daedb3fd) )
 ROM_END
 
@@ -113,7 +113,7 @@ ROM_START( lx_aven )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_32BIT | ROMREGION_LE )
 	ROM_LOAD32_DWORD( "29lv800.bin", 0x000000, 0x100000, CRC(7b107f6c) SHA1(3a8e37e51dab5cab9977261e0ac17ba5194a9370) )
 
-	DISK_REGION( "ata:0:hdd:image" ) /* 4GB SD Card */
+	DISK_REGION( "ata:0:hdd" ) /* 4GB SD Card */
 	DISK_IMAGE( "sd-card", 0, SHA1(911da7bf7dac391e3329e17e3f411caafac52f0f) )
 ROM_END
 

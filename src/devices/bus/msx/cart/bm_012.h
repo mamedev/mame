@@ -26,7 +26,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(midi_in);
+	void midi_in(int state);
 
 	void bm_012_memory_map(address_map &map);
 

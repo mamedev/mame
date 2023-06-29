@@ -73,7 +73,7 @@ void ne1000_device::ne1000_port_w(offs_t offset, uint8_t data) {
 	return;
 }
 
-WRITE_LINE_MEMBER(ne1000_device::ne1000_irq_w) {
+void ne1000_device::ne1000_irq_w(int state) {
 	switch(m_irq) {
 	case 0:
 		m_isa->irq2_w(state);

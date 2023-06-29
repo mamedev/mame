@@ -28,7 +28,7 @@ public:
 	auto rxd_handler_cb() { return m_rxd_handler.bind(); }
 
 	// input lines
-	DECLARE_WRITE_LINE_MEMBER(write_txd);
+	void write_txd(int state);
 
 protected:
 	virtual void device_start() override;
@@ -46,8 +46,8 @@ class device_interpro_keyboard_port_interface : public device_interface
 
 public:
 	// input lines
-	virtual DECLARE_WRITE_LINE_MEMBER(input_txd) = 0;
-	DECLARE_WRITE_LINE_MEMBER(output_rxd) { m_port->m_rxd_handler(state); }
+	virtual void input_txd(int state) = 0;
+	void output_rxd(int state) { m_port->m_rxd_handler(state); }
 
 protected:
 	device_interpro_keyboard_port_interface(machine_config const &mconfig, device_t &device);

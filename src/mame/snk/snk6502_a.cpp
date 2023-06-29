@@ -319,7 +319,7 @@ void snk6502_sound_device::set_music_clock(double clock_time)
 	m_tone_clock = 0;
 }
 
-READ_LINE_MEMBER(snk6502_sound_device::music0_playing)
+int snk6502_sound_device::music0_playing()
 {
 	return m_tone_channels[0].mute ? 1 : 0;
 }

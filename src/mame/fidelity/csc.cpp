@@ -42,6 +42,7 @@ on the CSC. Also seen with 101-1025A04 label, same ROM contents.
 101-1025A03 might be optional, one (untampered) Spanish PCB was seen with a socket
 instead of this ROM. Most of the opening book is in here.
 
+PCB label: 510-1326B01
 CPU is a 6502 running at 1.95MHz (3.9MHz resonator, divided by 2)
 
 NMI is not used.
@@ -162,6 +163,7 @@ Elite Champion Challenger (ELITE)
 This is a limited-release chess computer based on the CSC. They removed the PIAs
 and did the I/O with TTL instead (PIAs will still work from software point of view).
 ---------------------------------
+PCB label: 510-1041B01
 MPS 6502C CPU @ 4MHz
 20KB total ROM size, 4KB RAM(8*HM6147P)
 
@@ -190,11 +192,11 @@ The 1st version came out in 1980, a program revision was released in 1981.
 Another distinction is the board color and layout, the 1981 version is green.
 Not sure if the 1st version was even released, or just a prototype.
 ---------------------------------
-8*(8+1) buttons, 8*8+1 LEDs
-1KB RAM(2*2114), 4KB ROM
+PCB label: 510-1035A01
 MOS MPS 6502B CPU, frequency unknown
 MOS MPS 6520 PIA, I/O is nearly same as CSC's PIA 0
-PCB label 510-1035A01
+1KB RAM(2*2114), 4KB ROM
+8*(8+1) buttons, 8*8+1 LEDs
 
 To play it on MAME with the sensorboard device, it is recommended to set up
 keyboard shortcuts for the spawn inputs. Then hold the spawn input down while
@@ -277,12 +279,12 @@ protected:
 	void pia0_pa_w(u8 data);
 	void pia0_pb_w(u8 data);
 	u8 pia0_pa_r();
-	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w);
+	void pia0_ca2_w(int state);
+	void pia0_cb2_w(int state);
 	void pia1_pa_w(u8 data);
 	void pia1_pb_w(u8 data);
 	u8 pia1_pb_r();
-	DECLARE_WRITE_LINE_MEMBER(pia1_ca2_w);
+	void pia1_ca2_w(int state);
 
 	u8 m_led_data = 0;
 	u8 m_7seg_data = 0;
@@ -438,7 +440,7 @@ void csc_state::pia0_pb_w(u8 data)
 	update_display();
 }
 
-WRITE_LINE_MEMBER(csc_state::pia0_cb2_w)
+void csc_state::pia0_cb2_w(int state)
 {
 	// 7442 A2
 	m_inp_mux = (m_inp_mux & ~4) | (state ? 4 : 0);
@@ -446,7 +448,7 @@ WRITE_LINE_MEMBER(csc_state::pia0_cb2_w)
 	update_sound();
 }
 
-WRITE_LINE_MEMBER(csc_state::pia0_ca2_w)
+void csc_state::pia0_ca2_w(int state)
 {
 	// 7442 A3
 	m_inp_mux = (m_inp_mux & ~8) | (state ? 8 : 0);
@@ -496,7 +498,7 @@ u8 csc_state::pia1_pb_r()
 	return data | (*m_language << 6 & 0xc0);
 }
 
-WRITE_LINE_MEMBER(csc_state::pia1_ca2_w)
+void csc_state::pia1_ca2_w(int state)
 {
 	// printer?
 }

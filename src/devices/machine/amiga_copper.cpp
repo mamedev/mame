@@ -67,7 +67,7 @@ DEFINE_DEVICE_TYPE(AMIGA_COPPER, amiga_copper_device, "amiga_copper", "Amiga Cop
 amiga_copper_device::amiga_copper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AMIGA_COPPER, tag, owner, clock)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
-	, m_chipmem_r(*this)
+	, m_chipmem_r(*this, 0)
 {
 }
 
@@ -80,7 +80,6 @@ amiga_copper_device::amiga_copper_device(const machine_config &mconfig, const ch
 void amiga_copper_device::device_start()
 {
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
-	m_chipmem_r.resolve_safe(0);
 
 	save_item(NAME(m_cdang_setting));
 	save_item(NAME(m_cdang_min_reg));

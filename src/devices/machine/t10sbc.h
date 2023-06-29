@@ -18,12 +18,10 @@ class t10sbc : public virtual t10spc
 {
 public:
 	t10sbc()
-		: t10spc(), m_image(nullptr), m_lba(0), m_blocks(0), m_disk(nullptr), m_device(nullptr)
+		: t10spc(), m_image(nullptr), m_lba(0), m_blocks(0), m_device(nullptr)
 	{
 	}
 
-	virtual void SetDevice( void *device ) override;
-	virtual void GetDevice( void **device ) override;
 	virtual void ExecCommand() override;
 	virtual void WriteData( uint8_t *data, int dataLength ) override;
 	virtual void ReadData( uint8_t *data, int dataLength ) override;
@@ -94,7 +92,6 @@ protected:
 	uint32_t m_lba;
 	uint32_t m_blocks;
 
-	hard_disk_file *m_disk;
 	device_t *m_device;
 };
 

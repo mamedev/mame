@@ -815,7 +815,7 @@ void msisaac_state::msisaac(machine_config &config)
 	// port A/B likely to be TA7630 filters
 
 	MSM5232(config, m_msm, 2'000'000);
-	m_msm->set_capacitors(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6); // 0.65 (???) uF capacitors (match the sample, not verified)
+	m_msm->set_capacitors(1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6); // 1 uF capacitors (match the sample, not verified, standard)
 	m_msm->add_route(0, "mono", 1.0);   // pin 28  2'-1
 	m_msm->add_route(1, "mono", 1.0);   // pin 29  4'-1
 	m_msm->add_route(2, "mono", 1.0);   // pin 30  8'-1

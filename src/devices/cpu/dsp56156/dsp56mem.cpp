@@ -56,7 +56,7 @@ void mem_reset(dsp56156_core* cpustate)
 /************************************/
 void HCR_set(dsp56156_core* cpustate, uint16_t value)
 {
-	LOGMASKED(LOG_GENERAL, "%s: HCR_set: %02x\n", cpustate->device->machine().describe_context(), value);
+	LOG("%s: HCR_set: %02x\n", cpustate->device->machine().describe_context(), value);
 	HF3_bit_set (cpustate, (value & 0x0010) >> 4);
 	HF2_bit_set (cpustate, (value & 0x0008) >> 3);
 	HCIE_bit_set(cpustate, (value & 0x0004) >> 2);
@@ -75,7 +75,7 @@ void HF3_bit_set(dsp56156_core* cpustate, uint16_t value)
 	HCR &= ~(0x0010);
 	HCR |=  (value << 4);
 
-	LOGMASKED(LOG_GENERAL, "%s: HF3_bit_set: %d\n", cpustate->device->machine().describe_context(), value);
+	LOG("%s: HF3_bit_set: %d\n", cpustate->device->machine().describe_context(), value);
 	HF3_bit_host_set(cpustate, value);
 }
 void HF2_bit_set(dsp56156_core* cpustate, uint16_t value)
@@ -84,7 +84,7 @@ void HF2_bit_set(dsp56156_core* cpustate, uint16_t value)
 	HCR &= ~(0x0008);
 	HCR |=  (value << 3);
 
-	LOGMASKED(LOG_GENERAL, "%s: HF2_bit_set: %d\n", cpustate->device->machine().describe_context(), value);
+	LOG("%s: HF2_bit_set: %d\n", cpustate->device->machine().describe_context(), value);
 	HF2_bit_host_set(cpustate, value);
 }
 void HCIE_bit_set(dsp56156_core* cpustate, uint16_t value)

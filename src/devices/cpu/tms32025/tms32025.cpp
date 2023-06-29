@@ -249,11 +249,11 @@ tms32025_device::tms32025_device(const machine_config &mconfig, device_type type
 	, m_b1(*this, "b1")
 	, m_b2(*this, "b2")
 	, m_b3(*this, "b3")
-	, m_bio_in(*this)
-	, m_hold_in(*this)
+	, m_bio_in(*this, 0xffff)
+	, m_hold_in(*this, 0xffff)
 	, m_hold_ack_out(*this)
 	, m_xf_out(*this)
-	, m_dr_in(*this)
+	, m_dr_in(*this, 0xffff)
 	, m_dx_out(*this)
 	, m_mp_mc(true)
 {
@@ -1663,13 +1663,6 @@ void tms32025_device::device_start()
 	{
 		m_program.space().install_rom(0x0000, 0x0fff, memregion("internal")->base());
 	}
-
-	m_bio_in.resolve_safe(0xffff);
-	m_hold_in.resolve_safe(0xffff);
-	m_hold_ack_out.resolve_safe();
-	m_xf_out.resolve_safe();
-	m_dr_in.resolve_safe(0xffff);
-	m_dx_out.resolve_safe();
 
 	m_PREVPC = 0;
 	m_PFC = 0;

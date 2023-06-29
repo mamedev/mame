@@ -27,7 +27,7 @@ spg290_ppu_device::spg290_ppu_device(const machine_config &mconfig, const char *
 	, m_voffset_ram(*this, "voffset_ram")
 	, m_sprite_ram(*this, "sprite_ram")
 	, m_vblank_irq_cb(*this)
-	, m_space_read_cb(*this)
+	, m_space_read_cb(*this, 0)
 {
 }
 
@@ -49,9 +49,6 @@ void spg290_ppu_device::map(address_map &map)
 
 void spg290_ppu_device::device_start()
 {
-	m_vblank_irq_cb.resolve_safe();
-	m_space_read_cb.resolve_safe(0);
-
 	save_item(NAME(m_control));
 	save_item(NAME(m_sprite_control));
 	save_item(NAME(m_irq_control));

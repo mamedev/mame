@@ -40,29 +40,28 @@ public:
 	template<unsigned N> uint32_t periph_r(offs_t offset, uint32_t mem_mask = ~0)                { return m_peripherals_r[N - 1](offset, mem_mask); }
 	template<unsigned N> void periph_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0)     { m_peripherals_w[N - 1](offset, data, mem_mask);  }
 
-	DECLARE_WRITE_LINE_MEMBER(il0_w)        { change_interrupt(IRQ_STATUS_B, 0x01, state); change_interrupt(FIQ_STATUS, 0x40, state); }
-	DECLARE_WRITE_LINE_MEMBER(il1_w)        { change_interrupt(IRQ_STATUS_B, 0x02, state); }
-	DECLARE_WRITE_LINE_MEMBER(il2_w)        { change_interrupt(IRQ_STATUS_B, 0x04, state); }
-	DECLARE_WRITE_LINE_MEMBER(il3_w)        { change_interrupt(IRQ_STATUS_B, 0x08, state); }
-	DECLARE_WRITE_LINE_MEMBER(il4_w)        { change_interrupt(IRQ_STATUS_B, 0x10, state); }
-	DECLARE_WRITE_LINE_MEMBER(il5_w)        { change_interrupt(IRQ_STATUS_B, 0x20, state); }
-	DECLARE_WRITE_LINE_MEMBER(il6_w)        { change_interrupt(IRQ_STATUS_A, 0x01, state); }
-	DECLARE_WRITE_LINE_MEMBER(il7_w)        { change_interrupt(IRQ_STATUS_A, 0x02, state); }
-	DECLARE_WRITE_LINE_MEMBER(fh0_w)        { change_interrupt(FIQ_STATUS  , 0x01, state); }
-	DECLARE_WRITE_LINE_MEMBER(fh1_w)        { change_interrupt(FIQ_STATUS  , 0x02, state); }
-	DECLARE_WRITE_LINE_MEMBER(fl_w)         { change_interrupt(FIQ_STATUS  , 0x04, !state); }
-	DECLARE_WRITE_LINE_MEMBER(por_w)        { if (state) change_interrupt(IRQ_STATUS_A, 0x10, state); }
-	DECLARE_WRITE_LINE_MEMBER(kin_w)        { rx_w(state); }
-	DECLARE_WRITE_LINE_MEMBER(if_w);
-	DECLARE_WRITE_LINE_MEMBER(ir_w);
+	void il0_w(int state)        { change_interrupt(IRQ_STATUS_B, 0x01, state); change_interrupt(FIQ_STATUS, 0x40, state); }
+	void il1_w(int state)        { change_interrupt(IRQ_STATUS_B, 0x02, state); }
+	void il2_w(int state)        { change_interrupt(IRQ_STATUS_B, 0x04, state); }
+	void il3_w(int state)        { change_interrupt(IRQ_STATUS_B, 0x08, state); }
+	void il4_w(int state)        { change_interrupt(IRQ_STATUS_B, 0x10, state); }
+	void il5_w(int state)        { change_interrupt(IRQ_STATUS_B, 0x20, state); }
+	void il6_w(int state)        { change_interrupt(IRQ_STATUS_A, 0x01, state); }
+	void il7_w(int state)        { change_interrupt(IRQ_STATUS_A, 0x02, state); }
+	void fh0_w(int state)        { change_interrupt(FIQ_STATUS  , 0x01, state); }
+	void fh1_w(int state)        { change_interrupt(FIQ_STATUS  , 0x02, state); }
+	void fl_w(int state)         { change_interrupt(FIQ_STATUS  , 0x04, !state); }
+	void por_w(int state)        { if (state) change_interrupt(IRQ_STATUS_A, 0x10, state); }
+	void kin_w(int state)        { rx_w(state); }
+	void if_w(int state);
+	void ir_w(int state);
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_serial_interface overrides
+	// device_serial_interface implementation
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
 	virtual void rcv_complete() override;

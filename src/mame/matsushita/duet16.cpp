@@ -58,17 +58,17 @@ private:
 	void fdcctrl_w(u8 data);
 	void dispctrl_w(u8 data);
 	void pal_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(hrq_w);
+	void hrq_w(int state);
 	u8 rtc_r();
 	void rtc_w(u8 data);
 	u8 rtc_stat_r();
 	void rtc_addr_w(u8 data);
 	u16 sysstat_r();
-	DECLARE_WRITE_LINE_MEMBER(rtc_d0_w);
-	DECLARE_WRITE_LINE_MEMBER(rtc_d1_w);
-	DECLARE_WRITE_LINE_MEMBER(rtc_d2_w);
-	DECLARE_WRITE_LINE_MEMBER(rtc_d3_w);
-	DECLARE_WRITE_LINE_MEMBER(rtc_busy_w);
+	void rtc_d0_w(int state);
+	void rtc_d1_w(int state);
+	void rtc_d2_w(int state);
+	void rtc_d3_w(int state);
+	void rtc_busy_w(int state);
 	void rtc_irq_reset();
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void duet16_io(address_map &map);
@@ -139,7 +139,7 @@ void duet16_state::dmapg_w(u8 data)
 	m_dmapg = data & 0xf;
 }
 
-WRITE_LINE_MEMBER(duet16_state::hrq_w)
+void duet16_state::hrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_dmac->hack_w(state);
@@ -242,27 +242,27 @@ MC6845_UPDATE_ROW(duet16_state::crtc_update_row)
 	}
 }
 
-WRITE_LINE_MEMBER(duet16_state::rtc_d0_w)
+void duet16_state::rtc_d0_w(int state)
 {
 	m_rtc_d = (m_rtc_d & ~1) | (state ? 1 : 0);
 }
 
-WRITE_LINE_MEMBER(duet16_state::rtc_d1_w)
+void duet16_state::rtc_d1_w(int state)
 {
 	m_rtc_d = (m_rtc_d & ~2) | (state ? 2 : 0);
 }
 
-WRITE_LINE_MEMBER(duet16_state::rtc_d2_w)
+void duet16_state::rtc_d2_w(int state)
 {
 	m_rtc_d = (m_rtc_d & ~4) | (state ? 4 : 0);
 }
 
-WRITE_LINE_MEMBER(duet16_state::rtc_d3_w)
+void duet16_state::rtc_d3_w(int state)
 {
 	m_rtc_d = (m_rtc_d & ~8) | (state ? 8 : 0);
 }
 
-WRITE_LINE_MEMBER(duet16_state::rtc_busy_w)
+void duet16_state::rtc_busy_w(int state)
 {
 	if (state && !m_rtc_busy && !m_rtc_irq)
 	{

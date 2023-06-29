@@ -30,9 +30,9 @@ ________________________________________________________________________________
      | 80-093025(FR)   | Les Indestructibles - Les Indestructibles à la Rescousse
  *** | 80-093027(SP)   | Los Increíbles - Misión Increíble
 __________________________________________________________________________________________
- *** | 80-093040(US)   | Nickelodeon SpongeBob Squarepants - Idea Sponge [Needs revision checking]
- *** | 80-093040(US)   | Nickelodeon SpongeBob Squarepants - Idea Sponge (Rev. 1)
- *** | 80-093040(US)   | Nickelodeon SpongeBob Squarepants - Idea Sponge (Rev. 2)
+ *** | 80-093040(US)   | Nickelodeon SpongeBob SquarePants - Idea Sponge [Needs revision checking]
+ *** | 80-093040(US)   | Nickelodeon SpongeBob SquarePants - Idea Sponge (Rev. 1)
+ *** | 80-093040(US)   | Nickelodeon SpongeBob SquarePants - Idea Sponge (Rev. 2)
  *** | 80-093044(GE)   | Nick SpongeBob Schwammkopf - Ein Schwamm voller Ideen
      | 80-093045(FR)   | Nickelodeon Bob L'éponge - Une Idée Spongieuse
  *** | 80-093047(SP)   | Nickelodeon Bob Esponja - Misión Esponja
@@ -85,7 +85,7 @@ ________________________________________________________________________________
 __________________________________________________________________________________________
 -->
 
-<!-- CloneCD images are not fully supported by CHDMAN, thus the "Nickelodeon SpongeBob Squarepants - Idea Sponge (USA)" (spongeis) image
+<!-- CloneCD images are not fully supported by CHDMAN, thus the "Nickelodeon SpongeBob SquarePants - Idea Sponge (USA)" (spongeis) image
      might need to be recreated at a later stage from the original disk -->
 
 <softwarelist name="vsmile_cd" description="VTech V.Flash/V.Smile Pro V.Disc images">
@@ -561,7 +561,7 @@ ________________________________________________________________________________
 	Ring 2: "*59-93040-000-000*", "IFPI LQ24", "IFPI 9QH8", "59-93040-000"
 	-->
 	<software name="spongeisr2" supported="no">
-		<description>Nickelodeon SpongeBob Squarepants - Idea Sponge (USA, Rev. 2)</description>
+		<description>Nickelodeon SpongeBob SquarePants - Idea Sponge (USA, Rev. 2)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093040" />
@@ -580,7 +580,7 @@ ________________________________________________________________________________
 	Ring 1: "*59-93040-000-000", "IFPI LQ50", "IFPI 9QH8", "59-93040-000"
 	-->
 	<software name="spongeisr1" cloneof="spongeisr2" supported="no">
-		<description>Nickelodeon SpongeBob Squarepants - Idea Sponge (USA, Rev. 1)</description>
+		<description>Nickelodeon SpongeBob SquarePants - Idea Sponge (USA, Rev. 1)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093040" />
@@ -600,7 +600,7 @@ ________________________________________________________________________________
 		 <rom name="spongebob squarepants - idea sponge (us).img" size="373038960" crc="f3dcd059" sha1="bc70d3a4017b6282bea065e4ed8a05c601471069" />
 		 <rom name="spongebob squarepants - idea sponge (us).sub" size="15226080" crc="f8ef603f" sha1="84515fb53c4de9a0072dc051d365b1cbc1065b0f" />
 		 -->
-		<description>Nickelodeon SpongeBob Squarepants - Idea Sponge (USA)</description>
+		<description>Nickelodeon SpongeBob SquarePants - Idea Sponge (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cdrom" interface="vsmile_vdisk">

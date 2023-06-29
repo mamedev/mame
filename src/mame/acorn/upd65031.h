@@ -47,11 +47,11 @@ public:
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( flp_w );
-	DECLARE_WRITE_LINE_MEMBER( btl_w );
-	DECLARE_WRITE_LINE_MEMBER( rxd_w ) { rx_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( cts_w );
-	DECLARE_WRITE_LINE_MEMBER( dcd_w );
+	void flp_w(int state);
+	void btl_w(int state);
+	void rxd_w(int state) { rx_w(state); }
+	void cts_w(int state);
+	void dcd_w(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:

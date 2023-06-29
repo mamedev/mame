@@ -17,7 +17,7 @@
 
 DEFINE_DEVICE_TYPE(TMPZ84C015, tmpz84c015_device, "tmpz84c015", "Toshiba TMPZ84C015")
 
-void tmpz84c015_device::internal_io_map(address_map &map)
+void tmpz84c015_device::internal_io_map(address_map &map) const
 {
 	map(0x10, 0x13).mirror(0xff00).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x18, 0x1b).mirror(0xff00).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
@@ -27,10 +27,14 @@ void tmpz84c015_device::internal_io_map(address_map &map)
 	map(0xf4, 0xf4).mirror(0xff00).w(FUNC(tmpz84c015_device::irq_priority_w));
 }
 
-
 tmpz84c015_device::tmpz84c015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	z80_device(mconfig, TMPZ84C015, tag, owner, clock),
-	m_io_space_config( "io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(tmpz84c015_device::internal_io_map), this)),
+	tmpz84c015_device(mconfig, TMPZ84C015, tag, owner, clock, address_map_constructor(FUNC(tmpz84c015_device::internal_io_map), this))
+{
+}
+
+tmpz84c015_device::tmpz84c015_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor io_map) :
+	z80_device(mconfig, type, tag, owner, clock),
+	m_io_space_config( "io", ENDIANNESS_LITTLE, 8, 16, 0, io_map),
 	m_ctc(*this, "tmpz84c015_ctc"),
 	m_sio(*this, "tmpz84c015_sio"),
 	m_pio(*this, "tmpz84c015_pio"),
@@ -57,11 +61,11 @@ tmpz84c015_device::tmpz84c015_device(const machine_config &mconfig, const char *
 
 	m_zc_cb(*this),
 
-	m_in_pa_cb(*this),
+	m_in_pa_cb(*this, 0),
 	m_out_pa_cb(*this),
 	m_out_ardy_cb(*this),
 
-	m_in_pb_cb(*this),
+	m_in_pb_cb(*this, 0),
 	m_out_pb_cb(*this),
 	m_out_brdy_cb(*this),
 
@@ -84,36 +88,6 @@ device_memory_interface::space_config_vector tmpz84c015_device::memory_space_con
 void tmpz84c015_device::device_start()
 {
 	z80_device::device_start();
-
-	// resolve callbacks
-	m_out_txda_cb.resolve_safe();
-	m_out_dtra_cb.resolve_safe();
-	m_out_rtsa_cb.resolve_safe();
-	m_out_wrdya_cb.resolve_safe();
-	m_out_synca_cb.resolve_safe();
-
-	m_out_txdb_cb.resolve_safe();
-	m_out_dtrb_cb.resolve_safe();
-	m_out_rtsb_cb.resolve_safe();
-	m_out_wrdyb_cb.resolve_safe();
-	m_out_syncb_cb.resolve_safe();
-
-	m_out_rxdrqa_cb.resolve_safe();
-	m_out_txdrqa_cb.resolve_safe();
-	m_out_rxdrqb_cb.resolve_safe();
-	m_out_txdrqb_cb.resolve_safe();
-
-	m_zc_cb.resolve_all_safe();
-
-	m_in_pa_cb.resolve_safe(0);
-	m_out_pa_cb.resolve_safe();
-	m_out_ardy_cb.resolve_safe();
-
-	m_in_pb_cb.resolve_safe(0);
-	m_out_pb_cb.resolve_safe();
-	m_out_brdy_cb.resolve_safe();
-
-	m_wdtout_cb.resolve();
 
 	// setup watchdog timer
 	m_watchdog_timer = timer_alloc(FUNC(tmpz84c015_device::watchdog_timeout), this);
@@ -234,8 +208,7 @@ void tmpz84c015_device::wdtcr_w(uint8_t data)
 
 void tmpz84c015_device::watchdog_clear()
 {
-	if (!m_wdtout_cb.isnull())
-		m_wdtout_cb(CLEAR_LINE);
+	m_wdtout_cb(CLEAR_LINE);
 
 	if (BIT(m_wdtmr, 7))
 		m_watchdog_timer->adjust(cycles_to_attotime(0x10000 << (BIT(m_wdtmr, 5, 2) * 2)));
@@ -243,10 +216,8 @@ void tmpz84c015_device::watchdog_clear()
 
 TIMER_CALLBACK_MEMBER(tmpz84c015_device::watchdog_timeout)
 {
-	if (!m_wdtout_cb.isnull())
-		m_wdtout_cb(ASSERT_LINE);
-	else
-		logerror("Watchdog timeout\n");
+	logerror("Watchdog timeout\n");
+	m_wdtout_cb(ASSERT_LINE);
 }
 
 

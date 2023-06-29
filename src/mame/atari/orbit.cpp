@@ -83,7 +83,7 @@ private:
 	uint8_t m_flip_screen;
 	emu_timer *m_irq_off_timer = nullptr;
 
-	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
+	void coin_lockout_w(int state);
 	void playfield_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -218,7 +218,7 @@ INTERRUPT_GEN_MEMBER(orbit_state::interrupt)
  *************************************/
 
 
-WRITE_LINE_MEMBER(orbit_state::coin_lockout_w)
+void orbit_state::coin_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(0, !state);
 	machine().bookkeeping().coin_lockout_w(1, !state);

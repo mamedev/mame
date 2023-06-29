@@ -49,6 +49,7 @@ DECLARE_DEVICE_TYPE(QED5271LE, qed5271le_device)
 DECLARE_DEVICE_TYPE(RM7000BE, rm7000be_device)
 DECLARE_DEVICE_TYPE(RM7000LE, rm7000le_device)
 DECLARE_DEVICE_TYPE(R5900LE, r5900le_device)
+DECLARE_DEVICE_TYPE(R5900BE, r5900be_device)
 
 
 /***************************************************************************
@@ -541,6 +542,7 @@ public:
 private:
 	uint32_t compute_config_register();
 	uint32_t compute_prid_register();
+	uint32_t compute_fpu_prid_register();
 
 	uint32_t generate_tlb_index();
 	void tlb_map_entry(int tlbindex);
@@ -873,23 +875,15 @@ public:
 	}
 };
 
-class r5900le_device : public mips3_device {
-public:
+class r5900_device : public mips3_device {
+protected:
 	// construction/destruction
-	template <typename T>
-	r5900le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&vu0_tag)
-		: r5900le_device(mconfig, tag, owner, clock)
-	{
-		m_vu0.set_tag(std::forward<T>(vu0_tag));
-	}
-
-	r5900le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R5900LE, tag, owner, clock, MIPS3_TYPE_R5900, ENDIANNESS_LITTLE, 64)
+	r5900_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
+		: mips3_device(mconfig, type, tag, owner, clock, MIPS3_TYPE_R5900, endianness, 64)
 		, m_vu0(*this, finder_base::DUMMY_TAG)
 	{
 	}
 
-protected:
 	virtual void device_start() override;
 
 	// device_disasm_interface overrides
@@ -908,8 +902,8 @@ protected:
 	void WDOUBLE(offs_t address, uint64_t data) override;
 	void WDOUBLE_MASKED(offs_t address, uint64_t data, uint64_t mem_mask) override;
 
-	bool RQUAD(offs_t address, uint64_t *result_hi, uint64_t *result_lo);
-	void WQUAD(offs_t address, uint64_t data_hi, uint64_t data_lo);
+	virtual bool RQUAD(offs_t address, uint64_t *result_hi, uint64_t *result_lo) = 0;
+	virtual void WQUAD(offs_t address, uint64_t data_hi, uint64_t data_lo) = 0;
 
 	uint64_t get_cop2_reg(int idx) override;
 	void set_cop2_reg(int idx, uint64_t val) override;
@@ -937,6 +931,46 @@ protected:
 	void check_irqs() override;
 
 	required_device<sonyvu0_device> m_vu0;
+};
+
+class r5900le_device : public r5900_device {
+public:
+	// construction/destruction
+	template <typename T>
+	r5900le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&vu0_tag)
+		: r5900le_device(mconfig, tag, owner, clock)
+	{
+		m_vu0.set_tag(std::forward<T>(vu0_tag));
+	}
+
+	r5900le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: r5900_device(mconfig, R5900LE, tag, owner, clock, ENDIANNESS_LITTLE)
+	{
+	}
+
+protected:
+	bool RQUAD(offs_t address, uint64_t *result_hi, uint64_t *result_lo) override;
+	void WQUAD(offs_t address, uint64_t data_hi, uint64_t data_lo) override;
+};
+
+class r5900be_device : public r5900_device {
+public:
+	// construction/destruction
+	template <typename T>
+	r5900be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&vu0_tag)
+		: r5900be_device(mconfig, tag, owner, clock)
+	{
+		m_vu0.set_tag(std::forward<T>(vu0_tag));
+	}
+
+	r5900be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: r5900_device(mconfig, R5900BE, tag, owner, clock, ENDIANNESS_BIG)
+	{
+	}
+
+protected:
+	bool RQUAD(offs_t address, uint64_t *result_hi, uint64_t *result_lo) override;
+	void WQUAD(offs_t address, uint64_t data_hi, uint64_t data_lo) override;
 };
 
 class qed5271be_device : public mips3_device {

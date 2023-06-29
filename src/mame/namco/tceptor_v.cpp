@@ -523,7 +523,7 @@ uint32_t tceptor_state::screen_update_tceptor(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-WRITE_LINE_MEMBER(tceptor_state::screen_vblank_tceptor)
+void tceptor_state::screen_vblank_tceptor(int state)
 {
 	// rising edge
 	if (state)

@@ -133,13 +133,13 @@ IRQ_CALLBACK_MEMBER(msx_cart_sfg_device::irq_callback)
 	return m_ym2148->get_irq_vector();
 }
 
-WRITE_LINE_MEMBER(msx_cart_sfg_device::ym2151_irq_w)
+void msx_cart_sfg_device::ym2151_irq_w(int state)
 {
 	m_ym2151_irq_state = state ? ASSERT_LINE : CLEAR_LINE;
 	check_irq();
 }
 
-WRITE_LINE_MEMBER(msx_cart_sfg_device::ym2148_irq_w)
+void msx_cart_sfg_device::ym2148_irq_w(int state)
 {
 	m_ym2148_irq_state = state ? ASSERT_LINE : CLEAR_LINE;
 	check_irq();

@@ -217,10 +217,10 @@ private:
 	uint8_t SYSTAT_B();
 
 	TIMER_CALLBACK_MEMBER(execute_vg);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
-	DECLARE_WRITE_LINE_MEMBER(i8251_rxrdy_int);
-	DECLARE_WRITE_LINE_MEMBER(i8251_txrdy_int);
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(i8251_rts);
+	void crtc_vsync(int state);
+	void i8251_rxrdy_int(int state);
+	void i8251_txrdy_int(int state);
+	[[maybe_unused]] void i8251_rts(int state);
 	uint8_t vram_read();
 	uint8_t vram_attr_read();
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -970,23 +970,23 @@ void vk100_state::machine_start()
 	//m_i8251_sync_timer = timer_alloc(FUNC(vk100_state::i8251_sync), this);
 }
 
-WRITE_LINE_MEMBER(vk100_state::crtc_vsync)
+void vk100_state::crtc_vsync(int state)
 {
 	m_maincpu->set_input_line(I8085_RST75_LINE, state? ASSERT_LINE : CLEAR_LINE);
 	m_vsync = state;
 }
 
-WRITE_LINE_MEMBER(vk100_state::i8251_rxrdy_int)
+void vk100_state::i8251_rxrdy_int(int state)
 {
 	m_maincpu->set_input_line(I8085_RST65_LINE, state?ASSERT_LINE:CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(vk100_state::i8251_txrdy_int)
+void vk100_state::i8251_txrdy_int(int state)
 {
 	m_maincpu->set_input_line(I8085_RST55_LINE, state?ASSERT_LINE:CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(vk100_state::i8251_rts)
+void vk100_state::i8251_rts(int state)
 {
 	logerror("callback: RTS state changed to %d\n", state);
 	// TODO: only change this during loopback mode!

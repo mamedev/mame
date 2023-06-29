@@ -62,7 +62,7 @@ public:
 	void init_arligntn();
 	void init_hstennis();
 
-	DECLARE_READ_LINE_MEMBER(special_r);
+	int special_r();
 	DECLARE_CUSTOM_INPUT_MEMBER(gtg_mux);
 
 protected:
@@ -125,7 +125,7 @@ protected:
 	int m_bankxor = 0;
 
 	// common
-	DECLARE_WRITE_LINE_MEMBER(generate_tms34061_interrupt);
+	void generate_tms34061_interrupt(int state);
 	void nmi_ack_w(uint8_t data);
 	void blitter_bank_w(offs_t offset, uint8_t data);
 	void rimrockn_bank_w(uint8_t data);
@@ -152,8 +152,8 @@ protected:
 	uint32_t screen_update_2page(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_2page_large(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(generate_nmi);
-	DECLARE_WRITE_LINE_MEMBER(ninclown_irq);
+	void generate_nmi(int state);
+	void ninclown_irq(int state);
 	TIMER_CALLBACK_MEMBER(irq_off);
 	TIMER_CALLBACK_MEMBER(behind_the_beam_update);
 	TIMER_CALLBACK_MEMBER(blitter_done);

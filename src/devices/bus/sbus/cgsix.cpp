@@ -1274,7 +1274,7 @@ void sbus_cgsix_device::thc_misc_w(offs_t offset, uint32_t data, uint32_t mem_ma
 	m_thc_misc &= THC_MISC_WRITE_MASK;
 }
 
-WRITE_LINE_MEMBER(sbus_cgsix_device::vblank_w)
+void sbus_cgsix_device::vblank_w(int state)
 {
 	int old_state = BIT(m_thc_misc, THC_MISC_VSYNC_BIT);
 	if (old_state != state)

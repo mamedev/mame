@@ -110,7 +110,7 @@ private:
 	uint8_t mcu_io_r(address_space &space, offs_t offset);
 
 	// I8751-related VBLANK interrupt handlers
-	DECLARE_WRITE_LINE_MEMBER(i8751_main_cpu_vblank_w);
+	void i8751_main_cpu_vblank_w(int state);
 
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -175,15 +175,15 @@ private:
 	lamp_changed_delegate   m_lamp_changed_w;
 
 	// internal state
-	emu_timer              * m_i8751_sync_timer = nullptr;
-	uint8_t                  m_video_control = 0;
-	uint8_t                  m_mcu_control = 0;
-	uint8_t                  m_n7751_command = 0;
-	uint32_t                 m_n7751_rom_address = 0;
-	uint8_t                  m_last_buttons1 = 0;
-	uint8_t                  m_last_buttons2 = 0;
-	uint8_t                  m_read_port = 0;
-	uint8_t                  m_mj_input_num = 0;
+	emu_timer              * m_i8751_sync_timer;
+	uint8_t                  m_video_control;
+	uint8_t                  m_mcu_control;
+	uint8_t                  m_n7751_command;
+	uint32_t                 m_n7751_rom_address;
+	uint8_t                  m_last_buttons1;
+	uint8_t                  m_last_buttons2;
+	uint8_t                  m_read_port;
+	uint8_t                  m_mj_input_num;
 	optional_ioport_array<6> m_mj_inputs;
 	output_finder<2> m_lamps;
 };

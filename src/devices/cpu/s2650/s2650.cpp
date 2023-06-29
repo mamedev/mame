@@ -32,8 +32,9 @@ s2650_device::s2650_device(const machine_config &mconfig, const char *tag, devic
 	, m_program_config("program", ENDIANNESS_BIG, 8, 15)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 8)
 	, m_data_config("data", ENDIANNESS_BIG, 8, 1)
-	, m_sense_handler(*this)
-	, m_flag_handler(*this), m_intack_handler(*this)
+	, m_sense_handler(*this, 0)
+	, m_flag_handler(*this)
+	, m_intack_handler(*this, 0x00)
 	, m_ppc(0), m_page(0), m_iar(0), m_ea(0), m_psl(0), m_psu(0), m_r(0)
 	, m_halt(0), m_ir(0), m_irq_state(0), m_icount(0)
 	, m_debugger_temp(0)
@@ -179,7 +180,7 @@ inline void s2650_device::set_psu(uint8_t new_val)
 
 inline uint8_t s2650_device::get_psu()
 {
-	if (!m_sense_handler.isnull())
+	if (!m_sense_handler.isunset())
 	{
 		if (m_sense_handler())
 			m_psu |= SI;
@@ -206,7 +207,7 @@ inline int s2650_device::check_irq_line()
 
 	if (m_irq_state != CLEAR_LINE)
 	{
-		if( (m_psu & II) == 0 )
+		if ((m_psu & II) == 0)
 		{
 			if (m_halt)
 			{
@@ -819,10 +820,6 @@ static void BRA_EA(void) _BRA_EA()
 
 void s2650_device::device_start()
 {
-	m_sense_handler.resolve();
-	m_flag_handler.resolve_safe();
-	m_intack_handler.resolve_safe(0x00);
-
 	space(AS_PROGRAM).cache(m_cprogram);
 	space(AS_PROGRAM).specific(m_program);
 	space(AS_DATA).specific(m_data);

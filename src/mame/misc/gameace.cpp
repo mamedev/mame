@@ -60,9 +60,9 @@ TODO: is sound emulation complete? there's data in audio ROM at 0xe000, and whil
 
 
 // configurable logging
-#define LOG_MEMBANK     (1U <<  1)
-#define LOG_PALBANK     (1U <<  2)
-#define LOG_VIDBANK     (1U <<  3)
+#define LOG_MEMBANK     (1U << 1)
+#define LOG_PALBANK     (1U << 2)
+#define LOG_VIDBANK     (1U << 3)
 
 //#define VERBOSE (LOG_GENERAL | LOG_MEMBANK | LOG_PALBANK | LOG_VIDBANK)
 

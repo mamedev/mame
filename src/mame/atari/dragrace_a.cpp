@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
-// copyright-holders:Derrick Renaud
+// copyright-holders: Derrick Renaud
+
 /*************************************************************************
 
-    audio\dragrace.cpp
+    atari\dragrace_a.cpp
 
 *************************************************************************/
 #include "emu.h"
-#include "dragrace.h"
-#include "sound/discrete.h"
+
+#include "dragrace_a.h"
 
 /************************************************************************/
 /* dragrace Sound System Analog emulation                                  */

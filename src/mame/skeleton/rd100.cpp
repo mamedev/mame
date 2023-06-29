@@ -49,8 +49,8 @@ private:
 
 	uint8_t keys_r();
 	void key_scan_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( shift_r );
-	DECLARE_READ_LINE_MEMBER( ctrl_r );
+	int shift_r();
+	int ctrl_r();
 
 	void mem_map(address_map &map);
 
@@ -97,7 +97,7 @@ void rd100_state::key_scan_w(uint8_t data)
 	m_key_scan = data;
 }
 
-READ_LINE_MEMBER(rd100_state::shift_r)
+int rd100_state::shift_r()
 {
 	if (m_shift)
 	{
@@ -110,7 +110,7 @@ READ_LINE_MEMBER(rd100_state::shift_r)
 	return ky;
 }
 
-READ_LINE_MEMBER(rd100_state::ctrl_r)
+int rd100_state::ctrl_r()
 {
 	if (m_ctrl)
 	{

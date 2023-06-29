@@ -74,11 +74,11 @@ public:
 
 	void sdk85(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
-	DECLARE_WRITE_LINE_MEMBER(vect_intr_w);
+	void reset_w(int state);
+	void vect_intr_w(int state);
 
 private:
-	DECLARE_READ_LINE_MEMBER(sid_r);
+	int sid_r();
 
 	void scanlines_w(u8 data);
 	void digit_w(u8 data);
@@ -114,7 +114,7 @@ void sdk85_state::machine_start()
 	save_item(NAME(m_digit));
 }
 
-WRITE_LINE_MEMBER(sdk85_state::reset_w)
+void sdk85_state::reset_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 	if (!state)
@@ -127,12 +127,12 @@ WRITE_LINE_MEMBER(sdk85_state::reset_w)
 	}
 }
 
-WRITE_LINE_MEMBER(sdk85_state::vect_intr_w)
+void sdk85_state::vect_intr_w(int state)
 {
 	m_maincpu->set_input_line(I8085_RST75_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ_LINE_MEMBER(sdk85_state::sid_r)
+int sdk85_state::sid_r()
 {
 	// Actual HW has S25 switch to ground SID when using keyboard input instead of TTY RX
 	if (m_tty->get_card_device() == nullptr)

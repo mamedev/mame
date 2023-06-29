@@ -165,7 +165,7 @@ adsp21xx_device::adsp21xx_device(const machine_config &mconfig, device_type type
 		m_mstat_mask((m_chip_type >= CHIP_TYPE_ADSP2101) ? 0x7f : 0x0f),
 		m_imask_mask((m_chip_type >= CHIP_TYPE_ADSP2181) ? 0x3ff :
 					(m_chip_type >= CHIP_TYPE_ADSP2101) ? 0x3f : 0x0f),
-		m_sport_rx_cb(*this),
+		m_sport_rx_cb(*this, 0),
 		m_sport_tx_cb(*this),
 		m_timer_fired_cb(*this),
 		m_dmovlay_cb(*this)
@@ -420,11 +420,6 @@ uint16_t adsp2181_device::idma_data_r()
 
 void adsp21xx_device::device_start()
 {
-	m_sport_rx_cb.resolve();
-	m_sport_tx_cb.resolve();
-	m_timer_fired_cb.resolve();
-	m_dmovlay_cb.resolve();
-
 	// get our address spaces
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);

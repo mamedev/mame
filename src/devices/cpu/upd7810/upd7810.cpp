@@ -410,19 +410,19 @@ upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, 
 	, m_co0_func(*this)
 	, m_co1_func(*this)
 	, m_txd_func(*this)
-	, m_rxd_func(*this)
-	, m_an_func(*this)
-	, m_pa_in_cb(*this)
-	, m_pb_in_cb(*this)
-	, m_pc_in_cb(*this)
-	, m_pd_in_cb(*this)
-	, m_pf_in_cb(*this)
+	, m_rxd_func(*this, 1)
+	, m_an_func(*this, 0)
+	, m_pa_in_cb(*this, 0xff)
+	, m_pb_in_cb(*this, 0xff)
+	, m_pc_in_cb(*this, 0xff)
+	, m_pd_in_cb(*this, 0xff)
+	, m_pf_in_cb(*this, 0xff)
 	, m_pa_out_cb(*this)
 	, m_pb_out_cb(*this)
 	, m_pc_out_cb(*this)
 	, m_pd_out_cb(*this)
 	, m_pf_out_cb(*this)
-	, m_pt_in_cb(*this)
+	, m_pt_in_cb(*this, 0) // TODO: uPD7807 only
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, internal_map)
 	, m_pa_pullups(0xff)
 	, m_pb_pullups(0xff)
@@ -585,23 +585,30 @@ void upd7810_device::pf_w(uint8_t data, uint8_t mem_mask)
 	COMBINE_DATA(&m_pf_in);
 }
 
+void upd7810_device::sck_w(int state)
+{
+	if ((SMH & 0x03) == 0x03 && state != SCK)
+		update_sio(1);
+	SCK = state;
+}
+
 uint8_t upd7810_device::RP(offs_t port)
 {
 	uint8_t data = 0xff;
 	switch (port)
 	{
 	case UPD7810_PORTA:
-		if (m_ma && !m_pa_in_cb.isnull())   // NS20031301 no need to read if the port is set as output
+		if (m_ma && !m_pa_in_cb.isunset())  // NS20031301 no need to read if the port is set as output
 			m_pa_in = m_pa_in_cb(0, m_ma);
 		data = (m_pa_in & m_ma) | (m_pa_out & ~m_ma);
 		break;
 	case UPD7810_PORTB:
-		if (m_mb && !m_pb_in_cb.isnull())   // NS20031301 no need to read if the port is set as output
+		if (m_mb && !m_pb_in_cb.isunset())  // NS20031301 no need to read if the port is set as output
 			m_pb_in = m_pb_in_cb(0, m_mb);
 		data = (m_pb_in & m_mb) | (m_pb_out & ~m_mb);
 		break;
 	case UPD7810_PORTC:
-		if (m_mc && !m_pc_in_cb.isnull())   // NS20031301 no need to read if the port is set as output
+		if (m_mc && !m_pc_in_cb.isunset())  // NS20031301 no need to read if the port is set as output
 			m_pc_in = m_pc_in_cb(0, m_mc);
 		data = (m_pc_in & m_mc) | (m_pc_out & ~m_mc);
 		if (m_mcc & 0x01)   /* PC0 = TxD output */
@@ -622,7 +629,7 @@ uint8_t upd7810_device::RP(offs_t port)
 			data = (data & ~0x80) | (m_co1 & 1 ? 0x80 : 0x00);
 		break;
 	case UPD7810_PORTD:
-		if (!m_pd_in_cb.isnull())
+		if (!m_pd_in_cb.isunset())
 			m_pd_in = m_pd_in_cb();
 		switch (m_mm & 0x07)
 		{
@@ -638,7 +645,7 @@ uint8_t upd7810_device::RP(offs_t port)
 		}
 		break;
 	case UPD7810_PORTF:
-		if (m_mf && !m_pf_in_cb.isnull())
+		if (m_mf && !m_pf_in_cb.isunset())
 			m_pf_in = m_pf_in_cb(0, m_mf);
 		switch (m_mm & 0x06)
 		{
@@ -911,7 +918,9 @@ void upd7801_device::upd7810_take_irq()
 
 void upd7810_device::upd7810_to_output_change(int state)
 {
-	TO = state & 1;
+	if ((SMH & 0x03) == 0x00 && state != TO)
+		update_sio(1);
+	TO = state;
 	m_to_func(TO);
 
 	if (m_mcc & 0x10)
@@ -1350,6 +1359,25 @@ void upd7810_device::upd7810_handle_timer1(int cycles, int clkdiv)
 	}
 }
 
+void upd7810_device::update_sio(int cycles)
+{
+	const int divider[] = { 2, 384 / 3, 24 / 3, 2 };
+	const int prescale[] = { 1, 1, 16, 64 };
+	const int interval = divider[SMH & 0x03] * prescale[SML & 0x03];
+
+	OVCS += cycles;
+
+	while (OVCS >= interval / 2)
+	{
+		OVCS -= (interval / 2);
+
+		if (0 == (EDGES ^= 1))
+			upd7810_sio_input(); // rising edge
+		else
+			upd7810_sio_output(); // falling edge
+	}
+}
+
 void upd7810_device::handle_timers(int cycles)
 {
 	/**** TIMER 0 ****/
@@ -1461,21 +1489,7 @@ void upd7810_device::handle_timers(int cycles)
 	// we only handle "internal clock" serial mode here
 	if (((SMH & 0x03) == 0x01) || ((SMH & 0x03) == 0x02))
 	{
-		const int divider[] = { 0, 384, 24, 0 };
-		const int prescale[] = { 1, 1, 16, 64 };
-		const int interval = divider[SMH & 0x03] / 3 * prescale[SML & 0x03];
-
-		OVCS += cycles;
-
-		while (OVCS >= interval / 2)
-		{
-			OVCS -= (interval / 2);
-
-			if (0 == (EDGES ^= 1))
-				upd7810_sio_input(); // rising edge
-			else
-				upd7810_sio_output(); // falling edge
-		}
+		update_sio(cycles);
 	}
 
 	/**** ADC ****/
@@ -1585,27 +1599,6 @@ void upd7810_device::base_device_start()
 {
 	space(AS_PROGRAM).specific(m_program);
 	space(AS_PROGRAM).cache(m_opcodes);
-
-	m_to_func.resolve_safe();
-	m_co0_func.resolve_safe();
-	m_co1_func.resolve_safe();
-	m_txd_func.resolve_safe();
-	m_rxd_func.resolve_safe(1);
-	m_an_func.resolve_all_safe(0);
-
-	m_pa_in_cb.resolve();
-	m_pb_in_cb.resolve();
-	m_pc_in_cb.resolve();
-	m_pd_in_cb.resolve();
-	m_pf_in_cb.resolve();
-
-	m_pa_out_cb.resolve_safe();
-	m_pb_out_cb.resolve_safe();
-	m_pc_out_cb.resolve_safe();
-	m_pd_out_cb.resolve_safe();
-	m_pf_out_cb.resolve_safe();
-
-	m_pt_in_cb.resolve_safe(0); // TODO: uPD7807 only
 
 	configure_ops();
 

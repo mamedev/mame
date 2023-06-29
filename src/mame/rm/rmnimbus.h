@@ -159,19 +159,19 @@ private:
 	virtual void video_start() override;
 	virtual void video_reset() override;
 	uint32_t screen_update_nimbus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(sio_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_drq_w);
-	DECLARE_READ_LINE_MEMBER(nimbus_fdc_enmf_r);
+	void sio_interrupt(int state);
+	void nimbus_fdc_intrq_w(int state);
+	void nimbus_fdc_drq_w(int state);
+	int nimbus_fdc_enmf_r();
 
 	void nimbus_via_write_portb(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(write_scsi_bsy);
-	DECLARE_WRITE_LINE_MEMBER(write_scsi_cd);
-	DECLARE_WRITE_LINE_MEMBER(write_scsi_io);
-	DECLARE_WRITE_LINE_MEMBER(write_scsi_msg);
-	DECLARE_WRITE_LINE_MEMBER(write_scsi_req);
-	DECLARE_WRITE_LINE_MEMBER(nimbus_msm5205_vck);
-	DECLARE_WRITE_LINE_MEMBER(write_scsi_iena);
+	void write_scsi_bsy(int state);
+	void write_scsi_cd(int state);
+	void write_scsi_io(int state);
+	void write_scsi_msg(int state);
+	void write_scsi_req(int state);
+	void nimbus_msm5205_vck(int state);
+	void write_scsi_iena(int state);
 
 	uint8_t get_pixel(uint16_t x, uint16_t y);
 	uint16_t read_pixel_line(uint16_t x, uint16_t y, uint8_t pixels, uint8_t bpp);

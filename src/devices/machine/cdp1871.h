@@ -56,12 +56,12 @@ public:
 
 	uint8_t read();
 
-	DECLARE_READ_LINE_MEMBER( da_r ) { return m_da; }
-	DECLARE_READ_LINE_MEMBER( rpt_r ) { return m_rpt; }
+	int da_r() { return m_da; }
+	int rpt_r() { return m_rpt; }
 
-	DECLARE_WRITE_LINE_MEMBER( shift_w ) { m_shift = state; }
-	DECLARE_WRITE_LINE_MEMBER( control_w ) { m_control = state; }
-	DECLARE_WRITE_LINE_MEMBER( alpha_w ) { m_alpha = state; }
+	void shift_w(int state) { m_shift = state; }
+	void control_w(int state) { m_control = state; }
+	void alpha_w(int state) { m_alpha = state; }
 
 protected:
 	// device-level overrides

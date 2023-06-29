@@ -354,7 +354,7 @@ void dio16_98620_device::dma_transfer(int channel)
 	m_regs[channel].subcount--;
 }
 
-WRITE_LINE_MEMBER(dio16_98620_device::dmar0_in)
+void dio16_98620_device::dmar0_in(int state)
 {
 	LOG("%s: %d\n", __FUNCTION__, state);
 	m_dmar[0] = state;
@@ -364,7 +364,7 @@ WRITE_LINE_MEMBER(dio16_98620_device::dmar0_in)
 	dma_transfer(0);
 }
 
-WRITE_LINE_MEMBER(dio16_98620_device::dmar1_in)
+void dio16_98620_device::dmar1_in(int state)
 {
 	LOG("%s: %d\n", __FUNCTION__, state);
 	m_dmar[1] = state;

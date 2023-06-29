@@ -86,10 +86,10 @@ private:
 	void memmap_w(uint8_t data);
 	void hunter2_palette(palette_device &palette) const;
 
-	DECLARE_WRITE_LINE_MEMBER(timer0_out);
-	DECLARE_WRITE_LINE_MEMBER(timer1_out);
-	DECLARE_WRITE_LINE_MEMBER(cts_w);
-	DECLARE_WRITE_LINE_MEMBER(rxd_w);
+	void timer0_out(int state);
+	void timer1_out(int state);
+	void cts_w(int state);
+	void rxd_w(int state);
 
 	void hunter2_io(address_map &map);
 	void hunter2_mem(address_map &map);
@@ -386,19 +386,19 @@ void hunter2_state::hunter2_palette(palette_device &palette) const
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-WRITE_LINE_MEMBER(hunter2_state::timer0_out)
+void hunter2_state::timer0_out(int state)
 {
 	if(state == ASSERT_LINE)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE_LINE_MEMBER(hunter2_state::timer1_out)
+void hunter2_state::timer1_out(int state)
 {
 	if(m_irq_mask & 0x08)
 		m_maincpu->set_input_line(NSC800_RSTA, state);
 }
 
-WRITE_LINE_MEMBER(hunter2_state::cts_w)
+void hunter2_state::cts_w(int state)
 {
 	if(BIT(m_irq_mask, 1))
 	{
@@ -407,7 +407,7 @@ WRITE_LINE_MEMBER(hunter2_state::cts_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hunter2_state::rxd_w)
+void hunter2_state::rxd_w(int state)
 {
 	if(BIT(m_irq_mask, 2))
 		m_maincpu->set_input_line(NSC800_RSTB, ASSERT_LINE);

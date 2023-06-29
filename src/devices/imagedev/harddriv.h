@@ -74,8 +74,15 @@ public:
 	virtual const char *file_extensions() const noexcept override { return "chd,hd,hdv,2mg,hdi"; }
 	virtual const util::option_guide &create_option_guide() const override;
 
-	// specific implementation
-	hard_disk_file *get_hard_disk_file() { return m_hard_disk_handle.get(); }
+	const hard_disk_file::info &get_info() const;
+	bool read(uint32_t lbasector, void *buffer);
+	bool write(uint32_t lbasector, const void *buffer);
+
+	bool set_block_size(uint32_t blocksize);
+
+	std::error_condition get_inquiry_data(std::vector<uint8_t> &data) const;
+	std::error_condition get_cis_data(std::vector<uint8_t> &data) const;
+	std::error_condition get_disk_key_data(std::vector<uint8_t> &data) const;
 
 protected:
 	harddisk_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -88,6 +95,7 @@ protected:
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
+	void setup_current_preset_image();
 	std::error_condition internal_load_hd();
 
 	chd_file        *m_chd;

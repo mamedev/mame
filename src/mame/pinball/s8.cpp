@@ -172,12 +172,12 @@ private:
 	void sound_w(u8 data);
 	u8 switch_r();
 	void switch_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[16] = state; } // dummy to stop error log filling up
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { m_comma34 = state; } // comma3&4
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { m_comma12 = state; } // comma1&2
-	DECLARE_WRITE_LINE_MEMBER(pia_irq);
+	void pia21_ca2_w(int state);
+	void pia21_cb2_w(int state) { } // enable solenoids
+	void pia24_cb2_w(int state) { m_io_outputs[16] = state; } // dummy to stop error log filling up
+	void pia28_ca2_w(int state) { m_comma34 = state; } // comma3&4
+	void pia28_cb2_w(int state) { m_comma12 = state; } // comma1&2
+	void pia_irq(int state);
 
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
@@ -425,7 +425,7 @@ void s8_state::sound_w(u8 data)
 	m_sound_data = data;
 }
 
-WRITE_LINE_MEMBER( s8_state::pia21_ca2_w )
+void s8_state::pia21_ca2_w(int state)
 {
 // sound ns
 	if (m_pias)
@@ -506,7 +506,7 @@ u8 s8_state::sound_r()
 	return m_sound_data;
 }
 
-WRITE_LINE_MEMBER( s8_state::pia_irq )
+void s8_state::pia_irq(int state)
 {
 	if(state == CLEAR_LINE)
 	{
