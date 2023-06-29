@@ -100,11 +100,11 @@ namespace bx
 
 	/// Returns converted the argument _deg to radians.
 	///
-	BX_CONST_FUNC float toRad(float _deg);
+	BX_CONSTEXPR_FUNC float toRad(float _deg);
 
 	/// Returns converted the argument _rad to degrees.
 	///
-	BX_CONST_FUNC float toDeg(float _rad);
+	BX_CONSTEXPR_FUNC float toDeg(float _rad);
 
 	/// Reinterprets the bit pattern of _a as uint32_t.
 	///
@@ -316,7 +316,7 @@ namespace bx
 
 	/// Returns the floating-point remainder of the division operation _a/_b.
 	///
-	BX_CONST_FUNC float mod(float _a, float _b);
+	BX_CONSTEXPR_FUNC float mod(float _a, float _b);
 
 	///
 	BX_CONSTEXPR_FUNC bool isEqual(float _a, float _b, float _epsilon);
@@ -325,7 +325,7 @@ namespace bx
 	BX_CONST_FUNC bool isEqual(const float* _a, const float* _b, uint32_t _num, float _epsilon);
 
 	///
-	BX_CONST_FUNC float wrap(float _a, float _wrap);
+	BX_CONSTEXPR_FUNC float wrap(float _a, float _wrap);
 
 	///
 	BX_CONSTEXPR_FUNC float step(float _edge, float _a);
@@ -346,11 +346,11 @@ namespace bx
 	BX_CONSTEXPR_FUNC float gain(float _time, float _gain);
 
 	///
-	BX_CONST_FUNC float angleDiff(float _a, float _b);
+	BX_CONSTEXPR_FUNC float angleDiff(float _a, float _b);
 
 	/// Returns shortest distance linear interpolation between two angles.
 	///
-	BX_CONST_FUNC float angleLerp(float _a, float _b, float _t);
+	BX_CONSTEXPR_FUNC float angleLerp(float _a, float _b, float _t);
 
 	///
 	template<typename Ty>
