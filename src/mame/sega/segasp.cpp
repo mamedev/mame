@@ -101,10 +101,46 @@ G  171-8278G  315-6416  2x 512Mbit  RMI
 */
 
 #include "emu.h"
-#include "cpu/sh/sh4.h"
-#include "debugger.h"
-#include "segasp.h"
+
+#include "naomi.h"
 #include "naomim4.h"
+
+#include "cpu/sh/sh4.h"
+
+#include "debugger.h"
+
+
+namespace {
+
+class segasp_state : public naomi_state
+{
+public:
+	segasp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		naomi_state(mconfig, type, tag),
+		m_sp_eeprom(*this, "sp_eeprom")
+	{
+	}
+
+	void segasp(machine_config &config);
+
+	void init_segasp();
+
+private:
+	required_device<eeprom_serial_93cxx_device> m_sp_eeprom;
+
+	uint64_t sp_eeprom_r(offs_t offset, uint64_t mem_mask = ~0);
+	void sp_eeprom_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t sp_rombdflg_r();
+	uint64_t sp_io_r(offs_t offset, uint64_t mem_mask = ~0);
+	uint64_t sn_93c46a_r();
+	void sn_93c46a_w(uint64_t data);
+	uint64_t sp_bank_r(offs_t offset, uint64_t mem_mask = ~0);
+	void sp_bank_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint16_t m_sp_bank = 0;
+
+	void onchip_port(address_map &map);
+	void segasp_map(address_map &map);
+};
 
 uint64_t segasp_state::sp_bank_r(offs_t offset, uint64_t mem_mask)
 {
@@ -916,6 +952,8 @@ ROM_START( tetgiano )
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0604-com.ic15", 0, 0x800, CRC(a46dfd47) SHA1(9e24739ecaaf85ef3b862485064450db6c607189) )
 ROM_END
+
+} // anonymous namespace
 
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND)

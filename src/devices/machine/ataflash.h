@@ -10,7 +10,7 @@
 
 DECLARE_DEVICE_TYPE(ATA_FLASH_PCCARD, ata_flash_pccard_device)
 
-class ata_flash_pccard_device : public ide_hdd_device_base, public device_pccard_interface
+class ata_flash_pccard_device : public cf_device_base, public device_pccard_interface
 {
 public:
 	ata_flash_pccard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -25,9 +25,6 @@ protected:
 
 	// device_t implementation
 	virtual void device_reset() override;
-
-	virtual attotime seek_time() override;
-	uint8_t calculate_status() override { return ata_hle_device_base::calculate_status(); }
 
 private:
 	// ata_hle_device_base implementation

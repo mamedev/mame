@@ -940,3 +940,12 @@ void cf_device_base::ide_build_identify_device()
 	m_identify_buffer[160] = 0x00;                     /* 160:  Power requirement description*/
 	m_identify_buffer[161] = 0x00;                     /* 161-255: reserved */
 }
+
+//-------------------------------------------------
+//  seek_time
+//-------------------------------------------------
+
+attotime cf_device_base::seek_time()
+{
+	return attotime::zero;
+}
