@@ -19,6 +19,7 @@
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 #include "machine/sis85c496.h"
+#include "video/voodoo_pci.h"
 
 class sis496_state : public driver_device
 {
@@ -30,11 +31,29 @@ public:
 
 	void sis496(machine_config &config);
 
-private:
+protected:
 	required_device<i486dx4_device> m_maincpu;
-
+private:
 	void main_io(address_map &map);
 	void main_map(address_map &map);
+};
+
+#define PCI_ID_VIDEO    "pci:08.0"
+
+class sis496_voodoo1_state : public sis496_state
+{
+public:
+	sis496_voodoo1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sis496_state(mconfig, type, tag)
+		, m_voodoo(*this, PCI_ID_VIDEO)
+		, m_screen(*this, "screen")
+	{ }
+
+	void sis496_voodoo1(machine_config &config);
+
+protected:
+	required_device<voodoo_1_pci_device> m_voodoo;
+	required_device<screen_device> m_screen;
 };
 
 void sis496_state::main_map(address_map &map)
@@ -61,6 +80,23 @@ void sis496_state::sis496(machine_config &config)
 	ISA16_SLOT(config, "isa1", 0, "pci:05.0:isabus",  pc_isa16_cards, "svga_et4k", false);
 	ISA16_SLOT(config, "isa2", 0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
+}
+
+void sis496_voodoo1_state::sis496_voodoo1(machine_config &config)
+{
+	sis496_state::sis496(config);
+
+	VOODOO_1_PCI(config, m_voodoo, 0, m_maincpu, m_screen);
+	m_voodoo->set_fbmem(2);
+	m_voodoo->set_tmumem(4, 0);
+	m_voodoo->set_status_cycles(1000);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// Screeen size and timing is re-calculated later in voodoo card
+	m_screen->set_refresh_hz(57);
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea(0, 640 - 1, 0, 480 - 1);
+	m_screen->set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_1_pci_device::screen_update));
 }
 
 // generic placeholder for unknown BIOS types
@@ -181,7 +217,7 @@ ROM_START( a486sp3 )
 	ROMX_LOAD( "si4i0305.awd", 0x00000, 0x20000, CRC(2f90e63e) SHA1(a4f16753b5a57d65fba7702ca28e44f10bd5bb6c), ROM_BIOS(8))
 ROM_END
 
-COMP( 199?, sis85c496, 0, 0, sis496, 0, sis496_state, empty_init, "Hack Inc.", "486 motherboards using the SiS 85C496/85C497 chipset", MACHINE_NOT_WORKING ) // 4sim002 crashes while enabling cache?
+COMP( 199?, sis85c496, 0, 0, sis496_voodoo1, 0, sis496_voodoo1_state, empty_init, "Hack Inc.", "486 motherboards using the SiS 85C496/85C497 chipset + 3dfx Voodoo 1", MACHINE_NOT_WORKING ) // 4sim002 crashes while enabling cache?
 
 COMP( 1995, atc1425a,  0, 0, sis496, 0, sis496_state, empty_init, "A-Trend", "ATC-1425A (SiS 85C496/85C497)", MACHINE_NOT_WORKING ) // -bios 2 punts to Award BootBlock, -bios 0 and 1 crashes
 COMP( 1996, atc1425b,  0, 0, sis496, 0, sis496_state, empty_init, "A-Trend", "ATC-1425B (SiS 85C496/85C497)", MACHINE_NOT_WORKING ) // punts to Award BootBlock
