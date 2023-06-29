@@ -6,8 +6,9 @@
 #define SIS85C496_H
 
 #include "pci.h"
-#include "machine/ins8250.h"
 #include "machine/ds128x.h"
+#include "machine/idectrl.h"
+#include "machine/ins8250.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 
@@ -73,6 +74,7 @@ private:
 	required_device<ds12885_device> m_ds12885;
 	required_device<pc_kbdc_device> m_pc_kbdc;
 	required_device<isa16_device> m_isabus;
+	required_device_array<ide_controller_32_device, 2> m_ide;
 
 	uint8_t m_at_spkrdata;
 	uint8_t m_pit_out2;
@@ -94,6 +96,7 @@ private:
 	uint8_t m_bios_config, m_dram_config, m_isa_decoder;
 	uint16_t m_shadctrl;
 	uint8_t m_smramctrl;
+	uint16_t m_ide_vesa_ctrl;
 	u8 m_dram_boundary[8]{};
 
 	void internal_io_map(address_map &map);
@@ -110,6 +113,8 @@ private:
 	void shadow_config_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { COMBINE_DATA(&m_shadctrl); logerror("SiS496: %04x to shadow control\n", m_shadctrl); remap_cb(); }
 	uint8_t smram_ctrl_r() { return m_smramctrl; }
 	void smram_ctrl_w(uint8_t data) { m_smramctrl = data; remap_cb(); }
+	uint16_t ide_vesa_config_r() { return m_ide_vesa_ctrl; }
+	void ide_vesa_config_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { COMBINE_DATA(&m_ide_vesa_ctrl); logerror("SiS496: %04x to IDE/VESA Bus configuration\n", m_ide_vesa_ctrl); remap_cb(); }
 
 	// southbridge
 	uint8_t at_page8_r(offs_t offset);

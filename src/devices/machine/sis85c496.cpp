@@ -32,6 +32,7 @@ void sis85c496_host_device::config_map(address_map &map)
 			m_dram_boundary[offset] = data;
 		})
 	);
+	map(0x58, 0x59).rw(FUNC(sis85c496_host_device::ide_vesa_config_r), FUNC(sis85c496_host_device::ide_vesa_config_w));
 	map(0x5a, 0x5a).rw(FUNC(sis85c496_host_device::smram_ctrl_r), FUNC(sis85c496_host_device::smram_ctrl_w));
 	map(0xc8, 0xcb).rw(FUNC(sis85c496_host_device::mailbox_r), FUNC(sis85c496_host_device::mailbox_w));
 	map(0xd0, 0xd0).rw(FUNC(sis85c496_host_device::bios_config_r), FUNC(sis85c496_host_device::bios_config_w));
@@ -126,6 +127,12 @@ void sis85c496_host_device::device_add_mconfig(machine_config &config)
 	m_isabus->set_memspace(m_maincpu, AS_PROGRAM);
 	m_isabus->set_iospace(m_maincpu, AS_IO);
 
+	IDE_CONTROLLER_32(config, m_ide[0]).options(ata_devices, "hdd", nullptr, false);
+	m_ide[0]->irq_handler().set(m_pic8259_slave, FUNC(pic8259_device::ir6_w));
+
+	IDE_CONTROLLER_32(config, m_ide[1]).options(ata_devices, "cdrom", nullptr, false);
+	m_ide[1]->irq_handler().set(m_pic8259_slave, FUNC(pic8259_device::ir7_w));
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -145,6 +152,7 @@ sis85c496_host_device::sis85c496_host_device(const machine_config &mconfig, cons
 	m_ds12885(*this, "rtc"),
 	m_pc_kbdc(*this, "kbd"),
 	m_isabus(*this, "isabus"),
+	m_ide(*this, "ide%u", 1U),
 	m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_at_speaker(0), m_refresh(false), m_channel_check(0), m_nmi_enabled(0)
 {
 }
@@ -206,6 +214,7 @@ void sis85c496_host_device::device_reset()
 	m_isa_decoder = 0xff;
 	m_shadctrl = 0;
 	m_smramctrl = 0;
+	m_ide_vesa_ctrl = 0;
 }
 
 void sis85c496_host_device::device_config_complete()
@@ -349,6 +358,22 @@ void sis85c496_host_device::map_extra(uint64_t memory_window_start, uint64_t mem
 	{
 		logerror("SiS496: ISA base 640K enabled\n");
 		memory_space->install_ram(0x00000000, 0x0009ffff, &ram[0x00000000/4]);
+	}
+
+	if (BIT(m_ide_vesa_ctrl, 8))
+	{
+		const bool main_ch_select = bool(BIT(m_ide_vesa_ctrl, 9));
+		io_space->install_readwrite_handler(0x1f0, 0x1f7, read32s_delegate(*m_ide[main_ch_select], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_ide[main_ch_select], FUNC(ide_controller_32_device::cs0_w)), 0xffffffff);
+
+		if (!BIT(m_ide_vesa_ctrl, 7))
+			io_space->install_readwrite_handler(0x3f0, 0x3f7, read32s_delegate(*m_ide[main_ch_select], FUNC(ide_controller_32_device::cs1_r)), write32s_delegate(*m_ide[main_ch_select], FUNC(ide_controller_32_device::cs1_w)));
+
+		const bool sub_ch_select = main_ch_select ^ 1;
+
+		io_space->install_readwrite_handler(0x170, 0x177, read32s_delegate(*m_ide[sub_ch_select], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_ide[sub_ch_select], FUNC(ide_controller_32_device::cs0_w)), 0xffffffff);
+
+		if (!BIT(m_ide_vesa_ctrl, 6))
+			io_space->install_readwrite_handler(0x370, 0x377, read32s_delegate(*m_ide[sub_ch_select], FUNC(ide_controller_32_device::cs1_r)), write32s_delegate(*m_ide[sub_ch_select], FUNC(ide_controller_32_device::cs1_w)));
 	}
 
 	// 32 megs of RAM (todo: don't hardcode)
