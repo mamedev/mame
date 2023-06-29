@@ -189,6 +189,7 @@ void riot6532_device::write(offs_t offset, uint8_t data)
 		{
 			m_irqenable &= ~PA7_FLAG;
 		}
+		update_irqstate();
 
 		/* A0 specifies the edge detect direction: 0=negative, 1=positive */
 		m_pa7dir = (offset & 1) << 7;

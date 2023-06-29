@@ -526,18 +526,21 @@ uint8_t exidy_sound_device::sh6840_r(offs_t offset)
 	{
 		/* offset 0: Motorola datasheet says it isn't used, Hitachi datasheet says it reads as 0s always*/
 		case 0:
-		return 0;
+			return 0;
+
 		/* offset 1 reads the status register: bits 2 1 0 correspond to ints on channels 2,1,0, and bit 7 is an 'OR' of bits 2,1,0 */
 		case 1:
-		logerror("%s:exidy_sh6840_r - unexpected read, status register is TODO!\n", machine().describe_context());
-		return 0;
+			logerror("%s:exidy_sh6840_r - unexpected read, status register is TODO!\n", machine().describe_context());
+			return 0;
+
 		/* offsets 2,4,6 read channel 0,1,2 MSBs and latch the LSB*/
 		case 2: case 4: case 6:
-		m_sh6840_LSB_latch = m_sh6840_timer[((offset>>1)-1)].counter.b.l;
-		return m_sh6840_timer[((offset>>1)-1)].counter.b.h;
+			m_sh6840_LSB_latch = m_sh6840_timer[((offset>>1)-1)].counter.b.l;
+			return m_sh6840_timer[((offset>>1)-1)].counter.b.h;
+
 		/* offsets 3,5,7 read the LSB latch*/
 		default: /* case 3,5,7 */
-		return m_sh6840_LSB_latch;
+			return m_sh6840_LSB_latch;
 	}
 }
 
@@ -868,7 +871,8 @@ void mtrap_sound_device::device_add_mconfig(machine_config &config)
 	m_cvsdcpu->set_addrmap(AS_PROGRAM, &mtrap_sound_device::cvsd_map);
 	m_cvsdcpu->set_addrmap(AS_IO, &mtrap_sound_device::cvsd_iomap);
 
-	TIMER(config, m_cvsd_timer).configure_periodic(FUNC(mtrap_sound_device::cvsd_timer), attotime::from_hz(CVSD_CLOCK*2.0)); // this is a 555 timer with 53% duty cycle, within margin of error of 50% duty cycle; the handler clocks on both clock edges, hence * 2.0
+	// this is a 555 timer with 53% duty cycle, within margin of error of 50% duty cycle; the handler clocks on both clock edges, hence * 2.0
+	TIMER(config, m_cvsd_timer).configure_periodic(FUNC(mtrap_sound_device::cvsd_timer), attotime::from_hz(CVSD_CLOCK*2.0));
 
 	/* audio hardware */
 	FILTER_BIQUAD(config, m_cvsd_filter2).opamp_mfb_lowpass_setup(RES_K(10), RES_K(3.9), RES_K(18), CAP_N(20), CAP_N(2.2));
