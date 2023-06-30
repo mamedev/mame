@@ -926,9 +926,9 @@ ROM_END
 
 /****************************************************************** NCR PC6 ***
 
-Links: 	https://www.1000bit.it/ad/bro/ncr/ncr-pc6.pdf
-Info: 	ID-Nr. 3285-1011 (256KB RAM, 5.25 360KB flex drive), 3285-1012 (256KB RAM, 2x360KB flex drives), 3285-1014 (512KB RAM, 360KB flex and 20MB fixed drive),
-		3285-1015 (same as 1014, but adding a 10MB tape streamer); the motherboard is said to be the VLSI version of the PC4i mentioned there.
+Links:  https://www.1000bit.it/ad/bro/ncr/ncr-pc6.pdf
+Info:   ID-Nr. 3285-1011 (256KB RAM, 5.25 360KB flex drive), 3285-1012 (256KB RAM, 2x360KB flex drives), 3285-1014 (512KB RAM, 360KB flex and 20MB fixed drive),
+        3285-1015 (same as 1014, but adding a 10MB tape streamer); the motherboard is said to be the VLSI version of the PC4i mentioned there.
 Form factor: Desktop
 CPU: 8088-2 @ 4.77 MHz or 8 MHz
 RAM: 256K / 512K, up to 640K on board, four banks
@@ -937,29 +937,29 @@ On board ports: 2xserial, parallel, floppy, speaker
 Video: Extended CGA, Hercules, EGA (mono or color)
 
 DIP settings:
-SW1:	SW1/1	SW1/2	SW1/3	SW1/4	SW1/5	SW1/6	SW1/7	SW1/8
-		N/A		
-				ON														FPU not installed
-						N/A		N/A
-										OFF		OFF						monochrome display
-										OFF		ON						color/graphics 40x25
-										ON		OFF						color/graphics 80x25
-										ON		ON						no display
-														ON		ON		1 flexible disk drive
-														OFF		ON		2 flexible disk drives
-														ON		OFF		3 flexible disk drives
-														OFF		OFF		4 flexible disk drives
+SW1:    SW1/1   SW1/2   SW1/3   SW1/4   SW1/5   SW1/6   SW1/7   SW1/8
+        N/A
+                ON                                                      FPU not installed
+                        N/A     N/A
+                                        OFF     OFF                     monochrome display
+                                        OFF     ON                      color/graphics 40x25
+                                        ON      OFF                     color/graphics 80x25
+                                        ON      ON                      no display
+                                                        ON      ON      1 flexible disk drive
+                                                        OFF     ON      2 flexible disk drives
+                                                        ON      OFF     3 flexible disk drives
+                                                        OFF     OFF     4 flexible disk drives
 
-SWA:	SWA/1	SWA/2	SWA/3	SWA/4	SWA/5	SWA/6	SWA/7	SWA/8
-		OFF		OFF														256K RAM, 4x64K banks
-		OFF		ON														256K in bank 0
-		ON		OFF														640K (64K-64K-256K-256K) or 448K (64K-64K-256K-64K)
-		ON		ON														640K (256K-256K-64K-64K) or 576K (256K-256K-64K) or 512K (256K-256K-0K-0K)
-						ON												serial ports enabled
-								ON										parallel port enabled
-										ON								XP installed (turbo switch to 8 MHz)
-												N/A		N/A		N/A
-						
+SWA:    SWA/1   SWA/2   SWA/3   SWA/4   SWA/5   SWA/6   SWA/7   SWA/8
+        OFF     OFF                                                     256K RAM, 4x64K banks
+        OFF     ON                                                      256K in bank 0
+        ON      OFF                                                     640K (64K-64K-256K-256K) or 448K (64K-64K-256K-64K)
+        ON      ON                                                      640K (256K-256K-64K-64K) or 576K (256K-256K-64K) or 512K (256K-256K-0K-0K)
+                        ON                                              serial ports enabled
+                                ON                                      parallel port enabled
+                                        ON                              XP installed (turbo switch to 8 MHz)
+                                                N/A     N/A     N/A
+
 
 
 ******************************************************************************/
@@ -2400,7 +2400,7 @@ ISA: 6 slots
 *****************************************************************************/
 
 ROM_START( hyu16t )
-	ROM_REGION(0x10000, "bios", 0) 
+	ROM_REGION(0x10000, "bios", 0)
 	ROM_LOAD( "hea_v1.12ta_1986.bin", 0xc000, 0x4000, CRC(66573361) SHA1(6d0ef7ef6cd0bfbe2917ee52602e470cd143075f))
 ROM_END
 
@@ -2421,7 +2421,7 @@ ISA: 5 slots
 *****************************************************************************/
 
 ROM_START( hyu16te )
-	ROM_REGION(0x10000, "bios", 0) 
+	ROM_REGION(0x10000, "bios", 0)
 	ROM_LOAD( "v2.00id_1989.bin", 0xc000, 0x4000, CRC(9a7a9917) SHA1(e114fdcc7b8caf76070f633bdab8c792eaa7eda0))
 ROM_END
 
@@ -2438,9 +2438,10 @@ ISA: 8 slots
 *****************************************************************************/
 
 ROM_START( auvip800 ) // a v2.30 Juko BIOS exists on this MB, cf. juko8
-	ROM_REGION(0x10000, "bios", 0) 
+	ROM_REGION(0x10000, "bios", 0)
 	ROM_LOAD( "bxm10_phoenix_ver 2.52d.bin", 0xe000, 0x2000, CRC(9c964c80) SHA1(59a60425aa867abd33d30303300ed3c587969d2a))
 ROM_END
+
 } // anonymous namespace
 
 
@@ -2459,7 +2460,7 @@ COMP( 198?, olytext30,      ibm5150, 0,      olytext30,      pccga,    pc_state,
 COMP( 1987, earthst,        ibm5150, 0,      earthst,        pccga,    pc_state, empty_init,    "Alloy",                           "EarthStation-I",        MACHINE_NOT_WORKING )
 COMP( 1987, ataripc1,       ibm5150, 0,      ataripc1,       pccga,    pc_state, empty_init,    "Atari",                           "PC1",                   0 )
 COMP( 1988, ataripc3,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Atari",                           "PC3",                   0 )
-COMP( 198?, auvip800,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "AUVA",							   "VIP 800",				MACHINE_NOT_WORKING )
+COMP( 198?, auvip800,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "AUVA",                            "VIP 800",               MACHINE_NOT_WORKING )
 COMP( 1985, bw230,          ibm5150, 0,      bondwell,       bondwell, pc_state, init_bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)",  0 )
 COMP( 1982, mpc1600,        ibm5150, 0,      mpc1600,        pccga,    pc_state, empty_init,    "Columbia Data Products",          "MPC 1600",              0 )
 COMP( 198?, coppc21,        ibm5150, 0,      coppc400,       pccga,    pc_state, empty_init,    "Corona Data Systems, Inc.",       "Corona PPC-21",         MACHINE_NOT_WORKING )
@@ -2476,8 +2477,8 @@ COMP( 1990, ec1847,         ibm5150, 0,      ec1847,         pccga,    pc_state,
 COMP( 1985, eppc,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson Portable PC",  MACHINE_NOT_WORKING )
 COMP( 1989, fraking,        ibm5150, 0,      fraking,        pccga,    pc_state, empty_init,    "Frael",                           "King",                  MACHINE_NOT_WORKING )
 COMP( 198?, hyo88t,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Hyosung",                         "Topstar 88T",           MACHINE_NOT_WORKING )
-COMP( 1986, hyu16t,			ibm5150, 0, 	 pccga,          pccga,    pc_state, empty_init,    "Hyundai",						   "Super 16 T",	        MACHINE_NOT_WORKING )
-COMP( 1987, hyu16te,		ibm5150, 0, 	 pccga,          pccga,    pc_state, empty_init,    "Hyundai",						   "Super 16 TE",           MACHINE_NOT_WORKING )
+COMP( 1986, hyu16t,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Hyundai",                         "Super 16 T",            MACHINE_NOT_WORKING )
+COMP( 1987, hyu16te,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Hyundai",                         "Super 16 TE",           MACHINE_NOT_WORKING )
 COMP( 1983, ibm5550,        ibm5150, 0,      ibm5550,        pccga,    pc_state, empty_init,    "International Business Machines", "5550",                  MACHINE_NOT_WORKING )
 COMP( 1984, ittxtra,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "ITT Information Systems",         "ITT XTRA",              MACHINE_NOT_WORKING )
 COMP( 198?, juko8,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "JUKO",                            "NEST 8088 and V20",     MACHINE_NOT_WORKING )
