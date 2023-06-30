@@ -31885,6 +31885,9 @@ m6805evs                        //
 705r3prg                        //
 705u3prg                        //
 
+@source:motorola/m8120.cpp
+m8120                           // Motorola M8120
+
 @source:motorola/mekd1.cpp
 mekd1                           // 1975 Motorola Evaluation Kit
 
