@@ -5,7 +5,7 @@
     Exidy 6502 hardware
 
     TODO:
-    - use ptm6840_device and pit8253_device
+    - use ptm6840_device and pit8253_device, maybe mos6532_new_device too
 
 *************************************************************************/
 
