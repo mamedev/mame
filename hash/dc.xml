@@ -3113,33 +3113,6 @@ Black screen [GDROM READY] (fixed)
 
 	<!-- The Limited Edition (T-23204M) comes in a cardboard slipcase and includes an audio CD. -->
 	<software name="bsbsg" supported="no"> <!-- cloneof="bsb" --> <!-- Sega Rating: Suitable for All Ages -->
-		<!-- http://redump.org/disc/43713/ http://redump.org/disc/43714/
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan).gdi" size="243" crc="3494ccc6" md5="aede4489a8f62e9146a5d489110993da" sha1="ecacde76f17665539d69629c14d52218cb42766a"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Track 1).bin" size="2241456" crc="e607e01e" md5="93ae63a963ad44c86a023dafde9a63f1" sha1="b47a76464907cbd06ddf85345950f145782d00ba"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Track 2).bin" size="2302608" crc="a9684d33" md5="3a23931b29da109b04737c79cbcc18fc" sha1="1312a9ce85a306e731945dc0e97a047b2a7c6187"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Track 3).bin" size="1185760800" crc="2b4761b8" md5="25661323f8169f3a858c572c50505741" sha1="4ac729f5d37e58297685e90400344f2d8d540413"/>
-
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc).cue" size="2980" crc="5176f2bd" md5="cf5af18977c8f650cf103f8b62d7d610" sha1="1b9e6cd5ef4d6dd3fe4212f15dcf1dab41c4f5d1"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 01).bin" size="30256128" crc="f13a49c0" md5="cf6a65a5874bde5174153b9f44bf75ff" sha1="d72744889f392797019405ffc38f70fc03c882d6"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 02).bin" size="39160800" crc="ff625132" md5="bb45164bd996f7a5918dca98c7f510b1" sha1="e84ea9db7b053aad7ed86da027275eed15f92643"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 03).bin" size="30766512" crc="beaac766" md5="91a63fb269a422f4b89a818f92851d9d" sha1="2ef278fa1255baf0e5a552cd2c1022f690751c7d"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 04).bin" size="37841328" crc="fb2d9523" md5="5da6018aaa45df398f247dbad0c8f446" sha1="989dc309e26149caabf80d89e2461e1dde8f086d"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 05).bin" size="33969936" crc="6a9a3c8c" md5="217d2824b8153dedb7be876970cd73b2" sha1="03663948ac4ea2bd26593685cb24fbe2d15b6a47"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 06).bin" size="36665328" crc="72ca0449" md5="6d1cbe32b3afbd2bcaca89d5fb0dcd32" sha1="47702b78b0537905274c28130b60aaaed0b6b3d4"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 07).bin" size="59112816" crc="26e85858" md5="81da242a0a6db96323b5ebe02a298c47" sha1="76c91a26c1d40c8518e78d4dddb1b6a094ca1a89"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 08).bin" size="33741792" crc="6546438e" md5="a69746ef7f28c21b36d39e264f0eb98b" sha1="223735acf40887e269b6f9cd42282ae8a2284b5b"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 09).bin" size="25314576" crc="77bade60" md5="a3e441a9773372decffc5b1c027c9a44" sha1="6309d25465abc1cda6fe0c237be8faff91949f6f"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 10).bin" size="22221696" crc="78462bea" md5="64e3e50edee72c30305f7a0952eb3f1e" sha1="e6ffa2ed8f426025f2217d0b4fb80875dbcdd3bf"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 11).bin" size="24658368" crc="aeaf98c3" md5="6c46a930a4deb53ff47bfa2d49de22dd" sha1="e63b7903ab04a138de173d1da4a6118b10452100"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 12).bin" size="29795136" crc="44cf0fb1" md5="ff901027f4e5063b212557465cb1af2d" sha1="d95e2cffb9c567155f0d5696ae4066d0639fe384"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 13).bin" size="26949216" crc="a2a005c2" md5="6ce241f09e4a642ea700fb86e750a153" sha1="4b43f1c073ac6c4234e8f4028ba966b93c97d7a3"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 14).bin" size="29178912" crc="a7a88154" md5="a50f7d6ac781e739daa545608aa8a537" sha1="a106d87dc12b6f9cb6d36e301f7b3652fdf40427"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 15).bin" size="27588960" crc="1f62e7cc" md5="543405c953245e435ebb859fe1eaced0" sha1="51dc821f46e60e2b944f3505a39e709a10ca1fdc"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 16).bin" size="28235760" crc="32960115" md5="8be1a4af370d6052c2e5830fed4a9590" sha1="0837d5ea79725c2d034a56413713735b2f8ed454"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 17).bin" size="41451648" crc="4ffb5d5c" md5="ef86e59cf1541cc0adea62ffd58922c9" sha1="1d7622ed63faa74aecf37d90bae119925da7733e"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 18).bin" size="44156448" crc="723bb275" md5="f5ba54c98bf560c2ff7c2b418ce45e93" sha1="10512f01d713ff423b20656bce2c9322a5ea463e"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 19).bin" size="37808400" crc="f66551d7" md5="c1dfc917f08848a0c85c839a7a65c7ec" sha1="d49046c4381471bd23e6c1f24cb3f41ea9981263"/>
-		-->
 		<description>Blue-Sky-Blue[s]: Sora o Mau Tsubasa - Shokai Genteiban (Japan)</description>
 		<year>2003</year>
 		<publisher>Ecole</publisher>
@@ -3150,12 +3123,40 @@ Black screen [GDROM READY] (fixed)
 		<info name="ring_code" value="T-23205M-0886   2MS1   C   36 (Game), ECAP-0003 *   JRC-13934   Made in Korea (Audio)"/>
 		<info name="barcode" value="4 512435 000068"/>
 		<part interface="cdrom" name="cdrom1">
+			<!-- http://redump.org/disc/43713/
+			<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan).gdi" size="243" crc="3494ccc6" md5="aede4489a8f62e9146a5d489110993da" sha1="ecacde76f17665539d69629c14d52218cb42766a"/>
+			<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Track 1).bin" size="2241456" crc="e607e01e" md5="93ae63a963ad44c86a023dafde9a63f1" sha1="b47a76464907cbd06ddf85345950f145782d00ba"/>
+			<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Track 2).bin" size="2302608" crc="a9684d33" md5="3a23931b29da109b04737c79cbcc18fc" sha1="1312a9ce85a306e731945dc0e97a047b2a7c6187"/>
+			<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Track 3).bin" size="1185760800" crc="2b4761b8" md5="25661323f8169f3a858c572c50505741" sha1="4ac729f5d37e58297685e90400344f2d8d540413"/>
+			-->
 			<feature name="part_id" value="Blue-Sky-Blue[s]: Sora o Mau Tsubasa"/>
 			<diskarea name="cdrom">
 				<disk name="blue-sky-blue[s] sora o mau tsubasa (jpn)" sha1="2959be03664d42eebcb1692337ea6b2e93bfb9fb"/>
 			</diskarea>
 		</part>
 		<part interface="dc_cdrom" name="cdrom2">
+			<!-- http://redump.org/disc/43714/
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 01).bin" size="30256128" crc="f13a49c0" md5="cf6a65a5874bde5174153b9f44bf75ff" sha1="d72744889f392797019405ffc38f70fc03c882d6"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 02).bin" size="39160800" crc="ff625132" md5="bb45164bd996f7a5918dca98c7f510b1" sha1="e84ea9db7b053aad7ed86da027275eed15f92643"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 03).bin" size="30766512" crc="beaac766" md5="91a63fb269a422f4b89a818f92851d9d" sha1="2ef278fa1255baf0e5a552cd2c1022f690751c7d"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 04).bin" size="37841328" crc="fb2d9523" md5="5da6018aaa45df398f247dbad0c8f446" sha1="989dc309e26149caabf80d89e2461e1dde8f086d"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 05).bin" size="33969936" crc="6a9a3c8c" md5="217d2824b8153dedb7be876970cd73b2" sha1="03663948ac4ea2bd26593685cb24fbe2d15b6a47"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 06).bin" size="36665328" crc="72ca0449" md5="6d1cbe32b3afbd2bcaca89d5fb0dcd32" sha1="47702b78b0537905274c28130b60aaaed0b6b3d4"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 07).bin" size="59112816" crc="26e85858" md5="81da242a0a6db96323b5ebe02a298c47" sha1="76c91a26c1d40c8518e78d4dddb1b6a094ca1a89"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 08).bin" size="33741792" crc="6546438e" md5="a69746ef7f28c21b36d39e264f0eb98b" sha1="223735acf40887e269b6f9cd42282ae8a2284b5b"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 09).bin" size="25314576" crc="77bade60" md5="a3e441a9773372decffc5b1c027c9a44" sha1="6309d25465abc1cda6fe0c237be8faff91949f6f"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 10).bin" size="22221696" crc="78462bea" md5="64e3e50edee72c30305f7a0952eb3f1e" sha1="e6ffa2ed8f426025f2217d0b4fb80875dbcdd3bf"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 11).bin" size="24658368" crc="aeaf98c3" md5="6c46a930a4deb53ff47bfa2d49de22dd" sha1="e63b7903ab04a138de173d1da4a6118b10452100"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 12).bin" size="29795136" crc="44cf0fb1" md5="ff901027f4e5063b212557465cb1af2d" sha1="d95e2cffb9c567155f0d5696ae4066d0639fe384"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 13).bin" size="26949216" crc="a2a005c2" md5="6ce241f09e4a642ea700fb86e750a153" sha1="4b43f1c073ac6c4234e8f4028ba966b93c97d7a3"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 14).bin" size="29178912" crc="a7a88154" md5="a50f7d6ac781e739daa545608aa8a537" sha1="a106d87dc12b6f9cb6d36e301f7b3652fdf40427"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 15).bin" size="27588960" crc="1f62e7cc" md5="543405c953245e435ebb859fe1eaced0" sha1="51dc821f46e60e2b944f3505a39e709a10ca1fdc"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 16).bin" size="28235760" crc="32960115" md5="8be1a4af370d6052c2e5830fed4a9590" sha1="0837d5ea79725c2d034a56413713735b2f8ed454"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 17).bin" size="41451648" crc="4ffb5d5c" md5="ef86e59cf1541cc0adea62ffd58922c9" sha1="1d7622ed63faa74aecf37d90bae119925da7733e"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 18).bin" size="44156448" crc="723bb275" md5="f5ba54c98bf560c2ff7c2b418ce45e93" sha1="10512f01d713ff423b20656bce2c9322a5ea463e"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 19).bin" size="37808400" crc="f66551d7" md5="c1dfc917f08848a0c85c839a7a65c7ec" sha1="d49046c4381471bd23e6c1f24cb3f41ea9981263"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle).cue" size="3335" crc="22d44df4" md5="c130fa0d8bea9ef8a0eb6617d0b048be" sha1="9e1eb5f391bd97047ae4112b80658e13ee1760cd"/>
+			-->
 			<feature name="part_id" value="Premium Fan Disc"/> <!-- プレミアムファンデイスク -->
 			<diskarea name="cdrom">
 				<disk name="blue-sky-blue[s] sora o mau tsubasa - shokai genteiban (jpn) (premium fan disc)" sha1="9fc87706b7fc652cba2a6c58e709c7cacc3da03f"/>
