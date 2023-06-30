@@ -32848,6 +32848,9 @@ topracer                        // bootleg
 topracera                       // bootleg
 topracern                       // bootleg
 
+@source:namco/quickncrash.cpp
+qncrash
+
 @source:namco/rallyx.cpp
 commsega                        // (c) 1983 Sega
 cottong                         // bootleg
