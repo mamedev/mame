@@ -1689,10 +1689,10 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<!--
 		<rom name="ALIENFRONT_ONLINE.gdi" size="143" md5="0a3db521ea34e40a63967a0108d4bc78" sha1="397340cf23de1f66776741a3b9da8914c9b48203"/>
 		<rom name="track01.iso" size="921600" md5="98de8e5db931c9106cbf5c53b75f7cc7" sha1="5e23b9e4a63d4720e114bc777640bd65f0edca9b"/>
-		<rom name="track02.raw" size="13 994 400" md5="a55424800b9a45851b3670fa8afbf6a9" sha1="6cd6c33fc86f008d87f9d4385371e5df684c4c60"/>
-		<rom name="track03.iso" size="876 550 144" md5="17f9a991a2b7758f5ae1b2c2a08adb65" sha1="e99bcff45222f59148463dab5833ddf5e8aa93bd"/>
-		<rom name="track04.raw" size="13 818 000" md5="52d4f2952f4aca03f15d23825f5609b0" sha1="b00cc2ffa6abbd0908675ced977586fd9111d881"/>
-		<rom name="track05.iso" size="143 302 656" md5="d4ca27065a01df92300d240093d61ff5" sha1="2db3177f076caaa5e779a70f1ba546ac1b709e26"/>
+		<rom name="track02.raw" size="13994400" md5="a55424800b9a45851b3670fa8afbf6a9" sha1="6cd6c33fc86f008d87f9d4385371e5df684c4c60"/>
+		<rom name="track03.iso" size="876550144" md5="17f9a991a2b7758f5ae1b2c2a08adb65" sha1="e99bcff45222f59148463dab5833ddf5e8aa93bd"/>
+		<rom name="track04.raw" size="13818000" md5="52d4f2952f4aca03f15d23825f5609b0" sha1="b00cc2ffa6abbd0908675ced977586fd9111d881"/>
+		<rom name="track05.iso" size="143302656" md5="d4ca27065a01df92300d240093d61ff5" sha1="2db3177f076caaa5e779a70f1ba546ac1b709e26"/>
 		-->
 		<description>Alien Front Online (USA, prototype 20010625)</description>
 		<year>2001</year>
@@ -2631,7 +2631,7 @@ Black screen [GDROM READY] (fixed)
 		<rom name="Resident Evil - Code - Veronica (Spain) (Disc 1).cue" size="438" crc="4a381e1f" md5="1a2f9b05bb4327a9d8a4cb3dd0dd4f31" sha1="2015027657fc79fee0f0ab9c3be3e18f10770e21"/>
 		<rom name="Resident Evil - Code - Veronica (Spain) (Disc 1) (Track 1).bin" size="705600" crc="df4ce28a" md5="d15f4196c90da354d84875f0beae97b2" sha1="f7ca8308d5ec5bd3988f89497611162c22053241"/>
 		<rom name="Resident Evil - Code - Veronica (Spain) (Disc 1) (Track 2).bin" size="14347200" crc="49e43706" md5="9cca4624e62f04dc398aed22b5370a34" sha1="a34bdc73ac1e360b13d0592b501a388e0225e994"/>
-		<rom name="Resident Evil - Code - Veronica (Spain) (Disc 1) (Track 3).bin" size="1185760800" crc="01ca4c1e" md5="d166f9dc96ecdb7c13b582315ab74a9d" sha1="c5a1ca3b825753d364d08bec108114812c75f7ac"/>		
+		<rom name="Resident Evil - Code - Veronica (Spain) (Disc 1) (Track 3).bin" size="1185760800" crc="01ca4c1e" md5="d166f9dc96ecdb7c13b582315ab74a9d" sha1="c5a1ca3b825753d364d08bec108114812c75f7ac"/>
 		<rom name="Resident Evil - Code - Veronica (Spain) (Disc 2).gdi" size="252" crc="48f963f7" md5="a0ad564b88414a4f4fc6b0858f063e26" sha1="f2716d204174c807c2b560d7e794a1129e9b353e"/>
 		<rom name="Resident Evil - Code - Veronica (Spain) (Disc 2) (Track 1).bin" size="705600" crc="8ef6567f" md5="28b2d0e26e3e95dedfee7da075ecd984" sha1="b35b37fd7577152e659f7e2438f50e57989cef95"/>
 		<rom name="Resident Evil - Code - Veronica (Spain) (Disc 2) (Track 2).bin" size="14347200" crc="49e43706" md5="9cca4624e62f04dc398aed22b5370a34" sha1="a34bdc73ac1e360b13d0592b501a388e0225e994"/>
