@@ -23,9 +23,10 @@ namespace bx
 		/// Special OS directories:
 		enum Enum
 		{
-			Current, //!< Current directory.
-			Temp,    //!< Temporary directory.
-			Home,    //!< User's home directory.
+			Current,    //!< Current directory.
+			Executable, //!< Executable file path.
+			Home,       //!< User's home directory.
+			Temp,       //!< Temporary directory.
 
 			Count
 		};

@@ -133,3 +133,30 @@ TEST_CASE("FilePath temp", "[filepath]")
 	REQUIRE(bx::removeAll(tmp, &err) );
 	REQUIRE(err.isOk() );
 }
+
+TEST_CASE("FilePath special", "[filepath]")
+{
+	{
+		bx::FilePath tmp(bx::Dir::Current);
+		bx::StringView sv(tmp);
+		DBG("%S", &sv);
+	}
+
+	{
+		bx::FilePath tmp(bx::Dir::Executable);
+		bx::StringView sv(tmp);
+		DBG("%S", &sv);
+	}
+
+	{
+		bx::FilePath tmp(bx::Dir::Home);
+		bx::StringView sv(tmp);
+		DBG("%S", &sv);
+	}
+
+	{
+		bx::FilePath tmp(bx::Dir::Temp);
+		bx::StringView sv(tmp);
+		DBG("%S", &sv);
+	}
+}
