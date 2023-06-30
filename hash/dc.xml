@@ -15401,31 +15401,41 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 	-->
 
 	<software name="grandia2" supported="no">
-		<!--
-		<rom name="Grandia II v1.001 (2000)(Ubi Soft)(NTSC)(US)[!].gdi" size="147" md5="779bfea94c220796cb9202e719cdb2e6" sha1="0a9e87800a6d7e0b2c4b8d616f0461c91d8a90d8"/>
-		<rom name="track01.bin" size="1425312" md5="cf71233b825358b1a7f4037aee98987c" sha1="523371c8279b2b8abd8d861b4828566fe9260e5f"/>
-		<rom name="track02.raw" size="1237152" md5="94fde9cacd7a4b3c18d8918836e9cda5" sha1="4b9ed2a2eefaae6691674522b9f047a066304a75"/>
-		<rom name="track03.bin" size="11456592" md5="8438569ebff46674c270e6406c8bd454" sha1="89ace0de97116a81c5856a6ab16f9a2b5f9ccc2a"/>
-		<rom name="track04.raw" size="1060752" md5="166d547d4b80a87ad3538f9377fbf6d8" sha1="471abb758a709c9d678bd2e76f31a6d721b5f4f0"/>
-		<rom name="track05.bin" size="1172537856" md5="dbd00f0e1b9796ba3e14e0266a1f7bd0" sha1="3117d7aafce1e25364e89447cf8b158ae4764aa2"/>
-
-		<rom name="Grandia II (Includes Audio Disc) (US).cue" size="6990" md5="b4d9c2211b05674eaf7f5040f4143c80" sha1="6ada883540e6448cf307847a60d863fbb4b24941"/>
-		<rom name="Grandia II Official Music Selections by Noriyuki Iwadre [Audio CD].ccd" size="2491" md5="f0fa93382e0ff0762f1fcf9e8f3d97b9" sha1="c4b3a8180b0a1125c2fd8b9863b1cf4ab7384cba"/>
-		<rom name="Grandia II Official Music Selections by Noriyuki Iwadre [Audio CD].img" size="524058528" md5="2fea441413f8d26fe1208163fd584117" sha1="e1d79d544b442043f6e3ca3f9bb1801c824fded9"/>
-		<rom name="Grandia II Official Music Selections by Noriyuki Iwadre [Audio CD].sub" size="21390144" md5="c7950da71b8e56d2c12c9aa5a3388e4d" sha1="61e57eeed76657a0e8a85fc550dec06dd6406d5d"/>
-		-->
 		<description>Grandia II (USA)</description>
 		<year>2000</year>
 		<publisher>Ubisoft</publisher>
 		<info name="serial" value="T-17716N"/>
 		<info name="release" value="20001206"/>
 		<part interface="cdrom" name="cdrom1">
+			<!--
+			<rom name="Grandia II v1.001 (2000)(Ubi Soft)(NTSC)(US)[!].gdi" size="147" md5="779bfea94c220796cb9202e719cdb2e6" sha1="0a9e87800a6d7e0b2c4b8d616f0461c91d8a90d8"/>
+			<rom name="track01.bin" size="1425312" md5="cf71233b825358b1a7f4037aee98987c" sha1="523371c8279b2b8abd8d861b4828566fe9260e5f"/>
+			<rom name="track02.raw" size="1237152" md5="94fde9cacd7a4b3c18d8918836e9cda5" sha1="4b9ed2a2eefaae6691674522b9f047a066304a75"/>
+			<rom name="track03.bin" size="11456592" md5="8438569ebff46674c270e6406c8bd454" sha1="89ace0de97116a81c5856a6ab16f9a2b5f9ccc2a"/>
+			<rom name="track04.raw" size="1060752" md5="166d547d4b80a87ad3538f9377fbf6d8" sha1="471abb758a709c9d678bd2e76f31a6d721b5f4f0"/>
+			<rom name="track05.bin" size="1172537856" md5="dbd00f0e1b9796ba3e14e0266a1f7bd0" sha1="3117d7aafce1e25364e89447cf8b158ae4764aa2"/>
+			-->
 			<feature name="part_id" value="Grandia II"/>
 			<diskarea name="cdrom">
 				<disk name="grandia ii (usa)" sha1="5a1a449de242d31bf47931096ebe7ce5412d0215"/>
 			</diskarea>
 		</part>
 		<part interface="dc_cdrom" name="cdrom2">
+			<!-- http://redump.org/disc/72472/
+			<rom name="grandia ii music selections (usa) (track 01).bin" size="73029600" crc="e569a19b" md5="43b49137a16ce4e24c8c8d5ef7709742" sha1="4c01222ba023968c54d6f036dceae765d36aa3c2"/>
+			<rom name="grandia ii music selections (usa) (track 02).bin" size="51113664" crc="388a626b" md5="c69d814d073fc3b24db10630c3a52562" sha1="b7cc765fedf2670e548059e96fb7d01d0b44f8b8"/>
+			<rom name="grandia ii music selections (usa) (track 03).bin" size="36691200" crc="8e5bef65" md5="110e1a9bead6cc02ddc5f7a53bf9c098" sha1="3b13cb4d1b377f0e65d012d0aed13757f87b4286"/>
+			<rom name="grandia ii music selections (usa) (track 04).bin" size="40755456" crc="51179a09" md5="efb3615c7ef0ac8392b07154517f97a3" sha1="7a40a31d890e4be0060703ceccded7386e9c50af"/>
+			<rom name="grandia ii music selections (usa) (track 05).bin" size="45673488" crc="e97e8f39" md5="1d2aeced867b0d1a7dadf91a3e701dc5" sha1="539494370739f512d8f2e72a1f5ad34a991c39f6"/>
+			<rom name="grandia ii music selections (usa) (track 06).bin" size="41063568" crc="b65d4f35" md5="4077c79be889b610db4e3f65cfae178b" sha1="e29a27f2133563e6b463ca026a0d7f39f9fef0ff"/>
+			<rom name="grandia ii music selections (usa) (track 07).bin" size="29788080" crc="51b97f44" md5="6c3760246b80e3a2242d3863cf19b29c" sha1="c32d0a584d670b5d5ce9924468c9accdabfb3251"/>
+			<rom name="grandia ii music selections (usa) (track 08).bin" size="38130624" crc="bbd84f84" md5="2910babfa9e79c6bc1fda769c32b3451" sha1="6912a00a0fab17c8f2b8c602f8e3275e354063f0"/>
+			<rom name="grandia ii music selections (usa) (track 09).bin" size="31653216" crc="f34782e4" md5="e523a1dde4817eaa7cdd6b981afa65cc" sha1="9431776f7510c47f1fd94d75bc81ab20d71616f4"/>
+			<rom name="grandia ii music selections (usa) (track 10).bin" size="47959632" crc="e4ffb9c8" md5="e9965b767ba01c7858290f751302d16b" sha1="972fda06c0d9d86b4f45496ca35172a83653d44f"/>
+			<rom name="grandia ii music selections (usa) (track 11).bin" size="51511152" crc="3b9910f6" md5="5cd2ebfb4d1954c0057a0c6f9ab9743d" sha1="69c788d2fa7dcc52756c644f83e47422171394b2"/>
+			<rom name="grandia ii music selections (usa) (track 12).bin" size="36688848" crc="4f495ce8" md5="7565aeddd11c3a68960c8e615da21cce" sha1="f40eb9ad47dff120be4dc159e9f6029569e4ff29"/>
+			<rom name="grandia ii music selections (usa).cue" size="1513" crc="a31def9e" md5="957647bab9af38929e0ca188b8ed857f" sha1="0de5f1834251c4f0362ed7040a8ad714ec5f2221"/>
+			-->
 			<feature name="part_id" value="Music Selections"/>
 			<diskarea name="cdrom">
 				<disk name="grandia ii (usa) (music selections)" sha1="36b8d4c10044de33e05343cb1a68c4b28c13ee33"/>
