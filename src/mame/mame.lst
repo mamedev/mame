@@ -36056,6 +36056,7 @@ brooks                          //
 cueball                         //
 cueballa                        //
 cueballb                        //
+cueballc                        //
 freddy                          //
 freddy3                         //
 gladiatp                        //
@@ -38458,19 +38459,20 @@ gen_nomd                        // 1995 Sega Genesis Nomad (USA)
 megajet                         // 1993 Sega Mega Jet (Japan)
 
 @source:sega/megadriv_acbl.cpp
-aladmdb                         // MegaDrive-based hack
-barekch                         // MegaDrive-based hack
-barek2ch                        // MegaDrive-based hack
-barek2mb                        // MegaDrive-based hack
-barek3mb                        // MegaDrive-based hack
-bk3ssrmb                        // MegaDrive-based hack
-jparkmb                         // MegaDrive-based hack
-mk3mdb                          // MegaDrive-based hack
-sonic2mb                        // MegaDrive-based hack
-sonic3mb                        // MegaDrive-based hack
-srmdb                           // MegaDrive-based hack
-ssf2mdb                         // MegaDrive-based hack
-twinktmb                        // MegaDrive-based hack
+aladmdb
+barekch
+barek2ch
+barek2mb
+barek3mb
+barek3mba
+bk3ssrmb
+jparkmb
+mk3mdb
+sonic2mb
+sonic3mb
+srmdb
+ssf2mdb
+twinktmb
 
 @source:sega/megadriv_rad.cpp
 rad_sf2                         // (c)2004 Radica
