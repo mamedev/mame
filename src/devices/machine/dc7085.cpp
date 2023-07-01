@@ -18,7 +18,6 @@
 #include "emu.h"
 #include "dc7085.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_REG     (1U << 1)
 #define LOG_RX      (1U << 2)
 #define LOG_TX      (1U << 3)
@@ -127,10 +126,6 @@ void dc7085_device::map(address_map &map)
 
 void dc7085_device::device_start()
 {
-	m_int_cb.resolve_safe();
-	m_tx_cb.resolve_all_safe();
-	m_dtr_cb.resolve_all_safe();
-
 	save_item(NAME(m_csr));
 	save_item(NAME(m_tcr));
 	save_item(NAME(m_msr));
@@ -309,10 +304,6 @@ dc7085_channel::dc7085_channel(machine_config const &mconfig, char const *tag, d
 
 void dc7085_channel::device_start()
 {
-	m_tx_cb.resolve_safe();
-	m_rx_done.resolve_safe();
-	m_tx_done.resolve_safe();
-
 	save_item(NAME(m_rx_enabled));
 }
 

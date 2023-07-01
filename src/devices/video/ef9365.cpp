@@ -312,8 +312,6 @@ void ef9365_device::set_color_filler(uint8_t color)
 
 void ef9365_device::device_start()
 {
-	m_irq_handler.resolve_safe();
-
 	m_busy_timer = timer_alloc(FUNC(ef9365_device::clear_busy_flag), this);
 
 	m_videoram = &space(0);

@@ -26,7 +26,7 @@ public:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	static void get_time_string(std::string &dest, cassette_image_device *cassette, int *curpos, int *endpos);
 };

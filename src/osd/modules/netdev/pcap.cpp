@@ -189,15 +189,14 @@ netdev_pcap::netdev_pcap(const char *name, class device_network_interface *ifdev
 
 void netdev_pcap::set_mac(const char *mac)
 {
-	char filter[256];
 	struct bpf_program fp;
 	if(!m_p) return;
 #ifdef SDLMAME_MACOSX
-	sprintf(filter, "not ether src %.2X:%.2X:%.2X:%.2X:%.2X:%.2X and (ether dst %.2X:%.2X:%.2X:%.2X:%.2X:%.2X or ether multicast or ether broadcast or ether dst 09:00:07:ff:ff:ff)", (unsigned char)mac[0], (unsigned char)mac[1], (unsigned char)mac[2],(unsigned char)mac[3], (unsigned char)mac[4], (unsigned char)mac[5], (unsigned char)mac[0], (unsigned char)mac[1], (unsigned char)mac[2],(unsigned char)mac[3], (unsigned char)mac[4], (unsigned char)mac[5]);
+	auto filter = util::string_format("not ether src %02X:%02X:%02X:%02X:%02X:%02X and (ether dst %02X:%02X:%02X:%02X:%02X:%02X or ether multicast or ether broadcast or ether dst 09:00:07:ff:ff:ff)", (unsigned char)mac[0], (unsigned char)mac[1], (unsigned char)mac[2],(unsigned char)mac[3], (unsigned char)mac[4], (unsigned char)mac[5], (unsigned char)mac[0], (unsigned char)mac[1], (unsigned char)mac[2],(unsigned char)mac[3], (unsigned char)mac[4], (unsigned char)mac[5]);
 #else
-	sprintf(filter, "ether dst %.2X:%.2X:%.2X:%.2X:%.2X:%.2X or ether multicast or ether broadcast", (unsigned char)mac[0], (unsigned char)mac[1], (unsigned char)mac[2],(unsigned char)mac[3], (unsigned char)mac[4], (unsigned char)mac[5]);
+	auto filter = util::string_format("ether dst %02X:%02X:%02X:%02X:%02X:%02X or ether multicast or ether broadcast", (unsigned char)mac[0], (unsigned char)mac[1], (unsigned char)mac[2],(unsigned char)mac[3], (unsigned char)mac[4], (unsigned char)mac[5]);
 #endif
-	if ((*module->pcap_compile_dl)(m_p, &fp, filter, 1, 0) == -1) {
+	if ((*module->pcap_compile_dl)(m_p, &fp, filter.c_str(), 1, 0) == -1) {
 		osd_printf_error("Error with pcap_compile\n");
 	}
 	if ((*module->pcap_setfilter_dl)(m_p, &fp) == -1) {

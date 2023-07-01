@@ -173,7 +173,7 @@ void md_jcart_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 }
 
 template <unsigned N>
-DECLARE_WRITE_LINE_MEMBER(md_jcart_device::th_in)
+void md_jcart_device::th_in(int state)
 {
 	m_th_in[N] = state ? 0x40 : 0x00;
 }

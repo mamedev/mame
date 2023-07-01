@@ -8,7 +8,7 @@
 template<int Width, int AddrShift> class handler_entry_read_address : public handler_entry_read<Width, AddrShift>
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 
 	handler_entry_read_address(address_space *space, u32 flags) : handler_entry_read<Width, AddrShift>(space, flags) {}
 	~handler_entry_read_address() = default;
@@ -25,7 +25,7 @@ protected:
 template<int Width, int AddrShift> class handler_entry_write_address : public handler_entry_write<Width, AddrShift>
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 
 	static constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? (1 << (Width + AddrShift)) - 1 : 0;
 

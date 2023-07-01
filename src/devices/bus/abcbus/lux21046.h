@@ -15,6 +15,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "formats/abc800_dsk.h"
+#include "formats/abc800i_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80dma.h"
@@ -83,14 +84,14 @@ protected:
 	required_device<floppy_connector> m_floppy1;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( dma_int_w );
+	void dma_int_w(int state);
 
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	uint8_t io_read_byte(offs_t offset);
 	void io_write_byte(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	void fdc_intrq_w(int state);
 
 	uint8_t out_r();
 	void inp_w(uint8_t data);

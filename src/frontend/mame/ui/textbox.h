@@ -28,7 +28,7 @@ protected:
 	menu_textbox(mame_ui_manager &mui, render_container &container);
 
 	void reset_layout();
-	void handle_key(int key);
+	bool handle_key(int key);
 
 	virtual void populate_text(std::optional<text_layout> &layout, float &width, int &lines) = 0;
 
@@ -65,7 +65,7 @@ protected:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	std::string const m_heading;
 	std::string const m_content;

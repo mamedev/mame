@@ -55,7 +55,7 @@ void amiga_fdc_device::floppy_formats(format_registration &fr)
 amiga_fdc_device::amiga_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AMIGA_FDC, tag, owner, clock)
 	, m_write_index(*this)
-	, m_read_dma(*this)
+	, m_read_dma(*this, 0)
 	, m_write_dma(*this)
 	, m_write_dskblk(*this)
 	, m_write_dsksyn(*this)
@@ -67,11 +67,6 @@ amiga_fdc_device::amiga_fdc_device(const machine_config &mconfig, const char *ta
 
 void amiga_fdc_device::device_start()
 {
-	m_write_index.resolve_safe();
-	m_read_dma.resolve_safe(0);
-	m_write_dma.resolve_safe();
-	m_write_dskblk.resolve_safe();
-	m_write_dsksyn.resolve_safe();
 	m_leds.resolve();
 	m_fdc_led.resolve();
 
@@ -289,25 +284,11 @@ void amiga_fdc_device::live_run(const attotime &limit)
 						if(dma_state == DMA_WAIT_START) {
 							cur_live.bit_counter = 0;
 
-							if(!(dsklen & 0x3fff))
+							if(dsklen & 0x3fff)
+								dma_state = DMA_RUNNING_BYTE_0;
+							else
 								dma_done();
-							else if(dsklen & 0x4000) {
-								dskbyt |= 0x2000;
-								cur_live.bit_counter = 0;
-								dma_value = dma_read();
-
-							} else {
-								LOGSYNC("%s: DSKSYNC on %06x %d\n", this->tag(), dskpt, dma_state);
-								dma_write(dsksync);
-							}
-
-						} else if(dma_state != DMA_IDLE) {
-							LOGSYNC("%s: DSKSYNC on %06x %d\n", this->tag(), dskpt, dma_state);
-							dma_write(dsksync);
-							cur_live.bit_counter = 0;
-
-						} else if(cur_live.bit_counter != 8)
-							cur_live.bit_counter = 0;
+						}
 					}
 
 					dskbyt |= 0x1000;

@@ -21,7 +21,7 @@ class msx_cart_msx_audio_hxmu900_device : public device_t, public msx_cart_inter
 public:
 	msx_cart_msx_audio_hxmu900_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	virtual void device_start() override;
@@ -40,7 +40,7 @@ class msx_cart_msx_audio_nms1205_device : public device_t, public msx_cart_inter
 public:
 	msx_cart_msx_audio_nms1205_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	virtual void device_start() override;
@@ -50,8 +50,8 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(midi_in);
-	DECLARE_WRITE_LINE_MEMBER(irq_write);
+	void midi_in(int state);
+	void irq_write(int state);
 
 	required_device<y8950_device> m_y8950;
 	required_device<acia6850_device> m_acia6850;
@@ -65,7 +65,7 @@ class msx_cart_msx_audio_fsca1_device : public device_t, public msx_cart_interfa
 public:
 	msx_cart_msx_audio_fsca1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	virtual void device_start() override;

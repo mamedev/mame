@@ -110,7 +110,7 @@
   5. Change FREE PLAY to YES
   6. Press and hold HOLD3, HOLD5 and START until the horizontal scrolling line stops scrolling.
   7. Press HOLD4, HOLD5 and START together and release to enter hidden menu.
-  
+
   Note that ticket payout won't work with the current ticket driver.
 
 *****************************************************************************
@@ -147,11 +147,11 @@ Both setups show different variants for components layout, memory size, NVRAM, e
     but fixing these causes the poker winplan to be in the wrong place.
   - Super Petrix and Super Gran Safari use the same board but spetrix accesses the sound
     chip on the upper byte of the data bus and sgsafari on the lower. Is this just
-	a programming error on spetrix ?
+    a programming error on spetrix ?
   - Super Petrix attract mode consists of interleaved blue and gold blocks with the
     blue scrolling diagonally. The blocks are out of alignment which is caused by
-	update_screen doing m_tilemap[1]->set_scrollx(0, (m_vregs[2 / 2] - m_vregs[6 / 2]) + 4)
-	Removing the +4 fixes the problem but does it cause other issues ?
+    update_screen doing m_tilemap[1]->set_scrollx(0, (m_vregs[2 / 2] - m_vregs[6 / 2]) + 4)
+    Removing the +4 fixes the problem but does it cause other issues ?
 
 
 ****************************************************************************/
@@ -1622,8 +1622,8 @@ ROM_START( sgsafari )
 ROM_END
 
 /*
-	Super Petrix - Tetris type game.
-	Unknown manufacturer.
+    Super Petrix - Tetris type game.
+    Unknown manufacturer.
 */
 ROM_START( spetrix ) // same PCB as sgsafari but with a M48Z08 instead of a M48Z02
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code

@@ -46,7 +46,7 @@ public:
 	uint32_t screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
 
 	// Video enable
-	DECLARE_WRITE_LINE_MEMBER( videna );
+	void videna(int state);
 
 	// Callbacks
 	auto readmem_cb() { return m_mem_read_cb.bind(); }
@@ -64,7 +64,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(free_cpu);
 
 private:
-	std::string tts(attotime t);
 	devcb_read8   m_mem_read_cb; // Callback to read memory
 	devcb_write_line m_hold_cb;
 	devcb_write_line m_int_cb;

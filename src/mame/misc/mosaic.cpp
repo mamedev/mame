@@ -54,7 +54,7 @@ NOTE: PIC16C5x protection chip at 5A (UC02 as silkscreened on PCB)
 
 
 // configurable logging
-#define LOG_PICSIM     (1U <<  1)
+#define LOG_PICSIM     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_PICSIM)
 

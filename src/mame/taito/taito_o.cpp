@@ -25,7 +25,6 @@ TODO:
 - inputs (coins)
 - NVRAM
 - sprite priorities
-- dips
 - interrupts (sources) - valid levels 4,5,6(hop empty?)
 
 *****************************************************************/
@@ -60,9 +59,6 @@ public:
 	{ }
 
 	void parentj(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
 
 private:
 	// devices
@@ -216,58 +212,39 @@ static INPUT_PORTS_START( parentj )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
+	// dip descriptions and defaults taken from dip sheet
 	PORT_START("DSWA")
-	PORT_DIPNAME(0x0001,  0x00, "DSWA 0")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME(0x0002,  0x00, "DSWA 1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME(0x0004,  0x00, "DSWA 2")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME(0x0008,  0x00, "DSWA 3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME(0x0010,  0x00, "DSWA 4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x010, DEF_STR( On ) )
-	PORT_DIPNAME(0x0020,  0x00, "DSWA 5")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x020, DEF_STR( On ) )
-	PORT_DIPNAME(0x0040,  0x00, "DSWA 6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x040, DEF_STR( On ) )
-	PORT_DIPNAME(0x0080,  0x00, "DSWA 7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x080, DEF_STR( On ) )
+	PORT_DIPNAME(0x80, 0x80, "Credit")           PORT_DIPLOCATION("DSWA:1")
+	PORT_DIPSETTING(   0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(   0x80, DEF_STR( Yes ) )
+	PORT_DIPNAME(0x40, 0x00, "Player Character") PORT_DIPLOCATION("DSWA:2")
+	PORT_DIPSETTING(   0x40, "A" )
+	PORT_DIPSETTING(   0x00, "B" )
+	PORT_DIPNAME(0x20, 0x20, "Card Character")   PORT_DIPLOCATION("DSWA:3")
+	PORT_DIPSETTING(   0x20, "A" )
+	PORT_DIPSETTING(   0x00, "B" )
+	PORT_DIPNAME(0x18, 0x18, "Max Bet")          PORT_DIPLOCATION("DSWA:4,5")
+	PORT_DIPSETTING(   0x18, "50" )
+	PORT_DIPSETTING(   0x10, "30" )
+	PORT_DIPSETTING(   0x08, "20" )
+	PORT_DIPSETTING(   0x00, "10" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "DSWA:6" ) // always off according to dip sheet
+	PORT_DIPNAME(0x02, 0x02, "Key Up / Clear")   PORT_DIPLOCATION("DSWA:7")
+	PORT_DIPSETTING(   0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
+	PORT_DIPNAME(0x01, 0x00, "Credits at start") PORT_DIPLOCATION("DSWA:8")
+	PORT_DIPSETTING(   0x00, "500" )
+	PORT_DIPSETTING(   0x01, "0" )
 
-	PORT_START("DSWB")
-	PORT_DIPNAME(0x0001,  0x00, "Credits at start")
-	PORT_DIPSETTING(    0x00, "500" )
-	PORT_DIPSETTING(    0x01, "0" )
-	PORT_DIPNAME(0x0002,  0x00, "DSWB 1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME(0x0004,  0x00, "DSWB 2")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME(0x0008,  0x00, "DSWB 3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME(0x0010,  0x00, "DSWB 4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x010, DEF_STR( On ) )
-	PORT_DIPNAME(0x0020,  0x00, "DSWB 5")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x020, DEF_STR( On ) )
-	PORT_DIPNAME(0x0040,  0x00, "DSWB 6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x040, DEF_STR( On ) )
-	PORT_DIPNAME(0x0080,  0x00, "DSWB 7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x080, DEF_STR( On ) )
-
+	PORT_START("DSWB") // not used according to the dip sheet
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "DSWB:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "DSWB:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "DSWB:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "DSWB:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "DSWB:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "DSWB:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "DSWB:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DSWB:8" )
 INPUT_PORTS_END
 
 // unknown sources ...
@@ -280,10 +257,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(taitoo_state::interrupt)
 
 	if(scanline == 0)
 		m_maincpu->set_input_line(5, HOLD_LINE);
-}
-
-void taitoo_state::machine_start()
-{
 }
 
 void taitoo_state::parentj(machine_config &config)
@@ -312,8 +285,8 @@ void taitoo_state::parentj(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", 2000000)); // ?? MHz
-	ymsnd.port_a_read_callback().set_ioport("DSWA");
-	ymsnd.port_b_read_callback().set_ioport("DSWB");
+	ymsnd.port_a_read_callback().set_ioport("DSWB");
+	ymsnd.port_b_read_callback().set_ioport("DSWA");
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -336,7 +309,7 @@ ROM_START( parentj )
 	ROM_LOAD( "ampal22v10a-0233.c42", 0x000, 0x2dd, CRC(0c030a81) SHA1(0f8198df2cb046683d2db9ac8e609cdff53083ed) )
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 GAME( 1989, parentj, 0, parentj,  parentj, taitoo_state, empty_init, ROT0, "Taito", "Parent Jack (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

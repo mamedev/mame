@@ -13,13 +13,13 @@
 #include "emucore.h"
 #include "osdcore.h"
 
-emu_fatalerror::emu_fatalerror(util::format_argument_pack<std::ostream> const &args)
+emu_fatalerror::emu_fatalerror(util::format_argument_pack<char> const &args)
 	: emu_fatalerror(0, args)
 {
 	osd_break_into_debugger(m_text.c_str());
 }
 
-emu_fatalerror::emu_fatalerror(int _exitcode, util::format_argument_pack<std::ostream> const &args)
+emu_fatalerror::emu_fatalerror(int _exitcode, util::format_argument_pack<char> const &args)
 	: m_text(util::string_format(args))
 	, m_code(_exitcode)
 {

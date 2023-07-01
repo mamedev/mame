@@ -34,7 +34,7 @@ public:
 	void noise_w(offs_t offset, uint8_t data);
 
 	void sound_decrement();
-	void soundport_w(int which, int offset, int data);
+	void soundport_w(uint8_t which, offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -55,13 +55,13 @@ private:
 		NOISE() : reg{ 0, 0, 0 } { }
 
 		uint8_t reg[3];
-		int on = 0, right = 0, left = 0, play = 0;
+		uint8_t on = 0, right = 0, left = 0, play = 0;
 		Type type = Type::Type7Bit;
-		int state = 0;
-		int volume = 0;
-		int count = 0;
+		int32_t state = 0;
+		uint8_t volume = 0;
+		uint16_t count = 0;
 		double step = 0, pos = 0;
-		int value = 0; // currently simple random function
+		uint8_t value = 0; // currently simple random function
 	};
 
 	struct DMA
@@ -69,11 +69,11 @@ private:
 		DMA() : reg{ 0, 0, 0, 0, 0 } { }
 
 		uint8_t reg[5];
-		int on = 0, right = 0, left = 0;
-		int ca14to16 = 0;
-		int start = 0, size = 0;
+		uint8_t on = 0, right = 0, left = 0;
+		uint32_t ca14to16 = 0;
+		uint16_t start = 0, size = 0;
 		double pos = 0, step = 0;
-		int finished = 0;
+		uint8_t finished = 0;
 	};
 
 	struct CHANNEL
@@ -81,11 +81,11 @@ private:
 		CHANNEL() : reg{ 0, 0, 0, 0 } { }
 
 		uint8_t reg[4];
-		int on = 0;
-		int waveform = 0, volume = 0;
-		int pos = 0;
-		int size = 0;
-		int count = 0;
+		uint8_t on = 0;
+		uint8_t waveform = 0, volume = 0;
+		int32_t pos = 0;
+		int32_t size = 0;
+		uint16_t count = 0;
 	};
 
 	devcb_write_line m_irq_cb;

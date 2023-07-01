@@ -37,7 +37,6 @@
 #include "emu.h"
 #include "hle_mouse.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_RXTX    (1U << 1)
 #define LOG_COMMAND (1U << 2)
 #define LOG_REPORT  (1U << 3)

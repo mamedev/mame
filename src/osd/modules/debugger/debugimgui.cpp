@@ -995,18 +995,18 @@ void debug_imgui::mount_image()
 
 void debug_imgui::create_image()
 {
-	image_init_result res;
+	std::pair<std::error_condition, std::string> res;
 
 	auto *fd = dynamic_cast<floppy_image_device *>(m_dialog_image);
 	if(fd != nullptr)
 	{
 		res = fd->create(m_path,nullptr,nullptr);
-		if(res == image_init_result::PASS)
+		if(!res.first)
 			fd->setup_write(m_typelist.at(m_format_sel).format);
 	}
 	else
 		res = m_dialog_image->create(m_path,nullptr,nullptr);
-	if(res == image_init_result::PASS)
+	if(!res.first)
 		ImGui::CloseCurrentPopup();
 	// TODO: add a messagebox to display on an error
 }
@@ -1493,7 +1493,7 @@ void debug_imgui::init_debugger(running_machine &machine)
 	m_mapping[ITEM_ID_LEFT] = ImGuiKey_LeftArrow;
 	m_mapping[ITEM_ID_RIGHT] = ImGuiKey_RightArrow;
 	m_mapping[ITEM_ID_UP] = ImGuiKey_UpArrow;
-	m_mapping[ITEM_ID_DOWN] = ImGuiKey_DownArrow;	
+	m_mapping[ITEM_ID_DOWN] = ImGuiKey_DownArrow;
 	m_mapping[ITEM_ID_F3] = ImGuiKey_F3;
 	m_mapping[ITEM_ID_F5] = ImGuiKey_F5;
 	m_mapping[ITEM_ID_F6] = ImGuiKey_F6;

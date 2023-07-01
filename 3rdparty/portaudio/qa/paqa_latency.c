@@ -1,7 +1,7 @@
 /** @file paqa_latency.c
-	@ingroup qa_src
-	@brief Test latency estimates.
-	@author Ross Bencina <rossb@audiomulch.com>
+    @ingroup qa_src
+    @brief Test latency estimates.
+    @author Ross Bencina <rossb@audiomulch.com>
     @author Phil Burk <philburk@softsynth.com>
 */
 /*
@@ -32,13 +32,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 #include <stdio.h>
@@ -91,7 +91,7 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
     (void) timeInfo; /* Prevent unused variable warnings. */
     (void) statusFlags;
     (void) inputBuffer;
-    
+
     if( data->minFramesPerBuffer > framesPerBuffer )
     {
         data->minFramesPerBuffer = framesPerBuffer;
@@ -100,7 +100,7 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
     {
         data->maxFramesPerBuffer = framesPerBuffer;
     }
-    
+
     /* Measure min and max output time stamp delta. */
     if( data->callbackCount > 0 )
     {
@@ -115,7 +115,7 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
         }
     }
     data->previousTimeInfo = *timeInfo;
-    
+
     for( i=0; i<framesPerBuffer; i++ )
     {
         *out++ = data->sine[data->left_phase];  /* left */
@@ -125,12 +125,12 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
         data->right_phase += 3; /* higher pitch so we can distinguish left and right. */
         if( data->right_phase >= TABLE_SIZE ) data->right_phase -= TABLE_SIZE;
     }
-    
+
     data->callbackCount += 1;
     return paContinue;
 }
 
-PaError paqaCheckLatency( PaStreamParameters *outputParamsPtr, 
+PaError paqaCheckLatency( PaStreamParameters *outputParamsPtr,
                          paTestData *dataPtr, double sampleRate, unsigned long framesPerBuffer )
 {
     PaError err;
@@ -142,7 +142,7 @@ PaError paqaCheckLatency( PaStreamParameters *outputParamsPtr,
     dataPtr->minDeltaDacTime = 9999999.0;
     dataPtr->maxDeltaDacTime = 0.0;
     dataPtr->callbackCount = 0;
-    
+
     printf("Stream parameter: suggestedOutputLatency = %g\n", outputParamsPtr->suggestedLatency );
     if( framesPerBuffer == paFramesPerBufferUnspecified ){
         printf("Stream parameter: user framesPerBuffer = paFramesPerBufferUnspecified\n" );
@@ -159,7 +159,7 @@ PaError paqaCheckLatency( PaStreamParameters *outputParamsPtr,
                         patestCallback,
                         dataPtr );
     if( err != paNoError ) goto error1;
-    
+
     streamInfo = Pa_GetStreamInfo( stream );
     printf("Stream info: inputLatency  = %g\n", streamInfo->inputLatency );
     printf("Stream info: outputLatency = %g\n", streamInfo->outputLatency );
@@ -169,7 +169,7 @@ PaError paqaCheckLatency( PaStreamParameters *outputParamsPtr,
 
     printf("Play for %d seconds.\n", NUM_SECONDS );
     Pa_Sleep( NUM_SECONDS * 1000 );
-    
+
     printf("  minFramesPerBuffer = %4d\n", dataPtr->minFramesPerBuffer );
     printf("  maxFramesPerBuffer = %4d\n", dataPtr->maxFramesPerBuffer );
     printf("  minDeltaDacTime = %f\n", dataPtr->minDeltaDacTime );
@@ -181,7 +181,7 @@ PaError paqaCheckLatency( PaStreamParameters *outputParamsPtr,
     err = Pa_CloseStream( stream );
     Pa_Sleep( 1 * 1000 );
 
-    
+
     printf("-------------------------------------\n");
     return err;
 error2:
@@ -245,26 +245,26 @@ static int paqaCheckMultipleSuggested( PaDeviceIndex deviceIndex, int isInput )
     streamParameters.hostApiSpecificStreamInfo = NULL;
     streamParameters.sampleFormat = paFloat32;
     sampleRate = pdi->defaultSampleRate;
-    
+
     printf(" lowLatency  = %g\n", lowLatency );
     printf(" highLatency = %g\n", highLatency );
     printf(" numChannels = %d\n", numChannels );
     printf(" sampleRate  = %g\n", sampleRate );
-    
+
     if( (highLatency - lowLatency) < 0.001 )
     {
         numLoops = 1;
     }
 
     for( i=0; i<numLoops; i++ )
-    {   
+    {
         if( numLoops == 1 )
             streamParameters.suggestedLatency = lowLatency;
         else
             streamParameters.suggestedLatency = lowLatency + ((highLatency - lowLatency) * i /(numLoops - 1));
-        
+
         printf("   suggestedLatency[%d] = %6.4f\n", i, streamParameters.suggestedLatency );
-    
+
         err = Pa_OpenStream(
                             &stream,
                             (isInput ? &streamParameters : NULL),
@@ -275,11 +275,11 @@ static int paqaCheckMultipleSuggested( PaDeviceIndex deviceIndex, int isInput )
                             paqaNoopCallback,
                             NULL );
         if( err != paNoError ) goto error;
-        
+
         streamInfo = Pa_GetStreamInfo( stream );
-        
+
         err = Pa_CloseStream( stream );
-        
+
         if( isInput )
         {
             finalLatency = streamInfo->inputLatency;
@@ -317,7 +317,7 @@ static int paqaVerifySuggestedLatency( void )
     int result = 0;
     const PaDeviceInfo *pdi;
     int numDevices = Pa_GetDeviceCount();
-    
+
     printf("\n ------------------------ paqaVerifySuggestedLatency\n");
     for( id=0; id<numDevices; id++ )            /* Iterate through all devices. */
     {
@@ -349,7 +349,7 @@ static int paqaVerifyDeviceInfoLatency( void )
     PaDeviceIndex id;
     const PaDeviceInfo *pdi;
     int numDevices = Pa_GetDeviceCount();
-    
+
     printf("\n ------------------------ paqaVerifyDeviceInfoLatency\n");
     for( id=0; id<numDevices; id++ ) /* Iterate through all devices. */
     {
@@ -390,7 +390,7 @@ int main(void)
     int i;
     int framesPerBuffer;
     double sampleRate = SAMPLE_RATE;
-    
+
     printf("\nPortAudio QA: investigate output latency.\n");
 
     /* initialise sinusoidal wavetable */
@@ -399,19 +399,19 @@ int main(void)
         data.sine[i] = (float) sin( ((double)i/(double)TABLE_SIZE) * M_PI * 2. );
     }
     data.left_phase = data.right_phase = 0;
-    
+
     err = Pa_Initialize();
     if( err != paNoError ) goto error;
-    
+
     /* Run self tests. */
     if( paqaVerifyDeviceInfoLatency() < 0 ) goto error;
-    
+
     if( paqaVerifySuggestedLatency() < 0 ) goto error;
-    
+
     outputParameters.device = Pa_GetDefaultOutputDevice(); /* default output device */
     if (outputParameters.device == paNoDevice) {
-      fprintf(stderr,"Error: No default output device.\n");
-      goto error;
+        fprintf(stderr,"Error: No default output device.\n");
+        goto error;
     }
 
     printf("\n\nNow running Audio Output Tests...\n");
@@ -435,44 +435,44 @@ int main(void)
     outputParameters.suggestedLatency = deviceInfo->defaultLowOutputLatency;
     err = paqaCheckLatency( &outputParameters, &data, sampleRate, framesPerBuffer );
     if( err != paNoError ) goto error;
-    
+
     printf("------------- 64 frame buffer with 1.1 * defaultLow latency.\n");
     framesPerBuffer = 64;
     outputParameters.suggestedLatency = deviceInfo->defaultLowOutputLatency * 1.1;
     err = paqaCheckLatency( &outputParameters, &data, sampleRate, framesPerBuffer );
     if( err != paNoError ) goto error;
-    
+
     // Try to create a huge buffer that is bigger than the allowed device maximum.
     printf("------------- Try a huge buffer.\n");
     framesPerBuffer = 16*1024;
     outputParameters.suggestedLatency = ((double)framesPerBuffer) / sampleRate; // approximate
     err = paqaCheckLatency( &outputParameters, &data, sampleRate, framesPerBuffer );
     if( err != paNoError ) goto error;
-    
+
     printf("------------- Try suggestedLatency = 0.0\n");
     outputParameters.suggestedLatency = 0.0;
     err = paqaCheckLatency( &outputParameters, &data, sampleRate, paFramesPerBufferUnspecified );
     if( err != paNoError ) goto error;
-    
+
     printf("------------- Try suggestedLatency = defaultLowOutputLatency\n");
     outputParameters.suggestedLatency = deviceInfo->defaultLowOutputLatency;
     err = paqaCheckLatency( &outputParameters, &data, sampleRate, paFramesPerBufferUnspecified );
     if( err != paNoError ) goto error;
-    
+
     printf("------------- Try suggestedLatency = defaultHighOutputLatency\n");
     outputParameters.suggestedLatency = deviceInfo->defaultHighOutputLatency;
     err = paqaCheckLatency( &outputParameters, &data, sampleRate, paFramesPerBufferUnspecified );
     if( err != paNoError ) goto error;
-    
+
     printf("------------- Try suggestedLatency = defaultHighOutputLatency * 4\n");
     outputParameters.suggestedLatency = deviceInfo->defaultHighOutputLatency * 4;
     err = paqaCheckLatency( &outputParameters, &data, sampleRate, paFramesPerBufferUnspecified );
     if( err != paNoError ) goto error;
-    
+
     Pa_Terminate();
     printf("SUCCESS - test finished.\n");
     return err;
-    
+
 error:
     Pa_Terminate();
     fprintf( stderr, "ERROR - test failed.\n" );

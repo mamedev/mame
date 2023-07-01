@@ -59,7 +59,7 @@ private:
 	static bool s_first_start;
 
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	// drawing
 	virtual float draw_left_panel(float x1, float y1, float x2, float y2) override;
@@ -80,7 +80,7 @@ private:
 	virtual void inkey_export() override;
 
 	// internal methods
-	void change_info_pane(int delta);
+	bool change_info_pane(int delta);
 
 	void build_available_list();
 
@@ -90,8 +90,8 @@ private:
 	void load_custom_filters();
 
 	// handlers
-	void inkey_select(const event *menu_event);
-	void inkey_select_favorite(const event *menu_event);
+	bool inkey_select(const event *menu_event);
+	bool inkey_select_favorite(const event *menu_event);
 };
 
 } // namespace ui

@@ -22,7 +22,7 @@ public:
 
 	// reading and writing
 	virtual uint8_t read() = 0;
-	virtual DECLARE_WRITE_LINE_MEMBER(dir_w) = 0;
+	virtual void dir_w(int state) = 0;
 	virtual void write(uint8_t data) = 0;
 	virtual void set_ready() = 0;
 
@@ -52,12 +52,12 @@ public:
 	virtual ~mononcol_cartslot_device();
 
 	// device_image_interface implementation
-	virtual image_init_result call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual char const *image_interface() const noexcept override { return "monon_color_cart"; }
 	virtual char const *file_extensions() const noexcept override { return "bin"; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	uint8_t read()
@@ -65,7 +65,7 @@ public:
 		return m_cart->read();
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(dir_w)
+	void dir_w(int state)
 	{
 		m_cart->dir_w(state);
 	}
@@ -84,7 +84,7 @@ public:
 protected:
 	mononcol_cartslot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	device_mononcol_cart_interface *m_cart;

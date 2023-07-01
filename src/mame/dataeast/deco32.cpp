@@ -794,7 +794,7 @@ LC7535_VOLUME_CHANGED( dragngun_state::volume_gun_changed )
 		m_oki[2]->set_output_gain(ALL_OUTPUTS, m_vol_gun->normalize(attenuation_left));
 }
 
-WRITE_LINE_MEMBER( nslasher_state::tattass_sound_irq_w )
+void nslasher_state::tattass_sound_irq_w(int state)
 {
 	if (state)
 	{
@@ -1271,10 +1271,7 @@ void dragngun_state::dragngun_init_common()
 	{
 		u8 *ROM = memregion("dvi")->base();
 
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"video.dvi");
-		fp=fopen(filename, "w+b");
+		auto fp = fopen("video.dvi", "w+b");
 		if (fp)
 		{
 			fwrite(ROM, 0xc00000, 1, fp);

@@ -34,7 +34,7 @@ public:
 	uint8_t poll_r   () const;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;

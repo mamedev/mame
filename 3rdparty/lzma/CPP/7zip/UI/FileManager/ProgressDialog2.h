@@ -152,6 +152,7 @@ class CProgressDialog: public NWindows::NControl::CModalDialog
   NWindows::NControl::CListView _messageList;
   
   int _numMessages;
+  UStringVector _messageStrings;
 
   #ifdef __ITaskbarList3_INTERFACE_DEFINED__
   CMyComPtr<ITaskbarList3> _taskbarList;
@@ -169,7 +170,9 @@ class CProgressDialog: public NWindows::NControl::CModalDialog
   UInt64 _processed_Prev;
   UInt64 _packed_Prev;
   UInt64 _ratio_Prev;
+
   UString _filesStr_Prev;
+  UString _filesTotStr_Prev;
 
   unsigned _prevSpeed_MoveBits;
   UInt64 _prevSpeed;
@@ -210,6 +213,9 @@ class CProgressDialog: public NWindows::NControl::CModalDialog
   virtual bool OnSize(WPARAM wParam, int xSize, int ySize);
   virtual void OnCancel();
   virtual void OnOK();
+  virtual bool OnNotify(UINT /* controlID */, LPNMHDR header);
+  void CopyToClipboard();
+
   NWindows::NSynchronization::CManualResetEvent _createDialogEvent;
   NWindows::NSynchronization::CManualResetEvent _dialogCreatedEvent;
   #ifndef _SFX
@@ -261,7 +267,18 @@ public:
 
   INT_PTR Create(const UString &title, NWindows::CThread &thread, HWND wndParent = 0);
 
+
+  /* how it works:
+     1) the working thread calls ProcessWasFinished()
+        that sends kCloseMessage message to CProgressDialog (GUI) thread
+     2) CProgressDialog (GUI) thread receives kCloseMessage message and
+        calls ProcessWasFinished_GuiVirt();
+        So we can implement ProcessWasFinished_GuiVirt() and show special
+        results window in GUI thread with CProgressDialog as parent window
+  */
+
   void ProcessWasFinished();
+  virtual void ProcessWasFinished_GuiVirt() {}
 };
 
 
@@ -273,7 +290,8 @@ public:
   ~CProgressCloser() { _p->ProcessWasFinished(); }
 };
 
-class CProgressThreadVirt
+
+class CProgressThreadVirt: public CProgressDialog
 {
 protected:
   FStringVector ErrorPaths;
@@ -281,33 +299,59 @@ protected:
 
   // error if any of HRESULT, ErrorMessage, ErrorPath
   virtual HRESULT ProcessVirt() = 0;
-  void Process();
 public:
   HRESULT Result;
   bool ThreadFinishedOK; // if there is no fatal exception
-  CProgressDialog ProgressDialog;
 
-  static THREAD_FUNC_DECL MyThreadFunction(void *param)
-  {
-    CProgressThreadVirt *p = (CProgressThreadVirt *)param;
-    try
-    {
-      p->Process();
-      p->ThreadFinishedOK = true;
-    }
-    catch (...) { p->Result = E_FAIL; }
-    return 0;
-  }
-
+  void Process();
   void AddErrorPath(const FString &path) { ErrorPaths.Add(path); }
 
   HRESULT Create(const UString &title, HWND parentWindow = 0);
   CProgressThreadVirt(): Result(E_FAIL), ThreadFinishedOK(false) {}
 
   CProgressMessageBoxPair &GetMessagePair(bool isError) { return isError ? FinalMessage.ErrorMessage : FinalMessage.OkMessage; }
-
 };
 
 UString HResultToMessage(HRESULT errorCode);
+
+/*
+how it works:
+
+client code inherits CProgressThreadVirt and calls
+CProgressThreadVirt::Create()
+{
+  it creates new thread that calls CProgressThreadVirt::Process();
+  it creates modal progress dialog window with ProgressDialog.Create()
+}
+
+CProgressThreadVirt::Process()
+{
+  {
+    Result = ProcessVirt(); // virtual function that must implement real work
+  }
+  if (exceptions) or FinalMessage.ErrorMessage.Message
+  {
+    set message to ProgressDialog.Sync.FinalMessage.ErrorMessage.Message
+  }
+  else if (FinalMessage.OkMessage.Message)
+  {
+    set message to ProgressDialog.Sync.FinalMessage.OkMessage
+  }
+
+  PostMsg(kCloseMessage);
+}
+
+
+CProgressDialog::OnExternalCloseMessage()
+{
+  if (ProgressDialog.Sync.FinalMessage)
+  {
+    WorkWasFinishedVirt();
+    Show (ProgressDialog.Sync.FinalMessage)
+    MessagesDisplayed = true;
+  }
+}
+
+*/
 
 #endif

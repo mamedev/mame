@@ -257,7 +257,7 @@ void tecmo_state::adpcm_vol_w(uint8_t data)
 	m_msm->set_output_gain(ALL_OUTPUTS, (data & 15) / 15.0);
 }
 
-WRITE_LINE_MEMBER(tecmo_state::adpcm_int)
+void tecmo_state::adpcm_int(int state)
 {
 	if (m_adpcm_pos >= m_adpcm_end ||
 				m_adpcm_pos >= m_adpcm_rom.bytes())

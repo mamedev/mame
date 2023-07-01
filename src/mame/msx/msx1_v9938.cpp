@@ -9,6 +9,14 @@
 #include "bus/msx/slot/ram.h"
 #include "bus/msx/slot/ram_mm.h"
 #include "bus/msx/slot/rom.h"
+#include "softlist_dev.h"
+
+#include "msx_ar.lh"
+#include "msx_ar_1fdd.lh"
+#include "msx_en.lh"
+#include "msx_ru.lh"
+#include "msx_nocode.lh"
+#include "msx_nocode_1fdd.lh"
 
 using namespace msx_keyboard;
 
@@ -56,8 +64,9 @@ public:
 	void yis503ii(machine_config &config);
 
 protected:
-	void msx1_v9938(ay8910_type ay8910_type, machine_config &config);
-	void msx1_v9938_pal(ay8910_type ay8910_type, machine_config &config);
+	void msx1_v9938(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void msx1_v9938_pal(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void svi738_base(machine_config &config, const internal_layout &layout);
 
 	void io_map(address_map &map);
 
@@ -65,7 +74,7 @@ protected:
 };
 
 msx1_v9938_state::msx1_v9938_state(const machine_config &mconfig, device_type type, const char *tag)
-	: msx_state(mconfig, type, tag)
+	: msx_state(mconfig, type, tag, 21.477272_MHz_XTAL, 6)
 	, m_v9938(*this, "v9938")
 {
 }
@@ -76,9 +85,9 @@ void msx1_v9938_state::io_map(address_map &map)
 	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
 }
 
-void msx1_v9938_state::msx1_v9938(ay8910_type ay8910_type, machine_config &config)
+void msx1_v9938_state::msx1_v9938(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
-	msx_base(ay8910_type, config, 21.477272_MHz_XTAL, 6);
+	msx_base(ay8910_type, config, layout);
 
 	m_maincpu->set_addrmap(AS_IO, &msx1_v9938_state::io_map);
 
@@ -92,9 +101,9 @@ void msx1_v9938_state::msx1_v9938(ay8910_type ay8910_type, machine_config &confi
 	msx1_add_softlists(config);
 }
 
-void msx1_v9938_state::msx1_v9938_pal(ay8910_type ay8910_type, machine_config &config)
+void msx1_v9938_state::msx1_v9938_pal(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
-	msx1_v9938(ay8910_type, config);
+	msx1_v9938(ay8910_type, config, layout);
 	m_v9938->set_screen_pal(m_screen);
 }
 
@@ -122,9 +131,9 @@ void msx1_v9938_state::ax200(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "arabic", 0, 3, 1, 2, "arabic");
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, msx_yamaha_60pin, nullptr);
+	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, msx_yamaha_60pin, nullptr);
 
-	msx1_v9938_pal(SND_YM2149, config);
+	msx1_v9938_pal(SND_YM2149, config, layout_msx_ar);
 }
 
 /* MSX - Sakhr AX-200 (Arabic/French) */
@@ -154,9 +163,9 @@ void msx1_v9938_state::ax200m(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	// Dumped unit had a SFG05 with version M5.00.011 rom
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, msx_yamaha_60pin, "sfg05");
+	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, msx_yamaha_60pin, "sfg05");
 
-	msx1_v9938_pal(SND_YM2149, config);
+	msx1_v9938_pal(SND_YM2149, config, layout_msx_ar);
 }
 
 /* MSX - Spectravideo SVI-738 */
@@ -172,6 +181,17 @@ ROM_START(svi738)
 	ROM_LOAD("738232c.rom", 0x0000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7))
 ROM_END
 
+void msx1_v9938_state::svi738_base(machine_config &config, const internal_layout &layout)
+{
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
+	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 4);  // 64KB RAM
+	add_cartridge_slot<1>(config, 2);
+	add_internal_slot_irq<2>(config, MSX_SLOT_RS232_SVI738, "rs232", 3, 0, 1, 1, "rs232rom");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK2_FD1793_SS, "disk", 3, 1, 1, 2, "diskrom").use_motor_for_led();
+
+	msx1_v9938_pal(SND_AY8910, config, layout);
+}
+
 void msx1_v9938_state::svi738(machine_config &config)
 {
 	// AY8910
@@ -180,13 +200,7 @@ void msx1_v9938_state::svi738(machine_config &config)
 	// builtin 80 columns card (V9938)
 	// RS-232C interface
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 4);  // 64KB RAM
-	add_cartridge_slot<1>(config, 2);
-	add_internal_slot_irq<2>(config, MSX_SLOT_RS232_SVI738, "rs232", 3, 0, 1, 1, "rs232rom");
-	add_internal_disk_mirrored(config, MSX_SLOT_DISK2_FD1793_SS, "disk", 3, 1, 1, 2, "diskrom");
-
-	msx1_v9938_pal(SND_AY8910, config);
+	svi738_base(config, layout_msx_nocode_1fdd);
 }
 
 /* MSX - Spectravideo SVI-738 Arabic */
@@ -207,7 +221,7 @@ ROM_END
 
 void msx1_v9938_state::svi738ar(machine_config &config)
 {
-	svi738(config);
+	svi738_base(config, layout_msx_ar_1fdd);
 	add_internal_slot(config, MSX_SLOT_ROM, "arab", 3, 3, 1, 2, "arab");
 }
 
@@ -284,7 +298,7 @@ void msx1_v9938_state::tadpc200a(machine_config &config)
 	add_cartridge_slot<1>(config, 2);
 	// Expansion slot
 
-	msx1_v9938_pal(SND_YM2149, config);
+	msx1_v9938_pal(SND_YM2149, config, layout_msx_nocode);
 }
 
 /* MSX - Yamaha CX5MII-128A (Australia, New Zealand) */
@@ -298,9 +312,6 @@ ROM_START(cx5m128)
 
 	ROM_REGION(0x4000, "subrom", ROMREGION_ERASEFF)
 	ROM_LOAD("cx5m128sub.rom",  0x0000, 0x2000, CRC(b17a776d) SHA1(c2340313bfda751181e8a5287d60f77bc6a2f3e6))
-
-	ROM_REGION(0x4000, "minicart", 0)
-	ROM_LOAD("yrm502.rom", 0x0000, 0x4000, CRC(5412d5dc) SHA1(30747a56f45389be76362f7fc55d673f1bff8312))
 ROM_END
 
 void msx1_v9938_state::cx5m128(machine_config &config)
@@ -316,11 +327,12 @@ void msx1_v9938_state::cx5m128(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 1, 1, "subrom");
-	add_internal_slot(config, MSX_SLOT_ROM, "minicart", 3, 1, 1, 1, "minicart"); /* YRM-502 */
+	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_MINICART, "minicart", 3, 1, msx_yamaha_minicart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000);   // 128KB Mapper RAM
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, "sfg05");
+	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, "sfg05");
 
-	msx1_v9938_pal(SND_YM2149, config);
+	msx1_v9938_pal(SND_YM2149, config, layout_msx_nocode);
+	SOFTWARE_LIST(config, "minicart_list").set_original("msx_yamaha_minicart");
 }
 
 /* MSX - Yamaha CX5MII-128 C (Canada) */
@@ -348,9 +360,6 @@ ROM_START(cx5miib)
 	ROM_REGION(0x4000, "subrom", 0)
 	// overdump?
 	ROM_LOAD("cx5mii_sub.rom",  0x0000, 0x4000, BAD_DUMP CRC(317f9bb5) SHA1(0ce800666c0d66bc2aa0b73a16f228289b9198be))
-
-	ROM_REGION(0x4000, "minicart", 0)
-	ROM_LOAD("yrm502.rom", 0x0000, 0x4000, CRC(5330fe21) SHA1(7b1798561ee1844a7d6432924fbee9b4fc591c19))
 ROM_END
 
 void msx1_v9938_state::cx5miib(machine_config &config)
@@ -366,11 +375,12 @@ void msx1_v9938_state::cx5miib(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 1, 1, "subrom");
-	add_internal_slot(config, MSX_SLOT_ROM, "minicart", 3, 1, 1, 1, "minicart"); /* YRM-502 */
+	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_MINICART, "minicart", 3, 1, msx_yamaha_minicart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x10000);   // 64KB Mapper RAM
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, "sfg05");
+	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, "sfg05");
 
-	msx1_v9938_pal(SND_YM2149, config);
+	msx1_v9938_pal(SND_YM2149, config, layout_msx_nocode);
+	SOFTWARE_LIST(config, "minicart_list").set_original("msx_yamaha_minicart");
 }
 
 /* MSX - Yamaha CX5MIIC (Canada) */
@@ -408,7 +418,7 @@ void msx1_v9938_state::yis503ii(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  // 64KB RAM
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
 
-	msx1_v9938(SND_YM2149, config);
+	msx1_v9938(SND_YM2149, config, layout_msx_nocode);
 }
 
 /* MSX - Yamaha YIS503-IIR Russian */
@@ -433,12 +443,13 @@ void msx1_v9938_state::y503iir(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
-	//  Mini cartridge slot in slot #3-1
+	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_MINICART, "minicart", 3, 1, msx_yamaha_minicart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  // 64KB RAM
 	// This should have a serial network interface by default
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
+	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
 
-	msx1_v9938_pal(SND_YM2149, config);
+	msx1_v9938_pal(SND_YM2149, config, layout_msx_ru);
+	SOFTWARE_LIST(config, "minicart_list").set_original("msx_yamaha_minicart");
 }
 
 /* MSX - Yamaha YIS503-IIR Estonian */
@@ -463,12 +474,13 @@ void msx1_v9938_state::y503iir2(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
-	//  Mini cartridge slot in slot #3-1
+	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_MINICART, "minicart", 3, 1, msx_yamaha_minicart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  // 64KB RAM
 	// This should have a serial network interface by default
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
+	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
 
-	msx1_v9938_pal(SND_YM2149, config);
+	msx1_v9938_pal(SND_YM2149, config, layout_msx_ru);
+	SOFTWARE_LIST(config, "minicart_list").set_original("msx_yamaha_minicart");
 }
 
 } // anonymous namespace

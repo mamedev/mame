@@ -70,7 +70,7 @@ void c2031_device::c2031_mem(address_map &map)
 }
 
 
-WRITE_LINE_MEMBER( c2031_device::via0_irq_w )
+void c2031_device::via0_irq_w(int state)
 {
 	m_via0_irq = state;
 
@@ -202,7 +202,7 @@ void c2031_device::via0_pb_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER( c2031_device::via1_irq_w )
+void c2031_device::via1_irq_w(int state)
 {
 	m_via1_irq = state;
 
@@ -272,7 +272,7 @@ void c2031_device::via1_pb_w(uint8_t data)
 //  C64H156_INTERFACE( ga_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c2031_device::byte_w )
+void c2031_device::byte_w(int state)
 {
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, state);
 
@@ -299,7 +299,6 @@ void c2031_device::device_add_mconfig(machine_config &config)
 {
 	M6502(config, m_maincpu, XTAL(16'000'000)/16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c2031_device::c2031_mem);
-	//config.set_perfect_quantum(m_maincpu); FIXME: not safe in a slot device - add barriers
 
 	MOS6522(config, m_via0, XTAL(16'000'000)/16);
 	m_via0->readpa_handler().set(FUNC(c2031_device::via0_pa_r));

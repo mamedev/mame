@@ -614,13 +614,7 @@ ROM_START( alice32 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )            // from dcvg5k
 ROM_END
 
-ROM_START( alice90 )
-	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD("alice90.rom", 0x0000, 0x4000, CRC(d0a874bb) SHA1(a65c7be2d516bed2584c51c1ef78b045b91faef6))
-
-	ROM_REGION( 0x2000, "ef9345", 0 )
-	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )            // from dcvg5k
-ROM_END
+#define rom_alice90 rom_alice32
 
 }
 

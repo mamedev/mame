@@ -94,17 +94,17 @@ private:
 	void konami_sn76496_w(uint8_t data) { m_sn->write(m_sn76496_latch); }
 
 	uint8_t m_irq_mask = 0U;
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
+	template <uint8_t Which> void coin_counter_w(int state);
+	void irq_mask_w(int state);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	void flipscreen_w(int state);
 
 	void palette(palette_device &palette) const;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -244,7 +244,7 @@ void base_state::colorram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE_LINE_MEMBER(base_state::flipscreen_w)
+void base_state::flipscreen_w(int state)
 {
 	flip_screen_set(state);
 	machine().tilemap().mark_all_dirty();
@@ -343,12 +343,12 @@ void base_state::machine_start()
 }
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(base_state::coin_counter_w)
+void base_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);
 }
 
-WRITE_LINE_MEMBER(base_state::irq_mask_w)
+void base_state::irq_mask_w(int state)
 {
 	m_irq_mask = state;
 	if (!m_irq_mask)
@@ -614,7 +614,7 @@ static GFXDECODE_START( gfx_roadf )
 	GFXDECODE_ENTRY( "tiles",   0, roadf_charlayout,   16*16, 16 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(base_state::vblank_irq)
+void base_state::vblank_irq(int state)
 {
 	if (state && m_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -761,8 +761,6 @@ ROM_START( hyperspt )
 	ROM_LOAD( "c08",          0x0000, 0x2000, CRC(e8f8ea78) SHA1(8d37818e5a2740c96696f37996f2a3f870386690) )
 ROM_END
 
-
-
 ROM_START( hypersptb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.5g",          0x4000, 0x2000, CRC(0cfc68a7) SHA1(48ddd444f4366a39afb589e1c5df10d815b4b64f) )
@@ -787,7 +785,6 @@ ROM_START( hypersptb )
 	ROM_LOAD( "18.18g",          0x0a000, 0x2000, CRC(b145b39f) SHA1(e696e1f9b44aa44360ea9962c4ee9b61db8e53f5) )
 	ROM_LOAD( "19.17g",          0x0c000, 0x2000, CRC(d7ff9f2b) SHA1(b0e6a056db96027ba0c10d3ee3bfdef145a236e2) )
 
-
 	ROM_REGION( 0x08000, "tiles", 0 )
 	ROM_LOAD( "b.14a",          0x00000, 0x4000, CRC(8fd90bd2) SHA1(4faa270002f859a27719d08004b012cc297405f5) )  // 27256 ?! - it doesn't need to be!
 	ROM_CONTINUE(0x0000,0x4000)  // causes data we want to be at 0x0000 - 0x1fff
@@ -807,7 +804,6 @@ ROM_START( hypersptb )
 	ROM_LOAD( "9.20cd",       0xa000, 0x2000, CRC(e9919365) SHA1(bd11d6e3ee2c6e698159c2768e315389d666107f) )
 	ROM_LOAD( "8.20d",        0xc000, 0x2000, CRC(49a06454) SHA1(159a293125d7ac92a81120e290497ee7ed6d8acf) )
 	ROM_LOAD( "7.20b",        0xe000, 0x2000, CRC(607a36df) SHA1(17e553e5070771133ed094f05b26dd6cd63cfc23) )
-
 ROM_END
 
 ROM_START( hpolym84 )
@@ -848,6 +844,8 @@ ROM_START( hpolym84 )
 	ROM_LOAD( "c08",          0x0000, 0x2000, CRC(e8f8ea78) SHA1(8d37818e5a2740c96696f37996f2a3f870386690) )
 ROM_END
 
+/* Tecfri manufactures a Road Fighter PCB (probaby bootleg) with exactly the same software as the 'roadf'
+   set, but with ROMs 'J19_E14', 'G19_E18', 'A14_E26' and 'C14_E22' split on half capacity EPROMs. */
 ROM_START( roadf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g05_g01.bin",  0x4000, 0x2000, CRC(e2492a06) SHA1(e03895b83f1529dd7bb20e1380cb60c7606db3e4) )

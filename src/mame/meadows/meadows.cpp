@@ -211,7 +211,7 @@ INPUT_CHANGED_MEMBER(meadows_state::coin_inserted)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(meadows_state::meadows_vblank_irq)
+void meadows_state::meadows_vblank_irq(int state)
 {
 	if (state)
 	{
@@ -229,7 +229,7 @@ WRITE_LINE_MEMBER(meadows_state::meadows_vblank_irq)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(meadows_state::minferno_vblank_irq)
+void meadows_state::minferno_vblank_irq(int state)
 {
 	if (state)
 	{

@@ -46,9 +46,8 @@ void menu_input_groups::populate()
 	item_append(menu_item_type::SEPARATOR);
 }
 
-void menu_input_groups::handle(event const *ev)
+bool menu_input_groups::handle(event const *ev)
 {
-	// process the menu
 	if (ev && (ev->iptkey == IPT_UI_SELECT))
 	{
 		menu::stack_push<menu_input_general>(
@@ -57,6 +56,8 @@ void menu_input_groups::handle(event const *ev)
 				int(uintptr_t(ev->itemref) - 1),
 				util::string_format(_("Input Assignments (%1$s)"), ev->item->text()));
 	}
+
+	return false;
 }
 
 
@@ -377,10 +378,11 @@ void menu_input::custom_render(void *selectedref, float top, float bottom, float
 	}
 }
 
-void menu_input::handle(event const *ev)
+bool menu_input::handle(event const *ev)
 {
 	input_item_data *seqchangeditem = nullptr;
 	bool invalidate = false;
+	bool redraw = false;
 
 	// process the menu
 	if (pollingitem)
@@ -394,22 +396,12 @@ void menu_input::handle(event const *ev)
 
 		if (machine().ui_input().pressed(IPT_UI_CANCEL))
 		{
-			// if UI_CANCEL is pressed, abort
+			// if UI_CANCEL is pressed, abort and abandon changes
 			pollingitem = nullptr;
 			set_process_flags(PROCESS_LR_ALWAYS);
-			if (!seq_poll->modified() || modified_ticks == osd_ticks())
-			{
-				// cancelled immediately - toggle between default and none
-				record_next = false;
-				toggle_none_default(item->seq, starting_seq, *item->defseq);
-				seqchangeditem = item;
-			}
-			else
-			{
-				// entered something before cancelling - abandon change
-				invalidate = true;
-			}
+			invalidate = true;
 			seq_poll.reset();
+			machine().ui_input().reset();
 		}
 		else if (seq_poll->poll()) // poll again; if finished, update the sequence
 		{
@@ -429,6 +421,12 @@ void menu_input::handle(event const *ev)
 				erroritem = item;
 			}
 			seq_poll.reset();
+			machine().ui_input().reset();
+		}
+		else
+		{
+			// always redraw to ensure it updates as soon as possible in response to changes
+			redraw = true;
 		}
 	}
 	else if (ev && ev->itemref)
@@ -525,6 +523,7 @@ void menu_input::handle(event const *ev)
 			}
 			record_next = false;
 			lastitem = &item;
+			redraw = true;
 		}
 
 		// flip between set and append
@@ -540,6 +539,7 @@ void menu_input::handle(event const *ev)
 			{
 				record_next = !record_next;
 			}
+			redraw = true;
 		}
 	}
 
@@ -555,6 +555,8 @@ void menu_input::handle(event const *ev)
 	// if the menu is invalidated, clear it now
 	if (invalidate)
 		reset(reset_options::REMEMBER_POSITION);
+
+	return redraw && !invalidate;
 }
 
 

@@ -206,7 +206,7 @@ int i386_device::x87_check_exceptions(bool store)
 	if ((m_x87_sw & ~m_x87_cw) & 0x3f)
 	{
 		// m_device->execute().set_input_line(INPUT_LINE_FERR, RAISE_LINE);
-		logerror("Unmasked x87 exception (CW:%.4x, SW:%.4x)\n", m_x87_cw, m_x87_sw);
+		LOG("Unmasked x87 exception (CW:%.4x, SW:%.4x)\n", m_x87_cw, m_x87_sw);
 		// interrupt handler
 		m_x87_sw |= X87_SW_ES;
 		m_ferr_handler(1);

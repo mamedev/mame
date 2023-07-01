@@ -66,6 +66,101 @@ Sub / Sound board:
     LA MANIPULCION DE LA ETIQUETA O DE LA PLACA ANULA SU SARANTIA
     (this sticker is also present on the other PCB)
 
+ PCB configuration for YoYo Spell:
+
+  Inder 60808
+  ____________________________________________________________________________
+ |  _______________   _______________   _______________   _______________    |
+ | | EMPTY        |  | EMPTY        |  | EPROM        |  | EPROM        |    |
+ | |______________|  |______________|  |______________|  |______________|    |
+ |  _______________   _______________   _______________   _______________    |
+ | | EMPTY        |  | EMPTY        |  | EPROM        |  | EPROM        |    |
+ | |______________|  |______________|  |______________|  |______________|    |
+ |  _______________   _______________   _______________   _______________    |
+ | | EMPTY        |  | EMPTY        |  | EPROM        |  | EPROM        | ·  |
+ | |______________|  |______________|  |______________|  |______________| ·  |
+ |  _______________   _______________   _______________   _______________ ·  |
+ | | EMPTY        |  | EMPTY        |  | EPROM        |  | EPROM        |    |
+ | |______________|  |______________|  |______________|  |______________| __ |
+ |  _______________   _______________   _______________   _______________|  ||
+ | | EMPTY        |  | EMPTY        |  | EMPTY        |  | EMPTY        ||  ||
+ | |______________|  |______________|  |______________|  |______________||  |<-PIC16C57
+ |  _______________   _______________   _______________   _______________|  ||
+ | | EMPTY        |  | EMPTY        |  | EMPTY        |  | EMPTY        ||__||
+ | |______________|  |______________|  |______________|  |______________| __ |
+ |  _______________   _______________   _______________   _______________|  ||
+ | | EMPTY        |  | EMPTY        |  | EPROM        |  | EPROM        ||  ||
+ | |______________|  |______________|  |______________|  |______________||  |<-74HC373N
+ |  _______________   _______________   _________  _________  _________  |  ||
+ | | EMPTY        |  | EMPTY        |  |74HC245E| |PALCE16V8H|PALCE16V8H |__||
+ | |______________|  |______________|   _________  _________  _________      |
+ |  _______________   _______________  |74HC245E| |PALCE16V8H|74HC373N|      |
+ | | EMPTY        |  | EMPTY        |                                        |
+ | |______________|  |______________|  ::::::::::::::::::::::::::::::::::    |
+ |___________________________________________________________________________|
+
+ Inder 60807
+  _____________________________________________________________________________
+ | _____                 _________     ::::::::::::::::::::::::::::::::::     |
+ ||LM358N               |_SM8952_|                           _______________  |
+ |           _________   _________   _________   _________  | EPROM         | |
+ |          DAC0800LCN  MM74HC273N  CD74HC374E  PALCE16V8H  |_______________| |
+ |           _________   _________   _________   _________   _______________  |
+ | _____    DAC0800LCN  MM74HC273N  CD74HC374E  PALCE16V8H  | EPROM         | |
+ ||LM358N    _________   _________   _____________          |_______________| |
+ |          DAC0800LCN  MM74HC273N  | Z8430AB1   |           _______________  |
+ |           _________   _________  |____________|          | EMPTY         | |
+ | _____    DAC0800LCN  MM74HC273N   _____________________  |_______________| |
+ ||LM358N    _________   _________  | INDER CUSTOM        |  _______________  |
+ |          DAC0800LCN  MM74HC273N  |_____________________| | EMPTY         | |
+ | _____    _________   _________   _________   _________   |_______________| |
+ ||LM358N   DAC0800LCN  MM74HC273N  TC74HC670P  PALCE16V8H    ______________  |
+ |          _________   _________   _________                | EPROM        | |
+ | _____    DAC0800LCN  MM74HC273N  SN74HC138N          XTAL |______________| |
+ ||LM358N   _________   _________   _________  _________  8    _____________  |
+ |          DAC0800LCN  MM74HC273N  CD74HC74E  CD74HC74E MHz  | UM6116-3    | |
+ |                                                            |_____________| |
+ |____________________________________________________________________________|
+
+  ___________________________________________________________________________
+ |                                                                          |
+ |                    :::..                                                 |
+ |                 _________   _________   _________   Xtal                 |
+ |                 CD74HC74E   CD74HC74E   CD74HC04E   6.000                |
+ |                 _________   _________                MHz                 |
+ |                 MC74HC86N   CD74HC74E                        _________   |
+ |                          ____________                        KM44C256AP-8|
+ |                         | ACTEL     |                        _________   |
+ |                         | A1010A-   |                        KM44C256AP-8|
+ |                         |  PL68C    |                        _________   |
+ |                         |           |                        KM44C256AP-8|
+ |                         |___________|                        _________   |
+ |                            __________                        KM44C256AP-8|
+ |                           |BT478KPJ36        _________       _________   |
+ |                           |         |        SN74HC245N      898-3-R33   |
+ |                           |         |        _________       _________   |
+ |                           |_________|        SN74HC245N      TIBPAL22V10 |
+ |                               ___________    ___________                 |
+ |                               |PALCE20V8_|  |TMS34010FNL-4        Xtal   |
+ |                     _____________________   |          |          40.0   |
+ |                    | NEC 8255AC-2       |   |          |           MHz   |
+ |                    |____________________|   |__________|                 |
+ |                                    ···································   |
+ |                                    ···································   |
+ |                                    ···································   |
+ |                                                  _____________________   |
+ |                                ___________      | ST TS68000CP8      |   |
+ |  ___    ___                    |PALCE20V8_|     |____________________|   |
+ | |  |   |  |       ___________  ___________  ___________  _____________   |
+ | |  |<-DIPSx8      |_DM7417N_|  |SN74HC393N  |_PAL16V8__| |UM62256A-12L   |
+ | |__|   |__|                                              |___________|   |
+ |  ___    ___                        Xtal     ___________  _____________   |
+ | |  |   |  |                       16000     |CD74HC04E|  |UM62256A-12L   |
+ | |  |<-DIPSx8                       KHz                   |___________|   |
+ | |__|   |__|                                                              |
+ |                                                                          |
+ |__________________________________________________________________________|
+
 */
 
 #include "emu.h"
@@ -521,20 +616,29 @@ ROM_START( yoyospel )
 	ROM_LOAD( "yo-yo_son_0.u35", 0x000000, 0x2000,  CRC(7f9a2dcf) SHA1(37a28fedc690e0486c13eb85c20610e695d7dce3) )
 
 	ROM_REGION( 0x100000, "pic", 0 )
-	ROM_LOAD( "pic16c54-xt.bin", 0x000000, 0x430,  CRC(21f396fb) SHA1(c8badb9b3681e684bced0ced1de4c3a15641de8b) )
+	ROM_LOAD( "pic16c54-xt.bin", 0x000000, 0x430,  CRC(21f396fb) SHA1(c8badb9b3681e684bced0ced1de4c3a15641de8b) ) // Unprotected, verified to be the same as "Mega Phoenix"
 	ROM_FILL(0x2c, 1, 0x01) // patch timer length or it's too slow (pic issue?)
 
-	ROM_REGION( 0x1000, "pals", 0 ) // protected
-	ROM_LOAD( "p31_u31_palce16v8h-25.jed", 0x000, 0xbd4, NO_DUMP )
-	ROM_LOAD( "p40_u29_palce16v8h-25.jed", 0x000, 0xbd4, NO_DUMP )
+	ROM_REGION( 0x200, "pals", 0 ) // protected
+	// On main PCB
+	ROM_LOAD( "b5_pal20v8.bin",   0x000, 0x157, NO_DUMP )
+	ROM_LOAD( "b26_pal16v10.bin", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "b15_pal16v8.bin",  0x000, 0x117, NO_DUMP )
+	// On sound PCB
+	ROM_LOAD( "s33_pal16v8.u23",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "s32_pal16v8.u32",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "s31_pal16v8.bin",  0x000, 0x117, NO_DUMP )
+	// On ROMs PCB
+	ROM_LOAD( "p29_pal16v8.bin",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "p31_pal16v8.bin",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "p28_pal16v8.bin",  0x000, 0x117, NO_DUMP )
 ROM_END
 
 } // anonymous namespace
 
 
+GAME( 1991, megaphx,  0,        megaphx, megaphx,  megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Mega Phoenix", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hamboy,   0,        hamboy,  hamboy,   megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Hammer Boy",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, megaphx,  0,        megaphx, megaphx, megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Mega Phoenix", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hamboy,   0,        hamboy,  hamboy,  megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Hammer Boy",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-
-// This game would later become Little Robin, although this early version has significant design differences.  The game has no music, probably not an emulation problem.
-GAME( 1992, yoyospel, littlerb, megaphx, yoyospel,megaphx_state, empty_init, ROT0, "Inder", "YoYo Spell (prototype)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+// This game would later become Little Robin, although this early version has significant design differences. The game has no music, verified to be the same as the real hardware.
+GAME( 1992, yoyospel, littlerb, megaphx, yoyospel, megaphx_state, empty_init, ROT0, "Inder", "YoYo Spell (prototype)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

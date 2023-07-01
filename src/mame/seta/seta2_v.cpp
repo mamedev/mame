@@ -781,7 +781,7 @@ TIMER_CALLBACK_MEMBER(seta2_state::raster_timer_done)
 	{
 		if (m_rasterenabled & 1)
 		{
-			tmp68301->external_interrupt_1();
+			tmp68301->set_input_line(1, HOLD_LINE);
 			logerror("external int (vpos is %d)\n", m_screen->vpos());
 			m_screen->update_partial(m_screen->vpos() - 1);
 		}
@@ -905,7 +905,7 @@ uint32_t seta2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-WRITE_LINE_MEMBER(seta2_state::screen_vblank)
+void seta2_state::screen_vblank(int state)
 {
 	//popmessage("yoffset: %04x%04x yzoom: %04x%04x | xoffset: %04x%04x xzoom: %04x%04x  \n", m_vregs[0x1a/2],  m_vregs[0x18/2],  m_vregs[0x1e/2],  m_vregs[0x1c/2]   ,   m_vregs[0x12/2],  m_vregs[0x10/2],  m_vregs[0x16/2],  m_vregs[0x14/2]);
 }

@@ -67,8 +67,11 @@ bool CDoubleZeroStringListW::Add(LPCWSTR s) throw()
   return true;
 }
 
+
+#ifdef UNDER_CE
 #define MY__OFN_PROJECT  0x00400000
 #define MY__OFN_SHOW_ALL 0x01000000
+#endif
 
 /* if (lpstrFilter == NULL && nFilterIndex == 0)
   MSDN : "the system doesn't show any files",
@@ -91,14 +94,34 @@ So we use size of old version of structure. */
 
 #if defined(UNDER_CE) || defined(_WIN64) || (_WIN32_WINNT < 0x0500)
 // || !defined(WINVER)
+  #ifndef _UNICODE
   #define my_compatib_OPENFILENAMEA_size sizeof(OPENFILENAMEA)
+  #endif
   #define my_compatib_OPENFILENAMEW_size sizeof(OPENFILENAMEW)
 #else
+
+  // MinGW doesn't support some required macros. So we define them here:
+  #ifndef CDSIZEOF_STRUCT
+  #define CDSIZEOF_STRUCT(structname, member)  (((int)((LPBYTE)(&((structname*)0)->member) - ((LPBYTE)((structname*)0)))) + sizeof(((structname*)0)->member))
+  #endif
+  #ifndef _UNICODE
+  #ifndef OPENFILENAME_SIZE_VERSION_400A
+  #define OPENFILENAME_SIZE_VERSION_400A  CDSIZEOF_STRUCT(OPENFILENAMEA,lpTemplateName)
+  #endif
+  #endif
+  #ifndef OPENFILENAME_SIZE_VERSION_400W
+  #define OPENFILENAME_SIZE_VERSION_400W  CDSIZEOF_STRUCT(OPENFILENAMEW,lpTemplateName)
+  #endif
+  
+  #ifndef _UNICODE
   #define my_compatib_OPENFILENAMEA_size OPENFILENAME_SIZE_VERSION_400A
+  #endif
   #define my_compatib_OPENFILENAMEW_size OPENFILENAME_SIZE_VERSION_400W
 #endif
 
+#ifndef _UNICODE
 #define CONV_U_To_A(dest, src, temp) AString temp; if (src) { temp = GetSystemString(src); dest = temp; }
+#endif
 
 bool MyGetOpenFileName(HWND hwnd, LPCWSTR title,
     LPCWSTR initialDir,

@@ -75,8 +75,8 @@ private:
 
 	void bank_switch_w(u8 data);
 	void panel_led_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(fdc_tc_w);
-	DECLARE_WRITE_LINE_MEMBER(sed9420c_trgin_w);
+	void fdc_tc_w(int state);
+	void sed9420c_trgin_w(int state);
 	u8 fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, u8 data);
 
@@ -158,7 +158,7 @@ void korg_dss1_state::panel_led_w(u8 data)
 	// TODO
 }
 
-WRITE_LINE_MEMBER(korg_dss1_state::fdc_tc_w)
+void korg_dss1_state::fdc_tc_w(int state)
 {
 	if (m_cpu1.found())
 		m_fdc->tc_w(state);
@@ -168,7 +168,7 @@ WRITE_LINE_MEMBER(korg_dss1_state::fdc_tc_w)
 	}
 }
 
-WRITE_LINE_MEMBER(korg_dss1_state::sed9420c_trgin_w)
+void korg_dss1_state::sed9420c_trgin_w(int state)
 {
 	// TODO
 }

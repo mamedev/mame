@@ -307,9 +307,10 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
-	void z180_trdr_w(uint8_t data);
+	void csio_cks_w(int state);
 	void port90_bitswap_w(uint8_t data);
 	uint8_t ppi_bitswap_r(offs_t offset);
 	void ppi_bitswap_w(offs_t offset, uint8_t data);
@@ -318,11 +319,14 @@ private:
 	uint8_t input_port_c_r();
 	void output_port_c_w(uint8_t data);
 
-	uint8_t m_trdr = 0;
+	uint8_t m_csio_in = 0;
+	uint16_t m_csio_out = 0;
+	uint8_t m_csio_txs = 0;
+	uint8_t m_csio_cnt = 0;
 	uint8_t m_led_on = 0;
 
 	required_device<v9938_device> m_v9938;
-	required_device<cpu_device> m_maincpu;
+	required_device<z180_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
 	required_device<dac_byte_interface> m_dac;
 	required_ioport m_aux;
@@ -341,8 +345,19 @@ void luckybal_state::machine_start()
 {
 	m_lamps.resolve();
 
-	save_item(NAME(m_trdr));
+	save_item(NAME(m_csio_in));
+	save_item(NAME(m_csio_out));
+	save_item(NAME(m_csio_txs));
+	save_item(NAME(m_csio_cnt));
 	save_item(NAME(m_led_on));
+}
+
+void luckybal_state::machine_reset()
+{
+	m_csio_in = 0;
+	m_csio_out = 0;
+	m_csio_txs = 0;
+	m_csio_cnt = 0;
 }
 
 
@@ -361,9 +376,7 @@ void luckybal_state::main_io(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x00, 0x0a).nopr().nopw();  // Z180 Internal registers.
-	map(0x0b, 0x0b).nopr().w(FUNC(luckybal_state::z180_trdr_w));
-	map(0x0c, 0x3f).nopr().nopw();  // Z180 Internal registers.
+	map(0x00, 0x3f).nopr().nopw();  // Z180 Internal registers.
 
 	map(0x90, 0x90).w(FUNC(luckybal_state::port90_bitswap_w));
 	map(0xc0, 0xc3).rw(FUNC(luckybal_state::ppi_bitswap_r), FUNC(luckybal_state::ppi_bitswap_w));
@@ -394,9 +407,33 @@ M_MAP     EQU  90H    ; [A]= Bank to select (BIT6=MEM, BIT7=EN_NMI)
 *            R/W handlers             *
 **************************************/
 
-void luckybal_state::z180_trdr_w(uint8_t data)
+void luckybal_state::csio_cks_w(int state)
 {
-	m_trdr = data;
+	if (!state)
+	{
+		m_maincpu->rxs_cts1_w(BIT(m_csio_out, 0));
+		m_csio_out >>= 1;
+	}
+	else
+	{
+		m_csio_in >>= 1;
+		m_csio_in |= m_csio_txs << 7;
+
+		if (++m_csio_cnt == 8)
+		{
+			m_csio_cnt = 0;
+			const uint8_t csio_data = m_csio_in & 0x7f;
+			if (csio_data <= 36)
+			{
+				m_lamps[m_led_on] = 0;
+				m_lamps[csio_data] = 1;
+				m_led_on = csio_data;
+			}
+
+			// read back the previously written value
+			m_csio_out |= m_csio_in << 8;
+		}
+	}
 }
 
 void luckybal_state::port90_bitswap_w(uint8_t data)
@@ -417,16 +454,6 @@ void luckybal_state::ppi_bitswap_w(offs_t offset, uint8_t data)
 
 void luckybal_state::output_port_a_w(uint8_t data)
 {
-	if (m_trdr & 0x80)
-		m_trdr = m_trdr & 0x7f;
-
-	if (m_trdr <= 36)
-	{
-		m_lamps[m_led_on] = 0;
-		m_lamps[m_trdr] = 1;
-		m_led_on = m_trdr;
-	}
-
 	m_dac->write(data);
 }
 
@@ -583,6 +610,8 @@ void luckybal_state::luckybal(machine_config &config)
 	Z80180(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &luckybal_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &luckybal_state::main_io);
+	m_maincpu->cks_wr_callback().set(FUNC(luckybal_state::csio_cks_w));
+	m_maincpu->txs_wr_callback().set([this] (int state) { m_csio_txs = state; });
 
 	I8255A(config, m_ppi);
 	m_ppi->out_pa_callback().set(FUNC(luckybal_state::output_port_a_w));

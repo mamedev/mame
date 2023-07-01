@@ -40,7 +40,7 @@ protected:
 private:
 	void wd1770_control_w(uint8_t data);
 	static void floppy_formats(format_registration &fr);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void fdc_drq_w(int state);
 
 	required_device<wd1770_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;

@@ -25,7 +25,6 @@
 #include "modules/lib/osdlib.h"
 #include "modules/lib/osdobj_common.h"
 #include "modules/opengl/gl_shader_mgr.h"
-#include "modules/opengl/gl_shader_tool.h"
 #include "osdcomm.h"
 
 // OSD headers
@@ -190,7 +189,14 @@ struct ogl_video_config
 class ogl_texture_info
 {
 public:
-	ogl_texture_info()
+	ogl_texture_info(
+#if defined(USE_DISPATCH_GL)
+			osd_gl_dispatch *gld
+#endif
+			)
+#if defined(USE_DISPATCH_GL)
+		: gl_dispatch(gld)
+#endif
 	{
 		for (int i=0; i<2; i++)
 		{
@@ -204,6 +210,9 @@ public:
 			texCoord[i] = 0.0f;
 	}
 
+#if defined(USE_DISPATCH_GL)
+	osd_gl_dispatch *const gl_dispatch; // name is magic, can't be changed
+#endif
 	HashT               hash = 0;                       // hash value for the texture (must be >= pointer size)
 	uint32_t            flags = 0;                      // rendering flags
 	render_texinfo      texinfo;                        // copy of the texture info
@@ -258,7 +267,6 @@ public:
 		, m_usepbo(0)
 		, m_usefbo(0)
 		, m_useglsl(0)
-		, m_glsl(nullptr)
 		, m_glsl_program_num(0)
 		, m_glsl_program_mb2sc(0)
 		, m_usetexturerect(0)
@@ -314,6 +322,7 @@ private:
 	void destroy_all_textures();
 
 	void loadGLExtensions();
+	void loadgl_functions();
 	void initialize_gl();
 	void set_blendmode(int blendmode);
 	HashT texture_compute_hash(const render_texinfo *texture, uint32_t flags);
@@ -336,6 +345,20 @@ private:
 	int texture_fbo_create(uint32_t text_unit, uint32_t text_name, uint32_t fbo_name, int width, int height) const;
 	void texture_set_data(ogl_texture_info *texture, const render_texinfo *texsource, uint32_t flags) const;
 
+	int gl_check_error(bool log, const char *file, int line) const
+	{
+		GLenum const glerr = glGetError();
+		if (GL_NO_ERROR != glerr)
+		{
+			if (log)
+				osd_printf_warning("%s:%d: GL Error: %d 0x%X\n", file, line, int(glerr), unsigned(glerr));
+		}
+		return (GL_NO_ERROR != glerr) ? glerr : 0;
+	}
+
+#define GL_CHECK_ERROR_QUIET() gl_check_error(false, __FILE__, __LINE__)
+#define GL_CHECK_ERROR_NORMAL() gl_check_error(true, __FILE__, __LINE__)
+
 	ogl_video_config const &m_ogl_config;
 
 	int32_t         m_blittimer;
@@ -344,6 +367,7 @@ private:
 	osd_dim         m_blit_dim;
 
 	std::unique_ptr<osd_gl_context> m_gl_context;
+	std::unique_ptr<glsl_shader_info> m_shader_tool;
 
 	int             m_initialized;        // is everything well initialized, i.e. all GL stuff etc.
 	// 3D info (GL mode only)
@@ -356,8 +380,6 @@ private:
 	int             m_usepbo;         // runtime check if PBO is available
 	int             m_usefbo;         // runtime check if FBO is available
 	int             m_useglsl;        // runtime check if GLSL is available
-
-	glsl_shader_info *m_glsl;             // glsl_shader_info
 
 	GLhandleARB     m_glsl_program[2*GLSL_SHADER_MAX];  // GLSL programs, or 0
 	int             m_glsl_program_num;   // number of GLSL programs
@@ -378,6 +400,10 @@ private:
 	int32_t         m_surf_w;
 	int32_t         m_surf_h;
 	GLfloat         m_texVerticex[8];
+
+#if defined(USE_DISPATCH_GL)
+	std::unique_ptr<osd_gl_dispatch> gl_dispatch; // name is magic, can't be changed
+#endif
 
 	// OGL 1.3
 #if defined(GL_ARB_multitexture) && !defined(OSD_MAC)
@@ -520,7 +546,7 @@ void renderer_ogl::set_blendmode(int blendmode)
 	}
 }
 
-static int glsl_shader_feature = GLSL_SHADER_FEAT_PLAIN;
+static int glsl_shader_feature = glsl_shader_info::FEAT_PLAIN; // FIXME: why is this static?
 
 //============================================================
 //  Static Variables
@@ -532,9 +558,10 @@ bool renderer_ogl::s_shown_video_info = false;
 // Load the OGL function addresses
 //============================================================
 
-static void loadgl_functions(osd_gl_context &context)
+void renderer_ogl::loadgl_functions()
 {
-#ifdef USE_DISPATCH_GL
+#if defined(USE_DISPATCH_GL)
+	gl_dispatch = std::make_unique<osd_gl_dispatch>();
 
 	int err_count = 0;
 
@@ -542,11 +569,11 @@ static void loadgl_functions(osd_gl_context &context)
 	 * while func will be expanded to disp_p->glBegin
 	 */
 
-	#define OSD_GL(ret,func,params) \
-	if (!( func = (ret (APIENTRY *)params) context.getProcAddress( #func ) )) \
-		{ err_count++; osd_printf_error("GL function %s not found!\n", #func ); }
+	#define OSD_GL(ret, func, params) \
+		if (!m_gl_context->get_proc_address(func, #func)) \
+		{ err_count++; osd_printf_error("GL function %s not found!\n", #func); }
 
-	#define OSD_GL_UNUSED(ret,func,params)
+	#define OSD_GL_UNUSED(ret, func, params)
 
 	#define GET_GLFUNC 1
 	#include "modules/opengl/osd_opengl.h"
@@ -729,12 +756,13 @@ int renderer_ogl::create()
 #else
 	m_gl_context.reset(new sdl_gl_context(dynamic_cast<sdl_window_info &>(window()).platform_window()));
 #endif
-	if  (m_gl_context->LastErrorMsg() != nullptr)
+	if (!*m_gl_context)
 	{
-		osd_printf_error("%s\n", m_gl_context->LastErrorMsg());
+		char const *const msg = m_gl_context->last_error_message();
+		osd_printf_error("Creating OpenGL context failed: %s\n", msg ? msg : "unknown error");
 		return 1;
 	}
-	m_gl_context->SetSwapInterval(video_config.waitvsync ? 1 : 0);
+	m_gl_context->set_swap_interval(video_config.waitvsync ? 1 : 0);
 
 	m_blittimer = 0;
 	m_surf_w = 0;
@@ -750,7 +778,7 @@ int renderer_ogl::create()
 	/* load any GL function addresses
 	 * this must be done here because we need a context
 	 */
-	loadgl_functions(*m_gl_context);
+	loadgl_functions();
 	initialize_gl();
 
 	m_init_context = 0;
@@ -786,7 +814,7 @@ void renderer_ogl::destroy_all_textures()
 	if (!m_initialized)
 		return;
 
-	m_gl_context->MakeCurrent();
+	m_gl_context->make_current();
 
 	bool const lock = bool(window().m_primlist);
 	if (lock)
@@ -840,11 +868,7 @@ void renderer_ogl::destroy_all_textures()
 		}
 	}
 
-	if (m_useglsl)
-	{
-		glsl_shader_free(m_glsl);
-		m_glsl = nullptr;
-	}
+	m_shader_tool.reset();
 
 	m_initialized = 0;
 
@@ -885,86 +909,67 @@ void renderer_ogl::loadGLExtensions()
 
 	// Get Pointers To The GL Functions
 	// VBO:
-	if( m_usevbo )
+	if (m_usevbo)
 	{
-		m_glGenBuffers = (PFNGLGENBUFFERSPROC) m_gl_context->getProcAddress("glGenBuffers");
-		m_glDeleteBuffers = (PFNGLDELETEBUFFERSPROC) m_gl_context->getProcAddress("glDeleteBuffers");
-		m_glBindBuffer = (PFNGLBINDBUFFERPROC) m_gl_context->getProcAddress("glBindBuffer");
-		m_glBufferData = (PFNGLBUFFERDATAPROC) m_gl_context->getProcAddress("glBufferData");
-		m_glBufferSubData = (PFNGLBUFFERSUBDATAPROC) m_gl_context->getProcAddress("glBufferSubData");
+		m_gl_context->get_proc_address(m_glGenBuffers,    "glGenBuffers");
+		m_gl_context->get_proc_address(m_glDeleteBuffers, "glDeleteBuffers");
+		m_gl_context->get_proc_address(m_glBindBuffer,    "glBindBuffer");
+		m_gl_context->get_proc_address(m_glBufferData,    "glBufferData");
+		m_gl_context->get_proc_address(m_glBufferSubData, "glBufferSubData");
 	}
 	// PBO:
-	if ( m_usepbo )
+	if (m_usepbo)
 	{
-		m_glMapBuffer  = (PFNGLMAPBUFFERPROC) m_gl_context->getProcAddress("glMapBuffer");
-		m_glUnmapBuffer= (PFNGLUNMAPBUFFERPROC) m_gl_context->getProcAddress("glUnmapBuffer");
+		m_gl_context->get_proc_address(m_glMapBuffer,   "glMapBuffer");
+		m_gl_context->get_proc_address(m_glUnmapBuffer, "glUnmapBuffer");
 	}
 	// FBO:
-	if ( m_usefbo )
+	if (m_usefbo)
 	{
-		m_glIsFramebuffer = (PFNGLISFRAMEBUFFEREXTPROC) m_gl_context->getProcAddress("glIsFramebufferEXT");
-		m_glBindFramebuffer = (PFNGLBINDFRAMEBUFFEREXTPROC) m_gl_context->getProcAddress("glBindFramebufferEXT");
-		m_glDeleteFramebuffers = (PFNGLDELETEFRAMEBUFFERSEXTPROC) m_gl_context->getProcAddress("glDeleteFramebuffersEXT");
-		m_glGenFramebuffers = (PFNGLGENFRAMEBUFFERSEXTPROC) m_gl_context->getProcAddress("glGenFramebuffersEXT");
-		m_glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC) m_gl_context->getProcAddress("glCheckFramebufferStatusEXT");
-		m_glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DEXTPROC) m_gl_context->getProcAddress("glFramebufferTexture2DEXT");
+		m_gl_context->get_proc_address(m_glIsFramebuffer,          "glIsFramebufferEXT");
+		m_gl_context->get_proc_address(m_glBindFramebuffer,        "glBindFramebufferEXT");
+		m_gl_context->get_proc_address(m_glDeleteFramebuffers,     "glDeleteFramebuffersEXT");
+		m_gl_context->get_proc_address(m_glGenFramebuffers,        "glGenFramebuffersEXT");
+		m_gl_context->get_proc_address(m_glCheckFramebufferStatus, "glCheckFramebufferStatusEXT");
+		m_gl_context->get_proc_address(m_glFramebufferTexture2D,   "glFramebufferTexture2DEXT");
 	}
 
-	if ( m_usevbo &&
-			( !m_glGenBuffers || !m_glDeleteBuffers ||
-			!m_glBindBuffer || !m_glBufferData || !m_glBufferSubData
-		) )
+	if (m_usevbo && (!m_glGenBuffers || !m_glDeleteBuffers || !m_glBindBuffer || !m_glBufferData || !m_glBufferSubData))
 	{
-		m_usepbo=false;
+		m_usepbo = false;
 		if (_once)
 		{
-			osd_printf_warning("OpenGL: VBO not supported, missing: ");
+			osd_printf_warning("OpenGL: VBO not supported, missing:");
 			if (!m_glGenBuffers)
-			{
-				osd_printf_warning("glGenBuffers, ");
-			}
+				osd_printf_warning(" glGenBuffers");
 			if (!m_glDeleteBuffers)
-			{
-				osd_printf_warning("glDeleteBuffers");
-			}
+				osd_printf_warning(" glDeleteBuffers");
 			if (!m_glBindBuffer)
-			{
-				osd_printf_warning("glBindBuffer, ");
-			}
+				osd_printf_warning(" glBindBuffer");
 			if (!m_glBufferData)
-			{
-				osd_printf_warning("glBufferData, ");
-			}
+				osd_printf_warning(" glBufferData");
 			if (!m_glBufferSubData)
-			{
-				osd_printf_warning("glBufferSubData, ");
-			}
+				osd_printf_warning(" glBufferSubData");
 			osd_printf_warning("\n");
 		}
-		if ( m_usevbo )
+		if (m_usevbo)
 		{
 			if (_once)
-			{
 				osd_printf_warning("OpenGL: PBO not supported, no VBO support.\n");
-			}
-			m_usepbo=false;
+			m_usepbo = false;
 		}
 	}
 
-	if ( m_usepbo && ( !m_glMapBuffer || !m_glUnmapBuffer ) )
+	if (m_usepbo && (!m_glMapBuffer || !m_glUnmapBuffer))
 	{
-		m_usepbo=false;
+		m_usepbo = false;
 		if (_once)
 		{
-			osd_printf_warning("OpenGL: PBO not supported, missing: ");
+			osd_printf_warning("OpenGL: PBO not supported, missing:");
 			if (!m_glMapBuffer)
-			{
-				osd_printf_warning("glMapBuffer, ");
-			}
+				osd_printf_warning(" glMapBuffer");
 			if (!m_glUnmapBuffer)
-			{
-				osd_printf_warning("glUnmapBuffer, ");
-			}
+				osd_printf_warning(" glUnmapBuffer");
 			osd_printf_warning("\n");
 		}
 	}
@@ -974,89 +979,68 @@ void renderer_ogl::loadGLExtensions()
 			!m_glGenFramebuffers || !m_glCheckFramebufferStatus || !m_glFramebufferTexture2D
 		))
 	{
-		m_usefbo=false;
+		m_usefbo = false;
 		if (_once)
 		{
-			osd_printf_warning("OpenGL: FBO not supported, missing: ");
+			osd_printf_warning("OpenGL: FBO not supported, missing:");
 			if (!m_glIsFramebuffer)
-			{
-				osd_printf_warning("m_glIsFramebuffer, ");
-			}
+				osd_printf_warning(" m_glIsFramebuffer");
 			if (!m_glBindFramebuffer)
-			{
-				osd_printf_warning("m_glBindFramebuffer, ");
-			}
+				osd_printf_warning(" m_glBindFramebuffer");
 			if (!m_glDeleteFramebuffers)
-			{
-				osd_printf_warning("m_glDeleteFramebuffers, ");
-			}
+				osd_printf_warning(" m_glDeleteFramebuffers");
 			if (!m_glGenFramebuffers)
-			{
-				osd_printf_warning("m_glGenFramebuffers, ");
-			}
+				osd_printf_warning(" m_glGenFramebuffers");
 			if (!m_glCheckFramebufferStatus)
-			{
-				osd_printf_warning("m_glCheckFramebufferStatus, ");
-			}
+				osd_printf_warning(" m_glCheckFramebufferStatus");
 			if (!m_glFramebufferTexture2D)
-			{
-				osd_printf_warning("m_glFramebufferTexture2D, ");
-			}
+				osd_printf_warning(" m_glFramebufferTexture2D");
 			osd_printf_warning("\n");
 		}
 	}
 
 	if (_once)
 	{
-		if ( m_usevbo )
-		{
+		if (m_usevbo)
 			osd_printf_verbose("OpenGL: VBO supported\n");
-		}
 		else
-		{
 			osd_printf_warning("OpenGL: VBO not supported\n");
-		}
 
-		if ( m_usepbo )
-		{
+		if (m_usepbo)
 			osd_printf_verbose("OpenGL: PBO supported\n");
-		}
 		else
-		{
 			osd_printf_warning("OpenGL: PBO not supported\n");
-		}
 
-		if ( m_usefbo )
-		{
+		if (m_usefbo)
 			osd_printf_verbose("OpenGL: FBO supported\n");
-		}
 		else
-		{
 			osd_printf_warning("OpenGL: FBO not supported\n");
-		}
 	}
 
-	if ( m_useglsl )
+	if (m_useglsl)
 	{
 		#if defined(GL_ARB_multitexture) && !defined(OSD_MAC)
-		m_glActiveTexture = (PFNGLACTIVETEXTUREARBPROC) m_gl_context->getProcAddress("glActiveTextureARB");
+		m_gl_context->get_proc_address(m_glActiveTexture, "glActiveTextureARB");
 		#else
-		m_glActiveTexture = (PFNGLACTIVETEXTUREPROC) m_gl_context->getProcAddress("glActiveTexture");
+		m_gl_context->get_proc_address(m_glActiveTexture, "glActiveTexture");
 		#endif
 		if (!m_glActiveTexture)
 		{
 			if (_once)
-			{
 				osd_printf_warning("OpenGL: GLSL disabled, glActiveTexture(ARB) not supported\n");
-			}
 			m_useglsl = 0;
 		}
 	}
 
-	if ( m_useglsl )
+	if (m_useglsl)
 	{
-		m_glsl = glsl_shader_init(m_gl_context.get());
-		m_useglsl = (m_glsl != nullptr ? 1 : 0);
+		m_shader_tool = glsl_shader_info::init(
+				*m_gl_context
+#if defined(USE_DISPATCH_GL)
+				, gl_dispatch.get()
+#endif
+				);
+		m_useglsl = (m_shader_tool ? 1 : 0);
 
 		if ( ! m_useglsl )
 		{
@@ -1081,13 +1065,12 @@ void renderer_ogl::loadGLExtensions()
 
 	if (m_useglsl)
 	{
-		int i;
 		video_config.filter = false;
-		glsl_shader_feature = GLSL_SHADER_FEAT_PLAIN;
+		glsl_shader_feature = glsl_shader_info::FEAT_PLAIN;
 		m_glsl_program_num = 0;
 		m_glsl_program_mb2sc = 0;
 
-		for(i=0; i<m_ogl_config.glsl_shader_mamebm_num; i++)
+		for (int i=0; i<m_ogl_config.glsl_shader_mamebm_num; i++)
 		{
 			if ( !m_usefbo && m_glsl_program_num==1 )
 			{
@@ -1098,12 +1081,14 @@ void renderer_ogl::loadGLExtensions()
 				break;
 			}
 
-			if ( glsl_shader_add_mamebm(m_glsl, m_ogl_config.glsl_shader_mamebm[i].c_str(), m_glsl_program_num) )
+			if ( m_shader_tool->add_mamebm(m_ogl_config.glsl_shader_mamebm[i].c_str(), m_glsl_program_num) )
 			{
 				osd_printf_error("OpenGL: GLSL loading mame bitmap shader %d failed (%s)\n",
 					i, m_ogl_config.glsl_shader_mamebm[i]);
-			} else {
-				glsl_shader_feature = GLSL_SHADER_FEAT_CUSTOM;
+			}
+			else
+			{
+				glsl_shader_feature = glsl_shader_info::FEAT_CUSTOM;
 				if (_once)
 				{
 					osd_printf_verbose("OpenGL: GLSL using mame bitmap shader filter %d: '%s'\n",
@@ -1119,14 +1104,15 @@ void renderer_ogl::loadGLExtensions()
 			osd_printf_verbose("OpenGL: GLSL cannot use screen bitmap shader without bitmap shader\n");
 		}
 
-		for(i=0; m_usefbo && m_glsl_program_num>0 && i<m_ogl_config.glsl_shader_scrn_num; i++)
+		for(int i=0; m_usefbo && m_glsl_program_num>0 && i<m_ogl_config.glsl_shader_scrn_num; i++)
 		{
-			if ( glsl_shader_add_scrn(m_glsl, m_ogl_config.glsl_shader_scrn[i].c_str(),
-											m_glsl_program_num-1-m_glsl_program_mb2sc) )
+			if ( m_shader_tool->add_scrn(m_ogl_config.glsl_shader_scrn[i].c_str(), m_glsl_program_num-1-m_glsl_program_mb2sc) )
 			{
 				osd_printf_error("OpenGL: GLSL loading screen bitmap shader %d failed (%s)\n",
 					i, m_ogl_config.glsl_shader_scrn[i]);
-			} else {
+			}
+			else
+			{
 				if (_once)
 				{
 					osd_printf_verbose("OpenGL: GLSL using screen bitmap shader filter %d: '%s'\n",
@@ -1137,7 +1123,7 @@ void renderer_ogl::loadGLExtensions()
 		}
 
 		if ( 0==m_glsl_program_num &&
-				0 <= m_ogl_config.glsl_filter && m_ogl_config.glsl_filter < GLSL_SHADER_FEAT_INT_NUMBER )
+				0 <= m_ogl_config.glsl_filter && m_ogl_config.glsl_filter < glsl_shader_info::FEAT_INT_NUMBER )
 		{
 			m_glsl_program_mb2sc = m_glsl_program_num; // the last mame_bitmap (mb) shader does it.
 			m_glsl_program_num++;
@@ -1146,12 +1132,14 @@ void renderer_ogl::loadGLExtensions()
 			if (_once)
 			{
 				osd_printf_verbose("OpenGL: GLSL using shader filter '%s', idx: %d, num %d (vid filter: %d)\n",
-					glsl_shader_get_filter_name_mamebm(glsl_shader_feature),
+					m_shader_tool->get_filter_name_mamebm(glsl_shader_feature),
 					glsl_shader_feature, m_glsl_program_num, video_config.filter);
 			}
 		}
 
-	} else {
+	}
+	else
+	{
 		if (_once)
 		{
 			osd_printf_verbose("OpenGL: using vid filter: %d\n", video_config.filter);
@@ -1183,7 +1171,7 @@ int renderer_ogl::draw(const int update)
 		clear_flags(FI_CHANGED);
 	}
 
-	m_gl_context->MakeCurrent();
+	m_gl_context->make_current();
 
 	if (m_init_context)
 	{
@@ -1540,7 +1528,7 @@ int renderer_ogl::draw(const int update)
 	window().m_primlist->release_lock();
 	m_init_context = 0;
 
-	m_gl_context->SwapBuffer();
+	m_gl_context->swap_buffer();
 
 	return 0;
 }
@@ -1818,7 +1806,7 @@ int renderer_ogl::texture_fbo_create(uint32_t text_unit, uint32_t text_name, uin
 	glBindTexture(GL_TEXTURE_2D, text_name);
 	{
 		GLint _width, _height;
-		if ( gl_texture_check_size(GL_TEXTURE_2D, 0, GL_RGBA8, width, height,
+		if ( m_shader_tool->texture_check_size(GL_TEXTURE_2D, 0, GL_RGBA8, width, height,
 						0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, &_width, &_height, 1) )
 		{
 			osd_printf_error("cannot create fbo texture, req: %dx%d, avail: %dx%d - bail out\n",
@@ -1873,45 +1861,43 @@ int renderer_ogl::texture_shader_create(const render_texinfo *texsource, ogl_tex
 	for(i=0; i<m_glsl_program_num; i++)
 	{
 		if ( i<=m_glsl_program_mb2sc )
-		{
-			m_glsl_program[i] = glsl_shader_get_program_mamebm(glsl_shader_feature, i);
-		} else {
-			m_glsl_program[i] = glsl_shader_get_program_scrn(i-1-m_glsl_program_mb2sc);
-		}
-		pfn_glUseProgramObjectARB(m_glsl_program[i]);
+			m_glsl_program[i] = m_shader_tool->get_program_mamebm(glsl_shader_feature, i);
+		else
+			m_glsl_program[i] = m_shader_tool->get_program_scrn(i-1-m_glsl_program_mb2sc);
+		m_shader_tool->pfn_glUseProgramObjectARB(m_glsl_program[i]);
 
 		if ( i<=m_glsl_program_mb2sc )
 		{
 			// GL_TEXTURE0 GLSL Uniforms
-			uniform_location = pfn_glGetUniformLocationARB(m_glsl_program[i], "color_texture");
-			pfn_glUniform1iARB(uniform_location, 0);
+			uniform_location = m_shader_tool->pfn_glGetUniformLocationARB(m_glsl_program[i], "color_texture");
+			m_shader_tool->pfn_glUniform1iARB(uniform_location, 0);
 			GL_CHECK_ERROR_NORMAL();
 		}
 
 		{
 			GLfloat color_texture_sz[2] = { (GLfloat)texture->rawwidth, (GLfloat)texture->rawheight };
-			uniform_location = pfn_glGetUniformLocationARB(m_glsl_program[i], "color_texture_sz");
-			pfn_glUniform2fvARB(uniform_location, 1, &(color_texture_sz[0]));
+			uniform_location = m_shader_tool->pfn_glGetUniformLocationARB(m_glsl_program[i], "color_texture_sz");
+			m_shader_tool->pfn_glUniform2fvARB(uniform_location, 1, &(color_texture_sz[0]));
 			GL_CHECK_ERROR_NORMAL();
 		}
 
 		GLfloat color_texture_pow2_sz[2] = { (GLfloat)texture->rawwidth_create, (GLfloat)texture->rawheight_create };
-		uniform_location = pfn_glGetUniformLocationARB(m_glsl_program[i], "color_texture_pow2_sz");
-		pfn_glUniform2fvARB(uniform_location, 1, &(color_texture_pow2_sz[0]));
+		uniform_location = m_shader_tool->pfn_glGetUniformLocationARB(m_glsl_program[i], "color_texture_pow2_sz");
+		m_shader_tool->pfn_glUniform2fvARB(uniform_location, 1, &(color_texture_pow2_sz[0]));
 		GL_CHECK_ERROR_NORMAL();
 
 		GLfloat screen_texture_sz[2] = { (GLfloat) m_blit_dim.width(), (GLfloat) m_blit_dim.height() };
-		uniform_location = pfn_glGetUniformLocationARB(m_glsl_program[i], "screen_texture_sz");
-		pfn_glUniform2fvARB(uniform_location, 1, &(screen_texture_sz[0]));
+		uniform_location = m_shader_tool->pfn_glGetUniformLocationARB(m_glsl_program[i], "screen_texture_sz");
+		m_shader_tool->pfn_glUniform2fvARB(uniform_location, 1, &(screen_texture_sz[0]));
 		GL_CHECK_ERROR_NORMAL();
 
 		GLfloat screen_texture_pow2_sz[2] = { (GLfloat)surf_w_pow2, (GLfloat)surf_h_pow2 };
-		uniform_location = pfn_glGetUniformLocationARB(m_glsl_program[i], "screen_texture_pow2_sz");
-		pfn_glUniform2fvARB(uniform_location, 1, &(screen_texture_pow2_sz[0]));
+		uniform_location = m_shader_tool->pfn_glGetUniformLocationARB(m_glsl_program[i], "screen_texture_pow2_sz");
+		m_shader_tool->pfn_glUniform2fvARB(uniform_location, 1, &(screen_texture_pow2_sz[0]));
 		GL_CHECK_ERROR_NORMAL();
 	}
 
-	pfn_glUseProgramObjectARB(m_glsl_program[0]); // start with 1st shader
+	m_shader_tool->pfn_glUseProgramObjectARB(m_glsl_program[0]); // start with 1st shader
 
 	if( m_glsl_program_num > 1 )
 	{
@@ -1969,7 +1955,7 @@ int renderer_ogl::texture_shader_create(const render_texinfo *texsource, ogl_tex
 
 	uint32_t * dummy = nullptr;
 	GLint _width, _height;
-	if ( gl_texture_check_size(GL_TEXTURE_2D, 0, GL_RGBA8,
+	if ( m_shader_tool->texture_check_size(GL_TEXTURE_2D, 0, GL_RGBA8,
 					texture->rawwidth_create, texture->rawheight_create,
 					0,
 					GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV,
@@ -1991,7 +1977,7 @@ int renderer_ogl::texture_shader_create(const render_texinfo *texsource, ogl_tex
 
 	if ((PRIMFLAG_GET_SCREENTEX(flags)) && video_config.filter)
 	{
-		assert( glsl_shader_feature == GLSL_SHADER_FEAT_PLAIN );
+		assert( glsl_shader_feature == glsl_shader_info::FEAT_PLAIN );
 
 		// screen textures get the user's choice of filtering
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -2026,7 +2012,11 @@ ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, 
 	ogl_texture_info *texture;
 
 	// allocate a new texture
-	texture = new ogl_texture_info;
+	texture = new ogl_texture_info(
+#if defined(USE_DISPATCH_GL)
+			gl_dispatch.get()
+#endif
+			);
 
 	// fill in the core data
 	texture->hash = texture_compute_hash(texsource, flags);
@@ -2090,7 +2080,7 @@ ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, 
 
 	if ( texture->type != TEXTURE_TYPE_SHADER && m_useglsl)
 	{
-		pfn_glUseProgramObjectARB(0); // back to fixed function pipeline
+		m_shader_tool->pfn_glUseProgramObjectARB(0); // back to fixed function pipeline
 	}
 
 	if ( texture->type==TEXTURE_TYPE_SHADER )
@@ -2697,8 +2687,8 @@ void renderer_ogl::texture_mpass_flip(ogl_texture_info *texture, int shaderIdx)
 	if ( shaderIdx>0 )
 	{
 		int uniform_location;
-		uniform_location = pfn_glGetUniformLocationARB(m_glsl_program[shaderIdx], "mpass_texture");
-		pfn_glUniform1iARB(uniform_location, texture->mpass_textureunit[mpass_src_idx]-GL_TEXTURE0);
+		uniform_location = m_shader_tool->pfn_glGetUniformLocationARB(m_glsl_program[shaderIdx], "mpass_texture");
+		m_shader_tool->pfn_glUniform1iARB(uniform_location, texture->mpass_textureunit[mpass_src_idx]-GL_TEXTURE0);
 		GL_CHECK_ERROR_NORMAL();
 	}
 
@@ -2776,8 +2766,8 @@ void renderer_ogl::texture_shader_update(ogl_texture_info *texture, render_conta
 		vid_attributes[1] = settings.m_contrast;
 		vid_attributes[2] = settings.m_brightness;
 		vid_attributes[3] = 0.0f;
-		uniform_location = pfn_glGetUniformLocationARB(m_glsl_program[shaderIdx], "vid_attributes");
-		pfn_glUniform4fvARB(uniform_location, 1, &(vid_attributes[shaderIdx]));
+		uniform_location = m_shader_tool->pfn_glGetUniformLocationARB(m_glsl_program[shaderIdx], "vid_attributes");
+		m_shader_tool->pfn_glUniform4fvARB(uniform_location, 1, &(vid_attributes[shaderIdx]));
 		if ( GL_CHECK_ERROR_QUIET() ) {
 			osd_printf_verbose("GLSL: could not set 'vid_attributes' for shader prog idx %d\n", shaderIdx);
 		}
@@ -2798,7 +2788,7 @@ ogl_texture_info * renderer_ogl::texture_update(const render_primitive *prim, in
 	{
 		if ( texture->type == TEXTURE_TYPE_SHADER )
 		{
-			pfn_glUseProgramObjectARB(m_glsl_program[shaderIdx]); // back to our shader
+			m_shader_tool->pfn_glUseProgramObjectARB(m_glsl_program[shaderIdx]); // back to our shader
 		}
 		else if ( texture->type == TEXTURE_TYPE_DYNAMIC )
 		{
@@ -2862,7 +2852,7 @@ void renderer_ogl::texture_disable(ogl_texture_info * texture)
 	if ( texture->type == TEXTURE_TYPE_SHADER )
 	{
 		assert ( m_useglsl );
-		pfn_glUseProgramObjectARB(0); // back to fixed function pipeline
+		m_shader_tool->pfn_glUseProgramObjectARB(0); // back to fixed function pipeline
 	}
 	else if ( texture->type == TEXTURE_TYPE_DYNAMIC )
 	{
@@ -2877,22 +2867,26 @@ void renderer_ogl::texture_disable(ogl_texture_info * texture)
 
 void renderer_ogl::texture_all_disable()
 {
-	if ( m_useglsl )
+	if (m_useglsl)
 	{
-		pfn_glUseProgramObjectARB(0); // back to fixed function pipeline
+		m_shader_tool->pfn_glUseProgramObjectARB(0); // back to fixed function pipeline
 
 		m_glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, 0);
-		if ( m_usefbo ) m_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
+		if (m_usefbo)
+			m_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
 		m_glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, 0);
-		if ( m_usefbo ) m_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
+		if (m_usefbo)
+			m_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
 		m_glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, 0);
-		if ( m_usefbo ) m_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
+		if (m_usefbo)
+			m_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
 		m_glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, 0);
-		if ( m_usefbo ) m_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
+		if (m_usefbo)
+			m_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
 	}
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
 
@@ -2919,7 +2913,7 @@ class video_opengl : public osd_module, public render_module
 public:
 	video_opengl()
 		: osd_module(OSD_RENDERER_PROVIDER, "opengl")
-#ifdef USE_DISPATCH_GL
+#if defined(USE_DISPATCH_GL)
 		, m_dll_loaded(false)
 #endif
 	{
@@ -2936,8 +2930,7 @@ protected:
 
 private:
 	ogl_video_config m_ogl_config;
-#ifdef USE_DISPATCH_GL
-	std::unique_ptr<osd_gl_dispatch> m_gl_dispatch;
+#if defined(USE_DISPATCH_GL)
 	bool m_dll_loaded;
 #endif
 };
@@ -3001,7 +2994,6 @@ int video_opengl::init(osd_interface &osd, osd_options const &options)
 	}
 #endif // defined(OSD_SDL)
 	m_dll_loaded = true;
-	m_gl_dispatch = std::make_unique<osd_gl_dispatch>();
 #endif // defined(USE_DISPATCH_GL)
 
 #if defined(OSD_WINDOWS)
@@ -3020,7 +3012,6 @@ void video_opengl::exit()
 	if (m_dll_loaded)
 		SDL_GL_UnloadLibrary();
 #endif // defined(OSD_SDL)
-	m_gl_dispatch.reset();
 	m_dll_loaded = false;
 #endif // defined(USE_DISPATCH_GL)
 

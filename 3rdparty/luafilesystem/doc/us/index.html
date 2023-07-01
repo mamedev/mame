@@ -13,7 +13,7 @@
 
 <div id="product">
 	<div id="product_logo">
-        <a href="http://www.keplerproject.org">
+        <a href="http://keplerproject.github.io/luafilesystem">
 		<img alt="LuaFileSystem" src="luafilesystem.png"/>
 	    </a>
     </div>
@@ -33,7 +33,6 @@
 				<li><a href="index.html#download">Download</a></li>
 				<li><a href="index.html#history">History</a></li>
 				<li><a href="index.html#credits">Credits</a></li>
-				<li><a href="index.html#contact">Contact us</a></li>
 			</ul>
 		</li>
 		<li><a href="manual.html">Manual</a>
@@ -67,21 +66,43 @@ systems offered by the standard Lua distribution.</p>
 the underlying directory structure and file attributes.</p>
 
 <p>LuaFileSystem is free software and uses the same
-<a href="license.html">license</a> as Lua 5.1.</p>
+<a href="license.html">license</a> as Lua 5.x (MIT).</p>
 
 <h2><a name="status"></a>Status</h2>
 
-<p>Current version is 1.6.3. It works with Lua 5.1, 5.2 and 5.3.</p>
+<p>Current version is 1.8.0. It works with Lua 5.1, 5.2, 5.3 and 5.4, and it runs on various
+flavors of Unix (including Linux, BSDs, macOS) and Windows.</p>
 
 <h2><a name="download"></a>Download</h2>
 
-<p>LuaFileSystem source can be downloaded from its
-<a href="http://github.com/keplerproject/luafilesystem">Github</a>
-page.</p>
+<p>LuaFileSystem can be installed using <a href="https://luarocks.org">LuaRocks</a>:
+
+<pre class="example">
+$ luarocks install luafilesystem
+</pre>
+
+<p>Its source can be found at its <a href="http://github.com/keplerproject/luafilesystem">Github</a> page.</p>
 
 <h2><a name="history"></a>History</h2>
 
 <dl class="history">
+    <dt><strong>Version 1.8.0</strong> [22/Apr/2020]</dt>
+    <dd><ul>
+        <li>Lua 5.4 support</li>
+        <li>lfs.link and lfs.symlinkattributes now work on Windows</li>
+        <li>MACOSX_DEPLOYMENT_TARGET is configurable in the Makefile</li>
+        <li>Fallback to _POSIX_PATH_MAX when MAXPATHLEN is not avaliable</li>
+        <li>Fixed memory leak in case of realloc failure</li>
+    </ul></dd>
+
+    <dt><strong>Version 1.7.0</strong> [15/Sep/2017]</dt>
+    <dd><ul>
+        <li>symlinkattributes function now provides 'target' field, containing name of the file that the symlink points to.</li>
+        <li>attributes, symlinkattributes, touch, mkdir, and rmdir functions now return system-dependent error code as the third value on error.</li>
+        <li>Fixed detection of closed files for Lua 5.2+ in setmode, lock, and unlock functions.</li>
+        <li>Fixed various compiler warnings.</li>
+    </ul></dd>
+
 	<dt><strong>Version 1.6.3</strong> [15/Jan/2015]</dt>
 	<dd><ul>
         <li>Lua 5.3 support.</li>
@@ -115,9 +136,9 @@ page.</p>
 	<dt><strong>Version 1.4.2</strong> [03/Feb/2009]</dt>
 	<dd>
 		<ul>
-			<li>fixed bug [<a href="http://luaforge.net/tracker/?func=detail&amp;group_id=66&amp;aid=13198&amp;atid=356">#13198</a>]
-				lfs.attributes(filename, 'size') overflow on files > 2 Gb again  (bug report and patch by KUBO Takehiro).</li>
-			<li>fixed bug [<a href="http://luaforge.net/tracker/?group_id=66&amp;atid=356&amp;func=detail&amp;aid=39794">#39794</a>]
+			<li>fixed bug
+				<code>lfs.attributes(filename, 'size')</code> overflow on files > 2 Gb again  (bug report and patch by KUBO Takehiro).</li>
+			<li>fixed bug
 				Compile error on Solaris 10 (bug report and patch by Aaron B).</li>
 			<li>fixed compilation problems with Borland C.</li>
 		</ul>
@@ -129,7 +150,7 @@ page.</p>
 	<li>documentation review</li>
 	<li>fixed Windows compilation issues</li>
 	<li>fixed bug in the Windows tests (patch by Shmuel Zeigerman)</li>
-	<li>fixed bug [<a href="http://luaforge.net/tracker/?func=detail&amp;group_id=66&amp;aid=2185&amp;atid=356">#2185</a>]
+	<li>fixed bug
 		<code>lfs.attributes(filename, 'size')</code> overflow on files > 2 Gb
 	</li>
 	</ul>
@@ -191,17 +212,8 @@ page.</p>
 
 <p>LuaFileSystem was designed by Roberto Ierusalimschy,
 Andr&eacute; Carregal and Tom&aacute;s Guisasola as part of the
-<a href="http://www.keplerproject.org">Kepler Project</a>,
+<a href="https://github.com/keplerproject">Kepler Project</a>,
 which holds its copyright. LuaFileSystem is currently maintained by F&aacute;bio Mascarenhas.</p>
-
-<h2><a name="contact"></a>Contact us</h2>
-
-<p>For more information please
-<a href="mailto:info-NO-SPAM-THANKS@keplerproject.org">contact us</a>.
-Comments are welcome!</p>
-
-<p>You can also reach other Kepler developers and users on the Kepler Project
-<a href="http://luaforge.net/mail/?group_id=104">mailing list</a>.</p>
 
 </div> <!-- id="content" -->
 
@@ -209,7 +221,6 @@ Comments are welcome!</p>
 
 <div id="about">
 	<p><a href="http://validator.w3.org/check?uri=referer">Valid XHTML 1.0!</a></p>
-	<p><small>$Id: index.html,v 1.44 2009/02/04 21:21:33 carregal Exp $</small></p>
 </div> <!-- id="about" -->
 
 </div> <!-- id="container" -->

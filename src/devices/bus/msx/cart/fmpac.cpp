@@ -30,9 +30,9 @@ msx_cart_fmpac_device::msx_cart_fmpac_device(const machine_config &mconfig, cons
 
 void msx_cart_fmpac_device::device_add_mconfig(machine_config &config)
 {
-	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
-	SPEAKER(config, "mono").front_center();
-	YM2413(config, m_ym2413, XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 0.40);
+	YM2413(config, m_ym2413, DERIVED_CLOCK(1, 1));
+	if (parent_slot())
+		m_ym2413->add_route(ALL_OUTPUTS, soundin(), 0.8);
 }
 
 
@@ -44,7 +44,7 @@ void msx_cart_fmpac_device::device_start()
 	save_item(NAME(m_control));
 
 	// Install IO read/write handlers
-	io_space().install_write_handler(0x7c, 0x7d, write8sm_delegate(*this, FUNC(msx_cart_fmpac_device::write_ym2413)));
+	io_space().install_write_handler(0x7c, 0x7d, emu::rw_delegate(*this, FUNC(msx_cart_fmpac_device::write_ym2413)));
 }
 
 void msx_cart_fmpac_device::device_reset()
@@ -59,52 +59,52 @@ void msx_cart_fmpac_device::device_reset()
 
 }
 
-image_init_result msx_cart_fmpac_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_fmpac_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_fmpac_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	if (!cart_sram_region())
 	{
 		message = "msx_cart_fmpac_device: Required region 'sram' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	if (cart_rom_region()->bytes() != 0x10000)
 	{
 		message = "msx_cart_fmpac_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	if (cart_sram_region()->bytes() < 0x2000)
 	{
 		message = "msx_cart_fmpac_device: Region 'sram' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	}
 
 	m_rombank->configure_entries(0, 4, cart_rom_region()->base(), 0x4000);
 
 	page(1)->install_view(0x4000, 0x7fff, m_view);
 	m_view[0].install_read_bank(0x4000, 0x7fff, m_rombank);
-	m_view[0].install_write_handler(0x5ffe, 0x5fff, write8sm_delegate(*this, FUNC(msx_cart_fmpac_device::sram_unlock)));
-	m_view[0].install_write_handler(0x7ff4, 0x7ff5, write8sm_delegate(*this, FUNC(msx_cart_fmpac_device::write_ym2413)));
-	m_view[0].install_read_handler(0x7ff6, 0x7ff6, read8smo_delegate(*this, FUNC(msx_cart_fmpac_device::control_r)));
-	m_view[0].install_write_handler(0x7ff6, 0x7ff6, write8smo_delegate(*this, FUNC(msx_cart_fmpac_device::control_w)));
-	m_view[0].install_read_handler(0x7ff7, 0x7ff7, read8smo_delegate(*this, FUNC(msx_cart_fmpac_device::bank_r)));
-	m_view[0].install_write_handler(0x7ff7, 0x7ff7, write8smo_delegate(*this, FUNC(msx_cart_fmpac_device::bank_w)));
+	m_view[0].install_write_handler(0x5ffe, 0x5fff, emu::rw_delegate(*this, FUNC(msx_cart_fmpac_device::sram_unlock)));
+	m_view[0].install_write_handler(0x7ff4, 0x7ff5, emu::rw_delegate(*this, FUNC(msx_cart_fmpac_device::write_ym2413)));
+	m_view[0].install_read_handler(0x7ff6, 0x7ff6, emu::rw_delegate(*this, FUNC(msx_cart_fmpac_device::control_r)));
+	m_view[0].install_write_handler(0x7ff6, 0x7ff6, emu::rw_delegate(*this, FUNC(msx_cart_fmpac_device::control_w)));
+	m_view[0].install_read_handler(0x7ff7, 0x7ff7, emu::rw_delegate(*this, FUNC(msx_cart_fmpac_device::bank_r)));
+	m_view[0].install_write_handler(0x7ff7, 0x7ff7, emu::rw_delegate(*this, FUNC(msx_cart_fmpac_device::bank_w)));
 
 	m_view[1].install_ram(0x4000, 0x5fff, cart_sram_region()->base());
-	m_view[1].install_write_handler(0x5ffe, 0x5fff, write8sm_delegate(*this, FUNC(msx_cart_fmpac_device::sram_unlock)));
-	m_view[1].install_write_handler(0x7ff4, 0x7ff5, write8sm_delegate(*this, FUNC(msx_cart_fmpac_device::write_ym2413)));
-	m_view[1].install_read_handler(0x7ff6, 0x7ff6, read8smo_delegate(*this, FUNC(msx_cart_fmpac_device::control_r)));
-	m_view[1].install_write_handler(0x7ff6, 0x7ff6, write8smo_delegate(*this, FUNC(msx_cart_fmpac_device::control_w)));
-	m_view[1].install_read_handler(0x7ff7, 0x7ff7, read8smo_delegate(*this, FUNC(msx_cart_fmpac_device::bank_r)));
-	m_view[1].install_write_handler(0x7ff7, 0x7ff7, write8smo_delegate(*this, FUNC(msx_cart_fmpac_device::bank_w)));
+	m_view[1].install_write_handler(0x5ffe, 0x5fff, emu::rw_delegate(*this, FUNC(msx_cart_fmpac_device::sram_unlock)));
+	m_view[1].install_write_handler(0x7ff4, 0x7ff5, emu::rw_delegate(*this, FUNC(msx_cart_fmpac_device::write_ym2413)));
+	m_view[1].install_read_handler(0x7ff6, 0x7ff6, emu::rw_delegate(*this, FUNC(msx_cart_fmpac_device::control_r)));
+	m_view[1].install_write_handler(0x7ff6, 0x7ff6, emu::rw_delegate(*this, FUNC(msx_cart_fmpac_device::control_w)));
+	m_view[1].install_read_handler(0x7ff7, 0x7ff7, emu::rw_delegate(*this, FUNC(msx_cart_fmpac_device::bank_r)));
+	m_view[1].install_write_handler(0x7ff7, 0x7ff7, emu::rw_delegate(*this, FUNC(msx_cart_fmpac_device::bank_w)));
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void msx_cart_fmpac_device::sram_unlock(offs_t offset, u8 data)

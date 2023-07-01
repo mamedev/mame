@@ -145,7 +145,7 @@ static const char *m5_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-image_init_result m5_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> m5_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -165,10 +165,7 @@ image_init_result m5_cart_slot_device::call_load()
 			uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
 			if (size > 0x5000 && m_type == M5_STD)
-			{
-				seterror(image_error::INVALIDIMAGE, "Image extends beyond the expected size for an M5 cart");
-				return image_init_result::FAIL;
-			}
+				return std::make_pair(image_error::INVALIDLENGTH, "Image file exceeds the expected size for an M5 cart (20K)");
 
 			m_cart->rom_alloc(size, tag());
 
@@ -182,11 +179,10 @@ image_init_result m5_cart_slot_device::call_load()
 			if (get_software_region("ram"))
 				m_cart->ram_alloc(get_software_region_length("ram"));
 
-
 		//printf("Type: %s\n", m5_get_slot(m_type));
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

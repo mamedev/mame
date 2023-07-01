@@ -62,11 +62,20 @@ STREAM_INTERFACE(ISequentialOutStream, 0x02)
   */
 };
 
+#ifdef _WIN32
+
 #ifdef __HRESULT_FROM_WIN32
 #define HRESULT_WIN32_ERROR_NEGATIVE_SEEK __HRESULT_FROM_WIN32(ERROR_NEGATIVE_SEEK)
 #else
 #define HRESULT_WIN32_ERROR_NEGATIVE_SEEK   HRESULT_FROM_WIN32(ERROR_NEGATIVE_SEEK)
 #endif
+
+#else
+
+#define HRESULT_WIN32_ERROR_NEGATIVE_SEEK   MY__E_ERROR_NEGATIVE_SEEK
+
+#endif
+
 
 /*  Seek() Function
   If you seek before the beginning of the stream, Seek() function returns error code:
@@ -122,6 +131,13 @@ struct CStreamFileProps
 STREAM_INTERFACE(IStreamGetProps2, 0x09)
 {
   STDMETHOD(GetProps2)(CStreamFileProps *props) PURE;
+};
+
+
+STREAM_INTERFACE(IStreamGetProp, 0x0a)
+{
+  STDMETHOD(GetProperty)(PROPID propID, PROPVARIANT *value) PURE;
+  STDMETHOD(ReloadProps)() PURE;
 };
 
 #endif

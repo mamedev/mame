@@ -29,7 +29,7 @@ protected:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	device_slot_interface::slot_option const *const m_option;
 	bool const m_mounted;

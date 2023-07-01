@@ -32,22 +32,22 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_WRITE_LINE_MEMBER(write_joy3_0) { if (state) m_joy3 |= 1; else m_joy3 &= ~1; update_output(); }
-	DECLARE_WRITE_LINE_MEMBER(write_joy3_1) { if (state) m_joy3 |= 2; else m_joy3 &= ~2; update_output(); }
-	DECLARE_WRITE_LINE_MEMBER(write_joy3_2) { if (state) m_joy3 |= 4; else m_joy3 &= ~4; update_output(); }
-	DECLARE_WRITE_LINE_MEMBER(write_joy3_3) { if (state) m_joy3 |= 8; else m_joy3 &= ~8; update_output(); }
+	void write_joy3_0(int state) { if (state) m_joy3 |= 1; else m_joy3 &= ~1; update_output(); }
+	void write_joy3_1(int state) { if (state) m_joy3 |= 2; else m_joy3 &= ~2; update_output(); }
+	void write_joy3_2(int state) { if (state) m_joy3 |= 4; else m_joy3 &= ~4; update_output(); }
+	void write_joy3_3(int state) { if (state) m_joy3 |= 8; else m_joy3 &= ~8; update_output(); }
 
-	DECLARE_WRITE_LINE_MEMBER(write_joy4_0) { if (state) m_joy4 |= 1; else m_joy4 &= ~1; update_output(); }
-	DECLARE_WRITE_LINE_MEMBER(write_joy4_1) { if (state) m_joy4 |= 2; else m_joy4 &= ~2; update_output(); }
-	DECLARE_WRITE_LINE_MEMBER(write_joy4_2) { if (state) m_joy4 |= 4; else m_joy4 &= ~4; update_output(); }
-	DECLARE_WRITE_LINE_MEMBER(write_joy4_3) { if (state) m_joy4 |= 8; else m_joy4 &= ~8; update_output(); }
+	void write_joy4_0(int state) { if (state) m_joy4 |= 1; else m_joy4 &= ~1; update_output(); }
+	void write_joy4_1(int state) { if (state) m_joy4 |= 2; else m_joy4 &= ~2; update_output(); }
+	void write_joy4_2(int state) { if (state) m_joy4 |= 4; else m_joy4 &= ~4; update_output(); }
+	void write_joy4_3(int state) { if (state) m_joy4 |= 8; else m_joy4 &= ~8; update_output(); }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
 	// device_pet_user_port_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( input_l ) override;
+	virtual void input_l(int state) override;
 
 private:
 	void update_output();

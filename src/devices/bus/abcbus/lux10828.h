@@ -15,6 +15,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "formats/abc800_dsk.h"
+#include "formats/abc800i_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80pio.h"
@@ -80,8 +81,8 @@ private:
 	uint8_t pio_pb_r();
 	void pio_pb_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 	void ctrl_w(uint8_t data);
 	void status_w(uint8_t data);

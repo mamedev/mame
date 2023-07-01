@@ -33,9 +33,9 @@ scmp_device::scmp_device(const machine_config &mconfig, device_type type, const 
 	, m_AC(0), m_ER(0), m_SR(0), m_icount(0)
 	, m_flag_out_func(*this)
 	, m_sout_func(*this)
-	, m_sin_func(*this)
-	, m_sensea_func(*this)
-	, m_senseb_func(*this)
+	, m_sin_func(*this, 0)
+	, m_sensea_func(*this, 0)
+	, m_senseb_func(*this, 0)
 	, m_halt_func(*this)
 {
 }
@@ -499,14 +499,6 @@ void scmp_device::device_start()
 
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
-
-	/* resolve callbacks */
-	m_flag_out_func.resolve_safe();
-	m_sout_func.resolve_safe();
-	m_sin_func.resolve_safe(0);
-	m_sensea_func.resolve_safe(0);
-	m_senseb_func.resolve_safe(0);
-	m_halt_func.resolve_safe();
 
 	save_item(NAME(m_PC));
 	save_item(NAME(m_P1));

@@ -1,8 +1,8 @@
 /** @file
-	@ingroup test_src
-	@brief Hear the latency caused by big buffers.
-	Play a sine wave and change frequency based on letter input.
-	@author Phil Burk <philburk@softsynth.com>, and Darren Gibbs
+    @ingroup test_src
+    @brief Hear the latency caused by big buffers.
+    Play a sine wave and change frequency based on letter input.
+    @author Phil Burk <philburk@softsynth.com>, and Darren Gibbs
 */
 /*
  * $Id$
@@ -32,13 +32,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -136,14 +136,14 @@ int main(void)
 
     outputParameters.device = OUTPUT_DEVICE;
     if (outputParameters.device == paNoDevice) {
-      fprintf(stderr,"Error: No default output device.\n");
-      goto error;
+        fprintf(stderr,"Error: No default output device.\n");
+        goto error;
     }
     outputParameters.channelCount = 2;         /* stereo output */
     outputParameters.sampleFormat = paFloat32; /* 32 bit floating point output */
     outputParameters.suggestedLatency = Pa_GetDeviceInfo( outputParameters.device )->defaultLowOutputLatency;
     outputParameters.hostApiSpecificStreamInfo = NULL;
-    
+
     printf("Requested output latency = %.4f seconds.\n", outputParameters.suggestedLatency );
     printf("%d frames per buffer.\n.", FRAMES_PER_BUFFER );
 
@@ -186,7 +186,7 @@ int main(void)
     return err;
 error:
     Pa_Terminate();
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
     return err;

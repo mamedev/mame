@@ -209,9 +209,6 @@ basf7100_kbd_device::basf7100_kbd_device(const machine_config &mconfig, const ch
 
 void basf7100_kbd_device::device_start()
 {
-	// resolve callbacks
-	m_int_handler.resolve_safe();
-
 	// register for state saving
 	save_item(NAME(m_data));
 }

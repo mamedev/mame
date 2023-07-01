@@ -83,8 +83,6 @@ void asc_device::device_start()
 	save_item(NAME(m_regs));
 	save_item(NAME(m_phase));
 	save_item(NAME(m_incr));
-
-	write_irq.resolve_safe();
 }
 
 

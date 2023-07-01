@@ -77,7 +77,7 @@ private:
 	void background2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void tokib_adpcm_control_w(uint8_t data);
 	void tokib_adpcm_data_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(tokib_adpcm_int);
+	void tokib_adpcm_int(int state);
 
 	uint8_t jujuba_z80_data_decrypt(offs_t offset);
 

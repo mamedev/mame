@@ -25,9 +25,6 @@ osd_window::osd_window(
 		int index,
 		const std::shared_ptr<osd_monitor_info> &monitor,
 		const osd_window_config &config) :
-#ifdef OSD_WINDOWS
-	m_dc(nullptr), m_resize_state(0),
-#endif
 	m_target(nullptr),
 	m_primlist(nullptr),
 	m_win_config(config),

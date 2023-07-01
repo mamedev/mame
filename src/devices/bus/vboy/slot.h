@@ -105,7 +105,7 @@ public:
 	template <typename T> void set_rom(T &&tag, int no, offs_t base) { m_rom_space.set_tag(std::forward<T>(tag), no); m_rom_base = base; }
 
 	// device_image_interface implementation
-	virtual image_init_result call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual char const *image_interface() const noexcept override { return "vboy_cart"; }
@@ -117,7 +117,6 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_validity_check(validity_checker &valid) const override ATTR_COLD;
-	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
 private:
@@ -138,7 +137,7 @@ private:
 class device_vboy_cart_interface : public device_interface
 {
 public:
-	virtual image_init_result load() ATTR_COLD = 0;
+	virtual std::error_condition load() ATTR_COLD = 0;
 	virtual void unload() ATTR_COLD;
 
 protected:

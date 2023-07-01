@@ -41,7 +41,7 @@ public:
 	void jakks_gkr_wp(machine_config &config);
 	void jakks_gkr_cb(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(i2c_gkr_r);
+	int i2c_gkr_r();
 
 protected:
 	[[maybe_unused]] uint16_t jakks_porta_r();
@@ -67,7 +67,7 @@ private:
 	optional_ioport m_analog_y;
 };
 
-READ_LINE_MEMBER(jakks_gkr_state::i2c_gkr_r)
+int jakks_gkr_state::i2c_gkr_r()
 {
 	if (m_cart && m_cart->exists())
 	{

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Sean Riddle, Kevin Horton
-/***************************************************************************
+/*******************************************************************************
 
 GI PIC 16xx-driven dedicated handhelds or other simple devices.
 
@@ -53,12 +53,11 @@ TODO:
   Hong Kong subcontractor? I presume Toytronic.
 - uspbball and pabball internal artwork
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/pic16c5x/pic16c5x.h"
-#include "video/pwm.h"
 #include "machine/clock.h"
 #include "machine/input_merger.h"
 #include "machine/netlist.h"
@@ -66,6 +65,7 @@ TODO:
 #include "sound/dac.h"
 #include "sound/flt_vol.h"
 #include "sound/spkrdev.h"
+#include "video/pwm.h"
 
 #include "speaker.h"
 
@@ -114,12 +114,13 @@ protected:
 	optional_device<speaker_sound_device> m_speaker;
 	optional_ioport_array<6> m_inputs; // max 6
 
-	// misc common
-	u8 m_a = 0;                     // MCU port A write data
-	u8 m_b = 0;                     // " B
-	u8 m_c = 0;                     // " C
-	u8 m_d = 0;                     // " D
-	u16 m_inp_mux = ~0;             // multiplexed inputs mask
+	u16 m_inp_mux = ~0; // multiplexed inputs mask
+
+	// MCU output pin state
+	u8 m_a = 0;         // port A
+	u8 m_b = 0;         // port B
+	u8 m_c = 0;         // port C
+	u8 m_d = 0;         // port D
 
 	u16 read_inputs(int columns, u16 colmask = ~0);
 	u8 read_rotated_inputs(int columns, u8 rowmask = ~0);
@@ -132,11 +133,11 @@ protected:
 void hh_pic16_state::machine_start()
 {
 	// register for savestates
+	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));
 	save_item(NAME(m_c));
 	save_item(NAME(m_d));
-	save_item(NAME(m_inp_mux));
 }
 
 void hh_pic16_state::machine_reset()
@@ -146,11 +147,11 @@ void hh_pic16_state::machine_reset()
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Helper Functions
 
-***************************************************************************/
+*******************************************************************************/
 
 // generic input handlers
 
@@ -161,7 +162,7 @@ u16 hh_pic16_state::read_inputs(int columns, u16 colmask)
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
-		if (~m_inp_mux >> i & 1)
+		if (!BIT(m_inp_mux, i))
 			ret &= m_inputs[i]->read();
 
 	return ret;
@@ -189,7 +190,8 @@ INPUT_CHANGED_MEMBER(hh_pic16_state::reset_button)
 
 INPUT_CHANGED_MEMBER(hh_pic16_state::power_button)
 {
-	set_power((bool)param);
+	if (newval != field.defvalue())
+		set_power((bool)param);
 }
 
 void hh_pic16_state::set_power(bool state)
@@ -202,13 +204,13 @@ void hh_pic16_state::set_power(bool state)
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
-***************************************************************************/
+*******************************************************************************/
 
-/***************************************************************************
+/*******************************************************************************
 
   Atari Touch Me
   * PIC 1655A-053
@@ -220,7 +222,7 @@ void hh_pic16_state::set_power(bool state)
   - Model BH-100 GI C013233 Rev 2 Atari W 1979: PIC 1655A-053
   - Model BH-100 C013150 Rev 6 Atari 1979: AMI C10745 (custom ASIC)
 
-***************************************************************************/
+*******************************************************************************/
 
 class touchme_state : public hh_pic16_state
 {
@@ -281,7 +283,7 @@ void touchme_state::write_c(u8 data)
 	update_speaker();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( touchme )
 	PORT_START("IN.0") // B0 port A
@@ -303,6 +305,8 @@ static INPUT_PORTS_START( touchme )
 	PORT_CONFSETTING(    0x04^0x07, "3" )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void touchme_state::touchme(machine_config &config)
 {
@@ -340,7 +344,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Caprice Pro-Action Baseball (manufactured by Calfax)
   * PIC 1655A-043
@@ -350,7 +354,7 @@ ROM_END
   Electronics, exclusively for Kmart Corporation. Calfax / Caprice is basically
   the same company.
 
-***************************************************************************/
+*******************************************************************************/
 
 class pabball_state : public hh_pic16_state
 {
@@ -400,7 +404,7 @@ void pabball_state::write_c(u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( pabball )
 	PORT_START("IN.0") // port A
@@ -419,6 +423,8 @@ static INPUT_PORTS_START( pabball )
 	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, pabball_state, reset_button, 0) PORT_NAME("P1 Reset")
 INPUT_PORTS_END
+
+// config
 
 void pabball_state::pabball(machine_config &config)
 {
@@ -450,7 +456,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Electroplay Sound FX Phasor
   * PIC 1655A-522
@@ -464,7 +470,7 @@ ROM_END
 
   Paste example (must be in music mode): F11A F3B F4C F3D F3E F6F
 
-***************************************************************************/
+*******************************************************************************/
 
 class sfxphasor_state : public hh_pic16_state
 {
@@ -521,7 +527,7 @@ u8 sfxphasor_state::read_c()
 	return lo | hi << 4;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( sfxphasor )
 	PORT_START("IN.0") // C4 port C
@@ -557,6 +563,8 @@ static INPUT_PORTS_START( sfxphasor )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("On / Music") PORT_CHANGED_MEMBER(DEVICE_SELF, sfxphasor_state, power_button, true)
 INPUT_PORTS_END
 
+// config
+
 void sfxphasor_state::sfxphasor(machine_config &config)
 {
 	// basic machine hardware
@@ -591,7 +599,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   GAF Melody Madness
   * PIC 1655A-094
@@ -600,7 +608,7 @@ ROM_END
   Melody Madness is a tabletop music memory game, shaped like a jukebox.
   It can also be played as a simple electronic piano.
 
-***************************************************************************/
+*******************************************************************************/
 
 class melodym_state : public hh_pic16_state
 {
@@ -640,7 +648,7 @@ void melodym_state::write_c(u8 data)
 	m_speaker->level_w(~data >> 7 & 1);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( melodym )
 	PORT_START("IN.0") // B2 port C
@@ -685,6 +693,8 @@ static INPUT_PORTS_START( melodym )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Note")
 INPUT_PORTS_END
 
+// config
+
 void melodym_state::melodym(machine_config &config)
 {
 	// basic machine hardware
@@ -715,7 +725,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Ideal Maniac, by Ralph Baer
   * PIC 1655A-036
@@ -728,7 +738,7 @@ ROM_END
   3: Look Twice: Press the button after the game repeats the first pattern.
   4: Your Time Is Up: Press the button after estimating the duration of the tone.
 
-***************************************************************************/
+*******************************************************************************/
 
 class maniac_state : public hh_pic16_state
 {
@@ -779,7 +789,7 @@ void maniac_state::write_c(u8 data)
 	update_speaker();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( maniac )
 	PORT_START("IN.0") // port A
@@ -788,6 +798,8 @@ static INPUT_PORTS_START( maniac )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 INPUT_PORTS_END
+
+// config
 
 void maniac_state::maniac(machine_config &config)
 {
@@ -821,7 +833,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Ideal Flash
   * PCB label: 25-600321, REV C, TCI-A3H / 94HB
@@ -843,7 +855,7 @@ ROM_END
   9V would break it. The only thing it has to say about the game itself is
   "Your module will produce blinking lights and several different sounds."
 
-***************************************************************************/
+*******************************************************************************/
 
 class flash_state : public hh_pic16_state
 {
@@ -928,7 +940,7 @@ void flash_state::write_c(u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( flash )
 	PORT_START("IN.0") // port A
@@ -945,6 +957,8 @@ static INPUT_PORTS_START( flash )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 )
 INPUT_PORTS_END
+
+// config
 
 void flash_state::flash(machine_config &config)
 {
@@ -979,7 +993,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Kingsford Match Me
   * PIC 1655A-049
@@ -997,7 +1011,7 @@ ROM_END
   - PIC 1655A-049 (this one, dumped from a Mini Match Me)
   - PIC 1655A-123 (seen in Match Me and Mini Match Me)
 
-***************************************************************************/
+*******************************************************************************/
 
 class matchme_state : public hh_pic16_state
 {
@@ -1064,7 +1078,7 @@ void matchme_state::write_c(u8 data)
 	m_maincpu->set_input_line(PIC16C5x_RTCC, data >> 7 & 1);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( matchme )
 	PORT_START("IN.0") // C4 port C
@@ -1107,6 +1121,8 @@ static INPUT_PORTS_START( matchme )
 	PORT_CONFSETTING(    0x00, "Auto" )
 INPUT_PORTS_END
 
+// config
+
 void matchme_state::matchme(machine_config &config)
 {
 	// basic machine hardware
@@ -1136,7 +1152,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Kmart Dr. Dunk (manufactured in Hong Kong)
   * PIC 1655A-51
@@ -1150,7 +1166,7 @@ ROM_END
   - USA(1): Dr. Dunk, published by Kmart
   - USA(2): Electronic Basketball (model 60-2146), published by Tandy
 
-***************************************************************************/
+*******************************************************************************/
 
 class drdunk_state : public hh_pic16_state
 {
@@ -1205,7 +1221,7 @@ void drdunk_state::write_c(u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( drdunk )
 	PORT_START("IN.0") // B0 port A3
@@ -1228,6 +1244,8 @@ static INPUT_PORTS_START( drdunk )
 	PORT_CONFSETTING(    0x04, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
+
+// config
 
 void drdunk_state::drdunk(machine_config &config)
 {
@@ -1260,7 +1278,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Lakeside Le Boom
   * PIC 1655A-061
@@ -1281,7 +1299,7 @@ ROM_END
   4: The computer picks a secret combination. Find it first by listening to the
      clues. Find the right order and you'll get it to fizzle out.
 
-***************************************************************************/
+*******************************************************************************/
 
 class leboom_state : public hh_pic16_state
 {
@@ -1356,7 +1374,7 @@ void leboom_state::write_c(u8 data)
 	speaker_update();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( leboom )
 	PORT_START("IN.0") // B0 port A
@@ -1396,6 +1414,8 @@ static INPUT_PORTS_START( leboom )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("Blue Button 8")
 INPUT_PORTS_END
 
+// config
+
 void leboom_state::leboom(machine_config &config)
 {
 	// basic machine hardware
@@ -1428,7 +1448,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tiger Electronics Rocket Pinball (model 7-460)
   * PIC 1650A-110, 69-11397
@@ -1440,7 +1460,7 @@ ROM_END
   - USA(1): Rocket Pinball (model 60-2140), published by Tandy
   - USA(2): Cosmic Pinball (model 49-65456), published by Sears
 
-***************************************************************************/
+*******************************************************************************/
 
 class rockpin_state : public hh_pic16_state
 {
@@ -1501,7 +1521,7 @@ void rockpin_state::write_d(u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( rockpin )
 	PORT_START("IN.0") // port A
@@ -1510,6 +1530,8 @@ static INPUT_PORTS_START( rockpin )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Flipper")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Ball")
 INPUT_PORTS_END
+
+// config
 
 void rockpin_state::rockpin(machine_config &config)
 {
@@ -1551,7 +1573,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tiger Electronics Half Court Computer Basketball (model 7-470)
   * PIC 1655A(no serial), 69-11557
@@ -1561,7 +1583,7 @@ ROM_END
   - Hong Kong: Half Court Computer Basketball, published by Tiger
   - USA: Electronic Basketball (model 49-65453), published by Sears
 
-***************************************************************************/
+*******************************************************************************/
 
 class hccbaskb_state : public hh_pic16_state
 {
@@ -1616,7 +1638,7 @@ void hccbaskb_state::write_c(u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( hccbaskb )
 	PORT_START("IN.0") // B0 port A3
@@ -1639,6 +1661,8 @@ static INPUT_PORTS_START( hccbaskb )
 	PORT_CONFSETTING(    0x04, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
+
+// config
 
 void hccbaskb_state::hccbaskb(machine_config &config)
 {
@@ -1671,7 +1695,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Toytronic Football
   * PIC 1655A-033
@@ -1681,7 +1705,7 @@ ROM_END
   Hello and welcome to another Mattel Football clone, there are so many of these.
   Comparison suggests that this is the 'sequel' to 1655A-024.
 
-***************************************************************************/
+*******************************************************************************/
 
 class ttfball_state : public hh_pic16_state
 {
@@ -1741,7 +1765,7 @@ void ttfball_state::write_c(u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ttfball )
 	PORT_START("IN.0") // B0 port A3
@@ -1766,6 +1790,8 @@ static INPUT_PORTS_START( ttfball )
 	PORT_CONFSETTING(    0x04, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
+
+// config
 
 void ttfball_state::ttfball(machine_config &config)
 {
@@ -1805,7 +1831,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Toytronic Football (model 003201)
   * PIC 1655-024
@@ -1819,7 +1845,7 @@ ROM_END
   - Hong Kong(1): Football, published by Toytronic
   - Hong Kong(2): Football, published by (no brand)
 
-***************************************************************************/
+*******************************************************************************/
 
 class ttfballa_state : public ttfball_state
 {
@@ -1846,7 +1872,7 @@ void ttfballa_state::write_c(u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ttfballa )
 	PORT_START("IN.0") // B0 port A3
@@ -1872,6 +1898,8 @@ static INPUT_PORTS_START( ttfballa )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
+// config
+
 void ttfballa_state::ttfballa(machine_config &config)
 {
 	ttfball(config);
@@ -1896,7 +1924,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   U.S. Games Programmable Baseball
   * PIC 1650A-133
@@ -1906,7 +1934,7 @@ ROM_END
   - USA(1): Programmable Baseball, published by U.S. Games
   - USA(2): Electronic 2-Player Baseball (model 60-2157), published by Tandy
 
-***************************************************************************/
+*******************************************************************************/
 
 class uspbball_state : public hh_pic16_state
 {
@@ -1960,7 +1988,7 @@ void uspbball_state::write_d(u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( uspbball )
 	PORT_START("IN.0") // port A
@@ -1978,6 +2006,8 @@ static INPUT_PORTS_START( uspbball )
 	PORT_CONFSETTING(    0x80, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
+
+// config
 
 void uspbball_state::uspbball(machine_config &config)
 {
@@ -2016,7 +2046,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   U.S. Games Electronic 2-Player Football
   * PIC 1650A-144
@@ -2026,7 +2056,7 @@ ROM_END
   - USA(1): Electronic 2-Player Football, published by U.S. Games
   - USA(2): Electronic 2-Player Football (model 60-2156), published by Tandy
 
-***************************************************************************/
+*******************************************************************************/
 
 class us2pfball_state : public hh_pic16_state
 {
@@ -2089,7 +2119,7 @@ void us2pfball_state::write_d(u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( us2pfball )
 	PORT_START("IN.0") // B0 port A low
@@ -2122,6 +2152,8 @@ static INPUT_PORTS_START( us2pfball )
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Status/Score") // S
 INPUT_PORTS_END
+
+// config
 
 void us2pfball_state::us2pfball(machine_config &config)
 {
@@ -2161,35 +2193,35 @@ ROM_END
 
 } // anonymous namespace
 
-/***************************************************************************
+/*******************************************************************************
 
   Game driver(s)
 
-***************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME       PARENT  CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, touchme,   0,       0, touchme,   touchme,   touchme_state,   empty_init, "Atari", "Touch Me (handheld, Rev. 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1979, touchme,   0,       0,      touchme,   touchme,   touchme_state,   empty_init, "Atari", "Touch Me (handheld, Rev. 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, pabball,   0,       0, pabball,   pabball,   pabball_state,   empty_init, "Calfax / Caprice Electronics", "Pro-Action Electronic-Computerized Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1979, pabball,   0,       0,      pabball,   pabball,   pabball_state,   empty_init, "Calfax / Caprice Electronics", "Pro-Action Electronic-Computerized Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-CONS( 1981, sfxphasor, 0,       0, sfxphasor, sfxphasor, sfxphasor_state, empty_init, "Electroplay", "Sound FX Phasor", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+SYST( 1981, sfxphasor, 0,       0,      sfxphasor, sfxphasor, sfxphasor_state, empty_init, "Electroplay", "Sound FX Phasor", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-CONS( 1980, melodym,   0,       0, melodym,   melodym,   melodym_state,   empty_init, "GAF", "Melody Madness", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, melodym,   0,       0,      melodym,   melodym,   melodym_state,   empty_init, "GAF", "Melody Madness", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, maniac,    0,       0, maniac,    maniac,    maniac_state,    empty_init, "Ideal Toy Corporation", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1980, flash,     0,       0, flash,     flash,     flash_state,     empty_init, "Ideal Toy Corporation", "Flash (Ideal)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, maniac,    0,       0,      maniac,    maniac,    maniac_state,    empty_init, "Ideal Toy Corporation", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, flash,     0,       0,      flash,     flash,     flash_state,     empty_init, "Ideal Toy Corporation", "Flash (Ideal)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, matchme,   0,       0, matchme,   matchme,   matchme_state,   empty_init, "Kingsford", "Match Me", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, matchme,   0,       0,      matchme,   matchme,   matchme_state,   empty_init, "Kingsford", "Match Me", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, drdunk,    0,       0, drdunk,    drdunk,    drdunk_state,    empty_init, "Kmart Corporation", "Dr. Dunk", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, drdunk,    0,       0,      drdunk,    drdunk,    drdunk_state,    empty_init, "Kmart Corporation", "Dr. Dunk", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, leboom,    0,       0, leboom,    leboom,    leboom_state,    empty_init, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, leboom,    0,       0,      leboom,    leboom,    leboom_state,    empty_init, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, rockpin,   0,       0, rockpin,   rockpin,   rockpin_state,   empty_init, "Tiger Electronics", "Rocket Pinball", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, hccbaskb,  0,       0, hccbaskb,  hccbaskb,  hccbaskb_state,  empty_init, "Tiger Electronics", "Half Court Computer Basketball", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, rockpin,   0,       0,      rockpin,   rockpin,   rockpin_state,   empty_init, "Tiger Electronics", "Rocket Pinball", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, hccbaskb,  0,       0,      hccbaskb,  hccbaskb,  hccbaskb_state,  empty_init, "Tiger Electronics", "Half Court Computer Basketball", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, ttfball,   0,       0, ttfball,   ttfball,   ttfball_state,   empty_init, "Toytronic", "Football (Toytronic, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-CONS( 1979, ttfballa,  ttfball, 0, ttfballa,  ttfballa,  ttfballa_state,  empty_init, "Toytronic", "Football (Toytronic, set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, ttfball,   0,       0,      ttfball,   ttfball,   ttfball_state,   empty_init, "Toytronic", "Football (Toytronic, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+SYST( 1979, ttfballa,  ttfball, 0,      ttfballa,  ttfballa,  ttfballa_state,  empty_init, "Toytronic", "Football (Toytronic, set 2)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, uspbball,  0,       0, uspbball,  uspbball,  uspbball_state,  empty_init, "U.S. Games", "Programmable Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1981, us2pfball, 0,       0, us2pfball, us2pfball, us2pfball_state, empty_init, "U.S. Games", "Electronic 2-Player Football", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, uspbball,  0,       0,      uspbball,  uspbball,  uspbball_state,  empty_init, "U.S. Games Corporation", "Programmable Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1981, us2pfball, 0,       0,      us2pfball, us2pfball, us2pfball_state, empty_init, "U.S. Games Corporation", "Electronic 2-Player Football", MACHINE_SUPPORTS_SAVE )

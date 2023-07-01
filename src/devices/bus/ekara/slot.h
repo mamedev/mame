@@ -36,10 +36,10 @@ public:
 	virtual uint8_t read_extra(offs_t offset) { return 0xff; }
 	virtual void write_extra(offs_t offset, uint8_t data) { }
 
-	virtual DECLARE_WRITE_LINE_MEMBER(write_sda) { }
-	virtual DECLARE_WRITE_LINE_MEMBER(write_scl) { }
-	//virtual DECLARE_WRITE_LINE_MEMBER( write_wc )
-	virtual DECLARE_READ_LINE_MEMBER( read_sda ) { return 0; }
+	virtual void write_sda(int state) { }
+	virtual void write_scl(int state) { }
+	//virtual void write_wc(int state)
+	virtual int read_sda() { return 0; }
 
 	virtual void write_bus_control(offs_t offset, uint8_t data) { }
 
@@ -80,15 +80,15 @@ public:
 
 	virtual ~ekara_cart_slot_device();
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override {}
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "ekara_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,u1"; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
@@ -101,10 +101,10 @@ public:
 	uint8_t read_extra(offs_t offset);
 	void write_extra(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(write_sda);
-	DECLARE_WRITE_LINE_MEMBER(write_scl);
-	//DECLARE_WRITE_LINE_MEMBER( write_wc );
-	DECLARE_READ_LINE_MEMBER( read_sda );
+	void write_sda(int state);
+	void write_scl(int state);
+	//void write_wc(int state);
+	int read_sda();
 
 	void write_bus_control(offs_t offset, uint8_t data);
 
@@ -114,7 +114,7 @@ public:
 	bool has_cart() { return m_cart ? true : false; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	int m_type;

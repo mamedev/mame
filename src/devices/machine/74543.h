@@ -71,12 +71,12 @@ public:
 	auto outputb_cb() { return m_output_b.bind(); }
 
 	// public interfaces
-	DECLARE_WRITE_LINE_MEMBER(ceab_w);
-	DECLARE_WRITE_LINE_MEMBER(leab_w);
-	DECLARE_WRITE_LINE_MEMBER(oeab_w);
-	DECLARE_WRITE_LINE_MEMBER(ceba_w);
-	DECLARE_WRITE_LINE_MEMBER(leba_w);
-	DECLARE_WRITE_LINE_MEMBER(oeba_w);
+	void ceab_w(int state);
+	void leab_w(int state);
+	void oeab_w(int state);
+	void ceba_w(int state);
+	void leba_w(int state);
+	void oeba_w(int state);
 
 	void a_w(uint8_t a);
 	void b_w(uint8_t a);

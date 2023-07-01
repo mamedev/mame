@@ -54,7 +54,7 @@ public:
 	static void display_ui_chooser(running_machine &machine);
 	static int start_frontend(emu_options &options, osd_interface &osd, std::vector<std::string> &args);
 	static int start_frontend(emu_options &options, osd_interface &osd, int argc, char *argv[]);
-	static void draw_user_interface(running_machine& machine);
+	static bool draw_user_interface(running_machine& machine);
 	static void periodic_check();
 	static bool frame_hook();
 	static void sound_hook();

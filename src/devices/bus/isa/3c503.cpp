@@ -27,7 +27,7 @@ void el2_3c503_device::device_start() {
 	char mac[7];
 	uint32_t num = machine().rand();
 	memset(m_prom, 0x57, 16);
-	sprintf(mac, "\x02\x60\x8c%c%c%c", (num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff);
+	snprintf(mac, std::size(mac), "\x02\x60\x8c%c%c%c", (num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff);
 	memcpy(m_prom, mac, 6);
 	memset(m_rom, 0, 8*1024); // empty
 	m_dp8390->set_mac(mac);
@@ -278,7 +278,7 @@ void el2_3c503_device::el2_3c503_hiport_w(offs_t offset, uint8_t data) {
 	}
 }
 
-WRITE_LINE_MEMBER(el2_3c503_device::el2_3c503_irq_w) {
+void el2_3c503_device::el2_3c503_irq_w(int state) {
 	m_irq_state = state;
 	if(!(m_regs.gacfr & 0x80)) set_irq(state);
 }

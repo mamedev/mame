@@ -14,6 +14,7 @@
 #include "imagedev/snapquik.h"
 #include "bus/abckb/abckb.h"
 #include "bus/abckb/abc800kb.h"
+#include "machine/74259.h"
 #include "machine/e0516.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
@@ -84,6 +85,7 @@ public:
 		m_sio(*this, Z80SIO_TAG),
 		m_discrete(*this, DISCRETE_TAG),
 		m_cassette(*this, CASSETTE_TAG),
+		m_quickload(*this, "quickload"),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, Z80_TAG),
 		m_video_ram(*this, "video_ram", 0x4000, ENDIANNESS_LITTLE),
@@ -104,6 +106,7 @@ public:
 	required_device<z80sio_device> m_sio;
 	optional_device<discrete_sound_device> m_discrete;
 	optional_device<cassette_image_device> m_cassette;
+	required_device<snapshot_image_device> m_quickload;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	memory_share_creator<uint8_t> m_video_ram;
@@ -122,12 +125,12 @@ public:
 	uint8_t pling_r();
 	void hrs_w(uint8_t data);
 	void hrc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
-	DECLARE_WRITE_LINE_MEMBER( sio_txdb_w );
-	DECLARE_WRITE_LINE_MEMBER( sio_dtrb_w );
-	DECLARE_WRITE_LINE_MEMBER( sio_rtsb_w );
-	DECLARE_WRITE_LINE_MEMBER( keydtr_w );
+	void ctc_z0_w(int state);
+	void ctc_z1_w(int state);
+	void sio_txdb_w(int state);
+	void sio_dtrb_w(int state);
+	void sio_rtsb_w(int state);
+	void keydtr_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER( ctc_tick );
 	TIMER_DEVICE_CALLBACK_MEMBER( cassette_input_tick );
 
@@ -242,9 +245,9 @@ public:
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( lrs_w );
-	DECLARE_WRITE_LINE_MEMBER( mux80_40_w );
-	DECLARE_WRITE_LINE_MEMBER( vs_w );
+	void lrs_w(int state);
+	void mux80_40_w(int state);
+	void vs_w(int state);
 	MC6845_UPDATE_ROW( abc802_update_row );
 
 	// cpu state
@@ -273,6 +276,7 @@ public:
 		m_crtc(*this, MC6845_TAG),
 		m_palette(*this, "palette"),
 		m_rtc(*this, E0516_TAG),
+		m_sto(*this, "sto"),
 		m_rad_prom(*this, "rad"),
 		m_hru2_prom(*this, "hru"),
 		m_char_rom(*this, MC6845_TAG),
@@ -282,6 +286,7 @@ public:
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_device<e0516_device> m_rtc;
+	required_device<addressable_latch_device> m_sto;
 	required_memory_region m_rad_prom;
 	required_memory_region m_hru2_prom;
 	required_memory_region m_char_rom;
@@ -311,8 +316,14 @@ public:
 	void sso_w(uint8_t data);
 	uint8_t sti_r();
 	void sto_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( hs_w );
-	DECLARE_WRITE_LINE_MEMBER( vs_w );
+	void eme_w(int state);
+	void _40_w(int state);
+	void hru2_a8_w(int state);
+	void prot_ini_w(int state);
+	void txoff_w(int state);
+	void prot_din_w(int state);
+	void hs_w(int state);
+	void vs_w(int state);
 	void abc806_palette(palette_device &palette) const;
 	MC6845_UPDATE_ROW( abc806_update_row );
 

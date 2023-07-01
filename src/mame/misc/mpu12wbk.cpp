@@ -10,10 +10,14 @@
 
   Games running on this hardware:
 
-  * Fruit Star Bonus (Ver 8.27PVIE),      199?, Webak Elektronik.
-  * Fruit Star Bonus (Ver 8.20PIR),       1997, Webak Elektronik.
-  * Fruit Star Bonus (Ver 8.36UNG-1100),  1996, Webak Elektronik.
-  * Fruit Star Bonus (Ver 8.30UNG-200),   1996, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.2.00ITL),                     199?, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.27PVIE),                      199?, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.20PIR),                       1997, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.36UNG-1100),                  1996, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.30UNG-200),                   1996, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.23PSTK, Steiermark),          1999, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.17BGL-3, Burgenland, set 1),  1997, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.17BGL-3, Burgenland, set 2),  1997, Webak Elektronik.
 
 
 *****************************************************************************************
@@ -477,7 +481,7 @@ private:
 	void mpu12wbk_videoram_w(offs_t offset, uint8_t data);
 	void mpu12wbk_colorram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
+	void crtc_vs(int state);
 
 	uint32_t screen_update_mpu12wbk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void mpu12wbk_map(address_map &map);
@@ -601,7 +605,7 @@ uint32_t mpu12wbk_state::screen_update_mpu12wbk(screen_device &screen, bitmap_rg
 /********************************
 *    Interrupt Control          *
 ********************************/
-WRITE_LINE_MEMBER( mpu12wbk_state::crtc_vs )
+void mpu12wbk_state::crtc_vs(int state)
 {
 	if( m_frames++ > 120)
 	{
@@ -921,13 +925,52 @@ void mpu12wbk_state::mpu12wbk(machine_config &config)
 ********************************/
 
 /*
+  Fruit Star Bonus (Ver 8.2.00ITL)
+  International version with English language.
+
+  No MPU number, and no stickers in the CPU epoxy block.
+
+  Program flash ROM is inside a CPU epoxy block
+  with M6809 CPU and one PLD.
+
+  BET button is also used as HOLDs cancel, and to trigger the service menu in the service mode.
+
+*/
+
+ROM_START( fruitstb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "p28f512_8200itl_box.ic2",  0x8000, 0x8000, CRC(5810a945) SHA1(9f11ae7b4ca620400f0e05871812e2d83d47185f) )
+	ROM_IGNORE(                           0x8000 )  // second half is filled with 0xff, vectors are at the end of the 1st half.
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "03.ic39",  0x00000, 0x10000, CRC(062cc82d) SHA1(153bb45bc3d7d7cc820b79941291f3fc74f22cfd) )
+	ROM_LOAD( "02.ic38",  0x10000, 0x10000, CRC(bb974684) SHA1(aa8dff82ceb397904cb3a6887541c5b83a372f41) )
+	ROM_LOAD( "01.ic37",  0x20000, 0x10000, CRC(26c8bf72) SHA1(59ffe2da97f3596fef2b071532c06295a71d6988) )
+
+	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstb_820_nvram.bin",  0x0000, 0x1000, CRC(b7c2537a) SHA1(883febf6d0122ad974af5751de83d1a823a5a4fb) )
+
+	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstb_820_nvram2.bin", 0x0000, 0x0800, CRC(ce18880f) SHA1(b56245154673f65bbc6de003ec5b93bbd85e480d) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s147.ic46",  0x0000, 0x0200, CRC(18d89004) SHA1(a09bead0eca1757a385e2b605473f56c05088fc4) )
+
+	ROM_REGION( 0x0200, "proms2", 0 )
+	ROM_LOAD( "82s131.ic47",  0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "gal16v8_box.ic1", 0x0000, 0x0117, CRC(4c7af826) SHA1(3c78dae1606fc95292306ae5f9bd3bff4172ccf1) ) // cracked
+ROM_END
+
+/*
   Fruit Star Bonus (Ver 8.27PVIE)
 
   Program flash ROM is inside a CPU epoxy block
   with M6809 CPU and one PLD.
 
 */
-ROM_START( fruitstb )
+ROM_START( fruitstba )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "p28f512_827_box.ic2",  0x8000, 0x8000, CRC(c41fb59d) SHA1(7f8cde7a33aae83baae2564b8913c43502e7b5b7) )
 	ROM_IGNORE(                       0x8000 )  // second half is filled with 0xff, vectors are at the end of the 1st half.
@@ -938,10 +981,10 @@ ROM_START( fruitstb )
 	ROM_LOAD( "1.ic37",  0x20000, 0x10000, CRC(eaa231ad) SHA1(6c6d708a05b23b8b3f1f5844a587ae6d06940486) )
 
 	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
-	ROM_LOAD( "fruitstb_827_nvram.bin",  0x0000, 0x1000, CRC(90326cbd) SHA1(cc6c105e3faec88dd3b2f81d1d853d30b154ecdf) )
+	ROM_LOAD( "fruitstba_827_nvram.bin",  0x0000, 0x1000, CRC(90326cbd) SHA1(cc6c105e3faec88dd3b2f81d1d853d30b154ecdf) )
 
 	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
-	ROM_LOAD( "fruitstb_827_nvram2.bin", 0x0000, 0x0800, CRC(cc5f35e4) SHA1(03a451b8f6ac3849732e3567d6b5111df418e5af) )
+	ROM_LOAD( "fruitstba_827_nvram2.bin", 0x0000, 0x0800, CRC(cc5f35e4) SHA1(03a451b8f6ac3849732e3567d6b5111df418e5af) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.ic46",  0x0000, 0x0200, CRC(ee576268) SHA1(8964526fa253f484d784aec46c4c31358bc1667b) )
@@ -957,7 +1000,7 @@ ROM_END
   with M6809 CPU and one PLD.
 
 */
-ROM_START( fruitstba )
+ROM_START( fruitstbb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "p28f512_820_box.ic2",  0x8000, 0x8000, CRC(95d4ddaa) SHA1(498f841b3cd12ac128954841dd463b62c335e038) )
 	ROM_IGNORE(                       0x8000 )  // second half is filled with 0xff, vectors are at the end of the 1st half.
@@ -968,10 +1011,10 @@ ROM_START( fruitstba )
 	ROM_LOAD( "fruit1.ic37",  0x20000, 0x10000, CRC(c1834a6d) SHA1(ece1e47641087be342d3c5c092d8a7233ae871f3) )
 
 	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
-	ROM_LOAD( "fruitstba_820_nvram.bin",  0x0000, 0x1000, CRC(90f4cf2e) SHA1(cb63a4cc8461ff993c00449dc4559c0fd8e70de6) )
+	ROM_LOAD( "fruitstbb_820_nvram.bin",  0x0000, 0x1000, CRC(90f4cf2e) SHA1(cb63a4cc8461ff993c00449dc4559c0fd8e70de6) )
 
 	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
-	ROM_LOAD( "fruitstba_820_nvram2.bin", 0x0000, 0x0800, CRC(12edfdef) SHA1(b20b992db0189dfa063cfac7444881a3251b5f92) )
+	ROM_LOAD( "fruitstbb_820_nvram2.bin", 0x0000, 0x0800, CRC(12edfdef) SHA1(b20b992db0189dfa063cfac7444881a3251b5f92) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.ic46",  0x0000, 0x0200, CRC(ee576268) SHA1(8964526fa253f484d784aec46c4c31358bc1667b) )
@@ -992,7 +1035,7 @@ ROM_END
   program and graphics are older.
 
 */
-ROM_START( fruitstbb )
+ROM_START( fruitstbc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "p28f512_830_836_box.ic2",  0x8000, 0x8000, CRC(e647adc3) SHA1(6042bf12c6dac567d70a2cf3fbea0086f4e33e8f) )
 	ROM_CONTINUE(                         0x8000, 0x8000 )  // first half has program v8.30UNG-200. second half has program v8.36UNG-1100.
@@ -1006,10 +1049,10 @@ ROM_START( fruitstbb )
 	ROM_IGNORE(                           0x10000 )  // duplicated halves.
 
 	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
-	ROM_LOAD( "fruitstbb_836_nvram.bin",  0x0000, 0x1000, CRC(4d43b56a) SHA1(0dabb3d5eeed4b48e248794317711fc8ff856201) )
+	ROM_LOAD( "fruitstbc_836_nvram.bin",  0x0000, 0x1000, CRC(4d43b56a) SHA1(0dabb3d5eeed4b48e248794317711fc8ff856201) )
 
 	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
-	ROM_LOAD( "fruitstbb_836_nvram2.bin", 0x0000, 0x0800, CRC(6b3bd2f9) SHA1(f2fa7299e81c0b709f3e37a0eb497da5a714ffb4) )
+	ROM_LOAD( "fruitstbc_836_nvram2.bin", 0x0000, 0x0800, CRC(6b3bd2f9) SHA1(f2fa7299e81c0b709f3e37a0eb497da5a714ffb4) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.ic46",  0x0000, 0x0200, CRC(ee576268) SHA1(8964526fa253f484d784aec46c4c31358bc1667b) )
@@ -1028,7 +1071,7 @@ ROM_END
   program and graphics are older.
 
 */
-ROM_START( fruitstbc )
+ROM_START( fruitstbd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "p28f512_830_836_box.ic2",  0x8000, 0x8000, CRC(e647adc3) SHA1(6042bf12c6dac567d70a2cf3fbea0086f4e33e8f) )
 	ROM_IGNORE(                                   0x8000 )  // first half has program v8.30UNG-200. second half has program v8.36UNG-1100.
@@ -1042,13 +1085,119 @@ ROM_START( fruitstbc )
 	ROM_IGNORE(                           0x10000 )  // duplicated halves.
 
 	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
-	ROM_LOAD( "fruitstbc_830_nvram.bin",  0x0000, 0x1000, CRC(6483b841) SHA1(cb48063b842b04f5ab34dce515c564e0ee596deb) )
+	ROM_LOAD( "fruitstbd_830_nvram.bin",  0x0000, 0x1000, CRC(6483b841) SHA1(cb48063b842b04f5ab34dce515c564e0ee596deb) )
 
 	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
-	ROM_LOAD( "fruitstbc_830_nvram2.bin", 0x0000, 0x0800, CRC(72e5fadb) SHA1(1960c3d9c9a06a98579fca86cf16e8e99ffc3df5) )
+	ROM_LOAD( "fruitstbd_830_nvram2.bin", 0x0000, 0x0800, CRC(72e5fadb) SHA1(1960c3d9c9a06a98579fca86cf16e8e99ffc3df5) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.ic46",  0x0000, 0x0200, CRC(ee576268) SHA1(8964526fa253f484d784aec46c4c31358bc1667b) )
+
+	ROM_REGION( 0x0200, "proms2", 0 )
+	ROM_LOAD( "82s131.ic47",  0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )
+ROM_END
+
+/*
+  Fruit Star Bonus (Ver 8.23PSTK, Steiermark)
+  MPU11 Number: 6218.
+  Date: 1/99?
+
+  Program flash ROM is inside a CPU epoxy block
+  with M6809 CPU and one PLD.
+  
+  STK => Steiermark, Austria.
+
+*/
+ROM_START( fruitstbe )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "am28f512_8.23pstk_box.ic2",  0x8000, 0x8000, CRC(7c719e75) SHA1(67218db219eb4b7c229c66cce45dbf55fb594ff9) )
+	ROM_IGNORE(                                     0x8000 )  // second half is filled with 0xff, vectors are at the end of the 1st half.
+
+	ROM_REGION( 0x30000, "gfx1", 0 )  // double sized roms.
+	ROM_LOAD( "fu_3.ic39",  0x00000, 0x10000, CRC(70efbf69) SHA1(32bb019db5aaff4d3f3f98a30cdca422cca7b598) )
+	ROM_IGNORE(                      0x10000 )    // identical halves.
+	ROM_LOAD( "fu_2.ic38",  0x10000, 0x10000, CRC(82c196b8) SHA1(ea1a74a6b13dbea253a804b88f22bd124fb1a3e6) )
+	ROM_IGNORE(                      0x10000 )    // identical halves.
+	ROM_LOAD( "fu_1.ic37",  0x20000, 0x10000, CRC(11ee9747) SHA1(19931a8c99e4c521cd7aed42398a9557a0d7579a) )
+	ROM_IGNORE(                      0x10000 )    // identical halves.
+
+	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbe_823_nvram.bin",  0x0000, 0x1000, CRC(4255e21c) SHA1(055f2e1e507993184a15ec3133fbb1d8fafd6c22) )
+
+	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbe_823_nvram2.bin", 0x0000, 0x0800, CRC(ad6d8b59) SHA1(79de1b8e44bb2fc8e8dbd3210c0d1d26e641da4b) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "am27s29.ic46",  0x0000, 0x0200, CRC(ee576268) SHA1(8964526fa253f484d784aec46c4c31358bc1667b) )
+
+	ROM_REGION( 0x0200, "proms2", 0 )
+	ROM_LOAD( "82s131.ic47",  0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )
+ROM_END
+
+/*
+  Fruit Star Bonus (Ver 8.17BGL-3, Burgenland, set 1)
+  MPU11 Number: 9650.
+
+  Program flash ROM is inside a CPU epoxy block
+  with M6809 CPU and one PLD.
+  
+  BGL => Burgenland, Austria.
+
+*/
+ROM_START( fruitstbf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "p28f512_817bgl-3_box.ic2",  0x8000, 0x8000, CRC(9562ab0b) SHA1(e60bec86d9ad8f41f726efa29279b467a72d600d) )
+	ROM_IGNORE(                                    0x8000 )  // second half is filled with 0xff, vectors are at the end of the 1st half.
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "fu_3.ic39",  0x00000, 0x10000, CRC(81ad7752) SHA1(b5be715c9c1e0c20f63bfb2f9dcbadafe758a098) )
+	ROM_LOAD( "fu_2.ic38",  0x10000, 0x10000, CRC(0a7126aa) SHA1(28a05ca824922bb362b86f25f300833db30a91ae) )
+	ROM_LOAD( "fu_1.ic37",  0x20000, 0x10000, CRC(eaa231ad) SHA1(6c6d708a05b23b8b3f1f5844a587ae6d06940486) )
+
+	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbf_817_nvram.bin",  0x0000, 0x1000, CRC(08dd5a3e) SHA1(f8f6775a0ece56ffd9c1c2e3384f2da405cc6c60) )
+
+	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbf_817_nvram2.bin", 0x0000, 0x0800, CRC(0907a8dd) SHA1(14b54a753aef94543ee97c5022f5664863eebb8a) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "am27s29.ic46",  0x0000, 0x0200, CRC(ee576268) SHA1(8964526fa253f484d784aec46c4c31358bc1667b) )
+
+	ROM_REGION( 0x0200, "proms2", 0 )
+	ROM_LOAD( "82s131.ic47",  0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )
+ROM_END
+
+/*
+  Fruit Star Bonus (Ver 8.17BGL-3, Burgenland, set 2)
+  MPU11 Number: 9651. (program settings shows 5960)
+  Date: 3/97.
+
+  Program flash ROM is inside a CPU epoxy block
+  with M6809 CPU and one PLD.
+  
+  BGL => Burgenland, Austria.
+
+  Program has 4 bytes different to the other set.
+
+*/
+ROM_START( fruitstbg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "m28f512_8.17bgl-3_box.ic2",  0x8000, 0x8000, CRC(3a11823d) SHA1(7b7c21ad0f2f877274e0b99c8eb74398685705ae) )
+	ROM_IGNORE(                                     0x8000 )  // second half is filled with 0xff, vectors are at the end of the 1st half.
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "fu3.ic39",  0x00000, 0x10000, CRC(81ad7752) SHA1(b5be715c9c1e0c20f63bfb2f9dcbadafe758a098) )
+	ROM_LOAD( "fu2.ic38",  0x10000, 0x10000, CRC(0a7126aa) SHA1(28a05ca824922bb362b86f25f300833db30a91ae) )
+	ROM_LOAD( "fu1.ic37",  0x20000, 0x10000, CRC(eaa231ad) SHA1(6c6d708a05b23b8b3f1f5844a587ae6d06940486) )
+
+	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbg_817_nvram.bin",  0x0000, 0x1000, CRC(ff3e8883) SHA1(a6603d825b8298cba8b16005485a57acdd6243c0) )
+
+	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbg_817_nvram2.bin", 0x0000, 0x0800, CRC(6efbfb43) SHA1(0a6e36ea47683baa2b502ea9e17e1847cee65b45) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "am27s29.ic46",  0x0000, 0x0200, CRC(ee576268) SHA1(8964526fa253f484d784aec46c4c31358bc1667b) )
 
 	ROM_REGION( 0x0200, "proms2", 0 )
 	ROM_LOAD( "82s131.ic47",  0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )
@@ -1071,8 +1220,12 @@ void mpu12wbk_state::init_mpu12wbk()
 *         Game Drivers          *
 ********************************/
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY             FULLNAME                              FLAGS   LAYOUT
-GAMEL( 199?, fruitstb,  0,        mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.27PVIE)",     0,      layout_fruitstb )
-GAMEL( 1997, fruitstba, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.20PIR)",      0,      layout_fruitstb )
-GAMEL( 1996, fruitstbb, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.36UNG-1100)", 0,      layout_fruitstb )
-GAMEL( 1996, fruitstbc, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.30UNG-200)",  0,      layout_fruitstb )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY             FULLNAME                                              FLAGS   LAYOUT
+GAMEL( 199?, fruitstb,  0,        mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.2.00ITL)",                    0,      layout_fruitstb )
+GAMEL( 199?, fruitstba, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.27PVIE)",                     0,      layout_fruitstb )
+GAMEL( 1997, fruitstbb, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.20PIR)",                      0,      layout_fruitstb )
+GAMEL( 1996, fruitstbc, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.36UNG-1100)",                 0,      layout_fruitstb )
+GAMEL( 1996, fruitstbd, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.30UNG-200)",                  0,      layout_fruitstb )
+GAMEL( 1999, fruitstbe, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.23PSTK, Steiermark)",         0,      layout_fruitstb )
+GAMEL( 1997, fruitstbf, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.17BGL-3, Burgenland, set 1)", 0,      layout_fruitstb )
+GAMEL( 1997, fruitstbg, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.17BGL-3, Burgenland, set 2)", 0,      layout_fruitstb )

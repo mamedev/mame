@@ -303,8 +303,8 @@ private:
 	std::unique_ptr<m3_triangle[]> m_tri_alpha_buffer;
 	int m_tri_buffer_ptr = 0;
 	int m_tri_alpha_buffer_ptr = 0;
-	int m_viewport_tri_index[4];
-	int m_viewport_tri_alpha_index[4];
+	int m_viewport_tri_index[4]{};
+	int m_viewport_tri_alpha_index[4]{};
 
 	uint32_t rtc72421_r(offs_t offset);
 	void rtc72421_w(offs_t offset, uint32_t data);

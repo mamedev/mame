@@ -179,10 +179,6 @@ ioport_constructor agat_keyboard_device::device_input_ports() const
 
 void agat_keyboard_device::device_start()
 {
-	m_keyboard_cb.resolve();
-	m_out_meta_cb.resolve();
-	m_out_reset_cb.resolve();
-
 	save_item(NAME(m_last_modifiers));
 	save_item(NAME(m_meta));
 }

@@ -212,6 +212,8 @@ win_window_info::win_window_info(
 	, m_lastclickx(0)
 	, m_lastclicky(0)
 	, m_last_surrogate(0)
+	, m_dc(nullptr)
+	, m_resize_state(RESIZE_STATE_NORMAL)
 	, m_main(nullptr)
 	, m_attached_mode(false)
 {
@@ -1726,11 +1728,6 @@ void win_window_info::set_fullscreen(int fullscreen)
 	if (this->fullscreen() == fullscreen)
 		return;
 	m_fullscreen = fullscreen;
-
-	// reset UI to main menu
-	// FIXME: this cause crash if called when running_machine.m_ui not yet initialised. e.g. when trying to show error/warning messagebox at startup (during auto-switch from full screen to windowed mode).
-	// the menus need to be able to survive a fullscreen toggle anyway
-	machine().ui().menu_reset();
 
 	// kill off the renderer
 	renderer_reset();

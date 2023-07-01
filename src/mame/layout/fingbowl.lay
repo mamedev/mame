@@ -1,0 +1,573 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="white"><rect><color red="0.82" green="0.82" blue="0.82" /></rect></element>
+	<element name="whited"><disk><color red="0.82" green="0.82" blue="0.82" /></disk></element>
+	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="blackd"><disk><color red="0" green="0" blue="0" /></disk></element>
+	<element name="orange"><rect><color red="0.8" green="0.35" blue="0.1" /></rect></element>
+	<element name="oranged"><disk><color red="0.8" green="0.35" blue="0.1" /></disk></element>
+	<element name="greend"><disk><color red="0.2" green="0.7" blue="0.35" /></disk></element>
+
+	<element name="triangle">
+		<image><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="10" height="10">
+				<path d="M 5,0 10,10 0,10 z" fill="#ffffff" stroke="none" stroke-width="0" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="hlb" defstate="0">
+		<disk state="1"><color red="0" green="0" blue="0" /></disk>
+	</element>
+
+	<element name="nothing" defstate="0"><rect><color alpha="0" /></rect></element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+	</element>
+
+	<element name="text_event">
+		<text string="EVENT"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_score">
+		<text string="SCORE"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_player">
+		<text string="PLAYER"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+
+	<element name="text_i0">
+		<text string="SCHEDULE OF EVENTS"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+
+	<element name="text_i1a">
+		<text string="1"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i1b">
+		<text string="MILE RUN" align="1"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i1c">
+		<text string="SLIDE OVER ALL NUMBERS, 1 FINGER." align="2"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+
+	<element name="text_i2a">
+		<text string="2"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i2b">
+		<text string="HURDLES" align="1"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i2c">
+		<text string="PLACE HURDLES BETWEEN ANY" align="2"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i2d">
+		<text string="NUMBERS - JUMP OVER - RECORD HURDLES" align="2"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i2e">
+		<text string="DOWN OR CLEARED." align="1"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+
+	<element name="text_i3a">
+		<text string="3"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i3b">
+		<text string="RELAYS" align="1"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i3c">
+		<text string="SLIDE OVER ALL NUMBERS - 2" align="2"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i3d">
+		<text string="HANDS, 1 HAND PER LAP - 2 LAPS TOTAL." align="2"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+
+	<element name="text_i4a">
+		<disk>
+			<bounds xc="0" yc="0" width="3.5" height="3.5" />
+			<color red="0.2" green="0.7" blue="0.35" />
+		</disk>
+		<text string="4">
+			<bounds xc="0" yc="0" width="3" height="3" />
+			<color red="0.8" green="0.35" blue="0.1" />
+		</text>
+	</element>
+	<element name="text_i4b">
+		<text string="DISCUS" align="1"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i4c">
+		<text string="WIND UP AT 13, 14, 15 -" align="2"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i4d">
+		<text string="WHEN SIGNALED START AT 1," align="2"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i4e">
+		<text string="SLIDE TILL TONE IS HEARD." align="2"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+
+	<element name="text_i5a">
+		<text string="5"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i5b">
+		<text string="WALKING RACE" align="1"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i5c">
+		<text string="HAND OVER HAND TOUCH ALL" align="1"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i5d">
+		<text string="NUMBERS. (1 FINGER MUST TOUCH AT ALL TIMES.)" align="1"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+
+	<element name="text_i6a">
+		<text string="6"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i6b">
+		<text string="HOP SKIP JUMP" align="1"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i6c">
+		<text string="SKIP AND JUMP NUMBERS -" align="1"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i6d">
+		<text string="EXAMPLE: TOUCH 1, 2, 4, 7, 8, 10, 13, 14... ETC." align="1"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i6e">
+		<text string="TWICE AROUND THE TRACK." align="1"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+
+	<element name="text_i7a">
+		<text string="7"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i7b">
+		<text string="POLE VAULT" align="1"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i7c">
+		<text string="STACK HURDLES OVER" align="1"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i7d">
+		<text string="NUMBER 10 - TOUCH NUMBERS 1 THRU 9" align="1"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i7e">
+		<text string="- JUMP OVER POLE - TOUCH NUMBER 11" align="1"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i7f">
+		<text string="- RECORD IF CLEARED OR MISSED." align="1"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+
+	<element name="text_i8a">
+		<disk>
+			<bounds xc="0" yc="0" width="3.5" height="3.5" />
+			<color red="0.82" green="0.82" blue="0.82" />
+		</disk>
+		<disk>
+			<bounds xc="0" yc="0" width="2.5" height="2.5" />
+			<color red="0.8" green="0.35" blue="0.1" />
+		</disk>
+		<text string="8">
+			<bounds xc="0" yc="0" width="3" height="3" />
+			<color red="0.82" green="0.82" blue="0.82" />
+		</text>
+	</element>
+	<element name="text_i8b">
+		<text string="LONG JUMP" align="1"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i8c">
+		<text string="SLIDE OVER" align="1"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+	<element name="text_i8d">
+		<text string="NUMBERS 1 THRU 7 - JUMP TO 13." align="1"><color red="0.02" green="0.47" blue="0.72" /></text>
+	</element>
+
+	<element name="text_n1">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="1"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="text_n2">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="2"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="text_n3">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="3"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="text_n4">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="4"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="text_n5">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="5"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="text_n6">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="6"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="text_n7">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="7"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="text_n8">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="8"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="text_n9">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="9"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="text_n10">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="10"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="text_n11">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="11"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="text_n12">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="12"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="text_n13">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="13"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="text_n14">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="14"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="text_n15">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="15"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="text_n16">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="16"><color red="0" green="0" blue="0" /></text>
+	</element>
+
+	<element name="text_l1a">
+		<text string="ALL SET"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l1b">
+		<rect><color red="0" green="0" blue="0" /></rect>
+		<text string="STARTING LINE" align="1"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l2">
+		<text string="START EVENT"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l3a">
+		<text string="PRACTICE"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l3b">
+		<text string="START"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l5a">
+		<text string="ALL HURDLES"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l5b">
+		<text string="CLEARED"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l5c">
+		<text string="POLE VAULT"><color red="0.8" green="0.35" blue="0.1" /></text>
+	</element>
+	<element name="text_l5d">
+		<text string="CLEARED"><color red="0.8" green="0.35" blue="0.1" /></text>
+	</element>
+	<element name="text_l6a">
+		<text string="1 HURDLE"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l6b">
+		<text string="DOWN"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l7a">
+		<text string="2 HURDLES"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l7b">
+		<text string="DOWN"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l8a">
+		<text string="3 HURDLES"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l8b">
+		<text string="DOWN"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l8c">
+		<text string="POLE VAULT"><color red="0.8" green="0.35" blue="0.1" /></text>
+	</element>
+	<element name="text_l8d">
+		<text string="MISSED"><color red="0.8" green="0.35" blue="0.1" /></text>
+	</element>
+	<element name="text_l10a">
+		<text string="POLE" align="2"><color red="0.8" green="0.35" blue="0.1" /></text>
+	</element>
+	<element name="text_l10b">
+		<text string="VAULT" align="1"><color red="0.8" green="0.35" blue="0.1" /></text>
+	</element>
+	<element name="text_l11a">
+		<text string="LAST"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l11b">
+		<text string="SCORE"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l12a">
+		<text string="TOTAL"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l12b">
+		<text string="SCORE"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l13a">
+		<text string="RECORD"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l13b">
+		<text string="SCORE"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l14a">
+		<text string="SKIP"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l14b">
+		<text string="EVENT"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l15a">
+		<text string="SKILL"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l15b">
+		<text string="LEVEL"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l16a">
+		<text string="PLAYER"><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+	<element name="text_l16b">
+		<text string="NO."><color red="0.82" green="0.82" blue="0.82" /></text>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-5" right="131" top="-20" bottom="97" />
+
+		<element ref="whited"><bounds xc="50" yc="50" width="110" height="110" /></element>
+		<element ref="whited"><bounds xc="76" yc="50" width="110" height="110" /></element>
+		<element ref="white"><bounds xc="63" y="50" width="113" height="50" /></element>
+		<element ref="black"><bounds xc="63" y="97" width="120" height="50" /></element>
+
+		<!-- score panel -->
+		<element ref="white"><bounds xc="63" y="-20" width="45" height="50" /></element>
+		<element ref="black"><bounds xc="63" y="-17.5" width="40" height="20.5" /></element>
+
+		<element ref="text_event"><bounds xc="53" y="0" width="20" height="1.75" /></element>
+		<element ref="text_score"><bounds xc="63" y="-15.75" width="20" height="1.75" /></element>
+		<element ref="text_player"><bounds xc="73" y="0" width="20" height="1.75" /></element>
+
+		<element name="digit0" ref="digit"><bounds xc="53" y="-12.5" width="8" height="11" /></element>
+		<element name="digit1" ref="digit"><bounds xc="63" y="-12.5" width="8" height="11" /></element>
+		<element name="digit2" ref="digit"><bounds xc="73" y="-12.5" width="8" height="11" /></element>
+
+		<!-- track -->
+		<repeat count="5">
+			<param name="r1" start="85" increment="-9" />
+			<param name="r2" start="77" increment="-9" />
+
+			<element ref="blackd"><bounds xc="50" yc="50" width="~r1~" height="~r1~" /></element>
+			<element ref="blackd"><bounds xc="76" yc="50" width="~r1~" height="~r1~" /></element>
+			<element ref="black"><bounds xc="63" yc="50" width="26" height="~r1~" /></element>
+			<element ref="whited"><bounds xc="50" yc="50" width="~r2~" height="~r2~" /></element>
+			<element ref="whited"><bounds xc="76" yc="50" width="~r2~" height="~r2~" /></element>
+			<element ref="white"><bounds xc="63" yc="50" width="26" height="~r2~" /></element>
+		</repeat>
+
+		<element ref="white"><bounds xc="42.25" y="64" width="1" height="30" /></element>
+
+		<element ref="oranged"><bounds xc="50" yc="50" width="39" height="39" /></element>
+		<element ref="oranged"><bounds xc="76" yc="50" width="39" height="39" /></element>
+		<element ref="orange"><bounds xc="63" yc="50" width="26" height="39" /></element>
+
+		<repeat count="30">
+			<param name="x" start="18.5" increment="3" />
+			<element ref="white"><bounds x="~x~" yc="33.5" width="2" height="1" /></element>
+		</repeat>
+
+		<!-- inner labels -->
+		<element ref="white"><bounds xc="63" yc="50" width="66" height="1" /></element>
+		<element ref="white"><bounds xc="63" yc="46" width="65.5" height="1" /></element>
+		<element ref="text_i0" blend="add"><bounds xc="63" yc="48" width="60" height="3" /></element>
+
+		<element ref="text_i1a" blend="add"><bounds x="31.75" y="51.0" width="3" height="3" /></element>
+		<element ref="text_i1b" blend="add"><bounds x="35.75" y="51.25" width="40" height="1.75" /></element>
+		<element ref="text_i1c" blend="add"><bounds x="21.5" y="51.75" width="40" height="1.25" /></element>
+
+		<element ref="text_i2a" blend="add"><bounds x="34.5" y="54.75" width="3" height="3" /></element>
+		<element ref="text_i2b" blend="add"><bounds x="38.5" y="53.92" width="40" height="1.75" /></element>
+		<element ref="text_i2c" blend="add"><bounds x="21.5" y="54.42" width="40" height="1.25" /></element>
+		<element ref="text_i2d" blend="add"><bounds x="21.5" y="55.67" width="40" height="1.25" /></element>
+		<element ref="text_i2e" blend="add"><bounds x="41.5" y="56.92" width="40" height="1.25" /></element>
+
+		<element ref="text_i3a" blend="add"><bounds x="37.0" y="59.5" width="3" height="3" /></element>
+		<element ref="text_i3b" blend="add"><bounds x="41.0" y="59.58" width="40" height="1.75" /></element>
+		<element ref="text_i3c" blend="add"><bounds x="21.5" y="60.08" width="40" height="1.25" /></element>
+		<element ref="text_i3d" blend="add"><bounds x="21.5" y="61.33" width="40" height="1.25" /></element>
+
+		<element ref="text_i4a"><bounds x="40" y="63.375" width="3.5" height="3.5" /></element>
+		<element ref="text_i4b" blend="add"><bounds x="44.0" y="63.5" width="40" height="1.75" /></element>
+		<element ref="text_i4c" blend="add"><bounds x="21.5" y="64.0" width="40" height="1.25" /></element>
+		<element ref="text_i4d" blend="add"><bounds x="21.5" y="65.25" width="40" height="1.25" /></element>
+		<element ref="text_i4e" blend="add"><bounds x="21.5" y="66.5" width="40" height="1.25" /></element>
+
+		<element ref="text_i5a" blend="add"><bounds xc="64.0" y="51.0" width="3" height="3" /></element>
+		<element ref="text_i5b" blend="add"><bounds x="66.5" y="51.25" width="40" height="1.75" /></element>
+		<element ref="text_i5c" blend="add"><bounds x="77.75" y="51.75" width="40" height="1.25" /></element>
+		<element ref="text_i5d" blend="add"><bounds x="66.5" y="53.0" width="40" height="1.25" /></element>
+
+		<element ref="text_i6a" blend="add"><bounds xc="64.0" y="55.0" width="3" height="3" /></element>
+		<element ref="text_i6b" blend="add"><bounds x="66.5" y="54.5" width="40" height="1.75" /></element>
+		<element ref="text_i6c" blend="add"><bounds x="77.75" y="55.0" width="40" height="1.25" /></element>
+		<element ref="text_i6d" blend="add"><bounds x="66.5" y="56.25" width="40" height="1.25" /></element>
+		<element ref="text_i6e" blend="add"><bounds x="66.5" y="57.5" width="40" height="1.25" /></element>
+
+		<element ref="text_i7a" blend="add"><bounds xc="64.0" y="59.75" width="3" height="3" /></element>
+		<element ref="text_i7b" blend="add"><bounds x="66.5" y="59.0" width="40" height="1.75" /></element>
+		<element ref="text_i7c" blend="add"><bounds x="75.5" y="59.5" width="40" height="1.25" /></element>
+		<element ref="text_i7d" blend="add"><bounds x="66.5" y="60.75" width="40" height="1.25" /></element>
+		<element ref="text_i7e" blend="add"><bounds x="66.5" y="62.0" width="40" height="1.25" /></element>
+		<element ref="text_i7f" blend="add"><bounds x="66.5" y="63.25" width="40" height="1.25" /></element>
+
+		<element ref="text_i8a"><bounds xc="64.0" y="64.25" width="3.5" height="3.5" /></element>
+		<element ref="text_i8b" blend="add"><bounds x="66.5" y="64.75" width="40" height="1.75" /></element>
+		<element ref="text_i8c" blend="add"><bounds x="75.5" y="65.25" width="40" height="1.25" /></element>
+		<element ref="text_i8d" blend="add"><bounds x="66.5" y="66.5" width="40" height="1.25" /></element>
+
+		<!-- outer labels -->
+		<element ref="text_l1a"><bounds xc="47.17" yc="72.25" width="10" height="1.25" /></element>
+		<element ref="text_l1b"><bounds xc="40.5" y="76.5" width="1.25" height="8.5" /><orientation rotate="90" /></element>
+
+		<element ref="text_l2"><bounds xc="63" yc="72.5" width="10" height="1.25" /></element>
+
+		<element ref="text_l3a"><bounds xc="78.83" yc="71.75" width="10" height="1.25" /></element>
+		<element ref="text_l3b"><bounds xc="78.83" yc="73.0" width="10" height="1.25" /></element>
+
+		<element ref="text_l5a"><bounds xc="94.75" yc="62.75" width="1.25" height="10" /><orientation rotate="270" /></element>
+		<element ref="text_l5b"><bounds xc="96.0" yc="62.75" width="1.25" height="10" /><orientation rotate="270" /></element>
+		<element ref="text_l5c"><bounds xc="107.5" yc="71.5" width="10" height="1.25" /></element>
+		<element ref="text_l5d"><bounds xc="107.5" yc="72.75" width="10" height="1.25" /></element>
+
+		<element ref="text_l6a"><bounds xc="99.125" yc="50" width="1.25" height="10" /><orientation rotate="90" /></element>
+		<element ref="text_l6b"><bounds xc="97.875" yc="50" width="1.25" height="10" /><orientation rotate="90" /></element>
+
+		<element ref="text_l7a"><bounds xc="96.0" yc="37.25" width="1.25" height="10" /><orientation rotate="90" /></element>
+		<element ref="text_l7b"><bounds xc="94.75" yc="37.25" width="1.25" height="10" /><orientation rotate="90" /></element>
+
+		<element ref="text_l8a"><bounds xc="88.67" yc="30.0" width="10" height="1.25" /></element>
+		<element ref="text_l8b"><bounds xc="88.67" yc="31.25" width="10" height="1.25" /></element>
+		<element ref="text_l8c"><bounds xc="92.67" yc="18.0" width="10" height="1.25" /></element>
+		<element ref="text_l8d"><bounds xc="92.67" yc="19.25" width="10" height="1.25" /></element>
+
+		<element ref="triangle"><bounds xc="63" yc="9.5" width="2.1" height="2.1" /><orientation rotate="180" /></element>
+		<element ref="orange" blend="multiply"><bounds xc="63" yc="9.5" width="3" height="3" /></element>
+		<element ref="triangle"><bounds xc="63" yc="27.5" width="2.1" height="2.1" /></element>
+		<element ref="orange" blend="multiply"><bounds xc="63" yc="27.5" width="3" height="3" /></element>
+		<element ref="text_l10a"><bounds x="51" yc="27.5" width="10" height="1.25" /></element>
+		<element ref="text_l10b"><bounds x="65" yc="27.5" width="10" height="1.25" /></element>
+
+		<element ref="text_l11a"><bounds xc="47.17" yc="27.0" width="10" height="1.25" /></element>
+		<element ref="text_l11b"><bounds xc="47.17" yc="28.25" width="10" height="1.25" /></element>
+
+		<element ref="text_l12a"><bounds xc="37.33" yc="30.0" width="10" height="1.25" /></element>
+		<element ref="text_l12b"><bounds xc="37.33" yc="31.25" width="10" height="1.25" /></element>
+
+		<element ref="text_l13a"><bounds xc="30.25" yc="37.25" width="1.25" height="10" /><orientation rotate="270" /></element>
+		<element ref="text_l13b"><bounds xc="31.5" yc="37.25" width="1.25" height="10" /><orientation rotate="270" /></element>
+
+		<element ref="text_l14a"><bounds xc="26.875" yc="50" width="1.25" height="10" /><orientation rotate="270" /></element>
+		<element ref="text_l14b"><bounds xc="28.125" yc="50" width="1.25" height="10" /><orientation rotate="270" /></element>
+
+		<element ref="text_l15a"><bounds xc="31.5" yc="62.75" width="1.25" height="10" /><orientation rotate="90" /></element>
+		<element ref="text_l15b"><bounds xc="30.25" yc="62.75" width="1.25" height="10" /><orientation rotate="90" /></element>
+
+		<element ref="text_l16a"><bounds xc="37.33" yc="68.5" width="10" height="1.25" /></element>
+		<element ref="text_l16b"><bounds xc="37.33" yc="69.75" width="10" height="1.25" /></element>
+
+		<!-- buttons -->
+		<element ref="oranged"><bounds xc="47.17" yc="85.25" width="7" height="7" /></element>
+		<element ref="text_n1" blend="multiply"><bounds xc="47.17" yc="85.25" width="5" height="5" /></element>
+		<element ref="nothing" inputtag="IN.0" inputmask="0x08"><bounds xc="47.17" yc="85.25" width="11" height="11" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x08"><bounds xc="47.17" yc="85.25" width="7" height="7" /><color alpha="0.25" /></element>
+
+		<element ref="oranged"><bounds xc="63" yc="81" width="7" height="7" /></element>
+		<element ref="text_n2" blend="multiply"><bounds xc="63" yc="81" width="5" height="5" /></element>
+		<element ref="nothing" inputtag="IN.0" inputmask="0x04"><bounds xc="63" yc="81" width="11" height="11" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x04"><bounds xc="63" yc="81" width="7" height="7" /><color alpha="0.25" /></element>
+
+		<element ref="oranged"><bounds xc="78.83" yc="85.25" width="7" height="7" /></element>
+		<element ref="text_n3" blend="multiply"><bounds xc="78.83" yc="85.25" width="5" height="5" /></element>
+		<element ref="nothing" inputtag="IN.0" inputmask="0x02"><bounds xc="78.83" yc="85.25" width="11" height="11" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x02"><bounds xc="78.83" yc="85.25" width="7" height="7" /><color alpha="0.25" /></element>
+
+		<element ref="oranged"><bounds xc="92.67" yc="75.75" width="7" height="7" /></element>
+		<element ref="text_n4" blend="multiply"><bounds xc="92.66" yc="75.75" width="5" height="5" /></element>
+		<element ref="nothing" inputtag="IN.0" inputmask="0x01"><bounds xc="92.67" yc="75.75" width="11" height="11" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x01"><bounds xc="92.67" yc="75.75" width="7" height="7" /><color alpha="0.25" /></element>
+
+		<element ref="oranged"><bounds xc="107.5" yc="66.5" width="7" height="7" /></element>
+		<element ref="text_n5" blend="multiply"><bounds xc="107.5" yc="66.5" width="5" height="5" /></element>
+		<element ref="nothing" inputtag="IN.1" inputmask="0x08"><bounds xc="107.5" yc="66.5" width="11" height="11" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x08"><bounds xc="107.5" yc="66.5" width="7" height="7" /><color alpha="0.25" /></element>
+
+		<element ref="oranged"><bounds xc="107.5" yc="50" width="7" height="7" /></element>
+		<element ref="text_n6" blend="multiply"><bounds xc="107.5" yc="50" width="5" height="5" /></element>
+		<element ref="nothing" inputtag="IN.1" inputmask="0x04"><bounds xc="107.5" yc="50" width="11" height="11" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x04"><bounds xc="107.5" yc="50" width="7" height="7" /><color alpha="0.25" /></element>
+
+		<element ref="whited"><bounds xc="107.5" yc="33.5" width="7" height="7" /></element>
+		<element ref="oranged"><bounds xc="107.5" yc="33.5" width="5.5" height="5.5" /></element>
+		<element ref="text_n7" blend="multiply"><bounds xc="107.5" yc="33.5" width="5" height="5" /></element>
+		<element ref="nothing" inputtag="IN.1" inputmask="0x02"><bounds xc="107.5" yc="33.5" width="11" height="11" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x02"><bounds xc="107.5" yc="33.5" width="7" height="7" /><color alpha="0.25" /></element>
+
+		<element ref="oranged"><bounds xc="92.67" yc="24.25" width="7" height="7" /></element>
+		<element ref="text_n8" blend="multiply"><bounds xc="92.66" yc="24.25" width="5" height="5" /></element>
+		<element ref="nothing" inputtag="IN.1" inputmask="0x01"><bounds xc="92.67" yc="24.25" width="11" height="11" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x01"><bounds xc="92.67" yc="24.25" width="7" height="7" /><color alpha="0.25" /></element>
+
+		<element ref="oranged"><bounds xc="78.83" yc="14.75" width="7" height="7" /></element>
+		<element ref="text_n9" blend="multiply"><bounds xc="78.83" yc="14.75" width="5" height="5" /></element>
+		<element ref="nothing" inputtag="IN.2" inputmask="0x08"><bounds xc="78.83" yc="14.75" width="11" height="11" /></element>
+		<element ref="hlb" inputtag="IN.2" inputmask="0x08"><bounds xc="78.83" yc="14.75" width="7" height="7" /><color alpha="0.25" /></element>
+
+		<element ref="oranged"><bounds xc="63" yc="19" width="7" height="7" /></element>
+		<element ref="text_n10" blend="multiply"><bounds xc="63" yc="19" width="5" height="5" /></element>
+		<element ref="nothing" inputtag="IN.2" inputmask="0x04"><bounds xc="63" yc="19" width="11" height="11" /></element>
+		<element ref="hlb" inputtag="IN.2" inputmask="0x04"><bounds xc="63" yc="19" width="7" height="7" /><color alpha="0.25" /></element>
+
+		<element ref="oranged"><bounds xc="47.17" yc="14.75" width="7" height="7" /></element>
+		<element ref="text_n11" blend="multiply"><bounds xc="47.17" yc="14.75" width="5" height="5" /></element>
+		<element ref="nothing" inputtag="IN.2" inputmask="0x02"><bounds xc="47.17" yc="14.75" width="11" height="11" /></element>
+		<element ref="hlb" inputtag="IN.2" inputmask="0x02"><bounds xc="47.17" yc="14.75" width="7" height="7" /><color alpha="0.25" /></element>
+
+		<element ref="oranged"><bounds xc="33.33" yc="24.25" width="7" height="7" /></element>
+		<element ref="text_n12" blend="multiply"><bounds xc="33.33" yc="24.25" width="5" height="5" /></element>
+		<element ref="nothing" inputtag="IN.2" inputmask="0x01"><bounds xc="33.33" yc="24.25" width="11" height="11" /></element>
+		<element ref="hlb" inputtag="IN.2" inputmask="0x01"><bounds xc="33.33" yc="24.25" width="7" height="7" /><color alpha="0.25" /></element>
+
+		<element ref="whited"><bounds xc="18.5" yc="33.5" width="7" height="7" /></element>
+		<element ref="greend"><bounds xc="18.5" yc="33.5" width="5.5" height="5.5" /></element>
+		<element ref="text_n13" blend="multiply"><bounds xc="18.5" yc="33.5" width="5" height="5" /></element>
+		<element ref="nothing" inputtag="IN.3" inputmask="0x08"><bounds xc="18.5" yc="33.5" width="11" height="11" /></element>
+		<element ref="hlb" inputtag="IN.3" inputmask="0x08"><bounds xc="18.5" yc="33.5" width="7" height="7" /><color alpha="0.25" /></element>
+
+		<element ref="greend"><bounds xc="18.5" yc="50" width="7" height="7" /></element>
+		<element ref="text_n14" blend="multiply"><bounds xc="18.5" yc="50" width="5" height="5" /></element>
+		<element ref="nothing" inputtag="IN.3" inputmask="0x04"><bounds xc="18.5" yc="50" width="11" height="11" /></element>
+		<element ref="hlb" inputtag="IN.3" inputmask="0x04"><bounds xc="18.5" yc="50" width="7" height="7" /><color alpha="0.25" /></element>
+
+		<element ref="greend"><bounds xc="18.5" yc="66.5" width="7" height="7" /></element>
+		<element ref="text_n15" blend="multiply"><bounds xc="18.5" yc="66.5" width="5" height="5" /></element>
+		<element ref="nothing" inputtag="IN.3" inputmask="0x02"><bounds xc="18.5" yc="66.5" width="11" height="11" /></element>
+		<element ref="hlb" inputtag="IN.3" inputmask="0x02"><bounds xc="18.5" yc="66.5" width="7" height="7" /><color alpha="0.25" /></element>
+
+		<element ref="oranged"><bounds xc="33.33" yc="75.75" width="7" height="7" /></element>
+		<element ref="text_n16" blend="multiply"><bounds xc="33.33" yc="75.75" width="5" height="5" /></element>
+		<element ref="nothing" inputtag="IN.3" inputmask="0x01"><bounds xc="33.33" yc="75.75" width="11" height="11" /></element>
+		<element ref="hlb" inputtag="IN.3" inputmask="0x01"><bounds xc="33.33" yc="75.75" width="7" height="7" /><color alpha="0.25" /></element>
+	</view>
+
+</mamelayout>

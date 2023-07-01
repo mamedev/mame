@@ -91,8 +91,8 @@ static constexpr s32 clip18(int x) { return std::clamp(x, -131072, 131071); }
 #define DISDL(slot)     ((slot->udata.data[0x24 / 2] >> 0x8) & 0x000F)
 #define DIPAN(slot)     (MONO() ? 0 : ((slot->udata.data[0x24 / 2] >> 0x0) & 0x001F))
 
-#define EFSDL(slot)     ((m_EFSPAN[slot * 4] >> 8) & 0x000f)
-#define EFPAN(slot)     (MONO() ? 0 : ((m_EFSPAN[slot * 4] >> 0) & 0x001f))
+#define EFSDL(slot)     ((m_EFSPAN[slot] >> 8) & 0x000f)
+#define EFPAN(slot)     (MONO() ? 0 : ((m_EFSPAN[slot] >> 0) & 0x001f))
 
 //Unimplemented
 #define Q(slot)         ((slot->udata.data[0x28 / 2] >> 0x0) & 0x001F) // (0.75 × register value - 3)
@@ -662,7 +662,7 @@ void aica_device::UpdateReg(int reg)
 
 		case 0x90:
 		case 0x91:
-			if (!m_irq_cb.isnull())
+			if (!m_irq_cb.isunset())
 			{
 				u32 time;
 
@@ -681,7 +681,7 @@ void aica_device::UpdateReg(int reg)
 			break;
 		case 0x94:
 		case 0x95:
-			if (!m_irq_cb.isnull())
+			if (!m_irq_cb.isunset())
 			{
 				u32 time;
 
@@ -700,7 +700,7 @@ void aica_device::UpdateReg(int reg)
 			break;
 		case 0x98:
 		case 0x99:
-			if (!m_irq_cb.isnull())
+			if (!m_irq_cb.isunset())
 			{
 				u32 time;
 
@@ -727,7 +727,7 @@ void aica_device::UpdateReg(int reg)
 		case 0xa4:  //SCIRE
 		case 0xa5:
 
-			if (!m_irq_cb.isnull())
+			if (!m_irq_cb.isunset())
 			{
 				m_udata.data[0xa0 / 2] &= ~m_udata.data[0xa4 / 2];
 				ResetInterrupts();
@@ -754,7 +754,7 @@ void aica_device::UpdateReg(int reg)
 		case 0xad:
 		case 0xb0:
 		case 0xb1:
-			if (!m_irq_cb.isnull())
+			if (!m_irq_cb.isunset())
 			{
 				m_IrqTimA = DecodeSCI(SCITMA);
 				m_IrqTimBC = DecodeSCI(SCITMB);
@@ -874,7 +874,7 @@ void aica_device::w16(u32 addr,u16 val)
 		if (addr <= 0x2044)
 		{
 //          printf("%x to EFSxx slot %d (addr %x)\n", val, (addr - 0x2000)/4, addr & 0x7f);
-			m_EFSPAN[addr & 0x7f] = val;
+			m_EFSPAN[(addr & 0x7f) >> 2] = val;
 		}
 	}
 	else if (addr < 0x3000)
@@ -976,7 +976,7 @@ u16 aica_device::r16(u32 addr)
 	{
 		if (addr <= 0x2044)
 		{
-			v = m_EFSPAN[addr & 0x7f];
+			v = m_EFSPAN[(addr & 0x7f) >> 2];
 		}
 		else if (addr < 0x2800)
 		{
@@ -1300,6 +1300,7 @@ void aica_device::DoMasterSamples(std::vector<read_stream_view> const &inputs, w
 		}
 
 		bufl.put_int(s, smpl * m_LPANTABLE[MVOL() << 0xd], 32768 << SHIFT);
+		// TODO: diverges with SCSP, also wut?
 		bufr.put_int(s, smpr * m_LPANTABLE[MVOL() << 0xd], 32768 << SHIFT);
 	}
 }
@@ -1402,10 +1403,6 @@ void aica_device::device_start()
 
 	// init the emulation
 	Init();
-
-	// set up the IRQ callbacks
-	m_irq_cb.resolve_safe();
-	m_main_irq_cb.resolve_safe();
 
 	m_stream = stream_alloc(2, 2, (int)m_rate);
 

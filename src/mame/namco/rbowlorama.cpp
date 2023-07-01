@@ -89,7 +89,7 @@ ROM_START( rbowlorama )
 	ROM_REGION(0x2000, "io", 0)
 	ROM_LOAD("mc908ap8.u102", 0x0000, 0x2000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" ) // Sandisk Cruzer USB 8GB flash drive
+	DISK_REGION( "ide:0:hdd" ) // Sandisk Cruzer USB 8GB flash drive
 	DISK_IMAGE( "namco_bowling", 0, BAD_DUMP SHA1(138971fa22ba5a4f0e78daad989d444ebb072213) ) // v2.1.1. May contain operator and players data
 
 /*

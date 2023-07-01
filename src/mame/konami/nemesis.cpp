@@ -124,19 +124,19 @@ initials
 #include "konamigt.lh"
 
 
-WRITE_LINE_MEMBER(nemesis_state::nemesis_vblank_irq)
+void nemesis_state::nemesis_vblank_irq(int state)
 {
 	if (state && m_irq_on)
 		m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
-WRITE_LINE_MEMBER(nemesis_state::blkpnthr_vblank_irq)
+void nemesis_state::blkpnthr_vblank_irq(int state)
 {
 	if (state && m_irq_on)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-WRITE_LINE_MEMBER(nemesis_state::bubsys_vblank_irq)
+void nemesis_state::bubsys_vblank_irq(int state)
 {
 	if (state && m_irq_on)
 		m_maincpu->set_input_line(4, HOLD_LINE);
@@ -207,44 +207,44 @@ TIMER_DEVICE_CALLBACK_MEMBER(nemesis_state::gx400_interrupt)
 }
 
 
-WRITE_LINE_MEMBER(nemesis_state::irq_enable_w)
+void nemesis_state::irq_enable_w(int state)
 {
 	m_irq_on = state;
 }
 
-WRITE_LINE_MEMBER(nemesis_state::irq1_enable_w)
+void nemesis_state::irq1_enable_w(int state)
 {
 	m_irq1_on = state;
 }
 
-WRITE_LINE_MEMBER(nemesis_state::irq2_enable_w)
+void nemesis_state::irq2_enable_w(int state)
 {
 	m_irq2_on = state;
 }
 
-WRITE_LINE_MEMBER(nemesis_state::irq4_enable_w)
+void nemesis_state::irq4_enable_w(int state)
 {
 	m_irq4_on = state;
 }
 
-WRITE_LINE_MEMBER(nemesis_state::coin1_lockout_w)
+void nemesis_state::coin1_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(0, state);
 }
 
-WRITE_LINE_MEMBER(nemesis_state::coin2_lockout_w)
+void nemesis_state::coin2_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(1, state);
 }
 
-WRITE_LINE_MEMBER(nemesis_state::sound_irq_w)
+void nemesis_state::sound_irq_w(int state)
 {
 	// This asserts the Z80 /irq pin by setting a 74ls74 latch; the Z80 pulses /IOREQ low during servicing of the interrupt, which clears the latch automatically, so HOLD_LINE is correct in this case
 	if (state)
 		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
-WRITE_LINE_MEMBER(nemesis_state::sound_nmi_w)
+void nemesis_state::sound_nmi_w(int state)
 {
 	// On Bubble System at least, this goes to an LS02 NOR before the Z80, whose other input is tied to ???, acting as an inverter. Effectively, if the bit is 1, NMI is asserted, otherwise it is cleared. This is also cleared on reset.
 	// the ??? input is likely either tied to VBLANK or 256V, or tied to one of those two through a 74ls74 enable latch, controlled by something else (probably either the one of the two output/int enable latches of the 68k, or by exx0/exx7 address-latched accesses from the sound z80, though technically it could be anything, even the /BS signal from the mcu to the 68k)
@@ -2400,19 +2400,19 @@ ROM_END
 
 ROM_START( lifefrce )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "587-k02.18b",  0x00000, 0x10000, CRC(4a44da18) SHA1(8e76bc2b9c48bfc65664fb6ee4d1d33622ee1eb8) )
-	ROM_LOAD16_BYTE( "587-k05.18c",  0x00001, 0x10000, CRC(2f8c1cbd) SHA1(aa309d509be69f315e50047abff42d9b30334e1d) )
-	ROM_LOAD16_BYTE( "587-c03.17b",  0x40000, 0x20000, CRC(e5caf6e6) SHA1(f5df4fbc43cfa6e2866558c99dd95ba8dc89dc7a) ) /* Mask rom */
-	ROM_LOAD16_BYTE( "587-c06.17c",  0x40001, 0x20000, CRC(c2f567ea) SHA1(0c38fea53f3d4a9ae0deada5669deca4be8c9fd3) ) /* Mask rom */
+	ROM_LOAD16_BYTE( "587-l02.18b",  0x00000, 0x10000, CRC(4a44da18) SHA1(8e76bc2b9c48bfc65664fb6ee4d1d33622ee1eb8) )
+	ROM_LOAD16_BYTE( "587-l05.18c",  0x00001, 0x10000, CRC(2f8c1cbd) SHA1(aa309d509be69f315e50047abff42d9b30334e1d) )
+	ROM_LOAD16_BYTE( "6107.17b",     0x40000, 0x20000, CRC(e5caf6e6) SHA1(f5df4fbc43cfa6e2866558c99dd95ba8dc89dc7a) ) /* Mask rom */
+	ROM_LOAD16_BYTE( "6108.17c",     0x40001, 0x20000, CRC(c2f567ea) SHA1(0c38fea53f3d4a9ae0deada5669deca4be8c9fd3) ) /* Mask rom */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
-	ROM_LOAD(      "587-k09.11j",  0x00000, 0x08000, CRC(2255fe8c) SHA1(6ee35575a15f593642b29020857ec466094ef495) )
+	ROM_LOAD(      "587-k09.11j",    0x00000, 0x08000, CRC(2255fe8c) SHA1(6ee35575a15f593642b29020857ec466094ef495) )
 
 	ROM_REGION( 0x04000, "vlm", 0 )    /* VLM5030 data */
-	ROM_LOAD(      "587-k08.8g",  0x00000, 0x04000, CRC(7f0e9b41) SHA1(c9fc2723fac55691dfbb4cf9b3c472a42efa97c9) )
+	ROM_LOAD(      "587-k08.8g",     0x00000, 0x04000, CRC(7f0e9b41) SHA1(c9fc2723fac55691dfbb4cf9b3c472a42efa97c9) )
 
 	ROM_REGION( 0x20000, "k007232", 0 )    /* 007232 data */
-	ROM_LOAD(      "587-c01.10a",      0x00000, 0x20000, CRC(09fe0632) SHA1(4c3b29c623d70bbe8a938a0beb4638912c46fb6a) ) /* Mask rom */
+	ROM_LOAD(      "6106.10a",       0x00000, 0x20000, CRC(09fe0632) SHA1(4c3b29c623d70bbe8a938a0beb4638912c46fb6a) ) /* Mask rom */
 ROM_END
 
 ROM_START( lifefrcej )

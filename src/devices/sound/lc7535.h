@@ -45,9 +45,9 @@ public:
 	template <typename... T> void set_volume_callback(T &&... args) { m_volume_cb.set(std::forward<T>(args)...); }
 
 	// serial interface
-	DECLARE_WRITE_LINE_MEMBER( ce_w );
-	DECLARE_WRITE_LINE_MEMBER( di_w );
-	DECLARE_WRITE_LINE_MEMBER( clk_w );
+	void ce_w(int state);
+	void di_w(int state);
+	void clk_w(int state);
 
 	float normalize(int attenuation);
 

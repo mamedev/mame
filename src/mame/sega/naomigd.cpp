@@ -410,7 +410,6 @@ idegdrom_device::idegdrom_device(const machine_config &mconfig, const char *tag,
 void idegdrom_device::device_start()
 {
 	pci_device::device_start();
-	irq_cb.resolve_safe();
 	add_map(0x00000020, M_IO, FUNC(idegdrom_device::map_command));
 	bank_infos[0].adr = 0x01c0;
 	// pci system does not support base addresses not multiples of size
@@ -434,11 +433,11 @@ void idegdrom_device::map_extra(uint64_t memory_window_start, uint64_t memory_wi
 
 static void gdrom_devices(device_slot_interface &device)
 {
-	device.option_add("gdrom", GDROM);
+	device.option_add("gdrom", ATAPI_GDROM);
 }
 
 
-WRITE_LINE_MEMBER(idegdrom_device::ide_irq)
+void idegdrom_device::ide_irq(int state)
 {
 	irq_cb(state);
 }
@@ -1165,28 +1164,26 @@ ROM_START( dimm )
 	ROM_LOAD("317-0352-exp.pic", 0x00, 0x4000, CRC(b216fbfc) SHA1(da2341003b35d1600d63fbe34d13ff3b42bdc939) )
 	// 253-5508-0422J 317-0422-JPN BHE.BIN Quest of D undumped version, high likely 2.0x "Gofu no Keisyousya"
 	ROM_LOAD("317-0422-jpn.pic", 0x00, 0x4000, CRC(54197fbf) SHA1(a18b5b7aec0498c7a62cacf9f2298ddefb7482c9) )
-	// 253-5508-0456J 317-0456-JPN BEG.BIN WCCF 2005-2006 undumped Japan version
-	ROM_LOAD("317-0456-jpn.pic", 0x00, 0x4000, CRC(cf3bd834) SHA1(6236cdb780260d34c02806478a39c9f3432a45e8) )
 	// Sangokushi Taisen 2 satellite firmware update (CDV-10023) key, .BIN file name is unknown/incorrect.
 	ROM_LOAD("317-unknown.pic",  0x00, 0x4000, CRC(7dc07733) SHA1(b223dc44718fa71e7b420c3b44ce4ab961445461) )
 
 	// main firmwares
 	ROM_REGION(0x200000, "bios", ROMREGION_64BIT)
-	ROM_SYSTEM_BIOS(0, "fpr-23489c.ic14", "Bios 0")
+	ROM_SYSTEM_BIOS(0, "fpr-23489c.ic14", "BIOS 0")
 	ROMX_LOAD( "fpr-23489c.ic14", 0x000000, 0x200000, CRC(bc38bea1) SHA1(b36fcc6902f397d9749e9d02de1bbb7a5e29d468), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "203_203.bin", "Bios 1")
+	ROM_SYSTEM_BIOS(1, "203_203.bin", "BIOS 1")
 	ROMX_LOAD( "203_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(6f55f1ae0606816a4eca6645ed36eb7f9c7ad9cf), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(2, "fpr23718.ic36", "Bios 2")
+	ROM_SYSTEM_BIOS(2, "fpr23718.ic36", "BIOS 2")
 	ROMX_LOAD( "fpr23718.ic36",   0x000000, 0x200000, CRC(a738ea1c) SHA1(b7b5a55a6a4cf0aa2df1b3dff62ff67f864c55e8), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(3, "213_203.bin", "Bios 3")
+	ROM_SYSTEM_BIOS(3, "213_203.bin", "BIOS 3")
 	ROMX_LOAD( "213_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(17131f318632610b87bc095156ffad4597fed4ca), ROM_BIOS(3))
-	ROM_SYSTEM_BIOS(4, "217_203.bin", "Bios 4")
+	ROM_SYSTEM_BIOS(4, "217_203.bin", "BIOS 4")
 	ROMX_LOAD( "217_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(e5a229ae7ed48b2955cad63529fd938c6db555e5), ROM_BIOS(4))
-	ROM_SYSTEM_BIOS(5, "fpr23905.ic36", "Bios 5")
+	ROM_SYSTEM_BIOS(5, "fpr23905.ic36", "BIOS 5")
 	ROMX_LOAD( "fpr23905.ic36",   0x000000, 0x200000, CRC(ffffffff) SHA1(acade4362807c7571b1c2a48ed6067e4bddd404b), ROM_BIOS(5))
-	ROM_SYSTEM_BIOS(6, "317_312.bin", "Bios 6")
+	ROM_SYSTEM_BIOS(6, "317_312.bin", "BIOS 6")
 	ROMX_LOAD( "317_312.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(31d698cd659446ee09a2eeedec6e4bc6a19d05e8), ROM_BIOS(6))
-	ROM_SYSTEM_BIOS(7, "401_203.bin", "Bios 7")
+	ROM_SYSTEM_BIOS(7, "401_203.bin", "BIOS 7")
 	ROMX_LOAD( "401_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(edb52597108462bcea8eb2a47c19e51e5fb60638), ROM_BIOS(7))
 
 	// dynamically filled with data

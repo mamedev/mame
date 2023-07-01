@@ -20,14 +20,345 @@
 
 
 #include "emu.h"
-#include "vindictr.h"
+
+#include "atarijsa.h"
+#include "atarimo.h"
 
 #include "cpu/m68000/m68010.h"
 #include "machine/eeprompar.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
+namespace {
+
+class vindictr_state : public driver_device
+{
+public:
+	vindictr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_playfield_tilemap(*this, "playfield"),
+		m_alpha_tilemap(*this, "alpha"),
+		m_mob(*this, "mob"),
+		m_jsa(*this, "jsa"),
+		m_palette(*this, "palette"),
+		m_paletteram(*this, "paletteram"),
+		m_260010(*this, "260010")
+	{ }
+
+	void vindictr(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<tilemap_device> m_playfield_tilemap;
+	required_device<tilemap_device> m_alpha_tilemap;
+	required_device<atari_motion_objects_device> m_mob;
+	required_device<atari_jsa_i_device> m_jsa;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<uint16_t> m_paletteram;
+	required_ioport m_260010;
+
+	uint8_t m_playfield_tile_bank = 0;
+	uint16_t m_playfield_xscroll = 0;
+	uint16_t m_playfield_yscroll = 0;
+
+	void scanline_interrupt();
+	void scanline_int_ack_w(uint16_t data);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
+	uint16_t port1_r();
+	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
+	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	static const atari_motion_objects_config s_mob_config;
+	void main_map(address_map &map);
+};
+
+
+// video
+
+/*************************************
+ *
+ *  Tilemap callbacks
+ *
+ *************************************/
+
+TILE_GET_INFO_MEMBER(vindictr_state::get_alpha_tile_info)
+{
+	uint16_t const data = m_alpha_tilemap->basemem_read(tile_index);
+	int const code = data & 0x3ff;
+	int const color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
+	int const opaque = data & 0x8000;
+	tileinfo.set(1, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
+}
+
+
+TILE_GET_INFO_MEMBER(vindictr_state::get_playfield_tile_info)
+{
+	uint16_t const data = m_playfield_tilemap->basemem_read(tile_index);
+	int const code = (m_playfield_tile_bank * 0x1000) + (data & 0xfff);
+	int const color = 0x10 + 2 * ((data >> 12) & 7);
+	tileinfo.set(0, code, color, (data >> 15) & 1);
+}
+
+
+
+/*************************************
+ *
+ *  Video system start
+ *
+ *************************************/
+
+const atari_motion_objects_config vindictr_state::s_mob_config =
+{
+	0,                  // index to which gfx system
+	1,                  // number of motion object banks
+	1,                  // are the entries linked?
+	0,                  // are the entries split?
+	0,                  // render in reverse order?
+	0,                  // render in swapped X/Y order?
+	0,                  // does the neighbor bit affect the next object?
+	8,                  // pixels per SLIP entry (0 for no-slip)
+	0,                  // pixel offset for SLIPs
+	0,                  // maximum number of links to visit/scanline (0=all)
+
+	0x100,              // base palette entry
+	0x100,              // maximum number of colors
+	0,                  // transparent pen index
+
+	{{ 0,0,0,0x03ff }}, // mask for the link
+	{{ 0x7fff,0,0,0 }}, // mask for the code index
+	{{ 0,0x000f,0,0 }}, // mask for the color
+	{{ 0,0xff80,0,0 }}, // mask for the X position
+	{{ 0,0,0xff80,0 }}, // mask for the Y position
+	{{ 0,0,0x0038,0 }}, // mask for the width, in tiles
+	{{ 0,0,0x0007,0 }}, // mask for the height, in tiles
+	{{ 0,0,0x0040,0 }}, // mask for the horizontal flip
+	{{ 0 }},            // mask for the vertical flip
+	{{ 0,0x0070,0,0 }}, // mask for the priority
+	{{ 0 }},            // mask for the neighbor
+	{{ 0 }},            // mask for absolute coordinates
+
+	{{ 0 }},            // mask for the special value
+	0                   // resulting value to indicate "special"
+};
+
+void vindictr_state::video_start()
+{
+	// save states
+	save_item(NAME(m_playfield_tile_bank));
+	save_item(NAME(m_playfield_xscroll));
+	save_item(NAME(m_playfield_yscroll));
+}
+
+
+
+/*************************************
+ *
+ *  Palette RAM control
+ *
+ *************************************/
+
+void vindictr_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	static const int ztable[16] =
+		{ 0x0, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0x10, 0x11 };
+
+	// first blend the data
+	COMBINE_DATA(&m_paletteram[offset]);
+	data = m_paletteram[offset];
+
+	// now generate colors at all 16 intensities
+	for (int c = 0; c < 8; c++)
+	{
+		int const i = ztable[((data >> 12) + (c * 2)) & 15];
+		int const r = ((data >> 8) & 15) * i;
+		int const g = ((data >> 4) & 15) * i;
+		int const b = ((data >> 0) & 15) * i;
+
+		m_palette->set_pen_color(offset + c * 2048, rgb_t(r, g, b));
+	}
+}
+
+
+
+/*************************************
+ *
+ *  Periodic scanline updater
+ *
+ *************************************/
+
+TIMER_DEVICE_CALLBACK_MEMBER(vindictr_state::scanline_update)
+{
+	int const scanline = param;
+
+	// keep in range
+	int offset = ((scanline - 8) / 8) * 64 + 42;
+	if (offset < 0)
+		offset += 0x7c0;
+	else if (offset >= 0x7c0)
+		return;
+
+	// update the current parameters
+	for (int x = 42; x < 64; x++)
+	{
+		uint16_t const data = m_alpha_tilemap->basemem_read(offset++);
+
+		switch ((data >> 9) & 7)
+		{
+			case 2:     // /PFB
+				if (m_playfield_tile_bank != (data & 7))
+				{
+					m_screen->update_partial(scanline - 1);
+					m_playfield_tile_bank = data & 7;
+					m_playfield_tilemap->mark_all_dirty();
+				}
+				break;
+
+			case 3:     // /PFHSLD
+				if (m_playfield_xscroll != (data & 0x1ff))
+				{
+					m_screen->update_partial(scanline - 1);
+					m_playfield_tilemap->set_scrollx(0, data);
+					m_playfield_xscroll = data & 0x1ff;
+				}
+				break;
+
+			case 4:     // /MOHS
+				if (m_mob->xscroll() != (data & 0x1ff))
+				{
+					m_screen->update_partial(scanline - 1);
+					m_mob->set_xscroll(data & 0x1ff);
+				}
+				break;
+
+			case 5:     // /PFSPC
+				break;
+
+			case 6:     // /VIRQ
+				scanline_interrupt();
+				break;
+
+			case 7:     // /PFVS
+			{
+				// a new vscroll latches the offset into a counter; we must adjust for this
+				int offset = scanline;
+				const rectangle &visible_area = m_screen->visible_area();
+				if (offset > visible_area.bottom())
+					offset -= visible_area.bottom() + 1;
+
+				if (m_playfield_yscroll != ((data - offset) & 0x1ff))
+				{
+					m_screen->update_partial(scanline - 1);
+					m_playfield_tilemap->set_scrolly(0, data - offset);
+					m_mob->set_yscroll((data - offset) & 0x1ff);
+				}
+				break;
+			}
+		}
+	}
+}
+
+
+
+/*************************************
+ *
+ *  Main refresh
+ *
+ *************************************/
+
+uint32_t vindictr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// start drawing
+	m_mob->draw_async(cliprect);
+
+	// draw the playfield
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	// draw and merge the MO
+	bitmap_ind16 &mobitmap = m_mob->bitmap();
+	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
+		for (int y = rect->top(); y <= rect->bottom(); y++)
+		{
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
+			for (int x = rect->left(); x <= rect->right(); x++)
+				if (mo[x] != 0xffff)
+				{
+					/* partially verified via schematics (there are a lot of PALs involved!):
+
+					    SHADE = PAL(MPR1-0, LB7-0, PFX6-5, PFX3-2, PF/M)
+
+					    if (SHADE)
+					        CRA |= 0x100
+
+					    MOG3-1 = ~MAT3-1 if MAT6==1 and MSD3==1
+					*/
+					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+
+					// upper bit of MO priority signals special rendering and doesn't draw anything
+					if (mopriority & 4)
+						continue;
+
+					// MO pen 1 doesn't draw, but it sets the SHADE flag and bumps the palette offset
+					if ((mo[x] & 0x0f) == 1)
+					{
+						if ((mo[x] & 0xf0) != 0)
+							pf[x] |= 0x100;
+					}
+					else
+						pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+
+					// don't erase yet -- we need to make another pass later
+				}
+		}
+
+	// add the alpha on top
+	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	// now go back and process the upper bit of MO priority
+	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
+		for (int y = rect->top(); y <= rect->bottom(); y++)
+		{
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
+			for (int x = rect->left(); x <= rect->right(); x++)
+				if (mo[x] != 0xffff)
+				{
+					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+
+					// upper bit of MO priority might mean palette kludges
+					if (mopriority & 4)
+					{
+						// if bit 2 is set, start setting high palette bits
+						if (mo[x] & 2)
+							m_mob->apply_stain(bitmap, pf, mo, x, y);
+
+						// if the upper bit of pen data is set, we adjust the final intensity
+						if (mo[x] & 8)
+							pf[x] |= (~mo[x] & 0xe0) << 6;
+					}
+				}
+		}
+	return 0;
+}
+
+
+// machine
 
 /*************************************
  *
@@ -47,11 +378,6 @@ void vindictr_state::scanline_int_ack_w(uint16_t data)
 }
 
 
-void vindictr_state::machine_reset()
-{
-}
-
-
 
 /*************************************
  *
@@ -61,7 +387,7 @@ void vindictr_state::machine_reset()
 
 uint16_t vindictr_state::port1_r()
 {
-	int result = ioport("260010")->read();
+	int result = m_260010->read();
 	result ^= 0x0010;
 	return result;
 }
@@ -90,7 +416,7 @@ void vindictr_state::main_map(address_map &map)
 	map(0x360010, 0x360011).nopw();
 	map(0x360020, 0x360021).w(m_jsa, FUNC(atari_jsa_i_device::sound_reset_w));
 	map(0x360031, 0x360031).w(m_jsa, FUNC(atari_jsa_i_device::main_command_w));
-	map(0x3e0000, 0x3e0fff).ram().w(FUNC(vindictr_state::vindictr_paletteram_w)).share("paletteram");
+	map(0x3e0000, 0x3e0fff).ram().w(FUNC(vindictr_state::paletteram_w)).share(m_paletteram);
 	map(0x3f0000, 0x3f1fff).mirror(0x8000).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0x3f2000, 0x3f3fff).mirror(0x8000).ram().share("mob");
 	map(0x3f4000, 0x3f4f7f).mirror(0x8000).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
@@ -174,8 +500,8 @@ static const gfx_layout pfmolayout =
 
 
 static GFXDECODE_START( gfx_vindictr )
-	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  256, 32 )      /* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx2", 0, anlayout,      0, 64 )      /* characters 8x8 */
+	GFXDECODE_ENTRY( "sprites_pf", 0, pfmolayout,  256, 32 )
+	GFXDECODE_ENTRY( "chars",      0, anlayout,      0, 64 )
 GFXDECODE_END
 
 
@@ -188,8 +514,8 @@ GFXDECODE_END
 
 void vindictr_state::vindictr(machine_config &config)
 {
-	/* basic machine hardware */
-	M68010(config, m_maincpu, 14.318181_MHz_XTAL/2);
+	// basic machine hardware
+	M68010(config, m_maincpu, 14.318181_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vindictr_state::main_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(vindictr_state::scanline_update), m_screen, 0, 8);
@@ -198,25 +524,25 @@ void vindictr_state::vindictr(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vindictr);
 	PALETTE(config, m_palette).set_entries(2048*8);
 
-	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_COLS, 64,64).set_info_callback(FUNC(vindictr_state::get_playfield_tile_info));
-	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64,32, 0).set_info_callback(FUNC(vindictr_state::get_alpha_tile_info));
+	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(vindictr_state::get_playfield_tile_info));
+	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(FUNC(vindictr_state::get_alpha_tile_info));
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, vindictr_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	/* note: these parameters are from published specs, not derived */
-	/* the board uses a SYNGEN chip to generate video signals */
-	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(vindictr_state::screen_update_vindictr));
+	// note: these parameters are from published specs, not derived
+	// the board uses a SYNGEN chip to generate video signals
+	m_screen->set_raw(14.318181_MHz_XTAL / 2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(vindictr_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -237,7 +563,7 @@ void vindictr_state::vindictr(machine_config &config)
  *************************************/
 
 ROM_START( vindictr )
-	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 )  // 68000 code
 	ROM_LOAD16_BYTE( "136059-5117.d1",  0x000000, 0x010000, CRC(2e5135e4) SHA1(804b3ba201088ac2c35cfcbd530acbd73548ea8c) )
 	ROM_LOAD16_BYTE( "136059-5118.d3",  0x000001, 0x010000, CRC(e357fa79) SHA1(220a10287f4bf9d981fd412c8dd0a9c106eaf342) )
 	ROM_LOAD16_BYTE( "136059-5119.f1",  0x020000, 0x010000, CRC(0deb7330) SHA1(e9fb311e96bcf57f2136fff87a973a5a3b5208b3) )
@@ -245,10 +571,10 @@ ROM_START( vindictr )
 	ROM_LOAD16_BYTE( "136059-5121.k1",  0x040000, 0x010000, CRC(96b150c5) SHA1(405c848f7990c981fefd355ca635bfb0ac24eb26) )
 	ROM_LOAD16_BYTE( "136059-5122.k3",  0x040001, 0x010000, CRC(6415d312) SHA1(0115e32c1c42421cb3d978cc8642f7f88d492043) )
 
-	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "136059-1124.2k",  0x00000, 0x10000, CRC(d2212c0a) SHA1(df11fe76d74abc0cea23f18264cef4b0f33b1ffd) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "sprites_pf", ROMREGION_INVERT )
 	ROM_LOAD( "136059-1104.12p", 0x000000, 0x020000, CRC(062f8e52) SHA1(0968b8c822d8fee1cf7ddcf9c3b1bf059e446417) )
 	ROM_LOAD( "136059-1116.19p", 0x020000, 0x010000, CRC(0e4366fa) SHA1(1891f6b818f7b0e447e8a83ad0c12aade0b776ee) )
 	ROM_RELOAD(                  0x030000, 0x010000 )
@@ -262,7 +588,7 @@ ROM_START( vindictr )
 	ROM_LOAD( "136059-1113.2r",  0x0e0000, 0x010000, CRC(0a2aba63) SHA1(e4780c790278034f0332697d5f06e6ed6b57d273) )
 	ROM_RELOAD(                  0x0f0000, 0x010000 )
 
-	ROM_REGION( 0x04000, "gfx2", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136059-1123.16n", 0x000000, 0x004000, CRC(f99b631a) SHA1(7a2430b6810c77b0f717d6e9d71823eadbcf6013) )
 
 	ROM_REGION( 0x00800, "plds", 0 )
@@ -274,7 +600,7 @@ ROM_END
 
 
 ROM_START( vindictre )
-	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 )  // 68000 code
 	ROM_LOAD16_BYTE( "136059-5717.d1",  0x000000, 0x010000, CRC(af5ba4a8) SHA1(fdb6e7f0707af94b39368cc39ae45c53209ce32e) )
 	ROM_LOAD16_BYTE( "136059-5718.d3",  0x000001, 0x010000, CRC(c87b0581) SHA1(f33c72e83e8c811d3405deb470573327c7b68ea6) )
 	ROM_LOAD16_BYTE( "136059-5719.f1",  0x020000, 0x010000, CRC(1e5f94e1) SHA1(bf14e4d3c26507ad3a78ad28b6b54e4ea0939ceb) )
@@ -282,10 +608,10 @@ ROM_START( vindictre )
 	ROM_LOAD16_BYTE( "136059-5721.k1",  0x040000, 0x010000, CRC(96b150c5) SHA1(405c848f7990c981fefd355ca635bfb0ac24eb26) )
 	ROM_LOAD16_BYTE( "136059-5722.k3",  0x040001, 0x010000, CRC(6415d312) SHA1(0115e32c1c42421cb3d978cc8642f7f88d492043) )
 
-	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "136059-1124.2k",  0x00000, 0x10000, CRC(d2212c0a) SHA1(df11fe76d74abc0cea23f18264cef4b0f33b1ffd) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "sprites_pf", ROMREGION_INVERT )
 	ROM_LOAD( "136059-1104.12p", 0x000000, 0x020000, CRC(062f8e52) SHA1(0968b8c822d8fee1cf7ddcf9c3b1bf059e446417) )
 	ROM_LOAD( "136059-1116.19p", 0x020000, 0x010000, CRC(0e4366fa) SHA1(1891f6b818f7b0e447e8a83ad0c12aade0b776ee) )
 	ROM_RELOAD(                  0x030000, 0x010000 )
@@ -299,7 +625,7 @@ ROM_START( vindictre )
 	ROM_LOAD( "136059-1113.2r",  0x0e0000, 0x010000, CRC(0a2aba63) SHA1(e4780c790278034f0332697d5f06e6ed6b57d273) )
 	ROM_RELOAD(                  0x0f0000, 0x010000 )
 
-	ROM_REGION( 0x04000, "gfx2", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136059-1123.16n", 0x000000, 0x004000, CRC(f99b631a) SHA1(7a2430b6810c77b0f717d6e9d71823eadbcf6013) )
 
 	ROM_REGION( 0x00800, "plds", 0 )
@@ -311,7 +637,7 @@ ROM_END
 
 
 ROM_START( vindictrg )
-	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 )  // 68000 code
 	ROM_LOAD16_BYTE( "136059-1217.d1",  0x000000, 0x010000, CRC(0a589e9a) SHA1(6770212b57599cd9bcdeb126aec30d9815608005) )
 	ROM_LOAD16_BYTE( "136059-1218.d3",  0x000001, 0x010000, CRC(e8b7959a) SHA1(b63747934b188f44a5e59a54f52d15b33f9d676b) )
 	ROM_LOAD16_BYTE( "136059-1219.f1",  0x020000, 0x010000, CRC(2534fcbc) SHA1(d8a2121de88efabf99a153fd477c7bf2fddc88c9) )
@@ -319,10 +645,10 @@ ROM_START( vindictrg )
 	ROM_LOAD16_BYTE( "136059-1221.k1",  0x040000, 0x010000, CRC(ee1b1014) SHA1(ddfe01cdec4654a42c9e49660e3532e5c865a9b7) )
 	ROM_LOAD16_BYTE( "136059-1222.k3",  0x040001, 0x010000, CRC(517b33f0) SHA1(f6430862bb00e11a68e964c89adcad1f05bc021b) )
 
-	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "136059-1124.2k",  0x00000, 0x10000, CRC(d2212c0a) SHA1(df11fe76d74abc0cea23f18264cef4b0f33b1ffd) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "sprites_pf", ROMREGION_INVERT )
 	ROM_LOAD( "136059-1104.12p", 0x000000, 0x020000, CRC(062f8e52) SHA1(0968b8c822d8fee1cf7ddcf9c3b1bf059e446417) )
 	ROM_LOAD( "136059-1116.19p", 0x020000, 0x010000, CRC(0e4366fa) SHA1(1891f6b818f7b0e447e8a83ad0c12aade0b776ee) )
 	ROM_RELOAD(                  0x030000, 0x010000 )
@@ -336,7 +662,7 @@ ROM_START( vindictrg )
 	ROM_LOAD( "136059-1113.2r",  0x0e0000, 0x010000, CRC(0a2aba63) SHA1(e4780c790278034f0332697d5f06e6ed6b57d273) )
 	ROM_RELOAD(                  0x0f0000, 0x010000 )
 
-	ROM_REGION( 0x04000, "gfx2", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136059-1223.16n", 0x000000, 0x004000, CRC(d27975bb) SHA1(a8ab8bdbd9fbcbcf73e8621b2a4447d25bf612b8) )
 
 	ROM_REGION( 0x00800, "plds", 0 )
@@ -348,7 +674,7 @@ ROM_END
 
 
 ROM_START( vindictre4 )
-	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 )  // 68000 code
 	ROM_LOAD16_BYTE( "136059-1117.d1",  0x000000, 0x010000, CRC(2e5135e4) SHA1(804b3ba201088ac2c35cfcbd530acbd73548ea8c) )
 	ROM_LOAD16_BYTE( "136059-1118.d3",  0x000001, 0x010000, CRC(e357fa79) SHA1(220a10287f4bf9d981fd412c8dd0a9c106eaf342) )
 	ROM_LOAD16_BYTE( "136059-4719.f1",  0x020000, 0x010000, CRC(3b27ab80) SHA1(330a6fe0e0265cce40c913aa5c3607429afe510b) )
@@ -356,10 +682,10 @@ ROM_START( vindictre4 )
 	ROM_LOAD16_BYTE( "136059-4121.k1",  0x040000, 0x010000, CRC(9a0444ee) SHA1(211be931a8b6ca42dd140baf3e165ce23f75431f) )
 	ROM_LOAD16_BYTE( "136059-4122.k3",  0x040001, 0x010000, CRC(d5022d78) SHA1(eeb6876ee6994f5736114a786c5c4ba97f26ef01) )
 
-	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "136059-1124.2k",  0x00000, 0x10000, CRC(d2212c0a) SHA1(df11fe76d74abc0cea23f18264cef4b0f33b1ffd) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "sprites_pf", ROMREGION_INVERT )
 	ROM_LOAD( "136059-1104.12p", 0x000000, 0x020000, CRC(062f8e52) SHA1(0968b8c822d8fee1cf7ddcf9c3b1bf059e446417) )
 	ROM_LOAD( "136059-1116.19p", 0x020000, 0x010000, CRC(0e4366fa) SHA1(1891f6b818f7b0e447e8a83ad0c12aade0b776ee) )
 	ROM_RELOAD(                  0x030000, 0x010000 )
@@ -373,7 +699,7 @@ ROM_START( vindictre4 )
 	ROM_LOAD( "136059-1113.2r",  0x0e0000, 0x010000, CRC(0a2aba63) SHA1(e4780c790278034f0332697d5f06e6ed6b57d273) )
 	ROM_RELOAD(                  0x0f0000, 0x010000 )
 
-	ROM_REGION( 0x04000, "gfx2", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136059-1123.16n", 0x000000, 0x004000, CRC(f99b631a) SHA1(7a2430b6810c77b0f717d6e9d71823eadbcf6013) )
 
 	ROM_REGION( 0x00800, "plds", 0 )
@@ -385,7 +711,7 @@ ROM_END
 
 
 ROM_START( vindictr4 )
-	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 )  // 68000 code
 	ROM_LOAD16_BYTE( "136059-1117.d1",  0x000000, 0x010000, CRC(2e5135e4) SHA1(804b3ba201088ac2c35cfcbd530acbd73548ea8c) )
 	ROM_LOAD16_BYTE( "136059-1118.d3",  0x000001, 0x010000, CRC(e357fa79) SHA1(220a10287f4bf9d981fd412c8dd0a9c106eaf342) )
 	ROM_LOAD16_BYTE( "136059-4119.f1",  0x020000, 0x010000, CRC(44c77ee0) SHA1(f47307126a4960d59d19d1783497971f76ee00a5) )
@@ -393,10 +719,10 @@ ROM_START( vindictr4 )
 	ROM_LOAD16_BYTE( "136059-4121.k1",  0x040000, 0x010000, CRC(9a0444ee) SHA1(211be931a8b6ca42dd140baf3e165ce23f75431f) )
 	ROM_LOAD16_BYTE( "136059-4122.k3",  0x040001, 0x010000, CRC(d5022d78) SHA1(eeb6876ee6994f5736114a786c5c4ba97f26ef01) )
 
-	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "136059-1124.2k",  0x00000, 0x10000, CRC(d2212c0a) SHA1(df11fe76d74abc0cea23f18264cef4b0f33b1ffd) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "sprites_pf", ROMREGION_INVERT )
 	ROM_LOAD( "136059-1104.12p", 0x000000, 0x020000, CRC(062f8e52) SHA1(0968b8c822d8fee1cf7ddcf9c3b1bf059e446417) )
 	ROM_LOAD( "136059-1116.19p", 0x020000, 0x010000, CRC(0e4366fa) SHA1(1891f6b818f7b0e447e8a83ad0c12aade0b776ee) )
 	ROM_RELOAD(                  0x030000, 0x010000 )
@@ -410,7 +736,7 @@ ROM_START( vindictr4 )
 	ROM_LOAD( "136059-1113.2r",  0x0e0000, 0x010000, CRC(0a2aba63) SHA1(e4780c790278034f0332697d5f06e6ed6b57d273) )
 	ROM_RELOAD(                  0x0f0000, 0x010000 )
 
-	ROM_REGION( 0x04000, "gfx2", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136059-1123.16n", 0x000000, 0x004000, CRC(f99b631a) SHA1(7a2430b6810c77b0f717d6e9d71823eadbcf6013) )
 
 	ROM_REGION( 0x00800, "plds", 0 )
@@ -422,7 +748,7 @@ ROM_END
 
 
 ROM_START( vindictre3 )
-	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 )  // 68000 code
 	ROM_LOAD16_BYTE( "136059-3117.d1",  0x000000, 0x010000, CRC(af5ba4a8) SHA1(fdb6e7f0707af94b39368cc39ae45c53209ce32e) )
 	ROM_LOAD16_BYTE( "136059-3118.d3",  0x000001, 0x010000, CRC(c87b0581) SHA1(f33c72e83e8c811d3405deb470573327c7b68ea6) )
 	ROM_LOAD16_BYTE( "136059-3119.f1",  0x020000, 0x010000, CRC(f0516142) SHA1(16f23a9a8939cead728108fc23fccebf2529d553) )
@@ -430,10 +756,10 @@ ROM_START( vindictre3 )
 	ROM_LOAD16_BYTE( "136059-2121.k1",  0x040000, 0x010000, CRC(9b6111e0) SHA1(427197b21a5db2a06751ab281fde7a2f63818db8) )
 	ROM_LOAD16_BYTE( "136059-2122.k3",  0x040001, 0x010000, CRC(8d029a28) SHA1(a166d2a767f70050397f0f12add44ad1f5bc9fde) )
 
-	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "136059-1124.2k",  0x00000, 0x10000, CRC(d2212c0a) SHA1(df11fe76d74abc0cea23f18264cef4b0f33b1ffd) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "sprites_pf", ROMREGION_INVERT )
 	ROM_LOAD( "136059-1104.12p", 0x000000, 0x020000, CRC(062f8e52) SHA1(0968b8c822d8fee1cf7ddcf9c3b1bf059e446417) )
 	ROM_LOAD( "136059-1116.19p", 0x020000, 0x010000, CRC(0e4366fa) SHA1(1891f6b818f7b0e447e8a83ad0c12aade0b776ee) )
 	ROM_RELOAD(                  0x030000, 0x010000 )
@@ -447,7 +773,7 @@ ROM_START( vindictre3 )
 	ROM_LOAD( "136059-1113.2r",  0x0e0000, 0x010000, CRC(0a2aba63) SHA1(e4780c790278034f0332697d5f06e6ed6b57d273) )
 	ROM_RELOAD(                  0x0f0000, 0x010000 )
 
-	ROM_REGION( 0x04000, "gfx2", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136059-1123.16n", 0x000000, 0x004000, CRC(f99b631a) SHA1(7a2430b6810c77b0f717d6e9d71823eadbcf6013) )
 
 	ROM_REGION( 0x00800, "plds", 0 )
@@ -459,7 +785,7 @@ ROM_END
 
 
 ROM_START( vindictr2 )
-	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 )  // 68000 code
 	ROM_LOAD16_BYTE( "136059-1117.d1",  0x000000, 0x010000, CRC(2e5135e4) SHA1(804b3ba201088ac2c35cfcbd530acbd73548ea8c) )
 	ROM_LOAD16_BYTE( "136059-1118.d3",  0x000001, 0x010000, CRC(e357fa79) SHA1(220a10287f4bf9d981fd412c8dd0a9c106eaf342) )
 	ROM_LOAD16_BYTE( "136059-2119.f1",  0x020000, 0x010000, CRC(7f8c044e) SHA1(56cd047ff12ff2968bf403b38b86fdceb9c2b83d) )
@@ -467,10 +793,10 @@ ROM_START( vindictr2 )
 	ROM_LOAD16_BYTE( "136059-2121.k1",  0x040000, 0x010000, CRC(9b6111e0) SHA1(427197b21a5db2a06751ab281fde7a2f63818db8) )
 	ROM_LOAD16_BYTE( "136059-2122.k3",  0x040001, 0x010000, CRC(8d029a28) SHA1(a166d2a767f70050397f0f12add44ad1f5bc9fde) )
 
-	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "136059-1124.2k",  0x00000, 0x10000, CRC(d2212c0a) SHA1(df11fe76d74abc0cea23f18264cef4b0f33b1ffd) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "sprites_pf", ROMREGION_INVERT )
 	ROM_LOAD( "136059-1104.12p", 0x000000, 0x020000, CRC(062f8e52) SHA1(0968b8c822d8fee1cf7ddcf9c3b1bf059e446417) )
 	ROM_LOAD( "136059-1116.19p", 0x020000, 0x010000, CRC(0e4366fa) SHA1(1891f6b818f7b0e447e8a83ad0c12aade0b776ee) )
 	ROM_RELOAD(                  0x030000, 0x010000 )
@@ -484,7 +810,7 @@ ROM_START( vindictr2 )
 	ROM_LOAD( "136059-1113.2r",  0x0e0000, 0x010000, CRC(0a2aba63) SHA1(e4780c790278034f0332697d5f06e6ed6b57d273) )
 	ROM_RELOAD(                  0x0f0000, 0x010000 )
 
-	ROM_REGION( 0x04000, "gfx2", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136059-1123.16n", 0x000000, 0x004000, CRC(f99b631a) SHA1(7a2430b6810c77b0f717d6e9d71823eadbcf6013) )
 
 	ROM_REGION( 0x00800, "plds", 0 )
@@ -496,7 +822,7 @@ ROM_END
 
 
 ROM_START( vindictr1 )
-	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 )  // 68000 code
 	ROM_LOAD16_BYTE( "136059-1117.d1",  0x000000, 0x010000, CRC(2e5135e4) SHA1(804b3ba201088ac2c35cfcbd530acbd73548ea8c) )
 	ROM_LOAD16_BYTE( "136059-1118.d3",  0x000001, 0x010000, CRC(e357fa79) SHA1(220a10287f4bf9d981fd412c8dd0a9c106eaf342) )
 	ROM_LOAD16_BYTE( "136059-1119.f1",  0x020000, 0x010000, CRC(48938c95) SHA1(061771b074135b945621d781fbde7ec1260f31a1) )
@@ -504,10 +830,10 @@ ROM_START( vindictr1 )
 	ROM_LOAD16_BYTE( "136059-1121.k1",  0x040000, 0x010000, CRC(9b6111e0) SHA1(427197b21a5db2a06751ab281fde7a2f63818db8) )
 	ROM_LOAD16_BYTE( "136059-1122.k3",  0x040001, 0x010000, CRC(a94773f1) SHA1(2be841ab755d4ce319f3d562e9990918923384ee) )
 
-	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "136059-1124.2k",  0x00000, 0x10000, CRC(d2212c0a) SHA1(df11fe76d74abc0cea23f18264cef4b0f33b1ffd) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "sprites_pf", ROMREGION_INVERT )
 	ROM_LOAD( "136059-1104.12p", 0x000000, 0x020000, CRC(062f8e52) SHA1(0968b8c822d8fee1cf7ddcf9c3b1bf059e446417) )
 	ROM_LOAD( "136059-1116.19p", 0x020000, 0x010000, CRC(0e4366fa) SHA1(1891f6b818f7b0e447e8a83ad0c12aade0b776ee) )
 	ROM_RELOAD(                  0x030000, 0x010000 )
@@ -521,7 +847,7 @@ ROM_START( vindictr1 )
 	ROM_LOAD( "136059-1113.2r",  0x0e0000, 0x010000, CRC(0a2aba63) SHA1(e4780c790278034f0332697d5f06e6ed6b57d273) )
 	ROM_RELOAD(                  0x0f0000, 0x010000 )
 
-	ROM_REGION( 0x04000, "gfx2", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136059-1123.16n", 0x000000, 0x004000, CRC(f99b631a) SHA1(7a2430b6810c77b0f717d6e9d71823eadbcf6013) )
 
 	ROM_REGION( 0x00800, "plds", 0 )
@@ -531,18 +857,7 @@ ROM_START( vindictr1 )
 	ROM_LOAD( "pal16r6a-136059-1153.n7",  0x0600, 0x0104, CRC(61076033) SHA1(c860835a8fa48e141f3d24732395ac35a4b908a4) )
 ROM_END
 
-
-
-/*************************************
- *
- *  Driver initialization
- *
- *************************************/
-
-void vindictr_state::init_vindictr()
-{
-}
-
+} // anonymous namespace
 
 
 /*************************************
@@ -551,11 +866,11 @@ void vindictr_state::init_vindictr()
  *
  *************************************/
 
-GAME( 1988, vindictr,  0,        vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (rev 5)", 0 )
-GAME( 1988, vindictre, vindictr, vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (Europe, rev 5)", 0 )
-GAME( 1988, vindictrg, vindictr, vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (German, rev 1)", 0 )
-GAME( 1988, vindictre4,vindictr, vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (Europe, rev 4)", 0 )
-GAME( 1988, vindictr4, vindictr, vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (rev 4)", 0 )
-GAME( 1988, vindictre3,vindictr, vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (Europe, rev 3)", 0 )
-GAME( 1988, vindictr2, vindictr, vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (rev 2)", 0 )
-GAME( 1988, vindictr1, vindictr, vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (rev 1)", 0 )
+GAME( 1988, vindictr,  0,        vindictr, vindictr, vindictr_state, empty_init, ROT0, "Atari Games", "Vindicators (rev 5)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vindictre, vindictr, vindictr, vindictr, vindictr_state, empty_init, ROT0, "Atari Games", "Vindicators (Europe, rev 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vindictrg, vindictr, vindictr, vindictr, vindictr_state, empty_init, ROT0, "Atari Games", "Vindicators (German, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vindictre4,vindictr, vindictr, vindictr, vindictr_state, empty_init, ROT0, "Atari Games", "Vindicators (Europe, rev 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vindictr4, vindictr, vindictr, vindictr, vindictr_state, empty_init, ROT0, "Atari Games", "Vindicators (rev 4)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vindictre3,vindictr, vindictr, vindictr, vindictr_state, empty_init, ROT0, "Atari Games", "Vindicators (Europe, rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vindictr2, vindictr, vindictr, vindictr, vindictr_state, empty_init, ROT0, "Atari Games", "Vindicators (rev 2)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vindictr1, vindictr, vindictr, vindictr, vindictr_state, empty_init, ROT0, "Atari Games", "Vindicators (rev 1)",         MACHINE_SUPPORTS_SAVE )

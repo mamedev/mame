@@ -106,15 +106,15 @@
 // Devices
 #include "tp0370.h"
 
-#define LOG_DATA        (1U<<1)   // Data transfer
-#define LOG_DETAIL      (1U<<2)
-#define LOG_WRITE       (1U<<3)
-#define LOG_LINES       (1U<<4)
-#define LOG_STATUS      (1U<<5)
-#define LOG_MODE        (1U<<6)
+#define LOG_DATA        (1U << 1)   // Data transfer
+#define LOG_DETAIL      (1U << 2)
+#define LOG_WRITE       (1U << 3)
+#define LOG_LINES       (1U << 4)
+#define LOG_STATUS      (1U << 5)
+#define LOG_MODE        (1U << 6)
 
 // Minimum log should be config and warnings
-#define VERBOSE ( LOG_GENERAL )
+#define VERBOSE (LOG_GENERAL)
 
 enum
 {
@@ -347,9 +347,6 @@ void ibc_device::update_lines(bool bav, bool hsk)
 
 void ibc_device::device_start()
 {
-	m_int.resolve_safe();
-	m_hexout.resolve_safe();
-	m_latch.resolve_safe();
 }
 
 void ibc_device::device_reset()

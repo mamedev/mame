@@ -1304,6 +1304,11 @@ std::string cheat_manager::quote_expression(const parsed_expression &expression)
 	strreplace(str, "& ", " band ");
 	strreplace(str, "&", " band ");
 
+	strreplace(str, " << ", " lshift ");
+	strreplace(str, " <<", " lshift ");
+	strreplace(str, "<< ", " lshift ");
+	strreplace(str, "<<", " lshift ");
+
 	strreplace(str, " <= ", " le ");
 	strreplace(str, " <=", " le ");
 	strreplace(str, "<= ", " le ");
@@ -1313,11 +1318,6 @@ std::string cheat_manager::quote_expression(const parsed_expression &expression)
 	strreplace(str, " <", " lt ");
 	strreplace(str, "< ", " lt ");
 	strreplace(str, "<", " lt ");
-
-	strreplace(str, " << ", " lshift ");
-	strreplace(str, " <<", " lshift ");
-	strreplace(str, "<< ", " lshift ");
-	strreplace(str, "<<", " lshift ");
 
 	return str;
 }

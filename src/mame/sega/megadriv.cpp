@@ -725,7 +725,7 @@ void md_base_state::megadriv_stop_scanline_timer()
 
 
 // this comes from the VDP on lines 240 (on) 241 (off) and is connected to the z80 irq 0
-WRITE_LINE_MEMBER(md_base_state::vdp_sndirqline_callback_genesis_z80)
+void md_base_state::vdp_sndirqline_callback_genesis_z80(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -739,7 +739,7 @@ WRITE_LINE_MEMBER(md_base_state::vdp_sndirqline_callback_genesis_z80)
 }
 
 // this comes from the vdp, and is connected to 68k irq level 6 (main vbl interrupt)
-WRITE_LINE_MEMBER(md_core_state::vdp_lv6irqline_callback_genesis_68k)
+void md_core_state::vdp_lv6irqline_callback_genesis_68k(int state)
 {
 	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(6, HOLD_LINE);
@@ -748,7 +748,7 @@ WRITE_LINE_MEMBER(md_core_state::vdp_lv6irqline_callback_genesis_68k)
 }
 
 // this comes from the vdp, and is connected to 68k irq level 4 (raster interrupt)
-WRITE_LINE_MEMBER(md_core_state::vdp_lv4irqline_callback_genesis_68k)
+void md_core_state::vdp_lv4irqline_callback_genesis_68k(int state)
 {
 	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(4, HOLD_LINE);
@@ -1003,7 +1003,7 @@ void md_base_state::init_megadrie()
 	m_version_hi_nibble = 0xe0; // Export PAL no-SCD
 }
 
-WRITE_LINE_MEMBER(md_core_state::screen_vblank_megadriv)
+void md_core_state::screen_vblank_megadriv(int state)
 {
 	if (m_io_reset.read_safe(0) & 0x01)
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);

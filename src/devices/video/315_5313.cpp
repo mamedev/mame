@@ -299,10 +299,6 @@ void sega315_5313_device::device_post_load()
 
 void sega315_5313_device::device_start()
 {
-	m_sndirqline_callback.resolve_safe();
-	m_lv6irqline_callback.resolve_safe();
-	m_lv4irqline_callback.resolve_safe();
-
 	m_32x_scanline_func.resolve();
 	m_32x_interrupt_func.resolve();
 	m_32x_scanline_helper_func.resolve();

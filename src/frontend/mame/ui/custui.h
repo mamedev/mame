@@ -16,6 +16,8 @@
 #include "ui/menu.h"
 
 #include <functional>
+#include <string>
+#include <vector>
 
 
 namespace ui {
@@ -34,7 +36,7 @@ protected:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	void find_languages();
 	void find_sysnames();
@@ -63,7 +65,7 @@ protected:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	void list();
 
@@ -126,7 +128,7 @@ private:
 	};
 
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	s_color_table m_color_table[MUI_RESTORE];
 	void restore_colors();
@@ -156,15 +158,14 @@ private:
 	};
 
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
-	void inkey_special(const event *menu_event);
+	bool inkey_special(const event *menu_event);
 
 	rgb_t           *m_color;
 	std::string     m_search;
 	bool            m_key_active;
 	int             m_lock_ref;
-	std::string     m_title;
 };
 
 //-------------------------------------------------
@@ -178,7 +179,7 @@ public:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	static std::pair<const char *, const char *> const s_palette[];
 	rgb_t &m_original;

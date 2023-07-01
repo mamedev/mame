@@ -73,12 +73,6 @@ vic10_expansion_slot_device::vic10_expansion_slot_device(const machine_config &m
 void vic10_expansion_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_write_irq.resolve_safe();
-	m_write_res.resolve_safe();
-	m_write_cnt.resolve_safe();
-	m_write_sp.resolve_safe();
 }
 
 
@@ -86,15 +80,13 @@ void vic10_expansion_slot_device::device_start()
 //  call_load -
 //-------------------------------------------------
 
-image_init_result vic10_expansion_slot_device::call_load()
+std::pair<std::error_condition, std::string> vic10_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
-		size_t size;
-
 		if (!loaded_through_softlist())
 		{
-			size = length();
+			size_t const size = length();
 
 			if (is_filetype("80"))
 			{
@@ -139,7 +131,7 @@ image_init_result vic10_expansion_slot_device::call_load()
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -186,8 +178,8 @@ void vic10_expansion_slot_device::cd_w(offs_t offset, uint8_t data, int lorom, i
 	}
 }
 
-READ_LINE_MEMBER( vic10_expansion_slot_device::p0_r ) { int state = 0; if (m_card != nullptr) state = m_card->vic10_p0_r(); return state; }
-WRITE_LINE_MEMBER( vic10_expansion_slot_device::p0_w ) { if (m_card != nullptr) m_card->vic10_p0_w(state); }
+int vic10_expansion_slot_device::p0_r() { int state = 0; if (m_card != nullptr) state = m_card->vic10_p0_r(); return state; }
+void vic10_expansion_slot_device::p0_w(int state) { if (m_card != nullptr) m_card->vic10_p0_w(state); }
 
 
 //-------------------------------------------------

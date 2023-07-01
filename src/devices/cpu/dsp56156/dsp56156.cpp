@@ -269,9 +269,6 @@ void dsp56156_device::device_start()
 	m_core.modC_state = false;
 	m_core.reset_state = false;
 
-	/* Resolve line callbacks */
-	portC_cb.resolve_safe();
-
 	/* save states - dsp56156_core members */
 	save_item(NAME(m_core.modA_state));
 	save_item(NAME(m_core.modB_state));
@@ -462,25 +459,6 @@ void dsp56156_device::device_reset()
 /***************************************************************************
     CORE EXECUTION LOOP
 ***************************************************************************/
-// Execute a single opcode and return how many cycles it took.
-static size_t execute_one_new(dsp56156_core* cpustate)
-{
-	// For MAME
-	cpustate->ppc = PC;
-	if (cpustate->device->machine().debug_flags & DEBUG_FLAG_CALL_HOOK) // FIXME: if this was a member, the helper would work
-		cpustate->device->debug()->instruction_hook(PC);
-
-	cpustate->op = ROPCODE(PC);
-	uint16_t w0 = ROPCODE(PC);
-	uint16_t w1 = ROPCODE(PC + 1);
-
-	Opcode op(w0, w1);
-	op.evaluate(cpustate);
-	PC += op.evalSize();    // Special size function needed to handle jmps, etc.
-
-	// TODO: Currently all operations take up 4 cycles (inst->cycles()).
-	return 4;
-}
 
 void dsp56156_device::execute_run()
 {
@@ -504,7 +482,6 @@ void dsp56156_device::execute_run()
 	while(m_core.icount > 0)
 	{
 		execute_one(&m_core);
-		if (0) m_core.icount -= execute_one_new(&m_core);
 		pcu_service_interrupts(&m_core);   // TODO: Is it incorrect to service after each instruction?
 	}
 }

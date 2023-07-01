@@ -394,8 +394,8 @@ public:
 	template<int Chip> uint16_t soundram_r(offs_t offset);
 	template<int Chip> void soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void lamps_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(scsp1_to_sh1_irq);
-	DECLARE_WRITE_LINE_MEMBER(scsp2_to_sh1_irq);
+	void scsp1_to_sh1_irq(int state);
+	void scsp2_to_sh1_irq(int state);
 	void sound_to_sh1_w(uint8_t data);
 	void init_coolridr();
 	void init_aquastge();
@@ -3173,10 +3173,8 @@ void coolridr_state::machine_start()
 
 	if (0)
 	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"expanded_%s_gfx", machine().system().name);
-		fp=fopen(filename, "w+b");
+		auto filename = "expanded_" + std::string(machine().system().name) + "_gfx";
+		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{
 			for (int i=0;i<(0x800000*8);i++)
@@ -3184,7 +3182,6 @@ void coolridr_state::machine_start()
 				fwrite((uint8_t*)m_expanded_10bit_gfx.get()+(i^1), 1, 1, fp);
 			}
 			fclose(fp);
-
 		}
 	}
 
@@ -3209,7 +3206,7 @@ void coolridr_state::scsp_irq(offs_t offset, uint8_t data)
 	m_soundcpu->set_input_line(offset, data);
 }
 
-WRITE_LINE_MEMBER(coolridr_state::scsp1_to_sh1_irq)
+void coolridr_state::scsp1_to_sh1_irq(int state)
 {
 	m_subcpu->set_input_line(0xe, (state) ? ASSERT_LINE : CLEAR_LINE);
 	if(state)
@@ -3218,7 +3215,7 @@ WRITE_LINE_MEMBER(coolridr_state::scsp1_to_sh1_irq)
 		m_sound_data &= ~0x10;
 }
 
-WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
+void coolridr_state::scsp2_to_sh1_irq(int state)
 {
 	m_subcpu->set_input_line(0xe, (state) ? ASSERT_LINE : CLEAR_LINE);
 	if(state)

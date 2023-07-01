@@ -52,12 +52,12 @@ uint8_t trvquest_state::question_r(offs_t offset)
 	return m_questions_region[*m_question * 0x2000 + offset];
 }
 
-WRITE_LINE_MEMBER(trvquest_state::coin_w)
+void trvquest_state::coin_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, ~state & 1);
 }
 
-WRITE_LINE_MEMBER(trvquest_state::misc_w)
+void trvquest_state::misc_w(int state)
 {
 	// data & 1 -> led on/off ?
 }

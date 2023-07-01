@@ -75,12 +75,12 @@ private:
 	required_device<upd765a_device> m_fdc;
 	required_device<pc_keyboard_device> m_keyboard;
 
-	DECLARE_WRITE_LINE_MEMBER(out2_changed);
-	DECLARE_WRITE_LINE_MEMBER(keyb_interrupt);
+	void out2_changed(int state);
+	void keyb_interrupt(int state);
 
 	void pc_nmi_enable_w(uint8_t data);
 	uint8_t pcjr_nmi_enable_r();
-	DECLARE_WRITE_LINE_MEMBER(pic8259_set_int_line);
+	void pic8259_set_int_line(int state);
 
 	void pcjr_ppi_portb_w(uint8_t data);
 	uint8_t pcjr_ppi_portc_r();
@@ -89,7 +89,7 @@ private:
 	void pcjx_port_1ff_w(uint8_t data);
 	void pcjx_set_bank(int unk1, int unk2, int unk3);
 
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
+	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart1_load) { return load_cart(image, m_cart1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart2_load) { return load_cart(image, m_cart2); }
 	void pc_speaker_set_spkrdata(uint8_t data);
@@ -192,7 +192,7 @@ TIMER_CALLBACK_MEMBER(pcjr_state::kb_signal)
  *
  *************************************************************/
 
-WRITE_LINE_MEMBER(pcjr_state::pic8259_set_int_line)
+void pcjr_state::pic8259_set_int_line(int state)
 {
 	uint32_t pc = m_maincpu->pc();
 	if ( (pc == 0xF0453) || (pc == 0xFF196) )
@@ -216,7 +216,7 @@ void pcjr_state::pc_speaker_set_spkrdata(uint8_t data)
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
 }
 
-WRITE_LINE_MEMBER(pcjr_state::out2_changed)
+void pcjr_state::out2_changed(int state)
 {
 	m_pit_out2 = state ? 1 : 0;
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
@@ -261,7 +261,7 @@ WRITE_LINE_MEMBER(pcjr_state::out2_changed)
  *
  *************************************************************/
 
-WRITE_LINE_MEMBER(pcjr_state::keyb_interrupt)
+void pcjr_state::keyb_interrupt(int state)
 {
 	int data;
 
@@ -446,7 +446,9 @@ uint8_t pcjr_state::pcjx_port_1ff_r()
 	return 0x60; // expansion?
 }
 
-image_init_result pcjr_state::load_cart(device_image_interface &image, generic_slot_device *slot)
+std::pair<std::error_condition, std::string> pcjr_state::load_cart(
+		device_image_interface &image,
+		generic_slot_device *slot)
 {
 	uint32_t size = slot->common_get_size("rom");
 	bool imagic_hack = false;
@@ -465,12 +467,11 @@ image_init_result pcjr_state::load_cart(device_image_interface &image, generic_s
 				header_size = 0x200;
 				break;
 			default:
-				image.seterror(image_error::INVALIDIMAGE, "Invalid header size");
-				return image_init_result::FAIL;
+				return std::make_pair(image_error::INVALIDIMAGE, "Invalid header length (must be 128 bytes or 512 bytes)");
 		}
-		if (size - header_size == 0xa000)
+		if ((size - header_size) == 0xa000)
 		{
-			// alloc 64K for the imagic carts, so to handle the necessary mirroring
+			// alloc 64K for the imagic carts, so as to handle the necessary mirroring
 			size += 0x6000;
 			imagic_hack = true;
 		}
@@ -497,7 +498,8 @@ image_init_result pcjr_state::load_cart(device_image_interface &image, generic_s
 		memcpy(ROM + 0x4000, ROM, 0x2000);
 		memcpy(ROM + 0x2000, ROM, 0x2000);
 	}
-	return image_init_result::PASS;
+
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

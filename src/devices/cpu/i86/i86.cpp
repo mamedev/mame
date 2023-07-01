@@ -345,9 +345,6 @@ void i8086_cpu_device::execute_run()
 void i8086_cpu_device::device_start()
 {
 	i8086_common_cpu_device::device_start();
-	m_out_if_func.resolve_safe();
-	m_esc_opcode_handler.resolve_safe();
-	m_esc_data_handler.resolve_safe();
 	m_stack = has_space(AS_STACK) ? &space(AS_STACK) : m_program;
 	m_code = has_space(AS_CODE) ? &space(AS_CODE) : m_program;
 	m_extra = has_space(AS_EXTRA) ? &space(AS_EXTRA) : m_program;
@@ -525,8 +522,6 @@ void i8086_common_cpu_device::device_start()
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_TF).formatstr("%16s").noshow();
 
 	set_icountptr(m_icount);
-
-	m_lock_handler.resolve_safe();
 }
 
 
@@ -585,7 +580,7 @@ void i8086_common_cpu_device::interrupt(int int_num, int trap)
 	m_TF = m_IF = 0;
 
 	if (int_num == -1)
-		int_num = standard_irq_callback(0);
+		int_num = standard_irq_callback(0, (m_sregs[CS] << 4) + m_ip);
 	debugger_exception_hook(int_num);
 
 	m_easeg = CS;

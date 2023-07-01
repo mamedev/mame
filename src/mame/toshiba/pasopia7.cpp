@@ -109,7 +109,7 @@ private:
 	void nmi_reg_w(uint8_t data);
 	uint8_t nmi_porta_r();
 	uint8_t nmi_portb_r();
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	void speaker_w(int state);
 	TIMER_CALLBACK_MEMBER(pio_timer);
 	void p7_lcd_palette(palette_device &palette) const;
 	MC6845_UPDATE_ROW(update_row);
@@ -752,7 +752,7 @@ uint8_t pasopia7_state::nmi_portb_r()
 	return 0xd9 | data | m_nmi_trap | m_nmi_reset;
 }
 
-WRITE_LINE_MEMBER( pasopia7_state::speaker_w )
+void pasopia7_state::speaker_w(int state)
 {
 	if (state)
 	{
@@ -898,8 +898,8 @@ ROM_START( pasopia7 )
 	ROM_REGION( 0x8000, "basic", ROMREGION_ERASEFF )
 	ROM_LOAD( "basic.rom", 0x0000, 0x8000, CRC(8a58fab6) SHA1(5e1a91dfb293bca5cf145b0a0c63217f04003ed1))
 
-	ROM_REGION( 0x800, "font", ROMREGION_ERASEFF )
-	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(a91c45a9) SHA1(a472adf791b9bac3dfa6437662e1a9e94a88b412))
+	ROM_REGION( 0x1000, "font", ROMREGION_ERASEFF )
+	ROM_LOAD( "2732.ic146", 0x0000, 0x1000, CRC(aabf66e8) SHA1(1ff5c2c35f07d7481c4c22a453192d9458590eb0))
 ROM_END
 
 /* using an identical ROMset from now, but the screen type is different */
@@ -910,8 +910,8 @@ ROM_START( pasopia7lcd )
 	ROM_REGION( 0x8000, "basic", ROMREGION_ERASEFF )
 	ROM_LOAD( "basic.rom", 0x0000, 0x8000, CRC(8a58fab6) SHA1(5e1a91dfb293bca5cf145b0a0c63217f04003ed1))
 
-	ROM_REGION( 0x800, "font", ROMREGION_ERASEFF )
-	ROM_LOAD( "font.rom", 0x0000, 0x0800, BAD_DUMP CRC(a91c45a9) SHA1(a472adf791b9bac3dfa6437662e1a9e94a88b412))
+	ROM_REGION( 0x1000, "font", ROMREGION_ERASEFF )
+	ROM_LOAD( "2732.ic146", 0x0000, 0x1000, BAD_DUMP CRC(aabf66e8) SHA1(1ff5c2c35f07d7481c4c22a453192d9458590eb0))
 ROM_END
 
 
@@ -934,5 +934,5 @@ void pasopia7_state::init_p7_lcd()
 
 /* Driver */
 
-COMP( 1983, pasopia7,    0,        0, p7_raster, pasopia7, pasopia7_state, init_p7_raster, "Toshiba", "Pasopia 7 (Raster)", MACHINE_NOT_WORKING )
-COMP( 1983, pasopia7lcd, pasopia7, 0, p7_lcd,    pasopia7, pasopia7_state, init_p7_lcd,    "Toshiba", "Pasopia 7 (LCD)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, pasopia7,    0,        0, p7_raster, pasopia7, pasopia7_state, init_p7_raster, "Toshiba", "Pasopia 7 PA7007 (Raster)", MACHINE_NOT_WORKING )
+COMP( 1983, pasopia7lcd, pasopia7, 0, p7_lcd,    pasopia7, pasopia7_state, init_p7_lcd,    "Toshiba", "Pasopia 7 PA7007 with PA7170 (LCD)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

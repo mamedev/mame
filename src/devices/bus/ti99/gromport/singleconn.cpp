@@ -43,7 +43,7 @@ void ti99_single_cart_conn_device::cruwrite(offs_t offset, uint8_t data)
 	m_cartridge->cruwrite(offset, data);
 }
 
-WRITE_LINE_MEMBER(ti99_single_cart_conn_device::romgq_line)
+void ti99_single_cart_conn_device::romgq_line(int state)
 {
 	// Pass through
 	m_cartridge->romgq_line(state);
@@ -59,7 +59,7 @@ void ti99_single_cart_conn_device::set_gromlines(line_state mline, line_state mo
 }
 
 
-WRITE_LINE_MEMBER(ti99_single_cart_conn_device::gclock_in)
+void ti99_single_cart_conn_device::gclock_in(int state)
 {
 	// Pass through
 	m_cartridge->gclock_in(state);

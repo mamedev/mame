@@ -17,16 +17,32 @@
 #include "h8_intc.h"
 
 struct h8_dma_state {
-	uint32_t source, dest;
-	int32_t incs, incd;
-	uint32_t count;
-	int id;
-	bool autoreq; // activate by auto-request
-	bool suspended;
-	bool mode_16;
+	enum {
+		ACTIVE                 = 0x0001, // DMA is configured
+		SUSPENDED              = 0x0002, // DMA currently suspended until trigger happens
+		SUSPEND_AFTER_TRANSFER = 0x0004, // Auto-suspend DMA after each transfer
+		BLOCK                  = 0x0008, // FAE block mode (cleared on last block)
+		REPEAT                 = 0x0010, // SAE repeat mode
+		MODE_16                = 0x0020, // Transfer 16-bits values
+		EAT_INTERRUPT          = 0x0040, // Discard interrupt when used as trigger
+		TEND_INTERRUPT         = 0x0080, // Interrupt on end of transfer
+		SOURCE_DECREMENT       = 0x0100, // Decrement source instead of increment (folded into incs/incd)
+		DEST_DECREMENT         = 0x0200, // Decrement source instead of increment (folded into incs/incd)
+		SOURCE_IDLE            = 0x0400, // Don't increment/decrement source (folded into incs/incd)
+		DEST_IDLE              = 0x0800, // Don't increment/decrement destination (folded into incs/incd)
+		MAR_IS_DEST            = 0x1000, // MAR is destination in SAE (folded), destibation is the block in fae block
+		FAE                    = 0x2000, // FAE mode (for interrupt generation)
+	};
+
+	u32 m_source, m_dest;
+	s32 m_incs, m_incd;
+	u32 m_count, m_bcount;
+	u16 m_flags;
+	u8  m_id;
+	s8  m_trigger_vector;
 };
 
-class h8_dma_channel_device;
+class h8gen_dma_channel_device;
 
 enum {
 	// mind the order, all DREQ, TEND need to be sequential
@@ -41,128 +57,220 @@ enum {
 	H8_INPUT_LINE_TEND3,
 };
 
-class h8_dma_device : public device_t {
+class h8h_dma_device;
+class h8s_dma_device;
+
+DECLARE_DEVICE_TYPE(H8H_DMA,         h8h_dma_device)
+DECLARE_DEVICE_TYPE(H8S_DMA,         h8s_dma_device)
+
+class h8gen_dma_device : public device_t {
 public:
-	h8_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-
-	uint8_t dmawer_r();
-	void dmawer_w(uint8_t data);
-	uint8_t dmatcr_r();
-	void dmatcr_w(uint8_t data);
-	uint16_t dmabcr_r();
-	void dmabcr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
 	bool trigger_dma(int vector);
 	void count_last(int id);
 	void count_done(int id);
-	void clear_dte(int id);
 
 	void set_input(int inputnum, int state);
+	void start_stop_test();
 
 protected:
-	required_device<h8_dma_channel_device> dmach0, dmach1;
+	required_device<h8_device> m_cpu;
+	optional_device_array<h8gen_dma_channel_device, 4> m_dmach;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	bool dreq[2];
+	virtual u8 active_channels() const = 0;
 
-	uint8_t dmawer, dmatcr;
-	uint16_t dmabcr;
+	h8gen_dma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 };
 
-class h8_dma_channel_device : public device_t {
+class h8h_dma_device : public h8gen_dma_device
+{
+public:
+	h8h_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	template<typename T> h8h_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu)
+		: h8h_dma_device(mconfig, tag, owner)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu));
+	}
+
+	u8 active_channels() const override;
+};
+
+
+class h8s_dma_device : public h8gen_dma_device
+{
+public:
+	h8s_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	template<typename T> h8s_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu)
+		: h8s_dma_device(mconfig, tag, owner)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu));
+	}
+
+	u8 dmawer_r();
+	void dmawer_w(u8 data);
+	u8 dmatcr_r();
+	void dmatcr_w(u8 data);
+	u16 dmabcr_r();
+	void dmabcr_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	void channel_done(int id);
+	int channel_mode(int id, bool block) const;
+	std::tuple<bool, bool, bool> get_fae_dtie_dta(int id) const;
+
+protected:
+	u8 m_dmawer, m_dmatcr;
+	u16 m_dmabcr;
+
+	void device_start() override;
+	void device_reset() override;
+
+	u8 active_channels() const override;
+};
+
+
+
+
+class h8gen_dma_channel_device : public device_t {
 public:
 	enum {
-		NONE       = -1,
-		DREQ_LEVEL = -2,
-		DREQ_EDGE  = -3
+		NONE       =  0,
+		DREQ_LEVEL = -1,
+		DREQ_EDGE  = -2,
+		AUTOREQ_CS = -3,
+		AUTOREQ_B  = -4,
 	};
 
 	enum {
-		MODE8_MEM_MEM,
-		MODE8_DACK_MEM,
-		MODE8_MEM_DACK,
-		MODE16_MEM_MEM,
-		MODE16_DACK_MEM,
-		MODE16_MEM_DACK
+		FAE_NORMAL,
+		FAE_BLOCK,
+		SAE,
+		SAE_DACK,
 	};
 
-	h8_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner,
-			const char *intc, int irq_base, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8,
-			int v9 = h8_dma_channel_device::NONE,
-			int va = h8_dma_channel_device::NONE,
-			int vb = h8_dma_channel_device::NONE,
-			int vc = h8_dma_channel_device::NONE,
-			int vd = h8_dma_channel_device::NONE,
-			int ve = h8_dma_channel_device::NONE,
-			int vf = h8_dma_channel_device::NONE)
-		: h8_dma_channel_device(mconfig, tag, owner, 0)
-	{
-		set_info(intc, irq_base, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, va, vb, vc, vd, ve, vf);
-	}
-	void set_info(const char *intc, int irq_base, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8, int v9, int va, int vb, int vc, int vd, int ve, int vf);
+	h8_dma_state m_state[2];
 
-	uint16_t marah_r();
-	void marah_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t maral_r();
-	void maral_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t ioara_r();
-	uint8_t ioara8_r();
-	void ioara_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void ioara8_w(uint8_t data);
-	uint16_t etcra_r();
-	void etcra_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t marbh_r();
-	void marbh_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t marbl_r();
-	void marbl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t ioarb_r();
-	uint8_t ioarb8_r();
-	void ioarb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void ioarb8_w(uint8_t data);
-	uint16_t etcrb_r();
-	void etcrb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t dmacr_r();
-	void dmacr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	h8gen_dma_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// H8H DMA
-	uint8_t dtcra_r();
-	void dtcra_w(uint8_t data);
-	uint8_t dtcrb_r();
-	void dtcrb_w(uint8_t data);
+	u16 marah_r();
+	void marah_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 maral_r();
+	void maral_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 ioara_r();
+	u8 ioara8_r();
+	void ioara_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void ioara8_w(u8 data);
+	u16 etcra_r();
+	void etcra_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 marbh_r();
+	void marbh_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 marbl_r();
+	void marbl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 ioarb_r();
+	u8 ioarb8_r();
+	void ioarb_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void ioarb8_w(u8 data);
+	u16 etcrb_r();
+	void etcrb_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void set_id(int id);
-	void set_bcr(bool fae, bool sae, uint8_t dta, uint8_t dte, uint8_t dtie);
-	bool start_test(int vector);
-	void count_last(int submodule);
 	void count_done(int submodule);
+	void start_stop_test();
+	bool transfer_test_interrupt(int vector);
+	void set_dreq(int state);
+	void start(int submodule);
+
 protected:
-	required_device<h8_dma_device> dmac;
-	required_device<h8_device> cpu;
-	h8_intc_device *intc;
-	const char *intc_tag;
-	h8_dma_state state[2];
-	int irq_base;
+	required_device<h8_device> m_cpu;
+	required_device<h8_intc_device> m_intc;
+	int m_irq_base;
+	u32 m_ioar_mask; // ff0000 for h8s, ffff00 for h8h
 
-	int activation_vectors[16];
-
-	uint32_t mar[2];
-	uint16_t ioar[2], etcr[2], dmacr;
-	uint8_t dtcr[2]; // H8H
-	uint8_t dta, dte, dtie;
-	bool fae; // Full-Address Mode
-	bool sae; // Short-Address Mode
+	u32 m_mar[2];
+	u16 m_ioar[2], m_etcr[2];
+	bool m_dreq;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	void h8h_sync(); // call set_bcr with contents from DTCR
-	void start(int submodule);
+	virtual void dma_done(int subchannel);
+	virtual int channel_mode() const = 0;
+	virtual u16 channel_flags(int submodule) const = 0;
+	virtual s8 trigger_vector(int submodule) const = 0;
 };
 
-DECLARE_DEVICE_TYPE(H8_DMA,         h8_dma_device)
-DECLARE_DEVICE_TYPE(H8_DMA_CHANNEL, h8_dma_channel_device)
+class h8h_dma_channel_device : public h8gen_dma_channel_device
+{
+public:
+	h8h_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	template<typename T, typename U, typename V> h8h_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner,
+																		T &&cpu, U &&dma, V &&intc, bool has_adc, bool targets_sci1)
+		: h8h_dma_channel_device(mconfig, tag, owner)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu));
+		m_dma.set_tag(std::forward<U>(dma));
+		m_intc.set_tag(std::forward<V>(intc));
+		m_has_adc = has_adc;
+		m_targets_sci1 = targets_sci1;
+	}
+
+	u8 dtcra_r();
+	void dtcra_w(u8 data);
+	u8 dtcrb_r();
+	void dtcrb_w(u8 data);
+
+	u8 active_channels() const;
+
+protected:
+	required_device<h8h_dma_device> m_dma;
+	u8 m_dtcr[2];
+	bool m_has_adc;
+	bool m_targets_sci1;
+
+	void device_start() override;
+	void device_reset() override;
+	void dma_done(int subchannel) override;
+
+	int channel_mode() const override;
+	u16 channel_flags(int submodule) const override;
+	s8 trigger_vector(int submodule) const override;
+};
+
+class h8s_dma_channel_device : public h8gen_dma_channel_device
+{
+public:
+	h8s_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	template<typename T, typename U, typename V> h8s_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner,
+																		T &&cpu, U &&dma, V &&intc)
+		: h8s_dma_channel_device(mconfig, tag, owner)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu));
+		m_dma.set_tag(std::forward<U>(dma));
+		m_intc.set_tag(std::forward<V>(intc));
+	}
+
+	u16 dmacr_r();
+	void dmacr_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+protected:
+	u16 m_dmacr;
+
+	required_device<h8s_dma_device> m_dma;
+	void device_start() override;
+	void device_reset() override;
+	void dma_done(int subchannel) override;
+
+	int channel_mode() const override;
+	u16 channel_flags(int submodule) const override;
+	s8 trigger_vector(int submodule) const override;
+};
+
+DECLARE_DEVICE_TYPE(H8H_DMA_CHANNEL, h8h_dma_channel_device)
+DECLARE_DEVICE_TYPE(H8S_DMA_CHANNEL, h8s_dma_channel_device)
 
 #endif // MAME_CPU_H8_H8_DMA_H

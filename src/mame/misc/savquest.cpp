@@ -77,7 +77,7 @@
 #include "machine/idectrl.h"
 #include "machine/lpci.h"
 #include "machine/pckeybrd.h"
-#include "video/pc_vga.h"
+#include "video/pc_vga_s3.h"
 #include "video/voodoo_2.h"
 
 
@@ -143,7 +143,7 @@ private:
 	uint8_t parallel_port_r(offs_t offset);
 	void parallel_port_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
+	void vblank_assert(int state);
 
 	uint8_t smram_r(offs_t offset);
 	void smram_w(offs_t offset, uint8_t data);
@@ -833,7 +833,7 @@ void savquest_state::machine_reset()
 	m_haspstate = HASPSTATE_NONE;
 }
 
-WRITE_LINE_MEMBER(savquest_state::vblank_assert)
+void savquest_state::vblank_assert(int state)
 {
 }
 
@@ -871,7 +871,14 @@ void savquest_state::savquest(machine_config &config)
 	ISA16_SLOT(config, "isa1", 0, "isa", savquest_isa16_cards, "sb16", false);
 
 	/* video hardware */
-	pcvideo_s3_vga(config);
+	// TODO: map to ISA bus, make sure that the Voodoo can override s3 in screen update
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
+	screen.set_screen_update("vga", FUNC(s3_vga_device::screen_update));
+
+	s3_vga_device &vga(S3_VGA(config, "vga", 0));
+	vga.set_screen("screen");
+	vga.set_vram_size(0x100000);
 
 	VOODOO_2(config, m_voodoo, voodoo_2_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(4);
@@ -892,7 +899,7 @@ ROM_START( savquest )
 	ROM_REGION( 0x080, "rtc", 0 )    /* default NVRAM */
 	ROM_LOAD( "savquest_ds12885.bin", 0x0000, 0x080, BAD_DUMP CRC(e9270019) SHA1(4d900ca317d93c915c80a9053528b741746f08a1) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "savquest", 0, SHA1(b7c8901172b66706a7ab5f5c91e6912855153fa9) )
 ROM_END
 

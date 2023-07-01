@@ -63,7 +63,7 @@ public:
 	virtual char *gets(char *s, int n) override { return m_file.gets(s, n); }
 
 	virtual int puts(std::string_view s) override { return m_file.puts(s); }
-	virtual int vprintf(util::format_argument_pack<std::ostream> const &args) override { return m_file.vprintf(args); }
+	virtual int vprintf(util::format_argument_pack<char> const &args) override { return m_file.vprintf(args); }
 	virtual std::error_condition truncate(std::uint64_t offset) override { return m_file.truncate(offset); }
 
 private:
@@ -88,7 +88,7 @@ public:
 	virtual int ungetc(int c) override;
 	virtual char *gets(char *s, int n) override;
 	virtual int puts(std::string_view s) override;
-	virtual int vprintf(util::format_argument_pack<std::ostream> const &args) override;
+	virtual int vprintf(util::format_argument_pack<char> const &args) override;
 
 protected:
 	core_text_file(std::uint32_t openflags)
@@ -534,12 +534,12 @@ int core_text_file::puts(std::string_view s)
 //  vprintf - vfprintf to a text file
 //-------------------------------------------------
 
-int core_text_file::vprintf(util::format_argument_pack<std::ostream> const &args)
+int core_text_file::vprintf(util::format_argument_pack<char> const &args)
 {
 	m_printf_buffer.clear();
 	m_printf_buffer.reserve(1024);
 	m_printf_buffer.seekp(0, ovectorstream::beg);
-	util::stream_format<std::ostream, std::ostream>(m_printf_buffer, args);
+	util::stream_format(m_printf_buffer, args);
 	return puts(buf_to_string_view(m_printf_buffer));
 }
 

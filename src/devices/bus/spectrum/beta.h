@@ -48,7 +48,7 @@ protected:
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
+	virtual int romcs() override;
 
 	// passthru
 	virtual void post_opcode_fetch(offs_t offset) override { m_exp->post_opcode_fetch(offset); }
@@ -154,7 +154,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual DECLARE_READ_LINE_MEMBER(romcs) override { return 1; }
+	virtual int romcs() override { return 1; }
 
 	required_device<i8255_device> m_ppi;
 	required_device<acia6850_device> m_acia;

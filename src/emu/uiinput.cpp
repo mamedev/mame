@@ -254,7 +254,7 @@ bool ui_input_manager::pressed_repeat(int code, int speed)
 {
 	bool pressed;
 
-g_profiler.start(PROFILER_INPUT);
+	auto profile = g_profiler.start(PROFILER_INPUT);
 
 	/* get the status of this key (assumed to be only in the defaults) */
 	assert(code > IPT_UI_FIRST && code < IPT_UI_LAST);
@@ -288,8 +288,6 @@ g_profiler.start(PROFILER_INPUT);
 	/* if we're not pressed, reset the memory field */
 	else
 		m_next_repeat[code] = 0;
-
-g_profiler.stop();
 
 	return pressed;
 }

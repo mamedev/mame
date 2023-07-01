@@ -47,15 +47,15 @@ public:
 	void scsp_irq(offs_t offset, uint8_t data);
 
 	// SMPC HLE delegates
-	DECLARE_WRITE_LINE_MEMBER(master_sh2_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(master_sh2_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(slave_sh2_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_68k_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(system_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(system_halt_w);
-	DECLARE_WRITE_LINE_MEMBER(dot_select_w);
+	void master_sh2_reset_w(int state);
+	void master_sh2_nmi_w(int state);
+	void slave_sh2_reset_w(int state);
+	void sound_68k_reset_w(int state);
+	void system_reset_w(int state);
+	void system_halt_w(int state);
+	void dot_select_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
+	void m68k_reset_callback(int state);
 
 protected:
 	required_region_ptr<uint32_t> m_rom;
@@ -436,7 +436,7 @@ protected:
 
 	} stv_rbg_cache_data;
 
-//  DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
+//  void scudsp_end_w(int state);
 //  uint16_t scudsp_dma_r(offs_t offset);
 //  void scudsp_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 };

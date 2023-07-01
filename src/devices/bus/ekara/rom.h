@@ -122,9 +122,9 @@ protected:
 	bool is_write_access_not_rom(void) override;
 	uint8_t read_extra(offs_t offset) override;
 	void write_extra(offs_t offset, uint8_t data) override;
-	DECLARE_WRITE_LINE_MEMBER(write_sda) override;
-	DECLARE_WRITE_LINE_MEMBER(write_scl) override;
-	DECLARE_READ_LINE_MEMBER(read_sda ) override;
+	void write_sda(int state) override;
+	void write_scl(int state) override;
+	int read_sda() override;
 };
 
 class ekara_rom_i2c_24lc08_evio_device : public ekara_rom_i2c_24lc02_gc0010_device

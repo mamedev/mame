@@ -10,7 +10,7 @@
         · Dell Optiplex 390.
         · Dell Optiplex 580.
         · Microtel w/ASRock N68C-GS FX AM3+ motherboard.
-    - Video GeForce GT730.
+    - Video GeForce GT730 (GF108).
       * Other supported setups are:
         · nVidia 8400GS (256MB+).
         · nVidia 7300GS.
@@ -82,7 +82,7 @@ void rawthrillspc_state::rawthrillspc(machine_config &config)
 ROM_START( guitarheroac )
 	OPTIPLEX740_BIOS
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "slax105", 0, NO_DUMP )
 
 	// Recovery DVD
@@ -94,13 +94,13 @@ ROM_END
  Two I/O boards on "The Fast and The Furious":
    1. With Xilinx XC95144XL (labeled "FAST & FURIOUS U4 REV 1.0 (c)2004 RightHand Tech, Inc"),
        ST72F63BK4M1 (labeled "U6 FAST&FURIOUS Release 3 3311h (c)2004 RightHand Tech, Inc") and a bank of 8 dipswitches.
-   2- With Xilinx XC9536XL (labeled "r1.0 (c)2004 RightHand Tech, Inc")
+   2. With Xilinx XC9536XL (labeled "r1.0 (c)2004 RightHand Tech, Inc")
  Parallel port HASP4 1.5 dongle (MCU Marvin2)
 */
 ROM_START( fnf )
 	OPTIPLEX740_BIOS
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	/* Clean image created from the recovery CDs on the original machine.
 	   After installing the software from the discs, the PC reboots several times for configurating
 	   the hardware devices and peripherals, and then asks for controllers calibration.
@@ -117,7 +117,35 @@ ROM_START( fnf )
 	DISK_IMAGE_READONLY( "faf3.06d2", 0, SHA1(183664482f6665adffc74d69e28338da740443c5) )
 ROM_END
 
+/*
+ Doodle Jump Arcade, by default, uses a different PC than other Raw Thrills games:
+   -HP/Compaq Presario VS459AA-ABE CQ5211ES with an Asus M2N68-LA "Narra 3" motherboard (Socket AM3, nForce-based, nVidia MCP61P chipset)
+     * Fintek F8000 + Realtek RTL8201EL + Realtek ALC662 + nVidia NF-6100-430-N-A3 + ST L6740L.
+   -CPU Athlon II CPU (ADX2400CK23GQ).
+   -2GB RAM (single SIMM, PC3-12800) [HP P/N 655409-150].
+   -nVidia Club3D CGNX-G942LI.
+ The game runs over Linux CentOS.
+ I/O board with ICE P/N X2034X, silkscreened as "500-00040-01" and with a CPLD labeled as "RIO v0x5016 Copyright 2010 Raw Thrills Inc".
+ HASP USB security dongle.
+*/
+ROM_START( doodlejmp )
+	ROM_REGION32_LE( 0x100000, "bios", 0 )
+	ROM_SYSTEM_BIOS( 0, "0515", "Compaq 5.15 (11/06/2009)" )
+	ROMX_LOAD( "w25x80a.bin", 0x000000, 0x100000, CRC(e91538ee) SHA1(32add79eba2049205a98fc4e854976e11d102a4c), ROM_BIOS(0) )
+
+	DISK_REGION( "ide:0:hdd" )
+	DISK_IMAGE( "doodlejmp", 0, NO_DUMP )
+
+	/* Recovery DVD:
+	      -Doodle Jump 1.16
+	      -OS 00.07
+	      -8-Feb-2013 */
+	DISK_REGION( "recovery116" )
+	DISK_IMAGE_READONLY( "doodlejump_recover_dvd_1_16", 0, SHA1(67f2bc3d9d71fc924f8f784e62eaf3dd39c88f45) )
+ROM_END
+
 } // Anonymous namespace
 
+GAME(2013, doodlejmp,    0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "ICE / Raw Thrills (Lima Sky license)",      "Doodle Jump Arcade (v1.16)",       MACHINE_IS_SKELETON)
 GAME(2004, fnf,          0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills",                                "The Fast And The Furious (v3.06)", MACHINE_IS_SKELETON)
-GAME(2008, guitarheroac, 0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills (Activision / Konami licensed)", "Guitar Hero Arcade (v1.0.5)",      MACHINE_IS_SKELETON)
+GAME(2008, guitarheroac, 0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills (Activision / Konami license)", "Guitar Hero Arcade (v1.0.5)",      MACHINE_IS_SKELETON)

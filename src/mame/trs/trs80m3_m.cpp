@@ -473,7 +473,7 @@ INTERRUPT_GEN_MEMBER(trs80m3_state::rtc_interrupt)
 }
 
 // The floppy sector has been read. Enable CPU and NMI.
-WRITE_LINE_MEMBER(trs80m3_state::intrq_w)
+void trs80m3_state::intrq_w(int state)
 {
 	m_intrq_off = state ? false : true;
 	if (state)
@@ -490,7 +490,7 @@ WRITE_LINE_MEMBER(trs80m3_state::intrq_w)
 }
 
 // The next byte from floppy is available. Enable CPU so it can get the byte.
-WRITE_LINE_MEMBER(trs80m3_state::drq_w)
+void trs80m3_state::drq_w(int state)
 {
 	m_drq_off = state ? false : true;
 	if (state)
@@ -675,12 +675,12 @@ QUICKLOAD_LOAD_MEMBER(trs80m3_state::quickload_cb)
 
 	while (!image.image_feof())
 	{
-		image.fread( &type, 1);
-		image.fread( &length, 1);
+		image.fread(&type, 1);
+		image.fread(&length, 1);
 
 		switch (type)
 		{
-			case CMD_TYPE_OBJECT_CODE:  // 01 - block of data
+		case CMD_TYPE_OBJECT_CODE:  // 01 - block of data
 			{
 				length -= 2;
 				u16 block_length = length ? length : 256;
@@ -690,21 +690,22 @@ QUICKLOAD_LOAD_MEMBER(trs80m3_state::quickload_cb)
 				ptr = program.get_write_ptr(address);
 				if (!ptr)
 				{
-					image.message("Attempting to write outside of RAM");
-					return image_init_result::FAIL;
+					return std::make_pair(
+							image_error::INVALIDIMAGE,
+							util::string_format("Object code block at address %04x is outside RAM", address));
 				}
-				image.fread( ptr, block_length);
+				image.fread(ptr, block_length);
 			}
 			break;
 
-			case CMD_TYPE_TRANSFER_ADDRESS: // 02 - go address
+		case CMD_TYPE_TRANSFER_ADDRESS: // 02 - go address
 			{
 				image.fread( &addr, 2);
 				u16 address = (addr[1] << 8) | addr[0];
 				if (LOG) logerror("/CMD transfer address %04x\n", address);
 				m_maincpu->set_state_int(Z80_PC, address);
 			}
-			return image_init_result::PASS;
+			return std::make_pair(std::error_condition(), std::string());
 
 		case CMD_TYPE_LOAD_MODULE_HEADER: // 05 - name
 			image.fread( &data, length);
@@ -717,12 +718,13 @@ QUICKLOAD_LOAD_MEMBER(trs80m3_state::quickload_cb)
 			break;
 
 		default:
-			image.fread( &data, length);
+			image.fread(&data, length);
 			logerror("/CMD unsupported block type %u!\n", type);
-			image.message("Unsupported or invalid block type");
-			return image_init_result::FAIL;
+			return std::make_pair(
+					image_error::INVALIDIMAGE,
+					util::string_format("Unsupported or invalid block type %u", type));
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }

@@ -20,20 +20,19 @@
 
  ***********************************************************************************************************/
 
-
 #include "emu.h"
 #include "taito.h"
 
 #include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
 
+#define LOG_UNHANDLED (1U << 1)
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_UNHANDLED | LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (LOG_UNHANDLED)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-------------------------------------------------
@@ -174,7 +173,7 @@ void nes_x1_017_device::pcb_reset()
 
 void nes_tc0190fmc_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("tc0190fmc write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("tc0190fmc write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x6003)
 	{
@@ -234,7 +233,7 @@ void nes_tc0190fmc_pal16r4_device::hblank_irq(int scanline, bool vblank, bool bl
 
 void nes_tc0190fmc_pal16r4_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("tc0190fmc pal16r4 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("tc0190fmc pal16r4 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x6003)
 	{
@@ -282,7 +281,7 @@ void nes_tc0190fmc_pal16r4_device::write_h(offs_t offset, u8 data)
 
 void nes_x1_005_device::write_m(offs_t offset, u8 data)
 {
-	LOG_MMC(("x1_005 write_m, offset: %04x, data: %02x\n", offset, data));
+	LOG("x1_005 write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if ((offset & 0x1f70) == 0x1e70) // A7 is not connected
 	{
@@ -328,12 +327,12 @@ void nes_x1_005_device::write_m(offs_t offset, u8 data)
 	else if (offset >= 0x1f00 && m_latch == 0xa3)
 		m_x1_005_ram[offset & 0x7f] = data;
 	else
-		logerror("Taito X1-005 uncaught addr: %04x, value: %02x\n", offset + 0x6000, data);
+		LOGMASKED(LOG_UNHANDLED, "Taito X1-005 uncaught addr: %04x, value: %02x\n", offset + 0x6000, data);
 }
 
 u8 nes_x1_005_device::read_m(offs_t offset)
 {
-	LOG_MMC(("x1_005 read_m, offset: %04x\n", offset));
+	LOG("x1_005 read_m, offset: %04x\n", offset);
 
 	if (offset >= 0x1f00 && m_latch == 0xa3)
 		return m_x1_005_ram[offset & 0x7f];
@@ -379,7 +378,7 @@ void nes_x1_017_device::set_chr()
 
 void nes_x1_017_device::write_m(offs_t offset, u8 data)
 {
-	LOG_MMC(("x1017 write_m, offset: %04x, data: %02x\n", offset, data));
+	LOG("x1017 write_m, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset)
 	{
@@ -437,7 +436,7 @@ void nes_x1_017_device::write_m(offs_t offset, u8 data)
 
 u8 nes_x1_017_device::read_m(offs_t offset)
 {
-	LOG_MMC(("x1017 read_m, offset: %04x\n", offset));
+	LOG("x1017 read_m, offset: %04x\n", offset);
 
 	// 2+2+1 KB of Internal RAM can be independently enabled/disabled!
 	if ((offset < 0x0800 && m_reg[0] == 0xca) ||

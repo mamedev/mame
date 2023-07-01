@@ -52,7 +52,7 @@ protected:
 	virtual uint8_t nrdi_r(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
 	virtual void nwri_w(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
 
-	virtual WRITE_LINE_MEMBER( iint_w ) override { m_exp->iint_w(state); }
+	virtual void iint_w(int state) override { m_exp->iint_w(state); }
 
 private:
 	required_device<portfolio_memory_card_slot_device> m_ccm;

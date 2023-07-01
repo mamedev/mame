@@ -81,7 +81,7 @@ public:
 	void wfc_w(offs_t offset, u8 data);
 	u8 wfc_r(offs_t offset);
 	void wfc_command(u8 command);
-	int get_lbasector(hard_disk_file *hdf);
+	int get_lbasector(harddisk_image_device *hdf);
 
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_x);
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_y);
@@ -100,7 +100,7 @@ protected:
 
 	required_device<wd2797_device> m_fdc;
 	optional_device_array<floppy_image_device, 4> m_fdd;
-	optional_device_array<harddisk_image_device, 3> m_hdd;
+	required_device_array<harddisk_image_device, 3> m_hdd;
 
 	required_device<screen_device> m_screen;
 	required_shared_ptr<u32> m_vram;
@@ -191,7 +191,10 @@ void ceres1_state::wfc_command(u8 command)
 	m_wfc_status &= ~WFC_S_ERR;
 	m_wfc_error = 0;
 
-	hard_disk_file *hdf = m_hdd[(m_wfc_sdh >> 3) & 3]->get_hard_disk_file();
+	if (((m_wfc_sdh >> 3) & 3) == 3)
+		return;
+
+	harddisk_image_device *hdf = m_hdd[(m_wfc_sdh >> 3) & 3];
 
 	switch (command >> 4)
 	{
@@ -201,14 +204,14 @@ void ceres1_state::wfc_command(u8 command)
 	case 2:
 		LOG("read sector drive %d chs %d,%d,%d count %d\n",
 			(m_wfc_sdh >> 3) & 3, m_wfc_cylinder & 0x3ff, (m_wfc_sdh >> 0) & 7, m_wfc_sector, m_wfc_count);
-		if (hdf)
+		if (hdf->exists())
 			hdf->read(get_lbasector(hdf), m_wfc_sram);
 		m_wfc_offset = 0;
 		break;
 	case 3:
 		LOG("write sector drive %d chs %d,%d,%d count %d\n",
 			(m_wfc_sdh >> 3) & 3, m_wfc_cylinder & 0x3ff, (m_wfc_sdh >> 0) & 7, m_wfc_sector, m_wfc_count);
-		if (hdf)
+		if (hdf->exists())
 			hdf->write(get_lbasector(hdf), m_wfc_sram);
 		m_wfc_offset = 0;
 		break;
@@ -227,7 +230,7 @@ void ceres1_state::wfc_command(u8 command)
 	m_icu->ireq3_w(1);
 }
 
-int ceres1_state::get_lbasector(hard_disk_file *hdf)
+int ceres1_state::get_lbasector(harddisk_image_device *hdf)
 {
 	const auto &info = hdf->get_info();
 

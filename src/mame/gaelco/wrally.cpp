@@ -167,7 +167,7 @@ public:
 
 	void wrally(machine_config &config);
 
-	template <int N> DECLARE_READ_LINE_MEMBER(analog_bit_r);
+	template <int N> int analog_bit_r();
 
 protected:
 	virtual void machine_start() override;
@@ -177,13 +177,13 @@ private:
 	uint8_t shareram_r(offs_t offset);
 	void shareram_w(offs_t offset, uint8_t data);
 	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	void flipscreen_w(int state);
 	void okim6295_bankswitch_w(uint8_t data);
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
+	template <uint8_t Which> void coin_counter_w(int state);
+	template <uint8_t Which> void coin_lockout_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(adc_clk);
-	DECLARE_WRITE_LINE_MEMBER(adc_en);
+	void adc_clk(int state);
+	void adc_en(int state);
 
 	template <int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -342,7 +342,7 @@ void wrally_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_tilemap[(offset & 0x1fff) >> 12]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
 }
 
-WRITE_LINE_MEMBER(wrally_state::flipscreen_w)
+void wrally_state::flipscreen_w(int state)
 {
 	flip_screen_set(state);
 }
@@ -353,25 +353,25 @@ void wrally_state::okim6295_bankswitch_w(uint8_t data)
 }
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(wrally_state::coin_counter_w)
+void wrally_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);
 }
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(wrally_state::coin_lockout_w)
+void wrally_state::coin_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(Which, !state);
 }
 
 // the following methods have been pilfered from gaelco2.cpp (wrally2). They seem to work fine for wrally, too
 template <int N>
-READ_LINE_MEMBER(wrally_state::analog_bit_r)
+int wrally_state::analog_bit_r()
 {
 	return (m_analog_ports[N] >> 7) & 0x01;
 }
 
-WRITE_LINE_MEMBER(wrally_state::adc_clk)
+void wrally_state::adc_clk(int state)
 {
 	// a zero/one combo is written here to clock the next analog port bit
 	if (!state)
@@ -381,7 +381,7 @@ WRITE_LINE_MEMBER(wrally_state::adc_clk)
 	}
 }
 
-WRITE_LINE_MEMBER(wrally_state::adc_en)
+void wrally_state::adc_en(int state)
 {
 	// a zero is written here to read the analog ports, and a one is written when finished
 	if (!state)

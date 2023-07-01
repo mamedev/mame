@@ -29,13 +29,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -100,7 +100,7 @@ typedef struct PaVersionInfo {
     /** Version as a string, for example "PortAudio V19.5.0-devel, revision 1952M" */
     const char *versionText;
 } PaVersionInfo;
-    
+
 /** Retrieve version information for the currently running PortAudio build.
  @return A pointer to an immutable PaVersionInfo structure.
 
@@ -111,7 +111,7 @@ typedef struct PaVersionInfo {
  @see PaVersionInfo, paMakeVersionNumber
  @version Available as of 19.5.0.
 */
-const PaVersionInfo* Pa_GetVersionInfo();
+const PaVersionInfo* Pa_GetVersionInfo( void );
 
 
 /** Error codes returned by PortAudio functions.
@@ -167,9 +167,9 @@ const char *Pa_GetErrorText( PaError errorCode );
  and Pa_GetErrorText(), this function MUST be called before using any other
  PortAudio API functions.
 
- If Pa_Initialize() is called multiple times, each successful 
- call must be matched with a corresponding call to Pa_Terminate(). 
- Pairs of calls to Pa_Initialize()/Pa_Terminate() may overlap, and are not 
+ If Pa_Initialize() is called multiple times, each successful
+ call must be matched with a corresponding call to Pa_Terminate().
+ Pairs of calls to Pa_Initialize()/Pa_Terminate() may overlap, and are not
  required to be fully nested.
 
  Note that if Pa_Initialize() returns an error code, Pa_Terminate() should
@@ -196,7 +196,7 @@ PaError Pa_Initialize( void );
 
  @return paNoError if successful, otherwise an error code indicating the cause
  of failure.
- 
+
  @see Pa_Initialize
 */
 PaError Pa_Terminate( void );
@@ -287,7 +287,8 @@ typedef enum PaHostApiTypeId
     paWDMKS=11,
     paJACK=12,
     paWASAPI=13,
-    paAudioScienceHPI=14
+    paAudioScienceHPI=14,
+    paAudioIO=15
 } PaHostApiTypeId;
 
 
@@ -320,7 +321,7 @@ typedef struct PaHostApiInfo
      if no default output device is available.
     */
     PaDeviceIndex defaultOutputDevice;
-    
+
 } PaHostApiInfo;
 
 
@@ -349,7 +350,7 @@ const PaHostApiInfo * Pa_GetHostApiInfo( PaHostApiIndex hostApi );
  @return A valid PaHostApiIndex ranging from 0 to (Pa_GetHostApiCount()-1) or,
  a PaErrorCode (which are always negative) if PortAudio is not initialized
  or an error is encountered.
- 
+
  The paHostApiNotFound error code indicates that the host API specified by the
  type parameter is not available.
 
@@ -376,7 +377,7 @@ PaHostApiIndex Pa_HostApiTypeIdToHostApiIndex( PaHostApiTypeId type );
 
  A paInvalidDevice error code indicates that the hostApiDeviceIndex parameter
  is out of range.
- 
+
  @see PaHostApiInfo
 */
 PaDeviceIndex Pa_HostApiDeviceIndexToDeviceIndex( PaHostApiIndex hostApi,
@@ -449,12 +450,12 @@ PaDeviceIndex Pa_GetDefaultInputDevice( void );
 PaDeviceIndex Pa_GetDefaultOutputDevice( void );
 
 
-/** The type used to represent monotonic time in seconds. PaTime is 
- used for the fields of the PaStreamCallbackTimeInfo argument to the 
+/** The type used to represent monotonic time in seconds. PaTime is
+ used for the fields of the PaStreamCallbackTimeInfo argument to the
  PaStreamCallback and as the result of Pa_GetStreamTime().
 
  PaTime values have unspecified origin.
-     
+
  @see PaStreamCallback, PaStreamCallbackTimeInfo, Pa_GetStreamTime
 */
 typedef double PaTime;
@@ -472,7 +473,7 @@ typedef double PaTime;
 
  paUInt8 is an unsigned 8 bit format where 128 is considered "ground"
 
- The paNonInterleaved flag indicates that audio data is passed as an array 
+ The paNonInterleaved flag indicates that audio data is passed as an array
  of pointers to separate buffers, one buffer for each channel. Usually,
  when this flag is not used, audio data is passed as a single buffer with
  all channels interleaved.
@@ -502,7 +503,7 @@ typedef struct PaDeviceInfo
     int structVersion;  /* this is struct version 2 */
     const char *name;
     PaHostApiIndex hostApi; /**< note this is a host API index, not a type id*/
-    
+
     int maxInputChannels;
     int maxOutputChannels;
 
@@ -544,7 +545,7 @@ typedef struct PaStreamParameters
      This field must not be set to paNoDevice.
     */
     PaDeviceIndex device;
-    
+
     /** The number of channels of sound to be delivered to the
      stream callback or accessed by Pa_ReadStream() or Pa_WriteStream().
      It can range from 1 to the value of maxInputChannels in the
@@ -619,9 +620,9 @@ PaError Pa_IsFormatSupported( const PaStreamParameters *inputParameters,
  A single PaStream can provide multiple channels of real-time
  streaming audio input and output to a client application. A stream
  provides access to audio hardware represented by one or more
- PaDevices. Depending on the underlying Host API, it may be possible 
- to open multiple streams using the same device, however this behavior 
- is implementation defined. Portable applications should assume that 
+ PaDevices. Depending on the underlying Host API, it may be possible
+ to open multiple streams using the same device, however this behavior
+ is implementation defined. Portable applications should assume that
  a PaDevice may be simultaneously used by at most one PaStream.
 
  Pointers to PaStream objects are passed between PortAudio functions that
@@ -679,7 +680,7 @@ typedef unsigned long PaStreamFlags;
 /** Call the stream callback to fill initial output buffers, rather than the
  default behavior of priming the buffers with zeros (silence). This flag has
  no effect for input-only and blocking read/write streams.
- 
+
  @see PaStreamFlags
 */
 #define   paPrimeOutputBuffersUsingStreamCallback ((PaStreamFlags) 0x00000008)
@@ -693,7 +694,7 @@ typedef unsigned long PaStreamFlags;
  Timing information for the buffers passed to the stream callback.
 
  Time values are expressed in seconds and are synchronised with the time base used by Pa_GetStreamTime() for the associated stream.
- 
+
  @see PaStreamCallback, Pa_GetStreamTime
 */
 typedef struct PaStreamCallbackTimeInfo{
@@ -764,41 +765,41 @@ typedef enum PaStreamCallbackResult
  active PortAudio stream.
 
  When a stream is running, PortAudio calls the stream callback periodically.
- The callback function is responsible for processing buffers of audio samples 
+ The callback function is responsible for processing buffers of audio samples
  passed via the input and output parameters.
 
  The PortAudio stream callback runs at very high or real-time priority.
- It is required to consistently meet its time deadlines. Do not allocate 
- memory, access the file system, call library functions or call other functions 
+ It is required to consistently meet its time deadlines. Do not allocate
+ memory, access the file system, call library functions or call other functions
  from the stream callback that may block or take an unpredictable amount of
  time to complete.
 
  In order for a stream to maintain glitch-free operation the callback
  must consume and return audio data faster than it is recorded and/or
- played. PortAudio anticipates that each callback invocation may execute for 
- a duration approaching the duration of frameCount audio frames at the stream 
+ played. PortAudio anticipates that each callback invocation may execute for
+ a duration approaching the duration of frameCount audio frames at the stream
  sample rate. It is reasonable to expect to be able to utilise 70% or more of
- the available CPU time in the PortAudio callback. However, due to buffer size 
- adaption and other factors, not all host APIs are able to guarantee audio 
- stability under heavy CPU load with arbitrary fixed callback buffer sizes. 
- When high callback CPU utilisation is required the most robust behavior 
- can be achieved by using paFramesPerBufferUnspecified as the 
+ the available CPU time in the PortAudio callback. However, due to buffer size
+ adaption and other factors, not all host APIs are able to guarantee audio
+ stability under heavy CPU load with arbitrary fixed callback buffer sizes.
+ When high callback CPU utilisation is required the most robust behavior
+ can be achieved by using paFramesPerBufferUnspecified as the
  Pa_OpenStream() framesPerBuffer parameter.
-     
+
  @param input and @param output are either arrays of interleaved samples or;
- if non-interleaved samples were requested using the paNonInterleaved sample 
- format flag, an array of buffer pointers, one non-interleaved buffer for 
+ if non-interleaved samples were requested using the paNonInterleaved sample
+ format flag, an array of buffer pointers, one non-interleaved buffer for
  each channel.
 
  The format, packing and number of channels used by the buffers are
  determined by parameters to Pa_OpenStream().
-     
+
  @param frameCount The number of sample frames to be processed by
  the stream callback.
 
  @param timeInfo Timestamps indicating the ADC capture time of the first sample
  in the input buffer, the DAC output time of the first sample in the output buffer
- and the time the callback was invoked. 
+ and the time the callback was invoked.
  See PaStreamCallbackTimeInfo and Pa_GetStreamTime()
 
  @param statusFlags Flags indicating whether input and/or output buffers
@@ -836,10 +837,10 @@ typedef int PaStreamCallback(
 
 
 /** Opens a stream for either input, output or both.
-     
+
  @param stream The address of a PaStream pointer which will receive
  a pointer to the newly opened stream.
-     
+
  @param inputParameters A structure that describes the input parameters used by
  the opened stream. See PaStreamParameters for a description of these parameters.
  inputParameters must be NULL for output-only streams.
@@ -847,10 +848,13 @@ typedef int PaStreamCallback(
  @param outputParameters A structure that describes the output parameters used by
  the opened stream. See PaStreamParameters for a description of these parameters.
  outputParameters must be NULL for input-only streams.
- 
+
  @param sampleRate The desired sampleRate. For full-duplex streams it is the
- sample rate for both input and output
-     
+ sample rate for both input and output. Note that the actual sampleRate
+ may differ very slightly from the desired rate because of hardware limitations.
+ The exact rate can be queried using Pa_GetStreamInfo(). If nothing close
+ to the desired sampleRate is available then the open will fail and return an error.
+
  @param framesPerBuffer The number of frames passed to the stream callback
  function, or the preferred block granularity for a blocking read/write stream.
  The special value paFramesPerBufferUnspecified (0) may be used to request that
@@ -862,11 +866,11 @@ typedef int PaStreamCallback(
  will be kept to the theoretical minimum however, it is strongly recommended
  that a non-zero framesPerBuffer value only be used when your algorithm
  requires a fixed number of frames per stream callback.
- 
+
  @param streamFlags Flags which modify the behavior of the streaming process.
  This parameter may contain a combination of flags ORed together. Some flags may
  only be relevant to certain buffer formats.
-     
+
  @param streamCallback A pointer to a client supplied function that is responsible
  for processing and filling input and output buffers. If this parameter is NULL
  the stream will be opened in 'blocking read/write' mode. In blocking mode,
@@ -879,7 +883,7 @@ typedef int PaStreamCallback(
  function. It could for example, contain a pointer to instance data necessary
  for processing the audio buffers. This parameter is ignored if streamCallback
  is NULL.
-     
+
  @return
  Upon success Pa_OpenStream() returns paNoError and places a pointer to a
  valid PaStream in the stream argument. The stream is inactive (stopped).
@@ -904,7 +908,7 @@ PaError Pa_OpenStream( PaStream** stream,
 
  @param stream The address of a PaStream pointer which will receive
  a pointer to the newly opened stream.
- 
+
  @param numInputChannels  The number of channels of sound that will be supplied
  to the stream callback or returned by Pa_ReadStream. It can range from 1 to
  the value of maxInputChannels in the PaDeviceInfo record for the default input
@@ -913,13 +917,13 @@ PaError Pa_OpenStream( PaStream** stream,
  @param numOutputChannels The number of channels of sound to be delivered to the
  stream callback or passed to Pa_WriteStream. It can range from 1 to the value
  of maxOutputChannels in the PaDeviceInfo record for the default output device.
- If 0 the stream is opened as an output-only stream.
+ If 0 the stream is opened as an input-only stream.
 
  @param sampleFormat The sample format of both the input and output buffers
  provided to the callback or passed to and from Pa_ReadStream and Pa_WriteStream.
  sampleFormat may be any of the formats described by the PaSampleFormat
  enumeration.
- 
+
  @param sampleRate Same as Pa_OpenStream parameter of the same name.
  @param framesPerBuffer Same as Pa_OpenStream parameter of the same name.
  @param streamCallback Same as Pa_OpenStream parameter of the same name.
@@ -945,7 +949,7 @@ PaError Pa_OpenDefaultStream( PaStream** stream,
 PaError Pa_CloseStream( PaStream *stream );
 
 
-/** Functions of type PaStreamFinishedCallback are implemented by PortAudio 
+/** Functions of type PaStreamFinishedCallback are implemented by PortAudio
  clients. They can be registered with a stream using the Pa_SetStreamFinishedCallback
  function. Once registered they are called when the stream becomes inactive
  (ie once a call to Pa_StopStream() will not block).
@@ -954,7 +958,7 @@ PaError Pa_CloseStream( PaStream *stream );
  output, if the stream callback returns paComplete, or Pa_StopStream() is called,
  the stream finished callback will not be called until all generated sample data
  has been played.
- 
+
  @param userData The userData parameter supplied to Pa_OpenStream()
 
  @see Pa_SetStreamFinishedCallback
@@ -962,12 +966,12 @@ PaError Pa_CloseStream( PaStream *stream );
 typedef void PaStreamFinishedCallback( void *userData );
 
 
-/** Register a stream finished callback function which will be called when the 
- stream becomes inactive. See the description of PaStreamFinishedCallback for 
+/** Register a stream finished callback function which will be called when the
+ stream becomes inactive. See the description of PaStreamFinishedCallback for
  further details about when the callback will be called.
 
  @param stream a pointer to a PaStream that is in the stopped state - if the
- stream is not stopped, the stream's finished callback will remain unchanged 
+ stream is not stopped, the stream's finished callback will remain unchanged
  and an error code will be returned.
 
  @param streamFinishedCallback a pointer to a function with the same signature
@@ -980,7 +984,7 @@ typedef void PaStreamFinishedCallback( void *userData );
 
  @see PaStreamFinishedCallback
 */
-PaError Pa_SetStreamFinishedCallback( PaStream *stream, PaStreamFinishedCallback* streamFinishedCallback ); 
+PaError Pa_SetStreamFinishedCallback( PaStream *stream, PaStreamFinishedCallback* streamFinishedCallback );
 
 
 /** Commences audio processing.
@@ -1065,7 +1069,7 @@ typedef struct PaStreamInfo
      parameter passed to Pa_OpenStream().
     */
     double sampleRate;
-    
+
 } PaStreamInfo;
 
 
@@ -1087,15 +1091,15 @@ const PaStreamInfo* Pa_GetStreamInfo( PaStream *stream );
 
 /** Returns the current time in seconds for a stream according to the same clock used
  to generate callback PaStreamCallbackTimeInfo timestamps. The time values are
- monotonically increasing and have unspecified origin. 
- 
+ monotonically increasing and have unspecified origin.
+
  Pa_GetStreamTime returns valid time values for the entire life of the stream,
  from when the stream is opened until it is closed. Starting and stopping the stream
  does not affect the passage of time returned by Pa_GetStreamTime.
 
- This time may be used for synchronizing other events to the audio stream, for 
+ This time may be used for synchronizing other events to the audio stream, for
  example synchronizing audio to MIDI.
-                                        
+
  @return The stream's current time in seconds, or 0 if an error occurred.
 
  @see PaTime, PaStreamCallback, PaStreamCallbackTimeInfo
@@ -1110,7 +1114,7 @@ PaTime Pa_GetStreamTime( PaStream *stream );
 
  This function may be called from the stream callback function or the
  application.
-     
+
  @return
  A floating point value, typically between 0.0 and 1.0, where 1.0 indicates
  that the stream callback is consuming the maximum number of CPU cycles possible
@@ -1126,13 +1130,17 @@ double Pa_GetStreamCpuLoad( PaStream* stream );
  the entire buffer has been filled - this may involve waiting for the operating
  system to supply the data.
 
+ Reading from a stream that is stopped is not currently supported. In particular,
+ it is not possible to drain the read buffer by calling Pa_ReadStream after
+ calling Pa_StopStream.
+
  @param stream A pointer to an open stream previously created with Pa_OpenStream.
- 
+
  @param buffer A pointer to a buffer of sample frames. The buffer contains
  samples in the format specified by the inputParameters->sampleFormat field
  used to open the stream, and the number of channels specified by
  inputParameters->numChannels. If non-interleaved samples were requested using
- the paNonInterleaved sample format flag, buffer is a pointer to the first element 
+ the paNonInterleaved sample format flag, buffer is a pointer to the first element
  of an array of buffer pointers, one non-interleaved buffer for each channel.
 
  @param frames The number of frames to be read into buffer. This parameter
@@ -1152,13 +1160,17 @@ PaError Pa_ReadStream( PaStream* stream,
  entire buffer has been written - this may involve waiting for the operating
  system to consume the data.
 
+ Writing to a stream that is stopped is not currently supported. In particular,
+ it is not possible to prefill the write buffer by calling Pa_WriteStream
+ prior to calling Pa_StartStream.
+
  @param stream A pointer to an open stream previously created with Pa_OpenStream.
 
  @param buffer A pointer to a buffer of sample frames. The buffer contains
  samples in the format specified by the outputParameters->sampleFormat field
  used to open the stream, and the number of channels specified by
  outputParameters->numChannels. If non-interleaved samples were requested using
- the paNonInterleaved sample format flag, buffer is a pointer to the first element 
+ the paNonInterleaved sample format flag, buffer is a pointer to the first element
  of an array of buffer pointers, one non-interleaved buffer for each channel.
 
  @param frames The number of frames to be written from buffer. This parameter
@@ -1178,6 +1190,9 @@ PaError Pa_WriteStream( PaStream* stream,
 /** Retrieve the number of frames that can be read from the stream without
  waiting.
 
+ When the stream is stopped the return value of Pa_GetStreamReadAvailable is not
+ defined.
+
  @return Returns a non-negative value representing the maximum number of frames
  that can be read from the stream without blocking or busy waiting or, a
  PaErrorCode (which are always negative) if PortAudio is not initialized or an
@@ -1188,6 +1203,9 @@ signed long Pa_GetStreamReadAvailable( PaStream* stream );
 
 /** Retrieve the number of frames that can be written to the stream without
  waiting.
+
+ When the stream is stopped the return value of Pa_GetStreamWriteAvailable is not
+ defined.
 
  @return Returns a non-negative value representing the maximum number of frames
  that can be written to the stream without blocking or busy waiting or, a

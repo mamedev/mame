@@ -12,7 +12,7 @@ PortAudioCpp v19 revision 15 (unknown release date):
 
 	mblaauw:
 	- Changed some exception handling code in HostApi's constructor.
-	- Added accessors to PortAudio PaStream from PortAudioCpp Stream (their absense being pointed out
+	- Added accessors to PortAudio PaStream from PortAudioCpp Stream (their absence being pointed out
 	by Tom Jordan).
 	- Fixed a bug/typo in MemFunToCallbackInterfaceAdapter::init() thanks to Fredrik Viklund.
 	- Fixed issue with concrete Stream classes possibly throwing an exception and fixed documentation w.r.t. this.
@@ -37,14 +37,14 @@ PortAudioCpp v19 revision 13 03/10/19:
 	the std::exception base class's what() member function (which had throw(), i.e. no-throw guarantee).
 	- Changed the iterators so that they have a set of public typedefs instead of deriving the C++ standard 
 	library std::iterator<> struct. G++ 2.95 doesn't support std::exception<> and composition-by-aggregation 
-	is prefered over composition-by-inheritance in this case.
+	is preferred over composition-by-inheritance in this case.
 	- Changed some minor things to avoid G++ warning messages.
 
 	mblaauw:
 	- Renamed this file (/WHATSNEW.txt) to /CHANGELOG.
 	- Renamed /PA_ISSUES.txt to /PA_ISSUES.
 	- Added /INSTALL file with some build info for GNU/Linux and VC6.
-	- Added MSVC 6.0 projects for building PortAudioCpp as a staticly or dynamically linkable library.
+	- Added MSVC 6.0 projects for building PortAudioCpp as a statically or dynamically linkable library.
 	- Moved build files to /build/(gnu/ or vc6/).
 	- Moved Doxygen configuration files to /doc/ and output to /doc/api_reference/.
 	- Added a /doc/README with some info how to generate Doxygen documentation.
@@ -82,7 +82,7 @@ PortAudioCpp v19 revision 09 03/06/25:
 	mblaauw:
 	- Changed some things in SingleDirectionStreamParameters to ease it's usage.
 	- Placed all SingleDirectionStreamParameters stuff into a separate file.
-	+ Totally redid the callback stuff, now it's less ackward and supports C++ functions.
+	+ Totally redid the callback stuff, now it's less awkward and supports C++ functions.
 
 PortAudioCpp v19 revision 08 03/06/20:
 

@@ -19,6 +19,12 @@
 
 #include "emu.h"
 
+#include "egret.h"
+#include "macadb.h"
+#include "macscsi.h"
+#include "mactoolbox.h"
+#include "vasp.h"
+
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/nubus.h"
 #include "bus/nubus/cards.h"
@@ -31,11 +37,6 @@
 #include "machine/swim1.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
-#include "egret.h"
-#include "macadb.h"
-#include "macscsi.h"
-#include "mactoolbox.h"
-#include "vasp.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -110,7 +111,7 @@ private:
 		m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
 	}
 
-	WRITE_LINE_MEMBER(egret_reset_w)
+	void egret_reset_w(int state)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
@@ -123,7 +124,7 @@ private:
 	void devsel_w(uint8_t devsel);
 	uint16_t swim_r(offs_t offset, u16 mem_mask);
 	void swim_w(offs_t offset, u16 data, u16 mem_mask);
-	WRITE_LINE_MEMBER(hdsel_w);
+	void hdsel_w(int state);
 };
 
 void maciivx_state::machine_start()
@@ -260,7 +261,7 @@ void maciivx_state::devsel_w(uint8_t devsel)
 		m_cur_floppy->ss_w(m_hdsel);
 }
 
-WRITE_LINE_MEMBER(maciivx_state::hdsel_w)
+void maciivx_state::hdsel_w(int state)
 {
 	if (state != m_hdsel)
 	{

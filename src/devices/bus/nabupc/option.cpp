@@ -10,6 +10,8 @@
 #include "option.h"
 
 #include "fdc.h"
+#include "hdd.h"
+#include "rs232.h"
 
 DEFINE_DEVICE_TYPE(NABUPC_OPTION_BUS_SLOT, bus::nabupc::option_slot_device, "nabupc_option_slot", "NABU PC Option slot")
 DEFINE_DEVICE_TYPE(NABUPC_OPTION_BUS, bus::nabupc::option_bus_device, "nabupc_option_bus", "NABU PC Option Bus")
@@ -60,7 +62,7 @@ void option_slot_device::io_write(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(option_slot_device::int_w) {  (*m_bus).set_int_line(state, m_slot); }
+void option_slot_device::int_w(int state) {  (*m_bus).set_int_line(state, m_slot); }
 
 
 //**************************************************************************
@@ -86,7 +88,6 @@ void option_bus_device::add_slot(option_slot_device &slot)
 //-------------------------------------------------
 void option_bus_device::device_start()
 {
-	m_int_cb.resolve_all_safe();
 }
 
 //-------------------------------------------------
@@ -127,6 +128,8 @@ void device_option_expansion_interface::interface_pre_start()
 void option_bus_devices(device_slot_interface &device)
 {
 	device.option_add("fdc", NABUPC_OPTION_FDC);
+	device.option_add("hdd", NABUPC_OPTION_HDD);
+	device.option_add("rs232", NABUPC_OPTION_RS232);
 }
 
 }  // namespace bus::nabupc

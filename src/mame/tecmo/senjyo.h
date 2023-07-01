@@ -111,7 +111,7 @@ private:
 	void bg3videoram_w(offs_t offset, uint8_t data);
 	void dac_volume_w(uint8_t data);
 	void dac_enable_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(dac_clock_w);
+	void dac_clock_w(int state);
 	void irq_ctrl_w(uint8_t data);
 
 	static rgb_t IIBBGGRR(uint32_t raw);

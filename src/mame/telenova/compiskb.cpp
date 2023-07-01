@@ -240,8 +240,6 @@ compis_keyboard_device::compis_keyboard_device(const machine_config &mconfig, co
 
 void compis_keyboard_device::device_start()
 {
-	// resolve callbacks
-	m_out_tx_handler.resolve_safe();
 	m_out_tx_handler(1);
 
 	// resolve output finder
@@ -253,7 +251,7 @@ void compis_keyboard_device::device_start()
 //  si_w - serial input write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( compis_keyboard_device::si_w )
+void compis_keyboard_device::si_w(int state)
 {
 	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }

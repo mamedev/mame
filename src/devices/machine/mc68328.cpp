@@ -47,8 +47,8 @@ DEFINE_DEVICE_TYPE(MC68EZ328, mc68ez328_device, "mc68ez328", "MC68EZ328 DragonBa
 
 const u32 mc68328_base_device::VCO_DIVISORS[8] = { 2, 4, 8, 16, 1, 1, 1, 1 };
 
-mc68328_base_device::mc68328_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 addr_bits, address_map_constructor internal_map_ctor)
-	: m68000_device(mconfig, tag, owner, clock, type, 16, addr_bits, internal_map_ctor)
+mc68328_base_device::mc68328_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: m68000_device(mconfig, type, tag, owner, clock)
 	, m_pwm(nullptr)
 	, m_rtc(nullptr)
 	, m_spim(nullptr)
@@ -59,16 +59,16 @@ mc68328_base_device::mc68328_base_device(const machine_config &mconfig, device_t
 	, m_out_port_e_cb(*this)
 	, m_out_port_f_cb(*this)
 	, m_out_port_g_cb(*this)
-	, m_in_port_a_cb(*this)
-	, m_in_port_b_cb(*this)
-	, m_in_port_c_cb(*this)
-	, m_in_port_d_cb(*this)
-	, m_in_port_e_cb(*this)
-	, m_in_port_f_cb(*this)
-	, m_in_port_g_cb(*this)
+	, m_in_port_a_cb(*this, 0)
+	, m_in_port_b_cb(*this, 0)
+	, m_in_port_c_cb(*this, 0)
+	, m_in_port_d_cb(*this, 0)
+	, m_in_port_e_cb(*this, 0)
+	, m_in_port_f_cb(*this, 0)
+	, m_in_port_g_cb(*this, 0)
 	, m_out_pwm_cb(*this)
 	, m_out_spim_cb(*this)
-	, m_in_spim_cb(*this)
+	, m_in_spim_cb(*this, 0)
 	, m_out_flm_cb(*this)
 	, m_out_llp_cb(*this)
 	, m_out_lsclk_cb(*this)
@@ -78,21 +78,36 @@ mc68328_base_device::mc68328_base_device(const machine_config &mconfig, device_t
 }
 
 mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: mc68328_base_device(mconfig, MC68328, tag, owner, clock, 24, address_map_constructor(FUNC(mc68328_device::internal_map), this))
+	: mc68328_base_device(mconfig, MC68328, tag, owner, clock)
 	, m_out_port_j_cb(*this)
 	, m_out_port_k_cb(*this)
 	, m_out_port_m_cb(*this)
-	, m_in_port_j_cb(*this)
-	, m_in_port_k_cb(*this)
-	, m_in_port_m_cb(*this)
+	, m_in_port_j_cb(*this, 0)
+	, m_in_port_k_cb(*this, 0)
+	, m_in_port_m_cb(*this, 0)
 {
 	m_cpu_space_config.m_internal_map = address_map_constructor(FUNC(mc68328_device::cpu_space_map), this);
+	auto imap = address_map_constructor(FUNC(mc68328_device::internal_map), this);
+	m_program_config.m_internal_map = imap;
+	m_opcodes_config.m_internal_map = imap;
+	m_uprogram_config.m_internal_map = imap;
+	m_uopcodes_config.m_internal_map = imap;
 }
 
 mc68ez328_device::mc68ez328_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: mc68328_base_device(mconfig, MC68EZ328, tag, owner, clock, 32, address_map_constructor(FUNC(mc68ez328_device::internal_map), this))
+	: mc68328_base_device(mconfig, MC68EZ328, tag, owner, clock)
 {
 	m_cpu_space_config.m_internal_map = address_map_constructor(FUNC(mc68ez328_device::cpu_space_map), this);
+	m_cpu_space_config.m_addr_width = 32;
+	m_program_config.m_addr_width = 32;
+	m_opcodes_config.m_addr_width = 32;
+	m_uprogram_config.m_addr_width = 32;
+	m_uopcodes_config.m_addr_width = 32;
+	auto imap = address_map_constructor(FUNC(mc68ez328_device::internal_map), this);
+	m_program_config.m_internal_map = imap;
+	m_opcodes_config.m_internal_map = imap;
+	m_uprogram_config.m_internal_map = imap;
+	m_uopcodes_config.m_internal_map = imap;
 }
 
 void mc68328_base_device::base_internal_map(u32 addr_bits, address_map &map)
@@ -312,51 +327,7 @@ void mc68328_base_device::device_resolve_objects()
 {
 	m68000_device::device_resolve_objects();
 
-	m_out_port_a_cb.resolve_all_safe();
-	m_out_port_b_cb.resolve_all_safe();
-	m_out_port_c_cb.resolve_all_safe();
-	m_out_port_d_cb.resolve_all_safe();
-	m_out_port_e_cb.resolve_all_safe();
-	m_out_port_f_cb.resolve_all_safe();
-	m_out_port_g_cb.resolve_all_safe();
-
-	m_in_port_a_cb.resolve_all();
-	m_in_port_b_cb.resolve_all();
-	m_in_port_c_cb.resolve_all();
-	m_in_port_d_cb.resolve_all();
-	m_in_port_e_cb.resolve_all();
-	m_in_port_f_cb.resolve_all();
-	m_in_port_g_cb.resolve_all();
-
-	m_out_pwm_cb.resolve_safe();
-
-	m_out_spim_cb.resolve_safe();
-	m_in_spim_cb.resolve_safe(0);
-
-	m_out_flm_cb.resolve_safe();
-	m_out_llp_cb.resolve_safe();
-	m_out_lsclk_cb.resolve_safe();
-	m_out_ld_cb.resolve_safe();
-
-	m_lcd_info_changed_cb.resolve();
-}
-
-void mc68328_device::device_resolve_objects()
-{
-	mc68328_base_device::device_resolve_objects();
-
-	m_out_port_j_cb.resolve_all_safe();
-	m_out_port_k_cb.resolve_all_safe();
-	m_out_port_m_cb.resolve_all_safe();
-
-	m_in_port_j_cb.resolve_all();
-	m_in_port_k_cb.resolve_all();
-	m_in_port_m_cb.resolve_all();
-}
-
-void mc68ez328_device::device_resolve_objects()
-{
-	mc68328_base_device::device_resolve_objects();
+	m_lcd_info_changed_cb.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -420,7 +391,7 @@ void mc68328_base_device::device_reset()
 	m_ivr = 0x00;
 	m_icr = 0x0000;
 	m_imr = 0x00ffffff;
-	m_isr = 0x00000000;
+	m_gisr = 0x00000000;
 	m_ipr = 0x00000000;
 
 	m_pasel = 0x00;
@@ -602,7 +573,7 @@ void mc68328_base_device::register_state_save()
 	save_item(NAME(m_ivr));
 	save_item(NAME(m_icr));
 	save_item(NAME(m_imr));
-	save_item(NAME(m_isr));
+	save_item(NAME(m_gisr));
 	save_item(NAME(m_ipr));
 
 	save_item(NAME(m_padir));
@@ -1177,15 +1148,15 @@ void mc68328_base_device::update_ipr_state(u32 changed_mask)
 	{
 		// If a pending interrupt has changed, it's not masked, and it's not currently in service, raise the corresponding 68k IRQ line and mark it as
 		// in-service.
-		if ((~m_imr & irq_mask) && !(m_isr & changed_mask))
+		if ((~m_imr & irq_mask) && !(m_gisr & changed_mask))
 		{
-			m_isr |= changed_mask;
+			m_gisr |= changed_mask;
 			set_input_line(irq_level, ASSERT_LINE);
 		}
 	}
 	else
 	{
-		m_isr &= ~changed_mask;
+		m_gisr &= ~changed_mask;
 
 		// If there are no other pending, unmasked interrupts at this level, lower the corresponding 68k IRQ line.
 		if (!(m_ipr & ~m_imr & irq_mask))
@@ -1203,13 +1174,13 @@ void mc68328_base_device::update_imr_state(u32 changed_mask)
 
 	while (irq_level && irq_mask)
 	{
-		if (m_ipr & ~m_isr & ~m_imr & level_mask)
+		if (m_ipr & ~m_gisr & ~m_imr & level_mask)
 		{
 			// If a newly-unmasked interrupt is pending and not currently in-service, raise the relevant line.
-			m_isr |= level_mask;
+			m_gisr |= level_mask;
 			set_input_line(irq_level, ASSERT_LINE);
 		}
-		else if (m_isr & m_imr & level_mask)
+		else if (m_gisr & m_imr & level_mask)
 		{
 			// If a newly-masked interrupt is in-service, lower the relevant line.
 			set_input_line(irq_level, CLEAR_LINE);
@@ -1284,7 +1255,7 @@ u32 mc68328_device::get_irq_mask_for_level(int level)
 	return 0;
 }
 
-WRITE_LINE_MEMBER(mc68328_base_device::irq5_w)
+void mc68328_base_device::irq5_w(int state)
 {
 	set_interrupt_line(INT_IRQ5, state);
 }
@@ -1382,38 +1353,38 @@ void mc68328_base_device::isr_msw_w(offs_t offset, u16 data, u16 mem_mask) // 0x
 	// Clear edge-triggered IRQ1
 	if ((m_icr & ICR_ET1) == ICR_ET1 && ((data << 16) & INT_IRQ1_MASK) == INT_IRQ1_MASK)
 	{
-		m_isr &= ~INT_IRQ1_MASK;
+		m_gisr &= ~INT_IRQ1_MASK;
 	}
 
 	// Clear edge-triggered IRQ2
 	if ((m_icr & ICR_ET2) == ICR_ET2 && ((data << 16) & INT_IRQ2_MASK) == INT_IRQ2_MASK)
 	{
-		m_isr &= ~INT_IRQ2_MASK;
+		m_gisr &= ~INT_IRQ2_MASK;
 	}
 
 	// Clear edge-triggered IRQ3
 	if ((m_icr & ICR_ET3) == ICR_ET3 && ((data << 16) & INT_IRQ3_MASK) == INT_IRQ3_MASK)
 	{
-		m_isr &= ~INT_IRQ3_MASK;
+		m_gisr &= ~INT_IRQ3_MASK;
 	}
 
 	// Clear edge-triggered IRQ6
 	if ((m_icr & ICR_ET6) == ICR_ET6 && ((data << 16) & INT_IRQ6_MASK) == INT_IRQ6_MASK)
 	{
-		m_isr &= ~INT_IRQ6_MASK;
+		m_gisr &= ~INT_IRQ6_MASK;
 	}
 
 	// Clear edge-triggered IRQ7
 	if (((data << 16) & INT_IRQ7_MASK) == INT_IRQ7_MASK)
 	{
-		m_isr &= ~INT_IRQ7_MASK;
+		m_gisr &= ~INT_IRQ7_MASK;
 	}
 }
 
 u16 mc68328_base_device::isr_msw_r() // 0x30c
 {
-	LOGMASKED(LOG_INTS, "%s: isr_msw_r: ISR(MSW): %04x\n", machine().describe_context(), (u16)(m_isr >> 16));
-	return (u16)(m_isr >> 16);
+	LOGMASKED(LOG_INTS, "%s: isr_msw_r: ISR(MSW): %04x\n", machine().describe_context(), (u16)(m_gisr >> 16));
+	return (u16)(m_gisr >> 16);
 }
 
 void mc68328_base_device::isr_lsw_w(offs_t offset, u16 data, u16 mem_mask) // 0x30e
@@ -1423,8 +1394,8 @@ void mc68328_base_device::isr_lsw_w(offs_t offset, u16 data, u16 mem_mask) // 0x
 
 u16 mc68328_base_device::isr_lsw_r() // 0x30e
 {
-	LOGMASKED(LOG_INTS, "%s: isr_lsw_r: ISR(LSW): %04x\n", machine().describe_context(), (u16)m_isr);
-	return (u16)m_isr;
+	LOGMASKED(LOG_INTS, "%s: isr_lsw_r: ISR(LSW): %04x\n", machine().describe_context(), (u16)m_gisr);
+	return (u16)m_gisr;
 }
 
 void mc68328_base_device::ipr_msw_w(offs_t offset, u16 data, u16 mem_mask) // 0x310
@@ -1541,7 +1512,7 @@ u8 mc68328_base_device::padata_r() // 0x401
 			{
 				data |= m_padata & (1 << i);
 			}
-			else if (!m_in_port_a_cb[i].isnull())
+			else if (!m_in_port_a_cb[i].isunset())
 			{
 				data |= m_in_port_a_cb[i]() << i;
 			}
@@ -1604,7 +1575,7 @@ u8 mc68328_base_device::pbdata_r() // 0x409
 			{
 				data |= m_pbdata & (1 << i);
 			}
-			else if (!m_in_port_b_cb[i].isnull())
+			else if (!m_in_port_b_cb[i].isunset())
 			{
 				data |= m_in_port_b_cb[i]() << i;
 			}
@@ -1671,7 +1642,7 @@ u8 mc68328_base_device::pcdata_r() // 0x411
 			{
 				data |= m_pcdata & (1 << i);
 			}
-			else if (!m_in_port_c_cb[i].isnull())
+			else if (!m_in_port_c_cb[i].isunset())
 			{
 				data |= m_in_port_c_cb[i]() << i;
 			}
@@ -1765,7 +1736,7 @@ u8 mc68328_base_device::pddata_r() // 0x419
 		{
 			data |= m_pddata & (1 << i);
 		}
-		else if (!m_in_port_d_cb[i].isnull())
+		else if (!m_in_port_d_cb[i].isunset())
 		{
 			data |= m_in_port_d_cb[i]() << i;
 		}
@@ -1867,7 +1838,7 @@ u8 mc68328_base_device::pedata_r() // 0x421
 			{
 				data |= m_pedata & (1 << i);
 			}
-			else if (!m_in_port_e_cb[i].isnull())
+			else if (!m_in_port_e_cb[i].isunset())
 			{
 				data |= m_in_port_e_cb[i]() << i;
 			}
@@ -1946,7 +1917,7 @@ u8 mc68328_base_device::pfdata_r() // 0x429
 			{
 				data |= m_pfdata & (1 << i);
 			}
-			else if (!m_in_port_f_cb[i].isnull())
+			else if (!m_in_port_f_cb[i].isunset())
 			{
 				data |= m_in_port_f_cb[i]() << i;
 			}
@@ -2025,7 +1996,7 @@ u8 mc68328_base_device::pgdata_r() // 0x431
 			{
 				data |= m_pgdata & (1 << i);
 			}
-			else if (!m_in_port_g_cb[i].isnull())
+			else if (!m_in_port_g_cb[i].isunset())
 			{
 				data |= m_in_port_g_cb[i]() << i;
 			}
@@ -2104,7 +2075,7 @@ u8 mc68328_device::pjdata_r() // 0x439
 			{
 				data |= m_pjdata & (1 << i);
 			}
-			else if (!m_in_port_j_cb[i].isnull())
+			else if (!m_in_port_j_cb[i].isunset())
 			{
 				data |= m_in_port_j_cb[i]() << i;
 			}
@@ -2167,7 +2138,7 @@ u8 mc68328_device::pkdata_r() // 0x441
 			{
 				data |= m_pkdata & (1 << i);
 			}
-			else if (!m_in_port_k_cb[i].isnull())
+			else if (!m_in_port_k_cb[i].isunset())
 			{
 				data |= m_in_port_k_cb[i]() << i;
 			}
@@ -2246,7 +2217,7 @@ u8 mc68328_device::pmdata_r() // 0x449
 			{
 				data |= m_pmdata & (1 << i);
 			}
-			else if (!m_in_port_m_cb[i].isnull())
+			else if (!m_in_port_m_cb[i].isunset())
 			{
 				data |= m_in_port_m_cb[i]() << i;
 			}
@@ -3100,10 +3071,7 @@ void mc68328_device::lcd_update_info()
 	LOGMASKED(LOG_LCD, "lxmax %d, lymax %d, divisor %d, lrra %02x, lpxcd %02x\n", m_lxmax, m_lymax + 1, sysclk_divisor, m_lpxcd + 1);
 
 	constexpr u8 BIT_WIDTHS[4] = { 1, 2, 4, 0xff };
-	if (!m_lcd_info_changed_cb.isnull())
-	{
-		m_lcd_info_changed_cb(lcd_frame_duration.as_hz(), lcd_get_width(), m_lymax + 1, BIT_WIDTHS[(m_lpicf & LPICF_PBSIZ) >> LPICF_PBSIZ_SHIFT], BIT_WIDTHS[m_lpicf & LPICF_GS]);
-	}
+	m_lcd_info_changed_cb(lcd_frame_duration.as_hz(), lcd_get_width(), m_lymax + 1, BIT_WIDTHS[(m_lpicf & LPICF_PBSIZ) >> LPICF_PBSIZ_SHIFT], BIT_WIDTHS[m_lpicf & LPICF_GS]);
 
 	m_lcd_update_pending = false;
 }
@@ -3559,10 +3527,7 @@ void mc68ez328_device::lcd_update_info()
 	attotime lcd_frame_duration = (lcd_scan_duration + lcd_dma_duration) * (m_lymax + 1) * 2;
 
 	constexpr u8 BIT_WIDTHS[4] = { 1, 2, 4, 0xff };
-	if (!m_lcd_info_changed_cb.isnull())
-	{
-		m_lcd_info_changed_cb(lcd_frame_duration.as_hz(), lcd_get_width(), m_lymax + 1, BIT_WIDTHS[(m_lpicf & LPICF_PBSIZ) >> LPICF_PBSIZ_SHIFT], BIT_WIDTHS[m_lpicf & LPICF_GS]);
-	}
+	m_lcd_info_changed_cb(lcd_frame_duration.as_hz(), lcd_get_width(), m_lymax + 1, BIT_WIDTHS[(m_lpicf & LPICF_PBSIZ) >> LPICF_PBSIZ_SHIFT], BIT_WIDTHS[m_lpicf & LPICF_GS]);
 
 	m_lcd_update_pending = false;
 }

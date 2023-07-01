@@ -58,7 +58,7 @@ protected:
 	virtual void device_reset_after_children() override;
 
 	// device_zorro2_card_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w ) override;
+	virtual void cfgin_w(int state) override;
 
 	// amiga_autoconfig overrides
 	virtual void autoconfig_base_address(offs_t address) override;
@@ -80,21 +80,21 @@ private:
 	void cia_w(offs_t offset, uint8_t data);
 
 	// rs232
-	DECLARE_WRITE_LINE_MEMBER( rs232_1_rxd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_1_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_1_cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_2_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_2_cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_3_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_3_cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_4_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_4_cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_5_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_5_cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_6_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_6_cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_7_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_7_cts_w );
+	void rs232_1_rxd_w(int state);
+	void rs232_1_dcd_w(int state);
+	void rs232_1_cts_w(int state);
+	void rs232_2_dcd_w(int state);
+	void rs232_2_cts_w(int state);
+	void rs232_3_dcd_w(int state);
+	void rs232_3_cts_w(int state);
+	void rs232_4_dcd_w(int state);
+	void rs232_4_cts_w(int state);
+	void rs232_5_dcd_w(int state);
+	void rs232_5_cts_w(int state);
+	void rs232_6_dcd_w(int state);
+	void rs232_6_cts_w(int state);
+	void rs232_7_dcd_w(int state);
+	void rs232_7_cts_w(int state);
 
 	required_device<m65ce02_device> m_iocpu;
 	required_device<input_merger_device> m_ioirq;

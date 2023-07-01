@@ -289,12 +289,12 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE_LINE_MEMBER(sound_end0) { m_sys->generate_custom_interrupt(2); }
-	DECLARE_WRITE_LINE_MEMBER(sound_end1) { m_sys->generate_custom_interrupt(3); }
-	DECLARE_WRITE_LINE_MEMBER(sound_end2) { m_sys->generate_custom_interrupt(4); }
-	DECLARE_WRITE_LINE_MEMBER(sound_end3) { m_sys->generate_custom_interrupt(5); }
-	DECLARE_WRITE_LINE_MEMBER(sound_end4) { m_sys->generate_custom_interrupt(6); }
-	DECLARE_WRITE_LINE_MEMBER(sound_end5) { m_sys->generate_custom_interrupt(7); }
+	void sound_end0(int state) { m_sys->generate_custom_interrupt(2); }
+	void sound_end1(int state) { m_sys->generate_custom_interrupt(3); }
+	void sound_end2(int state) { m_sys->generate_custom_interrupt(4); }
+	void sound_end3(int state) { m_sys->generate_custom_interrupt(5); }
+	void sound_end4(int state) { m_sys->generate_custom_interrupt(6); }
+	void sound_end5(int state) { m_sys->generate_custom_interrupt(7); }
 };
 
 class elan_eu3a05_buzztime_state : public elan_eu3a05_state
@@ -362,18 +362,15 @@ void elan_eu3a05_buzztime_state::machine_start()
 
 DEVICE_IMAGE_LOAD_MEMBER(elan_eu3a05_buzztime_state::cart_load)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
-	if (size != 0x200000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
-	}
+	if (size != 0x20'0000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (only 2M supported)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_NATIVE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void elan_eu3a05_buzztime_state::elan_buzztime(machine_config &config)

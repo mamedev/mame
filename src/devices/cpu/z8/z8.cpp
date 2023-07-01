@@ -26,9 +26,9 @@
 #include "z8.h"
 #include "z8dasm.h"
 
-#define LOG_TIMER       (1 << 1U)
-#define LOG_RECEIVE     (1 << 2U)
-#define LOG_TRANSMIT    (1 << 3U)
+#define LOG_TIMER       (1U << 1)
+#define LOG_RECEIVE     (1U << 2)
+#define LOG_TRANSMIT    (1U << 3)
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -180,7 +180,7 @@ z8_device::z8_device(const machine_config &mconfig, device_type type, const char
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, preprogrammed ? address_map_constructor(FUNC(z8_device::preprogrammed_map), this) : address_map_constructor(FUNC(z8_device::program_map), this))
 	, m_data_config("data", ENDIANNESS_BIG, 8, 16, 0)
 	, m_register_config("register", ENDIANNESS_BIG, 8, 8, 0, address_map_constructor(FUNC(z8_device::register_map), this))
-	, m_input_cb(*this)
+	, m_input_cb(*this, 0xff)
 	, m_output_cb(*this)
 	, m_rom_size(rom_size)
 	, m_input{0xff, 0xff, 0xff, 0x0f}
@@ -1209,9 +1209,6 @@ TIMER_CALLBACK_MEMBER(z8_device::timeout)
 
 void z8_device::device_start()
 {
-	m_input_cb.resolve_all_safe(0xff);
-	m_output_cb.resolve_all_safe();
-
 	/* set up the state table */
 	{
 		state_add(Z8_PC,         "PC",        m_pc).callimport();
@@ -1347,7 +1344,7 @@ void z8_device::take_interrupt(int irq)
 
 	// acknowledge the IRQ
 	m_irq &= ~(1 << irq);
-	standard_irq_callback(irq);
+	standard_irq_callback(irq, m_pc);
 
 	// get the interrupt vector address
 	uint16_t vector = irq * 2;

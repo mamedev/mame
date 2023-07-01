@@ -1013,7 +1013,7 @@ std::error_condition zip_file_impl::read_ecd() noexcept
 		// if we found it, fill out the data
 		if (offset >= 0)
 		{
-			osd_printf_verbose("unzip: found %s ECD\n", m_filename);
+			osd_printf_verbose("unzip: found %s ECD at %d\n", m_filename, offset);
 
 			// extract ECD info
 			ecd_reader const ecd_rd(buffer.get() + offset);
@@ -1388,8 +1388,8 @@ std::error_condition zip_file_impl::decompress_data_type_14(std::uint64_t offset
 
 	// reset the stream
 	ISzAlloc alloc_imp;
-	alloc_imp.Alloc = [] (void *p, std::size_t size) -> void * { return size ? std::malloc(size) : nullptr; };
-	alloc_imp.Free = [] (void *p, void *address) -> void { std::free(address); };
+	alloc_imp.Alloc = [] (ISzAllocPtr p, std::size_t size) -> void * { return size ? std::malloc(size) : nullptr; };
+	alloc_imp.Free = [] (ISzAllocPtr p, void *address) -> void { std::free(address); };
 	CLzmaDec stream;
 	LzmaDec_Construct(&stream);
 

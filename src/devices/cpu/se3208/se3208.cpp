@@ -31,10 +31,6 @@ enum : uint32_t
 //Precompute the instruction decoding in a big table
 #define INST(a) void se3208_device::a(uint16_t Opcode)
 
-// officeye and donghaer perform unaligned DWORD accesses, allowing them to happen causes the games to malfunction.
-// are such accesses simply illegal, be handled in a different way, or simply not be happening in the first place?
-#define ALLOW_UNALIGNED_DWORD_ACCESS 0
-
 DEFINE_DEVICE_TYPE(SE3208, se3208_device, "se3208", "ADChips SE3208")
 
 
@@ -42,7 +38,7 @@ se3208_device::se3208_device(const machine_config &mconfig, const char *tag, dev
 	: cpu_device(mconfig, SE3208, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_machinex_cb(*this)
-	, m_iackx_cb(*this)
+	, m_iackx_cb(*this, 0)
 	, m_PC(0), m_SR(0), m_SP(0), m_ER(0), m_PPC(0), m_IRQ(0), m_NMI(0), m_icount(0)
 {
 }
@@ -52,13 +48,6 @@ device_memory_interface::space_config_vector se3208_device::memory_space_config(
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
-}
-
-
-void se3208_device::device_resolve_objects()
-{
-	m_machinex_cb.resolve_safe();
-	m_iackx_cb.resolve_safe(0);
 }
 
 
@@ -82,11 +71,7 @@ uint32_t se3208_device::SE3208_Read32(uint32_t address)
 	else
 	{
 		osd_printf_debug("%08x: dword READ unaligned %08x\n", m_PC, address);
-#if ALLOW_UNALIGNED_DWORD_ACCESS
 		return m_program.read_byte(address) | m_program.read_byte(address + 1) << 8 | m_program.read_byte(address + 2) << 16 | m_program.read_byte(address + 3) << 24;
-#else
-		return 0;
-#endif
 	}
 }
 
@@ -114,12 +99,10 @@ void se3208_device::SE3208_Write32(uint32_t address, uint32_t data)
 		m_program.write_dword(address, data);
 	else
 	{
-#if ALLOW_UNALIGNED_DWORD_ACCESS
 		m_program.write_byte(address, data & 0xff);
 		m_program.write_byte(address + 1, (data >> 8) & 0xff);
 		m_program.write_byte(address + 2, (data >> 16) & 0xff);
 		m_program.write_byte(address + 3, (data >> 24) & 0xff);
-#endif
 		osd_printf_debug("%08x: dword WRITE unaligned %08x\n", m_PC, address);
 	}
 }
@@ -1726,7 +1709,7 @@ void se3208_device::device_reset()
 
 void se3208_device::SE3208_NMI()
 {
-	standard_irq_callback(INPUT_LINE_NMI);
+	standard_irq_callback(INPUT_LINE_NMI, m_PC);
 	m_machinex_cb(0x00);
 
 	PushVal(m_PC);
@@ -1742,7 +1725,7 @@ void se3208_device::SE3208_Interrupt()
 	if(!TESTFLAG(FLAG_ENI))
 		return;
 
-	standard_irq_callback(0);
+	standard_irq_callback(0, m_PC);
 	m_machinex_cb(0x01);
 
 	PushVal(m_PC);

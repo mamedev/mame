@@ -38,6 +38,106 @@
     OE3-0_N CG memory output enable
     WEH_N, WEL_N CG memory write enable
 
+===============================================================================
+
+    cart pinout
+
+    +------------------------------------------+
+    |                                          |
+    |  +------+       +------+      +------+   |
+    |  |      |       |      |      |      |   |
+    |  |CHIP 1|       |CHIP 2|      |CHIP 3|   |
+    |  |      |       |      |      |      |   |
+    |  +------+       +------+      +------+   |
+    |                                          |
+    ++     +-+                        +-+     ++
+     |_____| |________________________| |_____|
+    A66                                      A01
+
+    +------------------------------------------+
+    |                                          |
+    |                                          |
+    |                                          |
+    |                                          |
+    |                                          |
+    |                                          |
+    |                                          |
+    ++     +-+                        +-+     ++
+     |_____| |________________________| |_____|
+    B01                                      B66
+
+
+
+      A  |  |  B  |
+    ---------------
+     GND |01| GND         ---------+
+     A08 |02| D00                  |
+     A09 |03| D01                  |
+     A10 |04| D02                  |
+     A11 |05| D03                  |
+     A12 |06| D04                  |
+     A13 |07| D05                  |
+     A14 |08| D06                  |
+     A15 |09| D07                  | CHIP U2
+     VCC |10| VCC                  |
+     A16 |11| A00                  |
+     A17 |12| A01                  |
+     A18 |13| A02                  |
+     A19 |14| A03                  |
+     A20 |15| A04                  |
+     A21 |16| A05                  |
+      CE |17| A06                  |
+      OE |18| A07                  |
+     GND |19| GND                  |
+    WE_U2|20| A19         ---------+
+    RE_U2|21| A18                  |
+     D15 |22| A17                  |
+     D14 |23| A16                  |
+     D13 |24| A15                  |
+     D12 |25| A14                  |
+     D11 |26| A13                  |
+     D10 |27| A12                  |
+     VCC |28| VCC                  |
+     D09 |29| A11                  |
+     D08 |30| A10                  |  CHIP U1
+     D07 |31| A09                  |
+     D06 |32| A08                  |
+     D05 |33| A07                  |
+     D04 |34| A06                  |
+     D03 |35| A05                  |
+     D02 |36| A04                  |
+     GND |37| GND                  |
+     D01 |38| A03                  |
+     D00 |39| A02                  |
+      CE |40| A01                  |
+      OE |41| A00                  |
+    WE_U1|42| A00         ---------+
+    RE_U3|43| A01                  |
+     D00 |44| A02                  |
+     D01 |45| A03                  |
+     VCC |46| VCC                  |
+     D02 |47| A04                  |
+     D03 |48| A05                  |
+     D04 |49| A06                  |
+     D05 |50| A07                  |
+     D06 |51| A08                  |
+     D07 |52| A09                  |
+     GND |53| GND                  |
+     D08 |54| A10                  | CHIP U3
+     D09 |55| A11                  |
+     D10 |56| A12                  |
+     D11 |57| A13                  |
+     D12 |58| A14                  |
+     D13 |59| A15                  |
+     VCC |60| VCC                  |
+     D14 |61| A16                  |
+     D15 |62| A17                  |
+      CE |63| A18                  |
+      OE |64| A19                  |
+      WE |65| A20                  |
+     GND |66| GND         ---------+
+    --------------
+      A  |  |  B
 ******************************************************************************/
 
 #include "emu.h"
@@ -182,8 +282,28 @@ ROM_START( amhbattl )
 	ROM_LOAD( "s29al016d70tfi01.u3", 0x200000, 0x200000, CRC(f5bfb1e8) SHA1(e36be311782e4bcbd00a8bc93473f23e5c39c67a) )
 ROM_END
 
+ROM_START( shpchamp ) // HA9022-0
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "s29al004.u1", 0x000000, 0x080000, CRC(194dc931) SHA1(eae05e6627d09daa4b71154f665237348bf0947c) ) // 11xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION(0x400000, "gfx", 0)
+	ROM_LOAD( "s29al016.u2", 0x000000, 0x200000, CRC(677cf07b) SHA1(f30892aa18da14c2077e8847a295112616b06386) )
+	ROM_LOAD( "s29al016.u3", 0x200000, 0x200000, CRC(d218c777) SHA1(7cb09925419864ec784f31802b10e9649eba3e58) )
+ROM_END
+
+ROM_START( zenponta ) // HA9020-0
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "29f400.u1", 0x000000, 0x080000, CRC(1debce88) SHA1(035cb45da6c44fa54756282401003c60b44174eb) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION(0x400000, "gfx", 0)
+	ROM_LOAD( "29f016.u2",  0x000000, 0x200000, CRC(0ae3354b) SHA1(05c22650ab8c60ad09d30ca83c0d3c628f4be622) )
+	ROM_LOAD( "29lv160.u3", 0x200000, 0x200000, CRC(76ed6b4a) SHA1(5b3523353771d91c0382b8c2440cae795a8207ed) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
+ROM_END
+
 }   // anonymous namespace
 
+GAME( 2005, zenponta,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Zenigata Ponta",  MACHINE_NOT_WORKING )
 GAME( 2006, amhbattl,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Acchi Muite Hoi Battle",  MACHINE_NOT_WORKING )
 GAME( 2007, docchift,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Docchi Fighter",  MACHINE_NOT_WORKING )
 GAME( 2008, mmhammer,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Mogu Mogu Hammer",  MACHINE_NOT_WORKING )
+GAME( 2008, shpchamp,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Shippe Champion",  MACHINE_NOT_WORKING )

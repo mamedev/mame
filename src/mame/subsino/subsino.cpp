@@ -223,7 +223,7 @@ To Do:
 ***************************************************************************/
 
 #include "emu.h"
-#include "subsino_m.h"
+#include "subsino_crypt.h"
 
 #include "cpu/z180/hd647180x.h"
 #include "machine/i8255.h"
@@ -3901,7 +3901,8 @@ ROM_END
 
 void subsino_state::init_victor5()
 {
-	subsino_decrypt(machine(), victor5_bitswaps, victor5_xors, 0xc000);
+	uint8_t *rom = memregion( "maincpu" )->base();
+	subsino_decrypt(rom, victor5_bitswaps, victor5_xors, 0xc000);
 
 	m_flash_packet = 0;
 	m_flash_packet_start = 0;
@@ -3914,12 +3915,14 @@ void subsino_state::init_victor5()
 
 void subsino_state::init_victor21()
 {
-	subsino_decrypt(machine(), victor21_bitswaps, victor21_xors, 0xc000);
+	uint8_t *rom = memregion( "maincpu" )->base();
+	subsino_decrypt(rom, victor21_bitswaps, victor21_xors, 0xc000);
 }
 
 void subsino_state::init_crsbingo()
 {
-	subsino_decrypt(machine(), crsbingo_bitswaps, crsbingo_xors, 0xc000);
+	uint8_t *rom = memregion( "maincpu" )->base();
+	subsino_decrypt(rom, crsbingo_bitswaps, crsbingo_xors, 0xc000);
 
 	m_flash_packet = 0;
 	m_flash_packet_start = 0;
@@ -3932,12 +3935,14 @@ void subsino_state::init_crsbingo()
 
 void subsino_state::init_sharkpy()
 {
-	subsino_decrypt(machine(), sharkpy_bitswaps, sharkpy_xors, 0xa000);
+	uint8_t *rom = memregion( "maincpu" )->base();
+	subsino_decrypt(rom, sharkpy_bitswaps, sharkpy_xors, 0xa000);
 }
 
 void subsino_state::init_sharkpye()
 {
-	subsino_decrypt(machine(), victor5_bitswaps, victor5_xors, 0xa000);
+	uint8_t *rom = memregion( "maincpu" )->base();
+	subsino_decrypt(rom, victor5_bitswaps, victor5_xors, 0xa000);
 }
 
 void subsino_state::init_smoto20()
@@ -3955,8 +3960,7 @@ void subsino_state::init_smoto13()
 void subsino_state::init_tisub()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
-
-	init_victor5();
+	subsino_decrypt(rom, victor5_bitswaps, victor5_xors, 0xc000);
 
 	/* this trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region... */
 	rom[0x64c8] = 0x00;
@@ -3970,8 +3974,7 @@ void subsino_state::init_tisub()
 void subsino_state::init_tisuba()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
-
-	init_victor5();
+	subsino_decrypt(rom, victor5_bitswaps, victor5_xors, 0xc000);
 
 	/* this trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region... */
 	rom[0x6491] = 0x00;
@@ -3984,9 +3987,8 @@ void subsino_state::init_tisuba()
 
 void subsino_state::init_tisubb()
 {
-	subsino_decrypt(machine(), tisubb_bitswaps, tisubb_xors, 0xc000);
-
 	uint8_t *rom = memregion( "maincpu" )->base();
+	subsino_decrypt(rom, tisubb_bitswaps, tisubb_xors, 0xc000);
 
 	/* this trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region... */
 	rom[0x60da] = 0x00;

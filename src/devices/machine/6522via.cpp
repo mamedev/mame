@@ -11,17 +11,6 @@
 
 **********************************************************************/
 
-/*
-  1999-Dec-22 PeT
-   vc20 random number generation only partly working
-   (reads (uninitialized) timer 1 and timer 2 counter)
-   timer init, reset, read changed
-
-  2017-Feb-15 Edstrom
-   Fixed shift registers to be more accurate, eg 50/50 duty cycle, latching
-   on correct edges and leading and trailing edges added + logging.
- */
-
 #include "emu.h"
 #include "6522via.h"
 
@@ -29,10 +18,10 @@
     PARAMETERS
 ***************************************************************************/
 
-#define LOG_SETUP   (1U <<  1)
-#define LOG_SHIFT   (1U <<  2)
-#define LOG_READ    (1U <<  3)
-#define LOG_INT     (1U <<  4)
+#define LOG_SETUP   (1U << 1)
+#define LOG_SHIFT   (1U << 2)
+#define LOG_READ    (1U << 3)
+#define LOG_INT     (1U << 4)
 
 //#define VERBOSE (LOG_SHIFT|LOG_INT|LOG_SETUP)
 //#define LOG_OUTPUT_FUNC printf
@@ -180,27 +169,27 @@ void via6522_device::map(address_map &map)
 //  via6522_device - constructor
 //-------------------------------------------------
 
-via6522_device::via6522_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		m_in_a_handler(*this),
-		m_in_b_handler(*this),
-		m_out_a_handler(*this),
-		m_out_b_handler(*this),
-		m_ca2_handler(*this),
-		m_cb1_handler(*this),
-		m_cb2_handler(*this),
-		m_irq_handler(*this),
-		m_in_a(0xff),
-		m_in_ca1(0),
-		m_in_ca2(0),
-		m_out_ca2(0),
-		m_in_b(0xff),
-		m_in_cb1(0),
-		m_in_cb2(0),
-		m_pcr(0),
-		m_acr(0),
-		m_ier(0),
-		m_ifr(0)
+via6522_device::via6522_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_in_a_handler(*this, 0xff),
+	m_in_b_handler(*this, 0xff),
+	m_out_a_handler(*this),
+	m_out_b_handler(*this),
+	m_ca2_handler(*this),
+	m_cb1_handler(*this),
+	m_cb2_handler(*this),
+	m_irq_handler(*this),
+	m_in_a(0xff),
+	m_in_ca1(0),
+	m_in_ca2(0),
+	m_out_ca2(0),
+	m_in_b(0xff),
+	m_in_cb1(0),
+	m_in_cb2(0),
+	m_pcr(0),
+	m_acr(0),
+	m_ier(0),
+	m_ifr(0)
 {
 }
 
@@ -251,15 +240,6 @@ w65c22s_device::w65c22s_device(const machine_config &mconfig, const char *tag, d
 
 void via6522_device::device_start()
 {
-	m_in_a_handler.resolve();
-	m_in_b_handler.resolve();
-	m_out_a_handler.resolve_safe();
-	m_out_b_handler.resolve_safe();
-	m_cb1_handler.resolve_safe();
-	m_ca2_handler.resolve_safe();
-	m_cb2_handler.resolve_safe();
-	m_irq_handler.resolve_safe();
-
 	m_t1ll = 0xf3; /* via at 0x9110 in vic20 show these values */
 	m_t1lh = 0xb5; /* ports are not written by kernel! */
 	m_t2ll = 0xff; /* taken from vice */
@@ -562,7 +542,7 @@ TIMER_CALLBACK_MEMBER(via6522_device::ca2_tick)
 uint8_t via6522_device::input_pa()
 {
 	// HACK: port a in the real 6522 does not mask off the output pins, but you can't trust handlers.
-	if (!m_in_a_handler.isnull())
+	if (!m_in_a_handler.isunset())
 		return (m_in_a & ~m_ddr_a & m_in_a_handler()) | (m_out_a & m_ddr_a);
 	else
 		return (m_out_a | ~m_ddr_a) & m_in_a;
@@ -584,7 +564,7 @@ uint8_t via6522_device::input_pb()
 	uint8_t pb = m_in_b & ~m_ddr_b;
 
 	/// TODO: REMOVE THIS
-	if (m_ddr_b != 0xff && !m_in_b_handler.isnull())
+	if (m_ddr_b != 0xff && !m_in_b_handler.isunset())
 	{
 		pb &= m_in_b_handler();
 	}
@@ -630,13 +610,13 @@ u8 via6522_device::read(offs_t offset)
 	{
 	case VIA_PB:
 		/* update the input */
-		if (PB_LATCH_ENABLE(m_acr) == 0)
+		if ((PB_LATCH_ENABLE(m_acr) != 0) && ((m_ifr & INT_CB1) != 0))
 		{
-			val = input_pb();
+			val = m_latch_b;
 		}
 		else
 		{
-			val = m_latch_b;
+			val = input_pb();
 		}
 
 		if (!machine().side_effects_disabled())
@@ -648,13 +628,13 @@ u8 via6522_device::read(offs_t offset)
 
 	case VIA_PA:
 		/* update the input */
-		if (PA_LATCH_ENABLE(m_acr) == 0)
+		if ((PA_LATCH_ENABLE(m_acr) != 0) && ((m_ifr & INT_CA1) != 0))
 		{
-			val = input_pa();
+			val = m_latch_a;
 		}
 		else
 		{
-			val = m_latch_a;
+			val = input_pa();
 		}
 
 		if (!machine().side_effects_disabled())
@@ -676,13 +656,13 @@ u8 via6522_device::read(offs_t offset)
 
 	case VIA_PANH:
 		/* update the input */
-		if (PA_LATCH_ENABLE(m_acr) == 0)
+		if ((PA_LATCH_ENABLE(m_acr) != 0) && ((m_ifr & INT_CA1) != 0))
 		{
-			val = input_pa();
+			val = m_latch_a;
 		}
 		else
 		{
-			val = m_latch_a;
+			val = input_pa();
 		}
 		break;
 
@@ -1058,12 +1038,8 @@ void via6522_device::write(offs_t offset, u8 data)
 		break;
 
 	case VIA_IFR:
-		if (data & INT_ANY)
-		{
-			data = 0x7f;
-		}
 		LOGINT("IFR INT ");
-		clear_int(data);
+		clear_int(data & 0x7f);
 		break;
 	}
 }
@@ -1085,7 +1061,7 @@ void via6522_device::write_pa( u8 data )
     ca1_w - interface setting VIA port CA1 input
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( via6522_device::write_ca1 )
+void via6522_device::write_ca1(int state)
 {
 	if (m_in_ca1 != state)
 	{
@@ -1117,7 +1093,7 @@ WRITE_LINE_MEMBER( via6522_device::write_ca1 )
     ca2_w - interface setting VIA port CA2 input
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( via6522_device::write_ca2 )
+void via6522_device::write_ca2(int state)
 {
 	if (m_in_ca2 != state)
 	{
@@ -1159,7 +1135,7 @@ void via6522_device::write_pb( u8 data )
     write_cb1 - interface setting VIA port CB1 input
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( via6522_device::write_cb1 )
+void via6522_device::write_cb1(int state)
 {
 	if (m_in_cb1 != state)
 	{
@@ -1200,7 +1176,7 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
     write_cb2 - interface setting VIA port CB2 input
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( via6522_device::write_cb2 )
+void via6522_device::write_cb2(int state)
 {
 	if (m_in_cb2 != state)
 	{

@@ -60,7 +60,7 @@ public:
 		m_floppy(*this, "fdc:%d", 0U),
 		m_rtc(*this,"rtc"),
 		m_scsibus1(*this, "scsi1"),
-		m_ncr1(*this, "scsi1:7:ncr5394"),
+		m_ncr1(*this, "scsi1:7:ncr53c96"),
 		m_sonic(*this, "sonic"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -87,7 +87,7 @@ private:
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<rtc3430042_device> m_rtc;
 	required_device<nscsi_bus_device> m_scsibus1;
-	required_device<ncr53cf94_device> m_ncr1;
+	required_device<ncr53c96_device> m_ncr1;
 	required_device<dp83932c_device> m_sonic;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -123,22 +123,22 @@ private:
 	uint32_t m_dafb_colors[3]{}, m_dafb_count = 0, m_dafb_clutoffs = 0, m_dafb_montype = 0, m_dafb_vbltime = 0;
 	uint32_t m_dafb_palette[256]{};
 
-	DECLARE_WRITE_LINE_MEMBER(nubus_irq_9_w);
-	DECLARE_WRITE_LINE_MEMBER(nubus_irq_a_w);
-	DECLARE_WRITE_LINE_MEMBER(nubus_irq_b_w);
-	DECLARE_WRITE_LINE_MEMBER(nubus_irq_c_w);
-	DECLARE_WRITE_LINE_MEMBER(nubus_irq_d_w);
-	DECLARE_WRITE_LINE_MEMBER(nubus_irq_e_w);
+	void nubus_irq_9_w(int state);
+	void nubus_irq_a_w(int state);
+	void nubus_irq_b_w(int state);
+	void nubus_irq_c_w(int state);
+	void nubus_irq_d_w(int state);
+	void nubus_irq_e_w(int state);
 	void nubus_slot_interrupt(uint8_t slot, uint32_t state);
 	int m_via2_ca1_hack = 0, m_nubus_irq_state = 0;
 
-	WRITE_LINE_MEMBER(adb_irq_w) { m_adb_irq_pending = state; }
+	void adb_irq_w(int state) { m_adb_irq_pending = state; }
 	int m_adb_irq_pending = 0;
 
-	DECLARE_WRITE_LINE_MEMBER(irq_539x_1_w);
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(irq_539x_2_w);
-	DECLARE_WRITE_LINE_MEMBER(drq_539x_1_w);
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(drq_539x_2_w);
+	void irq_539x_1_w(int state);
+	[[maybe_unused]] void irq_539x_2_w(int state);
+	void drq_539x_1_w(int state);
+	[[maybe_unused]] void drq_539x_2_w(int state);
 
 	floppy_image_device *m_cur_floppy = nullptr;
 	int m_hdsel = 0;
@@ -157,8 +157,8 @@ private:
 	void mac_via2_out_b(uint8_t data);
 	void mac_via_sync();
 	void field_interrupts();
-	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);
-	DECLARE_WRITE_LINE_MEMBER(mac_via2_irq);
+	void mac_via_irq(int state);
+	void mac_via2_irq(int state);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	int m_via_interrupt = 0, m_via2_interrupt = 0, m_scc_interrupt = 0, m_last_taken_interrupt = 0;
 
@@ -196,6 +196,8 @@ private:
 
 	uint8_t mac_5396_r(offs_t offset);
 	void mac_5396_w(offs_t offset, uint8_t data);
+	uint16_t mac_5396_dma_r(offs_t offset);
+	void mac_5396_dma_w(offs_t offset, uint16_t data);
 };
 
 void macquadra_state::field_interrupts()
@@ -325,12 +327,12 @@ void macquadra_state::nubus_slot_interrupt(uint8_t slot, uint32_t state)
 	}
 }
 
-WRITE_LINE_MEMBER(macquadra_state::nubus_irq_9_w) { nubus_slot_interrupt(9, state); }
-WRITE_LINE_MEMBER(macquadra_state::nubus_irq_a_w) { nubus_slot_interrupt(0xa, state); }
-WRITE_LINE_MEMBER(macquadra_state::nubus_irq_b_w) { nubus_slot_interrupt(0xb, state); }
-WRITE_LINE_MEMBER(macquadra_state::nubus_irq_c_w) { nubus_slot_interrupt(0xc, state); }
-WRITE_LINE_MEMBER(macquadra_state::nubus_irq_d_w) { nubus_slot_interrupt(0xd, state); }
-WRITE_LINE_MEMBER(macquadra_state::nubus_irq_e_w) { nubus_slot_interrupt(0xe, state); }
+void macquadra_state::nubus_irq_9_w(int state) { nubus_slot_interrupt(9, state); }
+void macquadra_state::nubus_irq_a_w(int state) { nubus_slot_interrupt(0xa, state); }
+void macquadra_state::nubus_irq_b_w(int state) { nubus_slot_interrupt(0xb, state); }
+void macquadra_state::nubus_irq_c_w(int state) { nubus_slot_interrupt(0xc, state); }
+void macquadra_state::nubus_irq_d_w(int state) { nubus_slot_interrupt(0xd, state); }
+void macquadra_state::nubus_irq_e_w(int state) { nubus_slot_interrupt(0xe, state); }
 
 // DAFB: video for Quadra 700/900
 
@@ -628,17 +630,17 @@ uint32_t macquadra_state::screen_update_dafb(screen_device &screen, bitmap_rgb32
 	return 0;
 }
 
-WRITE_LINE_MEMBER(macquadra_state::drq_539x_1_w)
+void macquadra_state::drq_539x_1_w(int state)
 {
 	m_dafb_scsi1_drq = state;
 }
 
-WRITE_LINE_MEMBER(macquadra_state::drq_539x_2_w)
+void macquadra_state::drq_539x_2_w(int state)
 {
 	m_dafb_scsi2_drq = state;
 }
 
-WRITE_LINE_MEMBER(macquadra_state::irq_539x_1_w)
+void macquadra_state::irq_539x_1_w(int state)
 {
 	if (state)  // make sure a CB1 transition occurs
 	{
@@ -647,7 +649,7 @@ WRITE_LINE_MEMBER(macquadra_state::irq_539x_1_w)
 	}
 }
 
-WRITE_LINE_MEMBER(macquadra_state::irq_539x_2_w)
+void macquadra_state::irq_539x_2_w(int state)
 {
 }
 
@@ -679,13 +681,13 @@ void macquadra_state::mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_via1->write(offset, (data >> 8) & 0xff);
 }
 
-WRITE_LINE_MEMBER(macquadra_state::mac_via_irq)
+void macquadra_state::mac_via_irq(int state)
 {
 	m_via_interrupt = state;
 	field_interrupts();
 }
 
-WRITE_LINE_MEMBER(macquadra_state::mac_via2_irq)
+void macquadra_state::mac_via2_irq(int state)
 {
 	m_via2_interrupt = state;
 	field_interrupts();
@@ -744,7 +746,7 @@ void macquadra_state::mac_via_sync()
 uint32_t macquadra_state::rom_switch_r(offs_t offset)
 {
 	// disable the overlay
-	if (m_overlay)
+	if (m_overlay && !machine().side_effects_disabled())
 	{
 		address_space& space = m_maincpu->space(AS_PROGRAM);
 		const u32 memory_end = m_ram->size() - 1;
@@ -768,29 +770,32 @@ TIMER_CALLBACK_MEMBER(macquadra_state::mac_6015_tick)
 
 uint8_t macquadra_state::mac_5396_r(offs_t offset)
 {
-	if (offset < 0x100)
-	{
-		return m_ncr1->read(offset>>4);
-	}
-	else    // pseudo-DMA: read from the FIFO
-	{
-		return m_ncr1->dma_r();
-	}
-
-	// never executed
-	return 0;
+	return m_ncr1->read(offset>>4);
 }
 
 void macquadra_state::mac_5396_w(offs_t offset, uint8_t data)
 {
-	if (offset < 0x100)
-	{
-		m_ncr1->write(offset>>4, data);
-	}
-	else    // pseudo-DMA: write to the FIFO
-	{
-		m_ncr1->dma_w(data);
-	}
+	m_ncr1->write(offset>>4, data);
+}
+
+uint16_t macquadra_state::mac_5396_dma_r(offs_t offset)
+{
+	// HACK: Extra time is necessary to avoid underrunning the FIFO at 4 MB/sec transfer rates claimed to
+	// be typical for Apple HDDs of the period.
+	// Likely due to inaccurate 68040 bus timings or wait states; DAFB documentation is clear that there is
+	// no "magic latch" like the 5380 machines use.
+	if (!machine().side_effects_disabled() && BIT(offset << 1, 18))
+		m_maincpu->adjust_icount(-4);
+
+	return m_ncr1->dma16_swap_r();
+}
+
+void macquadra_state::mac_5396_dma_w(offs_t offset, uint16_t data)
+{
+	if (!machine().side_effects_disabled() && BIT(offset << 1, 18))
+		m_maincpu->adjust_icount(-4);
+
+	m_ncr1->dma16_swap_w(data);
 }
 
 /***************************************************************************
@@ -805,7 +810,8 @@ void macquadra_state::quadra700_map(address_map &map)
 // 50008000 = Ethernet MAC ID PROM
 // 5000a000 = Sonic (DP83932) ethernet
 // 5000f000 = SCSI cf96, 5000f402 = SCSI #2 cf96
-	map(0x5000f000, 0x5000f401).rw(FUNC(macquadra_state::mac_5396_r), FUNC(macquadra_state::mac_5396_w)).mirror(0x00fc0000);
+	map(0x5000f000, 0x5000f0ff).rw(FUNC(macquadra_state::mac_5396_r), FUNC(macquadra_state::mac_5396_w)).mirror(0x00fc0000);
+	map(0x5000f100, 0x5000f101).rw(FUNC(macquadra_state::mac_5396_dma_r), FUNC(macquadra_state::mac_5396_dma_w)).select(0x00fc0000);
 	map(0x5000c000, 0x5000dfff).rw(FUNC(macquadra_state::mac_scc_r), FUNC(macquadra_state::mac_scc_2_w)).mirror(0x00fc0000);
 	map(0x50014000, 0x50015fff).rw(m_easc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00fc0000);
 	map(0x5001e000, 0x5001ffff).rw(FUNC(macquadra_state::swim_r), FUNC(macquadra_state::swim_w)).mirror(0x00fc0000);
@@ -947,15 +953,12 @@ void macquadra_state::macqd700(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi1:4", mac_scsi_devices, "cdrom");
 	NSCSI_CONNECTOR(config, "scsi1:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:6", mac_scsi_devices, "harddisk");
-	// HACK: Max clock for 5394/96 is 25 MHz, but we underrun the FIFO at that speed.
-	// Likely due to inaccurate 68040 and/or NSCSI bus timings; DAFB documentation is clear that there is
-	// no "magic latch" like the 5380 machines use.
-	NSCSI_CONNECTOR(config, "scsi1:7").option_set("ncr5394", NCR53CF94).clock(50_MHz_XTAL).machine_config(
+	NSCSI_CONNECTOR(config, "scsi1:7").option_set("ncr53c96", NCR53C96).clock(50_MHz_XTAL / 2).machine_config(
 		[this] (device_t *device)
 		{
-			ncr53cf94_device &adapter = downcast<ncr53cf94_device &>(*device);
+			ncr53c96_device &adapter = downcast<ncr53c96_device &>(*device);
 
-			adapter.set_busmd(ncr53cf94_device::BUSMD_0);
+			adapter.set_busmd(ncr53c96_device::BUSMD_1);
 			adapter.irq_handler_cb().set(*this, FUNC(macquadra_state::irq_539x_1_w));
 			adapter.drq_handler_cb().set(*this, FUNC(macquadra_state::drq_539x_1_w));
 		});

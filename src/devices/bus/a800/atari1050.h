@@ -29,9 +29,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER(data_out_w) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(command_w) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(ready_w) override;
+	virtual void data_out_w(int state) override;
+	virtual void command_w(int state) override;
+	virtual void ready_w(int state) override;
 
 private:
 	void step_w(u8 data);
@@ -42,7 +42,6 @@ private:
 	required_device<wd2793_device> m_fdc;
 };
 
-// device type declaration
 DECLARE_DEVICE_TYPE(ATARI1050, atari1050_device)
 
 #endif // MAME_BUS_A800_ATARI1050

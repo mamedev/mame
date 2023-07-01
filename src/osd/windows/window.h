@@ -33,9 +33,6 @@
 //  CONSTANTS
 //============================================================
 
-#define RESIZE_STATE_NORMAL     0
-#define RESIZE_STATE_RESIZING   1
-#define RESIZE_STATE_PENDING    2
 
 
 
@@ -54,6 +51,13 @@ enum class win_window_focus
 class win_window_info  : public osd_window_t<HWND>
 {
 public:
+	enum
+	{
+		RESIZE_STATE_NORMAL,
+		RESIZE_STATE_RESIZING,
+		RESIZE_STATE_PENDING
+	};
+
 	win_window_info(running_machine &machine, render_module &renderprovider, int index, const std::shared_ptr<osd_monitor_info> &monitor, const osd_window_config *config);
 
 	bool attached_mode() const { return m_attached_mode; }
@@ -119,6 +123,9 @@ public:
 	int                 m_lastclickx;
 	int                 m_lastclicky;
 	char16_t            m_last_surrogate;
+
+	HDC                 m_dc;       // only used by GDI renderer!
+	int                 m_resize_state;
 
 private:
 	void draw_video_contents(HDC dc, bool update);

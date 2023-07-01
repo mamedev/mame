@@ -114,12 +114,11 @@ void windows_osd_interface::update(bool skip_redraw)
 //  input_update
 //============================================================
 
-void windows_osd_interface::input_update()
+void windows_osd_interface::input_update(bool relative_reset)
 {
 	// poll the joystick values here
 	process_events(true, false);
-	poll_input(machine());
-	check_osd_inputs();
+	poll_input_modules(relative_reset);
 }
 
 //============================================================
@@ -175,7 +174,7 @@ void windows_osd_interface::extract_video_config()
 	video_config.triplebuf     = options().triple_buffer();
 	video_config.switchres     = options().switch_res();
 
-	if (video_config.prescale < 1 || video_config.prescale > 8)
+	if (video_config.prescale < 1 || video_config.prescale > 20)
 	{
 		osd_printf_warning("Invalid prescale option, reverting to '1'\n");
 		video_config.prescale = 1;

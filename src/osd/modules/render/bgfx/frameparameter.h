@@ -13,6 +13,7 @@
 
 #include "parameter.h"
 
+#include <cstdint>
 #include <string>
 
 class bgfx_frame_parameter : public bgfx_parameter

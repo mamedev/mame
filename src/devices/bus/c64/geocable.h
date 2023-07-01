@@ -37,15 +37,15 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_pet_user_port_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER(input_c) override { m_centronics->write_data0(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_d) override { m_centronics->write_data1(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_e) override { m_centronics->write_data2(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_f) override { m_centronics->write_data3(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_h) override { m_centronics->write_data4(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_j) override { m_centronics->write_data5(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_k) override { m_centronics->write_data6(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_l) override { m_centronics->write_data7(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_m) override { m_centronics->write_strobe(state); }
+	virtual void input_c(int state) override { m_centronics->write_data0(state); }
+	virtual void input_d(int state) override { m_centronics->write_data1(state); }
+	virtual void input_e(int state) override { m_centronics->write_data2(state); }
+	virtual void input_f(int state) override { m_centronics->write_data3(state); }
+	virtual void input_h(int state) override { m_centronics->write_data4(state); }
+	virtual void input_j(int state) override { m_centronics->write_data5(state); }
+	virtual void input_k(int state) override { m_centronics->write_data6(state); }
+	virtual void input_l(int state) override { m_centronics->write_data7(state); }
+	virtual void input_m(int state) override { m_centronics->write_strobe(state); }
 
 private:
 	required_device<centronics_device> m_centronics;

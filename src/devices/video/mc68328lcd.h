@@ -18,9 +18,9 @@ class mc68328_lcd_device : public device_t,
 public:
 	mc68328_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	DECLARE_WRITE_LINE_MEMBER(flm_w);
-	DECLARE_WRITE_LINE_MEMBER(llp_w);
-	DECLARE_WRITE_LINE_MEMBER(lsclk_w);
+	void flm_w(int state);
+	void llp_w(int state);
+	void lsclk_w(int state);
 	void ld_w(u8 data);
 	void lcd_info_changed(double refresh_hz, int width, int height, u8 bus_width, u8 bpp);
 

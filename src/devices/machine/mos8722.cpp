@@ -73,9 +73,9 @@ mos8722_device::mos8722_device(const machine_config &mconfig, const char *tag, d
 	device_t(mconfig, MOS8722, tag, owner, clock),
 	m_write_z80en(*this),
 	m_write_fsdir(*this),
-	m_read_game(*this),
-	m_read_exrom(*this),
-	m_read_sense40(*this)
+	m_read_game(*this, 1),
+	m_read_exrom(*this, 1),
+	m_read_sense40(*this, 1)
 {
 }
 
@@ -86,12 +86,6 @@ mos8722_device::mos8722_device(const machine_config &mconfig, const char *tag, d
 
 void mos8722_device::device_start()
 {
-	// resolve callbacks
-	m_write_z80en.resolve_safe();
-	m_write_fsdir.resolve_safe();
-	m_read_game.resolve_safe(1);
-	m_read_exrom.resolve_safe(1);
-	m_read_sense40.resolve_safe(1);
 }
 
 
@@ -252,7 +246,7 @@ void mos8722_device::write(offs_t offset, uint8_t data)
 //  fsdir_r - fast serial direction read
 //-------------------------------------------------
 
-READ_LINE_MEMBER( mos8722_device::fsdir_r )
+int mos8722_device::fsdir_r()
 {
 	return MCR_FSDIR;
 }

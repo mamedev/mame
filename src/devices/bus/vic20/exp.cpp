@@ -71,11 +71,6 @@ vic20_expansion_slot_device::vic20_expansion_slot_device(const machine_config &m
 void vic20_expansion_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_write_irq.resolve_safe();
-	m_write_nmi.resolve_safe();
-	m_write_res.resolve_safe();
 }
 
 
@@ -92,7 +87,7 @@ void vic20_expansion_slot_device::device_reset()
 //  call_load -
 //-------------------------------------------------
 
-image_init_result vic20_expansion_slot_device::call_load()
+std::pair<std::error_condition, std::string> vic20_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
@@ -109,7 +104,7 @@ image_init_result vic20_expansion_slot_device::call_load()
 				// read the header
 				uint8_t header[2];
 				fread(&header, 2);
-				uint16_t address = (header[1] << 8) | header[0];
+				uint16_t const address = (header[1] << 8) | header[0];
 
 				switch (address)
 				{
@@ -119,7 +114,7 @@ image_init_result vic20_expansion_slot_device::call_load()
 				case 0x7000: fread(m_card->m_blk3, 0x2000, 0x1000); break;
 				case 0xa000: fread(m_card->m_blk5, 0x2000); break;
 				case 0xb000: fread(m_card->m_blk5, 0x2000, 0x1000); break;
-				default: return image_init_result::FAIL;
+				default: return std::make_pair(image_error::INVALIDIMAGE, "Unsupported address in CRT file header");
 				}
 			}
 		}
@@ -132,7 +127,7 @@ image_init_result vic20_expansion_slot_device::call_load()
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

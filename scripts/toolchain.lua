@@ -50,18 +50,31 @@ newoption {
 newoption {
 	trigger = "with-android",
 	value   = "#",
-	description = "Set Android platform version (default: android-21).",
+	description = "Set Android platform version (default: android-24).",
 }
+
+local android = {}
+
+function androidToolchainRoot()
+	if android.toolchainRoot == nil then
+		local hostTags = {
+			windows = "windows-x86_64",
+			linux   = "linux-x86_64",
+			macosx  = "darwin-x86_64"
+		}
+		android.toolchainRoot = (os.getenv("ANDROID_NDK_HOME") or "") .. "/toolchains/llvm/prebuilt/" .. hostTags[os.get()]
+	end
+
+	return android.toolchainRoot;
+end
 
 function toolchain(_buildDir, _subDir)
 
 	location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION)
 
-	local androidPlatform = "android-24"
+	local androidApiLevel = 24
 	if _OPTIONS["with-android"] then
-		androidPlatform = "android-" .. _OPTIONS["with-android"]
-	elseif _OPTIONS["PLATFORM"]:find("64", -2) then
-		androidPlatform = "android-24"
+		androidApiLevel = _OPTIONS["with-android"]
 	end
 
 	if _ACTION == "gmake" or _ACTION == "ninja" then
@@ -73,32 +86,18 @@ function toolchain(_buildDir, _subDir)
 
 		if string.find(_OPTIONS["gcc"], "android") then
 			-- 64-bit android platform requires >= 21
-			if _OPTIONS["PLATFORM"]:find("64", -2) and tonumber(androidPlatform:sub(9)) < 21 then
+			if _OPTIONS["PLATFORM"]:find("64", -2) and (androidApiLevel < 21) then
 				error("64-bit android requires platform 21 or higher")
 			end
-			if not os.getenv("ANDROID_NDK_ROOT") then
-				print("Set ANDROID_NDK_ROOT environment variable.")
-			end
-			if not os.getenv("ANDROID_NDK_LLVM") then
-				print("Set ANDROID_NDK_LLVM envrionment variable.")
-			end
-			platform_ndk_env = "ANDROID_NDK_" .. _OPTIONS["PLATFORM"]:upper()
-			if not os.getenv(platform_ndk_env) then
-				print("Set " .. platform_ndk_env .. " environment variable.")
+			if not os.getenv("ANDROID_NDK_HOME") then
+				print("Set ANDROID_NDK_HOME environment variable.")
 			end
 
-			local platformToolchainMap = {
-				['arm']    = "arm-linux-androideabi",
-				['arm64']  = "aarch64-linux-android",
-				['x86']    = "i686-linux-android",
-				['x64']    = "x86_64-linux-android",
-			}
 
-			toolchainPrefix = os.getenv(platform_ndk_env) .. "/bin/" .. platformToolchainMap[_OPTIONS["PLATFORM"]] .. "-"
+			premake.gcc.cc   = androidToolchainRoot() .. "/bin/clang"
+			premake.gcc.cxx  = androidToolchainRoot() .. "/bin/clang++"
+			premake.gcc.ar   = androidToolchainRoot() .. "/bin/llvm-ar"
 
-			premake.gcc.cc  = "$(ANDROID_NDK_LLVM)/bin/clang"
-			premake.gcc.cxx = "$(ANDROID_NDK_LLVM)/bin/clang++"
-			premake.gcc.ar  = toolchainPrefix .. "ar"
 			premake.gcc.llvm = true
 
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-" .. _OPTIONS["PLATFORM"])
@@ -481,17 +480,6 @@ function toolchain(_buildDir, _subDir)
 
 	configuration { "android-*" }
 		objdir (_buildDir .. "android/obj/" .. _OPTIONS["PLATFORM"])
-		includedirs {
-			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libcxx/include",
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/include",
-			"$(ANDROID_NDK_ROOT)/sysroot/usr/include",
-			"$(ANDROID_NDK_ROOT)/sources/android/support/include",
-			"$(ANDROID_NDK_ROOT)/sources/android/native_app_glue",
-		}
-		linkoptions {
-			"-nostdlib",
-		}
 		flags {
 			"NoImportLib",
 		}
@@ -501,127 +489,68 @@ function toolchain(_buildDir, _subDir)
 			"m",
 			"android",
 			"log",
-			"c++_static",
-			"c++abi",
-			"stdc++",
-			"gcc",
 		}
 		buildoptions_c {
-			"-Wno-strict-prototypes",
+			"--gcc-toolchain=" .. androidToolchainRoot(),
+			"--sysroot=" .. androidToolchainRoot() .. "/sysroot",
 		}
 		buildoptions {
+			"--gcc-toolchain=" .. androidToolchainRoot(),
+			"--sysroot=" .. androidToolchainRoot() .. "/sysroot",
 			"-fpic",
 			"-ffunction-sections",
 			"-funwind-tables",
 			"-fstack-protector-strong",
 			"-no-canonical-prefixes",
-			"-fno-integrated-as",
-			"-Wunused-value",
-			"-Wundef",
-			"-Wno-cast-align",
-			"-Wno-unknown-attributes",
-			"-Wno-macro-redefined",
-			"-DASIO_HAS_STD_STRING_VIEW",
-			"-Wno-unused-function",
 		}
 		linkoptions {
-			"-no-canonical-prefixes",
+			"--gcc-toolchain=" .. androidToolchainRoot(),
+			"--sysroot=" .. androidToolchainRoot() .. "/sysroot",
 			"-Wl,--no-undefined",
 			"-Wl,-z,noexecstack",
 			"-Wl,-z,relro",
 			"-Wl,-z,now",
 		}
 
-
 	configuration { "android-arm" }
-			libdirs {
-				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a",
-				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib",
-			}
-			includedirs {
-				"$(ANDROID_NDK_ROOT)/sysroot/usr/include/arm-linux-androideabi",
-			}
 			buildoptions {
-				"-gcc-toolchain $(ANDROID_NDK_ARM)",
-				"-target armv7-none-linux-androideabi",
+				"--target=armv7-none-linux-android" .. androidApiLevel,
 				"-march=armv7-a",
 				"-mfloat-abi=softfp",
-				"-mfpu=vfpv3-d16",
+				"-mfpu=neon",
 				"-mthumb",
-			}
-			links {
-				"unwind",
 			}
 			linkoptions {
-				"-gcc-toolchain $(ANDROID_NDK_ARM)",
-				"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm",
-				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib/crtbegin_so.o",
-				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib/crtend_so.o",
-				"-target armv7-none-linux-androideabi",
+				"--target=armv7-none-linux-android" .. androidApiLevel,
 				"-march=armv7-a",
-				"-mthumb",
 			}
 
 	configuration { "android-arm64" }
-			libdirs {
-				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/arm64-v8a",
-				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/lib64",
-			}
-			includedirs {
-				"$(ANDROID_NDK_ROOT)/sysroot/usr/include/aarch64-linux-android",
-			}
 			buildoptions {
-				"-gcc-toolchain $(ANDROID_NDK_ARM64)",
-				"-target aarch64-none-linux-android",
+				"--target=aarch64-none-linux-android" .. androidApiLevel,
 			}
 			linkoptions {
-				"-gcc-toolchain $(ANDROID_NDK_ARM64)",
-				"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64",
-				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/lib/crtbegin_so.o",
-				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/lib/crtend_so.o",
-				"-target aarch64-none-linux-android",
+				"--target=aarch64-none-linux-android" .. androidApiLevel,
 			}
 
 	configuration { "android-x86" }
-		libdirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/x86",
-			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/lib",
-		}
-		includedirs {
-			"$(ANDROID_NDK_ROOT)/sysroot/usr/include/i686-linux-android",
-		}
 		buildoptions {
-			"-gcc-toolchain $(ANDROID_NDK_X86)",
-			"-target i686-none-linux-android",
-			"-mssse3"
+			"--target=i686-none-linux-android" .. androidApiLevel,
+			"-mtune=atom",
+			"-mstackrealign",
+			"-msse3",
+			"-mfpmath=sse",
 		}
 		linkoptions {
-			"-gcc-toolchain $(ANDROID_NDK_X86)",
-			"-target i686-none-linux-android",
-			"-mssse3",
-			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86",
-			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/lib/crtbegin_so.o",
-			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/lib/crtend_so.o",
+			"--target=i686-none-linux-android" .. androidApiLevel,
 		}
 
 	configuration { "android-x64" }
-		libdirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/x86_64",
-			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86_64/usr/lib64",
-		}
-		includedirs {
-			"$(ANDROID_NDK_ROOT)/sysroot/usr/include/x86_64-linux-android",
-		}
 		buildoptions {
-			"-gcc-toolchain $(ANDROID_NDK_X64)",
-			"-target x86_64-none-linux-android",
+			"--target=x86_64-none-linux-android" .. androidApiLevel,
 		}
 		linkoptions {
-			"-gcc-toolchain $(ANDROID_NDK_X64)",
-			"-target x86_64-none-linux-android",
-			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86_64",
-			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86_64/usr/lib64/crtbegin_so.o",
-			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86_64/usr/lib64/crtend_so.o",
+			"--target=x86_64-none-linux-android" .. androidApiLevel,
 		}
 
 	configuration { "asmjs" }

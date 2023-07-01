@@ -56,7 +56,7 @@ license:CC0-1.0
 		<info name="alt_title" value="リトルロマンス"/>
 		<part name="cart" interface="loopy_cart">
 			<dataarea name="rom" size="0x300000">
-				<rom name="d23c16000.ic104" size="0x200000" crc="947a96c3" sha1="df27293c136420d4c21724517953510292319433" offset="0x000000" />
+				<rom name="d23c16000.ic104" size="0x200000" crc="4406ed81" sha1="32ce9fa7f5d3cb6a9de69f0a54fb3a169cec5432" offset="0x000000" />
 				<rom name="d23c8000.ic105" size="0x100000" crc="a868e597" sha1="87226d26dbb3a95ce8f75a595bd874af6e5cb17b" offset="0x200000" />
 			</dataarea>
 		</part>

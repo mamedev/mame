@@ -76,12 +76,12 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	//DECLARE_WRITE_LINE_MEMBER(sound_end0) { m_sys->generate_custom_interrupt(2); }
-	//DECLARE_WRITE_LINE_MEMBER(sound_end1) { m_sys->generate_custom_interrupt(3); }
-	//DECLARE_WRITE_LINE_MEMBER(sound_end2) { m_sys->generate_custom_interrupt(4); }
-	//DECLARE_WRITE_LINE_MEMBER(sound_end3) { m_sys->generate_custom_interrupt(5); }
-	//DECLARE_WRITE_LINE_MEMBER(sound_end4) { m_sys->generate_custom_interrupt(6); }
-	//DECLARE_WRITE_LINE_MEMBER(sound_end5) { m_sys->generate_custom_interrupt(7); }
+	//void sound_end0(int state) { m_sys->generate_custom_interrupt(2); }
+	//void sound_end1(int state) { m_sys->generate_custom_interrupt(3); }
+	//void sound_end2(int state) { m_sys->generate_custom_interrupt(4); }
+	//void sound_end3(int state) { m_sys->generate_custom_interrupt(5); }
+	//void sound_end4(int state) { m_sys->generate_custom_interrupt(6); }
+	//void sound_end5(int state) { m_sys->generate_custom_interrupt(7); }
 
 	uint8_t nmi_vector_r(offs_t offset)
 	{

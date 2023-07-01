@@ -18,6 +18,30 @@
 //  BASE FINDER CLASS
 //**************************************************************************
 
+//-------------------------------------------------
+//  device_resolver_base - constructor
+//-------------------------------------------------
+
+device_resolver_base::device_resolver_base(device_t &base)
+	: m_next(base.register_auto_finder(*this))
+{
+}
+
+
+//-------------------------------------------------
+//  ~device_resolver_base - destructor
+//-------------------------------------------------
+
+device_resolver_base::~device_resolver_base()
+{
+}
+
+
+
+//**************************************************************************
+//  BASE FINDER CLASS
+//**************************************************************************
+
 constexpr char finder_base::DUMMY_TAG[];
 
 
@@ -26,19 +50,10 @@ constexpr char finder_base::DUMMY_TAG[];
 //-------------------------------------------------
 
 finder_base::finder_base(device_t &base, char const *tag)
-	: m_next(base.register_auto_finder(*this))
+	: device_resolver_base(base)
 	, m_base(base)
 	, m_tag(tag)
 	, m_resolved(false)
-{
-}
-
-
-//-------------------------------------------------
-//  ~finder_base - destructor
-//-------------------------------------------------
-
-finder_base::~finder_base()
 {
 }
 
@@ -50,6 +65,7 @@ finder_base::~finder_base()
 void finder_base::set_tag(char const *tag)
 {
 	assert(!m_resolved);
+	assert(tag);
 	m_base = m_base.get().mconfig().current_device();
 	m_tag = tag;
 }

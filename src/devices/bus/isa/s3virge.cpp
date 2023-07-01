@@ -88,7 +88,6 @@ void s3virge_vga_device::device_start()
 	vga.crtc.maximum_scan_line = 1;
 
 	// copy over interfaces
-	vga.read_dipswitch.set(nullptr); //read_dipswitch;
 	vga.svga_intf.seq_regcount = 0x1c;
 	vga.svga_intf.crtc_regcount = 0x19;
 	vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
@@ -113,8 +112,6 @@ void s3virge_vga_device::device_start()
 	save_item(s3virge.s3d.reg[2],"S3D Registers: 2D Polygon");
 	save_item(s3virge.s3d.reg[3],"S3D Registers: 3D Line");
 	save_item(s3virge.s3d.reg[4],"S3D Registers: 3D Triangle");
-
-	m_linear_config_changed_cb.resolve_safe();
 
 	// Initialise hardware graphics cursor colours, Windows 95 doesn't touch the registers for some reason
 	for (int x = 0; x < 4; x++)
@@ -759,7 +756,7 @@ uint8_t s3virge_vga_device::port_03b0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
-	if (CRTC_PORT_ADDR == 0x3b0)
+	if (get_crtc_port() == 0x3b0)
 	{
 		switch(offset)
 		{
@@ -777,7 +774,7 @@ uint8_t s3virge_vga_device::port_03b0_r(offs_t offset)
 
 void s3virge_vga_device::port_03b0_w(offs_t offset, uint8_t data)
 {
-	if (CRTC_PORT_ADDR == 0x3b0)
+	if (get_crtc_port() == 0x3b0)
 	{
 		switch(offset)
 		{
@@ -820,7 +817,7 @@ uint8_t s3virge_vga_device::port_03d0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
-	if (CRTC_PORT_ADDR == 0x3d0)
+	if (get_crtc_port() == 0x3d0)
 	{
 		switch(offset)
 		{
@@ -838,7 +835,7 @@ uint8_t s3virge_vga_device::port_03d0_r(offs_t offset)
 
 void s3virge_vga_device::port_03d0_w(offs_t offset, uint8_t data)
 {
-	if (CRTC_PORT_ADDR == 0x3d0)
+	if (get_crtc_port() == 0x3d0)
 	{
 		switch(offset)
 		{
@@ -1424,7 +1421,7 @@ void s3virge_vga_device::bitblt_monosrc_step()
 				dst = read_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current, dest_stride());
 
 				if (de)
-				{ 
+				{
 					if(src & (1 << x))
 						write_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_SRC_FG_CLR], dst, pat) & 0xffff);
 					else if(!(current_command & 0x200)) // only draw background colour if transparency is not set

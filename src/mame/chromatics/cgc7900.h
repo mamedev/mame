@@ -97,7 +97,7 @@ public:
 	u16 sync_r();
 	u16 unmapped_r();
 
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq) { irq_encoder(N, state); }
+	template <unsigned N> void irq(int state) { irq_encoder(N, state); }
 
 	void update_clut();
 	void draw_bitmap(screen_device *screen, bitmap_rgb32 &bitmap);

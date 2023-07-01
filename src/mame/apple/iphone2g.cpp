@@ -27,7 +27,6 @@ protected:
 	iphone2g_spi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -87,12 +86,6 @@ device_memory_interface::space_config_vector iphone2g_spi_device::memory_space_c
 	};
 }
 
-void iphone2g_spi_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_out_irq_func.resolve_safe();
-}
-
 void iphone2g_spi_device::device_start()
 {
 	save_item(NAME(m_cmd));
@@ -137,7 +130,6 @@ protected:
 	iphone2g_timer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -178,12 +170,6 @@ device_memory_interface::space_config_vector iphone2g_timer_device::memory_space
 	return space_config_vector{
 		std::make_pair(0, &m_mmio_config)
 	};
-}
-
-void iphone2g_timer_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_out_irq_func.resolve_safe();
 }
 
 void iphone2g_timer_device::device_start()

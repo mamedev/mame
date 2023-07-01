@@ -60,7 +60,7 @@ c64_expansion_slot_device::c64_expansion_slot_device(const machine_config &mconf
 	device_t(mconfig, C64_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_c64_expansion_card_interface>(mconfig, *this),
 	device_cartrom_image_interface(mconfig, *this),
-	m_read_dma_cd(*this),
+	m_read_dma_cd(*this, 0),
 	m_write_dma_cd(*this),
 	m_write_irq(*this),
 	m_write_nmi(*this),
@@ -77,14 +77,6 @@ c64_expansion_slot_device::c64_expansion_slot_device(const machine_config &mconf
 void c64_expansion_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_read_dma_cd.resolve_safe(0);
-	m_write_dma_cd.resolve_safe();
-	m_write_irq.resolve_safe();
-	m_write_nmi.resolve_safe();
-	m_write_dma.resolve_safe();
-	m_write_reset.resolve_safe();
 }
 
 
@@ -101,7 +93,7 @@ void c64_expansion_slot_device::device_reset()
 //  call_load -
 //-------------------------------------------------
 
-image_init_result c64_expansion_slot_device::call_load()
+std::pair<std::error_condition, std::string> c64_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
@@ -190,13 +182,10 @@ image_init_result c64_expansion_slot_device::call_load()
 		}
 
 		if ((m_card->m_roml_size & (m_card->m_roml_size - 1)) || (m_card->m_romh_size & (m_card->m_romh_size - 1)))
-		{
-			seterror(image_error::INVALIDIMAGE, "ROM size must be power of 2");
-			return image_init_result::FAIL;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "ROM size must be power of 2");
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

@@ -18,10 +18,11 @@ m20_8086_device::m20_8086_device(const machine_config &mconfig, const char *tag,
 void m20_8086_device::device_start()
 {
 	uint8_t* ram = m_ram->pointer();
-	m_8086->space(AS_PROGRAM).install_ram(0x00000,  m_ram->size() - 0x4001, &ram[0x4000]);
-	membank("highram")->set_base(ram);
-	membank("vram")->set_base(memshare(":videoram")->ptr());
-	membank("vram2")->set_base(memshare(":videoram")->ptr());
+	m_8086->space(AS_PROGRAM).install_ram(0x00000,  m_ram->size() - 0x4001, ram + 0x4000);
+	membank("highram")->set_base(ram + 0x4000);
+	membank("vram")->set_base(ram);
+	membank("vram2")->set_base(ram);
+
 }
 
 void m20_8086_device::device_reset()
@@ -86,13 +87,13 @@ IRQ_CALLBACK_MEMBER(m20_8086_device::int_cb)
 		return m_pic->acknowledge() << 1;
 }
 
-WRITE_LINE_MEMBER(m20_8086_device::nvi_w)
+void m20_8086_device::nvi_w(int state)
 {
 	m_nvi = state;
 	m_8086->set_input_line(INPUT_LINE_IRQ0, (state || m_vi) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(m20_8086_device::vi_w)
+void m20_8086_device::vi_w(int state)
 {
 	m_vi = state;
 	m_8086->set_input_line(INPUT_LINE_IRQ0, (state || m_nvi) ? ASSERT_LINE : CLEAR_LINE);

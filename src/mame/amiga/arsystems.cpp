@@ -936,15 +936,13 @@ void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, in
 	for (i = 0; i < 0x20000/2; i++)
 		rom[i] = bitswap<16>(rom[i], 15,14,13,12,11,10,9,8, bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0);
 
-	#if 0
+	if (0)
 	{
 		uint8_t *ROM = memregion(tag)->base();
 	//  int size = memregion(tag)->bytes();
 
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"decrypted_%s", machine().system().name);
-		fp=fopen(filename, "w+b");
+		auto filename = "decrypted_" + std::string(machine().system().name);
+		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{
 			for (i = 0; i < 0x20000; i++)
@@ -953,7 +951,6 @@ void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, in
 			fclose(fp);
 		}
 	}
-	#endif
 }
 
 

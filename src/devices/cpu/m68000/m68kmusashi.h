@@ -123,9 +123,7 @@ protected:
 	void define_state(void);
 
 public:
-	template <typename... T> void set_cmpild_callback(T &&... args) { m_cmpild_instr_callback.set(std::forward<T>(args)...); }
-	template <typename... T> void set_rte_callback(T &&... args) { m_rte_instr_callback.set(std::forward<T>(args)...); }
-	u16 get_fc();
+	virtual u16 get_fc() const noexcept override;
 	void set_hmmu_enable(int enable);
 	void set_emmu_enable(int enable);
 	int get_pmmu_enable() const {return m_pmmu_enabled;}
@@ -211,10 +209,6 @@ protected:
 	const u16 *m_state_table;
 	const u8* m_cyc_instruction;
 	const u8* m_cyc_exception;
-
-	/* Callbacks to host */
-	write32sm_delegate m_cmpild_instr_callback;           /* Called when a CMPI.L #v, Dn instruction is encountered */
-	write_line_delegate m_rte_instr_callback;             /* Called when a RTE instruction is encountered */
 
 	address_space *m_program, *m_oprogram, *m_cpu_space;
 
@@ -327,13 +321,11 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_memory_interface overrides
-	virtual bool memory_translate(int space, int intention, offs_t &address) override;
+	virtual bool memory_translate(int space, int intention, offs_t &address, address_space *&target_space) override;
 
 #include "m68kcpu.h"
 #include "m68kops.h"
 #include "m68kmmu.h"
-
-	virtual void m68k_reset_peripherals() { }
 
 	static double fx80_to_double(floatx80 fx)
 	{

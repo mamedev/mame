@@ -27,7 +27,7 @@ public:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 };
 
 
@@ -39,7 +39,7 @@ public:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	render_target &m_target;
 	bool const m_snapshot;

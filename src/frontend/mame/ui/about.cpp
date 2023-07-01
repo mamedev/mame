@@ -125,10 +125,12 @@ void menu_about::populate()
 //  handle - manages inputs in the about modal
 //-------------------------------------------------
 
-void menu_about::handle(event const *ev)
+bool menu_about::handle(event const *ev)
 {
 	if (ev)
-		handle_key(ev->iptkey);
+		return handle_key(ev->iptkey);
+	else
+		return false;
 }
 
 } // namespace ui

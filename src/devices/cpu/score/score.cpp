@@ -221,7 +221,6 @@ void score7_cpu_device::execute_set_input(int inputnum, int state)
 {
 	if (state)
 	{
-		standard_irq_callback(inputnum);
 		if (inputnum > 0 && inputnum < 64)
 			m_pending_interrupt |= 1ULL << inputnum;
 	}
@@ -316,7 +315,7 @@ void score7_cpu_device::check_irq()
 			if (m_pending_interrupt & (1ULL << i))
 			{
 				m_pending_interrupt &= ~(1ULL << i);
-				standard_irq_callback(i);
+				standard_irq_callback(i, m_pc);
 				gen_exception(EXCEPTION_INTERRUPT, i);
 				return;
 			}

@@ -65,16 +65,12 @@ QUICKLOAD_LOAD_MEMBER(comx35_state::quickload_cb)
 	int size = image.length();
 
 	if (size > m_ram->size())
-	{
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Image is larger than RAM");
 
 	image.fread( header, 5);
 
 	if (header[1] != 'C' || header[2] != 'O' || header[3] != 'M' || header[4] != 'X' )
-	{
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDIMAGE, std::string());
 
 	switch (header[0])
 	{
@@ -200,7 +196,7 @@ QUICKLOAD_LOAD_MEMBER(comx35_state::quickload_cb)
 		break;
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 //**************************************************************************
@@ -445,12 +441,12 @@ void comx35_state::check_interrupt()
 	m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, m_cr1 || m_int);
 }
 
-READ_LINE_MEMBER( comx35_state::clear_r )
+int comx35_state::clear_r()
 {
 	return m_clear;
 }
 
-READ_LINE_MEMBER( comx35_state::ef2_r )
+int comx35_state::ef2_r()
 {
 	if (m_iden)
 	{
@@ -464,12 +460,12 @@ READ_LINE_MEMBER( comx35_state::ef2_r )
 	}
 }
 
-READ_LINE_MEMBER( comx35_state::ef4_r )
+int comx35_state::ef4_r()
 {
 	return m_exp->ef4_r() | ((m_cassette->input() > 0.0f) ? 1 : 0);
 }
 
-WRITE_LINE_MEMBER( comx35_state::q_w )
+void comx35_state::q_w(int state)
 {
 	m_q = state;
 
@@ -528,7 +524,7 @@ void comx35_state::sc_w(uint8_t data)
 //  COMX_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( comx35_state::irq_w )
+void comx35_state::irq_w(int state)
 {
 	m_int = state;
 	check_interrupt();

@@ -39,8 +39,8 @@ public:
 
 	auto comms_out_wr_callback() { return m_write_comms_out.bind(); }
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_creatable() const noexcept override { return false; }
@@ -48,17 +48,17 @@ public:
 	virtual const char *file_extensions() const noexcept override { return "mdv,mdr"; }
 
 	// specific implementation
-	DECLARE_WRITE_LINE_MEMBER( clk_w );
-	DECLARE_WRITE_LINE_MEMBER( comms_in_w );
-	DECLARE_WRITE_LINE_MEMBER( erase_w );
-	DECLARE_WRITE_LINE_MEMBER( read_write_w );
-	DECLARE_WRITE_LINE_MEMBER( data1_w );
-	DECLARE_WRITE_LINE_MEMBER( data2_w );
-	DECLARE_READ_LINE_MEMBER ( data1_r );
-	DECLARE_READ_LINE_MEMBER ( data2_r );
+	void clk_w(int state);
+	void comms_in_w(int state);
+	void erase_w(int state);
+	void read_write_w(int state);
+	void data1_w(int state);
+	void data2_w(int state);
+	int data1_r();
+	int data2_r();
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	TIMER_CALLBACK_MEMBER(bit_timer);

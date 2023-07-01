@@ -108,11 +108,6 @@ protected:
 private:
 	void set_starting_view(int index, const char *defview, const char *view);
 
-public: // TODO: make these private
-#ifdef OSD_WINDOWS
-	HDC                     m_dc;       // only used by GDI renderer!
-	int                     m_resize_state;
-#endif
 private:
 	render_target           *m_target;
 public:

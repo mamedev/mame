@@ -143,29 +143,30 @@ void memoryview_info::update_context_menu(HMENU menu)
 			debug_view_xy const pos = memview.cursor_position();
 			offs_t const address = space->byte_to_address(memview.addressAtCursorPosition(pos));
 			offs_t a = address & space->logaddrmask();
-			if (!space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, a))
+			address_space *tspace;
+			if (!space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, a, tspace))
 			{
 				m_lastpc = "Bad address";
 			}
 			else
 			{
-				uint64_t memval = space->unmap();
-				auto dis = space->device().machine().disable_side_effects();
-				switch (space->data_width())
+				uint64_t memval = tspace->unmap();
+				auto dis = tspace->device().machine().disable_side_effects();
+				switch (tspace->data_width())
 				{
-				case  8: memval = space->read_byte(a);            break;
-				case 16: memval = space->read_word_unaligned(a);  break;
-				case 32: memval = space->read_dword_unaligned(a); break;
-				case 64: memval = space->read_qword_unaligned(a); break;
+				case  8: memval = tspace->read_byte(a);            break;
+				case 16: memval = tspace->read_word_unaligned(a);  break;
+				case 32: memval = tspace->read_dword_unaligned(a); break;
+				case 64: memval = tspace->read_qword_unaligned(a); break;
 				}
 
 				offs_t const pc = source.device()->debug()->track_mem_pc_from_space_address_data(
-						space->spacenum(),
+						tspace->spacenum(),
 						address,
 						memval);
 				if (pc != offs_t(-1))
 				{
-					if (space->is_octal())
+					if (tspace->is_octal())
 						m_lastpc = util::string_format("Address %o written at PC=%o", address, pc);
 					else
 						m_lastpc = util::string_format("Address %x written at PC=%x", address, pc);

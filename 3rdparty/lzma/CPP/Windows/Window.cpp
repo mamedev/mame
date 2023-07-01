@@ -114,12 +114,12 @@ bool MySetWindowText(HWND wnd, LPCWSTR s)
 bool CWindow::GetText(CSysString &s)
 {
   s.Empty();
-  int len = GetTextLength();
+  unsigned len = (unsigned)GetTextLength();
   if (len == 0)
     return (::GetLastError() == ERROR_SUCCESS);
   TCHAR *p = s.GetBuf(len);
   {
-    int len2 = GetText(p, len + 1);
+    unsigned len2 = (unsigned)GetText(p, (int)(len + 1));
     if (len > len2)
       len = len2;
   }
@@ -135,12 +135,12 @@ bool CWindow::GetText(UString &s)
   if (g_IsNT)
   {
     s.Empty();
-    int len = GetWindowTextLengthW(_window);
+    unsigned len = (unsigned)GetWindowTextLengthW(_window);
     if (len == 0)
       return (::GetLastError() == ERROR_SUCCESS);
     wchar_t *p = s.GetBuf(len);
     {
-      int len2 = GetWindowTextW(_window, p, len + 1);
+      unsigned len2 = (unsigned)GetWindowTextW(_window, p, (int)(len + 1));
       if (len > len2)
         len = len2;
     }

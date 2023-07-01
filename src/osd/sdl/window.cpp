@@ -91,17 +91,13 @@ bool sdl_osd_interface::window_init()
 			SDL_HINT_XINPUT_ENABLED, SDL_HINT_GAMECONTROLLERCONFIG,
 			SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, SDL_HINT_ALLOW_TOPMOST,
 			SDL_HINT_TIMER_RESOLUTION,
-#if SDL_VERSION_ATLEAST(2, 0, 2)
 			SDL_HINT_RENDER_DIRECT3D_THREADSAFE, SDL_HINT_VIDEO_ALLOW_SCREENSAVER,
 			SDL_HINT_ACCELEROMETER_AS_JOYSTICK, SDL_HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK,
 			SDL_HINT_VIDEO_WIN_D3DCOMPILER, SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT,
 			SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES, SDL_HINT_MOUSE_RELATIVE_MODE_WARP,
-#endif
-#if SDL_VERSION_ATLEAST(2, 0, 3)
 			SDL_HINT_RENDER_DIRECT3D11_DEBUG, SDL_HINT_VIDEO_HIGHDPI_DISABLED,
 			SDL_HINT_WINRT_PRIVACY_POLICY_URL, SDL_HINT_WINRT_PRIVACY_POLICY_LABEL,
 			SDL_HINT_WINRT_HANDLE_BACK_BUTTON,
-#endif
 			};
 
 	osd_printf_verbose("\nHints:\n");
@@ -243,8 +239,6 @@ void sdl_window_info::toggle_full_screen()
 		m_windowed_dim = get_size();
 	}
 
-	// reset UI to main menu
-	machine().ui().menu_reset();
 	// kill off the drawers
 	renderer_reset();
 	bool is_osx = false;
@@ -595,24 +589,6 @@ int sdl_window_info::complete_create()
 	{
 		m_extra_flags = 0;
 	}
-
-	// We need to workaround an issue in SDL 2.0.4 for OS X where setting the
-	// relative mode on the mouse in fullscreen mode makes mouse events stop
-	// It is fixed in the latest revisions so we'll assume it'll be fixed
-	// in the next public SDL release as well
-#if defined(SDLMAME_MACOSX) && SDL_VERSION_ATLEAST(2, 0, 2) // SDL_HINT_MOUSE_RELATIVE_MODE_WARP is introduced in 2.0.2
-	SDL_version linked;
-	SDL_GetVersion(&linked);
-	int revision = SDL_GetRevisionNumber();
-
-	// If we're running the exact version of SDL 2.0.4 (revision 10001) from the
-	// SDL web site, we need to work around this issue and send the warp mode hint
-	if (SDL_VERSION_EQUALS(linked, SDL_VERSIONNUM(2, 0, 4)) && revision == 10001)
-	{
-		osd_printf_verbose("Using warp mode for relative mouse in OS X SDL 2.0.4\n");
-		SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_MODE_WARP, "1");
-	}
-#endif
 
 	// create the SDL window
 	// soft driver also used | SDL_WINDOW_INPUT_GRABBED | SDL_WINDOW_MOUSE_FOCUS

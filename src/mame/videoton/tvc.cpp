@@ -99,8 +99,8 @@ protected:
 	void sound_w(offs_t offset, uint8_t data);
 	void cassette_w(uint8_t data);
 	uint8_t _5b_r();
-	DECLARE_WRITE_LINE_MEMBER(int_ff_set);
-	DECLARE_WRITE_LINE_MEMBER(centronics_ack);
+	void int_ff_set(int state);
+	void centronics_ack(int state);
 
 	// expansions
 	void expansion_w(offs_t offset, uint8_t data);
@@ -722,7 +722,7 @@ void tvc_state::tvc_palette(palette_device &palette) const
 	palette.set_pen_colors(0, tvc_pens);
 }
 
-WRITE_LINE_MEMBER(tvc_state::int_ff_set)
+void tvc_state::int_ff_set(int state)
 {
 	if (state)
 	{
@@ -731,7 +731,7 @@ WRITE_LINE_MEMBER(tvc_state::int_ff_set)
 	}
 }
 
-WRITE_LINE_MEMBER(tvc_state::centronics_ack)
+void tvc_state::centronics_ack(int state)
 {
 	if (state)
 		m_centronics_ff = 1;
@@ -746,11 +746,11 @@ QUICKLOAD_LOAD_MEMBER(tvc_state::quickload_cb)
 	{
 		image.fseek(0x90, SEEK_SET);
 		image.fread(m_ram->pointer() + 0x19ef, image.length() - 0x90);
-		return image_init_result::PASS;
+		return std::make_pair(std::error_condition(), std::string());
 	}
 	else
 	{
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDIMAGE, std::string());
 	}
 }
 

@@ -14,7 +14,7 @@
 #include <cmath>
 
 
-bool state_reader::V_READER_CHECK(bool condition, const util::format_argument_pack<std::ostream> &args)
+bool state_reader::V_READER_CHECK(bool condition, const util::format_argument_pack<char> &args)
 {
 	if (!condition)
 		osd_printf_error("Error: %s\n", util::string_format(args));
@@ -22,7 +22,7 @@ bool state_reader::V_READER_CHECK(bool condition, const util::format_argument_pa
 	return condition;
 }
 
-bool state_reader::V_READER_WARN(bool condition, const util::format_argument_pack<std::ostream> &args)
+bool state_reader::V_READER_WARN(bool condition, const util::format_argument_pack<char> &args)
 {
 	if (!condition)
 		osd_printf_warning("Warning: %s\n", util::string_format(args));

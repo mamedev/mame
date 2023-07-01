@@ -19,6 +19,7 @@ To verify:
 		<description>The Chess Game 2 (Europe)</description>
 		<year>1986</year>
 		<publisher>Eaglesoft</publisher>
+		<info name="serial" value="1264"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -33,7 +34,7 @@ To verify:
 		<year>1987</year>
 		<publisher>Omega System</publisher>
 		<info name="alt_title" value="レオナルド" />
-		<info name="usage" value="Load with CLOAD + RUN"/>
+		<info name="usage" value="Load with CLOAD + RUN. Requires a Japanese system."/>
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="21494">
@@ -46,19 +47,7 @@ To verify:
 		<description>Red Lights of Amsterdam (Europe)</description>
 		<year>1986</year>
 		<publisher>Eaglesoft</publisher>
-		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
-
-		<part name="cass1" interface="msx_cass">
-			<dataarea name="cass" size="172263">
-				<rom name="red lights of amsterdam (1986)(eaglesoft)(nl)[run'cas-'].cas" size="172263" crc="443d80f9" sha1="b8323adf0b5c9d05223f3c587d52d94b933c00f6"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="redlighta" cloneof="redlight">
-		<description>Red Lights of Amsterdam (Europe, 2 sides)</description>
-		<year>1986</year>
-		<publisher>Eaglesoft</publisher>
+		<info name="serial" value="1261"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">

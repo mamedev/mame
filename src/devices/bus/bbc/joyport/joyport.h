@@ -62,8 +62,8 @@ public:
 	auto cb2_handler() { return m_cb2_handler.bind(); }
 
 	// from slot
-	DECLARE_WRITE_LINE_MEMBER(cb1_w) { m_cb1_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER(cb2_w) { m_cb2_handler(state); }
+	void cb1_w(int state) { m_cb1_handler(state); }
+	void cb2_w(int state) { m_cb2_handler(state); }
 
 	// from host
 	uint8_t pb_r();

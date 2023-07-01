@@ -170,7 +170,7 @@ void device_sns_cart_interface::rom_map_setup(uint32_t size)
 //  write_irq - set the cart IRQ output
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(device_sns_cart_interface::write_irq)
+void device_sns_cart_interface::write_irq(int state)
 {
 	if (m_slot != nullptr)
 		m_slot->write_irq(state);
@@ -227,7 +227,7 @@ base_sns_cart_slot_device::base_sns_cart_slot_device(const machine_config &mconf
 	m_type(SNES_MODE20),
 	m_cart(nullptr),
 	m_irq_callback(*this),
-	m_open_bus_callback(*this)
+	m_open_bus_callback(*this, 0xff)
 {
 }
 
@@ -263,9 +263,6 @@ void base_sns_cart_slot_device::device_start()
 	m_cart = dynamic_cast<device_sns_cart_interface *>(get_card_device());
 	if (m_cart != nullptr)
 		m_cart->m_slot = this;
-
-	m_irq_callback.resolve_safe();
-	m_open_bus_callback.resolve_safe(0xff);
 }
 
 
@@ -649,15 +646,12 @@ static int snes_find_addon_chip(const uint8_t *buffer, uint32_t start_offs, uint
  -------------------------------------------------*/
 
 
-image_init_result base_sns_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> base_sns_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint8_t *ROM;
-		uint32_t len, offset = 0;
-		const char *slot_name;
-
-		/* Check for a header (512 bytes), and skip it if found */
+		// Check for a header (512 bytes), and skip it if found
+		uint32_t offset = 0;
 		if (!loaded_through_softlist())
 		{
 			uint32_t tmplen = length();
@@ -667,10 +661,10 @@ image_init_result base_sns_cart_slot_device::call_load()
 			fseek(offset, SEEK_SET);
 		}
 
-		len = !loaded_through_softlist() ? (length() - offset) : get_software_region_length("rom");
+		uint32_t const len = !loaded_through_softlist() ? (length() - offset) : get_software_region_length("rom");
 
 		m_cart->rom_alloc(len);
-		ROM = m_cart->get_rom_base();
+		uint8_t *const ROM = m_cart->get_rom_base();
 		if (!loaded_through_softlist())
 			fread(ROM, len);
 		else
@@ -693,13 +687,14 @@ image_init_result base_sns_cart_slot_device::call_load()
 			get_cart_type_addon(ROM, len, m_type, m_addon);
 		else
 		{
+			const char *slot_name;
 			if ((slot_name = get_feature("slot")) == nullptr)
 				m_type = SNES_MODE20;
 			else
 				m_type = sns_get_pcb_id(slot_name);
 
 			if (m_type == SNES_DSP && len > 0x100000)
-					m_type = SNES_DSP_2MB;
+				m_type = SNES_DSP_2MB;
 		}
 
 		if (!loaded_through_softlist())
@@ -725,11 +720,9 @@ image_init_result base_sns_cart_slot_device::call_load()
 		//printf("Type %d\n", m_type);
 
 		internal_header_logging(ROM, len);
-
-		return image_init_result::PASS;
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

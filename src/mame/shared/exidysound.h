@@ -46,7 +46,7 @@ public:
 protected:
 	exidy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -100,7 +100,7 @@ class exidy_sh8253_sound_device : public exidy_sound_device
 protected:
 	exidy_sh8253_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -144,14 +144,13 @@ public:
 	// external access
 	void pa_w(uint8_t data);
 	void pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ca_w);
-	DECLARE_WRITE_LINE_MEMBER(cb_w);
+	void ca_w(int state);
+	void cb_w(int state);
 
 protected:
 	venture_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	void venture_audio_map(address_map &map);
@@ -161,8 +160,8 @@ private:
 
 	void pia_pa_w(uint8_t data);
 	void pia_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
+	void pia_ca2_w(int state);
+	void pia_cb2_w(int state);
 
 	void venture_audio(machine_config &config);
 
@@ -180,7 +179,7 @@ public:
 	mtrap_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
@@ -208,14 +207,14 @@ public:
 	void command_w(uint8_t data);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(irq_clear_w);
-	DECLARE_WRITE_LINE_MEMBER(main_ack_w);
+	void irq_clear_w(int state);
+	void main_ack_w(int state);
 
 	void victory_audio_map(address_map &map);
 
@@ -224,8 +223,8 @@ private:
 
 	TIMER_CALLBACK_MEMBER( delayed_command_w );
 
-	int m_pia_ca1 = 0;
-	int m_pia_cb1 = 0;
+	int m_pia_ca1;
+	int m_pia_cb1;
 };
 
 DECLARE_DEVICE_TYPE(EXIDY_VICTORY, victory_sound_device)

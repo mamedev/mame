@@ -113,7 +113,7 @@ private:
 	void speech_w(uint8_t data);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	K007342_CALLBACK_MEMBER(tile_callback);
 	K007420_CALLBACK_MEMBER(sprite_callback);
 
@@ -205,7 +205,7 @@ uint32_t rockrage_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 // machine
 
-WRITE_LINE_MEMBER(rockrage_state::vblank_irq)
+void rockrage_state::vblank_irq(int state)
 {
 	if (state && m_k007342->is_int_enabled())
 		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);

@@ -21,6 +21,11 @@ void linear_flash_pccard_device::device_start()
 	m_space = &space(0);
 }
 
+void linear_flash_pccard_device::device_reset()
+{
+	m_slot->card_detect_w(1);
+}
+
 device_memory_interface::space_config_vector linear_flash_pccard_device::memory_space_config() const
 {
 	return space_config_vector{ std::make_pair(0, &m_space_config) };

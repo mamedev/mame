@@ -36,16 +36,11 @@ cit220p_keyboard_device::cit220p_keyboard_device(const machine_config &mconfig, 
 {
 }
 
-void cit220p_keyboard_device::device_resolve_objects()
-{
-	m_txd_callback.resolve_safe();
-}
-
 void cit220p_keyboard_device::device_start()
 {
 }
 
-WRITE_LINE_MEMBER(cit220p_keyboard_device::write_rxd)
+void cit220p_keyboard_device::write_rxd(int state)
 {
 	m_mcu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }

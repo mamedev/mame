@@ -13,14 +13,43 @@
 
 #pragma once
 
+class device_ata_interface;
 
-// ======================> device_ata_interface
 
-class ata_interface_device;
+class ata_slot_device :
+		public device_t,
+		public device_single_card_slot_interface<device_ata_interface>
+{
+public:
+	// construction/destruction
+	ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	auto irq_handler() { return m_irq_handler.bind(); }
+	auto dmarq_handler() { return m_dmarq_handler.bind(); }
+	auto dasp_handler() { return m_dasp_handler.bind(); }
+	auto pdiag_handler() { return m_pdiag_handler.bind(); }
+
+	device_ata_interface *dev() { return m_dev; }
+
+protected:
+	// device_t implementation
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+
+private:
+	devcb_write_line m_irq_handler;
+	devcb_write_line m_dmarq_handler;
+	devcb_write_line m_dasp_handler;
+	devcb_write_line m_pdiag_handler;
+
+	device_ata_interface *m_dev;
+
+	friend class device_ata_interface;
+};
+
 
 class device_ata_interface : public device_interface
 {
-	friend class abstract_ata_interface_device;
 public:
 	virtual uint16_t read_dma() = 0;
 	virtual uint16_t read_cs0(offs_t offset, uint16_t mem_mask = 0xffff) = 0;
@@ -30,41 +59,25 @@ public:
 	virtual void write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) = 0;
 	virtual void write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) = 0;
 
-	virtual DECLARE_WRITE_LINE_MEMBER(write_dmack) = 0;
-	virtual DECLARE_WRITE_LINE_MEMBER(write_csel) = 0;
-	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp) = 0;
-	virtual DECLARE_WRITE_LINE_MEMBER(write_pdiag) = 0;
+	virtual void write_dmack(int state) = 0;
+	virtual void write_csel(int state) = 0;
+	virtual void write_dasp(int state) = 0;
+	virtual void write_pdiag(int state) = 0;
 
 protected:
 	device_ata_interface(const machine_config &mconfig, device_t &device);
 
-	devcb_write_line m_irq_handler;
-	devcb_write_line m_dmarq_handler;
-	devcb_write_line m_dasp_handler;
-	devcb_write_line m_pdiag_handler;
-};
-
-// ======================> ata_slot_device
-
-class ata_slot_device : public device_t,
-						public device_single_card_slot_interface<device_ata_interface>
-{
-public:
-	// construction/destruction
-	ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-
-	device_ata_interface *dev() { return m_dev; }
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_config_complete() override;
+	void set_irq(int state) { m_slot->m_irq_handler(state); }
+	void set_dmarq(int state) { m_slot->m_dmarq_handler(state); }
+	void set_dasp(int state) { m_slot->m_dasp_handler(state); }
+	void set_pdiag(int state) { m_slot->m_pdiag_handler(state); }
 
 private:
-	device_ata_interface *m_dev;
+	ata_slot_device *const m_slot;
 };
 
-// device type definition
+
+// device type declaration
 DECLARE_DEVICE_TYPE(ATA_SLOT, ata_slot_device)
 
 void ata_devices(device_slot_interface &device);

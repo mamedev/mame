@@ -614,9 +614,6 @@ void fd1094_device::change_state(int newstate)
 
 	// notify of the state change
 	m_state_change(state());
-
-	// force a flush of the prefetch cache on any state change
-	set_state_int(M68K_PREF_ADDR, 0x0010);
 }
 
 
@@ -940,7 +937,7 @@ IRQ_CALLBACK_MEMBER( fd1094_device::irq_callback )
 //  is encountered
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(fd1094_device::rte_callback)
+void fd1094_device::rte_callback(int state)
 {
 	change_state(STATE_RTE);
 }

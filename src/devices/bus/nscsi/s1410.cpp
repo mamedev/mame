@@ -3,7 +3,6 @@
 #include "emu.h"
 #include "bus/nscsi/s1410.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_COMMAND (1U << 1)
 #define LOG_DATA    (1U << 2)
 
@@ -33,19 +32,47 @@ void nscsi_s1410_device::device_reset()
 	params[7] = 11;
 }
 
+bool nscsi_s1410_device::scsi_command_done(uint8_t command, uint8_t length)
+{
+	if(!length)
+		return false;
+	switch(command >> 5) {
+	case 0: return length == 6;
+	case 1: return true;
+	case 2: return true;
+	case 3: return true;
+	case 4: return true;
+	case 5: return true;
+	case 6: return true;
+	case 7: return length == 6;
+	}
+	return true;
+}
+
 void nscsi_s1410_device::scsi_command()
 {
+	memset(scsi_sense_buffer, 0, sizeof(scsi_sense_buffer));
+
 	switch(scsi_cmdbuf[0]) {
 	case SC_TEST_UNIT_READY:
 	case SC_REZERO:
 	case SC_REASSIGN_BLOCKS:
 	case SC_READ:
 	case SC_WRITE:
+		if (scsi_cmdbuf[1] >> 5) {
+			scsi_status_complete(SS_NOT_READY);
+			scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
+		} else {
+			nscsi_harddisk_device::scsi_command();
+		}
+		break;
+
 	case SC_SEEK:
 		if (scsi_cmdbuf[1] >> 5) {
 			scsi_status_complete(SS_NOT_READY);
+			scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
 		} else {
-			nscsi_harddisk_device::scsi_command();
+			scsi_status_complete(SS_GOOD);
 		}
 		break;
 
@@ -57,12 +84,12 @@ void nscsi_s1410_device::scsi_command()
 	case SC_FORMAT_UNIT:
 		LOG("command FORMAT UNIT\n");
 		{
-			const auto &info = harddisk->get_info();
+			const auto &info = image->get_info();
 			auto block = std::make_unique<uint8_t[]>(info.sectorbytes);
 			memset(&block[0], 0x6c, info.sectorbytes);
 			lba = ((scsi_cmdbuf[1] & 0x1f)<<16) | (scsi_cmdbuf[2]<<8) | scsi_cmdbuf[3];
 			for(; lba < (info.cylinders * info.heads * info.sectors); lba++) {
-				harddisk->write(lba, block.get());
+				image->write(lba, block.get());
 			}
 		}
 		scsi_status_complete(SS_GOOD);
@@ -71,6 +98,7 @@ void nscsi_s1410_device::scsi_command()
 	case SC_FORMAT_TRACK: {
 		if (scsi_cmdbuf[1] >> 5) {
 			scsi_status_complete(SS_NOT_READY);
+			scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
 			return;
 		}
 
@@ -81,9 +109,10 @@ void nscsi_s1410_device::scsi_command()
 		auto block = std::make_unique<uint8_t[]>(track_length);
 		memset(&block[0], 0x6c, track_length);
 
-		if(!harddisk->write(lba, &block[0])) {
+		if(!image->write(lba, &block[0])) {
 			logerror("%s: HD WRITE ERROR !\n", tag());
 			scsi_status_complete(SS_FORMAT_ERROR);
+			scsi_sense_buffer[0] = SK_FORMAT_ERROR;
 		} else {
 			scsi_status_complete(SS_GOOD);
 		}
@@ -93,6 +122,7 @@ void nscsi_s1410_device::scsi_command()
 	case SC_FORMAT_ALT_TRACK:
 		if (scsi_cmdbuf[1] >> 5) {
 			scsi_status_complete(SS_NOT_READY);
+			scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
 			return;
 		}
 
@@ -118,6 +148,7 @@ void nscsi_s1410_device::scsi_command()
 	case SC_CHECK_TRACK_FORMAT:
 		if (scsi_cmdbuf[1] >> 5) {
 			scsi_status_complete(SS_NOT_READY);
+			scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
 			return;
 		}
 		scsi_status_complete(SS_GOOD);

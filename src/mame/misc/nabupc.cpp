@@ -5,17 +5,15 @@
  *
  *   https://nabu.ca/
  *
- *   TODO:
- *     - Original keyboard support
  *
  ***********************************************************************/
 
 #include "emu.h"
 
+#include "nabupc_kbd.h"
+
 #include "bus/centronics/ctronics.h"
 #include "bus/nabupc/adapter.h"
-#include "bus/nabupc/keyboard/hlekeyboard.h"
-#include "bus/nabupc/keyboard/keyboard.h"
 #include "bus/nabupc/option.h"
 #include "bus/rs232/null_modem.h"
 #include "bus/rs232/pty.h"
@@ -212,11 +210,10 @@ private:
 	void centronics_busy_handler(uint8_t state);
 	void update_irq();
 
-	DECLARE_WRITE_LINE_MEMBER(hcca_fe_w);
-	DECLARE_WRITE_LINE_MEMBER(hcca_oe_w);
+	void hcca_fe_w(int state);
+	void hcca_oe_w(int state);
 
-	template <unsigned N>
-	DECLARE_WRITE_LINE_MEMBER(int_w);
+	template <unsigned N> void int_w(int state);
 
 	IRQ_CALLBACK_MEMBER(int_ack_cb);
 
@@ -268,13 +265,6 @@ static void hcca_devices(device_slot_interface &device)
 	device.option_add("hcca_adapter",  NABUPC_NETWORK_ADAPTER);
 }
 
-// Keyboard Devices
-static void keyboard_devices(device_slot_interface &device)
-{
-	device.option_add("nabu", NABUPC_KEYBOARD);
-	device.option_add("nabu_hle", NABUPC_HLE_KEYBOARD);
-}
-
 //**************************************************************************
 //  MACHINE CONFIGURATION
 //**************************************************************************
@@ -311,8 +301,8 @@ void nabupc_state::nabupc(machine_config &config)
 	I8251(config, m_kbduart, 10.738635_MHz_XTAL / 6);
 	m_kbduart->rxrdy_handler().set(*this, FUNC(nabupc_state::int_w<5>));
 
-	rs232_port_device &kbd(RS232_PORT(config, "kbd", keyboard_devices, "nabu"));
-	kbd.rxd_handler().set(m_kbduart, FUNC(i8251_device::write_rxd));
+	nabupc_keyboard_device &kbd(NABUPC_KEYBOARD(config, "kbd"));
+	kbd.rxd_cb().set(m_kbduart, FUNC(i8251_device::write_rxd));
 
 	// HCCA
 	AY31015(config, m_hccauart);
@@ -436,13 +426,13 @@ void nabupc_state::centronics_busy_handler(uint8_t state)
 }
 
 // HCCA Framing Error
-WRITE_LINE_MEMBER(nabupc_state::hcca_fe_w)
+void nabupc_state::hcca_fe_w(int state)
 {
 	BIT_SET(m_portb, 5, state);
 }
 
 // HCCA Overrun Error
-WRITE_LINE_MEMBER(nabupc_state::hcca_oe_w)
+void nabupc_state::hcca_oe_w(int state)
 {
 	BIT_SET(m_portb, 6, state);
 }
@@ -453,7 +443,7 @@ WRITE_LINE_MEMBER(nabupc_state::hcca_oe_w)
 //**************************************************************************
 
 template <unsigned N>
-WRITE_LINE_MEMBER(nabupc_state::int_w)
+void nabupc_state::int_w(int state)
 {
 	BIT_SET(m_int_lines, N, state);
 	update_irq();
@@ -514,11 +504,20 @@ void nabupc_state::io_map(address_map &map)
 
 ROM_START( nabupc )
 	ROM_REGION( 0x2000, "bios", 0 )
-	ROM_SYSTEM_BIOS( 0, "reva", "4k BIOS" )
+	ROM_DEFAULT_BIOS("reva")
+	ROM_SYSTEM_BIOS( 0, "reva", "4k BIOS (Rev A)" )
 	ROMX_LOAD( "nabupc-u53-90020060-reva-2732.bin", 0x0000, 0x1000, CRC(8110bde0) SHA1(57e5f34645df06d7cb6c202a6d35a442776af2cb), ROM_BIOS(0) )
 	ROM_RELOAD(0x1000, 0x1000)
-	ROM_SYSTEM_BIOS( 1, "revb", "8k BIOS - Floppy support" )
-	ROMX_LOAD( "nabupc-u53-90020060-revb-2764.bin", 0x0000, 0x2000, CRC(3088f21b) SHA1(bf2f1eb5d9f5a8e9d022ce0056f2a5a8526b830e), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "ver14", "4k BIOS - Floppy support (Ver 14)" )
+	ROMX_LOAD( "nabupc-u53-ver14-2732.bin", 0x0000, 0x1000, CRC(ca5e1ae9) SHA1(d713abd5d387a63a287d4ea51196ba5de42db052), ROM_BIOS(1) )
+	ROM_RELOAD(0x1000, 0x1000)
+	ROM_SYSTEM_BIOS( 2, "ver17", "4k BIOS - Floppy support (Ver 17)" )
+	ROMX_LOAD( "nabupc-u53-ver17-2732.bin", 0x0000, 0x1000, CRC(24d4f1fa) SHA1(1b9533c709604a21aa5fcc32071d0b0630e89c20), ROM_BIOS(2) )
+	ROM_RELOAD(0x1000, 0x1000)
+	ROM_SYSTEM_BIOS( 3, "revb", "8k BIOS - Floppy support (Rev B)" )
+	ROMX_LOAD( "nabupc-u53-90020060-revb-2764.bin", 0x0000, 0x2000, CRC(3088f21b) SHA1(bf2f1eb5d9f5a8e9d022ce0056f2a5a8526b830e), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 4, "ver29", "8k BIOS - Floppy support (Ver 29)" )
+	ROMX_LOAD( "nabupc-u53-90037150-ver29-2764.bin", 0x0000, 0x2000, CRC(3c484e3d) SHA1(dd10ad6e0a59c54561335272d3c808b0543ba0ef), ROM_BIOS(4) )
 ROM_END
 
 

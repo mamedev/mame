@@ -63,14 +63,6 @@ void dm9368_device::a_w(u8 data)
 }
 
 
-void dm9368_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_update_cb.resolve_safe();
-	m_rbo_cb.resolve_safe();
-}
-
-
 void dm9368_device::device_start()
 {
 	// state saving

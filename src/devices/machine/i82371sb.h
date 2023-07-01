@@ -9,23 +9,30 @@
 #include "pci.h"
 #include "machine/pci-ide.h"
 
+#include "bus/ata/ataintf.h"
+#include "bus/isa/isa.h"
+
 #include "machine/ins8250.h"
 #include "machine/ds128x.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 
-#include "bus/ata/ataintf.h"
-
 #include "sound/spkrdev.h"
 #include "machine/ram.h"
-#include "bus/isa/isa.h"
 #include "machine/nvram.h"
 
 #include "machine/am9517a.h"
 
-
-class i82371sb_isa_device : public pci_device {
+class i82371sb_isa_device : public pci_device
+{
 public:
+	template <typename T>
+	i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: i82371sb_isa_device(mconfig, tag, owner, clock)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
+
 	i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto smi() { return m_smi_callback.bind(); }
@@ -33,34 +40,38 @@ public:
 	auto stpclk() { return m_stpclk_callback.bind(); }
 	auto boot_state_hook() { return m_boot_state_hook.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(pc_pirqa_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_pirqb_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_pirqc_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_pirqd_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_mirq0_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_mirq1_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_ferr_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_extsmi_w);
+	template <typename T>
+	void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 
-	DECLARE_WRITE_LINE_MEMBER(pc_irq1_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq3_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq4_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq5_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq6_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq7_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq8n_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq9_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq10_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq11_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq12m_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq14_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq15_w);
+	void pc_pirqa_w(int state);
+	void pc_pirqb_w(int state);
+	void pc_pirqc_w(int state);
+	void pc_pirqd_w(int state);
+	void pc_mirq0_w(int state);
+	void pc_mirq1_w(int state);
+	void pc_ferr_w(int state);
+	void pc_extsmi_w(int state);
+
+	void pc_irq1_w(int state);
+	void pc_irq3_w(int state);
+	void pc_irq4_w(int state);
+	void pc_irq5_w(int state);
+	void pc_irq6_w(int state);
+	void pc_irq7_w(int state);
+	void pc_irq8n_w(int state);
+	void pc_irq9_w(int state);
+	void pc_irq10_w(int state);
+	void pc_irq11_w(int state);
+	void pc_irq12m_w(int state);
+	void pc_irq14_w(int state);
+	void pc_irq15_w(int state);
 
 protected:
-	virtual void device_start() override;
+	i82371sb_isa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_add_mconfig(machine_config & config) override;
+	virtual void device_config_complete() override;
 	virtual void device_reset() override;
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void reset_all_mappings() override;
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -71,9 +82,9 @@ protected:
 	virtual void config_map(address_map &map) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out0_changed);
-	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out1_changed);
-	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out2_changed);
+	void at_pit8254_out0_changed(int state);
+	void at_pit8254_out1_changed(int state);
+	void at_pit8254_out2_changed(int state);
 	uint8_t pc_dma8237_0_dack_r();
 	uint8_t pc_dma8237_1_dack_r();
 	uint8_t pc_dma8237_2_dack_r();
@@ -88,20 +99,20 @@ private:
 	void pc_dma8237_5_dack_w(uint8_t data);
 	void pc_dma8237_6_dack_w(uint8_t data);
 	void pc_dma8237_7_dack_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack4_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack5_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack6_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack7_w);
-	DECLARE_WRITE_LINE_MEMBER(at_dma8237_out_eop);
-	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
+	void pc_dack0_w(int state);
+	void pc_dack1_w(int state);
+	void pc_dack2_w(int state);
+	void pc_dack3_w(int state);
+	void pc_dack4_w(int state);
+	void pc_dack5_w(int state);
+	void pc_dack6_w(int state);
+	void pc_dack7_w(int state);
+	void at_dma8237_out_eop(int state);
+	void pc_dma_hrq_changed(int state);
 	uint8_t pc_dma_read_byte(offs_t offset);
 	void pc_dma_write_byte(offs_t offset, uint8_t data);
 	uint8_t pc_dma_read_word(offs_t offset);
-	void pc_dma_write_word(offs_t offset,uint8_t data);
+	void pc_dma_write_word(offs_t offset, uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
 
 	void internal_io_map(address_map &map);
@@ -150,7 +161,7 @@ private:
 	void at_page8_w(offs_t offset, uint8_t data);
 	uint8_t at_portb_r();
 	void at_portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(iochck_w);
+	void iochck_w(int state);
 	uint8_t at_dma8237_2_r(offs_t offset);
 	void at_dma8237_2_w(offs_t offset, uint8_t data);
 	uint8_t eisa_irq_read(offs_t offset);
@@ -176,7 +187,7 @@ private:
 
 	void map_bios(address_space *memory_space, uint32_t start, uint32_t end);
 
-	//southbridge
+	// southbridge
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259_master;
 	required_device<pic8259_device> m_pic8259_slave;
@@ -207,28 +218,40 @@ private:
 
 DECLARE_DEVICE_TYPE(I82371SB_ISA, i82371sb_isa_device)
 
-
-class i82371sb_ide_device : public pci_device {
+class i82371sb_ide_device : public pci_device
+{
 public:
+	template <typename T>
+	i82371sb_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: i82371sb_ide_device(mconfig, tag, owner, clock)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
+
 	i82371sb_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto irq_pri() { return m_irq_pri_callback.bind(); }
 	auto irq_sec() { return m_irq_sec_callback.bind(); }
 
+	template <typename T>
+	void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
+
 protected:
+	i82371sb_ide_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void reset_all_mappings() override;
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
-		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
+						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	virtual void config_map(address_map &map) override;
 
-	DECLARE_WRITE_LINE_MEMBER(primary_int);
-	DECLARE_WRITE_LINE_MEMBER(secondary_int);
+	void primary_int(int state);
+	void secondary_int(int state);
 
 private:
 	void status_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -262,6 +285,7 @@ private:
 	devcb_write_line m_irq_pri_callback;
 	devcb_write_line m_irq_sec_callback;
 
+	required_device<cpu_device> m_maincpu;
 	required_device<bus_master_ide_controller_device> m_ide1;
 	required_device<bus_master_ide_controller_device> m_ide2;
 };

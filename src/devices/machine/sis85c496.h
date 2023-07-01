@@ -6,12 +6,14 @@
 #define SIS85C496_H
 
 #include "pci.h"
-#include "machine/ins8250.h"
 #include "machine/ds128x.h"
+#include "machine/idectrl.h"
+#include "machine/ins8250.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 
 #include "bus/ata/ataintf.h"
+#include "bus/isa/isa.h"
 #include "machine/at_keybc.h"
 
 #include "sound/spkrdev.h"
@@ -25,14 +27,21 @@
 #include "cpu/i386/i386.h"
 #include "machine/at.h"
 
-#define SIS85C496_HOST(_config, _tag, _cpu_tag, _ram_size)  \
-	pci_host_device &pcihost(PCI_HOST(_config, _tag, SIS85C496, 0x10390496, 0x03, 0x00000000)); \
-	pcihost.set_cpu_tag(_cpu_tag); \
-	pcihost.set_ram_size(_ram_size);
-
 class sis85c496_host_device : public pci_host_device {
 public:
 	sis85c496_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T> sis85c496_host_device(
+		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
+		T &&cpu_tag, int ram_size
+	) : sis85c496_host_device(mconfig, tag, owner, clock)
+	{
+		// Revision 3
+		set_ids(0x10390496, 0x03, 0x060000, 0x00);
+		//set_multifunction_device(true);
+		set_cpu_tag(std::forward<T>(cpu_tag));
+		set_ram_size(ram_size);
+	}
 
 	void set_cpu_tag(const char *tag);
 	void set_ram_size(int ram_size);
@@ -41,6 +50,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_config_complete() override;
 
 	void map_bios(address_space *memory_space, uint32_t start, uint32_t end);
 	void map_shadowram(address_space *memory_space, offs_t addrstart, offs_t addrend, void *baseptr);
@@ -63,6 +73,8 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ds12885_device> m_ds12885;
 	required_device<pc_kbdc_device> m_pc_kbdc;
+	required_device<isa16_device> m_isabus;
+	required_device_array<ide_controller_32_device, 2> m_ide;
 
 	uint8_t m_at_spkrdata;
 	uint8_t m_pit_out2;
@@ -84,6 +96,8 @@ private:
 	uint8_t m_bios_config, m_dram_config, m_isa_decoder;
 	uint16_t m_shadctrl;
 	uint8_t m_smramctrl;
+	uint16_t m_ide_vesa_ctrl;
+	u8 m_dram_boundary[8]{};
 
 	void internal_io_map(address_map &map);
 
@@ -99,6 +113,8 @@ private:
 	void shadow_config_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { COMBINE_DATA(&m_shadctrl); logerror("SiS496: %04x to shadow control\n", m_shadctrl); remap_cb(); }
 	uint8_t smram_ctrl_r() { return m_smramctrl; }
 	void smram_ctrl_w(uint8_t data) { m_smramctrl = data; remap_cb(); }
+	uint16_t ide_vesa_config_r() { return m_ide_vesa_ctrl; }
+	void ide_vesa_config_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { COMBINE_DATA(&m_ide_vesa_ctrl); logerror("SiS496: %04x to IDE/VESA Bus configuration\n", m_ide_vesa_ctrl); remap_cb(); }
 
 	// southbridge
 	uint8_t at_page8_r(offs_t offset);
@@ -106,10 +122,9 @@ private:
 	uint8_t at_portb_r();
 	void at_portb_w(uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out0_changed);
-	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out1_changed);
-	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out2_changed);
-	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
+	void at_pit8254_out1_changed(int state);
+	void at_pit8254_out2_changed(int state);
+	void pc_dma_hrq_changed(int state);
 	uint8_t pc_dma8237_0_dack_r();
 	uint8_t pc_dma8237_1_dack_r();
 	uint8_t pc_dma8237_2_dack_r();
@@ -124,15 +139,15 @@ private:
 	void pc_dma8237_5_dack_w(uint8_t data);
 	void pc_dma8237_6_dack_w(uint8_t data);
 	void pc_dma8237_7_dack_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(at_dma8237_out_eop);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack4_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack5_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack6_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack7_w);
+	void at_dma8237_out_eop(int state);
+	void pc_dack0_w(int state);
+	void pc_dack1_w(int state);
+	void pc_dack2_w(int state);
+	void pc_dack3_w(int state);
+	void pc_dack4_w(int state);
+	void pc_dack5_w(int state);
+	void pc_dack6_w(int state);
+	void pc_dack7_w(int state);
 	uint8_t at_dma8237_2_r(offs_t offset);
 	void at_dma8237_2_w(offs_t offset, uint8_t data);
 	uint8_t at_keybc_r(offs_t offset);
@@ -142,11 +157,10 @@ private:
 	void pc_dma_write_byte(offs_t offset, uint8_t data);
 	uint8_t pc_dma_read_word(offs_t offset);
 	void pc_dma_write_word(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(cpu_int_w);
-	DECLARE_WRITE_LINE_MEMBER(cpu_a20_w);
-	DECLARE_WRITE_LINE_MEMBER(cpu_reset_w);
+	void cpu_a20_w(int state);
+	void cpu_reset_w(int state);
 };
 
-DECLARE_DEVICE_TYPE(SIS85C496, sis85c496_host_device)
+DECLARE_DEVICE_TYPE(SIS85C496_HOST, sis85c496_host_device)
 
 #endif

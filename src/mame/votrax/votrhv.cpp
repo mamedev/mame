@@ -60,10 +60,9 @@
 
 // defines
 
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
-#define LOG_INPUT     (1U <<  1)
-#define LOG_LATCHX    (1U <<  2)
-#define LOG_LATCHY    (1U <<  3)
+#define LOG_INPUT     (1U << 1)
+#define LOG_LATCHX    (1U << 2)
+#define LOG_LATCHY    (1U << 3)
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC printf
@@ -71,7 +70,6 @@
 
 namespace {
 
-#define LOGGEN(...) LOGMASKED(LOG_GENERAL, __VA_ARGS__)
 #define LOGINP(...) LOGMASKED(LOG_INPUT, __VA_ARGS__)
 #define LOGLTX(...) LOGMASKED(LOG_LATCHX, __VA_ARGS__)
 #define LOGLTY(...) LOGMASKED(LOG_LATCHY, __VA_ARGS__)
@@ -98,9 +96,9 @@ public:
 	void votrhv(machine_config &config);
 	void hc110(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(reset_counter);
-	DECLARE_WRITE_LINE_MEMBER(key_pressed);
-	DECLARE_WRITE_LINE_MEMBER(pho_done);
+	void reset_counter(int state);
+	void key_pressed(int state);
+	void pho_done(int state);
 
 protected:
 	virtual void machine_start() override;
@@ -444,7 +442,7 @@ void hc120_state::machine_reset()
  Driver specific functions
 ******************************************************************************/
 
-WRITE_LINE_MEMBER( votrhv_state::reset_counter )
+void votrhv_state::reset_counter(int state)
 {
 	if (state == CLEAR_LINE)
 	{
@@ -460,7 +458,7 @@ WRITE_LINE_MEMBER( votrhv_state::reset_counter )
 	}
 }
 
-WRITE_LINE_MEMBER( votrhv_state::key_pressed )
+void votrhv_state::key_pressed(int state)
 {
 	// If we got called here, a key was pressed or released somewhere on the keyboard, and we don't know where.
 	// If, regardless of whether a key was pressed or released, our currently selected column has a non-zero
@@ -469,7 +467,7 @@ WRITE_LINE_MEMBER( votrhv_state::key_pressed )
 	key_check();
 }
 
-WRITE_LINE_MEMBER( votrhv_state::pho_done )
+void votrhv_state::pho_done(int state)
 {
 	bool rising_edge = (!m_latcha_in && (state == ASSERT_LINE));
 	m_latcha_in = (state == ASSERT_LINE);
@@ -680,7 +678,7 @@ void votrhv_state::votrhv(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	// TEMPORARY HACK until 1818c device is done
-	VOTRAX_SC01(config, m_votrax, 720000);
+	VOTRAX_SC01A(config, m_votrax, 720000);
 	m_votrax->ar_callback().set(FUNC(votrhv_state::pho_done));
 	m_votrax->add_route(ALL_OUTPUTS, "mono", 1.00);
 }

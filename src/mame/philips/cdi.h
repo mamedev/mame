@@ -11,6 +11,7 @@
 #include "mcd212.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/m6805/m68hc05.h"
+#include "diserial.h"
 #include "screen.h"
 
 /*----------- driver state -----------*/
@@ -28,6 +29,7 @@ public:
 		, m_servo(*this, "servo")
 		, m_slave(*this, "slave")
 		, m_cdic(*this, "cdic")
+		, m_cdrom(*this, "cdrom")
 		, m_mcd212(*this, "mcd212")
 		, m_dmadac(*this, "dac%u", 1U)
 	{ }
@@ -38,16 +40,6 @@ public:
 	void cdi910(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-
-	void cdimono1_mem(address_map &map);
-
-	required_device<scc68070_device> m_maincpu;
-	required_region_ptr<uint16_t> m_main_rom;
-	optional_device<screen_device> m_lcd;
-	optional_device<cdislave_hle_device> m_slave_hle;
-
-private:
 	enum servo_portc_bit_t
 	{
 		INV_JUC_OUT = (1 << 2),
@@ -55,7 +47,23 @@ private:
 		INV_CADDYSWITCH_IN = (1 << 7)
 	};
 
+	required_device<scc68070_device> m_maincpu;
+	required_region_ptr<uint16_t> m_main_rom;
+	optional_device<screen_device> m_lcd;
+	optional_device<cdislave_hle_device> m_slave_hle;
+	required_shared_ptr_array<uint16_t, 2> m_plane_ram;
+	optional_device<m68hc05c8_device> m_servo;
+	optional_device<m68hc05c8_device> m_slave;
+	optional_device<cdicdic_device> m_cdic;
+	required_device<cdrom_image_device> m_cdrom;
+	required_device<mcd212_device> m_mcd212;
+
+	required_device_array<dmadac_sound_device, 2> m_dmadac;
+
 	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual void machine_reset() override;
+
+	void cdimono1_mem(address_map &map);
 
 	void cdi910_mem(address_map &map);
 	void cdimono2_mem(address_map &map);
@@ -71,21 +79,14 @@ private:
 
 	uint16_t bus_error_r(offs_t offset);
 	void bus_error_w(offs_t offset, uint16_t data);
-
-	required_shared_ptr_array<uint16_t, 2> m_plane_ram;
-	optional_device<m68hc05c8_device> m_servo;
-	optional_device<m68hc05c8_device> m_slave;
-	optional_device<cdicdic_device> m_cdic;
-	required_device<mcd212_device> m_mcd212;
-
-	required_device_array<dmadac_sound_device, 2> m_dmadac;
 };
 
-class quizard_state : public cdi_state
+class quizard_state : public cdi_state, public device_serial_interface
 {
 public:
 	quizard_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cdi_state(mconfig, type, tag)
+		, device_serial_interface(mconfig, *this)
 		, m_mcu(*this, "mcu")
 		, m_inputs(*this, "P%u", 0U)
 	{ }
@@ -95,6 +96,9 @@ public:
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	virtual void tra_callback() override;
+	virtual void rcv_complete() override;
 
 	TIMER_CALLBACK_MEMBER(boot_press_tick);
 
@@ -106,8 +110,6 @@ private:
 	void mcu_p1_w(uint8_t data);
 	void mcu_p2_w(uint8_t data);
 	void mcu_p3_w(uint8_t data);
-	void mcu_tx(uint8_t data);
-	uint8_t mcu_rx();
 
 	void mcu_rx_from_cpu(uint8_t data);
 	void mcu_rtsn_from_cpu(int state);
@@ -117,10 +119,9 @@ private:
 	required_device<i8751_device> m_mcu;
 	required_ioport_array<3> m_inputs;
 
-	uint8_t m_mcu_rx_from_cpu = 0U;
-	bool m_mcu_initial_byte = false;
 	bool m_boot_press = false;
 	emu_timer *m_boot_timer = nullptr;
+	uint8_t m_mcu_p3;
 };
 
 // Quizard 2 language values:

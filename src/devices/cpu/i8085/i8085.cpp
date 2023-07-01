@@ -208,10 +208,10 @@ i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type 
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
 	, m_opcode_config("opcodes", ENDIANNESS_LITTLE, 8, 16, 0)
-	, m_in_inta_func(*this)
+	, m_in_inta_func(*this, 0)
 	, m_out_status_func(*this)
 	, m_out_inte_func(*this)
-	, m_in_sid_func(*this)
+	, m_in_sid_func(*this, 0)
 	, m_out_sod_func(*this)
 	, m_clk_out_func(*this)
 { }
@@ -250,16 +250,14 @@ device_memory_interface::space_config_vector i8085a_cpu_device::memory_space_con
 
 void i8085a_cpu_device::device_config_complete()
 {
-	m_clk_out_func.resolve();
-	if (!m_clk_out_func.isnull())
-		m_clk_out_func(clock() / 2);
+	m_clk_out_func.resolve_safe();
+	m_clk_out_func(clock() / 2);
 }
 
 
 void i8085a_cpu_device::device_clock_changed()
 {
-	if (!m_clk_out_func.isnull())
-		m_clk_out_func(clock() / 2);
+	m_clk_out_func(clock() / 2);
 }
 
 
@@ -351,13 +349,6 @@ void i8085a_cpu_device::device_start()
 	space(AS_PROGRAM).specific(m_program);
 	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(m_copcodes);
 	space(AS_IO).specific(m_io);
-
-	/* resolve callbacks */
-	m_in_inta_func.resolve();
-	m_out_status_func.resolve_safe();
-	m_out_inte_func.resolve_safe();
-	m_in_sid_func.resolve_safe(0);
-	m_out_sod_func.resolve_safe();
 
 	/* register for state saving */
 	save_item(NAME(m_PC.w.l));
@@ -549,7 +540,7 @@ void i8085a_cpu_device::check_for_interrupts()
 
 		/* break out of HALT state and call the IRQ ack callback */
 		break_halt_for_interrupt();
-		standard_irq_callback(I8085_TRAP_LINE);
+		standard_irq_callback(I8085_TRAP_LINE, m_PC.w.l);
 
 		/* push the PC and jump to $0024 */
 		op_push(m_PC);
@@ -566,7 +557,7 @@ void i8085a_cpu_device::check_for_interrupts()
 
 		/* break out of HALT state and call the IRQ ack callback */
 		break_halt_for_interrupt();
-		standard_irq_callback(I8085_RST75_LINE);
+		standard_irq_callback(I8085_RST75_LINE, m_PC.w.l);
 
 		/* push the PC and jump to $003C */
 		op_push(m_PC);
@@ -580,7 +571,7 @@ void i8085a_cpu_device::check_for_interrupts()
 	{
 		/* break out of HALT state and call the IRQ ack callback */
 		break_halt_for_interrupt();
-		standard_irq_callback(I8085_RST65_LINE);
+		standard_irq_callback(I8085_RST65_LINE, m_PC.w.l);
 
 		/* push the PC and jump to $0034 */
 		op_push(m_PC);
@@ -594,7 +585,7 @@ void i8085a_cpu_device::check_for_interrupts()
 	{
 		/* break out of HALT state and call the IRQ ack callback */
 		break_halt_for_interrupt();
-		standard_irq_callback(I8085_RST55_LINE);
+		standard_irq_callback(I8085_RST55_LINE, m_PC.w.l);
 
 		/* push the PC and jump to $002C */
 		op_push(m_PC);
@@ -607,8 +598,8 @@ void i8085a_cpu_device::check_for_interrupts()
 	else if (m_irq_state[I8085_INTR_LINE] && (m_im & IM_IE))
 	{
 		/* break out of HALT state and call the IRQ ack callback */
-		if (!m_in_inta_func.isnull())
-			standard_irq_callback(I8085_INTR_LINE);
+		if (!m_in_inta_func.isunset())
+			standard_irq_callback(I8085_INTR_LINE, m_PC.w.l);
 		break_halt_for_interrupt();
 
 		u8 vector = read_inta();
@@ -712,8 +703,8 @@ u8 i8085a_cpu_device::read_op()
 
 u8 i8085a_cpu_device::read_inta()
 {
-	if (m_in_inta_func.isnull())
-		return standard_irq_callback(I8085_INTR_LINE);
+	if (m_in_inta_func.isunset())
+		return standard_irq_callback(I8085_INTR_LINE, m_PC.w.l);
 	else
 		return m_in_inta_func(m_PC.w.l);
 }

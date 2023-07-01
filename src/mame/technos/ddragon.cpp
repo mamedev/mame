@@ -333,7 +333,7 @@ void ddragon_state::ddragonba_port_w(uint8_t data)
  *
  *************************************/
 
-READ_LINE_MEMBER(ddragon_state::subcpu_bus_free_r)
+int ddragon_state::subcpu_bus_free_r()
 {
 	// Corresponds to BA (Bus Available) on the HD63701
 	if (m_subcpu)
@@ -441,12 +441,12 @@ void ddragon_state::dd_adpcm_int( int chip )
 	}
 }
 
-WRITE_LINE_MEMBER(ddragon_state::dd_adpcm_int_1)
+void ddragon_state::dd_adpcm_int_1(int state)
 {
 	dd_adpcm_int(0);
 }
 
-WRITE_LINE_MEMBER(ddragon_state::dd_adpcm_int_2)
+void ddragon_state::dd_adpcm_int_2(int state)
 {
 	dd_adpcm_int(1);
 }

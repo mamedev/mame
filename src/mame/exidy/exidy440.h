@@ -31,8 +31,8 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_READ_LINE_MEMBER(firq_beam_r);
-	DECLARE_READ_LINE_MEMBER(firq_vblank_r);
+	int firq_beam_r();
+	int firq_vblank_r();
 	DECLARE_CUSTOM_INPUT_MEMBER(hitnmiss_button1_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	void init_showdown();
@@ -62,7 +62,7 @@ protected:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int scroll_offset, int check_collision);
 	void update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,  int scroll_offset, int check_collision);
 	uint32_t screen_update_exidy440(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt_w);
+	void vblank_interrupt_w(int state);
 	TIMER_CALLBACK_MEMBER(delayed_sound_command_w);
 	TIMER_CALLBACK_MEMBER(beam_firq_callback);
 	TIMER_CALLBACK_MEMBER(collide_firq_callback);
@@ -98,8 +98,8 @@ private:
 	uint8_t m_firq_select = 0U;
 	uint8_t m_palettebank_io = 0U;
 	uint8_t m_palettebank_vis = 0U;
-	emu_timer *m_beam_firq_timer = nullptr;
-	emu_timer *m_collide_firq_timer = nullptr;
+	emu_timer *m_beam_firq_timer;
+	emu_timer *m_collide_firq_timer[128];
 	uint8_t m_beam_firq_count = 0U;
 };
 

@@ -17,10 +17,10 @@
 #include "util/ioprocs.h"
 #include "util/ioprocsfilter.h"
 
-#define LOG_WARN          (1U<<1)   // Warnings
-#define LOG_DETAIL        (1U<<2)   // Details
+#define LOG_WARN          (1U << 1)   // Warnings
+#define LOG_DETAIL        (1U << 2)   // Details
 
-#define VERBOSE ( LOG_WARN )
+#define VERBOSE (LOG_WARN)
 
 #include "logmacro.h"
 
@@ -248,17 +248,17 @@ const software_list_loader &cassette_image_device::get_software_list_loader() co
 	return image_software_list_loader::instance();
 }
 
-image_init_result cassette_image_device::call_create(int format_type, util::option_resolution *format_options)
+std::pair<std::error_condition, std::string> cassette_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
-	return internal_load(true);
+	return std::make_pair(internal_load(true), std::string());
 }
 
-image_init_result cassette_image_device::call_load()
+std::pair<std::error_condition, std::string> cassette_image_device::call_load()
 {
-	return internal_load(false);
+	return std::make_pair(internal_load(false), std::string());
 }
 
-image_init_result cassette_image_device::internal_load(bool is_create)
+std::error_condition cassette_image_device::internal_load(bool is_create)
 {
 	cassette_image::error err;
 	device_image_interface *image = nullptr;
@@ -335,7 +335,7 @@ image_init_result cassette_image_device::internal_load(bool is_create)
 		m_speed = 1;
 		m_direction = 1;
 
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 	else
 	{
@@ -358,8 +358,7 @@ image_init_result cassette_image_device::internal_load(bool is_create)
 				imgerr = image_error::UNSPECIFIED;
 				break;
 		}
-		image->seterror(imgerr, nullptr);
-		return image_init_result::FAIL;
+		return imgerr;
 	}
 }
 

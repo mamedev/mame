@@ -74,14 +74,14 @@ void neogeo_base_state::set_pens()
 }
 
 
-WRITE_LINE_MEMBER(neogeo_base_state::set_screen_shadow)
+void neogeo_base_state::set_screen_shadow(int state)
 {
 	m_screen_shadow = state;
 	set_pens();
 }
 
 
-WRITE_LINE_MEMBER(neogeo_base_state::set_palette_bank)
+void neogeo_base_state::set_palette_bank(int state)
 {
 	m_palette_bank = state ? 0x1000 : 0;
 	set_pens();

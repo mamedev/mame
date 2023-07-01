@@ -244,7 +244,6 @@
 
 #include "debugger.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_MMU     (1U << 1)
 #define LOG_IOCB    (1U << 2)
 
@@ -393,7 +392,7 @@ protected:
 	u16 lance_r(offs_t offset, u16 mem_mask = 0xffff);
 	void lance_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
 
-	template <u8 Source> WRITE_LINE_MEMBER(irq_w);
+	template <u8 Source> void irq_w(int state);
 
 private:
 	// processors and memory
@@ -1031,8 +1030,8 @@ void rx3230_state::rx3230(machine_config &config)
 	m_rambo->parity_out().set_inputline(m_cpu, INPUT_LINE_IRQ5);
 	//m_rambo->buzzer_out().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 	m_rambo->set_ram(m_ram);
-	m_rambo->dma_r<0>().set("scsi:7:ncr53c94", FUNC(ncr53c94_device::dma16_r));
-	m_rambo->dma_w<0>().set("scsi:7:ncr53c94", FUNC(ncr53c94_device::dma16_w));
+	m_rambo->dma_r<0>().set("scsi:7:ncr53c94", FUNC(ncr53c94_device::dma16_swap_r));
+	m_rambo->dma_w<0>().set("scsi:7:ncr53c94", FUNC(ncr53c94_device::dma16_swap_w));
 
 	// scsi bus and devices
 	NSCSI_BUS(config, m_scsibus);
@@ -1152,7 +1151,7 @@ void rx3230_state::rs3230(machine_config &config)
 	}
 }
 
-template <u8 Source> WRITE_LINE_MEMBER(rx3230_state::irq_w)
+template <u8 Source> void rx3230_state::irq_w(int state)
 {
 	if (state)
 		m_int_reg |= Source;

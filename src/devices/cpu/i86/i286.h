@@ -81,12 +81,14 @@ public:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
-	typedef delegate<uint32_t (bool)> a20_cb;
-	template <typename Object> void set_a20_callback(Object &&cb) { m_a20_callback = std::forward<Object>(cb); }
+	template <typename... T>
+	void set_a20_callback(T &&... args) { m_a20_callback.set(std::forward<T>(args)...); }
 
 	auto shutdown_callback() { return m_out_shutdown_func.bind(); }
 
 protected:
+	typedef device_delegate<uint32_t (bool)> a20_cb;
+
 	virtual void execute_run() override;
 	virtual void device_reset() override;
 	virtual void device_start() override;
@@ -97,7 +99,7 @@ protected:
 
 	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
 	virtual void execute_set_input(int inputnum, int state) override;
-	bool memory_translate(int spacenum, int intention, offs_t &address) override;
+	bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	virtual void interrupt(int int_num, int trap = 1) override { if(trap) throw TRAP(int_num, (uint16_t)-1); else interrupt_descriptor(int_num, 0, 0); }
 	virtual uint8_t read_port_byte(uint16_t port) override;

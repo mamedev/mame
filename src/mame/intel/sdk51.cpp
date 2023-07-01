@@ -57,8 +57,8 @@ private:
 
 	u8 upibus_r();
 	void upibus_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(display_clock_w);
-	DECLARE_WRITE_LINE_MEMBER(upiobf_w);
+	void display_clock_w(int state);
+	void upiobf_w(int state);
 	void serial_control_w(u8 data);
 
 	required_device<mcs51_cpu_device> m_maincpu;
@@ -127,7 +127,7 @@ void sdk51_state::serial_control_w(u8 data)
 	m_serial_control = data;
 }
 
-WRITE_LINE_MEMBER(sdk51_state::display_clock_w)
+void sdk51_state::display_clock_w(int state)
 {
 	if (!m_display_clock && state)
 		m_kdtime = ((m_kdtime << 1) & 0xfffffe) | BIT(m_upi->p1_r(), 6);
@@ -135,7 +135,7 @@ WRITE_LINE_MEMBER(sdk51_state::display_clock_w)
 	m_display_clock = state;
 }
 
-WRITE_LINE_MEMBER(sdk51_state::upiobf_w)
+void sdk51_state::upiobf_w(int state)
 {
 	if (m_upiobf != bool(state))
 	{

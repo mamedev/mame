@@ -20,6 +20,7 @@ np600a3_device::np600a3_device(const machine_config &mconfig, const char *tag, d
 	, device_isa16_card_interface(mconfig, *this)
 	, m_npcpu(*this, "npcpu")
 	, m_lcc(*this, "lcc")
+	, m_enetaddr(*this, "enetaddr")
 {
 }
 
@@ -33,7 +34,11 @@ void np600a3_device::lcc_ca_w(u16 data)
 	m_lcc->ca(1);
 }
 
-WRITE_LINE_MEMBER(np600a3_device::host_int_w)
+void np600a3_device::int1_ack_w(u8 data)
+{
+}
+
+void np600a3_device::host_int_w(int state)
 {
 	logerror("%s: Host interrupt %s\n", machine().describe_context(), state ? "asserted" : "cleared");
 }
@@ -41,6 +46,11 @@ WRITE_LINE_MEMBER(np600a3_device::host_int_w)
 u16 np600a3_device::status_r()
 {
 	return 0;
+}
+
+u8 np600a3_device::enetaddr_r(offs_t offset)
+{
+	return m_enetaddr[offset];
 }
 
 void np600a3_device::mem_map(address_map &map)
@@ -54,8 +64,11 @@ void np600a3_device::mem_map(address_map &map)
 void np600a3_device::io_map(address_map &map)
 {
 	map(0x0000, 0x0001).w(FUNC(np600a3_device::lcc_ca_w));
+	map(0x0010, 0x0010).w("fromhost", FUNC(generic_latch_16_device::acknowledge_w));
+	map(0x0020, 0x0020).w(FUNC(np600a3_device::int1_ack_w));
 	map(0x0070, 0x007f).w("bitlatch", FUNC(ls259_device::write_a0));
 	map(0x0080, 0x0081).r(FUNC(np600a3_device::status_r));
+	map(0x0300, 0x033f).r(FUNC(np600a3_device::enetaddr_r)).umask16(0x00ff);
 }
 
 void np600a3_device::lcc_map(address_map &map)
@@ -66,15 +79,19 @@ void np600a3_device::lcc_map(address_map &map)
 
 void np600a3_device::device_add_mconfig(machine_config &config)
 {
-	I80186(config, m_npcpu, 16_MHz_XTAL);
-	m_npcpu->set_addrmap(AS_PROGRAM, &np600a3_device::mem_map);
-	m_npcpu->set_addrmap(AS_IO, &np600a3_device::io_map);
+	i80186_cpu_device &npcpu(I80186(config, m_npcpu, 16_MHz_XTAL));
+	npcpu.set_addrmap(AS_PROGRAM, &np600a3_device::mem_map);
+	npcpu.set_addrmap(AS_IO, &np600a3_device::io_map);
+	npcpu.tmrout0_handler().set_inputline(m_npcpu, INPUT_LINE_NMI);
 
 	ls259_device &bitlatch(LS259(config, "bitlatch")); // U28
 	bitlatch.q_out_cb<1>().set(FUNC(np600a3_device::host_int_w));
 	bitlatch.q_out_cb<4>().set(m_lcc, FUNC(i82586_device::reset_w)).invert();
 
-	GENERIC_LATCH_16(config, "fromhost");
+	generic_latch_16_device &fromhost(GENERIC_LATCH_16(config, "fromhost"));
+	fromhost.data_pending_callback().set(m_npcpu, FUNC(i80186_cpu_device::int0_w));
+	fromhost.set_separate_acknowledge(true);
+
 	GENERIC_LATCH_16(config, "tohost");
 
 	I82586(config, m_lcc, 16_MHz_XTAL / 2); // clock presumed (20 MHz XTAL also present for SEEQ DQ8023A transceiver)
@@ -87,10 +104,12 @@ ROM_START(np600a3)
 	ROM_LOAD16_BYTE("258-0032-00_rev_ba.u38", 0x0000, 0x2000, CRC(84ccb317) SHA1(3ecc8e265336f5d3b0f276f18dd1b7001778f2c3))
 	ROM_LOAD16_BYTE("258-0033-00_rev_ba.u39", 0x0001, 0x2000, CRC(0e0f726c) SHA1(520773e235a826438b025381cd3861df86d4965d))
 
-	// Undumped small devices (mostly or all PLDs):
+	ROM_REGION(0x20, "enetaddr", 0)
+	ROM_LOAD("020701079bfa.u29", 0x00, 0x20, NO_DUMP) // MMI 63S081N (or equivalent PROM, probably having different label and contents for each PCB)
+
+	// Other undumped small devices (mostly or all PLDs):
 	// 258-0037-00 REV AA (U17, 20 pins)
 	// 258-0027-01 REV AB (U20, 20 pins)
-	// 020701079BFA (U29, 16 pins)
 	// 258-0031-00 REV AC (U34, PAL20xx, 24 pins)
 	// 258-0030-00 REV AA (U36, 20 pins)
 	// 258-0028-01 REV AA (U44, 20 pins)

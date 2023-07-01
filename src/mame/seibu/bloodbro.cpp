@@ -212,7 +212,7 @@ void bloodbro_state::weststry_map(address_map &map)
 	map(0x128000, 0x1287ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
 
-WRITE_LINE_MEMBER(bloodbro_state::weststry_opl_irq_w)
+void bloodbro_state::weststry_opl_irq_w(int state)
 {
 	m_weststry_opl_irq = state;
 	weststry_soundnmi_update();
@@ -874,7 +874,7 @@ ROM_START( skysmash )
 	ROM_LOAD( "rom1", 0x00000, 0x20000, CRC(e69986f6) SHA1(de38bf2d5638cb40740882e1abccf7928e43a5a6) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "ss006.u083.4j", 0x0000, 0x0100, NO_DUMP ) // N82S135N
+	ROM_LOAD( "ss006.u083.4j", 0x0000, 0x0100, CRC(8b2ae4a0) SHA1(7e7d0cc6afc8b8638b6b4614bc342a6baea3c7cf) ) // N82S135N
 ROM_END
 
 

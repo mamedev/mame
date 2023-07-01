@@ -90,16 +90,18 @@ render_primitive_list *renderer_gdi::get_primitives()
 
 int renderer_gdi::draw(const int update)
 {
+	auto &win = dynamic_cast<win_window_info &>(window());
+
 	// we don't have any special resize behaviors
-	if (window().m_resize_state == RESIZE_STATE_PENDING)
-		window().m_resize_state = RESIZE_STATE_NORMAL;
+	if (win.m_resize_state == win_window_info::RESIZE_STATE_PENDING)
+		win.m_resize_state = win_window_info::RESIZE_STATE_NORMAL;
 
 	// get the target bounds
 	RECT bounds;
-	GetClientRect(dynamic_cast<win_window_info &>(window()).platform_window(), &bounds);
+	GetClientRect(win.platform_window(), &bounds);
 
 	// compute width/height/pitch of target
-	osd_dim const dimensions = window().get_size();
+	osd_dim const dimensions = win.get_size();
 	int const width = dimensions.width();
 	int const height = dimensions.height();
 	int const pitch = (width + 3) & ~3;
@@ -113,9 +115,9 @@ int renderer_gdi::draw(const int update)
 	}
 
 	// draw the primitives to the bitmap
-	window().m_primlist->acquire_lock();
-	software_renderer<uint32_t, 0,0,0, 16,8,0>::draw_primitives(*window().m_primlist, m_bmdata.get(), width, height, pitch);
-	window().m_primlist->release_lock();
+	win.m_primlist->acquire_lock();
+	software_renderer<uint32_t, 0,0,0, 16,8,0>::draw_primitives(*win.m_primlist, m_bmdata.get(), width, height, pitch);
+	win.m_primlist->release_lock();
 
 	// fill in bitmap-specific info
 	m_bminfo.bmiHeader.biWidth = pitch;
@@ -123,7 +125,7 @@ int renderer_gdi::draw(const int update)
 
 	// blit to the screen
 	StretchDIBits(
-			window().m_dc, 0, 0, width, height,
+			win.m_dc, 0, 0, width, height,
 			0, 0, width, height,
 			m_bmdata.get(), &m_bminfo, DIB_RGB_COLORS, SRCCOPY);
 

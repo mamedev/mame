@@ -35,7 +35,7 @@ protected:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	void fill_image_line(device_image_interface *img, std::string &instance, std::string &filename);
 

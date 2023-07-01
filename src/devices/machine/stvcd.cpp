@@ -45,9 +45,22 @@ DASM notes:
 
 #include "coreutil.h"
 
-// super-verbose
-//#define VERBOSE 1
+#define LOG_WARN           (1U << 1)
+#define LOG_CMD            (1U << 2)
+#define LOG_SEEK           (1U << 3)
+#define LOG_XFER           (1U << 4)
+
+#define VERBOSE (LOG_CMD | LOG_WARN)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+
 #include "logmacro.h"
+
+#define LOGWARN(...)         LOGMASKED(LOG_WARN, __VA_ARGS__)
+#define LOGCMD(...)          LOGMASKED(LOG_CMD, __VA_ARGS__)
+#define LOGSEEK(...)         LOGMASKED(LOG_SEEK, __VA_ARGS__)
+#define LOGXFER(...)         LOGMASKED(LOG_XFER, __VA_ARGS__)
+
+#define LIVE_CD_VIEW    0
 
 // HIRQ definitions
 #define CMOK 0x0001 // command dispatch possible
@@ -108,6 +121,7 @@ void stvcd_device::device_add_mconfig(machine_config &config)
 	CDDA(config, m_cdda);
 	m_cdda->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 	m_cdda->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+	m_cdda->set_cdrom_tag("cdrom");
 }
 
 void stvcd_device::device_start()
@@ -159,7 +173,7 @@ u32 stvcd_device::datatrns_r(offs_t offset, uint32_t mem_mask)
 	}
 	else
 	{
-		printf("CD: Unknown data buffer read with mask = %08x\n", mem_mask);
+		LOGWARN("CD: Unknown data buffer read with mask = %08x\n", mem_mask);
 		rv = 0;
 	}
 	return rv;
@@ -170,7 +184,7 @@ void stvcd_device::datatrns_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	if (mem_mask == 0xffffffff)
 		dataxfer_long_w(data);
 	else
-		printf("CD: Unknown data buffer write with mask = %08x\n", mem_mask);
+		LOGWARN("CD: Unknown data buffer write with mask = %08x\n", mem_mask);
 }
 
 inline u32 stvcd_device::dataxfer_long_r()
@@ -232,7 +246,7 @@ inline u32 stvcd_device::dataxfer_long_r()
 			break;
 
 		default:
-			osd_printf_error("CD: unhandled 32-bit transfer type %d\n", (int)xfertype32);
+			LOGWARN("CD: unhandled 32-bit transfer type %d\n", (int)xfertype32);
 			break;
 	}
 
@@ -273,7 +287,7 @@ inline void stvcd_device::dataxfer_long_w(u32 data)
 			break;
 
 		default:
-			printf("CD: unhandled 32-bit transfer type write %d\n", (int)xfertype32);
+			LOGWARN("CD: unhandled 32-bit transfer type write %d\n", (int)xfertype32);
 			break;
 	}
 }
@@ -371,7 +385,7 @@ inline u16 stvcd_device::dataxfer_word_r()
 			break;
 
 		default:
-			osd_printf_error("STVCD: Unhandled xfer type %d\n", (int)xfertype);
+			LOGWARN("STVCD: Unhandled xfer type %d\n", (int)xfertype);
 			rv = 0;
 			break;
 	}
@@ -403,13 +417,13 @@ void stvcd_device::hirq_w(uint16_t data) { hirqreg &= data; }
 // TODO: these two are actually never read or written to by host?
 uint16_t stvcd_device::hirqmask_r()
 {
-	printf("RW HIRM: %04x\n", hirqmask);
+	LOGWARN("RW HIRM: %04x\n", hirqmask);
 	return hirqmask;
 }
 
 void stvcd_device::hirqmask_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	printf("WW HIRM: %04x => %04x\n", hirqmask, data);
+	LOGWARN("WW HIRM: %04x => %04x\n", hirqmask, data);
 	COMBINE_DATA(&hirqmask);
 }
 
@@ -478,12 +492,12 @@ int stvcd_device::get_track_index(uint32_t fad)
 	uint32_t rel_fad;
 	uint8_t track;
 
-	if(cdrom->get_track_type(cdrom->get_track(fad)) != cdrom_file::CD_TRACK_AUDIO)
+	if(m_cdrom_image->get_track_type(m_cdrom_image->get_track(fad)) != cdrom_file::CD_TRACK_AUDIO)
 		return 1;
 
-	track = cdrom->get_track( fad );
+	track = m_cdrom_image->get_track( fad );
 
-	rel_fad = fad - cdrom->get_track_start( track );
+	rel_fad = fad - m_cdrom_image->get_track_start( track );
 
 	if(rel_fad < 150)
 		return 0;
@@ -491,14 +505,14 @@ int stvcd_device::get_track_index(uint32_t fad)
 	return 1;
 }
 
-int stvcd_device::sega_cdrom_get_adr_control(cdrom_file *file, int track)
+int stvcd_device::sega_cdrom_get_adr_control(int track)
 {
-	return bitswap<8>(file->get_adr_control(cur_track),3,2,1,0,7,6,5,4);
+	return bitswap<8>(m_cdrom_image->get_adr_control(cur_track),3,2,1,0,7,6,5,4);
 }
 
 void stvcd_device::cr_standard_return(uint16_t cur_status)
 {
-	if (!cdrom)
+	if (!m_cdrom_image->exists())
 	{
 		cr1 = cur_status;
 		cr2 = 0;
@@ -508,17 +522,17 @@ void stvcd_device::cr_standard_return(uint16_t cur_status)
 	else if ((cd_stat & 0x0f00) == CD_STAT_SEEK)
 	{
 		/* During seek state, values returned are from the target position */
-		uint8_t seek_track = cdrom->get_track(cd_fad_seek-150);
+		uint8_t seek_track = m_cdrom_image->get_track(cd_fad_seek-150);
 
 		cr1 = cur_status | (playtype << 7) | 0x00 | (cdda_repeat_count & 0xf);
-		cr2 =  (seek_track == 0xff) ? 0xffff : ((sega_cdrom_get_adr_control(cdrom, seek_track)<<8) | seek_track);
+		cr2 =  (seek_track == 0xff) ? 0xffff : ((sega_cdrom_get_adr_control(seek_track)<<8) | seek_track);
 		cr3 = (get_track_index(cd_fad_seek)<<8) | (cd_fad_seek>>16); //index & 0xff00
 		cr4 = cd_fad_seek;
 	}
 	else
 	{
 		cr1 = cur_status | (playtype << 7) | 0x00 | (cdda_repeat_count & 0xf); //options << 4 | repeat & 0xf
-		cr2 = (cur_track == 0xff) ? 0xffff : ((sega_cdrom_get_adr_control(cdrom, cur_track)<<8) | (cdrom->get_track(cd_curfad-150)+1));
+		cr2 = (cur_track == 0xff) ? 0xffff : ((sega_cdrom_get_adr_control(cur_track)<<8) | (m_cdrom_image->get_track(cd_curfad-150)+1));
 		cr3 = (get_track_index(cd_curfad)<<8) | (cd_curfad>>16); //index & 0xff00
 		cr4 = cd_curfad;
 	}
@@ -538,7 +552,7 @@ void stvcd_device::mpeg_standard_return(uint16_t cur_status)
 
 void stvcd_device::cmd_get_status()
 {
-	//LOG("%s: Get Status\n", machine().describe_context();
+	//LOGCMD("%s: Get Status\n", machine().describe_context();
 	hirqreg |= CMOK;
 	if(status_type == 0)
 		cr_standard_return(cd_stat);
@@ -555,7 +569,7 @@ void stvcd_device::cmd_get_status()
 
 void stvcd_device::cmd_get_hw_info()
 {
-	LOG("%s: Get Hardware Info\n", machine().describe_context());
+	LOGCMD("%s: Get Hardware Info\n", machine().describe_context());
 	hirqreg |= CMOK;
 	cr1 = cd_stat;
 	cr2 = 0x0201;
@@ -566,7 +580,7 @@ void stvcd_device::cmd_get_hw_info()
 
 void stvcd_device::cmd_get_toc()
 {
-	LOG("%s: Get TOC\n", machine().describe_context());
+	LOGCMD("%s: Get TOC\n", machine().describe_context());
 	cd_readTOC();
 	cd_stat = CD_STAT_TRANS|CD_STAT_PAUSE;
 	cr1 = cd_stat;
@@ -584,7 +598,8 @@ void stvcd_device::cmd_get_session_info()
 	// bios is interested in returns in cr3 and cr4
 	// cr3 should be data track #
 	// cr4 must be > 1 and < 100 or bios gets angry.
-	LOG("%s: Get Session Info\n", machine().describe_context());
+	LOGCMD("%s: Get Session Info\n", machine().describe_context());
+	// TODO: shouldn't really read from TOC
 	cd_readTOC();
 	switch (cr1 & 0xff)
 	{
@@ -605,7 +620,7 @@ void stvcd_device::cmd_get_session_info()
 			break;
 
 		default:
-			osd_printf_error("CD: Unknown request to Get Session Info %x\n", cr1 & 0xff);
+			LOGWARN("CD: Unknown request to Get Session Info %x\n", cr1 & 0xff);
 			cr1 = cd_stat;
 			cr2 = 0;
 			cr3 = 0;
@@ -627,7 +642,7 @@ void stvcd_device::cmd_init_cdsystem()
 	// CR1 & 8 = retry reading mode 2 sectors
 	// CR1 & 10 = force single-speed
 	// CR1 & 80 = no change flag (done by Assault Suit Leynos 2)
-	LOG("%s: Initialize CD system\n", machine().describe_context());
+	LOGCMD("%s: Initialize CD system\n", machine().describe_context());
 	//if((cr1 & 0x81) == 0x00) //guess TODO: nope, Choice Cuts doesn't like it, it crashes if you try to skip the FMV otherwise.
 	{
 		if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
@@ -674,7 +689,7 @@ void stvcd_device::cmd_end_data_transfer()
 	// end data transfer (TODO: needs to be worked on!)
 	// returns # of bytes transferred (24 bits) in
 	// low byte of cr1 (MSB) and cr2 (middle byte, LSB)
-	LOG("%s: End data transfer (%d bytes xfer'd)\n", machine().describe_context(), xferdnum);
+	LOGXFER("%s: End data transfer (%d bytes xfer'd)\n", machine().describe_context(), xferdnum);
 
 	// clear the "transfer" flag
 	cd_stat &= ~CD_STAT_TRANS;
@@ -688,7 +703,7 @@ void stvcd_device::cmd_end_data_transfer()
 	}
 	else
 	{
-		logerror("No xferdnum error\n");
+		LOGWARN("No xferdnum error\n");
 		cr1 = (cd_stat) | (0xff);   // is this right?
 		cr2 = 0xffff;
 		cr3 = 0;
@@ -742,17 +757,17 @@ void stvcd_device::cmd_end_data_transfer()
 	xferdnum = 0;
 	hirqreg |= CMOK;
 
-	LOG("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4);
+	LOGXFER("\t%04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4);
 	status_type = 1;
 }
 
 void stvcd_device::cmd_play_disc()
 {
-	// Play Disc.  FAD is in lowest 7 bits of cr1 and all of cr2.
+	// Play Disc. FAD is in lowest 7 bits of cr1 and all of cr2.
 	uint32_t start_pos, end_pos;
 	uint8_t play_mode;
 
-	LOG("%s: Play Disc\n",   machine().describe_context());
+	LOGCMD("%s: Play Disc\n",   machine().describe_context());
 	cd_stat = CD_STAT_PLAY;
 
 	play_mode = (cr3 >> 8) & 0x7f;
@@ -767,8 +782,8 @@ void stvcd_device::cmd_play_disc()
 			if (start_pos != 0xffffff)
 				cd_curfad = start_pos & 0xfffff;
 
-			logerror("fad mode\n");
-			cur_track = cdrom->get_track(cd_curfad-150);
+			LOGCMD("\tFAD mode\n");
+			cur_track = m_cdrom_image->get_track(cd_curfad-150);
 		}
 		else
 		{
@@ -776,7 +791,7 @@ void stvcd_device::cmd_play_disc()
 			if(((start_pos)>>8) != 0)
 			{
 				cur_track = (start_pos)>>8;
-				cd_fad_seek = cdrom->get_track_start(cur_track-1);
+				cd_fad_seek = m_cdrom_image->get_track_start(cur_track-1);
 				cd_stat = CD_STAT_SEEK;
 				m_cdda->pause_audio(0);
 			}
@@ -789,7 +804,7 @@ void stvcd_device::cmd_play_disc()
 				return;
 			}
 
-			printf("track mode %d\n",cur_track);
+			LOGCMD("\ttrack mode %d\n",cur_track);
 		}
 
 		if (end_pos & 0x800000)
@@ -802,7 +817,7 @@ void stvcd_device::cmd_play_disc()
 			uint8_t end_track;
 
 			end_track = (end_pos)>>8;
-			fadstoplay = cdrom->get_track_start(end_track) - cd_fad_seek;
+			fadstoplay = m_cdrom_image->get_track_start(end_track) - cd_fad_seek;
 		}
 	}
 	else    // play until the end of the disc
@@ -818,11 +833,11 @@ void stvcd_device::cmd_play_disc()
 			else
 			{
 				if(end_pos == 0)
-					fadstoplay = (cdrom->get_track_start(0xaa)) - cd_curfad;
+					fadstoplay = (m_cdrom_image->get_track_start(0xaa)) - cd_curfad;
 				else
-					fadstoplay = (cdrom->get_track_start((end_pos & 0xff00) >> 8)) - cd_curfad;
+					fadstoplay = (m_cdrom_image->get_track_start((end_pos & 0xff00) >> 8)) - cd_curfad;
 			}
-			logerror("track mode %08x %08x\n",cd_curfad,fadstoplay);
+			LOGCMD("\ttrack mode %08x %08x\n", cd_curfad, fadstoplay);
 		}
 		else
 		{
@@ -835,14 +850,14 @@ void stvcd_device::cmd_play_disc()
 			// be countless possible combinations ...
 			if(fadstoplay == 0)
 			{
-				cd_curfad = cdrom->get_track_start(cur_track-1);
-				fadstoplay = cdrom->get_track_start(cur_track) - cd_curfad;
+				cd_curfad = m_cdrom_image->get_track_start(cur_track-1);
+				fadstoplay = m_cdrom_image->get_track_start(cur_track) - cd_curfad;
 			}
-			logerror("track resume %08x %08x\n",cd_curfad,fadstoplay);
+			LOGCMD("\ttrack resume %08x %08x\n",cd_curfad,fadstoplay);
 		}
 	}
 
-	LOG("Play Disc: start %x length %x\n", cd_curfad, fadstoplay);
+	LOGCMD("\tPlay Disc: start %x length %x\n", cd_curfad, fadstoplay);
 
 	cr_standard_return(cd_stat);
 	hirqreg |= (CMOK);
@@ -852,7 +867,7 @@ void stvcd_device::cmd_play_disc()
 	playtype = 0;
 
 	// cdda
-	if(cdrom->get_track_type(cdrom->get_track(cd_curfad)) == cdrom_file::CD_TRACK_AUDIO)
+	if(m_cdrom_image->get_track_type(m_cdrom_image->get_track(cd_curfad)) == cdrom_file::CD_TRACK_AUDIO)
 	{
 		m_cdda->pause_audio(0);
 		//m_cdda->start_audio(cd_curfad, fadstoplay);
@@ -872,8 +887,8 @@ void stvcd_device::cmd_seek_disc()
 {
 	uint32_t temp;
 
-	LOG("%s: Disc seek\n",   machine().describe_context());
-	//printf("%08x %08x %08x %08x\n",cr1,cr2,cr3,cr4);
+	LOGCMD("%s: Disc seek\n",   machine().describe_context());
+	LOGCMD("\t%08x %08x %08x %08x\n",cr1,cr2,cr3,cr4);
 	if (cr1 & 0x80)
 	{
 		temp = (cr1&0xff)<<16;  // get FAD to seek to
@@ -889,7 +904,7 @@ void stvcd_device::cmd_seek_disc()
 		else
 		{
 			cd_curfad = ((cr1&0x7f)<<16) | cr2;
-			printf("disc seek with params %04x %04x\n",cr1,cr2); //Area 51 sets this up
+			LOGCMD("\tdisc seek with params %04x %04x\n",cr1,cr2); //Area 51 sets this up
 		}
 	}
 	else
@@ -899,7 +914,7 @@ void stvcd_device::cmd_seek_disc()
 		{
 			cd_stat = CD_STAT_PAUSE;
 			cur_track = cr2>>8;
-			cd_curfad = cdrom->get_track_start(cur_track-1);
+			cd_curfad = m_cdrom_image->get_track_start(cur_track-1);
 			m_cdda->pause_audio(1);
 			// (index is cr2 low byte)
 		}
@@ -960,12 +975,12 @@ void stvcd_device::cmd_get_subcode_q_rw_channel()
 			*/
 
 			msf_abs = cdrom_file::lba_to_msf_alt( cd_curfad - 150 );
-			track = cdrom->get_track( cd_curfad );
-			msf_rel = cdrom_file::lba_to_msf_alt( cd_curfad - 150 - cdrom->get_track_start( track ) );
+			track = m_cdrom_image->get_track( cd_curfad );
+			msf_rel = cdrom_file::lba_to_msf_alt( cd_curfad - 150 - m_cdrom_image->get_track_start( track ) );
 
 			xfertype = XFERTYPE_SUBQ;
 			xfercount = 0;
-			subqbuf[0] = 0x01 | ((cdrom->get_track_type(cdrom->get_track(track+1)) == cdrom_file::CD_TRACK_AUDIO) ? 0x00 : 0x40);
+			subqbuf[0] = 0x01 | ((m_cdrom_image->get_track_type(m_cdrom_image->get_track(track+1)) == cdrom_file::CD_TRACK_AUDIO) ? 0x00 : 0x40);
 			subqbuf[1] = dec_2_bcd(track+1);
 			subqbuf[2] = dec_2_bcd(get_track_index(cd_curfad));
 			subqbuf[3] = dec_2_bcd((msf_rel >> 16) & 0xff);
@@ -1008,7 +1023,7 @@ void stvcd_device::cmd_set_cddevice_connection()
 	// get operation
 	parm = cr3>>8;
 
-	LOG("%s: Set CD Device Connection filter # %x\n",   machine().describe_context(), parm);
+	LOGCMD("%s: Set CD Device Connection filter # %x\n",   machine().describe_context(), parm);
 
 	cddevicenum = parm;
 
@@ -1053,12 +1068,12 @@ void stvcd_device::cmd_set_filter_range()
 	// cr3 hi = filter num.
 	uint8_t fnum = (cr3>>8)&0xff;
 
-	LOG("%s: Set Filter Range\n",   machine().describe_context());
+	LOGCMD("%s: Set Filter Range\n",   machine().describe_context());
 
 	filters[fnum].fad = ((cr1 & 0xff)<<16) | cr2;
 	filters[fnum].range = ((cr3 & 0xff)<<16) | cr4;
 
-	printf("%08x %08x %d\n",filters[fnum].fad,filters[fnum].range,fnum);
+	LOGCMD("\t%08x %08x %d\n",filters[fnum].fad,filters[fnum].range,fnum);
 
 	hirqreg |= (CMOK|ESEL);
 	cr_standard_return(cd_stat);
@@ -1076,7 +1091,7 @@ void stvcd_device::cmd_set_filter_subheader_conditions()
 	// Set Filter Subheader conditions
 	uint8_t fnum = (cr3>>8)&0xff;
 
-	LOG("%s: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1&0xff, cr2, cr3&0xff, cr4);
+	LOGCMD("%s: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1&0xff, cr2, cr3&0xff, cr4);
 
 	filters[fnum].chan = cr1 & 0xff;
 	filters[fnum].smmask = (cr2>>8)&0xff;
@@ -1096,7 +1111,7 @@ void stvcd_device::cmd_get_filter_subheader_conditions()
 	// Get Filter Subheader conditions
 	uint8_t fnum = (cr3>>8)&0xff;
 
-	LOG("%s: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1&0xff, cr2, cr3&0xff, cr4);
+	LOGCMD("%s: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1&0xff, cr2, cr3&0xff, cr4);
 
 	cr1 = cd_stat | (filters[fnum].chan & 0xff);
 	cr2 = (filters[fnum].smmask << 8) | (filters[fnum].cimask & 0xff);
@@ -1123,7 +1138,7 @@ void stvcd_device::cmd_set_filter_mode()
 		filters[fnum].mode = mode;
 	}
 
-	LOG("%s: Set Filter Mode filt %x mode %x\n", machine().describe_context(), fnum, mode);
+	LOGCMD("%s: Set Filter Mode filt %x mode %x\n", machine().describe_context(), fnum, mode);
 	hirqreg |= (CMOK|ESEL);
 	cr_standard_return(cd_stat);
 	status_type = 0;
@@ -1150,7 +1165,7 @@ void stvcd_device::cmd_set_filter_connection()
 	// (false condition?)
 	uint8_t fnum = (cr3>>8)&0xff;
 
-	LOG("%s:CD: Set Filter Connection %x => mode %x parm %04x\n", machine().describe_context(), fnum, cr1 & 0xf, cr2);
+	LOGCMD("%s: Set Filter Connection %x => mode %x parm %04x\n", machine().describe_context(), fnum, cr1 & 0xf, cr2);
 
 	if (cr1 & 1)    // set true condition
 		filters[fnum].condtrue = (cr2>>8)&0xff;
@@ -1168,7 +1183,7 @@ void stvcd_device::cmd_reset_selector()
 	int i,j;
 	// Reset Selector
 
-	LOG("%s: Reset Selector\n",   machine().describe_context());
+	LOGCMD("%s: Reset Selector\n",   machine().describe_context());
 
 	if((cr1 & 0xff) == 0x00)
 	{
@@ -1271,12 +1286,12 @@ void stvcd_device::cmd_get_buffer_partition_sector_number()
 
 	uint32_t bufnum = cr3>>8;
 
-	LOG("%s: Get Sector Number (bufno %d) = %d blocks\n",   machine().describe_context(), bufnum, cr4);
+	LOGCMD("%s: Get Sector Number (bufno %d) = %d blocks\n",   machine().describe_context(), bufnum, cr4);
 	cr1 = cd_stat;
 	cr2 = 0;
 	cr3 = 0;
 	if(cr1 & 0xff || cr2 || cr3 & 0xff || cr4)
-		printf("Get # sectors used with params %04x %04x %04x %04x\n",cr1,cr2,cr3,cr4);
+		LOGWARN("Get # sectors used with params %04x %04x %04x %04x\n",cr1,cr2,cr3,cr4);
 
 	// is the partition empty?
 	if (partitions[bufnum].size == -1)
@@ -1286,10 +1301,10 @@ void stvcd_device::cmd_get_buffer_partition_sector_number()
 	else
 	{
 		cr4 = partitions[bufnum].numblks;
-		//printf("Partition %08x %04x\n",bufnum,cr4);
+		//LOGWARN("Partition %08x %04x\n",bufnum,cr4);
 	}
 
-	//printf("%04x\n",cr4);
+	//LOGWARN("%04x\n",cr4);
 	if(cr4 == 0)
 		hirqreg |= (CMOK);
 	else
@@ -1304,7 +1319,7 @@ void stvcd_device::cmd_calculate_actual_data_size()
 	uint32_t sectoffs = cr2;
 	uint32_t numsect = cr4;
 
-	LOG("%s: Calculate actual size: buf %x offs %x numsect %x\n", machine().describe_context(), bufnum, sectoffs, numsect);
+	LOGCMD("%s: Calculate actual size: buf %x offs %x numsect %x\n", machine().describe_context(), bufnum, sectoffs, numsect);
 
 	calcsize = 0;
 	if (partitions[bufnum].size != -1)
@@ -1328,7 +1343,7 @@ void stvcd_device::cmd_calculate_actual_data_size()
 void stvcd_device::cmd_get_actual_data_size()
 {
 	// get actual block size
-	LOG("%s: Get actual block size\n", machine().describe_context());
+	LOGCMD("%s: Get actual block size\n", machine().describe_context());
 	cr1 = cd_stat | ((calcsize>>16)&0xff);
 	cr2 = (calcsize & 0xffff);
 	cr3 = 0;
@@ -1347,7 +1362,7 @@ void stvcd_device::cmd_get_sector_information()
 	{
 		cr1 |= CD_STAT_REJECT & 0xff00;
 		hirqreg |= (CMOK|ESEL);
-		printf("Get sector info reject\n");
+		LOGWARN("Get sector info reject\n");
 	}
 	else
 	{
@@ -1364,7 +1379,7 @@ void stvcd_device::cmd_get_sector_information()
 void stvcd_device::cmd_set_sector_length()
 {
 	// set sector length
-	LOG("%s: Set sector length\n",   machine().describe_context());
+	LOGCMD("%s: Set sector length\n",   machine().describe_context());
 
 	switch (cr1 & 0xff)
 	{
@@ -1409,13 +1424,13 @@ void stvcd_device::cmd_get_sector_data()
 	uint32_t sectofs = cr2;
 	uint32_t bufnum = cr3>>8;
 
-	LOG("%s: Get sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
+	LOGCMD("%s: Get sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
 
 	if (bufnum >= MAX_FILTERS)
 	{
 		// TODO: find actual SW that does this
 		// (may conceal a bigger issue)
-		osd_printf_error("CD: invalid buffer number\n");
+		LOGWARN("CD: invalid buffer number\n");
 		cr_standard_return(CD_STAT_REJECT);
 		hirqreg |= (CMOK|EHST);
 		return;
@@ -1423,7 +1438,7 @@ void stvcd_device::cmd_get_sector_data()
 
 	if (partitions[bufnum].numblks < sectnum)
 	{
-		osd_printf_error("CD: buffer is not full %08x %08x\n",partitions[bufnum].numblks,sectnum);
+		LOGWARN("CD: buffer is not full %08x %08x\n",partitions[bufnum].numblks,sectnum);
 		cr_standard_return(CD_STAT_REJECT);
 		hirqreg |= (CMOK|EHST);
 		return;
@@ -1453,12 +1468,12 @@ void stvcd_device::cmd_delete_sector_data()
 	uint32_t bufnum = cr3>>8;
 	int32_t i;
 
-	LOG("%s: Delete sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
+	LOGCMD("%s: Delete sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
 
 	if (bufnum >= MAX_FILTERS)
 	{
 		// TODO: mustn't happen
-		osd_printf_error("CD: invalid buffer number\n");
+		LOGWARN("CD: invalid buffer number\n");
 		cr_standard_return(CD_STAT_REJECT);
 		hirqreg |= (CMOK|EHST);
 		return;
@@ -1468,7 +1483,7 @@ void stvcd_device::cmd_delete_sector_data()
 	// TODO: verify if implementation is correct
 	if (partitions[bufnum].numblks == 0)
 	{
-		osd_printf_error("CD: buffer is already empty\n");
+		LOGWARN("CD: buffer is already empty\n");
 		cr_standard_return(CD_STAT_REJECT);
 		hirqreg |= (CMOK|EHST);
 		return;
@@ -1512,12 +1527,12 @@ void stvcd_device::cmd_get_and_delete_sector_data()
 	uint32_t sectofs = cr2;
 	uint32_t bufnum = cr3>>8;
 
-	LOG("%s: Get and delete sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
+	LOGCMD("%s: Get and delete sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
 
 	if (bufnum >= MAX_FILTERS)
 	{
 		// TODO: mustn't happen
-		osd_printf_error("CD: invalid buffer number\n");
+		LOGWARN("CD: invalid buffer number\n");
 		cr_standard_return(CD_STAT_REJECT);
 		hirqreg |= (CMOK|EHST);
 		return;
@@ -1527,7 +1542,7 @@ void stvcd_device::cmd_get_and_delete_sector_data()
 	// TODO: verify again if it's really REJECT or something else
 	if (partitions[bufnum].numblks < sectnum)
 	{
-		osd_printf_error("CD: buffer is not full %08x %08x\n",partitions[bufnum].numblks,sectnum);
+		LOGWARN("CD: buffer is not full %08x %08x\n",partitions[bufnum].numblks,sectnum);
 		cr_standard_return(CD_STAT_REJECT);
 		hirqreg |= (CMOK|EHST);
 		return;
@@ -1634,7 +1649,7 @@ void stvcd_device::cmd_copy_sector_data()
 void stvcd_device::cmd_get_sector_data_copy_or_move_error()
 {
 	// get copy error
-	LOG("%s: Get copy error\n",   machine().describe_context());
+	LOGCMD("%s: Get copy error\n",   machine().describe_context());
 	logerror("Get copy error\n");
 	cr1 = cd_stat;
 	cr2 = 0;
@@ -1648,7 +1663,7 @@ void stvcd_device::cmd_change_directory()
 {
 	uint32_t temp;
 	// change directory
-	LOG("%s: Change Directory\n",   machine().describe_context());
+	LOGCMD("%s: Change Directory\n",   machine().describe_context());
 	hirqreg |= (CMOK|EFLS);
 
 	temp = (cr3&0xff)<<16;
@@ -1662,7 +1677,7 @@ void stvcd_device::cmd_change_directory()
 void stvcd_device::cmd_read_directory()
 {
 	// Read directory entry
-	LOG("%s: Read Directory Entry\n",   machine().describe_context());
+	LOGCMD("%s: Read Directory Entry\n",   machine().describe_context());
 //  uint32_t read_dir;
 
 //  read_dir = ((cr3&0xff)<<16)|cr4;
@@ -1683,13 +1698,13 @@ void stvcd_device::cmd_read_directory()
 void stvcd_device::cmd_get_file_scope()
 {
 	// Get file system scope
-	LOG("%s: Get file system scope\n", machine().describe_context());
+	LOGCMD("%s: Get file system scope\n", machine().describe_context());
 	hirqreg |= (CMOK|EFLS);
 	cr1 = cd_stat;
 	cr2 = numfiles; // # of files in directory
 	cr3 = 0x0100;   // report directory held
 	cr4 = firstfile;    // first file id
-	printf("%04x %04x %04x %04x\n",cr1,cr2,cr3,cr4);
+	LOGWARN("%04x %04x %04x %04x\n",cr1,cr2,cr3,cr4);
 	status_type = 0;
 }
 
@@ -1698,7 +1713,7 @@ void stvcd_device::cmd_get_target_file_info()
 	uint32_t temp;
 
 	// Get File Info
-	LOG("%s: Get File Info\n",   machine().describe_context());
+	LOGCMD("%s: Get File Info\n",   machine().describe_context());
 	cd_stat |= CD_STAT_TRANS;
 	cd_stat &= 0xff00;      // clear top byte of return value
 	playtype = 0;
@@ -1737,7 +1752,7 @@ void stvcd_device::cmd_get_target_file_info()
 		// (iso9660 parsing doesn't read beyond the first sector)
 		if (curdir[temp].firstfad == 0 || curdir[temp].length == 0)
 			throw emu_fatalerror("File ID not found in XFERTYPE_FILEINFO_1");
-//      printf("%08x %08x\n",curdir[temp].firstfad,curdir[temp].length);
+//      LOGWARN("%08x %08x\n",curdir[temp].firstfad,curdir[temp].length);
 		// first 4 bytes = FAD
 		finfbuf[0] = (curdir[temp].firstfad>>24)&0xff;
 		finfbuf[1] = (curdir[temp].firstfad>>16)&0xff;
@@ -1764,7 +1779,7 @@ void stvcd_device::cmd_get_target_file_info()
 void stvcd_device::cmd_read_file()
 {
 	// Read File
-	LOG("%s: Read File\n",   machine().describe_context());
+	LOGCMD("%s: Read File\n",   machine().describe_context());
 	uint16_t file_offset,file_filter,file_id,file_size;
 
 	file_offset = ((cr1 & 0xff)<<8)|(cr2 & 0xff); /* correct? */
@@ -1780,7 +1795,7 @@ void stvcd_device::cmd_read_file()
 	else
 		cddevice = (filterT *)nullptr;
 
-	printf("Read file %08x (%08x %08x) %02x %d\n",curdir[file_id].firstfad,cd_curfad,fadstoplay,file_filter,sectlenin);
+	LOGWARN("Read file %08x (%08x %08x) %02x %d\n",curdir[file_id].firstfad,cd_curfad,fadstoplay,file_filter,sectlenin);
 
 	cr_standard_return(cd_stat);
 
@@ -1795,7 +1810,7 @@ void stvcd_device::cmd_read_file()
 
 void stvcd_device::cmd_abort_file()
 {
-	LOG("%s: Abort File\n",   machine().describe_context());
+	LOGCMD("%s: Abort File\n",   machine().describe_context());
 	// bios expects "2bc" mask to work against this
 	hirqreg |= (CMOK|EFLS);
 	sectorstore = 0;
@@ -1810,7 +1825,7 @@ void stvcd_device::cmd_abort_file()
 void stvcd_device::cmd_check_copy_protection()
 {
 	// appears to be copy protection check.  needs only to return OK.
-	LOG("%s: Verify copy protection\n",   machine().describe_context());
+	LOGCMD("%s: Verify copy protection\n",   machine().describe_context());
 	if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
 		cd_stat = CD_STAT_PAUSE;
 
@@ -1833,7 +1848,7 @@ void stvcd_device::cmd_check_copy_protection()
 void stvcd_device::cmd_get_disc_region()
 {
 	// get disc region
-	LOG("%s: Get disc region\n",   machine().describe_context());
+	LOGCMD("%s: Get disc region\n",   machine().describe_context());
 	if(cd_stat != CD_STAT_NODISC && cd_stat != CD_STAT_OPEN)
 		cd_stat = CD_STAT_PAUSE;
 	cr1 = cd_stat;  // necessary to pass
@@ -1919,7 +1934,7 @@ void stvcd_device::cd_exec_command()
 		1)
 		logerror("Command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
-	if(!cdrom && ((cr1 >> 8) & 0xff) != 0x00) {
+	if(!m_cdrom_image->exists() && ((cr1 >> 8) & 0xff) != 0x00) {
 		hirqreg |= (CMOK);
 		return;
 	}
@@ -2012,7 +2027,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( stvcd_device::stv_sh1_sim )
 
 TIMER_DEVICE_CALLBACK_MEMBER( stvcd_device::stv_sector_cb )
 {
-	if(!cdrom)
+	if(!m_cdrom_image->exists())
 		return;
 
 	//m_sector_timer->reset();
@@ -2021,7 +2036,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( stvcd_device::stv_sector_cb )
 
 	cd_playdata();
 
-	if(cdrom->get_track_type(cdrom->get_track(cd_curfad)) == cdrom_file::CD_TRACK_AUDIO)
+	if(m_cdrom_image->get_track_type(m_cdrom_image->get_track(cd_curfad)) == cdrom_file::CD_TRACK_AUDIO)
 		m_sector_timer->adjust(attotime::from_hz(75));    // 75 sectors / second = 150kBytes/second (cdda track ignores cd_speed setting)
 	else
 		m_sector_timer->adjust(attotime::from_hz(75*cd_speed));   // 75 / 150 sectors / second = 150 / 300kBytes/second
@@ -2088,11 +2103,7 @@ void stvcd_device::device_reset()
 	}
 
 	// open device
-	cdrom = m_cdrom_image->get_cdrom_file();
-
-	m_cdda->set_cdrom(cdrom);
-
-	if (cdrom)
+	if (m_cdrom_image->exists())
 	{
 		LOG("Opened CD-ROM successfully, reading root directory\n");
 		read_new_dir(0xffffff);    // read root directory
@@ -2122,7 +2133,7 @@ stvcd_device::blockT *stvcd_device::cd_alloc_block(uint8_t *blknum)
 			if (freeblocks <= 0)
 			{
 				buffull = 1;
-				printf("buffull in cd_alloc_block\n");
+				LOGWARN("buffull in cd_alloc_block\n");
 			}
 
 			blocks[i].size = sectlenin;
@@ -2168,7 +2179,7 @@ void stvcd_device::cd_getsectoroffsetnum(uint32_t bufnum, uint32_t *sectoffs, ui
 	if (*sectoffs == 0xffff)
 	{
 		// last sector
-		osd_printf_error("CD: Don't know how to handle offset ffff\n");
+		LOGWARN("CD: Don't know how to handle offset ffff\n");
 	}
 	else if (*sectnum == 0xffff)
 	{
@@ -2264,7 +2275,7 @@ void stvcd_device::read_new_dir(uint32_t fileno)
 			// easy to fix, but make sure we *need* to first
 			if (curroot.length > MAX_DIR_SIZE)
 			{
-				osd_printf_error("ERROR: root directory too big (%d)\n", curroot.length);
+				LOGWARN("ERROR: root directory too big (%d)\n", curroot.length);
 			}
 
 			// done with all that, read the root directory now
@@ -2275,7 +2286,7 @@ void stvcd_device::read_new_dir(uint32_t fileno)
 	{
 		if (curdir[fileno].length > MAX_DIR_SIZE)
 		{
-			osd_printf_error("ERROR: new directory too big (%d)!\n", curdir[fileno].length);
+			LOGWARN("ERROR: new directory too big (%d)!\n", curdir[fileno].length);
 		}
 		make_dir_current(curdir[fileno].firstfad);
 	}
@@ -2363,7 +2374,7 @@ void stvcd_device::make_dir_current(uint32_t fad)
 			curentry->name[i] = sect[nextent+33+i];
 		}
 		curentry->name[i] = '\0';   // terminate
-		//printf("%08x %08x %s %d/%d/%d\n",curentry->firstfad,curentry->length,curentry->name,curentry->year,curentry->month,curentry->day);
+		//LOGWARN("%08x %08x %s %d/%d/%d\n",curentry->firstfad,curentry->length,curentry->name,curentry->year,curentry->month,curentry->day);
 
 		nextent += sect[nextent];
 		curentry++;
@@ -2383,11 +2394,6 @@ void stvcd_device::make_dir_current(uint32_t fad)
 void stvcd_device::device_stop()
 {
 	curdir.clear();
-
-	if (cdrom)
-	{
-		cdrom = (cdrom_file *)nullptr;
-	}
 }
 
 void stvcd_device::cd_readTOC(void)
@@ -2397,9 +2403,9 @@ void stvcd_device::cd_readTOC(void)
 	xfertype = XFERTYPE_TOC;
 	xfercount = 0;
 
-	if (cdrom)
+	if (m_cdrom_image->exists())
 	{
-		ntrks = cdrom->get_last_track();
+		ntrks = m_cdrom_image->get_last_track();
 	}
 	else
 	{
@@ -2420,20 +2426,20 @@ void stvcd_device::cd_readTOC(void)
 
 	for (i = 0; i < ntrks; i++)
 	{
-		if (cdrom)
+		if (m_cdrom_image->exists())
 		{
 			//tocbuf[tocptr] = sega_cdrom_get_adr_control(cdrom, i);
 			//HACK: ddsom does not enter ingame with the line above!
-			tocbuf[tocptr] = cdrom->get_adr_control(i)<<4 | 0x01;
+			tocbuf[tocptr] = m_cdrom_image->get_adr_control(i)<<4 | 0x01;
 		}
 		else
 		{
 			tocbuf[tocptr] = 0xff;
 		}
 
-		if (cdrom)
+		if (m_cdrom_image->exists())
 		{
-			fad = cdrom->get_track_start(i) + 150;
+			fad = m_cdrom_image->get_track_start(i) + 150;
 
 			tocbuf[tocptr+1] = (fad>>16)&0xff;
 			tocbuf[tocptr+2] = (fad>>8)&0xff;
@@ -2474,7 +2480,7 @@ void stvcd_device::cd_readTOC(void)
 	tocbuf[tocptr+7] = 0;
 
 	// get total disc length (start of lead-out)
-	fad = cdrom->get_track_start(0xaa) + 150;
+	fad = m_cdrom_image->get_track_start(0xaa) + 150;
 
 	tocbuf[tocptr+8] = tocbuf[0];
 	tocbuf[tocptr+9]  = (fad>>16)&0xff;
@@ -2501,7 +2507,7 @@ stvcd_device::partitionT *stvcd_device::cd_filterdata(filterT *flt, int trktype,
 		{
 			if ((cd_curfad < flt->fad) || (cd_curfad > (flt->fad + flt->range)))
 			{
-				printf("curfad reject %08x %08x %08x %08x\n",cd_curfad,fadstoplay,flt->fad,flt->fad+flt->range);
+				LOGWARN("curfad reject %08x %08x %08x %08x\n",cd_curfad,fadstoplay,flt->fad,flt->fad+flt->range);
 				match = 0;
 				//lastbuf = flt->condfalse;
 				//flt = &filters[lastbuf];
@@ -2514,7 +2520,7 @@ stvcd_device::partitionT *stvcd_device::cd_filterdata(filterT *flt, int trktype,
 			{
 				if (curblock.fnum != flt->fid)
 				{
-					printf("fnum reject\n");
+					LOGWARN("fnum reject\n");
 					match = 0;
 				}
 			}
@@ -2523,7 +2529,7 @@ stvcd_device::partitionT *stvcd_device::cd_filterdata(filterT *flt, int trktype,
 			{
 				if (curblock.chan != flt->chan)
 				{
-					printf("channel number reject\n");
+					LOGWARN("channel number reject\n");
 					match = 0;
 				}
 			}
@@ -2532,7 +2538,7 @@ stvcd_device::partitionT *stvcd_device::cd_filterdata(filterT *flt, int trktype,
 			{
 				if((curblock.subm & flt->smmask) != flt->smval)
 				{
-					printf("sub mode reject\n");
+					LOGWARN("sub mode reject\n");
 					match = 0;
 				}
 			}
@@ -2541,7 +2547,7 @@ stvcd_device::partitionT *stvcd_device::cd_filterdata(filterT *flt, int trktype,
 			{
 				if((curblock.cinf & flt->cimask) != flt->cival)
 				{
-					printf("coding information reject\n");
+					LOGWARN("coding information reject\n");
 					match = 0;
 				}
 			}
@@ -2645,20 +2651,20 @@ stvcd_device::partitionT *stvcd_device::cd_read_filtered_sector(int32_t fad, uin
 	if ((cddevice != nullptr) && (!buffull))
 	{
 		// find out the track's type
-		trktype = cdrom->get_track_type(cdrom->get_track(fad-150));
+		trktype = m_cdrom_image->get_track_type(m_cdrom_image->get_track(fad-150));
 
 		// now get a raw 2352 byte sector - if it's mode 1, get mode1_raw
 		if ((trktype == cdrom_file::CD_TRACK_MODE1) || (trktype == cdrom_file::CD_TRACK_MODE1_RAW))
 		{
-			cdrom->read_data(fad-150, curblock.data, cdrom_file::CD_TRACK_MODE1_RAW);
+			m_cdrom_image->read_data(fad-150, curblock.data, cdrom_file::CD_TRACK_MODE1_RAW);
 		}
 		else if (trktype != cdrom_file::CD_TRACK_AUDIO) // if not audio it must be mode 2 so get mode2_raw
 		{
-			cdrom->read_data(fad-150, curblock.data, cdrom_file::CD_TRACK_MODE2_RAW);
+			m_cdrom_image->read_data(fad-150, curblock.data, cdrom_file::CD_TRACK_MODE2_RAW);
 		}
 		else
 		{
-			cdrom->read_data(fad-150, curblock.data, cdrom_file::CD_TRACK_AUDIO);
+			m_cdrom_image->read_data(fad-150, curblock.data, cdrom_file::CD_TRACK_AUDIO);
 		}
 
 		curblock.size = sectlenin;
@@ -2692,26 +2698,26 @@ void stvcd_device::cd_playdata()
 	if ((cd_stat & 0x0f00) == CD_STAT_SEEK)
 	{
 		int32_t fad_diff;
-		//printf("PRE %08x %08x %08x %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad);
+		LOGSEEK("PRE %08x %08x %08x %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad);
 
 		fad_diff = (cd_fad_seek - cd_curfad);
 
 		/* Zero Divide wants this TODO: timings. */
 		if(fad_diff > (750*cd_speed))
 		{
-			//printf("PRE FFWD %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad,750*cd_speed);
+			LOGSEEK("PRE FFWD %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad,750*cd_speed);
 			cd_curfad += (750*cd_speed);
-			//printf("POST FFWD %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, 750*cd_speed);
+			LOGSEEK("POST FFWD %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, 750*cd_speed);
 		}
 		else if(fad_diff < (-750*cd_speed))
 		{
-			//printf("PRE REW %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, -750*cd_speed);
+			LOGSEEK("PRE REW %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, -750*cd_speed);
 			cd_curfad -= (750*cd_speed);
-			//printf("POST REW %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, -750*cd_speed);
+			LOGSEEK("POST REW %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, -750*cd_speed);
 		}
 		else
 		{
-			//printf("Ready\n");
+			LOGSEEK("Ready\n");
 			cd_curfad = cd_fad_seek;
 			cd_stat = CD_STAT_PLAY;
 		}
@@ -2719,24 +2725,29 @@ void stvcd_device::cd_playdata()
 		return;
 	}
 
+	if (LIVE_CD_VIEW)
+		popmessage("%04x %d %d", cd_stat, cd_curfad, fadstoplay);
+
 	if ((cd_stat & 0x0f00) == CD_STAT_PLAY)
 	{
 		if (fadstoplay)
 		{
-			logerror("STVCD: Reading FAD %d\n", cd_curfad);
+			LOGXFER("STVCD: Reading FAD %d\n", cd_curfad);
 
-			if (cdrom)
+			if (m_cdrom_image->exists())
 			{
 				uint8_t p_ok;
 
-				if(cdrom->get_track_type(cdrom->get_track(cd_curfad)) != cdrom_file::CD_TRACK_AUDIO)
+				if(m_cdrom_image->get_track_type(m_cdrom_image->get_track(cd_curfad)) != cdrom_file::CD_TRACK_AUDIO)
 				{
 					cd_read_filtered_sector(cd_curfad,&p_ok);
 					m_cdda->stop_audio(); //stop any pending CD-DA
 				}
 				else
 				{
-					p_ok = 1; // TODO
+					 // TODO: pinpoint cases when this isn't okay
+					 // (out of bounds disc for example)
+					p_ok = 1;
 					m_cdda->start_audio(cd_curfad, 1);
 				}
 
@@ -2767,8 +2778,8 @@ void stvcd_device::cd_playdata()
 							if(cdda_repeat_count < 0xe)
 								cdda_repeat_count++;
 
-							cd_curfad = cdrom->get_track_start(cur_track-1) + 150;
-							fadstoplay = cdrom->get_track_start(cur_track) - cd_curfad;
+							cd_curfad = m_cdrom_image->get_track_start(cur_track-1) + 150;
+							fadstoplay = m_cdrom_image->get_track_start(cur_track) - cd_curfad;
 						}
 					}
 				}
@@ -2780,9 +2791,9 @@ void stvcd_device::cd_playdata()
 // loads a single sector off the CD, anywhere from FAD 150 on up
 void stvcd_device::cd_readblock(uint32_t fad, uint8_t *dat)
 {
-	if (cdrom)
+	if (m_cdrom_image->exists())
 	{
-		cdrom->read_data(fad-150, dat, cdrom_file::CD_TRACK_MODE1);
+		m_cdrom_image->read_data(fad-150, dat, cdrom_file::CD_TRACK_MODE1);
 	}
 }
 
@@ -2794,7 +2805,7 @@ void stvcd_device::set_tray_open()
 	hirqreg |= DCHG;
 	cd_stat = CD_STAT_OPEN;
 
-	cdrom = (cdrom_file *)nullptr;
+	// TODO: unmount image
 	tray_is_closed = 0;
 
 	popmessage("Tray Open");
@@ -2807,11 +2818,8 @@ void stvcd_device::set_tray_close()
 		return;
 
 	hirqreg |= DCHG;
-	cdrom = m_cdrom_image->get_cdrom_file();
 
-	m_cdda->set_cdrom(cdrom);
-
-	if (cdrom)
+	if (m_cdrom_image->exists())
 	{
 		LOG("Opened CD-ROM successfully, reading root directory\n");
 		//read_new_dir(0xffffff);  // read root directory

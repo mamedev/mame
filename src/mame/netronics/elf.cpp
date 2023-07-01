@@ -139,22 +139,22 @@ INPUT_PORTS_END
 
 /* CDP1802 Configuration */
 
-READ_LINE_MEMBER( elf2_state::wait_r )
+int elf2_state::wait_r()
 {
 	return LOAD;
 }
 
-READ_LINE_MEMBER( elf2_state::clear_r )
+int elf2_state::clear_r()
 {
 	return RUN;
 }
 
-READ_LINE_MEMBER( elf2_state::ef4_r )
+int elf2_state::ef4_r()
 {
 	return INPUT;
 }
 
-WRITE_LINE_MEMBER( elf2_state::q_w )
+void elf2_state::q_w(int state)
 {
 	m_led = state ? 1 : 0;
 }
@@ -181,7 +181,7 @@ void elf2_state::sc_w(uint8_t data)
 
 /* MM74C923 Interface */
 
-WRITE_LINE_MEMBER( elf2_state::da_w )
+void elf2_state::da_w(int state)
 {
 	if (state)
 	{
@@ -223,16 +223,16 @@ void elf2_state::machine_start()
 
 QUICKLOAD_LOAD_MEMBER(elf2_state::quickload_cb)
 {
-	int size = image.length();
+	int const size = image.length();
 
 	if (size > m_ram->size())
 	{
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 	}
 
 	image.fread(m_ram->pointer(), size);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void elf2_state::elf2(machine_config &config)

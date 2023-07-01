@@ -82,6 +82,14 @@ static HRESULT FindCodecClassId(const GUID *clsid, bool isCoder2, bool isFilter,
   return S_OK;
 }
 
+/*
+#ifdef __GNUC__
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wduplicated-branches"
+#endif
+#endif
+*/
+
 static HRESULT CreateCoderMain(unsigned index, bool encode, void **coder)
 {
   COM_TRY_BEGIN
@@ -97,12 +105,15 @@ static HRESULT CreateCoderMain(unsigned index, bool encode, void **coder)
   if (c)
   {
     IUnknown *unk;
+    unk = (IUnknown *)c;
+    /*
     if (codec.IsFilter)
       unk = (IUnknown *)(ICompressFilter *)c;
     else if (codec.NumStreams != 1)
       unk = (IUnknown *)(ICompressCoder2 *)c;
     else
       unk = (IUnknown *)(ICompressCoder *)c;
+    */
     unk->AddRef();
     *coder = c;
   }
@@ -136,16 +147,22 @@ static HRESULT CreateCoder2(bool encode, UInt32 index, const GUID *iid, void **o
   return CreateCoderMain(index, encode, outObject);
 }
 
+
+STDAPI CreateDecoder(UInt32 index, const GUID *iid, void **outObject);
 STDAPI CreateDecoder(UInt32 index, const GUID *iid, void **outObject)
 {
   return CreateCoder2(false, index, iid, outObject);
 }
 
+
+STDAPI CreateEncoder(UInt32 index, const GUID *iid, void **outObject);
 STDAPI CreateEncoder(UInt32 index, const GUID *iid, void **outObject)
 {
   return CreateCoder2(true, index, iid, outObject);
 }
 
+
+STDAPI CreateCoder(const GUID *clsid, const GUID *iid, void **outObject);
 STDAPI CreateCoder(const GUID *clsid, const GUID *iid, void **outObject)
 {
   *outObject = NULL;
@@ -175,6 +192,8 @@ STDAPI CreateCoder(const GUID *clsid, const GUID *iid, void **outObject)
   return CreateCoderMain(codecIndex, encode, outObject);
 }
  
+
+STDAPI GetMethodProperty(UInt32 codecIndex, PROPID propID, PROPVARIANT *value);
 STDAPI GetMethodProperty(UInt32 codecIndex, PROPID propID, PROPVARIANT *value)
 {
   ::VariantClear((VARIANTARG *)value);
@@ -211,15 +230,12 @@ STDAPI GetMethodProperty(UInt32 codecIndex, PROPID propID, PROPVARIANT *value)
         value->ulVal = (ULONG)codec.NumStreams;
       }
       break;
-    /*
     case NMethodPropID::kIsFilter:
-      // if (codec.IsFilter)
       {
         value->vt = VT_BOOL;
         value->boolVal = BoolToVARIANT_BOOL(codec.IsFilter);
       }
       break;
-    */
     /*
     case NMethodPropID::kDecoderFlags:
       {
@@ -238,6 +254,8 @@ STDAPI GetMethodProperty(UInt32 codecIndex, PROPID propID, PROPVARIANT *value)
   return S_OK;
 }
 
+
+STDAPI GetNumberOfMethods(UINT32 *numCodecs);
 STDAPI GetNumberOfMethods(UINT32 *numCodecs)
 {
   *numCodecs = g_NumCodecs;
@@ -270,6 +288,7 @@ static HRESULT CreateHasher2(UInt32 index, IHasher **hasher)
   COM_TRY_END
 }
 
+STDAPI CreateHasher(const GUID *clsid, IHasher **outObject);
 STDAPI CreateHasher(const GUID *clsid, IHasher **outObject)
 {
   COM_TRY_BEGIN
@@ -281,6 +300,7 @@ STDAPI CreateHasher(const GUID *clsid, IHasher **outObject)
   COM_TRY_END
 }
 
+STDAPI GetHasherProp(UInt32 codecIndex, PROPID propID, PROPVARIANT *value);
 STDAPI GetHasherProp(UInt32 codecIndex, PROPID propID, PROPVARIANT *value)
 {
   ::VariantClear((VARIANTARG *)value);
@@ -318,6 +338,7 @@ public:
   STDMETHOD(CreateHasher)(UInt32 index, IHasher **hasher);
 };
 
+STDAPI GetHashers(IHashers **hashers);
 STDAPI GetHashers(IHashers **hashers)
 {
   COM_TRY_BEGIN

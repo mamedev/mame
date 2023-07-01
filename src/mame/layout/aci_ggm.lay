@@ -14,11 +14,13 @@ license:CC0-1.0
 	<element name="brown"><rect><color red="0.25" green="0.1" blue="0.05" /></rect></element>
 	<element name="yellow"><rect><color red="0.8" green="0.7" blue="0.4" /></rect></element>
 
+	<element name="brown_nb" defstate="0xf"><rect state="0"><color red="0.25" green="0.1" blue="0.05" /></rect></element>
 	<element name="red_s3" defstate="0"><rect state="3"><color red="0.8" green="0.1" blue="0.15" /></rect></element>
 	<element name="green_s3" defstate="0"><rect state="3"><color red="0.3" green="0.8" blue="0.2" /></rect></element>
 	<element name="brown_s3" defstate="0"><rect state="3"><color red="0.25" green="0.1" blue="0.05" /></rect></element>
 	<element name="brown_s4" defstate="0"><rect state="4"><color red="0.25" green="0.1" blue="0.05" /></rect></element>
-	<element name="brown_nb" defstate="0xf"><rect state="0"><color red="0.25" green="0.1" blue="0.05" /></rect></element>
+	<element name="brown_s5" defstate="0"><rect state="5"><color red="0.25" green="0.1" blue="0.05" /></rect></element>
+	<element name="yellow_s5" defstate="0"><rect state="5"><color red="0.8" green="0.7" blue="0.4" /></rect></element>
 
 	<element name="digitr" defstate="0"><led14seg><color red="0.75" green="0.1" blue="0.15" /></led14seg></element>
 	<element name="digitb" defstate="0"><led14seg><color red="0" green="0" blue="0.0" /></led14seg></element>
@@ -146,7 +148,7 @@ license:CC0-1.0
 	<element name="text_lasvegas08" defstate="0"><text state="4" string="5"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_lasvegas09" defstate="0"><text state="4" string="6"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_lasvegas10a" defstate="0"><text state="4" string="TAKE"><color red="0.55" green="0.6" blue="0.35" /></text></element>
-	<element name="text_lasvegas10b" defstate="0"><text state="4" string=" INSURANCE"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_lasvegas10b" defstate="0"><text state="4" string=" INSURANCE "><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_lasvegas11" defstate="0"><text state="4" string="AUDIO"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_lasvegas12" defstate="0"><text state="4" string="1"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_lasvegas13" defstate="0"><text state="4" string="2"><color red="0.55" green="0.6" blue="0.35" /></text></element>
@@ -158,6 +160,28 @@ license:CC0-1.0
 	<element name="text_lasvegas18" defstate="0"><text state="4" string="DOUBLE"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_lasvegas19" defstate="0"><text state="4" string="HIT"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_lasvegas20" defstate="0"><text state="4" string="ENTER"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+
+	<element name="text_odin01" defstate="0"><text state="5" string="RESTORE"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_odin02" defstate="0"><text state="5" string="G.7"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_odin03" defstate="0"><text state="5" string="H.8"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_odin04" defstate="0"><text state="5" string="AUDIO"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_odin05" defstate="0"><text state="5" string="CE"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_odin06" defstate="0"><text state="5" string="HINT"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_odin07" defstate="0"><text state="5" string="D.4"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_odin08" defstate="0"><text state="5" string="E.5"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_odin09" defstate="0"><text state="5" string="F.6"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_odin10" defstate="0"><text state="5" string="TIME"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_odin11" defstate="0"><text state="5" string="HALT"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_odin12" defstate="0"><text state="5" string="A.1"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_odin13a" defstate="0"><text state="5" string="B.2"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_odin13b" defstate="0"><text state="5" string="ERASE"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_odin14" defstate="0"><text state="5" string="C.3"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_odin15" defstate="0"><text state="5" string="RANK"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_odin16" defstate="0"><text state="5" string="LEVEL"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_odin17" defstate="0"><text state="5" string="FLIPS"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_odin18" defstate="0"><text state="5" string="PLAY"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_odin19" defstate="0"><text state="5" string="B/W"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_odin20" defstate="0"><text state="5" string="ENTER"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 
 
 <!-- groups -->
@@ -389,6 +413,38 @@ license:CC0-1.0
 		<element ref="text_lasvegas18" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="8.1" y="11.5" width="3.3" height="0.8" /></element>
 		<element ref="text_lasvegas19" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="12.1" y="11.2" width="3.3" height="1.3" /></element>
 		<element ref="text_lasvegas20" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.1" y="11.5" width="3.3" height="0.8" /></element>
+
+		<!-- odin overlay -->
+		<element ref="brown_s5" inputtag="IN.6" inputmask="0x0f" inputraw="yes"><bounds x="5.25" y="4.85" width="1" height="1.3" /></element>
+		<element ref="brown_s5" inputtag="IN.6" inputmask="0x0f" inputraw="yes"><bounds x="9.25" y="4.85" width="1" height="1.3" /></element>
+		<element ref="brown_s5" inputtag="IN.6" inputmask="0x0f" inputraw="yes"><bounds x="13.25" y="4.85" width="1" height="1.3" /></element>
+		<element ref="brown_s5" inputtag="IN.6" inputmask="0x0f" inputraw="yes"><bounds x="9.25" y="8.35" width="1" height="1.3" /></element>
+		<element ref="yellow_s5" inputtag="IN.6" inputmask="0x0f" inputraw="yes"><bounds x="9" y="12.5" width="1.5" height="0.15" /></element>
+
+		<element ref="text_odin01" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.1" y="1.0" width="3.3" height="0.8" /></element>
+		<element ref="text_odin02" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="4.1" y="0.7" width="3.3" height="1.3" /></element>
+		<element ref="text_odin03" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="8.1" y="0.7" width="3.3" height="1.3" /></element>
+		<element ref="text_odin04" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="12.1" y="1.0" width="3.3" height="0.8" /></element>
+		<element ref="text_odin05" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.1" y="0.7" width="3.3" height="1.3" /></element>
+
+		<element ref="text_odin06" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.1" y="4.5" width="3.3" height="0.8" /></element>
+		<element ref="text_odin07" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="4.1" y="4.2" width="3.3" height="1.3" /></element>
+		<element ref="text_odin08" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="8.1" y="4.2" width="3.3" height="1.3" /></element>
+		<element ref="text_odin09" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="12.1" y="4.2" width="3.3" height="1.3" /></element>
+		<element ref="text_odin10" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.1" y="4.5" width="3.3" height="0.8" /></element>
+
+		<element ref="text_odin11" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.1" y="8.0" width="3.3" height="0.8" /></element>
+		<element ref="text_odin12" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="4.1" y="7.1" width="3.3" height="1.3" /></element>
+		<element ref="text_odin13a" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="8.1" y="7.1" width="3.3" height="1.3" /></element>
+		<element ref="text_odin13b" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="8.1" y="8.6" width="3.3" height="0.8" /></element>
+		<element ref="text_odin14" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="12.1" y="7.1" width="3.3" height="1.3" /></element>
+		<element ref="text_odin15" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.1" y="8.0" width="3.3" height="0.8" /></element>
+
+		<element ref="text_odin16" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.1" y="11.5" width="3.3" height="0.8" /></element>
+		<element ref="text_odin17" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="4.1" y="11.5" width="3.3" height="0.8" /></element>
+		<element ref="text_odin18" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="8.1" y="11.0" width="3.3" height="0.8" /></element>
+		<element ref="text_odin19" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="12.1" y="11.2" width="3.3" height="1.3" /></element>
+		<element ref="text_odin20" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.1" y="11.5" width="3.3" height="0.8" /></element>
 
 		<!-- input highlights -->
 		<element ref="hl" inputtag="IN.3" inputmask="0x08"><bounds x="0"  y="0" width="3.5" height="3" /><color alpha="0.22" /></element>

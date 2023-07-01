@@ -17,7 +17,6 @@ m24_z8000_device::m24_z8000_device(const machine_config &mconfig, const char *ta
 
 void m24_z8000_device::device_start()
 {
-	m_halt_out.resolve_safe();
 }
 
 void m24_z8000_device::device_reset()
@@ -158,13 +157,13 @@ void m24_z8000_device::dmem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t m24_z8000_device::i86_io_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t ret = m_maincpu->space(AS_IO).read_word(offset << 1, swapendian_int16(mem_mask));
+	uint16_t ret = m_maincpu->space(AS_IO).read_word(offset << 1, mem_mask == 0xffff ? 0xff00 : swapendian_int16(mem_mask));
 	return swapendian_int16(ret);
 }
 
 void m24_z8000_device::i86_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_maincpu->space(AS_IO).write_word(offset << 1, swapendian_int16(data), swapendian_int16(mem_mask));
+	m_maincpu->space(AS_IO).write_word(offset << 1, swapendian_int16(data), mem_mask == 0xffff ? 0xff00 : swapendian_int16(mem_mask));
 }
 
 void m24_z8000_device::irqctl_w(uint8_t data)
@@ -212,13 +211,13 @@ void m24_z8000_device::handshake_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(m24_z8000_device::mo_w)
+void m24_z8000_device::mo_w(int state)
 {
 	m_z8000->mi_w(state ? ASSERT_LINE : CLEAR_LINE);
 	m_halt_out(state);
 }
 
-WRITE_LINE_MEMBER(m24_z8000_device::timer_irq_w)
+void m24_z8000_device::timer_irq_w(int state)
 {
 	m_timer_irq = state ? true : false;
 	m_z8000->set_input_line(z8001_device::NVI_LINE, state ? ASSERT_LINE : CLEAR_LINE);

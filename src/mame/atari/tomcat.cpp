@@ -66,18 +66,18 @@ private:
 	void adcon_w(uint8_t data);
 	uint16_t tomcat_inputs_r(offs_t offset, uint16_t mem_mask = ~0);
 	void main_latch_w(offs_t offset, uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(lnkmode_w);
-	DECLARE_WRITE_LINE_MEMBER(err_w);
-	DECLARE_WRITE_LINE_MEMBER(ack_w);
-	DECLARE_WRITE_LINE_MEMBER(txbuff_w);
-	DECLARE_WRITE_LINE_MEMBER(sndres_w);
-	DECLARE_WRITE_LINE_MEMBER(mres_w);
+	void lnkmode_w(int state);
+	void err_w(int state);
+	void ack_w(int state);
+	void txbuff_w(int state);
+	void sndres_w(int state);
+	void mres_w(int state);
 	void tomcat_irqclr_w(uint16_t data);
 	uint16_t tomcat_inputs2_r();
 	uint16_t tomcat_320bio_r();
 	uint8_t tomcat_nvram_r(offs_t offset);
 	void tomcat_nvram_w(offs_t offset, uint8_t data);
-	DECLARE_READ_LINE_MEMBER(dsp_bio_r);
+	int dsp_bio_r();
 	void soundlatches_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	void dsp_map(address_map &map);
@@ -119,36 +119,36 @@ void tomcat_state::main_latch_w(offs_t offset, uint16_t data)
 	m_mainlatch->write_bit(offset & 7, BIT(offset, 3));
 }
 
-WRITE_LINE_MEMBER(tomcat_state::lnkmode_w)
+void tomcat_state::lnkmode_w(int state)
 {
 	// Link Mode
 	// When Low: Master does not respond to Interrupts
 }
 
-WRITE_LINE_MEMBER(tomcat_state::err_w)
+void tomcat_state::err_w(int state)
 {
 	// Link Error Flag
 }
 
-WRITE_LINE_MEMBER(tomcat_state::ack_w)
+void tomcat_state::ack_w(int state)
 {
 	// Link ACK Flag
 }
 
-WRITE_LINE_MEMBER(tomcat_state::txbuff_w)
+void tomcat_state::txbuff_w(int state)
 {
 	// Link Buffer Control
 	// When High: Turn off TX (Link) Buffer
 }
 
-WRITE_LINE_MEMBER(tomcat_state::sndres_w)
+void tomcat_state::sndres_w(int state)
 {
 	// Sound Reset
 	// When Low: Reset Sound System
 	// When High: Release reset of sound system
 }
 
-WRITE_LINE_MEMBER(tomcat_state::mres_w)
+void tomcat_state::mres_w(int state)
 {
 	// 320 Reset
 	// When Low: Reset TMS320
@@ -186,7 +186,7 @@ uint16_t tomcat_state::tomcat_320bio_r()
 	return 0;
 }
 
-READ_LINE_MEMBER(tomcat_state::dsp_bio_r)
+int tomcat_state::dsp_bio_r()
 {
 	if (m_dsp->pc() == 0x0001)
 	{

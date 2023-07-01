@@ -9,14 +9,15 @@ SMSC FDC37C93x Plug and Play Compatible Ultra I/O Controller
 ***************************************************************************/
 
 #include "emu.h"
-#include "bus/isa/isa.h"
-#include "machine/ds128x.h"
 #include "machine/fdc37c93x.h"
 
-DEFINE_DEVICE_TYPE(FDC37C93X, fdc37c93x_device, "fdc37c93x", "SMSC FDC37C93X")
+#include "formats/naslite_dsk.h"
+#include "formats/pc_dsk.h"
 
-fdc37c93x_device::fdc37c93x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, FDC37C93X, tag, owner, clock)
+DEFINE_DEVICE_TYPE(FDC37C93X, fdc37c93x_device, "fdc37c93x", "SMSC FDC37C93X Super I/O")
+
+fdc37c93x_device::fdc37c93x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, mode(OperatingMode::Run)
 	, config_key_step(0)
@@ -68,6 +69,13 @@ fdc37c93x_device::fdc37c93x_device(const machine_config &mconfig, const char *ta
 		enabled_logical[n] = false;
 	for (int n = 0; n < 4; n++)
 		dreq_mapping[n] = -1;
+}
+
+fdc37c93x_device::fdc37c93x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: fdc37c93x_device(mconfig, FDC37C93X, tag, owner, clock)
+{
+	m_device_id = 0x02;
+	m_device_rev = 0x01;
 }
 
 /*
@@ -282,162 +290,162 @@ void fdc37c93x_device::device_add_mconfig(machine_config &config)
 	m_kbdc->gate_a20_callback().set(FUNC(fdc37c93x_device::kbdp21_gp25_gatea20_w));
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::irq_floppy_w)
+void fdc37c93x_device::irq_floppy_w(int state)
 {
 	if (enabled_logical[LogicalDevice::FDC] == false)
 		return;
 	request_irq(configuration_registers[LogicalDevice::FDC][0x70], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::drq_floppy_w)
+void fdc37c93x_device::drq_floppy_w(int state)
 {
 	if (enabled_logical[LogicalDevice::FDC] == false)
 		return;
 	request_dma(configuration_registers[LogicalDevice::FDC][0x74], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::irq_parallel_w)
+void fdc37c93x_device::irq_parallel_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Parallel] == false)
 		return;
 	request_irq(configuration_registers[LogicalDevice::Parallel][0x70], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::irq_serial1_w)
+void fdc37c93x_device::irq_serial1_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Serial1] == false)
 		return;
 	request_irq(configuration_registers[LogicalDevice::Serial1][0x70], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::txd_serial1_w)
+void fdc37c93x_device::txd_serial1_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Serial1] == false)
 		return;
 	m_txd1_callback(state);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::dtr_serial1_w)
+void fdc37c93x_device::dtr_serial1_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Serial1] == false)
 		return;
 	m_ndtr1_callback(state);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::rts_serial1_w)
+void fdc37c93x_device::rts_serial1_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Serial1] == false)
 		return;
 	m_nrts1_callback(state);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::irq_serial2_w)
+void fdc37c93x_device::irq_serial2_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Serial2] == false)
 		return;
 	request_irq(configuration_registers[LogicalDevice::Serial2][0x70], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::txd_serial2_w)
+void fdc37c93x_device::txd_serial2_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Serial2] == false)
 		return;
 	m_txd2_callback(state);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::dtr_serial2_w)
+void fdc37c93x_device::dtr_serial2_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Serial2] == false)
 		return;
 	m_ndtr2_callback(state);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::rts_serial2_w)
+void fdc37c93x_device::rts_serial2_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Serial2] == false)
 		return;
 	m_nrts2_callback(state);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::rxd1_w)
+void fdc37c93x_device::rxd1_w(int state)
 {
 	pc_serial1_comdev->rx_w(state);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::ndcd1_w)
+void fdc37c93x_device::ndcd1_w(int state)
 {
 	pc_serial1_comdev->dcd_w(state);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::ndsr1_w)
+void fdc37c93x_device::ndsr1_w(int state)
 {
 	pc_serial1_comdev->dsr_w(state);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::nri1_w)
+void fdc37c93x_device::nri1_w(int state)
 {
 	pc_serial1_comdev->ri_w(state);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::ncts1_w)
+void fdc37c93x_device::ncts1_w(int state)
 {
 	pc_serial1_comdev->cts_w(state);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::rxd2_w)
+void fdc37c93x_device::rxd2_w(int state)
 {
 	pc_serial2_comdev->rx_w(state);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::ndcd2_w)
+void fdc37c93x_device::ndcd2_w(int state)
 {
 	pc_serial2_comdev->dcd_w(state);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::ndsr2_w)
+void fdc37c93x_device::ndsr2_w(int state)
 {
 	pc_serial2_comdev->dsr_w(state);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::nri2_w)
+void fdc37c93x_device::nri2_w(int state)
 {
 	pc_serial2_comdev->ri_w(state);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::ncts2_w)
+void fdc37c93x_device::ncts2_w(int state)
 {
 	pc_serial2_comdev->cts_w(state);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::irq_rtc_w)
+void fdc37c93x_device::irq_rtc_w(int state)
 {
 	if (enabled_logical[LogicalDevice::RTC] == false)
 		return;
 	request_irq(configuration_registers[LogicalDevice::RTC][0x70], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::irq_keyboard_w)
+void fdc37c93x_device::irq_keyboard_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Keyboard] == false)
 		return;
 	request_irq(configuration_registers[LogicalDevice::Keyboard][0x70], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::irq_mouse_w)
+void fdc37c93x_device::irq_mouse_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Keyboard] == false)
 		return;
 	request_irq(configuration_registers[LogicalDevice::Keyboard][0x72], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::kbdp21_gp25_gatea20_w)
+void fdc37c93x_device::kbdp21_gp25_gatea20_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Keyboard] == false)
 		return;
 	m_gp25_gatea20_callback(state);
 }
 
-WRITE_LINE_MEMBER(fdc37c93x_device::kbdp20_gp20_reset_w)
+void fdc37c93x_device::kbdp20_gp20_reset_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Keyboard] == false)
 		return;
@@ -901,10 +909,10 @@ uint16_t fdc37c93x_device::read_global_configuration_register(int index)
 		ret = logical_device;
 		break;
 	case 0x20:
-		ret = 2;
+		ret = m_device_id;
 		break;
 	case 0x21:
-		ret = 1;
+		ret = m_device_rev;
 		break;
 	}
 	logerror("Read global configuration register %02X = %02X\n", index, ret);
@@ -974,19 +982,19 @@ void fdc37c93x_device::device_start()
 	m_isa->set_dma_channel(2, this, true);
 	m_isa->set_dma_channel(3, this, true);
 	remap(AS_IO, 0, 0x400);
-	m_gp20_reset_callback.resolve_safe();
-	m_gp25_gatea20_callback.resolve_safe();
-	m_irq1_callback.resolve_safe();
-	m_irq8_callback.resolve_safe();
-	m_irq9_callback.resolve_safe();
-	m_txd1_callback.resolve_safe();
-	m_ndtr1_callback.resolve_safe();
-	m_nrts1_callback.resolve_safe();
-	m_txd2_callback.resolve_safe();
-	m_ndtr2_callback.resolve_safe();
-	m_nrts2_callback.resolve_safe();
 }
 
 void fdc37c93x_device::device_reset()
 {
+}
+
+// 'M707 is mostly same except no IDE ports and extra power management regs
+DEFINE_DEVICE_TYPE(FDC37M707, fdc37m707_device, "fdc37m707", "SMSC FDC37M707 Super I/O")
+
+
+fdc37m707_device::fdc37m707_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: fdc37c93x_device(mconfig, FDC37M707, tag, owner, clock)
+{
+	m_device_id = 0x42;
+	m_device_rev = 0x01;
 }

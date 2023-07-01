@@ -38,16 +38,16 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
-	DECLARE_WRITE_LINE_MEMBER(scsi_drq);
+	void scsi_irq(int state);
+	void scsi_drq(int state);
 
 	void set_timer_int_clear(uint32_t data);
-	DECLARE_WRITE_LINE_MEMBER(timer0_int);
-	DECLARE_WRITE_LINE_MEMBER(timer1_int);
-	DECLARE_WRITE_LINE_MEMBER(timer2_int);
-	DECLARE_WRITE_LINE_MEMBER(duart0_int_w);
-	DECLARE_WRITE_LINE_MEMBER(duart1_int_w);
-	DECLARE_WRITE_LINE_MEMBER(duart2_int_w);
+	void timer0_int(int state);
+	void timer1_int(int state);
+	void timer2_int(int state);
+	void duart0_int_w(int state);
+	void duart1_int_w(int state);
+	void duart2_int_w(int state);
 
 	void duart_int_w(int channel, int status);
 	void raise_local_irq(int channel, uint8_t source_mask);

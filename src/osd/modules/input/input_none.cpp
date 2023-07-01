@@ -19,7 +19,7 @@ public:
 	keyboard_input_none() : osd_module(OSD_KEYBOARDINPUT_PROVIDER, "none") { }
 	int init(osd_interface &osd, const osd_options &options) override { return 0; }
 	void input_init(running_machine &machine) override { }
-	void poll_if_necessary() override { }
+	void poll_if_necessary(bool relative_reset) override { }
 };
 
 
@@ -29,7 +29,7 @@ public:
 	mouse_input_none() : osd_module(OSD_MOUSEINPUT_PROVIDER, "none") { }
 	int init(osd_interface &osd, const osd_options &options) override { return 0; }
 	void input_init(running_machine &machine) override { }
-	void poll_if_necessary() override { }
+	void poll_if_necessary(bool relative_reset) override { }
 };
 
 
@@ -39,7 +39,7 @@ public:
 	lightgun_input_none() : osd_module(OSD_LIGHTGUNINPUT_PROVIDER, "none") { }
 	int init(osd_interface &osd, const osd_options &options) override { return 0; }
 	void input_init(running_machine &machine) override { }
-	void poll_if_necessary() override { }
+	void poll_if_necessary(bool relative_reset) override { }
 };
 
 
@@ -49,7 +49,7 @@ public:
 	joystick_input_none() : osd_module(OSD_JOYSTICKINPUT_PROVIDER, "none") { }
 	int init(osd_interface &osd, const osd_options &options) override { return 0; }
 	void input_init(running_machine &machine) override { }
-	void poll_if_necessary() override { }
+	void poll_if_necessary(bool relative_reset) override { }
 };
 
 } // anonymous namesapce

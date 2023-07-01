@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
 
-#include "machine/tmp68301.h"
+#include "cpu/m68000/tmp68301.h"
 #include "screen.h"
 #include "nichisnd.h"
 #include "nb1413m3.h"
@@ -25,7 +25,7 @@ public:
 
 	void init_niyanpai();
 
-	DECLARE_READ_LINE_MEMBER(musobana_outcoin_flag_r);
+	int musobana_outcoin_flag_r();
 
 private:
 	required_device<tmp68301_device> m_maincpu;
@@ -97,7 +97,7 @@ private:
 	void update_pixel(int vram, int x, int y);
 	void gfxdraw(int vram);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 
 	void mhhonban_map(address_map &map);
 	void musobana_map(address_map &map);

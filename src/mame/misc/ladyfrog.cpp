@@ -324,7 +324,7 @@ void ladyfrog_state::ladyfrog(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MSM5232(config, m_msm, XTAL(8'000'000)/4);
-	m_msm->set_capacitors(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6);
+	m_msm->set_capacitors(1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6);
 	m_msm->add_route(0, "mono", 1.0);   // pin 28  2'-1
 	m_msm->add_route(1, "mono", 1.0);   // pin 29  4'-1
 	m_msm->add_route(2, "mono", 1.0);   // pin 30  8'-1

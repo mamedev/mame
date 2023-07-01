@@ -218,9 +218,6 @@ mm1_keyboard_device::mm1_keyboard_device(const machine_config &mconfig, const ch
 
 void mm1_keyboard_device::device_start()
 {
-	// resolve callbacks
-	m_write_kbst.resolve_safe();
-
 	// allocate timers
 	m_scan_timer = timer_alloc(FUNC(mm1_keyboard_device::scan_keyboard), this);
 	m_scan_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));

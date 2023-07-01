@@ -29,10 +29,6 @@ nextkbd_device::nextkbd_device(const machine_config &mconfig, const char *tag, d
 
 void nextkbd_device::device_start()
 {
-	int_change_cb.resolve_safe();
-	int_power_cb.resolve_safe();
-	int_nmi_cb.resolve_safe();
-
 	poll_timer = timer_alloc(FUNC(nextkbd_device::update_tick), this);
 
 	save_item(NAME(ctrl_snd));

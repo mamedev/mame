@@ -9111,7 +9111,7 @@ void goldstar_state::cmast91(machine_config &config)
 
 
 
-WRITE_LINE_MEMBER(wingco_state::masked_irq)
+void wingco_state::masked_irq(int state)
 {
 	if (state && m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -9206,7 +9206,7 @@ void wingco_state::luckylad(machine_config &config)
 {
 	lucky8(config);
 
-	sega_315_spat_device &maincpu(SEGA_315_SPAT(config.replace(), m_maincpu, CPU_CLOCK)); // actually Falcon 03155096 encrypted Z80
+	sega_315_5096_device &maincpu(SEGA_315_5096(config.replace(), m_maincpu, CPU_CLOCK)); // actually Falcon 03155096 encrypted Z80
 	maincpu.set_addrmap(AS_PROGRAM, &wingco_state::lucky8_map);
 	maincpu.set_addrmap(AS_OPCODES, &wingco_state::common_decrypted_opcodes_map);
 	maincpu.set_decrypted_tag(":decrypted_opcodes");
@@ -9640,7 +9640,7 @@ void cmaster_state::nfm(machine_config &config)
 }
 
 
-WRITE_LINE_MEMBER(unkch_state::vblank_irq)
+void unkch_state::vblank_irq(int state)
 {
 	if (state && m_vblank_irq_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

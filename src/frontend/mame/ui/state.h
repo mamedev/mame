@@ -40,7 +40,7 @@ protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 	virtual void handle_keys(uint32_t flags, int &iptkey) override;
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	virtual void process_file(std::string &&file_name) = 0;
 

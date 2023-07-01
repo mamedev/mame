@@ -188,8 +188,8 @@ private:
 
 	uint8_t hp64k_crtc_filter(uint8_t data);
 	void hp64k_crtc_w(offs_t offset, uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(hp64k_crtc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(hp64k_crtc_vrtc_w);
+	void hp64k_crtc_drq_w(int state);
+	void hp64k_crtc_vrtc_w(int state);
 
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 
@@ -212,53 +212,48 @@ private:
 
 	uint16_t hp64k_flp_r(offs_t offset);
 	void hp64k_flp_w(offs_t offset, uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(hp64k_flp_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(hp64k_flp_intrq_w);
+	void hp64k_flp_drq_w(int state);
+	void hp64k_flp_intrq_w(int state);
 	void hp64k_update_floppy_dma(void);
 	void hp64k_update_floppy_irq(void);
 	void hp64k_update_drv_ctrl(void);
-	DECLARE_WRITE_LINE_MEMBER(hp64k_floppy0_rdy);
-	DECLARE_WRITE_LINE_MEMBER(hp64k_floppy1_rdy);
+	void hp64k_floppy0_rdy(int state);
+	void hp64k_floppy1_rdy(int state);
 	void hp64k_floppy_idx_cb(floppy_image_device *floppy , int state);
 	void hp64k_floppy_wpt_cb(floppy_image_device *floppy , int state);
 
 	uint16_t hp64k_usart_r(offs_t offset);
 	void hp64k_usart_w(offs_t offset, uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(hp64k_rxrdy_w);
-	DECLARE_WRITE_LINE_MEMBER(hp64k_txrdy_w);
-	DECLARE_WRITE_LINE_MEMBER(hp64k_txd_w);
-	DECLARE_WRITE_LINE_MEMBER(hp64k_dtr_w);
-	DECLARE_WRITE_LINE_MEMBER(hp64k_rts_w);
+	void hp64k_rxrdy_w(int state);
+	void hp64k_txrdy_w(int state);
+	void hp64k_txd_w(int state);
+	void hp64k_dtr_w(int state);
+	void hp64k_rts_w(int state);
 	void hp64k_loopback_w(uint16_t data);
 	void hp64k_update_loopback(void);
-	DECLARE_WRITE_LINE_MEMBER(hp64k_rs232_rxd_w);
-	DECLARE_WRITE_LINE_MEMBER(hp64k_rs232_dcd_w);
-	DECLARE_WRITE_LINE_MEMBER(hp64k_rs232_cts_w);
+	void hp64k_rs232_rxd_w(int state);
+	void hp64k_rs232_dcd_w(int state);
+	void hp64k_rs232_cts_w(int state);
 
 	uint16_t hp64k_phi_r(offs_t offset);
 	void hp64k_phi_w(offs_t offset, uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(hp64k_phi_int_w);
-	DECLARE_READ_LINE_MEMBER(hp64k_phi_sys_ctrl_r);
+	void hp64k_phi_int_w(int state);
+	int hp64k_phi_sys_ctrl_r();
 
 	void hp64k_beep_w(offs_t offset, uint16_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(hp64k_beeper_off);
 
-	DECLARE_WRITE_LINE_MEMBER(hp64k_baud_clk_w);
+	void hp64k_baud_clk_w(int state);
 	void cpu_io_map(address_map &map);
 	void cpu_mem_map(address_map &map);
 
 	required_device<hp_5061_3011_cpu_device> m_cpu;
 	required_device<i8275_device> m_crtc;
 	required_device<palette_device> m_palette;
-	required_ioport m_io_key0;
-	required_ioport m_io_key1;
-	required_ioport m_io_key2;
-	required_ioport m_io_key3;
+	required_ioport_array<4> m_io_key;
 	required_device<fd1791_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<ttl74123_device> m_ss0;
-	required_device<ttl74123_device> m_ss1;
+	required_device_array<floppy_connector, 2> m_floppy;
+	required_device_array<ttl74123_device, 2> m_ss;
 	required_ioport m_rear_panel_sw;
 	required_ioport m_rs232_sw;
 	required_device<beep_device> m_beeper;
@@ -302,8 +297,7 @@ private:
 	bool m_floppy_mdci;
 	bool m_floppy_intrq;
 	bool m_floppy_drq;
-	bool m_floppy0_wpt;
-	bool m_floppy1_wpt;
+	bool m_floppy_wpt[2];
 	uint8_t m_floppy_drv_ctrl;    // U39
 	uint8_t m_floppy_status;      // U25
 
@@ -378,15 +372,10 @@ hp64k_state::hp64k_state(const machine_config &mconfig, device_type type, const 
 	m_cpu(*this , "cpu"),
 	m_crtc(*this , "crtc"),
 	m_palette(*this , "palette"),
-	m_io_key0(*this , "KEY0"),
-	m_io_key1(*this , "KEY1"),
-	m_io_key2(*this , "KEY2"),
-	m_io_key3(*this , "KEY3"),
+	m_io_key(*this , "KEY%u" , 0U),
 	m_fdc(*this , "fdc"),
-	m_floppy0(*this , "fdc:0"),
-	m_floppy1(*this , "fdc:1"),
-	m_ss0(*this , "fdc_rdy0"),
-	m_ss1(*this , "fdc_rdy1"),
+	m_floppy(*this , "fdc:%u" , 0U),
+	m_ss(*this , "fdc_rdy%u" , 0U),
 	m_rear_panel_sw(*this , "rear_sw"),
 	m_rs232_sw(*this , "rs232_sw"),
 	m_beeper(*this , "beeper"),
@@ -430,8 +419,8 @@ void hp64k_state::machine_reset()
 	m_floppy_drv_ctrl = ~0;
 	m_floppy_if_state = HP64K_FLPST_IDLE;
 	m_current_floppy = nullptr;
-	m_floppy0_wpt = false;
-	m_floppy1_wpt = false;
+	m_floppy_wpt[0] = false;
+	m_floppy_wpt[1] = false;
 	m_beeper->set_state(0);
 	m_baud_rate->str_w((m_s5_sw->read() >> 1) & 0xf);
 	m_16x_clk = (m_rs232_sw->read() & 0x02) != 0;
@@ -454,7 +443,7 @@ void hp64k_state::hp64k_crtc_w(offs_t offset, uint16_t data)
 		m_crtc->write(offset == 0 , hp64k_crtc_filter((uint8_t)data));
 }
 
-WRITE_LINE_MEMBER(hp64k_state::hp64k_crtc_drq_w)
+void hp64k_state::hp64k_crtc_drq_w(int state)
 {
 		bool crtc_drq = state != 0;
 		bool prev_crtc = m_crtc_drq;
@@ -472,7 +461,7 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_crtc_drq_w)
 		}
 }
 
-WRITE_LINE_MEMBER(hp64k_state::hp64k_crtc_vrtc_w)
+void hp64k_state::hp64k_crtc_vrtc_w(int state)
 {
 		bool vrtc = state != 0;
 
@@ -554,10 +543,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp64k_state::hp64k_kb_scan)
 				unsigned i;
 
 				ioport_value input[ 4 ];
-				input[ 0 ] = m_io_key0->read();
-				input[ 1 ] = m_io_key1->read();
-				input[ 2 ] = m_io_key2->read();
-				input[ 3 ] = m_io_key3->read();
+				input[ 0 ] = m_io_key[ 0 ]->read();
+				input[ 1 ] = m_io_key[ 1 ]->read();
+				input[ 2 ] = m_io_key[ 2 ]->read();
+				input[ 3 ] = m_io_key[ 3 ]->read();
 
 				for (i = 0; i < 128; i++) {
 						if (++m_kb_row_col >= 128) {
@@ -778,13 +767,13 @@ void hp64k_state::hp64k_flp_w(offs_t offset, uint16_t data)
 		hp64k_update_floppy_irq();
 }
 
-WRITE_LINE_MEMBER(hp64k_state::hp64k_flp_drq_w)
+void hp64k_state::hp64k_flp_drq_w(int state)
 {
 		m_floppy_drq = state;
 		hp64k_update_floppy_dma();
 }
 
-WRITE_LINE_MEMBER(hp64k_state::hp64k_flp_intrq_w)
+void hp64k_state::hp64k_flp_intrq_w(int state)
 {
 		if (state && !m_floppy_intrq && !BIT(m_floppy_if_ctrl , 7)) {
 				m_floppy_mdci = true;
@@ -854,8 +843,8 @@ void hp64k_state::hp64k_update_floppy_irq(void)
 
 void hp64k_state::hp64k_update_drv_ctrl(void)
 {
-		floppy_image_device *floppy0 = m_floppy0->get_device();
-		floppy_image_device *floppy1 = m_floppy1->get_device();
+		floppy_image_device *floppy0 = m_floppy[0]->get_device();
+		floppy_image_device *floppy1 = m_floppy[1]->get_device();
 
 		floppy0->mon_w(BIT(m_floppy_drv_ctrl , 1));
 		floppy1->mon_w(BIT(m_floppy_drv_ctrl , 4));
@@ -881,9 +870,9 @@ void hp64k_state::hp64k_update_drv_ctrl(void)
 		floppy_image_device *new_drive;
 
 		if (!BIT(m_floppy_drv_ctrl , 3)) {
-				new_drive = m_floppy1->get_device();
+				new_drive = m_floppy[1]->get_device();
 		} else if (!BIT(m_floppy_drv_ctrl , 0)) {
-				new_drive = m_floppy0->get_device();
+				new_drive = m_floppy[0]->get_device();
 		} else {
 				new_drive = nullptr;
 		}
@@ -901,7 +890,7 @@ void hp64k_state::hp64k_update_drv_ctrl(void)
 		}
 }
 
-WRITE_LINE_MEMBER(hp64k_state::hp64k_floppy0_rdy)
+void hp64k_state::hp64k_floppy0_rdy(int state)
 {
 		if (state) {
 				BIT_CLR(m_floppy_status , 0);
@@ -910,7 +899,7 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_floppy0_rdy)
 		}
 }
 
-WRITE_LINE_MEMBER(hp64k_state::hp64k_floppy1_rdy)
+void hp64k_state::hp64k_floppy1_rdy(int state)
 {
 		if (state) {
 				BIT_CLR(m_floppy_status , 3);
@@ -921,10 +910,10 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_floppy1_rdy)
 
 void hp64k_state::hp64k_floppy_idx_cb(floppy_image_device *floppy , int state)
 {
-		if (floppy == m_floppy0->get_device()) {
-				m_ss0->a_w(!state);
-		} else if (floppy == m_floppy1->get_device()) {
-				m_ss1->a_w(!state);
+		if (floppy == m_floppy[0]->get_device()) {
+				m_ss[0]->a_w(!state);
+		} else if (floppy == m_floppy[1]->get_device()) {
+				m_ss[1]->a_w(!state);
 		}
 
 		if (floppy == m_current_floppy) {
@@ -934,9 +923,9 @@ void hp64k_state::hp64k_floppy_idx_cb(floppy_image_device *floppy , int state)
 
 void hp64k_state::hp64k_floppy_wpt_cb(floppy_image_device *floppy , int state)
 {
-		if (floppy == m_floppy0->get_device()) {
+		if (floppy == m_floppy[0]->get_device()) {
 				logerror("floppy0_wpt %d\n" , state);
-				if (m_floppy0_wpt && !state) {
+				if (m_floppy_wpt[0] && !state) {
 						BIT_SET(m_floppy_status , 2);
 						hp64k_update_floppy_irq();
 				}
@@ -945,10 +934,10 @@ void hp64k_state::hp64k_floppy_wpt_cb(floppy_image_device *floppy , int state)
 				} else {
 						BIT_CLR(m_floppy_status, 1);
 				}
-				m_floppy0_wpt = state;
-		} else if (floppy == m_floppy1->get_device()) {
+				m_floppy_wpt[0] = state;
+		} else if (floppy == m_floppy[1]->get_device()) {
 				logerror("floppy1_wpt %d\n" , state);
-				if (m_floppy1_wpt && !state) {
+				if (m_floppy_wpt[1] && !state) {
 						BIT_SET(m_floppy_status , 5);
 						hp64k_update_floppy_irq();
 				}
@@ -957,7 +946,7 @@ void hp64k_state::hp64k_floppy_wpt_cb(floppy_image_device *floppy , int state)
 				} else {
 						BIT_CLR(m_floppy_status, 4);
 				}
-				m_floppy1_wpt = state;
+				m_floppy_wpt[1] = state;
 		}
 }
 
@@ -981,7 +970,7 @@ void hp64k_state::hp64k_usart_w(offs_t offset, uint16_t data)
 		m_uart->write(~offset & 1, data & 0xff);
 }
 
-WRITE_LINE_MEMBER(hp64k_state::hp64k_rxrdy_w)
+void hp64k_state::hp64k_rxrdy_w(int state)
 {
 		if (state) {
 				BIT_SET(m_irl_pending , 6);
@@ -992,7 +981,7 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_rxrdy_w)
 		hp64k_update_irl();
 }
 
-WRITE_LINE_MEMBER(hp64k_state::hp64k_txrdy_w)
+void hp64k_state::hp64k_txrdy_w(int state)
 {
 		if (state) {
 				BIT_SET(m_irl_pending , 5);
@@ -1003,7 +992,7 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_txrdy_w)
 		hp64k_update_irl();
 }
 
-WRITE_LINE_MEMBER(hp64k_state::hp64k_txd_w)
+void hp64k_state::hp64k_txd_w(int state)
 {
 		m_txd_state = state;
 		if (m_loopback) {
@@ -1012,7 +1001,7 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_txd_w)
 		m_rs232->write_txd(state);
 }
 
-WRITE_LINE_MEMBER(hp64k_state::hp64k_dtr_w)
+void hp64k_state::hp64k_dtr_w(int state)
 {
 		m_dtr_state = state;
 		if (m_loopback) {
@@ -1021,7 +1010,7 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_dtr_w)
 		m_rs232->write_dtr(state);
 }
 
-WRITE_LINE_MEMBER(hp64k_state::hp64k_rts_w)
+void hp64k_state::hp64k_rts_w(int state)
 {
 	if (BIT(m_s5_sw->read() , 0)) {
 		// Full duplex, RTS/ = 0
@@ -1054,14 +1043,14 @@ void hp64k_state::hp64k_update_loopback(void)
 	}
 }
 
-WRITE_LINE_MEMBER(hp64k_state::hp64k_rs232_rxd_w)
+void hp64k_state::hp64k_rs232_rxd_w(int state)
 {
 	if (!m_loopback) {
 		m_uart->write_rxd(state);
 	}
 }
 
-WRITE_LINE_MEMBER(hp64k_state::hp64k_rs232_dcd_w)
+void hp64k_state::hp64k_rs232_dcd_w(int state)
 {
 	if (!m_loopback) {
 		m_uart->write_dsr(state);
@@ -1078,14 +1067,14 @@ void hp64k_state::hp64k_phi_w(offs_t offset, uint16_t data)
 	m_phi->reg16_w(m_phi_reg , data);
 }
 
-WRITE_LINE_MEMBER(hp64k_state::hp64k_rs232_cts_w)
+void hp64k_state::hp64k_rs232_cts_w(int state)
 {
 	if (!m_loopback) {
 		m_uart->write_cts(state);
 	}
 }
 
-WRITE_LINE_MEMBER(hp64k_state::hp64k_phi_int_w)
+void hp64k_state::hp64k_phi_int_w(int state)
 {
 	if (state) {
 		BIT_SET(m_irl_pending , 7);
@@ -1096,7 +1085,7 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_phi_int_w)
 	hp64k_update_irl();
 }
 
-READ_LINE_MEMBER(hp64k_state::hp64k_phi_sys_ctrl_r)
+int hp64k_state::hp64k_phi_sys_ctrl_r()
 {
 	return BIT(m_rear_panel_sw->read() , 6);
 }
@@ -1115,7 +1104,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp64k_state::hp64k_beeper_off)
 	m_beeper->set_state(0);
 }
 
-WRITE_LINE_MEMBER(hp64k_state::hp64k_baud_clk_w)
+void hp64k_state::hp64k_baud_clk_w(int state)
 {
 	if (!m_16x_clk) {
 		if (state && !m_baud_clk) {
@@ -1414,22 +1403,22 @@ void hp64k_state::hp64k(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", hp64k_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats, true);
 	FLOPPY_CONNECTOR(config, "fdc:1", hp64k_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats, true);
 
-	TTL74123(config, m_ss0, 0);
-	m_ss0->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
-	m_ss0->set_resistor_value(RES_K(68.1));
+	TTL74123(config, m_ss[0], 0);
+	m_ss[0]->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	m_ss[0]->set_resistor_value(RES_K(68.1));
 	// Warning! Duration formula is not correct for LS123, actual capacitor is 10 uF
-	m_ss0->set_capacitor_value(CAP_U(16));
-	m_ss0->set_b_pin_value(1);
-	m_ss0->set_clear_pin_value(1);
-	m_ss0->out_cb().set(FUNC(hp64k_state::hp64k_floppy0_rdy));
+	m_ss[0]->set_capacitor_value(CAP_U(16));
+	m_ss[0]->set_b_pin_value(1);
+	m_ss[0]->set_clear_pin_value(1);
+	m_ss[0]->out_cb().set(FUNC(hp64k_state::hp64k_floppy0_rdy));
 
-	TTL74123(config, m_ss1, 0);
-	m_ss1->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
-	m_ss1->set_resistor_value(RES_K(68.1));
-	m_ss1->set_capacitor_value(CAP_U(16));
-	m_ss1->set_b_pin_value(1);
-	m_ss1->set_clear_pin_value(1);
-	m_ss1->out_cb().set(FUNC(hp64k_state::hp64k_floppy1_rdy));
+	TTL74123(config, m_ss[1], 0);
+	m_ss[1]->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	m_ss[1]->set_resistor_value(RES_K(68.1));
+	m_ss[1]->set_capacitor_value(CAP_U(16));
+	m_ss[1]->set_b_pin_value(1);
+	m_ss[1]->set_clear_pin_value(1);
+	m_ss[1]->out_cb().set(FUNC(hp64k_state::hp64k_floppy1_rdy));
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 2500).add_route(ALL_OUTPUTS, "mono", 1.00);

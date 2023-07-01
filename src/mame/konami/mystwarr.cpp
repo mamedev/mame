@@ -624,7 +624,7 @@ void mystwarr_state::mystwarr_sound_map(address_map &map)
 }
 
 
-WRITE_LINE_MEMBER(mystwarr_state::k054539_nmi_gen)
+void mystwarr_state::k054539_nmi_gen(int state)
 {
 	if (m_sound_ctrl & 0x10)
 	{

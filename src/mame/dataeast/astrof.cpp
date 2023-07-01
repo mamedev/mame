@@ -48,7 +48,7 @@
     Known issues/to-do's:
         * Analog sound in all games
         * satsf3d color prom is not dumped, using the one from spfghmk2 instead
-		  (it looks good compared to photo)
+          (it looks good compared to photo)
 
     About Colours:
         * It was fairly common to have wiremods on these PCBs to change the

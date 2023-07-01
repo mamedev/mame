@@ -1644,7 +1644,7 @@ void segas32_state::sprite_render_list()
 	int numentries = 0;
 	int spritenum = 0;
 
-	g_profiler.start(PROFILER_USER2);
+	auto profile = g_profiler.start(PROFILER_USER2);
 
 //  logerror("----\n");
 
@@ -1714,8 +1714,6 @@ void segas32_state::sprite_render_list()
 				break;
 		}
 	}
-
-	g_profiler.stop();
 }
 
 
@@ -2200,9 +2198,10 @@ uint32_t segas32_state::screen_update_system32(screen_device &screen, bitmap_rgb
 	}
 
 	/* update the tilemaps */
-	g_profiler.start(PROFILER_USER1);
-	enablemask = update_tilemaps(screen, cliprect);
-	g_profiler.stop();
+	{
+		auto profile = g_profiler.start(PROFILER_USER1);
+		enablemask = update_tilemaps(screen, cliprect);
+	}
 
 	/* debugging */
 #if QWERTY_LAYER_ENABLE
@@ -2215,9 +2214,10 @@ uint32_t segas32_state::screen_update_system32(screen_device &screen, bitmap_rgb
 #endif
 
 	/* do the mixing */
-	g_profiler.start(PROFILER_USER3);
-	mix_all_layers(0, 0, bitmap, cliprect, enablemask);
-	g_profiler.stop();
+	{
+		auto profile = g_profiler.start(PROFILER_USER3);
+		mix_all_layers(0, 0, bitmap, cliprect, enablemask);
+	}
 
 	if (LOG_SPRITES && machine().input().code_pressed(KEYCODE_L))
 	{
@@ -2378,9 +2378,10 @@ uint32_t segas32_state::multi32_update(screen_device &screen, bitmap_rgb32 &bitm
 	}
 
 	/* update the tilemaps */
-	g_profiler.start(PROFILER_USER1);
-	enablemask = update_tilemaps(screen, cliprect);
-	g_profiler.stop();
+	{
+		auto profile = g_profiler.start(PROFILER_USER1);
+		enablemask = update_tilemaps(screen, cliprect);
+	}
 
 	/* debugging */
 #if QWERTY_LAYER_ENABLE
@@ -2393,15 +2394,16 @@ uint32_t segas32_state::multi32_update(screen_device &screen, bitmap_rgb32 &bitm
 #endif
 
 	/* do the mixing */
-	g_profiler.start(PROFILER_USER3);
-	mix_all_layers(index, 0, bitmap, cliprect, enablemask);
-	g_profiler.stop();
+	{
+		auto profile = g_profiler.start(PROFILER_USER3);
+		mix_all_layers(index, 0, bitmap, cliprect, enablemask);
+	}
 
-if (PRINTF_MIXER_DATA)
-{
-	if (!screen.machine().input().code_pressed(KEYCODE_M)) print_mixer_data(0);
-	else print_mixer_data(1);
-}
+	if (PRINTF_MIXER_DATA)
+	{
+		if (!screen.machine().input().code_pressed(KEYCODE_M)) print_mixer_data(0);
+		else print_mixer_data(1);
+	}
 	if (LOG_SPRITES && screen.machine().input().code_pressed(KEYCODE_L))
 	{
 		const rectangle &visarea = screen.visible_area();

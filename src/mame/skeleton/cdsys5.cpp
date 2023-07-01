@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/mc68hc11/mc68hc11.h"
-//#include "machine/74259.h"
+#include "machine/74259.h"
 #include "machine/mc146818.h"
 #include "machine/nvram.h"
 
@@ -21,21 +21,57 @@ public:
 	cdsys5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_shift_register(0)
 	{
 	}
 
 	void minijook(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
+	void shift_data_w(u8 data);
+	void shift_latch_w(u8 data);
+
 	void mem_map(address_map &map);
 
 	required_device<mc68hc11_cpu_device> m_maincpu;
+
+	u16 m_shift_register;
 };
 
+
+void cdsys5_state::machine_start()
+{
+	save_item(NAME(m_shift_register));
+}
+
+void cdsys5_state::shift_data_w(u8 data)
+{
+	m_shift_register = (m_shift_register << 1) | (data & 1);
+}
+
+void cdsys5_state::shift_latch_w(u8 data)
+{
+	//logerror("Latching $%04X from shift register\n", m_shift_register);
+}
 
 void cdsys5_state::mem_map(address_map &map)
 {
 	map(0x0401, 0x0401).nopw(); // watchdog?
+	//map(0x0420, 0x0421).w("lcdc", FUNC(hd44780_device::write));
+	map(0x0440, 0x0441).nopr();
+	map(0x0802, 0x0803).nopr();
+	map(0x0807, 0x0807).nopr();
+	map(0x0810, 0x081f).w("outlatch1", FUNC(cd4099_device::write_a0));
+	map(0x0820, 0x082f).w("outlatch2", FUNC(cd4099_device::write_a0));
+	map(0x0833, 0x0833).nopr();
+	map(0x0850, 0x085f).w("outlatch5", FUNC(cd4099_device::write_a0));
+	map(0x0860, 0x086f).w("outlatch6", FUNC(cd4099_device::write_a0));
+	map(0x0880, 0x088f).w("outlatch8", FUNC(cd4099_device::write_a0));
+	map(0x08a0, 0x08a0).w(FUNC(cdsys5_state::shift_latch_w));
+	map(0x08b0, 0x08b0).w(FUNC(cdsys5_state::shift_data_w));
 	map(0x0c00, 0x0c3f).rw("rtc", FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
 	map(0x4000, 0x47ff).ram().share("novram");
 	map(0x8000, 0xffff).rom().region("program", 0);
@@ -84,7 +120,11 @@ void cdsys5_state::minijook(machine_config &config)
 
 	MC146818(config, "rtc", 32.768_kHz_XTAL);
 
-	//CD4099(config, "outlatch"); // 5 on board
+	CD4099(config, "outlatch1");
+	CD4099(config, "outlatch2");
+	CD4099(config, "outlatch5");
+	CD4099(config, "outlatch6");
+	CD4099(config, "outlatch8"); // 5 on board
 }
 
 

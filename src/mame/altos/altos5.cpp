@@ -63,8 +63,8 @@ private:
 	void port14_w(uint8_t data);
 	void setup_banks(uint8_t source);
 	uint8_t convert(offs_t offset, bool state);
-	DECLARE_WRITE_LINE_MEMBER(busreq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
+	void busreq_w(int state);
+	void fdc_intrq_w(int state);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -222,7 +222,7 @@ void altos5_state::io_write_byte(offs_t offset, uint8_t data)
 	prog_space.write_byte(offset, data);
 }
 
-WRITE_LINE_MEMBER( altos5_state::busreq_w )
+void altos5_state::busreq_w(int state)
 {
 // since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
@@ -307,7 +307,7 @@ QUICKLOAD_LOAD_MEMBER(altos5_state::quickload_cb)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
 	if (image.length() >= 0xfd00)
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
 	setup_banks(2);
 
@@ -315,7 +315,7 @@ QUICKLOAD_LOAD_MEMBER(altos5_state::quickload_cb)
 	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
 	{
 		machine_reset();
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSUPPORTED, std::string());
 	}
 
 	/* Load image to the TPA (Transient Program Area) */
@@ -325,7 +325,7 @@ QUICKLOAD_LOAD_MEMBER(altos5_state::quickload_cb)
 		uint8_t data;
 
 		if (image.fread( &data, 1) != 1)
-			return image_init_result::FAIL;
+			return std::make_pair(image_error::UNSPECIFIED, std::string());
 		prog_space.write_byte(i+0x100, data);
 	}
 
@@ -336,7 +336,7 @@ QUICKLOAD_LOAD_MEMBER(altos5_state::quickload_cb)
 	m_maincpu->set_state_int(Z80_SP, 256 * prog_space.read_byte(7) - 300);
 	m_maincpu->set_pc(0x100);       // start program
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -345,7 +345,7 @@ static void altos5_floppies(device_slot_interface &device)
 	device.option_add("525qd", FLOPPY_525_QD);
 }
 
-WRITE_LINE_MEMBER( altos5_state::fdc_intrq_w )
+void altos5_state::fdc_intrq_w(int state)
 {
 	uint8_t data = m_port08 | ((uint8_t)(state) << 7);
 	m_pio0->port_a_write(data);

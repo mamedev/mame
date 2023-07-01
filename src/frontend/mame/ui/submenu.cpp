@@ -245,7 +245,7 @@ submenu::~submenu()
 //  handle the options menu
 //-------------------------------------------------
 
-void submenu::handle(event const *ev)
+bool submenu::handle(event const *ev)
 {
 	bool changed = false;
 	std::string error_string, tmptxt;
@@ -332,8 +332,9 @@ void submenu::handle(event const *ev)
 		}
 	}
 
-	if (changed)
+	if (changed) // FIXME: most changes should only require updating the item's subtext
 		reset(reset_options::REMEMBER_REF);
+	return false;
 }
 
 //-------------------------------------------------

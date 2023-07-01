@@ -8,11 +8,14 @@
 
 #include "machine/pci.h"
 #include "machine/idectrl.h"
-#include "machine/ds128x.h"
 
 #include <functional>
 
-//#define LOG_AUDIO
+#define LOG_AUDIO (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 /*
  * Host
@@ -106,12 +109,15 @@ void mcpx_isalpc_device::lpc_io(address_map &map)
 
 void mcpx_isalpc_device::internal_io_map(address_map &map)
 {
+	map(0x0000, 0x000f).rw("dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x0020, 0x0023).rw("pic8259_1", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x0043).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x0061, 0x0061).rw(FUNC(mcpx_isalpc_device::portb_r), FUNC(mcpx_isalpc_device::portb_w));
 	map(0x0070, 0x0073).rw("rtc", FUNC(ds12885ext_device::read_extended), FUNC(ds12885ext_device::write_extended));
 	map(0x0080, 0x0080).w(FUNC(mcpx_isalpc_device::boot_state_w));
+	map(0x0081, 0x008f).rw(FUNC(mcpx_isalpc_device::dma_page_r), FUNC(mcpx_isalpc_device::dma_page_w));
 	map(0x00a0, 0x00a3).rw("pic8259_2", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x00c0, 0x00df).rw(FUNC(mcpx_isalpc_device::dma2_r), FUNC(mcpx_isalpc_device::dma2_w));
 	map(0x00e0, 0x00e3).nopw();
 }
 
@@ -139,7 +145,10 @@ mcpx_isalpc_device::mcpx_isalpc_device(const machine_config &mconfig, const char
 	m_boot_state_hook(*this),
 	pic8259_1(*this, "pic8259_1"),
 	pic8259_2(*this, "pic8259_2"),
+	m_dma8237_1(*this, "dma8237_1"),
+	m_dma8237_2(*this, "dma8237_2"),
 	pit8254(*this, "pit8254"),
+	m_dma_space(*this, finder_base::DUMMY_TAG, -1, 32),
 	m_pm1_status(0),
 	m_pm1_enable(0),
 	m_pm1_control(0),
@@ -152,7 +161,11 @@ mcpx_isalpc_device::mcpx_isalpc_device(const machine_config &mconfig, const char
 	m_refresh(false),
 	m_pit_out2(0),
 	m_spkrdata(0),
-	m_channel_check(0)
+	m_channel_check(0),
+	m_dma_eop(0),
+	m_dma_high_byte(0xff),
+	m_dma_channel(-1),
+	m_page_offset(0)
 {
 }
 
@@ -160,9 +173,6 @@ void mcpx_isalpc_device::device_start()
 {
 	pci_device::device_start();
 	set_multifunction_device(true);
-	m_smi_callback.resolve_safe();
-	m_interrupt_output.resolve_safe();
-	m_boot_state_hook.resolve_safe();
 	add_map(0x00000100, M_IO, FUNC(mcpx_isalpc_device::lpc_io));
 	bank_infos[0].adr = 0x8000;
 	status = 0x00b0;
@@ -170,6 +180,8 @@ void mcpx_isalpc_device::device_start()
 	command_mask = 0x01be;
 	for (int a = 0; a < 16; a++)
 		lpcdevices[a] = nullptr;
+	for (int a = 0; a < 8; a++)
+		m_lineowners[a] = -1;
 	for (device_t &d : subdevices())
 	{
 		const char *t = d.basetag();
@@ -214,6 +226,39 @@ void mcpx_isalpc_device::device_add_mconfig(machine_config &config)
 	pic8259_2.out_int_callback().set(pic8259_1, FUNC(pic8259_device::ir2_w));
 	pic8259_2.in_sp_callback().set_constant(0);
 
+	am9517a_device &dma8237_2(AM9517A(config, "dma8237_2", XTAL(14'318'181) / 3));
+	dma8237_2.out_hreq_callback().set(FUNC(mcpx_isalpc_device::dma2_hreq_w));
+	dma8237_2.in_memr_callback().set(FUNC(mcpx_isalpc_device::dma_read_word));
+	dma8237_2.out_memw_callback().set(FUNC(mcpx_isalpc_device::dma_write_word));
+	dma8237_2.in_ior_callback<1>().set(FUNC(mcpx_isalpc_device::dma2_ior1_r));
+	dma8237_2.in_ior_callback<2>().set(FUNC(mcpx_isalpc_device::dma2_ior2_r));
+	dma8237_2.in_ior_callback<3>().set(FUNC(mcpx_isalpc_device::dma2_ior3_r));
+	dma8237_2.out_iow_callback<1>().set(FUNC(mcpx_isalpc_device::dma2_iow1_w));
+	dma8237_2.out_iow_callback<2>().set(FUNC(mcpx_isalpc_device::dma2_iow2_w));
+	dma8237_2.out_iow_callback<3>().set(FUNC(mcpx_isalpc_device::dma2_iow3_w));
+	dma8237_2.out_dack_callback<0>().set(FUNC(mcpx_isalpc_device::dma2_dack0_w));
+	dma8237_2.out_dack_callback<1>().set(FUNC(mcpx_isalpc_device::dma2_dack1_w));
+	dma8237_2.out_dack_callback<2>().set(FUNC(mcpx_isalpc_device::dma2_dack2_w));
+	dma8237_2.out_dack_callback<3>().set(FUNC(mcpx_isalpc_device::dma2_dack3_w));
+
+	am9517a_device &dma8237_1(AM9517A(config, "dma8237_1", XTAL(14'318'181) / 3));
+	dma8237_1.out_hreq_callback().set(dma8237_2, FUNC(am9517a_device::dreq0_w));
+	dma8237_1.out_eop_callback().set(FUNC(mcpx_isalpc_device::dma1_eop_w));
+	dma8237_1.in_memr_callback().set(FUNC(mcpx_isalpc_device::dma_read_byte));
+	dma8237_1.out_memw_callback().set(FUNC(mcpx_isalpc_device::dma_write_byte));
+	dma8237_1.in_ior_callback<0>().set(FUNC(mcpx_isalpc_device::dma1_ior0_r));
+	dma8237_1.in_ior_callback<1>().set(FUNC(mcpx_isalpc_device::dma1_ior1_r));
+	dma8237_1.in_ior_callback<2>().set(FUNC(mcpx_isalpc_device::dma1_ior2_r));
+	dma8237_1.in_ior_callback<3>().set(FUNC(mcpx_isalpc_device::dma1_ior3_r));
+	dma8237_1.out_iow_callback<0>().set(FUNC(mcpx_isalpc_device::dma1_iow0_w));
+	dma8237_1.out_iow_callback<1>().set(FUNC(mcpx_isalpc_device::dma1_iow1_w));
+	dma8237_1.out_iow_callback<2>().set(FUNC(mcpx_isalpc_device::dma1_iow2_w));
+	dma8237_1.out_iow_callback<3>().set(FUNC(mcpx_isalpc_device::dma1_iow3_w));
+	dma8237_1.out_dack_callback<0>().set(FUNC(mcpx_isalpc_device::dma1_dack0_w));
+	dma8237_1.out_dack_callback<1>().set(FUNC(mcpx_isalpc_device::dma1_dack1_w));
+	dma8237_1.out_dack_callback<2>().set(FUNC(mcpx_isalpc_device::dma1_dack2_w));
+	dma8237_1.out_dack_callback<3>().set(FUNC(mcpx_isalpc_device::dma1_dack3_w));
+
 	pit8254_device &pit8254(PIT8254(config, "pit8254", 0));
 	pit8254.set_clk<0>(1125000); /* heartbeat IRQ */
 	pit8254.out_handler<0>().set(FUNC(mcpx_isalpc_device::pit8254_out0_changed));
@@ -226,9 +271,8 @@ void mcpx_isalpc_device::device_add_mconfig(machine_config &config)
 	ds12885.irq().set(pic8259_2, FUNC(pic8259_device::ir0_w));
 
 	/*
-	More devices are needed:
+	More devices needed:
 	    82093 compatible I/O APIC
-	    dual 8237 DMA controllers
 	*/
 }
 
@@ -308,11 +352,10 @@ void mcpx_isalpc_device::acpi_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 void mcpx_isalpc_device::boot_state_w(uint8_t data)
 {
-	if (m_boot_state_hook)
-		m_boot_state_hook((offs_t)0, data);
+	m_boot_state_hook(offs_t(0), data);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::interrupt_ouptut_changed)
+void mcpx_isalpc_device::interrupt_ouptut_changed(int state)
 {
 	m_interrupt_output(state);
 }
@@ -324,49 +367,49 @@ uint8_t mcpx_isalpc_device::get_slave_ack(offs_t offset)
 	return 0x00;
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::pit8254_out0_changed)
+void mcpx_isalpc_device::pit8254_out0_changed(int state)
 {
 	pic8259_1->ir0_w(state);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::pit8254_out1_changed)
+void mcpx_isalpc_device::pit8254_out1_changed(int state)
 {
 	if (state)
 		m_refresh = !m_refresh;
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::pit8254_out2_changed)
+void mcpx_isalpc_device::pit8254_out2_changed(int state)
 {
 	m_pit_out2 = state ? 1 : 0;
 	//xbox_speaker_set_input(m_at_spkrdata & m_pit_out2);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::irq1)
+void mcpx_isalpc_device::irq1(int state)
 {
 	pic8259_1->ir1_w(state);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::irq3)
+void mcpx_isalpc_device::irq3(int state)
 {
 	pic8259_1->ir3_w(state);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::irq10)
+void mcpx_isalpc_device::irq10(int state)
 {
 	pic8259_2->ir2_w(state);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::irq11)
+void mcpx_isalpc_device::irq11(int state)
 {
 	pic8259_2->ir3_w(state);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::irq14)
+void mcpx_isalpc_device::irq14(int state)
 {
 	pic8259_2->ir6_w(state);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::irq15)
+void mcpx_isalpc_device::irq15(int state)
 {
 	pic8259_2->ir7_w(state);
 }
@@ -413,6 +456,7 @@ void mcpx_isalpc_device::debug_generate_irq(int irq, int state)
 
 void mcpx_isalpc_device::set_virtual_line(int line, int state)
 {
+	// support up to 16 irq lines
 	if (line < 16)
 	{
 		switch (line)
@@ -465,23 +509,175 @@ void mcpx_isalpc_device::set_virtual_line(int line, int state)
 		}
 		return;
 	}
-/* Will be updated to support dma
-    line = line - 16;
-    if (line < 4)
-    {
-        switch (line)
-        {
-        case 0:
-            break;
-        case 1:
-            break;
-        case 2:
-            break;
-        case 3:
-            break;
-        }
-    }
-*/
+	// support up to 8 drq lines
+	line = line - 16;
+	if (line < 8)
+	{
+		switch (line)
+		{
+		case 0:
+			m_dma8237_1->dreq0_w(state);
+			break;
+		case 1:
+			m_dma8237_1->dreq1_w(state);
+			break;
+		case 2:
+			m_dma8237_1->dreq2_w(state);
+			break;
+		case 3:
+			m_dma8237_1->dreq3_w(state);
+			break;
+		case 5:
+			m_dma8237_2->dreq1_w(state);
+			break;
+		case 6:
+			m_dma8237_2->dreq2_w(state);
+			break;
+		case 7:
+			m_dma8237_2->dreq3_w(state);
+			break;
+		}
+	}
+	// next would be the 8 dack lines
+	line = line - 8;
+}
+
+void mcpx_isalpc_device::assign_virtual_line(int line, int device_index)
+{
+	if (line == -1)
+	{
+		for (int a = 0; a < 8; a++)
+			if (m_lineowners[a] == device_index)
+				m_lineowners[a] = -1;
+		return;
+	}
+	if (line < 24)
+		return;
+	line = line - 24;
+	m_lineowners[line] = device_index; // dma dreq line/channel "line" used by lpc device "device_index"
+}
+
+void mcpx_isalpc_device::set_dma_channel(int channel, bool state)
+{
+	if (!state) // dack line low
+	{
+		m_dma_channel = channel;
+		switch (m_dma_channel)
+		{
+		case 0:
+			m_page_offset = (offs_t)m_dma_page[0x07] << 16;
+			break;
+		case 1:
+			m_page_offset = (offs_t)m_dma_page[0x03] << 16;
+			break;
+		case 2:
+			m_page_offset = (offs_t)m_dma_page[0x01] << 16;
+			break;
+		case 3:
+			m_page_offset = (offs_t)m_dma_page[0x02] << 16;
+			break;
+		case 5:
+			m_page_offset = (offs_t)m_dma_page[0x0b] << 16;
+			break;
+		case 6:
+			m_page_offset = (offs_t)m_dma_page[0x09] << 16;
+			break;
+		case 7:
+			m_page_offset = (offs_t)m_dma_page[0x0a] << 16;
+			break;
+		}
+		if (m_dma_eop)
+			signal_dma_end(channel, 1); // ASSERT_LINE
+	}
+	else // dack line high
+	{
+		if (m_dma_channel == channel)
+		{
+			m_dma_channel = -1;
+			if (m_dma_eop)
+				signal_dma_end(channel, 0);
+		}
+	}
+}
+
+void mcpx_isalpc_device::send_dma_byte(int channel, uint8_t value)
+{
+	lpcbus_device_interface *dev = lpcdevices[m_lineowners[channel]];
+
+	dev->dma_transfer(channel, lpcbus_device_interface::dma_operation::READ, lpcbus_device_interface::dma_size::BYTE, value);
+}
+
+void mcpx_isalpc_device::send_dma_word(int channel, uint16_t value)
+{
+	lpcbus_device_interface *dev = lpcdevices[m_lineowners[channel]];
+
+	dev->dma_transfer(channel, lpcbus_device_interface::dma_operation::READ, lpcbus_device_interface::dma_size::WORD, value);
+}
+
+uint8_t mcpx_isalpc_device::get_dma_byte(int channel)
+{
+	lpcbus_device_interface *dev = lpcdevices[m_lineowners[channel]];
+
+	return (uint8_t)dev->dma_transfer(channel, lpcbus_device_interface::dma_operation::WRITE, lpcbus_device_interface::dma_size::BYTE, 0);
+}
+
+uint16_t mcpx_isalpc_device::get_dma_word(int channel)
+{
+	lpcbus_device_interface *dev = lpcdevices[m_lineowners[channel]];
+
+	return (uint16_t)dev->dma_transfer(channel, lpcbus_device_interface::dma_operation::WRITE, lpcbus_device_interface::dma_size::WORD, 0);
+}
+
+void mcpx_isalpc_device::signal_dma_end(int channel, int tc)
+{
+	lpcbus_device_interface *dev = lpcdevices[m_lineowners[channel]];
+
+	dev->dma_transfer(channel, lpcbus_device_interface::dma_operation::END, lpcbus_device_interface::dma_size::BYTE, tc);
+}
+
+uint8_t mcpx_isalpc_device::dma_page_r(offs_t offset)
+{
+	return m_dma_page[offset + 1];
+}
+
+void mcpx_isalpc_device::dma_page_w(offs_t offset, uint8_t data)
+{
+	m_dma_page[offset + 1] = data;
+}
+
+uint8_t mcpx_isalpc_device::dma_read_byte(offs_t offset)
+{
+	if (m_dma_channel == -1)
+		return 0xff;
+
+	return m_dma_space->read_byte(m_page_offset + offset);
+}
+
+void mcpx_isalpc_device::dma_write_byte(offs_t offset, uint8_t data)
+{
+	if (m_dma_channel == -1)
+		return;
+
+	m_dma_space->write_byte(m_page_offset + offset, data);
+}
+
+uint8_t mcpx_isalpc_device::dma_read_word(offs_t offset)
+{
+	if (m_dma_channel == -1)
+		return 0xff;
+
+	uint16_t result = m_dma_space->read_word((m_page_offset & 0xfe0000) | (offset << 1));
+	m_dma_high_byte = result >> 8;
+
+	return result;
+}
+
+void mcpx_isalpc_device::dma_write_word(offs_t offset, uint8_t data)
+{
+	if (m_dma_channel == -1)
+		return;
+
+	m_dma_space->write_word((m_page_offset & 0xfe0000) | (offset << 1), (m_dma_high_byte << 8) | data);
 }
 
 void mcpx_isalpc_device::remap()
@@ -533,7 +729,6 @@ void mcpx_smbus_device::device_start()
 {
 	pci_device::device_start();
 	set_multifunction_device(true);
-	m_interrupt_handler.resolve_safe();
 	add_map(0x00000010, M_IO, FUNC(mcpx_smbus_device::smbus_io0));
 	bank_infos[0].adr = 0x1000;
 	add_map(0x00000010, M_IO, FUNC(mcpx_smbus_device::smbus_io1));
@@ -603,10 +798,7 @@ void mcpx_smbus_device::smbus_write(int bus, offs_t offset, uint32_t data, uint3
 	if ((offset == 0) && (ACCESSING_BITS_0_7 || ACCESSING_BITS_8_15)) // 0 smbus status
 	{
 		if (!((smbusst[bus].status ^ data) & 0x10)) // clearing interrupt
-		{
-			if (m_interrupt_handler)
-				m_interrupt_handler(0);
-		}
+			m_interrupt_handler(0);
 		smbusst[bus].status &= ~data;
 	}
 	if ((offset == 0) && ACCESSING_BITS_16_23) // 2 smbus control
@@ -626,10 +818,7 @@ void mcpx_smbus_device::smbus_write(int bus, offs_t offset, uint32_t data, uint3
 					logerror("SMBUS: access to missing device at bus %d address %d\n", bus, smbusst[bus].address);
 				smbusst[bus].status |= 0x10;
 				if (smbusst[bus].control & 0x10)
-				{
-					if (m_interrupt_handler)
-						m_interrupt_handler(1);
-				}
+					m_interrupt_handler(1);
 			}
 		}
 	}
@@ -710,7 +899,6 @@ void mcpx_ohci_device::plug_usb_device(int port, device_usb_ohci_function_interf
 void mcpx_ohci_device::device_start()
 {
 	pci_device::device_start();
-	m_interrupt_handler.resolve_safe();
 	add_map(0x00001000, M_MEM, FUNC(mcpx_ohci_device::ohci_mmio));
 	bank_infos[0].adr = 0xfed00000;
 	status = 0x00b0;
@@ -913,9 +1101,7 @@ TIMER_CALLBACK_MEMBER(mcpx_apu_device::audio_update)
 
 uint32_t mcpx_apu_device::apu_r(offs_t offset, uint32_t mem_mask)
 {
-#ifdef LOG_AUDIO
-	logerror("Audio_APU: read from %08X mask %08X\n", 0xfe800000 + offset * 4, mem_mask);
-#endif
+	LOGMASKED(LOG_AUDIO, "Audio_APU: read from %08X mask %08X\n", 0xfe800000 + offset * 4, mem_mask);
 	if (offset == 0x20010 / 4) // some kind of internal counter or state value
 		return 0x20 + 4 + 8 + 0x48 + 0x80;
 	return apust.memory[offset];
@@ -925,9 +1111,7 @@ void mcpx_apu_device::apu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t v;
 
-#ifdef LOG_AUDIO
-	logerror("Audio_APU: write at %08X mask %08X value %08X\n", 0xfe800000 + offset * 4, mem_mask, data);
-#endif
+	LOGMASKED(LOG_AUDIO, "Audio_APU: write at %08X mask %08X value %08X\n", 0xfe800000 + offset * 4, mem_mask, data);
 	apust.memory[offset] = data;
 	if (offset == 0x02040 / 4) // address of memory area with scatter-gather info (gpdsp scratch dma)
 		apust.gpdsp_sgaddress = data;
@@ -1092,9 +1276,7 @@ uint32_t mcpx_ac97_audio_device::ac97_audio_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 
-#ifdef LOG_AUDIO
-	logerror("Audio_AC3: read from %08X mask %08X\n", 0xfec00000 + offset * 4, mem_mask);
-#endif
+	LOGMASKED(LOG_AUDIO, "Audio_AC3: read from %08X mask %08X\n", 0xfec00000 + offset * 4, mem_mask);
 	if (offset < 0x80 / 4)
 	{
 		ret = ac97st.mixer_regs[offset];
@@ -1121,9 +1303,7 @@ uint32_t mcpx_ac97_audio_device::ac97_audio_r(offs_t offset, uint32_t mem_mask)
 
 void mcpx_ac97_audio_device::ac97_audio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-#ifdef LOG_AUDIO
-	logerror("Audio_AC3: write at %08X mask %08X value %08X\n", 0xfec00000 + offset * 4, mem_mask, data);
-#endif
+	LOGMASKED(LOG_AUDIO, "Audio_AC3: write at %08X mask %08X value %08X\n", 0xfec00000 + offset * 4, mem_mask, data);
 	if (offset < 0x80 / 4)
 	{
 		COMBINE_DATA(ac97st.mixer_regs + offset);
@@ -1233,8 +1413,6 @@ void mcpx_ide_device::device_start()
 	bank_infos[4].adr = 0xff60;
 	status = 0x00b0;
 	command = 0x0001;
-	m_pri_interrupt_handler.resolve_safe();
-	m_sec_interrupt_handler.resolve_safe();
 }
 
 void mcpx_ide_device::device_reset()
@@ -1246,11 +1424,9 @@ void mcpx_ide_device::device_add_mconfig(machine_config &config)
 {
 	bus_master_ide_controller_device &ide1(BUS_MASTER_IDE_CONTROLLER(config, "ide1", 0));
 	ide1.irq_handler().set(FUNC(mcpx_ide_device::ide_pri_interrupt));
-	ide1.set_bus_master_space(":maincpu", AS_PROGRAM);
 
 	bus_master_ide_controller_device &ide2(BUS_MASTER_IDE_CONTROLLER(config, "ide2", 0));
 	ide2.irq_handler().set(FUNC(mcpx_ide_device::ide_sec_interrupt));
-	ide2.set_bus_master_space(":maincpu", AS_PROGRAM);
 }
 
 void mcpx_ide_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -1330,12 +1506,12 @@ void mcpx_ide_device::sec_write_cs1_w(uint8_t data)
 	m_sec->write_cs1(1, data << 16, 0xff0000);
 }
 
-WRITE_LINE_MEMBER(mcpx_ide_device::ide_pri_interrupt)
+void mcpx_ide_device::ide_pri_interrupt(int state)
 {
 	m_pri_interrupt_handler(state);
 }
 
-WRITE_LINE_MEMBER(mcpx_ide_device::ide_sec_interrupt)
+void mcpx_ide_device::ide_sec_interrupt(int state)
 {
 	m_sec_interrupt_handler(state);
 }
@@ -1414,7 +1590,6 @@ nv2a_gpu_device::nv2a_gpu_device(const machine_config &mconfig, const char *tag,
 void nv2a_gpu_device::device_start()
 {
 	agp_device::device_start();
-	m_interrupt_handler.resolve_safe();
 	add_map(0x01000000, M_MEM, FUNC(nv2a_gpu_device::nv2a_mmio));
 	bank_infos[0].adr = 0xfd000000;
 	add_map(0x08000000, M_MEM, FUNC(nv2a_gpu_device::nv2a_mirror));

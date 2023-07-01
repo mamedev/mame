@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+Known cards:
+  Dumped  Serial     Name                 Contents
+      No  TN-SC2-01  Italian Folk         Mazurka, Waltz 5, Fox Trot 2, Polka 3, Quadriglia, Tarantella, Saltarello, Tango 3
+      No  TN-SC2-02  Beatles              Yesterday, Let It Be, Michelle, Hey Jude, The Long And, And I Love Her, Girl, Oh Darling
+      No  TN-SC2-03  Country              Two Step, Country Swing, Country Waltz 2, Train-Beats, Ballad 4, Bluegrass 2, Cajun, Country Rock 2
+     Yes  TN-SC2-04  Dance                Dance 2, Dance 3, Dance 4, Dance 5, Dance 6, Dance 7, Dance 8, Dance 9
+      No  TN-SC2-05  50´s & 60´s          Rock'N 4, Rock'N 5, Rock'N 6, Rock'N 7, Sl Rock 4, Limborck, Poprock, Twist 2
+      No  TN-SC2-06  Classic              Bolero, W'Waltz, W'Polka, March 3, Minuetto, Toccata, Rossini, Pavane
+      No  TN-SC2-07  Latin                Bossa 3, Bossa 4, Chacha 2, Rhumba 2, Mambo 2, Beguine 3, Samba 4, Samba 5
+      No  TN-SC2-08  Scandinavian         Fast 4/4, Sl Shuffle, Country 2/4, Shuffle 3, Fast 2/4, Boogie 3, Slow 4/4, 60's
+      No  TN-SC2-09  Evergreen 1          Blues, Slow Swing, Boogie 2, Ragtime, Lambada, Son, Samba 2, Mambo (styles from TN-SC1 cards)
+      No  TN-SC2-10  Evergreen 2          Slow Waltz, Standard, Ballad 2, Reggae 2, Caribbean, M'Town, Mexican Rock, Country Waltz (styles from TN-SC1 cards)
+      No  TN-SC2-11  Evergreen 3          Rock 1, Rock 2, Funk 1, Funk 2, 8 Beat 1, 8 Beat 2, 16 Beat 1, 16 Beat 2 (styles from E-20)
+      No  TN-SC2-12  Evergreen 4          Reggae, Swing, Country, Waltz 2, Polka, Bossa Nova, Rhumba, Fusion (styles from E-20)
+      No  TN-SC2-13  ?                    ?
+      No  TN-SC2-14  Big Band             Jazz Band, Big Band, BigBand Ballad, Standard 2
+      No  TN-SC2-15  Showtime             Music Hall, Broadway, Bubbles
+      No  TN-SC2-16  Country 2            Country Swing 2, Two Step 2, Country Waltz 3, Hoe Down
+      No  TN-SC2-17  Gospel               Gospel, Revival, Anthem, Gospel Ballad
+      No  TN-SC2-18  East Europe?         ?
+      No  TN-SC2-51  American Collection  Rock 3, Rock 4, Funk 4, R & B, Gospel, Big Band, Modern Ballad, Jazz Waltz
+      No  TN-SC2-52  Piano Styles         Popular Piano 1, Popular Piano 2, Contemporary, 50's Ballad, Ballad Shuffle, Swing Pop, Jazz Piano, Slow Waltz 3
+
+Releases according to http://www.rolandmuseum.de/indizees/roland_ch.html:
+    TN-SC2-01..07: 1992
+    TN-SC2-09..12: 1995
+    TN-SC2-51..52: 1995
+    TN-SC2-14..17: 1997
+    The other cards (08, 13, 18) are missing from the list.
+    Especially cards 13 and 18 seem to have barely any information online.
+-->
+
+<softwarelist name="roland_tnsc2" description="Roland TN-SC2 Music Style Cards">
+	<software name="tn_sc2_04" supported="no">
+		<!--
+		    1. Dance 2
+		    2. Dance 3
+		    3. Dance 4
+		    4. Dance 5
+		    5. Dance 6
+		    6. Dance 7
+		    7. Dance 8
+		    8. Dance 9
+		-->
+		<description>TN-SC2-04 Dance</description>
+		<year>1992</year>
+		<publisher>Roland</publisher>
+		<part name="cart" interface="roland_tnsc2">
+			<dataarea name="rom" size="0x10000">
+				<rom name="tn-sc2-04.bin" size="0x10000" crc="7fd52461" sha1="38e76a348eca1644999361650e2d99f55578a141"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

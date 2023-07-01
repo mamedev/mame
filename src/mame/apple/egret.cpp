@@ -395,11 +395,6 @@ egret_device::egret_device(const machine_config &mconfig, const char *tag, devic
 
 void egret_device::device_start()
 {
-	write_reset.resolve_safe();
-	write_linechange.resolve_safe();
-	write_via_clock.resolve_safe();
-	write_via_data.resolve_safe();
-
 #if USE_BUS_ADB
 	for (int i = 0; i < 2; i++)
 	{
@@ -413,6 +408,7 @@ void egret_device::device_start()
 #endif
 
 	m_timer = timer_alloc(FUNC(egret_device::seconds_tick), this);
+
 	save_item(NAME(ddrs[0]));
 	save_item(NAME(ddrs[1]));
 	save_item(NAME(ddrs[2]));

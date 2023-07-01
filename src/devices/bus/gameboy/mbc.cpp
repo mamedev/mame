@@ -95,7 +95,7 @@ protected:
 	{
 	}
 
-	bool install_memory(std::string &message, unsigned highbits, unsigned lowbits) ATTR_COLD
+	std::error_condition install_memory(std::string &message, unsigned highbits, unsigned lowbits) ATTR_COLD
 	{
 		// see if the cartridge shouldn't use all the low bank bits
 		char const *const lowbitsfeature(get_feature("banklowbits"));
@@ -110,7 +110,7 @@ protected:
 				message = util::string_format(
 						"Invalid 'banklowbits' value (must be a number from 0 to %u)\n",
 						lowbits);
-				return false;
+				return image_error::BADSOFTWARE;
 			}
 			lowbits = b;
 		}
@@ -119,7 +119,7 @@ protected:
 		set_bank_bits_rom(highbits, lowbits);
 		set_bank_bits_ram(highbits);
 		if (!check_rom(message) || !check_ram(message))
-			return false;
+			return image_error::BADSOFTWARE;
 
 		// everything checked out - install memory and return success
 		m_bank_lines[0] = util::make_bitmask<u16>(lowbits);
@@ -127,7 +127,7 @@ protected:
 		cart_space()->install_view(0xa000, 0xbfff, m_view_ram);
 		install_rom();
 		install_ram(m_view_ram[0]);
-		return true;
+		return std::error_condition();
 	}
 
 	void set_bank_rom_fine(u16 entry)
@@ -168,28 +168,29 @@ private:
 class mbc5_device_base : public rom_mbc_device_base
 {
 public:
-	virtual image_init_result load(std::string &message) override ATTR_COLD
+	virtual std::error_condition load(std::string &message) override ATTR_COLD
 	{
 		// set up ROM and RAM
-		if (!install_memory(message))
-			return image_init_result::FAIL;
+		std::error_condition err = install_memory(message);
+		if (err)
+			return err;
 
 		// install handlers
 		cart_space()->install_write_handler(
 				0x0000, 0x1fff,
-				write8smo_delegate(*this, FUNC(mbc5_device_base::enable_ram)));
+				emu::rw_delegate(*this, FUNC(mbc5_device_base::enable_ram)));
 		cart_space()->install_write_handler(
 				0x2000, 0x2fff,
-				write8smo_delegate(*this, FUNC(mbc5_device_base::bank_switch_fine_low)));
+				emu::rw_delegate(*this, FUNC(mbc5_device_base::bank_switch_fine_low)));
 		cart_space()->install_write_handler(
 				0x3000, 0x3fff,
-				write8smo_delegate(*this, FUNC(mbc5_device_base::bank_switch_fine_high)));
+				emu::rw_delegate(*this, FUNC(mbc5_device_base::bank_switch_fine_high)));
 		cart_space()->install_write_handler(
 				0x4000, 0x5fff,
-				write8smo_delegate(*this, FUNC(mbc5_device_base::bank_switch_coarse)));
+				emu::rw_delegate(*this, FUNC(mbc5_device_base::bank_switch_coarse)));
 
 		// all good
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
 protected:
@@ -208,7 +209,7 @@ protected:
 		set_bank_ram(0);
 	}
 
-	bool install_memory(std::string &message) ATTR_COLD
+	std::error_condition install_memory(std::string &message) ATTR_COLD
 	{
 		return rom_mbc_device_base::install_memory(message, 4, 9);
 	}
@@ -238,20 +239,20 @@ protected:
 class mbc5_logo_spoof_device_base : public mbc5_device_base
 {
 public:
-	virtual image_init_result load(std::string &message) override ATTR_COLD
+	virtual std::error_condition load(std::string &message) override ATTR_COLD
 	{
 		// install regular MBC5 handlers
-		image_init_result const result(mbc5_device_base::load(message));
-		if (image_init_result::PASS != result)
+		std::error_condition const result(mbc5_device_base::load(message));
+		if (result)
 			return result;
 
 		// intercept ROM reads for logo spoofing
 		cart_space()->install_read_handler(
 				0x0000, 0x7fff,
-				read8sm_delegate(*this, FUNC(mbc5_logo_spoof_device_base::read_rom)));
+				emu::rw_delegate(*this, FUNC(mbc5_logo_spoof_device_base::read_rom)));
 
 		// all good
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
 protected:
@@ -404,33 +405,32 @@ private:
 
 class mbc5_scrambled_device_base : public mbc5_logo_spoof_device_base
 {
-
-	virtual image_init_result load(std::string &message) override ATTR_COLD
+	virtual std::error_condition load(std::string &message) override ATTR_COLD
 	{
 		// install regular MBC5 handlers
-		image_init_result const result(mbc5_logo_spoof_device_base::load(message));
-		if (image_init_result::PASS != result)
+		std::error_condition const result(mbc5_logo_spoof_device_base::load(message));
+		if (result)
 			return result;
 
 		// bank numbers and ROM contents are scrambled for protection
 		cart_space()->install_read_handler(
 				0x0000, 0x3fff,
-				read8sm_delegate(*this, FUNC(mbc5_scrambled_device_base::read_rom_low)));
+				emu::rw_delegate(*this, FUNC(mbc5_scrambled_device_base::read_rom_low)));
 		cart_space()->install_read_handler(
 				0x4000, 0x7fff,
-				read8sm_delegate(*this, FUNC(mbc5_scrambled_device_base::read_rom_high)));
+				emu::rw_delegate(*this, FUNC(mbc5_scrambled_device_base::read_rom_high)));
 		cart_space()->install_write_handler(
 				0x2000, 0x2000, 0x0000, 0x0f00, 0x0000,
-				write8smo_delegate(*this, FUNC(mbc5_scrambled_device_base::bank_switch_fine_low_scrambled)));
+				emu::rw_delegate(*this, FUNC(mbc5_scrambled_device_base::bank_switch_fine_low_scrambled)));
 		cart_space()->install_write_handler(
 				0x2001, 0x2001, 0x0000, 0x0f00, 0x0000,
-				write8smo_delegate(*this, FUNC(mbc5_scrambled_device_base::set_data_scramble)));
+				emu::rw_delegate(*this, FUNC(mbc5_scrambled_device_base::set_data_scramble)));
 		cart_space()->install_write_handler(
 				0x2080, 0x2080, 0x0000, 0x0f00, 0x0000,
-				write8smo_delegate(*this, FUNC(mbc5_scrambled_device_base::set_bank_scramble)));
+				emu::rw_delegate(*this, FUNC(mbc5_scrambled_device_base::set_bank_scramble)));
 
 		// all good
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
 protected:
@@ -548,7 +548,7 @@ public:
 	{
 	}
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD
+	virtual std::error_condition load(std::string &message) override ATTR_COLD
 	{
 		// probe for "collection" cartridges wired for 4-bit fine bank number
 		unsigned banklowbits(5U);
@@ -556,25 +556,26 @@ public:
 			banklowbits = 4U;
 
 		// set up ROM and RAM
-		if (!install_memory(message, 2, banklowbits))
-			return image_init_result::FAIL;
+		std::error_condition err = install_memory(message, 2, banklowbits);
+		if (err)
+			return err;
 
 		// install handlers
 		cart_space()->install_write_handler(
 				0x0000, 0x1fff,
-				write8smo_delegate(*this, FUNC(mbc1_device::enable_ram)));
+				emu::rw_delegate(*this, FUNC(mbc1_device::enable_ram)));
 		cart_space()->install_write_handler(
 				0x2000, 0x3fff,
-				write8smo_delegate(*this, FUNC(mbc1_device::bank_switch_fine)));
+				emu::rw_delegate(*this, FUNC(mbc1_device::bank_switch_fine)));
 		cart_space()->install_write_handler(
 				0x4000, 0x5fff,
-				write8smo_delegate(*this, FUNC(mbc1_device::bank_switch_coarse)));
+				emu::rw_delegate(*this, FUNC(mbc1_device::bank_switch_coarse)));
 		cart_space()->install_write_handler(
 				0x6000, 0x7fff,
-				write8smo_delegate(*this, FUNC(mbc1_device::bank_low_mask)));
+				emu::rw_delegate(*this, FUNC(mbc1_device::bank_low_mask)));
 
 		// all good
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
 protected:
@@ -692,7 +693,7 @@ public:
 	{
 	}
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD
+	virtual std::error_condition load(std::string &message) override ATTR_COLD
 	{
 		// check whether rumble motor is present
 		char const *const rumblefeature(get_feature("rumble"));
@@ -712,7 +713,7 @@ public:
 			else
 			{
 				message = "Invalid 'rumble' feature value (must be yes or no)";
-				return image_init_result::FAIL;
+				return image_error::BADSOFTWARE;
 			}
 		}
 		else if (loaded_through_softlist())
@@ -765,8 +766,8 @@ public:
 		}
 
 		// install base MBC5 handlers
-		image_init_result const result(mbc5_device_base::load(message));
-		if (image_init_result::PASS != result)
+		std::error_condition const result(mbc5_device_base::load(message));
+		if (result)
 			return result;
 
 		// install rumble-aware handler if appropriate
@@ -774,11 +775,11 @@ public:
 		{
 			cart_space()->install_write_handler(
 					0x4000, 0x5fff,
-					write8smo_delegate(*this, FUNC(mbc5_device::bank_switch_coarse)));
+					emu::rw_delegate(*this, FUNC(mbc5_device::bank_switch_coarse)));
 		}
 
 		// all good
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
 protected:
@@ -928,32 +929,32 @@ public:
 	{
 	}
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD
+	virtual std::error_condition load(std::string &message) override ATTR_COLD
 	{
 		// install regular MBC5 handlers
-		image_init_result const result(mbc5_logo_spoof_device_base::load(message));
-		if (image_init_result::PASS != result)
+		std::error_condition const result(mbc5_logo_spoof_device_base::load(message));
+		if (result)
 			return result;
 
 		// bank numbers and ROM contents are scrambled for protection
 		cart_space()->install_read_handler(
 				0x0000, 0x3fff,
-				read8sm_delegate(*this, FUNC(sintax_device::read_rom_low)));
+				emu::rw_delegate(*this, FUNC(sintax_device::read_rom_low)));
 		cart_space()->install_read_handler(
 				0x4000, 0x7fff,
-				read8sm_delegate(*this, FUNC(sintax_device::read_rom_high)));
+				emu::rw_delegate(*this, FUNC(sintax_device::read_rom_high)));
 		cart_space()->install_write_handler(
 				0x2000, 0x2fff,
-				write8smo_delegate(*this, FUNC(sintax_device::bank_switch_fine_low_scrambled)));
+				emu::rw_delegate(*this, FUNC(sintax_device::bank_switch_fine_low_scrambled)));
 		cart_space()->install_write_handler(
 				0x5000, 0x5fff,
-				write8smo_delegate(*this, FUNC(sintax_device::set_scramble_mode)));
+				emu::rw_delegate(*this, FUNC(sintax_device::set_scramble_mode)));
 		cart_space()->install_write_handler(
 				0x7000, 0x70ff, 0x0000, 0x0f00, 0x0000,
-				write8sm_delegate(*this, FUNC(sintax_device::set_xor)));
+				emu::rw_delegate(*this, FUNC(sintax_device::set_xor)));
 
 		// all good
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
 protected:
@@ -1159,11 +1160,11 @@ public:
 	{
 	}
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD
+	virtual std::error_condition load(std::string &message) override ATTR_COLD
 	{
 		// install regular MBC5 handlers
-		image_init_result const result(mbc5_logo_spoof_device_base::load(message));
-		if (image_init_result::PASS != result)
+		std::error_condition const result(mbc5_logo_spoof_device_base::load(message));
+		if (result)
 			return result;
 
 		// protection against using a standard MBC5 - actual ignored range uncertain
@@ -1172,7 +1173,7 @@ public:
 		cart_space()->unmap_write(0x2101, 0x2fff);
 
 		// all good
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 };
 
@@ -1191,25 +1192,26 @@ public:
 	{
 	}
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD
+	virtual std::error_condition load(std::string &message) override ATTR_COLD
 	{
 		// TODO: ROM addresses seem to be fully decoded with HK0819 (rather than mirroring)
 
 		// set up ROM and RAM
 		// TODO: how many RAM bank outputs are actually present?
-		if (!install_memory(message, 2, 7))
-			return image_init_result::FAIL;
+		std::error_condition err = install_memory(message, 2, 7);
+		if (err)
+			return err;
 
 		// install handlers
 		cart_space()->install_write_handler(
 				0x0000, 0x1fff,
-				write8smo_delegate(*this, FUNC(ngbchk_device::enable_ram)));
+				emu::rw_delegate(*this, FUNC(ngbchk_device::enable_ram)));
 		cart_space()->install_write_handler(
 				0x2000, 0x3fff,
-				write8smo_delegate(*this, FUNC(ngbchk_device::bank_switch_fine)));
+				emu::rw_delegate(*this, FUNC(ngbchk_device::bank_switch_fine)));
 		cart_space()->install_write_handler(
 				0x4000, 0x5fff,
-				write8smo_delegate(*this, FUNC(ngbchk_device::bank_switch_coarse)));
+				emu::rw_delegate(*this, FUNC(ngbchk_device::bank_switch_coarse)));
 
 		// install protection over the top of high ROM bank
 		cart_space()->install_view(
@@ -1217,11 +1219,11 @@ public:
 				m_view_prot);
 		m_view_prot[0].install_read_handler(
 				0x4000, 0x4fff, 0x0ff0, 0x0000, 0x0000,
-				read8sm_delegate(*this, FUNC(ngbchk_device::protection)));
+				emu::rw_delegate(*this, FUNC(ngbchk_device::protection)));
 		m_view_prot[0].unmap_read(0x5000, 0x7fff);
 
 		// all good
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
 protected:
@@ -1315,7 +1317,7 @@ public:
 	{
 	}
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD
+	virtual std::error_condition load(std::string &message) override ATTR_COLD
 	{
 		// get the command preload value
 		// TODO: add a way to specify this in software lists
@@ -1334,8 +1336,8 @@ public:
 		}
 
 		// install regular MBC5 handlers
-		image_init_result const result(mbc5_logo_spoof_device_base::load(message));
-		if (image_init_result::PASS != result)
+		std::error_condition const result(mbc5_logo_spoof_device_base::load(message));
+		if (result)
 			return result;
 
 		// set up an additional bank for the upper part of the low bank when split
@@ -1356,13 +1358,13 @@ public:
 		// install handlers with protection emulation
 		cart_space()->install_read_handler(
 				0x0000, 0x7fff,
-				read8sm_delegate(*this, FUNC(vf001_device::read_rom)));
+				emu::rw_delegate(*this, FUNC(vf001_device::read_rom)));
 		cart_space()->install_write_handler(
 				0x6000, 0x700f, 0x100f, 0x0000, 0x0000,
-				write8sm_delegate(*this, FUNC(vf001_device::prot_cmd)));
+				emu::rw_delegate(*this, FUNC(vf001_device::prot_cmd)));
 
 		// all good
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
 protected:

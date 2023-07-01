@@ -600,20 +600,11 @@ DEVICE_IMAGE_LOAD_MEMBER( ts2068_state::cart_load )
 
 	if (!image.loaded_through_softlist())
 	{
-		int chunks_in_file = 0;
 		std::vector<uint8_t> header;
 		header.resize(9);
 
 		if (size % 0x2000 != 9)
-		{
-			image.seterror(image_error::INVALIDIMAGE, "File corrupted");
-			return image_init_result::FAIL;
-		}
-		if (!image.loaded_through_softlist())
-		{
-			image.seterror(image_error::UNSUPPORTED, "Loading from softlist is not supported yet");
-			return image_init_result::FAIL;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge data size (must be a multiple of 8K)");
 
 		m_dock->rom_alloc(0x10000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 		u8* DOCK = m_dock->get_rom_base();
@@ -621,13 +612,15 @@ DEVICE_IMAGE_LOAD_MEMBER( ts2068_state::cart_load )
 		// check header
 		image.fread(&header[0], 9);
 
+		int chunks_in_file = 0;
 		for (int i = 0; i < 8; i++)
 			if (header[i + 1] & 0x02) chunks_in_file++;
 
 		if (chunks_in_file * 0x2000 + 0x09 != size)
 		{
-			image.seterror(image_error::INVALIDIMAGE, "File corrupted");
-			return image_init_result::FAIL;
+			return std::make_pair(
+					image_error::INVALIDIMAGE,
+					util::string_format("Chunks in header (%d) do not match data size (%d)", chunks_in_file, (size - 0x09) / 0x2000));
 		}
 
 		switch (header[0])
@@ -650,8 +643,9 @@ DEVICE_IMAGE_LOAD_MEMBER( ts2068_state::cart_load )
 				break;
 
 			default:
-				image.seterror(image_error::INVALIDIMAGE, "Cart type not supported");
-				return image_init_result::FAIL;
+				return std::make_pair(
+						image_error::INVALIDIMAGE,
+						util::string_format("Cartridge type 0x%02X not supported", header[0]));
 		}
 
 		logerror ("Cart loaded [Chunks %02x]\n", m_ram_chunks);
@@ -662,7 +656,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ts2068_state::cart_load )
 		memcpy(m_dock->get_rom_base(), image.get_software_region("rom"), size);
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

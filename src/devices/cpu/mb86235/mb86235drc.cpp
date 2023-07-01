@@ -1718,8 +1718,7 @@ void mb86235_device::generate_xfer2(drcuml_block &block, compiler_state &compile
 	int ary = (opcode >> 4) & 7;
 	int md = opcode & 0xf;
 
-	int disp14 = (opcode >> 7) & 0x3fff;
-	if (disp14 & 0x2000) disp14 |= 0xffffc000;
+	int disp14 = util::sext((opcode >> 7) & 0x3fff, 14);
 
 	if (op == 0)    // MOV2
 	{

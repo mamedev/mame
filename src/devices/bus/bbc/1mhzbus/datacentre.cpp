@@ -276,7 +276,7 @@ void bbc_datacentre_device::jim_w(offs_t offset, uint8_t data)
 	m_ram[((m_page_ram & 0x0fff) << 8) | offset] = data;
 }
 
-WRITE_LINE_MEMBER(bbc_datacentre_device::irq_w)
+void bbc_datacentre_device::irq_w(int state)
 {
 	if (BIT(m_links->read(), 1))
 	{
@@ -309,13 +309,13 @@ INPUT_CHANGED_MEMBER(bbc_datacentre_device::import_nvrest)
 template<int Drive>
 QUICKLOAD_LOAD_MEMBER(bbc_datacentre_device::quickload_cb)
 {
-	/* simulate *IMPORT from USB to RAMFS */
+	// simulate *IMPORT from USB to RAMFS
 	if (image.is_filetype("ssd") || image.is_filetype("img") || image.is_filetype("dsd"))
 	{
-		uint32_t ram_addr = (Drive * 0x40000) | 0x1000;
+		uint32_t const ram_addr = (Drive * 0x40000) | 0x1000;
 		offs_t offset = 0;
 
-		/* import tracks */
+		// import tracks
 		for (int i = 0; i < 80; i++)
 		{
 			image.fread(m_ram.get() + ram_addr + offset, 0xa00);
@@ -328,9 +328,8 @@ QUICKLOAD_LOAD_MEMBER(bbc_datacentre_device::quickload_cb)
 	}
 	else
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid filetype, must be SSD, DSD, or IMG");
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDIMAGE, "Unsupported file type, must be SSD, DSD, or IMG");
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }

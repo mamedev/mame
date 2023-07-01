@@ -214,8 +214,6 @@ dl1416_device::dl1416_device(
 
 void dl1414_device::device_start()
 {
-	m_update_cb.resolve_safe();
-
 	// register for state saving
 	save_item(NAME(m_digit_ram));
 	save_item(NAME(m_cursor_state));
@@ -271,7 +269,7 @@ void dl1414_device::device_reset()
     IMPLEMENTATION
 *****************************************************************************/
 
-WRITE_LINE_MEMBER( dl1414_device::wr_w )
+void dl1414_device::wr_w(int state)
 {
 	if (bool(state) != m_wr_in)
 	{
@@ -281,7 +279,7 @@ WRITE_LINE_MEMBER( dl1414_device::wr_w )
 	}
 }
 
-WRITE_LINE_MEMBER( dl1416_device::wr_w )
+void dl1416_device::wr_w(int state)
 {
 	if (bool(state) != m_wr_in)
 	{
@@ -299,12 +297,12 @@ WRITE_LINE_MEMBER( dl1416_device::wr_w )
 	}
 }
 
-WRITE_LINE_MEMBER( dl1416_device::ce_w )
+void dl1416_device::ce_w(int state)
 {
 	m_ce_in = bool(state);
 }
 
-WRITE_LINE_MEMBER( dl1416_device::cu_w )
+void dl1416_device::cu_w(int state)
 {
 	m_cu_in = bool(state);
 }

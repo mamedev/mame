@@ -6,7 +6,7 @@
 \*********************************/
 
 #include "emu.h"
-#include "arcompactdasm.h"
+#include "arcompactdasm_internal.h"
 
 u32 arcompact_disassembler::opcode_alignment() const
 {
@@ -566,14 +566,14 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // B<cc><.d> s21                   0000 0sss ssss sss0   SSSS SSSS SSNQ QQQQ
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_B_cc_D_s21(stream, pc, op, opcodes); break; // Branch Conditionally
+						size = handle::dasm32_B_cc_D_s21(stream, pc, op, opcodes); break; // Branch Conditionally
 					}
 					case 0x01:
 					{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // B<.d> s25                       0000 0sss ssss sss1   SSSS SSSS SSNR tttt
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_B_D_s25(stream, pc, op, opcodes); break; // Branch Unconditionally Far
+						size = handle::dasm32_B_D_s25(stream, pc, op, opcodes); break; // Branch Unconditionally Far
 					}
 				}
 				break;
@@ -595,14 +595,14 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BL<.cc><.d> s21                 0000 1sss ssss ss00   SSSS SSSS SSNQ QQQQ
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_BL_cc_d_s21(stream, pc, op, opcodes); break; // Branch and Link Conditionally
+								size = handle::dasm32_BL_cc_d_s21(stream, pc, op, opcodes); break; // Branch and Link Conditionally
 							}
 							case 0x01:
 							{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BL<.d> s25                      0000 1sss ssss ss10   SSSS SSSS SSNR tttt
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_BL_d_s25(stream, pc, op, opcodes); break; // Branch and Link Unconditional Far
+								size = handle::dasm32_BL_d_s25(stream, pc, op, opcodes); break; // Branch and Link Unconditional Far
 							}
 						}
 						break;
@@ -626,7 +626,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // BREQ b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0000 (+ Limm)
 // BREQ limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0000 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										size = handle_dasm32_BREQ_reg_reg(stream, pc, op, opcodes); break;  // BREQ (reg-reg)
+										size = handle::dasm32_BREQ_reg_reg(stream, pc, op, opcodes); break;  // BREQ (reg-reg)
 									}
 									case 0x01:
 									{
@@ -635,7 +635,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // BRNE b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0001 (+ Limm)
 // BRNE limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0001 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										size = handle_dasm32_BRNE_reg_reg(stream, pc, op, opcodes); break; // BRNE (reg-reg)
+										size = handle::dasm32_BRNE_reg_reg(stream, pc, op, opcodes); break; // BRNE (reg-reg)
 									}
 									case 0x02:
 									{
@@ -644,7 +644,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // BRLT b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0010 (+ Limm)
 // BRLT limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0010 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										size = handle_dasm32_BRLT_reg_reg(stream, pc, op, opcodes); break;  // BRLT (reg-reg)
+										size = handle::dasm32_BRLT_reg_reg(stream, pc, op, opcodes); break;  // BRLT (reg-reg)
 									}
 									case 0x03:
 									{
@@ -653,7 +653,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // BRGE b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0011 (+ Limm)
 // BRGE limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0011 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										size = handle_dasm32_BRGE_reg_reg(stream, pc, op, opcodes); break; // BRGE (reg-reg)
+										size = handle::dasm32_BRGE_reg_reg(stream, pc, op, opcodes); break; // BRGE (reg-reg)
 									}
 									case 0x04:
 									{
@@ -662,7 +662,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // BRLO b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0100 (+ Limm)
 // BRLO limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0100 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										size = handle_dasm32_BRLO_reg_reg(stream, pc, op, opcodes); break; // BRLO (reg-reg)
+										size = handle::dasm32_BRLO_reg_reg(stream, pc, op, opcodes); break; // BRLO (reg-reg)
 									}
 									case 0x05:
 									{
@@ -671,26 +671,26 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // BRHS limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0101 (+ Limm)
 // BRHS<.d> b,c,s9                 0000 1bbb ssss sss1   SBBB CCCC CCN0 0101
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										size = handle_dasm32_BRHS_reg_reg(stream, pc, op, opcodes); break; // BRHS (reg-reg)
+										size = handle::dasm32_BRHS_reg_reg(stream, pc, op, opcodes); break; // BRHS (reg-reg)
 									}
 									case 0x0e:
 									{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BBIT0<.d> b,c,s9                0000 1bbb ssss sss1   SBBB CCCC CCN0 1110
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										size = handle_dasm32_BBIT0_reg_reg(stream, pc, op, opcodes); break; // BBIT0 (reg-reg)
+										size = handle::dasm32_BBIT0_reg_reg(stream, pc, op, opcodes); break; // BBIT0 (reg-reg)
 									}
 									case 0x0f:
 									{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BBIT1<.d> b,c,s9                0000 1bbb ssss sss1   SBBB CCCC CCN0 1111
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										size = handle_dasm32_BBIT1_reg_reg(stream, pc, op, opcodes); break;  // BBIT1 (reg-reg)
+										size = handle::dasm32_BBIT1_reg_reg(stream, pc, op, opcodes); break;  // BBIT1 (reg-reg)
 									}
 									default:
 									{
 										// 0x06 - 0x0d
-										size = handle_dasm_reserved(stream, pc, instruction, subinstr, subinstr2, subinstr3, op, opcodes); break;  // reserved
+										size = handle::dasm_reserved(stream, pc, instruction, subinstr, subinstr2, subinstr3, op, opcodes); break;  // reserved
 									}
 								}
 								break;
@@ -705,61 +705,61 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BREQ<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0000
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										size = handle_dasm32_BREQ_reg_imm(stream, pc, op, opcodes); break; // BREQ (reg-imm)
+										size = handle::dasm32_BREQ_reg_imm(stream, pc, op, opcodes); break; // BREQ (reg-imm)
 									}
 									case 0x01:
 									{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BRNE<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0001
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										size = handle_dasm32_BRNE_reg_imm(stream, pc, op, opcodes); break; // BRNE (reg-imm)
+										size = handle::dasm32_BRNE_reg_imm(stream, pc, op, opcodes); break; // BRNE (reg-imm)
 									}
 									case 0x02:
 									{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BRLT<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0010
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										size = handle_dasm32_BRLT_reg_imm(stream, pc, op, opcodes); break;  // BRLT (reg-imm)
+										size = handle::dasm32_BRLT_reg_imm(stream, pc, op, opcodes); break;  // BRLT (reg-imm)
 									}
 									case 0x03:
 									{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BRGE<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0011
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										size = handle_dasm32_BRGE_reg_imm(stream, pc, op, opcodes); break;  // BRGE (reg-imm)
+										size = handle::dasm32_BRGE_reg_imm(stream, pc, op, opcodes); break;  // BRGE (reg-imm)
 									}
 									case 0x04:
 									{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BRLO<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0100
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										size = handle_dasm32_BRLO_reg_imm(stream, pc, op, opcodes); break; // BRLO (reg-imm)
+										size = handle::dasm32_BRLO_reg_imm(stream, pc, op, opcodes); break; // BRLO (reg-imm)
 									}
 									case 0x05:
 									{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BRHS<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0101
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										size = handle_dasm32_BRHS_reg_imm(stream, pc, op, opcodes); break; // BRHS (reg-imm)
+										size = handle::dasm32_BRHS_reg_imm(stream, pc, op, opcodes); break; // BRHS (reg-imm)
 									}
 									case 0x0e:
 									{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BBIT0<.d> b,u6,s9               0000 1bbb ssss sss1   SBBB uuuu uuN1 1110
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										size = handle_dasm32_BBIT0_reg_imm(stream, pc, op, opcodes); break; // BBIT0 (reg-imm)
+										size = handle::dasm32_BBIT0_reg_imm(stream, pc, op, opcodes); break; // BBIT0 (reg-imm)
 									}
 									case 0x0f:
 									{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BBIT1<.d> b,u6,s9               0000 1bbb ssss sss1   SBBB uuuu uuN1 1111
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										size = handle_dasm32_BBIT1_reg_imm(stream, pc, op, opcodes); break; // BBIT1 (reg-imm)
+										size = handle::dasm32_BBIT1_reg_imm(stream, pc, op, opcodes); break; // BBIT1 (reg-imm)
 									}
 									default:
 									{
 										// 0x06 - 0x0d
-										size = handle_dasm_reserved(stream, pc, instruction, subinstr, subinstr2, subinstr3, op, opcodes); break;  // reserved
+										size = handle::dasm_reserved(stream, pc, instruction, subinstr, subinstr2, subinstr3, op, opcodes); break;  // reserved
 									}
 								}
 							}
@@ -784,7 +784,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // 40020310: 1404 3410
 // LD.AB r16 <- [r28_SP, 004]      0001 0100 0000 0100   0011 0100 0001 0000
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-				size = handle_dasm32_LD_r_o(stream, pc, op, opcodes); break; // LD r+o
+				size = handle::dasm32_LD_r_o(stream, pc, op, opcodes); break; // LD r+o
 			}
 			case 0x03:
 			{
@@ -798,7 +798,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // 400202A6: 1CFC B408
 // ST.AW [r28_SP, 1fc] <- r16      0001 1100 1111 1100   1011 0100 0000 1000
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-				size = handle_dasm32_ST_r_o(stream, pc, op, opcodes); break; // ST r+o
+				size = handle::dasm32_ST_r_o(stream, pc, op, opcodes); break; // ST r+o
 			}
 			case 0x04: // op a,b,c (basecase)
 			{
@@ -838,7 +838,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //
 //
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_ADD(stream, pc, op, opcodes); break; // ADD
+						size = handle::dasm32_ADD(stream, pc, op, opcodes); break; // ADD
 					}
 					case 0x01:
 					{
@@ -857,7 +857,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // ADC<.f> 0,b,limm                0010 0bbb 0000 0001   FBBB 1111 1011 1110 (+ Limm)
 // ADC<.cc><.f> 0,limm,c           0010 0110 1100 0001   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_ADC(stream, pc, op, opcodes); break; // ADC
+						size = handle::dasm32_ADC(stream, pc, op, opcodes); break; // ADC
 					}
 					case 0x02:
 					{
@@ -876,7 +876,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // SUB <.f> 0,b,limm               0010 0bbb 0000 0010   FBBB 1111 1011 1110 (+ Limm)
 // SUB <.cc><.f> 0,limm,c          0010 0110 1100 0010   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_SUB(stream, pc, op, opcodes); break; // SUB
+						size = handle::dasm32_SUB(stream, pc, op, opcodes); break; // SUB
 					}
 					case 0x03:
 					{
@@ -895,7 +895,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // SBC<.f> 0,b,limm                0010 0bbb 0000 0011   FBBB 1111 1011 1110 (+ Limm)
 // SBC<.cc><.f> 0,limm,c           0010 0110 1100 0011   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_SBC(stream, pc, op, opcodes); break; // SBC
+						size = handle::dasm32_SBC(stream, pc, op, opcodes); break; // SBC
 					}
 					case 0x04:
 					{
@@ -914,7 +914,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // AND<.f> 0,b,limm                0010 0bbb 0000 0100   FBBB 1111 1011 1110 (+ Limm)
 // AND<.cc><.f> 0,limm,c           0010 0110 1100 0100   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_AND(stream, pc, op, opcodes); break; // AND
+						size = handle::dasm32_AND(stream, pc, op, opcodes); break; // AND
 					}
 					case 0x05:
 					{
@@ -933,7 +933,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // OR<.f> 0,b,limm                 0010 0bbb 0000 0101   FBBB 1111 1011 1110 (+ Limm)
 // OR<.cc><.f> 0,limm,c            0010 0110 1100 010  1 F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_OR(stream, pc, op, opcodes); break; // OR
+						size = handle::dasm32_OR(stream, pc, op, opcodes); break; // OR
 					}
 					case 0x06:
 					{
@@ -953,7 +953,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // BIC<.f> 0,b,limm                0010 0bbb 0000 0110   FBBB 1111 1011 1110 (+ Limm)
 // BIC<.cc><.f> 0,limm,c           0010 0110 1100 0110   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_BIC(stream, pc, op, opcodes); break; // BIC
+						size = handle::dasm32_BIC(stream, pc, op, opcodes); break; // BIC
 					}
 					case 0x07:
 					{
@@ -973,7 +973,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // XOR<.f> 0,b,limm                0010 0bbb 0000 0111   FBBB 1111 1011 1110 (+ Limm)
 // XOR<.cc><.f> 0,limm,c           0010 0110 1100 0111   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_XOR(stream, pc, op, opcodes); break; // XOR
+						size = handle::dasm32_XOR(stream, pc, op, opcodes); break; // XOR
 					}
 					case 0x08:
 					{
@@ -993,7 +993,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // MAX<.f> 0,b,limm                0010 0bbb 0000 1000   FBBB 1111 1011 1110 (+ Limm)
 // MAX<.cc><.f> 0,limm,c           0010 0110 1100 1000   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_MAX(stream, pc, op, opcodes); break; // MAX
+						size = handle::dasm32_MAX(stream, pc, op, opcodes); break; // MAX
 					}
 					case 0x09:
 					{
@@ -1013,7 +1013,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // MIN<.f> 0,b,limm                0010 0bbb 0000 1001   FBBB 1111 1011 1110 (+ Limm)
 // MIN<.cc><.f> 0,limm,c           0010 0110 1100 1001   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_MIN(stream, pc, op, opcodes); break; // MIN
+						size = handle::dasm32_MIN(stream, pc, op, opcodes); break; // MIN
 					}
 					case 0x0a:
 					{
@@ -1032,7 +1032,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //
 // NOP                             0010 0110 0100 1010   0111 0000 0000 0000 (NOP is a custom encoded MOV where b is 'LIMM')
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_MOV(stream, pc, op, opcodes); break; // MOV
+						size = handle::dasm32_MOV(stream, pc, op, opcodes); break; // MOV
 					}
 					case 0x0b:
 					{
@@ -1044,7 +1044,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // TST<.cc> b,limm                 0010 0bbb 1100 1011   1BBB 1111 100Q QQQQ (+ Limm)
 // TST<.cc> limm,c                 0010 0110 1100 1011   1111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_TST(stream, pc, op, opcodes); break; // TST
+						size = handle::dasm32_TST(stream, pc, op, opcodes); break; // TST
 					}
 					case 0x0c:
 					{
@@ -1056,7 +1056,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // CMP<.cc> b,limm                 0010 0bbb 1100 1100   1BBB 1111 100Q QQQQ (+ Limm)
 // CMP<.cc> limm,c                 0010 0110 1100 1100   1111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_CMP(stream, pc, op, opcodes); break; // CMP
+						size = handle::dasm32_CMP(stream, pc, op, opcodes); break; // CMP
 					}
 					case 0x0d:
 					{
@@ -1067,7 +1067,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // RCMP<.cc> b,limm                0010 0bbb 1100 1101   1BBB 1111 100Q QQQQ (+ Limm)
 // RCMP<.cc> limm,c                0010 0110 1100 1101   1111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_RCMP(stream, pc, op, opcodes); break; // RCMP
+						size = handle::dasm32_RCMP(stream, pc, op, opcodes); break; // RCMP
 					}
 					case 0x0e:
 					{
@@ -1092,7 +1092,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //
 //                                 IIII I      SS SSSS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_RSUB(stream, pc, op, opcodes); break; // RSUB
+						size = handle::dasm32_RSUB(stream, pc, op, opcodes); break; // RSUB
 					}
 					case 0x0f:
 					{
@@ -1107,7 +1107,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // BSET<.f> 0,b,u6                 0010 0bbb 0100 1111   FBBB uuuu uu11 1110
 // BSET<.cc><.f> 0,limm,c          0010 0110 1100 1111   F110 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_BSET(stream, pc, op, opcodes); break; // BSET
+						size = handle::dasm32_BSET(stream, pc, op, opcodes); break; // BSET
 					}
 					case 0x10:
 					{
@@ -1122,7 +1122,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // BCLR<.f> 0,b,u6                 0010 0bbb 0101 0000   FBBB uuuu uu11 1110
 // BCLR<.cc><.f> 0,limm,c          0010 0110 1101 0000   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_BCLR(stream, pc, op, opcodes); break; // BCLR
+						size = handle::dasm32_BCLR(stream, pc, op, opcodes); break; // BCLR
 					}
 					case 0x11:
 					{
@@ -1131,7 +1131,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // BTST<.cc> b,u6                  0010 0bbb 1101 0001   1BBB uuuu uu1Q QQQQ
 // BTST<.cc> limm,c                0010 0110 1101 0001   1111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_BTST(stream, pc, op, opcodes); break; // BTST
+						size = handle::dasm32_BTST(stream, pc, op, opcodes); break; // BTST
 					}
 					case 0x12:
 					{
@@ -1146,7 +1146,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // BXOR<.f> 0,b,u6                 0010 0bbb 0101 0010   FBBB uuuu uu11 1110
 // BXOR<.cc><.f> 0,limm,c          0010 0110 1101 0010   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_BXOR(stream, pc, op, opcodes); break; // BXOR
+						size = handle::dasm32_BXOR(stream, pc, op, opcodes); break; // BXOR
 					}
 					case 0x13:
 					{
@@ -1161,7 +1161,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // BMSK<.f> 0,b,u6                 0010 0bbb 0101 0011   FBBB uuuu uu11 1110
 // BMSK<.cc><.f> 0,limm,c          0010 0110 1101 0011   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_BMSK(stream, pc, op, opcodes); break; // BMSK
+						size = handle::dasm32_BMSK(stream, pc, op, opcodes); break; // BMSK
 					}
 					case 0x14:
 					{
@@ -1181,7 +1181,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // ADD1<.f> 0,b,limm               0010 0bbb 0001 0100   FBBB 1111 1011 1110 (+ Limm)
 // ADD1<.cc><.f> 0,limm,c          0010 0110 1101 0100   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_ADD1(stream, pc, op, opcodes); break; // ADD1
+						size = handle::dasm32_ADD1(stream, pc, op, opcodes); break; // ADD1
 					}
 					case 0x15:
 					{
@@ -1201,7 +1201,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // ADD2<.f> 0,b,limm               0010 0bbb 0001 0101   FBBB 1111 1011 1110 (+ Limm)
 // ADD2<.cc><.f> 0,limm,c          0010 0110 1101 0101   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_ADD2(stream, pc, op, opcodes); break; // ADD2
+						size = handle::dasm32_ADD2(stream, pc, op, opcodes); break; // ADD2
 					}
 					case 0x16:
 					{
@@ -1221,7 +1221,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // ADD3<.f> 0,b,limm               0010 0bbb 0001 0110   FBBB 1111 1011 1110 (+ Limm)
 // ADD3<.cc><.f> 0,limm,c          0010 0110 1101 0110   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_ADD3(stream, pc, op, opcodes); break; // ADD3
+						size = handle::dasm32_ADD3(stream, pc, op, opcodes); break; // ADD3
 					}
 					case 0x17:
 					{
@@ -1241,7 +1241,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // SUB1<.f> 0,b,limm               0010 0bbb 0001 0111   FBBB 1111 1011 1110 (+ Limm)
 // SUB1<.cc><.f> 0,limm,c          0010 0110 1101 0111   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_SUB1(stream, pc, op, opcodes); break; // SUB1
+						size = handle::dasm32_SUB1(stream, pc, op, opcodes); break; // SUB1
 					}
 					case 0x18:
 					{
@@ -1261,7 +1261,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // SUB2<.f> 0,b,limm               0010 0bbb 0001 1000   FBBB 1111 1011 1110 (+ Limm)
 // SUB2<.cc><.f> 0,limm,c          0010 0110 1101 1000   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_SUB2(stream, pc, op, opcodes); break; // SUB2
+						size = handle::dasm32_SUB2(stream, pc, op, opcodes); break; // SUB2
 					}
 					case 0x19:
 					{
@@ -1281,7 +1281,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // SUB3<.f> 0,limm,c               0010 0110 0001 1001   F111 CCCC CC11 1110 (+ Limm)
 // SUB3<.cc><.f> 0,limm,c          0010 0110 1101 1001   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_SUB3(stream, pc, op, opcodes); break; // SUB3
+						size = handle::dasm32_SUB3(stream, pc, op, opcodes); break; // SUB3
 					}
 					case 0x1a:
 					{
@@ -1300,7 +1300,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // MPY<.f> 0,b,u6                  0010 0bbb 0101 1010   FBBB uuuu uu11 1110
 // MPY<.cc><.f> 0,limm,c           0010 0110 1101 1010   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_MPY(stream, pc, op, opcodes); break; // MPY *
+						size = handle::dasm32_MPY(stream, pc, op, opcodes); break; // MPY *
 					}
 					case 0x1b:
 					{
@@ -1319,7 +1319,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // MPYH<.f> 0,b,u6                 0010 0bbb 0101 1011   FBBB uuuu uu11 1110
 // MPYH<.cc><.f> 0,limm,c          0010 0110 1101 1011   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_MPYH(stream, pc, op, opcodes); break; // MPYH *
+						size = handle::dasm32_MPYH(stream, pc, op, opcodes); break; // MPYH *
 					}
 					case 0x1c:
 					{
@@ -1338,7 +1338,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // MPYHU<.f> 0,b,u6                0010 0bbb 0101 1100   FBBB uuuu uu11 1110
 // MPYHU<.cc><.f> 0,limm,c         0010 0110 1101 1100   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_MPYHU(stream, pc, op, opcodes); break; // MPYHU *
+						size = handle::dasm32_MPYHU(stream, pc, op, opcodes); break; // MPYHU *
 					}
 					case 0x1d:
 					{
@@ -1356,7 +1356,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // MPYU<.f> 0,b,u6                 0010 0bbb 0101 1101   FBBB uuuu uu11 1110
 // MPYU<.cc><.f> 0,limm,c          0010 0110 1101 1101   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_MPYU(stream, pc, op, opcodes); break; // MPYU *
+						size = handle::dasm32_MPYU(stream, pc, op, opcodes); break; // MPYU *
 					}
 					case 0x20:
 					{
@@ -1375,7 +1375,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // J u6                            0010 0RRR 0110 0000   0RRR uuuu uuRR RRRR
 // J s12                           0010 0RRR 1010 0000   0RRR ssss ssSS SSSS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_Jcc(stream, pc, op, opcodes); break; // Jcc
+						size = handle::dasm32_Jcc(stream, pc, op, opcodes); break; // Jcc
 					}
 					case 0x21:
 					{
@@ -1390,7 +1390,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // J.D s12                         0010 0RRR 1010 0001   0RRR ssss ssSS SSSS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-						size = handle_dasm32_Jcc_D(stream, pc, op, opcodes); break; // Jcc.D
+						size = handle::dasm32_Jcc_D(stream, pc, op, opcodes); break; // Jcc.D
 					}
 					case 0x22:
 					{
@@ -1404,7 +1404,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // JL u6                           0010 0RRR 0110 0010   0RRR uuuu uuRR RRRR
 // JL s12                          0010 0RRR 1010 0010   0RRR ssss ssSS SSSS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_JLcc(stream, pc, op, opcodes); break; // JLcc
+						size = handle::dasm32_JLcc(stream, pc, op, opcodes); break; // JLcc
 					}
 					case 0x23:
 					{
@@ -1416,7 +1416,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // JL.D u6                         0010 0RRR 0110 0011   0RRR uuuu uuRR RRRR
 // JL.D s12                        0010 0RRR 1010 0011   0RRR ssss ssSS SSSS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_JLcc_D(stream, pc, op, opcodes); break; // JLcc.D
+						size = handle::dasm32_JLcc_D(stream, pc, op, opcodes); break; // JLcc.D
 					}
 					case 0x28:
 					{
@@ -1425,7 +1425,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // LP<cc> u7                       0010 0RRR 1110 1000   0RRR uuuu uu1Q QQQQ
 // LP s13                          0010 0RRR 1010 1000   0RRR ssss ssSS SSSS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_LP(stream, pc, op, opcodes); break; // LPcc
+						size = handle::dasm32_LP(stream, pc, op, opcodes); break; // LPcc
 					}
 					case 0x29:
 					{
@@ -1453,7 +1453,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // FLAG<.cc> u6                    0010 0rrr 1110 1001   0RRR uuuu uu1Q QQQQ
 //
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_FLAG(stream, pc, op, opcodes); break; // FLAG
+						size = handle::dasm32_FLAG(stream, pc, op, opcodes); break; // FLAG
 					}
 					case 0x2a:
 					{
@@ -1464,7 +1464,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // LR b,[u6]                       0010 0bbb 0110 1010   0BBB uuuu uu00 0000
 // LR b,[s12]                      0010 0bbb 1010 1010   0BBB ssss ssSS SSSS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_LR(stream, pc, op, opcodes); break; // LR
+						size = handle::dasm32_LR(stream, pc, op, opcodes); break; // LR
 					}
 					case 0x2b:
 					{
@@ -1478,7 +1478,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // SR limm,[u6]                    0010 0110 0110 1011   0111 uuuu uu00 0000
 // SR limm,[s12]                   0010 0110 1010 1011   0111 ssss ssSS SSSS (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_SR(stream, pc, op, opcodes); break; // SR
+						size = handle::dasm32_SR(stream, pc, op, opcodes); break; // SR
 					}
 					case 0x2f: // Sub Opcode
 					{
@@ -1497,7 +1497,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // ASL<.f> 0,u6                    0010 0110 0110 1111   F111 uuuu uu00 0000
 // ASL<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 0000 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_ASL_single(stream, pc, op, opcodes); break; // ASL
+								size = handle::dasm32_ASL_single(stream, pc, op, opcodes); break; // ASL
 							}
 							case 0x01:
 							{
@@ -1511,7 +1511,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // ASR<.f> 0,u6                    0010 0110 0110 1111   F111 uuuu uu00 0001
 // ASR<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 0001 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_ASR_single(stream, pc, op, opcodes); break; // ASR
+								size = handle::dasm32_ASR_single(stream, pc, op, opcodes); break; // ASR
 							}
 							case 0x02:
 							{
@@ -1525,7 +1525,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // LSR<.f> 0,u6                    0010 0110 0110 1111   F111 uuuu uu00 0010
 // LSR<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 0010 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_LSR_single(stream, pc, op, opcodes); break; // LSR
+								size = handle::dasm32_LSR_single(stream, pc, op, opcodes); break; // LSR
 							}
 							case 0x03:
 							{
@@ -1539,7 +1539,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // ROR<.f> 0,u6                    0010 0110 0110 1111   F111 uuuu uu00 0011
 // ROR<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 0011 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_ROR_single(stream, pc, op, opcodes); break; // ROR
+								size = handle::dasm32_ROR_single(stream, pc, op, opcodes); break; // ROR
 							}
 							case 0x04:
 							{
@@ -1553,7 +1553,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // RRC<.f> 0,u6                    0010 0110 0110 1111   F111 uuuu uu00 0100
 // RRC<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 0100 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_RRC(stream, pc, op, opcodes); break; // RCC
+								size = handle::dasm32_RRC(stream, pc, op, opcodes); break; // RCC
 							}
 							case 0x05:
 							{
@@ -1567,7 +1567,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // SEXB<.f> 0,u6                   0010 0110 0110 1111   F111 uuuu uu00 0101
 // SEXB<.f> 0,limm                 0010 0110 0010 1111   F111 1111 1000 0101 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_SEXB(stream, pc, op, opcodes); break; // SEXB
+								size = handle::dasm32_SEXB(stream, pc, op, opcodes); break; // SEXB
 							}
 							case 0x06:
 							{
@@ -1581,7 +1581,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // SEXW<.f> 0,u6                   0010 0110 0110 1111   F111 uuuu uu00 0110
 // SEXW<.f> 0,limm                 0010 0110 0010 1111   F111 1111 1000 0110 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_SEXW(stream, pc, op, opcodes); break; // SEXW
+								size = handle::dasm32_SEXW(stream, pc, op, opcodes); break; // SEXW
 							}
 							case 0x07:
 							{
@@ -1595,7 +1595,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // EXTB<.f> 0,u6                   0010 0110 0110 1111   F111 uuuu uu00 0111
 // EXTB<.f> 0,limm                 0010 0110 0010 1111   F111 1111 1000 0111 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_EXTB(stream, pc, op, opcodes); break; // EXTB
+								size = handle::dasm32_EXTB(stream, pc, op, opcodes); break; // EXTB
 							}
 							case 0x08:
 							{
@@ -1609,7 +1609,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // EXTW<.f> 0,u6                   0010 0110 0110 1111   F111 uuuu uu00 1000
 // EXTW<.f> 0,limm                 0010 0110 0010 1111   F111 1111 1000 1000 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_EXTW(stream, pc, op, opcodes); break; // EXTW
+								size = handle::dasm32_EXTW(stream, pc, op, opcodes); break; // EXTW
 							}
 							case 0x09:
 							{
@@ -1623,7 +1623,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // ABS<.f> 0,u6                    0010 0110 0110 1111   F111 uuuu uu00 1001
 // ABS<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 1001 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_ABS(stream, pc, op, opcodes); break; // ABS
+								size = handle::dasm32_ABS(stream, pc, op, opcodes); break; // ABS
 							}
 							case 0x0a:
 							{
@@ -1638,7 +1638,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // NOT<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 1010 (+ Limm)
 //
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_NOT(stream, pc, op, opcodes); break; // NOT
+								size = handle::dasm32_NOT(stream, pc, op, opcodes); break; // NOT
 							}
 							case 0x0b:
 							{
@@ -1652,7 +1652,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // RLC<.f> 0,u6                    0010 0110 0110 1111   F111 uuuu uu00 1011
 // RLC<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 1011 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_RLC(stream, pc, op, opcodes); break; // RLC
+								size = handle::dasm32_RLC(stream, pc, op, opcodes); break; // RLC
 							}
 							case 0x0c:
 							{
@@ -1662,7 +1662,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // EX<.di> b,[u6]                  0010 0bbb 0110 1111   DBBB uuuu uu00 1100
 // EX<.di> b,[limm]                0010 0bbb 0010 1111   DBBB 1111 1000 1100 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_EX(stream, pc, op, opcodes); break; // EX
+								size = handle::dasm32_EX(stream, pc, op, opcodes); break; // EX
 							}
 							case 0x3f: // ZOPs (Zero Operand Opcodes)
 							{
@@ -1678,7 +1678,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // SLEEP <u6>                      0010 0001 0110 1111   0000 uuuu uu11 1111
 // SLEEP c                         0010 0001 0010 1111   0000 CCCC CC11 1111
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										size = handle_dasm32_SLEEP(stream, pc, op, opcodes); break; // SLEEP
+										size = handle::dasm32_SLEEP(stream, pc, op, opcodes); break; // SLEEP
 									}
 									case 0x02:
 									{
@@ -1686,7 +1686,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I$$$   SS SSSS    $$$        ss ssss
 // SWI/TRAP0                       0010 0010 0110 1111   0000 0000 0011 1111
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										size = handle_dasm32_SWI(stream, pc, op, opcodes); break; // SWI / TRAP9
+										size = handle::dasm32_SWI(stream, pc, op, opcodes); break; // SWI / TRAP9
 									}
 									case 0x03:
 									{
@@ -1694,7 +1694,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I$$$   SS SSSS    $$$        ss ssss
 // SYNC                            0010 0011 0110 1111   0000 0000 0011 1111
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										size = handle_dasm32_SYNC(stream, pc, op, opcodes); break; // SYNC
+										size = handle::dasm32_SYNC(stream, pc, op, opcodes); break; // SYNC
 									}
 									case 0x04:
 									{
@@ -1702,7 +1702,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I$$$   SS SSSS    $$$        ss ssss
 // RTIE                            0010 0100 0110 1111   0000 0000 0011 1111
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										size = handle_dasm32_RTIE(stream, pc, op, opcodes); break; // RTIE
+										size = handle::dasm32_RTIE(stream, pc, op, opcodes); break; // RTIE
 									}
 									case 0x05:
 									{
@@ -1710,13 +1710,13 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I$$$   SS SSSS    $$$        ss ssss
 // BRK                             0010 0101 0110 1111   0000 0000 0011 1111
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										size = handle_dasm32_BRK(stream, pc, op, opcodes); break; // BRK
+										size = handle::dasm32_BRK(stream, pc, op, opcodes); break; // BRK
 									}
 
 									default:
 									{
 										// 0x00, 0x06-0x3f
-										size = handle_dasm_illegal(stream, pc, instruction, subinstr, subinstr2, subinstr3, op, opcodes); break;  // illegal
+										size = handle::dasm_illegal(stream, pc, instruction, subinstr, subinstr2, subinstr3, op, opcodes); break;  // illegal
 									}
 								}
 								break;
@@ -1724,7 +1724,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 							default:
 							{
 								// 0x0d - 0x3e
-								size = handle_dasm_illegal(stream, pc, instruction, subinstr, subinstr2, op, opcodes); break;  // illegal
+								size = handle::dasm_illegal(stream, pc, instruction, subinstr, subinstr2, op, opcodes); break;  // illegal
 							}
 						}
 						break;
@@ -1745,17 +1745,17 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // LD<zz><.x><.di> 0,[limm,c]      0010 0110 RR11 0ZZX   D111 CCCC CC11 1110 (+ Limm) (b is 62)
 // PREFETCH [limm,c]               0010 0110 RR11 0000   0111 CCCC CC11 1110 (+ Limm) (b is 62) (ZZXD is 0) (prefetch is an alias)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-					case 0x30: size = handle_dasm32_LD_0(stream, pc, op, opcodes); break; // LD r-r
-					case 0x31: size = handle_dasm32_LD_1(stream, pc, op, opcodes); break; // LD r-r
-					case 0x32: size = handle_dasm32_LD_2(stream, pc, op, opcodes); break; // LD r-r
-					case 0x33: size = handle_dasm32_LD_3(stream, pc, op, opcodes); break; // LD r-r
-					case 0x34: size = handle_dasm32_LD_4(stream, pc, op, opcodes); break; // LD r-r
-					case 0x35: size = handle_dasm32_LD_5(stream, pc, op, opcodes); break; // LD r-r
-					case 0x36: size = handle_dasm32_LD_6(stream, pc, op, opcodes); break; // LD r-r
-					case 0x37: size = handle_dasm32_LD_7(stream, pc, op, opcodes); break; // LD r-r
+					case 0x30: size = handle::dasm32_LD_0(stream, pc, op, opcodes); break; // LD r-r
+					case 0x31: size = handle::dasm32_LD_1(stream, pc, op, opcodes); break; // LD r-r
+					case 0x32: size = handle::dasm32_LD_2(stream, pc, op, opcodes); break; // LD r-r
+					case 0x33: size = handle::dasm32_LD_3(stream, pc, op, opcodes); break; // LD r-r
+					case 0x34: size = handle::dasm32_LD_4(stream, pc, op, opcodes); break; // LD r-r
+					case 0x35: size = handle::dasm32_LD_5(stream, pc, op, opcodes); break; // LD r-r
+					case 0x36: size = handle::dasm32_LD_6(stream, pc, op, opcodes); break; // LD r-r
+					case 0x37: size = handle::dasm32_LD_7(stream, pc, op, opcodes); break; // LD r-r
 					default:
 					{
-						size = handle_dasm_illegal(stream, pc, instruction, subinstr, op, opcodes); break;  // illegal
+						size = handle::dasm_illegal(stream, pc, instruction, subinstr, op, opcodes); break;  // illegal
 					}
 				}
 				break;
@@ -1783,7 +1783,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // ASL<.f> 0,b,u6                  0010 1bbb 0100 0000   FBBB uuuu uu11 1110
 // ASL<.cc><.f> 0,limm,c           0010 1110 1100 0000   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_ASL_multiple(stream, pc, op, opcodes); break; // ASL
+						size = handle::dasm32_ASL_multiple(stream, pc, op, opcodes); break; // ASL
 					}
 					case 0x01:
 					{
@@ -1801,7 +1801,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // LSR<.f> 0,b,u6                  0010 1bbb 0100 0001   FBBB uuuu uu11 1110
 // LSR<.cc><.f> 0,limm,c           0010 1110 1100 0001   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_LSR_multiple(stream, pc, op, opcodes); break; // LSR
+						size = handle::dasm32_LSR_multiple(stream, pc, op, opcodes); break; // LSR
 					}
 					case 0x02:
 					{
@@ -1819,7 +1819,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // ASR<.f> 0,b,u6                  0010 1bbb 0100 0010   FBBB uuuu uu11 1110
 // ASR<.cc><.f> 0,limm,c           0010 1110 1100 0010   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_ASR_multiple(stream, pc, op, opcodes); break; // ASR
+						size = handle::dasm32_ASR_multiple(stream, pc, op, opcodes); break; // ASR
 					}
 					case 0x03:
 					{
@@ -1837,7 +1837,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // ROR<.f> 0,b,u6                  0010 1bbb 0100 0011   FBBB uuuu uu11 1110
 // ROR<.cc><.f> 0,limm,c           0010 1110 1100 0011   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_ROR_multiple(stream, pc, op, opcodes); break; // ROR
+						size = handle::dasm32_ROR_multiple(stream, pc, op, opcodes); break; // ROR
 					}
 					case 0x04:
 					{
@@ -1852,7 +1852,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // MUL64<.cc> <0,>limm,c           0010 1110 1100 0100   0111 CCCC CC0Q QQQQ (+ Limm)
 // MUL64<.cc> <0,>b,limm           0010 1bbb 1100 0100   0BBB 1111 100Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_MUL64(stream, pc, op, opcodes); break; // MUL64
+						size = handle::dasm32_MUL64(stream, pc, op, opcodes); break; // MUL64
 					}
 					case 0x05:
 					{
@@ -1867,7 +1867,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // MULU64<.cc> <0,>limm,c          0010 1110 1100 0101   0111 CCCC CC0Q QQQQ (+ Limm)
 // MULU64<.cc> <0,>b,limm          0010 1bbb 1100 0101   0BBB 1111 100Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_MULU64(stream, pc, op, opcodes); break; // MULU64
+						size = handle::dasm32_MULU64(stream, pc, op, opcodes); break; // MULU64
 					}
 					case 0x06:
 					{
@@ -1886,7 +1886,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // ADDS<.f> 0,b,limm               0010 1bbb 0000 0110   FBBB 1111 1011 1110 (+ Limm)
 // ADDS<.cc><.f> 0,limm,c          0010 1110 1100 0110   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_ADDS(stream, pc, op, opcodes); break; // ADDS
+						size = handle::dasm32_ADDS(stream, pc, op, opcodes); break; // ADDS
 					}
 					case 0x07:
 					{
@@ -1905,7 +1905,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // SUBS<.f> 0,b,limm               0010 1bbb 0000 0111   FBBB 1111 1011 1110 (+ Limm)
 // SUBS<.cc><.f> 0,limm,c          0010 1110 1100 0111   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_SUBS(stream, pc, op, opcodes); break; // SUBS
+						size = handle::dasm32_SUBS(stream, pc, op, opcodes); break; // SUBS
 					}
 					case 0x08:
 					{
@@ -1923,7 +1923,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // DIVAW 0,b,u6                    0010 1bbb 0100 1000   0BBB uuuu uu11 1110
 // DIVAW<.cc> 0,limm,c             0010 1110 1100 1000   0111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_DIVAW(stream, pc, op, opcodes); break; // DIVAW
+						size = handle::dasm32_DIVAW(stream, pc, op, opcodes); break; // DIVAW
 					}
 					case 0x0a:
 					{
@@ -1941,7 +1941,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // ASLS<.f> 0,b,u6                 0010 1bbb 0100 1010   FBBB uuuu uu11 1110
 // ASLS<.cc><.f> 0,limm,c          0010 1110 1100 1010   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_ASLS(stream, pc, op, opcodes); break; // ASLS
+						size = handle::dasm32_ASLS(stream, pc, op, opcodes); break; // ASLS
 					}
 					case 0x0b:
 					{
@@ -1959,7 +1959,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // ASRS<.f> 0,b,u6                 0010 1bbb 0100 1011   FBBB uuuu uu11 1110
 // ASRS<.cc><.f> 0,limm,c          0010 1110 1100 1011   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_ASRS(stream, pc, op, opcodes); break; // ASRS
+						size = handle::dasm32_ASRS(stream, pc, op, opcodes); break; // ASRS
 					}
 					case 0x0c:
 					{
@@ -2005,7 +2005,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // ADDSDW<.f> 0,b,u6               0010 1bbb 0110 1000   FBBB uuuu uu11 1110
 // ADDSDW<.cc><.f> 0,limm,c        0010 1110 1110 1000   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_ADDSDW(stream, pc, op, opcodes); break; // ADDSDW
+						size = handle::dasm32_ADDSDW(stream, pc, op, opcodes); break; // ADDSDW
 					}
 					case 0x29:
 					{
@@ -2023,7 +2023,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // SUBSDW<.f> 0,b,u6               0010 1bbb 0110 1001   FBBB uuuu uu11 1110
 // SUBSDW<.cc><.f> 0,limm,c        0010 1110 1110 1001   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						size = handle_dasm32_SUBSDW(stream, pc, op, opcodes); break; // SUBSDW
+						size = handle::dasm32_SUBSDW(stream, pc, op, opcodes); break; // SUBSDW
 					}
 					case 0x2f: // SOPs
 					{
@@ -2041,7 +2041,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // SWAP<.f> 0,u6                   0010 1110 0110 1111   F111 uuuu uu00 0000
 // SWAP<.f> 0,limm                 0010 1110 0010 1111   F111 1111 1000 0000 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_SWAP(stream, pc, op, opcodes); break; // SWAP
+								size = handle::dasm32_SWAP(stream, pc, op, opcodes); break; // SWAP
 							}
 							case 0x01:
 							{
@@ -2054,7 +2054,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // NORM<.f> 0,u6                   0010 1110 0110 1111   F111 uuuu uu00 0001
 // NORM<.f> 0,limm                 0010 1110 0010 1111   F111 1111 1000 0001 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_NORM(stream, pc, op, opcodes); break; // NORM
+								size = handle::dasm32_NORM(stream, pc, op, opcodes); break; // NORM
 							}
 							case 0x02:
 							{
@@ -2067,7 +2067,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // SAT16<.f> 0,u6                  0010 1110 0110 1111   F111 uuuu uu00 0010
 // SAT16<.f> 0,limm                0010 1110 0010 1111   F111 1111 1000 0010 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_SAT16(stream, pc, op, opcodes); break; // SAT16
+								size = handle::dasm32_SAT16(stream, pc, op, opcodes); break; // SAT16
 							}
 							case 0x03:
 							{
@@ -2080,7 +2080,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // RND16<.f> 0,u6                  0010 1110 0110 1111   F111 uuuu uu00 0011
 // RND16<.f> 0,limm                0010 1110 0010 1111   F111 1111 1000 0011 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_RND16(stream, pc, op, opcodes); break; // RND16
+								size = handle::dasm32_RND16(stream, pc, op, opcodes); break; // RND16
 							}
 							case 0x04:
 							{
@@ -2093,7 +2093,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // ABSSW<.f> 0,u6                  0010 1110 0110 1111   F111 uuuu uu00 0100
 // ABSSW<.f> 0,limm                0010 1110 0010 1111   F111 1111 1000 0100 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_ABSSW(stream, pc, op, opcodes); break; // ABSSW
+								size = handle::dasm32_ABSSW(stream, pc, op, opcodes); break; // ABSSW
 							}
 							case 0x05:
 							{
@@ -2106,7 +2106,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // ABSS<.f> 0,u6                   0010 1110 0110 1111   F111 uuuu uu00 0101
 // ABSS<.f> 0,limm                 0010 1110 0010 1111   F111 1111 1000 0101 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_ABSS(stream, pc, op, opcodes); break; // ABSS
+								size = handle::dasm32_ABSS(stream, pc, op, opcodes); break; // ABSS
 							}
 							case 0x06:
 							{
@@ -2119,7 +2119,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // NEGSW<.f> 0,u6                  0010 1110 0110 1111   F111 uuuu uu00 0110
 // NEGSW<.f> 0,limm                0010 1110 0010 1111   F111 1111 1000 0110 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_NEGSW(stream, pc, op, opcodes); break; // NEGSW
+								size = handle::dasm32_NEGSW(stream, pc, op, opcodes); break; // NEGSW
 							}
 							case 0x07:
 							{
@@ -2132,7 +2132,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // NEGS<.f> 0,u6                   0010 1110 0110 1111   F111 uuuu uu00 0111
 // NEGS<.f> 0,limm                 0010 1110 0010 1111   F111 1111 1000 0111 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_NEGS(stream, pc, op, opcodes); break; // NEGS
+								size = handle::dasm32_NEGS(stream, pc, op, opcodes); break; // NEGS
 							}
 							case 0x08:
 							{
@@ -2145,7 +2145,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // NORMW<.f> 0,u6                  0010 1110 0110 1111   F111 uuuu uu00 1000
 // NORMW<.f> 0,limm                0010 1110 0010 1111   F111 1111 1000 1000 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								size = handle_dasm32_NORMW(stream, pc, op, opcodes); break; // NORMW
+								size = handle::dasm32_NORMW(stream, pc, op, opcodes); break; // NORMW
 							}
 							case 0x3f: // ZOPs (Zero Operand Opcodes)
 							{
@@ -2156,32 +2156,32 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 								{
 									default:
 									{
-										size = handle_dasm_illegal(stream, pc, instruction, subinstr, subinstr2, subinstr3, op, opcodes); break;  // illegal
+										size = handle::dasm_illegal(stream, pc, instruction, subinstr, subinstr2, subinstr3, op, opcodes); break;  // illegal
 									}
 								}
 								break;
 							}
 							default:
 							{
-								size = handle_dasm_illegal(stream, pc, instruction, subinstr, subinstr2, op, opcodes); break;  // illegal
+								size = handle::dasm_illegal(stream, pc, instruction, subinstr, subinstr2, op, opcodes); break;  // illegal
 							}
 						}
 						break;
 					}
 					default:
 					{
-						size = handle_dasm_illegal(stream, pc, instruction, subinstr, op, opcodes); break;  // illegal
+						size = handle::dasm_illegal(stream, pc, instruction, subinstr, op, opcodes); break;  // illegal
 					}
 
 				}
 				break;
 			}
-			case 0x06: size = handle_dasm32_ARC_EXT06(stream, pc, op, opcodes); break;   // op a,b,c (06 ARC ext)
-			case 0x07: size = handle_dasm32_USER_EXT07(stream, pc, op, opcodes); break;  // op a,b,c (07 User ext)
-			case 0x08: size = handle_dasm32_USER_EXT08(stream, pc, op, opcodes); break;  // op a,b,c (08 User ext)
-			case 0x09: size = handle_dasm32_MARKET_EXT09(stream, pc, op, opcodes); break; // op a,b,c (09 Market ext)
-			case 0x0a: size = handle_dasm32_MARKET_EXT0a(stream, pc, op, opcodes); break; // op a,b,c (0a Market ext)
-			case 0x0b: size = handle_dasm32_MARKET_EXT0b(stream, pc, op, opcodes); break; // op a,b,c (0b Market ext)
+			case 0x06: size = handle::dasm32_ARC_EXT06(stream, pc, op, opcodes); break;   // op a,b,c (06 ARC ext)
+			case 0x07: size = handle::dasm32_USER_EXT07(stream, pc, op, opcodes); break;  // op a,b,c (07 User ext)
+			case 0x08: size = handle::dasm32_USER_EXT08(stream, pc, op, opcodes); break;  // op a,b,c (08 User ext)
+			case 0x09: size = handle::dasm32_MARKET_EXT09(stream, pc, op, opcodes); break; // op a,b,c (09 Market ext)
+			case 0x0a: size = handle::dasm32_MARKET_EXT0a(stream, pc, op, opcodes); break; // op a,b,c (0a Market ext)
+			case 0x0b: size = handle::dasm32_MARKET_EXT0b(stream, pc, op, opcodes); break; // op a,b,c (0b Market ext)
 		}
 	}
 	else
@@ -2203,7 +2203,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S S
 // LD_S a,[b,c]                    0110 0bbb ccc0 0aaa
 // #######################################################################################################################
-						size = handle_dasm_LD_S_a_b_c(stream, pc, op, opcodes); break; // LD_S a,[b,c]
+						size = handle::dasm_LD_S_a_b_c(stream, pc, op, opcodes); break; // LD_S a,[b,c]
 					}
 					case 0x01:
 					{
@@ -2211,7 +2211,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S S
 // LDB_S a,[b,c]                   0110 0bbb ccc0 1aaa
 // #######################################################################################################################
-						size = handle_dasm_LDB_S_a_b_c(stream, pc, op, opcodes); break; // LDB_S a,[b,c]
+						size = handle::dasm_LDB_S_a_b_c(stream, pc, op, opcodes); break; // LDB_S a,[b,c]
 					}
 					case 0x02:
 					{
@@ -2219,7 +2219,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S S
 // LDW_S a,[b,c]                   0110 0bbb ccc1 0aaa
 // #######################################################################################################################
-						size = handle_dasm_LDW_S_a_b_c(stream, pc, op, opcodes); break; // LDW_S a,[b,c]
+						size = handle::dasm_LDW_S_a_b_c(stream, pc, op, opcodes); break; // LDW_S a,[b,c]
 					}
 					case 0x03:
 					{
@@ -2227,7 +2227,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S S
 // ADD_S a,b,c                     0110 0bbb ccc1 1aaa
 // #######################################################################################################################
-						size = handle_dasm_ADD_S_a_b_c(stream, pc, op, opcodes); break; // ADD_S a,b,c
+						size = handle::dasm_ADD_S_a_b_c(stream, pc, op, opcodes); break; // ADD_S a,b,c
 					}
 				}
 				break;
@@ -2243,14 +2243,14 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // #######################################################################################################################
 // ADD_S c,b,u3                    0110 1bbb ccc0 0uuu
 // #######################################################################################################################
-						size = handle_dasm_ADD_S_c_b_u3(stream, pc, op, opcodes); break; // ADD_S c,b,u3
+						size = handle::dasm_ADD_S_c_b_u3(stream, pc, op, opcodes); break; // ADD_S c,b,u3
 					}
 					case 0x01:
 					{
 // #######################################################################################################################
 // SUB_S c,b,u3                    0110 1bbb ccc0 1uuu
 // #######################################################################################################################
-						size = handle_dasm_SUB_S_c_b_u3(stream, pc, op, opcodes); break; // SUB_S c,b,u3
+						size = handle::dasm_SUB_S_c_b_u3(stream, pc, op, opcodes); break; // SUB_S c,b,u3
 					}
 					case 0x02:
 					{
@@ -2258,7 +2258,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S S
 // ASL_S c,b,u3                    0110 1bbb ccc1 0uuu
 // #######################################################################################################################
-						size = handle_dasm_ASL_S_c_b_u3(stream, pc, op, opcodes); break; // ASL_S c,b,u3
+						size = handle::dasm_ASL_S_c_b_u3(stream, pc, op, opcodes); break; // ASL_S c,b,u3
 					}
 					case 0x03:
 					{
@@ -2266,7 +2266,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S S
 // ASR_S c,b,u3                    0110 1bbb ccc1 1uuu
 // #######################################################################################################################
-						size = handle_dasm_ASR_S_c_b_u3(stream, pc, op, opcodes); break; // ASR_S c,b,u3
+						size = handle::dasm_ASR_S_c_b_u3(stream, pc, op, opcodes); break; // ASR_S c,b,u3
 					}
 				}
 				break;
@@ -2285,7 +2285,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // ADD_S b,b,h                     0111 0bbb hhh0 0HHH
 // ADD_S b,b,limm                  0111 0bbb 1100 0111 (+ Limm)
 // #######################################################################################################################
-						size = handle_dasm_ADD_S_b_b_h_or_limm(stream, pc, op, opcodes); break; // ADD_S b,b,h  or  ADD_S b,b,limm
+						size = handle::dasm_ADD_S_b_b_h_or_limm(stream, pc, op, opcodes); break; // ADD_S b,b,h  or  ADD_S b,b,limm
 					}
 					case 0x01:
 					{
@@ -2294,7 +2294,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // MOV_S b,h                       0111 0bbb hhh0 1HHH
 // MOV_S b,limm                    0111 0bbb 1100 1111 (+ Limm)
 // #######################################################################################################################
-						size = handle_dasm_MOV_S_b_h_or_limm(stream, pc, op, opcodes); break; // MOV_S b,h  or  MOV_S b,limm
+						size = handle::dasm_MOV_S_b_h_or_limm(stream, pc, op, opcodes); break; // MOV_S b,h  or  MOV_S b,limm
 					}
 					case 0x02:
 					{
@@ -2303,7 +2303,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // CMP_S b,h                       0111 0bbb hhh1 0HHH
 // CMP_S b,limm                    0111 0bbb 1101 0111 (+ Limm)
 // #######################################################################################################################
-						size = handle_dasm_CMP_S_b_h_or_limm(stream, pc, op, opcodes); break; // CMP_S b,h  or  CMP_S b,limm
+						size = handle::dasm_CMP_S_b_h_or_limm(stream, pc, op, opcodes); break; // CMP_S b,h  or  CMP_S b,limm
 					}
 					case 0x03:
 					{
@@ -2311,7 +2311,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S S
 // MOV_S h,b                       0111 0bbb hhh1 1HHH
 // #######################################################################################################################
-						size = handle_dasm_MOV_S_h_b(stream, pc, op, opcodes); break; // MOV_S h,b
+						size = handle::dasm_MOV_S_h_b(stream, pc, op, opcodes); break; // MOV_S h,b
 					}
 				}
 				break;
@@ -2334,7 +2334,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    sssS SSSS
 // J_S [b]                         0111 1bbb 0000 0000
 // #######################################################################################################################
-								size = handle_dasm_J_S_b(stream, pc, op, opcodes); break; // J_S [b]
+								size = handle::dasm_J_S_b(stream, pc, op, opcodes); break; // J_S [b]
 							}
 							case 0x01:
 							{
@@ -2342,7 +2342,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    sssS SSSS
 // J_S.D [b]                       0111 1bbb 0010 0000
 // #######################################################################################################################
-								size = handle_dasm_J_S_D_b(stream, pc, op, opcodes); break; // J_S.D [b]
+								size = handle::dasm_J_S_D_b(stream, pc, op, opcodes); break; // J_S.D [b]
 							}
 							case 0x02:
 							{
@@ -2350,7 +2350,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    sssS SSSS
 // JL_S [b]                        0111 1bbb 0100 0000
 // #######################################################################################################################
-								size = handle_dasm_JL_S_b(stream, pc, op, opcodes); break; // JL_S [b]
+								size = handle::dasm_JL_S_b(stream, pc, op, opcodes); break; // JL_S [b]
 							}
 							case 0x03:
 							{
@@ -2358,7 +2358,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    sssS SSSS
 // JL_S.D [b]                      0111 1bbb 0110 0000
 // #######################################################################################################################
-								size = handle_dasm_JL_S_D_b(stream, pc, op, opcodes); break; // JL_S.D [b]
+								size = handle::dasm_JL_S_D_b(stream, pc, op, opcodes); break; // JL_S.D [b]
 							}
 							case 0x06:
 							{
@@ -2366,7 +2366,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // SUB_S.NE b,b,b                  0111 1bbb 1100 0000
 //                                 IIII I    sssS SSSS
 // #######################################################################################################################
-								size = handle_dasm_SUB_S_NE_b_b_b(stream, pc, op, opcodes); break; // SUB_S.NE b,b,b
+								size = handle::dasm_SUB_S_NE_b_b_b(stream, pc, op, opcodes); break; // SUB_S.NE b,b,b
 							}
 							case 0x07: // ZOPs
 							{
@@ -2380,7 +2380,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I$$$ sssS SSSS
 // NOP_S                           0111 1000 1110 0000
 // #######################################################################################################################
-										size = handle_dasm_NOP_S(stream, pc, op, opcodes); break; // NOP_S
+										size = handle::dasm_NOP_S(stream, pc, op, opcodes); break; // NOP_S
 									}
 									case 0x01:
 									{
@@ -2388,7 +2388,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I$$$ sssS SSSS
 // UNIMP_S                         0111 1001 1110 0000
 // #######################################################################################################################
-										size = handle_dasm_UNIMP_S(stream, pc, op, opcodes); break; // UNIMP_S
+										size = handle::dasm_UNIMP_S(stream, pc, op, opcodes); break; // UNIMP_S
 									}
 									case 0x04:
 									{
@@ -2396,7 +2396,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I$$$ sssS SSSS
 // JEQ_S [blink]                   0111 1100 1110 0000
 // #######################################################################################################################
-										size = handle_dasm_JEQ_S_blink(stream, pc, op, opcodes); break; // JEQ_S [BLINK]
+										size = handle::dasm_JEQ_S_blink(stream, pc, op, opcodes); break; // JEQ_S [BLINK]
 									}
 									case 0x05:
 									{
@@ -2404,7 +2404,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I$$$ sssS SSSS
 // JNE_S [blink]                   0111 1101 1110 0000
 // #######################################################################################################################
-										size = handle_dasm_JNE_S_blink(stream, pc, op, opcodes); break; // JNE_S [BLINK]
+										size = handle::dasm_JNE_S_blink(stream, pc, op, opcodes); break; // JNE_S [BLINK]
 									}
 									case 0x06:
 									{
@@ -2412,7 +2412,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I$$$ sssS SSSS
 // J_S [blink]                     0111 1110 1110 0000
 // #######################################################################################################################
-										size = handle_dasm_J_S_blink(stream, pc, op, opcodes); break; // J_S [BLINK]
+										size = handle::dasm_J_S_blink(stream, pc, op, opcodes); break; // J_S [BLINK]
 									}
 									case 0x07:
 									{
@@ -2420,19 +2420,19 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I$$$ sssS SSSS
 // J_S.D [blink]                   0111 1111 1110 0000
 // #######################################################################################################################
-										size = handle_dasm_J_S_D_blink(stream, pc, op, opcodes); break; // J_S.D [BLINK]
+										size = handle::dasm_J_S_D_blink(stream, pc, op, opcodes); break; // J_S.D [BLINK]
 									}
 
 									default: // 0x02, 0x03
 									{
-										size = handle_dasm_illegal(stream, pc, instruction, subinstr, subinstr2, subinstr3, op, opcodes); break;
+										size = handle::dasm_illegal(stream, pc, instruction, subinstr, subinstr2, subinstr3, op, opcodes); break;
 									}
 								}
 								break;
 							}
 							default: // 0x04, 0x05
 							{
-								size = handle_dasm_illegal(stream, pc, instruction, subinstr, subinstr2, op, opcodes); break;
+								size = handle::dasm_illegal(stream, pc, instruction, subinstr, subinstr2, op, opcodes); break;
 							}
 						}
 						break;
@@ -2443,7 +2443,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // SUB_S b,b,c                     0111 1bbb ccc0 0010
 // #######################################################################################################################
-						size = handle_dasm_SUB_S_b_b_c(stream, pc, op, opcodes); break; // SUB_S b,b,c
+						size = handle::dasm_SUB_S_b_b_c(stream, pc, op, opcodes); break; // SUB_S b,b,c
 					}
 					case 0x04:
 					{
@@ -2451,7 +2451,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // AND_S b,b,c                     0111 1bbb ccc0 0100
 // #######################################################################################################################
-						size = handle_dasm_AND_S_b_b_c(stream, pc, op, opcodes); break; // AND_S b,b,c
+						size = handle::dasm_AND_S_b_b_c(stream, pc, op, opcodes); break; // AND_S b,b,c
 					}
 					case 0x05:
 					{
@@ -2459,7 +2459,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // OR_S b,b,c                      0111 1bbb ccc0 0101
 // #######################################################################################################################
-						size = handle_dasm_OR_S_b_b_c(stream, pc, op, opcodes); break; // OR_S b,b,c
+						size = handle::dasm_OR_S_b_b_c(stream, pc, op, opcodes); break; // OR_S b,b,c
 					}
 					case 0x06:
 					{
@@ -2467,7 +2467,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // BIC_S b,b,c                     0111 1bbb ccc0 0110
 // #######################################################################################################################
-						size = handle_dasm_BIC_S_b_b_c(stream, pc, op, opcodes); break; // BIC_S b,b,c
+						size = handle::dasm_BIC_S_b_b_c(stream, pc, op, opcodes); break; // BIC_S b,b,c
 					}
 					case 0x07:
 					{
@@ -2475,7 +2475,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // XOR_S b,b,c                     0111 1bbb ccc0 0111
 // #######################################################################################################################
-						size = handle_dasm_XOR_S_b_b_c(stream, pc, op, opcodes); break; // XOR_S b,b,c
+						size = handle::dasm_XOR_S_b_b_c(stream, pc, op, opcodes); break; // XOR_S b,b,c
 					}
 					case 0x0b:
 					{
@@ -2483,7 +2483,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // TST_S b,c                       0111 1bbb ccc0 1011
 // #######################################################################################################################
-						size = handle_dasm_TST_S_b_c(stream, pc, op, opcodes); break; // TST_S b,c
+						size = handle::dasm_TST_S_b_c(stream, pc, op, opcodes); break; // TST_S b,c
 					}
 					case 0x0c:
 					{
@@ -2491,7 +2491,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // MUL64_S <0,>b,c                 0111 1bbb ccc0 1100
 // #######################################################################################################################
-						size = handle_dasm_MUL64_S_0_b_c(stream, pc, op, opcodes); break; // MUL64_S <0,>b,c
+						size = handle::dasm_MUL64_S_0_b_c(stream, pc, op, opcodes); break; // MUL64_S <0,>b,c
 					}
 					case 0x0d:
 					{
@@ -2500,7 +2500,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // SEXB_S b,c                      0111 1bbb ccc0 1101
 // #######################################################################################################################
-						size = handle_dasm_SEXB_S_b_c(stream, pc, op, opcodes); break; // SEXB_S b,c
+						size = handle::dasm_SEXB_S_b_c(stream, pc, op, opcodes); break; // SEXB_S b,c
 					}
 					case 0x0e:
 					{
@@ -2508,7 +2508,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // SEXW_S b,c                      0111 1bbb ccc0 1110
 // #######################################################################################################################
-						size = handle_dasm_SEXW_S_b_c(stream, pc, op, opcodes); break; // SEXW_S b,c
+						size = handle::dasm_SEXW_S_b_c(stream, pc, op, opcodes); break; // SEXW_S b,c
 					}
 					case 0x0f:
 					{
@@ -2516,7 +2516,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // EXTB_S b,c                      0111 1bbb ccc0 1111
 // #######################################################################################################################
-						size = handle_dasm_EXTB_S_b_c(stream, pc, op, opcodes); break; // EXTB_S b,c
+						size = handle::dasm_EXTB_S_b_c(stream, pc, op, opcodes); break; // EXTB_S b,c
 					}
 					case 0x10:
 					{
@@ -2524,7 +2524,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // EXTW_S b,c                      0111 1bbb ccc1 0000
 // #######################################################################################################################
-						size = handle_dasm_EXTW_S_b_c(stream, pc, op, opcodes); break; // EXTW_S b,c
+						size = handle::dasm_EXTW_S_b_c(stream, pc, op, opcodes); break; // EXTW_S b,c
 					}
 					case 0x11:
 					{
@@ -2532,7 +2532,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // ABS_S b,c                       0111 1bbb ccc1 0001
 // #######################################################################################################################
-						size = handle_dasm_ABS_S_b_c(stream, pc, op, opcodes); break; // ABS_S b,c
+						size = handle::dasm_ABS_S_b_c(stream, pc, op, opcodes); break; // ABS_S b,c
 					}
 					case 0x12:
 					{
@@ -2540,7 +2540,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // NOT_S b,c                       0111 1bbb ccc1 0010
 // #######################################################################################################################
-						size = handle_dasm_NOT_S_b_c(stream, pc, op, opcodes); break; // NOT_S b,c
+						size = handle::dasm_NOT_S_b_c(stream, pc, op, opcodes); break; // NOT_S b,c
 					}
 					case 0x13:
 					{
@@ -2548,7 +2548,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // NEG_S b,c                       0111 1bbb ccc1 0011
 // #######################################################################################################################
-						size = handle_dasm_NEG_S_b_c(stream, pc, op, opcodes); break; // NEG_S b,c
+						size = handle::dasm_NEG_S_b_c(stream, pc, op, opcodes); break; // NEG_S b,c
 					}
 					case 0x14:
 					{
@@ -2556,7 +2556,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // ADD1_S b,b,c                    0111 1bbb ccc1 0100
 // #######################################################################################################################
-						size = handle_dasm_ADD1_S_b_b_c(stream, pc, op, opcodes); break; // ADD1_S b,b,c
+						size = handle::dasm_ADD1_S_b_b_c(stream, pc, op, opcodes); break; // ADD1_S b,b,c
 					}
 					case 0x15:
 					{
@@ -2564,7 +2564,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // ADD2_S b,b,c                    0111 1bbb ccc1 0101
 // #######################################################################################################################
-						size = handle_dasm_ADD2_S_b_b_c(stream, pc, op, opcodes); break; // ADD2_S b,b,c
+						size = handle::dasm_ADD2_S_b_b_c(stream, pc, op, opcodes); break; // ADD2_S b,b,c
 					}
 					case 0x16:
 					{
@@ -2572,7 +2572,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // ADD3_S b,b,c                    0111 1bbb ccc1 0110
 // #######################################################################################################################
-						size = handle_dasm_ADD3_S_b_b_c(stream, pc, op, opcodes); break; // ADD3_S b,b,c
+						size = handle::dasm_ADD3_S_b_b_c(stream, pc, op, opcodes); break; // ADD3_S b,b,c
 					}
 					case 0x18:
 					{
@@ -2580,7 +2580,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // ASL_S b,b,c                     0111 1bbb ccc1 1000
 // #######################################################################################################################
-						size = handle_dasm_ASL_S_b_b_c_multiple(stream, pc, op, opcodes); break; // ASL_S b,b,c (multiple)
+						size = handle::dasm_ASL_S_b_b_c_multiple(stream, pc, op, opcodes); break; // ASL_S b,b,c (multiple)
 					}
 					case 0x19:
 					{
@@ -2588,7 +2588,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // LSR_S b,b,c                     0111 1bbb ccc1 1001
 // #######################################################################################################################
-						size = handle_dasm_LSR_S_b_b_c_multiple(stream, pc, op, opcodes); break; // LSR_S b,b,c (multiple)
+						size = handle::dasm_LSR_S_b_b_c_multiple(stream, pc, op, opcodes); break; // LSR_S b,b,c (multiple)
 					}
 					case 0x1a:
 					{
@@ -2596,7 +2596,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // ASR_S b,b,c                     0111 1bbb ccc1 1010
 // #######################################################################################################################
-						size = handle_dasm_ASR_S_b_b_c_multiple(stream, pc, op, opcodes); break; // ASR_S b,b,c (multiple)
+						size = handle::dasm_ASR_S_b_b_c_multiple(stream, pc, op, opcodes); break; // ASR_S b,b,c (multiple)
 					}
 					case 0x1b:
 					{
@@ -2604,7 +2604,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // ASL_S b,c                       0111 1bbb ccc1 1011
 // #######################################################################################################################
-						size = handle_dasm_ASL_S_b_c_single(stream, pc, op, opcodes); break; // ASL_S b,c (single)
+						size = handle::dasm_ASL_S_b_c_single(stream, pc, op, opcodes); break; // ASL_S b,c (single)
 					}
 					case 0x1c:
 					{
@@ -2612,7 +2612,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // ASR_S b,c                       0111 1bbb ccc1 1100
 // #######################################################################################################################
-						size = handle_dasm_ASR_S_b_c_single(stream, pc, op, opcodes); break; // ASR_S b,c (single)
+						size = handle::dasm_ASR_S_b_c_single(stream, pc, op, opcodes); break; // ASR_S b,c (single)
 					}
 					case 0x1d:
 					{
@@ -2620,7 +2620,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // LSR_S b,c                       0111 1bbb ccc1 1101
 // #######################################################################################################################
-						size = handle_dasm_LSR_S_b_c_single(stream, pc, op, opcodes); break; // LSR_S b,c (single)
+						size = handle::dasm_LSR_S_b_c_single(stream, pc, op, opcodes); break; // LSR_S b,c (single)
 					}
 					case 0x1e:
 					{
@@ -2628,7 +2628,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S SSSS
 // TRAP_S u6                       0111 1uuu uuu1 1110
 // #######################################################################################################################
-						size = handle_dasm_TRAP_S_u6(stream, pc, op, opcodes); break; // TRAP_S u6 (not a5?)
+						size = handle::dasm_TRAP_S_u6(stream, pc, op, opcodes); break; // TRAP_S u6 (not a5?)
 					}
 					case 0x1f:
 					{
@@ -2639,16 +2639,16 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII Isss sssS SSSS
 // BRK_S                           0111 1111 1111 1111
 // #######################################################################################################################
-							size = handle_dasm_BRK_S(stream, pc, op, opcodes); break; // BRK_S ( 0x7fff only? ) // BRK_S ( 0x7fff only? )
+							size = handle::dasm_BRK_S(stream, pc, op, opcodes); break; // BRK_S ( 0x7fff only? ) // BRK_S ( 0x7fff only? )
 						}
 						else
 						{
-							size = handle_dasm_illegal(stream, pc, instruction, subinstr, subinstr2, op, opcodes); break;
+							size = handle::dasm_illegal(stream, pc, instruction, subinstr, subinstr2, op, opcodes); break;
 						}
 					}
 					default: // 0x01, 0x03, 0x08, 0x09, 0x0a, 0x17
 					{
-						size = handle_dasm_illegal(stream, pc, instruction, subinstr, op, opcodes); break;
+						size = handle::dasm_illegal(stream, pc, instruction, subinstr, op, opcodes); break;
 					}
 				}
 				break;
@@ -2659,7 +2659,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I
 // LD_S c,[b,u7]                   1000 0bbb cccu uuuu
 // #######################################################################################################################
-				size = handle_dasm_LD_S_c_b_u7(stream, pc, op, opcodes); break; // LD_S c,[b,u7]
+				size = handle::dasm_LD_S_c_b_u7(stream, pc, op, opcodes); break; // LD_S c,[b,u7]
 			}
 			case 0x11:
 			{
@@ -2667,7 +2667,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I
 // LDB_S c,[b,u5]                  1000 1bbb cccu uuuu
 // #######################################################################################################################
-				size =  handle_dasm_LDB_S_c_b_u5(stream, pc, op, opcodes); break; // LDB_S c,[b,u5]
+				size =  handle::dasm_LDB_S_c_b_u5(stream, pc, op, opcodes); break; // LDB_S c,[b,u5]
 			}
 			case 0x12:
 			{
@@ -2675,7 +2675,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I
 // LDW_S c,[b,u6]                  1001 0bbb cccu uuuu
 // #######################################################################################################################
-				size = handle_dasm_LDW_S_c_b_u6(stream, pc, op, opcodes); break; // LDW_S c,[b,u6]
+				size = handle::dasm_LDW_S_c_b_u6(stream, pc, op, opcodes); break; // LDW_S c,[b,u6]
 			}
 			case 0x13:
 			{
@@ -2683,7 +2683,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I
 // LDW_S.X c,[b,u6]                1001 1bbb cccu uuuu
 // #######################################################################################################################
-				size = handle_dasm_LDW_S_X_c_b_u6(stream, pc, op, opcodes); break; // LDW_S.X c,[b,u6]
+				size = handle::dasm_LDW_S_X_c_b_u6(stream, pc, op, opcodes); break; // LDW_S.X c,[b,u6]
 			}
 			case 0x14:
 			{
@@ -2691,7 +2691,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I
 // ST_S c,[b,u7]                   1010 0bbb cccu uuuu
 // #######################################################################################################################
-				size = handle_dasm_ST_S_c_b_u7(stream, pc, op, opcodes); break; // ST_S c,[b,u7]
+				size = handle::dasm_ST_S_c_b_u7(stream, pc, op, opcodes); break; // ST_S c,[b,u7]
 			}
 			case 0x15:
 			{
@@ -2699,7 +2699,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I
 // STB_S c,[b,u5]                  1010 1bbb cccu uuuu
 // #######################################################################################################################
-				size = handle_dasm_STB_S_c_b_u5(stream, pc, op, opcodes); break; // STB_S
+				size = handle::dasm_STB_S_c_b_u5(stream, pc, op, opcodes); break; // STB_S
 			}
 			case 0x16:
 			{
@@ -2707,7 +2707,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I
 // STW_S c,[b,u6]                  1011 0bbb cccu uuuu
 // #######################################################################################################################
-				size = handle_dasm_STW_S_c_b_u6(stream, pc, op, opcodes); break; // STW_S
+				size = handle::dasm_STW_S_c_b_u6(stream, pc, op, opcodes); break; // STW_S
 			}
 			case 0x17: // Shift/Sub/Bit
 			{
@@ -2721,7 +2721,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    SSS
 // ASL_S b,b,u5                    1011 1bbb 000u uuuu
 // #######################################################################################################################
-						size = handle_dasm_ASL_S_b_b_u5(stream, pc, op, opcodes); break; // ASL_S b,b,u5
+						size = handle::dasm_ASL_S_b_b_u5(stream, pc, op, opcodes); break; // ASL_S b,b,u5
 					}
 					case 0x01:
 					{
@@ -2729,7 +2729,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    SSS
 // LSR_S b,b,u5                    1011 1bbb 001u uuuu
 // #######################################################################################################################
-						size = handle_dasm_LSR_S_b_b_u5(stream, pc, op, opcodes); break; // LSR_S b,b,u5
+						size = handle::dasm_LSR_S_b_b_u5(stream, pc, op, opcodes); break; // LSR_S b,b,u5
 					}
 					case 0x02:
 					{
@@ -2737,7 +2737,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    SSS
 // ASR_S b,b,u5                    1011 1bbb 010u uuuu
 // #######################################################################################################################
-						size = handle_dasm_ASR_S_b_b_u5(stream, pc, op, opcodes); break; // ASR_S b,b,u5
+						size = handle::dasm_ASR_S_b_b_u5(stream, pc, op, opcodes); break; // ASR_S b,b,u5
 					}
 					case 0x03:
 					{
@@ -2745,7 +2745,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    SSS
 // SUB_S b,b,u5                    1011 1bbb 011u uuuu
 // #######################################################################################################################
-						size = handle_dasm_SUB_S_b_b_u5(stream, pc, op, opcodes); break; // SUB_S b,b,u5
+						size = handle::dasm_SUB_S_b_b_u5(stream, pc, op, opcodes); break; // SUB_S b,b,u5
 					}
 					case 0x04:
 					{
@@ -2753,7 +2753,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    SSS
 // BSET_S b,b,u5                   1011 1bbb 100u uuuu
 // #######################################################################################################################
-						size = handle_dasm_BSET_S_b_b_u5(stream, pc, op, opcodes); break; // BSET_S b,b,u5
+						size = handle::dasm_BSET_S_b_b_u5(stream, pc, op, opcodes); break; // BSET_S b,b,u5
 					}
 					case 0x05:
 					{
@@ -2761,7 +2761,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    SSS
 // BCLR_S b,b,u5                   1011 1bbb 101u uuuu
 // #######################################################################################################################
-						size = handle_dasm_BCLR_S_b_b_u5(stream, pc, op, opcodes); break; // BCLR_S b,b,u5
+						size = handle::dasm_BCLR_S_b_b_u5(stream, pc, op, opcodes); break; // BCLR_S b,b,u5
 					}
 					case 0x06:
 					{
@@ -2769,7 +2769,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    SSS
 // BMSK_S b,b,u5                   1011 1bbb 110u uuuu
 // #######################################################################################################################
-						size = handle_dasm_BMSK_S_b_b_u5(stream, pc, op, opcodes); break; // BMSK_S b,b,u5
+						size = handle::dasm_BMSK_S_b_b_u5(stream, pc, op, opcodes); break; // BMSK_S b,b,u5
 					}
 					case 0x07:
 					{
@@ -2777,7 +2777,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    SSS
 // BTST_S b,u5                     1011 1bbb 111u uuuu
 // #######################################################################################################################
-						size = handle_dasm_BTST_S_b_u5(stream, pc, op, opcodes); break; // BTST_S b,u5
+						size = handle::dasm_BTST_S_b_u5(stream, pc, op, opcodes); break; // BTST_S b,u5
 					}
 				}
 				break;
@@ -2794,7 +2794,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    SSS
 // LD_S b,[sp,u7]                  1100 0bbb 000u uuuu
 // #######################################################################################################################
-						size = handle_dasm_LD_S_b_sp_u7(stream, pc, op, opcodes); break; // LD_S b,[sp,u7]
+						size = handle::dasm_LD_S_b_sp_u7(stream, pc, op, opcodes); break; // LD_S b,[sp,u7]
 					}
 					case 0x01:
 					{
@@ -2802,7 +2802,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    SSS
 // LDB_S b,[sp,u7]                 1100 0bbb 001u uuuu
 // #######################################################################################################################
-						size = handle_dasm_LDB_S_b_sp_u7(stream, pc, op, opcodes); break; // LDB_S b,[sp,u7]
+						size = handle::dasm_LDB_S_b_sp_u7(stream, pc, op, opcodes); break; // LDB_S b,[sp,u7]
 					}
 					case 0x02:
 					{
@@ -2810,7 +2810,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    SSS
 // ST_S b,[sp,u7]                  1100 0bbb 010u uuuu
 // #######################################################################################################################
-						size = handle_dasm_ST_S_b_sp_u7(stream, pc, op, opcodes); break; // ST_S b,[sp,u7]
+						size = handle::dasm_ST_S_b_sp_u7(stream, pc, op, opcodes); break; // ST_S b,[sp,u7]
 					}
 					case 0x03:
 					{
@@ -2818,7 +2818,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    SSS
 // STB_S b,[sp,u7]                 1100 0bbb 011u uuuu
 // #######################################################################################################################
-						size = handle_dasm_STB_S_b_sp_u7(stream, pc, op, opcodes); break; // STB_S b,[sp,u7]
+						size = handle::dasm_STB_S_b_sp_u7(stream, pc, op, opcodes); break; // STB_S b,[sp,u7]
 					}
 					case 0x04:
 					{
@@ -2826,7 +2826,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    SSS
 // ADD_S b,sp,u7                   1100 0bbb 100u uuuu
 // #######################################################################################################################
-						size = handle_dasm_ADD_S_b_sp_u7(stream, pc, op, opcodes); break; // ADD_S b,sp,u7
+						size = handle::dasm_ADD_S_b_sp_u7(stream, pc, op, opcodes); break; // ADD_S b,sp,u7
 					}
 
 					case 0x05: // subtable 18_05
@@ -2840,7 +2840,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII Isss SSS
 // ADD_S sp,sp,u7                  1100 0000 101u uuuu
 // #######################################################################################################################
-								size = handle_dasm_ADD_S_sp_sp_u7(stream, pc, op, opcodes); break; // ADD_S sp,sp,u7
+								size = handle::dasm_ADD_S_sp_sp_u7(stream, pc, op, opcodes); break; // ADD_S sp,sp,u7
 							}
 							case 0x01:
 							{
@@ -2848,9 +2848,9 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII Isss SSS
 // SUB_S sp,sp,u7                  1100 0001 101u uuuu
 // #######################################################################################################################
-								size = handle_dasm_SUB_S_sp_sp_u7(stream, pc, op, opcodes); break; // SUB_S sp,sp,u7
+								size = handle::dasm_SUB_S_sp_sp_u7(stream, pc, op, opcodes); break; // SUB_S sp,sp,u7
 							}
-							default: size = handle_dasm_illegal(stream, pc, instruction, subinstr, subinstr2, op, opcodes); break;
+							default: size = handle::dasm_illegal(stream, pc, instruction, subinstr, subinstr2, op, opcodes); break;
 						}
 						break;
 					}
@@ -2865,7 +2865,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    SSSs ssss
 // POP_S b                         1100 0bbb 1100 0001
 // #######################################################################################################################
-								size = handle_dasm_POP_S_b(stream, pc, op, opcodes); break; // POP_S b
+								size = handle::dasm_POP_S_b(stream, pc, op, opcodes); break; // POP_S b
 							}
 							case 0x11:
 							{
@@ -2873,9 +2873,9 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    SSSs ssss
 // POP_S blink                     1100 0RRR 1101 0001
 // #######################################################################################################################
-								size = handle_dasm_POP_S_blink(stream, pc, op, opcodes); break; // POP_S blink
+								size = handle::dasm_POP_S_blink(stream, pc, op, opcodes); break; // POP_S blink
 							}
-							default: size = handle_dasm_illegal(stream, pc, instruction, subinstr, subinstr2, op, opcodes); break;
+							default: size = handle::dasm_illegal(stream, pc, instruction, subinstr, subinstr2, op, opcodes); break;
 						}
 						break;
 					}
@@ -2891,7 +2891,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    SSSs ssss
 // PUSH_S b                        1100 0bbb 1110 0001
 // #######################################################################################################################
-								size = handle_dasm_PUSH_S_b(stream, pc, op, opcodes); break; // PUSH_S b
+								size = handle::dasm_PUSH_S_b(stream, pc, op, opcodes); break; // PUSH_S b
 							}
 							case 0x11:
 							{
@@ -2899,9 +2899,9 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    SSSs ssss
 // PUSH_S blink                    1100 0RRR 1111 0001
 // #######################################################################################################################
-								size = handle_dasm_PUSH_S_blink(stream, pc, op, opcodes); break; // PUSH_S blink
+								size = handle::dasm_PUSH_S_blink(stream, pc, op, opcodes); break; // PUSH_S blink
 							}
-							default: size = handle_dasm_illegal(stream, pc, instruction, subinstr, subinstr2, op, opcodes); break;
+							default: size = handle::dasm_illegal(stream, pc, instruction, subinstr, subinstr2, op, opcodes); break;
 						}
 					}
 				}
@@ -2920,7 +2920,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII ISS
 // LD_S r0,[gp,s11]                1100 100s ssss ssss
 // #######################################################################################################################
-						size = handle_dasm_LD_S_r0_gp_s11(stream, pc, op, opcodes); break; // LD_S r0,[gp,s11]
+						size = handle::dasm_LD_S_r0_gp_s11(stream, pc, op, opcodes); break; // LD_S r0,[gp,s11]
 					}
 					case 0x01:
 					{
@@ -2928,7 +2928,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII ISS
 // LDB_S r0,[gp,s9]                1100 101s ssss ssss
 // #######################################################################################################################
-						size = handle_dasm_LDB_S_r0_gp_s9(stream, pc, op, opcodes); break; // LDB_S r0,[gp,s9]
+						size = handle::dasm_LDB_S_r0_gp_s9(stream, pc, op, opcodes); break; // LDB_S r0,[gp,s9]
 					}
 					case 0x02:
 					{
@@ -2936,7 +2936,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII ISS
 // LDW_S r0,[gp,s10]               1100 110s ssss ssss
 // #######################################################################################################################
-						size = handle_dasm_LDW_S_r0_gp_s10(stream, pc, op, opcodes); break; // LDW_S r0,[gp,s10]
+						size = handle::dasm_LDW_S_r0_gp_s10(stream, pc, op, opcodes); break; // LDW_S r0,[gp,s10]
 					}
 					case 0x03:
 					{
@@ -2944,7 +2944,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII ISS
 // ADD_S r0,gp,s11                 1100 111s ssss ssss
 // #######################################################################################################################
-						size = handle_dasm_ADD_S_r0_gp_s11(stream, pc, op, opcodes); break; // ADD_S r0,gp,s11
+						size = handle::dasm_ADD_S_r0_gp_s11(stream, pc, op, opcodes); break; // ADD_S r0,gp,s11
 					}
 				}
 				break;
@@ -2955,7 +2955,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I
 // LD_S b,[pcl,u10]                1101 0bbb uuuu uuuu
 // #######################################################################################################################
-				size = handle_dasm_LD_S_b_pcl_u10(stream, pc, op, opcodes); break; // LD_S b,[pcl,u10]
+				size = handle::dasm_LD_S_b_pcl_u10(stream, pc, op, opcodes); break; // LD_S b,[pcl,u10]
 			}
 
 			case 0x1b:
@@ -2964,7 +2964,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I
 // MOV_S b,u8                      1101 1bbb uuuu uuuu
 // #######################################################################################################################
-				size = handle_dasm_MOV_S_b_u8(stream, pc, op, opcodes); break; // MOV_S b, u8
+				size = handle::dasm_MOV_S_b_u8(stream, pc, op, opcodes); break; // MOV_S b, u8
 			}
 
 			case 0x1c: // ADD_S/CMP_S
@@ -2979,7 +2979,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    s
 // ADD_S b,b,u7                    1110 0bbb 0uuu uuuu
 // #######################################################################################################################
-						size = handle_dasm_ADD_S_b_b_u7(stream, pc, op, opcodes); break; // ADD_S b, b, u7
+						size = handle::dasm_ADD_S_b_b_u7(stream, pc, op, opcodes); break; // ADD_S b, b, u7
 					}
 					case 0x01:
 					{
@@ -2987,7 +2987,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    s
 // CMP_S b,u7                      1110 0bbb 1uuu uuuu
 // #######################################################################################################################
-						size = handle_dasm_CMP_S_b_u7(stream, pc, op, opcodes); break; // CMP_S b, u7
+						size = handle::dasm_CMP_S_b_u7(stream, pc, op, opcodes); break; // CMP_S b, u7
 					}
 				}
 				break;
@@ -3004,7 +3004,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    s
 // BREQ_S b,0,s8                   1110 1bbb 0sss ssss
 // #######################################################################################################################
-						size = handle_dasm_BREQ_S_b_0_s8(stream, pc, op, opcodes); break; // BREQ_S b,0,s8
+						size = handle::dasm_BREQ_S_b_0_s8(stream, pc, op, opcodes); break; // BREQ_S b,0,s8
 					}
 					case 0x01:
 					{
@@ -3012,7 +3012,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I    s
 // BRNE_S b,0,s8                   1110 1bbb 1sss ssss
 // #######################################################################################################################
-						size =  handle_dasm_BRNE_S_b_0_s8(stream, pc, op, opcodes); break; // BRNE_S b,0,s8
+						size =  handle::dasm_BRNE_S_b_0_s8(stream, pc, op, opcodes); break; // BRNE_S b,0,s8
 					}
 				}
 				break;
@@ -3029,7 +3029,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII ISS
 // B_S s10                         1111 000s ssss ssss
 // #######################################################################################################################
-						size = handle_dasm_B_S_s10(stream, pc, op, opcodes); break; // B_S s10
+						size = handle::dasm_B_S_s10(stream, pc, op, opcodes); break; // B_S s10
 					}
 					case 0x01:
 					{
@@ -3037,7 +3037,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII ISS
 // BEQ_S s10                       1111 001s ssss ssss
 // #######################################################################################################################
-						size = handle_dasm_BEQ_S_s10(stream, pc, op, opcodes); break; // BEQ_S s10
+						size = handle::dasm_BEQ_S_s10(stream, pc, op, opcodes); break; // BEQ_S s10
 					}
 					case 0x02:
 					{
@@ -3045,7 +3045,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII ISS
 // BNE_S s10                       1111 010s ssss ssss
 // #######################################################################################################################
-						size = handle_dasm_BNE_S_s10(stream, pc, op, opcodes); break; // BNE_S s10
+						size = handle::dasm_BNE_S_s10(stream, pc, op, opcodes); break; // BNE_S s10
 					}
 					case 0x03: // Bcc_S
 					{
@@ -3059,7 +3059,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII ISSs ss
 // BGT_S s7                        1111 0110 00ss ssss
 // #######################################################################################################################
-								size = handle_dasm_BGT_S_s7(stream, pc, op, opcodes); break; // BGT_S s7
+								size = handle::dasm_BGT_S_s7(stream, pc, op, opcodes); break; // BGT_S s7
 							}
 							case 0x01:
 							{
@@ -3067,7 +3067,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII ISSs ss
 // BGE_S s7                        1111 0110 01ss ssss
 // #######################################################################################################################
-								size = handle_dasm_BGE_S_s7(stream, pc, op, opcodes); break; // BGE_S s7
+								size = handle::dasm_BGE_S_s7(stream, pc, op, opcodes); break; // BGE_S s7
 							}
 							case 0x02:
 							{
@@ -3075,7 +3075,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII ISSs ss
 // BLT_S s7                        1111 0110 10ss ssss
 // #######################################################################################################################
-								size = handle_dasm_BLT_S_s7(stream, pc, op, opcodes); break; // BLT_S s7
+								size = handle::dasm_BLT_S_s7(stream, pc, op, opcodes); break; // BLT_S s7
 							}
 							case 0x03:
 							{
@@ -3083,7 +3083,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII ISSs ss
 // BLE_S s7                        1111 0110 11ss ssss
 // #######################################################################################################################
-								size = handle_dasm_BLE_S_s7(stream, pc, op, opcodes); break; // BLE_S s7
+								size = handle::dasm_BLE_S_s7(stream, pc, op, opcodes); break; // BLE_S s7
 							}
 							case 0x04:
 							{
@@ -3091,7 +3091,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII ISSs ss
 // BHI_S s7                        1111 0111 00ss ssss
 // #######################################################################################################################
-								size = handle_dasm_BHI_S_s7(stream, pc, op, opcodes); break; // BHI_S s7
+								size = handle::dasm_BHI_S_s7(stream, pc, op, opcodes); break; // BHI_S s7
 							}
 							case 0x05:
 							{
@@ -3099,7 +3099,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII ISSs ss
 // BHS_S s7                        1111 0111 01ss ssss
 // #######################################################################################################################
-								size = handle_dasm_BHS_S_s7(stream, pc, op, opcodes); break; // BHS_S s7
+								size = handle::dasm_BHS_S_s7(stream, pc, op, opcodes); break; // BHS_S s7
 							}
 							case 0x06:
 							{
@@ -3107,7 +3107,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII ISSs ss
 // BLO_S s7                        1111 0111 10ss ssss
 // #######################################################################################################################
-								size = handle_dasm_BLO_S_s7(stream, pc, op, opcodes); break; // BLO_S s7
+								size = handle::dasm_BLO_S_s7(stream, pc, op, opcodes); break; // BLO_S s7
 							}
 
 							case 0x07:
@@ -3116,7 +3116,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII ISSs ss
 // BLS_S s7                        1111 0111 11ss ssss
 // #######################################################################################################################
-								size = handle_dasm_BLS_S_s7(stream, pc, op, opcodes); break; // BLS_S s7
+								size = handle::dasm_BLS_S_s7(stream, pc, op, opcodes); break; // BLS_S s7
 							}
 						}
 					}
@@ -3129,7 +3129,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I
 // BL_S s13                        1111 1sss ssss ssss
 // #######################################################################################################################
-				size = handle_dasm_BL_S_s13(stream, pc, op, opcodes); break; // BL_S s13
+				size = handle::dasm_BL_S_s13(stream, pc, op, opcodes); break; // BL_S s13
 			}
 		}
 	}

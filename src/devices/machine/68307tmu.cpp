@@ -25,11 +25,11 @@ uint16_t m68307_cpu_device::m68307_internal_timer_r(offs_t offset, uint16_t mem_
 	switch (offset&0x7)
 	{
 		case m68307TIMER_TCN: /* 0x3 (0x126 / 0x136) */
-			//if (m_ppc!=0x2182e) logerror("%08x m68307_internal_timer_r %08x (%04x) (TCN - Timer Counter for timer %d)\n", m_ppc, offset*2,mem_mask, which);
+			//if (m_ipc!=0x2182e) logerror("%08x m68307_internal_timer_r %08x (%04x) (TCN - Timer Counter for timer %d)\n", m_ipc, offset*2,mem_mask, which);
 			return timer.read_tcn(mem_mask, which);
 
 		default:
-			logerror("%08x m68307_internal_timer_r %08x, (%04x)\n", m_ppc, offset*2,mem_mask);
+			logerror("%08x m68307_internal_timer_r %08x, (%04x)\n", m_ipc, offset*2,mem_mask);
 			break;
 	}
 
@@ -46,53 +46,53 @@ void m68307_cpu_device::m68307_internal_timer_w(offs_t offset, uint16_t data, ui
 	switch (offset&0x7)
 	{
 		case m68307TIMER_TMR: /* 0x0 (0x120 / 0x130) */
-			logerror("%08x m68307_internal_timer_w %08x, %04x (%04x) (TMR - Timer Mode Register for timer %d)\n", m_ppc, offset*2,data,mem_mask, which);
+			logerror("%08x m68307_internal_timer_w %08x, %04x (%04x) (TMR - Timer Mode Register for timer %d)\n", m_ipc, offset*2,data,mem_mask, which);
 			timer.write_tmr(data, mem_mask, which);
 			break;
 
 		case m68307TIMER_TRR: /* 0x1 (0x122 / 0x132) */
-			logerror("%08x m68307_internal_timer_w %08x, %04x (%04x) (TRR - Timer Reference Register for timer %d)\n", m_ppc, offset*2,data,mem_mask, which);
+			logerror("%08x m68307_internal_timer_w %08x, %04x (%04x) (TRR - Timer Reference Register for timer %d)\n", m_ipc, offset*2,data,mem_mask, which);
 			timer.write_trr(data, mem_mask, which);
 			break;
 
 		case m68307TIMER_TCR: /* 0x2 (0x124 / 0x134) */
-			logerror("%08x m68307_internal_timer_w %08x, %04x (%04x) (TCR - Timer Capture Register for timer %d) (illegal, read-only)\n", m_ppc, offset*2,data,mem_mask, which);
+			logerror("%08x m68307_internal_timer_w %08x, %04x (%04x) (TCR - Timer Capture Register for timer %d) (illegal, read-only)\n", m_ipc, offset*2,data,mem_mask, which);
 			break;
 
 		case m68307TIMER_TCN: /* 0x3 (0x126 / 0x136) */
-			logerror("%08x m68307_internal_timer_w %08x, %04x (%04x) (TCN - Timer Counter for timer %d)\n", m_ppc, offset*2,data,mem_mask, which);
+			logerror("%08x m68307_internal_timer_w %08x, %04x (%04x) (TCN - Timer Counter for timer %d)\n", m_ipc, offset*2,data,mem_mask, which);
 			break;
 
 		case m68307TIMER_TER: /* 0x4 (0x128 / 0x138) */
 			/* 8-bit only!! */
-			//logerror("%08x m68307_internal_timer_w %08x, %04x (%04x) (TER - Timer Event Register for timer %d)\n", m_ppc, offset*2,data,mem_mask, which);
+			//logerror("%08x m68307_internal_timer_w %08x, %04x (%04x) (TER - Timer Event Register for timer %d)\n", m_ipc, offset*2,data,mem_mask, which);
 			timer.write_ter(data, mem_mask, which);
 			break;
 
 		case m68307TIMER_WRR: /* 0x5 (0x12a / 0x13a) */
 			if (which==0)
 			{
-				logerror("%08x m68307_internal_timer_w %08x, %04x (%04x) (WRR - Watchdog Reference Register)\n", m_ppc, offset*2,data,mem_mask);
+				logerror("%08x m68307_internal_timer_w %08x, %04x (%04x) (WRR - Watchdog Reference Register)\n", m_ipc, offset*2,data,mem_mask);
 			}
 			else
 			{
-				logerror("%08x m68307_internal_timer_w %08x, %04x (%04x) (illegal)\n", m_ppc, offset*2,data,mem_mask);
+				logerror("%08x m68307_internal_timer_w %08x, %04x (%04x) (illegal)\n", m_ipc, offset*2,data,mem_mask);
 			}
 			break;
 
 		case m68307TIMER_WCR: /* 0x6 (0x12c / 0x13c) */
 			if (which==0)
 			{
-				logerror("%08x m68307_internal_timer_w %08x, %04x (%04x) (WRR - Watchdog Counter Register)\n", m_ppc, offset*2,data,mem_mask);
+				logerror("%08x m68307_internal_timer_w %08x, %04x (%04x) (WRR - Watchdog Counter Register)\n", m_ipc, offset*2,data,mem_mask);
 			}
 			else
 			{
-				logerror("%08x m68307_internal_timer_w %08x, %04x (%04x) (illegal)\n", m_ppc, offset*2,data,mem_mask);
+				logerror("%08x m68307_internal_timer_w %08x, %04x (%04x) (illegal)\n", m_ipc, offset*2,data,mem_mask);
 			}
 			break;
 
 		case m68307TIMER_XXX: /* 0x7 (0x12e / 0x13e) */
-			logerror("%08x m68307_internal_timer_w %08x, %04x (%04x) (illegal)\n", m_ppc, offset*2,data,mem_mask);
+			logerror("%08x m68307_internal_timer_w %08x, %04x (%04x) (illegal)\n", m_ipc, offset*2,data,mem_mask);
 			break;
 	}
 }

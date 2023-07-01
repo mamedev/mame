@@ -10,11 +10,10 @@
 
 #define DUMP_VRAM 0
 
-#define LOG_GENERAL  (1 << 0)
-#define LOG_REGISTER (1 << 1)
-#define LOG_FIFO     (1 << 2)
-#define LOG_CMDEXEC  (1 << 3)
-#define LOG_DRAW     (1 << 4)
+#define LOG_REGISTER (1U << 1)
+#define LOG_FIFO     (1U << 2)
+#define LOG_CMDEXEC  (1U << 3)
+#define LOG_DRAW     (1U << 4)
 // #define VERBOSE      (LOG_GENERAL | LOG_REGISTER | LOG_FIFO | LOG_CMDEXEC | LOG_DRAW)
 // #define LOG_OUTPUT_STREAM std::cout
 
@@ -36,8 +35,6 @@ k057714_device::k057714_device(const machine_config &mconfig, const char *tag, d
 
 void k057714_device::device_start()
 {
-	m_irq.resolve_safe();
-
 	m_vram = std::make_unique<uint32_t[]>(VRAM_SIZE/4);
 
 	save_pointer(NAME(m_vram), VRAM_SIZE/4);
@@ -230,10 +227,7 @@ void k057714_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 			/* it enables bits 0x41, but 0x01 seems to be the one it cares about */
 			if (ACCESSING_BITS_16_31 && (data & 0x00010000) == 0)
 			{
-				if (!m_irq.isnull())
-				{
-					m_irq(CLEAR_LINE);
-				}
+				m_irq(CLEAR_LINE);
 			}
 			if (ACCESSING_BITS_0_15)
 			{

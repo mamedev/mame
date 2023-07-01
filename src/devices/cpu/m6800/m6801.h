@@ -45,6 +45,7 @@ class m6801_cpu_device : public m6800_cpu_device
 public:
 	m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// port 1-4 I/O, DDR is passed through mem_mask
 	auto in_p1_cb() { return m_in_port_func[0].bind(); }
 	auto out_p1_cb() { return m_out_port_func[0].bind(); }
 	auto in_p2_cb() { return m_in_port_func[1].bind(); }
@@ -64,18 +65,17 @@ public:
 protected:
 	m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal = address_map_constructor());
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
 	virtual uint32_t execute_input_lines() const noexcept override { return 5; }
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	void p1_ddr_w(uint8_t data);
@@ -129,33 +129,33 @@ protected:
 	int m_sclk_divider;
 
 	/* internal registers */
-	uint8_t   m_port_ddr[4];
-	uint8_t   m_port_data[4];
-	uint8_t   m_p3csr;          // Port 3 Control/Status Register
-	uint8_t   m_tcsr;           /* Timer Control and Status Register */
-	uint8_t   m_pending_tcsr;   /* pending IRQ flag for clear IRQflag process */
-	uint8_t   m_irq2;           /* IRQ2 flags */
-	uint8_t   m_ram_ctrl;
-	PAIR    m_counter;        /* free running counter */
-	PAIR    m_output_compare; /* output compare       */
-	uint16_t  m_input_capture;  /* input capture        */
-	bool m_pending_isf_clear;
-	int     m_port3_latched;
+	uint8_t  m_port_ddr[4];
+	uint8_t  m_port_data[4];
+	uint8_t  m_p3csr;          // Port 3 Control/Status Register
+	uint8_t  m_tcsr;           /* Timer Control and Status Register */
+	uint8_t  m_pending_tcsr;   /* pending IRQ flag for clear IRQflag process */
+	uint8_t  m_irq2;           /* IRQ2 flags */
+	uint8_t  m_ram_ctrl;
+	PAIR     m_counter;        /* free running counter */
+	PAIR     m_output_compare; /* output compare       */
+	uint16_t m_input_capture;  /* input capture        */
+	bool     m_pending_isf_clear;
+	int      m_port3_latched;
+	bool     m_port2_written;
 
-	uint8_t   m_trcsr, m_rmcr, m_rdr, m_tdr, m_rsr, m_tsr;
-	int     m_rxbits, m_txbits, m_txstate, m_trcsr_read_tdre, m_trcsr_read_orfe, m_trcsr_read_rdrf, m_tx, m_ext_serclock;
-	bool    m_use_ext_serclock;
-	bool    m_port2_written;
+	uint8_t  m_trcsr, m_rmcr, m_rdr, m_tdr, m_rsr, m_tsr;
+	int      m_rxbits, m_txbits, m_txstate, m_trcsr_read_tdre, m_trcsr_read_orfe, m_trcsr_read_rdrf, m_tx, m_ext_serclock;
+	bool     m_use_ext_serclock;
 
-	int     m_latch09;
+	int      m_latch09;
 
-	PAIR    m_timer_over;
+	PAIR     m_timer_over;
 	emu_timer *m_sci_timer;
 
 	/* point of next timer event */
 	uint32_t m_timer_next;
 
-	int     m_sc1_state;
+	int      m_sc1_state;
 
 	static const uint8_t cycles_6803[256];
 	static const uint8_t cycles_63701[256];
@@ -207,7 +207,7 @@ protected:
 class hd6301_cpu_device : public m6801_cpu_device
 {
 protected:
-	hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal = address_map_constructor());
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -251,6 +251,7 @@ public:
 class hd6301x_cpu_device : public hd6301_cpu_device
 {
 public:
+	// port 5-7 I/O, DDR is passed through mem_mask
 	auto in_p5_cb() { return m_in_portx_func[0].bind(); }
 	auto out_p5_cb() { return m_out_portx_func[0].bind(); }
 	auto in_p6_cb() { return m_in_portx_func[1].bind(); }
@@ -263,8 +264,7 @@ public:
 protected:
 	hd6301x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -380,7 +380,6 @@ protected:
 	void clear_pending_isf();
 
 	uint8_t m_p6csr;
-	bool m_pending_isf_clear;
 };
 
 

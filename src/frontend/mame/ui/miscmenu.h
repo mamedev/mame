@@ -34,7 +34,7 @@ public:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 };
 
 class menu_bookkeeping : public menu_textbox
@@ -49,7 +49,7 @@ protected:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	attotime prevtime;
 };
@@ -82,7 +82,7 @@ private:
 	};
 
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	std::vector<crosshair_item_data> m_data;
 	std::vector<std::string> m_pics;
@@ -97,7 +97,7 @@ public:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 };
 
 
@@ -113,7 +113,7 @@ public:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	std::vector<const game_driver*> m_list;
 };
@@ -149,7 +149,7 @@ private:
 	};
 
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	void setup_bios();
 
@@ -175,7 +175,7 @@ public:
 
 protected:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 };
 
 } // namespace ui

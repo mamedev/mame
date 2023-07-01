@@ -9,8 +9,6 @@ NOTE:  Eventually to be merged into galaxian.cpp
 TODO:
 ----
 
-- Need correct color PROMs for Super Bond
-
 - Dark Planet background graphics
 
 - Explosion sound in Scramble/Super Cobra repeats
@@ -71,7 +69,7 @@ public:
 	void hustlerb(machine_config &config);
 	void rescuefe(machine_config &config);
 
-	template <int Mask> DECLARE_READ_LINE_MEMBER(stratgyx_coinage_r);
+	template <int Mask> int stratgyx_coinage_r();
 
 private:
 	uint8_t scobra_soundram_r(offs_t offset);
@@ -407,7 +405,7 @@ void scobra_state::hustlerb_sound_io_map(address_map &map)
 
 /* stratgyx coinage DIPs are spread across two input ports */
 template <int Mask>
-READ_LINE_MEMBER(scobra_state::stratgyx_coinage_r)
+int scobra_state::stratgyx_coinage_r()
 {
 	return (ioport("IN4")->read() & Mask) ? 1 : 0;
 }

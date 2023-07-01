@@ -56,7 +56,7 @@ protected:
 
 	// methods
 	virtual void menu_activated() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 	virtual void hook_load(const std::string &filename);
 
 private:

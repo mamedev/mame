@@ -36,6 +36,10 @@
 #include "abc800_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_ABC800I_DSK
+#include "abc800i_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_ABCFD2_DSK
 #include "abcfd2_dsk.h"
 #endif
@@ -560,6 +564,10 @@
 #include "rk_cas.h"
 #endif
 
+#ifdef HAS_FORMATS_ROLAND_DSK
+#include "roland_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_RX50_DSK
 #include "rx50_dsk.h"
 #endif
@@ -680,6 +688,10 @@
 #include "vg5k_cas.h"
 #endif
 
+#ifdef HAS_FORMATS_VGI_DSK
+#include "vgi_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_VICTOR9K_DSK
 #include "victor9k_dsk.h"
 #endif
@@ -730,6 +742,10 @@
 
 #ifdef HAS_FORMATS_FS_ISIS
 #include "fs_isis.h"
+#endif
+
+#ifdef HAS_FORMATS_FS_HP98X5
+#include "fs_hp98x5.h"
 #endif
 
 void mame_formats_full_list(mame_formats_enumerator &en)
@@ -816,6 +832,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #ifdef HAS_FORMATS_ABC800_DSK
 	en.add(FLOPPY_ABC800_FORMAT); // abc800_dsk.h
 #endif
+#ifdef HAS_FORMATS_ABC800I_DSK
+	en.add(FLOPPY_ABC800I_FORMAT); // abc800i_dsk.h
+#endif
 #ifdef HAS_FORMATS_ABCFD2_DSK
 	en.add(FLOPPY_ABC_FD2_FORMAT); // abcfd2_dsk.h
 #endif
@@ -886,6 +905,11 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 #ifdef HAS_FORMATS_FS_HPLIF
 	en.add(fs::HPLIF); // fs_lif.h
+#endif
+#ifdef HAS_FORMATS_FS_HP98X5
+	en.add(fs::HP9825);
+	en.add(fs::HP9831);
+	en.add(fs::HP9845);
 #endif
 
 	en.category("Applix");
@@ -1260,6 +1284,11 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_RC759_FORMAT); // rc759_dsk.h
 #endif
 
+	en.category("Roland");
+#ifdef HAS_FORMATS_ROLAND_DSK
+	en.add(FLOPPY_ROLAND_SDISK_FORMAT); // roland_dsk.h
+#endif
+
 	en.category("DEC");
 #ifdef HAS_FORMATS_RX50_DSK
 	en.add(FLOPPY_RX50IMG_FORMAT); // rx50_dsk.h
@@ -1394,6 +1423,11 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Microbee");
 #ifdef HAS_FORMATS_MBEE_CAS
 	en.add(mbee_cassette_formats); // mbee_cas.h
+#endif
+
+	en.category("Micropolis");
+#ifdef HAS_FORMATS_VGI_DSK
+	en.add(FLOPPY_VGI_FORMAT); // vgi_dsk.h
 #endif
 
 	en.category("Orao");

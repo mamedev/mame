@@ -33,13 +33,13 @@ class rp5h01_device : public device_t
 public:
 	rp5h01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER( enable_w );   /* /CE */
-	DECLARE_WRITE_LINE_MEMBER( reset_w );    /* RESET */
-	DECLARE_WRITE_LINE_MEMBER( cs_w );       /* CS */
-	DECLARE_WRITE_LINE_MEMBER( clock_w );    /* DATA CLOCK (active low) */
-	DECLARE_WRITE_LINE_MEMBER( test_w );     /* TEST */
-	DECLARE_READ_LINE_MEMBER( counter_r );   /* COUNTER OUT */
-	DECLARE_READ_LINE_MEMBER( data_r );      /* DATA */
+	void enable_w(int state);   // /CE
+	void reset_w(int state);    // RESET
+	void cs_w(int state);       // CS
+	void clock_w(int state);    // DATA CLOCK (active low)
+	void test_w(int state);     // TEST
+	int counter_r();            // COUNTER OUT
+	int data_r();               // DATA
 
 protected:
 	// device-level overrides

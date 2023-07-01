@@ -455,9 +455,6 @@ kc_keyboard_device::~kc_keyboard_device()
 
 void kc_keyboard_device::device_start()
 {
-	// resolve callbacks
-	m_write_out.resolve_safe();
-
 	m_timer_transmit_pulse = timer_alloc(FUNC(kc_keyboard_device::transmit_pulse), this);
 	m_timer_transmit_pulse->adjust(attotime::from_usec(1024), 0, attotime::from_usec(1024));
 }

@@ -186,7 +186,8 @@ public:
 		m_hardcopy_led(*this, "hardcopy_led"),
 		m_l1_led(*this, "l1_led"),
 		m_l2_led(*this, "l2_led"),
-		m_vg_timer(nullptr)
+		m_vg_timer(nullptr),
+		m_col_array(*this, "COL%X", 0U)
 		//m_i8251_rx_timer(nullptr),
 		//m_i8251_tx_timer(nullptr),
 		//m_i8251_sync_timer(nullptr)
@@ -216,10 +217,10 @@ private:
 	uint8_t SYSTAT_B();
 
 	TIMER_CALLBACK_MEMBER(execute_vg);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
-	DECLARE_WRITE_LINE_MEMBER(i8251_rxrdy_int);
-	DECLARE_WRITE_LINE_MEMBER(i8251_txrdy_int);
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(i8251_rts);
+	void crtc_vsync(int state);
+	void i8251_rxrdy_int(int state);
+	void i8251_txrdy_int(int state);
+	[[maybe_unused]] void i8251_rts(int state);
 	uint8_t vram_read();
 	uint8_t vram_attr_read();
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -273,7 +274,7 @@ private:
 	uint8_t m_vgGO; // activated on next SYNC pulse after EXEC
 	uint8_t m_ACTS;
 	uint8_t m_ADSR;
-	ioport_port* m_col_array[16];
+	required_ioport_array<16> m_col_array;
 };
 
 // vram access functions:
@@ -961,13 +962,6 @@ void vk100_state::machine_start()
 	m_vgGO = 0;
 	m_ACTS = 1;
 	m_ADSR = 1;
-	char kbdcol[8];
-	// look up all 16 tags 'the slow way' but only once on reset
-	for (int i = 0; i < 16; i++)
-	{
-		sprintf(kbdcol,"COL%X", i);
-		m_col_array[i] = ioport(kbdcol);
-	}
 
 	m_vg_timer = timer_alloc(FUNC(vk100_state::execute_vg), this);
 	// TODO: figure out the best way to bring up the i8251 timers
@@ -976,23 +970,23 @@ void vk100_state::machine_start()
 	//m_i8251_sync_timer = timer_alloc(FUNC(vk100_state::i8251_sync), this);
 }
 
-WRITE_LINE_MEMBER(vk100_state::crtc_vsync)
+void vk100_state::crtc_vsync(int state)
 {
 	m_maincpu->set_input_line(I8085_RST75_LINE, state? ASSERT_LINE : CLEAR_LINE);
 	m_vsync = state;
 }
 
-WRITE_LINE_MEMBER(vk100_state::i8251_rxrdy_int)
+void vk100_state::i8251_rxrdy_int(int state)
 {
 	m_maincpu->set_input_line(I8085_RST65_LINE, state?ASSERT_LINE:CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(vk100_state::i8251_txrdy_int)
+void vk100_state::i8251_txrdy_int(int state)
 {
 	m_maincpu->set_input_line(I8085_RST55_LINE, state?ASSERT_LINE:CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(vk100_state::i8251_rts)
+void vk100_state::i8251_rts(int state)
 {
 	logerror("callback: RTS state changed to %d\n", state);
 	// TODO: only change this during loopback mode!

@@ -70,7 +70,7 @@ void menu_video_targets::populate()
     menu
 -------------------------------------------------*/
 
-void menu_video_targets::handle(event const *ev)
+bool menu_video_targets::handle(event const *ev)
 {
 	if (ev && (ev->iptkey == IPT_UI_SELECT))
 	{
@@ -82,6 +82,8 @@ void menu_video_targets::handle(event const *ev)
 				*target,
 				&machine().video().snapshot_target() == target);
 	}
+
+	return false;
 }
 
 
@@ -200,9 +202,14 @@ void menu_video_options::populate()
     menu
 -------------------------------------------------*/
 
-void menu_video_options::handle(event const *ev)
+bool menu_video_options::handle(event const *ev)
 {
-	auto const lockout_popup([this] () { machine().popmessage(_("Cannot change options while recording!")); });
+	auto const lockout_popup(
+			[this] ()
+			{
+				machine().popmessage(_("Cannot change options while recording!"));
+				return true;
+			});
 	bool const snap_lockout(m_snapshot && machine().video().is_recording());
 	bool changed(false);
 
@@ -340,6 +347,7 @@ void menu_video_options::handle(event const *ev)
 	// if something changed, rebuild the menu
 	if (changed)
 		reset(reset_options::REMEMBER_REF);
+	return false;
 }
 
 } // namespace ui

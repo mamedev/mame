@@ -31,6 +31,12 @@ public:
   bool SetItemText(int itemID, LPCTSTR s)
     { return BOOLToBool(SetDlgItemText(_window, itemID, s)); }
 
+  bool SetItemTextA(int itemID, LPCSTR s)
+    { return BOOLToBool(SetDlgItemTextA(_window, itemID, s)); }
+
+  bool SetItemText_Empty(int itemID)
+    { return SetItemText(itemID, TEXT("")); }
+
   #ifndef _UNICODE
   bool SetItemText(int itemID, LPCWSTR s)
   {
@@ -51,6 +57,12 @@ public:
   */
   #endif
 
+  bool GetItemText(int itemID, UString &s)
+  {
+    CWindow window(GetItem(itemID));
+    return window.GetText(s);
+  }
+
   bool SetItemInt(int itemID, UINT value, bool isSigned)
     { return BOOLToBool(SetDlgItemInt(_window, itemID, value, BoolToBOOL(isSigned))); }
   bool GetItemInt(int itemID, bool isSigned, UINT &value)
@@ -64,6 +76,13 @@ public:
     { return GetNextDlgGroupItem(_window, control, BoolToBOOL(previous)); }
   HWND GetNextTabItem(HWND control, bool previous)
     { return GetNextDlgTabItem(_window, control, BoolToBOOL(previous)); }
+
+  LRESULT SendMsg_NextDlgCtl(WPARAM wParam, LPARAM lParam)
+    { return SendMsg(WM_NEXTDLGCTL, wParam, lParam); }
+  LRESULT SendMsg_NextDlgCtl_HWND(HWND hwnd) { return SendMsg_NextDlgCtl((WPARAM)hwnd, TRUE); }
+  LRESULT SendMsg_NextDlgCtl_CtlId(int id)   { return SendMsg_NextDlgCtl_HWND(GetItem(id)); }
+  LRESULT SendMsg_NextDlgCtl_Next()          { return SendMsg_NextDlgCtl(0, FALSE); }
+  LRESULT SendMsg_NextDlgCtl_Prev()          { return SendMsg_NextDlgCtl(1, FALSE); }
 
   bool MapRect(LPRECT rect)
     { return BOOLToBool(MapDialogRect(_window, rect)); }
@@ -92,6 +111,7 @@ public:
   virtual bool OnCommand(WPARAM wParam, LPARAM lParam);
   virtual bool OnCommand(int code, int itemID, LPARAM lParam);
   virtual bool OnSize(WPARAM /* wParam */, int /* xSize */, int /* ySize */) { return false; }
+  virtual bool OnDestroy() { return false; }
 
   /*
   #ifdef UNDER_CE
@@ -105,6 +125,7 @@ public:
   virtual bool OnButtonClicked(int buttonID, HWND buttonHWND);
   virtual void OnOK() {};
   virtual void OnCancel() {};
+  virtual void OnClose() {}
   virtual bool OnNotify(UINT /* controlID */, LPNMHDR /* lParam */) { return false; }
   virtual bool OnTimer(WPARAM /* timerID */, LPARAM /* callback */) { return false; }
 
@@ -133,6 +154,7 @@ public:
   #endif
   virtual void OnOK() { Destroy(); }
   virtual void OnCancel() { Destroy(); }
+  virtual void OnClose() { Destroy(); }
 };
 
 class CModalDialog: public CDialog
@@ -147,6 +169,7 @@ public:
   bool End(INT_PTR result) { return BOOLToBool(::EndDialog(_window, result)); }
   virtual void OnOK() { End(IDOK); }
   virtual void OnCancel() { End(IDCANCEL); }
+  virtual void OnClose() { End(IDCLOSE); }
 };
 
 class CDialogChildControl: public NWindows::CWindow
@@ -160,7 +183,7 @@ public:
   }
 };
 
-bool IsDialogSizeOK(int xSize, int ySize);
+bool IsDialogSizeOK(int xSize, int ySize, HWND hwnd = NULL);
 
 }}
 

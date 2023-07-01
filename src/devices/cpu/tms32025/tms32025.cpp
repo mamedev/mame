@@ -249,11 +249,11 @@ tms32025_device::tms32025_device(const machine_config &mconfig, device_type type
 	, m_b1(*this, "b1")
 	, m_b2(*this, "b2")
 	, m_b3(*this, "b3")
-	, m_bio_in(*this)
-	, m_hold_in(*this)
+	, m_bio_in(*this, 0xffff)
+	, m_hold_in(*this, 0xffff)
 	, m_hold_ack_out(*this)
 	, m_xf_out(*this)
-	, m_dr_in(*this)
+	, m_dr_in(*this, 0xffff)
 	, m_dx_out(*this)
 	, m_mp_mc(true)
 {
@@ -1664,13 +1664,6 @@ void tms32025_device::device_start()
 		m_program.space().install_rom(0x0000, 0x0fff, memregion("internal")->base());
 	}
 
-	m_bio_in.resolve_safe(0xffff);
-	m_hold_in.resolve_safe(0xffff);
-	m_hold_ack_out.resolve_safe();
-	m_xf_out.resolve_safe();
-	m_dr_in.resolve_safe(0xffff);
-	m_dx_out.resolve_safe();
-
 	m_PREVPC = 0;
 	m_PFC = 0;
 	m_STR0 = 0;
@@ -1858,8 +1851,8 @@ int tms32025_device::process_IRQs()
 
 		if ((m_IFR & 0x01) && (m_imr & 0x01)) {       /* IRQ line 0 */
 			//logerror("TMS32025:  Active INT0\n");
+			standard_irq_callback(0, m_PC);
 			m_PC = 0x0002;
-			standard_irq_callback(0);
 			m_idle = 0;
 			m_IFR &= (~0x01);
 			SET0(INTM_FLAG);
@@ -1867,8 +1860,8 @@ int tms32025_device::process_IRQs()
 		}
 		if ((m_IFR & 0x02) && (m_imr & 0x02)) {       /* IRQ line 1 */
 			//logerror("TMS32025:  Active INT1\n");
+			standard_irq_callback(1, m_PC);
 			m_PC = 0x0004;
-			standard_irq_callback(1);
 			m_idle = 0;
 			m_IFR &= (~0x02);
 			SET0(INTM_FLAG);
@@ -1876,8 +1869,8 @@ int tms32025_device::process_IRQs()
 		}
 		if ((m_IFR & 0x04) && (m_imr & 0x04)) {       /* IRQ line 2 */
 			//logerror("TMS32025:  Active INT2\n");
+			standard_irq_callback(2, m_PC);
 			m_PC = 0x0006;
-			standard_irq_callback(2);
 			m_idle = 0;
 			m_IFR &= (~0x04);
 			SET0(INTM_FLAG);

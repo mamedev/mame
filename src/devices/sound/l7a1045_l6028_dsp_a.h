@@ -26,11 +26,12 @@ public:
 	void dma_w_cb(offs_t offset, uint8_t data);
 	uint16_t dma_r16_cb() { m_voice[0].pos++; return 0; }
 	void dma_w16_cb(uint16_t data) { m_voice[0].pos++; }
-	DECLARE_WRITE_LINE_MEMBER(dma_hreq_cb);
+	void dma_hreq_cb(int state);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;

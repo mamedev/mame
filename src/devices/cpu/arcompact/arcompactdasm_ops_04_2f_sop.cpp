@@ -8,8 +8,7 @@
 \*********************************/
 
 #include "emu.h"
-
-#include "arcompactdasm.h"
+#include "arcompactdasm_internal.h"
 
 int arcompact_disassembler::handle04_2f_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext)
 {
@@ -17,9 +16,9 @@ int arcompact_disassembler::handle04_2f_helper_dasm(std::ostream &stream, offs_t
 	// 0010 0bbb pp10 1111 FBBB CCCC CCII IIII
 	int size = 4;
 
-	uint8_t p = dasm_common32_get_p(op);
-	uint8_t breg = dasm_common32_get_breg(op);
-	bool F = dasm_common32_get_F(op);
+	uint8_t p = common32_get_p(op);
+	uint8_t breg = common32_get_breg(op);
+	bool F = common32_get_F(op);
 
 	util::stream_format(stream, "%s%s", optext, flagbit[F]);
 
@@ -35,7 +34,7 @@ int arcompact_disassembler::handle04_2f_helper_dasm(std::ostream &stream, offs_t
 
 	if (p == 0)
 	{
-		uint8_t creg = dasm_common32_get_creg(op);
+		uint8_t creg = common32_get_creg(op);
 
 		if (creg == DASM_REG_LIMM)
 		{
@@ -51,7 +50,7 @@ int arcompact_disassembler::handle04_2f_helper_dasm(std::ostream &stream, offs_t
 	}
 	else if (p == 1)
 	{
-		uint32_t u = dasm_common32_get_u6(op);
+		uint32_t u = common32_get_u6(op);
 
 		util::stream_format(stream, "0x%02x ", u);
 	}
@@ -67,67 +66,67 @@ int arcompact_disassembler::handle04_2f_helper_dasm(std::ostream &stream, offs_t
 	return size;
 }
 
-int arcompact_disassembler::handle_dasm32_ASL_single(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_ASL_single(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "ASL");
 }
 
-int arcompact_disassembler::handle_dasm32_ASR_single(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_ASR_single(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "ASR");
 }
 
-int arcompact_disassembler::handle_dasm32_LSR_single(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_LSR_single(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "LSR");
 }
 
-int arcompact_disassembler::handle_dasm32_ROR_single(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_ROR_single(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "ROR");
 }
 
-int arcompact_disassembler::handle_dasm32_RRC(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_RRC(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "RCC");
 }
 
-int arcompact_disassembler::handle_dasm32_SEXB(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_SEXB(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "SEXB");
 }
 
-int arcompact_disassembler::handle_dasm32_SEXW(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_SEXW(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "SEXW");
 }
 
-int arcompact_disassembler::handle_dasm32_EXTB(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_EXTB(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "EXTB");
 }
 
-int arcompact_disassembler::handle_dasm32_EXTW(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_EXTW(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "EXTW");
 }
 
-int arcompact_disassembler::handle_dasm32_ABS(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_ABS(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "ABS");
 }
 
-int arcompact_disassembler::handle_dasm32_NOT(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_NOT(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "NOT");
 }
 
-int arcompact_disassembler::handle_dasm32_RLC(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_RLC(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "RLC");
 }
 
-int arcompact_disassembler::handle_dasm32_EX(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_EX(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "EX");
 }

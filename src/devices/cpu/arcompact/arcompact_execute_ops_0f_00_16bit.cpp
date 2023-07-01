@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "emu.h"
-#include "arcompact.h"
+#include "arcompact_helper.ipp"
 
 // #######################################################################################################################
 //                                 IIII I    sssS SSSS

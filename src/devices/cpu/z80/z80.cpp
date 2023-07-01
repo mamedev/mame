@@ -402,7 +402,7 @@ z80_device::ops_type z80_device::out()
  ***************************************************************/
 u8 z80_device::data_read(u16 addr)
 {
-	return m_data.read_byte(addr);
+	return m_data.read_byte(translate_memory_address(addr));
 }
 
 z80_device::ops_type z80_device::rm()
@@ -446,7 +446,7 @@ inline void z80_device::rm16(uint16_t addr, PAIR &r)
  * Write a byte to given memory location
  ***************************************************************/
 void z80_device::data_write(u16 addr, u8 value) {
-	m_data.write_byte((u32)addr, value);
+	m_data.write_byte(translate_memory_address((u32)addr), value);
 }
 
 z80_device::ops_type z80_device::wm()
@@ -512,7 +512,7 @@ inline void z80_device::wm16_sp(PAIR &r)
  ***************************************************************/
 u8 z80_device::opcode_read()
 {
-	return m_opcodes.read_byte(PCD);
+	return m_opcodes.read_byte(translate_memory_address(PCD));
 }
 
 z80_device::ops_type z80_device::rop()
@@ -535,7 +535,7 @@ z80_device::ops_type z80_device::rop()
  ***************************************************************/
 u8 z80_device::arg_read()
 {
-	return m_args.read_byte(PCD);
+	return m_args.read_byte(translate_memory_address(PCD));
 }
 
 z80_device::ops_type z80_device::arg()
@@ -1502,13 +1502,13 @@ inline void z80_device::ei()
 
 inline void z80_device::illegal_1() {
 	logerror("Z80 ill. opcode $%02x $%02x ($%04x)\n",
-			m_opcodes.read_byte((PCD-1)&0xffff), m_opcodes.read_byte(PCD), PCD-1);
+			m_opcodes.read_byte(translate_memory_address((PCD-1)&0xffff)), m_opcodes.read_byte(translate_memory_address(PCD)), PCD-1);
 }
 
 inline void z80_device::illegal_2()
 {
 	logerror("Z80 ill. opcode $ed $%02x\n",
-			m_opcodes.read_byte((PCD-1)&0xffff));
+			m_opcodes.read_byte(translate_memory_address((PCD-1)&0xffff)));
 }
 
 void z80_device::init_op_steps() {
@@ -3306,7 +3306,7 @@ void z80_device::take_interrupt()
 
 	// fetch the IRQ vector
 	device_z80daisy_interface *intf = daisy_get_irq_device();
-	int irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback_member(*this, 0);
+	int irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w.l);
 	LOG(("Z80 single int. irq_vector $%02x\n", irq_vector));
 
 	/* 'interrupt latency' cycles */
@@ -3367,11 +3367,23 @@ void z80_device::take_interrupt()
 					PCD = irq_vector & 0xffff;
 					break;
 				default:        /* rst (or other opcodes?) */
-					/* RST $xx cycles */
-					CC(op, 0xff);
-					T(m_icount_executing - MTM * 2);
-					wm16_sp(m_pc);
-					PCD = irq_vector & 0x0038;
+					if (irq_vector == 0xfb)
+					{
+						// EI
+						CC(op, 0xfb);
+						T(m_icount_executing);
+						ei();
+					}
+					else if ((irq_vector & 0xc7) == 0xc7)
+					{
+						/* RST $xx cycles */
+						CC(op, 0xff);
+						T(m_icount_executing - MTM * 2);
+						wm16_sp(m_pc);
+						PCD = irq_vector & 0x0038;
+					}
+					else
+						logerror("take_interrupt: unexpected opcode in im0 mode: 0x%02x\n", irq_vector);
 					break;
 			}
 		}
@@ -3642,16 +3654,12 @@ void z80_device::device_start()
 	m_cc_xy = cc_xy;
 	m_cc_xycb = cc_xycb;
 	m_cc_ex = cc_ex;
-
-	m_irqack_cb.resolve_safe();
-	m_refresh_cb.resolve_safe();
-	m_nomreq_cb.resolve_safe();
-	m_halt_cb.resolve_safe();
 }
 
 void nsc800_device::device_start()
 {
 	z80_device::device_start();
+
 	save_item(NAME(m_nsc800_irq_state));
 }
 

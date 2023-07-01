@@ -19,7 +19,8 @@
 \*********************************/
 
 #include "emu.h"
-#include "arcompact.h"
+#include "arcompact_helper.ipp"
+
 #include "arcompactdasm.h"
 
 

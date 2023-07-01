@@ -147,17 +147,17 @@ void fireone_state::music_w(offs_t offset, uint8_t data)
 	m_pit->write(offset, data);
 }
 
-WRITE_LINE_MEMBER(fireone_state::music_a_out_cb)
+void fireone_state::music_a_out_cb(int state)
 {
 	m_music_a->write(state);
 }
 
-WRITE_LINE_MEMBER(fireone_state::music_b_out_cb)
+void fireone_state::music_b_out_cb(int state)
 {
 	m_music_b->write(state);
 }
 
-WRITE_LINE_MEMBER(fireone_state::music_c_out_cb)
+void fireone_state::music_c_out_cb(int state)
 {
 	m_music_c->write(state);
 }

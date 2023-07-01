@@ -44,23 +44,22 @@ public:
 	void write(u8 data);
 
 	// status output polling
-	DECLARE_READ_LINE_MEMBER(busy_r) { return internal_busy() ? 0 : 1; }
-	DECLARE_READ_LINE_MEMBER(irq_r) { return m_irq_active ? 0 : 1; }
+	int busy_r() { return internal_busy() ? 0 : 1; }
+	int irq_r() { return m_irq_active ? 0 : 1; }
 
 protected:
 	m3002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_clock_changed() override;
 
-	// device_nvram_interface overrides
+	// device_nvram_interface implementation
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
 	virtual void nvram_default() override;
 
-	// device_rtc_interface overrides
+	// device_rtc_interface implementation
 	virtual bool rtc_feature_y2k() const override { return false; }
 	virtual bool rtc_feature_leap_year() const override { return true; }
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;

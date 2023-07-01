@@ -199,7 +199,7 @@ device_dmvslot_interface::~device_dmvslot_interface()
 dmvcart_slot_device::dmvcart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, DMVCART_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_dmvslot_interface>(mconfig, *this),
-	m_prog_read_cb(*this),
+	m_prog_read_cb(*this, 0),
 	m_prog_write_cb(*this),
 	m_out_int_cb(*this),
 	m_out_irq_cb(*this),
@@ -226,13 +226,6 @@ dmvcart_slot_device::~dmvcart_slot_device()
 void dmvcart_slot_device::device_start()
 {
 	m_cart = get_card_device();
-
-	// resolve callbacks
-	m_prog_read_cb.resolve_safe(0);
-	m_prog_write_cb.resolve_safe();
-	m_out_int_cb.resolve_safe();
-	m_out_irq_cb.resolve_safe();
-	m_out_thold_cb.resolve_safe();
 }
 
 /*-------------------------------------------------

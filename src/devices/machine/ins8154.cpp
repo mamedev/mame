@@ -14,7 +14,7 @@
 #include "emu.h"
 #include "ins8154.h"
 
-#define LOG_BITS   (1U <<  1)
+#define LOG_BITS   (1U << 1)
 //#define VERBOSE (LOG_BITS) // (LOG_GENERAL|LOG_BITS)
 #include "logmacro.h"
 
@@ -48,9 +48,9 @@ DEFINE_DEVICE_TYPE(INS8154, ins8154_device, "ins8154", "INS8154 RAM I/O")
 
 ins8154_device::ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, INS8154, tag, owner, clock)
-	, m_in_a_cb(*this)
+	, m_in_a_cb(*this, 0xff)
 	, m_out_a_cb(*this)
-	, m_in_b_cb(*this)
+	, m_in_b_cb(*this, 0xff)
 	, m_out_b_cb(*this)
 	, m_out_irq_cb(*this)
 	, m_in_a(0), m_in_b(0), m_out_a(0), m_out_b(0), m_mdr(0), m_odra(0), m_odrb(0)
@@ -63,13 +63,6 @@ ins8154_device::ins8154_device(const machine_config &mconfig, const char *tag, d
 
 void ins8154_device::device_start()
 {
-	/* resolve callbacks */
-	m_in_a_cb.resolve();
-	m_out_a_cb.resolve_safe();
-	m_in_b_cb.resolve();
-	m_out_b_cb.resolve_safe();
-	m_out_irq_cb.resolve_safe();
-
 	/* register for state saving */
 	save_item(NAME(m_in_a));
 	save_item(NAME(m_in_b));
@@ -111,14 +104,12 @@ uint8_t ins8154_device::read_io(offs_t offset)
 	switch (offset)
 	{
 	case 0x20:
-		if (!m_in_a_cb.isnull())
-			val = m_in_a_cb(0);
+		val = m_in_a_cb(0);
 		m_in_a = val;
 		break;
 
 	case 0x21:
-		if (!m_in_b_cb.isnull())
-			val = m_in_b_cb(0);
+		val = m_in_b_cb(0);
 		m_in_b = val;
 		break;
 
@@ -126,7 +117,7 @@ uint8_t ins8154_device::read_io(offs_t offset)
 		val = 0;
 		if (offset < 0x08) // Read a bit in Port A
 		{
-			if (!m_in_a_cb.isnull())
+			if (!m_in_a_cb.isunset())
 			{
 				//val = (m_in_a_cb(0) << (8 - offset)) & 0x80;
 				val = (m_in_a_cb(0) & ~m_odra & (1 << (offset & 0x07))) ? 0x80 : 0x00;
@@ -135,7 +126,7 @@ uint8_t ins8154_device::read_io(offs_t offset)
 		}
 		else  // Read a bit in Port B
 		{
-			if (!m_in_b_cb.isnull())
+			if (!m_in_b_cb.isunset())
 			{
 				val = (m_in_b_cb(0) & ~m_odrb & (1 << (offset & 0x07))) ? 0x80 : 0x00;
 			}

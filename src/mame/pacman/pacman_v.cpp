@@ -194,7 +194,7 @@ void pacman_state::pacman_colorram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE_LINE_MEMBER(pacman_state::flipscreen_w)
+void pacman_state::flipscreen_w(int state)
 {
 	m_flipscreen = state;
 	m_bg_tilemap->set_flip(m_flipscreen * (TILEMAP_FLIPX + TILEMAP_FLIPY));
@@ -207,7 +207,7 @@ void mspactwin_state::mspactwin_videoram_w(offs_t offset, uint8_t data)
 	pacman_videoram_w(offset, data);
 }
 
-WRITE_LINE_MEMBER(mspactwin_state::flipscreen_w)
+void mspactwin_state::flipscreen_w(int state)
 {
 	m_flipscreen = state;
 	m_bg_tilemap->set_flip(m_flipscreen * (TILEMAP_FLIPX + TILEMAP_FLIPY));
@@ -338,19 +338,19 @@ VIDEO_START_MEMBER(pacman_state,pengo)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pacman_state::pacman_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(pacman_state::pacman_scan_rows)), 8, 8, 36, 28);
 }
 
-WRITE_LINE_MEMBER(pacman_state::pengo_palettebank_w)
+void pacman_state::pengo_palettebank_w(int state)
 {
 	m_palettebank = state;
 	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(pacman_state::pengo_colortablebank_w)
+void pacman_state::pengo_colortablebank_w(int state)
 {
 	m_colortablebank = state;
 	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(pacman_state::pengo_gfxbank_w)
+void pacman_state::pengo_gfxbank_w(int state)
 {
 	m_spritebank = state;
 	m_charbank = state;
@@ -569,13 +569,13 @@ void pacman_state::jrpacman_videoram_w(offs_t offset, uint8_t data)
 	jrpacman_mark_tile_dirty(offset);
 }
 
-WRITE_LINE_MEMBER(pacman_state::jrpacman_charbank_w)
+void pacman_state::jrpacman_charbank_w(int state)
 {
 	m_charbank = state;
 	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(pacman_state::jrpacman_spritebank_w)
+void pacman_state::jrpacman_spritebank_w(int state)
 {
 	m_spritebank = state;
 }
@@ -588,7 +588,7 @@ void pacman_state::jrpacman_scroll_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(pacman_state::jrpacman_bgpriority_w)
+void pacman_state::jrpacman_bgpriority_w(int state)
 {
 	m_bgpriority = state;
 }

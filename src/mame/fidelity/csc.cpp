@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Kevin Horton, Jonathan Gevaryahu, Sandro Ronco, hap
 // thanks-to:Berger, yoyo_chessboard
-/******************************************************************************
+/*******************************************************************************
 
 Fidelity CSC(and derived) hardware
 - Champion Sensory Chess Challenger
@@ -15,7 +15,7 @@ TODO:
 - hook up csce I/O properly, it doesn't have PIAs
 - verify super9cc maskrom dump
 
-*******************************************************************************
+********************************************************************************
 
 Champion Sensory Chess Challenger (CSC)
 ---------------------------------------
@@ -42,6 +42,7 @@ on the CSC. Also seen with 101-1025A04 label, same ROM contents.
 101-1025A03 might be optional, one (untampered) Spanish PCB was seen with a socket
 instead of this ROM. Most of the opening book is in here.
 
+PCB label: 510-1326B01
 CPU is a 6502 running at 1.95MHz (3.9MHz resonator, divided by 2)
 
 NMI is not used.
@@ -148,7 +149,7 @@ LED display:
 -----
 88:88
 
-The LED display is four 7 segment digits.  normal ABCDEFG lettering is used for segments.
+The LED display is four 7 segment digits. Normal ABCDEFG lettering is used for segments.
 
 The upper dot is connected to digit 3 common
 The lower dot is connected to digit 4 common
@@ -156,12 +157,13 @@ The lone LED is connected to digit 1 common
 
 All three of the above are called "segment H".
 
-*******************************************************************************
+********************************************************************************
 
 Elite Champion Challenger (ELITE)
 This is a limited-release chess computer based on the CSC. They removed the PIAs
 and did the I/O with TTL instead (PIAs will still work from software point of view).
 ---------------------------------
+PCB label: 510-1041B01
 MPS 6502C CPU @ 4MHz
 20KB total ROM size, 4KB RAM(8*HM6147P)
 
@@ -169,7 +171,7 @@ The "Fidelity X" that won the 1981 Travemünde contest is also on this hardware,
 a 5MHz CPU and 32KB total ROM size. In the 90s, Wilfried Bucke provided an upgrade
 kit for csce to make it similar to this version, CPU was changed to a R65C02P4.
 
-*******************************************************************************
+********************************************************************************
 
 Super 9 Sensory Chess Challenger (SU9/DS9)
 This is basically the Fidelity Elite A/S program on CSC hardware.
@@ -183,24 +185,24 @@ built-in CB9 module
 
 See CSC description above for more information.
 
-*******************************************************************************
+********************************************************************************
 
 Reversi Sensory Challenger (RSC)
 The 1st version came out in 1980, a program revision was released in 1981.
 Another distinction is the board color and layout, the 1981 version is green.
 Not sure if the 1st version was even released, or just a prototype.
 ---------------------------------
-8*(8+1) buttons, 8*8+1 LEDs
-1KB RAM(2*2114), 4KB ROM
+PCB label: 510-1035A01
 MOS MPS 6502B CPU, frequency unknown
 MOS MPS 6520 PIA, I/O is nearly same as CSC's PIA 0
-PCB label 510-1035A01
+1KB RAM(2*2114), 4KB ROM
+8*(8+1) buttons, 8*8+1 LEDs
 
 To play it on MAME with the sensorboard device, it is recommended to set up
 keyboard shortcuts for the spawn inputs. Then hold the spawn input down while
 clicking on the game board.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -277,12 +279,12 @@ protected:
 	void pia0_pa_w(u8 data);
 	void pia0_pb_w(u8 data);
 	u8 pia0_pa_r();
-	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w);
+	void pia0_ca2_w(int state);
+	void pia0_cb2_w(int state);
 	void pia1_pa_w(u8 data);
 	void pia1_pb_w(u8 data);
 	u8 pia1_pb_r();
-	DECLARE_WRITE_LINE_MEMBER(pia1_ca2_w);
+	void pia1_ca2_w(int state);
 
 	u8 m_led_data = 0;
 	u8 m_7seg_data = 0;
@@ -332,9 +334,9 @@ void su9_state::su9_set_cpu_freq()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // sensorboard handlers
 
@@ -410,10 +412,8 @@ u8 csc_state::pia0_read(offs_t offset)
 	// CA1/CB1: button row 6/7
 	if (!machine().side_effects_disabled())
 	{
-		if (offset == 1)
-			m_pia[0]->ca1_w(BIT(read_inputs(), 6));
-		else if (offset == 3)
-			m_pia[0]->cb1_w(BIT(read_inputs(), 7));
+		m_pia[0]->ca1_w(BIT(read_inputs(), 6));
+		m_pia[0]->cb1_w(BIT(read_inputs(), 7));
 	}
 
 	return m_pia[0]->read(offset);
@@ -440,7 +440,7 @@ void csc_state::pia0_pb_w(u8 data)
 	update_display();
 }
 
-WRITE_LINE_MEMBER(csc_state::pia0_cb2_w)
+void csc_state::pia0_cb2_w(int state)
 {
 	// 7442 A2
 	m_inp_mux = (m_inp_mux & ~4) | (state ? 4 : 0);
@@ -448,7 +448,7 @@ WRITE_LINE_MEMBER(csc_state::pia0_cb2_w)
 	update_sound();
 }
 
-WRITE_LINE_MEMBER(csc_state::pia0_ca2_w)
+void csc_state::pia0_ca2_w(int state)
 {
 	// 7442 A3
 	m_inp_mux = (m_inp_mux & ~8) | (state ? 8 : 0);
@@ -498,16 +498,16 @@ u8 csc_state::pia1_pb_r()
 	return data | (*m_language << 6 & 0xc0);
 }
 
-WRITE_LINE_MEMBER(csc_state::pia1_ca2_w)
+void csc_state::pia1_ca2_w(int state)
 {
 	// printer?
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void csc_state::csc_map(address_map &map)
 {
@@ -541,9 +541,9 @@ void csc_state::rsc_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( csc )
 	PORT_START("IN.0")
@@ -611,9 +611,9 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void csc_state::csc(machine_config &config)
 {
@@ -711,9 +711,9 @@ void csc_state::rsc(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( csc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -851,15 +851,15 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, csc,      0,      0, csc,      csc,  csc_state, empty_init, "Fidelity Electronics", "Champion Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, csce,     0,      0, csce,     csc,  csc_state, empty_init, "Fidelity Electronics", "Elite Champion Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, cscet,    csce,   0, cscet,    csc,  csc_state, empty_init, "Fidelity Electronics", u8"Elite Champion Challenger (Travemünde TM version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1981, csc,      0,      0,      csc,     csc,   csc_state, empty_init, "Fidelity Electronics", "Champion Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, csce,     0,      0,      csce,    csc,   csc_state, empty_init, "Fidelity Electronics", "Elite Champion Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, cscet,    csce,   0,      cscet,   csc,   csc_state, empty_init, "Fidelity Electronics", u8"Elite Champion Challenger (Travemünde TM version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1983, super9cc, 0,      0, su9,      su9,  su9_state, empty_init, "Fidelity Electronics", "Super \"9\" Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, super9cc, 0,      0,      su9,     su9,   su9_state, empty_init, "Fidelity Electronics", "Super \"9\" Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1981, reversic, 0,      0, rsc,      rsc,  csc_state, empty_init, "Fidelity Electronics", "Reversi Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, reversic, 0,      0,      rsc,     rsc,   csc_state, empty_init, "Fidelity Electronics", "Reversi Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

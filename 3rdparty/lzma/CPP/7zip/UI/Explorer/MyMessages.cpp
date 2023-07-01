@@ -26,7 +26,7 @@ void ShowErrorMessageRes(UINT resID)
   ShowErrorMessageHwndRes(0, resID);
 }
 
-void ShowErrorMessageDWORD(HWND window, DWORD errorCode)
+static void ShowErrorMessageDWORD(HWND window, DWORD errorCode)
 {
   ShowErrorMessage(window, NError::MyFormatMessage(errorCode));
 }

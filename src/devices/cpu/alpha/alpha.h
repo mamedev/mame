@@ -32,7 +32,7 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;

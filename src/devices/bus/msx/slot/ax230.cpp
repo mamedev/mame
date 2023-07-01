@@ -36,7 +36,7 @@ void msx_slot_ax230_device::device_start()
 	}
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
 	page(1)->install_read_bank(0x6000, 0x7fff, m_rombank[1]);
-	page(1)->install_write_handler(0x6000, 0x7fff, write8sm_delegate(*this, FUNC(msx_slot_ax230_device::mapper_write)));
+	page(1)->install_write_handler(0x6000, 0x7fff, emu::rw_delegate(*this, FUNC(msx_slot_ax230_device::mapper_write)));
 	page(2)->install_read_bank(0x8000, 0x9fff, m_rombank[2]);
 	page(2)->install_read_bank(0xa000, 0xbfff, m_rombank[3]);
 }

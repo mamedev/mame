@@ -111,10 +111,6 @@ electron_cartslot_device::electron_cartslot_device(const machine_config &mconfig
 void electron_cartslot_device::device_start()
 {
 	m_cart = get_card_device();
-
-	// resolve callbacks
-	m_irq_handler.resolve_safe();
-	m_nmi_handler.resolve_safe();
 }
 
 
@@ -122,19 +118,16 @@ void electron_cartslot_device::device_start()
 //  call load
 //-------------------------------------------------
 
-image_init_result electron_cartslot_device::call_load()
+std::pair<std::error_condition, std::string> electron_cartslot_device::call_load()
 {
 	if (m_cart)
 	{
 		if (!loaded_through_softlist())
 		{
-			uint32_t size = length();
+			uint32_t const size = length();
 
 			if (size % 0x2000)
-			{
-				seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-				return image_init_result::FAIL;
-			}
+				return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be a multiple of 8K)");
 
 			m_cart->rom_alloc(size, tag());
 			fread(m_cart->get_rom_base(), size);
@@ -150,11 +143,8 @@ image_init_result electron_cartslot_device::call_load()
 			uint32_t ramsize = get_software_region_length("ram");
 			uint32_t nvramsize = get_software_region_length("nvram");
 
-			if ((upsize % 0x2000 && upsize != 0) || (losize % 0x2000 && losize != 0) || (romsize % 0x2000 && romsize != 0))
-			{
-				seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-				return image_init_result::FAIL;
-			}
+			if ((upsize % 0x2000) || (losize % 0x2000) || (romsize % 0x2000))
+				return std::make_pair(image_error::INVALIDLENGTH, "Unsupported ROM size (must be a multiple of 8K)");
 
 			// load standard 2x16K ROM cartridges
 			if (losize != 0 || upsize != 0)
@@ -197,7 +187,7 @@ image_init_result electron_cartslot_device::call_load()
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

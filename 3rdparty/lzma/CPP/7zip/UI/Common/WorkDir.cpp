@@ -5,6 +5,7 @@
 #include "../../../Common/StringConvert.h"
 #include "../../../Common/Wildcard.h"
 
+#include "../../../Windows/FileFind.h"
 #include "../../../Windows/FileName.h"
 
 #include "WorkDir.h"
@@ -39,13 +40,13 @@ FString GetWorkDir(const NWorkDir::CInfo &workDirInfo, const FString &path, FStr
   #endif
   
   int pos = path.ReverseFind_PathSepar() + 1;
-  fileName = path.Ptr(pos);
+  fileName = path.Ptr((unsigned)pos);
   
   switch (mode)
   {
     case NWorkDir::NMode::kCurrent:
     {
-      return path.Left(pos);
+      return path.Left((unsigned)pos);
     }
     case NWorkDir::NMode::kSpecified:
     {
@@ -75,8 +76,7 @@ HRESULT CWorkDirTempFile::CreateTempFile(const FString &originalPath)
   OutStream = _outStreamSpec;
   if (!_tempFile.Create(workDir + namePart, &_outStreamSpec->File))
   {
-    DWORD error = GetLastError();
-    return error ? error : E_FAIL;
+    return GetLastError_noZero_HRESULT();
   }
   _originalPath = originalPath;
   return S_OK;
@@ -87,8 +87,7 @@ HRESULT CWorkDirTempFile::MoveToOriginal(bool deleteOriginal)
   OutStream.Release();
   if (!_tempFile.MoveTo(_originalPath, deleteOriginal))
   {
-    DWORD error = GetLastError();
-    return error ? error : E_FAIL;
+    return GetLastError_noZero_HRESULT();
   }
   return S_OK;
 }

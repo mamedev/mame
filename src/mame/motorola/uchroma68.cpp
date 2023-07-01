@@ -175,7 +175,7 @@ private:
 	bool m_video_inv;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	DECLARE_WRITE_LINE_MEMBER(kansas_w);
+	void kansas_w(int state);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6846_device> m_mc6846;
@@ -358,7 +358,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(uchroma68_state::kansas_r)
 		m_acia->write_rxc(1);
 }
 
-WRITE_LINE_MEMBER(uchroma68_state::kansas_w)
+void uchroma68_state::kansas_w(int state)
 {
 	// The Kansas City cassette format encodes a '0' bit by four cycles of
 	// a 1200 Hz sine wave, and a '1' bit as eight cycles of 2400 Hz,

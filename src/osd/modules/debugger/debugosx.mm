@@ -160,7 +160,7 @@ void debugger_osx::wait_for_debugger(device_t &device, bool firststop)
 	}
 
 	// get and process messages
-	NSEvent *ev = [NSApp nextEventMatchingMask:NSAnyEventMask
+	NSEvent *ev = [NSApp nextEventMatchingMask:NSEventMaskAny
 									 untilDate:[NSDate distantFuture]
 										inMode:NSDefaultRunLoopMode
 									   dequeue:YES];
@@ -236,7 +236,7 @@ void debugger_osx::build_menus()
 		[[debugMenu addItemWithTitle:@"Hard Reset"
 							  action:@selector(debugHardReset:)
 					   keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF3FunctionKey]]
-		 setKeyEquivalentModifierMask:NSShiftKeyMask];
+		 setKeyEquivalentModifierMask:NSEventModifierFlagShift];
 
 		NSMenu *const runMenu = [[NSMenu alloc] initWithTitle:@"Run"];
 		item = [[NSApp mainMenu] insertItemWithTitle:@"Run"
@@ -290,7 +290,7 @@ void debugger_osx::build_menus()
 		[[runMenu addItemWithTitle:@"Step Out"
 							action:@selector(debugStepOut:)
 					 keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF10FunctionKey]]
-		 setKeyEquivalentModifierMask:NSShiftKeyMask];
+		 setKeyEquivalentModifierMask:NSEventModifierFlagShift];
 	}
 }
 

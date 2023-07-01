@@ -83,7 +83,6 @@ private:
 
 void mindset_module_interface::device_start()
 {
-	m_irq_cb.resolve_safe();
 	save_item(NAME(m_irq_state));
 }
 

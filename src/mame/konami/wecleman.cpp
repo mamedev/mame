@@ -829,7 +829,7 @@ INPUT_PORTS_END
                             Hot Chase Input Ports
 ***************************************************************************/
 
-READ_LINE_MEMBER(wecleman_state::hotchase_sound_status_r)
+int wecleman_state::hotchase_sound_status_r()
 {
 	return m_hotchase_sound_hs;
 }

@@ -1,6 +1,6 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, ElSemi
-/***************************************************************************
+/**************************************************************************************************
 
     L7A1045 L6028 DSP-A
     (QFP120 package)
@@ -77,11 +77,16 @@
 
     TODO:
     - Sample format needs to be double checked;
-    - Octave Control/BPM/Pitch, right now XRally Network BGM wants 66150 Hz which is definitely too fast for Terry Bogard speech;
-    - Key Off;
+    - Octave Control/BPM/Pitch, xrally Network BGM wants 66150 Hz which is definitely too fast for
+      most fatfurwa samples;
+    - Key Off for looping samples (fatfurwa should stop all samples when user insert a credit,
+      cfr. reg[0] readback);
+    - Most non-looping samples are setup to repeat twice on different channels (cfr. fatfurwa);
+    - Fix relative sample end positions (non-loop);
     - ADSR (registers 2 & 4?);
+    - How DMA really works?
 
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "l7a1045_l6028_dsp_a.h"
@@ -120,7 +125,9 @@ void l7a1045_sound_device::device_start()
 	assert(!(m_rom.length() & (m_rom.length() - 1)));
 
 	// Allocate the stream
-	m_stream = stream_alloc(0, 2, 66150); //clock() / 384);
+//  m_stream = stream_alloc(0, 2, 66150); //clock() / 384);
+	// TODO: confirm frequency
+	m_stream = stream_alloc(0, 2, 44100);
 
 	save_item(STRUCT_MEMBER(m_voice, start));
 	save_item(STRUCT_MEMBER(m_voice, end));
@@ -135,6 +142,10 @@ void l7a1045_sound_device::device_start()
 	save_item(STRUCT_MEMBER(m_audiodat, dat));
 }
 
+void l7a1045_sound_device::device_reset()
+{
+	m_key = 0;
+}
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
@@ -218,8 +229,10 @@ uint16_t l7a1045_sound_device::l7a1045_sound_r(offs_t offset, uint16_t mem_mask)
 
 	//logerror("%s: read at %x (mask %04x)\n", tag(), offset, mem_mask);
 
-	if(offset == 0)
-		printf("sound_select_r?\n");
+	if (offset == 0)
+	{
+		//logerror("sound_select_r?\n");
+	}
 	else
 		return sound_data_r(offset -1);
 
@@ -255,7 +268,7 @@ void l7a1045_sound_device::sound_data_w(offs_t offset, uint16_t data)
 	l7a1045_voice *vptr = &m_voice[m_audiochannel];
 
 	//if(m_audioregister != 0 && m_audioregister != 1 && m_audioregister != 7)
-	//  printf("%04x %04x (%04x %04x)\n",offset,data,m_audioregister,m_audiochannel);
+	//  logerror("%04x %04x (%04x %04x)\n",offset,data,m_audioregister,m_audiochannel);
 
 	m_audiodat[m_audioregister][m_audiochannel].dat[offset] = data;
 
@@ -281,12 +294,15 @@ void l7a1045_sound_device::sound_data_w(offs_t offset, uint16_t data)
 			break;
 		case 0x01:
 			// relative to start
-				//printf("%04x\n",m_audiodat[m_audioregister][m_audiochannel].dat[0]);
-				//printf("%04x\n",m_audiodat[m_audioregister][m_audiochannel].dat[1]);
-				//printf("%04x\n",m_audiodat[m_audioregister][m_audiochannel].dat[2]);
+				//logerror("%04x\n",m_audiodat[m_audioregister][m_audiochannel].dat[0]);
+				//logerror("%04x\n",m_audiodat[m_audioregister][m_audiochannel].dat[1]);
+				//logerror("%04x\n",m_audiodat[m_audioregister][m_audiochannel].dat[2]);
 
 			if(m_audiodat[m_audioregister][m_audiochannel].dat[2] & 0x100)
 			{
+				// TODO: definitely wrong
+				// fatfurwa title screen sample 0x45a (0x8000?)
+				// fatfurwa coin 0x3a0 (0x2000?)
 				vptr->end = (m_audiodat[m_audioregister][m_audiochannel].dat[0] & 0xffff) << 2;
 				vptr->end += vptr->start;
 				vptr->mode = false;
@@ -312,7 +328,7 @@ void l7a1045_sound_device::sound_data_w(offs_t offset, uint16_t data)
 			vptr->r_volume = (vptr->r_volume) | (vptr->r_volume << 8);
 			vptr->l_volume = (m_audiodat[m_audioregister][m_audiochannel].dat[0] >> 8) & 0xff;
 			vptr->l_volume = (vptr->l_volume) | (vptr->l_volume << 8);
-			//printf("%04x %02x %02x\n",m_audiodat[m_audioregister][m_audiochannel].dat[0],vptr->l_volume,vptr->r_volume);
+			//logerror("%04x %02x %02x\n",m_audiodat[m_audioregister][m_audiochannel].dat[0],vptr->l_volume,vptr->r_volume);
 
 			break;
 	}
@@ -321,7 +337,7 @@ void l7a1045_sound_device::sound_data_w(offs_t offset, uint16_t data)
 
 uint16_t l7a1045_sound_device::sound_data_r(offs_t offset)
 {
-	//printf("%04x (%04x %04x)\n",offset,m_audioregister,m_audiochannel);
+	//logerror("%04x (%04x %04x)\n",offset,m_audioregister,m_audiochannel);
 	//machine().debug_break();
 	l7a1045_voice *vptr = &m_voice[m_audiochannel];
 
@@ -331,6 +347,9 @@ uint16_t l7a1045_sound_device::sound_data_r(offs_t offset)
 		{
 			uint32_t current_addr;
 			uint16_t res;
+
+			// TODO: fatfurwa reads offset == 2, ANDs with 0xf and compares against a sample buffer value if it's bigger, smaller or equal
+			// Returning 0xffff here for looping samples and they will silence out when user insert a coin ...
 
 			current_addr = vptr->start + vptr->pos;
 			if(offset == 0)
@@ -344,6 +363,9 @@ uint16_t l7a1045_sound_device::sound_data_r(offs_t offset)
 		}
 	}
 
+	// TODO: at least regs [3] and [5], relative position read-back?
+	// TODO: reg [6]
+
 	return 0;
 }
 
@@ -356,11 +378,11 @@ void l7a1045_sound_device::sound_status_w(uint16_t data)
 #if 0
 		if(vptr->start != 0)
 		{
-		printf("%08x START\n",vptr->start);
-		printf("%08x END\n",vptr->end);
+			logerror("%08x START\n",vptr->start);
+			logerror("%08x END\n",vptr->end);
 
-		for(int i=0;i<0x10;i++)
-			printf("%02x (%02x) = %04x%04x%04x\n",m_audiochannel,i,m_audiodat[i][m_audiochannel].dat[2],m_audiodat[i][m_audiochannel].dat[1],m_audiodat[i][m_audiochannel].dat[0]);
+			for(int i=0;i<0x10;i++)
+				logerror("%02x (%02x) = %04x%04x%04x\n",m_audiochannel,i,m_audiodat[i][m_audiochannel].dat[2],m_audiodat[i][m_audiochannel].dat[1],m_audiodat[i][m_audiochannel].dat[0]);
 		}
 #endif
 
@@ -370,7 +392,8 @@ void l7a1045_sound_device::sound_status_w(uint16_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(l7a1045_sound_device::dma_hreq_cb)
+// TODO: stub functions not really used
+void l7a1045_sound_device::dma_hreq_cb(int state)
 {
 //  m_maincpu->hack_w(1);
 }

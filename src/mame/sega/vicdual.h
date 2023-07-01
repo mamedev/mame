@@ -69,13 +69,13 @@ public:
 	void carhntds(machine_config &config);
 	void alphaho(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(coin_status_r);
-	DECLARE_READ_LINE_MEMBER(get_64v);
-	DECLARE_READ_LINE_MEMBER(vblank_comp_r);
-	DECLARE_READ_LINE_MEMBER(cblank_comp_r);
-	DECLARE_READ_LINE_MEMBER(timer_value_r);
-	template <int Param> DECLARE_READ_LINE_MEMBER(fake_lives_r);
-	template <int N> DECLARE_READ_LINE_MEMBER(samurai_protection_r);
+	int coin_status_r();
+	int get_64v();
+	int vblank_comp_r();
+	int cblank_comp_r();
+	int timer_value_r();
+	template <int Param> int fake_lives_r();
+	template <int N> int samurai_protection_r();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed);
 
 protected:
@@ -297,7 +297,7 @@ protected:
 	/*----------- defined in audio/carnival.cpp -----------*/
 	void carnival_audio_1_w(uint8_t data);
 	void carnival_audio_2_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( carnival_music_port_t1_r );
+	int carnival_music_port_t1_r();
 	void carnivala_music_port_1_w(uint8_t data);
 	void carnivala_music_port_2_w(uint8_t data);
 	void carnival_psg_latch();

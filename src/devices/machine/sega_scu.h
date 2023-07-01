@@ -46,13 +46,13 @@ public:
 	// I/O operations
 	void regs_map(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_out_w);
-	DECLARE_WRITE_LINE_MEMBER(vblank_in_w);
-	DECLARE_WRITE_LINE_MEMBER(hblank_in_w);
-	DECLARE_WRITE_LINE_MEMBER(vdp1_end_w);
+	void vblank_out_w(int state);
+	void vblank_in_w(int state);
+	void hblank_in_w(int state);
+	void vdp1_end_w(int state);
 	void check_scanline_timers(int scanline,int y_step);
-	DECLARE_WRITE_LINE_MEMBER(sound_req_w);
-	DECLARE_WRITE_LINE_MEMBER(smpc_irq_w);
+	void sound_req_w(int state);
+	void smpc_irq_w(int state);
 
 	template <typename T> void set_hostcpu(T &&tag) { m_hostcpu.set_tag(std::forward<T>(tag)); }
 
@@ -110,7 +110,7 @@ private:
 	void dma_single_transfer(uint32_t src, uint32_t dst,uint8_t *src_shift);
 	void dma_start_factor_ack(uint8_t event);
 
-	DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
+	void scudsp_end_w(int state);
 	uint16_t scudsp_dma_r(offs_t offset, uint16_t mem_mask = ~0);
 	void scudsp_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 

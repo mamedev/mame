@@ -45,12 +45,13 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 	set_process_flags(PROCESS_LR_ALWAYS | PROCESS_CUSTOM_NAV);
 	for (device_image_interface& image : image_interface_enumerator(mui.machine().root_device()))
 	{
-		if (image.filename())
+		if (image.loaded_through_softlist())
 		{
-			m_list = strensure(image.software_list_name());
+			m_list = image.software_list_name();
 			m_short = image.software_entry()->shortname();
 			m_long = image.software_entry()->longname();
 			m_parent = image.software_entry()->parentname();
+			break;
 		}
 	}
 	std::vector<std::string> lua_list;
@@ -166,32 +167,36 @@ void menu_dats_view::add_info_text(text_layout &layout, std::string_view text, r
 //  handle
 //-------------------------------------------------
 
-void menu_dats_view::handle(event const *ev)
+bool menu_dats_view::handle(event const *ev)
 {
-	if (ev)
+	if (!ev)
+		return false;
+
+	switch (ev->iptkey)
 	{
-		switch (ev->iptkey)
+	case IPT_UI_LEFT:
+		if (m_actual > 0)
 		{
-		case IPT_UI_LEFT:
-			if (m_actual > 0)
-			{
-				m_actual--;
-				reset_layout();
-			}
-			break;
-
-		case IPT_UI_RIGHT:
-			if ((m_actual + 1) < m_items_list.size())
-			{
-				m_actual++;
-				reset_layout();
-			}
-			break;
-
-		default:
-			handle_key(ev->iptkey);
+			m_actual--;
+			reset_layout();
+			return true;
 		}
+		break;
+
+	case IPT_UI_RIGHT:
+		if ((m_actual + 1) < m_items_list.size())
+		{
+			m_actual++;
+			reset_layout();
+			return true;
+		}
+		break;
+
+	default:
+		return handle_key(ev->iptkey);
 	}
+
+	return false;
 }
 
 //-------------------------------------------------

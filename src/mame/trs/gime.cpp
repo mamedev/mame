@@ -144,7 +144,7 @@ gime_device::gime_device(const machine_config &mconfig, device_type type, const 
 	, sam6883_friend_device_interface(mconfig, *this, 8)
 	, m_write_irq(*this)
 	, m_write_firq(*this)
-	, m_read_floating_bus(*this)
+	, m_read_floating_bus(*this, 0)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_ram(*this, finder_base::DUMMY_TAG)
 	, m_cart_device(*this, finder_base::DUMMY_TAG)
@@ -192,11 +192,6 @@ void gime_device::device_start()
 		snprintf(buffer, std::size(buffer), "wbank%d", i);
 		m_write_banks[i] = machine().root_device().membank(buffer);
 	}
-
-	// resolve callbacks
-	m_write_irq.resolve_safe();
-	m_write_firq.resolve_safe();
-	m_read_floating_bus.resolve_safe(0);
 
 	// set up ROM/RAM pointers
 	m_rom = m_rom_region->base();

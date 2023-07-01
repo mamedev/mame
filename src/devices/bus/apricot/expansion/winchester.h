@@ -34,15 +34,15 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(hdc_intrq_w);
+	void hdc_intrq_w(int state);
 	uint8_t hdc_data_r();
 	void hdc_data_w(uint8_t data);
 	uint8_t int_r();
-	template<int N> DECLARE_WRITE_LINE_MEMBER(head_w);
-	template<int N> DECLARE_WRITE_LINE_MEMBER(drive_w);
-	DECLARE_WRITE_LINE_MEMBER(xferd_w);
-	DECLARE_WRITE_LINE_MEMBER(hbcr_w);
-	DECLARE_WRITE_LINE_MEMBER(clksel_w);
+	template<int N> void head_w(int state);
+	template<int N> void drive_w(int state);
+	void xferd_w(int state);
+	void hbcr_w(int state);
+	void clksel_w(int state);
 	uint8_t data_r();
 	void data_w(uint8_t data);
 

@@ -5,7 +5,7 @@
 \*********************************/
 
 #include "emu.h"
-#include "arcompactdasm.h"
+#include "arcompactdasm_internal.h"
 
 
 inline uint32_t arcompact_disassembler::get_01_01_01_address_offset(uint32_t op)
@@ -16,7 +16,7 @@ inline uint32_t arcompact_disassembler::get_01_01_01_address_offset(uint32_t op)
 	return address;
 }
 
-int arcompact_disassembler::handle_dasm32_B_cc_D_s21(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_B_cc_D_s21(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	int size = 4;
 	// Branch Conditionally
@@ -25,13 +25,13 @@ int arcompact_disassembler::handle_dasm32_B_cc_D_s21(std::ostream &stream, offs_
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
 	address = util::sext(address, 20);
 	int n = (op & 0x00000020) >> 5;
-	uint8_t condition = dasm_common32_get_condition(op);
+	uint8_t condition = common32_get_condition(op);
 
 	util::stream_format(stream, "B%s%s 0x%08x", conditions[condition], delaybit[n], (pc&0xfffffffc) + (address * 2));
 	return size;
 }
 
-int arcompact_disassembler::handle_dasm32_B_D_s25(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_B_D_s25(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	int size = 4;
 	// Branch Unconditionally Far
@@ -47,7 +47,7 @@ int arcompact_disassembler::handle_dasm32_B_D_s25(std::ostream &stream, offs_t p
 	return size;
 }
 
-int arcompact_disassembler::handle_dasm32_BL_cc_d_s21(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_BL_cc_d_s21(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	int size = 4;
 
@@ -59,13 +59,13 @@ int arcompact_disassembler::handle_dasm32_BL_cc_d_s21(std::ostream &stream, offs
 
 	int n = (op & 0x00000020) >> 5;
 
-	uint8_t condition = dasm_common32_get_condition(op);
+	uint8_t condition = common32_get_condition(op);
 
 	util::stream_format(stream, "BL%s%s 0x%08x", conditions[condition], delaybit[n], (pc&0xfffffffc) + (address *2));
 	return size;
 }
 
-int arcompact_disassembler::handle_dasm32_BL_d_s25(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_BL_d_s25(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	int size = 4;
 	// Branch and Link Unconditionally Far
@@ -92,8 +92,8 @@ int arcompact_disassembler::handle01_01_00_helper(std::ostream &stream, offs_t p
 	// 00001 bbb sssssss 1 S BBB CCCCCC N 0 iiii
 	uint32_t address = get_01_01_01_address_offset(op);
 
-	uint8_t creg = dasm_common32_get_creg(op);
-	uint8_t breg = dasm_common32_get_breg(op);
+	uint8_t creg = common32_get_creg(op);
+	uint8_t breg = common32_get_breg(op);
 	int n = (op & 0x00000020) >> 5;
 
 	if ((breg != DASM_REG_LIMM) && (creg != DASM_REG_LIMM))
@@ -125,42 +125,42 @@ int arcompact_disassembler::handle01_01_00_helper(std::ostream &stream, offs_t p
 
 
 // register - register cases
-int arcompact_disassembler::handle_dasm32_BREQ_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_BREQ_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_00_helper( stream, pc, op, opcodes, "BREQ");
 }
 
-int arcompact_disassembler::handle_dasm32_BRNE_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_BRNE_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_00_helper( stream, pc, op, opcodes, "BRNE");
 }
 
-int arcompact_disassembler::handle_dasm32_BRLT_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_BRLT_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_00_helper( stream, pc, op, opcodes, "BRLT");
 }
 
-int arcompact_disassembler::handle_dasm32_BRGE_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_BRGE_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_00_helper( stream, pc, op, opcodes, "BRGE");
 }
 
-int arcompact_disassembler::handle_dasm32_BRLO_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_BRLO_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_00_helper( stream, pc, op, opcodes, "BRLO");
 }
 
-int arcompact_disassembler::handle_dasm32_BRHS_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_BRHS_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_00_helper( stream, pc, op, opcodes, "BRHS");
 }
 
-int arcompact_disassembler::handle_dasm32_BBIT0_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_BBIT0_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_00_helper( stream, pc, op, opcodes, "BBIT0");
 }
 
-int arcompact_disassembler::handle_dasm32_BBIT1_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_BBIT1_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_00_helper( stream, pc, op, opcodes, "BBIT1");
 }
@@ -176,8 +176,8 @@ int arcompact_disassembler::handle01_01_01_helper(std::ostream &stream, offs_t p
 	// 0000 1bbb ssss sss1 SBBB uuuu uuN1 iiii
 	uint32_t address = get_01_01_01_address_offset(op);
 
-	uint32_t u = dasm_common32_get_u6(op);
-	uint8_t breg = dasm_common32_get_breg(op);
+	uint32_t u = common32_get_u6(op);
+	uint8_t breg = common32_get_breg(op);
 	int n = (op & 0x00000020) >> 5;
 
 	util::stream_format(stream, "%s%s %s, 0x%02x 0x%08x", optext, delaybit[n], regnames[breg], u, (pc&0xfffffffc) + (address * 2));
@@ -186,42 +186,42 @@ int arcompact_disassembler::handle01_01_01_helper(std::ostream &stream, offs_t p
 }
 
 // register -immediate cases
-int arcompact_disassembler::handle_dasm32_BREQ_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_BREQ_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_01_helper(stream, pc, op, opcodes, "BREQ");
 }
 
-int arcompact_disassembler::handle_dasm32_BRNE_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_BRNE_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_01_helper(stream, pc, op, opcodes, "BRNE");
 }
 
-int arcompact_disassembler::handle_dasm32_BRLT_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_BRLT_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_01_helper(stream, pc, op, opcodes, "BRLT");
 }
 
-int arcompact_disassembler::handle_dasm32_BRGE_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_BRGE_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_01_helper(stream, pc, op, opcodes, "BRGE");
 }
 
-int arcompact_disassembler::handle_dasm32_BRLO_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_BRLO_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_01_helper(stream, pc, op, opcodes, "BRLO");
 }
 
-int arcompact_disassembler::handle_dasm32_BRHS_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_BRHS_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_01_helper(stream, pc, op, opcodes, "BRHS");
 }
 
-int arcompact_disassembler::handle_dasm32_BBIT0_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_BBIT0_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_01_helper(stream, pc, op, opcodes, "BBIT0");
 }
 
-int arcompact_disassembler::handle_dasm32_BBIT1_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle::dasm32_BBIT1_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_01_helper(stream, pc, op, opcodes, "BBIT1");
 }

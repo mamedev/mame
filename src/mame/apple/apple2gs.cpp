@@ -386,11 +386,11 @@ private:
 	void bank1_0000_sh_w(offs_t offset, u8 data);
 	u8 bank1_c000_r(offs_t offset);
 	void bank1_c000_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
-	DECLARE_WRITE_LINE_MEMBER(doc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(scc_irq_w);
+	void a2bus_irq_w(int state);
+	void a2bus_nmi_w(int state);
+	void a2bus_inh_w(int state);
+	void doc_irq_w(int state);
+	void scc_irq_w(int state);
 	u8 doc_adc_read();
 	u8 apple2gs_read_vector(offs_t offset);
 
@@ -568,7 +568,7 @@ offs_t apple2gs_state::dasm_trampoline(std::ostream &stream, offs_t pc, const ut
 	return m_a2common->dasm_override_GS(stream, pc, opcodes, params);
 }
 
-WRITE_LINE_MEMBER(apple2gs_state::a2bus_irq_w)
+void apple2gs_state::a2bus_irq_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -581,13 +581,13 @@ WRITE_LINE_MEMBER(apple2gs_state::a2bus_irq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(apple2gs_state::a2bus_nmi_w)
+void apple2gs_state::a2bus_nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
 // TODO: this assumes /INH only on ROM, needs expansion to support e.g. phantom-slotting cards and etc.
-WRITE_LINE_MEMBER(apple2gs_state::a2bus_inh_w)
+void apple2gs_state::a2bus_inh_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -727,12 +727,24 @@ void apple2gs_state::machine_start()
 	m_inh_slot = -1;
 	m_cnxx_slot = CNXX_UNCLAIMED;
 
-	// install memory beyond 256K/1M
-	address_space& space = m_maincpu->space(AS_PROGRAM);
-	int ramsize = m_ram_size - 0x20000; // subtract 128K for banks 0 and 1, which are handled specially
 
-	// RAM sizes for both classes of machine no longer include the Mega II RAM
-	space.install_ram(0x020000, ramsize - 1 + 0x20000, m_ram_ptr + 0x020000);
+	// install memory beyond 256K
+	int ramsize = m_ram_size;
+	if (!m_is_rom3 && m_ram_size <= 1280 * 1024)
+	{
+		ramsize -= 0x40000; // subtract 256k for banks 0, 1, e0, e1
+	}
+	else if (m_is_rom3 || m_ram_size == 1024 * 1024 * 8)
+	{
+		ramsize -= 0x20000; // subtract 128K for banks 0 and 1, which are handled specially
+	}
+
+	if (ramsize)
+	{
+		address_space& space = m_maincpu->space(AS_PROGRAM);
+		// RAM sizes for both classes of machine no longer include the Mega II RAM
+		space.install_ram(0x020000, ramsize - 1 + 0x20000, m_ram_ptr + 0x020000);
+	}
 
 	// setup save states
 	save_item(NAME(m_speaker_state));
@@ -881,6 +893,9 @@ void apple2gs_state::machine_reset()
 	auxbank_update();
 	update_slotrom_banks();
 
+	// reset the slots
+	m_a2bus->reset_bus();
+
 	// with all the banking reset, now reset the CPU
 	m_maincpu->reset();
 
@@ -1002,10 +1017,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	m_screen->update_partial(scanline);
 
 	/* check scanline interrupt bits if we're in super hi-res and the current scanline is within the active display area */
-	if ((m_video->get_newvideo() & 0x80) && (scanline >= (BORDER_TOP-1)) && (scanline < (200+BORDER_TOP-1)))
+	if ((m_video->get_newvideo() & 0x80) && (scanline >= BORDER_TOP) && (scanline < (200+BORDER_TOP)))
 	{
 		u8 scb;
-		const int shrline = scanline - BORDER_TOP + 1;
+		const int shrline = scanline - BORDER_TOP;
 
 		if (shrline & 1)
 		{
@@ -1501,28 +1516,11 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 	switch (offset)
 	{
-		case 0x00:  // keyboard latch
+		// keyboard latch
+		case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06:
+		case 0x07: case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d:
+		case 0x0e: case 0x0f:
 			return uKeyboard;
-
-		case 0x02:  // RAMRDOFF
-			m_ramrd = false;
-			auxbank_update();
-			break;
-
-		case 0x03:  // RAMRDON
-			m_ramrd = true;
-			auxbank_update();
-			break;
-
-		case 0x04:  // RAMWRTOFF
-			m_ramwrt = false;
-			auxbank_update();
-			break;
-
-		case 0x05:  // RAMWRTON
-			m_ramwrt = true;
-			auxbank_update();
-			break;
 
 		case 0x10:  // read any key down, reset keyboard strobe
 			keyglu_816_write(GLU_C010, 0);
@@ -3390,8 +3388,26 @@ void apple2gs_state::adbmicro_p2_out(u8 data)
 	if (!BIT(data, 5) && BIT(m_adb_p2_last, 5))
 	{
 		m_adb_reset_freeze = 2;
+		m_a2bus->reset_bus();
 		m_maincpu->reset();
 		m_video->set_newvideo(0x41);
+
+		m_lcram = false;
+		m_lcram2 = true;
+		m_lcprewrite = false;
+		m_lcwriteenable = true;
+		m_intcxrom = false;
+		m_slotc3rom = false;
+		m_video->a80store_w(false);
+		m_altzp = false;
+		m_ramrd = false;
+		m_ramwrt = false;
+		m_altzp = false;
+		m_video->page2_w(false);
+		m_video->res_w(0);
+
+		auxbank_update();
+		update_slotrom_banks();
 	}
 
 	if (!(data & 0x10))
@@ -3647,7 +3663,7 @@ void apple2gs_state::keyglu_regen_irqs()
 	}
 }
 
-WRITE_LINE_MEMBER(apple2gs_state::scc_irq_w)
+void apple2gs_state::scc_irq_w(int state)
 {
 	if (state)
 	{
@@ -3660,7 +3676,7 @@ WRITE_LINE_MEMBER(apple2gs_state::scc_irq_w)
 }
 
 /* Sound - DOC */
-WRITE_LINE_MEMBER(apple2gs_state::doc_irq_w)
+void apple2gs_state::doc_irq_w(int state)
 {
 	if (state)
 	{

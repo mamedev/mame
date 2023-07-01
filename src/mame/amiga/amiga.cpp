@@ -24,6 +24,8 @@
 #include "machine/mos6526.h"
 #include "machine/gayle.h"
 #include "machine/dmac.h"
+#include "machine/pccard.h"
+#include "machine/pccard_sram.h"
 #include "machine/nvram.h"
 #include "machine/i2cmem.h"
 #include "machine/amigafdc.h"
@@ -113,7 +115,7 @@ public:
 		return *this;
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(kbclk_w)
+	void kbclk_w(int state)
 	{
 		if (bool(state) != bool(m_kbclk))
 		{
@@ -141,11 +143,6 @@ public:
 	}
 
 protected:
-	virtual void device_resolve_objects() override
-	{
-		m_kbrst_cb.resolve_safe();
-	}
-
 	virtual void device_start() override
 	{
 		// allocate resources
@@ -248,6 +245,7 @@ public:
 	void a1000_bootrom_map(address_map &map);
 	void a1000_mem(address_map &map);
 	void a1000_overlay_map(address_map &map);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -272,8 +270,8 @@ public:
 	void init_pal();
 	void init_ntsc();
 
-	DECLARE_WRITE_LINE_MEMBER( zorro2_int2_w );
-	DECLARE_WRITE_LINE_MEMBER( zorro2_int6_w );
+	void zorro2_int2_w(int state);
+	void zorro2_int6_w(int state);
 
 	u16 clock_r(offs_t offset);
 	void clock_w(offs_t offset, u16 data);
@@ -281,6 +279,7 @@ public:
 	void a2000(machine_config &config);
 	void a2000n(machine_config &config);
 	void a2000_mem(address_map &map);
+
 protected:
 	virtual void machine_reset() override;
 
@@ -311,12 +310,13 @@ public:
 	void init_pal();
 	void init_ntsc();
 
-	DECLARE_WRITE_LINE_MEMBER( side_int2_w );
-	DECLARE_WRITE_LINE_MEMBER( side_int6_w );
+	void side_int2_w(int state);
+	void side_int6_w(int state);
 
 	void a500n(machine_config &config);
 	void a500(machine_config &config);
 	void a500_mem(address_map &map);
+
 protected:
 	virtual void machine_reset() override;
 
@@ -354,15 +354,16 @@ public:
 
 	uint8_t dmac_scsi_data_read(offs_t offset);
 	void dmac_scsi_data_write(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( dmac_int_w );
+	void dmac_int_w(int state);
 
 	void tpi_port_b_write(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( tpi_int_w );
+	void tpi_int_w(int state);
 
 	void cdtv(machine_config &config);
 	void cdtvn(machine_config &config);
 	void cdtv_mem(address_map &map);
 	void cdtv_rc_mem(address_map &map);
+
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -401,6 +402,7 @@ public:
 	void a3000(machine_config &config);
 	void a3000n(machine_config &config);
 	void a3000_mem(address_map &map);
+
 protected:
 
 private:
@@ -426,6 +428,7 @@ public:
 	void a500pn(machine_config &config);
 	void a500p(machine_config &config);
 	void a500p_mem(address_map &map);
+
 protected:
 	virtual void machine_reset() override;
 
@@ -448,10 +451,13 @@ class a600_state : public amiga_state
 public:
 	a600_state(const machine_config &mconfig, device_type type, const char *tag)
 		: amiga_state(mconfig, type, tag)
+		, m_gayle(*this, "gayle")
+		, m_pcmcia(*this, "pcmcia")
 		, m_gayle_int2(0)
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER( gayle_int2_w );
+	void gayle_int2_w(int state);
+	void gayle_int6_w(int state);
 
 	void init_pal();
 	void init_ntsc();
@@ -461,11 +467,18 @@ public:
 	void a600n(machine_config &config);
 	void a600(machine_config &config);
 	void a600_mem(address_map &map);
+
 protected:
+	// amiga_state overrides
 	virtual bool int2_pending() override;
+	virtual bool int6_pending() override;
 
 private:
+	required_device<gayle_device> m_gayle;
+	required_device<pccard_slot_device> m_pcmcia;
+
 	int m_gayle_int2;
+	int m_gayle_int6;
 };
 
 class a1200_state : public amiga_state
@@ -473,10 +486,13 @@ class a1200_state : public amiga_state
 public:
 	a1200_state(const machine_config &mconfig, device_type type, const char *tag)
 		: amiga_state(mconfig, type, tag)
+		, m_gayle(*this, "gayle")
+		, m_pcmcia(*this, "pcmcia")
 		, m_gayle_int2(0)
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER( gayle_int2_w );
+	void gayle_int2_w(int state);
+	void gayle_int6_w(int state);
 
 	void init_pal();
 	void init_ntsc();
@@ -486,11 +502,18 @@ public:
 	void a1200(machine_config &config);
 	void a1200n(machine_config &config);
 	void a1200_mem(address_map &map);
+
 protected:
+	// amiga_state overrides
 	virtual bool int2_pending() override;
+	virtual bool int6_pending() override;
 
 private:
+	required_device<gayle_device> m_gayle;
+	required_device<pccard_slot_device> m_pcmcia;
+
 	int m_gayle_int2;
+	int m_gayle_int6;
 };
 
 class a4000_state : public amiga_state
@@ -510,7 +533,7 @@ public:
 	void scsi_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u16 ide_r(offs_t offset, u16 mem_mask = ~0);
 	void ide_w(offs_t offset, u16 data, u16 mem_mask);
-	DECLARE_WRITE_LINE_MEMBER( ide_interrupt_w );
+	void ide_interrupt_w(int state);
 	u32 motherboard_r(offs_t offset, u32 mem_mask = ~0);
 	void motherboard_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
@@ -526,6 +549,7 @@ public:
 	void a400030_mem(address_map &map);
 	void a4000_mem(address_map &map);
 	void a4000t_mem(address_map &map);
+
 protected:
 
 private:
@@ -544,17 +568,17 @@ public:
 	cd32_state(const machine_config &mconfig, device_type type, const char *tag)
 		: amiga_state(mconfig, type, tag)
 		, m_player_ports(*this, {"p1_cd32_buttons", "p2_cd32_buttons"})
-		, m_cdda(*this, "cdda")
+		, m_cdda(*this, "akiko:cdda")
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER( akiko_int_w );
+	void akiko_int_w(int state);
 	void akiko_cia_0_port_a_write(uint8_t data);
 
 	void handle_joystick_cia(u8 pra, u8 dra);
 	u16 handle_joystick_potgor(u16 potgor);
 
 	DECLARE_CUSTOM_INPUT_MEMBER( cd32_input );
-	template <int P> DECLARE_READ_LINE_MEMBER( cd32_sel_mirror_input );
+	template <int P> int cd32_sel_mirror_input();
 
 	void init_pal();
 	void init_ntsc();
@@ -568,6 +592,7 @@ public:
 	void cd32n(machine_config &config);
 	void cd32(machine_config &config);
 	void cd32_mem(address_map &map);
+
 protected:
 	// amiga_state overrides
 	virtual void potgo_w(u16 data) override;
@@ -630,7 +655,7 @@ void cdtv_state::dmac_scsi_data_write(offs_t offset, uint8_t data)
 		m_tpi->write(offset, data);
 }
 
-WRITE_LINE_MEMBER( cdtv_state::dmac_int_w )
+void cdtv_state::dmac_int_w(int state)
 {
 	m_dmac_irq = state;
 	update_int2();
@@ -642,7 +667,7 @@ void cdtv_state::tpi_port_b_write(uint8_t data)
 	m_cdrom->enable_w(BIT(data, 1));
 }
 
-WRITE_LINE_MEMBER( cdtv_state::tpi_int_w )
+void cdtv_state::tpi_int_w(int state)
 {
 	m_tpi_irq = state;
 	update_int2();
@@ -817,13 +842,13 @@ void a2000_state::machine_reset()
 	m_zorro->reset();
 }
 
-WRITE_LINE_MEMBER( a2000_state::zorro2_int2_w )
+void a2000_state::zorro2_int2_w(int state)
 {
 	m_zorro2_int2 = state;
 	update_int2();
 }
 
-WRITE_LINE_MEMBER( a2000_state::zorro2_int6_w )
+void a2000_state::zorro2_int6_w(int state)
 {
 	m_zorro2_int6 = state;
 	update_int6();
@@ -848,13 +873,13 @@ void a500_state::machine_reset()
 	m_side->reset();
 }
 
-WRITE_LINE_MEMBER( a500_state::side_int2_w )
+void a500_state::side_int2_w(int state)
 {
 	m_side_int2 = state;
 	update_int2();
 }
 
-WRITE_LINE_MEMBER( a500_state::side_int6_w )
+void a500_state::side_int6_w(int state)
 {
 	m_side_int6 = state;
 	update_int6();
@@ -938,10 +963,21 @@ bool a600_state::int2_pending()
 	return m_cia_0_irq || m_gayle_int2;
 }
 
-WRITE_LINE_MEMBER( a600_state::gayle_int2_w )
+bool a600_state::int6_pending()
+{
+	return m_cia_1_irq || m_gayle_int6;
+}
+
+void a600_state::gayle_int2_w(int state)
 {
 	m_gayle_int2 = state;
 	update_int2();
+}
+
+void a600_state::gayle_int6_w(int state)
+{
+	m_gayle_int6 = state;
+	update_int6();
 }
 
 bool a1200_state::int2_pending()
@@ -949,10 +985,21 @@ bool a1200_state::int2_pending()
 	return m_cia_0_irq || m_gayle_int2;
 }
 
-WRITE_LINE_MEMBER( a1200_state::gayle_int2_w )
+bool a1200_state::int6_pending()
+{
+	return m_cia_1_irq || m_gayle_int6;
+}
+
+void a1200_state::gayle_int2_w(int state)
 {
 	m_gayle_int2 = state;
 	update_int2();
+}
+
+void a1200_state::gayle_int6_w(int state)
+{
+	m_gayle_int6 = state;
+	update_int6();
 }
 
 u32 a4000_state::scsi_r(offs_t offset, u32 mem_mask)
@@ -993,7 +1040,7 @@ void a4000_state::ide_w(offs_t offset, u16 data, u16 mem_mask)
 		m_ata->cs0_swap_w((offset >> 1) & 0x07, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER( a4000_state::ide_interrupt_w )
+void a4000_state::ide_interrupt_w(int state)
 {
 	m_ide_interrupt = state;
 }
@@ -1038,7 +1085,7 @@ void a4000_state::motherboard_w(offs_t offset, u32 data, u32 mem_mask)
 	logerror("motherboard_w(%06x): %08x & %08x\n", offset, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER(cd32_state::akiko_int_w)
+void cd32_state::akiko_int_w(int state)
 {
 	set_interrupt(INTENA_SETCLR | INTENA_PORTS);
 }
@@ -1125,7 +1172,7 @@ CUSTOM_INPUT_MEMBER( cd32_state::cd32_input )
 }
 
 template <int P>
-READ_LINE_MEMBER( cd32_state::cd32_sel_mirror_input )
+int cd32_state::cd32_sel_mirror_input()
 {
 	u8 bits = m_player_ports[P]->read();
 	return (bits & 0x20)>>5;
@@ -1330,7 +1377,12 @@ void a600_state::a600_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
-	map(0x200000, 0xa7ffff).noprw();
+	map(0x200000, 0x5fffff).noprw();
+	map(0x600000, 0x9fffff).rw(m_pcmcia, FUNC(pccard_slot_device::read_memory_swap), FUNC(pccard_slot_device::write_memory_swap));
+	map(0xa00000, 0xa1ffff).rw(m_pcmcia, FUNC(pccard_slot_device::read_reg_swap), FUNC(pccard_slot_device::write_reg_swap));
+	//map(0xa20000, 0xa3ffff) credit card i/o
+	//map(0xa40000, 0xa5ffff) credit card bits
+	//map(0xa60000, 0xa7ffff) credit card pc i/o
 	map(0xa80000, 0xafffff).nopw().r(FUNC(a600_state::rom_mirror_r));
 	map(0xb00000, 0xb7ffff).nopw().r(FUNC(a600_state::rom_mirror_r));
 	map(0xb80000, 0xbeffff).noprw(); // reserved (cdtv)
@@ -1338,7 +1390,7 @@ void a600_state::a600_mem(address_map &map)
 	map(0xc00000, 0xd7ffff).noprw(); // slow mem
 	map(0xd80000, 0xd8ffff).noprw(); // spare chip select
 	map(0xd90000, 0xd9ffff).noprw(); // arcnet chip select
-	map(0xda0000, 0xdaffff).rw("gayle", FUNC(gayle_device::gayle_r), FUNC(gayle_device::gayle_w));
+	map(0xda0000, 0xdaffff).m("gayle", FUNC(gayle_device::register_map));
 	map(0xdb0000, 0xdbffff).noprw(); // reserved (external ide)
 	map(0xdc0000, 0xdcffff).noprw(); // rtc
 	map(0xdd0000, 0xddffff).noprw(); // reserved (dma controller)
@@ -1355,7 +1407,12 @@ void a1200_state::a1200_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap32));
-	map(0x200000, 0xa7ffff).noprw();
+	map(0x200000, 0x5fffff).noprw();
+	map(0x600000, 0x9fffff).rw(m_pcmcia, FUNC(pccard_slot_device::read_memory_swap), FUNC(pccard_slot_device::write_memory_swap));
+	map(0xa00000, 0xa1ffff).rw(m_pcmcia, FUNC(pccard_slot_device::read_reg_swap), FUNC(pccard_slot_device::write_reg_swap));
+	//map(0xa20000, 0xa3ffff) credit card i/o
+	//map(0xa40000, 0xa5ffff) credit card bits
+	//map(0xa60000, 0xa7ffff) credit card pc i/o
 	map(0xa80000, 0xafffff).nopw().r(FUNC(a1200_state::rom_mirror32_r));
 	map(0xb00000, 0xb7ffff).nopw().r(FUNC(a1200_state::rom_mirror32_r));
 	map(0xb80000, 0xbeffff).noprw(); // reserved (cdtv)
@@ -1363,7 +1420,7 @@ void a1200_state::a1200_mem(address_map &map)
 	map(0xc00000, 0xd7ffff).noprw(); // slow mem
 	map(0xd80000, 0xd8ffff).noprw(); // spare chip select
 	map(0xd90000, 0xd9ffff).noprw(); // arcnet chip select
-	map(0xda0000, 0xdaffff).rw("gayle", FUNC(gayle_device::gayle_r), FUNC(gayle_device::gayle_w));
+	map(0xda0000, 0xdaffff).m("gayle", FUNC(gayle_device::register_map));
 	map(0xdb0000, 0xdbffff).noprw(); // reserved (external ide)
 	map(0xdc0000, 0xdcffff).noprw(); // rtc
 	map(0xdd0000, 0xddffff).noprw(); // reserved (dma controller)
@@ -1558,6 +1615,14 @@ INPUT_PORTS_END
 static void amiga_floppies(device_slot_interface &device)
 {
 	device.option_add("35dd", FLOPPY_35_DD);
+}
+
+static void pcmcia_devices(device_slot_interface &device)
+{
+	device.option_add("melcard_1m", PCCARD_SRAM_MITSUBISHI_1M);
+	device.option_add("sram_1m", PCCARD_SRAM_CENTENNIAL_1M);
+	device.option_add("sram_2m", PCCARD_SRAM_CENTENNIAL_2M);
+	device.option_add("sram_4m", PCCARD_SRAM_CENTENNIAL_4M);
 }
 
 // basic elements common to all amigas
@@ -1961,15 +2026,21 @@ void a600_state::a600(machine_config &config)
 	gayle_device &gayle(GAYLE(config, "gayle", amiga_state::CLK_28M_PAL / 2));
 	gayle.set_id(a600_state::GAYLE_ID);
 	gayle.int2_handler().set(FUNC(a600_state::gayle_int2_w));
-	gayle.cs0_read_handler().set("ata", FUNC(ata_interface_device::cs0_r));
-	gayle.cs0_write_handler().set("ata", FUNC(ata_interface_device::cs0_w));
-	gayle.cs1_read_handler().set("ata", FUNC(ata_interface_device::cs1_r));
-	gayle.cs1_write_handler().set("ata", FUNC(ata_interface_device::cs1_w));
+	gayle.int6_handler().set(FUNC(a600_state::gayle_int6_w));
+	gayle.rst_handler().set(FUNC(a600_state::kbreset_w)); // not really kbreset, but use it for now
+	gayle.ide_cs_r_cb<0>().set("ata", FUNC(ata_interface_device::cs0_swap_r));
+	gayle.ide_cs_r_cb<1>().set("ata", FUNC(ata_interface_device::cs1_swap_r));
+	gayle.ide_cs_w_cb<0>().set("ata", FUNC(ata_interface_device::cs0_swap_w));
+	gayle.ide_cs_w_cb<1>().set("ata", FUNC(ata_interface_device::cs1_swap_w));
 
 	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, false));
 	ata.irq_handler().set("gayle", FUNC(gayle_device::ide_interrupt_w));
 
-	// TODO: pcmcia
+	PCCARD_SLOT(config, m_pcmcia, pcmcia_devices, nullptr);
+	m_pcmcia->card_detect_cb().set("gayle", FUNC(gayle_device::cc_cd_w));
+	m_pcmcia->battery_voltage_1_cb().set("gayle", FUNC(gayle_device::cc_bvd1_w));
+	m_pcmcia->battery_voltage_2_cb().set("gayle", FUNC(gayle_device::cc_bvd2_w));
+	m_pcmcia->write_protect_cb().set("gayle", FUNC(gayle_device::cc_wp_w));
 
 	// software
 	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
@@ -2017,10 +2088,12 @@ void a1200_state::a1200(machine_config &config)
 	gayle_device &gayle(GAYLE(config, "gayle", amiga_state::CLK_28M_PAL / 2));
 	gayle.set_id(a1200_state::GAYLE_ID);
 	gayle.int2_handler().set(FUNC(a1200_state::gayle_int2_w));
-	gayle.cs0_read_handler().set("ata", FUNC(ata_interface_device::cs0_r));
-	gayle.cs0_write_handler().set("ata", FUNC(ata_interface_device::cs0_w));
-	gayle.cs1_read_handler().set("ata", FUNC(ata_interface_device::cs1_r));
-	gayle.cs1_write_handler().set("ata", FUNC(ata_interface_device::cs1_w));
+	gayle.int6_handler().set(FUNC(a1200_state::gayle_int6_w));
+	gayle.rst_handler().set(FUNC(a1200_state::kbreset_w)); // not really kbreset, but use it for now
+	gayle.ide_cs_r_cb<0>().set("ata", FUNC(ata_interface_device::cs0_swap_r));
+	gayle.ide_cs_r_cb<1>().set("ata", FUNC(ata_interface_device::cs1_swap_r));
+	gayle.ide_cs_w_cb<0>().set("ata", FUNC(ata_interface_device::cs0_swap_w));
+	gayle.ide_cs_w_cb<1>().set("ata", FUNC(ata_interface_device::cs1_swap_w));
 
 	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, false));
 	ata.irq_handler().set("gayle", FUNC(gayle_device::ide_interrupt_w));
@@ -2030,7 +2103,11 @@ void a1200_state::a1200(machine_config &config)
 	subdevice<amiga_keyboard_bus_device>("kbd").set_default_option("a1200_us");
 #endif
 
-	// TODO: pcmcia
+	PCCARD_SLOT(config, m_pcmcia, pcmcia_devices, nullptr);
+	m_pcmcia->card_detect_cb().set("gayle", FUNC(gayle_device::cc_cd_w));
+	m_pcmcia->battery_voltage_1_cb().set("gayle", FUNC(gayle_device::cc_bvd1_w));
+	m_pcmcia->battery_voltage_2_cb().set("gayle", FUNC(gayle_device::cc_bvd2_w));
+	m_pcmcia->write_protect_cb().set("gayle", FUNC(gayle_device::cc_wp_w));
 
 	// software
 	SOFTWARE_LIST(config, "aga_list").set_original("amigaaga_flop");
@@ -2157,14 +2234,9 @@ void cd32_state::cd32(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
-	CDDA(config, m_cdda);
-	m_cdda->add_route(0, "lspeaker", 0.50);
-	m_cdda->add_route(1, "rspeaker", 0.50);
-
 	m_cia_0->pa_wr_callback().set(FUNC(cd32_state::akiko_cia_0_port_a_write));
 	m_cia_0->sp_wr_callback().set_nop();
 
-	CDROM(config, "cdrom").set_interface("cdrom");
 	SOFTWARE_LIST(config, "cd32_list").set_original("cd32");
 	SOFTWARE_LIST(config, "cd_list").set_original("cdtv");
 }

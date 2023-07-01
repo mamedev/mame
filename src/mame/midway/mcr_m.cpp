@@ -145,12 +145,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(mcr_nflfoot_state::ipu_interrupt)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(mcr_nflfoot_state::sio_txda_w)
+void mcr_nflfoot_state::sio_txda_w(int state)
 {
 	m_ipu_sio_txda = !state;
 }
 
-WRITE_LINE_MEMBER(mcr_nflfoot_state::sio_txdb_w)
+void mcr_nflfoot_state::sio_txdb_w(int state)
 {
 	// disc player
 	m_ipu_sio_txdb = !state;

@@ -1319,7 +1319,6 @@ ioport_constructor desertgu_audio_device::device_input_ports() const
 
 void desertgu_audio_device::device_start()
 {
-	m_ctrl_sel_out.resolve();
 	m_recoil.resolve();
 
 	m_p2 = 0U;
@@ -2011,8 +2010,6 @@ ioport_constructor clowns_audio_device::device_input_ports() const
 
 void clowns_audio_device::device_start()
 {
-	m_ctrl_sel_out.resolve_safe();
-
 	m_p1 = 0U;
 	m_p2 = 0U;
 
@@ -2395,8 +2392,6 @@ ioport_constructor spacwalk_audio_device::device_input_ports() const
 
 void spacwalk_audio_device::device_start()
 {
-	m_ctrl_sel_out.resolve();
-
 	m_p1 = 0U;
 
 	save_item(NAME(m_p1));
@@ -3322,8 +3317,6 @@ void invaders_audio_device::device_add_mconfig(machine_config &config)
 
 void invaders_audio_device::device_start()
 {
-	m_flip_screen_out.resolve_safe();
-
 	m_p2 = 0U;
 
 	save_item(NAME(m_p2));

@@ -10,17 +10,6 @@
     Nate Woods (current maintainer)
     Tim Lindner (VHD and other work)
 
-    Version information:
-
-    Basic   Extended Basic  Disk Extended
-    coco    1.0 -           -
-    cocoe   1.1 1.0         1.0
-    coco2   1.2 1.1         1.1
-    coco2b  1.3 1.1         1.1
-    coco3   1.2 2.0         1.1
-    coco3p  1.2 2.0         1.1
-    coco3h  1.2 2.0         1.1
-
     TRS-80 Deluxe Color Computer
 
     Prototype Color Computer with added MOS6551 and AY-3-8913
@@ -177,13 +166,6 @@ INPUT_PORTS_END
 INPUT_PORTS_START( coco_beckerport )
 	PORT_START(BECKERPORT_TAG)
 	PORT_CONFNAME( 0x01, 0x00, "Becker Port" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ))
-	PORT_CONFSETTING(    0x01, DEF_STR( On ))
-INPUT_PORTS_END
-
-INPUT_PORTS_START( coco_beckerport_dw )
-	PORT_START(BECKERPORT_TAG)
-	PORT_CONFNAME( 0x01, 0x01, "Becker Port" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ))
 	PORT_CONFSETTING(    0x01, DEF_STR( On ))
 INPUT_PORTS_END
@@ -564,7 +546,7 @@ void coco12_state::coco(machine_config &config)
 	coco_floating(config);
 
 	// cartridge
-	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "pak"));
+	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "fdc"));
 	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
 	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
@@ -573,6 +555,10 @@ void coco12_state::coco(machine_config &config)
 	SOFTWARE_LIST(config, "coco_cart_list").set_original("coco_cart").set_filter("COCO");
 	SOFTWARE_LIST(config, "coco_flop_list").set_original("coco_flop").set_filter("COCO");
 	SOFTWARE_LIST(config, "dragon_cart_list").set_compatible("dragon_cart");
+
+	// virtual hard disks
+	COCO_VHD(config, m_vhd_0, 0, m_maincpu);
+	COCO_VHD(config, m_vhd_1, 0, m_maincpu);
 }
 
 void coco12_state::cocoh(machine_config &config)
@@ -580,33 +566,11 @@ void coco12_state::cocoh(machine_config &config)
 	coco(config);
 	HD6309E(config.replace(), m_maincpu, DERIVED_CLOCK(1, 1));
 	m_maincpu->set_addrmap(AS_PROGRAM, &coco12_state::coco_mem);
-	m_ram->set_default_size("64K");
-}
-
-void coco12_state::cocoe(machine_config &config)
-{
-	coco(config);
-	cococart_slot_device &cartslot(COCOCART_SLOT(config.replace(), CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "fdc"));
-	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
-	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	COCO_VHD(config, m_vhd_0, 0, m_maincpu);
-	COCO_VHD(config, m_vhd_1, 0, m_maincpu);
-}
-
-void coco12_state::cocoeh(machine_config &config)
-{
-	cocoe(config);
-	HD6309E(config.replace(), m_maincpu, DERIVED_CLOCK(1, 1));
-	m_maincpu->set_addrmap(AS_PROGRAM, &coco12_state::coco_mem);
-	m_ram->set_default_size("64K");
 }
 
 void deluxecoco_state::deluxecoco(machine_config &config)
 {
 	coco12_state::coco2b(config);
-
-	m_ram->set_default_size("64K");
 
 	// Asynchronous Communications Interface Adapter
 	MOS6551(config, m_acia, 0);
@@ -634,28 +598,9 @@ void deluxecoco_state::deluxecoco(machine_config &config)
 	m_sam->set_addrmap(5, &deluxecoco_state::deluxecoco_io1);
 }
 
-void coco12_state::coco2(machine_config &config)
-{
-	coco(config);
-	cococart_slot_device &cartslot(COCOCART_SLOT(config.replace(), CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "fdcv11"));
-	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
-	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	COCO_VHD(config, m_vhd_0, 0, m_maincpu);
-	COCO_VHD(config, m_vhd_1, 0, m_maincpu);
-}
-
-void coco12_state::coco2h(machine_config &config)
-{
-	coco2(config);
-	HD6309E(config.replace(), m_maincpu, DERIVED_CLOCK(1, 1));
-	m_maincpu->set_addrmap(AS_PROGRAM, &coco12_state::coco_mem);
-	m_ram->set_default_size("64K");
-}
-
 void coco12_state::coco2b(machine_config &config)
 {
-	coco2(config);
+	coco(config);
 	MC6847T1_NTSC(config.replace(), m_vdg, XTAL(14'318'181) / 4);
 	m_vdg->set_screen(SCREEN_TAG);
 	m_vdg->hsync_wr_callback().set(FUNC(coco12_state::horizontal_sync));
@@ -668,7 +613,6 @@ void coco12_state::coco2bh(machine_config &config)
 	coco2b(config);
 	HD6309E(config.replace(), m_maincpu, DERIVED_CLOCK(1, 1));
 	m_maincpu->set_addrmap(AS_PROGRAM, &coco12_state::coco_mem);
-	m_ram->set_default_size("64K");
 }
 
 void coco12_state::cp400(machine_config &config)
@@ -682,7 +626,7 @@ void coco12_state::cp400(machine_config &config)
 
 void coco12_state::t4426(machine_config &config)
 {
-	coco2(config);
+	coco(config);
 	cococart_slot_device &cartslot(COCOCART_SLOT(config.replace(), CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), t4426_cart, "t4426"));
 	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
 	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
@@ -711,19 +655,31 @@ void coco12_state::ms1600(machine_config &config)
 
 ROM_START(coco)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
-	ROM_LOAD("bas10.rom", 0x2000, 0x2000, CRC(00b50aaa) SHA1(1f08455cd48ce6a06132aea15c4778f264e19539))
-ROM_END
-
-ROM_START(cocoe)
-	ROM_REGION(0x8000,MAINCPU_TAG,0)
-	ROM_LOAD("bas11.rom",    0x2000, 0x2000, CRC(6270955a) SHA1(cecb7c24ff1e0ab5836e4a7a8eb1b8e01f1fded3))
-	ROM_LOAD("extbas10.rom", 0x0000, 0x2000, CRC(6111a086) SHA1(8aa58f2eb3e8bcfd5470e3e35e2b359e9a72848e))
-ROM_END
-
-ROM_START(coco2)
-	ROM_REGION(0x8000,MAINCPU_TAG,0)
-	ROM_LOAD("bas12.rom",    0x2000, 0x2000, CRC(54368805) SHA1(0f14dc46c647510eb0b7bd3f53e33da07907d04f))
-	ROM_LOAD("extbas11.rom", 0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
+	ROM_DEFAULT_BIOS("b12e11")
+	ROM_SYSTEM_BIOS(0, "b10", "Color BASIC v1.0")
+	ROMX_LOAD("bas10.rom",    0x2000, 0x2000, CRC(00b50aaa) SHA1(1f08455cd48ce6a06132aea15c4778f264e19539), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "b11", "Color BASIC v1.1")
+	ROMX_LOAD("bas11.rom",    0x2000, 0x2000, CRC(6270955a) SHA1(cecb7c24ff1e0ab5836e4a7a8eb1b8e01f1fded3), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "b12", "Color BASIC v1.2")
+	ROMX_LOAD("bas12.rom",    0x2000, 0x2000, CRC(54368805) SHA1(0f14dc46c647510eb0b7bd3f53e33da07907d04f), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "b10e10", "Color BASIC v1.0 / Extended Color BASIC v1.0")
+	ROMX_LOAD("bas10.rom",    0x2000, 0x2000, CRC(00b50aaa) SHA1(1f08455cd48ce6a06132aea15c4778f264e19539), ROM_BIOS(3))
+	ROMX_LOAD("extbas10.rom", 0x0000, 0x2000, CRC(6111a086) SHA1(8aa58f2eb3e8bcfd5470e3e35e2b359e9a72848e), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(4, "b10e11", "Color BASIC v1.0 / Extended Color BASIC v1.1")
+	ROMX_LOAD("bas10.rom",    0x2000, 0x2000, CRC(00b50aaa) SHA1(1f08455cd48ce6a06132aea15c4778f264e19539), ROM_BIOS(4))
+	ROMX_LOAD("extbas11.rom", 0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(5, "b11e10", "Color BASIC v1.1 / Extended Color BASIC v1.0")
+	ROMX_LOAD("bas11.rom",    0x2000, 0x2000, CRC(6270955a) SHA1(cecb7c24ff1e0ab5836e4a7a8eb1b8e01f1fded3), ROM_BIOS(5))
+	ROMX_LOAD("extbas10.rom", 0x0000, 0x2000, CRC(6111a086) SHA1(8aa58f2eb3e8bcfd5470e3e35e2b359e9a72848e), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(6, "b11e11", "Color BASIC v1.1 / Extended Color BASIC v1.1")
+	ROMX_LOAD("bas11.rom",    0x2000, 0x2000, CRC(6270955a) SHA1(cecb7c24ff1e0ab5836e4a7a8eb1b8e01f1fded3), ROM_BIOS(6))
+	ROMX_LOAD("extbas11.rom", 0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea), ROM_BIOS(6))
+	ROM_SYSTEM_BIOS(7, "b12e10", "Color BASIC v1.2 / Extended Color BASIC v1.0")
+	ROMX_LOAD("bas12.rom",    0x2000, 0x2000, CRC(54368805) SHA1(0f14dc46c647510eb0b7bd3f53e33da07907d04f), ROM_BIOS(7))
+	ROMX_LOAD("extbas10.rom", 0x0000, 0x2000, CRC(6111a086) SHA1(8aa58f2eb3e8bcfd5470e3e35e2b359e9a72848e), ROM_BIOS(7))
+	ROM_SYSTEM_BIOS(8, "b12e11", "Color BASIC v1.2 / Extended Color BASIC v1.1")
+	ROMX_LOAD("bas12.rom",    0x2000, 0x2000, CRC(54368805) SHA1(0f14dc46c647510eb0b7bd3f53e33da07907d04f), ROM_BIOS(8))
+	ROMX_LOAD("extbas11.rom", 0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea), ROM_BIOS(8))
 ROM_END
 
 ROM_START(deluxecoco)
@@ -787,8 +743,6 @@ ROM_START(ms1600)
 ROM_END
 
 #define rom_cocoh rom_coco
-#define rom_cocoeh rom_cocoe
-#define rom_coco2h rom_coco2
 #define rom_coco2bh rom_coco2b
 
 //**************************************************************************
@@ -796,13 +750,9 @@ ROM_END
 //**************************************************************************
 
 //    YEAR   NAME        PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                         FULLNAME                               FLAGS
-COMP( 1980,  coco,       0,      0,      coco,       coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer",                      MACHINE_SUPPORTS_SAVE )
-COMP( 1981,  cocoe,      coco,   0,      cocoe,      coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0)", MACHINE_SUPPORTS_SAVE )
-COMP( 19??,  cocoh,      coco,   0,      cocoh,      coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer (HD6309)",             MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
-COMP( 19??,  cocoeh,     coco,   0,      cocoeh,     coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0; HD6309)", MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
+COMP( 1980,  coco,       0,      0,      coco,       coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 1/2",                  MACHINE_SUPPORTS_SAVE )
+COMP( 19??,  cocoh,      coco,   0,      cocoh,      coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 1/2 (HD6309)",         MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
 COMP( 1983,  deluxecoco, coco,   0,      deluxecoco, deluxecoco, deluxecoco_state, empty_init, "Tandy Radio Shack",            "Deluxe Color Computer",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-COMP( 1983,  coco2,      coco,   0,      coco2,      coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2",                    MACHINE_SUPPORTS_SAVE )
-COMP( 19??,  coco2h,     coco,   0,      coco2h,     coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2 (HD6309)",           MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
 COMP( 1985?, coco2b,     coco,   0,      coco2b,     coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2B",                   MACHINE_SUPPORTS_SAVE )
 COMP( 19??,  coco2bh,    coco,   0,      coco2bh,    coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2B (HD6309)",          MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
 COMP( 1983,  cp400,      coco,   0,      cp400,      coco,       coco12_state,     empty_init, "Prológica",                    "CP400",                               MACHINE_SUPPORTS_SAVE )

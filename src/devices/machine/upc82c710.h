@@ -44,11 +44,11 @@ public:
 	auto rts() { return m_rts_callback.bind(); }
 
 	// chip pins for uarts
-	DECLARE_WRITE_LINE_MEMBER(rxd_w);
-	DECLARE_WRITE_LINE_MEMBER(dcd_w);
-	DECLARE_WRITE_LINE_MEMBER(dsr_w);
-	DECLARE_WRITE_LINE_MEMBER(ri_w);
-	DECLARE_WRITE_LINE_MEMBER(cts_w);
+	void rxd_w(int state);
+	void dcd_w(int state);
+	void dsr_w(int state);
+	void ri_w(int state);
+	void cts_w(int state);
 
 protected:
 	// device-level overrides
@@ -63,8 +63,8 @@ private:
 	required_device<ns16450_device> m_serial;
 
 	void dor_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
 
 	bool irq, drq, fdc_drq, fdc_irq;
 	u8 dor;

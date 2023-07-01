@@ -419,7 +419,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 		blend = lerp(blend, texelH, Level8Weight * BloomScale);
 	}
 
-	return float4(blend, texel.a);
+	return float4(blend, 1.0f);
 }
 
 //-----------------------------------------------------------------------------

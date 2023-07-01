@@ -60,13 +60,13 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(ic10_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(ic10_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(ic11_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(ic11_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(ic2_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(ic2_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	void ic10_ca2_w(int state);
+	void ic10_cb2_w(int state);
+	void ic11_ca2_w(int state);
+	void ic11_cb2_w(int state);
+	void ic2_ca2_w(int state);
+	void ic2_cb2_w(int state);
+	void clock_w(int state);
 	void ic10_a_w(u8 data);
 	void ic10_b_w(u8 data);
 	void ic11_a_w(u8 data);
@@ -325,14 +325,14 @@ void hankin_state::ic10_b_w(u8 data)
 	// also sound data
 }
 
-WRITE_LINE_MEMBER( hankin_state::ic10_ca2_w )
+void hankin_state::ic10_ca2_w(int state)
 {
 	m_io_leds[0] = state ? 0 : 1;
 	// also sound strobe
 	m_ic2->ca1_w(state);
 }
 
-WRITE_LINE_MEMBER( hankin_state::ic10_cb2_w )
+void hankin_state::ic10_cb2_w(int state)
 {
 	// solenoid strobe
 	m_ic10_cb2 = state;
@@ -376,7 +376,7 @@ u8 hankin_state::ic11_b_r()
 	return data;
 }
 
-WRITE_LINE_MEMBER( hankin_state::ic11_ca2_w )
+void hankin_state::ic11_ca2_w(int state)
 {
 	m_ic11_ca2 = state;
 	if (!state)
@@ -384,7 +384,7 @@ WRITE_LINE_MEMBER( hankin_state::ic11_ca2_w )
 }
 
 // lamp strobe
-WRITE_LINE_MEMBER( hankin_state::ic11_cb2_w )
+void hankin_state::ic11_cb2_w(int state)
 {
 	m_ic11_cb2 = state;
 	// Todo: no lamps are ever activated at this moment, to fix
@@ -398,7 +398,7 @@ WRITE_LINE_MEMBER( hankin_state::ic11_cb2_w )
 }
 
 // zero-cross detection
-WRITE_LINE_MEMBER( hankin_state::clock_w )
+void hankin_state::clock_w(int state)
 {
 	m_ic11->cb1_w(state);
 }
@@ -505,13 +505,13 @@ void hankin_state::ic2_b_w(u8 data)
 }
 
 // low to divide 555 by 2
-WRITE_LINE_MEMBER( hankin_state::ic2_ca2_w )
+void hankin_state::ic2_ca2_w(int state)
 {
 	m_ic2_ca2 = state;
 }
 
 // low to enable 7493 dividers
-WRITE_LINE_MEMBER( hankin_state::ic2_cb2_w )
+void hankin_state::ic2_cb2_w(int state)
 {
 	m_ic2_cb2 = state;
 }

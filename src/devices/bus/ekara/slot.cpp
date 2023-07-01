@@ -127,16 +127,15 @@ static const char *ekara_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-image_init_result ekara_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> ekara_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint8_t *ROM;
-		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+		uint32_t const len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
 		m_cart->rom_alloc(len);
 
-		ROM = m_cart->get_rom_base();
+		uint8_t *const ROM = m_cart->get_rom_base();
 
 		if (!loaded_through_softlist())
 			fread(ROM, len);
@@ -155,11 +154,9 @@ image_init_result ekara_cart_slot_device::call_load()
 			if (pcb_name)
 				m_type = ekara_get_pcb_id(pcb_name);
 		}
-
-		return image_init_result::PASS;
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -261,17 +258,17 @@ bool ekara_cart_slot_device::is_write_access_not_rom(void)
  direct seeprom access (popira2, gc0010)
  -------------------------------------------------*/
 
-WRITE_LINE_MEMBER(ekara_cart_slot_device::write_sda)
+void ekara_cart_slot_device::write_sda(int state)
 {
 	m_cart->write_sda(state);
 }
 
-WRITE_LINE_MEMBER(ekara_cart_slot_device::write_scl)
+void ekara_cart_slot_device::write_scl(int state)
 {
 	m_cart->write_scl(state);
 }
 
-READ_LINE_MEMBER(ekara_cart_slot_device::read_sda )
+int ekara_cart_slot_device::read_sda()
 {
 	return  m_cart->read_sda();
 }

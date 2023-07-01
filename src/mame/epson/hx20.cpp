@@ -40,9 +40,11 @@
 
 #include "emu.h"
 #include "hx20.h"
+
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
 #include "utf8.h"
 
 
@@ -793,7 +795,7 @@ INPUT_PORTS_END
 //  mc146818_interface rtc_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( hx20_state::rtc_irq_w )
+void hx20_state::rtc_irq_w(int state)
 {
 	m_rtc_irq = state;
 
@@ -835,15 +837,12 @@ DEVICE_IMAGE_LOAD_MEMBER(hx20_state::optrom_load)
 	uint32_t size = m_optrom->common_get_size("rom");
 
 	if (size != 0x2000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported ROM size");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported ROM size (must be 8K)");
 
 	m_optrom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_optrom->common_load_rom(m_optrom->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 uint8_t hx20_state::optrom_r(offs_t offset)

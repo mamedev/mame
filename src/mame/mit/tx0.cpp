@@ -366,15 +366,15 @@ public:
 	// construction/destruction
 	tx0_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
 
-	virtual image_init_result call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 	virtual const char *image_interface() const noexcept override { return "tx0_ptp"; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override { }
 
 private:
@@ -395,15 +395,15 @@ public:
 	// construction/destruction
 	tx0_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
 
-	virtual image_init_result call_load() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override { }
 
 private:
@@ -426,7 +426,7 @@ public:
 	// construction/destruction
 	tx0_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual bool is_readable()  const noexcept override { return false; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return true; }
@@ -436,11 +436,11 @@ public:
 	virtual const char *image_type_name() const noexcept override { return "printout"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "prin"; }
 
-	virtual image_init_result call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override { }
 
 private:
@@ -462,14 +462,14 @@ public:
 	// construction/destruction
 	tx0_magtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual const char *file_extensions() const noexcept override { return "tap"; }
 
-	virtual image_init_result call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:
@@ -489,7 +489,7 @@ tx0_magtape_image_device::tx0_magtape_image_device(const machine_config &mconfig
 
     unit 0 is reader (read-only), unit 1 is puncher (write-only)
 */
-image_init_result tx0_readtape_image_device::call_load()
+std::pair<std::error_condition, std::string> tx0_readtape_image_device::call_load()
 {
 	if (m_tx0)
 	{
@@ -518,7 +518,7 @@ image_init_result tx0_readtape_image_device::call_load()
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void tx0_readtape_image_device::call_unload()
@@ -630,16 +630,18 @@ TIMER_CALLBACK_MEMBER(tx0_state::reader_callback)
 /*
     timer callback to generate punch completion pulse
 */
-image_init_result tx0_punchtape_image_device::call_load()
+std::pair<std::error_condition, std::string> tx0_punchtape_image_device::call_load()
 {
 	/* punch unit */
 	if (m_tx0)
 		m_tx0->m_tape_puncher.fd = this;
 
-	return image_init_result::PASS;
+	fseek(0, SEEK_END);
+
+	return std::make_pair(std::error_condition(), std::string());
 }
 
-image_init_result tx0_punchtape_image_device::call_create(int format_type, util::option_resolution *format_options)
+std::pair<std::error_condition, std::string> tx0_punchtape_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	return call_load();
 }
@@ -659,7 +661,7 @@ TIMER_CALLBACK_MEMBER(tx0_state::puncher_callback)
 /*
     Initiate read of a 6-bit word from tape
 */
-WRITE_LINE_MEMBER( tx0_state::tx0_io_r1l )
+void tx0_state::tx0_io_r1l(int state)
 {
 	begin_tape_read( 0);
 }
@@ -667,7 +669,7 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_r1l )
 /*
     Initiate read of a 18-bit word from tape (used in read-in mode)
 */
-WRITE_LINE_MEMBER( tx0_state::tx0_io_r3l )
+void tx0_state::tx0_io_r3l(int state)
 {
 	begin_tape_read(1);
 }
@@ -675,7 +677,7 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_r3l )
 /*
     Write a 7-bit word to tape (7th bit clear)
 */
-WRITE_LINE_MEMBER( tx0_state::tx0_io_p6h )
+void tx0_state::tx0_io_p6h(int state)
 {
 	int ac;
 
@@ -690,7 +692,7 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_p6h )
 /*
     Write a 7-bit word to tape (7th bit set)
 */
-WRITE_LINE_MEMBER( tx0_state::tx0_io_p7h )
+void tx0_state::tx0_io_p7h(int state)
 {
 	int ac;
 
@@ -713,13 +715,15 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_p7h )
 /*
     Open a file for typewriter output
 */
-image_init_result tx0_printer_image_device::call_load()
+std::pair<std::error_condition, std::string> tx0_printer_image_device::call_load()
 {
 	/* open file */
 	if (m_tx0)
 		m_tx0->m_typewriter.fd = this;
 
-	return image_init_result::PASS;
+	fseek(0, SEEK_END);
+
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void tx0_printer_image_device::call_unload()
@@ -749,7 +753,7 @@ TIMER_CALLBACK_MEMBER(tx0_state::prt_callback)
 /*
     prt io callback
 */
-WRITE_LINE_MEMBER( tx0_state::tx0_io_prt )
+void tx0_state::tx0_io_prt(int state)
 {
 	int ac;
 	int ch;
@@ -775,7 +779,7 @@ TIMER_CALLBACK_MEMBER(tx0_state::dis_callback)
 /*
     Plot one point on crt
 */
-WRITE_LINE_MEMBER( tx0_state::tx0_io_dis )
+void tx0_state::tx0_io_dis(int state)
 {
 	int ac;
 	int x;
@@ -852,7 +856,7 @@ void tx0_magtape_image_device::device_start()
 /*
     Open a magnetic tape image
 */
-image_init_result tx0_magtape_image_device::call_load()
+std::pair<std::error_condition, std::string> tx0_magtape_image_device::call_load()
 {
 	if (m_tx0)
 	{
@@ -871,7 +875,7 @@ image_init_result tx0_magtape_image_device::call_load()
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void tx0_magtape_image_device::call_unload()
@@ -1335,7 +1339,7 @@ void tx0_state::magtape_callback()
 	}
 }
 
-WRITE_LINE_MEMBER( tx0_state::tx0_sel )
+void tx0_state::tx0_sel(int state)
 {
 	m_magtape.sel_pending = true;
 
@@ -1347,7 +1351,7 @@ WRITE_LINE_MEMBER( tx0_state::tx0_sel )
 	}
 }
 
-WRITE_LINE_MEMBER( tx0_state::tx0_io_cpy )
+void tx0_state::tx0_io_cpy(int state)
 {
 	switch (m_magtape.state)
 	{
@@ -1381,7 +1385,7 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_cpy )
 
     IO devices should reset
 */
-WRITE_LINE_MEMBER( tx0_state::tx0_io_reset_callback )
+void tx0_state::tx0_io_reset_callback(int state)
 {
 	m_tape_reader.rcl = m_tape_reader.rc = 0;
 	if (m_tape_reader.timer)

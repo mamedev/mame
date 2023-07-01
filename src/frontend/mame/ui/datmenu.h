@@ -60,7 +60,7 @@ private:
 	};
 
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	void get_data(std::string &buffer);
 	void get_data_sw(std::string &buffer);

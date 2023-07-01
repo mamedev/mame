@@ -39,16 +39,17 @@ public:
 	auto out_keydown_handler() { return m_out_keydown_handler.bind(); }
 
 	// computer interface
-	DECLARE_WRITE_LINE_MEMBER( txd_w );
+	void txd_w(int state);
 
 	// peripheral interface
-	DECLARE_WRITE_LINE_MEMBER( write_rx );
-	DECLARE_WRITE_LINE_MEMBER( trxc_w );
-	DECLARE_WRITE_LINE_MEMBER( keydown_w );
+	void write_rx(int state);
+	void trxc_w(int state);
+	void keydown_w(int state);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	devcb_write_line m_out_rx_handler;
 	devcb_write_line m_out_trxc_handler;
@@ -62,6 +63,7 @@ class abc_keyboard_interface : public device_interface
 {
 public:
 	virtual void txd_w(int state) { }
+	virtual void reset_w(int state) { }
 
 protected:
 	// construction/destruction
@@ -76,6 +78,7 @@ DECLARE_DEVICE_TYPE(ABC_KEYBOARD_PORT, abc_keyboard_port_device)
 
 
 // supported devices
+void abc800_keyboard_devices(device_slot_interface &device);
 void abc_keyboard_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_ABCKB_ABCKB_H

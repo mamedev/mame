@@ -81,11 +81,11 @@ private:
 	u8 pia_r();
 	void pia_w(u8 data);
 	void colorram_w(offs_t offset, u8 data);
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef4_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_WRITE_LINE_MEMBER( ca2_w );
+	int clear_r();
+	int ef2_r();
+	int ef4_r();
+	void q_w(int state);
+	void ca2_w(int state);
 	void dma_w(offs_t offset, u8 data);
 	u8 pia_pa_r();
 	void pia_pa_w(u8 data);
@@ -132,7 +132,7 @@ void eti660_state::pia_w(u8 data)
 	m_pia->write(pia_offset, data);
 }
 
-WRITE_LINE_MEMBER( eti660_state::ca2_w ) // test with Wipeout game - it should start up in colour
+void eti660_state::ca2_w(int state) // test with Wipeout game - it should start up in colour
 {
 	m_cti->con_w(state);
 }
@@ -203,7 +203,7 @@ INPUT_PORTS_END
 
 /* CDP1802 Interface */
 
-READ_LINE_MEMBER( eti660_state::clear_r )
+int eti660_state::clear_r()
 {
 	// A hack to make the machine reset itself on
 	// boot, like the real one does.
@@ -214,17 +214,17 @@ READ_LINE_MEMBER( eti660_state::clear_r )
 	return BIT(m_special->read(), 0); // R key
 }
 
-READ_LINE_MEMBER( eti660_state::ef2_r )
+int eti660_state::ef2_r()
 {
 	return m_cassette->input() < 0;
 }
 
-READ_LINE_MEMBER( eti660_state::ef4_r )
+int eti660_state::ef4_r()
 {
 	return BIT(m_special->read(), 1); // S key
 }
 
-WRITE_LINE_MEMBER( eti660_state::q_w )
+void eti660_state::q_w(int state)
 {
 	/* CDP1864 audio output enable */
 	m_cti->aoe_w(state);
@@ -316,38 +316,28 @@ void eti660_state::machine_start()
 
 QUICKLOAD_LOAD_MEMBER(eti660_state::quickload_cb)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	int i;
-	int quick_addr = 0x600;
-	int quick_length;
+	int const quick_length = image.length();
 	std::vector<u8> quick_data;
-	int read_;
-	image_init_result result = image_init_result::FAIL;
-
-	quick_length = image.length();
 	quick_data.resize(quick_length);
-	read_ = image.fread( &quick_data[0], quick_length);
+	int const read_ = image.fread( &quick_data[0], quick_length);
 	if (read_ != quick_length)
+		return std::make_pair(image_error::INVALIDIMAGE, "Cannot read the file");
+
+	constexpr int QUICK_ADDR = 0x600;
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	for (int i = 0; i < quick_length; i++)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
-		image.message(" Cannot read the file");
+		if ((QUICK_ADDR + i) < 0x1000)
+			space.write_byte(i + QUICK_ADDR, quick_data[i]);
 	}
+
+	// display a message about the loaded quickload
+	if (image.is_filetype("bin"))
+		image.message(" Quickload: size=%04X : start=%04X : end=%04X : Press 6 to start", quick_length, QUICK_ADDR, QUICK_ADDR+quick_length);
 	else
-	{
-		for (i = 0; i < quick_length; i++)
-			if ((quick_addr + i) < 0x1000)
-				space.write_byte(i + quick_addr, quick_data[i]);
+		image.message(" Quickload: size=%04X : start=%04X : end=%04X : Press 8 to start", quick_length, QUICK_ADDR, QUICK_ADDR+quick_length);
 
-		/* display a message about the loaded quickload */
-		if (image.is_filetype("bin"))
-			image.message(" Quickload: size=%04X : start=%04X : end=%04X : Press 6 to start",quick_length,quick_addr,quick_addr+quick_length);
-		else
-			image.message(" Quickload: size=%04X : start=%04X : end=%04X : Press 8 to start",quick_length,quick_addr,quick_addr+quick_length);
-
-		result = image_init_result::PASS;
-	}
-
-	return result;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /* Machine Drivers */

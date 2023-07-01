@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, hap
 // thanks-to:Sean Riddle, Berger
-/******************************************************************************
+/*******************************************************************************
 
 SciSys Chess Traveler (aka Novag Pocket Chess)
 SciSys Chess Intercontinental Traveler
@@ -44,7 +44,7 @@ electronically measuring them affected the frequency.
 TODO:
 - add low-battery indicator? useless since it's not software-controlled
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "cpu/f8/f8.h"
@@ -121,9 +121,9 @@ void chesstrv_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // F3870 ports
 
@@ -172,9 +172,9 @@ u8 chesstrv_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void chesstrv_state::chesstrv_mem(address_map &map)
 {
@@ -191,9 +191,9 @@ void chesstrv_state::chesstrv_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( chesstrv )
 	PORT_START("IN.0")
@@ -236,13 +236,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void chesstrv_state::chesstrv(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	F8(config, m_maincpu, 4500000/2); // approximation
 	m_maincpu->set_addrmap(AS_PROGRAM, &chesstrv_state::chesstrv_mem);
 	m_maincpu->set_addrmap(AS_IO, &chesstrv_state::chesstrv_io);
@@ -253,7 +253,7 @@ void chesstrv_state::chesstrv(machine_config &config)
 	psu.read_b().set(FUNC(chesstrv_state::input_r));
 	psu.write_b().set(FUNC(chesstrv_state::matrix_w));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 7);
 	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_saitek_chesstrv);
@@ -263,7 +263,7 @@ void chesstrv_state::chesstrvi(machine_config &config)
 {
 	chesstrv(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_clock(6000000/2); // approximation
 	subdevice<f38t56_device>("psu")->set_clock(6000000/2);
 
@@ -273,9 +273,9 @@ void chesstrv_state::chesstrvi(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( chesstrv )
 	ROM_REGION( 0x0800, "maincpu", 0 )
@@ -291,10 +291,10 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME       PARENT CMP MACHINE    INPUT      STATE           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, chesstrv,  0,      0, chesstrv,  chesstrv,  chesstrv_state, empty_init, "SciSys / Novag", "Chess Traveler", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, chesstrvi, 0,      0, chesstrvi, chesstrvi, chesstrv_state, empty_init, "SciSys", "Chess Intercontinental Traveler", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1980, chesstrv,  0,      0,      chesstrv,  chesstrv,  chesstrv_state, empty_init, "SciSys / Novag", "Chess Traveler", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, chesstrvi, 0,      0,      chesstrvi, chesstrvi, chesstrv_state, empty_init, "SciSys", "Chess Intercontinental Traveler", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

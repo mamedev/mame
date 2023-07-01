@@ -118,7 +118,7 @@ void menu_tape_control::populate()
 //  handle - main tape control menu
 //-------------------------------------------------
 
-void menu_tape_control::handle(event const *ev)
+bool menu_tape_control::handle(event const *ev)
 {
 	// process the menu
 	if (ev)
@@ -158,6 +158,7 @@ void menu_tape_control::handle(event const *ev)
 
 	// hacky way to update the tape counter by repopulating every frame
 	reset(reset_options::REMEMBER_POSITION);
+	return false;
 }
 
 

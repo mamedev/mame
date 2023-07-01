@@ -6,7 +6,8 @@
 
 #include "bus/generic/carts.h"
 #include "bus/sms_ctrl/controllers.h"
-#include "imagedev/chd_cd.h"
+#include "bus/generic/slot.h"
+#include "imagedev/cdromimg.h"
 #include "sound/sn76496.h"
 
 #include "softlist.h"
@@ -172,7 +173,7 @@ void md_cons_cd_state::machine_start()
 }
 
 // same as screen_eof_megadriv but with addition of 32x and SegaCD/MegaCD pieces
-WRITE_LINE_MEMBER(md_cons_state::screen_vblank_console)
+void md_cons_state::screen_vblank_console(int state)
 {
 	if (m_io_reset.read_safe(0) & 0x01)
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
@@ -394,7 +395,6 @@ DEVICE_IMAGE_LOAD_MEMBER( md_cons_state::_32x_cart )
 	std::vector<uint8_t> temp_copy;
 	uint16_t *ROM16;
 	uint32_t *ROM32;
-	int i;
 
 	if (!image.loaded_through_softlist())
 	{
@@ -409,21 +409,21 @@ DEVICE_IMAGE_LOAD_MEMBER( md_cons_state::_32x_cart )
 		memcpy(&temp_copy[0], image.get_software_region("rom"), length);
 	}
 
-	/* Copy the cart image in the locations the driver expects */
+	// Copy the cart image in the locations the driver expects
 	// Notice that, by using pick_integer, we are sure the code works on both LE and BE machines
 	ROM16 = (uint16_t *) memregion("gamecart")->base();
-	for (i = 0; i < length; i += 2)
+	for (int i = 0; i < length; i += 2)
 		ROM16[i / 2] = pick_integer_be(&temp_copy[0], i, 2);
 
 	ROM32 = (uint32_t *) memregion("gamecart_sh2")->base();
-	for (i = 0; i < length; i += 4)
+	for (int i = 0; i < length; i += 4)
 		ROM32[i / 4] = pick_integer_be(&temp_copy[0], i, 4);
 
 	ROM16 = (uint16_t *) memregion("maincpu")->base();
-	for (i = 0x00; i < length; i += 2)
+	for (int i = 0x00; i < length; i += 2)
 		ROM16[i / 2] = pick_integer_be(&temp_copy[0], i, 2);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

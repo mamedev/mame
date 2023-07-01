@@ -114,8 +114,8 @@ protected:
 
 	focused_menu get_focus() const { return m_focus; }
 	void set_focus(focused_menu focus) { m_focus = focus; }
-	void next_image_view();
-	void previous_image_view();
+	bool next_image_view();
+	bool previous_image_view();
 
 	bool dismiss_error();
 	void set_error(reset_options ropt, std::string &&message);
@@ -164,8 +164,8 @@ protected:
 		return (uintptr_t(selected_ref) > m_skip_main_items) ? selected_ref : m_prev_selected;
 	}
 
-	u8 const right_panel() const { return m_right_panel; }
-	u8 const right_image() const { return m_image_view; }
+	u8 right_panel() const { return m_right_panel; }
+	u8 right_image() const { return m_image_view; }
 	char const *right_panel_config_string() const;
 	char const *right_image_config_string() const;
 	void set_right_panel(u8 index);

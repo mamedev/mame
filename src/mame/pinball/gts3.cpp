@@ -101,7 +101,7 @@ private:
 	void solenoid_w(offs_t, u8);
 	void u4b_w(u8 data);
 	void u5a_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+	void nmi_w(int state);
 	void mem_map(address_map &map);
 	bool m_dispclk = false;
 	bool m_lampclk = false;
@@ -239,7 +239,7 @@ INPUT_CHANGED_MEMBER( gts3_state::test_inp )
 }
 
 // This trampoline needed; WRITELINE("maincpu", m65c02_device, nmi_line) does not work
-WRITE_LINE_MEMBER( gts3_state::nmi_w )
+void gts3_state::nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, (state) ? CLEAR_LINE : HOLD_LINE);
 }

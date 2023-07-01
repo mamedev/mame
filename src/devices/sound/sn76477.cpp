@@ -49,7 +49,8 @@
  *
  *****************************************************************************/
 
-#define VERBOSE                 1
+#define VERBOSE (0)
+#include "logmacro.h"
 
 /* if 1, create a .wav file of the sound produced */
 #define LOG_WAV                 0
@@ -74,8 +75,6 @@
 
 #define LOG_WAV_FILE_NAME       "sn76477_%s.wav"
 
-
-#define LOG(n,...) do { if (VERBOSE >= (n)) logerror(__VA_ARGS__); } while (0)
 
 #define CHECK_BOOLEAN      assert((state & 0x01) == state)
 #define CHECK_POSITIVE     assert(data >= 0.0)
@@ -627,7 +626,7 @@ void sn76477_device::log_enable_line()
 		"Enabled", "Inhibited"
 	};
 
-	LOG(1, "SN76477:              Enable line (9): %d [%s]\n", m_enable, desc[m_enable]);
+	LOG("Enable line (9): %d [%s]\n", m_enable, desc[m_enable]);
 }
 
 
@@ -639,7 +638,7 @@ void sn76477_device::log_mixer_mode()
 		"SLF/Noise", "SLF/VCO/Noise", "SLF/VCO", "Inhibit"
 	};
 
-	LOG(1, "SN76477:           Mixer mode (25-27): %d [%s]\n", m_mixer_mode, desc[m_mixer_mode]);
+	LOG("Mixer mode (25-27): %d [%s]\n", m_mixer_mode, desc[m_mixer_mode]);
 }
 
 
@@ -650,7 +649,7 @@ void sn76477_device::log_envelope_mode()
 		"VCO", "One-Shot", "Mixer Only", "VCO with Alternating Polarity"
 	};
 
-	LOG(1, "SN76477:         Envelope mode (1,28): %d [%s]\n", m_envelope_mode, desc[m_envelope_mode]);
+	LOG("Envelope mode (1,28): %d [%s]\n", m_envelope_mode, desc[m_envelope_mode]);
 }
 
 
@@ -661,7 +660,7 @@ void sn76477_device::log_vco_mode()
 		"External (Pin 16)", "Internal (SLF)"
 	};
 
-	LOG(1, "SN76477:                VCO mode (22): %d [%s]\n", m_vco_mode, desc[m_vco_mode]);
+	LOG("VCO mode (22): %d [%s]\n", m_vco_mode, desc[m_vco_mode]);
 }
 
 
@@ -671,16 +670,16 @@ void sn76477_device::log_one_shot_time()
 	{
 		if (compute_one_shot_cap_charging_rate() > 0)
 		{
-			LOG(1, "SN76477:        One-shot time (23,24): %.4f sec\n", ONE_SHOT_CAP_VOLTAGE_RANGE * (1 / compute_one_shot_cap_charging_rate()));
+			LOG("One-shot time (23,24): %.4f sec\n", ONE_SHOT_CAP_VOLTAGE_RANGE * (1 / compute_one_shot_cap_charging_rate()));
 		}
 		else
 		{
-			LOG(1, "SN76477:        One-shot time (23,24): N/A\n");
+			LOG("One-shot time (23,24): N/A\n");
 		}
 	}
 	else
 	{
-		LOG(1, "SN76477:        One-shot time (23,24): External (cap = %.2fV)\n", m_one_shot_cap_voltage);
+		LOG("One-shot time (23,24): External (cap = %.2fV)\n", m_one_shot_cap_voltage);
 	}
 }
 
@@ -694,29 +693,29 @@ void sn76477_device::log_slf_freq()
 			double charging_time = (1 / compute_slf_cap_charging_rate()) * SLF_CAP_VOLTAGE_RANGE;
 			double discharging_time = (1 / compute_slf_cap_discharging_rate()) * SLF_CAP_VOLTAGE_RANGE;
 
-			LOG(1, "SN76477:        SLF frequency (20,21): %.2f Hz\n", 1 / (charging_time + discharging_time));
+			LOG("SLF frequency (20,21): %.2f Hz\n", 1 / (charging_time + discharging_time));
 		}
 		else
 		{
-			LOG(1, "SN76477:        SLF frequency (20,21): N/A\n");
+			LOG("SLF frequency (20,21): N/A\n");
 		}
 	}
 	else
 	{
-		LOG(1, "SN76477:        SLF frequency (20,21): External (cap = %.2fV)\n", m_slf_cap_voltage);
+		LOG("SLF frequency (20,21): External (cap = %.2fV)\n", m_slf_cap_voltage);
 	}
 }
 
 
 void sn76477_device::log_vco_pitch_voltage()
 {
-	LOG(1, "SN76477:       VCO pitch voltage (19): %.2fV\n", m_pitch_voltage);
+	LOG("VCO pitch voltage (19): %.2fV\n", m_pitch_voltage);
 }
 
 
 void sn76477_device::log_vco_duty_cycle()
 {
-	LOG(1, "SN76477:       VCO duty cycle (16,19): %.0f%%\n", compute_vco_duty_cycle() * 100.0);
+	LOG("VCO duty cycle (16,19): %.0f%%\n", compute_vco_duty_cycle() * 100.0);
 }
 
 
@@ -729,16 +728,16 @@ void sn76477_device::log_vco_freq()
 			double min_freq = compute_vco_cap_charging_discharging_rate() / (2 * VCO_CAP_VOLTAGE_RANGE);
 			double max_freq = compute_vco_cap_charging_discharging_rate() / (2 * VCO_TO_SLF_VOLTAGE_DIFF);
 
-			LOG(1, "SN76477:        VCO frequency (17,18): %.2f Hz - %.1f Hz\n", min_freq, max_freq);
+			LOG("VCO frequency (17,18): %.2f Hz - %.1f Hz\n", min_freq, max_freq);
 		}
 		else
 		{
-			LOG(1, "SN76477:        VCO frequency (17,18): N/A\n");
+			LOG("VCO frequency (17,18): N/A\n");
 		}
 	}
 	else
 	{
-		LOG(1, "SN76477:        VCO frequency (17,18): External (cap = %.2fV)\n", m_vco_cap_voltage);
+		LOG("VCO frequency (17,18): External (cap = %.2fV)\n", m_vco_cap_voltage);
 	}
 }
 
@@ -750,13 +749,13 @@ void sn76477_device::log_vco_ext_voltage()
 		double min_freq = compute_vco_cap_charging_discharging_rate() / (2 * VCO_CAP_VOLTAGE_RANGE);
 		double max_freq = compute_vco_cap_charging_discharging_rate() / (2 * VCO_TO_SLF_VOLTAGE_DIFF);
 
-		LOG(1, "SN76477:        VCO ext. voltage (16): %.2fV (%.2f Hz)\n",
+		LOG("VCO ext. voltage (16): %.2fV (%.2f Hz)\n",
 				m_vco_voltage,
 				min_freq + ((max_freq - min_freq) * m_vco_voltage / VCO_MAX_EXT_VOLTAGE));
 	}
 	else
 	{
-		LOG(1, "SN76477:        VCO ext. voltage (16): %.2fV (saturated, no output)\n", m_vco_voltage);
+		LOG("VCO ext. voltage (16): %.2fV (saturated, no output)\n", m_vco_voltage);
 	}
 }
 
@@ -765,17 +764,17 @@ void sn76477_device::log_noise_gen_freq()
 {
 	if (m_noise_clock_ext)
 	{
-		LOG(1, "SN76477:      Noise gen frequency (4): External\n");
+		LOG("Noise gen frequency (4): External\n");
 	}
 	else
 	{
 		if (compute_noise_gen_freq() > 0)
 		{
-			LOG(1, "SN76477:      Noise gen frequency (4): %d Hz\n", compute_noise_gen_freq());
+			LOG("Noise gen frequency (4): %d Hz\n", compute_noise_gen_freq());
 		}
 		else
 		{
-			LOG(1, "SN76477:      Noise gen frequency (4): N/A\n");
+			LOG("Noise gen frequency (4): N/A\n");
 		}
 	}
 }
@@ -794,21 +793,21 @@ void sn76477_device::log_noise_filter_freq()
 				double charging_time = (1 / charging_rate) * NOISE_CAP_VOLTAGE_RANGE;
 				double discharging_time = (1 / charging_rate) * NOISE_CAP_VOLTAGE_RANGE;
 
-				LOG(1, "SN76477: Noise filter frequency (5,6): %.0f Hz\n", 1 / (charging_time + discharging_time));
+				LOG("Noise filter frequency (5,6): %.0f Hz\n", 1 / (charging_time + discharging_time));
 			}
 			else
 			{
-				LOG(1, "SN76477: Noise filter frequency (5,6): Very Large (Filtering Disabled)\n");
+				LOG("Noise filter frequency (5,6): Very Large (Filtering Disabled)\n");
 			}
 		}
 		else
 		{
-			LOG(1, "SN76477: Noise filter frequency (5,6): N/A\n");
+			LOG("Noise filter frequency (5,6): N/A\n");
 		}
 	}
 	else
 	{
-		LOG(1, "SN76477: Noise filter frequency (5,6): External (cap = %.2fV)\n", m_noise_filter_cap);
+		LOG("Noise filter frequency (5,6): External (cap = %.2fV)\n", m_noise_filter_cap);
 	}
 }
 
@@ -819,16 +818,16 @@ void sn76477_device::log_attack_time()
 	{
 		if (compute_attack_decay_cap_charging_rate() > 0)
 		{
-			LOG(1, "SN76477:           Attack time (8,10): %.4f sec\n", AD_CAP_VOLTAGE_RANGE * (1 / compute_attack_decay_cap_charging_rate()));
+			LOG("Attack time (8,10): %.4f sec\n", AD_CAP_VOLTAGE_RANGE * (1 / compute_attack_decay_cap_charging_rate()));
 		}
 		else
 		{
-			LOG(1, "SN76477:           Attack time (8,10): N/A\n");
+			LOG("Attack time (8,10): N/A\n");
 		}
 	}
 	else
 	{
-		LOG(1, "SN76477:           Attack time (8,10): External (cap = %.2fV)\n", m_attack_decay_cap_voltage);
+		LOG("Attack time (8,10): External (cap = %.2fV)\n", m_attack_decay_cap_voltage);
 	}
 }
 
@@ -839,23 +838,23 @@ void sn76477_device::log_decay_time()
 	{
 		if (compute_attack_decay_cap_discharging_rate() > 0)
 		{
-			LOG(1, "SN76477:             Decay time (7,8): %.4f sec\n", AD_CAP_VOLTAGE_RANGE * (1 / compute_attack_decay_cap_discharging_rate()));
+			LOG("Decay time (7,8): %.4f sec\n", AD_CAP_VOLTAGE_RANGE * (1 / compute_attack_decay_cap_discharging_rate()));
 		}
 		else
 		{
-			LOG(1, "SN76477:            Decay time (8,10): N/A\n");
+			LOG("Decay time (8,10): N/A\n");
 		}
 	}
 	else
 	{
-		LOG(1, "SN76477:             Decay time (7, 8): External (cap = %.2fV)\n", m_attack_decay_cap_voltage);
+		LOG("Decay time (7, 8): External (cap = %.2fV)\n", m_attack_decay_cap_voltage);
 	}
 }
 
 
 void sn76477_device::log_voltage_out()
 {
-	LOG(1, "SN76477:    Voltage OUT range (11,12): %.2fV - %.2fV (clips above %.2fV)\n",
+	LOG("Voltage OUT range (11,12): %.2fV - %.2fV (clips above %.2fV)\n",
 			OUT_CENTER_LEVEL_VOLTAGE + compute_center_to_peak_voltage_out() * out_neg_gain[(int)(AD_CAP_VOLTAGE_MAX * 10)],
 			OUT_CENTER_LEVEL_VOLTAGE + compute_center_to_peak_voltage_out() * out_pos_gain[(int)(AD_CAP_VOLTAGE_MAX * 10)],
 			OUT_HIGH_CLIP_THRESHOLD);
@@ -899,7 +898,7 @@ void sn76477_device::open_wav_file()
 
 	m_file = util::wav_open(wav_file_name, m_our_sample_rate, 2);
 
-	LOG(1, "SN76477:         Logging output: %s\n", wav_file_name);
+	LOG("Logging output: %s\n", wav_file_name);
 }
 
 
@@ -951,7 +950,7 @@ inline uint32_t sn76477_device::generate_next_real_noise_bit()
  *
  *****************************************************************************/
 
-WRITE_LINE_MEMBER(sn76477_device::enable_w)
+void sn76477_device::enable_w(int state)
 {
 	CHECK_BOOLEAN;
 
@@ -983,7 +982,7 @@ WRITE_LINE_MEMBER(sn76477_device::enable_w)
  *
  *****************************************************************************/
 
-WRITE_LINE_MEMBER( sn76477_device::mixer_a_w )
+void sn76477_device::mixer_a_w(int state)
 {
 	CHECK_BOOLEAN;
 
@@ -997,7 +996,7 @@ WRITE_LINE_MEMBER( sn76477_device::mixer_a_w )
 	}
 }
 
-WRITE_LINE_MEMBER( sn76477_device::mixer_b_w )
+void sn76477_device::mixer_b_w(int state)
 {
 	CHECK_BOOLEAN;
 
@@ -1011,7 +1010,7 @@ WRITE_LINE_MEMBER( sn76477_device::mixer_b_w )
 	}
 }
 
-WRITE_LINE_MEMBER( sn76477_device::mixer_c_w )
+void sn76477_device::mixer_c_w(int state)
 {
 	CHECK_BOOLEAN;
 
@@ -1031,7 +1030,7 @@ WRITE_LINE_MEMBER( sn76477_device::mixer_c_w )
  *
  *****************************************************************************/
 
-WRITE_LINE_MEMBER( sn76477_device::envelope_1_w )
+void sn76477_device::envelope_1_w(int state)
 {
 	CHECK_BOOLEAN;
 
@@ -1045,7 +1044,7 @@ WRITE_LINE_MEMBER( sn76477_device::envelope_1_w )
 	}
 }
 
-WRITE_LINE_MEMBER( sn76477_device::envelope_2_w )
+void sn76477_device::envelope_2_w(int state)
 {
 	CHECK_BOOLEAN;
 
@@ -1065,7 +1064,7 @@ WRITE_LINE_MEMBER( sn76477_device::envelope_2_w )
  *
  *****************************************************************************/
 
-WRITE_LINE_MEMBER( sn76477_device::vco_w )
+void sn76477_device::vco_w(int state)
 {
 	CHECK_BOOLEAN;
 
@@ -1363,7 +1362,7 @@ void sn76477_device::pitch_voltage_w(double data)
  *
  *****************************************************************************/
 
-WRITE_LINE_MEMBER( sn76477_device::noise_clock_w )
+void sn76477_device::noise_clock_w(int state)
 {
 	CHECK_BOOLEAN;
 

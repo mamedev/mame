@@ -166,11 +166,7 @@ uniform bool UiLutEnable;
 
 float4 ps_screen_main(PS_INPUT Input) : COLOR
 {
-	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
-
-	if (LutEnable)
-		BaseTexel.rgb = apply_lut(BaseTexel.rgb);
-	return BaseTexel;
+	return tex2D(DiffuseSampler, Input.TexCoord);
 }
 
 float4 ps_vector_buffer_main(PS_INPUT Input) : COLOR

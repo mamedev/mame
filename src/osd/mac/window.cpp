@@ -230,8 +230,6 @@ void mac_window_info::toggle_full_screen()
 		m_windowed_dim = get_size();
 	}
 
-	// reset UI to main menu
-	machine().ui().menu_reset();
 	// kill off the drawers
 	renderer_reset();
 	if (fullscreen() && video_config.switchres)

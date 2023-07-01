@@ -117,7 +117,7 @@ private:
 	void update_psg0(int port);
 	void update_psg1(int port);
 	void update_da();
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 	void darius_cpub_map(address_map &map);
 	void darius_map(address_map &map);
 	void darius_sound2_io_map(address_map &map);

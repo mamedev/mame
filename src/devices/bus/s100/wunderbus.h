@@ -48,8 +48,8 @@ protected:
 	virtual void s100_sout_w(offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( pic_int_w );
-	DECLARE_WRITE_LINE_MEMBER( rtc_tp_w );
+	void pic_int_w(int state);
+	void rtc_tp_w(int state);
 
 	required_device<pic8259_device> m_pic;
 	required_device<ins8250_device> m_ace1;

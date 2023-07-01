@@ -2,7 +2,7 @@
 // copyright-holders:Karl Stenerud
 
 #include "emu.h"
-#include "m68000.h"
+#include "m68kmusashi.h"
 
 static constexpr int FPCC_N          = 0x08000000;
 static constexpr int FPCC_Z          = 0x04000000;
@@ -118,7 +118,7 @@ inline void m68000_musashi_device::store_pack_float80(u32 ea, int k, floatx80 fp
 	dw1 = dw2 = dw3 = 0;
 	ch = &str[0];
 
-	sprintf(str, "%.16e", fx80_to_double(fpr));
+	snprintf(str, 128, "%.16e", fx80_to_double(fpr));
 
 	if (*ch == '-')
 	{

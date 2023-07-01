@@ -211,11 +211,11 @@ mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type ty
 			(ram_size == 128) ? address_map_constructor(FUNC(mcs48_cpu_device::data_7bit), this) :
 			address_map_constructor(FUNC(mcs48_cpu_device::data_8bit), this))
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
-	, m_port_in_cb(*this)
+	, m_port_in_cb(*this, 0xff)
 	, m_port_out_cb(*this)
-	, m_bus_in_cb(*this)
+	, m_bus_in_cb(*this, 0xff)
 	, m_bus_out_cb(*this)
-	, m_test_in_cb(*this)
+	, m_test_in_cb(*this, 0)
 	, m_t0_clk_func(*this)
 	, m_prog_out_cb(*this)
 	, m_psw(0)
@@ -717,8 +717,6 @@ OPHANDLER( in_a_dbb )
 	burn_cycles(1);
 
 	// acknowledge the IBF IRQ and clear the bit in STS
-	if ((m_sts & STS_IBF) != 0)
-		standard_irq_callback(UPI41_INPUT_IBF);
 	m_sts &= ~STS_IBF;
 
 	// if P2 flags are enabled, update the state of P2
@@ -1135,14 +1133,6 @@ void mcs48_cpu_device::device_start()
 	if(m_feature_mask & EXT_BUS_FEATURE)
 		space(AS_IO).specific(m_io);
 
-	// resolve callbacks
-	m_port_in_cb.resolve_all_safe(0xff);
-	m_port_out_cb.resolve_all_safe();
-	m_bus_in_cb.resolve_safe(0xff);
-	m_bus_out_cb.resolve_safe();
-	m_test_in_cb.resolve_all_safe(0);
-	m_prog_out_cb.resolve_safe();
-
 	// ensure that regptr is valid before get_info gets called
 	update_regptr();
 
@@ -1258,6 +1248,9 @@ void mcs48_cpu_device::check_irqs()
 	// external interrupts take priority
 	else if ((m_irq_state || (m_sts & STS_IBF) != 0) && m_xirq_enabled)
 	{
+		// indicate we took the external IRQ
+		standard_irq_callback(0, m_pc);
+
 		burn_cycles(2);
 		m_irq_in_progress = true;
 
@@ -1270,14 +1263,13 @@ void mcs48_cpu_device::check_irqs()
 
 		// transfer to location 0x03
 		execute_call(0x03);
-
-		// indicate we took the external IRQ
-		standard_irq_callback(0);
 	}
 
 	// timer overflow interrupts follow
 	else if (m_timer_overflow && m_tirq_enabled)
 	{
+		standard_irq_callback(1, m_pc);
+
 		burn_cycles(2);
 		m_irq_in_progress = true;
 

@@ -23,12 +23,9 @@ public:
 	menu_confirm_quit(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_confirm_quit();
 
-protected:
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
-
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 };
 
 } // namespace ui

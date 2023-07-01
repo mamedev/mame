@@ -11,21 +11,23 @@
 [:mac] ':3f' (08058) BUS ERROR R fefe4:0007e4 (NONX 1 WP 0 TASK 3 FC 1 MAGIC 1)
 
 [:mac] TASK 3 SEGMENT 31 PAGE 13 MEM fe800-fefff 000000-0007ff X W[:mac]  000000-0007ff X W
-[:mac] TASK 3 SEGMENT 31 PAGE 15 MEM ff800-fffff 07d800-07dfff    [:mac]  07d800-07dfff    
+[:mac] TASK 3 SEGMENT 31 PAGE 15 MEM ff800-fffff 07d800-07dfff    [:mac]  07d800-07dfff
 */
 
 #include "emu.h"
 #include "abc1600mac.h"
 
+#define LOG_MAC    (1U << 1)
+#define LOG_DMA    (1U << 2)
+#define LOG_TASKS  (1U << 3)
+#define LOG_ERRORS (1U << 4)
 
+#define VERBOSE (LOG_ERRORS | LOG_TASKS)
+#include "logmacro.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LOG 0
-#define LOG_MAC 0
-#define LOG_DMA 0
 
 #define A8          BIT(offset, 8)
 
@@ -107,13 +109,13 @@ abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char
 	m_program_config("program", ENDIANNESS_BIG, 8, 21, 0, address_map_constructor(FUNC(abc1600_mac_device::program_map), this)),
 	m_mac_config("mac", ENDIANNESS_BIG, 8, 20, 0, address_map_constructor(FUNC(abc1600_mac_device::mac_map), this)),
 	m_rom(*this, "boot"),
+	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_segment_ram(*this, "segment_ram", 0x400, ENDIANNESS_LITTLE),
 	m_page_ram(*this, "page_ram", 0x400*2, ENDIANNESS_LITTLE),
 	m_watchdog(*this, "watchdog"),
-	m_read_fc(*this),
-	m_write_buserr(*this),
-	m_read_tren(*this),
+	m_read_tren(*this, 0xff),
 	m_write_tren(*this),
+	m_rstbut(0),
 	m_boote(0),
 	m_magic(0),
 	m_task(0),
@@ -129,13 +131,8 @@ abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char
 
 void abc1600_mac_device::device_start()
 {
-	// resolve callbacks
-	m_read_fc.resolve_safe(0);
-	m_write_buserr.resolve_safe();
-	m_read_tren.resolve_all_safe(0xff);
-	m_write_tren.resolve_all_safe();
-
 	// state saving
+	save_item(NAME(m_rstbut));
 	save_item(NAME(m_boote));
 	save_item(NAME(m_magic));
 	save_item(NAME(m_task));
@@ -195,10 +192,13 @@ inline offs_t abc1600_mac_device::get_physical_offset(offs_t offset, int task, b
 	nonx = PAGE_NONX;
 	wp = PAGE_WP;
 
-	m_cause = ((offset >> 13) & 0x1f) | DMAOK;
+	if (!machine().side_effects_disabled())
+	{
+		m_cause = ((offset >> 13) & 0x1f) | DMAOK;
+	}
 
-	if (LOG && (offset != virtual_offset)) logerror("%s MAC %05x:%06x (SEGA %03x SEGD %02x PGA %03x PGD %04x NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
-		machine().describe_context(), offset, virtual_offset, sega, segd, pga, page_data, nonx, wp, task, m_read_fc(), m_magic);
+	if (offset != virtual_offset) LOG("%s MAC %05x:%06x (SEGA %03x SEGD %02x PGA %03x PGD %04x NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
+		machine().describe_context(), offset, virtual_offset, sega, segd, pga, page_data, nonx, wp, task, m_cpu->get_fc(), m_magic);
 
 	return virtual_offset;
 }
@@ -215,15 +215,15 @@ uint8_t abc1600_mac_device::read(offs_t offset)
 		return m_rom->base()[offset & 0x3fff];
 	}
 
-	uint8_t fc = m_read_fc();
+	uint8_t fc = m_cpu->get_fc();
 	int task = m_task;
 
 	if (FC2)
 	{
 		if (offset & 0x80000)
 		{
-			if (LOG_MAC && (offset != 0x80007)) logerror("%s MAC R %05x\n",
-					machine().describe_context(), offset);
+			if (offset != 0x80007)
+				LOGMASKED(LOG_MAC, "%s MAC R %05x\n",machine().describe_context(), offset);
 
 			return space(AS_MAC).read_byte(offset);
 		}
@@ -233,7 +233,7 @@ uint8_t abc1600_mac_device::read(offs_t offset)
 		}
 	}
 
-	if (!m_magic && (fc == M68K_FC_USER_PROGRAM))
+	if (!m_magic && (fc == 2))
 	{
 		task = 0;
 	}
@@ -241,16 +241,8 @@ uint8_t abc1600_mac_device::read(offs_t offset)
 	bool nonx, wp;
 	offs_t virtual_offset = get_physical_offset(offset, task, nonx, wp);
 
-	if (!machine().side_effects_disabled())
-	{
-		if (nonx)
-		{
-			logerror("%s BUS ERROR R %05x:%06x (NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
-				machine().describe_context(), offset, virtual_offset, nonx, wp, task, fc, m_magic);
-			machine().debug_break();
-			m_write_buserr(offset, 1);
-		}
-	}
+	if (!machine().side_effects_disabled() && nonx)
+		m_cpu->trigger_bus_error();
 
 	return space().read_byte(virtual_offset);
 }
@@ -262,15 +254,14 @@ uint8_t abc1600_mac_device::read(offs_t offset)
 
 void abc1600_mac_device::write(offs_t offset, uint8_t data)
 {
-	uint8_t fc = m_read_fc();
+	uint8_t fc = m_cpu->get_fc();
 	int task = m_task;
 
 	if (FC2)
 	{
 		if (offset & 0x80000)
 		{
-			if (LOG_MAC) logerror("%s MAC W %05x:%02x\n",
-				machine().describe_context(), offset, data);
+			LOGMASKED(LOG_MAC, "%s MAC W %05x:%02x\n", machine().describe_context(), offset, data);
 
 			space(AS_MAC).write_byte(offset, data);
 			return;
@@ -284,23 +275,8 @@ void abc1600_mac_device::write(offs_t offset, uint8_t data)
 	bool nonx, wp;
 	offs_t virtual_offset = get_physical_offset(offset, task, nonx, wp);
 
-	if (!machine().side_effects_disabled())
-	{
-		if (nonx)
-		{
-			logerror("%s BUS ERROR W %05x:%06x (NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
-				machine().describe_context(), offset, virtual_offset, nonx, wp, task, fc, m_magic);
-			machine().debug_break();
-			m_write_buserr(offset, 0);
-		}
-		if (!wp)
-		{
-			logerror("%s BUS ERROR W %05x:%06x (NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
-				machine().describe_context(), offset, virtual_offset, nonx, wp, task, fc, m_magic);
-			machine().debug_break();
-			m_write_buserr(offset, 0);
-		}
-	}
+	if (!machine().side_effects_disabled() && (nonx || !wp))
+		m_cpu->trigger_bus_error();
 
 	space().write_byte(virtual_offset, data);
 }
@@ -327,14 +303,17 @@ uint8_t abc1600_mac_device::cause_r()
 
 	*/
 
-	uint8_t data = 0;
+	uint8_t data = m_rstbut;
 
 	if (!m_partst)
 	{
 		data = 0x02 | m_cause;
 	}
 
-	m_watchdog->watchdog_reset();
+	if (!machine().side_effects_disabled())
+	{
+		m_watchdog->watchdog_reset();
+	}
 
 	return data;
 }
@@ -365,8 +344,7 @@ void abc1600_mac_device::task_w(offs_t offset, uint8_t data)
 	m_boote = !BIT(data, 6);
 	m_magic = !BIT(data, 7);
 
-	if (LOG_MAC) logerror("%s TASK W %02x (TASK %u BOOTE %u MAGIC %u)\n",
-		machine().describe_context(), data, m_task, m_boote, m_magic);
+	LOGMASKED(LOG_MAC, "%s TASK W %02x (TASK %u BOOTE %u MAGIC %u)\n", machine().describe_context(), data, m_task, m_boote, m_magic);
 }
 
 
@@ -422,9 +400,7 @@ void abc1600_mac_device::segment_w(offs_t offset, uint8_t data)
 	offs_t sega = (m_task << 5) | A8 << 4 | ((offset >> 15) & 0xf);
 	m_segment_ram[sega] = data & 0x7f;
 
-	if (LOG_MAC) logerror("%s SEG W %05x:%02x SEGA %03x SEGD %02x TASK %u\n",
-		machine().describe_context(), offset, data,
-		sega, m_segment_ram[sega], m_task);
+	LOGMASKED(LOG_MAC, "%s SEG W %05x:%02x SEGA %03x SEGD %02x TASK %u\n", machine().describe_context(), offset, data, sega, m_segment_ram[sega], m_task);
 }
 
 
@@ -525,9 +501,7 @@ void abc1600_mac_device::page_lo_w(offs_t offset, uint8_t data)
 	offs_t pga = ((segd & 0x3f) << 4) | ((offset >> 11) & 0xf);
 	m_page_ram[pga] = (m_page_ram[pga] & 0xff00) | data;
 
-	if (LOG_MAC) logerror("%s PAGE W %05x:%02x (SEGA %03x SEGD %02x PGA %03x PGD %04x TASK %u)\n",
-		machine().describe_context(), offset, data,
-		sega, segd, pga, m_page_ram[pga], m_task);
+	LOGMASKED(LOG_MAC, "%s PAGE W %05x:%02x (SEGA %03x SEGD %02x PGA %03x PGD %04x TASK %u)\n", machine().describe_context(), offset, data, sega, segd, pga, m_page_ram[pga], m_task);
 }
 
 
@@ -568,7 +542,13 @@ void abc1600_mac_device::page_hi_w(offs_t offset, uint8_t data)
 
 offs_t abc1600_mac_device::get_dma_address(int index, offs_t offset, bool &rw)
 {
-	// A0 = DMA15, A1 = BA1, A2 = BA2
+	/*
+	            BA2 BA1 A15
+	    DMA0     1   1   x
+	    DMA1     1   0   x
+	    DMA2     0   0   x
+	*/
+
 	uint8_t dmamap_addr = index | BIT(offset, 15);
 	uint8_t dmamap = m_dmamap[dmamap_addr];
 
@@ -604,8 +584,7 @@ uint8_t abc1600_mac_device::dma_mreq_r(int index, int dmamap, offs_t offset)
 		space().write_byte(virtual_offset, data);
 	}
 
-	if (LOG_DMA) logerror("%s DMRQ R:%c %04x:%06x=%02x\n",
-		machine().describe_context(), rw ? 'R' : 'W', offset, virtual_offset, data);
+	LOGMASKED(LOG_DMA, "%s DMRQ R:%c %04x:%06x=%02x\n", machine().describe_context(), rw ? 'R' : 'W', offset, virtual_offset, data);
 
 	return data;
 }
@@ -620,8 +599,7 @@ void abc1600_mac_device::dma_mreq_w(int index, int dmamap, offs_t offset, uint8_
 	bool rw;
 	offs_t virtual_offset = get_dma_address(dmamap, offset, rw);
 
-	if (LOG_DMA) logerror("%s DMRQ W:%c %04x:%06x=%02x\n",
-		machine().describe_context(), rw ? 'R' : 'W', offset, virtual_offset, data);
+	LOGMASKED(LOG_DMA, "%s DMRQ W:%c %04x:%06x=%02x\n", machine().describe_context(), rw ? 'R' : 'W', offset, virtual_offset, data);
 
 	if (!rw)
 	{
@@ -639,8 +617,7 @@ uint8_t abc1600_mac_device::dma_iorq_r(int dmamap, offs_t offset)
 	bool rw;
 	offs_t virtual_offset = 0x1fe000 | get_dma_address(dmamap, offset, rw);
 
-	if (LOG_DMA) logerror("%s DIORQ R %04x:%06x\n",
-		machine().describe_context(), offset, virtual_offset);
+	LOGMASKED(LOG_DMA, "%s DIORQ R %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
 
 	return space().read_byte(virtual_offset);
 }
@@ -655,8 +632,7 @@ void abc1600_mac_device::dma_iorq_w(int dmamap, offs_t offset, uint8_t data)
 	bool rw;
 	offs_t virtual_offset = 0x1fe000 | get_dma_address(dmamap, offset, rw);
 
-	if (LOG_DMA) logerror("%s DIORQ W %04x:%06x=%02x\n",
-		machine().describe_context(), offset, virtual_offset, data);
+	LOGMASKED(LOG_DMA, "%s DIORQ W %04x:%06x=%02x\n", machine().describe_context(), offset, virtual_offset, data);
 
 	space().write_byte(virtual_offset, data);
 }
@@ -683,8 +659,7 @@ void abc1600_mac_device::dmamap_w(offs_t offset, uint8_t data)
 
 	*/
 
-	if (LOG_DMA) logerror("%s DMAMAP %u:%02x\n",
-		machine().describe_context(), offset & 7, data);
+	LOGMASKED(LOG_DMA, "%s DMAMAP %u:%02x\n", machine().describe_context(), offset & 7, data);
 
 	m_dmamap[offset & 7] = data;
 }
@@ -721,7 +696,7 @@ void abc1600_mac_device::dump()
 				bool nonx = PAGE_NONX;
 				bool wp = PAGE_WP;
 
-				logerror("TASK %.2u SEGMENT %.2u PAGE %.2u MEM %05x-%05x %06x-%06x %c %c\n",
+				LOGMASKED(LOG_TASKS, "TASK %.2u SEGMENT %.2u PAGE %.2u MEM %05x-%05x %06x-%06x %c %c\n",
 					task, seg, page, logical, logical + 0x7ff, physical, physical + 0x7ff, nonx ? 'X' : ' ', wp ? ' ' : 'W');
 			}
 		}

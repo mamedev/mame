@@ -3,8 +3,8 @@
 
 // Only known to be used by the Tandy VIS
 
-#ifndef MAME_MACHINE_DS6417_H_
-#define MAME_MACHINE_DS6417_H_
+#ifndef MAME_MACHINE_DS6417_H
+#define MAME_MACHINE_DS6417_H
 
 #pragma once
 
@@ -21,13 +21,13 @@ public:
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "bin"; }
 
-	virtual image_init_result call_load() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 
-	DECLARE_WRITE_LINE_MEMBER(data_w) { if(!m_read) m_data = state; }
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_WRITE_LINE_MEMBER(reset_w) { if(!state && m_reset) reset(); m_reset = state; }
-	DECLARE_READ_LINE_MEMBER(data_r) { return m_read ? m_data : 0; }
+	void data_w(int state) { if(!m_read) m_data = state; }
+	void clock_w(int state);
+	void reset_w(int state) { if(!state && m_reset) reset(); m_reset = state; }
+	int data_r() { return m_read ? m_data : 0; }
 
 protected:
 	virtual void device_start() override;
@@ -60,4 +60,4 @@ private:
 
 DECLARE_DEVICE_TYPE(DS6417, ds6417_device)
 
-#endif /* MAME_MACHINE_DS6417_H_ */
+#endif // MAME_MACHINE_DS6417_H

@@ -25,30 +25,30 @@ void msx_cart_halnote_device::device_reset()
 	m_view1.select(0);
 }
 
-image_init_result msx_cart_halnote_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_halnote_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_halnote_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	if (!cart_sram_region())
 	{
 		message = "msx_cart_halnote_device: Required region 'sram' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	if (cart_rom_region()->bytes() != 0x100000)
 	{
 		message = "msx_cart_halnote_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	if (cart_sram_region()->bytes() < 0x4000)
 	{
 		message = "msx_cart_halnote_device: Region 'sram' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	}
 
 	for (int i = 0; i < 4; i++)
@@ -62,24 +62,24 @@ image_init_result msx_cart_halnote_device::initialize_cartridge(std::string &mes
 	m_view0[0];
 	m_view0[1].install_ram(0x0000, 0x3fff, cart_sram_region()->base());
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
-	page(1)->install_write_handler(0x4fff, 0x4fff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank0_w)));
+	page(1)->install_write_handler(0x4fff, 0x4fff, emu::rw_delegate(*this, FUNC(msx_cart_halnote_device::bank0_w)));
 	page(1)->install_view(0x6000, 0x7fff, m_view1);
 	m_view1[0].install_read_bank(0x6000, 0x7fff, m_rombank[1]);
-	m_view1[0].install_write_handler(0x6fff, 0x6fff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank1_w)));
-	m_view1[0].install_write_handler(0x77ff, 0x77ff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank4_w)));
-	m_view1[0].install_write_handler(0x7fff, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank5_w)));
+	m_view1[0].install_write_handler(0x6fff, 0x6fff, emu::rw_delegate(*this, FUNC(msx_cart_halnote_device::bank1_w)));
+	m_view1[0].install_write_handler(0x77ff, 0x77ff, emu::rw_delegate(*this, FUNC(msx_cart_halnote_device::bank4_w)));
+	m_view1[0].install_write_handler(0x7fff, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_halnote_device::bank5_w)));
 	m_view1[1].install_read_bank(0x6000, 0x6fff, m_rombank[1]);
-	m_view1[1].install_write_handler(0x6fff, 0x6fff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank1_w)));
+	m_view1[1].install_write_handler(0x6fff, 0x6fff, emu::rw_delegate(*this, FUNC(msx_cart_halnote_device::bank1_w)));
 	m_view1[1].install_read_bank(0x7000, 0x77ff, m_rombank[4]);
-	m_view1[1].install_write_handler(0x77ff, 0x77ff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank4_w)));
+	m_view1[1].install_write_handler(0x77ff, 0x77ff, emu::rw_delegate(*this, FUNC(msx_cart_halnote_device::bank4_w)));
 	m_view1[1].install_read_bank(0x7800, 0x7fff, m_rombank[5]);
-	m_view1[1].install_write_handler(0x7fff, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank5_w)));
+	m_view1[1].install_write_handler(0x7fff, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_halnote_device::bank5_w)));
 	page(2)->install_read_bank(0x8000, 0x9fff, m_rombank[2]);
-	page(2)->install_write_handler(0x8fff, 0x8fff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank2_w)));
+	page(2)->install_write_handler(0x8fff, 0x8fff, emu::rw_delegate(*this, FUNC(msx_cart_halnote_device::bank2_w)));
 	page(2)->install_read_bank(0xa000, 0xbfff, m_rombank[3]);
-	page(2)->install_write_handler(0xafff, 0xafff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank3_w)));
+	page(2)->install_write_handler(0xafff, 0xafff, emu::rw_delegate(*this, FUNC(msx_cart_halnote_device::bank3_w)));
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void msx_cart_halnote_device::bank0_w(u8 data)

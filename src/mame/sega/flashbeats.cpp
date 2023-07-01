@@ -47,7 +47,6 @@ public:
 
 	void flashbeats(machine_config &config);
 	void flashbeats_map(address_map &map);
-	void flashbeats_io_map(address_map &map);
 	void main_scsp_map(address_map &map);
 	void scsp_mem(address_map &map);
 
@@ -106,11 +105,6 @@ void flashbeats_state::flashbeats_map(address_map &map)
 	map(0xa10000, 0xa10fff).ram();
 }
 
-void flashbeats_state::flashbeats_io_map(address_map &map)
-{
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(flashbeats_state::p6_r), FUNC(flashbeats_state::p6_w));
-}
-
 void flashbeats_state::main_scsp_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).ram().share("sound_ram");
@@ -128,7 +122,8 @@ void flashbeats_state::flashbeats(machine_config &config)
 	/* basic machine hardware */
 	H83007(config, m_maincpu, 16_MHz_XTAL); // 16 MHz oscillator next to chip, also 16 MHz causes SCI0 and 1 rates to be 31250 (MIDI)
 	m_maincpu->set_addrmap(AS_PROGRAM, &flashbeats_state::flashbeats_map);
-	m_maincpu->set_addrmap(AS_IO, &flashbeats_state::flashbeats_io_map);
+	m_maincpu->read_port6().set(FUNC(flashbeats_state::p6_r));
+	m_maincpu->write_port6().set(FUNC(flashbeats_state::p6_w));
 
 	M68000(config, m_scspcpu, 11289600);
 	m_scspcpu->set_addrmap(AS_PROGRAM, &flashbeats_state::main_scsp_map);

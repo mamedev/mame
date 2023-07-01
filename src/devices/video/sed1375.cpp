@@ -13,13 +13,13 @@
 #include "sed1375.h"
 #include "screen.h"
 
-#define LOG_REG_READ    (1 << 1)
-#define LOG_REG_WRITE   (1 << 2)
-#define LOG_VRAM_READ   (1 << 3)
-#define LOG_VRAM_WRITE  (1 << 4)
-#define LOG_LUT_READ    (1 << 5)
-#define LOG_LUT_WRITE   (1 << 6)
-#define LOG_VBL_READ    (1 << 7)
+#define LOG_REG_READ    (1U << 1)
+#define LOG_REG_WRITE   (1U << 2)
+#define LOG_VRAM_READ   (1U << 3)
+#define LOG_VRAM_WRITE  (1U << 4)
+#define LOG_LUT_READ    (1U << 5)
+#define LOG_LUT_WRITE   (1U << 6)
+#define LOG_VBL_READ    (1U << 7)
 #define LOG_ALL         (LOG_REG_READ | LOG_REG_WRITE | LOG_VRAM_READ | LOG_VRAM_WRITE | LOG_LUT_READ | LOG_LUT_WRITE | LOG_VBL_READ)
 
 #define VERBOSE         (0)

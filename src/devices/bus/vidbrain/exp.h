@@ -113,20 +113,20 @@ public:
 	void unmap_w(offs_t offset, uint8_t data) { bo_w(offset + 0x3000, data, 1, 0); }
 
 	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER( extres_w ) { m_write_extres(state); }
+	void extres_w(int state) { m_write_extres(state); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "vidbrain_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin"; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	devcb_write_line   m_write_extres;

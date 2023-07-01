@@ -230,7 +230,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map);
@@ -523,7 +523,7 @@ GFXDECODE_END
 
 // Interrupt Generator
 
-WRITE_LINE_MEMBER(commando_state::vblank_irq)
+void commando_state::vblank_irq(int state)
 {
 	if (state)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80 - RST 10h - VBLANK

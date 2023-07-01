@@ -9,7 +9,10 @@
 
 #pragma once
 
-class arcompact_device : public cpu_device
+#include "arcompact_common.h"
+
+
+class arcompact_device : public cpu_device, protected arcompact_common
 {
 public:
 	// construction/destruction
@@ -113,101 +116,6 @@ private:
 		m_regs[REG_LIMM] |= READ16((m_pc + 4));
 	}
 
-	// registers used in 16-bit opcodes have a limited range
-	// and can only address registers r0-r3 and r12-r15
-	static uint8_t common16_get_and_expand_breg(uint16_t op)
-	{
-		uint8_t reg = ((op & 0x0700) >> 8);
-		if (reg>3) reg += 8;
-		return reg;
-	}
-
-	static uint8_t common16_get_and_expand_creg(uint16_t op)
-	{
-		uint8_t reg = ((op & 0x00e0) >> 5);
-		if (reg>3) reg += 8;
-		return reg;
-	}
-
-	static uint8_t common16_get_and_expand_areg(uint16_t op)
-	{
-		uint8_t reg = op & 0x0007;
-		if (reg>3) reg += 8;
-		return reg;
-	}
-
-	static uint8_t common16_get_u3(uint16_t op)
-	{
-		return op & 0x0007;
-	}
-
-	static uint8_t common16_get_u5(uint16_t op)
-	{
-		return op & 0x001f;
-	}
-
-	static uint8_t common16_get_u8(uint16_t op)
-	{
-		return op & 0x00ff;
-	}
-
-	static uint8_t common16_get_u7(uint16_t op)
-	{
-		return op & 0x007f;
-	}
-
-	static uint32_t common16_get_s9(uint16_t op)
-	{
-		uint32_t s = util::sext(op, 9);
-		return s;
-	}
-
-	static uint8_t common32_get_breg(uint32_t op)
-	{
-		int b_temp = (op & 0x07000000) >> 24;
-		int B_temp = (op & 0x00007000) >> 12;
-		return b_temp | (B_temp << 3);
-	}
-
-	static bool common32_get_F(uint32_t op)
-	{
-		return (op & 0x00008000) ? true : false;
-	}
-
-	static uint8_t common32_get_creg(uint32_t op)
-	{
-		return (op & 0x00000fc0) >> 6;
-	}
-
-	static uint8_t common32_get_areg(uint32_t op)
-	{
-		return op & 0x0000003f;
-	}
-
-	static uint8_t common32_get_p(uint32_t op)
-	{
-		return (op & 0x00c00000) >> 22;
-	}
-
-	static uint8_t common32_get_areg_reserved(uint32_t op)
-	{
-		return op & 0x0000003f;
-	}
-
-	static uint32_t common32_get_s12(uint32_t op)
-	{
-		int S_temp = op & 0x0000003f;
-		int s_temp = (op & 0x00000fc0) >> 6;
-		uint32_t S = s_temp | (S_temp<<6);
-		S = util::sext(S, 12);
-		return S;
-	}
-
-	static uint32_t common32_get_u6(uint32_t op)
-	{
-		return (op & 0x00000fc0) >> 6;
-	}
-
 	int check_limm16(uint8_t hreg)
 	{
 		if (hreg == REG_LIMM)
@@ -243,11 +151,6 @@ private:
 		uint8_t h = ((op & 0x0007) << 3);
 		h |= ((op & 0x00e0) >> 5);
 		return h;
-	}
-
-	static uint8_t common32_get_condition(uint32_t op)
-	{
-		return op & 0x0000001f;
 	}
 
 	void status32_set_e1() { m_status32 |= E1_FLAG; }
@@ -379,10 +282,10 @@ private:
 	uint32_t handleop32_FLAG(uint32_t op);
 
 	// arcompact_execute_ops_04_jumps.cpp
-	inline uint32_t handle_jump_to_addr(bool delay, bool link, uint32_t address, uint32_t next_addr);
-	inline uint32_t handle_jump_to_register(bool delay, bool link, uint32_t reg, uint32_t next_addr, int flag);
-	inline uint32_t handleop32_Jcc_f_a_b_c_helper(uint32_t op, bool delay, bool link);
-	inline uint32_t handleop32_Jcc_cc_f_b_b_c_helper(uint32_t op, bool delay, bool link);
+	uint32_t handle_jump_to_addr(bool delay, bool link, uint32_t address, uint32_t next_addr);
+	uint32_t handle_jump_to_register(bool delay, bool link, uint32_t reg, uint32_t next_addr, int flag);
+	uint32_t handleop32_Jcc_f_a_b_c_helper(uint32_t op, bool delay, bool link);
+	uint32_t handleop32_Jcc_cc_f_b_b_c_helper(uint32_t op, bool delay, bool link);
 	uint32_t handleop32_J(uint32_t op, bool delay, bool link);
 
 	// arcompact_execute_ops_04_aux.cpp
@@ -601,7 +504,7 @@ private:
 		m_regs[REG_PCL] = m_pc & 0xfffffffc; // always 32-bit aligned
 	}
 
-	inline uint32_t READ32(uint32_t address)
+	uint32_t READ32(uint32_t address)
 	{
 		if (address & 0x3)
 			fatalerror("%08x: attempted unaligned READ32 on address %08x", m_pc, address);
@@ -609,54 +512,54 @@ private:
 		return m_program->read_dword(address);
 	}
 
-	inline void WRITE32(uint32_t address, uint32_t data)
+	void WRITE32(uint32_t address, uint32_t data)
 	{
 		if (address & 0x3)
 			fatalerror("%08x: attempted unaligned WRITE32 on address %08x", m_pc, address);
 
 		m_program->write_dword(address, data);
 	}
-	inline uint16_t READ16(uint32_t address)
+	uint16_t READ16(uint32_t address)
 	{
 		if (address & 0x1)
 			fatalerror("%08x: attempted unaligned READ16 on address %08x", m_pc, address);
 
 		return m_program->read_word(address);
 	}
-	inline void WRITE16(uint32_t address, uint16_t data)
+	void WRITE16(uint32_t address, uint16_t data)
 	{
 		if (address & 0x1)
 			fatalerror("%08x: attempted unaligned WRITE16 on address %08x", m_pc, address);
 
 		m_program->write_word(address, data);
 	}
-	inline uint8_t READ8(uint32_t address)
+	uint8_t READ8(uint32_t address)
 	{
 		return m_program->read_byte(address);
 	}
-	inline void WRITE8(uint32_t address, uint8_t data)
+	void WRITE8(uint32_t address, uint8_t data)
 	{
 		m_program->write_byte(address, data);
 	}
 
-	inline uint64_t READAUX(uint64_t address) { return m_io->read_dword(address); }
-	inline void WRITEAUX(uint64_t address, uint32_t data) { m_io->write_dword(address, data); }
+	uint64_t READAUX(uint64_t address) { return m_io->read_dword(address); }
+	void WRITEAUX(uint64_t address, uint32_t data) { m_io->write_dword(address, data); }
 
 	// arcompact_helper.ipp
-	inline bool check_condition(uint8_t condition);
-	inline void do_flags_overflow(uint32_t result, uint32_t b, uint32_t c);
-	inline void do_flags_add(uint32_t result, uint32_t b, uint32_t c);
-	inline void do_flags_sub(uint32_t result, uint32_t b, uint32_t c);
-	inline void do_flags_nz(uint32_t result);
+	bool check_condition(uint8_t condition);
+	void do_flags_overflow(uint32_t result, uint32_t b, uint32_t c);
+	void do_flags_add(uint32_t result, uint32_t b, uint32_t c);
+	void do_flags_sub(uint32_t result, uint32_t b, uint32_t c);
+	void do_flags_nz(uint32_t result);
 	using ophandler32 = uint32_t (*)(arcompact_device &obj, uint32_t src1, uint32_t src2, bool set_flags);
 	using ophandler32_ff = void (*)(arcompact_device &obj, uint32_t src1, uint32_t src2);
 	using ophandler32_mul = void (*)(arcompact_device &obj, uint32_t src1, uint32_t src2);
 	using ophandler32_sop = uint32_t (*)(arcompact_device &obj, uint32_t src1, bool set_flags);
-	inline uint32_t handleop32_general(uint32_t op, ophandler32 ophandler);
-	inline uint32_t handleop32_general_MULx64(uint32_t op, ophandler32_mul ophandler);
-	inline uint32_t handleop32_general_nowriteback_forced_flag(uint32_t op, ophandler32_ff ophandler);
-	inline uint32_t handleop32_general_SOP_group(uint32_t op, ophandler32_sop ophandler);
-	inline void arcompact_handle_ld_helper(uint32_t op, uint8_t areg, uint8_t breg, uint32_t s, uint8_t X, uint8_t Z, uint8_t a);
+	uint32_t handleop32_general(uint32_t op, ophandler32 ophandler);
+	uint32_t handleop32_general_MULx64(uint32_t op, ophandler32_mul ophandler);
+	uint32_t handleop32_general_nowriteback_forced_flag(uint32_t op, ophandler32_ff ophandler);
+	uint32_t handleop32_general_SOP_group(uint32_t op, ophandler32_sop ophandler);
+	void arcompact_handle_ld_helper(uint32_t op, uint8_t areg, uint8_t breg, uint32_t s, uint8_t X, uint8_t Z, uint8_t a);
 
 	// config
 	uint32_t m_default_vector_base;
@@ -691,7 +594,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(ARCA5, arcompact_device)
-
-#include "arcompact_helper.ipp"
 
 #endif // MAME_CPU_ARCOMPACT_ARCOMPACT_H

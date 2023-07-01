@@ -886,7 +886,7 @@ ioport_type_class ioport_field::type_class() const noexcept
 		return INPUT_CLASS_KEYBOARD;
 
 	// configuration settings (specific names required)
-	if (m_type == IPT_CONFIG)
+	if (m_type == IPT_CONFIG || m_type == IPT_ADJUSTER)
 		return INPUT_CLASS_CONFIG;
 
 	// DIP switches (specific names required)
@@ -1846,14 +1846,14 @@ time_t ioport_manager::initialize()
 		port.second->init_live_state();
 
 	// handle autoselection of devices
-	init_autoselect_devices(IPT_AD_STICK_X,  IPT_AD_STICK_Y,   IPT_AD_STICK_Z, OPTION_ADSTICK_DEVICE,    "analog joystick");
-	init_autoselect_devices(IPT_PADDLE,      IPT_PADDLE_V,     0,              OPTION_PADDLE_DEVICE,     "paddle");
-	init_autoselect_devices(IPT_PEDAL,       IPT_PEDAL2,       IPT_PEDAL3,     OPTION_PEDAL_DEVICE,      "pedal");
-	init_autoselect_devices(IPT_LIGHTGUN_X,  IPT_LIGHTGUN_Y,   0,              OPTION_LIGHTGUN_DEVICE,   "lightgun");
-	init_autoselect_devices(IPT_POSITIONAL,  IPT_POSITIONAL_V, 0,              OPTION_POSITIONAL_DEVICE, "positional");
-	init_autoselect_devices(IPT_DIAL,        IPT_DIAL_V,       0,              OPTION_DIAL_DEVICE,       "dial");
-	init_autoselect_devices(IPT_TRACKBALL_X, IPT_TRACKBALL_Y,  0,              OPTION_TRACKBALL_DEVICE,  "trackball");
-	init_autoselect_devices(IPT_MOUSE_X,     IPT_MOUSE_Y,      0,              OPTION_MOUSE_DEVICE,      "mouse");
+	init_autoselect_devices({ IPT_AD_STICK_X,  IPT_AD_STICK_Y,   IPT_AD_STICK_Z }, OPTION_ADSTICK_DEVICE,    "analog joystick");
+	init_autoselect_devices({ IPT_PADDLE,      IPT_PADDLE_V },                     OPTION_PADDLE_DEVICE,     "paddle");
+	init_autoselect_devices({ IPT_PEDAL,       IPT_PEDAL2,       IPT_PEDAL3 },     OPTION_PEDAL_DEVICE,      "pedal");
+	init_autoselect_devices({ IPT_LIGHTGUN_X,  IPT_LIGHTGUN_Y },                   OPTION_LIGHTGUN_DEVICE,   "lightgun");
+	init_autoselect_devices({ IPT_POSITIONAL,  IPT_POSITIONAL_V },                 OPTION_POSITIONAL_DEVICE, "positional");
+	init_autoselect_devices({ IPT_DIAL,        IPT_DIAL_V },                       OPTION_DIAL_DEVICE,       "dial");
+	init_autoselect_devices({ IPT_TRACKBALL_X, IPT_TRACKBALL_Y },                  OPTION_TRACKBALL_DEVICE,  "trackball");
+	init_autoselect_devices({ IPT_MOUSE_X,     IPT_MOUSE_Y },                      OPTION_MOUSE_DEVICE,      "mouse");
 
 	// look for 4-way diagonal joysticks and change the default map if we find any
 	const char *joystick_map_default = machine().options().joystick_map();
@@ -1911,39 +1911,71 @@ void ioport_manager::init_port_types()
 //  in and the corresponding option
 //-------------------------------------------------
 
-void ioport_manager::init_autoselect_devices(int type1, int type2, int type3, const char *option, const char *ananame)
+void ioport_manager::init_autoselect_devices(std::initializer_list<ioport_type> types, std::string_view option, std::string_view ananame)
 {
+	static std::pair<char const *, char const *> const CLASS_OPTIONS[] = {
+			{ "mouse",     OPTION_MOUSE },
+			{ "joystick",  OPTION_JOYSTICK },
+			{ "lightgun",  OPTION_LIGHTGUN } };
+
 	// if nothing specified, ignore the option
-	const char *stemp = machine().options().value(option);
-	if (stemp[0] == 0 || strcmp(stemp, "none") == 0)
+	auto const autooption = machine().options().get_entry(option);
+	char const *const autoclass = autooption->value();
+	if (!autoclass || !*autoclass || !std::strcmp(autoclass, "none"))
 		return;
 
-	// extract valid strings
+	// if the device class is enabled anyway or disabled at a higher priority level, do nothing
+	auto const classname = std::find_if(
+			std::begin(CLASS_OPTIONS),
+			std::end(CLASS_OPTIONS),
+			[&autoclass] (auto const &x) { return !std::strcmp(autoclass, x.first); });
+	if (std::end(CLASS_OPTIONS) != classname)
+	{
+		if (machine().options().bool_value(classname->second))
+			return;
+
+		auto const classoption = machine().options().get_entry(classname->second);
+		if (classoption->priority() > autooption->priority())
+		{
+			osd_printf_verbose("Input: Won't autoenable %s in presence of a %s as it's disabled at a higher priority\n", autoclass, ananame);
+			return;
+		}
+	}
+
+	// find matching device class
 	input_class *autoenable_class = nullptr;
 	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
-		if (strcmp(stemp, machine().input().device_class(devclass).name()) == 0)
+	{
+		if (!std::strcmp(autoclass, machine().input().device_class(devclass).name()))
 		{
 			autoenable_class = &machine().input().device_class(devclass);
 			break;
 		}
-	if (autoenable_class == nullptr)
+	}
+	if (!autoenable_class)
 	{
-		osd_printf_error("Invalid %s value %s; reverting to keyboard\n", option, stemp);
+		osd_printf_error("Invalid %s value %s; reverting to keyboard\n", option, autoclass);
 		autoenable_class = &machine().input().device_class(DEVICE_CLASS_KEYBOARD);
 	}
 
-	// only scan the list if we haven't already enabled this class of control
-	if (!autoenable_class->enabled())
-		for (auto &port : m_portlist)
-			for (ioport_field const &field : port.second->fields())
+	// nothing to do if the class is already enabled
+	if (autoenable_class->enabled())
+		return;
 
-				// if this port type is in use, apply the autoselect criteria
-				if ((type1 != 0 && field.type() == type1) || (type2 != 0 && field.type() == type2) || (type3 != 0 && field.type() == type3))
-				{
-					osd_printf_verbose("Input: Autoenabling %s due to presence of a %s\n", autoenable_class->name(), ananame);
-					autoenable_class->enable();
-					break;
-				}
+	// scan the port list
+	for (auto &port : m_portlist)
+	{
+		for (ioport_field const &field : port.second->fields())
+		{
+			// if this port type is in use, apply the autoselect criteria
+			if (std::find(std::begin(types), std::end(types), field.type()) != std::end(types))
+			{
+				osd_printf_verbose("Input: Autoenabling %s due to presence of a %s\n", autoenable_class->name(), ananame);
+				autoenable_class->enable();
+				return;
+			}
+		}
+	}
 }
 
 
@@ -2134,7 +2166,7 @@ void ioport_manager::frame_update_callback()
 
 void ioport_manager::frame_update()
 {
-	g_profiler.start(PROFILER_INPUT);
+	auto profile = g_profiler.start(PROFILER_INPUT);
 
 	// record/playback information about the current frame
 	attotime curtime = machine().time();
@@ -2171,8 +2203,6 @@ void ioport_manager::frame_update()
 			if (dynfield.field().type() != IPT_OUTPUT)
 				dynfield.write(newvalue);
 	}
-
-	g_profiler.stop();
 }
 
 
@@ -2460,6 +2490,7 @@ bool ioport_manager::load_controller_config(
 
 	// find the matching field
 	ioport_value const defvalue = portnode.get_attribute_int("defvalue", 0);
+	bool matched = false;
 	for (ioport_field &field : port->second->fields())
 	{
 		// find the matching mask and default value
@@ -2521,13 +2552,16 @@ bool ioport_manager::load_controller_config(
 #endif
 			}
 
-			// successfully applied
-			return true;
+			// only break out of the loop for unconditional inputs
+			if (field.condition().condition() == ioport_condition::ALWAYS)
+				return true;
+			else
+				matched = true;
 		}
 	}
 
-	// no matching field
-	return false;
+	// return whether any field matched
+	return matched;
 }
 
 
@@ -2598,7 +2632,10 @@ void ioport_manager::load_system_config(
 					else if (revstring && !strcmp(revstring, "no"))
 						field.live().analog->m_reverse = false;
 				}
-				break;
+
+				// only break out of the loop for unconditional inputs
+				if (field.condition().condition() == ioport_condition::ALWAYS)
+					break;
 			}
 		}
 	}
@@ -2822,7 +2859,7 @@ void ioport_manager::save_game_inputs(util::xml::data_node &parentnode)
 	// iterate over ports
 	for (auto &port : m_portlist)
 		for (ioport_field const &field : port.second->fields())
-			if (save_this_input_field_type(field.type()))
+			if (save_this_input_field_type(field.type()) && field.enabled())
 			{
 				// determine if we changed
 				bool changed = false;
@@ -3383,7 +3420,7 @@ ioport_configurer& ioport_configurer::setting_alloc(ioport_value value, const ch
 {
 	// make sure we have a field
 	if (!m_curfield)
-		throw emu_fatalerror("alloc_setting called with no active field (value=%X name=%s)\n", value, name);
+		throw emu_fatalerror("setting_alloc called with no active field (value=%X name=%s)\n", value, name);
 
 	// append a new setting
 	m_cursetting = &m_curfield->m_settinglist.emplace_back(*m_curfield, value & m_curfield->mask(), string_from_token(name));

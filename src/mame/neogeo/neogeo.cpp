@@ -30,7 +30,6 @@
         * Graphical Glitches caused by incorrect timing?
           - Some raster effects are imperfect (off by a couple of lines)
         * 68000 waitstates on ROM region access, determined by jumpers on cart
-          (garou train stage 3 background bug is probably related to this)
         * AES Input clock is incorrect (24.167829MHz for NTSC systems, PAL is same?)
         * PAL region AES behavior is not verified
 
@@ -561,8 +560,10 @@
 #include "irrmaze.lh"
 #include "neogeo.lh"
 
+#define LOG_VIDEO_SYSTEM         (1U << 1)
 
-#define LOG_VIDEO_SYSTEM         (0)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
 class mvs_state : public ngarcade_base_state
@@ -758,7 +759,7 @@ protected:
 void neogeo_base_state::adjust_display_position_interrupt_timer()
 {
 	attotime period = attotime::from_ticks((uint64_t)m_display_counter + 1, NEOGEO_PIXEL_CLOCK);
-	if (LOG_VIDEO_SYSTEM) logerror("adjust_display_position_interrupt_timer  current y: %02x  current x: %02x   target y: %x  target x: %x\n", m_screen->vpos(), m_screen->hpos(), (m_display_counter + 1) / NEOGEO_HTOTAL, (m_display_counter + 1) % NEOGEO_HTOTAL);
+	LOGMASKED(LOG_VIDEO_SYSTEM, "adjust_display_position_interrupt_timer  current y: %02x  current x: %02x   target y: %x  target x: %x\n", m_screen->vpos(), m_screen->hpos(), (m_display_counter + 1) / NEOGEO_HTOTAL, (m_display_counter + 1) % NEOGEO_HTOTAL);
 
 	m_display_position_interrupt_timer->adjust(period);
 }
@@ -774,7 +775,7 @@ void neogeo_base_state::set_display_counter_msb(uint16_t data)
 {
 	m_display_counter = (m_display_counter & 0x0000ffff) | ((uint32_t)data << 16);
 
-	if (LOG_VIDEO_SYSTEM) logerror("PC %06x: set_display_counter %08x\n", m_maincpu->pc(), m_display_counter);
+	LOGMASKED(LOG_VIDEO_SYSTEM, "PC %06x: set_display_counter %08x\n", m_maincpu->pc(), m_display_counter);
 }
 
 
@@ -782,11 +783,11 @@ void neogeo_base_state::set_display_counter_lsb(uint16_t data)
 {
 	m_display_counter = (m_display_counter & 0xffff0000) | data;
 
-	if (LOG_VIDEO_SYSTEM) logerror("PC %06x: set_display_counter %08x\n", m_maincpu->pc(), m_display_counter);
+	LOGMASKED(LOG_VIDEO_SYSTEM, "PC %06x: set_display_counter %08x\n", m_maincpu->pc(), m_display_counter);
 
 	if (m_display_position_interrupt_control & IRQ2CTRL_LOAD_RELATIVE)
 	{
-		if (LOG_VIDEO_SYSTEM) logerror("AUTOLOAD_RELATIVE ");
+		LOGMASKED(LOG_VIDEO_SYSTEM, "AUTOLOAD_RELATIVE ");
 		adjust_display_position_interrupt_timer();
 	}
 }
@@ -815,11 +816,11 @@ void neogeo_base_state::acknowledge_interrupt(uint16_t data)
 
 TIMER_CALLBACK_MEMBER(neogeo_base_state::display_position_interrupt_callback)
 {
-	if (LOG_VIDEO_SYSTEM) logerror("--- Scanline @ %d,%d\n", m_screen->vpos(), m_screen->hpos());
+	LOGMASKED(LOG_VIDEO_SYSTEM, "--- Scanline @ %d,%d\n", m_screen->vpos(), m_screen->hpos());
 
 	if (m_display_position_interrupt_control & IRQ2CTRL_ENABLE)
 	{
-		if (LOG_VIDEO_SYSTEM) logerror("*** Scanline interrupt (IRQ2) ***  y: %02x  x: %02x\n", m_screen->vpos(), m_screen->hpos());
+		LOGMASKED(LOG_VIDEO_SYSTEM, "*** Scanline interrupt (IRQ2) ***  y: %02x  x: %02x\n", m_screen->vpos(), m_screen->hpos());
 		m_display_position_interrupt_pending = 1;
 
 		update_interrupts();
@@ -827,7 +828,7 @@ TIMER_CALLBACK_MEMBER(neogeo_base_state::display_position_interrupt_callback)
 
 	if (m_display_position_interrupt_control & IRQ2CTRL_AUTOLOAD_REPEAT)
 	{
-		if (LOG_VIDEO_SYSTEM) logerror("AUTOLOAD_REPEAT ");
+		LOGMASKED(LOG_VIDEO_SYSTEM, "AUTOLOAD_REPEAT ");
 		adjust_display_position_interrupt_timer();
 	}
 }
@@ -837,7 +838,7 @@ TIMER_CALLBACK_MEMBER(neogeo_base_state::display_position_vblank_callback)
 {
 	if (m_display_position_interrupt_control & IRQ2CTRL_AUTOLOAD_VBLANK)
 	{
-		if (LOG_VIDEO_SYSTEM) logerror("AUTOLOAD_VBLANK ");
+		LOGMASKED(LOG_VIDEO_SYSTEM, "AUTOLOAD_VBLANK ");
 		adjust_display_position_interrupt_timer();
 	}
 
@@ -848,7 +849,7 @@ TIMER_CALLBACK_MEMBER(neogeo_base_state::display_position_vblank_callback)
 
 TIMER_CALLBACK_MEMBER(neogeo_base_state::vblank_interrupt_callback)
 {
-	if (LOG_VIDEO_SYSTEM) logerror("+++ VBLANK @ %d,%d\n", m_screen->vpos(), m_screen->hpos());
+	LOGMASKED(LOG_VIDEO_SYSTEM, "+++ VBLANK @ %d,%d\n", m_screen->vpos(), m_screen->hpos());
 
 	m_vblank_interrupt_pending = 1;
 	update_interrupts();
@@ -926,15 +927,20 @@ CUSTOM_INPUT_MEMBER(ngarcade_base_state::startsel_edge_joy_r)
 
 void neogeo_base_state::io_control_w(offs_t offset, uint8_t data)
 {
-	if ((offset & 0x38) == 0x00) // TODO: the mask is supposedly less restrictive on AES?
+	switch (offset & 0x38) // TODO: the mask is supposedly less restrictive on AES?
 	{
+	case 0x00:
 		if (m_ctrl1) m_ctrl1->write_ctrlsel(data & 0x07);
 		if (m_ctrl2) m_ctrl2->write_ctrlsel((data >> 3) & 0x07);
 		if (m_edge) m_edge->write_ctrlsel(data & 0x3f); // FIXME: only MV-1B and MV-1C have this output
-	}
-	else
-	{
-		logerror("PC: %x  Unmapped I/O control write.  Offset: %x  Data: %x\n", m_maincpu->pc(), offset, data);
+		break;
+
+	case 0x08:
+		m_card_bank = data & 0x07;
+		break;
+
+	default:
+		logerror("%s: Unmapped I/O control write.  Offset: %02x  Data: %02x\n", machine().describe_context(), offset, data);
 	}
 }
 
@@ -943,6 +949,7 @@ void ngarcade_base_state::io_control_w(offs_t offset, uint8_t data)
 	switch (offset & 0x78)
 	{
 	case 0x00:
+	case 0x08:
 		neogeo_base_state::io_control_w(offset, data);
 		break;
 
@@ -961,7 +968,7 @@ void ngarcade_base_state::io_control_w(offs_t offset, uint8_t data)
 		break;
 
 	default:
-		logerror("PC: %x  Unmapped I/O control write.  Offset: %x  Data: %x\n", m_maincpu->pc(), offset, data);
+		logerror("%s: Unmapped I/O control write.  Offset: %02x  Data: %02x\n", machine().describe_context(), offset, data);
 	}
 }
 
@@ -1032,7 +1039,7 @@ uint16_t neogeo_base_state::unmapped_r(address_space &space)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(ngarcade_base_state::set_save_ram_unlock)
+void ngarcade_base_state::set_save_ram_unlock(int state)
 {
 	m_save_ram_unlocked = state;
 }
@@ -1060,18 +1067,15 @@ CUSTOM_INPUT_MEMBER(neogeo_base_state::get_memcard_status)
 }
 
 
-uint16_t neogeo_base_state::memcard_r(offs_t offset)
+uint16_t neogeo_base_state::memcard_r(offs_t offset, uint16_t mem_mask)
 {
 	m_maincpu->eat_cycles(2); // insert waitstate
 
-	uint16_t ret;
-
-	if (m_memcard->present())
-		ret = m_memcard->read(offset) | 0xff00;
+	// memory card enabled by /UDS
+	if (ACCESSING_BITS_8_15 && m_memcard->present())
+		return m_memcard->read((offs_t(m_card_bank) << 21) | offset);
 	else
-		ret = 0xffff;
-
-	return ret;
+		return 0xffff;
 }
 
 
@@ -1079,19 +1083,17 @@ void neogeo_base_state::memcard_w(offs_t offset, uint16_t data, uint16_t mem_mas
 {
 	m_maincpu->eat_cycles(2); // insert waitstate
 
-	if (ACCESSING_BITS_0_7)
-	{
-		if (m_memcard->present())
-			m_memcard->write(offset, data);
-	}
+	// memory card enabled by /UDS
+	if (ACCESSING_BITS_8_15 && m_memcard->present())
+		m_memcard->write((offs_t(m_card_bank) << 21) | offset, data);
 }
+
 
 /*************************************
  *
  *  Inter-CPU communications
  *
  *************************************/
-
 
 CUSTOM_INPUT_MEMBER(neogeo_base_state::get_audio_result)
 {
@@ -1121,14 +1123,13 @@ uint8_t neogeo_base_state::audio_cpu_bank_select_r(offs_t offset)
  *
  *************************************/
 
-
-WRITE_LINE_MEMBER(neogeo_base_state::set_use_cart_vectors)
+void neogeo_base_state::set_use_cart_vectors(int state)
 {
 	m_use_cart_vectors = state;
 }
 
 
-WRITE_LINE_MEMBER(neogeo_base_state::set_use_cart_audio)
+void neogeo_base_state::set_use_cart_audio(int state)
 {
 	m_use_cart_audio = state;
 	m_sprgen->neogeo_set_fixed_layer_source(state);
@@ -1287,6 +1288,7 @@ uint16_t neogeo_base_state::read_lorom_kof10th(offs_t offset)
 		offset += m_slots[m_curr_slot]->get_special_bank();
 	return rom[offset + 0x80/2];
 }
+
 
 /*************************************
  *
@@ -1536,6 +1538,7 @@ void neogeo_base_state::set_slot_idx(int slot)
 	}
 }
 
+
 /*************************************
  *
  *  Machine start
@@ -1565,6 +1568,7 @@ void neogeo_base_state::machine_start()
 	save_item(NAME(m_bank_base));
 	save_item(NAME(m_use_cart_vectors));
 	save_item(NAME(m_use_cart_audio));
+	save_item(NAME(m_card_bank));
 }
 
 void ngarcade_base_state::machine_start()
@@ -1585,9 +1589,9 @@ void ngarcade_base_state::machine_start()
 
 	if (m_memcard)
 	{
-		main_program_space.unmap_readwrite(0x800000, 0x800fff);
-		main_program_space.install_read_handler(0x800000, 0x800fff, read16sm_delegate(*this, FUNC(ngarcade_base_state::memcard_r)));
-		main_program_space.install_write_handler(0x800000, 0x800fff, write16s_delegate(*this, FUNC(ngarcade_base_state::memcard_w)));
+		main_program_space.unmap_readwrite(0x800000, 0xbfffff);
+		main_program_space.install_read_handler(0x800000, 0xbfffff, read16s_delegate(*this, FUNC(ngarcade_base_state::memcard_r)));
+		main_program_space.install_write_handler(0x800000, 0xbfffff, write16s_delegate(*this, FUNC(ngarcade_base_state::memcard_w)));
 	}
 
 	// enable rtc and serial mode
@@ -1712,7 +1716,7 @@ void neogeo_base_state::base_main_map(address_map &map)
 	map(0x360000, 0x37ffff).r(FUNC(neogeo_base_state::unmapped_r));
 	map(0x380000, 0x3800ff).mirror(0x01ff00).w(FUNC(neogeo_base_state::io_control_w)).umask16(0x00ff);
 	map(0x3a0000, 0x3a001f).mirror(0x01ffe0).r(FUNC(neogeo_base_state::unmapped_r));
-	map(0x3a0000, 0x3a001f).mirror(0x01ffe0).w("systemlatch", FUNC(hc259_device::write_a3)).umask16(0x00ff); // BITW1 (system control registers)
+	map(0x3a0000, 0x3a001f).mirror(0x01ffe0).w(m_systemlatch, FUNC(hc259_device::write_a3)).umask16(0x00ff); // BITW1 (system control registers)
 	map(0x3c0000, 0x3c0007).mirror(0x01fff8).r(FUNC(neogeo_base_state::video_register_r));
 	map(0x3c0000, 0x3c000f).mirror(0x01fff0).w(FUNC(neogeo_base_state::video_register_w));
 	map(0x3e0000, 0x3fffff).r(FUNC(neogeo_base_state::unmapped_r));
@@ -1762,7 +1766,7 @@ void aes_state::aes_main_map(address_map &map)
 	map(0x000000, 0x00007f).r(FUNC(aes_state::banked_vectors_r));
 	map(0x100000, 0x10ffff).mirror(0x0f0000).ram();
 	// some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too
-	map(0x800000, 0x800fff).rw(FUNC(aes_state::memcard_r), FUNC(aes_state::memcard_w));
+	map(0x800000, 0xbfffff).rw(FUNC(aes_state::memcard_r), FUNC(aes_state::memcard_w));
 	map(0xc00000, 0xc1ffff).mirror(0x0e0000).rom().region("mainbios", 0);
 	map(0xd00000, 0xffffff).r(FUNC(aes_state::unmapped_r));
 }
@@ -1904,9 +1908,9 @@ INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(aes_base_state::aes_jp1)
 {
-	// Shorting JP1 causes a 68000 /BERR (Bus Error). On Dev Bios, this pops up the debug monitor.
+	// Shorting JP1 causes a 68000 /BERR (Bus Error). On Dev BIOS, this pops up the debug monitor.
 	if (newval)
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, HOLD_LINE);
+		m_maincpu->trigger_bus_error();
 }
 
 
@@ -1932,7 +1936,7 @@ void neogeo_base_state::neogeo_base(machine_config &config)
 	m_systemlatch->q_out_cb<1>().set(FUNC(neogeo_base_state::set_use_cart_vectors));
 	m_systemlatch->q_out_cb<2>().set_nop(); // memory card 1: write enable/disable
 	m_systemlatch->q_out_cb<3>().set_nop(); // memory card 2: write disable/enable
-	m_systemlatch->q_out_cb<4>().set_nop(); // memory card: register select enable/set to normal (what does it mean?)
+	m_systemlatch->q_out_cb<4>().set_nop(); // memory card: register select enable/set to normal
 	m_systemlatch->q_out_cb<7>().set(FUNC(neogeo_base_state::set_palette_bank));
 
 	/* video hardware */
@@ -1974,6 +1978,16 @@ void neogeo_base_state::neogeo_stereo(machine_config &config)
 }
 
 
+void neogeo_base_state::neogeo_memcard(machine_config &config)
+{
+	NG_MEMCARD(config, m_memcard, 0);
+
+	m_systemlatch->q_out_cb<2>().set(m_memcard, FUNC(ng_memcard_device::lock1_w));
+	m_systemlatch->q_out_cb<3>().set(m_memcard, FUNC(ng_memcard_device::unlock2_w));
+	m_systemlatch->q_out_cb<4>().set(m_memcard, FUNC(ng_memcard_device::regsel_w));
+}
+
+
 void ngarcade_base_state::neogeo_arcade(machine_config &config)
 {
 	neogeo_base(config);
@@ -2011,8 +2025,7 @@ void mvs_led_state::mv1(machine_config &config)
 {
 	neogeo_arcade(config);
 	neogeo_stereo(config);
-
-	NG_MEMCARD(config, m_memcard, 0);
+	neogeo_memcard(config);
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
@@ -2055,8 +2068,7 @@ void mvs_led_el_state::mv2f(machine_config &config)
 {
 	neogeo_arcade(config);
 	neogeo_stereo(config);
-
-	NG_MEMCARD(config, m_memcard, 0);
+	neogeo_memcard(config);
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
@@ -2072,8 +2084,7 @@ void mvs_led_el_state::mv4f(machine_config &config)
 {
 	neogeo_arcade(config);
 	neogeo_stereo(config);
-
-	NG_MEMCARD(config, m_memcard, 0);
+	neogeo_memcard(config);
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
@@ -2089,8 +2100,7 @@ void mvs_led_el_state::mv6f(machine_config &config)
 {
 	neogeo_arcade(config);
 	neogeo_stereo(config);
-
-	NG_MEMCARD(config, m_memcard, 0);
+	neogeo_memcard(config);
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
@@ -2106,8 +2116,7 @@ void mvs_led_state::mv1_fixed(machine_config &config)
 {
 	neogeo_arcade(config);
 	neogeo_stereo(config);
-
-	NG_MEMCARD(config, m_memcard, 0);
+	neogeo_memcard(config);
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", true);
 
@@ -2148,10 +2157,9 @@ void aes_state::aes_ntsc(machine_config &config)
 {
 	neogeo_base(config);
 	neogeo_stereo(config);
+	neogeo_memcard(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &aes_state::aes_main_map);
-
-	NG_MEMCARD(config, m_memcard, 0);
 
 	NEOGEO_CART_SLOT(config, m_slots[0], neogeo_cart, nullptr);
 
@@ -2165,26 +2173,26 @@ void aes_state::aes_ntsc(machine_config &config)
 
 /*************************************
  *
- *  Neo-Geo bios
+ *  Neo-Geo BIOS
  *
  *************************************
 
-    These are the known Bios Roms, Set options.bios to the one you want.
+    These are the known BIOS Roms, Set options.bios to the one you want.
 
-    The Universe bios roms are supported because they're now used on enough PCBs
+    The Universe BIOS roms are supported because they're now used on enough PCBs
     to be considered 'in active arcade use' rather than just homebrew hacks.
     Some may be missing, there have been multiple CRCs reported for the same
-    revision in some cases (the Universe bios has an option for entering / displaying
+    revision in some cases (the Universe BIOS has an option for entering / displaying
     a serial number; these should be noted as such if they're added).
-    Universe bios prior to version 1.3 was incompatible with AES.
+    Universe BIOS prior to version 1.3 was incompatible with AES.
 
     The 'japan-hotel' BIOS is a dump of an MVS which could be found in some japanese
     hotels. it is a custom MVS mobo which uses MVS carts but it hasn't jamma
     connector and it's similar to a console with a coin mechanism, so it's a sort
     of little coin op console installed in hotels.
 
-    The sp-45.sp1 bios is the latest 'ASIA' revision. Japan-j3.bin is the latest 'JAPAN'
-    revision. Both of them are also used in the sp-4x.sp1 bios of the Jamma PCB boards.
+    The sp-45.sp1 BIOS is the latest 'ASIA' revision. Japan-j3.bin is the latest 'JAPAN'
+    revision. Both of them are also used in the sp-4x.sp1 BIOS of the Jamma PCB boards.
 
     The current Neo-Geo MVS system set (SFIX/SM1/000-LO) used is from a NEO-MVH MV1FS board.
     Other boards (MV1xx / MV2x / MV4x /MV6x) other system sets?
@@ -2243,7 +2251,7 @@ void aes_state::aes_ntsc(machine_config &config)
    Game Start Compulsion: 30 seconds
    They also allow you to set the continue price, rather than the Coin 2 rate (Coin 2 rate doesn't show up, even if you set Dipswitch to 'VS mode')
 
-   The Yellow bios ROM does not show the 'Winners Don't Use Drugs' logo for several earlier games (eg. Metal Slug, Neo Bomberman) but does still show other US specific screens (Parental Advisory)
+   The Yellow BIOS ROM does not show the 'Winners Don't Use Drugs' logo for several earlier games (eg. Metal Slug, Neo Bomberman) but does still show other US specific screens (Parental Advisory)
    Later games seem to be unaffected by this and show all screens regardless
 */
 
@@ -2254,7 +2262,7 @@ void aes_state::aes_ntsc(machine_config &config)
 	ROM_SYSTEM_BIOS( 1, "euro-s1", "Europe MVS (Ver. 1)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 1, "sp-s.sp1",          0x00000, 0x020000, CRC(c7f2fa45) SHA1(09576ff20b4d6b365e78e6a5698ea450262697cd) ) /* 3 Dark Blue - Europe, 4 Slot */ \
 	ROM_SYSTEM_BIOS( 2, "asia-mv1c", "Asia NEO-MVH MV1C" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 2, "sp-45.sp1",         0x00000, 0x080000, CRC(03cc9f6a) SHA1(cdf1f49e3ff2bac528c21ed28449cf35b7957dc1) ) /* 6 Dark Blue - Latest Asia bios (MV1C - mask ROM) */ \
+	ROM_LOAD16_WORD_SWAP_BIOS( 2, "sp-45.sp1",         0x00000, 0x080000, CRC(03cc9f6a) SHA1(cdf1f49e3ff2bac528c21ed28449cf35b7957dc1) ) /* 6 Dark Blue - Latest Asia BIOS (MV1C - mask ROM) */ \
 	ROM_SYSTEM_BIOS( 3, "asia-mv1b", "Asia MV1B" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 3, "sp-s3.sp1",         0x00000, 0x020000, CRC(91b64be3) SHA1(720a3e20d26818632aedf2c2fd16c54f213543e1) ) /* 6 Dark Blue - Asia (MV1B) */ \
 	\
@@ -2270,17 +2278,17 @@ void aes_state::aes_ntsc(machine_config &config)
 	ROM_LOAD16_WORD_SWAP_BIOS( 8, "sp1-u3.bin",        0x00000, 0x020000, CRC(2025b7a2) SHA1(73d774746196f377111cd7aa051cc8bb5dd948b3) ) /* 2 Green - 6 Slot */ \
 	\
 	ROM_SYSTEM_BIOS( 9, "japan", "Japan MVS (Ver. 3)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 9, "vs-bios.rom",       0x00000, 0x020000, CRC(f0e8f27d) SHA1(ecf01eda815909f1facec62abf3594eaa8d11075) ) /* 6 Red - Japan, Ver 6 VS Bios */ \
+	ROM_LOAD16_WORD_SWAP_BIOS( 9, "vs-bios.rom",       0x00000, 0x020000, CRC(f0e8f27d) SHA1(ecf01eda815909f1facec62abf3594eaa8d11075) ) /* 6 Red - Japan, Ver 6 VS BIOS */ \
 	ROM_SYSTEM_BIOS( 10, "japan-s2", "Japan MVS (Ver. 2)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 10, "sp-j2.sp1",        0x00000, 0x020000, CRC(acede59c) SHA1(b6f97acd282fd7e94d9426078a90f059b5e9dd91) ) /* 5 Red - Japan, Older */ \
 	ROM_SYSTEM_BIOS( 11, "japan-s1", "Japan MVS (Ver. 1)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 11, "sp1.jipan.1024",   0x00000, 0x020000, CRC(9fb0abe4) SHA1(18a987ce2229df79a8cf6a84f968f0e42ce4e59d) ) /* 3 Red - Japan, Older */ \
 	ROM_SYSTEM_BIOS( 12, "japan-mv1b", "Japan MV1B" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 12, "japan-j3.bin",     0x00000, 0x020000, CRC(dff6d41f) SHA1(e92910e20092577a4523a6b39d578a71d4de7085) ) /* 6 Red - Latest Japan bios (MV1B) */ \
+	ROM_LOAD16_WORD_SWAP_BIOS( 12, "japan-j3.bin",     0x00000, 0x020000, CRC(dff6d41f) SHA1(e92910e20092577a4523a6b39d578a71d4de7085) ) /* 6 Red - Latest Japan BIOS (MV1B) */ \
 	ROM_SYSTEM_BIOS( 13, "japan-j3a", "Japan MVS (J3, alt)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 13, "sp1-j3.bin",       0x00000, 0x020000, CRC(fbc6d469) SHA1(46b2b409b5b68869e367b40c846373623edb632a) ) /* 2 Red - 6 Slot */ \
 	ROM_SYSTEM_BIOS( 14, "japan-mv1c", "Japan NEO-MVH MV1C" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 14, "sp-j3.sp1",        0x00000, 0x080000, CRC(486cb450) SHA1(52c21ea817928904b80745a8c8d15cbad61e1dc1) ) /* 6 Red - Latest Japan bios (MV1C - mask ROM) */ \
+	ROM_LOAD16_WORD_SWAP_BIOS( 14, "sp-j3.sp1",        0x00000, 0x080000, CRC(486cb450) SHA1(52c21ea817928904b80745a8c8d15cbad61e1dc1) ) /* 6 Red - Latest Japan BIOS (MV1C - mask ROM) */ \
 	\
 	ROM_SYSTEM_BIOS( 15, "japan-hotel", "Custom Japanese Hotel" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 15, "sp-1v1_3db8c.bin", 0x00000, 0x020000, CRC(162f0ebe) SHA1(fe1c6dd3dfcf97d960065b1bb46c1e11cb7bf271) ) /* 6 Red - 'rare MVS found in japanese hotels' shows v1.3 in test mode */ \
@@ -7985,8 +7993,10 @@ ROM_START( irrmaze ) /* MVS ONLY RELEASE */
 	// special BIOS with trackball support, we only have one Irritating Maze bios and that's Asian
 	ROM_SYSTEM_BIOS( 0, "asia-sp1", "Asia MV1B 263" )
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "236-bios.sp1", 0x00000, 0x020000, CRC(853e6b96) SHA1(de369cb4a7df147b55168fa7aaf0b98c753b735e) )
+	ROM_SYSTEM_BIOS( 1, "japan", "Japan (hack?)" ) // from a 'refurbished' Japanese cabinet, had label of the arcade distributor rather than original sticker however, and looks like a hack of above Asia ROM
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "236-bios_japan_hack.sp1", 0x00000, 0x020000, CRC(02bf4426) SHA1(f4aa64bfe0b93e5df07b4fe2e0f638d91c7f2e71) )
 	// Universe BIOS 2.2 and later allow joystick play as a cheat
-	NEOGEO_UNIBIOS_2_2_AND_NEWER(1)
+	NEOGEO_UNIBIOS_2_2_AND_NEWER(2)
 
 	ROM_REGION( 0x30000, "cslot1:audiocpu", 0 )
 	ROM_LOAD( "236-m1.m1", 0x00000, 0x20000, CRC(880a1abd) SHA1(905afa157aba700e798243b842792e50729b19a0) ) /* TC531001 */
@@ -12147,7 +12157,7 @@ GAME( 1996, neomrdo,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1995, goalx3,     neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Goal! Goal! Goal!", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, neodrift,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Neo Drift Out - New Technology", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, breakers,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Breakers", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, puzzldpr,   puzzledp, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Puzzle De Pon! R!", MACHINE_SUPPORTS_SAVE ) // game concept licensed from Taito
+GAME( 1997, puzzldpr,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Puzzle De Pon! R!", MACHINE_SUPPORTS_SAVE ) // game concept licensed from Taito
 GAME( 1998, breakrev,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Breakers Revenge", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, flipshot,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Battle Flip Shot", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, ctomaday,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Captain Tomaday", MACHINE_SUPPORTS_SAVE )

@@ -335,8 +335,8 @@ protected:
 	uint8_t videopkr_p2_data_r();
 	void videopkr_p1_data_w(uint8_t data);
 	void videopkr_p2_data_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(videopkr_t0_latch);
-	DECLARE_WRITE_LINE_MEMBER(prog_w);
+	int videopkr_t0_latch();
+	void prog_w(int state);
 	uint8_t sound_io_r();
 	void sound_io_w(uint8_t data);
 	uint8_t sound_p2_r();
@@ -458,12 +458,11 @@ static uint8_t dec_7seg(int data)
 /* Display a seven digit counter on layout - Index points to less significant digit*/
 void videopkr_state::count_7dig(unsigned long data, uint8_t index)
 {
-	uint8_t i;
-	char strn[8];
-	sprintf(strn,"%7lu",data);
-
-	for (i = 0; i < 7; i++)
-		m_digits[index+i] = dec_7seg((strn[6 - i] | 0x10) - 0x30);
+	for (auto i = 0; i < 7; i++)
+	{
+		m_digits[index+i] = dec_7seg(data % 10);
+		data /= 10;
+	}
 }
 
 void videopkr_state::videopkr_palette(palette_device &palette) const
@@ -781,12 +780,12 @@ void videopkr_state::videopkr_p2_data_w(uint8_t data)
 	m_p2 = data;
 }
 
-READ_LINE_MEMBER(videopkr_state::videopkr_t0_latch)
+int videopkr_state::videopkr_t0_latch()
 {
 	return m_t0_latch;
 }
 
-WRITE_LINE_MEMBER(videopkr_state::prog_w)
+void videopkr_state::prog_w(int state)
 {
 	if (!state)
 		m_maincpu->set_input_line(0, CLEAR_LINE);   /* clear interrupt FF */

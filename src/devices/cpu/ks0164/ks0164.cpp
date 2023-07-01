@@ -108,6 +108,7 @@ void ks0164_cpu_device::handle_irq()
 			// Normal irq (not reset), save pc and psw
 			if(m_r[R_PSW] & F_I)
 				return;
+			standard_irq_callback(0, m_r[R_PC]);
 			m_program.write_word(m_r[R_SP] - 2, m_r[R_PC]);
 			m_program.write_word(m_r[R_SP] - 4, m_r[R_PSW]);
 			m_r[R_SP] -= 4;
@@ -118,8 +119,6 @@ void ks0164_cpu_device::handle_irq()
 		m_r[R_PSW] = (m_r[R_PSW] & 0xfff0) | (index ? index - 1 : 0);
 		m_r[R_PC] = m_program_cache.read_word(index*2);
 		m_icount --;
-		if(index)
-			standard_irq_callback(0);
 	}
 }
 

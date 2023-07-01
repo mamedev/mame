@@ -48,9 +48,9 @@ public:
 
 	void raster_irq_ack();
 
-	DECLARE_WRITE_LINE_MEMBER(lightgun1_trigger_w);
-	DECLARE_WRITE_LINE_MEMBER(lightgun2_trigger_w);
-	DECLARE_WRITE_LINE_MEMBER(lightgun_irq_ack_w);
+	void lightgun1_trigger_w(int state);
+	void lightgun2_trigger_w(int state);
+	void lightgun_irq_ack_w(int state);
 
 protected:
 	// device-level overrides

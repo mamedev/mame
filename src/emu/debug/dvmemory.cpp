@@ -309,7 +309,7 @@ void debug_view_memory::generate_row(debug_view_char *destmin, debug_view_char *
 
 	// generate the address
 	char addrtext[20];
-	sprintf(addrtext, m_addrformat.c_str(), address);
+	snprintf(addrtext, 20, m_addrformat.c_str(), address);
 	debug_view_char *dest = destrow + m_section[0].m_pos + 1;
 	for (int ch = 0; addrtext[ch] != 0 && ch < m_section[0].m_width - 1; ch++, dest++)
 		if (dest >= destmin && dest < destmax)
@@ -359,15 +359,15 @@ void debug_view_memory::generate_row(debug_view_char *destmin, debug_view_char *
 				switch (m_data_format)
 				{
 				case data_format::FLOAT_32BIT:
-					sprintf(valuetext, "%.8g", u32_to_float(u32(chunkdata)));
+					snprintf(valuetext, 64, "%.8g", u32_to_float(u32(chunkdata)));
 					break;
 				case data_format::FLOAT_64BIT:
-					sprintf(valuetext, "%.24g", u64_to_double(chunkdata));
+					snprintf(valuetext, 64, "%.24g", u64_to_double(chunkdata));
 					break;
 				case data_format::FLOAT_80BIT:
 				{
 					float64_t f64 = extF80M_to_f64(&chunkdata80);
-					sprintf(valuetext, "%.24g", u64_to_double(f64.v));
+					snprintf(valuetext, 64, "%.24g", u64_to_double(f64.v));
 					break;
 				}
 				default:
@@ -862,14 +862,17 @@ bool debug_view_memory::read(u8 size, offs_t offs, u64 &data)
 		auto dis = machine().disable_side_effects();
 
 		bool ismapped = offs <= m_maxaddr;
+		address_space *tspace;
 		if (ismapped && !m_no_translation)
 		{
 			offs_t dummyaddr = offs;
-			ismapped = source.m_memintf->translate(source.m_space->spacenum(), TRANSLATE_READ_DEBUG, dummyaddr);
+			ismapped = source.m_memintf->translate(source.m_space->spacenum(), device_memory_interface::TR_READ, dummyaddr, tspace);
 		}
+		else
+			tspace = source.m_space;
 		data = ~u64(0);
 		if (ismapped)
-			data = m_expression.context().read_memory(*source.m_space, offs, size, !m_no_translation);
+			data = m_expression.context().read_memory(*tspace, offs, size, !m_no_translation);
 		return ismapped;
 	}
 

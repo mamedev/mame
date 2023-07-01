@@ -14,12 +14,12 @@
 
 i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int data_width) :
 	mcs96_device(mconfig, type, tag, owner, clock, data_width, address_map_constructor(FUNC(i8x9x_device::internal_regs), this)),
-	m_ach_cb(*this),
+	m_ach_cb(*this, 0),
 	m_hso_cb(*this),
 	m_serial_tx_cb(*this),
-	m_in_p0_cb(*this),
-	m_out_p1_cb(*this), m_in_p1_cb(*this),
-	m_out_p2_cb(*this), m_in_p2_cb(*this),
+	m_in_p0_cb(*this, 0),
+	m_out_p1_cb(*this), m_in_p1_cb(*this, 0xff),
+	m_out_p2_cb(*this), m_in_p2_cb(*this, 0xc2),
 	base_timer2(0), ad_done(0), hsi_mode(0), hsi_status(0), hso_command(0), ad_command(0), hso_active(0), hso_time(0), ad_result(0), pwm_control(0),
 	port1(0), port2(0),
 	ios0(0), ios1(0), ioc0(0), ioc1(0), extint(false),
@@ -37,18 +37,6 @@ i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, cons
 std::unique_ptr<util::disasm_interface> i8x9x_device::create_disassembler()
 {
 	return std::make_unique<i8x9x_disassembler>();
-}
-
-void i8x9x_device::device_resolve_objects()
-{
-	m_ach_cb.resolve_all();
-	m_hso_cb.resolve_safe();
-	m_serial_tx_cb.resolve_safe();
-	m_in_p0_cb.resolve_safe(0);
-	m_out_p1_cb.resolve_safe();
-	m_in_p1_cb.resolve_safe(0xff);
-	m_out_p2_cb.resolve_safe();
-	m_in_p2_cb.resolve_safe(0xc2);
 }
 
 void i8x9x_device::device_start()
@@ -156,7 +144,7 @@ void i8x9x_device::ad_start(u64 current_time)
 	ad_result = 8 | (ad_command & 7);
 	if (!BIT(i8x9x_p0_mask(), ad_command & 7))
 		logerror("Analog input on ACH%d does not exist on this device\n", ad_command & 7);
-	else if (m_ach_cb[ad_command & 7].isnull())
+	else if (m_ach_cb[ad_command & 7].isunset())
 		logerror("Analog input on ACH%d not configured\n", ad_command & 7);
 	else
 		ad_result |= m_ach_cb[ad_command & 7]() << 6;
@@ -533,10 +521,10 @@ void i8x9x_device::internal_update(u64 current_time)
 		}
 	}
 
-	if(ad_done && ad_done < event_time)
+	if(ad_done && (!event_time || ad_done < event_time))
 		event_time = ad_done;
 
-	if(serial_send_timer && serial_send_timer < event_time)
+	if(serial_send_timer && (!event_time || serial_send_timer < event_time))
 		event_time = serial_send_timer;
 
 	recompute_bcount(event_time);

@@ -181,8 +181,26 @@ public:
 	ds1287_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class ds1397_device : public mc146818_device
+{
+public:
+	ds1397_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	u8 xram_r(offs_t offset);
+	void xram_w(offs_t offset, u8 data);
+
+protected:
+	virtual int data_size() const override { return 64 + 4096; }
+
+	u8 m_xram_page;
+};
+
 // device type definition
 DECLARE_DEVICE_TYPE(MC146818, mc146818_device)
 DECLARE_DEVICE_TYPE(DS1287, ds1287_device)
+DECLARE_DEVICE_TYPE(DS1397, ds1397_device)
 
 #endif // MAME_MACHINE_MC146818_H

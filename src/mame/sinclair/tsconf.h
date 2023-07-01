@@ -12,13 +12,14 @@
 
 #include "spec128.h"
 
-#include "beta_m.h"
-
 #include "glukrs.h"
-#include "machine/pckeybrd.h"
-#include "machine/spi_sdcard.h"
 #include "tsconfdma.h"
 
+#include "beta_m.h"
+#include "bus/centronics/ctronics.h"
+#include "machine/pckeybrd.h"
+#include "machine/spi_sdcard.h"
+#include "sound/ay8910.h"
 #include "tilemap.h"
 
 
@@ -26,17 +27,21 @@ class tsconf_state : public spectrum_128_state
 {
 public:
 	tsconf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: spectrum_128_state(mconfig, type, tag),
-		  m_bank0_rom(*this, "bank0_rom"),
-		  m_keyboard(*this, "pc_keyboard"),
-		  m_beta(*this, BETA_DISK_TAG),
-		  m_dma(*this, "dma"),
-		  m_sdcard(*this, "sdcard"),
-		  m_glukrs(*this, "glukrs"),
-		  m_palette(*this, "palette"),
-		  m_gfxdecode(*this, "gfxdecode"),
-		  m_cram(*this, "cram"),
-		  m_sfile(*this, "sfile")
+		: spectrum_128_state(mconfig, type, tag)
+		, m_bank0_rom(*this, "bank0_rom")
+		, m_keyboard(*this, "pc_keyboard")
+		, m_io_mouse(*this, "mouse_input%u", 1U)
+		, m_beta(*this, BETA_DISK_TAG)
+		, m_dma(*this, "dma")
+		, m_sdcard(*this, "sdcard")
+		, m_glukrs(*this, "glukrs")
+		, m_palette(*this, "palette")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_cram(*this, "cram")
+		, m_sfile(*this, "sfile")
+		, m_centronics(*this, "centronics")
+		, m_ay(*this, "ay%u", 0U)
+		, m_mod_ay(*this, "MOD_AY")
 	{
 	}
 
@@ -46,10 +51,11 @@ public:
 	static constexpr u16 with_vblank(u16 pixclocks) { return 32 + pixclocks; }
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void video_start() override;
+	void machine_start() override;
+	void machine_reset() override;
 
+	TIMER_CALLBACK_MEMBER(irq_off) override;
 	TIMER_CALLBACK_MEMBER(irq_frame);
 	TIMER_CALLBACK_MEMBER(irq_scanline);
 
@@ -132,9 +138,11 @@ private:
 
 	void update_frame_timer();
 	emu_timer *m_frame_irq_timer = nullptr;
-	emu_timer *m_line_irq_timer = nullptr;
+	emu_timer *m_scanline_irq_timer = nullptr;
 
 	INTERRUPT_GEN_MEMBER(tsconf_vblank_interrupt);
+	IRQ_CALLBACK_MEMBER(irq_vector);
+	u8 m_int_mask;
 
 	DECLARE_VIDEO_START(tsconf);
 	TILE_GET_INFO_MEMBER(get_tile_info_txt);
@@ -142,6 +150,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info_16c);
 
 	u8 get_border_color(u16 hpos = ~0, u16 vpos = ~0) override;
+	u32 get_vpage_offset();
 	rectangle get_screen_area() override;
 	void spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	void tsconf_UpdateZxScreenBitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -151,17 +160,19 @@ private:
 	void tsconf_palette(palette_device &palette) const;
 	void tsconf_update_video_mode();
 
+	u8 tsconf_port_xx1f_r(offs_t offset);
 	void tsconf_port_7ffd_w(u8 data);
 	void tsconf_ula_w(offs_t offset, u8 data);
 	u8 tsconf_port_xxaf_r(offs_t reg);
 	void tsconf_port_xxaf_w(offs_t reg, u8 data);
-	u8 tsconf_port_77_zctr_r(offs_t reg);
-	void tsconf_port_77_zctr_w(offs_t reg, u8 data);
-	u8 tsconf_port_57_zctr_r(offs_t reg);
-	void tsconf_port_57_zctr_w(offs_t reg, u8 data);
+	u8 tsconf_port_77_zctr_r();
+	void tsconf_port_77_zctr_w(u8 data);
+	u8 tsconf_port_57_zctr_r();
+	void tsconf_port_57_zctr_w(u8 data);
 	void tsconf_spi_miso_w(u8 data);
 	u8 tsconf_port_f7_r(offs_t offset);
 	void tsconf_port_f7_w(offs_t offset, u8 data);
+	void tsconf_ay_address_w(u8 data);
 
 	void tsconf_update_bank0();
 	u8 beta_neutral_r(offs_t offset);
@@ -192,6 +203,7 @@ private:
 	memory_view m_bank0_rom;
 
 	required_device<at_keyboard_device> m_keyboard;
+	required_ioport_array<3> m_io_mouse;
 
 	required_device<beta_disk_device> m_beta;
 	required_device<tsconfdma_device> m_dma;
@@ -208,6 +220,11 @@ private:
 	tilemap_t *m_ts_tilemap[3]{};
 	required_device<ram_device> m_cram;
 	required_device<ram_device> m_sfile;
+	required_device<centronics_device> m_centronics;
+
+	required_device_array<ym2149_device, 2> m_ay;
+	u8 m_ay_selected;
+	required_ioport m_mod_ay;
 };
 
 /*----------- defined in drivers/tsconf.c -----------*/

@@ -28,8 +28,10 @@ protected:
 
 private:
 	void lcc_ca_w(u16 data);
-	DECLARE_WRITE_LINE_MEMBER(host_int_w);
+	void int1_ack_w(u8 data);
+	void host_int_w(int state);
 	u16 status_r();
+	u8 enetaddr_r(offs_t offset);
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
@@ -37,6 +39,7 @@ private:
 
 	required_device<cpu_device> m_npcpu;
 	required_device<i82586_device> m_lcc;
+	required_region_ptr<u8> m_enetaddr;
 };
 
 DECLARE_DEVICE_TYPE(NP600A3, np600a3_device)

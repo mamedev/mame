@@ -71,47 +71,51 @@ menu_keyboard_mode::~menu_keyboard_mode()
 {
 }
 
-void menu_keyboard_mode::handle(event const *ev)
+bool menu_keyboard_mode::handle(event const *ev)
 {
-	if (ev && uintptr_t(ev->itemref))
+	if (!ev || !uintptr_t(ev->itemref))
+		return false;
+
+	natural_keyboard &natkbd(machine().natkeyboard());
+	uintptr_t const ref(uintptr_t(ev->itemref));
+	bool left(IPT_UI_LEFT == ev->iptkey);
+	bool right(IPT_UI_RIGHT == ev->iptkey);
+	if (ITEM_KBMODE == ref)
 	{
-		natural_keyboard &natkbd(machine().natkeyboard());
-		uintptr_t const ref(uintptr_t(ev->itemref));
-		bool left(IPT_UI_LEFT == ev->iptkey);
-		bool right(IPT_UI_RIGHT == ev->iptkey);
-		if (ITEM_KBMODE == ref)
+		if (IPT_UI_SELECT == ev->iptkey)
 		{
-			if (IPT_UI_SELECT == ev->iptkey)
-			{
-				left = natkbd.in_use();
-				right = !left;
-			}
-			if ((left || right) && (natkbd.in_use() != right))
-			{
-				natkbd.set_in_use(right);
-				ev->item->set_subtext(right ? _("menu-keyboard", "Natural") : _("menu-keyboard", "Emulated"));
-				ev->item->set_flags(right ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW);
-			}
+			left = natkbd.in_use();
+			right = !left;
 		}
-		else if (ITEM_KBDEV_FIRST <= ref)
+		if ((left || right) && (natkbd.in_use() != right))
 		{
-			auto const kbdno(ref - ITEM_KBDEV_FIRST);
-			if (IPT_UI_SELECT == ev->iptkey)
-			{
-				left = natkbd.keyboard_enabled(kbdno);
-				right = !left;
-			}
-			if ((left || right) && (natkbd.keyboard_enabled(kbdno) != right))
-			{
-				if (right)
-					natkbd.enable_keyboard(kbdno);
-				else
-					natkbd.disable_keyboard(kbdno);
-				ev->item->set_subtext(right ? _("Enabled") : _("Disabled"));
-				ev->item->set_flags(right ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW);
-			}
+			natkbd.set_in_use(right);
+			ev->item->set_subtext(right ? _("menu-keyboard", "Natural") : _("menu-keyboard", "Emulated"));
+			ev->item->set_flags(right ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW);
+			return true;
 		}
 	}
+	else if (ITEM_KBDEV_FIRST <= ref)
+	{
+		auto const kbdno(ref - ITEM_KBDEV_FIRST);
+		if (IPT_UI_SELECT == ev->iptkey)
+		{
+			left = natkbd.keyboard_enabled(kbdno);
+			right = !left;
+		}
+		if ((left || right) && (natkbd.keyboard_enabled(kbdno) != right))
+		{
+			if (right)
+				natkbd.enable_keyboard(kbdno);
+			else
+				natkbd.disable_keyboard(kbdno);
+			ev->item->set_subtext(right ? _("Enabled") : _("Disabled"));
+			ev->item->set_flags(right ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 } // namespace ui

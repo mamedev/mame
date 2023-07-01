@@ -207,8 +207,6 @@ private:
 	void ram_w_se(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t ram_600000_r(offs_t offset);
 	void ram_600000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~ 0);
-	void via_sync();
-	void via_sync_end();
 	uint16_t mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, uint16_t data);
 	uint16_t mac_autovector_r(offs_t offset);
@@ -219,13 +217,13 @@ private:
 	void macplus_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t macse_scsi_r(offs_t offset, uint16_t mem_mask = ~0);
 	void macse_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(scsi_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(scsi_drq_w);
+	void scsi_irq_w(int state);
+	void scsi_drq_w(int state);
 	void scsi_berr_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(set_scc_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void set_scc_interrupt(int state);
+	void vblank_w(int state);
 
-	WRITE_LINE_MEMBER(adb_irq_w) { m_adb_irq_pending = state; }
+	void adb_irq_w(int state) { m_adb_irq_pending = state; }
 
 	TIMER_CALLBACK_MEMBER(mac_scanline);
 	TIMER_CALLBACK_MEMBER(mac_hblank);
@@ -238,7 +236,7 @@ private:
 	void mac_via_out_b(uint8_t data);
 	void mac_via_out_a_se(uint8_t data);
 	void mac_via_out_b_se(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);
+	void mac_via_irq(int state);
 	void update_volume();
 
 	void mac512ke_map(address_map &map);
@@ -402,7 +400,7 @@ void mac128_state::field_interrupts()
 	}
 }
 
-WRITE_LINE_MEMBER(mac128_state::set_scc_interrupt)
+void mac128_state::set_scc_interrupt(int state)
 {
 //  printf("SCC IRQ: %d\n", state);
 	m_scc_interrupt = state;
@@ -452,7 +450,7 @@ void mac128_state::update_volume()
 	m_volfilter->opamp_mfb_lowpass_modify(res_ohm_tbl[m_snd_vol&7], RES_K(0), RES_K(200), CAP_U(0), CAP_P(220)); // variable based on cd4016, short, R15, absent, C10
 }
 
-WRITE_LINE_MEMBER(mac128_state::vblank_w)
+void mac128_state::vblank_w(int state)
 {
 	m_via->write_ca1(state);
 }
@@ -600,18 +598,18 @@ void mac128_state::pwm_push(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(mac128_state::scsi_irq_w)
+void mac128_state::scsi_irq_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(mac128_state::scsi_drq_w)
+void mac128_state::scsi_drq_w(int state)
 {
 	m_scsi_drq = state;
 }
 
 void mac128_state::scsi_berr_w(uint8_t data)
 {
-	m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
+	m_maincpu->trigger_bus_error();
 }
 
 uint16_t mac128_state::macplus_scsi_r(offs_t offset, uint16_t mem_mask)
@@ -716,40 +714,10 @@ void mac128_state::mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_iwm->write((offset >> 8) & 0xf, data>>8);
 }
 
-WRITE_LINE_MEMBER(mac128_state::mac_via_irq)
+void mac128_state::mac_via_irq(int state)
 {
 	/* interrupt the 68k (level 1) */
 	set_via_interrupt(state);
-}
-
-void mac128_state::via_sync()
-{
-	// The VIA runs from the E clock of the 68k and uses VPA.
-
-	// That means:
-	// - The 68000 starts the access cycle, with AS and the address bus.  It's validated at cycle+1.
-
-	// - The glue chip sets VPA.  The 68000 sees it and acts on it at cycle+2.
-
-	// - Between cycle+2 and cycle+11, the E clock goes up.  The VIA
-	// is synced on that clock, so that's at a multiple of 10 in
-	// absolute time
-
-	// - 4 cycles later E goes down and that's the end of the access,
-
-	// We sync on the start of cycle (so that the via timings go ok)
-	// then on the end on via_sync_end()
-
-	uint64_t cur_cycle = m_maincpu->total_cycles();
-	uint64_t vpa_cycle = cur_cycle+2;
-	uint64_t via_start_cycle = (vpa_cycle + 9) / 10;
-	uint64_t m68k_start_cycle = via_start_cycle * 10;
-	m_maincpu->adjust_icount(cur_cycle - m68k_start_cycle); // 4 cycles already counted by the core
-}
-
-void mac128_state::via_sync_end()
-{
-	m_maincpu->adjust_icount(-4);
 }
 
 uint16_t mac128_state::mac_via_r(offs_t offset)
@@ -759,11 +727,7 @@ uint16_t mac128_state::mac_via_r(offs_t offset)
 	offset >>= 8;
 	offset &= 0x0f;
 
-	via_sync();
-
 	data = m_via->read(offset);
-
-	via_sync_end();
 	return (data & 0xff) | (data << 8);
 }
 
@@ -772,11 +736,7 @@ void mac128_state::mac_via_w(offs_t offset, uint16_t data)
 	offset >>= 8;
 	offset &= 0x0f;
 
-	via_sync();
-
 	m_via->write(offset, (data >> 8) & 0xff);
-
-	via_sync_end();
 }
 
 void mac128_state::mac_autovector_w(offs_t offset, uint16_t data)
@@ -1078,7 +1038,7 @@ void mac128_state::mac512ke_map(address_map &map)
 	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::dc_ab_r)).umask16(0xff00);
 	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::dc_ab_w)).umask16(0x00ff);
 	map(0xc00000, 0xdfffff).rw(FUNC(mac128_state::mac_iwm_r), FUNC(mac128_state::mac_iwm_w));
-	map(0xe80000, 0xefffff).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
+	map(0xe80000, 0xefffff).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
 	map(0xfffff0, 0xffffff).rw(FUNC(mac128_state::mac_autovector_r), FUNC(mac128_state::mac_autovector_w));
 }
 
@@ -1090,7 +1050,7 @@ void mac128_state::macplus_map(address_map &map)
 	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::dc_ab_r)).umask16(0xff00);
 	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::dc_ab_w)).umask16(0x00ff);
 	map(0xc00000, 0xdfffff).rw(FUNC(mac128_state::mac_iwm_r), FUNC(mac128_state::mac_iwm_w));
-	map(0xe80000, 0xefffff).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
+	map(0xe80000, 0xefffff).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
 	map(0xfffff0, 0xffffff).rw(FUNC(mac128_state::mac_autovector_r), FUNC(mac128_state::mac_autovector_w));
 }
 
@@ -1102,7 +1062,7 @@ void mac128_state::macse_map(address_map &map)
 	map(0x900000, 0x9fffff).r(m_scc, FUNC(z80scc_device::dc_ab_r)).umask16(0xff00);
 	map(0xb00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::dc_ab_w)).umask16(0x00ff);
 	map(0xd00000, 0xdfffff).rw(FUNC(mac128_state::mac_iwm_r), FUNC(mac128_state::mac_iwm_w));
-	map(0xe80000, 0xefffff).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
+	map(0xe80000, 0xefffff).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
 	map(0xfffff0, 0xffffff).rw(FUNC(mac128_state::mac_autovector_r), FUNC(mac128_state::mac_autovector_w));
 }
 

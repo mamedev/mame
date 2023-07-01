@@ -34,12 +34,12 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
+	virtual int romcs() override;
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 
 private:
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
+	std::error_condition load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	required_device<generic_slot_device> m_cart;

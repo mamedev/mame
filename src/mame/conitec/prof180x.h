@@ -38,14 +38,14 @@ private:
 	uint8_t status1_r();
 	uint8_t status_r(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER(c0_flag_w);
-	DECLARE_WRITE_LINE_MEMBER(c1_flag_w);
-	DECLARE_WRITE_LINE_MEMBER(c2_flag_w);
-	DECLARE_WRITE_LINE_MEMBER(mini_flag_w);
-	DECLARE_WRITE_LINE_MEMBER(mm0_flag_w);
-	DECLARE_WRITE_LINE_MEMBER(rtc_ce_w);
-	DECLARE_WRITE_LINE_MEMBER(peps_flag_w);
-	DECLARE_WRITE_LINE_MEMBER(mm1_flag_w);
+	void c0_flag_w(int state);
+	void c1_flag_w(int state);
+	void c2_flag_w(int state);
+	void mini_flag_w(int state);
+	void mm0_flag_w(int state);
+	void rtc_ce_w(int state);
+	void peps_flag_w(int state);
+	void mm1_flag_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

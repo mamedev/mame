@@ -31,7 +31,6 @@ Year  Game                CPU         Sound            Custom                   
 
 To do:
 
-- Implement serial communication, remove patches (used for protection).
 - Add sound to SS9804/SS9904 games.
 - ptrain: missing scroll in race screens.
 - humlan: empty reels when bonus image should scroll in via L0 scroll. The image (crown/fruits) is at y > 0x100 in the tilemap.
@@ -40,14 +39,29 @@ To do:
 - mtrain: implement hopper.
 - xplan: starts with 4 credits, no controls to move the aircraft
 
+Protection seems to work the same way on every game in this driver, using a bitbanged Dallas 1-Wire EEPROM. First a Read ROM
+command is issued, and only the first 8 bits returned are examined to determine whether they match the expected device code (0x14).
+If this test passes, the EEPROM contents are recalled and the first 64 bits are read out. These 64 bits are then unscrambled using
+a permutation table common to all games. The second and final protection check compares byte 6 in the unscrambled data buffer
+against a game-specific ID code. This byte is composed of EEPROM bits 22 (MSB), 27, 52, 50, 42, 9, 38 and 35 (LSB).
+
+It is unknown where this protection EEPROM exists on any Subsino PCB (if it isn't an external dongle), though the IC package is
+known to be quite small. (The iButton version, DS1971, is another possibility.)
+
+Timings in the Z180-based and H8-based games consistently fail to meet 1-Wire specifications. In the case of the H8-based games,
+this likely has to do with CPU clocks and emulated cycle timings being both too fast. There may also be wait states programmed
+by the otherwise seemingly unnecessary internal ROMs.
+
 ************************************************************************************************************/
 
 #include "emu.h"
-#include "subsino_m.h"
+#include "subsino_crypt.h"
+#include "subsino_io.h"
 
 #include "cpu/h8/h83048.h"
 #include "cpu/i86/i186.h"
 #include "cpu/z180/z180.h"
+#include "machine/ds2430a.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
@@ -94,8 +108,6 @@ class subsino2_state : public driver_device
 public:
 	subsino2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_outputs16(*this, "outputs16")
-		, m_outputs(*this, "outputs")
 		, m_maincpu(*this, "maincpu")
 		, m_oki(*this, "oki")
 		, m_gfxdecode(*this, "gfxdecode")
@@ -103,15 +115,16 @@ public:
 		, m_palette(*this, "palette")
 		, m_hopper(*this, "hopper")
 		, m_ticket(*this, "ticket")
+		, m_eeprom(*this, "eeprom")
 		, m_keyb(*this, "KEYB_%u", 0U)
 		, m_dsw(*this, "DSW%u", 1U)
-		, m_system(*this, "SYSTEM")
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	void bishjan(machine_config &config);
 	void saklove(machine_config &config);
 	void mtrain(machine_config &config);
+	void tbonusal(machine_config &config);
 	void humlan(machine_config &config);
 	void new2001(machine_config &config);
 	void expcard(machine_config &config);
@@ -123,21 +136,14 @@ public:
 	void init_new2001();
 	void init_queenbee();
 	void init_queenbeeb();
+	void init_queenbeei();
 	void init_humlan();
 	void init_squeenb();
 	void init_qbeebing();
 	void init_treamary();
-	void init_xtrain();
-	void init_expcard();
 	void init_wtrnymph();
 	void init_mtrain();
-	void init_strain();
 	void init_tbonusal();
-	void init_saklove();
-	void init_xplan();
-	void init_ptrain();
-	void init_treacity();
-	void init_treacity202();
 
 protected:
 	virtual void video_start() override;
@@ -178,22 +184,38 @@ private:
 	uint8_t dsw_r();
 	uint8_t vblank_bit2_r();
 	uint8_t vblank_bit6_r();
-	void bishjan_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t bishjan_serial_r();
-	void bishjan_input_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t bishjan_input_r();
-	void bishjan_outputs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void new2001_outputs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void humlan_outputs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void expcard_outputs_w(offs_t offset, uint8_t data);
-	void mtrain_outputs_w(offs_t offset, uint8_t data);
+	uint8_t bishjan_sound_r();
+	void bishjan_sound_w(uint8_t data);
+	uint8_t bishjan_serial_r();
+	uint8_t bishjan_unknown_r();
+	void bishjan_input_w(uint8_t data);
+	uint8_t bishjan_input_r();
+	void bishjan_outputs_w(uint8_t data);
+	uint8_t new2001_sound_ready_r();
+	void new2001_output0_w(uint8_t data);
+	void new2001_output1_w(uint8_t data);
+	void humlan_output0_w(uint8_t data);
+	void humlan_output1_w(uint8_t data);
+	void expcard_out_b_w(uint8_t data);
+	void expcard_out_a_w(uint8_t data);
+	void mtrain_output0_w(uint8_t data);
+	void mtrain_output1_w(uint8_t data);
+	void mtrain_output2_w(uint8_t data);
+	void mtrain_output3_w(uint8_t data);
 	void mtrain_videoram_w(offs_t offset, uint8_t data);
 	void mtrain_tilesize_w(uint8_t data);
-	uint8_t mtrain_prot_r(offs_t offset);
-	void saklove_outputs_w(offs_t offset, uint8_t data);
-	void xplan_outputs_w(offs_t offset, uint8_t data);
-	void xtrain_outputs_w(offs_t offset, uint8_t data);
-	uint8_t xtrain_subsino_r(offs_t offset);
+	void saklove_output0_w(uint8_t data);
+	void saklove_output1_w(uint8_t data);
+	void saklove_output2_w(uint8_t data);
+	void saklove_output3_w(uint8_t data);
+	void xplan_out_d_w(uint8_t data);
+	void xplan_out_c_w(uint8_t data);
+	void xplan_out_b_w(uint8_t data);
+	void xplan_out_a_w(uint8_t data);
+	void xtrain_out_d_w(uint8_t data);
+	void xtrain_out_c_w(uint8_t data);
+	void xtrain_out_b_w(uint8_t data);
+	void xtrain_out_a_w(uint8_t data);
 	void oki_bank_bit0_w(uint8_t data);
 	void oki_bank_bit4_w(uint8_t data);
 
@@ -202,19 +224,16 @@ private:
 	uint32_t screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void bishjan_map(address_map &map);
-	void expcard_io(address_map &map);
-	void humlan_map(address_map &map);
 	void mtrain_io(address_map &map);
+	void mtrain_base_map(address_map &map);
 	void mtrain_map(address_map &map);
-	void new2001_base_map(address_map &map);
+	void tbonusal_map(address_map &map);
 	void new2001_map(address_map &map);
 	void ramdac_map(address_map &map);
 	void saklove_io(address_map &map);
 	void saklove_map(address_map &map);
-	void xplan_common_io(address_map &map);
 	void xplan_io(address_map &map);
 	void xplan_map(address_map &map);
-	void xtrain_io(address_map &map);
 
 	virtual void machine_start() override { m_leds.resolve(); }
 
@@ -227,10 +246,8 @@ private:
 	uint8_t m_ss9601_tilesize;
 	uint8_t m_ss9601_disable;
 	uint8_t m_dsw_mask;
-	optional_shared_ptr<uint16_t> m_outputs16;
-	optional_shared_ptr<uint8_t> m_outputs;
-	uint16_t m_bishjan_sound;
-	uint16_t m_bishjan_input;
+	uint8_t m_bishjan_sound;
+	uint8_t m_bishjan_input;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
@@ -239,9 +256,9 @@ private:
 	required_device<palette_device> m_palette;
 	optional_device<ticket_dispenser_device> m_hopper;
 	optional_device<ticket_dispenser_device> m_ticket;
+	required_device<ds2430a_device> m_eeprom;
 	optional_ioport_array<5> m_keyb;
 	optional_ioport_array<4> m_dsw;
-	optional_ioport m_system;
 	output_finder<9> m_leds;
 
 	inline void ss9601_get_tile_info(layer_t *l, tile_data &tileinfo, tilemap_memory_index tile_index);
@@ -901,62 +918,68 @@ void subsino2_state::oki_bank_bit4_w(uint8_t data)
                                 Bishou Jan
 ***************************************************************************/
 
-void subsino2_state::bishjan_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+uint8_t subsino2_state::bishjan_sound_r()
+{
+	return 0;
+}
+
+void subsino2_state::bishjan_sound_w(uint8_t data)
 {
 	/*
 	    sound writes in service mode:
 	    01 88 04 00 (coin in)
 	    02 89 04 0v (v = voice = 0..3)
 	*/
-	if (ACCESSING_BITS_8_15)
-		m_bishjan_sound = data >> 8;
+	switch (data)
+	{
+	case 0x10:
+		m_eeprom->data_w(1);
+		break;
+
+	case 0x13:
+		m_eeprom->data_w(0);
+		break;
+	}
+	m_bishjan_sound = data;
 }
 
-uint16_t subsino2_state::bishjan_serial_r()
+uint8_t subsino2_state::bishjan_serial_r()
 {
 	return
-		(machine().rand() & 0x9800) |                     // bit 7 - serial communication
-		(((m_bishjan_sound == 0x12) ? 0x40:0x00) << 8) |  // bit 6 - sound communication
+		(m_eeprom->data_r() ? 0x80 : 0) |             // bit 7 - serial communication
+		(machine().rand() & 0x18) |
+		((m_bishjan_sound == 0x12) ? 0x40:0x00);     // bit 6 - sound communication
+}
+
+uint8_t subsino2_state::bishjan_unknown_r()
+{
+	return
 //      (machine().rand() & 0xff);
 //      (((m_screen->frame_number()%60)==0)?0x18:0x00);
 		0x18;
 }
 
-void subsino2_state::bishjan_input_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void subsino2_state::bishjan_input_w(uint8_t data)
 {
-	if (ACCESSING_BITS_8_15)
-		m_bishjan_input = data >> 8;
+	m_bishjan_input = data;
 }
 
-uint16_t subsino2_state::bishjan_input_r()
+uint8_t subsino2_state::bishjan_input_r()
 {
-	uint16_t res = 0xff;
+	uint8_t res = 0xff;
 
 	for (int i = 0; i < 5; i++)
 		if (m_bishjan_input & (1 << i))
 			res = m_keyb[i]->read();
 
-	return  (res << 8) |                    // high byte
-			m_system->read();       // low byte
+	return res;
 }
 
-void subsino2_state::bishjan_outputs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void subsino2_state::bishjan_outputs_w(uint8_t data)
 {
-	COMBINE_DATA( &m_outputs16[offset] );
-
-	switch (offset)
-	{
-		case 0:
-			if (ACCESSING_BITS_0_7)
-			{
-				// coin out         BIT(data, 0)
-				m_hopper->motor_w(BIT(data, 1));   // hopper
-				machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
-			}
-			break;
-	}
-
-//  popmessage("0: %04x", m_outputs16[0]);
+	// coin out         BIT(data, 0)
+	m_hopper->motor_w(BIT(data, 1));   // hopper
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
 }
 
 
@@ -992,7 +1015,7 @@ void subsino2_state::bishjan_map(address_map &map)
 	map(0x436000, 0x436fff).w(FUNC(subsino2_state::ss9601_reelram_hi_lo_w));
 	map(0x437000, 0x4371ff).w(FUNC(subsino2_state::ss9601_scrollram_0_hi_lo_w));
 
-	map(0x600000, 0x600001).nopr().w(FUNC(subsino2_state::bishjan_sound_w));
+	map(0x600000, 0x600000).rw(FUNC(subsino2_state::bishjan_sound_r), FUNC(subsino2_state::bishjan_sound_w));
 	map(0x600040, 0x600040).w(FUNC(subsino2_state::ss9601_scrollctrl_w));
 	map(0x600060, 0x600060).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x600061, 0x600061).w("ramdac", FUNC(ramdac_device::pal_w));
@@ -1003,11 +1026,7 @@ void subsino2_state::bishjan_map(address_map &map)
 	map(0xa0001f, 0xa0001f).w(FUNC(subsino2_state::ss9601_disable_w));
 	map(0xa00020, 0xa00025).w(FUNC(subsino2_state::ss9601_scroll_w));
 
-	map(0xc00000, 0xc00001).portr("DSW");                              // SW1
-	map(0xc00002, 0xc00003).portr("JOY").w(FUNC(subsino2_state::bishjan_input_w));   // IN C
-	map(0xc00004, 0xc00005).r(FUNC(subsino2_state::bishjan_input_r));                        // IN A & B
-	map(0xc00006, 0xc00007).r(FUNC(subsino2_state::bishjan_serial_r));                       // IN D
-	map(0xc00008, 0xc00009).portr("RESET").w(FUNC(subsino2_state::bishjan_outputs_w)).share("outputs16");
+	map(0xc00000, 0xc0001f).rw("io", FUNC(ss9802_device::read), FUNC(ss9802_device::write));
 }
 
 void subsino2_state::ramdac_map(address_map &map)
@@ -1019,203 +1038,111 @@ void subsino2_state::ramdac_map(address_map &map)
                                   New 2001
 ***************************************************************************/
 
-void subsino2_state::new2001_outputs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+uint8_t subsino2_state::new2001_sound_ready_r()
 {
-	COMBINE_DATA( &m_outputs16[offset] );
+	return 0x20;
+}
 
-	switch (offset)
-	{
-		case 0:
-			if (ACCESSING_BITS_8_15)
-			{
-				m_leds[0] = BIT(data, 14); // record?
-				m_leds[1] = BIT(data, 13); // shoot now
-				m_leds[2] = BIT(data, 12); // double
-				m_leds[3] = BIT(data, 11); // black/red
-			}
-			if (ACCESSING_BITS_0_7)
-			{
-				m_leds[4] = BIT(data, 7); // start
-				m_leds[5] = BIT(data, 6); // take
-				m_leds[6] = BIT(data, 5); // black/red
+void subsino2_state::new2001_output0_w(uint8_t data)
+{
+	m_leds[0] = BIT(data, 6); // record?
+	m_leds[1] = BIT(data, 5); // shoot now
+	m_leds[2] = BIT(data, 4); // double
+	m_leds[3] = BIT(data, 3); // black/red
+}
 
-				machine().bookkeeping().coin_counter_w(0, data & 0x0010); // coin in / key in
-				m_leds[7] = BIT(data, 2); // ?
-				m_leds[8] = BIT(data, 1); // ?
-			}
-			break;
-	}
+void subsino2_state::new2001_output1_w(uint8_t data)
+{
+	m_leds[4] = BIT(data, 7); // start
+	m_leds[5] = BIT(data, 6); // take
+	m_leds[6] = BIT(data, 5); // black/red
 
-//  popmessage("0: %04x", m_outputs16[0]);
+	machine().bookkeeping().coin_counter_w(0, data & 0x0010); // coin in / key in
+	m_leds[7] = BIT(data, 2); // ?
+	m_leds[8] = BIT(data, 1); // ?
 }
 
 // Same as bishjan (except for i/o and lo2 usage like xplan)
-void subsino2_state::new2001_base_map(address_map &map)
+void subsino2_state::new2001_map(address_map &map)
 {
-	map.global_mask(0xffffff);
-
-	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
-	map(0x080000, 0x0fffff).rom().region("maincpu", 0);
-
-	map(0x200000, 0x207fff).ram().share("nvram"); // battery
+	bishjan_map(map);
 
 	// write both (L1, byte_lo2)
 	map(0x410000, 0x411fff).w(FUNC(subsino2_state::ss9601_videoram_1_hi_lo2_w));
-	// read lo (L1)   (only half tilemap?)
-	map(0x412000, 0x412fff).r(FUNC(subsino2_state::ss9601_videoram_1_lo_r));
-	map(0x413000, 0x4131ff).rw(FUNC(subsino2_state::ss9601_scrollram_1_lo_r), FUNC(subsino2_state::ss9601_scrollram_1_lo_w));
 	// write both (L0 & REEL, byte_lo2)
 	map(0x414000, 0x415fff).w(FUNC(subsino2_state::ss9601_videoram_0_hi_lo2_w));
-	// read lo (REEL)
-	map(0x416000, 0x416fff).r(FUNC(subsino2_state::ss9601_reelram_lo_r));
-	map(0x417000, 0x4171ff).rw(FUNC(subsino2_state::ss9601_scrollram_0_lo_r), FUNC(subsino2_state::ss9601_scrollram_0_lo_w));
 
-	// read hi (L1)
-	map(0x422000, 0x422fff).r(FUNC(subsino2_state::ss9601_videoram_1_hi_r));
-	map(0x423000, 0x4231ff).rw(FUNC(subsino2_state::ss9601_scrollram_1_hi_r), FUNC(subsino2_state::ss9601_scrollram_1_hi_w));
-	// read hi (REEL)
-	map(0x426000, 0x426fff).r(FUNC(subsino2_state::ss9601_reelram_hi_r));
-	map(0x427000, 0x4271ff).rw(FUNC(subsino2_state::ss9601_scrollram_0_hi_r), FUNC(subsino2_state::ss9601_scrollram_0_hi_w));
-
-	// write both (L1, byte_lo)
-	map(0x430000, 0x431fff).w(FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
-	map(0x432000, 0x432fff).w(FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
-	map(0x433000, 0x4331ff).w(FUNC(subsino2_state::ss9601_scrollram_1_hi_lo_w));
-	// write both (L0 & REEL, byte_lo)
-	map(0x434000, 0x435fff).w(FUNC(subsino2_state::ss9601_videoram_0_hi_lo_w));
-	map(0x436000, 0x436fff).w(FUNC(subsino2_state::ss9601_reelram_hi_lo_w));
-	map(0x437000, 0x4371ff).w(FUNC(subsino2_state::ss9601_scrollram_0_hi_lo_w));
-
-	map(0x600000, 0x600001).nopr().w(FUNC(subsino2_state::bishjan_sound_w));
 	map(0x600020, 0x600020).w(FUNC(subsino2_state::ss9601_byte_lo2_w));
-	map(0x600040, 0x600040).w(FUNC(subsino2_state::ss9601_scrollctrl_w));
-	map(0x600060, 0x600060).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x600061, 0x600061).w("ramdac", FUNC(ramdac_device::pal_w));
-	map(0x600062, 0x600062).w("ramdac", FUNC(ramdac_device::mask_w));
-	map(0x600080, 0x600080).w(FUNC(subsino2_state::ss9601_tilesize_w));
-	map(0x6000a0, 0x6000a0).w(FUNC(subsino2_state::ss9601_byte_lo_w));
-
-	map(0xa0001f, 0xa0001f).w(FUNC(subsino2_state::ss9601_disable_w));
-	map(0xa00020, 0xa00025).w(FUNC(subsino2_state::ss9601_scroll_w));
-
-	map(0xc00000, 0xc00001).portr("DSW");
-	map(0xc00002, 0xc00003).portr("IN-C");
-	map(0xc00004, 0xc00005).portr("IN-AB");
-	map(0xc00006, 0xc00007).r(FUNC(subsino2_state::bishjan_serial_r));
-}
-
-void subsino2_state::new2001_map(address_map &map)
-{
-	new2001_base_map(map);
-	map(0xc00008, 0xc00009).w(FUNC(subsino2_state::new2001_outputs_w)).share("outputs16");
 }
 
 /***************************************************************************
                              Humlan's Lyckohjul
 ***************************************************************************/
 
-void subsino2_state::humlan_outputs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void subsino2_state::humlan_output0_w(uint8_t data)
 {
-	COMBINE_DATA( &m_outputs16[offset] );
-
-	switch (offset)
-	{
-		case 0:
-			if (ACCESSING_BITS_8_15)
-			{
-				m_leds[5] = BIT(data, 13); // big or small
-				m_leds[4] = BIT(data, 10); // double
-				m_leds[3] = BIT(data, 9); // big or small
-				m_leds[2] = BIT(data, 8); // bet
-			}
-			if (ACCESSING_BITS_0_7)
-			{
-				m_leds[1] = BIT(data, 7); // take
-				m_leds[0] = BIT(data, 6); // start
-				machine().bookkeeping().coin_counter_w(1, data & 0x0004); // key in
-				machine().bookkeeping().coin_counter_w(0, data & 0x0002); // coin in
-			}
-			break;
-	}
-
-//  popmessage("0: %04x", m_outputs16[0]);
+	m_leds[5] = BIT(data, 5); // big or small
+	m_leds[4] = BIT(data, 2); // double
+	m_leds[3] = BIT(data, 1); // big or small
+	m_leds[2] = BIT(data, 0); // bet
 }
 
-void subsino2_state::humlan_map(address_map &map)
+void subsino2_state::humlan_output1_w(uint8_t data)
 {
-	new2001_base_map(map);
-	map(0xc00008, 0xc00009).w(FUNC(subsino2_state::humlan_outputs_w)).share("outputs16");
+	m_leds[1] = BIT(data, 7); // take
+	m_leds[0] = BIT(data, 6); // start
+	machine().bookkeeping().coin_counter_w(1, data & 0x04); // key in
+	machine().bookkeeping().coin_counter_w(0, data & 0x02); // coin in
 }
 
 /***************************************************************************
                        Express Card / Top Card
 ***************************************************************************/
 
-void subsino2_state::expcard_outputs_w(offs_t offset, uint8_t data)
+void subsino2_state::expcard_out_b_w(uint8_t data)
 {
-	m_outputs[offset] = data;
+	m_leds[1] = BIT(data, 2);   // hold 4 / small & hold 5 / big ?
+	m_leds[2] = BIT(data, 3);   // hold 1 / bet
+	m_leds[3] = BIT(data, 4);   // hold 2 / take ?
+	m_leds[4] = BIT(data, 5);   // hold 3 / double up ?
+}
 
-	switch (offset)
-	{
-		case 0: // D
-			// 0x40 = serial out ? (at boot)
-			break;
+void subsino2_state::expcard_out_a_w(uint8_t data)
+{
+	machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
+	machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
 
-		case 1: // C
-			m_leds[0] = BIT(data, 1);   // raise
-			break;
-
-		case 2: // B
-			m_leds[1] = BIT(data, 2);   // hold 4 / small & hold 5 / big ?
-			m_leds[2] = BIT(data, 3);   // hold 1 / bet
-			m_leds[3] = BIT(data, 4);   // hold 2 / take ?
-			m_leds[4] = BIT(data, 5);   // hold 3 / double up ?
-			break;
-
-		case 3: // A
-			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
-			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
-
-			m_leds[5] = BIT(data, 4);   // start
-			break;
-	}
-
-//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
+	m_leds[5] = BIT(data, 4);   // start
 }
 
 /***************************************************************************
                                 Magic Train
 ***************************************************************************/
 
-void subsino2_state::mtrain_outputs_w(offs_t offset, uint8_t data)
+void subsino2_state::mtrain_output0_w(uint8_t data)
 {
-	m_outputs[offset] = data;
+	machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // key in
+	machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // coin in
+	machine().bookkeeping().coin_counter_w(2,    data & 0x10 );  // pay out
+//  machine().bookkeeping().coin_counter_w(3,   data & 0x20 );  // hopper motor
+}
 
-	switch (offset)
-	{
-		case 0:
-			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // key in
-			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // coin in
-			machine().bookkeeping().coin_counter_w(2,    data & 0x10 );  // pay out
-//          machine().bookkeeping().coin_counter_w(3,   data & 0x20 );  // hopper motor
-			break;
+void subsino2_state::mtrain_output1_w(uint8_t data)
+{
+	m_leds[0] = BIT(data, 0);   // stop reel?
+	m_leds[1] = BIT(data, 1);   // stop reel? (double or take)
+	m_leds[2] = BIT(data, 2);   // start all
+	m_leds[3] = BIT(data, 3);   // bet / stop all
+	m_leds[4] = BIT(data, 5);   // stop reel? (double or take)
+}
 
-		case 1:
-			m_leds[0] = BIT(data, 0);   // stop reel?
-			m_leds[1] = BIT(data, 1);   // stop reel? (double or take)
-			m_leds[2] = BIT(data, 2);   // start all
-			m_leds[3] = BIT(data, 3);   // bet / stop all
-			m_leds[4] = BIT(data, 5);   // stop reel? (double or take)
-			break;
+void subsino2_state::mtrain_output2_w(uint8_t data)
+{
+}
 
-		case 2:
-			break;
-
-		case 3:
-			break;
-	}
-
-//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
+void subsino2_state::mtrain_output3_w(uint8_t data)
+{
+	m_eeprom->data_w(!BIT(data, 6));
 }
 
 void subsino2_state::mtrain_videoram_w(offs_t offset, uint8_t data)
@@ -1280,12 +1207,7 @@ void subsino2_state::mtrain_tilesize_w(uint8_t data)
 	}
 }
 
-uint8_t subsino2_state::mtrain_prot_r(offs_t offset)
-{
-	return "SUBSION"[offset];
-}
-
-void subsino2_state::mtrain_map(address_map &map)
+void subsino2_state::mtrain_base_map(address_map &map)
 {
 	map(0x00000, 0x077ff).rom();
 
@@ -1298,27 +1220,28 @@ void subsino2_state::mtrain_map(address_map &map)
 
 	map(0x0912f, 0x0912f).w(FUNC(subsino2_state::ss9601_byte_lo_w));
 
-	map(0x09140, 0x09142).w(FUNC(subsino2_state::mtrain_outputs_w)).share("outputs");
-	map(0x09143, 0x09143).portr("IN-D"); // (not shown in system test) 0x40 serial out, 0x80 serial in
-	map(0x09144, 0x09144).portr("IN-A"); // A
-	map(0x09145, 0x09145).portr("IN-B"); // B
-	map(0x09146, 0x09146).portr("IN-C"); // C
-	map(0x09147, 0x09147).r(FUNC(subsino2_state::dsw_r));
-	map(0x09148, 0x09148).w(FUNC(subsino2_state::dsw_mask_w));
-
-	map(0x09152, 0x09152).r(FUNC(subsino2_state::vblank_bit2_r)).w(FUNC(subsino2_state::oki_bank_bit0_w));
-
-	map(0x09158, 0x0915e).r(FUNC(subsino2_state::mtrain_prot_r));
+	map(0x09140, 0x0915f).rw("io", FUNC(ss9602_device::read), FUNC(ss9602_device::write));
 
 	map(0x09160, 0x09160).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x09161, 0x09161).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x09162, 0x09162).w("ramdac", FUNC(ramdac_device::mask_w));
-	map(0x09164, 0x09164).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x09168, 0x09168).w(FUNC(subsino2_state::mtrain_tilesize_w));
 
 	map(0x09800, 0x09fff).ram();
 
 	map(0x0a000, 0x0ffff).rom();
+}
+
+void subsino2_state::mtrain_map(address_map &map)
+{
+	mtrain_base_map(map);
+	map(0x09164, 0x09164).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
+
+void subsino2_state::tbonusal_map(address_map &map)
+{
+	mtrain_base_map(map);
+	map(0x09166, 0x09167).w("ymsnd", FUNC(ym3812_device::write));
 }
 
 void subsino2_state::mtrain_io(address_map &map)
@@ -1330,29 +1253,24 @@ void subsino2_state::mtrain_io(address_map &map)
                           Sakura Love - Ying Hua Lian
 ***************************************************************************/
 
-void subsino2_state::saklove_outputs_w(offs_t offset, uint8_t data)
+void subsino2_state::saklove_output0_w(uint8_t data)
 {
-	m_outputs[offset] = data;
+	machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
+	machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
+}
 
-	switch (offset)
-	{
-		case 0:
-			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
-			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
-			break;
+void subsino2_state::saklove_output1_w(uint8_t data)
+{
+}
 
-		case 1:
-			break;
+void subsino2_state::saklove_output2_w(uint8_t data)
+{
+}
 
-		case 2:
-			break;
-
-		case 3:
-			// 1, 2, 4
-			break;
-	}
-
-//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
+void subsino2_state::saklove_output3_w(uint8_t data)
+{
+	// 1, 2, 4
+	m_eeprom->data_w(!BIT(data, 6));
 }
 
 void subsino2_state::saklove_map(address_map &map)
@@ -1397,54 +1315,38 @@ void subsino2_state::saklove_io(address_map &map)
 	map(0x021f, 0x021f).w(FUNC(subsino2_state::ss9601_disable_w));
 	map(0x0220, 0x0225).w(FUNC(subsino2_state::ss9601_scroll_w));
 
-	map(0x0300, 0x0303).w(FUNC(subsino2_state::saklove_outputs_w)).share("outputs");
-	map(0x0303, 0x0303).portr("IN-D"); // 0x40 serial out, 0x80 serial in
-	map(0x0304, 0x0304).portr("IN-A");
-	map(0x0305, 0x0305).portr("IN-B");
-	map(0x0306, 0x0306).portr("IN-C");
-
-	map(0x0307, 0x0307).r(FUNC(subsino2_state::dsw_r));
-	map(0x0308, 0x0308).w(FUNC(subsino2_state::dsw_mask_w));
-
-	map(0x0312, 0x0312).r(FUNC(subsino2_state::vblank_bit2_r)).w(FUNC(subsino2_state::oki_bank_bit0_w));
-
+	map(0x0300, 0x031f).rw("io", FUNC(ss9602_device::read), FUNC(ss9602_device::write));
 }
 
 /***************************************************************************
                                 X-Plan
 ***************************************************************************/
 
-void subsino2_state::xplan_outputs_w(offs_t offset, uint8_t data)
+void subsino2_state::xplan_out_d_w(uint8_t data)
 {
-	m_outputs[offset] = data;
+	m_eeprom->data_w(!BIT(data, 6));
+}
 
-	switch (offset)
-	{
-		case 0:
-			// 0x40 = serial out ? (at boot)
-			break;
+void subsino2_state::xplan_out_c_w(uint8_t data)
+{
+	m_leds[0] = BIT(data, 1);   // raise
+}
 
-		case 1:
-			m_leds[0] = BIT(data, 1);   // raise
-			break;
+void subsino2_state::xplan_out_b_w(uint8_t data)
+{
+	m_leds[1] = BIT(data, 2);   // hold 1 / big ?
+	m_leds[2] = BIT(data, 3);   // hold 5 / bet
+	m_leds[3] = BIT(data, 4);   // hold 4 ?
+	m_leds[4] = BIT(data, 5);   // hold 2 / double up
+	m_leds[5] = BIT(data, 6);   // hold 3 / small ?
+}
 
-		case 2: // B
-			m_leds[1] = BIT(data, 2);   // hold 1 / big ?
-			m_leds[2] = BIT(data, 3);   // hold 5 / bet
-			m_leds[3] = BIT(data, 4);   // hold 4 ?
-			m_leds[4] = BIT(data, 5);   // hold 2 / double up
-			m_leds[5] = BIT(data, 6);   // hold 3 / small ?
-			break;
+void subsino2_state::xplan_out_a_w(uint8_t data)
+{
+	machine().bookkeeping().coin_counter_w(0,    data & 0x01 );
+	machine().bookkeeping().coin_counter_w(1,    data & 0x02 );
 
-		case 3: // A
-			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );
-			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );
-
-			m_leds[6] = BIT(data, 4);   // start / take
-			break;
-	}
-
-//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
+	m_leds[6] = BIT(data, 4);   // start / take
 }
 
 void subsino2_state::xplan_map(address_map &map)
@@ -1482,7 +1384,7 @@ void subsino2_state::xplan_map(address_map &map)
 	map(0xc0000, 0xfffff).rom().region("maincpu", 0);
 }
 
-void subsino2_state::xplan_common_io(address_map &map)
+void subsino2_state::xplan_io(address_map &map)
 {
 	map(0x0000, 0x0000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
@@ -1502,88 +1404,45 @@ void subsino2_state::xplan_common_io(address_map &map)
 
 	map(0x0235, 0x0235).noprw(); // INT0 Ack.?
 
-	map(0x0300, 0x0300).r(FUNC(subsino2_state::vblank_bit6_r)).w(FUNC(subsino2_state::oki_bank_bit4_w));
-	map(0x0301, 0x0301).w(FUNC(subsino2_state::dsw_mask_w));
-	map(0x0302, 0x0302).r(FUNC(subsino2_state::dsw_r));
-	map(0x0303, 0x0303).portr("IN-C");
-	map(0x0304, 0x0304).portr("IN-B");
-	map(0x0305, 0x0305).portr("IN-A");
-	map(0x0306, 0x0306).portr("IN-D"); // 0x40 serial out, 0x80 serial in
-}
-
-void subsino2_state::xplan_io(address_map &map)
-{
-	xplan_common_io(map);
-
-	// 306 = d, 307 = c, 308 = b, 309 = a
-	map(0x0306, 0x0309).w(FUNC(subsino2_state::xplan_outputs_w)).share("outputs");
+	map(0x0300, 0x031f).rw("io", FUNC(ss9802_device::read), FUNC(ss9802_device::write));
 }
 
 /***************************************************************************
                                 X-Train
 ***************************************************************************/
 
-void subsino2_state::xtrain_outputs_w(offs_t offset, uint8_t data)
+void subsino2_state::xtrain_out_d_w(uint8_t data)
 {
-	m_outputs[offset] = data;
-
-	switch (offset)
-	{
-		case 0: // D
-			m_hopper->motor_w(BIT(data, 2));
-			// 0x40 = serial out ? (at boot)
-			break;
-
-		case 1: // C
-			if (m_ticket.found())
-				m_ticket->motor_w(BIT(data, 0));
-
-			m_leds[0] = BIT(data, 1);   // re-double
-			m_leds[1] = BIT(data, 2);   // half double
-			break;
-
-		case 2: // B
-			m_leds[2] = BIT(data, 1);   // hold 3 / small
-			m_leds[3] = BIT(data, 2);   // hold 2 / big
-			m_leds[4] = BIT(data, 3);   // bet
-			m_leds[5] = BIT(data, 4);   // hold1 / take
-			m_leds[6] = BIT(data, 5);   // double up
-			break;
-
-		case 3: // A
-			machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // coin in
-			machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // key in
-			machine().bookkeeping().coin_counter_w(2, BIT(data, 2)); // hopper out
-			machine().bookkeeping().coin_counter_w(3, BIT(data, 3)); // ticket out
-
-			m_leds[7] = BIT(data, 4);   // start
-			break;
-	}
-
-//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
+	m_hopper->motor_w(BIT(data, 2));
+	m_eeprom->data_w(!BIT(data, 6));
 }
 
-uint8_t subsino2_state::xtrain_subsino_r(offs_t offset)
+void subsino2_state::xtrain_out_c_w(uint8_t data)
 {
-	static const char data[] = { "SUBSINO" };
-	return data[offset];
+	if (m_ticket.found())
+		m_ticket->motor_w(BIT(data, 0));
+
+	m_leds[0] = BIT(data, 1);   // re-double
+	m_leds[1] = BIT(data, 2);   // half double
 }
 
-void subsino2_state::expcard_io(address_map &map)
+void subsino2_state::xtrain_out_b_w(uint8_t data)
 {
-	xplan_common_io(map);
-
-	// 306 = d, 307 = c, 308 = b, 309 = a
-	map(0x0306, 0x0309).w(FUNC(subsino2_state::expcard_outputs_w)).share("outputs");
+	m_leds[2] = BIT(data, 1);   // hold 3 / small
+	m_leds[3] = BIT(data, 2);   // hold 2 / big
+	m_leds[4] = BIT(data, 3);   // bet
+	m_leds[5] = BIT(data, 4);   // hold1 / take
+	m_leds[6] = BIT(data, 5);   // double up
 }
 
-void subsino2_state::xtrain_io(address_map &map)
+void subsino2_state::xtrain_out_a_w(uint8_t data)
 {
-	xplan_common_io(map);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // coin in
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // key in
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 2)); // hopper out
+	machine().bookkeeping().coin_counter_w(3, BIT(data, 3)); // ticket out
 
-	// 306 = d, 307 = c, 308 = b, 309 = a
-	map(0x0306, 0x0309).w(FUNC(subsino2_state::xtrain_outputs_w)).share("outputs");
-	map(0x0313, 0x0319).r(FUNC(subsino2_state::xtrain_subsino_r));
+	m_leds[7] = BIT(data, 4);   // start
 }
 
 
@@ -1617,12 +1476,12 @@ GFXDECODE_END
 
 static INPUT_PORTS_START( bishjan )
 	PORT_START("RESET")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 
 	PORT_START("DSW")   // SW1
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Controls ) )      PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(      0x0001, "Keyboard" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Joystick ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Controls ) )      PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "Keyboard" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Joystick ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
@@ -1632,74 +1491,74 @@ static INPUT_PORTS_START( bishjan )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
 
 	PORT_START("JOY")   // IN C
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1         ) PORT_NAME("1 Player Start (Joy Mode)")    // start (joy)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )   // down (joy)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )   // left (joy)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )   // right (joy)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1        )   // n (joy)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_MAHJONG_BET    ) PORT_NAME("P1 Mahjong Bet (Joy Mode)")    // bet (joy)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2        )   // select (joy)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1         ) PORT_NAME("1 Player Start (Joy Mode)")    // start (joy)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )   // down (joy)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )   // left (joy)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )   // right (joy)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1        )   // n (joy)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_BET    ) PORT_NAME("P1 Mahjong Bet (Joy Mode)")    // bet (joy)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2        )   // select (joy)
 
 	PORT_START("SYSTEM") // IN A
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE        )   PORT_IMPULSE(1) // service mode (press twice for inputs)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_CUSTOM        )   PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1       )   // stats
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE2       )   // pay out? "hopper empty"
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN1          )   PORT_IMPULSE(2) // coin
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE3       )   // pay out? "hopper empty"
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN2          )   PORT_IMPULSE(2) // coin
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE        )   PORT_IMPULSE(1) // service mode (press twice for inputs)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM        )   PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1       )   // stats
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2       )   // pay out? "hopper empty"
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1          )   PORT_IMPULSE(2) // coin
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3       )   // pay out? "hopper empty"
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2          )   PORT_IMPULSE(2) // coin
 
 	PORT_START("KEYB_0")    // IN B(0)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_A      )   // a
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_E      )   // e
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_I      )   // i
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_M      )   // m
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_KAN    )   // i2 (kan)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1         )   // b2 (start)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A      )   // a
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E      )   // e
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I      )   // i
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M      )   // m
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN    )   // i2 (kan)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1         )   // b2 (start)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 
 	PORT_START("KEYB_1")    // IN B(1)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_B      )   // b
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_F      )   // f
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_J      )   // j
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_N      )   // n
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_REACH  )   // l2 (reach)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_BET    )   // c2 (bet)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B      )   // b
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F      )   // f
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J      )   // j
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N      )   // n
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH  )   // l2 (reach)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET    )   // c2 (bet)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 
 	PORT_START("KEYB_2")    // IN B(2)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_C      )   // c
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_G      )   // g
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_K      )   // k
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_CHI    )   // k2 (chi)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_RON    )   // m2
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C      )   // c
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G      )   // g
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K      )   // k
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI    )   // k2 (chi)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON    )   // m2
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 
 	PORT_START("KEYB_3")    // IN B(3)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_D      )   // d
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_H      )   // h
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_L      )   // l
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_PON    )   // j2 (pon)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D      )   // d
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H      )   // h
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L      )   // l
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON    )   // j2 (pon)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 
 	PORT_START("KEYB_4")    // IN B(4)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // g2
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // e2
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // d2
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // f2
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // g2
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // e2
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // d2
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // f2
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -1707,7 +1566,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( new2001 )
-	PORT_START("DSW") // c00000
+	PORT_START("DSW") // c00001
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
@@ -1719,35 +1578,36 @@ static INPUT_PORTS_START( new2001 )
 	// high byte related to sound communication
 
 	// JAMMA inputs:
-	PORT_START("IN-C") // c00002
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER         ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_START("IN-C") // c00003
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER         ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	// high byte not read
 
-	PORT_START("IN-AB") // c00004
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE       ) PORT_IMPULSE(1) // service mode (press twice for inputs)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_POKER_HOLD3   ) PORT_NAME("Hold 3 / Black")
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   ) PORT_NAME("Double Up / Help")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD2   ) PORT_NAME("Hold 2 / Red")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_HOLD1   ) PORT_NAME("Hold 1 / Take")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET    ) PORT_NAME("Bet (Shoot)")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1         ) PORT_IMPULSE(1)
+	PORT_START("IN-B") // c00004
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1        ) PORT_NAME("Start")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK   ) // stats (keep pressed during boot for service mode)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1        ) PORT_NAME("Start")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK   ) // stats (keep pressed during boot for service mode)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_START("IN-A") // c00005
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE       ) PORT_IMPULSE(1) // service mode (press twice for inputs)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3   ) PORT_NAME("Hold 3 / Black")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   ) PORT_NAME("Double Up / Help")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD2   ) PORT_NAME("Hold 2 / Red")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD1   ) PORT_NAME("Hold 1 / Take")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BET    ) PORT_NAME("Bet (Shoot)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1         ) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -1755,7 +1615,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( humlan )
-	PORT_START("DSW") // c00000
+	PORT_START("DSW") // c00001
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" ) // used
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
@@ -1767,36 +1627,37 @@ static INPUT_PORTS_START( humlan )
 	// high byte related to sound communication
 
 	// JAMMA inputs:
-	PORT_START("IN-C") // c00002
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE       ) PORT_IMPULSE(1) // service mode (press twice for inputs)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // ?
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // ?
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER         ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_START("IN-C") // c00003
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE       ) PORT_IMPULSE(1) // service mode (press twice for inputs)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // ?
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // ?
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER         ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	// high byte not read
 
-	PORT_START("IN-AB") // c00004
+	PORT_START("IN-B") // c00004
 	// 1st-type panel
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1        ) PORT_NAME("Start")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_HOLD3   ) PORT_NAME("Hold 3 / Small")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET    )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1         ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1   ) PORT_NAME("Hold 1 / Take")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   ) PORT_NAME("Double Up / Help")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD2   ) PORT_NAME("Hold 2 / Big")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK   ) // stats (keep pressed during boot for service mode)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // ?
 
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_HOLD1   ) PORT_NAME("Hold 1 / Take")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   ) PORT_NAME("Double Up / Help")
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_POKER_HOLD2   ) PORT_NAME("Hold 2 / Big")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK   ) // stats (keep pressed during boot for service mode)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // ?
+	PORT_START("IN-A") // c00005
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1        ) PORT_NAME("Start")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3   ) PORT_NAME("Hold 3 / Small")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BET    )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1         ) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -1880,8 +1741,8 @@ static INPUT_PORTS_START( expcard )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN      )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER        ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)  // reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN      )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN      )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM      )                                   // serial in?
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER       ) // serial out
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r)
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -2021,14 +1882,11 @@ static INPUT_PORTS_START( mtrain )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 
 	PORT_START("IN-D")  // not shown in test mode
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM  )   // serial in?
+	PORT_BIT( 0x47, IP_ACTIVE_HIGH, IPT_UNUSED  ) // outputs
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r) // serial in
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -2171,14 +2029,11 @@ static INPUT_PORTS_START( strain ) // inputs need verifying
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 
 	PORT_START("IN-D")  // not shown in test mode
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM  )   // serial in?
+	PORT_BIT( 0x47, IP_ACTIVE_HIGH, IPT_UNUSED  ) // outputs
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r) // serial in
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -2321,14 +2176,11 @@ static INPUT_PORTS_START( tbonusal ) // inputs need verifying
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 
 	PORT_START("IN-D")  // not shown in test mode
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM  )   // serial in?
+	PORT_BIT( 0x47, IP_ACTIVE_HIGH, IPT_UNUSED  ) // outputs
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r) // serial in
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -2458,8 +2310,8 @@ static INPUT_PORTS_START( saklove )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // used?
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER   ) // serial out
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r) // serial in
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -2608,8 +2460,8 @@ static INPUT_PORTS_START( treacity )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // used?
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER   ) // serial out
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r) // serial in
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -2676,8 +2528,8 @@ static INPUT_PORTS_START( xplan )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       )                      // used?
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER         ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM       )                      // serial in?
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER        ) // serial out
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM       ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r) // serial in
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -2742,8 +2594,8 @@ static INPUT_PORTS_START( xtrain )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_CUSTOM)  PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)   PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) // serial in?
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) // serial out
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r) // serial in
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ptrain )
@@ -2891,14 +2743,11 @@ static INPUT_PORTS_START( wtrnymph )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER      ) PORT_NAME("Play Tetris")     PORT_CODE(KEYCODE_T)   // T |__ play Tetris game
 
 	PORT_START("IN-D")  // not shown in test mode
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM  )   // serial in?
+	PORT_BIT( 0x47, IP_ACTIVE_HIGH, IPT_UNUSED  ) // outputs
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r) // serial in
 INPUT_PORTS_END
 
 
@@ -2916,7 +2765,21 @@ void subsino2_state::bishjan(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::bishjan_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	ss9802_device &io(SS9802(config, "io"));
+	io.in_port_callback<1>().set_ioport("DSW");   // SW1
+	io.out_port_callback<2>().set(FUNC(subsino2_state::bishjan_input_w));
+	io.in_port_callback<3>().set_ioport("JOY");   // IN C
+	io.in_port_callback<4>().set(FUNC(subsino2_state::bishjan_input_r));  // IN B
+	io.in_port_callback<5>().set_ioport("SYSTEM");  // IN A
+	io.in_port_callback<6>().set(FUNC(subsino2_state::bishjan_serial_r));  // IN D
+	io.in_port_callback<7>().set(FUNC(subsino2_state::bishjan_unknown_r));
+	io.in_port_callback<9>().set_ioport("RESET");
+	io.out_port_callback<9>().set(FUNC(subsino2_state::bishjan_outputs_w));
+
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+
+	DS2430A(config, m_eeprom).set_timing_scale(0.12);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2942,6 +2805,15 @@ void subsino2_state::new2001(machine_config &config)
 	bishjan(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::new2001_map);
 
+	ss9802_device &io(*subdevice<ss9802_device>("io"));
+	io.in_port_callback<0>().set(FUNC(subsino2_state::new2001_sound_ready_r));
+	io.in_port_callback<3>().set_ioport("IN-C");
+	io.in_port_callback<4>().set_ioport("IN-B");
+	io.in_port_callback<5>().set_ioport("IN-A");
+	io.out_port_callback<8>().set(FUNC(subsino2_state::new2001_output0_w));
+	io.out_port_callback<9>().set(FUNC(subsino2_state::new2001_output1_w));
+	io.in_port_callback<9>().set_constant(0);
+
 	m_screen->set_size(640, 256);
 	m_screen->set_visarea(0, 640-1, 0, 256-16-1);
 }
@@ -2950,7 +2822,18 @@ void subsino2_state::humlan(machine_config &config)
 {
 	bishjan(config);
 	H83044(config.replace(), m_maincpu, XTAL(48'000'000) / 3);
-	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::humlan_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::new2001_map);
+
+	ss9802_device &io(*subdevice<ss9802_device>("io"));
+	io.in_port_callback<0>().set(FUNC(subsino2_state::new2001_sound_ready_r));
+	io.in_port_callback<3>().set_ioport("IN-C");
+	io.in_port_callback<4>().set_ioport("IN-B");
+	io.in_port_callback<5>().set_ioport("IN-A");
+	io.out_port_callback<8>().set(FUNC(subsino2_state::humlan_output0_w));
+	io.out_port_callback<9>().set(FUNC(subsino2_state::humlan_output1_w));
+	io.in_port_callback<9>().set_constant(0);
+
+	m_eeprom->set_timing_scale(0.16);
 
 	// sound hardware
 	// SS9804
@@ -2965,6 +2848,22 @@ void subsino2_state::mtrain(machine_config &config)
 	Z80180(config, m_maincpu, XTAL(12'000'000));   /* Unknown clock */
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::mtrain_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino2_state::mtrain_io);
+
+	ss9602_device &io(SS9602(config, "io"));
+	io.out_port_callback<0>().set(FUNC(subsino2_state::mtrain_output0_w));
+	io.out_port_callback<1>().set(FUNC(subsino2_state::mtrain_output1_w));
+	io.out_port_callback<2>().set(FUNC(subsino2_state::mtrain_output2_w));
+	io.out_port_callback<3>().set(FUNC(subsino2_state::mtrain_output3_w));
+	io.in_port_callback<3>().set_ioport("IN-D"); // (not shown in system test) 0x40 serial out, 0x80 serial in
+	io.in_port_callback<4>().set_ioport("IN-A"); // A
+	io.in_port_callback<5>().set_ioport("IN-B"); // B
+	io.in_port_callback<6>().set_ioport("IN-C"); // C
+	io.in_port_callback<7>().set(FUNC(subsino2_state::dsw_r));
+	io.out_port_callback<8>().set(FUNC(subsino2_state::dsw_mask_w));
+	io.in_port_callback<9>().set(FUNC(subsino2_state::vblank_bit2_r));
+	io.out_port_callback<9>().set(FUNC(subsino2_state::oki_bank_bit0_w));
+
+	DS2430A(config, m_eeprom).set_timing_scale(0.73);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2990,6 +2889,16 @@ void subsino2_state::mtrain(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void subsino2_state::tbonusal(machine_config &config)
+{
+	mtrain(config);
+	config.device_remove("oki");
+	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::tbonusal_map);
+	subdevice<ss9602_device>("io")->out_port_callback<9>().set_nop();
+
+	YM3812(config, "ymsnd", 3'000'000).add_route(ALL_OUTPUTS, "mono", 0.80); // ? chip and clock unknown
+}
+
 /***************************************************************************
                           Sakura Love - Ying Hua Lian
 ***************************************************************************/
@@ -3001,6 +2910,22 @@ void subsino2_state::saklove(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &subsino2_state::saklove_io);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	ss9602_device &io(SS9602(config, "io"));
+	io.out_port_callback<0>().set(FUNC(subsino2_state::saklove_output0_w));
+	io.out_port_callback<1>().set(FUNC(subsino2_state::saklove_output1_w));
+	io.out_port_callback<2>().set(FUNC(subsino2_state::saklove_output2_w));
+	io.out_port_callback<3>().set(FUNC(subsino2_state::saklove_output3_w));
+	io.in_port_callback<3>().set_ioport("IN-D"); // 0x40 serial out, 0x80 serial in
+	io.in_port_callback<4>().set_ioport("IN-A");
+	io.in_port_callback<5>().set_ioport("IN-B");
+	io.in_port_callback<6>().set_ioport("IN-C");
+	io.in_port_callback<7>().set(FUNC(subsino2_state::dsw_r));
+	io.out_port_callback<8>().set(FUNC(subsino2_state::dsw_mask_w));
+	io.in_port_callback<9>().set(FUNC(subsino2_state::vblank_bit2_r));
+	io.out_port_callback<9>().set(FUNC(subsino2_state::oki_bank_bit0_w));
+
+	DS2430A(config, m_eeprom);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3037,6 +2962,22 @@ void subsino2_state::xplan(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
+	ss9802_device &io(SS9802(config, "io"));
+	io.in_port_callback<0>().set(FUNC(subsino2_state::vblank_bit6_r));
+	io.out_port_callback<0>().set(FUNC(subsino2_state::oki_bank_bit4_w));
+	io.out_port_callback<1>().set(FUNC(subsino2_state::dsw_mask_w));
+	io.in_port_callback<2>().set(FUNC(subsino2_state::dsw_r));
+	io.in_port_callback<3>().set_ioport("IN-C");
+	io.in_port_callback<4>().set_ioport("IN-B");
+	io.in_port_callback<5>().set_ioport("IN-A");
+	io.in_port_callback<6>().set_ioport("IN-D"); // 0x40 serial out, 0x80 serial in
+	io.out_port_callback<6>().set(FUNC(subsino2_state::xplan_out_d_w));
+	io.out_port_callback<7>().set(FUNC(subsino2_state::xplan_out_c_w));
+	io.out_port_callback<8>().set(FUNC(subsino2_state::xplan_out_b_w)); // B
+	io.out_port_callback<9>().set(FUNC(subsino2_state::xplan_out_a_w)); // A
+
+	DS2430A(config, m_eeprom);
+
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_size(512, 256);
@@ -3062,7 +3003,12 @@ void subsino2_state::xplan(machine_config &config)
 void subsino2_state::xtrain(machine_config &config)
 {
 	xplan(config);
-	m_maincpu->set_addrmap(AS_IO, &subsino2_state::xtrain_io);
+
+	ss9802_device &io(*subdevice<ss9802_device>("io"));
+	io.out_port_callback<6>().set(FUNC(subsino2_state::xtrain_out_d_w)); // D
+	io.out_port_callback<7>().set(FUNC(subsino2_state::xtrain_out_c_w)); // C
+	io.out_port_callback<8>().set(FUNC(subsino2_state::xtrain_out_b_w)); // B
+	io.out_port_callback<9>().set(FUNC(subsino2_state::xtrain_out_a_w)); // A
 
 	HOPPER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 }
@@ -3077,7 +3023,10 @@ void subsino2_state::ptrain(machine_config &config)
 void subsino2_state::expcard(machine_config &config)
 {
 	xplan(config);
-	m_maincpu->set_addrmap(AS_IO, &subsino2_state::expcard_io);
+
+	ss9802_device &io(*subdevice<ss9802_device>("io"));
+	io.out_port_callback<8>().set(FUNC(subsino2_state::expcard_out_b_w)); // B
+	io.out_port_callback<9>().set(FUNC(subsino2_state::expcard_out_a_w)); // A
 }
 
 
@@ -3143,14 +3092,14 @@ ROM_START( bishjan )
 
 	ROM_REGION( 0x100000, "samples", 0 )    // SS9904
 	ROM_LOAD( "2-v201.u9", 0x000000, 0x100000, CRC(ea42764d) SHA1(13fe1cd30e474f4b092949c440068e9ddca79976) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(e248ebfa) SHA1(b75e5be0a0a6b32e6cc372fc3da01009f3cca7e2) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
 
 void subsino2_state::init_bishjan()
 {
 	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
-
-	// patch serial protection test (it always enters test mode on boot otherwise)
-	rom[0x042EA/2] = 0x4008;
 
 	// rts -> rte
 	rom[0x33386/2] = 0x5670; // IRQ 0
@@ -3213,14 +3162,14 @@ ROM_START( new2001 )
 
 	ROM_REGION( 0x80000, "samples", 0 )    // SS9904
 	ROM_LOAD( "new_2001_italy_2_v200.u9", 0x00000, 0x80000, CRC(9d522d04) SHA1(68f314b077a62598f3de8ef753bdedc93d6eca71) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(71281d72) SHA1(1661181a5a5331083d649b10a7d3a36062e617c0) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
 
 void subsino2_state::init_new2001()
 {
 	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
-
-	// patch serial protection test (ERROR 041920 otherwise)
-	rom[0x19A2/2] = 0x4066;
 
 	// rts -> rte
 	rom[0x45E8/2] = 0x5670; // IRQ 8
@@ -3249,14 +3198,14 @@ ROM_START( queenbee )
 
 	ROM_REGION( 0x80000, "samples", 0 )
 	ROM_LOAD( "27c4001 u9.bin", 0x000000, 0x80000, CRC(c7cda990) SHA1(193144fe0c31fc8342bd44aa4899bf15f0bc399d) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(f64b92e5) SHA1(fbef61b1046c6559d5ac71e665e822f9a6704461) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
 
 void subsino2_state::init_queenbee()
 {
 	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
-
-	// patch serial protection test (ERROR 093099 otherwise)
-	rom[0x1cc6/2] = 0x4066;
 
 	// rts -> rte
 	rom[0x3e6a/2] = 0x5670; // IRQ 8
@@ -3278,14 +3227,14 @@ ROM_START( queenbeeb )
 
 	ROM_REGION( 0x40000, "samples", 0 )
 	ROM_LOAD( "u9", 0x000000, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(b6d57e98) SHA1(6bbed2613c667369e74c417917c1c36d36f03739) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
 
 void subsino2_state::init_queenbeeb()
 {
 	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
-
-	// patch serial protection test (ERROR 093099 otherwise)
-	rom[0x1826/2] = 0x4066;
 
 	// rts -> rte
 	rom[0x3902/2] = 0x5670; // IRQ 8
@@ -3303,7 +3252,19 @@ ROM_START( queenbeei )
 
 	ROM_REGION( 0x80000, "samples", 0 )
 	ROM_LOAD( "u9", 0x000000, 0x80000, NO_DUMP )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(25d37d36) SHA1(9d7130328be80c1b9376ac6923300122ee1b9399) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
+
+void subsino2_state::init_queenbeei()
+{
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
+
+	// rts -> rte
+	rom[0x3abc/2] = 0x5670; // IRQ 8
+	rom[0x3bca/2] = 0x5670; // IRQ 0
+}
 
 ROM_START( queenbeesa )
 	ROM_REGION( 0x80000, "maincpu", 0 )    // H8/3044
@@ -3315,8 +3276,10 @@ ROM_START( queenbeesa )
 
 	ROM_REGION( 0x80000, "samples", 0 )
 	ROM_LOAD( "u9", 0x000000, 0x80000, NO_DUMP )
-ROM_END
 
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(a084e2c9) SHA1(18ba0577ab61d89816b157ee24532c4a3f8d0b6f) BAD_DUMP ) // handcrafted to pass protection check
+ROM_END
 
 
 
@@ -3347,14 +3310,14 @@ ROM_START( humlan )
 	ROM_REGION( 0x40000, "samples", 0 )    // SS9804
 	// clearly samples, might be different from the SS9904 case
 	ROM_LOAD( "subsino__qb-v1.u9", 0x000000, 0x40000, CRC(c5dfed44) SHA1(3f5effb85de10c0804efee9bce769d916268bfc9) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(281eb16b) SHA1(db62a7004e2bc9a052d6f154cb4c6d645d00f768) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
 
 void subsino2_state::init_humlan()
 {
 	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
-
-	// patch serial protection test (ERROR 093099 otherwise)
-	rom[0x170A/2] = 0x4066;
 
 	// rts -> rte
 	rom[0x38B4/2] = 0x5670; // IRQ 8
@@ -3383,14 +3346,14 @@ ROM_START( squeenb )
 
 	ROM_REGION( 0x80000, "samples", 0 )
 	ROM_LOAD( "u9", 0x000000, 0x80000, CRC(c7cda990) SHA1(193144fe0c31fc8342bd44aa4899bf15f0bc399d) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(c861db4a) SHA1(3109031239328a167f80082ec70b62630f8316ab) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
 
 void subsino2_state::init_squeenb()
 {
 	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
-
-	// patch serial protection test (ERROR 093099 otherwise)
-	rom[0x1814/2] = 0x4066;
 
 	// rts -> rte
 	rom[0x399a/2] = 0x5670; // IRQ 8
@@ -3406,16 +3369,18 @@ ROM_START( qbeebing )
 	ROM_LOAD16_BYTE( "rom 3   27c160  08d7h", 0x000000, 0x200000, CRC(1fdf0fcb) SHA1(ed54172521f8d05bad37b670548106e4c4deb8af) )
 
 	ROM_REGION( 0x80000, "samples", ROMREGION_ERASE00 ) // no samples, missing?
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(0d8db9ef) SHA1(eef0c8debbb2cb20af180c5c6a8ba998104fa24e) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
 
 void subsino2_state::init_qbeebing()
 {
 	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
 
-	// patch serial protection test (ERROR 093099 otherwise)
-	rom[0x25b6/2] = 0x4066;
-
-	// other patches?
+	// rts -> rte
+	rom[0x4714/2] = 0x5670; // IRQ 8
+	rom[0x49a0/2] = 0x5670; // IRQ 0
 }
 
 ROM_START( treamary )
@@ -3430,14 +3395,20 @@ ROM_START( treamary )
 
 	ROM_REGION( 0x80000, "samples", 0 )
 	ROM_LOAD( "27c040_u9.bin", 0x000000, 0x80000, CRC(5345ca39) SHA1(2b8f1dfeebb93a1d99c06912d89b268c642163df) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(0c068400) SHA1(7892443b04a987da944e36d6a528e1fdfbc68a39) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
 
 
 void subsino2_state::init_treamary()
 {
-	// other patches?
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
 
-	// gets stuck on CHIP1 test, enters test mode if bypassed
+	// rts -> rte
+	rom[0x5804/2] = 0x5670; // IRQ 0
+
+	// other patches?
 }
 
 
@@ -3491,15 +3462,10 @@ ROM_START( expcard )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "top_card-ve1.u7", 0x00000, 0x80000, CRC(0ca9bd18) SHA1(af791c78ae321104afa738564bc23f520f37e7d5) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(622a8862) SHA1(fae60a326e6905aefc36275d505147e1860a71d0) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
-
-void subsino2_state::init_expcard()
-{
-	uint8_t *rom = memregion("maincpu")->base();
-
-	// patch protection test (it always enters test mode on boot otherwise)
-	rom[0xed4dc-0xc0000] = 0xeb;
-}
 
 /***************************************************************************
 
@@ -3569,6 +3535,9 @@ ROM_START( mtrain )
 	ROM_LOAD( "gal16v8d.u19", 0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "gal16v8d.u26", 0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "gal16v8d.u31", 0x000, 0x117, NO_DUMP )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(a73211f7) SHA1(ebe175b9b8ea3fffcc9dd03ea51ccef36b016eb8) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
 
 ROM_START( strain )
@@ -3589,6 +3558,9 @@ ROM_START( strain )
 
 	ROM_REGION( 0x117, "plds", ROMREGION_ERASE00 )
 	// TODO: list these
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(133705eb) SHA1(974b7fd5f7eaa84c4ba2a5ba9e014ac459fa7d23) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
 
 
@@ -3611,21 +3583,7 @@ ROM_END
 
 void subsino2_state::init_mtrain()
 {
-	subsino_decrypt(machine(), crsbingo_bitswaps, crsbingo_xors, 0x8000);
-
-	// patch serial protection test (it always enters test mode on boot otherwise)
-	uint8_t *rom = memregion("maincpu")->base();
-	rom[0x0cec] = 0x18;
-	rom[0xb037] = 0x18;
-}
-
-void subsino2_state::init_strain()
-{
-	subsino_decrypt(machine(), crsbingo_bitswaps, crsbingo_xors, 0x8000);
-
-	// patch 'version error' (not sure this is correct, there's no title logo?)
-	uint8_t *rom = memregion("maincpu")->base();
-	rom[0x141c] = 0x20;
+	subsino_decrypt(memregion("maincpu")->base(), crsbingo_bitswaps, crsbingo_xors, 0x8000);
 }
 
 
@@ -3653,16 +3611,14 @@ ROM_START( tbonusal )
 
 	ROM_REGION( 0x117, "plds", ROMREGION_ERASEFF )
 	// TODO list of GALs
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(7c832409) SHA1(fe16074490fe4edab2be2de5fa83941dac9969b0) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
 
 void subsino2_state::init_tbonusal()
 {
-	subsino_decrypt(machine(), sharkpy_bitswaps, sharkpy_xors, 0x8000);
-
-	// patch serial protection test (it always enters test mode on boot otherwise)
-	uint8_t *rom = memregion("maincpu")->base();
-	rom[0x0ea7] = 0x18;
-	rom[0xbbbf] = 0x18;
+	subsino_decrypt(memregion("maincpu")->base(), sharkpy_bitswaps, sharkpy_xors, 0x8000);
 }
 
 /***************************************************************************
@@ -3709,15 +3665,10 @@ ROM_START( saklove )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "2.u10", 0x00000, 0x80000, CRC(4f70125c) SHA1(edd5e6bd47b9a4fa3c4057cb4a85544241fe483d) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(0ed01bd7) SHA1(62546003443845552e6adc4ca26375f93824d662) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
-
-void subsino2_state::init_saklove()
-{
-	uint8_t *rom = memregion("maincpu")->base();
-
-	// patch serial protection test (it always enters test mode on boot otherwise)
-	rom[0x0e029] = 0xeb;
-}
 
 /***************************************************************************
 
@@ -3769,15 +3720,10 @@ ROM_START( xplan )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "x-plan_rom_2_v100.u7", 0x00000, 0x80000, CRC(c742b5c8) SHA1(646960508be738824bfc578c1b21355c17e05010) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(ac70474d) SHA1(120362665af4ab361197795c6be51c8fed5a3506) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
-
-void subsino2_state::init_xplan()
-{
-	uint8_t *rom = memregion("maincpu")->base();
-
-	// patch protection test (it always enters test mode on boot otherwise)
-	rom[0xeded9-0xc0000] = 0xeb;
-}
 
 /***************************************************************************
 
@@ -3829,15 +3775,10 @@ ROM_START( xtrain )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "x-train_rom_2_v1.2.u7", 0x00000, 0x80000, CRC(aae563ff) SHA1(97db845d7e3d343bd70352371cb27b16faacca7f) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(9c5973b7) SHA1(ba79b2971cfa5d0183b1be5d54c5e7f13f0e8243) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
-
-void subsino2_state::init_xtrain()
-{
-	uint8_t *rom = memregion("maincpu")->base();
-
-	// patch protection test (it always enters test mode on boot otherwise)
-	rom[0xe190f-0xc0000] = 0xeb;
-}
 
 /***************************************************************************
 
@@ -3892,15 +3833,10 @@ ROM_START( ptrain )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "panda-novam_2-v1.4.u7", 0x00000, 0x80000, CRC(d1debec8) SHA1(9086975e5bef2066a688ab3c1df3b384f59e507d) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(a19d7b78) SHA1(e32a33a953d2523a558c395debbf85ee1df8965b) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
-
-void subsino2_state::init_ptrain()
-{
-	uint8_t *rom = memregion("maincpu")->base();
-
-	// patch protection test (it always enters test mode on boot otherwise)
-	rom[0xe1b08-0xc0000] = 0xeb;
-}
 
 
 /***************************************************************************
@@ -3920,15 +3856,10 @@ ROM_START( treacity )
 	ROM_LOAD32_BYTE( "alpha 207_27c4001_u10.bin", 0x00003, 0x80000, CRC(338370f9) SHA1(0e06ed1b71fb44bfd617f4d5112f6d34f0b759bc) )
 
 	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE00 ) // samples, missing or not used / other hardware here?
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(8c9906fd) SHA1(8afaaf80dbaf5d9763da5fa0c6f95d20887bc336) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
-
-void subsino2_state::init_treacity()
-{
-	uint8_t *rom = memregion("maincpu")->base();
-
-	// patch protection test (it always enters test mode on boot otherwise)
-	rom[0xaff9] = 0x75;
-}
 
 ROM_START( treacity202 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -3941,15 +3872,10 @@ ROM_START( treacity202 )
 	ROM_LOAD32_BYTE( "alpha 142_27c4001_u10.bin", 0x00003, 0x80000, CRC(8545e8cd) SHA1(0d122a532df81fe2150c1eaf49b5a4e35c8134eb) )
 
 	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE00 ) // samples, missing or not used / other hardware here?
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(8c9906fd) SHA1(8afaaf80dbaf5d9763da5fa0c6f95d20887bc336) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
-
-void subsino2_state::init_treacity202()
-{
-	uint8_t *rom = memregion("maincpu")->base();
-
-	// patch protection test (it always enters test mode on boot otherwise)
-	rom[0xae30] = 0x75;
-}
 
 
 
@@ -3986,49 +3912,45 @@ ROM_START( wtrnymph )
 	ROM_LOAD( "gal16v8d.u19", 0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "gal16v8d.u26", 0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "gal16v8d.u31", 0x000, 0x117, NO_DUMP )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(1b585f27) SHA1(ee89dfc731d867507c15009910e9f743c652a399) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
 
 void subsino2_state::init_wtrnymph()
 {
-	subsino_decrypt(machine(), victor5_bitswaps, victor5_xors, 0x8000);
-
-	// patch serial protection test (it always enters test mode on boot otherwise)
-	uint8_t *rom = memregion("maincpu")->base();
-	rom[0x0d79] = 0x18;
-	rom[0xc1cf] = 0x18;
-	rom[0xc2a9] = 0x18;
-	rom[0xc2d7] = 0x18;
+	subsino_decrypt(memregion("maincpu")->base(), victor5_bitswaps, victor5_xors, 0x8000);
 }
 
 GAME( 1996, mtrain,   0,        mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.31)",               0 )
 
-GAME( 1996, strain,   0,        mtrain,   strain,   subsino2_state, init_strain,   ROT0, "Subsino",                          "Super Train (Ver. 1.9)",               MACHINE_NOT_WORKING )
+GAME( 1996, strain,   0,        mtrain,   strain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Super Train (Ver. 1.9)",               MACHINE_NOT_WORKING )
 
-GAME( 1995, tbonusal, 0,        mtrain,   tbonusal, subsino2_state, init_tbonusal, ROT0, "Subsino (American Alpha license)", "Treasure Bonus (American Alpha, Ver. 1.6)", MACHINE_NOT_WORKING )
+GAME( 1995, tbonusal, 0,        tbonusal, tbonusal, subsino2_state, init_tbonusal, ROT0, "Subsino (American Alpha license)", "Treasure Bonus (American Alpha, Ver. 1.6)", MACHINE_NOT_WORKING )
 
 GAME( 1996, wtrnymph, 0,        mtrain,   wtrnymph, subsino2_state, init_wtrnymph, ROT0, "Subsino",                          "Water-Nymph (Ver. 1.4)",                0 )
 
-GAME( 1998, expcard,  0,        expcard,  expcard,  subsino2_state, init_expcard,  ROT0, "Subsino (American Alpha license)", "Express Card / Top Card (Ver. 1.5)",    0 )
+GAME( 1998, expcard,  0,        expcard,  expcard,  subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Express Card / Top Card (Ver. 1.5)",    0 )
 
-GAME( 1998, saklove,  0,        saklove,  saklove,  subsino2_state, init_saklove,  ROT0, "Subsino",                          "Ying Hua Lian 2.0 (China, Ver. 1.02)",  0 )
+GAME( 1998, saklove,  0,        saklove,  saklove,  subsino2_state, empty_init,    ROT0, "Subsino",                          "Ying Hua Lian 2.0 (China, Ver. 1.02)",  0 )
 
-GAME( 1999, xtrain,   0,        xtrain,   xtrain,   subsino2_state, init_xtrain,   ROT0, "Subsino",                          "X-Train (Ver. 1.3)",                    0 )
+GAME( 1999, xtrain,   0,        xtrain,   xtrain,   subsino2_state, empty_init,    ROT0, "Subsino",                          "X-Train (Ver. 1.3)",                    0 )
 
-GAME( 1999, ptrain,   0,        ptrain,   ptrain,   subsino2_state, init_ptrain,   ROT0, "Subsino",                          "Panda Train (Novamatic 1.7)",           MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, ptrain,   0,        ptrain,   ptrain,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Panda Train (Novamatic 1.7)",           MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1997, treacity,    0,       saklove, treacity, subsino2_state, init_treacity,    ROT0, "Subsino (American Alpha license)", "Treasure City (Ver. 208)",              MACHINE_NOT_WORKING )
-GAME( 1997, treacity202, treacity,saklove, treacity, subsino2_state, init_treacity202, ROT0, "Subsino (American Alpha license)", "Treasure City (Ver. 202)",              MACHINE_NOT_WORKING )
+GAME( 1997, treacity,    0,       saklove, treacity, subsino2_state, empty_init,   ROT0, "Subsino (American Alpha license)", "Treasure City (Ver. 208)",              MACHINE_NOT_WORKING )
+GAME( 1997, treacity202, treacity,saklove, treacity, subsino2_state, empty_init,   ROT0, "Subsino (American Alpha license)", "Treasure City (Ver. 202)",              MACHINE_NOT_WORKING )
 
 GAME( 1999, bishjan,  0,        bishjan,  bishjan,  subsino2_state, init_bishjan,  ROT0, "Subsino",                          "Bishou Jan (Japan, Ver. 203)",          MACHINE_NO_SOUND )
 
 GAME( 2000, new2001,  0,        new2001,  new2001,  subsino2_state, init_new2001,  ROT0, "Subsino",                          "New 2001 (Italy, Ver. 200N)",           MACHINE_NO_SOUND )
 
-GAME( 2006, xplan,    0,        xplan,    xplan,    subsino2_state, init_xplan,    ROT0, "Subsino",                          "X-Plan (Ver. 101)",                     MACHINE_NOT_WORKING )
+GAME( 2006, xplan,    0,        xplan,    xplan,    subsino2_state, empty_init,    ROT0, "Subsino",                          "X-Plan (Ver. 101)",                     MACHINE_NOT_WORKING )
 
 GAME( 2001, queenbee, 0,        humlan,   queenbee, subsino2_state, init_queenbee, ROT0, "Subsino (American Alpha license)", "Queen Bee (Ver. 114)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues
 GAME( 2001, queenbeeb,queenbee, humlan,   queenbee, subsino2_state, init_queenbeeb,ROT0, "Subsino",                          "Queen Bee (Brazil, Ver. 202)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues, only program ROM available
-GAME( 2001, queenbeei,queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (Israel, Ver. 100)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues, only program ROM available
-GAME( 2001, queenbeesa,queenbee,humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (SA-101-HARD)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues, only program ROM available
+GAME( 2001, queenbeei,queenbee, humlan,   queenbee, subsino2_state, init_queenbeei,ROT0, "Subsino",                          "Queen Bee (Israel, Ver. 100)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues, only program ROM available
+GAME( 2001, queenbeesa,queenbee,humlan,   queenbee, subsino2_state, init_queenbeeb,ROT0, "Subsino",                          "Queen Bee (SA-101-HARD)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues, only program ROM available
 
 GAME( 2001, humlan,   queenbee, humlan,   humlan,   subsino2_state, init_humlan,   ROT0, "Subsino (Truemax license)",        "Humlan's Lyckohjul (Sweden, Ver. 402)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues
 
@@ -4036,4 +3958,4 @@ GAME( 2002, squeenb,  0,        humlan,   humlan,   subsino2_state, init_squeenb
 
 GAME( 2003, qbeebing, 0,        humlan,   humlan,   subsino2_state, init_qbeebing, ROT0, "Subsino",                          "Queen Bee Bingo",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 200?, treamary, 0,        humlan,   humlan,   subsino2_state, init_treamary, ROT0, "Subsino",                          "Treasure Mary",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 200?, treamary, 0,        bishjan,  bishjan,  subsino2_state, init_treamary, ROT0, "Subsino",                          "Treasure Mary",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )

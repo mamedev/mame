@@ -44,8 +44,7 @@ DEFINE_DEVICE_TYPE(QBUS_SLOT, qbus_slot_device, "qbus_slot", "DEC Qbus slot")
 
 device_qbus_card_interface::device_qbus_card_interface(const machine_config &mconfig, device_t &device) :
 	device_interface(device, "qbus"),
-	m_bus(nullptr),
-	m_next(nullptr)
+	m_bus(nullptr)
 {
 }
 
@@ -74,13 +73,8 @@ qbus_slot_device::qbus_slot_device(const machine_config &mconfig, const char *ta
 void qbus_slot_device::device_start()
 {
 	device_qbus_card_interface *dev = dynamic_cast<device_qbus_card_interface *>(get_card_device());
-	if (dev) m_bus->add_card(dev);
-
-	m_write_birq4.resolve_safe();
-	m_write_birq5.resolve_safe();
-	m_write_birq6.resolve_safe();
-	m_write_birq7.resolve_safe();
-	m_write_bdmr.resolve_safe();
+	if (dev)
+		m_bus->add_card(*dev);
 }
 
 
@@ -102,6 +96,17 @@ qbus_device::qbus_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
+qbus_device::~qbus_device()
+{
+}
+
+device_memory_interface::space_config_vector qbus_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -109,12 +114,6 @@ qbus_device::qbus_device(const machine_config &mconfig, const char *tag, device_
 
 void qbus_device::device_start()
 {
-	// resolve callbacks
-	m_out_birq4_cb.resolve_safe();
-	m_out_birq5_cb.resolve_safe();
-	m_out_birq6_cb.resolve_safe();
-	m_out_birq7_cb.resolve_safe();
-	m_out_bdmr_cb.resolve_safe();
 }
 
 
@@ -131,10 +130,10 @@ void qbus_device::device_reset()
 //  add_card - add card
 //-------------------------------------------------
 
-void qbus_device::add_card(device_qbus_card_interface *card)
+void qbus_device::add_card(device_qbus_card_interface &card)
 {
-	card->m_bus = this;
-	m_device_list.append(*card);
+	card.m_bus = this;
+	m_device_list.emplace_back(card);
 }
 
 void qbus_device::install_device(offs_t start, offs_t end, read16sm_delegate rhandler, write16sm_delegate whandler, uint32_t mask)
@@ -150,14 +149,12 @@ void qbus_device::install_device(offs_t start, offs_t end, read16sm_delegate rha
 int qbus_device::z80daisy_irq_state()
 {
 	int data = 0;
-	device_qbus_card_interface *entry = m_device_list.first();
 
-	while (entry)
+	for (device_qbus_card_interface &entry : m_device_list)
 	{
-		data = entry->z80daisy_irq_state();
+		data = entry.z80daisy_irq_state();
 		if (data)
 			return data;
-		entry = entry->next();
 	}
 
 	return data;
@@ -166,14 +163,12 @@ int qbus_device::z80daisy_irq_state()
 int qbus_device::z80daisy_irq_ack()
 {
 	int vec = -1;
-	device_qbus_card_interface *entry = m_device_list.first();
 
-	while (entry)
+	for (device_qbus_card_interface &entry : m_device_list)
 	{
-		vec = entry->z80daisy_irq_ack();
+		vec = entry.z80daisy_irq_ack();
 		if (vec > 0)
 			return vec;
-		entry = entry->next();
 	}
 
 	return vec;

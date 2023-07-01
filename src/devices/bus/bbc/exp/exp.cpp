@@ -60,13 +60,6 @@ bbc_exp_slot_device::bbc_exp_slot_device(const machine_config &mconfig, const ch
 void bbc_exp_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_irq_handler.resolve_safe();
-	m_nmi_handler.resolve_safe();
-
-	m_cb1_handler.resolve_safe();
-	m_cb2_handler.resolve_safe();
 }
 
 

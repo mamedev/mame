@@ -9,9 +9,9 @@
 #include "emu.h"
 #include "macadb.h"
 
-#define LOG_TALK_LISTEN     (1 << 1U)
-#define LOG_STATE           (1 << 2U)
-#define LOG_LINESTATE       (1 << 3U)
+#define LOG_TALK_LISTEN     (1U << 1)
+#define LOG_STATE           (1U << 2)
+#define LOG_LINESTATE       (1U << 3)
 #define VERBOSE             (0)
 #include "logmacro.h"
 
@@ -252,11 +252,6 @@ ioport_constructor macadb_device::device_input_ports() const
 
 void macadb_device::device_start()
 {
-	write_via_clock.resolve_safe();
-	write_via_data.resolve_safe();
-	write_adb_data.resolve_safe();
-	write_adb_irq.resolve_safe();
-
 	this->m_adb_timer = timer_alloc(FUNC(macadb_device::mac_adb_tick), this);
 	this->m_adb_timer->adjust(attotime::never);
 
@@ -303,7 +298,7 @@ void macadb_device::device_start()
 	save_item(NAME(m_keyboard_handler));
 }
 
-WRITE_LINE_MEMBER(macadb_device::adb_data_w)
+void macadb_device::adb_data_w(int state)
 {
 	if (m_adb_timer_ticks > 0)
 	{
@@ -1105,7 +1100,7 @@ void macadb_device::device_reset()
 	m_last_adb_time = 0;
 }
 
-WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
+void macadb_device::adb_linechange_w(int state)
 {
 /*  static char const *const states[] =
     {

@@ -225,9 +225,8 @@ public:
 
 	virtual void notify(const char *outname, int32_t value) override
 	{
-		static char buf[256];
-		sprintf(buf, "%s = %d\r", ((outname==nullptr) ? "none" : outname), value);
-		m_server->deliver_to_all(buf);
+		auto msg = util::string_format("%s = %d\r", ((outname==nullptr) ? "none" : outname), value);
+		m_server->deliver_to_all(msg);
 	}
 
 	// implementation
