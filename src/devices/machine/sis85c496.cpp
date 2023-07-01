@@ -362,18 +362,17 @@ void sis85c496_host_device::map_extra(uint64_t memory_window_start, uint64_t mem
 
 	if (BIT(m_ide_vesa_ctrl, 8))
 	{
-		const bool main_ch_select = bool(BIT(m_ide_vesa_ctrl, 9));
-		io_space->install_readwrite_handler(0x1f0, 0x1f7, read32s_delegate(*m_ide[main_ch_select], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_ide[main_ch_select], FUNC(ide_controller_32_device::cs0_w)), 0xffffffff);
+		// TODO: doesn't seem to work right for anything after IDE[0] primary
+		// bit 9: swaps IDE channels
+		io_space->install_readwrite_handler(0x170, 0x177, read32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs0_w)));
 
-		if (!BIT(m_ide_vesa_ctrl, 7))
-			io_space->install_readwrite_handler(0x3f0, 0x3f7, read32s_delegate(*m_ide[main_ch_select], FUNC(ide_controller_32_device::cs1_r)), write32s_delegate(*m_ide[main_ch_select], FUNC(ide_controller_32_device::cs1_w)));
+		io_space->install_readwrite_handler(0x1f0, 0x1f7, read32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs0_w)));
 
-		const bool sub_ch_select = main_ch_select ^ 1;
+		//if (!BIT(m_ide_vesa_ctrl, 6))
+		io_space->install_readwrite_handler(0x370, 0x377, read32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs1_r)), write32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs1_w)));
 
-		io_space->install_readwrite_handler(0x170, 0x177, read32s_delegate(*m_ide[sub_ch_select], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_ide[sub_ch_select], FUNC(ide_controller_32_device::cs0_w)), 0xffffffff);
-
-		if (!BIT(m_ide_vesa_ctrl, 6))
-			io_space->install_readwrite_handler(0x370, 0x377, read32s_delegate(*m_ide[sub_ch_select], FUNC(ide_controller_32_device::cs1_r)), write32s_delegate(*m_ide[sub_ch_select], FUNC(ide_controller_32_device::cs1_w)));
+		//if (!BIT(m_ide_vesa_ctrl, 7))
+		io_space->install_readwrite_handler(0x3f0, 0x3f7, read32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs1_r)), write32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs1_w)));
 	}
 
 	// 32 megs of RAM (todo: don't hardcode)
