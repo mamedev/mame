@@ -720,7 +720,7 @@ public:
 				if (ImGui::Selectable(
 					  "##selectable"
 					, &isSelected
-					, ImGuiSelectableFlags_AllowItemOverlap
+					, ImGuiSelectableFlags_AllowOverlap
 					, ImGui::GetItemRectSize()
 					) )
 				{
