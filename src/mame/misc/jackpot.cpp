@@ -142,6 +142,7 @@ uint32_t jackpot_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 void jackpot_state::prg_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom(); // after this, ROM is 0xff filled but in the range 0x1e000 - 0x1efff. Where does it get mapped?
 	// 0xd514, 0xd516 triplets for a 1bpp RAMDAC (???)
 	map(0xd518, 0xd51f).lr8(
@@ -160,9 +161,9 @@ void jackpot_state::prg_map(address_map &map)
 	map(0xd800, 0xdfff).ram().share("nvram"); // MK48Z02B?
 	// 384x256 needs 0x600 bytes, assume the rest unmapped
 	map(0xe000, 0xe5ff).ram().share(m_vram).w(FUNC(jackpot_state::vram_w));
-	map(0xe600, 0xefff).ram();
+	map(0xe600, 0xefff).noprw();
 	map(0xf000, 0xf5ff).ram().share(m_attr).w(FUNC(jackpot_state::attr_w));
-	map(0xf600, 0xf7ff).ram();
+	map(0xf600, 0xf7ff).noprw();
 }
 
 void jackpot_state::sound_prg_map(address_map &map)
