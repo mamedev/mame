@@ -2650,7 +2650,7 @@ On side B: Atmos version
 		</part>
 		<part name="cass2" interface="oric1_cass">
 			<feature name="part_id" value="FACE B - ATMOS"/>
-			<dataarea name="cass" size="35037">
+			<dataarea name="cass">
 				<rom name="Mission Impossible - Face B.tap" status="nodump" />
 			</dataarea>
 		</part>
