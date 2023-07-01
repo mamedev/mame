@@ -1128,7 +1128,11 @@ ROM_START( bellstrp )  // Strings: Copyright (c) 1998 Paloma Elektronik. Play St
 ROM_END
 
 
-ROM_START( vip2000 )
+/* Vip 2000
+   2004 Paloma Elektronik.
+
+*/
+ROM_START( vip2000 ) // Strings: (c) 2004 Paloma Elektronik. V24.
 	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )   // i186 code
 	ROM_LOAD16_BYTE( "vipbios8l.bin", 0x00000, 0x08000, CRC(a4c2b351) SHA1(bb718584bfe32b9ed27fadfd89b4094d4bbd6d7f) )
 	ROM_LOAD16_BYTE( "vipbios8h.bin", 0x00001, 0x08000, CRC(7c42c5ee) SHA1(c419a834ddb245363bacfe70d31cff7c2d4a2d03) )
@@ -1233,22 +1237,22 @@ ROM_END
 //    YEAR  NAME      PARENT   MACHINE   INPUT   STATE         INIT        ROT    COMPANY                          FULLNAME                             FLAGS
 GAME( 1992, bingor1,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria?", "Bingo Roll / Bell Star? (set 1)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1992, bingor2,  0,       bingor2,  bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria?", "Bingo Roll / Bell Star? (set 2)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, bingor3,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bingo Roll / Bell Star? (set 3)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, bingor4,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bingo Roll / Bell Star? (set 4)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, bingor5,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bingo Roll / Bell Star V3? (set 5)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bingor3,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma Elektronik?",            "Bingo Roll / Bell Star? (set 3)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bingor4,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma Elektronik?",            "Bingo Roll / Bell Star? (set 4)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bingor5,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma Elektronik?",            "Bingo Roll / Bell Star V3? (set 5)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1991, bingor6,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "AWR Hard & Soft Austria?",      "Bingo Roll / Turbo Bingo?",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1995, bingor7,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria",  "Bingo Roll (209 / 19-1-95)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2001, bingor8,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria",  "Bingo Roll 2001 (v22.1)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1992, bingor9,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria",  "Bingo Roll (Vip2 v26.02.02)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2002, bellstr1, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bell-Star+ 5 (Vip2 v.3.6.02)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, bellstr2, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bell-Star+ (Vip2 v.25.02.02)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, bellstr3, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bell-Star+ (Vip2 v.30.1.02)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bellstr1, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma Elektronik?",            "Bell-Star+ 5 (Vip2 v.3.6.02)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bellstr2, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma Elektronik?",            "Bell-Star+ (Vip2 v.25.02.02)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bellstr3, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma Elektronik?",            "Bell-Star+ (Vip2 v.30.1.02)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 1998, bellstrp, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bell Star Plus",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, bellstrp, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma Elektronik?",            "Bell Star Plus",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2001, vip2000,  0,       vip2000,  bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "unknown 'VIP 2000' game",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2004, vip2000,  0,       vip2000,  bingor, bingor_state, empty_init, ROT0, "Paloma Elektronik?",            "unknown 'VIP 2000' game",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 1999, roljokr1, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Rolling Joker",                      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1997, roljokr2, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Rolling Joker (v23.11.91)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1999, roljokr3, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Rolling Joker (v.99.7)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, roljokr1, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma Elektronik?",            "Rolling Joker",                      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, roljokr2, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma Elektronik?",            "Rolling Joker (v23.11.91)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, roljokr3, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma Elektronik?",            "Rolling Joker (v.99.7)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
