@@ -2642,16 +2642,10 @@ On side B: Atmos version
 ]]></notes>
 		<info name="language" value="French" />
 		<info name="region" value="France" />
-		<part name="cass1" interface="oric1_cass">
+		<part name="cass" interface="oric1_cass">
 			<feature name="part_id" value="FACE A - ORIC 48K"/>
 			<dataarea name="cass" size="47175">
 				<rom name="Mission Impossible - Face A.tap" size="47175" crc="1aba6c78" sha1="8b8ac2594946a2fdbfe30520b392a6b335f9ec60"/>
-			</dataarea>
-		</part>
-		<part name="cass2" interface="oric1_cass">
-			<feature name="part_id" value="FACE B - ATMOS"/>
-			<dataarea name="cass">
-				<rom name="Mission Impossible - Face B.tap" status="nodump" />
 			</dataarea>
 		</part>
 	</software>
