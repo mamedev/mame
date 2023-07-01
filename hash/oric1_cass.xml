@@ -869,7 +869,7 @@ Cassette with two versions, side 1 with the Atmos version, side 2 with Oric-1 ve
 		</part>
 	</software>
 
-	<software name="composer" supportede="no">
+	<software name="composer" supported="no">
 		<description>Composer</description>
 		<year>1983</year>
 		<publisher>Sector 7 Software</publisher>
