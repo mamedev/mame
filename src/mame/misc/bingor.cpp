@@ -1136,6 +1136,38 @@ ROM_START( bellstr1 )  // Strings: C1992, AWR. Copyright (c) 1995-1997 Paloma El
 	ROM_LOAD( "24c04a.bin", 0x000000, 0x200, CRC(6278b83b) SHA1(a66dcfc6c8533c11e374a5015a2507267187b241) )
 ROM_END
 
+/* Bell-Star+ (Vip2 v.25.02.02)
+   2002 Paloma Elektronik.
+
+   Play Star Austria 0316/821193.
+   CBA-Design, Lyon France.
+   C1992, AWR.
+
+   Same PCB layout than bingor2, 3, 4
+
+   Serial: 9843.
+*/
+ROM_START( bellstr2 )  // Strings: C1992, AWR. Copyright (c) 1995-1997 Paloma Elektronik.
+	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )   // i186 code
+	ROM_LOAD16_BYTE( "bell-star+_vip2_25.02.02_l.bin",  0x00000, 0x08000, CRC(82ff28c5) SHA1(b0f7c47f32457ebb7783acb94a2ee7d60dbf000f) )
+	ROM_LOAD16_BYTE( "bell-star+_vip2_25.02.02_h.bin",  0x00001, 0x08000, CRC(b6243a72) SHA1(2d0f5222a1908076658614035c96a69a579ee3a2) )
+//	ROM_LOAD16_BYTE( "bell-star+_vip2_v_25.2.02_h.bin", 0x00001, 0x08000, CRC(c9ab19a0) SHA1(e65a4923a8efb0847b5156b68dbf9f2e5aedfecb) )
+
+	ROM_REGION16_LE( 0x10000, "alt_h", 0 ) // from identical set, but different high program (to check).
+	ROM_LOAD16_BYTE( "bell-star+_vip2_v_25.2.02_h.bin", 0x00001, 0x08000, CRC(c9ab19a0) SHA1(e65a4923a8efb0847b5156b68dbf9f2e5aedfecb) )
+
+	ROM_REGION16_LE( 0x10000, "gfx", ROMREGION_ERASE00 )    // blitter data?
+	ROM_LOAD16_BYTE( "bell-star+_grafik_l.bin", 0x000000, 0x08000, CRC(2c179e12) SHA1(2c3ea8073ab416530c2e7060c50bfd1a3fc6977e) )
+	ROM_LOAD16_BYTE( "bell-star+_grafik_h.bin", 0x000001, 0x08000, CRC(ee441cc7) SHA1(18c114cb3e0d7acd59ef914edbe4ebfe979e0841) )
+
+	ROM_REGION( 0x1fff, "pic", 0 ) // need verification
+	ROM_LOAD( "pic16c54.bin", 0x0000, 0x200, CRC(21e8a699) SHA1(8a22292fa3669105d52a9d681d5be345fcfe6607) )
+
+	ROM_REGION( 0x20000, "eeprom", 0 )  // eeprom
+	ROM_LOAD( "24c04a.bin", 0x000000, 0x200, CRC(179a39ed) SHA1(4f6a1261efba43cb822f4752dfca8b8a62c58be6) )
+	ROM_LOAD( "24c04a_alt.bin", 0x000000, 0x200, CRC(ef197aae) SHA1(bc6766e7e80122b4aaf7c4ffb7dd04b1cb8ba308) )  // from an identical set.
+ROM_END
+
 
 } // anonymous namespace
 
@@ -1157,6 +1189,7 @@ GAME( 2001, bingor8,  0,       bingor,   bingor, bingor_state, empty_init, ROT0,
 GAME( 1992, bingor9,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria",  "Bingo Roll (Vip2 v26.02.02)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 GAME( 2002, bellstr1, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bell-Star+ 5 (Vip2 v.3.6.02)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bellstr2, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bell-Star+ (Vip2 v.25.02.02)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 GAME( 1998, bellstrp, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bell Star Plus",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
