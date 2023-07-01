@@ -18,6 +18,8 @@
 #if BX_PLATFORM_WINDOWS
 extern "C" __declspec(dllimport) unsigned long __stdcall GetModuleFileNameA(void* _module, char* _outFilePath, unsigned long _size);
 extern "C" __declspec(dllimport) unsigned long __stdcall GetTempPathA(unsigned long _max, char* _outFilePath);
+#elif BX_PLATFORM_OSX
+extern "C" int _NSGetExecutablePath(char* _buf, uint32_t* _bufSize);
 #endif // BX_PLATFORM_WINDOWS
 
 namespace bx
@@ -214,6 +216,12 @@ namespace bx
 			return true;
 		}
 #elif BX_PLATFORM_OSX
+		uint32_t len = *_inOutSize;
+		bool result = _NSGetExecutablePath(_out, &len);
+		if (0 == result)
+		{
+			return true;
+		}
 #endif // BX_PLATFORM_*
 
 		return false;
