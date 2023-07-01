@@ -342,5 +342,6 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1998, jackpot,        0, jackpot, jackpot, jackpot_state, empty_init, ROT0, "Electronic Projects", "Jackpot (Ver 16.16L)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // 08.09.98
-GAME( 1998, jackpota, jackpot, jackpot, jackpot, jackpot_state, empty_init, ROT0, "Electronic Projects", "Jackpot (Ver 1.16L)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // 01.09.98
+// Both mentions "QL ELETTRONICA" as HW manufacturer during attract
+GAME( 1998, jackpot,        0, jackpot, jackpot, jackpot_state, empty_init, ROT0, "Electronic Projects", "Jackpot Bowling (Ver 16.16L)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // 08.09.98
+GAME( 1998, jackpota, jackpot, jackpot, jackpot, jackpot_state, empty_init, ROT0, "Electronic Projects", "Jackpot Bowling (Ver 1.16L)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // 01.09.98 title mispelled as "Jackpot Bowlinng" on initial full screen title, otherwise correct during attract
