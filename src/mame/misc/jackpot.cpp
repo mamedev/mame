@@ -52,6 +52,7 @@ In the same period Electronic Projects also released games on different platform
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
+#include "machine/ins8250.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/ymopl.h"
@@ -154,9 +155,7 @@ void jackpot_state::prg_map(address_map &map)
 	map(0xd600, 0xd600).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0xd601, 0xd601).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-	// 'attendere prego test hardware' (please wait hardware test), returning this is enough to progress.
-	// TODO: Serial comms with a master unit for game override?
-	map(0xd702, 0xd702).lr8(NAME([] () -> uint8_t { return 0xff; }));
+	map(0xd700, 0xd707).rw("uart", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 
 	map(0xd800, 0xdfff).ram().share("nvram"); // MK48Z02B?
 	// 384x256 needs 0x600 bytes, assume the rest unmapped
@@ -176,6 +175,9 @@ void jackpot_state::sound_prg_map(address_map &map)
 void jackpot_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
+	map(0x00, 0x01).w("ymsnd", FUNC(ym3526_device::write));
+	map(0x04, 0x04).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x06, 0x06).w("aysnd", FUNC(ay8910_device::address_w));
 }
 
 
@@ -237,6 +239,10 @@ void jackpot_state::jackpot(machine_config &config) // clocks not verified
 	EEPROM_93C66_8BIT(config, "eeprom");
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
+	// TODO: Serial comms with a master unit for game override?
+	ins8250_device &uart(INS8250(config, "uart", 1843200)); // actual type and clock unknown
+	uart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
 	// reset by the CRTC with 384x256, 55.93 Hz (tentative)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -257,7 +263,9 @@ void jackpot_state::jackpot(machine_config &config) // clocks not verified
 
 	SPEAKER(config, "mono").front_center();
 
-	YM3526(config, "ymsnd", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.30);
+	ym3526_device &ymsnd(YM3526(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.irq_handler().set_inputline("audiocpu", INPUT_LINE_IRQ0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	AY8910(config, "aysnd", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.30);
 }
@@ -335,4 +343,4 @@ ROM_END
 
 
 GAME( 1998, jackpot,        0, jackpot, jackpot, jackpot_state, empty_init, ROT0, "Electronic Projects", "Jackpot (Ver 16.16L)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // 08.09.98
-GAME( 1988, jackpota, jackpot, jackpot, jackpot, jackpot_state, empty_init, ROT0, "Electronic Projects", "Jackpot (Ver 1.16L)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // 01.09.98
+GAME( 1998, jackpota, jackpot, jackpot, jackpot, jackpot_state, empty_init, ROT0, "Electronic Projects", "Jackpot (Ver 1.16L)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // 01.09.98
