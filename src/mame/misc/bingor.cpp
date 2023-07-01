@@ -1110,6 +1110,33 @@ ROM_START( bingor9 )  // Strings: (c) 1988, 1989, 1990, 1991, 1992 Rosenauer Ele
 ROM_END
 
 
+/* Bell-Star+ 5 (Vip2 v.3.6.02)
+   2002 Paloma Elektronik.
+
+   Play Star Austria 0316/821193.
+   CBA-Design, Lyon France.
+   C1992, AWR.
+
+   Same PCB layout than bingor2, 3, 4
+
+*/
+ROM_START( bellstr1 )  // Strings: C1992, AWR. Copyright (c) 1995-1997 Paloma Elektronik.
+	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )   // i186 code
+	ROM_LOAD16_BYTE( "bell-star+_5_vip_2_v.3.6.02_l.bin", 0x00000, 0x08000, CRC(0115bca7) SHA1(0b692b46bc6641296861666f00ec0475dc7296a1) )
+	ROM_LOAD16_BYTE( "bell-star+_5_vip_2_v.3.6.02_h.bin", 0x00001, 0x08000, CRC(c689aa69) SHA1(fb1f477654909f156c30a6be29f84962f4edb1c3) )
+
+	ROM_REGION16_LE( 0x10000, "gfx", ROMREGION_ERASE00 )    // blitter data?
+	ROM_LOAD16_BYTE( "grafik_l.bin", 0x000000, 0x08000, CRC(a8b22477) SHA1(92d638f0f188a43f14487989cf42195311fb2c35) )
+	ROM_LOAD16_BYTE( "grafik_h.bin", 0x000001, 0x08000, CRC(969d201c) SHA1(7705ceb383ef122538ebf8046041d1c24ec9b9a4) )
+
+	ROM_REGION( 0x1fff, "pic", 0 ) // need verification
+	ROM_LOAD( "pic16c54.bin", 0x0000, 0x200, CRC(21e8a699) SHA1(8a22292fa3669105d52a9d681d5be345fcfe6607) )
+
+	ROM_REGION( 0x20000, "eeprom", 0 )  // eeprom
+	ROM_LOAD( "24c04a.bin", 0x000000, 0x200, CRC(6278b83b) SHA1(a66dcfc6c8533c11e374a5015a2507267187b241) )
+ROM_END
+
+
 } // anonymous namespace
 
 
@@ -1125,10 +1152,11 @@ GAME( 2002, bingor3,  0,       bingor,   bingor, bingor_state, empty_init, ROT0,
 GAME( 2002, bingor4,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bingo Roll / Bell Star? (set 4)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, bingor5,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bingo Roll / Bell Star V3? (set 5)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1991, bingor6,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "AWR Hard & Soft Austria?",      "Bingo Roll / Turbo Bingo?",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-
 GAME( 1995, bingor7,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria",  "Bingo Roll (209 / 19-1-95)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2001, bingor8,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria",  "Bingo Roll 2001 (v22.1)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1992, bingor9,  0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria",  "Bingo Roll (Vip2 v26.02.02)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+GAME( 2002, bellstr1, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bell-Star+ 5 (Vip2 v.3.6.02)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 GAME( 1998, bellstrp, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bell Star Plus",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
