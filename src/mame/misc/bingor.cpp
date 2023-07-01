@@ -1119,6 +1119,7 @@ ROM_END
 
    Same PCB layout than bingor2, 3, 4
 
+   Serial: 9851.
 */
 ROM_START( bellstr1 )  // Strings: C1992, AWR. Copyright (c) 1995-1997 Paloma Elektronik.
 	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )   // i186 code
