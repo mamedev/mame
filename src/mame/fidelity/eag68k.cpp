@@ -56,6 +56,10 @@ V3: 512KB DRAM
 V4: 1MB DRAM
 V5: 128KB+16KB DRAM, dual-CPU! (2*68K @ 16MHz)
 
+V2/V3/V4 have the same program, older versions can be run by decreasing the
+RAM size (-ramsize option). It's not verified if V1 has the same program, but
+it probably does.
+
 V6-V11 are on model 6117. Older 1986 model 6081/6088/6089 uses a 6502 CPU.
 
 Hardware info:
@@ -106,6 +110,9 @@ V8: 2*68020, 512KB+128KB h.RAM
 V9: 68030, 1MB h.RAM
 V10: 68040, 1MB h.RAM
 V11: 68060, high speed, 2MB h.RAM (half unused?)
+
+V6 has the same program as V7, it can be run by decreasing the RAM size. V11
+supposedly has the same program as V10.
 
 V7 Hardware info:
 -----------------
@@ -205,10 +212,9 @@ public:
 	{ }
 
 	// machine configs
-	void eagv2(machine_config &config);
+	void eagv4(machine_config &config);
 	void eagv3(machine_config &config);
 	void eagv5(machine_config &config);
-	void eagv6(machine_config &config);
 	void eagv7(machine_config &config);
 	void eagv9(machine_config &config);
 	void eagv10(machine_config &config);
@@ -230,7 +236,7 @@ protected:
 
 	// address maps
 	void eag_map(address_map &map);
-	void eagv6_map(address_map &map);
+	void eagv7_map(address_map &map);
 	void eagv10_map(address_map &map);
 
 	// I/O handlers
@@ -484,7 +490,7 @@ void eagv5_state::sub_map(address_map &map)
 	map(0x140001, 0x140001).r(m_mainlatch, FUNC(generic_latch_8_device::read));
 }
 
-void eag_state::eagv6_map(address_map &map)
+void eag_state::eagv7_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x104000, 0x107fff).ram();
@@ -634,27 +640,19 @@ void eag_state::eag_base(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }
 
-void eag_state::eagv2(machine_config &config)
+void eag_state::eagv4(machine_config &config)
 {
 	eag_base(config);
 
 	// basic machine hardware
 	RAM(config, m_ram).set_extra_options("128K, 512K, 1M");
-	m_ram->set_default_size("128K");
+	m_ram->set_default_size("1M");
 	m_ram->set_default_value(0);
-}
-
-void eag_state::eagv3(machine_config &config)
-{
-	eagv2(config);
-
-	// basic machine hardware
-	m_ram->set_default_size("512K");
 }
 
 void eagv5_state::eagv5(machine_config &config)
 {
-	eagv2(config);
+	eagv4(config);
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &eagv5_state::main_map);
@@ -670,27 +668,20 @@ void eagv5_state::eagv5(machine_config &config)
 	// gen_latch syncs on write, but this is still needed with tight cpu comms
 	// (not that it locks up or anything, but it will calculate moves much slower if timing is off)
 	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 4));
-}
 
-void eag_state::eagv6(machine_config &config)
-{
-	eagv3(config);
-
-	// basic machine hardware
-	M68020(config.replace(), m_maincpu, 20_MHz_XTAL); // MC68020RC20E
-	m_maincpu->set_interrupt_mixer(false);
-	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv6_map);
-
-	m_ram->set_extra_options("512K, 1M");
+	m_ram->set_default_size("128K");
 }
 
 void eag_state::eagv7(machine_config &config)
 {
-	eagv6(config);
+	eagv4(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(20_MHz_XTAL); // also seen with 25MHz XTAL
-	m_ram->set_default_size("1M");
+	M68020(config.replace(), m_maincpu, 20_MHz_XTAL); // MC68020RC20E
+	m_maincpu->set_interrupt_mixer(false);
+	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv7_map);
+
+	m_ram->set_extra_options("512K, 1M");
 }
 
 void eag_state::eagv9(machine_config &config)
@@ -700,7 +691,7 @@ void eag_state::eagv9(machine_config &config)
 	// basic machine hardware
 	M68030(config.replace(), m_maincpu, 32_MHz_XTAL); // also seen with 40MHz XTAL
 	m_maincpu->set_interrupt_mixer(false);
-	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv6_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv7_map);
 }
 
 void eag_state::eagv10(machine_config &config)
@@ -786,16 +777,16 @@ ROM_START( fex68km4 ) // model 6110, PCB label 510.1120B01 - checksum FD96
 ROM_END
 
 
-ROM_START( feagv2 )
-	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("6114_e5_yellow.u22", 0x00000, 0x10000, CRC(f9c7bada) SHA1(60e545f829121b9a4f1100d9e85ac83797715e80) ) // 27c512
-	ROM_LOAD16_BYTE("6114_o5_green.u19",  0x00001, 0x10000, CRC(04f97b22) SHA1(8b2845dd115498f7b385e8948eca6a5893c223d1) ) // "
-ROM_END
-
-ROM_START( feagv3 )
+ROM_START( feagv4 ) // dumped from a V3
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("elite_1.6_e.u22", 0x00000, 0x10000, CRC(c8b89ccc) SHA1(d62e0a72f54b793ab8853468a81255b62f874658) )
 	ROM_LOAD16_BYTE("elite_1.6_o.u19", 0x00001, 0x10000, CRC(904c7061) SHA1(742110576cf673321440bc81a4dae4c949b49e38) )
+ROM_END
+
+ROM_START( feagv4a ) // dumped from a V2
+	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("6114_e5_yellow.u22", 0x00000, 0x10000, CRC(f9c7bada) SHA1(60e545f829121b9a4f1100d9e85ac83797715e80) ) // 27c512
+	ROM_LOAD16_BYTE("6114_o5_green.u19",  0x00001, 0x10000, CRC(04f97b22) SHA1(8b2845dd115498f7b385e8948eca6a5893c223d1) ) // "
 ROM_END
 
 ROM_START( feagv5 )
@@ -808,22 +799,22 @@ ROM_START( feagv5 )
 	ROM_LOAD16_BYTE("slave_o", 0x00001, 0x08000, CRC(35fe2fdf) SHA1(731da12ee290bad9bc03cffe281c8cc48e555dfb) )
 ROM_END
 
-ROM_START( feagv6 ) // PCB label 510.1136A01
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("e1_yellow.u22", 0x00000, 0x10000, CRC(2fa692a9) SHA1(357fd47e97f823462e372c7b4d0730c1fa35c364) )
-	ROM_LOAD16_BYTE("o1_red.u19",    0x00001, 0x10000, CRC(bceb99f0) SHA1(601869be5fb9724fe75f14d4dac58471eed6e0f4) )
-ROM_END
-
-ROM_START( feagv7 )
+ROM_START( feagv7 ) // dumped from a repro pcb
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("eag-v7b", 0x00000, 0x10000, CRC(f2f68b63) SHA1(621e5073e9c5083ac9a9b467f3ef8aa29beac5ac) )
 	ROM_LOAD16_BYTE("eag-v7a", 0x00001, 0x10000, CRC(506b688f) SHA1(0a091c35d0f01166b57f964b111cde51c5720d58) )
 ROM_END
 
-ROM_START( feagv7a )
+ROM_START( feagv7a ) // PCB label 510.1136A01, dumped from a V6
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("eag-v7b", 0x00000, 0x10000, CRC(44baefbf) SHA1(dbc24340d7e3013cc8f111ebb2a59169c5dcb8e8) )
-	ROM_LOAD16_BYTE("eag-v7a", 0x00001, 0x10000, CRC(951a7857) SHA1(dad21b049fd4f411a79d4faefb922c1277569c0e) )
+	ROM_LOAD16_BYTE("e1_yellow.u22", 0x00000, 0x10000, CRC(2fa692a9) SHA1(357fd47e97f823462e372c7b4d0730c1fa35c364) )
+	ROM_LOAD16_BYTE("o1_red.u19",    0x00001, 0x10000, CRC(bceb99f0) SHA1(601869be5fb9724fe75f14d4dac58471eed6e0f4) )
+ROM_END
+
+ROM_START( feagv7b )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("e1_yellow.u22", 0x00000, 0x10000, CRC(44baefbf) SHA1(dbc24340d7e3013cc8f111ebb2a59169c5dcb8e8) )
+	ROM_LOAD16_BYTE("o1_red.u19",    0x00001, 0x10000, CRC(951a7857) SHA1(dad21b049fd4f411a79d4faefb922c1277569c0e) )
 ROM_END
 
 ROM_START( feagv9 )
@@ -867,12 +858,12 @@ SYST( 1988, fex68km3a, fex68k,  0,      fex68km3, excel68k, excel68k_state, empt
 SYST( 1988, fex68km3b, fex68k,  0,      fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1989, fex68km4,  fex68k,  0,      fex68km4, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach IV 68020 Master 2325", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-SYST( 1989, feagv2,    0,       0,      eagv2,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, feagv3,    feagv2,  0,      eagv3,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, feagv5,    feagv2,  0,      eagv5,    eag,      eagv5_state,    init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, feagv6,    feagv2,  0,      eagv6,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6117)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, feagv7,    feagv2,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, feagv7a,   feagv2,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, feagv9,    feagv2,  0,      eagv9,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, feagv10,   feagv2,  0,      eagv10,   eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-SYST( 2002, feagv11,   feagv2,  0,      eagv11,   eag,      eag_state,      empty_init, "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+SYST( 1989, feagv4,    0,       0,      eagv4,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-4, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, feagv4a,   feagv4,  0,      eagv4,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-4, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, feagv5,    feagv4,  0,      eagv5,    eag,      eagv5_state,    init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, feagv7,    feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, feagv7a,   feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, feagv7b,   feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, feagv9,    feagv4,  0,      eagv9,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, feagv10,   feagv4,  0,      eagv10,   eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+SYST( 2002, feagv11,   feagv4,  0,      eagv11,   eag,      eag_state,      empty_init, "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
