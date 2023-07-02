@@ -1499,7 +1499,7 @@ uint8_t ibm8514a_device::ibm8514_status_r(offs_t offset)
 		case 4:
 			return m_vga->ramdac_write_index_r(0);
 		case 5:
-			return m_vga->ramdac_data_r(9);
+			return m_vga->ramdac_data_r(0);
 	}
 	return 0;
 }
