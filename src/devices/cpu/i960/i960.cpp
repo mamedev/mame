@@ -13,7 +13,7 @@
 
 
 DEFINE_DEVICE_TYPE(I960, i960_cpu_device, "i960kb", "Intel i960KB")
-ALLOW_SAVE_TYPE(i960_cpu_device::ExtendedReal);
+ALLOW_SAVE_TYPE(i960_cpu_device::extended_real);
 
 i960_cpu_device::i960_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, I960, tag, owner, clock)
@@ -268,7 +268,7 @@ double i960_cpu_device::get_1_rif(uint32_t opcode)
 	else {
 		int idx = opcode & 0x1f;
 		if(idx < 4)
-			return m_fp[idx].m_floatValue;
+			return m_fp[idx].m_float_value;
 		if(idx == 0x16)
 			return 1.0;
 		// TODO: only respond with 0.0 with specific opcode, otherwise
@@ -294,7 +294,7 @@ double i960_cpu_device::get_2_rif(uint32_t opcode)
 	else {
 		int idx = (opcode>>14) & 0x1f;
 		if(idx < 4)
-			return m_fp[idx].m_floatValue;
+			return m_fp[idx].m_float_value;
 		if(idx == 0x16)
 			return 1.0;
 		// TODO: only respond with 0.0 with specific opcode, otherwise
@@ -318,7 +318,7 @@ void i960_cpu_device::set_rif(uint32_t opcode, double val)
 	if(!(opcode & 0x00002000))
 		m_r[(opcode>>19) & 0x1f] = f2u(val);
 	else if(!(opcode & 0x00e00000))
-		m_fp[(opcode>>19) & 3].m_floatValue = val;
+		m_fp[(opcode>>19) & 3].m_float_value = val;
 	else
 		fatalerror("I960: %x: set_rif on literal?\n", m_PIP);
 }
@@ -332,7 +332,7 @@ double i960_cpu_device::get_1_rifl(uint32_t opcode)
 	} else {
 		int idx = opcode & 0x1f;
 		if(idx < 4)
-			return m_fp[idx].m_floatValue;
+			return m_fp[idx].m_float_value;
 		if(idx == 0x16)
 			return 1.0;
 		// TODO: only respond with 0.0 with specific opcode, otherwise
@@ -360,7 +360,7 @@ double i960_cpu_device::get_2_rifl(uint32_t opcode)
 	} else {
 		int idx = (opcode>>14) & 0x1f;
 		if(idx < 4)
-			return m_fp[idx].m_floatValue;
+			return m_fp[idx].m_float_value;
 		if(idx == 0x16)
 			return 1.0;
 		// TODO: only respond with 0.0 with specific opcode, otherwise
@@ -386,7 +386,7 @@ void i960_cpu_device::set_rifl(uint32_t opcode, double val)
 		m_r[(opcode>>19) & 0x1e] = v;
 		m_r[((opcode>>19) & 0x1e)+1] = v>>32;
 	} else if(!(opcode & 0x00e00000))
-		m_fp[(opcode>>19) & 3].m_floatValue = val;
+		m_fp[(opcode>>19) & 3].m_float_value = val;
 	else
 		fatalerror("I960: %x: set_rifl on literal?\n", m_PIP);
 }
@@ -2423,7 +2423,6 @@ void i960_cpu_device::movre(uint32_t opcode)
 {
 	uint32_t *src=nullptr, *dst=nullptr;
 
-	/// @todo figure out why we are subtracting not adding
 	m_icount -= 8;
 
 	if(!(opcode & 0x00000800)) {

@@ -124,16 +124,16 @@ private:
 	// I960_RCACHE_SIZE or greater means out of cache, must save to memory.
 	int32_t m_rcache_pos;
 	// TODO: redefine RawExtendedReal to use an extFloat80_t once sin/cos/tan/log/etc support is reliabily implemented in softfloat3
-	using RawExtendedReal = double;
-	union ExtendedReal {
-		RawExtendedReal m_floatValue;
+	using raw_extended_real = double;
+	union extended_real {
+		raw_extended_real m_float_value;
 		uint32_t m_ordinals[3];
-		ExtendedReal& operator=(const int value) noexcept {
-			m_floatValue = value;
+		extended_real& operator=(const int value) noexcept {
+			m_float_value = value;
 			return *this;
 		}
 	};
-	ExtendedReal m_fp[4];
+	extended_real m_fp[4];
 
 	uint32_t m_SAT;
 	uint32_t m_PRCB;
