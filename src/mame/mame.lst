@@ -18670,11 +18670,11 @@ lightfgt                        // Milton Bradley
 lilcomp                         // Texas Instruments
 mbaskb2                         // Mattel
 mdallas                         // Mattel
+minspacep                       // Mego
 msoccer2                        // Mattel
 plus1                           // Milton Bradley
 qkracera                        // National Semiconductor
 solution                        // SCAT
-unkeinv                         // Gordon Barlow Design
 vidchal                         // Select Merchandise
 
 @source:handheld/hh_cops1.cpp
@@ -19082,10 +19082,10 @@ bmsoccer                        // Bambino
 ctntune                         // Castle Toy
 edracula                        // Epoch
 efball                          // Epoch
+einspace                        // Epoch
 galaxy2                         // Epoch
 galaxy2b                        // Epoch
 grobot9                         // Gakken
-invspace                        // Epoch
 mcompgin                        // Mattel
 mvbfree                         // Mego
 splasfgt                        // Bambino
