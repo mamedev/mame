@@ -14,11 +14,18 @@ Main PCB has both 'Namco TY294-V-0 1331960101' and 'Tamura DNP0674A'
 - 6264BLP10L
 - 20.000 MHz XTAL
 - lots of connectors
+
+Namco H-5 CPU PCB (8830970101 - 8830960101)
+- TMPZ84C015
+- D24OP8I XTAL
+- Epson SED1531F0A
+- 2x TC55257DFL-70L
 */
 
 #include "emu.h"
 
 #include "cpu/z80/kl5c80a12.h"
+#include "cpu/z80/tmpz84c015.h"
 #include "machine/eepromser.h"
 #include "machine/i8255.h"
 #include "sound/okim9810.h"
@@ -41,14 +48,20 @@ public:
 private:
 	required_device<kl5c80a12_device> m_maincpu;
 
-	void program_map(address_map &map) ATTR_COLD;
+	void main_program_map(address_map &map) ATTR_COLD;
+	void dot_program_map(address_map &map) ATTR_COLD;
 };
 
 
-void qncrash_state::program_map(address_map &map)
+void qncrash_state::main_program_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).rom().region("maincpu", 0x0000);
 	map(0xff800, 0xffdff).ram(); // 0xffe00 - 0xfffff is internal RAM
+}
+
+void qncrash_state::dot_program_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("dotcpu", 0x0000);
 }
 
 
@@ -69,7 +82,7 @@ void qncrash_state::qncrash(machine_config &config)
 {
 	// basic machine hardware
 	KL5C80A12(config, m_maincpu, 20_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &qncrash_state::program_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &qncrash_state::main_program_map);
 	m_maincpu->in_p0_callback().set_log("p0 in");
 	m_maincpu->out_p0_callback().set_log("p0 out");
 	m_maincpu->in_p1_callback().set_log("p1 in");
@@ -78,6 +91,9 @@ void qncrash_state::qncrash(machine_config &config)
 	m_maincpu->out_p2_callback().set_log("p2 out");
 	m_maincpu->in_p3_callback().set_log("p3 in");
 	m_maincpu->out_p3_callback().set_log("p3 out");
+
+	tmpz84c015_device &dotcpu(TMPZ84C015(config, "dotcpu", 16'000'000 / 2)); // unknown D24OP8I XTAL, everything not verified
+	dotcpu.set_addrmap(AS_PROGRAM, &qncrash_state::dot_program_map);
 
 	I8255(config, "ppi"); // NEC D71055C
 
@@ -100,12 +116,20 @@ ROM_START( qncrash )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qc1-mpr0c.ic3", 0x00000, 0x10000, CRC(8e3f605d) SHA1(69a0da6286e250b92e47b66c9423bc5c793b350b) )
 
+	ROM_REGION( 0x20000, "dotcpu", 0 )
+	ROM_LOAD( "qc1-dot0.ic7", 0x00000, 0x20000, CRC(45dda645) SHA1(27efcef0e3a09390eec0d7859465a13caf52f9df) )
+
 	ROM_REGION( 0x800000, "oki", 0 )
 	ROM_LOAD( "qc1-sound00.ic12", 0x000000, 0x400000, CRC(d72713d2) SHA1(556a0be2bb08fc9b4a2476b0ce8a23aa66858809) )
 	ROM_LOAD( "qc1-sound01.ic13", 0x400000, 0x400000, CRC(70e472a1) SHA1(df06270cede1d00e2ec231276e5e5466ab549794) ) // 1xxxxxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION(0x200, "eeprom", 0)
+	ROM_REGION( 0x200, "eeprom", 0 )
 	ROM_LOAD( "93c66n.ic5", 0x000, 0x200, CRC(1ba66a58) SHA1(adb7f1685cf81585ed30613adc39e9091e63af84) )
+
+	ROM_REGION( 0x600, "dot_plds", ROMREGION_ERASE00 ) // all 18CV8P
+	ROM_LOAD( "j4153.ic2", 0x000, 0x155, NO_DUMP )
+	ROM_LOAD( "j4154.ic3", 0x200, 0x155, NO_DUMP )
+	ROM_LOAD( "j4155.ic5", 0x400, 0x155, NO_DUMP )
 ROM_END
 
 } // anonymous namespace
