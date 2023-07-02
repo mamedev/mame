@@ -6,9 +6,8 @@
 #pragma once
 
 #include "isa.h"
-#include "s3virge.h"
-
 #include "video/pc_vga_s3.h"
+#include "video/s3virge.h"
 
 
 //**************************************************************************

@@ -51,6 +51,7 @@ DEFINE_DEVICE_TYPE(NVIDIA_NV3_VGA,  nvidia_nv3_vga_device,  "nvidia_nv3_vga",  "
 nvidia_nv3_vga_device::nvidia_nv3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, NVIDIA_NV3_VGA, tag, owner, clock)
 {
+	m_main_if_space_config = address_space_config("io_regs", ENDIANNESS_LITTLE, 8, 4, 0, address_map_constructor(FUNC(nvidia_nv3_vga_device::io_3bx_3dx_map), this));
 	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(nvidia_nv3_vga_device::crtc_map), this));
 }
 

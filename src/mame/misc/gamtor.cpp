@@ -61,6 +61,7 @@ DEFINE_DEVICE_TYPE(GAMTOR_VGA, gamtor_vga_device, "gamtor_vga", "CT-65550 SVGA")
 gamtor_vga_device::gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, GAMTOR_VGA, tag, owner, clock)
 {
+	m_main_if_space_config = address_space_config("io_regs", ENDIANNESS_LITTLE, 8, 4, 0, address_map_constructor(FUNC(gamtor_vga_device::io_3bx_3dx_map), this));
 }
 
 // A0/A1 are inverted (protection or ct55550 feature?)

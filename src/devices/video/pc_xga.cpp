@@ -761,6 +761,7 @@ oak_oti111_vga_device::oak_oti111_vga_device(const machine_config &mconfig, cons
 	: svga_device(mconfig, OTI111, tag, owner, clock)
 	, m_xga(*this, "xga")
 {
+	m_main_if_space_config = address_space_config("io_regs", ENDIANNESS_LITTLE, 8, 4, 0, address_map_constructor(FUNC(oak_oti111_vga_device::io_3bx_3dx_map), this));
 }
 
 void oak_oti111_vga_device::device_add_mconfig(machine_config &config)

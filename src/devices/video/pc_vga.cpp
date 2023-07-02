@@ -116,9 +116,8 @@ vga_device::vga_device(const machine_config &mconfig, device_type type, const ch
 	, device_memory_interface(mconfig, *this)
 	, vga(*this)
 	, m_input_sense(*this, "VGA_SENSE")
-	, m_ioas_3bx_view(*this, "ioas_3bx_view")
-	, m_ioas_3dx_view(*this, "ioas_3dx_view")
 {
+	m_main_if_space_config = address_space_config("io_regs", ENDIANNESS_LITTLE, 8, 4, 0, address_map_constructor(FUNC(vga_device::io_3bx_3dx_map), this));
 	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vga_device::crtc_map), this));
 	m_gc_space_config = address_space_config("gc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vga_device::gc_map), this));
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vga_device::sequencer_map), this));
@@ -147,6 +146,7 @@ void vga_device::zero()
 device_memory_interface::space_config_vector vga_device::memory_space_config() const
 {
 	return space_config_vector {
+		std::make_pair(MAIN_IF_REG, &m_main_if_space_config),
 		std::make_pair(CRTC_REG, &m_crtc_space_config),
 		std::make_pair(GC_REG, &m_gc_space_config),
 		std::make_pair(SEQ_REG, &m_seq_space_config),
@@ -266,8 +266,7 @@ void vga_device::device_reset()
 	/* clear out the VGA structure */
 	memset(vga.pens, 0, sizeof(vga.pens));
 	vga.miscellaneous_output = 0;
-	m_ioas_3bx_view.select(0);
-	m_ioas_3dx_view.select(0);
+	m_ioas = false;
 	vga.feature_control = 0;
 	vga.sequencer.index = 0;
 	memset(vga.sequencer.data, 0, sizeof(vga.sequencer.data));
@@ -298,18 +297,46 @@ void vga_device::device_reset()
  *
  *************************************/
 
-// NOTE: clients should never override this but rather the individual overrides below
-// additionally they must call space.unmap() rather than fixed values in order to preserve MDA compatibility
+// A bare minimum VGA installs 3 main I/O areas, a fixed one at $3c0 and a moveable one at $3b0-$3bb
+// (for MDA compatibility) and $3d0-$3df. $3bc-$3bf is canonically assigned to LPT3 in an IBM machine.
 void vga_device::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x0f).view(m_ioas_3bx_view);
-	m_ioas_3bx_view[0](0x00, 0x0f).m(FUNC(vga_device::io_3bx_3dx_map));
-//	m_ioas_3bx_view[1](0x00, 0x0f).unmaprw();
+//	map(0x00, 0x0b).view(m_ioas_3bx_view);
+//	m_ioas_3bx_view[0](0x00, 0x0b).m(FUNC(vga_device::io_3bx_3dx_map));
+//	m_ioas_3bx_view[1](0x00, 0x0b).unmaprw();
+	map(0x00, 0x0b).lrw8(
+		NAME([this] (offs_t offset) {
+			if (m_ioas == false)
+				return space(MAIN_IF_REG).read_byte(offset);
+			return (u8)space().unmap();
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			if (m_ioas == false)
+			{
+				space(MAIN_IF_REG).write_byte(offset, data);
+			}
+		})
+	);
+
 	map(0x10, 0x1f).m(FUNC(vga_device::io_3cx_map));
-	map(0x20, 0x2f).view(m_ioas_3dx_view);
+
+//	map(0x20, 0x2f).view(m_ioas_3dx_view);
 //	m_ioas_3dx_view[0](0x20, 0x2f).unmaprw();
-	m_ioas_3dx_view[1](0x20, 0x2f).m(FUNC(vga_device::io_3bx_3dx_map));
+//	m_ioas_3dx_view[1](0x20, 0x2f).m(FUNC(vga_device::io_3bx_3dx_map));
+	map(0x20, 0x2f).lrw8(
+		NAME([this] (offs_t offset) {
+			if (m_ioas == true)
+				return space(MAIN_IF_REG).read_byte(offset);
+			return (u8)space().unmap();
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			if (m_ioas == true)
+			{
+				space(MAIN_IF_REG).write_byte(offset, data);
+			}
+		})
+	);
 }
 
 void vga_device::io_3bx_3dx_map(address_map &map)
@@ -476,8 +503,7 @@ void vga_device::miscellaneous_output_w(offs_t offset, u8 data)
 {
 	vga.miscellaneous_output = data;
 	recompute_params();
-	m_ioas_3bx_view.select(data & 1);
-	m_ioas_3dx_view.select(data & 1);
+	m_ioas = bool(BIT(data, 0));
 }
 
 u8 vga_device::sequencer_address_r(offs_t offset)

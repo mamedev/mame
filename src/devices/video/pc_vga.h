@@ -278,20 +278,21 @@ protected:
 	emu_timer *m_vblank_timer;
 
 	enum {
-		CRTC_REG = 0,
+		MAIN_IF_REG = 0,
+		CRTC_REG,
 		GC_REG,
 		SEQ_REG,
 		ATC_REG
 	};
 
+	address_space_config m_main_if_space_config;
 	address_space_config m_crtc_space_config;
 	address_space_config m_gc_space_config;
 	address_space_config m_seq_space_config;
 	address_space_config m_atc_space_config;
 
 private:
-	memory_view m_ioas_3bx_view;
-	memory_view m_ioas_3dx_view;
+	bool m_ioas = false;
 };
 
 
