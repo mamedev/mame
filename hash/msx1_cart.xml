@@ -20549,7 +20549,7 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
-	<software name="pwnd310">
+	<software name="pwnd310" cloneof="pwnd3">
 		<description>PWND part 3 - Full Metal Snake (v1.0)</description>
 		<year>2019</year>
 		<publisher>&lt;homebrew&gt;</publisher>
