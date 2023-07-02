@@ -40,9 +40,8 @@ enum
 #define DEVICE1_PDIAG_TIME                  (attotime::from_msec(2))
 #define DIAGNOSTIC_TIME                     (attotime::from_msec(2))
 
-ata_hle_device::ata_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+ata_hle_device_base::ata_hle_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_ata_interface(mconfig, *this),
 	m_buffer_offset(0),
 	m_buffer_size(0),
 	m_error(0),
@@ -70,7 +69,7 @@ ata_hle_device::ata_hle_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-void ata_hle_device::device_start()
+void ata_hle_device_base::device_start()
 {
 	MINIMUM_COMMAND_TIME = attotime::from_usec(10);
 
@@ -105,11 +104,11 @@ void ata_hle_device::device_start()
 
 	save_item(NAME(m_identify_buffer));
 
-	m_busy_timer = timer_alloc(FUNC(ata_hle_device::busy_tick), this);
-	m_buffer_empty_timer = timer_alloc(FUNC(ata_hle_device::empty_tick), this);
+	m_busy_timer = timer_alloc(FUNC(ata_hle_device_base::busy_tick), this);
+	m_buffer_empty_timer = timer_alloc(FUNC(ata_hle_device_base::empty_tick), this);
 }
 
-void ata_hle_device::device_reset()
+void ata_hle_device_base::device_reset()
 {
 	/* reset the drive state */
 	set_dasp(CLEAR_LINE);
@@ -132,7 +131,7 @@ void ata_hle_device::device_reset()
 	}
 }
 
-void ata_hle_device::soft_reset()
+void ata_hle_device_base::soft_reset()
 {
 	m_buffer_offset = 0;
 	m_buffer_size = 0;
@@ -146,19 +145,19 @@ void ata_hle_device::soft_reset()
 	start_busy(DIAGNOSTIC_TIME, PARAM_DIAGNOSTIC);
 }
 
-TIMER_CALLBACK_MEMBER(ata_hle_device::busy_tick)
+TIMER_CALLBACK_MEMBER(ata_hle_device_base::busy_tick)
 {
 	m_status &= ~IDE_STATUS_BSY;
 	finished_busy(param);
 }
 
-TIMER_CALLBACK_MEMBER(ata_hle_device::empty_tick)
+TIMER_CALLBACK_MEMBER(ata_hle_device_base::empty_tick)
 {
 	m_buffer_empty_timer->enable(false);
 	fill_buffer();
 }
 
-void ata_hle_device::finished_busy(int param)
+void ata_hle_device_base::finished_busy(int param)
 {
 	switch (param)
 	{
@@ -182,7 +181,7 @@ void ata_hle_device::finished_busy(int param)
 	}
 }
 
-void ata_hle_device::process_command()
+void ata_hle_device_base::process_command()
 {
 	switch (m_command)
 	{
@@ -208,7 +207,7 @@ void ata_hle_device::process_command()
 	}
 }
 
-void ata_hle_device::finished_command()
+void ata_hle_device_base::finished_command()
 {
 	switch (m_command)
 	{
@@ -240,7 +239,7 @@ void ata_hle_device::finished_command()
 	}
 }
 
-bool ata_hle_device::set_dma_mode(int word)
+bool ata_hle_device_base::set_dma_mode(int word)
 {
 	if ((m_identify_buffer[word] >> (m_sector_count & 7)) & 1)
 	{
@@ -255,7 +254,7 @@ bool ata_hle_device::set_dma_mode(int word)
 	return false;
 }
 
-bool ata_hle_device::set_features()
+bool ata_hle_device_base::set_features()
 {
 	switch (m_feature)
 	{
@@ -318,7 +317,7 @@ bool ata_hle_device::set_features()
 	return false;
 }
 
-int ata_hle_device::bit_to_mode(uint16_t word)
+int ata_hle_device_base::bit_to_mode(uint16_t word)
 {
 	switch (word>>8)
 	{
@@ -344,24 +343,24 @@ int ata_hle_device::bit_to_mode(uint16_t word)
 }
 
 // Return the currently selected single word dma mode, -1 if none selected
-int ata_hle_device::single_word_dma_mode()
+int ata_hle_device_base::single_word_dma_mode()
 {
 	return bit_to_mode(m_identify_buffer[62]);
 }
 
 // Return the currently selected multi word dma mode, -1 if none selected
-int ata_hle_device::multi_word_dma_mode()
+int ata_hle_device_base::multi_word_dma_mode()
 {
 	return bit_to_mode(m_identify_buffer[63]);
 }
 
 // Return the currently selected ultra dma mode, -1 if none selected
-int ata_hle_device::ultra_dma_mode()
+int ata_hle_device_base::ultra_dma_mode()
 {
 	return bit_to_mode(m_identify_buffer[88]);
 }
 
-uint16_t ata_hle_device::read_data()
+uint16_t ata_hle_device_base::read_data()
 {
 	/* fetch the correct amount of data */
 	uint16_t result = m_buffer[m_buffer_offset++];
@@ -378,7 +377,7 @@ uint16_t ata_hle_device::read_data()
 	return result;
 }
 
-void ata_hle_device::write_data(uint16_t data)
+void ata_hle_device_base::write_data(uint16_t data)
 {
 	/* store the correct amount of data */
 	m_buffer[m_buffer_offset++] = data;
@@ -393,67 +392,27 @@ void ata_hle_device::write_data(uint16_t data)
 	}
 }
 
-void ata_hle_device::update_irq()
+void ata_hle_device_base::update_irq()
 {
 	if (device_selected() && (m_device_control & IDE_DEVICE_CONTROL_NIEN) == 0)
-		device_ata_interface::set_irq(m_irq);
+		set_irq_out(m_irq);
 	else
-		device_ata_interface::set_irq(CLEAR_LINE);
+		set_irq_out(CLEAR_LINE);
 }
 
-void ata_hle_device::set_irq(int state)
-{
-	if (m_irq != state)
-	{
-		m_irq = state;
-
-		update_irq();
-	}
-}
-
-void ata_hle_device::set_dmarq(int state)
-{
-	if (m_dmarq != state)
-	{
-		m_dmarq = state;
-
-		device_ata_interface::set_dmarq(state);
-	}
-}
-
-void ata_hle_device::set_dasp(int state)
-{
-	if (m_daspout != state)
-	{
-		m_daspout = state;
-
-		device_ata_interface::set_dasp(state);
-	}
-}
-
-void ata_hle_device::set_pdiag(int state)
-{
-	if (m_pdiagout != state)
-	{
-		m_pdiagout = state;
-
-		device_ata_interface::set_pdiag(state);
-	}
-}
-
-void ata_hle_device::start_busy(const attotime &time, int param)
+void ata_hle_device_base::start_busy(const attotime &time, int param)
 {
 	m_status |= IDE_STATUS_BSY;
 	m_busy_timer->adjust(time, param);
 }
 
-void ata_hle_device::stop_busy()
+void ata_hle_device_base::stop_busy()
 {
 	m_status &= ~IDE_STATUS_BSY;
 	m_busy_timer->adjust(attotime::never);
 }
 
-void ata_hle_device::read_buffer_empty()
+void ata_hle_device_base::read_buffer_empty()
 {
 	m_buffer_offset = 0;
 
@@ -471,7 +430,7 @@ void ata_hle_device::read_buffer_empty()
 		fill_buffer();
 }
 
-void ata_hle_device::write_buffer_full()
+void ata_hle_device_base::write_buffer_full()
 {
 	m_buffer_offset = 0;
 
@@ -484,7 +443,7 @@ void ata_hle_device::write_buffer_full()
 	process_buffer();
 }
 
-void ata_hle_device::start_diagnostic()
+void ata_hle_device_base::start_diagnostic()
 {
 	m_error = IDE_ERROR_DIAGNOSTIC_FAILED;
 
@@ -499,7 +458,7 @@ void ata_hle_device::start_diagnostic()
 		finished_diagnostic();
 }
 
-void ata_hle_device::finished_diagnostic()
+void ata_hle_device_base::finished_diagnostic()
 {
 	m_resetting = false;
 
@@ -507,17 +466,7 @@ void ata_hle_device::finished_diagnostic()
 }
 
 
-void ata_hle_device::write_csel(int state)
-{
-	m_csel = state;
-}
-
-void ata_hle_device::write_dasp(int state)
-{
-	m_daspin = state;
-}
-
-void ata_hle_device::write_dmack(int state)
+void ata_hle_device_base::set_dmack_in(int state)
 {
 	if (state && !m_dmack && single_word_dma_mode() >= 0)
 		set_dmarq(CLEAR_LINE);
@@ -525,7 +474,7 @@ void ata_hle_device::write_dmack(int state)
 	m_dmack = state;
 }
 
-void ata_hle_device::write_pdiag(int state)
+void ata_hle_device_base::set_pdiag_in(int state)
 {
 	m_pdiagin = state;
 
@@ -536,7 +485,7 @@ void ata_hle_device::write_pdiag(int state)
 	}
 }
 
-uint16_t ata_hle_device::read_dma()
+uint16_t ata_hle_device_base::dma_r()
 {
 	uint16_t result = 0xffff;
 
@@ -578,7 +527,7 @@ uint16_t ata_hle_device::read_dma()
 	return result;
 }
 
-uint16_t ata_hle_device::read_cs0(offs_t offset, uint16_t mem_mask)
+uint16_t ata_hle_device_base::command_r(offs_t offset)
 {
 	uint16_t result = 0xffff;
 
@@ -586,7 +535,7 @@ uint16_t ata_hle_device::read_cs0(offs_t offset, uint16_t mem_mask)
 	{
 		if (m_dmack)
 		{
-			logerror( "%s: %s dev %d read_cs0 %04x %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset, mem_mask );
+			logerror( "%s: %s dev %d read_cs0 %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset );
 		}
 		else if ((m_status & IDE_STATUS_BSY) && offset != IDE_CS0_STATUS_R)
 		{
@@ -597,7 +546,7 @@ uint16_t ata_hle_device::read_cs0(offs_t offset, uint16_t mem_mask)
 				switch (offset)
 				{
 					case IDE_CS0_DATA_RW:
-						logerror( "%s: %s dev %d read_cs0 %04x %04x ignored (BSY)\n", machine().describe_context(), tag(), dev(), offset, mem_mask );
+						logerror( "%s: %s dev %d read_cs0 %04x ignored (BSY)\n", machine().describe_context(), tag(), dev(), offset );
 						break;
 
 					default:
@@ -682,7 +631,7 @@ uint16_t ata_hle_device::read_cs0(offs_t offset, uint16_t mem_mask)
 
 				/* log anything else */
 				default:
-					logerror("%s:unknown IDE cs0 read at %03X, mem_mask=%X\n", machine().describe_context(), offset, mem_mask);
+					logerror("%s:unknown IDE cs0 read at %03X\n", machine().describe_context(), offset);
 					break;
 			}
 		}
@@ -690,18 +639,18 @@ uint16_t ata_hle_device::read_cs0(offs_t offset, uint16_t mem_mask)
 
 	/* logit */
 //  if (offset != IDE_CS0_DATA_RW && offset != IDE_CS0_STATUS_R)
-		LOG(("%s:IDE cs0 read %X at %X (err: %X), mem_mask=%X\n", machine().describe_context(), result, offset, m_error, mem_mask));
+		LOG(("%s:IDE cs0 read %X at %X (err: %X)\n", machine().describe_context(), result, offset, m_error));
 
 	/* return the result */
 	return result;
 }
 
 
-uint16_t ata_hle_device::read_cs1(offs_t offset, uint16_t mem_mask)
+uint16_t ata_hle_device_base::control_r(offs_t offset)
 {
 	/* logit */
 //  if (offset != IDE_CS1_ALTERNATE_STATUS_R)
-		LOG(("%s:IDE cs1 read at %X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask));
+		LOG(("%s:IDE cs1 read at %X\n", machine().describe_context(), offset));
 
 	uint16_t result = 0xffff;
 
@@ -709,7 +658,7 @@ uint16_t ata_hle_device::read_cs1(offs_t offset, uint16_t mem_mask)
 	{
 		if (m_dmack)
 		{
-			logerror( "%s: %s dev %d read_cs1 %04x %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset, mem_mask );
+			logerror( "%s: %s dev %d read_cs1 %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset );
 		}
 		else
 		{
@@ -753,7 +702,7 @@ uint16_t ata_hle_device::read_cs1(offs_t offset, uint16_t mem_mask)
 
 				/* log anything else */
 				default:
-					logerror("%s:unknown IDE cs1 read at %03X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask);
+					logerror("%s:unknown IDE cs1 read at %03X\n", machine().describe_context(), offset);
 					break;
 			}
 		}
@@ -763,7 +712,7 @@ uint16_t ata_hle_device::read_cs1(offs_t offset, uint16_t mem_mask)
 	return result;
 }
 
-void ata_hle_device::write_dma( uint16_t data )
+void ata_hle_device_base::dma_w(uint16_t data)
 {
 	if (device_selected())
 	{
@@ -801,23 +750,23 @@ void ata_hle_device::write_dma( uint16_t data )
 	}
 }
 
-void ata_hle_device::write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask)
+void ata_hle_device_base::command_w(offs_t offset, uint16_t data)
 {
 	/* logit */
 	if (offset != IDE_CS0_DATA_RW)
-		LOG(("%s:IDE cs0 write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));
+		LOG(("%s:IDE cs0 write to %X = %04X\n", machine().describe_context(), offset, data));
 
 	if (m_dmack)
 	{
-		logerror( "%s: %s dev %d write_cs0 %04x %04x %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset, data, mem_mask );
+		logerror( "%s: %s dev %d write_cs0 %04x %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset, data );
 	}
 	else if ((m_status & IDE_STATUS_BSY) && offset != IDE_CS0_COMMAND_W)
 	{
-		logerror( "%s: %s dev %d write_cs0 %04x %04x %04x ignored (BSY) command %02x\n", machine().describe_context(), tag(), dev(), offset, data, mem_mask, m_command );
+		logerror( "%s: %s dev %d write_cs0 %04x %04x ignored (BSY) command %02x\n", machine().describe_context(), tag(), dev(), offset, data, m_command );
 	}
 	else if ((m_status & IDE_STATUS_DRQ) && offset != IDE_CS0_DATA_RW && offset != IDE_CS0_COMMAND_W)
 	{
-		logerror( "%s: %s dev %d write_cs0 %04x %04x %04x ignored (DRQ) command %02x\n", machine().describe_context(), tag(), dev(), offset, data, mem_mask, m_command );
+		logerror( "%s: %s dev %d write_cs0 %04x %04x ignored (DRQ) command %02x\n", machine().describe_context(), tag(), dev(), offset, data, m_command );
 	}
 	else
 	{
@@ -831,7 +780,7 @@ void ata_hle_device::write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask)
 				{
 					if (!(m_status & IDE_STATUS_DRQ))
 					{
-						logerror( "%s: %s dev %d write_cs0 %04x %04x %04x ignored (!DRQ)\n", machine().describe_context(), tag(), dev(), offset, data, mem_mask );
+						logerror( "%s: %s dev %d write_cs0 %04x %04x ignored (!DRQ)\n", machine().describe_context(), tag(), dev(), offset, data );
 					}
 					else
 					{
@@ -878,11 +827,11 @@ void ata_hle_device::write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask)
 				// Packet devices can accept DEVICE RESET when BSY or DRQ is set.
 				if (m_status & IDE_STATUS_BSY)
 				{
-					logerror( "%s: %s dev %d write_cs0 %04x %04x %04x ignored (BSY) command %02x\n", machine().describe_context(), tag(), dev(), offset, data, mem_mask, m_command );
+					logerror( "%s: %s dev %d write_cs0 %04x %04x ignored (BSY) command %02x\n", machine().describe_context(), tag(), dev(), offset, data, m_command );
 				}
 				else if (m_status & IDE_STATUS_DRQ)
 				{
-					logerror( "%s: %s dev %d write_cs0 %04x %04x %04x ignored (DRQ) command %02x\n", machine().describe_context(), tag(), dev(), offset, data, mem_mask, m_command );
+					logerror( "%s: %s dev %d write_cs0 %04x %04x ignored (DRQ) command %02x\n", machine().describe_context(), tag(), dev(), offset, data, m_command );
 				}
 				else if (device_selected() || m_command == IDE_COMMAND_DIAGNOSTIC)
 				{
@@ -904,20 +853,20 @@ void ata_hle_device::write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask)
 				break;
 
 			default:
-				logerror("%s:unknown IDE cs0 write at %03X = %04x, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask);
+				logerror("%s:unknown IDE cs0 write at %03X = %04x\n", machine().describe_context(), offset, data);
 				break;
 		}
 	}
 }
 
-void ata_hle_device::write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask)
+void ata_hle_device_base::control_w(offs_t offset, uint16_t data)
 {
 	/* logit */
-	LOG(("%s:IDE cs1 write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));
+	LOG(("%s:IDE cs1 write to %X = %08X\n", machine().describe_context(), offset, data));
 
 	if (m_dmack)
 	{
-		logerror( "%s: %s dev %d write_cs1 %04x %04x %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset, data, mem_mask );
+		logerror( "%s: %s dev %d write_cs1 %04x %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset, data);
 	}
 	else
 	{
@@ -939,7 +888,7 @@ void ata_hle_device::write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask)
 					{
 						if (m_resetting)
 						{
-							logerror( "%s: %s dev %d write_cs1 %04x %04x %04x ignored (RESET)\n", machine().describe_context(), tag(), dev(), offset, data, mem_mask );
+							logerror( "%s: %s dev %d write_cs1 %04x %04x ignored (RESET)\n", machine().describe_context(), tag(), dev(), offset, data );
 						}
 						else
 						{
@@ -959,7 +908,7 @@ void ata_hle_device::write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask)
 				break;
 
 			default:
-				logerror("%s:unknown IDE cs1 write at %03X = %04x, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask);
+				logerror("%s:unknown IDE cs1 write at %03X = %04x\n", machine().describe_context(), offset, data);
 				break;
 		}
 	}

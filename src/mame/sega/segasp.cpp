@@ -59,6 +59,7 @@ Dinosaur King 2 Ver 2.501 China             ???-?????       MDA-C0081 CF   EXP  
 Dinosaur King Ver 4.000                     ???-?????       MDA-C0061 CF   JP     253-5508-0408   AAFE-xxxxxxxxxxx
 Disney: Magical Dream Dance on Stage        ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Future Police Patrol Chase                  ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
+Galileo Factory (main)                      834-14773    F*           ROM  JP     ???-????-????   AAFE-01F9856xxxx
 Heat Up Hockey Image                        834000201  TSB0-SEGA00001 CF   JP     ???-????-????   AAFE-xxxxxxxxxxx
 Issyouni Turbo Drive                        ???-?????                 no          ???-????-????   AAFE-01E91305101
 Isshoni Wanwan Waiwai Puppy 2008            834-14747                 ROM         253-5508-0496J  AAFE-01E34655005
@@ -101,10 +102,46 @@ G  171-8278G  315-6416  2x 512Mbit  RMI
 */
 
 #include "emu.h"
-#include "cpu/sh/sh4.h"
-#include "debugger.h"
-#include "segasp.h"
+
+#include "naomi.h"
 #include "naomim4.h"
+
+#include "cpu/sh/sh4.h"
+
+#include "debugger.h"
+
+
+namespace {
+
+class segasp_state : public naomi_state
+{
+public:
+	segasp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		naomi_state(mconfig, type, tag),
+		m_sp_eeprom(*this, "sp_eeprom")
+	{
+	}
+
+	void segasp(machine_config &config);
+
+	void init_segasp();
+
+private:
+	required_device<eeprom_serial_93cxx_device> m_sp_eeprom;
+
+	uint64_t sp_eeprom_r(offs_t offset, uint64_t mem_mask = ~0);
+	void sp_eeprom_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t sp_rombdflg_r();
+	uint64_t sp_io_r(offs_t offset, uint64_t mem_mask = ~0);
+	uint64_t sn_93c46a_r();
+	void sn_93c46a_w(uint64_t data);
+	uint64_t sp_bank_r(offs_t offset, uint64_t mem_mask = ~0);
+	void sp_bank_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint16_t m_sp_bank = 0;
+
+	void onchip_port(address_map &map);
+	void segasp_map(address_map &map);
+};
 
 uint64_t segasp_state::sp_bank_r(offs_t offset, uint64_t mem_mask)
 {
@@ -496,6 +533,22 @@ ROM_START( dinoking )
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0408-com.ic15", 0, 0x800, CRC(f77c49dc) SHA1(e10173bbbd5930ed159cec9a7dba308e2a3f3c43) )
+ROM_END
+
+ROM_START( galilfac )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASEFF )
+	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(37fda864) SHA1(e4cdb7b35a97285d609d445e7411200fd1cd1df4) )
+	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(c16707a7) SHA1(0dd9dc670a932b1a008f477f8cd7b68bce451a96) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-unk-jpn.ic15", 0, 0x800, BAD_DUMP CRC(f2233b04) SHA1(c44e717db0185634be79a59c005c0b96f6511962) ) // bruteforced, dumped PCB had no PIC key
 ROM_END
 
 ROM_START( isshoni )
@@ -917,6 +970,8 @@ ROM_START( tetgiano )
 	ROM_LOAD( "317-0604-com.ic15", 0, 0x800, CRC(a46dfd47) SHA1(9e24739ecaaf85ef3b862485064450db6c607189) )
 ROM_END
 
+} // anonymous namespace
+
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND)
 
@@ -927,6 +982,7 @@ GAME( 2009, bingogal,segasp,     segasp,    segasp, segasp_state, init_segasp, R
 GAME( 2009, bingogals,segasp,    segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (satellite)", GAME_FLAGS ) // 28.05.2009
 GAME( 2009, brickppl,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Brick People / Block PeePoo (Ver 1.002)", GAME_FLAGS )
 GAME( 2005, dinoking,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King (USA)", GAME_FLAGS )
+GAME( 2008, galilfac,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Galileo Factory (main)", GAME_FLAGS )
 GAME( 2008, isshoni,segasp,      segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Isshoni Wanwan Waiwai Puppy 2008", GAME_FLAGS ) // いっしょにワンワンわいわいパピー 2008
 GAME( 2009, kingyo,segasp,       segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Yataimura Kingyosukui (1-player, Japan, Ver 1.005)", GAME_FLAGS ) // キッズ屋台村 金魚すくい
 GAME( 2006, lovebery,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 2.000)", GAME_FLAGS )

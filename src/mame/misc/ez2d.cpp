@@ -196,7 +196,7 @@ void ez2d_state::ez2d(machine_config &config)
 {
 	ez2d_state::cubx(config);
 
-	// TODO: Riva TNT2
+	RIVATNT2_M64(config.replace(), "pci:01.0:00.0", 0);
 	// TODO: Sound Blaster Live CT4830
 }
 
@@ -218,11 +218,6 @@ ROM_START( ez2d2m )
 	ROMX_LOAD("1006cu.awd", 0x00000, 0x40000, CRC(086c320a) SHA1(4b4c07e594602c467e678187f80e3a5c1445bd30), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "award", "Award (unknown rev)" )
 	ROMX_LOAD("ez2dancer2ndmove_motherboard_v29c51002t_award_bios", 0x00000, 0x40000, BAD_DUMP CRC(02a5e84b) SHA1(94b341d268ce9d42597c68bc98c3b8b62e137205), ROM_BIOS(1) ) // 29f020
-
-	ROM_REGION( 0x10000, "vbios", 0 )
-	// nVidia TNT2 Model 64 video BIOS (not from provided dump)
-	// TODO: move to PCI device once we have one
-	ROM_LOAD( "62090211.rom", 0x000000, 0x00b000, CRC(5669135b) SHA1(b704ce0d20b71e40563d12bcc45bd1240227be74) )
 
 	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "ez2d2m", 0, SHA1(431f0bef3b81f83dad3818bca8994faa8ce9d5b7) )

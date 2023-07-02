@@ -307,6 +307,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/geforce.h,VIDEOS["GEFORCE"] = true
+--------------------------------------------------
+
+if (VIDEOS["GEFORCE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/geforce.cpp",
+		MAME_DIR .. "src/devices/video/geforce.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/gf4500.h,VIDEOS["GF4500"] = true
 --------------------------------------------------
 

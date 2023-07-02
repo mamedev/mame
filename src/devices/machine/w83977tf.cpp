@@ -59,6 +59,8 @@ void w83977tf_device::device_reset()
 	m_index = 0;
 	m_hefras = 0;
 	m_lock_sequence = 2;
+	m_keyb_address[0] = 0x60;
+	m_keyb_address[1] = 0x64;
 }
 
 device_memory_interface::space_config_vector w83977tf_device::memory_space_config() const
@@ -77,7 +79,7 @@ void w83977tf_device::device_add_mconfig(machine_config &config)
 
 	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);
-//	m_kbdc->set_interrupt_type(kbdc8042_device::KBDC8042_DOUBLE);
+	m_kbdc->set_interrupt_type(kbdc8042_device::KBDC8042_DOUBLE);
 	m_kbdc->system_reset_callback().set(FUNC(w83977tf_device::kbdp20_gp20_reset_w));
 	m_kbdc->gate_a20_callback().set(FUNC(w83977tf_device::kbdp21_gp25_gatea20_w));
 	m_kbdc->input_buffer_full_callback().set(FUNC(w83977tf_device::irq_keyboard_w));
@@ -94,8 +96,8 @@ void w83977tf_device::remap(int space_id, offs_t start, offs_t end)
 
 		if (m_activate[5] & 1)
 		{
-			m_isa->install_device(0x60, 0x60, read8sm_delegate(*m_kbdc, FUNC(kbdc8042_device::data_r)), write8sm_delegate(*m_kbdc, FUNC(kbdc8042_device::data_w)));
-			m_isa->install_device(0x64, 0x64, read8sm_delegate(*this, FUNC(w83977tf_device::keybc_status_r)), write8sm_delegate(*this, FUNC(w83977tf_device::keybc_command_w)));
+			m_isa->install_device(m_keyb_address[0], m_keyb_address[0], read8sm_delegate(*m_kbdc, FUNC(kbdc8042_device::data_r)), write8sm_delegate(*m_kbdc, FUNC(kbdc8042_device::data_w)));
+			m_isa->install_device(m_keyb_address[1], m_keyb_address[1], read8sm_delegate(*this, FUNC(w83977tf_device::keybc_status_r)), write8sm_delegate(*this, FUNC(w83977tf_device::keybc_command_w)));
 		}
 
 		if (m_activate[8] & 1)
@@ -182,8 +184,17 @@ void w83977tf_device::config_map(address_map &map)
 	m_logical_view[4](0x30, 0xff).unmaprw();
 	// KBC
 	m_logical_view[5](0x30, 0x30).rw(FUNC(w83977tf_device::activate_r<5>), FUNC(w83977tf_device::activate_w<5>));
+	m_logical_view[5](0x60, 0x63).rw(FUNC(w83977tf_device::keyb_io_address_r), FUNC(w83977tf_device::keyb_io_address_w));
 	m_logical_view[5](0x70, 0x70).rw(FUNC(w83977tf_device::keyb_irq_r), FUNC(w83977tf_device::keyb_irq_w));
 	m_logical_view[5](0x72, 0x72).rw(FUNC(w83977tf_device::mouse_irq_r), FUNC(w83977tf_device::mouse_irq_w));
+	m_logical_view[5](0xf0, 0xf0).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			// xx-- ---- KBC clock rate (00 = 6 MHz, 01 = 8 MHz, 10 = 12 MHz, 11 16 MHz)
+			// ---- -x-- Enable port $92
+			// ---- --xx Enables HW A20/reset from port $92
+			LOG("keyboard_hwcontrol_w: %02x\n", data);
+		})
+	);
 	// <reserved>
 	m_logical_view[6](0x30, 0xff).unmaprw();
 	// GPIO1
@@ -345,6 +356,30 @@ u8 w83977tf_device::keybc_status_r(offs_t offset)
 void w83977tf_device::keybc_command_w(offs_t offset, u8 data)
 {
 	m_kbdc->data_w(4, data);
+}
+
+// $60-$61 selects data port, $62-$63 command port
+u8 w83977tf_device::keyb_io_address_r(offs_t offset)
+{
+	return m_keyb_address[(offset & 2) >> 1] >> ((offset & 1) ? 0 : 8) & 0xff;
+}
+
+void w83977tf_device::keyb_io_address_w(offs_t offset, u8 data)
+{
+	const u8 which = (offset & 2) >> 1;
+	if (offset & 1)
+	{
+		m_keyb_address[which] &= 0xff00;
+		m_keyb_address[which] |= data;
+		LOG("keyb_io_address_w[1] %04x (%04x & 0x00ff)\n", which, m_keyb_address[which], data);
+	}
+	else
+	{
+		m_keyb_address[which] &= 0xff;
+		m_keyb_address[which] |= data << 8;
+		LOG("keyb_io_address_w[0] %04x (%04x & 0xff00)\n", which, m_keyb_address[which], data << 8);
+	}
+	remap(AS_IO, 0, 0x400);
 }
 
 /*

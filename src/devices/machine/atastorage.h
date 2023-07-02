@@ -4,20 +4,23 @@
 
     idehd.h
 
-    IDE Harddisk
+    IDE hard disk
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_ATA_IDEHD_H
-#define MAME_BUS_ATA_IDEHD_H
+#ifndef MAME_MACHINE_ATASTORAGE_H
+#define MAME_MACHINE_ATASTORAGE_H
 
 #pragma once
 
 #include "atahle.h"
-#include "harddisk.h"
+
 #include "imagedev/harddriv.h"
 
-class ata_mass_storage_device : public ata_hle_device
+#include "harddisk.h"
+
+
+class ata_mass_storage_device_base : public ata_hle_device_base
 {
 public:
 	uint16_t *identify_device_buffer() { return m_identify_buffer; }
@@ -35,8 +38,9 @@ public:
 	}
 
 	void set_dma_transfer_time(const attotime time) { m_dma_transfer_time = time; }
+
 protected:
-	ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ata_mass_storage_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 
@@ -84,56 +88,44 @@ private:
 	attotime          m_dma_transfer_time;
 };
 
-// ======================> ide_hdd_device
+// ======================> ide_hdd_device_base
 
-class ide_hdd_device : public ata_mass_storage_device
+class ide_hdd_device_base : public ata_mass_storage_device_base
 {
-public:
-	// construction/destruction
-	ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 protected:
-	ide_hdd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	// construction/destruction
+	ide_hdd_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual int read_sector(uint32_t lba, void *buffer) override { return !m_image->exists() ? 0 : m_image->read(lba, buffer); }
 	virtual int write_sector(uint32_t lba, const void *buffer) override { return !m_image->exists() ? 0 : m_image->write(lba, buffer); }
 	virtual uint8_t calculate_status() override;
 
-	enum
-	{
-		TID_NULL = TID_BUSY + 1
-	};
-
 	required_device<harddisk_image_device> m_image;
 
 private:
-	emu_timer *     m_last_status_timer;
+	emu_timer *m_last_status_timer;
 };
 
-// ======================> ide_cf_device
 
-class ide_cf_device : public ide_hdd_device
+// ======================> cf_device_base
+
+class cf_device_base : public ide_hdd_device_base
 {
-public:
-	// construction/destruction
-	ide_cf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 protected:
-	// optional information overrides
+	// construction/destruction
+	cf_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	void ide_build_identify_device() override;
+	virtual void ide_build_identify_device() override;
+	virtual attotime seek_time() override;
+	virtual uint8_t calculate_status() override { return ata_hle_device_base::calculate_status(); }
 };
 
-// device type definition
-DECLARE_DEVICE_TYPE(IDE_HARDDISK, ide_hdd_device)
-DECLARE_DEVICE_TYPE(ATA_CF, ide_cf_device)
-
-#endif // MAME_BUS_ATA_IDEHD_H
+#endif // MAME_MACHINE_ATASTORAGE_H

@@ -139,30 +139,31 @@
 */
 
 #include "emu.h"
+#include "k057714.h"
+#include "midikbd.h"
 
 #include "bus/ata/ataintf.h"
 #include "bus/ata/atapicdr.h"
-#include "bus/ata/idehd.h"
+#include "bus/ata/hdd.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/fdc37c665gt.h"
 #include "machine/ins8250.h"
 #include "machine/intelfsh.h"
 #include "machine/mb8421.h"
-#include "midikbd.h"
 #include "machine/rtc65271.h"
 #include "machine/timer.h"
 #include "sound/cdda.h"
 #include "sound/xt446.h"
 #include "sound/rf5c400.h"
 #include "sound/ymz280b.h"
-#include "k057714.h"
 
 #include "imagedev/floppy.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
 #include "osdcomm.h"
 
 #include "wdlfft/fft.h"

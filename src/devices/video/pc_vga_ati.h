@@ -6,10 +6,12 @@
 
 #pragma once
 
-#include "screen.h"
-#include "video/pc_vga.h"
-#include "video/ati_mach8.h"
 #include "machine/eepromser.h"
+#include "video/ati_mach8.h"
+#include "video/pc_vga.h"
+
+#include "screen.h"
+
 
 class ati_vga_device : public svga_device
 {

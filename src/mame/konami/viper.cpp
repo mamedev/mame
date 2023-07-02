@@ -403,15 +403,17 @@ The golf club acts like a LED gun. PCB power input is 12V.
 */
 
 #include "emu.h"
+
 #include "cpu/powerpc/ppc.h"
 #include "cpu/upd78k/upd78k4.h"
 #include "bus/ata/ataintf.h"
-#include "bus/ata/idehd.h"
+#include "bus/ata/hdd.h"
 #include "machine/lpci.h"
 #include "machine/timekpr.h"
 #include "machine/timer.h"
 #include "sound/dmadac.h"
 #include "video/voodoo_banshee.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

@@ -81,6 +81,9 @@ private:
 	u8 keybc_status_r(offs_t offset);
 	void keybc_command_w(offs_t offset, u8 data);
 
+	u8 keyb_io_address_r(offs_t offset);
+	void keyb_io_address_w(offs_t offset, u8 data);
+
 	void kbdp21_gp25_gatea20_w(int state);
 	void kbdp20_gp20_reset_w(int state);
 
@@ -99,6 +102,7 @@ private:
 	u8 m_keyb_irq_line = 0;
 	u8 m_mouse_irq_line = 0;
 	u8 m_rtc_irq_line = 0;
+	u16 m_keyb_address[2]{};
 };
 
 DECLARE_DEVICE_TYPE(W83977TF, w83977tf_device);

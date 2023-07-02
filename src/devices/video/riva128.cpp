@@ -28,7 +28,8 @@ References:
 #define LOGTODO(...)            LOGMASKED(LOG_TODO, __VA_ARGS__)
 
 
-DEFINE_DEVICE_TYPE(RIVA128, riva128_device, "riva128", "SGS-Thompson/nVidia Riva 128 (NV3)")
+DEFINE_DEVICE_TYPE(RIVA128,   riva128_device,   "riva128",   "SGS-Thompson/nVidia Riva 128 (NV3)")
+DEFINE_DEVICE_TYPE(RIVA128ZX, riva128zx_device, "riva128zx", "SGS-Thompson/nVidia Riva 128 ZX (NV3T)")
 
 riva128_device::riva128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, type, tag, owner, clock)
@@ -216,4 +217,34 @@ void riva128_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 		io_space->install_device(0x03b0, 0x03df, *this, &riva128_device::legacy_io_map);
 		//memory_space->install_rom(0xc0000, 0xcffff, (void *)expansion_rom);
 	}
+}
+
+/********************************************
+ *
+ * Riva 128ZX overrides
+ *
+ *******************************************/
+
+riva128zx_device::riva128zx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: riva128_device(mconfig, RIVA128ZX, tag, owner, clock)
+{
+	// $54-$57 in ROM for subvendor ID (if FBA[1] config is 1)
+	set_ids_agp(0x12d20019, 0x00, 0x12d20019);
+}
+
+ROM_START( riva128zx )
+	ROM_REGION32_LE( 0x8000, "vga_rom", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS( 0, "asus", "ASUS AGP-V3000 ZX TV (V1.70D.03)" )
+	ROMX_LOAD( "asus_agp-v3000zx.vbi", 0x000000, 0x008000, CRC(8319de18) SHA1(837fe8afdf03196550c51ff4987e7f25cc75222c), ROM_BIOS(0) )
+	// TODO: confirm if this is really a 128ZX
+	// (underlying ROM PCIR has 0x0018 not 0x0019)
+	ROM_SYSTEM_BIOS( 1, "elsa", "ELSA VICTORY Erazor/LT (Ver. 1.58.00)" )
+	ROMX_LOAD( "elsa.vbi",     0x000000, 0x008000, CRC(8dd4627a) SHA1(cfb10d9a370a951f9ed23719b2c5fa79c9e49668), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "creative", "Creative Graphics Blaster Riva 128ZX (V1.72.3D)" )
+	ROMX_LOAD( "creative_ct6730.vbi", 0x000000, 0x008000, CRC(72f03a0e) SHA1(7126c4c4d20c48848defc5dd05f0d5b698948015), ROM_BIOS(2) )
+ROM_END
+
+const tiny_rom_entry *riva128zx_device::device_rom_region() const
+{
+	return ROM_NAME(riva128zx);
 }

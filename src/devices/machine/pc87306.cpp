@@ -79,7 +79,7 @@ void pc87306_device::device_add_mconfig(machine_config &config)
 
 	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);
-	m_kbdc->set_interrupt_type(kbdc8042_device::KBDC8042_SINGLE);
+	m_kbdc->set_interrupt_type(kbdc8042_device::KBDC8042_DOUBLE);
 	m_kbdc->input_buffer_full_callback().set(FUNC(pc87306_device::irq_keyboard_w));
 	m_kbdc->input_buffer_full_mouse_callback().set(FUNC(pc87306_device::irq_mouse_w));
 	m_kbdc->system_reset_callback().set(FUNC(pc87306_device::kbdp20_gp20_reset_w));

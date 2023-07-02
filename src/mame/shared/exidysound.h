@@ -223,8 +223,8 @@ private:
 
 	TIMER_CALLBACK_MEMBER( delayed_command_w );
 
-	int m_pia_ca1 = 0;
-	int m_pia_cb1 = 0;
+	int m_pia_ca1;
+	int m_pia_cb1;
 };
 
 DECLARE_DEVICE_TYPE(EXIDY_VICTORY, victory_sound_device)

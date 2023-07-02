@@ -21,6 +21,7 @@ atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, const char
 
 atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	atapi_hle_device(mconfig, type, tag, owner, clock),
+	device_ata_interface(mconfig, *this),
 	ultra_dma_mode(0)
 {
 }

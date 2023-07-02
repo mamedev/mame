@@ -6,8 +6,10 @@
 
 #pragma once
 
-#include "screen.h"
 #include "video/pc_vga.h"
+
+#include "screen.h"
+
 
 class tseng_vga_device :  public svga_device
 {
