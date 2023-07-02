@@ -92,7 +92,7 @@ license:CC0-1.0
 		<publisher>Defence Force</publisher>
 		<info name="developer" value="Mickael Pointier (Dbug)" />
 		<info name="region" value="France" />
-		<info name="usage" value="only Oric Atmos compatible" />
+		<sharedfeat name="compatibility" value="Atmos"/>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="4093">
 				<rom name="4KKong.tap" size="4093" crc="1335cca5" sha1="fc52ce11b70ab3a95d7780b33e6ed95ae3aea150"/>
@@ -102,7 +102,7 @@ license:CC0-1.0
 
 	<software name="3dtunnel">
 		<description>The 3D Tunnel</description>
-		<year>1998</year>	
+		<year>1998</year>
 		<publisher>Dbug</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="25359">
@@ -280,9 +280,6 @@ license:CC0-1.0
 		<description>Arsène Lapin</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
-		<notes><![CDATA[
-Cassette with two versions, side 1 with the Atmos version, side 2 with Oric-1 version.
-]]></notes>
 		<info name="language" value="French" />
 		<info name="region" value="France" />
 		<part name="cass1" interface="oric1_cass">
@@ -302,8 +299,7 @@ Cassette with two versions, side 1 with the Atmos version, side 2 with Oric-1 ve
 	<software name="asciichase">
 		<description>ASCII Chase</description>
 		<year>2017</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Fabrizio Caruso" />
+		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="30460">
 				<rom name="ASCII Chase (2017-07-08)(Caruso, Fabrizio).tap" size="30460" crc="8b5f0ea9" sha1="cb9c88efdacdf2f15e22bacacd54a220443ecc35"/>
@@ -784,9 +780,6 @@ Type-in from magazine
 		<description>Cobra</description>
 		<year>1985</year>
 		<publisher>Norsoft</publisher>
-		<notes><![CDATA[
-Cassette with two versions, side 1 with the Atmos version, side 2 with Oric-1 version.
-]]></notes>
 		<info name="language" value="French" />
 		<info name="region" value="France" />
 		<part name="cass1" interface="oric1_cass">
@@ -973,8 +966,7 @@ Side B: An instruction program is recorded at fast speed
 	<software name="crossbomber">
 		<description>Cross Bomber</description>
 		<year>2022</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Fabrizio Caruso" />
+		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="6684">
 				<rom name="Cross Bomber (2022-07-20)(Caruso, Fabrizio)[48K].tap" size="6684" crc="952b37c8" sha1="8298e07d262181611ab7286719830f5d66d670b6"/>
@@ -985,8 +977,7 @@ Side B: An instruction program is recorded at fast speed
 	<software name="crossbomber1" cloneof="crossbomber">
 		<description>Cross Bomber (2021-05-13)</description>
 		<year>2021</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Fabrizio Caruso" />
+		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="6684">
 				<rom name="Cross Bomber (2021-05-13)(Caruso, Fabrizio)[48K].tap" size="6412" crc="5915840a" sha1="ab594aa3f6913c836956854374eafe243e4b457c"/>
@@ -997,8 +988,7 @@ Side B: An instruction program is recorded at fast speed
 	<software name="crossbomber2" cloneof="crossbomber">
 		<description>Cross Bomber (2020-08-26)</description>
 		<year>2020</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Fabrizio Caruso" />
+		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="6825">
 				<rom name="Cross Bomber (2020-08-26)(Caruso, Fabrizio)[48K].tap" size="6825" crc="94f6274b" sha1="bfcf65fc2d83fd97e42874cf0cab34b037c2cf62"/>
@@ -1009,8 +999,7 @@ Side B: An instruction program is recorded at fast speed
 	<software name="crosschase">
 		<description>Cross Chase</description>
 		<year>2021</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Fabrizio Caruso" />
+		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="13877">
 				<rom name="Cross Chase (2021-05-13)(Caruso, Fabrizio)[48K].tap" size="13877" crc="d6c535c3" sha1="bc97c142b7b871226a3023bce38db6bbf38c2fe7"/>
@@ -1021,8 +1010,7 @@ Side B: An instruction program is recorded at fast speed
 	<software name="crosshorde">
 		<description>Cross Horde v1.0</description>
 		<year>2021</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Fabrizio Caruso" />
+		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="10604">
 				<rom name="Cross Horde v1.0 (2021-05-01)(Caruso, Fabrizio)[48K].tap" size="10604" crc="77953696" sha1="a5860a886232f1689bb8294c214742dd3b944b03"/>
@@ -1033,8 +1021,7 @@ Side B: An instruction program is recorded at fast speed
 	<software name="crossshoot">
 		<description>Cross Shoot</description>
 		<year>2021</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Fabrizio Caruso" />
+		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="19190">
 				<rom name="Cross Shoot (2021-05-13)(Caruso, Fabrizio)[48K].tap" size="19190" crc="b8ba95d0" sha1="67f632ad5b1c5439f8f461c31d66308d6bfc00c8"/>
@@ -1045,8 +1032,7 @@ Side B: An instruction program is recorded at fast speed
 	<software name="crosssnake">
 		<description>Cross Snake (v2.0)</description>
 		<year>2020</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Fabrizio Caruso" />
+		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="12115">
 				<rom name="Cross Snake v2.0 (2020-12-31)(Caruso, Fabrizio)[48K].tap" size="12115" crc="20de70a6" sha1="a60a5c7eeae0a8cb4ff97d90a874f42d840fee4c"/>
@@ -1057,8 +1043,7 @@ Side B: An instruction program is recorded at fast speed
 	<software name="crosssnakep" cloneof="crosssnake">
 		<description>Cross Snake (preview)</description>
 		<year>2020</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Fabrizio Caruso" />
+		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="8428">
 				<rom name="Cross Snake Preview (2020-12-05)(Caruso, Fabrizio)[48K].tap" size="8428" crc="7a9b27f8" sha1="2a93e6ab42043a668f81ce7c5c8b34e21d0d720b"/>
@@ -1069,8 +1054,7 @@ Side B: An instruction program is recorded at fast speed
 	<software name="crosssnake1" cloneof="crosssnake">
 		<description>Cross Snake (v1.0)</description>
 		<year>2020</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Fabrizio Caruso" />
+		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="12110">
 				<rom name="Cross Snake v1.0 (2020-12-12)(Caruso, Fabrizio)[48K].tap" size="12110" crc="6fc09666" sha1="5079c5565a3dd2944ff40b5585a06cc7072062fc"/>
@@ -2010,7 +1994,7 @@ Tape 2 Side B - VOYAGES: Which is loaded when you go from one town to another
 		<description>Impossible Mission (Atmos 50Hz)</description>
 		<year>2010</year>
 		<publisher>Defence Force</publisher>
-		<info name="usage" value="only Oric Atmos compatible" />
+		<sharedfeat name="compatibility" value="Atmos"/>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="48110">
 				<rom name="im10.tap" size="48110" crc="0a02a6de" sha1="abfc6eee380488c8548001b17f1b6e2716f430ac"/>
@@ -2022,7 +2006,7 @@ Tape 2 Side B - VOYAGES: Which is loaded when you go from one town to another
 		<description>Impossible Mission (Atmos 60Hz)</description>
 		<year>2010</year>
 		<publisher>Defence Force</publisher>
-		<info name="usage" value="only Oric Atmos compatible" />
+		<sharedfeat name="compatibility" value="Atmos"/>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="48110">
 				<rom name="im10-60.tap" size="48110" crc="225c6d82" sha1="09009d75d67e7e7501561028898559a68280820e"/>
@@ -2642,10 +2626,16 @@ On side B: Atmos version
 ]]></notes>
 		<info name="language" value="French" />
 		<info name="region" value="France" />
-		<part name="cass" interface="oric1_cass">
+		<part name="cass1" interface="oric1_cass">
 			<feature name="part_id" value="FACE A - ORIC 48K"/>
 			<dataarea name="cass" size="47175">
 				<rom name="Mission Impossible - Face A.tap" size="47175" crc="1aba6c78" sha1="8b8ac2594946a2fdbfe30520b392a6b335f9ec60"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="FACE B - ATMOS"/>
+			<dataarea name="cass" size="0">
+				<rom name="Mission Impossible - Face B.tap" size="0" status="nodump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3506,8 +3496,7 @@ On side B: Atmos version
 	<software name="rushhour">
 		<description>Rush Hour</description>
 		<year>19??</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Fabrice Francès" />
+		<publisher>Fabrice Francès</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="18084">
 				<rom name="Rush Hour (demo) (19xx)(F., Frances)(FR)[b].tap" size="18084" crc="da1f933a" sha1="7e834462345a9cac1a320d7e431ab1175512c6a8"/>
@@ -3518,9 +3507,8 @@ On side B: Atmos version
 	<software name="rushhr4k">
 		<description>Rush Hour 4K</description>
 		<year>2003</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Fabrice Francès" />
-		<info name="usage" value="only Oric Atmos compatible" />
+		<publisher>Fabrice Francès</publisher>
+		<sharedfeat name="compatibility" value="Atmos"/>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="4095">
 				<rom name="RushHour.tap" size="4095" crc="b0bae580" sha1="56ac4c00275e1687cb9beab232c24bfc4ce5d6ca"/>
@@ -3905,7 +3893,7 @@ On side B: Atmos version
 		<description>Stormlord (Atmos)</description>
 		<year>2010</year>
 		<publisher>Defence Force</publisher>
-		<info name="usage" value="only Oric Atmos compatible" />
+		<sharedfeat name="compatibility" value="Atmos"/>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="47254">
 				<rom name="Storm.tap" size="47254" crc="04e4b66e" sha1="6a810866c2ab75e1faca9410e6144729350fb55b"/>
@@ -4172,7 +4160,7 @@ Side A with the game's rule, side B with the game.
 		</part>
 		<part name="cass2" interface="oric1_cass">
 			<feature name="part_id" value="FACE B"/>
-			<dataarea name="cass" size="35037">
+			<dataarea name="cass" size="42058">
 				<rom name="tdm_jeu.tap" size="42058" crc="44b755fa" sha1="ccc572fb6189940af3f89135f20570d462af6749"/>
 			</dataarea>
 		</part>
@@ -4341,9 +4329,6 @@ Side A with the game's rule, side B with the game.
 		<description>The Ultra</description>
 		<year>1983</year>
 		<publisher>Personal Software Services</publisher>
-		<notes><![CDATA[
-Cassette with two versions, side 1 with the Oric 16/48K version, side 2 with Oric V1.1 & Atmos version.
-]]></notes>
 		<info name="language" value="French" />
 		<info name="region" value="France" />
 		<part name="cass1" interface="oric1_cass">
