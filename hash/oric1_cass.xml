@@ -1532,18 +1532,14 @@ Tape 2 Side B - VOYAGES: Which is loaded when you go from one town to another
 		<description>Fire Flash</description>
 		<year>1984</year>
 		<publisher>No Man's Land</publisher>
-		<part name="cass" interface="oric1_cass">
+		<part name="cass1" interface="oric1_cass">
+			<feature name="part_id" value="A - FAST" />
 			<dataarea name="cass" size="18456">
 				<rom name="Fire Flash (1984)(No Man's Land)(FR)(Side A)(Fast).tap" size="18456" crc="764f23fc" sha1="6a404942cad5fd064c947f370c4bd70cfe5f919d"/>
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="fireflash1" cloneof="fireflash">
-		<description>Fire Flash (alt)</description>
-		<year>1984</year>
-		<publisher>No Man's Land</publisher>
-		<part name="cass" interface="oric1_cass">
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="B - SLOW" />
 			<dataarea name="cass" size="18455">
 				<rom name="Fire Flash (1984)(No Man's Land)(FR)(Side B)(Slow)[b errors].tap" size="18455" crc="3f46e827" sha1="08f4cbda5de1f7b95a13cc7c8d6e32edc77f986c"/>
 			</dataarea>
