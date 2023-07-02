@@ -78,17 +78,21 @@ Notes:
 
 void lwings_state::avengers_adpcm_w(uint8_t data)
 {
+	//logerror("%s: avengers_adpcm_w %02x\n", machine().describe_context().c_str(), data);
+
 	m_adpcm = data;
 }
 
 uint8_t lwings_state::avengers_adpcm_r()
 {
+//  logerror("%s: avengers_adpcm_r\n", machine().describe_context().c_str());
+
 	return m_adpcm;
 }
 
 void lwings_state::lwings_bankswitch_w(uint8_t data)
 {
-//  if (data & 0xe0) printf("bankswitch_w %02x\n", data);
+//  if (data & 0xe0) logerror("bankswitch_w %02x\n", data);
 //  Fireball writes 0x20 on startup, maybe reset soundcpu?
 	m_sprbank = (data & 0x10)>>4; // Fireball only
 
@@ -121,161 +125,23 @@ void lwings_state::avengers_interrupt(int state)
 
 void lwings_state::avengers_protection_w(uint8_t data)
 {
-	int pc = m_maincpu->pc();
+	m_mcu_prot_val = data;
 
-	if (pc == 0x2eeb)
+	if (m_mcu)
 	{
-		m_param[0] = data;
-	}
-	else if (pc == 0x2f09)
-	{
-		m_param[1] = data;
-	}
-	else if(pc == 0x2f26)
-	{
-		m_param[2] = data;
-	}
-	else if (pc == 0x2f43)
-	{
-		m_param[3] = data;
-	}
-	else if (pc == 0x0445)
-	{
-		m_soundstate = 0x80;
-		m_soundlatch->write(data);
+		m_mcu->set_input_line(0, ASSERT_LINE);
+		m_irq_ack_timer->adjust(attotime::from_msec(1000/60));
 	}
 }
 
 void lwings_state::avengers_prot_bank_w(uint8_t data)
 {
-	m_palette_pen = data * 64;
-}
-
-int lwings_state::avengers_fetch_paldata(  )
-{
-	static const char pal_data[] =
-	/* page 1: 0x03,0x02,0x01,0x00 */
-	"0000000000000000" "A65486A6364676D6" "C764C777676778A7" "A574E5E5C5756AE5"
-	"0000000000000000" "F51785D505159405" "A637B6A636269636" "F45744E424348824"
-	"0000000000000000" "A33263B303330203" "4454848454440454" "A27242C232523632"
-	"0000000000000000" "1253327202421102" "3386437373631373" "41A331A161715461"
-	"0000000000000000" "1341715000711203" "4442635191622293" "5143D48383D37186"
-	"0000000000000000" "2432423000412305" "6633343302333305" "7234A565A5A4A2A8"
-	"0000000000000000" "46232422A02234A7" "88241624A21454A7" "A3256747A665D3AA"
-	"0000000000000000" "070406020003050B" "0A05090504050508" "05060A090806040C"
-
-	/* page2: 0x07,0x06,0x05,0x04 */
-	"0000000000000000" "2472030503230534" "6392633B23433B53" "0392846454346423"
-	"0000000000000000" "1313052405050423" "3223754805354832" "323346A38686A332"
-	"0000000000000000" "72190723070723D2" "81394776070776D1" "A15929F25959F2F1"
-	"0000000000000000" "650706411A2A1168" "770737C43A3A3466" "87071F013C0C3175"
-	"0000000000000000" "2001402727302020" "4403048F4A484344" "4A050B074E0E4440"
-	"0000000000000000" "3003800C35683130" "5304035C587C5453" "5607080C5B265550"
-	"0000000000000000" "4801D00043854245" "6C020038669A6569" "6604050A69446764"
-	"0000000000000000" "0504000001030504" "0A05090504060307" "04090D0507010403"
-
-	/* page3: 0x0b,0x0a,0x09,0x08 */
-	"0000000000000000" "685A586937F777F7" "988A797A67A7A7A7" "B8CA898DC737F787"
-	"0000000000000000" "4738A61705150505" "8797672835250535" "7777072A25350525"
-	"0000000000000000" "3525642404340404" "6554453554440454" "5544053634540434"
-	"0000000000000000" "2301923203430303" "4333834383630373" "3324034473730363"
-	"0000000000000000" "3130304000762005" "5352525291614193" "6463635483D06581"
-	"0000000000000000" "4241415100483107" "6463631302335304" "76757415A5A077A3"
-	"0000000000000000" "53525282A02A43AA" "76747424A31565A5" "88888536A66089A4"
-	"0000000000000000" "05040304000D050C" "0806050604070707" "0A0A060808000C06"
-
-	/* page4: 0x0f,0x0e,0x0d,0x0c */
-	"0000000000000000" "3470365956342935" "5590578997554958" "73C078A8C573687A"
-	"0000000000000000" "5355650685030604" "2427362686042607" "010A070584010508"
-	"0000000000000000" "0208432454022403" "737A243455733406" "000D050353000307"
-	"0000000000000000" "000A023233003202" "424C134234424204" "000F241132001105"
-	"0000000000000000" "3031113030300030" "5152215252512051" "7273337374723272"
-	"0000000000000000" "4141214041411041" "6263326363623162" "8385448585834383"
-	"0000000000000000" "5153225152512051" "7375437475734273" "9598559697946495"
-	"0000000000000000" "0205020303020102" "0407040606040304" "060A060809060506"
-
-	/* page5: 0x13,0x12,0x11,0x10 */
-	"0000000000000000" "4151D141D3D177F7" "5454C44482C4A7A7" "0404D45491D4F787"
-	"0000000000000000" "0303032374230505" "9696962673560535" "0505054502850525"
-	"0000000000000000" "0303030355030404" "7777770754470454" "0606060603760434"
-	"0000000000000000" "0505053547050303" "4949492945390373" "0808083804580363"
-	"0000000000000000" "0B0C444023442005" "3D3F333433334193" "0000043504046581"
-	"0000000000000000" "0809565085863107" "0B6A352374455304" "00700644050677A3"
-	"0000000000000000" "06073879C8C843AA" "09492739A58765A5" "0050084A060889A4"
-	"0000000000000000" "05060B070B0B050C" "0707090707090707" "00000B08070B0C06"
-
-	/* page6: 0x17,0x16,0x15,0x14 */
-	"0000000000000000" "0034308021620053" "0034417042512542" "0034526064502E31"
-	"0000000000000000" "0106412032733060" "11A6522053628350" "22A6632072620D42"
-	"0000000000000000" "1308223052242080" "2478233071235170" "3578243090230960"
-	"0000000000000000" "2111334333331404" "3353324232324807" "45B5314131310837"
-	"0000000000000000" "3232445444445302" "445443534343B725" "567642524242B745"
-	"0000000000000000" "4343556555550201" "5575546454540524" "6787536353537554"
-	"0000000000000000" "6474667676660100" "7696657575650423" "88A8647474645473"
-	"0000000000000000" "0001070701050004" "0003060603040303" "0005050505040302";
-
-	int bank = m_palette_pen / 64;
-	int offs = m_palette_pen % 64;
-	int page = bank / 4;                    /* 0..7 */
-	int base = (3 - (bank & 3));            /* 0..3 */
-	int row = offs & 0xf;                   /* 0..15 */
-	int col = offs / 16 + base * 4;         /* 0..15 */
-	int digit0 = pal_data[page * 256 * 2 + (31 - row * 2) * 16 + col];
-	int digit1 = pal_data[page * 256 * 2 + (30 - row * 2) * 16 + col];
-	int result;
-
-	if (digit0 >= 'A')
-		digit0 += 10 - 'A';
-	else
-		digit0 -= '0';
-
-	if (digit1 >= 'A')
-		digit1 += 10 - 'A';
-	else
-		digit1 -= '0';
-
-	result = digit0 * 16 + digit1;
-
-	if ((m_palette_pen & 0x3f) != 0x3f)
-		m_palette_pen++;
-
-	return result;
+	m_palette_pen_raw = data;
 }
 
 uint8_t lwings_state::avengers_protection_r()
 {
-	static const int xpos[8] = { 10, 7,  0, -7, -10, -7,   0,  7 };
-	static const int ypos[8] = {  0, 7, 10,  7,   0, -7, -10, -7 };
-	int best_dist = 0;
-	int best_dir = 0;
-	int x, y;
-	int dx, dy, dist, dir;
-
-	if (m_maincpu->pc() == 0x7c7)
-	{
-		/* palette data */
-		return avengers_fetch_paldata();
-	}
-
-	/*  Point to Angle Function
-
-	    Input: two cartesian points
-	    Output: direction code (north, northeast, east, ...)
-	 */
-	x = m_param[0] - m_param[2];
-	y = m_param[1] - m_param[3];
-	for (dir = 0; dir < 8; dir++)
-	{
-		dx = xpos[dir] - x;
-		dy = ypos[dir] - y;
-		dist = dx * dx + dy * dy;
-		if (dist < best_dist || dir == 0)
-		{
-			best_dir = dir;
-			best_dist = dist;
-		}
-	}
-	return best_dir << 5;
+	return m_mcu_outlatch;
 }
 
 uint8_t lwings_state::avengers_soundlatch2_r()
@@ -413,7 +279,7 @@ void lwings_state::fball_map(address_map &map)
 
 void lwings_state::fball_oki_bank_w(uint8_t data)
 {
-	//printf("fball_oki_bank_w %02x\n", data);
+	//logerror("fball_oki_bank_w %02x\n", data);
 	membank("samplebank")->set_entry((data >> 1) & 0x7);
 }
 
@@ -875,11 +741,13 @@ void lwings_state::machine_start()
 	save_item(NAME(m_scroll_x));
 	save_item(NAME(m_scroll_y));
 	save_item(NAME(m_param));
-	save_item(NAME(m_palette_pen));
+	save_item(NAME(m_palette_pen_raw));
 	save_item(NAME(m_soundstate));
 	save_item(NAME(m_adpcm));
 	save_item(NAME(m_nmi_mask));
 	save_item(NAME(m_sprbank));
+	save_item(NAME(m_mcu_outlatch));
+	save_item(NAME(m_mcu_prot_val));
 
 	/*
 	Fireball has 2 copies of the 'fixed' code in the main program rom, with only slight changes.
@@ -921,6 +789,8 @@ void lwings_state::machine_start()
 		membank("samplebank")->configure_entries(0, 8, OKIROM, 0x20000);
 	}
 
+	m_irq_ack_timer = timer_alloc(FUNC(lwings_state::irq_ack), this);
+
 }
 
 void lwings_state::machine_reset()
@@ -934,7 +804,7 @@ void lwings_state::machine_reset()
 	m_param[1] = 0;
 	m_param[2] = 0;
 	m_param[3] = 0;
-	m_palette_pen = 0;
+	m_palette_pen_raw = 0;
 	m_soundstate = 0;
 	m_adpcm = 0;
 }
@@ -955,15 +825,15 @@ void lwings_state::lwings(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(lwings_state::screen_update_lwings));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
-	screen.screen_vblank().append(FUNC(lwings_state::lwings_interrupt));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(lwings_state::screen_update_lwings));
+	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	m_screen->screen_vblank().append(FUNC(lwings_state::lwings_interrupt));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lwings);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
@@ -992,7 +862,7 @@ void lwings_state::sectionz(machine_config &config)
 
 	m_maincpu->set_clock(12_MHz_XTAL/4); // XTAL and clock verified on an original PCB and on a bootleg with ROMs matching those of sectionza
 
-	subdevice<screen_device>("screen")->set_refresh_hz(55.37); // verified on an original PCB
+	m_screen->set_refresh_hz(55.37); // verified on an original PCB
 }
 
 void lwings_state::fball(machine_config &config)
@@ -1052,7 +922,7 @@ void lwings_state::trojan(machine_config &config)
 	m_gfxdecode->set_info(gfx_trojan);
 
 	MCFG_VIDEO_START_OVERRIDE(lwings_state,trojan)
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(lwings_state::screen_update_trojan));
+	m_screen->set_screen_update(FUNC(lwings_state::screen_update_trojan));
 
 	// sound hardware
 	GENERIC_LATCH_8(config, "soundlatch2");
@@ -1062,14 +932,82 @@ void lwings_state::trojan(machine_config &config)
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
+u8 lwings_state::mcu_p0_r()
+{
+	u8 retval = m_mcu_prot_val;
+	//logerror("%s mcu_p0_r (read protection param %02x)\n", machine().describe_context().c_str(), retval);
+	return retval;
+}
+
+u8 lwings_state::mcu_p1_r()
+{
+	// this is used to decide if we're sending angle params or a sound write? compares against 0xf0, vpos like 1943?
+	return m_screen->vpos();
+}
+
+u8 lwings_state::mcu_p2_r()
+{
+	return m_palette_pen_raw;
+}
+
+u8 lwings_state::mcu_p3_r()
+{
+	return 0x00;
+}
+
+void lwings_state::mcu_p0_w(u8 data)
+{
+	m_mcu_outlatch = data;
+}
+
+void lwings_state::mcu_p1_w(u8 data)
+{
+}
+
+void lwings_state::mcu_p2_w(u8 data)
+{
+	m_mcu->set_input_line(0, CLEAR_LINE); // not sure, we also clear on a timed ack
+	m_soundstate = 0x80;
+	m_soundlatch->write(data);
+}
+
+void lwings_state::mcu_p3_w(u8 data)
+{
+	//logerror("%s mcu_p3_w %02x\n", machine().describe_context().c_str(), data);
+	// possibly 0xbf -> 0xff transition - NO can't be, 0xbf doesn't happen on param writes for angle?
+	//if (data == 0xff)
+	//  m_mcu->set_input_line(0, CLEAR_LINE);
+}
+
+
+TIMER_CALLBACK_MEMBER(lwings_state::irq_ack)
+{
+	m_mcu->set_input_line(0, CLEAR_LINE);
+}
+
+
 void lwings_state::avengers(machine_config &config)
 {
 	trojan(config);
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::avengers_map);
+	m_maincpu->set_clock((12_MHz_XTAL / 2) * 0.8125); // if we're running the MCU at 6Mhz the CPU has to be slightly slower to keep the palette transfers with the MCU in sync
 
+	//I8751(config, m_mcu, 12_MHz_XTAL/3.25); // if we're running the main CPU at 3Mhz the MCU has to be slightly faster
 	I8751(config, m_mcu, 12_MHz_XTAL/2);
+
+	m_mcu->port_in_cb<0>().set(FUNC(lwings_state::mcu_p0_r));
+	m_mcu->port_in_cb<1>().set(FUNC(lwings_state::mcu_p1_r));
+	m_mcu->port_in_cb<2>().set(FUNC(lwings_state::mcu_p2_r));
+	m_mcu->port_in_cb<3>().set(FUNC(lwings_state::mcu_p3_r));
+
+	m_mcu->port_out_cb<0>().set(FUNC(lwings_state::mcu_p0_w));
+	m_mcu->port_out_cb<1>().set(FUNC(lwings_state::mcu_p1_w));
+	m_mcu->port_out_cb<2>().set(FUNC(lwings_state::mcu_p2_w));
+	m_mcu->port_out_cb<3>().set(FUNC(lwings_state::mcu_p3_w));
+
+	config.set_perfect_quantum(m_maincpu);
 
 	screen_device &screen(*subdevice<screen_device>("screen"));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
@@ -1088,9 +1026,6 @@ void lwings_state::buraikenb(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::buraikenb_map);
 	config.device_remove("mcu");
-
-	// video hardware
-	MCFG_VIDEO_START_OVERRIDE(lwings_state,buraikenb)
 }
 
 
@@ -1656,6 +1591,18 @@ It was common for Capcom to use the same ROM label across regional sets but add 
   with and without the "U" being stamped.
 
 */
+
+// there is definitely at least one bad opcode in this dump, there could be others affecting enemy movement
+#define AVENGERS_MCU \
+	ROM_REGION( 0x1000, "mcu", 0 ) /* Intel C8751H - 88 */ \
+	ROM_LOAD( "av.13k", 0x0000, 0x1000, BAD_DUMP CRC(505a0987) SHA1(ea1d855a9870d79d0e00eaa88a23038355a1203a) ) \
+	ROM_FILL(0x0b84, 0x01, 0x02) /* bad code! bit 0x80 was flipped */ \
+	/* these palette entries look wrong, but the low bit is unused, so could just be like that */ \
+	ROM_FILL(0x0481, 0x01, 0x00) \
+	ROM_FILL(0x04e0, 0x01, 0x00) \
+	ROM_FILL(0x0483, 0x01, 0xa0) \
+	ROM_FILL(0x04c3, 0x01, 0x30)
+
 ROM_START( avengers )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "avu_04c.10n",  0x00000, 0x8000, CRC(4555b925) SHA1(49829272b23a39798bcaeb6d847a4091031b3dec) ) /* Red stripe across label for US region */
@@ -1668,8 +1615,7 @@ ROM_START( avengers )
 	ROM_REGION( 0x10000, "adpcmcpu", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "av_01.6d",     0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
-	ROM_REGION( 0x1000, "mcu", 0 ) // Intel C8751H-88
-	ROM_LOAD( "av.13k", 0x0000, 0x1000, CRC(505a0987) SHA1(ea1d855a9870d79d0e00eaa88a23038355a1203a) )
+	AVENGERS_MCU
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "av_03.8k",     0x00000, 0x8000, CRC(efb5883e) SHA1(08aebf579f2c5ff472db66597cde1c6871d7d757) )  /* characters */
@@ -1718,8 +1664,7 @@ ROM_START( avengersa )
 	ROM_REGION( 0x10000, "adpcmcpu", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "av_01.6d",     0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
-	ROM_REGION( 0x1000, "mcu", 0 ) // Intel C8751H-88
-	ROM_LOAD( "av.13k", 0x0000, 0x1000, CRC(505a0987) SHA1(ea1d855a9870d79d0e00eaa88a23038355a1203a) )
+	AVENGERS_MCU
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "av_03.8k",     0x00000, 0x8000, CRC(efb5883e) SHA1(08aebf579f2c5ff472db66597cde1c6871d7d757) )  /* characters */
@@ -1768,8 +1713,7 @@ ROM_START( avengersb )
 	ROM_REGION( 0x10000, "adpcmcpu", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "av_01.6d",     0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
-	ROM_REGION( 0x1000, "mcu", 0 ) // Intel C8751H-88
-	ROM_LOAD( "av.13k", 0x0000, 0x1000, CRC(505a0987) SHA1(ea1d855a9870d79d0e00eaa88a23038355a1203a) )
+	AVENGERS_MCU
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "av_03.8k",     0x00000, 0x8000, CRC(efb5883e) SHA1(08aebf579f2c5ff472db66597cde1c6871d7d757) )  /* characters */
@@ -1818,8 +1762,7 @@ ROM_START( avengersc )
 	ROM_REGION( 0x10000, "adpcmcpu", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "av_01.6d",     0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
-	ROM_REGION( 0x1000, "mcu", 0 ) // Intel C8751H-88
-	ROM_LOAD( "av.13k", 0x0000, 0x1000, CRC(505a0987) SHA1(ea1d855a9870d79d0e00eaa88a23038355a1203a) )
+	AVENGERS_MCU
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "av_03.8k",     0x00000, 0x8000, CRC(efb5883e) SHA1(08aebf579f2c5ff472db66597cde1c6871d7d757) )  /* characters */
@@ -1868,8 +1811,7 @@ ROM_START( buraiken )
 	ROM_REGION( 0x10000, "adpcmcpu", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "av_01.6d",     0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
-	ROM_REGION( 0x1000, "mcu", 0 ) // Intel C8751H-88
-	ROM_LOAD( "av.13k", 0x0000, 0x1000, CRC(505a0987) SHA1(ea1d855a9870d79d0e00eaa88a23038355a1203a) )
+	AVENGERS_MCU
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "av_03.8k",     0x00000, 0x8000, CRC(efb5883e) SHA1(08aebf579f2c5ff472db66597cde1c6871d7d757) )  /* characters */

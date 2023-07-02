@@ -49,7 +49,7 @@ TILE_GET_INFO_MEMBER(lwings_state::trojan_get_bg1_tile_info)
 	code += (color & 0xe0)<<3;
 	tileinfo.set(1,
 			code,
-			m_bg2_avenger_hw ? ((color & 7) ^ 6) : (color & 7),
+			(color & 7),
 			((color & 0x10) ? TILE_FLIPX : 0));
 
 	tileinfo.group = (color & 0x08) >> 3;
@@ -94,21 +94,12 @@ VIDEO_START_MEMBER(lwings_state,trojan)
 	m_bg1_tilemap->set_transmask(0, 0xffff, 0x0001); // split type 0 is totally transparent in front half
 	m_bg1_tilemap->set_transmask(1, 0xf07f, 0x0f81); // split type 1 has pens 7-11 opaque in front half
 
-	m_bg2_avenger_hw = 0;
 	m_spr_avenger_hw = 0;
 }
 
 VIDEO_START_MEMBER(lwings_state,avengers)
 {
 	VIDEO_START_CALL_MEMBER(trojan);
-	m_bg2_avenger_hw = 1;
-	m_spr_avenger_hw = 1;
-}
-
-VIDEO_START_MEMBER(lwings_state,buraikenb)
-{
-	VIDEO_START_CALL_MEMBER(trojan);
-	m_bg2_avenger_hw = 0;
 	m_spr_avenger_hw = 1;
 }
 

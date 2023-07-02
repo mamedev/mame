@@ -7,6 +7,7 @@
 #include "sound/msm5205.h"
 
 #include "emupal.h"
+#include "screen.h"
 #include "tilemap.h"
 
 class lwings_state : public driver_device
@@ -18,6 +19,7 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_adpcmcpu(*this, "adpcmcpu"),
 		m_mcu(*this, "mcu"),
+		m_screen(*this, "screen"),
 		m_msm(*this, "5205"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -46,6 +48,7 @@ private:
 	required_device<cpu_device> m_soundcpu;
 	optional_device<cpu_device> m_adpcmcpu;
 	optional_device<i8751_device> m_mcu;
+	required_device<screen_device> m_screen;
 	optional_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -62,7 +65,6 @@ private:
 	tilemap_t *m_bg1_tilemap = nullptr;
 	tilemap_t *m_bg2_tilemap = nullptr;
 	uint8_t   m_bg2_image = 0U;
-	int       m_bg2_avenger_hw = 0;
 	int       m_spr_avenger_hw = 0;
 	uint8_t   m_scroll_x[2]{};
 	uint8_t   m_scroll_y[2]{};
@@ -98,7 +100,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	DECLARE_VIDEO_START(trojan);
 	DECLARE_VIDEO_START(avengers);
-	DECLARE_VIDEO_START(buraikenb);
 	uint32_t screen_update_lwings(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_trojan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void lwings_interrupt(int state);
@@ -106,7 +107,6 @@ private:
 	inline int is_sprite_on( uint8_t *buffered_spriteram, int offs );
 	void lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	int avengers_fetch_paldata();
 
 	void avengers_adpcm_io_map(address_map &map);
 	void avengers_map(address_map &map);
@@ -119,4 +119,19 @@ private:
 	void trojan_adpcm_io_map(address_map &map);
 	void trojan_adpcm_map(address_map &map);
 	void trojan_map(address_map &map);
+
+	u8 mcu_p0_r();
+	u8 mcu_p1_r();
+	u8 mcu_p2_r();
+	u8 mcu_p3_r();
+	void mcu_p0_w(u8 data);
+	void mcu_p1_w(u8 data);
+	void mcu_p2_w(u8 data);
+	void mcu_p3_w(u8 data);
+	TIMER_CALLBACK_MEMBER(irq_ack);
+
+	u8 m_palette_pen_raw;
+	u8 m_mcu_outlatch;
+	u8 m_mcu_prot_val;
+	emu_timer *m_irq_ack_timer = nullptr;
 };
