@@ -78,7 +78,6 @@ Kanji Word Processor - Toshiba
 Kanji Word Processor 2 - Toshiba
 Kanji Word Processor - Matsushita
 Kanji Word Processor Unit - Yamaha
-Lightly roller ~ すいすいローラー - Toshiba
 Logus ~ 獣神ローガス - Random House
 Management betting ticket (kanri baken) ~ 管理馬券 - MicroCabin
 Master Of The Lamps ~ マスターオブザランプ - Pony Canyon
@@ -176,7 +175,6 @@ Bobble Bobble 2 - ProSoft
 Django - Prosoft
 Hello Kangshi ~ 헬로우 강시 - Clover
 Hong Gildong - Saeron
-L3W - Screen Software
 New Neoguri ~ 뉴 너구리 - Prosoft
 New Tetris - Clover
 Plotting - Clover
@@ -7765,6 +7763,18 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="l3w">
+		<description>L.3.W (Korea)</description>
+		<year>1990</year>
+		<publisher>Screen Software</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="l.3.w (korea).rom" size="0x8000" crc="18334af8" sha1="c5274a14616be10b9561f08e51f61516d37fd76e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="laddrbld">
 		<description>Ladder Building (Japan)</description>
 		<year>1983</year>
@@ -7834,6 +7844,35 @@ kept for now until finding out what those bytes affect...
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="0x10000">
 				<rom name="light corridor, the (europe).rom" size="0x10000" crc="a330b549" sha1="0442dd29ea0f7b78c9cd5849ec7ef5bb21ec0bf5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Light pens are not supported -->
+	<software name="lightpen" supported="no">
+		<description>Light Pen Graphic (Japan)</description>
+		<year>1985</year>
+		<publisher>Sanyo</publisher>
+		<info name="alt_title" value="ライトペングラフィックス"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="light pen graphic (japan).rom" size="0x2000" crc="b06f2905" sha1="40348c56add3cf5a4b40b8cbc94a39e0ec94ff0a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lghtrllr">
+		<description>Lightly Roller (Japan)</description>
+		<year>1985</year>
+		<publisher>Toshiba</publisher>
+		<info name="serial" value="HX-S352" />
+		<info name="alt_title" value="すいすいローラー" />
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="lightly roller (japan).rom" size="0x8000" crc="016dc451" sha1="91e260231d402771b74a6917994bf11f1d9331cb" />
 			</dataarea>
 		</part>
 	</software>
@@ -18345,6 +18384,399 @@ legacy FM implementations cannot find it.
 
 <!-- Homebrew / Doujin software -->
 
+	<software name="labbaye">
+		<description>l'Abbaye des Morts (v1.2)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="RetroDeluxe"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x40000">
+				<rom name="l'abbaye des morts - retrodeluxe (2020) (v1.2).rom" size="0x40000" crc="c5aef269" sha1="3b417dd6e2debf80f898e681f1c6a754dfaed2e1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="labbaye11" cloneof="labbaye">
+		<description>l'Abbaye des Morts (v1.1)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="RetroDeluxe"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x40000">
+				<rom name="l'abbaye des morts - retrodeluxe (2020) (v1.1).rom" size="0x40000" crc="38e9bdb2" sha1="f37f8b8f32b546a866497834dcb4ed8cde638009" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="labbaye01" cloneof="labbaye">
+		<description>l'Abbaye des Morts (v0.1)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="RetroDeluxe"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x40000">
+				<rom name="l'abbaye des morts - retrodeluxe (2020) (v0.1).rom" size="0x40000" crc="ec5490d0" sha1="ef4e555c470849eafddae40b07cea01ef3239c6e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lacorenc">
+		<description>La Corona Encantada (English)</description>
+		<year>2009</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="la corona encantada - karoshi corporation (2009) (english).rom" size="0x8000" crc="7473aa74" sha1="97b8ef65d86ec425d5901fce80d33a3d731e50e1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lacorenca" cloneof="lacorenc">
+		<description>La Corona Encantada (English, alt)</description>
+		<year>2009</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="la corona encantada - karoshi corporation (2009) (english, alt).rom" size="0x8000" crc="880417f3" sha1="d76a904dd88f7360fe79000c374f40a69b801325" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lacorencs" cloneof="lacorenc">
+		<description>La Corona Encantada (Spanish)</description>
+		<year>2009</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="la corona encantada - karoshi corporation (2009) (spanish).rom" size="0x8000" crc="3b2a82a0" sha1="761071622b60384ec38e964fa2b2ee12d3d0b2c9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lacorencsa" cloneof="lacorenc">
+		<description>La Corona Encantada (Spanish, alt)</description>
+		<year>2009</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="la corona encantada - karoshi corporation (2009) (spanish, alt).rom" size="0x8000" crc="865cdf8d" sha1="03ae0eebbbf80f8e51c5892a74aa2b4f287a9319" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lacorencf" cloneof="lacorenc">
+		<description>La Corona Encantada (Spanish, final)</description>
+		<year>2009</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="la corona encantada - karoshi corporation (2009) (spanish, final).rom" size="0xc000" crc="71e4252e" sha1="75a59677275602e9a2b314fc077411b23754308f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lacorencfa" cloneof="lacorenc">
+		<description>La Corona Encantada (Spanish, final, alt)</description>
+		<year>2009</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="la corona encantada - karoshi corporation (2009) (spanish, final, alt).rom" size="0xc000" crc="01342acb" sha1="b5bb76d666dda2c3ad93f2ece44be72f5d0f61e3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="landing">
+		<description>Landing</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Z80 Epoch"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="landing - z80 epoch (2020).rom" size="0x4000" crc="4ca599ae" sha1="694781a1f1a6ce3c34edf6008e008bf7618d0ad1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lawnmower">
+		<description>Lawn Mower</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Paulo Silva"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="lawn mower - paulo silva (2020).rom" size="0x2000" crc="4f2d55fc" sha1="bdc04d703e33cf5074258ffd6bf77627837a848e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="leilak">
+		<description>Leila K</description>
+		<year>2007</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="DVIK &amp; Joyrex productions"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="leila k - dvik &amp; joyrex productions (2007).rom" size="0x80000" crc="b0638377" sha1="e4401a78869ffa879a55f239e5da4990cb6797a6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="libreway">
+		<description>Libreway</description>
+		<year>2014</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="nitrofurano"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="libreway - nitrofurano (2014).rom" size="0x2000" crc="615708d4" sha1="054efaa9369fd7d74c149ef3778fcb554b0b4394" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lift">
+		<description>Lift</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Inufuto"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="lift - inufuto (2021).rom" size="0x2000" crc="1f12d963" sha1="3ee27e5f01783d450c39c43a6cb38afc0e04a16b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="limaribu">
+		<description>Limaribu</description>
+		<year>2009</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Arnold Metselaar"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="limaribu - arnold metselaar (2009).rom" size="0x8000" crc="3d6cb0b7" sha1="6baf75aa6024cb1311fc1171cce4560e16de6d9a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="linez">
+		<description>Linez</description>
+		<year>2018</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Wim Dewijngaert"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="linez - wim dewijngaert (2018).rom" size="0x8000" crc="4109d42d" sha1="e0d98ac7dc66626f3562089e75dc5fcbd347fc6a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="linez1b" cloneof="linez">
+		<description>Linez (1 level broken)</description>
+		<year>2018</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes>Level 51 cannot be completed.</notes>
+		<info name="developer" value="Wim Dewijngaert"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="linez - wim dewijngaert (2018) (1 broken).rom" size="0x8000" crc="9df79847" sha1="05f3594bb1c8ca6d0479e755c0e8e43157683a18" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="linez2b" cloneof="linez">
+		<description>Linez (2 levels broken)</description>
+		<year>2018</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes>Levels 45 and 51 cannot be completed.</notes>
+		<info name="developer" value="Wim Dewijngaert"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="linez - wim dewijngaert (2018) (2 broken).rom" size="0x8000" crc="a073e387" sha1="0cfbbec61137b4e7ef05285dfc0f4683f334e737" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="linez3b" cloneof="linez">
+		<description>Linez (3 levels broken)</description>
+		<year>2018</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes>Levels 29, 45, and 51 cannot be completed.</notes>
+		<info name="developer" value="Wim Dewijngaert"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="linez - wim dewijngaert (2018) (3 broken).rom" size="0x8000" crc="98fdf09e" sha1="307f9167ffabcbc79fe6770eb58fced244a5ef03" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="litterbox">
+		<description>Litter Box</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Ray2day MSX Software"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="litter box - ray2day msx software (2020).rom" size="0x4000" crc="4a5304b4" sha1="53fb28a6e27dc212f4a0b8f3c95e5c75ee7bc087" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lizwilly">
+		<description>Lizard Willy</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="sfranck72"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="lizard willy - sfranck72 (2016).rom" size="0x8000" crc="ddff4bcc" sha1="ffe977061090a45b5af521adb888e4f3f34b7c32" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lockchas">
+		<description>Lock'n Chase</description>
+		<year>2014</year>
+		<publisher>Matra</publisher>
+		<info name="developer" value="BFG Studio"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="lock'n chase - bfg studio (2014).rom" size="0x8000" crc="784a7f57" sha1="8d806f74e15d76e484718230b6d4ccc2541f3998" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loderun">
+		<description>Lode Run</description>
+		<year>2005</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Andrea Gasparrini"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="lode run - andrea gasparrini (2005).rom" size="0x4000" crc="05d0c9b0" sha1="ea774f43f9c02064fcc07d5131691f5bd4e9c4f5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logremas">
+		<description>Logic Remastered (32KB RAM)</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Plattysoft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="logic remastered (32kb ram) - plattysoft (2021).rom" size="0xc000" crc="856b7dbb" sha1="f97eeb7bb71b510d6a7c9ba18f2aa62082165468" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logremas16" cloneof="logremas">
+		<description>Logic Remastered (16KB RAM)</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Plattysoft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x40000">
+				<rom name="logic remastered (16kb ram) - plattysoft (2021).rom" size="0x40000" crc="c92f91b7" sha1="25f15a3ad9f693225e651dfa8b2b39a36aa1ea2f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jzeewang">
+		<description>Los Jardines de Zee Wang Zu</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Jos'b"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="los jardinies de zee wang zu - jos'b (2006).rom" size="0x4000" crc="3137e35b" sha1="ba6bff43e5773c6777f73ebc63b4f38466dc2630" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jzeewangs" cloneof="jzeewang">
+		<description>Los Jardines de Zee Wang Zu (SCC)</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Jos'b"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="los jardinies de zee wang zu - jos'b (2006) (scc).rom" size="0x4000" crc="b88a7fde" sha1="46611b1ab3b8ed272d989fe3b209ebe29a866718" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lotusf3">
+		<description>Lotus F3</description>
+		<year>2007</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="DVIK &amp; Joyrex productions"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="lotus f3 - dvik &amp; joyrex productions (2007).rom" size="0x20000" crc="3b38cfea" sha1="e348e62e3c4c02d87ff2aa4d55ddebb60c3ea507" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lotusf3a" cloneof="lotusf3">
+		<description>Lotus F3 (alt)</description>
+		<year>2007</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="DVIK &amp; Joyrex productions"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="lotus f3 - dvik &amp; joyrex productions (2007) (alt).rom" size="0x20000" crc="565022a4" sha1="0f2c5a7c6cc9ff591c911e4f3f204e425bd3cf50" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lr">
+		<description>LR</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Cobinee"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="lr - cobinee (2020).rom" size="0x8000" crc="afdb2a75" sha1="22775cdd27e3352037d7d1c6e22d9068b2d606f8" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mtanks">
 		<description>M-Tanks</description>
 		<year>2012</year>
@@ -20117,7 +20549,7 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
-	<software name="pwnd310">
+	<software name="pwnd310" cloneof="pwnd3">
 		<description>PWND part 3 - Full Metal Snake (v1.0)</description>
 		<year>2019</year>
 		<publisher>&lt;homebrew&gt;</publisher>
