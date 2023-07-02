@@ -11828,7 +11828,7 @@ license:CC0-1.0
 	<software name="hobgrev">
 		<description>Hobgoblin's Revenge</description>
 		<year>1987</year>
-		<publisher>Unpublished or self-published</publisher>
+		<publisher>Arthur Sweet</publisher>
 		<info name="usage" value="Requires a 64K Apple II+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2020-04-01 -->
@@ -25522,7 +25522,7 @@ license:CC0-1.0
 	<software name="gamewrld1">
 		<description>Games From Around The World #1: Wari</description>
 		<year>1988</year>
-		<publisher>Unpublished</publisher>
+		<publisher>John Besnard (unpublished)</publisher>
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-02-21 -->
@@ -25537,7 +25537,7 @@ license:CC0-1.0
 	<software name="gamewrld2">
 		<description>Games From Around The World #2: Kono</description>
 		<year>1988</year>
-		<publisher>Unpublished</publisher>
+		<publisher>John Besnard (unpublished)</publisher>
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-02-25 -->
@@ -25552,7 +25552,7 @@ license:CC0-1.0
 	<software name="gamewrld3">
 		<description>Games From Around The World #3: Fox &amp; Geese</description>
 		<year>1988</year>
-		<publisher>Unpublished</publisher>
+		<publisher>John Besnard (unpublished)</publisher>
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-02-25 -->
@@ -25574,7 +25574,7 @@ license:CC0-1.0
 	<software name="gamewrld4">
 		<description>Games From Around The World #4: Seega</description>
 		<year>1988</year>
-		<publisher>Unpublished</publisher>
+		<publisher>John Besnard (unpublished)</publisher>
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-02-25 -->
@@ -25589,7 +25589,7 @@ license:CC0-1.0
 	<software name="gamewrld5">
 		<description>Games From Around The World #5: Nine Men's Morris</description>
 		<year>1988</year>
-		<publisher>Unpublished</publisher>
+		<publisher>John Besnard (unpublished)</publisher>
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-02-25 -->
@@ -25604,7 +25604,7 @@ license:CC0-1.0
 	<software name="gamewrld6">
 		<description>Games From Around The World #6: Mu Torere</description>
 		<year>1988</year>
-		<publisher>Unpublished</publisher>
+		<publisher>John Besnard (unpublished)</publisher>
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-02-25 -->
@@ -25619,7 +25619,7 @@ license:CC0-1.0
 	<software name="weighttr">
 		<description>Weights and Treasure</description>
 		<year>1988</year>
-		<publisher>Unpublished</publisher>
+		<publisher>John Besnard (unpublished)</publisher>
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-02-25 -->
@@ -25634,7 +25634,7 @@ license:CC0-1.0
 	<software name="brainmch">
 		<description>Brain Machine</description>
 		<year>1986</year>
-		<publisher>Unpublished</publisher>
+		<publisher>John Besnard (unpublished)</publisher>
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-02-25 -->
