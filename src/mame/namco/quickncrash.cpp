@@ -16,7 +16,7 @@ Main PCB has both 'Namco TY294-V-0 1331960101' and 'Tamura DNP0674A'
 - lots of connectors
 
 Namco H-5 CPU PCB (8830970101 - 8830960101)
-- TMPZ84C015
+- TMPZ84C015BF-12
 - D24OP8I XTAL
 - Epson SED1531F0A
 - 2x TC55257DFL-70L
@@ -92,7 +92,7 @@ void qncrash_state::qncrash(machine_config &config)
 	m_maincpu->in_p3_callback().set_log("p3 in");
 	m_maincpu->out_p3_callback().set_log("p3 out");
 
-	tmpz84c015_device &dotcpu(TMPZ84C015(config, "dotcpu", 16'000'000 / 2)); // unknown D24OP8I XTAL, everything not verified
+	tmpz84c015_device &dotcpu(TMPZ84C015(config, "dotcpu", 24'000'000 / 2)); // unknown D24OP8I XTAL, but TMPZ84C015BF-12 is rated for max 12 MHz, so guessed
 	dotcpu.set_addrmap(AS_PROGRAM, &qncrash_state::dot_program_map);
 
 	I8255(config, "ppi"); // NEC D71055C
