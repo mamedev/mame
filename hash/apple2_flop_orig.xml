@@ -3096,13 +3096,13 @@ license:CC0-1.0
 		<!-- Dump released: 2018-08-23 -->
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Game Disk" />
+			<feature name="part_id" value="Disk 1 - Game Disk" />
 			<dataarea name="flop" size="200176">
 				<rom name="trick shot disk 1 (game).woz" size="200176" crc="e84e4d9a" sha1="b0f52dd9391aacc189caae5bac460e8b38c90e2b" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Sample Shots Disk" />
+			<feature name="part_id" value="Disk 2 - Sample Shots Disk" />
 			<dataarea name="flop" size="140273">
 				<rom name="trick shot disk 2 (sample shots).woz" size="140273" crc="e053b0ed" sha1="3fa54660d25e39e6797fe038bbadb4a7c3a3d976" />
 			</dataarea>
@@ -3184,25 +3184,25 @@ license:CC0-1.0
 		<!-- Dump released: 2019-01-17 -->
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Program Disk" />
+			<feature name="part_id" value="Side A - Program Disk" />
 			<dataarea name="flop" size="240170">
 				<rom name="ultima iv - side a - program.woz" size="240170" crc="9e1d5595" sha1="a2de1815ffe51b4bdaad8b6abe8ec935911ec394" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Towne Disk" />
+			<feature name="part_id" value="Side B - Towne Disk" />
 			<dataarea name="flop" size="233516">
 				<rom name="ultima iv - side b - towne.woz" size="233516" crc="8ba7e933" sha1="f100cec0ae9d04a25f687fc3c1d76b139266826e" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Britannia Disk" />
+			<feature name="part_id" value="Side C - Britannia Disk" />
 			<dataarea name="flop" size="233520">
 				<rom name="ultima iv - side c - britannia.woz" size="233520" crc="ac61d6c4" sha1="846bfcebf3dafa9642d290ea8d1619e580573e1a" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Underworld Disk" />
+			<feature name="part_id" value="Side D - Underworld Disk" />
 			<dataarea name="flop" size="233521">
 				<rom name="ultima iv - side d - underworld.woz" size="233521" crc="7daab34f" sha1="d365cb92dd1c737a3c8773f432fe4c880019f324" />
 			</dataarea>
@@ -3613,7 +3613,6 @@ license:CC0-1.0
 		<!-- Dump released: 2019-02-23 -->
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="507649">
 				<rom name="lunar leepers.woz" size="507649" crc="3cd5d255" sha1="0607fb62340c48abc0624fe369dace2e9d5fedfd" />
 			</dataarea>
@@ -24836,13 +24835,13 @@ license:CC0-1.0
 		<!-- Dump released: 2022-09-24 -->
 		<!--"Destiny" is a 1985 adventure game developed by Jeff Pierce and distributed by Destiny Software.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side a" />
+			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="234785">
 				<rom name="destiny side a.woz" size="234785" crc="62649f93" sha1="77f67f309ea9534d1b3c9048f7025799f997bc6a" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side b" />
+			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="241441">
 				<rom name="destiny side b.woz" size="241441" crc="ba29eae6" sha1="d4abae3ecc598e8f19289c33ee4113ff9381368d" />
 			</dataarea>
@@ -24858,13 +24857,13 @@ license:CC0-1.0
 		<!-- Dump released: 2022-09-24 -->
 		<!--"Alternate Reality: The City" is a 1985 roleplaying game developed by Philip Price, Gary Gilbertson (music), Craig Skinner (artwork), Jim Ratcliff (Apple version), and Ken Jordan (Apple version), and distributed by Datasoft.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side a" />
+			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="234893">
 				<rom name="alternate reality- the city side a.woz" size="234893" crc="a991c13c" sha1="05ad6656a2b82a60d8a6c9749b3c06ce14966627" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side b" />
+			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234893">
 				<rom name="alternate reality- the city side b.woz" size="234893" crc="d91bf591" sha1="058f5be53707bc86a4ceb459af14861f070e0786" />
 			</dataarea>
@@ -24910,13 +24909,13 @@ license:CC0-1.0
 		<!-- Dump released: 2022-10-12 -->
 		<!--"Copy II Plus" is a 1989 disk utility developed and distributed by Central Point Software. This is version 9.0 beta 1.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side a" />
+			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="234790">
 				<rom name="copy ii plus v9.0 beta 1 - side a.woz" size="234790" crc="5b51194a" sha1="01b9804e27d7a1ce01e88feada6e082b8a2db1a1" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side b" />
+			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234790">
 				<rom name="copy ii plus v9.0 beta 1 - side b.woz" size="234790" crc="2e225a8f" sha1="656d42a1ecc95874235d3539c8545ac03ec71819" />
 			</dataarea>
@@ -25559,13 +25558,13 @@ license:CC0-1.0
 		<!-- Dump released: 2023-02-25 -->
 		<!--"Games From Around The World #3: Fox & Geese" is a 1988 board game developed by John Besnard. It is unpublished.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Program" />
+			<feature name="part_id" value="Program" />
 			<dataarea name="flop" size="234792">
 				<rom name="games from around the world #3- fox &amp; geese.woz" size="234792" crc="5dd11e9e" sha1="01c337fb1acfc80c6dbbf5dd3024bcac85cf9e01" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 Source" />
+			<feature name="part_id" value="Source code" />
 			<dataarea name="flop" size="143360">
 				<rom name="games from around the world #3- fox &amp; geese source code.dsk" size="143360" crc="f1863a88" sha1="d5e041da5468c4d15f3914c2dba9e1b60e98dd0f" />
 			</dataarea>
@@ -25656,13 +25655,13 @@ license:CC0-1.0
 		<!-- Dump released: 2023-02-25 -->
 		<!--"First Encounter" is a 1987 educational game developed by John Besnard and presented by Softdisk.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side a" />
+			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="234789">
 				<rom name="first encounter side a.woz" size="234789" crc="0ea12c21" sha1="170c558083e8a80fa558c8104f212c9cfe61e393" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side b" />
+			<feature name="part_id" value="Side B - Boot" />
 			<dataarea name="flop" size="234789">
 				<rom name="first encounter side b (boot).woz" size="234789" crc="dae05752" sha1="5816344bb2cf301e025fba5c1b1917f7b6cb4584" />
 			</dataarea>
@@ -26929,13 +26928,13 @@ license:CC0-1.0
 		<!-- Dump released: 2023-06-03 -->
 		<!--"Leather Goddesses of Phobos" is a 1988 adventure game developed by Steve Meretzky and distributed by Infocom. This is r4-880405-2H. -->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side a" />
+			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="234825">
 				<rom name="leather goddesses of phobos r4-880405-2h side a.woz" size="234825" crc="90d263d5" sha1="b4440ba4bf56a01f71bf8a4e9c6122fd6d09025c" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side b" />
+			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234718">
 				<rom name="leather goddesses of phobos r4-880405-2h side b.woz" size="234718" crc="765f1e0f" sha1="78d2ecc997c605f2b52ec34c45497ffd54815e9e" />
 			</dataarea>
@@ -27041,13 +27040,13 @@ license:CC0-1.0
 		<!-- Dump released: 2023-06-03 -->
 		<!--"Sherlock: The Riddle of the Crown Jewels" is a 1987 adventure game developed by Bob Bates and distributed by Infocom. This is r21-871214-2F. -->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side a" />
+			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="234841">
 				<rom name="sherlock r21-871214-2f side a.woz" size="234841" crc="c0a5b356" sha1="4d9c1f5274191270a427d04778487b0079179dbd" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side b" />
+			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234735">
 				<rom name="sherlock r21-871214-2f side b.woz" size="234735" crc="43490be6" sha1="166fc4ba1ce976cef780f1adb5bd83d1ec6dd024" />
 			</dataarea>
@@ -27258,13 +27257,13 @@ license:CC0-1.0
 		<!-- Dump released: 2023-06-04 -->
 		<!--"The Royal Rules" is a 1986 educational game developed by Tom O'Brien and Raoul Watson, and distributed by Sunburst Communications.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Disk 1 - Program disk" />
 			<dataarea name="flop" size="234715">
 				<rom name="the royal rules disk 1 - program.woz" size="234715" crc="8c70e053" sha1="7ef047f711e1890166d4f06817ed39c6d48dcd5a" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Disk 2 - Data disk" />
 			<dataarea name="flop" size="234715">
 				<rom name="the royal rules disk 2 - data.woz" size="234715" crc="e5565228" sha1="03db61fe88d3c1bcc178f2c34cb6216cbd3e9db3" />
 			</dataarea>
@@ -27415,13 +27414,13 @@ license:CC0-1.0
 		<!-- Dump released: 2023-06-10 -->
 		<!--"Stickybear Music" is a 1986 educational program developed by Richard Hefter and Dave Lusby, and distributed by Optimum Resource.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Program disk" />
 			<dataarea name="flop" size="234819">
 				<rom name="stickybear music.woz" size="234819" crc="e568902e" sha1="f070d8e67e09e7cea4f0c89e7b913caa37559c2b" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Library 1 disk" />
 			<dataarea name="flop" size="234809">
 				<rom name="stickybear music library 1.woz" size="234809" crc="430a7a0b" sha1="03d14eaa14ad6558789cb2a8289f310037c33751" />
 			</dataarea>
@@ -27722,13 +27721,13 @@ license:CC0-1.0
 		<!-- Dump released: 2023-06-11 -->
 		<!--"Troll Printmaker: Holiday Fun" is a 1994 graphics program developed by Millicent Sabater (design, animation, graphic design), Hudson Ansley (design, programming, sound), Bonnie Seiler (educational consultant), and Nancy Patrissi (project manager), and distributed by Troll Associates.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Disk 1 - Program disk" />
 			<dataarea name="flop" size="234952">
 				<rom name="troll printmaker- holiday fun disk 1 - program.woz" size="234952" crc="cc6585d0" sha1="95b0dec2ec64a26810050014b10f06df2d89489b" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Disk 2 - Data disk" />
 			<dataarea name="flop" size="234980">
 				<rom name="troll printmaker- holiday fun disk 2 - data.woz" size="234980" crc="519bbe93" sha1="f5d9c9179b31fff7436da523a4ae5ee21fc26265" />
 			</dataarea>
@@ -28674,13 +28673,13 @@ license:CC0-1.0
 		<!--Dump released: 2023-06-22-->
 		<!--"MECC Dataquest: The Presidents" is a 1985 educational program developed and distributed by MECC. This is version 1.1.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side a" />
+			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="234805">
 				<rom name="mecc dataquest- the presidents v1.1 side a.woz" size="234805" crc="474553d5" sha1="9a6e9b4d2f1a2abc56f2344afb5eeed17194bc26" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side b" />
+			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234805">
 				<rom name="mecc dataquest- the presidents v1.1 side b.woz" size="234805" crc="0918cfff" sha1="0648dea58422b86c7a8472e8d8614177825c3a7f" />
 			</dataarea>
@@ -28696,13 +28695,13 @@ license:CC0-1.0
 		<!--Dump released: 2023-06-22-->
 		<!--"MECC Dataquest: The Presidents" is a 1985 educational program developed and distributed by MECC. This is version 1.2.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side a" />
+			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="234805">
 				<rom name="mecc dataquest- the presidents v1.2 side a.woz" size="234805" crc="6e3d2c1b" sha1="46e45f560d98fcd300224659608c65c6b463dcaa" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side b" />
+			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234805">
 				<rom name="mecc dataquest- the presidents v1.2 side b.woz" size="234805" crc="23bcdad9" sha1="9c4c5bafeb5f3401a278fca30b919b548d15a6e5" />
 			</dataarea>
@@ -28823,13 +28822,13 @@ license:CC0-1.0
 		<!--Dump released: 2023-06-22-->
 		<!--"Study Guide" is a 1984 educational program developed and distributed by MECC. This is version 1.5.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Disk 1 - Program disk" />
 			<dataarea name="flop" size="241442">
 				<rom name="study guide v1.5 disk 1 - program.woz" size="241442" crc="df0ee4ff" sha1="33bded9178a6364841753f6bc32651468bb2e393" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Disk 2 - Data master disk" />
 			<dataarea name="flop" size="241442">
 				<rom name="study guide v1.5 disk 2 - data master.woz" size="241442" crc="12ede32a" sha1="78f1f86b7c9d4c2d20047cb3017f05e5f76b35bf" />
 			</dataarea>
@@ -28875,13 +28874,13 @@ license:CC0-1.0
 		<!--Dump released: 2023-06-22-->
 		<!--"The Oregon Trail" is a 1985 educational program developed and distributed by MECC. This is version 1.4.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side a" />
+			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="234806">
 				<rom name="the oregon trail v1.4 side a.woz" size="234806" crc="8c97c45a" sha1="bba76a312ec2da8a59d8bbd71ea7f06dc04075c1" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side b" />
+			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234806">
 				<rom name="the oregon trail v1.4 side b.woz" size="234806" crc="2e324af6" sha1="70e1b9074e12e750e246c9c00241c31ae3eab7ad" />
 			</dataarea>
@@ -28897,13 +28896,13 @@ license:CC0-1.0
 		<!--Dump released: 2023-06-22-->
 		<!--"Word Processing on the Apple" is a 1984 educational program developed and distributed by MECC. This is version 2.0.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side a" />
+			<feature name="part_id" value="Side A - Prodos disk" />
 			<dataarea name="flop" size="234803">
 				<rom name="word processing on the apple v2.0 side a - prodos.woz" size="234803" crc="d2f837b0" sha1="59abacf7555ab1cc6797313e01b1290b1114bc60" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side b" />
+			<feature name="part_id" value="Side B - Dos 3.3 disk" />
 			<dataarea name="flop" size="234803">
 				<rom name="word processing on the apple v2.0 side b - dos 3.3.woz" size="234803" crc="81bddcaa" sha1="987dc8e8041bc0e76d2fad40c99a15f251299f9a" />
 			</dataarea>
@@ -28919,13 +28918,13 @@ license:CC0-1.0
 		<!--Dump released: 2023-06-22-->
 		<!--"Arizona Mix" is a 1993 educational program developed by Rich Bergeron, Greg S. Johnson, Sheila Kelly, Lon Koenig, John Persoon, and Elizabeth Wendland, and distributed by MECC. This is version 1.0.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side a" />
+			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="234880">
 				<rom name="arizona mix v1.0 side a.woz" size="234880" crc="fe2aeca3" sha1="aeea8ab575747e2995438540e20e665710b135d1" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side b" />
+			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234880">
 				<rom name="arizona mix v1.0 side b.woz" size="234880" crc="02901e10" sha1="f3fd29c945af0ec3ba7862a6c2053883e9b28239" />
 			</dataarea>
@@ -29061,13 +29060,13 @@ license:CC0-1.0
 		<!--Dump released: 2023-06-22-->
 		<!--"Dog Sled Ambassadors" is a 1993 educational program developed by Beth Bell, Beth Daniels, Sheila Dols, Sheila Kelly, Kevin Neff, Korey Schulz, and John P. Wlazlo, and distributed by MECC. This is version 1.0.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side a" />
+			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="234890">
 				<rom name="dog sled ambassadors v1.0 side a.woz" size="234890" crc="cc3a97ec" sha1="748921d1d7a6e855c7d89b994025693389939773" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side b" />
+			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234890">
 				<rom name="dog sled ambassadors v1.0 side b.woz" size="234890" crc="38fc607d" sha1="eac6fc6e2e3ae9e3c808c80d2a71605c86678a28" />
 			</dataarea>
@@ -29158,13 +29157,13 @@ license:CC0-1.0
 		<!--Dump released: 2023-06-22-->
 		<!--"Instant Survey" is a 1989 educational program developed by Mark Dostal, Cathy Grittner, Greg Holey, Sherry Luedloff, Jean Sharp, Roger Shimada, Craig Solomonson, Jim Thompson, Debra Vonk, and Brian Walker, and distributed by MECC. This is version 1.0.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Disk 1 - Program disk" />
 			<dataarea name="flop" size="234930">
 				<rom name="instant survey v1.0 disk 1 - program.woz" size="234930" crc="e91954ea" sha1="34513b9a7dbc6e386a54c27c387969796e85c657" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Disk 2 - Sampler disk" />
 			<dataarea name="flop" size="234930">
 				<rom name="instant survey v1.0 disk 2 - sampler.woz" size="234930" crc="0e0350d7" sha1="b0d2c559bbc70b1a40276c79984d926f5371c623" />
 			</dataarea>
@@ -29420,13 +29419,13 @@ license:CC0-1.0
 		<!--Dump released: 2023-06-22-->
 		<!--"Show Time" is a 1986 educational program developed and distributed by MECC. This is version 1.1.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side a" />
+			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="234782">
 				<rom name="show time v1.1 side a.woz" size="234782" crc="e4e19090" sha1="4b169386362763fbf86f1d396f2e7491f468cbbc" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side b" />
+			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234782">
 				<rom name="show time v1.1 side b.woz" size="234782" crc="0e92e491" sha1="b43accc4cfec757422868d00c745298edb9e2ce8" />
 			</dataarea>
@@ -29442,13 +29441,13 @@ license:CC0-1.0
 		<!--Dump released: 2023-06-23-->
 		<!--"Space Station Freedom" is a 1990 educational program developed by Mark Hanson, Charolyn Kapplinger, Mike Palmquist, Jane Peterson, and John P. Wlazlo, and distributed by MECC. This is version 1.0.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side a" />
+			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="234880">
 				<rom name="space station freedom v1.0 side a.woz" size="234880" crc="111e0a80" sha1="cbb7296917482de22f96625f2bfb47b5a681bfdc" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side b" />
+			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234880">
 				<rom name="space station freedom v1.0 side b.woz" size="234880" crc="440e9416" sha1="53ae773b5920501b0e1dfaa68fd375e1155f43b2" />
 			</dataarea>
@@ -29509,13 +29508,13 @@ license:CC0-1.0
 		<!--Dump released: 2023-06-23-->
 		<!--"Time Navigator Leaps Back" is a 1990 educational program developed by Beth Bell, Vincent Erickson, John J. Krenz, Nan Leekley, Brian Nesse, Mark Paquette, Diane Portner, and Wayne Studer, and distributed by MECC. This is version 1.0.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side a" />
+			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="234914">
 				<rom name="time navigator leaps back v1.0 side a.woz" size="234914" crc="1ff83681" sha1="13dca1caca38e75a5951baddfce05deaaea1498c" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side b" />
+			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234914">
 				<rom name="time navigator leaps back v1.0 side b.woz" size="234914" crc="ea1cc92a" sha1="ac48ac737bcdef4adbc7b3978895502bbc373111" />
 			</dataarea>
@@ -29531,13 +29530,13 @@ license:CC0-1.0
 		<!--Dump released: 2023-06-23-->
 		<!--"Time Navigator" is a 1989 educational program developed by Beth Bell, Vincent Erickson, Charolyn Kapplinger, John J. Krenz, Nan Leekley, Brian Nesse, Mark Paquette, Diane Portner, and Wayne Studer, and distributed by MECC. This is version 1.0.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side a" />
+			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="234923">
 				<rom name="time navigator v1.0 side a.woz" size="234923" crc="93a87311" sha1="4ca9a74f4f46c6bef92259d0261eeb1f5897a9c9" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side b" />
+			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234923">
 				<rom name="time navigator v1.0 side b.woz" size="234923" crc="89a881bf" sha1="fec13816b6ccdbd488ff0743d7524df73006645d" />
 			</dataarea>
@@ -29553,13 +29552,13 @@ license:CC0-1.0
 		<!--Dump released: 2023-06-23-->
 		<!--"Vacation Nation Travel" is a 1991 educational program developed by John Ojanen, Mike Palmquist, Dee Dee Roedel, and John P. Wlazlo, and distributed by MECC. This is version 1.0.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side a" />
+			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="234862">
 				<rom name="vacation nation travel v1.0 side a.woz" size="234862" crc="7fd8b5e2" sha1="cb9d2830ef3f6d5137ba7fbb2d4b27d4ee07077e" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side b" />
+			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234862">
 				<rom name="vacation nation travel v1.0 side b.woz" size="234862" crc="630aecc7" sha1="953ecdc580d7945c9222f0cbe8053a59fc821bb8" />
 			</dataarea>
@@ -29605,13 +29604,13 @@ license:CC0-1.0
 		<!--Dump released: 2023-06-23-->
 		<!--"Zoyon Patrol" is a 1987 educational program developed and distributed by MECC. This is version 1.0.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side a" />
+			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="234785">
 				<rom name="zoyon patrol v1.0 side a.woz" size="234785" crc="bbc55637" sha1="a08f8bc01e4c29f842715e5f95d799338a4da29a" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side b" />
+			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234785">
 				<rom name="zoyon patrol v1.0 side b.woz" size="234785" crc="3d07b6c2" sha1="dfbaa413a575e90d3724be8ba61074573bbad47a" />
 			</dataarea>
@@ -29777,13 +29776,13 @@ license:CC0-1.0
 		<!--Dump released: 2023-06-27-->
 		<!--"Oliver's Crosswords" is a 1990 educational program developed and distributed by Micrograms Publishing.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side a" />
+			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="234777">
 				<rom name="oliver's crosswords side a.woz" size="234777" crc="69a602e3" sha1="f943186b0ec801e36da67b4e42c402c7fce82c8a" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side b" />
+			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234777">
 				<rom name="oliver's crosswords side b.woz" size="234777" crc="a3b0570f" sha1="ad398cff43b42998c8ac9a140a7d044d13274a1b" />
 			</dataarea>

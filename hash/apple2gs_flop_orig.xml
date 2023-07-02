@@ -3602,7 +3602,7 @@ license:CC0-1.0
 		<description>Dragon's Lair</description>
 		<year>2022</year>
 		<publisher>Brutal Deluxe Software</publisher>
-		<info name="usage" value="System Requirements: Apple IIgs ROM 01/3 with 1.5 MB RAM, one 3.5 disk drive, System 5.0.4. Recommended: Apple IIgs ROM 01/3 with 4 MB RAM, accelerator card, hard drive, System 6.0.1." />		
+		<info name="usage" value="System Requirements: Apple IIgs ROM 01/3 with 1.5 MB RAM, one 3.5 disk drive, System 5.0.4. Recommended: Apple IIgs ROM 01/3 with 4 MB RAM, accelerator card, hard drive, System 6.0.1." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2022-3-30 -->
 		<!--  Apple IIgs version by Antoine Vignau and Olivier Zardini -->
@@ -4072,7 +4072,6 @@ license:CC0-1.0
 		<!--  Apple IIgs version by Antoine Vignau and Olivier Zardini -->
 
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="819272">
 				<rom name="canalmeurtre.2mg" size="819272" crc="b5c3cf6d" sha1="be8b75f6352d4e77146e75a911f4b8bbc54f5480" />
 			</dataarea>
@@ -4088,13 +4087,13 @@ license:CC0-1.0
 		<!-- Dump released: 2022-11-20 -->
 		<!--"Sinbad and the Throne of the Falcon" is a 1990 action game developed by Curt Toumanian (art director), Steve Quinn (original art), Jeff Hilbers (art), Rob Landeros (art), Russ Truelove (art), Bill Williams (music & story), Jim Simmons (orchestration), Andrew Caldwell (orchestration), Douglass Sharp (computagraphy), and distributed by Cinemaware.-->
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1 Reel 1" />
+			<feature name="part_id" value="Disk 1 - Reel 1" />
 			<dataarea name="flop" size="1296414">
 				<rom name="sinbad and the throne of the falcon - reel 1.woz" size="1296414" crc="a3056453" sha1="f90a3f48445f80abe28ba368ff9de51deb55930a" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2 Reel 2 " />
+			<feature name="part_id" value="Disk 2 - Reel 2" />
 			<dataarea name="flop" size="1296381">
 				<rom name="sinbad and the throne of the falcon - reel 2.woz" size="1296381" crc="3eb2b298" sha1="1920ab0321f8bcf85a607baf2b3a0778251c3747" />
 			</dataarea>
@@ -4110,13 +4109,13 @@ license:CC0-1.0
 		<!-- Dump released: 2022-11-24 -->
 		<!--"Magical Myths" is a 1988 educational program developed by Stan Brewster, Joseph B. Hewitt IV (graphics), and June Stark, and distributed by Unicorn Software.-->
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk  Side " />
+			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1296701">
 				<rom name="magical myths iigs disk 1.woz" size="1296701" crc="681789c6" sha1="6f65fcfe7f25eeac365e17fe00fb9c044048dc04" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk  Side " />
+			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1296189">
 				<rom name="magical myths iigs disk 2.woz" size="1296189" crc="aff8db40" sha1="e9fb62fb6006938b101cde428bd9252d333944e4" />
 			</dataarea>
