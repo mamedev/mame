@@ -28487,6 +28487,8 @@ roljokr1                        // (c) 1999 Paloma-Elektronik
 roljokr2                        // (c) 1997 Paloma-Elektronik
 roljokr3                        // (c) 1999 Paloma-Elektronik
 vip2000                         // (c) Paloma-Elektronik
+vip2000a                        // (c) Paloma-Elektronik
+vip2000b                        // (c) Paloma-Elektronik
 
 @source:misc/blitz68k.cpp
 bankrob                         // (c) 1993 Entertainment Technology Corp.
