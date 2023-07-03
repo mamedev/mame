@@ -131,6 +131,7 @@ private:
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank2;
 	optional_memory_bank m_samplebank;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_maincpu_program;
 
 	// video-related
 	tilemap_t *m_fg_tilemap = nullptr;
@@ -183,7 +184,7 @@ private:
 	uint32_t screen_update_trojan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void lwings_interrupt(int state);
 	void avengers_interrupt(int state);
-	inline int is_sprite_on( uint8_t *buffered_spriteram, int offs );
+	bool is_sprite_on(uint8_t const *buffered_spriteram, int offs);
 	void lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
@@ -307,7 +308,7 @@ uint8_t lwings_state::avengers_m1_r(offs_t offset)
 	// 2 wait states on each M1 access (needed to keep in sync with MCU)
 	if (!machine().side_effects_disabled())
 		m_maincpu->adjust_icount(-2);
-	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	return m_maincpu_program.read_byte(offset);
 }
 
 uint8_t lwings_state::avengers_soundlatch2_r()
@@ -637,35 +638,30 @@ void lwings_state::trojan_bg2_image_w(uint8_t data)
 
 ***************************************************************************/
 
-inline int lwings_state::is_sprite_on( uint8_t *buffered_spriteram, int offs )
+inline bool lwings_state::is_sprite_on(uint8_t const *buffered_spriteram, int offs)
 {
-	int sx, sy;
-
-	sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
-	sy = buffered_spriteram[offs + 2];
+	int const sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
+	int const sy = buffered_spriteram[offs + 2];
 
 	return sx || sy;
 }
 
 void lwings_state::lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	uint8_t *buffered_spriteram = m_spriteram->buffer();
-	int offs;
+	uint8_t const *const buffered_spriteram = m_spriteram->buffer();
 
-	for (offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
+	for (int offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
 	{
 		if (is_sprite_on(buffered_spriteram, offs))
 		{
-			int code, color, sx, sy, flipx, flipy;
-
-			sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
-			sy = buffered_spriteram[offs + 2];
+			int sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
+			int sy = buffered_spriteram[offs + 2];
 			if (sy > 0xf8)
 				sy -= 0x100;
-			code = buffered_spriteram[offs] | (buffered_spriteram[offs + 1] & 0xc0) << 2;
-			color = (buffered_spriteram[offs + 1] & 0x38) >> 3;
-			flipx = buffered_spriteram[offs + 1] & 0x02;
-			flipy = buffered_spriteram[offs + 1] & 0x04;
+			int code = buffered_spriteram[offs] | (buffered_spriteram[offs + 1] & 0xc0) << 2;
+			int color = (buffered_spriteram[offs + 1] & 0x38) >> 3;
+			int flipx = buffered_spriteram[offs + 1] & 0x02;
+			int flipy = buffered_spriteram[offs + 1] & 0x04;
 
 			if (flip_screen())
 			{
@@ -675,35 +671,34 @@ void lwings_state::lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 				flipy = !flipy;
 			}
 
-			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
-					code+(m_sprbank*0x400),color,
-					flipx,flipy,
-					sx,sy,15);
+			m_gfxdecode->gfx(2)->transpen(
+					bitmap, cliprect,
+					code + (m_sprbank * 0x400), color,
+					flipx, flipy, sx, sy,
+					15);
 		}
 	}
 }
 
 void lwings_state::trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	uint8_t *buffered_spriteram = m_spriteram->buffer();
-	int offs;
+	uint8_t const *const buffered_spriteram = m_spriteram->buffer();
 
-	for (offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
+	for (int offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
 	{
 		if (is_sprite_on(buffered_spriteram, offs))
 		{
-			int code, color, sx, sy, flipx, flipy;
-
-			sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
-			sy = buffered_spriteram[offs + 2];
+			int sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
+			int sy = buffered_spriteram[offs + 2];
 			if (sy > 0xf8)
 				sy -= 0x100;
-			code = buffered_spriteram[offs] |
+			int code = buffered_spriteram[offs] |
 					((buffered_spriteram[offs + 1] & 0x20) << 4) |
 					((buffered_spriteram[offs + 1] & 0x40) << 2) |
 					((buffered_spriteram[offs + 1] & 0x80) << 3);
-			color = (buffered_spriteram[offs + 1] & 0x0e) >> 1;
+			int color = (buffered_spriteram[offs + 1] & 0x0e) >> 1;
 
+			int flipx, flipy;
 			if (m_spr_avenger_hw)
 			{
 				flipx = 0;                                      /* Avengers */
@@ -723,10 +718,11 @@ void lwings_state::trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 				flipy = !flipy;
 			}
 
-			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
-					code,color,
-					flipx,flipy,
-					sx,sy,15);
+			m_gfxdecode->gfx(2)->transpen(
+					bitmap, cliprect,
+					code, color,
+					flipx, flipy, sx, sy,
+					15);
 		}
 	}
 }
@@ -1167,6 +1163,8 @@ void lwings_state::machine_start()
 
 	m_bank1->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
+	m_maincpu->space(AS_PROGRAM).specific(m_maincpu_program);
+
 	save_item(NAME(m_bg2_image));
 	save_item(NAME(m_scroll_x));
 	save_item(NAME(m_scroll_y));
@@ -1176,9 +1174,9 @@ void lwings_state::machine_start()
 	save_item(NAME(m_sprbank));
 
 	/*
-	Fireball has 2 copies of the 'fixed' code in the main program rom, with only slight changes.
-	it might be possible the hardware can bank that whole area or alternatively only see one version of the program
-	the only difference is 2 pieces of code have been swapped around.  It is unknown when this code is called.
+	Fireball has 2 copies of the 'fixed' code in the main program ROM, with only slight changes.
+	It might be possible the hardware can bank that whole area or alternatively only see one version of the program
+	The only difference is 2 pieces of code have been swapped around.  It is unknown when this code is called.
 
 	3822:   CD  73
 	3823:   00  23

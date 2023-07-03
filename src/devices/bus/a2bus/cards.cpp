@@ -44,9 +44,9 @@
 #include "a2zipdrive.h"
 #include "booti.h"
 #include "byte8251.h"
-#include "computereyes2.h"
 #include "ccs7710.h"
 #include "cmsscsi.h"
+#include "computereyes2.h"
 #include "excel9.h"
 #include "ezcgi.h"
 #include "grafex.h"
@@ -56,6 +56,7 @@
 #include "mouse.h"
 #include "pc_xporter.h"
 #include "prodosromdrive.h"
+#include "q68.h"
 #include "ramcard128k.h"
 #include "ramcard16k.h"
 #include "romcard.h"
@@ -69,7 +70,6 @@
 #include "transwarp.h"
 #include "uniprint.h"
 #include "uthernet.h"
-#include "q68.h"
 
 
 void apple2_slot0_cards(device_slot_interface &device)
