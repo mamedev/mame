@@ -308,8 +308,8 @@ MC6845_UPDATE_ROW(heath_tlb_device::crtc_update_row)
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
 
-	if (de) {
-
+	if (de)
+	{
 		for (uint16_t x = 0; x < x_count; x++)
 		{
 			uint8_t inv = (x == cursor_x) ? 0xff : 0;
