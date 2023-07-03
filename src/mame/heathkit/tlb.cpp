@@ -305,38 +305,52 @@ void heath_tlb_device::right_shift_w(int state)
 
 MC6845_UPDATE_ROW(heath_tlb_device::crtc_update_row)
 {
-	if (!de)
-	{
-		return;
-	}
-
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
 
-	for (uint16_t x = 0; x < x_count; x++)
+	if (de)
 	{
-		uint8_t inv = (x == cursor_x) ? 0xff : 0;
-
-		uint8_t chr = m_p_videoram[(ma + x) & 0x7ff];
-
-		if (chr & 0x80)
+		for (uint16_t x = 0; x < x_count; x++)
 		{
-			inv ^= 0xff;
-			chr &= 0x7f;
+			uint8_t inv = (x == cursor_x) ? 0xff : 0;
+
+			uint8_t chr = m_p_videoram[(ma + x) & 0x7ff];
+
+			if (chr & 0x80)
+			{
+				inv ^= 0xff;
+				chr &= 0x7f;
+			}
+
+			// get pattern of pixels for that character scanline
+			uint8_t const gfx = m_p_chargen[(chr<<4) | ra] ^ inv;
+
+			// Display a scanline of a character (8 pixels)
+			*p++ = palette[BIT(gfx, 7)];
+			*p++ = palette[BIT(gfx, 6)];
+			*p++ = palette[BIT(gfx, 5)];
+			*p++ = palette[BIT(gfx, 4)];
+			*p++ = palette[BIT(gfx, 3)];
+			*p++ = palette[BIT(gfx, 2)];
+			*p++ = palette[BIT(gfx, 1)];
+			*p++ = palette[BIT(gfx, 0)];
 		}
+	}
+	else
+	{
+		const rgb_t color = palette[0];
 
-		// get pattern of pixels for that character scanline
-		uint8_t const gfx = m_p_chargen[(chr<<4) | ra] ^ inv;
-
-		// Display a scanline of a character (8 pixels)
-		*p++ = palette[BIT(gfx, 7)];
-		*p++ = palette[BIT(gfx, 6)];
-		*p++ = palette[BIT(gfx, 5)];
-		*p++ = palette[BIT(gfx, 4)];
-		*p++ = palette[BIT(gfx, 3)];
-		*p++ = palette[BIT(gfx, 2)];
-		*p++ = palette[BIT(gfx, 1)];
-		*p++ = palette[BIT(gfx, 0)];
+		for (uint16_t x = 0; x < x_count; x++)
+		{
+			*p++ = color; // bit 7
+			*p++ = color; // bit 6
+			*p++ = color; // bit 5
+			*p++ = color; // bit 4
+			*p++ = color; // bit 3
+			*p++ = color; // bit 2
+			*p++ = color; // bit 1
+			*p++ = color; // bit 0
+		}
 	}
 }
 
