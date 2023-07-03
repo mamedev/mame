@@ -7311,7 +7311,7 @@ During gameplay the timer/question (?) has offset char (verify)
 
 	<software name="adaw_alta" supported="no">
 		<!-- "Power" -->
-		<description>Altaaqa</description>
+		<description>al-Taaqa</description>
 		<year>198?</year>
 		<publisher>aDawliah</publisher>
 		<notes><![CDATA[
@@ -7329,7 +7329,7 @@ Needs Arabic keyboard layout
 
 	<software name="adaw_bank" supported="no">
 		<!-- "Data Bank" -->
-		<description>Bank Almaelumat</description>
+		<description>Bank al-Maelumat</description>
 		<year>198?</year>
 		<publisher>aDawliah</publisher>
 		<notes><![CDATA[
@@ -7348,7 +7348,7 @@ Needs Arabic keyboard layout
 
 	<software name="adaw_kayf" supported="no">
 		<!-- "How Computers Work" -->
-		<description>Kayf Yaemal Alkumbiutar</description>
+		<description>Kayf Yaemal al-Computer</description>
 		<year>198?</year>
 		<publisher>aDawliah</publisher>
 		<notes><![CDATA[
