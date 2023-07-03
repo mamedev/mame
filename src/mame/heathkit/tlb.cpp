@@ -338,11 +338,6 @@ MC6845_UPDATE_ROW(heath_tlb_device::crtc_update_row)
 	}
 	else
 	{
-		// for the additional scan lines we need to clear them to properly support
-		// line 25 of the H19. On the real H19, the crtc is reprogramed to not
-		// display these lines and the memory remains the same. Only when the line
-		// 25 is reenabled will the memory be cleared. On a real CRT the screen
-		// will fade, but here, have to explicitly clear them from the screen.
 		const rgb_t color = palette[0];
 
 		for (uint16_t x = 0; x < x_count; x++)
