@@ -1210,6 +1210,34 @@ static INPUT_PORTS_START( daimakai )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( daimakair )
+	PORT_INCLUDE(ghouls)
+
+	PORT_MODIFY("DSWC")
+	PORT_DIPNAME( 0x0f, 0x0f, "Starting Level" ) PORT_DIPLOCATION("SW(C):1,2,3,4")
+	PORT_DIPSETTING(    0x0f, "Level 1-1 (3 lives)" )
+	PORT_DIPSETTING(    0x0e, "Level 1-2 (4 lives)" )
+	PORT_DIPSETTING(    0x0d, "Level 2-1 (5 lives)" )
+	PORT_DIPSETTING(    0x0c, "Level 2-2 (6 lives)" )
+	PORT_DIPSETTING(    0x0b, "Level 3-1 (3 lives)" )
+	PORT_DIPSETTING(    0x0a, "Level 3-2 (4 lives)" )
+	PORT_DIPSETTING(    0x09, "Level 4-1 (5 lives)" )
+	PORT_DIPSETTING(    0x08, "Level 4-2 (6 lives)" )
+	PORT_DIPSETTING(    0x07, "Level 5-1 (3 lives)" )
+	PORT_DIPSETTING(    0x06, "Level 5-2 (4 lives)" )
+	PORT_DIPSETTING(    0x05, "Level 6 (5 Lives)" )
+	PORT_DIPSETTING(    0x04, "Level 6 (6 Lives)" )
+//  PORT_DIPSETTING(    0x03, "INVALID" )
+//  PORT_DIPSETTING(    0x02, "INVALID" )
+//  PORT_DIPSETTING(    0x01, "INVALID" )
+//  PORT_DIPSETTING(    0x00, "INVALID" )
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" ) PORT_DIPLOCATION("SW(B):8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 /* "Debug" features to be implemented */
 static INPUT_PORTS_START( strider )
 	PORT_INCLUDE( cps1_3b )
@@ -14760,7 +14788,7 @@ GAME( 1988, lostwrldo,   forgottn, forgottn,   forgottn, cps_state, init_cps1,  
 GAME( 1988, ghouls,      0,        cps1_10MHz, ghouls,   cps_state, init_cps1,     ROT0,   "Capcom", "Ghouls'n Ghosts (World)", MACHINE_SUPPORTS_SAVE )   // "EXPORT" // Wed.26.10.1988 in the ROMs
 GAME( 1988, ghoulsu,     ghouls,   cps1_10MHz, ghoulsu,  cps_state, init_cps1,     ROT0,   "Capcom", "Ghouls'n Ghosts (USA)", MACHINE_SUPPORTS_SAVE ) // "EXPORT" // Wed.26.10.1988 in the ROMs
 GAME( 1988, daimakai,    ghouls,   cps1_10MHz, daimakai, cps_state, init_cps1,     ROT0,   "Capcom", "Daimakaimura (Japan)", MACHINE_SUPPORTS_SAVE )              // Wed.26.10.1988 in the ROMs
-GAME( 1988, daimakair,   ghouls,   cps1_12MHz, daimakai, cps_state, init_cps1,     ROT0,   "Capcom", "Daimakaimura (Japan Resale Ver.)", MACHINE_SUPPORTS_SAVE )      // Wed.26.10.1988 in the ROMs   // 12MHz verified
+GAME( 1988, daimakair,   ghouls,   cps1_12MHz, daimakair, cps_state, init_cps1,    ROT0,   "Capcom", "Daimakaimura (Japan Resale Ver.)", MACHINE_SUPPORTS_SAVE )      // Wed.26.10.1988 in the ROMs   // 12MHz verified
 GAME( 1989, strider,     0,        cps1_10MHz, strider,  cps_state, init_cps1,     ROT0,   "Capcom", "Strider (USA, B-Board 89624B-2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, striderua,   strider,  cps1_10MHz, stridrua, cps_state, init_cps1,     ROT0,   "Capcom", "Strider (USA, B-Board 89624B-3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, strideruc,   strider,  cps1_10MHz, stridrua, cps_state, init_cps1,     ROT0,   "bootleg (Capcom)", "Strider (USA, B-Board 90629B-3, buggy Street Fighter II conversion)", MACHINE_SUPPORTS_SAVE ) // various bugs even on PCB, see ROM load
