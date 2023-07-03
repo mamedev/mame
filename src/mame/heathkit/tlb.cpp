@@ -45,8 +45,8 @@
       0x60    MC6845 CRT controller
       0x80    MM5740 Keyboard encoder
       0xA0    Keyboard status
-      0xC0    Key click enable
-      0xE0    Bell enable
+      0xC0    Trigger key click
+      0xE0    Trigger bell
 
 ****************************************************************************/
 
