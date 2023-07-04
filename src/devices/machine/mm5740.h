@@ -118,9 +118,10 @@ private:
 
 	required_memory_region m_rom;                   // Internal ROM
 
-	int m_b;                    // output buffer
+	s32  m_b;                    // output buffer
+	u16 m_offset;                // last key pressed (without shift/ctrl modifiers)
 
-	int m_x_mask[9];            // mask of what keys are down
+	u16  m_x_mask[9];            // mask of what keys are down
 	bool m_repeat;               // state of the 'repeat' input.
 	bool m_last_repeat;          // state of the repeat input on the last scan.
 

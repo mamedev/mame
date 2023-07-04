@@ -82,6 +82,7 @@ void mm5740_device::device_start()
 
 	// state saving
 	save_item(NAME(m_b));
+	save_item(NAME(m_offset));
 	save_item(NAME(m_x_mask));
 	save_item(NAME(m_repeat));
 	save_item(NAME(m_last_repeat));
@@ -112,20 +113,21 @@ TIMER_CALLBACK_MEMBER(mm5740_device::perform_scan)
 
 		for (int y = 0; y < 10; y++)
 		{
-			u8 *rom = m_rom->base();
 			u16 offset = x * 10 + y;
-			// Common portion
-			u16 common = (u16)rom[offset];
-
-			offset += (((m_read_shift() ? 1 : 0) + (m_read_control() ? 2 : 0)) + 1) * 90;
-
-			// Unique portion based on shift/ctrl keys.
-			u8 uniq = rom[offset];
-
-			u16 b = (((common & 0x10) << 4) | ((uniq & 0x0f) << 4) | (common & 0x0f)) ^ 0x1ff;
 
 			if (BIT(data, y))
 			{
+				u8 *rom = m_rom->base();
+				// Common portion
+				u16 common = (u16)rom[offset];
+
+				u16 uniq_offset = offset + ((((m_read_shift() ? 1 : 0) + (m_read_control() ? 2 : 0)) + 1) * 90);
+
+				// Unique portion based on shift/ctrl keys.
+				u8 uniq = rom[uniq_offset];
+
+				u16 b = (((common & 0x10) << 4) | ((uniq & 0x0f) << 4) | (common & 0x0f)) ^ 0x1ff;
+
 				// Check for a new keypress
 				if (!BIT(m_x_mask[x], y))
 				{
@@ -133,6 +135,7 @@ TIMER_CALLBACK_MEMBER(mm5740_device::perform_scan)
 					if (m_b != b)
 					{
 						m_b = b;
+						m_offset = offset;
 						m_write_data_ready(ASSERT_LINE);
 
 						return;
@@ -143,7 +146,7 @@ TIMER_CALLBACK_MEMBER(mm5740_device::perform_scan)
 			{
 				// key released, unmark it from the "down" info
 				m_x_mask[x] &= ~(1 << y);
-				if (m_b == b)
+				if (m_offset == offset)
 				{
 					m_write_data_ready(CLEAR_LINE);
 					m_b = -1;
