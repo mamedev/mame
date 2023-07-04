@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 
-#ifndef MAME_VIDEO_SIS_H
-#define MAME_VIDEO_SIS_H
+#ifndef MAME_VIDEO_PC_VGA_SIS_H
+#define MAME_VIDEO_PC_VGA_SIS_H
 
 #pragma once
 
@@ -41,4 +41,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SIS630_SVGA, sis630_svga_device)
 
-#endif // MAME_VIDEO_SIS_H
+#endif // MAME_VIDEO_PC_VGA_SIS_H

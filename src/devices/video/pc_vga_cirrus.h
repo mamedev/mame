@@ -5,8 +5,8 @@
     Cirrus Logic GD542x/3x video chipsets
 
 */
-#ifndef MAME_VIDEO_CIRRUS_H
-#define MAME_VIDEO_CIRRUS_H
+#ifndef MAME_VIDEO_PC_VGA_CIRRUS_H
+#define MAME_VIDEO_PC_VGA_CIRRUS_H
 
 #pragma once
 
@@ -129,4 +129,4 @@ DECLARE_DEVICE_TYPE(CIRRUS_GD5428, cirrus_gd5428_device)
 DECLARE_DEVICE_TYPE(CIRRUS_GD5430, cirrus_gd5430_device)
 DECLARE_DEVICE_TYPE(CIRRUS_GD5446, cirrus_gd5446_device)
 
-#endif // MAME_VIDEO_CIRRUS_H
+#endif // MAME_VIDEO_PC_VGA_CIRRUS_H

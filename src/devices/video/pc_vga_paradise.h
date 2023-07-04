@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 
-#ifndef MAME_VIDEO_PARADISE_H
-#define MAME_VIDEO_PARADISE_H
+#ifndef MAME_VIDEO_PC_VGA_PARADISE_H
+#define MAME_VIDEO_PC_VGA_PARADISE_H
 
 #pragma once
 
@@ -22,4 +22,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(PVGA1A, pvga1a_vga_device)
 
-#endif // MAME_VIDEO_PARADISE_H
+#endif // MAME_VIDEO_PC_VGA_PARADISE_H
