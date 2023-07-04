@@ -931,6 +931,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/pc_vga_paradise.h,VIDEOS["PC_VGA_PARADISE"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_PARADISE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_paradise.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_paradise.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pc_vga_s3.h,VIDEOS["PC_VGA_S3"] = true
 --------------------------------------------------
 
