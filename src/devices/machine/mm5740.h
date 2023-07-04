@@ -4,7 +4,7 @@
 
     MM5740 Keyboard Encoder emulation
 
-**********************************************************************
+ **********************************************************************
                             _____   _____
                     B3   1 |*    \_/     | 40  B4
                    Vll   2 |             | 39  B9
@@ -26,6 +26,7 @@
                    Vgg  18 |             | 23  Y1
                Control  19 |             | 22  Y10
         Shift Lock I/O  20 |_____________| 21  Shift
+
 
 Name                 Pin No.     Function
 ----------------------------------------------------------------------
@@ -63,11 +64,9 @@ Vll                  2           Ground
 
 Vgg                  18          -12V
 
-
 **********************************************************************/
 
 /* TODO:
-    Support Key-bounce mask
     Support shift lock
     Support additional internal ROMs
 */
@@ -77,17 +76,9 @@ Vgg                  18          -12V
 
 #pragma once
 
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> mm5740_device
-
 class mm5740_device : public device_t
 {
 public:
-	// construction/destruction
 	mm5740_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// public interface
@@ -116,17 +107,17 @@ private:
 	devcb_read_line m_read_control;
 	devcb_write_line m_write_data_ready;
 
-	required_memory_region m_rom;                   // Internal ROM
+	required_memory_region m_rom; // Internal ROM
 
-	s32  m_b;                    // output buffer
-	u16 m_offset;                // last key pressed (without shift/ctrl modifiers)
+	s32  m_b;                     // output buffer
+	u16  m_offset;                // last key pressed (without shift/ctrl modifiers)
 
-	u16  m_x_mask[9];            // mask of what keys are down
-	bool m_repeat;               // state of the 'repeat' input.
-	bool m_last_repeat;          // state of the repeat input on the last scan.
+	u16  m_x_mask[9];             // mask of what keys are down
+	bool m_repeat;                // state of the 'repeat' input.
+	bool m_last_repeat;           // state of the repeat input on the last scan.
 
 	// timers
-	emu_timer *m_scan_timer;    // keyboard scan timer
+	emu_timer *m_scan_timer;      // keyboard scan timer
 };
 
 
