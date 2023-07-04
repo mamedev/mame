@@ -5,8 +5,8 @@
     Cirrus Logic GD542x/3x video chipsets
 
 */
-#ifndef MAME_VIDEO_CLGD542X_H
-#define MAME_VIDEO_CLGD542X_H
+#ifndef MAME_VIDEO_CIRRUS_H
+#define MAME_VIDEO_CIRRUS_H
 
 #pragma once
 
@@ -18,12 +18,6 @@ public:
 	// construction/destruction
 	cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint8_t port_03c0_r(offs_t offset) override;
-	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
-	virtual uint8_t port_03b0_r(offs_t offset) override;
-	virtual void port_03b0_w(offs_t offset, uint8_t data) override;
-	virtual uint8_t port_03d0_r(offs_t offset) override;
-	virtual void port_03d0_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
 
@@ -37,6 +31,14 @@ protected:
 	virtual void device_reset() override;
 	virtual uint16_t offset() override;
 
+	virtual void io_3cx_map(address_map &map) override;
+
+	u8 ramdac_hidden_mask_r(offs_t offset);
+	void ramdac_hidden_mask_w(offs_t offset, u8 data);
+	u8 ramdac_overlay_r(offs_t offset);
+	void ramdac_overlay_w(offs_t offset, u8 data);
+	u8 m_hidden_dac_mode = 0;
+	u8 m_hidden_dac_phase = 0;
 	uint8_t m_chip_id;
 
 	uint8_t gc_mode_ext;
@@ -88,14 +90,12 @@ protected:
 
 	virtual uint8_t vga_latch_write(int offs, uint8_t data) override;
 
+	virtual void crtc_map(address_map &map) override;
+	virtual void gc_map(address_map &map) override;
+	virtual void sequencer_map(address_map &map) override;
+
 private:
 	void cirrus_define_video_mode();
-	uint8_t cirrus_seq_reg_read(uint8_t index);
-	void cirrus_seq_reg_write(uint8_t index, uint8_t data);
-	uint8_t cirrus_gc_reg_read(uint8_t index);
-	void cirrus_gc_reg_write(uint8_t index, uint8_t data);
-	uint8_t cirrus_crtc_reg_read(uint8_t index);
-	void cirrus_crtc_reg_write(uint8_t index, uint8_t data);
 
 	void start_bitblt();
 	void start_reverse_bitblt();
@@ -129,4 +129,4 @@ DECLARE_DEVICE_TYPE(CIRRUS_GD5428, cirrus_gd5428_device)
 DECLARE_DEVICE_TYPE(CIRRUS_GD5430, cirrus_gd5430_device)
 DECLARE_DEVICE_TYPE(CIRRUS_GD5446, cirrus_gd5446_device)
 
-#endif // MAME_VIDEO_CLGD542X_H
+#endif // MAME_VIDEO_CIRRUS_H

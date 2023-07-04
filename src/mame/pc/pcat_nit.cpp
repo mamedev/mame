@@ -91,7 +91,7 @@ Smitdogg
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
 #include "machine/nvram.h"
-#include "video/clgd542x.h"
+#include "video/pc_vga_cirrus.h"
 
 namespace {
 
@@ -210,9 +210,7 @@ void pcat_nit_state::pcat_nit_io(address_map &map)
 	pcat32_io_common(map);
 	map(0x0278, 0x027f).r(FUNC(pcat_nit_state::pcat_nit_io_r)).nopw();
 	map(0x0280, 0x0283).nopr();
-	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
-	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
-	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
+	map(0x03b0, 0x03df).m("vga", FUNC(vga_device::io_map));
 	map(0x03f8, 0x03ff).rw(m_uart, FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w));
 }
 
@@ -221,9 +219,7 @@ void pcat_nit_state::bonanza_io_map(address_map &map)
 	pcat32_io_common(map);
 	map(0x0278, 0x027f).r(FUNC(pcat_nit_state::pcat_nit_io_r)).nopw();
 	map(0x0280, 0x0283).nopr();
-	map(0x03b0, 0x03bf).rw("vga", FUNC(cirrus_gd5428_device::port_03b0_r), FUNC(cirrus_gd5428_device::port_03b0_w));
-	map(0x03c0, 0x03cf).rw("vga", FUNC(cirrus_gd5428_device::port_03c0_r), FUNC(cirrus_gd5428_device::port_03c0_w));
-	map(0x03d0, 0x03df).rw("vga", FUNC(cirrus_gd5428_device::port_03d0_r), FUNC(cirrus_gd5428_device::port_03d0_w));
+	map(0x03b0, 0x03df).m("vga", FUNC(cirrus_gd5428_device::io_map));
 	map(0x03f8, 0x03ff).rw(m_uart, FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w));
 }
 

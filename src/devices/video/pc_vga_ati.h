@@ -23,7 +23,6 @@ public:
 	virtual void mem_w(offs_t offset, uint8_t data) override;
 
 	// VGA registers
-	virtual uint8_t port_03c0_r(offs_t offset) override;
 	uint8_t ati_port_ext_r(offs_t offset);
 	void ati_port_ext_w(offs_t offset, uint8_t data);
 

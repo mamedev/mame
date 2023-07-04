@@ -24,12 +24,6 @@ public:
 
 	auto linear_config_changed() { return m_linear_config_changed_cb.bind(); }
 
-	virtual uint8_t port_03b0_r(offs_t offset) override;
-	virtual void port_03b0_w(offs_t offset, uint8_t data) override;
-	virtual uint8_t port_03c0_r(offs_t offset) override;
-	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
-	virtual uint8_t port_03d0_r(offs_t offset) override;
-	virtual void port_03d0_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
 
@@ -84,6 +78,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual uint16_t offset() override;
+
+	virtual void crtc_map(address_map &map) override;
 
 	enum
 	{
@@ -197,6 +193,8 @@ protected:
 
 	devcb_write_line m_linear_config_changed_cb;
 
+	virtual void s3_define_video_mode(void) override;
+	// has no 8514/A device
 private:
 	emu_timer* m_draw_timer;
 	void bitblt_step();
@@ -209,11 +207,6 @@ private:
 	void add_command(int cmd_type);
 	void command_start();
 	void command_finish();
-
-	virtual uint8_t s3_crtc_reg_read(uint8_t index);
-	virtual void s3_define_video_mode(void);
-	virtual void s3_crtc_reg_write(uint8_t index, uint8_t data);
-	// has no 8514/A device
 };
 
 
