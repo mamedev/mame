@@ -37177,8 +37177,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 -->
 
-	<!-- http://redump.org/disc/38429/ http://redump.org/disc/38430/ -->
 	<software name="crshock">
+		<!-- http://redump.org/disc/38429/ http://redump.org/disc/38430/ -->
 		<description>Creature Shock (Japan)</description>
 		<year>1996</year>
 		<publisher>Data East</publisher>
@@ -37202,8 +37202,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/15743/ -->
 	<software name="depth">
+		<!-- http://redump.org/disc/15743/ -->
 		<description>Depth (Japan)</description>
 		<year>1996</year>
 		<publisher>Sony Computer Entertainment</publisher>
@@ -37260,8 +37260,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/1539/ -->
 	<software name="pitomail">
+		<!-- http://redump.org/disc/1539/ -->
 		<description>Pi to Mail (Japan)</description>
 		<year>1999</year>
 		<publisher>Hudson</publisher>
@@ -37339,8 +37339,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/14070/ -->
 	<software name="sentokka">
+		<!-- http://redump.org/disc/14070/ -->
 		<description>Sentou Kokka: Air Land Battle (Japan, rev. 1)</description>
 		<year>1995</year>
 		<publisher>Sony Computer Entertainment</publisher>
@@ -37377,8 +37377,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/7919/ -->
 	<software name="wares">
+		<!-- http://redump.org/disc/7919/ -->
 		<description>Wares 1092: Souheiden (Japan)</description>
 		<year>1997</year>
 		<publisher>Yutaka</publisher>
@@ -48480,7 +48480,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<description>Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan)</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
-		<part name="cdrom" interface="psx_cdrom">
+		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="chou jikuu yousai macross - ai oboete imasu ka (japan) (disc 1)" sha1="f231291ee425f4e6044f2711bb97d2357972d630"/>
 			</diskarea>
@@ -59418,9 +59418,9 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 	<!-- Redump PAL (Europe) -->
 
-	<!-- http://redump.org/disc/19444/ -->
 	<!-- Bundled with "Action Replay 2 Version 2" for PlayStation 2. Should be moved to that list when possible. -->
 	<software name="ar2_223" cloneof="ar2_230">
+		<!-- http://redump.org/disc/19444/ -->
 		<description>Action Replay 2 Version 2.23 - Bonus PSone Codes! (Europe)</description>
 		<year>2002</year>
 		<publisher>&lt;unlicensed&gt;</publisher> <!-- Datel -->
@@ -59434,9 +59434,9 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/6147/ -->
 	<!-- Uses LibCrypt protection which isn't included in the CHD. -->
 	<software name="apescapee" cloneof="apescape" supported="no">
+		<!-- http://redump.org/disc/6147/ -->
 		<description>Ape Escape (Europe)</description>
 		<year>1999</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59451,9 +59451,9 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/1036/ -->
 	<!-- Came bundled with releases of "Crash Bandicoot" and "Tekken 2" -->
 	<software name="acrels96">
+		<!-- http://redump.org/disc/1036/ -->
 		<description>Autumn/Christmas Releases '96 (Europe)</description>
 		<year>1996</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59468,8 +59468,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3407/ -->
 	<software name="bm">
+		<!-- http://redump.org/disc/3407/ -->
 		<description>Beatmania (Europe)</description>
 		<year>2000</year>
 		<publisher>Konami of Europe</publisher>
@@ -59484,8 +59484,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/27257/ http://redump.org/disc/27258/ -->
 	<software name="cte" cloneof="covertop">
+		<!-- http://redump.org/disc/27257/ http://redump.org/disc/27258/ -->
 		<description>Chase the Express (Europe)</description>
 		<year>2000</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59508,9 +59508,9 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/5483/ -->
 	<!-- Uses LibCrypt protection which isn't included in the CHD. -->
 	<software name="crashbshe" cloneof="crashbsh" supported="no">
+		<!-- http://redump.org/disc/5483/ -->
 		<description>Crash Bash (Europe)</description>
 		<year>2000</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59525,8 +59525,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/531/ -->
 	<software name="demo1_1">
+		<!-- http://redump.org/disc/531/ -->
 		<description>Demo One (Version 1) (Europe)</description>
 		<year>1995?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59540,8 +59540,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/526/ -->
 	<software name="demo1_2">
+		<!-- http://redump.org/disc/526/ -->
 		<description>Demo One (Version 2) (Europe)</description>
 		<year>1995?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59554,8 +59554,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/1038/ -->
 	<software name="demo1_4g">
+		<!-- http://redump.org/disc/1038/ -->
 		<description>Demo One (Version 4) (Germany)</description>
 		<year>1996?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59570,8 +59570,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/55136/ -->
 	<software name="monstincsw" cloneof="monstinc">
+		<!-- http://redump.org/disc/55136/ -->
 		<description>Disney/Pixar Monsters, Inc.: Skrämmarön (Sweden)</description>
 		<year>2002</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59584,8 +59584,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/562/ http://redump.org/disc/563/ -->
 	<software name="draculae" cloneof="dracula">
+		<!-- http://redump.org/disc/562/ http://redump.org/disc/563/ -->
 		<description>Dracula: The Resurrection (Europe)</description>
 		<year>2000</year>
 		<publisher>Microïds</publisher>
@@ -59608,8 +59608,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/1095/ http://redump.org/disc/1180/ -->
 	<software name="driver2e" cloneof="driver2">
+		<!-- http://redump.org/disc/1095/ http://redump.org/disc/1180/ -->
 		<description>Driver 2: Back on the Streets (Europe, rev. 1)</description>
 		<year>2000</year>
 		<publisher>Infogrames Europe</publisher>
@@ -59632,8 +59632,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/1022/ -->
 	<software name="edemo21">
+		<!-- http://redump.org/disc/1022/ -->
 		<description>Euro Demo 21 (Europe)</description>
 		<year>1996?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59648,8 +59648,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/649/ -->
 	<software name="edemo22">
+		<!-- http://redump.org/disc/649/ -->
 		<description>Euro Demo 22 (Europe)</description>
 		<year>1996?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59665,8 +59665,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/331/ -->
 	<software name="edemo28">
+		<!-- http://redump.org/disc/331/ -->
 		<description>Euro Demo 28 (Europe)</description>
 		<year>1997?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59681,8 +59681,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/314/ -->
 	<software name="edemo58">
+		<!-- http://redump.org/disc/314/ -->
 		<description>Euro Demo 58 (Europe)</description>
 		<year>2000?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59697,8 +59697,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/316/ -->
 	<software name="edemo60">
+		<!-- http://redump.org/disc/316/ -->
 		<description>Euro Demo 60 (Europe)</description>
 		<year>2000?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59712,8 +59712,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/574/ -->
 	<software name="edemo62">
+		<!-- http://redump.org/disc/574/ -->
 		<description>Euro Demo 62 (Europe)</description>
 		<year>2000?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59728,8 +59728,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/319/ -->
 	<software name="edemo63">
+		<!-- http://redump.org/disc/319/ -->
 		<description>Euro Demo 63 (Europe)</description>
 		<year>2000?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59744,8 +59744,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/291/ -->
 	<software name="edemo64">
+		<!-- http://redump.org/disc/291/ -->
 		<description>Euro Demo 64 (Europe)</description>
 		<year>2000?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59760,8 +59760,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/288/ -->
 	<software name="edemo65">
+		<!-- http://redump.org/disc/288/ -->
 		<description>Euro Demo 65 (Europe)</description>
 		<year>2001?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59776,8 +59776,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/289/ -->
 	<software name="edemo66">
+		<!-- http://redump.org/disc/289/ -->
 		<description>Euro Demo 66 (Europe)</description>
 		<year>2001?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59791,8 +59791,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/290/ -->
 	<software name="edemo67">
+		<!-- http://redump.org/disc/290/ -->
 		<description>Euro Demo 67 (Europe)</description>
 		<year>2001?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59807,8 +59807,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/1236/ -->
 	<software name="edemo68">
+		<!-- http://redump.org/disc/1236/ -->
 		<description>Euro Demo 68 (Europe)</description>
 		<year>2001?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59822,8 +59822,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/322/ -->
 	<software name="edemo69">
+		<!-- http://redump.org/disc/322/ -->
 		<description>Euro Demo 69 (Europe)</description>
 		<year>2001?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59838,8 +59838,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/292/ -->
 	<software name="edemo70">
+		<!-- http://redump.org/disc/292/ -->
 		<description>Euro Demo 70 (Europe)</description>
 		<year>2001?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59853,8 +59853,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/293/ -->
 	<software name="edemo71">
+		<!-- http://redump.org/disc/293/ -->
 		<description>Euro Demo 71 (Europe)</description>
 		<year>2001?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59868,8 +59868,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/294/ -->
 	<software name="edemo72">
+		<!-- http://redump.org/disc/294/ -->
 		<description>Euro Demo 72 (Europe)</description>
 		<year>2001?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59883,8 +59883,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/19604/ -->
 	<software name="edemo73">
+		<!-- http://redump.org/disc/19604/ -->
 		<description>Euro Demo 73 (Europe)</description>
 		<year>2001?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59899,8 +59899,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/1262/ -->
 	<software name="edemo74">
+		<!-- http://redump.org/disc/1262/ -->
 		<description>Euro Demo 74 (Europe)</description>
 		<year>2001?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59915,8 +59915,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/19905/ -->
 	<software name="evryglf2" cloneof="hotshot2">
+		<!-- http://redump.org/disc/19905/ -->
 		<description>Everybody's Golf 2 (Europe)</description>
 		<year>2000</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59932,8 +59932,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/1751/ -->
 	<software name="f1cs2ke" cloneof="f1cs2k">
+		<!-- http://redump.org/disc/1751/ -->
 		<description>F1 Championship Season 2000 (Europe)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
@@ -59949,9 +59949,9 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/866/ http://redump.org/disc/875/ http://redump.org/disc/873/ http://redump.org/disc/874/ -->
 	<!-- Uses LibCrypt protection which isn't included in the CHDs. -->
 	<software name="ffant8e" cloneof="ffant8" supported="no">
+		<!-- http://redump.org/disc/866/ http://redump.org/disc/875/ http://redump.org/disc/873/ http://redump.org/disc/874/ -->
 		<description>Final Fantasy VIII (Europe, Australia)</description>
 		<year>1999</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -59986,8 +59986,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/61313/ -->
 	<software name="frontms3e" cloneof="frontms3">
+		<!-- http://redump.org/disc/61313/ -->
 		<description>Front Mission 3 (Europe, prototype 20000616)</description>
 		<year>2000</year>
 		<publisher>Square Europe</publisher>
@@ -60001,8 +60001,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/19600/ -->
 	<software name="ghlpanic">
+		<!-- http://redump.org/disc/19600/ -->
 		<description>Ghoul Panic (Europe)</description>
 		<year>2000</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -60017,8 +60017,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/81/ -->
 	<software name="gt1e" cloneof="gt1">
+		<!-- http://redump.org/disc/81/ -->
 		<description>Gran Turismo (Europe)</description>
 		<year>1998</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -60034,8 +60034,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/82/ http://redump.org/disc/83/ -->
 	<software name="gt2e" cloneof="gt2">
+		<!-- http://redump.org/disc/82/ http://redump.org/disc/83/ -->
 		<description>Gran Turismo 2 (Europe)</description>
 		<year>2000</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -60058,8 +60058,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/188/ -->
 	<software name="gta2e" cloneof="gta2">
+		<!-- http://redump.org/disc/188/ -->
 		<description>Grand Theft Auto 2 (Europe, rev. 1)</description>
 		<year>1999</year>
 		<publisher>Rockstar Games</publisher>
@@ -60075,9 +60075,9 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/1659/ -->
 	<!-- Uses LibCrypt protection which isn't included in the CHD. -->
 	<software name="lemans24" cloneof="tdlemans" supported="no">
+		<!-- http://redump.org/disc/1659/ -->
 		<description>Le Mans 24 Hours (Europe)</description>
 		<year>1999</year>
 		<publisher>Infogrames Europe</publisher>
@@ -60093,8 +60093,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/1204/ -->
 	<software name="mhonrunde" cloneof="mhonrund">
+		<!-- http://redump.org/disc/1204/ -->
 		<description>Medal of Honor: Underground (Europe)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
@@ -60110,8 +60110,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/597/ http://redump.org/disc/598/ -->
 	<software name="mgse" cloneof="mgs">
+		<!-- http://redump.org/disc/597/ http://redump.org/disc/598/ -->
 		<description>Metal Gear Solid (Europe)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
@@ -60134,8 +60134,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/1167/ -->
 	<software name="mgssm" cloneof="mgsvr">
+		<!-- http://redump.org/disc/1167/ -->
 		<description>Metal Gear Solid: Special Missions (Europe)</description>
 		<year>1999</year>
 		<publisher>Konami of Europe</publisher>
@@ -60150,8 +60150,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/19601/ -->
 	<software name="micromc3e" cloneof="micromc3">
+		<!-- http://redump.org/disc/19601/ -->
 		<description>Micro Machines V3 (Europe, EDC)</description>
 		<year>1997</year>
 		<publisher>The Codemasters Software Company</publisher>
@@ -60166,8 +60166,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/1001/ -->
 	<software name="motorcre" cloneof="motorcr">
+		<!-- http://redump.org/disc/1001/ -->
 		<description>Moto Racer (Europe)</description>
 		<year>1997</year>
 		<publisher>Electronic Arts</publisher>
@@ -60183,8 +60183,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/1201/ -->
 	<software name="motorcwte" cloneof="motorcwt">
+		<!-- http://redump.org/disc/1201/ -->
 		<description>Moto Racer World Tour (Europe)</description>
 		<year>2000</year>
 		<publisher>Infogrames</publisher>
@@ -60200,8 +60200,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/110/ -->
 	<software name="music">
+		<!-- http://redump.org/disc/110/ -->
 		<description>Music: Music Creation for the PlayStation (Europe)</description>
 		<year>1998</year>
 		<publisher>Codemasters</publisher>
@@ -60217,8 +60217,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/367/ -->
 	<software name="nfs2e" cloneof="nfs2">
+		<!-- http://redump.org/disc/367/ -->
 		<description>Need for Speed II (Europe)</description>
 		<year>1997</year>
 		<publisher>Electronic Arts</publisher>
@@ -60233,8 +60233,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/1169/ -->
 	<software name="nfs3e" cloneof="nfs3">
+		<!-- http://redump.org/disc/1169/ -->
 		<description>Need for Speed III: Hot Pursuit (Europe)</description>
 		<year>1998</year>
 		<publisher>Electronic Arts</publisher>
@@ -60249,8 +60249,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/606/ -->
 	<software name="nofeare" cloneof="nofear">
+		<!-- http://redump.org/disc/606/ -->
 		<description>No Fear Downhill Mountain Biking (Europe)</description>
 		<year>1999</year>
 		<publisher>The Codemasters Software Company</publisher>
@@ -60265,8 +60265,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/702/ -->
 	<software name="abeodysse" cloneof="abeodyss">
+		<!-- http://redump.org/disc/702/ -->
 		<description>Oddworld: Abe's Oddysee (Europe)</description>
 		<year>1997</year>
 		<publisher>GT Interactive Software Europe / Infogrames</publisher>
@@ -60282,9 +60282,9 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/323/ -->
 	<!-- Came bundled with releases of "Treasures of the Deep", "Klonoa: Door to Phantomile" and "Tekken 2" -->
 	<software name="ptblanked" cloneof="ptblank">
+		<!-- http://redump.org/disc/323/ -->
 		<description>Point Blank (Europe, demo)</description>
 		<year>1998</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -60298,8 +60298,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/1542/ -->
 	<software name="ptblanke" cloneof="ptblank">
+		<!-- http://redump.org/disc/1542/ -->
 		<description>Point Blank (Europe, rev. 1)</description>
 		<year>1997</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -60314,8 +60314,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/226/ -->
 	<software name="ptblank2e" cloneof="ptblank2">
+		<!-- http://redump.org/disc/226/ -->
 		<description>Point Blank 2 (Europe, Australia)</description>
 		<year>1999?</year>
 		<publisher>Namco</publisher>
@@ -60330,8 +60330,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/684/ -->
 	<software name="porschece" cloneof="porschec">
+		<!-- http://redump.org/disc/684/ -->
 		<description>Porsche Challenge (Europe)</description>
 		<year>1997</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -60347,8 +60347,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/31217/ -->
 	<software name="powrsrc">
+		<!-- http://redump.org/disc/31217/ -->
 		<description>Power Source (Europe)</description>
 		<year>1997?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -60363,8 +60363,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/26738/ -->
 	<software name="ppinbrue" cloneof="ppinbru">
+		<!-- http://redump.org/disc/26738/ -->
 		<description>Pro Pinball: Big Race USA (Europe)</description>
 		<year>1998</year>
 		<publisher>Empire Interactive Entertainment</publisher>
@@ -60379,9 +60379,9 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/8760/ -->
 	<!-- A prototype version is also dumped but contains the same data as final version -->
 	<software name="rshot">
+		<!-- http://redump.org/disc/8760/ -->
 		<description>Rescue Shot (Europe)</description>
 		<year>2000</year>
 		<publisher>Namco</publisher>
@@ -60397,8 +60397,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/19602/ -->
 	<software name="revile" cloneof="revil">
+		<!-- http://redump.org/disc/19602/ -->
 		<description>Resident Evil (Europe, EDC)</description>
 		<year>1996</year>
 		<publisher>Virgin Interactive Entertainment (Europe)</publisher>
@@ -60413,9 +60413,9 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/496/ -->
 	<!-- Uses LibCrypt protection which isn't included in the CHD. -->
 	<software name="revil3e" cloneof="revil3" supported="no">
+		<!-- http://redump.org/disc/496/ -->
 		<description>Resident Evil 3: Nemesis (Europe)</description>
 		<year>1999</year>
 		<publisher>Eidos Interactive</publisher>
@@ -60429,8 +60429,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/801/ -->
 	<software name="revilsrve" cloneof="revilsrv">
+		<!-- http://redump.org/disc/801/ -->
 		<description>Resident Evil: Survivor (Europe)</description>
 		<year>2000</year>
 		<publisher>Eidos Interactive</publisher>
@@ -60444,8 +60444,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/135/ -->
 	<software name="silenthe" cloneof="silenth">
+		<!-- http://redump.org/disc/135/ -->
 		<description>Silent Hill (Europe)</description>
 		<year>1999</year>
 		<publisher>Konami Digital Entertainment</publisher>
@@ -60461,9 +60461,9 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/18437/ -->
 	<!-- Bundled with ASCII Sphere 360° Controller -->
 	<software name="sphere360">
+		<!-- http://redump.org/disc/18437/ -->
 		<description>Sphere 360° (Europe)</description>
 		<year>1999?</year>
 		<publisher>ASCII Entertainment Europe</publisher>
@@ -60477,8 +60477,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/907/ -->
 	<software name="spidermne" cloneof="spidermn">
+		<!-- http://redump.org/disc/907/ -->
 		<description>Spider-Man (Europe)</description>
 		<year>2000</year>
 		<publisher>Activision Publishing</publisher>
@@ -60493,8 +60493,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/1184/ -->
 	<software name="spyroe" cloneof="spyro">
+		<!-- http://redump.org/disc/1184/ -->
 		<description>Spyro the Dragon (Europe)</description>
 		<year>1998</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -60510,9 +60510,9 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/19611/ -->
 	<!-- Uses LibCrypt protection which isn't included in the CHD. -->
 	<software name="spyro3e" cloneof="spyro3" supported="no">
+		<!-- http://redump.org/disc/19611/ -->
 		<description>Spyro: Year of the Dragon (Europe, rev. 1)</description>
 		<year>2001</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
@@ -60528,8 +60528,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/26746/ -->
 	<software name="strskat2" cloneof="strsk8_2">
+		<!-- http://redump.org/disc/26746/ -->
 		<description>Street Skater 2 (Europe)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
@@ -60544,8 +60544,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/19603/ -->
 	<software name="tenchude" cloneof="tenchu">
+		<!-- http://redump.org/disc/19603/ -->
 		<description>Tenchu: Stealth Assassins (Europe, demo)</description>
 		<year>1998</year>
 		<publisher>Activision</publisher>
@@ -60559,8 +60559,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/7536/ -->
 	<software name="td6e" cloneof="td6">
+		<!-- http://redump.org/disc/7536/ -->
 		<description>Test Drive 6 (Europe)</description>
 		<year>2000</year>
 		<publisher>Cryo Interactive Entertainment</publisher>
@@ -60575,8 +60575,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/4787/ -->
 	<software name="themehose" cloneof="themehos">
+		<!-- http://redump.org/disc/4787/ -->
 		<description>Theme Hospital (Europe)</description>
 		<year>1998</year>
 		<publisher>Electronic Arts</publisher>
@@ -60591,9 +60591,9 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/910/ -->
 	<!-- Uses LibCrypt protection which isn't included in the CHD. -->
 	<software name="themepw" cloneof="simtprk" supported="no">
+		<!-- http://redump.org/disc/910/ -->
 		<description>Theme Park World (Europe)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
@@ -60608,9 +60608,9 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/615/ -->
 	<!-- Uses LibCrypt protection which isn't included in the CHD. -->
 	<software name="tocawtc" cloneof="jlstock" supported="no">
+		<!-- http://redump.org/disc/615/ -->
 		<description>TOCA World Touring Cars (Europe)</description>
 		<year>2000</year>
 		<publisher>The Codemasters Software Company</publisher>
@@ -60625,8 +60625,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/380/ -->
 	<software name="traid4e" cloneof="traid4">
+		<!-- http://redump.org/disc/380/ -->
 		<description>Tomb Raider: The Last Revelation (Europe, Australia)</description>
 		<year>1999</year>
 		<publisher>Eidos Interactive</publisher>
@@ -60641,9 +60641,9 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/618/ -->
 	<!-- Uses LibCrypt protection which isn't included in the CHD. -->
 	<software name="urbchaose" cloneof="urbchaos" supported="no">
+		<!-- http://redump.org/disc/618/ -->
 		<description>Urban Chaos (Europe)</description>
 		<year>2000</year>
 		<publisher>Eidos Interactive</publisher>
@@ -60658,8 +60658,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/1313/ -->
 	<software name="vanishpte" cloneof="vanishpt">
+		<!-- http://redump.org/disc/1313/ -->
 		<description>Vanishing Point (Europe)</description>
 		<year>2001</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -60675,8 +60675,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3328/ -->
 	<software name="warpathe" cloneof="warpath">
+		<!-- http://redump.org/disc/3328/ -->
 		<description>Warpath: Jurassic Park (Europe)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
@@ -60691,8 +60691,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/474/ -->
 	<software name="wcwmayhme" cloneof="wcwmayhm">
+		<!-- http://redump.org/disc/474/ -->
 		<description>WCW Mayhem (Europe)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
