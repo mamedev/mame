@@ -195,7 +195,6 @@ Hydlide 2 - Shine of Darkness (Kor) - Zemina
 MSX Rugby (Kor) - Zemina
 Gopher no Yabou - Episode II (Nemesis 3) ~ 사라만다 II (Kor) - Zemina
 Sinbad (Kor) - Zemina
-Sokoban (Kor) - Zemina
 Star Soldier (Kor) - Zemina
 Strange Loop (Kor) - Zemina
 Tatica (Kor) - Zemina
@@ -6912,7 +6911,7 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="jpwinkle.rom" size="0x8000" crc="1bc4132b" sha1="4e4989c8f6336663690217f32aca22a319b90091" />
+				<rom name="jpwinkle.rom" size="0x8000" crc="5c94b4b7" sha1="9e6a78cda66fcaa9fe13aedbea7f69f2a8a97433" />
 			</dataarea>
 		</part>
 	</software>
@@ -7088,6 +7087,20 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="junofrsta" cloneof="junofrst">
+		<description>Juno First (Japan, alt)</description>
+		<year>1983</year>
+		<publisher>Sony</publisher>
+		<info name="serial" value="HBS-G002C" />
+		<info name="alt_title" value="ジュノファースト" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="juno first (japan, alt).rom" size="0x8000" crc="d902be7c" sha1="846bd4d89bd034ac5346cbc559752635ad2bda6b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="keybmstr">
 		<description>Keyboard Master (prototype)</description>
 		<year>1984</year>
@@ -7144,6 +7157,20 @@ kept for now until finding out what those bytes affect...
 				<rom size="0x4000" offset="0x4000" loadflag="reload" />
 				<rom size="0x4000" offset="0x8000" loadflag="reload" />
 				<rom size="0x4000" offset="0xc000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keykapera">
+		<description>Keystone Kapers (Japan, alt)</description>
+		<year>1984</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="serial" value="R48X5503" />
+		<info name="alt_title" value="キーストンケーパーズ" />
+		<part name="cart" interface="msx_cart">
+			<dataarea name="rom" size="0x10000">
+				<rom name="keystone kapers (japan, alt).rom" size="0x8000" crc="7ff117f9" sha1="fb4724b8159beae132f89f394f71ce3934a61ae2" />
+				<rom size="0x8000" offset="0x8000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -7371,6 +7398,18 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="pesadelo" cloneof="knightmr">
+		<description>Pesadelo (Brazil)</description>
+		<year>1989</year>
+		<publisher>Forte II Games</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="pesadelo (brazil).rom" size="0x8000" crc="fa2176d4" sha1="87e278b7c5d341693abecaa17d8036b071507c85" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="knightm2">
 		<description>Knightmare II - The Maze of Galious (Japan)</description>
 		<year>1987</year>
@@ -7468,6 +7507,20 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
 				<rom name="konami's baseball (japan).rom" size="0x4000" crc="b660494b" sha1="076d6f5b9f8427f6959f7a255abb4acac0dd9d0c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="konbballa" cloneof="konbball">
+		<description>Konami's Baseball (Japan, alt)</description>
+		<year>1985</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RC724" />
+		<info name="alt_title" value="コナミのベースボール" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="konami's baseball (japan, alt).rom" size="0x4000" crc="57570d4d" sha1="da6a332dc236073286aa78582c0fccf728c86ba4" />
 			</dataarea>
 		</part>
 	</software>
@@ -9103,6 +9156,19 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="sokobankz" cloneof="sokoban">
+		<description>Soukoban (Korea, Zemina)</description>
+		<year>1984</year>
+		<publisher>Zemina</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="soukoban (1984)(zemina).rom" size="0x4000" crc="756d3402" sha1="5cacfb40c99a9e66e068a15b5d22cbc7ab90cb65" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Communication hardware not emulated -->
 	<software name="expertm2" supported="no">
 		<description>Expert TM-2 Multi Modem (Brazil)</description>
@@ -10342,6 +10408,21 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="police story, the (japan) (alt 1).rom" size="0x8000" crc="e4554b51" sha1="835b3e2bae1d680d7050ce188c617fbcfb326eb3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="policestb" cloneof="policest">
+		<description>The Police Story (Japan, alt 2)</description>
+		<year>1986</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="serial" value="R49X5091" />
+		<info name="alt_title" value="ポリスストーリー" />
+		<info name="gtin" value="04988013001794"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="police story, the (japan) (alt 2).rom" size="0x8000" crc="3935edb5" sha1="1b1153675a334be6919468433f24060b8afffc9e" />
 			</dataarea>
 		</part>
 	</software>
@@ -15028,14 +15109,29 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 <!-- SYSTEM ROMS? -->
 
 	<!-- Release contains cartridge and a 2DD floppy. -->
-	<software name="msxbasic" supported="no">
+	<software name="msxbasic">
 		<description>MSX Basic-kun Plus 2.0 (Japan)</description>
 		<year>1988</year>
 		<publisher>ASCII</publisher>
+		<info name="alt_title" value="ＭＳＸべーしっ君"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
 				<rom name="msx basic-kun plus (japan) (program).rom" size="0x4000" crc="a13615d2" sha1="c279c3f41d5368761f9088157b80214d835a548c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Release contains cartridge and a 2DD floppy. -->
+	<software name="msxbasica" cloneof="msxbasic">
+		<description>MSX Basic-kun Plus 2.0 (Japan, alt)</description>
+		<year>1988</year>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="ＭＳＸべーしっ君"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="msx basic-kun plus (japan, alt) (program).rom" size="0x4000" crc="590cd7f0" sha1="0b68d6968f2ce736316be64c689573f0a461acf8" />
 			</dataarea>
 		</part>
 	</software>
@@ -18383,6 +18479,300 @@ legacy FM implementations cannot find it.
 
 
 <!-- Homebrew / Doujin software -->
+
+	<software name="ineedspd">
+		<description>I Need Speed (MSX Cartridge Shop)</description>
+		<year>2009</year>
+		<publisher>MSX Cartridge Shop</publisher>
+		<info name="developer" value="CEZ Games Studio"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="i need speed - msx cartridge shop (2009).rom" size="0xc000" crc="97831466" sha1="c6c079b105492f7665a8d6ccb81e337b864582fa" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ineedspdf" cloneof="ineedspd">
+		<description>I Need Speed (final)</description>
+		<year>2008</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="CEZ Games Studio"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="i need speed - cez games studio (2009)(final).rom" size="0xc000" crc="e00fc003" sha1="0293bc55df4f9b7fb97ae9cded8ab2c5c9ed0fd4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ineedspdm" cloneof="ineedspd">
+		<description>I Need Speed (contest)</description>
+		<year>2009</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="CEZ Games Studio"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="i need speed - cez games studio (2006)(msxdev).rom" size="0xc000" crc="6bd36d0f" sha1="bd46981d1b580ec9a2d1d909f5c1a8dfd9a71ed7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inertia">
+		<description>I.N.E.R.T.I.A.</description>
+		<year>2006</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Andrea Rossetti"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="i.n.e.r.t.i.a. - andrea rossetti (2006).rom" size="0x4000" crc="0ad95c4c" sha1="a53610adcf84bdb1b84d94d4c6d1f0a7d45e9ddd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impetus">
+		<description>Impetus</description>
+		<year>2021</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="impetus - inufuto (2021).rom" size="0x4000" crc="8b041688" sha1="b31b68de515469a836bb570ae88fa321059b6602" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inqsuqnm">
+		<description>Inq &amp; Suq vs Nightmare</description>
+		<year>2018</year>
+		<publisher>Matra</publisher>
+		<info name="developer" value="GW's Workshop"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="inq &amp; suq vs nightmare - gw's workshop (2018).rom" size="0x8000" crc="25c6e10f" sha1="6b58d0d84eb9e7b901ee7ba990ae8fe4cafa65ec" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invzombm">
+		<description>Invasion of the Zombie Monsters</description>
+		<year>2010</year>
+		<publisher>RELEVO Videogames</publisher>
+		<info name="developer" value="RELEVO Videogames"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="invasion of the zombie monsters - relevo videogames (2010).rom" size="0x8000" crc="a232351f" sha1="bf2452f9932cbce5986f72eb04d4c1ecec045b7f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="isitar7">
+		<description>Isitar 7</description>
+		<year>2019</year>
+		<publisher>N.I</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="isitar 7 - n.i (2019).rom" size="0x8000" crc="d7795487" sha1="da9c15e0f960554ffe4357cd00006afbaa69a414" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="italstal">
+		<description>Italian Stallion</description>
+		<year>2007</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Impulse 9"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="italian stallion - impulse 9 (2007).rom" size="0x8000" crc="904e0edd" sha1="64f921c9c57aedb47663a269046d4c51388f41fb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jetpac">
+		<description>J.E.T.P.A.C.</description>
+		<year>2009</year>
+		<publisher>MSX Cartridge Shop</publisher>
+		<info name="developer" value="Imanok"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="j.e.t.p.a.c. - imanok (2009).rom" size="0x8000" crc="38ad7112" sha1="cc13bac2f50f58bc466d605839187cf09dbe269c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jaasta">
+		<description>Jäästä</description>
+		<year>2020</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Uninteresting"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="jaasta - uninteresting (2020).rom" size="0x8000" crc="77380a9d" sha1="e5e0da269094bd2bf1e2aadd92d6523518f4de89" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jawbreak">
+		<description>Jawbreaker II</description>
+		<year>2014</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Maggoo"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="jawbreaker ii - maggoo (2014).rom" size="0x4000" crc="4137905f" sha1="ae3eb3af124b36878ab4f189abfc3737bfd3d56a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jumping">
+		<description>JumpinG - The Tutorial Game (English)</description>
+		<year>2011</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Dimension Z"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="jumping - dimension z (2011) (english).rom" size="0x8000" crc="7f492f09" sha1="dbea257c0f3cc4d46a94d2db30370df64eb02221" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jumpings" cloneof="jumping">
+		<description>JumpinG - The Tutorial Game (Spanish)</description>
+		<year>2011</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Dimension Z"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="jumping - dimension z (2011) (spanish).rom" size="0x8000" crc="d19a6356" sha1="74f7fba8a016e4ead892c2db5970028ed1aa4fa2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jumpingsd" cloneof="jumping">
+		<description>JumpinG - The Tutorial Game (Spanish, demo)</description>
+		<year>2011</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Dimension Z"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="jumping - dimension z (2011) (spanish, demo).rom" size="0x8000" crc="1e81a253" sha1="a0643d70c853d667eb680c82b9b5f0a2322a7809" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jnglhunt">
+		<description>Jungle Hunt</description>
+		<year>2007</year>
+		<publisher>Icon Games</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="jungle hunt - icon games (2007).rom" size="0x8000" crc="2119b92d" sha1="c9a89cceb355e5daf47ed5e8ee3e211ebd2494d8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="killmice">
+		<description>Kill Mice</description>
+		<year>2011</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Gamecast Entertainment"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="kill mice - gamecast entertainment (2011).rom" size="0x10000" crc="783afacb" sha1="5bf2b21a9b97e744cef71f2f6e9cacbbf695f3f6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="klondike">
+		<description>Klondike Solitaire</description>
+		<year>2021</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Under4Mhz"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="klondike solitaire - under4mhz (2021).rom" size="0x8000" crc="dcd00173" sha1="07fc9c7ab63777f75f1adb1af7038d0ce1be52e4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kobashi">
+		<description>Kobashi</description>
+		<year>2004</year>
+		<publisher>msx.org Underwater Challenge</publisher>
+		<info name="developer" value="Desire In Envy"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="kobashi - desire in envy (2004).rom" size="0x2000" crc="d137c518" sha1="e0854e9322c113ecbccf61f9de1c0a59bda03d23" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="k8tetris">
+		<description>Kralizec 8K Tetris</description>
+		<year>2004</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Kralizec"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="kralizec 8k tetris - kralizec (2004).rom" size="0x2000" crc="56b234fc" sha1="7056a2bea5013894930279f8c09cc77633964778" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kbtetris">
+		<description>Kralizec Battle Tetris</description>
+		<year>2004</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Kralizec"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="kralizec battle tetris - kralizec (2004).rom" size="0x2000" crc="5a5748f7" sha1="9776da8b475d81400e027e37d949ccffbb33fe30" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="krtetris">
+		<description>Kralizec Tetris</description>
+		<year>2005</year>
+		<publisher>Kralizec</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="kralizec tetris - kralizec (2005).rom" size="0x8000" crc="4a41a3c4" sha1="864824c2ef01945b7fccb3ec3399347b714d6aac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="krtetrisa">
+		<description>Kralizec Tetris (alt)</description>
+		<year>2005</year>
+		<publisher>Kralizec</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="kralizec tetris - kralizec (2005) (alt).rom" size="0x8000" crc="9235ea8d" sha1="1fbf5640df41fe48c7d64ffc51e33b57b41fd7e1" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="labbaye">
 		<description>l'Abbaye des Morts (v1.2)</description>
