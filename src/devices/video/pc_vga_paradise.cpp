@@ -12,8 +12,8 @@ TODO:
 - WD90C30-LR / WD90C31-LR / WD90C31-ZS / WD90C31A-LR / WD90C31A-ZS
 - WD90C33-ZZ
 - WD90C24A-ZZ / WD90C24A2-ZZ (mobile chips, no ISA option)
+- WD90C26A (apple/macpwrbk030.cpp macpb180c, no ISA)
 - WD9710-MZ (PCI + MPEG-1, a.k.a. Pipeline 9710 / 9712)
-- Pinpoint what chip apple/macpwrbk030.cpp macpb180c really uses;
 
 **************************************************************************************************/
 
