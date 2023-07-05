@@ -1034,7 +1034,7 @@ void m68000_musashi_device::init_cpu_common(void)
 
 	/* disable all MMUs */
 	m_has_pmmu         = false;
-	m_has_hmmu         = false;
+	m_has_hmmu         = 0;
 	m_pmmu_enabled     = false;
 	m_hmmu_enabled     = false;
 	m_emmu_enabled     = false;
@@ -2333,7 +2333,7 @@ void m68000_musashi_device::clear_all()
 	m_instr_mode= 0;
 	m_run_mode= 0;
 	m_has_pmmu= false;
-	m_has_hmmu= false;
+	m_has_hmmu= 0;
 	m_pmmu_enabled= false;
 	m_hmmu_enabled= false;
 	m_emmu_enabled= false;

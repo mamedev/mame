@@ -174,7 +174,7 @@ protected:
 	u32 m_instr_mode;   /* Stores whether we are in instruction mode or group 0/1 exception mode */
 	u32 m_run_mode;     /* Stores whether we are processing a reset, bus error, address error, or something else */
 	bool m_has_pmmu;     /* Indicates if a PMMU available (yes on 030, 040, no on EC030) */
-	bool m_has_hmmu;     /* Indicates if an Apple HMMU is available in place of the 68851 (020 only) */
+	int  m_has_hmmu;     /* Indicates if an Apple HMMU is available in place of the 68851 (020 only) */
 	bool m_pmmu_enabled; /* Indicates if the PMMU is enabled */
 	bool m_hmmu_enabled; /* Indicates if the HMMU is enabled */
 	bool m_emmu_enabled; /* Indicates if external MMU is enabled */
