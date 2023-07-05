@@ -280,8 +280,8 @@ private:
 	void mac_gsc_w(uint8_t data);
 	void macgsc_palette(palette_device &palette) const;
 
-	uint32_t macwd_r(offs_t offset, uint32_t mem_mask = ~0);
-	void macwd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t macwd_r(offs_t offset);
+	void macwd_w(offs_t offset, uint8_t data);
 
 	u32 m_colors[3]{}, m_count = 0, m_clutoffs = 0, m_wd_palette[256]{};
 
@@ -695,57 +695,49 @@ void macpb030_state::mac_gsc_w(uint8_t data)
 {
 }
 
-uint32_t macpb030_state::macwd_r(offs_t offset, uint32_t mem_mask)
+uint8_t macpb030_state::macwd_r(offs_t offset)
 {
 	switch (offset)
 	{
-	case 0xf6:
-		if (m_screen->vblank())
-		{
-			return 0xffffffff;
-		}
-		else
-		{
-			return 0;
-		}
+		case 0x3da: // VGA "Input Status 1"
+			if (m_screen->vblank())
+			{
+				return 0x8;
+			}
+			else
+			{
+				return 0;
+			}
 
-	default:
-		//            printf("macwd_r: @ %x, mask %08x (PC=%x)\n", offset, mem_mask, m_maincpu->pc());
-		break;
+		default:
+			//            printf("macwd_r: @ %x, mask %08x (PC=%x)\n", offset, mem_mask, m_maincpu->pc());
+			break;
 	}
 	return 0;
 }
 
-void macpb030_state::macwd_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void macpb030_state::macwd_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
-	case 0xf2:
-		if (mem_mask == 0xff000000) // DAC control
-		{
-			m_clutoffs = (data >> 24);
+		case 0x3c8: // VGA palette address
+			m_clutoffs = data;
 			m_count = 0;
-		}
-		else if (mem_mask == 0x00ff0000) // DAC data
-		{
-			m_colors[m_count++] = ((data >> 16) & 0x3f) << 2;
+			break;
+
+		case 0x3c9: // VGA palette data
+			m_colors[m_count++] = (data & 0x3f) << 2;
 			if (m_count == 3)
 			{
-				//printf("RAMDAC: color %d = %02x %02x %02x\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2]);
 				m_wd_palette[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
 				m_count = 0;
 			}
-		}
-		else
-		{
-			logerror("macwd: Unknown DAC write, data %08x, mask %08x\n", data, mem_mask);
-		}
-		break;
+			break;
 
-	default:
-		//            printf("macwd_w: %x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, m_maincpu->pc());
-		break;
+		default:
+			//printf("macwd_w: %x @ %x (PC=%x)\n", data, offset, m_maincpu->pc());
+			break;
 	}
 }
 
@@ -806,9 +798,8 @@ void macpb030_state::macpb165c_map(address_map &map)
 
 	// on-board color video on 165c/180c
 	map(0xfc000000, 0xfc07ffff).ram().share("vram").mirror(0x00380000); // 512k of VRAM
-	map(0xfc400000, 0xfcefffff).rw(FUNC(macpb030_state::macwd_r), FUNC(macpb030_state::macwd_w));
-	// fc4003c8 = DAC control, fc4003c9 = DAC data
-	// fc4003da bit 3 is VBL
+	map(0xfc400000, 0xfc7fffff).rw(FUNC(macpb030_state::macwd_r), FUNC(macpb030_state::macwd_w));
+	// something else video related? is at fc800000
 	map(0xfcff8000, 0xfcffffff).rom().region("vrom", 0x0000);
 }
 
