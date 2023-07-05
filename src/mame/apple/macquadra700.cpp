@@ -9,13 +9,9 @@
 
 ****************************************************************************/
 
-//#define USE_ADBMODEM
-
 #include "emu.h"
 
-#ifdef USE_ADBMODEM
 #include "adbmodem.h"
-#endif
 #include "dafb.h"
 #include "macadb.h"
 #include "macrtc.h"
@@ -56,9 +52,7 @@ public:
 		m_via1(*this, "via1"),
 		m_via2(*this, "via2"),
 		m_macadb(*this, "macadb"),
-#ifdef USE_ADBMODEM
 		m_adbmodem(*this, "adbmodem"),
-#endif
 		m_ram(*this, RAM_TAG),
 		m_swim(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
@@ -83,9 +77,7 @@ private:
 	required_device<m68040_device> m_maincpu;
 	required_device<via6522_device> m_via1, m_via2;
 	required_device<macadb_device> m_macadb;
-#ifdef USE_ADBMODEM
 	required_device<adbmodem_device> m_adbmodem;
-#endif
 	required_device<ram_device> m_ram;
 	required_device<applefdintf_device> m_swim;
 	required_device_array<floppy_connector, 2> m_floppy;
@@ -453,12 +445,7 @@ u8 macquadra_state::mac_via_in_a()
 
 u8 macquadra_state::mac_via_in_b()
 {
-#ifdef USE_ADBMODEM
 	u8 val = m_rtc->data_r();
-#else
-	u8 val = m_macadb->get_adb_state()<<4;
-	val |= m_rtc->data_r();
-#endif
 
 	if (!m_adb_irq_pending)
 	{
@@ -486,11 +473,8 @@ void macquadra_state::mac_via_out_a(u8 data)
 void macquadra_state::mac_via_out_b(u8 data)
 {
 //  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
-#ifdef USE_ADBMODEM
 	m_adbmodem->set_via_state((data & 0x30) >> 4);
-#else
-	m_macadb->mac_adb_newaction((data & 0x30) >> 4);
-#endif
+
 	m_rtc->ce_w((data & 0x04)>>2);
 	m_rtc->data_w(data & 0x01);
 	m_rtc->clk_w((data >> 1) & 0x01);
@@ -590,7 +574,7 @@ void macquadra_state::macqd700(machine_config &config)
 			adapter.drq_handler_cb().set(m_dafb, FUNC(dafb_device::turboscsi_drq_w<0>));
 		});
 
-	DP83932C(config, m_sonic, 40_MHz_XTAL / 2);
+	DP83932C(config, m_sonic, 40_MHz_XTAL / 2); // clock is C20M on the schematics
 	m_sonic->set_bus(m_maincpu, 0);
 
 	nubus_device &nubus(NUBUS(config, "nubus", 40_MHz_XTAL / 4));
@@ -610,9 +594,6 @@ void macquadra_state::macqd700(machine_config &config)
 	m_via1->writepa_handler().set(FUNC(macquadra_state::mac_via_out_a));
 	m_via1->writepb_handler().set(FUNC(macquadra_state::mac_via_out_b));
 	m_via1->irq_handler().set(FUNC(macquadra_state::mac_via_irq));
-#ifndef USE_ADBMODEM
-	m_via1->cb2_handler().set(m_macadb, FUNC(macadb_device::adb_data_w));
-#endif
 
 	R65NC22(config, m_via2, C7M/10);
 	m_via2->readpa_handler().set(FUNC(macquadra_state::mac_via2_in_a));
@@ -621,25 +602,16 @@ void macquadra_state::macqd700(machine_config &config)
 	m_via2->writepb_handler().set(FUNC(macquadra_state::mac_via2_out_b));
 	m_via2->irq_handler().set(FUNC(macquadra_state::mac_via2_irq));
 
-#ifdef USE_ADBMODEM
-		ADBMODEM(config, m_adbmodem, C7M);
-		m_adbmodem->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
-		m_adbmodem->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
-		m_adbmodem->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
-		m_adbmodem->irq_callback().set(FUNC(macquadra_state::adb_irq_w));
-		m_via1->cb2_handler().set(m_adbmodem, FUNC(adbmodem_device::set_via_data));
-		config.set_maximum_quantum(attotime::from_hz(1000000));
-#endif
+	ADBMODEM(config, m_adbmodem, C7M);
+	m_adbmodem->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+	m_adbmodem->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+	m_adbmodem->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_adbmodem->irq_callback().set(FUNC(macquadra_state::adb_irq_w));
+	m_via1->cb2_handler().set(m_adbmodem, FUNC(adbmodem_device::set_via_data));
+	config.set_perfect_quantum(m_maincpu);
 
 	MACADB(config, m_macadb, C15M);
-#ifdef USE_ADBMODEM
-	  m_macadb->adb_data_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
-#else
-	m_macadb->set_mcu_mode(false);
-	m_macadb->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
-	m_macadb->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
-	m_macadb->adb_irq_callback().set(FUNC(macquadra_state::adb_irq_w));
-#endif
+	m_macadb->adb_data_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -665,4 +637,4 @@ ROM_END
 
 } // anonymous namespace
 
-COMP( 1991, macqd700, 0, 0, macqd700, macadb, macquadra_state, init_macqd700,  "Apple Computer", "Macintosh Quadra 700", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+COMP( 1991, macqd700, 0, 0, macqd700, macadb, macquadra_state, init_macqd700,  "Apple Computer", "Macintosh Quadra 700", MACHINE_SUPPORTS_SAVE)
