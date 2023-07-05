@@ -19,6 +19,8 @@
   TODO:
     - determine why ULTRA ROM's self-diag (ESC |) fails for the ROM and
       scratchpad memory
+    - INS8250 needs to implement "Set Break" (LCR, bit 6) before Break key
+      will function as expected.
 
 ****************************************************************************/
 /***************************************************************************
@@ -167,6 +169,7 @@ void heath_tlb_device::device_start()
 	save_item(NAME(m_reset_key));
 	save_item(NAME(m_keyboard_irq_raised));
 	save_item(NAME(m_serial_irq_raised));
+	save_item(NAME(m_break_key_irq_raised));
 
 	m_strobe = false;
 	m_key_click_active = false;
@@ -176,6 +179,7 @@ void heath_tlb_device::device_start()
 	m_reset_key = false;
 	m_keyboard_irq_raised = false;
 	m_serial_irq_raised = false;
+	m_break_key_irq_raised = false;
 
 	m_key_click_timer = timer_alloc(FUNC(heath_tlb_device::key_click_off), this);
 	m_bell_timer = timer_alloc(FUNC(heath_tlb_device::bell_off), this);
@@ -288,7 +292,8 @@ void heath_tlb_device::serial_irq_w(int state)
 void heath_tlb_device::set_irq_line()
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0,
-		(m_keyboard_irq_raised || m_serial_irq_raised) ? ASSERT_LINE : CLEAR_LINE);
+		(m_keyboard_irq_raised || m_serial_irq_raised || m_break_key_irq_raised) ?
+		 ASSERT_LINE : CLEAR_LINE);
 }
 
 void heath_tlb_device::check_for_reset()
@@ -326,6 +331,13 @@ void heath_tlb_device::repeat_key_w(int state)
 {
 	// when repeat key pressed, set duty cycle to 0.5, else 0.
 	m_repeat_clock->set_duty_cycle(state == CLEAR_LINE ? 0.5 : 0);
+}
+
+void heath_tlb_device::break_key_w(int state)
+{
+	m_break_key_irq_raised = (state == CLEAR_LINE);
+
+	set_irq_line();
 }
 
 MC6845_UPDATE_ROW(heath_tlb_device::crtc_update_row)
@@ -405,7 +417,7 @@ static INPUT_PORTS_START( tlb )
 	PORT_START("MODIFIERS")
 	// bit 0 - 0x001 connects to B8 of MM5740 - low if either shift key is
 	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CapsLock")   PORT_CODE(KEYCODE_CAPSLOCK)  PORT_TOGGLE
-	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break")      PORT_CODE(KEYCODE_PAUSE)
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break")      PORT_CODE(KEYCODE_PAUSE)     PORT_WRITE_LINE_MEMBER(heath_tlb_device, break_key_w)
 	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("OffLine")    PORT_CODE(KEYCODE_F12)       PORT_TOGGLE
 	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL")       PORT_CODE(KEYCODE_LCONTROL)  PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LeftShift")  PORT_CODE(KEYCODE_LSHIFT)    PORT_CHAR(UCHAR_SHIFT_1)
