@@ -75,7 +75,8 @@ TODO: others.
 
 TODO:
 - exact cycles/scanlines for VBLANK and 256V int assert/clear need to be figured out and implemented.
-- bubble system needs a delay (and auto-sound-nmi hookup) so the 'getting ready... 49...' countdown actually plays before the simulated MCU releases the 68k and the load (and morning music) begins.
+- bubble system needs a delay (and auto-sound-nmi hookup) so the 'getting ready... 49...' countdown actually
+  plays before the simulated MCU releases the 68k and the load (and morning music) begins.
 - hcrash: Konami GT-type inputs doesn't work properly.
 - gradiusb: still needs proper MCU emulation;
 
@@ -145,24 +146,33 @@ void nemesis_state::bubsys_vblank_irq(int state)
 TIMER_DEVICE_CALLBACK_MEMBER(nemesis_state::bubsys_interrupt)
 {
 	// process these in priority order
-
 	int scanline = param;
 	m_scanline_counter++;
 	if (m_scanline_counter >= 72)
 	{
 		m_scanline_counter = 0;
-		if (m_irq4_on) // the int4 fires every 72 scanlines of a counter that is NOT reset by VBLANK, and acts as a sort of constant timer
+
+		// the int4 fires every 72 scanlines of a counter that is NOT reset by VBLANK, and acts as a sort of constant timer
+		if (m_irq4_on)
 			m_maincpu->set_input_line(4, HOLD_LINE);
 	}
 
-	// based on tracing, the VBLANK int rising edge is 16 full scanlines before the rising edge of the VSYNC pulse on CSYNC, and the VBLANK int falling edge is 16 full scanlines after the falling edge of the VSYNC pulse on CSYNC. What we don't know is where exactly "scanline 0" is within that block.
-	// we know from traces of VBLANK vs 256V below (which is inverted the same cycle that the VBLANK int edge rises) that that cycle must be the transition from scanline 255 to 256, so presumably the vblank area is 'after' the display lines of a particular frame.
+	// based on tracing, the VBLANK int rising edge is 16 full scanlines before the rising edge of the VSYNC pulse on CSYNC,
+	// and the VBLANK int falling edge is 16 full scanlines after the falling edge of the VSYNC pulse on CSYNC. What we don't
+	// know is where exactly "scanline 0" is within that block.
+	// we know from traces of VBLANK vs 256V below (which is inverted the same cycle that the VBLANK int edge rises) that that
+	// cycle must be the transition from scanline 255 to 256, so presumably the vblank area is 'after' the display lines of a
+	// particular frame.
 	// TODO: actually implement this. The behavior may differ in the (unused(?) and untested) 288 scanline mode, as well.
 	if (scanline == 0 && m_irq2_on)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
-	if (scanline == 0 && m_irq1_on && (m_screen->frame_number() & 1) == 0) // 'INT32' is tied to 256V, which is inverted exactly at the same time as the rising edge of the VBLANK int above in 256 scanline mode. Its behavior in 288 scanline mode is unknown/untested.
+	if (scanline == 0 && m_irq1_on && (m_screen->frame_number() & 1) == 0)
+	{
+		// 'INT32' is tied to 256V, which is inverted exactly at the same time as the rising edge of the VBLANK int above in 256 scanline mode.
+		// Its behavior in 288 scanline mode is unknown/untested.
 		m_maincpu->set_input_line(1, ASSERT_LINE);
+	}
 	else if (scanline == 0 && m_irq1_on && (m_screen->frame_number() & 1) != 0)
 		m_maincpu->set_input_line(1, CLEAR_LINE);
 
@@ -239,16 +249,21 @@ void nemesis_state::coin2_lockout_w(int state)
 
 void nemesis_state::sound_irq_w(int state)
 {
-	// This asserts the Z80 /irq pin by setting a 74ls74 latch; the Z80 pulses /IOREQ low during servicing of the interrupt, which clears the latch automatically, so HOLD_LINE is correct in this case
+	// This asserts the Z80 /irq pin by setting a 74ls74 latch; the Z80 pulses /IOREQ low during servicing of the interrupt,
+	// which clears the latch automatically, so HOLD_LINE is correct in this case
 	if (state)
 		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 void nemesis_state::sound_nmi_w(int state)
 {
-	// On Bubble System at least, this goes to an LS02 NOR before the Z80, whose other input is tied to ???, acting as an inverter. Effectively, if the bit is 1, NMI is asserted, otherwise it is cleared. This is also cleared on reset.
-	// the ??? input is likely either tied to VBLANK or 256V, or tied to one of those two through a 74ls74 enable latch, controlled by something else (probably either the one of the two output/int enable latches of the 68k, or by exx0/exx7 address-latched accesses from the sound z80, though technically it could be anything, even the /BS signal from the mcu to the 68k)
-	// TODO: trace implement the other NMI source; without this, the 'getting ready' pre-bubble-ready countdown in bubble system cannot work, since it requires a sequence of NMIs in order to function.
+	// On Bubble System at least, this goes to an LS02 NOR before the Z80, whose other input is tied to ???, acting as an inverter.
+	// Effectively, if the bit is 1, NMI is asserted, otherwise it is cleared. This is also cleared on reset.
+	// The ??? input is likely either tied to VBLANK or 256V, or tied to one of those two through a 74ls74 enable latch, controlled
+	// by something else (probably either the one of the two output/int enable latches of the 68k, or by exx0/exx7 address-latched
+	// accesses from the sound z80, though technically it could be anything, even the /BS signal from the mcu to the 68k)
+	// TODO: trace implement the other NMI source; without this, the 'getting ready' pre-bubble-ready countdown in bubble system cannot work,
+	// since it requires a sequence of NMIs in order to function.
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -288,7 +303,8 @@ void nemesis_state::bubsys_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	else
 	{
 		//logerror("bubsys_mcu_trigger_w (%08x) %d (%02x %02x %02x %02x)\n", m_maincpu->pc(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
-		m_maincpu->set_input_line(5, CLEAR_LINE); // Not confirmed the clear happens here; clear is done by the MCU code itself, presumably some number of cycles after the assert.
+		// Not confirmed the clear happens here; clear is done by the MCU code itself, presumably some number of cycles after the assert.
+		m_maincpu->set_input_line(5, CLEAR_LINE);
 	}
 }
 
@@ -2976,7 +2992,10 @@ void nemesis_state::bubsys(machine_config &config)
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
-	//m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI); // TODO: This is supposed to be gated by something on bubble system, unclear what. it should only be active while the bubble memory is warming up, and disabled after the bubble mcu 'releases' the 68k from reset.
+	// TODO: This is supposed to be gated by something on bubble system, unclear what.
+	// it should only be active while the bubble memory is warming up, and disabled after
+	// the bubble mcu 'releases' the 68k from reset.
+	//m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
 	PALETTE(config, m_palette).set_entries(2048);
