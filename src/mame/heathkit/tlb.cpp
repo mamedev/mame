@@ -315,14 +315,14 @@ void heath_tlb_device::check_for_reset()
 
 void heath_tlb_device::reset_key_w(int state)
 {
-	m_reset_key = (state == CLEAR_LINE);
+	m_reset_key = (state == 0);
 
 	check_for_reset();
 }
 
 void heath_tlb_device::right_shift_w(int state)
 {
-	m_right_shift = (state == CLEAR_LINE);
+	m_right_shift = (state == 0);
 
 	check_for_reset();
 }
@@ -335,7 +335,7 @@ void heath_tlb_device::repeat_key_w(int state)
 
 void heath_tlb_device::break_key_w(int state)
 {
-	m_break_key_irq_raised = (state == CLEAR_LINE);
+	m_break_key_irq_raised = (state == 0);
 
 	set_irq_line();
 }
