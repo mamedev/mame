@@ -35168,10 +35168,8 @@ at486                           // 19?? IBM AT 486
 atc1415                         // A-Trend ATC-1415 motherboard (486)
 bluenote                        // Highscreen Colani Blue Note (486)
 ch48633c                        // Chicony CH-486-33C motherboard (486)
-ch486spm                        // Chaintech 486SPM motherboard (486)
 ch491e                          // Chicony CH-491E motherboard (486)
 ch4slez1                        // Chaintech 486SLE M106 4SLE-Z1 motherboard (486)
-ch4spi                          // Chaintech 4SPI motherboard (486)
 comt486                         // Commodore Tower 486
 dt486                           // Commodore DT486
 ec4913                          // Elitegroup UC4913 REV:1.1 motherboard (486)
@@ -35189,7 +35187,6 @@ ficpio2                         // 1995 FIC 486-PIO-2
 ficvipio                        // FIC 486-VIP-IO
 ficvipio2                       // FIC 486-VIP-IO2
 fic4386vcv                      // FIC 4386-VC-V motherboard (486)
-ft486f55                        // Freetech 486FT55 motherboard (486)
 ftsserv                         // 1991 Apricot FTs (Scorpion)
 ga486vf                         // Gigabyte GA-486VF motherboard (486)
 ga486vs                         // Gigabyte GA-486VS motherboard (486)
@@ -35202,11 +35199,8 @@ hot409                          // Shuttle HOT-409
 hot419                          // Shuttle HOT-419 motherboard (486)
 hot433                          // Shuttle HOT-433 motherboard (486)
 ibm2133                         // IBM PS/1 2133
-jakms41                         // Jamicon KM-S4-1 VER 1.1
 jwj403tg                        // JETWAY J-403TG motherboard (486)
-jwj446a                         // Jetway J-446A motherboard (486)
 lion3500                        // 1993 Lion 3500C/T notebook
-ls486e                          // LuckyStar LS-486E Rev:C motherboard (486)
 lsucm486v30                     // Lucky Star UCM-486V30
 mb1433aeap                      // BIOSTAR - MB-1433/50 AEA-P - V:1
 mb1433ucv                       // Biostar MB-1433UCV motherboard (486)
@@ -35220,7 +35214,6 @@ ms4125                          // MSI MS-4125 motherboard (486)
 ms4132                          // MSI MS-4132 G VER:1 motherboard (486)
 ms4134                          // MSI MS-4134 motherboard (486)
 ms4138                          // MSI MS-4138 motherboard (486)
-ms4144                          // MSI MS-4144 motherboard (486)
 ms4145                          // MSI MS-4145 motherboard (486)
 nat48pv                         // NAT48PV-1.00 VL motherboard (486)
 ncr3433                         // NCR Class 3433
@@ -35254,8 +35247,6 @@ sm48650usc                      // Vintage Sprite SM 486-50USC motherboard (486)
 so025d2                         // SOYO 486 VESA 025D2
 so025k2                         // SOYO 025K2 motherboard (486)
 so025r2                         // SOYO 025R2 motherboard (486)
-so30h                           // SOYO 30H motherboard (486)
-so4saw2                         // SOYO SY-4SAW2 motherboard (486)
 sto486wb                        // Auva-Cam-33-P2 = See-Thru Sto486Wb motherboard (486)
 td4ipaio                        // TD-4IP-UMC-AIO motherboard (486)
 tmpat48pg4                      // TMC PAT48PG4
@@ -35271,7 +35262,6 @@ uniwb4407                       // UNICHIP 486 WB 4407 REV 1.0 motherboard (486)
 v4p895p3                        // QDI V4P895P3/SMT V5.0 motherboard (486)
 via4386vio                      // Via 4386 VIO / Highscreen universal board (486)
 zi4dvs                          // Zida 4DVS motherboard (486)
-zito4dps                        // ZIDA Tomato board 4DPS (486)
 
 @source:pc/atpci.cpp
 at586                           // 19?? AT 586
@@ -35443,6 +35433,16 @@ aoap43                          // Aopen AP43 motherboard (486)
 a486sp3                         // ASUS PVI-486SP3
 aa486s                          // ASUS PCI/I-A486S
 sis85c496                       // 486 motherboards using the SiS 85C496/85C497 chipset
+ch486spm                        // Chaintech 486SPM motherboard (486)
+ch4spi                          // Chaintech 4SPI motherboard (486)
+ft486f55                        // Freetech 486FT55 motherboard (486)
+jakms41                         // Jamicon KM-S4-1 VER 1.1
+jwj446a                         // Jetway J-446A motherboard (486)
+ls486e                          // LuckyStar LS-486E Rev:C motherboard (486)
+ms4144                          // MSI MS-4144 motherboard (486)
+so30h                           // SOYO 30H motherboard (486)
+so4saw2                         // SOYO SY-4SAW2 motherboard (486)
+zito4dps                        // ZIDA Tomato board 4DPS (486)
 
 @source:pc/pcxt.cpp
 filetto                         // (c) 1990 Novamatic
