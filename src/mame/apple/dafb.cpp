@@ -179,7 +179,8 @@ u32 dafb_base::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const 
 	auto const vram8 = util::big_endian_cast<u8 const>(&m_vram[0]) + m_base;
 	const pen_t *pens = m_palette->pens();
 
-	if (m_swatch_mode & 1)
+	// check display disable
+	if (BIT(m_swatch_mode, 0))
 	{
 		return 0;
 	}
@@ -484,13 +485,19 @@ u32 dafb_base::swatch_r(offs_t offset)
 			return m_int_status;
 
 		case 0xc: // clear cursor scanline int
-			m_int_status &= ~4;
-			recalc_ints();
+			if (!machine().side_effects_disabled())
+			{
+				m_int_status &= ~4;
+				recalc_ints();
+			}
 			break;
 
 		case 0x14: // clear VBL int
-			m_int_status &= ~1;
-			recalc_ints();
+			if (!machine().side_effects_disabled())
+			{
+				m_int_status &= ~1;
+				recalc_ints();
+			}
 			break;
 
 		case 0x20: // unused register, used by the driver to stash data
@@ -596,7 +603,10 @@ u32 dafb_base::ac842_r(offs_t offset)
 		case 0x10:
 			{
 				pen_t entry = m_palette->pen(m_pal_address);
-				m_pal_idx++;
+				if (!machine().side_effects_disabled())
+				{
+					m_pal_idx++;
+				}
 				switch (m_pal_idx - 1)
 				{
 					case 0:
