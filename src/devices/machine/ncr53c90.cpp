@@ -1179,6 +1179,7 @@ void ncr53c90_device::dma_set(int dir)
 
 void ncr53c90_device::dma_w(uint8_t val)
 {
+	LOGMASKED(LOG_FIFO, "dma_w 0x%02x fifo_pos %d tcounter %d (%s)\n", val, fifo_pos, tcounter, machine().describe_context());
 	fifo_push(val);
 	decrement_tcounter();
 	check_drq();
@@ -1354,6 +1355,8 @@ void ncr53c94_device::dma16_w(u16 data)
 		dma_w(data & 0x00ff);
 		return;
 	}
+
+	LOGMASKED(LOG_FIFO, "dma16_w 0x%04x fifo_pos %d tcounter %d (%s)\n", data, fifo_pos, tcounter, machine().describe_context());
 
 	// push two bytes into fifo
 	fifo[fifo_pos++] = data;
