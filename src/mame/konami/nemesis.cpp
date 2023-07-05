@@ -399,6 +399,11 @@ void nemesis_state::salamand_speech_start_w(uint8_t data)
 	// bit 2 is OE for VLM data
 }
 
+uint8_t nemesis_state::salamand_speech_busy_r()
+{
+	return m_vlm->bsy();
+}
+
 uint8_t nemesis_state::nemesis_portA_r()
 {
 /*
@@ -743,12 +748,6 @@ void nemesis_state::nyanpani_map(address_map &map)
 	map(0x311000, 0x311fff).ram();
 }
 
-uint8_t nemesis_state::wd_r()
-{
-	m_frame_counter ^= 1;
-	return m_frame_counter;
-}
-
 void nemesis_state::sal_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -757,7 +756,7 @@ void nemesis_state::sal_sound_map(address_map &map)
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xd000, 0xd000).w(m_vlm, FUNC(vlm5030_device::data_w));
-	map(0xe000, 0xe000).r(FUNC(nemesis_state::wd_r)); /* watchdog?? */
+	map(0xe000, 0xe000).r(FUNC(nemesis_state::salamand_speech_busy_r));
 	map(0xf000, 0xf000).w(FUNC(nemesis_state::salamand_speech_start_w));
 }
 
@@ -774,7 +773,6 @@ void nemesis_state::blkpnthr_sound_map(address_map &map)
 	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xe000, 0xe000).r(FUNC(nemesis_state::wd_r)); /* watchdog?? */
 }
 
 void nemesis_state::city_sound_map(address_map &map)
@@ -1756,7 +1754,6 @@ void nemesis_state::machine_start()
 	save_item(NAME(m_irq1_on));
 	save_item(NAME(m_irq2_on));
 	save_item(NAME(m_irq4_on));
-	save_item(NAME(m_frame_counter));
 	save_item(NAME(m_scanline_counter));
 	save_item(NAME(m_gx400_irq1_cnt));
 	save_item(NAME(m_gx400_speech_offset));
@@ -1771,7 +1768,6 @@ void nemesis_state::machine_reset()
 	m_irq_on = 0;
 	m_gx400_irq1_cnt = 0;
 	m_gx400_speech_offset = 0;
-	m_frame_counter = 1;
 	m_scanline_counter = 0;
 	m_selected_ip = 0;
 
