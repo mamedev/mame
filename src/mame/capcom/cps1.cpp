@@ -3061,8 +3061,8 @@ static INPUT_PORTS_START( qadjr )
 //  PORT_DIPSETTING(    0x60, "3" )
 
 	PORT_MODIFY("DSWC")
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )              PORT_DIPLOCATION("SW(C):6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )              PORT_DIPLOCATION("SW(C):6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )                      // Manual states default is OFF
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_MODIFY("IN2")  /* check code at 0x000c48 */
