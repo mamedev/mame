@@ -86,19 +86,20 @@ private:
 	int       m_spriteram_words = 0;
 	int       m_tilemap_flip = 0;
 	int       m_flipscreen = 0;
-	uint8_t     m_irq_port_last = 0;
-	uint8_t     m_blank_tile[8*8];
-	uint8_t     m_palette_lookup[32];
+	uint8_t   m_irq_port_last = 0;
+	uint8_t   m_blank_tile[8*8] = { };
+	uint8_t   m_palette_lookup[32] = { };
 
 	/* misc */
 	int       m_irq_on = 0;
 	int       m_irq1_on = 0;
 	int       m_irq2_on = 0;
 	int       m_irq4_on = 0;
-	uint8_t    m_selected_ip = 0; // needed for Hyper Crash
+	uint8_t   m_selected_ip = 0; // needed for Hyper Crash
 	int       m_gx400_irq1_cnt = 0;
-	uint8_t     m_frame_counter = 0;
-	uint16_t    m_scanline_counter = 0;
+	uint8_t   m_gx400_speech_offset = 0;
+	uint8_t   m_frame_counter = 0;
+	uint16_t  m_scanline_counter = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

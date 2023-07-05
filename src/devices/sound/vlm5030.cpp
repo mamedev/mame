@@ -316,8 +316,12 @@ int vlm5030_device::parse_frame()
 			return nums * FR_SIZE;
 		}
 	}
+
 	/* pitch */
-	m_new_pitch  = (m_coeff->pitchtable[get_bits(1,m_coeff->pitch_bits)] + m_pitch_offset) & 0xff;
+	m_new_pitch = m_coeff->pitchtable[get_bits(1,m_coeff->pitch_bits)];
+	if (m_new_pitch > 0)
+		m_new_pitch += m_pitch_offset;
+
 	/* energy */
 	m_new_energy = m_coeff->energytable[get_bits(6,m_coeff->energy_bits)];
 
@@ -351,16 +355,16 @@ void vlm5030_device::setup_parameter(uint8_t param)
 	/* latch parameter value */
 	m_parameter = param;
 
-	/* bit 0,1 : 4800bps / 9600bps , interporator step */
+	/* bit 0,1 : 4800bps / 9600bps , interpolator step */
 	if (param & 2) /* bit 1 = 1 , 9600bps */
-		m_interp_step = 4; /* 9600bps : no interporator */
+		m_interp_step = 4; /* 9600bps : no interpolator */
 	else if (param & 1) /* bit1 = 0 & bit0 = 1 , 4800bps */
-		m_interp_step = 2; /* 4800bps : 2 interporator */
+		m_interp_step = 2; /* 4800bps : 2 interpolator */
 	else    /* bit1 = bit0 = 0 : 2400bps */
-		m_interp_step = 1; /* 2400bps : 4 interporator */
+		m_interp_step = 1; /* 2400bps : 4 interpolator */
 
 	/* bit 3,4,5 : speed (frame size) */
-	m_frame_size = vlm5030_speed_table[(param>>3) &7];
+	m_frame_size = vlm5030_speed_table[(param>>3) & 7];
 
 	/* bit 6,7 : low / high pitch */
 	if (param & 0x80)  /* bit7=1 , high pitch */
@@ -462,7 +466,7 @@ void vlm5030_device::st(int state)
 				}
 				else
 				{
-					/* indirect accedd mode */
+					/* indirect access mode */
 					int table = (m_latch_data&0xfe) + (((int)m_latch_data&1)<<8);
 					m_address = (read_byte(table)<<8) | read_byte(table+1);
 					/* show unsupported parameter message */
@@ -622,7 +626,7 @@ phase_stop:
 		{
 			m_sample_count = 0;
 			/* logerror("VLM5030 BSY=H\n"); */
-			/* pin_BSY = 1; */
+			/* m_pin_BSY = 1; */
 			m_phase = PH_WAIT;
 		}
 		else

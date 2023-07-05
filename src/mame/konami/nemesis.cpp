@@ -380,13 +380,16 @@ void nemesis_state::nemesis_filter_w(offs_t offset, uint8_t data)
 
 void nemesis_state::gx400_speech_w(offs_t offset, uint8_t data)
 {
-	m_vlm->rst(BIT(offset, 4));
-	m_vlm->st(BIT(offset, 5));
-	// bits 3, 6 also used (one is OE for VLM data?)
-	// data is irrelevant for most writes
-
-	if (offset == 0)
+	// bit 3 falling edge: latch VLM data (databus is irrelevant for other writes)
+	// bit 4 is also used (OE for VLM data?)
+	if (BIT(~offset, 3) && BIT(m_gx400_speech_offset, 3))
 		m_vlm->data_w(data);
+
+	// bit 5: ST, bit 6: RST
+	m_vlm->st(BIT(offset, 5));
+	m_vlm->rst(BIT(offset, 6));
+
+	m_gx400_speech_offset = offset;
 }
 
 void nemesis_state::salamand_speech_start_w(uint8_t data)
@@ -1756,6 +1759,7 @@ void nemesis_state::machine_start()
 	save_item(NAME(m_frame_counter));
 	save_item(NAME(m_scanline_counter));
 	save_item(NAME(m_gx400_irq1_cnt));
+	save_item(NAME(m_gx400_speech_offset));
 	save_item(NAME(m_selected_ip));
 	save_item(NAME(m_tilemap_flip));
 	save_item(NAME(m_flipscreen));
@@ -1766,6 +1770,7 @@ void nemesis_state::machine_reset()
 {
 	m_irq_on = 0;
 	m_gx400_irq1_cnt = 0;
+	m_gx400_speech_offset = 0;
 	m_frame_counter = 1;
 	m_scanline_counter = 0;
 	m_selected_ip = 0;
