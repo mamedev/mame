@@ -1034,9 +1034,9 @@ void m68000_musashi_device::init_cpu_common(void)
 
 	/* disable all MMUs */
 	m_has_pmmu         = false;
-	m_has_hmmu         = 0;
+	m_has_hmmu         = false;
 	m_pmmu_enabled     = false;
-	m_hmmu_enabled     = false;
+	m_hmmu_enabled     = 0;
 	m_emmu_enabled     = false;
 	m_instruction_restart = false;
 
@@ -1110,7 +1110,7 @@ void m68000_musashi_device::device_reset()
 {
 	/* Disable the PMMU/HMMU on reset, if any */
 	m_pmmu_enabled = false;
-	m_hmmu_enabled = false;
+	m_hmmu_enabled = 0;
 	m_emmu_enabled = false;
 	m_instruction_restart = false;
 
@@ -1307,7 +1307,7 @@ void m68000_musashi_device::state_string_export(const device_state_entry &entry,
 
 /* global access */
 
-void m68000_musashi_device::set_hmmu_enable(bool enable)
+void m68000_musashi_device::set_hmmu_enable(int enable)
 {
 	m_hmmu_enabled = enable;
 }
@@ -1831,7 +1831,7 @@ void m68000_musashi_device::init_cpu_m68000(void)
 	m_cyc_shift        = 2;
 	m_cyc_reset        = 132;
 	m_has_pmmu         = 0;
-	m_has_hmmu         = 0;
+	m_has_hmmu         = false;
 	m_has_fpu          = 0;
 
 	define_state();
@@ -1940,7 +1940,7 @@ void m68000_musashi_device::init_cpu_m68020hmmu(void)
 {
 	init_cpu_m68020();
 
-	m_has_hmmu = 1;
+	m_has_hmmu = true;
 	m_has_fpu  = 1;
 
 
@@ -2333,9 +2333,9 @@ void m68000_musashi_device::clear_all()
 	m_instr_mode= 0;
 	m_run_mode= 0;
 	m_has_pmmu= false;
-	m_has_hmmu= 0;
+	m_has_hmmu= false;
 	m_pmmu_enabled= false;
-	m_hmmu_enabled= false;
+	m_hmmu_enabled= 0;
 	m_emmu_enabled= false;
 	m_instruction_restart= false;
 	m_has_fpu= 0;
