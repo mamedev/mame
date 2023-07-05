@@ -1175,12 +1175,6 @@ void ncr53c90_device::clock_w(uint8_t data)
 void ncr53c90_device::dma_set(int dir)
 {
 	dma_dir = dir;
-
-	// account for data already in the fifo
-	if (dir == DMA_OUT && fifo_pos)
-	{
-		decrement_tcounter(fifo_pos);
-	}
 }
 
 void ncr53c90_device::dma_w(uint8_t val)
