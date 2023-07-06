@@ -137,20 +137,24 @@ void k051649_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	{
 		for (sound_channel &voice : m_channel_list)
 		{
-			// channel is halted for freq < 9
-			if (voice.frequency > 8)
+			if (--voice.clock < 0)
 			{
-				if (--voice.clock < 0)
+				// channel is halted for freq < 9
+				if (voice.frequency < 9)
+				{
+					voice.clock = 0;
+					continue;
+				}
+				else
 				{
 					voice.counter = (voice.counter + 1) & 0x1f;
 					voice.clock = voice.frequency;
 				}
-				// scale to 11 bit digital output on chip
-				if (voice.key)
-					outputs[0].add_int(i, (voice.waveram[voice.counter] * voice.volume) >> 4, 1024);
 			}
-			else if (voice.clock > 0)
-				voice.clock--;
+
+			// scale to 11 bit digital output on chip
+			if (voice.key)
+				outputs[0].add_int(i, (voice.waveram[voice.counter] * voice.volume) >> 4, 1024);
 		}
 	}
 }
