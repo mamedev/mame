@@ -861,7 +861,9 @@ maccclas                        // 1993 Apple Macintosh Color Classic
 
 @source:apple/maclc3.cpp
 maclc3                          // 1993 Apple Macintosh LC III
+maclc3p                         // 1993 Apple Macintosh LC III+
 maclc520                        // 1993 Apple Macintosh LC 520
+maclc550                        // 1994 Apple Macintosh LC 550
 
 @source:apple/macpdm.cpp
 pmac6100                        // 1993 Apple Power Macintosh 6100
