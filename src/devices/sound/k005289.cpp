@@ -68,9 +68,9 @@ void k005289_device::device_start()
 	m_stream = stream_alloc(0, 1, clock());
 
 	/* reset all the voices */
-	for (auto & elem : m_voice)
+	for (auto & voice : m_voice)
 	{
-		elem.reset();
+		voice.reset();
 	}
 
 	save_item(STRUCT_MEMBER(m_voice, counter));
@@ -93,7 +93,7 @@ void k005289_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		for (int i = 0; i < 2; i++)
 		{
 			voice_t &v = m_voice[i];
-			if ((v.counter--) <= 0)
+			if (--v.counter < 0)
 			{
 				v.waveform = (v.waveform & ~0x1f) | ((v.waveform + 1) & 0x1f);
 				v.counter = v.frequency;

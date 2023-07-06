@@ -22,6 +22,10 @@
     K052539 is more or less equivalent to this chip except channel 5
     does not share waveram with channel 4.
 
+    TODO:
+    - make K052539 a subdevice
+    - test register bits 0-4, not used in any software
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -136,7 +140,7 @@ void k051649_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			// channel is halted for freq < 9
 			if (voice.frequency > 8)
 			{
-				if ((voice.clock--) <= 0)
+				if (--voice.clock < 0)
 				{
 					voice.counter = (voice.counter + 1) & 0x1f;
 					voice.clock = voice.frequency;
@@ -145,6 +149,8 @@ void k051649_device::sound_stream_update(sound_stream &stream, std::vector<read_
 				if (voice.key)
 					outputs[0].add_int(i, (voice.waveram[voice.counter] * voice.volume) >> 4, 1024);
 			}
+			else if (voice.clock > 0)
+				voice.clock--;
 		}
 	}
 }
@@ -174,17 +180,19 @@ void k051649_device::k051649_waveform_w(offs_t offset, u8 data)
 
 u8 k051649_device::k051649_waveform_r(offs_t offset)
 {
-	// test-register bits 6/7 expose the internal counter
+	u8 counter = 0;
+
+	// test register bits 6/7 expose the internal counter
 	if (m_test & 0xc0)
 	{
 		m_stream->update();
 
-		if (offset >= 0x60)
-			offset += m_channel_list[3 + (m_test >> 6 & 1)].counter;
+		if (offset >= 0x60 && (m_test & 0xc0) != 0xc0)
+			counter = m_channel_list[3 + (m_test >> 6 & 1)].counter;
 		else if (m_test & 0x40)
-			offset += m_channel_list[offset >> 5].counter;
+			counter = m_channel_list[offset >> 5].counter;
 	}
-	return m_channel_list[offset >> 5].waveram[offset & 0x1f];
+	return m_channel_list[offset >> 5].waveram[(offset + counter) & 0x1f];
 }
 
 
@@ -201,13 +209,15 @@ void k051649_device::k052539_waveform_w(offs_t offset, u8 data)
 
 u8 k051649_device::k052539_waveform_r(offs_t offset)
 {
-	// test-register bit 6 exposes the internal counter
+	u8 counter = 0;
+
+	// test register bit 6 exposes the internal counter
 	if (m_test & 0x40)
 	{
 		m_stream->update();
-		offset += m_channel_list[offset >> 5].counter;
+		counter = m_channel_list[offset >> 5].counter;
 	}
-	return m_channel_list[offset >> 5].waveram[offset & 0x1f];
+	return m_channel_list[offset >> 5].waveram[(offset + counter) & 0x1f];
 }
 
 
@@ -225,15 +235,12 @@ void k051649_device::k051649_frequency_w(offs_t offset, u8 data)
 
 	m_stream->update();
 
-	// test-register bit 5 resets the internal counter
+	// test register bit 5 resets the internal counter
 	if (m_test & 0x20)
 	{
-		m_channel_list[offset].counter = 0;
+		m_channel_list[offset].counter = 0x1f;
 		m_channel_list[offset].clock = 0;
 	}
-	// TODO: correct?
-	else if (m_channel_list[offset].frequency < 9)
-		m_channel_list[offset].clock = 0;
 
 	// update frequency
 	if (freq_hi)

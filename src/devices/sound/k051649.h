@@ -30,6 +30,7 @@ public:
 	u8   k052539_waveform_r(offs_t offset);
 
 	void scc_map(address_map &map);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -55,7 +56,7 @@ private:
 		}
 
 		u8 counter;     // address counter for wavetable
-		u32 clock;      // internal clock
+		s16 clock;      // internal clock
 		u16 frequency;  // frequency; result: (input clock / (32 * (frequency + 1)))
 		int volume;     // volume
 		bool key;       // keyon/off
