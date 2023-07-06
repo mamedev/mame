@@ -1601,22 +1601,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!-- Hangs at the loading screen -->
-	<software name="chelnov" supported="no">
+	<software name="chelnov">
 		<description>Video Game Anthology Vol. 2 - Atomic Runner Chelnov</description>
-		<year>1993</year>
-		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
-		<info name="alt_title" value="ビデオゲームアンソロジー vol.2 - チェルノブ" />
-		<info name="release" value="19930129" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="3444600">
-				<rom name="atomic_runner_chelnov.mfm" size="3444600" crc="1acdd3b4" sha1="58db64ced0171d97a4580a960bd94d6fd11a260a" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chelnovc" cloneof="chelnov">
-		<description>Video Game Anthology Vol. 2 - Atomic Runner Chelnov (cracked)</description>
 		<year>1993</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="ビデオゲームアンソロジー vol.2 - チェルノブ" />
