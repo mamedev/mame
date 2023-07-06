@@ -2676,7 +2676,7 @@ ROM_START( gondo )
 	ROM_CONTINUE(         0x70000, 0x08000 )
 	ROM_LOAD( "dt11.h15", 0x68000, 0x08000, CRC(53e9cf17) SHA1(8cbb45154a60f42f1b1e7299b12d2e92fc194df8) )
 
-	ROM_REGION( 1024, "proms", 0 )
+	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) /* BPROM type MB7122E for Priority (Not yet used) */
 ROM_END
 
@@ -2720,7 +2720,7 @@ ROM_START( gondou )
 	ROM_CONTINUE(         0x70000, 0x08000 )
 	ROM_LOAD( "dt11.h15", 0x68000, 0x08000, CRC(53e9cf17) SHA1(8cbb45154a60f42f1b1e7299b12d2e92fc194df8) )
 
-	ROM_REGION( 1024, "proms", 0 )
+	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) /* BPROM type MB7122E for Priority (Not yet used) */
 ROM_END
 
@@ -2764,7 +2764,7 @@ ROM_START( makyosen )
 	ROM_CONTINUE(         0x70000, 0x08000 )
 	ROM_LOAD( "ds11.h15", 0x68000, 0x08000, CRC(53e9cf17) SHA1(8cbb45154a60f42f1b1e7299b12d2e92fc194df8) )
 
-	ROM_REGION( 1024, "proms", 0 )
+	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) /* BPROM type MB7122E for Priority (Not yet used) */
 
 	ROM_REGION( 0x0600, "plds", 0 )
@@ -3276,47 +3276,51 @@ ROM_START( csilver )
 	ROM_LOAD( "dx09.10f", 0x30000, 0x10000, CRC(3192571d) SHA1(240c6c099f1e6edbf0be7d5a4ec396b056c9f70f) )
 	ROM_LOAD( "dx10.12f",  0x40000, 0x10000, CRC(3ef77a32) SHA1(97b97c35a6ca994d2e7a6e7a63101eda9709bcb1) )
 	ROM_LOAD( "dx11.13f",  0x50000, 0x10000, CRC(9cf3d5b8) SHA1(df4974f8412ab1cf65871b8e4e3dbee478bf4d21) )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "dx-15.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) // BPROM type MB7122E for priority (Not yet used), location on alternate board unknown
 ROM_END
 
-/* Different IC positions to World set? */
+// There is known to exist an identical ROM set with different PCB locations designated for an alternate ROM board (noted on the right of the ROM definition)
 ROM_START( csilverj )
 	ROM_REGION( 0x48000, "maincpu", 0 )
-	ROM_LOAD( "dx03-3.a4", 0x08000, 0x08000, CRC(02dd8cfc) SHA1(f29c0d9dd03e8c52672c0f3dbee44a93c5b4261d) )
-	ROM_LOAD( "dx01.a2", 0x10000, 0x10000, CRC(570fb50c) SHA1(3002f53182834a060fc282be1bc5767906e19ba2) )
-	ROM_LOAD( "dx02.a3", 0x20000, 0x10000, CRC(58625890) SHA1(503a969085f6dcb16687217c48136ea22d07c89f) )
+	ROM_LOAD( "dx03-2.18d", 0x08000, 0x08000, CRC(02dd8cfc) SHA1(f29c0d9dd03e8c52672c0f3dbee44a93c5b4261d) ) // dx03-3.a4 (Different ROM label but identical to dx03-2.18d)
+	ROM_LOAD( "dx01.12d",   0x10000, 0x10000, CRC(570fb50c) SHA1(3002f53182834a060fc282be1bc5767906e19ba2) ) // dx01.a2
+	ROM_LOAD( "dx02.13d",   0x20000, 0x10000, CRC(58625890) SHA1(503a969085f6dcb16687217c48136ea22d07c89f) ) // dx01.a3
 
 	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
-	ROM_LOAD( "dx04-1.a5", 0x0000, 0x10000,  CRC(29432691) SHA1(a76ecd27d217c66a0e43f93e29efe83c657925c3) )
+	ROM_LOAD( "dx04-1.19d", 0x0000, 0x10000,  CRC(29432691) SHA1(a76ecd27d217c66a0e43f93e29efe83c657925c3) ) // dx04-1.a5
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "dx05.a6", 0x00000, 0x10000,  CRC(eb32cf25) SHA1(9390c88033259c65eb15320e31f5d696970987cc) )
+	ROM_LOAD( "dx05.3f", 0x00000, 0x10000,  CRC(eb32cf25) SHA1(9390c88033259c65eb15320e31f5d696970987cc) ) // dx05.a6
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
 	// hand modified version of csilver ROM
 	ROM_LOAD( "id8751h_japan.mcu", 0x0000, 0x1000, BAD_DUMP CRC(6e801217) SHA1(2d8f7ae533dd8146acf8461d61ddd839544adf55) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
-	ROM_LOAD( "dx00.a1",  0x00000, 0x08000, CRC(f01ef985) SHA1(d5b823bd7c0efcf3137f8643c5d99a260bed5675) )
+	ROM_LOAD( "dx00.3d",  0x00000, 0x08000, CRC(f01ef985) SHA1(d5b823bd7c0efcf3137f8643c5d99a260bed5675) ) // dx00.a1
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites (3bpp) */
-	ROM_LOAD( "dx14.b5",  0x00000, 0x10000, CRC(80f07915) SHA1(ea100f12ef3a68110af911fa9beeb73b388f069d) )
+	ROM_LOAD( "dx14.15k",  0x00000, 0x10000, CRC(80f07915) SHA1(ea100f12ef3a68110af911fa9beeb73b388f069d) ) // dx14.b5
 	/* 0x10000-0x1ffff empty */
-	ROM_LOAD( "dx13.b4",  0x20000, 0x10000, CRC(d32c02e7) SHA1(d0518ec31e9e3f7b4e76fba5d7c05c33c61a9c72) )
+	ROM_LOAD( "dx13.13k",  0x20000, 0x10000, CRC(d32c02e7) SHA1(d0518ec31e9e3f7b4e76fba5d7c05c33c61a9c72) ) // dx13.b4
 	/* 0x30000-0x3ffff empty */
-	ROM_LOAD( "dx12.b3",  0x40000, 0x10000, CRC(ac78b76b) SHA1(c2be347fd950894401123ada8b27bfcfce53e66b) )
+	ROM_LOAD( "dx12.10k",  0x40000, 0x10000, CRC(ac78b76b) SHA1(c2be347fd950894401123ada8b27bfcfce53e66b) ) // dx12.b3
 	/* 0x50000-0x5ffff empty */
 	/* 0x60000-0x7ffff empty (no 4th plane) */
 
 	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles (3bpp) */
-	ROM_LOAD( "dx06.a7",  0x00000, 0x10000, CRC(b6fb208c) SHA1(027d33f0b5feb6f0433134213cfcef96790eaace) )
-	ROM_LOAD( "dx07.a8",  0x10000, 0x10000, CRC(ee3e1817) SHA1(013496976a9ffacf1587b3a6fc0f548becb1ab0e) )
-	ROM_LOAD( "dx08.a9",  0x20000, 0x10000, CRC(705900fe) SHA1(53b9d09f9780a3bf3545bc27a2855ebee3884124) )
-	ROM_LOAD( "dx09.a10", 0x30000, 0x10000, CRC(3192571d) SHA1(240c6c099f1e6edbf0be7d5a4ec396b056c9f70f) )
-	ROM_LOAD( "dx10.b1",  0x40000, 0x10000, CRC(3ef77a32) SHA1(97b97c35a6ca994d2e7a6e7a63101eda9709bcb1) )
-	ROM_LOAD( "dx11.b2",  0x50000, 0x10000, CRC(9cf3d5b8) SHA1(df4974f8412ab1cf65871b8e4e3dbee478bf4d21) )
-ROM_END
+	ROM_LOAD( "dx06.5f",  0x00000, 0x10000, CRC(b6fb208c) SHA1(027d33f0b5feb6f0433134213cfcef96790eaace) ) // dx06.a7
+	ROM_LOAD( "dx07.7f",  0x10000, 0x10000, CRC(ee3e1817) SHA1(013496976a9ffacf1587b3a6fc0f548becb1ab0e) ) // dx07.a8
+	ROM_LOAD( "dx08.8f",  0x20000, 0x10000, CRC(705900fe) SHA1(53b9d09f9780a3bf3545bc27a2855ebee3884124) ) // dx08.a9
+	ROM_LOAD( "dx09.10f", 0x30000, 0x10000, CRC(3192571d) SHA1(240c6c099f1e6edbf0be7d5a4ec396b056c9f70f) ) // dx09.a10
+	ROM_LOAD( "dx10.12f",  0x40000, 0x10000, CRC(3ef77a32) SHA1(97b97c35a6ca994d2e7a6e7a63101eda9709bcb1) ) // dx10.b1
+	ROM_LOAD( "dx11.13f",  0x50000, 0x10000, CRC(9cf3d5b8) SHA1(df4974f8412ab1cf65871b8e4e3dbee478bf4d21) ) // dx11.b2
 
-/* Same IC positions to World set */
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "dx-15.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) // BPROM type MB7122E for priority (Not yet used), location on alternate board unknown
+ROM_END
 
 ROM_START( csilverja ) // DE-0250-3 + DE-0251-2
 	ROM_REGION( 0x48000, "maincpu", 0 )
@@ -3353,6 +3357,9 @@ ROM_START( csilverja ) // DE-0250-3 + DE-0251-2
 	ROM_LOAD( "dx09.10f", 0x30000, 0x10000, CRC(3192571d) SHA1(240c6c099f1e6edbf0be7d5a4ec396b056c9f70f) )
 	ROM_LOAD( "dx10.12f",  0x40000, 0x10000, CRC(3ef77a32) SHA1(97b97c35a6ca994d2e7a6e7a63101eda9709bcb1) )
 	ROM_LOAD( "dx11.13f",  0x50000, 0x10000, CRC(9cf3d5b8) SHA1(df4974f8412ab1cf65871b8e4e3dbee478bf4d21) )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "dx-15.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) // BPROM type MB7122E for priority (Not yet used), location on alternate board unknown
 ROM_END
 
 ROM_START( oscar )
@@ -3862,7 +3869,7 @@ GAME( 1987, ghostb3a,   ghostb,   ghostb,   ghostb3,   dec8_state,    empty_init
 GAME( 1987, meikyuh,    ghostb,   meikyuh,  meikyuh,   dec8_state,    empty_init, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, meikyuha,   ghostb,   meikyuh,  meikyuh,   dec8_state,    empty_init, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, csilver,    0,        csilver,  csilver,   csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilverj,   csilver,  csilver,  csilverj,  csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilverj,   csilver,  csilver,  csilverj,  csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, csilverja,  csilver,  csilver,  csilverj,  csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, oscar,      0,        oscar,    oscar,     dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, oscarbl,    oscar,    oscarbl,  oscar,     dec8_state,    empty_init, ROT0,   "bootleg",               "Psycho-Nics Oscar (World revision 0, bootleg)", MACHINE_SUPPORTS_SAVE )

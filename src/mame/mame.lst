@@ -20196,6 +20196,7 @@ pepk0810a                       // (c) 1987 IGT - International Game Technology
 pepk0811                        // (c) 1987 IGT - International Game Technology
 pepk0823                        // (c) 1987 IGT - International Game Technology
 pepk0832                        // (c) 1987 IGT - International Game Technology
+pepk0846                        // (c) 1987 IGT - International Game Technology
 pepk0849                        // (c) 1987 IGT - International Game Technology
 pepk0856                        // (c) 1987 IGT - International Game Technology
 pepk0856a                       // (c) 1987 IGT - International Game Technology
@@ -20209,6 +20210,7 @@ pepk1002                        // (c) 1987 IGT - International Game Technology
 pepk1004                        // (c) 1987 IGT - International Game Technology
 pepk1013                        // (c) 1987 IGT - International Game Technology
 pepk1015                        // (c) 1987 IGT - International Game Technology
+pepk1017                        // (c) 1987 IGT - International Game Technology
 pepk1020                        // (c) 1987 IGT - International Game Technology
 pepk1024                        // (c) 1987 IGT - International Game Technology
 pepk1030                        // (c) 1987 IGT - International Game Technology
@@ -45198,6 +45200,7 @@ ojankoy                         // [1986] V-System Co. (Japan)
 @source:vsystem/pipedrm.cpp
 hatris                          // (c) 1990 Video System Co. (US)
 hatrisj                         // (c) 1990 Video System Co. (Japan)
+hatrisp                         // (c) 1990 Video System Co. (prototype)
 pipedrm                         // (c) 1990 Video System Co. (World)
 pipedrmj                        // (c) 1990 Video System Co. (Japan)
 pipedrmt                        // (c) 1990 Video System Co. (Taiwan)
