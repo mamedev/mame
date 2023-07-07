@@ -126,14 +126,6 @@ ROM_END
 
 */
 
-/* Cirrus Logic CL-GD5465 Laguna3D
-// Chaintech GA-5465AS AGP graphics card - Chip: CL-GD5465 - ROM: CL-GD546x Laguna PCI VGA BIOS Version 1.62c - RAM: 4MB, 8MB - OSC: 14.3C7Y - Connector: DB15 - VESA feature connector
-ROM_START( clgd5465 )
-    ROM_REGION(0x08000, "clgd5465", 0)
-    ROM_LOAD("chaintech.vbi", 0x00000, 0x08000, CRC(8afa1afb) SHA1(251a953d442dc34738f80371cfbd0fd9f1097635) )
-ROM_END
-
-*/
 
 //**************************************************************************
 //  GLOBAL VARIABLES
