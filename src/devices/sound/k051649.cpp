@@ -76,6 +76,7 @@ void k051649_device::device_start()
 	save_item(STRUCT_MEMBER(m_channel_list, clock));
 	save_item(STRUCT_MEMBER(m_channel_list, frequency));
 	save_item(STRUCT_MEMBER(m_channel_list, volume));
+	save_item(STRUCT_MEMBER(m_channel_list, sample));
 	save_item(STRUCT_MEMBER(m_channel_list, key));
 	save_item(STRUCT_MEMBER(m_channel_list, waveram));
 	save_item(NAME(m_test));
