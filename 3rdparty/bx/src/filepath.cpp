@@ -16,7 +16,9 @@
 #endif // !BX_CRT_NONE
 
 #if BX_PLATFORM_WINDOWS
+#if !defined(GetModuleFileName)
 extern "C" __declspec(dllimport) unsigned long __stdcall GetModuleFileNameA(void* _module, char* _outFilePath, unsigned long _size);
+#endif
 extern "C" __declspec(dllimport) unsigned long __stdcall GetTempPathA(unsigned long _max, char* _outFilePath);
 #elif BX_PLATFORM_OSX
 extern "C" int _NSGetExecutablePath(char* _buf, uint32_t* _bufSize);
