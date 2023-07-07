@@ -928,7 +928,12 @@ ROM_START( hatrisj ) // VS-Z80-0H-8 PCB
 ROM_END
 
 
-ROM_START( hatrisp ) // PCB silkscreened VS-Z80-0H-8 despite being different to the above sets' PCB - Has 'show version' handwritten in Japanese on a label
+/*
+The PCB had a sticker stating "Show Version" written in Japanese, so this version was likely meant for the
+  1990 AOU show held 1990/02/27 through 1990/02/28 or possibly for the 1990 AMOA held 1990/10/25 through
+  1990/10/27 as it has a "THIS GAME IS FOR USE IN THE USA ONLY." regional copyright notice
+*/
+ROM_START( hatrisp ) // PCB silkscreened VS-Z80-0H-8 despite being different to the above sets' PCB
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3-6show.ic8", 0x00000, 0x08000, CRC(e1cf7403) SHA1(86a5392c6078618575682b53a83e7810fd6db7c0) ) // hand written 3/6  Show
 
