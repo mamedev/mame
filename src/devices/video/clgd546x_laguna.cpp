@@ -99,13 +99,13 @@ void cirrus_gd5465_laguna3d_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
 	// TODO: AGP CAPPTR
-//	map(0xf8, 0xf8) PCI VGA Shadow Register
-//	map(0xfc, 0xfc) PCI Vendor Specific Control Register
+//  map(0xf8, 0xf8) PCI VGA Shadow Register
+//  map(0xfc, 0xfc) PCI Vendor Specific Control Register
 }
 
 void cirrus_gd5465_laguna3d_device::mmio_map(address_map &map)
 {
-	
+
 }
 
 void cirrus_gd5465_laguna3d_device::vram_aperture_map(address_map &map)
