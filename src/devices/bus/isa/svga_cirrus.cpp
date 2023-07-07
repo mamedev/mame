@@ -24,28 +24,6 @@ ROM_END
 // unemulated Chipsets from the CL-GD5430 onwards
 
 /*
-    Cirrus Logic CL-GD543x - PCI cards
-
-//  PCI card CL543XPCI Ver 4.0 - ROM: CL-GD543x PCI VGA BIOS Version 1.10B - RAM: 1MB, 2MB or 4MB - Chip: CL-GD5430-0C-C - OSC: 14.318 MHz - Connector: DB15
-// VESA feature connector - Jumpers: IRQ9 enable/disable, Green control
-ROM_START( clgd543x_pci )
-    ROM_REGION(0x08000, "clgd543x_pci", 0)
-    ROM_SYSTEM_BIOS(0, "pci_version_1.10b", "PCI VGA BIOS Version 1.10B")
-    ROMX_LOAD("cl543x_pci_rev4.bin", 0x00000, 0x8000, CRC(553171a3) SHA1(b72edc318710c46c9cb280e9b1b3c9f8a34844f2), ROM_BIOS(0) )
-    ROM_IGNORE( 0x8000 )
-    ROM_SYSTEM_BIOS(1, "pci_version_1.00e", "PCI VGA BIOS Version 1.00e")
-    ROMX_LOAD("cirrus5434.bin", 0x00000, 0x8000, CRC(bc271648) SHA1(08afd4468c4c1a1630a200de1007b1671f109b3c), ROM_BIOS(1) )
-    ROM_SYSTEM_BIOS(2, "pci_version_1.22", "PCI VGA BIOS Version 1.22")
-    ROMX_LOAD("gd5434pci.bin", 0x00000, 0x8000, CRC(fa76dabf) SHA1(0310ef02df941e7d35e1d832400e2e4dd07d6309), ROM_BIOS(2) )
-    ROM_SYSTEM_BIOS(3, "pci_ver_1.10b_jap", "PCI VGA BIOS Version 1.10B Japan chip")
-    ROMX_LOAD("japan.bin", 0x00000, 0x8000, CRC(46fe9efa) SHA1(58712b00faf102509c4129c0babeb98df2b6e042), ROM_BIOS(3) )
-    ROM_SYSTEM_BIOS(4, "gd5434pciv124", "CL-GD543x PCI VGA BIOS Version 1.24")
-    ROMX_LOAD("1.24.bin", 0x00000,0x8000, CRC(174fa427) SHA1(3e490f3cc3af33dbfac6ff3ddac5e90bdc895646), ROM_BIOS(4) )
-ROM_END
-
-*/
-
-/*
     Cirrus Logic CL-GD543x - ISA cards
 
 // Diamond Speedstar 64 ISA Rev. A3A - Chip: CL-GD5434-J-QC-F - RAM: 2MB - ROM: 32KB V2.02 - OSC: 14.31818MHz - Connector: DB15 - VESA feature connector
@@ -78,50 +56,6 @@ ROM_START( clgd543x_vlb )
     // ROM: Kelvin 64-VLB BIOS Ver 1.10B - OSC: 14.318180 Mhz, 55.000 MHz, unreadable - Connectors: DB15, 2x3.5mm jacks - Potentiometer on rear bracket
     ROM_SYSTEM_BIOS(2, "kelmpeg", "Orchid Kelvin MPEG Version 1.10B")
     ROMX_LOAD("kelvin64_mpeg.bin", 0x00000, 0x10000, CRC(403020a4) SHA1(1ee70f6cc3c7b9a9afb402a1bc939f9f2e0cc739), ROM_BIOS(2) )
-ROM_END
-
-
-
-*/
-
-/*
-    Cirrus Logic VL-GD5436 - PCI cards
-
-//Chip: CL-GD5436-I-QC-A - ROM: CL-GD5436 VL/PCI VGA BIOS Version 1.00b - RAM: 1MB, up to 4MB - Connector: DB15 - VESA connector - OSC: 14.31818MHz
-// Jumpers: JG1 Green Control, IRQ9 enable/disable
-ROM_START( clgd5436 )
-    ROM_REGION(0x08000, "clgd5436", 0)
-    ROM_LOAD("5436.vbi", 0x00000, 0x08000, CRC(7737d03e) SHA1(e4d0b4e7262887dc5a6473ea8909fdc13a6a02c1) )
-ROM_END
-
-*/
-
-/*
-    Cirrus Logic CL-GD5440 - PCI cards
-
-// Chip: Cirrus Logic CL-GD5440-J-QC-B - ROM: CL-GD5440 VGA BIOS Version 1.07 - RAM: 1MB, max. 2MB - OSC:14.31818MHz - Connector: DB15 - VESA connector
-ROM_START( clgd5440 )
-    ROM_REGION(0x10000, "clgd5440", 0)
-    ROM_LOAD("bios.bin", 0x00000, 0x10000, CRC(f0d3d0b4) SHA1(620b0727a20b127f5f32576ec54fbc6f9f437ad3) )
-ROM_END
-*/
-
-/*
-    Cirrus Logic CL-GD5446 - PCI cards
-// Chip:CL-GD5446-HC-A - ROM: CL-GD5436/46 PCI VGA BIOS Version 1.25 - RAM: 1MB, 2MB, 4MB - OSC: 14.31818MHz - Connector: DB15 - VESA feature connector
-ROM_START( clgd5446 )
-    ROM_REGION(0x10000, "clgd5446", 0)
-    ROM_LOAD("5446bv.vbi", 0x00000, 0x10000, CRC(7a859659) SHA1(ff667218261969c48082ec12aa91088a01b0cb2a) )
-ROM_END
-
-*/
-
-/*
-    Cirrus Logic CL-GD5464 Laguna3D
-// DSystems Wizar3D PCI graphics card - Chip: CL-GD5464-HC-A - ROM: DSystems Wizar3D 144a.10H - RAM: 2MB, 4MB, 8MB - Connector: DB15 - VESA feature connector
-ROM_START( clgd5464 )
-    ROM_REGION(0x08000, "clgd5464", 0)
-    ROM_LOAD("dsystems_wizard3d.vbi", 0x00000, 0x08000, CRC(df9f1570), SHA1(4e611f4039b851fd4237d450e38c9d764920a747) )
 ROM_END
 
 */
@@ -287,20 +221,6 @@ ROM_END
 
 */
 
-/*
-    Cirrus Logic CL-GD54M30 - PCI
-ROM_START( clgd54m30 )
-    ROM_REGION(0x10000, "clgd54m30", 0)
-    // Chip: CL-GD54M30-I-QC-A, ROM: 32KB, RAM: 1MB, 2MB, Connector: DB15, VESA veature connector
-    ROM_SYSTEM_BIOS(0, "version_1.00d", "VGA BIOS Version 1.00d")
-    ROMX_LOAD("korea.bin", 0x00000, 0x10000, CRC(0870507b) SHA1(b3873cb8834767250fcb7043918a35b1b895b0b1), ROM_BIOS(0) )
-    ROM_SYSTEM_BIOS(1, "stlab_ver_1.00d", "STlab Version 1.00d")
-    ROMX_LOAD("gd54m30stlab.bin", 0x08000, 0x8000, CRC(72116f4e) SHA1(4618640aa0f07586ebab02260fc58aa3035114fb), ROM_BIOS(1) )
-    ROM_SYSTEM_BIOS(2, "clgd54m30_ver1.00d", "CL-GD54M30 Ver.1.00d")
-    ROMX("gd54m30.bin", 0x08000, 0x000, CRC(45a1d9d0) SHA1(0e8a88ff354699bfb75a1de807f2187ff9910c67), ROM_BIOS(2) )
-ROM_END
-
-*/
 
 /*
     Generic CL-GD542x video card
@@ -331,39 +251,39 @@ ROM_START( clgd542x )
 	// Diamond Speedstar PRO - Chipset: CL-GD5426-80QC-B - ROM: Ver 2.04 - RAM: 1MB - Connector: DB15 - VESA feature connectorVL card
 	ROM_SYSTEM_BIOS(6, "speedstar_pro", "Diamond Speedstar PRO")
 	ROMX_LOAD("diamond5426_v204.vbi", 0x00000, 0x08000, CRC(c98491b0) SHA1(19ae9d2bf39e5b2726d6d556ef2cfa84b06d4da9), ROM_BIOS(6) )
+	// ISA16 - Chip: CL-GD5424-80QC-GW - RAM: 512KB
+	ROM_SYSTEM_BIOS(7, "5424_ver_1.41", "5424 Ver 1.41")
+	ROMX_LOAD("cl5424.bin", 0x0000, 0x04000, CRC(c3b0239a) SHA1(6327b98b26f481f993ebbd0dc18410e4fb5b3aad), ROM_SKIP(1) | ROM_BIOS(7) )
+	ROM_CONTINUE(                                   0x00001, 0x04000 )
+	ROM_IGNORE(0x8000)
+	// UTD-01D CL542X - VLB - Chip: Cirrus Logic CL-GD5428-80QC-A - RAM: 1MB
+	ROM_SYSTEM_BIOS(8, "5428_ver_1.41", "5428 Ver 1.41")
+	ROMX_LOAD("cl5428.bin", 0x00000, 0x04000, CRC(baba9c04) SHA1(2b7a426e060f656c401586a1a6c1183edbf464a5), ROM_SKIP(1) | ROM_BIOS(8) )
+	ROM_CONTINUE(                                   0x00001, 0x04000 )
+	ROM_SYSTEM_BIOS(9, "cl5429_v1.00a", "CL-GD5429 Ver.1.00a")
+	ROMX_LOAD("5429.vbi", 0x00000, 0x08000, CRC(a2d81c5b) SHA1(8060cd4b49052572bb5ec929f8ad21e2addce237), ROM_BIOS(9) )
+	// VLB - CL5429 SOJ/SMT/4L/V1 - ROM: CL-GD5906-20DC-1.00 - Chipset: Cirrus Logic CL-GD5429-86QC-B - RAM: 1MB, max. 2MB
+	ROM_SYSTEM_BIOS(10, "20dc-1.00", "CL-GD5906-20DC-1.00")
+	ROMX_LOAD("cl5429.bin", 0x00000, 0x8000, CRC(c4af3673) SHA1(a987c6047141b3d478aeccccd07936210ddb374b), ROM_BIOS(10) )
+	// Source: ROM dump - NCR 8bit VLB VGA card S17-0000248 - Chip: CL-GD5428-80QC-A - ROM: CL-GD5422/5424/5426/5428 VGA BIOS Version 1.3 - RAM: 1MB - Connector: DB15 - VESA feature connector
+	ROM_SYSTEM_BIOS(11, "ncr_5428_v130", "NCR 5428 VLB V1.30")
+	ROMX_LOAD("ncr_vlb_vga_cl-gd5428-80qc-a.bin", 0x00000, 0x08000, CRC(2d68bfb7) SHA1(f0e385e4d2c4a417ed21f10bf340ad6338b768bd), ROM_BIOS(11) )
+	// Machspeed VGA GUI 2100 - 16bit VLB Cirrus Logic CL-GD5428 based VGA card - ROM: CL-GD542X VGA BIOS Version 1.41 - Chips: MACHSPEED GTK6189 9408 CL-GD5428-80QC-A
+	// RAM: 1MB max. 2MB - Connectors: DB15 -  VESA feature connector
+	ROM_SYSTEM_BIOS(12, "machspeed2100", "Machspeed VGA GUI 2100 V1.41a")
+	ROMX_LOAD("machspeed_vga_gui_2100_vlb.vbi", 0x00000, 0x08000, CRC(da3b3261) SHA1(a09ceea0d8036e13ec501dd6cc32bca16f2f9204), ROM_BIOS(12) )
 	// Octek VL-Combo rev.3.2 - This is a Cirrus Logic CL-GD5426 based VGA card that includes 2 serial ports, a parallel port, a floppy controller and an IDE HDD controller.
 	// Chips: CL-GD5426, SMC FDC37C652QF, PROMISE PDC20230C
 	// The 64KB original dump includes two identical 32KB halves with 16KB "quarters" interleaved in each.
 	// The rev.3.3 card uses the same BIOS but a CL-GD5428
-	ROM_SYSTEM_BIOS(7, "octec_vlcombo3.2", "Octek VL-Combo rev.3.2")
-	ROMX_LOAD("octek_vl-combo_rev3_2_27256.bin", 0x00000, 0x04000, CRC(0dbabb0a) SHA1(693c384abf42420276a2727ec4a4c1792704eb30), ROM_SKIP(1) | ROM_BIOS(7) )
+	ROM_SYSTEM_BIOS(13, "octec_vlcombo3.2", "Octek VL-Combo rev.3.2")
+	ROMX_LOAD("octek_vl-combo_rev3_2_27256.bin", 0x00000, 0x04000, CRC(0dbabb0a) SHA1(693c384abf42420276a2727ec4a4c1792704eb30), ROM_SKIP(1) | ROM_BIOS(13) )
 	ROM_CONTINUE(                                   0x00001, 0x04000 )
 	// Octek VL-Combo rev.2.1 - PDC20230-B IDE-controller
 	// Software dump using the MESS method, the Promise HDD-controller part is dumped from D800, the 32K from C800 are FF
-	ROM_SYSTEM_BIOS(8, "octec_vlcombo2.1", "Octek VL-Combo rev.2.1")
-	ROMX_LOAD("octek_vl_combo_v2.1_myc000.bin", 0x00000, 0x08000, CRC(1a97b6d5) SHA1(fde41c45347b66ed4b1f99c3f7057e7411cdf4da), ROM_BIOS(8) )
+	ROM_SYSTEM_BIOS(14, "octec_vlcombo2.1", "Octek VL-Combo rev.2.1")
+	ROMX_LOAD("octek_vl_combo_v2.1_myc000.bin", 0x00000, 0x08000, CRC(1a97b6d5) SHA1(fde41c45347b66ed4b1f99c3f7057e7411cdf4da), ROM_BIOS(14) )
 	// ROM_LOAD("octek_vl_combo_v2.1_myd800.bin", 0x00000, 0x02000, CRC(2c472bfe) SHA1(ab4879924f5826c38f6066ac769106584ac2d2e8) ) // HDD
-	// ISA16 - Chip: CL-GD5424-80QC-GW - RAM: 512KB
-	ROM_SYSTEM_BIOS(9, "5424_ver_1.41", "5424 Ver 1.41")
-	ROMX_LOAD("cl5424.bin", 0x0000, 0x04000, CRC(c3b0239a) SHA1(6327b98b26f481f993ebbd0dc18410e4fb5b3aad), ROM_SKIP(1) | ROM_BIOS(9) )
-	ROM_CONTINUE(                                   0x00001, 0x04000 )
-	ROM_IGNORE(0x8000)
-	// UTD-01D CL542X - VLB - Chip: Cirrus Logic CL-GD5428-80QC-A - RAM: 1MB
-	ROM_SYSTEM_BIOS(10, "5428_ver_1.41", "5428 Ver 1.41")
-	ROMX_LOAD("cl5428.bin", 0x00000, 0x04000, CRC(baba9c04) SHA1(2b7a426e060f656c401586a1a6c1183edbf464a5), ROM_SKIP(1) | ROM_BIOS(10) )
-	ROM_CONTINUE(                                   0x00001, 0x04000 )
-	ROM_SYSTEM_BIOS(11, "cl5429_v1.00a", "CL-GD5429 Ver.1.00a")
-	ROMX_LOAD("5429.vbi", 0x00000, 0x08000, CRC(a2d81c5b) SHA1(8060cd4b49052572bb5ec929f8ad21e2addce237), ROM_BIOS(11) )
-	// VLB - CL5429 SOJ/SMT/4L/V1 - ROM: CL-GD5906-20DC-1.00 - Chipset: Cirrus Logic CL-GD5429-86QC-B - RAM: 1MB, max. 2MB
-	ROM_SYSTEM_BIOS(12, "20dc-1.00", "CL-GD5906-20DC-1.00")
-	ROMX_LOAD("cl5429.bin", 0x00000, 0x8000, CRC(c4af3673) SHA1(a987c6047141b3d478aeccccd07936210ddb374b), ROM_BIOS(12) )
-	// Source: ROM dump - NCR 8bit VLB VGA card S17-0000248 - Chip: CL-GD5428-80QC-A - ROM: CL-GD5422/5424/5426/5428 VGA BIOS Version 1.3 - RAM: 1MB - Connector: DB15 - VESA feature connector
-	ROM_SYSTEM_BIOS(13, "ncr_5428_v130", "NCR 5428 VLB V1.30")
-	ROMX_LOAD("ncr_vlb_vga_cl-gd5428-80qc-a.bin", 0x00000, 0x08000, CRC(2d68bfb7) SHA1(f0e385e4d2c4a417ed21f10bf340ad6338b768bd), ROM_BIOS(13) )
-	// Machspeed VGA GUI 2100 - 16bit VLB Cirrus Logic CL-GD5428 based VGA card - ROM: CL-GD542X VGA BIOS Version 1.41 - Chips: MACHSPEED GTK6189 9408 CL-GD5428-80QC-A
-	// RAM: 1MB max. 2MB - Connectors: DB15 -  VESA feature connector
-	ROM_SYSTEM_BIOS(14, "machspeed2100", "Machspeed VGA GUI 2100 V1.41a")
-	ROMX_LOAD("machspeed_vga_gui_2100_vlb.vbi", 0x00000, 0x8000, CRC(da3b3261) SHA1(a09ceea0d8036e13ec501dd6cc32bca16f2f9204), ROM_BIOS(14) )
 ROM_END
 
 //**************************************************************************
