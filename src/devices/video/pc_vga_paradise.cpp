@@ -4,16 +4,20 @@
 
 Paradise / Western Digital (S)VGA chipsets
 
-TODO:
-- stub, (S?)VGA features not yet implemented;
+- PVGA1A
 - PVGA1A-JK / WD90C90-JK (same as PVGA1A with extra connectors?)
-- WD90C00-JK
+
+TODO:
+- Complete WD90C00-JK
 - WD90C11-LR / WD90C11A-LR
 - WD90C30-LR / WD90C31-LR / WD90C31-ZS / WD90C31A-LR / WD90C31A-ZS
 - WD90C33-ZZ
 - WD90C24A-ZZ / WD90C24A2-ZZ (mobile chips, no ISA option)
 - WD90C26A (apple/macpwrbk030.cpp macpb180c, no ISA)
 - WD9710-MZ (PCI + MPEG-1, a.k.a. Pipeline 9710 / 9712)
+
+- Memory Data pins (MD) & CNF
+- /EBROM signal (for enabling ROM readback)
 
 **************************************************************************************************/
 
@@ -34,10 +38,16 @@ TODO:
 
 
 DEFINE_DEVICE_TYPE(PVGA1A, pvga1a_vga_device, "pvga1a_vga", "Paradise Systems PVGA1A")
+DEFINE_DEVICE_TYPE(WD90C00, wd90c00_vga_device, "wd90c00_vga", "Western Digital WD90C00 VGA Controller")
+
+pvga1a_vga_device::pvga1a_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: svga_device(mconfig, type, tag, owner, clock)
+	, m_ext_gc_view(*this, "ext_gc_view")
+{
+}
 
 pvga1a_vga_device::pvga1a_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: svga_device(mconfig, PVGA1A, tag, owner, clock)
-	, m_ext_view(*this, "ext_view")
+	: pvga1a_vga_device(mconfig, PVGA1A, tag, owner, clock)
 {
 	m_gc_space_config = address_space_config("gc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(pvga1a_vga_device::gc_map), this));
 }
@@ -60,11 +70,11 @@ void pvga1a_vga_device::device_reset()
 	svga_device::device_reset();
 
 	m_memory_size = 0;
-	m_video_control = 0; // &= 0x8;
+	m_video_control = 0; // Really &= 0x8; at POR according to docs
 	m_video_select = 0;
 	m_crtc_lock = 0;
-	m_ext_unlock = false;
-	m_ext_view.select(0);
+	m_ext_gc_unlock = false;
+	m_ext_gc_view.select(0);
 }
 
 uint8_t pvga1a_vga_device::mem_r(offs_t offset)
@@ -77,6 +87,7 @@ uint8_t pvga1a_vga_device::mem_r(offs_t offset)
 void pvga1a_vga_device::mem_w(offs_t offset, uint8_t data)
 {
 	// TODO: Address Offset B, not extensively tested
+	// Should also enable thru bits 5-4 of PR1 but instead SW seems to use 7-6!?
 	if (svga.rgb8_en)
 	{
 		svga_device::mem_linear_w(offset + (svga.bank_w * 0x1000), data);
@@ -88,19 +99,19 @@ void pvga1a_vga_device::mem_w(offs_t offset, uint8_t data)
 void pvga1a_vga_device::gc_map(address_map &map)
 {
 	svga_device::gc_map(map);
-	map(0x09, 0x0e).view(m_ext_view);
-	m_ext_view[0](0x09, 0x0e).lr8(
+	map(0x09, 0x0e).view(m_ext_gc_view);
+	m_ext_gc_view[0](0x09, 0x0e).lr8(
 		NAME([this] (offs_t offset) {
 			LOGLOCKED("Attempt to R ext. register offset %02x while locked\n", offset + 9);
-			return 0;
+			return 0xff;
 		})
 	);
-	m_ext_view[1](0x09, 0x0a).rw(FUNC(pvga1a_vga_device::address_offset_r), FUNC(pvga1a_vga_device::address_offset_w));
-	m_ext_view[1](0x0b, 0x0b).rw(FUNC(pvga1a_vga_device::memory_size_r), FUNC(pvga1a_vga_device::memory_size_w));
-	m_ext_view[1](0x0c, 0x0c).rw(FUNC(pvga1a_vga_device::video_select_r), FUNC(pvga1a_vga_device::video_select_w));
-	m_ext_view[1](0x0d, 0x0d).rw(FUNC(pvga1a_vga_device::crtc_lock_r), FUNC(pvga1a_vga_device::crtc_lock_w));
-	m_ext_view[1](0x0e, 0x0e).rw(FUNC(pvga1a_vga_device::video_control_r), FUNC(pvga1a_vga_device::video_control_w));
-	map(0x0f, 0x0f).rw(FUNC(pvga1a_vga_device::ext_status_r), FUNC(pvga1a_vga_device::ext_unlock_w));
+	m_ext_gc_view[1](0x09, 0x0a).rw(FUNC(pvga1a_vga_device::address_offset_r), FUNC(pvga1a_vga_device::address_offset_w));
+	m_ext_gc_view[1](0x0b, 0x0b).rw(FUNC(pvga1a_vga_device::memory_size_r), FUNC(pvga1a_vga_device::memory_size_w));
+	m_ext_gc_view[1](0x0c, 0x0c).rw(FUNC(pvga1a_vga_device::video_select_r), FUNC(pvga1a_vga_device::video_select_w));
+	m_ext_gc_view[1](0x0d, 0x0d).rw(FUNC(pvga1a_vga_device::crtc_lock_r), FUNC(pvga1a_vga_device::crtc_lock_w));
+	m_ext_gc_view[1](0x0e, 0x0e).rw(FUNC(pvga1a_vga_device::video_control_r), FUNC(pvga1a_vga_device::video_control_w));
+	map(0x0f, 0x0f).rw(FUNC(pvga1a_vga_device::ext_gc_status_r), FUNC(pvga1a_vga_device::ext_gc_unlock_w));
 }
 
 /*
@@ -160,7 +171,6 @@ void pvga1a_vga_device::memory_size_w(offs_t offset, u8 data)
 	m_memory_size = data;
 }
 
-//  m_ext_view[1](0x0d, 0x0d) PR3 CRT Control [locks groups in CRTC]
 /*
  * [0x0c] PR2 Video Select
  *
@@ -244,14 +254,82 @@ void pvga1a_vga_device::video_control_w(offs_t offset, u8 data)
  * ---- -xxx lock register
  * ---- -101 unlock, any other value locks r/w to the extensions
  */
-u8 pvga1a_vga_device::ext_status_r(offs_t offset)
+u8 pvga1a_vga_device::ext_gc_status_r(offs_t offset)
 {
-	return m_ext_unlock ? 0x05 : 0x00;
+	return m_ext_gc_unlock ? 0x05 : 0x00;
 }
 
-void pvga1a_vga_device::ext_unlock_w(offs_t offset, u8 data)
+void pvga1a_vga_device::ext_gc_unlock_w(offs_t offset, u8 data)
 {
-	m_ext_unlock = (data & 0x7) == 5;
-	LOGLOCKED("PR5 %s state (%02x)\n", m_ext_unlock ? "unlock" : "lock", data);
-	m_ext_view.select(m_ext_unlock);
+	m_ext_gc_unlock = (data & 0x7) == 5;
+	LOGLOCKED("PR5 %s state (%02x)\n", m_ext_gc_unlock ? "unlock" : "lock", data);
+	m_ext_gc_view.select(m_ext_gc_unlock);
+}
+
+/**************************************
+ *
+ * Western Digital WD90C00
+ *
+ *************************************/
+
+wd90c00_vga_device::wd90c00_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pvga1a_vga_device(mconfig, WD90C00, tag, owner, clock)
+	, m_ext_crtc_view(*this, "ext_crtc_view")
+{
+	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(wd90c00_vga_device::crtc_map), this));
+	m_gc_space_config = address_space_config("gc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(wd90c00_vga_device::gc_map), this));
+}
+
+void wd90c00_vga_device::device_reset()
+{
+	pvga1a_vga_device::device_reset();
+
+	m_pr10_scratch = 0;
+	m_ext_crtc_write_unlock = false;
+	m_ext_crtc_view.select(0);
+}
+
+void wd90c00_vga_device::crtc_map(address_map &map)
+{
+	pvga1a_vga_device::crtc_map(map);
+	map(0x29, 0x29).rw(FUNC(wd90c00_vga_device::ext_crtc_status_r), FUNC(wd90c00_vga_device::ext_crtc_unlock_w));
+	map(0x2a, 0x3f).view(m_ext_crtc_view);
+	m_ext_crtc_view[0](0x2a, 0x3f).lr8(
+		NAME([this] (offs_t offset) {
+			LOGLOCKED("Attempt to R ext. register offset %02x while locked\n", offset + 0x2a);
+			return 0xff;
+		})
+	);
+//	m_ext_crtc_view[1](0x2a, 0x2a) PR11 EGA Switches
+	m_ext_crtc_view[1](0x2b, 0x2b).ram(); // PR12 scratch pad
+//	m_ext_crtc_view[1](0x2c, 0x2c) PR13 Interlace H/2 Start
+//	m_ext_crtc_view[1](0x2d, 0x2d) PR14 Interlace H/2 End
+//	m_ext_crtc_view[1](0x2e, 0x2e) PR15 Misc Control 1
+//	m_ext_crtc_view[1](0x2f, 0x2f) PR16 Misc Control 2
+//	m_ext_crtc_view[1](0x30, 0x30) PR17 Misc Control 3
+//	m_ext_crtc_view[1](0x31, 0x3f) <reserved>
+}
+
+/*
+ * [0x29] PR10 Unlock PR11/PR17
+ *
+ * x--- x--- Read lock
+ * 1--- 0--- Unlocks, any other write locks reading
+ * -xxx ---- Scratch Pad
+ * ---- -xxx Write lock
+ * ---- -101 Unlocks, any other write locks writing
+ */
+u8 wd90c00_vga_device::ext_crtc_status_r(offs_t offset)
+{
+	return m_pr10_scratch | (m_ext_crtc_write_unlock ? 0x05 : 0x00);
+}
+
+void wd90c00_vga_device::ext_crtc_unlock_w(offs_t offset, u8 data)
+{
+	m_ext_crtc_write_unlock = (data & 0x7) == 5;
+	LOGLOCKED("PR10 %s state (%02x)\n", m_ext_crtc_write_unlock ? "unlock" : "lock", data);
+	// TODO: read unlock
+	//m_ext_crtc_read_unlock = (data & 0x88) == 0x80;
+	m_ext_crtc_view.select(m_ext_crtc_write_unlock);
+	m_pr10_scratch = data & 0x70;
 }
