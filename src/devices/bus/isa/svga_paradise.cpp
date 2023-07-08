@@ -8,6 +8,15 @@ TODO:
 - Add ISA8 and MCA variants for pvga1a_jk;
 - Nokia NVGA2, wd90c00_jk: they don't boot, accesses areas $c6000-$c7fff
   that aren't covered in current dumps;
+  \- Specifically they do:
+     000C03AB: cmp     word ptr [10h],0h ; wd90c00 == 0x3000
+     000C03B0: 75 09          jne     0C03BBh
+     000C03B2: cmp     byte ptr [12h],7Eh ; wd90c00 == 0x00
+     000C03B7: jne     0C03BBh
+     000C03B9: pop     ds
+     000C03BA: ret
+     000C03BB: jmp     0FFFFh:0h ; reset machine
+
 
 ***************************************************************************/
 
@@ -21,6 +30,7 @@ DEFINE_DEVICE_TYPE(ISA16_PVGA1A,     isa16_pvga1a_device,     "pvga1a", "Paradis
 DEFINE_DEVICE_TYPE(ISA16_PVGA1A_JK,  isa16_pvga1a_jk_device,  "pvga1a_jk", "Paradise Systems PVGA1A-JK Graphics Card")
 DEFINE_DEVICE_TYPE(ISA8_WD90C90_JK,  isa8_wd90c90_jk_device,  "wd90c90_jk", "Western Digital WD90C90-JK Graphics Card")
 DEFINE_DEVICE_TYPE(ISA16_WD90C00_JK, isa16_wd90c00_jk_device, "wd90c00_jk", "Western Digital WD90C00-JK Graphics Card")
+DEFINE_DEVICE_TYPE(ISA16_WD90C11_LR, isa16_wd90c11_lr_device, "wd90c11_lr", "Western Digital WD90C11-LR Graphics Card \"1024 CX\"")
 
 
 isa16_pvga1a_device::isa16_pvga1a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -99,7 +109,7 @@ ROM_START( pvga1a_jk )
 	// "Paradise Basic VGA"?
 	ROM_SYSTEM_BIOS(0, "pvga1a_jk", "Paradise Systems PVGA1A-JK")
 	// BIOS.BIN     1xxxxxxxxxxxxxxx = 0xFF
-    ROMX_LOAD( "bios.bin",     0x000000, 0x08000, CRC(2bfe8adb) SHA1(afd8c33f24e28b025e43ae68d95fd6811659013b), ROM_BIOS(0) )
+	ROMX_LOAD( "bios.bin",     0x000000, 0x08000, CRC(2bfe8adb) SHA1(afd8c33f24e28b025e43ae68d95fd6811659013b), ROM_BIOS(0) )
 	ROM_IGNORE( 0x8000 )
 	// TODO: consider splitting if a good dump surfaces
 	ROM_SYSTEM_BIOS(1, "nvga2", "Nokia NVGA2")
@@ -207,7 +217,15 @@ isa16_wd90c00_jk_device::isa16_wd90c00_jk_device(const machine_config &mconfig, 
 ROM_START( wd90c00_jk )
 	ROM_REGION(0x8000,"vga_rom", ROMREGION_ERASE00)
 	ROM_SYSTEM_BIOS(0, "wd90c00_jk", "Western Digital WD90C00-JK")
-	ROMX_LOAD( "90c00jk-lh6673.vbi", 0x000000, 0x006000, BAD_DUMP CRC(595eda15) SHA1(a3d4a978f30a0669bcb4a74ce196fd7a798d456f), ROM_BIOS(0) )
+	// "vga bios western digital wd90c00 1989 (part 1).bin"
+	ROMX_LOAD( "wdh.bin", 0x000001, 0x004000, CRC(0f4c7aed) SHA1(bdcc298b863ea7f37b1352164107264a12030cb5), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "wdl.bin", 0x000000, 0x004000, CRC(6916523e) SHA1(
+a4024e8a71b310fc95a37743bc255212c7dd73a5), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "wd90c00_jk_1", "Western Digital WD90C00-JK (alt)")
+	ROMX_LOAD( "wd90c00h.bin", 0x000001, 0x004000, CRC(b3279a8d) SHA1(d531c5e3d2c083190477b8d799dc5205c9357181), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "wd90c00l.bin", 0x000000, 0x004000, CRC(a4fdc1db) SHA1(9680ab2049a0fd49bb23eb0a08487518cb9fa861), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(2, "wd90c00_jk_v", "Western Digital WD90C00-JK (alt .vbi)")
+	ROMX_LOAD( "90c00jk-lh6673.vbi", 0x000000, 0x006000, BAD_DUMP CRC(595eda15) SHA1(a3d4a978f30a0669bcb4a74ce196fd7a798d456f), ROM_BIOS(2) )
 ROM_END
 
 const tiny_rom_entry *isa16_wd90c00_jk_device::device_rom_region() const
@@ -223,8 +241,8 @@ void isa16_wd90c00_jk_device::device_add_mconfig(machine_config &config)
 
 	WD90C00(config, m_vga, 0);
 	m_vga->set_screen("screen");
-	// 256kB to 1MB
-	m_vga->set_vram_size(0x100000);
+	// 512KB (+ option for 1MB? Verify)
+	m_vga->set_vram_size(0x80000);
 }
 
 void isa16_wd90c00_jk_device::io_isa_map(address_map &map)
@@ -240,4 +258,56 @@ void isa16_wd90c00_jk_device::device_start()
 
 	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(wd90c00_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(wd90c00_vga_device::mem_w)));
 	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_wd90c00_jk_device::io_isa_map);
+}
+
+/******************
+ *
+ * WD90C11-LR
+ *
+ *****************/
+
+isa16_wd90c11_lr_device::isa16_wd90c11_lr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ISA16_WD90C11_LR, tag, owner, clock),
+	device_isa16_card_interface(mconfig, *this),
+	m_vga(*this, "vga")
+{
+}
+
+ROM_START( wd90c11_lr )
+	ROM_REGION(0x8000,"vga_rom", ROMREGION_ERASE00)
+	ROM_SYSTEM_BIOS(0, "wd90c11_lr", "Western Digital WD90C11-LR")
+	ROMX_LOAD( "wd90c11.vbi",  0x000000, 0x008000, CRC(9c1296d7) SHA1(10fd263ab0187d8960d4cb2954254732ac29472f), ROM_BIOS(0) )
+ROM_END
+
+const tiny_rom_entry *isa16_wd90c11_lr_device::device_rom_region() const
+{
+	return ROM_NAME( wd90c11_lr );
+}
+
+void isa16_wd90c11_lr_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
+	screen.set_screen_update("vga", FUNC(wd90c00_vga_device::screen_update));
+
+	// TODO: bump to WD90C11A
+	WD90C00(config, m_vga, 0);
+	m_vga->set_screen("screen");
+	// 512kB
+	m_vga->set_vram_size(0x80000);
+}
+
+void isa16_wd90c11_lr_device::io_isa_map(address_map &map)
+{
+	map(0x00, 0x2f).m(m_vga, FUNC(wd90c00_vga_device::io_map));
+}
+
+void isa16_wd90c11_lr_device::device_start()
+{
+	set_isa_device();
+
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
+
+	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(wd90c00_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(wd90c00_vga_device::mem_w)));
+	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_wd90c11_lr_device::io_isa_map);
 }

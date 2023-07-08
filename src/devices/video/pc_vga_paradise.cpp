@@ -9,7 +9,7 @@ Paradise / Western Digital (S)VGA chipsets
 
 TODO:
 - Complete WD90C00-JK
-- WD90C11-LR / WD90C11A-LR
+- WD90C11-LR / WD90C11A-LR (WD90C00 with new sequencer regs)
 - WD90C30-LR / WD90C31-LR / WD90C31-ZS / WD90C31A-LR / WD90C31A-ZS
 - WD90C33-ZZ
 - WD90C24A-ZZ / WD90C24A2-ZZ (mobile chips, no ISA option)
