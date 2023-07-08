@@ -12,15 +12,15 @@
     waveform from RAM (32 bytes per waveform, 8 bit signed data).
 
     This sound chip is the same as the sound chip in some Konami
-    megaROM cartridges for the MSX. It is actually well researched
-    and documented:
-
-        http://bifi.msxnet.org/msxnet/tech/scc.html
-
-    Thanks to Sean Young (sean@mess.org) for some bugfixes.
+    megaROM cartridges for the MSX. This device only emulates the
+    sound portion, not the memory mapper.
 
     K052539 is more or less equivalent to this chip except channel 5
     does not share waveram with channel 4.
+
+    References:
+    - http://bifi.msxnet.org/msxnet/tech/scc.html
+    - http://bifi.msxnet.org/msxnet/tech/soundcartridge
 
     TODO:
     - make K052539 a subdevice
