@@ -1434,9 +1434,8 @@ VK_IMPORT_INSTANCE
 					BX_TRACE("\t      DeviceId: %x", pdp.deviceID);
 					BX_TRACE("\t          Type: %d", pdp.deviceType);
 
-					if (VK_VENDOR_ID_MESA == pdp.vendorID)
+					if (VK_PHYSICAL_DEVICE_TYPE_CPU == pdp.deviceType)
 					{
-						// LLVM pipe...
 						pdp.vendorID = BGFX_PCI_ID_SOFTWARE_RASTERIZER;
 					}
 
@@ -1446,7 +1445,7 @@ VK_IMPORT_INSTANCE
 
 					if ( (BGFX_PCI_ID_NONE != g_caps.vendorId ||            0 != g_caps.deviceId)
 					&&   (BGFX_PCI_ID_NONE == g_caps.vendorId || pdp.vendorID == g_caps.vendorId)
-					&&   (0 == g_caps.deviceId                || pdp.deviceID == g_caps.deviceId) )
+					&&   (               0 == g_caps.deviceId || pdp.deviceID == g_caps.deviceId) )
 					{
 						if (pdp.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
 						||  pdp.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU)
@@ -1456,7 +1455,7 @@ VK_IMPORT_INSTANCE
 
 						physicalDeviceIdx = ii;
 					}
-					else
+					else if (UINT32_MAX == physicalDeviceIdx)
 					{
 						if (pdp.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU)
 						{
