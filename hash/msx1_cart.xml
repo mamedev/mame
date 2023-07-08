@@ -6445,17 +6445,57 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-<!-- only tape released? tap2crt hack??
-     There is a cartridge version released by Al Alamiah
- -->
-	<software name="hopper">
-		<description>Hopper (Europe)</description>
-		<year>1986</year>
-		<publisher>Eaglesoft</publisher>
+	<software name="holein1pb" cloneof="holein1p">
+		<description>Hole in One Professional (Japan, alt 2)</description>
+		<year>1985</year>
+		<publisher>HAL Kenkyuujo</publisher>
+		<info name="serial" value="HM-019" />
+		<info name="alt_title" value="ホールインワンプロフェッショナル" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="hole in one professional (japan) (alt 2).rom" size="0x8000" crc="e8cfdbd3" sha1="13f55fcb993dabbef792f2a3696c4f545f31f44b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="holein1pc" cloneof="holein1p">
+		<description>Hole in One Professional (Japan, alt 3)</description>
+		<year>1985</year>
+		<publisher>HAL Kenkyuujo</publisher>
+		<info name="serial" value="HM-019" />
+		<info name="alt_title" value="ホールインワンプロフェッショナル" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="hole in one professional (japan) (alt 3).rom" size="0x8000" crc="6c086da7" sha1="92f69dc4b957c2c6800f55e0d75b94cdc6872354" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hotasm">
+		<description>Hot-Asm (Brazil)</description>
+		<year>1985</year>
+		<publisher>Epcom</publisher>
+		<info name="serial" value="A004"/>
+		<info name="usage" value="Use CALL START or CALL EDT from Basic to start the software."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
-				<rom name="hopper (europe).rom" size="0x4000" crc="d3032ad7" sha1="dd9a41e4c8802cd4bbb87e30281711f4e7ae017f" status="baddump" />
+				<rom name="hot-asm (brazil).rom" size="0x4000" crc="829f78ea" sha1="7f189caa1f0c30760707e05c13bc50c3fb3ac441"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hotplan">
+		<description>Hot-Plan (Brazil)</description>
+		<year>1986</year>
+		<publisher>Epcom</publisher>
+		<info name="usage" value="Use CALL HOTPLAN from Basic to start the software."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="hot-plan (brazil).rom" size="0x8000" crc="2b641f19" sha1="ac1096e7b725830e61213b2b26310ff322df2946"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6581,6 +6621,23 @@ kept for now until finding out what those bytes affect...
 				<rom name="hydlide ii - shine of darkness (japan) (alt 1).rom" size="0x20000" crc="b886d7f5" sha1="a3537934a4d9dfbf27aca5aaf42e0f18e4975366" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hydlide2k" cloneof="hydlide2">
+		<description>Hydlide II - Shine of Darkness (Korea)</description>
+		<year>1986</year>
+		<publisher>Zemina</publisher>
+		<notes><![CDATA[
+This version does not have SRAM?
+There are 4 characters predefined.
+Character creation does not write the new character data.
+]]></notes>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="korean_hydlide2" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="hydlide ii - shine of darkness (korea).rom" size="0x20000" crc="58de803b" sha1="552a758f77a7c35969523dbaca74587f0b59eb2b" />
 			</dataarea>
 		</part>
 	</software>
@@ -15900,7 +15957,8 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
-	<software name="quran">
+	<!-- Graphics incomplete or displayed three times on ax150. Restarts on ax500. -->
+	<software name="quran" supported="no">
 		<description>The Holy Quran (v1.00)</description>
 		<year>1987</year>
 		<publisher>Al Alamiah</publisher>
@@ -15912,6 +15970,19 @@ legacy FM implementations cannot find it.
 			<dataarea name="rom" size="1048576">
 				<!-- there are 2 ROMs on the cartridge -->
 				<rom name="holyquran.rom" size="1048576" crc="3b003e5c" sha1="7d439080b43d94385fd4c426d4f6fee884bc2926" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hopper">
+		<description>Hopper (Arab)</description>
+		<year>1986</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="GA012" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="hopper (1986)(al alamiah).rom" size="0x8000" crc="a114e129" sha1="8f150ea3bf6a2931bd718fc377bb432574164705" />
 			</dataarea>
 		</part>
 	</software>
@@ -18479,6 +18550,108 @@ legacy FM implementations cannot find it.
 
 
 <!-- Homebrew / Doujin software -->
+
+	<software name="hansadv">
+		<description>Hans' Adventure (v1.1)</description>
+		<year>2010</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="The Pets Mode"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="hans' adventure - the pets mode (2010) (v1.1).rom" size="0xc000" crc="c7452eca" sha1="6835f0aba6c95a106309129f90f58adf04994f14" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hansadv10" cloneof="hansadv">
+		<description>Hans' Adventure (v1.0)</description>
+		<year>2010</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="The Pets Mode"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="hans' adventure - the pets mode (2010) (v1.0).rom" size="0xc000" crc="821c56f4" sha1="9c6c43af0516e7232a7aaafee5a47235232cf7f9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="happyhal">
+		<description>Happy Halloween</description>
+		<year>2018</year>
+		<publisher>Clube MSX Magazine</publisher>
+		<info name="developer" value="Mario Cavalcanti"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="happy halloween - mario cavalcanti (2018).rom" size="0x4000" crc="1b02a98a" sha1="0e266e0cd7938e6d97a58363003e2a6ef492348d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hsqrxmas">
+		<description>Happy Square Christmas</description>
+		<year>2010</year>
+		<publisher>303bcn</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="happy square christmas - 303bcn (2010).rom" size="0x8000" crc="3846014a" sha1="63ddb6adb4a3b95a596f9aa876cb658929392d13" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hrtstlr2">
+		<description>Heart Stealer 2</description>
+		<year>2021</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Timmy"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="heart stealer 2 - timmy (2021).rom" size="0x4000" crc="8ccde019" sha1="2a57cc0f5610ca55f5bfb6994033adddc38d9203" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heroesar">
+		<description>Heroes Arena</description>
+		<year>2010</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Imanok"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="heroes arena - imanok (2010).rom" size="0x8000" crc="3c6c9c72" sha1="fa6172ba3a78c03ed6194dee6e26a1dc3adb939f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hosediog">
+		<description>Hose Diogo Martinez: The Bussas Quest</description>
+		<year>2008</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Muffie Co."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="hose diogo martinez - muffie co (2008).rom" size="0x4000" crc="2d0d5419" sha1="21e44cc5957b65b24c34d2c42b39879cacd82ff9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="howdumbl">
+		<description>How Many Are The Dumbbells You Lift?</description>
+		<year>2019</year>
+		<publisher>Cobinee</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="how many are the dumbbells you lift? - cobinee (2019).rom" size="0x8000" crc="21090c38" sha1="9f177a508930bda78841413218a927a230be7ac5" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="ineedspd">
 		<description>I Need Speed (MSX Cartridge Shop)</description>
