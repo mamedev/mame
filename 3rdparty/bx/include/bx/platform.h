@@ -461,4 +461,18 @@
 #	define BX_CPP_NAME "C++Unknown"
 #endif // defined(__cplusplus)
 
+#if BX_PLATFORM_BSD   \
+ || BX_PLATFORM_HAIKU \
+ || BX_PLATFORM_HURD
+static_assert(false, "\n\n"
+	"\t** IMPORTANT! **\n\n"
+	"\tYou're compiling for unsupported platform!\n"
+	"\tIf you wish to support this platform, make your own fork, and modify code for _yourself_.\n"
+	"\t\n"
+	"\tDo not submit PR to main repo, it won't be considered, and it would code rot anyway. I have no ability\n"
+	"\tto test on these platforms, and over years there wasn't any serious contributor who wanted to take\n"
+	"\tburden of maintaining code for these platforms.\n"
+	"\t\n");
+#endif // BX_PLATFORM_*
+
 #endif // BX_PLATFORM_H_HEADER_GUARD
