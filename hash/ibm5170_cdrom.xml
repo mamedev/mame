@@ -2710,7 +2710,7 @@ Untested (and likely unsupported) Spawned Diablo and multi player mode
 		<info name="serial" value="310691030-2 / 310691081-2"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="cranberries, the - doors and windows (usa)" sha1="4933df55a2925e4bc6639537b2b5d18349d7b3ac" />
+				<disk name="cranberries, the - doors and windows (usa)" sha1="7088d9cead7c658279a362e97caa55e0ee9f07a2" />
 			</diskarea>
 		</part>
 	</software>
