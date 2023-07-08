@@ -175,7 +175,7 @@ private:
 	u8 m_control2 = 0;
 	u8 m_shuri_irq = 0;
 	int m_ccu_int_time = 0;
-	int m_ccu_int_time_count = 0;;
+	int m_ccu_int_time_count = 0;
 	int m_avac = 0;
 	int m_layer_colorbase[4] = { };
 	int m_layer_order[4] = { };
