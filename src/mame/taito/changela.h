@@ -61,22 +61,24 @@ private:
 	required_ioport                 m_gas;
 	required_ioport                 m_wheel;
 
-	void changela_map(address_map &map);
-
 	// video-related
 	bitmap_ind16 m_obj0_bitmap;
 	bitmap_ind16 m_river_bitmap;
 	bitmap_ind16 m_tree0_bitmap;
 	bitmap_ind16 m_tree1_bitmap;
-	std::unique_ptr<uint8_t[]>   m_treeram;
-	std::unique_ptr<uint8_t[]>   m_memory_devices;
-	uint32_t   m_mem_dev_selected = 0U; // an offset within memory_devices area
-	uint32_t   m_sloperom_bank = 0U;
-	uint8_t    m_tree_en = 0U;
-	uint8_t    m_horizon = 0U;
-	uint8_t    m_v_count_river = 0U;
-	uint8_t    m_v_count_tree = 0U;
-	int        m_tree_on[2]{};
+
+	std::unique_ptr<uint8_t[]> m_riverram;
+	std::unique_ptr<uint8_t[]> m_treeram;
+	uint8_t    m_treeram2[0x20 * 2] = { };
+	uint8_t    m_stateram[0x40 * 3] = { };
+
+	uint32_t   m_mem_dev_selected = 0;
+	uint32_t   m_sloperom_bank = 0;
+	uint8_t    m_tree_en = 0;
+	uint8_t    m_horizon = 0;
+	uint8_t    m_v_count_river = 0;
+	uint8_t    m_v_count_tree = 0;
+	uint8_t    m_tree_on[2] = { };
 	emu_timer* m_scanline_timer = nullptr;
 
 	// mcu-related
@@ -86,15 +88,15 @@ private:
 	uint8_t    m_mcu_in = 0xff;
 
 	// misc
-	uint8_t    m_tree0_col = 0U;
-	uint8_t    m_tree1_col = 0U;
-	uint8_t    m_left_bank_col = 0U;
-	uint8_t    m_right_bank_col = 0U;
-	uint8_t    m_boat_shore_col = 0U;
-	uint8_t    m_collision_reset = 0U;
-	uint8_t    m_tree_collision_reset = 0U;
-	uint8_t    m_prev_value_31 = 0U;
-	int        m_dir_31 = 0;
+	uint8_t    m_tree0_col = 0;
+	uint8_t    m_tree1_col = 0;
+	uint8_t    m_left_bank_col = 0;
+	uint8_t    m_right_bank_col = 0;
+	uint8_t    m_boat_shore_col = 0;
+	uint8_t    m_collision_reset = 0;
+	uint8_t    m_tree_collision_reset = 0;
+	uint8_t    m_prev_value_31 = 0;
+	uint8_t    m_dir_31 = 0;
 
 	// devices
 	uint8_t mcu_r();
@@ -127,4 +129,6 @@ private:
 	void draw_obj1(bitmap_ind16 &bitmap);
 	void draw_river(bitmap_ind16 &bitmap, int sy);
 	void draw_tree(bitmap_ind16 &bitmap, int sy, int tree_num);
+
+	void changela_map(address_map &map);
 };

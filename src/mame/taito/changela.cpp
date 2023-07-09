@@ -26,6 +26,8 @@ Tomasz Slanina
 void changela_state::machine_start()
 {
 	// video
+	save_item(NAME(m_treeram2));
+	save_item(NAME(m_stateram));
 	save_item(NAME(m_sloperom_bank));
 	save_item(NAME(m_tree_en));
 	save_item(NAME(m_horizon));
@@ -160,16 +162,15 @@ uint8_t changela_state::changela_31_r()
 	/* If the new value is less than the old value, and it did not wrap around,
 	   or if the new value is greater than the old value, and it did wrap around,
 	   then we are moving LEFT. */
-	uint8_t curr_value = m_wheel->read();
+	uint8_t cur = m_wheel->read();
+	uint8_t prev = m_prev_value_31;
 
-	if ((curr_value < m_prev_value_31 && (m_prev_value_31 - curr_value) < 0x80)
-	|| (curr_value > m_prev_value_31 && (curr_value - m_prev_value_31) > 0x80))
+	if ((cur < prev && (prev - cur) < 0x80) || (cur > prev && (cur - prev) > 0x80))
 		m_dir_31 = 1;
-	if ((m_prev_value_31 < curr_value && (curr_value - m_prev_value_31) < 0x80)
-	||  (m_prev_value_31 > curr_value && (m_prev_value_31 - curr_value) > 0x80))
+	if ((prev < cur && (cur - prev) < 0x80) || (prev > cur && (prev - cur) > 0x80))
 		m_dir_31 = 0;
 
-	m_prev_value_31 = curr_value;
+	m_prev_value_31 = cur;
 
 	// wheel UP/DOWN control signal on bit 3, collisions on bits:2,1,0
 	return (m_dir_31 << 3) | (m_left_bank_col << 2) | (m_right_bank_col << 1) | m_boat_shore_col;
@@ -226,7 +227,7 @@ void changela_state::changela_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x83ff).ram().share("spriteram"); // OBJ0 RAM
 	map(0x9000, 0x97ff).ram().share("videoram"); // OBJ1 RAM
-	map(0xa000, 0xa07f).w(FUNC(changela_state::changela_colors_w)).share("colorram"); // Color 93419 RAM 64x9(nine!!!) bits A0-used as the 8-th bit data input (d0-d7->normal, a0->d8)
+	map(0xa000, 0xa07f).w(FUNC(changela_state::changela_colors_w)).share("colorram"); // Color 93419 RAM 64x9(nine!!!) bits A0-used as the 8th bit data input (d0-d7->normal, a0->d8)
 	map(0xb000, 0xbfff).rom();
 
 	map(0xc000, 0xc7ff).rw(FUNC(changela_state::changela_mem_device_r), FUNC(changela_state::changela_mem_device_w)); // RAM4 (River Bed RAM); RAM5 (Tree RAM)

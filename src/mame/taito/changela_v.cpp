@@ -20,8 +20,11 @@ TODO: Priority between tree0 and tree1.
 
 void changela_state::video_start()
 {
-	m_memory_devices = std::make_unique<uint8_t[]>(4 * 0x800); // 0 - not connected, 1,2,3 - RAMs
-	m_treeram = std::make_unique<uint8_t[]>(2 * 0x20);
+	m_riverram = std::make_unique<uint8_t[]>(0x800);
+	save_pointer(NAME(m_riverram), 0x800);
+
+	m_treeram = std::make_unique<uint8_t[]>(0x800);
+	save_pointer(NAME(m_treeram), 0x800);
 
 	m_screen->register_screen_bitmap(m_obj0_bitmap);
 	m_screen->register_screen_bitmap(m_river_bitmap);
@@ -30,9 +33,6 @@ void changela_state::video_start()
 
 	m_scanline_timer = timer_alloc(FUNC(changela_state::changela_scanline_callback), this);
 	m_scanline_timer->adjust(m_screen->time_until_pos(30), 30);
-
-	save_pointer(NAME(m_memory_devices), 4 * 0x800);
-	save_pointer(NAME(m_treeram), 2 * 0x20);
 }
 
 
@@ -160,9 +160,9 @@ void changela_state::draw_obj1(bitmap_ind16 &bitmap)
 void changela_state::draw_river(bitmap_ind16 &bitmap, int sy)
 {
 	uint8_t const *const ROM = m_sloperom;
-	uint8_t *const RAM = m_memory_devices.get() + 0x800;
+	uint8_t *const RAM = m_stateram;
 	uint8_t const *const TILE_ROM = m_tilerom;
-	uint8_t const *const TILE_RAM = m_memory_devices.get() + 0x1000;
+	uint8_t const *const TILE_RAM = m_riverram.get();
 	uint8_t const *const PROM = m_proms;
 
 	int preload = ((sy < 32) ? 1 : 0);
@@ -203,32 +203,22 @@ void changela_state::draw_river(bitmap_ind16 &bitmap, int sy)
 
 		int rom_addr = m_sloperom_bank | ((m_v_count_river & 0x7e) << 2) | ((rom_count & 0x0e) >> 1);
 		int ram_a5 = ((curr_state & 0x01) & ((curr_state & 0x40) >> 6) & preload) ^ 0x01;
-		int ram_addr =  (ram_a5 << 5) | (ram_count << 1) | ((curr_state & 0x20) >> 5);
+		int ram_addr = (ram_a5 << 5) | (ram_count << 1) | ((curr_state & 0x20) >> 5);
 		int mux45 = rom_count & 0x01;
 		int mux61 = m_v_count_river & 0x01;
 
 		switch (curr_state)
 		{
-			case 0x01:
-			case 0x09:
-			case 0x19:
-			case 0x0d:
-			case 0x8d:
+			case 0x01: case 0x09: case 0x19: case 0x0d: case 0x8d:
 				pre_train[0] = (mux45 ? ((ROM[rom_addr] & 0xf0) >> 4) : (ROM[rom_addr] & 0x0f));
 				break;
-			case 0x0f:
-			case 0x2f:
+			case 0x0f: case 0x2f:
 				math_train[0] = RAM[ram_addr] = (mux45 ? ((ROM[rom_addr] & 0xf0) >> 4) : (ROM[rom_addr] & 0x0f));
 				break;
-			case 0x4d:
-			case 0x69:
-			case 0x6d:
-			case 0xc5:
-			case 0xcd:
+			case 0x4d: case 0x69: case 0x6d: case 0xc5: case 0xcd:
 				pre_train[0] = RAM[ram_addr] & 0x0f;
 				break;
-			case 0xea:
-			case 0xee:
+			case 0xea: case 0xee:
 				math_train[0] = RAM[ram_addr] = (mux61 ? (pre_train[1]) : ((pre_train[1] + pre_train[2] + carry) & 0x0f));
 				break;
 			default:
@@ -328,13 +318,13 @@ void changela_state::draw_tree(bitmap_ind16 &bitmap, int sy, int tree_num)
 {
 	// State machine
 	uint8_t const *const ROM = m_sloperom;
-	uint8_t *const RAM = m_memory_devices.get() + 0x840 + 0x40 * tree_num;
+	uint8_t *const RAM = m_stateram + 0x40 + 0x40 * tree_num;
 	uint8_t const *const PROM = m_proms;
 
 	// Tree Data
-	uint8_t *const RAM2 = m_treeram.get() + 0x20 * tree_num;
+	uint8_t *const RAM2 = m_treeram2 + 0x20 * tree_num;
 	uint8_t const *const TILE_ROM = (tree_num ? (m_treerom + 0x1000) : (m_tilerom + 0x2000));
-	uint8_t const *const TILE_RAM = (tree_num ? (m_treerom) : (m_memory_devices.get() + 0x1800));
+	uint8_t const *const TILE_RAM = (tree_num ? m_treerom : m_treeram.get());
 
 	int preload = ((sy < 32) ? 1 : 0);
 
@@ -393,18 +383,18 @@ void changela_state::draw_tree(bitmap_ind16 &bitmap, int sy, int tree_num)
 		int mux45 = rom_count & 0x01;
 		int mux61 = m_v_count_tree & 0x01;
 
-		switch(curr_state)
+		switch (curr_state)
 		{
-			case 0x01:  case 0x09:  case 0x19:  case 0x0d:  case 0x8d:
+			case 0x01: case 0x09: case 0x19: case 0x0d: case 0x8d:
 				pre_train[0] = (mux45 ? ((ROM[rom_addr] & 0xf0) >> 4) : (ROM[rom_addr] & 0x0f));
 				break;
-			case 0x0f:  case 0x2f:
+			case 0x0f: case 0x2f:
 				RAM[ram_addr] = (mux45 ? ((ROM[rom_addr] & 0xf0) >> 4) : (ROM[rom_addr] & 0x0f));
 				break;
-			case 0x4d:  case 0x69:  case 0x6d:  case 0xc5:  case 0xcd:
+			case 0x4d: case 0x69: case 0x6d: case 0xc5: case 0xcd:
 				pre_train[0] = RAM[ram_addr] & 0x0f;
 				break;
-			case 0xea:  case 0xee:
+			case 0xea: case 0xee:
 				RAM[ram_addr] = (mux61 ? (pre_train[1]) : ((pre_train[1] + pre_train[2] + carry) & 0x0f));
 				break;
 			default:
@@ -415,18 +405,18 @@ void changela_state::draw_tree(bitmap_ind16 &bitmap, int sy, int tree_num)
 		{
 			int mux82 = (m_v_count_tree & 0x01) ^ 0x01;
 
-			switch(curr_state)
+			switch (curr_state)
 			{
-				case 0x01:  case 0x09:  case 0x19:  case 0x0d:  case 0x8d:
+				case 0x01: case 0x09: case 0x19: case 0x0d: case 0x8d:
 					tree_train[0] = RAM2[ram2_addr] = pre_train[0];
 					break;
-				case 0x0f:  case 0x2f:
+				case 0x0f: case 0x2f:
 					math_train[0] = RAM2[ram2_addr] = RAM[ram_addr] & 0x0f;
 					break;
-				case 0x4d:  case 0x69:  case 0x6d:  case 0xc5:  case 0xcd:
+				case 0x4d: case 0x69: case 0x6d: case 0xc5: case 0xcd:
 					tree_train[0] = RAM2[ram2_addr] = pre_train[0];
 					break;
-				case 0xea:  case 0xee:
+				case 0xea: case 0xee:
 					math_train[0] = RAM2[ram2_addr] = (mux82 ? ((tree_train[1] + tree_train[2] + tree_carry) & 0x0f) : (tree_train[1]));
 					break;
 				default:
@@ -437,18 +427,18 @@ void changela_state::draw_tree(bitmap_ind16 &bitmap, int sy, int tree_num)
 		{
 			int mux82 = ((curr_state & 0x04) ? 0 : 1);
 
-			switch(curr_state)
+			switch (curr_state)
 			{
-				case 0x01:  case 0x09:  case 0x19:  case 0x0d:  case 0x8d:
+				case 0x01: case 0x09: case 0x19: case 0x0d: case 0x8d:
 					tree_train[0] = RAM2[ram2_addr];
 					break;
-				case 0x0f:  case 0x2f:
+				case 0x0f: case 0x2f:
 					math_train[0] = RAM2[ram2_addr];
 					break;
-				case 0x4d:  case 0x69:  case 0x6d:  case 0xc5:  case 0xcd:
+				case 0x4d: case 0x69: case 0x6d: case 0xc5: case 0xcd:
 					tree_train[0] = RAM2[ram2_addr];
 					break;
-				case 0xea:  case 0xee:
+				case 0xea: case 0xee:
 					math_train[0] = RAM2[ram2_addr] = (mux82 ? ((tree_train[1] + tree_train[2] + tree_carry) & 0x0f) : (tree_train[1]));
 					break;
 				default:
@@ -688,7 +678,7 @@ TIMER_CALLBACK_MEMBER(changela_state::changela_scanline_callback)
 uint32_t changela_state::screen_update_changela(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_river_bitmap, 0, 0, 0, 0, cliprect);
-	copybitmap_trans(bitmap, m_obj0_bitmap,  0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, m_obj0_bitmap, 0, 0, 0, 0, cliprect, 0);
 	copybitmap_trans(bitmap, m_tree0_bitmap, 0, 0, 0, 0, cliprect, 0);
 	copybitmap_trans(bitmap, m_tree1_bitmap, 0, 0, 0, 0, cliprect, 0);
 	draw_obj1(bitmap);
@@ -719,7 +709,6 @@ void changela_state::changela_colors_w(offs_t offset, uint8_t data)
 	uint32_t c, color_index;
 
 	c = (data) | ((offset & 0x01) << 8); //* a0 used as D8 bit input
-
 	c ^= 0x1ff; // active low
 
 	color_index = offset >> 1;
@@ -735,35 +724,57 @@ void changela_state::changela_colors_w(offs_t offset, uint8_t data)
 
 void changela_state::changela_mem_device_select_w(uint8_t data)
 {
-	m_mem_dev_selected = (data & 0x07) * 0x800;
-	m_tree_en = (data & 0x30) >> 4;
-
 	/*
 	(data & 0x07) possible settings:
 	0 - not connected (no device)
 	1 - ADR1 is 2114 RAM at U59 (state machine) (accessible range: 0x0000-0x003f)
 	2 - ADR2 is 2128 RAM at U109 (River RAM)    (accessible range: 0x0000-0x07ff)
 	3 - ADR3 is 2128 RAM at U114 (Tree RAM)     (accessible range: 0x0000-0x07ff)
-	4 - ADR4 is 2732 ROM at U7    (Tree ROM)    (accessible range: 0x0000-0x07ff)
+	4 - ADR4 is 2732 ROM at U7 (Tree ROM)       (accessible range: 0x0000-0x07ff)
 	5 - SLOPE is ROM at U44 (state machine)     (accessible range: 0x0000-0x07ff)
 	*/
+	m_mem_dev_selected = data & 0x07;
+	m_tree_en = (data & 0x30) >> 4;
 }
 
 void changela_state::changela_mem_device_w(offs_t offset, uint8_t data)
 {
-	m_memory_devices[m_mem_dev_selected + offset] = data;
-
-	if (m_mem_dev_selected == 0x800)
+	switch (m_mem_dev_selected)
 	{
-		m_memory_devices[m_mem_dev_selected + 0x40 + offset] = data;
-		m_memory_devices[m_mem_dev_selected + 0x80 + offset] = data;
+		case 1:
+			for (int i = 0; i < 3; i++)
+				m_stateram[(i * 0x40) + (offset & 0x3f)] = data & 0xf;
+			break;
+
+		case 2:
+			m_riverram[offset] = data;
+			break;
+
+		case 3:
+			m_treeram[offset] = data;
+			break;
+
+		default:
+			break;
 	}
 }
 
 
 uint8_t changela_state::changela_mem_device_r(offs_t offset)
 {
-	return m_memory_devices[m_mem_dev_selected + offset];
+	switch (m_mem_dev_selected)
+	{
+		case 1: return m_stateram[offset & 0x3f];
+		case 2: return m_riverram[offset];
+		case 3: return m_treeram[offset];
+		case 4: return m_treerom[offset];
+		case 5: return m_sloperom[offset];
+
+		default:
+			break;
+	}
+
+	return 0;
 }
 
 
