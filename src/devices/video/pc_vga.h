@@ -291,7 +291,6 @@ protected:
 	address_space_config m_seq_space_config;
 	address_space_config m_atc_space_config;
 
-private:
 	bool m_ioas = false;
 };
 

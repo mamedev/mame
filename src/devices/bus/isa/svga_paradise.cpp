@@ -241,8 +241,8 @@ void isa16_wd90c00_jk_device::device_add_mconfig(machine_config &config)
 
 	WD90C00(config, m_vga, 0);
 	m_vga->set_screen("screen");
-	// 512KB (+ option for 1MB? Verify)
-	m_vga->set_vram_size(0x80000);
+	// 256kB, 512kB, 1MB
+	m_vga->set_vram_size(0x100000);
 }
 
 void isa16_wd90c00_jk_device::io_isa_map(address_map &map)
@@ -291,9 +291,9 @@ void isa16_wd90c11_lr_device::device_add_mconfig(machine_config &config)
 	screen.set_screen_update("vga", FUNC(wd90c00_vga_device::screen_update));
 
 	// TODO: bump to WD90C11A
-	WD90C00(config, m_vga, 0);
+	WD90C11A(config, m_vga, 0);
 	m_vga->set_screen("screen");
-	// 512kB
+	// 512KB (+ option for 1MB? Verify with interlace)
 	m_vga->set_vram_size(0x80000);
 }
 
