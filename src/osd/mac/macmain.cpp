@@ -20,6 +20,7 @@
 #include "corestr.h"
 #include "osdepend.h"
 #include "emu.h"
+#include "main.h"
 #include "emuopts.h"
 #include "strconv.h"
 
@@ -42,12 +43,11 @@
 //============================================================
 
 const options_entry mac_options::s_option_entries[] =
-{
-	{ MACOPTION_INIPATH,                     INI_PATH,    OPTION_STRING,     "path to ini files" },
+	{
+		{MACOPTION_INIPATH, INI_PATH, core_options::option_type::STRING, "path to ini files"},
 
-	// End of list
-	{ nullptr }
-};
+		// End of list
+		{nullptr}};
 
 //============================================================
 //  mac_options
@@ -193,8 +193,6 @@ static void osd_mac_info(void)
 
 void mac_osd_interface::video_register()
 {
-	video_options_add("opengl", nullptr);
-	video_options_add("bgfx", nullptr);
 }
 
 //============================================================
