@@ -20,10 +20,10 @@ TODO: Priority between tree0 and tree1.
 
 void changela_state::video_start()
 {
-	m_riverram = std::make_unique<uint8_t[]>(0x800);
+	m_riverram = std::make_unique<u8[]>(0x800);
 	save_pointer(NAME(m_riverram), 0x800);
 
-	m_treeram = std::make_unique<uint8_t[]>(0x800);
+	m_treeram = std::make_unique<u8[]>(0x800);
 	save_pointer(NAME(m_treeram), 0x800);
 
 	m_screen->register_screen_bitmap(m_obj0_bitmap);
@@ -42,34 +42,34 @@ void changela_state::video_start()
 
 void changela_state::draw_obj0(bitmap_ind16 &bitmap, int sy)
 {
-	uint8_t const *const ROM = m_obj0rom;
-	uint8_t const *const RAM = m_spriteram;
+	u8 const *const ROM = m_obj0rom;
+	u8 const *const RAM = m_spriteram;
 
 	for (int sx = 0; sx < 256; sx++)
 	{
 		int vr = (RAM[sx * 4 + 0] & 0x80) >> 7;
 		int hr = (RAM[sx * 4 + 0] & 0x40) >> 6;
 		int hs = (RAM[sx * 4 + 0] & 0x20) >> 5;
-		uint32_t vsize = RAM[sx * 4 + 0] & 0x1f;
-		uint8_t ypos = ~RAM[sx * 4 + 1];
-		uint8_t tile = RAM[sx * 4 + 2];
-		uint8_t xpos = RAM[sx * 4 + 3];
+		u32 vsize = RAM[sx * 4 + 0] & 0x1f;
+		u8 ypos = ~RAM[sx * 4 + 1];
+		u8 tile = RAM[sx * 4 + 2];
+		u8 xpos = RAM[sx * 4 + 3];
 
 		if (sy - ypos <= vsize)
 		{
 			for (int i = 0; i < 16; i++)
 			{
-				uint8_t sum = sy - ypos;
+				u8 sum = sy - ypos;
 
-				uint8_t counter = i;
+				u8 counter = i;
 				if (hr) counter ^= 0x0f;
 
-				uint32_t A8 = ((tile & 0x02) >> 1) ^ ((hr & hs) ^ hs);
-				uint32_t A7 = ((((vr ^ ((sum & 0x10) >> 4)) & ((vsize & 0x10) >> 4)) ^ 0x01) & (tile & 0x01)) ^ 0x01;
-				uint32_t rom_addr = (counter >> 1) | ((sum & 0x0f) << 3) | (A7 << 7) | (A8 << 8) | ((tile >> 2) << 9);
+				u32 A8 = ((tile & 0x02) >> 1) ^ ((hr & hs) ^ hs);
+				u32 A7 = ((((vr ^ ((sum & 0x10) >> 4)) & ((vsize & 0x10) >> 4)) ^ 0x01) & (tile & 0x01)) ^ 0x01;
+				u32 rom_addr = (counter >> 1) | ((sum & 0x0f) << 3) | (A7 << 7) | (A8 << 8) | ((tile >> 2) << 9);
 				if (vr) rom_addr ^= (0x0f << 3);
 
-				uint8_t data;
+				u8 data;
 				if (counter & 1)
 					data = ROM[rom_addr] & 0x0f;
 				else
@@ -100,12 +100,12 @@ void changela_state::draw_obj0(bitmap_ind16 &bitmap, int sy)
 
 void changela_state::draw_obj1(bitmap_ind16 &bitmap)
 {
-	uint8_t const *const ROM = m_obj1rom;
-	uint8_t const *const RAM = m_videoram;
+	u8 const *const ROM = m_obj1rom;
+	u8 const *const RAM = m_videoram;
 
-	uint8_t reg[4] = { 0 }; // 4x4-bit registers (U58, U59)
+	u8 reg[4] = { 0 }; // 4x4-bit registers (U58, U59)
 
-	uint8_t attrib = 0;
+	u8 attrib = 0;
 
 	for (int sy = 0; sy < 256; sy++)
 	{
@@ -118,7 +118,7 @@ void changela_state::draw_obj1(bitmap_ind16 &bitmap)
 			if (!(RAM[ram_addr + 1] & 0x10) && (sx & 0x04)) // D4=0 enables latch at U32
 				attrib = RAM[ram_addr + 1];
 
-			uint8_t tile = ROM[(tile_addr << 4) | ((sx & 0x04) >> 2) | ((sy & 0x07) << 1)];
+			u8 tile = ROM[(tile_addr << 4) | ((sx & 0x04) >> 2) | ((sy & 0x07) << 1)];
 			reg[(sx & 0x0c) >> 2] = tile;
 			int sum = (sx & 0x0f) + (attrib & 0x0f); // 4-bit adder (U45)
 
@@ -159,21 +159,21 @@ void changela_state::draw_obj1(bitmap_ind16 &bitmap)
 
 void changela_state::draw_river(bitmap_ind16 &bitmap, int sy)
 {
-	uint8_t const *const ROM = m_sloperom;
-	uint8_t *const RAM = m_stateram;
-	uint8_t const *const TILE_ROM = m_tilerom;
-	uint8_t const *const TILE_RAM = m_riverram.get();
-	uint8_t const *const PROM = m_proms;
+	u8 const *const ROM = m_sloperom;
+	u8 *const RAM = m_stateram;
+	u8 const *const TILE_ROM = m_tilerom;
+	u8 const *const TILE_RAM = m_riverram.get();
+	u8 const *const PROM = m_proms;
 
 	int preload = ((sy < 32) ? 1 : 0);
 
-	uint8_t math_train[10] = { 0 };
-	uint8_t pre_train[3] = { 0 };
+	u8 math_train[10] = { 0 };
+	u8 pre_train[3] = { 0 };
 
-	uint8_t prev_state = 0;
+	u8 prev_state = 0;
 
-	uint8_t ram_count = 0;
-	uint8_t rom_count = 0;
+	u8 ram_count = 0;
+	u8 rom_count = 0;
 
 	int hosc = 0;
 	int carry = 0;
@@ -185,7 +185,7 @@ void changela_state::draw_river(bitmap_ind16 &bitmap, int sy)
 	// ----- STATE MACHINE -----
 	for (int i = 0; i < 0x20; i++)
 	{
-		uint8_t curr_state = PROM[i];
+		u8 curr_state = PROM[i];
 
 		// Update Counters
 		if (prev_state & 0x80)
@@ -317,25 +317,25 @@ void changela_state::draw_river(bitmap_ind16 &bitmap, int sy)
 void changela_state::draw_tree(bitmap_ind16 &bitmap, int sy, int tree_num)
 {
 	// State machine
-	uint8_t const *const ROM = m_sloperom;
-	uint8_t *const RAM = m_stateram + 0x40 + 0x40 * tree_num;
-	uint8_t const *const PROM = m_proms;
+	u8 const *const ROM = m_sloperom;
+	u8 *const RAM = m_stateram + 0x40 + 0x40 * tree_num;
+	u8 const *const PROM = m_proms;
 
 	// Tree Data
-	uint8_t *const RAM2 = m_treeram2 + 0x20 * tree_num;
-	uint8_t const *const TILE_ROM = (tree_num ? (m_treerom + 0x1000) : (m_tilerom + 0x2000));
-	uint8_t const *const TILE_RAM = (tree_num ? m_treerom : m_treeram.get());
+	u8 *const RAM2 = m_treeram2 + 0x20 * tree_num;
+	u8 const *const TILE_ROM = (tree_num ? (m_treerom + 0x1000) : (m_tilerom + 0x2000));
+	u8 const *const TILE_RAM = (tree_num ? m_treerom : m_treeram.get());
 
 	int preload = ((sy < 32) ? 1 : 0);
 
-	uint8_t math_train[10] = { 0 };
-	uint8_t pre_train[3] = { 0 };
-	uint8_t tree_train[3] = { 0 };
+	u8 math_train[10] = { 0 };
+	u8 pre_train[3] = { 0 };
+	u8 tree_train[3] = { 0 };
 
-	uint8_t prev_state = 0;
+	u8 prev_state = 0;
 
-	uint8_t ram_count = 0;
-	uint8_t rom_count = 0;
+	u8 ram_count = 0;
+	u8 rom_count = 0;
 
 	int hosc = 0;
 	int carry = 0;
@@ -357,7 +357,7 @@ void changela_state::draw_tree(bitmap_ind16 &bitmap, int sy, int tree_num)
 	//* ----- STATE MACHINE -----
 	for (int i = 0; i < 0x20; i++)
 	{
-		uint8_t curr_state = PROM[i];
+		u8 curr_state = PROM[i];
 
 		// Update Counters
 		if (prev_state & 0x80)
@@ -619,21 +619,11 @@ TIMER_CALLBACK_MEMBER(changela_state::changela_scanline_callback)
 	// Collision Detection
 	for (int sx = 1; sx < 256; sx++)
 	{
-		int riv_col;
-		if ((m_river_bitmap.pix(sy, sx) == 0x08)
-		|| (m_river_bitmap.pix(sy, sx) == 0x09)
-		|| (m_river_bitmap.pix(sy, sx) == 0x0a))
-			riv_col = 1;
-		else
-			riv_col = 0;
+		u16 pix = m_river_bitmap.pix(sy, sx);
+		const bool riv_col = (pix == 0x08 || pix == 0x09 || pix == 0x0a);
 
-		int prev_col;
-		if ((m_river_bitmap.pix(sy, sx-1) == 0x08)
-		|| (m_river_bitmap.pix(sy, sx-1) == 0x09)
-		|| (m_river_bitmap.pix(sy, sx-1) == 0x0a))
-			prev_col = 1;
-		else
-			prev_col = 0;
+		pix = m_river_bitmap.pix(sy, sx-1);
+		const bool prev_col = (pix == 0x08 || pix == 0x09 || pix == 0x0a);
 
 		if (m_obj0_bitmap.pix(sy, sx) == 0x14) // Car Outline Color
 		{
@@ -646,15 +636,15 @@ TIMER_CALLBACK_MEMBER(changela_state::changela_scanline_callback)
 				m_tree1_col = 1;
 
 			// Hit Right Bank
-			if (riv_col == 0 && prev_col == 1)
+			if (!riv_col && prev_col)
 				m_right_bank_col = 1;
 
 			// Hit Left Bank
-			if (riv_col == 1 && prev_col == 0)
+			if (riv_col && !prev_col)
 				m_left_bank_col = 1;
 
 			// Boat Hit Shore
-			if (riv_col == 1)
+			if (riv_col)
 				m_boat_shore_col = 1;
 		}
 	}
@@ -675,7 +665,7 @@ TIMER_CALLBACK_MEMBER(changela_state::changela_scanline_callback)
 	m_scanline_timer->adjust(m_screen->time_until_pos(sy), sy);
 }
 
-uint32_t changela_state::screen_update_changela(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 changela_state::screen_update_changela(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_river_bitmap, 0, 0, 0, 0, cliprect);
 	copybitmap_trans(bitmap, m_obj0_bitmap, 0, 0, 0, 0, cliprect, 0);
@@ -686,7 +676,7 @@ uint32_t changela_state::screen_update_changela(screen_device &screen, bitmap_in
 	return 0;
 }
 
-void changela_state::changela_colors_w(offs_t offset, uint8_t data)
+void changela_state::changela_colors_w(offs_t offset, u8 data)
 {
 	/* Each color is combined from 3 bits from open-collector outputs of ram.
 	Each of the bits is connected to a 220, 470, or 1000 Ohm resistor.
@@ -703,10 +693,10 @@ void changela_state::changela_colors_w(offs_t offset, uint8_t data)
 	    111     |   3.819   (2.2k)
 	Which were normalized to produce the following table: */
 
-	static const uint8_t color_table[8] = { 0, 7, 18, 31, 58, 88, 146, 255 };
+	static const u8 color_table[8] = { 0, 7, 18, 31, 58, 88, 146, 255 };
 
 	int r, g, b;
-	uint32_t c, color_index;
+	u32 c, color_index;
 
 	c = (data) | ((offset & 0x01) << 8); //* a0 used as D8 bit input
 	c ^= 0x1ff; // active low
@@ -722,7 +712,7 @@ void changela_state::changela_colors_w(offs_t offset, uint8_t data)
 }
 
 
-void changela_state::changela_mem_device_select_w(uint8_t data)
+void changela_state::changela_mem_device_select_w(u8 data)
 {
 	/*
 	(data & 0x07) possible settings:
@@ -737,7 +727,7 @@ void changela_state::changela_mem_device_select_w(uint8_t data)
 	m_tree_en = (data & 0x30) >> 4;
 }
 
-void changela_state::changela_mem_device_w(offs_t offset, uint8_t data)
+void changela_state::changela_mem_device_w(offs_t offset, u8 data)
 {
 	switch (m_mem_dev_selected)
 	{
@@ -760,7 +750,7 @@ void changela_state::changela_mem_device_w(offs_t offset, uint8_t data)
 }
 
 
-uint8_t changela_state::changela_mem_device_r(offs_t offset)
+u8 changela_state::changela_mem_device_r(offs_t offset)
 {
 	switch (m_mem_dev_selected)
 	{
@@ -778,12 +768,12 @@ uint8_t changela_state::changela_mem_device_r(offs_t offset)
 }
 
 
-void changela_state::changela_slope_rom_addr_hi_w(uint8_t data)
+void changela_state::changela_slope_rom_addr_hi_w(u8 data)
 {
 	m_sloperom_bank = (data & 0x03) << 9;
 }
 
-void changela_state::changela_slope_rom_addr_lo_w(uint8_t data)
+void changela_state::changela_slope_rom_addr_lo_w(u8 data)
 {
 	m_horizon = data;
 }

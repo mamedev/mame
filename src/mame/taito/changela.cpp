@@ -93,12 +93,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(changela_state::changela_scanline)
     MCU
 *********************************/
 
-void changela_state::changela_68705_port_a_w(uint8_t data)
+void changela_state::changela_68705_port_a_w(u8 data)
 {
 	m_port_a_out = data;
 }
 
-void changela_state::changela_68705_port_c_w(uint8_t data)
+void changela_state::changela_68705_port_c_w(u8 data)
 {
 	// PC3 is connected to the CLOCK input of the LS374, so we latch the data on rising edge
 	if (BIT(data, 3) && !BIT(m_port_c_out, 3))
@@ -111,14 +111,14 @@ void changela_state::changela_68705_port_c_w(uint8_t data)
 }
 
 // latch LS374 at U40
-uint8_t changela_state::mcu_r()
+u8 changela_state::mcu_r()
 {
 	//osd_printf_debug("Z80 MCU  R = %x\n", m_mcu_out);
 	return m_mcu_out & (BIT(m_port_c_out, 2) ? 0xff : m_mcu_in);
 }
 
 // latch LS374 at U39
-void changela_state::mcu_w(uint8_t data)
+void changela_state::mcu_w(u8 data)
 {
 	m_mcu_in = data;
 	if (!BIT(m_port_c_out, 2))
@@ -126,7 +126,7 @@ void changela_state::mcu_w(uint8_t data)
 }
 
 // U30
-uint8_t changela_state::changela_24_r()
+u8 changela_state::changela_24_r()
 {
 	return (BIT(m_port_c_out, 1) << 3) | 0x07; // bits 2,1,0-N/C inputs
 }
@@ -146,24 +146,24 @@ INTERRUPT_GEN_MEMBER(changela_state::chl_mcu_irq)
     Other I/O
 *********************************/
 
-uint8_t changela_state::changela_25_r()
+u8 changela_state::changela_25_r()
 {
 	// collisions on bits 3,2, bits 1,0-N/C inputs
 	return (m_tree1_col << 3) | (m_tree0_col << 2) | 0x03;
 }
 
-uint8_t changela_state::changela_30_r()
+u8 changela_state::changela_30_r()
 {
 	return m_wheel->read() & 0x0f; // wheel control (clocked input) signal on bits 3,2,1,0
 }
 
-uint8_t changela_state::changela_31_r()
+u8 changela_state::changela_31_r()
 {
 	/* If the new value is less than the old value, and it did not wrap around,
 	   or if the new value is greater than the old value, and it did wrap around,
 	   then we are moving LEFT. */
-	uint8_t cur = m_wheel->read();
-	uint8_t prev = m_prev_value_31;
+	u8 cur = m_wheel->read();
+	u8 prev = m_prev_value_31;
 
 	if ((cur < prev && (prev - cur) < 0x80) || (cur > prev && (cur - prev) > 0x80))
 		m_dir_31 = 1;
@@ -176,9 +176,9 @@ uint8_t changela_state::changela_31_r()
 	return (m_dir_31 << 3) | (m_left_bank_col << 2) | (m_right_bank_col << 1) | m_boat_shore_col;
 }
 
-uint8_t changela_state::changela_2d_r()
+u8 changela_state::changela_2d_r()
 {
-	int gas;
+	u8 gas;
 
 	// Gas pedal is made up of 2 switches, 1 active low, 1 active high
 	switch (m_gas->read() & 0x03)
