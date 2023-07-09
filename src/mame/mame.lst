@@ -31861,6 +31861,9 @@ multi8                          //
 @source:mitsubishi/multi16.cpp
 multi16                         //
 
+@source:mitsubishi/trium.cpp
+triumec                         //
+
 @source:mizar/mzr8105.cpp
 mzr8105                         //
 
