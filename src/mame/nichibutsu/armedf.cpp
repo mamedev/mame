@@ -2007,7 +2007,7 @@ GAME( 1987, legionjb2, legion,   legionjb2, legion,   armedf_state,   init_legio
 
 GAME( 1987, terraf,    0,        terraf,    terraf,   armedf_state,   init_terraf,   ROT0,   "Nichibutsu",                    "Terra Force", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, terrafu,   terraf,   terraf,    terraf,   armedf_state,   init_terraf,   ROT0,   "Nichibutsu USA",                "Terra Force (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, terrafua,  terraf,   terraf,    terraf,   armedf_state,   init_terraf,   ROT0,   "Nichibutsu USA",                "Terra Force (US), alternate sound", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, terrafua,  terraf,   terraf,    terraf,   armedf_state,   init_terraf,   ROT0,   "Nichibutsu USA",                "Terra Force (US, alternate sound)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, terrafj,   terraf,   terraf,    terraf,   armedf_state,   init_terraf,   ROT0,   "Nichibutsu Japan",              "Terra Force (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, terrafjb,  terraf,   terrafjb,  terraf,   armedf_state,   init_terraf,   ROT0,   "bootleg",                       "Terra Force (Japan, bootleg with additional Z80)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, terrafb,   terraf,   terrafb,   terraf,   armedf_state,   init_terraf,   ROT0,   "bootleg",                       "Terra Force (Japan, bootleg set 2)", MACHINE_SUPPORTS_SAVE )
