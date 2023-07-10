@@ -251,6 +251,7 @@ void pkspirit_state::pkspirit(machine_config &config)
 
 	ym2203_device &opn(YM2203(config, "opn", 36_MHz_XTAL / 9)); // divider not verified
 	opn.irq_handler().set_inputline("audiocpu", 0);
+	//ymsnd.port_a_write_callback() TODO: writes continuously here.
 	opn.add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	OKIM6295(config, "oki", 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // all verified
