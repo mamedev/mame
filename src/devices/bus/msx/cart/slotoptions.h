@@ -51,6 +51,7 @@ extern char const *const KOREAN_25IN1;
 extern char const *const KOREAN_80IN1;
 extern char const *const KOREAN_90IN1;
 extern char const *const KOREAN_126IN1;
+extern char const *const KOREAN_HYDLIDE2;
 extern char const *const LOVEPLUS;
 extern char const *const MAJUSTUSHI;
 extern char const *const MM256K;
