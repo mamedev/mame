@@ -27,6 +27,7 @@ protected:
 	memory_view m_ext_gc_view;
 
 	u8 m_video_select = 0;
+	u8 m_crtc_lock = 0;
 private:
 	u8 address_offset_r(offs_t offset);
 	void address_offset_w(offs_t offset, u8 data);
@@ -44,7 +45,6 @@ private:
 	u8 m_memory_size = 0;
 	u8 m_video_control = 0;
 	bool m_ext_gc_unlock = false;
-	u8 m_crtc_lock = 0;
 };
 
 class wd90c00_vga_device : public pvga1a_vga_device
@@ -59,6 +59,8 @@ protected:
 
 	virtual void crtc_map(address_map &map) override;
 	virtual void recompute_params() override;
+
+	virtual bool get_interlace_mode() override { return m_interlace_mode; }
 
 	memory_view m_ext_crtc_view;
 private:
@@ -105,8 +107,28 @@ private:
 	u8 m_pr31 = 0;
 };
 
+class wd90c30_vga_device : public wd90c11a_vga_device
+{
+public:
+	wd90c30_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	wd90c30_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void crtc_map(address_map &map) override;
+	virtual void sequencer_map(address_map &map) override;
+
+	virtual void device_reset() override;
+private:
+	u8 vert_timing_overflow_r(offs_t offset);
+	void vert_timing_overflow_w(offs_t offset, u8 data);
+
+	u8 m_pr18 = 0;
+};
+
 DECLARE_DEVICE_TYPE(PVGA1A, pvga1a_vga_device)
 DECLARE_DEVICE_TYPE(WD90C00, wd90c00_vga_device)
 DECLARE_DEVICE_TYPE(WD90C11A, wd90c11a_vga_device)
+DECLARE_DEVICE_TYPE(WD90C30, wd90c30_vga_device)
 
 #endif // MAME_VIDEO_PC_VGA_PARADISE_H

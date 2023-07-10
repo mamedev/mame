@@ -31,6 +31,7 @@ DEFINE_DEVICE_TYPE(ISA16_PVGA1A_JK,  isa16_pvga1a_jk_device,  "pvga1a_jk", "Para
 DEFINE_DEVICE_TYPE(ISA8_WD90C90_JK,  isa8_wd90c90_jk_device,  "wd90c90_jk", "Western Digital WD90C90-JK Graphics Card")
 DEFINE_DEVICE_TYPE(ISA16_WD90C00_JK, isa16_wd90c00_jk_device, "wd90c00_jk", "Western Digital WD90C00-JK Graphics Card")
 DEFINE_DEVICE_TYPE(ISA16_WD90C11_LR, isa16_wd90c11_lr_device, "wd90c11_lr", "Western Digital WD90C11-LR Graphics Card \"1024 CX\"")
+DEFINE_DEVICE_TYPE(ISA16_WD90C30_LR, isa16_wd90c30_lr_device, "wd90c30_lr", "Western Digital WD90C30-LR Graphics Card \"1024 DX\"")
 
 
 isa16_pvga1a_device::isa16_pvga1a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -290,7 +291,6 @@ void isa16_wd90c11_lr_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(wd90c00_vga_device::screen_update));
 
-	// TODO: bump to WD90C11A
 	WD90C11A(config, m_vga, 0);
 	m_vga->set_screen("screen");
 	// 512KB (+ option for 1MB? Verify with interlace)
@@ -299,7 +299,7 @@ void isa16_wd90c11_lr_device::device_add_mconfig(machine_config &config)
 
 void isa16_wd90c11_lr_device::io_isa_map(address_map &map)
 {
-	map(0x00, 0x2f).m(m_vga, FUNC(wd90c00_vga_device::io_map));
+	map(0x00, 0x2f).m(m_vga, FUNC(wd90c11a_vga_device::io_map));
 }
 
 void isa16_wd90c11_lr_device::device_start()
@@ -310,4 +310,55 @@ void isa16_wd90c11_lr_device::device_start()
 
 	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(wd90c00_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(wd90c00_vga_device::mem_w)));
 	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_wd90c11_lr_device::io_isa_map);
+}
+
+/******************
+ *
+ * WD90C30-LR
+ *
+ *****************/
+
+isa16_wd90c30_lr_device::isa16_wd90c30_lr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ISA16_WD90C30_LR, tag, owner, clock),
+	device_isa16_card_interface(mconfig, *this),
+	m_vga(*this, "vga")
+{
+}
+
+ROM_START( wd90c30_lr )
+	ROM_REGION(0x8000,"vga_rom", ROMREGION_ERASE00)
+	ROM_SYSTEM_BIOS(0, "wd90c30_lr", "Western Digital WD90C30-LR")
+	ROMX_LOAD(  "90c30-lr.vbi", 0x000000, 0x008000, CRC(3356ad43) SHA1(6cd56cf274b3c9262b7ca12d49bae63afc331c58), ROM_BIOS(0) )
+ROM_END
+
+const tiny_rom_entry *isa16_wd90c30_lr_device::device_rom_region() const
+{
+	return ROM_NAME( wd90c30_lr );
+}
+
+void isa16_wd90c30_lr_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
+	screen.set_screen_update("vga", FUNC(wd90c00_vga_device::screen_update));
+
+	WD90C30(config, m_vga, 0);
+	m_vga->set_screen("screen");
+	// 512KB, 1MB
+	m_vga->set_vram_size(0x100000);
+}
+
+void isa16_wd90c30_lr_device::io_isa_map(address_map &map)
+{
+	map(0x00, 0x2f).m(m_vga, FUNC(wd90c30_vga_device::io_map));
+}
+
+void isa16_wd90c30_lr_device::device_start()
+{
+	set_isa_device();
+
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
+
+	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(wd90c30_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(wd90c30_vga_device::mem_w)));
+	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_wd90c30_lr_device::io_isa_map);
 }

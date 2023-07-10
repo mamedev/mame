@@ -42,8 +42,8 @@ TODO:
 
 DEFINE_DEVICE_TYPE(PVGA1A, pvga1a_vga_device, "pvga1a_vga", "Paradise Systems PVGA1A")
 DEFINE_DEVICE_TYPE(WD90C00, wd90c00_vga_device, "wd90c00_vga", "Western Digital WD90C00 \"PVGA1B\" VGA Controller")
-DEFINE_DEVICE_TYPE(WD90C11A, wd90c11a_vga_device, "wd90c11a_vga", "Western Digital WD90C11A \"PVGA1M\" VGA Controller")
-//DEFINE_DEVICE_TYPE(WD90C30, wd90c30_vga_device, "wd90c30_vga", "Western Digital WD90C30 \"PVGA1D\" VGA Controller")
+DEFINE_DEVICE_TYPE(WD90C11A, wd90c11a_vga_device, "wd90c11a_vga", "Western Digital WD90C11A \"PVGA1C\" VGA Controller")
+DEFINE_DEVICE_TYPE(WD90C30, wd90c30_vga_device, "wd90c30_vga", "Western Digital WD90C30 \"PVGA1D\" VGA Controller")
 
 pvga1a_vga_device::pvga1a_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, type, tag, owner, clock)
@@ -330,9 +330,11 @@ void wd90c00_vga_device::recompute_params()
 {
 	u8 xtal_select = (vga.miscellaneous_output & 0x0c) >> 2;
 	int xtal;
-	// TODO: VTB disables video select bit 1 for 1024x768 mode (with no interlace mode setup)
+	// TODO: wd90c11a VTB disables video select bit 1 for 1024x768 mode (with interlace mode = false)
 	// Uses VCLK1, without the bump will select 26.43 Hz as refresh rate
 	const u8 multiplier = BIT(m_video_select, 1) ? 1 : 2;
+
+	//printf("%d %d %02x\n", m_interlace_mode, xtal_select, m_video_select);
 
 	switch(xtal_select & 3)
 	{
@@ -342,6 +344,7 @@ void wd90c00_vga_device::recompute_params()
 		case 1: xtal = XTAL(28'636'363).value() * multiplier; break;
 		// VCLK2, selected in 800x600 modes
 		case 2:
+		// TODO: wd90c30 selects this for 1024x768 interlace mode (~40 Hz)
 		default:
 			xtal = XTAL(42'000'000).value();
 			break;
@@ -569,4 +572,87 @@ void wd90c11a_vga_device::sys_if_control_w(offs_t offset, u8 data)
 {
 	LOG("PR31 System Interface Control W %02x\n", data);
 	m_pr31 = data;
+}
+
+/**************************************
+ *
+ * Western Digital WD90C30
+ *
+ *************************************/
+
+wd90c30_vga_device::wd90c30_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: wd90c11a_vga_device(mconfig, type, tag, owner, clock)
+{
+	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(wd90c30_vga_device::crtc_map), this));
+	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(wd90c30_vga_device::sequencer_map), this));
+}
+
+wd90c30_vga_device::wd90c30_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: wd90c30_vga_device(mconfig, WD90C30, tag, owner, clock)
+{
+}
+
+void wd90c30_vga_device::device_reset()
+{
+	wd90c11a_vga_device::device_reset();
+
+	m_pr18 = 0;
+}
+
+void wd90c30_vga_device::crtc_map(address_map &map)
+{
+	wd90c11a_vga_device::crtc_map(map);
+//  m_ext_crtc_view[1](0x20, 0x21) Signature read data
+//	m_ext_crtc_view[1](0x3d, 0x3d) PR1A CRTC Shadow Register Control
+	m_ext_crtc_view[1](0x3e, 0x3e).rw(FUNC(wd90c30_vga_device::vert_timing_overflow_r), FUNC(wd90c30_vga_device::vert_timing_overflow_w));
+//	m_ext_crtc_view[1](0x3f, 0x3f) PR19 Signature Analyzer Control
+}
+
+void wd90c30_vga_device::sequencer_map(address_map &map)
+{
+	wd90c11a_vga_device::sequencer_map(map);
+//	m_ext_seq_view[1](0x13, 0x13) PR33 DRAM Timing and zero Wait State Control
+//	m_ext_seq_view[1](0x14, 0x14) PR34 Video Memory Mapping
+//	m_ext_seq_view[1](0x15, 0x15) PR35 USR0, USR1 Output Select
+}
+
+/*
+ * [0x3e] PR18 CRTC Vertical Timing Overflow
+ *
+ * xxx- ---- <reserved>
+ * ---x ---- Line Compare bit 10
+ * ---- x--- Start vertical blank bit 10
+ * ---- -x-- Start vertical retrace bit 10
+ * ---- --x- Vertical display enable end bit 10
+ * ---- ---x Vertical total bit 10
+ */
+u8 wd90c30_vga_device::vert_timing_overflow_r(offs_t offset)
+{
+	LOG("PR18 CRTC Vertical Timing Overflow R (%02x)\n", m_pr18);
+	return m_pr18;
+}
+
+void wd90c30_vga_device::vert_timing_overflow_w(offs_t offset, u8 data)
+{
+	LOG("PR18 CRTC Vertical Timing Overflow W %02x\n", data);
+	if (!BIT(m_crtc_lock, 1) && !vga.crtc.protect_enable)
+	{
+		vga.crtc.vert_disp_end = (vga.crtc.vert_disp_end & 0x03ff) | ((BIT(data, 1) << 10));
+		m_pr18 &= ~2;
+		m_pr18 |= (data & 2);
+	}
+
+	if (!BIT(m_crtc_lock, 0) || !vga.crtc.protect_enable)
+	{
+		vga.crtc.vert_blank_start = (vga.crtc.vert_blank_start & 0x03ff) | ((BIT(data, 3) << 10));
+		//vga.crtc.vert_retrace =    (vga.crtc.vert_retrace & 0x03ff)    | ((BIT(data, 2) << 10));
+		vga.crtc.vert_total =       (vga.crtc.vert_total & 0x03ff)       | ((BIT(data, 0) << 10));
+		m_pr18 &= ~0x0d;
+		m_pr18 |= (data & 0xd);
+	}
+
+	vga.crtc.line_compare = (vga.crtc.line_compare & 0x03ff) | ((BIT(data, 4) << 10));
+	m_pr18 &= ~0xf0;
+	m_pr18 |= data & 0xf0;
+	recompute_params();
 }

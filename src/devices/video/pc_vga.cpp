@@ -73,7 +73,7 @@
 ***************************************************************************/
 
 //#define TEXT_LINES (LINES_HELPER)
-#define LINES (vga.crtc.vert_disp_end+1)
+#define LINES ((vga.crtc.vert_disp_end + 1) * (get_interlace_mode() + 1))
 #define TEXT_LINES (vga.crtc.vert_disp_end+1)
 
 #define GRAPHIC_MODE (vga.gc.alpha_dis) /* else text mode */
@@ -1541,7 +1541,7 @@ uint32_t vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 void vga_device::recompute_params_clock(int divisor, int xtal)
 {
-	int vblank_period,hblank_period;
+	int vblank_period, hblank_period;
 	attoseconds_t refresh;
 	uint8_t hclock_m = (!GRAPHIC_MODE) ? VGA_CH_WIDTH : 8;
 	int pixel_clock;
@@ -1550,12 +1550,15 @@ void vga_device::recompute_params_clock(int divisor, int xtal)
 	if(!vga.crtc.horz_disp_end || !vga.crtc.vert_disp_end || !vga.crtc.horz_total || !vga.crtc.vert_total)
 		return;
 
-	rectangle visarea(0, ((vga.crtc.horz_disp_end + 1) * ((float)(hclock_m)/divisor))-1, 0, vga.crtc.vert_disp_end);
+	const u8 is_interlace_mode = get_interlace_mode() + 1;
+	const int display_lines = vga.crtc.vert_disp_end * is_interlace_mode;
 
-	vblank_period = (vga.crtc.vert_total + 2);
+	rectangle visarea(0, ((vga.crtc.horz_disp_end + 1) * ((float)(hclock_m)/divisor))-1, 0, display_lines);
+
+	vblank_period = (vga.crtc.vert_total + 2) * is_interlace_mode;
 	hblank_period = ((vga.crtc.horz_total + 5) * ((float)(hclock_m)/divisor));
 
-	/* TODO: 10b and 11b settings aren't known */
+	// TODO: improve/complete clocking modes
 	pixel_clock = xtal / (((vga.sequencer.data[1]&8) >> 3) + 1);
 
 	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
