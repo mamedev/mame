@@ -294,7 +294,7 @@ void isa16_wd90c11_lr_device::device_add_mconfig(machine_config &config)
 	WD90C11A(config, m_vga, 0);
 	m_vga->set_screen("screen");
 	// 512KB (+ option for 1MB? Verify with interlace)
-	m_vga->set_vram_size(0x80000);
+	m_vga->set_vram_size(0x100000);
 }
 
 void isa16_wd90c11_lr_device::io_isa_map(address_map &map)

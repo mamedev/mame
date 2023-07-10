@@ -123,6 +123,7 @@ void pvga1a_vga_device::gc_map(address_map &map)
  * [0x09] PR0A Address Offset A
  * [0x0a] PR0B Address Offset B
  *
+ * x--- ---- <reserved> according to docs, Win 95 uses this in 800x600 modes for systray
  * -xxx xxxx bank selects, in 4KB units
  */
 u8 pvga1a_vga_device::address_offset_r(offs_t offset)
@@ -130,7 +131,7 @@ u8 pvga1a_vga_device::address_offset_r(offs_t offset)
 	if (!offset)
 	{
 		LOGBANK("PR0A read Address Offset A\n");
-		return svga.bank_w & 0x7f;
+		return svga.bank_w & 0xff;
 	}
 	// Address Offset B, TBD
 	LOGBANK("PR0A read Address Offset B\n");
@@ -142,7 +143,7 @@ void pvga1a_vga_device::address_offset_w(offs_t offset, u8 data)
 	if (!offset)
 	{
 		LOG("PR0A write Address Offset A %02x\n", data);
-		svga.bank_w = data & 0x7f;
+		svga.bank_w = data & 0xff;
 	}
 	else
 	{
