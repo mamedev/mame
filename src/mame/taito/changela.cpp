@@ -2,7 +2,13 @@
 // copyright-holders:Jarek Burczynski, Phil Stroffolino, Tomasz Slanina, Adam Bousley
 /**************************************************************************
 
-    Taito America's Change Lanes
+Taito America's Change Lanes
+
+The video hardware is an evolution of Midway Space Encounters. This game
+was designed by the same person (Dave Needle), it's not a Taito Japan game.
+
+TODO:
+- filtering on ay2
 
 ***************************************************************************/
 
@@ -542,7 +548,7 @@ void changela_state::draw_tree(bitmap_ind16 &bitmap, int sy, int tree_num)
 	if (tree_num == 0)
 		m_v_count_tree = (m_v_count_tree + 1) & 0xff;
 
-	//* ----- STATE MACHINE -----
+	// ----- STATE MACHINE -----
 	for (int i = 0; i < 0x20; i++)
 	{
 		u8 curr_state = PROM[i];
@@ -844,7 +850,7 @@ void changela_state::changela_colors_w(offs_t offset, u8 data)
 	int r, g, b;
 	u32 c, color_index;
 
-	c = (data) | ((offset & 0x01) << 8); //* a0 used as D8 bit input
+	c = data | ((offset & 0x01) << 8); // a0 used as D8 bit input
 	c ^= 0x1ff; // active low
 
 	color_index = offset >> 1;
@@ -1021,23 +1027,13 @@ u8 changela_state::changela_31_r()
 
 u8 changela_state::changela_2d_r()
 {
-	u8 gas;
-
 	// Gas pedal is made up of 2 switches, 1 active low, 1 active high
-	switch (m_gas->read() & 0x03)
-	{
-	case 0x02:
-		gas = 0x80;
-		break;
-	case 0x01:
-		gas = 0x00;
-		break;
-	default:
-		gas = 0x40;
-		break;
-	}
+	const u8 lut_gas[3] = { 1, 0, 2 };
+	u8 gas = lut_gas[m_gas->read() % 3];
 
-	return (m_inputs[1]->read() & 0x20) | gas | (m_screen->vpos() >> 4 & 0x10);
+	u8 v8 = BIT(m_screen->vpos(), 8);
+
+	return (m_inputs[1]->read() & 0x20) | (gas << 6) | (v8 << 4);
 }
 
 void changela_state::coin_counter_1_w(int state)
@@ -1271,12 +1267,12 @@ void changela_state::changela(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &ay1(AY8910(config, "ay1", 20_MHz_XTAL/16));
+	ay8910_device &ay1(AY8910(config, "ay1", 20_MHz_XTAL/16)); // U8
 	ay1.port_a_read_callback().set_ioport("DSWA");
 	ay1.port_b_read_callback().set_ioport("DSWB");
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	ay8910_device &ay2(AY8910(config, "ay2", 20_MHz_XTAL/16));
+	ay8910_device &ay2(AY8910(config, "ay2", 20_MHz_XTAL/16)); // U9
 	ay2.port_a_read_callback().set_ioport("DSWC");
 	ay2.port_b_read_callback().set_ioport("DSWD");
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.50);
