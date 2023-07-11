@@ -13,12 +13,12 @@
 #pragma once
 
 
-class sc01_device :  public device_t,
+class votrax_sc01_device :  public device_t,
 							public device_sound_interface
 {
 public:
 	// construction/destruction
-	sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto ar_callback() { return m_ar_cb.bind(); }
 
@@ -28,7 +28,7 @@ public:
 
 protected:
 	// overridable type for subclass
-	sc01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	votrax_sc01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_start() override;
@@ -181,10 +181,10 @@ private:
 	stream_buffer::sample_t analog_calc();                  // Compute one more sample
 };
 
-class sc01a_device : public sc01_device
+class votrax_sc01a_device : public votrax_sc01_device
 {
 public:
-	sc01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	votrax_sc01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -195,7 +195,7 @@ protected:
 //**************************************************************************
 
 // device type definition
-DECLARE_DEVICE_TYPE(SC01, sc01_device)
-DECLARE_DEVICE_TYPE(SC01A, sc01a_device)
+DECLARE_DEVICE_TYPE(VOTRAX_SC01, votrax_sc01_device)
+DECLARE_DEVICE_TYPE(VOTRAX_SC01A, votrax_sc01a_device)
 
 #endif // MAME_SOUND_VOTRAX_H

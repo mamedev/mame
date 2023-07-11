@@ -23,6 +23,9 @@
 *             A0 switches the ACIA between status/command, and data in/out.
 *
 *
+*  ToDo:
+*  - Votrax device needs considerable improvement in sound quality.
+*
 ******************************************************************************/
 
 /* Core includes */
@@ -45,7 +48,7 @@ public:
 	votrtnt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_sc01a(*this, "votrax")
+		, m_votrax(*this, "votrax")
 		, m_clock(*this, "acia_clock")
 	{ }
 
@@ -57,7 +60,7 @@ private:
 	void mem_map(address_map &map);
 
 	required_device<m6802_cpu_device> m_maincpu;
-	required_device<sc01a_device> m_sc01a;
+	required_device<votrax_sc01_device> m_votrax;
 	required_device<clock_device> m_clock;
 };
 
@@ -85,7 +88,7 @@ void votrtnt_state::mem_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).mirror(0x9c00).ram(); /* RAM, 2114*2 (0x400 bytes) mirrored 4x */
 	map(0x2000, 0x2001).mirror(0x9ffe).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0x4000, 0x4000).mirror(0x9fff).w(m_sc01a, FUNC(sc01a_device::write));
+	map(0x4000, 0x4000).mirror(0x9fff).w(m_votrax, FUNC(votrax_sc01_device::write));
 	map(0x6000, 0x6fff).mirror(0x9000).rom().region("maincpu",0); /* ROM in potted block */
 }
 
@@ -160,9 +163,9 @@ void votrtnt_state::votrtnt(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SC01A(config, m_sc01a, 720000); // 720kHz? needs verify
-	m_sc01a->ar_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_sc01a->add_route(ALL_OUTPUTS, "mono", 1.00);
+	VOTRAX_SC01A(config, m_votrax, 720000); // 720kHz? needs verify
+	m_votrax->ar_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_votrax->add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 

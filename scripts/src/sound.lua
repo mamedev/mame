@@ -1122,11 +1122,11 @@ end
 
 ---------------------------------------------------
 -- Votrax SC-01[-A] speech synthesizer
---@src/devices/sound/votrax.h,SOUNDS["SC01"] = true
---@src/devices/sound/votrax.h,SOUNDS["SC01A"] = true
+--@src/devices/sound/votrax.h,SOUNDS["VOTRAX_SC01"] = true
+--@src/devices/sound/votrax.h,SOUNDS["VOTRAX_SC01A"] = true
 ---------------------------------------------------
 
-if (SOUNDS["SC01"]~=null or SOUNDS["SC01A"]~=null) then
+if (SOUNDS["VOTRAX_SC01"]~=null or SOUNDS["VOTRAX_SC01A"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/votrax.cpp",
 		MAME_DIR .. "src/devices/sound/votrax.h",

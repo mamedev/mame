@@ -33,7 +33,6 @@ namespace {
 #define AY3_TAG "mockbd_ay3"
 #define AY4_TAG "mockbd_ay4"
 #define E2P_TMS_TAG "tms5220"
-#define MB_SC01_TAG "sc01"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -88,7 +87,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_reset() override;
 
-	required_device<sc01a_device> m_sc01a;
+	required_device<votrax_sc01_device> m_sc01;
 
 private:
 	void write_via1_cb2(int state);
@@ -182,10 +181,10 @@ void a2bus_mockingboard_device::device_add_mconfig(machine_config &config)
 	AY8913(config, m_ay2, 1022727);
 	m_ay2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
-	SC01A(config, m_sc01a, 1022727);
-	m_sc01a->ar_callback().set(m_via1, FUNC(via6522_device::write_cb1));
-	m_sc01a->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_sc01a->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	VOTRAX_SC01A(config, m_sc01, 1022727);
+	m_sc01->ar_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+	m_sc01->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_sc01->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
 void a2bus_phasor_device::device_add_mconfig(machine_config &config)
@@ -238,8 +237,8 @@ a2bus_ayboard_device::a2bus_ayboard_device(const machine_config &mconfig, device
 }
 
 a2bus_mockingboard_device::a2bus_mockingboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_ayboard_device(mconfig, A2BUS_MOCKINGBOARD, tag, owner, clock)
-	, m_sc01a(*this, MB_SC01_TAG)
+	a2bus_ayboard_device(mconfig, A2BUS_MOCKINGBOARD, tag, owner, clock),
+	m_sc01(*this, "sc01")
 {
 }
 
@@ -680,8 +679,8 @@ void a2bus_mockingboard_device::write_via1_cb2(int state)
 {
 	if ((state == CLEAR_LINE) && (m_last_cb2_state == ASSERT_LINE))
 	{
-		m_sc01a->write(m_portb1);
-		m_sc01a->inflection_w(m_portb1 >> 6);
+		m_sc01->write(m_portb1);
+		m_sc01->inflection_w(m_portb1 >> 6);
 	}
 	m_last_cb2_state = state;
 }

@@ -40,7 +40,7 @@ protected:
 	virtual void c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
 
 private:
-	required_device<sc01a_device> m_votrax;
+	required_device<votrax_sc01_device> m_votrax;
 };
 
 

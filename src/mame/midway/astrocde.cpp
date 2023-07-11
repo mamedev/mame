@@ -1367,7 +1367,7 @@ void astrocde_state::wow(machine_config &config)
 	m_astrocade_sound[0]->so_cb<5>().set("outlatch", FUNC(cd4099_device::write_nibble_d0));
 	m_astrocade_sound[0]->so_cb<7>().set(FUNC(astrocde_state::votrax_speech_w));
 
-	SC01(config, m_votrax, 756000);
+	VOTRAX_SC01(config, m_votrax, 756000);
 
 	m_votrax->add_route(0, "f1", 0.65);
 	FILTER_RC(config, "f1").set_lowpass(110e3, 560e-12).add_route(0, "f2", 1.00);
@@ -1423,7 +1423,7 @@ void astrocde_state::gorf(machine_config &config)
 
 	ASTROCADE_IO(config, m_astrocade_sound[1], ASTROCADE_CLOCK/4).add_route(ALL_OUTPUTS, "lower", 0.35);
 
-	SC01(config, m_votrax, 756000);
+	VOTRAX_SC01(config, m_votrax, 756000);
 	m_votrax->add_route(ALL_OUTPUTS, "upper", 0.45);
 }
 

@@ -72,8 +72,8 @@ void aussiebyte_state::io_map(address_map &map)
 	map(0x1c, 0x1f).w(FUNC(aussiebyte_state::port1c_w)); // gpebh select
 	map(0x20, 0x23).rw(m_pio2, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x24, 0x27).rw("sio2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
-	map(0x28, 0x28).r(FUNC(aussiebyte_state::port28_r)).w(m_votrax, FUNC(sc01a_device::write));
-	map(0x2c, 0x2c).w(m_votrax, FUNC(sc01a_device::inflection_w));
+	map(0x28, 0x28).r(FUNC(aussiebyte_state::port28_r)).w(m_votrax, FUNC(votrax_sc01_device::write));
+	map(0x2c, 0x2c).w(m_votrax, FUNC(votrax_sc01_device::inflection_w));
 	map(0x30, 0x30).w(FUNC(aussiebyte_state::address_w));
 	map(0x31, 0x31).r(m_crtc, FUNC(mc6845_device::status_r));
 	map(0x32, 0x32).w(FUNC(aussiebyte_state::register_w));
@@ -517,7 +517,7 @@ void aussiebyte_state::aussiebyte(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-	SC01A(config, m_votrax, 720000); // 720kHz? needs verify
+	VOTRAX_SC01A(config, m_votrax, 720000); // 720kHz? needs verify
 	m_votrax->ar_callback().set([this] (bool state) { m_port28 = state ? 0 : 1; });
 	m_votrax->add_route(ALL_OUTPUTS, "mono", 1.00);
 

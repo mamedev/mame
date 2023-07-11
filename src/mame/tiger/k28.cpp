@@ -70,7 +70,7 @@ private:
 	required_device<mm5445_device> m_vfd;
 	required_device<pwm_display_device> m_display;
 	required_device<tms6100_device> m_tms6100;
-	required_device<sc01a_device> m_speech;
+	required_device<votrax_sc01_device> m_speech;
 	required_ioport_array<7> m_inputs;
 
 	bool m_power_on = false;
@@ -306,7 +306,7 @@ void k28_state::k28(machine_config &config)
 	m_maincpu->p2_in_cb().set(FUNC(k28_state::mcu_p2_r));
 	m_maincpu->p2_out_cb().set(FUNC(k28_state::mcu_p2_w));
 	m_maincpu->prog_out_cb().set("vfd", FUNC(mm5445_device::clock_w));
-	m_maincpu->t1_in_cb().set("speech", FUNC(sc01a_device::request));
+	m_maincpu->t1_in_cb().set("speech", FUNC(votrax_sc01_device::request));
 
 	TMS6100(config, m_tms6100, 3.579545_MHz_XTAL / 15); // CLK tied to 8021 ALE pin
 
@@ -318,7 +318,7 @@ void k28_state::k28(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SC01A(config, "speech", 760000).add_route(ALL_OUTPUTS, "mono", 0.5); // measured 760kHz on its RC pin
+	VOTRAX_SC01A(config, "speech", 760000).add_route(ALL_OUTPUTS, "mono", 0.5); // measured 760kHz on its RC pin
 }
 
 

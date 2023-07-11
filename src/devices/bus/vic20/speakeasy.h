@@ -42,7 +42,7 @@ protected:
 	virtual void vic20_cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) override;
 
 private:
-	required_device<sc01a_device> m_votrax;
+	required_device<votrax_sc01_device> m_votrax;
 };
 
 
