@@ -216,7 +216,7 @@ void a2bus_echoplus_device::device_add_mconfig(machine_config &config)
 	m_ay2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
 	SPEAKER(config, "echosp").front_center();
-	TMS5220(config, m_tms, 640000);
+	TMS5220C(config, m_tms, 640000);
 	// echo+ has a TSP5220C soldered down on it
 	m_tms->add_route(ALL_OUTPUTS, "echosp", 1.0);
 }
