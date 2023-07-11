@@ -464,7 +464,7 @@ void changela_state::draw_river(bitmap_ind16 &bitmap, int sy)
 
 		for (int sx = 0; sx < 256; sx++)
 		{
-			for (int i = 0; i < ((sx < 24) ? 2 : 4); i++)
+			for (int i = 0; i < ((sx < 16) ? 1 : 4); i++)
 			{
 				if (h_count > 0xff)
 				{
@@ -658,7 +658,7 @@ void changela_state::draw_tree(bitmap_ind16 &bitmap, int sy, int tree_num)
 
 	for (int sx = 0; sx < 256; sx++)
 	{
-		for (int i = 0; i < ((sx < 24) ? 2 : 4); i++)
+		for (int i = 0; i < ((sx < 16) ? 1 : 4); i++)
 		{
 			if (h_count > 0xff)
 			{
@@ -1216,7 +1216,7 @@ static INPUT_PORTS_START( changela )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("IN0") // 0xDx2C
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_CONDITION("DSWA", 0x20, EQUALS, 0x00) // SPARE
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSWA", 0x20, EQUALS, 0x00) // SPARE
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSWA", 0x20, EQUALS, 0x00) // SPARE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_CONDITION("DSWA", 0x20, EQUALS, 0x20)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_CONDITION("DSWA", 0x20, EQUALS, 0x20)
