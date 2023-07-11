@@ -48,13 +48,28 @@ ROM_START( pvga1a )
 	// BIOS.BIN     1xxxxxxxxxxxxxxx = 0xFF
 	ROMX_LOAD("bios.bin", 0x000000, 0x008000, CRC(2be5d405) SHA1(5e3b4ebae221b7ad02f3eaa052178cb39d1d9bbe), ROM_BIOS(0))
 	ROM_IGNORE( 0x8000 )
-	// Western Digital licensed
-	ROM_SYSTEM_BIOS(1, "go481", "Olivetti GO481")
-	ROMX_LOAD("oli_go481_hi.bin", 0x000001, 0x004000, CRC(cda447be) SHA1(f397e3ddd3885666e3151fb4f681abf47fef36ba), ROM_SKIP(1) | ROM_BIOS(1))
+	// 8bit Paradise Basic VGA
+	ROM_SYSTEM_BIOS(1, "basic01488", "Paradise Basic VGA 07/14/88")
+	ROMX_LOAD( "pvga1a.bin", 0x000000, 0x08000, CRC(ffb5aa30) SHA1(4f785702744ac7565e4ec659b9841e750948e8cb), ROM_BIOS(1) )
+	// 8bit Paradise Basic VGA
+	ROM_SYSTEM_BIOS(2, "basic092189", "Paradise Basic VGA 09/21/89")
+	ROMX_LOAD( "pvga1_89.bin", 0x000000, 0x08000, CRC(9521f5a0) SHA1(1ab06a897edeef1a8e119099897a1d7954d7b9d9), ROM_BIOS(2) )
+	// Epson Parts No. Y19120100100 - 16bit ISA graphics card - ROM: Western Digtal CVGA-A02/B02, 27C128 EPROMs - RAM: 256KB - Chips: Paradise PVGA1A-JK, IMSGI76P-40
+	// OSC: 42.000 MHz, 36.000 MHz, 25.175 MHz, 28.322 MHz - Connectors: DB15, 26 pin EDGE - DIP: 4way
+	ROM_SYSTEM_BIOS(3, "epson", "Epson PVGA1A")
+	ROMX_LOAD( "epson_pvga1a_cvga_a02.bin", 0x000000, 0x004000, CRC(5b94c843) SHA1(c2c70c03097a36bf1c6de687d228bcfec5bd4b2d), ROM_SKIP(1) | ROM_BIOS(3) )
 	ROM_IGNORE( 0x4000 )
-	ROMX_LOAD("oli_go481_lo.bin", 0x000000, 0x004000, CRC(7db97902) SHA1(b93aa9d45942e98fb4932b4db34b82d459060adf), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "epson_pvga1a_cvga_b02.bin", 0x000000, 0x004000, CRC(e7c297c3) SHA1(f60802a8271c437df26eca57ed61cab75e5c0618), ROM_SKIP(1) |ROM_BIOS(3) )
 	ROM_IGNORE( 0x4000 )
-
+	// ISA16 graphics card - RAM: 256KB - 8-bit mode supported - FCC ID: DBM5UEVGAPROF - Connectors: DB15, 26pin EDGE - Chips: Paradise PVGA1A, AVASEM V3476-40
+	// DIP: 4way - OSC: 42 MHz, 36 MHz, 25.1750 MHz, 28.3220 MHz
+	ROM_SYSTEM_BIOS(4, "philips", "Philips PVGA1A")
+	ROMX_LOAD("par_u35.bin", 0x000000, 0x004000, CRC(afa802a4) SHA1(33ee89248d945869206aee3d9cb63bd375e51ed7), ROM_SKIP(1) | ROM_BIOS(4))
+	ROM_IGNORE( 0x4000 )
+	ROMX_LOAD("par_u36.bin", 0x000001, 0x004000, CRC(c51ab2e3) SHA1(d53d2a9aeffc7c41199fe91bc3d6d2e4d90173c8), ROM_SKIP(1) | ROM_BIOS(4))
+	ROM_IGNORE( 0x4000 )
+	
+	
 	// There's also a:
 	// ROMX_LOAD( "paradisepvga1a.bin", 0x000000, 0x008000, CRC(e7c6883a) SHA1(61ae199d3a9077844c8a1aa80c3f5804c29383e8), ROM_BIOS(N) )
 	// BIOS.BIN     [1/4]      paradisepvga1a.BIN [1/2]      IDENTICAL
@@ -115,6 +130,20 @@ ROM_START( pvga1a_jk )
 	// TODO: consider splitting if a good dump surfaces
 	ROM_SYSTEM_BIOS(1, "nvga2", "Nokia NVGA2")
 	ROMX_LOAD( "nokia.vbi",    0x000000, 0x06000, BAD_DUMP CRC(9f430ae7) SHA1(3d37b86853347d43ebc85a7e92e4a609b13406bb), ROM_BIOS(1) )
+	// Please consider splitting, as it is used in: Olivetti M290, M300, M380XP and was a popular upgrade to the M24 (16bit card works in a 8bit slot)
+	// 16bit ISA graphics adapter - Chip: Paradise PVGA1A-JK - ROM: 2x27128, WD copyright - RAM: 256KB - OSC: 36MHz, 25.175MHz, 28.322 MHz - Connector: DB15 
+	// V1.06 ROMs have the labels "PDP5" and "PDP7"
+	ROM_SYSTEM_BIOS(2, "go481", "Olivetti GO481")
+	ROMX_LOAD( "oli_go481_hi.bin", 0x000001, 0x004000, CRC(cda447be) SHA1(f397e3ddd3885666e3151fb4f681abf47fef36ba), ROM_SKIP(1) | ROM_BIOS(2))
+	ROM_IGNORE( 0x4000 )
+	ROMX_LOAD( "oli_go481_lo.bin", 0x000000, 0x004000, CRC(7db97902) SHA1(b93aa9d45942e98fb4932b4db34b82d459060adf), ROM_SKIP(1) | ROM_BIOS(2))
+	ROM_IGNORE( 0x4000 )
+	// offered as replacement ROMs for an Olivetti GO
+	ROM_SYSTEM_BIOS(3, "16bitjk", "16bit ISA PVGA1A-JK")
+	ROMX_LOAD( "vga_paradaise_pvga1a-jk_lo_27c128.bin", 0x000000, 0x004000, CRC(a00bd1e8) SHA1(545d0bacfa5bab9208685fc880509827ae527d84), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROM_IGNORE( 0x4000 )
+	ROMX_LOAD( "vga_paradaise_pvga1a-jk_hi_27c128.bin", 0x000001, 0x004000, CRC(fb3dbc51) SHA1(218811ae3f58002eece74c4e444309d8a2a21836), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROM_IGNORE( 0x4000 )
 ROM_END
 
 const tiny_rom_entry *isa16_pvga1a_jk_device::device_rom_region() const
@@ -276,6 +305,7 @@ isa16_wd90c11_lr_device::isa16_wd90c11_lr_device(const machine_config &mconfig, 
 
 ROM_START( wd90c11_lr )
 	ROM_REGION(0x8000,"vga_rom", ROMREGION_ERASE00)
+	// Octek PVGA1C - Version LR - WDC Paradise 90C11A
 	ROM_SYSTEM_BIOS(0, "wd90c11_lr", "Western Digital WD90C11-LR")
 	ROMX_LOAD( "wd90c11.vbi",  0x000000, 0x008000, CRC(9c1296d7) SHA1(10fd263ab0187d8960d4cb2954254732ac29472f), ROM_BIOS(0) )
 ROM_END
@@ -329,6 +359,14 @@ ROM_START( wd90c30_lr )
 	ROM_REGION(0x8000,"vga_rom", ROMREGION_ERASE00)
 	ROM_SYSTEM_BIOS(0, "wd90c30_lr", "Western Digital WD90C30-LR")
 	ROMX_LOAD(  "90c30-lr.vbi", 0x000000, 0x008000, CRC(3356ad43) SHA1(6cd56cf274b3c9262b7ca12d49bae63afc331c58), ROM_BIOS(0) )
+	// WDC 90C30 reference design - Chips: WDC WD90C30-LR, MUSIC TR9C1710-80DCA - ROMS: 62-003265-008 - RAM: 512KB, up to 1MB
+	// Connectors: DB15, 26pin EDGE - DIP: 5 way (SW1)
+	// Identical ROMs are used on a VG-8000 WD90C30 VGA
+	ROM_SYSTEM_BIOS(1, "wdc30lr_hl", "WD90C30-LR Hi/Lo")
+	ROMX_LOAD("u24.bin", 0x000000, 0x008000, CRC(797ec96d) SHA1(902418504a446f0a484fd3da6f65d3cff3987280), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROM_IGNORE(					   0x008000 )
+	ROMX_LOAD("u24.bin", 0x000000, 0x008000, CRC(797ec96d) SHA1(902418504a446f0a484fd3da6f65d3cff3987280), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROM_IGNORE(					   0x008000 )
 ROM_END
 
 const tiny_rom_entry *isa16_wd90c30_lr_device::device_rom_region() const
