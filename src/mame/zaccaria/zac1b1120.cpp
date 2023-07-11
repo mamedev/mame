@@ -13,6 +13,13 @@
  * leave the battery unpopulated (Invaders schematics say "OMIT") and place a
  * 2101 RAM there instead.
  *
+ * Sound on these games is generated partly by the 2636 and partly by a
+ * daughterboard containing discrete components, TTL logic, and a SN76477
+ * (The Invaders only).
+ *
+ * A later revision of The Invaders, apparently cocktail only, runs on a single
+ * board labeled 1B1124/1. The discrete sound hardware is different here again.
+ *
  *
  * TODO: discrete sound
  *
@@ -443,6 +450,7 @@ INPUT_PORTS_END
 
 void zac1b1120_state::palette(palette_device &palette) const
 {
+	// FIXME: this PCB actually outputs RGB signals, not monochrome video!
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t::white());
 	palette.set_pen_color(2, rgb_t::black());
