@@ -68,8 +68,7 @@ ROM_START( pvga1a )
 	ROM_IGNORE( 0x4000 )
 	ROMX_LOAD("par_u36.bin", 0x000001, 0x004000, CRC(c51ab2e3) SHA1(d53d2a9aeffc7c41199fe91bc3d6d2e4d90173c8), ROM_SKIP(1) | ROM_BIOS(4))
 	ROM_IGNORE( 0x4000 )
-	
-	
+		
 	// There's also a:
 	// ROMX_LOAD( "paradisepvga1a.bin", 0x000000, 0x008000, CRC(e7c6883a) SHA1(61ae199d3a9077844c8a1aa80c3f5804c29383e8), ROM_BIOS(N) )
 	// BIOS.BIN     [1/4]      paradisepvga1a.BIN [1/2]      IDENTICAL
