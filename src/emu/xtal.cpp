@@ -256,6 +256,7 @@ const double XTAL::known_xtals[] = {
 	 15'400'000, /* 15.4_MHz_XTAL          DVK KSM */
 	 15'468'480, /* 15.46848_MHz_XTAL      Bank Panic h/w, Sega G80 */
 	 15'582'000, /* 15.582_MHz_XTAL        Zentec Zephyr */
+	 15'625'000, /* 15.625_MHz_XTAL        Zaccaria The Invaders */
 	 15'667'200, /* 15.6672_MHz_XTAL       Apple Macintosh */
 	 15'700'000, /* 15.7_MHz_XTAL          Motogonki */
 	 15'741'000, /* 15.741_MHz_XTAL        DECmate II 80-column display clock */
@@ -347,7 +348,7 @@ const double XTAL::known_xtals[] = {
 	 23'961'600, /* 23.9616_MHz_XTAL       Osborne 4 (Vixen) */
 	 24'000'000, /* 24_MHz_XTAL            Mario, 80's Data East games, 80's Konami games */
 	 24'073'400, /* 24.0734_MHz_XTAL       DEC Rainbow 100 */
-	 24'167'829, /* 24.167829MHz_XTAL      Neo Geo AES rev. 3-3 and later */
+	 24'167'829, /* 24.167829_MHz_XTAL     Neo Geo AES rev. 3-3 and later (~1536x NTSC line rate) */
 	 24'270'000, /* 24.27_MHz_XTAL         CIT-101XL */
 	 24'300'000, /* 24.3_MHz_XTAL          ADM 36 132-column display clock */
 	 24'576'000, /* 24.576_MHz_XTAL        Pole Position h/w, Model 3 CPU board */
