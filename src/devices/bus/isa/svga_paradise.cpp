@@ -362,10 +362,10 @@ ROM_START( wd90c30_lr )
 	// Connectors: DB15, 26pin EDGE - DIP: 5 way (SW1)
 	// Identical ROMs are used on a VG-8000 WD90C30 VGA
 	ROM_SYSTEM_BIOS(1, "wdc30lr_hl", "WD90C30-LR Hi/Lo")
-	ROMX_LOAD("u24.bin", 0x000000, 0x008000, CRC(797ec96d) SHA1(902418504a446f0a484fd3da6f65d3cff3987280), ROM_SKIP(1) | ROM_BIOS(1) )
-	ROM_IGNORE(					   0x008000 )
-	ROMX_LOAD("u24.bin", 0x000000, 0x008000, CRC(797ec96d) SHA1(902418504a446f0a484fd3da6f65d3cff3987280), ROM_SKIP(1) | ROM_BIOS(1) )
-	ROM_IGNORE(					   0x008000 )
+	ROMX_LOAD("u24.bin", 0x000001, 0x4000, CRC(797ec96d) SHA1(902418504a446f0a484fd3da6f65d3cff3987280), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROM_IGNORE(					   0x4000 )
+	ROMX_LOAD("u25.bin", 0x000000, 0x4000, CRC(f3ba68ae) SHA1(a072c9f8bd465c18fc75b9f8890061587abda1f2), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROM_IGNORE(					   0x4000 )
 ROM_END
 
 const tiny_rom_entry *isa16_wd90c30_lr_device::device_rom_region() const
