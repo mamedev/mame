@@ -59,15 +59,15 @@ struct instruction
 const struct instruction mn1610_table[] =
 {
 	// memory
-	{ 0xc700, 0xc700, "b",    { EA } },            // 11mm m111 nnnn nnnn
-	{ 0x8700, 0xc700, "bal",  { EA },              // 10mm m111 nnnn nnnn
-		util::disasm_interface::STEP_OVER },
-	{ 0xc600, 0xc700, "ims",  { EA },              // 11mm m110 nnnn nnnn
-		util::disasm_interface::STEP_COND },
 	{ 0x8600, 0xc700, "dms",  { EA },              // 10mm m110 nnnn nnnn
 		util::disasm_interface::STEP_COND },
-	{ 0xc000, 0xc000, "l",    { Rd, EA } },        // 11mm mrrr nnnn nnnn
+	{ 0xc600, 0xc700, "ims",  { EA },              // 11mm m110 nnnn nnnn
+		util::disasm_interface::STEP_COND },
+	{ 0x8700, 0xc700, "bal",  { EA },              // 10mm m111 nnnn nnnn
+		util::disasm_interface::STEP_OVER },
+	{ 0xc700, 0xc700, "b",    { EA } },            // 11mm m111 nnnn nnnn
 	{ 0x8000, 0xc000, "st",   { Rd, EA } },        // 10mm mrrr nnnn nnnn
+	{ 0xc000, 0xc000, "l",    { Rd, EA } },        // 11mm mrrr nnnn nnnn
 
 	// arithmetic
 	{ 0x5000, 0xf808, "cb",   { Rd, Rs, SK } },    // 0101 0ddd kkkk 0sss
@@ -76,8 +76,8 @@ const struct instruction mn1610_table[] =
 	{ 0x5808, 0xf808, "a",    { Rd, Rs, SK } },    // 0101 1ddd kkkk 1sss
 	{ 0x6000, 0xf808, "eor",  { Rd, Rs, SK } },    // 0110 0ddd kkkk 0sss
 	{ 0x6008, 0xf808, "or",   { Rd, Rs, SK } },    // 0110 0ddd kkkk 1sss
-	{ 0x6808, 0xf808, "and",  { Rd, Rs, SK } },    // 0110 1ddd kkkk 1sss
 	{ 0x6800, 0xf808, "lad",  { Rd, Rs, SK } },    // 0110 1ddd kkkk 0sss
+	{ 0x6808, 0xf808, "and",  { Rd, Rs, SK } },    // 0110 1ddd kkkk 1sss
 	{ 0x7000, 0xf808, "dswp", { Rd, Rs, SK } },    // 0111 0ddd kkkk 0sss
 	{ 0x7008, 0xf808, "bswp", { Rd, Rs, SK } },    // 0111 0ddd kkkk 1sss
 	{ 0x7800, 0xf808, "mvb",  { Rd, Rs, SK } },    // 0111 1ddd kkkk 0sss
@@ -88,16 +88,16 @@ const struct instruction mn1610_table[] =
 	{ 0x2008, 0xf80c, "sr",   { Rd, EE, SK } },    // 0010 0rrr kkkk 10ee
 
 	// immediate
-	{ 0x3800, 0xf800, "sbit", { Rd, I4, SK } },    // 0011 1rrr kkkk nnnn
-	{ 0x3000, 0xf800, "rbit", { Rd, I4, SK } },    // 0011 0rrr kkkk nnnn
 	{ 0x2800, 0xf800, "tbit", { Rd, I4, SK } },    // 0010 1rrr kkkk nnnn
-	{ 0x4800, 0xf800, "ai",   { Rd, I4, SK } },    // 0100 1rrr kkkk nnnn
+	{ 0x3000, 0xf800, "rbit", { Rd, I4, SK } },    // 0011 0rrr kkkk nnnn
+	{ 0x3800, 0xf800, "sbit", { Rd, I4, SK } },    // 0011 1rrr kkkk nnnn
 	{ 0x4000, 0xf800, "si",   { Rd, I4, SK } },    // 0100 0rrr kkkk nnnn
+	{ 0x4800, 0xf800, "ai",   { Rd, I4, SK } },    // 0100 1rrr kkkk nnnn
 
 	// i/o
-	{ 0x1800, 0xf800, "rd",   { Rd, Ib } },        // 0001 1rrr nnnn nnnn
-	{ 0x1000, 0xf800, "wt",   { Rd, Ib } },        // 0001 0rrr nnnn nnnn
 	{ 0x0800, 0xf800, "mvi",  { Rd, Ib } },        // 0000 1rrr nnnn nnnn
+	{ 0x1000, 0xf800, "wt",   { Rd, Ib } },        // 0001 0rrr nnnn nnnn
+	{ 0x1800, 0xf800, "rd",   { Rd, Ib } },        // 0001 1rrr nnnn nnnn
 
 	// other
 	{ 0x2000, 0xffff, "h",    { },                 // 0010 0000 0000 0000
