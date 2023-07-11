@@ -48,7 +48,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<votrax_sc01_device> m_votrax;
+	optional_device<sc01_device> m_votrax;
 	optional_device_array<astrocade_io_device, 2> m_astrocade_sound;
 	optional_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_protected_ram;

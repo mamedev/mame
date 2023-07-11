@@ -155,7 +155,7 @@ protected:
 
 private:
 	// devices
-	required_device<votrax_sc01_device> m_votrax;
+	required_device<sc01_device> m_sc01;
 
 	// internal state
 	uint8_t m_last_speech_clock = 0;

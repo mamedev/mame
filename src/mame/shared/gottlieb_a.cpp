@@ -41,7 +41,7 @@ DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device,        
 
 
 //**************************************************************************
-//  PIN 2 SOUND BOARD: 6502 + 6530 + DAC
+//  PIN 2 SOUND BOARD: 6503 + 6530 + DAC
 //**************************************************************************
 
 //-------------------------------------------------
@@ -262,7 +262,7 @@ void gottlieb_sound_p3_device::device_start()
 
 
 //**************************************************************************
-//  REV 1 SOUND BOARD: 6502 + DAC part number MA-309
+//  REV 1 SOUND BOARD: 6502 + DAC; part number MA-309
 //**************************************************************************
 
 //-------------------------------------------------
@@ -347,7 +347,7 @@ INPUT_PORTS_END
 INPUT_PORTS_START( gottlieb_sound_r1_with_votrax )
 	PORT_INCLUDE(gottlieb_sound_r1)
 	PORT_MODIFY("SB1")
-	PORT_BIT( 0x80, 0x80, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("votrax", votrax_sc01_device, request)
+	PORT_BIT( 0x80, 0x80, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("votrax", sc01_device, request)
 INPUT_PORTS_END
 
 
@@ -398,7 +398,7 @@ void gottlieb_sound_r1_device::device_start()
 
 
 //**************************************************************************
-//  REV 1 SOUND BOARD WITH VOTRAX, part number MA-216 (same pcb as MA-309 but with a Votrax SC-01(-A) and support components populated)
+//  REV 1 SOUND/SPEECH BOARD; part number MA-216 (same PCB as MA-309 above but with a Votrax SC-01(-A) and support components populated)
 //**************************************************************************
 
 //-------------------------------------------------
@@ -408,7 +408,7 @@ void gottlieb_sound_r1_device::device_start()
 
 gottlieb_sound_r1_with_votrax_device::gottlieb_sound_r1_with_votrax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: gottlieb_sound_r1_device(mconfig, GOTTLIEB_SOUND_REV1_VOTRAX, tag, owner, clock)
-	, m_votrax(*this, "votrax")
+	, m_sc01(*this, "votrax")
 	, m_last_speech_clock(0)
 {
 }
@@ -425,10 +425,9 @@ void gottlieb_sound_r1_with_votrax_device::device_add_mconfig(machine_config &co
 	m_dac->reset_routes();
 	m_dac->add_route(ALL_OUTPUTS, *this, 0.20);
 
-	// add the VOTRAX
-	VOTRAX_SC01A(config, m_votrax, 720000); // Note: early boards use an SC-01 (reactor, q-bert test version, maybe some early pinball machines?) while later boards (qbert main release, most pinball machines) use an SC-01-A
-	m_votrax->ar_callback().set("nmi", FUNC(input_merger_device::in_w<1>));
-	m_votrax->add_route(ALL_OUTPUTS, *this, 0.80);
+	SC01A(config, m_sc01, 720000); // Note: early boards use an SC-01 (reactor, q-bert test version, maybe some early pinball machines?) while later boards (qbert main release, most pinball machines) use an SC-01-A
+	m_sc01->ar_callback().set("nmi", FUNC(input_merger_device::in_w<1>));
+	m_sc01->add_route(ALL_OUTPUTS, *this, 0.80);
 }
 
 
@@ -459,7 +458,7 @@ void gottlieb_sound_r1_with_votrax_device::device_post_load()
 	gottlieb_sound_r1_device::device_post_load();
 
 	// totally random guesswork; would like to get real measurements on a board
-	m_votrax->set_unscaled_clock(900000 + (m_last_speech_clock - 0xa0) * 9000);
+	m_sc01->set_unscaled_clock(900000 + (m_last_speech_clock - 0xa0) * 9000);
 }
 
 
@@ -470,8 +469,8 @@ void gottlieb_sound_r1_with_votrax_device::device_post_load()
 
 void gottlieb_sound_r1_with_votrax_device::votrax_data_w(uint8_t data)
 {
-	m_votrax->inflection_w(data >> 6);
-	m_votrax->write(~data & 0x3f);
+	m_sc01->inflection_w(data >> 6);
+	m_sc01->write(~data & 0x3f);
 }
 
 
@@ -491,7 +490,7 @@ void gottlieb_sound_r1_with_votrax_device::speech_clock_dac_w(uint8_t data)
 		logerror("clock = %02X\n", data);
 
 		// totally random guesswork; would like to get real measurements on a board
-		m_votrax->set_unscaled_clock(950000 + (data - 0xa0) * 5500);
+		m_sc01->set_unscaled_clock(950000 + (data - 0xa0) * 5500);
 		m_last_speech_clock = data;
 	}
 }

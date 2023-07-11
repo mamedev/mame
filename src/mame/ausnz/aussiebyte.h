@@ -150,7 +150,7 @@ private:
 	optional_device<floppy_connector> m_floppy1;
 	required_device<mc6845_device> m_crtc;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<votrax_sc01_device> m_votrax;
+	required_device<sc01a_device> m_votrax;
 	required_device<msm5832_device> m_rtc;
 };
 
