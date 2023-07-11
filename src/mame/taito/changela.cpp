@@ -462,44 +462,14 @@ void changela_state::draw_river(bitmap_ind16 &bitmap, int sy)
 		int tile_v = ((math_train[3] & 0x0c) >> 2) | ((math_train[2] & 0x0f) << 2) | ((math_train[1] & 0x07) << 6);
 		int tile_h = ((math_train[7] & 0x0f) | ((math_train[6] & 0x0f) << 4) | ((math_train[5] & 0x01) << 8)) + 4;
 
-		// Burst of 16 10Mhz Clocks
-		for (int sx = 0; sx < 16; sx++)
+		for (int sx = 0; sx < 256; sx++)
 		{
-			for (int i = 0; i < 1; i++)
+			for (int i = 0; i < ((sx < 24) ? 2 : 4); i++)
 			{
 				if (h_count > 0xff)
 				{
 					h_count = ((math_train[9] & 0x0f) >> 1) | ((math_train[8] & 0x0f) << 3) | 0x80;
 					tile_h = (tile_h + 1) & 0xfff;
-
-					// Skip one count if LSB is high
-					if (((math_train[9] & 0x01) && (tile_h & 0x01)))
-						h_count--;
-				}
-				else
-					h_count++;
-			}
-
-			int ram_addr = ((tile_h & 0x1f8) >> 3) | ((tile_v & 0x1f0) << 2);
-			int rom_addr = ((tile_h & 0x06) >> 1) | ((tile_v & 0x0f) << 2) | ((TILE_RAM[ram_addr] & 0x7f) << 6);
-
-			int col;
-			if (tile_h & 0x01)
-				col = TILE_ROM[rom_addr] & 0x0f;
-			else
-				col = (TILE_ROM[rom_addr] & 0xf0) >> 4;
-
-			bitmap.pix(sy, sx) = col;
-		}
-
-		for (int sx = 16; sx < 256; sx++)
-		{
-			for (int i = 0; i < 4; i++)
-			{
-				if (h_count > 0xff)
-				{
-					h_count = ((math_train[9] & 0x0f) >> 1) | ((math_train[8] & 0x0f) << 3) | 0x80;
-					tile_h = (tile_h+1) & 0xfff;
 
 					// Skip one count if LSB is high
 					if (((math_train[9] & 0x01) && (tile_h & 0x01)))
@@ -686,10 +656,9 @@ void changela_state::draw_tree(bitmap_ind16 &bitmap, int sy, int tree_num)
 	tile_h = ((math_train[7] & 0x0f) | ((math_train[6] & 0x0f) << 4) | ((math_train[5] & 0x01) << 8)) + 4;
 	all_ff = 1;
 
-	// Burst of 16 10Mhz clocks
-	for (int sx = 0; sx < 16; sx++)
+	for (int sx = 0; sx < 256; sx++)
 	{
-		for (int i = 0; i < 1; i++)
+		for (int i = 0; i < ((sx < 24) ? 2 : 4); i++)
 		{
 			if (h_count > 0xff)
 			{
@@ -726,47 +695,9 @@ void changela_state::draw_tree(bitmap_ind16 &bitmap, int sy, int tree_num)
 		}
 	}
 
-	for (int sx = 16; sx < 256; sx++)
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			if (h_count > 0xff)
-			{
-				h_count = ((math_train[9] & 0x0f) >> 1) | ((math_train[8] & 0x0f) << 3) | 0x80;
-				tile_h = (tile_h+1) & 0xfff;
-
-				// Skip one count if LSB is high
-				if (((math_train[9] & 0x01) && (tile_h & 0x01)))
-					h_count--;
-			}
-			else
-				h_count++;
-		}
-
-		int ram_addr = ((tile_h & 0x1f8) >> 3) | ((tile_v & 0x1f0) << 2);
-		int rom_addr = ((tile_h & 0x06) >> 1) | ((tile_v & 0x0f) << 2) | ((TILE_RAM[ram_addr] & 0x7f) << 6);
-
-		if (!(m_v_count_tree & 0x80) && (m_tree_en & (0x01 << tree_num)) && ((TILE_ROM[rom_addr] & 0xf0) == 0))
-			m_tree_on[tree_num] = 1;
-
-		if (m_tree_on[tree_num])
-		{
-			int col;
-			if (tile_h & 0x01)
-				col = TILE_ROM[rom_addr] & 0x0f;
-			else
-				col = (TILE_ROM[rom_addr] & 0xf0) >> 4;
-
-			if (col != 0x0f)
-				all_ff = 0;
-
-			if (col != 0x0f && col != 0x00)
-				bitmap.pix(sy, sx) = col | 0x30;
-		}
-	}
-
 	// Tree on only stays high if a pixel that is not 0xf is encountered, because any non 0xf pixel sets U56 high
-	if (all_ff) m_tree_on[tree_num] = 0;
+	if (all_ff)
+		m_tree_on[tree_num] = 0;
 }
 
 
