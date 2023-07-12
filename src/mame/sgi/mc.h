@@ -2,14 +2,14 @@
 // copyright-holders:Ryan Holtz
 /*********************************************************************
 
-    sgi.h
+    mc.h
 
     Silicon Graphics MC (Memory Controller) code
 
 *********************************************************************/
 
-#ifndef MAME_SGI_SGI_H
-#define MAME_SGI_SGI_H
+#ifndef MAME_SGI_MC_H
+#define MAME_SGI_MC_H
 
 #pragma once
 
@@ -115,4 +115,4 @@ private:
 DECLARE_DEVICE_TYPE(SGI_MC, sgi_mc_device)
 
 
-#endif // MAME_SGI_SGI_H
+#endif // MAME_SGI_MC_H

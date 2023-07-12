@@ -67,7 +67,7 @@
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
-#include "sgi.h"
+#include "mc.h"
 #include "vino.h"
 #include "machine/saa7191.h"
 #include "machine/wd33c9x.h"
