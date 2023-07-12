@@ -45,6 +45,7 @@ private:
 	u8 m_memory_size = 0;
 	u8 m_video_control = 0;
 	bool m_ext_gc_unlock = false;
+	bool m_ega_compatible = false;
 };
 
 class wd90c00_vga_device : public pvga1a_vga_device

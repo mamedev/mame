@@ -77,9 +77,10 @@ void pvga1a_vga_device::device_reset()
 	m_memory_size = 0;
 	m_video_control = 0; // Really &= 0x8; at POR according to docs
 	m_video_select = 0;
+	m_ega_compatible = false;
 	m_crtc_lock = 0;
 	m_ext_gc_unlock = false;
-	m_ext_gc_view.select(0);
+	m_ext_gc_view.select(1);
 }
 
 uint8_t pvga1a_vga_device::mem_r(offs_t offset)
@@ -110,12 +111,28 @@ void pvga1a_vga_device::gc_map(address_map &map)
 			LOGLOCKED("Attempt to R ext. GC register offset %02x while locked\n", offset + 9);
 			return 0xff;
 		})
+	).unmapw();
+	m_ext_gc_view[1](0x09, 0x0a).r(FUNC(pvga1a_vga_device::address_offset_r)).unmapw();
+	m_ext_gc_view[1](0x0b, 0x0b).r(FUNC(pvga1a_vga_device::memory_size_r)).unmapw();
+	m_ext_gc_view[1](0x0c, 0x0c).r(FUNC(pvga1a_vga_device::video_select_r)).unmapw();
+	m_ext_gc_view[1](0x0d, 0x0d).r(FUNC(pvga1a_vga_device::crtc_lock_r)).unmapw();
+	m_ext_gc_view[1](0x0e, 0x0e).r(FUNC(pvga1a_vga_device::video_control_r)).unmapw();
+	m_ext_gc_view[2](0x09, 0x0e).lr8(
+		NAME([this] (offs_t offset) {
+			LOGLOCKED("Attempt to R ext. GC register offset %02x while locked\n", offset + 9);
+			return 0xff;
+		})
 	);
-	m_ext_gc_view[1](0x09, 0x0a).rw(FUNC(pvga1a_vga_device::address_offset_r), FUNC(pvga1a_vga_device::address_offset_w));
-	m_ext_gc_view[1](0x0b, 0x0b).rw(FUNC(pvga1a_vga_device::memory_size_r), FUNC(pvga1a_vga_device::memory_size_w));
-	m_ext_gc_view[1](0x0c, 0x0c).rw(FUNC(pvga1a_vga_device::video_select_r), FUNC(pvga1a_vga_device::video_select_w));
-	m_ext_gc_view[1](0x0d, 0x0d).rw(FUNC(pvga1a_vga_device::crtc_lock_r), FUNC(pvga1a_vga_device::crtc_lock_w));
-	m_ext_gc_view[1](0x0e, 0x0e).rw(FUNC(pvga1a_vga_device::video_control_r), FUNC(pvga1a_vga_device::video_control_w));
+	m_ext_gc_view[2](0x09, 0x0a).w(FUNC(pvga1a_vga_device::address_offset_w));
+	m_ext_gc_view[2](0x0b, 0x0b).w(FUNC(pvga1a_vga_device::memory_size_w));
+	m_ext_gc_view[2](0x0c, 0x0c).w(FUNC(pvga1a_vga_device::video_select_w));
+	m_ext_gc_view[2](0x0d, 0x0d).w(FUNC(pvga1a_vga_device::crtc_lock_w));
+	m_ext_gc_view[2](0x0e, 0x0e).w(FUNC(pvga1a_vga_device::video_control_w));
+	m_ext_gc_view[3](0x09, 0x0a).rw(FUNC(pvga1a_vga_device::address_offset_r), FUNC(pvga1a_vga_device::address_offset_w));
+	m_ext_gc_view[3](0x0b, 0x0b).rw(FUNC(pvga1a_vga_device::memory_size_r), FUNC(pvga1a_vga_device::memory_size_w));
+	m_ext_gc_view[3](0x0c, 0x0c).rw(FUNC(pvga1a_vga_device::video_select_r), FUNC(pvga1a_vga_device::video_select_w));
+	m_ext_gc_view[3](0x0d, 0x0d).rw(FUNC(pvga1a_vga_device::crtc_lock_r), FUNC(pvga1a_vga_device::crtc_lock_w));
+	m_ext_gc_view[3](0x0e, 0x0e).rw(FUNC(pvga1a_vga_device::video_control_r), FUNC(pvga1a_vga_device::video_control_w));
 	map(0x0f, 0x0f).rw(FUNC(pvga1a_vga_device::ext_gc_status_r), FUNC(pvga1a_vga_device::ext_gc_unlock_w));
 }
 
@@ -225,7 +242,7 @@ u8 pvga1a_vga_device::crtc_lock_r(offs_t offset)
 
 void pvga1a_vga_device::crtc_lock_w(offs_t offset, u8 data)
 {
-	LOG("PR3 CRTC lock W\n", data);
+	LOG("PR3 CRTC lock W %02x\n", data);
 	m_crtc_lock = data;
 }
 
@@ -252,6 +269,9 @@ void pvga1a_vga_device::video_control_w(offs_t offset, u8 data)
 	LOG("PR4 Video Control W %02x\n", data);
 	m_video_control = data;
 	svga.rgb8_en = BIT(data, 0);
+	m_ega_compatible = bool(BIT(data, 1));
+	m_ext_gc_view.select(m_ext_gc_unlock << 1 | !m_ega_compatible);
+
 }
 
 /*
@@ -271,7 +291,7 @@ void pvga1a_vga_device::ext_gc_unlock_w(offs_t offset, u8 data)
 {
 	m_ext_gc_unlock = (data & 0x7) == 5;
 	LOGLOCKED("PR5 %s state (%02x)\n", m_ext_gc_unlock ? "unlock" : "lock", data);
-	m_ext_gc_view.select(m_ext_gc_unlock);
+	m_ext_gc_view.select(m_ext_gc_unlock << 1 | !m_ega_compatible);
 }
 
 /**************************************
