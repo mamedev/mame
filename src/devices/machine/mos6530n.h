@@ -136,16 +136,16 @@ protected:
 	uint8_t irq_r();
 	void timer_off_w(offs_t offset, uint8_t data);
 	void timer_on_w(offs_t offset, uint8_t data);
-	void edge_w(uint8_t data);
+	void edge_w(offs_t offset, uint8_t data);
 
 	memory_share_creator<uint8_t> m_ram;
 	optional_region_ptr<uint8_t> m_rom;
 
 	devcb_write_line m_irq_cb;
-	devcb_read8    m_in8_pa_cb;
-	devcb_write8   m_out8_pa_cb;
-	devcb_read8    m_in8_pb_cb;
-	devcb_write8   m_out8_pb_cb;
+	devcb_read8 m_in8_pa_cb;
+	devcb_write8 m_out8_pa_cb;
+	devcb_read8 m_in8_pb_cb;
+	devcb_write8 m_out8_pb_cb;
 	devcb_read_line::array<8> m_in_pa_cb;
 	devcb_write_line::array<8> m_out_pa_cb;
 	devcb_read_line::array<8> m_in_pb_cb;
