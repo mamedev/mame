@@ -283,7 +283,9 @@ protected:
 		CRTC_REG,
 		GC_REG,
 		SEQ_REG,
-		ATC_REG
+		ATC_REG,
+		// pointer for subclasses to declare further spaces
+		EXT_REG
 	};
 
 	address_space_config m_main_if_space_config;

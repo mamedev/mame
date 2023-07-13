@@ -8,7 +8,8 @@ Paradise / Western Digital (S)VGA chipsets
 - PVGA1A-JK / WD90C90-JK (same as PVGA1A with extra connectors?)
 - WD90C00-JK (extended CRTC regs)
 - WD90C11-LR / WD90C11A-LR (extended sequencer regs)
-- WD90C30-LR / WD90C31-LR / WD90C31-ZS / WD90C31A-LR / WD90C31A-ZS
+- WD90C30-LR
+- WD90C31-LR / WD90C31-ZS / WD90C31A-LR / WD90C31A-ZS
 - WD90C33-ZZ
 
 TODO:
@@ -16,7 +17,10 @@ TODO:
 - WD90C26A (apple/macpwrbk030.cpp macpb180c, no ISA)
 - WD9710-MZ (PCI + MPEG-1, a.k.a. Pipeline 9710 / 9712)
 
-- Memory Data pins (MD) & CNF
+- 'C31A difference compared to 'C31 (just "reserved" PR35?);
+- Emulate new features of 'C31 & 'C33;
+- win95 can't draw with 'C33 properly when in VESA modes;
+- Memory Data pins (MD) a.k.a. CNF (64 of them across the device tree)
 - /EBROM signal (for enabling ROM readback)
 - AIDA16 & UniVBE VESA suite detects 'C11 as 'C30, is the ROM mislabeled?
 - CRTC group locks;
@@ -41,10 +45,13 @@ TODO:
 #define LOGLOCKED(...)     LOGMASKED(LOG_LOCKED,  __VA_ARGS__)
 
 
-DEFINE_DEVICE_TYPE(PVGA1A, pvga1a_vga_device, "pvga1a_vga", "Paradise Systems PVGA1A")
-DEFINE_DEVICE_TYPE(WD90C00, wd90c00_vga_device, "wd90c00_vga", "Western Digital WD90C00 \"PVGA1B\" VGA Controller")
-DEFINE_DEVICE_TYPE(WD90C11A, wd90c11a_vga_device, "wd90c11a_vga", "Western Digital WD90C11A \"PVGA1C\" VGA Controller")
-DEFINE_DEVICE_TYPE(WD90C30, wd90c30_vga_device, "wd90c30_vga", "Western Digital WD90C30 \"PVGA1D\" VGA Controller")
+DEFINE_DEVICE_TYPE(PVGA1A,   pvga1a_vga_device,    "pvga1a_vga",   "Paradise Systems PVGA1A")
+DEFINE_DEVICE_TYPE(WD90C00,  wd90c00_vga_device,   "wd90c00_vga",  "Western Digital WD90C00 \"PVGA1B\" VGA Controller")
+DEFINE_DEVICE_TYPE(WD90C11A, wd90c11a_vga_device,  "wd90c11a_vga", "Western Digital WD90C11A \"PVGA1C\" VGA Controller")
+DEFINE_DEVICE_TYPE(WD90C30,  wd90c30_vga_device,   "wd90c30_vga",  "Western Digital WD90C30 \"PVGA1D\" VGA Controller")
+DEFINE_DEVICE_TYPE(WD90C31,  wd90c31_vga_device,   "wd90c31_vga",  "Western Digital WD90C31 VGA Controller")
+DEFINE_DEVICE_TYPE(WD90C33,  wd90c33_vga_device,   "wd90c33_vga",  "Western Digital WD90C33 VGA Controller")
+
 
 pvga1a_vga_device::pvga1a_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, type, tag, owner, clock)
@@ -357,7 +364,8 @@ void wd90c00_vga_device::recompute_params()
 		case 1: xtal = XTAL(28'636'363).value() * multiplier; break;
 		// VCLK2, selected in 800x600 modes
 		case 2:
-		// TODO: wd90c30 selects this for 1024x768 interlace mode (~40 Hz)
+		// TODO: wd90c30 selects this for 1024x768 interlace mode 
+		// (~40 Hz, should be 43 according to defined video clocks in WD9710 driver .inf)
 		default:
 			xtal = XTAL(42'000'000).value();
 			break;
@@ -626,7 +634,7 @@ void wd90c30_vga_device::sequencer_map(address_map &map)
 	wd90c11a_vga_device::sequencer_map(map);
 //	m_ext_seq_view[1](0x13, 0x13) PR33 DRAM Timing and zero Wait State Control
 //	m_ext_seq_view[1](0x14, 0x14) PR34 Video Memory Mapping
-//	m_ext_seq_view[1](0x15, 0x15) PR35 USR0, USR1 Output Select
+//	m_ext_seq_view[1](0x15, 0x15) PR35 USR0, USR1 Output Select, <reserved> on 'C31A
 }
 
 /*
@@ -668,4 +676,102 @@ void wd90c30_vga_device::vert_timing_overflow_w(offs_t offset, u8 data)
 	m_pr18 &= ~0xf0;
 	m_pr18 |= data & 0xf0;
 	recompute_params();
+}
+
+/**************************************
+ *
+ * Western Digital WD90C31
+ *
+ *************************************/
+
+wd90c31_vga_device::wd90c31_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: wd90c30_vga_device(mconfig, type, tag, owner, clock)
+{
+}
+
+wd90c31_vga_device::wd90c31_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: wd90c31_vga_device(mconfig, WD90C31, tag, owner, clock)
+{
+}
+
+// maps at $23c0 in normal conditions, 16-bit
+void wd90c31_vga_device::ext_io_map(address_map &map)
+{
+//	map(0x00, 0x01) Index Control register
+//	map(0x02, 0x03) Register Access port
+//	map(0x04, 0x05) BITBLT I/O Port
+//	map(0x06, 0x07) <reserved>
+}
+
+/*
+ * Index Control register
+ *
+ * xx-- ---- ---- ---- <reserved>
+ * --x- ---- ---- ---- (r/o) signals if an attempt to an unhandled device index is selected
+ * ---x ---- ---- ---- Auto-increment disable
+ * ---- xxxx ---- ---- Device register Index
+ * ---- ---- xxxx xxxx Register block pointer
+ * ---- ---- 0000 0000 System Control
+ * ---- ---- 0000 0001 BITBLT
+ * ---- ---- 0000 0010 HW Cursor
+ *
+ */
+
+// System Control Register Block
+// ext_io_view[0](0x00, 0x00) IRQ status
+// BITBLT
+// ext_io_view[1](0x00, 0x01) Control
+// ext_io_view[1](0x02, 0x03) Source
+// ext_io_view[1](0x04, 0x05) Destination
+// ext_io_view[1](0x06, 0x07) Dimension X/Y
+// ext_io_view[1](0x08, 0x08) Row pitch
+// ext_io_view[1](0x09, 0x09) ROP type
+// ext_io_view[1](0x0a, 0x0a) Foreground Color
+// ext_io_view[1](0x0b, 0x0b) Background Color
+// ext_io_view[1](0x0c, 0x0c) Transparency Color
+// ext_io_view[1](0x0d, 0x0d) Transparency Mask
+// ext_io_view[1](0x0e, 0x0e) Map and Plane Mask
+// HW Cursor
+// ext_io_view[2](0x00, 0x00) Control
+// ext_io_view[2](0x01, 0x02) Pattern Address
+// ext_io_view[2](0x03, 0x03) Primary Color
+// ext_io_view[2](0x04, 0x04) Secondary Color
+// ext_io_view[2](0x05, 0x05) Origin
+// ext_io_view[2](0x06, 0x07) Display Position X/Y
+// ext_io_view[2](0x08, 0x08) Auxiliary Color
+// NOTE: on shutdown Win 95 will try to read HW Cursor Control even if disabled (?)
+
+/**************************************
+ *
+ * Western Digital WD90C33
+ *
+ *************************************/
+
+wd90c33_vga_device::wd90c33_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: wd90c31_vga_device(mconfig, type, tag, owner, clock)
+{
+}
+
+wd90c33_vga_device::wd90c33_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: wd90c33_vga_device(mconfig, WD90C33, tag, owner, clock)
+{
+}
+
+void wd90c33_vga_device::ext_io_map(address_map &map)
+{
+	wd90c31_vga_device::ext_io_map(map);
+//	map(0x04, 0x07) Host Bit Block Transfer (HBLT), same as above but 32-bit?
+//	map(0x08, 0x09) K1 Line Draw Constant 1
+//	map(0x0a, 0x0b) K2 Line Draw Constant 2
+//	map(0x0c, 0x0d) ET Line Draw Error Term
+//	map(0x0e, 0x0f) Command Buffer and Interrupt
+}
+
+// maps at $23d0 in normal conditions, 8-bit
+void wd90c33_vga_device::localbus_if_map(address_map &map)
+{
+//	map(0x00, 0x00) configuration
+//	map(0x01, 0x01) wait state
+//	map(0x02, 0x02) Video Memory Mapping Register (MMIO)
+//	map(0x03, 0x03) (r/o) Status Register
 }

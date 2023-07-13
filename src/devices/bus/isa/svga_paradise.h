@@ -164,7 +164,7 @@ protected:
 	void io_isa_map(address_map &map);
 
 private:
-	required_device<wd90c30_vga_device> m_vga;
+	required_device<wd90c31_vga_device> m_vga;
 };
 
 class isa16_wd90c31a_lr_device :
@@ -186,7 +186,7 @@ protected:
 	void io_isa_map(address_map &map);
 
 private:
-	required_device<wd90c30_vga_device> m_vga;
+	required_device<wd90c31_vga_device> m_vga;
 };
 
 class isa16_wd90c31a_zs_device :
@@ -208,7 +208,7 @@ protected:
 	void io_isa_map(address_map &map);
 
 private:
-	required_device<wd90c30_vga_device> m_vga;
+	required_device<wd90c31_vga_device> m_vga;
 };
 
 class isa16_wd90c33_zz_device :
@@ -230,7 +230,7 @@ protected:
 	void io_isa_map(address_map &map);
 
 private:
-	required_device<wd90c30_vga_device> m_vga;
+	required_device<wd90c33_vga_device> m_vga;
 };
 
 // device type definition

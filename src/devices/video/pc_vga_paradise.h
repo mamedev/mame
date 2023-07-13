@@ -128,9 +128,34 @@ private:
 	u8 m_pr18 = 0;
 };
 
+class wd90c31_vga_device : public wd90c30_vga_device
+{
+public:
+	wd90c31_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void ext_io_map(address_map &map);
+
+protected:
+	wd90c31_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class wd90c33_vga_device : public wd90c31_vga_device
+{
+public:
+	wd90c33_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void ext_io_map(address_map &map) override;
+	void localbus_if_map(address_map &map);
+
+protected:
+	wd90c33_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+};
+
 DECLARE_DEVICE_TYPE(PVGA1A, pvga1a_vga_device)
 DECLARE_DEVICE_TYPE(WD90C00, wd90c00_vga_device)
 DECLARE_DEVICE_TYPE(WD90C11A, wd90c11a_vga_device)
 DECLARE_DEVICE_TYPE(WD90C30, wd90c30_vga_device)
+DECLARE_DEVICE_TYPE(WD90C31, wd90c31_vga_device)
+DECLARE_DEVICE_TYPE(WD90C33, wd90c33_vga_device)
 
 #endif // MAME_VIDEO_PC_VGA_PARADISE_H
