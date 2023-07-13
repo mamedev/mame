@@ -24,11 +24,12 @@ protected:
 	virtual void device_reset() override;
 	virtual void gc_map(address_map &map) override;
 
-	memory_view m_ext_gc_view;
-
 	u8 m_video_select = 0;
 	u8 m_crtc_lock = 0;
 private:
+	virtual u8 gc_data_r(offs_t offset) override;
+	virtual void gc_data_w(offs_t offset, u8 data) override;
+
 	u8 address_offset_r(offs_t offset);
 	void address_offset_w(offs_t offset, u8 data);
 	u8 memory_size_r(offs_t offset);
@@ -45,7 +46,7 @@ private:
 	u8 m_memory_size = 0;
 	u8 m_video_control = 0;
 	bool m_ext_gc_unlock = false;
-	bool m_ega_compatible = false;
+	bool m_ega_compatible_mode = false;
 };
 
 class wd90c00_vga_device : public pvga1a_vga_device
