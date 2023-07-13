@@ -66,6 +66,7 @@ public:
 	void init_mkyawdim2();
 	void init_shimpact();
 	void init_hiimpact();
+	void init_mkla3bl();
 	void init_mkyturbo();
 	void init_term2la2();
 
