@@ -35,6 +35,7 @@ public:
 	void reset_key_w(int state);
 	void right_shift_w(int state);
 	void repeat_key_w(int state);
+	void break_key_w(int state);
 	void serial_irq_w(int state);
 
 protected:
@@ -100,6 +101,7 @@ private:
 	bool     m_reset_key;
 	bool     m_keyboard_irq_raised;
 	bool     m_serial_irq_raised;
+	bool     m_break_key_irq_raised;
 };
 
 class heath_super19_tlb_device : public heath_tlb_device
