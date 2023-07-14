@@ -145,7 +145,7 @@ void scorpion_state::scorpion_update_memory()
 	}
 	else
 	{
-		const u8 rom_page = BIT(m_port_1ffd_data, 1)
+		const u8 rom_page = (BIT(m_port_1ffd_data, 1) && !m_nmi_pending)
 			? 2
 			: ((m_beta->is_active() << 1) | BIT(m_port_7ffd_data, 4));
 
@@ -220,17 +220,18 @@ u8 scorpion_state::beta_disable_r(offs_t offset)
 	if (!machine().side_effects_disabled())
 	{
 		if (m_is_m1_even && (m_maincpu->total_cycles() & 1)) m_maincpu->eat_cycles(1);
-		if (m_beta->started() && m_beta->is_active())
-		{
-			m_beta->disable();
-			scorpion_update_memory();
-		}
 		if (m_nmi_pending)
 		{
 			m_port_1ffd_data |= 0x02;
+			m_beta->enable();
 			scorpion_update_memory();
 			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			m_nmi_pending = 0;
+		}
+		else if (m_beta->started() && m_beta->is_active())
+		{
+			m_beta->disable();
+			scorpion_update_memory();
 		}
 	}
 	return m_program.read_byte(offset + 0x4000);
