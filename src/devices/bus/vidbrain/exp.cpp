@@ -37,7 +37,7 @@ device_videobrain_expansion_card_interface::device_videobrain_expansion_card_int
 
 
 //-------------------------------------------------
-//  videobrain_roml_pointer - get low ROM pointer
+//  videobrain_rom_pointer - get ROM pointer
 //-------------------------------------------------
 
 uint8_t* device_videobrain_expansion_card_interface::videobrain_rom_pointer(running_machine &machine, size_t size)
@@ -45,7 +45,6 @@ uint8_t* device_videobrain_expansion_card_interface::videobrain_rom_pointer(runn
 	if (m_rom.empty())
 	{
 		m_rom.resize(size);
-
 		m_rom_mask = size - 1;
 	}
 
@@ -62,7 +61,6 @@ uint8_t* device_videobrain_expansion_card_interface::videobrain_ram_pointer(runn
 	if (m_ram.empty())
 	{
 		m_ram.resize(size);
-
 		m_ram_mask = size - 1;
 	}
 

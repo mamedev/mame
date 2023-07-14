@@ -59,7 +59,6 @@ private:
 	uint8_t keyboard_r();
 	void sound_w(uint8_t data);
 
-	void ext_int_w(int state);
 	void hblank_w(int state);
 	uint8_t memory_read_byte(offs_t offset);
 
@@ -82,7 +81,7 @@ private:
 
 	// keyboard state
 	uint8_t m_keylatch = 0;
-	int m_joy_enable = 0;
+	bool m_joy_enable = 0;
 
 	// sound state
 	int m_sound_clk = 0;

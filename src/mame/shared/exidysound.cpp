@@ -464,7 +464,8 @@ uint8_t exidy_sound_device::sh6840_r(offs_t offset)
 
 		// offsets 2,4,6 read channel 0,1,2 MSBs and latch the LSB
 		case 2: case 4: case 6:
-			m_sh6840_LSB_latch = m_sh6840_timer[((offset>>1)-1)].counter.b.l;
+			if (!machine().side_effects_disabled())
+				m_sh6840_LSB_latch = m_sh6840_timer[((offset>>1)-1)].counter.b.l;
 			return m_sh6840_timer[((offset>>1)-1)].counter.b.h;
 
 		// offsets 3,5,7 read the LSB latch

@@ -17,8 +17,7 @@
 
 /*
 
-    TODO:
-
+TODO:
     - wait states (UV201: 2.9us, memory except RES1: 1.65us)
     - interlaced video?
     - pinball background colors
@@ -28,7 +27,6 @@
     - video interrupts
     - R-2R ladder DAC
     - reset on cartridge unload
-    - use machine/f3853.h
     - joystick scan timer 555
     - expander 1 (F3870 CPU, cassette, RS-232)
     - expander 2 (modem)
@@ -59,13 +57,8 @@ Using the system:
 
 #include "vidbrain.lh"
 
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define LOG         1
+//#define VERBOSE (LOG_GENERAL)
+#include "logmacro.h"
 
 
 
@@ -94,7 +87,7 @@ void vidbrain_state::keyboard_w(uint8_t data)
 
 	*/
 
-	if (LOG) logerror("Keyboard %02x\n", data);
+	LOG("Keyboard %02x\n", data);
 
 	m_keylatch = data;
 }
@@ -155,7 +148,7 @@ void vidbrain_state::sound_w(uint8_t data)
 
 	*/
 
-	if (LOG) logerror("Sound %02x\n", data);
+	LOG("Sound %02x\n", data);
 
 	// sound clock
 	int sound_clk = BIT(data, 4);
@@ -168,7 +161,7 @@ void vidbrain_state::sound_w(uint8_t data)
 	m_sound_clk = sound_clk;
 
 	// joystick enable
-	m_joy_enable = BIT(data, 7);
+	m_joy_enable = !BIT(data, 7);
 }
 
 
@@ -202,7 +195,7 @@ void vidbrain_state::vidbrain_io(address_map &map)
 {
 	map(0x00, 0x00).w(FUNC(vidbrain_state::keyboard_w));
 	map(0x01, 0x01).rw(FUNC(vidbrain_state::keyboard_r), FUNC(vidbrain_state::sound_w));
-	map(0x0c, 0x0f).rw(F3853_TAG, FUNC(f3853_device::read), FUNC(f3853_device::write));
+	map(0x0c, 0x0f).rw(m_smi, FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 
 
@@ -217,7 +210,7 @@ void vidbrain_state::vidbrain_io(address_map &map)
 
 INPUT_CHANGED_MEMBER( vidbrain_state::trigger_reset )
 {
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -320,28 +313,20 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-void vidbrain_state::ext_int_w(int state)
-{
-	if (state)
-	{
-		m_smi->ext_int_w(1);
-	}
-}
-
 void vidbrain_state::hblank_w(int state)
 {
 	if (state && m_joy_enable)
 	{
 		uint8_t joydata = 0;
 
-		if (!BIT(m_keylatch, 0)) joydata = m_joy1_x->read();
-		if (!BIT(m_keylatch, 1)) joydata = m_joy1_y->read();
-		if (!BIT(m_keylatch, 2)) joydata = m_joy2_x->read();
-		if (!BIT(m_keylatch, 3)) joydata = m_joy2_y->read();
-		if (!BIT(m_keylatch, 4)) joydata = m_joy3_x->read();
-		if (!BIT(m_keylatch, 5)) joydata = m_joy3_y->read();
-		if (!BIT(m_keylatch, 6)) joydata = m_joy4_x->read();
-		if (!BIT(m_keylatch, 7)) joydata = m_joy4_y->read();
+		if (BIT(m_keylatch, 0)) joydata |= m_joy1_x->read();
+		if (BIT(m_keylatch, 1)) joydata |= m_joy1_y->read();
+		if (BIT(m_keylatch, 2)) joydata |= m_joy2_x->read();
+		if (BIT(m_keylatch, 3)) joydata |= m_joy2_y->read();
+		if (BIT(m_keylatch, 4)) joydata |= m_joy3_x->read();
+		if (BIT(m_keylatch, 5)) joydata |= m_joy3_y->read();
+		if (BIT(m_keylatch, 6)) joydata |= m_joy4_x->read();
+		if (BIT(m_keylatch, 7)) joydata |= m_joy4_y->read();
 
 		// NE555 in monostable mode
 		// R = 3K9 + 100K linear pot
@@ -372,7 +357,6 @@ uint8_t vidbrain_state::memory_read_byte(offs_t offset)
 TIMER_CALLBACK_MEMBER(vidbrain_state::joystick_tick)
 {
 	m_uv->ext_int_w(0);
-	m_smi->ext_int_w(0);
 }
 
 
@@ -411,7 +395,7 @@ void vidbrain_state::vidbrain(machine_config &config)
 	F8(config, m_maincpu, XTAL(4'000'000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vidbrain_state::vidbrain_mem);
 	m_maincpu->set_addrmap(AS_IO, &vidbrain_state::vidbrain_io);
-	m_maincpu->set_irq_acknowledge_callback(F3853_TAG, FUNC(f3853_device::int_acknowledge));
+	m_maincpu->set_irq_acknowledge_callback(m_smi, FUNC(f3853_device::int_acknowledge));
 
 	// video hardware
 	config.set_default_layout(layout_vidbrain);
@@ -421,13 +405,13 @@ void vidbrain_state::vidbrain(machine_config &config)
 	screen.set_raw(3636363, 232, 18, 232, 262, 21, 262);
 	UV201(config, m_uv, 3636363);
 	m_uv->set_screen(SCREEN_TAG);
-	m_uv->ext_int_wr_callback().set(FUNC(vidbrain_state::ext_int_w));
+	m_uv->ext_int_wr_callback().set(m_smi, FUNC(f3853_device::ext_int_w));
 	m_uv->hblank_wr_callback().set(FUNC(vidbrain_state::hblank_w));
 	m_uv->db_rd_callback().set(FUNC(vidbrain_state::memory_read_byte));
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	DAC_2BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.167); // 74ls74.u16 + 120k + 56k
+	DAC_2BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 74ls74.u16 + 120k + 56k
 
 	// devices
 	F3853(config, m_smi, XTAL(4'000'000)/2);
@@ -455,7 +439,7 @@ void vidbrain_state::vidbrain(machine_config &config)
 
 ROM_START( vidbrain )
 	ROM_REGION( 0x800, "res1", 0 )
-	ROM_LOAD( "uvres 1n.d67", 0x000, 0x800, CRC(065fe7c2) SHA1(9776f9b18cd4d7142e58eff45ac5ee4bc1fa5a2a) )
+	ROM_LOAD( "uvres_1n.d67", 0x000, 0x800, CRC(065fe7c2) SHA1(9776f9b18cd4d7142e58eff45ac5ee4bc1fa5a2a) )
 
 	ROM_REGION( 0x800, "res2", 0 )
 	ROM_LOAD( "resn2.e5", 0x000, 0x800, CRC(1d85d7be) SHA1(26c5a25d1289dedf107fa43aa8dfc14692fd9ee6) )
