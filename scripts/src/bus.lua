@@ -4604,6 +4604,8 @@ if (BUSES["ZXBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/spectrum/zxbus.h",
 		MAME_DIR .. "src/devices/bus/spectrum/neogs.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/neogs.h",
+		MAME_DIR .. "src/devices/bus/spectrum/smuc.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/smuc.h",
 	}
 end
 
