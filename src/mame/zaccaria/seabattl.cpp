@@ -88,8 +88,6 @@ private:
 	void score2_display_w(uint8_t data);
 	template <unsigned N> void digit_w(uint8_t data) { m_7segs[N] = data; }
 
-	INTERRUPT_GEN_MEMBER(seabattl_interrupt);
-
 	void seabattl_palette(palette_device &palette) const;
 	uint32_t screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void seabattl_data_map(address_map &map);
@@ -260,8 +258,6 @@ void seabattl_state::seabattl_map(address_map &map)
 {
 	map(0x0000, 0x13ff).rom();
 	map(0x2000, 0x33ff).rom();
-	map(0x4000, 0x53ff).rom();
-	map(0x6000, 0x73ff).rom();
 	map(0x1400, 0x17ff).mirror(0x2000).ram().w(FUNC(seabattl_state::seabattl_colorram_w)).share("colorram");
 	map(0x1800, 0x1bff).mirror(0x2000).ram().w(FUNC(seabattl_state::seabattl_videoram_w)).share("videoram");
 	map(0x1c00, 0x1cff).mirror(0x2000).ram();
@@ -470,11 +466,6 @@ void seabattl_state::machine_reset()
 {
 }
 
-INTERRUPT_GEN_MEMBER(seabattl_state::seabattl_interrupt)
-{
-	m_maincpu->set_input_line(0, ASSERT_LINE);
-}
-
 static const gfx_layout tiles32x16x3_layout =
 {
 	32,16,
@@ -499,7 +490,6 @@ void seabattl_state::seabattl(machine_config &config)
 	S2650(config, m_maincpu, 14318180/4/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &seabattl_state::seabattl_map);
 	m_maincpu->set_addrmap(AS_DATA, &seabattl_state::seabattl_data_map);
-	m_maincpu->set_vblank_int("screen", FUNC(seabattl_state::seabattl_interrupt));
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 	S2636(config, m_s2636, 0);
@@ -522,6 +512,7 @@ void seabattl_state::seabattl(machine_config &config)
 	m_screen->set_visarea(1*8, 29*8-1, 2*8, 32*8-1);
 	m_screen->set_screen_update(FUNC(seabattl_state::screen_update_seabattl));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seabattl);
 	PALETTE(config, m_palette, FUNC(seabattl_state::seabattl_palette), 26);
