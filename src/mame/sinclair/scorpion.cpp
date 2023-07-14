@@ -90,14 +90,14 @@ public:
 	void scorpiontb(machine_config &config);
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
-	void video_start() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
-	void scorpion_ioext(address_map &map) override;
-	void ay_address_w(u8 data) override;
+	virtual void scorpion_ioext(address_map &map) override;
+	virtual void ay_address_w(u8 data) override;
 
-	void scorpion_update_memory() override;
+	virtual void scorpion_update_memory() override;
 
 private:
 	u8 ay_data_r();

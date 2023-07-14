@@ -4,10 +4,10 @@
 #include "emu.h"
 #include "smuc.h"
 
-#include "bus/ata/atapicdr.h"
 #include "bus/ata/ataintf.h"
-#include "machine/ds17x85.h"
+#include "bus/ata/atapicdr.h"
 #include "bus/ata/hdd.h"
+#include "machine/ds17x85.h"
 #include "machine/i2cmem.h"
 
 namespace bus::spectrum::zxbus {
@@ -26,9 +26,9 @@ public:
     { }
 
 protected:
-	void device_add_mconfig(machine_config &config) override;
-	void device_start() override;
-	void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	void map_io(address_map &map);

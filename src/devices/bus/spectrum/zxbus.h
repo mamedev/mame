@@ -80,14 +80,12 @@ protected:
 DECLARE_DEVICE_TYPE(ZXBUS_SLOT, zxbus_slot_device)
 
 
-class zxbus_device : public device_t
-                   , public device_memory_interface
+class zxbus_device : public device_t, public device_memory_interface
 {
 public:
 	zxbus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	template <typename T> void set_iospace(T &&tag, int spacenum) { m_iospace.set_tag(std::forward<T>(tag), spacenum); }
-
 	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), u64 unitmask = ~u64(0))
 	{
 		m_iospace->install_device(addrstart, addrend, device, map, unitmask);
@@ -99,16 +97,16 @@ public:
 	void add_slot(zxbus_slot_device &slot);
 	void set_custom_spaces() { m_allocspaces = true; }
 
-	space_config_vector memory_space_config() const override;
-	const address_space_config m_io_config;
+	virtual space_config_vector memory_space_config() const override;
 
 protected:
 	zxbus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	void device_config_complete() override;
-	void device_start() override;
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
 
 private:
+	const address_space_config m_io_config;
 	required_address_space m_iospace;
 	bool m_allocspaces;
 
@@ -120,14 +118,14 @@ DECLARE_DEVICE_TYPE(ZXBUS, zxbus_device)
 
 class device_zxbus_card_interface : public device_interface
 {
-  friend class zxbus_slot_device;
+	friend class zxbus_slot_device;
 
 protected:
 	device_zxbus_card_interface(const machine_config &mconfig, device_t &device);
 
-	void interface_pre_start() override;
+	virtual void interface_pre_start() override;
 
-	void set_zxbusbus(zxbus_device *zxbus) { assert(!device().started()); m_zxbus = zxbus; }
+	void set_zxbusbus(zxbus_device &zxbus) { assert(!device().started()); m_zxbus = &zxbus; }
 
 	zxbus_device *m_zxbus;
 };
