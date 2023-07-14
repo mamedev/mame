@@ -11,11 +11,10 @@ Paradise / Western Digital (S)VGA chipsets
 - WD90C30-LR
 - WD90C31-LR / WD90C31-ZS / WD90C31A-LR / WD90C31A-ZS
 - WD90C33-ZZ
+- WD90C24A-ZZ / WD90C24A2-ZZ / WD90C26A (cfr. video/wd90c26.cpp)
 
 TODO:
-- WD90C24A-ZZ / WD90C24A2-ZZ (mobile chips, no ISA option)
-- WD90C26A (apple/macpwrbk030.cpp macpb180c, no ISA)
-- WD9710-MZ (PCI + MPEG-1, a.k.a. Pipeline 9710 / 9712)
+- WD9710-MZ (PCI + MPEG-1, a.k.a. Pipeline 9710 / 9712, to be added in specific sub-file as well)
 
 - 'C31A difference compared to 'C31 (just "reserved" PR35?);
 - Emulate new features of 'C31 & 'C33;
@@ -110,7 +109,7 @@ void pvga1a_vga_device::mem_w(offs_t offset, uint8_t data)
 
 u8 pvga1a_vga_device::gc_data_r(offs_t offset)
 {
-	if (m_ega_compatible_mode && vga.gc.index >= 9 && vga.gc.index <= 0xe)
+	if (m_ega_compatible_mode && vga.gc.index >= 9 && vga.gc.index <= 0xe && !machine().side_effects_disabled())
 	{
 		LOGLOCKED("Attempt to read ext. GC register offset [%02x] while locked\n", vga.gc.index);
 		return 0xff;
@@ -120,7 +119,7 @@ u8 pvga1a_vga_device::gc_data_r(offs_t offset)
 
 void pvga1a_vga_device::gc_data_w(offs_t offset, u8 data)
 {
-	if (!m_ext_gc_unlock && vga.gc.index >= 9 && vga.gc.index <= 0xe)
+	if (!m_ext_gc_unlock && vga.gc.index >= 9 && vga.gc.index <= 0xe && !machine().side_effects_disabled())
 	{
 		LOGLOCKED("Attempt to write ext. GC register offset [%02x] <- %02x while locked\n", vga.gc.index, data);
 		return;
@@ -333,7 +332,8 @@ void wd90c00_vga_device::crtc_map(address_map &map)
 	map(0x2a, 0x3f).view(m_ext_crtc_view);
 	m_ext_crtc_view[0](0x2a, 0x3f).lr8(
 		NAME([this] (offs_t offset) {
-			LOGLOCKED("Attempt to R ext. CRTC register offset %02x while locked\n", offset + 0x2a);
+			if (!machine().side_effects_disabled())
+				LOGLOCKED("Attempt to R ext. CRTC register offset %02x while locked\n", offset + 0x2a);
 			return 0xff;
 		})
 	);
@@ -525,7 +525,8 @@ void wd90c11a_vga_device::sequencer_map(address_map &map)
 	map(0x07, 0x1f).view(m_ext_seq_view);
 	m_ext_seq_view[0](0x07, 0x1f).lr8(
 		NAME([this] (offs_t offset) {
-			LOGLOCKED("Attempt to R ext. Sequencer register offset %02x while locked\n", offset + 0x07);
+			if (!machine().side_effects_disabled())
+				LOGLOCKED("Attempt to R ext. Sequencer register offset %02x while locked\n", offset + 0x07);
 			return 0xff;
 		})
 	);
