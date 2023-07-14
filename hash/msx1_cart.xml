@@ -5754,8 +5754,8 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<!-- A redump is needed to determine what the real mapper is -->
-	<software name="gangjeol">
-		<description>Gangjeol Robocop (Korea)</description>
+	<software name="gangrobo">
+		<description>Gangcheol Robocop (Korea)</description>
 		<year>1992</year>
 		<publisher>Screen Software</publisher>
 		<info name="serial" value="SI-3131Z" />
@@ -5763,13 +5763,13 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<dataarea name="rom" size="0x10000">
-				<rom name="gangjeol robocop (korea).rom" size="0x10000" crc="5681c3b6" sha1="555475b0f5b23b192d89c0bbda2c2c2f4b182c25" />
+				<rom name="gangcheol robocop (korea).rom" size="0x10000" crc="5681c3b6" sha1="555475b0f5b23b192d89c0bbda2c2c2f4b182c25" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="gangjeola" cloneof="gangjeol">
-		<description>Gangjeol Robocop (Korea, alt)</description>
+	<software name="gangroboa" cloneof="gangrobo">
+		<description>Gangcheol Robocop (Korea, alt)</description>
 		<year>1992</year>
 		<publisher>Screen Software</publisher>
 		<info name="serial" value="SI-3131Z" />
@@ -5777,13 +5777,13 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<dataarea name="rom" size="0x10000">
-				<rom name="gangjeol robocop (korea) (alt).rom" size="0x10000" crc="248dd0da" sha1="77cacb5e9a6cef48a36e8acabc938d5f1f1beadc" />
+				<rom name="gangcheol robocop (korea) (alt).rom" size="0x10000" crc="248dd0da" sha1="77cacb5e9a6cef48a36e8acabc938d5f1f1beadc" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="gangjeolb" cloneof="gangjeol">
-		<description>Gangjeol Robocop (Korea, alt 2)</description>
+	<software name="gangrobob" cloneof="gangrobo">
+		<description>Gangcheol Robocop (Korea, alt 2)</description>
 		<year>1992</year>
 		<publisher>Screen Software</publisher>
 		<info name="serial" value="SI-3131Z" />
@@ -5791,7 +5791,7 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<dataarea name="rom" size="0x10000">
-				<rom name="gangjeol robocop (korea) (alt 2).rom" size="0x10000" crc="4e3d69f9" sha1="ad21deb6e85eeb1098d4ee0a84e00755c185dc15" />
+				<rom name="gangcheol robocop (korea) (alt 2).rom" size="0x10000" crc="4e3d69f9" sha1="ad21deb6e85eeb1098d4ee0a84e00755c185dc15" />
 			</dataarea>
 		</part>
 	</software>
@@ -5982,14 +5982,14 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="gomokunak" cloneof="gomokuna">
-		<description>Dunoegyosil Omog (Korea)</description>
+		<description>Dunoegyosil Omok (Korea)</description>
 		<year>1984</year>
 		<publisher>Zemina</publisher>
 		<info name="alt_title" value="두뇌교실 오목" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
-				<rom name="dunoegyosil omog (korea).rom" size="0x4000" crc="f4cb0a83" sha1="bd5617cfd9ee1d17f4cde6f282da897003226089" />
+				<rom name="dunoegyosil omok (korea).rom" size="0x4000" crc="f4cb0a83" sha1="bd5617cfd9ee1d17f4cde6f282da897003226089" />
 			</dataarea>
 		</part>
 	</software>
