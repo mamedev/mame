@@ -3246,13 +3246,6 @@ ROM_START( mkla3bl ) // strange bootleg with peculiarly arranged GFX ROMs.
 	ROM_LOAD16_BYTE( "ax422-m1-5", 0x00000, 0x80000, CRC(2ce843c5) SHA1(d48efcecd6528414249f3884edc32e0dafa9677f) )
 	ROM_LOAD16_BYTE( "ax422-m1-4", 0x00001, 0x80000, CRC(49a46e10) SHA1(c63c00531b29c01ee864acc141b1713507d25c69) )
 
-/*
-    ROM_LOAD ( "b-1.bin",  0x000000, 0x100000, CRC(f41e61c6) SHA1(7dad38839d5c9aa0cfa7b2f7199f14e0f2c4494b) )  // 6x 8Mbit masks
-    ROM_LOAD ( "b-2.bin",  0x100000, 0x100000, CRC(8052740b) SHA1(f1b7fd536966d9d0ce690cdec635069c340d678e) )
-
-    ROM_LOAD ( "a-1.bin",  0x200000, 0x100000, CRC(7da3cb93) SHA1(23b9053b3241b69988f7f2e6a9d1353dac4fc8ab) )
-    ROM_LOAD ( "a-2.bin",  0x300000, 0x100000, CRC(1eedb0f8) SHA1(27c056c469c17bb176325b91cf92296c89681ac6) )
-*/
 	ROM_REGION( 0x800000, "gfx1", 0 )
 	ROM_LOAD ( "pw3412-m1-a", 0x000000, 0x200000, CRC(87776f14) SHA1(83533049545b175fa1fc8e021056466f6a37b2a5) ) // even == a-2.bin, odd == b-2.bin
 	ROM_LOAD ( "pw3412-m1-b", 0x200000, 0x200000, CRC(30724e04) SHA1(a5f354b82fd5f73535ba77ed8be473f862528682) ) // even == a-1.bin, odd == b-1.bin
