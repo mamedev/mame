@@ -570,7 +570,7 @@ Serial No.: V143107
 Main PCB looks like it's a revised Sea Scare main PCB (I.G.R. LC26 C)
  - 2650 CPU
  - 2636 PVI
- - DIP switch block (8)
+ - DIP switch block (8) (at IC11)
 
 Sound PCB looks similar to Scorpion (I.G.R. LC241)
  - Z80 CPU
@@ -579,22 +579,22 @@ Sound PCB looks similar to Scorpion (I.G.R. LC241)
  - Stereo amplifiers
  - Epoxy block like Scorpion
  - Shaved off 40-pin IC likely the same speech IC as Scorpion
- - DIP switch block (8)
+ - DIP switch block (8) (at IC55)
 */
 ROM_START( armada )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "armada-1", 0x0000, 0x0400, CRC(8528510c) SHA1(fbb653a0a4c77dd31fa106f1aeab985d02ebad50) )
-	ROM_CONTINUE(         0x2000, 0x0400 )
-	ROM_CONTINUE(         0x4000, 0x0400 )
-	ROM_CONTINUE(         0x6000, 0x0400 )
-	ROM_LOAD( "armada-2", 0x0400, 0x0400, CRC(7f5a2089) SHA1(be15d9c31c8bd33c029dfa7fcfc4e36d6dc8e04f) )
-	ROM_CONTINUE(         0x2400, 0x0400 )
-	ROM_CONTINUE(         0x4400, 0x0400 )
-	ROM_CONTINUE(         0x6400, 0x0400 )
-	ROM_LOAD( "armada-3", 0x0800, 0x0400, CRC(43e4c8c9) SHA1(b2f3a492cef183875370bd0c4e75e9bdb70c9cf2) )
-	ROM_CONTINUE(         0x2800, 0x0400 )
-	ROM_CONTINUE(         0x4800, 0x0400 )
-	ROM_CONTINUE(         0x6800, 0x0400 )
+	ROM_LOAD( "armada-1.ic83", 0x0000, 0x0400, CRC(8528510c) SHA1(fbb653a0a4c77dd31fa106f1aeab985d02ebad50) )
+	ROM_CONTINUE(              0x2000, 0x0400 )
+	ROM_CONTINUE(              0x4000, 0x0400 )
+	ROM_CONTINUE(              0x6000, 0x0400 )
+	ROM_LOAD( "armada-2.ic84", 0x0400, 0x0400, CRC(7f5a2089) SHA1(be15d9c31c8bd33c029dfa7fcfc4e36d6dc8e04f) )
+	ROM_CONTINUE(              0x2400, 0x0400 )
+	ROM_CONTINUE(              0x4400, 0x0400 )
+	ROM_CONTINUE(              0x6400, 0x0400 )
+	ROM_LOAD( "armada-3.ic85", 0x0800, 0x0400, CRC(43e4c8c9) SHA1(b2f3a492cef183875370bd0c4e75e9bdb70c9cf2) )
+	ROM_CONTINUE(              0x2800, 0x0400 )
+	ROM_CONTINUE(              0x4800, 0x0400 )
+	ROM_CONTINUE(              0x6800, 0x0400 )
 	// 2 adjacent DIP28 positions (IC72, IC73) are unpopulated
 
 	ROM_REGION( 0x1800, "gfx1", 0 ) // probably the same as above without the blank data at the start
