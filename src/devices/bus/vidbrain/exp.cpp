@@ -142,12 +142,16 @@ std::string videobrain_expansion_slot_device::get_default_card_software(get_defa
 
 // slot devices
 #include "std.h"
+#include "comp_language.h"
+#include "info_manager.h"
 #include "money_minder.h"
 #include "timeshare.h"
 
 void vidbrain_expansion_cards(device_slot_interface &device)
 {
 	device.option_add_internal("standard", VB_STD);
-	device.option_add_internal("moneyminder", VB_MONEY_MINDER);
+	device.option_add_internal("comp_language", VB_COMP_LANGUAGE);
+	device.option_add_internal("info_manager", VB_INFO_MANAGER);
+	device.option_add_internal("money_minder", VB_MONEY_MINDER);
 	device.option_add_internal("timeshare", VB_TIMESHARE);
 }

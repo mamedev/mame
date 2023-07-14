@@ -35,15 +35,6 @@ videobrain_standard_cartridge_device::videobrain_standard_cartridge_device(const
 
 
 //-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void videobrain_standard_cartridge_device::device_start()
-{
-}
-
-
-//-------------------------------------------------
 //  videobrain_bo_r - cartridge data read
 //-------------------------------------------------
 

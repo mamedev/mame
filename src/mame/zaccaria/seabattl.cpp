@@ -538,27 +538,27 @@ void seabattl_state::armada(machine_config &config)
 
 ROM_START( seabattl )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "sea b b_1 1.prg",  0x0000, 0x0400, CRC(16a475c0) SHA1(5380d3be39c421227e52012d1bcf0516e99f6a3f) )
-	ROM_CONTINUE(                 0x2000, 0x0400 )
-	ROM_LOAD( "sea b b_1 2.prg",  0x0400, 0x0400, CRC(4bd73a82) SHA1(9ab4edf24fcd437ecd8e9e551ce0ed33be3bbad7) )
-	ROM_CONTINUE(                 0x2400, 0x0400 )
-	ROM_LOAD( "sea b b_1 3.prg",  0x0800, 0x0400, CRC(e251492b) SHA1(a152f9b6f189909ff478b4d95ee764f1898405b5) )
-	ROM_CONTINUE(                 0x2800, 0x0400 )
-	ROM_LOAD( "sea b b_1 4.prg",  0x0c00, 0x0400, CRC(6012b83f) SHA1(57de9e45253609b71f14fb3541760fd33647a651) )
-	ROM_CONTINUE(                 0x2c00, 0x0400 )
-	ROM_LOAD( "sea b b_1 5.prg",  0x1000, 0x0400, CRC(55c263f6) SHA1(33eba61cb8c9318cf19b771c93a14397b4ee0ace) )
-	ROM_CONTINUE(                 0x3000, 0x0400 )
+	ROM_LOAD( "sea_b_b_1_1.2b",  0x0000, 0x0400, CRC(16a475c0) SHA1(5380d3be39c421227e52012d1bcf0516e99f6a3f) )
+	ROM_CONTINUE(                0x2000, 0x0400 )
+	ROM_LOAD( "sea_b_b_1_2.2c",  0x0400, 0x0400, CRC(4bd73a82) SHA1(9ab4edf24fcd437ecd8e9e551ce0ed33be3bbad7) )
+	ROM_CONTINUE(                0x2400, 0x0400 )
+	ROM_LOAD( "sea_b_b_1_3.2d",  0x0800, 0x0400, CRC(e251492b) SHA1(a152f9b6f189909ff478b4d95ee764f1898405b5) )
+	ROM_CONTINUE(                0x2800, 0x0400 )
+	ROM_LOAD( "sea_b_b_1_4.4b",  0x0c00, 0x0400, CRC(6012b83f) SHA1(57de9e45253609b71f14fb3541760fd33647a651) )
+	ROM_CONTINUE(                0x2c00, 0x0400 )
+	ROM_LOAD( "sea_b_b_1_5.4c",  0x1000, 0x0400, CRC(55c263f6) SHA1(33eba61cb8c9318cf19b771c93a14397b4ee0ace) )
+	ROM_CONTINUE(                0x3000, 0x0400 )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_LOAD( "sea b red.prg",    0x0000, 0x0800, CRC(fe7192df) SHA1(0b262bc1ac959d8dd79d71780e16237075f4a099) )
-	ROM_LOAD( "sea b green.prg",  0x0800, 0x0800, CRC(cea4c0c9) SHA1(697c136ef363676b346692740d3c3a482dde6207) )
-	ROM_LOAD( "sea b blu.prg",    0x1000, 0x0800, CRC(cd972c4a) SHA1(fcb8149bc462912c8393431ccb792ea4b1b1109d) )
+	ROM_LOAD( "sea_b_red.8d",    0x0000, 0x0800, CRC(fe7192df) SHA1(0b262bc1ac959d8dd79d71780e16237075f4a099) )
+	ROM_LOAD( "sea_b_green.8c",  0x0800, 0x0800, CRC(cea4c0c9) SHA1(697c136ef363676b346692740d3c3a482dde6207) )
+	ROM_LOAD( "sea_b_blu.8a",    0x1000, 0x0800, CRC(cd972c4a) SHA1(fcb8149bc462912c8393431ccb792ea4b1b1109d) )
 
 	ROM_REGION( 0x0800, "gfx2", 0 )
-	ROM_LOAD( "sea b screen.prg", 0x0000, 0x0800, CRC(8e4391dd) SHA1(f5698d66e5a3c46082b515ce86f9d3e96fd9ff77) )
+	ROM_LOAD( "sea_b_screen.7f", 0x0000, 0x0800, CRC(8e4391dd) SHA1(f5698d66e5a3c46082b515ce86f9d3e96fd9ff77) )
 
 	ROM_REGION( 0x0800, "gfx3", 0 )
-	ROM_LOAD( "sea b wawe.prg",   0x0000, 0x0800, CRC(7e356dc5) SHA1(71d34fa39ff0b7d0fa6d32ba2b9dc0006a03d1bb) )
+	ROM_LOAD( "sea_b_wawe.10k",  0x0000, 0x0800, CRC(7e356dc5) SHA1(71d34fa39ff0b7d0fa6d32ba2b9dc0006a03d1bb) ) // sic
 ROM_END
 
 /*
@@ -567,7 +567,7 @@ Zaccaria Armada
 
 Serial No.: V143107
 
-Main PCB looks like it's a revised Sea Scare main PCB (I.G.R. LC26 C)
+Main PCB looks like it's a revised Sea Battle main PCB (I.G.R. LC26 C)
  - 2650 CPU
  - 2636 PVI
  - DIP switch block (8) (at IC11)
@@ -614,8 +614,8 @@ ROM_START( armada )
 	ROM_LOAD( "sound-3.ic14", 0x2000, 0x1000, CRC(6409f99b) SHA1(e8d7f457e9a315d7f89b817c2b7cda1f2f3e5877) )
 
 	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD( "speach-1.ic25", 0x0000, 0x1000, CRC(b72a8559) SHA1(08c60b950c2ed345840a65b427b19788c66d1e27) )
-	ROM_LOAD( "speach-2.ic24", 0x1000, 0x1000, CRC(93133519) SHA1(12848b80eb313df9cd552122fdee9d335b32972f) )
+	ROM_LOAD( "speach-1.ic25", 0x0000, 0x1000, CRC(b72a8559) SHA1(08c60b950c2ed345840a65b427b19788c66d1e27) ) // sic
+	ROM_LOAD( "speach-2.ic24", 0x1000, 0x1000, CRC(93133519) SHA1(12848b80eb313df9cd552122fdee9d335b32972f) ) // "
 ROM_END
 
 } // anonymous namespace

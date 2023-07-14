@@ -37,9 +37,9 @@ Entertainment Series:
 		<part name="cart" interface="vidbrain_cart">
 			<feature name="slot" value="timeshare" />
 			<dataarea name="rom" size="0x800">
-				<rom name="timeshare-cm01.bin" size="0x800" crc="957d7246" sha1="cb8eb48f7bf895b87975f2386451286143087fff" />
+				<rom name="uv401c-m01" size="0x800" crc="957d7246" sha1="cb8eb48f7bf895b87975f2386451286143087fff" />
 			</dataarea>
-			<dataarea name="ram" size="0x800"/>
+			<dataarea name="ram" size="0x400"/>
 		</part>
 	</software>
 
@@ -196,23 +196,23 @@ Entertainment Series:
 
 <!-- Money Management Series (green) -->
 
-	<software name="complang" supported="no">
+	<software name="complang">
 		<description>The Computational Language</description>
 		<year>1978</year>
 		<publisher>VideoBrain Computer Company</publisher>
 		<info name="serial" value="APL/S"/>
 		<part name="cart" interface="vidbrain_cart">
-			<feature name="slot" value="complang" />
-			<dataarea name="rom" size="0x3800">
-				<rom name="apls_a.bin" offset="0x0000" size="0x800" crc="e0b883c8" sha1="30508b45d7120119e081a09433ee1eef4152b11a" />
-				<rom name="apls_b.bin" offset="0x0800" size="0x800" crc="93c869d2" sha1="4c414d5b1df35dde1d816d502cb85f19977d3a71" />
-				<rom name="apls_c.bin" offset="0x1000" size="0x800" crc="98fbf99c" sha1="9e45794f5b0f0b321ee7ee8fa7420816ab3ff52a" />
-				<rom name="apls_d.bin" offset="0x1800" size="0x800" crc="31adadcc" sha1="deb38e30d09e3b8de93d3be4ae9a0f7aae718537" />
-				<rom name="apls_e.bin" offset="0x2000" size="0x800" crc="47048589" sha1="43417af8a509f971f42616a0b9dbf9af3e977bb3" />
-				<rom name="apls_f.bin" offset="0x2800" size="0x800" crc="b74e799e" sha1="67694da241fc336c01dfca9a81c0d334f343bb47" />
-				<rom name="apls_g.bin" offset="0x3000" size="0x800" crc="6d5773fa" sha1="96401d934617bbf54af836c1efc0232e9718067b" />
+			<feature name="slot" value="comp_language" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="0310_apls-a.u1"  offset="0x0000" size="0x800" crc="e0b883c8" sha1="30508b45d7120119e081a09433ee1eef4152b11a" />
+				<rom name="0311_apls-b.u4"  offset="0x0800" size="0x800" crc="93c869d2" sha1="4c414d5b1df35dde1d816d502cb85f19977d3a71" />
+				<rom name="0312_apls-c.u3"  offset="0x1000" size="0x800" crc="98fbf99c" sha1="9e45794f5b0f0b321ee7ee8fa7420816ab3ff52a" />
+				<rom name="0313_apls-d.u6"  offset="0x1800" size="0x800" crc="31adadcc" sha1="deb38e30d09e3b8de93d3be4ae9a0f7aae718537" />
+				<rom name="0314_apls-e.u2"  offset="0x2000" size="0x800" crc="47048589" sha1="43417af8a509f971f42616a0b9dbf9af3e977bb3" />
+				<rom name="0315_apls-f.u5"  offset="0x2800" size="0x800" crc="b74e799e" sha1="67694da241fc336c01dfca9a81c0d334f343bb47" />
+				<rom name="0316_apls-g.u11" offset="0x3000" size="0x800" crc="6d5773fa" sha1="96401d934617bbf54af836c1efc0232e9718067b" />
 			</dataarea>
-			<dataarea name="ram" size="0x800"/>
+			<dataarea name="ram" size="0x400"/>
 		</part>
 	</software>
 
@@ -229,16 +229,16 @@ Entertainment Series:
 	</software>
 
 	<software name="moneymin">
-		<description>Money Minder</description>
+		<description>Money Minder</description> <!-- "Money Manager" on title screen -->
 		<year>1978</year>
 		<publisher>VideoBrain Computer Company</publisher>
 		<info name="serial" value="VB-1000"/>
 		<part name="cart" interface="vidbrain_cart">
-			<feature name="slot" value="moneyminder" />
+			<feature name="slot" value="money_minder" />
 			<dataarea name="rom" size="0x1000">
-				<rom name="moneymanager-vb1000.bin" size="0x1000" crc="4f588081" sha1="afb95754d4710b2989689c877b775706b2a7a43d" />
+				<rom name="r2332c_r2319-11" size="0x1000" crc="4f588081" sha1="afb95754d4710b2989689c877b775706b2a7a43d" />
 			</dataarea>
-			<dataarea name="ram" size="0x800"/>
+			<dataarea name="ram" size="0x400"/>
 		</part>
 	</software>
 
@@ -248,13 +248,13 @@ Entertainment Series:
 		<publisher>VideoBrain Computer Company</publisher>
 		<info name="serial" value="VB-1200"/>
 		<part name="cart" interface="vidbrain_cart">
-			<feature name="slot" value="infomanager" />
-			<dataarea name="rom" size="0x1800">
-				<rom name="vb1200a_1000-17ff_9_25_78.bin" offset="0x0000" size="0x800" crc="7fc58830" sha1="39c2821f73c86c3e368fe5429628672cfe594306" />
-				<rom name="vb1200c_3000-37ff_9_25_78.bin" offset="0x0800" size="0x800" crc="e5d18447" sha1="d98b94ae1cce2ce6e6ae933180a7bf001b73932f" />
-				<rom name="vb-1200_3800-3fff_9_26_78.bin" offset="0x1000" size="0x800" crc="df9d9437" sha1="3a38a889b552acaa1a284e2ca7447f142b494737" />
+			<feature name="slot" value="info_manager" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="vb1200a_1000-17ff_9_25_78_51" offset="0x0000" size="0x800" crc="7fc58830" sha1="39c2821f73c86c3e368fe5429628672cfe594306" /> <!-- handwritten EPROM labels -->
+				<rom name="vb1200c_3000-37ff_9_25_78_51" offset="0x1000" size="0x800" crc="e5d18447" sha1="d98b94ae1cce2ce6e6ae933180a7bf001b73932f" /> <!-- " -->
+				<rom name="vb-1200_3800-3fff_9_26_78"    offset="0x1800" size="0x800" crc="df9d9437" sha1="3a38a889b552acaa1a284e2ca7447f142b494737" /> <!-- " -->
 			</dataarea>
-			<dataarea name="ram" size="0x800"/>
+			<dataarea name="ram" size="0x400"/>
 		</part>
 	</software>
 

@@ -81,7 +81,7 @@ private:
 
 	// keyboard state
 	uint8_t m_keylatch = 0;
-	bool m_joy_enable = 0;
+	bool m_joy_enable = false;
 
 	// sound state
 	int m_sound_clk = 0;

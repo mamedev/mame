@@ -129,7 +129,7 @@ protected:
 	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
-	devcb_write_line   m_write_extres;
+	devcb_write_line m_write_extres;
 
 	device_videobrain_expansion_card_interface *m_cart;
 };
