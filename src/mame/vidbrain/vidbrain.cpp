@@ -49,16 +49,97 @@ Using the system:
 */
 
 #include "emu.h"
-#include "vidbrain.h"
 
+#include "bus/vidbrain/exp.h"
+#include "cpu/f8/f8.h"
+#include "machine/f3853.h"
+#include "machine/ram.h"
 #include "machine/rescap.h"
+#include "sound/dac.h"
+
 #include "softlist_dev.h"
 #include "speaker.h"
+#include "uv201.h"
 
 #include "vidbrain.lh"
 
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
+
+namespace {
+
+class vidbrain_state : public driver_device
+{
+public:
+	vidbrain_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_smi(*this, "smi"),
+		m_uv(*this, "uv"),
+		m_dac(*this, "dac"),
+		m_exp(*this, "exp"),
+		m_io(*this, "IO%02u", 0),
+		m_uv201_31(*this, "UV201-31"),
+		m_joy_r(*this, "JOY-R"),
+		m_joy1_x(*this, "JOY1-X"),
+		m_joy1_y(*this, "JOY1-Y"),
+		m_joy2_x(*this, "JOY2-X"),
+		m_joy2_y(*this, "JOY2-Y"),
+		m_joy3_x(*this, "JOY3-X"),
+		m_joy3_y(*this, "JOY3-Y"),
+		m_joy4_x(*this, "JOY4-X"),
+		m_joy4_y(*this, "JOY4-Y")
+	{ }
+
+	void vidbrain(machine_config &config);
+	void vidbrain_video(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	void vidbrain_mem(address_map &map);
+	void vidbrain_io(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(joystick_tick);
+
+	void keyboard_w(uint8_t data);
+	uint8_t keyboard_r();
+	void sound_w(uint8_t data);
+
+	void hblank_w(int state);
+	uint8_t memory_read_byte(offs_t offset);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<f3853_device> m_smi;
+	required_device<uv201_device> m_uv;
+	required_device<dac_byte_interface> m_dac;
+	required_device<videobrain_expansion_slot_device> m_exp;
+	required_ioport_array<8> m_io;
+	required_ioport m_uv201_31;
+	required_ioport m_joy_r;
+	required_ioport m_joy1_x;
+	required_ioport m_joy1_y;
+	required_ioport m_joy2_x;
+	required_ioport m_joy2_y;
+	required_ioport m_joy3_x;
+	required_ioport m_joy3_y;
+	required_ioport m_joy4_x;
+	required_ioport m_joy4_y;
+
+	// keyboard state
+	uint8_t m_keylatch = 0;
+	bool m_joy_enable = false;
+
+	// sound state
+	int m_sound_clk = 0;
+
+	// timers
+	emu_timer *m_timer_ne555 = nullptr;
+};
 
 
 
@@ -222,8 +303,8 @@ static INPUT_PORTS_START( vidbrain )
 	PORT_START("IO00")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_CHAR('"')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_CHAR('#')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("P \xC2\xA2") PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_CHAR(0x00a2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("; \xC2\xB6") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(0x00b6)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(u8"P ¢") PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_CHAR(0x00a2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(u8"; π") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(0x03c0)
 
 	PORT_START("IO01")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U') PORT_CHAR('!')
@@ -232,13 +313,13 @@ static INPUT_PORTS_START( vidbrain )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR('\'') PORT_CHAR('*')
 
 	PORT_START("IO02")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Y \xC3\xB7") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_CHAR(0x00f7)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(u8"Y ÷") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_CHAR(0x00f7)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('(')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_CHAR(':')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 
 	PORT_START("IO03")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("T \xC3\x97") PORT_CODE(KEYCODE_T) PORT_CHAR('T') PORT_CHAR(0x00d7)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(u8"T ×") PORT_CODE(KEYCODE_T) PORT_CHAR('T') PORT_CHAR(0x00d7)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H') PORT_CHAR('/')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR(',')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ERASE RESTART") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
@@ -400,11 +481,12 @@ void vidbrain_state::vidbrain(machine_config &config)
 	// video hardware
 	config.set_default_layout(layout_vidbrain);
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_screen_update(UV201_TAG, FUNC(uv201_device::screen_update));
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update(m_uv, FUNC(uv201_device::screen_update));
 	screen.set_raw(3636363, 232, 18, 232, 262, 21, 262);
+
 	UV201(config, m_uv, 3636363);
-	m_uv->set_screen(SCREEN_TAG);
+	m_uv->set_screen("screen");
 	m_uv->ext_int_wr_callback().set(m_smi, FUNC(f3853_device::ext_int_w));
 	m_uv->hblank_wr_callback().set(FUNC(vidbrain_state::hblank_w));
 	m_uv->db_rd_callback().set(FUNC(vidbrain_state::memory_read_byte));
@@ -444,9 +526,11 @@ ROM_START( vidbrain )
 	ROM_REGION( 0x800, "res2", 0 )
 	ROM_LOAD( "resn2.e5", 0x000, 0x800, CRC(1d85d7be) SHA1(26c5a25d1289dedf107fa43aa8dfc14692fd9ee6) )
 
-	ROM_REGION( 0x800, F3870_TAG, 0 )
+	ROM_REGION( 0x800, "exp1", 0 )
 	ROM_LOAD( "expander1.bin", 0x0000, 0x0800, CRC(dac31abc) SHA1(e1ac7a9d654c2a70979effc744d98f21d13b4e05) )
 ROM_END
+
+} // anonymous namespace
 
 
 
@@ -455,4 +539,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                        FULLNAME                     FLAGS
-COMP( 1977, vidbrain, 0,      0,      vidbrain, vidbrain, vidbrain_state, empty_init, "VideoBrain Computer Company", "VideoBrain FamilyComputer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1978, vidbrain, 0,      0,      vidbrain, vidbrain, vidbrain_state, empty_init, "VideoBrain Computer Company", "VideoBrain FamilyComputer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
