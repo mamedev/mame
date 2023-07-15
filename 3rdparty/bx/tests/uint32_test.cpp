@@ -6,7 +6,7 @@
 #include "test.h"
 #include <bx/uint32_t.h>
 
-TEST_CASE("StrideAlign")
+TEST_CASE("StrideAlign", "[uint32_t]")
 {
 	REQUIRE(0  == bx::strideAlign(0, 12) );
 	for (uint32_t ii = 0; ii < 12; ++ii)
@@ -28,7 +28,7 @@ TEST_CASE("StrideAlign")
 	REQUIRE(offset == 48);
 }
 
-TEST_CASE("uint32_cnt")
+TEST_CASE("uint32_cnt", "[uint32_t]")
 {
 	REQUIRE( 0 == bx::uint32_cnttz<uint8_t >(1) );
 	REQUIRE( 7 == bx::uint32_cnttz<uint8_t >(1<<7) );
@@ -67,13 +67,29 @@ TEST_CASE("uint32_cnt")
 	REQUIRE(64 == bx::uint32_cntbits(UINT64_MAX) );
 }
 
-TEST_CASE("uint32_part")
+TEST_CASE("uint32_part", "[uint32_t]")
 {
 	REQUIRE(UINT32_C(0x55555555) == bx::uint32_part1by1(UINT16_MAX) );
 	REQUIRE(UINT32_C(0x09249249) == bx::uint32_part1by2(0x3ff) );
 }
 
-TEST_CASE("halfTo/FromFloat", "")
+TEST_CASE("uint32_gcd", "[uint32_t]")
+{
+	REQUIRE(1 == bx::uint32_gcd(13, 89) );
+	REQUIRE(3 == bx::uint32_gcd( 3,  9) );
+	REQUIRE(8 == bx::uint32_gcd( 8, 64) );
+	REQUIRE(9 == bx::uint32_gcd(18, 81) );
+}
+
+TEST_CASE("uint32_lcm", "[uint32_t]")
+{
+	REQUIRE(1157 == bx::uint32_lcm(13, 89) );
+	REQUIRE(   9 == bx::uint32_lcm( 3,  9) );
+	REQUIRE(  48 == bx::uint32_lcm( 6, 16) );
+	REQUIRE(  80 == bx::uint32_lcm(16, 20) );
+}
+
+TEST_CASE("halfTo/FromFloat", "[uint32_t]")
 {
 	for (uint32_t ii = 0; ii < 0x7c00; ++ii)
 	{
@@ -92,7 +108,7 @@ TEST_CASE("halfTo/FromFloat", "")
 	}
 }
 
-TEST_CASE("uint32_testpow2", "")
+TEST_CASE("uint32_testpow2")
 {
 	uint32_t shift = 0;
 
@@ -106,19 +122,19 @@ TEST_CASE("uint32_testpow2", "")
 	}
 }
 
-TEST_CASE("uint32_roX", "")
+TEST_CASE("uint32_roX", "[uint32_t]")
 {
 	REQUIRE(bx::uint32_rol(0x80000000, 1) == 1);
 	REQUIRE(bx::uint32_ror(1, 1) == 0x80000000);
 }
 
-TEST_CASE("uint64_roX", "")
+TEST_CASE("uint64_roX", "[uint32_t]")
 {
 	REQUIRE(bx::uint64_rol(0x8000000000000000, 1) == 1);
 	REQUIRE(bx::uint64_ror(1, 1) == 0x8000000000000000);
 }
 
-TEST_CASE("align", "")
+TEST_CASE("align", "[uint32_t]")
 {
 	REQUIRE( bx::isAligned(0,  8) );
 	REQUIRE(!bx::isAligned(7,  8) );
