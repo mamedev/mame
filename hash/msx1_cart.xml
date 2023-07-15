@@ -18836,7 +18836,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
-				<rom name="find it! - fabf (2020).rom" size="0x4000" crc="f4f2f480" sha1="d54e797d739fc7a5e5b0c43a910f34ea6af58ab2" />
+				<rom name="find it - fabf (2020).rom" size="0x4000" crc="f4f2f480" sha1="d54e797d739fc7a5e5b0c43a910f34ea6af58ab2" />
 			</dataarea>
 		</part>
 	</software>
