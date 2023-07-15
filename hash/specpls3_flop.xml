@@ -8306,7 +8306,7 @@ The game doesn't start
 		</part>
 	</software>
 
-	<software name="espadasag" sopported="no">
+	<software name="espadasag" supported="no">
 		<description>La Espada Sagrada</description>
 		<year>1990</year>
 		<publisher>Topo Soft</publisher>
