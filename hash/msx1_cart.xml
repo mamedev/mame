@@ -119,7 +119,6 @@ Chicken Chase - Mind Games España
 Compulandia - Idealogic
 Cosmos - Sony Spain
 Curso de BASIC - Sony Spain
-Fighting Rider - Sony Spain
 Financiële administratie - [VG 8181] Philips
 Financiële administratie 2 - [VG 8183] Philips
 GranSoft TXT - Editor de Texto - GranSoft
@@ -5104,6 +5103,19 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="fightrid">
+		<description>Fighting Rider (Spain)</description>
+		<year>1985</year>
+		<publisher>Sony Spain</publisher>
+		<info name="serial" value="HBS-I028" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="fighting rider (spain).rom" size="0x4000" crc="4b210e07" sha1="099c04bc72a43f129bec9f906e3ba6283cc87231" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fjustice">
 		<description>Final Justice (Japan)</description>
 		<year>1985</year>
@@ -5142,6 +5154,20 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
 				<rom name="final justice (japan) (alt 2).rom" size="0x4000" crc="b1663de8" sha1="d833c66dd541239908555762e04bcbb22bca748a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fjusticec" cloneof="fjustice">
+		<description>Final Justice (Japan, alt 3)</description>
+		<year>1985</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="serial" value="R48X5084" />
+		<info name="alt_title" value="ファイナルジャスティス" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="final justice (japan) (alt 3).rom" size="0x4000" crc="74ca598a" sha1="068e5cd232a794f7e203e5316a3ad2bcc7f3c939" />
 			</dataarea>
 		</part>
 	</software>
@@ -18751,6 +18777,325 @@ legacy FM implementations cannot find it.
 
 <!-- Homebrew / Doujin software -->
 
+	<software name="factinfc">
+		<description>Factory Infection</description>
+		<year>2004</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="factory infection - karoshi corporation (2004).rom" size="0x2000" crc="43f31061" sha1="1c90a57cc1237bdadd70d90d74e69c33d7a89293" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fantfoot">
+		<description>Fantastic Football</description>
+		<year>2021</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Zoran Majcenić"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="fantastic football - zoran majcenic (2021).rom" size="0xc000" crc="51e1fe56" sha1="1981c852c8b47e9596cd8a6869d5665f3c730d59" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="farm">
+		<description>Farm</description>
+		<year>2019</year>
+		<publisher>N.I</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="farm - n.i (2019).rom" size="0x2000" crc="61cee4ab" sha1="c621f4e32383914dc2e7fd250454b0fbf254720a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fartypig">
+		<description>Farty Pig (beta)</description>
+		<year>2020</year>
+		<publisher>Flappy Bird Challenge</publisher>
+		<info name="developer" value="TheGeps"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="farty pig - thegeps (2020) (beta).rom" size="0x4000" crc="5ddd1e48" sha1="d398ac4a0ad3923fcbd87f0164967276dc7f632a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="findit">
+		<description>Find It!</description>
+		<year>2020</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Fabf"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="find it! - fabf (2020).rom" size="0x4000" crc="f4f2f480" sha1="d54e797d739fc7a5e5b0c43a910f34ea6af58ab2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flappybcf">
+		<description>Flappy Bird (Crunchworks, rev F)</description>
+		<year>2019</year>
+		<publisher>Crunchworks</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="flappy bird - crunchworks (2019) (rev f).rom" size="0x2000" crc="5f145428" sha1="822e827772157f89e4fe5277736c970595771c87" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flappybcfa" cloneof="flappybcf">
+		<description>Flappy Bird (Crunchworks, rev F, alt)</description>
+		<year>2019</year>
+		<publisher>Crunchworks</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="flappy bird - crunchworks (2019) (rev f, alt).rom" size="0x2000" crc="46125867" sha1="7fdc2c70bcfd2560aa9523001cbaeeb8652418b8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flappybcb" cloneof="flappybcf">
+		<description>Flappy Bird (Crunchworks, rev B)</description>
+		<year>2014</year>
+		<publisher>Crunchworks</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="flappy bird - crunchworks (2014) (rev b).rom" size="0x2000" crc="a6fa12b8" sha1="c5cdd1109b1e24906c5f0530f09e9ec95fbd7bb0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flappybs">
+		<description>Flappy Bird (SCS)</description>
+		<year>2014</year>
+		<publisher>SCS</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="flappy bird - scs (2014).rom" size="0x4000" crc="c4b07e01" sha1="bfec80f1c35293f31be8b34058e2e0e6da9aef09" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flyguy">
+		<description>FlyGuy</description>
+		<year>2021</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Robosoft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="flyguy - robosoft (2021).rom" size="0x8000" crc="955fc82b" sha1="36ea537101b57f729bd7da25304f92bdf1471dd4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frmldice">
+		<description>Formula Dice</description>
+		<year>2009</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="robylu"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="formula dice - robylu (2009).rom" size="0x4000" crc="7f118b40" sha1="5c3ccb1681fbf63ebe318d05616eebace91b5ed9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foryster">
+		<description>Foryster (v00.9)</description>
+		<year>2022</year>
+		<publisher>Siudym</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="foryster - siudym (2022) (v00.9).rom" size="0x8000" crc="33787ba7" sha1="848678718e050d8c98dbf5a4b74440fa720314b6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foryster03" cloneof="foryster">
+		<description>Foryster (v00.3)</description>
+		<year>2022</year>
+		<publisher>Siudym</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="foryster - siudym (2022) (v00.3).rom" size="0x8000" crc="82137f5a" sha1="98722272c070f0ecb6a90ed502904066727ce2c1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foryster02" cloneof="foryster">
+		<description>Foryster (v00.2)</description>
+		<year>2022</year>
+		<publisher>Siudym</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="foryster - siudym (2022) (v00.2).rom" size="0x8000" crc="3dfb25d8" sha1="c20792bea3506a679ec40a5796e90722a03ee79e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght">
+		<description>Freedom Fighter (final)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x40000">
+				<rom name="freedom fighter - thegeps (2020).rom" size="0x30000" crc="1d75c0b4" sha1="fe3ef5f553570b7d81da1dc94d15ae25b5ea331d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght19" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.9)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.9).rom" size="0x20000" crc="c570ea63" sha1="1b8db65bdc29b7868bd73644f35dcc5cc8fc75ac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght18a" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.8a)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.8a).rom" size="0x20000" crc="78ca8923" sha1="4a102bdda151da512988d24ee6bee6610edd6558" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght18" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.8)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.8).rom" size="0x20000" crc="8257fa7f" sha1="8a8fae418f092d2e1d40da03ddaefda18abb012f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght17" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.7)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.7).rom" size="0x20000" crc="24ee1fe4" sha1="eb2cb0e6d45492c01da9fb99c501db09d9fa8c27" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght16" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.6)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.6).rom" size="0x20000" crc="1679bfcc" sha1="8222b6338dd57223f864aaacecc1d1153b696975" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght15" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.5)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.5).rom" size="0x20000" crc="c2252e70" sha1="632423b549219b0413d12fdd5ef883dbba3fbcaf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght14" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.4)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.4).rom" size="0x20000" crc="e35f8bf8" sha1="2f6a4171274bcaff83d1d16d04952d70a65cc1d8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght13" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.3)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.3).rom" size="0x20000" crc="01976e19" sha1="2b6e2ac79f5f650e24ccf7b2730aed15184c0b41" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght12a" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.2a)</description>
+		<year>2020</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="TheGeps"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.2a).rom" size="0x20000" crc="6e7be17e" sha1="d70a799daf9134a762259477c61493b4b02be71d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght11" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.1)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.1).rom" size="0x20000" crc="15e0b97e" sha1="ac13c262401f6d646b3ce2d930c141069604e38a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght10" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.0)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.0).rom" size="0x20000" crc="f831de82" sha1="a8b64009424f518b9e9714b3a5e7b548a4e60eb2" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gmonkey">
 		<description>G-Monkey</description>
 		<year>2008</year>
@@ -20557,7 +20902,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<dataarea name="rom" size="0x20000">
-				<rom name="mr mole - nerlaska studio (2007).rom" size="0x20000" crc="aa6f2968" sha1="168d59fca3170f56858f39d0b53067c0c0d414a8" />
+				<rom name="mr mole - nerlaska studio (2007) (scc).rom" size="0x20000" crc="aa6f2968" sha1="168d59fca3170f56858f39d0b53067c0c0d414a8" />
 			</dataarea>
 		</part>
 	</software>
