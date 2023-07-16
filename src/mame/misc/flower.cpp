@@ -132,7 +132,6 @@ private:
 	void txvram_w(offs_t offset, u8 data);
 	void master_irq_ack_w(int state);
 	void slave_irq_ack_w(int state);
-	void vblank_irq_w(int state);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -501,15 +500,6 @@ void flower_state::slave_irq_ack_w(int state)
 		m_slavecpu->set_input_line(0, CLEAR_LINE);
 }
 
-void flower_state::vblank_irq_w(int state)
-{
-	if (state)
-	{
-		m_mastercpu->set_input_line(0, ASSERT_LINE);
-		m_slavecpu->set_input_line(0, ASSERT_LINE);
-	}
-}
-
 
 void flower_state::flower(machine_config &config)
 {
@@ -537,7 +527,8 @@ void flower_state::flower(machine_config &config)
 	m_screen->set_screen_update(FUNC(flower_state::screen_update));
 	m_screen->set_raw(MASTER_CLOCK / 3, 384, 0, 288, 264, 16, 240); // derived from Galaxian HW, 60.606060
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(flower_state::vblank_irq_w));
+	m_screen->screen_vblank().set_inputline(m_mastercpu, 0, ASSERT_LINE);
+	m_screen->screen_vblank().append_inputline(m_slavecpu, 0, ASSERT_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_flower);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);

@@ -943,6 +943,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/wd90c26.h,VIDEOS["WD90C26"] = true
+--------------------------------------------------
+
+if (VIDEOS["WD90C26"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/wd90c26.cpp",
+		MAME_DIR .. "src/devices/video/wd90c26.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pc_vga_s3.h,VIDEOS["PC_VGA_S3"] = true
 --------------------------------------------------
 

@@ -54,11 +54,8 @@ FM Auto Arranger Utility ~ ＦＭオート・アレンジャーＵＴＩＬＩ�
 FM Musiwriter ~ ＦＭミュージライター - MCS
 FM Sound Synthesizer Unit ~ ＦＭサウンドシンセサイザーユニット - Yamaha
 FM Sound Synthesizer Unit II ~ ＦＭサウンドシンセサイザーユニットII - Yamaha
-Graphic Artist - Yamaha
 Graphic Artist Utility - Yamaha
 Graphic card set - Yamaha
-Graphic Master Lab - HAL Kenkyuujo
-Gyro Adventure - Nihon Columbia
 The Hucal data man - Hudson
 Japanese Word Processor - Casio
 Japanese Word Processor Cartridge - Konami
@@ -5652,7 +5649,7 @@ kept for now until finding out what those bytes affect...
 
 	<software name="gw30">
 		<description>Game World - 30 Games (Korea)</description>
-		<year>19??</year>
+		<year>1991</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="korean_80in1" />
@@ -5665,13 +5662,26 @@ kept for now until finding out what those bytes affect...
 
 	<software name="gw64">
 		<description>Game World - 64 Games (Korea)</description>
-		<year>19??</year>
+		<year>1991</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="korean_80in1" />
 			<feature name="mapper" value="80IN1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="game world 64 (zemina).rom" size="1048576" crc="e50bab84" sha1="5f912637565932c2bd7c0d7b9be6ad3dc971f96f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gw64a" cloneof="gw64">
+		<description>Game World - 64 Games (Korea, alt)</description>
+		<year>1991</year>
+		<publisher>Zemina</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="korean_80in1" />
+			<feature name="mapper" value="80IN1" />
+			<dataarea name="rom" size="1048576">
+				<rom name="game world 64 (zemina) (alt).rom" size="1048576" crc="b5373785" sha1="bf13ba021ed5bc1fd33ea9c896198eeb1c6afbe7" />
 			</dataarea>
 		</part>
 	</software>
@@ -5743,6 +5753,49 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<!-- A redump is needed to determine what the real mapper is -->
+	<software name="gangrobo">
+		<description>Gangcheol Robocop (Korea)</description>
+		<year>1992</year>
+		<publisher>Screen Software</publisher>
+		<info name="serial" value="SI-3131Z" />
+		<info name="alt_title" value="강철 로보캅" />
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="gangcheol robocop (korea).rom" size="0x10000" crc="5681c3b6" sha1="555475b0f5b23b192d89c0bbda2c2c2f4b182c25" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gangroboa" cloneof="gangrobo">
+		<description>Gangcheol Robocop (Korea, alt)</description>
+		<year>1992</year>
+		<publisher>Screen Software</publisher>
+		<info name="serial" value="SI-3131Z" />
+		<info name="alt_title" value="강철 로보캅" />
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="gangcheol robocop (korea) (alt).rom" size="0x10000" crc="248dd0da" sha1="77cacb5e9a6cef48a36e8acabc938d5f1f1beadc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gangrobob" cloneof="gangrobo">
+		<description>Gangcheol Robocop (Korea, alt 2)</description>
+		<year>1992</year>
+		<publisher>Screen Software</publisher>
+		<info name="serial" value="SI-3131Z" />
+		<info name="alt_title" value="강철 로보캅" />
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="gangcheol robocop (korea) (alt 2).rom" size="0x10000" crc="4e3d69f9" sha1="ad21deb6e85eeb1098d4ee0a84e00755c185dc15" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ghostbst">
 		<description>Ghostbusters (Japan)</description>
 		<year>1984</year>
@@ -5752,7 +5805,7 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="ghostbusters (europe).rom" size="0x8000" crc="c9bcbe5a" sha1="ba30ad98a8488bec6d0c661f7b859beb2fe219d1" />
+				<rom name="ghostbusters (japan).rom" size="0x8000" crc="c9bcbe5a" sha1="ba30ad98a8488bec6d0c661f7b859beb2fe219d1" />
 			</dataarea>
 		</part>
 	</software>
@@ -5783,6 +5836,19 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
 				<rom name="glider (japan) (alt 1).rom" size="0x4000" crc="5a23f1ee" sha1="310ab424edf15d5399e31fdbc1230ddcde307d1a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gnomofed">
+		<description>El Gnomo Fedor en la Caverna Perdida (Spain)</description>
+		<year>1986</year>
+		<publisher>Idealogic</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="el gnomo fedor en la caverna perdida (spain).rom" size="0x8000" crc="4551827d" sha1="e234d337ed6d59597052a608707f061ce304049c" />
+				<rom size="0x8000" offset="0x8000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -5858,6 +5924,20 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="gokiburia" cloneof="gokiburi">
+		<description>Gokiburi Daisakusen (Japan, alt)</description>
+		<year>1983</year>
+		<publisher>National</publisher>
+		<info name="serial" value="MXMD 21001 / CF-SS018" />
+		<info name="alt_title" value="ゴキブリ大作戦" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="gokiburi daisakusen - bug bomb (japan) (alt).rom" size="0x4000" crc="27976214" sha1="2ca992cb859dfb395464d08d3813e17871aaf41a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="golfgame">
 		<description>Golf Game (Japan)</description>
 		<year>1983</year>
@@ -5901,6 +5981,19 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="gomokunak" cloneof="gomokuna">
+		<description>Dunoegyosil Omok (Korea)</description>
+		<year>1984</year>
+		<publisher>Zemina</publisher>
+		<info name="alt_title" value="두뇌교실 오목" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="dunoegyosil omok (korea).rom" size="0x4000" crc="f4cb0a83" sha1="bd5617cfd9ee1d17f4cde6f282da897003226089" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="goonies">
 		<description>The Goonies (Japan)</description>
 		<year>1986</year>
@@ -5930,6 +6023,72 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="graphart">
+		<description>Graphic Artist (Japan, Europe)</description>
+		<year>1985</year>
+		<publisher>Yamaha</publisher>
+		<info name="serial" value="GAR-01" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="graphic artist (japan, europe).rom" size="0x8000" crc="1433054e" sha1="2a6d5512a1b4bfb3e616ded0a825db23bb143fba" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grapharta" cloneof="graphart">
+		<description>Graphic Artist (Japan, Europe, alt)</description>
+		<year>1985</year>
+		<publisher>Yamaha</publisher>
+		<info name="serial" value="GAR-01" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="graphic artist (japan, europe) (alt).rom" size="0x8000" crc="b2d3e4ee" sha1="8d26d4bcd727e057a37d2ec7f72626af68cbcdfb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphcrd">
+		<description>Yamaha Graphic Card</description>
+		<year>1984</year>
+		<publisher>Yamaha</publisher>
+		<info name="serial" value="UGA-02" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="yamaha graphic card.rom" size="0x4000" crc="a8f89d26" sha1="05e519caf911a4b4a66c820cadc37feba9b85d68" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphmas">
+		<description>Graphic Master Lab (Japan, Europe)</description>
+		<year>1985</year>
+		<publisher>Sony</publisher>
+		<info name="serial" value="HBS-H011C" />
+		<info name="alt_title" value="グラフィックマスターラボ"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="graphic master lab (japan, europe).rom" size="0x8000" crc="b8356583" sha1="1ee04a1b1165ca7762e6eb2ba47bce917d824b65" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphmasa" cloneof="graphmas">
+		<description>Graphic Master Lab (Japan, Europe, alt)</description>
+		<year>1985</year>
+		<publisher>Sony</publisher>
+		<info name="serial" value="HBS-H011C" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="graphic master lab (japan, europe) (alt).rom" size="0x8000" crc="84f5c8c7" sha1="64e37a5a65d74db75f6d007b33777057a9aa29e7" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gberet">
 		<description>Green Beret (Europe)</description>
 		<year>1986</year>
@@ -5954,6 +6113,20 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="green beret (europe) (alt 1).rom" size="0x8000" crc="46f5e571" sha1="acd46021a228b2b612c82d04c124b78e7d4c25e3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gberetb" cloneof="gberet">
+		<description>Green Beret (Europe, alt 2)</description>
+		<year>1986</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="KN327" />
+		<info name="gtin" value="05015173100438"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="green beret (europe) (alt 2).rom" size="0x8000" crc="db46ef0e" sha1="dcf79362f68853733326a22eb8fdafa17bca281e" />
 			</dataarea>
 		</part>
 	</software>
@@ -6104,6 +6277,19 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="gunjin shogi mars (japan).rom" size="0x8000" crc="174f409d" sha1="f2ec3714138175212b6b6e28b5da4361cc4b5471" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gyroadv">
+		<description>Gyro Adventure (Japan)</description>
+		<year>1984</year>
+		<publisher>Colpax</publisher>
+		<info name="alt_title" value="ジャイロアドベンチャー" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="gyro adventure (japan).rom" size="0x4000" crc="40b8bc6a" sha1="6ae42ce317c23e064dec0c8bd10a645494b67e35" />
 			</dataarea>
 		</part>
 	</software>
@@ -9393,6 +9579,20 @@ Character creation does not write the new character data.
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="nemesis 2 (japan) (demo).rom" size="0x20000" crc="c8fac21a" sha1="6844758ff5c2c410115d4d7cf12498c42e931732" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gradius2da" cloneof="gradius2">
+		<description>Nemesis 2 (Europe) ~ Gradius 2 (Japan) (demo, alt)</description>
+		<year>1987</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="グラディウス2" />
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<feature name="mapper" value="KONAMI-SCC" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="nemesis 2 (japan) (demo, alt).rom" size="0x20000" crc="6be6b85b" sha1="7561f3c70c221df40f1b28209c59882ca065603d" />
 			</dataarea>
 		</part>
 	</software>
@@ -18550,6 +18750,287 @@ legacy FM implementations cannot find it.
 
 
 <!-- Homebrew / Doujin software -->
+
+	<software name="gmonkey">
+		<description>G-Monkey</description>
+		<year>2008</year>
+		<publisher>2KBOS</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="g-monkey - karoshi corporation (2008).rom" size="0x2000" crc="7854cfc4" sha1="affc4dcc0b2c8846202cd99a2f0ef27fc705d96d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="genesis">
+		<description>Genesis Dawn of a New Day</description>
+		<year>2012</year>
+		<publisher>Retroworks</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="genesis dawn of a new day - retroworks (2012).rom" size="0x20000" crc="391e6f9a" sha1="025ba6d1021eadf0c4ff1e189389b31adb08f6fe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="genesisa" cloneof="genesis">
+		<description>Genesis Dawn of a New Day (alt)</description>
+		<year>2012</year>
+		<publisher>Retroworks</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="genesis dawn of a new day - retroworks (2012) (alt).rom" size="0x20000" crc="21c3999f" sha1="ff79f5f9c29041083c2359f85dd75b02fe07bfc6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gniffel">
+		<description>Gniffel</description>
+		<year>2004</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Dioniso"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="gniffel - dioniso (2004).rom" size="0x2000" crc="aa568406" sha1="071e07f110bf1b2574c63f81042fc80c894e3f73" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goal">
+		<description>Goal</description>
+		<year>2018</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="G.G.G. Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="goal - g.g.g. soft (2018).rom" size="0x10000" crc="5b232af5" sha1="e6b1af53fd225ce565c88572d6a592b4fb637840" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goala" cloneof="goal">
+		<description>Goal (alt)</description>
+		<year>2018</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="G.G.G. Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="goal - g.g.g. soft (2018) (alt).rom" size="0x10000" crc="2f94bdec" sha1="b57eca5206a235318397f7461d7f541b44ca2f01" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gommyce">
+		<description>Gommy - Medieval Defender - Cartridge Edition</description>
+		<year>2013</year>
+		<publisher>Retroworks</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="gommy - medieval defender - cartridge edition - retroworks (2013).rom" size="0xc000" crc="00cc2162" sha1="f9eb4335d482508fa822d103b95017aaf59ca724" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gommye" cloneof="gommyce">
+		<description>Gommy - Medieval Defender (English)</description>
+		<year>2013</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Retroworks, Dimension Z, nenefranz"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="gommy - medieval defender - retroworks (2013) (english).rom" size="0x4000" crc="66b27261" sha1="da3555f2f6fd6341ef4c5bc878b45581101a1126" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gommys" cloneof="gommyce">
+		<description>Gommy - Medieval Defender (Spanish)</description>
+		<year>2013</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Retroworks, Dimension Z, nenefranz"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="gommy - medieval defender - retroworks (2013) (spanish).rom" size="0x4000" crc="cb628d7a" sha1="ed73332e7053aab6471f9eb3fea00be25923641f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gemmasdp">
+		<description>Gorgeous Gemma in Escape from the Space Disposal Planet</description>
+		<year>2014</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Impulse9"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="gorgeous gemma in escape from the space disposal planet - impulse9 (2014).rom" size="0x8000" crc="818ccade" sha1="bc56324cb10a1fc2ec5094812f6ffebf481d97f6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gemmasdpo" cloneof="gemmasdp">
+		<description>Gorgeous Gemma in Escape from the Space Disposal Planet (older)</description>
+		<year>2014</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Impulse9"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="gorgeous gemma in escape from the space disposal planet - impulse9 (2014) (older).rom" size="0x8000" crc="f101f812" sha1="d85298a9cdd9bcb4a546cb020ebaccd3c4281f07" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gravitica">
+		<description>GRAVITICA</description>
+		<year>2018</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Yusuke Miyauchi"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="gravitica - yusuke miyauchi (2018).rom" size="0x8000" crc="3bc64731" sha1="9dec583ada35979e62d1d6ad296a8916f3de9414" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="greencat">
+		<description>Green Cat Chronicles</description>
+		<year>2018</year>
+		<publisher>N.I</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="green cat chronicles - n.i (2018).rom" size="0x4000" crc="7cfd2174" sha1="fafa7b2f249983c8e92d6a9f67ef71f75deb07e5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gridwars">
+		<description>Grid Wars</description>
+		<year>2006</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Emma Six"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="grid wars - emma six (2006).rom" size="0x8000" crc="03b56d90" sha1="0e6b6644021dbfad3c486c378818ea5e432bb9fd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grielex">
+		<description>Griel's Quest for the Sangraal (extended edition)</description>
+		<year>2005</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="griel's quest for the sangraal - karoshi corporation (2005) (extended).rom" size="0x8000" crc="c9427fe2" sha1="acb6e93227bc89da119443e03890b58a1befc0b0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grielexo" cloneof="grielex">
+		<description>Griel's Quest for the Sangraal (extended edition, older)</description>
+		<year>2005</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="griel's quest for the sangraal - karoshi corporation (2005) (extended, older).rom" size="0x8000" crc="1da914f3" sha1="4dd2ec21474720eb56f012bb761117b4d507f331" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="griel" cloneof="grielex">
+		<description>Griel's Quest for the Sangraal</description>
+		<year>2005</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="griel's quest for the sangraal - karoshi corporation (2005).rom" size="0x8000" crc="6cebb29b" sha1="5a9364271ddca5208b625c891f01a89fd2367a8d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grielo" cloneof="grielex">
+		<description>Griel's Quest for the Sangraal (older)</description>
+		<year>2005</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="griel's quest for the sangraal - karoshi corporation (2005) (older).rom" size="0x8000" crc="3e7cd0e2" sha1="989d9ba7c0f29694fa3b737d09cf102606b2fd5b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guntus">
+		<description>Guntus</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="guntus - innufuto (2022).rom" size="0x2dd5" crc="54722d30" sha1="74d4d4cf97cc18ac355040ee04a44d50b545f16a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gurulogc">
+		<description>Guru Logic</description>
+		<year>2003</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="guru logic - karoshi corporation (2003).rom" size="0x8000" crc="e18e58e9" sha1="a355e49523edce5f15ebf92b8320ffa6523c1382" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gurulogca" cloneof="gurulogc">
+		<description>Guru Logic (alt)</description>
+		<year>2003</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="guru logic - karoshi corporation (2003) (alt).rom" size="0x8000" crc="28efb895" sha1="3f52c04e64688e8a5cbfc95b21ef03698e1de518" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- SN76489 not emulated -->
+	<software name="gyruss" supported="no">
+		<description>Gyruss</description>
+		<year>2017</year>
+		<publisher>Repro Factory</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="gyruss - repro factory (2017).rom" size="0x10000" crc="e58619bb" sha1="7ba4725a6c0f11f009ed2a333f9951f22cc5b4c7" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="hansadv">
 		<description>Hans' Adventure (v1.1)</description>

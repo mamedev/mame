@@ -2,14 +2,14 @@
 // copyright-holders:Ryan Holtz
 /*********************************************************************
 
-    sgi.c
+    mc.cpp
 
     Silicon Graphics MC (Memory Controller) code
 
 *********************************************************************/
 
 #include "emu.h"
-#include "sgi.h"
+#include "mc.h"
 
 #define LOG_UNKNOWN     (1U << 1)
 #define LOG_READS       (1U << 2)

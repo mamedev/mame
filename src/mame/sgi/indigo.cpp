@@ -21,7 +21,7 @@
 #include "cpu/mips/r4000.h"
 #include "machine/eepromser.h"
 #include "hpc1.h"
-#include "sgi.h"
+#include "mc.h"
 #include "light.h"
 
 #define LOG_UNKNOWN     (1U << 1)

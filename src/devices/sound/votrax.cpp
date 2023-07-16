@@ -481,7 +481,7 @@ void votrax_sc01_device::chip_update()
 	// Closure counter, reset every other tick in theory when not
 	// active (on the extra rom cycle).
 	//
-	// The closure level is immediatly used in the analog path,
+	// The closure level is immediately used in the analog path,
 	// there's no pitch synchronization.
 
 	if(!m_cur_closure && (m_filt_fa || m_filt_va))
@@ -683,16 +683,16 @@ stream_buffer::sample_t votrax_sc01_device::analog_calc()
   defined as the ratio Vo/Vi.  To do that, you use some properties:
 
   - The intensity through an element is equal to the voltage
-    difference through the element divided by the impedence
+    difference through the element divided by the impedance
 
-  - The impedence of a resistance is equal to its resistance
+  - The impedance of a resistance is equal to its resistance
 
-  - The impedence of a capacitor is 1/(s*C) where C is its capacitance
+  - The impedance of a capacitor is 1/(s*C) where C is its capacitance
 
-  - The impedence of elements in series is the sum of the impedences
+  - The impedance of elements in series is the sum of their impedances
 
-  - The impedence of elements in parallel is the inverse of the sum of
-    the inverses
+  - The impedance of elements in parallel is the inverse of the sum of
+    their inverses
 
   - The sum of all intensities flowing into a node is 0 (there's no
     charge accumulation in a wire)
@@ -737,7 +737,7 @@ stream_buffer::sample_t votrax_sc01_device::analog_calc()
   |        H(s) = -------------------------
   |                 1 + k[1]*s + k[2]*s^2
 
-  We can always reintroduce the global multipler later, and it's 1 in
+  We can always reintroduce the global multiplier later, and it's 1 in
   most of our cases anyway.
 
   The we pose:

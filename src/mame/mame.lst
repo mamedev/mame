@@ -27260,6 +27260,7 @@ mazebl                          // bootleg
 mkla1                           // (c) 1992 Midway
 mkla2                           // (c) 1992 Midway
 mkla3                           // (c) 1992 Midway
+mkla3bl                         // bootleg
 mkla4                           // (c) 1992 Midway
 mknifty                         // hack
 mknifty666                      // hack
@@ -28384,6 +28385,8 @@ magibombd                       // (c) 2005  Astro Corp.
 magibombe                       // (c) 2001? Astro Corp.
 magibombf                       // (c) 2002  Astro Corp.
 magibombg                       // (c) 2004  Astro Corp.
+magibombh                       // (c) 2001? Astro Corp.
+magibombi                       // (c) 2001? Astro Corp.
 showhanc                        // (c) 2000  Astro Corp.
 showhand                        // (c) 2000  Astro Corp.
 skilldrp                        // (c) 2002  Astro Corp.
@@ -29526,11 +29529,10 @@ fortecrd                        // (c) 1994, Fortex Ltd.
 fortecrde                       // (c) 1994, Fortex Ltd.
 
 @source:misc/freekick.cpp
-omega                           // (c) 1986 Nihon System
-omegaa                          // (c) 1986 Nihon System
 countrun                        // (c) 1988 Nihon System (+ optional Sega) NS6201-A 1988.3
 countrunb                       // (c) 1988 bootleg
 countrunb2                      // (c) 1988 bootleg
+countrunb3                      // (c) 1988 bootleg
 freekick                        // (c) 1988 Nihon System licensed to Merit (+ optional Sega) NS6201-A 1987.10
 freekicka                       // (c) 1988 Nihon System (+ optional Sega) NS6201-A 1987.9
 freekickb1                      // (c) 1987 bootleg
@@ -29541,6 +29543,8 @@ gigasb                          // (c) 1986 bootleg
 gigasm2                         // (c) 1986 Sega
 gigasm2b                        // (c) 1986 bootleg
 oigas                           // (c) 1986 bootleg
+omega                           // (c) 1986 Nihon System
+omegaa                          // (c) 1986 Nihon System
 pbillrd                         // (c) 1987 Nihon System
 pbillrdbl                       // (c) 1987 bootleg
 pbillrds                        // (c) 1987 Nihon System (Sega license?)
@@ -40265,6 +40269,7 @@ panicrg                         // Seibu / TV-Tuning (Germany)
 @source:seibu/r2dx_v33.cpp
 nzeroteam                       // (c) 1997 Seibu Kaihatsu
 nzeroteama                      //
+nzeroteamb                      //
 r2dx_v33                        // (c) 1996 Seibu Kaihatsu
 r2dx_v33_r2                     // (c) 1996 Seibu Kaihatsu
 zerotm2k                        // (c) 2000 Seibu Kaihatsu
@@ -45652,8 +45657,8 @@ laserbat                        // (c) 1981
 lazarian                        // (c) 1981
 
 @source:zaccaria/seabattl.cpp
+armada                          //
 seabattl                        // (c) 1980
-seabattla                       // (c) 1980
 
 @source:zaccaria/zac1b1120.cpp
 dodgem                          // (c) 1979

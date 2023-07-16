@@ -119,16 +119,18 @@ mos6530_device_base::mos6530_device_base(const machine_config &mconfig, device_t
 //  mos6530_new_device - constructor
 //-------------------------------------------------
 
-mos6530_new_device::mos6530_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mos6530_device_base(mconfig, MOS6530_NEW, tag, owner, clock, 0x40) { }
+mos6530_new_device::mos6530_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	mos6530_device_base(mconfig, MOS6530_NEW, tag, owner, clock, 0x40)
+{ }
 
 
 //-------------------------------------------------
 //  mos6532_new_device - constructor
 //-------------------------------------------------
 
-mos6532_new_device::mos6532_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mos6530_device_base(mconfig, MOS6532_NEW, tag, owner, clock, 0x80) { }
+mos6532_new_device::mos6532_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	mos6530_device_base(mconfig, MOS6532_NEW, tag, owner, clock, 0x80)
+{ }
 
 
 //-------------------------------------------------
@@ -155,6 +157,20 @@ void mos6530_device_base::device_start()
 	save_item(NAME(m_irq_edge));
 	save_item(NAME(m_prescale));
 	save_item(NAME(m_timer));
+
+	save_item(NAME(cur_live.tm));
+	save_item(NAME(cur_live.tm_irq));
+	save_item(NAME(cur_live.period));
+	save_item(NAME(cur_live.state));
+	save_item(NAME(cur_live.next_state));
+	save_item(NAME(cur_live.value));
+
+	save_item(NAME(checkpoint_live.tm));
+	save_item(NAME(checkpoint_live.tm_irq));
+	save_item(NAME(checkpoint_live.period));
+	save_item(NAME(checkpoint_live.state));
+	save_item(NAME(checkpoint_live.next_state));
+	save_item(NAME(checkpoint_live.value));
 }
 
 
@@ -183,9 +199,8 @@ void mos6530_device_base::device_reset()
 	m_timer = 0xff;
 	m_prescale = 1024;
 
-	if (cur_live.state != IDLE) {
+	if (cur_live.state != IDLE)
 		live_abort();
-	}
 
 	live_start();
 	live_run();
@@ -209,25 +224,13 @@ TIMER_CALLBACK_MEMBER(mos6530_device_base::update)
 
 void mos6530_device_base::update_pa()
 {
-	uint8_t out = m_pa_out;
-	uint8_t ddr = m_pa_ddr;
-	uint8_t data = (out & ddr) | (ddr ^ 0xff);
+	uint8_t data = (m_pa_out & m_pa_ddr) | (m_pa_ddr ^ 0xff);
 
-	if (m_out8_pa_cb.isunset())
-	{
-		m_out_pa_cb[0](BIT(data, 0));
-		m_out_pa_cb[1](BIT(data, 1));
-		m_out_pa_cb[2](BIT(data, 2));
-		m_out_pa_cb[3](BIT(data, 3));
-		m_out_pa_cb[4](BIT(data, 4));
-		m_out_pa_cb[5](BIT(data, 5));
-		m_out_pa_cb[6](BIT(data, 6));
-		m_out_pa_cb[7](BIT(data, 7));
-	}
-	else
-	{
+	if (m_out8_pa_cb.isunset()) {
+		for (int i = 0; i < 8; i++)
+			m_out_pa_cb[i](BIT(data, i));
+	} else
 		m_out8_pa_cb(data);
-	}
 }
 
 
@@ -237,57 +240,31 @@ void mos6530_device_base::update_pa()
 
 void mos6530_device_base::update_pb()
 {
-	uint8_t out = m_pb_out;
-	uint8_t ddr = m_pb_ddr;
-	uint8_t data = (out & ddr) | (ddr ^ 0xff);
+	uint8_t data = (m_pb_out & m_pb_ddr) | (m_pb_ddr ^ 0xff);
 
-	if (m_out8_pb_cb.isunset())
-	{
-		m_out_pb_cb[0](BIT(data, 0));
-		m_out_pb_cb[1](BIT(data, 1));
-		m_out_pb_cb[2](BIT(data, 2));
-		m_out_pb_cb[3](BIT(data, 3));
-		m_out_pb_cb[4](BIT(data, 4));
-		m_out_pb_cb[5](BIT(data, 5));
-		m_out_pb_cb[6](BIT(data, 6));
-		m_out_pb_cb[7](BIT(data, 7));
-	}
-	else
-	{
+	if (m_out8_pb_cb.isunset()) {
+		for (int i = 0; i < 8; i++)
+			m_out_pb_cb[i](BIT(data, i));
+	} else
 		m_out8_pb_cb(data);
-	}
 }
 
 void mos6530_new_device::update_pb()
 {
-	uint8_t out = m_pb_out;
-	uint8_t ddr = m_pb_ddr;
-	uint8_t data = (out & ddr) | (ddr ^ 0xff);
+	uint8_t data = (m_pb_out & m_pb_ddr) | (m_pb_ddr ^ 0xff);
 
-	if (m_ie_timer)
-	{
-		if (m_irq_timer) {
+	if (m_ie_timer) {
+		if (m_irq_timer)
 			data |= IRQ_TIMER;
-		} else {
+		else
 			data &= ~IRQ_TIMER;
-		}
 	}
 
-	if (m_out8_pb_cb.isunset())
-	{
-		m_out_pb_cb[0](BIT(data, 0));
-		m_out_pb_cb[1](BIT(data, 1));
-		m_out_pb_cb[2](BIT(data, 2));
-		m_out_pb_cb[3](BIT(data, 3));
-		m_out_pb_cb[4](BIT(data, 4));
-		m_out_pb_cb[5](BIT(data, 5));
-		m_out_pb_cb[6](BIT(data, 6));
-		m_out_pb_cb[7](BIT(data, 7));
-	}
-	else
-	{
+	if (m_out8_pb_cb.isunset()) {
+		for (int i = 0; i < 8; i++)
+			m_out_pb_cb[i](BIT(data, i));
+	} else
 		m_out8_pb_cb(data);
-	}
 }
 
 
@@ -341,13 +318,10 @@ uint8_t mos6530_new_device::get_irq_flags()
 
 void mos6530_device_base::edge_detect()
 {
-	uint8_t ddr_out = m_pa_ddr;
-	uint8_t ddr_in = m_pa_ddr ^ 0xff;
-	uint8_t data = (m_pa_out & ddr_out) | (m_pa_in & ddr_in);
+	uint8_t data = (m_pa_out & m_pa_ddr) | (m_pa_in & ~m_pa_ddr);
 	int state = BIT(data, 7);
 
-	if ((m_pa7 ^ state) && (m_pa7_dir ^ state) == 0 && !m_irq_edge)
-	{
+	if ((m_pa7 ^ state) && !(m_pa7_dir ^ state) && !m_irq_edge) {
 		LOG("%s %s edge-detect IRQ\n", machine().time().as_string(), name());
 
 		m_irq_edge = true;
@@ -394,26 +368,13 @@ uint8_t mos6530_device_base::pa_data_r()
 {
 	uint8_t in = 0;
 
-	if (m_in8_pa_cb.isunset())
-	{
-		in |= (m_in_pa_cb[0].isunset() ? BIT(m_pa_in, 0) : m_in_pa_cb[0]());
-		in |= (m_in_pa_cb[1].isunset() ? BIT(m_pa_in, 1) : m_in_pa_cb[1]()) << 1;
-		in |= (m_in_pa_cb[2].isunset() ? BIT(m_pa_in, 2) : m_in_pa_cb[2]()) << 2;
-		in |= (m_in_pa_cb[3].isunset() ? BIT(m_pa_in, 3) : m_in_pa_cb[3]()) << 3;
-		in |= (m_in_pa_cb[4].isunset() ? BIT(m_pa_in, 4) : m_in_pa_cb[4]()) << 4;
-		in |= (m_in_pa_cb[5].isunset() ? BIT(m_pa_in, 5) : m_in_pa_cb[5]()) << 5;
-		in |= (m_in_pa_cb[6].isunset() ? BIT(m_pa_in, 6) : m_in_pa_cb[6]()) << 6;
-		in |= (m_in_pa_cb[7].isunset() ? BIT(m_pa_in, 7) : m_in_pa_cb[7]()) << 7;
-	}
-	else
-	{
+	if (m_in8_pa_cb.isunset()) {
+		for (int i = 0; i < 8; i++)
+			in |= (m_in_pa_cb[i].isunset() ? BIT(m_pa_in, i) : m_in_pa_cb[i]()) << i;
+	} else
 		in = m_in8_pa_cb();
-	}
 
-	uint8_t out = m_pa_out;
-	uint8_t ddr_out = m_pa_ddr;
-	uint8_t ddr_in = m_pa_ddr ^ 0xff;
-	uint8_t data = (out & ddr_out) | (in & ddr_in);
+	uint8_t data = (m_pa_out & m_pa_ddr) | (in & ~m_pa_ddr);
 
 	LOG("%s %s %s Port A Data In %02x\n", machine().time().as_string(), machine().describe_context(), name(), data);
 
@@ -459,26 +420,13 @@ uint8_t mos6530_device_base::pb_data_r()
 {
 	uint8_t in = 0;
 
-	if (m_in8_pb_cb.isunset())
-	{
-		in |= (m_in_pb_cb[0].isunset() ? BIT(m_pb_in, 0) : m_in_pb_cb[0]());
-		in |= (m_in_pb_cb[1].isunset() ? BIT(m_pb_in, 1) : m_in_pb_cb[1]()) << 1;
-		in |= (m_in_pb_cb[2].isunset() ? BIT(m_pb_in, 2) : m_in_pb_cb[2]()) << 2;
-		in |= (m_in_pb_cb[3].isunset() ? BIT(m_pb_in, 3) : m_in_pb_cb[3]()) << 3;
-		in |= (m_in_pb_cb[4].isunset() ? BIT(m_pb_in, 4) : m_in_pb_cb[4]()) << 4;
-		in |= (m_in_pb_cb[5].isunset() ? BIT(m_pb_in, 5) : m_in_pb_cb[5]()) << 5;
-		in |= (m_in_pb_cb[6].isunset() ? BIT(m_pb_in, 6) : m_in_pb_cb[6]()) << 6;
-		in |= (m_in_pb_cb[7].isunset() ? BIT(m_pb_in, 7) : m_in_pb_cb[7]()) << 7;
-	}
-	else
-	{
+	if (m_in8_pb_cb.isunset()) {
+		for (int i = 0; i < 8; i++)
+			in |= (m_in_pb_cb[i].isunset() ? BIT(m_pb_in, i) : m_in_pb_cb[i]()) << i;
+	} else
 		in = m_in8_pb_cb();
-	}
 
-	uint8_t out = m_pb_out;
-	uint8_t ddr_out = m_pb_ddr;
-	uint8_t ddr_in = m_pb_ddr ^ 0xff;
-	uint8_t data = (out & ddr_out) | (in & ddr_in);
+	uint8_t data = (m_pb_out & m_pb_ddr) | (in & ~m_pb_ddr);
 
 	LOG("%s %s %s Port B Data In %02x\n", machine().time().as_string(), machine().describe_context(), name(), data);
 
@@ -541,9 +489,8 @@ uint8_t mos6530_device_base::timer_r(bool ie)
 	live_sync();
 
 	m_ie_timer = ie;
-	if (cur_live.tm_irq != machine().time()) {
+	if (cur_live.tm_irq != machine().time())
 		m_irq_timer = false;
-	}
 	update_irq();
 
 	data = cur_live.value;
@@ -604,18 +551,16 @@ void mos6530_device_base::timer_w(offs_t offset, uint8_t data, bool ie)
 	}
 
 	m_ie_timer = ie;
-	if (cur_live.tm_irq != machine().time()) {
+	if (cur_live.tm_irq != machine().time())
 		m_irq_timer = false;
-	}
 	update_irq();
 
 	LOGTIMER("%s %s %s Timer value %02x prescale %u IE %u\n", machine().time().as_string(), machine().describe_context(), name(), data, m_prescale, m_ie_timer ? 1 : 0);
 
 	checkpoint();
 
-	if (cur_live.state != IDLE) {
+	if (cur_live.state != IDLE)
 		live_abort();
-	}
 
 	live_start();
 	live_run();
@@ -626,10 +571,11 @@ void mos6530_device_base::timer_w(offs_t offset, uint8_t data, bool ie)
 //  edge_w -
 //-------------------------------------------------
 
-void mos6530_device_base::edge_w(uint8_t data)
+void mos6530_device_base::edge_w(offs_t offset, uint8_t data)
 {
-	m_pa7_dir = BIT(data, 0);
-	m_ie_edge = BIT(data, 1) ? false : true;
+	m_pa7_dir = BIT(offset, 0);
+	m_ie_edge = bool(BIT(offset, 1));
+	update_irq();
 
 	LOG("%s %s %s %s edge-detect, %s interrupt\n", machine().time().as_string(), machine().describe_context(), name(), m_pa7_dir ? "positive" : "negative", m_ie_edge ? "enable" : "disable");
 }
@@ -666,7 +612,7 @@ void mos6530_device_base::rollback()
 void mos6530_device_base::live_delay(int state)
 {
 	cur_live.next_state = state;
-	if(cur_live.tm != machine().time())
+	if (cur_live.tm != machine().time())
 		t_gen->adjust(cur_live.tm - machine().time());
 	else
 		live_sync();
@@ -674,16 +620,16 @@ void mos6530_device_base::live_delay(int state)
 
 void mos6530_device_base::live_sync()
 {
-	if(!cur_live.tm.is_never()) {
-		if(cur_live.tm > machine().time()) {
+	if (!cur_live.tm.is_never()) {
+		if (cur_live.tm > machine().time()) {
 			rollback();
 			live_run(machine().time());
 		} else {
-			if(cur_live.next_state != -1) {
+			if (cur_live.next_state != -1) {
 				cur_live.state = cur_live.next_state;
 				cur_live.next_state = -1;
 			}
-			if(cur_live.state == IDLE) {
+			if (cur_live.state == IDLE) {
 				cur_live.tm = attotime::never;
 			}
 		}
@@ -694,7 +640,7 @@ void mos6530_device_base::live_sync()
 
 void mos6530_device_base::live_abort()
 {
-	if(!cur_live.tm.is_never() && cur_live.tm > machine().time()) {
+	if (!cur_live.tm.is_never() && cur_live.tm > machine().time()) {
 		rollback();
 		live_run(machine().time());
 	}
@@ -707,11 +653,11 @@ void mos6530_device_base::live_abort()
 
 void mos6530_device_base::live_run(const attotime &limit)
 {
-	if(cur_live.state == IDLE || cur_live.next_state != -1)
+	if (cur_live.state == IDLE || cur_live.next_state != -1)
 		return;
 
-	for(;;) {
-		switch(cur_live.state) {
+	for (;;) {
+		switch (cur_live.state) {
 		case RUNNING: {
 			if (cur_live.tm > limit)
 				return;
