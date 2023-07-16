@@ -94,7 +94,7 @@ void smuc_device::map_io(address_map &map)
 	map(0x138a6, 0x138a6).mirror(0x4718) //  7[ef]be | 0x111xxN101xx110 | i8259 - absent in 2.0
 		.lr8(NAME([]() { return 0x57; })).nopw();
 	map(0x198a2, 0x198a2).mirror(0x4718) //     dfba | 1x011xxx101xx010 | DS1685RTC
-		.lrw8(NAME([this]() { return m_rtc->read(BIT(m_port_ffba_data, 7)); })
+		.lrw8(NAME([this]() { return m_rtc->read(1); })
 			, NAME([this](offs_t offset, u8 data) { m_rtc->write(BIT(m_port_ffba_data, 7), data); }));
 	map(0x198a6, 0x198a6).mirror(0x4718) //     d8be | 1x011xxx101xx110 | IDE-Hi
 		.lrw8(NAME([this]() { return m_ide_hi; }), NAME([this](u8 data) { m_ide_hi = data; }));
