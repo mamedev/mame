@@ -102,19 +102,25 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	TIMER_CALLBACK_MEMBER(update);
-
-	enum
-	{
+	enum {
 		IRQ_EDGE  = 0x40,
 		IRQ_TIMER = 0x80
+	};
+
+	enum {
+		TIMER_COUNTING,
+		TIMER_FINISHING
 	};
 
 	void update_pa();
 	virtual void update_pb();
 	virtual void update_irq();
 	virtual uint8_t get_irq_flags();
+	TIMER_CALLBACK_MEMBER(timer_end);
+	uint8_t get_timer();
+	void timer_irq_enable(bool ie);
 	void edge_detect();
+
 	void pa_w(int bit, int state);
 	void pb_w(int bit, int state);
 	void timer_w(offs_t offset, uint8_t data, bool ie);
@@ -166,33 +172,10 @@ protected:
 	bool m_ie_edge;
 	bool m_irq_edge;
 
-	int m_prescale;
-	uint8_t m_timer;
-
-	enum {
-		IDLE,
-		RUNNING,
-		RUNNING_SYNCPOINT,
-		RUNNING_AFTER_INTERRUPT
-	};
-
-	struct live_info {
-		attotime tm, tm_irq;
-		attotime period;
-		int state, next_state;
-		uint8_t value;
-	};
-
-	live_info cur_live, checkpoint_live;
-	emu_timer *t_gen;
-
-	void live_start();
-	void checkpoint();
-	void rollback();
-	void live_delay(int state);
-	void live_sync();
-	void live_abort();
-	void live_run(const attotime &limit = attotime::never);
+	uint8_t m_timershift;
+	uint8_t m_timerstate;
+	emu_timer *m_timer;
+	attotime m_timeout;
 };
 
 

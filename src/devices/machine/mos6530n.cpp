@@ -107,11 +107,10 @@ mos6530_device_base::mos6530_device_base(const machine_config &mconfig, device_t
 	m_ie_timer(false),
 	m_irq_timer(true),
 	m_ie_edge(false),
-	m_irq_edge(false)
+	m_irq_edge(false),
+	m_timershift(0),
+	m_timerstate(0)
 {
-	cur_live.tm = attotime::never;
-	cur_live.state = IDLE;
-	cur_live.next_state = -1;
 }
 
 
@@ -140,7 +139,7 @@ mos6532_new_device::mos6532_new_device(const machine_config &mconfig, const char
 void mos6530_device_base::device_start()
 {
 	// allocate timer
-	t_gen = timer_alloc(FUNC(mos6530_device_base::update), this);
+	m_timer = timer_alloc(FUNC(mos6530_device_base::timer_end), this);
 
 	// state saving
 	save_item(NAME(m_pa_in));
@@ -148,29 +147,19 @@ void mos6530_device_base::device_start()
 	save_item(NAME(m_pa_ddr));
 	save_item(NAME(m_pa7));
 	save_item(NAME(m_pa7_dir));
+
 	save_item(NAME(m_pb_in));
 	save_item(NAME(m_pb_out));
 	save_item(NAME(m_pb_ddr));
+
 	save_item(NAME(m_ie_timer));
 	save_item(NAME(m_irq_timer));
 	save_item(NAME(m_ie_edge));
 	save_item(NAME(m_irq_edge));
-	save_item(NAME(m_prescale));
-	save_item(NAME(m_timer));
 
-	save_item(NAME(cur_live.tm));
-	save_item(NAME(cur_live.tm_irq));
-	save_item(NAME(cur_live.period));
-	save_item(NAME(cur_live.state));
-	save_item(NAME(cur_live.next_state));
-	save_item(NAME(cur_live.value));
-
-	save_item(NAME(checkpoint_live.tm));
-	save_item(NAME(checkpoint_live.tm_irq));
-	save_item(NAME(checkpoint_live.period));
-	save_item(NAME(checkpoint_live.state));
-	save_item(NAME(checkpoint_live.next_state));
-	save_item(NAME(checkpoint_live.value));
+	save_item(NAME(m_timershift));
+	save_item(NAME(m_timerstate));
+	save_item(NAME(m_timeout));
 }
 
 
@@ -196,25 +185,10 @@ void mos6530_device_base::device_reset()
 	update_irq();
 	edge_detect();
 
-	m_timer = 0xff;
-	m_prescale = 1024;
-
-	if (cur_live.state != IDLE)
-		live_abort();
-
-	live_start();
-	live_run();
-}
-
-
-//-------------------------------------------------
-//  update - update the current device state
-//-------------------------------------------------
-
-TIMER_CALLBACK_MEMBER(mos6530_device_base::update)
-{
-	live_sync();
-	live_run();
+	// reset timer states
+	m_timershift = 10;
+	m_timerstate = TIMER_COUNTING;
+	m_timer->adjust(attotime::from_ticks(256 << m_timershift, clock()));
 }
 
 
@@ -309,6 +283,57 @@ uint8_t mos6530_new_device::get_irq_flags()
 	if (m_irq_timer) data |= IRQ_TIMER;
 
 	return data;
+}
+
+
+//-------------------------------------------------
+//  get_timer - return the current timer value
+//-------------------------------------------------
+
+uint8_t mos6530_device_base::get_timer()
+{
+	// determine the number of ticks remaining
+	uint8_t shift = (m_timerstate == TIMER_COUNTING) ? m_timershift : 0;
+	int64_t remain = m_timer->remaining().as_ticks(clock());
+	uint8_t val = remain >> shift;
+
+	// timeout is at 255, so round it down
+	return (remain & ((1 << shift) - 1)) ? val : (val - 1);
+}
+
+
+//-------------------------------------------------
+//  timer_end -
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(mos6530_device_base::timer_end)
+{
+	// if we finished counting, signal timer IRQ
+	if (m_timerstate == TIMER_COUNTING) {
+		m_timeout = machine().time();
+		m_irq_timer = true;
+		update_irq();
+	}
+
+	// if we finished, keep spinning without the prescaler
+	m_timerstate = TIMER_FINISHING;
+	m_timer->adjust(attotime::from_ticks(256, clock()));
+}
+
+
+//-------------------------------------------------
+//  timer_irq_enable - enable/clear timer IRQ
+//-------------------------------------------------
+
+void mos6530_device_base::timer_irq_enable(bool ie)
+{
+	m_ie_timer = ie;
+
+	// IRQ is not cleared if access is at same time IRQ is raised
+	if (m_timeout <= machine().time() - attotime::from_hz(clock()))
+		m_irq_timer = false;
+
+	update_irq();
 }
 
 
@@ -468,37 +493,24 @@ void mos6530_device_base::pb_ddr_w(uint8_t data)
 
 uint8_t mos6530_device_base::timer_off_r()
 {
-	if (machine().side_effects_disabled())
-		return 0;
-
 	return timer_r(false);
 }
 
 uint8_t mos6530_device_base::timer_on_r()
 {
-	if (machine().side_effects_disabled())
-		return 0;
-
 	return timer_r(true);
 }
 
 uint8_t mos6530_device_base::timer_r(bool ie)
 {
-	uint8_t data;
+	uint8_t data = get_timer();
 
-	live_sync();
+	if (!machine().side_effects_disabled())
+	{
+		timer_irq_enable(ie);
 
-	m_ie_timer = ie;
-	if (cur_live.tm_irq != machine().time())
-		m_irq_timer = false;
-	update_irq();
-
-	data = cur_live.value;
-
-	LOGTIMER("%s %s %s Timer read %02x IE %u\n", machine().time().as_string(), machine().describe_context(), name(), data, m_ie_timer ? 1 : 0);
-
-	checkpoint();
-	live_run();
+		LOGTIMER("%s %s %s Timer read %02x IE %u\n", machine().time().as_string(), machine().describe_context(), name(), data, m_ie_timer ? 1 : 0);
+	}
 
 	return data;
 }
@@ -539,31 +551,19 @@ void mos6530_device_base::timer_on_w(offs_t offset, uint8_t data)
 
 void mos6530_device_base::timer_w(offs_t offset, uint8_t data, bool ie)
 {
-	live_sync();
+	// A0-A1 contain the prescaler
+	static const uint8_t timershift[4] = { 0, 3, 6, 10 };
+	m_timershift = timershift[offset & 3];
 
-	m_timer = data;
+	timer_irq_enable(ie);
 
-	switch (offset & 0x03) {
-	case 0: m_prescale = 1; break;
-	case 1: m_prescale = 8; break;
-	case 2: m_prescale = 64; break;
-	case 3: m_prescale = 1024; break;
-	}
+	LOGTIMER("%s %s %s Timer value %02x prescale %u IE %u\n", machine().time().as_string(), machine().describe_context(), name(), data, 1 << m_timershift, m_ie_timer ? 1 : 0);
 
-	m_ie_timer = ie;
-	if (cur_live.tm_irq != machine().time())
-		m_irq_timer = false;
-	update_irq();
-
-	LOGTIMER("%s %s %s Timer value %02x prescale %u IE %u\n", machine().time().as_string(), machine().describe_context(), name(), data, m_prescale, m_ie_timer ? 1 : 0);
-
-	checkpoint();
-
-	if (cur_live.state != IDLE)
-		live_abort();
-
-	live_start();
-	live_run();
+	// update the timer
+	m_timerstate = TIMER_COUNTING;
+	attotime curtime = machine().time();
+	int64_t target = curtime.as_ticks(clock()) + 1 + (data << m_timershift);
+	m_timer->adjust(attotime::from_ticks(target, clock()) - curtime);
 }
 
 
@@ -578,131 +578,4 @@ void mos6530_device_base::edge_w(offs_t offset, uint8_t data)
 	update_irq();
 
 	LOG("%s %s %s %s edge-detect, %s interrupt\n", machine().time().as_string(), machine().describe_context(), name(), m_pa7_dir ? "positive" : "negative", m_ie_edge ? "enable" : "disable");
-}
-
-
-//-------------------------------------------------
-//  live_start -
-//-------------------------------------------------
-
-void mos6530_device_base::live_start()
-{
-	cur_live.period = attotime::from_ticks(m_prescale, clock());
-	cur_live.tm = machine().time() + attotime::from_hz(clock());
-	cur_live.state = RUNNING;
-	cur_live.next_state = -1;
-
-	cur_live.value = m_timer;
-
-	checkpoint();
-
-	live_run();
-}
-
-void mos6530_device_base::checkpoint()
-{
-	checkpoint_live = cur_live;
-}
-
-void mos6530_device_base::rollback()
-{
-	cur_live = checkpoint_live;
-}
-
-void mos6530_device_base::live_delay(int state)
-{
-	cur_live.next_state = state;
-	if (cur_live.tm != machine().time())
-		t_gen->adjust(cur_live.tm - machine().time());
-	else
-		live_sync();
-}
-
-void mos6530_device_base::live_sync()
-{
-	if (!cur_live.tm.is_never()) {
-		if (cur_live.tm > machine().time()) {
-			rollback();
-			live_run(machine().time());
-		} else {
-			if (cur_live.next_state != -1) {
-				cur_live.state = cur_live.next_state;
-				cur_live.next_state = -1;
-			}
-			if (cur_live.state == IDLE) {
-				cur_live.tm = attotime::never;
-			}
-		}
-		cur_live.next_state = -1;
-		checkpoint();
-	}
-}
-
-void mos6530_device_base::live_abort()
-{
-	if (!cur_live.tm.is_never() && cur_live.tm > machine().time()) {
-		rollback();
-		live_run(machine().time());
-	}
-
-	cur_live.tm = attotime::never;
-	cur_live.state = IDLE;
-	cur_live.next_state = -1;
-	cur_live.tm_irq = attotime::never;
-}
-
-void mos6530_device_base::live_run(const attotime &limit)
-{
-	if (cur_live.state == IDLE || cur_live.next_state != -1)
-		return;
-
-	for (;;) {
-		switch (cur_live.state) {
-		case RUNNING: {
-			if (cur_live.tm > limit)
-				return;
-
-			cur_live.value--;
-
-			if (cur_live.value == 0xff) {
-				live_delay(RUNNING_SYNCPOINT);
-				return;
-			} else {
-				LOGTIMER("%s %s timer %02x\n", cur_live.tm.as_string(), name(), cur_live.value);
-
-				cur_live.tm += cur_live.period;
-			}
-			break;
-		}
-
-		case RUNNING_SYNCPOINT: {
-			LOGTIMER("%s %s timer %02x interrupt\n", cur_live.tm.as_string(), name(), cur_live.value);
-
-			cur_live.tm_irq = cur_live.tm;
-			m_irq_timer = true;
-			update_irq();
-
-			checkpoint();
-
-			cur_live.state = RUNNING_AFTER_INTERRUPT;
-			cur_live.period = attotime::from_hz(clock());
-			cur_live.tm += cur_live.period;
-			break;
-		}
-
-		case RUNNING_AFTER_INTERRUPT: {
-			if (cur_live.tm > limit)
-				return;
-
-			cur_live.value--;
-
-			LOGTIMER("%s %s timer %02x\n", cur_live.tm.as_string(), name(), cur_live.value);
-
-			cur_live.tm += cur_live.period;
-
-			live_delay(RUNNING_AFTER_INTERRUPT);
-			return;
-		}
-		}
-	}
 }
