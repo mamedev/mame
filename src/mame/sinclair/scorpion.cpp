@@ -250,6 +250,7 @@ void scorpion_state::scorpion_mem(address_map &map)
 
 void scorpion_state::scorpion_ioext(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0022, 0x0022).select(0xffdc) // FE | xxxxxxxxxx1xxx10
 		.rw(FUNC(scorpion_state::spectrum_ula_r), FUNC(scorpion_state::spectrum_ula_w));
 	map(0x0023, 0x0023).mirror(0xffdc) // FF | xxxxxxxxxx1xxx11
@@ -282,7 +283,6 @@ void scorpion_state::scorpion_ioext(address_map &map)
 
 void scorpion_state::scorpion_io(address_map &map)
 {
-	map.unmap_value_high();
 	map(0x0000, 0xffff).lrw8(
 		NAME([this](offs_t offset) { return m_bankio->read8((m_beta->is_active() || BIT(m_port_1ffd_data, 3)) << 16 | offset); }),
 		NAME([this](offs_t offset, u8 data) { m_bankio->write8((m_beta->is_active() || BIT(m_port_1ffd_data, 3)) << 16 | offset, data); }));
