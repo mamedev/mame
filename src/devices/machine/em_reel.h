@@ -14,60 +14,64 @@
 class em_reel_device : public device_t
 {
 public:
-	em_reel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	em_reel_device(const machine_config &mconfig, const char *tag, device_t *owner, 
-				   uint16_t steps, uint16_t numstops, double speed, uint8_t direction = REVERSE) :
-				   em_reel_device(mconfig, tag, owner, 0)
-	{
-		set_max_pos(steps);
-		set_steps_per_detent(numstops);
-		set_speed(speed);
-		set_direction(direction);
-	}
-
-	// Start and stop the reel
-	void set_state(uint8_t state);
-	// Set the direction the reel moves in
-	void set_direction(uint8_t direction) { m_direction = direction; }
-	// Set the speed of the reel (revolutions/second)
-	void set_speed(double speed) { m_step_period = attotime::from_double(1.0 / speed / m_max_pos); }
-	// Get the reel's current step position
-	uint16_t get_pos() { return m_pos; }
-
-	// Movement state callback, used for playing samples
-	auto state_changed_callback() { return m_state_cb.bind(); }
-
-	void set_max_pos(uint16_t steps) { m_max_pos = steps; }
-	void set_steps_per_detent(uint16_t numstops);
-
-	enum
+	enum class dir : uint8_t
 	{
 		FORWARD = 0, // Steps count up
 		REVERSE // Steps count down
 	};
 
+	em_reel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	em_reel_device(const machine_config &mconfig, const char *tag, device_t *owner, 
+				   uint16_t steps, std::set<uint16_t> detents, attotime period, dir direction = dir::REVERSE) :
+				   em_reel_device(mconfig, tag, owner, 0)
+	{
+		set_max_pos(steps);
+		set_detents(detents);
+		set_rotation_period(period);
+		set_direction(direction);
+	}
+
+	// Set period for one full rotation
+	void set_rotation_period(attotime period) { m_step_period = period / (m_max_pos + 1); }
+
+	// Get the reel's current step position
+	uint16_t get_pos() { return m_pos; }
+	// Start and stop the reel
+	void set_state(uint8_t state);
+	// Set the direction the reel moves in
+	void set_direction(dir direction) { m_direction = direction; }
+
+	// Movement state callback, used for playing samples
+	auto state_changed_callback() { return m_state_cb.bind(); }
+
 protected:
 	virtual void device_start() override;
+	virtual void device_validity_check(validity_checker &valid) const override;
 
 private:
-	uint8_t m_state;
-	uint16_t m_pos;
-	emu_timer *m_move_timer;
-	uint16_t m_max_pos;
-	uint16_t m_steps_per_detent;
-	attotime m_step_period;
-	uint8_t m_direction;
+	enum class reel_state : uint8_t
+	{
+		STOPPED = 0,
+		SPINNING,
+		STOPPING
+	};
 
 	TIMER_CALLBACK_MEMBER(move);
 
-	enum
-	{
-		REEL_STOPPED = 0,
-		REEL_SPINNING,
-		REEL_STOPPING
-	};
+	void set_max_pos(uint16_t steps) { m_max_pos = steps - 1; }
+	void set_detents(std::set<uint16_t> detents) { m_detents = detents; }
+
+	uint16_t m_max_pos;
+	std::set<uint16_t> m_detents;
+	attotime m_step_period;
+
+	reel_state m_state;
+	uint16_t m_pos;
+	dir m_direction;
+	emu_timer *m_move_timer;
 
 	output_finder<> m_reel_out;
+
 	devcb_write8 m_state_cb;
 };
 

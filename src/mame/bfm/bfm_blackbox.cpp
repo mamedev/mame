@@ -63,8 +63,8 @@ namespace {
 class blackbox_base_state : public driver_device
 {
 public:
-	DECLARE_READ_LINE_MEMBER(in_perc_r);
-	DECLARE_READ_LINE_MEMBER(chute_r) { return m_50p_chute; }
+	int in_perc_r();
+	int chute_r() { return m_50p_chute; }
 	DECLARE_INPUT_CHANGED_MEMBER(chute_inserted);
 
 protected:
@@ -90,8 +90,6 @@ protected:
 	void blackbox_base(machine_config &config);
 
 	virtual void machine_start() override;
-
-	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w) {} // Prevent CB2 write spam
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi) { m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq) { m_maincpu->pulse_input_line(M6800_IRQ_LINE, attotime::from_usec(2500)); }
@@ -151,7 +149,7 @@ protected:
 
 	enum { STEPS_PER_SYMBOL = 20 };
 
-	void add_em_reels(machine_config &config, int symbols, double speed);
+	void add_em_reels(machine_config &config, int symbols, attotime period);
 	template <unsigned Reel> void reel_sample_cb(uint8_t state);
 
 	void out_triacs2_w(address_space &space, uint8_t data);
@@ -171,7 +169,7 @@ public:
 	void blackbox_em(machine_config &config);
 	void blackbox_em_bellt(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(in_extra_r);
+	int in_extra_r();
 
 protected:
 	uint8_t in_2000_r(offs_t offset);
@@ -250,8 +248,8 @@ public:
 		blackbox_em_base_state(mconfig, type, tag)
 	{ }
 
-	template <unsigned Reel> DECLARE_READ_LINE_MEMBER(symbol_opto_r);
-	template <unsigned Reel> DECLARE_READ_LINE_MEMBER(reel_opto_r);
+	template <unsigned Reel> int symbol_opto_r();
+	template <unsigned Reel> int reel_opto_r();
 
 protected:
 	void out_meters_w(address_space &space, uint8_t data);
@@ -499,8 +497,10 @@ void blackbox_base_state::pia_portb_w(uint8_t data)
 uint8_t blackbox_base_state::in_1800_r(offs_t offset)
 {
 	if(BIT(m_in_1800->read(), offset)) return 0x80;
+
 	for(int i = 0; i < 6; i++)
 		if(m_input_en[i] && BIT(m_in_1800_en[i]->read(), offset)) return 0x80;
+
 	return 0;
 }
 
@@ -516,10 +516,11 @@ uint8_t blackbox_em_state::in_2000_r(offs_t offset)
 		for(int i = 0; i < 4; i++)
 			if(m_input_en[i] && BIT(reel_pos_r(i), offset)) return 0x80;
 	}
+
 	return BIT(m_in_2000->read(), offset) ? 0x80 : 0;
 }
 
-READ_LINE_MEMBER(blackbox_base_state::in_perc_r) 
+int blackbox_base_state::in_perc_r()
 {
 	/* 0x2007 is used for the percentage adjustment switch and it's
 	   a bit weird. On older games it's a simple on-off switch,
@@ -536,10 +537,11 @@ READ_LINE_MEMBER(blackbox_base_state::in_perc_r)
 	return 0;
 }
 
-READ_LINE_MEMBER(blackbox_em_state::in_extra_r) 
+int blackbox_em_state::in_extra_r()
 {
 	for(int i = 0; i < 8; i++) 
 		if(m_in_extra_select[i] && BIT(m_in_extra->read(), i)) return 1;
+
 	return 0;
 }
 
@@ -554,7 +556,7 @@ uint8_t blackbox_em_state::reel_pos_r(uint8_t reel)
 }
 
 template <unsigned Reel>
-READ_LINE_MEMBER( blackbox_em_opto_state::symbol_opto_r )
+int blackbox_em_opto_state::symbol_opto_r()
 {
 	uint8_t sym_pos = m_reels[Reel]->get_pos() % STEPS_PER_SYMBOL;
 
@@ -562,7 +564,7 @@ READ_LINE_MEMBER( blackbox_em_opto_state::symbol_opto_r )
 }
 
 template <unsigned Reel>
-READ_LINE_MEMBER( blackbox_em_opto_state::reel_opto_r )
+int blackbox_em_opto_state::reel_opto_r()
 {
 	uint16_t pos = m_reels[Reel]->get_pos();
 
@@ -612,17 +614,20 @@ void blackbox_base_state::out_triacs1_w(address_space &space, uint8_t data)
 
 	switch(bit)
 	{
-		case 0: payout_w(0, 0, state); break;
-		case 1: payout_w(1, 0, state); break;
-		case 4:
-		{
-			machine().bookkeeping().coin_lockout_w(0, !state);
-			machine().bookkeeping().coin_lockout_w(1, !state);
-			machine().bookkeeping().coin_lockout_w(2, !state);
-		} break;
-		case 5: machine().bookkeeping().coin_lockout_w(3, !state); break; // 50p lockout
-		case 6: payout_w(0, 1, state); break;
-		case 7: payout_w(1, 1, state); break;
+		case 0: payout_w(0, 0, state);
+				break;
+		case 1: payout_w(1, 0, state);
+				break;
+		case 4: machine().bookkeeping().coin_lockout_w(0, !state);
+				machine().bookkeeping().coin_lockout_w(1, !state);
+				machine().bookkeeping().coin_lockout_w(2, !state);
+				break;
+		case 5: machine().bookkeeping().coin_lockout_w(3, !state); // 50p lockout
+				break;
+		case 6: payout_w(0, 1, state);
+				break;
+		case 7: payout_w(1, 1, state);
+				break;
 	}
 }
 
@@ -693,19 +698,19 @@ void blackbox_em_admc_state::out_triacs2_w(address_space &space, uint8_t data)
 		case 0:
 		case 1:
 		case 2:
-		case 3: m_reels[bit]->set_state(state); break;
-		case 4:
-		{
-			if(state)
-				for(int i = 0; i < 4; i++) m_reels[i]->set_direction(em_reel_device::REVERSE);
-		} break;
-		case 5:
-		{
-			if(state)
-				for(int i = 0; i < 4; i++) m_reels[i]->set_direction(em_reel_device::FORWARD);
-		} break;
+		case 3: m_reels[bit]->set_state(state);
+				break;
+		case 4: if(state)
+					for(int i = 0; i < 4; i++)
+						m_reels[i]->set_direction(em_reel_device::dir::REVERSE);
+				break;
+		case 5: if(state)
+					for(int i = 0; i < 4; i++)
+						m_reels[i]->set_direction(em_reel_device::dir::FORWARD);
+				break;
 		case 6:
-		case 7: m_lamps[16 + (bit - 6)] = state; break; // MFME lamps 30-31
+		case 7: m_lamps[16 + (bit - 6)] = state; // MFME lamps 30-31
+				break;
 	}
 }
 
@@ -761,10 +766,15 @@ void blackbox_em_opto_state::out_meters_w(address_space &space, uint8_t data)
 	uint8_t bit = (m_out_data & 0xe) >> 1;
 	bool state = m_out_data & 0x1;
 
-	if(bit < 7) 
+	if(bit < 7)
+	{
 		machine().bookkeeping().coin_counter_w(bit, state);
+	}
 	else
-		for(int i = 0; i < 4; i++) m_reels[i]->set_direction(state ? em_reel_device::FORWARD : em_reel_device::REVERSE);
+	{
+		for(int i = 0; i < 4; i++)
+			m_reels[i]->set_direction(state ? em_reel_device::dir::FORWARD : em_reel_device::dir::REVERSE);
+	}
 }
 
 uint8_t blackbox_em_opto_state::out_meters_r(address_space &space)
@@ -815,17 +825,18 @@ void blackbox_em_21up_state::out_lamps1_beeper_w(address_space &space, uint8_t d
 	/* Bit 6 controls a beeper, which generates a 3500 Hz sine wave amplitude
 	   modulated at 50 Hz. The beeper circuit is unknown, so I'm using a sample
 	   to generate the beep for now. */
-	switch(bit)
+	if(bit == 6)
 	{
-		case 6: 
-		{
-			if(state && !m_beeper_on)
-				m_beep_sample->start_raw(0, m_beep_sample_data, 477, 48000, true);
-			else if(!state)
-				m_beep_sample->stop(0);
-			m_beeper_on = state;
-		} break;
-		default: m_lamps[bit] = state; break;
+		if(state && !m_beeper_on)
+			m_beep_sample->start_raw(0, m_beep_sample_data, 477, 48000, true);
+		else if(!state)
+			m_beep_sample->stop(0);
+
+		m_beeper_on = state;
+	}
+	else
+	{
+		m_lamps[bit] = state;
 	}
 }
 
@@ -841,14 +852,16 @@ void blackbox_em_state::out_lamps2_buzzer_w(address_space &space, uint8_t data)
 	uint8_t bit = (m_out_data & 0xe) >> 1;
 	bool state = m_out_data & 0x1;
 
-	switch(bit)
+	if(bit == 5)
 	{
-		case 5:
-		{
-			if(state && !m_buzzer_on) m_samples->play(fruit_samples_device::SAMPLE_BUZZER);
-			m_buzzer_on = state;
-		} break;
-		default: m_lamps[8 + bit] = state; break;
+		if(state && !m_buzzer_on)
+			m_samples->play(fruit_samples_device::SAMPLE_BUZZER);
+
+		m_buzzer_on = state;
+	}
+	else
+	{
+		m_lamps[8 + bit] = state;
 	}
 }
 
@@ -1012,6 +1025,7 @@ uint8_t blackbox_em_opto_music_state::out_music_500_r(address_space &space)
 uint8_t blackbox_em_opto_music_state::tms1000_k_r()
 {
 	uint8_t result = 0;
+
 	if(m_r_bits & m_r_select) result |= m_k_cols;
 	return result | (m_tempo_timer->enabled() ? 0x8 : 0);
 }
@@ -1077,6 +1091,7 @@ uint8_t blackbox_em_admc_state::out_prot_clock_r(address_space &space)
 uint8_t blackbox_em_admc_state::prot_r()
 {
 	uint8_t value = 0;
+
 	const uint8_t prot_values[8] = { 0, 0, 0x80, 0, 0x80, 0, 0x80, 0 }; // 0x54 in reverse
 	if(m_prot_index < 8) value = prot_values[m_prot_index];
 	return value;
@@ -1581,11 +1596,12 @@ void blackbox_base_state::machine_start()
 
 	save_item(NAME(m_input_en));
 
-	for(int i = 0; i < 6; i++) m_input_en[i] = false;
+	std::fill(std::begin(m_input_en), std::end(m_input_en), false);
 	m_50p_chute = false;
 
 	// bb_upndn & bb_reelg won't properly read nudge down buttons on the first go if RAM starts out as 0's??
-	for(int i = 0; i < 0x80; i++) m_maincpu->space(AS_PROGRAM).write_byte(i, 0xff);
+	for(int i = 0; i < 0x80; i++)
+		m_maincpu->space(AS_PROGRAM).write_byte(i, 0xff);
 }
 
 void blackbox_em_opto_club_state::machine_start()
@@ -1611,16 +1627,23 @@ void blackbox_base_state::blackbox_base(machine_config &config)
 	m_pia->writepa_handler().set(FUNC(blackbox_base_state::pia_porta_w));
 	m_pia->readpb_handler().set(FUNC(blackbox_base_state::pia_portb_r));
 	m_pia->writepb_handler().set(FUNC(blackbox_base_state::pia_portb_w));
-	m_pia->cb2_handler().set(FUNC(blackbox_base_state::pia_cb2_w));
+	m_pia->cb2_handler().set_nop(); // Not connected
 
 	ACIA6850(config, m_acia, 0);
 
 	FRUIT_SAMPLES(config, m_samples);
 }
 
-void blackbox_em_base_state::add_em_reels(machine_config &config, int symbols, double speed)
+void blackbox_em_base_state::add_em_reels(machine_config &config, int symbols, attotime period)
 {
-	for(int i = 0; i < 4; i++) EM_REEL(config, m_reels[i], symbols * STEPS_PER_SYMBOL, symbols, speed);
+	for(int i = 0; i < 4; i++)
+	{
+		std::set<uint16_t> detents;
+		for(int i = 0; i < symbols; i++)
+			detents.insert(i * STEPS_PER_SYMBOL);
+
+		EM_REEL(config, m_reels[i], symbols * STEPS_PER_SYMBOL, detents, period);
+	}
 
 	m_reels[0]->state_changed_callback().set(FUNC(blackbox_em_base_state::reel_sample_cb<0>));
 	m_reels[1]->state_changed_callback().set(FUNC(blackbox_em_base_state::reel_sample_cb<1>));
@@ -1631,7 +1654,7 @@ void blackbox_em_base_state::add_em_reels(machine_config &config, int symbols, d
 void blackbox_em_state::blackbox_em(machine_config &config)
 {
 	blackbox_base(config);
-	add_em_reels(config, 20, 0.91);
+	add_em_reels(config, 20, attotime::from_double(1.1));
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &blackbox_em_state::blackbox_em_map);
 }
@@ -1666,7 +1689,7 @@ void blackbox_em_21up_state::blackbox_em_21up(machine_config &config)
 void blackbox_em_opto_sndgen_state::blackbox_em_opto_sndgen(machine_config &config)
 {
 	blackbox_base(config);
-	add_em_reels(config, 20, 0.91);
+	add_em_reels(config, 20, attotime::from_double(1.1));
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &blackbox_em_opto_sndgen_state::blackbox_em_opto_sndgen_map);
 
@@ -1685,7 +1708,7 @@ void blackbox_em_opto_aux_state::blackbox_em_opto_aux_base(machine_config &confi
 void blackbox_em_opto_aux_state::blackbox_em_opto_aux(machine_config &config)
 {
 	blackbox_em_opto_aux_base(config);
-	add_em_reels(config, 20, 0.91);
+	add_em_reels(config, 20, attotime::from_double(1.1));
 	
 	m_maincpu->set_addrmap(AS_PROGRAM, &blackbox_em_opto_aux_state::blackbox_em_opto_aux_map);
 }
@@ -1693,7 +1716,7 @@ void blackbox_em_opto_aux_state::blackbox_em_opto_aux(machine_config &config)
 void blackbox_em_opto_music_state::blackbox_em_opto_music(machine_config &config)
 {
 	blackbox_base(config);
-	add_em_reels(config, 20, 0.91);
+	add_em_reels(config, 20, attotime::from_double(1.1));
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &blackbox_em_opto_music_state::blackbox_em_opto_music_map);
 	TMS1000(config, m_tms1000, 452000); // R and C unknown, pitch matches a real machine
@@ -1712,7 +1735,7 @@ void blackbox_em_opto_music_state::blackbox_em_opto_music(machine_config &config
 void blackbox_em_opto_club_state::blackbox_em_opto_club(machine_config &config)
 {
 	blackbox_em_opto_aux_base(config);
-	add_em_reels(config, 24, 0.694);
+	add_em_reels(config, 24, attotime::from_double(1.44));
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &blackbox_em_opto_club_state::blackbox_em_opto_club_map);
 

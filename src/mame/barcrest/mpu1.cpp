@@ -69,7 +69,7 @@ protected:
 private:
 	enum { STEPS_PER_SYMBOL = 20 };
 
-	template <unsigned Lamp> DECLARE_WRITE_LINE_MEMBER(pia_lamp_w) { m_lamps[Lamp] = state; }
+	template <unsigned Lamp> void pia_lamp_w(int state) { m_lamps[Lamp] = state; }
 	template <unsigned Reel> void reel_sample_cb(uint8_t state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi);
@@ -372,10 +372,14 @@ void mpu1_state::mpu1(machine_config &config)
 	m_pia2->cb1_w(0);
 	m_pia2->cb2_handler().set(FUNC(mpu1_state::pia_lamp_w<10>));
 
-	EM_REEL(config, m_reels[0], 20 * STEPS_PER_SYMBOL, 20, 1.25);
-	EM_REEL(config, m_reels[1], 20 * STEPS_PER_SYMBOL, 20, 1.25);
-	EM_REEL(config, m_reels[2], 20 * STEPS_PER_SYMBOL, 20, 1.25);
-	EM_REEL(config, m_reels[3], 20 * STEPS_PER_SYMBOL, 20, 1.25);
+	for(int i = 0; i < 4; i++)
+	{
+		std::set<uint16_t> detents;
+		for(int i = 0; i < 20; i++)
+			detents.insert(i * STEPS_PER_SYMBOL);
+
+		EM_REEL(config, m_reels[i], 20 * STEPS_PER_SYMBOL, detents, attotime::from_double(0.8));
+	}
 
 	SPEAKER(config, "mono").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -393,7 +397,8 @@ void mpu1_state::mpu1_lg(machine_config &config)
 
 	m_pia1->writepb_handler().set(FUNC(mpu1_state::pia1_portb_lg_w));
 
-	for(int i = 0; i < 4; i++) m_reels[i]->set_speed(0.96); // Slower reels
+	for(int i = 0; i < 4; i++)
+		m_reels[i]->set_rotation_period(attotime::from_double(1.04)); // Slower reels
 }
 
 // Common mask ROM on most cartridges, also used by MPU2
