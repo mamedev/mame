@@ -28,7 +28,7 @@ class scorpion_state : public spectrum_128_state
 public:
 	scorpion_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_128_state(mconfig, type, tag)
-		, m_zxbus(*this, "zxbus")
+		, m_bankio(*this, "bankio")
 		, m_beta(*this, BETA_DISK_TAG)
 		, m_ay(*this, "ay%u", 0U)
 		, m_bank0_rom(*this, "bank0_rom")
@@ -59,7 +59,7 @@ protected:
 	virtual void scorpion_update_memory();
 
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
-	required_device<zxbus_device> m_zxbus;
+	required_device<address_map_bank_device> m_bankio;
 	required_device<beta_disk_device> m_beta;
 	required_device_array<ay8912_device, 2> m_ay;
 
@@ -137,7 +137,7 @@ D6-D7 - not used. ( yet ? )
 
 void scorpion_state::scorpion_update_memory()
 {
-	if (BIT(m_port_1ffd_data, 0))
+	if (BIT(m_port_1ffd_data, 0) && !m_nmi_pending)
 	{
 		m_bank_ram[0]->set_entry(0);
 		m_bank0_rom.select(0);
@@ -284,8 +284,8 @@ void scorpion_state::scorpion_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xffff).lrw8(
-		NAME([this](offs_t offset) { return m_zxbus->io_r((m_beta->is_active() || BIT(m_port_1ffd_data, 3)) << 16 | offset); }),
-		NAME([this](offs_t offset, u8 data) { m_zxbus->io_w((m_beta->is_active() || BIT(m_port_1ffd_data, 3)) << 16 | offset, data); }));
+		NAME([this](offs_t offset) { return m_bankio->read8((m_beta->is_active() || BIT(m_port_1ffd_data, 3)) << 16 | offset); }),
+		NAME([this](offs_t offset, u8 data) { m_bankio->write8((m_beta->is_active() || BIT(m_port_1ffd_data, 3)) << 16 | offset, data); }));
 }
 
 void scorpion_state::scorpion_switch(address_map &map)
@@ -304,7 +304,6 @@ void scorpion_state::machine_start()
 	save_item(NAME(m_ay_selected));
 	save_item(NAME(m_ram_banks));
 
-	m_zxbus->install_device(0x00000, 0x1ffff, *this, &scorpion_state::scorpion_ioext);
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
 	// reconfigure ROMs
@@ -449,10 +448,12 @@ void scorpion_state::scorpion(machine_config &config)
 
 	config.device_remove("exp");
 
-	ZXBUS(config, m_zxbus, 0);
-	m_zxbus->set_custom_spaces();
-	ZXBUS_SLOT(config, "zxbus:1", 0, m_zxbus, zxbus_cards, nullptr);
-	ZXBUS_SLOT(config, "zxbus:2", 0, m_zxbus, zxbus_cards, nullptr);
+	ADDRESS_MAP_BANK(config, m_bankio).set_map(&scorpion_state::scorpion_ioext).set_options(ENDIANNESS_LITTLE, 8, 17, 0);
+
+	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
+	zxbus.set_iospace(m_bankio, AS_PROGRAM);
+	ZXBUS_SLOT(config, "zxbus:1", 0, "zxbus", zxbus_cards, nullptr);
+	ZXBUS_SLOT(config, "zxbus:2", 0, "zxbus", zxbus_cards, nullptr);
 }
 
 void scorpion_state::profi(machine_config &config)

@@ -80,7 +80,7 @@ protected:
 DECLARE_DEVICE_TYPE(ZXBUS_SLOT, zxbus_slot_device)
 
 
-class zxbus_device : public device_t, public device_memory_interface
+class zxbus_device : public device_t
 {
 public:
 	zxbus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -91,24 +91,15 @@ public:
 		m_iospace->install_device(addrstart, addrend, device, map, unitmask);
 	}
 
-	u8 io_r(offs_t offset);
-	void io_w(offs_t offset, u8 data);
-
 	void add_slot(zxbus_slot_device &slot);
-	void set_custom_spaces() { m_allocspaces = true; }
-
-	virtual space_config_vector memory_space_config() const override;
 
 protected:
 	zxbus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 
 private:
-	const address_space_config m_io_config;
 	required_address_space m_iospace;
-	bool m_allocspaces;
 
 	std::forward_list<zxbus_slot_device *> m_slot_list;
 };

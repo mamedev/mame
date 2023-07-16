@@ -40,40 +40,12 @@ zxbus_device::zxbus_device(const machine_config &mconfig, const char *tag, devic
 
 zxbus_device::zxbus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_memory_interface(mconfig, *this)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor())
 	, m_iospace(*this, finder_base::DUMMY_TAG, -1)
-	, m_allocspaces(false)
 {
-}
-
-device_memory_interface::space_config_vector zxbus_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(AS_IO, &m_io_config),
-	};
-}
-
-void zxbus_device::device_config_complete()
-{
-	if (m_allocspaces)
-		m_iospace.set_tag(*this, DEVICE_SELF, AS_IO);
 }
 
 void zxbus_device::device_start()
 {
-	if (m_allocspaces)
-		m_iospace->unmap_value_high();
-}
-
-u8 zxbus_device::io_r(offs_t offset)
-{
-	return m_iospace->read_byte(offset);
-}
-
-void zxbus_device::io_w(offs_t offset, u8 data)
-{
-	m_iospace->write_byte(offset, data);
 }
 
 void zxbus_device::add_slot(zxbus_slot_device &slot)
