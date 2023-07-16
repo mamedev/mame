@@ -1465,7 +1465,7 @@ void ppc_device::static_generate_lsw_entries(int mode)
 		char temp[20];
 
 		/* allocate a handle */
-		sprintf(temp, "lsw%d", regnum);
+		snprintf(temp, 20, "lsw%d", regnum);
 		alloc_handle(m_drcuml.get(), &m_lsw[mode][regnum], temp);
 		UML_HANDLE(block, *m_lsw[mode][regnum]);                               // handle  lsw<regnum>
 		UML_LABEL(block, regnum);                                                       // regnum:
@@ -1517,7 +1517,7 @@ void ppc_device::static_generate_stsw_entries(int mode)
 		char temp[20];
 
 		/* allocate a handle */
-		sprintf(temp, "stsw%d", regnum);
+		snprintf(temp, 20, "stsw%d", regnum);
 		alloc_handle(m_drcuml.get(), &m_stsw[mode][regnum], temp);
 		UML_HANDLE(block, *m_stsw[mode][regnum]);                              // handle  stsw<regnum>
 		UML_LABEL(block, regnum);                                                       // regnum:

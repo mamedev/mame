@@ -5,7 +5,6 @@
 
 #include "k573fpga.h"
 
-#define LOG_GENERAL  (1 << 0)
 #define VERBOSE      (LOG_GENERAL)
 // #define LOG_OUTPUT_STREAM std::cout
 
@@ -354,7 +353,7 @@ TIMER_CALLBACK_MEMBER(k573fpga_device::update_stream)
 	mp3_remaining_bytes--;
 }
 
-WRITE_LINE_MEMBER(k573fpga_device::mpeg_frame_sync)
+void k573fpga_device::mpeg_frame_sync(int state)
 {
 	if (state) {
 		mpeg_status &= ~(1 << PLAYBACK_STATE_IDLE);
@@ -375,7 +374,7 @@ WRITE_LINE_MEMBER(k573fpga_device::mpeg_frame_sync)
 	}
 }
 
-WRITE_LINE_MEMBER(k573fpga_device::mas3507d_demand)
+void k573fpga_device::mas3507d_demand(int state)
 {
 	if (state && !BIT(mpeg_status, PLAYBACK_STATE_DEMAND)) {
 		mpeg_status |= 1 << PLAYBACK_STATE_DEMAND;

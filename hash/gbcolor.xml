@@ -28397,4 +28397,97 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
+
+<!-- Freeware games for emulators -->
+
+	<software name="grimaces">
+		<description>Grimace’s Birthday (V1.5)</description>
+		<year>2023</year>
+		<publisher>Krool Toys</publisher>
+		<info name="release" value="20230619" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="bX4TvUeiUEfKRw8bkPGaB.gb" size="0x100000" crc="f8e8e1f3" sha1="a3fdfe3981e800fa7c73ff989bc06426f668c331" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="grimaces14" cloneof="grimaces">
+		<description>Grimace’s Birthday (V1.4)</description>
+		<year>2023</year>
+		<publisher>Krool Toys</publisher>
+		<info name="release" value="20230617" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="bX4TvUeiUEfKRw8bkPGaB.gb" size="0x100000" crc="9baa5f46" sha1="d247c03119ac14f97fdeeaa6bf0defa98e35fa17" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="grimaces13" cloneof="grimaces">
+		<description>Grimace’s Birthday (V1.3)</description>
+		<year>2023</year>
+		<publisher>Krool Toys</publisher>
+		<info name="release" value="20230615" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="bX4TvUeiUEfKRw8bkPGaB.gb" size="0x100000" crc="ab41a9ef" sha1="d8e727745e285f5e467f5eccbfd30ee175bafc2e" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="grimaces12" cloneof="grimaces">
+		<description>Grimace’s Birthday (V1.2)</description>
+		<year>2023</year>
+		<publisher>Krool Toys</publisher>
+		<info name="release" value="20230613" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="bX4TvUeiUEfKRw8bkPGaB.gb" size="0x100000" crc="9dee42fe" sha1="071fa179df96950c3c92b0abbe32092b1816ec40" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="grimaces11" cloneof="grimaces">
+		<description>Grimace’s Birthday (V1.1)</description>
+		<year>2023</year>
+		<publisher>Krool Toys</publisher>
+		<info name="release" value="20230613" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="bX4TvUeiUEfKRw8bkPGaB" size="0x100000" crc="7744f551" sha1="035b7417e03c4e264a90212f2a3811012f03c2a2" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="grimaceso" cloneof="grimaces">
+		<description>Grimace’s Birthday (initial release)</description>
+		<year>2023</year>
+		<publisher>Krool Toys</publisher>
+		<info name="release" value="20230612" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="bX4TvUeiUEfKRw8bkPGaB.gb" size="0x100000" crc="7f4386e9" sha1="d6358d100ea65d34d95588f800635b64927baf82" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
 </softwarelist>

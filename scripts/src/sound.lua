@@ -969,7 +969,6 @@ if (SOUNDS["SP0250"]~=null) then
 end
 
 
-
 ---------------------------------------------------
 -- S14001A speech synthesizer
 --@src/devices/sound/s14001a.h,SOUNDS["S14001A"] = true
@@ -1122,11 +1121,12 @@ if (SOUNDS["VLM5030"]~=null) then
 end
 
 ---------------------------------------------------
--- Votrax speech synthesizer
---@src/devices/sound/votrax.h,SOUNDS["VOTRAX"] = true
+-- Votrax SC-01[-A] speech synthesizer
+--@src/devices/sound/votrax.h,SOUNDS["VOTRAX_SC01"] = true
+--@src/devices/sound/votrax.h,SOUNDS["VOTRAX_SC01A"] = true
 ---------------------------------------------------
 
-if (SOUNDS["VOTRAX"]~=null) then
+if (SOUNDS["VOTRAX_SC01"]~=null or SOUNDS["VOTRAX_SC01A"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/votrax.cpp",
 		MAME_DIR .. "src/devices/sound/votrax.h",
@@ -1287,6 +1287,18 @@ if (SOUNDS["MULTIPCM"]~=null) then
 end
 
 ---------------------------------------------------
+-- MP3 AUDIO
+--@src/devices/sound/mp3_audio.h,SOUNDS["MP3_AUDIO"] = true
+---------------------------------------------------
+
+if (SOUNDS["MP3_AUDIO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/mp3_audio.cpp",
+		MAME_DIR .. "src/devices/sound/mp3_audio.h",
+	}
+end
+
+---------------------------------------------------
 -- MPEG AUDIO
 --@src/devices/sound/mpeg_audio.h,SOUNDS["MPEG_AUDIO"] = true
 ---------------------------------------------------
@@ -1426,6 +1438,18 @@ if (SOUNDS["LC7535"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/lc7535.cpp",
 		MAME_DIR .. "src/devices/sound/lc7535.h",
+	}
+end
+
+---------------------------------------------------
+-- Sanyo LC82310
+--@src/devices/sound/lc82310.h,SOUNDS["LC82310"] = true
+---------------------------------------------------
+
+if (SOUNDS["LC82310"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/lc82310.cpp",
+		MAME_DIR .. "src/devices/sound/lc82310.h",
 	}
 end
 
@@ -1594,5 +1618,17 @@ if (SOUNDS["LYNX"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/lynx.cpp",
 		MAME_DIR .. "src/devices/sound/lynx.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/sound/nn71003f.h,SOUNDS["NN71003F"] = true
+---------------------------------------------------
+
+if (SOUNDS["NN71003F"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/nn71003f.cpp",
+		MAME_DIR .. "src/devices/sound/nn71003f.h",
 	}
 end

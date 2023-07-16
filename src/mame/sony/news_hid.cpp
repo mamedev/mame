@@ -89,8 +89,6 @@ void news_hid_hle_device::map_apbus(address_map &map)
 
 void news_hid_hle_device::device_start()
 {
-	m_irq_out_cb.resolve_all_safe();
-
 	//save_item(NAME(m_fifo));
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_irq_out_state));

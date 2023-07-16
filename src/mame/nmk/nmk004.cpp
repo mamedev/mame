@@ -101,8 +101,6 @@ nmk004_device::nmk004_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 void nmk004_device::device_start()
 {
-	m_reset_cb.resolve_safe();
-
 	save_item(NAME(to_main));
 	save_item(NAME(to_nmk004));
 

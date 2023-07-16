@@ -120,7 +120,7 @@ zsg2_device::zsg2_device(const machine_config &mconfig, const char *tag, device_
 	, device_sound_interface(mconfig, *this)
 	, m_mem_base(*this, DEVICE_SELF)
 	, m_read_address(0)
-	, m_ext_read_handler(*this)
+	, m_ext_read_handler(*this, 0)
 {
 }
 
@@ -130,8 +130,6 @@ zsg2_device::zsg2_device(const machine_config &mconfig, const char *tag, device_
 
 void zsg2_device::device_start()
 {
-	m_ext_read_handler.resolve();
-
 	memset(&m_chan, 0, sizeof(m_chan));
 
 	m_stream = stream_alloc(0, 4, clock() / 768);
@@ -227,7 +225,7 @@ uint32_t zsg2_device::read_memory(uint32_t offset)
 	if (offset >= m_mem_blocks)
 		return 0;
 
-	if (m_ext_read_handler.isnull())
+	if (m_ext_read_handler.isunset())
 		return m_mem_base[offset];
 
 	return m_ext_read_handler(offset);

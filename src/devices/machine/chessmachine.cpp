@@ -59,9 +59,6 @@ chessmachine_device::chessmachine_device(const machine_config &mconfig, const ch
 
 void chessmachine_device::device_start()
 {
-	// resolve callbacks
-	m_data_out.resolve_safe();
-
 	// register for savestates
 	save_item(NAME(m_bootrom_enabled));
 	save_item(NAME(m_latch));

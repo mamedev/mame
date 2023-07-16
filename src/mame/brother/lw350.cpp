@@ -171,7 +171,7 @@ private:
 		rombank->set_entry(data & 0x03);
 	}
 	void beeper_w(uint8_t data) { // F0
-		beeper->set_state(data == 0);
+		beeper->set_state(~data & 0x01);
 	}
 	void irqack_w(uint8_t) { // F8
 		maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
@@ -635,7 +635,7 @@ private:
 			rombank->set_entry(data - 4);
 	}
 	void beeper_w(uint8_t data) { // F0
-		speaker->set_state(data == 0);
+		speaker->set_state(~data & 0x01);
 	}
 	void irqack_w(uint8_t) { // F8
 		maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
@@ -643,7 +643,7 @@ private:
 
 	// CRTC
 	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
+	void crtc_vsync(int state);
 	void io_72_w(uint8_t data) { io_72 = data; }
 	void io_73_w(uint8_t data) { io_73 = data; }
 	void io_74_w(uint8_t data);
@@ -705,7 +705,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(lw450_state::int1_timer_callback)
 	maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(lw450_state::crtc_vsync)
+void lw450_state::crtc_vsync(int state)
 {
 	if(state) {
 		framecnt++;
@@ -898,15 +898,15 @@ void lw450_state::lw450(machine_config &config) {
 
 ROM_START( lw350 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD("uc6273-a-lwb6", 0x00000, 0x80000, CRC(5E85D1EC) SHA1(4ca68186fc70f30ccac95429604c88db4f0c34d2))
-//  ROM_LOAD("patched", 0x00000, 0x80000, CRC(5E85D1EC) SHA1(4ca68186fc70f30ccac95429604c88db4f0c34d2))
+	ROM_LOAD("uc6273-a-lwb6", 0x00000, 0x80000, CRC(5e85d1ec) SHA1(4ca68186fc70f30ccac95429604c88db4f0c34d2))
+//  ROM_LOAD("patched", 0x00000, 0x80000, CRC(5e85d1ec) SHA1(4ca68186fc70f30ccac95429604c88db4f0c34d2))
 ROM_END
 
 ROM_START( lw450 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD("2bc04", 0x00000, 0x40000, CRC(96C2A6F1) SHA1(eb47e37ea46e3becc1b4453286f120682a0a1ddc))
+	ROM_LOAD("2bc04", 0x00000, 0x40000, CRC(96c2a6f1) SHA1(eb47e37ea46e3becc1b4453286f120682a0a1ddc))
 	ROM_REGION(0x80000, "dictionary", 0)
-	ROM_LOAD("ua2849-a", 0x00000, 0x80000, CRC(FA8712EB) SHA1(2d3454138c79e75604b30229c05ed8fb8e7d15fe))
+	ROM_LOAD("ua2849-a", 0x00000, 0x80000, CRC(fa8712eb) SHA1(2d3454138c79e75604b30229c05ed8fb8e7d15fe))
 ROM_END
 
 } // anonymous namespace

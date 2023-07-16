@@ -36,11 +36,11 @@ public:
 	auto hrs_wr_cb() { return m_write_hrs.bind(); }
 	auto day_wr_cb() { return m_write_day.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( cs_w );
-	DECLARE_WRITE_LINE_MEMBER( clk_w );
-	DECLARE_WRITE_LINE_MEMBER( dio_w );
-	DECLARE_READ_LINE_MEMBER( dio_r );
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
+	void cs_w(int state);
+	void clk_w(int state);
+	void dio_w(int state);
+	int dio_r();
+	void reset_w(int state);
 
 protected:
 	// device-level overrides

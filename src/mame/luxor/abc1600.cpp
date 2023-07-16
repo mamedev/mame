@@ -36,6 +36,7 @@
 
     TODO:
 
+    - abcenix panics while booting after commit 78661e9aa92c7e43c9a96039e7dfb3dabc79a287
     - systest1600 failures
         - CIO timer
         - RTC (seconds advance too slowly)
@@ -410,7 +411,7 @@ void abc1600_state::fw1_w(uint8_t data)
 //  cs7_w - CS7 output handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(abc1600_state::cs7_w)
+void abc1600_state::cs7_w(int state)
 {
 	LOG("%s CS7 %d\n", machine().describe_context(), state);
 
@@ -422,7 +423,7 @@ WRITE_LINE_MEMBER(abc1600_state::cs7_w)
 //  btce_w - _BTCE output handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(abc1600_state::btce_w)
+void abc1600_state::btce_w(int state)
 {
 	LOG("%s _BTCE %d\n", machine().describe_context(), state);
 
@@ -434,7 +435,7 @@ WRITE_LINE_MEMBER(abc1600_state::btce_w)
 //  atce_w - _ATCE output handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(abc1600_state::atce_w)
+void abc1600_state::atce_w(int state)
 {
 	LOG("%s _ATCE %d\n", machine().describe_context(), state);
 
@@ -446,7 +447,7 @@ WRITE_LINE_MEMBER(abc1600_state::atce_w)
 //  dmadis_w - _DMADIS output handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(abc1600_state::dmadis_w)
+void abc1600_state::dmadis_w(int state)
 {
 	LOG("%s _DMADIS %d\n", machine().describe_context(), state);
 
@@ -458,7 +459,7 @@ WRITE_LINE_MEMBER(abc1600_state::dmadis_w)
 //  sysscc_w - SYSSCC output handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(abc1600_state::sysscc_w)
+void abc1600_state::sysscc_w(int state)
 {
 	LOG("%s SYSSCC %d\n", machine().describe_context(), state);
 
@@ -474,7 +475,7 @@ WRITE_LINE_MEMBER(abc1600_state::sysscc_w)
 //  sysfs_w - SYSFS output handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(abc1600_state::sysfs_w)
+void abc1600_state::sysfs_w(int state)
 {
 	LOG("%s SYSFS %d\n", machine().describe_context(), state);
 
@@ -843,7 +844,7 @@ void abc1600_state::floppy_formats(format_registration &fr)
 //  ABC1600BUS_INTERFACE( abcbus_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc1600_state::nmi_w )
+void abc1600_state::nmi_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -1059,6 +1060,7 @@ void abc1600_state::abc1600(machine_config &config)
 
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("abc1600_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("abc1600_hdd");
 }
 
 

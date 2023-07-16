@@ -82,46 +82,46 @@ private:
 
 	void pdm_map(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER(nmi_irq);
-	DECLARE_WRITE_LINE_MEMBER(dma_irq);
-	DECLARE_WRITE_LINE_MEMBER(enet_irq);
-	DECLARE_WRITE_LINE_MEMBER(scc_irq);
-	DECLARE_WRITE_LINE_MEMBER(via1_irq);
+	void nmi_irq(int state);
+	void dma_irq(int state);
+	void enet_irq(int state);
+	void scc_irq(int state);
+	void via1_irq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(bus_err_irq);
-	DECLARE_WRITE_LINE_MEMBER(fdc_dma_irq);
-	DECLARE_WRITE_LINE_MEMBER(etx_dma_irq);
-	DECLARE_WRITE_LINE_MEMBER(erx_dma_irq);
-	DECLARE_WRITE_LINE_MEMBER(txa_dma_irq);
-	DECLARE_WRITE_LINE_MEMBER(rxa_dma_irq);
-	DECLARE_WRITE_LINE_MEMBER(txb_dma_irq);
-	DECLARE_WRITE_LINE_MEMBER(rxb_dma_irq);
+	void bus_err_irq(int state);
+	void fdc_dma_irq(int state);
+	void etx_dma_irq(int state);
+	void erx_dma_irq(int state);
+	void txa_dma_irq(int state);
+	void rxa_dma_irq(int state);
+	void txb_dma_irq(int state);
+	void rxb_dma_irq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(sndo_dma_irq);
-	DECLARE_WRITE_LINE_MEMBER(sndi_dma_irq);
+	void sndo_dma_irq(int state);
+	void sndi_dma_irq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_err_irq);
-	DECLARE_WRITE_LINE_MEMBER(etx_err_irq);
-	DECLARE_WRITE_LINE_MEMBER(erx_err_irq);
-	DECLARE_WRITE_LINE_MEMBER(txa_err_irq);
-	DECLARE_WRITE_LINE_MEMBER(rxa_err_irq);
-	DECLARE_WRITE_LINE_MEMBER(txb_err_irq);
-	DECLARE_WRITE_LINE_MEMBER(rxb_err_irq);
+	void fdc_err_irq(int state);
+	void etx_err_irq(int state);
+	void erx_err_irq(int state);
+	void txa_err_irq(int state);
+	void rxa_err_irq(int state);
+	void txb_err_irq(int state);
+	void rxb_err_irq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(scsi_err_irq);
-	DECLARE_WRITE_LINE_MEMBER(sndo_err_irq);
-	DECLARE_WRITE_LINE_MEMBER(sndi_err_irq);
+	void scsi_err_irq(int state);
+	void sndo_err_irq(int state);
+	void sndi_err_irq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(slot2_irq);
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(slot1_irq);
-	DECLARE_WRITE_LINE_MEMBER(slot0_irq);
+	void vblank_irq(int state);
+	[[maybe_unused]] void slot2_irq(int state);
+	[[maybe_unused]] void slot1_irq(int state);
+	void slot0_irq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(sound_irq);
-	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
-	DECLARE_WRITE_LINE_MEMBER(scsi_drq);
+	void fdc_irq(int state);
+	void fdc_drq(int state);
+	[[maybe_unused]] void sound_irq(int state);
+	void scsi_irq(int state);
+	void scsi_drq(int state);
 
 	void phases_w(uint8_t phases);
 	void sel35_w(int sel35);
@@ -133,9 +133,9 @@ private:
 	void via1_out_a(uint8_t data);
 	void via1_out_b(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(via1_60_15_timer);
-	DECLARE_WRITE_LINE_MEMBER(via1_out_cb2);
+	void via1_out_cb2(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(cuda_reset_w);
+	void cuda_reset_w(int state);
 
 	uint8_t via1_r(offs_t offset);
 	void via1_w(offs_t offset, uint8_t data);
@@ -441,13 +441,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(macpdm_state::via1_60_15_timer)
 	m_via1->write_ca1(0);
 }
 
-WRITE_LINE_MEMBER(macpdm_state::via1_out_cb2)
+void macpdm_state::via1_out_cb2(int state)
 {
 	m_cuda->set_via_data(state & 1);
 }
 
 
-WRITE_LINE_MEMBER(macpdm_state::cuda_reset_w)
+void macpdm_state::cuda_reset_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
@@ -640,42 +640,42 @@ uint32_t macpdm_state::id_r()
 	return m_model_id;
 }
 
-WRITE_LINE_MEMBER(macpdm_state::scc_irq)
+void macpdm_state::scc_irq(int state)
 {
 	logerror("scc irq %d\n", state);
 }
 
-WRITE_LINE_MEMBER(macpdm_state::via1_irq)
+void macpdm_state::via1_irq(int state)
 {
 	irq_main_set(0x01, state);
 }
 
-WRITE_LINE_MEMBER(macpdm_state::sound_irq)
+void macpdm_state::sound_irq(int state)
 {
 	via2_irq_main_set(0x20, state);
 }
 
-WRITE_LINE_MEMBER(macpdm_state::vblank_irq)
+void macpdm_state::vblank_irq(int state)
 {
 	via2_irq_slot_set(0x40, state);
 }
 
-WRITE_LINE_MEMBER(macpdm_state::slot2_irq)
+void macpdm_state::slot2_irq(int state)
 {
 	via2_irq_slot_set(0x20, state);
 }
 
-WRITE_LINE_MEMBER(macpdm_state::slot1_irq)
+void macpdm_state::slot1_irq(int state)
 {
 	via2_irq_slot_set(0x10, state);
 }
 
-WRITE_LINE_MEMBER(macpdm_state::sndo_dma_irq)
+void macpdm_state::sndo_dma_irq(int state)
 {
 	// TODO
 }
 
-WRITE_LINE_MEMBER(macpdm_state::sndi_dma_irq)
+void macpdm_state::sndi_dma_irq(int state)
 {
 	// TODO
 }
@@ -751,12 +751,12 @@ void macpdm_state::dma_scsi_a_step()
 	m_dma_scsi_a_in_step = false;
 }
 
-WRITE_LINE_MEMBER(macpdm_state::scsi_irq)
+void macpdm_state::scsi_irq(int state)
 {
 	via2_irq_main_set(0x08, state);
 }
 
-WRITE_LINE_MEMBER(macpdm_state::scsi_drq)
+void macpdm_state::scsi_drq(int state)
 {
 	via2_irq_main_set(0x01, state);
 	if((m_dma_scsi_a_ctrl & 0x02) && (m_via2_ifr & 0x01) && !m_dma_scsi_a_in_step)
@@ -898,7 +898,7 @@ void macpdm_state::dma_floppy_adr_w(offs_t, uint32_t data, uint32_t mem_mask)
 	logerror("dma floppy adr %08x\n", m_dma_floppy_adr);
 }
 
-WRITE_LINE_MEMBER(macpdm_state::fdc_irq)
+void macpdm_state::fdc_irq(int state)
 {
 	via2_irq_main_set(0x20, state);
 }
@@ -930,7 +930,7 @@ void macpdm_state::dma_floppy_step()
 	m_dma_floppy_in_step = false;
 }
 
-WRITE_LINE_MEMBER(macpdm_state::fdc_drq)
+void macpdm_state::fdc_drq(int state)
 {
 	m_floppy_drq = state;
 	if((m_dma_floppy_ctrl & 0x02) && m_floppy_drq && !m_dma_floppy_in_step)

@@ -63,17 +63,12 @@ void sgi_kbd_port_device::device_config_complete()
 	m_kbd = get_card_device();
 }
 
-void sgi_kbd_port_device::device_resolve_objects()
-{
-	m_rxd_handler.resolve_safe();
-}
-
 void sgi_kbd_port_device::device_start()
 {
 	m_rxd_handler(1);
 }
 
-WRITE_LINE_MEMBER(sgi_kbd_port_device::write_txd)
+void sgi_kbd_port_device::write_txd(int state)
 {
 	if (m_kbd)
 		m_kbd->write_txd(state);

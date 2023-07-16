@@ -147,10 +147,10 @@ private:
 	void ay_porta_w(uint8_t data);
 	void ay_portb_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(pia_u72_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_u72_cb2_w);
+	void pia_u72_ca2_w(int state);
+	void pia_u72_cb2_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(pia_u75_cb2_w);
+	void pia_u75_cb2_w(int state);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	virtual void machine_start() override;
@@ -546,7 +546,7 @@ void squale_state::pia_u72_porta_w(uint8_t data)
 	return;
 }
 
-WRITE_LINE_MEMBER( squale_state::pia_u72_ca2_w )
+void squale_state::pia_u72_ca2_w(int state)
 {
 	// U72 PIA CA2 : Cartridge address control
 
@@ -570,7 +570,7 @@ WRITE_LINE_MEMBER( squale_state::pia_u72_ca2_w )
 	}
 }
 
-WRITE_LINE_MEMBER( squale_state::pia_u75_cb2_w )
+void squale_state::pia_u75_cb2_w(int state)
 {
 	// U75 PIA CB2 : Cartridge address reset
 
@@ -618,7 +618,7 @@ void squale_state::pia_u72_portb_w(uint8_t data)
 	return;
 }
 
-WRITE_LINE_MEMBER( squale_state::pia_u72_cb2_w )
+void squale_state::pia_u72_cb2_w(int state)
 {
 	// U72 PIA CB2 : Printer Data Strobe line
 

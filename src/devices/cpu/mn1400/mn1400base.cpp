@@ -31,6 +31,13 @@ MN1456A: MN1455 with double amount ROM/RAM
 MN148x: DAC for TV/VTR tuner
 MN1427: support for FM audio tuner
 
+TODO:
+- counter input pin (CSLCT and SNS1)
+- are illegal opcodes 0x38/0xe0 and 0x39/0xe1 branch-always and branch-never?
+  right now they're implemented as such
+- is branch emulation correct when near the end of a page?
+- add other MCUs when needed
+
 */
 
 #include "emu.h"
@@ -45,9 +52,9 @@ mn1400_base_device::mn1400_base_device(const machine_config &mconfig, device_typ
 	m_stack_levels(stack_levels),
 	m_prgwidth(prgwidth),
 	m_datawidth(datawidth),
-	m_read_a(*this),
-	m_read_b(*this),
-	m_read_sns(*this),
+	m_read_a(*this, 0),
+	m_read_b(*this, 0),
+	m_read_sns(*this, 0),
 	m_write_c(*this),
 	m_write_d(*this),
 	m_write_e(*this),
@@ -86,14 +93,6 @@ void mn1400_base_device::device_start()
 	m_data = &space(AS_DATA);
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
-
-	// resolve callbacks
-	m_read_a.resolve_safe(0);
-	m_read_b.resolve_safe(0);
-	m_read_sns.resolve_safe(0);
-	m_write_c.resolve_safe();
-	m_write_d.resolve_safe();
-	m_write_e.resolve_safe();
 
 	// zerofill
 	m_pc = 0;

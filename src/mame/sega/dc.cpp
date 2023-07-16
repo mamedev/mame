@@ -622,12 +622,12 @@ void dc_state::soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	COMBINE_DATA(&dc_sound_ram[offset]);
 }
 
-WRITE_LINE_MEMBER(dc_state::aica_irq)
+void dc_state::aica_irq(int state)
 {
 	m_soundcpu->set_input_line(ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(dc_state::sh4_aica_irq)
+void dc_state::sh4_aica_irq(int state)
 {
 	if(state)
 		dc_sysctrl_regs[SB_ISTEXT] |= IST_EXT_AICA;
@@ -637,7 +637,7 @@ WRITE_LINE_MEMBER(dc_state::sh4_aica_irq)
 	dc_update_interrupt_status();
 }
 
-WRITE_LINE_MEMBER(dc_state::external_irq)
+void dc_state::external_irq(int state)
 {
 	if (state)
 		dc_sysctrl_regs[SB_ISTEXT] |= IST_EXT_EXTERNAL;

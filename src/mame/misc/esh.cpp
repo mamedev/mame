@@ -72,7 +72,7 @@ private:
 	void esh_palette(palette_device &palette) const;
 	uint32_t screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_esh);
-	DECLARE_WRITE_LINE_MEMBER(ld_command_strobe_cb);
+	void ld_command_strobe_cb(int state);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<beep_device> m_beep;
@@ -331,7 +331,7 @@ INTERRUPT_GEN_MEMBER(esh_state::vblank_callback_esh)
 }
 
 // TODO: 0xfe NMI enabled after writing to LD command port, NMI reads LD port.
-WRITE_LINE_MEMBER(esh_state::ld_command_strobe_cb)
+void esh_state::ld_command_strobe_cb(int state)
 {
 	if(m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);

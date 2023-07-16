@@ -63,8 +63,6 @@ void upd800468_timer_device::device_start()
 {
 	m_timer = timer_alloc(FUNC(upd800468_timer_device::irq_timer_tick), this);
 
-	m_irq_cb.resolve_safe();
-
 	save_item(NAME(m_rate));
 	save_item(NAME(m_control));
 }
@@ -128,7 +126,7 @@ upd800468_device::upd800468_device(const machine_config &mconfig, const char *ta
 	, m_vic(*this, "vic")
 	, m_timer(*this, "timer%u", 0)
 	, m_kbd(*this, "kbd")
-	, m_adc_cb(*this), m_in_cb(*this), m_out_cb(*this)
+	, m_adc_cb(*this, 0x00), m_in_cb(*this, 0x00), m_out_cb(*this)
 	, m_ram_view(*this, "ramview")
 {
 }
@@ -168,10 +166,6 @@ void upd800468_device::device_add_mconfig(machine_config &config)
 void upd800468_device::device_start()
 {
 	arm7_cpu_device::device_start();
-
-	m_adc_cb.resolve_all_safe(0x000);
-	m_in_cb.resolve_all_safe(0x00);
-	m_out_cb.resolve_all_safe();
 
 	save_item(NAME(m_port_data));
 	save_item(NAME(m_port_ddr));

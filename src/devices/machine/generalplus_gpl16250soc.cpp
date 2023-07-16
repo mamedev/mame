@@ -25,6 +25,33 @@
 
 DEFINE_DEVICE_TYPE(GCM394, sunplus_gcm394_device, "gcm394", "GeneralPlus GPL16250 System-on-a-Chip")
 
+sunplus_gcm394_base_device::sunplus_gcm394_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, address_map_constructor internal) :
+	unsp_20_device(mconfig, type, tag, owner, clock, internal),
+	device_mixer_interface(mconfig, *this, 2),
+	m_screen(*this, finder_base::DUMMY_TAG),
+	m_spg_video(*this, "spgvideo"),
+	m_spg_audio(*this, "spgaudio"),
+	m_internalrom(*this, "internal"),
+	m_mainram(*this, "mainram"),
+	m_porta_in(*this, 0),
+	m_portb_in(*this, 0),
+	m_portc_in(*this, 0),
+	m_portd_in(*this, 0),
+	m_porta_out(*this),
+	m_portb_out(*this),
+	m_portc_out(*this),
+	m_portd_out(*this),
+	m_nand_read_cb(*this, 0),
+	m_csbase(0x20000),
+	m_cs_space(nullptr),
+	m_romtype(0),
+	m_space_read_cb(*this, 0),
+	m_space_write_cb(*this),
+	m_boot_mode(0),
+	m_cs_callback(*this, DEVICE_SELF, FUNC(sunplus_gcm394_base_device::default_cs_callback))
+{
+}
+
 sunplus_gcm394_device::sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	sunplus_gcm394_base_device(mconfig, GCM394, tag, owner, clock)
 {
@@ -526,7 +553,6 @@ void sunplus_gcm394_base_device::chipselect_csx_memory_device_control_w(offs_t o
 
 	logerror("CS%d set to size: %02x (%08x words) md: %01x %s   warat: %01x wait: %01x\n", offset, cs_size, (cs_size+1)*0x10000, cs_md, md[cs_md], cs_warat, cs_wait);
 
-
 	m_cs_callback(m_782x[0], m_782x[1], m_782x[2], m_782x[3], m_782x[4]);
 
 }
@@ -551,8 +577,7 @@ uint16_t sunplus_gcm394_base_device::ioarea_7860_porta_r()
 void sunplus_gcm394_base_device::ioarea_7860_porta_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_IO, "%s:sunplus_gcm394_base_device::ioarea_7860_porta_w %04x\n", machine().describe_context(), data);
-	if (m_porta_out)
-		m_porta_out(data);
+	m_porta_out(data);
 }
 
 uint16_t sunplus_gcm394_base_device::ioarea_7861_porta_buffer_r()
@@ -607,16 +632,13 @@ uint16_t sunplus_gcm394_base_device::ioarea_7869_portb_buffer_r()
 void sunplus_gcm394_base_device::ioarea_7869_portb_buffer_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_IO, "%s:sunplus_gcm394_base_device::ioarea_7869_portb_buffer_w %04x\n", machine().describe_context(), data);
-
-	if (m_portb_out) // buffer writes must update output state too, beijuehh requires it for banking
-		m_portb_out(data);
+	m_portb_out(data); // buffer writes must update output state too, beijuehh requires it for banking
 }
 
 void sunplus_gcm394_base_device::ioarea_7868_portb_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_IO, "%s:sunplus_gcm394_base_device::ioarea_7868_portb_w %04x\n", machine().describe_context(), data);
-	if (m_portb_out)
-		m_portb_out(data);
+	m_portb_out(data);
 }
 
 uint16_t sunplus_gcm394_base_device::ioarea_786a_portb_direction_r()
@@ -655,8 +677,7 @@ void sunplus_gcm394_base_device::ioarea_7870_portc_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_IO, "%s:sunplus_gcm394_base_device::ioarea_7870_portc_w %04x\n", machine().describe_context(), data);
 	m_7870 = data;
-	if (m_portc_out)
-		m_portc_out(data);
+	m_portc_out(data);
 }
 
 uint16_t sunplus_gcm394_base_device::ioarea_7871_portc_buffer_r()
@@ -707,9 +728,7 @@ void sunplus_gcm394_base_device::ioarea_7878_portd_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_IO, "%s:sunplus_gcm394_base_device::ioarea_7878_portd_w %04x\n", machine().describe_context(), data);
 	//m_7878 = data;
-
-	if (m_portd_out)
-		m_portd_out(data);
+	m_portd_out(data);
 }
 
 uint16_t sunplus_gcm394_base_device::ioarea_7879_portd_buffer_r()
@@ -721,9 +740,7 @@ uint16_t sunplus_gcm394_base_device::ioarea_7879_portd_buffer_r()
 void sunplus_gcm394_base_device::ioarea_7879_portd_buffer_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_IO, "%s:sunplus_gcm394_base_device::ioarea_7879_portd_buffer_w %04x\n", machine().describe_context(), data);
-
-	if (m_portd_out) // buffer writes must update output state too, beijuehh requires it for banking
-		m_portd_out(data);
+	m_portd_out(data); // buffer writes must update output state too, beijuehh requires it for banking
 }
 
 
@@ -1570,22 +1587,6 @@ void sunplus_gcm394_base_device::device_start()
 
 	m_cs_callback.resolve();
 
-	m_porta_in.resolve_safe(0);
-	m_portb_in.resolve_safe(0);
-	m_portc_in.resolve_safe(0);
-	m_portd_in.resolve_safe(0);
-
-	m_porta_out.resolve();
-	m_portb_out.resolve();
-	m_portc_out.resolve();
-	m_portd_out.resolve();
-
-
-	m_space_read_cb.resolve_safe(0);
-	m_space_write_cb.resolve();
-
-	m_nand_read_cb.resolve_safe(0);
-
 	m_unk_timer = timer_alloc(FUNC(sunplus_gcm394_base_device::unknown_tick), this);
 	m_unk_timer->adjust(attotime::never);
 
@@ -1795,12 +1796,12 @@ TIMER_CALLBACK_MEMBER(sunplus_gcm394_base_device::unknown_tick)
 }
 
 
-WRITE_LINE_MEMBER(sunplus_gcm394_base_device::audioirq_w)
+void sunplus_gcm394_base_device::audioirq_w(int state)
 {
 	//set_state_unsynced(UNSP_IRQ5_LINE, state);
 }
 
-WRITE_LINE_MEMBER(sunplus_gcm394_base_device::videoirq_w)
+void sunplus_gcm394_base_device::videoirq_w(int state)
 {
 	set_state_unsynced(UNSP_IRQ5_LINE, state);
 }

@@ -174,11 +174,6 @@ void nand_device::device_reset()
 	std::fill_n(m_pagereg.get(), m_page_total_size, 0);
 }
 
-void nand_device::device_resolve_objects()
-{
-	m_write_rnb.resolve_safe();
-}
-
 void nand_device::nvram_default()
 {
 	if (m_region.found())

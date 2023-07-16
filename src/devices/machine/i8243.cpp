@@ -27,7 +27,7 @@ i8243_device::i8243_device(const machine_config &mconfig, const char *tag, devic
 	: device_t(mconfig, I8243, tag, owner, clock)
 	, m_p{0, 0, 0, 0}
 	, m_p2out(0x0f), m_p2(0x0f), m_opcode(0), m_prog(1), m_cs(0)
-	, m_readhandler(*this)
+	, m_readhandler(*this, 0)
 	, m_writehandler(*this)
 {
 }
@@ -38,9 +38,6 @@ i8243_device::i8243_device(const machine_config &mconfig, const char *tag, devic
 
 void i8243_device::device_start()
 {
-	m_readhandler.resolve_all();
-	m_writehandler.resolve_all();
-
 	save_item(NAME(m_p));
 	save_item(NAME(m_p2out));
 	save_item(NAME(m_p2));
@@ -76,7 +73,7 @@ void i8243_device::p2_w(uint8_t data)
 
 void i8243_device::output_update(int which)
 {
-	if (m_writehandler[which].isnull())
+	if (m_writehandler[which].isunset())
 		logerror("%s: Unconfigured write to P%d (%01X)\n", machine().describe_context(), which + 4, m_p[which]);
 	else
 		m_writehandler[which](m_p[which]);
@@ -88,7 +85,7 @@ void i8243_device::output_update(int which)
 //  state
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(i8243_device::prog_w)
+void i8243_device::prog_w(int state)
 {
 	/* on high->low transition state, latch opcode/port */
 	if (m_prog && !state && !m_cs)
@@ -99,7 +96,7 @@ WRITE_LINE_MEMBER(i8243_device::prog_w)
 		if ((m_opcode >> 2) == mcs48_cpu_device::EXPANDER_OP_READ)
 		{
 			int which = m_opcode & 3;
-			if (m_readhandler[which].isnull())
+			if (m_readhandler[which].isunset())
 				logerror("%s: Unconfigured read from P%d\n", machine().describe_context(), which + 4);
 			else
 				m_p[which] = m_readhandler[which]();
@@ -144,7 +141,7 @@ WRITE_LINE_MEMBER(i8243_device::prog_w)
 //  cs_w - handle chip select line (active low)
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(i8243_device::cs_w)
+void i8243_device::cs_w(int state)
 {
 	m_cs = state;
 	if (m_cs)

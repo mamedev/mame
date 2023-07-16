@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "gt913_io.h"
+#include "cpu/h8/h8.h"
 
 
 //**************************************************************************
@@ -21,17 +22,14 @@ DEFINE_DEVICE_TYPE(GT913_IO_HLE, gt913_io_hle_device, "gt913_io_hle", "Casio GT9
 
 gt913_io_hle_device::gt913_io_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, GT913_IO_HLE, tag, owner, clock),
-	m_cpu(*this, DEVICE_SELF_OWNER),
-	m_cpu_io(nullptr), m_intc(nullptr), m_intc_tag(nullptr)
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_intc(*this, finder_base::DUMMY_TAG)
 {
 	m_timer_irq[0] = m_timer_irq[1] = 0;
 }
 
 void gt913_io_hle_device::device_start()
 {
-	m_cpu_io = &m_cpu->space(AS_IO);
-	m_intc = siblingdevice<h8_intc_device>(m_intc_tag);
-
 	m_timer[0] = timer_alloc(FUNC(gt913_io_hle_device::irq_timer_tick), this);
 	m_timer[1] = timer_alloc(FUNC(gt913_io_hle_device::irq_timer_tick), this);
 
@@ -137,9 +135,9 @@ void gt913_io_hle_device::adc_control_w(uint8_t data)
 	if (m_adc_enable && BIT(data, 0))
 	{
 		if (!m_adc_channel)
-			m_adc_data[0] = m_cpu_io->read_word(h8_device::ADC_0);
+			m_adc_data[0] = m_cpu->do_read_adc(0);
 		else
-			m_adc_data[1] = m_cpu_io->read_word(h8_device::ADC_1);
+			m_adc_data[1] = m_cpu->do_read_adc(1);
 	}
 }
 

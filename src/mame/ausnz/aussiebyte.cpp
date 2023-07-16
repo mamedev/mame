@@ -281,7 +281,7 @@ void aussiebyte_state::io_write_byte(offs_t offset, u8 data)
 	prog_space.write_byte(offset, data);
 }
 
-WRITE_LINE_MEMBER( aussiebyte_state::busreq_w )
+void aussiebyte_state::busreq_w(int state)
 {
 // since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
@@ -293,28 +293,28 @@ WRITE_LINE_MEMBER( aussiebyte_state::busreq_w )
     DMA selector
 
 ************************************************************/
-WRITE_LINE_MEMBER( aussiebyte_state::sio1_rdya_w )
+void aussiebyte_state::sio1_rdya_w(int state)
 {
 	m_port17_rdy = (m_port17_rdy & 0xfd) | (u8)(state << 1);
 	if (m_port17 == 1)
 		m_dma->rdy_w(state);
 }
 
-WRITE_LINE_MEMBER( aussiebyte_state::sio1_rdyb_w )
+void aussiebyte_state::sio1_rdyb_w(int state)
 {
 	m_port17_rdy = (m_port17_rdy & 0xfb) | (u8)(state << 2);
 	if (m_port17 == 2)
 		m_dma->rdy_w(state);
 }
 
-WRITE_LINE_MEMBER( aussiebyte_state::sio2_rdya_w )
+void aussiebyte_state::sio2_rdya_w(int state)
 {
 	m_port17_rdy = (m_port17_rdy & 0xef) | (u8)(state << 4);
 	if (m_port17 == 4)
 		m_dma->rdy_w(state);
 }
 
-WRITE_LINE_MEMBER( aussiebyte_state::sio2_rdyb_w )
+void aussiebyte_state::sio2_rdyb_w(int state)
 {
 	m_port17_rdy = (m_port17_rdy & 0xdf) | (u8)(state << 5);
 	if (m_port17 == 5)
@@ -370,13 +370,13 @@ static const z80_daisy_config daisy_chain_intf[] =
 
 ************************************************************/
 
-WRITE_LINE_MEMBER( aussiebyte_state::fdc_intrq_w )
+void aussiebyte_state::fdc_intrq_w(int state)
 {
 	u8 data = (m_port19 & 0xbf) | (state ? 0x40 : 0);
 	m_port19 = data;
 }
 
-WRITE_LINE_MEMBER( aussiebyte_state::fdc_drq_w )
+void aussiebyte_state::fdc_drq_w(int state)
 {
 	u8 data = (m_port19 & 0x7f) | (state ? 0x80 : 0);
 	m_port19 = data;
@@ -517,7 +517,7 @@ void aussiebyte_state::aussiebyte(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-	VOTRAX_SC01(config, m_votrax, 720000); // 720kHz? needs verify
+	VOTRAX_SC01A(config, m_votrax, 720000); // 720kHz? needs verify
 	m_votrax->ar_callback().set([this] (bool state) { m_port28 = state ? 0 : 1; });
 	m_votrax->add_route(ALL_OUTPUTS, "mono", 1.00);
 

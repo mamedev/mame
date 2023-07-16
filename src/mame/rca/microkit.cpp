@@ -47,7 +47,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(runu_button);
 
 private:
-	DECLARE_READ_LINE_MEMBER(clear_r);
+	int clear_r();
 	void ram_w(offs_t offset, uint8_t data);
 	uint8_t ram_r(offs_t offset);
 
@@ -106,7 +106,7 @@ INPUT_CHANGED_MEMBER(microkit_state::runu_button)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ_LINE_MEMBER( microkit_state::clear_r )
+int microkit_state::clear_r()
 {
 	if (m_resetcnt < 0x20)
 		m_resetcnt++;

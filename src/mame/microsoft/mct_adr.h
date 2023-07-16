@@ -22,8 +22,8 @@ public:
 	template <unsigned DMA> auto dma_r_cb() { return m_dma_r[DMA].bind(); }
 	template <unsigned DMA> auto dma_w_cb() { return m_dma_w[DMA].bind(); }
 
-	template <unsigned IRQ> DECLARE_WRITE_LINE_MEMBER(irq) { set_irq_line(IRQ, state); }
-	template <unsigned DRQ> DECLARE_WRITE_LINE_MEMBER(drq) { set_drq_line(DRQ, state); }
+	template <unsigned IRQ> void irq(int state) { set_irq_line(IRQ, state); }
+	template <unsigned DRQ> void drq(int state) { set_drq_line(DRQ, state); }
 
 	void map(address_map &map);
 

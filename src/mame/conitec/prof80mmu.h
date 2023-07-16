@@ -26,7 +26,7 @@ public:
 	virtual void z80_program_map(address_map &map);
 
 	void par_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( mme_w );
+	void mme_w(int state);
 
 	void program_map(address_map &map);
 protected:

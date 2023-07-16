@@ -427,13 +427,13 @@ private:
 	void floppy_id_w(uint8_t data);
 	static void floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE_LINE_MEMBER(irq_1);
-	DECLARE_WRITE_LINE_MEMBER(irq_2);
-	DECLARE_WRITE_LINE_MEMBER(irq_3);
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(irq_4);
-	DECLARE_WRITE_LINE_MEMBER(irq_5);
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(irq_6);
-	DECLARE_WRITE_LINE_MEMBER(irq_7);
+	void irq_1(int state);
+	void irq_2(int state);
+	void irq_3(int state);
+	[[maybe_unused]] void irq_4(int state);
+	void irq_5(int state);
+	[[maybe_unused]] void irq_6(int state);
+	void irq_7(int state);
 
 	void hp_ipc_mem_inner_base(address_map &map);
 	void hp_ipc_mem_inner_9807a(address_map &map);
@@ -656,37 +656,37 @@ void hp_ipc_state::floppy_id_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(hp_ipc_state::irq_1)
+void hp_ipc_state::irq_1(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_1, state);
 }
 
-WRITE_LINE_MEMBER(hp_ipc_state::irq_2)
+void hp_ipc_state::irq_2(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_2, state);
 }
 
-WRITE_LINE_MEMBER(hp_ipc_state::irq_3)
+void hp_ipc_state::irq_3(int state)
 {
 	m_irq3_merger->in_w<0>(state);
 }
 
-WRITE_LINE_MEMBER(hp_ipc_state::irq_4)
+void hp_ipc_state::irq_4(int state)
 {
 	m_irq4_merger->in_w<0>(state);
 }
 
-WRITE_LINE_MEMBER(hp_ipc_state::irq_5)
+void hp_ipc_state::irq_5(int state)
 {
 	m_irq5_merger->in_w<0>(state);
 }
 
-WRITE_LINE_MEMBER(hp_ipc_state::irq_6)
+void hp_ipc_state::irq_6(int state)
 {
 	m_irq6_merger->in_w<0>(state);
 }
 
-WRITE_LINE_MEMBER(hp_ipc_state::irq_7)
+void hp_ipc_state::irq_7(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_7, state);
 }

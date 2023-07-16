@@ -199,12 +199,12 @@ MAIN BOARD:
 #define VLM_CLOCK             XTAL(3'579'545)
 
 
-WRITE_LINE_MEMBER(trackfld_state::coin_counter_1_w)
+void trackfld_state::coin_counter_1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(trackfld_state::coin_counter_2_w)
+void trackfld_state::coin_counter_2_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
@@ -221,7 +221,7 @@ void trackfld_state::questions_bank_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(trackfld_state::irq_mask_w)
+void trackfld_state::irq_mask_w(int state)
 {
 	m_irq_mask = state;
 	if (!m_irq_mask)
@@ -251,7 +251,7 @@ void trackfld_state::main_map(address_map &map)
 	map(0x6000, 0xffff).rom();
 }
 
-WRITE_LINE_MEMBER(trackfld_state::nmi_mask_w)
+void trackfld_state::nmi_mask_w(int state)
 {
 	m_nmi_mask = state;
 	if (!m_nmi_mask)
@@ -871,13 +871,13 @@ MACHINE_RESET_MEMBER(trackfld_state,trackfld)
 	m_old_gfx_bank = 0;
 }
 
-WRITE_LINE_MEMBER(trackfld_state::vblank_irq)
+void trackfld_state::vblank_irq(int state)
 {
 	if (state && m_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(trackfld_state::vblank_nmi)
+void trackfld_state::vblank_nmi(int state)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

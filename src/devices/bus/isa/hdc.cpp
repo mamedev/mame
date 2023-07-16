@@ -117,7 +117,7 @@ const char *const s_hdc_command_names[] =
 
 ROM_START( hdc )
 	ROM_REGION(0x02000,"hdc", 0)
-	// Bios taken from WD1002A-WX1
+	// BIOS taken from WD1002A-WX1
 	ROM_LOAD("wdbios.rom",  0x00000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 ROM_END
 
@@ -196,8 +196,6 @@ void xt_hdc_device::device_start()
 {
 	m_buffer = std::make_unique<uint8_t[]>(256*512);   // maximum possible transfer
 	m_timer = timer_alloc(FUNC(xt_hdc_device::process_command), this);
-	m_irq_handler.resolve_safe();
-	m_drq_handler.resolve_safe();
 }
 
 void xt_hdc_device::device_reset()
@@ -1076,7 +1074,7 @@ uint8_t isa8_hdc_device::pc_hdc_dipswitch_r()
 	return m_dip;
 }
 
-WRITE_LINE_MEMBER(isa8_hdc_device::irq_w)
+void isa8_hdc_device::irq_w(int state)
 {
 	if (BIT(m_dip, 6))
 		m_isa->irq5_w(state);
@@ -1084,7 +1082,7 @@ WRITE_LINE_MEMBER(isa8_hdc_device::irq_w)
 		m_isa->irq2_w(state);
 }
 
-WRITE_LINE_MEMBER(isa8_hdc_device::drq_w)
+void isa8_hdc_device::drq_w(int state)
 {
 	m_isa->drq3_w(state);
 }

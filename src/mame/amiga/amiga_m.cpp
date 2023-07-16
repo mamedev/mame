@@ -21,10 +21,13 @@
  *
  *************************************/
 
-#define LOG_CUSTOM  0
-#define LOG_CIA     0
-#define LOG_BLITS   0
-#define LOG_SERIAL  1
+#define LOG_CUSTOM  (1U << 1)
+#define LOG_CIA     (1U << 2)
+#define LOG_BLITS   (1U << 3)
+#define LOG_SERIAL  (1U << 4)
+
+#define VERBOSE (LOG_SERIAL)
+#include "logmacro.h"
 
 
 
@@ -169,7 +172,7 @@ void amiga_state::machine_start()
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 }
 
-WRITE_LINE_MEMBER( amiga_state::m68k_reset )
+void amiga_state::m68k_reset(int state)
 {
 	logerror("%s: Executed RESET\n", machine().describe_context());
 	machine_reset();
@@ -191,17 +194,17 @@ void amiga_state::machine_reset()
 	m_overlay->set_bank(1);
 }
 
-WRITE_LINE_MEMBER(amiga_state::fdc_dskblk_w)
+void amiga_state::fdc_dskblk_w(int state)
 {
 	set_interrupt(INTENA_SETCLR | INTENA_DSKBLK);
 }
 
-WRITE_LINE_MEMBER(amiga_state::fdc_dsksyn_w)
+void amiga_state::fdc_dsksyn_w(int state)
 {
 	set_interrupt((state ? INTENA_SETCLR : 0) | INTENA_DSKSYN);
 }
 
-WRITE_LINE_MEMBER( amiga_state::kbreset_w )
+void amiga_state::kbreset_w(int state)
 {
 	// this is connected to the gary chip, gary then resets the 68k, agnus, paula and the cias
 	if (!state)
@@ -854,19 +857,16 @@ TIMER_CALLBACK_MEMBER( amiga_state::amiga_blitter_proc )
 	uint32_t blitsum = 0;
 
 	/* logging */
-	if (LOG_BLITS)
-	{
-		static const char *const type[] = { "ASCENDING", "LINE", "DESCENDING", "LINE" };
-		logerror("BLIT %s: %dx%d  %04x %04x\n", type[CUSTOM_REG(REG_BLTCON1) & 0x0003], CUSTOM_REG(REG_BLTSIZH), CUSTOM_REG(REG_BLTSIZV), CUSTOM_REG(REG_BLTCON0), CUSTOM_REG(REG_BLTCON1));
-		if (CUSTOM_REG(REG_BLTCON0) & 0x0800)
-			logerror("  A: addr=%06X mod=%3d shift=%2d maskl=%04x maskr=%04x\n", CUSTOM_REG_LONG(REG_BLTAPTH), CUSTOM_REG_SIGNED(REG_BLTAMOD), CUSTOM_REG(REG_BLTCON0) >> 12, CUSTOM_REG(REG_BLTAFWM), CUSTOM_REG(REG_BLTALWM));
-		if (CUSTOM_REG(REG_BLTCON0) & 0x0400)
-			logerror("  B: addr=%06X mod=%3d shift=%2d\n", CUSTOM_REG_LONG(REG_BLTBPTH), CUSTOM_REG_SIGNED(REG_BLTBMOD), CUSTOM_REG(REG_BLTCON1) >> 12);
-		if (CUSTOM_REG(REG_BLTCON0) & 0x0200)
-			logerror("  C: addr=%06X mod=%3d\n", CUSTOM_REG_LONG(REG_BLTCPTH), CUSTOM_REG_SIGNED(REG_BLTCMOD));
-		if (CUSTOM_REG(REG_BLTCON0) & 0x0100)
-			logerror("  D: addr=%06X mod=%3d\n", CUSTOM_REG_LONG(REG_BLTDPTH), CUSTOM_REG_SIGNED(REG_BLTDMOD));
-	}
+	static const char *const type[] = { "ASCENDING", "LINE", "DESCENDING", "LINE" };
+	LOGMASKED(LOG_BLITS, "BLIT %s: %dx%d  %04x %04x\n", type[CUSTOM_REG(REG_BLTCON1) & 0x0003], CUSTOM_REG(REG_BLTSIZH), CUSTOM_REG(REG_BLTSIZV), CUSTOM_REG(REG_BLTCON0), CUSTOM_REG(REG_BLTCON1));
+	if (CUSTOM_REG(REG_BLTCON0) & 0x0800)
+		LOGMASKED(LOG_BLITS, "  A: addr=%06X mod=%3d shift=%2d maskl=%04x maskr=%04x\n", CUSTOM_REG_LONG(REG_BLTAPTH), CUSTOM_REG_SIGNED(REG_BLTAMOD), CUSTOM_REG(REG_BLTCON0) >> 12, CUSTOM_REG(REG_BLTAFWM), CUSTOM_REG(REG_BLTALWM));
+	if (CUSTOM_REG(REG_BLTCON0) & 0x0400)
+		LOGMASKED(LOG_BLITS, "  B: addr=%06X mod=%3d shift=%2d\n", CUSTOM_REG_LONG(REG_BLTBPTH), CUSTOM_REG_SIGNED(REG_BLTBMOD), CUSTOM_REG(REG_BLTCON1) >> 12);
+	if (CUSTOM_REG(REG_BLTCON0) & 0x0200)
+		LOGMASKED(LOG_BLITS, "  C: addr=%06X mod=%3d\n", CUSTOM_REG_LONG(REG_BLTCPTH), CUSTOM_REG_SIGNED(REG_BLTCMOD));
+	if (CUSTOM_REG(REG_BLTCON0) & 0x0100)
+		LOGMASKED(LOG_BLITS, "  D: addr=%06X mod=%3d\n", CUSTOM_REG_LONG(REG_BLTDPTH), CUSTOM_REG_SIGNED(REG_BLTDMOD));
 
 	/* set the zero flag */
 	CUSTOM_REG(REG_DMACON) |= 0x2000;
@@ -891,8 +891,7 @@ TIMER_CALLBACK_MEMBER( amiga_state::amiga_blitter_proc )
 	/* clear the zero flag if we actually wrote data */
 	if (blitsum)
 		CUSTOM_REG(REG_DMACON) &= ~0x2000;
-	if (LOG_BLITS)
-		logerror("%04x ZF=%d\n", blitsum, bool(BIT(CUSTOM_REG(REG_DMACON), 13)));
+	LOGMASKED(LOG_BLITS, "%04x ZF=%d\n", blitsum, bool(BIT(CUSTOM_REG(REG_DMACON), 13)));
 
 	/* no longer busy */
 	CUSTOM_REG(REG_DMACON) &= ~0x4000;
@@ -979,24 +978,24 @@ void amiga_state::blitter_setup()
 //  CENTRONICS
 //**************************************************************************
 
-WRITE_LINE_MEMBER( amiga_state::centronics_ack_w )
+void amiga_state::centronics_ack_w(int state)
 {
 	m_cia_0->flag_w(state);
 }
 
-WRITE_LINE_MEMBER( amiga_state::centronics_busy_w )
+void amiga_state::centronics_busy_w(int state)
 {
 	m_centronics_busy = state;
 	m_cia_1->sp_w(state);
 }
 
-WRITE_LINE_MEMBER( amiga_state::centronics_perror_w )
+void amiga_state::centronics_perror_w(int state)
 {
 	m_centronics_perror = state;
 	m_cia_1->cnt_w(state);
 }
 
-WRITE_LINE_MEMBER( amiga_state::centronics_select_w )
+void amiga_state::centronics_select_w(int state)
 {
 	m_centronics_select = state;
 }
@@ -1019,16 +1018,14 @@ uint16_t amiga_state::cia_r(offs_t offset, uint16_t mem_mask)
 	if ((offset & 0x2000/2) == 0 && ACCESSING_BITS_8_15)
 		data |= m_cia_1->read(offset >> 7) << 8;
 
-	if (LOG_CIA)
-		logerror("%s: cia_r(%06x) = %04x & %04x\n", machine().describe_context(), offset, data, mem_mask);
+	LOGMASKED(LOG_CIA, "%s: cia_r(%06x) = %04x & %04x\n", machine().describe_context(), offset, data, mem_mask);
 
 	return data;
 }
 
 void amiga_state::cia_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if (LOG_CIA)
-		logerror("%s: cia_w(%06x) = %04x & %04x\n", machine().describe_context(), offset, data, mem_mask);
+	LOGMASKED(LOG_CIA, "%s: cia_w(%06x) = %04x & %04x\n", machine().describe_context(), offset, data, mem_mask);
 
 	if ((offset & 0x1000/2) == 0 && ACCESSING_BITS_0_7)
 		m_cia_0->write(offset >> 7, data & 0xff);
@@ -1064,10 +1061,9 @@ void amiga_state::cia_0_port_a_write(uint8_t data)
 	m_power_led = BIT(~data, 1);
 }
 
-WRITE_LINE_MEMBER( amiga_state::cia_0_irq )
+void amiga_state::cia_0_irq(int state)
 {
-	if (LOG_CIA)
-		logerror("%s: cia_0_irq: %d\n", machine().describe_context(), state);
+	LOGMASKED(LOG_CIA, "%s: cia_0_irq: %d\n", machine().describe_context(), state);
 
 	m_cia_0_irq = state;
 	update_int2();
@@ -1100,10 +1096,9 @@ void amiga_state::cia_1_port_a_write(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( amiga_state::cia_1_irq )
+void amiga_state::cia_1_irq(int state)
 {
-	if (LOG_CIA)
-		logerror("%s: cia_1_irq: %d\n", machine().describe_context(), state);
+	LOGMASKED(LOG_CIA, "%s: cia_1_irq: %d\n", machine().describe_context(), state);
 
 	m_cia_1_irq = state;
 	update_int6();
@@ -1300,8 +1295,7 @@ uint16_t amiga_state::custom_chip_r(offs_t offset)
 {
 	uint16_t temp;
 
-	if (LOG_CUSTOM)
-		logerror("%06X:read from custom %s\n", m_maincpu->pc(), s_custom_reg_names[offset & 0xff]);
+	LOGMASKED(LOG_CUSTOM, "%06X:read from custom %s\n", m_maincpu->pc(), s_custom_reg_names[offset & 0xff]);
 
 	switch (offset & 0xff)
 	{
@@ -1315,9 +1309,7 @@ uint16_t amiga_state::custom_chip_r(offs_t offset)
 			return amiga_gethvpos() & 0xffff;
 
 		case REG_SERDATR:
-			if (LOG_SERIAL)
-				logerror("r SERDATR: %04x\n", CUSTOM_REG(REG_SERDATR));
-
+			LOGMASKED(LOG_SERIAL, "r SERDATR: %04x\n", CUSTOM_REG(REG_SERDATR));
 			return CUSTOM_REG(REG_SERDATR);
 
 		case REG_JOY0DAT:
@@ -1400,8 +1392,7 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 	uint16_t temp;
 	offset &= 0xff;
 
-	if (LOG_CUSTOM)
-		logerror("%06X:write to custom %s = %04X\n", m_maincpu->pc(), s_custom_reg_names[offset & 0xff], data);
+	LOGMASKED(LOG_CUSTOM, "%06X:write to custom %s = %04X\n", m_maincpu->pc(), s_custom_reg_names[offset & 0xff], data);
 
 	switch (offset)
 	{
@@ -1445,9 +1436,7 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			break;
 
 		case REG_SERDAT:
-			if (LOG_SERIAL)
-				logerror("w SERDAT: %04x\n", data);
-
+			LOGMASKED(LOG_SERIAL, "w SERDAT: %04x\n", data);
 			CUSTOM_REG(REG_SERDAT) = data;
 
 			// transmit shift register currently empty?
@@ -1471,9 +1460,7 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			return;
 
 		case REG_SERPER:
-			if (LOG_SERIAL)
-				logerror("w SERPER: %04x\n", data);
-
+			LOGMASKED(LOG_SERIAL, "w SERPER: %04x\n", data);
 			CUSTOM_REG(REG_SERPER) = data;
 			serial_adjust();
 
@@ -1819,7 +1806,7 @@ void amiga_state::rx_write(int level)
 	CUSTOM_REG(REG_SERDATR) |= level << 11;
 }
 
-WRITE_LINE_MEMBER( amiga_state::rs232_rx_w )
+void amiga_state::rs232_rx_w(int state)
 {
 	rx_write(state);
 
@@ -1828,22 +1815,22 @@ WRITE_LINE_MEMBER( amiga_state::rs232_rx_w )
 		serial_adjust();
 }
 
-WRITE_LINE_MEMBER( amiga_state::rs232_dcd_w )
+void amiga_state::rs232_dcd_w(int state)
 {
 	m_rs232_dcd = state;
 }
 
-WRITE_LINE_MEMBER( amiga_state::rs232_dsr_w )
+void amiga_state::rs232_dsr_w(int state)
 {
 	m_rs232_dsr = state;
 }
 
-WRITE_LINE_MEMBER( amiga_state::rs232_ri_w )
+void amiga_state::rs232_ri_w(int state)
 {
 	m_rs232_ri = state;
 }
 
-WRITE_LINE_MEMBER( amiga_state::rs232_cts_w )
+void amiga_state::rs232_cts_w(int state)
 {
 	m_rs232_cts = state;
 }

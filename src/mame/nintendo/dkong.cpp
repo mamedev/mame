@@ -452,7 +452,7 @@ void dkong_state::memory_write_byte(offs_t offset, uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(dkong_state::s2650_interrupt)
+void dkong_state::s2650_interrupt(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -672,7 +672,7 @@ void dkong_state::s2650_data_w(uint8_t data)
 	m_hunchloopback = data;
 }
 
-WRITE_LINE_MEMBER(dkong_state::s2650_fo_w)
+void dkong_state::s2650_fo_w(int state)
 {
 #if DEBUG_PROTECTION
 	logerror("%s write : FO = %02x\n", machine().describe_context(), data);
@@ -1623,7 +1623,7 @@ uint8_t dkong_state::braze_eeprom_r()
 	return m_eeprom->do_read();
 }
 
-WRITE_LINE_MEMBER(dkong_state::dk_braze_a15)
+void dkong_state::dk_braze_a15(int state)
 {
 	m_bank1->set_entry(state & 0x01);
 	m_bank2->set_entry(state & 0x01);
@@ -1667,13 +1667,13 @@ void dkong_state::braze_decrypt_rom(uint8_t *dest)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(dkong_state::vblank_irq)
+void dkong_state::vblank_irq(int state)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(dkong_state::busreq_w )
+void dkong_state::busreq_w(int state)
 {
 	// since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);

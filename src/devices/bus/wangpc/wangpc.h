@@ -106,19 +106,19 @@ public:
 	uint8_t dack3_r() { return dack_r(3); }
 	void dack3_w(uint8_t data) { dack_w(3, data); }
 
-	DECLARE_WRITE_LINE_MEMBER( tc_w );
+	void tc_w(int state);
 
 	// peripheral interface
-	DECLARE_WRITE_LINE_MEMBER( irq2_w ) { m_write_irq2(state); }
-	DECLARE_WRITE_LINE_MEMBER( irq3_w ) { m_write_irq3(state); }
-	DECLARE_WRITE_LINE_MEMBER( irq4_w ) { m_write_irq4(state); }
-	DECLARE_WRITE_LINE_MEMBER( irq5_w ) { m_write_irq5(state); }
-	DECLARE_WRITE_LINE_MEMBER( irq6_w ) { m_write_irq6(state); }
-	DECLARE_WRITE_LINE_MEMBER( irq7_w ) { m_write_irq7(state); }
-	DECLARE_WRITE_LINE_MEMBER( drq1_w ) { m_write_drq1(state); }
-	DECLARE_WRITE_LINE_MEMBER( drq2_w ) { m_write_drq2(state); }
-	DECLARE_WRITE_LINE_MEMBER( drq3_w ) { m_write_drq3(state); }
-	DECLARE_WRITE_LINE_MEMBER( ioerror_w ) { m_write_ioerror(state); }
+	void irq2_w(int state) { m_write_irq2(state); }
+	void irq3_w(int state) { m_write_irq3(state); }
+	void irq4_w(int state) { m_write_irq4(state); }
+	void irq5_w(int state) { m_write_irq5(state); }
+	void irq6_w(int state) { m_write_irq6(state); }
+	void irq7_w(int state) { m_write_irq7(state); }
+	void drq1_w(int state) { m_write_drq1(state); }
+	void drq2_w(int state) { m_write_drq2(state); }
+	void drq3_w(int state) { m_write_drq3(state); }
+	void ioerror_w(int state) { m_write_ioerror(state); }
 
 protected:
 	// devicedevice_t implementation

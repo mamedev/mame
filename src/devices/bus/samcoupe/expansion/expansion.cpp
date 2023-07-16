@@ -51,9 +51,6 @@ void samcoupe_expansion_device::device_start()
 {
 	// get inserted module
 	m_module = get_card_device();
-
-	// resolve callbacks
-	m_int_handler.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -88,13 +85,13 @@ void samcoupe_expansion_device::iorq_w(offs_t offset, uint8_t data)
 		m_module->iorq_w(offset, data);
 }
 
-WRITE_LINE_MEMBER( samcoupe_expansion_device::xmem_w )
+void samcoupe_expansion_device::xmem_w(int state)
 {
 	if (m_module)
 		m_module->xmem_w(state);
 }
 
-WRITE_LINE_MEMBER( samcoupe_expansion_device::print_w )
+void samcoupe_expansion_device::print_w(int state)
 {
 	if (m_module)
 		m_module->print_w(state);

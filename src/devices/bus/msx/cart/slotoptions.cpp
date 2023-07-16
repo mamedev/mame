@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
+#include "emu.h"
 #include "slotoptions.h"
 
 namespace bus::msx::cart::slotoptions {
@@ -44,9 +45,12 @@ char const *const KANJI           = "kanji";
 char const *const KEYBOARD_MASTER = "keyboard_master";
 char const *const KONAMI          = "konami";
 char const *const KONAMI_SCC      = "konami_scc";
+char const *const KOREAN_25IN1    = "korean_25in1";
 char const *const KOREAN_80IN1    = "korean_80in1";
 char const *const KOREAN_90IN1    = "korean_90in1";
 char const *const KOREAN_126IN1   = "korean_126in1";
+char const *const KOREAN_HYDLIDE2 = "korean_hydlide2";
+char const *const LOVEPLUS        = "loveplus";
 char const *const MAJUSTUSHI      = "majutsushi";
 char const *const MM256K          = "mm256k";
 char const *const MM512K          = "mm512k";
@@ -62,6 +66,7 @@ char const *const MSXDOS2J        = "msxdos2j";
 char const *const MSXDOS2E        = "msxdos2e";
 char const *const MSXWRITE        = "msxwrite";
 char const *const NOMAPPER        = "nomapper";
+char const *const QUICKDISK       = "quickdisk";
 char const *const RAM16K          = "ram16k";
 char const *const RAM32K          = "ram32k";
 char const *const RAM48K          = "ram48k";

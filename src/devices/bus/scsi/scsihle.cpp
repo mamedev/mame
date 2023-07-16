@@ -405,7 +405,7 @@ void scsihle_device::scsi_change_phase(uint8_t newphase)
 	}
 }
 
-WRITE_LINE_MEMBER( scsihle_device::input_sel )
+void scsihle_device::input_sel(int state)
 {
 //  printf( "sel %d %d %02x\n", state, m_phase, m_input_data );
 	switch (m_phase)
@@ -433,7 +433,7 @@ WRITE_LINE_MEMBER( scsihle_device::input_sel )
 	}
 }
 
-WRITE_LINE_MEMBER( scsihle_device::input_ack )
+void scsihle_device::input_ack(int state)
 {
 	switch (m_phase)
 	{
@@ -571,7 +571,7 @@ WRITE_LINE_MEMBER( scsihle_device::input_ack )
 	}
 }
 
-WRITE_LINE_MEMBER( scsihle_device::input_rst )
+void scsihle_device::input_rst(int state)
 {
 	if (state)
 	{

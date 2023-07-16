@@ -5,10 +5,9 @@
 #include "emu.h"
 #include "dmac3.h"
 
-#define LOG_GENERAL (1U << 0)
-#define LOG_REGISTER (1U << 1)
+#define LOG_REGISTER  (1U << 1)
 #define LOG_INTERRUPT (1U << 2)
-#define LOG_DATA (1U << 3)
+#define LOG_DATA      (1U << 3)
 
 #define DMAC3_DEBUG (LOG_GENERAL | LOG_REGISTER | LOG_INTERRUPT)
 #define DMAC3_TRACE (DMAC3_DEBUG | LOG_DATA)
@@ -20,7 +19,7 @@ DEFINE_DEVICE_TYPE(DMAC3, dmac3_device, "dmac3", "Sony CXD8403Q DMAC3 DMA Contro
 dmac3_device::dmac3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, DMAC3, tag, owner, clock), m_bus(*this, finder_base::DUMMY_TAG, -1, 64),
 	m_irq_handler(*this),
-	m_dma_r(*this),
+	m_dma_r(*this, 0),
 	m_dma_w(*this),
 	m_apbus_virt_to_phys_callback(*this)
 {
@@ -29,9 +28,6 @@ dmac3_device::dmac3_device(machine_config const &mconfig, char const *tag, devic
 void dmac3_device::device_start()
 {
 	m_apbus_virt_to_phys_callback.resolve();
-	m_irq_handler.resolve_safe();
-	m_dma_r.resolve_all_safe(0);
-	m_dma_w.resolve_all_safe();
 
 	m_irq_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dmac3_device::irq_check), this));
 	m_dma_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dmac3_device::dma_check), this));
@@ -92,7 +88,7 @@ void dmac3_device::csr_w(dmac3_controller controller, uint32_t data)
 	LOGMASKED(LOG_REGISTER, "dmac3-%d csr_w: 0x%x\n", controller, data);
 	if (data & CSR_RESET)
 	{
-		LOGMASKED(LOG_GENERAL, "dmac3-%d chip reset\n", controller);
+		LOG("dmac3-%d chip reset\n", controller);
 		reset_controller(controller);
 	}
 	else

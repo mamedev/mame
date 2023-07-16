@@ -58,7 +58,7 @@ tiki100_bus_device::tiki100_bus_device(const machine_config &mconfig, const char
 	m_irq_cb(*this),
 	m_nmi_cb(*this),
 	m_busrq_cb(*this),
-	m_in_mrq_cb(*this),
+	m_in_mrq_cb(*this, 0),
 	m_out_mrq_cb(*this)
 {
 }
@@ -74,12 +74,6 @@ tiki100_bus_device::~tiki100_bus_device()
 
 void tiki100_bus_device::device_start()
 {
-	// resolve callbacks
-	m_irq_cb.resolve_safe();
-	m_nmi_cb.resolve_safe();
-	m_busrq_cb.resolve_safe();
-	m_in_mrq_cb.resolve();
-	m_out_mrq_cb.resolve();
 }
 
 
@@ -147,7 +141,7 @@ void tiki100_bus_device::iorq_w(offs_t offset, uint8_t data)
 //  busak_w - bus acknowledge write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( tiki100_bus_device::busak_w )
+void tiki100_bus_device::busak_w(int state)
 {
 	for (device_tiki100bus_card_interface &entry : m_device_list)
 		entry.busak_w(state);

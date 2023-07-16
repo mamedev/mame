@@ -1950,10 +1950,18 @@ if CPUS["M680X0"] then
 		MAME_DIR .. "src/devices/cpu/m68000/m68000-sif.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68000-sdp.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68000-sip.cpp",
-		MAME_DIR .. "src/devices/cpu/m68000/m68000-sdfm.cpp",
-		MAME_DIR .. "src/devices/cpu/m68000/m68000-sifm.cpp",
-		MAME_DIR .. "src/devices/cpu/m68000/m68000-sdpm.cpp",
-		MAME_DIR .. "src/devices/cpu/m68000/m68000-sipm.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000mcu-head.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000mcu-sdfm.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000mcu-sifm.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000mcu-sdpm.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000mcu-sipm.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000mcu.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000mcu.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68008-head.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68008-sdf8.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68008-sif8.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68008-sdp8.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68008-sip8.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68008.h",
 		MAME_DIR .. "src/devices/cpu/m68000/m68008.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68010.h",
@@ -2869,6 +2877,8 @@ if (CPUS["Z80"]~=null or CPUS["KC80"]~=null) then
 		MAME_DIR .. "src/devices/cpu/z80/mc8123.h",
 		MAME_DIR .. "src/devices/cpu/z80/r800.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/r800.h",
+		MAME_DIR .. "src/devices/cpu/z80/z84c015.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/z84c015.h",
 	}
 end
 
@@ -3822,4 +3832,21 @@ end
 if opt_tool(CPUS, "INTERDATA16") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/interdata16/dasm16.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/interdata16/dasm16.h")
+end
+
+--------------------------------------------------
+-- SGS-Thomson ST9
+--@src/devices/cpu/st9/st905x.h,CPUS["ST9"] = true
+--------------------------------------------------
+
+if CPUS["ST9"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/st9/st905x.cpp",
+		MAME_DIR .. "src/devices/cpu/st9/st905x.h",
+	}
+end
+
+if opt_tool(CPUS, "ST9") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/st9/st9dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/st9/st9dasm.h")
 end

@@ -44,7 +44,7 @@ deco_irq_device::deco_irq_device(const machine_config &mconfig, const char *tag,
 	device_t(mconfig, DECO_IRQ, tag, owner, clock),
 	m_screen(*this, finder_base::DUMMY_TAG),
 	m_scanline_timer(nullptr),
-	m_lightgun1_cb(*this), m_lightgun2_cb(*this),
+	m_lightgun1_cb(*this, 0), m_lightgun2_cb(*this, 0),
 	m_lightgun_irq_cb(*this),
 	m_raster1_irq_cb(*this), m_raster2_irq_cb(*this),
 	m_vblank_irq_cb(*this),
@@ -64,14 +64,6 @@ void deco_irq_device::device_start()
 	// make sure our screen is started
 	if (!m_screen->started())
 		throw device_missing_dependencies();
-
-	// resolve callbacks
-	m_lightgun1_cb.resolve_safe(0);
-	m_lightgun2_cb.resolve_safe(0);
-	m_lightgun_irq_cb.resolve_safe();
-	m_raster1_irq_cb.resolve_safe();
-	m_raster2_irq_cb.resolve_safe();
-	m_vblank_irq_cb.resolve_safe();
 
 	// allocate scanline timer and start it
 	m_scanline_timer = timer_alloc(FUNC(deco_irq_device::scanline_callback), this);
@@ -221,19 +213,19 @@ u8 deco_irq_device::status_r()
 	return data;
 }
 
-WRITE_LINE_MEMBER( deco_irq_device::lightgun1_trigger_w )
+void deco_irq_device::lightgun1_trigger_w(int state)
 {
 	if (state)
 		m_lightgun_latch = m_lightgun1_cb();
 }
 
-WRITE_LINE_MEMBER( deco_irq_device::lightgun2_trigger_w )
+void deco_irq_device::lightgun2_trigger_w(int state)
 {
 	if (state)
 		m_lightgun_latch = m_lightgun2_cb();
 }
 
-WRITE_LINE_MEMBER( deco_irq_device::lightgun_irq_ack_w )
+void deco_irq_device::lightgun_irq_ack_w(int state)
 {
 	m_lightgun_irq = false;
 	m_lightgun_irq_cb(CLEAR_LINE);

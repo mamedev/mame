@@ -2,74 +2,85 @@
 # copyright-holders:Olivier Galibert, AJR
 adc_ipx
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, X)) {
 		read(set_l(TMP, TMP+X));
 	}
-	do_adc(read(TMP+X));
+	TMP2 = read(TMP+X);
+	do_adc(TMP2);
 	if(P & F_D) {
-		read_pc_noinc();
+		read_pc();
 		set_nz(A);
 	}
 	prefetch();
 
 add_imm
 	TMP = read_pc();
+	PC++;
 	do_add(TMP);
 	if(P & F_D) {
-		read_pc_noinc();
+		read_pc();
 		set_nz(A);
 	}
 	prefetch();
 
 add_zpg
 	TMP = read_pc();
+	PC++;
 	TMP2 = read(TMP);
 	do_add(TMP2);
 	if(P & F_D) {
-		read_pc_noinc();
+		read_pc();
 		set_nz(A);
 	}
 	prefetch();
 
 add_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	TMP2 = read(uint8_t(TMP+X));
 	do_add(TMP2);
 	if(P & F_D) {
-		read_pc_noinc();
+		read_pc();
 		set_nz(A);
 	}
 	prefetch();
 
 and_ipx
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, X)) {
 		read(set_l(TMP, TMP+X));
 	}
-	A &= read(TMP+X);
+	TMP2 = read(TMP+X);
+	A &= TMP2;
 	set_nz(A);
 	prefetch();
 
 asr_acc
-	read_pc_noinc();
+	read_pc();
 	A = do_asr(A);
 	prefetch();
 
 bar_amr
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = read(TMP);
-	TMP = read_pc_noinc();
+	TMP = read_pc();
 	read_pc();
+	PC++;
 	TMP2 = ~TMP2 & TMP;
 	TMP = read_pc();
+	PC++;
 	if(TMP2 != 0) {
-		read_pc_noinc();
+		read_pc();
 		if(page_changing(PC, int8_t(TMP))) {
 			read_arg(set_l(PC, PC+int8_t(TMP)));
 		}
@@ -79,14 +90,18 @@ bar_amr
 
 bas_amr
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = read(TMP);
-	TMP = read_pc_noinc();
+	TMP = read_pc();
 	read_pc();
+	PC++;
 	TMP2 &= TMP;
 	TMP = read_pc();
+	PC++;
 	if(TMP2 != 0) {
-		read_pc_noinc();
+		read_pc();
 		if(page_changing(PC, int8_t(TMP))) {
 			read_arg(set_l(PC, PC+int8_t(TMP)));
 		}
@@ -96,9 +111,10 @@ bas_amr
 
 brk_r_imp
 	if(irq_taken || nmi_pending) {
-		read_pc_noinc();
+		read_pc();
 	} else {
 		read_pc();
+		PC++;
 	}
 	write(SP, PC >> 8);
 	dec_SP();
@@ -124,34 +140,39 @@ brk_r_imp
 	inst_state = -1;
 
 clw_imp
-	read_pc_noinc();
+	read_pc();
 	P &= ~F_V;
 	m_w = 0;
 	prefetch();
 
 cmp_ipx
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, X)) {
 		read(set_l(TMP, TMP+X));
 	}
-	do_cmp(A, read(TMP+X));
+	TMP2 = read(TMP+X);
+	do_cmp(A, TMP2);
 	prefetch();
 
 eor_ipx
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, X)) {
 		read(set_l(TMP, TMP+X));
 	}
-	A ^= read(TMP+X);
+	TMP2 = read(TMP+X);
+	A ^= TMP2;
 	set_nz(A);
 	prefetch();
 
 exc_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	TMP = uint8_t(TMP+X);
 	TMP2 = read(TMP);
@@ -160,7 +181,7 @@ exc_zpx
 	prefetch();
 
 ini_imp
-	read_pc_noinc();
+	read_pc();
 	read(m_i);
 	m_i++;
 	prefetch();
@@ -175,7 +196,7 @@ jpi_ind
 	prefetch();
 
 jsb_vec
-	read_pc_noinc();
+	read_pc();
 	write(SP, PC>>8);
 	dec_SP();
 	write(SP, PC);
@@ -187,14 +208,18 @@ jsb_vec
 
 jmp_r_ind
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	PC = read(TMP);
 	PC = set_h(PC, read(TMP+1));
 	prefetch();
 
 jsr_r_adr
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	write(SP, PC>>8);
 	dec_SP();
 	write(SP, PC);
@@ -203,26 +228,27 @@ jsr_r_adr
 	prefetch();
 
 lab_acc
-	read_pc_noinc();
-	read_pc_noinc();
+	read_pc();
+	read_pc();
 	if(int8_t(A) < 0)
 		A = -A;
 	set_nz(A);
 	prefetch();
 
 lai_imp
-	read_pc_noinc();
+	read_pc();
 	A = read(m_i);
 	prefetch();
 
 lan_imp
-	read_pc_noinc();
+	read_pc();
 	A = read(m_i);
 	m_i++;
 	prefetch();
 
 lda_ipx
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, X)) {
@@ -233,7 +259,7 @@ lda_ipx
 	prefetch();
 
 lii_imp
-	read_pc_noinc();
+	read_pc();
 	TMP = read(m_i);
 	TMP = set_h(TMP, read(m_i+1));
 	read(TMP);
@@ -241,33 +267,33 @@ lii_imp
 	prefetch();
 
 mpa_imp
-	read_pc_noinc();
-	read_pc_noinc();
-	read_pc_noinc();
-	read_pc_noinc();
-	read_pc_noinc();
+	read_pc();
+	read_pc();
+	read_pc();
+	read_pc();
+	read_pc();
 	TMP = int8_t(A) * int8_t(Y);
 	m_w = do_accumulate(TMP, m_w);
 	prefetch();
 
 mpy_imp
-	read_pc_noinc();
-	read_pc_noinc();
-	read_pc_noinc();
-	read_pc_noinc();
-	read_pc_noinc();
+	read_pc();
+	read_pc();
+	read_pc();
+	read_pc();
+	read_pc();
 	TMP = int8_t(A) * int8_t(Y);
 	A = do_accumulate(TMP, 0)>>8;
 	prefetch();
 
 neg_acc
-	read_pc_noinc();
+	read_pc();
 	A = -A;
 	set_nz(A);
 	prefetch();
 
 nxt_imp
-	read_pc_noinc();
+	read_pc();
 	PC = read(m_i);
 	PC = set_h(PC, read(m_i+1));
 	m_i += 2;
@@ -275,17 +301,19 @@ nxt_imp
 
 ora_ipx
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, X)) {
 		read(set_l(TMP, TMP+X));
 	}
-	A |= read(TMP+X);
+	TMP2 = read(TMP+X);
+	A |= TMP2;
 	set_nz(A);
 	prefetch();
 
 phi_imp
-	read_pc_noinc();
+	read_pc();
 	write(SP, m_i>>8);
 	dec_SP();
 	write(SP, m_i);
@@ -293,7 +321,7 @@ phi_imp
 	prefetch();
 
 phw_imp
-	read_pc_noinc();
+	read_pc();
 	write(SP, m_w>>8);
 	dec_SP();
 	write(SP, m_w);
@@ -301,7 +329,7 @@ phw_imp
 	prefetch();
 
 pia_imp
-	read_pc_noinc();
+	read_pc();
 	read(SP);
 	inc_SP();
 	m_i = read(SP);
@@ -312,7 +340,7 @@ pia_imp
 	prefetch();
 
 pli_imp
-	read_pc_noinc();
+	read_pc();
 	read(SP);
 	inc_SP();
 	m_i = read(SP);
@@ -322,7 +350,7 @@ pli_imp
 	prefetch();
 
 plw_imp
-	read_pc_noinc();
+	read_pc();
 	read(SP);
 	inc_SP();
 	m_w = read(SP);
@@ -331,7 +359,7 @@ plw_imp
 	prefetch();
 
 psh_imp
-	read_pc_noinc();
+	read_pc();
 	write(SP, A);
 	dec_SP();
 	write(SP, X);
@@ -341,7 +369,7 @@ psh_imp
 	prefetch();
 
 pul_imp
-	read_pc_noinc();
+	read_pc();
 	read(SP);
 	inc_SP();
 	Y = read(SP);
@@ -353,8 +381,11 @@ pul_imp
 
 rba_ima
 	A = read_pc(); // "Note that Accumulator contents are altered by RBA and SBA" (C29/C39 Technical Reference Manual, p. C-29)
+	PC++;
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = read(TMP);
 	read(TMP);
 	TMP2 &= ~A;
@@ -362,14 +393,14 @@ rba_ima
 	prefetch();
 
 rnd_imp
-	read_pc_noinc();
+	read_pc();
 	TMP = set_l(m_w, Y);
 	A = do_accumulate(TMP, (m_w<<1) & 0x100)>>8;
 	prefetch();
 
 rts_r_imp
-	read_pc_noinc();
-	read_pc_noinc();
+	read_pc();
+	read_pc();
 	inc_SP();
 	PC = read(SP);
 	inc_SP();
@@ -378,8 +409,11 @@ rts_r_imp
 
 sba_ima
 	A = read_pc();
+	PC++;
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = read(TMP);
 	read(TMP);
 	TMP2 |= A;
@@ -388,20 +422,23 @@ sba_ima
 
 sbc_ipx
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, X)) {
 		read(set_l(TMP, TMP+X));
 	}
-	do_sbc(read(TMP+X));
+	TMP2 = read(TMP+X);
+	do_sbc(TMP2);
 	if(P & F_D) {
-		read_pc_noinc();
+		read_pc();
 		set_nz(A);
 	}
 	prefetch();
 
 sta_ipx
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	read(set_l(TMP, TMP+X));
@@ -410,23 +447,25 @@ sta_ipx
 
 sti_imz
 	TMP = read_pc();
+	PC++;
 	TMP2 = read_pc();
+	PC++;
 	write(TMP2, TMP);
 	prefetch();
 
 taw_imp
-	read_pc_noinc();
+	read_pc();
 	m_w = A<<8;
 	set_nz(m_w>>8);
 	prefetch();
 
 tip_imp
-	read_pc_noinc();
+	read_pc();
 	PC = m_i;
 	prefetch();
 
 twa_imp
-	read_pc_noinc();
+	read_pc();
 	A = m_w>>8;
 	set_nz(A);
 	prefetch();
@@ -434,7 +473,8 @@ twa_imp
 #   exceptions
 reset_r
 	read_pc();
-	read_pc_noinc();
+	PC++;
+	read_pc();
 	read(SP);
 	dec_SP();
 	read(SP);

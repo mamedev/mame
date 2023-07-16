@@ -30,10 +30,10 @@
 #include "emu.h"
 #include "genkbd.h"
 
-#define LOG_WARN         (1U<<1)
-#define LOG_QUEUE        (1U<<2)
-#define LOG_TRANSFER     (1U<<3)
-#define LOG_LINES        (1U<<4)
+#define LOG_WARN         (1U << 1)
+#define LOG_QUEUE        (1U << 2)
+#define LOG_TRANSFER     (1U << 3)
+#define LOG_LINES        (1U << 4)
 
 #define VERBOSE (LOG_GENERAL | LOG_WARN)
 
@@ -544,7 +544,7 @@ void geneve_xt_101_hle_keyboard_device::post_in_key_queue(int keycode)
 //  clock_write -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(geneve_xt_101_hle_keyboard_device::clock_write)
+void geneve_xt_101_hle_keyboard_device::clock_write(int state)
 {
 	LOGMASKED(LOG_LINES, "Clock write: %d\n", state);
 	m_clock_line = (line_state)state;
@@ -562,7 +562,7 @@ WRITE_LINE_MEMBER(geneve_xt_101_hle_keyboard_device::clock_write)
 //  data_write -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(geneve_xt_101_hle_keyboard_device::data_write)
+void geneve_xt_101_hle_keyboard_device::data_write(int state)
 {
 	LOGMASKED(LOG_LINES, "Data write: %d\n", state);
 	m_data_line = (line_state)state;
@@ -600,7 +600,7 @@ void geneve_xt_101_hle_keyboard_device::device_reset()
 }
 
 
-WRITE_LINE_MEMBER(geneve_xt_101_hle_keyboard_device::reset_line)
+void geneve_xt_101_hle_keyboard_device::reset_line(int state)
 {
 	m_resetting = !state;
 

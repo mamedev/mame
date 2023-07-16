@@ -115,18 +115,18 @@ uint8_t oric_microdisc_device::port_318_r()
 	return drq_state ? 0x7f : 0xff;
 }
 
-WRITE_LINE_MEMBER(oric_microdisc_device::fdc_irq_w)
+void oric_microdisc_device::fdc_irq_w(int state)
 {
 	intrq_state = state;
 	irq_w(intrq_state && (port_314 & P_IRQEN));
 }
 
-WRITE_LINE_MEMBER(oric_microdisc_device::fdc_drq_w)
+void oric_microdisc_device::fdc_drq_w(int state)
 {
 	drq_state = state;
 }
 
-WRITE_LINE_MEMBER(oric_microdisc_device::fdc_hld_w)
+void oric_microdisc_device::fdc_hld_w(int state)
 {
 	hld_state = state;
 	floppy_image_device *floppy = floppies[(port_314 >> 5) & 3]->get_device();

@@ -866,7 +866,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 
 	case T10SPC_CMD_MODE_SENSE_6:
 	case T10SPC_CMD_MODE_SENSE_10:
-		//		m_device->logerror("T10MMC: MODE SENSE page code = %x, PC = %x\n", command[2] & 0x3f, (command[2]&0xc0)>>6);
+		//      m_device->logerror("T10MMC: MODE SENSE page code = %x, PC = %x\n", command[2] & 0x3f, (command[2]&0xc0)>>6);
 
 		memset(data, 0, SCSILengthFromUINT16( &command[ 7 ] ));
 
@@ -927,7 +927,6 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 		break;
 
 	case T10MMC_CMD_READ_DISC_STRUCTURE:
-		m_device->machine().debug_break();
 		m_device->logerror("T10MMC: READ DISC STRUCTURE, data\n");
 		data[0] = data[1] = 0;
 		data[2] = data[3] = 0;

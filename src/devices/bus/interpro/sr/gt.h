@@ -261,7 +261,7 @@ protected:
 	virtual void map(address_map &map) override;
 	virtual void map_dynamic(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER(serial_irq);
+	void serial_irq(int state);
 	void mouse_status_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void srx_mapping_w(u32 data);
 

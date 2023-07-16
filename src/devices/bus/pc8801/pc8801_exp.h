@@ -38,9 +38,8 @@ public:
 	auto int5_callback() { return m_int5_cb.bind(); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
-	virtual void device_resolve_objects() override;
 
 private:
 	required_address_space m_iospace;
@@ -68,9 +67,9 @@ protected:
 
 	pc8801_exp_slot_device *m_slot;
 
-	DECLARE_WRITE_LINE_MEMBER( int3_w );
-	virtual DECLARE_WRITE_LINE_MEMBER( int4_w );
-	DECLARE_WRITE_LINE_MEMBER( int5_w );
+	void int3_w(int state);
+	virtual void int4_w(int state);
+	void int5_w(int state);
 };
 
 class pc8801_exp_device : public device_t, public device_pc8801_exp_interface

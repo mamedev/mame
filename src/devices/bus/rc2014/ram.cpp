@@ -68,7 +68,7 @@ protected:
 
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_WRITE_LINE_MEMBER( page_w ) { m_bank = state; update_banks(); }
+	void page_w(int state) { m_bank = state; update_banks(); }
 
 	virtual void update_banks() = 0;
 

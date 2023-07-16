@@ -98,8 +98,8 @@ Notes:
 #include "tilemap.h"
 
 // configurable logging
-#define LOG_SCROLL     (1U <<  1)
-#define LOG_MCU        (1U <<  2)
+#define LOG_SCROLL     (1U << 1)
+#define LOG_MCU        (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_SCROLL | LOG_MCU)
 

@@ -35,7 +35,7 @@ public:
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
 
-	template<int N> DECLARE_WRITE_LINE_MEMBER( joy_irq_w );
+	template<int N> void joy_irq_w(int state);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;

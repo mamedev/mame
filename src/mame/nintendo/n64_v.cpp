@@ -118,9 +118,12 @@ void n64_state::video_start()
 	{
 		rdp_exec = fopen("rdp_execute.txt", "wt");
 	}
+
+	m_screen->register_screen_bitmap(m_interlace_bitmap[0]);
+	m_screen->register_screen_bitmap(m_interlace_bitmap[1]);
 }
 
-uint32_t n64_state::screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t n64_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	//uint16_t* frame_buffer = (uint16_t*)&rdram[(m_rcp_periphs->vi_origin & 0xffffff) >> 2];
 	//uint8_t* cvg_buffer = &m_rdp.m_hidden_bits[((m_rcp_periphs->vi_origin & 0xffffff) >> 2) >> 1];
@@ -168,27 +171,42 @@ uint32_t n64_state::screen_update_n64(screen_device &screen, bitmap_rgb32 &bitma
 		return 0;
 	}
 
-	m_rcp_periphs->video_update(bitmap);
+	if (m_rcp_periphs->is_interlace_mode())
+	{
+		m_rcp_periphs->video_update(m_interlace_bitmap[m_rcp_periphs->get_current_field()]);
+		for (int y=cliprect.min_y; y <= cliprect.max_y; y ++)
+		{
+			const u8 line_field = y & 1;
+			const u16 y_field_line = y >> 1;
+			for (int x = cliprect.min_x; x<=cliprect.max_x; x++)
+			{
+				bitmap.pix(y, x) = m_interlace_bitmap[line_field].pix(y_field_line, x);
+			}
+		}
+	}
+	else
+		m_rcp_periphs->video_update(bitmap);
 
 	return 0;
 }
 
-WRITE_LINE_MEMBER(n64_state::screen_vblank_n64)
+void n64_state::screen_vblank(int state)
 {
+	if (state)
+		m_rcp_periphs->field_update();
+}
+
+void n64_periphs::field_update()
+{
+	/* Interlace */
+	if (vi_control & 0x40)
+		field ^= 1;
+	else
+		field = 0;
 }
 
 void n64_periphs::video_update(bitmap_rgb32 &bitmap)
 {
-
-	if (vi_control & 0x40) /* Interlace */
-	{
-		field ^= 1;
-	}
-	else
-	{
-		field = 0;
-	}
-
 	switch (vi_control & 0x3)
 	{
 		case PIXEL_SIZE_16BIT:

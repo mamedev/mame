@@ -680,7 +680,7 @@ static INPUT_PORTS_START( pgm2 )
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER(pgm2_state::irq)
+void pgm2_state::irq(int state)
 {
 //  logerror("irq\n");
 	if (state == ASSERT_LINE) m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);

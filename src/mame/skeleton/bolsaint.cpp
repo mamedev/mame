@@ -67,11 +67,11 @@ void bolsaint_state::bolsaint(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	// There is a jumper on the sound PCB for selecting between 16KHz and 32KHz,
-	// but is fixed (soldered) for 32KHz 
+	// but is fixed (soldered) for 32KHz
 	OKIM6376(config, m_okim6376, 5.0000_MHz_XTAL/8/2).add_route(ALL_OUTPUTS, "mono", 1.0); // Guess
 }
 
-// Bolsa Internacional (Euro). 
+// Bolsa Internacional (Euro).
 // Only two units were ever made for the euro-adapted version (there's a previous version which only supports pesetas).
 ROM_START(bolsaint)
 	ROM_REGION(0x080000, "maincpu", 0)

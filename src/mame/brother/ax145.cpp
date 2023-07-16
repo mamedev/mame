@@ -283,9 +283,9 @@ INPUT_PORTS_END
 
 ROM_START( ax145 )
 	ROM_REGION(0x20000, "maincpu", 0)
-	ROM_LOAD("ua4774-c", 0x00000, 0x20000, CRC(82E0F117) SHA1(2bb2883feb73c7c20e2e3004b3588ba354e52b3a)) // german/french/dutch/spanish
+	ROM_LOAD("ua4774-c", 0x00000, 0x20000, CRC(82e0f117) SHA1(2bb2883feb73c7c20e2e3004b3588ba354e52b3a)) // german/french/dutch/spanish
 	ROM_REGION(0x80000, "dictionary", 0)
-	ROM_LOAD("ua2849-a", 0x00000, 0x80000, CRC(FA8712EB) SHA1(2d3454138c79e75604b30229c05ed8fb8e7d15fe)) // german dictionary
+	ROM_LOAD("ua2849-a", 0x00000, 0x80000, CRC(fa8712eb) SHA1(2d3454138c79e75604b30229c05ed8fb8e7d15fe)) // german dictionary
 ROM_END
 
 } // anonymous namespace

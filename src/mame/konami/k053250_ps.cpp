@@ -76,7 +76,6 @@ void k053250ps_device::device_start()
 	save_item(NAME(m_page));
 	save_item(NAME(m_dmairq_on));
 
-	m_dmairq_cb.resolve_safe();
 	m_timer_lvcdma = timer_alloc(FUNC(k053250ps_device::handle_od_wait), this);
 }
 
@@ -526,7 +525,7 @@ TIMER_CALLBACK_MEMBER(k053250ps_device::handle_od_wait)
 	}
 }
 
-WRITE_LINE_MEMBER(k053250ps_device::vblank_w)
+void k053250ps_device::vblank_w(int state)
 {
 	if (state == 1)
 	{
@@ -547,7 +546,7 @@ WRITE_LINE_MEMBER(k053250ps_device::vblank_w)
 	}
 }
 
-READ_LINE_MEMBER(k053250ps_device::dmairq_r)
+int k053250ps_device::dmairq_r()
 {
 	return !m_dmairq_on;
 }

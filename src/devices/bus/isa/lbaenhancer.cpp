@@ -9,7 +9,7 @@
     Generic BIOS extension card. Adds 28 bit LBA mode to any pre-1994
        board with an empty ISA slot.
 
-    Supports 1 to 4 large hard disks. Bios boot remains possible.
+    Supports 1 to 4 large hard disks. BIOS boot remains possible.
 
     Check date code of Ami BIOS (at bottom of boot screen):
     40-0100-001139-00101111-111192-486ABC-F  (111192 will not support LBA)

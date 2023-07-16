@@ -41,7 +41,7 @@ DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device,        
 
 
 //**************************************************************************
-//  PIN 2 SOUND BOARD: 6502 + 6530 + DAC
+//  PIN 2 SOUND BOARD: 6503 + 6530 + DAC
 //**************************************************************************
 
 //-------------------------------------------------
@@ -262,7 +262,7 @@ void gottlieb_sound_p3_device::device_start()
 
 
 //**************************************************************************
-//  REV 1 SOUND BOARD: 6502 + DAC
+//  REV 1 SOUND BOARD: 6502 + DAC; part number MA-309
 //**************************************************************************
 
 //-------------------------------------------------
@@ -398,7 +398,7 @@ void gottlieb_sound_r1_device::device_start()
 
 
 //**************************************************************************
-//  REV 1 SOUND BOARD WITH VOTRAX
+//  REV 1 SOUND/SPEECH BOARD; part number MA-216 (same PCB as MA-309 above but with a Votrax SC-01(-A) and support components populated)
 //**************************************************************************
 
 //-------------------------------------------------
@@ -425,8 +425,7 @@ void gottlieb_sound_r1_with_votrax_device::device_add_mconfig(machine_config &co
 	m_dac->reset_routes();
 	m_dac->add_route(ALL_OUTPUTS, *this, 0.20);
 
-	// add the VOTRAX
-	VOTRAX_SC01(config, m_votrax, 720000);
+	VOTRAX_SC01A(config, m_votrax, 720000); // Note: early boards use an SC-01 (reactor, q-bert test version, maybe some early pinball machines?) while later boards (qbert main release, most pinball machines) use an SC-01-A
 	m_votrax->ar_callback().set("nmi", FUNC(input_merger_device::in_w<1>));
 	m_votrax->add_route(ALL_OUTPUTS, *this, 0.80);
 }

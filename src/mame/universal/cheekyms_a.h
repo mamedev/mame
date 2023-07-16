@@ -13,15 +13,15 @@ class cheekyms_audio_device : public device_t
 public:
 	cheekyms_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(mute_w);          // 15
-	DECLARE_WRITE_LINE_MEMBER(cheese_w);        // 13
-	DECLARE_WRITE_LINE_MEMBER(music_w);         // 14
-	DECLARE_WRITE_LINE_MEMBER(mouse_w);         // 9
-	DECLARE_WRITE_LINE_MEMBER(hammer_w);        // 12
-	DECLARE_WRITE_LINE_MEMBER(pest_w);          // 8
-	DECLARE_WRITE_LINE_MEMBER(mouse_dies_w);    // 11
-	DECLARE_WRITE_LINE_MEMBER(pest_dies_w);     // 10
-	DECLARE_WRITE_LINE_MEMBER(coin_extra_w);    // 16
+	void mute_w(int state);         // 15
+	void cheese_w(int state);       // 13
+	void music_w(int state);        // 14
+	void mouse_w(int state);        // 9
+	void hammer_w(int state);       // 12
+	void pest_w(int state);         // 8
+	void mouse_dies_w(int state);   // 11
+	void pest_dies_w(int state);    // 10
+	void coin_extra_w(int state);   // 16
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

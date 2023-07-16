@@ -30,7 +30,7 @@ public:
 
 	auto txd_handler() { return m_txd_handler.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( write_rxd );
+	void write_rxd(int state);
 
 	void wangpc_keyboard_io(address_map &map);
 

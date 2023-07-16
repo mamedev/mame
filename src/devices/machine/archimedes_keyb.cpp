@@ -243,7 +243,6 @@ archimedes_keyboard_device::archimedes_keyboard_device(const machine_config &mco
 
 void archimedes_keyboard_device::device_resolve_objects()
 {
-	m_kout.resolve_safe();
 	m_leds.resolve();
 }
 
@@ -409,7 +408,7 @@ uint8_t archimedes_keyboard_device::mouse_r()
 	return (m_mouse_xref << 4) | (m_mouse_xdir << 5) | (m_mouse_yref << 6) | (m_mouse_ydir << 7);
 }
 
-WRITE_LINE_MEMBER(archimedes_keyboard_device::kin_w)
+void archimedes_keyboard_device::kin_w(int state)
 {
 	m_kin = state;
 }

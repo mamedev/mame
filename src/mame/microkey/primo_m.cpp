@@ -27,7 +27,7 @@
 
 *******************************************************************************/
 
-WRITE_LINE_MEMBER(primo_state::vblank_irq)
+void primo_state::vblank_irq(int state)
 {
 	if (state && m_nmi)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);

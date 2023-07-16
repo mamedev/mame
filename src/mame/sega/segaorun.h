@@ -118,7 +118,7 @@ protected:
 
 	// internal helpers
 	void update_main_irqs();
-	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
+	void m68k_reset_callback(int state);
 
 	// custom I/O
 	uint16_t outrun_custom_io_r(address_space &space, offs_t offset);

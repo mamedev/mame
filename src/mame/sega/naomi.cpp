@@ -209,9 +209,9 @@ Notes:
 
 
 ------------------------------------------------------------------------------------------------------------
-Bios Version Information                                                                                   |
+BIOS Version Information                                                                                   |
 ------------------------------------------------------------------------------------------------------------
-    Bios Label               |  Support    | mobo s/n    | 171-7978B   | Support | Support   | 171-8346C   |
+    BIOS Label               |  Support    | mobo s/n    | 171-7978B   | Support | Support   | 171-8346C   |
 ---------------------------- | Multi-Board | EEPROM type | M1-type     | DIMM    | Net-DIMM  | M4-type     |
     NAOMI     |  Naomi 2     |             |             | ROM board   |         |           | ROM board   |
 ------------------------------------------------------------------------------------------------------------
@@ -2387,7 +2387,7 @@ MACHINE_RESET_MEMBER(naomi_state,naomi)
 	naomi_state::machine_reset();
 }
 
-WRITE_LINE_MEMBER(naomi_state::external_reset)
+void naomi_state::external_reset(int state)
 {
 	// routine called by the dimm board to reboot the naomi mainboard
 	logerror("Received reset fromm dimm board !\n");

@@ -32,14 +32,14 @@ Video Registers: at 0x305ffe0 for ps3 or 0x405ffe0 for ps5/ps5v2:
 0x04 -- ffffffff above continued.
 0x08 -- ffff0000 priority values for sprites, 4-bits per value
         0000ff00 unknown. always 20. number of addressable banks? boards are populated with 20.
-        000000f0 unknown. s1945ii/s1945iii/gunbird2/gnbarich/tgm2 sets to c. soldivid/daraku is 0. another bank select?
+        000000f0 unknown. s1945ii/s1945iii/gunbird2/gnbarich/tgm2/dragnblz/sbomber/mjgtaste sets to c. soldivid/daraku is 0. another bank select?
         0000000f is priority for per-line post-blending
 0x0c -- 3f3f3f3f unknown. A table of 4 6-bit values. usually 0f102038. tgm2 is 0a172838.
         c0c00000 unknown. unused?
         0000c000 is flipscreen (currently ignored). presumably flipy<<1|flipx.
         000000c0 is screen size select. 0 is 224 lines, c is 240 (see tgm2, not confirmed).
 0x10 -- ffff0000 is always 00aa
-        0000f000 number of banks for sprites (not confirmed). mjgtaste/tgm2/sbomberb/s1945ii is 3, gunbird2/s1945iii is 2, soldivid/daraku is b.
+        0000f000 number of banks for sprites (not confirmed). mjgtaste/tgm2/sbomber/s1945ii/dragnblz/gnbarich is 3, gunbird2/s1945iii is 2, soldivid/daraku is b.
         00000fff Controls gfx data bank available to be read by SH-2 for verification.
 0x14 -- ffffffff always 83ff000e
 0x18 -- ffffffff bank for tilemaps. As follows for the different tilemaps: 11223344. Bit 0x80 indicates use of line effects and the bank should be used to look up the tile-bank per line.
@@ -1135,7 +1135,7 @@ popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
 	return 0;
 }
 
-WRITE_LINE_MEMBER(psikyosh_state::screen_vblank)
+void psikyosh_state::screen_vblank(int state)
 {
 	if (state)
 	{

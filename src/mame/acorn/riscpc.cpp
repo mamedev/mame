@@ -70,29 +70,29 @@ private:
 	void riscpc_map(address_map &map);
 
 	bool m_i2cmem_clock = false;
-	DECLARE_READ_LINE_MEMBER(iocr_od0_r);
-	DECLARE_READ_LINE_MEMBER(iocr_od1_r);
-	DECLARE_WRITE_LINE_MEMBER(iocr_od0_w);
-	DECLARE_WRITE_LINE_MEMBER(iocr_od1_w);
+	int iocr_od0_r();
+	int iocr_od1_r();
+	void iocr_od0_w(int state);
+	void iocr_od1_w(int state);
 };
 
-READ_LINE_MEMBER(riscpc_state::iocr_od1_r)
+int riscpc_state::iocr_od1_r()
 {
 	// TODO: presuming same as Acorn Archimedes, where i2c clock can be readback
 	return (m_i2cmem_clock == true) ? 1 : 0;
 }
 
-READ_LINE_MEMBER(riscpc_state::iocr_od0_r)
+int riscpc_state::iocr_od0_r()
 {
 	return (m_i2cmem->read_sda() ? 1 : 0); //eeprom read
 }
 
-WRITE_LINE_MEMBER(riscpc_state::iocr_od0_w)
+void riscpc_state::iocr_od0_w(int state)
 {
 	m_i2cmem->write_sda(state == true ? 1 : 0);
 }
 
-WRITE_LINE_MEMBER(riscpc_state::iocr_od1_w)
+void riscpc_state::iocr_od1_w(int state)
 {
 	m_i2cmem_clock = state;
 	m_i2cmem->write_scl(state == true ? 1 : 0);

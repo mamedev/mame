@@ -219,7 +219,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
+	void write_centronics_busy(int state);
 	uint8_t ppi_pa_r();
 	void ppi_pc_w(uint8_t data);
 
@@ -507,7 +507,7 @@ INPUT_PORTS_END
     I8255 INTERFACE
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( sf7000_state::write_centronics_busy )
+void sf7000_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }

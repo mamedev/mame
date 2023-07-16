@@ -50,11 +50,6 @@ void uts_keyboard_port_device::device_config_complete()
 	m_kbd = get_card_device();
 }
 
-void uts_keyboard_port_device::device_resolve_objects()
-{
-	m_rxd_callback.resolve_safe();
-}
-
 void uts_keyboard_port_device::device_start()
 {
 }

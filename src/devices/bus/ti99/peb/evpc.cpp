@@ -43,12 +43,12 @@
 
 #include "speaker.h"
 
-#define LOG_WARN        (1U<<1)   // Warnings
-#define LOG_CRU         (1U<<2)   // CRU access
-#define LOG_MEM         (1U<<3)   // Memory access
-#define LOG_ADDRESS     (1U<<4)   // Addresses
+#define LOG_WARN        (1U << 1)   // Warnings
+#define LOG_CRU         (1U << 2)   // CRU access
+#define LOG_MEM         (1U << 3)   // Memory access
+#define LOG_ADDRESS     (1U << 4)   // Addresses
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
 #define EVPC_SCREEN_TAG      "screen"
@@ -399,7 +399,7 @@ void snug_enhanced_video_device::cruwrite(offs_t offset, uint8_t data)
 /*
     READY line for the sound chip
 */
-WRITE_LINE_MEMBER( snug_enhanced_video_device::ready_line )
+void snug_enhanced_video_device::ready_line(int state)
 {
 	m_slot->set_ready(state);
 }
@@ -438,7 +438,7 @@ void snug_enhanced_video_device::device_stop()
 
     For the SGCPU, the signal is delivered by the LCP line.
 */
-WRITE_LINE_MEMBER( snug_enhanced_video_device::video_interrupt_in )
+void snug_enhanced_video_device::video_interrupt_in(int state)
 {
 	// This method is frequently called without level change, so we only
 	// react on changes

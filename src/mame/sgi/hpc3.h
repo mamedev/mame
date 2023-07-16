@@ -64,11 +64,10 @@ public:
 	void enet_rxrdy_w(int state);
 	void enet_intr_in_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(scsi0_drq);
-	DECLARE_WRITE_LINE_MEMBER(scsi1_drq);
+	void scsi0_drq(int state);
+	void scsi1_drq(int state);
 
 protected:
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

@@ -25,9 +25,10 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define LOG_COMMANDS                0
-#define LOG_PORTS                   0
-
+#define LOG_COMMANDS (1U << 1)
+#define LOG_PORTS    (1U << 2)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
 //**************************************************************************
@@ -237,8 +238,8 @@ TIMER_CALLBACK_MEMBER(philips_22vp931_device::process_vbi_data)
 TIMER_CALLBACK_MEMBER(philips_22vp931_device::process_deferred_data)
 {
 	// set the value and mark it pending
-	if (LOG_COMMANDS && m_fromcontroller_pending)
-		printf("Dropped previous command byte\n");
+	if (m_fromcontroller_pending)
+		LOGMASKED(LOG_COMMANDS, "Dropped previous command byte\n");
 	m_fromcontroller = param;
 	m_fromcontroller_pending = true;
 
@@ -246,8 +247,8 @@ TIMER_CALLBACK_MEMBER(philips_22vp931_device::process_deferred_data)
 	if (m_cmdcount < std::size(m_cmdbuf))
 	{
 		m_cmdbuf[m_cmdcount++ % 3] = param;
-		if (LOG_COMMANDS && m_cmdcount % 3 == 0)
-			printf("Cmd: %02X %02X %02X\n", m_cmdbuf[0], m_cmdbuf[1], m_cmdbuf[2]);
+		if (m_cmdcount % 3 == 0)
+			LOGMASKED(LOG_COMMANDS, "Cmd: %02X %02X %02X\n", m_cmdbuf[0], m_cmdbuf[1], m_cmdbuf[2]);
 	}
 }
 
@@ -376,7 +377,7 @@ void philips_22vp931_device::i8049_output0_w(uint8_t data)
 	    $01 = inverted -> VIDEO MUTE
 	*/
 
-	if (LOG_PORTS && (m_i8049_out0 ^ data) & 0xff)
+	if ((VERBOSE & LOG_PORTS) && (m_i8049_out0 ^ data) & 0xff)
 	{
 		std::string flags;
 		if ( (data & 0x80)) flags += " ???";
@@ -417,7 +418,7 @@ void philips_22vp931_device::i8049_output1_w(uint8_t data)
 
 	int32_t speed;
 
-	if (LOG_PORTS && (m_i8049_out1 ^ data) & 0x08)
+	if ((VERBOSE & LOG_PORTS) && (m_i8049_out1 ^ data) & 0x08)
 	{
 		std::string flags;
 		if (!(data & 0x08)) flags += " SMS";
@@ -565,7 +566,7 @@ void philips_22vp931_device::i8049_port1_w(uint8_t data)
 	    $01 = P10 = (out) D100 -> some op-amp then to C334, B56, B332
 	*/
 
-	if (LOG_PORTS && (m_i8049_port1 ^ data) & 0x1f)
+	if ((VERBOSE & LOG_PORTS) && (m_i8049_port1 ^ data) & 0x1f)
 	{
 		std::string flags;
 		if (!(data & 0x10)) flags += " SPEED";

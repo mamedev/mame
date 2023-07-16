@@ -40,9 +40,9 @@ amiga_dmac_device::amiga_dmac_device(const machine_config &mconfig, const char *
 	m_cfgout_handler(*this),
 	m_int_handler(*this),
 	m_xdack_handler(*this),
-	m_scsi_read_handler(*this),
+	m_scsi_read_handler(*this, 0),
 	m_scsi_write_handler(*this),
-	m_io_read_handler(*this),
+	m_io_read_handler(*this, 0),
 	m_io_write_handler(*this),
 	m_space(nullptr),
 	m_rom(nullptr),
@@ -64,14 +64,6 @@ amiga_dmac_device::amiga_dmac_device(const machine_config &mconfig, const char *
 
 void amiga_dmac_device::device_start()
 {
-	// resolve callbacks
-	m_cfgout_handler.resolve_safe();
-	m_int_handler.resolve_safe();
-	m_xdack_handler.resolve_safe();
-	m_scsi_read_handler.resolve_safe(0);
-	m_scsi_write_handler.resolve_safe();
-	m_io_read_handler.resolve_safe(0);
-	m_io_write_handler.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -333,7 +325,7 @@ void amiga_dmac_device::register_write(offs_t offset, uint16_t data, uint16_t me
 }
 
 // this signal tells us to expose our autoconfig values
-WRITE_LINE_MEMBER( amiga_dmac_device::configin_w )
+void amiga_dmac_device::configin_w(int state)
 {
 	LOG("%s('%s'): configin_w (%d)\n", shortname(), basetag(), state);
 
@@ -388,7 +380,7 @@ WRITE_LINE_MEMBER( amiga_dmac_device::configin_w )
 }
 
 // this sets the ram size depending on the line voltage
-WRITE_LINE_MEMBER( amiga_dmac_device::ramsz_w )
+void amiga_dmac_device::ramsz_w(int state)
 {
 	LOG("%s('%s'): ramsz_w (%d)\n", shortname(), basetag(), state);
 
@@ -402,7 +394,7 @@ WRITE_LINE_MEMBER( amiga_dmac_device::ramsz_w )
 }
 
 // reset the device
-WRITE_LINE_MEMBER( amiga_dmac_device::rst_w )
+void amiga_dmac_device::rst_w(int state)
 {
 	LOG("%s('%s'): rst_w (%d)\n", shortname(), basetag(), state);
 
@@ -413,7 +405,7 @@ WRITE_LINE_MEMBER( amiga_dmac_device::rst_w )
 }
 
 // external interrupt
-WRITE_LINE_MEMBER( amiga_dmac_device::intx_w )
+void amiga_dmac_device::intx_w(int state)
 {
 	LOG("%s('%s'): intx_w (%d)\n", shortname(), basetag(), state);
 
@@ -426,7 +418,7 @@ WRITE_LINE_MEMBER( amiga_dmac_device::intx_w )
 }
 
 // data request
-WRITE_LINE_MEMBER( amiga_dmac_device::xdreq_w )
+void amiga_dmac_device::xdreq_w(int state)
 {
 	LOG("%s('%s'): xdreq_w (%d)\n", shortname(), basetag(), state);
 

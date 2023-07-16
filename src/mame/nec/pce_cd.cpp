@@ -2,7 +2,7 @@
 // copyright-holders:Wilbert Pol, Angelo Salese
 /**************************************************************************************************
 
-PC Engine CD HW notes:
+PC Engine CD HW sub-portion:
 
 TODO:
 - Rewrite SCSI to honor actual nscsi_device;
@@ -23,6 +23,7 @@ TODO:
 - Audio CD player rewind/fast forward don't work properly
   \- never go past 1 minute mark, underflows;
 - Fader feature is sketchy and unchecked against real HW;
+- Implement proper check condition errors (non-SCSI complaint);
 
 **************************************************************************************************/
 
@@ -30,12 +31,12 @@ TODO:
 #include "coreutil.h"
 #include "pce_cd.h"
 
-#define LOG_CMD            (1U <<  1)
-#define LOG_CDDA           (1U <<  2)
-#define LOG_SCSI           (1U <<  3)
-#define LOG_FADER          (1U <<  4)
-#define LOG_IRQ            (1U <<  5)
-#define LOG_SCSIXFER       (1U <<  6) // single byte transfers, verbose
+#define LOG_CMD            (1U << 1)
+#define LOG_CDDA           (1U << 2)
+#define LOG_SCSI           (1U << 3)
+#define LOG_FADER          (1U << 4)
+#define LOG_IRQ            (1U << 5)
+#define LOG_SCSIXFER       (1U << 6) // single byte transfers, verbose
 
 #define VERBOSE (LOG_GENERAL | LOG_CMD | LOG_CDDA | LOG_FADER)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -241,7 +242,6 @@ void pce_cd_device::late_setup()
 	if (m_cdrom->exists())
 	{
 		m_toc = &m_cdrom->get_toc();
-		m_cdda->set_cdrom(m_cdrom);
 		m_last_frame = m_cdrom->get_track_start(m_cdrom->get_last_track() - 1);
 		m_last_frame += m_toc->tracks[m_cdrom->get_last_track() - 1].frames;
 		m_end_frame = m_last_frame;
@@ -276,6 +276,7 @@ void pce_cd_device::device_add_mconfig(machine_config &config)
 	m_msm->add_route(ALL_OUTPUTS, "^rspeaker", 0.50);
 
 	CDDA(config, m_cdda);
+	m_cdda->set_cdrom_tag(m_cdrom);
 	m_cdda->audio_end_cb().set(FUNC(pce_cd_device::cdda_end_mark_cb));
 	m_cdda->add_route(0, "^lspeaker", 1.00);
 	m_cdda->add_route(1, "^rspeaker", 1.00);
@@ -307,7 +308,7 @@ void pce_cd_device::adpcm_play()
   the MSM5205. Currently we can only use static clocks for the
   MSM5205.
  */
-WRITE_LINE_MEMBER( pce_cd_device::msm5205_int )
+void pce_cd_device::msm5205_int(int state)
 {
 	uint8_t msm_data;
 
@@ -378,13 +379,14 @@ void pce_cd_device::reply_status_byte(uint8_t status)
 void pce_cd_device::test_unit_ready()
 {
 	LOGCMD("0x00 TEST UNIT READY: status send ");
-	if (m_cdrom)
+	if (m_cdrom->exists())
 	{
 		LOGCMD("STATUS_OK\n");
 		reply_status_byte(SCSI_STATUS_OK);
 	}
 	else
 	{
+		// TODO: sense key/ASC/ASCQ
 		LOGCMD("CHECK_CONDITION\n");
 		reply_status_byte(SCSI_CHECK_CONDITION);
 	}
@@ -397,9 +399,9 @@ void pce_cd_device::read_6()
 	uint32_t frame_count = m_command_buffer[4];
 	LOGCMD("0x08 READ(6): frame: %08x size: %08x\n", frame, frame_count);
 
-	/* Check for presence of a CD */
-	if (!m_cdrom)
+	if (!m_cdrom->exists())
 	{
+		// TODO: sense key/ASC/ASCQ
 		reply_status_byte(SCSI_CHECK_CONDITION);
 		return;
 	}
@@ -437,9 +439,9 @@ void pce_cd_device::nec_set_audio_start_position()
 	const uint8_t mode = m_command_buffer[9] & 0xc0;
 	LOGCMD("0xd8 SET AUDIO PLAYBACK START POSITION (NEC): mode %02x\n", mode);
 
-	if (!m_cdrom)
+	if (!m_cdrom->exists())
 	{
-		/* Throw some error here */
+		// TODO: sense key/ASC/ASCQ
 		reply_status_byte(SCSI_CHECK_CONDITION);
 		return;
 	}
@@ -555,13 +557,12 @@ void pce_cd_device::nec_set_audio_stop_position()
 	const uint8_t mode = m_command_buffer[9] & 0xc0;
 	LOGCMD("0xd9 SET AUDIO PLAYBACK END POSITION (NEC): mode %02x\n", mode);
 
-	if (!m_cdrom)
+	if (!m_cdrom->exists())
 	{
-		/* Throw some error here */
+		// TODO: sense key/ASC/ASCQ
 		reply_status_byte(SCSI_CHECK_CONDITION);
 		return;
 	}
-
 
 	switch (mode)
 	{
@@ -642,8 +643,9 @@ void pce_cd_device::nec_set_audio_stop_position()
 void pce_cd_device::nec_pause()
 {
 	/* If no cd mounted throw an error */
-	if (!m_cdrom)
+	if (!m_cdrom->exists())
 	{
+		// TODO: sense key/ASC/ASCQ
 		reply_status_byte(SCSI_CHECK_CONDITION);
 		return;
 	}
@@ -653,6 +655,7 @@ void pce_cd_device::nec_pause()
 	/* If there was no cdda playing, throw an error */
 	if (m_cdda_status == PCE_CD_CDDA_OFF)
 	{
+		// TODO: sense key/ASC/ASCQ
 		LOG("Issued SCSI_CHECK_CONDITION in 0xda!\n");
 		reply_status_byte(SCSI_CHECK_CONDITION);
 		return;
@@ -672,9 +675,9 @@ void pce_cd_device::nec_get_subq()
 	uint32_t msf_abs, msf_rel, track, frame;
 	//LOGCMD("0xdd READ SUBCHANNEL Q (NEC) %d\n", m_cdda_status);
 
-	if (!m_cdrom)
+	if (!m_cdrom->exists())
 	{
-		/* Throw some error here */
+		// TODO: sense key/ASC/ASCQ
 		reply_status_byte(SCSI_CHECK_CONDITION);
 		return;
 	}
@@ -739,10 +742,11 @@ void pce_cd_device::nec_get_dir_info()
 	uint32_t frame, msf, track = 0;
 	LOGCMD("0xde GET DIR INFO (NEC)\n");
 
-	if (!m_cdrom)
+	if (!m_cdrom->exists())
 	{
-		/* Throw some error here */
+		// TODO: sense key/ASC/ASCQ
 		reply_status_byte(SCSI_CHECK_CONDITION);
+		return;
 	}
 
 	const cdrom_file::toc &toc = m_cdrom->get_toc();
@@ -807,6 +811,7 @@ void pce_cd_device::nec_get_dir_info()
 
 void pce_cd_device::end_of_list()
 {
+	// TODO: sense key/ASC/ASCQ
 	reply_status_byte(SCSI_CHECK_CONDITION);
 }
 
@@ -872,7 +877,7 @@ void pce_cd_device::handle_data_output()
 	}
 }
 
-WRITE_LINE_MEMBER(pce_cd_device::cdda_end_mark_cb)
+void pce_cd_device::cdda_end_mark_cb(int state)
 {
 	if (state != ASSERT_LINE)
 		return;

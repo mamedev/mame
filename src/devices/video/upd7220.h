@@ -76,8 +76,8 @@ public:
 	uint8_t dack_r();
 	void dack_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( ext_sync_w );
-	DECLARE_WRITE_LINE_MEMBER( lpen_w );
+	void ext_sync_w(int state);
+	void lpen_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

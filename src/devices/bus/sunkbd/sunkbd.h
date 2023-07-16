@@ -31,15 +31,14 @@ public:
 	// configuration helpers
 	auto rxd_handler() { return m_rxd_handler.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( write_txd );
+	void write_txd(int state);
 
-	DECLARE_READ_LINE_MEMBER( rxd_r ) { return m_rxd; }
+	int rxd_r() { return m_rxd; }
 
 protected:
 	sun_keyboard_port_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_config_complete() override;
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 	int m_rxd;
@@ -61,9 +60,9 @@ public:
 protected:
 	device_sun_keyboard_port_interface(machine_config const &mconfig, device_t &device);
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) { }
+	virtual void input_txd(int state) { }
 
-	DECLARE_WRITE_LINE_MEMBER( output_rxd ) { m_port->m_rxd = state; m_port->m_rxd_handler(state); }
+	void output_rxd(int state) { m_port->m_rxd = state; m_port->m_rxd_handler(state); }
 
 	sun_keyboard_port_device *m_port;
 

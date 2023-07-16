@@ -484,7 +484,7 @@ u16 huc6270_device::next_pixel()
 //}
 
 
-WRITE_LINE_MEMBER( huc6270_device::vsync_changed )
+void huc6270_device::vsync_changed(int state)
 {
 	state &= 0x01;
 	if ( m_vsync != state )
@@ -510,7 +510,7 @@ WRITE_LINE_MEMBER( huc6270_device::vsync_changed )
 }
 
 
-WRITE_LINE_MEMBER( huc6270_device::hsync_changed )
+void huc6270_device::hsync_changed(int state)
 {
 	state &= 0x01;
 
@@ -846,9 +846,6 @@ void huc6270_device::write(offs_t offset, u8 data)
 
 void huc6270_device::device_start()
 {
-	/* Resolve callbacks */
-	m_irq_changed_cb.resolve_safe();
-
 	m_vram = make_unique_clear<uint16_t[]>(m_vram_size/sizeof(uint16_t));
 	m_vram_mask = (m_vram_size >> 1) - 1;
 

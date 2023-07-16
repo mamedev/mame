@@ -36,10 +36,10 @@ public:
 	virtual uint8_t read_extra(offs_t offset) { return 0xff; }
 	virtual void write_extra(offs_t offset, uint8_t data) { }
 
-	virtual DECLARE_WRITE_LINE_MEMBER(write_sda) { }
-	virtual DECLARE_WRITE_LINE_MEMBER(write_scl) { }
-	//virtual DECLARE_WRITE_LINE_MEMBER( write_wc )
-	virtual DECLARE_READ_LINE_MEMBER( read_sda ) { return 0; }
+	virtual void write_sda(int state) { }
+	virtual void write_scl(int state) { }
+	//virtual void write_wc(int state)
+	virtual int read_sda() { return 0; }
 
 	virtual void write_bus_control(offs_t offset, uint8_t data) { }
 
@@ -101,10 +101,10 @@ public:
 	uint8_t read_extra(offs_t offset);
 	void write_extra(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(write_sda);
-	DECLARE_WRITE_LINE_MEMBER(write_scl);
-	//DECLARE_WRITE_LINE_MEMBER( write_wc );
-	DECLARE_READ_LINE_MEMBER( read_sda );
+	void write_sda(int state);
+	void write_scl(int state);
+	//void write_wc(int state);
+	int read_sda();
 
 	void write_bus_control(offs_t offset, uint8_t data);
 

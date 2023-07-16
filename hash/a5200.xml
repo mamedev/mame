@@ -102,7 +102,7 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="5200menu.bin" size="8192" crc="0de2db48" sha1="e64fb1a353c72b87c5483bb88cb3523ea5d37b59"/>
 			</dataarea>
@@ -114,7 +114,7 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>Brøderbund Software Inc</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="aep.bin" size="16384" crc="35484751" sha1="e18a603b18b85e24f9c938b33b6077a767c1fa9c"/>
 			</dataarea>
@@ -127,7 +127,7 @@ Possible Undumped protos: -
 		<publisher>Activision</publisher>
 		<info name="serial" value="FC-008" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="decathln.bin" size="16384" crc="f43e7cd0" sha1="db203973df13b071da46d52fdb078a76f4db428d"/>
 			</dataarea>
@@ -140,7 +140,7 @@ Possible Undumped protos: -
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5201" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="asteroid.bin" size="8192" crc="38480891" sha1="18697dd8e640fa1578b3b4ae09af484c14fb8410"/>
 			</dataarea>
@@ -167,7 +167,7 @@ Possible Undumped protos: -
 		<info name="release" value="19830803" />
 		<info name="serial" value="CX5233" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="0x8000">
 				<rom name="astrogrover.bin" size="0x8000" crc="18417ada" sha1="f3bad1c66743c8051d7c9c36eb367bdf908bc6fb"/>
 			</dataarea>
@@ -180,7 +180,7 @@ Possible Undumped protos: -
 		<publisher>Atari / Lucasfilm</publisher>
 		<info name="serial" value="CX5255" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="ballblze.bin" size="32768" crc="94d97d14" sha1="ed92ffd21abd50339f5be0cbff9bdcc8fafbc67f"/>
 			</dataarea>
@@ -188,7 +188,7 @@ Possible Undumped protos: -
 	</software>
 
 <!-- Barroom Baseball.  This prototype is for an standup arcade environment involving coins/timer and is based on Real Sports
-     Baseball.  While this functions in an Atari 5200 as a cartridge image, it is not a home cartridge.  Therefore, it is commented. -->
+     Baseball.  While this functions in an Atari 5200 as a cartridge image, it is not a home cartridge. Handled in atari/bartop52.cpp -->
 
 <!--
     <software name="barbball">
@@ -196,7 +196,7 @@ Possible Undumped protos: -
         <year>1983</year>
         <publisher>Atari</publisher>
         <part name="cart" interface="a8bit_cart">
-            <feature name="slot" value="a5200" />
+            <feature name="slot" value="a5200_rom" />
             <dataarea name="rom" size="32768">
                 <rom name="barbball.bin" size="32768" crc="21d19c8f" sha1="510ccb20df2ecdbe7f8373de6a9fc11493e8c3f2"/>
             </dataarea>
@@ -223,7 +223,7 @@ Possible Undumped protos: -
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5239" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="0x8000"> <!-- same data as the other set but repeated -->
 				<rom name="battle zone lo.a" size="0x2000" crc="45247338" sha1="1b27681fb53ab80bd39e4e7ad0a35625c79e7677" offset="0x0000"/>
 				<rom name="battle zone mlo.b" size="0x2000" crc="45247338" sha1="1b27681fb53ab80bd39e4e7ad0a35625c79e7677" offset="0x2000"/>
@@ -239,7 +239,7 @@ Possible Undumped protos: -
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-009" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="beamrid.bin" size="16384" crc="9bae58dc" sha1="b75d555d059ad61992f9f5a234129ecbf9504c35"/>
 			</dataarea>
@@ -251,7 +251,7 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Atari / Lucasfilm</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="0x8000">
 				<rom name="behind jaggi lo 1-18-84 101a.a" size="0x2000" crc="c244bde8" sha1="a08b1764ab3b8f3c30fd90faa3ac62fcf447dbb0" offset="0x0000"/>
 				<rom name="behind jaggi mlo 1-18-84 c3c1.b" size="0x2000" crc="5ea68db3" sha1="499ec2f48314943f1f3d4cb39f484a21f4d0009a" offset="0x2000"/>
@@ -267,7 +267,7 @@ Possible Undumped protos: -
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5221" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="berzerk.bin" size="16384" crc="be3cd348" sha1="e56ccc6bf427a832ce00540b02d065a2688260dc"/>
 			</dataarea>
@@ -278,9 +278,13 @@ Possible Undumped protos: -
 		<description>Black Belt (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Sluggish in gameplay (btanb)
+]]></notes>
+		<info name="usage" value="Select difficulty with 1-8 keys, press start then press 0 key" />
 		<info name="serial" value="CX5231" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="blckbelt.bin" size="32768" crc="ed47b0d8" sha1="9b7ecd444b6239442ef1f54cd8e14c294c064da2"/>
 			</dataarea>
@@ -292,7 +296,7 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="blaster.bin" size="16384" crc="c8f9c094" sha1="ab3130256d16af09cac8b11749dfaff6aaaa3ea3"/>
 			</dataarea>
@@ -305,9 +309,28 @@ Possible Undumped protos: -
 		<publisher>CBS Electronics / Bally Midway MFG. Co.</publisher>
 		<info name="serial" value="80033" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="blueprnt.bin" size="16384" crc="0624e6e7" sha1="1e1a20c104bf4d55eca0ca1e72dc5dc64fa6b1b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bosco" supported="no">
+		<!-- Versioning on title screen, earlier 128KB Super Cart known to exist -->
+		<description>Bosconian 5200 - Star Destroyer (Ultimate Version)</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Player dot is invisible on radar
+Status bar cuts off words (i.e. ROUN instead of ROUND)
+Text colors are off on title and score table screens
+Title grey animation doesn't mask [ANTIC] playfield properly
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_supercart" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="bosconian.bin" size="0x80000" crc="cedcd5d9" sha1="8a92963b3b0b45393bdc31d86120044282534c4b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -360,7 +383,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5253" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="choplift.bin" size="16384" crc="9ad53bbc" sha1="9f1ee191319ef0261cc7074a81c0e6d6b7464cd2"/>
 			</dataarea>
@@ -400,7 +423,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-011" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="pitfall2.bin" size="16384" crc="4b910461" sha1="b051f0fb2e816787ab6eed0cb008b9f8cc9963dc"/>
 			</dataarea>
@@ -439,7 +462,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-005" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="dredfctr.bin" size="8192" crc="460def2d" sha1="ea7b40ce1106378e1d409cab6634fb2e483ff238"/>
 			</dataarea>
@@ -452,7 +475,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5256" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="finalleg.bin" size="16384" crc="d3bd3221" sha1="48625af4f3e9fe538dab2a0b463887fc8c6b138d"/>
 			</dataarea>
@@ -477,7 +500,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9530" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="frogger.bin" size="8192" crc="ae7e3444" sha1="d9a695757f0494aee92a50ab8a49558745e0cedf"/>
 			</dataarea>
@@ -497,13 +520,17 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="galaxian">
+	<software name="galaxian" supported="no">
 		<description>Galaxian</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Player missile is vertically offset when idle
+Some enemies never collides with player bullets
+]]></notes>
 		<info name="serial" value="CX5206" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
 			<dataarea name="rom" size="8192">
 				<rom name="galaxian.bin" size="8192" crc="3ef4a23f" sha1="0df0d7f11d89e2c5b59cc9f98d67d98e203831aa"/>
@@ -517,7 +544,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>CBS Electronics / Bally Midway MFG. Co.</publisher>
 		<info name="serial" value="80013" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="gorf.bin" size="8192" crc="e955db74" sha1="80926bb270ea66cb5cacc379de1fc16d8a3d814b"/>
 			</dataarea>
@@ -530,7 +557,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5257" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="gremlins.bin" size="32768" crc="063ec2c4" sha1="f3c32b39580d589799dcead98bb206fbf3df0504"/>
 			</dataarea>
@@ -556,7 +583,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-007" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="hero.bin" size="16384" crc="18a73af3" sha1="d286ecb6793a0dda9c9c68f6355dbe3ade6922f9"/>
 			</dataarea>
@@ -621,7 +648,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>CBS Electronics / Kay Enterprizes Co.</publisher>
 		<info name="serial" value="80503" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="krazysht.bin" size="8192" crc="ee702214" sha1="c7eb2b4a46a197adfedf33c2ccc17d8424d681c4"/>
 			</dataarea>
@@ -634,7 +661,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-001" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
 			<dataarea name="rom" size="4096">
 				<rom name="kaboom.bin" size="4096" crc="420f5d0b" sha1="a80f876a89a8ceacc71da5d9c02b546970b17730"/>
@@ -661,7 +688,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-006" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="keystone.bin" size="8192" crc="8fe3bb2c" sha1="9f31c85a13e919135438590601e33bef11a8df8a"/>
 			</dataarea>
@@ -674,7 +701,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5260" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="laststar.bin" size="16384" crc="83517703" sha1="4046f60602254a7d86d2a6efd1a330455eaec119"/>
 			</dataarea>
@@ -699,19 +726,24 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5247" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="mario.bin" size="32768" crc="873742f1" sha1="a293b6b06050e11029d97137f2b1b36059567273"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="meebzork">
+	<software name="meebzork" supported="partial">
 		<description>Meebzork (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Unresponsive menuing (btanb)
+Doesn't seem to provide a way to restart a game without system reset (btanb)
+Doesn't mask sprites on title and "the end" screens [GTIA] GRACTL
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="meebzork.bin" size="32768" crc="9fb13411" sha1="ff0f1d9ed0ae45e3c81b252f3d0a335e03b0aa4b"/>
 			</dataarea>
@@ -724,7 +756,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-003" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="megamnia.bin" size="8192" crc="240a1e1a" sha1="f5512460c6b6d3a1baa0b23adf6a3a37fe308eb3"/>
 			</dataarea>
@@ -736,7 +768,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<year>1983</year>
 		<publisher>Electra Concepts</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="meteorit.bin" size="16384" crc="ab8e035b" sha1="32d86a381feff43149b66336dcc4ba2523273228"/>
 			</dataarea>
@@ -761,7 +793,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5248" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
 			<dataarea name="rom" size="16384">
 				<rom name="milliped.bin" size="16384" crc="969cfe1a" sha1="1243a8ecfc02a74ae4e1f4fcda38502776f45cb0"/>
@@ -769,13 +801,16 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="mine2049">
+	<software name="mine2049" supported="partial">
 		<description>Miner 2049er</description>
 		<year>1983</year>
 		<publisher>Big Five Software</publisher>
+		<notes><![CDATA[
+Hi-score screen has wrong colored rotating digits and direction desyncs at bottom
+]]></notes>
 		<info name="serial" value="BF1912" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="mine2049.bin" size="16384" crc="7df1adfb" sha1="0564b1867a0b570d66dfcbc11adc3e51a2c6f28c"/>
 			</dataarea>
@@ -801,7 +836,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5202" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
 			<dataarea name="rom" size="8192">
 				<rom name="missile.bin" size="8192" crc="44d3ff6f" sha1="5c8ec22e131810ccac08066ca96e9944ccfa4ecb"/>
@@ -828,7 +863,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5241" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="mpatrol.bin" size="16384" crc="d0b2f285" sha1="02dd5b9278c06ae8cbb6dacc094e238fbacf08d2"/>
 			</dataarea>
@@ -841,7 +876,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>CBS Electronics</publisher>
 		<info name="serial" value="80083" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="mntnking.bin" size="8192" crc="0f24243c" sha1="2e7ae57260624d1f5710d445a0936f0c280a6655"/>
 			</dataarea>
@@ -854,7 +889,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9420" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="docastle.bin" size="8192" crc="aa55f9be" sha1="002e6f8c7533b03f8041e7f1896589c0ab0e17a6"/>
 			</dataarea>
@@ -893,7 +928,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5236" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="pengo.bin" size="32768" crc="e4f8ba8c" sha1="19ff7622dbbc2915e3e98d8d966340e7e893ff34"/>
 			</dataarea>
@@ -906,7 +941,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-004" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="pitfall.bin" size="8192" crc="b2887833" sha1="d1c7dc3de097a4bfab82235acec69a97e6e05f18"/>
 			</dataarea>
@@ -932,7 +967,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
 			<dataarea name="rom" size="0x8000">
 				<rom name="poleposition_133-05.bin" size="0x8000" crc="15b7b5ef" sha1="c22e5ea7cc892f515e4967f6ff0844b5a8d34b62"/>
@@ -959,7 +994,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9500" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="qbert.bin" size="8192" crc="3fe4a401" sha1="e6966bde5cd4167020c9d21bab613af1648b4d75"/>
 			</dataarea>
@@ -979,13 +1014,16 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="quintana">
+	<software name="quintana" supported="no">
 		<description>Quest for Quintana Roo</description>
 		<year>1984</year>
 		<publisher>Sunrise</publisher>
+		<notes><![CDATA[
+Doesn't recognize start button
+]]></notes>
 		<info name="serial" value="1603" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="questroo.bin" size="16384" crc="b5f3402b" sha1="17a41c5f9a32f8a71939cfaa0e96807b951aedad"/>
 			</dataarea>
@@ -998,7 +1036,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5209" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
 			<dataarea name="rom" size="32768">
 				<rom name="rsbsebll.bin" size="32768" crc="44166592" sha1="a94d06739fa19453fa586a836eaacae11fe93989"/>
@@ -1012,7 +1050,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5219" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="rsbktbll.bin" size="32768" crc="dd217276" sha1="9b21ac7fec8d556585c6970231318ef1f501b2b5"/>
 			</dataarea>
@@ -1025,7 +1063,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5219" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="rsbktbll1.bin" size="32768" crc="c90196fa" sha1="9edb066a37ca7657979952c946ab89be7926f4f8"/>
 			</dataarea>
@@ -1060,11 +1098,14 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="rssoccer">
+	<software name="rssoccer" supported="no">
 		<description>RealSports Soccer</description>
 		<!-- Originally released as "Soccer" -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Analog input ranges don't allow going down and right on full presses (i.e. on digital input tapping goes right, holding goes left)
+]]></notes>
 		<info name="serial" value="CX5213" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a5200_2chips" />
@@ -1095,7 +1136,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Atari / Lucasfilm</publisher>
 		<info name="serial" value="CX5254" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="fractal.bin" size="32768" crc="762c591b" sha1="9253d7286cf87999474b37df242ba23b4358ef4a"/>
 			</dataarea>
@@ -1108,7 +1149,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-002" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="riveraid.bin" size="8192" crc="09fc7648" sha1="ce9bd3b0847c5e187c3e8f667c8f5ea771c49965"/>
 			</dataarea>
@@ -1134,7 +1175,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5225" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="robotron.bin" size="16384" crc="4252abd9" sha1="9175e6daca58102ac8b9729d7b0336cf09977d12"/>
 			</dataarea>
@@ -1160,7 +1201,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5204" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
 			<dataarea name="rom" size="8192">
 				<rom name="spaceinv.bin" size="8192" crc="de5c354a" sha1="cf411db770217b5af5fcfa32725cc587a8b9e710"/>
@@ -1174,7 +1215,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-012" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="spceshut.bin" size="16384" crc="387365dc" sha1="5ae20e767d9819fe601f3b1ea6d4506ae2f2ceef"/>
 			</dataarea>
@@ -1186,7 +1227,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="spitfire.bin" size="32768" crc="3c311303" sha1="688133761c462d6865bf673ed298b4d828120940"/>
 			</dataarea>
@@ -1238,7 +1279,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9060" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="starwars.bin" size="8192" crc="0675f0a5" sha1="bf77048abc36ba2cba5eeeac812802d6a0eba891"/>
 			</dataarea>
@@ -1277,7 +1318,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5203" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
 			<dataarea name="rom" size="4096">
 				<rom name="sprbreak.bin" size="4096" crc="a0642110" sha1="f5f9c7f97bf09e5647e808d892b656f3ee1e19e0"/>
@@ -1291,7 +1332,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9550" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="scobra.bin" size="8192" crc="97debcd2" sha1="8205093f5fb1fdf0ccb71d667ea0a3849fb0a0f2"/>
 			</dataarea>
@@ -1303,7 +1344,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="spacman.bin" size="16384" crc="0a4ddb1e" sha1="238cb448555d8bb5c96aa0354718411e8777c613"/>
 			</dataarea>
@@ -1317,7 +1358,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<info name="developer" value="Keithen Hayenga" />
 		<info name="serial" value="CX5220" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="tempest.bin" size="16384" crc="1187342f" sha1="85fcea0a4d4d1f22437801c96229ba96e0f6b711"/>
 			</dataarea>
@@ -1330,7 +1371,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5258" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="trackfld.bin" size="16384" crc="0ba22ece" sha1="9dfbb5d8b77504c66ce3ac4382daf79820393dd8"/>
 			</dataarea>
@@ -1343,7 +1384,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5216" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="vanguard.bin" size="32768" crc="caaea0a4" sha1="6c633de50e6cc0c0c40061cd24e6f78f552a438f"/>
 			</dataarea>
@@ -1356,17 +1397,20 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>CBS Electronics</publisher>
 		<info name="serial" value="80003" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="wow.bin" size="16384" crc="d6f7ddfd" sha1="49debdf3c133fde9905d6d9137da5d8dff8d6283"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="xari">
+	<software name="xari" supported="no">
 		<description>Xari Arena (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Flickering player sprite, unplayable
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
@@ -1381,7 +1425,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5246" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="xevious.bin" size="32768" crc="382634dc" sha1="c3cf33216dfa484309b923f21829d040486bc481"/>
 			</dataarea>
@@ -1393,7 +1437,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="4096">
 				<rom name="yllowsub.bin" size="4096" crc="f47bc091" sha1="e58e1f257923694dbeb586c860f385e74e460f90"/>
 			</dataarea>
@@ -1406,7 +1450,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Sega</publisher>
 		<info name="serial" value="008-02" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="zaxxon.bin" size="32768" crc="741746d1" sha1="4a4c4a25c8ed1b0ae79ca22684d7d311a564a7b5"/>
 			</dataarea>
@@ -1419,7 +1463,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-010" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="zenji.bin" size="8192" crc="da228530" sha1="55da563b4394508c23d866fb1e543262fb45536d"/>
 			</dataarea>
@@ -1432,7 +1476,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-101" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="znerangr.bin" size="16384" crc="2959d827" sha1="18315bec1e62102290feeb77fb290e1266cf5bfc"/>
 			</dataarea>
@@ -1444,17 +1488,20 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="petetest.bin" size="8192" crc="28278cd6" sha1="d3ff99e080985c9c8e25389dfa74835e8c9be508"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="pamdiag2">
+	<software name="pamdiag2" supported="no">
 		<description>PAM Diag 2.0</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Crashes on Atari copyright screen
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
@@ -1463,10 +1510,14 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="pamdg23">
+	<software name="pamdg23" supported="partial">
 		<description>Atari PAM Diagnostics (rev 2.3)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+[ANTIC] test returns "soft error 34 01"
+[POKEY] test requires an unemulated loopback serial board
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
@@ -1480,7 +1531,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="finaltst.bin" size="8192" crc="7ea86e87" sha1="af81c400f1af0ee13a24da5e8b642442a0fc9479"/>
 			</dataarea>
@@ -1492,33 +1543,39 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="4096">
 				<rom name="boogie.bin" size="4096" crc="3bd5fdd6" sha1="5236bc13e4b06d2e16d70b0a0c98588e1726da0c"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cblast">
+	<software name="cblast" supported="no">
 		<description>Castle Blast</description>
 		<year>2002</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Playfield is gray filled, unplayable
+]]></notes>
 		<info name="developer" value="Ronen Habot" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="cblast.bin" size="32768" crc="7c988054" sha1="c1a56a1fc51e09b1d8e93af40ddd7596847e6164"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ccrisis">
+	<software name="ccrisis" supported="no">
 		<description>Castle Crisis</description>
 		<year>2004</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+[ANTIC] playfield height doesn't cover full screen
+]]></notes>
 		<info name="developer" value="Bryan Edewaard" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="ccrisis.bin" size="32768" crc="d50e4061" sha1="4e022e101d7346a0a8618018372740e7333b4a36"/>
 			</dataarea>
@@ -1528,10 +1585,10 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	<software name="koffiyk">
 		<description>Koffi: Yellow Kopter</description>
 		<year>2002</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Ron Lloyd" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="koffiyk.bin" size="32768" crc="917be656" sha1="9547c56e2951e1b3a713b0b99d3edb43c9d3cdd8"/>
 			</dataarea>
@@ -1544,7 +1601,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		<publisher>AtariAge</publisher> <!-- unlicensed? -->
 		<info name="developer" value="Keithen Hayenga" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="tempest (atariage).bin" size="32768" crc="a6400e17" sha1="0cb2bd6ed89ce6710ac092533a24f1248688c88c"/>
 			</dataarea>

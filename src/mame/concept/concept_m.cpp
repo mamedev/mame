@@ -73,7 +73,7 @@ uint32_t concept_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-WRITE_LINE_MEMBER(concept_state::ioc_interrupt)
+void concept_state::ioc_interrupt(int state)
 {
 	concept_set_interrupt(IOCINT_level, state);
 }
@@ -155,7 +155,7 @@ void concept_state::via_out_b(uint8_t data)
     VIA CB2: used as sound output
 */
 
-WRITE_LINE_MEMBER(concept_state::via_out_cb2)
+void concept_state::via_out_cb2(int state)
 {
 //  LOG(("via_out_cb2: Sound control written: data=0x%2.2x\n", state));
 	m_speaker->level_w(state);
@@ -164,7 +164,7 @@ WRITE_LINE_MEMBER(concept_state::via_out_cb2)
 /*
     VIA irq -> 68k level 5
 */
-WRITE_LINE_MEMBER(concept_state::via_irq_func)
+void concept_state::via_irq_func(int state)
 {
 	concept_set_interrupt(TIMINT_level, state);
 }

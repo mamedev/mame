@@ -48,13 +48,13 @@
     - To enter Basic, type BASIC. To quit, type EXIT.
 
     Cassette:
-    - Bios 0: you can SAVE and LOAD from the monitor, but not from Basic. (see ToDo)
-    - Bios 1: Doesn't seem to be supported.
+    - BIOS 0: you can SAVE and LOAD from the monitor, but not from Basic. (see ToDo)
+    - BIOS 1: Doesn't seem to be supported.
 
     Sound:
-    - Bios 0: Sound is initialised with the volume turned off. In Basic, you
+    - BIOS 0: Sound is initialised with the volume turned off. In Basic, you
               can POKE 4382,144 to enable sound.
-    - Bios 1: Doesn't appear to support sound. The included Basic has a SOUND
+    - BIOS 1: Doesn't appear to support sound. The included Basic has a SOUND
               command (e.g SOUND 127,80), but no sound is heard.
 
 *******************************************************************************/

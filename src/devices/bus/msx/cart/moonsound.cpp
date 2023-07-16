@@ -73,7 +73,7 @@ void msx_cart_moonsound_device::device_reset()
 {
 }
 
-WRITE_LINE_MEMBER(msx_cart_moonsound_device::irq_w)
+void msx_cart_moonsound_device::irq_w(int state)
 {
 	LOG("moonsound: irq state %d\n", state);
 	irq_out(state);

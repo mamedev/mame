@@ -22,7 +22,7 @@ Chesster Phantom is on the same base hardware, and adds the Chesster voice to it
 using the same ROM as the original Chesster. Model 6124 extra hardware is on a
 daughterboard, the housing is the same as model 6100, except for button labels.
 Model 6126 has a dedicated PCB, this version also has a motion sensor at the front
-and 2 leds to mimick eyes, and the housing color theme is green instead of beige.
+and 2 leds to mimic eyes, and the housing color theme is green instead of beige.
 
 At boot-up, the computer will do a self-test, the user can start playing after the
 motor has moved to the upper-right corner. The computer will continue positioning

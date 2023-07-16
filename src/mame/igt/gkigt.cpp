@@ -138,7 +138,7 @@ private:
 	uint8_t irq_vector_r();
 	void unk_w(uint8_t data);
 	uint8_t frame_number_r();
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 
 	uint8_t timer_r();
 	uint16_t version_r();
@@ -586,7 +586,7 @@ void igt_gameking_state::machine_reset()
 	m_quart1->ip2_w(1); // needs to be high
 }
 
-WRITE_LINE_MEMBER(igt_gameking_state::vblank_irq)
+void igt_gameking_state::vblank_irq(int state)
 {
 	if (state && BIT(m_irq_enable, 3))
 	{

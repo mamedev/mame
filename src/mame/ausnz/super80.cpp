@@ -635,7 +635,7 @@ static const z80_daisy_config super80_daisy_chain[] =
 //  Z80DMA
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( super80v_state::busreq_w )
+void super80v_state::busreq_w(int state)
 {
 // since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);

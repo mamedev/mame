@@ -50,12 +50,12 @@ DEFINE_DEVICE_TYPE(SC61860, sc61860_device, "sc61860", "Sharp SC61860")
 sc61860_device::sc61860_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, SC61860, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
-	, m_reset(*this)
-	, m_brk(*this)
-	, m_x(*this)
-	, m_ina(*this)
+	, m_reset(*this, 0)
+	, m_brk(*this, 0)
+	, m_x(*this, 0)
+	, m_ina(*this, 0)
 	, m_outa(*this)
-	, m_inb(*this)
+	, m_inb(*this, 0)
 	, m_outb(*this)
 	, m_outc(*this)
 {
@@ -110,14 +110,6 @@ void sc61860_device::device_start()
 
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
-	m_reset.resolve();
-	m_brk.resolve();
-	m_x.resolve();
-	m_ina.resolve_safe(0);
-	m_outa.resolve_safe();
-	m_inb.resolve_safe(0);
-	m_outb.resolve_safe();
-	m_outc.resolve_safe();
 
 	m_p = 0;
 	m_q = 0;

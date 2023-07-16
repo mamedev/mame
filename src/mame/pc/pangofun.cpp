@@ -142,9 +142,7 @@ void pangofun_state::pcat_io(address_map &map)
 {
 	pcat32_io_common(map);
 	map(0x00e0, 0x00e3).nopw();
-	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
-	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
-	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
+	map(0x03b0, 0x03df).m("vga", FUNC(vga_device::io_map));
 }
 
 static INPUT_PORTS_START( pangofun )
@@ -163,7 +161,14 @@ void pangofun_state::pangofun(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
-	pcvideo_vga(config);
+	// TODO: map to ISA bus, CLGD5401
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
+	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
+
+	vga_device &vga(VGA(config, "vga", 0));
+	vga.set_screen("screen");
+	vga.set_vram_size(0x100000);
 
 	pcat_common(config);
 

@@ -112,7 +112,7 @@ private:
 	inline void get_fromance_tile_info(tile_data &tileinfo, int tile_index, int layer);
 	inline void get_nekkyoku_tile_info(tile_data &tileinfo, int tile_index, int layer);
 	void crtc_refresh();
-	DECLARE_WRITE_LINE_MEMBER(fromance_adpcm_int);
+	void fromance_adpcm_int(int state);
 	void fromance_main_map(address_map &map);
 	void fromance_sub_io_map(address_map &map);
 	void fromance_sub_map(address_map &map);

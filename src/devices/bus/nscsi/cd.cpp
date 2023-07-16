@@ -99,7 +99,6 @@ void nscsi_cdrom_device::device_reset()
 {
 	nscsi_full_device::device_reset();
 	sequence_counter = image->sequence_counter();
-	cdda->set_cdrom(image);
 	lba = 0;
 	cur_sector = -1;
 	mode_data_size = 12;
@@ -108,7 +107,7 @@ void nscsi_cdrom_device::device_reset()
 void nscsi_cdrom_device::device_add_mconfig(machine_config &config)
 {
 	CDROM(config, image).set_interface("cdrom");
-	CDDA(config, "cdda");
+	CDDA(config, cdda).set_cdrom_tag(image);
 }
 
 int nscsi_cdrom_device::to_msf(int frame)
@@ -194,7 +193,7 @@ void nscsi_cdrom_device::scsi_command()
 	int blocks;
 
 	// check for media change
-	if(	sequence_counter != image->sequence_counter() && (scsi_cmdbuf[0] != SC_INQUIRY))
+	if( sequence_counter != image->sequence_counter() && (scsi_cmdbuf[0] != SC_INQUIRY))
 	{
 		// clear media change condition
 		cur_sector = -1;

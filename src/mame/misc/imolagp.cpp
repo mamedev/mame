@@ -161,7 +161,7 @@ private:
 	uint8_t imola_draw_mode_r(offs_t offset);
 	void vreg_control_w(uint8_t data);
 	void vreg_data_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(imolagp_pot_callback);
 
 	void imolagp_palette(palette_device &palette) const;
@@ -261,7 +261,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(imolagp_state::imolagp_pot_callback)
 		m_steer_pot_timer->adjust(attotime::from_msec(20));
 }
 
-WRITE_LINE_MEMBER(imolagp_state::vblank_irq)
+void imolagp_state::vblank_irq(int state)
 {
 	if (state)
 	{

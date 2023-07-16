@@ -42,8 +42,7 @@ public:
 	auto out_pf_callback() { return m_port_output_cb[5].bind(); }
 
 protected:
-	// device-specific overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

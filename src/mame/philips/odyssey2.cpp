@@ -172,7 +172,7 @@ protected:
 	void p1_write(u8 data);
 	u8 p2_read();
 	void p2_write(u8 data);
-	DECLARE_READ_LINE_MEMBER(t1_read);
+	int t1_read();
 
 	void odyssey2_io(address_map &map);
 	void odyssey2_mem(address_map &map);
@@ -430,7 +430,7 @@ u8 odyssey2_state::bus_read()
 	return data;
 }
 
-READ_LINE_MEMBER(odyssey2_state::t1_read)
+int odyssey2_state::t1_read()
 {
 	return m_i8244->vblank() | m_i8244->hblank();
 }

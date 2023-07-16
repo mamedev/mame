@@ -132,12 +132,12 @@ public:
 	uint8_t iorq_r(offs_t offset, uint8_t data);
 	void iorq_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( busak_w );
+	void busak_w(int state);
 
 	// peripheral interface
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( busrq_w ) { m_busrq_cb(state); }
+	void irq_w(int state) { m_irq_cb(state); }
+	void nmi_w(int state) { m_nmi_cb(state); }
+	void busrq_w(int state) { m_busrq_cb(state); }
 	uint8_t exin_mrq_r(offs_t offset) { return m_in_mrq_cb(offset); }
 	void exin_mrq_w(offs_t offset, uint8_t data) { m_out_mrq_cb(offset, data); }
 

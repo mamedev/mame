@@ -13,10 +13,10 @@
 
 #include "etna.h"
 
-#define LOG_READS       (1 << 0)
-#define LOG_WRITES      (1 << 1)
-#define LOG_UNKNOWNS    (1 << 2)
-#define LOG_PROM        (1 << 3)
+#define LOG_READS       (1U << 1)
+#define LOG_WRITES      (1U << 2)
+#define LOG_UNKNOWNS    (1U << 3)
+#define LOG_PROM        (1U << 4)
 #define LOG_ALL         (LOG_READS | LOG_WRITES | LOG_UNKNOWNS | LOG_PROM)
 
 #define VERBOSE         (0)
@@ -210,7 +210,7 @@ uint8_t etna_device::regs_r(offs_t offset)
 	return data;
 }
 
-WRITE_LINE_MEMBER(etna_device::eeprom_cs_in)
+void etna_device::eeprom_cs_in(int state)
 {
 	bool old = m_prom_cs;
 	m_prom_cs = state;
@@ -222,7 +222,7 @@ WRITE_LINE_MEMBER(etna_device::eeprom_cs_in)
 	}
 }
 
-WRITE_LINE_MEMBER(etna_device::eeprom_clk_in)
+void etna_device::eeprom_clk_in(int state)
 {
 	bool old = m_prom_clk;
 	m_prom_clk = state;
@@ -252,6 +252,6 @@ WRITE_LINE_MEMBER(etna_device::eeprom_clk_in)
 	}
 }
 
-WRITE_LINE_MEMBER(etna_device::eeprom_data_in)
+void etna_device::eeprom_data_in(int state)
 {
 }

@@ -794,7 +794,7 @@ LC7535_VOLUME_CHANGED( dragngun_state::volume_gun_changed )
 		m_oki[2]->set_output_gain(ALL_OUTPUTS, m_vol_gun->normalize(attenuation_left));
 }
 
-WRITE_LINE_MEMBER( nslasher_state::tattass_sound_irq_w )
+void nslasher_state::tattass_sound_irq_w(int state)
 {
 	if (state)
 	{

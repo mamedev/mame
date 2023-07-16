@@ -440,7 +440,7 @@ void itech32_state::update_interrupts(int vint, int xint, int qint)
 }
 
 
-WRITE_LINE_MEMBER(itech32_state::generate_int1)
+void itech32_state::generate_int1(int state)
 {
 	if (state)
 	{
@@ -535,7 +535,7 @@ void itech32_state::color_w(u8 data)
  *************************************/
 
 
-READ_LINE_MEMBER(itech32_state::special_port_r)
+int itech32_state::special_port_r()
 {
 	if (m_soundlatch->pending_r())
 		m_special_result ^= 1;
@@ -771,7 +771,7 @@ void drivedge_state::portb_out(u8 data)
 }
 
 
-WRITE_LINE_MEMBER(drivedge_state::turbo_light)
+void drivedge_state::turbo_light(int state)
 {
 	m_leds[0] = state ? 1 : 0;
 }

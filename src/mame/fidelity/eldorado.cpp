@@ -61,7 +61,7 @@ private:
 	void mux_w(u8 data);
 	u8 mux_r();
 	void control_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(t0_r);
+	int t0_r();
 	u8 input_r();
 
 	bool m_kp_select = false;
@@ -113,7 +113,7 @@ void eldorado_state::control_w(u8 data)
 	m_kp_select = !bool(data & 0x80);
 }
 
-READ_LINE_MEMBER(eldorado_state::t0_r)
+int eldorado_state::t0_r()
 {
 	// T0: P27
 	return m_kp_select ? 0 : 1;

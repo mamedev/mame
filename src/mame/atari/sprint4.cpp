@@ -52,9 +52,9 @@ public:
 
 	void sprint4(machine_config &config);
 
-	template <int N> DECLARE_READ_LINE_MEMBER(lever_r);
-	template <int N> DECLARE_READ_LINE_MEMBER(wheel_r);
-	template <int N> DECLARE_READ_LINE_MEMBER(collision_flipflop_r);
+	template <int N> int lever_r();
+	template <int N> int wheel_r();
+	template <int N> int collision_flipflop_r();
 
 private:
 	virtual void machine_start() override;
@@ -80,7 +80,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 
 	required_device<cpu_device> m_maincpu;
@@ -113,21 +113,21 @@ private:
 
 
 template <int N>
-READ_LINE_MEMBER(sprint4_state::lever_r)
+int sprint4_state::lever_r()
 {
 	return 4 * m_gear[N] > m_da_latch;
 }
 
 
 template <int N>
-READ_LINE_MEMBER(sprint4_state::wheel_r)
+int sprint4_state::wheel_r()
 {
 	return 8 * m_steer_FF1[N] + 8 * m_steer_FF2[N] > m_da_latch;
 }
 
 
 template <int N>
-READ_LINE_MEMBER(sprint4_state::collision_flipflop_r)
+int sprint4_state::collision_flipflop_r()
 {
 	return m_collision[N];
 }
@@ -345,7 +345,7 @@ uint32_t sprint4_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-WRITE_LINE_MEMBER(sprint4_state::screen_vblank)
+void sprint4_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
@@ -601,48 +601,152 @@ void sprint4_state::sprint4(machine_config &config)
 	m_discrete->add_route(1, "rspeaker", 1.0);
 }
 
+ // NOTE:  SPRINT 4 A008716 PCB can accept both 8bit ROMs and 4bit BPROMs or combination thereof
 
-ROM_START( sprint4 )
+ROM_START( sprint4 ) // 4bit BPROM version of Rev 03
 	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD         ( "30031.c1",    0x2800, 0x0800, CRC(017ee7c4) SHA1(9386cacc619669c18af31f66691a45af6dafef64) )
+	ROM_LOAD_NIB_LOW ( "30034-03.p1", 0x2800, 0x0800, CRC(a55aef81) SHA1(f7f28deec098b271247881e96cb35dc82d7ab98d) ) // These are all N82S185 BPROMs
+	ROM_LOAD_NIB_HIGH( "30035-03.j1", 0x2800, 0x0800, CRC(90c1abee) SHA1(3fb67ffcd7b217d1374241e07e8a8ce85e61b4b6) )
+	ROM_LOAD_NIB_LOW ( "30036-03.n1", 0x3000, 0x0800, CRC(55a0749f) SHA1(f3c535a916c3e20de3e51c3c1dc848b103d2a630) )
+	ROM_LOAD_NIB_HIGH( "30037-03.k1", 0x3000, 0x0800, CRC(7730ec67) SHA1(83ab0ee96ccad122d23551f5dd1d9266d8418366) )
+	ROM_LOAD_NIB_LOW ( "30038-03.m1", 0x3800, 0x0800, CRC(142a4603) SHA1(e3b61734f3f19aaa1d674823c59018e9ad8f3bed) )
+	ROM_LOAD_NIB_HIGH( "30039-03.l1", 0x3800, 0x0800, CRC(d3ffa2fc) SHA1(a7cab3e996ce3da3bb449bbe065761b169bc25ec) )
+
+	ROM_REGION( 0x0800, "gfx1", 0 ) // playfield
+	ROM_LOAD_NIB_LOW ( "30025-01.j6", 0x0000, 0x0800, CRC(748ca960) SHA1(45752e788e34b61d3079cce040df2603886a4bc3) ) // These are N82S185 BPROMs
+	ROM_LOAD_NIB_HIGH( "30026-01.h6", 0x0000, 0x0800, CRC(a50253d4) SHA1(edd76c105c6577b07e4f4f9e9637a25b20c44eaa) )
+
+	ROM_REGION( 0x0c00, "gfx2", 0 ) // motion
+	ROM_LOAD( "30028-03.n6", 0x0000, 0x0400, CRC(d3337030) SHA1(3e73fc45bdcaa52dc1aa01489b46240284562ab7) ) // These are DM74S573N BPROMs
+	ROM_LOAD( "30029-03.m6", 0x0400, 0x0400, CRC(77e04ba4) SHA1(f13d132eb23b59119748a893ae352bd435da7bfb) )
+	ROM_LOAD( "30030-03.l6", 0x0800, 0x0400, CRC(aa1b45ab) SHA1(1ddb64d4ec92a1383866daaefa556499837decd1) )
+
+	ROM_REGION( 0x0200, "user1", 0 ) // SYNC
+	ROM_LOAD( "30024-01.p8", 0x0000, 0x0200, CRC(e71d2e22) SHA1(434c3a8237468604cce7feb40e6061d2670013b3) ) // MMI6306-1 BPROM
+ROM_END
+
+
+ROM_START( sprint4a ) // Mixed, 8bit ROM & 4bit BPROM version of Rev 02
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD         ( "30031-01.c1", 0x2800, 0x0800, CRC(017ee7c4) SHA1(9386cacc619669c18af31f66691a45af6dafef64) ) // == 030034-03.p1(low)+030035-03.j1(high)
 	ROM_LOAD_NIB_LOW ( "30036-02.n1", 0x3000, 0x0800, CRC(883b9d7c) SHA1(af52ffdd9cd8dfed54013c9b0d3c6e48c7419d17) )
 	ROM_LOAD_NIB_HIGH( "30037-02.k1", 0x3000, 0x0800, CRC(c297fbd8) SHA1(8cc0f486429e12bee21a5dd1135e799196480044) )
-	ROM_LOAD         ( "30033.e1",    0x3800, 0x0800, CRC(b8b717b7) SHA1(2f6b1a0e9803901d9ba79d1f19a025f6a6134756) )
+	ROM_LOAD         ( "30033-01.e1", 0x3800, 0x0800, CRC(b8b717b7) SHA1(2f6b1a0e9803901d9ba79d1f19a025f6a6134756) )
 
-	ROM_REGION( 0x0800, "gfx1", 0 ) /* playfield */
-	ROM_LOAD( "30027.h5", 0x0000, 0x0800, CRC(3a752e07) SHA1(d990f94b296409d47e8bada98ddbed5f76567e1b) )
+	ROM_REGION( 0x0800, "gfx1", 0 ) // playfield
+	ROM_LOAD( "30027-01.h5", 0x0000, 0x0800, CRC(3a752e07) SHA1(d990f94b296409d47e8bada98ddbed5f76567e1b) )
 
-	ROM_REGION( 0x0c00, "gfx2", 0 ) /* motion */
+	ROM_REGION( 0x0c00, "gfx2", 0 ) // motion
+	ROM_LOAD( "30028-03.n6", 0x0000, 0x0400, CRC(d3337030) SHA1(3e73fc45bdcaa52dc1aa01489b46240284562ab7) ) // rev 3 graphics ROMs with rev 02 programs?? Operator upgrade??
+	ROM_LOAD( "30029-03.m6", 0x0400, 0x0400, CRC(77e04ba4) SHA1(f13d132eb23b59119748a893ae352bd435da7bfb) )
+	ROM_LOAD( "30030-03.l6", 0x0800, 0x0400, CRC(aa1b45ab) SHA1(1ddb64d4ec92a1383866daaefa556499837decd1) )
+
+	ROM_REGION( 0x0200, "user1", 0 ) // SYNC
+	ROM_LOAD( "30024-01.p8", 0x0000, 0x0200, CRC(e71d2e22) SHA1(434c3a8237468604cce7feb40e6061d2670013b3) ) // MMI6306-1 BPROM
+ROM_END
+
+
+ROM_START( sprint4b ) // Mixed, 8bit ROM & 4bit BPROM version of Rev 02
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD         ( "30031-01.c1", 0x2800, 0x0800, CRC(017ee7c4) SHA1(9386cacc619669c18af31f66691a45af6dafef64) ) // == 030034-03.p1(low)+030035-03.j1(high)
+	ROM_LOAD_NIB_LOW ( "30036-02.n1", 0x3000, 0x0800, CRC(883b9d7c) SHA1(af52ffdd9cd8dfed54013c9b0d3c6e48c7419d17) )
+	ROM_LOAD_NIB_HIGH( "30037-02.k1", 0x3000, 0x0800, CRC(c297fbd8) SHA1(8cc0f486429e12bee21a5dd1135e799196480044) )
+	ROM_LOAD         ( "30033-01.e1", 0x3800, 0x0800, CRC(b8b717b7) SHA1(2f6b1a0e9803901d9ba79d1f19a025f6a6134756) )
+
+	ROM_REGION( 0x0800, "gfx1", 0 ) // playfield
+	ROM_LOAD( "30027-01.h5", 0x0000, 0x0800, CRC(3a752e07) SHA1(d990f94b296409d47e8bada98ddbed5f76567e1b) )
+
+	ROM_REGION( 0x0c00, "gfx2", 0 ) // motion
 	ROM_LOAD( "30028-01.n6", 0x0000, 0x0400, CRC(3ebcb13f) SHA1(e0b87239081f12f6613d3db6a8cb5b80937df7d7) )
 	ROM_LOAD( "30029-01.m6", 0x0400, 0x0400, CRC(963a8424) SHA1(d52a0e73c54154531e825153012687bdb85e479a) )
 	ROM_LOAD( "30030-01.l6", 0x0800, 0x0400, CRC(e94dfc2d) SHA1(9c5b1401c4aadda0a3aee76e4f92e73ae1d35cb7) )
 
-	ROM_REGION( 0x0200, "user1", 0 )
-	ROM_LOAD( "30024-01.p8", 0x0000, 0x0200, CRC(e71d2e22) SHA1(434c3a8237468604cce7feb40e6061d2670013b3) ) /* SYNC */
+	ROM_REGION( 0x0200, "user1", 0 ) // SYNC
+	ROM_LOAD( "30024-01.p8", 0x0000, 0x0200, CRC(e71d2e22) SHA1(434c3a8237468604cce7feb40e6061d2670013b3) ) // MMI6306-1 BPROM
 ROM_END
 
+/*
 
-ROM_START( sprint4a )
-	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD         ( "30031.c1",    0x2800, 0x0800, CRC(017ee7c4) SHA1(9386cacc619669c18af31f66691a45af6dafef64) )
-	ROM_LOAD_NIB_LOW ( "30036-02.n1", 0x3000, 0x0800, CRC(883b9d7c) SHA1(af52ffdd9cd8dfed54013c9b0d3c6e48c7419d17) )
-	ROM_LOAD_NIB_HIGH( "30037-02.k1", 0x3000, 0x0800, CRC(c297fbd8) SHA1(8cc0f486429e12bee21a5dd1135e799196480044) )
-	ROM_LOAD         ( "30033.e1",    0x3800, 0x0800, CRC(b8b717b7) SHA1(2f6b1a0e9803901d9ba79d1f19a025f6a6134756) )
+ROM_START( sprint4r38 ) // 8bit ROM version of Rev 03
+    ROM_REGION( 0x4000, "maincpu", 0 )
+    ROM_LOAD ( "30031-03.c1", 0x2800, 0x0800, CRC(017ee7c4) SHA1(9386cacc619669c18af31f66691a45af6dafef64) ) // == 30031-01.c1
+    ROM_LOAD ( "30032-03.d1", 0x3000, 0x0800, CRC(55183642) SHA1(ff5b6ab8fc39d96ab9902667ee3bb595f5722c2d) )
+    ROM_LOAD ( "30033-03.e1", 0x3800, 0x0800, CRC(58c8cae0) SHA1(4903579ddab753f50da17911a7e842225efaf7f4) )
 
-	ROM_REGION( 0x0800, "gfx1", 0 ) /* playfield */
-	ROM_LOAD( "30027.h5", 0x0000, 0x0800, CRC(3a752e07) SHA1(d990f94b296409d47e8bada98ddbed5f76567e1b) )
+    ROM_REGION( 0x0800, "gfx1", 0 ) // playfield
+    ROM_LOAD( "30027-01.h5", 0x0000, 0x0800, CRC(3a752e07) SHA1(d990f94b296409d47e8bada98ddbed5f76567e1b) )
 
-	ROM_REGION( 0x0c00, "gfx2", 0 ) /* motion */
-	ROM_LOAD( "30028-03.n6", 0x0000, 0x0400, CRC(d3337030) SHA1(3e73fc45bdcaa52dc1aa01489b46240284562ab7) )
-	ROM_LOAD( "30029-03.m6", 0x0400, 0x0400, NO_DUMP )
-	ROM_LOAD( "30030-03.l6", 0x0800, 0x0400, CRC(aa1b45ab) SHA1(1ddb64d4ec92a1383866daaefa556499837decd1) )
+    ROM_REGION( 0x0c00, "gfx2", 0 ) // motion
+    ROM_LOAD( "30028-03.n6", 0x0000, 0x0400, CRC(d3337030) SHA1(3e73fc45bdcaa52dc1aa01489b46240284562ab7) )
+    ROM_LOAD( "30029-03.m6", 0x0400, 0x0400, CRC(77e04ba4) SHA1(f13d132eb23b59119748a893ae352bd435da7bfb) )
+    ROM_LOAD( "30030-03.l6", 0x0800, 0x0400, CRC(aa1b45ab) SHA1(1ddb64d4ec92a1383866daaefa556499837decd1) )
 
-	ROM_REGION( 0x0200, "user1", 0 )
-	ROM_LOAD( "30024-01.p8", 0x0000, 0x0200, CRC(e71d2e22) SHA1(434c3a8237468604cce7feb40e6061d2670013b3) ) /* SYNC */
+    ROM_REGION( 0x0200, "user1", 0 ) // SYNC
+    ROM_LOAD( "30024-01.p8", 0x0000, 0x0200, CRC(e71d2e22) SHA1(434c3a8237468604cce7feb40e6061d2670013b3) ) // MMI6306-1 BPROM
 ROM_END
+
+ROM_START( sprint4r24 ) // 4bit BPROM version of Rev 02
+    ROM_REGION( 0x4000, "maincpu", 0 )
+    ROM_LOAD_NIB_LOW ( "30034-01.p1", 0x2800, 0x0800, CRC(a55aef81) SHA1(f7f28deec098b271247881e96cb35dc82d7ab98d) ) // == 30034-03.p1
+    ROM_LOAD_NIB_HIGH( "30035-01.j1", 0x2800, 0x0800, CRC(90c1abee) SHA1(3fb67ffcd7b217d1374241e07e8a8ce85e61b4b6) ) // == 30035-03.p1
+    ROM_LOAD_NIB_LOW ( "30036-02.n1", 0x3000, 0x0800, CRC(883b9d7c) SHA1(af52ffdd9cd8dfed54013c9b0d3c6e48c7419d17) )
+    ROM_LOAD_NIB_HIGH( "30037-02.k1", 0x3000, 0x0800, CRC(c297fbd8) SHA1(8cc0f486429e12bee21a5dd1135e799196480044) )
+    ROM_LOAD_NIB_LOW ( "30038-01.m1", 0x3800, 0x0800, CRC(ed1d6c3a) SHA1(7ae09eb12c463566736f65be68932dc3d4a9ad2c) )
+    ROM_LOAD_NIB_HIGH( "30039-01.l1", 0x3800, 0x0800, CRC(7261cff2) SHA1(17af3555a765eef2c20a676484bb62bf553f8760) )
+
+    ROM_REGION( 0x0800, "gfx1", 0 ) // playfield
+    ROM_LOAD_NIB_LOW ( "30025-01.j6", 0x0000, 0x0800, CRC(748ca960) SHA1(45752e788e34b61d3079cce040df2603886a4bc3) )
+    ROM_LOAD_NIB_HIGH( "30026-01.h6", 0x0000, 0x0800, CRC(a50253d4) SHA1(edd76c105c6577b07e4f4f9e9637a25b20c44eaa) )
+
+    ROM_REGION( 0x0c00, "gfx2", 0 ) // motion
+    ROM_LOAD( "30028-01.n6", 0x0000, 0x0400, CRC(3ebcb13f) SHA1(e0b87239081f12f6613d3db6a8cb5b80937df7d7) )
+    ROM_LOAD( "30029-01.m6", 0x0400, 0x0400, CRC(963a8424) SHA1(d52a0e73c54154531e825153012687bdb85e479a) )
+    ROM_LOAD( "30030-01.l6", 0x0800, 0x0400, CRC(e94dfc2d) SHA1(9c5b1401c4aadda0a3aee76e4f92e73ae1d35cb7) )
+
+    ROM_REGION( 0x0200, "user1", 0 ) // SYNC
+    ROM_LOAD( "30024-01.p8", 0x0000, 0x0200, CRC(e71d2e22) SHA1(434c3a8237468604cce7feb40e6061d2670013b3) ) // MMI6306-1 BPROM
+ROM_END
+
+ROM_START( sprint4r28 ) // 8bit ROM version of Rev 02
+    ROM_REGION( 0x4000, "maincpu", 0 )
+    ROM_LOAD ( "30031-01.c1", 0x2800, 0x0800, CRC(017ee7c4) SHA1(9386cacc619669c18af31f66691a45af6dafef64) )
+    ROM_LOAD ( "30032-02.d1", 0x3000, 0x0800, CRC(092d859e) SHA1(4e932e7ad9cec4cb87b5196418083971fb2900d0) )
+    ROM_LOAD ( "30033-01.e1", 0x3800, 0x0800, CRC(b8b717b7) SHA1(2f6b1a0e9803901d9ba79d1f19a025f6a6134756) )
+
+    ROM_REGION( 0x0800, "gfx1", 0 ) // playfield
+    ROM_LOAD( "30027-01.h5", 0x0000, 0x0800, CRC(3a752e07) SHA1(d990f94b296409d47e8bada98ddbed5f76567e1b) )
+
+    ROM_REGION( 0x0c00, "gfx2", 0 ) // motion
+    ROM_LOAD( "30028-01.n6", 0x0000, 0x0400, CRC(3ebcb13f) SHA1(e0b87239081f12f6613d3db6a8cb5b80937df7d7) )
+    ROM_LOAD( "30029-01.m6", 0x0400, 0x0400, CRC(963a8424) SHA1(d52a0e73c54154531e825153012687bdb85e479a) )
+    ROM_LOAD( "30030-01.l6", 0x0800, 0x0400, CRC(e94dfc2d) SHA1(9c5b1401c4aadda0a3aee76e4f92e73ae1d35cb7) )
+
+    ROM_REGION( 0x0200, "user1", 0 ) // SYNC
+    ROM_LOAD( "30024-01.p8", 0x0000, 0x0200, CRC(e71d2e22) SHA1(434c3a8237468604cce7feb40e6061d2670013b3) ) // MMI6306-1 BPROM
+ROM_END
+
+ROM_START( sprint4r18 ) // 8bit ROM version of Rev 01 - Currently undumped!
+    ROM_REGION( 0x4000, "maincpu", 0 )
+    ROM_LOAD ( "30031-01.c1", 0x2800, 0x0800, CRC(017ee7c4) SHA1(9386cacc619669c18af31f66691a45af6dafef64) )
+    ROM_LOAD ( "30032-01.d1", 0x3000, 0x0800, NO_DUMP ) // CRC(58ecd1b9) SHA1(0) - Only expected CRC32 value is known
+    ROM_LOAD ( "30033-01.e1", 0x3800, 0x0800, CRC(b8b717b7) SHA1(2f6b1a0e9803901d9ba79d1f19a025f6a6134756) )
+
+    ROM_REGION( 0x0800, "gfx1", 0 ) // playfield
+    ROM_LOAD( "30027-01.h5", 0x0000, 0x0800, CRC(3a752e07) SHA1(d990f94b296409d47e8bada98ddbed5f76567e1b) )
+
+    ROM_REGION( 0x0c00, "gfx2", 0 ) // motion
+    ROM_LOAD( "30028-01.n6", 0x0000, 0x0400, CRC(3ebcb13f) SHA1(e0b87239081f12f6613d3db6a8cb5b80937df7d7) )
+    ROM_LOAD( "30029-01.m6", 0x0400, 0x0400, CRC(963a8424) SHA1(d52a0e73c54154531e825153012687bdb85e479a) )
+    ROM_LOAD( "30030-01.l6", 0x0800, 0x0400, CRC(e94dfc2d) SHA1(9c5b1401c4aadda0a3aee76e4f92e73ae1d35cb7) )
+
+    ROM_REGION( 0x0200, "user1", 0 ) // SYNC
+    ROM_LOAD( "30024-01.p8", 0x0000, 0x0200, CRC(e71d2e22) SHA1(434c3a8237468604cce7feb40e6061d2670013b3) ) // MMI6306-1 BPROM
+ROM_END
+*/
 
 } // anonymous namespace
 
 
-GAME( 1977, sprint4,  0,       sprint4,  sprint4, sprint4_state, empty_init, ROT180, "Atari", "Sprint 4 (set 1)", MACHINE_SUPPORTS_SAVE ) /* large cars */
-GAME( 1977, sprint4a, sprint4, sprint4,  sprint4, sprint4_state, empty_init, ROT180, "Atari", "Sprint 4 (set 2)", MACHINE_SUPPORTS_SAVE ) /* small cars */
+GAME( 1977, sprint4,  0,       sprint4,  sprint4, sprint4_state, empty_init, ROT180, "Atari", "Sprint 4 (Rev 03)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1977, sprint4a, sprint4, sprint4,  sprint4, sprint4_state, empty_init, ROT180, "Atari", "Sprint 4 (Rev 02, set 1)", MACHINE_SUPPORTS_SAVE ) // Rev 02 program, Rev 03 car graphics
+GAME( 1977, sprint4b, sprint4, sprint4,  sprint4, sprint4_state, empty_init, ROT180, "Atari", "Sprint 4 (Rev 02, set 2)", MACHINE_SUPPORTS_SAVE ) // Rev 02 program, Rev 01 car graphics

@@ -120,7 +120,7 @@ std::unique_ptr<util::disasm_interface> cquestrot_cpu_device::create_disassemble
 cquestlin_cpu_device::cquestlin_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, CQUESTLIN, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 64, 8, -3)
-	, m_linedata_r(*this)
+	, m_linedata_r(*this, 0)
 	, m_flags(0)
 	, m_curpc(0)
 {
@@ -177,7 +177,6 @@ u16 cquestrot_cpu_device::rotram_r(offs_t offset)
 
 void cquestsnd_cpu_device::device_start()
 {
-	m_dac_w.resolve_safe();
 	assert(m_sound_region_tag != nullptr);
 	m_sound_data = (u16*)machine().root_device().memregion(m_sound_region_tag)->base();
 
@@ -258,8 +257,6 @@ void cquestsnd_cpu_device::device_reset()
 
 void cquestrot_cpu_device::device_start()
 {
-	m_linedata_w.resolve_safe();
-
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
 
@@ -389,8 +386,6 @@ device_memory_interface::space_config_vector cquestrot_cpu_device::memory_space_
 
 void cquestlin_cpu_device::device_start()
 {
-	m_linedata_r.resolve_safe(0);
-
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
 

@@ -202,10 +202,6 @@ rp5c15_device::rp5c15_device(const machine_config &mconfig, const char *tag, dev
 
 void rp5c15_device::device_start()
 {
-	// resolve callbacks
-	m_out_alarm_cb.resolve_safe();
-	m_out_clkout_cb.resolve_safe();
-
 	// allocate timers
 	m_clock_timer = timer_alloc(FUNC(rp5c15_device::advance_1hz_clock), this);
 	m_clock_timer->adjust(attotime::from_hz(clock() / 16384), 0, attotime::from_hz(clock() / 16384));

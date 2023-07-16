@@ -79,7 +79,7 @@ private:
 	uint8_t snd_status_r();
 	void snd_status_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(video_interrupt);
+	void video_interrupt(int state);
 	INTERRUPT_GEN_MEMBER(snd_timed_irq);
 
 	inline void read_vectorram(int addr, int *x, int *y, int *c);
@@ -136,7 +136,7 @@ m_vector->add_point(m_xcenter + ((x) << 16), m_ycenter - ((y) << 16), color, int
 
 
 
-WRITE_LINE_MEMBER(aztarac_state::video_interrupt)
+void aztarac_state::video_interrupt(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);

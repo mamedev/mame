@@ -38,12 +38,12 @@
 #include "emu.h"
 #include "6840ptm.h"
 
-#define LOG_COUNTERS    (1 << 1)
-#define LOG_STATUS      (1 << 2)
-#define LOG_CONTROL     (1 << 3)
-#define LOG_RESETS      (1 << 4)
-#define LOG_TIMEOUTS    (1 << 5)
-#define LOG_IRQS        (1 << 6)
+#define LOG_COUNTERS    (1U << 1)
+#define LOG_STATUS      (1U << 2)
+#define LOG_CONTROL     (1U << 3)
+#define LOG_RESETS      (1U << 4)
+#define LOG_TIMEOUTS    (1U << 5)
+#define LOG_IRQS        (1U << 6)
 #define LOG_ALL         (LOG_COUNTERS | LOG_STATUS | LOG_CONTROL | LOG_RESETS | LOG_TIMEOUTS | LOG_IRQS)
 
 #define VERBOSE         (0)
@@ -90,10 +90,6 @@ ptm6840_device::ptm6840_device(const machine_config &mconfig, const char *tag, d
 
 void ptm6840_device::device_start()
 {
-	// resolve callbacks
-	m_out_cb.resolve_all_safe();
-	m_irq_cb.resolve_safe();
-
 	m_timer[0] = timer_alloc(FUNC(ptm6840_device::state_changed), this);
 	m_timer[1] = timer_alloc(FUNC(ptm6840_device::state_changed), this);
 	m_timer[2] = timer_alloc(FUNC(ptm6840_device::state_changed), this);

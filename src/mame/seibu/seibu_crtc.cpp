@@ -245,20 +245,17 @@ void seibu_crtc_device::seibu_crtc_vregs(address_map &map)
 
 void seibu_crtc_device::decrypt_key_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if (!m_decrypt_key_cb.isnull())
-		m_decrypt_key_cb(0, data, mem_mask);
+	m_decrypt_key_cb(0, data, mem_mask);
 }
 
 void seibu_crtc_device::layer_en_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if (!m_layer_en_cb.isnull())
-		m_layer_en_cb(0,data,mem_mask);
+	m_layer_en_cb(0,data,mem_mask);
 }
 
 void seibu_crtc_device::layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if (!m_layer_scroll_cb.isnull())
-		m_layer_scroll_cb(offset,data,mem_mask);
+	m_layer_scroll_cb(offset,data,mem_mask);
 }
 
 uint16_t seibu_crtc_device::reg_1a_r()
@@ -270,14 +267,12 @@ uint16_t seibu_crtc_device::reg_1a_r()
 void seibu_crtc_device::reg_1a_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_reg_1a);
-	if (!m_reg_1a_cb.isnull())
-		m_reg_1a_cb(offset,data,mem_mask);
+	m_reg_1a_cb(offset,data,mem_mask);
 }
 
 void seibu_crtc_device::layer_scroll_base_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if (!m_layer_scroll_base_cb.isnull())
-		m_layer_scroll_base_cb(offset,data,mem_mask);
+	m_layer_scroll_base_cb(offset,data,mem_mask);
 }
 
 //**************************************************************************
@@ -317,12 +312,6 @@ void seibu_crtc_device::device_validity_check(validity_checker &valid) const
 
 void seibu_crtc_device::device_start()
 {
-	m_decrypt_key_cb.resolve();
-	m_layer_en_cb.resolve();
-	m_layer_scroll_cb.resolve();
-	m_reg_1a_cb.resolve();
-	m_layer_scroll_base_cb.resolve();
-
 	save_item(NAME(m_reg_1a));
 }
 

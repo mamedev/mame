@@ -41,9 +41,9 @@ enum
 
 cdp1852_device::cdp1852_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, CDP1852, tag, owner, clock),
-	m_read_mode(*this),
+	m_read_mode(*this, 0),
 	m_write_sr(*this),
-	m_read_data(*this),
+	m_read_data(*this, 0),
 	m_write_data(*this),
 	m_new_data(false), m_data(0),
 	m_clock_active(true), m_sr(false), m_next_sr(false),
@@ -59,12 +59,6 @@ cdp1852_device::cdp1852_device(const machine_config &mconfig, const char *tag, d
 
 void cdp1852_device::device_start()
 {
-	// resolve callbacks
-	m_read_mode.resolve_safe(0);
-	m_write_sr.resolve_safe();
-	m_read_data.resolve_safe(0);
-	m_write_data.resolve_safe();
-
 	// allocate timers
 	m_update_do_timer = timer_alloc(FUNC(cdp1852_device::update_do), this);
 	m_update_sr_timer = timer_alloc(FUNC(cdp1852_device::update_sr), this);
@@ -107,7 +101,7 @@ void cdp1852_device::device_reset()
 //  clock_w - clock write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(cdp1852_device::clock_w)
+void cdp1852_device::clock_w(int state)
 {
 	if (m_clock_active != bool(state))
 		return;

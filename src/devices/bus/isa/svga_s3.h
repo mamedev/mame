@@ -6,8 +6,9 @@
 #pragma once
 
 #include "isa.h"
-#include "video/pc_vga.h"
-#include "s3virge.h"
+#include "video/pc_vga_s3.h"
+#include "video/s3virge.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -34,6 +35,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	void io_isa_map(address_map &map);
+
 private:
 	required_device<s3_vga_device> m_vga;
 	required_device<ibm8514a_device> m_8514;
@@ -58,7 +61,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_WRITE_LINE_MEMBER(linear_config_changed_w);
+	void linear_config_changed_w(int state);
+
+	void io_isa_map(address_map &map);
 
 private:
 	required_device<s3virge_vga_device> m_vga;
@@ -83,7 +88,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_WRITE_LINE_MEMBER(linear_config_changed_w);
+	void linear_config_changed_w(int state);
+
+	void io_isa_map(address_map &map);
 
 private:
 	required_device<s3virgedx_vga_device> m_vga;
@@ -111,7 +118,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_WRITE_LINE_MEMBER(linear_config_changed_w);
+	void linear_config_changed_w(int state);
+
+	void io_isa_map(address_map &map);
 
 private:
 	required_device<s3virgedx_vga_device> m_vga;

@@ -37,10 +37,10 @@ public:
 	auto clock_wr_callback() { return m_write_clock.bind(); }
 	auto data_wr_callback() { return m_write_data.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( power_w );
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
-	DECLARE_WRITE_LINE_MEMBER( busy_w );
-	DECLARE_READ_LINE_MEMBER( data_r );
+	void power_w(int state);
+	void reset_w(int state);
+	void busy_w(int state);
+	int data_r();
 
 protected:
 	// device-level overrides

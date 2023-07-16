@@ -65,7 +65,7 @@ public:
 	void pc_w(u8 data);
 	void pd_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(cntr_w);
+	void cntr_w(int state);
 
 protected:
 	enum
@@ -77,7 +77,6 @@ protected:
 		M6500_1_LC
 	};
 
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

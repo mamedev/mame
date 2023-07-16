@@ -59,7 +59,6 @@
 #include "emu.h"
 #include "sgi_gr1.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_READS   (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL)
@@ -199,8 +198,6 @@ ioport_constructor sgi_gr1_device::device_input_ports() const
 
 void sgi_gr1_device::device_start()
 {
-	m_int_fifo_cb.resolve_safe();
-
 	//save_item(NAME());
 
 	m_reset = true;

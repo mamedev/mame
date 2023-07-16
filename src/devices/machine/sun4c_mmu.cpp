@@ -17,25 +17,25 @@
 DEFINE_DEVICE_TYPE(SUN4_MMU, sun4_mmu_device, "sun4_mmu", "Sun 4 MMU")
 DEFINE_DEVICE_TYPE(SUN4C_MMU, sun4c_mmu_device, "sun4c_mmu", "Sun 4c MMU")
 
-#define LOG_PAGE_MAP        (1U << 0)
-#define LOG_SEGMENT_MAP     (1U << 1)
-#define LOG_CONTEXT         (1U << 2)
-#define LOG_SYSTEM_ENABLE   (1U << 3)
-#define LOG_UART            (1U << 4)
-#define LOG_PARITY          (1U << 5)
-#define LOG_SEGMENT_FLUSH   (1U << 6)
-#define LOG_PAGE_FLUSH      (1U << 7)
-#define LOG_CONTEXT_FLUSH   (1U << 8)
-#define LOG_ALL_FLUSH       (1U << 9)
-#define LOG_CACHE_TAGS      (1U << 10)
-#define LOG_CACHE_DATA      (1U << 11)
-#define LOG_INVALID_PTE     (1U << 12)
-#define LOG_BUSERROR        (1U << 13)
-#define LOG_TYPE0_TIMEOUT   (1U << 14)
-#define LOG_TYPE1_TIMEOUT   (1U << 15)
-#define LOG_UNKNOWN_SPACE   (1U << 16)
-#define LOG_UNKNOWN_SEGMENT (1U << 17)
-#define LOG_WRITE_PROTECT   (1U << 18)
+#define LOG_PAGE_MAP        (1U << 1)
+#define LOG_SEGMENT_MAP     (1U << 2)
+#define LOG_CONTEXT         (1U << 3)
+#define LOG_SYSTEM_ENABLE   (1U << 4)
+#define LOG_UART            (1U << 5)
+#define LOG_PARITY          (1U << 6)
+#define LOG_SEGMENT_FLUSH   (1U << 7)
+#define LOG_PAGE_FLUSH      (1U << 8)
+#define LOG_CONTEXT_FLUSH   (1U << 9)
+#define LOG_ALL_FLUSH       (1U << 10)
+#define LOG_CACHE_TAGS      (1U << 11)
+#define LOG_CACHE_DATA      (1U << 12)
+#define LOG_INVALID_PTE     (1U << 13)
+#define LOG_BUSERROR        (1U << 14)
+#define LOG_TYPE0_TIMEOUT   (1U << 15)
+#define LOG_TYPE1_TIMEOUT   (1U << 16)
+#define LOG_UNKNOWN_SPACE   (1U << 17)
+#define LOG_UNKNOWN_SEGMENT (1U << 18)
+#define LOG_WRITE_PROTECT   (1U << 19)
 #define LOG_MMU             (LOG_PAGE_MAP | LOG_SEGMENT_MAP | LOG_CONTEXT)
 #define LOG_MISC_HW         (LOG_SYSTEM_ENABLE | LOG_UART | LOG_PARITY)
 #define LOG_FLUSHES         (LOG_SEGMENT_FLUSH | LOG_PAGE_FLUSH | LOG_CONTEXT_FLUSH | LOG_ALL_FLUSH)
@@ -54,7 +54,7 @@ sun4_mmu_base_device::sun4_mmu_base_device(const machine_config &mconfig, device
 	, m_rom(*this, finder_base::DUMMY_TAG)
 	, m_scc(*this, finder_base::DUMMY_TAG)
 	, m_host(nullptr)
-	, m_type1_r(*this)
+	, m_type1_r(*this, 0xffffffff)
 	, m_type1_w(*this)
 	, m_rom_ptr(nullptr)
 	, m_ram_ptr(nullptr)
@@ -81,9 +81,6 @@ sun4c_mmu_device::sun4c_mmu_device(const machine_config &mconfig, const char *ta
 
 void sun4_mmu_base_device::device_start()
 {
-	m_type1_r.resolve_safe(0xffffffff);
-	m_type1_w.resolve_safe();
-
 	// allocate timer for system reset
 	m_reset_timer = timer_alloc(FUNC(sun4_mmu_base_device::reset_off_tick), this);
 	m_reset_timer->adjust(attotime::never);

@@ -22,13 +22,12 @@
 #include "emu.h"
 #include "spifi3.h"
 
-#define LOG_GENERAL (1U << 0)
-#define LOG_STATE (1U << 1)
+#define LOG_STATE     (1U << 1)
 #define LOG_INTERRUPT (1U << 2)
-#define LOG_DATA (1U << 3)
-#define LOG_REGISTER (1U << 4)
-#define LOG_CMD (1U << 5)
-#define LOG_AUTO (1U << 6)
+#define LOG_DATA      (1U << 3)
+#define LOG_REGISTER  (1U << 4)
+#define LOG_CMD       (1U << 5)
+#define LOG_AUTO      (1U << 6)
 
 #define SPIFI3_DEBUG (LOG_GENERAL | LOG_REGISTER | LOG_INTERRUPT | LOG_AUTO)
 #define SPIFI3_TRACE (SPIFI3_DEBUG | LOG_STATE | LOG_CMD)
@@ -325,9 +324,6 @@ void spifi3_device::device_start()
 	save_item(STRUCT_MEMBER(m_odd_fifo, tail));
 	save_item(STRUCT_MEMBER(m_odd_fifo, size));
 	save_item(STRUCT_MEMBER(m_odd_fifo, fifo));
-
-	m_irq_handler.resolve_safe();
-	m_drq_handler.resolve_safe();
 
 	bus_id = 0;
 	tm = timer_alloc(FUNC(spifi3_device::tick), this);

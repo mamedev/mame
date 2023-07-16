@@ -468,9 +468,9 @@ void sc61860_device::sc61860_test_special()
 	int t=0;
 	if (m_timer.t512ms) t|=1;
 	if (m_timer.t2ms) t|=2;
-	if (!m_brk.isnull()&&m_brk()) t|=8;
-	if (!m_reset.isnull()&&m_reset()) t|=0x40;
-	if (!m_x.isnull()&&m_x()) t|=0x80;
+	if (!m_brk.isunset()&&m_brk()) t|=8;
+	if (!m_reset.isunset()&&m_reset()) t|=0x40;
+	if (!m_x.isunset()&&m_x()) t|=0x80;
 
 	m_zero=(t&READ_OP())==0;
 }
@@ -748,7 +748,7 @@ void sc61860_device::sc61860_wait_x(int level)
 	int c;
 	m_zero=level;
 
-	if (!m_x.isnull()) {
+	if (!m_x.isunset()) {
 		for (c=READ_RAM(I); c>=0; c--) {
 			uint8_t t = (READ_RAM(m_p)+1)&0x7f;
 			WRITE_RAM(m_p, t);

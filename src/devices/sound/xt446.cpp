@@ -40,7 +40,6 @@ xt446_device::xt446_device(const machine_config &mconfig, const char *tag, devic
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_maincpu(*this, "maincpu")
 	, m_swp30(*this, "swp30")
-	, m_midi_serial(*this, "maincpu:sci1")
 {
 }
 
@@ -64,18 +63,6 @@ void xt446_device::xt446_map(address_map &map)
 	map(0x400000, 0x401fff).m(m_swp30, FUNC(swp30_device::map));
 }
 
-void xt446_device::xt446_iomap(address_map &map)
-{
-	map(h8_device::ADC_0, h8_device::ADC_0).lr16(NAME([]() -> u16 { return 0; }));
-	map(h8_device::ADC_1, h8_device::ADC_1).lr16(NAME([]() -> u16 { return 0; }));
-	map(h8_device::ADC_2, h8_device::ADC_2).lr16(NAME([]() -> u16 { return 0; }));
-	map(h8_device::ADC_1, h8_device::ADC_3).lr16(NAME([]() -> u16 { return 0; }));
-	map(h8_device::ADC_4, h8_device::ADC_4).lr16(NAME([]() -> u16 { return 0; }));
-	map(h8_device::ADC_5, h8_device::ADC_5).lr16(NAME([]() -> u16 { return 0; }));
-	map(h8_device::ADC_6, h8_device::ADC_6).lr16(NAME([]() -> u16 { return 0x200; }));
-	map(h8_device::ADC_7, h8_device::ADC_7).lr16(NAME([]() -> u16 { return 0x200; }));
-}
-
 void xt446_device::swp30_map(address_map &map)
 {
 	map(0x000000*4, 0x200000*4-1).rom().region("swp30",         0).mirror(4*0x200000);
@@ -87,7 +74,14 @@ void xt446_device::device_add_mconfig(machine_config &config)
 {
 	H8S2655(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &xt446_device::xt446_map);
-	m_maincpu->set_addrmap(AS_IO, &xt446_device::xt446_iomap);
+	m_maincpu->read_adc<0>().set_constant(0);
+	m_maincpu->read_adc<1>().set_constant(0);
+	m_maincpu->read_adc<2>().set_constant(0);
+	m_maincpu->read_adc<3>().set_constant(0);
+	m_maincpu->read_adc<4>().set_constant(0);
+	m_maincpu->read_adc<5>().set_constant(0);
+	m_maincpu->read_adc<6>().set_constant(0x200);
+	m_maincpu->read_adc<7>().set_constant(0x200);
 
 	SWP30(config, m_swp30);
 	m_swp30->set_addrmap(0, &xt446_device::swp30_map);

@@ -56,6 +56,7 @@
 
 #include "emu.h"
 #include "hp9895.h"
+#include "formats/fs_hp98x5.h"
 #include "formats/hpi_dsk.h"
 
 #define LOG_LEVEL0      (0x1U << 1)
@@ -415,42 +416,42 @@ void hp9895_device::ieee488_ren(int state)
 	m_phi->ren_w(state);
 }
 
-WRITE_LINE_MEMBER(hp9895_device::phi_eoi_w)
+void hp9895_device::phi_eoi_w(int state)
 {
 	m_bus->eoi_w(this , state);
 }
 
-WRITE_LINE_MEMBER(hp9895_device::phi_dav_w)
+void hp9895_device::phi_dav_w(int state)
 {
 	m_bus->dav_w(this , state);
 }
 
-WRITE_LINE_MEMBER(hp9895_device::phi_nrfd_w)
+void hp9895_device::phi_nrfd_w(int state)
 {
 	m_bus->nrfd_w(this , state);
 }
 
-WRITE_LINE_MEMBER(hp9895_device::phi_ndac_w)
+void hp9895_device::phi_ndac_w(int state)
 {
 	m_bus->ndac_w(this , state);
 }
 
-WRITE_LINE_MEMBER(hp9895_device::phi_ifc_w)
+void hp9895_device::phi_ifc_w(int state)
 {
 	m_bus->ifc_w(this , state);
 }
 
-WRITE_LINE_MEMBER(hp9895_device::phi_srq_w)
+void hp9895_device::phi_srq_w(int state)
 {
 	m_bus->srq_w(this , state);
 }
 
-WRITE_LINE_MEMBER(hp9895_device::phi_atn_w)
+void hp9895_device::phi_atn_w(int state)
 {
 	m_bus->atn_w(this , state);
 }
 
-WRITE_LINE_MEMBER(hp9895_device::phi_ren_w)
+void hp9895_device::phi_ren_w(int state)
 {
 	m_bus->ren_w(this , state);
 }
@@ -465,7 +466,7 @@ void hp9895_device::phi_dio_w(uint8_t data)
 	m_bus->dio_w(this , data);
 }
 
-WRITE_LINE_MEMBER(hp9895_device::phi_int_w)
+void hp9895_device::phi_int_w(int state)
 {
 	m_cpu->set_input_line(INPUT_LINE_NMI , state);
 	if (state) {
@@ -861,6 +862,8 @@ static void hp9895_floppies(device_slot_interface &device)
 static void hp9895_floppy_formats(format_registration &fr)
 {
 	fr.add(FLOPPY_HPI_FORMAT);
+	fr.add(fs::HP9825);
+	fr.add(fs::HP9845);
 };
 
 const tiny_rom_entry *hp9895_device::device_rom_region() const

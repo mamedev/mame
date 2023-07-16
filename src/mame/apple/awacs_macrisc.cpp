@@ -17,8 +17,7 @@
 #include "emu.h"
 #include "awacs_macrisc.h"
 
-#define LOG_GENERAL (1U << 0)
-#define LOG_REGISTERS (1U << 0)
+#define LOG_REGISTERS (1U << 1)
 
 #define VERBOSE (0)
 #include "logmacro.h"
@@ -40,7 +39,7 @@ DEFINE_DEVICE_TYPE(SCREAMER, screamer_device, "screamer", "Screamer audio I/O")
 awacs_macrisc_device::awacs_macrisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_output_cb(*this)
+	, m_output_cb(*this, 0)
 	, m_input_cb(*this)
 	, m_stream(nullptr)
 {
@@ -64,9 +63,6 @@ void awacs_macrisc_device::device_start()
 {
 	// create the stream
 	m_stream = stream_alloc(0, 2, clock()/1024, STREAM_SYNCHRONOUS);
-
-	m_output_cb.resolve_safe(0);
-	m_input_cb.resolve_safe();
 
 	save_item(NAME(m_phase));
 	save_item(NAME(m_active));
@@ -149,7 +145,7 @@ void awacs_macrisc_device::write_macrisc(offs_t offset, uint32_t data)
 	{
 		case 0: // Audio Control
 			m_stream->set_sample_rate(clock() / rates[(data >> 8) & 7]);
-			LOGMASKED(LOG_GENERAL, "%s: sample rate to %d Hz\n", tag(), clock() / rates[(data >> 8) & 7]);
+			LOG("%s: sample rate to %d Hz\n", tag(), clock() / rates[(data >> 8) & 7]);
 			break;
 
 		case 4: // Audio CODEC Control
@@ -206,5 +202,5 @@ void screamer_device::write_macrisc(offs_t offset, uint32_t data)
 	{
 		m_active &= ~ACTIVE_OUT;
 	}
-	LOGMASKED(LOG_GENERAL, "%s: Playback %s reg 6 %x)\n", tag(), !BIT(m_registers[6], 1) ? "on" : "off", m_registers[6]);
+	LOG("%s: Playback %s reg 6 %x)\n", tag(), !BIT(m_registers[6], 1) ? "on" : "off", m_registers[6]);
 }

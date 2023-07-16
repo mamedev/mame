@@ -1993,6 +1993,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"pang3b4",     CPS_B_21_DEF, mapper_pang3b4 },
 	{"pang3b5",     CPS_B_21_DEF, mapper_CP1B1F_boot },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
 	{"ganbare",     CPS_B_21_DEF, mapper_GBPR2 },
+	{"pmonster",    CPS_B_21_DEF, mapper_GBPR2 },   // wrong, this set uses GBP63B, dumped but not reversed yet
 	{"gulunpa",     CPS_B_21_DEF, mapper_gulunpa }, // wrong
 
 	/* CPS Changer */
@@ -3112,7 +3113,7 @@ uint32_t cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-WRITE_LINE_MEMBER(cps_state::screen_vblank_cps1)
+void cps_state::screen_vblank_cps1(int state)
 {
 	// rising edge
 	if (state)

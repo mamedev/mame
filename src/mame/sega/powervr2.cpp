@@ -3359,7 +3359,8 @@ void powervr2_device::pvr_accumulationbuffer_to_framebuffer(address_space &space
 		break;
 
 		case 0x02:
-			printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x (4444 ARGB)\n",x,y,packmode);
+			// TODO: demofist character select
+			//printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x (4444 ARGB)\n",x,y,packmode);
 			break;
 
 		case 0x03: // 1555 ARGB 16 bit
@@ -3911,8 +3912,6 @@ powervr2_device::powervr2_device(const machine_config &mconfig, const char *tag,
 
 void powervr2_device::device_start()
 {
-	irq_cb.resolve_safe();
-
 	grab = std::make_unique<receiveddata[]>(NUM_BUFFERS);
 
 	pvr_build_parameterconfig();

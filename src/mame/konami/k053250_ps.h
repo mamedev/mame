@@ -38,8 +38,8 @@ public:
 	uint16_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t rom_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
-	DECLARE_READ_LINE_MEMBER(dmairq_r);
+	void vblank_w(int state);
+	int dmairq_r();
 
 	void draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int colorbase, int flags, bitmap_ind8 &priority_bitmap, int priority );
 

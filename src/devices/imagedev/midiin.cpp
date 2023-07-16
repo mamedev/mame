@@ -77,7 +77,6 @@ ioport_constructor midiin_device::device_input_ports() const
 
 void midiin_device::device_start()
 {
-	m_input_cb.resolve_safe();
 	m_timer = timer_alloc(FUNC(midiin_device::midi_update), this);
 	m_midi.reset();
 	m_timer->enable(false);
@@ -174,13 +173,13 @@ std::pair<std::error_condition, std::string> midiin_device::call_load()
 		// if the parsing succeeds, schedule the start to happen at least
 		// 10 seconds after starting to allow the keyboards to initialize
 		// TODO: this should perhaps be a driver-configurable parameter?
-		if (m_sequence.parse(image_core_file(), length()))
+		err = m_sequence.parse(image_core_file(), length());
+		if (!err)
 		{
 			m_sequence_start = std::max(machine().time(), attotime(10, 0));
 			m_timer->adjust(attotime::zero);
-			return std::make_pair(std::error_condition(), std::string());
 		}
-		return std::make_pair(image_error::UNSPECIFIED, std::string());
+		return std::make_pair(err, std::string());
 	}
 	else
 	{

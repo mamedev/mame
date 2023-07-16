@@ -7,12 +7,14 @@
 TODO:
 - Checks CPUID pretty soon that is a Geode processor at PC=f604d, jumps to lalaland
   on next CPUID with EAX=1 if ecx is equal to 0x540/0x551/0x552 ...
+- "NV440" listed below doesn't make sense, NV[S]440 is a nVidia Quadro card.
+  More likely it's either a GeForce MX 440 (NV17) or a GeForce 6200/6500 (NV43/NV44)
 
  Speed Driver
  -------------
 
  4 boards
-    1x NV440 gfx card
+    1x NV440 gfx card (?)
     1x sound card
     1x CF2IDE card
     1x proteection card with a IGS027A (ARM7 with internal ROM)
@@ -54,8 +56,8 @@ class speeddrv_state : public driver_device
 {
 public:
 	speeddrv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void speeddrv(machine_config &config);

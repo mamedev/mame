@@ -28,6 +28,7 @@
 #include "h8s2000.h"
 #include "h8_intc.h"
 #include "h8_adc.h"
+#include "h8_dma.h"
 #include "h8_port.h"
 #include "h8_timer8.h"
 #include "h8_timer16.h"
@@ -38,41 +39,67 @@ class h8s2357_device : public h8s2000_device {
 public:
 	h8s2357_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto read_port1()  { return m_read_port [PORT_1].bind(); }
+	auto write_port1() { return m_write_port[PORT_1].bind(); }
+	auto read_port2()  { return m_read_port [PORT_2].bind(); }
+	auto write_port2() { return m_write_port[PORT_2].bind(); }
+	auto read_port3()  { return m_read_port [PORT_3].bind(); }
+	auto write_port3() { return m_write_port[PORT_3].bind(); }
+	auto read_port4()  { return m_read_port [PORT_4].bind(); }
+	auto read_port5()  { return m_read_port [PORT_5].bind(); }
+	auto write_port5() { return m_write_port[PORT_5].bind(); }
+	auto read_port6()  { return m_read_port [PORT_6].bind(); }
+	auto write_port6() { return m_write_port[PORT_6].bind(); }
+	auto read_porta()  { return m_read_port [PORT_A].bind(); }
+	auto write_porta() { return m_write_port[PORT_A].bind(); }
+	auto read_portb()  { return m_read_port [PORT_B].bind(); }
+	auto write_portb() { return m_write_port[PORT_B].bind(); }
+	auto read_portc()  { return m_read_port [PORT_C].bind(); }
+	auto write_portc() { return m_write_port[PORT_C].bind(); }
+	auto read_portd()  { return m_read_port [PORT_D].bind(); }
+	auto write_portd() { return m_write_port[PORT_D].bind(); }
+	auto read_porte()  { return m_read_port [PORT_E].bind(); }
+	auto write_porte() { return m_write_port[PORT_E].bind(); }
+	auto read_portf()  { return m_read_port [PORT_F].bind(); }
+	auto write_portf() { return m_write_port[PORT_F].bind(); }
+	auto read_portg()  { return m_read_port [PORT_G].bind(); }
+	auto write_portg() { return m_write_port[PORT_G].bind(); }
+
 	uint8_t syscr_r();
 	void syscr_w(uint8_t data);
 
 protected:
-	required_device<h8s_intc_device> intc;
-	required_device<h8_adc_device> adc;
-	required_device<h8_port_device> port1;
-	required_device<h8_port_device> port2;
-	required_device<h8_port_device> port3;
-	required_device<h8_port_device> port4;
-	required_device<h8_port_device> port5;
-	required_device<h8_port_device> port6;
-	required_device<h8_port_device> porta;
-	required_device<h8_port_device> portb;
-	required_device<h8_port_device> portc;
-	required_device<h8_port_device> portd;
-	required_device<h8_port_device> porte;
-	required_device<h8_port_device> portf;
-	required_device<h8_port_device> portg;
-	required_device<h8h_timer8_channel_device> timer8_0;
-	required_device<h8h_timer8_channel_device> timer8_1;
-	required_device<h8_timer16_device> timer16;
-	required_device<h8s_timer16_channel_device> timer16_0;
-	required_device<h8s_timer16_channel_device> timer16_1;
-	required_device<h8s_timer16_channel_device> timer16_2;
-	required_device<h8s_timer16_channel_device> timer16_3;
-	required_device<h8s_timer16_channel_device> timer16_4;
-	required_device<h8s_timer16_channel_device> timer16_5;
-	required_device<h8_sci_device> sci0;
-	required_device<h8_sci_device> sci1;
-	required_device<h8_sci_device> sci2;
-	required_device<h8_watchdog_device> watchdog;
+	required_device<h8s_intc_device> m_intc;
+	required_device<h8_adc_device> m_adc;
+	required_device<h8s_dma_device> m_dma;
+	required_device<h8s_dma_channel_device> m_dma0;
+	required_device<h8s_dma_channel_device> m_dma1;
+	required_device<h8_port_device> m_port1;
+	required_device<h8_port_device> m_port2;
+	required_device<h8_port_device> m_port3;
+	required_device<h8_port_device> m_port4;
+	required_device<h8_port_device> m_port5;
+	required_device<h8_port_device> m_port6;
+	required_device<h8_port_device> m_porta;
+	required_device<h8_port_device> m_portb;
+	required_device<h8_port_device> m_portc;
+	required_device<h8_port_device> m_portd;
+	required_device<h8_port_device> m_porte;
+	required_device<h8_port_device> m_portf;
+	required_device<h8_port_device> m_portg;
+	required_device<h8h_timer8_channel_device> m_timer8_0;
+	required_device<h8h_timer8_channel_device> m_timer8_1;
+	required_device<h8_timer16_device> m_timer16;
+	required_device<h8s_timer16_channel_device> m_timer16_0;
+	required_device<h8s_timer16_channel_device> m_timer16_1;
+	required_device<h8s_timer16_channel_device> m_timer16_2;
+	required_device<h8s_timer16_channel_device> m_timer16_3;
+	required_device<h8s_timer16_channel_device> m_timer16_4;
+	required_device<h8s_timer16_channel_device> m_timer16_5;
+	required_device<h8_watchdog_device> m_watchdog;
 
-	uint32_t ram_start;
-	unsigned char syscr;
+	uint32_t m_ram_start;
+	unsigned char m_syscr;
 
 	h8s2357_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start);
 

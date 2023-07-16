@@ -138,7 +138,7 @@ sparcv8_device::sparcv8_device(const machine_config &mconfig, device_type type, 
 
 mb86930_device::mb86930_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sparcv8_device(mconfig, MB86930, tag, owner, clock)
-	, m_cs_r(*this)
+	, m_cs_r(*this, 0)
 	, m_cs_w(*this)
 {
 	m_asi_config[0x00] = address_space_config("debugger",       ENDIANNESS_BIG, 32, 32);
@@ -647,9 +647,6 @@ void mb86930_device::device_start()
 
 	std::fill_n(&m_arsr[0], 6, 0);
 	std::fill_n(&m_amr[0], 6, 0);
-
-	m_cs_r.resolve_all_safe(0);
-	m_cs_w.resolve_all_safe();
 }
 
 void mb86930_device::device_reset()

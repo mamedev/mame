@@ -10,7 +10,6 @@
 #include "emu.h"
 #include "ncr53c90.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_STATE   (1U << 1)
 #define LOG_FIFO    (1U << 2)
 #define LOG_COMMAND (1U << 3)
@@ -239,9 +238,6 @@ void ncr53c90_device::device_start()
 	save_item(NAME(irq));
 	save_item(NAME(drq));
 	save_item(NAME(test_mode));
-
-	m_irq_handler.resolve_safe();
-	m_drq_handler.resolve_safe();
 
 	config = 0;
 	bus_id = 0;
@@ -1179,16 +1175,11 @@ void ncr53c90_device::clock_w(uint8_t data)
 void ncr53c90_device::dma_set(int dir)
 {
 	dma_dir = dir;
-
-	// account for data already in the fifo
-	if (dir == DMA_OUT && fifo_pos)
-	{
-		decrement_tcounter(fifo_pos);
-	}
 }
 
 void ncr53c90_device::dma_w(uint8_t val)
 {
+	LOGMASKED(LOG_FIFO, "dma_w 0x%02x fifo_pos %d tcounter %d (%s)\n", val, fifo_pos, tcounter, machine().describe_context());
 	fifo_push(val);
 	decrement_tcounter();
 	check_drq();
@@ -1364,6 +1355,8 @@ void ncr53c94_device::dma16_w(u16 data)
 		dma_w(data & 0x00ff);
 		return;
 	}
+
+	LOGMASKED(LOG_FIFO, "dma16_w 0x%04x fifo_pos %d tcounter %d (%s)\n", data, fifo_pos, tcounter, machine().describe_context());
 
 	// push two bytes into fifo
 	fifo[fifo_pos++] = data;

@@ -33,16 +33,16 @@ DEFINE_DEVICE_TYPE(RIPPLE_COUNTER, ripple_counter_device, "ripple_counter", "Gen
 //  ripple_counter_device - constructor
 //-------------------------------------------------
 
-ripple_counter_device::ripple_counter_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, RIPPLE_COUNTER, tag, owner, clock),
-		device_rom_interface(mconfig, *this),
-		m_count_out_cb(*this),
-		m_rom_out_cb(*this),
-		m_count_timer(nullptr),
-		m_count_mask(0),
-		m_count(1),
-		m_clk(false),
-		m_reset(false)
+ripple_counter_device::ripple_counter_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, RIPPLE_COUNTER, tag, owner, clock),
+	device_rom_interface(mconfig, *this),
+	m_count_out_cb(*this),
+	m_rom_out_cb(*this),
+	m_count_timer(nullptr),
+	m_count_mask(0),
+	m_count(1),
+	m_clk(false),
+	m_reset(false)
 {
 }
 
@@ -54,7 +54,7 @@ ripple_counter_device::ripple_counter_device(const machine_config &mconfig, cons
 
 device_memory_interface::space_config_vector ripple_counter_device::memory_space_config() const
 {
-	if (m_rom_out_cb.isnull())
+	if (m_rom_out_cb.isunset())
 		return space_config_vector();
 	else
 		return device_rom_interface::memory_space_config();
@@ -70,20 +70,6 @@ void ripple_counter_device::device_validity_check(validity_checker &valid) const
 {
 	if (m_count_mask == 0)
 		osd_printf_error("No counting stages configured\n");
-}
-
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void ripple_counter_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_count_out_cb.resolve_safe();
-	m_rom_out_cb.resolve();
 }
 
 
@@ -135,7 +121,7 @@ void ripple_counter_device::set_count(u32 count)
 {
 	m_count = count;
 	m_count_out_cb(count);
-	if (!m_rom_out_cb.isnull())
+	if (!m_rom_out_cb.isunset())
 		m_rom_out_cb(read_byte(count));
 }
 
@@ -144,7 +130,7 @@ void ripple_counter_device::set_count(u32 count)
 //  clock_w - handle falling-edge clock input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(ripple_counter_device::clock_w)
+void ripple_counter_device::clock_w(int state)
 {
 	if (m_clk != bool(state))
 	{
@@ -159,7 +145,7 @@ WRITE_LINE_MEMBER(ripple_counter_device::clock_w)
 //  reset_w - handle active-high reset input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(ripple_counter_device::reset_w)
+void ripple_counter_device::reset_w(int state)
 {
 	if (m_reset != bool(state))
 	{

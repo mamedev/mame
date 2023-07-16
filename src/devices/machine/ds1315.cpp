@@ -32,9 +32,9 @@
 
 DEFINE_DEVICE_TYPE(DS1315, ds1315_device, "ds1315", "Dallas DS1315 Phantom Time Chip")
 
-ds1315_device::ds1315_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DS1315, tag, owner, clock),
-	m_backing_read(*this),
+ds1315_device::ds1315_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, DS1315, tag, owner, clock),
+	m_backing_read(*this, 0xff),
 	m_mode(),
 	m_count(0)
 {
@@ -46,8 +46,6 @@ ds1315_device::ds1315_device(const machine_config &mconfig, const char *tag, dev
 
 void ds1315_device::device_start()
 {
-	m_backing_read.resolve_safe(0xff);
-
 	save_item(NAME(m_count));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_raw_data));

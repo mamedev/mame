@@ -521,6 +521,7 @@ const i386_device::X86_OPCODE i386_device::s_x86_opcode_table[] =
 	{ 0x7F,     OP_3BYTEF3|OP_SSE,          &i386_device::sse_movdqu_rm128_r128,       &i386_device::sse_movdqu_rm128_r128,   false},
 	{ 0xAE,     OP_3BYTE66|OP_SSE,          &i386_device::i386_invalid,                &i386_device::i386_invalid,            false},
 	{ 0xB8,     OP_3BYTEF3|OP_PENTIUM,      &i386_device::pentium_popcnt_r16_rm16,     &i386_device::pentium_popcnt_r32_rm32, false},
+	{ 0xBC,     OP_3BYTEF3|OP_I386,         &i386_device::i386_bsf_r16_rm16,           &i386_device::i386_bsf_r32_rm32,       false},
 	{ 0xBC,     OP_3BYTEF3|OP_PENTIUM,      &i386_device::pentium_tzcnt_r16_rm16,      &i386_device::pentium_tzcnt_r32_rm32,  false},
 	{ 0xC2,     OP_3BYTEF3|OP_SSE,          &i386_device::sse_cmpss_r128_r128m32_i8,   &i386_device::sse_cmpss_r128_r128m32_i8,false},
 	{ 0xC7,     OP_3BYTEF2|OP_SSE,          &i386_device::i386_invalid,                &i386_device::i386_invalid,            false},

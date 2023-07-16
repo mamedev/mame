@@ -170,8 +170,6 @@ void gdrom_device::device_reset()
 		GDROM_Cmd11_Reply[i] = GDROM_Def_Cmd11_Reply[i];
 
 	atapi_cdrom_device::device_reset();
-
-	m_cdda->set_cdrom(m_image);
 }
 
 // scsicd_exec_command
@@ -247,7 +245,7 @@ void gdrom_device::ExecCommand()
 
 			// TODO: it's supposed to write a single and a double density TOC request
 			//if (command[1])
-			//	throw emu_fatalerror("Double density unsupported");
+			//  throw emu_fatalerror("Double density unsupported");
 			u16 allocation_length = SCSILengthFromUINT16( &command[ 3 ] );
 			LOGCMD("READ_TOC 14h %02x %02x %d\n",
 				command[1], command[2], allocation_length
@@ -583,7 +581,7 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 
 						tstart = m_image->get_track_start(i - 1) + 150;
 						//if ((command[1]&2)>>1)
-						//	tstart = cdrom_file::lba_to_msf(tstart);
+						//  tstart = cdrom_file::lba_to_msf(tstart);
 						data[dptr++] = (tstart>>16) & 0xff;
 						data[dptr++] = (tstart>>8) & 0xff;
 						data[dptr++] = (tstart & 0xff);
@@ -601,7 +599,7 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 					data[dptr++] = 0;
 					const u32 tend = m_image->get_track_start(0xaa) + 150;
 					//if ((command[1]&2)>>1)
-					//	tstart = cdrom_file::lba_to_msf(tstart);
+					//  tstart = cdrom_file::lba_to_msf(tstart);
 					data[dptr++] = m_image->get_adr_control(0xaa) | 1;
 					data[dptr++] = (tend>>16) & 0xff;
 					data[dptr++] = (tend>>8) & 0xff;
@@ -865,11 +863,11 @@ void gdrom_device::signature()
 //bool gdrom_device::set_features()
 //{
 	// TODO: DSC, likely tested by Check-GD programs
-//	m_status |= IDE_STATUS_DSC;
-//	return atapi_cdrom_device::set_features();
+//  m_status |= IDE_STATUS_DSC;
+//  return atapi_cdrom_device::set_features();
 //}
 
-WRITE_LINE_MEMBER(gdrom_device::cdda_end_mark_cb)
+void gdrom_device::cdda_end_mark_cb(int state)
 {
 	if (state != ASSERT_LINE)
 		return;

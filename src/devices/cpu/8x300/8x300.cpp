@@ -184,16 +184,6 @@ uint8_t n8x305_cpu_device::get_reg(uint8_t reg)
 	}
 }
 
-void n8x300_cpu_device::device_resolve_objects()
-{
-	m_sc_callback.resolve_safe();
-	m_wc_callback.resolve_safe();
-	m_lb_callback.resolve_safe();
-	m_rb_callback.resolve_safe();
-	m_mclk_callback.resolve_safe();
-	m_iv_callback.resolve_safe();
-}
-
 void n8x300_cpu_device::device_start()
 {
 	space(AS_PROGRAM).cache(m_cache);

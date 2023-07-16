@@ -89,7 +89,7 @@ private:
 	emu_timer *                 m_deferred_reg_write;
 	emu_timer *                 m_deferred_data_write;
 
-	DECLARE_READ_LINE_MEMBER( tms_write_pending_r );
+	int tms_write_pending_r();
 };
 
 

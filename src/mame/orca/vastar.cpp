@@ -153,7 +153,7 @@ protected:
 
 	uint8_t m_nmi_mask = 0;
 
-	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
+	void nmi_mask_w(int state);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
 	void cpu2_map(address_map &map);
@@ -205,7 +205,7 @@ void vastar_state::machine_reset()
 {
 }
 
-WRITE_LINE_MEMBER(vastar_common_state::nmi_mask_w)
+void vastar_common_state::nmi_mask_w(int state)
 {
 	m_nmi_mask = state;
 }

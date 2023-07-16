@@ -216,15 +216,6 @@ void ps2_fdc_device::set_mode(mode_t _mode)
 	mode = _mode;
 }
 
-void upd765_family_device::device_resolve_objects()
-{
-	intrq_cb.resolve_safe();
-	drq_cb.resolve_safe();
-	hdl_cb.resolve_safe();
-	idx_cb.resolve_safe();
-	us_cb.resolve_safe();
-}
-
 void upd765_family_device::device_start()
 {
 	save_item(NAME(selected_drive));
@@ -357,7 +348,7 @@ bool upd765_family_device::get_ready(int fid)
 	return !external_ready;
 }
 
-WRITE_LINE_MEMBER(upd765_family_device::reset_w)
+void upd765_family_device::reset_w(int state)
 {
 	// This implementation is not valid for devices with DOR and possibly other extra registers.
 	// The working assumption is that no need to manipulate the RESET line directly when software can use DOR instead.
@@ -3200,19 +3191,13 @@ uint8_t wd37c65c_device::get_st3(floppy_info &fi)
 
 mcs3201_device::mcs3201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	upd765_family_device(mconfig, MCS3201, tag, owner, clock),
-	m_input_handler(*this)
+	m_input_handler(*this, 0)
 {
 	has_dor = true;
 	ready_polled = false;
 	ready_connected = false;
 	select_connected = true;
 	select_multiplexed = false;
-}
-
-void mcs3201_device::device_start()
-{
-	upd765_family_device::device_start();
-	m_input_handler.resolve_safe(0);
 }
 
 uint8_t mcs3201_device::input_r()
@@ -3315,15 +3300,9 @@ void upd72069_device::auxcmd_w(uint8_t data)
 
 hd63266f_device::hd63266f_device(const machine_config& mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: upd765_family_device(mconfig, HD63266F, tag, owner, clock)
-	, inp_cb(*this)
+	, inp_cb(*this, 0)
 {
 	has_dor = false;
-}
-
-void hd63266f_device::device_start()
-{
-	upd765_family_device::device_start();
-	inp_cb.resolve();
 }
 
 void hd63266f_device::map(address_map &map)
@@ -3385,7 +3364,7 @@ void hd63266f_device::execute_command(int cmd)
 		break;
 	case C_SENSE_DRIVE_STATUS:
 		upd765_family_device::execute_command(cmd);
-		if(inp_cb)
+		if(!inp_cb.isunset())
 			result[0] = (result[0] & ~ST3_TS) | (inp_cb() ? 0 : 8);
 		break;
 	default:

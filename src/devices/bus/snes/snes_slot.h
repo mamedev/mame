@@ -143,7 +143,7 @@ public:
 protected:
 	device_sns_cart_interface(const machine_config &mconfig, device_t &device);
 
-	DECLARE_WRITE_LINE_MEMBER(write_irq);
+	void write_irq(int state);
 	uint8_t read_open_bus();
 	int scanlines_r();
 	offs_t address_r();
@@ -212,7 +212,7 @@ public:
 	uint8_t chip_read(offs_t offset);
 	void chip_write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(write_irq) { m_irq_callback(state); }
+	void write_irq(int state) { m_irq_callback(state); }
 	uint8_t read_open_bus() { return m_open_bus_callback(); }
 	int scanlines_r() { return m_scanlines; }
 	offs_t address_r() { return m_address; }

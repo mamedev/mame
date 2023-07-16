@@ -29,7 +29,6 @@
 #include "spi_sdcard.h"
 #include "imagedev/harddriv.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_COMMAND (1U << 1)
 #define LOG_SPI     (1U << 2)
 
@@ -73,7 +72,6 @@ ALLOW_SAVE_TYPE(spi_sdcard_device::sd_type);
 
 void spi_sdcard_device::device_start()
 {
-	write_miso.resolve_safe();
 	save_item(NAME(m_state));
 	save_item(NAME(m_in_latch));
 	save_item(NAME(m_out_latch));
@@ -161,7 +159,7 @@ void spi_sdcard_device::latch_in()
 			m_data[m_write_ptr++] = m_in_latch;
 			if (m_write_ptr == (m_blksize + 2))
 			{
-				LOGMASKED(LOG_GENERAL, "writing LBA %x, data %02x %02x %02x %02x\n", m_blknext, m_data[0], m_data[1], m_data[2], m_data[3]);
+				LOG("writing LBA %x, data %02x %02x %02x %02x\n", m_blknext, m_data[0], m_data[1], m_data[2], m_data[3]);
 				if (m_image->write(m_blknext, &m_data[0]))
 				{
 					m_data[0] = DATA_RESPONSE_OK;
@@ -334,7 +332,7 @@ void spi_sdcard_device::do_command()
 				{
 					blk /= m_blksize;
 				}
-				LOGMASKED(LOG_GENERAL, "reading LBA %x\n", blk);
+				LOG("reading LBA %x\n", blk);
 				m_image->read(blk, &m_data[3]);
 				{
 					util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], m_blksize);

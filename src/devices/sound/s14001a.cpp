@@ -196,13 +196,13 @@ uint8_t CalculateOutput(bool bVoiced, bool bXSilence, uint8_t uPPQtr, bool bPPQS
 // device definition
 DEFINE_DEVICE_TYPE(S14001A, s14001a_device, "s14001a", "SSi TSI S14001A")
 
-s14001a_device::s14001a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, S14001A, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_SpeechRom(*this, DEVICE_SELF),
-		m_stream(nullptr),
-		m_bsy_handler(*this),
-		m_ext_read_handler(*this)
+s14001a_device::s14001a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, S14001A, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_SpeechRom(*this, DEVICE_SELF),
+	m_stream(nullptr),
+	m_bsy_handler(*this),
+	m_ext_read_handler(*this, 0)
 {
 }
 
@@ -215,10 +215,6 @@ ALLOW_SAVE_TYPE(s14001a_device::states); // allow save_item on a non-fundamental
 void s14001a_device::device_start()
 {
 	m_stream = stream_alloc(0, 1, clock() ? clock() : machine().sample_rate());
-
-	// resolve callbacks
-	m_ext_read_handler.resolve();
-	m_bsy_handler.resolve();
 
 	// zero-fill
 	m_bPhase1 = false;
@@ -361,7 +357,7 @@ void s14001a_device::set_clock(uint32_t clock)
 uint8_t s14001a_device::readmem(uint16_t offset, bool phase)
 {
 	offset &= 0xfff; // 11-bit internal
-	return ((m_ext_read_handler.isnull()) ? m_SpeechRom[offset & (m_SpeechRom.bytes() - 1)] : m_ext_read_handler(offset));
+	return (m_ext_read_handler.isunset()) ? m_SpeechRom[offset & (m_SpeechRom.bytes() - 1)] : m_ext_read_handler(offset);
 }
 
 bool s14001a_device::Clock()
@@ -413,7 +409,7 @@ bool s14001a_device::Clock()
 		m_uOutputP1 = 7;
 		if (m_bStart) m_uStateP1 = states::WORDWAIT;
 
-		if (m_bBusyP1 && !m_bsy_handler.isnull())
+		if (m_bBusyP1)
 			m_bsy_handler(0);
 		m_bBusyP1 = false;
 		break;
@@ -428,7 +424,7 @@ bool s14001a_device::Clock()
 		if (m_bStart) m_uStateP1 = states::WORDWAIT;
 		else          m_uStateP1 = states::CWARMSB;
 
-		if (!m_bBusyP1 && !m_bsy_handler.isnull())
+		if (!m_bBusyP1)
 			m_bsy_handler(1);
 		m_bBusyP1 = true;
 		break;

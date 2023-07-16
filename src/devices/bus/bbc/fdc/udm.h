@@ -44,9 +44,9 @@ protected:
 private:
 	static void floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE_LINE_MEMBER(intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(drq_w);
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
+	void intrq_w(int state);
+	void drq_w(int state);
+	void motor_w(int state);
 
 	required_device<wd2793_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;

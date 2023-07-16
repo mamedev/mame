@@ -155,21 +155,19 @@ void am53cf96_device::device_start()
 {
 	legacy_scsi_host_adapter::device_start();
 
-	m_irq_handler.resolve_safe();
-
 	memset(scsi_regs, 0, sizeof(scsi_regs));
 
 	fptr = 0;
 	xfer_state = 0;
 	last_id = -1;
 
-	save_item( NAME( scsi_regs ) );
-	save_item( NAME( fifo ) );
-	save_item( NAME( fptr ) );
-	save_item( NAME( xfer_state ) );
-	save_item( NAME( last_id ) );
+	save_item(NAME(scsi_regs));
+	save_item(NAME(fifo));
+	save_item(NAME(fptr));
+	save_item(NAME(xfer_state));
+	save_item(NAME(last_id));
 
-	m_transfer_timer = timer_alloc( FUNC( am53cf96_device::irq_timer_tick ), this );
+	m_transfer_timer = timer_alloc(FUNC(am53cf96_device::irq_timer_tick), this);
 }
 
 // retrieve data from the SCSI controller

@@ -83,7 +83,7 @@ void cms_ieee_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER(cms_ieee_device::bus_irq_w)
+void cms_ieee_device::bus_irq_w(int state)
 {
 	m_bus->irq_w(state);
 }

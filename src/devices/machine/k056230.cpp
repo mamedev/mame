@@ -42,7 +42,6 @@ k056230_device::k056230_device(const machine_config &mconfig, const char *tag, d
 
 void k056230_device::device_start()
 {
-	m_irq_cb.resolve_safe();
 	m_irq_state = CLEAR_LINE;
 
 	save_item(NAME(m_irq_state));

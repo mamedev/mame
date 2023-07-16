@@ -142,19 +142,25 @@
 	NSRect const    available = [[NSScreen mainScreen] visibleFrame];
 	NSSize const    regCurrent = [regScroll frame].size;
 	NSSize const    regSize = [NSScrollView frameSizeForContentSize:[regView maximumFrameSize]
-											  hasHorizontalScroller:YES
-												hasVerticalScroller:YES
-														 borderType:[regScroll borderType]];
+											horizontalScrollerClass:[NSScroller class]
+											  verticalScrollerClass:[NSScroller class]
+														 borderType:[regScroll borderType]
+														controlSize:NSControlSizeRegular
+													  scrollerStyle:NSScrollerStyleOverlay];
 	NSSize const    dasmCurrent = [dasmScroll frame].size;
 	NSSize const    dasmSize = [NSScrollView frameSizeForContentSize:[dasmView maximumFrameSize]
-											  hasHorizontalScroller:YES
-												hasVerticalScroller:YES
-														 borderType:[dasmScroll borderType]];
+											 horizontalScrollerClass:[NSScroller class]
+											   verticalScrollerClass:[NSScroller class]
+														  borderType:[dasmScroll borderType]
+														 controlSize:NSControlSizeRegular
+													   scrollerStyle:NSScrollerStyleOverlay];
 	NSSize const    consoleCurrent = [consoleContainer frame].size;
 	NSSize          consoleSize = [NSScrollView frameSizeForContentSize:[consoleView maximumFrameSize]
-												  hasHorizontalScroller:YES
-													hasVerticalScroller:YES
-															 borderType:[consoleScroll borderType]];
+												horizontalScrollerClass:[NSScroller class]
+												  verticalScrollerClass:[NSScroller class]
+															 borderType:[consoleScroll borderType]
+															controlSize:NSControlSizeRegular
+														  scrollerStyle:NSScrollerStyleOverlay];
 	NSRect          windowFrame = [window frame];
 	NSSize          adjustment;
 

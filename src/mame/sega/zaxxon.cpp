@@ -303,14 +303,14 @@ INPUT_CHANGED_MEMBER(zaxxon_state::service_switch)
 }
 
 
-WRITE_LINE_MEMBER(zaxxon_state::vblank_int)
+void zaxxon_state::vblank_int(int state)
 {
 	if (state && m_int_enabled)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 
-WRITE_LINE_MEMBER(zaxxon_state::int_enable_w)
+void zaxxon_state::int_enable_w(int state)
 {
 	m_int_enabled = state;
 	if (!m_int_enabled)
@@ -391,13 +391,13 @@ void zaxxon_state::zaxxon_control_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(zaxxon_state::coin_counter_a_w)
+void zaxxon_state::coin_counter_a_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
 
-WRITE_LINE_MEMBER(zaxxon_state::coin_counter_b_w)
+void zaxxon_state::coin_counter_b_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
@@ -407,7 +407,7 @@ WRITE_LINE_MEMBER(zaxxon_state::coin_counter_b_w)
 // each coin input, which then needs to be explicitly cleared by the game.
 // Each coin input first passes through a debounce circuit consisting of a
 // LS175 quad flip-flop and LS10 3-input NAND gate, which is not emulated.
-WRITE_LINE_MEMBER(zaxxon_state::coin_enable_w)
+void zaxxon_state::coin_enable_w(int state)
 {
 	for (int n = 0; n < 3; n++)
 		if (!BIT(m_mainlatch[0]->output_state(), n))
@@ -423,7 +423,7 @@ INPUT_CHANGED_MEMBER(zaxxon_state::zaxxon_coin_inserted)
 
 
 template <int Num>
-READ_LINE_MEMBER(zaxxon_state::zaxxon_coin_r)
+int zaxxon_state::zaxxon_coin_r()
 {
 	return m_coin_status[Num];
 }
@@ -926,6 +926,9 @@ void zaxxon_state::root(machine_config &config)
 	m_ppi->out_pa_callback().set(FUNC(zaxxon_state::zaxxon_sound_a_w));
 	m_ppi->out_pb_callback().set(FUNC(zaxxon_state::zaxxon_sound_b_w));
 	m_ppi->out_pc_callback().set(FUNC(zaxxon_state::zaxxon_sound_c_w));
+	m_ppi->tri_pa_callback().set_constant(0);
+	m_ppi->tri_pb_callback().set_constant(0);
+	m_ppi->tri_pc_callback().set_constant(0);
 
 	LS259(config, m_mainlatch[0]); // U55 on Zaxxon IC Board A
 	m_mainlatch[0]->q_out_cb<0>().set(FUNC(zaxxon_state::coin_enable_w)); // COIN EN A
@@ -989,7 +992,6 @@ void zaxxon_state::futspye(machine_config &config)
 	maincpu.set_addrmap(AS_OPCODES, &zaxxon_state::decrypted_opcodes_map);
 	maincpu.set_decrypted_tag(":decrypted_opcodes");
 	maincpu.set_size(0x6000);
-
 
 	/* video hardware */
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(zaxxon_state::screen_update_futspy));

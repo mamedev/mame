@@ -54,7 +54,7 @@ protected:
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	DECLARE_WRITE_LINE_MEMBER(apu_irq);
+	void apu_irq(int state);
 	uint8_t apu_read_mem(offs_t offset);
 };
 

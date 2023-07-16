@@ -116,10 +116,6 @@ addressable_latch_device::addressable_latch_device(const machine_config &mconfig
 
 void addressable_latch_device::device_start()
 {
-	// resolve callbacks
-	m_q_out_cb.resolve_all();
-	m_parallel_out_cb.resolve();
-
 	// initial input state
 	m_address = 0;
 	m_data = false;
@@ -181,7 +177,7 @@ void addressable_latch_device::write_abcd(u8 a, bool d)
 //  enable_w - handle enable input (active low)
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(addressable_latch_device::enable_w)
+void addressable_latch_device::enable_w(int state)
 {
 	m_enable = !state;
 	if (m_enable)
@@ -214,15 +210,13 @@ void addressable_latch_device::update_bit()
 	}
 
 	// update output line via callback
-	if (!m_q_out_cb[m_address].isnull())
-		m_q_out_cb[m_address](m_data);
+	m_q_out_cb[m_address](m_data);
 
 	// update parallel output
-	if (!m_parallel_out_cb.isnull())
-		m_parallel_out_cb(0, m_q, 1 << m_address);
+	m_parallel_out_cb(0, m_q, 1 << m_address);
 
 	// do some logging
-	if (LOG_ALL_WRITES || (LOG_UNDEFINED_WRITES && m_q_out_cb[m_address].isnull() && m_parallel_out_cb.isnull()))
+	if (LOG_ALL_WRITES || (LOG_UNDEFINED_WRITES && m_q_out_cb[m_address].isunset() && m_parallel_out_cb.isunset()))
 		logerror("Q%d %s at %s\n", m_address, m_data ? "set" : "cleared", machine().describe_context());
 }
 
@@ -346,7 +340,7 @@ void addressable_latch_device::clear(u8 data)
 //  clear_w - handle clear/reset input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(addressable_latch_device::clear_w)
+void addressable_latch_device::clear_w(int state)
 {
 	m_clear = bool(state) == m_clear_active;
 	if (m_clear)
@@ -367,12 +361,11 @@ void addressable_latch_device::clear_outputs(u8 new_q)
 
 	// return any previously set output lines to clear state
 	for (int bit = 0; bit < 8; bit++)
-		if (BIT(bits_changed, bit) && !m_q_out_cb[bit].isnull())
+		if (BIT(bits_changed, bit))
 			m_q_out_cb[bit](BIT(new_q, bit));
 
 	// update parallel output
-	if (!m_parallel_out_cb.isnull())
-		m_parallel_out_cb(0, new_q, bits_changed);
+	m_parallel_out_cb(0, new_q, bits_changed);
 }
 
 //**************************************************************************

@@ -434,6 +434,7 @@ void gew_pcm_device::device_start()
 	save_pointer(STRUCT_MEMBER(m_slots, m_octave), m_voices);
 	save_pointer(STRUCT_MEMBER(m_slots, m_pitch), m_voices);
 	save_pointer(STRUCT_MEMBER(m_slots, m_step), m_voices);
+	save_pointer(STRUCT_MEMBER(m_slots, m_reverse), m_voices);
 	save_pointer(STRUCT_MEMBER(m_slots, m_pan), m_voices);
 	save_pointer(STRUCT_MEMBER(m_slots, m_total_level), m_voices);
 	save_pointer(STRUCT_MEMBER(m_slots, m_dest_total_level), m_voices);
@@ -559,6 +560,11 @@ void gew_pcm_device::sound_stream_update(sound_stream &stream, std::vector<read_
 				int32_t csample = 0;
 				int32_t fpart = slot.m_offset & ((1 << TL_SHIFT) - 1);
 
+				if (slot.m_reverse)
+				{
+					spos = slot.m_sample.m_end - spos - 1;
+				}
+
 				if (slot.m_sample.m_format & 4)  // 12-bit linear
 				{
 					offs_t adr = slot.m_sample.m_start + (spos >> 1) * 3;
@@ -590,6 +596,8 @@ void gew_pcm_device::sound_stream_update(sound_stream &stream, std::vector<read_
 				if (slot.m_offset >= (slot.m_sample.m_end << TL_SHIFT))
 				{
 					slot.m_offset -= (slot.m_sample.m_end - slot.m_sample.m_loop) << TL_SHIFT;
+					// DD-9 expects the looped silence at the end of some samples to be the same whether reversed or not
+					slot.m_reverse = false;
 				}
 
 				if (spos ^ (slot.m_offset >> TL_SHIFT))

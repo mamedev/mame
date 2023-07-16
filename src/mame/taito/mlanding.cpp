@@ -166,8 +166,8 @@ private:
 	void msm5205_1_addr_hi_w(u8 data);
 	void msm5205_2_start_w(u8 data);
 	void msm5205_2_stop_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(msm5205_1_vck);
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_to0);
+	void msm5205_1_vck(int state);
+	void z80ctc_to0(int state);
 
 	u8 motor_r();
 
@@ -588,14 +588,14 @@ void mlanding_state::msm5205_update(unsigned chip)
 }
 
 
-WRITE_LINE_MEMBER(mlanding_state::msm5205_1_vck)
+void mlanding_state::msm5205_1_vck(int state)
 {
 	if (state)
 		msm5205_update(0);
 }
 
 
-WRITE_LINE_MEMBER(mlanding_state::z80ctc_to0)
+void mlanding_state::z80ctc_to0(int state)
 {
 	if (m_msm2_vck2 && !state)
 	{

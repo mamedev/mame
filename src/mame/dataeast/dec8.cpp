@@ -69,7 +69,7 @@ void dec8_state::dec8_mxc06_karn_buffer_spriteram_w(uint8_t data)
 }
 
 /* Only used by ghostb, gondo, garyoret, other games can control buffering */
-WRITE_LINE_MEMBER(dec8_state::screen_vblank_dec8)
+void dec8_state::screen_vblank_dec8(int state)
 {
 	// rising edge
 	if (state)
@@ -216,7 +216,7 @@ void dec8_state::dec8_sound_w(uint8_t data)
 	m_m6502_timer->adjust(m_audiocpu->cycles_to_attotime(3));
 }
 
-WRITE_LINE_MEMBER(csilver_state::csilver_adpcm_int)
+void csilver_state::csilver_adpcm_int(int state)
 {
 	m_toggle ^= 1;
 	if (m_toggle)
@@ -604,6 +604,12 @@ void dec8_state::oscar_s_map(address_map &map)
 	map(0x4000, 0x4001).w("ym2", FUNC(ym3526_device::write));
 	map(0x6000, 0x6000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x8000, 0xffff).rom();
+}
+
+// Used by the bootleg which has a standard M6502 with predecrypted opcodes
+void dec8_state::oscarbl_s_opcodes_map(address_map &map)
+{
+	map(0x8000, 0xffff).rom().region("audiocpu", 0x10000);
 }
 
 /* Used by Last Mission, Shackled & Breywood */
@@ -1763,7 +1769,7 @@ GFXDECODE_END
 /******************************************************************************/
 
 /* Coins generate NMI's */
-WRITE_LINE_MEMBER(dec8_state::oscar_coin_irq)
+void dec8_state::oscar_coin_irq(int state)
 {
 	if (state && !m_coin_state)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -1775,7 +1781,7 @@ void dec8_state::oscar_coin_clear_w(uint8_t data)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(dec8_state::shackled_coin_irq)
+void dec8_state::shackled_coin_irq(int state)
 {
 	if (state && !m_coin_state)
 		m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
@@ -2288,6 +2294,15 @@ void dec8_state::oscar(machine_config &config)
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
 }
 
+void dec8_state::oscarbl(machine_config &config)
+{
+	oscar(config);
+
+	M6502(config.replace(), m_audiocpu, XTAL(12'000'000)/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::oscar_s_map); /* NMIs are caused by the main CPU */
+	m_audiocpu->set_addrmap(AS_OPCODES, &dec8_state::oscarbl_s_opcodes_map);
+}
+
 void dec8_state::srdarwin(machine_config &config)
 {
 	/* basic machine hardware */
@@ -2661,7 +2676,7 @@ ROM_START( gondo )
 	ROM_CONTINUE(         0x70000, 0x08000 )
 	ROM_LOAD( "dt11.h15", 0x68000, 0x08000, CRC(53e9cf17) SHA1(8cbb45154a60f42f1b1e7299b12d2e92fc194df8) )
 
-	ROM_REGION( 1024, "proms", 0 )
+	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) /* BPROM type MB7122E for Priority (Not yet used) */
 ROM_END
 
@@ -2705,7 +2720,7 @@ ROM_START( gondou )
 	ROM_CONTINUE(         0x70000, 0x08000 )
 	ROM_LOAD( "dt11.h15", 0x68000, 0x08000, CRC(53e9cf17) SHA1(8cbb45154a60f42f1b1e7299b12d2e92fc194df8) )
 
-	ROM_REGION( 1024, "proms", 0 )
+	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) /* BPROM type MB7122E for Priority (Not yet used) */
 ROM_END
 
@@ -2749,7 +2764,7 @@ ROM_START( makyosen )
 	ROM_CONTINUE(         0x70000, 0x08000 )
 	ROM_LOAD( "ds11.h15", 0x68000, 0x08000, CRC(53e9cf17) SHA1(8cbb45154a60f42f1b1e7299b12d2e92fc194df8) )
 
-	ROM_REGION( 1024, "proms", 0 )
+	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) /* BPROM type MB7122E for Priority (Not yet used) */
 
 	ROM_REGION( 0x0600, "plds", 0 )
@@ -3261,47 +3276,51 @@ ROM_START( csilver )
 	ROM_LOAD( "dx09.10f", 0x30000, 0x10000, CRC(3192571d) SHA1(240c6c099f1e6edbf0be7d5a4ec396b056c9f70f) )
 	ROM_LOAD( "dx10.12f",  0x40000, 0x10000, CRC(3ef77a32) SHA1(97b97c35a6ca994d2e7a6e7a63101eda9709bcb1) )
 	ROM_LOAD( "dx11.13f",  0x50000, 0x10000, CRC(9cf3d5b8) SHA1(df4974f8412ab1cf65871b8e4e3dbee478bf4d21) )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "dx-15.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) // BPROM type MB7122E for priority (Not yet used), location on alternate board unknown
 ROM_END
 
-/* Different IC positions to World set? */
+// There is known to exist an identical ROM set with different PCB locations designated for an alternate ROM board (noted on the right of the ROM definition)
 ROM_START( csilverj )
 	ROM_REGION( 0x48000, "maincpu", 0 )
-	ROM_LOAD( "dx03-3.a4", 0x08000, 0x08000, CRC(02dd8cfc) SHA1(f29c0d9dd03e8c52672c0f3dbee44a93c5b4261d) )
-	ROM_LOAD( "dx01.a2", 0x10000, 0x10000, CRC(570fb50c) SHA1(3002f53182834a060fc282be1bc5767906e19ba2) )
-	ROM_LOAD( "dx02.a3", 0x20000, 0x10000, CRC(58625890) SHA1(503a969085f6dcb16687217c48136ea22d07c89f) )
+	ROM_LOAD( "dx03-2.18d", 0x08000, 0x08000, CRC(02dd8cfc) SHA1(f29c0d9dd03e8c52672c0f3dbee44a93c5b4261d) ) // dx03-3.a4 (Different ROM label but identical to dx03-2.18d)
+	ROM_LOAD( "dx01.12d",   0x10000, 0x10000, CRC(570fb50c) SHA1(3002f53182834a060fc282be1bc5767906e19ba2) ) // dx01.a2
+	ROM_LOAD( "dx02.13d",   0x20000, 0x10000, CRC(58625890) SHA1(503a969085f6dcb16687217c48136ea22d07c89f) ) // dx01.a3
 
 	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
-	ROM_LOAD( "dx04-1.a5", 0x0000, 0x10000,  CRC(29432691) SHA1(a76ecd27d217c66a0e43f93e29efe83c657925c3) )
+	ROM_LOAD( "dx04-1.19d", 0x0000, 0x10000,  CRC(29432691) SHA1(a76ecd27d217c66a0e43f93e29efe83c657925c3) ) // dx04-1.a5
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "dx05.a6", 0x00000, 0x10000,  CRC(eb32cf25) SHA1(9390c88033259c65eb15320e31f5d696970987cc) )
+	ROM_LOAD( "dx05.3f", 0x00000, 0x10000,  CRC(eb32cf25) SHA1(9390c88033259c65eb15320e31f5d696970987cc) ) // dx05.a6
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
 	// hand modified version of csilver ROM
 	ROM_LOAD( "id8751h_japan.mcu", 0x0000, 0x1000, BAD_DUMP CRC(6e801217) SHA1(2d8f7ae533dd8146acf8461d61ddd839544adf55) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
-	ROM_LOAD( "dx00.a1",  0x00000, 0x08000, CRC(f01ef985) SHA1(d5b823bd7c0efcf3137f8643c5d99a260bed5675) )
+	ROM_LOAD( "dx00.3d",  0x00000, 0x08000, CRC(f01ef985) SHA1(d5b823bd7c0efcf3137f8643c5d99a260bed5675) ) // dx00.a1
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites (3bpp) */
-	ROM_LOAD( "dx14.b5",  0x00000, 0x10000, CRC(80f07915) SHA1(ea100f12ef3a68110af911fa9beeb73b388f069d) )
+	ROM_LOAD( "dx14.15k",  0x00000, 0x10000, CRC(80f07915) SHA1(ea100f12ef3a68110af911fa9beeb73b388f069d) ) // dx14.b5
 	/* 0x10000-0x1ffff empty */
-	ROM_LOAD( "dx13.b4",  0x20000, 0x10000, CRC(d32c02e7) SHA1(d0518ec31e9e3f7b4e76fba5d7c05c33c61a9c72) )
+	ROM_LOAD( "dx13.13k",  0x20000, 0x10000, CRC(d32c02e7) SHA1(d0518ec31e9e3f7b4e76fba5d7c05c33c61a9c72) ) // dx13.b4
 	/* 0x30000-0x3ffff empty */
-	ROM_LOAD( "dx12.b3",  0x40000, 0x10000, CRC(ac78b76b) SHA1(c2be347fd950894401123ada8b27bfcfce53e66b) )
+	ROM_LOAD( "dx12.10k",  0x40000, 0x10000, CRC(ac78b76b) SHA1(c2be347fd950894401123ada8b27bfcfce53e66b) ) // dx12.b3
 	/* 0x50000-0x5ffff empty */
 	/* 0x60000-0x7ffff empty (no 4th plane) */
 
 	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles (3bpp) */
-	ROM_LOAD( "dx06.a7",  0x00000, 0x10000, CRC(b6fb208c) SHA1(027d33f0b5feb6f0433134213cfcef96790eaace) )
-	ROM_LOAD( "dx07.a8",  0x10000, 0x10000, CRC(ee3e1817) SHA1(013496976a9ffacf1587b3a6fc0f548becb1ab0e) )
-	ROM_LOAD( "dx08.a9",  0x20000, 0x10000, CRC(705900fe) SHA1(53b9d09f9780a3bf3545bc27a2855ebee3884124) )
-	ROM_LOAD( "dx09.a10", 0x30000, 0x10000, CRC(3192571d) SHA1(240c6c099f1e6edbf0be7d5a4ec396b056c9f70f) )
-	ROM_LOAD( "dx10.b1",  0x40000, 0x10000, CRC(3ef77a32) SHA1(97b97c35a6ca994d2e7a6e7a63101eda9709bcb1) )
-	ROM_LOAD( "dx11.b2",  0x50000, 0x10000, CRC(9cf3d5b8) SHA1(df4974f8412ab1cf65871b8e4e3dbee478bf4d21) )
-ROM_END
+	ROM_LOAD( "dx06.5f",  0x00000, 0x10000, CRC(b6fb208c) SHA1(027d33f0b5feb6f0433134213cfcef96790eaace) ) // dx06.a7
+	ROM_LOAD( "dx07.7f",  0x10000, 0x10000, CRC(ee3e1817) SHA1(013496976a9ffacf1587b3a6fc0f548becb1ab0e) ) // dx07.a8
+	ROM_LOAD( "dx08.8f",  0x20000, 0x10000, CRC(705900fe) SHA1(53b9d09f9780a3bf3545bc27a2855ebee3884124) ) // dx08.a9
+	ROM_LOAD( "dx09.10f", 0x30000, 0x10000, CRC(3192571d) SHA1(240c6c099f1e6edbf0be7d5a4ec396b056c9f70f) ) // dx09.a10
+	ROM_LOAD( "dx10.12f",  0x40000, 0x10000, CRC(3ef77a32) SHA1(97b97c35a6ca994d2e7a6e7a63101eda9709bcb1) ) // dx10.b1
+	ROM_LOAD( "dx11.13f",  0x50000, 0x10000, CRC(9cf3d5b8) SHA1(df4974f8412ab1cf65871b8e4e3dbee478bf4d21) ) // dx11.b2
 
-/* Same IC positions to World set */
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "dx-15.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) // BPROM type MB7122E for priority (Not yet used), location on alternate board unknown
+ROM_END
 
 ROM_START( csilverja ) // DE-0250-3 + DE-0251-2
 	ROM_REGION( 0x48000, "maincpu", 0 )
@@ -3338,6 +3357,9 @@ ROM_START( csilverja ) // DE-0250-3 + DE-0251-2
 	ROM_LOAD( "dx09.10f", 0x30000, 0x10000, CRC(3192571d) SHA1(240c6c099f1e6edbf0be7d5a4ec396b056c9f70f) )
 	ROM_LOAD( "dx10.12f",  0x40000, 0x10000, CRC(3ef77a32) SHA1(97b97c35a6ca994d2e7a6e7a63101eda9709bcb1) )
 	ROM_LOAD( "dx11.13f",  0x50000, 0x10000, CRC(9cf3d5b8) SHA1(df4974f8412ab1cf65871b8e4e3dbee478bf4d21) )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "dx-15.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) // BPROM type MB7122E for priority (Not yet used), location on alternate board unknown
 ROM_END
 
 ROM_START( oscar )
@@ -3365,6 +3387,33 @@ ROM_START( oscar )
 	ROM_LOAD( "ed03", 0x20000, 0x10000, CRC(4fc4fb0f) SHA1(0906762a3adbffe765e072255262fedaa78bdb2a) )
 	ROM_LOAD( "ed00", 0x40000, 0x10000, CRC(ac201f2d) SHA1(77f13eb6a1a44444ca9b25363031451b0d68c988) )
 	ROM_LOAD( "ed02", 0x60000, 0x10000, CRC(7ddc5651) SHA1(f5ec5245cf3d9d4d9c1df6a8128c24565e331317) )
+ROM_END
+
+ROM_START( oscarbl )  // very similar to the original, main difference it's it uses a standard M6502 for sound with predecrypted opcodes.
+	ROM_REGION( 0x20000, "maincpu", 0 ) // same as the original
+	ROM_LOAD( "m27c256.3",  0x08000, 0x08000, CRC(120040d8) SHA1(22d5f84f3ca724cbf39dfc4790f2175ba4945aaf) )
+	ROM_LOAD( "at27c512.2", 0x10000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "at27c512.4", 0x00000, 0x10000, CRC(2ad9ef5d) SHA1(19db4446a6a5f75c7ddb2807b69d7c40d8b2d55a) )
+
+	ROM_REGION( 2*0x10000, "audiocpu", 0 )
+	ROM_LOAD( "at27c512.1", 0x08000, 0x10000, CRC(302ff92c) SHA1(222cc1e4673a5439da1cdd07cc65dc23f522da1c) ) // data in the first half, opcodes in the second
+
+	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
+	ROM_LOAD( "ed08", 0x00000, 0x04000, BAD_DUMP CRC(308ac264) SHA1(fd1c4ec4e4f99c33e93cd15e178c4714251a9b7e) ) // not included in this set, probably same
+
+	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_LOAD( "at27c512.6", 0x00000, 0x10000, CRC(967315b5) SHA1(b7a081241477ab8e62fe3df1b7025b50ceaba180) )
+	ROM_LOAD( "at27c512.7", 0x20000, 0x10000, CRC(fcdba431) SHA1(0be2194519c36ddf136610f60890506eda1faf0b) )
+	ROM_LOAD( "at27c512.8", 0x40000, 0x10000, CRC(7d50bebc) SHA1(06375f3273c48c7c7d81f1c15cbc5d3f3e05b8ed) )
+	ROM_LOAD( "at27c512.9", 0x60000, 0x10000, CRC(8fdf0fa5) SHA1(2b4d1ca1436864e89b13b3fa151a4a3708592e0a) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles */
+	ROM_LOAD( "at27c512.10", 0x00000, 0x10000, CRC(98cb4ffc) SHA1(75465a1e7c113db766e14d22b31bf999c520a8bf) )
+	ROM_LOAD( "at27c512.11", 0x20000, 0x10000, CRC(bff7fddc) SHA1(129e99fa99920e647a53b9af64c9c288c1e8ad57) )
+	ROM_LOAD( "at27c512.12", 0x40000, 0x10000, CRC(eff3b56c) SHA1(427d3aa053fa81ef004019eb8bb0aa97787f283e) )
+	ROM_LOAD( "at27c512.13", 0x60000, 0x10000, CRC(7ddc5651) SHA1(f5ec5245cf3d9d4d9c1df6a8128c24565e331317) )
 ROM_END
 
 ROM_START( oscaru )
@@ -3820,9 +3869,10 @@ GAME( 1987, ghostb3a,   ghostb,   ghostb,   ghostb3,   dec8_state,    empty_init
 GAME( 1987, meikyuh,    ghostb,   meikyuh,  meikyuh,   dec8_state,    empty_init, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, meikyuha,   ghostb,   meikyuh,  meikyuh,   dec8_state,    empty_init, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, csilver,    0,        csilver,  csilver,   csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilverj,   csilver,  csilver,  csilverj,  csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilverj,   csilver,  csilver,  csilverj,  csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, csilverja,  csilver,  csilver,  csilverj,  csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, oscar,      0,        oscar,    oscar,     dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarbl,    oscar,    oscarbl,  oscar,     dec8_state,    empty_init, ROT0,   "bootleg",               "Psycho-Nics Oscar (World revision 0, bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, oscaru,     oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East USA",         "Psycho-Nics Oscar (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, oscarj1,    oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, oscarj2,    oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", MACHINE_SUPPORTS_SAVE )

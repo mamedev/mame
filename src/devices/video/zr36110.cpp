@@ -18,14 +18,15 @@ DEFINE_DEVICE_TYPE(ZR36110, zr36110_device, "zr36110", "Zoran ZR36110 mpeg decod
 
 zr36110_device::zr36110_device(const machine_config &mconfig, char const *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, ZR36110, tag, owner, clock),
-	m_drq_handler(*this)
+	m_drq_w(*this),
+	m_sp_frm_w{*this, *this},
+	m_sp_dat_w{*this, *this},
+	m_sp_clk_w{*this, *this}
 {
 }
 
 void zr36110_device::device_start()
 {
-	m_drq_handler.resolve_safe();
-
 	save_item(NAME(m_mc1_adr));
 	save_item(NAME(m_mc23_adr));
 	save_item(NAME(m_setup_adr));
@@ -57,6 +58,32 @@ void zr36110_device::mc18_w(u8 data)
 	m_mc1_adr = m_mc1_adr + 1;
 }
 
+void zr36110_device::mc1x_w(u16 data)
+{
+	if(!(m_bus_control & 0x80))
+		mc18_w(data >> 8);
+	else if(m_bus_control & 0x40) {
+		mc18_w(data >> 8);
+		mc18_w(data);
+	} else {
+		mc18_w(data);
+		mc18_w(data >> 8);
+	}
+}
+
+void zr36110_device::mc1_w(u16 data)
+{
+	if(!(m_bus_control & 0x80))
+		mc18_w(data);
+	else if(m_bus_control & 0x40) {
+		mc18_w(data);
+		mc18_w(data >> 8);
+	} else {
+		mc18_w(data >> 8);
+		mc18_w(data);
+	}
+}
+
 void zr36110_device::mc238_w(u8 data)
 {
 	m_setup_adr = 0;
@@ -65,6 +92,32 @@ void zr36110_device::mc238_w(u8 data)
 	m_mc23_adr = m_mc23_adr + 1;
 	if(m_mc23_adr >= 0x2000 && m_state == S_INIT)
 		m_state = S_IDLE;
+}
+
+void zr36110_device::mc23_w(u16 data)
+{
+	if(!(m_bus_control & 0x80))
+		mc238_w(data);
+	else if(m_bus_control & 0x40) {
+		mc238_w(data);
+		mc238_w(data >> 8);
+	} else {
+		mc238_w(data >> 8);
+		mc238_w(data);
+	}
+}
+
+void zr36110_device::mc23x_w(u16 data)
+{
+	if(!(m_bus_control & 0x80))
+		mc238_w(data >> 8);
+	else if(m_bus_control & 0x40) {
+		mc238_w(data >> 8);
+		mc238_w(data);
+	} else {
+		mc238_w(data);
+		mc238_w(data >> 8);
+	}
 }
 
 double zr36110_device::u6_10_to_f(u16 val)
@@ -175,14 +228,41 @@ void zr36110_device::setup8_w(u8 data)
 	m_setup_adr = m_setup_adr + 1;
 }
 
+void zr36110_device::setup_w(u16 data)
+{
+	if(!(m_bus_control & 0x80))
+		setup8_w(data);
+	else if(m_bus_control & 0x40) {
+		setup8_w(data);
+		setup8_w(data >> 8);
+	} else {
+		setup8_w(data >> 8);
+		setup8_w(data);
+	}
+}
+
+void zr36110_device::setupx_w(u16 data)
+{
+	if(!(m_bus_control & 0x80))
+		setup8_w(data >> 8);
+	else if(m_bus_control & 0x40) {
+		setup8_w(data >> 8);
+		setup8_w(data);
+	} else {
+		setup8_w(data);
+		setup8_w(data >> 8);
+	}
+}
+
 void zr36110_device::cmd8_w(u8 data)
 {
-	LOG("cmd_w %02x\n", data);
+	//  LOG("cmd_w %02x\n", data);
 
 	if(m_cmd_phase) {
 		m_cmd |= data;
 		switch(m_cmd & 0xff) {
 		case 0x00: go(); break;
+		case 0x81: case 0x82: case 0x83: case 0x84: end_decoding(m_cmd & 3); break;
 		default:
 			logerror("Unknown command %02x.%02x\n", m_cmd >> 8, m_cmd & 0xff);
 		}
@@ -191,19 +271,121 @@ void zr36110_device::cmd8_w(u8 data)
 	m_cmd_phase = !m_cmd_phase;
 }
 
-u8 zr36110_device::stat0_r()
+void zr36110_device::cmd_w(u16 data)
+{
+	if(!(m_bus_control & 0x80))
+		cmd8_w(data);
+	else if(m_bus_control & 0x40) {
+		cmd8_w(data);
+		cmd8_w(data >> 8);
+	} else {
+		cmd8_w(data >> 8);
+		cmd8_w(data);
+	}
+}
+
+void zr36110_device::cmdx_w(u16 data)
+{
+	if(!(m_bus_control & 0x80))
+		cmd8_w(data >> 8);
+	else if(m_bus_control & 0x40) {
+		cmd8_w(data >> 8);
+		cmd8_w(data);
+	} else {
+		cmd8_w(data);
+		cmd8_w(data >> 8);
+	}
+}
+
+void zr36110_device::dma8_w(u8 data)
+{
+	//  logerror("dma %02x\n", data);
+}
+
+void zr36110_device::dma_w(u16 data)
+{
+	if(!(m_bus_control & 0x80))
+		dma8_w(data);
+	else if(m_bus_control & 0x40) {
+		dma8_w(data);
+		dma8_w(data >> 8);
+	} else {
+		dma8_w(data >> 8);
+		dma8_w(data);
+	}
+}
+
+void zr36110_device::dmax_w(u16 data)
+{
+	if(!(m_bus_control & 0x80))
+		dma8_w(data >> 8);
+	else if(m_bus_control & 0x40) {
+		dma8_w(data >> 8);
+		dma8_w(data);
+	} else {
+		dma8_w(data);
+		dma8_w(data >> 8);
+	}
+}
+
+u8 zr36110_device::stat08_r()
 {
 	return 0x20 | m_state;
 }
 
-u8 zr36110_device::stat1_r()
+u8 zr36110_device::stat18_r()
 {
 	return 0x0c;
 }
 
-u8 zr36110_device::stat2_r()
+u8 zr36110_device::stat28_r()
 {
 	return 0x01;
+}
+
+u16 zr36110_device::stat0_r()
+{
+	return 0x20 | m_state;
+}
+
+u16 zr36110_device::stat1_r()
+{
+	return 0x0c;
+}
+
+u16 zr36110_device::stat2_r()
+{
+	return 0x01;
+}
+
+u16 zr36110_device::stat0x_r()
+{
+	return (0x20 | m_state) << 8;
+}
+
+u16 zr36110_device::stat1x_r()
+{
+	return 0x0c << 8;
+}
+
+u16 zr36110_device::stat2x_r()
+{
+	return 0x01 << 8;
+}
+
+u8 zr36110_device::user8_r()
+{
+	return 0;
+}
+
+u16 zr36110_device::user_r()
+{
+	return 0;
+}
+
+u16 zr36110_device::userx_r()
+{
+	return 0;
 }
 
 void zr36110_device::go()
@@ -215,4 +397,16 @@ void zr36110_device::go()
 	logerror("command GO\n");
 	m_bus_control = m_setup[0];
 	m_state = S_NORMAL;
+	m_drq_w(1);
+}
+
+void zr36110_device::end_decoding(u8 mode)
+{
+	if(m_state != S_NORMAL) {
+		logerror("command END DECODING on wrong state, ignoring\n");
+		return;
+	}
+	logerror("command END DECODING %d\n", mode);
+	m_state = S_IDLE;
+	m_drq_w(0);
 }

@@ -17,14 +17,13 @@ public:
 	auto clock_out_callback() { return m_clock_out_callback.bind(); }
 
 	// external control input
-	DECLARE_WRITE_LINE_MEMBER(strobe_w);
+	void strobe_w(int state);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 private:

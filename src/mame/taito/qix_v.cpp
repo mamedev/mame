@@ -10,9 +10,6 @@
 #include "emu.h"
 #include "qix.h"
 
-#include "cpu/m6809/m6809.h"
-#include "video/mc6845.h"
-
 
 /*************************************
  *
@@ -41,7 +38,7 @@ void qix_state::video_start()
  *
  *************************************/
 
-WRITE_LINE_MEMBER(qix_state::display_enable_changed)
+void qix_state::display_enable_changed(int state)
 {
 	/* on the rising edge, latch the scanline */
 	if (state)
@@ -62,7 +59,7 @@ WRITE_LINE_MEMBER(qix_state::display_enable_changed)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(qix_state::qix_flip_screen_w)
+void qix_state::qix_flip_screen_w(int state)
 {
 	m_flip = state;
 }
@@ -107,7 +104,7 @@ void qix_state::qix_videoram_w(offs_t offset, uint8_t data)
 }
 
 
-void qix_state::slither_videoram_w(offs_t offset, uint8_t data)
+void slither_state::slither_videoram_w(offs_t offset, uint8_t data)
 {
 	/* update the screen in case the game is writing "behind" the beam -
 	   Zookeeper likes to do this */
@@ -160,7 +157,7 @@ void qix_state::qix_addresslatch_w(offs_t offset, uint8_t data)
 }
 
 
-void qix_state::slither_addresslatch_w(offs_t offset, uint8_t data)
+void slither_state::slither_addresslatch_w(offs_t offset, uint8_t data)
 {
 	/* update the screen in case the game is writing "behind" the beam */
 //  m_screen->update_now();
@@ -352,16 +349,16 @@ void zookeep_state::video_map(address_map &map)
 }
 
 
-void qix_state::slither_video_map(address_map &map)
+void slither_state::slither_video_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rw(FUNC(qix_state::qix_videoram_r), FUNC(qix_state::slither_videoram_w));
+	map(0x0000, 0x7fff).rw(FUNC(slither_state::qix_videoram_r), FUNC(slither_state::slither_videoram_w));
 	map(0x8000, 0x83ff).ram().share("share1");
 	map(0x8400, 0x87ff).ram().share("nvram");
-	map(0x8800, 0x8800).mirror(0x03ff).w(FUNC(qix_state::qix_palettebank_w));
-	map(0x8c00, 0x8c00).mirror(0x03fe).rw(FUNC(qix_state::qix_data_firq_r), FUNC(qix_state::qix_data_firq_w));
-	map(0x8c01, 0x8c01).mirror(0x03fe).rw(FUNC(qix_state::qix_video_firq_ack_r), FUNC(qix_state::qix_video_firq_ack_w));
-	map(0x9000, 0x93ff).ram().w(FUNC(qix_state::qix_paletteram_w)).share("paletteram");
-	map(0x9400, 0x9400).mirror(0x03fc).rw(FUNC(qix_state::qix_addresslatch_r), FUNC(qix_state::slither_addresslatch_w));
+	map(0x8800, 0x8800).mirror(0x03ff).w(FUNC(slither_state::qix_palettebank_w));
+	map(0x8c00, 0x8c00).mirror(0x03fe).rw(FUNC(slither_state::qix_data_firq_r), FUNC(slither_state::qix_data_firq_w));
+	map(0x8c01, 0x8c01).mirror(0x03fe).rw(FUNC(slither_state::qix_video_firq_ack_r), FUNC(slither_state::qix_video_firq_ack_w));
+	map(0x9000, 0x93ff).ram().w(FUNC(slither_state::qix_paletteram_w)).share("paletteram");
+	map(0x9400, 0x9400).mirror(0x03fc).rw(FUNC(slither_state::qix_addresslatch_r), FUNC(slither_state::slither_addresslatch_w));
 	map(0x9401, 0x9401).mirror(0x03fc).writeonly().share("videoram_mask");
 	map(0x9402, 0x9403).mirror(0x03fc).writeonly().share("videoram_addr");
 	map(0x9800, 0x9800).mirror(0x03ff).readonly().share("scanline_latch");
@@ -408,8 +405,8 @@ void zookeep_state::video(machine_config &config)
 	m_videocpu->set_addrmap(AS_PROGRAM, &zookeep_state::video_map);
 }
 
-void qix_state::slither_video(machine_config &config)
+void slither_state::slither_video(machine_config &config)
 {
 	m_videocpu->set_clock(SLITHER_CLOCK_OSC/4/4);   /* 1.34 MHz */
-	m_videocpu->set_addrmap(AS_PROGRAM, &qix_state::slither_video_map);
+	m_videocpu->set_addrmap(AS_PROGRAM, &slither_state::slither_video_map);
 }

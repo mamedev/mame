@@ -3,10 +3,8 @@
 // thanks-to:Sean Riddle
 /*******************************************************************************
 
-Matsushita (Panasonic) MN1400 handhelds
-
-TODO:
-- internal artwork for compperf and tmbaskb
+Matsushita (Panasonic) MN1400 handhelds. Matsushita used this MCU in their
+audio/video equipment, and it's used in some handheld toys too.
 
 *******************************************************************************/
 
@@ -20,9 +18,11 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
+#include "compperf.lh" // clickable
 #include "scrablexa.lh"
+#include "tmbaskb.lh" // clickable
 
-#include "hh_mn1400_test.lh" // common test-layout - use external artwork
+//#include "hh_mn1400_test.lh" // common test-layout - use external artwork
 
 
 namespace {
@@ -110,6 +110,10 @@ u16 hh_mn1400_state::read_inputs(int columns)
   * PCB label: Lakeside, PANASONIC, TCI-A4H94HB
   * MN1400ML (28 pins, die label: 1400 ML-0)
   * 10 LEDs, 2-bit sound
+
+  known releases:
+  - USA: Computer Perfection, published by Lakeside
+  - UK: Computer Perfection, published by Action GT
 
 *******************************************************************************/
 
@@ -210,11 +214,9 @@ INPUT_PORTS_END
 void compperf_state::compperf(machine_config &config)
 {
 	// basic machine hardware
-	MN1400(config, m_maincpu, 300000); // approximation - RC osc. R=18K, C=100pF
+	MN1400_28PINS(config, m_maincpu, 290000); // approximation - RC osc. R=18K, C=100pF
 	m_maincpu->write_c().set(FUNC(compperf_state::write_c));
-	m_maincpu->set_c_mask(0x3e0);
 	m_maincpu->write_d().set(FUNC(compperf_state::write_d));
-	m_maincpu->set_d_mask(0xf, 0x5321);
 	m_maincpu->write_e().set(FUNC(compperf_state::write_e));
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->read_b().set_ioport("IN.1");
@@ -223,7 +225,7 @@ void compperf_state::compperf(machine_config &config)
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 10);
 	m_display->set_bri_levels(0.25);
-	config.set_default_layout(layout_hh_mn1400_test);
+	config.set_default_layout(layout_compperf);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -380,7 +382,7 @@ INPUT_PORTS_END
 void scrablexa_state::scrablexa(machine_config &config)
 {
 	// basic machine hardware
-	MN1405(config, m_maincpu, 300000); // approximation - RC osc. R=15K, C=100pF
+	MN1405(config, m_maincpu, 310000); // approximation - RC osc. R=15K, C=100pF
 	m_maincpu->write_c().set(FUNC(scrablexa_state::write_c));
 	m_maincpu->write_d().set(FUNC(scrablexa_state::write_d));
 	m_maincpu->write_e().set(FUNC(scrablexa_state::write_e));
@@ -423,7 +425,8 @@ ROM_END
   * 2 7seg LEDs, 29 other LEDs, 1-bit sound
 
   Two versions are known: one with a black bezel and one with a brown bezel,
-  the internal hardware is the same.
+  the internal hardware is the same. The other 2 games in this series (Soccer,
+  Volleyball) use a TMS1000 MCU instead.
 
 *******************************************************************************/
 
@@ -490,14 +493,14 @@ u8 tmbaskb_state::read_b()
 
 static INPUT_PORTS_START( tmbaskb )
 	PORT_START("IN.0") // CO3 BI (left)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Offense P")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Offense S")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Defense")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Offense P")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Offense S")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Defense")
 
 	PORT_START("IN.1") // CO5 BI (right)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Offense P")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Offense S")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Defense")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Offense P")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Offense S")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Defense")
 
 	PORT_START("IN.2") // BI0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME("Score")
@@ -506,9 +509,9 @@ static INPUT_PORTS_START( tmbaskb )
 	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
-	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Difficulty ) )
-	PORT_CONFSETTING(    0x02, "1" ) // PRO1
-	PORT_CONFSETTING(    0x00, "2" ) // PRO2
+	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x00, "1" ) // PRO1
+	PORT_CONFSETTING(    0x02, "2" ) // PRO2
 INPUT_PORTS_END
 
 // config
@@ -516,11 +519,10 @@ INPUT_PORTS_END
 void tmbaskb_state::tmbaskb(machine_config &config)
 {
 	// basic machine hardware
-	MN1400(config, m_maincpu, 300000); // approximation - RC osc. R=18K, C=100pF
+	MN1400_28PINS(config, m_maincpu, 290000); // approximation - RC osc. R=18K, C=100pF
 	m_maincpu->write_c().set(FUNC(tmbaskb_state::write_c));
 	m_maincpu->set_c_mask(0x3ef);
 	m_maincpu->write_d().set(FUNC(tmbaskb_state::write_d));
-	m_maincpu->set_d_mask(0xf, 0x5321);
 	m_maincpu->write_e().set(FUNC(tmbaskb_state::write_e));
 	m_maincpu->read_b().set(FUNC(tmbaskb_state::read_b));
 	m_maincpu->read_sns().set_ioport("IN.3");
@@ -528,7 +530,7 @@ void tmbaskb_state::tmbaskb(machine_config &config)
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6, 8);
 	m_display->set_segmask(3, 0x7f);
-	config.set_default_layout(layout_hh_mn1400_test);
+	config.set_default_layout(layout_tmbaskb);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -557,8 +559,8 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1979, compperf,  0,        0,      compperf,  compperf,  compperf_state,  empty_init, "Lakeside", "Computer Perfection", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1979, compperf,  0,        0,      compperf,  compperf,  compperf_state,  empty_init, "Lakeside", "Computer Perfection", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 SYST( 1980, scrablexa, scrablex, 0,      scrablexa, scrablexa, scrablexa_state, empty_init, "Selchow & Righter", "Scrabble Lexor: Computer Word Game (MN1405 version)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, tmbaskb,   0,        0,      tmbaskb,   tmbaskb,   tmbaskb_state,   empty_init, "Tomy", "Basketball (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1980, tmbaskb,   0,        0,      tmbaskb,   tmbaskb,   tmbaskb_state,   empty_init, "Tomy", "Basketball (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

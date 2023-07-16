@@ -125,26 +125,26 @@ private:
 
 	uint32_t eventc_latch = 0;
 
-	DECLARE_WRITE_LINE_MEMBER(scc_irq);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_irq);
-	DECLARE_WRITE_LINE_MEMBER(power_irq);
-	DECLARE_WRITE_LINE_MEMBER(nmi_irq);
+	void scc_irq(int state);
+	void keyboard_irq(int state);
+	void power_irq(int state);
+	void nmi_irq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
-	DECLARE_WRITE_LINE_MEMBER(scsi_drq);
+	void scsi_irq(int state);
+	void scsi_drq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
+	void fdc_irq(int state);
+	void fdc_drq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(net_tx_irq);
-	DECLARE_WRITE_LINE_MEMBER(net_rx_irq);
-	DECLARE_WRITE_LINE_MEMBER(net_tx_drq);
-	DECLARE_WRITE_LINE_MEMBER(net_rx_drq);
+	void net_tx_irq(int state);
+	void net_rx_irq(int state);
+	void net_tx_drq(int state);
+	void net_rx_drq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(mo_irq);
-	DECLARE_WRITE_LINE_MEMBER(mo_drq);
+	void mo_irq(int state);
+	void mo_drq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 
 	void ncr53c90(device_t *device);
 	void next_0b_m_mem(address_map &map);

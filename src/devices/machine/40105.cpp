@@ -43,17 +43,17 @@ DEFINE_DEVICE_TYPE(CD40105, cmos_40105_device, "cd40105", "CD40105B FIFO Registe
 //  cmos_40105_device - constructor
 //-------------------------------------------------
 
-cmos_40105_device::cmos_40105_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, CD40105, tag, owner, clock),
-		m_write_dir(*this),
-		m_write_dor(*this),
-		m_write_q(*this),
-		m_d(0),
-		m_q(0),
-		m_dir(false),
-		m_dor(false),
-		m_si(false),
-		m_so(false)
+cmos_40105_device::cmos_40105_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, CD40105, tag, owner, clock),
+	m_write_dir(*this),
+	m_write_dor(*this),
+	m_write_q(*this),
+	m_d(0),
+	m_q(0),
+	m_dir(false),
+	m_dor(false),
+	m_si(false),
+	m_so(false)
 {
 }
 
@@ -64,11 +64,6 @@ cmos_40105_device::cmos_40105_device(const machine_config &mconfig, const char *
 
 void cmos_40105_device::device_start()
 {
-	// resolve callbacks
-	m_write_dir.resolve_safe();
-	m_write_dor.resolve_safe();
-	m_write_q.resolve_safe();
-
 	// state saving
 	save_item(NAME(m_d));
 	save_item(NAME(m_q));
@@ -163,7 +158,7 @@ void cmos_40105_device::output_ready()
 //  si_w - shift in write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cmos_40105_device::si_w )
+void cmos_40105_device::si_w(int state)
 {
 	// load input on rising edge when ready
 	if (m_dir && !m_si && state)
@@ -185,7 +180,7 @@ WRITE_LINE_MEMBER( cmos_40105_device::si_w )
 //  so_w - shift out write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cmos_40105_device::so_w )
+void cmos_40105_device::so_w(int state)
 {
 	// shift out on falling edge when ready
 	if (m_dor && m_so && !state)
@@ -218,7 +213,7 @@ WRITE_LINE_MEMBER( cmos_40105_device::so_w )
 //  dir_r - data in ready read
 //-------------------------------------------------
 
-READ_LINE_MEMBER( cmos_40105_device::dir_r )
+int cmos_40105_device::dir_r()
 {
 	return m_dir;
 }
@@ -228,7 +223,7 @@ READ_LINE_MEMBER( cmos_40105_device::dir_r )
 //  dor_r - data out ready read
 //-------------------------------------------------
 
-READ_LINE_MEMBER( cmos_40105_device::dor_r )
+int cmos_40105_device::dor_r()
 {
 	return m_dor;
 }

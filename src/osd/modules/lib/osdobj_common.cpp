@@ -109,7 +109,7 @@ const options_entry osd_options::s_option_entries[] =
 
 	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD ACCELERATED VIDEO OPTIONS" },
 	{ OSDOPTION_FILTER ";glfilter;flt",          "1",              core_options::option_type::BOOLEAN,   "use bilinear filtering when scaling emulated video" },
-	{ OSDOPTION_PRESCALE "(1-8)",                "1",              core_options::option_type::INTEGER,   "scale emulated video by this factor before applying filters/shaders" },
+	{ OSDOPTION_PRESCALE "(1-20)",               "1",              core_options::option_type::INTEGER,   "scale emulated video by this factor before applying filters/shaders" },
 
 #if USE_OPENGL
 	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OpenGL-SPECIFIC OPTIONS" },

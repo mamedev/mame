@@ -66,7 +66,7 @@ private:
 	void bankswitch_w(uint8_t data);
 	void spritebank_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	K007342_CALLBACK_MEMBER(tile_callback);
 	K007420_CALLBACK_MEMBER(sprite_callback);
 
@@ -132,7 +132,7 @@ uint32_t battlnts_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
  *
  *************************************/
 
-WRITE_LINE_MEMBER(battlnts_state::vblank_irq)
+void battlnts_state::vblank_irq(int state)
 {
 	if (state && m_k007342->is_int_enabled())
 		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
@@ -324,10 +324,10 @@ void battlnts_state::machine_reset()
 void battlnts_state::battlnts(machine_config &config)
 {
 	// basic machine hardware
-	HD6309(config, m_maincpu, XTAL(24'000'000) / 2);  // 3'000'000 * 4?
+	HD6309E(config, m_maincpu, XTAL(24'000'000) / 8); // HD63C09EP
 	m_maincpu->set_addrmap(AS_PROGRAM, &battlnts_state::main_map);
 
-	Z80(config, m_audiocpu, XTAL(24'000'000) / 6); // 3579545?
+	Z80(config, m_audiocpu, XTAL(24'000'000) / 6); // 3579545? (no such XTAL on board)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &battlnts_state::sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");

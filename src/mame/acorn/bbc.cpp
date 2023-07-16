@@ -1078,7 +1078,7 @@ static const char *const bbc_sample_names[] =
 };
 
 
-WRITE_LINE_MEMBER(bbc_state::adlc_irq_w)
+void bbc_state::adlc_irq_w(int state)
 {
 	m_adlc_irq = state;
 	update_nmi();

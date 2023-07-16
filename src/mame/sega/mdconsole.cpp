@@ -173,7 +173,7 @@ void md_cons_cd_state::machine_start()
 }
 
 // same as screen_eof_megadriv but with addition of 32x and SegaCD/MegaCD pieces
-WRITE_LINE_MEMBER(md_cons_state::screen_vblank_console)
+void md_cons_state::screen_vblank_console(int state)
 {
 	if (m_io_reset.read_safe(0) & 0x01)
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);

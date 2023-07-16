@@ -10,8 +10,6 @@
 #include "emu.h"
 #include "qix.h"
 
-#include "cpu/m6800/m6800.h"
-
 
 /*************************************
  *
@@ -19,14 +17,24 @@
  *
  *************************************/
 
+void slither_state::machine_start()
+{
+	qix_state::machine_start();
+
+	save_item(NAME(m_sn76489_ctrl));
+}
+
 void qixmcu_state::machine_start()
 {
 	qix_state::machine_start();
 
-	/* reset the coin counter register */
+	// HACK: force port B latch to zero to avoid spurious coin counter pulses because the MCU program initializes DDRB before the latch
+	m_mcu->set_state_int(m68705_device::M68705_LATCHB, 0);
+
+	// reset the coin counter register
 	m_coinctrl = 0x00;
 
-	/* set up save states */
+	// set up save states
 	save_item(NAME(m_68705_porta_out));
 	save_item(NAME(m_coinctrl));
 }
@@ -38,7 +46,7 @@ void zookeep_state::machine_start()
 	else
 		qix_state::machine_start();
 
-	/* configure the banking */
+	// configure the banking
 	m_vidbank->configure_entry(0, memregion("videocpu")->base() + 0xa000);
 	m_vidbank->configure_entry(1, memregion("videocpu")->base() + 0x10000);
 	m_vidbank->set_entry(0);
@@ -50,7 +58,7 @@ void zookeep_state::machine_start()
  *
  *************************************/
 
-WRITE_LINE_MEMBER(qix_state::qix_vsync_changed)
+void qix_state::qix_vsync_changed(int state)
 {
 	m_sndpia0->cb1_w(state);
 }
@@ -66,7 +74,7 @@ WRITE_LINE_MEMBER(qix_state::qix_vsync_changed)
 void zookeep_state::bankswitch_w(uint8_t data)
 {
 	m_vidbank->set_entry(BIT(data, 2));
-	/* not necessary, but technically correct */
+	// not necessary, but technically correct
 	qix_palettebank_w(data);
 }
 
@@ -158,8 +166,8 @@ uint8_t qixmcu_state::coin_r()
 void qixmcu_state::coin_w(uint8_t data)
 {
 	logerror("qixmcu_state, coin_w = %02X\n", data);
-	/* this is a callback called by pia6821_device::write(), so I don't need to synchronize */
-	/* the CPUs - they have already been synchronized by qix_pia_w() */
+	// this is a callback called by pia6821_device::write(), so I don't need to synchronize
+	// the CPUs - they have already been synchronized by qix_pia_w()
 	m_mcu->pa_w(data);
 }
 
@@ -169,8 +177,8 @@ void qixmcu_state::coinctrl_w(uint8_t data)
 	if (BIT(data, 2))
 	{
 		m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
-		/* temporarily boost the interleave to sync things up */
-		/* note: I'm using 50 because 30 is not enough for space dungeon at game over */
+		// temporarily boost the interleave to sync things up
+		// note: I'm using 50 because 30 is not enough for space dungeon at game over
 		machine().scheduler().perfect_quantum(attotime::from_usec(50));
 	}
 	else
@@ -178,8 +186,8 @@ void qixmcu_state::coinctrl_w(uint8_t data)
 		m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 	}
 
-	/* this is a callback called by pia6821_device::write(), so I don't need to synchronize */
-	/* the CPUs - they have already been synchronized by qix_pia_w() */
+	// this is a callback called by pia6821_device::write(), so I don't need to synchronize
+	// the CPUs - they have already been synchronized by qix_pia_w()
 	m_coinctrl = data;
 	logerror("qixmcu_state, coinctrl_w = %02X\n", data);
 }
@@ -194,13 +202,13 @@ void qixmcu_state::coinctrl_w(uint8_t data)
 
 uint8_t qixmcu_state::mcu_portb_r()
 {
-	return (ioport("COIN")->read() & 0x0f) | ((ioport("COIN")->read() & 0x80) >> 3);
+	return (m_coin->read() & 0x0f) | ((m_coin->read() & 0x80) >> 3);
 }
 
 
 uint8_t qixmcu_state::mcu_portc_r()
 {
-	return (m_coinctrl & 0x08) | ((ioport("COIN")->read() & 0x70) >> 4);
+	return (m_coinctrl & 0x08) | ((m_coin->read() & 0x70) >> 4);
 }
 
 
@@ -218,8 +226,9 @@ void qixmcu_state::mcu_porta_w(uint8_t data)
 }
 
 
-void qixmcu_state::mcu_portb_w(uint8_t data)
+void qixmcu_state::mcu_portb_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
+	data &= mem_mask;
 	machine().bookkeeping().coin_lockout_w(0, (~data >> 6) & 1);
 	machine().bookkeeping().coin_counter_w(0, (data >> 7) & 1);
 }
@@ -240,8 +249,8 @@ TIMER_CALLBACK_MEMBER(qix_state::pia_w_callback)
 
 void qix_state::qix_pia_w(offs_t offset, uint8_t data)
 {
-	/* make all the CPUs synchronize, and only AFTER that write the command to the PIA */
-	/* otherwise the 68705 will miss commands */
+	// make all the CPUs synchronize, and only AFTER that write the command to the PIA
+	// otherwise the 68705 will miss commands
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(qix_state::pia_w_callback), this), data | (offset << 8));
 }
 
@@ -259,6 +268,12 @@ void qix_state::qix_coinctl_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, (data >> 1) & 1);
 }
 
+void slither_state::slither_coinctl_w(uint8_t data)
+{
+	machine().bookkeeping().coin_lockout_w(0, (~data >> 6) & 1);
+	machine().bookkeeping().coin_counter_w(0, (data >> 5) & 1);
+}
+
 
 
 /*************************************
@@ -267,25 +282,23 @@ void qix_state::qix_coinctl_w(uint8_t data)
  *
  *************************************/
 
-void qix_state::slither_76489_0_w(uint8_t data)
+void slither_state::sn76489_0_ctrl_w(int state)
 {
-	/* write to the sound chip */
-	m_sn1->write(data);
+	// write to the sound chip
+	if (!state && m_sn76489_ctrl[0])
+		m_sn[0]->write(m_pia1->b_output());
 
-	/* clock the ready line going back into CB1 */
-	m_pia1->cb1_w(0);
-	m_pia1->cb1_w(1);
+	m_sn76489_ctrl[0] = bool(state);
 }
 
 
-void qix_state::slither_76489_1_w(uint8_t data)
+void slither_state::sn76489_1_ctrl_w(int state)
 {
-	/* write to the sound chip */
-	m_sn2->write(data);
+	// write to the sound chip
+	if (!state && m_sn76489_ctrl[1])
+		m_sn[1]->write(m_pia2->b_output());
 
-	/* clock the ready line going back into CB1 */
-	m_pia2->cb1_w(0);
-	m_pia2->cb1_w(1);
+	m_sn76489_ctrl[1] = bool(state);
 }
 
 
@@ -296,13 +309,13 @@ void qix_state::slither_76489_1_w(uint8_t data)
  *
  *************************************/
 
-uint8_t qix_state::slither_trak_lr_r()
+uint8_t slither_state::trak_lr_r()
 {
-	return ioport(m_flip ? "AN3" : "AN1")->read();
+	return m_trak[m_flip ? 3 : 1]->read();
 }
 
 
-uint8_t qix_state::slither_trak_ud_r()
+uint8_t slither_state::trak_ud_r()
 {
-	return ioport(m_flip ? "AN2" : "AN0")->read();
+	return m_trak[m_flip ? 2 : 0]->read();
 }

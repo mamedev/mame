@@ -70,9 +70,6 @@ void es8712_device::device_add_mconfig(machine_config &config)
 
 void es8712_device::device_start()
 {
-	m_reset_handler.resolve_safe();
-	m_msm_write_cb.resolve_safe();
-
 	es8712_state_save_register();
 }
 

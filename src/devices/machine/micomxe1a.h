@@ -21,9 +21,9 @@ public:
 
 	u8 out_r();
 
-	DECLARE_WRITE_LINE_MEMBER(req_w);
-	DECLARE_WRITE_LINE_MEMBER(mode_w); // 0 = digital, 1 = analog
-	DECLARE_WRITE_LINE_MEMBER(interface_w); // 0 = PC, 1 = MD
+	void req_w(int state);
+	void mode_w(int state); // 0 = digital, 1 = analog
+	void interface_w(int state); // 0 = PC, 1 = MD
 
 protected:
 	virtual void device_start() override ATTR_COLD;

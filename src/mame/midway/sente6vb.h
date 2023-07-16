@@ -31,7 +31,7 @@ public:
 	auto send_cb() { return m_send_cb.bind(); }
 	auto clock_out_cb() { return m_clock_out_cb.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(rec_w);
+	void rec_w(int state);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -45,12 +45,12 @@ private:
 	void chip_select_w(uint8_t data);
 	void dac_data_w(offs_t offset, uint8_t data);
 	void register_addr_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(uart_clock_w);
-	DECLARE_WRITE_LINE_MEMBER(counter_0_set_out);
+	void uart_clock_w(int state);
+	void counter_0_set_out(int state);
 
 	void update_counter_0_timer();
 	TIMER_DEVICE_CALLBACK_MEMBER(clock_counter_0_ff);
-	DECLARE_WRITE_LINE_MEMBER(set_counter_0_ff);
+	void set_counter_0_ff(int state);
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);

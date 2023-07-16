@@ -28,17 +28,8 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-#define LOG_PRINTF  (1U << 1)
-#define LOG_SETUP   (1U << 2)
-#define LOG_GENERAL (1U << 3)
-
-#define VERBOSE (LOG_PRINTF | LOG_SETUP | LOG_GENERAL)
-
+#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
-
-#define LOGPRINTF(...)  LOGMASKED(LOG_PRINTF,   __VA_ARGS__)
-#define LOGSETUP(...)   LOGMASKED(LOG_SETUP,    __VA_ARGS__)
-#define LOGGENERAL(...) LOGMASKED(LOG_GENERAL,  __VA_ARGS__)
 
 // Clocks
 #define MVME120_MASTER_CLOCK    20_MHz_XTAL
@@ -264,7 +255,7 @@ void vme_mvme120_device::rom_shadow_tap(offs_t address, u16 data, u16 mem_mask)
 	}
 }
 
-WRITE_LINE_MEMBER(vme_mvme120_device::watchdog_reset)
+void vme_mvme120_device::watchdog_reset(int state)
 {
 	if(state)
 	{
@@ -273,7 +264,7 @@ WRITE_LINE_MEMBER(vme_mvme120_device::watchdog_reset)
 	}
 }
 
-WRITE_LINE_MEMBER(vme_mvme120_device::mfp_interrupt)
+void vme_mvme120_device::mfp_interrupt(int state)
 {
 	LOG("%s: MFP asserting interrupt\n", FUNCNAME);
 

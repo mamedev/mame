@@ -15,14 +15,11 @@
 #include "machine/z80scc.h"
 #include "speaker.h"
 
-// ======================> heathrow_device
-
-class heathrow_device :  public pci_device
+class macio_device :  public pci_device
 {
 public:
 	// construction/destruction
-	heathrow_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	heathrow_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	macio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// interface routines
 	auto irq_callback() { return write_irq.bind(); }
@@ -34,16 +31,14 @@ public:
 	auto codec_r_callback() { return read_codec.bind(); }
 	auto codec_w_callback() { return write_codec.bind(); }
 
-	virtual void map(address_map &map);
-
 	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
 	template <typename... T> void set_pci_root_tag(T &&... args) { m_pci_memory.set_tag(std::forward<T>(args)...); }
 
-	DECLARE_WRITE_LINE_MEMBER(cb1_w);
-	DECLARE_WRITE_LINE_MEMBER(cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(scc_irq_w);
+	void cb1_w(int state);
+	void cb2_w(int state);
+	void scc_irq_w(int state);
 
-	template <int bit> DECLARE_WRITE_LINE_MEMBER(set_irq_line);
+	template <int bit> void set_irq_line(int state);
 
 	u32 codec_dma_read(u32 offset);
 	void codec_dma_write(u32 offset, u32 data);
@@ -53,10 +48,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	virtual void base_map(address_map &map);
 	virtual void config_map(address_map &map) override;
 
 	void common_init();
@@ -69,9 +64,6 @@ protected:
 
 	u8 fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, u8 data);
-
-	u8 nvram_r(offs_t offset);
-	void nvram_w(offs_t offset, u8 data);
 
 	u16 scc_r(offs_t offset);
 	void scc_w(offs_t offset, u16 data);
@@ -92,14 +84,13 @@ protected:
 	required_device<applefdintf_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<z80scc_device> m_scc;
-	required_device<dbdma_device> m_dma_audio_in, m_dma_audio_out;
+	required_device<dbdma_device> m_dma_scsi, m_dma_floppy, m_dma_sccatx, m_dma_sccarx;
+	required_device<dbdma_device> m_dma_sccbtx, m_dma_sccbrx, m_dma_audio_in, m_dma_audio_out;
 	required_address_space m_pci_memory;
 
 private:
 	floppy_image_device *m_cur_floppy = nullptr;
 	int m_hdsel;
-
-	u8 m_nvram[0x20000];
 
 	u8 via_in_a();
 	u8 via_in_b();
@@ -107,7 +98,7 @@ private:
 	void via_out_b(u8 data);
 	void via_sync();
 	void field_interrupts();
-	DECLARE_WRITE_LINE_MEMBER(via_out_cb2);
+	void via_out_cb2(int state);
 
 	void phases_w(u8 phases);
 	void devsel_w(u8 devsel);
@@ -120,22 +111,55 @@ private:
 	u32 m_InterruptEvents2, m_InterruptMask2, m_InterruptLevels2;
 };
 
-class paddington_device : public heathrow_device
-{
-public:
-	// construction/destruction
-	paddington_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-};
-
-class grandcentral_device : public heathrow_device
+class grandcentral_device : public macio_device
 {
 public:
 	// construction/destruction
 	grandcentral_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void map(address_map &map);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	required_device<dbdma_device> m_dma_scsi1;
+};
+
+class ohare_device : public macio_device, public device_nvram_interface
+{
+public:
+	// construction/destruction
+	ohare_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ohare_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void map(address_map &map);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	// device_nvram_interface overrides
+	virtual void nvram_default() override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
+
+	required_device<dbdma_device> m_dma_ata0, m_dma_ata1;
+
+	u8 nvram_r(offs_t offset);
+	void nvram_w(offs_t offset, u8 data);
+
+	u8 m_nvram[0x8000];
+};
+
+class heathrow_device : public ohare_device
+{
+public:
+	// construction/destruction
+	heathrow_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	heathrow_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void map(address_map &map) override;
 
@@ -144,11 +168,11 @@ protected:
 	virtual void device_start() override;
 };
 
-class ohare_device : public heathrow_device
+class paddington_device : public heathrow_device
 {
 public:
 	// construction/destruction
-	ohare_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	paddington_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// device-level overrides

@@ -69,6 +69,8 @@
 #include "../Include/intermediate.h"
 #include "../Include/InfoSink.h"
 
+#include <cstdint>
+
 namespace glslang {
 
 //

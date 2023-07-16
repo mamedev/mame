@@ -54,7 +54,7 @@ void uts_400_keyboard_device::device_start()
 	save_item(NAME(m_prog_line));
 }
 
-WRITE_LINE_MEMBER(uts_400_keyboard_device::ready_w)
+void uts_400_keyboard_device::ready_w(int state)
 {
 	m_ready_line = bool(state);
 }
@@ -79,12 +79,12 @@ void uts_400_keyboard_device::p2_w(u8 data)
 	m_p2_output = data;
 }
 
-READ_LINE_MEMBER(uts_400_keyboard_device::t1_r)
+int uts_400_keyboard_device::t1_r()
 {
 	return m_ready_line;
 }
 
-WRITE_LINE_MEMBER(uts_400_keyboard_device::prog_w)
+void uts_400_keyboard_device::prog_w(int state)
 {
 	if (!m_prog_line && state)
 		m_input_select = m_p2_output & 0x0f;

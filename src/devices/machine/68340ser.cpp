@@ -9,18 +9,16 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h
-#define LOG_SETUP   (1U <<  1)
-#define LOG_READ    (1U <<  2)
-#define LOG_SERIAL  (1U <<  3)
-#define LOG_INT     (1U <<  4)
+#define LOG_SETUP   (1U << 1)
+#define LOG_READ    (1U << 2)
+#define LOG_SERIAL  (1U << 3)
+#define LOG_INT     (1U << 4)
 
 //#define VERBOSE  (LOG_SETUP|LOG_READ|LOG_SERIAL|LOG_INT)
 #define LOG_OUTPUT_FUNC printf // Needs always to be enabled as the default value 'logerror' is not available here
 
 #include "logmacro.h"
 
-//#define LOG(...) LOGMASKED(LOG_GENERAL,   __VA_ARGS__) // Already defined in logmacro.h
 #define LOGSETUP(...)  LOGMASKED(LOG_SETUP,  __VA_ARGS__)
 #define LOGR(...)      LOGMASKED(LOG_READ,   __VA_ARGS__)
 #define LOGSERIAL(...) LOGMASKED(LOG_SERIAL, __VA_ARGS__)
@@ -146,7 +144,7 @@ void mc68340_serial_module_device::write(offs_t offset, uint8_t data)
 
 }
 
-WRITE_LINE_MEMBER( mc68340_serial_module_device::irq_w )
+void mc68340_serial_module_device::irq_w(int state)
 {
 	LOGINT("IRQ!\n%s\n", FUNCNAME);
 	m_cpu->update_ipl();

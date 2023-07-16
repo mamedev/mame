@@ -124,7 +124,7 @@ private:
 	required_device<meters_device> m_meters;
 	output_finder<256> m_lamps;
 
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
+	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	void watchdog_w(uint8_t data);
 	uint8_t irqlatch_r();
 	void reel12_w(uint8_t data);
@@ -139,8 +139,8 @@ private:
 	void mux_enable_w(uint8_t data);
 	void triac_w(uint8_t data);
 	uint8_t triac_r();
-	DECLARE_WRITE_LINE_MEMBER(sys85_data_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	void sys85_data_w(int state);
+	void write_acia_clock(int state);
 	int b85_find_project_string();
 };
 
@@ -151,13 +151,13 @@ private:
 ///////////////////////////////////////////////////////////////////////////
 
 
-WRITE_LINE_MEMBER(bfmsys85_state::sys85_data_w)
+void bfmsys85_state::sys85_data_w(int state)
 {
 	m_sys85_data_line_t = state;
 }
 
 
-WRITE_LINE_MEMBER(bfmsys85_state::write_acia_clock)
+void bfmsys85_state::write_acia_clock(int state)
 {
 	m_acia6850_0->write_txc(state);
 	m_acia6850_0->write_rxc(state);

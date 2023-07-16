@@ -20,9 +20,9 @@ public:
 	// host interface
 	u8 data_r();
 	void data_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
-	DECLARE_READ_LINE_MEMBER(host_semaphore_r) { return m_host_flag ? 1 : 0; }
-	DECLARE_READ_LINE_MEMBER(mcu_semaphore_r) { return m_mcu_flag ? 1 : 0; }
+	void reset_w(int state);
+	int host_semaphore_r() { return m_host_flag ? 1 : 0; }
+	int mcu_semaphore_r() { return m_mcu_flag ? 1 : 0; }
 
 protected:
 	taito68705_mcu_device_base(

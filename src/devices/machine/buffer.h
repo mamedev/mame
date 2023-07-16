@@ -10,14 +10,14 @@ public:
 
 	uint8_t read() { return m_input_data; }
 
-	DECLARE_WRITE_LINE_MEMBER(write_bit0) { if (state) m_input_data |= 0x01; else m_input_data &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(write_bit1) { if (state) m_input_data |= 0x02; else m_input_data &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(write_bit2) { if (state) m_input_data |= 0x04; else m_input_data &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(write_bit3) { if (state) m_input_data |= 0x08; else m_input_data &= ~0x08; }
-	DECLARE_WRITE_LINE_MEMBER(write_bit4) { if (state) m_input_data |= 0x10; else m_input_data &= ~0x10; }
-	DECLARE_WRITE_LINE_MEMBER(write_bit5) { if (state) m_input_data |= 0x20; else m_input_data &= ~0x20; }
-	DECLARE_WRITE_LINE_MEMBER(write_bit6) { if (state) m_input_data |= 0x40; else m_input_data &= ~0x40; }
-	DECLARE_WRITE_LINE_MEMBER(write_bit7) { if (state) m_input_data |= 0x80; else m_input_data &= ~0x80; }
+	void write_bit0(int state) { if (state) m_input_data |= 0x01; else m_input_data &= ~0x01; }
+	void write_bit1(int state) { if (state) m_input_data |= 0x02; else m_input_data &= ~0x02; }
+	void write_bit2(int state) { if (state) m_input_data |= 0x04; else m_input_data &= ~0x04; }
+	void write_bit3(int state) { if (state) m_input_data |= 0x08; else m_input_data &= ~0x08; }
+	void write_bit4(int state) { if (state) m_input_data |= 0x10; else m_input_data &= ~0x10; }
+	void write_bit5(int state) { if (state) m_input_data |= 0x20; else m_input_data &= ~0x20; }
+	void write_bit6(int state) { if (state) m_input_data |= 0x40; else m_input_data &= ~0x40; }
+	void write_bit7(int state) { if (state) m_input_data |= 0x80; else m_input_data &= ~0x80; }
 
 protected:
 	virtual void device_start() override;

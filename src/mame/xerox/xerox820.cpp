@@ -339,7 +339,7 @@ void xerox820ii_state::rdpio_pb_w(uint8_t data)
 	// TODO: LS74 Q
 }
 
-WRITE_LINE_MEMBER( xerox820ii_state::rdpio_pardy_w )
+void xerox820ii_state::rdpio_pardy_w(int state)
 {
 	// TODO
 }
@@ -433,14 +433,14 @@ void xerox820_state::update_nmi()
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
-WRITE_LINE_MEMBER( xerox820_state::fdc_intrq_w )
+void xerox820_state::fdc_intrq_w(int state)
 {
 	m_fdc_irq = state;
 
 	update_nmi();
 }
 
-WRITE_LINE_MEMBER( xerox820_state::fdc_drq_w )
+void xerox820_state::fdc_drq_w(int state)
 {
 	m_fdc_drq = state;
 

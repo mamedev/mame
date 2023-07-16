@@ -63,8 +63,6 @@ void ics2115_device::device_start()
 	m_timer[1].timer = timer_alloc(FUNC(ics2115_device::timer_cb_1), this);
 	m_stream = stream_alloc(0, 2, clock() / (32 * 32));
 
-	m_irq_cb.resolve_safe();
-
 	//Exact formula as per patent 5809466
 	//This seems to give the ok fit but it is not good enough.
 	/*double maxvol = ((1 << volume_bits) - 1) * pow(2., (double)1/0x100);
@@ -1082,8 +1080,7 @@ void ics2115_device::recalc_irq()
 	for (int i = 0; (!irq) && (i < 32); i++)
 		irq |= m_voice[i].vol_ctrl.bitflags.irq_pending && m_voice[i].osc_conf.bitflags.irq_pending;
 	m_irq_on = irq;
-	if (!m_irq_cb.isnull())
-		m_irq_cb(irq ? ASSERT_LINE : CLEAR_LINE);
+	m_irq_cb(irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 TIMER_CALLBACK_MEMBER( ics2115_device::timer_cb_0 )

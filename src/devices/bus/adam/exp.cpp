@@ -67,9 +67,6 @@ adam_expansion_slot_device::adam_expansion_slot_device(const machine_config &mco
 void adam_expansion_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_write_irq.resolve_safe();
 }
 
 

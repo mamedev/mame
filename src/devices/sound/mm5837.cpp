@@ -43,9 +43,6 @@ mm5837_device::mm5837_device(const machine_config &mconfig, const char *tag, dev
 
 void mm5837_device::device_start()
 {
-	// resolve callbacks
-	m_output_cb.resolve_safe();
-
 	// get timer
 	m_timer = timer_alloc(FUNC(mm5837_device::update_clock_output), this);
 

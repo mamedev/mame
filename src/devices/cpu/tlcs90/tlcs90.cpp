@@ -157,7 +157,7 @@ void tlcs90_device::tmp90ph44_mem(address_map &map)
 tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, program_map)
-	, m_port_read_cb(*this)
+	, m_port_read_cb(*this, 0xff)
 	, m_port_write_cb(*this)
 {
 }
@@ -2850,9 +2850,6 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer4_callback )
 
 void tlcs90_device::device_start()
 {
-	m_port_read_cb.resolve_all_safe(0xff);
-	m_port_write_cb.resolve_all_safe();
-
 	save_item(NAME(m_prvpc.w.l));
 	save_item(NAME(m_pc.w.l));
 	save_item(NAME(m_sp.w.l));

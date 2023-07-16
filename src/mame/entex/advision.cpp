@@ -104,10 +104,10 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void av_control_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(vblank);
+	void vblank(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(led_update);
 	TIMER_DEVICE_CALLBACK_MEMBER(led_off);
-	DECLARE_READ_LINE_MEMBER(vsync_r);
+	int vsync_r();
 
 	TIMER_CALLBACK_MEMBER(sound_cmd_sync);
 	u8 sound_cmd_r();
@@ -196,7 +196,7 @@ void advision_state::av_control_w(u8 data)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(advision_state::sound_cmd_sync), this), data >> 4);
 }
 
-WRITE_LINE_MEMBER(advision_state::vblank)
+void advision_state::vblank(int state)
 {
 	if (!state && (m_screen->frame_number() & 3) == 0)
 	{
@@ -236,7 +236,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(advision_state::led_off)
 	m_video_enable = false;
 }
 
-READ_LINE_MEMBER(advision_state::vsync_r)
+int advision_state::vsync_r()
 {
 	// T1: mirror sync pulse (half rotation)
 	return (m_mirror_sync->enabled()) ? 0 : 1;

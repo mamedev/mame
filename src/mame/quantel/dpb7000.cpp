@@ -49,34 +49,34 @@
 #include <algorithm>
 #include <deque>
 
-#define LOG_UNKNOWN         (1 << 0)
-#define LOG_UCODE           (1 << 1)
-#define LOG_MORE_UCODE      (1 << 2)
-#define LOG_CSR             (1 << 3)
-#define LOG_CTRLBUS         (1 << 4)
-#define LOG_SYS_CTRL        (1 << 5)
-#define LOG_FDC_CTRL        (1 << 6)
-#define LOG_FDC_PORT        (1 << 7)
-#define LOG_FDC_CMD         (1 << 8)
-#define LOG_FDC_MECH        (1 << 9)
-#define LOG_OUTPUT_TIMING   (1 << 10)
-#define LOG_BRUSH_ADDR      (1 << 11)
-#define LOG_STORE_ADDR      (1 << 12)
-#define LOG_COMBINER        (1 << 13)
-#define LOG_SIZE_CARD       (1 << 14)
-#define LOG_FILTER_CARD     (1 << 15)
-#define LOG_KEYBC           (1 << 16)
-#define LOG_TDS             (1 << 17)
-#define LOG_TABLET          (1 << 18)
-#define LOG_COMMANDS        (1 << 19)
-#define LOG_HDD             (1 << 20)
-#define LOG_FDD             (1 << 21)
-#define LOG_DDB             (1 << 22)
-#define LOG_IRQ             (1 << 23)
-#define LOG_BRUSH_LATCH     (1 << 24)
-#define LOG_BRUSH_DRAWS     (1 << 25)
-#define LOG_BRUSH_WRITES    (1 << 26)
-#define LOG_STORE_READS     (1 << 27)
+#define LOG_UNKNOWN         (1U << 1)
+#define LOG_UCODE           (1U << 2)
+#define LOG_MORE_UCODE      (1U << 3)
+#define LOG_CSR             (1U << 4)
+#define LOG_CTRLBUS         (1U << 5)
+#define LOG_SYS_CTRL        (1U << 6)
+#define LOG_FDC_CTRL        (1U << 7)
+#define LOG_FDC_PORT        (1U << 8)
+#define LOG_FDC_CMD         (1U << 9)
+#define LOG_FDC_MECH        (1U << 10)
+#define LOG_OUTPUT_TIMING   (1U << 11)
+#define LOG_BRUSH_ADDR      (1U << 12)
+#define LOG_STORE_ADDR      (1U << 13)
+#define LOG_COMBINER        (1U << 14)
+#define LOG_SIZE_CARD       (1U << 15)
+#define LOG_FILTER_CARD     (1U << 16)
+#define LOG_KEYBC           (1U << 17)
+#define LOG_TDS             (1U << 18)
+#define LOG_TABLET          (1U << 19)
+#define LOG_COMMANDS        (1U << 20)
+#define LOG_HDD             (1U << 21)
+#define LOG_FDD             (1U << 22)
+#define LOG_DDB             (1U << 23)
+#define LOG_IRQ             (1U << 24)
+#define LOG_BRUSH_LATCH     (1U << 25)
+#define LOG_BRUSH_DRAWS     (1U << 26)
+#define LOG_BRUSH_WRITES    (1U << 27)
+#define LOG_STORE_READS     (1U << 28)
 #define LOG_ALL             (LOG_UNKNOWN | LOG_CSR | LOG_CTRLBUS | LOG_SYS_CTRL | LOG_BRUSH_ADDR | \
 							 LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD | LOG_COMMANDS | LOG_OUTPUT_TIMING | \
 							 LOG_BRUSH_LATCH | LOG_FDC_PORT | LOG_FDC_CMD | LOG_FDC_MECH | LOG_BRUSH_WRITES | LOG_STORE_READS)
@@ -180,7 +180,7 @@ private:
 	void fddcpu_p1_w(uint8_t data);
 	uint8_t fddcpu_p2_r();
 	void fddcpu_p2_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(fddcpu_debug_rx);
+	void fddcpu_debug_rx(int state);
 
 	bool handle_command(uint16_t data);
 	void store_address_w(uint8_t card, uint16_t data);
@@ -369,8 +369,8 @@ private:
 	uint8_t keyboard_p2_r();
 	void keyboard_p1_w(uint8_t data);
 	void keyboard_p2_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(keyboard_t0_r);
-	DECLARE_READ_LINE_MEMBER(keyboard_t1_r);
+	int keyboard_t0_r();
+	int keyboard_t1_r();
 	uint8_t m_keybc_latched_bit;
 	uint8_t m_keybc_p1_data;
 	uint8_t m_keybc_tx;
@@ -398,7 +398,7 @@ private:
 	void tds_convert_w(uint8_t data);
 	uint8_t tds_adc_r();
 	uint8_t tds_pen_switches_r();
-	DECLARE_WRITE_LINE_MEMBER(duart_b_w);
+	void duart_b_w(int state);
 	TIMER_CALLBACK_MEMBER(tablet_tx_tick);
 	TIMER_CALLBACK_MEMBER(tds_adc_tick);
 	TIMER_CALLBACK_MEMBER(tds_press_tick);
@@ -3044,7 +3044,7 @@ uint8_t dpb7000_state::fdd_cmd_r()
 	return m_diskseq_cmd_to_ctrl;
 }
 
-WRITE_LINE_MEMBER(dpb7000_state::fddcpu_debug_rx)
+void dpb7000_state::fddcpu_debug_rx(int state)
 {
 	if (m_fdd_debug_rx_bit_count < 10)
 	{
@@ -3093,13 +3093,13 @@ void dpb7000_state::keyboard_p2_w(uint8_t data)
 	m_keybc_tx = BIT(~data, 7);
 }
 
-READ_LINE_MEMBER(dpb7000_state::keyboard_t0_r)
+int dpb7000_state::keyboard_t0_r()
 {
 	LOGMASKED(LOG_KEYBC, "%s: T0 read\n", machine().describe_context());
 	return 0;
 }
 
-READ_LINE_MEMBER(dpb7000_state::keyboard_t1_r)
+int dpb7000_state::keyboard_t1_r()
 {
 	uint8_t data = m_keybc_latched_bit;
 	//m_keybc_latched_bit = 0;
@@ -3200,7 +3200,7 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::tablet_tx_tick)
 	}
 }
 
-WRITE_LINE_MEMBER(dpb7000_state::duart_b_w)
+void dpb7000_state::duart_b_w(int state)
 {
 	//printf("B%d ", state);
 }

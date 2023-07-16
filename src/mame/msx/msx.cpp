@@ -107,9 +107,6 @@
 #include "screen.h"
 #include "softlist_dev.h"
 
-#include "msx.lh"
-
-
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
@@ -161,10 +158,7 @@ msx_state::msx_state(const machine_config &mconfig, device_type type, const char
 	, m_port_c_old(0)
 	, m_keylatch(0)
 	, m_caps_led(*this, "caps_led")
-	, m_caps_led_name(*this, "caps_led_name")
 	, m_code_led(*this, "code_led")
-	, m_code_led_name(*this, "code_led_name")
-	, m_region(REGION_UNKNOWN)
 	, m_main_xtal(main_xtal)
 	, m_cpu_xtal_divider(cpu_xtal_divider)
 {
@@ -309,24 +303,18 @@ void msx_state::machine_reset()
 		m_view_slot0_page2.select(0);
 		m_view_slot0_page3.select(0);
 	}
-	m_caps_led_name = m_hw_def.has_caps_led() ? 1 : 0;
-	m_caps_led = m_hw_def.has_caps_led() ? 1 : 0;
-	m_code_led_name = m_hw_def.has_code_led() ? m_region : 0;
-	m_code_led = m_hw_def.has_code_led() ? 1 : 0;
+	m_caps_led = 0;
+	m_code_led = 0;
 }
 
 void msx_state::machine_start()
 {
 	m_caps_led.resolve();
-	m_caps_led_name.resolve();
 	m_code_led.resolve();
-	m_code_led_name.resolve();
 	m_port_c_old = 0xff;
 }
 
-/* A hack to add 1 wait cycle in each opcode fetch.
-   Possibly worth not to use custom table at all but adjust desired icount
-   directly in m_opcodes.read_byte handler. */
+// Update instruction timings to add 1 wait cycle for each M1 opcode fetch.
 static const u8 cc_op[0x100] = {
 	4+1,10+1, 7+1, 6+1, 4+1, 4+1, 7+1, 4+1, 4+1,11+1, 7+1, 6+1, 4+1, 4+1, 7+1, 4+1,
 	8+1,10+1, 7+1, 6+1, 4+1, 4+1, 7+1, 4+1,12+1,11+1, 7+1, 6+1, 4+1, 4+1, 7+1, 4+1,
@@ -465,8 +453,7 @@ void msx_state::psg_port_a_w(u8 data)
 void msx_state::psg_port_b_w(u8 data)
 {
 	// Code(/Kana/Arabic/Hangul) led
-	if (m_hw_def.has_code_led())
-		m_code_led = 1 + BIT(~data, 7);
+	m_code_led = BIT(~data, 7);
 
 	m_gen_port1->pin_6_w(BIT(data, 0));
 	m_gen_port1->pin_7_w(BIT(data, 1));
@@ -494,8 +481,7 @@ void msx_state::ppi_port_c_w(u8 data)
 	m_keylatch = data & 0x0f;
 
 	// caps lock
-	if (m_hw_def.has_caps_led())
-		m_caps_led = 1 + BIT(~data, 6);
+	m_caps_led = BIT(~data, 6);
 
 	// key click
 	if (BIT(m_port_c_old ^ data, 7))
@@ -565,9 +551,8 @@ void msx_state::kanji_w(offs_t offset, u8 data)
 		m_kanji_latch = (m_kanji_latch & 0x1f800) | ((data & 0x3f) << 5);
 }
 
-void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, region_type region)
+void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
-	m_region = region;
 	// basic machine hardware
 	Z80(config, m_maincpu, m_main_xtal / m_cpu_xtal_divider);         // 3.579545 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &msx_state::memory_map);
@@ -626,7 +611,7 @@ void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, region
 		m_cassette->set_interface("msx_cass");
 	}
 
-	config.set_default_layout(layout_msx);
+	config.set_default_layout(layout);
 }
 
 void msx_state::msx1_add_softlists(machine_config &config)
@@ -641,9 +626,9 @@ void msx_state::msx1_add_softlists(machine_config &config)
 		SOFTWARE_LIST(config, "flop_list").set_original("msx1_flop");
 }
 
-void msx_state::msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config, region_type region)
+void msx_state::msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
-	msx_base(ay8910_type, config, region);
+	msx_base(ay8910_type, config, layout);
 
 	m_maincpu->set_addrmap(AS_IO, &msx_state::msx1_io_map);
 
@@ -741,7 +726,7 @@ void msx2_base_state::switched_w(offs_t offset, u8 data)
 }
 
 // Some MSX2+ can switch the z80 clock between 3.5 and 5.3 MHz
-WRITE_LINE_MEMBER(msx2_base_state::turbo_w)
+void msx2_base_state::turbo_w(int state)
 {
 	// 0 - 5.369317 MHz
 	// 1 - 3.579545 MHz
@@ -824,17 +809,17 @@ void msx2_base_state::turbor_add_softlists(machine_config &config)
 	}
 }
 
-void msx2_base_state::msx2_base(ay8910_type ay8910_type, machine_config &config, region_type region)
+void msx2_base_state::msx2_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
-	msx_base(ay8910_type, config, region);
+	msx_base(ay8910_type, config, layout);
 
 	// real time clock
 	RP5C01(config, m_rtc, 32.768_kHz_XTAL);
 }
 
-void msx2_base_state::msx2(ay8910_type ay8910_type, machine_config &config, region_type region)
+void msx2_base_state::msx2(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
-	msx2_base(ay8910_type, config, region);
+	msx2_base(ay8910_type, config, layout);
 
 	m_maincpu->set_addrmap(AS_IO, &msx2_base_state::msx2_io_map);
 
@@ -848,15 +833,15 @@ void msx2_base_state::msx2(ay8910_type ay8910_type, machine_config &config, regi
 	msx2_add_softlists(config);
 }
 
-void msx2_base_state::msx2_pal(ay8910_type ay8910_type, machine_config &config, region_type region)
+void msx2_base_state::msx2_pal(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
-	msx2(ay8910_type, config, region);
+	msx2(ay8910_type, config, layout);
 	m_v9938->set_screen_pal(m_screen);
 }
 
-void msx2_base_state::msx2plus_base(ay8910_type ay8910_type, machine_config &config, region_type region)
+void msx2_base_state::msx2plus_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
-	msx2_base(ay8910_type, config, region);
+	msx2_base(ay8910_type, config, layout);
 
 	m_maincpu->set_addrmap(AS_IO, &msx2_base_state::msx2plus_io_map);
 
@@ -867,23 +852,23 @@ void msx2_base_state::msx2plus_base(ay8910_type ay8910_type, machine_config &con
 	m_v9958->int_cb().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
 }
 
-void msx2_base_state::msx2plus(ay8910_type ay8910_type, machine_config &config, region_type region)
+void msx2_base_state::msx2plus(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
-	msx2plus_base(ay8910_type, config, region);
+	msx2plus_base(ay8910_type, config, layout);
 
 	// Software lists
 	msx2plus_add_softlists(config);
 }
 
-void msx2_base_state::msx2plus_pal(ay8910_type ay8910_type, machine_config &config, region_type region)
+void msx2_base_state::msx2plus_pal(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
-	msx2plus(ay8910_type, config, region);
+	msx2plus(ay8910_type, config, layout);
 	m_v9958->set_screen_pal(m_screen);
 }
 
-void msx2_base_state::turbor(ay8910_type ay8910_type, machine_config &config, region_type region)
+void msx2_base_state::turbor(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
-	msx2plus_base(ay8910_type, config, region);
+	msx2plus_base(ay8910_type, config, layout);
 
 	R800(config.replace(), m_maincpu, 28.636363_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &msx2_base_state::memory_map);

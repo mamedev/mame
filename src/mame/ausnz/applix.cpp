@@ -29,7 +29,7 @@
     - Audio: it could be better
     - DAC output is used to compare against analog inputs; core doesn't permit
       audio outputs to be used for non-speaker purposes.
-    - Bios 5 crashes MAME after scrolling about half a screen
+    - BIOS 5 crashes MAME after scrolling about half a screen
 
 ****************************************************************************/
 
@@ -99,7 +99,7 @@ private:
 	u8 applix_pb_r();
 	void applix_pa_w(u8 data);
 	void applix_pb_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(vsync_w);
+	void vsync_w(int state);
 	u8 port00_r();
 	u8 port08_r();
 	u8 port10_r();
@@ -818,7 +818,7 @@ MC6845_BEGIN_UPDATE( applix_state::crtc_update_border )
 	bitmap.fill(m_palette->pen(m_video_latch >> 4), cliprect);
 }
 
-WRITE_LINE_MEMBER( applix_state::vsync_w )
+void applix_state::vsync_w(int state)
 {
 	m_via->write_ca2(state);
 }

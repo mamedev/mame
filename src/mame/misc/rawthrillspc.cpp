@@ -10,7 +10,7 @@
         · Dell Optiplex 390.
         · Dell Optiplex 580.
         · Microtel w/ASRock N68C-GS FX AM3+ motherboard.
-    - Video GeForce GT730.
+    - Video GeForce GT730 (GF108).
       * Other supported setups are:
         · nVidia 8400GS (256MB+).
         · nVidia 7300GS.
@@ -119,7 +119,7 @@ ROM_END
 
 /*
  Doodle Jump Arcade, by default, uses a different PC than other Raw Thrills games:
-   -HP with an Asus M2N68-LA "Narra 3" motherboard (Socket AM3, nForce-based, nVidia MCP61P chipset)
+   -HP/Compaq Presario VS459AA-ABE CQ5211ES with an Asus M2N68-LA "Narra 3" motherboard (Socket AM3, nForce-based, nVidia MCP61P chipset)
      * Fintek F8000 + Realtek RTL8201EL + Realtek ALC662 + nVidia NF-6100-430-N-A3 + ST L6740L.
    -CPU Athlon II CPU (ADX2400CK23GQ).
    -2GB RAM (single SIMM, PC3-12800) [HP P/N 655409-150].
@@ -130,8 +130,8 @@ ROM_END
 */
 ROM_START( doodlejmp )
 	ROM_REGION32_LE( 0x100000, "bios", 0 )
-	ROM_SYSTEM_BIOS( 0, "1001", "ASUS 1001 (11/17/2010)" )
-	ROMX_LOAD( "m2n68-asus-1001.rom", 0x000000, 0x100000, CRC(6f4ff699) SHA1(d43baae25fcfb442ccf2cc716e6051b3795296cd), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 0, "0515", "Compaq 5.15 (11/06/2009)" )
+	ROMX_LOAD( "w25x80a.bin", 0x000000, 0x100000, CRC(e91538ee) SHA1(32add79eba2049205a98fc4e854976e11d102a4c), ROM_BIOS(0) )
 
 	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "doodlejmp", 0, NO_DUMP )
@@ -146,6 +146,6 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(2013, doodlejmp,    0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "ICE / Raw Thrills (Lima Sky licensed)",      "Doodle Jump Arcade (v1.16)",       MACHINE_IS_SKELETON)
+GAME(2013, doodlejmp,    0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "ICE / Raw Thrills (Lima Sky license)",      "Doodle Jump Arcade (v1.16)",       MACHINE_IS_SKELETON)
 GAME(2004, fnf,          0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills",                                "The Fast And The Furious (v3.06)", MACHINE_IS_SKELETON)
-GAME(2008, guitarheroac, 0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills (Activision / Konami licensed)", "Guitar Hero Arcade (v1.0.5)",      MACHINE_IS_SKELETON)
+GAME(2008, guitarheroac, 0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills (Activision / Konami license)", "Guitar Hero Arcade (v1.0.5)",      MACHINE_IS_SKELETON)

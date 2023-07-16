@@ -302,7 +302,7 @@ CUSTOM_INPUT_MEMBER(phoenix_state::player_input_r)
 		return (ioport("CTRL")->read() & 0x0f) >> 0;
 }
 
-READ_LINE_MEMBER(phoenix_state::pleiads_protection_r)
+int phoenix_state::pleiads_protection_r()
 {
 	/* handle Pleiads protection */
 	switch (m_pleiads_protection_question)
@@ -424,7 +424,7 @@ uint8_t phoenix_state::survival_protection_r()
 	return m_survival_protection_value;
 }
 
-READ_LINE_MEMBER(phoenix_state::survival_sid_callback)
+int phoenix_state::survival_sid_callback()
 {
 	return m_survival_sid_value ? ASSERT_LINE : CLEAR_LINE;
 }

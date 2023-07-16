@@ -26,7 +26,7 @@ class geneve_xt_101_hle_keyboard_device : public device_t, public device_pc_kbd_
 public:
 	// construction/destruction
 	geneve_xt_101_hle_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_WRITE_LINE_MEMBER(reset_line);
+	void reset_line(int state);
 
 protected:
 	// device-level overrides
@@ -35,8 +35,8 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// device_pc_kbd_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER(clock_write) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(data_write) override;
+	virtual void clock_write(int state) override;
+	virtual void data_write(int state) override;
 
 	TIMER_CALLBACK_MEMBER(poll_tick);
 	TIMER_CALLBACK_MEMBER(send_tick);

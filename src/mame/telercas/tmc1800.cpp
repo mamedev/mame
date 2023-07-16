@@ -551,68 +551,68 @@ INPUT_PORTS_END
 
 // Telmac 1800
 
-READ_LINE_MEMBER( tmc1800_state::clear_r )
+int tmc1800_state::clear_r()
 {
 	return BIT(m_run->read(), 0);
 }
 
-READ_LINE_MEMBER( tmc1800_state::ef2_r )
+int tmc1800_state::ef2_r()
 {
 	return m_cassette->input() < 0;
 }
 
-READ_LINE_MEMBER( tmc1800_state::ef3_r )
+int tmc1800_state::ef3_r()
 {
 	return CLEAR_LINE; // TODO
 }
 
-WRITE_LINE_MEMBER( tmc1800_state::q_w )
+void tmc1800_state::q_w(int state)
 {
 	m_cassette->output(state ? 1.0 : -1.0);
 }
 
 // Oscom 1000B
 
-READ_LINE_MEMBER( osc1000b_state::clear_r )
+int osc1000b_state::clear_r()
 {
 	return BIT(m_run->read(), 0);
 }
 
-READ_LINE_MEMBER( osc1000b_state::ef2_r )
+int osc1000b_state::ef2_r()
 {
 	return m_cassette->input() < 0;
 }
 
-READ_LINE_MEMBER( osc1000b_state::ef3_r )
+int osc1000b_state::ef3_r()
 {
 	return CLEAR_LINE; // TODO
 }
 
-WRITE_LINE_MEMBER( osc1000b_state::q_w )
+void osc1000b_state::q_w(int state)
 {
 	m_cassette->output(state ? 1.0 : -1.0);
 }
 
 // Telmac 2000
 
-READ_LINE_MEMBER( tmc2000_state::clear_r )
+int tmc2000_state::clear_r()
 {
 	return BIT(m_run->read(), 0);
 }
 
-READ_LINE_MEMBER( tmc2000_state::ef2_r )
+int tmc2000_state::ef2_r()
 {
 	return (m_cassette)->input() < 0;
 }
 
-READ_LINE_MEMBER( tmc2000_state::ef3_r )
+int tmc2000_state::ef3_r()
 {
 	uint8_t data = ~m_key_row[m_keylatch / 8]->read();
 
 	return BIT(data, m_keylatch % 8);
 }
 
-WRITE_LINE_MEMBER( tmc2000_state::q_w )
+void tmc2000_state::q_w(int state)
 {
 	/* CDP1864 audio output enable */
 	m_cti->aoe_w(state);
@@ -634,7 +634,7 @@ void tmc2000_state::dma_w(offs_t offset, uint8_t data)
 
 // OSCOM Nano
 
-READ_LINE_MEMBER( nano_state::clear_r )
+int nano_state::clear_r()
 {
 	int run = BIT(m_run->read(), 0);
 	int monitor = BIT(m_monitor->read(), 0);
@@ -642,12 +642,12 @@ READ_LINE_MEMBER( nano_state::clear_r )
 	return run && monitor;
 }
 
-READ_LINE_MEMBER( nano_state::ef2_r )
+int nano_state::ef2_r()
 {
 	return m_cassette->input() < 0;
 }
 
-READ_LINE_MEMBER( nano_state::ef3_r )
+int nano_state::ef3_r()
 {
 	uint8_t data = 0xff;
 
@@ -657,7 +657,7 @@ READ_LINE_MEMBER( nano_state::ef3_r )
 	return !BIT(data, m_keylatch & 0x07);
 }
 
-WRITE_LINE_MEMBER( nano_state::q_w )
+void nano_state::q_w(int state)
 {
 	/* CDP1864 audio output enable */
 	m_cti->aoe_w(state);

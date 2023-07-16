@@ -28,7 +28,7 @@ public:
 	u8 bsmt_comms_r();
 	void bsmt_comms_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(bsmt_reset_line);
+	void bsmt_reset_line(int state);
 
 	void bsmt_map(address_map &map);
 	void decobsmt_map(address_map &map);

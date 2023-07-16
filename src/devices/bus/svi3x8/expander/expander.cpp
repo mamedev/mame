@@ -36,7 +36,7 @@ svi_expander_device::svi_expander_device(const machine_config &mconfig, const ch
 	m_ramdis_handler(*this),
 	m_ctrl1_handler(*this),
 	m_ctrl2_handler(*this),
-	m_excsr_handler(*this),
+	m_excsr_handler(*this, 0xff),
 	m_excsw_handler(*this)
 {
 }
@@ -57,15 +57,6 @@ void svi_expander_device::device_start()
 {
 	// get inserted module
 	m_module = get_card_device();
-
-	// resolve callbacks
-	m_int_handler.resolve_safe();
-	m_romdis_handler.resolve_safe();
-	m_ramdis_handler.resolve_safe();
-	m_ctrl1_handler.resolve_safe();
-	m_ctrl2_handler.resolve_safe();
-	m_excsr_handler.resolve_safe(0xff);
-	m_excsw_handler.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -106,28 +97,28 @@ void svi_expander_device::iorq_w(offs_t offset, uint8_t data)
 		m_module->iorq_w(offset, data);
 }
 
-WRITE_LINE_MEMBER( svi_expander_device::bk21_w )
+void svi_expander_device::bk21_w(int state)
 {
-		if (m_module)
-			m_module->bk21_w(state);
+	if (m_module)
+		m_module->bk21_w(state);
 }
 
-WRITE_LINE_MEMBER( svi_expander_device::bk22_w )
+void svi_expander_device::bk22_w(int state)
 {
-		if (m_module)
-			m_module->bk22_w(state);
+	if (m_module)
+		m_module->bk22_w(state);
 }
 
-WRITE_LINE_MEMBER( svi_expander_device::bk31_w )
+void svi_expander_device::bk31_w(int state)
 {
-		if (m_module)
-			m_module->bk31_w(state);
+	if (m_module)
+		m_module->bk31_w(state);
 }
 
-WRITE_LINE_MEMBER( svi_expander_device::bk32_w )
+void svi_expander_device::bk32_w(int state)
 {
-		if (m_module)
-			m_module->bk32_w(state);
+	if (m_module)
+		m_module->bk32_w(state);
 }
 
 

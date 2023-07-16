@@ -72,10 +72,10 @@ protected:
 	void n8080_sound_1_w(uint8_t data);
 	void n8080_sound_2_w(uint8_t data);
 	uint8_t n8080_8035_p1_r();
-	DECLARE_READ_LINE_MEMBER(n8080_8035_t0_r);
-	DECLARE_READ_LINE_MEMBER(n8080_8035_t1_r);
+	int n8080_8035_t0_r();
+	int n8080_8035_t1_r();
 	void n8080_dac_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(n8080_inte_callback);
+	void n8080_inte_callback(int state);
 	void n8080_status_callback(uint8_t data);
 	void n8080_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(rst1_tick);
@@ -178,8 +178,8 @@ private:
 	void helifire_sound(machine_config &config);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(dac_volume_timer);
-	DECLARE_READ_LINE_MEMBER(helifire_8035_t0_r);
-	DECLARE_READ_LINE_MEMBER(helifire_8035_t1_r);
+	int helifire_8035_t0_r();
+	int helifire_8035_t1_r();
 	uint8_t helifire_8035_external_ram_r();
 	uint8_t helifire_8035_p2_r();
 	void sound_ctrl_w(uint8_t data);
@@ -187,7 +187,7 @@ private:
 
 	void helifire_palette(palette_device &palette) const;
 	void next_line();
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void main_cpu_map(address_map &map);
 

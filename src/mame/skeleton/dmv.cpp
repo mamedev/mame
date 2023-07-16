@@ -85,12 +85,12 @@ private:
 	void update_halt_line();
 
 	void leds_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
-	DECLARE_WRITE_LINE_MEMBER(dmac_eop);
-	DECLARE_WRITE_LINE_MEMBER(dmac_dack3);
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-	DECLARE_WRITE_LINE_MEMBER(pit_out0);
-	DECLARE_WRITE_LINE_MEMBER(timint_w);
+	void dma_hrq_changed(int state);
+	void dmac_eop(int state);
+	void dmac_dack3(int state);
+	void fdc_irq(int state);
+	void pit_out0(int state);
+	void timint_w(int state);
 	void fdd_motor_w(uint8_t data);
 	uint8_t sys_status_r();
 	void tc_set_w(uint8_t data);
@@ -107,27 +107,27 @@ private:
 	void program_w(offs_t offset, uint8_t data);
 	uint8_t exp_program_r(offs_t offset);
 	void exp_program_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(thold7_w);
+	void thold7_w(int state);
 
 	void update_busint(int slot, int state);
-	DECLARE_WRITE_LINE_MEMBER(busint2_w)    { update_busint(0, state); }
-	DECLARE_WRITE_LINE_MEMBER(busint2a_w)   { update_busint(1, state); }
-	DECLARE_WRITE_LINE_MEMBER(busint3_w)    { update_busint(2, state); }
-	DECLARE_WRITE_LINE_MEMBER(busint4_w)    { update_busint(3, state); }
-	DECLARE_WRITE_LINE_MEMBER(busint5_w)    { update_busint(4, state); }
-	DECLARE_WRITE_LINE_MEMBER(busint6_w)    { update_busint(5, state); }
-	DECLARE_WRITE_LINE_MEMBER(busint7_w)    { update_busint(6, state); }
-	DECLARE_WRITE_LINE_MEMBER(busint7a_w)   { update_busint(7, state); }
+	void busint2_w(int state)    { update_busint(0, state); }
+	void busint2a_w(int state)   { update_busint(1, state); }
+	void busint3_w(int state)    { update_busint(2, state); }
+	void busint4_w(int state)    { update_busint(3, state); }
+	void busint5_w(int state)    { update_busint(4, state); }
+	void busint6_w(int state)    { update_busint(5, state); }
+	void busint7_w(int state)    { update_busint(6, state); }
+	void busint7a_w(int state)   { update_busint(7, state); }
 
 	void update_irqs(int slot, int state);
-	DECLARE_WRITE_LINE_MEMBER(irq2_w)       { update_irqs(0, state); }
-	DECLARE_WRITE_LINE_MEMBER(irq2a_w)      { update_irqs(1, state); }
-	DECLARE_WRITE_LINE_MEMBER(irq3_w)       { update_irqs(2, state); }
-	DECLARE_WRITE_LINE_MEMBER(irq4_w)       { update_irqs(3, state); }
-	DECLARE_WRITE_LINE_MEMBER(irq5_w)       { update_irqs(4, state); }
-	DECLARE_WRITE_LINE_MEMBER(irq6_w)       { update_irqs(5, state); }
-	DECLARE_WRITE_LINE_MEMBER(irq7_w)       { update_irqs(6, state); }
-	DECLARE_WRITE_LINE_MEMBER(irq7a_w)      { update_irqs(7, state); }
+	void irq2_w(int state)       { update_irqs(0, state); }
+	void irq2a_w(int state)      { update_irqs(1, state); }
+	void irq3_w(int state)       { update_irqs(2, state); }
+	void irq4_w(int state)       { update_irqs(3, state); }
+	void irq5_w(int state)       { update_irqs(4, state); }
+	void irq6_w(int state)       { update_irqs(5, state); }
+	void irq7_w(int state)       { update_irqs(6, state); }
+	void irq7a_w(int state)      { update_irqs(7, state); }
 
 	static void floppy_formats(format_registration &fr);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
@@ -466,7 +466,7 @@ uint8_t dmv_state::program_r(offs_t offset)
 	return program_read(m_ram_bank, offset);
 }
 
-WRITE_LINE_MEMBER( dmv_state::thold7_w )
+void dmv_state::thold7_w(int state)
 {
 	if (m_thold7 != state)
 	{
@@ -702,7 +702,7 @@ GFXDECODE_END
 //   I8237
 //------------------------------------------------------------------------------------
 
-WRITE_LINE_MEMBER( dmv_state::dma_hrq_changed )
+void dmv_state::dma_hrq_changed(int state)
 {
 	m_dma_hrq = state;
 	update_halt_line();
@@ -711,7 +711,7 @@ WRITE_LINE_MEMBER( dmv_state::dma_hrq_changed )
 	m_dmac->hack_w(state);
 }
 
-WRITE_LINE_MEMBER( dmv_state::dmac_eop )
+void dmv_state::dmac_eop(int state)
 {
 	if (!(m_dack3_line || m_eop_line) && (m_dack3_line || state))
 		m_fdc->tc_w(true);
@@ -719,7 +719,7 @@ WRITE_LINE_MEMBER( dmv_state::dmac_eop )
 	m_eop_line = state;
 }
 
-WRITE_LINE_MEMBER( dmv_state::dmac_dack3 )
+void dmv_state::dmac_dack3(int state)
 {
 	if (!(m_dack3_line || m_eop_line) && (state || m_eop_line))
 		m_fdc->tc_w(true);
@@ -727,7 +727,7 @@ WRITE_LINE_MEMBER( dmv_state::dmac_dack3 )
 	m_dack3_line = state;
 }
 
-WRITE_LINE_MEMBER( dmv_state::pit_out0 )
+void dmv_state::pit_out0(int state)
 {
 	if (!state)
 	{
@@ -737,13 +737,13 @@ WRITE_LINE_MEMBER( dmv_state::pit_out0 )
 	}
 }
 
-WRITE_LINE_MEMBER( dmv_state::timint_w )
+void dmv_state::timint_w(int state)
 {
 	m_slot7a->timint_w(state);
 	m_slot7->timint_w(state);
 }
 
-WRITE_LINE_MEMBER( dmv_state::fdc_irq )
+void dmv_state::fdc_irq(int state)
 {
 	m_slot7a->flexint_w(state);
 	m_slot7->flexint_w(state);

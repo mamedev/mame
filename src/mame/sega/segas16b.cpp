@@ -1238,7 +1238,7 @@ uint8_t segas16b_state::upd7759_status_r()
 //  NMI to the sound CPU
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(segas16b_state::upd7759_generate_nmi)
+void segas16b_state::upd7759_generate_nmi(int state)
 {
 	if (state)
 		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);

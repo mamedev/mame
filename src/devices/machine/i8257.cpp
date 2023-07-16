@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "i8257.h"
 
-//#define LOG_GENERAL (1U << 0) //defined in logmacro.h already
 #define LOG_SETUP     (1U << 1)
 #define LOG_TFR       (1U << 2)
 
@@ -270,9 +269,9 @@ i8257_device::i8257_device(const machine_config &mconfig, const char *tag, devic
 	, m_temp(0)
 	, m_out_hrq_cb(*this)
 	, m_out_tc_cb(*this)
-	, m_in_memr_cb(*this)
+	, m_in_memr_cb(*this, 0)
 	, m_out_memw_cb(*this)
-	, m_in_ior_cb(*this)
+	, m_in_ior_cb(*this, 0)
 	, m_out_iow_cb(*this)
 	, m_out_dack_cb(*this)
 {
@@ -288,15 +287,6 @@ void i8257_device::device_start()
 	LOG("%s\n", FUNCNAME);
 	// set our instruction counter
 	set_icountptr(m_icount);
-
-	// resolve callbacks
-	m_out_hrq_cb.resolve_safe();
-	m_out_tc_cb.resolve_safe();
-	m_in_memr_cb.resolve_safe(0);
-	m_out_memw_cb.resolve_safe();
-	m_in_ior_cb.resolve_all_safe(0);
-	m_out_iow_cb.resolve_all_safe();
-	m_out_dack_cb.resolve_all_safe();
 
 	// state saving
 	save_item(NAME(m_msb));

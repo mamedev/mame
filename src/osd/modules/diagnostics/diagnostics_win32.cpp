@@ -169,8 +169,8 @@ bool stack_walker::s_initialized = false;
 //  stack_walker - constructor
 //-------------------------------------------------
 
-stack_walker::stack_walker()
-	: m_process(GetCurrentProcess()),
+stack_walker::stack_walker() :
+	m_process(GetCurrentProcess()),
 	m_thread(GetCurrentThread()),
 	m_first(true)
 {
@@ -289,8 +289,8 @@ bool stack_walker::unwind()
 //  symbol_manager - constructor
 //-------------------------------------------------
 
-symbol_manager::symbol_manager(const char *argv0)
-	: m_mapfile(argv0),
+symbol_manager::symbol_manager(const char *argv0) :
+	m_mapfile(argv0),
 	m_symfile(argv0),
 	m_process(GetCurrentProcess()),
 	m_last_base(0),
@@ -300,7 +300,7 @@ symbol_manager::symbol_manager(const char *argv0)
 	// compute the name of the mapfile
 	int extoffs = m_mapfile.find_last_of('.');
 	if (extoffs != -1)
-		m_mapfile.substr(0, extoffs);
+		m_mapfile = m_mapfile.substr(0, extoffs);
 	m_mapfile.append(".map");
 
 	// and the name of the symfile
@@ -653,8 +653,8 @@ uintptr_t symbol_manager::get_text_section_base(ULONG &size)
 //  sampling_profiler - constructor
 //-------------------------------------------------
 
-sampling_profiler::sampling_profiler(uint32_t max_seconds, uint8_t stack_depth = 0)
-	: m_target_thread(nullptr),
+sampling_profiler::sampling_profiler(uint32_t max_seconds, uint8_t stack_depth = 0) :
+	m_target_thread(nullptr),
 	m_thread(nullptr),
 	m_thread_id(0),
 	m_thread_exit(false),

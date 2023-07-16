@@ -28,7 +28,6 @@
 #include "emu.h"
 #include "machine/cs4031.h"
 
-#define LOG_GENERAL     (1U << 0)
 #define LOG_REGISTER    (1U << 1)
 #define LOG_MEMORY      (1U << 2)
 #define LOG_IO          (1U << 3)
@@ -162,7 +161,7 @@ void cs4031_device::device_add_mconfig(machine_config &config)
 
 cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CS4031, tag, owner, clock),
-	m_read_ior(*this),
+	m_read_ior(*this, 0),
 	m_write_iow(*this),
 	m_write_tc(*this),
 	m_write_hold(*this),
@@ -213,17 +212,6 @@ void cs4031_device::device_start()
 	// make sure the ram device is already running
 	if (!m_ram_dev->started())
 		throw device_missing_dependencies();
-
-	// resolve callbacks
-	m_read_ior.resolve_safe(0);
-	m_write_iow.resolve_safe();
-	m_write_tc.resolve_safe();
-	m_write_hold.resolve_safe();
-	m_write_nmi.resolve_safe();
-	m_write_intr.resolve_safe();
-	m_write_cpureset.resolve_safe();
-	m_write_a20m.resolve_safe();
-	m_write_spkr.resolve_safe();
 
 	// register for state saving
 	save_item(NAME(m_dma_eop));
@@ -360,12 +348,12 @@ void cs4031_device::dma_write_word(offs_t offset, uint8_t data)
 	m_space->write_word((page_offset() & 0xfe0000) | (offset << 1), (m_dma_high_byte << 8) | data);
 }
 
-WRITE_LINE_MEMBER( cs4031_device::dma2_dack0_w )
+void cs4031_device::dma2_dack0_w(int state)
 {
 	m_dma1->hack_w(state ? 0 : 1); // inverted?
 }
 
-WRITE_LINE_MEMBER( cs4031_device::dma1_eop_w )
+void cs4031_device::dma1_eop_w(int state)
 {
 	m_dma_eop = state;
 	if (m_dma_channel != -1)
@@ -436,7 +424,7 @@ uint8_t cs4031_device::intc1_slave_ack_r(offs_t offset)
 	return 0x00;
 }
 
-WRITE_LINE_MEMBER( cs4031_device::iochck_w )
+void cs4031_device::iochck_w(int state)
 {
 	LOGIO("cs4031_device::iochck_w: %u\n", state);
 
@@ -458,13 +446,13 @@ WRITE_LINE_MEMBER( cs4031_device::iochck_w )
 //  TIMER
 //**************************************************************************
 
-WRITE_LINE_MEMBER( cs4031_device::ctc_out1_w )
+void cs4031_device::ctc_out1_w(int state)
 {
 	m_refresh_toggle ^= state;
 	m_portb = (m_portb & 0xef) | (m_refresh_toggle << 4);
 }
 
-WRITE_LINE_MEMBER( cs4031_device::ctc_out2_w )
+void cs4031_device::ctc_out2_w(int state)
 {
 	m_write_spkr(!(state & BIT(m_portb, 1)));
 	m_portb = (m_portb & 0xdf) | (state << 5);
@@ -795,14 +783,14 @@ void cs4031_device::keyb_data_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( cs4031_device::gatea20_w )
+void cs4031_device::gatea20_w(int state)
 {
 	LOGKEYBOARD("cs4031_device::gatea20_w: %u\n", state);
 
 	keyboard_gatea20(state);
 }
 
-WRITE_LINE_MEMBER( cs4031_device::kbrst_w )
+void cs4031_device::kbrst_w(int state)
 {
 	LOGKEYBOARD("cs4031_device::kbrst_w: %u\n", state);
 

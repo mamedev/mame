@@ -1,12 +1,15 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// copyright-holders:Ryan Holtz, Angelo Salese
 /* Come On Baby
   (c) 2000 ExPotato Co. Ltd (Excellent Potato)
 
 TODO:
-- skeleton driver;
 - Throws "Primary master hard disk fail" in shutms11. Disk has a non canonical -chs of 524,255,63.
-  winimage will throw plenty of errors on manual file extraction.
+  winimage will throw plenty of errors on manual file extraction (related to Korean paths?).
+- Currently needs enabled_logical true in super I/O handling (needs the real
+  ITE Giga I/O to fix);
+- In this driver with a manually rebuilt image will loop during the fake "now loading" screen
+  (customized Win 98 splash screen);
 - In pcipc with a manually rebuilt image will throw an exception in "Internat" module once it loads
   Windows 98 (and installs the diff drivers).
 
@@ -189,9 +192,27 @@ TODO:
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
+#include "machine/pci-ide.h"
+#include "machine/i82443bx_host.h"
+#include "machine/i82371eb_isa.h"
+#include "machine/i82371eb_ide.h"
+#include "machine/i82371eb_acpi.h"
+#include "machine/i82371eb_usb.h"
+#include "video/virge_pci.h"
+#include "bus/isa/isa_cards.h"
+//#include "bus/rs232/hlemouse.h"
+//#include "bus/rs232/null_modem.h"
+//#include "bus/rs232/rs232.h"
+//#include "bus/rs232/sun_kbd.h"
+//#include "bus/rs232/terminal.h"
+#include "machine/fdc37c93x.h"
+#include "video/voodoo_pci.h"
 
+#define ENABLE_VOODOO 0
 
 namespace {
+
+#define PCI_AGP_ID "pci:01.0:00.0"
 
 class comebaby_state : public driver_device
 {
@@ -199,44 +220,114 @@ public:
 	comebaby_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_voodoo3(*this, PCI_AGP_ID)
 	{ }
 
 	void comebaby(machine_config &config);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<pentium2_device> m_maincpu;
+	// optional for making the compile switch to work
+	optional_device<voodoo_3_pci_device> m_voodoo3;
 
 	void comebaby_map(address_map &map);
+
+	static void superio_config(device_t *device);
 };
 
 void comebaby_state::comebaby_map(address_map &map)
 {
-	map(0x00000000, 0x0009ffff).ram();
-//  map(0x000a0000, 0x000bffff).ram();
-	map(0x000e0000, 0x000fffff).rom().region("bios", 0x20000);
-	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
+	map.unmap_value_high();
 }
 
 static INPUT_PORTS_START( comebaby )
 INPUT_PORTS_END
 
+static void isa_internal_devices(device_slot_interface &device)
+{
+	device.option_add("fdc37c93x", FDC37C93X);
+}
 
+void comebaby_state::superio_config(device_t *device)
+{
+	// TODO: wrong super I/O type
+	// It's an ITE 8671 "Giga I/O", unemulated
+	fdc37c93x_device &fdc = *downcast<fdc37c93x_device *>(device);
+	fdc.set_sysopt_pin(0);
+	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
+	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
+#if 0
+	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+#endif
+}
+
+// TODO: unverified PCI config space
 void comebaby_state::comebaby(machine_config &config)
 {
-	/* basic machine hardware */
-	PENTIUM2(config, m_maincpu, 66'666'666); /* Actually a Celeron (66'666'666 * 19) / 2 */
+	PENTIUM2(config, m_maincpu, 66'666'666); // Actually a Celeron (66'666'666 * 19) / 2
 	m_maincpu->set_addrmap(AS_PROGRAM, &comebaby_state::comebaby_map);
+	//m_maincpu->set_addrmap(AS_IO, &comebaby_state::comebaby_io);
+	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
+	m_maincpu->smiact().set("pci:00.0", FUNC(i82443bx_host_device::smi_act_w));
 
 	PCI_ROOT(config, "pci", 0);
-	// ...
+	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 64*1024*1024);
+	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
+	//I82443BX_AGP   (config, "pci:01.0:00.0");
+
+	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, m_maincpu));
+	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
+	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+
+	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", 0, m_maincpu));
+	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
+	ide.irq_sec().set("pci:07.0", FUNC(i82371eb_isa_device::pc_mirq0_w));
+
+	I82371EB_USB (config, "pci:07.2", 0);
+	I82371EB_ACPI(config, "pci:07.3", 0);
+	LPC_ACPI     (config, "pci:07.3:acpi", 0);
+	SMBUS        (config, "pci:07.3:smbus", 0);
+
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", superio_config);
+	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+
+	// YMF740G goes thru "pci:0c.0"
+	// Expansion slots, mapping SVGA for debugging
+	// TODO: all untested, check clock
+#if ENABLE_VOODOO
+	VOODOO_3_PCI(config, m_voodoo3, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
+	m_voodoo3->set_fbmem(2);
+	m_voodoo3->set_tmumem(4, 4);
+	m_voodoo3->set_status_cycles(1000);
+
+	// TODO: fix legacy raw setup here
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57);
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
+	screen.set_screen_update(PCI_AGP_ID, FUNC(voodoo_3_pci_device::screen_update));
+#else
+	// "pci:0d.0" J4D2
+	// "pci:0e.0" J4D1
+	VIRGE_PCI(config, "pci:0e.0", 0); // J4C1
+#endif
+
 }
 
 
 ROM_START(comebaby)
-	ROM_REGION32_LE(0x40000, "bios", 0)  /* motherboard bios */
+	ROM_REGION32_LE(0x40000, "pci:07.0", 0)  /* motherboard bios */
 	ROM_LOAD("b1120iag.bin", 0x000000, 0x40000, CRC(9b6f95f1) SHA1(65d6a2fea9911593f093b2e2a43d1534b54d60b3) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "pci:07.1:ide1:0:hdd" )
 	DISK_IMAGE( "comebaby", 0, BAD_DUMP SHA1(ea57919319c0b6a1d4abd7822cff028855bf082f) )
 ROM_END
 

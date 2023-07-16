@@ -695,8 +695,8 @@ void sdl_osd_interface::process_textinput_event(SDL_Event const &event)
 
 void sdl_osd_interface::check_osd_inputs()
 {
-	// check for toggling fullscreen mode
-	if (machine().ui_input().pressed(IPT_OSD_1))
+	// check for toggling fullscreen mode (don't do this in debug mode)
+	if (machine().ui_input().pressed(IPT_OSD_1) && !(machine().debug_flags & DEBUG_FLAG_OSD_ENABLED))
 	{
 		// destroy the renderers first so that the render module can bounce if it depends on having a window handle
 		for (auto it = osd_common_t::window_list().rbegin(); osd_common_t::window_list().rend() != it; ++it)

@@ -30,8 +30,6 @@ void msm5232_device::device_start()
 	int rate = clock()/CLOCK_RATE_DIVIDER;
 	int voicenum;
 
-	m_gate_handler_cb.resolve();
-
 	init(clock(), rate);
 
 	m_stream = stream_alloc(0, 11, rate);
@@ -225,42 +223,37 @@ static FILE *sample[9];
  */
 
 
-static constexpr double R51 =    870;    /* attack resistance */
-static constexpr double R52 =  17400;    /* decay 1 resistance */
-static constexpr double R53 = 101000;    /* decay 2 resistance */
+static constexpr double R51 =    870;    // attack resistance
+static constexpr double R52 =  17400;    // decay 1 resistance
+static constexpr double R53 = 101000;    // decay 2 resistance
 
 
 void msm5232_device::init_tables()
 {
-	int i;
-	double scale;
+	// sample rate = chip clock !!!  But :
+	// highest possible frequency is chipclock/13/16 (pitch data=0x57)
+	// at 2MHz : 2000000/13/16 = 9615 Hz
 
-	/* sample rate = chip clock !!!  But : */
-	/* highest possible frequency is chipclock/13/16 (pitch data=0x57) */
-	/* at 2MHz : 2000000/13/16 = 9615 Hz */
+	m_UpdateStep = int(double(1 << STEP_SH) * double(m_rate) / double(m_chip_clock));
+	//logerror("clock=%i Hz rate=%i Hz, UpdateStep=%i\n", m_chip_clock, m_rate, m_UpdateStep);
 
-	i = ((double)(1<<STEP_SH) * (double)m_rate) / (double)m_chip_clock;
-	m_UpdateStep = i;
-	/* logerror("clock=%i Hz rate=%i Hz, UpdateStep=%i\n",
-	        m_chip_clock, m_rate, m_UpdateStep); */
+	double const scale = double(m_chip_clock) / double(m_rate);
+	m_noise_step = ((1 << STEP_SH) / 128.0) * scale; // step of the rng reg in 16.16 format
+	//logerror("noise step=%8x\n", m_noise_step);
 
-	scale = ((double)m_chip_clock) / (double)m_rate;
-	m_noise_step = ((1<<STEP_SH)/128.0) * scale; /* step of the rng reg in 16.16 format */
-	/* logerror("noise step=%8x\n", m_noise_step); */
-
-	for (i=0; i<8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		double clockscale = (double)m_chip_clock / 2119040.0;
-		int rcp_duty_cycle = 1 << ( i<6 ? i : i-2 );
-		m_ar_tbl[i]   = (rcp_duty_cycle / clockscale) * (double)R51;
+		double const clockscale = double(m_chip_clock) / 2119040.0;
+		int const rcp_duty_cycle = 1 << ((i & 4) ? (i & ~2) : i); // bit 1 is ignored if bit 2 is set
+		m_ar_tbl[i] = (rcp_duty_cycle / clockscale) * R51;
 	}
 
-	for (i=0; i<8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		double clockscale = (double)m_chip_clock / 2119040.0;
-		int rcp_duty_cycle = 1 << ( i<6 ? i : i-2 );
-		m_dr_tbl[i]   = (rcp_duty_cycle / clockscale) * (double)R52;
-		m_dr_tbl[i+8] = (rcp_duty_cycle / clockscale) * (double)R53;
+		double const clockscale = double(m_chip_clock) / 2119040.0;
+		int const rcp_duty_cycle = 1 << ((i & 4) ? (i & ~2) : i); // bit 1 is ignored if bit 2 is set
+		m_dr_tbl[i] = (rcp_duty_cycle / clockscale) * R52;
+		m_dr_tbl[i + 8] = (rcp_duty_cycle / clockscale) * R53;
 	}
 
 
@@ -296,7 +289,7 @@ void msm5232_device::gate_update()
 {
 	int new_state = (m_control2 & 0x20) ? m_voi[7].GF : 0;
 
-	if (m_gate != new_state && !m_gate_handler_cb.isnull())
+	if (m_gate != new_state)
 	{
 		m_gate = new_state;
 		m_gate_handler_cb(new_state);

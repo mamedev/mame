@@ -46,12 +46,12 @@ isa8_fdc_device::isa8_fdc_device(const machine_config &mconfig, device_type type
 {
 }
 
-WRITE_LINE_MEMBER( isa8_fdc_device::irq_w )
+void isa8_fdc_device::irq_w(int state)
 {
 	m_isa->irq6_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( isa8_fdc_device::drq_w )
+void isa8_fdc_device::drq_w(int state)
 {
 	m_isa->drq2_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -148,13 +148,13 @@ uint8_t isa8_upd765_fdc_device::dir_r()
 	return 0x00;
 }
 
-WRITE_LINE_MEMBER(isa8_upd765_fdc_device::fdc_irq_w)
+void isa8_upd765_fdc_device::fdc_irq_w(int state)
 {
 	fdc_irq = state;
 	check_irq();
 }
 
-WRITE_LINE_MEMBER(isa8_upd765_fdc_device::fdc_drq_w)
+void isa8_upd765_fdc_device::fdc_drq_w(int state)
 {
 	fdc_drq = state;
 	check_drq();
@@ -325,7 +325,7 @@ void isa8_ec1841_0003_device::device_start()
 	m_isa->install_device(0x023c, 0x023f, *m_bus_mouse, &bus_mouse_device::map);
 }
 
-WRITE_LINE_MEMBER( isa8_ec1841_0003_device::aux_irq_w )
+void isa8_ec1841_0003_device::aux_irq_w(int state)
 {
 	m_isa->irq4_w(state ? ASSERT_LINE : CLEAR_LINE);
 }

@@ -21,6 +21,7 @@ atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, const char
 
 atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	atapi_hle_device(mconfig, type, tag, owner, clock),
+	device_ata_interface(mconfig, *this),
 	ultra_dma_mode(0)
 {
 }
@@ -52,7 +53,7 @@ void atapi_cdrom_device::device_add_mconfig(machine_config &config)
 		GDROM(config, "image").set_interface("cdrom");
 	else
 		CDROM(config, "image").set_interface("cdrom");
-	CDDA(config, "cdda");
+	CDDA(config, "cdda").set_cdrom_tag("image");
 }
 
 void atapi_cdrom_device::device_start()
@@ -132,7 +133,7 @@ void atapi_fixed_dvdrom_device::device_reset()
 
 void atapi_cdrom_device::process_buffer()
 {
-	if(	m_sequence_counter != m_image->sequence_counter() )
+	if( m_sequence_counter != m_image->sequence_counter() )
 	{
 		m_media_change = true;
 		m_sequence_counter = m_image->sequence_counter();

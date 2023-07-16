@@ -132,7 +132,7 @@ void decobsmt_device::bsmt_comms_w(u8 data)
 	m_bsmt_comms = data;
 }
 
-WRITE_LINE_MEMBER(decobsmt_device::bsmt_reset_line)
+void decobsmt_device::bsmt_reset_line(int state)
 {
 	m_ourcpu->set_input_line(INPUT_LINE_RESET, state);
 }

@@ -228,13 +228,13 @@ inline void rtc9701_device::rtc_write(uint8_t offset,uint8_t data)
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE_LINE_MEMBER( rtc9701_device::write_bit )
+void rtc9701_device::write_bit(int state)
 {
 	m_latch = state;
 }
 
 
-READ_LINE_MEMBER( rtc9701_device::read_bit )
+int rtc9701_device::read_bit()
 {
 	if (rtc_state == state_t::RTC_READ)
 	{
@@ -259,7 +259,7 @@ READ_LINE_MEMBER( rtc9701_device::read_bit )
 }
 
 
-WRITE_LINE_MEMBER( rtc9701_device::set_cs_line )
+void rtc9701_device::set_cs_line(int state)
 {
 	//logerror("set reset line %d\n",state);
 	m_reset_line = state;
@@ -279,7 +279,7 @@ WRITE_LINE_MEMBER( rtc9701_device::set_cs_line )
 
 
 
-WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
+void rtc9701_device::set_clock_line(int state)
 {
 	//logerror("set clock line %d\n",state);
 

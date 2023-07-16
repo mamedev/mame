@@ -19,6 +19,27 @@
 #include "sm510base.h"
 
 
+sm510_base_device::sm510_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
+	cpu_device(mconfig, type, tag, owner, clock),
+	m_program_config("program", ENDIANNESS_LITTLE, 8, prgwidth, 0, program),
+	m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data),
+	m_prgwidth(prgwidth),
+	m_datawidth(datawidth),
+	m_stack_levels(stack_levels),
+	m_r_mask_option(RMASK_DIRECT),
+	m_lcd_ram_a(*this, "lcd_ram_a"),
+	m_lcd_ram_b(*this, "lcd_ram_b"),
+	m_lcd_ram_c(*this, "lcd_ram_c"),
+	m_write_segs(*this),
+	m_melody_rom(*this, "melody"),
+	m_read_k(*this, 0),
+	m_read_ba(*this, 1),
+	m_read_b(*this, 1),
+	m_write_s(*this),
+	m_write_r(*this)
+{ }
+
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -30,14 +51,6 @@ void sm510_base_device::device_start()
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
 	m_pagemask = 0x3f;
-
-	// resolve callbacks
-	m_read_k.resolve_safe(0);
-	m_read_ba.resolve_safe(1);
-	m_read_b.resolve_safe(1);
-	m_write_s.resolve_safe();
-	m_write_r.resolve_safe();
-	m_write_segs.resolve_safe();
 
 	// init/zerofill
 	std::fill_n(m_stack, std::size(m_stack), 0);

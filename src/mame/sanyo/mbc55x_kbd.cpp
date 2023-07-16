@@ -176,11 +176,6 @@ ioport_constructor mbc55x_keyboard_device::device_input_ports() const
 //  INITIALIZATION AND HLE SERIAL INTERFACE
 //**************************************************************************
 
-void mbc55x_keyboard_device::device_resolve_objects()
-{
-	m_txd_callback.resolve_safe();
-}
-
 void mbc55x_keyboard_device::device_start()
 {
 	set_tra_rate(1230); // more or less

@@ -246,7 +246,7 @@ TIMER_CALLBACK_MEMBER(mw8080bw_state::interrupt_trigger)
 }
 
 
-WRITE_LINE_MEMBER(mw8080bw_state::int_enable_w)
+void mw8080bw_state::int_enable_w(int state)
 {
 	m_int_enable = state;
 }

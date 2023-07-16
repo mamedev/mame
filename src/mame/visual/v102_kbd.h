@@ -13,17 +13,16 @@ class visual_mcs48_keyboard_device : public device_t
 public:
 	auto txd_callback() { return m_txd_callback.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(write_rxd);
+	void write_rxd(int state);
 
 protected:
 	visual_mcs48_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner);
 
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 	u8 p1_r();
 	void p2_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(prog_w);
+	void prog_w(int state);
 	void prog_map(address_map &map);
 	void ext_map(address_map &map);
 

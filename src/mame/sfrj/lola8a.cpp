@@ -89,9 +89,9 @@ private:
 	void machine_start() override;
 	u8 lola8a_port_a_r();
 	void lola8a_port_b_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
-	DECLARE_READ_LINE_MEMBER(cass_r);
-	DECLARE_WRITE_LINE_MEMBER(cass_w);
+	void crtc_vsync(int state);
+	int cass_r();
+	void cass_w(int state);
 	u8 keyboard_r();
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -270,12 +270,12 @@ void lola8a_state::lola8a_port_b_w(u8 data)
 	m_portb = data;
 }
 
-READ_LINE_MEMBER( lola8a_state::cass_r )
+int lola8a_state::cass_r()
 {
 	return (m_cass->input() < 0.03);
 }
 
-WRITE_LINE_MEMBER( lola8a_state::cass_w )
+void lola8a_state::cass_w(int state)
 {
 	m_cass->output(state ? -1.0 : +1.0);
 }
@@ -317,7 +317,7 @@ void lola8a_state::machine_start()
 	save_item(NAME(m_portb));
 }
 
-WRITE_LINE_MEMBER(lola8a_state::crtc_vsync)
+void lola8a_state::crtc_vsync(int state)
 {
 	m_maincpu->set_input_line(I8085_RST75_LINE, state? ASSERT_LINE : CLEAR_LINE);
 }

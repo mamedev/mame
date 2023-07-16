@@ -119,8 +119,8 @@ private:
 	void psg_porta_write(uint8_t data);
 
 	/* fdc */
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 	void dgnalpha_io1(address_map &map);
 
@@ -278,7 +278,7 @@ void dragon_alpha_state::psg_porta_write(uint8_t data)
 //  through IC16 (early PLD), and is gated by pia2 CA2
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( dragon_alpha_state::fdc_intrq_w )
+void dragon_alpha_state::fdc_intrq_w(int state)
 {
 	if (state)
 	{
@@ -299,7 +299,7 @@ WRITE_LINE_MEMBER( dragon_alpha_state::fdc_intrq_w )
 //  does for pia1 CB1
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( dragon_alpha_state::fdc_drq_w )
+void dragon_alpha_state::fdc_drq_w(int state)
 {
 	m_pia_2->cb1_w(state ? ASSERT_LINE : CLEAR_LINE);
 }

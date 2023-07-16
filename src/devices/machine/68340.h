@@ -28,10 +28,8 @@ public:
 	auto pb_out_callback() { return m_pb_out_cb.bind(); }
 
 	auto tout1_out_callback() { return m_timer[0]->m_tout_out_cb.bind(); }
-	auto tin1_in_callback() { return m_timer[0]->m_tin_in_cb.bind(); }
 	auto tgate1_in_callback() { return m_timer[0]->m_tgate_in_cb.bind(); }
 	auto tout2_out_callback() { return m_timer[1]->m_tout_out_cb.bind(); }
-	auto tin2_in_callback() { return m_timer[1]->m_tin_in_cb.bind(); }
 	auto tgate2_in_callback() { return m_timer[1]->m_tgate_in_cb.bind(); }
 
 	uint16_t get_cs(offs_t address);
@@ -39,17 +37,18 @@ public:
 	void set_crystal(const XTAL &crystal) { set_crystal(crystal.value()); }
 
 	// Timer input methods, can be used instead of the corresponding polling MCFG callbacks
-	DECLARE_WRITE_LINE_MEMBER( tin1_w )  { m_timer[0]->tin_w(state);  }
-	DECLARE_WRITE_LINE_MEMBER( tgate1_w ){ m_timer[0]->tgate_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( tin2_w )  { m_timer[1]->tin_w(state);  }
-	DECLARE_WRITE_LINE_MEMBER( tgate2_w ){ m_timer[1]->tgate_w(state); }
+	void tin1_w(int state)  { m_timer[0]->tin_w(state);  }
+	void tgate1_w(int state){ m_timer[0]->tgate_w(state); }
+	void tin2_w(int state)  { m_timer[1]->tin_w(state);  }
+	void tgate2_w(int state){ m_timer[1]->tgate_w(state); }
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_config_complete() override;
 
-	DECLARE_WRITE_LINE_MEMBER(reset_peripherals);
+	void reset_peripherals(int state);
 
 private:
 	required_device<mc68340_serial_module_device> m_serial;
@@ -95,8 +94,8 @@ private:
 	void m68340_internal_sim_cs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// Clock/VCO setting TODO: support external clock with PLL and Limp mode
-	DECLARE_WRITE_LINE_MEMBER( set_modck );
-	DECLARE_WRITE_LINE_MEMBER( extal_w );
+	void set_modck(int state);
+	void extal_w(int state);
 
 	void m68340_internal_map(address_map &map);
 

@@ -77,17 +77,6 @@ wangpcbus_device::~wangpcbus_device()
 
 void wangpcbus_device::device_start()
 {
-	// resolve callbacks
-	m_write_irq2.resolve_safe();
-	m_write_irq3.resolve_safe();
-	m_write_irq4.resolve_safe();
-	m_write_irq5.resolve_safe();
-	m_write_irq6.resolve_safe();
-	m_write_irq7.resolve_safe();
-	m_write_drq1.resolve_safe();
-	m_write_drq2.resolve_safe();
-	m_write_drq3.resolve_safe();
-	m_write_ioerror.resolve_safe();
 }
 
 
@@ -195,7 +184,7 @@ void wangpcbus_device::dack_w(int line, uint8_t data)
 //  tc_w - terminal count
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wangpcbus_device::tc_w )
+void wangpcbus_device::tc_w(int state)
 {
 	for (device_wangpcbus_card_interface &entry : m_device_list)
 		entry.wangpcbus_tc_w(state);

@@ -48,8 +48,8 @@ public:
 
 	uint8_t sam_read(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER( horizontal_sync );
-	DECLARE_WRITE_LINE_MEMBER( field_sync );
+	void horizontal_sync(int state);
+	void field_sync(int state);
 
 	void coco(machine_config &config);
 	void cocoh(machine_config &config);

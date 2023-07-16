@@ -58,10 +58,6 @@ hlcd0601_device::hlcd0601_device(const machine_config &mconfig, const char *tag,
 
 void hlcd0515_device::device_start()
 {
-	// resolve callbacks
-	m_write_cols.resolve_safe();
-	m_write_data.resolve_safe();
-
 	// timer
 	m_lcd_timer = timer_alloc(FUNC(hlcd0515_device::scan_lcd), this);
 	attotime period = attotime::from_hz(clock() / 2);
@@ -168,7 +164,7 @@ void hlcd0515_device::clock_data(int col)
 }
 
 
-WRITE_LINE_MEMBER(hlcd0515_device::clock_w)
+void hlcd0515_device::clock_w(int state)
 {
 	state = (state) ? 1 : 0;
 
@@ -194,7 +190,7 @@ WRITE_LINE_MEMBER(hlcd0515_device::clock_w)
 }
 
 
-WRITE_LINE_MEMBER(hlcd0515_device::cs_w)
+void hlcd0515_device::cs_w(int state)
 {
 	state = (state) ? 1 : 0;
 

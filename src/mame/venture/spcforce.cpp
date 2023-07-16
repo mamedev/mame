@@ -78,12 +78,12 @@ private:
 	void sn76496_latch_w(uint8_t data);
 	uint8_t sn76496_select_r();
 	void sn76496_select_w(uint8_t data);
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(write_sn_ready);
-	DECLARE_READ_LINE_MEMBER(t0_r);
+	template <uint8_t Which> void write_sn_ready(int state);
+	int t0_r();
 	void soundtrigger_w(uint8_t data);
 	void misc_outputs_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
-	DECLARE_WRITE_LINE_MEMBER(unknown_w);
+	void flip_screen_w(int state);
+	void unknown_w(int state);
 
 	void palette(palette_device &palette) const;
 
@@ -112,7 +112,7 @@ private:
 
 // video
 
-WRITE_LINE_MEMBER(spcforce_state::flip_screen_w)
+void spcforce_state::flip_screen_w(int state)
 {
 	flip_screen_set(!state);
 }
@@ -165,7 +165,7 @@ void spcforce_state::sn76496_latch_w(uint8_t data)
 }
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(spcforce_state::write_sn_ready)
+void spcforce_state::write_sn_ready(int state)
 {
 	m_sn_ready[Which] = state;
 }
@@ -188,7 +188,7 @@ void spcforce_state::sn76496_select_w(uint8_t data)
 	if (!BIT(data, 4)) m_sn[2]->write(m_sn76496_latch);
 }
 
-READ_LINE_MEMBER(spcforce_state::t0_r)
+int spcforce_state::t0_r()
 {
 	// SN76496 status according to Al - not supported by MAME??
 	return machine().rand() & 1;
@@ -208,7 +208,7 @@ void spcforce_state::misc_outputs_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 3));
 }
 
-WRITE_LINE_MEMBER(spcforce_state::unknown_w)
+void spcforce_state::unknown_w(int state)
 {
 	// written very frequently
 }

@@ -119,7 +119,7 @@ Taito Custom:
   TC0540OBN
   TC0360PRI
 
-ST TimeKeeper Ram MK48T08B-10 - Lithuim Batery backed RAM chip
+ST TimeKeeper Ram MK48T08B-10 - Lithium Battery backed RAM chip
 MB8421-90LP - Dual Port SRAM
 ADC0809CNN - 8-bit Microprocessor Compatible A/D Converter
              With 8-Channel Multiplexer

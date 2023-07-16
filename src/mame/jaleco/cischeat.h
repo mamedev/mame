@@ -73,7 +73,7 @@ public:
 	void f1gpstr2_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void cischeat_soundbank_1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void cischeat_soundbank_2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	void sound_irq(int state);
 	void init_cischeat();
 	void init_bigrun();
 	void init_f1gpstar();
@@ -220,7 +220,7 @@ public:
 	}
 
 	void captflag(machine_config &config);
-	template <int N> DECLARE_READ_LINE_MEMBER(motor_busy_r);
+	template <int N> int motor_busy_r();
 	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(motor_pos_r);
 	void init_captflag();
 	void init_vscaptfl();

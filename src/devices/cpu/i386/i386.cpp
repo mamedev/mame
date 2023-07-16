@@ -28,17 +28,17 @@
 #include "debug/debugcpu.h"
 #include "debug/express.h"
 
-#define LOG_MSR				(1U <<	1)
-#define LOG_INVALID_OPCODE	(1U <<	2)
-#define LOG_LIMIT_CHECK		(1U <<	3)
-#define LOG_UNEMULATED		(1U	<<	4)
-#define LOG_PM_EVENTS		(1U <<	5)
-#define LOG_PM_FAULT_GP		(1U <<  6)
-#define LOG_PM_FAULT_SS		(1U << 	7)
-#define LOG_PM_FAULT_NP		(1U <<	8)
-#define LOG_PM_FAULT_TS		(1U <<  9)
-#define LOG_PM_FAULT_DF		(1U <<	10)
-#define LOG_PM_FAULT_UD		(1U <<	11)
+#define LOG_MSR             (1U << 1)
+#define LOG_INVALID_OPCODE  (1U << 2)
+#define LOG_LIMIT_CHECK     (1U << 3)
+#define LOG_UNEMULATED      (1U << 4)
+#define LOG_PM_EVENTS       (1U << 5)
+#define LOG_PM_FAULT_GP     (1U << 6)
+#define LOG_PM_FAULT_SS     (1U << 7)
+#define LOG_PM_FAULT_NP     (1U << 8)
+#define LOG_PM_FAULT_TS     (1U << 9)
+#define LOG_PM_FAULT_DF     (1U << 10)
+#define LOG_PM_FAULT_UD     (1U << 11)
 
 //#define VERBOSE (LOG_PM_FAULT_GP)
 #include "logmacro.h"
@@ -2043,8 +2043,6 @@ void i386_device::i386_common_init()
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(i386_device::i386_postload), this));
 
-	m_smiact.resolve_safe();
-	m_ferr_handler.resolve_safe();
 	m_ferr_handler(0);
 
 	set_icountptr(m_cycles);
@@ -2547,8 +2545,7 @@ void i386_device::enter_smm()
 
 	m_cr[0] &= ~(0x8000000d);
 	set_flags(2);
-	if(!m_smiact.isnull())
-		m_smiact(true);
+	m_smiact(true);
 	m_smm = true;
 	m_smi_latched = false;
 
@@ -2699,8 +2696,7 @@ void i386_device::leave_smm()
 			m_sreg[i].valid = true;
 	}
 
-	if (!m_smiact.isnull())
-		m_smiact(false);
+	m_smiact(false);
 	m_smm = false;
 
 	CHANGE_PC(m_eip);

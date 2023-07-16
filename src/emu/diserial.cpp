@@ -138,7 +138,7 @@ void device_serial_interface::rcv_edge()
 	}
 }
 
-WRITE_LINE_MEMBER(device_serial_interface::tx_clock_w)
+void device_serial_interface::tx_clock_w(int state)
 {
 	if(state != m_tra_clock_state) {
 		m_tra_clock_state = state;
@@ -147,7 +147,7 @@ WRITE_LINE_MEMBER(device_serial_interface::tx_clock_w)
 	}
 }
 
-WRITE_LINE_MEMBER(device_serial_interface::rx_clock_w)
+void device_serial_interface::rx_clock_w(int state)
 {
 	if(state != m_rcv_clock_state) {
 		m_rcv_clock_state = state;
@@ -156,7 +156,7 @@ WRITE_LINE_MEMBER(device_serial_interface::rx_clock_w)
 	}
 }
 
-WRITE_LINE_MEMBER(device_serial_interface::clock_w)
+void device_serial_interface::clock_w(int state)
 {
 	tx_clock_w(state);
 	rx_clock_w(state);
@@ -216,7 +216,7 @@ void device_serial_interface::receive_register_reset()
 	}
 }
 
-WRITE_LINE_MEMBER(device_serial_interface::rx_w)
+void device_serial_interface::rx_w(int state)
 {
 	m_rcv_line = state;
 	if (m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED)

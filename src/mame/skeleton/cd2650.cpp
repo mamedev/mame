@@ -83,8 +83,8 @@ private:
 	void mem_map(address_map &map);
 	u8 keyin_r();
 	void kbd_put(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(tape_deck_on_w);
-	DECLARE_READ_LINE_MEMBER(cass_r);
+	void tape_deck_on_w(int state);
+	int cass_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
@@ -132,12 +132,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(cd2650_state::kansas_r)
 	}
 }
 
-WRITE_LINE_MEMBER(cd2650_state::tape_deck_on_w)
+void cd2650_state::tape_deck_on_w(int state)
 {
 	m_cass->change_state(state ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
-READ_LINE_MEMBER(cd2650_state::cass_r)
+int cd2650_state::cass_r()
 {
 	return m_cass_data[2];
 }

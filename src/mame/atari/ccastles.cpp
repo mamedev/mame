@@ -171,7 +171,7 @@ TIMER_CALLBACK_MEMBER(ccastles_state::clock_irq)
 }
 
 
-READ_LINE_MEMBER(ccastles_state::vblank_r)
+int ccastles_state::vblank_r()
 {
 	int scanline = m_screen->vpos();
 	return m_syncprom[scanline & 0xff] & 1;
@@ -274,7 +274,7 @@ void ccastles_state::nvram_recall_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(ccastles_state::nvram_store_w)
+void ccastles_state::nvram_store_w(int state)
 {
 	m_nvram_4b->store(!m_outlatch[0]->q2_r() && m_outlatch[0]->q3_r());
 	m_nvram_4a->store(!m_outlatch[0]->q2_r() && m_outlatch[0]->q3_r());

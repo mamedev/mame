@@ -26,10 +26,16 @@ tp1 = phi clock (tied to f2q rom access)
 #include "votrax.h"
 
 
-DEFINE_DEVICE_TYPE(VOTRAX_SC01, votrax_sc01_device, "votrax", "Votrax SC-01")
+DEFINE_DEVICE_TYPE(VOTRAX_SC01, votrax_sc01_device, "votrsc01", "Votrax SC-01")
+DEFINE_DEVICE_TYPE(VOTRAX_SC01A, votrax_sc01a_device, "votrsc01a", "Votrax SC-01-A")
 
 // ROM definition for the Votrax phone ROM
 ROM_START( votrax_sc01 )
+	ROM_REGION64_LE( 0x200, "internal", 0 )
+	ROM_LOAD( "sc01.bin", 0x000, 0x200, CRC(528d1c57) SHA1(268b5884dce04e49e2376df3e2dc82e852b708c1) )
+ROM_END
+
+ROM_START( votrax_sc01a )
 	ROM_REGION64_LE( 0x200, "internal", 0 )
 	ROM_LOAD( "sc01a.bin", 0x000, 0x200, CRC(fc416227) SHA1(1d6da90b1807a01b5e186ef08476119a862b5e6d) )
 ROM_END
@@ -74,13 +80,23 @@ const double votrax_sc01_device::s_glottal_wave[9] =
 	1/7.0
 };
 
-
 votrax_sc01_device::votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VOTRAX_SC01, tag, owner, clock),
+	: votrax_sc01_device(mconfig, VOTRAX_SC01, tag, owner, clock)
+{
+}
+
+// overridable type for subclass
+votrax_sc01_device::votrax_sc01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
 	  m_stream(nullptr),
 	  m_rom(*this, "internal"),
 	  m_ar_cb(*this)
+{
+}
+
+votrax_sc01a_device::votrax_sc01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: votrax_sc01_device(mconfig, VOTRAX_SC01A, tag, owner, clock)
 {
 }
 
@@ -158,6 +174,11 @@ const tiny_rom_entry *votrax_sc01_device::device_rom_region() const
 	return ROM_NAME( votrax_sc01 );
 }
 
+const tiny_rom_entry *votrax_sc01a_device::device_rom_region() const
+{
+	return ROM_NAME( votrax_sc01a );
+}
+
 
 //-------------------------------------------------
 //  device_start - handle device startup
@@ -173,7 +194,6 @@ void votrax_sc01_device::device_start()
 	m_timer = timer_alloc(FUNC(votrax_sc01_device::phone_tick), this);
 
 	// reset outputs
-	m_ar_cb.resolve_safe();
 	m_ar_state = ASSERT_LINE;
 
 	// save inputs
@@ -461,7 +481,7 @@ void votrax_sc01_device::chip_update()
 	// Closure counter, reset every other tick in theory when not
 	// active (on the extra rom cycle).
 	//
-	// The closure level is immediatly used in the analog path,
+	// The closure level is immediately used in the analog path,
 	// there's no pitch synchronization.
 
 	if(!m_cur_closure && (m_filt_fa || m_filt_va))
@@ -663,16 +683,16 @@ stream_buffer::sample_t votrax_sc01_device::analog_calc()
   defined as the ratio Vo/Vi.  To do that, you use some properties:
 
   - The intensity through an element is equal to the voltage
-    difference through the element divided by the impedence
+    difference through the element divided by the impedance
 
-  - The impedence of a resistance is equal to its resistance
+  - The impedance of a resistance is equal to its resistance
 
-  - The impedence of a capacitor is 1/(s*C) where C is its capacitance
+  - The impedance of a capacitor is 1/(s*C) where C is its capacitance
 
-  - The impedence of elements in series is the sum of the impedences
+  - The impedance of elements in series is the sum of their impedances
 
-  - The impedence of elements in parallel is the inverse of the sum of
-    the inverses
+  - The impedance of elements in parallel is the inverse of the sum of
+    their inverses
 
   - The sum of all intensities flowing into a node is 0 (there's no
     charge accumulation in a wire)
@@ -717,7 +737,7 @@ stream_buffer::sample_t votrax_sc01_device::analog_calc()
   |        H(s) = -------------------------
   |                 1 + k[1]*s + k[2]*s^2
 
-  We can always reintroduce the global multipler later, and it's 1 in
+  We can always reintroduce the global multiplier later, and it's 1 in
   most of our cases anyway.
 
   The we pose:

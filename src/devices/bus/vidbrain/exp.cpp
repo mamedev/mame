@@ -37,7 +37,7 @@ device_videobrain_expansion_card_interface::device_videobrain_expansion_card_int
 
 
 //-------------------------------------------------
-//  videobrain_roml_pointer - get low ROM pointer
+//  videobrain_rom_pointer - get ROM pointer
 //-------------------------------------------------
 
 uint8_t* device_videobrain_expansion_card_interface::videobrain_rom_pointer(running_machine &machine, size_t size)
@@ -45,7 +45,6 @@ uint8_t* device_videobrain_expansion_card_interface::videobrain_rom_pointer(runn
 	if (m_rom.empty())
 	{
 		m_rom.resize(size);
-
 		m_rom_mask = size - 1;
 	}
 
@@ -62,7 +61,6 @@ uint8_t* device_videobrain_expansion_card_interface::videobrain_ram_pointer(runn
 	if (m_ram.empty())
 	{
 		m_ram.resize(size);
-
 		m_ram_mask = size - 1;
 	}
 
@@ -95,9 +93,6 @@ videobrain_expansion_slot_device::videobrain_expansion_slot_device(const machine
 void videobrain_expansion_slot_device::device_start()
 {
 	m_cart = get_card_device();
-
-	// resolve callbacks
-	m_write_extres.resolve_safe();
 }
 
 
@@ -147,12 +142,16 @@ std::string videobrain_expansion_slot_device::get_default_card_software(get_defa
 
 // slot devices
 #include "std.h"
+#include "comp_language.h"
+#include "info_manager.h"
 #include "money_minder.h"
 #include "timeshare.h"
 
 void vidbrain_expansion_cards(device_slot_interface &device)
 {
 	device.option_add_internal("standard", VB_STD);
-	device.option_add_internal("moneyminder", VB_MONEY_MINDER);
+	device.option_add_internal("comp_language", VB_COMP_LANGUAGE);
+	device.option_add_internal("info_manager", VB_INFO_MANAGER);
+	device.option_add_internal("money_minder", VB_MONEY_MINDER);
 	device.option_add_internal("timeshare", VB_TIMESHARE);
 }

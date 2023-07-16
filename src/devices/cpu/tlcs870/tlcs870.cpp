@@ -110,9 +110,9 @@ tlcs870_device::tlcs870_device(const machine_config &mconfig, device_type optype
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_intram(*this, "intram")
 	, m_dbr(*this, "dbr")
-	, m_port_in_cb(*this)
+	, m_port_in_cb(*this, 0xff)
 	, m_port_out_cb(*this)
-	, m_port_analog_in_cb(*this)
+	, m_port_analog_in_cb(*this, 0xff)
 	, m_serial_out_cb(*this)
 {
 }
@@ -1238,11 +1238,6 @@ void tlcs870_device::device_start()
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_F).formatstr("%8s").noshow();
 
 	set_icountptr(m_icount);
-
-	m_port_in_cb.resolve_all_safe(0xff);
-	m_port_out_cb.resolve_all_safe();
-	m_port_analog_in_cb.resolve_all_safe(0xff);
-	m_serial_out_cb.resolve_all_safe();
 
 	m_serial_transmit_timer[0] = timer_alloc(FUNC(tlcs870_device::sio0_transmit_cb), this);
 	m_serial_transmit_timer[1] = timer_alloc(FUNC(tlcs870_device::sio1_transmit_cb), this);

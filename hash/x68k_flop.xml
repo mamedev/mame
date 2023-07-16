@@ -3115,7 +3115,6 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!-- Offset front layer, but playable -->
 	<software name="cuebrunr">
 		<description>Cueb Runner</description>
 		<year>1990</year>
@@ -28055,7 +28054,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="minic" supported="partial">
+	<software name="minic">
 		<description>Mi ni Ikuzo! Hedgehog</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>

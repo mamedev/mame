@@ -263,7 +263,7 @@ void bbc_tube_6502_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER(bbc_tube_6502_device::prst_w)
+void bbc_tube_6502_device::prst_w(int state)
 {
 	device_reset();
 

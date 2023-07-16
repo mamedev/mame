@@ -10,7 +10,7 @@ known chips:
 
   serial  device   etc.
 ----------------------------------------------------------------
-  055     uPD546C  1978, Fidelity Checker Challenger (CR) -> fidel_checkc2.cpp
+  055     uPD546C  1978, Fidelity Checker Challenger (CR) -> fidelity/checkc2.cpp
 
  @017     uPD552C  1979, Bambino UFO Master-Blaster Station (ET-02)
  @042     uPD552C  1980, Tomy Cosmic Combat (TN-??)
@@ -45,10 +45,10 @@ known chips:
  @513     uPD557LC 1980, Castle Toy Name That Tune
 
  @060     uPD650C  1979, Mattel Computer Gin
-  085     uPD650C  1980, Roland TR-808 -> roland_tr808.cpp
+  085     uPD650C  1980, Roland TR-808 -> roland/roland_tr808.cpp
  *127     uPD650C  198?, Sony OA-S1100 Typecorder (subcpu, have dump)
-  128     uPD650C  1981, Roland TR-606 -> roland_tr606.cpp
-  133     uPD650C  1982, Roland TB-303 -> roland_tb303.cpp
+  128     uPD650C  1981, Roland TR-606 -> roland/roland_tr606.cpp
+  133     uPD650C  1982, Roland TB-303 -> roland/roland_tb303.cpp
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
@@ -1623,14 +1623,14 @@ ROM_END
 
 *******************************************************************************/
 
-class invspace_state : public hh_ucom4_state
+class einspace_state : public hh_ucom4_state
 {
 public:
-	invspace_state(const machine_config &mconfig, device_type type, const char *tag) :
+	einspace_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void invspace(machine_config &config);
+	void einspace(machine_config &config);
 
 private:
 	void update_display();
@@ -1640,12 +1640,12 @@ private:
 
 // handlers
 
-void invspace_state::update_display()
+void einspace_state::update_display()
 {
 	m_display->matrix(m_grid, m_plate);
 }
 
-void invspace_state::grid_w(offs_t offset, u8 data)
+void einspace_state::grid_w(offs_t offset, u8 data)
 {
 	// I0: speaker out
 	if (offset == PORTI)
@@ -1657,7 +1657,7 @@ void invspace_state::grid_w(offs_t offset, u8 data)
 	update_display();
 }
 
-void invspace_state::plate_w(offs_t offset, u8 data)
+void einspace_state::plate_w(offs_t offset, u8 data)
 {
 	// E,F,G,H123: vfd plate
 	int shift = (offset - PORTE) * 4;
@@ -1667,7 +1667,7 @@ void invspace_state::plate_w(offs_t offset, u8 data)
 
 // inputs
 
-static INPUT_PORTS_START( invspace )
+static INPUT_PORTS_START( einspace )
 	PORT_START("IN.0") // port A
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START )
@@ -1682,19 +1682,19 @@ INPUT_PORTS_END
 
 // config
 
-void invspace_state::invspace(machine_config &config)
+void einspace_state::einspace(machine_config &config)
 {
 	// basic machine hardware
 	NEC_D552(config, m_maincpu, 400_kHz_XTAL);
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->read_b().set_ioport("IN.1");
-	m_maincpu->write_c().set(FUNC(invspace_state::grid_w));
-	m_maincpu->write_d().set(FUNC(invspace_state::grid_w));
-	m_maincpu->write_e().set(FUNC(invspace_state::plate_w));
-	m_maincpu->write_f().set(FUNC(invspace_state::plate_w));
-	m_maincpu->write_g().set(FUNC(invspace_state::plate_w));
-	m_maincpu->write_h().set(FUNC(invspace_state::plate_w));
-	m_maincpu->write_i().set(FUNC(invspace_state::grid_w));
+	m_maincpu->write_c().set(FUNC(einspace_state::grid_w));
+	m_maincpu->write_d().set(FUNC(einspace_state::grid_w));
+	m_maincpu->write_e().set(FUNC(einspace_state::plate_w));
+	m_maincpu->write_f().set(FUNC(einspace_state::plate_w));
+	m_maincpu->write_g().set(FUNC(einspace_state::plate_w));
+	m_maincpu->write_h().set(FUNC(einspace_state::plate_w));
+	m_maincpu->write_i().set(FUNC(einspace_state::grid_w));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
@@ -1712,12 +1712,12 @@ void invspace_state::invspace(machine_config &config)
 
 // roms
 
-ROM_START( invspace )
+ROM_START( einspace )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c_054", 0x0000, 0x0400, CRC(913d9c13) SHA1(f20edb5458e54d2f6d4e45e5d59efd87e05a6f3f) )
 
 	ROM_REGION( 110894, "screen", 0)
-	ROM_LOAD( "invspace.svg", 0, 110894, CRC(1ec324b8) SHA1(847621c7d6c10b254b715642d63efc9c30a701c1) )
+	ROM_LOAD( "einspace.svg", 0, 110894, CRC(1ec324b8) SHA1(847621c7d6c10b254b715642d63efc9c30a701c1) )
 ROM_END
 
 
@@ -2549,7 +2549,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tomy(tronic) Cosmic Combat (manufactured in Japan)
+  Tomy Cosmic Combat (manufactured in Japan)
   * PCB label: 2E1019-E01
   * NEC uCOM-44 MCU, label D552C 042
   * cyan VFD NEC FIP32AM18Y tube no. 0E, with blue window
@@ -2664,7 +2664,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tomy(tronic) Tennis (manufactured in Japan)
+  Tomy Tennis (manufactured in Japan)
   * PCB label: TOMY TN-04 TENNIS
   * NEC uCOM-44 MCU, label D552C 048
   * cyan VFD NEC FIP11AM15T tube no. 0F, with overlay
@@ -2838,7 +2838,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tomy(tronic) Pac-Man (manufactured in Japan)
+  Tomy Pac-Man (manufactured in Japan)
   * PCB label: TN-08 2E108E01
   * NEC uCOM-43 MCU, label D553C 160
   * cyan/red/green VFD NEC FIP8AM18T no. 2-21
@@ -2959,7 +2959,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tomy(tronic) Scramble (manufactured in Japan)
+  Tomy Scramble (manufactured in Japan)
   * PCB label: TN-10 2E114E01
   * NEC uCOM-43 MCU, label D553C 192
   * cyan/red/green VFD NEC FIP10CM20T no. 2-41
@@ -3075,7 +3075,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tomy(tronic) Caveman (manufactured in Japan)
+  Tomy Caveman (manufactured in Japan)
   * PCB label: TN-12 2E114E03
   * NEC uCOM-43 MCU, label D553C 209
   * cyan/red/green VFD NEC FIP8AM20T no. 2-42
@@ -3354,7 +3354,7 @@ SYST( 1982, bcclimbr, 0,        0,      bcclimbr, bcclimbr, bcclimbr_state, empt
 SYST( 1980, tactix,   0,        0,      tactix,   tactix,   tactix_state,   empty_init, "Castle Toy", "Tactix (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1980, ctntune,  0,        0,      ctntune,  ctntune,  ctntune_state,  empty_init, "Castle Toy", "Name That Tune (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
-SYST( 1980, invspace, 0,        0,      invspace, invspace, invspace_state, empty_init, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, einspace, 0,        0,      einspace, einspace, einspace_state, empty_init, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, efball,   0,        0,      efball,   efball,   efball_state,   empty_init, "Epoch", "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
 SYST( 1981, galaxy2,  0,        0,      galaxy2,  galaxy2,  galaxy2_state,  empty_init, "Epoch", "Galaxy II (VFD Rev. D)", MACHINE_SUPPORTS_SAVE )
 SYST( 1981, galaxy2b, galaxy2,  0,      galaxy2b, galaxy2,  galaxy2_state,  empty_init, "Epoch", "Galaxy II (VFD Rev. B)", MACHINE_SUPPORTS_SAVE )
@@ -3365,7 +3365,7 @@ SYST( 1979, mcompgin, 0,        0,      mcompgin, mcompgin, mcompgin_state, empt
 
 SYST( 1979, mvbfree,  0,        0,      mvbfree,  mvbfree,  mvbfree_state,  empty_init, "Mego", "Mini-Vid: Break Free", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, grobot9,  0,        0,      grobot9,  grobot9,  grobot9_state,  empty_init, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
+SYST( 1980, grobot9,  0,        0,      grobot9,  grobot9,  grobot9_state,  empty_init, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the games: ***
 
 SYST( 1980, tccombat, 0,        0,      tccombat, tccombat, tccombat_state, empty_init, "Tomy", "Cosmic Combat", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, tmtennis, 0,        0,      tmtennis, tmtennis, tmtennis_state, empty_init, "Tomy", "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE )

@@ -24,8 +24,8 @@ ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, device_type type
 	ppu2c0x_device(mconfig, type, tag, owner, clock),
 	m_is_pal(false),
 	m_is_50hz(false),
-	m_read_bg(*this),
-	m_read_sp(*this)
+	m_read_bg(*this, 0),
+	m_read_sp(*this, 0)
 {
 }
 
@@ -281,8 +281,6 @@ void ppu_vt03_device::device_reset()
 {
 	ppu2c0x_device::device_reset();
 
-	m_read_bg.resolve_safe(0);
-	m_read_sp.resolve_safe(0);
 	for (int i = 0; i < 0xff; i++)
 		m_palette_ram[i] = 0x0;
 

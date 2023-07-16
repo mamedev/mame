@@ -82,15 +82,15 @@ private:
 	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_CALLBACK_MEMBER(led_refresh);
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_r);
-	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_0_w);
-	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_1_w);
-	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_2_w);
-	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_3_w);
-	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_4_w);
-	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_5_w);
-	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_7_w);
-	DECLARE_WRITE_LINE_MEMBER(via1_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(via1_cb2_w);
+	void sym1_74145_output_0_w(int state);
+	void sym1_74145_output_1_w(int state);
+	void sym1_74145_output_2_w(int state);
+	void sym1_74145_output_3_w(int state);
+	void sym1_74145_output_4_w(int state);
+	void sym1_74145_output_5_w(int state);
+	void sym1_74145_output_7_w(int state);
+	void via1_ca2_w(int state);
+	void via1_cb2_w(int state);
 	uint8_t riot_a_r();
 	uint8_t riot_b_r();
 	void riot_a_w(uint8_t data);
@@ -120,15 +120,15 @@ private:
 //  KEYBOARD INPUT & LED OUTPUT
 //**************************************************************************
 
-WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_0_w ) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 0); }
-WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_1_w ) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 1); }
-WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_2_w ) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 2); }
-WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_3_w ) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 3); }
-WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_4_w ) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 4); }
-WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_5_w ) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 5); }
-WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_7_w ) { m_cass->output( state ? -1.0 : +1.0); }
+void sym1_state::sym1_74145_output_0_w(int state) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 0); }
+void sym1_state::sym1_74145_output_1_w(int state) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 1); }
+void sym1_state::sym1_74145_output_2_w(int state) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 2); }
+void sym1_state::sym1_74145_output_3_w(int state) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 3); }
+void sym1_state::sym1_74145_output_4_w(int state) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 4); }
+void sym1_state::sym1_74145_output_5_w(int state) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 5); }
+void sym1_state::sym1_74145_output_7_w(int state) { m_cass->output( state ? -1.0 : +1.0); }
 
-WRITE_LINE_MEMBER( sym1_state::via1_cb2_w )
+void sym1_state::via1_cb2_w(int state)
 {
 	m_cb2 = state;
 	m_cass->change_state(state ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -282,7 +282,7 @@ INPUT_PORTS_END
 
 // CA2 will be forced high when the VIA is reset, causing the ROM to be switched in
 // When the bios clears POR, FF80-FFFF becomes a mirror of A600-A67F
-WRITE_LINE_MEMBER( sym1_state::via1_ca2_w )
+void sym1_state::via1_ca2_w(int state)
 {
 	m_banks[8]->set_entry(state);
 }

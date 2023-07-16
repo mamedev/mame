@@ -86,13 +86,6 @@ apricot_expansion_bus_device::~apricot_expansion_bus_device()
 
 void apricot_expansion_bus_device::device_start()
 {
-	// resolve callbacks
-	m_dma1_handler.resolve_safe();
-	m_dma2_handler.resolve_safe();
-	m_ext1_handler.resolve_safe();
-	m_ext2_handler.resolve_safe();
-	m_int2_handler.resolve_safe();
-	m_int3_handler.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -106,12 +99,12 @@ void apricot_expansion_bus_device::add_card(device_apricot_expansion_card_interf
 }
 
 // callbacks from slot device to the host
-WRITE_LINE_MEMBER( apricot_expansion_bus_device::dma1_w ) { m_dma1_handler(state); }
-WRITE_LINE_MEMBER( apricot_expansion_bus_device::dma2_w ) { m_dma2_handler(state); }
-WRITE_LINE_MEMBER( apricot_expansion_bus_device::ext1_w ) { m_ext1_handler(state); }
-WRITE_LINE_MEMBER( apricot_expansion_bus_device::ext2_w ) { m_ext2_handler(state); }
-WRITE_LINE_MEMBER( apricot_expansion_bus_device::int2_w ) { m_int2_handler(state); }
-WRITE_LINE_MEMBER( apricot_expansion_bus_device::int3_w ) { m_int3_handler(state); }
+void apricot_expansion_bus_device::dma1_w(int state) { m_dma1_handler(state); }
+void apricot_expansion_bus_device::dma2_w(int state) { m_dma2_handler(state); }
+void apricot_expansion_bus_device::ext1_w(int state) { m_ext1_handler(state); }
+void apricot_expansion_bus_device::ext2_w(int state) { m_ext2_handler(state); }
+void apricot_expansion_bus_device::int2_w(int state) { m_int2_handler(state); }
+void apricot_expansion_bus_device::int3_w(int state) { m_int3_handler(state); }
 
 //-------------------------------------------------
 //  install_ram - attach ram to cpu/iop

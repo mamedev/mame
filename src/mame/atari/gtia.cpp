@@ -123,9 +123,9 @@ DEFINE_DEVICE_TYPE(ATARI_GTIA, gtia_device, "gtia", "Atari GTIA")
 gtia_device::gtia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ATARI_GTIA, tag, owner, clock)
 	, m_region(GTIA_NTSC)
-	, m_read_cb(*this)
+	, m_read_cb(*this, 0x0f)
 	, m_write_cb(*this)
-	, m_trigger_cb(*this)
+	, m_trigger_cb(*this, 0xf)
 {
 }
 
@@ -136,10 +136,6 @@ gtia_device::gtia_device(const machine_config &mconfig, const char *tag, device_
 
 void gtia_device::device_start()
 {
-	m_read_cb.resolve();
-	m_write_cb.resolve();
-	m_trigger_cb.resolve_safe(0xf);
-
 	save_item(NAME(m_r.m0pf));
 	save_item(NAME(m_r.m1pf));
 	save_item(NAME(m_r.m2pf));
@@ -317,12 +313,13 @@ void gtia_device::button_interrupt(int button_count)
 	}
 
 	/* button registers for xl/xe */
+	// these don't really unregister on latch but are instant
 	if (button_count == 2)
 	{
 		// TRIG2: unused on xl/xe (1), xegs keyboard (1) connected (0) disconnected
-		m_r.but[2] = 1;
+		m_r.but[2] = BIT(button_port, 2);
 		// TRIG3: RD5 external cart readback (1) present (0) disabled thru bankswitch or absent
-		m_r.but[3] = 0;
+		m_r.but[3] = BIT(button_port, 3);
 	}
 
 }
@@ -379,7 +376,7 @@ uint8_t gtia_device::read(offs_t offset)
 			// unconfirmed behaviour with reading lines unconnected,
 			// assume active low logic with read direction.
 			const u8 consol_read_dir = (~m_w.consol & 0xf);
-			const u8 res = !m_read_cb.isnull() ? m_read_cb(0) : 0x0f;
+			const u8 res = m_read_cb(0);
 			m_r.consol = res & consol_read_dir;
 			return m_r.consol;
 		}
@@ -893,7 +890,7 @@ void gtia_device::write(offs_t offset, uint8_t data)
 		recalc_m3();
 		break;
 
-		case 30:    /* clear collisions */
+	case 30:    /* clear collisions */
 		m_r.m0pf = m_r.m1pf = m_r.m2pf = m_r.m3pf =
 		m_r.p0pf = m_r.p1pf = m_r.p2pf = m_r.p3pf =
 		m_r.m0pl = m_r.m1pl = m_r.m2pl = m_r.m3pl =
@@ -905,8 +902,7 @@ void gtia_device::write(offs_t offset, uint8_t data)
 		if (data == m_w.consol)
 			break;
 		m_w.consol = data & 0x0f;
-		if (!m_write_cb.isnull())
-			m_write_cb((offs_t)0, m_w.consol);
+		m_write_cb(offs_t(0), m_w.consol);
 		break;
 	}
 }

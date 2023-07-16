@@ -151,8 +151,8 @@ private:
 	void disp_w(offs_t, u8 data);
 	void update_sound_a();
 	void update_sound_m();
-	DECLARE_WRITE_LINE_MEMBER(ic5a_w);
-	DECLARE_WRITE_LINE_MEMBER(ic5m_w);
+	void ic5a_w(int state);
+	void ic5m_w(int state);
 	void spinb_palette(palette_device &palette) const;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -800,14 +800,14 @@ void spinb_state::update_sound_m()
 		m_ic14m->ba_w(0);
 }
 
-WRITE_LINE_MEMBER( spinb_state::ic5a_w )
+void spinb_state::ic5a_w(int state)
 {
 	m_pc0a = state;
 	m_ic5a->d_w(state);
 	m_ic14a->select_w(state);
 }
 
-WRITE_LINE_MEMBER( spinb_state::ic5m_w )
+void spinb_state::ic5m_w(int state)
 {
 	m_pc0m = state;
 	m_ic5m->d_w(state);

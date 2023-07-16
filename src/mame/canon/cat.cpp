@@ -295,11 +295,11 @@ private:
 
 	uint32_t screen_update_cat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(cat_duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(cat_duart_txa);
-	DECLARE_WRITE_LINE_MEMBER(cat_duart_txb);
+	void cat_duart_irq_handler(int state);
+	void cat_duart_txa(int state);
+	void cat_duart_txb(int state);
 	void cat_duart_output(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(prn_ack_ff);
+	void prn_ack_ff(int state);
 
 	uint16_t cat_floppy_control_r(offs_t offset);
 	void cat_floppy_control_w(offs_t offset, uint16_t data);
@@ -967,7 +967,7 @@ uint32_t cat_state::screen_update_cat(screen_device &screen, bitmap_rgb32 &bitma
  * The duart also will, if configured to do so, fire an int when the state
  * changes of the centronics /ACK pin; this is used while printing.
  */
-WRITE_LINE_MEMBER(cat_state::cat_duart_irq_handler)
+void cat_state::cat_duart_irq_handler(int state)
 {
 #ifdef DEBUG_DUART_IRQ_HANDLER
 	fprintf(stderr, "Duart IRQ handler called: state: %02X, vector: %06X\n", state, irqvector);
@@ -975,14 +975,14 @@ WRITE_LINE_MEMBER(cat_state::cat_duart_irq_handler)
 	m_maincpu->set_input_line(M68K_IRQ_1, state);
 }
 
-WRITE_LINE_MEMBER(cat_state::cat_duart_txa) // semit sends stuff here; connects to the serial port on the back
+void cat_state::cat_duart_txa(int state) // semit sends stuff here; connects to the serial port on the back
 {
 #ifdef DEBUG_DUART_TXA
 	fprintf(stderr, "Duart TXA: data %02X\n", state);
 #endif
 }
 
-WRITE_LINE_MEMBER(cat_state::cat_duart_txb) // memit sends stuff here; connects to the modem chip
+void cat_state::cat_duart_txb(int state) // memit sends stuff here; connects to the modem chip
 {
 #ifdef DEBUG_DUART_TXB
 	fprintf(stderr, "Duart TXB: data %02X\n", state);
@@ -1025,7 +1025,7 @@ void cat_state::cat_duart_output(uint8_t data)
 	m_speaker->level_w((data >> 3) & 1);
 }
 
-WRITE_LINE_MEMBER(cat_state::prn_ack_ff) // switch the flipflop state on the rising edge of /ACK
+void cat_state::prn_ack_ff(int state) // switch the flipflop state on the rising edge of /ACK
 {
 	if ((m_duart_prn_ack_prev_state == 0) && (state == 1))
 	{

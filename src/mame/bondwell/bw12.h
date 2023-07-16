@@ -68,19 +68,19 @@ public:
 private:
 	void bankswitch();
 
-	DECLARE_WRITE_LINE_MEMBER( ls138_a0_w );
-	DECLARE_WRITE_LINE_MEMBER( ls138_a1_w );
-	DECLARE_WRITE_LINE_MEMBER( init_w );
-	DECLARE_WRITE_LINE_MEMBER( motor0_w );
-	DECLARE_WRITE_LINE_MEMBER( motor1_w );
+	void ls138_a0_w(int state);
+	void ls138_a1_w(int state);
+	void init_w(int state);
+	void motor0_w(int state);
+	void motor1_w(int state);
 
 	uint8_t ls259_r(offs_t offset);
 	uint8_t pia_pa_r();
-	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
-	DECLARE_WRITE_LINE_MEMBER( pit_out2_w );
-	DECLARE_READ_LINE_MEMBER( ay3600_shift_r );
-	DECLARE_READ_LINE_MEMBER( ay3600_control_r );
-	DECLARE_WRITE_LINE_MEMBER( ay3600_data_ready_w );
+	void pia_cb2_w(int state);
+	void pit_out2_w(int state);
+	int ay3600_shift_r();
+	int ay3600_control_r();
+	void ay3600_data_ready_w(int state);
 	MC6845_UPDATE_ROW( crtc_update_row );
 
 	void floppy_motor_on_off();
@@ -88,9 +88,9 @@ private:
 	static void bw12_floppy_formats(format_registration &fr);
 	static void bw14_floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	void write_centronics_busy(int state);
+	void write_centronics_fault(int state);
+	void write_centronics_perror(int state);
 
 	void common(machine_config &config);
 	void bw12_io(address_map &map);

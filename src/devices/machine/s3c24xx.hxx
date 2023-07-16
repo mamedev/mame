@@ -133,14 +133,7 @@ void S3C24_CLASS_NAME::s3c24xx_reset()
 
 int S3C24_CLASS_NAME::iface_core_pin_r(int pin)
 {
-	if (!m_pin_r_cb.isnull())
-	{
-		return (m_pin_r_cb)(pin);
-	}
-	else
-	{
-		return 0;
-	}
+	return m_pin_r_cb(pin);
 }
 
 /* LCD Controller */
@@ -1754,25 +1747,15 @@ void S3C24_CLASS_NAME::s3c24xx_gpio_reset()
 
 uint32_t S3C24_CLASS_NAME::iface_gpio_port_r(int port, uint32_t mask)
 {
-	if (!m_port_r_cb.isnull())
-	{
-		// TO CHECK : masking is not done in any of handlers
-		// devcb do it automatically so guess is masks are not proper right now
-		// without masking works fine
-		return (m_port_r_cb)( port ); //, mask);
-	}
-	else
-	{
-		return 0;
-	}
+	// TO CHECK : masking is not done in any of handlers
+	// devcb do it automatically so guess is masks are not proper right now
+	// without masking works fine
+	return m_port_r_cb( port ); //, mask);
 }
 
 void S3C24_CLASS_NAME::iface_gpio_port_w(int port, uint32_t mask, uint32_t data)
 {
-	if (!m_port_w_cb.isnull())
-	{
-		(m_port_w_cb)( port, data, mask );
-	}
+	m_port_w_cb( port, data, mask );
 }
 
 uint16_t S3C24_CLASS_NAME::s3c24xx_gpio_get_mask( uint32_t con, int val)
@@ -2228,22 +2211,17 @@ void S3C24_CLASS_NAME::s3c24xx_iic_reset()
 
 void S3C24_CLASS_NAME::iface_i2c_scl_w( int state)
 {
-	if (!m_scl_w_cb.isnull())
-		m_scl_w_cb(state);
+	m_scl_w_cb(state);
 }
 
 void S3C24_CLASS_NAME::iface_i2c_sda_w(int state)
 {
-	if (!m_sda_w_cb.isnull())
-		m_sda_w_cb(state);
+	m_sda_w_cb(state);
 }
 
 int S3C24_CLASS_NAME::iface_i2c_sda_r()
 {
-	if (!m_sda_r_cb.isnull())
-		return m_sda_r_cb();
-	else
-		return 1;
+	return m_sda_r_cb();
 }
 
 void S3C24_CLASS_NAME::i2c_send_start()
@@ -2447,8 +2425,7 @@ TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_iic_timer_exp )
 
 void S3C24_CLASS_NAME::iface_i2s_data_w(int ch, uint16_t data)
 {
-	if (!m_data_w_cb.isnull())
-		(m_data_w_cb)(ch, data, 0);
+	m_data_w_cb(ch, data, 0);
 }
 
 void S3C24_CLASS_NAME::s3c24xx_iis_start()
@@ -2598,21 +2575,14 @@ void S3C24_CLASS_NAME::s3c24xx_adc_reset()
 
 uint32_t S3C24_CLASS_NAME::iface_adc_data_r(int ch)
 {
-	if (!m_data_r_cb.isnull())
-	{
-		int offs = ch;
+	int offs = ch;
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
-		if (BIT(m_adc.regs.adctsc, 2) != 0)
-		{
-			offs += 2;
-		}
-#endif
-		return m_data_r_cb(offs, 0);
-	}
-	else
+	if (BIT(m_adc.regs.adctsc, 2) != 0)
 	{
-		return 0;
+		offs += 2;
 	}
+#endif
+	return m_data_r_cb(offs, 0);
 }
 
 uint32_t S3C24_CLASS_NAME::s3c24xx_adc_r(offs_t offset, uint32_t mem_mask)
@@ -2811,32 +2781,22 @@ void S3C24_CLASS_NAME::s3c24xx_nand_reset()
 
 void S3C24_CLASS_NAME::iface_nand_command_w(uint8_t data)
 {
-	if (!m_command_w_cb.isnull())
-	{
-		m_command_w_cb(0, data, 0xff);
-	}
+	m_command_w_cb(0, data, 0xff);
 }
 
 void S3C24_CLASS_NAME::iface_nand_address_w(uint8_t data)
 {
-	if (!m_address_w_cb.isnull())
-	{
-		m_address_w_cb(0, data, 0xff);
-	}
+	m_address_w_cb(0, data, 0xff);
 }
 
 uint8_t S3C24_CLASS_NAME::iface_nand_data_r()
 {
-	if (!m_nand_data_r_cb.isnull())
-		return m_nand_data_r_cb(0, 0xff);
-	else
-		return 0;
+	return m_nand_data_r_cb(0, 0xff);
 }
 
 void S3C24_CLASS_NAME::iface_nand_data_w(uint8_t data)
 {
-	if (!m_nand_data_w_cb.isnull())
-		m_nand_data_w_cb(0, data, 0xff);
+	m_nand_data_w_cb(0, data, 0xff);
 }
 
 void S3C24_CLASS_NAME::nand_update_mecc(uint8_t *ecc, int pos, uint8_t data)
@@ -3080,7 +3040,7 @@ void S3C24_CLASS_NAME::s3c24xx_nand_w(offs_t offset, uint32_t data, uint32_t mem
 	}
 }
 
-[[maybe_unused]] WRITE_LINE_MEMBER( S3C24_CLASS_NAME::s3c24xx_pin_frnb_w )
+[[maybe_unused]] void S3C24_CLASS_NAME::s3c24xx_pin_frnb_w(int state)
 {
 	LOGMASKED(LOG_FLASH, "s3c24xx_pin_frnb_w (%d)\n", state);
 #if defined(DEVICE_S3C2440)
@@ -3250,21 +3210,6 @@ void S3C24_CLASS_NAME::s3c24xx_device_reset()
 void S3C24_CLASS_NAME::s3c24xx_device_start()
 {
 	LOGMASKED(LOG_RESET, "s3c24xx device start\n");
-	m_pin_r_cb.resolve();
-	m_pin_w_cb.resolve_safe();
-	m_port_r_cb.resolve();
-	m_port_w_cb.resolve();
-	m_scl_w_cb.resolve();
-	m_sda_r_cb.resolve();
-	m_sda_w_cb.resolve();
-	m_data_r_cb.resolve();
-	m_data_w_cb.resolve();
-#if !defined(DEVICE_S3C2400)
-	m_command_w_cb.resolve();
-	m_address_w_cb.resolve();
-	m_nand_data_r_cb.resolve();
-	m_nand_data_w_cb.resolve();
-#endif
 	for (int i = 0; i < 5; i++)
 		m_pwm.timer[i] = timer_alloc(FUNC(S3C24_CLASS_NAME::s3c24xx_pwm_timer_exp), this);
 	for (auto & elem : m_dma)

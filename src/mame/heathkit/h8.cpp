@@ -89,7 +89,7 @@ private:
 	void portf0_w(u8 data);
 	void portf1_w(u8 data);
 	void h8_status_callback(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(h8_inte_callback);
+	void h8_inte_callback(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_irq_pulse);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
@@ -282,7 +282,7 @@ void h8_state::machine_start()
 	save_item(NAME(m_cassold));
 }
 
-WRITE_LINE_MEMBER( h8_state::h8_inte_callback )
+void h8_state::h8_inte_callback(int state)
 {
 	// operate the ION LED
 	m_ion_led = !state;

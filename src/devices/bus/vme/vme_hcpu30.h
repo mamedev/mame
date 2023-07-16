@@ -57,11 +57,11 @@ private:
 	required_region_ptr<uint32_t> m_sysrom;
 	required_ioport m_dips;
 
-	DECLARE_WRITE_LINE_MEMBER(dusirq_callback);
-	DECLARE_WRITE_LINE_MEMBER(scsiirq_callback);
-	DECLARE_WRITE_LINE_MEMBER(scsidrq_callback);
-	DECLARE_WRITE_LINE_MEMBER(fdcirq_callback);
-	DECLARE_WRITE_LINE_MEMBER(fdcdrq_callback);
+	void dusirq_callback(int state);
+	void scsiirq_callback(int state);
+	void scsidrq_callback(int state);
+	void fdcirq_callback(int state);
+	void fdcdrq_callback(int state);
 
 	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
 	memory_passthrough_handler m_rom_shadow_tap;

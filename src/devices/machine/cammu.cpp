@@ -33,7 +33,6 @@
 
 #include <algorithm>
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_ACCESS  (1U << 1)
 #define LOG_DTU     (1U << 2)
 #define LOG_TLB     (1U << 3)
@@ -158,7 +157,6 @@ cammu_device::cammu_device(const machine_config &mconfig, device_type type, cons
 
 void cammu_device::device_start()
 {
-	m_exception_func.resolve();
 }
 
 void cammu_device::device_reset()

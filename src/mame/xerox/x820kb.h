@@ -53,8 +53,8 @@ private:
 	uint8_t kb_p1_r();
 	void kb_p1_w(uint8_t data);
 	uint8_t kb_p2_r();
-	DECLARE_READ_LINE_MEMBER( kb_t0_r );
-	DECLARE_READ_LINE_MEMBER( kb_t1_r );
+	int kb_t0_r();
+	int kb_t1_r();
 	void kb_bus_w(uint8_t data);
 };
 
