@@ -16186,6 +16186,9 @@ chmate                          //
 @source:commodore/clcd.cpp
 clcd                            // Commodore LCD
 
+@source:commodore/kim1.cpp
+kim1                            // Commodore (MOS) KIM-1 1976
+
 @source:commodore/mps1230.cpp
 mps1000                         // 1986 Commodore MPS-1000 (dot matrix printer)
 mps1230                         // 1988 Commodore MPS-1230 near-letter-quality dot matrix printer
@@ -31880,9 +31883,6 @@ mpz80                           //
 
 @source:morrow/tricep.cpp
 tricep                          //
-
-@source:mos/kim1.cpp
-kim1                            // Commodore (MOS) KIM-1 1975
 
 @source:motorola/ampscarp.cpp
 ampscarp                        // Motorola Amps Car Phone

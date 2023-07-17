@@ -229,9 +229,9 @@ void mos6530_new_device::update_pb()
 {
 	uint8_t data = (m_pb_out & m_pb_ddr) | (m_pb_ddr ^ 0xff);
 
-	if (m_ie_timer) {
+	if (!BIT(m_pb_ddr, 7)) {
 		// active low!
-		if (m_irq_timer)
+		if (m_ie_timer && m_irq_timer)
 			data &= ~IRQ_TIMER;
 		else
 			data |= IRQ_TIMER;

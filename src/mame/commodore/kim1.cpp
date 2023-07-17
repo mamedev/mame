@@ -101,15 +101,15 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
 	void kim1(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	uint8_t kim1_u2_read_a();
 	void kim1_u2_write_a(uint8_t data);
 	uint8_t kim1_u2_read_b();
 	void kim1_u2_write_b(uint8_t data);
-
-	// device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kim1_cassette_input);
 
@@ -124,9 +124,9 @@ private:
 	required_ioport_array<3> m_row;
 	required_ioport m_special;
 
-	uint8_t m_u2_port_b;
-	uint8_t m_311_output;
-	uint32_t m_cassette_high_count;
+	uint8_t m_u2_port_b = 0;
+	uint8_t m_311_output = 0;
+	uint32_t m_cassette_high_count = 0;
 };
 
 
@@ -306,7 +306,7 @@ void kim1_state::kim1(machine_config &config)
 	m_cass->set_formats(kim1_cassette_formats);
 	m_cass->set_default_state(CASSETTE_STOPPED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
-	m_cass->set_interface ("kim1_cass");
+	m_cass->set_interface("kim1_cass");
 
 	SPEAKER(config, "mono").front_center();
 
@@ -323,8 +323,8 @@ void kim1_state::kim1(machine_config &config)
 
 ROM_START(kim1)
 	ROM_REGION(0x0800,"maincpu",0)
-	ROM_LOAD("6530-003.bin", 0x0000, 0x0400, CRC(a2a56502) SHA1(60b6e48f35fe4899e29166641bac3e81e3b9d220))
-	ROM_LOAD("6530-002.bin", 0x0400, 0x0400, CRC(2b08e923) SHA1(054f7f6989af3a59462ffb0372b6f56f307b5362))
+	ROM_LOAD("6530-003", 0x0000, 0x0400, CRC(a2a56502) SHA1(60b6e48f35fe4899e29166641bac3e81e3b9d220))
+	ROM_LOAD("6530-002", 0x0400, 0x0400, CRC(2b08e923) SHA1(054f7f6989af3a59462ffb0372b6f56f307b5362))
 ROM_END
 
 } // anonymous namespace
@@ -334,5 +334,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME  FLAGS
-COMP( 1975, kim1, 0,      0,      kim1,    kim1,  kim1_state, empty_init, "MOS Technologies", "KIM-1",  MACHINE_SUPPORTS_SAVE)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY           FULLNAME  FLAGS
+COMP( 1976, kim1, 0,      0,      kim1,    kim1,  kim1_state, empty_init, "MOS Technology", "KIM-1",  MACHINE_SUPPORTS_SAVE)
