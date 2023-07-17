@@ -2,8 +2,10 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    MOS Technology 6530 Memory, I/O, Timer Array emulation
-    MOS Technology 6532 RAM, I/O, Timer Array emulation
+    MOS Technology 6530 MIOT (Memory, I/O, Timer Array)
+    Rockwell calls it RRIOT: ROM, RAM, I/O, Timer
+
+    MOS Technology 6532 RIOT (RAM, I/O, Timer Array)
 
 **********************************************************************/
 
@@ -105,7 +107,7 @@ mos6530_device_base::mos6530_device_base(const machine_config &mconfig, device_t
 	m_pb_out(0),
 	m_pb_ddr(0),
 	m_ie_timer(false),
-	m_irq_timer(true),
+	m_irq_timer(false),
 	m_ie_edge(false),
 	m_irq_edge(false),
 	m_timershift(0),
@@ -228,10 +230,11 @@ void mos6530_new_device::update_pb()
 	uint8_t data = (m_pb_out & m_pb_ddr) | (m_pb_ddr ^ 0xff);
 
 	if (m_ie_timer) {
+		// active low!
 		if (m_irq_timer)
-			data |= IRQ_TIMER;
-		else
 			data &= ~IRQ_TIMER;
+		else
+			data |= IRQ_TIMER;
 	}
 
 	if (m_out8_pb_cb.isunset()) {
@@ -505,8 +508,7 @@ uint8_t mos6530_device_base::timer_r(bool ie)
 {
 	uint8_t data = get_timer();
 
-	if (!machine().side_effects_disabled())
-	{
+	if (!machine().side_effects_disabled()) {
 		timer_irq_enable(ie);
 
 		LOGTIMER("%s %s %s Timer read %02x IE %u\n", machine().time().as_string(), machine().describe_context(), name(), data, m_ie_timer ? 1 : 0);

@@ -485,7 +485,7 @@ void c2040_device::add_common_devices(machine_config &config)
 	m_miot->pb_wr_callback<0>().set(m_fdc, FUNC(c2040_fdc_device::drv_sel_w));
 	m_miot->pb_wr_callback<1>().set(m_fdc, FUNC(c2040_fdc_device::ds0_w));
 	m_miot->pb_wr_callback<2>().set(m_fdc, FUNC(c2040_fdc_device::ds1_w));
-	m_miot->pb_wr_callback<7>().set_inputline(m_fdccpu, M6502_IRQ_LINE);
+	m_miot->pb_wr_callback<7>().set_inputline(m_fdccpu, M6502_IRQ_LINE).invert();
 	m_miot->pb_rd_callback<3>().set(m_fdc, FUNC(c2040_fdc_device::wps_r));
 
 	C2040_FDC(config, m_fdc, XTAL(16'000'000));

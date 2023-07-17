@@ -45,7 +45,7 @@ MOS MPS 6332 005 2179
 
 #include "emu.h"
 #include "cpu/m6502/m6504.h"
-#include "machine/mos6530.h"
+#include "machine/mos6530n.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
 #include "speaker.h"
@@ -83,7 +83,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<mos6530_device> m_miot;
+	required_device<mos6530_new_device> m_miot;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	optional_ioport_array<5> m_inputs;
@@ -179,10 +179,10 @@ u8 chmate_state::input_r()
 void chmate_state::main_map(address_map &map)
 {
 	map.global_mask(0x1fff);
-	map(0x0000, 0x00ff).mirror(0x100).ram();
-	map(0x0b00, 0x0b0f).rw(m_miot, FUNC(mos6530_device::read), FUNC(mos6530_device::write));
-	map(0x0b80, 0x0bbf).ram(); // 6530 RAM
-	map(0x0c00, 0x0fff).rom(); // 6530 ROM
+	map(0x0000, 0x00ff).mirror(0x0100).ram();
+	map(0x0b00, 0x0b0f).mirror(0x0030).m(m_miot, FUNC(mos6530_new_device::io_map));
+	map(0x0b80, 0x0bbf).m(m_miot, FUNC(mos6530_new_device::ram_map));
+	map(0x0c00, 0x0fff).m(m_miot, FUNC(mos6530_new_device::rom_map));
 	map(0x1000, 0x1fff).rom();
 }
 
@@ -268,10 +268,10 @@ void chmate_state::chmate(machine_config &config)
 	M6504(config, m_maincpu, 8_MHz_XTAL/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &chmate_state::main_map);
 
-	MOS6530(config, m_miot, 8_MHz_XTAL/8);
-	m_miot->in_pa_callback().set(FUNC(chmate_state::input_r));
-	m_miot->out_pa_callback().set(FUNC(chmate_state::digit_w));
-	m_miot->out_pb_callback().set(FUNC(chmate_state::control_w));
+	MOS6530_NEW(config, m_miot, 8_MHz_XTAL/8);
+	m_miot->pa_rd_callback().set(FUNC(chmate_state::input_r));
+	m_miot->pa_wr_callback().set(FUNC(chmate_state::digit_w));
+	m_miot->pb_wr_callback().set(FUNC(chmate_state::control_w));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4+1, 8);
@@ -302,22 +302,15 @@ void chmate_state::mk2a(machine_config &config)
 *******************************************************************************/
 
 ROM_START( chmate )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("6530_024", 0x0c00, 0x0400, CRC(4f28c443) SHA1(e33f8b7f38e54d7a6e0f0763f2328cc12cb0eade) )
+	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD("6332_005", 0x1000, 0x1000, CRC(6f10991b) SHA1(90cdc5a15d9ad813ad20410f21081c6e3e481812) )
+
+	ROM_REGION( 0x400, "miot", 0 )
+	ROM_LOAD("6530_024", 0x0000, 0x0400, CRC(4f28c443) SHA1(e33f8b7f38e54d7a6e0f0763f2328cc12cb0eade) )
 ROM_END
 
-ROM_START( ccmk2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("6530_024", 0x0c00, 0x0400, CRC(4f28c443) SHA1(e33f8b7f38e54d7a6e0f0763f2328cc12cb0eade) )
-	ROM_LOAD("6332_005", 0x1000, 0x1000, CRC(6f10991b) SHA1(90cdc5a15d9ad813ad20410f21081c6e3e481812) )
-ROM_END
-
-ROM_START( ccmk2a )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("6530_024", 0x0c00, 0x0400, CRC(4f28c443) SHA1(e33f8b7f38e54d7a6e0f0763f2328cc12cb0eade) )
-	ROM_LOAD("6332_005", 0x1000, 0x1000, CRC(6f10991b) SHA1(90cdc5a15d9ad813ad20410f21081c6e3e481812) )
-ROM_END
+#define rom_ccmk2 rom_chmate
+#define rom_ccmk2a rom_chmate
 
 } // anonymous namespace
 
