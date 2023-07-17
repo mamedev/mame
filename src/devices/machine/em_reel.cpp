@@ -2,12 +2,15 @@
 // copyright-holders:SomeRandomGuyIdk
 /**********************************************************************
 
-	Electromechanical reels for slot machines
+    Electromechanical reels for slot machines
 
 **********************************************************************/
 
 #include "emu.h"
 #include "em_reel.h"
+
+#include <algorithm>
+
 
 ALLOW_SAVE_TYPE(em_reel_device::dir);
 ALLOW_SAVE_TYPE(em_reel_device::reel_state);
@@ -18,7 +21,8 @@ em_reel_device::em_reel_device(const machine_config &mconfig, const char *tag, d
 	device_t(mconfig, EM_REEL, tag, owner, clock),
 	m_reel_out(*this, tag),
 	m_state_cb(*this)
-{}
+{
+}
 
 void em_reel_device::set_state(uint8_t state)
 {
@@ -35,7 +39,7 @@ void em_reel_device::set_state(uint8_t state)
 	{
 		if(!state)
 		{
-			if(m_detents.find(m_pos) != m_detents.end()) // If reel is already on a detent, then stop it immediately
+			if(is_at_detent()) // If reel is already on a detent, then stop it immediately
 			{
 				m_move_timer->adjust(attotime::never);
 				m_state = reel_state::STOPPED;
@@ -52,6 +56,12 @@ void em_reel_device::set_state(uint8_t state)
 		if(state)
 			m_state = reel_state::SPINNING;
 	}
+}
+
+inline bool em_reel_device::is_at_detent() const
+{
+	auto const found = std::lower_bound(m_detents.begin(), m_detents.end(), m_pos);
+	return (m_detents.end() != found) && (*found == m_pos);
 }
 
 TIMER_CALLBACK_MEMBER( em_reel_device::move )
@@ -71,7 +81,7 @@ TIMER_CALLBACK_MEMBER( em_reel_device::move )
 			m_pos++;
 	}
 
-	if(m_state == reel_state::STOPPING && m_detents.find(m_pos) != m_detents.end()) // Stop once a detent is reached
+	if(m_state == reel_state::STOPPING && is_at_detent()) // Stop once a detent is reached
 	{
 		m_state = reel_state::STOPPED;
 		m_state_cb(0);
@@ -100,9 +110,16 @@ void em_reel_device::device_start()
 
 void em_reel_device::device_validity_check(validity_checker &valid) const
 {
-	for(auto detent : m_detents)
+	auto detent = m_detents.begin();
+	while(m_detents.end() != detent)
 	{
-		if(detent > m_max_pos)
-			fatalerror("Detent on step %u is out of range, maximum is %u\n", detent, m_max_pos);
+		if(*detent > m_max_pos)
+			fatalerror("Detent on step %u is out of range, maximum is %u\n", *detent, m_max_pos);
+
+		auto const next = std::next(detent);
+		if((m_detents.end() != next) && (*next <= *detent))
+			fatalerror("Detents %u and %u are not in ascending order\n", *detent, *next);
+
+		detent = next;
 	}
 }
