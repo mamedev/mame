@@ -4684,6 +4684,30 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="exainnovc" cloneof="exainnov">
+		<description>E.I. - Exa Innova (Japan, Compile)</description>
+		<year>1983</year>
+		<publisher>Compile</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="exa innova (japan, compile).rom" size="0x4000" crc="2de0e6da" sha1="2430a387e9eb2b2046532babfdf52afbbb1c599d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exainnovca" cloneof="exainnov">
+		<description>E.I. - Exa Innova (Japan, Compile, alt)</description>
+		<year>1983</year>
+		<publisher>Compile</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="exa innova (japan, compile, alt).rom" size="0x4000" crc="a7013512" sha1="4de646009f906754a81581096821b8afecb060d2" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Screen stays black -->
 	<software name="eagle5" supported="no">
 		<description>Eagles 5 (Korea)</description>
@@ -4765,6 +4789,31 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="erika (japan).rom" size="0x8000" crc="85ac5626" sha1="7de755f98b6a68886e61473d524d0aa6ab6577d7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ewoks">
+		<description>Ewoks (Spain)</description>
+		<year>1987</year>
+		<publisher>Walther Miller</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="ewoks (spain).rom" size="0x8000" crc="d42e3740" sha1="ef6f0db4c9858a96f9a83cda414112087ad64b78" />
+				<rom size="0x8000" offset="0x8000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ewoksdan">
+		<description>Ewoks and the Dandelion Warriors (Spain)</description>
+		<year>1987</year>
+		<publisher>Walther Miller</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="ewoks and the dandeloin warriors (spain).rom" size="0x8000" crc="514b1f31" sha1="e8437b5372f29193e99db30d1a75993ebed93c61" />
 			</dataarea>
 		</part>
 	</software>
@@ -18776,6 +18825,105 @@ legacy FM implementations cannot find it.
 
 
 <!-- Homebrew / Doujin software -->
+
+	<software name="earthatt">
+		<description>Earth Attack</description>
+		<year>2021</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="earth attack - thegeps (2021).rom" size="0x8000" crc="c9596ccb" sha1="b4335bf70d19d80a1e59faa890e04c5fefee0072" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eatblue">
+		<description>Eat Blue! 2004</description>
+		<year>2004</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Paxanga Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="eat blue 2004 - paxanga soft (2004).rom" size="0x2000" crc="caef6e71" sha1="d31eb4ff4d6e4b3af645f24388c734a1d00a0c47" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eatbluea" cloneof="eatblue">
+		<description>Eat Blue! 2004 (alt)</description>
+		<year>2004</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Paxanga Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="eat blue 2004 - paxanga soft (2004) (alt).rom" size="0x2000" crc="1ac005a0" sha1="30c6f72928b81c7d37d192cf6d6d6d3d1232469b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="erukafb">
+		<description>Eruka Fan Book</description>
+		<year>2016</year>
+		<publisher>N.I</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="eruka - n.i (2016).rom" size="0xc000" crc="d08d9358" sha1="8511c79774a2aa1913ece5fde339cf0082fc09ab" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="estapant">
+		<description>Está en el Pantano</description>
+		<year>2010</year>
+		<publisher>RELEVO Videogames</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="esta en el pantano - relevo videogames (2010).rom" size="0x8000" crc="3bb41093" sha1="f1550e958a0664f5966568e2677c3a041ba940d5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="estacaja">
+		<description>Está en la Caja (v1.1)</description>
+		<year>2009</year>
+		<publisher>RELEVO Videogames</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="esta en la caja - relevo videogames (2009) (v1.1).rom" size="0x8000" crc="1a9fda56" sha1="2e41133411cf9e4e9f6af42bb61eaf93b9ed5712" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="estacaja10" cloneof="estacaja">
+		<description>Está en la Caja (v1.0)</description>
+		<year>2009</year>
+		<publisher>RELEVO Videogames</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="esta en la caja - relevo videogames (2009) (v1.0).rom" size="0x8000" crc="2aa983ac" sha1="76b7fd1aed062d3ee5dbad6a94fb81c3e753e9f6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exchess">
+		<description>ExChess</description>
+		<year>2012</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="GarlicSoft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="exchess - garlicsoft (2012).rom" size="0x8000" crc="65687246" sha1="5d6861cfa10dd57315956e25a3c302a711605e44" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="factinfc">
 		<description>Factory Infection</description>
