@@ -20,6 +20,7 @@
 #include "cpu/mips/mips1.h"
 #include "cpu/mips/r4000.h"
 #include "machine/eepromser.h"
+
 #include "hpc1.h"
 #include "mc.h"
 #include "light.h"
@@ -42,7 +43,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_hpc(*this, "hpc")
 		, m_eeprom(*this, "eeprom")
-		, m_light(*this, "lg1")
+		, m_gfx(*this, "lg1")
 	{
 	}
 
@@ -62,7 +63,7 @@ protected:
 	required_device<hpc1_device> m_hpc;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	std::unique_ptr<uint32_t[]> m_dsp_ram;
-	required_device<light_video_device> m_light;
+	required_device<sgi_lg1_device> m_gfx;
 	address_space *m_space = nullptr;
 };
 
@@ -145,7 +146,7 @@ void indigo_state::dsp_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 void indigo_state::indigo_map(address_map &map)
 {
-	map(0x1f3f0000, 0x1f3fffff).rw(m_light, FUNC(light_video_device::entry_r), FUNC(light_video_device::entry_w));
+	map(0x1f3f0000, 0x1f3f7fff).m(m_gfx, FUNC(sgi_lg1_device::map));
 	map(0x1fb80000, 0x1fb8ffff).rw(m_hpc, FUNC(hpc1_device::read), FUNC(hpc1_device::write));
 	map(0x1fbd9000, 0x1fbd903f).rw(FUNC(indigo_state::int_r), FUNC(indigo_state::int_w));
 	map(0x1fbe0000, 0x1fbfffff).rw(FUNC(indigo_state::dsp_ram_r), FUNC(indigo_state::dsp_ram_w));
@@ -169,7 +170,7 @@ INPUT_PORTS_END
 
 void indigo_state::indigo_base(machine_config &config)
 {
-	LIGHT_VIDEO(config, m_light);
+	SGI_LG1(config, m_gfx);
 
 	EEPROM_93C56_16BIT(config, m_eeprom);
 }
