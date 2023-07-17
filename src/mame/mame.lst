@@ -15071,6 +15071,7 @@ mswordu                         // 25/07/1990 (c) 1990 (USA)
 mtwins                          // 19/06/1990 (c) 1990 (World)
 nemo                            // 30/11/1990 (c) 1990 (World)
 nemoj                           // 20/11/1990 (c) 1990 (Japan)
+nemoja                          // 20/11/1990 (c) 1990 (Japan)
 nemor1                          // 09/11/1990 (c) 1990 (World)
 pang3                           // 01/06/1995 (c) 1995 Mitchell (Euro) not listed on Capcom's site
 pang3b                          // bootleg
@@ -16562,7 +16563,7 @@ lastmisnu5                      // (c) 1986 Data East USA (US)
 lastmisnu6                      // (c) 1986 Data East USA (US)
 makyosen                        // (c) 1987 Data East Corporation (Japan)
 meikyuh                         // (c) 1987 Data East Corporation (Japan)
-meikyuha                        // (c) 1987 Data East Corporation (Japan)
+meikyuhbl                       // bootleg
 oscar                           // (c) 1988 Data East Corporation (World)
 oscarbl                         // bootleg
 oscarj1                         // (c) 1987 Data East Corporation (Japan)
@@ -31716,6 +31717,9 @@ twinbskt                        // (c) 1995 Recreativos Pasqual
 saiyukip                        //
 umipoker                        //
 
+@source:misc/unkgolf.cpp
+unkgolf
+
 @source:misc/unkhorse.cpp
 unkhorse                        //
 
@@ -34457,6 +34461,8 @@ vandykejal2                     // UPL-90064 (c) Jaleco
 drail                           // NTC / NMK
 hpierrot                        // NTC / NMK
 omatsuri                        // NMK
+pldoraemon                      // NMK
+plpittashi                      // NMK
 sweethrt                        // NMK
 trocana                         // NTC / NMK
 
