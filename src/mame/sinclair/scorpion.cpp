@@ -59,6 +59,7 @@ protected:
 	virtual void scorpion_update_memory();
 
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<17, 0, 0, ENDIANNESS_LITTLE>::specific m_ioext;
 	required_device<address_map_bank_device> m_bankio;
 	required_device<beta_disk_device> m_beta;
 	required_device_array<ay8912_device, 2> m_ay;
@@ -266,11 +267,11 @@ void scorpion_state::scorpion_ioext(address_map &map)
 		.lr8(NAME([this]() { return m_ay[m_ay_selected]->data_r(); })).w(FUNC(scorpion_state::ay_address_w));
 
 	// Mouse
-	map(0xfadf, 0xfadf).lr8(NAME([this]() { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));
-	map(0xfbdf, 0xfbdf).lr8(NAME([this]() { return m_io_mouse[0]->read(); }));
-	map(0xffdf, 0xffdf).lr8(NAME([this]() { return ~m_io_mouse[1]->read(); }));
+	map(0xfadf, 0xfadf).lr8(NAME([this]() -> u8 { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));
+	map(0xfbdf, 0xfbdf).lr8(NAME([this]() -> u8 { return m_io_mouse[0]->read(); }));
+	map(0xffdf, 0xffdf).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));
 	map(0x0003, 0x0003) // 1F | xxxxxxxx0x0xxx11
-		.select(0xff5c).lr8(NAME([]() { return u8(0xc0); })); // TODO Kepmston Joystick
+		.select(0xff5c).lr8(NAME([]() -> u8 { return 0xc0; })); // TODO Kepmston Joystick
 
 	// Shadow
 	// DOS + xxxxxxxx0nnxxx11
@@ -284,8 +285,8 @@ void scorpion_state::scorpion_ioext(address_map &map)
 void scorpion_state::scorpion_io(address_map &map)
 {
 	map(0x0000, 0xffff).lrw8(
-		NAME([this](offs_t offset) { return m_bankio->read8((m_beta->is_active() || BIT(m_port_1ffd_data, 3)) << 16 | offset); }),
-		NAME([this](offs_t offset, u8 data) { m_bankio->write8((m_beta->is_active() || BIT(m_port_1ffd_data, 3)) << 16 | offset, data); }));
+		NAME([this](offs_t offset) { return m_ioext.read_byte((m_beta->is_active() || BIT(m_port_1ffd_data, 3)) << 16 | offset); }),
+		NAME([this](offs_t offset, u8 data) { m_ioext.write_byte((m_beta->is_active() || BIT(m_port_1ffd_data, 3)) << 16 | offset, data); }));
 }
 
 void scorpion_state::scorpion_switch(address_map &map)
@@ -305,6 +306,7 @@ void scorpion_state::machine_start()
 	save_item(NAME(m_ram_banks));
 
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
+	m_bankio->space(AS_PROGRAM).specific(m_ioext);
 
 	// reconfigure ROMs
 	memory_region *rom = memregion("maincpu");
@@ -555,10 +557,10 @@ void scorpiontb_state::video_start()
 void scorpiontb_state::scorpion_ioext(address_map &map)
 {
 	scorpion_state::scorpion_ioext(map);
-	map(0x4021, 0x4021).mirror(0x3fdc) // 7FFD | 00xxxxxxxx1xxx01
-		.lr8(NAME([this](offs_t offset) { m_maincpu->set_clock_scale(2); return 0xff; }));
-	map(0x0021, 0x0021).mirror(0x3fdc) // 1FFD | 01xxxxxxxx1xxx01
+	map(0x0021, 0x0021).mirror(0x13fdc) // 1FFD | 00xxxxxxxx1xxx01
 		.lr8(NAME([this](offs_t offset) { m_maincpu->set_clock_scale(1); return 0xff; }));
+	map(0x4021, 0x4021).mirror(0x13fdc) // 7FFD | 01xxxxxxxx1xxx01
+		.lr8(NAME([this](offs_t offset) { m_maincpu->set_clock_scale(2); return 0xff; }));
 	map(0xe021, 0xe021).mirror(0x1fdc) // FFFD | 111xxxxxxx1xxx01
 		.rw(FUNC(scorpiontb_state::ay_data_r),  FUNC(scorpiontb_state::ay_address_w));
 
