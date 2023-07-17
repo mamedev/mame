@@ -2,30 +2,7 @@
 // copyright-holders:Juergen Buchmueller
 /******************************************************************************
 
-    kim1.cpp - KIM-1
-
-    LED: six 7-segment LEDs
-        left 4 digits (address)
-        right 2 digits (data)
-    Keyboard: 23 keys and SST switch
-        0-F  16 keys to enter data
-        AD   address entry mode
-        DA   data entry mode
-        +    increment address
-        PC   recalls address stored in the Program Counter
-        RS   system reset
-        GO   execute program
-        ST   program stop
-        SST  single step slide switch
-
-    How to use cassette:
-        00F1      00 to clear decimal mode
-        17F5-17F6 start address low and high
-        17F7-17F8 end address low and high
-        17F9      2 digit program ID
-        1800      press GO to save tape
-        1873      press GO to load tape
-    NOTE: save end address is next address from program end
+MOS Technology KIM-1
 
 The cassette interface
 ======================
@@ -40,6 +17,16 @@ a 311 comparator. For a high tone a 1 is passed to DB7 of 6530-U2 for a low tone
 a 0 is passed. The KIM-1 software measures the time it takes for the signal to
 change from 1 to 0.
 
+How to use cassette:
+    00F1      00 to clear decimal mode
+    17F5-17F6 start address low and high
+    17F7-17F8 end address low and high
+    17F9      2 digit program ID
+    1800      press GO to save tape
+    1873      press GO to load tape
+NOTE: save end address is next address from program end
+
+
 Keyboard and Display logic
 ==========================
 PA0-PA6 of 6530-U2 are connected to the columns of the keyboard matrix. These
@@ -51,15 +38,30 @@ When a key is pressed the corresponding input to PA0-PA6 is set low and the KIM-
 software reads this signal. The KIM-1 software sends an output signal to PA0-PA6
 and the corresponding segments of an LED are illuminated.
 
+LED: six 7-segment LEDs
+    left 4 digits (address)
+    right 2 digits (data)
+Keyboard: 23 keys and SST switch
+    0-F  16 keys to enter data
+    AD   address entry mode
+    DA   data entry mode
+    +    increment address
+    PC   recalls address stored in the Program Counter
+    RS   system reset
+    GO   execute program
+    ST   program stop
+    SST  single step slide switch
+
+Paste test:
+    N-0100=11^22^33^44^55^66^77^88^99^-0100=
+    Press UP to verify data.
+
+
 TODO:
 - LEDs should be dark at startup (RS key to activate)
 - hook up Single Step dip switch
 - slots for expansion & application ports
 - add TTY support
-
-Paste test:
-    N-0100=11^22^33^44^55^66^77^88^99^-0100=
-    Press UP to verify data.
 
 ******************************************************************************/
 
@@ -68,7 +70,7 @@ Paste test:
 #include "cpu/m6502/m6502.h"
 #include "formats/kim1_cas.h"
 #include "imagedev/cassette.h"
-#include "machine/mos6530.h"
+#include "machine/mos6530n.h"
 #include "machine/timer.h"
 #include "video/pwm.h"
 
@@ -101,15 +103,15 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
 	void kim1(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	uint8_t kim1_u2_read_a();
 	void kim1_u2_write_a(uint8_t data);
 	uint8_t kim1_u2_read_b();
 	void kim1_u2_write_b(uint8_t data);
-
-	// device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kim1_cassette_input);
 
@@ -117,16 +119,16 @@ private:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device_array<mos6530_device, 2> m_miot;
+	required_device_array<mos6530_new_device, 2> m_miot;
 	required_device<pwm_display_device> m_digit_pwm;
 	required_device<cassette_image_device> m_cass;
 
 	required_ioport_array<3> m_row;
 	required_ioport m_special;
 
-	uint8_t m_u2_port_b;
-	uint8_t m_311_output;
-	uint32_t m_cassette_high_count;
+	uint8_t m_u2_port_b = 0;
+	uint8_t m_311_output = 0;
+	uint32_t m_cassette_high_count = 0;
 };
 
 
@@ -138,10 +140,12 @@ void kim1_state::mem_map(address_map &map)
 {
 	map.global_mask(0x1fff);
 	map(0x0000, 0x03ff).ram();
-	map(0x1700, 0x173f).rw(m_miot[1], FUNC(mos6530_device::read), FUNC(mos6530_device::write));
-	map(0x1740, 0x177f).rw(m_miot[0], FUNC(mos6530_device::read), FUNC(mos6530_device::write));
-	map(0x1780, 0x17ff).ram();
-	map(0x1800, 0x1fff).rom().region("maincpu",0);
+	map(0x1700, 0x170f).mirror(0x0030).m(m_miot[1], FUNC(mos6530_new_device::io_map));
+	map(0x1740, 0x174f).mirror(0x0030).m(m_miot[0], FUNC(mos6530_new_device::io_map));
+	map(0x1780, 0x17bf).m(m_miot[1], FUNC(mos6530_new_device::ram_map));
+	map(0x17c0, 0x17ff).m(m_miot[0], FUNC(mos6530_new_device::ram_map));
+	map(0x1800, 0x1bff).m(m_miot[1], FUNC(mos6530_new_device::rom_map));
+	map(0x1c00, 0x1fff).m(m_miot[0], FUNC(mos6530_new_device::rom_map));
 }
 
 INPUT_CHANGED_MEMBER(kim1_state::trigger_reset)
@@ -225,7 +229,7 @@ void kim1_state::kim1_u2_write_a(uint8_t data)
 
 uint8_t kim1_state::kim1_u2_read_b()
 {
-	if (m_miot[0]->portb_out_get() & 0x20)
+	if (m_u2_port_b & 0x20)
 		return 0xff;
 
 	// Load from cassette
@@ -242,8 +246,6 @@ void kim1_state::kim1_u2_write_b(uint8_t data)
 	// Cassette write/speaker update
 	if (data & 0x20)
 		m_cass->output((data & 0x80) ? -1.0 : 1.0);
-
-	// Set IRQ when bit 7 is cleared
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_cassette_input)
@@ -294,19 +296,19 @@ void kim1_state::kim1(machine_config &config)
 	config.set_default_layout(layout_kim1);
 
 	// devices
-	MOS6530(config, m_miot[0], 1_MHz_XTAL); // u2
-	m_miot[0]->in_pa_callback().set(FUNC(kim1_state::kim1_u2_read_a));
-	m_miot[0]->out_pa_callback().set(FUNC(kim1_state::kim1_u2_write_a));
-	m_miot[0]->in_pb_callback().set(FUNC(kim1_state::kim1_u2_read_b));
-	m_miot[0]->out_pb_callback().set(FUNC(kim1_state::kim1_u2_write_b));
+	MOS6530_NEW(config, m_miot[0], 1_MHz_XTAL); // u2
+	m_miot[0]->pa_rd_callback().set(FUNC(kim1_state::kim1_u2_read_a));
+	m_miot[0]->pa_wr_callback().set(FUNC(kim1_state::kim1_u2_write_a));
+	m_miot[0]->pb_rd_callback().set(FUNC(kim1_state::kim1_u2_read_b));
+	m_miot[0]->pb_wr_callback().set(FUNC(kim1_state::kim1_u2_write_b));
 
-	MOS6530(config, m_miot[1], 1_MHz_XTAL); // u3
+	MOS6530_NEW(config, m_miot[1], 1_MHz_XTAL); // u3
 
 	CASSETTE(config, m_cass);
 	m_cass->set_formats(kim1_cassette_formats);
 	m_cass->set_default_state(CASSETTE_STOPPED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
-	m_cass->set_interface ("kim1_cass");
+	m_cass->set_interface("kim1_cass");
 
 	SPEAKER(config, "mono").front_center();
 
@@ -321,10 +323,12 @@ void kim1_state::kim1(machine_config &config)
 //  ROM DEFINITIONS
 //**************************************************************************
 
-ROM_START(kim1)
-	ROM_REGION(0x0800,"maincpu",0)
-	ROM_LOAD("6530-003.bin", 0x0000, 0x0400, CRC(a2a56502) SHA1(60b6e48f35fe4899e29166641bac3e81e3b9d220))
-	ROM_LOAD("6530-002.bin", 0x0400, 0x0400, CRC(2b08e923) SHA1(054f7f6989af3a59462ffb0372b6f56f307b5362))
+ROM_START( kim1 )
+	ROM_REGION( 0x400, "miot0", 0 )
+	ROM_LOAD("6530-002.u2", 0x0000, 0x0400, CRC(2b08e923) SHA1(054f7f6989af3a59462ffb0372b6f56f307b5362))
+
+	ROM_REGION( 0x400, "miot1", 0 )
+	ROM_LOAD("6530-003.u3", 0x0000, 0x0400, CRC(a2a56502) SHA1(60b6e48f35fe4899e29166641bac3e81e3b9d220))
 ROM_END
 
 } // anonymous namespace
@@ -334,5 +338,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME  FLAGS
-COMP( 1975, kim1, 0,      0,      kim1,    kim1,  kim1_state, empty_init, "MOS Technologies", "KIM-1",  MACHINE_SUPPORTS_SAVE)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY           FULLNAME  FLAGS
+COMP( 1976, kim1, 0,      0,      kim1,    kim1,  kim1_state, empty_init, "MOS Technology", "KIM-1",  MACHINE_SUPPORTS_SAVE)

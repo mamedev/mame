@@ -3,6 +3,7 @@
 /**********************************************************************
 
     VideoBrain Timeshare cartridge emulation
+    2KB mask ROM (AMI), 1KB RAM (2*NatSemi MM2114N)
 
 **********************************************************************/
 
@@ -30,15 +31,6 @@ DEFINE_DEVICE_TYPE(VB_TIMESHARE, videobrain_timeshare_cartridge_device, "vb_time
 videobrain_timeshare_cartridge_device::videobrain_timeshare_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VB_TIMESHARE, tag, owner, clock),
 	device_videobrain_expansion_card_interface(mconfig, *this)
-{
-}
-
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void videobrain_timeshare_cartridge_device::device_start()
 {
 }
 

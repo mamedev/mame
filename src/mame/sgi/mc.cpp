@@ -31,6 +31,7 @@ sgi_mc_device::sgi_mc_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, SGI_MC, tag, owner, clock)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_eeprom(*this, finder_base::DUMMY_TAG)
+	, m_simms(*this, "SIMMS")
 	, m_int_dma_done_cb(*this)
 	, m_eisa_present(*this, true)
 	, m_dma_timer(nullptr)
@@ -43,6 +44,7 @@ sgi_mc_device::sgi_mc_device(const machine_config &mconfig, const char *tag, dev
 	, m_gio64_arb_param(0)
 	, m_arb_cpu_time(0)
 	, m_arb_burst_time(0)
+	, m_memcfg{}
 	, m_cpu_mem_access_config(0)
 	, m_gio_mem_access_config(0)
 	, m_cpu_error_addr(0)
@@ -90,7 +92,7 @@ void sgi_mc_device::device_start()
 	save_item(NAME(m_gio64_arb_param));
 	save_item(NAME(m_arb_cpu_time));
 	save_item(NAME(m_arb_burst_time));
-	save_item(NAME(m_mem_config));
+	save_item(NAME(m_memcfg));
 	save_item(NAME(m_cpu_mem_access_config));
 	save_item(NAME(m_gio_mem_access_config));
 	save_item(NAME(m_cpu_error_addr));
@@ -129,8 +131,6 @@ void sgi_mc_device::device_reset()
 	m_gio64_arb_param = 0;
 	m_arb_cpu_time = 0;
 	m_arb_burst_time = 0;
-	m_mem_config[0] = 0;
-	m_mem_config[1] = 0;
 	m_cpu_mem_access_config = 0;
 	m_gio_mem_access_config = 0;
 	m_cpu_error_addr = 0;
@@ -161,6 +161,31 @@ void sgi_mc_device::device_reset()
 	memset(m_semaphore, 0, sizeof(uint32_t) * 16);
 
 	m_space = &m_maincpu->space(AS_PROGRAM);
+
+	u16 const simms = m_simms->read();
+
+	// allocate installed memory
+	for (unsigned bank = 0; bank < 4; bank++)
+	{
+		u32 const size = BIT(simms, bank * 4, 3);
+
+		switch (size)
+		{
+		case 0:
+			LOG("ram bank %c empty\n", bank + 'A');
+			m_ram[bank].reset();
+			break;
+		default:
+			LOG("ram bank %c size %dM (%s rank)\n",
+				bank + 'A', 1U << (size + 1), BIT(simms, bank * 4 + 3) ? "dual" : "single");
+			m_ram[bank] = std::make_unique<u8[]>(1U << (size + 21));
+			break;
+		}
+	}
+
+	// assume memory configuration is invalidated by reset
+	memcfg_w(0, 0);
+	memcfg_w(1, 0);
 }
 
 void sgi_mc_device::set_cpu_buserr(uint32_t address, uint64_t mem_mask)
@@ -351,8 +376,8 @@ uint32_t sgi_mc_device::read(offs_t offset, uint32_t mem_mask)
 	case 0x00c8/4:
 	{
 		const uint32_t index = (offset >> 1) & 1;
-		LOGMASKED(LOG_MEMCFG, "%s: Memory Configuration Register %d Read: %08x & %08x\n", machine().describe_context(), index, m_mem_config[index], mem_mask);
-		return m_mem_config[index];
+		LOGMASKED(LOG_MEMCFG, "%s: Memory Configuration Register %d Read: %08x & %08x\n", machine().describe_context(), index, m_memcfg[index], mem_mask);
+		return m_memcfg[index];
 	}
 	case 0x00d0/4:
 		LOGMASKED(LOG_READS, "%s: CPU Memory Access Config Params Read: %08x & %08x\n", machine().describe_context(), m_cpu_mem_access_config, mem_mask);
@@ -545,7 +570,7 @@ void sgi_mc_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 		LOGMASKED(LOG_MEMCFG_EXT, "%s:     Bank %d, SIMM Size: %02x (%s)\n", machine().describe_context(), index+1, (data >> 8) & 0x1f, s_mem_size[(data >> 8) & 0x1f]);
 		LOGMASKED(LOG_MEMCFG_EXT, "%s:     Bank %d, Valid: %d\n", machine().describe_context(), index+1, BIT(data, 13));
 		LOGMASKED(LOG_MEMCFG_EXT, "%s:     Bank %d, # Subbanks: %d\n", machine().describe_context(), index+1, BIT(data, 14) + 1);
-		m_mem_config[index] = data;
+		memcfg_w(index, data);
 		break;
 	}
 	case 0x00d0/4:
@@ -712,4 +737,125 @@ void sgi_mc_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 		LOGMASKED(LOG_WRITES | LOG_UNKNOWN, "%s: Unmapped MC write: %08x: %08x & %08x\n", machine().describe_context(), 0x1fa00000 + offset*4, data, mem_mask);
 		break;
 	}
+}
+
+/*
+ * When the configured memory size for a bank exceeds the physical memory
+ * installed in the bank, the physical memory is mirrored in the configured
+ * range. When dual ranks are configured, the configured space is divided in
+ * two and each rank of the installed memory mirrored in the corresponding
+ * half. When the configured and installed number of ranks do not match, either
+ * half of the installed memory will be inaccessible, or half of the configured
+ * range will not be mapped to anything.
+ *
+ * The lowest 512KiB of whatever is mapped into physical memory segment 0
+ * (address 0x0800'0000) is also mapped at address 0.
+ */
+void sgi_mc_device::memcfg_w(offs_t offset, u32 data)
+{
+	LOGMASKED(LOG_MEMCFG, "memcfg%d 0x%08x\n", offset, data);
+
+	 // remove existing mapping
+	for (unsigned bank = 0; bank < 2; bank++)
+	{
+		// if previous memory configuration was valid, unmap the whole configured range
+		if (BIT(m_memcfg[offset], 29 - bank * 16))
+		{
+			u32 const conf_base = BIT(m_memcfg[offset], 16 - bank * 16, 8) << 22;
+			u32 const conf_size = (BIT(m_memcfg[offset], 24 - bank * 16, 5) + 1) << 22;
+
+			LOGMASKED(LOG_MEMCFG, "unmap bank %c 0x%08x-0x%08x\n",
+				offset * 2 + bank + 'A', conf_base, conf_base + conf_size - 1);
+			m_space->unmap_readwrite(conf_base, conf_base + conf_size - 1);
+
+			if (conf_base == 0x0800'0000U)
+				m_space->unmap_readwrite(0x0000'0000, 0x0007'ffff);
+		}
+	}
+
+	m_memcfg[offset] = data;
+
+	u16 const simms = m_simms->read();
+
+	// install ram into memory map
+	for (unsigned bank = 0; bank < 2; bank++)
+	{
+		// bank configuration valid?
+		if (!BIT(m_memcfg[offset], 29 - bank * 16))
+			continue;
+
+		// simms installed in bank?
+		if (!BIT(simms, (offset * 2 + bank) * 4, 3))
+			continue;
+
+		// configured base, rank and size/rank
+		u32 const conf_base = BIT(m_memcfg[offset], 16 - bank * 16, 8) << 22;
+		unsigned const conf_rank = BIT(m_memcfg[offset], 30 - bank * 16);
+		u32 const conf_size = (BIT(m_memcfg[offset], 24 - bank * 16, 5) + 1) << (22 - conf_rank);
+
+		// installed rank and size/rank
+		unsigned const inst_rank = BIT(simms, (offset * 2 + bank) * 4 + 3);
+		u32 const inst_size = 1U << (BIT(simms, (offset * 2 + bank) * 4, 3) + 21 - inst_rank);
+
+		// resulting number of ranks and size/rank
+		unsigned const ranks = std::min(conf_rank, inst_rank) + 1;
+		u32 const size = std::min(conf_size, inst_size);
+
+		for (unsigned rank = 0; rank < ranks; rank++)
+		{
+			LOGMASKED(LOG_MEMCFG, "remap bank %c rank %d from 0x%08x-0x%08x mirror 0x%08x size 0x%08x offset 0x%08x\n",
+				offset * 2 + bank + 'A', rank, conf_base + conf_size * rank, conf_base + conf_size * rank + size - 1, (conf_size - 1) ^ (size - 1), size, size * rank);
+			m_space->install_ram(conf_base + conf_size * rank, conf_base + conf_size * rank + size - 1, (conf_size - 1) ^ (size - 1), &m_ram[offset * 2 + bank][size * rank]);
+		}
+
+		if (conf_base == 0x0800'0000U)
+			m_space->install_ram(0x0000'0000, 0x0007'ffff, &m_ram[offset * 2 + bank][0]);
+	}
+}
+
+static INPUT_PORTS_START(mc)
+	PORT_START("VALID")
+	PORT_CONFNAME(0x0f, 0x00, "Valid Banks")
+
+	PORT_START("SIMMS")
+	PORT_CONFNAME(0x000f, 0x0003, "RAM bank A") PORT_CONDITION("VALID", 0x01, EQUALS, 0x01)
+	PORT_CONFSETTING(0x0000, "Empty")
+	PORT_CONFSETTING(0x0001, "4x1M")
+	PORT_CONFSETTING(0x000a, "4x2M")
+	PORT_CONFSETTING(0x0003, "4x4M")
+	PORT_CONFSETTING(0x000c, "4x8M")
+	PORT_CONFSETTING(0x0005, "4x16M")
+	PORT_CONFSETTING(0x000e, "4x32M")
+
+	PORT_CONFNAME(0x00f0, 0x0000, "RAM bank B") PORT_CONDITION("VALID", 0x02, EQUALS, 0x02)
+	PORT_CONFSETTING(0x0000, "Empty")
+	PORT_CONFSETTING(0x0010, "4x1M")
+	PORT_CONFSETTING(0x00a0, "4x2M")
+	PORT_CONFSETTING(0x0030, "4x4M")
+	PORT_CONFSETTING(0x00c0, "4x8M")
+	PORT_CONFSETTING(0x0050, "4x16M")
+	PORT_CONFSETTING(0x00e0, "4x32M")
+
+	PORT_CONFNAME(0x0f00, 0x0000, "RAM bank C") PORT_CONDITION("VALID", 0x04, EQUALS, 0x04)
+	PORT_CONFSETTING(0x0000, "Empty")
+	PORT_CONFSETTING(0x0100, "4x1M")
+	PORT_CONFSETTING(0x0a00, "4x2M")
+	PORT_CONFSETTING(0x0300, "4x4M")
+	PORT_CONFSETTING(0x0c00, "4x8M")
+	PORT_CONFSETTING(0x0500, "4x16M")
+	PORT_CONFSETTING(0x0e00, "4x32M")
+
+	PORT_CONFNAME(0xf000, 0x0000, "RAM bank D") PORT_CONDITION("VALID", 0x08, EQUALS, 0x08)
+	PORT_CONFSETTING(0x0000, "Empty")
+	PORT_CONFSETTING(0x1000, "4x1M")
+	PORT_CONFSETTING(0xa000, "4x2M")
+	PORT_CONFSETTING(0x3000, "4x4M")
+	PORT_CONFSETTING(0xc000, "4x8M")
+	PORT_CONFSETTING(0x5000, "4x16M")
+	PORT_CONFSETTING(0xe000, "4x32M")
+INPUT_PORTS_END
+
+ioport_constructor sgi_mc_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(mc);
 }

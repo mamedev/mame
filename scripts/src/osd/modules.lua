@@ -390,7 +390,6 @@ function qtdebuggerbuild()
 				else
 					MOC = _OPTIONS["QT_HOME"] .. "/bin/moc"
 				end
-				MOC = _OPTIONS["QT_HOME"] .. "/libexec/moc"
 			else
 				MOCTST = backtick("which moc-qt5 2>/dev/null")
 				if (MOCTST=='') then
