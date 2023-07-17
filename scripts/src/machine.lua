@@ -4282,6 +4282,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/em_reel.h,MACHINES["EM_REEL"] = true
+---------------------------------------------------
+
+if (MACHINES["EM_REEL"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/em_reel.cpp",
+		MAME_DIR .. "src/devices/machine/em_reel.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/corvushd.h,MACHINES["CORVUSHD"] = true
 ---------------------------------------------------
 if (MACHINES["CORVUSHD"]~=null) then

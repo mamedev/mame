@@ -118,6 +118,9 @@ protected:
 
 	template <unsigned N> void opto_cb(int state) { m_opto[N] = state; }
 
+	TIMER_DEVICE_CALLBACK_MEMBER(int1);
+	TIMER_DEVICE_CALLBACK_MEMBER(int2);
+
 	uint8_t inputs_r(offs_t offset);
 	uint8_t inputs_ext_r(offs_t offset);
 	void reel_w(offs_t offset, uint8_t data);
@@ -174,10 +177,6 @@ protected:
 	uint8_t m_busext_mode;
 	uint8_t m_busext_addr;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(int1);
-	TIMER_DEVICE_CALLBACK_MEMBER(int2);
-
-	// devices
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<4> m_inputs;
 	required_device_array<stepper_device, 4> m_reel;

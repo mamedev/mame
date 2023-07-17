@@ -9263,6 +9263,23 @@ ad5vpaa                         //
 ad5vpab                         //
 ad5vpac                         //
 
+@source:bfm/bfm_blackbox.cpp
+bb_21up                         // 21 Up (Bellfruit)
+bb_21upa                        //
+bb_bellt                        // Bell Trail (Bellfruit)
+bb_cjack                        // Crackerjack (Bellfruit)
+bb_dblit                        // Double It (Bellfruit)
+bb_fiest                        // Fiesta (Associated Leisure)
+bb_firec                        // Fire Cracker (Bellfruit)
+bb_gspin                        // Golden Spin (BWB)
+bb_nudcl                        // Nudge Climber (Bellfruit)
+bb_nudgm                        // The Nudge Machine (ADMC)
+bb_oal                          // Oranges And Lemons (Bellfruit)
+bb_reelg                        // Reel Gambler (Bellfruit)
+bb_spinu                        // Spin Up (CTL)
+bb_upndn                        // Upstairs 'N' Downstairs (Bellfruit)
+bb_upndna                       //
+
 @source:bfm/bfm_sc1.cpp
 m_tppokr                        // (c) 1996 BFM/ELAM,Game Card 95-750-899, uses Adder board for feature gfx
 sc1actv8                        //
