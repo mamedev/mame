@@ -42605,6 +42605,9 @@ lkageb4                         // bootleg
 lkageo                          // A54 (c) 1984 Taito Corporation
 lkageoo                         // A54 (c) 1984 Taito Corporation
 
+@source:taito/lkage5232.cpp
+lkage5232
+
 @source:taito/lsasquad.cpp
 daikaiju                        // A74 (c) 1986 Taito
 lsasquad                        // A64 (c) 1986 Taito Corporation / Taito America (dip switch)
