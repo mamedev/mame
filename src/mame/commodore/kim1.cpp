@@ -59,7 +59,6 @@ Paste test:
 
 TODO:
 - LEDs should be dark at startup (RS key to activate)
-- hook up Single Step switch
 - slots for expansion & application ports
 - add TTY support
 
@@ -108,28 +107,141 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	uint8_t kim1_u2_read_a();
-	void kim1_u2_write_a(uint8_t data);
-	uint8_t kim1_u2_read_b();
-	void kim1_u2_write_b(uint8_t data);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(kim1_cassette_input);
-
-	void mem_map(address_map &map);
-
-	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<m6502_device> m_maincpu;
 	required_device_array<mos6530_new_device, 2> m_miot;
 	required_device<pwm_display_device> m_digit_pwm;
 	required_device<cassette_image_device> m_cass;
-
 	required_ioport_array<3> m_row;
 	required_ioport m_special;
 
+	void mem_map(address_map &map);
+	void sync_map(address_map &map);
+
+	uint8_t sync_r(offs_t offset);
+	void sync_w(int state);
+
+	uint8_t u2_read_a();
+	void u2_write_a(uint8_t data);
+	uint8_t u2_read_b();
+	void u2_write_b(uint8_t data);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(cassette_input);
+
+	int m_sync_state = 0;
+	bool m_k7 = false;
 	uint8_t m_u2_port_b = 0;
 	uint8_t m_311_output = 0;
 	uint32_t m_cassette_high_count = 0;
 };
+
+void kim1_state::machine_start()
+{
+	// Register for save states
+	save_item(NAME(m_sync_state));
+	save_item(NAME(m_k7));
+	save_item(NAME(m_u2_port_b));
+	save_item(NAME(m_311_output));
+	save_item(NAME(m_cassette_high_count));
+}
+
+void kim1_state::machine_reset()
+{
+	m_311_output = 0;
+	m_cassette_high_count = 0;
+}
+
+
+//**************************************************************************
+//  I/O
+//**************************************************************************
+
+INPUT_CHANGED_MEMBER(kim1_state::trigger_reset)
+{
+	// RS key triggers system reset via 556 timer
+	if (newval)
+		machine().schedule_soft_reset();
+}
+
+INPUT_CHANGED_MEMBER(kim1_state::trigger_nmi)
+{
+	// ST key triggers NMI via 556 timer
+	if (newval)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
+uint8_t kim1_state::sync_r(offs_t offset)
+{
+	// A10-A12 to 74145
+	if (!machine().side_effects_disabled())
+		m_k7 = bool(~offset & 0x1c00);
+
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
+void kim1_state::sync_w(int state)
+{
+	// Signal NMI at falling edge of SYNC when SST is enabled and K7 line is high
+	if (m_sync_state && !state && m_k7 && BIT(m_special->read(), 2))
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+
+	m_sync_state = state;
+}
+
+uint8_t kim1_state::u2_read_a()
+{
+	uint8_t data = 0x7f;
+
+	// Read from keyboard
+	offs_t const sel = (m_u2_port_b >> 1) & 0x0f;
+	if (3U > sel)
+		data = m_row[sel]->read() & 0x7f;
+
+	return data | 0x80;
+}
+
+void kim1_state::u2_write_a(uint8_t data)
+{
+	// Write to 7-segment LEDs
+	m_digit_pwm->write_mx(data & 0x7f);
+}
+
+uint8_t kim1_state::u2_read_b()
+{
+	if (m_u2_port_b & 0x20)
+		return 0xff;
+
+	// Load from cassette
+	return 0x7f | (m_311_output ^ 0x80);
+}
+
+void kim1_state::u2_write_b(uint8_t data)
+{
+	m_u2_port_b = data;
+
+	// Select 7-segment LED
+	m_digit_pwm->write_my(1 << (data >> 1 & 0xf) >> 4);
+
+	// Cassette write/speaker update
+	if (data & 0x20)
+		m_cass->output((data & 0x80) ? -1.0 : 1.0);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::cassette_input)
+{
+	double tap_val = m_cass->input();
+
+	if (tap_val <= 0)
+	{
+		if (m_cassette_high_count)
+		{
+			m_311_output = (m_cassette_high_count < 8) ? 0x80 : 0;
+			m_cassette_high_count = 0;
+		}
+	}
+
+	if (tap_val > 0)
+		m_cassette_high_count++;
+}
 
 
 //**************************************************************************
@@ -148,16 +260,9 @@ void kim1_state::mem_map(address_map &map)
 	map(0x1c00, 0x1fff).m(m_miot[0], FUNC(mos6530_new_device::rom_map));
 }
 
-INPUT_CHANGED_MEMBER(kim1_state::trigger_reset)
+void kim1_state::sync_map(address_map &map)
 {
-	// RS key input
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
-}
-
-INPUT_CHANGED_MEMBER(kim1_state::trigger_nmi)
-{
-	// ST key input
-	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	map(0x0000, 0xffff).r(FUNC(kim1_state::sync_r));
 }
 
 
@@ -174,7 +279,6 @@ static INPUT_PORTS_START( kim1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('2')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
@@ -184,7 +288,6 @@ static INPUT_PORTS_START( kim1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR('9')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR('8')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('7')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_NAME("PC")
@@ -194,83 +297,12 @@ static INPUT_PORTS_START( kim1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR('-') PORT_NAME("AD")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_NAME("ST") PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_nmi, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_NAME("RS") PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_reset, 0)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_NAME("SST")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_NAME("ST") PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_nmi, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_NAME("RS") PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_reset, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_NAME("SST")
 INPUT_PORTS_END
-
-uint8_t kim1_state::kim1_u2_read_a()
-{
-	uint8_t data = 0xff;
-
-	// Read from keyboard
-	offs_t const sel = (m_u2_port_b >> 1) & 0x0f;
-	if (3U > sel)
-		data = m_row[sel]->read();
-
-	return data & 0x7f;
-}
-
-void kim1_state::kim1_u2_write_a(uint8_t data)
-{
-	// Write to 7-segment LEDs
-	m_digit_pwm->write_mx(data & 0x7f);
-}
-
-uint8_t kim1_state::kim1_u2_read_b()
-{
-	if (m_u2_port_b & 0x20)
-		return 0xff;
-
-	// Load from cassette
-	return 0x7f | (m_311_output ^ 0x80);
-}
-
-void kim1_state::kim1_u2_write_b(uint8_t data)
-{
-	m_u2_port_b = data;
-
-	// Select 7-segment LED
-	m_digit_pwm->write_my(1 << (data >> 1 & 0xf) >> 4);
-
-	// Cassette write/speaker update
-	if (data & 0x20)
-		m_cass->output((data & 0x80) ? -1.0 : 1.0);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_cassette_input)
-{
-	double tap_val = m_cass->input();
-
-	if (tap_val <= 0)
-	{
-		if (m_cassette_high_count)
-		{
-			m_311_output = (m_cassette_high_count < 8) ? 0x80 : 0;
-			m_cassette_high_count = 0;
-		}
-	}
-
-	if (tap_val > 0)
-		m_cassette_high_count++;
-}
-
-void kim1_state::machine_start()
-{
-	// Register for save states
-	save_item(NAME(m_u2_port_b));
-	save_item(NAME(m_311_output));
-	save_item(NAME(m_cassette_high_count));
-}
-
-void kim1_state::machine_reset()
-{
-	m_311_output = 0;
-	m_cassette_high_count = 0;
-}
 
 
 //**************************************************************************
@@ -282,6 +314,8 @@ void kim1_state::kim1(machine_config &config)
 	// basic machine hardware
 	M6502(config, m_maincpu, 1_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kim1_state::mem_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &kim1_state::sync_map);
+	m_maincpu->sync_cb().set(FUNC(kim1_state::sync_w));
 
 	// video hardware
 	PWM_DISPLAY(config, m_digit_pwm).set_size(6, 7);
@@ -290,10 +324,10 @@ void kim1_state::kim1(machine_config &config)
 
 	// devices
 	MOS6530_NEW(config, m_miot[0], 1_MHz_XTAL); // U2
-	m_miot[0]->pa_rd_callback().set(FUNC(kim1_state::kim1_u2_read_a));
-	m_miot[0]->pa_wr_callback().set(FUNC(kim1_state::kim1_u2_write_a));
-	m_miot[0]->pb_rd_callback().set(FUNC(kim1_state::kim1_u2_read_b));
-	m_miot[0]->pb_wr_callback().set(FUNC(kim1_state::kim1_u2_write_b));
+	m_miot[0]->pa_rd_callback().set(FUNC(kim1_state::u2_read_a));
+	m_miot[0]->pa_wr_callback().set(FUNC(kim1_state::u2_write_a));
+	m_miot[0]->pb_rd_callback().set(FUNC(kim1_state::u2_read_b));
+	m_miot[0]->pb_wr_callback().set(FUNC(kim1_state::u2_write_b));
 
 	MOS6530_NEW(config, m_miot[1], 1_MHz_XTAL); // U3
 
@@ -305,7 +339,7 @@ void kim1_state::kim1(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	TIMER(config, "cassette_timer").configure_periodic(FUNC(kim1_state::kim1_cassette_input), attotime::from_hz(44100));
+	TIMER(config, "cassette_timer").configure_periodic(FUNC(kim1_state::cassette_input), attotime::from_hz(44100));
 
 	// software list
 	SOFTWARE_LIST(config, "cass_list").set_original("kim1_cass");
