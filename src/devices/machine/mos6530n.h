@@ -2,8 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    MOS Technology 6530 Memory, I/O, Timer Array emulation
-    MOS Technology 6532 RAM, I/O, Timer Array emulation
+    MOS Technology 6530 MIOT, 6532 RIOT
 
 **********************************************************************
                             _____   _____
@@ -63,7 +62,7 @@
 
 // ======================> mos6530_device_base
 
-class mos6530_device_base :  public device_t
+class mos6530_device_base : public device_t
 {
 public:
 	auto irq_wr_callback() { return m_irq_cb.bind(); }
@@ -179,7 +178,7 @@ protected:
 };
 
 
-class mos6530_new_device :  public mos6530_device_base
+class mos6530_new_device : public mos6530_device_base
 {
 public:
 	// construction/destruction
@@ -197,7 +196,7 @@ protected:
 };
 
 
-class mos6532_new_device :  public mos6530_device_base
+class mos6532_new_device : public mos6530_device_base
 {
 public:
 	// construction/destruction
