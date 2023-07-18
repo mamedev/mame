@@ -12,8 +12,8 @@ Sharp LH0082A Z80A-CTC-D
 HM6264ALP-15 RAM
 4x TMP82C55AP-2 (with 2 more empty spaces)
 OKI M6376
-? XTAL
-4.096 XTAL
+20 Mhz XTAL
+4.096 Mhz XTAL
 8-DIP bank
 1 push button
 */
@@ -113,12 +113,12 @@ static const z80_daisy_config daisy_chain[] =
 
 void unkgolf_state::unkgolf(machine_config &config)
 {
-	Z80(config, m_maincpu, 4'000'000); // need to verify unreadable XTAL
+	Z80(config, m_maincpu, 20_MHz_XTAL / 5); // divisor unknown
 	m_maincpu->set_daisy_config(daisy_chain);
 	m_maincpu->set_addrmap(AS_PROGRAM, &unkgolf_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &unkgolf_state::io_map);
 
-	z80ctc_device& ctc(Z80CTC(config, "ctc", 4'000'000));
+	z80ctc_device& ctc(Z80CTC(config, "ctc", 20_MHz_XTAL / 5)); // divisor unknown
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	I8255(config, "ppi0");
