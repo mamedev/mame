@@ -444,8 +444,7 @@ void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 			/*
 			    0x01 = AFE
 			*/
-			if (data & 0x01)
-				m_watchdog->watchdog_reset();
+			m_watchdog->reset_line_w(data & 0x01);
 			break;
 
 		default:

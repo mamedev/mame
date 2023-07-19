@@ -64,10 +64,10 @@ void mos6532_new_device::ram_map(address_map &map)
 void mos6532_new_device::io_map(address_map &map)
 {
 	map.global_mask(0x1f);
-	map(0x00, 0x00).mirror(0x18).rw(FUNC(mos6532_new_device::pa_data_r), FUNC(mos6532_new_device::pa_data_w));  // SWCHA
-	map(0x01, 0x01).mirror(0x18).rw(FUNC(mos6532_new_device::pa_ddr_r), FUNC(mos6532_new_device::pa_ddr_w));    // SWACNT
-	map(0x02, 0x02).mirror(0x18).rw(FUNC(mos6532_new_device::pb_data_r), FUNC(mos6532_new_device::pb_data_w));  // SWCHB
-	map(0x03, 0x03).mirror(0x18).rw(FUNC(mos6532_new_device::pb_ddr_r), FUNC(mos6532_new_device::pb_ddr_w));    // SWBCNT
+	map(0x00, 0x00).mirror(0x18).rw(FUNC(mos6532_new_device::pa_data_r), FUNC(mos6532_new_device::pa_data_w));
+	map(0x01, 0x01).mirror(0x18).rw(FUNC(mos6532_new_device::pa_ddr_r), FUNC(mos6532_new_device::pa_ddr_w));
+	map(0x02, 0x02).mirror(0x18).rw(FUNC(mos6532_new_device::pb_data_r), FUNC(mos6532_new_device::pb_data_w));
+	map(0x03, 0x03).mirror(0x18).rw(FUNC(mos6532_new_device::pb_ddr_r), FUNC(mos6532_new_device::pb_ddr_w));
 	map(0x14, 0x17).w(FUNC(mos6532_new_device::timer_off_w));
 	map(0x1c, 0x1f).w(FUNC(mos6532_new_device::timer_on_w));
 	map(0x04, 0x04).mirror(0x12).r(FUNC(mos6532_new_device::timer_off_r));
@@ -109,9 +109,7 @@ mos6530_device_base::mos6530_device_base(const machine_config &mconfig, device_t
 	m_ie_timer(false),
 	m_irq_timer(false),
 	m_ie_edge(false),
-	m_irq_edge(false),
-	m_timershift(0),
-	m_timerstate(0)
+	m_irq_edge(false)
 {
 }
 
@@ -142,6 +140,9 @@ void mos6530_device_base::device_start()
 {
 	// allocate timer
 	m_timer = timer_alloc(FUNC(mos6530_device_base::timer_end), this);
+	m_timershift = 10;
+	m_timerstate = TIMER_COUNTING;
+	m_timer->adjust(attotime::from_ticks(256 << m_timershift, clock()));
 
 	// state saving
 	save_item(NAME(m_pa_in));
@@ -171,13 +172,12 @@ void mos6530_device_base::device_start()
 
 void mos6530_device_base::device_reset()
 {
-	m_pa_out = 0xff;
+	m_pa_out = 0;
 	m_pa_ddr = 0;
-	m_pb_out = 0xff; // a7800 One-On-One Basketball (1on1u) needs this or you can't start a game, it doesn't initialize it.  (see MT6060)
+	m_pb_out = 0;
 	m_pb_ddr = 0;
 
 	m_ie_timer = false;
-	m_irq_timer = false;
 	m_ie_edge = false;
 	m_irq_edge = false;
 	m_pa7_dir = 0;
@@ -186,11 +186,6 @@ void mos6530_device_base::device_reset()
 	update_pb();
 	update_irq();
 	edge_detect();
-
-	// reset timer states
-	m_timershift = 10;
-	m_timerstate = TIMER_COUNTING;
-	m_timer->adjust(attotime::from_ticks(256 << m_timershift, clock()));
 }
 
 
@@ -319,7 +314,7 @@ TIMER_CALLBACK_MEMBER(mos6530_device_base::timer_end)
 	}
 
 	// if we finished, keep spinning without the prescaler
-	m_timerstate = TIMER_FINISHING;
+	m_timerstate = TIMER_SPINNING;
 	m_timer->adjust(attotime::from_ticks(256, clock()));
 }
 

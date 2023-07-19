@@ -210,10 +210,9 @@ uint8_t a7800_state::riot_console_button_r()
 
 void a7800_state::riot_button_pullup_w(uint8_t data)
 {
-	if(m_maincpu->space(AS_PROGRAM).read_byte(0x283) & 0x04)
-		m_p1_one_button = data & 0x04; // pin 6 of the controller port is held high by the riot chip when reading two-button controllers (from schematic)
-	if(m_maincpu->space(AS_PROGRAM).read_byte(0x283) & 0x10)
-		m_p2_one_button = data & 0x10;
+	// pin 6 of the controller port is held high by the riot chip when reading two-button controllers (from schematic)
+	m_p1_one_button = data & 0x04;
+	m_p2_one_button = data & 0x10;
 }
 
 uint8_t a7800_state::tia_r(offs_t offset)
@@ -240,12 +239,12 @@ uint8_t a7800_state::tia_r(offs_t offset)
 	case 0x0b:
 		return ((m_io_buttons->read() & 0x04) << 5);
 	case 0x0c:
-		if (((m_io_buttons->read() & 0x08) ||(m_io_buttons->read() & 0x02)) && m_p1_one_button)
+		if (((m_io_buttons->read() & 0x08) || (m_io_buttons->read() & 0x02)) && m_p1_one_button)
 			return 0x00;
 		else
 			return 0x80;
 	case 0x0d:
-		if (((m_io_buttons->read() & 0x01) ||(m_io_buttons->read() & 0x04)) && m_p2_one_button)
+		if (((m_io_buttons->read() & 0x01) || (m_io_buttons->read() & 0x04)) && m_p2_one_button)
 			return 0x00;
 		else
 			return 0x80;

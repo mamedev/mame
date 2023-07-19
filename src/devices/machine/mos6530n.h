@@ -108,7 +108,7 @@ protected:
 
 	enum {
 		TIMER_COUNTING,
-		TIMER_FINISHING
+		TIMER_SPINNING
 	};
 
 	void update_pa();

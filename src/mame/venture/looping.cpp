@@ -101,8 +101,7 @@ public:
 		m_dac(*this, "dac"),
 		m_soundlatch(*this, "soundlatch"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_watchdog(*this, "watchdog")
+		m_palette(*this, "palette")
 	{ }
 
 	void looping(machine_config &config);
@@ -121,7 +120,6 @@ private:
 	void colorram_w(offs_t offset, uint8_t data);
 	void level2_irq_set(int state);
 	void main_irq_ack_w(int state);
-	void watchdog_w(int state);
 	void souint_clr(int state);
 	void ballon_enable_w(int state);
 	void out_0_w(uint8_t data);
@@ -166,7 +164,6 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<watchdog_timer_device> m_watchdog;
 };
 
 
@@ -373,11 +370,6 @@ void looping_state::main_irq_ack_w(int state)
 {
 	if (state == 0)
 		m_maincpu->set_input_line(INT_9995_INT1, CLEAR_LINE);
-}
-
-void looping_state::watchdog_w(int state)
-{
-	m_watchdog->watchdog_reset();
 }
 
 
@@ -638,9 +630,9 @@ void looping_state::looping(machine_config &config)
 	// Q4 = C0
 	// Q5 = C1
 	mainlatch.q_out_cb<6>().set(FUNC(looping_state::main_irq_ack_w));
-	mainlatch.q_out_cb<7>().set(FUNC(looping_state::watchdog_w));
+	mainlatch.q_out_cb<7>().set("watchdog", FUNC(watchdog_timer_device::reset_line_w)).invert();
 
-	WATCHDOG_TIMER(config, m_watchdog);
+	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
