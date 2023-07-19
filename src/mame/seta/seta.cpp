@@ -9902,7 +9902,7 @@ ROM_START( daiohp2 ) /* Found on the same P0-072-2 PCB as the previous Daioh pro
 	ROM_LOAD( "fa-021.u116", 0x000a00, 0x117, CRC(e335cf2e) SHA1(35f6fa2fb2da1dc5b1fad93f44947f76d6ef35aa) )
 ROM_END
 
-ROM_START( daiohp3 ) // TODO: PCB infos
+ROM_START( daiohp3 ) // P0-072-2 PCB
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "prg0even.u3",    0x000000, 0x020000, CRC(a69bceaa) SHA1(45863eccf32cf2374769ad4517678eb74eaca590) )
 	ROM_LOAD16_BYTE( "prg0odd.u4",     0x000001, 0x020000, CRC(e3462ad8) SHA1(a5a1b0d79bc300a7bcc48fa39a750a0a060293ba) )
