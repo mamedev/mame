@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "machine/dp8573.h"
+#include "machine/dp8573a.h"
 #include "machine/eepromser.h"
 #include "machine/pit8253.h"
 #include "machine/wd33c9x.h"
@@ -65,7 +65,7 @@ protected:
 	required_device<wd33c93_device> m_wd33c93;
 	required_device_array<scc85c30_device, 3> m_scc;
 	required_device<pit8254_device> m_pit;
-	required_device<dp8573_device> m_rtc;
+	required_device<dp8572a_device> m_rtc;
 
 	enum
 	{

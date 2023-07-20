@@ -45,7 +45,7 @@
 #include "machine/am79c90.h"
 #include "machine/mc68681.h"
 #include "machine/pit8253.h"
-#include "machine/dp8573.h"
+#include "machine/dp8573a.h"
 #include "machine/z80scc.h"
 #include "machine/edlc.h"
 #include "machine/input_merger.h"
@@ -102,7 +102,7 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<eeprom_serial_93c56_16bit_device> m_eeprom;
 
-	required_device<dp8573_device> m_rtc;
+	required_device<dp8572a_device> m_rtc;
 	required_device<pit8254_device> m_pit;
 	required_device<wd33c9x_base_device> m_scsi;
 	required_device<am7990_device> m_enet;
@@ -264,7 +264,7 @@ private:
 	required_region_ptr<u16> m_eprom;
 	required_device<eeprom_serial_93c56_16bit_device> m_eeprom;
 
-	required_device<dp8573_device> m_rtc;
+	required_device<dp8572a_device> m_rtc;
 	required_device<pit8254_device> m_pit;
 	required_device<wd33c9x_base_device> m_scsi;
 	required_device<seeq8003_device> m_enet;
@@ -495,7 +495,7 @@ void pi4d2x_state::map(address_map &map)
 		NAME([this](offs_t offset) { return m_duart[BIT(offset, 0)]->read(offset >> 2); }),
 		NAME([this](offs_t offset, u8 data) { m_duart[BIT(offset, 0)]->write(offset >> 2, data); })).umask32(0xff000000);
 
-	map(0x1fbc0000, 0x1fbc007f).rw(m_rtc, FUNC(dp8573_device::read), FUNC(dp8573_device::write)).umask32(0xff000000);
+	map(0x1fbc0000, 0x1fbc007f).rw(m_rtc, FUNC(dp8572a_device::read), FUNC(dp8572a_device::write)).umask32(0xff000000);
 
 	map(0x1fc00000, 0x1fc3ffff).rom().region("boot", 0);
 
@@ -597,7 +597,7 @@ void pi4d3x_state::map(address_map &map)
 	map(0x1fb80d10, 0x1fb80d1f).rw(m_duart[1], FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0x000000ff);
 	map(0x1fb80d20, 0x1fb80d2f).rw(m_duart[2], FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0x000000ff);
 
-	map(0x1fb80e00, 0x1fb80e7f).rw(m_rtc, FUNC(dp8573_device::read), FUNC(dp8573_device::write)).umask32(0x000000ff);
+	map(0x1fb80e00, 0x1fb80e7f).rw(m_rtc, FUNC(dp8572a_device::read), FUNC(dp8572a_device::write)).umask32(0x000000ff);
 
 	map(0x1fbe0000, 0x1fbfffff).ram().share("dsp_sram"); // 3xTC55328J-25 32KiB CMOS static RAM
 
@@ -662,7 +662,7 @@ void pi4d2x_state::common(machine_config &config)
 
 	EEPROM_93C56_16BIT(config, m_eeprom);
 
-	DP8573(config, m_rtc); // DP8572AN
+	DP8572A(config, m_rtc, 32.768_KHz_XTAL);
 
 	PIT8254(config, m_pit);
 	m_pit->set_clk<2>(3.6864_MHz_XTAL);
@@ -792,7 +792,7 @@ void pi4d3x_state::common(machine_config &config)
 
 	EEPROM_93C56_16BIT(config, m_eeprom);
 
-	DP8573(config, m_rtc); // DP8572AV
+	DP8572A(config, m_rtc, 32.768_KHz_XTAL);
 
 	// 1: local0
 	// 2: local1

@@ -4185,13 +4185,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/dp8573.h,MACHINES["DP8573"] = true
+--@src/devices/machine/dp8573a.h,MACHINES["DP8573A"] = true
 ---------------------------------------------------
 
-if (MACHINES["DP8573"]~=null) then
+if (MACHINES["DP8573A"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/machine/dp8573.cpp",
-		MAME_DIR .. "src/devices/machine/dp8573.h",
+		MAME_DIR .. "src/devices/machine/dp8573a.cpp",
+		MAME_DIR .. "src/devices/machine/dp8573a.h",
 	}
 end
 
