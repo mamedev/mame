@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="mac_flop_orig" description="Macintosh 400K/800K Original disk images">
+	
+<software name="lodrun10">
+  <description>Lode Runner (version 1.0)</description>
+  <year>1984</year>
+  <publisher>Brøderbund Software</publisher>
+  <info name="developer" value="Doug Smith" />
+  <info name="programmer" value="Glenn Axworthy" />
+  <info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+  <info name="version" value="1.0" />
+  <sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+  <!--Dump released: 2022-09-28-->
+  <!--action game-->
+  <part name="flop1" interface="floppy_3_5">
+    <dataarea name="flop" size="649040">
+      <rom name="lode runner.moof" size="649040" crc="9e654df4" sha1="20f9af71734b7d4553f3083453b3caedd88c8fb5" />
+    </dataarea>
+  </part>
+</software>	
+		
+</softwarelist>
