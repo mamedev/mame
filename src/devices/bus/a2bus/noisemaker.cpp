@@ -79,7 +79,7 @@ void a2bus_noisemaker_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 }
 
-} // aonymous namespace
+} // anonymous namespace
 
 
 // device type definition
