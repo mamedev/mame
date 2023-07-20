@@ -662,7 +662,7 @@ void pi4d2x_state::common(machine_config &config)
 
 	EEPROM_93C56_16BIT(config, m_eeprom);
 
-	DP8572A(config, m_rtc, 32.768_KHz_XTAL);
+	DP8572A(config, m_rtc, 32.768_kHz_XTAL);
 
 	PIT8254(config, m_pit);
 	m_pit->set_clk<2>(3.6864_MHz_XTAL);
@@ -792,7 +792,7 @@ void pi4d3x_state::common(machine_config &config)
 
 	EEPROM_93C56_16BIT(config, m_eeprom);
 
-	DP8572A(config, m_rtc, 32.768_KHz_XTAL);
+	DP8572A(config, m_rtc, 32.768_kHz_XTAL);
 
 	// 1: local0
 	// 2: local1
