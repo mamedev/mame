@@ -885,6 +885,13 @@ macpd210                        // 1992 Apple Macintosh PowerBook Duo 210
 @source:apple/macquadra700.cpp
 macqd700                        // 1991 Apple Macintosh Quadra 700
 
+@source:apple/macquadra800.cpp
+macqd800                        // 1993 Apple Macintosh Quadra 800
+macct610                        // 1993 Apple Macintosh Centris 610
+macct650                        // 1993 Apple Macintosh Centris 650
+macqd610                        // 1993 Apple Macintosh Quadra 610
+macqd650                        // 1993 Apple Macintosh Quadra 650
+
 @source:apple/newton.cpp
 newtnotp
 newtonmp

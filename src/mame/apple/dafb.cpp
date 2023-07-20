@@ -5,18 +5,20 @@
     Emulation by R. Belmont
     Some inspiration from mv_sonora by Olivier Galibert and nubus_48gc by Vas Crabb
 
-    DAFB (officially Direct Access Frame Buffer, internally Dave's Awesome Frame Buffer) was the on-board video
+    DAFB (officially Direct Access Frame Buffer, internally Dale's Awesome Frame Buffer) was the on-board video
     for the Quadra 700, 900, and 950.  Standalone DAFB and DAFB-II include what Apple calls "Turbo SCSI", which
     is an interface for up to 2 5394/5396 chips that adds a configurable wait state to each access and can hold
     off /DTACK on pseudo-DMA reads and writes.
 
     Shipping configurations:
-    DAFB    - original standalone chip, Quadra 700 and 900 (returns versions 0 and 1)
-    DAFB II - revised standalone chip with 15 bpp support added (uses AC843 CODEC instead of AC842) (returns version 2)
-              Used in Quadra 950.
-    MEMC    - DAFB II without the Turbo SCSI logic, in the djMEMC and MEMCjr memory controllers. (returns version 3)
-              Used in LC 475, LC 575, Quadra 605, Quadra 610, Quadra 650, and Quadra 800.
-              This version uses a DP8533 timing generator instead of the DP8531.
+    DAFB     - original standalone chip, Quadra 700 and 900 (returns versions 0 and 1)
+    DAFB II  - revised standalone chip with 15 bpp support added (uses AC842a CODEC instead of AC842) (returns version 2)
+               Used in Quadra 950.
+    MEMC     - DAFB II without the Turbo SCSI logic, in the djMEMC and MEMCjr memory controllers. (returns version 3)
+               Used in LC 475, LC 575, Quadra 605, Quadra 610, Quadra 650, and Quadra 800.
+               This version uses a DP8534 timing generator instead of the DP8531 and an AC842a DAC instead of AC842.
+    DaMFB    - DAFB II with a PowerPC bus interface instead of 68040.  Used in the HPV card for the PowerMac 6100/7100/8100.
+    Platinum - DAFB II with 4 MB VRAM support and a blitter bolted on.
 
     The Turbo SCSI block moved into the IOSB and PrimeTime I/O ASICs for the machines where DAFB moved into the
     memory controller.  It was enhanced slightly to allow longword pseudo-DMA transfers.
@@ -45,15 +47,14 @@
 #define LOG_SWATCH      (1U << 1)
 #define LOG_CLOCKGEN    (1U << 2)
 #define LOG_MONSENSE    (1U << 3)
-#define LOG_AC842       (1U << 4)
+#define LOG_RAMDAC      (1U << 4)
 #define LOG_TURBOSCSI   (1U << 5)
 
 #define VERBOSE (0)
 #include "logmacro.h"
 
-static constexpr int VRAM_SIZE = 0x200000 / sizeof(u32);
-
 DEFINE_DEVICE_TYPE(DAFB, dafb_device, "macdafb", "Apple DAFB video")
+DEFINE_DEVICE_TYPE(DAFB_MEMC, dafb_memc_device, "macdafb_memc", "Apple DAFB II video (djMEMC integrated)")
 
 //-------------------------------------------------
 //  ADDRESS_MAP
@@ -63,19 +64,22 @@ void dafb_base::map(address_map &map)
 {
 	map(0x00000000, 0x000000ff).rw(FUNC(dafb_base::dafb_r), FUNC(dafb_base::dafb_w));
 	map(0x00000100, 0x000001ff).rw(FUNC(dafb_base::swatch_r), FUNC(dafb_base::swatch_w));
-	map(0x00000200, 0x000002ff).rw(FUNC(dafb_base::ac842_r), FUNC(dafb_base::ac842_w));
+	map(0x00000200, 0x000002ff).rw(FUNC(dafb_base::ramdac_r), FUNC(dafb_base::ramdac_w));
 	map(0x00000300, 0x000003ff).rw(FUNC(dafb_base::clockgen_r), FUNC(dafb_base::clockgen_w));
 }
 
 dafb_base::dafb_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
+	m_vram_size(0x200000),
 	m_dafb_version(1),
+	m_pixel_clock(31334400),
+	m_pal_address(0), m_pal_idx(0), m_ac842_pbctrl(0), m_mode(0),
 	m_screen(*this, "screen"),
 	m_palette(*this, "palette"),
 	m_monitor_config(*this, "monitor"),
 	m_irq(*this),
-	m_vram_offset(0), m_timing_control(0), m_mode(0), m_depth(0), m_monitor_id(0), m_pal_address(0),
-	m_pal_idx(0), m_ac842_pbctrl(0), m_base(0), m_stride(1024), m_test(0), m_swatch_mode(1),
+	m_vram_offset(0), m_timing_control(0), m_monitor_id(0),
+	m_base(0), m_stride(1024), m_test(0), m_swatch_mode(1),
 	m_cursor_line(0), m_anim_line(0), m_int_status(0), m_hres(0), m_vres(0), m_htotal(0), m_vtotal(0),
 	m_config(0), m_block_control(0), m_swatch_test(0)
 {
@@ -95,9 +99,17 @@ dafb_device::dafb_device(const machine_config &mconfig, const char *tag, device_
 	m_ncr[0] = m_ncr[1] = nullptr;
 }
 
+dafb_memc_device::dafb_memc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	dafb_base(mconfig, DAFB_MEMC, tag, owner, clock),
+	m_pcbr1(0),
+	m_clock_shift(0),
+	m_clock_params(0)
+{
+}
+
 void dafb_base::device_start()
 {
-	m_vram = std::make_unique<u32[]>(VRAM_SIZE);
+	m_vram = std::make_unique<u32[]>(m_vram_size);
 
 	m_vbl_timer = timer_alloc(FUNC(dafb_base::vbl_tick), this);
 	m_cursor_timer = timer_alloc(FUNC(dafb_base::cursor_tick), this);
@@ -108,7 +120,6 @@ void dafb_base::device_start()
 	save_item(NAME(m_timing_control));
 	save_item(NAME(m_vram_offset));
 	save_item(NAME(m_mode));
-	save_item(NAME(m_depth));
 	save_item(NAME(m_monitor_id));
 	save_item(NAME(m_base));
 	save_item(NAME(m_stride));
@@ -130,7 +141,7 @@ void dafb_base::device_start()
 	save_item(NAME(m_block_control));
 	save_item(NAME(m_swatch_test));
 	save_item(NAME(m_int_status));
-	save_pointer(NAME(m_vram), VRAM_SIZE);
+	save_pointer(NAME(m_vram), m_vram_size);
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(dafb_base::recalc_mode), this));
 }
@@ -271,6 +282,18 @@ u32 dafb_base::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const 
 				}
 			}
 			break;
+
+		case 5: // 16bpp x555
+			for (int y = 0; y < m_vres; y++)
+			{
+				u32 *scanline = &bitmap.pix(y);
+				for (int x = 0; x < m_hres; x++)
+				{
+					u16 const pixels = (vram8[(y * stride) + (x<<1)] << 8) | vram8[(y * stride) + (x<<1) + 1];
+					*scanline++ = rgb_t(((pixels >> 10) & 0x1f) << 3, ((pixels >> 5) & 0x1f) << 3, (pixels & 0x1f) << 3);
+				}
+			}
+			break;
 	}
 
 	return 0;
@@ -326,6 +349,7 @@ u32 dafb_base::dafb_r(offs_t offset)
 
 void dafb_base::dafb_w(offs_t offset, u32 data)
 {
+	data &= 0xfff;
 	switch (offset << 2)
 	{
 		case 0: // bits 20-9 of base
@@ -508,6 +532,9 @@ u32 dafb_base::swatch_r(offs_t offset)
 
 void dafb_base::swatch_w(offs_t offset, u32 data)
 {
+	// registers are all 12 bits wide
+	data &= 0xfff;
+
 	switch (offset << 2)
 	{
 		case 0x0:           // Swatch mode
@@ -592,7 +619,7 @@ void dafb_base::swatch_w(offs_t offset, u32 data)
 	}
 }
 
-u32 dafb_base::ac842_r(offs_t offset)
+u32 dafb_base::ramdac_r(offs_t offset)
 {
 	switch (offset << 2)
 	{
@@ -625,11 +652,12 @@ u32 dafb_base::ac842_r(offs_t offset)
 	return 0;
 }
 
-void dafb_base::ac842_w(offs_t offset, u32 data)
+void dafb_base::ramdac_w(offs_t offset, u32 data)
 {
 	switch (offset << 2)
 	{
 	case 0:
+		LOGMASKED(LOG_RAMDAC, "Address to %d\n", data & 0xff);
 		m_pal_address = data & 0xff;
 		m_pal_idx = 0;
 		break;
@@ -670,7 +698,7 @@ void dafb_base::ac842_w(offs_t offset, u32 data)
 
 	case 0x20:
 		m_ac842_pbctrl = data;
-		LOGMASKED(LOG_AC842, "%02x to AC842 pixel bus control, & 0x1c = %02x\n", data, data & 0x1c);
+		LOGMASKED(LOG_RAMDAC, "%02x to AC842 pixel bus control, & 0x1c = %02x\n", data, data & 0x1c);
 		switch (data & 0x1c)
 		{
 			case 0x00:
@@ -752,17 +780,22 @@ void dafb_base::recalc_mode()
 	}
 }
 
-u32 dafb_base::clockgen_r(offs_t offset)
+u8 dafb_base::clockgen_r(offs_t offset)
 {
 	return 0;
 }
 
-void dafb_base::clockgen_w(offs_t offset, u32 data)
+void dafb_base::clockgen_w(offs_t offset, u8 data)
 {
-	m_dp8531_regs[offset>>2] = data & 0xf;
-	LOGMASKED(LOG_CLOCKGEN, "%s: Write %x to DP8531 at %d\n", tag(), data, offset);
+	if ((offset & 3) != 3)
+	{
+		return;
+	}
 
-	if ((offset >> 2) == 15)
+	m_dp8531_regs[offset>>4] = data & 0xf;
+	LOGMASKED(LOG_CLOCKGEN, "%s: Write %x to DP8531 at %d (reg %d)\n", tag(), data, offset, offset>>4);
+
+	if ((offset>>4) == 15)
 	{
 		int r = m_dp8531_regs[6] << 8 | m_dp8531_regs[5] << 4 | m_dp8531_regs[4];
 		int p = (1 << m_dp8531_regs[9]);
@@ -785,12 +818,12 @@ void dafb_base::clockgen_w(offs_t offset, u32 data)
 
 u32 dafb_base::vram_r(offs_t offset)
 {
-	return m_vram[offset];
+	return m_vram[offset & (m_vram_size - 1)];
 }
 
 void dafb_base::vram_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	COMBINE_DATA(&m_vram[offset]);
+	COMBINE_DATA(&m_vram[offset & (m_vram_size - 1)]);
 }
 
 void dafb_base::recalc_ints()
@@ -951,3 +984,128 @@ void dafb_device::turboscsi_drq_w(int state)
 
 template void dafb_device::turboscsi_drq_w<0>(int state);
 template void dafb_device::turboscsi_drq_w<1>(int state);
+
+// ************************************************************************
+//  dafb_memc_device overrides/additions
+// ************************************************************************
+void dafb_memc_device::device_start()
+{
+	m_vram_size = 0x100000;         // all 5 MEMC machines can only have 1 MB VRAM
+	dafb_base::device_start();
+}
+
+// MEMC's DAFB uses the DP8534 clock generator, not the DP8531.
+// The interface is quite different, and no datasheet seems to exist.
+// This emulation is reverse-engineered from https://sourceforge.net/projects/dt3152/files/
+// which brute forces the DP8534 parameters from a given pixel clock (and also shows
+// how the parameters become the output clock, as well as how the parameters fit into
+// the bitstream clocked into the chip.
+u8 dafb_memc_device::clockgen_r(offs_t offset)
+{
+	return 0;
+}
+
+void dafb_memc_device::clockgen_w(offs_t offset, u8 data)
+{
+	switch (offset)
+	{
+		case 3: // shift parameters into bit 0 one bit at a time
+			m_clock_shift <<= 1;
+			m_clock_shift |= (data & 1);
+			break;
+
+		case 19:    // commit parameters to memory
+			m_clock_params = (m_clock_shift << 2);
+			m_clock_shift = 0;
+
+			const u8 param1 = bitswap<8>((m_clock_params >> 32) & 0xff, 0, 1, 2, 3, 4, 5, 6, 7);
+			const u8 param2 = bitswap<8>((m_clock_params >> 24) & 0xff, 0, 1, 2, 3, 4, 5, 6, 7);
+			const u8 param3 = bitswap<8>((m_clock_params >> 16) & 0xff, 0, 1, 2, 3, 4, 5, 6, 7);
+			const u8 param4 = bitswap<8>((m_clock_params >> 8) & 0xff, 0, 1, 2, 3, 4, 5, 6, 7);
+			const u8 param5 = bitswap<8>(m_clock_params & 0xff, 0, 1, 2, 3, 4, 5, 6, 7);
+
+			const u8 p = (param1 >> 7) | (param2 << 1);
+			const u8 rcnt = (param2 >> 7) | (param3 << 1);
+			const u8 ncnt = (param4 >> 1) | (param5 << 7);
+
+			const float vco_clock = (20.0 * (float)ncnt) / (float)rcnt;
+			const float pixel_clock = vco_clock / (float)(p+1);
+			m_pixel_clock = (int)(pixel_clock*1000000+.5);
+
+			LOGMASKED(LOG_CLOCKGEN, "DP8534: P %d RCNT %d NCNT %d => VCO=%d Hz, pixel clock %d Hz\n", p, rcnt, ncnt, (int)(vco_clock*1000000+.5), m_pixel_clock);
+			break;
+	}
+}
+
+// This is an AC842a, which has x555 16bpp mode
+u32 dafb_memc_device::ramdac_r(offs_t offset)
+{
+	switch (offset << 2)
+	{
+		case 0x20:
+			if ((m_pal_address == 1) && ((m_ac842_pbctrl & 0x06) == 0x06))
+			{
+				return m_pcbr1;
+			}
+			else
+			{
+				return dafb_base::ramdac_r(offset);
+			}
+
+		default:
+			return dafb_base::ramdac_r(offset);
+	}
+}
+
+void dafb_memc_device::ramdac_w(offs_t offset, u32 data)
+{
+	switch (offset << 2)
+	{
+		case 0x20:
+			if ((m_pal_address == 1) && ((m_ac842_pbctrl & 0x06) == 0x06))
+			{
+				LOGMASKED(LOG_RAMDAC, "%02x to AC842a PCBR1\n", data);
+				m_pcbr1 = data & 0xf0;
+			}
+			else
+			{
+				LOGMASKED(LOG_RAMDAC, "%02x to AC842a PCBR0, & 0x1c = %02x\n", data, data & 0x1c);
+				m_ac842_pbctrl = data;
+				if ((m_pcbr1 & 0xc0) == 0xc0)
+				{
+					m_mode = 5;     // 16 bpp (x555)
+				}
+				else
+				{
+					switch (data & 0x1c)
+					{
+						case 0x00:
+							m_mode = 0; // 1bpp
+							break;
+
+						case 0x08:
+							m_mode = 1; // 2bpp
+							break;
+
+						case 0x10:
+							m_mode = 2; // 4bpp
+							break;
+
+						case 0x18:
+							m_mode = 3; // 8bpp
+							break;
+
+						case 0x1c:
+							m_mode = 4; // 24bpp
+							break;
+					}
+				}
+				recalc_mode();
+			}
+			break;
+
+		default:
+			dafb_base::ramdac_w(offset, data);
+			break;
+	}
+}
