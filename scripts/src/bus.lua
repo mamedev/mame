@@ -2873,6 +2873,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/mouse.h",
 		MAME_DIR .. "src/devices/bus/a2bus/nippelclock.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/nippelclock.h",
+		MAME_DIR .. "src/devices/bus/a2bus/noisemaker.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/noisemaker.h",
 		MAME_DIR .. "src/devices/bus/a2bus/pc_xporter.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/pc_xporter.h",
 		MAME_DIR .. "src/devices/bus/a2bus/prodosromdrive.cpp",
