@@ -8,7 +8,6 @@
  *
  * TODO:
  *  - multi-word cache line sizes
- *  - verify lwl/lwr and swl/swr cache logic
  *  - R3041 features
  *
  */
@@ -1397,7 +1396,7 @@ template <typename T, bool Aligned> void mips1core_device_base::store(u32 addres
 
 				l.update(u32(data) << shift, u32(mem_mask) << shift);
 			}
-			else if constexpr (sizeof(T) == 4)
+			else if constexpr (Aligned && sizeof(T) == 4)
 				// only full word stores update the cache after a miss
 				l.update(data, mem_mask);
 		}
@@ -1416,7 +1415,7 @@ template <typename T, bool Aligned> void mips1core_device_base::store(u32 addres
 		// stores invalidate the cache line
 		auto [l, miss] = cache_lookup(address, true);
 
-		if constexpr (sizeof(T) == 4)
+		if constexpr (Aligned && sizeof(T) == 4)
 			l.update(data, mem_mask);
 		else
 			l.invalidate();
