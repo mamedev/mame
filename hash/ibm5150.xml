@@ -13889,11 +13889,11 @@ Bad dump: Several accessed file and some saved game files
 		<description>Mean 18 (Olivetti Prodest PC1 release)</description>
 		<year>1987</year>
 		<publisher>Accolade</publisher>
-		<info name="developer" value="Microsmiths" />
 		<notes><![CDATA[
  Modified disk with a saved game file
  Contains only "Bush Hill CC" course
 ]]></notes>
+		<info name="developer" value="Microsmiths" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Mean_18_Golf_DSK.dsk" size="737280" crc="94c6df0b" sha1="048a0eb740feeef82f7ee18d5a6c7d9af19b5320" status="baddump"/>
