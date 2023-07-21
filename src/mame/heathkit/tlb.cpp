@@ -59,6 +59,11 @@
 // Clocks
 static constexpr XTAL MASTER_CLOCK = XTAL(12'288'000);
 
+// DOT clocks
+static constexpr XTAL DOT_CLOCK_1 = XTAL(20'282'000) / 8;   // 132 columns
+static constexpr XTAL DOT_CLOCK_2 = XTAL(12'292'000) / 8;   // 80 columns
+static constexpr XTAL DOT_CLOCK_3 = XTAL(10'644'000) / 8;   // Graphics mode
+
 // Standard H19 used a 2.048 MHz clock
 static constexpr XTAL H19_CLOCK = MASTER_CLOCK / 6;
 static constexpr XTAL MC6845_CLOCK = MASTER_CLOCK / 8;
@@ -75,6 +80,7 @@ DEFINE_DEVICE_TYPE(HEATH_TLB, heath_tlb_device, "heath_tlb", "Heath Terminal Log
 DEFINE_DEVICE_TYPE(HEATH_SUPER19, heath_super19_tlb_device, "heath_super19_tlb", "Heath Terminal Logic Board w/Super19 ROM");
 DEFINE_DEVICE_TYPE(HEATH_WATZ, heath_watz_tlb_device, "heath_watz_tlb", "Heath Terminal Logic Board w/Watzman ROM");
 DEFINE_DEVICE_TYPE(HEATH_ULTRA, heath_ultra_tlb_device, "heath_ultra_tlb", "Heath Terminal Logic Board w/Ultra ROM");
+DEFINE_DEVICE_TYPE(HEATH_GP19, heath_gp19_tlb_device, "heath_gp19_tlb", "Heath Terminal Logic Board plus Northwest Digital Systems GP-19")
 
 heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	heath_tlb_device(mconfig, HEATH_TLB, tag, owner, clock)
@@ -84,14 +90,14 @@ heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *ta
 heath_tlb_device::heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_maincpu(*this, "maincpu"),
-	m_write_sd(*this),
-	m_reset(*this),
 	m_palette(*this, "palette"),
 	m_crtc(*this, "crtc"),
-	m_ace(*this, "ins8250"),
-	m_beep(*this, "beeper"),
 	m_p_videoram(*this, "videoram"),
 	m_p_chargen(*this, "chargen"),
+	m_write_sd(*this),
+	m_reset(*this),
+	m_ace(*this, "ins8250"),
+	m_beep(*this, "beeper"),
 	m_mm5740(*this, "mm5740"),
 	m_kbdrom(*this, "keyboard"),
 	m_kbspecial(*this, "MODIFIERS"),
@@ -709,6 +715,41 @@ static INPUT_PORTS_START( watz19 )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( gp19 )
+  PORT_INCLUDE( tlb )
+
+	PORT_MODIFY("SW402")
+	PORT_DIPNAME( 0x80, 0x00, "Automatic Holdscreen")    PORT_DIPLOCATION("SW402:8")
+	PORT_DIPSETTING(    0x00, "Disabled (VT100 mode)")
+	PORT_DIPSETTING(    0x80, "Enabled (Z19 mode)")
+
+	PORT_START("SW1")
+	PORT_DIPNAME( 0x03, 0x01, "Trailing characters for Tektronix message")   PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "none")
+	PORT_DIPSETTING(    0x01, "CR")
+	PORT_DIPSETTING(    0x02, "none")
+	PORT_DIPSETTING(    0x03, "CR,EOT")
+	PORT_DIPNAME( 0x04, 0x01, "Shift key")                                   PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "Normal")
+	PORT_DIPSETTING(    0x04, "Shift key inverts CAPS LOCK")
+	PORT_DIPNAME( 0x08, 0x00, "Terminal Transmission Rate")                  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x00, "Only limited by baud rate")
+	PORT_DIPSETTING(    0x08, "One character per 16.7 mSec")
+	PORT_DIPNAME( 0x10, 0x10, "Character set")                               PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x00, "VT100")
+	PORT_DIPSETTING(    0x10, "Zenith")
+	PORT_DIPNAME( 0x20, 0x00, "ANSI mode")                                   PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x00, "Zenith ANSI")
+	PORT_DIPSETTING(    0x20, "EDT compatible")
+	PORT_DIPNAME( 0x40, 0x00, "Tektronix character wrap")                    PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, "Column 74")
+	PORT_DIPSETTING(    0x40, "Column 73")
+	PORT_DIPNAME( 0x80, 0x00, "Blank screen")                                PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, "After 10 mins")
+	PORT_DIPSETTING(    0x80, "Never")
+
+INPUT_PORTS_END
+
 
 ROM_START( h19 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
@@ -769,6 +810,23 @@ ROM_START( ultra19 )
 	ROM_REGION( 0x1000, "keyboard", 0 )
 	ROM_LOAD( "2716_h19_ultra_keyboard.bin", 0x0000, 0x0800, CRC(76130c92) SHA1(ca39c602af48505139d2750a084b5f8f0e662ff7))
 ROM_END
+
+ROM_START( gp19 )
+	// GP-19 ROMs
+	ROM_REGION( 0x3000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "gp19_rom_1_ver_1_1.bin", 0x0000, 0x1000, CRC(7cbe8e0d) SHA1(977df895b067fa4e4646b4518cffb08d4e6bb6e0))
+	ROM_LOAD( "gp19_rom_2_ver_1_1.bin", 0x1000, 0x1000, CRC(a85e3bc4) SHA1(f64e851c5d3ef98a9a48e0fc482baa576773ff43))
+	ROM_LOAD( "gp19_rom_3_ver_1_1.bin", 0x2000, 0x1000, CRC(878f577c) SHA1(0756435914dcfb981de4e40d5f81af3e0f5bb1c5))
+
+	ROM_REGION( 0x1000, "chargen", 0 )
+	// GP-19 font
+	ROM_LOAD( "gp19_char_gen_cg_1.bin", 0x0000, 0x1000, CRC(49ec9242) SHA1(770a8c7b5b15bcfe465fd84326d0ae3dcaa85311))
+
+	ROM_REGION( 0x1000, "keyboard", 0 )
+	// Original dump
+	ROM_LOAD( "2716_444-37_h19keyb.bin", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
+ROM_END
+
 
 
 ioport_constructor heath_tlb_device::device_input_ports() const
@@ -905,4 +963,184 @@ const tiny_rom_entry *heath_ultra_tlb_device::device_rom_region() const
 ioport_constructor heath_ultra_tlb_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(ultra19);
+}
+
+/**
+ * Northwest Digital Systems GP-19 add-in board
+ */
+heath_gp19_tlb_device::heath_gp19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	heath_tlb_device(mconfig, HEATH_GP19, tag, owner, clock)
+{
+}
+
+void heath_gp19_tlb_device::device_add_mconfig(machine_config &config)
+{
+	heath_tlb_device::device_add_mconfig(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &heath_gp19_tlb_device::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &heath_gp19_tlb_device::io_map);
+
+	m_crtc->set_update_row_callback(FUNC(heath_gp19_tlb_device::crtc_update_row));
+	m_crtc->set_clock(DOT_CLOCK_2);
+}
+
+void heath_gp19_tlb_device::device_start()
+{
+	heath_tlb_device::device_start();
+
+	save_item(NAME(char_gen_a11));
+	save_item(NAME(graphic_mode));
+	save_item(NAME(col_132));
+	save_item(NAME(reverse_video));
+
+	char_gen_a11 = false;
+	graphic_mode = false;
+	col_132 = false;
+	reverse_video = false;
+
+}
+
+void heath_gp19_tlb_device::mem_map(address_map &map)
+{
+	// heath_tlb_device::mem_map(map);
+
+	map(0x0000, 0x02fff).rom();  // ROMs 1, 2, 3
+
+	// map(0x3000, 0x03fff);   // Optional external board - Program ROM 4, external I/O
+
+	map(0x4000, 0x40ff).mirror(0x3f00).ram();
+	map(0x6000, 0x67ff).mirror(0x1800).ram();
+	map(0x8000, 0xbfff).mirror(0x4000).ram().share(m_p_videoram);
+}
+
+
+void heath_gp19_tlb_device::io_map(address_map &map)
+{
+	heath_tlb_device::io_map(map);
+
+	map(0x68, 0x68).mirror(0x07).w(FUNC(heath_gp19_tlb_device::latch_u5_w)); // Write octal latch U5
+	map(0x70, 0x70).mirror(0x07).portr("SW1");                               // Switch on GP-19 board
+	// map(0x78, 0x78).mirror(0x07);    // Optional Auxiliary I/O connector
+
+}
+
+/**
+ * U5 Latch
+ *
+ * 	Q0 Graph/character H
+ * 	Q1 132/80 columns H
+ * 	Q2 Reverse Screen H
+ * 	Q3 Alt Character L
+ * 	Q4-Q7 LED indicators
+ */
+void heath_gp19_tlb_device::latch_u5_w(uint8_t data)
+{
+	graphic_mode = bool(BIT(data, 0));
+	col_132 = bool(BIT(data, 1));
+	reverse_video = bool(BIT(data, 2));
+	char_gen_a11 = bool(BIT(data, 3));
+
+	// TODO handle LED indicators
+
+	if (graphic_mode)
+	{
+		m_crtc->set_clock(DOT_CLOCK_3);
+	}
+	else if (col_132)
+	{
+		m_crtc->set_clock(DOT_CLOCK_1);
+	}
+	else
+	{
+		m_crtc->set_clock(DOT_CLOCK_2);
+	}
+}
+
+
+MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
+{
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
+
+	if (de)
+	{
+		uint8_t screen_inv = reverse_video ? 0xff : 0x00;
+
+		if (graphic_mode)
+		{
+			for (uint16_t x = 0; x < x_count; x++)
+			{
+
+				uint8_t chr = m_p_videoram[(ma + x) & 0x3fff] ^ screen_inv;
+
+				*p++ = palette[BIT(chr, 0)];
+				*p++ = palette[BIT(chr, 1)];
+				*p++ = palette[BIT(chr, 2)];
+				*p++ = palette[BIT(chr, 3)];
+				*p++ = palette[BIT(chr, 4)];
+				*p++ = palette[BIT(chr, 5)];
+				*p++ = palette[BIT(chr, 6)];
+				*p++ = palette[BIT(chr, 7)];
+			}
+		}
+		else
+		{
+			for (uint16_t x = 0; x < x_count; x++)
+			{
+				uint8_t inv = (x == cursor_x) ? 0xff : 0;
+
+				uint8_t chr = m_p_videoram[(ma + x) & 0x3fff];
+
+				if (chr & 0x80)
+				{
+					inv ^= 0xff;
+					chr &= 0x7f;
+				}
+
+				inv ^= screen_inv;
+
+				// get pattern of pixels for that character scanline
+				uint16_t base = char_gen_a11 ? 0x800 : 0x0;
+
+				uint8_t const gfx = m_p_chargen[base | (chr<<4) | ra] ^ inv;
+
+				// Display a scanline of a character (8 pixels)
+				*p++ = palette[BIT(gfx, 7)];
+				*p++ = palette[BIT(gfx, 6)];
+				*p++ = palette[BIT(gfx, 5)];
+				*p++ = palette[BIT(gfx, 4)];
+				*p++ = palette[BIT(gfx, 3)];
+				*p++ = palette[BIT(gfx, 2)];
+				*p++ = palette[BIT(gfx, 1)];
+				*p++ = palette[BIT(gfx, 0)];
+			}
+		}
+	}
+	else
+	{
+		const rgb_t color = palette[0];
+
+		for (uint16_t x = 0; x < x_count; x++)
+		{
+			*p++ = color; // bit 7
+			*p++ = color; // bit 6
+			*p++ = color; // bit 5
+			*p++ = color; // bit 4
+			*p++ = color; // bit 3
+			*p++ = color; // bit 2
+			*p++ = color; // bit 1
+			*p++ = color; // bit 0
+		}
+	}
+}
+
+
+const tiny_rom_entry *heath_gp19_tlb_device::device_rom_region() const
+{
+	return ROM_NAME(gp19);
+}
+
+ioport_constructor heath_gp19_tlb_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(gp19);
 }
