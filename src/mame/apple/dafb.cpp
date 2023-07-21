@@ -1071,7 +1071,7 @@ void dafb_memc_device::ramdac_w(offs_t offset, u32 data)
 			{
 				LOGMASKED(LOG_RAMDAC, "%02x to AC842a PCBR0, & 0x1c = %02x\n", data, data & 0x1c);
 				m_ac842_pbctrl = data;
-				if ((m_pcbr1 & 0xc0) == 0xc0)
+				if (((m_pcbr1 & 0xc0) == 0xc0) && ((data & 0x06) == 0x06))
 				{
 					m_mode = 5;     // 16 bpp (x555)
 				}
