@@ -13866,8 +13866,6 @@ Contains four mini games:
 		<description>Mean 18</description>
 		<year>1988</year>
 		<publisher>Accolade</publisher>
-		<info name="copy_protection" value="Copy protected floppy disk track" />
-		<info name="developer" value="Microsmiths" />
 		<notes><![CDATA[
 1988 release with four courses:
 - Bush Hill CC
@@ -13877,6 +13875,8 @@ Contains four mini games:
 
 Bad dump: Several accessed file and some saved game files
 ]]></notes>
+		<info name="copy_protection" value="Copy protected floppy disk track" />
+		<info name="developer" value="Microsmiths" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "2172672">
 				<rom name="Mean 18 [Accolade] [1988] [3.5DD] [Disk 1 of 1].mfm" size="2172672" crc="66222835" sha1="ee4d3319f6c731191c3a20b3c80620d027c0bf9c" status="baddump"/>
