@@ -117,6 +117,7 @@ void apple2_cards(device_slot_interface &device)
 	device.option_add("ultratermenh", A2BUS_ULTRATERMENH);     // Videx UltraTerm (enhanced //e)
 	device.option_add("aevm80", A2BUS_AEVIEWMASTER80);         // Applied Engineering ViewMaster 80
 	device.option_add("parprn", A2BUS_PARPRN);                 // Apple II Parallel Printer Interface Card
+	device.option_add("4dparprn", A2BUS_4DPARPRN);             // Fourth Dimension Parallel Printer Interface
 	device.option_add("parallel", A2BUS_PIC);                  // Apple II Parallel Interface Card
 	device.option_add("grappler", A2BUS_GRAPPLER);             // Orange Micro Grappler Printer Interface card
 	device.option_add("grapplus", A2BUS_GRAPPLERPLUS);         // Orange Micro Grappler+ Printer Interface card
@@ -187,6 +188,7 @@ void apple2e_cards(device_slot_interface &device)
 	device.option_add("ultratermenh", A2BUS_ULTRATERMENH);     // Videx UltraTerm (enhanced //e)
 	device.option_add("aevm80", A2BUS_AEVIEWMASTER80);         // Applied Engineering ViewMaster 80
 	device.option_add("parprn", A2BUS_PARPRN);                 // Apple II Parallel Printer Interface Card
+	device.option_add("4dparprn", A2BUS_4DPARPRN);             // Fourth Dimension Parallel Printer Interface
 	device.option_add("parallel", A2BUS_PIC);                  // Apple II Parallel Interface Card
 	device.option_add("grappler", A2BUS_GRAPPLER);             // Orange Micro Grappler Printer Interface card
 	device.option_add("grapplus", A2BUS_GRAPPLERPLUS);         // Orange Micro Grappler+ Printer Interface card
@@ -263,6 +265,7 @@ void apple2gs_cards(device_slot_interface &device)
 	device.option_add("ultratermenh", A2BUS_ULTRATERMENH);     // Videx UltraTerm (enhanced //e)
 	device.option_add("aevm80", A2BUS_AEVIEWMASTER80);         // Applied Engineering ViewMaster 80
 	device.option_add("parprn", A2BUS_PARPRN);                 // Apple II Parallel Printer Interface Card
+	device.option_add("4dparprn", A2BUS_4DPARPRN);             // Fourth Dimension Parallel Printer Interface
 	device.option_add("parallel", A2BUS_PIC);                  // Apple Parallel Interface Card
 	device.option_add("grappler", A2BUS_GRAPPLER);             // Orange Micro Grappler Printer Interface card
 	device.option_add("grapplus", A2BUS_GRAPPLERPLUS);         // Orange Micro Grappler+ Printer Interface card
