@@ -1342,7 +1342,7 @@ void wd33c9x_base_device::step(bool timeout)
 		if (sat && m_xfr_phase == S_PHASE_MSG_IN) {
 			if (m_regs[COMMAND_PHASE] <= COMMAND_PHASE_CP_BYTES_C) {
 				switch (m_last_message) {
-				case SM_SAVE_DATA_PTR:
+				case SM_SAVE_DATA_POINTER:
 					set_scsi_state(FINISHED);
 					irq_fifo_push(SCSI_STATUS_SAVE_DATA_POINTERS);
 					m_regs[COMMAND_PHASE] = COMMAND_PHASE_SAVE_DATA_POINTER;

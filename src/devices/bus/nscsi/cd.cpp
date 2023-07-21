@@ -299,8 +299,8 @@ void nscsi_cdrom_device::scsi_command()
 		scsi_status_complete(SS_GOOD);
 		break;
 
-	case SC_RECIEVE_DIAG_RES: {
-		LOG("command RECIEVE DIAGNOSTICS RESULTS");
+	case SC_RECEIVE_DIAGNOSTIC_RESULTS: {
+		LOG("command RECEIVE DIAGNOSTIC RESULTS");
 		int size = (scsi_cmdbuf[3] << 8) | scsi_cmdbuf[4];
 		int pos = 0;
 		scsi_cmdbuf[pos++] = 0;
@@ -317,8 +317,8 @@ void nscsi_cdrom_device::scsi_command()
 		break;
 	}
 
-	case SC_SEND_DIAGNOSTICS: {
-		LOG("command SEND DIAGNOSTICS");
+	case SC_SEND_DIAGNOSTIC: {
+		LOG("command SEND DIAGNOSTIC");
 		int size = (scsi_cmdbuf[3] << 8) | scsi_cmdbuf[4];
 		if(scsi_cmdbuf[1] & 4) {
 			// Self-test
