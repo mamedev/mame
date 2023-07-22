@@ -1742,6 +1742,7 @@ firefoxa                        // 136026           (c) 1984
 
 @source:atari/firetrk.cpp
 firetrk                         // 030926           1978/06 [6808]
+firetrka                        // 030926           1978/06 [6808]
 montecar                        // 035763-035780    1980/04 [6502]
 superbug                        // 009115-009467    1977/09 [6800]
 
@@ -30248,6 +30249,9 @@ jungleyo
 
 @source:misc/kas89.cpp
 kas89                           // 1989, SFC S.R.L.
+
+@source:misc/katosmedz80.cpp
+dnbanban
 
 @source:misc/kingpin.cpp
 dealracl                        //
