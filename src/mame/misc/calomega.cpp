@@ -341,7 +341,9 @@
 
     El Grande - 5 Card Draw:
 
-    This game was created by Tuni Electro Service and was licensed to E.T. Marketing,Inc.
+    This game was created by Tuni Electro Service (later known as Enter-Tech) and was
+    published by E.T. Marketing, Inc., which is basically the marketing branch of
+    E.T. Industries (parent company of Tuni/Enter-Tech).
     This is the new version. The old one is still undumped, but looks like Golden Poker D-Up.
 
     Flyer: https://flyers.arcade-museum.com/?page=flyer&db=videodb&id=4542&image=1
@@ -6160,12 +6162,12 @@ GAME( 1988, comg5107, 0,        sys906,   stand906, calomega_state, empty_init, 
 GAME( 1988, comg5108, 0,        sys906,   stand906, calomega_state, empty_init,    ROT0, "Casino Electronics Inc.",               "CEI 51.08 (CEI 906-III Poker)",                    MACHINE_SUPPORTS_SAVE )
 
 //****** Unofficial 903/904/905 3rd part games *******
-GAME( 1982, elgrande,  0,        s903mod,  elgrande, calomega_state, empty_init,   ROT0, "Enter-Tech, Ltd. / Tuni Electro Service", "El Grande - 5 Card Draw (New)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jjpoker,   0,        s903mod,  jjpoker,  calomega_state, empty_init,   ROT0, "Enter-Tech, Ltd.",                        "Jackpot Joker Poker (set 1)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jjpokerb,  jjpoker,  s903mod,  jjpoker,  calomega_state, empty_init,   ROT0, "Enter-Tech, Ltd.",                        "Jackpot Joker Poker (set 2)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ssipkr24,  0,        s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                     "SSI Poker (v2.4)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ssipkr30,  ssipkr24, s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                     "SSI Poker (v3.0)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ssipkr40,  ssipkr24, s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                     "SSI Poker (v4.0)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, elgrande,  0,        s903mod,  elgrande, calomega_state, empty_init,   ROT0, "Tuni Electro Service",                  "El Grande - 5 Card Draw (New)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jjpoker,   0,        s903mod,  jjpoker,  calomega_state, empty_init,   ROT0, "Enter-Tech, Ltd.",                      "Jackpot Joker Poker (set 1)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jjpokerb,  jjpoker,  s903mod,  jjpoker,  calomega_state, empty_init,   ROT0, "Enter-Tech, Ltd.",                      "Jackpot Joker Poker (set 2)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ssipkr24,  0,        s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                   "SSI Poker (v2.4)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ssipkr30,  ssipkr24, s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                   "SSI Poker (v3.0)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ssipkr40,  ssipkr24, s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                   "SSI Poker (v4.0)",                                 MACHINE_SUPPORTS_SAVE )
 
 //****** Unofficial 906-III family 3rd part games *******
 GAME( 1990, cas21iwc,  0,        sys906,   cas21iwc, calomega_state, empty_init,   ROT0, "UCMC/IWC",                              "Casino 21 UCMC/IWC (ver 30.08)",                   MACHINE_SUPPORTS_SAVE )

@@ -47,6 +47,34 @@ Notes:
 #include "speaker.h"
 
 
+namespace {
+
+class trvquest_state : public gameplan_state
+{
+public:
+	trvquest_state(const machine_config &mconfig, device_type type, const char *tag) :
+		gameplan_state(mconfig, type, tag),
+		m_question(*this, "question"),
+		m_questions_region(*this, "questions")
+	{ }
+
+	void trvquest(machine_config &config);
+
+protected:
+	virtual void machine_start() override { }
+
+private:
+	required_shared_ptr<uint8_t> m_question;
+	required_region_ptr<uint8_t> m_questions_region;
+
+	uint8_t question_r(offs_t offset);
+	void coin_w(int state);
+	void misc_w(int state);
+
+	void cpu_map(address_map &map);
+};
+
+
 uint8_t trvquest_state::question_r(offs_t offset)
 {
 	return m_questions_region[*m_question * 0x2000 + offset];
@@ -66,9 +94,9 @@ void trvquest_state::cpu_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram"); // cmos ram
 	map(0x2000, 0x27ff).ram(); // main ram
-	map(0x3800, 0x380f).m(m_via_1, FUNC(via6522_device::map));
-	map(0x3810, 0x381f).m(m_via_2, FUNC(via6522_device::map));
-	map(0x3820, 0x382f).m(m_via_0, FUNC(via6522_device::map));
+	map(0x3800, 0x380f).m(m_via[1], FUNC(via6522_device::map));
+	map(0x3810, 0x381f).m(m_via[2], FUNC(via6522_device::map));
+	map(0x3820, 0x382f).m(m_via[0], FUNC(via6522_device::map));
 	map(0x3830, 0x3831).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x3840, 0x3841).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x3850, 0x3850).nopr(); //watchdog_reset_r ?
@@ -77,6 +105,7 @@ void trvquest_state::cpu_map(address_map &map)
 	map(0xa000, 0xa000).nopr(); // bogus read from the game code when reads question roms
 	map(0xb000, 0xffff).rom();
 }
+
 
 static INPUT_PORTS_START( trvquest )
 	PORT_START("IN0")
@@ -125,7 +154,7 @@ static INPUT_PORTS_START( trvquest )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW")
+	PORT_START("DSW0")
 	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -153,47 +182,42 @@ static INPUT_PORTS_START( trvquest )
 INPUT_PORTS_END
 
 
-void trvquest_state::machine_start()
-{
-	gameplan_state::machine_start();
-
-	m_via_0->write_pb5(1);
-}
-
-
 void trvquest_state::trvquest(machine_config &config)
 {
-	M6809(config, m_maincpu, XTAL(6'000'000)/4);
+	M6809(config, m_maincpu, 6_MHz_XTAL/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &trvquest_state::cpu_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	/* video hardware */
-	trvquest_video(config);
+	// via
+	MOS6522(config, m_via[0], 6_MHz_XTAL/4);
+	m_via[0]->writepa_handler().set(FUNC(trvquest_state::video_data_w));
+	m_via[0]->writepb_handler().set(FUNC(trvquest_state::video_command_w));
+	m_via[0]->readpb_handler().set(FUNC(trvquest_state::video_status_r));
+	m_via[0]->ca2_handler().set(FUNC(trvquest_state::video_command_trigger_w));
 
-	/* sound hardware */
+	MOS6522(config, m_via[1], 6_MHz_XTAL/4);
+	m_via[1]->readpa_handler().set_ioport("IN0");
+	m_via[1]->readpb_handler().set_ioport("IN1");
+	m_via[1]->ca2_handler().set(FUNC(trvquest_state::coin_w));
+
+	MOS6522(config, m_via[2], 6_MHz_XTAL/4);
+	m_via[2]->readpa_handler().set_ioport("UNK");
+	m_via[2]->readpb_handler().set_ioport("DSW0");
+	m_via[2]->ca2_handler().set(FUNC(trvquest_state::misc_w));
+	m_via[2]->irq_handler().set_inputline(m_maincpu, 0);
+
+	// video hardware
+	gameplan_video(config);
+	m_screen->screen_vblank().set(m_via[2], FUNC(via6522_device::write_ca1));
+
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "ay1", XTAL(6'000'000)/2).add_route(ALL_OUTPUTS, "mono", 0.25);
-	AY8910(config, "ay2", XTAL(6'000'000)/2).add_route(ALL_OUTPUTS, "mono", 0.25);
-
-	/* via */
-	MOS6522(config, m_via_0, XTAL(6'000'000)/4);
-	m_via_0->writepa_handler().set(FUNC(trvquest_state::video_data_w));
-	m_via_0->writepb_handler().set(FUNC(trvquest_state::gameplan_video_command_w));
-	m_via_0->ca2_handler().set(FUNC(trvquest_state::video_command_trigger_w));
-
-	MOS6522(config, m_via_1, XTAL(6'000'000)/4);
-	m_via_1->readpa_handler().set_ioport("IN0");
-	m_via_1->readpb_handler().set_ioport("IN1");
-	m_via_1->ca2_handler().set(FUNC(trvquest_state::coin_w));
-
-	MOS6522(config, m_via_2, XTAL(6'000'000)/4);
-	m_via_2->readpa_handler().set_ioport("UNK");
-	m_via_2->readpb_handler().set_ioport("DSW");
-	m_via_2->ca2_handler().set(FUNC(trvquest_state::misc_w));
-	m_via_2->irq_handler().set_inputline(m_maincpu, 0);
+	AY8910(config, "ay1", 6_MHz_XTAL/2).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8910(config, "ay2", 6_MHz_XTAL/2).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
+
 
 ROM_START( trvquest )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -216,4 +240,7 @@ ROM_START( trvquest )
 	ROM_LOAD( "roma", 0x16000, 0x2000, CRC(b4bcaf33) SHA1(c6b08fb8d55b2834d0c6c5baff9f544c795e4c15) )
 ROM_END
 
-GAME( 1984, trvquest, 0, trvquest, trvquest, trvquest_state, empty_init, ROT90, "Sunn / Techstar", "Trivia Quest", MACHINE_SUPPORTS_SAVE )
+} // anonymous namespace
+
+
+GAME( 1984, trvquest, 0, trvquest, trvquest, trvquest_state, empty_init, ROT90, "Techstar / Sunn", "Trivia Quest", MACHINE_SUPPORTS_SAVE )

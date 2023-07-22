@@ -5,7 +5,7 @@
 
     Beezer
 
-    (c) 1982 Tong Electronic
+    (c) 1982 Pacific Polytechnical Corp (PPC). / Tong Electronic
 
     Notes:
     - To enter test mode, hold down 1P Start and 2P Start, then reset
@@ -604,6 +604,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT   CLASS         INIT        ROTATION  COMPANY            FULLNAME          FLAGS
-GAME( 1982, beezer,  0,      beezer,  beezer, beezer_state, empty_init, ROT90,    "Tong Electronic", "Beezer (version 9.0)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Has test mode, shows version
-GAME( 1982, beezer1, beezer, beezer,  beezer, beezer_state, empty_init, ROT90,    "Tong Electronic", "Beezer (unknown earlier version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // No test mode, possibly earlier?
+//    YEAR  NAME     PARENT  MACHINE  INPUT   CLASS         INIT        ROTATION  COMPANY                                          FULLNAME                            FLAGS
+GAME( 1982, beezer,  0,      beezer,  beezer, beezer_state, empty_init, ROT90,    "Pacific Polytechnical Corp. / Tong Electronic", "Beezer (version 9.0)",             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Has test mode, shows version
+GAME( 1982, beezer1, beezer, beezer,  beezer, beezer_state, empty_init, ROT90,    "Pacific Polytechnical Corp. / Tong Electronic", "Beezer (unknown earlier version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // No test mode, possibly earlier?
