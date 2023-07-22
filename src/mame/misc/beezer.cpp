@@ -25,6 +25,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/input_merger.h"
 #include "machine/timer.h"
@@ -34,6 +35,7 @@
 #include "sound/mm5837.h"
 #include "sound/dac76.h"
 #include "video/resnet.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -98,6 +100,7 @@ public:
 	void beezer(machine_config &config);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -505,6 +508,13 @@ void beezer_state::beezer(machine_config &config)
 	input_merger_device &audio_irqs(INPUT_MERGER_ANY_HIGH(config, "audio_irqs"));
 	audio_irqs.output_handler().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 
+	PTM6840(config, m_ptm, 4_MHz_XTAL / 4);
+	m_ptm->o1_callback().set(FUNC(beezer_state::ptm_o1_w));
+	m_ptm->o2_callback().set(FUNC(beezer_state::ptm_o2_w));
+	m_ptm->o3_callback().set(FUNC(beezer_state::ptm_o3_w));
+	m_ptm->irq_callback().set("audio_irqs", FUNC(input_merger_device::in_w<0>));
+	// schematics show an input labeled VCO to channel 2, but the source is unknown
+
 	MOS6522(config, m_via_audio, 4_MHz_XTAL / 4);
 	m_via_audio->readpa_handler().set(FUNC(beezer_state::via_audio_pa_r));
 	m_via_audio->writepa_handler().set(FUNC(beezer_state::via_audio_pa_w));
@@ -512,14 +522,7 @@ void beezer_state::beezer(machine_config &config)
 	m_via_audio->ca2_handler().set(m_via_system, FUNC(via6522_device::write_cb1));
 	m_via_audio->cb1_handler().set(FUNC(beezer_state::dmod_clr_w));
 	m_via_audio->cb2_handler().set(FUNC(beezer_state::dmod_data_w));
-	m_via_audio->irq_handler().set("audio_irqs", FUNC(input_merger_device::in_w<0>));
-
-	PTM6840(config, m_ptm, 4_MHz_XTAL / 4);
-	m_ptm->o1_callback().set(FUNC(beezer_state::ptm_o1_w));
-	m_ptm->o2_callback().set(FUNC(beezer_state::ptm_o2_w));
-	m_ptm->o3_callback().set(FUNC(beezer_state::ptm_o3_w));
-	m_ptm->irq_callback().set("audio_irqs", FUNC(input_merger_device::in_w<1>));
-	// schematics show an input labeled VCO to channel 2, but the source is unknown
+	m_via_audio->irq_handler().set("audio_irqs", FUNC(input_merger_device::in_w<1>));
 
 	mm5837_device &noise(MM5837(config, "noise"));
 	noise.set_vdd(-12);
