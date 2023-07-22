@@ -6,7 +6,7 @@
     6KB EPROM (3*B2716), 1KB RAM (2*2114)
 
     It has the same PCB layout as comp_language, with wire mods to put
-	the ROM/RAM at fixed addresses. There's a big orange label saying
+    the ROM/RAM at fixed addresses. There's a big orange label saying
     "TEST UNIT NO. 14", and a handwritten one with "INFO. MGR SPECIAL".
 
 **********************************************************************/

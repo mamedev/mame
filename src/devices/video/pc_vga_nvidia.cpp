@@ -316,5 +316,5 @@ void nvidia_nv3_vga_device::crtc_map(address_map &map)
  * ---x ---- SCL
  * ---- x--- SDA
  */
-// map(0x3f, 0x3f) 
+// map(0x3f, 0x3f)
 }

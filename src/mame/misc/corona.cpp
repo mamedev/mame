@@ -47,7 +47,7 @@
   Four players 6-horses racing game, similar to Winner Circle
   (note that this one has 6 horses instead of 7).
 
-  It has four independent coin slots of 10-francs each. 
+  It has four independent coin slots of 10-francs each.
 
 
 **************************************************************************
@@ -462,10 +462,10 @@ void corona_state::blitter_aux_w(uint8_t data)
 
 uint8_t corona_state::blitter_status_r()
 {
-	//	Code checks bit 6 and/or bit 7
+	//  Code checks bit 6 and/or bit 7
 	//
-	//	x--- ---- blitter busy
-	//	-x-- ---- vblank
+	//  x--- ---- blitter busy
+	//  -x-- ---- vblank
 
 	return 0x80 | ((m_screen->vblank() & 1) << 6);
 	// return machine().rand() & 0xc0;
@@ -1641,7 +1641,7 @@ ROM_END
   Isermatic France S.A.
 
   Four players 6-horses racing game.
-  It has four independent coin slots of 10-francs each. 
+  It has four independent coin slots of 10-francs each.
 
 */
 ROM_START(legrandc)

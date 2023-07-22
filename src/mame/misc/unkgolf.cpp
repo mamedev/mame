@@ -74,7 +74,7 @@ void unkgolf_state::io_map(address_map &map)
 	map(0x40, 0x43).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x50, 0x53).rw("ppi3", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x60, 0x63).rw("ppi4", FUNC(i8255_device::read), FUNC(i8255_device::write));  // indirect input/output through 61h. no sense at all since was set to output.
-//	map(0x70, 0x73).rw("ppi5", FUNC(i8255_device::read), FUNC(i8255_device::write));  // initialized, but not used.
+//  map(0x70, 0x73).rw("ppi5", FUNC(i8255_device::read), FUNC(i8255_device::write));  // initialized, but not used.
 
 /*
   .-----.-----------.---------.---------.---------.-------.-------.-------.------.

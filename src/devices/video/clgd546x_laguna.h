@@ -37,8 +37,8 @@ private:
 	u8 vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
 
-//	u32 unmap_log_r(offs_t offset, u32 mem_mask = ~0);
-//	void unmap_log_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+//  u32 unmap_log_r(offs_t offset, u32 mem_mask = ~0);
+//  void unmap_log_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	bool m_vga_legacy_enable = false;
 };

@@ -21,9 +21,9 @@
 // ======================> vga_device
 
 class vga_device : public device_t
-                 , public device_video_interface
-                 , public device_palette_interface
-                 , public device_memory_interface
+				 , public device_video_interface
+				 , public device_palette_interface
+				 , public device_memory_interface
 {
 	friend class ibm8514a_device;
 

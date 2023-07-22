@@ -93,7 +93,7 @@ void gammagic_state::gammagic_io(address_map &map)
 	map(0x00e8, 0x00ef).noprw();
 //  map(0x00f0, 0x01ef).noprw();
 //  map(0x01f8, 0x03af).noprw();
-//	map(0x03b0, 0x03df).m("vga", FUNC(vga_device::io_map));
+//  map(0x03b0, 0x03df).m("vga", FUNC(vga_device::io_map));
 //  map(0x03e0, 0x03ef).noprw();
 //  map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
 //  map(0x0400, 0xffff).noprw();

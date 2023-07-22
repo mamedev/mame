@@ -384,8 +384,8 @@ isa16_wd90c31_lr_device::isa16_wd90c31_lr_device(const machine_config &mconfig, 
 ROM_START( wd90c31_lr )
 	ROM_REGION(0x8000,"vga_rom", ROMREGION_ERASE00)
 	ROM_SYSTEM_BIOS(0, "wdxlr831", "Western Digital WD90C31-LR")
-    ROMX_LOAD( "62-003259-800.bin", 0x000001, 0x004000, CRC(e71090bd) SHA1(f784ebc14801a0944271aab9ba4746dd9d0e001d), ROM_SKIP(1) | ROM_BIOS(0) )
-    ROMX_LOAD( "62-003260-800.bin", 0x000000, 0x004000, CRC(1e66af70) SHA1(7f236d6acb34d07480584d51f6bb57836ff262c4), ROM_SKIP(1) |ROM_BIOS(0) )
+	ROMX_LOAD( "62-003259-800.bin", 0x000001, 0x004000, CRC(e71090bd) SHA1(f784ebc14801a0944271aab9ba4746dd9d0e001d), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "62-003260-800.bin", 0x000000, 0x004000, CRC(1e66af70) SHA1(7f236d6acb34d07480584d51f6bb57836ff262c4), ROM_SKIP(1) | ROM_BIOS(0) )
 ROM_END
 
 const tiny_rom_entry *isa16_wd90c31_lr_device::device_rom_region() const
@@ -439,7 +439,7 @@ ROM_START( wd90c31a_lr )
 	ROM_REGION(0x8000,"vga_rom", ROMREGION_ERASE00)
 	ROM_SYSTEM_BIOS(0, "speed24x", "Diamond Speedstar 24x (Vers. 1.04)")
 	ROMX_LOAD( "wd90c31alrdiamondspeedstar24x2.bin", 0x000000, 0x008000, CRC(578cb3c3) SHA1(ca7d871f9589eb06ace8075dd2d87a59bd191744), ROM_BIOS(0) )
-//	"wd90c31alrdiamondspeedstar24x1.bin" identical to above
+//  "wd90c31alrdiamondspeedstar24x1.bin" identical to above
 	ROM_SYSTEM_BIOS(1, "wd90c31a_lr", "Western Digital WD90C31A-LR")
 	ROMX_LOAD( "bios.bin",     0x000000, 0x008000, CRC(cdc4c32e) SHA1(52ed7b8301ec5ebab0d87bab8cddd9cc8612e2ab), ROM_BIOS(1) )
 	ROM_IGNORE( 0x8000 )

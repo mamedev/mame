@@ -671,7 +671,7 @@ void changela_state::draw_tree(bitmap_ind16 &bitmap, int sy, int tree_num)
 				h_count = ((math_train[9] & 0x0f) >> 1) | ((math_train[8] & 0x0f) << 3) | 0x80;
 				tile_h = (tile_h + 1) & 0xfff;
 
- 				// Skip one count if LSB is high
+				// Skip one count if LSB is high
 				if (((math_train[9] & 0x01) && (tile_h & 0x01)))
 					h_count--;
 			}

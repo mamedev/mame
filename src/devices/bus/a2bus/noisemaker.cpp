@@ -8,7 +8,7 @@
     Programmable Sound Generator through two I/O addresses, and has
     a dedicated audio amplifier and speaker connector for the combined
     output of its three channels. The manual gives the option of using
-    8T26 inverting buffers instead of 8T28 noninverting buffers, which 
+    8T26 inverting buffers instead of 8T28 noninverting buffers, which
     changes the programming interface somewhat, though both schematics
     and actual boards have 8T28s.
 

@@ -302,9 +302,9 @@ void vga_device::device_reset()
 void vga_device::io_map(address_map &map)
 {
 	map.unmap_value_high();
-//	map(0x00, 0x0b).view(m_ioas_3bx_view);
-//	m_ioas_3bx_view[0](0x00, 0x0b).m(FUNC(vga_device::io_3bx_3dx_map));
-//	m_ioas_3bx_view[1](0x00, 0x0b).unmaprw();
+//  map(0x00, 0x0b).view(m_ioas_3bx_view);
+//  m_ioas_3bx_view[0](0x00, 0x0b).m(FUNC(vga_device::io_3bx_3dx_map));
+//  m_ioas_3bx_view[1](0x00, 0x0b).unmaprw();
 	map(0x00, 0x0b).lrw8(
 		NAME([this] (offs_t offset) {
 			if (m_ioas == false)
@@ -321,9 +321,9 @@ void vga_device::io_map(address_map &map)
 
 	map(0x10, 0x1f).m(FUNC(vga_device::io_3cx_map));
 
-//	map(0x20, 0x2f).view(m_ioas_3dx_view);
-//	m_ioas_3dx_view[0](0x20, 0x2f).unmaprw();
-//	m_ioas_3dx_view[1](0x20, 0x2f).m(FUNC(vga_device::io_3bx_3dx_map));
+//  map(0x20, 0x2f).view(m_ioas_3dx_view);
+//  m_ioas_3dx_view[0](0x20, 0x2f).unmaprw();
+//  m_ioas_3dx_view[1](0x20, 0x2f).m(FUNC(vga_device::io_3bx_3dx_map));
 	map(0x20, 0x2f).lrw8(
 		NAME([this] (offs_t offset) {
 			if (m_ioas == true)
@@ -443,7 +443,7 @@ u8 vga_device::input_status_1_r(offs_t offset)
 	case 0x20:
 		if (vga.attribute.data[0x11]&2)
 			res |= 0x10;
-		if (vga.attribute.data[0x11]&8) 
+		if (vga.attribute.data[0x11]&8)
 			res |= 0x20;
 		break;
 	case 0x30:
@@ -975,25 +975,25 @@ void vga_device::gc_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00, 0x00).lrw8(
 		NAME([this](offs_t offset) {
-			return vga.gc.set_reset & 0xf; 
+			return vga.gc.set_reset & 0xf;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
-			vga.gc.set_reset = data & 0xf; 
+		NAME([this](offs_t offset, u8 data) {
+			vga.gc.set_reset = data & 0xf;
 		})
 	);
 	map(0x01, 0x01).lrw8(
-		NAME([this](offs_t offset) { 
+		NAME([this](offs_t offset) {
 			return vga.gc.enable_set_reset & 0xf;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			vga.gc.enable_set_reset = data & 0xf;
 		})
 	);
 	map(0x02, 0x02).lrw8(
-		NAME([this](offs_t offset) { 
+		NAME([this](offs_t offset) {
 			return vga.gc.color_compare & 0xf;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			vga.gc.color_compare = data & 0xf;
 		})
 	);
@@ -1001,7 +1001,7 @@ void vga_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return ((vga.gc.logical_op & 3) << 3) | (vga.gc.rotate_count & 7);
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			vga.gc.logical_op = (data & 0x18) >> 3;
 			vga.gc.rotate_count = data & 7;
 		})
@@ -1010,7 +1010,7 @@ void vga_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return vga.gc.read_map_sel & 3;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			vga.gc.read_map_sel = data & 3;
 		})
 	);
@@ -1023,7 +1023,7 @@ void vga_device::gc_map(address_map &map)
 			res |= (vga.gc.write_mode & 3);
 			return res;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			vga.gc.shift256 = BIT(data, 6);
 			vga.gc.shift_reg = BIT(data, 5);
 			vga.gc.host_oe = BIT(data, 4);
@@ -1034,7 +1034,7 @@ void vga_device::gc_map(address_map &map)
 		})
 	);
 	map(0x06, 0x06).lrw8(
-		NAME([this](offs_t offset) { 
+		NAME([this](offs_t offset) {
 			u8 res = (vga.gc.memory_map_sel & 3) << 2;
 			res |= (vga.gc.chain_oe & 1) << 1;
 			res |= (vga.gc.alpha_dis & 1);
@@ -1083,8 +1083,8 @@ void vga_device::sequencer_map(address_map &map)
 			return res;
 		})
 	);
-//	map(0x00, 0x00) Reset Register
-//	map(0x01, 0x01) Clocking Mode Register
+//  map(0x00, 0x00) Reset Register
+//  map(0x01, 0x01) Clocking Mode Register
 	map(0x02, 0x02).lw8(
 		NAME([this] (offs_t offset, u8 data) {
 			vga.sequencer.map_mask = data & 0xf;
@@ -1101,10 +1101,10 @@ void vga_device::sequencer_map(address_map &map)
 		})
 	);
 	// Sequencer Memory Mode Register
-//	map(0x04, 0x04)
+//  map(0x04, 0x04)
 	// (undocumented) Sequencer Horizontal Character Counter Reset
 	// Any write strobe to this register will lock the character generator until another write to other regs happens.
-//	map(0x07, 0x07)
+//  map(0x07, 0x07)
 }
 
 /**************************************

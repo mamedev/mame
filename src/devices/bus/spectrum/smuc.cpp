@@ -23,7 +23,7 @@ public:
 		, m_rtc(*this, "rtc")
 		, m_eeprom(*this, "eeprom")
 		, m_ata(*this, "ata")
-    { }
+	{ }
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

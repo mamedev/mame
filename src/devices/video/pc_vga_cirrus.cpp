@@ -249,7 +249,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return vga.gc.set_reset & ((gc_mode_ext & 0x04) ? 0xff : 0x0f);
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			// if extended writes are enabled (bit 2 of index 0bh), then index 0 and 1 are extended to 8 bits,
 			// however XFree86 does not appear to do this...
 			vga.gc.set_reset = data & 0xff;
@@ -259,7 +259,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return vga.gc.enable_set_reset & ((gc_mode_ext & 0x04) ? 0xff : 0x0f);
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			vga.gc.enable_set_reset = data & 0xff;
 		})
 	);
@@ -275,7 +275,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 				res |= (vga.gc.write_mode & 3);
 			return res;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			vga.gc.shift256 = (data & 0x40) >> 6;
 			vga.gc.shift_reg = (data & 0x20) >> 5;
 			vga.gc.host_oe = (data & 0x10) >> 4;
@@ -291,7 +291,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return gc_bank_0;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			gc_bank_0 = data;
 			LOG("CL: Offset register 0 set to %i\n", data);
 		})
@@ -301,7 +301,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return gc_bank_1;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			gc_bank_1 = data;
 			LOG("CL: Offset register 1 set to %i\n", data);
 		})
@@ -311,7 +311,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return gc_mode_ext;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			gc_mode_ext = data;
 			if(!(data & 0x04))
 			{
@@ -333,7 +333,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return m_gr10;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			m_gr10 = data;
 		})
 	);
@@ -342,7 +342,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return m_gr11;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			m_gr11 = data;
 		})
 	);
@@ -351,7 +351,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return m_blt_width & 0x00ff;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			m_blt_width = (m_blt_width & 0xff00) | data;
 		})
 	);
@@ -360,7 +360,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return m_blt_width >> 8;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			m_blt_width = (m_blt_width & 0x00ff) | (data << 8);
 		})
 	);
@@ -369,7 +369,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return m_blt_height & 0x00ff;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			m_blt_height = (m_blt_height & 0xff00) | data;
 		})
 	);
@@ -378,7 +378,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return m_blt_height >> 8;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			m_blt_height = (m_blt_height & 0x00ff) | (data << 8);
 		})
 	);
@@ -387,7 +387,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return m_blt_dest_pitch & 0x00ff;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			m_blt_dest_pitch = (m_blt_dest_pitch & 0xff00) | data;
 		})
 	);
@@ -396,7 +396,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return m_blt_dest_pitch >> 8;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			m_blt_dest_pitch = (m_blt_dest_pitch & 0x00ff) | (data << 8);
 		})
 	);
@@ -405,7 +405,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return m_blt_source_pitch & 0x00ff;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			m_blt_source_pitch = (m_blt_source_pitch & 0xff00) | data;
 		})
 	);
@@ -414,7 +414,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return m_blt_source_pitch >> 8;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			m_blt_source_pitch = (m_blt_source_pitch & 0x00ff) | (data << 8);
 		})
 	);
@@ -434,7 +434,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return (m_blt_source >> (8 * (offset & 3))) & 0xff;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			const u8 byte_access = (8 * (offset & 3));
 			const u32 old_mask = ~(0xff << byte_access);
 			m_blt_source = (m_blt_source & old_mask) | (data << byte_access);
@@ -447,7 +447,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return m_blt_mode;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			m_blt_mode = data;
 		})
 	);
@@ -456,7 +456,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return m_blt_status;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			m_blt_status = data & ~0xf2;
 			if(data & 0x02)
 			{
@@ -472,7 +472,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return m_blt_rop;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			m_blt_rop = data;
 		})
 	);
@@ -490,7 +490,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return m_blt_trans_colour >> 8;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			m_blt_trans_colour = (m_blt_trans_colour & 0x00ff) | (data << 8);
 		})
 	);
@@ -499,7 +499,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return m_blt_trans_colour_mask & 0xff;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			m_blt_trans_colour_mask = (m_blt_trans_colour_mask & 0xff00) | data;
 		})
 	);
@@ -508,7 +508,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		NAME([this](offs_t offset) {
 			return m_blt_trans_colour_mask >> 8;
 		}),
-		NAME([this](offs_t offset, u8 data) { 
+		NAME([this](offs_t offset, u8 data) {
 			m_blt_trans_colour_mask = (m_blt_trans_colour_mask & 0x00ff) | (data << 8);
 		})
 	);
@@ -518,7 +518,7 @@ void cirrus_gd5428_device::sequencer_map(address_map &map)
 {
 	svga_device::sequencer_map(map);
 	map(0x02, 0x02).lrw8(
-		NAME([this] (offs_t offset) { 
+		NAME([this] (offs_t offset) {
 			return vga.sequencer.map_mask & ((gc_mode_ext & 0x08) ? 0xff : 0x0f);
 		}),
 		NAME([this] (offs_t offset, u8 data) {

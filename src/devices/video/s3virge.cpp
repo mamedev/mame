@@ -205,7 +205,7 @@ void s3virge_vga_device::crtc_map(address_map &map)
 	map(0x40, 0x40).lw8(
 		NAME([this] (offs_t offset, u8 data) {
 			// enable S3D registers
-			s3.enable_s3d = data & 0x01; 
+			s3.enable_s3d = data & 0x01;
 		})
 	);
 	map(0x43, 0x43).lw8(

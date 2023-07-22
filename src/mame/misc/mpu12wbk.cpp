@@ -1104,7 +1104,7 @@ ROM_END
 
   Program flash ROM is inside a CPU epoxy block
   with M6809 CPU and one PLD.
-  
+
   STK => Steiermark, Austria.
 
 */
@@ -1140,7 +1140,7 @@ ROM_END
 
   Program flash ROM is inside a CPU epoxy block
   with M6809 CPU and one PLD.
-  
+
   BGL => Burgenland, Austria.
 
 */
@@ -1174,7 +1174,7 @@ ROM_END
 
   Program flash ROM is inside a CPU epoxy block
   with M6809 CPU and one PLD.
-  
+
   BGL => Burgenland, Austria.
 
   Program has 4 bytes different to the other set.

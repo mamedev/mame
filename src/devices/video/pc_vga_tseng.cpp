@@ -162,7 +162,7 @@ void tseng_vga_device::attribute_map(address_map &map)
 	// TODO: implement KEY protection
 	map(0x16, 0x16).mirror(0x20).lrw8(
 		NAME([this] (offs_t offset) { return et4k.misc1; }),
-		NAME([this] (offs_t offset, u8 data) { 
+		NAME([this] (offs_t offset, u8 data) {
 			et4k.misc1 = data;
 			// TODO: this should be taken into account for recompute_params
 			#if 0
@@ -190,7 +190,7 @@ void tseng_vga_device::attribute_map(address_map &map)
 	// TODO: not on stock et4k?
 	map(0x17, 0x17).mirror(0x20).lrw8(
 		NAME([this] (offs_t offset) { return et4k.misc2; }),
-		NAME([this] (offs_t offset, u8 data) { 
+		NAME([this] (offs_t offset, u8 data) {
 			et4k.misc2 = data;
 		})
 	);

@@ -1057,7 +1057,7 @@ ROM_START( bellstr2 )  // Strings: C1992, AWR. Copyright (c) 1995-1997 Paloma El
 	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )   // i186 code
 	ROM_LOAD16_BYTE( "bell-star+_vip2_25.02.02_l.bin",  0x00000, 0x08000, CRC(82ff28c5) SHA1(b0f7c47f32457ebb7783acb94a2ee7d60dbf000f) )
 	ROM_LOAD16_BYTE( "bell-star+_vip2_25.02.02_h.bin",  0x00001, 0x08000, CRC(b6243a72) SHA1(2d0f5222a1908076658614035c96a69a579ee3a2) )
-//	ROM_LOAD16_BYTE( "bell-star+_vip2_v_25.2.02_h.bin", 0x00001, 0x08000, CRC(c9ab19a0) SHA1(e65a4923a8efb0847b5156b68dbf9f2e5aedfecb) )
+//  ROM_LOAD16_BYTE( "bell-star+_vip2_v_25.2.02_h.bin", 0x00001, 0x08000, CRC(c9ab19a0) SHA1(e65a4923a8efb0847b5156b68dbf9f2e5aedfecb) )
 
 	ROM_REGION16_LE( 0x10000, "alt_h", 0 ) // from identical set, but different high program (to check).
 	ROM_LOAD16_BYTE( "bell-star+_vip2_v_25.2.02_h.bin", 0x00001, 0x08000, CRC(c9ab19a0) SHA1(e65a4923a8efb0847b5156b68dbf9f2e5aedfecb) )
@@ -1099,14 +1099,14 @@ ROM_START( bellstr3 )  // Strings: Copyright (c) 1995-1997 Paloma Elektronik.
 	ROM_REGION( 0x20000, "eeprom", 0 )  // eeprom
 	ROM_LOAD( "24c04a.bin", 0x000000, 0x200, CRC(26ca6607) SHA1(e6f162481bf2e7196f06239e09ed81bb14e99f1e) )
 ROM_END
-	   
+
 
 /* Bell Star Plus
    1998 Paloma Elektronik.
 
    Play Star Austria 0316/821193.
    CBA-Design, Lyon France.
-   
+
    Same PCB layout than bingor2, 3, 4
 
    Serial: 9837
@@ -1221,7 +1221,7 @@ ROM_END
 
    Serial: 9813
 */
-ROM_START( roljokr1 )  // Strings: 
+ROM_START( roljokr1 )  // Strings:
 	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )   // i186 code
 	ROM_LOAD16_BYTE( "rol_l.bin", 0x00000, 0x08000, CRC(df4b5758) SHA1(88dfc7a623e4f200d4c90e6118e1a101242cb8ab) )
 	ROM_LOAD16_BYTE( "rol_h.bin", 0x00001, 0x08000, CRC(02bf6d89) SHA1(57f0bfeb6ad579b7bb0a022b2c1acd217ccae995) )
