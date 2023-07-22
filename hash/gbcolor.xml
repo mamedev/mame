@@ -9048,12 +9048,12 @@ license:CC0-1.0
 		<description>Inspector Gadget - Operation Madkactus (Europe)</description>
 		<year>2000</year>
 		<publisher>Ubi Soft</publisher>
-		<info name="serial" value="CGB-BIGP-EUR"/>
-		<sharedfeat name="compatibility" value="GBC"/>
+		<info name="serial" value="CGB-BIGP-EUR" />
+		<sharedfeat name="compatibility" value="GBC" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="1048576">
-				<rom name="inspector gadget - operation madkactus (europe) (en,fr,de,es,it,nl).bin" size="1048576" crc="3390b056" sha1="55c02b81fa854938ca3cb3e5b725a6a72f711e7b"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="inspector gadget - operation madkactus (europe) (en,fr,de,es,it,nl).bin" size="0x100000" crc="3390b056" sha1="55c02b81fa854938ca3cb3e5b725a6a72f711e7b" />
 			</dataarea>
 		</part>
 	</software>
@@ -9062,12 +9062,25 @@ license:CC0-1.0
 		<description>Inspector Gadget - Operation Madkactus (USA)</description>
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
-		<info name="serial" value="CGB-BIGE-USA"/>
-		<sharedfeat name="compatibility" value="GBC"/>
+		<info name="serial" value="CGB-BIGE-USA" />
+		<sharedfeat name="compatibility" value="GBC" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="1048576">
-				<rom name="inspector gadget - operation madkactus (usa).bin" size="1048576" crc="1af0b489" sha1="b0fa81a35e605948df3b7f1fcb5893bab99d9d6a"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="inspector gadget - operation madkactus (usa).bin" size="0x100000" crc="1af0b489" sha1="b0fa81a35e605948df3b7f1fcb5893bab99d9d6a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inspgadgp" cloneof="inspgadg">
+		<description>Inspector Gadget - Operation Madkactus (prototype, French)</description>
+		<year>2000</year>
+		<publisher>Ubi Soft</publisher>
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="inspector gadget - operation madkactus (prototype) (fr).bin" size="0x100000" crc="93ec798b" sha1="8444ff17aa3f865eec33cc49398b450e345376c3" />
 			</dataarea>
 		</part>
 	</software>
