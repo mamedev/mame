@@ -80,6 +80,9 @@ TODO:
   reading from VIA1. It's possible to fix with a simple wire mod/pcb cut trace,
   like done with piratetr_main_map. Let's assume they did something like that.
 
+BTANB:
+- BGM stops in leprechn when you touch a tree
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -163,8 +166,8 @@ uint32_t gameplan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 TIMER_CALLBACK_MEMBER(gameplan_state::hblank_callback)
 {
-	// screen !HBLANK is tied to VIA1 PB6
-	m_via[0]->write_pb6(param ^ 1);
+	// screen HBLANK is tied to VIA1 PB6
+	m_via[0]->write_pb6(param);
 }
 
 
@@ -1110,7 +1113,7 @@ void gameplan_state::gameplan_video(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(11.6688_MHz_XTAL / 2, 352, 0, 256, 280, 0, 256);
 	m_screen->set_screen_update(FUNC(gameplan_state::screen_update));
-	m_screen->screen_vblank().set(m_via[0], FUNC(via6522_device::write_ca1)).invert(); // !VBLANK is connected to CA1
+	m_screen->screen_vblank().set(m_via[0], FUNC(via6522_device::write_ca1)); // VBLANK is connected to CA1
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::RGB_3BIT);

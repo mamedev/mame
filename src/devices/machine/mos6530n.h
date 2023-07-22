@@ -92,12 +92,14 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	enum {
+	enum
+	{
 		IRQ_EDGE  = 0x40,
 		IRQ_TIMER = 0x80
 	};
 
-	enum {
+	enum
+	{
 		TIMER_COUNTING,
 		TIMER_SPINNING
 	};
@@ -106,9 +108,9 @@ protected:
 	virtual void update_pb();
 	virtual void update_irq();
 	virtual uint8_t get_irq_flags();
-	TIMER_CALLBACK_MEMBER(timer_end);
 	uint8_t get_timer();
-	void timer_irq_enable(bool ie);
+	void timer_start(uint8_t data);
+	TIMER_CALLBACK_MEMBER(timer_end);
 	void edge_detect();
 
 	void pa_w(int bit, int state);
