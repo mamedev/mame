@@ -64,6 +64,10 @@ Notes:
   Megattack
   Pot Of Gold (Leprechaun)
 
+- Leprechaun and Pirate Treasure were made for the Moppet Video arcade series
+  (Enter-Tech arcade cabs aimed at younger children). That's why the games are
+  so easy.
+
 
 TODO:
 - The board has, instead of a watchdog, a timed reset that has to be disabled
@@ -71,6 +75,10 @@ TODO:
   to that pin in the log. Missing support in machine/6522via.cpp?
 - Investigate and document the 8910 dip switches
 - Fix the input ports of Kaos
+- Some of the games do unmapped reads all over the place, probably just bad
+  programming. One of these is piratetr, and it will lock up eventually when
+  reading from VIA1. It's possible to fix with a simple wire mod/pcb cut trace,
+  like done with piratetr_main_map. Let's assume they did something like that.
 
 ****************************************************************************/
 
@@ -347,6 +355,12 @@ void gameplan_state::gameplan_main_map(address_map &map)
 	map(0x2800, 0x280f).mirror(0x07f0).m(m_via[1], FUNC(via6522_device::map)); // VIA 2
 	map(0x3000, 0x300f).mirror(0x07f0).m(m_via[2], FUNC(via6522_device::map)); // VIA 3
 	map(0x8000, 0xffff).rom();
+}
+
+void gameplan_state::piratetr_main_map(address_map &map)
+{
+	gameplan_main_map(map);
+	map(0x2010, 0x201f).mirror(0x07e0).unmaprw(); // A4, see TODO
 }
 
 
@@ -1174,6 +1188,12 @@ void gameplan_state::leprechn(machine_config &config)
 	m_via[0]->writepb_handler().set(FUNC(gameplan_state::video_command_w)).rshift(3);
 }
 
+void gameplan_state::piratetr(machine_config &config)
+{
+	leprechn(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gameplan_state::piratetr_main_map);
+}
+
 
 
 /*************************************
@@ -1336,4 +1356,4 @@ GAME( 1981, kaos,      0,        gameplan, kaos,      gameplan_state, empty_init
 GAME( 1982, leprechn,  0,        leprechn, leprechn,  gameplan_state, empty_init, ROT0,   "Pacific Polytechnical Corp.",                           "Leprechaun (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, leprechna, leprechn, leprechn, leprechna, gameplan_state, empty_init, ROT0,   "Pacific Polytechnical Corp. (Tong Electronic license)", "Leprechaun (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, potogold,  leprechn, leprechn, leprechn,  gameplan_state, empty_init, ROT0,   "Pacific Polytechnical Corp. (Game Plan license)",       "Pot of Gold",        MACHINE_SUPPORTS_SAVE )
-GAME( 1982, piratetr,  0,        leprechn, piratetr,  gameplan_state, empty_init, ROT0,   "Pacific Polytechnical Corp. (Tong Electronic license)", "Pirate Treasure",    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, piratetr,  0,        piratetr, piratetr,  gameplan_state, empty_init, ROT0,   "Pacific Polytechnical Corp. (Tong Electronic license)", "Pirate Treasure",    MACHINE_SUPPORTS_SAVE )

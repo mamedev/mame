@@ -35,6 +35,7 @@ public:
 	void gameplan(machine_config &config);
 	void gameplan_video(machine_config &config);
 	void leprechn(machine_config &config);
+	void piratetr(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -91,4 +92,5 @@ private:
 	void gameplan_main_map(address_map &map);
 	void gameplan_audio_map(address_map &map);
 	void leprechn_audio_map(address_map &map);
+	void piratetr_main_map(address_map &map);
 };
