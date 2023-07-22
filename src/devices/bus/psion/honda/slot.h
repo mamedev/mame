@@ -57,21 +57,37 @@ public:
 	psion_honda_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// callbacks
-	auto int_cb() { return m_int_cb.bind(); }
+	auto rxd_handler() { return m_rxd_handler.bind(); }
+	auto dcd_handler() { return m_dcd_handler.bind(); }
+	auto dsr_handler() { return m_dsr_handler.bind(); }
+	auto cts_handler() { return m_cts_handler.bind(); }
+	auto sdoe_handler() { return m_sdoe_handler.bind(); }
 
 	uint8_t data_r();
 	void data_w(uint16_t data);
 
-	void int_w(int state) { m_int_cb(state); }
+	void write_txd(int state);
+	void write_dtr(int state);
+	void write_rts(int state);
+
+	void write_rxd(int state) { m_rxd_handler(state); }
+	void write_dcd(int state) { m_dcd_handler(state); }
+	void write_dsr(int state) { m_dsr_handler(state); }
+	void write_cts(int state) { m_cts_handler(state); }
+	void write_sdoe(int state) { m_sdoe_handler(state); }
 
 protected:
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override;
 
-	device_psion_honda_interface *m_card;
-
 private:
-	devcb_write_line m_int_cb;
+	devcb_write_line m_rxd_handler;
+	devcb_write_line m_dcd_handler;
+	devcb_write_line m_dsr_handler;
+	devcb_write_line m_cts_handler;
+	devcb_write_line m_sdoe_handler;
+
+	device_psion_honda_interface *m_card;
 };
 
 
@@ -80,6 +96,10 @@ private:
 class device_psion_honda_interface : public device_interface
 {
 public:
+	virtual void write_txd(int state) { }
+	virtual void write_dtr(int state) { }
+	virtual void write_rts(int state) { }
+
 	virtual uint8_t data_r() { return 0x00; }
 	virtual void data_w(uint16_t data) { }
 
