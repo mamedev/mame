@@ -728,6 +728,14 @@ void vis_vga_device::device_start()
 	m_isa->install_device(0x03b0, 0x03df, *this, &vis_vga_device::io_isa_map);
 
 	svga_device::device_start();
+	save_item(NAME(m_extreg));
+	save_item(NAME(m_extcnt));
+	save_item(NAME(m_wina));
+	save_item(NAME(m_winb));
+	save_item(NAME(m_interlace));
+	save_item(NAME(m_shift256));
+	save_item(NAME(m_dw));
+	save_item(NAME(m_8bit_640));
 }
 
 void vis_vga_device::device_reset()
@@ -817,7 +825,7 @@ void vis_vga_device::ramdac_hidden_mask_w(offs_t offset, u8 data)
 		return;
 	}
 
-	vga_device::ramdac_write_index_w(offset, data);
+	vga_device::ramdac_mask_w(offset, data);
 }
 
 class vis_state : public driver_device
