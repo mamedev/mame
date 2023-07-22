@@ -716,7 +716,7 @@ static INPUT_PORTS_START( watz19 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gp19 )
-  PORT_INCLUDE( tlb )
+	PORT_INCLUDE( tlb )
 
 	PORT_MODIFY("SW402")
 	PORT_DIPNAME( 0x80, 0x00, "Automatic Holdscreen")    PORT_DIPLOCATION("SW402:8")
@@ -1027,11 +1027,11 @@ void heath_gp19_tlb_device::io_map(address_map &map)
 /**
  * U5 Latch
  *
- * 	Q0 Graph/character H
- * 	Q1 132/80 columns H
- * 	Q2 Reverse Screen H
- * 	Q3 Alt Character L
- * 	Q4-Q7 LED indicators
+ *  Q0 Graph/character H
+ *  Q1 132/80 columns H
+ *  Q2 Reverse Screen H
+ *  Q3 Alt Character L
+ *  Q4-Q7 LED indicators
  */
 void heath_gp19_tlb_device::latch_u5_w(uint8_t data)
 {

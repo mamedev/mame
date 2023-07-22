@@ -19141,10 +19141,10 @@ h8                              //
 
 @source:heathkit/h19.cpp
 h19                             // Heath H19 (Zenith Z-19)
-super19                         // Super19 replacement ROMS for H19
-watz19                          // Watzman replacement ROMS for H19
-ultra19                         // ULTRA ROM replacement ROMS for H19
 gp19                            // H19 with Northwest Digital Systems GP-19
+super19                         // Super19 replacement ROMS for H19
+ultra19                         // ULTRA ROM replacement ROMS for H19
+watz19                          // Watzman replacement ROMS for H19
 
 @source:heathkit/h89.cpp
 h89                             //
