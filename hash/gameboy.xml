@@ -1958,35 +1958,35 @@ license:CC0-1.0
 	</software>
 
 	<software name="bspace" supported="no">
-		<!--
-		Battle Space requires Barcode Boy, a barcode reader accessory for Game Boy.
-		The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
-		It came bundled with the following barcode cards (all EAN-13):
-		    1 (up):
-		        4905672306367
-		    1 (down):
-		        4902776809367
-		    2 (up):
-		        4908052808369
-		    2 (down):
-		        4907981000301
-		    3 (up):
-		        4911826551347
-		    3 (down):
-		        4909062206350
-		    4 (up):
-		        4913508504399
-		    4 (down):
-		        4912713004366
-		    5 (up):
-		        4918156001351
-		    5 (down):
-		        4916911302309
-		There is also a "free card" without barcodes.
-		-->
 		<description>Battle Space (Japan)</description>
 		<year>1992</year>
 		<publisher>Namcot</publisher>
+		<notes><![CDATA[
+Battle Space requires Barcode Boy, a barcode reader accessory for Game Boy.
+The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
+It came bundled with the following barcode cards (all EAN-13):
+	1 (up):
+		4905672306367
+	1 (down):
+		4902776809367
+	2 (up):
+		4908052808369
+	2 (down):
+		4907981000301
+	3 (up):
+		4911826551347
+	3 (down):
+		4909062206350
+	4 (up):
+		4913508504399
+	4 (down):
+		4912713004366
+	5 (up):
+		4918156001351
+	5 (down):
+		4916911302309
+There is also a "free card" without barcodes.
+]]></notes>
 		<info name="serial" value="DMG-NXJ" />
 		<info name="release" value="19921225" />
 		<info name="alt_title" value="バトルスペース" />
@@ -5604,6 +5604,9 @@ license:CC0-1.0
 		<description>Double Dragon 3 (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+Does not respond to inputs at title screen
+]]></notes>
 		<info name="serial" value="DMG-DX-USA, DMG-DX-NOE, DMG-DX-ESP" />
 		<info name="alt_title" value="Double Dragon 3 - The Arcade Game (Box)" />
 		<part name="cart" interface="gameboy_cart">
@@ -12284,10 +12287,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="lawnmowr" supported="no"> <!-- does not respond to inputs -->
+	<software name="lawnmowr" supported="no">
 		<description>The Lawnmower Man (Europe)</description>
 		<year>1993</year>
 		<publisher>Sales Curve</publisher>
+		<notes><![CDATA[
+Does not respond to inputs
+]]></notes>
 		<info name="serial" value="DMG-LR-NOE" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
@@ -12297,10 +12303,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="lawnmowrup" cloneof="lawnmowr" supported="no"> <!-- does not respond to inputs -->
+	<software name="lawnmowrup" cloneof="lawnmowr" supported="no">
 		<description>The Lawnmower Man (prototype)</description>
 		<year>1993</year>
 		<publisher>THQ</publisher>
+		<notes><![CDATA[
+Does not respond to inputs
+]]></notes>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="0x20000">
@@ -12328,6 +12337,9 @@ license:CC0-1.0
 		<description>Learn and Play Blackjack &amp; Solitaire (prototype)</description>
 		<year>1994</year>
 		<publisher>Spidersoft</publisher>
+		<notes><![CDATA[
+Crashes a few seconds on title screen
+]]></notes>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="0x20000">
@@ -14800,31 +14812,31 @@ license:CC0-1.0
 	</software>
 
 	<software name="monstmkb" supported="no">
-		<!--
-		Monster Maker - Barcode Saga requires Barcode Boy, a barcode reader accessory for Game Boy.
-		The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
-		It came bundled with the following barcode cards (all EAN-13):
-		    1 (fg up):
-		        9120153954577
-		    1 (fg down):
-		        9022038781998
-		    1 (bg up):
-		        9362462085911
-		    1 (bg down):
-		        9752412234900
-		    2 (fg up):
-		        9052091324955
-		    2 (fg down):
-		        9322158686716
-		    2 (bg up):
-		        9447410810323
-		    2 (bg down):
-		        9998017308336
-		Cards 3, 4 and 5 contains no barcodes.
-		-->
 		<description>Monster Maker - Barcode Saga (Japan)</description>
 		<year>1993</year>
 		<publisher>Namcot</publisher>
+		<notes><![CDATA[
+Monster Maker - Barcode Saga requires Barcode Boy, a barcode reader accessory for Game Boy.
+The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
+It came bundled with the following barcode cards (all EAN-13):
+	1 (fg up):
+		9120153954577
+	1 (fg down):
+		9022038781998
+	1 (bg up):
+		9362462085911
+	1 (bg down):
+		9752412234900
+	2 (fg up):
+		9052091324955
+	2 (fg down):
+		9322158686716
+	2 (bg up):
+		9447410810323
+	2 (bg down):
+		9998017308336
+Cards 3, 4 and 5 contains no barcodes.
+]]></notes>
 		<info name="serial" value="DMG-QNJ" />
 		<info name="release" value="19930810" />
 		<info name="alt_title" value="モンスターメーカー バーコードサーガ" />
@@ -17916,11 +17928,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pinbaldx" supported="no"> <!-- crashes a few seconds after starting any table -->
+	<software name="pinbaldx" supported="no">
 		<!-- Enhanced version of Pinball Fantasies with 3 extra tables -->
 		<description>Pinball Deluxe (Europe)</description>
 		<year>1995</year>
 		<publisher>GameTek</publisher>
+		<notes><![CDATA[
+Crashes a few seconds after starting any table
+]]></notes>
 		<info name="serial" value="DMG-APDP-EUR" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" /> <!-- Also found with DMG-BEAN(K)-02 -->
@@ -17949,10 +17964,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pbfantas" supported="no"> <!-- crashes a few seconds after starting any table -->
+	<software name="pbfantas" supported="no">
 		<description>Pinball Fantasies (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>GameTek</publisher>
+		<notes><![CDATA[
+Crashes a few seconds after starting any table
+]]></notes>
 		<info name="serial" value="DMG-APFP-EUR, DMG-APFE-USA" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />
@@ -17965,10 +17983,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pbmania" supported="no"> <!-- crashes a few seconds after starting any table -->
+	<software name="pbmania" supported="no">
 		<description>Pinball Mania (Europe)</description>
 		<year>1995</year>
 		<publisher>GameTek</publisher>
+		<notes><![CDATA[
+Crashes a few seconds after starting any table
+]]></notes>
 		<info name="serial" value="DMG-APIP-EUR" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
@@ -26290,10 +26311,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="virtwars" cloneof="lawnmowr" supported="no"> <!-- does not respond to inputs -->
+	<software name="virtwars" cloneof="lawnmowr" supported="no">
 		<description>Virtual Wars (Japan)</description>
 		<year>1994</year>
 		<publisher>Coconuts Japan</publisher>
+		<notes><![CDATA[
+Does not respond to inputs
+]]></notes>
 		<info name="serial" value="DMG-L5J" />
 		<info name="release" value="19940211" />
 		<info name="alt_title" value="バーチャルウォーズ" />
