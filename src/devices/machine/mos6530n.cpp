@@ -521,11 +521,9 @@ uint8_t mos6530_device_base::irq_r()
 {
 	uint8_t data = get_irq_flags();
 
-	if (!machine().side_effects_disabled()) {
-		if (m_irq_edge) {
-			m_irq_edge = false;
-			update_irq();
-		}
+	if (!machine().side_effects_disabled() && m_irq_edge) {
+		m_irq_edge = false;
+		update_irq();
 	}
 
 	return data;

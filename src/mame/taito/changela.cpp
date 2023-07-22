@@ -218,10 +218,10 @@ void changela_state::machine_reset()
 
 void changela_state::video_start()
 {
-	m_riverram = std::make_unique<u8[]>(0x800);
+	m_riverram = make_unique_clear<u8[]>(0x800);
 	save_pointer(NAME(m_riverram), 0x800);
 
-	m_treeram = std::make_unique<u8[]>(0x800);
+	m_treeram = make_unique_clear<u8[]>(0x800);
 	save_pointer(NAME(m_treeram), 0x800);
 
 	m_screen->register_screen_bitmap(m_obj0_bitmap);

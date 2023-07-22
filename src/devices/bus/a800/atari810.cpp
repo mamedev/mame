@@ -52,17 +52,17 @@ void atari810_device::mem_map(address_map &map)
 
 void atari810_device::data_out_w(int state)
 {
-	m_pia->pb7_w(state);
+	m_pia->pb_w<7>(state);
 }
 
 void atari810_device::command_w(int state)
 {
-	m_pia->pb6_w(state);
+	m_pia->pb_w<6>(state);
 }
 
 void atari810_device::ready_w(int state)
 {
-	m_pia->pb1_w(state);
+	m_pia->pb_w<1>(state);
 }
 
 
@@ -92,8 +92,8 @@ void atari810_device::device_add_mconfig(machine_config &config)
 	//m_pia->irq_wr_callback().set(m_fdc, FUNC(fd1771_device::ip_w));
 
 	FD1771(config, m_fdc, 1_MHz_XTAL);
-	m_fdc->drq_wr_callback().set(m_pia, FUNC(mos6532_new_device::pa7_w));
-	m_fdc->intrq_wr_callback().set(m_pia, FUNC(mos6532_new_device::pa6_w));
+	m_fdc->drq_wr_callback().set(m_pia, FUNC(mos6532_new_device::pa_w<7>));
+	m_fdc->intrq_wr_callback().set(m_pia, FUNC(mos6532_new_device::pa_w<6>));
 }
 
 

@@ -65,33 +65,24 @@
 class mos6530_device_base : public device_t
 {
 public:
-	auto irq_wr_callback() { return m_irq_cb.bind(); }
+	// port byte callbacks
 	auto pa_rd_callback() { return m_in8_pa_cb.bind(); }
 	auto pa_wr_callback() { return m_out8_pa_cb.bind(); }
 	auto pb_rd_callback() { return m_in8_pb_cb.bind(); }
 	auto pb_wr_callback() { return m_out8_pb_cb.bind(); }
+
+	// port bit callbacks
 	template <unsigned N> auto pa_rd_callback() { return m_in_pa_cb[N].bind(); }
 	template <unsigned N> auto pa_wr_callback() { return m_out_pa_cb[N].bind(); }
 	template <unsigned N> auto pb_rd_callback() { return m_in_pb_cb[N].bind(); }
 	template <unsigned N> auto pb_wr_callback() { return m_out_pb_cb[N].bind(); }
 
-	void pa0_w(int state) { pa_w(0, state); }
-	void pa1_w(int state) { pa_w(1, state); }
-	void pa2_w(int state) { pa_w(2, state); }
-	void pa3_w(int state) { pa_w(3, state); }
-	void pa4_w(int state) { pa_w(4, state); }
-	void pa5_w(int state) { pa_w(5, state); }
-	void pa6_w(int state) { pa_w(6, state); }
-	void pa7_w(int state) { pa_w(7, state); }
+	// 6532 _IRQ pin (on 6530 it is PB7)
+	auto irq_wr_callback() { return m_irq_cb.bind(); }
 
-	void pb0_w(int state) { pb_w(0, state); }
-	void pb1_w(int state) { pb_w(1, state); }
-	void pb2_w(int state) { pb_w(2, state); }
-	void pb3_w(int state) { pb_w(3, state); }
-	void pb4_w(int state) { pb_w(4, state); }
-	void pb5_w(int state) { pb_w(5, state); }
-	void pb6_w(int state) { pb_w(6, state); }
-	void pb7_w(int state) { pb_w(7, state); }
+	// write to port inputs
+	template <unsigned N> void pa_w(int state) { pa_w(N, state); }
+	template <unsigned N> void pb_w(int state) { pb_w(N, state); }
 
 protected:
 	// construction/destruction

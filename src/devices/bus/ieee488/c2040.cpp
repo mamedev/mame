@@ -489,7 +489,7 @@ void c2040_device::add_common_devices(machine_config &config)
 	m_miot->pb_rd_callback<3>().set(m_fdc, FUNC(c2040_fdc_device::wps_r));
 
 	C2040_FDC(config, m_fdc, XTAL(16'000'000));
-	m_fdc->sync_wr_callback().set(m_miot, FUNC(mos6530_new_device::pb6_w));
+	m_fdc->sync_wr_callback().set(m_miot, FUNC(mos6530_new_device::pb_w<6>));
 	m_fdc->ready_wr_callback().set(m_via, FUNC(via6522_device::write_ca1));
 	m_fdc->error_wr_callback().set(m_via, FUNC(via6522_device::write_cb1));
 }
@@ -658,7 +658,7 @@ void c2040_device::device_reset()
 	m_miot->reset();
 	m_via->reset();
 
-	m_riot1->pa7_w(0);
+	m_riot1->pa_w<7>(0);
 
 	// turn off spindle motors
 	m_fdc->mtr0_w(1);
@@ -674,7 +674,7 @@ void c2040_device::ieee488_atn(int state)
 {
 	update_ieee_signals();
 
-	m_riot1->pa7_w(!state);
+	m_riot1->pa_w<7>(!state);
 }
 
 

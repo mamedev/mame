@@ -774,7 +774,7 @@ void c8050_device::device_reset()
 	m_miot->reset();
 	m_via->reset();
 
-	m_riot1->pa7_w(1);
+	m_riot1->pa_w<7>(1);
 
 	// turn off spindle motors
 	m_fdc->mtr0_w(1);
@@ -790,7 +790,7 @@ void c8050_device::ieee488_atn(int state)
 {
 	update_ieee_signals();
 
-	m_riot1->pa7_w(state);
+	m_riot1->pa_w<7>(state);
 }
 
 

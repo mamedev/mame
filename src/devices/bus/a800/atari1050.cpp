@@ -54,17 +54,17 @@ void atari1050_device::mem_map(address_map &map)
 
 void atari1050_device::data_out_w(int state)
 {
-	m_pia->pb6_w(state);
+	m_pia->pb_w<6>(state);
 }
 
 void atari1050_device::command_w(int state)
 {
-	m_pia->pb7_w(state);
+	m_pia->pb_w<7>(state);
 }
 
 void atari1050_device::ready_w(int state)
 {
-	m_pia->pb1_w(state);
+	m_pia->pb_w<1>(state);
 }
 
 
@@ -93,12 +93,12 @@ void atari1050_device::device_add_mconfig(machine_config &config)
 	m_pia->pa_wr_callback().set(m_fdc, FUNC(wd2793_device::dden_w)).bit(3);
 	//m_pia->pa_wr_callback().append(atari1050_device::motor_control_w)).bit(1);
 	m_pia->pb_wr_callback().set(FUNC(atari1050_device::step_w));
-	m_pia->irq_wr_callback().set(m_pia, FUNC(mos6532_new_device::pa6_w)).invert();
+	m_pia->irq_wr_callback().set(m_pia, FUNC(mos6532_new_device::pa_w<6>)).invert();
 	//m_pia->irq_wr_callback().append(m_fdc, FUNC(wd2793_device::ip_w));
 
 	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
-	m_fdc->drq_wr_callback().set(m_pia, FUNC(mos6532_new_device::pa7_w));
-	m_fdc->enp_wr_callback().set(m_pia, FUNC(mos6532_new_device::pa4_w));
+	m_fdc->drq_wr_callback().set(m_pia, FUNC(mos6532_new_device::pa_w<7>));
+	m_fdc->enp_wr_callback().set(m_pia, FUNC(mos6532_new_device::pa_w<4>));
 }
 
 
