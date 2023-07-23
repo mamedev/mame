@@ -16438,7 +16438,7 @@ GAME( 1983, ozon1,       0,        ozon1,      ozon1,      galaxian_state, init_
 GAME( 1981, ckongs,      ckong,    ckongs,     ckongs,     galaxian_state, init_ckongs,     ROT90,  "bootleg", "Crazy Kong (bootleg on Scramble hardware)", MACHINE_SUPPORTS_SAVE )
 
 // Konami L-1200-2 base board with custom Subelectro 113 rom board
-GAME( 1981, jungsub,    jungler,   jungsub,    jungsub,    galaxian_state, init_jungsub,    ROT90,  "bootleg (Subelectro)", "Jungler (Subelectro, bootleg on Scramble hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // mostly works, bad GFX ROM causes lots of glitches
+GAME( 1981, jungsub,     jungler,  jungsub,    jungsub,    galaxian_state, init_jungsub,    ROT90,  "bootleg (Subelectro)", "Jungler (Subelectro, bootleg on Scramble hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // mostly works, bad GFX ROM causes lots of glitches
 
 // Scorpion hardware; based on Scramble but with a 3rd AY-8910 and a speech chip
 GAME( 1982, scorpion,    0,        scorpion,   scorpion,   zac_scorpion_state, init_scorpion, ROT90,  "Zaccaria",           "Scorpion (set 1)",                                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)

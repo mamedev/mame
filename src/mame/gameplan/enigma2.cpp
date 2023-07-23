@@ -2,7 +2,7 @@
 // copyright-holders:Pierpaolo Prazzoli, Tomasz Slanina
 /********************************************************************
 
-Enigma 2 (C) Game Plan / Zilec Electronics
+Enigma 2 (C) Zilec Electronics / Game Plan
 
 driver by Pierpaolo Prazzoli and Tomasz Slanina
 
@@ -170,13 +170,13 @@ class enigma2_state : public driver_device
 public:
 	enigma2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_colors(*this, "colors"),
-		m_stars(*this, "stars")
+		m_stars(*this, "stars"),
+		m_videoram(*this, "videoram")
 	{ }
 
 	void enigma2(machine_config &config);
@@ -187,11 +187,19 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(p1_controls_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(p2_controls_r);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
-	/* memory pointers */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<screen_device> m_screen;
+	optional_device<palette_device> m_palette;
+	optional_region_ptr<uint8_t> m_colors;
+	optional_region_ptr<uint8_t> m_stars;
 	required_shared_ptr<uint8_t> m_videoram;
 
-	/* misc */
 	int m_blink_count = 0;
 	uint8_t m_sound_latch = 0;
 	uint8_t m_last_sound_data = 0;
@@ -201,29 +209,20 @@ private:
 	emu_timer *m_interrupt_clear_timer = nullptr;
 	emu_timer *m_interrupt_assert_timer = nullptr;
 
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<screen_device> m_screen;
-	optional_device<palette_device> m_palette;
-	optional_region_ptr<uint8_t> m_colors;
-	optional_region_ptr<uint8_t> m_stars;
-
 	uint8_t dip_switch_r(offs_t offset);
 	void sound_data_w(uint8_t data);
 	void enigma2_flip_screen_w(uint8_t data);
 	uint8_t sound_latch_r();
 	void protection_data_w(uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	uint32_t screen_update_enigma2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_enigma2a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(interrupt_clear_callback);
 	TIMER_CALLBACK_MEMBER(interrupt_assert_callback);
 	inline uint16_t vpos_to_vysnc_chain_counter( int vpos );
 	inline int vysnc_chain_counter_to_vpos( uint16_t counter );
-	void create_interrupt_timers(  );
-	void start_interrupt_timers(  );
+	void create_interrupt_timers();
+	void start_interrupt_timers();
+
 	void enigma2_audio_cpu_map(address_map &map);
 	void enigma2_main_cpu_map(address_map &map);
 	void enigma2a_main_cpu_io_map(address_map &map);
@@ -297,7 +296,6 @@ void enigma2_state::start_interrupt_timers(  )
 void enigma2_state::machine_start()
 {
 	create_interrupt_timers();
-
 
 	save_item(NAME(m_blink_count));
 	save_item(NAME(m_sound_latch));
@@ -722,7 +720,6 @@ void enigma2_state::enigma2(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2_audio_cpu_map);
 	m_audiocpu->set_periodic_int(FUNC(enigma2_state::irq0_line_hold), attotime::from_hz(8*52));
 
-
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
@@ -750,7 +747,6 @@ void enigma2_state::enigma2a(machine_config &config)
 	Z80(config, m_audiocpu, 2500000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2_audio_cpu_map);
 	m_audiocpu->set_periodic_int(FUNC(enigma2_state::irq0_line_hold), attotime::from_hz(8*52));
-
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
