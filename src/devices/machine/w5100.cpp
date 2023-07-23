@@ -550,7 +550,7 @@ void w5100_device::device_reset()
 void w5100_device::update_ethernet_irq()
 {
 
-	m_ir & 0b11100000;
+	m_ir &= 0b11100000;
 
 	unsigned bit = 0x01;
 	for (auto socket : m_sockets)
@@ -920,7 +920,7 @@ void w5100_device::copy_from_tx_buffer(int sn, unsigned offset, uint8_t *data, i
 		for (int i = 0; i < length; ++i, ++offset)
 		{
 			offset &= mask;
-			if (offset < limit) data[i] = data[i] = buffer_base[offset];
+			if (offset < limit) data[i] = buffer_base[offset];
 			else data[i] = m_tx_buffer[offset];
 		}
 	}

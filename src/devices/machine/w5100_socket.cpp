@@ -659,6 +659,7 @@ void w5100_socket_device::command(unsigned command)
 		case Sn_CR_CONNECT:
 			LOGMASKED(LOG_COMMAND, "Command: Connect %s\n", ip_to_string(m_pending_dipr, m_pending_dport));
 			command_connect();
+			break;
 		case Sn_CR_DISCON:
 			LOGMASKED(LOG_COMMAND, "Command: Disconnect\n");
 			command_disconnect();
