@@ -2,8 +2,7 @@
 // copyright-holders:Chris Moore
 /***************************************************************************
 
-GAME PLAN driver
-
+Killer Comet hardware, by Centuri (previously known as Allied Leisure)
 driver by Chris Moore
 
 Killer Comet memory map
@@ -99,15 +98,15 @@ BTANB:
  *
  *************************************/
 
-void gameplan_state::machine_start()
+void killcom_state::machine_start()
 {
-	// register for save states (gameplan specific)
+	// register for save states (killcom specific)
 	save_item(NAME(m_current_port));
 	save_item(NAME(m_audio_reset));
 	save_item(NAME(m_audio_trigger));
 }
 
-void gameplan_state::machine_reset()
+void killcom_state::machine_reset()
 {
 	m_video_x = 0;
 	m_video_y = 0;
@@ -115,15 +114,15 @@ void gameplan_state::machine_reset()
 }
 
 
-void gameplan_state::video_start()
+void killcom_state::video_start()
 {
 	m_videoram = make_unique_clear<uint8_t[]>(0x10000);
 	save_pointer(NAME(m_videoram), 0x10000);
 
-	m_hblank_timer[0] = timer_alloc(FUNC(gameplan_state::hblank_callback), this);
+	m_hblank_timer[0] = timer_alloc(FUNC(killcom_state::hblank_callback), this);
 	m_hblank_timer[0]->adjust(attotime::zero, 0, m_screen->scan_period());
 
-	m_hblank_timer[1] = timer_alloc(FUNC(gameplan_state::hblank_callback), this);
+	m_hblank_timer[1] = timer_alloc(FUNC(killcom_state::hblank_callback), this);
 	m_hblank_timer[1]->adjust(256 * m_screen->pixel_period(), 1, m_screen->scan_period());
 
 	// register for save states
@@ -143,7 +142,7 @@ void gameplan_state::video_start()
  *
  *************************************/
 
-uint32_t gameplan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t killcom_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -164,39 +163,39 @@ uint32_t gameplan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(gameplan_state::hblank_callback)
+TIMER_CALLBACK_MEMBER(killcom_state::hblank_callback)
 {
 	// screen HBLANK is tied to VIA1 PB6
 	m_via[0]->write_pb6(param);
 }
 
 
-void gameplan_state::video_data_w(uint8_t data)
+void killcom_state::video_data_w(uint8_t data)
 {
 	m_video_data = data;
 }
 
 
-void gameplan_state::video_command_w(uint8_t data)
+void killcom_state::video_command_w(uint8_t data)
 {
 	m_video_command = data & 0x07;
 }
 
 
-uint8_t gameplan_state::video_status_r()
+uint8_t killcom_state::video_status_r()
 {
 	// video busy flags on the upper bits
 	return 0xff;
 }
 
 
-uint8_t gameplan_state::leprechn_videoram_r()
+uint8_t killcom_state::leprechn_videoram_r()
 {
 	return (video_status_r() & 0xf8) | m_video_previous;
 }
 
 
-void gameplan_state::video_command_trigger_w(int state)
+void killcom_state::video_command_trigger_w(int state)
 {
 	if (state && !m_video_command_trigger)
 	{
@@ -262,13 +261,13 @@ void gameplan_state::video_command_trigger_w(int state)
  *
  *************************************/
 
-void gameplan_state::io_select_w(uint8_t data)
+void killcom_state::io_select_w(uint8_t data)
 {
 	m_current_port = data;
 }
 
 
-uint8_t gameplan_state::io_port_r()
+uint8_t killcom_state::io_port_r()
 {
 	uint8_t data = 0xff;
 
@@ -286,7 +285,7 @@ uint8_t gameplan_state::io_port_r()
 }
 
 
-void gameplan_state::coin_w(int state)
+void killcom_state::coin_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, ~state & 1);
 }
@@ -299,7 +298,7 @@ void gameplan_state::coin_w(int state)
  *
  *************************************/
 
-void gameplan_state::audio_reset_sync_w(int param)
+void killcom_state::audio_reset_sync_w(int param)
 {
 	if (param && !m_audio_reset)
 	{
@@ -312,22 +311,22 @@ void gameplan_state::audio_reset_sync_w(int param)
 }
 
 
-void gameplan_state::audio_reset_w(int state)
+void killcom_state::audio_reset_w(int state)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(gameplan_state::audio_reset_sync_w), this), state);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(killcom_state::audio_reset_sync_w), this), state);
 }
 
 
-void gameplan_state::audio_trigger_sync_w(int param)
+void killcom_state::audio_trigger_sync_w(int param)
 {
 	m_audio_trigger = param;
 	m_riot->pa_w<7>(param);
 }
 
 
-void gameplan_state::audio_trigger_w(int state)
+void killcom_state::audio_trigger_w(int state)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(gameplan_state::audio_trigger_sync_w), this), state);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(killcom_state::audio_trigger_sync_w), this), state);
 }
 
 
@@ -338,7 +337,7 @@ void gameplan_state::audio_trigger_w(int state)
  *
  *************************************/
 
-uint8_t gameplan_state::soundlatch_r()
+uint8_t killcom_state::soundlatch_r()
 {
 	return m_audio_trigger << 7 | (m_soundlatch->read() & 0x7f);
 }
@@ -351,7 +350,7 @@ uint8_t gameplan_state::soundlatch_r()
  *
  *************************************/
 
-void gameplan_state::gameplan_main_map(address_map &map)
+void killcom_state::killcom_main_map(address_map &map)
 {
 	map(0x0000, 0x03ff).mirror(0x0400).ram();
 	map(0x2000, 0x200f).mirror(0x07f0).m(m_via[0], FUNC(via6522_device::map)); // VIA 1
@@ -360,9 +359,9 @@ void gameplan_state::gameplan_main_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-void gameplan_state::piratetr_main_map(address_map &map)
+void killcom_state::piratetr_main_map(address_map &map)
 {
-	gameplan_main_map(map);
+	killcom_main_map(map);
 	map(0x2010, 0x201f).mirror(0x07e0).unmaprw(); // A4, see TODO
 }
 
@@ -374,7 +373,7 @@ void gameplan_state::piratetr_main_map(address_map &map)
  *
  *************************************/
 
-void gameplan_state::gameplan_audio_map(address_map &map)
+void killcom_state::killcom_audio_map(address_map &map)
 {
 	map(0x0000, 0x007f).mirror(0x1780).m(m_riot, FUNC(mos6532_new_device::ram_map));
 	map(0x0800, 0x081f).mirror(0x17e0).m(m_riot, FUNC(mos6532_new_device::io_map));
@@ -384,9 +383,9 @@ void gameplan_state::gameplan_audio_map(address_map &map)
 	map(0xe000, 0xe7ff).mirror(0x1800).rom();
 }
 
-void gameplan_state::leprechn_audio_map(address_map &map)
+void killcom_state::leprechn_audio_map(address_map &map)
 {
-	gameplan_audio_map(map);
+	killcom_audio_map(map);
 	map(0xe000, 0xefff).mirror(0x1000).rom();
 }
 
@@ -1108,58 +1107,58 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void gameplan_state::gameplan_video(machine_config &config)
+void killcom_state::killcom_video(machine_config &config)
 {
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(11.6688_MHz_XTAL / 2, 352, 0, 256, 280, 0, 256);
-	m_screen->set_screen_update(FUNC(gameplan_state::screen_update));
+	m_screen->set_screen_update(FUNC(killcom_state::screen_update));
 	m_screen->screen_vblank().set(m_via[0], FUNC(via6522_device::write_ca1)); // VBLANK is connected to CA1
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::RGB_3BIT);
 }
 
-void gameplan_state::gameplan(machine_config &config)
+void killcom_state::killcom(machine_config &config)
 {
 	// basic machine hardware
 	M6502(config, m_maincpu, 3.579545_MHz_XTAL / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gameplan_state::gameplan_main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &killcom_state::killcom_main_map);
 
 	input_merger_device &main_irqs(INPUT_MERGER_ANY_HIGH(config, "main_irqs"));
 	main_irqs.output_handler().set_inputline(m_maincpu, 0);
 
 	M6502(config, m_audiocpu, 3.579545_MHz_XTAL / 4);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &gameplan_state::gameplan_audio_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &killcom_state::killcom_audio_map);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MOS6532_NEW(config, m_riot, 3.579545_MHz_XTAL / 4);
-	m_riot->pa_rd_callback().set(FUNC(gameplan_state::soundlatch_r));
+	m_riot->pa_rd_callback().set(FUNC(killcom_state::soundlatch_r));
 	m_riot->pb_wr_callback().set(m_via[2], FUNC(via6522_device::write_pb));
 	m_riot->irq_wr_callback().set_inputline(m_audiocpu, 0);
 
 	// via
 	MOS6522(config, m_via[0], 3.579545_MHz_XTAL / 4);
-	m_via[0]->writepa_handler().set(FUNC(gameplan_state::video_data_w));
-	m_via[0]->writepb_handler().set(FUNC(gameplan_state::video_command_w));
-	m_via[0]->readpb_handler().set(FUNC(gameplan_state::video_status_r));
-	m_via[0]->ca2_handler().set(FUNC(gameplan_state::video_command_trigger_w));
+	m_via[0]->writepa_handler().set(FUNC(killcom_state::video_data_w));
+	m_via[0]->writepb_handler().set(FUNC(killcom_state::video_command_w));
+	m_via[0]->readpb_handler().set(FUNC(killcom_state::video_status_r));
+	m_via[0]->ca2_handler().set(FUNC(killcom_state::video_command_trigger_w));
 	m_via[0]->irq_handler().set("main_irqs", FUNC(input_merger_device::in_w<0>));
 
 	MOS6522(config, m_via[1], 3.579545_MHz_XTAL / 4);
-	m_via[1]->readpa_handler().set(FUNC(gameplan_state::io_port_r));
-	m_via[1]->writepb_handler().set(FUNC(gameplan_state::io_select_w));
-	m_via[1]->cb2_handler().set(FUNC(gameplan_state::coin_w));
+	m_via[1]->readpa_handler().set(FUNC(killcom_state::io_port_r));
+	m_via[1]->writepb_handler().set(FUNC(killcom_state::io_select_w));
+	m_via[1]->cb2_handler().set(FUNC(killcom_state::coin_w));
 	m_via[1]->irq_handler().set("main_irqs", FUNC(input_merger_device::in_w<1>));
 
 	MOS6522(config, m_via[2], 3.579545_MHz_XTAL / 4);
 	m_via[2]->writepa_handler().set(m_soundlatch, FUNC(generic_latch_8_device::write));
-	m_via[2]->ca2_handler().set(FUNC(gameplan_state::audio_trigger_w));
-	m_via[2]->cb2_handler().set(FUNC(gameplan_state::audio_reset_w));
+	m_via[2]->ca2_handler().set(FUNC(killcom_state::audio_trigger_w));
+	m_via[2]->cb2_handler().set(FUNC(killcom_state::audio_reset_w));
 	m_via[2]->irq_handler().set("main_irqs", FUNC(input_merger_device::in_w<2>));
 
 	// video hardware
-	gameplan_video(config);
+	killcom_video(config);
 
 	// audio hardware
 	SPEAKER(config, "mono").front_center();
@@ -1170,9 +1169,9 @@ void gameplan_state::gameplan(machine_config &config)
 	m_ay->add_route(ALL_OUTPUTS, "mono", 0.33);
 }
 
-void gameplan_state::leprechn(machine_config &config)
+void killcom_state::leprechn(machine_config &config)
 {
-	gameplan(config);
+	killcom(config);
 
 	// basic machine hardware
 	m_maincpu->set_clock(4_MHz_XTAL / 4);
@@ -1184,17 +1183,17 @@ void gameplan_state::leprechn(machine_config &config)
 	m_riot->set_clock(4_MHz_XTAL / 4);
 	m_ay->set_clock(4_MHz_XTAL / 2);
 
-	m_audiocpu->set_addrmap(AS_PROGRAM, &gameplan_state::leprechn_audio_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &killcom_state::leprechn_audio_map);
 
 	// via
-	m_via[0]->readpb_handler().set(FUNC(gameplan_state::leprechn_videoram_r));
-	m_via[0]->writepb_handler().set(FUNC(gameplan_state::video_command_w)).rshift(3);
+	m_via[0]->readpb_handler().set(FUNC(killcom_state::leprechn_videoram_r));
+	m_via[0]->writepb_handler().set(FUNC(killcom_state::video_command_w)).rshift(3);
 }
 
-void gameplan_state::piratetr(machine_config &config)
+void killcom_state::piratetr(machine_config &config)
 {
 	leprechn(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gameplan_state::piratetr_main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &killcom_state::piratetr_main_map);
 }
 
 
@@ -1350,13 +1349,14 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, killcom,   0,        gameplan, killcom,   gameplan_state, empty_init, ROT0,   "Centuri (Game Plan license)", "Killer Comet",     MACHINE_SUPPORTS_SAVE )
-GAME( 1980, megatack,  0,        gameplan, megatack,  gameplan_state, empty_init, ROT0,   "Centuri (Game Plan license)", "Megatack (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, megatacka, megatack, gameplan, megatack,  gameplan_state, empty_init, ROT0,   "Centuri (Game Plan license)", "Megatack (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, challeng,  0,        gameplan, challeng,  gameplan_state, empty_init, ROT270, "Centuri",                     "Challenger",       MACHINE_SUPPORTS_SAVE ) // cab is vertical
+//    YEAR  NAME       PARENT    MACHINE   INPUT      CLASS          INIT        SCREEN  COMPANY                        FULLNAME            FLAGS
+GAME( 1980, killcom,   0,        killcom,  killcom,   killcom_state, empty_init, ROT0,   "Centuri (Game Plan license)", "Killer Comet",     MACHINE_SUPPORTS_SAVE )
+GAME( 1980, megatack,  0,        killcom,  megatack,  killcom_state, empty_init, ROT0,   "Centuri (Game Plan license)", "Megatack (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, megatacka, megatack, killcom,  megatack,  killcom_state, empty_init, ROT0,   "Centuri (Game Plan license)", "Megatack (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, challeng,  0,        killcom,  challeng,  killcom_state, empty_init, ROT270, "Centuri",                     "Challenger",       MACHINE_SUPPORTS_SAVE ) // cab is vertical
 
-GAME( 1981, kaos,      0,        gameplan, kaos,      gameplan_state, empty_init, ROT270, "Pacific Polytechnical Corp. (Game Plan license)",       "Kaos",               MACHINE_SUPPORTS_SAVE )
-GAME( 1982, leprechn,  0,        leprechn, leprechn,  gameplan_state, empty_init, ROT0,   "Pacific Polytechnical Corp.",                           "Leprechaun (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, leprechna, leprechn, leprechn, leprechna, gameplan_state, empty_init, ROT0,   "Pacific Polytechnical Corp. (Tong Electronic license)", "Leprechaun (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, potogold,  leprechn, leprechn, leprechn,  gameplan_state, empty_init, ROT0,   "Pacific Polytechnical Corp. (Game Plan license)",       "Pot of Gold",        MACHINE_SUPPORTS_SAVE )
-GAME( 1982, piratetr,  0,        piratetr, piratetr,  gameplan_state, empty_init, ROT0,   "Pacific Polytechnical Corp. (Tong Electronic license)", "Pirate Treasure",    MACHINE_SUPPORTS_SAVE )
+GAME( 1981, kaos,      0,        killcom,  kaos,      killcom_state, empty_init, ROT270, "Pacific Polytechnical Corp. (Game Plan license)",       "Kaos",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, leprechn,  0,        leprechn, leprechn,  killcom_state, empty_init, ROT0,   "Pacific Polytechnical Corp.",                           "Leprechaun (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, leprechna, leprechn, leprechn, leprechna, killcom_state, empty_init, ROT0,   "Pacific Polytechnical Corp. (Tong Electronic license)", "Leprechaun (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, potogold,  leprechn, leprechn, leprechn,  killcom_state, empty_init, ROT0,   "Pacific Polytechnical Corp. (Game Plan license)",       "Pot of Gold",        MACHINE_SUPPORTS_SAVE )
+GAME( 1982, piratetr,  0,        piratetr, piratetr,  killcom_state, empty_init, ROT0,   "Pacific Polytechnical Corp. (Tong Electronic license)", "Pirate Treasure",    MACHINE_SUPPORTS_SAVE )

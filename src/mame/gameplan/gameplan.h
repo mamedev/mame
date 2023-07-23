@@ -2,7 +2,7 @@
 // copyright-holders:Chris Moore
 /***************************************************************************
 
-GAME PLAN driver
+    Killer Comet driver
 
 ***************************************************************************/
 
@@ -16,10 +16,10 @@ GAME PLAN driver
 #include "screen.h"
 
 
-class gameplan_state : public driver_device
+class killcom_state : public driver_device
 {
 public:
-	gameplan_state(const machine_config &mconfig, device_type type, const char *tag) :
+	killcom_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via(*this, "via%u", 1U),
@@ -32,8 +32,8 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
-	void gameplan(machine_config &config);
-	void gameplan_video(machine_config &config);
+	void killcom(machine_config &config);
+	void killcom_video(machine_config &config);
 	void leprechn(machine_config &config);
 	void piratetr(machine_config &config);
 
@@ -48,6 +48,7 @@ protected:
 	optional_ioport_array<4> m_inputs;
 	optional_ioport_array<4> m_dsw;
 
+	void coin_w(int state);
 	void video_data_w(uint8_t data);
 	void video_command_w(uint8_t data);
 	uint8_t video_status_r();
@@ -78,7 +79,6 @@ private:
 
 	void io_select_w(uint8_t data);
 	uint8_t io_port_r();
-	void coin_w(int state);
 	void audio_reset_w(int state);
 	void audio_reset_sync_w(int param);
 	void audio_trigger_w(int state);
@@ -88,8 +88,8 @@ private:
 	TIMER_CALLBACK_MEMBER(hblank_callback);
 	uint8_t leprechn_videoram_r();
 
-	void gameplan_main_map(address_map &map);
-	void gameplan_audio_map(address_map &map);
+	void killcom_main_map(address_map &map);
+	void killcom_audio_map(address_map &map);
 	void leprechn_audio_map(address_map &map);
 	void piratetr_main_map(address_map &map);
 };

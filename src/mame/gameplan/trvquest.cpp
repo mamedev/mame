@@ -32,7 +32,7 @@ as is.
  driver by Pierpaolo Prazzoli
 
 Notes:
-- Hardware is similar to the one in gameplan.cpp
+- Hardware is similar to the one in killcom.cpp
 
 */
 
@@ -49,63 +49,76 @@ Notes:
 
 namespace {
 
-class trvquest_state : public gameplan_state
+class trvquest_state : public killcom_state
 {
 public:
 	trvquest_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gameplan_state(mconfig, type, tag),
-		m_question(*this, "question"),
-		m_questions_region(*this, "questions")
+		killcom_state(mconfig, type, tag),
+		m_bank(*this, "bank")
 	{ }
 
 	void trvquest(machine_config &config);
 
 protected:
-	virtual void machine_start() override { }
+	virtual void machine_start() override;
 
 private:
-	required_shared_ptr<uint8_t> m_question;
-	required_region_ptr<uint8_t> m_questions_region;
+	required_memory_bank m_bank;
 
-	uint8_t question_r(offs_t offset);
-	void coin_w(int state);
-	void misc_w(int state);
+	void bankswitch_w(uint8_t data);
 
-	void cpu_map(address_map &map);
+	void main_map(address_map &map);
 };
 
 
-uint8_t trvquest_state::question_r(offs_t offset)
+
+/*************************************
+ *
+ *  Bankswitch
+ *
+ *************************************/
+
+void trvquest_state::machine_start()
 {
-	return m_questions_region[*m_question * 0x2000 + offset];
+	m_bank->configure_entries(0, 16, memregion("questions")->base(), 0x2000);
 }
 
-void trvquest_state::coin_w(int state)
+void trvquest_state::bankswitch_w(uint8_t data)
 {
-	machine().bookkeeping().coin_counter_w(0, ~state & 1);
+	m_bank->set_entry(data & 0xf);
 }
 
-void trvquest_state::misc_w(int state)
-{
-	// data & 1 -> led on/off ?
-}
 
-void trvquest_state::cpu_map(address_map &map)
+
+/*************************************
+ *
+ *  Address map
+ *
+ *************************************/
+
+void trvquest_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram"); // cmos ram
 	map(0x2000, 0x27ff).ram(); // main ram
+	map(0x2800, 0x2800).nopr(); // ?
 	map(0x3800, 0x380f).m(m_via[1], FUNC(via6522_device::map));
 	map(0x3810, 0x381f).m(m_via[2], FUNC(via6522_device::map));
 	map(0x3820, 0x382f).m(m_via[0], FUNC(via6522_device::map));
 	map(0x3830, 0x3831).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x3840, 0x3841).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0x3850, 0x3850).nopr(); //watchdog_reset_r ?
-	map(0x8000, 0x9fff).r(FUNC(trvquest_state::question_r));
-	map(0xa000, 0xa000).writeonly().share(m_question);
-	map(0xa000, 0xa000).nopr(); // bogus read from the game code when reads question roms
+	map(0x3850, 0x3850).nopr(); // watchdog_reset_r ?
+	map(0x8000, 0x9fff).bankr(m_bank);
+	map(0xa000, 0xa000).w(FUNC(trvquest_state::bankswitch_w)).nopr();
 	map(0xb000, 0xffff).rom();
 }
 
+
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( trvquest )
 	PORT_START("IN0")
@@ -182,10 +195,17 @@ static INPUT_PORTS_START( trvquest )
 INPUT_PORTS_END
 
 
+
+/*************************************
+ *
+ *  Machine config
+ *
+ *************************************/
+
 void trvquest_state::trvquest(machine_config &config)
 {
 	M6809(config, m_maincpu, 6_MHz_XTAL/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &trvquest_state::cpu_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &trvquest_state::main_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -204,11 +224,10 @@ void trvquest_state::trvquest(machine_config &config)
 	MOS6522(config, m_via[2], 6_MHz_XTAL/4);
 	m_via[2]->readpa_handler().set_ioport("UNK");
 	m_via[2]->readpb_handler().set_ioport("DSW0");
-	m_via[2]->ca2_handler().set(FUNC(trvquest_state::misc_w));
 	m_via[2]->irq_handler().set_inputline(m_maincpu, 0);
 
 	// video hardware
-	gameplan_video(config);
+	killcom_video(config);
 	m_screen->screen_vblank().set(m_via[2], FUNC(via6522_device::write_ca1));
 
 	// sound hardware
@@ -219,6 +238,13 @@ void trvquest_state::trvquest(machine_config &config)
 }
 
 
+
+/*************************************
+ *
+ *  ROM defintions
+ *
+ *************************************/
+
 ROM_START( trvquest )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom3", 0xb000, 0x1000, CRC(2ff7f370) SHA1(66f40426ed02ee44235e17a49d9054ede42b83b9) )
@@ -227,8 +253,8 @@ ROM_START( trvquest )
 	ROM_LOAD( "rom6", 0xe000, 0x1000, CRC(fabf4846) SHA1(862cac32de78f2ff4afef398b864d5533d302a4f) )
 	ROM_LOAD( "rom7", 0xf000, 0x1000, CRC(a9f56551) SHA1(fb6fc3b17a6e66571a5ba837befbfac1ac26cc39) )
 
-	ROM_REGION( 0x18000, "questions", ROMREGION_ERASEFF ) /* Question roms */
-	/* 0x00000 - 0x07fff empty */
+	ROM_REGION( 0x20000, "questions", ROMREGION_ERASEFF ) // Question roms
+	// 0x00000 - 0x05fff empty
 	ROM_LOAD( "romi", 0x06000, 0x2000, CRC(c8368f69) SHA1(c1dfb701482c5ae922df0a93665a519995a2f4f1) )
 	ROM_LOAD( "romh", 0x08000, 0x2000, CRC(f3aa8a08) SHA1(2bf8f878cc1df84806a6fb8e7be2656c422d61b9) )
 	ROM_LOAD( "romg", 0x0a000, 0x2000, CRC(f85f8e48) SHA1(38c9142181a8ee5c0bc80cf2a06d4137fcb2a8b9) )
@@ -243,4 +269,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1984, trvquest, 0, trvquest, trvquest, trvquest_state, empty_init, ROT90, "Techstar / Sunn", "Trivia Quest", MACHINE_SUPPORTS_SAVE )
+
+//    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        SCREEN  COMPANY            FULLNAME        FLAGS
+GAME( 1984, trvquest, 0,      trvquest, trvquest, trvquest_state, empty_init, ROT90,  "Techstar / Sunn", "Trivia Quest", MACHINE_SUPPORTS_SAVE )
