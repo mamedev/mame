@@ -460,8 +460,25 @@ ace                             // [1976 Allied Leisure]
 @source:alliedleisure/aleisttl.cpp
 sburners                        // (c) 1975 Allied Leisure
 
+@source:alliedleisure/aztarac.cpp
+aztarac                         // (c) 1983 Centuri (vector game)
+
 @source:alliedleisure/clayshoo.cpp
 clayshoo                        // [1979 Allied Leisure]
+
+@source:alliedleisure/killcom.cpp
+challeng                        // (c) 1981 Centuri
+kaos                            // (c) 1981
+killcom                         // (c) 1980 Centuri
+leprechn                        // (c) 1982
+leprechna                       // (c) 1982
+megatack                        // (c) 1980 Centuri
+megatacka                       // (c) 1980 Centuri
+piratetr                        // (c) 1982
+potogold                        // (c) 1982
+
+@source:alliedleisure/trvquest.cpp
+trvquest                        // (c) 1984 Techstar / Sunn
 
 @source:alpha/alpha68k.cpp
 btlfield                        // Alpha-68K96II 'BT' (c) 1987
@@ -18592,29 +18609,6 @@ gp2x                            // GP2X 2005
 @source:gamepark/gp32.cpp
 gp32                            // GP32 2001
 
-@source:gameplan/enigma2.cpp
-enigma2                         // (c) 1981 Game Plan (Zilec Electronics license)
-enigma2a                        // (c) 1984 Zilec Electronics (bootleg?)
-enigma2b                        // (c) 1981 Zilec Electronics
-
-@source:gameplan/gameplan.cpp
-challeng                        // (c) 1981 Centuri
-kaos                            // (c) 1981
-killcom                         // (c) 1980 Centuri
-leprechn                        // (c) 1982
-leprechna                       // (c) 1982
-megatack                        // (c) 1980 Centuri
-megatacka                       // (c) 1980 Centuri
-piratetr                        // (c) 1982
-potogold                        // (c) 1982
-
-@source:gameplan/toratora.cpp
-toratora                        // (c) 1980 Game Plan
-toratorab                       // (c) 1980 Game Plan
-
-@source:gameplan/trvquest.cpp
-trvquest                        // (c) 1984 Sunn / Techstar
-
 @source:gametron/gatron.cpp
 bingo                           // Game-A-Tron?
 poker41                         // (c) 1983 Game-A-Tron
@@ -28473,9 +28467,6 @@ avtnfl                          // (c) 1989 AVT
 avtsym14                        // (c) 1985 AVT
 avtsym25                        // (c) 1985 AVT
 
-@source:misc/aztarac.cpp
-aztarac                         // (c) 1983 Centuri (vector game)
-
 @source:misc/babysuprem.cpp
 bsuprem                         // (c) 198? Andra / Vifico
 
@@ -29432,6 +29423,11 @@ foolrace
 @source:misc/electra.cpp
 avenger                         // (c) 1975 Electra
 flyingf                         // (c) 1976 Electra
+
+@source:misc/enigma2.cpp
+enigma2                         // (c) 1981 Zilec Electronics (Game Plan license)
+enigma2a                        // (c) 1984 Zilec Electronics (bootleg?)
+enigma2b                        // (c) 1981 Zilec Electronics
 
 @source:misc/epos.cpp
 catapult                        // (c) 1982
@@ -31683,6 +31679,10 @@ tmspoker                        //
 @source:misc/tomsadvs.cpp
 icecoldice                      // (c) ICE
 tomsadvs                        //
+
+@source:misc/toratora.cpp
+toratora                        // (c) 1980 Game Plan
+toratorab                       // (c) 1980 Game Plan
 
 @source:misc/triton.cpp
 triton41                        // 1978 Transam Triton L4.1

@@ -34,8 +34,8 @@ namespace {
 class aztarac_state : public driver_device
 {
 public:
-	aztarac_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	aztarac_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_nvram(*this, "nvram"),
@@ -44,7 +44,8 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_vectorram(*this, "vectorram"),
 		m_sticky(*this, "STICKY"),
-		m_stickz(*this, "STICKZ") { }
+		m_stickz(*this, "STICKZ")
+	{ }
 
 	void aztarac(machine_config &config);
 
@@ -382,11 +383,8 @@ void aztarac_state::aztarac(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	AY8910(config, "ay1", 16_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
-
 	AY8910(config, "ay2", 16_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
-
 	AY8910(config, "ay3", 16_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
-
 	AY8910(config, "ay4", 16_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
 }
 

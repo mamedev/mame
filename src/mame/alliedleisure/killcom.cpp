@@ -85,7 +85,7 @@ BTANB:
 ****************************************************************************/
 
 #include "emu.h"
-#include "gameplan.h"
+#include "killcom.h"
 
 #include "cpu/m6502/m6502.h"
 #include "speaker.h"
@@ -100,7 +100,7 @@ BTANB:
 
 void killcom_state::machine_start()
 {
-	// register for save states (killcom specific)
+	// register for save states
 	save_item(NAME(m_current_port));
 	save_item(NAME(m_audio_reset));
 	save_item(NAME(m_audio_trigger));

@@ -5,6 +5,17 @@
 Trivia Quest
 Sunn/Techstar 1984
 
+ driver by Pierpaolo Prazzoli
+
+This is a subdriver of killcom.cpp, the hardware is similar to it,
+video blitter hardware is identical.
+
+TODO:
+- button response is too rapid? PORT_IMPULSE on coin is also a bad sign
+
+
+PCB notes:
+
 CPU: 6809
 Three SY6522 - for flashing lighted buttons?
 
@@ -24,20 +35,13 @@ rom3 through rom7 - Main pcb PRG.
 
 roma through romi - Sub pcb Questions.
 
-The main pcb had empty sockets for
-rom0, rom1 and rom2.
-This pcb has been tested and works
-as is.
-
- driver by Pierpaolo Prazzoli
-
-Notes:
-- Hardware is similar to the one in killcom.cpp
+The main pcb had empty sockets for rom0, rom1 and rom2.
+This pcb has been tested and works as is.
 
 */
 
 #include "emu.h"
-#include "gameplan.h"
+#include "killcom.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/6522via.h"
@@ -80,6 +84,7 @@ private:
 
 void trvquest_state::machine_start()
 {
+	// no need to call killcom_state::machine_start()
 	m_bank->configure_entries(0, 16, memregion("questions")->base(), 0x2000);
 }
 
