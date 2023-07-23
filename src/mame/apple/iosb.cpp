@@ -329,7 +329,7 @@ void iosb_device::scsi_irq_w(int state)
 
 void iosb_device::asc_irq(int state)
 {
-	m_via2->write_cb1(state);
+	m_via2->write_cb1(state ^ 1);
 	m_asc_irq = state;
 }
 
