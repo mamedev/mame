@@ -59,7 +59,6 @@ private:
 	uint8_t m_current_port = 0;
 	uint8_t m_audio_reset = 0;
 	uint8_t m_audio_trigger = 0;
-	uint8_t m_riot_irq = 0;
 
 	/* video state */
 	std::unique_ptr<uint8_t[]> m_videoram;
