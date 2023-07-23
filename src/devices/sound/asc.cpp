@@ -457,8 +457,6 @@ void asc_device::write(offs_t offset, uint8_t data)
 	{
 		if (m_regs[R_MODE-0x800] == 1)
 		{
-			if (m_fifo_cap_a >= 0x400) printf("Overflow FIFO A!\n");
-
 			m_fifo_a[m_fifo_a_wrptr++] = data;
 			m_fifo_cap_a++;
 
