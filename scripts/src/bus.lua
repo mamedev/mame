@@ -6277,3 +6277,16 @@ if (BUSES["STCART_CONNECTOR"]~=null) then
 		MAME_DIR .. "src/devices/bus/st/rom.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/bus/applepp/applepp.h,BUSES["APPLEPP"] = true
+---------------------------------------------------
+if (BUSES["APPLEPP"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/applepp/applepp.cpp",
+		MAME_DIR .. "src/devices/bus/applepp/applepp.h",
+		MAME_DIR .. "src/devices/bus/applepp/storagehle.cpp",
+		MAME_DIR .. "src/devices/bus/applepp/storagehle.h",
+	}
+end

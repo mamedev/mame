@@ -5490,3 +5490,15 @@ if (MACHINES["SUN1_MMU"]~=null) then
 		MAME_DIR .. "src/devices/machine/sun1_mmu.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/quadmouse.h,MACHINES["QUADMOUSE"] = true
+---------------------------------------------------
+
+if (MACHINES["QUADMOUSE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/quadmouse.cpp",
+		MAME_DIR .. "src/devices/machine/quadmouse.h",
+	}
+end
