@@ -5272,3 +5272,15 @@ if (MACHINES["TC9223"]~=null) then
 		MAME_DIR .. "src/devices/machine/tc9223.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/quadmouse.h,MACHINES["QUADMOUSE"] = true
+---------------------------------------------------
+
+if (MACHINES["QUADMOUSE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/quadmouse.cpp",
+		MAME_DIR .. "src/devices/machine/quadmouse.h",
+	}
+end

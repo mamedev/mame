@@ -33,6 +33,49 @@ m68000_device::m68000_device(const machine_config &mconfig, device_type type, co
 {
 }
 
+u16 m68000_device::mmu_disabled::read_program(offs_t addr, u16 mem_mask)
+{
+	return 0;
+}
+
+void m68000_device::mmu_disabled::write_program(offs_t addr, u16 data, u16 mem_mask)
+{
+}
+
+u16 m68000_device::mmu_disabled::read_data(offs_t addr, u16 mem_mask)
+{
+	return 0;
+}
+
+void m68000_device::mmu_disabled::write_data(offs_t addr, u16 data, u16 mem_mask)
+{
+}
+
+u16 m68000_device::mmu_disabled::read_cpu(offs_t addr, u16 mem_mask)
+{
+	return 0;
+}
+
+void m68000_device::mmu_disabled::set_super(bool super)
+{
+}
+
+bool m68000_device::mmu_disabled::translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
+{
+	return false;
+}
+
+void m68000_device::enable_mmu(bool disable_spaces)
+{
+	m_mmu = &m_mmu_disabled;
+	m_disable_spaces = disable_spaces;
+}
+
+void m68000_device::set_current_mmu(mmu *mmu)
+{
+	m_mmu = mmu;
+}
+
 void m68000_device::abort_access(u32 reason)
 {
 	m_post_run = reason;
@@ -134,7 +177,7 @@ void m68000_device::execute_run()
 	}
 }
 
-device_memory_interface::space_config_vector m68000_device::memory_space_config() const
+device_memory_interface::space_config_vector m68000_device::memory_logical_space_config() const
 {
 	device_memory_interface::space_config_vector scv;
 	scv.push_back(std::make_pair(AS_PROGRAM, &m_program_config));
@@ -148,6 +191,15 @@ device_memory_interface::space_config_vector m68000_device::memory_space_config(
 		scv.push_back(std::make_pair(AS_CPU_SPACE, &m_cpu_space_config));
 	return scv;
 }
+
+device_memory_interface::space_config_vector m68000_device::memory_space_config() const
+{
+	if(m_disable_spaces)
+		return device_memory_interface::space_config_vector();
+	else
+		return memory_logical_space_config();
+}
+
 
 void m68000_device::default_autovectors_map(address_map &map)
 {
@@ -474,3 +526,12 @@ void m68000_device::end_interrupt_vector_lookup()
 	m_int_vector = (m_edb & 0xff) << 2;
 	m_int_next_state = 0;
 }
+
+bool m68000_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
+{
+	if(m_mmu)
+		return m_mmu->translate(spacenum, intention, address, target_space);
+	else
+		return device_memory_interface::memory_translate(spacenum, intention, address, target_space);
+}
+
