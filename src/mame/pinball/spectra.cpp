@@ -40,7 +40,7 @@ ToDo:
 #include "emu.h"
 #include "genpin.h"
 
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m6503.h"
 #include "machine/mos6530n.h"
 #include "machine/timer.h"
 #include "sound/sn76477.h"
@@ -97,7 +97,6 @@ private:
 void spectra_state::spectra_map(address_map &map)
 {
 	map.unmap_value_high();
-	map.global_mask(0xfff);
 	map(0x0000, 0x00ff).ram().share("nvram"); // battery backed, 2x 5101L
 	map(0x0100, 0x017f).m(m_riot, FUNC(mos6532_new_device::ram_map));
 	map(0x0180, 0x019f).m(m_riot, FUNC(mos6532_new_device::io_map));
@@ -265,7 +264,7 @@ void spectra_state::machine_reset()
 void spectra_state::spectra(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, XTAL(3'579'545)/4); // actually a M6503
+	M6503(config, m_maincpu, XTAL(3'579'545)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spectra_state::spectra_map);
 
 	MOS6532_NEW(config, m_riot, XTAL(3'579'545)/4);

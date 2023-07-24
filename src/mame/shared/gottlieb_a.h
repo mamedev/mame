@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m6503.h"
 #include "machine/mos6530.h"
 #include "machine/6532riot.h"
 #include "sound/ay8910.h"
@@ -60,7 +61,7 @@ protected:
 
 private:
 	// devices
-	required_device<m6502_device>       m_cpu;
+	required_device<m6503_device>       m_cpu;
 	required_device<mos6530_device>     m_r6530;
 
 	uint8_t m_sndcmd = 0;
@@ -89,7 +90,7 @@ protected:
 
 private:
 	// devices
-	required_device<m6502_device>       m_cpu;
+	required_device<m6503_device>       m_cpu;
 	required_device<mos6530_device>     m_r6530;
 
 	uint8_t m_sndcmd = 0;

@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m740.c
+    m740.cpp
 
     Mitsubishi M740 series (M507xx/M509xx)
 

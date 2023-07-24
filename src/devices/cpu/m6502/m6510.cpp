@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m6510.c
+    m6510.cpp
 
     6502 with 6 i/o pins, also known as 8500
 

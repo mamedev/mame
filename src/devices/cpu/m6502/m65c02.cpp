@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m65c02.c
+    m65c02.cpp
 
     WDC W65C02, CMOS variant with some additional instructions
     (but not the bitwise ones)

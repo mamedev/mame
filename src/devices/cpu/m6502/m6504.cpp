@@ -2,9 +2,11 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m6504.c
+    m6504.cpp
 
     MOS Technology 6502, NMOS variant with reduced address bus
+
+    28-pin package, address bus is 13 bits, no NMI, no SO, no SYNC, no RDY.
 
 ***************************************************************************/
 
