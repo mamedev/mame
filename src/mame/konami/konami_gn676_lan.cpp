@@ -73,12 +73,12 @@ and the Racing Jam 2 dfc74cc9 firmware are actually the same except for the fina
 
 Racing Jam 2 and Thrill Drive were released as ROM conversion kits without having to replace the timekeeper.
 To circumvent this, Konami would use the B version network with the x76 as an additional check. Once installed, the
-system will boot with a backup data error prompting one to push the test button to reset settings to default (but keeps
-the intial string from 0x00-0x0f the same). Both Racing Jam 2 and Thrill Drive use the x76 differently.
+system will boot with a backup data error prompting one to push the test button to reset settings to default but keeps
+the intial string from 0x00-0x0f the same. Both Racing Jam 2 and Thrill Drive use the x76 differently.
 
 Racing Jam 2 enables x76 usage if the game detects a Racing Jam 1 timekeeper, G*676, expecting the region ID of the
-timekeeper and x76 to match (and gives a "hardware error" message if not). Cabinet type is determined by the timekeeper
-like with Racing Jam 1(as long as checksum at 0x0e-0x0f is changed accordingly). Using a Racing Jam 2 timekeeper, G*888, skips
+timekeeper and x76 to match and gives a "hardware error" message if not. Cabinet type is determined by the timekeeper
+like with Racing Jam 1 as long as checksum at 0x0e-0x0f is changed accordingly. Using a Racing Jam 2 timekeeper, G*888, skips
 the x76 check potentially allowing use of an A version network board as well.
 
 Thrill Drive (NWK-TR) always uses the x76 as that determines and forces the cabinet type instead of the timekeeper. For example, using a
