@@ -564,7 +564,7 @@ void c8050_device::add_common_devices(machine_config &config)
 	m_miot->pb_wr_callback<2>().set(m_fdc, FUNC(c8050_fdc_device::ds1_w));
 	m_miot->pb_rd_callback<3>().set(m_fdc, FUNC(c8050_fdc_device::wps_r));
 	m_miot->pb_rd_callback<6>().set_constant(1); // SINGLE SIDED
-	m_miot->pb_wr_callback<7>().set_inputline(m_fdccpu, M6502_IRQ_LINE).invert();
+	m_miot->irq_wr_callback().set_inputline(m_fdccpu, M6502_IRQ_LINE);
 
 	C8050_FDC(config, m_fdc, XTAL(12'000'000)/2);
 	m_fdc->sync_wr_callback().set(m_via, FUNC(via6522_device::write_pb7));
@@ -774,7 +774,7 @@ void c8050_device::device_reset()
 	m_miot->reset();
 	m_via->reset();
 
-	m_riot1->pa_w<7>(1);
+	m_riot1->pa_bit_w<7>(1);
 
 	// turn off spindle motors
 	m_fdc->mtr0_w(1);
@@ -790,7 +790,7 @@ void c8050_device::ieee488_atn(int state)
 {
 	update_ieee_signals();
 
-	m_riot1->pa_w<7>(state);
+	m_riot1->pa_bit_w<7>(state);
 }
 
 

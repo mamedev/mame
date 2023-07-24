@@ -485,11 +485,11 @@ void c2040_device::add_common_devices(machine_config &config)
 	m_miot->pb_wr_callback<0>().set(m_fdc, FUNC(c2040_fdc_device::drv_sel_w));
 	m_miot->pb_wr_callback<1>().set(m_fdc, FUNC(c2040_fdc_device::ds0_w));
 	m_miot->pb_wr_callback<2>().set(m_fdc, FUNC(c2040_fdc_device::ds1_w));
-	m_miot->pb_wr_callback<7>().set_inputline(m_fdccpu, M6502_IRQ_LINE).invert();
 	m_miot->pb_rd_callback<3>().set(m_fdc, FUNC(c2040_fdc_device::wps_r));
+	m_miot->irq_wr_callback().set_inputline(m_fdccpu, M6502_IRQ_LINE);
 
 	C2040_FDC(config, m_fdc, XTAL(16'000'000));
-	m_fdc->sync_wr_callback().set(m_miot, FUNC(mos6530_new_device::pb_w<6>));
+	m_fdc->sync_wr_callback().set(m_miot, FUNC(mos6530_new_device::pb_bit_w<6>));
 	m_fdc->ready_wr_callback().set(m_via, FUNC(via6522_device::write_ca1));
 	m_fdc->error_wr_callback().set(m_via, FUNC(via6522_device::write_cb1));
 }
@@ -658,7 +658,7 @@ void c2040_device::device_reset()
 	m_miot->reset();
 	m_via->reset();
 
-	m_riot1->pa_w<7>(0);
+	m_riot1->pa_bit_w<7>(0);
 
 	// turn off spindle motors
 	m_fdc->mtr0_w(1);
@@ -674,7 +674,7 @@ void c2040_device::ieee488_atn(int state)
 {
 	update_ieee_signals();
 
-	m_riot1->pa_w<7>(!state);
+	m_riot1->pa_bit_w<7>(!state);
 }
 
 

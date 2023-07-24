@@ -662,12 +662,12 @@ void firefox_state::firefox(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	GENERIC_LATCH_8(config, soundlatch[0]);
-	soundlatch[0]->data_pending_callback().set(m_riot, FUNC(mos6532_new_device::pa_w<7>)); // MAINFLAG
+	soundlatch[0]->data_pending_callback().set(m_riot, FUNC(mos6532_new_device::pa_bit_w<7>)); // MAINFLAG
 	soundlatch[0]->data_pending_callback().append_inputline(m_audiocpu, INPUT_LINE_NMI);
 	soundlatch[0]->data_pending_callback().append([this](int state) { if (state) machine().scheduler().perfect_quantum(attotime::from_usec(100)); });
 
 	GENERIC_LATCH_8(config, soundlatch[1]);
-	soundlatch[1]->data_pending_callback().set(m_riot, FUNC(mos6532_new_device::pa_w<6>)); // SOUNDFLAG
+	soundlatch[1]->data_pending_callback().set(m_riot, FUNC(mos6532_new_device::pa_bit_w<6>)); // SOUNDFLAG
 
 	for (int i = 0; i < 4; i++)
 	{

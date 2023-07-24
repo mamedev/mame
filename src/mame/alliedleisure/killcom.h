@@ -7,8 +7,6 @@
 ***************************************************************************/
 
 #include "machine/6522via.h"
-#include "machine/gen_latch.h"
-#include "machine/input_merger.h"
 #include "machine/mos6530n.h"
 #include "sound/ay8910.h"
 
@@ -28,8 +26,7 @@ public:
 		m_dsw(*this, "DSW%u", 0U),
 		m_audiocpu(*this, "audiocpu"),
 		m_riot(*this, "riot"),
-		m_ay(*this, "ay"),
-		m_soundlatch(*this, "soundlatch")
+		m_ay(*this, "ay")
 	{ }
 
 	void killcom(machine_config &config);
@@ -75,15 +72,16 @@ private:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<mos6532_new_device> m_riot;
 	optional_device<ay8910_device> m_ay;
-	optional_device<generic_latch_8_device> m_soundlatch;
 
 	void io_select_w(uint8_t data);
 	uint8_t io_port_r();
-	void audio_reset_w(int state);
-	void audio_reset_sync_w(int param);
-	void audio_trigger_w(int state);
-	void audio_trigger_sync_w(int param);
-	uint8_t soundlatch_r();
+
+	void audio_cmd_w_sync(int param);
+	void audio_trigger_w_sync(int param);
+	void audio_reset_w_sync(int param);
+	void audio_cmd_w(uint8_t data) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(killcom_state::audio_cmd_w_sync), this), data); }
+	void audio_trigger_w(int state) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(killcom_state::audio_trigger_w_sync), this), state); }
+	void audio_reset_w(int state) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(killcom_state::audio_reset_w_sync), this), state); }
 
 	TIMER_CALLBACK_MEMBER(hblank_callback);
 	uint8_t leprechn_videoram_r();

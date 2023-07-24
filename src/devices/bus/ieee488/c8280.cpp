@@ -434,7 +434,7 @@ void c8280_device::device_reset()
 	m_riot1->reset();
 	m_fdc->reset();
 
-	m_riot1->pa_w<7>(1);
+	m_riot1->pa_bit_w<7>(1);
 
 	m_fk5 = 0;
 	m_floppy = nullptr;
@@ -451,7 +451,7 @@ void c8280_device::ieee488_atn(int state)
 {
 	update_ieee_signals();
 
-	m_riot1->pa_w<7>(state);
+	m_riot1->pa_bit_w<7>(state);
 }
 
 

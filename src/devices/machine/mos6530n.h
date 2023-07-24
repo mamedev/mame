@@ -77,12 +77,14 @@ public:
 	template <unsigned N> auto pb_rd_callback() { return m_in_pb_cb[N].bind(); }
 	template <unsigned N> auto pb_wr_callback() { return m_out_pb_cb[N].bind(); }
 
-	// 6532 _IRQ pin (on 6530 it is PB7)
+	// _IRQ pin (on 6530 it's shared with PB7)
 	auto irq_wr_callback() { return m_irq_cb.bind(); }
 
-	// write to port inputs
-	template <unsigned N> void pa_w(int state) { pa_w(N, state); }
-	template <unsigned N> void pb_w(int state) { pb_w(N, state); }
+	// write to port inputs (PA7 can trigger an IRQ, the others are normal inputs)
+	void pa_w(offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pb_w(offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	template <unsigned N> void pa_bit_w(int state) { pa_w(0, (state & 1) << N, 1 << N); }
+	template <unsigned N> void pb_bit_w(int state) { pb_w(0, (state & 1) << N, 1 << N); }
 
 protected:
 	// construction/destruction
@@ -113,8 +115,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(timer_end);
 	void edge_detect();
 
-	void pa_w(int bit, int state);
-	void pb_w(int bit, int state);
 	void timer_w(offs_t offset, uint8_t data, bool ie);
 	uint8_t timer_r(bool ie);
 

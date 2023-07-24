@@ -717,7 +717,7 @@ void mtrap_sound_device::voiceio_w(offs_t offset, uint8_t data)
 		m_cvsd->digit_w(data & 1);
 
 	if (!(offset & 0x20))
-		m_riot->pb_w<0>(data & 1);
+		m_riot->pb_bit_w<0>(data & 1);
 }
 
 

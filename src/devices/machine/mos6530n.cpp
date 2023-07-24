@@ -243,6 +243,8 @@ void mos6530_new_device::update_pb()
 	}
 	else
 		m_out8_pb_cb(data);
+
+	m_irq_cb(BIT(data, 7) ? CLEAR_LINE: ASSERT_LINE);
 }
 
 
@@ -364,13 +366,11 @@ void mos6530_device_base::edge_detect()
 //  pa_w -
 //-------------------------------------------------
 
-void mos6530_device_base::pa_w(int bit, int state)
+void mos6530_device_base::pa_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	LOG("%s %s %s Port A Data Bit %u State %u\n", machine().time().as_string(), machine().describe_context(), name(), bit, state);
+	LOG("%s %s %s Port A Data Write %02X Mask %02X\n", machine().time().as_string(), machine().describe_context(), name(), data, mem_mask);
 
-	m_pa_in &= ~(1 << bit);
-	m_pa_in |= (state << bit);
-
+	m_pa_in = (m_pa_in & ~mem_mask) | (data & mem_mask);
 	edge_detect();
 }
 
@@ -379,12 +379,11 @@ void mos6530_device_base::pa_w(int bit, int state)
 //  pb_w -
 //-------------------------------------------------
 
-void mos6530_device_base::pb_w(int bit, int state)
+void mos6530_device_base::pb_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	LOG("%s %s %s Port B Data Bit %u State %u\n", machine().time().as_string(), machine().describe_context(), name(), bit, state);
+	LOG("%s %s %s Port B Data Write %02X Mask %02X\n", machine().time().as_string(), machine().describe_context(), name(), data, mem_mask);
 
-	m_pb_in &= ~(1 << bit);
-	m_pb_in |= (state << bit);
+	m_pb_in = (m_pb_in & ~mem_mask) | (data & mem_mask);
 }
 
 
@@ -515,7 +514,7 @@ uint8_t mos6530_device_base::timer_r(bool ie)
 	if (!machine().side_effects_disabled())
 	{
 		// IRQ is not cleared when reading at the same time IRQ is raised
-		if (m_timeout <= machine().time() - attotime::from_hz(clock()))
+		if (m_timeout < machine().time() - attotime::from_hz(2 * clock()))
 		{
 			m_irq_timer = false;
 

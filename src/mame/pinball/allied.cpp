@@ -727,21 +727,21 @@ void allied_state::allied(machine_config &config)
 	m_ic8->irqb_handler().set("main_irqs", FUNC(input_merger_device::in_w<9>));
 
 	MOS6530_NEW(config, m_ic3, 3.579545_MHz_XTAL/4); // unknown where the ram and i/o is located
-	m_ic3->pb_wr_callback().set("main_irqs", FUNC(input_merger_device::in_w<10>)).bit(7).invert();
+	m_ic3->irq_wr_callback().set("main_irqs", FUNC(input_merger_device::in_w<10>));
 
 	MOS6530_NEW(config, m_ic5, 3.579545_MHz_XTAL/4);
 	m_ic5->pa_rd_callback().set(FUNC(allied_state::ic5_a_r));
 	//m_ic5->pa_wr_callback().set(FUNC(allied_state::ic5_a_w));
 	//m_ic5->pb_rd_callback().set(FUNC(allied_state::ic5_b_r));
 	m_ic5->pb_wr_callback().set(FUNC(allied_state::ic5_b_w));
-	m_ic5->pb_wr_callback().append("main_irqs", FUNC(input_merger_device::in_w<11>)).bit(7).invert();
+	m_ic5->irq_wr_callback().set("main_irqs", FUNC(input_merger_device::in_w<11>));
 
 	MOS6530_NEW(config, m_ic6, 3.579545_MHz_XTAL/4);
 	m_ic6->pa_rd_callback().set(FUNC(allied_state::ic6_a_r));
 	//m_ic6->pa_wr_callback().set(FUNC(allied_state::ic6_a_w));
 	m_ic6->pb_rd_callback().set(FUNC(allied_state::ic6_b_r));
 	m_ic6->pb_wr_callback().set(FUNC(allied_state::ic6_b_w));
-	m_ic6->pb_wr_callback().append("main_irqs", FUNC(input_merger_device::in_w<12>)).bit(7).invert();
+	m_ic6->irq_wr_callback().set("main_irqs", FUNC(input_merger_device::in_w<12>));
 
 	TIMER(config, "timer_a").configure_periodic(FUNC(allied_state::timer_a), attotime::from_hz(50));
 }

@@ -333,11 +333,11 @@ void starwars_state::starwars(machine_config &config)
 	TMS5220(config, m_tms, MASTER_CLOCK/2/9).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set(m_riot, FUNC(mos6532_new_device::pa_w<7>));
+	m_soundlatch->data_pending_callback().set(m_riot, FUNC(mos6532_new_device::pa_bit_w<7>));
 	m_soundlatch->data_pending_callback().append([this](int state) { if (state) machine().scheduler().perfect_quantum(attotime::from_usec(100)); });
 
 	GENERIC_LATCH_8(config, m_mainlatch);
-	m_mainlatch->data_pending_callback().set(m_riot, FUNC(mos6532_new_device::pa_w<6>));
+	m_mainlatch->data_pending_callback().set(m_riot, FUNC(mos6532_new_device::pa_bit_w<6>));
 	m_mainlatch->data_pending_callback().append([this](int state) { if (state) machine().scheduler().perfect_quantum(attotime::from_usec(100)); });
 }
 

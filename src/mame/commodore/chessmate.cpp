@@ -143,10 +143,6 @@ void chmate_state::control_w(u8 data)
 	// d3-d5: leds (direct)
 	m_led_data = data >> 3 & 7;
 	update_display();
-
-	// d6: chipselect used?
-	// d7: IRQ out
-	m_maincpu->set_input_line(M6502_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void chmate_state::digit_w(u8 data)
@@ -272,6 +268,7 @@ void chmate_state::chmate(machine_config &config)
 	m_miot->pa_rd_callback().set(FUNC(chmate_state::input_r));
 	m_miot->pa_wr_callback().set(FUNC(chmate_state::digit_w));
 	m_miot->pb_wr_callback().set(FUNC(chmate_state::control_w));
+	m_miot->irq_wr_callback().set_inputline(m_maincpu, 0);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4+1, 8);

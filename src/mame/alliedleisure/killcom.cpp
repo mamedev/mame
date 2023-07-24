@@ -88,6 +88,7 @@ BTANB:
 #include "killcom.h"
 
 #include "cpu/m6502/m6502.h"
+#include "machine/input_merger.h"
 #include "speaker.h"
 
 
@@ -103,7 +104,6 @@ void killcom_state::machine_start()
 	// register for save states
 	save_item(NAME(m_current_port));
 	save_item(NAME(m_audio_reset));
-	save_item(NAME(m_audio_trigger));
 }
 
 void killcom_state::machine_reset()
@@ -298,7 +298,19 @@ void killcom_state::coin_w(int state)
  *
  *************************************/
 
-void killcom_state::audio_reset_sync_w(int param)
+void killcom_state::audio_cmd_w_sync(int param)
+{
+	m_riot->pa_w(0, param, 0x7f);
+}
+
+
+void killcom_state::audio_trigger_w_sync(int param)
+{
+	m_riot->pa_bit_w<7>(param);
+}
+
+
+void killcom_state::audio_reset_w_sync(int param)
 {
 	if (param && !m_audio_reset)
 	{
@@ -308,38 +320,6 @@ void killcom_state::audio_reset_sync_w(int param)
 
 	m_audio_reset = param;
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, param ? CLEAR_LINE : ASSERT_LINE);
-}
-
-
-void killcom_state::audio_reset_w(int state)
-{
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(killcom_state::audio_reset_sync_w), this), state);
-}
-
-
-void killcom_state::audio_trigger_sync_w(int param)
-{
-	m_audio_trigger = param;
-	m_riot->pa_w<7>(param);
-}
-
-
-void killcom_state::audio_trigger_w(int state)
-{
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(killcom_state::audio_trigger_sync_w), this), state);
-}
-
-
-
-/*************************************
- *
- *  RIOT - audio
- *
- *************************************/
-
-uint8_t killcom_state::soundlatch_r()
-{
-	return m_audio_trigger << 7 | (m_soundlatch->read() & 0x7f);
 }
 
 
@@ -1130,10 +1110,7 @@ void killcom_state::killcom(machine_config &config)
 	M6502(config, m_audiocpu, 3.579545_MHz_XTAL / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &killcom_state::killcom_audio_map);
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-
 	MOS6532_NEW(config, m_riot, 3.579545_MHz_XTAL / 4);
-	m_riot->pa_rd_callback().set(FUNC(killcom_state::soundlatch_r));
 	m_riot->pb_wr_callback().set(m_via[2], FUNC(via6522_device::write_pb));
 	m_riot->irq_wr_callback().set_inputline(m_audiocpu, 0);
 
@@ -1152,7 +1129,7 @@ void killcom_state::killcom(machine_config &config)
 	m_via[1]->irq_handler().set("main_irqs", FUNC(input_merger_device::in_w<1>));
 
 	MOS6522(config, m_via[2], 3.579545_MHz_XTAL / 4);
-	m_via[2]->writepa_handler().set(m_soundlatch, FUNC(generic_latch_8_device::write));
+	m_via[2]->writepa_handler().set(FUNC(killcom_state::audio_cmd_w));
 	m_via[2]->ca2_handler().set(FUNC(killcom_state::audio_trigger_w));
 	m_via[2]->cb2_handler().set(FUNC(killcom_state::audio_reset_w));
 	m_via[2]->irq_handler().set("main_irqs", FUNC(input_merger_device::in_w<2>));
