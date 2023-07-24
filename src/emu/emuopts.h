@@ -145,6 +145,7 @@
 #define OPTION_PADDLE_DEVICE        "paddle_device"
 #define OPTION_ADSTICK_DEVICE       "adstick_device"
 #define OPTION_PEDAL_DEVICE         "pedal_device"
+#define OPTION_LEVER_DEVICE         "lever_device"
 #define OPTION_DIAL_DEVICE          "dial_device"
 #define OPTION_TRACKBALL_DEVICE     "trackball_device"
 #define OPTION_LIGHTGUN_DEVICE      "lightgun_device"
@@ -419,6 +420,7 @@ public:
 	const char *paddle_device() const { return value(OPTION_PADDLE_DEVICE); }
 	const char *adstick_device() const { return value(OPTION_ADSTICK_DEVICE); }
 	const char *pedal_device() const { return value(OPTION_PEDAL_DEVICE); }
+	const char *lever_device() const { return value(OPTION_LEVER_DEVICE); }
 	const char *dial_device() const { return value(OPTION_DIAL_DEVICE); }
 	const char *trackball_device() const { return value(OPTION_TRACKBALL_DEVICE); }
 	const char *lightgun_device() const { return value(OPTION_LIGHTGUN_DEVICE); }

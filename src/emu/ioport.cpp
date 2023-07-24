@@ -1849,6 +1849,7 @@ time_t ioport_manager::initialize()
 	init_autoselect_devices({ IPT_AD_STICK_X,  IPT_AD_STICK_Y,   IPT_AD_STICK_Z }, OPTION_ADSTICK_DEVICE,    "analog joystick");
 	init_autoselect_devices({ IPT_PADDLE,      IPT_PADDLE_V },                     OPTION_PADDLE_DEVICE,     "paddle");
 	init_autoselect_devices({ IPT_PEDAL,       IPT_PEDAL2,       IPT_PEDAL3 },     OPTION_PEDAL_DEVICE,      "pedal");
+	init_autoselect_devices({ IPT_LEVER,       IPT_LEVER2,       IPT_LEVER3 },     OPTION_LEVER_DEVICE,      "lever");
 	init_autoselect_devices({ IPT_LIGHTGUN_X,  IPT_LIGHTGUN_Y },                   OPTION_LIGHTGUN_DEVICE,   "lightgun");
 	init_autoselect_devices({ IPT_POSITIONAL,  IPT_POSITIONAL_V },                 OPTION_POSITIONAL_DEVICE, "positional");
 	init_autoselect_devices({ IPT_DIAL,        IPT_DIAL_V },                       OPTION_DIAL_DEVICE,       "dial");
@@ -3574,10 +3575,13 @@ analog_field::analog_field(ioport_field &field)
 			m_interpolate = !field.analog_reset();
 			break;
 
-		// pedals start at and autocenter to the min range
+		// pedals/levers start at and autocenter to the min range
 		case IPT_PEDAL:
 		case IPT_PEDAL2:
 		case IPT_PEDAL3:
+		case IPT_LEVER:
+		case IPT_LEVER2:
+		case IPT_LEVER3:
 			m_center = osd::input_device::ABSOLUTE_MIN;
 			m_accum = apply_inverse_sensitivity(m_center);
 			m_absolute = true;
@@ -3765,7 +3769,7 @@ s32 analog_field::apply_settings(s32 value) const
 	if (m_reverse)
 		value = m_reverse_val - value;
 	else if (m_single_scale)
-		// it's a pedal or the default value is equal to min/max
+		// it's a pedal/lever or the default value is equal to min/max
 		// so we need to adjust the center to the minimum
 		value -= osd::input_device::ABSOLUTE_MIN;
 

@@ -871,7 +871,7 @@ void hornet_state::terabrst_map(address_map &map)
 	map(0x74080000, 0x7408000f).rw(FUNC(hornet_state::gun_r), FUNC(hornet_state::gun_w));
 }
 
-void hornet_state::sscope_map(address_map &map) //placeholder; may remove if mapping the second ADC12138 isn't necessary
+void hornet_state::sscope_map(address_map &map)
 {
 	hornet_map(map);
 
@@ -1006,9 +1006,9 @@ static INPUT_PORTS_START( hornet )
 	PORT_DIPNAME( 0x80, 0x00, "Skip Post" ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Disable Machine Init" ) PORT_DIPLOCATION("SW:2") // Having this on disables the analog controls in terabrst, thrilldbu, sscope and sscope2
+	PORT_DIPNAME( 0x40, 0x00, "Disable Machine Init" ) PORT_DIPLOCATION("SW:2") // Having this on disables the analog controls in terabrst, sscope and sscope2 and enables usage with JAMMA inputs
 	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) ) //they instead make them usable with JAMMA inputs
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) ) // in addition, this disables the wheel motor test in thrilldg**
 	PORT_DIPNAME( 0x20, 0x20, "DIP3" ) PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
@@ -1160,6 +1160,37 @@ static INPUT_PORTS_START( thrilld )
 	PORT_BIT(0x7ff, 0x000, IPT_PEDAL2) PORT_NAME("Brake Pedal") PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(60)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( thrilld_gp )
+	PORT_INCLUDE( thrilld )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Gear Shift Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Gear Shift Down")
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( thrilld_gn )
+	PORT_INCLUDE( thrilld )
+
+	PORT_START("ANALOG4")
+	PORT_BIT(0x7ff, 0x000, IPT_LEVER) PORT_NAME("Handbrake Lever") PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(60)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( thrilld_gm )
+	PORT_INCLUDE( thrilld_gn )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Gear Shift Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Gear Shift Down")
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( thrilld_ge )
+	PORT_INCLUDE( thrilld_gn )
+
+	PORT_START("ANALOG5")
+	PORT_BIT(0x7ff, 0x000, IPT_PEDAL3) PORT_NAME("Clutch Pedal") PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(60)
+INPUT_PORTS_END
 
 /* PowerPC interrupts
 
@@ -3537,15 +3568,15 @@ GAME(  1998, terabrstaa, terabrst, terabrst,   terabrst, hornet_state, init_horn
 // GE713UF no handbrake, no clutch. settings configurable on boot: brake pedal, shifter (up/down, 4 pos, 5+R), steering motor type (A, W, H types)
 // GK713EA no clutch. settings configurable on boot: handbrake lever, shifter (up/down, 4 pos, 5+R), shifter display position (right/left)
 // GK713EE no clutch. settings configurable on boot: handbrake lever, shifter (up/down, 4 pos, 5+R), shifter display position (right/left)
-// GK713K* no handbrake, up/down shifter, no clutch, English only version of GP713JA?
-GAME(  1998, thrilldgeu,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GE713UFB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, thrilldgnj,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GN713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, thrilldgmj,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GM713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, thrilldgpj,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GP713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, thrilldgej,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GE713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, thrilldgke,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GK713EAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, thrilldgkee, thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GK713EEB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, thrilldgkk,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GK713K*B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+// GK713K* no handbrake, up/down shifter, no clutch, English only version of GP713JA, supposed Korean release
+GAME(  1998, thrilldgeu,  thrilld,  hornet_lan, thrilld,    hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GE713UFB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgnj,  thrilld,  hornet_lan, thrilld_gn, hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GN713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgmj,  thrilld,  hornet_lan, thrilld_gm, hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GM713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgpj,  thrilld,  hornet_lan, thrilld_gp, hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GP713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgej,  thrilld,  hornet_lan, thrilld_ge, hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GE713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgke,  thrilld,  hornet_lan, thrilld_gn, hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GK713EAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgkk,  thrilld,  hornet_lan, thrilld_gp, hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GK713K*B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgkee, thrilld,  hornet_lan, thrilld_gn, hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GK713EEB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // Revisions C and D removed Japanese region support but introduced Voodoo 2 support.
 GAMEL( 1999, sscope,   0,      sscope, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver UAD, Ver 1.33)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )

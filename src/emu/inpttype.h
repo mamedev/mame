@@ -223,6 +223,9 @@ enum ioport_type : osd::u32
 			IPT_PEDAL,          // absolute // autocenter
 			IPT_PEDAL2,         // absolute // autocenter
 			IPT_PEDAL3,         // absolute // autocenter
+			IPT_LEVER,          // absolute // autocenter
+			IPT_LEVER2,         // absolute // autocenter
+			IPT_LEVER3,         // absolute // autocenter
 			IPT_LIGHTGUN_X,     // absolute
 			IPT_LIGHTGUN_Y,     // absolute
 			IPT_POSITIONAL,     // absolute // autocenter if not wraps
@@ -329,6 +332,7 @@ enum ioport_type : osd::u32
 	// aliases for some types
 	IPT_PADDLE_H        = IPT_PADDLE,
 	IPT_PEDAL1          = IPT_PEDAL,
+	IPT_LEVER1          = IPT_LEVER,
 	IPT_POSITIONAL_H    = IPT_POSITIONAL,
 	IPT_DIAL_H          = IPT_DIAL
 };

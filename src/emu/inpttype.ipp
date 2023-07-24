@@ -653,6 +653,48 @@ namespace {
 		INPUT_PORT_ANALOG_TYPE(  10, PLAYER10, PEDAL3,              N_p("input-name", "%p Pedal 3"),             input_seq(), input_seq(), input_seq() ) \
 		CORE_INPUT_TYPES_END()
 
+#define CORE_INPUT_TYPES_LEVER \
+		CORE_INPUT_TYPES_BEGIN(lever) \
+		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  LEVER,               N_p("input-name", "%p Lever 1"),             input_seq(), input_seq(), input_seq(KEYCODE_Z) ) \
+		INPUT_PORT_ANALOG_TYPE(   2, PLAYER2,  LEVER,               N_p("input-name", "%p Lever 1"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   3, PLAYER3,  LEVER,               N_p("input-name", "%p Lever 1"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  LEVER,               N_p("input-name", "%p Lever 1"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   5, PLAYER5,  LEVER,               N_p("input-name", "%p Lever 1"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   6, PLAYER6,  LEVER,               N_p("input-name", "%p Lever 1"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   7, PLAYER7,  LEVER,               N_p("input-name", "%p Lever 1"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   8, PLAYER8,  LEVER,               N_p("input-name", "%p Lever 1"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   9, PLAYER9,  LEVER,               N_p("input-name", "%p Lever 1"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(  10, PLAYER10, LEVER,               N_p("input-name", "%p Lever 1"),             input_seq(), input_seq(), input_seq() ) \
+		CORE_INPUT_TYPES_END()
+
+#define CORE_INPUT_TYPES_LEVER2 \
+		CORE_INPUT_TYPES_BEGIN(lever2) \
+		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  LEVER2,               N_p("input-name", "%p Lever 2"),             input_seq(), input_seq(), input_seq(KEYCODE_X) ) \
+		INPUT_PORT_ANALOG_TYPE(   2, PLAYER2,  LEVER2,               N_p("input-name", "%p Lever 2"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   3, PLAYER3,  LEVER2,               N_p("input-name", "%p Lever 2"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  LEVER2,               N_p("input-name", "%p Lever 2"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   5, PLAYER5,  LEVER2,               N_p("input-name", "%p Lever 2"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   6, PLAYER6,  LEVER2,               N_p("input-name", "%p Lever 2"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   7, PLAYER7,  LEVER2,               N_p("input-name", "%p Lever 2"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   8, PLAYER8,  LEVER2,               N_p("input-name", "%p Lever 2"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   9, PLAYER9,  LEVER2,               N_p("input-name", "%p Lever 2"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(  10, PLAYER10, LEVER2,               N_p("input-name", "%p Lever 2"),             input_seq(), input_seq(), input_seq() ) \
+		CORE_INPUT_TYPES_END()
+
+#define CORE_INPUT_TYPES_LEVER3 \
+		CORE_INPUT_TYPES_BEGIN(lever3) \
+		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  LEVER3,               N_p("input-name", "%p Lever 3"),             input_seq(), input_seq(), input_seq(KEYCODE_C) ) \
+		INPUT_PORT_ANALOG_TYPE(   2, PLAYER2,  LEVER3,               N_p("input-name", "%p Lever 3"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   3, PLAYER3,  LEVER3,               N_p("input-name", "%p Lever 3"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  LEVER3,               N_p("input-name", "%p Lever 3"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   5, PLAYER5,  LEVER3,               N_p("input-name", "%p Lever 3"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   6, PLAYER6,  LEVER3,               N_p("input-name", "%p Lever 3"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   7, PLAYER7,  LEVER3,               N_p("input-name", "%p Lever 3"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   8, PLAYER8,  LEVER3,               N_p("input-name", "%p Lever 3"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   9, PLAYER9,  LEVER3,               N_p("input-name", "%p Lever 3"),             input_seq(), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(  10, PLAYER10, LEVER3,               N_p("input-name", "%p Lever 3"),             input_seq(), input_seq(), input_seq() ) \
+		CORE_INPUT_TYPES_END()
+
 #define CORE_INPUT_TYPES_PADDLE \
 		CORE_INPUT_TYPES_BEGIN(paddle) \
 		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  PADDLE,              N_p("input-name", "Paddle"),                 input_seq(MOUSECODE_X_INDEXED(0)), input_seq(KEYCODE_LEFT), input_seq(KEYCODE_RIGHT) ) \
@@ -1005,6 +1047,9 @@ CORE_INPUT_TYPES_OTHER
 CORE_INPUT_TYPES_PEDAL
 CORE_INPUT_TYPES_PEDAL2
 CORE_INPUT_TYPES_PEDAL3
+CORE_INPUT_TYPES_LEVER
+CORE_INPUT_TYPES_LEVER2
+CORE_INPUT_TYPES_LEVER3
 CORE_INPUT_TYPES_PADDLE
 CORE_INPUT_TYPES_PADDLE_V
 CORE_INPUT_TYPES_POSITIONAL
@@ -1065,6 +1110,9 @@ constexpr size_t core_input_types_count()
 			CORE_INPUT_TYPES_PEDAL
 			CORE_INPUT_TYPES_PEDAL2
 			CORE_INPUT_TYPES_PEDAL3
+			CORE_INPUT_TYPES_LEVER
+			CORE_INPUT_TYPES_LEVER2
+			CORE_INPUT_TYPES_LEVER3
 			CORE_INPUT_TYPES_PADDLE
 			CORE_INPUT_TYPES_PADDLE_V
 			CORE_INPUT_TYPES_POSITIONAL
@@ -1123,6 +1171,9 @@ ATTR_COLD inline void emplace_core_types(std::vector<input_type_entry> &typelist
 	emplace_core_types_pedal(typelist);
 	emplace_core_types_pedal2(typelist);
 	emplace_core_types_pedal3(typelist);
+	emplace_core_types_lever(typelist);
+	emplace_core_types_lever2(typelist);
+	emplace_core_types_lever3(typelist);
 	emplace_core_types_paddle(typelist);
 	emplace_core_types_paddle_v(typelist);
 	emplace_core_types_positional(typelist);

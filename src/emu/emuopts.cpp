@@ -172,6 +172,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_PADDLE_DEVICE ";paddle",                    "keyboard",  core_options::option_type::STRING,     "enable (none|keyboard|mouse|lightgun|joystick) if a paddle control is present" },
 	{ OPTION_ADSTICK_DEVICE ";adstick",                  "keyboard",  core_options::option_type::STRING,     "enable (none|keyboard|mouse|lightgun|joystick) if an analog joystick control is present" },
 	{ OPTION_PEDAL_DEVICE ";pedal",                      "keyboard",  core_options::option_type::STRING,     "enable (none|keyboard|mouse|lightgun|joystick) if a pedal control is present" },
+	{ OPTION_LEVER_DEVICE ";lever",                      "keyboard",  core_options::option_type::STRING,     "enable (none|keyboard|mouse|lightgun|joystick) if a lever control is present" },
 	{ OPTION_DIAL_DEVICE ";dial",                        "keyboard",  core_options::option_type::STRING,     "enable (none|keyboard|mouse|lightgun|joystick) if a dial control is present" },
 	{ OPTION_TRACKBALL_DEVICE ";trackball",              "keyboard",  core_options::option_type::STRING,     "enable (none|keyboard|mouse|lightgun|joystick) if a trackball control is present" },
 	{ OPTION_LIGHTGUN_DEVICE,                            "keyboard",  core_options::option_type::STRING,     "enable (none|keyboard|mouse|lightgun|joystick) if a lightgun control is present" },
