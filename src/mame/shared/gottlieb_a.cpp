@@ -114,7 +114,7 @@ INPUT_PORTS_END
 INPUT_CHANGED_MEMBER( gottlieb_sound_p2_device::audio_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
-	if (newval==CLEAR_LINE)
+	if (!newval)
 		m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 

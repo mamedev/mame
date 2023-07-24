@@ -19,5 +19,7 @@ m6504_device::m6504_device(const machine_config &mconfig, const char *tag, devic
 	m6502_device(mconfig, M6504, tag, owner, clock)
 {
 	program_config.m_addr_width = 13;
+	program_config.m_logaddr_width = 13;
 	sprogram_config.m_addr_width = 13;
+	sprogram_config.m_logaddr_width = 13;
 }

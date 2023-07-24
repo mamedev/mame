@@ -47,6 +47,8 @@ void m6502_device::init()
 	if(mintf) {
 		space(AS_PROGRAM).cache(mintf->cprogram);
 		space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(mintf->csprogram);
+
+		// specific group 1-14 or 15-31
 		if(space(AS_PROGRAM).addr_width() > 14)
 			space(AS_PROGRAM).specific(mintf->program);
 		else
