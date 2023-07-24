@@ -558,25 +558,25 @@ void gts80a_state::p0(machine_config &config)
 void gts80a_state::p2(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_PIN2(config, m_p2_sound, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
+	GOTTLIEB_SOUND_PIN2(config, m_p2_sound).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 void gts80a_state::p3(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_PIN3(config, m_p3_sound, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
+	GOTTLIEB_SOUND_PIN3(config, m_p3_sound).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 void gts80a_state::r1(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_REV1(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
+	GOTTLIEB_SOUND_REV1(config, m_r1_sound).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 void gts80a_state::r1v(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
+	GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 //******************* CAVEMAN ****************************************************************

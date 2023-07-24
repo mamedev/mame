@@ -480,7 +480,7 @@ void gts3a_state::p0(machine_config &config)
 void gts3a_state::p7(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_PIN7(config, m_p7_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
+	GOTTLIEB_SOUND_PIN7(config, m_p7_sound).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 
