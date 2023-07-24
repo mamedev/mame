@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
-/***************************************************************************
+/*******************************************************************************
 
     Konami 051649 - SCC1 sound as used in Haunted Castle, City Bomber
 
@@ -15,7 +15,7 @@
     megaROM cartridges for the MSX. This device only emulates the
     sound portion, not the memory mapper.
 
-    K052539 is more or less equivalent to this chip except channel 5
+    052539 is more or less equivalent to this chip except channel 5
     does not share waveram with channel 4.
 
     References:
@@ -23,10 +23,14 @@
     - http://bifi.msxnet.org/msxnet/tech/soundcartridge
 
     TODO:
-    - make K052539 a subdevice
+    - make 052539 a subdevice
+    - bus conflicts on 051649 (not 052539). When the CPU accesses waveform RAM
+      and the SCC is reading it at the same time, it can cause audible spikes.
+      A similar thing happens internally when the shared ch4/ch5 do a read at
+      the same time.
     - test register bits 0-4, not used in any software
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "k051649.h"
@@ -45,9 +49,9 @@ void k051649_device::scc_map(address_map &map)
 DEFINE_DEVICE_TYPE(K051649, k051649_device, "k051649", "K051649 SCC1")
 
 
-//**************************************************************************
+//******************************************************************************
 //  LIVE DEVICE
-//**************************************************************************
+//******************************************************************************
 
 //-------------------------------------------------
 //  k051649_device - constructor
@@ -159,7 +163,7 @@ void k051649_device::sound_stream_update(sound_stream &stream, std::vector<read_
 }
 
 
-/********************************************************************************/
+/******************************************************************************/
 
 
 void k051649_device::k051649_waveform_w(offs_t offset, u8 data)

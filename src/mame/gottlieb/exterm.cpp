@@ -63,16 +63,94 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "exterm.h"
 
 #include "cpu/m6502/m6502.h"
+#include "cpu/tms34010/tms34010.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/dac.h"
+#include "sound/ymopm.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+namespace {
+
+class exterm_state : public driver_device
+{
+public:
+	exterm_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_audioslave(*this, "audioslave"),
+		m_soundlatch(*this, "soundlatch%u", 1),
+		m_slave(*this, "slave"),
+		m_ym2151(*this, "ymsnd"),
+		m_nmi_timer(*this, "snd_nmi_timer"),
+		m_master_videoram(*this, "master_videoram"),
+		m_slave_videoram(*this, "slave_videoram"),
+		m_dial(*this, "DIAL%u", 0U),
+		m_input(*this, "P%u", 1U)
+	{ }
+
+	void exterm(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_device<tms34010_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_audioslave;
+	required_device_array<generic_latch_8_device, 2> m_soundlatch;
+	required_device<tms34010_device> m_slave;
+	required_device<ym2151_device> m_ym2151;
+	required_device<timer_device> m_nmi_timer;
+
+	required_shared_ptr<uint16_t> m_master_videoram;
+	required_shared_ptr<uint16_t> m_slave_videoram;
+
+	required_ioport_array<2> m_dial;
+	required_ioport_array<2> m_input;
+
+	uint8_t m_aimpos[2]{};
+	uint8_t m_trackball_old[2]{};
+	uint8_t m_sound_control = 0U;
+	uint16_t m_last = 0U;
+
+	void host_data_w(offs_t offset, uint16_t data);
+	uint16_t host_data_r(offs_t offset);
+	template<uint8_t Which> uint16_t trackball_port_r();
+	void output_port_0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_latch_w(uint8_t data);
+	void sound_nmi_rate_w(uint8_t data);
+	uint8_t sound_nmi_to_slave_r();
+	void sound_control_w(uint8_t data);
+	void ym2151_data_latch_w(uint8_t data);
+	void exterm_palette(palette_device &palette) const;
+	TIMER_DEVICE_CALLBACK_MEMBER(master_sound_nmi_callback);
+	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
+	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg_master);
+	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg_master);
+	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg_slave);
+	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg_slave);
+	void master_map(address_map &map);
+	void slave_map(address_map &map);
+	void sound_master_map(address_map &map);
+	void sound_slave_map(address_map &map);
+};
+
+
+
+/*************************************
+ *
+ *  Initialization
+ *
+ *************************************/
 
 void exterm_state::machine_start()
 {
@@ -81,6 +159,106 @@ void exterm_state::machine_start()
 	save_item(NAME(m_sound_control));
 	save_item(NAME(m_last));
 }
+
+
+
+/*************************************
+ *
+ *  Palette setup
+ *
+ *************************************/
+
+void exterm_state::exterm_palette(palette_device &palette) const
+{
+	// initialize 555 RGB lookup
+	for (int i = 0; i < 32768; i++)
+		palette.set_pen_color(i + 0x800, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
+}
+
+
+
+/*************************************
+ *
+ *  Master shift register
+ *
+ *************************************/
+
+TMS340X0_TO_SHIFTREG_CB_MEMBER(exterm_state::to_shiftreg_master)
+{
+	memcpy(shiftreg, &m_master_videoram[address >> 4], 256 * sizeof(uint16_t));
+}
+
+
+TMS340X0_FROM_SHIFTREG_CB_MEMBER(exterm_state::from_shiftreg_master)
+{
+	memcpy(&m_master_videoram[address >> 4], shiftreg, 256 * sizeof(uint16_t));
+}
+
+
+TMS340X0_TO_SHIFTREG_CB_MEMBER(exterm_state::to_shiftreg_slave)
+{
+	memcpy(shiftreg, &m_slave_videoram[address >> 4], 256 * 2 * sizeof(uint8_t));
+}
+
+
+TMS340X0_FROM_SHIFTREG_CB_MEMBER(exterm_state::from_shiftreg_slave)
+{
+	memcpy(&m_slave_videoram[address >> 4], shiftreg, 256 * 2 * sizeof(uint8_t));
+}
+
+
+
+/*************************************
+ *
+ *  Main video refresh
+ *
+ *************************************/
+
+TMS340X0_SCANLINE_IND16_CB_MEMBER(exterm_state::scanline_update)
+{
+	uint16_t *const bgsrc = &m_master_videoram[(params->rowaddr << 8) & 0xff00];
+	uint16_t *const dest = &bitmap.pix(scanline);
+	tms340x0_device::display_params fgparams;
+	int coladdr = params->coladdr;
+	int fgcoladdr = 0;
+
+	/* get parameters for the slave CPU */
+	m_slave->get_display_params(&fgparams);
+
+	/* compute info about the slave vram */
+	uint16_t *fgsrc = nullptr;
+	if (fgparams.enabled && scanline >= fgparams.veblnk && scanline < fgparams.vsblnk && fgparams.heblnk < fgparams.hsblnk)
+	{
+		fgsrc = &m_slave_videoram[((fgparams.rowaddr << 8) + (fgparams.yoffset << 7)) & 0xff80];
+		fgcoladdr = (fgparams.coladdr >> 1);
+	}
+
+	/* copy the non-blanked portions of this scanline */
+	for (int x = params->heblnk; x < params->hsblnk; x += 2)
+	{
+		uint16_t bgdata, fgdata = 0;
+
+		if (fgsrc != nullptr)
+			fgdata = fgsrc[fgcoladdr++ & 0x7f];
+
+		bgdata = bgsrc[coladdr++ & 0xff];
+		if ((bgdata & 0xe000) == 0xe000)
+			dest[x + 0] = bgdata & 0x7ff;
+		else if ((fgdata & 0x00ff) != 0)
+			dest[x + 0] = fgdata & 0x00ff;
+		else
+			dest[x + 0] = (bgdata & 0x8000) ? (bgdata & 0x7ff) : (bgdata + 0x800);
+
+		bgdata = bgsrc[coladdr++ & 0xff];
+		if ((bgdata & 0xe000) == 0xe000)
+			dest[x + 1] = bgdata & 0x7ff;
+		else if ((fgdata & 0xff00) != 0)
+			dest[x + 1] = fgdata >> 8;
+		else
+			dest[x + 1] = (bgdata & 0x8000) ? (bgdata & 0x7ff) : (bgdata + 0x800);
+	}
+}
+
 
 
 /*************************************
@@ -134,6 +312,7 @@ uint16_t exterm_state::trackball_port_r()
 
 	return (port & 0xc0ff) | (m_aimpos[Which] << 8);
 }
+
 
 
 /*************************************
@@ -362,6 +541,7 @@ static INPUT_PORTS_START( exterm )
 INPUT_PORTS_END
 
 
+
 /*************************************
  *
  *  Machine drivers
@@ -460,6 +640,8 @@ ROM_START( exterm )
 	ROM_LOAD16_BYTE( "v101p0",   0x1e0000, 0x10000, CRC(6c8ee79a) SHA1(aa051e33e3ed6eed475a37e5dae1be0ac6471b12) )
 	ROM_LOAD16_BYTE( "v101p1",   0x1e0001, 0x10000, CRC(557bfc84) SHA1(8d0f1b40adbf851a85f626663956f3726ca8026d) )
 ROM_END
+
+} // anonymous namespace
 
 
 

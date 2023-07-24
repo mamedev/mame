@@ -110,8 +110,7 @@ mos6530_device_base::mos6530_device_base(const machine_config &mconfig, device_t
 	m_irq_timer(false),
 	m_ie_edge(false),
 	m_irq_edge(false)
-{
-}
+{ }
 
 
 //-------------------------------------------------
@@ -197,10 +196,12 @@ void mos6530_device_base::update_pa()
 {
 	uint8_t data = (m_pa_out & m_pa_ddr) | (m_pa_ddr ^ 0xff);
 
-	if (m_out8_pa_cb.isunset()) {
+	if (m_out8_pa_cb.isunset())
+	{
 		for (int i = 0; i < 8; i++)
 			m_out_pa_cb[i](BIT(data, i));
-	} else
+	}
+	else
 		m_out8_pa_cb(data);
 }
 
@@ -213,10 +214,12 @@ void mos6530_device_base::update_pb()
 {
 	uint8_t data = (m_pb_out & m_pb_ddr) | (m_pb_ddr ^ 0xff);
 
-	if (m_out8_pb_cb.isunset()) {
+	if (m_out8_pb_cb.isunset())
+	{
 		for (int i = 0; i < 8; i++)
 			m_out_pb_cb[i](BIT(data, i));
-	} else
+	}
+	else
 		m_out8_pb_cb(data);
 }
 
@@ -224,7 +227,8 @@ void mos6530_new_device::update_pb()
 {
 	uint8_t data = (m_pb_out & m_pb_ddr) | (m_pb_ddr ^ 0xff);
 
-	if (!BIT(m_pb_ddr, 7)) {
+	if (!BIT(m_pb_ddr, 7))
+	{
 		// active low!
 		if (m_ie_timer && m_irq_timer)
 			data &= ~IRQ_TIMER;
@@ -232,11 +236,15 @@ void mos6530_new_device::update_pb()
 			data |= IRQ_TIMER;
 	}
 
-	if (m_out8_pb_cb.isunset()) {
+	if (m_out8_pb_cb.isunset())
+	{
 		for (int i = 0; i < 8; i++)
 			m_out_pb_cb[i](BIT(data, i));
-	} else
+	}
+	else
 		m_out8_pb_cb(data);
+
+	m_irq_cb(BIT(data, 7) ? CLEAR_LINE: ASSERT_LINE);
 }
 
 
@@ -301,13 +309,27 @@ uint8_t mos6530_device_base::get_timer()
 
 
 //-------------------------------------------------
+//  timer_start - restart timer counter
+//-------------------------------------------------
+
+void mos6530_device_base::timer_start(uint8_t data)
+{
+	m_timerstate = TIMER_COUNTING;
+	attotime curtime = machine().time();
+	int64_t target = curtime.as_ticks(clock()) + 1 + (data << m_timershift);
+	m_timer->adjust(attotime::from_ticks(target, clock()) - curtime);
+}
+
+
+//-------------------------------------------------
 //  timer_end -
 //-------------------------------------------------
 
 TIMER_CALLBACK_MEMBER(mos6530_device_base::timer_end)
 {
 	// if we finished counting, signal timer IRQ
-	if (m_timerstate == TIMER_COUNTING) {
+	if (m_timerstate == TIMER_COUNTING)
+	{
 		m_timeout = machine().time();
 		m_irq_timer = true;
 		update_irq();
@@ -320,22 +342,6 @@ TIMER_CALLBACK_MEMBER(mos6530_device_base::timer_end)
 
 
 //-------------------------------------------------
-//  timer_irq_enable - enable/clear timer IRQ
-//-------------------------------------------------
-
-void mos6530_device_base::timer_irq_enable(bool ie)
-{
-	m_ie_timer = ie;
-
-	// IRQ is not cleared if access is at same time IRQ is raised
-	if (m_timeout <= machine().time() - attotime::from_hz(clock()))
-		m_irq_timer = false;
-
-	update_irq();
-}
-
-
-//-------------------------------------------------
 //  edge_detect -
 //-------------------------------------------------
 
@@ -344,7 +350,8 @@ void mos6530_device_base::edge_detect()
 	uint8_t data = (m_pa_out & m_pa_ddr) | (m_pa_in & ~m_pa_ddr);
 	int state = BIT(data, 7);
 
-	if ((m_pa7 ^ state) && !(m_pa7_dir ^ state) && !m_irq_edge) {
+	if ((m_pa7 ^ state) && !(m_pa7_dir ^ state) && !m_irq_edge)
+	{
 		LOG("%s %s edge-detect IRQ\n", machine().time().as_string(), name());
 
 		m_irq_edge = true;
@@ -359,13 +366,11 @@ void mos6530_device_base::edge_detect()
 //  pa_w -
 //-------------------------------------------------
 
-void mos6530_device_base::pa_w(int bit, int state)
+void mos6530_device_base::pa_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	LOG("%s %s %s Port A Data Bit %u State %u\n", machine().time().as_string(), machine().describe_context(), name(), bit, state);
+	LOG("%s %s %s Port A Data Write %02X Mask %02X\n", machine().time().as_string(), machine().describe_context(), name(), data, mem_mask);
 
-	m_pa_in &= ~(1 << bit);
-	m_pa_in |= (state << bit);
-
+	m_pa_in = (m_pa_in & ~mem_mask) | (data & mem_mask);
 	edge_detect();
 }
 
@@ -374,12 +379,11 @@ void mos6530_device_base::pa_w(int bit, int state)
 //  pb_w -
 //-------------------------------------------------
 
-void mos6530_device_base::pb_w(int bit, int state)
+void mos6530_device_base::pb_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	LOG("%s %s %s Port B Data Bit %u State %u\n", machine().time().as_string(), machine().describe_context(), name(), bit, state);
+	LOG("%s %s %s Port B Data Write %02X Mask %02X\n", machine().time().as_string(), machine().describe_context(), name(), data, mem_mask);
 
-	m_pb_in &= ~(1 << bit);
-	m_pb_in |= (state << bit);
+	m_pb_in = (m_pb_in & ~mem_mask) | (data & mem_mask);
 }
 
 
@@ -391,10 +395,12 @@ uint8_t mos6530_device_base::pa_data_r()
 {
 	uint8_t in = 0;
 
-	if (m_in8_pa_cb.isunset()) {
+	if (m_in8_pa_cb.isunset())
+	{
 		for (int i = 0; i < 8; i++)
 			in |= (m_in_pa_cb[i].isunset() ? BIT(m_pa_in, i) : m_in_pa_cb[i]()) << i;
-	} else
+	}
+	else
 		in = m_in8_pa_cb();
 
 	uint8_t data = (m_pa_out & m_pa_ddr) | (in & ~m_pa_ddr);
@@ -443,10 +449,12 @@ uint8_t mos6530_device_base::pb_data_r()
 {
 	uint8_t in = 0;
 
-	if (m_in8_pb_cb.isunset()) {
+	if (m_in8_pb_cb.isunset())
+	{
 		for (int i = 0; i < 8; i++)
 			in |= (m_in_pb_cb[i].isunset() ? BIT(m_pb_in, i) : m_in_pb_cb[i]()) << i;
-	} else
+	}
+	else
 		in = m_in8_pb_cb();
 
 	uint8_t data = (m_pb_out & m_pb_ddr) | (in & ~m_pb_ddr);
@@ -503,8 +511,20 @@ uint8_t mos6530_device_base::timer_r(bool ie)
 {
 	uint8_t data = get_timer();
 
-	if (!machine().side_effects_disabled()) {
-		timer_irq_enable(ie);
+	if (!machine().side_effects_disabled())
+	{
+		// IRQ is not cleared when reading at the same time IRQ is raised
+		if (m_timeout < machine().time() - attotime::from_hz(2 * clock()))
+		{
+			m_irq_timer = false;
+
+			// timer goes back to count mode
+			if (m_timerstate == TIMER_SPINNING)
+				timer_start(data);
+		}
+
+		m_ie_timer = ie;
+		update_irq();
 
 		LOGTIMER("%s %s %s Timer read %02x IE %u\n", machine().time().as_string(), machine().describe_context(), name(), data, m_ie_timer ? 1 : 0);
 	}
@@ -521,11 +541,10 @@ uint8_t mos6530_device_base::irq_r()
 {
 	uint8_t data = get_irq_flags();
 
-	if (!machine().side_effects_disabled()) {
-		if (m_irq_edge) {
-			m_irq_edge = false;
-			update_irq();
-		}
+	if (!machine().side_effects_disabled() && m_irq_edge)
+	{
+		m_irq_edge = false;
+		update_irq();
 	}
 
 	return data;
@@ -551,16 +570,13 @@ void mos6530_device_base::timer_w(offs_t offset, uint8_t data, bool ie)
 	// A0-A1 contain the prescaler
 	static const uint8_t timershift[4] = { 0, 3, 6, 10 };
 	m_timershift = timershift[offset & 3];
+	timer_start(data);
 
-	timer_irq_enable(ie);
+	m_irq_timer = false;
+	m_ie_timer = ie;
+	update_irq();
 
 	LOGTIMER("%s %s %s Timer value %02x prescale %u IE %u\n", machine().time().as_string(), machine().describe_context(), name(), data, 1 << m_timershift, m_ie_timer ? 1 : 0);
-
-	// update the timer
-	m_timerstate = TIMER_COUNTING;
-	attotime curtime = machine().time();
-	int64_t target = curtime.as_ticks(clock()) + 1 + (data << m_timershift);
-	m_timer->adjust(attotime::from_ticks(target, clock()) - curtime);
 }
 
 

@@ -197,23 +197,178 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 ***************************************************************************/
 
 #include "emu.h"
-#include "gottlieb.h"
+#include "gottlieb_a.h"
 
+#include "cpu/i86/i86.h"
+#include "cpu/m6502/m6502.h"
+#include "machine/ldpr8210.h"
 #include "machine/nvram.h"
 #include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/dac.h"
+#include "sound/samples.h"
+#include "video/resnet.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
-#define LOG_AUDIO_DECODE    (0)
+#define LOG_AUDIO_DECODE        (0)
 
-#define SYSTEM_CLOCK        XTAL(20'000'000)
-#define CPU_CLOCK           XTAL(15'000'000)
-#define NTSC_CLOCK          XTAL(14'318'181)
-#define LASERDISC_CLOCK     PERIOD_OF_555_ASTABLE(16000, 10000, 0.001e-6)
+#define SYSTEM_CLOCK            XTAL(20'000'000)
+#define CPU_CLOCK               XTAL(15'000'000)
+#define NTSC_CLOCK              XTAL(14'318'181)
+#define LASERDISC_CLOCK         PERIOD_OF_555_ASTABLE(16000, 10000, 0.001e-6)
 
-#define AUDIORAM_SIZE       0x400
+#define AUDIORAM_SIZE           0x400
+
+#define GOTTLIEB_VIDEO_HCOUNT   318
+#define GOTTLIEB_VIDEO_HBLANK   256
+#define GOTTLIEB_VIDEO_VCOUNT   256
+#define GOTTLIEB_VIDEO_VBLANK   240
+
+namespace {
+
+class gottlieb_state : public driver_device
+{
+public:
+	gottlieb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_laserdisc(*this, "laserdisc")
+		, m_r1_sound(*this, "r1sound")
+		, m_r2_sound(*this, "r2sound")
+		, m_knocker_sample(*this, "knocker_sam")
+		, m_videoram(*this, "videoram")
+		, m_charram(*this, "charram")
+		, m_spriteram(*this, "spriteram")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_paletteram(*this, "paletteram")
+		, m_track_x(*this, "TRACKX")
+		, m_track_y(*this, "TRACKY")
+		, m_leds(*this, "led%u", 0U)
+		, m_knockers(*this, "knocker%d", 0U)
+	{ }
+
+	void gottlieb_core(machine_config &config);
+	void cobram3(machine_config &config);
+	void screwloo(machine_config &config);
+	void gottlieb2(machine_config &config);
+	void gottlieb2_ram_rom(machine_config &config);
+	void reactor(machine_config &config);
+	void tylz(machine_config &config);
+	void g2laser(machine_config &config);
+	void qbert(machine_config &config);
+	void qbert_knocker(machine_config &config);
+	void gottlieb1(machine_config &config);
+	void gottlieb1_rom(machine_config &config);
+	void gottlieb1_votrax(machine_config &config);
+
+	void init_romtiles();
+	void init_screwloo();
+	void init_vidvince();
+	void init_ramtiles();
+	void init_stooges();
+	void init_qbert();
+	void init_qbertqub();
+
+	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(track_delta_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(stooges_joystick_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	void analog_reset_w(u8 data);
+	void general_output_w(u8 data);
+	void reactor_output_w(u8 data);
+	void stooges_output_w(u8 data);
+	void qbertqub_output_w(u8 data);
+	void qbert_output_w(u8 data);
+	void qbert_knocker(u8 knock);
+	u8 laserdisc_status_r(offs_t offset);
+	void laserdisc_select_w(u8 data);
+	void laserdisc_command_w(u8 data);
+	void sound_w(u8 data);
+	void palette_w(offs_t offset, u8 data);
+	void video_control_w(u8 data);
+	void laserdisc_video_control_w(u8 data);
+	void videoram_w(offs_t offset, u8 data);
+	void charram_w(offs_t offset, u8 data);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_screwloo_bg_tile_info);
+	DECLARE_VIDEO_START(screwloo);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(interrupt);
+	TIMER_CALLBACK_MEMBER(laserdisc_philips_callback);
+	TIMER_CALLBACK_MEMBER(laserdisc_bit_off_callback);
+	TIMER_CALLBACK_MEMBER(laserdisc_bit_callback);
+	TIMER_CALLBACK_MEMBER(nmi_clear);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	inline void audio_end_state();
+	void audio_process_clock(bool logit);
+	void audio_handle_zero_crossing(const attotime &zerotime, bool logit);
+	void laserdisc_audio_process(int samplerate, int samples, const int16_t *ch0, const int16_t *ch1);
+
+	void gottlieb_base_map(address_map &map);
+	void gottlieb_ram_map(address_map &map);
+	void gottlieb_ram_rom_map(address_map &map);
+	void gottlieb_rom_map(address_map &map);
+	void reactor_map(address_map &map);
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	optional_device<pioneer_pr8210_device> m_laserdisc;
+	optional_device<gottlieb_sound_r1_device> m_r1_sound;
+	optional_device<gottlieb_sound_r2_device> m_r2_sound;
+	optional_device<samples_device> m_knocker_sample;
+
+	required_shared_ptr<u8> m_videoram;
+	required_shared_ptr<u8> m_charram;
+	required_shared_ptr<u8> m_spriteram;
+
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<u8> m_paletteram;
+
+	optional_ioport m_track_x;
+	optional_ioport m_track_y;
+	output_finder<3> m_leds; // only used by reactor
+	output_finder<1> m_knockers; // only used by qbert
+
+	u8 m_knocker_prev = 0U;
+	u8 m_joystick_select = 0U;
+	u8 m_track[2]{};
+	emu_timer *m_laserdisc_bit_timer = nullptr;
+	emu_timer *m_laserdisc_bit_off_timer = nullptr;
+	emu_timer *m_laserdisc_philips_timer = nullptr;
+	emu_timer *m_nmi_clear_timer = nullptr;
+	u8 m_laserdisc_select = 0U;
+	u8 m_laserdisc_status = 0U;
+	uint16_t m_laserdisc_philips_code = 0U;
+	std::unique_ptr<u8[]> m_laserdisc_audio_buffer;
+	uint16_t m_laserdisc_audio_address = 0U;
+	int16_t m_laserdisc_last_samples[2]{};
+	attotime m_laserdisc_last_time;
+	attotime m_laserdisc_last_clock;
+	u8 m_laserdisc_zero_seen = 0U;
+	u8 m_laserdisc_audio_bits = 0U;
+	u8 m_laserdisc_audio_bit_count = 0U;
+	u8 m_gfxcharlo = 0U;
+	u8 m_gfxcharhi = 0U;
+	u8 m_background_priority = 0U;
+	u8 m_spritebank = 0U;
+	u8 m_transparent0 = 0U;
+	tilemap_t *m_bg_tilemap = nullptr;
+	double m_weights[4]{};
+};
 
 
 
@@ -227,6 +382,7 @@ void gottlieb_state::machine_start()
 {
 	m_leds.resolve();
 	m_knockers.resolve();
+
 	/* register for save states */
 	save_item(NAME(m_joystick_select));
 	save_item(NAME(m_track));
@@ -271,11 +427,232 @@ void gottlieb_state::machine_start()
 }
 
 
+void gottlieb_state::video_start()
+{
+	static const int resistances[4] = { 2000, 1000, 470, 240 };
+
+	/* compute palette information */
+	/* note that there really are pullup/pulldown resistors, but this situation is complicated */
+	/* by the use of transistors, so we ignore that and just use the realtive resistor weights */
+	compute_resistor_weights(0, 255, -1.0,
+			4, resistances, m_weights, 180, 0,
+			4, resistances, m_weights, 180, 0,
+			4, resistances, m_weights, 180, 0);
+	m_transparent0 = false;
+
+	/* configure the background tilemap */
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gottlieb_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap->set_transparent_pen(0);
+
+	/* save some state */
+	save_item(NAME(m_background_priority));
+	save_item(NAME(m_spritebank));
+	save_item(NAME(m_transparent0));
+}
+
+
+VIDEO_START_MEMBER(gottlieb_state,screwloo)
+{
+	static const int resistances[4] = { 2000, 1000, 470, 240 };
+
+	/* compute palette information */
+	/* note that there really are pullup/pulldown resistors, but this situation is complicated */
+	/* by the use of transistors, so we ignore that and just use the realtive resistor weights */
+	compute_resistor_weights(0, 255, -1.0,
+			4, resistances, m_weights, 180, 0,
+			4, resistances, m_weights, 180, 0,
+			4, resistances, m_weights, 180, 0);
+	m_transparent0 = false;
+
+	/* configure the background tilemap */
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gottlieb_state::get_screwloo_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap->set_transparent_pen(0);
+
+	/* save some state */
+	save_item(NAME(m_background_priority));
+	save_item(NAME(m_spritebank));
+	save_item(NAME(m_transparent0));
+}
+
+
 void gottlieb_state::machine_reset()
 {
 	/* if we have a laserdisc, reset our philips code callback for the next line 17 */
 	if (m_laserdisc != nullptr)
 		m_laserdisc_philips_timer->adjust(m_screen->time_until_pos(17), 17);
+}
+
+
+
+/*************************************
+ *
+ *  Palette RAM writes
+ *
+ *************************************/
+
+void gottlieb_state::palette_w(offs_t offset, u8 data)
+{
+	int val;
+
+	m_paletteram[offset] = data;
+
+	/* blue & green are encoded in the even bytes */
+	val = m_paletteram[offset & ~1];
+	int const g = combine_weights(m_weights, BIT(val, 4), BIT(val, 5), BIT(val, 6), BIT(val, 7));
+	int const b = combine_weights(m_weights, BIT(val, 0), BIT(val, 1), BIT(val, 2), BIT(val, 3));
+
+	/* red is encoded in the odd bytes */
+	val = m_paletteram[offset | 1];
+	int const r = combine_weights(m_weights, BIT(val, 0), BIT(val, 1), BIT(val, 2), BIT(val, 3));
+
+	/* alpha is set to 0 if laserdisc video is enabled */
+	int const a = (m_transparent0 && offset / 2 == 0) ? 0 : 255;
+	m_palette->set_pen_color(offset / 2, rgb_t(a, r, g, b));
+}
+
+
+
+/*************************************
+ *
+ *  Video controls
+ *
+ *************************************/
+
+void gottlieb_state::video_control_w(u8 data)
+{
+	/* bit 0 controls foreground/background priority */
+	if (m_background_priority != (BIT(data, 0)))
+		m_screen->update_partial(m_screen->vpos());
+	m_background_priority = BIT(data, 0);
+
+	/* bit 1 controls horizontal flip screen */
+	flip_screen_x_set(BIT(data, 1));
+
+	/* bit 2 controls vertical flip screen */
+	flip_screen_y_set(BIT(data, 2));
+}
+
+
+void gottlieb_state::laserdisc_video_control_w(u8 data)
+{
+	/* bit 0 works like the other games */
+	video_control_w(BIT(data, 0));
+
+	/* bit 1 controls the sprite bank. */
+	m_spritebank = BIT(data, 1);
+
+	/* bit 2 video enable (0 = black screen) */
+	/* bit 3 genlock control (1 = show laserdisc image) */
+	m_laserdisc->overlay_enable((data & 0x04) ? true : false);
+	m_laserdisc->video_enable(((data & 0x0c) == 0x0c) ? true : false);
+
+	/* configure the palette if the laserdisc is enabled */
+	m_transparent0 = BIT(data, 3);
+	palette_w(0, m_paletteram[0]);
+}
+
+
+
+/*************************************
+ *
+ *  Video RAM and character RAM access
+ *
+ *************************************/
+
+void gottlieb_state::videoram_w(offs_t offset, u8 data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+
+void gottlieb_state::charram_w(offs_t offset, u8 data)
+{
+	if (m_charram[offset] != data)
+	{
+		m_charram[offset] = data;
+		m_gfxdecode->gfx(0)->mark_dirty(offset / 32);
+	}
+}
+
+
+TILE_GET_INFO_MEMBER(gottlieb_state::get_bg_tile_info)
+{
+	int code = m_videoram[tile_index];
+	if ((code & 0x80) == 0)
+		tileinfo.set(m_gfxcharlo, code, 0, 0);
+	else
+		tileinfo.set(m_gfxcharhi, code, 0, 0);
+}
+
+TILE_GET_INFO_MEMBER(gottlieb_state::get_screwloo_bg_tile_info)
+{
+	int code = m_videoram[tile_index];
+	if ((code & 0xc0) == 0)
+		tileinfo.set(m_gfxcharlo, code, 0, 0);
+	else
+		tileinfo.set(m_gfxcharhi, code, 0, 0);
+}
+
+
+
+/*************************************
+ *
+ *  Sprite rendering
+ *
+ *************************************/
+
+void gottlieb_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	rectangle clip = cliprect;
+	int offs;
+
+	/* this is a temporary guess until the sprite hardware is better understood */
+	/* there is some additional clipping, but this may not be it */
+	clip.min_x = 8;
+
+	for (offs = 0; offs < 256; offs += 4)
+	{
+		/* coordinates hand tuned to make the position correct in Q*Bert Qubes start */
+		/* of level animation. */
+		int sx = (m_spriteram[offs + 1]) - 4;
+		int sy = (m_spriteram[offs]) - 13;
+		int code = (255 ^ m_spriteram[offs + 2]) + 256 * m_spritebank;
+
+		if (flip_screen_x()) sx = 233 - sx;
+		if (flip_screen_y()) sy = 228 - sy;
+
+		m_gfxdecode->gfx(2)->transpen(bitmap,clip,
+		code, 0,
+		flip_screen_x(), flip_screen_y(),
+		sx,sy, 0);
+	}
+}
+
+
+
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
+
+uint32_t gottlieb_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	/* if the background has lower priority, render it first, else clear the screen */
+	if (!m_background_priority)
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	else
+		bitmap.fill(m_palette->pen(0), cliprect);
+
+	/* draw the sprites */
+	draw_sprites(bitmap, cliprect);
+
+	/* if the background has higher priority, render it now */
+	if (m_background_priority)
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
 }
 
 
@@ -2643,6 +3020,8 @@ void gottlieb_state::init_vidvince()
 	m_gfxcharlo = 1;
 	m_gfxcharhi = 0;
 }
+
+} // anonymous namespace
 
 
 

@@ -460,8 +460,25 @@ ace                             // [1976 Allied Leisure]
 @source:alliedleisure/aleisttl.cpp
 sburners                        // (c) 1975 Allied Leisure
 
+@source:alliedleisure/aztarac.cpp
+aztarac                         // (c) 1983 Centuri (vector game)
+
 @source:alliedleisure/clayshoo.cpp
 clayshoo                        // [1979 Allied Leisure]
+
+@source:alliedleisure/killcom.cpp
+challeng                        // (c) 1981 Centuri
+kaos                            // (c) 1981
+killcom                         // (c) 1980 Centuri
+leprechn                        // (c) 1982
+leprechna                       // (c) 1982
+megatack                        // (c) 1980 Centuri
+megatacka                       // (c) 1980 Centuri
+piratetr                        // (c) 1982
+potogold                        // (c) 1982
+
+@source:alliedleisure/trvquest.cpp
+trvquest                        // (c) 1984 Techstar / Sunn
 
 @source:alpha/alpha68k.cpp
 btlfield                        // Alpha-68K96II 'BT' (c) 1987
@@ -18592,29 +18609,6 @@ gp2x                            // GP2X 2005
 @source:gamepark/gp32.cpp
 gp32                            // GP32 2001
 
-@source:gameplan/enigma2.cpp
-enigma2                         // (c) 1981 Game Plan (Zilec Electronics license)
-enigma2a                        // (c) 1984 Zilec Electronics (bootleg?)
-enigma2b                        // (c) 1981 Zilec Electronics
-
-@source:gameplan/gameplan.cpp
-challeng                        // (c) 1981 Centuri
-kaos                            // (c) 1981
-killcom                         // (c) 1980 Centuri
-leprechn                        // (c) 1982
-leprechp                        // (c) 1982
-megatack                        // (c) 1980 Centuri
-megatacka                       // (c) 1980 Centuri
-piratetr                        // (c) 1982
-potogold                        // (c) 1982
-
-@source:gameplan/toratora.cpp
-toratora                        // (c) 1980 Game Plan
-toratorab                       // (c) 1980 Game Plan
-
-@source:gameplan/trvquest.cpp
-trvquest                        // (c) 1984 Sunn / Techstar
-
 @source:gametron/gatron.cpp
 bingo                           // Game-A-Tron?
 poker41                         // (c) 1983 Game-A-Tron
@@ -28473,9 +28467,6 @@ avtnfl                          // (c) 1989 AVT
 avtsym14                        // (c) 1985 AVT
 avtsym25                        // (c) 1985 AVT
 
-@source:misc/aztarac.cpp
-aztarac                         // (c) 1983 Centuri (vector game)
-
 @source:misc/babysuprem.cpp
 bsuprem                         // (c) 198? Andra / Vifico
 
@@ -29432,6 +29423,11 @@ foolrace
 @source:misc/electra.cpp
 avenger                         // (c) 1975 Electra
 flyingf                         // (c) 1976 Electra
+
+@source:misc/enigma2.cpp
+enigma2                         // (c) 1981 Zilec Electronics (Game Plan license)
+enigma2a                        // (c) 1984 Zilec Electronics (bootleg?)
+enigma2b                        // (c) 1981 Zilec Electronics
 
 @source:misc/epos.cpp
 catapult                        // (c) 1982
@@ -31683,6 +31679,10 @@ tmspoker                        //
 @source:misc/tomsadvs.cpp
 icecoldice                      // (c) ICE
 tomsadvs                        //
+
+@source:misc/toratora.cpp
+toratora                        // (c) 1980 Game Plan
+toratorab                       // (c) 1980 Game Plan
 
 @source:misc/triton.cpp
 triton41                        // 1978 Transam Triton L4.1
@@ -40718,24 +40718,27 @@ tim011                          //
 @source:sfrj/tim100.cpp
 tim100                          //
 
-@source:sgi/4dpi.cpp
-4d20                            //  IP6: Personal Iris 4D/20, R2000 @12.5MHz
-4d25                            // IP10: Personal Iris 4D/25, R3000 @20MHz
-4d30                            // IP14: Personal Iris 4D/30, R3000A @30MHz
-4d35                            // IP12: Personal Iris 4D/35, R3000A @36MHz
-
 @source:sgi/crimson.cpp
 crimson                         // (c) 1992 SGI
-
-@source:sgi/indigo.cpp
-indigo3k                        // IP12: Indigo 1, R3000, 33MHz
-indigo4k                        // IP20: Indigo 1, R4400, 150MHz
 
 @source:sgi/indy_indigo2.cpp
 indy_4610                       // IP22: Indy, R4600, 100MHz
 indy_4613                       // IP22: Indy, R4600, 133MHz
 indy_5015                       // IP22: Indy, R5000, 150MHz
 indigo2_4415                    // IP24: Indigo 2, R4400, 150MHz
+
+@source:sgi/ip6.cpp
+pi4d20                          // Personal IRIS 4D/20 (R2000 @ 12.5MHz)
+pi4d25                          // Personal IRIS 4D/25 (R3000 @ 20MHz)
+
+@source:sgi/ip12.cpp
+pi4d30                          // Personal IRIS 4D/30 (R3000A @ 30MHz)
+pi4d35                          // Personal IRIS 4D/35 (R3000A @ 36MHz)
+indigo                          // IRIS Indigo HP1 (R3000A @ 33MHz)
+
+@source:sgi/ip20.cpp
+indigo_r4000                    // Indigo HP2, PM1 (R4000 @ 100MHz)
+indigo_r4400                    // Indigo HP2, PM2 (R4400 @ 150MHz)
 
 @source:sgi/iris3130.cpp
 iris3130                        // IP2: IRIS 3xx0, 68020, 16MHz
@@ -43598,6 +43601,7 @@ rygar                           // 6002 - (c) 1986 Tecmo
 rygar2                          // 6002 - (c) 1986 Tecmo
 rygar3                          // 6002 - (c) 1986 Tecmo
 rygarj                          // 6002 - (c) 1986 Tecmo
+rygarj2                         // 6002 - (c) 1986 Tecmo
 silkworm                        // 6217 - (c) 1988 Tecmo
 silkwormj                       // 6217 - (c) 1988 Tecmo
 silkwormp                       // 6217 - (c) 1988 Tecmo

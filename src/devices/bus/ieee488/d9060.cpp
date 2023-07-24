@@ -542,7 +542,7 @@ void d9060_device_base::device_reset()
 
 	m_hdccpu->set_input_line(M6502_SET_OVERFLOW, ASSERT_LINE);
 
-	m_riot1->pa7_w(1);
+	m_riot1->pa_bit_w<7>(1);
 }
 
 
@@ -554,7 +554,7 @@ void d9060_device_base::ieee488_atn(int state)
 {
 	update_ieee_signals();
 
-	m_riot1->pa7_w(state);
+	m_riot1->pa_bit_w<7>(state);
 }
 
 

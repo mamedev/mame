@@ -42,6 +42,11 @@ private:
 
 	void program_map(address_map &map);
 	void io_map(address_map &map);
+
+	void ppi0_b_w(uint8_t data);
+	void ppi0_c_w(uint8_t data);
+	void ppi1_b_w(uint8_t data);
+	void ppi1_c_w(uint8_t data);
 };
 
 
@@ -59,28 +64,56 @@ void katosmedz80_state::io_map(address_map &map)
 	// map(0x08, 0x08) // ??
 	map(0x0c, 0x0c).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
+/*
+  .-----.-----------.---------.---------.---------.-------.-------.-------.
+  | PPI | Map Range | control | PA mode | PB mode | PortA | PortB | PortC |
+  '-----+-----------'---------'---------'---------'-------'-------'-------'
+   PPI0    00h-03h     0x90       M0        M0       IN      OUT     OUT
+   PPI1    04h-07h     0x90       M0        M0       IN      OUT     OUT
+
+*/
+
+void katosmedz80_state::ppi0_b_w(uint8_t data)
+{
+	logerror("PPI0 Port B OUT: %02X\n", data);
+}
+
+void katosmedz80_state::ppi0_c_w(uint8_t data)
+{
+	logerror("PPI0 Port C OUT: %02X\n", data);
+}
+
+void katosmedz80_state::ppi1_b_w(uint8_t data)
+{
+	logerror("PPI1 Port B OUT: %02X\n", data);
+}
+
+void katosmedz80_state::ppi1_c_w(uint8_t data)
+{
+	logerror("PPI1 Port C OUT: %02X\n", data);
+}
 
 
 static INPUT_PORTS_START( dnbanban )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("IN0-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("IN0-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("IN0-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("IN0-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("IN0-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("IN0-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("IN0-8")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("IN1-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("IN1-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN1-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN1-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN1-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("IN1-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("IN1-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")
 
 	PORT_START("DSW") // 4-DIP bank
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -106,9 +139,17 @@ void katosmedz80_state::dnbanban(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &katosmedz80_state::io_map);
 	m_maincpu->set_periodic_int(FUNC(katosmedz80_state::irq0_line_hold), attotime::from_hz(4*60)); // wrong
 
-	I8255(config, "ppi0"); // D71055C
+	i8255_device &ppi0(I8255(config, "ppi0")); // D71055C
+	// (00-03) Mode 0 - Ports A set as input, Ports B, high C & low C as output.
+	ppi0.in_pa_callback().set_ioport("IN0");
+	ppi0.out_pb_callback().set(FUNC(katosmedz80_state::ppi0_b_w));
+	ppi0.out_pc_callback().set(FUNC(katosmedz80_state::ppi0_c_w));
 
-	I8255(config, "ppi1"); // D71055C
+	i8255_device &ppi1(I8255(config, "ppi1")); // D71055C
+	// (04-07) Mode 0 - Ports A set as input, Ports B, high C & low C as output.
+	ppi1.in_pa_callback().set_ioport("IN1");
+	ppi1.out_pb_callback().set(FUNC(katosmedz80_state::ppi1_b_w));
+	ppi1.out_pc_callback().set(FUNC(katosmedz80_state::ppi1_c_w));
 
 	// 2x LEDs
 

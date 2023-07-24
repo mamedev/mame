@@ -6994,7 +6994,7 @@ ROM_END
 /* B-Board 89625B-1 */
 ROM_START( nemoja )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_BYTE( "nmj_36a.12f", 0x00000, 0x20000, CRC(daeceabb) SHA1(ebd44922be9d07a3d3411af52edee8a60cb11dad) ) // data identical to nemoj, only 4 program ROMs explicitly labaled with "J"
+	ROM_LOAD16_BYTE( "nmj_36a.12f", 0x00000, 0x20000, CRC(daeceabb) SHA1(ebd44922be9d07a3d3411af52edee8a60cb11dad) ) // data identical to nemoj, only 4 program ROMs explicitly labeled with "J"
 	ROM_LOAD16_BYTE( "nmj_42a.12h", 0x00001, 0x20000, CRC(55024740) SHA1(4bacbd191bb435de5dc548ac7fa16ed286bd2d3b) )
 	ROM_LOAD16_BYTE( "nmj_37a.13f", 0x40000, 0x20000, CRC(619068b6) SHA1(2507c6f77a06a80f913c848dcb6816bcbf4bba8a) )
 	ROM_LOAD16_BYTE( "nmj_43a.13h", 0x40001, 0x20000, CRC(a948a53b) SHA1(65c2abf321cf8b171bbfbb51ed57bc99eb552ca9) )
@@ -8579,7 +8579,7 @@ ROM_START( sf2re ) // combines sf2m8 program ROMs with sf2cems6a ROMs for most G
 ROM_END
 
 // PCB is marked: "100P003" and "054-034" on solder side
-// PCB is labelled: "10037SI 7", "STREET FIGHTER 2" and "STREET FIGHTER II MAGIC TURBO" on component side
+// PCB is labeled: "10037SI 7", "STREET FIGHTER 2" and "STREET FIGHTER II MAGIC TURBO" on component side
 ROM_START( sf2mkot )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "u222.bin", 0x000000, 0x80000, CRC(b01a94b6) SHA1(a23682ccb463d766fd81a53cbc29b31f3fd4e5e0) )

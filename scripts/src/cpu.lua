@@ -1600,6 +1600,7 @@ end
 --@src/devices/cpu/m6502/m5074x.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6500_1.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6502.h,CPUS["M6502"] = true
+--@src/devices/cpu/m6502/m6503.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6504.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6507.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6509.h,CPUS["M6502"] = true
@@ -1645,6 +1646,8 @@ if CPUS["M6502"] then
 		MAME_DIR .. "src/devices/cpu/m6502/m6502.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m6502mcu.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m6502mcu.ipp",
+		MAME_DIR .. "src/devices/cpu/m6502/m6503.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/m6503.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m6504.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m6504.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m6507.cpp",

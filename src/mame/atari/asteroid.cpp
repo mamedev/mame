@@ -856,7 +856,7 @@ void asteroid_state::asteroid_base(machine_config &config)
 	VECTOR(config, "vector");
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
 	screen.set_refresh_hz(CLOCK_3KHZ/12/4);
-	screen.set_size(400,300);
+	screen.set_size(400, 300);
 	screen.set_visarea(522, 1566, 394, 1182);
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 

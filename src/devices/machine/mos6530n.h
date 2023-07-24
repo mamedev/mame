@@ -65,33 +65,26 @@
 class mos6530_device_base : public device_t
 {
 public:
-	auto irq_wr_callback() { return m_irq_cb.bind(); }
+	// port byte callbacks
 	auto pa_rd_callback() { return m_in8_pa_cb.bind(); }
 	auto pa_wr_callback() { return m_out8_pa_cb.bind(); }
 	auto pb_rd_callback() { return m_in8_pb_cb.bind(); }
 	auto pb_wr_callback() { return m_out8_pb_cb.bind(); }
+
+	// port bit callbacks
 	template <unsigned N> auto pa_rd_callback() { return m_in_pa_cb[N].bind(); }
 	template <unsigned N> auto pa_wr_callback() { return m_out_pa_cb[N].bind(); }
 	template <unsigned N> auto pb_rd_callback() { return m_in_pb_cb[N].bind(); }
 	template <unsigned N> auto pb_wr_callback() { return m_out_pb_cb[N].bind(); }
 
-	void pa0_w(int state) { pa_w(0, state); }
-	void pa1_w(int state) { pa_w(1, state); }
-	void pa2_w(int state) { pa_w(2, state); }
-	void pa3_w(int state) { pa_w(3, state); }
-	void pa4_w(int state) { pa_w(4, state); }
-	void pa5_w(int state) { pa_w(5, state); }
-	void pa6_w(int state) { pa_w(6, state); }
-	void pa7_w(int state) { pa_w(7, state); }
+	// _IRQ pin (on 6530 it's shared with PB7)
+	auto irq_wr_callback() { return m_irq_cb.bind(); }
 
-	void pb0_w(int state) { pb_w(0, state); }
-	void pb1_w(int state) { pb_w(1, state); }
-	void pb2_w(int state) { pb_w(2, state); }
-	void pb3_w(int state) { pb_w(3, state); }
-	void pb4_w(int state) { pb_w(4, state); }
-	void pb5_w(int state) { pb_w(5, state); }
-	void pb6_w(int state) { pb_w(6, state); }
-	void pb7_w(int state) { pb_w(7, state); }
+	// write to port inputs (PA7 can trigger an IRQ, the others are normal inputs)
+	void pa_w(offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pb_w(offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	template <unsigned N> void pa_bit_w(int state) { pa_w(0, (state & 1) << N, 1 << N); }
+	template <unsigned N> void pb_bit_w(int state) { pb_w(0, (state & 1) << N, 1 << N); }
 
 protected:
 	// construction/destruction
@@ -101,12 +94,14 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	enum {
+	enum
+	{
 		IRQ_EDGE  = 0x40,
 		IRQ_TIMER = 0x80
 	};
 
-	enum {
+	enum
+	{
 		TIMER_COUNTING,
 		TIMER_SPINNING
 	};
@@ -115,13 +110,11 @@ protected:
 	virtual void update_pb();
 	virtual void update_irq();
 	virtual uint8_t get_irq_flags();
-	TIMER_CALLBACK_MEMBER(timer_end);
 	uint8_t get_timer();
-	void timer_irq_enable(bool ie);
+	void timer_start(uint8_t data);
+	TIMER_CALLBACK_MEMBER(timer_end);
 	void edge_detect();
 
-	void pa_w(int bit, int state);
-	void pb_w(int bit, int state);
 	void timer_w(offs_t offset, uint8_t data, bool ie);
 	uint8_t timer_r(bool ie);
 

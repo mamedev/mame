@@ -88,7 +88,6 @@ void gottlieb_sound_p2_device::write(uint8_t data)
 
 void gottlieb_sound_p2_device::p2_map(address_map &map)
 {
-	map.global_mask(0x0fff);
 	map.unmap_value_high();
 	map(0x0000, 0x017f).ram();
 	map(0x0200, 0x03ff).rw(m_r6530, FUNC(mos6530_device::read), FUNC(mos6530_device::write));
@@ -115,7 +114,7 @@ INPUT_PORTS_END
 INPUT_CHANGED_MEMBER( gottlieb_sound_p2_device::audio_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
-	if (newval==CLEAR_LINE)
+	if (!newval)
 		m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -127,7 +126,7 @@ INPUT_CHANGED_MEMBER( gottlieb_sound_p2_device::audio_nmi )
 void gottlieb_sound_p2_device::device_add_mconfig(machine_config &config)
 {
 	// audio CPU
-	M6502(config, m_cpu, 800'000); // M6503 - clock is a gate, a resistor and a capacitor. Freq 675-1000kHz.
+	M6503(config, m_cpu, 800'000); // clock is a gate, a resistor and a capacitor. Freq 675-1000kHz.
 	m_cpu->set_addrmap(AS_PROGRAM, &gottlieb_sound_p2_device::p2_map);
 
 	// I/O configuration
@@ -222,7 +221,6 @@ void gottlieb_sound_p3_device::write(uint8_t data)
 
 void gottlieb_sound_p3_device::p3_map(address_map &map)
 {
-	map.global_mask(0x0fff);
 	map.unmap_value_high();
 	map(0x0000, 0x017f).ram();
 	map(0x0200, 0x03ff).rw(m_r6530, FUNC(mos6530_device::read), FUNC(mos6530_device::write));
@@ -237,7 +235,7 @@ void gottlieb_sound_p3_device::p3_map(address_map &map)
 void gottlieb_sound_p3_device::device_add_mconfig(machine_config &config)
 {
 	// audio CPU
-	M6502(config, m_cpu, 800'000); // M6503 - clock is a gate, a resistor and a capacitor. Freq 675-1000kHz.
+	M6503(config, m_cpu, 800'000); // clock is a gate, a resistor and a capacitor. Freq 675-1000kHz.
 	m_cpu->set_addrmap(AS_PROGRAM, &gottlieb_sound_p3_device::p3_map);
 
 	// I/O configuration

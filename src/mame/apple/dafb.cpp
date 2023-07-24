@@ -624,17 +624,21 @@ u32 dafb_base::ramdac_r(offs_t offset)
 	switch (offset << 2)
 	{
 		case 0:
-			m_pal_idx = 0;
+			if (!machine().side_effects_disabled())
+			{
+				m_pal_idx = 0;
+			}
 			return m_pal_address;
 
 		case 0x10:
 			{
-				pen_t entry = m_palette->pen(m_pal_address);
+				pen_t const entry = m_palette->pen(m_pal_address);
+				u8 const idx = m_pal_idx;
 				if (!machine().side_effects_disabled())
 				{
 					m_pal_idx++;
 				}
-				switch (m_pal_idx - 1)
+				switch (idx)
 				{
 					case 0:
 						return (entry >> 16) & 0xff;

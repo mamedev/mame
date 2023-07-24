@@ -4010,7 +4010,7 @@ void pwrkick_state::pwrkick(machine_config &config) // Sunwise SW931201-1 PCB (2
 	m_maincpu->set_addrmap(AS_PROGRAM, &pwrkick_state::pwrkick_68k_mem);
 	m_maincpu->reset_cb().set(FUNC(pwrkick_state::toaplan2_reset));
 
-	UPD4992(config, m_rtc, 32'768);
+	UPD4992(config, m_rtc, 32.768_kHz_XTAL);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -4046,7 +4046,7 @@ void pwrkick_state::othldrby(machine_config &config) // Sunwise S951060-VGP PCB 
 	m_maincpu->set_addrmap(AS_PROGRAM, &pwrkick_state::othldrby_68k_mem);
 	m_maincpu->reset_cb().set(FUNC(pwrkick_state::toaplan2_reset));
 
-	UPD4992(config, m_rtc, 32'768);
+	UPD4992(config, m_rtc, 32.768_kHz_XTAL);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -5177,7 +5177,7 @@ ROM_START( batsugunbl )
 	ROM_LOAD( "27c040.bin", 0x00000, 0x80000, CRC(1f8ec1b6) SHA1(28107a90d29613ceddc001df2556543b33c1294c) )
 ROM_END
 
-ROM_START( pwrkick ) // Sunwise SW931301-1 PCB - 8-liner connections
+ROM_START( pwrkick ) // Sunwise SW931201-1 PCB - 8-liner connections
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "1.u61", 0x000000, 0x080000, CRC(118b5899) SHA1(7a1637a63eb17e3892d79aede5730013a1dc00f9) )
 
@@ -5189,7 +5189,54 @@ ROM_START( pwrkick ) // Sunwise SW931301-1 PCB - 8-liner connections
 	ROM_LOAD( "4.u33", 0x000000, 0x080000, CRC(3ab742f1) SHA1(ce8ca02ca57fd77872e421ce601afd017d3518a0) )
 ROM_END
 
-ROM_START( burgkids ) // Sunwise SW931301-1 PCB - 8-liner connections
+/*
+
+Burger Kids, 1995 Sunwise
+
+SW931201-1
++--||||||-----------------------------------------+
+|         YM3014*  YM2151*                        |
+| TDA1519A         M6295   FFK4.U33          BT1  |
+|                              U31*               |
+|                      16.000MHz 32.768kHz D4992C |
+|                                      MB3771     |
+|8                                                |
+|-                                     U67*       |
+|L                                 FFK1.U61 62256 |
+|I                                     U68* 62256 |
+|N                     GAL16V8B    TMP68HC000P-12 |
+|E                                                |
+|R                                                |
+|                        1635  27.000MHz FFK3.U27 |
+|             GAL16V8B   1635  20.000MHz     U12* |
+| SW1         GAL16V8B    +---------+    FFK2.U26 |
+| SW2                     | L7A0498 |        U13* |
+| SW3                     | GP9001  |   4256 4256 |
+|     6216                +---------+   4256 4256 |
+|     6216                              4256 4256 |
++-------------------------------------------------+
+
+NOTE: This PCB uses an 8-Liner style edge connector
+
+* Denotes unpopulated components
+
+   CPU: Toshiba TMP68HC000P-12
+ Sound: OKI M6295
+ Video: L7A0498 GP9001 QFP208
+   OSC: 27MHz, 20MHz, 16MHz & 32.768kHz
+   RAM: MB81C4256A-70P - 256K x 4-bit DRAM
+        HM62256BLP-9 - 32K x 8-bit SRAM
+        IMS1635P-25 - 8K x 8-bit SRAM
+        XRM6216-10 - 2K x 8-bit SRAM
+ Other: 8 Position Dipswitch x 3
+        NEC D4992 CMOS 8-Bit Parallel I/O Calendar Clock
+        MB3771 Voltage monitor
+        BT1 - CR2550 3Volt battery
+
+NOTE: Sunwise's S951060-VGP PCB uses identical componenets to the SW931201 but has a standard JAMMA connector
+*/
+
+ROM_START( burgkids ) // Sunwise SW931201-1 PCB - 8-liner connections
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "ffk1.u61", 0x000000, 0x080000, CRC(ac96cb0d) SHA1(2ce5c06d61f3ff18b222619e41d09e46d44c5bab) )
 
@@ -5201,7 +5248,7 @@ ROM_START( burgkids ) // Sunwise SW931301-1 PCB - 8-liner connections
 	ROM_LOAD( "ffk4.u33", 0x000000, 0x080000,  CRC(3b032d4f) SHA1(69056bf205aadf6c9fee56ce396b11a5187caa03) )
 ROM_END
 
-ROM_START( othldrby ) // Sunwise S951060-VGP PCB - JAMMA compliant (components identical to Sunwise SW931301-1 PCB)
+ROM_START( othldrby ) // Sunwise S951060-VGP PCB - JAMMA compliant (components identical to Sunwise SW931201-1 PCB)
 	ROM_REGION( 0x080000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "sunwise_db0_1.u61", 0x00000, 0x80000, CRC(6b4008d3) SHA1(4cf838c47563ba482be8364b2e115569a4a06c83) )
 
