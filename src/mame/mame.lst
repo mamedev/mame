@@ -40926,6 +40926,7 @@ profi                           //
 quorum                          //
 scorpio                         //
 scorpiontb                      //
+scorpiongmx                     //
 
 @source:sinclair/spec128.cpp
 hc128                           // 1991 HC-128
