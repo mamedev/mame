@@ -2556,18 +2556,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/mos6530l.h,MACHINES["MOS6530L"] = true
----------------------------------------------------
-
-if (MACHINES["MOS6530L"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/mos6530l.cpp",
-		MAME_DIR .. "src/devices/machine/mos6530l.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/mos6530n.h,MACHINES["MOS6530"] = true
 ---------------------------------------------------
 
