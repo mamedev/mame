@@ -2161,7 +2161,7 @@ void gottlieb_state::gottlieb_core(machine_config &config)
 void gottlieb_state::gottlieb1(machine_config &config)
 {
 	gottlieb_core(config);
-	GOTTLIEB_SOUND_REV1(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	GOTTLIEB_SOUND_REV1(config, m_r1_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void gottlieb_state::gottlieb1_rom(machine_config &config)
@@ -2173,7 +2173,7 @@ void gottlieb_state::gottlieb1_rom(machine_config &config)
 void gottlieb_state::gottlieb2(machine_config &config)
 {
 	gottlieb_core(config);
-	GOTTLIEB_SOUND_REV2(config, m_r2_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	GOTTLIEB_SOUND_REV2(config, m_r2_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void gottlieb_state::gottlieb2_ram_rom(machine_config &config)
@@ -2185,7 +2185,7 @@ void gottlieb_state::gottlieb2_ram_rom(machine_config &config)
 void gottlieb_state::g2laser(machine_config &config)
 {
 	gottlieb_core(config);
-	GOTTLIEB_SOUND_REV2(config, m_r2_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	GOTTLIEB_SOUND_REV2(config, m_r2_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	PIONEER_PR8210(config, m_laserdisc, 0);
 	m_laserdisc->set_audio(FUNC(gottlieb_state::laserdisc_audio_process));
@@ -2213,7 +2213,7 @@ void gottlieb_state::g2laser(machine_config &config)
 void gottlieb_state::gottlieb1_votrax(machine_config &config)
 {
 	gottlieb_core(config);
-	GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void gottlieb_state::reactor(machine_config &config)
@@ -2249,7 +2249,7 @@ void gottlieb_state::screwloo(machine_config &config)
 void gottlieb_state::cobram3(machine_config &config)
 {
 	gottlieb_core(config);
-	GOTTLIEB_SOUND_REV2(config, m_r2_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	GOTTLIEB_SOUND_REV2(config, m_r2_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
 	m_r2_sound->enable_cobram3_mods();
 
 	PIONEER_PR8210(config, m_laserdisc, 0);

@@ -794,7 +794,7 @@ void gts1_state::p2(machine_config &config)
 {
 	p0(config);
 	SPEAKER(config, "mono").front_center();
-	GOTTLIEB_SOUND_PIN2(config, m_p2_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	GOTTLIEB_SOUND_PIN2(config, m_p2_sound).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

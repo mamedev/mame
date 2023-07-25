@@ -190,7 +190,7 @@ protected:
 	uint8_t speech_data_r();
 	uint8_t audio_data_r();
 	uint8_t signal_audio_nmi_r();
-	void signal_audio_nmi_w(uint8_t data);
+	void signal_audio_nmi_w(uint8_t data = 0);
 	void nmi_rate_w(uint8_t data);
 	void speech_ctrl_w(uint8_t data);
 	void psg_latch_w(uint8_t data);
@@ -264,7 +264,7 @@ private:
 
 // ======================> gottlieb_sound_p5_device
 
-// same as p5 plus a YM2151 in the expansion socket
+// same as p4 plus a YM2151 in the expansion socket
 class gottlieb_sound_p5_device : public gottlieb_sound_p4_device
 {
 public:

@@ -555,7 +555,7 @@ void gottlieb_sound_r2_device::speech_control_w(uint8_t data)
 	}
 	else
 	{
-		if ( data & 0x10 )
+		if (data & 0x10)
 		{
 			m_psg_data_latch = m_psg_latch;
 		}
@@ -661,7 +661,6 @@ void gottlieb_sound_r2_device::device_add_mconfig(machine_config &config)
 		.add_route(0, "dac", -1.0, DAC_INPUT_RANGE_LO);
 
 	AY8913(config, m_ay1, SOUND2_CLOCK/2).add_route(ALL_OUTPUTS, *this, 0.5);
-
 	AY8913(config, m_ay2, SOUND2_CLOCK/2).add_route(ALL_OUTPUTS, *this, 0.5);
 
 	SP0250(config, m_sp0250, SOUND2_SPEECH_CLOCK).add_route(ALL_OUTPUTS, *this, 1.0);
@@ -816,15 +815,7 @@ uint8_t gottlieb_sound_p4_device::speech_data_r()
 uint8_t gottlieb_sound_p4_device::signal_audio_nmi_r()
 {
 	if (!machine().side_effects_disabled())
-	{
-		m_dcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		m_dcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		if (m_dcpu2)
-		{
-			m_dcpu2->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-			m_dcpu2->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		}
-	}
+		signal_audio_nmi_w();
 	return 0xff;
 }
 
@@ -836,13 +827,9 @@ uint8_t gottlieb_sound_p4_device::signal_audio_nmi_r()
 
 void gottlieb_sound_p4_device::signal_audio_nmi_w(uint8_t data)
 {
-	m_dcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	m_dcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_dcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	if (m_dcpu2)
-	{
-		m_dcpu2->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		m_dcpu2->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	}
+		m_dcpu2->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -953,7 +940,6 @@ void gottlieb_sound_p4_device::device_add_mconfig(machine_config &config)
 		.add_route(0, "dac", -1.0, DAC_INPUT_RANGE_LO);
 
 	AY8913(config, m_ay1, SOUND2_CLOCK/2).add_route(ALL_OUTPUTS, *this, 0.5);
-
 	AY8913(config, m_ay2, SOUND2_CLOCK/2).add_route(ALL_OUTPUTS, *this, 0.5);
 }
 
@@ -1027,8 +1013,7 @@ TIMER_CALLBACK_MEMBER(gottlieb_sound_p4_device::update_latch)
 //-------------------------------------------------
 
 gottlieb_sound_p5_device::gottlieb_sound_p5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gottlieb_sound_p4_device(mconfig, GOTTLIEB_SOUND_PIN5, tag, owner, clock)
-	, m_ym2151(*this, "ym2151")
+	: gottlieb_sound_p5_device(mconfig, GOTTLIEB_SOUND_PIN5, tag, owner, clock)
 {
 }
 
@@ -1046,9 +1031,7 @@ gottlieb_sound_p5_device::gottlieb_sound_p5_device(
 void gottlieb_sound_p5_device::p5_ymap(address_map &map)
 {
 	gottlieb_sound_p4_device::p4_ymap(map);
-	map.unmap_value_high();
-	map(0x4000, 0x4000).mirror(0x1fff).lw8(NAME([this] (u8 data)
-		{ if (BIT(m_speech_control, 7)) m_ym2151->data_w(data); else m_ym2151->address_w(data); } ));
+	map(0x4000, 0x4000).mirror(0x1fff).lw8(NAME([this](u8 data) { m_ym2151->write(BIT(m_speech_control, 7), data); } ));
 }
 
 //-------------------------------------------------
@@ -1060,7 +1043,7 @@ void gottlieb_sound_p5_device::device_add_mconfig(machine_config &config)
 	gottlieb_sound_p4_device::device_add_mconfig(config);
 	m_ycpu->set_addrmap(AS_PROGRAM, &gottlieb_sound_p5_device::p5_ymap);
 
-	YM2151(config, m_ym2151, SOUND2_CLOCK).add_route(ALL_OUTPUTS, *this, 0.5);
+	YM2151(config, m_ym2151, SOUND2_CLOCK).add_route(ALL_OUTPUTS, *this, 0.75);
 }
 
 void gottlieb_sound_p5_device::device_start()
@@ -1162,7 +1145,6 @@ void gottlieb_sound_p7_device::y_latch_w(uint8_t data)
 void gottlieb_sound_p7_device::p7_ymap(address_map &map)
 {
 	gottlieb_sound_p5_device::p5_ymap(map);
-	map.unmap_value_high();
 	map(0x7800, 0x7800).mirror(0x07ff).w(FUNC(gottlieb_sound_p7_device::y_latch_w));
 	map(0xa000, 0xa000).mirror(0x1fff).w(FUNC(gottlieb_sound_p7_device::y_ctrl_w));
 }
