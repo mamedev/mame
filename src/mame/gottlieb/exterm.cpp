@@ -2,9 +2,13 @@
 // copyright-holders:Alex Pasadyn,Zsolt Vasvari,Aaron Giles
 /****************************************************************************
 
-    Gottlieb Exterminator hardware
+    Premier Technology (Gottlieb) Exterminator hardware
 
     driver by Zsolt Vasvari and Alex Pasadyn
+
+    Premier Technology was the successor to Mylstar Electronics in the mid-80s.
+    It still says Gottlieb on the title screen and the cabinet, but that's
+    just a marketing brand name.
 
 *****************************************************************************
 
@@ -520,4 +524,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1989, exterm, 0, exterm, exterm, exterm_state, empty_init, ROT0, "Gottlieb / Premier Technology", "Exterminator", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, exterm, 0, exterm, exterm, exterm_state, empty_init, ROT0, "Premier Technology", "Exterminator", MACHINE_SUPPORTS_SAVE )

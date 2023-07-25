@@ -150,7 +150,7 @@ u8 spectra_state::porta_r()
 	u8 key = m_io_keyboard[row]->read();
 	u8 ret = ((BIT(key, m_porta & 7)) ? 0x40 : 0) | (m_porta & 0xbf);
 
-	if (ret == 0x1b && m_p_ram[0x7b] < 0x1E)
+	if (ret == 0x1b && m_p_ram[0x7b] < 0x1e)
 		m_samples->start(3, 8); // coin
 
 	return ret;
@@ -209,21 +209,25 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
 		u8 segments = patterns[data&15] | (BIT(data, 4) ? 0x80 : 0);
 		m_digits[m_out_offs] = segments;
 	}
-	else if (m_out_offs < 0x6f)
+	else
+	if (m_out_offs < 0x6f)
 	{
 		m_out_offs = 0x6f;
 	}
-	else if (m_out_offs < 0x74)
+	else
+	if (m_out_offs < 0x74)
 	{
 		if (m_p_ram[m_out_offs])
 			m_samples->start(0, 5); // holes
 	}
-	else if (m_out_offs < 0x77)
+	else
+	if (m_out_offs < 0x77)
 	{
 		if (m_p_ram[m_out_offs])
 			m_samples->start(1, 0); // bumpers
 	}
-	else if (m_out_offs < 0x79)
+	else
+	if (m_out_offs < 0x79)
 	{
 		if (m_p_ram[m_out_offs])
 			m_samples->start(2, 7); // slings

@@ -260,7 +260,6 @@ public:
 	void gottlieb2(machine_config &config);
 	void gottlieb2_ram_rom(machine_config &config);
 	void reactor(machine_config &config);
-	void tylz(machine_config &config);
 	void g2laser(machine_config &config);
 	void qbert(machine_config &config);
 	void qbert_knocker(machine_config &config);
@@ -2164,6 +2163,12 @@ void gottlieb_state::gottlieb1(machine_config &config)
 	GOTTLIEB_SOUND_REV1(config, m_r1_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
+void gottlieb_state::gottlieb1_votrax(machine_config &config)
+{
+	gottlieb_core(config);
+	GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
+
 void gottlieb_state::gottlieb1_rom(machine_config &config)
 {
 	gottlieb1(config);
@@ -2209,13 +2214,6 @@ void gottlieb_state::g2laser(machine_config &config)
  *
  *************************************/
 
-
-void gottlieb_state::gottlieb1_votrax(machine_config &config)
-{
-	gottlieb_core(config);
-	GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
-}
-
 void gottlieb_state::reactor(machine_config &config)
 {
 	gottlieb1_votrax(config);
@@ -2232,11 +2230,6 @@ void gottlieb_state::qbert(machine_config &config)
 
 	/* sound hardware */
 	qbert_knocker(config);
-}
-
-void gottlieb_state::tylz(machine_config &config)
-{
-	gottlieb1_votrax(config);
 }
 
 void gottlieb_state::screwloo(machine_config &config)
@@ -2269,6 +2262,7 @@ void gottlieb_state::cobram3(machine_config &config)
 	subdevice<ad7528_device>("r2sound:dac")->reset_routes();
 	subdevice<ad7528_device>("r2sound:dac")->add_route(ALL_OUTPUTS, "r2sound", 1.00);
 }
+
 
 
 /*************************************
@@ -3040,7 +3034,7 @@ GAME( 1982, myqbert,    qbert,    qbert,             qbert,    gottlieb_state, i
 GAME( 1982, qberttst,   qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (early test version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, qbtrktst,   qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert Board Input Test Rom", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, insector,   0,        gottlieb1,         insector, gottlieb_state, init_romtiles, ROT0,   "Gottlieb",                  "Insector (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, tylz,       0,        tylz,              tylz,     gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Tylz (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // modified sound hw?
+GAME( 1982, tylz,       0,        gottlieb1_votrax,  tylz,     gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Tylz (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // modified sound hw?
 GAME( 1984, argusg,     0,        gottlieb1_rom,     argusg,   gottlieb_state, init_ramtiles, ROT0,   "Gottlieb",                  "Argus (Gottlieb, prototype)" , MACHINE_SUPPORTS_SAVE ) // aka Guardian / Protector?
 GAME( 1983, mplanets,   0,        gottlieb1,         mplanets, gottlieb_state, init_romtiles, ROT270, "Gottlieb",                  "Mad Planets", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mplanetsuk, mplanets, gottlieb1,         mplanets, gottlieb_state, init_romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", MACHINE_SUPPORTS_SAVE )
