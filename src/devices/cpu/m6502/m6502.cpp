@@ -412,12 +412,12 @@ void m6502_device::execute_set_input(int inputnum, int state)
 	case IRQ_LINE: irq_state = state == ASSERT_LINE; break;
 	case APU_IRQ_LINE: apu_irq_state = state == ASSERT_LINE; break;
 	case NMI_LINE:
-		if(!nmi_state && state == ASSERT_LINE)
+		if(machine().time() > attotime::zero && !nmi_state && state == ASSERT_LINE)
 			nmi_pending = true;
 		nmi_state = state == ASSERT_LINE;
 		break;
 	case V_LINE:
-		if(!v_state && state == ASSERT_LINE)
+		if(machine().time() > attotime::zero && !v_state && state == ASSERT_LINE)
 			P |= F_V;
 		v_state = state == ASSERT_LINE;
 		break;
