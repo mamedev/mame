@@ -140,6 +140,10 @@ void ip20_state::cpu_map(address_map &map)
 	map(0x1fc0'0000, 0x1fc7'ffff).rom().region("prom", 0);
 }
 
+static DEVICE_INPUT_DEFAULTS_START(ip20_mc)
+	DEVICE_INPUT_DEFAULTS("VALID", 0x0f, 0x07)
+DEVICE_INPUT_DEFAULTS_END
+
 static void scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM_SGI).machine_config(
@@ -172,6 +176,7 @@ void ip20_state::ip20(machine_config &config)
 
 	SGI_MC(config, m_mc, m_cpu, m_eerom, 50'000'000);
 	m_mc->eisa_present().set_constant(0);
+	m_mc->set_input_default(DEVICE_INPUT_DEFAULTS_NAME(ip20_mc));
 
 	SGI_HPC1(config, m_hpc, 0);
 	m_hpc->set_gio(m_cpu, AS_PROGRAM);
@@ -281,6 +286,10 @@ void ip20_state::ip20(machine_config &config)
 ROM_START(indigo_r4000)
 	ROM_REGION64_BE(0x80000, "prom", 0)
 	ROMX_LOAD("ip20prom.070-8116-004.bin", 0x000000, 0x080000, CRC(940d960e) SHA1(596aba530b53a147985ff3f6f853471ce48c866c), ROM_GROUPDWORD | ROM_REVERSE)
+
+	// hand-made content sets eaddr 08:00:69:12:34:56 and netaddr 192.168.137.2
+	ROM_REGION16_LE(0x100, "nvram", 0)
+	ROM_LOAD("nvram.bin", 0x000, 0x100, CRC(b8367798) SHA1(61af4c9dba69e9f0552c10770f16044421730b6d))
 ROM_END
 
 #define rom_indigo_r4400 rom_indigo_r4000
