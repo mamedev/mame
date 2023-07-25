@@ -14,7 +14,7 @@ public:
 	void set_pwm_mode() { m_pwm_mode = true; }
 
 	void write(uint8_t data);
-	uint8_t drq_r();
+	int drq_r();
 
 protected:
 	// device-level overrides

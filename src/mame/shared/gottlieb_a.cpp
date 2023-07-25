@@ -505,17 +505,6 @@ gottlieb_sound_r2_device::gottlieb_sound_r2_device(const machine_config &mconfig
 
 
 //-------------------------------------------------
-//  speech_drq_custom_r - return the SP0250
-//  request line as an input port bit
-//-------------------------------------------------
-
-CUSTOM_INPUT_MEMBER(gottlieb_sound_r2_device::speech_drq_custom_r)
-{
-	return m_sp0250->drq_r();
-}
-
-
-//-------------------------------------------------
 //  speech_control_w - primary audio control
 //  register on the speech board
 //-------------------------------------------------
@@ -623,7 +612,7 @@ INPUT_PORTS_START( gottlieb_sound_r2 )
 	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )            PORT_DIPLOCATION("SB2:3")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(gottlieb_sound_r2_device, speech_drq_custom_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("spsnd", sp0250_device, drq_r)
 INPUT_PORTS_END
 
 ioport_constructor gottlieb_sound_r2_device::device_input_ports() const

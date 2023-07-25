@@ -233,8 +233,6 @@ public:
 	// configuration helpers
 	void enable_cobram3_mods() { m_cobram3_mod = true; }
 
-	CUSTOM_INPUT_MEMBER(speech_drq_custom_r);
-
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
