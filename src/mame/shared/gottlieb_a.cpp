@@ -87,10 +87,10 @@ void gottlieb_sound_p2_device::write(u8 data)
 void gottlieb_sound_p2_device::p2_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x003f).mirror(0x1c0).m(m_r6530, FUNC(mos6530_new_device::ram_map));
-	map(0x0200, 0x020f).mirror(0x1f0).m(m_r6530, FUNC(mos6530_new_device::io_map));
+	map(0x0000, 0x003f).mirror(0x1c0).m(m_r6530, FUNC(mos6530_device::ram_map));
+	map(0x0200, 0x020f).mirror(0x1f0).m(m_r6530, FUNC(mos6530_device::io_map));
 	map(0x0400, 0x07ff).rom();
-	map(0x0c00, 0x0fff).m(m_r6530, FUNC(mos6530_new_device::rom_map));
+	map(0x0c00, 0x0fff).m(m_r6530, FUNC(mos6530_device::rom_map));
 }
 
 
@@ -135,7 +135,7 @@ void gottlieb_sound_p2_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_PROGRAM, &gottlieb_sound_p2_device::p2_map);
 
 	// I/O configuration
-	MOS6530_NEW(config, m_r6530, 800'000); // same as cpu
+	MOS6530(config, m_r6530, 800'000); // same as cpu
 	m_r6530->pa_wr_callback().set("dac", FUNC(dac_byte_interface::data_w));
 
 	// sound devices
@@ -308,8 +308,8 @@ void gottlieb_sound_r1_device::r1_map(address_map &map)
 	// A15 not decoded except in expansion socket
 	map.global_mask(0x7fff);
 	map.unmap_value_high();
-	map(0x0000, 0x007f).mirror(0x0d80).m(m_riot, FUNC(mos6532_new_device::ram_map));
-	map(0x0200, 0x021f).mirror(0x0de0).m(m_riot, FUNC(mos6532_new_device::io_map));
+	map(0x0000, 0x007f).mirror(0x0d80).m(m_riot, FUNC(mos6532_device::ram_map));
+	map(0x0200, 0x021f).mirror(0x0de0).m(m_riot, FUNC(mos6532_device::io_map));
 	map(0x1000, 0x1000).mirror(0x0fff).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x6000, 0x7fff).rom();
 }
@@ -352,7 +352,7 @@ void gottlieb_sound_r1_device::device_add_mconfig(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, "nmi").output_handler().set_inputline("audiocpu", INPUT_LINE_NMI);
 
 	// I/O configuration
-	MOS6532_NEW(config, m_riot, SOUND1_CLOCK/4);
+	MOS6532(config, m_riot, SOUND1_CLOCK/4);
 	m_riot->pb_rd_callback().set_ioport("SB1");
 	m_riot->pb_wr_callback().set("nmi", FUNC(input_merger_device::in_w<0>)).bit(7).invert(); // unsure if this is ever used, but the NMI is connected to the RIOT's PB7
 	m_riot->irq_wr_callback().set_inputline("audiocpu", M6502_IRQ_LINE);

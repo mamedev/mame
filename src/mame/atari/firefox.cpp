@@ -38,7 +38,7 @@ but requires a special level III player for proper control. Video: CAV. Audio: A
 #include "machine/adc0808.h"
 #include "machine/ldvp931.h"
 #include "machine/gen_latch.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "machine/x2212.h"
@@ -120,7 +120,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<mos6532_new_device> m_riot;
+	required_device<mos6532_device> m_riot;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -469,8 +469,8 @@ void firefox_state::main_map(address_map &map)
 void firefox_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x087f).mirror(0x0700).m(m_riot, FUNC(mos6532_new_device::ram_map));
-	map(0x0880, 0x089f).mirror(0x0760).m(m_riot, FUNC(mos6532_new_device::io_map));
+	map(0x0800, 0x087f).mirror(0x0700).m(m_riot, FUNC(mos6532_device::ram_map));
+	map(0x0880, 0x089f).mirror(0x0760).m(m_riot, FUNC(mos6532_device::io_map));
 	map(0x1000, 0x1000).r(soundlatch[0], FUNC(generic_latch_8_device::read));
 	map(0x1800, 0x1800).w(soundlatch[1], FUNC(generic_latch_8_device::write));
 	map(0x2000, 0x200f).rw(m_pokey[0], FUNC(pokey_device::read), FUNC(pokey_device::write));
@@ -647,7 +647,7 @@ void firefox_state::firefox(machine_config &config)
 	X2212(config, "nvram_1c").set_auto_save(true);
 	X2212(config, "nvram_1d").set_auto_save(true);
 
-	MOS6532_NEW(config, m_riot, MASTER_XTAL/8);
+	MOS6532(config, m_riot, MASTER_XTAL/8);
 	m_riot->pa_wr_callback<0>().set(m_tms, FUNC(tms5220_device::wsq_w));
 	m_riot->pa_wr_callback<1>().set(m_tms, FUNC(tms5220_device::rsq_w));
 	m_riot->pa_rd_callback<2>().set(m_tms, FUNC(tms5220_device::readyq_r));
@@ -662,12 +662,12 @@ void firefox_state::firefox(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	GENERIC_LATCH_8(config, soundlatch[0]);
-	soundlatch[0]->data_pending_callback().set(m_riot, FUNC(mos6532_new_device::pa_bit_w<7>)); // MAINFLAG
+	soundlatch[0]->data_pending_callback().set(m_riot, FUNC(mos6532_device::pa_bit_w<7>)); // MAINFLAG
 	soundlatch[0]->data_pending_callback().append_inputline(m_audiocpu, INPUT_LINE_NMI);
 	soundlatch[0]->data_pending_callback().append([this](int state) { if (state) machine().scheduler().perfect_quantum(attotime::from_usec(100)); });
 
 	GENERIC_LATCH_8(config, soundlatch[1]);
-	soundlatch[1]->data_pending_callback().set(m_riot, FUNC(mos6532_new_device::pa_bit_w<6>)); // SOUNDFLAG
+	soundlatch[1]->data_pending_callback().set(m_riot, FUNC(mos6532_device::pa_bit_w<6>)); // SOUNDFLAG
 
 	for (int i = 0; i < 4; i++)
 	{

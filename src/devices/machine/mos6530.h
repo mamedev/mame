@@ -51,8 +51,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_MOS6530N_H
-#define MAME_MACHINE_MOS6530N_H
+#ifndef MAME_MACHINE_MOS6530_H
+#define MAME_MACHINE_MOS6530_H
 
 #pragma once
 
@@ -171,11 +171,11 @@ protected:
 };
 
 
-class mos6530_new_device : public mos6530_device_base
+class mos6530_device : public mos6530_device_base
 {
 public:
 	// construction/destruction
-	mos6530_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void rom_map(address_map &map);
 	virtual void ram_map(address_map &map);
@@ -189,11 +189,11 @@ protected:
 };
 
 
-class mos6532_new_device : public mos6530_device_base
+class mos6532_device : public mos6530_device_base
 {
 public:
 	// construction/destruction
-	mos6532_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos6532_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void ram_map(address_map &map);
 	virtual void io_map(address_map &map);
@@ -201,7 +201,7 @@ public:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(MOS6530_NEW, mos6530_new_device)
-DECLARE_DEVICE_TYPE(MOS6532_NEW, mos6532_new_device)
+DECLARE_DEVICE_TYPE(MOS6530, mos6530_device)
+DECLARE_DEVICE_TYPE(MOS6532, mos6532_device)
 
-#endif // MAME_MACHINE_MOS6530N_H
+#endif // MAME_MACHINE_MOS6530_H

@@ -2544,13 +2544,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/mos6530n.h,MACHINES["MOS6530"] = true
+--@src/devices/machine/mos6530.h,MACHINES["MOS6530"] = true
 ---------------------------------------------------
 
 if (MACHINES["MOS6530"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/machine/mos6530n.cpp",
-		MAME_DIR .. "src/devices/machine/mos6530n.h",
+		MAME_DIR .. "src/devices/machine/mos6530.cpp",
+		MAME_DIR .. "src/devices/machine/mos6530.h",
 	}
 end
 

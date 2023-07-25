@@ -148,8 +148,8 @@ void starwars_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x07ff).w(m_mainlatch, FUNC(generic_latch_8_device::write));
 	map(0x0800, 0x0fff).r(m_soundlatch, FUNC(generic_latch_8_device::read)); /* SIN Read */
-	map(0x1000, 0x107f).m(m_riot, FUNC(mos6532_new_device::ram_map));
-	map(0x1080, 0x109f).m(m_riot, FUNC(mos6532_new_device::io_map));
+	map(0x1000, 0x107f).m(m_riot, FUNC(mos6532_device::ram_map));
+	map(0x1080, 0x109f).m(m_riot, FUNC(mos6532_device::io_map));
 	map(0x1800, 0x183f).w(FUNC(starwars_state::quad_pokeyn_w));
 	map(0x2000, 0x27ff).ram();                         /* program RAM */
 	map(0x4000, 0x7fff).rom();                         /* sound roms */
@@ -287,7 +287,7 @@ void starwars_state::starwars(machine_config &config)
 	adc.in_callback<1>().set_ioport("STICKX"); // yaw
 	adc.in_callback<2>().set_constant(0); // thrust (unused)
 
-	MOS6532_NEW(config, m_riot, MASTER_CLOCK / 8);
+	MOS6532(config, m_riot, MASTER_CLOCK / 8);
 	m_riot->pa_wr_callback<0>().set(m_tms, FUNC(tms5220_device::wsq_w));
 	m_riot->pa_wr_callback<1>().set(m_tms, FUNC(tms5220_device::rsq_w));
 	m_riot->pa_rd_callback<2>().set(m_tms, FUNC(tms5220_device::readyq_r));
@@ -333,11 +333,11 @@ void starwars_state::starwars(machine_config &config)
 	TMS5220(config, m_tms, MASTER_CLOCK/2/9).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set(m_riot, FUNC(mos6532_new_device::pa_bit_w<7>));
+	m_soundlatch->data_pending_callback().set(m_riot, FUNC(mos6532_device::pa_bit_w<7>));
 	m_soundlatch->data_pending_callback().append([this](int state) { if (state) machine().scheduler().perfect_quantum(attotime::from_usec(100)); });
 
 	GENERIC_LATCH_8(config, m_mainlatch);
-	m_mainlatch->data_pending_callback().set(m_riot, FUNC(mos6532_new_device::pa_bit_w<6>));
+	m_mainlatch->data_pending_callback().set(m_riot, FUNC(mos6532_device::pa_bit_w<6>));
 	m_mainlatch->data_pending_callback().append([this](int state) { if (state) machine().scheduler().perfect_quantum(attotime::from_usec(100)); });
 }
 

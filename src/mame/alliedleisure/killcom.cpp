@@ -355,8 +355,8 @@ void killcom_state::piratetr_main_map(address_map &map)
 
 void killcom_state::killcom_audio_map(address_map &map)
 {
-	map(0x0000, 0x007f).mirror(0x1780).m(m_riot, FUNC(mos6532_new_device::ram_map));
-	map(0x0800, 0x081f).mirror(0x17e0).m(m_riot, FUNC(mos6532_new_device::io_map));
+	map(0x0000, 0x007f).mirror(0x1780).m(m_riot, FUNC(mos6532_device::ram_map));
+	map(0x0800, 0x081f).mirror(0x17e0).m(m_riot, FUNC(mos6532_device::io_map));
 	map(0xa000, 0xa000).mirror(0x1ffc).w(m_ay, FUNC(ay8910_device::address_w));
 	map(0xa001, 0xa001).mirror(0x1ffc).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0xa002, 0xa002).mirror(0x1ffc).w(m_ay, FUNC(ay8910_device::data_w));
@@ -1110,7 +1110,7 @@ void killcom_state::killcom(machine_config &config)
 	M6502(config, m_audiocpu, 3.579545_MHz_XTAL / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &killcom_state::killcom_audio_map);
 
-	MOS6532_NEW(config, m_riot, 3.579545_MHz_XTAL / 4);
+	MOS6532(config, m_riot, 3.579545_MHz_XTAL / 4);
 	m_riot->pb_wr_callback().set(m_via[2], FUNC(via6522_device::write_pb));
 	m_riot->irq_wr_callback().set_inputline(m_audiocpu, 0);
 

@@ -7,7 +7,7 @@ Gottlieb System 80B
 
 Same as system 80, except that the displays are 20-digit alphanumeric driven by Rockwell 10939/10941 chips.
 
-The test rom says U4 is faulty. Using MOS6532_NEW fixes this error, but the games ramdomly slam-tilt instead.
+The test rom says U4 is faulty. Using MOS6532 fixes this error, but the games ramdomly slam-tilt instead.
 
 PinMAME used for the display character generator.
 
@@ -132,9 +132,9 @@ private:
 	bool m_slam_low = false;
 
 	required_device<m6502_device> m_maincpu;
-	required_device<mos6532_new_device> m_riot1;
-	required_device<mos6532_new_device> m_riot2;
-	required_device<mos6532_new_device> m_riot3;
+	required_device<mos6532_device> m_riot1;
+	required_device<mos6532_device> m_riot2;
+	required_device<mos6532_device> m_riot3;
 	required_ioport_array<4> m_io_dips;
 	required_ioport_array<9> m_io_keyboard;
 	optional_device<gottlieb_sound_p3_device> m_p3_sound;
@@ -149,13 +149,13 @@ private:
 void gts80b_state::gts80b_map(address_map &map)
 {
 	map.global_mask(0xbfff);
-	map(0x0000, 0x007f).mirror(0x8000).m(m_riot1, FUNC(mos6532_new_device::ram_map));
-	map(0x0080, 0x00ff).mirror(0x8000).m(m_riot2, FUNC(mos6532_new_device::ram_map));
-	map(0x0100, 0x017f).mirror(0x8000).m(m_riot3, FUNC(mos6532_new_device::ram_map));
+	map(0x0000, 0x007f).mirror(0x8000).m(m_riot1, FUNC(mos6532_device::ram_map));
+	map(0x0080, 0x00ff).mirror(0x8000).m(m_riot2, FUNC(mos6532_device::ram_map));
+	map(0x0100, 0x017f).mirror(0x8000).m(m_riot3, FUNC(mos6532_device::ram_map));
 	map(0x01cb, 0x01cb).lr8(NAME([] () { return 0xff; }));  // continual read
-	map(0x0200, 0x021f).mirror(0x8060).m(m_riot1, FUNC(mos6532_new_device::io_map));
-	map(0x0280, 0x029f).mirror(0x8060).m(m_riot2, FUNC(mos6532_new_device::io_map));
-	map(0x0300, 0x031f).mirror(0x8060).m(m_riot3, FUNC(mos6532_new_device::io_map));
+	map(0x0200, 0x021f).mirror(0x8060).m(m_riot1, FUNC(mos6532_device::io_map));
+	map(0x0280, 0x029f).mirror(0x8060).m(m_riot2, FUNC(mos6532_device::io_map));
+	map(0x0300, 0x031f).mirror(0x8060).m(m_riot3, FUNC(mos6532_device::io_map));
 	map(0x1000, 0x17ff).rom();
 	map(0x1800, 0x18ff).mirror(0x8000).ram().share("nvram"); // 5101L-1 256x4
 	map(0x2000, 0x2fff).rom();
@@ -167,13 +167,13 @@ void gts80b_state::gts80b_map(address_map &map)
 void gts80b_state::master_map(address_map &map)
 {
 	map(0x0000, 0x7fff).mirror(0x8000).rom();
-	map(0x0000, 0x007f).mirror(0x8000).m(m_riot1, FUNC(mos6532_new_device::ram_map));
-	map(0x0080, 0x00ff).mirror(0x8000).m(m_riot2, FUNC(mos6532_new_device::ram_map));
-	map(0x0100, 0x017f).mirror(0x8000).m(m_riot3, FUNC(mos6532_new_device::ram_map));
+	map(0x0000, 0x007f).mirror(0x8000).m(m_riot1, FUNC(mos6532_device::ram_map));
+	map(0x0080, 0x00ff).mirror(0x8000).m(m_riot2, FUNC(mos6532_device::ram_map));
+	map(0x0100, 0x017f).mirror(0x8000).m(m_riot3, FUNC(mos6532_device::ram_map));
 	map(0x01cb, 0x01cb).lr8(NAME([] () { return 0xff; }));  // continual read
-	map(0x0200, 0x021f).mirror(0x8060).m(m_riot1, FUNC(mos6532_new_device::io_map));
-	map(0x0280, 0x029f).mirror(0x8060).m(m_riot2, FUNC(mos6532_new_device::io_map));
-	map(0x0300, 0x031f).mirror(0x8060).m(m_riot3, FUNC(mos6532_new_device::io_map));
+	map(0x0200, 0x021f).mirror(0x8060).m(m_riot1, FUNC(mos6532_device::io_map));
+	map(0x0280, 0x029f).mirror(0x8060).m(m_riot2, FUNC(mos6532_device::io_map));
+	map(0x0300, 0x031f).mirror(0x8060).m(m_riot3, FUNC(mos6532_device::io_map));
 	map(0x1800, 0x18ff).mirror(0x8000).ram().share("nvram"); // 5101L-1 256x4
 }
 
@@ -618,18 +618,18 @@ void gts80b_state::p0(machine_config &config)
 	config.set_default_layout(layout_gts80b);
 
 	/* Devices */
-	MOS6532_NEW(config, m_riot1, XTAL(3'579'545)/4);
+	MOS6532(config, m_riot1, XTAL(3'579'545)/4);
 	m_riot1->pa_rd_callback().set(FUNC(gts80b_state::port1a_r)); // sw_r
 	m_riot1->pb_wr_callback().set(FUNC(gts80b_state::port1b_w)); // sw_w
 	m_riot1->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<0>));
 
-	MOS6532_NEW(config, m_riot2, XTAL(3'579'545)/4);
+	MOS6532(config, m_riot2, XTAL(3'579'545)/4);
 	m_riot2->pa_rd_callback().set(FUNC(gts80b_state::port2a_r)); // pa7 - slam tilt
 	m_riot2->pa_wr_callback().set(FUNC(gts80b_state::port2a_w)); // digit select
 	m_riot2->pb_wr_callback().set(FUNC(gts80b_state::port2b_w)); // seg
 	m_riot2->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<1>));
 
-	MOS6532_NEW(config, m_riot3, XTAL(3'579'545)/4);
+	MOS6532(config, m_riot3, XTAL(3'579'545)/4);
 	m_riot3->pa_wr_callback().set(FUNC(gts80b_state::port3a_w)); // sol, snd
 	m_riot3->pb_wr_callback().set(FUNC(gts80b_state::port3b_w)); // lamps
 	m_riot3->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<2>));

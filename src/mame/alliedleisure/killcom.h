@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "machine/6522via.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "sound/ay8910.h"
 
 #include "emupal.h"
@@ -69,7 +69,7 @@ private:
 
 	/* devices */
 	optional_device<cpu_device> m_audiocpu;
-	optional_device<mos6532_new_device> m_riot;
+	optional_device<mos6532_device> m_riot;
 	optional_device<ay8910_device> m_ay;
 
 	void io_select_w(uint8_t data);

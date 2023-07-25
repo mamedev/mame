@@ -41,7 +41,7 @@ ToDo:
 #include "genpin.h"
 
 #include "cpu/m6502/m6503.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "machine/timer.h"
 #include "sound/sn76477.h"
 #include "speaker.h"
@@ -85,7 +85,7 @@ private:
 	u8 m_out_offs = 0U;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<mos6532_new_device> m_riot;
+	required_device<mos6532_device> m_riot;
 	required_device<sn76477_device> m_snsnd;
 	required_ioport_array<4> m_io_keyboard;
 	required_shared_ptr<u8> m_p_ram;
@@ -98,8 +98,8 @@ void spectra_state::spectra_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).ram().share("nvram"); // battery backed, 2x 5101L
-	map(0x0100, 0x017f).m(m_riot, FUNC(mos6532_new_device::ram_map));
-	map(0x0180, 0x019f).m(m_riot, FUNC(mos6532_new_device::io_map));
+	map(0x0100, 0x017f).m(m_riot, FUNC(mos6532_device::ram_map));
+	map(0x0180, 0x019f).m(m_riot, FUNC(mos6532_device::io_map));
 	map(0x0400, 0x0fff).rom();
 }
 
@@ -271,7 +271,7 @@ void spectra_state::spectra(machine_config &config)
 	M6503(config, m_maincpu, XTAL(3'579'545)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spectra_state::spectra_map);
 
-	MOS6532_NEW(config, m_riot, XTAL(3'579'545)/4);
+	MOS6532(config, m_riot, XTAL(3'579'545)/4);
 	m_riot->pa_rd_callback().set(FUNC(spectra_state::porta_r));
 	m_riot->pa_wr_callback().set(FUNC(spectra_state::porta_w));
 	m_riot->pb_rd_callback().set(FUNC(spectra_state::portb_r));

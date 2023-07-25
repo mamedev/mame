@@ -47,7 +47,7 @@ ToDo:
 
 #include "cpu/m6502/m6504.h"
 #include "machine/input_merger.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 
@@ -116,10 +116,10 @@ private:
 	required_device<m6504_device> m_maincpu;
 	required_device<pia6821_device> m_ic1;
 	required_device<pia6821_device> m_ic2;
-	required_device<mos6530_new_device> m_ic3;
+	required_device<mos6530_device> m_ic3;
 	required_device<pia6821_device> m_ic4;
-	required_device<mos6530_new_device> m_ic5;
-	required_device<mos6530_new_device> m_ic6;
+	required_device<mos6530_device> m_ic5;
+	required_device<mos6530_device> m_ic6;
 	required_device<pia6821_device> m_ic7;
 	required_device<pia6821_device> m_ic8;
 	output_finder<42> m_digits;
@@ -130,18 +130,18 @@ private:
 
 void allied_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x003f).m(m_ic6, FUNC(mos6530_new_device::ram_map));
+	map(0x0000, 0x003f).m(m_ic6, FUNC(mos6530_device::ram_map));
 	map(0x0044, 0x0047).rw(m_ic2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0048, 0x004b).rw(m_ic1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0050, 0x0053).rw(m_ic7, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0060, 0x0063).rw(m_ic4, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0080, 0x008f).m(m_ic5, FUNC(mos6530_new_device::io_map));
-	map(0x0840, 0x084f).m(m_ic6, FUNC(mos6530_new_device::io_map));
+	map(0x0080, 0x008f).m(m_ic5, FUNC(mos6530_device::io_map));
+	map(0x0840, 0x084f).m(m_ic6, FUNC(mos6530_device::io_map));
 	map(0x00c0, 0x00c3).rw(m_ic8, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0100, 0x013f).m(m_ic5, FUNC(mos6530_new_device::ram_map));
-	map(0x1400, 0x17ff).m(m_ic5, FUNC(mos6530_new_device::rom_map));
-	map(0x1800, 0x1bff).m(m_ic6, FUNC(mos6530_new_device::rom_map));
-	map(0x1c00, 0x1fff).m(m_ic3, FUNC(mos6530_new_device::rom_map));
+	map(0x0100, 0x013f).m(m_ic5, FUNC(mos6530_device::ram_map));
+	map(0x1400, 0x17ff).m(m_ic5, FUNC(mos6530_device::rom_map));
+	map(0x1800, 0x1bff).m(m_ic6, FUNC(mos6530_device::rom_map));
+	map(0x1c00, 0x1fff).m(m_ic3, FUNC(mos6530_device::rom_map));
 }
 
 static INPUT_PORTS_START( allied )
@@ -726,17 +726,17 @@ void allied_state::allied(machine_config &config)
 	m_ic8->irqa_handler().set("main_irqs", FUNC(input_merger_device::in_w<8>));
 	m_ic8->irqb_handler().set("main_irqs", FUNC(input_merger_device::in_w<9>));
 
-	MOS6530_NEW(config, m_ic3, 3.579545_MHz_XTAL/4); // unknown where the ram and i/o is located
+	MOS6530(config, m_ic3, 3.579545_MHz_XTAL/4); // unknown where the ram and i/o is located
 	m_ic3->irq_wr_callback().set("main_irqs", FUNC(input_merger_device::in_w<10>));
 
-	MOS6530_NEW(config, m_ic5, 3.579545_MHz_XTAL/4);
+	MOS6530(config, m_ic5, 3.579545_MHz_XTAL/4);
 	m_ic5->pa_rd_callback().set(FUNC(allied_state::ic5_a_r));
 	//m_ic5->pa_wr_callback().set(FUNC(allied_state::ic5_a_w));
 	//m_ic5->pb_rd_callback().set(FUNC(allied_state::ic5_b_r));
 	m_ic5->pb_wr_callback().set(FUNC(allied_state::ic5_b_w));
 	m_ic5->irq_wr_callback().set("main_irqs", FUNC(input_merger_device::in_w<11>));
 
-	MOS6530_NEW(config, m_ic6, 3.579545_MHz_XTAL/4);
+	MOS6530(config, m_ic6, 3.579545_MHz_XTAL/4);
 	m_ic6->pa_rd_callback().set(FUNC(allied_state::ic6_a_r));
 	//m_ic6->pa_wr_callback().set(FUNC(allied_state::ic6_a_w));
 	m_ic6->pb_rd_callback().set(FUNC(allied_state::ic6_b_r));

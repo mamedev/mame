@@ -19,7 +19,7 @@
 #include "bus/rs232/rs232.h"
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "machine/ram.h"
 #include "video/dl1416.h"
 #include "emupal.h"
@@ -125,7 +125,7 @@ private:
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
 	required_device<pia6821_device> m_pia;
-	required_device<mos6532_new_device> m_riot;
+	required_device<mos6532_device> m_riot;
 	required_ioport_array<8> m_io_keyboard;
 };
 

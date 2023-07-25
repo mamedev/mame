@@ -8,7 +8,7 @@
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m6503.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/okim6295.h"
@@ -63,7 +63,7 @@ protected:
 
 	// devices
 	required_device<m6503_device> m_cpu;
-	required_device<mos6530_new_device> m_r6530;
+	required_device<mos6530_device> m_r6530;
 
 private:
 	u8 m_dummy; // needed for save-state support
@@ -121,7 +121,7 @@ protected:
 
 	// devices
 	required_device<mc1408_device> m_dac;
-	required_device<mos6532_new_device> m_riot;
+	required_device<mos6532_device> m_riot;
 
 private:
 	u8 m_dummy; // needed for save-state support

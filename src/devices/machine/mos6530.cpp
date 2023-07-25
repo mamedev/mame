@@ -10,7 +10,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "mos6530n.h"
+#include "mos6530.h"
 
 #define LOG_TIMER   (1U << 1)
 
@@ -25,55 +25,55 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(MOS6530_NEW, mos6530_new_device, "mos6530_new", "MOS 6530 (new)")
-DEFINE_DEVICE_TYPE(MOS6532_NEW, mos6532_new_device, "mos6532_new", "MOS 6532 (new)")
+DEFINE_DEVICE_TYPE(MOS6530, mos6530_device, "mos6530", "MOS 6530 MIOT")
+DEFINE_DEVICE_TYPE(MOS6532, mos6532_device, "mos6532", "MOS 6532 RIOT")
 
 
-void mos6530_new_device::rom_map(address_map &map)
+void mos6530_device::rom_map(address_map &map)
 {
 	map.global_mask(0x3ff);
-	map(0x000, 0x3ff).r(FUNC(mos6530_new_device::rom_r));
+	map(0x000, 0x3ff).r(FUNC(mos6530_device::rom_r));
 }
 
-void mos6530_new_device::ram_map(address_map &map)
+void mos6530_device::ram_map(address_map &map)
 {
 	map.global_mask(0x3f);
-	map(0x00, 0x3f).rw(FUNC(mos6530_new_device::ram_r), FUNC(mos6530_new_device::ram_w));
+	map(0x00, 0x3f).rw(FUNC(mos6530_device::ram_r), FUNC(mos6530_device::ram_w));
 }
 
-void mos6530_new_device::io_map(address_map &map)
+void mos6530_device::io_map(address_map &map)
 {
 	map.global_mask(0xf);
-	map(0x00, 0x00).mirror(0x8).rw(FUNC(mos6530_new_device::pa_data_r), FUNC(mos6530_new_device::pa_data_w));
-	map(0x01, 0x01).mirror(0x8).rw(FUNC(mos6530_new_device::pa_ddr_r), FUNC(mos6530_new_device::pa_ddr_w));
-	map(0x02, 0x02).mirror(0x8).rw(FUNC(mos6530_new_device::pb_data_r), FUNC(mos6530_new_device::pb_data_w));
-	map(0x03, 0x03).mirror(0x8).rw(FUNC(mos6530_new_device::pb_ddr_r), FUNC(mos6530_new_device::pb_ddr_w));
-	map(0x04, 0x07).w(FUNC(mos6530_new_device::timer_off_w));
-	map(0x0c, 0x0f).w(FUNC(mos6530_new_device::timer_on_w));
-	map(0x04, 0x04).mirror(0x2).r(FUNC(mos6530_new_device::timer_off_r));
-	map(0x0c, 0x0c).mirror(0x2).r(FUNC(mos6530_new_device::timer_on_r));
-	map(0x05, 0x05).mirror(0xa).r(FUNC(mos6530_new_device::irq_r));
+	map(0x00, 0x00).mirror(0x8).rw(FUNC(mos6530_device::pa_data_r), FUNC(mos6530_device::pa_data_w));
+	map(0x01, 0x01).mirror(0x8).rw(FUNC(mos6530_device::pa_ddr_r), FUNC(mos6530_device::pa_ddr_w));
+	map(0x02, 0x02).mirror(0x8).rw(FUNC(mos6530_device::pb_data_r), FUNC(mos6530_device::pb_data_w));
+	map(0x03, 0x03).mirror(0x8).rw(FUNC(mos6530_device::pb_ddr_r), FUNC(mos6530_device::pb_ddr_w));
+	map(0x04, 0x07).w(FUNC(mos6530_device::timer_off_w));
+	map(0x0c, 0x0f).w(FUNC(mos6530_device::timer_on_w));
+	map(0x04, 0x04).mirror(0x2).r(FUNC(mos6530_device::timer_off_r));
+	map(0x0c, 0x0c).mirror(0x2).r(FUNC(mos6530_device::timer_on_r));
+	map(0x05, 0x05).mirror(0xa).r(FUNC(mos6530_device::irq_r));
 }
 
-void mos6532_new_device::ram_map(address_map &map)
+void mos6532_device::ram_map(address_map &map)
 {
 	map.global_mask(0x7f);
-	map(0x00, 0x7f).rw(FUNC(mos6532_new_device::ram_r), FUNC(mos6532_new_device::ram_w));
+	map(0x00, 0x7f).rw(FUNC(mos6532_device::ram_r), FUNC(mos6532_device::ram_w));
 }
 
-void mos6532_new_device::io_map(address_map &map)
+void mos6532_device::io_map(address_map &map)
 {
 	map.global_mask(0x1f);
-	map(0x00, 0x00).mirror(0x18).rw(FUNC(mos6532_new_device::pa_data_r), FUNC(mos6532_new_device::pa_data_w));
-	map(0x01, 0x01).mirror(0x18).rw(FUNC(mos6532_new_device::pa_ddr_r), FUNC(mos6532_new_device::pa_ddr_w));
-	map(0x02, 0x02).mirror(0x18).rw(FUNC(mos6532_new_device::pb_data_r), FUNC(mos6532_new_device::pb_data_w));
-	map(0x03, 0x03).mirror(0x18).rw(FUNC(mos6532_new_device::pb_ddr_r), FUNC(mos6532_new_device::pb_ddr_w));
-	map(0x14, 0x17).w(FUNC(mos6532_new_device::timer_off_w));
-	map(0x1c, 0x1f).w(FUNC(mos6532_new_device::timer_on_w));
-	map(0x04, 0x04).mirror(0x12).r(FUNC(mos6532_new_device::timer_off_r));
-	map(0x0c, 0x0c).mirror(0x12).r(FUNC(mos6532_new_device::timer_on_r));
-	map(0x05, 0x05).mirror(0x1a).r(FUNC(mos6532_new_device::irq_r));
-	map(0x04, 0x07).mirror(0x8).w(FUNC(mos6532_new_device::edge_w));
+	map(0x00, 0x00).mirror(0x18).rw(FUNC(mos6532_device::pa_data_r), FUNC(mos6532_device::pa_data_w));
+	map(0x01, 0x01).mirror(0x18).rw(FUNC(mos6532_device::pa_ddr_r), FUNC(mos6532_device::pa_ddr_w));
+	map(0x02, 0x02).mirror(0x18).rw(FUNC(mos6532_device::pb_data_r), FUNC(mos6532_device::pb_data_w));
+	map(0x03, 0x03).mirror(0x18).rw(FUNC(mos6532_device::pb_ddr_r), FUNC(mos6532_device::pb_ddr_w));
+	map(0x14, 0x17).w(FUNC(mos6532_device::timer_off_w));
+	map(0x1c, 0x1f).w(FUNC(mos6532_device::timer_on_w));
+	map(0x04, 0x04).mirror(0x12).r(FUNC(mos6532_device::timer_off_r));
+	map(0x0c, 0x0c).mirror(0x12).r(FUNC(mos6532_device::timer_on_r));
+	map(0x05, 0x05).mirror(0x1a).r(FUNC(mos6532_device::irq_r));
+	map(0x04, 0x07).mirror(0x8).w(FUNC(mos6532_device::edge_w));
 }
 
 
@@ -114,20 +114,20 @@ mos6530_device_base::mos6530_device_base(const machine_config &mconfig, device_t
 
 
 //-------------------------------------------------
-//  mos6530_new_device - constructor
+//  mos6530_device - constructor
 //-------------------------------------------------
 
-mos6530_new_device::mos6530_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	mos6530_device_base(mconfig, MOS6530_NEW, tag, owner, clock, 0x40)
+mos6530_device::mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	mos6530_device_base(mconfig, MOS6530, tag, owner, clock, 0x40)
 { }
 
 
 //-------------------------------------------------
-//  mos6532_new_device - constructor
+//  mos6532_device - constructor
 //-------------------------------------------------
 
-mos6532_new_device::mos6532_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	mos6530_device_base(mconfig, MOS6532_NEW, tag, owner, clock, 0x80)
+mos6532_device::mos6532_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	mos6530_device_base(mconfig, MOS6532, tag, owner, clock, 0x80)
 { }
 
 
@@ -223,7 +223,7 @@ void mos6530_device_base::update_pb()
 		m_out8_pb_cb(data);
 }
 
-void mos6530_new_device::update_pb()
+void mos6530_device::update_pb()
 {
 	uint8_t data = (m_pb_out & m_pb_ddr) | (m_pb_ddr ^ 0xff);
 
@@ -262,7 +262,7 @@ void mos6530_device_base::update_irq()
 	m_irq_cb(state);
 }
 
-void mos6530_new_device::update_irq()
+void mos6530_device::update_irq()
 {
 	update_pb();
 }
@@ -282,7 +282,7 @@ uint8_t mos6530_device_base::get_irq_flags()
 	return data;
 }
 
-uint8_t mos6530_new_device::get_irq_flags()
+uint8_t mos6530_device::get_irq_flags()
 {
 	uint8_t data = 0;
 
