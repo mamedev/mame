@@ -19,7 +19,7 @@ and should be verified against real hardware.
 ***************************************************************************/
 
 #include "emu.h"
-#include "mos6530.h"
+#include "mos6530l.h"
 
 
 /***************************************************************************
@@ -39,10 +39,10 @@ enum
     DEVICE INTERFACE
 ***************************************************************************/
 
-DEFINE_DEVICE_TYPE(MOS6530, mos6530_device, "mos6530", "MOS 6530 MIOT")
+DEFINE_DEVICE_TYPE(MOS6530L, mos6530l_device, "mos6530l", "MOS 6530 MIOT L")
 
-mos6530_device::mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MOS6530, tag, owner, clock),
+mos6530l_device::mos6530l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, MOS6530L, tag, owner, clock),
 	m_in_pa_cb(*this, 0),
 	m_out_pa_cb(*this),
 	m_in_pb_cb(*this, 0),
@@ -54,13 +54,13 @@ mos6530_device::mos6530_device(const machine_config &mconfig, const char *tag, d
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void mos6530_device::device_start()
+void mos6530l_device::device_start()
 {
 	/* set static values */
 	m_clock = clock();
 
 	/* allocate timers */
-	m_timer = timer_alloc(FUNC(mos6530_device::end_state), this);
+	m_timer = timer_alloc(FUNC(mos6530l_device::end_state), this);
 
 	/* register for save states */
 	save_item(NAME(m_port[0].m_in));
@@ -81,7 +81,7 @@ void mos6530_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void mos6530_device::device_reset()
+void mos6530l_device::device_reset()
 {
 	/* reset I/O states */
 	m_port[0].m_out = 0;
@@ -111,7 +111,7 @@ void mos6530_device::device_reset()
     based on interrupt enables
 -------------------------------------------------*/
 
-void mos6530_device::update_irqstate()
+void mos6530l_device::update_irqstate()
 {
 	uint8_t out = m_port[1].m_out;
 
@@ -126,7 +126,7 @@ void mos6530_device::update_irqstate()
     get_timer - return the current timer value
 -------------------------------------------------*/
 
-uint8_t mos6530_device::get_timer()
+uint8_t mos6530l_device::get_timer()
 {
 	/* if idle, return 0 */
 	if (m_timerstate == TIMER_IDLE)
@@ -150,7 +150,7 @@ uint8_t mos6530_device::get_timer()
     end_state - callback to process the timer
 -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER(mos6530_device::end_state)
+TIMER_CALLBACK_MEMBER(mos6530l_device::end_state)
 {
 	assert(m_timerstate != TIMER_IDLE);
 
@@ -181,7 +181,7 @@ TIMER_CALLBACK_MEMBER(mos6530_device::end_state)
     mos6530_w - master I/O write access
 -------------------------------------------------*/
 
-void mos6530_device::write(offs_t offset, uint8_t data)
+void mos6530l_device::write(offs_t offset, uint8_t data)
 {
 	/* if A2 == 1, we are writing to the timer */
 	if (offset & 0x04)
@@ -245,7 +245,7 @@ void mos6530_device::write(offs_t offset, uint8_t data)
     mos6530_r - master I/O read access
 -------------------------------------------------*/
 
-uint8_t mos6530_device::read(offs_t offset)
+uint8_t mos6530l_device::read(offs_t offset)
 {
 	uint8_t val;
 
@@ -309,7 +309,7 @@ uint8_t mos6530_device::read(offs_t offset)
     value
 -------------------------------------------------*/
 
-void mos6530_device::porta_in_set(uint8_t data, uint8_t mask)
+void mos6530l_device::porta_in_set(uint8_t data, uint8_t mask)
 {
 	m_port[0].m_in = (m_port[0].m_in & ~mask) | (data & mask);
 }
@@ -320,7 +320,7 @@ void mos6530_device::porta_in_set(uint8_t data, uint8_t mask)
     value
 -------------------------------------------------*/
 
-void mos6530_device::portb_in_set(uint8_t data, uint8_t mask)
+void mos6530l_device::portb_in_set(uint8_t data, uint8_t mask)
 {
 	m_port[1].m_in = (m_port[1].m_in & ~mask) | (data & mask);
 }
@@ -331,7 +331,7 @@ void mos6530_device::portb_in_set(uint8_t data, uint8_t mask)
     value
 -------------------------------------------------*/
 
-uint8_t mos6530_device::porta_in_get()
+uint8_t mos6530l_device::porta_in_get()
 {
 	return m_port[0].m_in;
 }
@@ -342,7 +342,7 @@ uint8_t mos6530_device::porta_in_get()
     value
 -------------------------------------------------*/
 
-uint8_t mos6530_device::portb_in_get()
+uint8_t mos6530l_device::portb_in_get()
 {
 	return m_port[1].m_in;
 }
@@ -353,7 +353,7 @@ uint8_t mos6530_device::portb_in_get()
     value
 -------------------------------------------------*/
 
-uint8_t mos6530_device::porta_out_get()
+uint8_t mos6530l_device::porta_out_get()
 {
 	return m_port[0].m_out;
 }
@@ -364,7 +364,7 @@ uint8_t mos6530_device::porta_out_get()
     value
 -------------------------------------------------*/
 
-uint8_t mos6530_device::portb_out_get()
+uint8_t mos6530l_device::portb_out_get()
 {
 	return m_port[1].m_out;
 }

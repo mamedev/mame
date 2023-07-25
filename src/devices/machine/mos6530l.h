@@ -29,8 +29,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_MOS6530_H
-#define MAME_MACHINE_MOS6530_H
+#ifndef MAME_MACHINE_MOS6530L_H
+#define MAME_MACHINE_MOS6530L_H
 
 #pragma once
 
@@ -43,10 +43,10 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-class mos6530_device : public device_t
+class mos6530l_device : public device_t
 {
 public:
-	mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos6530l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto in_pa_callback() { return m_in_pa_cb.bind(); }
 	auto out_pa_callback() { return m_out_pa_cb.bind(); }
@@ -102,6 +102,6 @@ private:
 	void portb_in_set(uint8_t data, uint8_t mask);
 };
 
-DECLARE_DEVICE_TYPE(MOS6530, mos6530_device)
+DECLARE_DEVICE_TYPE(MOS6530L, mos6530l_device)
 
-#endif // MAME_MACHINE_MOS6530_H
+#endif // MAME_MACHINE_MOS6530L_H

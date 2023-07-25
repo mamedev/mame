@@ -2556,6 +2556,30 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/mos6530l.h,MACHINES["MOS6530L"] = true
+---------------------------------------------------
+
+if (MACHINES["MOS6530L"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mos6530l.cpp",
+		MAME_DIR .. "src/devices/machine/mos6530l.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/mos6530n.h,MACHINES["MOS6530"] = true
+---------------------------------------------------
+
+if (MACHINES["MOS6530"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mos6530n.cpp",
+		MAME_DIR .. "src/devices/machine/mos6530n.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/mos6702.h,MACHINES["MOS6702"] = true
 ---------------------------------------------------
 
@@ -2599,21 +2623,6 @@ if (MACHINES["MOS8726"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/mos8726.cpp",
 		MAME_DIR .. "src/devices/machine/mos8726.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/mos6530.h,MACHINES["MIOT6530"] = true
---@src/devices/machine/mos6530n.h,MACHINES["MIOT6530"] = true
----------------------------------------------------
-
-if (MACHINES["MIOT6530"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/mos6530.cpp",
-		MAME_DIR .. "src/devices/machine/mos6530.h",
-		MAME_DIR .. "src/devices/machine/mos6530n.cpp",
-		MAME_DIR .. "src/devices/machine/mos6530n.h",
 	}
 end
 
