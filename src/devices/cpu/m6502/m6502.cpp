@@ -29,8 +29,9 @@ m6502_device::m6502_device(const machine_config &mconfig, device_type type, cons
 	cpu_device(mconfig, type, tag, owner, clock),
 	sync_w(*this),
 	program_config("program", ENDIANNESS_LITTLE, 8, 16),
-	sprogram_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 16), PPC(0), NPC(0), PC(0), SP(0), TMP(0), TMP2(0), A(0), X(0), Y(0), P(0), IR(0), inst_state_base(0), mintf(nullptr),
-	inst_state(0), inst_substate(0), icount(0), nmi_state(false), irq_state(false), apu_irq_state(false), v_state(false), nmi_pending(false), irq_taken(false), sync(false), inhibit_interrupts(false), uses_custom_memory_interface(false)
+	sprogram_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 16),
+	mintf(nullptr),
+	uses_custom_memory_interface(false)
 {
 }
 
@@ -54,8 +55,6 @@ void m6502_device::init()
 		else
 			space(AS_PROGRAM).specific(mintf->program14);
 	}
-
-	XPC = 0;
 
 	state_add(STATE_GENPC,     "GENPC",     XPC).callexport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     XPC).callexport().noshow();
@@ -92,6 +91,8 @@ void m6502_device::init()
 
 	set_icountptr(icount);
 
+	XPC = 0x0000;
+	PPC = 0x0000;
 	PC = 0x0000;
 	NPC = 0x0000;
 	A = 0x00;
@@ -121,10 +122,6 @@ void m6502_device::device_reset()
 	inst_state = STATE_RESET;
 	inst_substate = 0;
 	inst_state_base = 0;
-	irq_state = false;
-	nmi_state = false;
-	apu_irq_state = false;
-	v_state = false;
 	nmi_pending = false;
 	irq_taken = false;
 	sync = false;
@@ -150,7 +147,7 @@ uint32_t m6502_device::execute_input_lines() const noexcept
 
 bool m6502_device::execute_input_edge_triggered(int inputnum) const noexcept
 {
-	return inputnum == NMI_LINE;
+	return inputnum == NMI_LINE || inputnum == V_LINE;
 }
 
 void m6502_device::do_adc_d(uint8_t val)
