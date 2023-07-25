@@ -341,18 +341,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/6532riot.h,MACHINES["RIOT6532"] = true
----------------------------------------------------
-
-if (MACHINES["RIOT6532"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/6532riot.cpp",
-		MAME_DIR .. "src/devices/machine/6532riot.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/6821pia.h,MACHINES["6821PIA"] = true
 ---------------------------------------------------
 
