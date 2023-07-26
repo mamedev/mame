@@ -547,7 +547,7 @@ void gts80_state::p2(machine_config &config)
 void gts80_state::r1v(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound).add_route(ALL_OUTPUTS, "mono", 0.75);
+	GOTTLIEB_SOUND_SPEECH_REV1(config, m_r1_sound).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 /* SYSTEM-80 ALTERNATE ROMS =======================================================================

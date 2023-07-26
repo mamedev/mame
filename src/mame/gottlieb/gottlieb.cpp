@@ -261,10 +261,12 @@ public:
 	void gottlieb2_ram_rom(machine_config &config);
 	void reactor(machine_config &config);
 	void g2laser(machine_config &config);
+	void qbert_old(machine_config &config);
 	void qbert(machine_config &config);
 	void qbert_knocker(machine_config &config);
 	void gottlieb1(machine_config &config);
 	void gottlieb1_rom(machine_config &config);
+	void gottlieb1_votrax_old(machine_config &config);
 	void gottlieb1_votrax(machine_config &config);
 
 	void init_romtiles();
@@ -2162,10 +2164,16 @@ void gottlieb_state::gottlieb1(machine_config &config)
 	GOTTLIEB_SOUND_REV1(config, m_r1_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
+void gottlieb_state::gottlieb1_votrax_old(machine_config &config)
+{
+	gottlieb_core(config);
+	GOTTLIEB_SOUND_SPEECH_REV1(config, m_r1_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
+
 void gottlieb_state::gottlieb1_votrax(machine_config &config)
 {
 	gottlieb_core(config);
-	GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	GOTTLIEB_SOUND_SPEECH_REV1A(config, m_r1_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void gottlieb_state::gottlieb1_rom(machine_config &config)
@@ -2215,12 +2223,20 @@ void gottlieb_state::g2laser(machine_config &config)
 
 void gottlieb_state::reactor(machine_config &config)
 {
-	gottlieb1_votrax(config);
+	gottlieb1_votrax_old(config);
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &gottlieb_state::reactor_map);
 
 	config.device_remove("nvram");
+}
+
+void gottlieb_state::qbert_old(machine_config &config)
+{
+	gottlieb1_votrax_old(config);
+
+	/* sound hardware */
+	qbert_knocker(config);
 }
 
 void gottlieb_state::qbert(machine_config &config)
@@ -3030,7 +3046,7 @@ GAME( 1982, qbert,      0,        qbert,             qbert,    gottlieb_state, i
 GAME( 1982, qberta,     qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, qbertj,     qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, myqbert,    qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Mello Yello Q*bert", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, qberttst,   qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (early test version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, qberttst,   qbert,    qbert_old,         qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (early test version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, qbtrktst,   qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert Board Input Test Rom", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, insector,   0,        gottlieb1,         insector, gottlieb_state, init_romtiles, ROT0,   "Gottlieb",                  "Insector (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, tylz,       0,        gottlieb1_votrax,  tylz,     gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Tylz (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // modified sound hw?

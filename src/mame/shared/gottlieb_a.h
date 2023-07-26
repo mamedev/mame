@@ -28,7 +28,8 @@ DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN5,        gottlieb_sound_p5_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN6,        gottlieb_sound_p6_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN7,        gottlieb_sound_p7_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1,        gottlieb_sound_r1_device)
-DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1_VOTRAX, gottlieb_sound_r1_with_votrax_device)
+DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_SPEECH_REV1, gottlieb_sound_speech_r1_device)
+DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_SPEECH_REV1A, gottlieb_sound_speech_r1a_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device)
 
 
@@ -97,7 +98,7 @@ private:
 
 // ======================> gottlieb_sound_r1_device
 
-// rev 1 sound board, with unpopulated VOTRAX
+// rev 1 sound board, with unpopulated SC-01[-A] and support circuitry
 class gottlieb_sound_r1_device : public device_t, public device_mixer_interface
 {
 public:
@@ -128,16 +129,18 @@ private:
 };
 
 
-// ======================> gottlieb_sound_r1_with_votrax_device
+// ======================> gottlieb_sound_speech_r1_device
 
-// fully populated rev 1 sound board
-class gottlieb_sound_r1_with_votrax_device : public gottlieb_sound_r1_device
+// fully populated rev 1 sound board with SC-01 installed
+class gottlieb_sound_speech_r1_device : public gottlieb_sound_r1_device
 {
 public:
 	// construction/destruction
-	gottlieb_sound_r1_with_votrax_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	gottlieb_sound_speech_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
+	gottlieb_sound_speech_r1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
@@ -146,17 +149,31 @@ protected:
 
 	virtual void r1_map(address_map &map) override;
 
-private:
 	// internal communications
-	void votrax_data_w(u8 data);
-	void speech_clock_dac_w(u8 data);
 	u32 convert_speech_clock(u8 data);
 
 	// devices
 	required_device<votrax_sc01_device> m_votrax;
 
+private:
+	// internal communications
+	void votrax_data_w(u8 data);
+	void speech_clock_dac_w(u8 data);
+
 	// internal state
 	u32 m_speech_clock;
+};
+
+// fully populated rev 1 sound board with SC-01-A installed
+class gottlieb_sound_speech_r1a_device : public gottlieb_sound_speech_r1_device
+{
+public:
+	// construction/destruction
+	gottlieb_sound_speech_r1a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+protected:
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 

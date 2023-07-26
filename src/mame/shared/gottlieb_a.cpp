@@ -36,7 +36,8 @@ DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN5,        gottlieb_sound_p5_device,        
 DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN6,        gottlieb_sound_p6_device,             "gotsndp6",   "Gottlieb Sound pin. 6")
 DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN7,        gottlieb_sound_p7_device,             "gotsndp7",   "Gottlieb Sound pin. 7")
 DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1,        gottlieb_sound_r1_device,             "gotsndr1",   "Gottlieb Sound rev. 1")
-DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1_VOTRAX, gottlieb_sound_r1_with_votrax_device, "gotsndr1vt", "Gottlieb Sound rev. 1 with Votrax")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_SPEECH_REV1, gottlieb_sound_speech_r1_device,      "gotsndspr1", "Gottlieb Sound/Speech rev. 1 w/SC-01")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_SPEECH_REV1A,gottlieb_sound_speech_r1a_device,     "gotsndspr1a","Gottlieb Sound/Speech rev. 1 w/SC-01-A")
 DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device,             "gotsndr2",   "Gottlieb Sound rev. 2")
 
 
@@ -89,7 +90,7 @@ void gottlieb_sound_p2_device::p2_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x003f).mirror(0x1c0).m(m_r6530, FUNC(mos6530_device::ram_map));
 	map(0x0200, 0x020f).mirror(0x1f0).m(m_r6530, FUNC(mos6530_device::io_map));
-	map(0x0400, 0x07ff).rom();
+	map(0x0400, 0x07ff).rom(); // external hm7643-5 1kx4 prom, on d0-d3
 	map(0x0c00, 0x0fff).m(m_r6530, FUNC(mos6530_device::rom_map));
 }
 
@@ -379,12 +380,17 @@ void gottlieb_sound_r1_device::device_start()
 //**************************************************************************
 
 //-------------------------------------------------
-//  gottlieb_sound_r1_with_votrax_device -
-//  constructor
+//  gottlieb_sound_speech_r1_device -
+//  constructors
 //-------------------------------------------------
 
-gottlieb_sound_r1_with_votrax_device::gottlieb_sound_r1_with_votrax_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: gottlieb_sound_r1_device(mconfig, GOTTLIEB_SOUND_REV1_VOTRAX, tag, owner, clock)
+gottlieb_sound_speech_r1_device::gottlieb_sound_speech_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: gottlieb_sound_speech_r1_device(mconfig, GOTTLIEB_SOUND_SPEECH_REV1, tag, owner, clock)
+{
+}
+
+gottlieb_sound_speech_r1_device::gottlieb_sound_speech_r1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: gottlieb_sound_r1_device(mconfig, GOTTLIEB_SOUND_SPEECH_REV1, tag, owner, clock)
 	, m_votrax(*this, "votrax")
 	, m_speech_clock(0)
 {
@@ -396,7 +402,7 @@ gottlieb_sound_r1_with_votrax_device::gottlieb_sound_r1_with_votrax_device(const
 //  speech chip
 //-------------------------------------------------
 
-void gottlieb_sound_r1_with_votrax_device::votrax_data_w(u8 data)
+void gottlieb_sound_speech_r1_device::votrax_data_w(u8 data)
 {
 	m_votrax->inflection_w(data >> 6);
 	m_votrax->write(~data & 0x3f);
@@ -408,7 +414,7 @@ void gottlieb_sound_r1_with_votrax_device::votrax_data_w(u8 data)
 //  the Votrax SC-01 speech chip
 //-------------------------------------------------
 
-u32 gottlieb_sound_r1_with_votrax_device::convert_speech_clock(u8 data)
+u32 gottlieb_sound_speech_r1_device::convert_speech_clock(u8 data)
 {
 	// prevent negative clock values (and possible crash)
 	if (data < 0x40) data = 0x40;
@@ -418,7 +424,7 @@ u32 gottlieb_sound_r1_with_votrax_device::convert_speech_clock(u8 data)
 	return m_speech_clock;
 }
 
-void gottlieb_sound_r1_with_votrax_device::speech_clock_dac_w(u8 data)
+void gottlieb_sound_speech_r1_device::speech_clock_dac_w(u8 data)
 {
 	//logerror("clock = %02X\n", data);
 
@@ -430,11 +436,11 @@ void gottlieb_sound_r1_with_votrax_device::speech_clock_dac_w(u8 data)
 //  audio CPU address map
 //-------------------------------------------------
 
-void gottlieb_sound_r1_with_votrax_device::r1_map(address_map &map)
+void gottlieb_sound_speech_r1_device::r1_map(address_map &map)
 {
 	gottlieb_sound_r1_device::r1_map(map);
-	map(0x2000, 0x2000).mirror(0x0fff).w(FUNC(gottlieb_sound_r1_with_votrax_device::votrax_data_w));
-	map(0x3000, 0x3000).mirror(0x0fff).w(FUNC(gottlieb_sound_r1_with_votrax_device::speech_clock_dac_w));
+	map(0x2000, 0x2000).mirror(0x0fff).w(FUNC(gottlieb_sound_speech_r1_device::votrax_data_w));
+	map(0x3000, 0x3000).mirror(0x0fff).w(FUNC(gottlieb_sound_speech_r1_device::speech_clock_dac_w));
 }
 
 
@@ -442,16 +448,16 @@ void gottlieb_sound_r1_with_votrax_device::r1_map(address_map &map)
 //  input ports
 //-------------------------------------------------
 
-INPUT_PORTS_START( gottlieb_sound_r1_with_votrax )
+INPUT_PORTS_START( gottlieb_sound_speech_r1 )
 	PORT_INCLUDE( gottlieb_sound_r1 )
 
 	PORT_MODIFY("SB1")
 	PORT_BIT( 0x80, 0x80, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("votrax", votrax_sc01_device, request)
 INPUT_PORTS_END
 
-ioport_constructor gottlieb_sound_r1_with_votrax_device::device_input_ports() const
+ioport_constructor gottlieb_sound_speech_r1_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME(gottlieb_sound_r1_with_votrax);
+	return INPUT_PORTS_NAME(gottlieb_sound_speech_r1);
 }
 
 
@@ -459,15 +465,15 @@ ioport_constructor gottlieb_sound_r1_with_votrax_device::device_input_ports() co
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void gottlieb_sound_r1_with_votrax_device::device_add_mconfig(machine_config &config)
+void gottlieb_sound_speech_r1_device::device_add_mconfig(machine_config &config)
 {
 	gottlieb_sound_r1_device::device_add_mconfig(config);
 
 	m_dac->reset_routes();
 	m_dac->add_route(ALL_OUTPUTS, *this, 0.20);
 
-	// Note: early boards use an SC-01 (reactor, q-bert test version, maybe some early pinball machines?) while later boards (qbert main release, most pinball machines) use an SC-01-A
-	VOTRAX_SC01A(config, m_votrax, convert_speech_clock(0));
+	// Note: used on machines in early 1981, such as reactor, q-bert test version, mars: god of war, and maybe early boards of black hole and volcano
+	VOTRAX_SC01(config, m_votrax, convert_speech_clock(0));
 	m_votrax->ar_callback().set("nmi", FUNC(input_merger_device::in_w<1>));
 	m_votrax->add_route(ALL_OUTPUTS, *this, 0.80);
 }
@@ -477,12 +483,43 @@ void gottlieb_sound_r1_with_votrax_device::device_add_mconfig(machine_config &co
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void gottlieb_sound_r1_with_votrax_device::device_start()
+void gottlieb_sound_speech_r1_device::device_start()
 {
 	gottlieb_sound_r1_device::device_start();
 
 	// register for save states
 	save_item(NAME(m_speech_clock));
+}
+
+
+
+//**************************************************************************
+//  REV 1 SOUND/SPEECH BOARD; part number MA-216 (same PCB as MA-309 above but with a Votrax SC-01-A and support components populated)
+//**************************************************************************
+
+//-------------------------------------------------
+//  gottlieb_sound_speech_r1a_device -
+//  constructor
+//-------------------------------------------------
+
+gottlieb_sound_speech_r1a_device::gottlieb_sound_speech_r1a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: gottlieb_sound_speech_r1_device(mconfig, GOTTLIEB_SOUND_SPEECH_REV1A, tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void gottlieb_sound_speech_r1a_device::device_add_mconfig(machine_config &config)
+{
+	gottlieb_sound_speech_r1_device::device_add_mconfig(config);
+
+	// Note: used on all machines past mid-late 1981
+	VOTRAX_SC01A(config.replace(), m_votrax, convert_speech_clock(0));
+	m_votrax->ar_callback().set("nmi", FUNC(input_merger_device::in_w<1>));
+	m_votrax->add_route(ALL_OUTPUTS, *this, 0.80);
 }
 
 
