@@ -361,10 +361,12 @@ ROM_START( snes4sl )
 	ROM_REGION(0x8000, "mcu", 0)
 	ROM_SYSTEM_BIOS(0, "940601", "94-06-01") // Found on PCB with Intel P80C31BH, has 'SISTEME FRANCE' string in ROM
 	ROMX_LOAD("27c256_06_01.u43", 0x0000, 0x8000, CRC(d0f4849f) SHA1(971743c9b5a2c0ba267dd8a1ce9ff3821759b4fe), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "931207", "93-12-07") // Found on PCB with Siemens SAB 8051A-P (4KBytes internal ROM undumped)
-	ROMX_LOAD("27c256_12-07.bin", 0x0000, 0x8000, CRC(0922314d) SHA1(04f1265ddc753111e6fcd56162a917ae1791c164), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(2, "931103", "93-11-03") // Found on PCB with WD1016D-PL
-	ROMX_LOAD("27c256_11-03.bin", 0x0000, 0x8000, CRC(4e471581) SHA1(0f23ad065d448097f56ab45c3850d53cf85f3670), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(1, "940415", "94-04-15") // Found on a PCB with NBA Jam installed
+	ROMX_LOAD("27c256_06_01.u43", 0x0000, 0x8000, CRC(af8a64e3) SHA1(f13187d213fe7c2a0edcb88d4e828bd24112e812), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "931207", "93-12-07") // Found on PCB with Siemens SAB 8051A-P (4KBytes internal ROM undumped)
+	ROMX_LOAD("27c256_12-07.bin", 0x0000, 0x8000, CRC(0922314d) SHA1(04f1265ddc753111e6fcd56162a917ae1791c164), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "931103", "93-11-03") // Found on PCB with WD1016D-PL
+	ROMX_LOAD("27c256_11-03.bin", 0x0000, 0x8000, CRC(4e471581) SHA1(0f23ad065d448097f56ab45c3850d53cf85f3670), ROM_BIOS(3))
 
 	ROM_DEFAULT_BIOS("940601")
 ROM_END
@@ -409,8 +411,8 @@ void snesb51_state::init_fatfurspb()
 
 
 //    YEAR  NAME       PARENT  MACHINE   INPUT    CLASS          INIT             ROT   COMPANY    FULLNAME                                     FLAGS
-GAME( 199?, mk3snes,   0,      mk3snes,  mk3snes, snesb51_state, init_snes_hirom, ROT0, "bootleg", "Mortal Kombat 3 (SNES bootleg)",            MACHINE_IS_SKELETON )
-GAME( 199?, kinstsnes, 0,      mk3snes,  mk3snes, snesb51_state, init_snes_hirom, ROT0, "bootleg", "Killer Instinct (SNES bootleg with timer)", MACHINE_IS_SKELETON )
-GAME( 1993, snes4sl,   0,      snes4sl,  snes4sl, snesb51_state, init_snes,       ROT0, "bootleg", "SNES 4 Slot arcade switcher",               MACHINE_IS_SKELETON )
-GAME( 1994, snes4sln,  0,      snes4sln, snes4sl, snesb51_state, init_snes,       ROT0, "bootleg", "SNES 4 Slot arcade switcher (NBA Jam)",     MACHINE_IS_SKELETON )
-GAME( 199?, fatfurspb, 0,      mk3snes,  mk3snes, snesb51_state, init_fatfurspb,  ROT0, "bootleg", "Fatal Fury Special (SNES bootleg)",         MACHINE_IS_SKELETON )
+GAME( 199?, mk3snes,   0,      mk3snes,  mk3snes, snesb51_state, init_snes_hirom, ROT0, "bootleg", "Mortal Kombat 3 (SNES bootleg with timer)",    MACHINE_IS_SKELETON )
+GAME( 199?, kinstsnes, 0,      mk3snes,  mk3snes, snesb51_state, init_snes_hirom, ROT0, "bootleg", "Killer Instinct (SNES bootleg with timer)",    MACHINE_IS_SKELETON )
+GAME( 1993, snes4sl,   0,      snes4sl,  snes4sl, snesb51_state, init_snes,       ROT0, "bootleg", "SNES 4 Slot arcade switcher",                  MACHINE_IS_SKELETON )
+GAME( 1994, snes4sln,  0,      snes4sln, snes4sl, snesb51_state, init_snes,       ROT0, "bootleg", "SNES 4 Slot arcade switcher (NBA Jam)",        MACHINE_IS_SKELETON )
+GAME( 199?, fatfurspb, 0,      mk3snes,  mk3snes, snesb51_state, init_fatfurspb,  ROT0, "bootleg", "Fatal Fury Special (SNES bootleg with timer)", MACHINE_IS_SKELETON )
