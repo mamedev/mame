@@ -195,11 +195,8 @@ void ip20_state::ip20(machine_config &config)
 		});
 
 	SGI_INT2(config, m_int, 10_MHz_XTAL);
-	m_int->write_intr<1>().set_inputline(m_cpu, INPUT_LINE_IRQ1);
-	m_int->write_intr<2>().set_inputline(m_cpu, INPUT_LINE_IRQ2);
-	m_int->write_intr<3>().set_inputline(m_cpu, INPUT_LINE_IRQ3);
-	m_int->write_intr<4>().set_inputline(m_cpu, INPUT_LINE_IRQ4);
-	m_int->write_intr<5>().set_inputline(m_cpu, INPUT_LINE_IRQ5);
+	m_int->write_intr<1>().set_inputline(m_cpu, INPUT_LINE_IRQ0);
+	m_int->write_intr<2>().set_inputline(m_cpu, INPUT_LINE_IRQ1);
 	// TODO: write_led and write_poweroff outputs
 	//
 	//  0   cache parity error?
