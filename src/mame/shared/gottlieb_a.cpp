@@ -29,16 +29,16 @@ constexpr XTAL SOUND2_SPEECH_CLOCK(3'120'000);
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN2,        gottlieb_sound_p2_device,             "gotsndp2",   "Gottlieb Multi-mode Sound Board")
-DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN3,        gottlieb_sound_p3_device,             "gotsndp3",   "Gottlieb Sound pin. 3")
-DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN4,        gottlieb_sound_p4_device,             "gotsndp4",   "Gottlieb Sound pin. 4")
-DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN5,        gottlieb_sound_p5_device,             "gotsndp5",   "Gottlieb Sound pin. 5")
-DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN6,        gottlieb_sound_p6_device,             "gotsndp6",   "Gottlieb Sound pin. 6")
-DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN7,        gottlieb_sound_p7_device,             "gotsndp7",   "Gottlieb Sound pin. 7")
-DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1,        gottlieb_sound_r1_device,             "gotsndr1",   "Gottlieb Sound rev. 1")
-DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_SPEECH_REV1, gottlieb_sound_speech_r1_device,      "gotsndspr1", "Gottlieb Sound/Speech rev. 1 w/SC-01")
-DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_SPEECH_REV1A,gottlieb_sound_speech_r1a_device,     "gotsndspr1a","Gottlieb Sound/Speech rev. 1 w/SC-01-A")
-DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device,             "gotsndr2",   "Gottlieb Sound rev. 2")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN2,         gottlieb_sound_p2_device,         "gotsndp2",    "Gottlieb Multi-mode Sound Board")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN3,         gottlieb_sound_p3_device,         "gotsndp3",    "Gottlieb Sound pin. 3")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN4,         gottlieb_sound_p4_device,         "gotsndp4",    "Gottlieb Sound pin. 4")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN5,         gottlieb_sound_p5_device,         "gotsndp5",    "Gottlieb Sound pin. 5")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN6,         gottlieb_sound_p6_device,         "gotsndp6",    "Gottlieb Sound pin. 6")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN7,         gottlieb_sound_p7_device,         "gotsndp7",    "Gottlieb Sound pin. 7")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1,         gottlieb_sound_r1_device,         "gotsndr1",    "Gottlieb Sound rev. 1")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_SPEECH_REV1,  gottlieb_sound_speech_r1_device,  "gotsndspr1",  "Gottlieb Sound/Speech rev. 1 w/SC-01")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_SPEECH_REV1A, gottlieb_sound_speech_r1a_device, "gotsndspr1a", "Gottlieb Sound/Speech rev. 1 w/SC-01-A")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,         gottlieb_sound_r2_device,         "gotsndr2",    "Gottlieb Sound rev. 2")
 
 
 //**************************************************************************
@@ -390,7 +390,7 @@ gottlieb_sound_speech_r1_device::gottlieb_sound_speech_r1_device(const machine_c
 }
 
 gottlieb_sound_speech_r1_device::gottlieb_sound_speech_r1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: gottlieb_sound_r1_device(mconfig, GOTTLIEB_SOUND_SPEECH_REV1, tag, owner, clock)
+	: gottlieb_sound_r1_device(mconfig, type, tag, owner, clock)
 	, m_votrax(*this, "votrax")
 	, m_speech_clock(0)
 {
@@ -502,7 +502,7 @@ void gottlieb_sound_speech_r1_device::device_start()
 //  constructor
 //-------------------------------------------------
 
-gottlieb_sound_speech_r1a_device::gottlieb_sound_speech_r1a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+gottlieb_sound_speech_r1a_device::gottlieb_sound_speech_r1a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: gottlieb_sound_speech_r1_device(mconfig, GOTTLIEB_SOUND_SPEECH_REV1A, tag, owner, clock)
 {
 }

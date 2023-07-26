@@ -21,16 +21,16 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN2,        gottlieb_sound_p2_device)
-DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN3,        gottlieb_sound_p3_device)
-DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN4,        gottlieb_sound_p4_device)
-DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN5,        gottlieb_sound_p5_device)
-DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN6,        gottlieb_sound_p6_device)
-DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN7,        gottlieb_sound_p7_device)
-DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1,        gottlieb_sound_r1_device)
-DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_SPEECH_REV1, gottlieb_sound_speech_r1_device)
+DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN2,         gottlieb_sound_p2_device)
+DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN3,         gottlieb_sound_p3_device)
+DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN4,         gottlieb_sound_p4_device)
+DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN5,         gottlieb_sound_p5_device)
+DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN6,         gottlieb_sound_p6_device)
+DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN7,         gottlieb_sound_p7_device)
+DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1,         gottlieb_sound_r1_device)
+DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_SPEECH_REV1,  gottlieb_sound_speech_r1_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_SPEECH_REV1A, gottlieb_sound_speech_r1a_device)
-DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device)
+DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,         gottlieb_sound_r2_device)
 
 
 //**************************************************************************
