@@ -21,8 +21,12 @@
   output, but it's probably something like this; note that RED and BLUE
   are swapped wrt the usual configuration.
 
-  bit 7 -- 220 ohm resistor  -- RED
-        -- 470 ohm resistor  -- RED
+  Update 2023: The two red components needs to be swapped in order to get
+  correct sea colors, would be violet-ish otherwise.
+  cfr. https://github.com/mamedev/mame/issues/11443
+
+  bit 7 -- 470 ohm resistor  -- RED
+        -- 220 ohm resistor  -- RED
         -- 220 ohm resistor  -- GREEN
         -- 470 ohm resistor  -- GREEN
         -- 1  kohm resistor  -- GREEN
@@ -43,8 +47,8 @@ void m57_state::m57_palette(palette_device &palette) const
 
 		// red component
 		bit0 = 0;
-		bit1 = BIT(color_prom[256], 2);
-		bit2 = BIT(color_prom[256], 3);
+		bit1 = BIT(color_prom[256], 3);
+		bit2 = BIT(color_prom[256], 2);
 		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		// green component
 		bit0 = BIT(color_prom[0], 3);
