@@ -52,7 +52,10 @@ protected:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
+	virtual MC6845_UPDATE_ROW(crtc_update_row);
+
 	required_device<cpu_device>     m_maincpu;
+	required_device<screen_device>  m_screen;
 	required_device<palette_device> m_palette;
 	required_device<mc6845_device>  m_crtc;
 	required_shared_ptr<uint8_t>    m_p_videoram;
@@ -75,8 +78,6 @@ private:
 	int mm5740_shift_r();
 	int mm5740_control_r();
 	void mm5740_data_ready_w(int state);
-
-	MC6845_UPDATE_ROW(crtc_update_row);
 
 	TIMER_CALLBACK_MEMBER(key_click_off);
 	TIMER_CALLBACK_MEMBER(bell_off);
@@ -160,19 +161,18 @@ protected:
 
 	void latch_u5_w(uint8_t data);
 
-	MC6845_UPDATE_ROW(crtc_update_row);
+	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
 
 	bool char_gen_a11;
 	bool graphic_mode;
 	bool col_132;
 	bool reverse_video;
-
 };
 
 DECLARE_DEVICE_TYPE(HEATH_TLB, heath_tlb_device)
+DECLARE_DEVICE_TYPE(HEATH_GP19, heath_gp19_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_SUPER19, heath_super19_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_WATZ, heath_watz_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_ULTRA, heath_ultra_tlb_device)
-DECLARE_DEVICE_TYPE(HEATH_GP19, heath_gp19_tlb_device)
 
 #endif // MAME_HEATHKIT_TLB_H

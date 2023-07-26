@@ -12,15 +12,19 @@
     mask-programmed keyboard controller. The output of this passes
     through a rom.
 
-    Input can also come from the serial port (a 8250).
-    Either device will signal an interrupt to the CPU when a key
-    is pressed/data is received.
+    Input can also come from the serial port.
 
   TODO:
     - determine why ULTRA ROM's self-diag (ESC |) fails for the ROM and
       scratchpad memory
     - INS8250 needs to implement "Set Break" (LCR, bit 6) before Break key
       will function as expected.
+    - 49/50 row mode does not work when DOT clocks are programmed as documented
+      in the manual. It does work when DOT clock is fixed at the 20.282 MHz
+      rate.
+    - In 49/50 row mode, character descenders are cut off.
+    - fix GP-19 graphics mode only showing the top half of the image (on the
+      visible screen).
 
 ****************************************************************************/
 /***************************************************************************
@@ -60,13 +64,13 @@
 static constexpr XTAL MASTER_CLOCK = XTAL(12'288'000);
 
 // DOT clocks
-static constexpr XTAL DOT_CLOCK_1 = XTAL(20'282'000) / 8;   // 132 columns
-static constexpr XTAL DOT_CLOCK_2 = XTAL(12'292'000) / 8;   // 80 columns
-static constexpr XTAL DOT_CLOCK_3 = XTAL(10'644'000) / 8;   // Graphics mode
+static constexpr XTAL BASE_DOT_CLOCK = MASTER_CLOCK;
+static constexpr XTAL GP19_DOT_CLOCK_1 = XTAL(20'282'000);   // 132 columns
+static constexpr XTAL GP19_DOT_CLOCK_2 = XTAL(12'292'000);   // 80 columns
+static constexpr XTAL GP19_DOT_CLOCK_3 = XTAL(10'644'000);   // Graphics mode
 
-// Standard H19 used a 2.048 MHz clock
+// Standard H19 used a 2.048 MHz clock for Z80
 static constexpr XTAL H19_CLOCK = MASTER_CLOCK / 6;
-static constexpr XTAL MC6845_CLOCK = MASTER_CLOCK / 8;
 static constexpr XTAL INS8250_CLOCK = MASTER_CLOCK / 4;
 
 // Beep Frequency is 1 KHz
@@ -90,6 +94,7 @@ heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *ta
 heath_tlb_device::heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_maincpu(*this, "maincpu"),
+	m_screen(*this, "screen"),
 	m_palette(*this, "palette"),
 	m_crtc(*this, "crtc"),
 	m_p_videoram(*this, "videoram"),
@@ -858,14 +863,16 @@ void heath_tlb_device::device_add_mconfig(machine_config &config)
 
 	// video hardware
 	// TODO: make configurable, Heath offered 2 different CRTs - White, Green
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
-	screen.set_raw(MC6845_CLOCK * 45 / 2, 900, 260, 0, 640, 0, 250);
-	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	// based on the H19 ROM code for 60 Hz
+	m_screen->set_raw(BASE_DOT_CLOCK, 768, 32, 672, 270, 0, 250);
+	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_h19);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MC6845(config, m_crtc, MC6845_CLOCK);
+	// MC 6845 uses a character clock, divide the DOT clock by 8.
+	MC6845(config, m_crtc, BASE_DOT_CLOCK / 8);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
@@ -897,6 +904,7 @@ void heath_tlb_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, H19_BEEP_FRQ).add_route(ALL_OUTPUTS, "mono", 0.05);
 
+	// clock for repeat key
 	CLOCK(config, m_repeat_clock, 40);
 	m_repeat_clock->set_duty_cycle(0);
 	m_repeat_clock->signal_handler().set(m_mm5740, FUNC(mm5740_device::repeat_line_w));
@@ -981,7 +989,10 @@ void heath_gp19_tlb_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &heath_gp19_tlb_device::io_map);
 
 	m_crtc->set_update_row_callback(FUNC(heath_gp19_tlb_device::crtc_update_row));
-	m_crtc->set_clock(DOT_CLOCK_2);
+	m_crtc->set_clock(GP19_DOT_CLOCK_2 / 8);
+
+	m_screen->set_raw(GP19_DOT_CLOCK_2, 776, 32, 672, 264, 10, 250);
+
 }
 
 void heath_gp19_tlb_device::device_start()
@@ -1002,11 +1013,11 @@ void heath_gp19_tlb_device::device_start()
 
 void heath_gp19_tlb_device::mem_map(address_map &map)
 {
-	// heath_tlb_device::mem_map(map);
+	// ROMs 1, 2, 3
+	map(0x0000, 0x02fff).rom();
 
-	map(0x0000, 0x02fff).rom();  // ROMs 1, 2, 3
-
-	// map(0x3000, 0x03fff);   // Optional external board - Program ROM 4, external I/O
+	// Optional external board - Program ROM 4, external I/O
+	// map(0x3000, 0x03fff).rom();
 
 	map(0x4000, 0x40ff).mirror(0x3f00).ram();
 	map(0x6000, 0x67ff).mirror(0x1800).ram();
@@ -1018,10 +1029,14 @@ void heath_gp19_tlb_device::io_map(address_map &map)
 {
 	heath_tlb_device::io_map(map);
 
-	map(0x68, 0x68).mirror(0x07).w(FUNC(heath_gp19_tlb_device::latch_u5_w)); // Write octal latch U5
-	map(0x70, 0x70).mirror(0x07).portr("SW1");                               // Switch on GP-19 board
-	// map(0x78, 0x78).mirror(0x07);    // Optional Auxiliary I/O connector
+	// Latch U5
+	map(0x68, 0x68).mirror(0x07).w(FUNC(heath_gp19_tlb_device::latch_u5_w));
 
+	// Switch on GP-19 board
+	map(0x70, 0x70).mirror(0x07).portr("SW1");
+
+	// Optional Auxiliary I/O connector
+	// map(0x78, 0x78).mirror(0x07);
 }
 
 /**
@@ -1044,15 +1059,18 @@ void heath_gp19_tlb_device::latch_u5_w(uint8_t data)
 
 	if (graphic_mode)
 	{
-		m_crtc->set_clock(DOT_CLOCK_3);
+		m_crtc->set_clock(GP19_DOT_CLOCK_3 / 8);
+		m_screen->set_raw(GP19_DOT_CLOCK_3, 672, 50, 560, 264, 0, 250);
 	}
 	else if (col_132)
 	{
-		m_crtc->set_clock(DOT_CLOCK_1);
+		m_crtc->set_clock(GP19_DOT_CLOCK_1 / 8);
+		m_screen->set_raw(GP19_DOT_CLOCK_1, 1280, 1088, 33, 264, 10, 250);
 	}
 	else
 	{
-		m_crtc->set_clock(DOT_CLOCK_2);
+		m_crtc->set_clock(GP19_DOT_CLOCK_2 / 8);
+		m_screen->set_raw(GP19_DOT_CLOCK_2, 776, 32, 672, 264, 10, 250);
 	}
 }
 
@@ -1070,17 +1088,16 @@ MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 		{
 			for (uint16_t x = 0; x < x_count; x++)
 			{
+				uint8_t gfx = m_p_videoram[(ma + x) & 0x3fff] ^ screen_inv;
 
-				uint8_t chr = m_p_videoram[(ma + x) & 0x3fff] ^ screen_inv;
-
-				*p++ = palette[BIT(chr, 0)];
-				*p++ = palette[BIT(chr, 1)];
-				*p++ = palette[BIT(chr, 2)];
-				*p++ = palette[BIT(chr, 3)];
-				*p++ = palette[BIT(chr, 4)];
-				*p++ = palette[BIT(chr, 5)];
-				*p++ = palette[BIT(chr, 6)];
-				*p++ = palette[BIT(chr, 7)];
+				*p++ = palette[BIT(gfx, 0)];
+				*p++ = palette[BIT(gfx, 1)];
+				*p++ = palette[BIT(gfx, 2)];
+				*p++ = palette[BIT(gfx, 3)];
+				*p++ = palette[BIT(gfx, 4)];
+				*p++ = palette[BIT(gfx, 5)];
+				*p++ = palette[BIT(gfx, 6)];
+				*p++ = palette[BIT(gfx, 7)];
 			}
 		}
 		else
@@ -1102,7 +1119,7 @@ MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 				// get pattern of pixels for that character scanline
 				uint16_t base = char_gen_a11 ? 0x800 : 0x0;
 
-				uint8_t const gfx = m_p_chargen[base | (chr<<4) | ra] ^ inv;
+				uint8_t const gfx = m_p_chargen[base | (chr << 4) | ra] ^ inv;
 
 				// Display a scanline of a character (8 pixels)
 				*p++ = palette[BIT(gfx, 7)];
@@ -1133,7 +1150,6 @@ MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 		}
 	}
 }
-
 
 const tiny_rom_entry *heath_gp19_tlb_device::device_rom_region() const
 {
