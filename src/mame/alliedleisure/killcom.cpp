@@ -2,7 +2,7 @@
 // copyright-holders:Chris Moore
 /***************************************************************************
 
-Killer Comet hardware, by Centuri (previously known as Allied Leisure)
+Killer Comet hardware, by Centuri (formerly known as Allied Leisure)
 driver by Chris Moore
 
 Killer Comet memory map
