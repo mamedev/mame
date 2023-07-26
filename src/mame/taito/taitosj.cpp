@@ -1769,15 +1769,15 @@ void taitosj_state::dacvol_w(uint8_t data)
 void taitosj_state::nomcu(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 8_MHz_XTAL / 2);      // on CPU board
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2); // on CPU board
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitosj_state::main_nomcu_map);
 
-	Z80(config, m_audiocpu, 12_MHz_XTAL / 4);    // on GAME board
+	Z80(config, m_audiocpu, 12_MHz_XTAL / 4); // on GAME board
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitosj_state::taitosj_audio_map);
-			/* interrupts:
-			   - no interrupts synced with vblank
-			   - NMI triggered by the main CPU
-			   - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz, */
+	// interrupts:
+	// - no interrupts synced with vblank
+	// - NMI triggered by the main CPU
+	// - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz.
 	m_audiocpu->set_periodic_int(FUNC(taitosj_state::irq0_line_hold), attotime::from_hz(12_MHz_XTAL / (2*4*16*16*10*16)));
 
 	// video hardware
@@ -1814,13 +1814,10 @@ void taitosj_state::nomcu(machine_config &config)
 	m_ay[2]->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	AY8910(config, m_ay[3], 12_MHz_XTAL / 8); // on GAME board, AY-3-8910 @ IC50
+	// TODO: Implement ay4 Port A bits 0 and 1 which connect to a 7416 open collector inverter, to selectively
+	// tie none, either or both of two capacitors between the ay4 audio output signal and ground,
+    // or between audio output signal and high-z (i.e. do nothing). Bio Attack uses this?
 	m_ay[3]->set_flags(AY8910_SINGLE_OUTPUT);
-	/* TODO: Implement ay4 Port A bits 0 and 1 which connect to a 7416 open
-	   collector inverter, to selectively tie none, either or both of two
-	   capacitors between the ay4 audio output signal and ground, or between
-	   audio output signal and high-z (i.e. do nothing).
-	   Bio Attack uses this?
-	*/
 	m_ay[3]->port_b_write_callback().set(FUNC(taitosj_state::sndnmi_msk_w));
 	m_ay[3]->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
@@ -1841,7 +1838,7 @@ void taitosj_state::mcu(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitosj_state::main_mcu_map);
 
-	TAITO_SJ_SECURITY_MCU(config, m_mcu, 3_MHz_XTAL);   // divided by 4 internally
+	TAITO_SJ_SECURITY_MCU(config, m_mcu, 3_MHz_XTAL); // divided by 4 internally
 	m_mcu->set_int_mode(taito_sj_security_mcu_device::int_mode::LATCH);
 	m_mcu->m68read_cb().set(FUNC(taitosj_state::mcu_mem_r));
 	m_mcu->m68write_cb().set(FUNC(taitosj_state::mcu_mem_w));
@@ -2924,7 +2921,7 @@ GAME( 1983, elevatorb, elevator, nomcu,    elevator, taitosj_state, init_taitosj
 GAME( 1983, tinstar,   0,        mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "The Tin Star (A10, 4 PCB version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, tinstara,  tinstar,  mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "The Tin Star (TS, 5 PCB version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, waterski,  0,        nomcu,    waterski, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Water Ski", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, bioatack,  0,        nomcu,    bioatack, taitosj_state, init_taitosj, ROT270, "Taito Corporation (Fox Video Games license)", "Bio Attack", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bioatack,  0,        nomcu,    bioatack, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Bio Attack", MACHINE_SUPPORTS_SAVE ) // Fox Video Games = licensor of movie rights
 GAME( 1984, sfposeid,  0,        mcu,      sfposeid, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Sea Fighter Poseidon", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hwrace,    0,        nomcu,    hwrace,   taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "High Way Race", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, kikstart,  0,        kikstart, kikstart, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Kick Start - Wheelie King", MACHINE_SUPPORTS_SAVE )
