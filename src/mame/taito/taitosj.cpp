@@ -1771,7 +1771,6 @@ void taitosj_state::nomcu(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, 8_MHz_XTAL / 2);      // on CPU board
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitosj_state::main_nomcu_map);
-	m_maincpu->set_vblank_int("screen", FUNC(taitosj_state::irq0_line_hold));
 
 	Z80(config, m_audiocpu, 12_MHz_XTAL / 4);    // on GAME board
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitosj_state::taitosj_audio_map);
@@ -1783,12 +1782,10 @@ void taitosj_state::nomcu(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 256, 264, 16, 240); // verified from schematics
 	m_screen->set_screen_update(FUNC(taitosj_state::screen_update));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taitosj);
 	PALETTE(config, m_palette).set_entries(64);
