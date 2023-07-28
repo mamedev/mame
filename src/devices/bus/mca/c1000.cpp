@@ -317,7 +317,7 @@ void mca16_c1000_ide_device::update_pos_data_3(uint8_t data)
     m_option_select[MCABus::POS::OPTION_SELECT_DATA_3] = data;
 }
 
-WRITE_LINE_MEMBER(mca16_c1000_ide_device::ide_interrupt)
+void mca16_c1000_ide_device::ide_interrupt(int state)
 {
     switch(m_option_select[MCABus::POS::OPTION_SELECT_DATA_2] & 0x3f)
     {

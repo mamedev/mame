@@ -134,12 +134,16 @@ void mca16_planar_lpt_device::planar_remap_irq(uint8_t new_irq)
 
 uint8_t mca16_planar_lpt_device::io8_r(offs_t offset)
 {
-    assert_card_feedback();
+	printf("assert card feedback r %p\n", m_mca);
+	assert_card_feedback();
+	printf("ok\n");
     return m_lpt->read(offset);
 }
 
 void mca16_planar_lpt_device::io8_w(offs_t offset, uint8_t data)
 {
-    assert_card_feedback();
+	printf("assert card feedback w %p\n", m_mca);
+	assert_card_feedback();
+	printf("ok\n");
     m_lpt->write(offset, data);
 }

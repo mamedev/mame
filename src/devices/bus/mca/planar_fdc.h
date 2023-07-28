@@ -30,8 +30,8 @@ public:
 	// construction/destruction
 	mca16_planar_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( drq_w );
+	void irq_w(int state);
+	void drq_w(int state);
 	static void floppy_formats(format_registration &fr);
 
 	virtual uint8_t io8_r(offs_t offset) override;
@@ -64,8 +64,8 @@ protected:
 
 	required_device<n82077aa_device> m_fdc;
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
 };
 
 // device type definition

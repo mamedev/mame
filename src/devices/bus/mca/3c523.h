@@ -66,7 +66,7 @@ protected:
 	required_device<i82586_device> m_net;
 	required_device<ram_device> m_ram;
 
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 
 private:
 	uint8_t 	control_register_r();

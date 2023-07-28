@@ -13,7 +13,7 @@ class ps2_mb_device;
 class ibm72x8299_device : public device_t, public device_mca16_card_interface
 {
 public:
-	ibm72x8299_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, ps2_mb_device *planar);
+	ibm72x8299_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, ps2_mb_device *planar, mca16_device *bus);
     ibm72x8299_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// outputs to host
@@ -38,11 +38,11 @@ public:
 
     uint8_t card_select_feedback_r(offs_t offset);
 
-    DECLARE_WRITE_LINE_MEMBER(pit_ch2_gate_w);
-    DECLARE_WRITE_LINE_MEMBER(pit_ch3_gate_w);
-    DECLARE_WRITE_LINE_MEMBER(pit_ch3_clk_w);
+    void pit_ch2_gate_w(int state);
+    void pit_ch3_gate_w(int state);
+    void pit_ch3_clk_w(int state);
     
-    DECLARE_WRITE_LINE_MEMBER(cd_sfdbk_w);
+    void cd_sfdbk_w(int state);
 
 protected:
 	void device_start() override;
@@ -59,9 +59,9 @@ protected:
 private:
     required_device<ps2_pit_device> m_pit;
 
-    DECLARE_WRITE_LINE_MEMBER(pit_ch0_w);
-    DECLARE_WRITE_LINE_MEMBER(pit_ch2_w);
-    DECLARE_WRITE_LINE_MEMBER(pit_ch3_w);
+    void pit_ch0_w(int state);
+    void pit_ch2_w(int state);
+    void pit_ch3_w(int state);
     
 	devcb_write_line::array<4> m_pit_ch_cb;
 

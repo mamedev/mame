@@ -56,7 +56,7 @@ protected:
     virtual const tiny_rom_entry *device_rom_region() const override;
     
 private:
-    DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+    void ide_interrupt(int state);
 
     void update_pos_data_1(uint8_t data) override;
     void update_pos_data_2(uint8_t data) override;

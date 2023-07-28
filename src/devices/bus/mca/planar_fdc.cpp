@@ -104,13 +104,13 @@ void mca16_planar_fdc_device::disable()
 	m_mca->unmap_device(0x3f0, 0x3f7);
 }
 
-WRITE_LINE_MEMBER( mca16_planar_fdc_device::irq_w )
+void mca16_planar_fdc_device::irq_w(int state)
 {
 	LOG("%s: FDC: IRQ 6 now %d\n", FUNCNAME, state);
 	m_mca->ireq_w<6>(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( mca16_planar_fdc_device::drq_w )
+void mca16_planar_fdc_device::drq_w(int state)
 {
 	LOG("%s: FDC: DMA 2 now %d\n", FUNCNAME, state);
 	m_mca->dreq_w<2>(state ? ASSERT_LINE : CLEAR_LINE);

@@ -248,11 +248,12 @@ void ps2_mb_device::device_add_mconfig(machine_config &config)
 /* Common PS/2 devices. */
 void ps2_mb_device::add_southbridge_72x8299(machine_config &config)
 {
-	ibm72x8299_device &m_io_controller(IBM72X8299(config, "io_ctrlr", 0, this));
-	
-	m_io_controller.pit_ch_callback<0>().set(FUNC(ps2_mb_device::irq0_w));
-	m_io_controller.pit_ch_callback<2>().set(FUNC(ps2_mb_device::pit8254_out2_changed));
-	m_io_controller.pit_ch_callback<3>().set(FUNC(ps2_mb_device::watchdog_w));
+	//ibm72x8299_device &m_io_controller(IBM72X8299(config, "io_ctrlr", 0, this, m_mcabus));
+
+	IBM72X8299(config, m_io_controller, 0, this, m_mcabus);
+	m_io_controller->pit_ch_callback<0>().set(FUNC(ps2_mb_device::irq0_w));
+	m_io_controller->pit_ch_callback<2>().set(FUNC(ps2_mb_device::pit8254_out2_changed));
+	m_io_controller->pit_ch_callback<3>().set(FUNC(ps2_mb_device::watchdog_w));
 
 	m_mcabus->cs_feedback_callback().set(m_io_controller, FUNC(ibm72x8299_device::cd_sfdbk_w));
 }
@@ -331,7 +332,7 @@ uint8_t ps2_mb_device::get_slave_ack(offs_t offset)
 	return 0x00;
 }
 
-WRITE_LINE_MEMBER( ps2_mb_device::keybc_irq_latch_w )
+void ps2_mb_device::keybc_irq_latch_w(int state)
 {
 	// Latches on IRQ 1, reset by a read to 0x60.
 	if(state == ASSERT_LINE) m_pic8259_master->ir1_w(state);
@@ -361,7 +362,7 @@ void ps2_mb_device::speaker_set_spkrdata(uint8_t data)
  *
  *************************************************************/
 
-WRITE_LINE_MEMBER( ps2_mb_device::pit8254_out2_changed )
+void ps2_mb_device::pit8254_out2_changed(int state)
 {
 	m_pit_out2 = state ? 1 : 0;
 	m_speaker->level_w(m_at_spkrdata & m_pit_out2);
@@ -434,13 +435,13 @@ void ps2_mb_device::nvram_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( ps2_mb_device::shutdown )
+void ps2_mb_device::shutdown(int state)
 {
 	if(state)
 		m_maincpu->reset();
 }
 
-WRITE_LINE_MEMBER( ps2_mb_device::irq0_w )
+void ps2_mb_device::irq0_w(int state)
 {
 	// IRQ0 is latched, the PIT channel 3 lines are not.
 	if(state) m_pic8259_master->ir0_w(state);
@@ -453,7 +454,7 @@ void ps2_mb_device::irq0_latch_reset()
 	m_pic8259_master->ir0_w(false);
 }
 
-WRITE_LINE_MEMBER( ps2_mb_device::watchdog_w )
+void ps2_mb_device::watchdog_w(int state)
 {
 	if(state)
 	{
@@ -510,13 +511,13 @@ void ps2_mb_device::portb_w(uint8_t data)
 	m_io_controller->pit_ch2_gate_w(m_write_gate_2);
 }
 
-WRITE_LINE_MEMBER( ps2_mb_device::iochck_w )
+void ps2_mb_device::iochck_w(int state)
 {
 	if (!state && m_nmi_enabled && !m_channel_check)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( ps2_mb_device::gate_a20_w )
+void ps2_mb_device::gate_a20_w(int state)
 {
 	m_gate_a20 = state;
 	m_maincpu->set_input_line(INPUT_LINE_A20, m_gate_a20);

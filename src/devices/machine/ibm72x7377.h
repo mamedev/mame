@@ -39,7 +39,7 @@ public:
 	void dma_arbiter_w(offs_t offset, uint8_t data);
 	void dma_feedback_w(offs_t offset, uint8_t data);
 
-	template <unsigned C> DECLARE_WRITE_LINE_MEMBER( dreq_w ) { dma_request(C, state); }
+	template <unsigned C> void dreq_w(int state) { dma_request(C, state); }
 
 protected:
 	void device_start() override;
@@ -55,8 +55,8 @@ private:
 
 	void dma_request(int channel, bool state);
 
-	DECLARE_WRITE_LINE_MEMBER(dma8237_1_out_eop);
-	DECLARE_WRITE_LINE_MEMBER(dma8237_2_out_eop);
+	void dma8237_1_out_eop(int state);
+	void dma8237_2_out_eop(int state);
 	uint8_t dma8237_0_dack_r();
 	uint8_t dma8237_1_dack_r();
 	uint8_t dma8237_2_dack_r();
@@ -71,16 +71,16 @@ private:
 	void dma8237_5_dack_w(uint8_t data);
 	void dma8237_6_dack_w(uint8_t data);
 	void dma8237_7_dack_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(dack3_w);
-	DECLARE_WRITE_LINE_MEMBER(dack4_w);
-	DECLARE_WRITE_LINE_MEMBER(dack5_w);
-	DECLARE_WRITE_LINE_MEMBER(dack6_w);
-	DECLARE_WRITE_LINE_MEMBER(dack7_w);
+	void dack0_w(int state);
+	void dack1_w(int state);
+	void dack2_w(int state);
+	void dack3_w(int state);
+	void dack4_w(int state);
+	void dack5_w(int state);
+	void dack6_w(int state);
+	void dack7_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
+	void dma_hrq_changed(int state);
 	void set_dma_channel(int channel, int state);
 
     uint8_t dma_read_byte(offs_t offset);

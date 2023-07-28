@@ -88,15 +88,12 @@ void mca16_planar_vga_device::enable()
     LOG("%s\n", FUNCNAME);
 
     m_mcabus->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(vga_device::mem_w)));
-    m_mcabus->install_device(0x3b0, 0x3ba, 
-        read8sm_delegate(*this, FUNC(mca16_planar_vga_device::port_03b0_r)),
-        write8sm_delegate(*this, FUNC(mca16_planar_vga_device::port_03b0_w)));
-    m_mcabus->install_device(0x3c0, 0x3cf, 
-        read8sm_delegate(*this, FUNC(mca16_planar_vga_device::port_03c0_r)),
-        write8sm_delegate(*this, FUNC(mca16_planar_vga_device::port_03c0_w)));
-    m_mcabus->install_device(0x3d0, 0x3df, 
-        read8sm_delegate(*this, FUNC(mca16_planar_vga_device::port_03d0_r)),
-        write8sm_delegate(*this, FUNC(mca16_planar_vga_device::port_03d0_w)));
+    m_mcabus->install_device(0x03b0, 0x03df, *m_vga, &vga_device::io_map);
+
+    m_mcabus->get_iospace()->install_readwrite_tap(0x03b0, 0x03bb, "card_feedback_tap", 
+        [this] (offs_t, u32& data, u32){ if(!machine().side_effects_disabled()) assert_card_feedback(); },
+        [this] (offs_t, u32& data, u32){ if(!machine().side_effects_disabled()) assert_card_feedback(); });
+
     m_is_mapped = 1;
 }
 
@@ -120,41 +117,41 @@ void mca16_planar_vga_device::planar_remap_irq(uint8_t new_irq)
     // Always IRQ 2/9.
 }
 
-uint8_t mca16_planar_vga_device::port_03b0_r(offs_t offset)
-{
-    assert_card_feedback();
-    return m_vga->port_03b0_r(offset);
-}
+// uint8_t mca16_planar_vga_device::port_03b0_r(offs_t offset)
+// {
+//     assert_card_feedback();
+//     return m_vga->port_03b0_r(offset);
+// }
 
-void mca16_planar_vga_device::port_03b0_w(offs_t offset, uint8_t data)
-{
-    assert_card_feedback();
-    m_vga->port_03b0_w(offset, data);
-}
+// void mca16_planar_vga_device::port_03b0_w(offs_t offset, uint8_t data)
+// {
+//     assert_card_feedback();
+//     m_vga->port_03b0_w(offset, data);
+// }
 
-uint8_t mca16_planar_vga_device::port_03c0_r(offs_t offset)
-{
-    assert_card_feedback();
-    return m_vga->port_03c0_r(offset);
-}
+// uint8_t mca16_planar_vga_device::port_03c0_r(offs_t offset)
+// {
+//     assert_card_feedback();
+//     return m_vga->port_03c0_r(offset);
+// }
 
-void mca16_planar_vga_device::port_03c0_w(offs_t offset, uint8_t data)
-{
-    assert_card_feedback();
-    m_vga->port_03c0_w(offset, data);
-}
+// void mca16_planar_vga_device::port_03c0_w(offs_t offset, uint8_t data)
+// {
+//     assert_card_feedback();
+//     m_vga->port_03c0_w(offset, data);
+// }
 
-uint8_t mca16_planar_vga_device::port_03d0_r(offs_t offset)
-{
-    assert_card_feedback();
-    return m_vga->port_03d0_r(offset);
-}
+// uint8_t mca16_planar_vga_device::port_03d0_r(offs_t offset)
+// {
+//     assert_card_feedback();
+//     return m_vga->port_03d0_r(offset);
+// }
 
-void mca16_planar_vga_device::port_03d0_w(offs_t offset, uint8_t data)
-{
-    assert_card_feedback();
-    m_vga->port_03d0_w(offset, data);
-}
+// void mca16_planar_vga_device::port_03d0_w(offs_t offset, uint8_t data)
+// {
+//     assert_card_feedback();
+//     m_vga->port_03d0_w(offset, data);
+// }
 
 void mca16_planar_vga_device::sleep_w(uint8_t data)
 {

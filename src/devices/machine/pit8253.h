@@ -194,8 +194,11 @@ public:
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
 
-	WRITE_LINE_MEMBER(write_gate3) { m_ch3_counter->gate_w(state); }
-	WRITE_LINE_MEMBER(write_clk3) { m_ch3_counter->set_clock_signal(state); }
+	// WRITE_LINE_MEMBER(write_gate3) { m_ch3_counter->gate_w(state); }
+	// WRITE_LINE_MEMBER(write_clk3) { m_ch3_counter->set_clock_signal(state); }
+
+	void write_gate3(int state) { m_ch3_counter->gate_w(state); }
+	void write_clk3(int state)	{ m_ch3_counter->set_clock_signal(state); }
 
 	auto ch3_out_handler() { return m_ch3_out_handler.bind(); }
 

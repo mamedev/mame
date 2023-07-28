@@ -37,13 +37,13 @@ public:
     virtual void planar_remap(int space_id, offs_t start, offs_t end);
 	virtual void planar_remap_irq(uint8_t line);
 
-	uint8_t port_03b0_r(offs_t offset);
-    uint8_t port_03c0_r(offs_t offset);
-    uint8_t port_03d0_r(offs_t offset);
+	// uint8_t port_03b0_r(offs_t offset);
+    // uint8_t port_03c0_r(offs_t offset);
+    // uint8_t port_03d0_r(offs_t offset);
 
-    void port_03b0_w(offs_t offset, uint8_t data);
-    void port_03c0_w(offs_t offset, uint8_t data);
-    void port_03d0_w(offs_t offset, uint8_t data);
+    // void port_03b0_w(offs_t offset, uint8_t data);
+    // void port_03c0_w(offs_t offset, uint8_t data);
+    // void port_03d0_w(offs_t offset, uint8_t data);
 
 	void sleep_w(uint8_t data);
 	uint8_t sleep_r() { return m_sleep; }
@@ -65,7 +65,7 @@ private:
 	bool m_is_mapped;
 	bool m_sleep;		// VGA does not respond to any data when cleared.
 
-	DECLARE_WRITE_LINE_MEMBER(retrace_interrupt_w) { m_mcabus->ireq_w<2>(state); }
+	void retrace_interrupt_w(int state) { m_mcabus->ireq_w<2>(state); }
 
 };
 

@@ -342,7 +342,7 @@ void mca16_3c523_device::io8_w(offs_t offset, uint8_t data)
 	if(offset == 6) control_register_w(data);
 }
 
-WRITE_LINE_MEMBER(mca16_3c523_device::irq_w)
+void mca16_3c523_device::irq_w(int state)
 {
 	bool asserting_now = (m_interrupt_flag == 0) && (state == 1);
 	m_interrupt_flag = state; // This flag is not affected by the INTE bit.

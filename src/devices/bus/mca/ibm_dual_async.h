@@ -31,8 +31,8 @@ public:
 	// construction/destruction
 	mca16_ibm_dual_async_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_1) { if(m_cur_irq_uart1 == 4) m_mca->ireq_w<4>(state); else m_mca->ireq_w<3>(state); }
-	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_2) { if(m_cur_irq_uart2 == 4) m_mca->ireq_w<4>(state); else m_mca->ireq_w<3>(state); }
+	void pc_com_interrupt_1(int state) { if(m_cur_irq_uart1 == 4) m_mca->ireq_w<4>(state); else m_mca->ireq_w<3>(state); }
+	void pc_com_interrupt_2(int state) { if(m_cur_irq_uart2 == 4) m_mca->ireq_w<4>(state); else m_mca->ireq_w<3>(state); }
 
 	virtual void unmap() override;
 	virtual void remap() override;

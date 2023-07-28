@@ -84,11 +84,11 @@ public:
 	mca16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
-	template<int Line> DECLARE_WRITE_LINE_MEMBER( dreq_w )
+	template<int Line> void dreq_w(int state)
 	{
 		m_out_drq_cb[Line](state);
 	}
-	template<int Line> DECLARE_WRITE_LINE_MEMBER( ireq_w )
+	template<int Line> void ireq_w(int state)
 	{
 		m_out_irq_cb[Line](state);
 	};
@@ -114,6 +114,7 @@ public:
 	{
 		m_iospace->install_device(addrstart, addrend, device, map, unitmask);
 	}
+	
 	void install_bank(offs_t start, offs_t end, uint8_t *data);
 	void install_bank(offs_t start, offs_t end, memory_bank *bank);
 	void install_rom(device_t *dev, offs_t start, offs_t end, const char *region);
@@ -147,6 +148,8 @@ public:
 	virtual void remap(int space_id, offs_t start, offs_t end) {};
 
 	const address_space_config m_mem16_config, m_io16_config;
+
+	required_address_space get_iospace() { return m_iospace; }
 
 protected:
 	mca16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -271,7 +274,7 @@ protected:
 	/// that a device is present at a particular I/O address.
 	/// Asserted by the receiving device, not the transmitting device.
 	/// If no device is present, the line is never asserted.
-	virtual void assert_card_feedback() { m_mca->cs_feedback_callback(); }
+	virtual void assert_card_feedback() { printf("assert_card_feedback %p\n", this); m_mca->cs_feedback_callback(); }
 	virtual void reset_option_select() { memset(m_option_select, 0, 8);  }
 		
 	uint8_t 	m_option_select[8];

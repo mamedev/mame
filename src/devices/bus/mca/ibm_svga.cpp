@@ -97,6 +97,7 @@ void mca16_ibm_svga_device::remap()
 {
     m_mca->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_svga, FUNC(cirrus_gd5428_device::mem_r)), write8sm_delegate(*m_svga, FUNC(cirrus_gd5428_device::mem_w)));
     m_mca->install_rom(this, 0xc0000, 0xc7fff, "option");                   // VGA BIOS is always at C0000-C7FFF.
+
     // Need local trampolines to assert channel feedback
     m_mca->install_device(0x3b0, 0x3ba, 
         read8sm_delegate(*this, FUNC(mca16_ibm_svga_device::port_03b0_r)),
@@ -112,37 +113,37 @@ void mca16_ibm_svga_device::remap()
 uint8_t mca16_ibm_svga_device::port_03b0_r(offs_t offset)
 {
     assert_card_feedback();
-    return m_svga->port_03b0_r(offset);
+    return 0; //m_svga->port_03b0_r(offset);
 }
 
 void mca16_ibm_svga_device::port_03b0_w(offs_t offset, uint8_t data)
 {
     assert_card_feedback();
-    m_svga->port_03b0_w(offset, data);
+    //m_svga->port_03b0_w(offset, data);
 }
 
 uint8_t mca16_ibm_svga_device::port_03c0_r(offs_t offset)
 {
     assert_card_feedback();
-    return m_svga->port_03c0_r(offset);
+    return 0; //m_svga->port_03c0_r(offset);
 }
 
 void mca16_ibm_svga_device::port_03c0_w(offs_t offset, uint8_t data)
 {
     assert_card_feedback();
-    m_svga->port_03c0_w(offset, data);
+    //m_svga->port_03c0_w(offset, data);
 }
 
 uint8_t mca16_ibm_svga_device::port_03d0_r(offs_t offset)
 {
     assert_card_feedback();
-    return m_svga->port_03d0_r(offset);
+    return 0; //m_svga->port_03d0_r(offset);
 }
 
 void mca16_ibm_svga_device::port_03d0_w(offs_t offset, uint8_t data)
 {
     assert_card_feedback();
-    m_svga->port_03d0_w(offset, data);
+    //m_svga->port_03d0_w(offset, data);
 }
 
 ROM_START( ibm_svga )

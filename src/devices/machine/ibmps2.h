@@ -65,8 +65,8 @@ public:
 	template <typename T> void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_ram_tag(T &&tag) { m_ram.set_tag(std::forward<T>(tag)); }
 
-	DECLARE_WRITE_LINE_MEMBER(iochck_w);
-	DECLARE_WRITE_LINE_MEMBER(shutdown);
+	void iochck_w(int state);
+	void shutdown(int state);
 
 	virtual IRQ_CALLBACK_MEMBER(inta_cb);
 
@@ -146,12 +146,12 @@ protected:
 	bool m_refresh_state;
 	bool m_supports_fast_refresh;
 
-	DECLARE_WRITE_LINE_MEMBER(pit8254_out2_changed);
-	DECLARE_WRITE_LINE_MEMBER(irq0_w);
-	DECLARE_WRITE_LINE_MEMBER(watchdog_w);
-	DECLARE_WRITE_LINE_MEMBER(gate_a20_w);
-	DECLARE_WRITE_LINE_MEMBER(hot_reset_w);	
-	DECLARE_WRITE_LINE_MEMBER(keybc_irq_latch_w);
+	void pit8254_out2_changed(int state);
+	void irq0_w(int state);
+	void watchdog_w(int state);
+	void gate_a20_w(int state);
+	void hot_reset_w(int state);
+	void keybc_irq_latch_w(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(refresh_cb);
 };

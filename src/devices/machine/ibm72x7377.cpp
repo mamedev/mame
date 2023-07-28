@@ -117,14 +117,14 @@ void ibm72x7377_device::dma8237_5_dack_w(uint8_t data) { m_mcabus->dack16_w(5, m
 void ibm72x7377_device::dma8237_6_dack_w(uint8_t data) { m_mcabus->dack16_w(6, m_dma_high_byte | data); }
 void ibm72x7377_device::dma8237_7_dack_w(uint8_t data) { m_mcabus->dack16_w(7, m_dma_high_byte | data); }
 
-WRITE_LINE_MEMBER( ibm72x7377_device::dack0_w ) { set_dma_channel(0, state); }
-WRITE_LINE_MEMBER( ibm72x7377_device::dack1_w ) { set_dma_channel(1, state); }
-WRITE_LINE_MEMBER( ibm72x7377_device::dack2_w ) { set_dma_channel(2, state); }
-WRITE_LINE_MEMBER( ibm72x7377_device::dack3_w ) { set_dma_channel(3, state); }
-WRITE_LINE_MEMBER( ibm72x7377_device::dack4_w ) { m_dma8237_1->hack_w(state ? 0 : 1); } // it's inverted
-WRITE_LINE_MEMBER( ibm72x7377_device::dack5_w ) { set_dma_channel(5, state); }
-WRITE_LINE_MEMBER( ibm72x7377_device::dack6_w ) { set_dma_channel(6, state); }
-WRITE_LINE_MEMBER( ibm72x7377_device::dack7_w ) { set_dma_channel(7, state); }
+void ibm72x7377_device::dack0_w(int state) { set_dma_channel(0, state); }
+void ibm72x7377_device::dack1_w(int state) { set_dma_channel(1, state); }
+void ibm72x7377_device::dack2_w(int state) { set_dma_channel(2, state); }
+void ibm72x7377_device::dack3_w(int state) { set_dma_channel(3, state); }
+void ibm72x7377_device::dack4_w(int state) { m_dma8237_1->hack_w(state ? 0 : 1); } // it's inverted
+void ibm72x7377_device::dack5_w(int state) { set_dma_channel(5, state); }
+void ibm72x7377_device::dack6_w(int state) { set_dma_channel(6, state); }
+void ibm72x7377_device::dack7_w(int state) { set_dma_channel(7, state); }
 
 void ibm72x7377_device::dma_request(int channel, bool state)
 {
@@ -201,7 +201,7 @@ void ibm72x7377_device::dma_write_word(offs_t offset, uint8_t data)
 	prog_space.write_word((page_offset & 0xfe0000) | (offset << 1), m_dma_high_byte | data);
 }
 
-WRITE_LINE_MEMBER( ibm72x7377_device::dma_hrq_changed )
+void ibm72x7377_device::dma_hrq_changed(int state)
 {
 	LOG("%s %d\n", FUNCNAME, state);
 
@@ -211,7 +211,7 @@ WRITE_LINE_MEMBER( ibm72x7377_device::dma_hrq_changed )
 	m_dma8237_2->hack_w(state);
 }
 
-WRITE_LINE_MEMBER( ibm72x7377_device::dma8237_1_out_eop )
+void ibm72x7377_device::dma8237_1_out_eop(int state)
 {
 	m_cur_eop = state == ASSERT_LINE;
 
@@ -225,7 +225,7 @@ WRITE_LINE_MEMBER( ibm72x7377_device::dma8237_1_out_eop )
 		
 }
 
-WRITE_LINE_MEMBER( ibm72x7377_device::dma8237_2_out_eop )
+void ibm72x7377_device::dma8237_2_out_eop(int state)
 {
 	m_cur_eop2 = state == ASSERT_LINE;
 

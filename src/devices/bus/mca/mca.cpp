@@ -169,15 +169,7 @@ void mca16_device::device_config_complete()
 
 void mca16_device::device_resolve_objects()
 {
-	// resolve callbacks
-	m_write_iochrdy.resolve_safe();
-	m_write_iochck.resolve_safe();
-
-	m_out_irq_cb.resolve_all_safe();
-	m_out_drq_cb.resolve_all_safe();
-
-	m_cs_feedback.resolve_safe();
-
+	
 	m_iowidth = m_iospace->data_width();
 	m_memwidth = m_memspace->data_width();
 }
@@ -197,8 +189,8 @@ void mca16_device::device_start()
 
 void mca16_device::device_reset()
 {
+	
 }
-
 
 template <typename R, typename W> void mca16_device::install_space(int spacenum, offs_t start, offs_t end, R rhandler, W whandler)
 {

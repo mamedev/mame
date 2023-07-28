@@ -55,10 +55,11 @@
 
 DEFINE_DEVICE_TYPE(IBM72X8299, ibm72x8299_device, "ibm72x8299", "IBM 72X8299 Micro Channel I/O Controller")
 
-ibm72x8299_device::ibm72x8299_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, ps2_mb_device *planar)
+ibm72x8299_device::ibm72x8299_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, ps2_mb_device *planar, mca16_device *bus)
 	: ibm72x8299_device(mconfig, tag, owner, clock)
 {
 	m_planar = planar;
+	m_mca = bus;
 	m_planar_id = planar->get_planar_id();
 }
 
@@ -91,11 +92,13 @@ void ibm72x8299_device::device_reset()
 
 void ibm72x8299_device::device_add_mconfig(machine_config &config)
 {
-	// TODO: get rid of this absolute tag
-   	MCA16_SLOT(config, m_planar_vga,    0, ":mb:mcabus", pc_mca16_cards, "planar_vga", true);
-	MCA16_SLOT(config, m_planar_fdc,    0, ":mb:mcabus", pc_mca16_cards, "planar_fdc", true);
-	MCA16_SLOT(config, m_planar_uart,   0, ":mb:mcabus", pc_mca16_cards, "planar_uart", true);
-	MCA16_SLOT(config, m_planar_lpt,    0, ":mb:mcabus", pc_mca16_cards, "planar_lpt", true);
+   	MCA16_SLOT(config, m_planar_vga,    0, *m_mca, pc_mca16_cards, "planar_vga", true);
+	MCA16_SLOT(config, m_planar_fdc,    0, *m_mca, pc_mca16_cards, "planar_fdc", true);
+	MCA16_SLOT(config, m_planar_uart,   0, *m_mca, pc_mca16_cards, "planar_uart", true);
+	MCA16_SLOT(config, m_planar_lpt,    0, *m_mca, pc_mca16_cards, "planar_lpt", true);
+
+	m_mca->cs_feedback_callback().set(*this, FUNC(ibm72x8299_device::cd_sfdbk_w));
+	printf("assert card feedback r %p\n", m_mca);
 
     PS2_PIT(config, m_pit);
     m_pit->set_clk<0>(XTAL_U153 / 21); /* heartbeat IRQ */
@@ -117,38 +120,36 @@ void ibm72x8299_device::device_config_complete()
 
 void ibm72x8299_device::device_resolve_objects()
 {
-	// resolve callbacks
-	m_pit_ch_cb.resolve_all_safe();
+	
 }
 
-
 /* PIT write lines and gates */
-WRITE_LINE_MEMBER(ibm72x8299_device::pit_ch0_w)
+void ibm72x8299_device::pit_ch0_w(int state)
 {
     m_pit_ch_cb[0](state);
 }
 
-WRITE_LINE_MEMBER(ibm72x8299_device::pit_ch2_w)
+void ibm72x8299_device::pit_ch2_w(int state)
 {
     m_pit_ch_cb[2](state);
 }
 
-WRITE_LINE_MEMBER(ibm72x8299_device::pit_ch3_w)
+void ibm72x8299_device::pit_ch3_w(int state)
 {
     m_pit_ch_cb[3](state);
 }
 
-WRITE_LINE_MEMBER(ibm72x8299_device::pit_ch2_gate_w)
+void ibm72x8299_device::pit_ch2_gate_w(int state)
 {
     m_pit->write_gate2(state);
 }
 
-WRITE_LINE_MEMBER(ibm72x8299_device::pit_ch3_gate_w)
+void ibm72x8299_device::pit_ch3_gate_w(int state)
 {
     m_pit->write_gate3(state);
 }
 
-WRITE_LINE_MEMBER(ibm72x8299_device::pit_ch3_clk_w)
+void ibm72x8299_device::pit_ch3_clk_w(int state)
 {
     m_pit->write_clk3(state);
 }
@@ -372,7 +373,7 @@ void ibm72x8299_device::system_board_io_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( ibm72x8299_device::cd_sfdbk_w )
+void ibm72x8299_device::cd_sfdbk_w(int state)
 {
 	// An MCA adapter asserts this on any I/O access.
 	if(state) m_cd_sfdbk = true;

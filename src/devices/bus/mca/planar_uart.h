@@ -57,8 +57,8 @@ private:
     offs_t  m_cur_io_start, m_cur_io_end;
     uint8_t m_cur_irq;
 
-	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_3) { m_mca->ireq_w<3>(state); }
-	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_4) { m_mca->ireq_w<4>(state); }
+	void pc_com_interrupt_3(int state) { m_mca->ireq_w<3>(state); }
+	void pc_com_interrupt_4(int state) { m_mca->ireq_w<4>(state); }
 };
 
 // device type definition

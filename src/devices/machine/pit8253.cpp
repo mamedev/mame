@@ -122,7 +122,6 @@ void ps2_pit_device::device_resolve_objects()
 {
 	pit8253_device::device_resolve_objects();
 
-	m_ch3_out_handler.resolve_safe();
 	m_ch3_counter->m_index = 3;
 	m_ch3_counter->m_clockin = m_ch3_clk;
 	m_ch3_counter->m_clock_period = (m_ch3_clk != 0) ? attotime::from_hz(m_ch3_clk) : attotime::never;
