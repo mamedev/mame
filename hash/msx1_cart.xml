@@ -21454,7 +21454,7 @@ legacy FM implementations cannot find it.
 	</software>
 
 	<software name="minimags">
-		<description>Minimagos</description>
+		<description>MiniMagos</description>
 		<year>2017</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Fran Games"/>
