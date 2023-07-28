@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="mac_flop_clcracked" description="Macintosh 400K/800K cleanly cracked disks">
+
+	<software name="dlxmuscset10">
+		<description>Deluxe Music Construction Set (version 1.0)</description>
+		<year>1985</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="programmer" value="Geoff Brown and John MacMillan" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-12-21-->
+		<!--music program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="deluxe music construction set v1.0 (san inc crack).dc42" size="419284" crc="5de68d4f" sha1="b5dc7cb805e44b45a201266199334aaafa2f886a" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
