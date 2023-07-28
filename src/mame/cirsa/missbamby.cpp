@@ -233,7 +233,6 @@ ROM_START( miniazard )
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD( "mini_azar_rom1.2.bin", 0x0000, 0x2000, CRC(4368a70a) SHA1(fc09b0bfb9c7777b144b909ff306098b77ef1b82) )
 	ROM_LOAD( "mini_azar_rom1.1.bin", 0x2000, 0x2000, CRC(5228f8c8) SHA1(1979905e5728e388f49f9fbc0be604f37455beae) ) // 11xxxxxxxxxxx = 0xFF
-	ROM_IGNORE( 0x8000 )
 
 	ROM_REGION(0x20, "prom", 0)
 	ROM_LOAD( "prom.bin", 0x00, 0x20, NO_DUMP )
