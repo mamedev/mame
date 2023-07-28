@@ -427,7 +427,6 @@ u32 gottlieb_sound_speech_r1_device::convert_speech_clock(u8 data)
 void gottlieb_sound_speech_r1_device::speech_clock_dac_w(u8 data)
 {
 	//logerror("clock = %02X\n", data);
-
 	m_votrax->set_unscaled_clock(convert_speech_clock(data));
 }
 
@@ -472,7 +471,7 @@ void gottlieb_sound_speech_r1_device::device_add_mconfig(machine_config &config)
 	m_dac->reset_routes();
 	m_dac->add_route(ALL_OUTPUTS, *this, 0.20);
 
-	// Note: used on machines in early 1981, such as reactor, q-bert test version, mars: god of war, and maybe early boards of black hole and volcano
+	// Note: used on machines in early 1981, such as reactor, q-bert test version, mars: god of war prototype
 	VOTRAX_SC01(config, m_votrax, convert_speech_clock(0));
 	m_votrax->ar_callback().set("nmi", FUNC(input_merger_device::in_w<1>));
 	m_votrax->add_route(ALL_OUTPUTS, *this, 0.80);
@@ -494,7 +493,7 @@ void gottlieb_sound_speech_r1_device::device_start()
 
 
 //**************************************************************************
-//  REV 1 SOUND/SPEECH BOARD; part number MA-216 (same PCB as MA-309 above but with a Votrax SC-01-A and support components populated)
+//  REV 1 SOUND/SPEECH BOARD: as above, but with SC-01-A instead of SC-01
 //**************************************************************************
 
 //-------------------------------------------------

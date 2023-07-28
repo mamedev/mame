@@ -78,6 +78,7 @@ public:
 	void p0(machine_config &config);  // no sound card
 	void p2(machine_config &config);  // multi-mode card
 	void r1v(machine_config &config); // r1 with votrax
+	void marspp(machine_config &config); // marspp has either SC-01 or SC-01-A
 	DECLARE_INPUT_CHANGED_MEMBER(slam_w);
 
 protected:
@@ -547,6 +548,12 @@ void gts80_state::p2(machine_config &config)
 void gts80_state::r1v(machine_config &config)
 {
 	p0(config);
+	GOTTLIEB_SOUND_SPEECH_REV1A(config, m_r1_sound).add_route(ALL_OUTPUTS, "mono", 0.75);
+}
+
+void gts80_state::marspp(machine_config &config)
+{
+	p0(config);
 	GOTTLIEB_SOUND_SPEECH_REV1(config, m_r1_sound).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
@@ -920,29 +927,29 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1981, s80tst,    0,        r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "System 80 Test",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, s80tst,    0,        r1v,    gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "System 80 Test",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
-GAME(1980, panthera,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Panthera",                          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, grand8,    panthera, p0,  gts80, gts80_state, empty_init, ROT0, "Christian Tabart", "Le Grand 8",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, spidermn,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "The Amazing Spider-Man",            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, circusp,   0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Circus",                            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, cntforce,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Counterforce",                      MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, starrace,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Star Race",                         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, jamesb,    0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "James Bond (Timed Play)",           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, jamesb2,   jamesb,   p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "James Bond (3/5-Ball)",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, timeline,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Time Line",                         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, forceii,   0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Force II",                          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, pnkpnthr,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Pink Panther",                      MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, marsp,     0,        r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Mars - God of War",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, marspf,    marsp,    r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Mars - God of War (French speech)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, marspp,    marsp,    r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Mars - God of War (Prototype)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, vlcno_ax,  0,        r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, vlcno_1c,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano (Sound Only set 1)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, vlcno_1b,  vlcno_1c, p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano (Sound Only set 2)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, vlcno_1a,  vlcno_1c, p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano (Sound Only set 3)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, blckhole,  0,        r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Black Hole (Rev. 4)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, blckhole2, blckhole, r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Black Hole (Rev. 2)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, blckhols,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Black Hole (Sound Only)",           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1982, hh,        0,        r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Haunted House (Rev. 2)",            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1982, hh_1,      hh,       r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Haunted House (Rev. 1)",            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, eclipse,   0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Eclipse",                           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, panthera,  0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Panthera",                          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, grand8,    panthera, p0,     gts80, gts80_state, empty_init, ROT0, "Christian Tabart", "Le Grand 8",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, spidermn,  0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "The Amazing Spider-Man",            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, circusp,   0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Circus",                            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, cntforce,  0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Counterforce",                      MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, starrace,  0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Star Race",                         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, jamesb,    0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "James Bond (Timed Play)",           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, jamesb2,   jamesb,   p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "James Bond (3/5-Ball)",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, timeline,  0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Time Line",                         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, forceii,   0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Force II",                          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, pnkpnthr,  0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Pink Panther",                      MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, marsp,     0,        r1v,    gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Mars - God of War",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, marspf,    marsp,    r1v,    gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Mars - God of War (French speech)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, marspp,    marsp,    marspp, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Mars - God of War (Prototype)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, vlcno_ax,  0,        r1v,    gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, vlcno_1c,  0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano (Sound Only set 1)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, vlcno_1b,  vlcno_1c, p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano (Sound Only set 2)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, vlcno_1a,  vlcno_1c, p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano (Sound Only set 3)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, blckhole,  0,        r1v,    gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Black Hole (Rev. 4)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, blckhole2, blckhole, r1v,    gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Black Hole (Rev. 2)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, blckhols,  0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Black Hole (Sound Only)",           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1982, hh,        0,        r1v,    gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Haunted House (Rev. 2)",            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1982, hh_1,      hh,       r1v,    gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Haunted House (Rev. 1)",            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, eclipse,   0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Eclipse",                           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
