@@ -180,7 +180,7 @@ def save_tables(f, device, states):
     d = { "device": device,
           "disasm_count": total_states-1
           }
-    
+
     emit(f, DO_EXEC_FULL_PROLOG % d)
     for n, state in enumerate(states):
         if state == ".": continue
@@ -205,7 +205,7 @@ def save_dasm(f, device, states):
     d = { "device": device,
           "disasm_count": total_states-1
           }
-    
+
     emit(f, DISASM_PROLOG % d )
     for n, state in enumerate(states):
         if state == ".": continue

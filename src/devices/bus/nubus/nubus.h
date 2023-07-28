@@ -34,8 +34,6 @@ public:
 	// construction/destruction
 	virtual ~device_nubus_card_interface();
 
-	void set_nubus_device();
-
 	// helper functions for card devices
 	void install_declaration_rom(const char *romregion, bool mirror_all_mb = false, bool reverse_rom = false);
 	void install_bank(offs_t start, offs_t end, void *data);

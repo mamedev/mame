@@ -56,13 +56,13 @@ public:
 	void int_w(int state) { m_int_cb(state); }
 
 protected:
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override;
-
-	device_psion_sibo_interface *m_card;
 
 private:
 	devcb_write_line m_int_cb;
+
+	device_psion_sibo_interface *m_card;
 };
 
 

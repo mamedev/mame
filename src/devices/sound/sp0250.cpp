@@ -181,7 +181,7 @@ void sp0250_device::write(uint8_t data)
 }
 
 
-uint8_t sp0250_device::drq_r()
+int sp0250_device::drq_r()
 {
 	m_stream->update();
 	return (m_fifo_pos == 15) ? CLEAR_LINE : ASSERT_LINE;

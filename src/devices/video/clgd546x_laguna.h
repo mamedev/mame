@@ -6,8 +6,7 @@
 #pragma once
 
 #include "machine/pci.h"
-//#include "video/pc_vga.h"
-#include "video/clgd542x.h"
+#include "video/pc_vga_cirrus.h"
 
 class cirrus_gd5465_laguna3d_device :  public pci_device
 {
@@ -37,15 +36,9 @@ private:
 
 	u8 vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
-	u32 vga_3b0_r(offs_t offset, uint32_t mem_mask = ~0);
-	void vga_3b0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	u32 vga_3c0_r(offs_t offset, uint32_t mem_mask = ~0);
-	void vga_3c0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	u32 vga_3d0_r(offs_t offset, uint32_t mem_mask = ~0);
-	void vga_3d0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-//	u32 unmap_log_r(offs_t offset, u32 mem_mask = ~0);
-//	void unmap_log_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+//  u32 unmap_log_r(offs_t offset, u32 mem_mask = ~0);
+//  void unmap_log_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	bool m_vga_legacy_enable = false;
 };

@@ -51,6 +51,8 @@ DEFINE_DEVICE_TYPE(NVIDIA_NV3_VGA,  nvidia_nv3_vga_device,  "nvidia_nv3_vga",  "
 nvidia_nv3_vga_device::nvidia_nv3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, NVIDIA_NV3_VGA, tag, owner, clock)
 {
+	m_main_if_space_config = address_space_config("io_regs", ENDIANNESS_LITTLE, 8, 4, 0, address_map_constructor(FUNC(nvidia_nv3_vga_device::io_3bx_3dx_map), this));
+	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(nvidia_nv3_vga_device::crtc_map), this));
 }
 
 void nvidia_nv3_vga_device::device_add_mconfig(machine_config &config)
@@ -78,8 +80,6 @@ void nvidia_nv3_vga_device::device_start()
 
 	vga.crtc.maximum_scan_line = 1;
 
-	vga.svga_intf.seq_regcount = 0x05;
-	vga.svga_intf.crtc_regcount = 0x40;
 	// TODO: shared with main GPU, fake it for now
 	// Start address ends at 20 bits so 0x1fffff mask / 2,097,151 bytes / 2MB window is (theorically) given
 	// we assume that is really 4 MB, VESA tests extensively tests with 0x7f banks
@@ -93,113 +93,18 @@ void nvidia_nv3_vga_device::device_start()
 	save_item(NAME(m_ext_offset));
 }
 
-// TODO: should really calculate the access bit internally
-uint8_t nvidia_nv3_vga_device::port_03b0_r(offs_t offset)
+void nvidia_nv3_vga_device::io_3bx_3dx_map(address_map &map)
 {
-	uint8_t res = 0xff;
-
-	if (get_crtc_port() == 0x3b0)
-	{
-		switch(offset)
-		{
-			case 0:
-			case 1:
-			case 2:
-			case 3:
-				LOGRMA("RMA_ACCESS R %02x\n", offset & 3);
-				break;
-
-			case 5:
-				res = crtc_reg_read(vga.crtc.index);
-				break;
-
-			default:
-				res = vga_device::port_03b0_r(offset);
-				break;
-		}
-	}
-
-	return res;
-}
-
-void nvidia_nv3_vga_device::port_03b0_w(offs_t offset, uint8_t data)
-{
-	if (get_crtc_port() == 0x3b0)
-	{
-		switch(offset)
-		{
-			case 0:
-			case 1:
-			case 2:
-			case 3:
-				LOGRMA("RMA_ACCESS W %02x -> %02x\n", offset & 3, data);
-				break;
-
-			case 5:
-				vga.crtc.data[vga.crtc.index] = data;
-				crtc_reg_write(vga.crtc.index, data);
-				break;
-
-			default:
-				vga_device::port_03b0_w(offset, data);
-				break;
-		}
-	}
-	//define_video_mode();
-}
-
-uint8_t nvidia_nv3_vga_device::port_03d0_r(offs_t offset)
-{
-	uint8_t res = 0xff;
-
-	if (get_crtc_port() == 0x3d0)
-	{
-		switch(offset)
-		{
-			case 0:
-			case 1:
-			case 2:
-			case 3:
-				LOGRMA("RMA_ACCESS R %02x\n", offset & 3);
-				break;
-
-			case 5:
-				res = crtc_reg_read(vga.crtc.index);
-				break;
-
-			default:
-				res = vga_device::port_03d0_r(offset);
-				break;
-		}
-	}
-
-	return res;
-}
-
-void nvidia_nv3_vga_device::port_03d0_w(offs_t offset, uint8_t data)
-{
-	if (get_crtc_port() == 0x3d0)
-	{
-		switch(offset)
-		{
-			case 0:
-			case 1:
-			case 2:
-			case 3:
-				LOGRMA("RMA_ACCESS W %02x -> %02x\n", offset & 3, data);
-				break;
-
-			case 5:
-				vga.crtc.data[vga.crtc.index] = data;
-				crtc_reg_write(vga.crtc.index, data);
-				break;
-
-			default:
-				vga_device::port_03d0_w(offset, data);
-				break;
-		}
-	}
-	//define_video_mode();
+	svga_device::io_3bx_3dx_map(map);
+	map(0x00, 0x03).lrw8(
+		NAME([this] (offs_t offset) {
+			LOGRMA("RMA_ACCESS R %02x\n", offset & 3);
+			return space().unmap();
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGRMA("RMA_ACCESS W %02x -> %02x\n", offset & 3, data);
+		})
+	);
 }
 
 uint8_t nvidia_nv3_vga_device::mem_r(offs_t offset)
@@ -221,133 +126,26 @@ void nvidia_nv3_vga_device::mem_w(offs_t offset, uint8_t data)
 
 uint16_t nvidia_nv3_vga_device::offset()
 {
+	// TODO: check true enable condition
 	if (svga.rgb8_en || svga.rgb16_en || svga.rgb24_en || svga.rgb32_en)
 		return (vga.crtc.offset << 3) + m_ext_offset;
 	return svga_device::offset();
 }
 
+// TODO: lock mechanism
+void nvidia_nv3_vga_device::crtc_map(address_map &map)
+{
+	svga_device::crtc_map(map);
+	// REPAINT_0
 /*
  * xxx- ---- Row offset bits 3-5
  * ---x xxxx Start address bits 16-20
  */
-// map(0x19, 0x19) REPAINT_0
-
-/*
- * ???? ?-?? <unknown, definitely used>
- * ---- -x-- Shifts row offset by 1 bit (verify)
- */
-// map(0x1a, 0x1a) REPAINT_1
-
-/*
- * --xx xxxx write bank, in 32k units
- */
-// map(0x1d, 0x1d) WRITE_BANK
-
-/*
- * --xx xxxx read bank
- */
-// map(0x1e, 0x1e) READ_BANK
-
-/*
- * ---x ---- Horizontal Total bit 8
- * ---- x--- Vertical Sync Start bit 10
- * ---- -x-- Vertical Blank Start bit 10
- * ---- --x- Vertical Display End bit 10
- * ---- ---x Vertical Total bit 10
- */
-// map(0x25, 0x25) EXTENDED_VERT
-
-/*
- * ---- --xx Pixel Format
- * ---- --00 VGA
- * ---- --01 8bpp
- * ---- --10 16bpp
- * ---- --11 32bpp
- */
-// map(0x28, 0x28) PIXEL_FMT
-
-/*
- * ---- ---x Horizontal Display End bit 8
- */
-// map(0x2d, 0x2d) EXTENDED_HORZ
-
-/*
- * ---- xxx- RMA index
- * ---- ---x enable RMA
- */
-// map(0x38, 0x38) RMA_MODE
-
-/*
- * ---- x--- SDA
- * ---- -x-- SCL
- */
-// map(0x3e, 0x3e) I2C_READ
-
-/*
- * ---x ---- SCL
- * ---- x--- SDA
- */
-// map(0x3f, 0x3f) I2C_WRITE
-
-uint8_t nvidia_nv3_vga_device::crtc_reg_read(uint8_t index)
-{
-	uint8_t res = 0;
-
-	//index &= 0x3f;
-
-	if(index <= 0x18)
-		return svga_device::crtc_reg_read(index);
-
-	switch(index)
-	{
-		case 0x19:
-			res = m_repaint[0];
-			break;
-		case 0x1a:
-			res = m_repaint[1];
-			break;
-		case 0x1d:
-			res = svga.bank_w;
-			break;
-		case 0x1e:
-			res = svga.bank_r;
-			break;
-		case 0x25:
-			res = vga.crtc.data[0x25];
-			break;
-		case 0x28:
-			res = svga.rgb32_en ? 3 : svga.rgb16_en ? 2 : svga.rgb8_en ? 1 : 0;
-			break;
-		case 0x2d:
-			res = (vga.crtc.horz_disp_end >> 10) & 1;
-			break;
-		case 0x38:
-			res = vga.crtc.data[0x38];
-			LOGRMA("RMA_MODE read %02x\n", res);
-			break;
-		default:
-			LOGCRTC("EXT CRTC: %02x Read\n", index);
-			//machine().debug_break();
-			res = vga.crtc.data[index];
-
-			break;
-	}
-
-	return res;
-}
-
-void nvidia_nv3_vga_device::crtc_reg_write(uint8_t index, uint8_t data)
-{
-	//index &= 0x3f;
-	if(index <= 0x18)
-	{
-		svga_device::crtc_reg_write(index,data);
-		return;
-	}
-
-	switch(index)
-	{
-		case 0x19:
+	map(0x19, 0x19).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_repaint[0];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
 			// TODO: untested, likely used in extended text modes
 			//vga.crtc.start_addr_latch &= ~0x1f0000;
 			//vga.crtc.start_addr_latch |= ((data & 0x1f) << 16);
@@ -355,8 +153,18 @@ void nvidia_nv3_vga_device::crtc_reg_write(uint8_t index, uint8_t data)
 			m_repaint[0] = data;
 			//m_ext_offset = recalculate_ext_offset();
 			LOGCRTC("EXT CRTC: REPAINT_0 %02x\n", data);
-			break;
-		case 0x1a:
+		})
+	);
+	// REPAINT_1
+/*
+ * ???? ?-?? <unknown, definitely used>
+ * ---- -x-- Shifts row offset by 1 bit (verify)
+ */
+	map(0x1a, 0x1a).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_repaint[1];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
 			// TODO: this definitely uses more regs in the equation
 			//                      REPAINT_0 REPAINT_1 base_offset  <expected_extra_offset>
 			// 10eh 320x200   16bpp 0x00      0x3c      0x50         560  / 0x230 (with scan doubler?)
@@ -372,18 +180,49 @@ void nvidia_nv3_vga_device::crtc_reg_write(uint8_t index, uint8_t data)
 			m_repaint[1] = data;
 			//m_ext_offset = recalculate_ext_offset();
 			LOGCRTC("EXT CRTC: REPAINT_1 %02x\n", data);
-			break;
-		case 0x1d:
+		})
+	);
+	// WRITE_BANK
+/*
+ * --xx xxxx write bank, in 32k units
+ */
+	map(0x1d, 0x1d).lrw8(
+		NAME([this] (offs_t offset) {
+			return svga.bank_w;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
 			if (data & 0x80)
 				LOGWARN("WRITE_BANK: attempt to write to undocumented bits %02x\n", data);
 			svga.bank_w = data & 0x7f;
-			break;
-		case 0x1e:
+		})
+	);
+	// READ_BANK
+/*
+ * --xx xxxx read bank
+ */
+	map(0x1e, 0x1e).lrw8(
+		NAME([this] (offs_t offset) {
+			return svga.bank_r;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
 			if (data & 0x80)
 				LOGWARN("READ_BANK: attempt to write to undocumented bits %02x\n", data);
 			svga.bank_r = data & 0x7f;
-			break;
-		case 0x25:
+		})
+	);
+	// EXTENDED_VERT
+/*
+ * ---x ---- Horizontal Total bit 8
+ * ---- x--- Vertical Sync Start bit 10
+ * ---- -x-- Vertical Blank Start bit 10
+ * ---- --x- Vertical Display End bit 10
+ * ---- ---x Vertical Total bit 10
+ */
+	map(0x25, 0x25).lrw8(
+		NAME([this] (offs_t offset) {
+			return vga.crtc.data[0x25];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
 			if (data & 0xe0)
 				LOGWARN("EXTENDED_VERT: attempt to write to undocumented bits %02x\n", data);
 			LOGCRTC("EXT CRTC: EXTENDED_VERT %02x\n", data & 0x1f);
@@ -394,8 +233,21 @@ void nvidia_nv3_vga_device::crtc_reg_write(uint8_t index, uint8_t data)
 			vga.crtc.vert_total =       (vga.crtc.vert_total & 0x03ff)       | ((BIT(data, 0) << 10));
 			vga.crtc.data[0x25] = data;
 			recompute_params();
-			break;
-		case 0x28:
+		})
+	);
+	// PIXEL_FMT
+/*
+ * ---- --xx Pixel Format
+ * ---- --00 VGA
+ * ---- --01 8bpp
+ * ---- --10 16bpp
+ * ---- --11 32bpp
+ */
+	map(0x28, 0x28).lrw8(
+		NAME([this] (offs_t offset) {
+			return svga.rgb32_en ? 3 : svga.rgb16_en ? 2 : svga.rgb8_en ? 1 : 0;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
 			if (data & 0xfc)
 				LOGWARN("PIXEL_FMT: attempt to write to undocumented bits %02x\n", data);
 			data &= 3;
@@ -419,22 +271,50 @@ void nvidia_nv3_vga_device::crtc_reg_write(uint8_t index, uint8_t data)
 					LOGCRTC("PIXEL_FMT: SVGA 32bpp mode selected\n");
 					break;
 			}
-			break;
-		case 0x2d:
+		})
+	);
+	// EXTENDED_HORZ
+/*
+ * ---- ---x Horizontal Display End bit 8
+ */
+	map(0x2d, 0x2d).lrw8(
+		NAME([this] (offs_t offset) {
+			return (vga.crtc.horz_disp_end >> 10) & 1;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
 			if (data & 0xfc)
 				LOGWARN("EXTENDED_HORZ: attempt to write to undocumented bits %02x\n", data);
 			LOGCRTC("EXT CRTC: EXTENDED_HORZ %02x\n", data & 1);
 			vga.crtc.horz_disp_end = (vga.crtc.horz_disp_end & 0x00ff) | ((data & 0x01) << 8);
 			recompute_params();
-			break;
-		case 0x38:
-			vga.crtc.data[index] = data;
+		})
+	);
+	// RMA_MODE
+/*
+ * ---- xxx- RMA index
+ * ---- ---x enable RMA
+ */
+	map(0x38, 0x38).lrw8(
+		NAME([this] (offs_t offset) {
+			u8 res = vga.crtc.data[0x38];
+			LOGRMA("RMA_MODE read %02x\n", res);
+			return res;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			vga.crtc.data[0x38] = data;
 			LOGRMA("RMA_MODE write %s, index %d\n", data & 1 ? "enable" : "disable", (data & 0xe) >> 1);
-			break;
-		default:
-			vga.crtc.data[index] = data;
-
-			LOGCRTC("EXT CRTC [%02x] <- %02x\n",index,data);
-			break;
-	}
+		})
+	);
+	// I2C_READ
+/*
+ * ---- x--- SDA
+ * ---- -x-- SCL
+ */
+// map(0x3e, 0x3e)
+	// I2C_WRITE
+/*
+ * ---x ---- SCL
+ * ---- x--- SDA
+ */
+// map(0x3f, 0x3f)
 }

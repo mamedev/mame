@@ -88,7 +88,7 @@ private:
 		m_control = data;
 	}
 
-	u8 vram_r(offs_t offset);
+	u8 vram_r(address_space &space, offs_t offset);
 	void vram_w(offs_t offset, u8 data);
 
 	void serial_io_w(u8 data);
@@ -190,7 +190,7 @@ void quickpick5_state::ccu_int_time_w(u8 data)
 	m_ccu_int_time = data;
 }
 
-u8 quickpick5_state::vram_r(offs_t offset)
+u8 quickpick5_state::vram_r(address_space &space, offs_t offset)
 {
 	if ((m_control & 0x10) == 0x10)
 	{
@@ -201,7 +201,7 @@ u8 quickpick5_state::vram_r(offs_t offset)
 		}
 		else if ((offset >= 0x8e0) && (offset <= 0x8ff))
 		{
-			return m_k051649->k051649_test_r();
+			return m_k051649->k051649_test_r(space);
 		}
 	}
 

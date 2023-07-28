@@ -2687,6 +2687,34 @@ Untested (and likely unsupported) Spawned Diablo and multi player mode
 		</part>
 	</software>
 
+	<!-- Windows 3.1 -->
+	<!-- Rainbow disc (CD-ROM XA / CD-i / VideoCD / CD-DA) -->
+	<!--
+	Origin: redump (http://redump.org/disc/54514/)
+	<rom name="Cranberries, The - Doors and Windows (USA) (Track 1).bin" size="553665504" crc="499dc148" md5="ec76c5c41095ce953509bbfb889dd95a"/>
+	<rom name="Cranberries, The - Doors and Windows (USA) (Track 2).bin" size="44528064" crc="ff10d7d3" md5="b66710e4192053062aa80ecf6ea3c1e5"/>
+	<rom name="Cranberries, The - Doors and Windows (USA) (Track 3).bin" size="50516256" crc="aed80da5" md5="07876717d36fa90bdb6e55bbb0b06fc6"/>
+	<rom name="Cranberries, The - Doors and Windows (USA) (Track 4).bin" size="28405104" crc="8b042db3" md5="39d672dbc91e5c6e44a5a0d8e0f852d1"/>
+	<rom name="Cranberries, The - Doors and Windows (USA) (Track 5).bin" size="37269792" crc="26ed1a0d" md5="99afa04401a863b4238425848954a2a1"/>
+	<rom name="Cranberries, The - Doors and Windows (USA) (Track 6).bin" size="55996416" crc="4e78455b" md5="fca6e7e070cfb63d59e5872bd1692034"/>
+	<rom name="Cranberries, The - Doors and Windows (USA).cue" size="821" crc="2df31efa" md5="3875f3b228779ee4a7efce0939cd60c4"/>
+	Note: Track 1 in the cue file had to be edited to read MODE2/2352 to get around chdman not recognizing a valid CDI/2352 value.
+	The info for the original cue is below.
+	<rom name="Cranberries, The - Doors and Windows (USA).cue" size="819" crc="c4424220" md5="cd3b4ef9fe2c410b199e6ceede112cc3"/>
+	-->
+	<!-- TODO: Continuous MAME warnings about "requires ide_controller_32_device" -->
+	<software name="doorswin">
+		<description>The Cranberries: Doors and Windows (USA)</description>
+		<year>1995</year>
+		<publisher>Philips Media / Island Records</publisher>
+		<info name="serial" value="310691030-2 / 310691081-2"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cranberries, the - doors and windows (usa)" sha1="7088d9cead7c658279a362e97caa55e0ee9f07a2" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<software name="duke3d" supported="partial">
 		<description>Duke Nukem 3D (shareware v1.1)</description>

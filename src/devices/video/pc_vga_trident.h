@@ -17,10 +17,6 @@
 class trident_vga_device :  public svga_device
 {
 public:
-	virtual uint8_t port_03c0_r(offs_t offset) override;
-	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
-	virtual uint8_t port_03d0_r(offs_t offset) override;
-	virtual void port_03d0_w(offs_t offset, uint8_t data) override;
 	uint8_t port_83c6_r(offs_t offset);
 	void port_83c6_w(offs_t offset, uint8_t data);
 	uint8_t port_43c6_r(offs_t offset);
@@ -43,6 +39,28 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	virtual void io_3bx_3dx_map(address_map &map) override;
+	virtual void io_3cx_map(address_map &map) override;
+
+	u8 ramdac_hidden_mask_r(offs_t offset);
+	void ramdac_hidden_mask_w(offs_t offset, u8 data);
+	u8 ramdac_overlay_r(offs_t offset);
+	void ramdac_overlay_w(offs_t offset, u8 data);
+
+	u8 svga_bank_write_r(offs_t offset);
+	void svga_bank_write_w(offs_t offset, u8 data);
+	u8 svga_bank_read_r(offs_t offset);
+	void svga_bank_read_w(offs_t offset, u8 data);
+
+
+	virtual void crtc_map(address_map &map) override;
+	virtual void sequencer_map(address_map &map) override;
+	virtual void gc_map(address_map &map) override;
+
+	virtual void recompute_params() override;
+
+
+	// TODO: remove this leaky abstraction
 	struct
 	{
 		uint8_t sr0c;
@@ -117,13 +135,6 @@ protected:
 	} tri;
 	uint8_t m_version;
 private:
-	uint8_t trident_seq_reg_read(uint8_t index);
-	void trident_seq_reg_write(uint8_t index, uint8_t data);
-	virtual void trident_define_video_mode();
-	uint8_t trident_crtc_reg_read(uint8_t index);
-	void trident_crtc_reg_write(uint8_t index, uint8_t data);
-	uint8_t trident_gc_reg_read(uint8_t index);
-	void trident_gc_reg_write(uint8_t index, uint8_t data);
 
 	int calculate_clock();
 
@@ -162,7 +173,8 @@ public:
 
 	tvga9000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void trident_define_video_mode() override;
+protected:
+	virtual void recompute_params() override;
 };
 
 // device type definition

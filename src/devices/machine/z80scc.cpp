@@ -1046,10 +1046,8 @@ void z80scc_channel::device_start()
 	m_uart->m_wr0_ptrbits = 0;
 
 	m_rx_fifo_sz = (m_uart->m_variant & z80scc_device::SET_ESCC) ? 8 : 3;
-	m_rx_fifo_wp = m_rx_fifo_rp = 0;
 
 	m_tx_fifo_sz = (m_uart->m_variant & z80scc_device::SET_ESCC) ? 4 : 1;
-	m_tx_fifo_wp = m_tx_fifo_rp = 0;
 
 	m_rxc   = 0x00;
 	m_txc   = 0x00;
@@ -1130,6 +1128,10 @@ void z80scc_channel::device_reset()
 	// Reset RS232 emulation
 	receive_register_reset();
 	transmit_register_reset();
+
+	// empty fifos
+	m_rx_fifo_wp = m_rx_fifo_rp = 0;
+	m_tx_fifo_wp = m_tx_fifo_rp = 0;
 
 	// Soft/Channel Reset values (mostly) according to SCC users manual
 	m_wr0   = 0x00;

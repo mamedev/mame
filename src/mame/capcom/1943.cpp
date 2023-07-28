@@ -277,7 +277,7 @@ void _1943_state::_1943(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &_1943_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(_1943_state::irq0_line_hold), attotime::from_hz(4*60));
 
-	I8751(config, m_mcu, XTAL(24'000'000)/4); // clock unknown
+	I8751(config, m_mcu, XTAL(24'000'000)/8); /* verified on pcb */
 	m_mcu->port_in_cb<0>().set([this](){ return m_cpu_to_mcu; });
 	m_mcu->port_out_cb<0>().set([this](u8 data){ m_mcu_p0 = data; });
 	m_mcu->port_in_cb<1>().set([this]{ return m_screen->vpos(); });

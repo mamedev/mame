@@ -7,6 +7,7 @@ DEFINE_DEVICE_TYPE(MSX_CART_KOREAN_25IN1,  msx_cart_korean_25in1_device,  "msx_c
 DEFINE_DEVICE_TYPE(MSX_CART_KOREAN_80IN1,  msx_cart_korean_80in1_device,  "msx_cart_korean_80in1",  "MSX Cartridge - Korean 80-in-1")
 DEFINE_DEVICE_TYPE(MSX_CART_KOREAN_90IN1,  msx_cart_korean_90in1_device,  "msx_cart_korean_90in1",  "MSX Cartridge - Korean 90-in-1")
 DEFINE_DEVICE_TYPE(MSX_CART_KOREAN_126IN1, msx_cart_korean_126in1_device, "msx_cart_korean_126in1", "MSX Cartridge - Korean 126-in-1")
+DEFINE_DEVICE_TYPE(MSX_CART_KOREAN_HYDLIDE2, msx_cart_korean_hydlide2_device, "msx_cart_korean_hydlide2", "MSX Cartridge - Korean Hydlide 2")
 
 
 msx_cart_korean_25in1_device::msx_cart_korean_25in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -240,4 +241,54 @@ std::error_condition msx_cart_korean_126in1_device::initialize_cartridge(std::st
 void msx_cart_korean_126in1_device::bank_w(offs_t offset, uint8_t data)
 {
 	m_rombank[offset & 0x01]->set_entry(data & m_bank_mask);
+}
+
+
+
+
+
+msx_cart_korean_hydlide2_device::msx_cart_korean_hydlide2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, MSX_CART_KOREAN_HYDLIDE2, tag, owner, clock)
+	, msx_cart_interface(mconfig, *this)
+	, m_rombank(*this, "rombank")
+	, m_bank_mask(0)
+{
+}
+
+void msx_cart_korean_hydlide2_device::device_reset()
+{
+	m_rombank->set_entry(0);
+}
+
+std::error_condition msx_cart_korean_hydlide2_device::initialize_cartridge(std::string &message)
+{
+	if (!cart_rom_region())
+	{
+		message = "msx_cart_korean_hydlide2_device: Required region 'rom' was not found.";
+		return image_error::INTERNAL;
+	}
+
+	const u32 size = cart_rom_region()->bytes();
+	const u16 banks = size / 0x4000;
+
+	if (size > 256 * 0x4000 || size < 0x8000 || size != banks * 0x4000 || (~(banks - 1) % banks))
+	{
+		message = "msx_cart_korean_hydlide2_device: Region 'rom' has unsupported size.";
+		return image_error::INVALIDLENGTH;
+	}
+
+	m_bank_mask = banks - 1;
+
+	m_rombank->configure_entries(0, banks, cart_rom_region()->base(), 0x4000);
+
+	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
+	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank);
+	page(2)->install_write_handler(0x8000, 0x8000, emu::rw_delegate(*this, FUNC(msx_cart_korean_hydlide2_device::bank_w)));
+
+	return std::error_condition();
+}
+
+void msx_cart_korean_hydlide2_device::bank_w(uint8_t data)
+{
+	m_rombank->set_entry(data & m_bank_mask);
 }

@@ -1056,16 +1056,16 @@ void champbas_state::tbasebal(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &champbas_state::tbasebal_map);
 
-	m_mainlatch->q_out_cb<6>().set([this](int state){ logerror("%s latch bit 6 w: %02x\n", machine().describe_context(), state); }); // to M68705? the code here seems the same as champbb2
-	m_mainlatch->q_out_cb<7>().set([this](int state){ logerror("%s latch bit 7 w: %02x\n", machine().describe_context(), state); }); // "
+	m_mainlatch->q_out_cb<6>().set([this](int state) { logerror("%s latch bit 6 w: %d\n", machine().describe_context(), state); }); // to M68705? the code here seems the same as champbb2
+	m_mainlatch->q_out_cb<7>().set([this](int state) { logerror("%s latch bit 7 w: %d\n", machine().describe_context(), state); }); // "
 
 	m68705p_device &mcu(M68705P3(config, "mcu", XTAL(18'432'000) / 6)); // ?Mhz
-	mcu.porta_r().set_log("MCU port A r");
-	mcu.porta_w().set([this](uint8_t data){ logerror("%s MCU port A w: %02x\n", machine().describe_context(), data); });
-	mcu.portb_r().set_log("MCU port B r");
-	mcu.portb_w().set([this](uint8_t data){ logerror("%s MCU port B w: %02x\n", machine().describe_context(), data); });
-	mcu.portc_r().set_log("MCU port C r");
-	mcu.portc_w().set([this](uint8_t data){ logerror("%s MCU port C w: %02x\n", machine().describe_context(), data); });
+	mcu.porta_r().set([this]() { logerror("%s MCU port A r\n", machine().describe_context()); return 0xff; });
+	mcu.porta_w().set([this](uint8_t data) { logerror("%s MCU port A w: %02X\n", machine().describe_context(), data); });
+	mcu.portb_r().set([this]() { logerror("%s MCU port B r\n", machine().describe_context()); return 0xff; });
+	mcu.portb_w().set([this](uint8_t data) { logerror("%s MCU port B w: %02X\n", machine().describe_context(), data); });
+	mcu.portc_r().set([this]() { logerror("%s MCU port C r\n", machine().describe_context()); return 0xff; });
+	mcu.portc_w().set([this](uint8_t data) { logerror("%s MCU port C w: %02X\n", machine().describe_context(), data); });
 }
 
 

@@ -77,14 +77,15 @@ public:
 
 	u8 xga_read(offs_t offset);
 	void xga_write(offs_t offset, u8 data);
-	u8 dac_read(offs_t offset);
-	void dac_write(offs_t offset, u8 data);
-	virtual u8 port_03d0_r(offs_t offset) override;
-	virtual void port_03d0_w(offs_t offset, uint8_t data) override;
+
+	void ramdac_mmio_map(address_map &map);
+
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual uint16_t offset() override;
+
+	virtual void io_3bx_3dx_map(address_map &map) override;
 private:
 	u8 m_oak_regs[0x3b];
 	u8 m_oak_idx;

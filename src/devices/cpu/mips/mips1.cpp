@@ -6,9 +6,9 @@
  * IDT devices come in two variations: those with an "E" suffix include a TLB,
  * while those without have hard-wired address translation.
  *
- * TODO
- *   - R3041 features
- *   - cache emulation
+ * TODO:
+ *  - multi-word cache line sizes
+ *  - R3041 features
  *
  */
 #include "emu.h"
@@ -23,6 +23,167 @@
 //#define VERBOSE     (LOG_GENERAL|LOG_TLB)
 
 #include "logmacro.h"
+
+enum registers : unsigned
+{
+	MIPS1_R0   = 0,
+	MIPS1_COP0 = 32,
+	MIPS1_F0   = 64,
+
+	MIPS1_PC   = 80,
+	MIPS1_HI,
+	MIPS1_LO,
+	MIPS1_FCR30,
+	MIPS1_FCR31,
+};
+
+enum exception : u32
+{
+	EXCEPTION_INTERRUPT = 0x00000000,
+	EXCEPTION_TLBMOD    = 0x00000004,
+	EXCEPTION_TLBLOAD   = 0x00000008,
+	EXCEPTION_TLBSTORE  = 0x0000000c,
+	EXCEPTION_ADDRLOAD  = 0x00000010,
+	EXCEPTION_ADDRSTORE = 0x00000014,
+	EXCEPTION_BUSINST   = 0x00000018,
+	EXCEPTION_BUSDATA   = 0x0000001c,
+	EXCEPTION_SYSCALL   = 0x00000020,
+	EXCEPTION_BREAK     = 0x00000024,
+	EXCEPTION_INVALIDOP = 0x00000028,
+	EXCEPTION_BADCOP    = 0x0000002c,
+	EXCEPTION_OVERFLOW  = 0x00000030,
+	EXCEPTION_TRAP      = 0x00000034,
+
+	EXCEPTION_BADCOP0   = 0x0000002c,
+	EXCEPTION_BADCOP1   = 0x1000002c,
+	EXCEPTION_BADCOP2   = 0x2000002c,
+	EXCEPTION_BADCOP3   = 0x3000002c,
+};
+
+enum cop0_reg : u8
+{
+	COP0_Index    = 0,
+	COP0_Random   = 1,
+	COP0_EntryLo  = 2,
+	COP0_BusCtrl  = 2,  // r3041 only
+	COP0_Config   = 3,  // r3041/r3071/r3081 only
+	COP0_Context  = 4,
+	COP0_BadVAddr = 8,
+	COP0_Count    = 9,  // r3041 only
+	COP0_EntryHi  = 10,
+	COP0_PortSize = 10, // r3041 only
+	COP0_Compare  = 11, // r3041 only
+	COP0_Status   = 12,
+	COP0_Cause    = 13,
+	COP0_EPC      = 14,
+	COP0_PRId     = 15,
+};
+
+enum sr_mask : u32
+{
+	SR_IEc    = 0x00000001, // interrupt enable (current)
+	SR_KUc    = 0x00000002, // user mode (current)
+	SR_IEp    = 0x00000004, // interrupt enable (previous)
+	SR_KUp    = 0x00000008, // user mode (previous)
+	SR_IEo    = 0x00000010, // interrupt enable (old)
+	SR_KUo    = 0x00000020, // user mode (old)
+	SR_IMSW0  = 0x00000100, // software interrupt 0 enable
+	SR_IMSW1  = 0x00000200, // software interrupt 1 enable
+	SR_IMEX0  = 0x00000400, // external interrupt 0 enable
+	SR_IMEX1  = 0x00000800, // external interrupt 1 enable
+	SR_IMEX2  = 0x00001000, // external interrupt 2 enable
+	SR_IMEX3  = 0x00002000, // external interrupt 3 enable
+	SR_IMEX4  = 0x00004000, // external interrupt 4 enable
+	SR_IMEX5  = 0x00008000, // external interrupt 5 enable
+	SR_IsC    = 0x00010000, // isolate (data) cache
+	SR_SwC    = 0x00020000, // swap caches
+	SR_PZ     = 0x00040000, // cache parity zero
+	SR_CM     = 0x00080000, // cache miss
+	SR_PE     = 0x00100000, // cache parity error
+	SR_TS     = 0x00200000, // tlb shutdown
+	SR_BEV    = 0x00400000, // boot exception vectors
+	SR_RE     = 0x02000000, // reverse endianness in user mode
+	SR_COP0   = 0x10000000, // coprocessor 0 usable
+	SR_COP1   = 0x20000000, // coprocessor 1 usable
+	SR_COP2   = 0x40000000, // coprocessor 2 usable
+	SR_COP3   = 0x80000000, // coprocessor 3 usable
+
+	SR_KUIE   = 0x0000003f, // all interrupt enable and user mode bits
+	SR_KUIEpc = 0x0000000f, // previous and current interrupt enable and user mode bits
+	SR_KUIEop = 0x0000003c, // old and previous interrupt enable and user mode bits
+	SR_IM     = 0x0000ff00, // all interrupt mask bits
+};
+
+enum cause_mask : u32
+{
+	CAUSE_EXCCODE = 0x0000007c, // exception code
+	CAUSE_IPSW0   = 0x00000100, // software interrupt 0 pending
+	CAUSE_IPSW1   = 0x00000200, // software interrupt 1 pending
+	CAUSE_IPEX0   = 0x00000400, // external interrupt 0 pending
+	CAUSE_IPEX1   = 0x00000800, // external interrupt 1 pending
+	CAUSE_IPEX2   = 0x00001000, // external interrupt 2 pending
+	CAUSE_IPEX3   = 0x00002000, // external interrupt 3 pending
+	CAUSE_IPEX4   = 0x00004000, // external interrupt 4 pending
+	CAUSE_IPEX5   = 0x00008000, // external interrupt 5 pending
+	CAUSE_IP      = 0x0000ff00, // interrupt pending
+	CAUSE_CE      = 0x30000000, // co-processor error
+	CAUSE_BD      = 0x80000000, // branch delay
+
+	CAUSE_IPEX    = 0x0000fc00, // external interrupt pending
+};
+
+enum entryhi_mask : u32
+{
+	EH_VPN  = 0xfffff000, // virtual page number
+	EH_ASID = 0x00000fc0, // address space identifier
+
+	EH_WM   = 0xffffffc0, // write mask
+};
+enum entrylo_mask : u32
+{
+	EL_PFN = 0xfffff000, // physical frame
+	EL_N   = 0x00000800, // noncacheable
+	EL_D   = 0x00000400, // dirty
+	EL_V   = 0x00000200, // valid
+	EL_G   = 0x00000100, // global
+
+	EL_WM  = 0xffffff00, // write mask
+};
+enum context_mask : u32
+{
+	PTE_BASE = 0xffe00000, // base address of page table
+	BAD_VPN  = 0x001ffffc, // virtual address bits 30..12
+};
+
+enum cp1_fcr31_mask : u32
+{
+	FCR31_RM = 0x00000003, // rounding mode
+
+	FCR31_FI = 0x00000004, // inexact operation flag
+	FCR31_FU = 0x00000008, // underflow flag
+	FCR31_FO = 0x00000010, // overflow flag
+	FCR31_FZ = 0x00000020, // divide by zero flag
+	FCR31_FV = 0x00000040, // invalid operation flag
+
+	FCR31_EI = 0x00000080, // inexact operation enable
+	FCR31_EU = 0x00000100, // underflow enable
+	FCR31_EO = 0x00000200, // overflow enable
+	FCR31_EZ = 0x00000400, // divide by zero enable
+	FCR31_EV = 0x00000800, // invalid operation enable
+
+	FCR31_CI = 0x00001000, // inexact operation cause
+	FCR31_CU = 0x00002000, // underflow cause
+	FCR31_CO = 0x00004000, // overflow cause
+	FCR31_CZ = 0x00008000, // divide by zero cause
+	FCR31_CV = 0x00010000, // invalid operation cause
+	FCR31_CE = 0x00020000, // unimplemented operation cause
+
+	FCR31_C = 0x00800000, // condition
+
+	FCR31_FM = 0x0000007c, // flag mask
+	FCR31_EM = 0x00000f80, // enable mask
+	FCR31_CM = 0x0001f000, // cause mask (except unimplemented)
+};
 
 #define RSREG           ((op >> 21) & 31)
 #define RTREG           ((op >> 16) & 31)
@@ -58,13 +219,12 @@ mips1core_device_base::mips1core_device_base(machine_config const &mconfig, devi
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config_be("program", ENDIANNESS_BIG, 32, 32)
 	, m_program_config_le("program", ENDIANNESS_LITTLE, 32, 32)
-	, m_icache_config("icache", ENDIANNESS_BIG, 32, 32)
-	, m_dcache_config("dcache", ENDIANNESS_BIG, 32, 32)
 	, m_cpurev(cpurev)
 	, m_endianness(ENDIANNESS_BIG)
 	, m_icount(0)
-	, m_icache_size(icache_size)
-	, m_dcache_size(dcache_size)
+	, m_icache(icache_size)
+	, m_dcache(dcache_size)
+	, m_cache((icache_size && dcache_size) ? CACHED : UNCACHED)
 	, m_in_brcond(*this, 0)
 {
 }
@@ -132,17 +292,6 @@ iop_device::iop_device(machine_config const &mconfig, char const *tag, device_t 
 	m_endianness = ENDIANNESS_LITTLE;
 }
 
-/*
- * Two additional address spaces are defined to represent the instruction and
- * data caches. These are only used to simulate cache isolation functionality
- * at this point, but could simulate other behaviour as needed in future.
- */
-void mips1core_device_base::device_add_mconfig(machine_config &config)
-{
-	set_addrmap(1, &mips1core_device_base::icache_map);
-	set_addrmap(2, &mips1core_device_base::dcache_map);
-}
-
 void mips1core_device_base::device_start()
 {
 	// set our instruction counter
@@ -181,6 +330,14 @@ void mips1core_device_base::device_start()
 	m_cop0[COP0_Cause] = 0;
 
 	m_r[0] = 0;
+
+	m_icache.start();
+	m_dcache.start();
+
+	save_pointer(STRUCT_MEMBER(m_icache.line, tag), m_icache.lines());
+	save_pointer(STRUCT_MEMBER(m_icache.line, data), m_icache.lines());
+	save_pointer(STRUCT_MEMBER(m_dcache.line, tag), m_dcache.lines());
+	save_pointer(STRUCT_MEMBER(m_dcache.line, data), m_dcache.lines());
 }
 
 void r3041_device::device_start()
@@ -208,7 +365,6 @@ void mips1core_device_base::device_reset()
 	// non-tlb devices have tlb shut down
 	m_cop0[COP0_Status] = SR_BEV | SR_TS;
 
-	m_data_spacenum = 0;
 	m_bus_error = false;
 }
 
@@ -632,21 +788,21 @@ void mips1core_device_base::execute_set_input(int irqline, int state)
 device_memory_interface::space_config_vector mips1core_device_base::memory_space_config() const
 {
 	return space_config_vector {
-		std::make_pair(AS_PROGRAM, (m_endianness == ENDIANNESS_BIG) ? &m_program_config_be : &m_program_config_le),
-		std::make_pair(1, &m_icache_config),
-		std::make_pair(2, &m_dcache_config)
+		std::make_pair(AS_PROGRAM, (m_endianness == ENDIANNESS_BIG) ? &m_program_config_be : &m_program_config_le)
 	};
 }
 
 bool mips1core_device_base::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
 	target_space = &space(spacenum);
+
 	if (spacenum != AS_PROGRAM)
 		return true;
-	return translate(intention, address, true);
+
+	return translate(intention, address, true) != ERROR;
 }
 
-bool mips1core_device_base::translate(int intention, offs_t &address, bool debug)
+mips1core_device_base::translate_result mips1core_device_base::translate(int intention, offs_t &address, bool debug)
 {
 	// check for kernel memory address
 	if (BIT(address, 31))
@@ -657,9 +813,12 @@ bool mips1core_device_base::translate(int intention, offs_t &address, bool debug
 			switch (address & 0xe0000000)
 			{
 			case 0x80000000: // kseg0: unmapped, cached, privileged
+				address &= ~0xe0000000;
+				return m_cache;
+
 			case 0xa0000000: // kseg1: unmapped, uncached, privileged
 				address &= ~0xe0000000;
-				break;
+				return UNCACHED;
 
 			case 0xc0000000: // kseg2: mapped, cached, privileged
 			case 0xe0000000:
@@ -670,31 +829,19 @@ bool mips1core_device_base::translate(int intention, offs_t &address, bool debug
 		{
 			address_error(intention, address);
 
-			return false;
+			return ERROR;
 		}
 	}
 	else
 		// kuseg physical addresses have a 1GB offset
 		address += 0x40000000;
 
-	return true;
+	return m_cache;
 }
 
 std::unique_ptr<util::disasm_interface> mips1core_device_base::create_disassembler()
 {
 	return std::make_unique<mips1_disassembler>();
-}
-
-void mips1core_device_base::icache_map(address_map &map)
-{
-	if (m_icache_size)
-		map(0, m_icache_size - 1).ram().mirror(~(m_icache_size - 1));
-}
-
-void mips1core_device_base::dcache_map(address_map &map)
-{
-	if (m_dcache_size)
-		map(0, m_dcache_size - 1).ram().mirror(~(m_dcache_size - 1));
 }
 
 void mips1core_device_base::generate_exception(u32 exception, bool refill)
@@ -954,10 +1101,10 @@ void mips1core_device_base::set_cop0_reg(unsigned const reg, u32 const data)
 		{
 			u32 const delta = SR ^ data;
 
-			m_cop0[COP0_Status] = data;
+			if ((delta & SR_IsC) && (m_cache == UNCACHED))
+				fatalerror("mips1: cannot isolate non-existent cache (%s)\n", machine().describe_context());
 
-			// handle cache isolation and swap
-			m_data_spacenum = (data & SR_IsC) ? ((data & SR_SwC) ? 1 : 2) : 0;
+			m_cop0[COP0_Status] = data;
 
 			if ((delta & SR_KUc) && (m_branch_state != EXCEPTION))
 				debugger_privilege_hook();
@@ -1074,7 +1221,7 @@ void mips1core_device_base::lwr(u32 const op)
 	offs_t const offset = SIMMVAL + m_r[RSREG];
 	load<u32, false>(offset, [this, op, offset](u32 temp)
 	{
-		unsigned const shift = ((offset & 0x3) ^ (m_endianness == ENDIANNESS_LITTLE ? 0 : 3)) << 3;
+		unsigned const shift = ((offset & 3) ^ (m_endianness == ENDIANNESS_LITTLE ? 0 : 3)) << 3;
 
 		m_r[RTREG] = (m_r[RTREG] & ~u32(0xffffffffU >> shift)) | (temp >> shift);
 	});
@@ -1096,6 +1243,53 @@ void mips1core_device_base::swr(u32 const op)
 	store<u32, false>(offset, m_r[RTREG] << shift, 0xffffffffU << shift);
 }
 
+/*
+ * This function determines the active cache (instruction or data) depending on
+ * the icache parameter and the status register SwC (swap caches) flag. A line
+ * within the cache is then selected based upon the low address bits. The upper
+ * address bits are compared with the line tag to identify whether the lookup
+ * is a hit or a miss.
+ *
+ * If the cache lookup misses and the invalidate parameter evaluates to true,
+ * the cache line tag is updated to match the input address and invalidated.
+ *
+ * The function returns the selected line and the miss state.
+ *
+ * TODO: multiple-word cache lines
+ */
+std::tuple<struct mips1core_device_base::cache::line &, bool> mips1core_device_base::cache_lookup(u32 address, bool invalidate, bool icache)
+{
+	// cache line data is word-addressed
+	address &= ~3;
+
+	// select instruction or data cache
+	struct cache const &c = (icache ^ bool(SR & SR_SwC)) ? m_icache : m_dcache;
+
+	// select line within cache based on low address bits
+	struct cache::line &l = c.line[(address & (c.size - 1)) >> 2];
+
+	// compare cache line tag against upper address bits and line valid bit
+	bool const miss = (l.tag ^ address) & (-c.size | cache::line::INV);
+
+	// on cache miss, optionally update the line tag and invalidate (cache
+	// miss is usually followed by line replacement)
+	if (miss && invalidate)
+		l.tag = (address & -c.size) | cache::line::INV;
+
+	return std::tie(l, miss);
+}
+
+// compute bit position of sub-unit within a word given endianness and address
+template <typename T> unsigned mips1core_device_base::shift_factor(u32 address) const
+{
+	if constexpr (sizeof(T) == 1)
+		return ((m_endianness == ENDIANNESS_BIG) ? (address & 3) ^ 3 : (address & 3)) * 8;
+	else if constexpr (sizeof(T) == 2)
+		return ((m_endianness == ENDIANNESS_BIG) ? (address & 2) ^ 2 : (address & 2)) * 8;
+	else
+		return 0;
+}
+
 template <typename T, bool Aligned, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, void> mips1core_device_base::load(u32 address, U &&apply)
 {
 	// alignment error
@@ -1105,28 +1299,75 @@ template <typename T, bool Aligned, typename U> std::enable_if_t<std::is_convert
 		return;
 	}
 
-	if (translate(TR_READ, address, false))
+	T data;
+	if (!(SR & SR_IsC))
 	{
+		translate_result const t = translate(TR_READ, address, false);
+		if (t == ERROR)
+			return;
+
 		// align address for ld[lr] instructions
 		if (!Aligned)
 			address &= ~(sizeof(T) - 1);
 
-		T const data
-			= (sizeof(T) == 1) ? space(m_data_spacenum).read_byte(address)
-			: (sizeof(T) == 2) ? space(m_data_spacenum).read_word(address)
-			: space(m_data_spacenum).read_dword(address);
-
-		if (m_bus_error)
+		if (t == CACHED)
 		{
-			m_bus_error = false;
-			generate_exception(EXCEPTION_BUSDATA);
+			auto [l, miss] = cache_lookup(address, true);
+
+			if (miss)
+			{
+				// load
+				u32 const data = space(AS_PROGRAM).read_dword(address);
+				if (m_bus_error)
+				{
+					m_bus_error = false;
+					generate_exception(EXCEPTION_BUSDATA);
+
+					return;
+				}
+
+				// replace cache line data and mark valid
+				l.update(data);
+			}
+
+			data = l.data >> shift_factor<T>(address);
 		}
 		else
-			apply(data);
+		{
+			if constexpr (sizeof(T) == 4)
+				data = space(AS_PROGRAM).read_dword(address);
+			else if constexpr (sizeof(T) == 2)
+				data = space(AS_PROGRAM).read_word(address);
+			else if constexpr (sizeof(T) == 1)
+				data = space(AS_PROGRAM).read_byte(address);
+
+			if (m_bus_error)
+			{
+				m_bus_error = false;
+				generate_exception(EXCEPTION_BUSDATA);
+
+				return;
+			}
+		}
 	}
+	else
+	{
+		// when isolated, loads always hit the cache and the status register
+		// CM flag reflects the actual hit/miss state
+		auto [l, miss] = cache_lookup(address, false);
+
+		if (miss)
+			SR |= SR_CM;
+		else
+			SR &= ~SR_CM;
+
+		data = l.data >> shift_factor<T>(address);
+	}
+
+	apply(data);
 }
 
-template <typename T, bool Aligned, typename U> std::enable_if_t<std::is_convertible<U, T>::value, void> mips1core_device_base::store(u32 address, U data, T mem_mask)
+template <typename T, bool Aligned> void mips1core_device_base::store(u32 address, T data, T mem_mask)
 {
 	// alignment error
 	if (Aligned && (address & (sizeof(T) - 1)))
@@ -1135,47 +1376,99 @@ template <typename T, bool Aligned, typename U> std::enable_if_t<std::is_convert
 		return;
 	}
 
-	if (translate(TR_WRITE, address, false))
+	if (!(SR & SR_IsC))
 	{
+		translate_result const t = translate(TR_WRITE, address, false);
+		if (t == ERROR)
+			return;
+
 		// align address for sd[lr] instructions
 		if (!Aligned)
 			address &= ~(sizeof(T) - 1);
 
-		switch (sizeof(T))
+		if (t == CACHED)
 		{
-		case 1: space(m_data_spacenum).write_byte(address, T(data)); break;
-		case 2: space(m_data_spacenum).write_word(address, T(data), mem_mask); break;
-		case 4: space(m_data_spacenum).write_dword(address, T(data), mem_mask); break;
+			auto [l, miss] = cache_lookup(address, sizeof(T) == 4);
+
+			if (!miss)
+			{
+				unsigned const shift = shift_factor<T>(address);
+
+				l.update(u32(data) << shift, u32(mem_mask) << shift);
+			}
+			else if constexpr (Aligned && sizeof(T) == 4)
+				// only full word stores update the cache after a miss
+				l.update(data, mem_mask);
 		}
+
+		// uncached or write-through store
+		if constexpr (sizeof(T) == 4)
+			space(AS_PROGRAM).write_dword(address, T(data), mem_mask);
+		else if constexpr (sizeof(T) == 2)
+			space(AS_PROGRAM).write_word(address, T(data), mem_mask);
+		else if constexpr (sizeof(T) == 1)
+			space(AS_PROGRAM).write_byte(address, T(data));
+	}
+	else
+	{
+		// when isolated, full word stores update the cache, while partial word
+		// stores invalidate the cache line
+		auto [l, miss] = cache_lookup(address, true);
+
+		if constexpr (Aligned && sizeof(T) == 4)
+			l.update(data, mem_mask);
+		else
+			l.invalidate();
 	}
 }
 
-bool mips1core_device_base::fetch(u32 address, std::function<void(u32)> &&apply)
+void mips1core_device_base::fetch(u32 address, std::function<void(u32)> &&apply)
 {
 	// alignment error
 	if (address & 3)
-	{
 		address_error(TR_FETCH, address);
-		return false;
-	}
 
-	if (translate(TR_FETCH, address, false))
+	translate_result const t = translate(TR_FETCH, address, false);
+	if (t == ERROR)
+		return;
+
+	u32 data;
+	if (t == CACHED)
 	{
-		u32 const data = space(AS_PROGRAM).read_dword(address);
+		auto [l, miss] = cache_lookup(address, true, true);
+
+		if (miss)
+		{
+			// fetch
+			u32 const data = space(AS_PROGRAM).read_dword(address);
+			if (m_bus_error)
+			{
+				m_bus_error = false;
+				generate_exception(EXCEPTION_BUSINST);
+
+				return;
+			}
+
+			// replace cache line data and mark valid
+			l.update(data);
+		}
+
+		data = l.data;
+	}
+	else
+	{
+		data = space(AS_PROGRAM).read_dword(address);
 
 		if (m_bus_error)
 		{
 			m_bus_error = false;
 			generate_exception(EXCEPTION_BUSINST);
 
-			return false;
+			return;
 		}
-
-		apply(data);
-		return true;
 	}
-	else
-		return false;
+
+	apply(data);
 }
 
 std::string mips1core_device_base::debug_string(u32 string_pointer, unsigned const limit)
@@ -1949,7 +2242,7 @@ template <typename T> void mips1_device_base::set_cop1_reg(unsigned const reg, T
 		m_f[reg] = data;
 }
 
-bool mips1_device_base::translate(int intention, offs_t &address, bool debug)
+mips1core_device_base::translate_result mips1_device_base::translate(int intention, offs_t &address, bool debug)
 {
 	// check for kernel memory address
 	if (BIT(address, 31))
@@ -1960,9 +2253,12 @@ bool mips1_device_base::translate(int intention, offs_t &address, bool debug)
 			switch (address & 0xe0000000)
 			{
 			case 0x80000000: // kseg0: unmapped, cached, privileged
+				address &= ~0xe0000000;
+				return m_cache;
+
 			case 0xa0000000: // kseg1: unmapped, uncached, privileged
 				address &= ~0xe0000000;
-				return true;
+				return UNCACHED;
 
 			case 0xc0000000: // kseg2: mapped, cached, privileged
 			case 0xe0000000:
@@ -1973,7 +2269,7 @@ bool mips1_device_base::translate(int intention, offs_t &address, bool debug)
 		{
 			address_error(intention, address);
 
-			return false;
+			return ERROR;
 		}
 	}
 
@@ -2018,7 +2314,7 @@ bool mips1_device_base::translate(int intention, offs_t &address, bool debug)
 		if (i > 0)
 			std::swap(mru[i - 1], mru[i]);
 
-		return true;
+		return (entry[1] & EL_N) ? UNCACHED : m_cache;
 	}
 
 	if (!machine().side_effects_disabled() && !debug)
@@ -2041,5 +2337,5 @@ bool mips1_device_base::translate(int intention, offs_t &address, bool debug)
 		generate_exception(modify ? EXCEPTION_TLBMOD : (intention == TR_WRITE) ? EXCEPTION_TLBSTORE : EXCEPTION_TLBLOAD, refill);
 	}
 
-	return false;
+	return ERROR;
 }

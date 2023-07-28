@@ -54,11 +54,8 @@ FM Auto Arranger Utility ~ ＦＭオート・アレンジャーＵＴＩＬＩ�
 FM Musiwriter ~ ＦＭミュージライター - MCS
 FM Sound Synthesizer Unit ~ ＦＭサウンドシンセサイザーユニット - Yamaha
 FM Sound Synthesizer Unit II ~ ＦＭサウンドシンセサイザーユニットII - Yamaha
-Graphic Artist - Yamaha
 Graphic Artist Utility - Yamaha
 Graphic card set - Yamaha
-Graphic Master Lab - HAL Kenkyuujo
-Gyro Adventure - Nihon Columbia
 The Hucal data man - Hudson
 Japanese Word Processor - Casio
 Japanese Word Processor Cartridge - Konami
@@ -122,7 +119,6 @@ Chicken Chase - Mind Games España
 Compulandia - Idealogic
 Cosmos - Sony Spain
 Curso de BASIC - Sony Spain
-Fighting Rider - Sony Spain
 Financiële administratie - [VG 8181] Philips
 Financiële administratie 2 - [VG 8183] Philips
 GranSoft TXT - Editor de Texto - GranSoft
@@ -195,7 +191,6 @@ Hydlide 2 - Shine of Darkness (Kor) - Zemina
 MSX Rugby (Kor) - Zemina
 Gopher no Yabou - Episode II (Nemesis 3) ~ 사라만다 II (Kor) - Zemina
 Sinbad (Kor) - Zemina
-Sokoban (Kor) - Zemina
 Star Soldier (Kor) - Zemina
 Strange Loop (Kor) - Zemina
 Tatica (Kor) - Zemina
@@ -4201,6 +4196,18 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="ddayka" cloneof="dday">
+		<description>D-Day (Korea, alt)</description>
+		<year>198?</year>
+		<publisher>San Ho</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="d-day (korea, alt).rom" size="0x4000" crc="8d71bbe0" sha1="9476ad42c2487ba4fbe0cfd7c50c1fb355bdb068" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dskeiba">
 		<description>Dai Shougai Keiba (Japan)</description>
 		<year>1984</year>
@@ -4347,8 +4354,7 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="0"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="decathlon (japan).rom" size="0x4000" crc="f99b1c22" sha1="5d43cb6ca89f31d5f543e4dcd3fa9987b9769602" />
-				<rom size="0x4000" offset="0x4000" loadflag="reload" />
+				<rom name="decathlon (japan).rom" size="0x8000" crc="cd016b93" sha1="a1656f612360a126e09ef2baaa8002d92054125d" />
 			</dataarea>
 		</part>
 	</software>
@@ -4379,6 +4385,22 @@ kept for now until finding out what those bytes affect...
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="deep dungeon ii (japan).rom" size="0x20000" crc="101db19c" sha1="d82135a5e28b750c44995af116db890a15f6428a" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deepdng2a" cloneof="deepdng2">
+		<description>Deep Dungeon II - Yuushi no Monshou (Japan, alt)</description>
+		<year>1988</year>
+		<publisher>ScapTrust</publisher>
+		<info name="alt_title" value="ディープダンジョン勇士の紋章" />
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="deep dungeon ii (japan) (alt).rom" size="0x20000" crc="213da247" sha1="2a209a0ead2feb463d211dc428aa847b0b9ed606" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000">
 			</dataarea>
@@ -4459,6 +4481,30 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="dipdip">
+		<description>Dip Dip (Spain)</description>
+		<year>1985</year>
+		<publisher>Microbyte</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="dip dip (spain).rom" size="0x4000" crc="9a2cc849" sha1="65f89c813a1d57a8f8a04e81682202f759ee6980" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dipdipa" cloneof="dipdip">
+		<description>Dip Dip (Spain, alt)</description>
+		<year>1985</year>
+		<publisher>Microbyte</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="dip dip (spain) (alt).rom" size="0x4000" crc="6b42d0d7" sha1="067c90e90b8910de615d481aeabe145269a9920f" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dokidoki">
 		<description>Doki Doki Penguin Land (Japan)</description>
 		<year>1985</year>
@@ -4485,6 +4531,19 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="doki doki penguin land (japan) (alt 1).rom" size="0x8000" crc="de4af7f6" sha1="23531b4e8a2b3e975483318846cf89e65f32f7d1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dokidokik" cloneof="dokidoki">
+		<description>Penguin Land (Korea)</description>
+		<year>1985</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="팽귄랜드"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="doki doki penguin land (korea).rom" size="0x8000" crc="e3225904" sha1="3e98965975166c9c97349427e97447a8817cec44" />
 			</dataarea>
 		</part>
 	</software>
@@ -4526,6 +4585,18 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="double dragon (korea) (unl).rom" size="0x8000" crc="c70e3a34" sha1="6724b2abce8145609333c8b2964de0f1a90d9cd5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drhello">
+		<description>Dr. Hello (Korea)</description>
+		<year>1991</year>
+		<publisher>Sis Co.</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="dr. hello (korea).rom" size="0x10000" crc="ba27bb28" sha1="f5bb3c6d41245271faa3c3f54e3948787e181a5e" />
 			</dataarea>
 		</part>
 	</software>
@@ -4599,6 +4670,32 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="drainer (japan).rom" size="0x8000" crc="db803e8a" sha1="e34161034364ef03df907d62976c2ac8f551404f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="droidspl">
+		<description>Droids En el Planeta Ingo (Spain)</description>
+		<year>1987</year>
+		<publisher>Walther Miller</publisher>
+		<info name="serial" value="WM 0187"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="droids en el planeta ingo (spain).rom" size="0x8000" crc="8f719431" sha1="3b09ad0f8bd590e0e202e5b3e4dfd347d90043af" />
+				<rom size="0x8000" offset="0x8000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="droidsww">
+		<description>Droids the White Witch (Spain)</description>
+		<year>1987</year>
+		<publisher>Walther Miller</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="droids the white witch (spain).rom" size="0x8000" crc="2a9fbecc" sha1="aadb3779765f7dd7168cf14c843bebd44c27c89c" />
 			</dataarea>
 		</part>
 	</software>
@@ -4689,6 +4786,30 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="exainnovc" cloneof="exainnov">
+		<description>E.I. - Exa Innova (Japan, Compile)</description>
+		<year>1983</year>
+		<publisher>Compile</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="exa innova (japan, compile).rom" size="0x4000" crc="2de0e6da" sha1="2430a387e9eb2b2046532babfdf52afbbb1c599d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exainnovca" cloneof="exainnov">
+		<description>E.I. - Exa Innova (Japan, Compile, alt)</description>
+		<year>1983</year>
+		<publisher>Compile</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="exa innova (japan, compile, alt).rom" size="0x4000" crc="a7013512" sha1="4de646009f906754a81581096821b8afecb060d2" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Screen stays black -->
 	<software name="eagle5" supported="no">
 		<description>Eagles 5 (Korea)</description>
@@ -4770,6 +4891,31 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="erika (japan).rom" size="0x8000" crc="85ac5626" sha1="7de755f98b6a68886e61473d524d0aa6ab6577d7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ewoks">
+		<description>Ewoks (Spain)</description>
+		<year>1987</year>
+		<publisher>Walther Miller</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="ewoks (spain).rom" size="0x8000" crc="d42e3740" sha1="ef6f0db4c9858a96f9a83cda414112087ad64b78" />
+				<rom size="0x8000" offset="0x8000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ewoksdan">
+		<description>Ewoks and the Dandelion Warriors (Spain)</description>
+		<year>1987</year>
+		<publisher>Walther Miller</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="ewoks and the dandeloin warriors (spain).rom" size="0x8000" crc="514b1f31" sha1="e8437b5372f29193e99db30d1a75993ebed93c61" />
 			</dataarea>
 		</part>
 	</software>
@@ -5108,6 +5254,19 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="fightrid">
+		<description>Fighting Rider (Spain)</description>
+		<year>1985</year>
+		<publisher>Sony Spain</publisher>
+		<info name="serial" value="HBS-I028" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="fighting rider (spain).rom" size="0x4000" crc="4b210e07" sha1="099c04bc72a43f129bec9f906e3ba6283cc87231" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fjustice">
 		<description>Final Justice (Japan)</description>
 		<year>1985</year>
@@ -5146,6 +5305,20 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
 				<rom name="final justice (japan) (alt 2).rom" size="0x4000" crc="b1663de8" sha1="d833c66dd541239908555762e04bcbb22bca748a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fjusticec" cloneof="fjustice">
+		<description>Final Justice (Japan, alt 3)</description>
+		<year>1985</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="serial" value="R48X5084" />
+		<info name="alt_title" value="ファイナルジャスティス" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="final justice (japan) (alt 3).rom" size="0x4000" crc="74ca598a" sha1="068e5cd232a794f7e203e5316a3ad2bcc7f3c939" />
 			</dataarea>
 		</part>
 	</software>
@@ -5653,7 +5826,7 @@ kept for now until finding out what those bytes affect...
 
 	<software name="gw30">
 		<description>Game World - 30 Games (Korea)</description>
-		<year>19??</year>
+		<year>1991</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="korean_80in1" />
@@ -5666,13 +5839,26 @@ kept for now until finding out what those bytes affect...
 
 	<software name="gw64">
 		<description>Game World - 64 Games (Korea)</description>
-		<year>19??</year>
+		<year>1991</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="korean_80in1" />
 			<feature name="mapper" value="80IN1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="game world 64 (zemina).rom" size="1048576" crc="e50bab84" sha1="5f912637565932c2bd7c0d7b9be6ad3dc971f96f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gw64a" cloneof="gw64">
+		<description>Game World - 64 Games (Korea, alt)</description>
+		<year>1991</year>
+		<publisher>Zemina</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="korean_80in1" />
+			<feature name="mapper" value="80IN1" />
+			<dataarea name="rom" size="1048576">
+				<rom name="game world 64 (zemina) (alt).rom" size="1048576" crc="b5373785" sha1="bf13ba021ed5bc1fd33ea9c896198eeb1c6afbe7" />
 			</dataarea>
 		</part>
 	</software>
@@ -5744,6 +5930,49 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<!-- A redump is needed to determine what the real mapper is -->
+	<software name="gangrobo">
+		<description>Gangcheol Robocop (Korea)</description>
+		<year>1992</year>
+		<publisher>Screen Software</publisher>
+		<info name="serial" value="SI-3131Z" />
+		<info name="alt_title" value="강철 로보캅" />
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="gangcheol robocop (korea).rom" size="0x10000" crc="5681c3b6" sha1="555475b0f5b23b192d89c0bbda2c2c2f4b182c25" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gangroboa" cloneof="gangrobo">
+		<description>Gangcheol Robocop (Korea, alt)</description>
+		<year>1992</year>
+		<publisher>Screen Software</publisher>
+		<info name="serial" value="SI-3131Z" />
+		<info name="alt_title" value="강철 로보캅" />
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="gangcheol robocop (korea) (alt).rom" size="0x10000" crc="248dd0da" sha1="77cacb5e9a6cef48a36e8acabc938d5f1f1beadc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gangrobob" cloneof="gangrobo">
+		<description>Gangcheol Robocop (Korea, alt 2)</description>
+		<year>1992</year>
+		<publisher>Screen Software</publisher>
+		<info name="serial" value="SI-3131Z" />
+		<info name="alt_title" value="강철 로보캅" />
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="gangcheol robocop (korea) (alt 2).rom" size="0x10000" crc="4e3d69f9" sha1="ad21deb6e85eeb1098d4ee0a84e00755c185dc15" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ghostbst">
 		<description>Ghostbusters (Japan)</description>
 		<year>1984</year>
@@ -5753,7 +5982,7 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="ghostbusters (europe).rom" size="0x8000" crc="c9bcbe5a" sha1="ba30ad98a8488bec6d0c661f7b859beb2fe219d1" />
+				<rom name="ghostbusters (japan).rom" size="0x8000" crc="c9bcbe5a" sha1="ba30ad98a8488bec6d0c661f7b859beb2fe219d1" />
 			</dataarea>
 		</part>
 	</software>
@@ -5784,6 +6013,19 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
 				<rom name="glider (japan) (alt 1).rom" size="0x4000" crc="5a23f1ee" sha1="310ab424edf15d5399e31fdbc1230ddcde307d1a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gnomofed">
+		<description>El Gnomo Fedor en la Caverna Perdida (Spain)</description>
+		<year>1986</year>
+		<publisher>Idealogic</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="el gnomo fedor en la caverna perdida (spain).rom" size="0x8000" crc="4551827d" sha1="e234d337ed6d59597052a608707f061ce304049c" />
+				<rom size="0x8000" offset="0x8000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -5859,6 +6101,20 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="gokiburia" cloneof="gokiburi">
+		<description>Gokiburi Daisakusen (Japan, alt)</description>
+		<year>1983</year>
+		<publisher>National</publisher>
+		<info name="serial" value="MXMD 21001 / CF-SS018" />
+		<info name="alt_title" value="ゴキブリ大作戦" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="gokiburi daisakusen - bug bomb (japan) (alt).rom" size="0x4000" crc="27976214" sha1="2ca992cb859dfb395464d08d3813e17871aaf41a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="golfgame">
 		<description>Golf Game (Japan)</description>
 		<year>1983</year>
@@ -5902,6 +6158,19 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="gomokunak" cloneof="gomokuna">
+		<description>Dunoegyosil Omok (Korea)</description>
+		<year>1984</year>
+		<publisher>Zemina</publisher>
+		<info name="alt_title" value="두뇌교실 오목" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="dunoegyosil omok (korea).rom" size="0x4000" crc="f4cb0a83" sha1="bd5617cfd9ee1d17f4cde6f282da897003226089" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="goonies">
 		<description>The Goonies (Japan)</description>
 		<year>1986</year>
@@ -5931,6 +6200,72 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="graphart">
+		<description>Graphic Artist (Japan, Europe)</description>
+		<year>1985</year>
+		<publisher>Yamaha</publisher>
+		<info name="serial" value="GAR-01" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="graphic artist (japan, europe).rom" size="0x8000" crc="1433054e" sha1="2a6d5512a1b4bfb3e616ded0a825db23bb143fba" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grapharta" cloneof="graphart">
+		<description>Graphic Artist (Japan, Europe, alt)</description>
+		<year>1985</year>
+		<publisher>Yamaha</publisher>
+		<info name="serial" value="GAR-01" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="graphic artist (japan, europe) (alt).rom" size="0x8000" crc="b2d3e4ee" sha1="8d26d4bcd727e057a37d2ec7f72626af68cbcdfb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphcrd">
+		<description>Yamaha Graphic Card</description>
+		<year>1984</year>
+		<publisher>Yamaha</publisher>
+		<info name="serial" value="UGA-02" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="yamaha graphic card.rom" size="0x4000" crc="a8f89d26" sha1="05e519caf911a4b4a66c820cadc37feba9b85d68" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphmas">
+		<description>Graphic Master Lab (Japan, Europe)</description>
+		<year>1985</year>
+		<publisher>Sony</publisher>
+		<info name="serial" value="HBS-H011C" />
+		<info name="alt_title" value="グラフィックマスターラボ"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="graphic master lab (japan, europe).rom" size="0x8000" crc="b8356583" sha1="1ee04a1b1165ca7762e6eb2ba47bce917d824b65" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphmasa" cloneof="graphmas">
+		<description>Graphic Master Lab (Japan, Europe, alt)</description>
+		<year>1985</year>
+		<publisher>Sony</publisher>
+		<info name="serial" value="HBS-H011C" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="graphic master lab (japan, europe) (alt).rom" size="0x8000" crc="84f5c8c7" sha1="64e37a5a65d74db75f6d007b33777057a9aa29e7" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gberet">
 		<description>Green Beret (Europe)</description>
 		<year>1986</year>
@@ -5955,6 +6290,20 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="green beret (europe) (alt 1).rom" size="0x8000" crc="46f5e571" sha1="acd46021a228b2b612c82d04c124b78e7d4c25e3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gberetb" cloneof="gberet">
+		<description>Green Beret (Europe, alt 2)</description>
+		<year>1986</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="KN327" />
+		<info name="gtin" value="05015173100438"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="green beret (europe) (alt 2).rom" size="0x8000" crc="db46ef0e" sha1="dcf79362f68853733326a22eb8fdafa17bca281e" />
 			</dataarea>
 		</part>
 	</software>
@@ -6105,6 +6454,19 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="gunjin shogi mars (japan).rom" size="0x8000" crc="174f409d" sha1="f2ec3714138175212b6b6e28b5da4361cc4b5471" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gyroadv">
+		<description>Gyro Adventure (Japan)</description>
+		<year>1984</year>
+		<publisher>Colpax</publisher>
+		<info name="alt_title" value="ジャイロアドベンチャー" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="gyro adventure (japan).rom" size="0x4000" crc="40b8bc6a" sha1="6ae42ce317c23e064dec0c8bd10a645494b67e35" />
 			</dataarea>
 		</part>
 	</software>
@@ -6446,17 +6808,57 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-<!-- only tape released? tap2crt hack??
-     There is a cartridge version released by Al Alamiah
- -->
-	<software name="hopper">
-		<description>Hopper (Europe)</description>
-		<year>1986</year>
-		<publisher>Eaglesoft</publisher>
+	<software name="holein1pb" cloneof="holein1p">
+		<description>Hole in One Professional (Japan, alt 2)</description>
+		<year>1985</year>
+		<publisher>HAL Kenkyuujo</publisher>
+		<info name="serial" value="HM-019" />
+		<info name="alt_title" value="ホールインワンプロフェッショナル" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="hole in one professional (japan) (alt 2).rom" size="0x8000" crc="e8cfdbd3" sha1="13f55fcb993dabbef792f2a3696c4f545f31f44b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="holein1pc" cloneof="holein1p">
+		<description>Hole in One Professional (Japan, alt 3)</description>
+		<year>1985</year>
+		<publisher>HAL Kenkyuujo</publisher>
+		<info name="serial" value="HM-019" />
+		<info name="alt_title" value="ホールインワンプロフェッショナル" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="hole in one professional (japan) (alt 3).rom" size="0x8000" crc="6c086da7" sha1="92f69dc4b957c2c6800f55e0d75b94cdc6872354" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hotasm">
+		<description>Hot-Asm (Brazil)</description>
+		<year>1985</year>
+		<publisher>Epcom</publisher>
+		<info name="serial" value="A004"/>
+		<info name="usage" value="Use CALL START or CALL EDT from Basic to start the software."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
-				<rom name="hopper (europe).rom" size="0x4000" crc="d3032ad7" sha1="dd9a41e4c8802cd4bbb87e30281711f4e7ae017f" status="baddump" />
+				<rom name="hot-asm (brazil).rom" size="0x4000" crc="829f78ea" sha1="7f189caa1f0c30760707e05c13bc50c3fb3ac441"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hotplan">
+		<description>Hot-Plan (Brazil)</description>
+		<year>1986</year>
+		<publisher>Epcom</publisher>
+		<info name="usage" value="Use CALL HOTPLAN from Basic to start the software."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="hot-plan (brazil).rom" size="0x8000" crc="2b641f19" sha1="ac1096e7b725830e61213b2b26310ff322df2946"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6582,6 +6984,23 @@ kept for now until finding out what those bytes affect...
 				<rom name="hydlide ii - shine of darkness (japan) (alt 1).rom" size="0x20000" crc="b886d7f5" sha1="a3537934a4d9dfbf27aca5aaf42e0f18e4975366" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hydlide2k" cloneof="hydlide2">
+		<description>Hydlide II - Shine of Darkness (Korea)</description>
+		<year>1986</year>
+		<publisher>Zemina</publisher>
+		<notes><![CDATA[
+This version does not have SRAM?
+There are 4 characters predefined.
+Character creation does not write the new character data.
+]]></notes>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="korean_hydlide2" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="hydlide ii - shine of darkness (korea).rom" size="0x20000" crc="58de803b" sha1="552a758f77a7c35969523dbaca74587f0b59eb2b" />
 			</dataarea>
 		</part>
 	</software>
@@ -6912,7 +7331,7 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="jpwinkle.rom" size="0x8000" crc="1bc4132b" sha1="4e4989c8f6336663690217f32aca22a319b90091" />
+				<rom name="jpwinkle.rom" size="0x8000" crc="5c94b4b7" sha1="9e6a78cda66fcaa9fe13aedbea7f69f2a8a97433" />
 			</dataarea>
 		</part>
 	</software>
@@ -7088,6 +7507,20 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="junofrsta" cloneof="junofrst">
+		<description>Juno First (Japan, alt)</description>
+		<year>1983</year>
+		<publisher>Sony</publisher>
+		<info name="serial" value="HBS-G002C" />
+		<info name="alt_title" value="ジュノファースト" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="juno first (japan, alt).rom" size="0x8000" crc="d902be7c" sha1="846bd4d89bd034ac5346cbc559752635ad2bda6b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="keybmstr">
 		<description>Keyboard Master (prototype)</description>
 		<year>1984</year>
@@ -7144,6 +7577,20 @@ kept for now until finding out what those bytes affect...
 				<rom size="0x4000" offset="0x4000" loadflag="reload" />
 				<rom size="0x4000" offset="0x8000" loadflag="reload" />
 				<rom size="0x4000" offset="0xc000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keykapera">
+		<description>Keystone Kapers (Japan, alt)</description>
+		<year>1984</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="serial" value="R48X5503" />
+		<info name="alt_title" value="キーストンケーパーズ" />
+		<part name="cart" interface="msx_cart">
+			<dataarea name="rom" size="0x10000">
+				<rom name="keystone kapers (japan, alt).rom" size="0x8000" crc="7ff117f9" sha1="fb4724b8159beae132f89f394f71ce3934a61ae2" />
+				<rom size="0x8000" offset="0x8000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -7371,6 +7818,18 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="pesadelo" cloneof="knightmr">
+		<description>Pesadelo (Brazil)</description>
+		<year>1989</year>
+		<publisher>Forte II Games</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="pesadelo (brazil).rom" size="0x8000" crc="fa2176d4" sha1="87e278b7c5d341693abecaa17d8036b071507c85" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="knightm2">
 		<description>Knightmare II - The Maze of Galious (Japan)</description>
 		<year>1987</year>
@@ -7468,6 +7927,20 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
 				<rom name="konami's baseball (japan).rom" size="0x4000" crc="b660494b" sha1="076d6f5b9f8427f6959f7a255abb4acac0dd9d0c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="konbballa" cloneof="konbball">
+		<description>Konami's Baseball (Japan, alt)</description>
+		<year>1985</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RC724" />
+		<info name="alt_title" value="コナミのベースボール" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="konami's baseball (japan, alt).rom" size="0x4000" crc="57570d4d" sha1="da6a332dc236073286aa78582c0fccf728c86ba4" />
 			</dataarea>
 		</part>
 	</software>
@@ -9103,6 +9576,19 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="sokobankz" cloneof="sokoban">
+		<description>Soukoban (Korea, Zemina)</description>
+		<year>1984</year>
+		<publisher>Zemina</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="soukoban (1984)(zemina).rom" size="0x4000" crc="756d3402" sha1="5cacfb40c99a9e66e068a15b5d22cbc7ab90cb65" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Communication hardware not emulated -->
 	<software name="expertm2" supported="no">
 		<description>Expert TM-2 Multi Modem (Brazil)</description>
@@ -9270,6 +9756,20 @@ kept for now until finding out what those bytes affect...
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="nemesis 2 (japan) (demo).rom" size="0x20000" crc="c8fac21a" sha1="6844758ff5c2c410115d4d7cf12498c42e931732" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gradius2da" cloneof="gradius2">
+		<description>Nemesis 2 (Europe) ~ Gradius 2 (Japan) (demo, alt)</description>
+		<year>1987</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="グラディウス2" />
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<feature name="mapper" value="KONAMI-SCC" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="nemesis 2 (japan) (demo, alt).rom" size="0x20000" crc="6be6b85b" sha1="7561f3c70c221df40f1b28209c59882ca065603d" />
 			</dataarea>
 		</part>
 	</software>
@@ -10342,6 +10842,21 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="police story, the (japan) (alt 1).rom" size="0x8000" crc="e4554b51" sha1="835b3e2bae1d680d7050ce188c617fbcfb326eb3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="policestb" cloneof="policest">
+		<description>The Police Story (Japan, alt 2)</description>
+		<year>1986</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="serial" value="R49X5091" />
+		<info name="alt_title" value="ポリスストーリー" />
+		<info name="gtin" value="04988013001794"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="police story, the (japan) (alt 2).rom" size="0x8000" crc="3935edb5" sha1="1b1153675a334be6919468433f24060b8afffc9e" />
 			</dataarea>
 		</part>
 	</software>
@@ -14791,9 +15306,21 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<year>198?</year>
 		<publisher>Yamaha</publisher>
 		<part name="cart" interface="msx_cart">
-			<feature name="start_page" value="1"/>
+			<feature name="start_page" value="0"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="yrm304.rom" size="0x8000" crc="170afead" sha1="c79626eddf8bc390d64ada99ad6da32dfd52d086" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yrm304a" cloneof="yrm304" supported="no">
+		<description>Yamaha DX7 Voicing Program II YRM-304 (Japan, alt)</description>
+		<year>198?</year>
+		<publisher>Yamaha</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="yrm304 (alt).rom" size="0x8000" crc="d23e4ccb" sha1="265261c8fc05741437f53244699d0dded09f27f7" />
 			</dataarea>
 		</part>
 	</software>
@@ -15028,14 +15555,29 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 <!-- SYSTEM ROMS? -->
 
 	<!-- Release contains cartridge and a 2DD floppy. -->
-	<software name="msxbasic" supported="no">
+	<software name="msxbasic">
 		<description>MSX Basic-kun Plus 2.0 (Japan)</description>
 		<year>1988</year>
 		<publisher>ASCII</publisher>
+		<info name="alt_title" value="ＭＳＸべーしっ君"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
 				<rom name="msx basic-kun plus (japan) (program).rom" size="0x4000" crc="a13615d2" sha1="c279c3f41d5368761f9088157b80214d835a548c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Release contains cartridge and a 2DD floppy. -->
+	<software name="msxbasica" cloneof="msxbasic">
+		<description>MSX Basic-kun Plus 2.0 (Japan, alt)</description>
+		<year>1988</year>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="ＭＳＸべーしっ君"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="msx basic-kun plus (japan, alt) (program).rom" size="0x4000" crc="590cd7f0" sha1="0b68d6968f2ce736316be64c689573f0a461acf8" />
 			</dataarea>
 		</part>
 	</software>
@@ -15442,6 +15984,21 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="2faceaa" cloneof="2face">
+		<description>Double Face (Arab, alt)</description>
+		<year>1987</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="alt_title" value="ذو الوجهين"/>
+		<info name="serial" value="F007" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="double face (al-alamiah, 1987, alt).rom" size="0x8000" crc="04389cfe" sha1="affbe8a1ca3ac62d315d62fa3038e1ecbdd3dac3" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="2face2">
 		<description>Double Face 2 (Arab, v1.8)</description>
 		<year>1987</year>
@@ -15804,7 +16361,8 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
-	<software name="quran">
+	<!-- Graphics incomplete or displayed three times on ax150. Restarts on ax500. -->
+	<software name="quran" supported="no">
 		<description>The Holy Quran (v1.00)</description>
 		<year>1987</year>
 		<publisher>Al Alamiah</publisher>
@@ -15816,6 +16374,19 @@ legacy FM implementations cannot find it.
 			<dataarea name="rom" size="1048576">
 				<!-- there are 2 ROMs on the cartridge -->
 				<rom name="holyquran.rom" size="1048576" crc="3b003e5c" sha1="7d439080b43d94385fd4c426d4f6fee884bc2926" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hopper">
+		<description>Hopper (Arab)</description>
+		<year>1986</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="GA012" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="hopper (1986)(al alamiah).rom" size="0x8000" crc="a114e129" sha1="8f150ea3bf6a2931bd718fc377bb432574164705" />
 			</dataarea>
 		</part>
 	</software>
@@ -18384,6 +18955,1565 @@ legacy FM implementations cannot find it.
 
 <!-- Homebrew / Doujin software -->
 
+	<software name="daedopus">
+		<description>Daedalian Opus</description>
+		<year>2006</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="daedalian opus - karoshi corporation (2006).rom" size="0x8000" crc="d7edf15d" sha1="3574a6dc954579341934452feb141859b7cfa3bc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dngrtwr">
+		<description>Danger Tower</description>
+		<year>2009</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Danger Team"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="danger tower - danger team (2009).rom" size="0x8000" crc="02c3af4a" sha1="595ed23f45a8382739a3b865e153583f41f4ead7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="daqlidar">
+		<description>DAQ Lord of Idar</description>
+		<year>2010</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Darkstone"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="daq lord of idar - darkstone (2010).rom" size="0x8000" crc="39cd51da" sha1="9be7612db1f968455dcd0b115239efcb91474e91" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="daqlidara" cloneof="daqlidar">
+		<description>DAQ Lord of Idar (flashrom version)</description>
+		<year>2010</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Darkstone"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="daq lord of idar - darkstone (2010) (flashrom version).rom" size="0x8000" crc="4b8106b1" sha1="053c7ff78dce7c3b24250f64ca6b139182e14844" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deepcore">
+		<description>Deep Core Raider</description>
+		<year>2020</year>
+		<publisher>Paul Jenkinson</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="deep core raider - paul jenkinson (2020).rom" size="0x8000" crc="1306a8b3" sha1="f6cf7936ee1c6ad70de4254ecc9de72c0ea4c6c2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deepdung">
+		<description>Deep Dungeon Adventure (cartridge)</description>
+		<year>2016</year>
+		<publisher>Trilobyte</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="deep dungeon adventure - trilobyte (2016) (cartridge).rom" size="0xc000" crc="96bd10ee" sha1="4071d5de5fa498f5d87110fc1da1d0149293a867" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deepdunga" cloneof="deepdung">
+		<description>Deep Dungeon Adventure (cartridge, alt)</description>
+		<year>2009</year>
+		<publisher>Matra</publisher>
+		<info name="developer" value="Trilobyte"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="deep dungeon adventure - trilobyte (2009) (cartridge, alt).rom" size="0xc000" crc="538fe6bf" sha1="dbe3f131989ff784cafb910da0076d10e7c178b1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deepdungb" cloneof="deepdung">
+		<description>Deep Dungeon Adventure</description>
+		<year>2009</year>
+		<publisher>Trilobyte</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="deep dungeon adventure - trilobyte (2009).rom" size="0x8000" crc="8686edd7" sha1="38de114353c7cc1525e1a129c715aa5428416d69" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deepdungc" cloneof="deepdung">
+		<description>Deep Dungeon</description>
+		<year>2009</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Trilobyte"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="deep dungeon - trilobyte (2009).rom" size="0x8000" crc="012e13d3" sha1="4233ab2fb0d956e0efb43e2a489ca46b65aeda8f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defence">
+		<description>Defence (v1.3)</description>
+		<year>2022</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="GameCast Entertainment"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="defence - gamecast entertainment (2022) (v1.3).rom" size="0x8000" crc="00840e27" sha1="b69e6828fdaedd78a2ce2b3b91c4048541849aa0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defence12" cloneof="defence">
+		<description>Defence (v1.2)</description>
+		<year>2022</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="GameCast Entertainment"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="defence - gamecast entertainment (2022) (v1.2).rom" size="0x8000" crc="c39b5168" sha1="5eb0dd08998a41648ddc1e196954583d605514ad" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defence11" cloneof="defence">
+		<description>Defence (v1.1)</description>
+		<year>2022</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="GameCast Entertainment"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="defence - gamecast entertainment (2022) (v1.1).rom" size="0x8000" crc="9534d094" sha1="cf57734708cd77e2cd83042353d1559117b73195" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defence10" cloneof="defence">
+		<description>Defence (v1.0)</description>
+		<year>2022</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="GameCast Entertainment"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="defence - gamecast entertainment (2022) (v1.0).rom" size="0x8000" crc="1f9f6701" sha1="3c62c7e5f3e2a28240eb15da97febcc85c4befec" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="destroyr">
+		<description>Destroyer</description>
+		<year>2014</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="CEZ / RetroWorks"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="destroyer - cez retroworks (2014).rom" size="0x4000" crc="a366950a" sha1="b1cb1eef123cd685dd22738cebeee4b67d00710b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="destroyro" cloneof="destroyr">
+		<description>Destroyer (older)</description>
+		<year>2014</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="CEZ / RetroWorks"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="destroyer - cez retroworks (2014) (older).rom" size="0x4000" crc="1e4f0071" sha1="fd646f058d1d194a42daad034c17bb1a117555a4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Github release is v1.12, title screen says v1.2 -->
+	<software name="diced">
+		<description>DICED Tournament (v1.12/v1.2)</description>
+		<year>2022</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Mi-Chi &amp; DefDanny"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="diced tournament - mi-chi &amp; defdanny (2022) (v1.12).rom" size="0x52000" crc="3d530e48" sha1="1632fb300a4cc07f0ead7c33abf1e5b2ad2b4c2a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diced101" cloneof="diced">
+		<description>DICED Tournament (v1.01)</description>
+		<year>2022</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Mi-Chi &amp; DefDanny"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="diced tournament - mi-chi &amp; defdanny (2022) (v1.01).rom" size="0x52000" crc="ac93d42c" sha1="034d7034291ba0a461ae439bcb8885726e3d7b7b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diced10" cloneof="diced">
+		<description>DICED Tournament (v1.0)</description>
+		<year>2022</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Mi-Chi &amp; DefDanny"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="diced tournament - mi-chi &amp; defdanny (2022) (v1.0).rom" size="0x52000" crc="67695642" sha1="6fcc3e29391a65bd2e7e7ab1423dc511ad938997" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jinj2">
+		<description>Jinj 2 - Belmonte's Revenge (final)</description>
+		<year>2012</year>
+		<publisher>RetroWorks</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="jinj 2 - retroworks (2012) (final).rom" size="0x8000" crc="628ffbce" sha1="58eee6e9fc84fd9ff23e0ed6be0024fe91756e20" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jinj220" cloneof="jinj2">
+		<description>Jinj 2 - Belmonte's Revenge (v2.0)</description>
+		<year>2012</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="RetroWorks"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="jinj 2 - retroworks (2012) (v2.0).rom" size="0x8000" crc="d43cf107" sha1="007c2b7d2f640a9fdc295cb2c65efd89574afb43" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jinj210" cloneof="jinj2">
+		<description>Jinj 2 - Belmonte's Revenge (v1.0)</description>
+		<year>2012</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="RetroWorks"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="jinj 2 - retroworks (2012) (v1.0).rom" size="0x8000" crc="627e377d" sha1="3302b30e24374a668c85744849ad9af3657f47ad" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dothesam">
+		<description>Do The Same (v1.1)</description>
+		<year>2021</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="EM"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="do the same - em (2021) (v1.1).rom" size="0x8000" crc="220709e4" sha1="31eec0237c7eb96d984619c60273a1740f12c136" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dothesam10" cloneof="dothesam">
+		<description>Do The Same (v1.0)</description>
+		<year>2021</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="EM"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="do the same - em (2021) (v1.0).rom" size="0x8000" crc="aa2401a7" sha1="4514252a06fda072198facbce549568de4008afc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Does not work on 60Hz machines. -->
+	<software name="dodgravn">
+		<description>Dodgin' Raven</description>
+		<year>2009</year>
+		<publisher>Karoshi Corporation</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x6000">
+				<rom name="dodgin raven - karoshi corporation (2009).rom" size="0x6000" crc="8b5170df" sha1="03cbca9e6e9a8ef5742ce0ae173a3884f74dbd54" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doopmcom">
+		<description>Doopm Community</description>
+		<year>2016</year>
+		<publisher>N.I</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="doopm community - n.i (2016).rom" size="0x4000" crc="0984f723" sha1="016a269cb2a4924286dfff71a187598ca26f93c2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dotatack">
+		<description>Dot Attack</description>
+		<year>2020</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="NOP"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="dot attack - nop (2020).rom" size="0x8000" crc="0dd83b99" sha1="ad3ca1918288b4c5e7c5f831ff7a1756b4703e7a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dotatacka" cloneof="dotatack">
+		<description>Dot Attack (alt)</description>
+		<year>2020</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="NOP"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="dot attack - nop (2020) (alt).rom" size="0x8000" crc="fdab9733" sha1="42213dfdc2b348eeb0905cb3c764a7059114b4d5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drpill">
+		<description>Dr. Pill</description>
+		<year>2009</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Infinite"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="dr. pill - infinite (2009).rom" size="0x20000" crc="27ff4efd" sha1="fe192b900c12b5dfaf59f022e57e17a4d2738623" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drpilla" cloneof="drpill">
+		<description>Dr. Pill (alt)</description>
+		<year>2009</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Infinite"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="dr. pill - infinite (2009) (alt).rom" size="0x20000" crc="a8e518cd" sha1="5993ce557a93f8a81cd21f49244af047c04218cb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dracthrn">
+		<description>Draconic Throne</description>
+		<year>2017</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="GW's Workshop"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="draconic throne - gws workshop (2017).rom" size="0x8000" crc="1109499f" sha1="39b11232bf539a953e528c574ae5776766c5d03e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dracthrna" cloneof="dracthrn">
+		<description>Draconic Throne (alt)</description>
+		<year>2017</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="GW's Workshop"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="draconic throne - gws workshop (2017) (alt).rom" size="0x8000" crc="8d382de6" sha1="cefe6636d64f2333ccc610caf405195c16344d3c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dracthrnb" cloneof="dracthrn">
+		<description>Draconic Throne (alt 2)</description>
+		<year>2017</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="GW's Workshop"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="draconic throne - gws workshop (2017) (alt 2).rom" size="0x8000" crc="fead306d" sha1="d2a86f789a3869bee18c061866a14a043da9a69f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- gfx9000 not supported -->
+	<software name="dreampzl" supported="no">
+		<description>Dream Puzzle</description>
+		<year>2018</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Mapax"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x400000">
+				<rom name="dream puzzle - mapax (2018).rom" size="0x400000" crc="ba443ce9" sha1="ddeb8d9903c2ef90360fcf385e20e4e02e334b76" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Requires a light gun -->
+	<software name="duckhunt" supported="no">
+		<description>Duck Hunt</description>
+		<year>2004</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="duck hunt - karoshi corporation (2004).rom" size="0x2000" crc="f5b5ed7d" sha1="a6145a658ac51d8f455ac60629ed2d118d50f1ad" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="duckstrm">
+		<description>Duckstroma (v1.02)</description>
+		<year>2020</year>
+		<publisher>UltraNarwhal</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="duckstroma - ultranarwhal (2020) (v1.02).rom" size="0x8000" crc="4e964017" sha1="cb24250769363914ed747d6b394a52459085acff" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="duckstrm100" cloneof="duckstrm">
+		<description>Duckstroma (v1.00)</description>
+		<year>2020</year>
+		<publisher>UltraNarwhal</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="duckstroma - ultranarwhal (2020) (v1.00).rom" size="0x8000" crc="80e31215" sha1="76f560d4438a32f6042f25fa4e1fd2cb89ccaf01" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="earthatt">
+		<description>Earth Attack</description>
+		<year>2021</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="earth attack - thegeps (2021).rom" size="0x8000" crc="c9596ccb" sha1="b4335bf70d19d80a1e59faa890e04c5fefee0072" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eatblue">
+		<description>Eat Blue! 2004</description>
+		<year>2004</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Paxanga Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="eat blue 2004 - paxanga soft (2004).rom" size="0x2000" crc="caef6e71" sha1="d31eb4ff4d6e4b3af645f24388c734a1d00a0c47" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eatbluea" cloneof="eatblue">
+		<description>Eat Blue! 2004 (alt)</description>
+		<year>2004</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Paxanga Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="eat blue 2004 - paxanga soft (2004) (alt).rom" size="0x2000" crc="1ac005a0" sha1="30c6f72928b81c7d37d192cf6d6d6d3d1232469b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="erukafb">
+		<description>Eruka Fan Book</description>
+		<year>2016</year>
+		<publisher>N.I</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="eruka - n.i (2016).rom" size="0xc000" crc="d08d9358" sha1="8511c79774a2aa1913ece5fde339cf0082fc09ab" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="estapant">
+		<description>Está en el Pantano</description>
+		<year>2010</year>
+		<publisher>RELEVO Videogames</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="esta en el pantano - relevo videogames (2010).rom" size="0x8000" crc="3bb41093" sha1="f1550e958a0664f5966568e2677c3a041ba940d5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="estacaja">
+		<description>Está en la Caja (v1.1)</description>
+		<year>2009</year>
+		<publisher>RELEVO Videogames</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="esta en la caja - relevo videogames (2009) (v1.1).rom" size="0x8000" crc="1a9fda56" sha1="2e41133411cf9e4e9f6af42bb61eaf93b9ed5712" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="estacaja10" cloneof="estacaja">
+		<description>Está en la Caja (v1.0)</description>
+		<year>2009</year>
+		<publisher>RELEVO Videogames</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="esta en la caja - relevo videogames (2009) (v1.0).rom" size="0x8000" crc="2aa983ac" sha1="76b7fd1aed062d3ee5dbad6a94fb81c3e753e9f6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exchess">
+		<description>ExChess</description>
+		<year>2012</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="GarlicSoft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="exchess - garlicsoft (2012).rom" size="0x8000" crc="65687246" sha1="5d6861cfa10dd57315956e25a3c302a711605e44" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="factinfc">
+		<description>Factory Infection</description>
+		<year>2004</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="factory infection - karoshi corporation (2004).rom" size="0x2000" crc="43f31061" sha1="1c90a57cc1237bdadd70d90d74e69c33d7a89293" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fantfoot">
+		<description>Fantastic Football</description>
+		<year>2021</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Zoran Majcenić"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="fantastic football - zoran majcenic (2021).rom" size="0xc000" crc="51e1fe56" sha1="1981c852c8b47e9596cd8a6869d5665f3c730d59" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="farm">
+		<description>Farm</description>
+		<year>2019</year>
+		<publisher>N.I</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="farm - n.i (2019).rom" size="0x2000" crc="61cee4ab" sha1="c621f4e32383914dc2e7fd250454b0fbf254720a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fartypig">
+		<description>Farty Pig (beta)</description>
+		<year>2020</year>
+		<publisher>Flappy Bird Challenge</publisher>
+		<info name="developer" value="TheGeps"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="farty pig - thegeps (2020) (beta).rom" size="0x4000" crc="5ddd1e48" sha1="d398ac4a0ad3923fcbd87f0164967276dc7f632a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="findit">
+		<description>Find It!</description>
+		<year>2020</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Fabf"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="find it - fabf (2020).rom" size="0x4000" crc="f4f2f480" sha1="d54e797d739fc7a5e5b0c43a910f34ea6af58ab2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flappybcf">
+		<description>Flappy Bird (Crunchworks, rev F)</description>
+		<year>2019</year>
+		<publisher>Crunchworks</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="flappy bird - crunchworks (2019) (rev f).rom" size="0x2000" crc="5f145428" sha1="822e827772157f89e4fe5277736c970595771c87" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flappybcfa" cloneof="flappybcf">
+		<description>Flappy Bird (Crunchworks, rev F, alt)</description>
+		<year>2019</year>
+		<publisher>Crunchworks</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="flappy bird - crunchworks (2019) (rev f, alt).rom" size="0x2000" crc="46125867" sha1="7fdc2c70bcfd2560aa9523001cbaeeb8652418b8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flappybcb" cloneof="flappybcf">
+		<description>Flappy Bird (Crunchworks, rev B)</description>
+		<year>2014</year>
+		<publisher>Crunchworks</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="flappy bird - crunchworks (2014) (rev b).rom" size="0x2000" crc="a6fa12b8" sha1="c5cdd1109b1e24906c5f0530f09e9ec95fbd7bb0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flappybs">
+		<description>Flappy Bird (SCS)</description>
+		<year>2014</year>
+		<publisher>SCS</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="flappy bird - scs (2014).rom" size="0x4000" crc="c4b07e01" sha1="bfec80f1c35293f31be8b34058e2e0e6da9aef09" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flyguy">
+		<description>FlyGuy</description>
+		<year>2021</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Robosoft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="flyguy - robosoft (2021).rom" size="0x8000" crc="955fc82b" sha1="36ea537101b57f729bd7da25304f92bdf1471dd4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frmldice">
+		<description>Formula Dice</description>
+		<year>2009</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="robylu"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="formula dice - robylu (2009).rom" size="0x4000" crc="7f118b40" sha1="5c3ccb1681fbf63ebe318d05616eebace91b5ed9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foryster">
+		<description>Foryster (v00.9)</description>
+		<year>2022</year>
+		<publisher>Siudym</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="foryster - siudym (2022) (v00.9).rom" size="0x8000" crc="33787ba7" sha1="848678718e050d8c98dbf5a4b74440fa720314b6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foryster03" cloneof="foryster">
+		<description>Foryster (v00.3)</description>
+		<year>2022</year>
+		<publisher>Siudym</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="foryster - siudym (2022) (v00.3).rom" size="0x8000" crc="82137f5a" sha1="98722272c070f0ecb6a90ed502904066727ce2c1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foryster02" cloneof="foryster">
+		<description>Foryster (v00.2)</description>
+		<year>2022</year>
+		<publisher>Siudym</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="foryster - siudym (2022) (v00.2).rom" size="0x8000" crc="3dfb25d8" sha1="c20792bea3506a679ec40a5796e90722a03ee79e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght">
+		<description>Freedom Fighter (final)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x40000">
+				<rom name="freedom fighter - thegeps (2020).rom" size="0x30000" crc="1d75c0b4" sha1="fe3ef5f553570b7d81da1dc94d15ae25b5ea331d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght19" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.9)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.9).rom" size="0x20000" crc="c570ea63" sha1="1b8db65bdc29b7868bd73644f35dcc5cc8fc75ac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght18a" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.8a)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.8a).rom" size="0x20000" crc="78ca8923" sha1="4a102bdda151da512988d24ee6bee6610edd6558" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght18" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.8)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.8).rom" size="0x20000" crc="8257fa7f" sha1="8a8fae418f092d2e1d40da03ddaefda18abb012f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght17" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.7)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.7).rom" size="0x20000" crc="24ee1fe4" sha1="eb2cb0e6d45492c01da9fb99c501db09d9fa8c27" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght16" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.6)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.6).rom" size="0x20000" crc="1679bfcc" sha1="8222b6338dd57223f864aaacecc1d1153b696975" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght15" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.5)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.5).rom" size="0x20000" crc="c2252e70" sha1="632423b549219b0413d12fdd5ef883dbba3fbcaf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght14" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.4)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.4).rom" size="0x20000" crc="e35f8bf8" sha1="2f6a4171274bcaff83d1d16d04952d70a65cc1d8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght13" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.3)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.3).rom" size="0x20000" crc="01976e19" sha1="2b6e2ac79f5f650e24ccf7b2730aed15184c0b41" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght12a" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.2a)</description>
+		<year>2020</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="TheGeps"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.2a).rom" size="0x20000" crc="6e7be17e" sha1="d70a799daf9134a762259477c61493b4b02be71d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght11" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.1)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.1).rom" size="0x20000" crc="15e0b97e" sha1="ac13c262401f6d646b3ce2d930c141069604e38a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frdmfght10" cloneof="frdmfght">
+		<description>Freedom Fighter (v1.0)</description>
+		<year>2020</year>
+		<publisher>TheGeps</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="freedom fighter - thegeps (2020) (v1.0).rom" size="0x20000" crc="f831de82" sha1="a8b64009424f518b9e9714b3a5e7b548a4e60eb2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gmonkey">
+		<description>G-Monkey</description>
+		<year>2008</year>
+		<publisher>2KBOS</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="g-monkey - karoshi corporation (2008).rom" size="0x2000" crc="7854cfc4" sha1="affc4dcc0b2c8846202cd99a2f0ef27fc705d96d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="genesis">
+		<description>Genesis Dawn of a New Day</description>
+		<year>2012</year>
+		<publisher>Retroworks</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="genesis dawn of a new day - retroworks (2012).rom" size="0x20000" crc="391e6f9a" sha1="025ba6d1021eadf0c4ff1e189389b31adb08f6fe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="genesisa" cloneof="genesis">
+		<description>Genesis Dawn of a New Day (alt)</description>
+		<year>2012</year>
+		<publisher>Retroworks</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="genesis dawn of a new day - retroworks (2012) (alt).rom" size="0x20000" crc="21c3999f" sha1="ff79f5f9c29041083c2359f85dd75b02fe07bfc6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gniffel">
+		<description>Gniffel</description>
+		<year>2004</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Dioniso"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="gniffel - dioniso (2004).rom" size="0x2000" crc="aa568406" sha1="071e07f110bf1b2574c63f81042fc80c894e3f73" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goal">
+		<description>Goal</description>
+		<year>2018</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="G.G.G. Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="goal - g.g.g. soft (2018).rom" size="0x10000" crc="5b232af5" sha1="e6b1af53fd225ce565c88572d6a592b4fb637840" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goala" cloneof="goal">
+		<description>Goal (alt)</description>
+		<year>2018</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="G.G.G. Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="goal - g.g.g. soft (2018) (alt).rom" size="0x10000" crc="2f94bdec" sha1="b57eca5206a235318397f7461d7f541b44ca2f01" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gommyce">
+		<description>Gommy - Medieval Defender - Cartridge Edition</description>
+		<year>2013</year>
+		<publisher>Retroworks</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="gommy - medieval defender - cartridge edition - retroworks (2013).rom" size="0xc000" crc="00cc2162" sha1="f9eb4335d482508fa822d103b95017aaf59ca724" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gommye" cloneof="gommyce">
+		<description>Gommy - Medieval Defender (English)</description>
+		<year>2013</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Retroworks, Dimension Z, nenefranz"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="gommy - medieval defender - retroworks (2013) (english).rom" size="0x4000" crc="66b27261" sha1="da3555f2f6fd6341ef4c5bc878b45581101a1126" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gommys" cloneof="gommyce">
+		<description>Gommy - Medieval Defender (Spanish)</description>
+		<year>2013</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Retroworks, Dimension Z, nenefranz"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="gommy - medieval defender - retroworks (2013) (spanish).rom" size="0x4000" crc="cb628d7a" sha1="ed73332e7053aab6471f9eb3fea00be25923641f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gemmasdp">
+		<description>Gorgeous Gemma in Escape from the Space Disposal Planet</description>
+		<year>2014</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Impulse9"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="gorgeous gemma in escape from the space disposal planet - impulse9 (2014).rom" size="0x8000" crc="818ccade" sha1="bc56324cb10a1fc2ec5094812f6ffebf481d97f6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gemmasdpo" cloneof="gemmasdp">
+		<description>Gorgeous Gemma in Escape from the Space Disposal Planet (older)</description>
+		<year>2014</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Impulse9"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="gorgeous gemma in escape from the space disposal planet - impulse9 (2014) (older).rom" size="0x8000" crc="f101f812" sha1="d85298a9cdd9bcb4a546cb020ebaccd3c4281f07" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gravitica">
+		<description>GRAVITICA</description>
+		<year>2018</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Yusuke Miyauchi"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="gravitica - yusuke miyauchi (2018).rom" size="0x8000" crc="3bc64731" sha1="9dec583ada35979e62d1d6ad296a8916f3de9414" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="greencat">
+		<description>Green Cat Chronicles</description>
+		<year>2018</year>
+		<publisher>N.I</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="green cat chronicles - n.i (2018).rom" size="0x4000" crc="7cfd2174" sha1="fafa7b2f249983c8e92d6a9f67ef71f75deb07e5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gridwars">
+		<description>Grid Wars</description>
+		<year>2006</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Emma Six"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="grid wars - emma six (2006).rom" size="0x8000" crc="03b56d90" sha1="0e6b6644021dbfad3c486c378818ea5e432bb9fd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grielex">
+		<description>Griel's Quest for the Sangraal (extended edition)</description>
+		<year>2005</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="griel's quest for the sangraal - karoshi corporation (2005) (extended).rom" size="0x8000" crc="c9427fe2" sha1="acb6e93227bc89da119443e03890b58a1befc0b0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grielexo" cloneof="grielex">
+		<description>Griel's Quest for the Sangraal (extended edition, older)</description>
+		<year>2005</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="griel's quest for the sangraal - karoshi corporation (2005) (extended, older).rom" size="0x8000" crc="1da914f3" sha1="4dd2ec21474720eb56f012bb761117b4d507f331" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="griel" cloneof="grielex">
+		<description>Griel's Quest for the Sangraal</description>
+		<year>2005</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="griel's quest for the sangraal - karoshi corporation (2005).rom" size="0x8000" crc="6cebb29b" sha1="5a9364271ddca5208b625c891f01a89fd2367a8d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grielo" cloneof="grielex">
+		<description>Griel's Quest for the Sangraal (older)</description>
+		<year>2005</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="griel's quest for the sangraal - karoshi corporation (2005) (older).rom" size="0x8000" crc="3e7cd0e2" sha1="989d9ba7c0f29694fa3b737d09cf102606b2fd5b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guntus">
+		<description>Guntus</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="guntus - innufuto (2022).rom" size="0x2dd5" crc="54722d30" sha1="74d4d4cf97cc18ac355040ee04a44d50b545f16a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gurulogc">
+		<description>Guru Logic</description>
+		<year>2003</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="guru logic - karoshi corporation (2003).rom" size="0x8000" crc="e18e58e9" sha1="a355e49523edce5f15ebf92b8320ffa6523c1382" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gurulogca" cloneof="gurulogc">
+		<description>Guru Logic (alt)</description>
+		<year>2003</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Karoshi Corporation"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="guru logic - karoshi corporation (2003) (alt).rom" size="0x8000" crc="28efb895" sha1="3f52c04e64688e8a5cbfc95b21ef03698e1de518" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- SN76489 not emulated -->
+	<software name="gyruss" supported="no">
+		<description>Gyruss</description>
+		<year>2017</year>
+		<publisher>Repro Factory</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="gyruss - repro factory (2017).rom" size="0x10000" crc="e58619bb" sha1="7ba4725a6c0f11f009ed2a333f9951f22cc5b4c7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hansadv">
+		<description>Hans' Adventure (v1.1)</description>
+		<year>2010</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="The Pets Mode"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="hans' adventure - the pets mode (2010) (v1.1).rom" size="0xc000" crc="c7452eca" sha1="6835f0aba6c95a106309129f90f58adf04994f14" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hansadv10" cloneof="hansadv">
+		<description>Hans' Adventure (v1.0)</description>
+		<year>2010</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="The Pets Mode"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="hans' adventure - the pets mode (2010) (v1.0).rom" size="0xc000" crc="821c56f4" sha1="9c6c43af0516e7232a7aaafee5a47235232cf7f9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="happyhal">
+		<description>Happy Halloween</description>
+		<year>2018</year>
+		<publisher>Clube MSX Magazine</publisher>
+		<info name="developer" value="Mario Cavalcanti"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="happy halloween - mario cavalcanti (2018).rom" size="0x4000" crc="1b02a98a" sha1="0e266e0cd7938e6d97a58363003e2a6ef492348d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hsqrxmas">
+		<description>Happy Square Christmas</description>
+		<year>2010</year>
+		<publisher>303bcn</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="happy square christmas - 303bcn (2010).rom" size="0x8000" crc="3846014a" sha1="63ddb6adb4a3b95a596f9aa876cb658929392d13" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hrtstlr2">
+		<description>Heart Stealer 2</description>
+		<year>2021</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Timmy"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="heart stealer 2 - timmy (2021).rom" size="0x4000" crc="8ccde019" sha1="2a57cc0f5610ca55f5bfb6994033adddc38d9203" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heroesar">
+		<description>Heroes Arena</description>
+		<year>2010</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Imanok"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="heroes arena - imanok (2010).rom" size="0x8000" crc="3c6c9c72" sha1="fa6172ba3a78c03ed6194dee6e26a1dc3adb939f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hosediog">
+		<description>Hose Diogo Martinez: The Bussas Quest</description>
+		<year>2008</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Muffie Co."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="hose diogo martinez - muffie co (2008).rom" size="0x4000" crc="2d0d5419" sha1="21e44cc5957b65b24c34d2c42b39879cacd82ff9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="howdumbl">
+		<description>How Many Are The Dumbbells You Lift?</description>
+		<year>2019</year>
+		<publisher>Cobinee</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="how many are the dumbbells you lift? - cobinee (2019).rom" size="0x8000" crc="21090c38" sha1="9f177a508930bda78841413218a927a230be7ac5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ineedspd">
+		<description>I Need Speed (MSX Cartridge Shop)</description>
+		<year>2009</year>
+		<publisher>MSX Cartridge Shop</publisher>
+		<info name="developer" value="CEZ Games Studio"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="i need speed - msx cartridge shop (2009).rom" size="0xc000" crc="97831466" sha1="c6c079b105492f7665a8d6ccb81e337b864582fa" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ineedspdf" cloneof="ineedspd">
+		<description>I Need Speed (final)</description>
+		<year>2008</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="CEZ Games Studio"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="i need speed - cez games studio (2009)(final).rom" size="0xc000" crc="e00fc003" sha1="0293bc55df4f9b7fb97ae9cded8ab2c5c9ed0fd4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ineedspdm" cloneof="ineedspd">
+		<description>I Need Speed (contest)</description>
+		<year>2009</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="CEZ Games Studio"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="i need speed - cez games studio (2006)(msxdev).rom" size="0xc000" crc="6bd36d0f" sha1="bd46981d1b580ec9a2d1d909f5c1a8dfd9a71ed7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inertia">
+		<description>I.N.E.R.T.I.A.</description>
+		<year>2006</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Andrea Rossetti"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="i.n.e.r.t.i.a. - andrea rossetti (2006).rom" size="0x4000" crc="0ad95c4c" sha1="a53610adcf84bdb1b84d94d4c6d1f0a7d45e9ddd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impetus">
+		<description>Impetus</description>
+		<year>2021</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="impetus - inufuto (2021).rom" size="0x4000" crc="8b041688" sha1="b31b68de515469a836bb570ae88fa321059b6602" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inqsuqnm">
+		<description>Inq &amp; Suq vs Nightmare</description>
+		<year>2018</year>
+		<publisher>Matra</publisher>
+		<info name="developer" value="GW's Workshop"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="inq &amp; suq vs nightmare - gw's workshop (2018).rom" size="0x8000" crc="25c6e10f" sha1="6b58d0d84eb9e7b901ee7ba990ae8fe4cafa65ec" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invzombm">
+		<description>Invasion of the Zombie Monsters</description>
+		<year>2010</year>
+		<publisher>RELEVO Videogames</publisher>
+		<info name="developer" value="RELEVO Videogames"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="invasion of the zombie monsters - relevo videogames (2010).rom" size="0x8000" crc="a232351f" sha1="bf2452f9932cbce5986f72eb04d4c1ecec045b7f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="isitar7">
+		<description>Isitar 7</description>
+		<year>2019</year>
+		<publisher>N.I</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="isitar 7 - n.i (2019).rom" size="0x8000" crc="d7795487" sha1="da9c15e0f960554ffe4357cd00006afbaa69a414" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="italstal">
+		<description>Italian Stallion</description>
+		<year>2007</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Impulse 9"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="italian stallion - impulse 9 (2007).rom" size="0x8000" crc="904e0edd" sha1="64f921c9c57aedb47663a269046d4c51388f41fb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jetpac">
+		<description>J.E.T.P.A.C.</description>
+		<year>2009</year>
+		<publisher>MSX Cartridge Shop</publisher>
+		<info name="developer" value="Imanok"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="j.e.t.p.a.c. - imanok (2009).rom" size="0x8000" crc="38ad7112" sha1="cc13bac2f50f58bc466d605839187cf09dbe269c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jaasta">
+		<description>Jäästä</description>
+		<year>2020</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Uninteresting"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="jaasta - uninteresting (2020).rom" size="0x8000" crc="77380a9d" sha1="e5e0da269094bd2bf1e2aadd92d6523518f4de89" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jawbreak">
+		<description>Jawbreaker II</description>
+		<year>2014</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Maggoo"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="jawbreaker ii - maggoo (2014).rom" size="0x4000" crc="4137905f" sha1="ae3eb3af124b36878ab4f189abfc3737bfd3d56a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jumping">
+		<description>JumpinG - The Tutorial Game (English)</description>
+		<year>2011</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Dimension Z"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="jumping - dimension z (2011) (english).rom" size="0x8000" crc="7f492f09" sha1="dbea257c0f3cc4d46a94d2db30370df64eb02221" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jumpings" cloneof="jumping">
+		<description>JumpinG - The Tutorial Game (Spanish)</description>
+		<year>2011</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Dimension Z"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="jumping - dimension z (2011) (spanish).rom" size="0x8000" crc="d19a6356" sha1="74f7fba8a016e4ead892c2db5970028ed1aa4fa2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jumpingsd" cloneof="jumping">
+		<description>JumpinG - The Tutorial Game (Spanish, demo)</description>
+		<year>2011</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Dimension Z"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="jumping - dimension z (2011) (spanish, demo).rom" size="0x8000" crc="1e81a253" sha1="a0643d70c853d667eb680c82b9b5f0a2322a7809" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jnglhunt">
+		<description>Jungle Hunt</description>
+		<year>2007</year>
+		<publisher>Icon Games</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="jungle hunt - icon games (2007).rom" size="0x8000" crc="2119b92d" sha1="c9a89cceb355e5daf47ed5e8ee3e211ebd2494d8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="killmice">
+		<description>Kill Mice</description>
+		<year>2011</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Gamecast Entertainment"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="kill mice - gamecast entertainment (2011).rom" size="0x10000" crc="783afacb" sha1="5bf2b21a9b97e744cef71f2f6e9cacbbf695f3f6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="klondike">
+		<description>Klondike Solitaire</description>
+		<year>2021</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Under4Mhz"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="klondike solitaire - under4mhz (2021).rom" size="0x8000" crc="dcd00173" sha1="07fc9c7ab63777f75f1adb1af7038d0ce1be52e4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kobashi">
+		<description>Kobashi</description>
+		<year>2004</year>
+		<publisher>msx.org Underwater Challenge</publisher>
+		<info name="developer" value="Desire In Envy"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="kobashi - desire in envy (2004).rom" size="0x2000" crc="d137c518" sha1="e0854e9322c113ecbccf61f9de1c0a59bda03d23" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="k8tetris">
+		<description>Kralizec 8K Tetris</description>
+		<year>2004</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Kralizec"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="kralizec 8k tetris - kralizec (2004).rom" size="0x2000" crc="56b234fc" sha1="7056a2bea5013894930279f8c09cc77633964778" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kbtetris">
+		<description>Kralizec Battle Tetris</description>
+		<year>2004</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Kralizec"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="kralizec battle tetris - kralizec (2004).rom" size="0x2000" crc="5a5748f7" sha1="9776da8b475d81400e027e37d949ccffbb33fe30" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="krtetris">
+		<description>Kralizec Tetris</description>
+		<year>2005</year>
+		<publisher>Kralizec</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="kralizec tetris - kralizec (2005).rom" size="0x8000" crc="4a41a3c4" sha1="864824c2ef01945b7fccb3ec3399347b714d6aac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="krtetrisa">
+		<description>Kralizec Tetris (alt)</description>
+		<year>2005</year>
+		<publisher>Kralizec</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="kralizec tetris - kralizec (2005) (alt).rom" size="0x8000" crc="9235ea8d" sha1="1fbf5640df41fe48c7d64ffc51e33b57b41fd7e1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="labbaye">
 		<description>l'Abbaye des Morts (v1.2)</description>
 		<year>2020</year>
@@ -19513,7 +21643,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<dataarea name="rom" size="0x20000">
-				<rom name="mr mole - nerlaska studio (2007).rom" size="0x20000" crc="aa6f2968" sha1="168d59fca3170f56858f39d0b53067c0c0d414a8" />
+				<rom name="mr mole - nerlaska studio (2007) (scc).rom" size="0x20000" crc="aa6f2968" sha1="168d59fca3170f56858f39d0b53067c0c0d414a8" />
 			</dataarea>
 		</part>
 	</software>

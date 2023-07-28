@@ -25,7 +25,7 @@ TODO:
 #include "machine/6522via.h"
 #include "machine/74145.h"
 #include "machine/input_merger.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
@@ -393,7 +393,7 @@ void sym1_state::sym1_map(address_map &map)
 	map(0x0c00, 0x0fff).bankr("bank6").bankw("bank7");  // U18/U19 OPT RAM
 	map(0x8000, 0x8fff).rom(); // U20 Monitor ROM
 	map(0xa000, 0xa00f).m("via1", FUNC(via6522_device::map));  // U25 VIA #1
-	map(0xa400, 0xa41f).m("riot", FUNC(mos6532_new_device::io_map));  // U27 RIOT
+	map(0xa400, 0xa41f).m("riot", FUNC(mos6532_device::io_map));  // U27 RIOT
 	map(0xa600, 0xa67f).bankr("bank0").bankw("bank1");   // U27 RIOT RAM
 	map(0xa800, 0xa80f).m("via2", FUNC(via6522_device::map));  // U28 VIA #2
 	map(0xac00, 0xac0f).m("via3", FUNC(via6522_device::map));  // U29 VIA #3
@@ -419,7 +419,7 @@ void sym1_state::sym1(machine_config &config)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	// devices
-	mos6532_new_device &riot(MOS6532_NEW(config, "riot", SYM1_CLOCK));
+	mos6532_device &riot(MOS6532(config, "riot", SYM1_CLOCK));
 	riot.pa_rd_callback().set(FUNC(sym1_state::riot_a_r));
 	riot.pa_wr_callback().set(FUNC(sym1_state::riot_a_w));
 	riot.pb_rd_callback().set(FUNC(sym1_state::riot_b_r));

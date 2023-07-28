@@ -1663,7 +1663,7 @@ void minspace_state::minspace(machine_config &config)
 
 // roms
 
-ROM_START( minspacep )
+ROM_START( minspace )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "cop421_us4345764", 0x0000, 0x0400, CRC(0068c3a3) SHA1(4e5fd566a5a26c066cc14623a9bd01e109ebf797) ) // typed in from patent US4345764, good print quality
 ROM_END
@@ -2820,7 +2820,7 @@ SYST( 1979, msoccer2,   0,         0,      msoccer2,   msoccer2,   mbaskb2_state
 SYST( 1980, lafootb,    0,         0,      lafootb,    lafootb,    lafootb_state,   empty_init, "Mattel Electronics", "Look Alive! Football", MACHINE_SUPPORTS_SAVE )
 SYST( 1981, mdallas,    0,         0,      mdallas,    mdallas,    mdallas_state,   empty_init, "Mattel Electronics", "Dalla$ (J.R. handheld)", MACHINE_SUPPORTS_SAVE ) // ***
 
-SYST( 1980, minspacep,  0,         0,      minspace,   minspace,   minspace_state,  empty_init, "Mego", "Invasion From Space (patent)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, minspace,   0,         0,      minspace,   minspace,   minspace_state,  empty_init, "Mego", "Invasion From Space (patent)", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1980, plus1,      0,         0,      plus1,      plus1,      plus1_state,     empty_init, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS ) // ***
 SYST( 1981, lightfgt,   0,         0,      lightfgt,   lightfgt,   lightfgt_state,  empty_init, "Milton Bradley", "Electronic Lightfight: The Games of Dueling Lights", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

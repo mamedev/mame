@@ -18,6 +18,7 @@
 #include "vga.h"
 #include "vga_ati.h"
 #include "svga_cirrus.h"
+#include "svga_paradise.h"
 #include "svga_s3.h"
 #include "svga_tseng.h"
 #include "svga_trident.h"
@@ -106,6 +107,7 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("vga", ISA8_VGA);
 	device.option_add("svga_et4k", ISA8_SVGA_ET4K);
 	device.option_add("svga_et4k_kasan16", ISA8_SVGA_ET4K_KASAN16);
+	device.option_add("wd90c90_jk", ISA8_WD90C90_JK);
 	device.option_add("num9rev",ISA8_NUM_9_REV);
 	device.option_add("com", ISA8_COM);
 	device.option_add("fdc", ISA8_FDC_SUPERIO);
@@ -160,6 +162,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("vga", ISA8_VGA);
 	device.option_add("svga_et4k", ISA8_SVGA_ET4K);
 	device.option_add("svga_et4k_kasan16", ISA8_SVGA_ET4K_KASAN16);
+	device.option_add("wd90c90_jk", ISA8_WD90C90_JK);
 	device.option_add("num9rev",ISA8_NUM_9_REV);
 	device.option_add("com", ISA8_COM);
 	device.option_add("comat", ISA8_COM_AT);
@@ -217,6 +220,15 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("gfxultrap", ISA16_SVGA_GFXULTRAPRO);
 	device.option_add("tvga9000", ISA16_SVGA_TVGA9000);
 //  device.option_add("tgui9680",ISA16_SVGA_TGUI9680);
+	device.option_add("pvga1a", ISA16_PVGA1A);
+	device.option_add("pvga1a_jk", ISA16_PVGA1A_JK);
+	device.option_add("wd90c00_jk", ISA16_WD90C00_JK);
+	device.option_add("wd90c11_lr", ISA16_WD90C11_LR);
+	device.option_add("wd90c30_lr", ISA16_WD90C30_LR);
+	device.option_add("wd90c31_lr", ISA16_WD90C31_LR);
+	device.option_add("wd90c31a_lr", ISA16_WD90C31A_LR);
+	device.option_add("wd90c31a_zs", ISA16_WD90C31A_ZS);
+	device.option_add("wd90c33_zz", ISA16_WD90C33_ZZ);
 	device.option_add("3c505", ISA16_3C505);
 	device.option_add("mach64", ISA16_SVGA_MACH64);
 	device.option_add("sb16_lle", ISA16_SB16);

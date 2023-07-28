@@ -182,14 +182,11 @@ via6522_device::via6522_device(const machine_config &mconfig, device_type type, 
 	m_in_a(0xff),
 	m_in_ca1(0),
 	m_in_ca2(0),
-	m_out_ca2(0),
 	m_in_b(0xff),
 	m_in_cb1(0),
 	m_in_cb2(0),
 	m_pcr(0),
-	m_acr(0),
-	m_ier(0),
-	m_ifr(0)
+	m_acr(0)
 {
 }
 
@@ -198,8 +195,8 @@ via6522_device::via6522_device(const machine_config &mconfig, device_type type, 
 //  mos6522_device - constructor
 //-------------------------------------------------
 
-mos6522_device::mos6522_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: via6522_device(mconfig, MOS6522, tag, owner, clock)
+mos6522_device::mos6522_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	via6522_device(mconfig, MOS6522, tag, owner, clock)
 {
 }
 
@@ -208,8 +205,8 @@ mos6522_device::mos6522_device(const machine_config &mconfig, const char *tag, d
 //  r65c22_device - constructor
 //-------------------------------------------------
 
-r65c22_device::r65c22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: via6522_device(mconfig, R65C22, tag, owner, clock)
+r65c22_device::r65c22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	via6522_device(mconfig, R65C22, tag, owner, clock)
 {
 }
 
@@ -218,8 +215,8 @@ r65c22_device::r65c22_device(const machine_config &mconfig, const char *tag, dev
 //  r65c22_device - constructor
 //-------------------------------------------------
 
-r65nc22_device::r65nc22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: via6522_device(mconfig, R65NC22, tag, owner, clock)
+r65nc22_device::r65nc22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	via6522_device(mconfig, R65NC22, tag, owner, clock)
 {
 }
 
@@ -228,8 +225,8 @@ r65nc22_device::r65nc22_device(const machine_config &mconfig, const char *tag, d
 //  w65c22s_device - constructor
 //-------------------------------------------------
 
-w65c22s_device::w65c22s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: via6522_device(mconfig, W65C22S, tag, owner, clock)
+w65c22s_device::w65c22s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	via6522_device(mconfig, W65C22S, tag, owner, clock)
 {
 }
 
@@ -244,9 +241,10 @@ void via6522_device::device_start()
 	m_t1lh = 0xb5; /* ports are not written by kernel! */
 	m_t2ll = 0xff; /* taken from vice */
 	m_t2lh = 0xff;
-	m_sr = 0;
 
-	m_time2 = m_time1 = machine().time();
+	m_time1 = machine().time();
+	m_time2 = machine().time();
+
 	m_t1 = timer_alloc(FUNC(via6522_device::t1_tick), this);
 	m_t2 = timer_alloc(FUNC(via6522_device::t2_tick), this);
 	m_ca2_timer = timer_alloc(FUNC(via6522_device::ca2_tick), this);
@@ -254,7 +252,34 @@ void via6522_device::device_start()
 	m_shift_timer = timer_alloc(FUNC(via6522_device::shift_tick), this);
 	m_shift_irq_timer = timer_alloc(FUNC(via6522_device::shift_irq_tick), this);
 
-	/* save state register */
+	// zerofill other
+	m_out_a = 0;
+	m_out_ca2 = 0;
+	m_ddr_a = 0;
+	m_latch_a = 0;
+	m_out_b = 0;
+	m_out_cb1 = 0;
+	m_out_cb2 = 0;
+	m_ddr_b = 0;
+	m_latch_b = 0;
+
+	m_t1cl = 0;
+	m_t1ch = 0;
+	m_t2cl = 0;
+	m_t2ch = 0;
+
+	m_sr = 0;
+	m_pcr = 0;
+	m_acr = 0;
+	m_ier = 0;
+	m_ifr = 0;
+
+	m_t1_active = 0;
+	m_t1_pb7 = 0;
+	m_t2_active = 0;
+	m_shift_counter = 0;
+
+	// save state register
 	save_item(NAME(m_in_a));
 	save_item(NAME(m_in_ca1));
 	save_item(NAME(m_in_ca2));
@@ -262,6 +287,7 @@ void via6522_device::device_start()
 	save_item(NAME(m_out_ca2));
 	save_item(NAME(m_ddr_a));
 	save_item(NAME(m_latch_a));
+
 	save_item(NAME(m_in_b));
 	save_item(NAME(m_in_cb1));
 	save_item(NAME(m_in_cb2));
@@ -270,6 +296,7 @@ void via6522_device::device_start()
 	save_item(NAME(m_out_cb2));
 	save_item(NAME(m_ddr_b));
 	save_item(NAME(m_latch_b));
+
 	save_item(NAME(m_t1cl));
 	save_item(NAME(m_t1ch));
 	save_item(NAME(m_t1ll));
@@ -278,11 +305,13 @@ void via6522_device::device_start()
 	save_item(NAME(m_t2ch));
 	save_item(NAME(m_t2ll));
 	save_item(NAME(m_t2lh));
+
 	save_item(NAME(m_sr));
 	save_item(NAME(m_pcr));
 	save_item(NAME(m_acr));
 	save_item(NAME(m_ier));
 	save_item(NAME(m_ifr));
+
 	save_item(NAME(m_time1));
 	save_item(NAME(m_t1_active));
 	save_item(NAME(m_t1_pb7));
@@ -444,7 +473,7 @@ void via6522_device::shift_out()
 void via6522_device::shift_in()
 {
 	// Only shift in data on raising edge
-	if ( !(m_shift_counter & 1) )
+	if (!(m_shift_counter & 1))
 	{
 		LOGSHIFT("%s shift In SR: %02x->", tag(), m_sr);
 		m_sr =  (m_sr << 1) | (m_in_cb2 & 1);
@@ -863,7 +892,7 @@ void via6522_device::write(offs_t offset, u8 data)
 		break;
 
 	case VIA_DDRB:
-		if ( data != m_ddr_b )
+		if (data != m_ddr_b)
 		{
 			m_ddr_b = data;
 
@@ -1052,7 +1081,7 @@ void via6522_device::set_pa_line(int line, int state)
 		m_in_a &= ~(1 << line);
 }
 
-void via6522_device::write_pa( u8 data )
+void via6522_device::write_pa(u8 data)
 {
 	m_in_a = data;
 }
@@ -1123,7 +1152,7 @@ void via6522_device::set_pb_line(int line, int state)
 	}
 }
 
-void via6522_device::write_pb( u8 data )
+void via6522_device::write_pb(u8 data)
 {
 	if (!BIT(data, 6) && BIT(m_in_b, 6))
 		counter2_decrement();

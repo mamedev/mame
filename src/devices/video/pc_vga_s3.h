@@ -17,12 +17,6 @@ public:
 	// construction/destruction
 	s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint8_t port_03b0_r(offs_t offset) override;
-	virtual void port_03b0_w(offs_t offset, uint8_t data) override;
-	virtual uint8_t port_03c0_r(offs_t offset) override;
-	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
-	virtual uint8_t port_03d0_r(offs_t offset) override;
-	virtual void port_03d0_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
 
@@ -40,6 +34,10 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	virtual void crtc_map(address_map &map) override;
+	virtual void sequencer_map(address_map &map) override;
+
+	// TODO: remove this leaky abstraction
 	struct
 	{
 		uint8_t memory_config;
@@ -89,15 +87,9 @@ protected:
 	} s3;
 	virtual uint16_t offset() override;
 
-protected:
-	uint8_t crtc_reg_read(uint8_t index) override;
-	void crtc_reg_write(uint8_t index, uint8_t data) override;
+	virtual void s3_define_video_mode(void);
 
 private:
-
-	void s3_define_video_mode(void);
-	uint8_t s3_seq_reg_read(uint8_t index);
-	void s3_seq_reg_write(uint8_t index, uint8_t data);
 	ibm8514a_device* m_8514;
 };
 

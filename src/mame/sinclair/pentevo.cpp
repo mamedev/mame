@@ -618,10 +618,10 @@ void pentevo_state::pentevo_io(address_map &map)
 	map(0x0057, 0x0057).select(0xff00).rw(FUNC(pentevo_state::spi_port_57_r), FUNC(pentevo_state::spi_port_57_w));
 
 	// Mouse
-	map(0xfadf, 0xfadf).lr8(NAME([this]() { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));
-	map(0xfbdf, 0xfbdf).lr8(NAME([this]() { return  m_io_mouse[0]->read(); }));
-	map(0xffdf, 0xffdf).lr8(NAME([this]() { return ~m_io_mouse[1]->read(); }));
-	map(0x001f, 0x001f).mirror(0xff00).lr8(NAME([]() { return 0x00; })); // TODO Kepmston Joystick
+	map(0xfadf, 0xfadf).lr8(NAME([this]() -> u8 { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));
+	map(0xfbdf, 0xfbdf).lr8(NAME([this]() -> u8 { return  m_io_mouse[0]->read(); }));
+	map(0xffdf, 0xffdf).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));
+	map(0x001f, 0x001f).mirror(0xff00).lr8(NAME([]() -> u8 { return 0x00; })); // TODO Kepmston Joystick
 
 	// PORTS: Shadow
 	map(0x0000, 0xffff).view(m_io_view);
