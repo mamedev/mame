@@ -16,18 +16,13 @@
 #include "sound/asc.h"
 #include "speaker.h"
 
-// ======================> iosb_device
+// ======================> iosb_base
 
-class iosb_device :  public device_t
+class iosb_base :  public device_t
 {
 public:
 	// construction/destruction
-	iosb_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: iosb_device(mconfig, tag, owner, (uint32_t)0)
-	{
-	}
-
-	iosb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	iosb_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// interface routines
 	auto write_adb_st() { return m_adb_st.bind(); } // ADB state
@@ -67,7 +62,9 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-private:
+	virtual uint8_t via_in_b();
+	virtual void via_out_b(uint8_t data);
+
 	devcb_write8 m_adb_st;
 	devcb_write_line m_cb1, m_cb2;
 	devcb_read_line m_pa1, m_pa2, m_pa4, m_pa6;
@@ -76,10 +73,10 @@ private:
 	required_device<ncr53c96_device> m_ncr;
 	required_device<via6522_device> m_via1, m_via2;
 	required_device<asc_device> m_asc;
-	required_device<rtc3430042_device> m_rtc;
 	required_device<applefdintf_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 
+private:
 	emu_timer *m_6015_timer;
 	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
 	floppy_image_device *m_cur_floppy = nullptr;
@@ -105,9 +102,7 @@ private:
 
 	uint8_t via_in_a();
 	uint8_t via2_in_a();
-	uint8_t via_in_b();
 	void via_out_a(uint8_t data);
-	void via_out_b(uint8_t data);
 	void field_interrupts();
 	void via_out_cb1(int state);
 	void via_out_cb2(int state);
@@ -122,7 +117,45 @@ private:
 	void swim_w(offs_t offset, u16 data, u16 mem_mask);
 };
 
+class iosb_device : public iosb_base
+{
+public:
+	// construction/destruction
+	iosb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	virtual uint8_t via_in_b() override;
+	virtual void via_out_b(uint8_t data) override;
+
+	required_device<rtc3430042_device> m_rtc;
+
+private:
+};
+
+class primetime_device : public iosb_base
+{
+public:
+	// construction/destruction
+	primetime_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	auto pb4_callback() { return write_pb4.bind(); }
+	auto pb5_callback() { return write_pb5.bind(); }
+	auto pb3_callback() { return read_pb3.bind(); }
+
+protected:
+	virtual uint8_t via_in_b() override;
+	virtual void via_out_b(uint8_t data) override;
+
+	devcb_write_line write_pb4, write_pb5;
+	devcb_read_line read_pb3;
+
+private:
+};
+
 // device type definition
 DECLARE_DEVICE_TYPE(IOSB, iosb_device)
+DECLARE_DEVICE_TYPE(PRIMETIME, primetime_device)
 
 #endif // MAME_APPLE_IOSB_H

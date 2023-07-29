@@ -25,12 +25,6 @@ public:
 
 	auto dafb_irq() { return m_irq.bind(); }
 
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	u32 dafb_r(offs_t offset);
 	void dafb_w(offs_t offset, u32 data);
 	u32 swatch_r(offs_t offset);
@@ -39,6 +33,13 @@ protected:
 	virtual void ramdac_w(offs_t offset, u32 data);
 	virtual u8 clockgen_r(offs_t offset);
 	virtual void clockgen_w(offs_t offset, u8 data);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
 	void recalc_ints();
 	void recalc_mode();
 
@@ -133,6 +134,7 @@ public:
 
 protected:
 	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	virtual u8 clockgen_r(offs_t offset) override;
 	virtual void clockgen_w(offs_t offset, u8 data) override;
@@ -145,7 +147,31 @@ private:
 	u64 m_clock_params;
 };
 
+class dafb_memcjr_device: public dafb_base
+{
+public:
+	dafb_memcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+protected:
+	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override;
+
+	virtual u8 clockgen_r(offs_t offset) override;
+	virtual void clockgen_w(offs_t offset, u8 data) override;
+	virtual u32 ramdac_r(offs_t offset) override;
+	virtual void ramdac_w(offs_t offset, u32 data) override;
+
+private:
+	u8 m_pcbr1;
+	u8 m_last_clock;
+	u32 m_clock_shift;
+	s32 m_bit_clock;
+	u8 m_M, m_N, m_P;
+	u32 m_mclk, m_pclk;
+};
+
 DECLARE_DEVICE_TYPE(DAFB, dafb_device)
 DECLARE_DEVICE_TYPE(DAFB_MEMC, dafb_memc_device)
+DECLARE_DEVICE_TYPE(DAFB_MEMCJR, dafb_memcjr_device)
 
 #endif  /* MAME_APPLE_DAFB_H */

@@ -899,6 +899,11 @@ macpb180                        // 1992 Apple Macintosh PowerBook 180
 macpb180c                       // 1992 Apple Macintosh PowerBook 180c
 macpd210                        // 1992 Apple Macintosh PowerBook Duo 210
 
+@source:apple/macquadra605.cpp
+macqd605                        // 1993 Apple Macintosh Quadra 605
+maclc475                        // 1993 Apple Macintosh LC/Performa 475
+maclc575                        // 1994 Apple Macintosh LC/Performa 575
+
 @source:apple/macquadra700.cpp
 macqd700                        // 1991 Apple Macintosh Quadra 700
 
