@@ -1953,6 +1953,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/msx/cart/loveplus.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/majutsushi.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/majutsushi.h",
+		MAME_DIR .. "src/devices/bus/msx/cart/matra.cpp",
+		MAME_DIR .. "src/devices/bus/msx/cart/matra.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/moonsound.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/moonsound.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/msx_audio.cpp",

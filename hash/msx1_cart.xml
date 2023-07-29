@@ -2961,6 +2961,20 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="csoa" cloneof="cso">
+		<description>C_So! (Japan, alt)</description>
+		<year>1985</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="serial" value="R48X5082" />
+		<info name="alt_title" value="シーソー" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="c-so (japan) (alt).rom" size="0x4000" crc="f302aef4" sha1="8b4853737f7f4006ca4291f481cfdfcf66e2ce34" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="csok" cloneof="cso">
 		<description>C_So! (Korea)</description>
 		<year>198?</year>
@@ -2969,6 +2983,30 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="c-so.rom" size="0x8000" crc="4f195441" sha1="22183520d99924a4185c5572a3cf948f4f0f04b5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="campcond">
+		<description>Campeón de Conductores (Spain)</description>
+		<year>1986</year>
+		<publisher>Toshiba Spain</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="campeon de conductores (spain).rom" size="0x4000" crc="067a7f97" sha1="aabbe983157761623cc6e6de61c8365c37074e49" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cannonf">
+		<description>Cannon Fighter (Japan, The Link)</description>
+		<year>198?</year>
+		<publisher>Policy</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cannon fighter (japan, the link).rom" size="0x4000" crc="d5f7ad2e" sha1="2f05afb4649e0cb58ee0c62f7550f0434603e96d" />
 			</dataarea>
 		</part>
 	</software>
@@ -2982,6 +3020,19 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="cannon_turbo_(1987)_(brother).rom" size="0x8000" crc="1ff280e3" sha1="e997d8f02e413d2df5aed2bf7e79986c4c851d34" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cannonta" cloneof="cannont">
+		<description>Cannon Turbo (Japan, alt)</description>
+		<year>198?</year>
+		<publisher>Brother Kougyou</publisher>
+		<info name="alt_title" value="キャノンターボ" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cannon_turbo_(1987)_(brother) (alt).rom" size="0x4000" crc="67110357" sha1="1765ab792d9d6e9df8458f3aefee9dc399f9bb63" />
 			</dataarea>
 		</part>
 	</software>
@@ -3588,6 +3639,20 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="circuscl" cloneof="circusc">
+		<description>Circus Charlie (Japan, The Link)</description>
+		<year>1984</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RC712" />
+		<info name="alt_title" value="サーカスチャーリー" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="circus charlie (japan, the link).rom" size="0x4000" crc="c5506092" sha1="3b924d7d3768fae4522fbdec01989c3d5efa97f6" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="citycon">
 		<description>City Connection (Japan)</description>
 		<year>1986</year>
@@ -4021,12 +4086,16 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="クレイジートレイン" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="0"/>
-			<dataarea name="rom" size="0x8000">
-				<!-- Mirroring not verified -->
+			<dataarea name="rom" size="0x10000">
+				<!-- An overdump shows mirroring in all pages -->
 				<rom name="crazy train (japan).rom" size="0x2000" crc="39e6ff25" sha1="8aca0ee5845b0b39af624e8a998bb04f02d0fda4" />
 				<rom size="0x2000" offset="0x2000" loadflag="reload" />
 				<rom size="0x2000" offset="0x4000" loadflag="reload" />
 				<rom size="0x2000" offset="0x6000" loadflag="reload" />
+				<rom size="0x2000" offset="0x8000" loadflag="reload" />
+				<rom size="0x2000" offset="0xa000" loadflag="reload" />
+				<rom size="0x2000" offset="0xc000" loadflag="reload" />
+				<rom size="0x2000" offset="0xe000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -4039,12 +4108,16 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="クレイジートレイン" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="0"/>
-			<dataarea name="rom" size="0x8000">
-				<!-- Mirroring not verified -->
+			<dataarea name="rom" size="0x10000">
+				<!-- An overdump shows mirroring in all pages -->
 				<rom name="crazy train (japan) (alt 1).rom" size="0x2000" crc="b8764cd3" sha1="31b452ff42624c6ac1e0141d65869df1eabe5bb3" />
 				<rom size="0x2000" offset="0x2000" loadflag="reload" />
 				<rom size="0x2000" offset="0x4000" loadflag="reload" />
 				<rom size="0x2000" offset="0x6000" loadflag="reload" />
+				<rom size="0x2000" offset="0x8000" loadflag="reload" />
+				<rom size="0x2000" offset="0xa000" loadflag="reload" />
+				<rom size="0x2000" offset="0xc000" loadflag="reload" />
+				<rom size="0x2000" offset="0xe000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -4114,6 +4187,21 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="crusader.rom" size="0x8000" crc="73f3c7e2" sha1="a0b6f2ce1428d21dfb81606d517890bf8f7cec03" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="custar">
+		<description>Custar (Japan)</description>
+		<year>1985</year>
+		<publisher>HAL Laboratory</publisher>
+		<info name="alt_title" value="キュースター" />
+		<info name="serial" value="HM-104"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="custar (japan).rom" size="0x2000" crc="1e4e5da0" sha1="f864f825b2270c3b98b3c04671a3ac5f2d95affa" />
 			</dataarea>
 		</part>
 	</software>
@@ -8851,6 +8939,20 @@ Character creation does not write the new character data.
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
 				<rom name="midway (japan).rom" size="0x4000" crc="40e2f32a" sha1="3a8c815f9f97c067828e22f50386a9383f8e1a3d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midwaya" cloneof="midway">
+		<description>Midway (Japan, alt)</description>
+		<year>1983</year>
+		<publisher>National</publisher>
+		<info name="alt_title" value="カラー・ミッドウエイ ~ Color Midway" />
+		<info name="serial" value="CF-SS012"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="midway (japan) (alt).rom" size="0x4000" crc="30cb06ec" sha1="24d3f37d8fc0513617527fb7e9e4fafba3c262bf" />
 			</dataarea>
 		</part>
 	</software>
@@ -13694,6 +13796,20 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x2000">
 				<rom name="video hustler - konami billiards - konami (1984) [the link].rom" size="0x2000" crc="08d007cb" sha1="2b7802d594baab9c04e5a5d1a406fc0f5f295bfc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hustlerc" cloneof="konbill">
+		<description>Video Hustler (Japan, alt 3)</description>
+		<year>1984</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RC706" />
+		<info name="alt_title" value="ビデオハスラー" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="video hustler (japan) (alt 3).rom" size="0x2000" crc="5c1628a3" sha1="03815512c062d9c9269431b6b14e1701e8b5abaf" />
 			</dataarea>
 		</part>
 	</software>
@@ -18954,6 +19070,907 @@ legacy FM implementations cannot find it.
 
 
 <!-- Homebrew / Doujin software -->
+
+	<software name="ccr">
+		<description>C.C.R. Anexo 1 El Algoritmo (v1.2)</description>
+		<year>2018</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Joesg"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="c.c.r. - joesg (2018) (v1.2).rom" size="0x8000" crc="3e4862c0" sha1="a2327e1ae71b431282bfadeb0db4339c884933d7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccr11" cloneof="ccr">
+		<description>C.C.R. Anexo 1 El Algoritmo (v1.1)</description>
+		<year>2018</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Joesg"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="c.c.r. - joesg (2018) (v1.1).rom" size="0x8000" crc="32422ed8" sha1="ac5befd00528117995e2693872c4f260ea5d09b2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccr10" cloneof="ccr">
+		<description>C.C.R. Anexo 1 El Algoritmo (v1.0)</description>
+		<year>2018</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Joesg"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="c.c.r. - joesg (2018) (v1.0).rom" size="0x8000" crc="b221dc3f" sha1="b8ca3873eb5d089567fb71f9860310bfcbc2d5f7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cacorm">
+		<description>Cacorm</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cacorm - inufuto (2022).rom" size="0x20a5" crc="d32b2732" sha1="ffc83fc674ccb1279e0cc436006503d9274a5453" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="caosbegins">
+		<description>Caos Begins</description>
+		<year>2007</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Hikaru Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="caos begins - hikaru games (2007).rom" size="0x8000" crc="231a61e9" sha1="317a7cc0ab90882d25d1185eeb9aca6b884c8879" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="caosbeginsa" cloneof="caosbegins">
+		<description>Caos Begins (alt)</description>
+		<year>2007</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Hikaru Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="caos begins - hikaru games (2007) (alt).rom" size="0x8000" crc="44421f97" sha1="37f302291c75847f4b87a82e3acbbf62eab625f8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="caosbeginsb" cloneof="caosbegins">
+		<description>Caos Begins (alt 2)</description>
+		<year>2007</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Hikaru Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="caos begins - hikaru games (2007) (alt 2).rom" size="0x8000" crc="e600458c" sha1="da7026070bb6b84850d1c2e09fe4be072684eb48" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cworange">
+		<description>Cardwork Orange (unlicensed)</description>
+		<year>2010</year>
+		<publisher>Matra</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="matra_comp" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="cardwork orange - matra (2010).rom" size="0x80000" crc="32804025" sha1="5688dc926f87e3cf71050caced90cab29f82af60" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="casgpmv1">
+		<description>Casio GPM-Collection Volumen 1 (unlicensed)</description>
+		<year>2010</year>
+		<publisher>Matra</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="matra_comp" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="casio gpm-collection volumen 1 - matra (2010).rom" size="0x80000" crc="ef2d8d0c" sha1="ef9c51bd3e8cb6f531a8210f97843e48f368aae4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="casgpmv2">
+		<description>Casio GPM-Collection Volumen 2 (unlicensed)</description>
+		<year>2010</year>
+		<publisher>Matra</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="matra_comp" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="casio gpm-collection volumen 2 - matra (2010).rom" size="0x80000" crc="e7578b71" sha1="5b9a76d4c6eea0fa61544afa5b8c7dcece5608c6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cstltomb">
+		<description>Castle Tomb</description>
+		<year>2009</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="AG Software"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="castle tomb - ag software (2009).rom" size="0x4000" crc="811d91c1" sha1="902d109e4ff452471b11936039a472cbee81a902" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavtitan">
+		<description>Caverns of Titan</description>
+		<year>2005</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="JLTurSan"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="caverns of titan - jltursan (2005).rom" size="0x4000" crc="9e02db6c" sha1="c5568fc07bfb193b43ad7c840787f274d9c1e42f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavtitana" cloneof="cavtitan">
+		<description>Caverns of Titan (alt)</description>
+		<year>2005</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="JLTurSan"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="caverns of titan - jltursan (2005) (alt).rom" size="0x4000" crc="f1410d2d" sha1="a5802d5fe8bcda79354519d7e7a7b710bb6f9db8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavit">
+		<description>Cavit</description>
+		<year>2021</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cavit - inufuto (2020).rom" size="0x4000" crc="ff2b1492" sha1="45946b27635b02b9ad360b08e27827d7d2765295" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chthyrea">
+		<description>Chambers of Thyrea</description>
+		<year>2020</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Spacecorn"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="chambers of thyrea - spacecorn (2020).rom" size="0x8000" crc="2da2f419" sha1="50dd5eaf04229660e38d571ac6d8a7bc4c09bea0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chbllrds">
+		<description>Champion Billiards</description>
+		<year>2020</year>
+		<publisher>Mastropiero</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="champion billiards - mastropiero (2020).rom" size="0x8000" crc="6e647e49" sha1="ee4cea6057884916a2f67b5a09a9af591af04c85" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chtngwvs">
+		<description>Cheating Wives</description>
+		<year>2005</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Crappysoft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cheating wives - crappysoft (2005).rom" size="0x4000" crc="a22344a0" sha1="ca770384382bd487dd7330552403f85d7edbb8ce" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chcbrcng">
+		<description>Chocobo Racing</description>
+		<year>2004</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="HL-Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="chocobo racing - hl-soft (2004).rom" size="0x2000" crc="0727cfbc" sha1="2544de44386cf49dad2eb1035ea0e8553dd7598b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clmnswpr">
+		<description>Classic Minesweeper</description>
+		<year>2004</year>
+		<publisher>Karoshi Corporation</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="classic minesweeper - karoshi corporation (2004).rom" size="0x2000" crc="e446fc9b" sha1="d632a1f06a8018422fc9bc83ab26c501d34d447d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="claspong">
+		<description>Classic Pong</description>
+		<year>2004</year>
+		<publisher>Karoshi Corporation</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="classic pong - karoshi corporation (2004).rom" size="0x2000" crc="71a382be" sha1="59a124ed38869892496fc12f14af404a422e162a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmjn">
+		<description>CMJN</description>
+		<year>2014</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="nitrofurano"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cmjn - nitrofurano (2014).rom" size="0x4000" crc="fab6c719" sha1="01135411960ef84cc93a56d15060c5edf4ed00bd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cocoatm">
+		<description>Cocoa and the Time Machine</description>
+		<year>2020</year>
+		<publisher>Minilop</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="cocoa and the time machine - minilop (2020).rom" size="0x20000" crc="23b9e099" sha1="191cf0d5c1cdd87af6bffb9abeb3892129425e53" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- V9990 is not supported yet -->
+	<software name="cnintrdr" supported="no">
+		<description>Codename: INTRUDER</description>
+		<year>2018</year>
+		<publisher>Repro Factory</publisher>
+		<part name="cart" interface="msx_cart">
+			<!-- TODO: Determine mapper -->
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x80000">
+				<rom name="codename intruder - bitvision (2018).rom" size="0x80000" crc="891a4929" sha1="f7039ebd100695d9a40188d7a3117c0fcc11d442" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cldblood">
+		<description>Cold Blood</description>
+		<year>2009</year>
+		<publisher>MSX Cartridge Shop</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="cold blood - paxanga soft (2009).rom" size="0x8000" crc="0d622a32" sha1="8cde922a3c189889096970fb6e8a1670fcc4e8ed" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cldbloodd" cloneof="cldblood">
+		<description>Cold Blood (demo)</description>
+		<year>2009</year>
+		<publisher>Paxanga Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="cold blood (demo) - paxanga soft (2009).rom" size="0x8000" crc="eb617d8c" sha1="50881d29421b9431b31f8b09fe26ee8b298ba76a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compwars">
+		<description>Computer Wars (English)</description>
+		<year>2004</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Crappysoft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="computer wars - crappysoft (2004) (english).rom" size="0x2000" crc="ea7c50c7" sha1="8c19e0176b87f2436057922328dd1945bb3175ba" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compwarss" cloneof="compwars">
+		<description>Computer Wars (Spanish)</description>
+		<year>2004</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Crappysoft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="computer wars - crappysoft (2004) (spanish).rom" size="0x2000" crc="e5ee8051" sha1="e73fb56555a7232758d4b5bf2dd6736c9b3d5358" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="corspree">
+		<description>Corona's Spree</description>
+		<year>2020</year>
+		<publisher>Arnauri Calcalho</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="coronas spree - arnauri calcalho (2020).rom" size="0x8000" crc="ade539b0" sha1="967b09163886842029a940325dd79969a84e7e6b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="corunner">
+		<description>Corridor Runner (v1.1.2)</description>
+		<year>2022</year>
+		<publisher>Aburi Games</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="corridor runner - aburi games (2022) (v1.1.2).rom" size="0x8000" crc="f48b6335" sha1="6693e8a0baef87cdc73e2c42b61d8fac2a6dd296" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="corunner111" cloneof="corunner">
+		<description>Corridor Runner (v1.1.1)</description>
+		<year>2022</year>
+		<publisher>Aburi Games</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="corridor runner - aburi games (2022) (v1.1.1).rom" size="0x8000" crc="2d98e04a" sha1="e809a0ec61b932f7887034b3be75cb9ea52cb62a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="corunner110" cloneof="corunner">
+		<description>Corridor Runner (v1.1.0)</description>
+		<year>2022</year>
+		<publisher>Aburi Games</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="corridor runner - aburi games (2022) (v1.1.0).rom" size="0x8000" crc="41cefba0" sha1="746f3d3f450f62dbddda2ab75240ae2ad3ce9a3d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="corunner101" cloneof="corunner">
+		<description>Corridor Runner (v1.0.1)</description>
+		<year>2022</year>
+		<publisher>Aburi Games</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="corridor runner - aburi games (2022) (v1.0.1).rom" size="0x8000" crc="56428423" sha1="79e902648ef54ddfddcc27e97579f831debde9de" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="corunner100" cloneof="corunner">
+		<description>Corridor Runner (v1.0.0)</description>
+		<year>2022</year>
+		<publisher>Aburi Games</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="corridor runner - aburi games (2022) (v1.0.0).rom" size="0x8000" crc="c175e20d" sha1="f5b96771a07b559e16306d1e50537f134e76b115" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="corunner031" cloneof="corunner">
+		<description>Corridor Runner (v0.3.1)</description>
+		<year>2022</year>
+		<publisher>Aburi Games</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="corridor runner - aburi games (2022) (v0.3.1).rom" size="0x8000" crc="79a04c2b" sha1="4f0298caa95c2fb6d58fe96c4587daa7099d2bd6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="corunner030" cloneof="corunner">
+		<description>Corridor Runner (v0.3.0)</description>
+		<year>2022</year>
+		<publisher>Aburi Games</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="corridor runner - aburi games (2022) (v0.3.0).rom" size="0x8000" crc="3371dfba" sha1="91643a3de90f3ac500a89c19ef5ccfe9606983ec" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="corunner022" cloneof="corunner">
+		<description>Corridor Runner (v0.2.2)</description>
+		<year>2022</year>
+		<publisher>Aburi Games</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="corridor runner - aburi games (2022) (v0.2.2).rom" size="0x4000" crc="cf4911a2" sha1="7f4cd1b97d12888d61f952cc221bcd2c6b45a72e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="corunner020" cloneof="corunner">
+		<description>Corridor Runner (v0.2.0)</description>
+		<year>2022</year>
+		<publisher>Aburi Games</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="corridor runner - aburi games (2022) (v0.2.0).rom" size="0x4000" crc="78f3d380" sha1="4ac3997afd0417e9d27c95b1559c03fca58f5eaf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="corunner010" cloneof="corunner">
+		<description>Corridor Runner (v0.1.0)</description>
+		<year>2022</year>
+		<publisher>Aburi Games</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="corridor runner - aburi games (2022) (v0.1.0).rom" size="0x4000" crc="f2986e65" sha1="b27008c4b27757c21f984c8c990c717f60b65318" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="csmcbttl">
+		<description>Cosmic Battle (beta)</description>
+		<year>2005</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Vendetta"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="cosmic battle - vendetta (2005) (beta).rom" size="0x8000" crc="64cfbbdf" sha1="30fa1447f8ef8e8ff9653dce6d7d672104f6e6ab" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cowabduc">
+		<description>Cow Abductors</description>
+		<year>2009</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Paxanga Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cow abductors - paxanga soft (2009).rom" size="0x4000" crc="5f8e7df0" sha1="4528654ce1a4d286b19ab5e3730d70598db63d11" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cowabduco" cloneof="cowabduc">
+		<description>Cow Abductors (older)</description>
+		<year>2009</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Paxanga Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cow abductors - paxanga soft (2009) (older).rom" size="0x4000" crc="790623de" sha1="9d87ba5ac3b9a865f2dd93d239e9cdaf6e48dff5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crapolym">
+		<description>Crappy Olympics</description>
+		<year>2021</year>
+		<publisher>Orazio Cacciola</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="crappy olympics - orazio cacciola (2021).rom" size="0x3e24" crc="445903dd" sha1="9a5c0724fbbf2acbda05a61be6ecae2a3a70638a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crazbggy">
+		<description>Crazy Buggy</description>
+		<year>2005</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Crappysoft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="crazy buggy - crappysoft (2005).rom" size="0x4000" crc="fea00d3b" sha1="5586085d3be79378f9623e52fd04cad25febc34b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crmsxfr">
+		<description>Crazy MSX Frenchies</description>
+		<year>2007</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Jipe of the MSX Café"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="crazy msx frenchies - jipe of the msx cafe (2007).rom" size="0x4000" crc="5db59a30" sha1="484a21c62bde3eab537f394bc270ac7c1c557f7c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xbomber">
+		<description>Cross Bomber (2022-07-20)</description>
+		<year>2022</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cross bomber - fabrizio caruso (2022-07-20).rom" size="0x4000" crc="6e1bb7de" sha1="dd5836adc05a9653d34e2d495b1d7bf6c0069ebd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xbombera" cloneof="xbomber">
+		<description>Cross Bomber (alt)</description>
+		<year>2022</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cross bomber - fabrizio caruso (alt).rom" size="0x4000" crc="9fbab9ad" sha1="b47a944b6ece4d3b58d949e94ce8fa20381dcf48" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xbomberb" cloneof="xbomber">
+		<description>Cross Bomber (2020-09-25)</description>
+		<year>2020</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cross bomber - fabrizio caruso (2020-09-25).rom" size="0x4000" crc="fcc08b80" sha1="1691dcc00d5d2bdc7e2e645bd1d06dff0aa22c97" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xchase">
+		<description>Cross Chase (2021-05-13)</description>
+		<year>2021</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cross chase - fabrizio caruso (2021-05-13).rom" size="0x4000" crc="3c4707f4" sha1="bba1bbd39b270c9a29f3eba0a0843aa3ccca8d97" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xchasea" cloneof="xchase">
+		<description>Cross Chase (alt)</description>
+		<year>2021</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cross chase - fabrizio caruso (alt).rom" size="0x4000" crc="23aaa3df" sha1="1811d7ff157f856d976c1b800544e2b191d29444" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xchaseb" cloneof="xchase">
+		<description>Cross Chase (2020-04-02)</description>
+		<year>2020</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="cross chase - fabrizio caruso (2020-04-02).rom" size="0x8000" crc="6d26fa75" sha1="ea2ab3e17a3692e57fd4754021fd133ac0988395" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xchasec" cloneof="xchase">
+		<description>Cross Chase (2018-11-13)</description>
+		<year>2018</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="cross chase - fabrizio caruso (2018-11-13).rom" size="0x8000" crc="4eaf8f86" sha1="282aad5de055fd8404661413b145b0fba2579822" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xchased" cloneof="xchase">
+		<description>Cross Chase (2018-08-10)</description>
+		<year>2018</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="cross chase - fabrizio caruso (2018-08-10).rom" size="0x8000" crc="714d9061" sha1="15ba0106f0d86febf6412023f03f491914ab73a6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xchasee" cloneof="xchase">
+		<description>Cross Chase (2018-07-19)</description>
+		<year>2018</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="cross chase - fabrizio caruso (2018-07-19).rom" size="0x3ad6" crc="b3001967" sha1="9c6a7bc137500952b714dd49411d741252cb6d8f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xchasef" cloneof="xchase">
+		<description>Cross Chase (2018-05-19)</description>
+		<year>2018</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="cross chase - fabrizio caruso (2018-05-19).rom" size="0x38eb" crc="3c8659c6" sha1="df4a54ab465ae9545486bdff4558d13aa5601578" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xchaseg" cloneof="xchase">
+		<description>Cross Chase (2018-04-15)</description>
+		<year>2018</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="cross chase - fabrizio caruso (2018-04-15).rom" size="0x39e2" crc="1790f34b" sha1="9786f9089281dd810b0a488e4c3d1df9e03aae44" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xchaseh" cloneof="xchase">
+		<description>Cross Chase (2018-02-03)</description>
+		<year>2018</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="cross chase - fabrizio caruso (2018-02-03).rom" size="0x3abf" crc="7749d13c" sha1="d16d9d016c9b181b58b944a2c30b8b6c8aa8fac6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xchasei" cloneof="xchase">
+		<description>Cross Chase (2017-12-16)</description>
+		<year>2018</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="cross chase - fabrizio caruso (2017-12-16).rom" size="0x3b37" crc="4887672a" sha1="3e551178c8fa00645c3f730b93aabe275b90e84f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xchasej" cloneof="xchase">
+		<description>Cross Chase (2017-10-30)</description>
+		<year>2018</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="cross chase - fabrizio caruso (2017-10-30).rom" size="0x3c89" crc="b148cead" sha1="20b78d770a54564d2df2743caec77dffd5c52731" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xchasek" cloneof="xchase">
+		<description>Cross Chase (2017-10-11)</description>
+		<year>2018</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="cross chase - fabrizio caruso (2017-10-11).rom" size="0x3c77" crc="e432b416" sha1="eb06f7949a3a9b4351e541aa5b35350ab8a061a0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xhorde">
+		<description>Cross Horde (2021-05-12)</description>
+		<year>2021</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cross horde - fabrizio caruso (2021-05-12).rom" size="0x4000" crc="94ea2b91" sha1="2f48d5a71955ce7fbc455251aae7eedbc1ef5f00" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xhordea" cloneof="xhorde">
+		<description>Cross Horde (2021-05-01)</description>
+		<year>2021</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cross horde - fabrizio caruso (2021-05-01).rom" size="0x4000" crc="f44beb68" sha1="69433d11f079afc19d3f968145bad1a6c1bae968" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xhordeb" cloneof="xhorde">
+		<description>Cross Horde (2021-04-25)</description>
+		<year>2021</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cross horde - fabrizio caruso (2021-04-25).rom" size="0x4000" crc="68c8abec" sha1="e11caa6fddcaa00ba209cf9bb01fc440c6d4187e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xshoot">
+		<description>Cross Shoot (2022-02-26)</description>
+		<year>2022</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="cross shoot - fabrizio caruso (2022-02-26).rom" size="0x8000" crc="73242f3e" sha1="eba0741c800b73ce26d49f5d132e72c2cb9e34a6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xshoota" cloneof="xshoot">
+		<description>Cross Shoot (alt)</description>
+		<year>2022</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="cross shoot - fabrizio caruso (2020) (alt).rom" size="0x8000" crc="29e269d3" sha1="4cab91aedb534a2f1107ea0121caca19ffc132f6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xshootb" cloneof="xshoot">
+		<description>Cross Shoot (2021-05-12)</description>
+		<year>2021</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="cross shoot - fabrizio caruso (2021-05-12).rom" size="0x8000" crc="ff305e42" sha1="baa2a12e745c53528a5418ae8b4c9dcb52a9f6a6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xsnake">
+		<description>Cross Snake (v2.0)</description>
+		<year>2020</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cross snake - fabrizio caruso (2020) (v2.0).rom" size="0x4000" crc="7ca9f2b1" sha1="5b80401274e86e48d0317a8424e671a1300cdbf3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xsnake20a" cloneof="xsnake">
+		<description>Cross Snake (v2.0, alt)</description>
+		<year>2021</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cross snake - fabrizio caruso (2021) (v2.0, alt).rom" size="0x4000" crc="e0954b6c" sha1="875704c4e19a0168490612c9656489f9d9137091" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xsnake10" cloneof="xsnake">
+		<description>Cross Snake (v1.0)</description>
+		<year>2021</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cross snake - fabrizio caruso (2020) (v1.0).rom" size="0x4000" crc="b8ed12ea" sha1="afd35151fd05ed26be62eef1dc8398380def8d76" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xsnakep" cloneof="xsnake">
+		<description>Cross Snake (preview)</description>
+		<year>2021</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cross snake - fabrizio caruso (2020) (preview).rom" size="0x4000" crc="c6101305" sha1="d8e0b2f42416810577b1d844a13cb4104b54fd29" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crptogrm">
+		<description>Cryptogram - Anagrams Crosswords (v1.1)</description>
+		<year>2022</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Amaury Carvalho"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="cryptogram - amaury carvalho (2022) (v1.1).rom" size="0xc000" crc="0a8152fb" sha1="07fa3735e3cb96ddece45bb6f3ff6710b6ff7052" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crptogrm10" cloneof="crptogrm">
+		<description>Cryptogram - Anagrams Crosswords (v1.0)</description>
+		<year>2022</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Amaury Carvalho"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="cryptogram - amaury carvalho (2022) (v1.0).rom" size="0xc000" crc="9d07079c" sha1="265fed3401edaa9a82352ba286bbaedbd4d840f4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cuncuna">
+		<description>Cuncuna</description>
+		<year>2020</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Christian Córdova"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cuncuna - christian cordova (2020).rom" size="0x4000" crc="de336286" sha1="e3bd976e58db41b1baef4486be58e381dfff15dc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cuncunao" cloneof="cuncuna">
+		<description>Cuncuna (older)</description>
+		<year>1991</year>
+		<publisher>Christian Córdova</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cuncuna - christian cordova (1991).rom" size="0x4000" crc="8cd5a7c2" sha1="0880cdc142fd471bc13fb1cc28f3d0773ba24a3b" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="daedopus">
 		<description>Daedalian Opus</description>

@@ -54,6 +54,7 @@ extern char const *const KOREAN_126IN1;
 extern char const *const KOREAN_HYDLIDE2;
 extern char const *const LOVEPLUS;
 extern char const *const MAJUSTUSHI;
+extern char const *const MATRA_COMP;
 extern char const *const MM256K;
 extern char const *const MM512K;
 extern char const *const MM768K;

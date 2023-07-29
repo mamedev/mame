@@ -52,6 +52,7 @@ char const *const KOREAN_126IN1   = "korean_126in1";
 char const *const KOREAN_HYDLIDE2 = "korean_hydlide2";
 char const *const LOVEPLUS        = "loveplus";
 char const *const MAJUSTUSHI      = "majutsushi";
+char const *const MATRA_COMP      = "matra_comp";
 char const *const MM256K          = "mm256k";
 char const *const MM512K          = "mm512k";
 char const *const MM768K          = "mm768k";
