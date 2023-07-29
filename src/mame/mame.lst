@@ -33946,6 +33946,7 @@ smb3bl
 @source:nintendo/nes_clone.cpp
 afbm7800
 dancexpt
+digezlg
 dnce2000
 hs36blk
 hs36red
@@ -34246,6 +34247,7 @@ endless                         // bootleg
 endlessa                        // bootleg
 ffight2b                        // bootleg
 ffight3b                        // bootleg
+ffight3b2                       // bootleg
 iron                            // bootleg
 legendsb                        // bootleg
 kinstb                          // bootleg
@@ -34257,6 +34259,7 @@ wldgunsb                        // bootleg
 
 @source:nintendo/snesb51.cpp
 fatfurspb
+kinstsnes
 mk3snes
 snes4sl
 snes4sln
@@ -39915,6 +39918,7 @@ twsoc98                         // 1998.04 Tecmo World Soccer '98 (Tecmo)
 vfkids                          // 1996.03 Virtua Fighter Kids
 vfremix                         // 1995.06 Virtua Fighter Remix
 vmahjong                        // 1997.02 Virtual Mahjong (Micronet)
+wasafari                        // 1998.11 Wanpaku Safari
 winterht                        // 1997.10 Winter Heat (Data East)
 yattrmnp                        // 1998.10 Yatterman Plus
 znpwfv                          // 1997.12 Zen Nippon Pro Wrestling featuring Virtua

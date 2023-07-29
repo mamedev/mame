@@ -591,6 +591,7 @@ void macportable_state::macprtb(machine_config &config)
 	m_ram->set_default_size("1M");
 	m_ram->set_extra_options("1M,3M,5M,7M,9M");
 
+	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");

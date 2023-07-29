@@ -222,7 +222,7 @@ void pkspirit_state::pkspirit(machine_config &config)
 	// basic machine hardware
 	TMP68301(config, m_maincpu, 32_MHz_XTAL / 2); // divider not verified, actually TMP68303F-16
 	m_maincpu->set_addrmap(AS_PROGRAM, &pkspirit_state::main_map);
-	m_maincpu->parallel_r_cb().set_log("par_r");
+	m_maincpu->parallel_r_cb().set([this]() { logerror("%s par_r\n", machine().describe_context()); return 0xffff; });
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 36_MHz_XTAL / 9)); // divider not verified, but marked as 4MHz on PCB
 	audiocpu.set_addrmap(AS_PROGRAM, &pkspirit_state::sound_map);

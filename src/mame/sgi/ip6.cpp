@@ -16,26 +16,38 @@
  *   - https://github.com/NetBSD/src/tree/trunk/sys/arch/sgimips/
  *
  * TODO:
- *   - audio, printer
- *   - devicify ioc1 and ctl1
- *
- * Status:
+ *  - audio, printer
+ *  - devicify ioc1 and ctl1
  *  - parity and cache diagnostics fail
- *  - irix 4.0.5 working
  *  - ide test failures
  *    - lca2 (unimplemented fpga program/readback)
  *    - nvram4 (security mode?)
  *    - fpu (cvt.?.? invalid operation exceptions)
  */
 
-/*
- * Installation instructions
- * --
- * 1. boot, enter monitor, set ethernet address: eaddr 08:00:69:12:34:56
- * 2. start mame with CDROM iso image as hard disk ID 6: mame 4d20 ... -scsi:6 harddisk -hard2 pathname.iso
- * 3. boot, enter monitor, launch sash: boot -f dksc(0,6,8)sash.IP6
- * 4.
- */
+ /*
+  * WIP
+  * --
+  * 4D/2x doesn't support CDROM, so to install IRIX, mount the .iso
+  * as if it's a hard disk: ... -scsi:6 harddisk -hard2 pathname.iso
+  *
+  * install IRIX 4.0.5/5.3:
+  *  - monitor: eaddr 08:00:69:12:34:56                         # set ethernet mac address
+  *  - monitor: init
+  *  - monitor: dksc(0,6,8)sash.IP6 dksc(0,6,7)stand/fx.IP6 -x  # start fx disk partition/label utility
+  *  - fx: r; ro; ..; l; sync; ..; exit                          # create root partition and label disk
+  *  - monitor: setenv tapedevice dksc(0,6,8)
+  *  - monitor: dksc(0,6,8)sash.IP6 -m                          # copy/boot from miniroot
+  *  - inst: sh                                                 # escape to shell from inst
+  *  - sh: mkdir /mnt; mount /dev/dsk/dks0d6s7 /mnt; exit       # mount distribution media
+  *  - inst: from /mnt/dist
+  *  - inst: go                                                 # may take ~1.5 hours
+  *  - inst: shroot
+  *  - sh: chkconfig windowsystem off; chkconfig xdm off            # disable graphics subsystems (until graphics works)
+  *  - sh: edit /etc/hosts and /etc/inittab                     # change host IP address, enable getty on console
+  *  - inst: quit                                               # complete installation and reboot
+  */
+
 
 #include "emu.h"
 

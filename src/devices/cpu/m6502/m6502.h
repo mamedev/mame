@@ -130,7 +130,7 @@ protected:
 	uint8_t   Y;                      /* Y index register */
 	uint8_t   P;                      /* Processor status */
 	uint8_t   IR;                     /* Prefetched instruction register */
-	int     inst_state_base;        /* Current instruction bank */
+	int       inst_state_base;        /* Current instruction bank */
 
 	std::unique_ptr<memory_interface> mintf;
 	int inst_state, inst_substate;

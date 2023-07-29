@@ -41,7 +41,7 @@ ToDo:
 #include "genpin.h"
 
 #include "cpu/m6502/m6503.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "machine/timer.h"
 #include "sound/sn76477.h"
 #include "speaker.h"
@@ -85,7 +85,7 @@ private:
 	u8 m_out_offs = 0U;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<mos6532_new_device> m_riot;
+	required_device<mos6532_device> m_riot;
 	required_device<sn76477_device> m_snsnd;
 	required_ioport_array<4> m_io_keyboard;
 	required_shared_ptr<u8> m_p_ram;
@@ -98,8 +98,8 @@ void spectra_state::spectra_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).ram().share("nvram"); // battery backed, 2x 5101L
-	map(0x0100, 0x017f).m(m_riot, FUNC(mos6532_new_device::ram_map));
-	map(0x0180, 0x019f).m(m_riot, FUNC(mos6532_new_device::io_map));
+	map(0x0100, 0x017f).m(m_riot, FUNC(mos6532_device::ram_map));
+	map(0x0180, 0x019f).m(m_riot, FUNC(mos6532_device::io_map));
 	map(0x0400, 0x0fff).rom();
 }
 
@@ -150,7 +150,7 @@ u8 spectra_state::porta_r()
 	u8 key = m_io_keyboard[row]->read();
 	u8 ret = ((BIT(key, m_porta & 7)) ? 0x40 : 0) | (m_porta & 0xbf);
 
-	if (ret == 0x1b && m_p_ram[0x7b] < 0x1E)
+	if (ret == 0x1b && m_p_ram[0x7b] < 0x1e)
 		m_samples->start(3, 8); // coin
 
 	return ret;
@@ -209,21 +209,25 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
 		u8 segments = patterns[data&15] | (BIT(data, 4) ? 0x80 : 0);
 		m_digits[m_out_offs] = segments;
 	}
-	else if (m_out_offs < 0x6f)
+	else
+	if (m_out_offs < 0x6f)
 	{
 		m_out_offs = 0x6f;
 	}
-	else if (m_out_offs < 0x74)
+	else
+	if (m_out_offs < 0x74)
 	{
 		if (m_p_ram[m_out_offs])
 			m_samples->start(0, 5); // holes
 	}
-	else if (m_out_offs < 0x77)
+	else
+	if (m_out_offs < 0x77)
 	{
 		if (m_p_ram[m_out_offs])
 			m_samples->start(1, 0); // bumpers
 	}
-	else if (m_out_offs < 0x79)
+	else
+	if (m_out_offs < 0x79)
 	{
 		if (m_p_ram[m_out_offs])
 			m_samples->start(2, 7); // slings
@@ -267,7 +271,7 @@ void spectra_state::spectra(machine_config &config)
 	M6503(config, m_maincpu, XTAL(3'579'545)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spectra_state::spectra_map);
 
-	MOS6532_NEW(config, m_riot, XTAL(3'579'545)/4);
+	MOS6532(config, m_riot, XTAL(3'579'545)/4);
 	m_riot->pa_rd_callback().set(FUNC(spectra_state::porta_r));
 	m_riot->pa_wr_callback().set(FUNC(spectra_state::porta_w));
 	m_riot->pb_rd_callback().set(FUNC(spectra_state::portb_r));

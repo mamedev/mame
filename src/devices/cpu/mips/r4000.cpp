@@ -3739,7 +3739,7 @@ void r4000_base_device::address_error(int intention, u64 const address)
 
 template <typename T> void r4000_base_device::accessors(T &m)
 {
-	space(AS_PROGRAM).cache(m);
+	space(AS_PROGRAM).specific(m);
 
 	read_byte = [&m](offs_t offset) { return m.read_byte(offset); };
 	read_word = [&m](offs_t offset) { return m.read_word(offset); };

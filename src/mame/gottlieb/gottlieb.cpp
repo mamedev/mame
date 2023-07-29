@@ -260,12 +260,13 @@ public:
 	void gottlieb2(machine_config &config);
 	void gottlieb2_ram_rom(machine_config &config);
 	void reactor(machine_config &config);
-	void tylz(machine_config &config);
 	void g2laser(machine_config &config);
+	void qbert_old(machine_config &config);
 	void qbert(machine_config &config);
 	void qbert_knocker(machine_config &config);
 	void gottlieb1(machine_config &config);
 	void gottlieb1_rom(machine_config &config);
+	void gottlieb1_votrax_old(machine_config &config);
 	void gottlieb1_votrax(machine_config &config);
 
 	void init_romtiles();
@@ -427,6 +428,14 @@ void gottlieb_state::machine_start()
 }
 
 
+void gottlieb_state::machine_reset()
+{
+	/* if we have a laserdisc, reset our philips code callback for the next line 17 */
+	if (m_laserdisc != nullptr)
+		m_laserdisc_philips_timer->adjust(m_screen->time_until_pos(17), 17);
+}
+
+
 void gottlieb_state::video_start()
 {
 	static const int resistances[4] = { 2000, 1000, 470, 240 };
@@ -472,14 +481,6 @@ VIDEO_START_MEMBER(gottlieb_state,screwloo)
 	save_item(NAME(m_background_priority));
 	save_item(NAME(m_spritebank));
 	save_item(NAME(m_transparent0));
-}
-
-
-void gottlieb_state::machine_reset()
-{
-	/* if we have a laserdisc, reset our philips code callback for the next line 17 */
-	if (m_laserdisc != nullptr)
-		m_laserdisc_philips_timer->adjust(m_screen->time_until_pos(17), 17);
 }
 
 
@@ -1043,7 +1044,6 @@ void gottlieb_state::laserdisc_audio_process(int samplerate, int samples, const 
 
 void gottlieb_state::qbert_knocker(u8 knock)
 {
-	//output().set_value("knocker0", knock);
 	m_knockers[0] = knock ? 1 : 0;
 
 	// start sound on rising edge
@@ -1219,7 +1219,7 @@ static INPUT_PORTS_START( reactor )
 	PORT_DIPSETTING(    0x80, "20000" )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
 	PORT_SERVICE_DIPLOC( 0x02, IP_ACTIVE_LOW, "SB1:8" )
 	PORT_BIT ( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -1276,7 +1276,7 @@ static INPUT_PORTS_START( qbert )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
 
 	PORT_START("IN2")   /* trackball H not used */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1284,15 +1284,15 @@ static INPUT_PORTS_START( qbert )
 	PORT_START("IN3")   /* trackball V not used */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN4")      /* joystick - actually 4-Way but assigned as 8-Way to allow diagonal mapping */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_START("IN4")   /* joystick, it's rotated 45 degrees clockwise */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("P1 Right (Down-Right)") PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("P1 Left (Up-Left)") PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("P1 Up (Up-Right)") PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("P1 Down (Down-Left)") PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("P2 Right (Down-Right)") PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("P2 Left (Up-Left)") PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("P2 Up (Up-Right)") PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("P2 Down (Down-Left)") PORT_4WAY PORT_COCKTAIL
 INPUT_PORTS_END
 
 
@@ -1376,7 +1376,7 @@ static INPUT_PORTS_START( tylz )
 
 	PORT_START("IN1")   /* ? */
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1) // cycle through test options, hold to do test
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1) // cycle through test options, hold to do test
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )    // probably nothing else here
@@ -1426,7 +1426,7 @@ static INPUT_PORTS_START( argusg )
 
 	PORT_START("IN1")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1440,11 +1440,11 @@ static INPUT_PORTS_START( argusg )
 	PORT_START("IN3")   /* trackball V */
 	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(gottlieb_state, track_delta_r<1>)
 
-/* NOTE: Buttons are shared for both players; are mirrored to each side of the controller */
+	/* NOTE: Buttons are shared for both players; are mirrored to each side of the controller */
 	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )           PORT_NAME("P1 Start/Button 1")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)PORT_NAME("P2 Start/Button 2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Start/Button 1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 Start/Button 2") PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -1485,7 +1485,7 @@ static INPUT_PORTS_START( mplanets )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x3c, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("IN2")   /* trackball H not used */
@@ -1536,7 +1536,7 @@ static INPUT_PORTS_START( krull )
 
 	PORT_START("IN1")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1646,7 +1646,7 @@ static INPUT_PORTS_START( qbertqub )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
 
 	PORT_START("IN2")   /* trackball H not used */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1654,11 +1654,11 @@ static INPUT_PORTS_START( qbertqub )
 	PORT_START("IN3")   /* trackball V not used */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN4")      /* joystick - actually 4-Way but assigned as 8-Way to allow diagonal mapping */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_START("IN4")   /* joystick, it's rotated 45 degrees clockwise */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("P1 Right (Down-Right)") PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("P1 Left (Up-Left)") PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("P1 Up (Up-Right)") PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("P1 Down (Down-Left)") PORT_4WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1699,7 +1699,7 @@ static INPUT_PORTS_START( curvebal )
 
 	PORT_START("IN1")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1715,12 +1715,12 @@ static INPUT_PORTS_START( curvebal )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Swing") PORT_PLAYER(1)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pitch Left") PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Swing") PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pitch Left") PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Pitch Right") PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Pitch Right") PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Bunt") PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Bunt") PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -1753,7 +1753,7 @@ static INPUT_PORTS_START( screwloo )
 
 	PORT_START("IN1")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY
@@ -1807,7 +1807,7 @@ static INPUT_PORTS_START( mach3 )
 
 	PORT_START("IN1")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1860,7 +1860,7 @@ static INPUT_PORTS_START( cobram3 )
 
 	PORT_START("IN1")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1905,7 +1905,7 @@ static INPUT_PORTS_START( usvsthem )
 
 	PORT_START("IN1")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1956,7 +1956,7 @@ static INPUT_PORTS_START( 3stooges )
 
 	PORT_START("IN1")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_TILT )
@@ -2022,7 +2022,7 @@ static INPUT_PORTS_START( vidvince )
 
 	PORT_START("IN1")   /* ? */
 	PORT_SERVICE( 0x01, IP_ACTIVE_HIGH )
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1) // cycle through test options, hold to do test
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1) // cycle through test options, hold to do test
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_TILT )
@@ -2074,7 +2074,7 @@ static INPUT_PORTS_START( wizwarz )
 
 	PORT_START("IN1")   /* ? */
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1) // cycle through test options, hold to do test
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1) // cycle through test options, hold to do test
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2164,6 +2164,18 @@ void gottlieb_state::gottlieb1(machine_config &config)
 	GOTTLIEB_SOUND_REV1(config, m_r1_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
+void gottlieb_state::gottlieb1_votrax_old(machine_config &config)
+{
+	gottlieb_core(config);
+	GOTTLIEB_SOUND_SPEECH_REV1(config, m_r1_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
+
+void gottlieb_state::gottlieb1_votrax(machine_config &config)
+{
+	gottlieb_core(config);
+	GOTTLIEB_SOUND_SPEECH_REV1A(config, m_r1_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
+
 void gottlieb_state::gottlieb1_rom(machine_config &config)
 {
 	gottlieb1(config);
@@ -2209,21 +2221,22 @@ void gottlieb_state::g2laser(machine_config &config)
  *
  *************************************/
 
-
-void gottlieb_state::gottlieb1_votrax(machine_config &config)
-{
-	gottlieb_core(config);
-	GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
-}
-
 void gottlieb_state::reactor(machine_config &config)
 {
-	gottlieb1_votrax(config);
+	gottlieb1_votrax_old(config);
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &gottlieb_state::reactor_map);
 
 	config.device_remove("nvram");
+}
+
+void gottlieb_state::qbert_old(machine_config &config)
+{
+	gottlieb1_votrax_old(config);
+
+	/* sound hardware */
+	qbert_knocker(config);
 }
 
 void gottlieb_state::qbert(machine_config &config)
@@ -2232,11 +2245,6 @@ void gottlieb_state::qbert(machine_config &config)
 
 	/* sound hardware */
 	qbert_knocker(config);
-}
-
-void gottlieb_state::tylz(machine_config &config)
-{
-	gottlieb1_votrax(config);
 }
 
 void gottlieb_state::screwloo(machine_config &config)
@@ -2269,6 +2277,7 @@ void gottlieb_state::cobram3(machine_config &config)
 	subdevice<ad7528_device>("r2sound:dac")->reset_routes();
 	subdevice<ad7528_device>("r2sound:dac")->add_route(ALL_OUTPUTS, "r2sound", 1.00);
 }
+
 
 
 /*************************************
@@ -2724,7 +2733,7 @@ ROM_START( mach3a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "m3rom4.bin",   0x6000, 0x2000, CRC(8bfd5a44) SHA1(61f5c6c39047c1d0296e2cacce2be9525cb47176) )
 	ROM_LOAD( "m3rom3.bin",   0x8000, 0x2000, CRC(b1b045af) SHA1(4e71ca4661bf5daaf9e2ffbb930ac3b13e2e57bd) )
-	ROM_LOAD( "m3rom2-1.bin",   0xa000, 0x2000, CRC(2b1689a7) SHA1(18714810de6501bc1656261aacf98be228af624e) )
+	ROM_LOAD( "m3rom2-1.bin", 0xa000, 0x2000, CRC(2b1689a7) SHA1(18714810de6501bc1656261aacf98be228af624e) )
 	ROM_LOAD( "m3rom1.bin",   0xc000, 0x2000, CRC(3b0ba80b) SHA1(bc7e961311b40f05f2998f10f0a68f2e515c8e66) )
 	ROM_LOAD( "m3rom0.bin",   0xe000, 0x2000, CRC(70c12bf4) SHA1(c26127b6e2a16791b3be8abac93be6af4f30fb3b) )
 
@@ -3037,10 +3046,10 @@ GAME( 1982, qbert,      0,        qbert,             qbert,    gottlieb_state, i
 GAME( 1982, qberta,     qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, qbertj,     qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, myqbert,    qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Mello Yello Q*bert", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, qberttst,   qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (early test version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, qberttst,   qbert,    qbert_old,         qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (early test version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, qbtrktst,   qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert Board Input Test Rom", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, insector,   0,        gottlieb1,         insector, gottlieb_state, init_romtiles, ROT0,   "Gottlieb",                  "Insector (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, tylz,       0,        tylz,              tylz,     gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Tylz (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // modified sound hw?
+GAME( 1982, tylz,       0,        gottlieb1_votrax,  tylz,     gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Tylz (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // modified sound hw?
 GAME( 1984, argusg,     0,        gottlieb1_rom,     argusg,   gottlieb_state, init_ramtiles, ROT0,   "Gottlieb",                  "Argus (Gottlieb, prototype)" , MACHINE_SUPPORTS_SAVE ) // aka Guardian / Protector?
 GAME( 1983, mplanets,   0,        gottlieb1,         mplanets, gottlieb_state, init_romtiles, ROT270, "Gottlieb",                  "Mad Planets", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mplanetsuk, mplanets, gottlieb1,         mplanets, gottlieb_state, init_romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", MACHINE_SUPPORTS_SAVE )

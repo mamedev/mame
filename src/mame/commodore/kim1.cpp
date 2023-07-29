@@ -69,7 +69,7 @@ TODO:
 #include "cpu/m6502/m6502.h"
 #include "formats/kim1_cas.h"
 #include "imagedev/cassette.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "machine/timer.h"
 #include "video/pwm.h"
 
@@ -108,7 +108,7 @@ protected:
 
 private:
 	required_device<m6502_device> m_maincpu;
-	required_device_array<mos6530_new_device, 2> m_miot;
+	required_device_array<mos6530_device, 2> m_miot;
 	required_device<pwm_display_device> m_digit_pwm;
 	required_device<cassette_image_device> m_cass;
 	required_ioport_array<3> m_row;
@@ -252,12 +252,12 @@ void kim1_state::mem_map(address_map &map)
 {
 	map.global_mask(0x1fff);
 	map(0x0000, 0x03ff).ram();
-	map(0x1700, 0x170f).mirror(0x0030).m(m_miot[1], FUNC(mos6530_new_device::io_map));
-	map(0x1740, 0x174f).mirror(0x0030).m(m_miot[0], FUNC(mos6530_new_device::io_map));
-	map(0x1780, 0x17bf).m(m_miot[1], FUNC(mos6530_new_device::ram_map));
-	map(0x17c0, 0x17ff).m(m_miot[0], FUNC(mos6530_new_device::ram_map));
-	map(0x1800, 0x1bff).m(m_miot[1], FUNC(mos6530_new_device::rom_map));
-	map(0x1c00, 0x1fff).m(m_miot[0], FUNC(mos6530_new_device::rom_map));
+	map(0x1700, 0x170f).mirror(0x0030).m(m_miot[1], FUNC(mos6530_device::io_map));
+	map(0x1740, 0x174f).mirror(0x0030).m(m_miot[0], FUNC(mos6530_device::io_map));
+	map(0x1780, 0x17bf).m(m_miot[1], FUNC(mos6530_device::ram_map));
+	map(0x17c0, 0x17ff).m(m_miot[0], FUNC(mos6530_device::ram_map));
+	map(0x1800, 0x1bff).m(m_miot[1], FUNC(mos6530_device::rom_map));
+	map(0x1c00, 0x1fff).m(m_miot[0], FUNC(mos6530_device::rom_map));
 }
 
 void kim1_state::sync_map(address_map &map)
@@ -323,13 +323,13 @@ void kim1_state::kim1(machine_config &config)
 	config.set_default_layout(layout_kim1);
 
 	// devices
-	MOS6530_NEW(config, m_miot[0], 1_MHz_XTAL); // U2
+	MOS6530(config, m_miot[0], 1_MHz_XTAL); // U2
 	m_miot[0]->pa_rd_callback().set(FUNC(kim1_state::u2_read_a));
 	m_miot[0]->pa_wr_callback().set(FUNC(kim1_state::u2_write_a));
 	m_miot[0]->pb_rd_callback().set(FUNC(kim1_state::u2_read_b));
 	m_miot[0]->pb_wr_callback().set(FUNC(kim1_state::u2_write_b));
 
-	MOS6530_NEW(config, m_miot[1], 1_MHz_XTAL); // U3
+	MOS6530(config, m_miot[1], 1_MHz_XTAL); // U3
 
 	CASSETTE(config, m_cass);
 	m_cass->set_formats(kim1_cassette_formats);

@@ -20215,7 +20215,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="how many are the dumbbells you lift? - cobinee (2019).rom" size="0x8000" crc="21090c38" sha1="9f177a508930bda78841413218a927a230be7ac5" />
+				<rom name="how many are the dumbbells you lift - cobinee (2019).rom" size="0x8000" crc="21090c38" sha1="9f177a508930bda78841413218a927a230be7ac5" />
 			</dataarea>
 		</part>
 	</software>
@@ -21454,7 +21454,7 @@ legacy FM implementations cannot find it.
 	</software>
 
 	<software name="minimags">
-		<description>Minimagos</description>
+		<description>MiniMagos</description>
 		<year>2017</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Fran Games"/>

@@ -33,7 +33,7 @@
 #include "video/vector.h"
 #include "machine/74259.h"
 #include "machine/adc0808.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "machine/timekpr.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
@@ -270,8 +270,8 @@ void tomcat_state::sound_map(address_map &map)
 	map(0x2000, 0x2001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x3000, 0x30df).w(FUNC(tomcat_state::soundlatches_w));
 	map(0x30e0, 0x30e0).noprw(); // COINRD Inputs: D7 = Coin L, D6 = Coin R, D5 = SOUNDFLAG
-	map(0x5000, 0x507f).m("riot", FUNC(mos6532_new_device::ram_map));
-	map(0x5080, 0x509f).m("riot", FUNC(mos6532_new_device::io_map));
+	map(0x5000, 0x507f).m("riot", FUNC(mos6532_device::ram_map));
+	map(0x5080, 0x509f).m("riot", FUNC(mos6532_device::io_map));
 	map(0x6000, 0x601f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x7000, 0x701f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x8000, 0xffff).noprw(); // main sound program rom
@@ -330,7 +330,7 @@ void tomcat_state::tomcat(machine_config &config)
 	m_adc->in_callback<0>().set_ioport("STICKY");
 	m_adc->in_callback<1>().set_ioport("STICKX");
 
-	MOS6532_NEW(config, "riot", 14.318181_MHz_XTAL / 8);
+	MOS6532(config, "riot", 14.318181_MHz_XTAL / 8);
 	/*
 	 PA0 = /WS   OUTPUT  (TMS-5220 WRITE STROBE)
 	 PA1 = /RS   OUTPUT  (TMS-5220 READ STROBE)
