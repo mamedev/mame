@@ -154,7 +154,7 @@ protected:
 	memory_view m_io_gmx;
 
 private:
-	u8 m_magic_shift; // <<<<<<<<<<<<<
+	u8 m_magic_shift;
 	u8 m_gfx_ext = 0;
 	u8 m_magic_disabled;
 	u8 m_port_00_data;
