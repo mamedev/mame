@@ -478,7 +478,7 @@ static INPUT_PORTS_START( tlb )
 	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- _")        PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("= +")        PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=') PORT_CHAR('+')
 	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("` ~")        PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('`') PORT_CHAR('~')
-	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Back Space") PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(8)
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Back Space") PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))
 	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("k_X1")
 	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-7 IC")    PORT_CODE(KEYCODE_7_PAD)      PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-8 UP")    PORT_CODE(KEYCODE_8_PAD)      PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
@@ -507,7 +507,7 @@ static INPUT_PORTS_START( tlb )
 	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M")          PORT_CODE(KEYCODE_M)          PORT_CHAR('m') PORT_CHAR('M')
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", <")        PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(". >")        PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space")      PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(' ')
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space")      PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(UCHAR_MAMEKEY(SPACE))
 
 	PORT_START("X7")
 	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A")          PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
@@ -1046,7 +1046,7 @@ void heath_gp19_tlb_device::io_map(address_map &map)
  *  Q1 132/80 columns H
  *  Q2 Reverse Screen H
  *  Q3 Alt Character L
- *  Q4-Q7 LED indicators
+ *  Q4-Q7 LED indicators (debug LEDs on circuit board)
  */
 void heath_gp19_tlb_device::latch_u5_w(uint8_t data)
 {
@@ -1116,7 +1116,7 @@ MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 
 				inv ^= screen_inv;
 
-				// get pattern of pixels for that character scanline
+				// select proper character set
 				uint16_t base = char_gen_a11 ? 0x800 : 0x0;
 
 				uint8_t const gfx = m_p_chargen[base | (chr << 4) | ra] ^ inv;
