@@ -55,7 +55,7 @@
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(DAFB, dafb_device, "macdafb", "Apple DAFB video")
-DEFINE_DEVICE_TYPE(DAFB_MEMC, dafb_memc_device, "macdafb_memc", "Apple DAFB II video (djMEMC integrated)")
+DEFINE_DEVICE_TYPE(DAFB_MEMC, dafb_memc_device, "macdafb_djmemc", "Apple DAFB II video (djMEMC integrated)")
 DEFINE_DEVICE_TYPE(DAFB_MEMCJR, dafb_memcjr_device, "macdafb_memcjr", "Apple DAFB II video (MEMCjr integrated)")
 
 //-------------------------------------------------
@@ -110,7 +110,7 @@ dafb_memc_device::dafb_memc_device(const machine_config &mconfig, const char *ta
 }
 
 dafb_memcjr_device::dafb_memcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	dafb_base(mconfig, DAFB_MEMC, tag, owner, clock),
+	dafb_base(mconfig, DAFB_MEMCJR, tag, owner, clock),
 	m_pcbr1(0),
 	m_last_clock(0),
 	m_clock_shift(0),
