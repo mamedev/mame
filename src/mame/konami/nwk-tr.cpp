@@ -1764,7 +1764,7 @@ ROM_END
 // GNxxx -> 5+R gear shift (8-way joystick), clutch pedal, hand brake lever
 // GYxxx -> Same as GN but intended for the 'super deluxe' cab (Cobra system). GY676 RTC is interchangable between Cobra and NWK-TR Racing Jam
 // GPxxx, GExxx, GMxxx -> up/down gear shift, no clutch, hand brake lever
-// GQxxx -> up/down gear shift, no clutch, no hand brake lever, less wheel range than other versions
+// GQxxx -> up/down gear shift, no clutch, no hand brake lever
 // Change the first two bytes in the NVRAM and fix the checksum at 0x0e-0x0f (calculated as the negated sum of 0x00-0x0e as 16-bit big endian values)
 // to generate new NVRAMs.
 GAME( 1998, racingj,    0,        nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676UAC)",               GAME_FLAGS )
