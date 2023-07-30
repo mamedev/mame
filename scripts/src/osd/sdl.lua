@@ -28,6 +28,7 @@ function maintargetosdoptions(_target,_subtarget)
 		links {
 			"X11",
 			"Xinerama",
+			"wayland-egl",
 		}
 	else
 		if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
