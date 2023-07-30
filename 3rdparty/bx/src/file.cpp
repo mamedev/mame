@@ -70,11 +70,12 @@ namespace bx
 #	if BX_CRT_MSVC
 #		define fseeko64 _fseeki64
 #		define ftello64 _ftelli64
-#	elif 0                   \
-	  || BX_PLATFORM_ANDROID \
-	  || BX_PLATFORM_BSD     \
-	  || BX_PLATFORM_HAIKU   \
-	  || BX_PLATFORM_IOS     \
+#	elif 0                      \
+	  || BX_PLATFORM_ANDROID    \
+	  || BX_PLATFORM_BSD        \
+	  || BX_PLATFORM_EMSCRIPTEN \
+	  || BX_PLATFORM_HAIKU      \
+	  || BX_PLATFORM_IOS        \
 	  || BX_PLATFORM_OSX
 #		define fseeko64 fseeko
 #		define ftello64 ftello
