@@ -23,16 +23,6 @@
 
 namespace {
 
-#define ROM_PAGE_SYS 2
-#define ROM_PAGE_DOS 3
-
-#define DOS        m_beta->is_active()
-#define ROMRAM     BIT(m_port_1ffd_data, 0)
-#define ROM1       BIT(m_port_7ffd_data, 4)
-
-#define GMX_FIXROM BIT(m_port_00_data, 4)
-
-
 class scorpion_state : public spectrum_128_state
 {
 public:
@@ -53,9 +43,16 @@ public:
 	INPUT_CHANGED_MEMBER(on_nmi);
 
 protected:
+	static constexpr u8 ROM_PAGE_SYS = 2;
+	static constexpr u8 ROM_PAGE_DOS = 3;
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+
+	bool dos()    const { return m_beta->is_active(); }
+	bool romram() const { return BIT(m_port_1ffd_data, 0); }
+	bool rom1()   const { return BIT(m_port_7ffd_data, 4); }
 
 	void scorpion_io(address_map &map);
 	void scorpion_mem(address_map &map);
@@ -98,6 +95,7 @@ class scorpiontb_state : public scorpion_state
 public:
 	scorpiontb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: scorpion_state(mconfig, type, tag)
+		, m_io_turbo(*this, "TURBO")
 	{ }
 
 	void scorpiontb(machine_config &config);
@@ -114,7 +112,8 @@ protected:
 
 	virtual void scorpion_update_memory() override;
 
-	u8 m_turbo;
+	required_ioport m_io_turbo;
+
 	u8 m_prof_plane;
 
 private:
@@ -154,6 +153,8 @@ protected:
 	memory_view m_io_gmx;
 
 private:
+	bool fixrom() const { return BIT(m_port_00_data, 4); }
+
 	u8 m_magic_shift;
 	u8 m_gfx_ext = 0;
 	u8 m_magic_disabled;
@@ -198,7 +199,7 @@ D6-D7 - not used. ( yet ? )
 
 void scorpion_state::scorpion_update_memory()
 {
-	if (ROMRAM && !m_nmi_pending)
+	if (romram() && !m_nmi_pending)
 	{
 		m_bank_ram[0]->set_entry(0);
 		m_bank0_rom.select(0);
@@ -208,7 +209,7 @@ void scorpion_state::scorpion_update_memory()
 	{
 		const u8 rom_page = BIT(m_port_1ffd_data, 1)
 			? ROM_PAGE_SYS
-			: (((m_nmi_pending || DOS) << 1) | ROM1);
+			: (((m_nmi_pending || dos()) << 1) | rom1());
 
 		m_bank_rom[0]->set_entry(rom_page);
 		m_bank0_rom.disable();
@@ -239,7 +240,7 @@ void scorpion_state::do_nmi()
 
 u8 scorpion_state::port_ff_r()
 {
-	if (m_magic_lock)
+	if (m_magic_lock && !machine().side_effects_disabled())
 	{
 		LOGIO("Registers lock released\n");
 		m_magic_lock = 0;
@@ -286,7 +287,7 @@ u8 scorpion_state::beta_enable_r(offs_t offset)
 	if (!machine().side_effects_disabled())
 	{
 		if (m_is_m1_even && (m_maincpu->total_cycles() & 1)) m_maincpu->eat_cycles(1);
-		if (!DOS && ROM1)
+		if (!dos() && rom1())
 		{
 			m_beta->enable();
 			scorpion_update_memory();
@@ -304,7 +305,7 @@ u8 scorpion_state::beta_disable_r(offs_t offset)
 		{
 			do_nmi();
 		}
-		else if (DOS)
+		else if (dos())
 		{
 			m_beta->disable();
 			scorpion_update_memory();
@@ -360,8 +361,8 @@ void scorpion_state::scorpion_ioext(address_map &map)
 void scorpion_state::scorpion_io(address_map &map)
 {
 	map(0x0000, 0xffff).lrw8(
-		NAME([this](offs_t offset) { return m_ioext.read_byte((DOS << 16) | offset); }),
-		NAME([this](offs_t offset, u8 data) { m_ioext.write_byte((DOS << 16) | offset, data); }));
+		NAME([this](offs_t offset) { return m_ioext.read_byte((dos() << 16) | offset); }),
+		NAME([this](offs_t offset, u8 data) { m_ioext.write_byte((dos() << 16) | offset, data); }));
 }
 
 void scorpion_state::scorpion_switch(address_map &map)
@@ -565,9 +566,11 @@ u8 scorpiontb_state::ay_data_r()
 
 INPUT_CHANGED_MEMBER(scorpiontb_state::turbo_changed)
 {
-	m_turbo = !m_turbo;
-	m_maincpu->set_clock_scale(1 << m_turbo);
-	popmessage("Turbo %s\n", m_turbo ? "ON" : "OFF");
+	if (newval != oldval)
+	{
+		m_maincpu->set_clock_scale(1 << newval);
+		popmessage("Turbo %s\n", newval ? "ON" : "OFF");
+	}
 }
 
 INPUT_PORTS_START( scorpiontb )
@@ -602,7 +605,6 @@ void scorpiontb_state::machine_start()
 
 	save_item(NAME(m_prof_plane));
 	save_item(NAME(m_ay_reg));
-	save_item(NAME(m_turbo));
 }
 
 void scorpiontb_state::machine_reset()
@@ -612,7 +614,7 @@ void scorpiontb_state::machine_reset()
 
 	scorpion_state::machine_reset();
 	m_is_m1_even = 0;
-	m_turbo = 0;
+	m_io_turbo->field(0x01)->live().value = 0;
 	m_maincpu->set_clock_scale(1);
 }
 
@@ -631,7 +633,7 @@ void scorpiontb_state::video_start()
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
 	prg.install_read_tap(0x0100, 0x010c, "plane_switch", [this](offs_t offset, u8 &data, u8 mem_mask)
 	{
-		if (!machine().side_effects_disabled() && !ROMRAM && ((m_bank_rom[0]->entry() & 3) == ROM_PAGE_SYS))
+		if (!machine().side_effects_disabled() && !romram() && ((m_bank_rom[0]->entry() & 3) == ROM_PAGE_SYS))
 		{
 			const u8 offs = offset & 0x000f;
 			if ((offs == 0) || (offs == 4) || (offs == 8) || (offs == 0x0c))
@@ -651,9 +653,9 @@ void scorpiontb_state::scorpion_ioext(address_map &map)
 {
 	scorpion_state::scorpion_ioext(map);
 	map(0x0021, 0x0021).mirror(0x13fdc) // 1FFD | 00xxxxxxxx1xxx01
-		.lr8(NAME([this](offs_t offset) -> u8 { m_turbo = 0; m_maincpu->set_clock_scale(1); return 0xff; }));
+		.lr8(NAME([this](offs_t offset) -> u8 { m_io_turbo->field(0x01)->live().value = 0; m_maincpu->set_clock_scale(1); return 0xff; }));
 	map(0x4021, 0x4021).mirror(0x13fdc) // 7FFD | 01xxxxxxxx1xxx01
-		.lr8(NAME([this](offs_t offset) -> u8 { m_turbo = 1; m_maincpu->set_clock_scale(2); return 0xff; }));
+		.lr8(NAME([this](offs_t offset) -> u8 { m_io_turbo->field(0x01)->live().value = 1; m_maincpu->set_clock_scale(2); return 0xff; }));
 	map(0xe021, 0xe021).mirror(0x11fdc) // FFFD | 111xxxxxxx1xxx01
 		.rw(FUNC(scorpiontb_state::ay_data_r),  FUNC(scorpiontb_state::ay_address_w));
 
@@ -751,7 +753,7 @@ void scorpiongmx_state::global_cfg_w(u8 data)
 	if (BIT(data, 3))
 	{
 		m_magic_shift = 0x88 | (data & 7);
-		if (!GMX_FIXROM)
+		if (!fixrom())
 			m_maincpu->reset();
 	}
 }
@@ -761,7 +763,10 @@ u8 scorpiongmx_state::port_78fd_r()
 	u8 tmp = (BIT(m_port_fe_data, 1) << 7) // BRD1
 		| (m_port_78fd_data & 0x7f);
 	tmp |= (m_magic_shift & 1);
-	m_magic_shift >>= 1;
+
+	if(!machine().side_effects_disabled())
+		m_magic_shift >>= 1;
+
 	return tmp;
 }
 
@@ -786,7 +791,7 @@ u8 scorpiongmx_state::port_7efd_r()
 	else
 		data = (BIT(m_port_1ffd_data, 0) << 6)
 			| (m_gfx_ext << 3)
-			| (m_turbo << 2)
+			| (m_io_turbo->read() << 2)
 			| (BIT(m_port_7ffd_data, 3) << 1)
 			| BIT(m_port_7ffd_data, 5);
 
@@ -799,10 +804,10 @@ u8 scorpiongmx_state::port_7efd_r()
 
 void scorpiongmx_state::port_7efd_w(u8 data)
 {
-	m_turbo = BIT(data, 7);
-	m_maincpu->set_clock_scale(1 << m_turbo);
+	m_io_turbo->field(0x01)->live().value = BIT(data, 7);
+	m_maincpu->set_clock_scale(1 << BIT(data, 7));
 
-	if (!GMX_FIXROM)
+	if (!fixrom())
 	{
 		m_prof_plane = BIT(data, 4, 3); // D4..6 - A16..18: 28F400
 		scorpion_update_memory();
