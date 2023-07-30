@@ -177,9 +177,6 @@ void ps2_mb_device::add_mca16(machine_config &config)
 	MCA16(config, m_mcabus, 0);
 	m_mcabus->set_addrmap(0, &ps2_mb_device::ps2_16_map);
 	m_mcabus->set_addrmap(1, &ps2_mb_device::ps2_16_io);
-
-	m_mcabus->cs_feedback_callback().set(m_io_controller, FUNC(ibm72x8299_device::cd_sfdbk_w));
-
 	add_mca_common(config);
 }
 
@@ -188,9 +185,6 @@ void ps2_mb_device::add_mca32(machine_config &config)
 	MCA32(config, m_mcabus, 0);
 	m_mcabus->set_addrmap(0, &ps2_mb_device::ps2_32_map);
 	m_mcabus->set_addrmap(1, &ps2_mb_device::ps2_32_io);
-
-	m_mcabus->cs_feedback_callback().set(m_io_controller, FUNC(ibm72x8299_device::cd_sfdbk_w));
-
 	add_mca_common(config);
 }
 

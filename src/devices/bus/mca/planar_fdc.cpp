@@ -136,7 +136,7 @@ void mca16_planar_fdc_device::eop_w(int state)
 
 uint8_t mca16_planar_fdc_device::io8_r(offs_t offset)
 {
-	assert_card_feedback();
+	//assert_card_feedback();
 	uint8_t data;
 	
 	switch(offset)
@@ -160,7 +160,7 @@ void mca16_planar_fdc_device::io8_w(offs_t offset, uint8_t data)
 {
 	//LOG("%s: O:%02X D:%02X\n", FUNCNAME, offset, data);
 
-	assert_card_feedback();
+	//assert_card_feedback();
 	
 	switch(offset)
 	{

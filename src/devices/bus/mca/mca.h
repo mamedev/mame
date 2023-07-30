@@ -39,6 +39,7 @@ namespace MCABus
 	const uint16_t CARD_NOT_PRESENT = 0xffff;
 };
 
+// The class that represents a 16-bit MCA slot.
 class mca16_slot_device : public device_t, public device_slot_interface
 {
 public:
@@ -69,7 +70,8 @@ protected:
 DECLARE_DEVICE_TYPE(MCA16_SLOT, mca16_slot_device)
 
 class device_mca16_card_interface;
-// ======================> mca16_device
+
+// Class representing the 16-bit MCA bus.
 class mca16_device : public device_t,
 					public device_memory_interface
 {
@@ -97,7 +99,7 @@ public:
 	template <typename T> void set_iospace(T &&tag, int spacenum) { m_iospace.set_tag(std::forward<T>(tag), spacenum); }
 	auto iochrdy_callback() { return m_write_iochrdy.bind(); }
 	auto iochck_callback() { return m_write_iochck.bind(); }
-	auto cs_feedback_callback() { return m_cs_feedback.bind(); }
+	auto cs_feedback_callback() { printf("cs_feedback_callback %p\n", this); return m_cs_feedback.bind(); }
 
 	template<int Line> auto irq_callback() { return m_out_irq_cb[Line].bind(); }
 	template<int Line> auto drq_callback() { return m_out_drq_cb[Line].bind(); }
@@ -189,7 +191,7 @@ DECLARE_DEVICE_TYPE(MCA16, mca16_device)
 
 // ======================> device_mca16_card_interface
 
-// class representing interface-specific live mca16 card
+// The class representing a card with a 16-bit MCA interface.
 class device_mca16_card_interface : public device_interface
 {
 	friend class mca16_device;
@@ -260,7 +262,7 @@ public:
 	virtual void update_pos_data_4(uint8_t data) {}
 
 	// Stuff for out-of-band bus/card device configuration.
-	void set_mcabus(device_t *mca_device) { m_mca_dev = mca_device; }
+	void set_host_bus(device_t *mca_device) { m_mca_dev = mca_device; }
 	virtual void set_mca_device() { m_mca = dynamic_cast<mca16_device *>(m_mca_dev); }
 
 	device_mca16_card_interface *next() const { return m_next; }
@@ -274,7 +276,7 @@ protected:
 	/// that a device is present at a particular I/O address.
 	/// Asserted by the receiving device, not the transmitting device.
 	/// If no device is present, the line is never asserted.
-	virtual void assert_card_feedback() { printf("assert_card_feedback %p\n", this); m_mca->cs_feedback_callback(); }
+	virtual void assert_card_feedback() { } //printf("16-bit card interface: assert card feedback %p\n", m_mca); m_mca->cs_feedback_callback(); }
 	virtual void reset_option_select() { memset(m_option_select, 0, 8);  }
 		
 	uint8_t 	m_option_select[8];
@@ -292,6 +294,7 @@ private:
 ////////////////////////////
 class device_mca32_card_interface;
 
+// The class representing the 32-bit MCA bus.
 class mca32_device : public mca16_device
 {
 public:
@@ -325,6 +328,7 @@ protected:
 
 DECLARE_DEVICE_TYPE(MCA32, mca32_device);
 
+// The class that represents a 32-bit MCA slot.
 class mca32_slot_device : public mca16_slot_device
 {
 public:
@@ -348,6 +352,7 @@ protected:
 	virtual void device_start() override;
 };
 
+// The class that represents a 32-bit MCA card.
 class device_mca32_card_interface : public device_mca16_card_interface
 {
 	friend class mca32_device;

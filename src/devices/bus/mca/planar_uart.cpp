@@ -124,13 +124,13 @@ void mca16_planar_uart_device::disable()
 
 uint8_t mca16_planar_uart_device::io8_r(offs_t offset)
 {
-    assert_card_feedback();
+    //assert_card_feedback();
     return m_uart->ins8250_r(offset);
 }
 
 void mca16_planar_uart_device::io8_w(offs_t offset, uint8_t data)
 {
-    assert_card_feedback();
+    //assert_card_feedback();
     m_uart->ins8250_w(offset, data);
 }
 

@@ -68,7 +68,7 @@ void mca16_slot_device::device_start()
 {
 	device_mca16_card_interface *const dev = dynamic_cast<device_mca16_card_interface *>(get_card_device());
 
-	if (dev) dev->set_mcabus(m_mca_bus);
+	if (dev) dev->set_host_bus(m_mca_bus);
 
 	// tell MCA bus that there is one slot with the specified tag
 	downcast<mca16_device &>(*m_mca_bus).add_slot(tag());
@@ -589,7 +589,7 @@ void mca32_slot_device::device_start()
 {
 	device_mca32_card_interface *const dev = dynamic_cast<device_mca32_card_interface *>(get_card_device());
 
-	if (dev) dev->set_mcabus(m_mca_bus);
+	if (dev) dev->set_host_bus(m_mca_bus);
 
 	// tell MCA bus that there is one slot with the specified tag
 	downcast<mca32_device &>(*m_mca_bus).add_slot(tag());

@@ -59,7 +59,7 @@ ibm72x8299_device::ibm72x8299_device(const machine_config &mconfig, const char *
 	: ibm72x8299_device(mconfig, tag, owner, clock)
 {
 	m_planar = planar;
-	m_mca = bus;
+	m_mca = planar->get_mca_bus();
 	m_planar_id = planar->get_planar_id();
 }
 
@@ -92,13 +92,12 @@ void ibm72x8299_device::device_reset()
 
 void ibm72x8299_device::device_add_mconfig(machine_config &config)
 {
-   	MCA16_SLOT(config, m_planar_vga,    0, *m_mca, pc_mca16_cards, "planar_vga", true);
-	MCA16_SLOT(config, m_planar_fdc,    0, *m_mca, pc_mca16_cards, "planar_fdc", true);
-	MCA16_SLOT(config, m_planar_uart,   0, *m_mca, pc_mca16_cards, "planar_uart", true);
-	MCA16_SLOT(config, m_planar_lpt,    0, *m_mca, pc_mca16_cards, "planar_lpt", true);
+   	MCA16_SLOT(config, m_planar_vga,    0, ":mb:mcabus", pc_mca16_cards, "planar_vga", true);
+	MCA16_SLOT(config, m_planar_fdc,    0, ":mb:mcabus", pc_mca16_cards, "planar_fdc", true);
+	MCA16_SLOT(config, m_planar_uart,   0, ":mb:mcabus", pc_mca16_cards, "planar_uart", true);
+	MCA16_SLOT(config, m_planar_lpt,    0, ":mb:mcabus", pc_mca16_cards, "planar_lpt", true);
 
 	m_mca->cs_feedback_callback().set(*this, FUNC(ibm72x8299_device::cd_sfdbk_w));
-	printf("assert card feedback r %p\n", m_mca);
 
     PS2_PIT(config, m_pit);
     m_pit->set_clk<0>(XTAL_U153 / 21); /* heartbeat IRQ */
