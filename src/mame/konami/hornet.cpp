@@ -3593,8 +3593,8 @@ GAME(  1998, thrilldgmj,  thrilld,  hornet_lan, thrilld_gm, hornet_state, init_h
 GAME(  1998, thrilldgpj,  thrilld,  hornet_lan, thrilld_gp, hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GP713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, thrilldgej,  thrilld,  hornet_lan, thrilld_ge, hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GE713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, thrilldgke,  thrilld,  hornet_lan, thrilld_gk, hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GK713EAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, thrilldgkk,  thrilld,  hornet_lan, thrilld_gp, hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GK713K*B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, thrilldgkee, thrilld,  hornet_lan, thrilld_gk, hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GK713EEB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgkk,  thrilld,  hornet_lan, thrilld_gp, hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GK713K*B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // Revisions C and D removed Japanese region support but introduced Voodoo 2 support.
 GAMEL( 1999, sscope,   0,      sscope, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver UAD, Ver 1.33)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
