@@ -24,8 +24,6 @@ Address writing (address book) ~ 宛名書き（住所録）- Toshiba
 An English Word Processor ~ 英文ワードプロセッサ - Toshiba
 Animation editor EDDY ~ アニメエディタＥＤＤＹ - HAL Kenkyujo
 Aoki Ookami to Shiroki Mejika - Koei (apparently a cart version existed)
-Bank Street Writer - Toshiba
-BASIC Compiler ~ ＢＡＳＩＣコンパイラ - Heart Soft
 BASIC Helper ~ ベーシックヘルパー - Yamaha
 Blood Pressure Program ~ 連続血圧測定プログラム - Tateishi Electronics
 Buck Rogers - Sega?
@@ -166,7 +164,6 @@ Ligue-se ao Expert - Gradiente
 
 - original titles
 Adventure Kid - Open
-Bubble Bobble ~ 보글보글 - Clover
 Bobble Bobble 2 - ProSoft
 Django - Prosoft
 Hello Kangshi ~ 헬로우 강시 - Clover
@@ -279,18 +276,6 @@ Skooter - Al Alamiah
 Snake It - [GA004] Al Alamiah
 Time Curb - [GA003] Al Alamiah
 Ultra Chess - [K085] Al Alamiah
-
-
-Softcards:
-
-Barnstormer - Electric Software
-Chack'n Pop - Electric Software
-Choro Q - Electric Software
-Front Line - Electric Software
-Graphics Editor - Electric Software
-Shark Hunter - Electric Software
-Sweet Acorn - Electric Software
-Xyzolog - Electric Software
 
 -->
 
@@ -2029,6 +2014,21 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="backtofb" cloneof="backtof">
+		<description>Back to the Future (Japan, alt 2)</description>
+		<year>1986</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="serial" value="R49X5090" />
+		<info name="alt_title" value="バックトゥザフューチャー" />
+		<info name="gtin" value="04988013001695"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="back to the future (japan) (alt 2).rom" size="0x8000" crc="58bc5a86" sha1="7c14ace9aa67372db53ba9f43821b0aa5ff7008e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="backgamj">
 		<description>Back Gammon (Japan)</description>
 		<year>1984</year>
@@ -2181,6 +2181,18 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="bankswrt">
+		<description>Bank Street Writer (United Kingdom)</description>
+		<year>1983</year>
+		<publisher>Toshiba</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="bank street writer (1982).rom" size="0x8000" crc="3b782b71" sha1="223661138586a1b024d6dba5e5fa67d6b7685884" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="basicnyu">
 		<description>Basic Nyuumon (Japan)</description>
 		<year>1984</year>
@@ -2207,6 +2219,20 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="basic lessons 2 (japan).rom" size="0x8000" crc="13014324" sha1="01cf858888f5a0d3aee08f42a66c515ab0d06400" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basicmpl">
+		<description>BASIC compiler (Japan)</description>
+		<year>1985</year>
+		<publisher>Heart Soft</publisher>
+		<info name="alt_title" value="ＢＡＳＩＣコンパイラ" />
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="basic compiler (japan).rom" size="0x4000" crc="c42ffe96" sha1="3060f68327e518f5b65c8ceca9dac35e26288340" />
 			</dataarea>
 		</part>
 	</software>
@@ -2335,10 +2361,24 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="ビームライダー" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="0x10000">
-				<rom name="beam rider (japan) (alt 1).rom" size="0x4000" crc="d6a6bee6" sha1="f51f936887498d21f6ee9fe8a7701633be67e79d" />
+				<rom name="beam rider (japan).rom" size="0x4000" crc="d6a6bee6" sha1="f51f936887498d21f6ee9fe8a7701633be67e79d" />
 				<rom size="0x4000" offset="0x4000" loadflag="reload" />
 				<rom size="0x4000" offset="0x8000" loadflag="reload" />
 				<rom size="0x4000" offset="0xc000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beamridra" cloneof="beamridr">
+		<description>Beam Rider (Japan, alt)</description>
+		<year>1984</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="serial" value="R48X5502" />
+		<info name="alt_title" value="ビームライダー" />
+		<part name="cart" interface="msx_cart">
+			<dataarea name="rom" size="0x10000">
+				<rom name="beam rider (japan) (alt).rom" size="0x8000" crc="1553e408" sha1="1231984ae24bf35f9f38596b864420d8ccd3f30b" />
+				<rom size="0x8000" offset="0x8000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -2872,6 +2912,19 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="bruce lee (japan).rom" size="0x8000" crc="a20b196d" sha1="621ea075a534584361c9e9d640e39007a79dfd78" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbobblek">
+		<description>Bubble Bobble (Korea)</description>
+		<year>1990</year>
+		<publisher>Clover</publisher>
+		<info name="alt_title" value="보글보글" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="bubble bobble (korea).rom" size="0x8000" crc="3eb092fb" sha1="b3b7098fb285df6f96c024fa83714d3a28d8a3c8" />
 			</dataarea>
 		</part>
 	</software>
@@ -16040,6 +16093,19 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="breakina" cloneof="breakinj">
+		<description>Break In (Arab)</description>
+		<year>1987</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="GA019" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="breakin (al alamiah, 1987).rom" size="0x8000" crc="c05b3bc9" sha1="91af1d8cd39d12b20be8b905077a4c1ed99e0847" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="xword">
 		<description>Cross Word (Arab)</description>
 		<year>1985</year>
@@ -17857,8 +17923,8 @@ legacy FM implementations cannot find it.
 		<info name="serial" value="AQ010"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
-			<dataarea name="rom" size="0x8000">
-				<rom name="b_basic.rom" size="0x8000" crc="bdc18f43" sha1="f9f3e2e6222e1cdb0784bf041e4a01146aab736a" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="b_basic.rom" size="0x4000" crc="eb3b2e86" sha1="f6ae6e9f42a2d2328a3464d3168517c189f3de10" />
 			</dataarea>
 		</part>
 	</software>
@@ -19070,6 +19136,507 @@ legacy FM implementations cannot find it.
 
 
 <!-- Homebrew / Doujin software -->
+
+	<software name="bagman">
+		<description>Bagman</description>
+		<year>2007</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="AG Software"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="bagman - ag software (2007).rom" size="0x4000" crc="c3a33d26" sha1="e984bfb4251e7b9f9b6b95d5e1005e67c223ae67" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bakerman">
+		<description>Bakerman</description>
+		<year>2008</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="AG Software"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="bakerman - ag software (2008).rom" size="0x4000" crc="8528b797" sha1="619a2d42263da74a723cceead5a19e0e0dd86c6f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ballbstr">
+		<description>Balloon Buster</description>
+		<year>2022</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Hakogame"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="balloon buster - hakogame (2022).rom" size="0x20000" crc="d8975d68" sha1="d81a11ba78fe472355740a96c8681cc3281fd2a0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ballcity">
+		<description>Balloon City</description>
+		<year>2007</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="AG Software"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="balloon city - ag software (2007).rom" size="0x4000" crc="e442c99a" sha1="c46f85f21f780f126a0d61848071fcdcf84f15b9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battlot">
+		<description>Battlot</description>
+		<year>2021</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="battlot - inufuto (2021).rom" size="0x4000" crc="eb5e76e8" sha1="c1757d4f232b691cb70355ca4d2f532de1cccd5c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bee">
+		<description>Bee</description>
+		<year>2016</year>
+		<publisher>N.I</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="bee - n.i (2016).rom" size="0x8000" crc="226f2e46" sha1="b1ce0053b176282274137e633a03653cbba7d472" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beeprtrn">
+		<description>Beepertron</description>
+		<year>2006</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Dioniso"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="beepertron - dioniso (2006).rom" size="0x2000" crc="422bccc5" sha1="65961a1926b24c8efa71f2ab68cbafa2d0122acf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beez">
+		<description>BeeZ</description>
+		<year>2006</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Darkstone"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="beez - darkstone (2006).rom" size="0x8000" crc="c51814db" sha1="bd44cc152851d9f3827fb304f3e4780ee607f896" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="betiled">
+		<description>BeTiled!</description>
+		<year>2007</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="CEZ Games Studio"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="betiled - cez games studio (2007).rom" size="0xc000" crc="4f89a784" sha1="8a3749af3d6ff88404df59da9d9ac7990bbc318d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="betileda" cloneof="betiled">
+		<description>BeTiled! (alt)</description>
+		<year>2007</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="CEZ Games Studio"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="betiled - cez games studio (2007) (alt).rom" size="0xc000" crc="6fa6f617" sha1="afe11b840b7bf0243b1c4f98309e274a3ddde35f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="betiledb" cloneof="betiled">
+		<description>BeTiled! (alt 2)</description>
+		<year>2007</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="CEZ Games Studio"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="betiled - cez games studio (2007) (alt 2).rom" size="0xc000" crc="d8dfe8d0" sha1="9267ea63e1d32095868eec1347a4eafbdfb5ef7e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="betiledc" cloneof="betiled">
+		<description>BeTiled! (alt 3)</description>
+		<year>2007</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="CEZ Games Studio"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="betiled - cez games studio (2007) (alt 3).rom" size="0xc000" crc="c7d64e70" sha1="c910ebb99e50181f5d14dad9bc9283fa42a09262" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brdchair">
+		<description>Bird &amp; Chairs</description>
+		<year>2017</year>
+		<publisher>N.I</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="bird and chairs - n.i (2017).rom" size="0x8000" crc="0236deea" sha1="ed0b859afd5cb5ab66fd2b1122ed83682b0f3ea1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bitlogic">
+		<description>BitLogic</description>
+		<year>2016</year>
+		<publisher>Matra</publisher>
+		<info name="developer" value="OXiAB Game Studio &amp; ThePetsMode"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x40000">
+				<rom name="bitlogic free mind - thepetsmode (2016).rom" size="0x40000" crc="a3dd2687" sha1="a38ace5c3d1877f4e5704fdeb2d1b405f1153bc5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bitlogcm" cloneof="bitlogic">
+		<description>BitLogic (MSXDev)</description>
+		<year>2015</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="OXiAB Game Studio &amp; ThePetsMode"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="bitlogic - thepetsmode (2015).rom" size="0xc000" crc="fbcd1942" sha1="fce65889dc551c83638f2e2ade1fd61dd44d6f58" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blastoid">
+		<description>Blastoid</description>
+		<year>2022</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Ludogix Ltd"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="blastoid - ludogix ltd (2022).rom" size="0x8000" crc="9ebd4cf0" sha1="cd66f222468f46cdacad82e4ddb0d3b5174f91e9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blckbstr">
+		<description>Blockbuster</description>
+		<year>2021</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Robosoft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="blockbuster - robosoft (2021).rom" size="0x8000" crc="a7a2aeae" sha1="5727ceabfac70da5c3033d9baaa8ae7334a5199e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blckpzzl">
+		<description>BlockPuzzle (v1.2)</description>
+		<year>2020</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="David Heremans"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="blockpuzzle - david heremans (2020) (v1.2).rom" size="0x8000" crc="0798e2b0" sha1="d1b52c3e71d0cb4a62635415b844375f85fae2c7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blckpzzl11" cloneof="blckpzzl">
+		<description>BlockPuzzle (v1.1)</description>
+		<year>2020</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="David Heremans"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="blockpuzzle - david heremans (2020) (v1.1).rom" size="0x8000" crc="e89b0da3" sha1="c52305b0737099dc05eb0d367ac21c18ce1733a5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blckpzzl10" cloneof="blckpzzl">
+		<description>BlockPuzzle (v1.0)</description>
+		<year>2020</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="David Heremans"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="blockpuzzle - david heremans (2020) (v1.0).rom" size="0x8000" crc="13b4d6af" sha1="6b0fe7ef1ab59ea6f1bde3e75d0dbefec45d245b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bloodymary">
+		<description>Bloody Mary</description>
+		<year>2020</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Lady DarkBite"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="bloody mary - lady darkbite (2020).rom" size="0x4000" crc="60d358c8" sha1="3fe78ca418eea1c330a2c97f05bf2a459fd5e5a1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blusyshop">
+		<description>Blusy Shop</description>
+		<year>2005</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="MSXNAKE"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="blusy shop - msxnake (2005).rom" size="0x4000" crc="1177c9d4" sha1="3e44a4e5608e01793877e62f82c12c2b82908461" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombmanm">
+		<description>Bomb Man</description>
+		<year>2005</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="AG Software"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="bomb man - ag software (2005).rom" size="0x4000" crc="216910c7" sha1="46ecaf85f1ff1b4821670bf44ff1249fe1b13a35" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombnblast">
+		<description>Bomb'n Blast</description>
+		<year>2015</year>
+		<publisher>Repro Factory</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="bomb n blast - repro factory (2021).rom" size="0x8000" crc="73c3cd75" sha1="47d320ef1a275894c0ec113041cf5125909586c8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bookworm">
+		<description>Bookworm</description>
+		<year>2021</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Z80 AMSer"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="bookworm - z80asmer (2021).rom" size="0x4000" crc="e8288af2" sha1="bed185497ca04fd5237c0eb0e475485d74cdc9c8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bootskell">
+		<description>Bootskell</description>
+		<year>2021</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="bootskell - inufuto (2021).rom" size="0x4000" crc="f110abd8" sha1="2d3ed1416728d097c0aec053ab3b809882fe7e76" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakbomb">
+		<description>Break Bomb</description>
+		<year>2021</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Gamecast Entertainment"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="break bomb - gamecast entertainment (2021).rom" size="0x10000" crc="d4bbd264" sha1="1e4c22a66491a96e222e7f077e88b5d48ab19801" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="britbob">
+		<description>British Bob</description>
+		<year>2009</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="RELEVO Videogames"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="british bob - relevo videogames (2009).rom" size="0x4000" crc="8ab004f9" sha1="e45af2f15327dfdc1b1250ddab97b7f28801d5ca" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="britboba" cloneof="britbob">
+		<description>British Bob (alt)</description>
+		<year>2009</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="RELEVO Videogames"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="british bob - relevo videogames (2009) (alt).rom" size="0x4000" crc="c38ef92d" sha1="f2dd846532d2244d67bb1959cf9ac5642a6381fa" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bubbowld">
+		<description>Bubbo World</description>
+		<year>2016</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="N.I"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="bubbo world - n.i (2016).rom" size="0x2000" crc="42ac5dac" sha1="c84d6b04725676b7162a0b9a23e8d94ed0e81495" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bubbwld2">
+		<description>Bubbo World 2</description>
+		<year>2016</year>
+		<publisher>N.I</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="bubbo world 2 - n.i (2016).rom" size="0x4000" crc="d9c25a09" sha1="045c28fd5c3d5f5ad5bd9e5c2c1ab6c2faaf84b2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buddhagi">
+		<description>BUDDHAGILLIE (v1.10)</description>
+		<year>2018</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="GW's Workshop"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="buddhagillie - gws workshop (2018) (v1.10).rom" size="0x8000" crc="906e2ce6" sha1="139be74cb58224eb6e405741d19a4a16c6adb553" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buddhagi100" cloneof="buddhagi">
+		<description>BUDDHAGILLIE (v1.00)</description>
+		<year>2018</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="GW's Workshop"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="buddhagillie - gws workshop (2018) (v1.00).rom" size="0x8000" crc="2e8cbab3" sha1="461e50c7372490a453a6cb04bfacf72253c32509" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bufonada">
+		<description>Bufonada (English)</description>
+		<year>2022</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Roolandoo"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="bufonada - roolandoo (2022) (english).rom" size="0xc000" crc="ab9d3ac5" sha1="dc152b96fddbc85cf32f4003f8b0988adf4f8ca7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bufonadas" cloneof="bufonada">
+		<description>Bufonada (Spanish)</description>
+		<year>2022</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Roolandoo"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="bufonada - roolandoo (2022) (spanish).rom" size="0xc000" crc="e75c8e50" sha1="ea463839ca7fc764fab8656f0d6b22db131a3d02" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsracing">
+		<description>Bumper Ship Racing (v1.1)</description>
+		<year>2018</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Uninteresting"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="bumper ship racing - uninteresting (2018) (v1.1).rom" size="0x8000" crc="b47b371b" sha1="7e91f77eb2146c0690656557d445617fbfe02190" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsracing10" cloneof="bsracing">
+		<description>Bumper Ship Racing (v1.0)</description>
+		<year>2018</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Uninteresting"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="bumper ship racing - uninteresting (2018) (v1.0).rom" size="0x8000" crc="9846d92a" sha1="4948aa0a8c3cb34fba5d3619df1245376a26f12f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="burnus">
+		<description>Burn Us (v2.0)</description>
+		<year>2018</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Carambalan Studios"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="burn us - carambalan studios (2018) (v2.0).rom" size="0x8000" crc="b3d06d43" sha1="c4dfda5c87c132830b6d776dde4de82fe6ec2865" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="burnus10" cloneof="burnus">
+		<description>Burn Us (v1.0)</description>
+		<year>2018</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Carambalan Studios"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="burn us - carambalan studios (2018) (v1.0).rom" size="0x8000" crc="d764de21" sha1="3dfd447efc149ab463575b7368c487777e409517" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="ccr">
 		<description>C.C.R. Anexo 1 El Algoritmo (v1.2)</description>
