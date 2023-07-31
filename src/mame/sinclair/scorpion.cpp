@@ -95,7 +95,6 @@ class scorpiontb_state : public scorpion_state
 public:
 	scorpiontb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: scorpion_state(mconfig, type, tag)
-		, m_io_turbo(*this, "TURBO")
 	{ }
 
 	void scorpiontb(machine_config &config);
@@ -112,8 +111,7 @@ protected:
 
 	virtual void scorpion_update_memory() override;
 
-	required_ioport m_io_turbo;
-
+	u8 m_turbo;
 	u8 m_prof_plane;
 
 private:
@@ -474,7 +472,7 @@ INPUT_PORTS_START( scorpion )
 	PORT_INCLUDE( spec_plus )
 
 	PORT_MODIFY("NMI")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, scorpion_state, on_nmi, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, scorpion_state, on_nmi, 0)
 
 
 	PORT_START("mouse_input1")
@@ -566,10 +564,11 @@ u8 scorpiontb_state::ay_data_r()
 
 INPUT_CHANGED_MEMBER(scorpiontb_state::turbo_changed)
 {
-	if (newval != oldval)
+	if (newval == 1)
 	{
-		m_maincpu->set_clock_scale(1 << newval);
-		popmessage("Turbo %s\n", newval ? "ON" : "OFF");
+		m_turbo = !m_turbo;
+		m_maincpu->set_clock_scale(1 << m_turbo);
+		popmessage("Turbo %s\n", m_turbo ? "ON" : "OFF");
 	}
 }
 
@@ -577,8 +576,7 @@ INPUT_PORTS_START( scorpiontb )
 	PORT_INCLUDE( scorpion )
 
 	PORT_START("TURBO")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Turbo") PORT_CODE(KEYCODE_F11) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, scorpiontb_state, turbo_changed, 0)
-	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TURBO") PORT_CODE(KEYCODE_F11) PORT_CHANGED_MEMBER(DEVICE_SELF, scorpiontb_state, turbo_changed, 0)
 INPUT_PORTS_END
 
 void scorpiontb_state::scorpiontb(machine_config &config)
@@ -605,6 +603,7 @@ void scorpiontb_state::machine_start()
 
 	save_item(NAME(m_prof_plane));
 	save_item(NAME(m_ay_reg));
+	save_item(NAME(m_turbo));
 }
 
 void scorpiontb_state::machine_reset()
@@ -614,7 +613,7 @@ void scorpiontb_state::machine_reset()
 
 	scorpion_state::machine_reset();
 	m_is_m1_even = 0;
-	m_io_turbo->field(0x01)->live().value = 0;
+	m_turbo = 0;
 	m_maincpu->set_clock_scale(1);
 }
 
@@ -653,9 +652,9 @@ void scorpiontb_state::scorpion_ioext(address_map &map)
 {
 	scorpion_state::scorpion_ioext(map);
 	map(0x0021, 0x0021).mirror(0x13fdc) // 1FFD | 00xxxxxxxx1xxx01
-		.lr8(NAME([this](offs_t offset) -> u8 { m_io_turbo->field(0x01)->live().value = 0; m_maincpu->set_clock_scale(1); return 0xff; }));
+		.lr8(NAME([this](offs_t offset) -> u8 { m_turbo = 0; m_maincpu->set_clock_scale(1); return 0xff; }));
 	map(0x4021, 0x4021).mirror(0x13fdc) // 7FFD | 01xxxxxxxx1xxx01
-		.lr8(NAME([this](offs_t offset) -> u8 { m_io_turbo->field(0x01)->live().value = 1; m_maincpu->set_clock_scale(2); return 0xff; }));
+		.lr8(NAME([this](offs_t offset) -> u8 { m_turbo = 1; m_maincpu->set_clock_scale(2); return 0xff; }));
 	map(0xe021, 0xe021).mirror(0x11fdc) // FFFD | 111xxxxxxx1xxx01
 		.rw(FUNC(scorpiontb_state::ay_data_r),  FUNC(scorpiontb_state::ay_address_w));
 
@@ -791,7 +790,7 @@ u8 scorpiongmx_state::port_7efd_r()
 	else
 		data = (BIT(m_port_1ffd_data, 0) << 6)
 			| (m_gfx_ext << 3)
-			| (m_io_turbo->read() << 2)
+			| (m_turbo << 2)
 			| (BIT(m_port_7ffd_data, 3) << 1)
 			| BIT(m_port_7ffd_data, 5);
 
@@ -804,8 +803,8 @@ u8 scorpiongmx_state::port_7efd_r()
 
 void scorpiongmx_state::port_7efd_w(u8 data)
 {
-	m_io_turbo->field(0x01)->live().value = BIT(data, 7);
-	m_maincpu->set_clock_scale(1 << BIT(data, 7));
+	m_turbo = BIT(data, 7);
+	m_maincpu->set_clock_scale(1 << m_turbo);
 
 	if (!fixrom())
 	{
