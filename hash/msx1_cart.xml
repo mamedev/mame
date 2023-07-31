@@ -163,7 +163,6 @@ Ligue-se ao Expert - Gradiente
 ==Known undumped Korean carts==
 
 - original titles
-Adventure Kid - Open
 Bobble Bobble 2 - ProSoft
 Django - Prosoft
 Hello Kangshi ~ 헬로우 강시 - Clover
@@ -184,7 +183,6 @@ Tom &amp; Jerry ~ 톰과 제리 - Static Soft/Aproman
 Arkanoid II (Kor) - Zemina
 Family Billiards (Kor) - Zemina
 Fruit Search (Kor) - Zemina
-Hydlide 2 - Shine of Darkness (Kor) - Zemina
 MSX Rugby (Kor) - Zemina
 Gopher no Yabou - Episode II (Nemesis 3) ~ 사라만다 II (Kor) - Zemina
 Sinbad (Kor) - Zemina
@@ -241,7 +239,6 @@ X & Y - [M022] Al Alamiah
 
 - undumped ports
 Alcazar - [GV026] Al Alamiah
-Alpine Ski - [GM038] Al Alamiah
 Beamrider - [GV024] Al Alamiah
 Binary Land - [GH035] Al Alamiah
 Bomber Man - [GH036] Al Alamiah
@@ -1386,6 +1383,19 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="advenkid">
+		<description>Adventure Kid (Korea)</description>
+		<year>1993</year>
+		<publisher>Open</publisher>
+		<info name="alt_title" value="원더키드" />
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="korean_hydlide2" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="adventure kid (korea).rom" size="0x20000" crc="01181477" sha1="0f984330ed5dc929e1207cf6afcc9a35837408d7" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="albatros">
 		<description>Albatross (Japan)</description>
 		<year>1986</year>
@@ -1559,6 +1569,19 @@ kept for now until finding out what those bytes affect...
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="aliens - alien 2 (japan) (alt 2).rom" size="0x20000" crc="3ddcb524" sha1="0d9c472cf7687b86f3fe2e5af6545a26a0efd5fc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aliensk" cloneof="aliens">
+		<description>Aliens - Alien 2 (Korea)</description>
+		<year>1987</year>
+		<publisher>Zemina</publisher>
+		<info name="alt_title" value="에이리언2" />
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="aliens - alien 2 (korea).rom" size="0x20000" crc="05e43e8c" sha1="9b04d06fa77c4f0757be28eb758b9710769e9759" />
 			</dataarea>
 		</part>
 	</software>
@@ -15944,6 +15967,19 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="alpski">
+		<description>Alpine Ski (Arab)</description>
+		<year>1987</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="GM038" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="alpine ski.rom" size="0x4000" crc="618b3a13" sha1="6e15b3d92191bf2c5ff07435c9849e31dad3ed1e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="arabhist">
 		<description>Arab History (Arab)</description>
 		<year>1985</year>
@@ -19136,6 +19172,323 @@ legacy FM implementations cannot find it.
 
 
 <!-- Homebrew / Doujin software -->
+
+	<software name="1937">
+		<description>1937 (English)</description>
+		<year>2022</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="joesg"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="1937 - joesg (2022) (english).rom" size="0x8000" crc="de7bd684" sha1="c97591331046562a69d64d40210d39972955fc29" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1937s" cloneof="1937">
+		<description>1937 (Spanish)</description>
+		<year>2022</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="joesg"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="1937 - joesg (2022) (spanish).rom" size="0x8000" crc="17ea63f5" sha1="866832b6a5e3f2a0f5c2e0a0ad5d1594070f539e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2048sim">
+		<description>2048 Simulator</description>
+		<year>2015</year>
+		<publisher>Timmy</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="2048 simulator - timmy (2015).rom" size="0x2000" crc="e5806599" sha1="e57074e93f0caaff0861294f0f496283042b829a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3_4">
+		<description>3,4</description>
+		<year>2019</year>
+		<publisher>Cobinee</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="3,4 - cobinee (2019).rom" size="0x8000" crc="1fadb2f3" sha1="1cfc616035ccaf11f56bd1e726eb785f75ba2cef" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="acegun">
+		<description>Ace Gun</description>
+		<year>2020</year>
+		<publisher>Cobinee</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="ace gun - cobinee (2020).rom" size="0x8000" crc="d9bbb093" sha1="e39fa4db6282a243a81baa6c807962a3e84df701" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aerial">
+		<description>Aerial</description>
+		<year>2021</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="aerial - inufuto (2021).rom" size="0x4000" crc="6fc792dc" sha1="7eb8d7ccf178b49f80c51e5d6a470d4044ca2a2d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alienatt">
+		<description>Alien Attack (v3.5)</description>
+		<year>2021</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Marcos Daniel Blanco"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x40000">
+				<rom name="alien attack - marcos daniel blanco (2021) (v3.5).rom" size="0x40000" crc="fbd3f05b" sha1="0aec9a3ff2ae32f8fa86283d41f26da8b62a5c7a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alienatt30" cloneof="alienatt">
+		<description>Alien Attack (v3.0)</description>
+		<year>2021</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Marcos Daniel Blanco"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
+			<dataarea name="rom" size="0x40000">
+				<rom name="alien attack - marcos daniel blanco (2021) (v3.0).rom" size="0x40000" crc="8b5fcc0c" sha1="796edcd920e33a90a90f39cfdbfe4d98cfc7b0fc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alienatt13" cloneof="alienatt">
+		<description>Alien Attack (v1.3)</description>
+		<year>2021</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Marcos Daniel Blanco"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="alien attack - marcos daniel blanco (2021) (v1.3).rom" size="0x8000" crc="4f34701e" sha1="971e1a8fd699c9704587184c07126ee66945552a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alienatt106" cloneof="alienatt">
+		<description>Alien Attack (v1.06)</description>
+		<year>2020</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Marcos Daniel Blanco"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
+			<dataarea name="rom" size="0x40000">
+				<rom name="alien attack - marcos daniel blanco (2020) (v1.06).rom" size="0x40000" crc="fdf8501c" sha1="c29240be15c6d87d7816966e0daeebfe6882e809" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alienatt101" cloneof="alienatt">
+		<description>Alien Attack (v1.01)</description>
+		<year>2020</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Marcos Daniel Blanco"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="alien attack - marcos daniel blanco (2020) (v1.01).rom" size="0x8000" crc="e3026083" sha1="976fa9b155fcfb04603e27ceb58b7bf3980de102" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alienatt10" cloneof="alienatt">
+		<description>Alien Attack (v1.0)</description>
+		<year>2020</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Marcos Daniel Blanco"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="alien attack - marcos daniel blanco (2020) (v1.0).rom" size="0x8000" crc="bec7ffe8" sha1="e0fb392da701589a104937120fe90d12843aae9e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alterego">
+		<description>Alter Ego</description>
+		<year>2011</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="The New Image"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="alter ego - the new image (2011).rom" size="0xc000" crc="41b51564" sha1="0cf251004caf6d874a66b05e100b599e5eaf9d32" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anchoraw">
+		<description>Anchors Aweigh (v1.1)</description>
+		<year>2020</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Manuel Martínez"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x40000">
+				<rom name="anchors aweigh - manuel martinez (2020) (v1.1).rom" size="0x2a000" crc="88aa7b0f" sha1="0522be9b9d0aea9b40b1aa7a1d331099a68ccd07" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anchoraw02" cloneof="anchoraw">
+		<description>Anchors Aweigh (v0.2)</description>
+		<year>2020</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Manuel Martínez"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x40000">
+				<rom name="anchors aweigh - manuel martinez (2020) (v0.2).rom" size="0x2a000" crc="7e87bf2a" sha1="c866ac07ffb80d086965be243866e13866262837" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anchorawp" cloneof="anchoraw">
+		<description>Anchors Aweigh (pre-release)</description>
+		<year>2020</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Manuel Martínez"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x40000">
+				<rom name="anchors aweigh - manuel martinez (2020) (pre-release).rom" size="0x2a000" crc="b3f333e7" sha1="660af63d866caab0c99f8ce1128726f872b52f55" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anpetten">
+		<description>Andrea Petkovic Tennis (English)</description>
+		<year>2017</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="joesg"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="andrea petkovic tennis - joesg (2017) (english).rom" size="0x4000" crc="85b04a3b" sha1="28d987178af4bf7161670342201686a3d6f1d009" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anpettens" cloneof="anpetten">
+		<description>Andrea Petkovic Tennis (Spanish)</description>
+		<year>2017</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="joesg"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="andrea petkovic tennis - joesg (2017) (spanish).rom" size="0x4000" crc="b612fdb7" sha1="6ad320178c79806d7febefa84c07e6176f1cb75e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anytrday">
+		<description>Any Treasure Day</description>
+		<year>2018</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Timmy"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="any treasure day - timmy (2018).rom" size="0x8000" crc="0a51b74e" sha1="581990d984cc01bb695208a62a2203abc896e563" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcomage">
+		<description>Arcomage</description>
+		<year>2015</year>
+		<publisher>Repro Factory</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="arcomage - bitvision software (2015).rom" size="0x10000" crc="a72794ba" sha1="1ee16b4fb031899f20a3e12fcd2663460d8e7950" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="armwrest">
+		<description>Arm Wrestler</description>
+		<year>2021</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="SKSOFT"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="arm wrestler - sksoft (2021).rom" size="0x8000" crc="4aafd3c2" sha1="5822456787cc4af33a956d7a6bdba0ad85137d0b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arnodash">
+		<description>Arno Dash</description>
+		<year>2021</year>
+		<publisher>Under4Mhz</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="arno dash - under4mhz (2021).rom" size="0x8000" crc="c29d7e34" sha1="cef6040cf49737498e3ff9b228696b3f60a7ffcc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="automania">
+		<description>Automania</description>
+		<year>2022</year>
+		<publisher>MSXDev</publisher>
+		<info name="developer" value="Fregani"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="automania - fregani (2022).rom" size="0x20000" crc="223be07f" sha1="2f24c2adc10277c78a1468894abdf23dcfe51e9a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="az8bjam">
+		<description>Azzurro 8bit Jam (v1.1)</description>
+		<year>2011</year>
+		<publisher>Matra</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="azzurro 8bit jam - relevo videogames (2011) (v1.1).rom" size="0x8000" crc="5b58c730" sha1="3f29328cfac7e39db6fb4f9270e7d590e0ca312c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="az8bjam10" cloneof="az8bjam">
+		<description>Azzurro 8bit Jam (v1.0)</description>
+		<year>2011</year>
+		<publisher>Matra</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="azzurro 8bit jam - relevo videogames (2011) (v1.0).rom" size="0x8000" crc="e6e5367a" sha1="e7ac2fb16598e3e446a7d1c9708f10cf4c332a77" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="bagman">
 		<description>Bagman</description>
