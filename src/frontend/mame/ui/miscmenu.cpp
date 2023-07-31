@@ -970,16 +970,16 @@ bool menu_plugins_configure::handle(event const *ev)
 
 void menu_plugins_configure::populate()
 {
-	plugin_options const &plugins = mame_machine_manager::instance()->plugins();
+	plugin_options const &plugin_opts = mame_machine_manager::instance()->plugins();
 
 	bool first(true);
-	for (auto const &curentry : plugins.plugins())
+	for (const plugin_options::plugin &p : plugin_opts.plugins())
 	{
-		if ("library" != curentry.m_type)
+		if (p.m_type != "library")
 		{
 			first = false;
-			bool const enabled = curentry.m_start;
-			item_append_on_off(curentry.m_description, enabled, 0, (void *)(uintptr_t)curentry.m_name.c_str());
+			bool const enabled = p.m_start;
+			item_append_on_off(p.m_description, enabled, 0, (void *)(uintptr_t)p.m_name.c_str());
 		}
 	}
 	if (first)

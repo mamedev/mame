@@ -101,7 +101,7 @@ mos6530_device_base::mos6530_device_base(const machine_config &mconfig, device_t
 	m_pa_in(0xff),
 	m_pa_out(0),
 	m_pa_ddr(0),
-	m_pa7(0),
+	m_pa7(1),
 	m_pa7_dir(0),
 	m_pb_in(0xff),
 	m_pb_out(0),
