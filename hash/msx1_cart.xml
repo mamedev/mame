@@ -1387,7 +1387,6 @@ kept for now until finding out what those bytes affect...
 		<description>Adventure Kid (Korea)</description>
 		<year>1993</year>
 		<publisher>Open</publisher>
-		<info name="alt_title" value="원더키드" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="korean_hydlide2" />
 			<dataarea name="rom" size="0x20000">
