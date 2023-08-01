@@ -83,14 +83,14 @@ void qncrash_state::qncrash(machine_config &config)
 	// basic machine hardware
 	KL5C80A12(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &qncrash_state::main_program_map);
-	m_maincpu->in_p0_callback().set_log("p0 in");
-	m_maincpu->out_p0_callback().set_log("p0 out");
-	m_maincpu->in_p1_callback().set_log("p1 in");
-	m_maincpu->out_p1_callback().set_log("p1 out");
-	m_maincpu->in_p2_callback().set_log("p2 in");
-	m_maincpu->out_p2_callback().set_log("p2 out");
-	m_maincpu->in_p3_callback().set_log("p3 in");
-	m_maincpu->out_p3_callback().set_log("p3 out");
+	m_maincpu->in_p0_callback().set([this] () { logerror("%s: p0 in", machine().describe_context()); return u8(0); });
+	m_maincpu->out_p0_callback().set([this] (u8 data) { logerror("%s: p0 out %02X", machine().describe_context(), data); });
+	m_maincpu->in_p1_callback().set([this] () { logerror("%s: p1 in", machine().describe_context()); return u8(0); });
+	m_maincpu->out_p1_callback().set([this] (u8 data) { logerror("%s: p1 out %02X", machine().describe_context(), data); });
+	m_maincpu->in_p2_callback().set([this] () { logerror("%s: p2 in", machine().describe_context()); return u8(0); });
+	m_maincpu->out_p2_callback().set([this] (u8 data) { logerror("%s: p2 out %02X", machine().describe_context(), data); });
+	m_maincpu->in_p3_callback().set([this] () { logerror("%s: p3 in", machine().describe_context()); return u8(0); });
+	m_maincpu->out_p3_callback().set([this] (u8 data) { logerror("%s: p3 out %02X", machine().describe_context(), data); });
 
 	tmpz84c015_device &dotcpu(TMPZ84C015(config, "dotcpu", 24'000'000 / 2)); // unknown D24OP8I XTAL, but TMPZ84C015BF-12 is rated for max 12 MHz, so guessed
 	dotcpu.set_addrmap(AS_PROGRAM, &qncrash_state::dot_program_map);
