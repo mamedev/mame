@@ -40641,6 +40641,7 @@ nratechu                        // (c) 1996 Seta
 renju                           // (c) 1994 Visco
 
 @source:seta/speedatk.cpp
+daifugo
 speedatk                        // CB-0 (c) SetaKikaku
 
 @source:seta/speglsht.cpp
