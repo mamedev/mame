@@ -478,7 +478,7 @@ static INPUT_PORTS_START( tlb )
 	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- _")        PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("= +")        PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=') PORT_CHAR('+')
 	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("` ~")        PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('`') PORT_CHAR('~')
-	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Back Space") PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Back Space") PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(8)
 	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("k_X1")
 	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-7 IC")    PORT_CODE(KEYCODE_7_PAD)      PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-8 UP")    PORT_CODE(KEYCODE_8_PAD)      PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
@@ -507,7 +507,7 @@ static INPUT_PORTS_START( tlb )
 	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M")          PORT_CODE(KEYCODE_M)          PORT_CHAR('m') PORT_CHAR('M')
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", <")        PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(". >")        PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space")      PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(UCHAR_MAMEKEY(SPACE))
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space")      PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(' ')
 
 	PORT_START("X7")
 	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A")          PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
@@ -730,9 +730,9 @@ static INPUT_PORTS_START( gp19 )
 
 	PORT_START("SW1")
 	PORT_DIPNAME( 0x03, 0x01, "Trailing characters for Tektronix message")   PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(    0x00, "none")
+	PORT_DIPSETTING(    0x00, "None")
 	PORT_DIPSETTING(    0x01, "CR")
-	PORT_DIPSETTING(    0x02, "none")
+	PORT_DIPSETTING(    0x02, "None")
 	PORT_DIPSETTING(    0x03, "CR,EOT")
 	PORT_DIPNAME( 0x04, 0x01, "Shift key")                                   PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, "Normal")
@@ -999,15 +999,15 @@ void heath_gp19_tlb_device::device_start()
 {
 	heath_tlb_device::device_start();
 
-	save_item(NAME(char_gen_a11));
-	save_item(NAME(graphic_mode));
-	save_item(NAME(col_132));
-	save_item(NAME(reverse_video));
+	save_item(NAME(m_char_gen_a11));
+	save_item(NAME(m_graphic_mode));
+	save_item(NAME(m_col_132));
+	save_item(NAME(m_reverse_video));
 
-	char_gen_a11 = false;
-	graphic_mode = false;
-	col_132 = false;
-	reverse_video = false;
+	m_char_gen_a11 = false;
+	m_graphic_mode = false;
+	m_col_132 = false;
+	m_reverse_video = false;
 
 }
 
@@ -1050,19 +1050,19 @@ void heath_gp19_tlb_device::io_map(address_map &map)
  */
 void heath_gp19_tlb_device::latch_u5_w(uint8_t data)
 {
-	graphic_mode = bool(BIT(data, 0));
-	col_132 = bool(BIT(data, 1));
-	reverse_video = bool(BIT(data, 2));
-	char_gen_a11 = bool(BIT(data, 3));
+	m_graphic_mode = bool(BIT(data, 0));
+	m_col_132 = bool(BIT(data, 1));
+	m_reverse_video = bool(BIT(data, 2));
+	m_char_gen_a11 = bool(BIT(data, 3));
 
 	// TODO handle LED indicators
 
-	if (graphic_mode)
+	if (m_graphic_mode)
 	{
 		m_crtc->set_clock(GP19_DOT_CLOCK_3 / 8);
 		m_screen->set_raw(GP19_DOT_CLOCK_3, 672, 50, 560, 264, 0, 250);
 	}
-	else if (col_132)
+	else if (m_col_132)
 	{
 		m_crtc->set_clock(GP19_DOT_CLOCK_1 / 8);
 		m_screen->set_raw(GP19_DOT_CLOCK_1, 1280, 1088, 33, 264, 10, 250);
@@ -1082,9 +1082,9 @@ MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 
 	if (de)
 	{
-		uint8_t screen_inv = reverse_video ? 0xff : 0x00;
+		uint8_t screen_inv = m_reverse_video ? 0xff : 0x00;
 
-		if (graphic_mode)
+		if (m_graphic_mode)
 		{
 			for (uint16_t x = 0; x < x_count; x++)
 			{
@@ -1117,7 +1117,7 @@ MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 				inv ^= screen_inv;
 
 				// select proper character set
-				uint16_t base = char_gen_a11 ? 0x800 : 0x0;
+				uint16_t base = m_char_gen_a11 ? 0x800 : 0x0;
 
 				uint8_t const gfx = m_p_chargen[base | (chr << 4) | ra] ^ inv;
 

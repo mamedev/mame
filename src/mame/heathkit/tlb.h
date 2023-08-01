@@ -163,10 +163,10 @@ protected:
 
 	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
 
-	bool char_gen_a11;
-	bool graphic_mode;
-	bool col_132;
-	bool reverse_video;
+	bool m_char_gen_a11;
+	bool m_graphic_mode;
+	bool m_col_132;
+	bool m_reverse_video;
 };
 
 DECLARE_DEVICE_TYPE(HEATH_TLB, heath_tlb_device)
