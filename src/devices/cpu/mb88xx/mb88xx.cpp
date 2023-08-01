@@ -56,7 +56,7 @@ DEFINE_DEVICE_TYPE(MB8844,  mb8844_cpu_device,  "mb8844",  "Fujitsu MB8844")
 #define TEST_CF()           (m_cf & 1)
 #define TEST_VF()           (m_vf & 1)
 #define TEST_SF()           (m_sf & 1)
-#define TEST_NF()           (m_nf & 1)
+#define TEST_IF()           (m_if & 1)
 
 #define UPDATE_ST_C(v)      m_st=(v&0x10) ? 0 : 1
 #define UPDATE_ST_Z(v)      m_st=(v==0) ? 0 : 1
@@ -201,7 +201,7 @@ void mb88_cpu_device::device_start()
 	save_item(NAME(m_cf));
 	save_item(NAME(m_vf));
 	save_item(NAME(m_sf));
-	save_item(NAME(m_nf));
+	save_item(NAME(m_if));
 	save_item(NAME(m_pio));
 	save_item(NAME(m_TH));
 	save_item(NAME(m_TL));
@@ -239,7 +239,7 @@ void mb88_cpu_device::state_import(const device_state_entry &entry)
 			m_cf = (m_debugger_flags & 0x04) ? 1 : 0;
 			m_vf = (m_debugger_flags & 0x08) ? 1 : 0;
 			m_sf = (m_debugger_flags & 0x10) ? 1 : 0;
-			m_nf = (m_debugger_flags & 0x20) ? 1 : 0;
+			m_if = (m_debugger_flags & 0x20) ? 1 : 0;
 			break;
 
 		case STATE_GENPC:
@@ -262,7 +262,7 @@ void mb88_cpu_device::state_export(const device_state_entry &entry)
 			if (TEST_CF()) m_debugger_flags |= 0x04;
 			if (TEST_VF()) m_debugger_flags |= 0x08;
 			if (TEST_SF()) m_debugger_flags |= 0x10;
-			if (TEST_NF()) m_debugger_flags |= 0x20;
+			if (TEST_IF()) m_debugger_flags |= 0x20;
 			break;
 
 		case STATE_GENPC:
@@ -284,7 +284,7 @@ void mb88_cpu_device::state_string_export(const device_state_entry &entry, std::
 					TEST_CF() ? 'C' : 'c',
 					TEST_VF() ? 'V' : 'v',
 					TEST_SF() ? 'S' : 's',
-					TEST_NF() ? 'I' : 'i');
+					TEST_IF() ? 'I' : 'i');
 
 			break;
 	}
@@ -306,7 +306,7 @@ void mb88_cpu_device::device_reset()
 	m_cf = 0;
 	m_vf = 0;
 	m_sf = 0;
-	m_nf = 0;
+	m_if = 0;
 	m_pio = 0;
 	m_TH = 0;
 	m_TL = 0;
@@ -359,12 +359,12 @@ void mb88_cpu_device::execute_set_input(int inputnum, int state)
 	/* On rising edge trigger interrupt.
 	 * Note this is a logical level, the actual pin is high-to-low voltage
 	 * triggered. */
-	if ( (m_pio & INT_CAUSE_EXTERNAL) && !m_nf && state != CLEAR_LINE )
+	if ( (m_pio & INT_CAUSE_EXTERNAL) && !m_if && state != CLEAR_LINE )
 	{
 		m_pending_interrupt |= INT_CAUSE_EXTERNAL;
 	}
 
-	m_nf = state != CLEAR_LINE;
+	m_if = state != CLEAR_LINE;
 }
 
 void mb88_cpu_device::update_pio_enable( uint8_t newpio )
@@ -727,7 +727,7 @@ void mb88_cpu_device::execute_run()
 				break;
 
 			case 0x25: /* tsti ZCS:..x */
-				m_st = m_nf ^ 1;
+				m_st = m_if ^ 1;
 				break;
 
 			case 0x26: /* tstv ZCS:..x */

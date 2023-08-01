@@ -148,7 +148,7 @@ private:
 	uint8_t   m_cf;     /* Carry flag: 1 bit */
 	uint8_t   m_vf;     /* Timer overflow flag: 1 bit */
 	uint8_t   m_sf;     /* Serial Full/Empty flag: 1 bit */
-	uint8_t   m_nf;     /* Interrupt flag: 1 bit */
+	uint8_t   m_if;     /* Interrupt flag: 1 bit */
 
 	/* Peripheral Control */
 	uint8_t   m_pio; /* Peripheral enable bits: 8 bits */
