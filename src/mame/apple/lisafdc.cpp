@@ -6,6 +6,32 @@
 #include "emu.h"
 #include "lisafdc.h"
 
+// Read command
+// lisa 1: 136a
+//   87 88 00 00 00 00 00 00 (wait until boot)
+//   86 08 00 00 00 00 00 00
+//   85 ff 00 00 00 00 00 00
+//   81 00 00 00 00 00 00 00
+//   85 cc 00 00 00 00 00 00
+//   81 00 00 00 00 00 00 00
+
+// lisa 2: 149a
+//   86 80 00 00 00 00 00 00
+//   85 ff 00 00 00 00 00 00
+//   81 00 00 00 00 00 00 00
+
+// lisa2 floppy failure
+//    1db3 = write 10 at +b (fail!)
+// -> 1d8a = 
+//    bp 1d7a
+
+// macxl: 149e
+//   87 88 00 00 00 00 00 00 (wait until boot)
+//   86 80 00 00 00 00 00 00
+//   85 ff 00 00 00 00 00 00
+//   81 00 80 00 00 00 00 00
+//   85 cc 80 00 00 00 00 00
+
 DEFINE_DEVICE_TYPE(LISAFDC,  lisa_fdc_device,  "lisafdc",  "Lisa 1 FDC subsystem")
 DEFINE_DEVICE_TYPE(LISA2FDC, lisa2_fdc_device, "lisa2fdc", "Lisa 2 FDC subsystem")
 DEFINE_DEVICE_TYPE(MACXLFDC, macxl_fdc_device, "macxlfdc", "Mac XL/Lisa 210 FDC subsystem")
@@ -119,8 +145,8 @@ void macxl_fdc_device::device_add_mconfig(machine_config &config)
 	m_iwm->devsel_cb().set(FUNC(macxl_fdc_device::devsel_w));
 	m_iwm->phases_cb().set(FUNC(macxl_fdc_device::phases_w));
 	
-	applefdintf_device::add_35_sd(config, m_floppy[0]);
-	applefdintf_device::add_35_nc(config, m_floppy[1]);
+	applefdintf_device::add_35_nc(config, m_floppy[0]);
+	applefdintf_device::add_35_sd(config, m_floppy[1]);
 }
 
 void lisa_base_fdc_device::device_start()
@@ -166,7 +192,7 @@ void lisa_base_fdc_device::update_sel()
 void lisa_base_fdc_device::update_phases()
 {
 	if(m_cur_floppy)
-		m_cur_floppy->seek_phase_w(m_hds);
+		m_cur_floppy->seek_phase_w(m_phases);
 }
 
 void lisa_original_fdc_device::map(address_map &map)
@@ -221,6 +247,7 @@ void macxl_fdc_device::map(address_map &map)
 	map(0x081d, 0x081d).lr8(NAME([this]() -> u8 { diag_1(); return 0; })).lw8(NAME([this](u8) { diag_1(); }));
 	map(0x081e, 0x081e).lr8(NAME([this]() -> u8 { fdir_0(); return 0; })).lw8(NAME([this](u8) { fdir_0(); }));
 	map(0x081f, 0x081f).lr8(NAME([this]() -> u8 { fdir_1(); return 0; })).lw8(NAME([this](u8) { fdir_1(); }));
+	map(0x0820, 0x0820).w(FUNC(macxl_fdc_device::pwm_w));
 
 	map(0x1000, 0x1fff).rom().region("cpu", 0);
 }
@@ -387,4 +414,40 @@ void macxl_fdc_device::update_sel()
 {
 	lisa_base_fdc_device::update_sel();
 	m_iwm->set_floppy(m_cur_floppy);
+	update_pwm();
+}
+
+void macxl_fdc_device::device_start()
+{
+	save_item(NAME(m_pwm));
+}
+
+void macxl_fdc_device::device_reset()
+{
+	m_pwm = 0;
+}
+
+void macxl_fdc_device::update_pwm()
+{
+	if(!m_cur_floppy)
+		return;
+	// Use a ramp somewhat similar to the macs
+	// The documentation requires:
+	// - duty cycle of 9.4%, 305 < rpm < 380 (middle 342.5)
+	// - duty cycle of 91%,  625 < rpm < 780 (middle 702.5)
+	// - linear between these two points
+
+	// Assume 0 = duty cycle of 0%, ff = duty cycle of 100%
+
+	float duty_cycle = (255-m_pwm) / 255.0;
+	float rpm = (duty_cycle - 0.094) * (702.5 - 342.5) / (0.91 - 0.094) + 342.5;
+
+	logerror("rpm %f\n", rpm);
+	m_cur_floppy->set_rpm(rpm);
+}
+
+void macxl_fdc_device::pwm_w(u8 data)
+{
+	m_pwm = data;
+	update_pwm();
 }

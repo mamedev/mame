@@ -94,9 +94,14 @@ class macxl_fdc_device : public lisa_base_fdc_device {
 public:
 	macxl_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	void pwm_w(u8 data);
+
 protected:
 	required_device<iwm_device> m_iwm;
+	u8 m_pwm;
 
+	void device_start() override;
+	void device_reset() override;
 	void device_add_mconfig(machine_config &config) override;
 	const tiny_rom_entry *device_rom_region() const override;
 	void map(address_map &map);
@@ -108,6 +113,7 @@ protected:
 	void phases_w(uint8_t phases);
 
 	virtual void update_sel() override;
+	void update_pwm();
 };
 
 DECLARE_DEVICE_TYPE(LISAFDC,  lisa_fdc_device)
