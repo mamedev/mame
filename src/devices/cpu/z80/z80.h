@@ -122,6 +122,7 @@ protected:
 	void init_op_steps();
 
 	// device_execute_interface overrides
+	virtual bool cpu_is_interruptible() const override { return true; }
 	virtual u32 execute_min_cycles() const noexcept override { return 2; }
 	virtual u32 execute_max_cycles() const noexcept override { return 16; }
 	virtual u32 execute_input_lines() const noexcept override { return 4; }

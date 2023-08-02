@@ -383,7 +383,7 @@ inline void z80_device::leave_halt()
 z80_device::ops_type z80_device::in()
 {
 	return ST_F {
-		TDAT8 = m_io.read_byte(TADR); } FN {
+		TDAT8 = m_io.read_byte(TADR);
 		T(4 * m_cycles_multiplier);   } EST
 }
 
@@ -393,7 +393,7 @@ z80_device::ops_type z80_device::in()
 z80_device::ops_type z80_device::out()
 {
 	return ST_F {
-		m_io.write_byte(TADR, TDAT8); } FN {
+		m_io.write_byte(TADR, TDAT8);
 		T(4 * m_cycles_multiplier);   } EST
 }
 
@@ -402,14 +402,15 @@ z80_device::ops_type z80_device::out()
  ***************************************************************/
 u8 z80_device::data_read(u16 addr)
 {
-	return m_data.read_byte(translate_memory_address(addr));
+	const u8 tmp = m_data.read_byte(translate_memory_address(addr));
+	T(MTM);
+	return tmp;
 }
 
 z80_device::ops_type z80_device::rm()
 {
 	return ST_F {
-		TDAT8 = data_read(TADR); } FN {
-		T(MTM);                  } EST
+		TDAT8 = data_read(TADR); } EST
 }
 
 z80_device::ops_type z80_device::rm_reg()
@@ -437,9 +438,7 @@ z80_device::ops_type z80_device::rm16()
 inline void z80_device::rm16(uint16_t addr, PAIR &r)
 {
 	r.b.l = data_read(addr);
-	T(MTM);
 	r.b.h = data_read(addr+1);
-	T(MTM);
 }
 
 /***************************************************************
@@ -447,15 +446,15 @@ inline void z80_device::rm16(uint16_t addr, PAIR &r)
  ***************************************************************/
 void z80_device::data_write(u16 addr, u8 value) {
 	m_data.write_byte(translate_memory_address((u32)addr), value);
+	T(MTM);
 }
 
 z80_device::ops_type z80_device::wm()
 {
 	return ST_F {
 		// As we don't count changes between read and write, simply adjust to the end of requested.
-		if (m_icount_executing != MTM) T(m_icount_executing - MTM); } FN {
-		data_write(TADR, TDAT8);                                    } FN {
-		T(MTM);                                                     } EST
+		if (m_icount_executing != MTM) T(m_icount_executing - MTM);
+		data_write(TADR, TDAT8);                                    } EST
 }
 
 
@@ -481,15 +480,13 @@ z80_device::ops_type z80_device::wm16()
 z80_device::ops_type z80_device::wm16_sp()
 {
 	return ST_F {
-		m_icount_executing -= MTM;                                  } FN {
-		if (m_icount_executing != MTM) T(m_icount_executing - MTM); } FN {
-		SP--;
-		data_write(SPD, TDAT_H);                                    } FN {
-		T(MTM);
+		SP--;                                                       } FN {
+		m_icount_executing -= MTM;
+		if (m_icount_executing != MTM) T(m_icount_executing - MTM);
+		data_write(SPD, TDAT_H);
 		m_icount_executing += MTM;                                  } FN {
-		SP--;
-		data_write(SPD, TDAT_L);                                    } FN {
-		T(MTM);                                                     } EST
+		SP--;                                                       } FN {
+		data_write(SPD, TDAT_L);                                    } EST
 }
 
 inline void z80_device::wm16_sp(PAIR &r)
@@ -498,11 +495,9 @@ inline void z80_device::wm16_sp(PAIR &r)
 	if (m_icount_executing != MTM) T(m_icount_executing - MTM);
 	SP--;
 	data_write(SPD, r.b.h);
-	T(MTM);
 	m_icount_executing += MTM;
 	SP--;
 	data_write(SPD, r.b.l);
-	T(MTM);
 }
 
 /***************************************************************
@@ -512,16 +507,17 @@ inline void z80_device::wm16_sp(PAIR &r)
  ***************************************************************/
 u8 z80_device::opcode_read()
 {
-	return m_opcodes.read_byte(translate_memory_address(PCD));
+	const u8 tmp = m_opcodes.read_byte(translate_memory_address(PCD));
+	T(get_opfetch_cycles() - (2 * m_cycles_multiplier));
+	return tmp;
 }
 
 z80_device::ops_type z80_device::rop()
 {
 	return ST_F {
 		TDAT8 = opcode_read();                                               } FN {
-		T(get_opfetch_cycles() - (2 * m_cycles_multiplier));                 } FN {
-		m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | (m_r & 0x7f), 0x00, 0xff); } FN {
-		T(2 * m_cycles_multiplier);
+		m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | (m_r & 0x7f), 0x00, 0xff);
+		T(2 * m_cycles_multiplier);                                          } FN {
 		PC++;
 		m_r++;                                                               } EST
 }
@@ -535,14 +531,16 @@ z80_device::ops_type z80_device::rop()
  ***************************************************************/
 u8 z80_device::arg_read()
 {
-	return m_args.read_byte(translate_memory_address(PCD));
+	const u8 tmp = m_args.read_byte(translate_memory_address(PCD));
+	T(MTM);
+	return tmp;
 }
 
 z80_device::ops_type z80_device::arg()
 {
 	return ST_F {
 		TDAT8 = arg_read(); } FN {
-		T(MTM); PC++;       } EST
+		PC++;               } EST
 }
 
 z80_device::ops_type z80_device::arg16()
@@ -581,9 +579,9 @@ z80_device::ops_type z80_device::pop()
 {
 	return ST_F {
 		TDAT_L = data_read(SPD); } FN {
-		T(MTM); SP++;            } FN {
+		SP++;                    } FN {
 		TDAT_H = data_read(SPD); } FN {
-		T(MTM); SP++;            } EST
+		SP++;                    } EST
 }
 
 /***************************************************************
@@ -3730,7 +3728,16 @@ void z80_device::execute_run()
 				m_icount = 0; // stalled
 				return;
 			}
+			const int icount = m_icount;
+			const int executing = m_icount_executing;
 			v[m_cycle++]();
+			if ((m_icount < 0) && access_to_be_redone())
+			{
+				m_icount = icount;
+				m_icount_executing = executing;
+				m_cycle--;
+				return;
+			}
 		}
 
 		if(m_cycle >= v.size())
