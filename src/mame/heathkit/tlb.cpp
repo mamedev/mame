@@ -273,17 +273,17 @@ uint8_t heath_tlb_device::kbd_flags_r()
 
 int heath_tlb_device::mm5740_shift_r()
 {
-	return ((m_kbspecial->read() & 0x120) != 0x120) ? ASSERT_LINE : CLEAR_LINE;
+	return ((m_kbspecial->read() & 0x120) != 0x120) ? 1 : 0;
 }
 
 int heath_tlb_device::mm5740_control_r()
 {
-	return (m_kbspecial->read() & KB_STATUS_CONTROL_KEY_MASK) ? CLEAR_LINE : ASSERT_LINE;
+	return (m_kbspecial->read() & KB_STATUS_CONTROL_KEY_MASK) ? 0 : 1;
 }
 
 void heath_tlb_device::mm5740_data_ready_w(int state)
 {
-	if (state == ASSERT_LINE)
+	if (state)
 	{
 		uint8_t *decode = m_kbdrom->base();
 
@@ -296,7 +296,7 @@ void heath_tlb_device::mm5740_data_ready_w(int state)
 
 void heath_tlb_device::serial_irq_w(int state)
 {
-	m_serial_irq_raised = state != CLEAR_LINE;
+	m_serial_irq_raised = bool(state);
 	set_irq_line();
 }
 
@@ -312,7 +312,7 @@ void heath_tlb_device::check_for_reset()
 	if (m_reset_key && m_right_shift)
 	{
 		m_reset_pending = true;
-		m_reset(ASSERT_LINE);
+		m_reset(1);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 	else if (m_reset_pending)
@@ -320,7 +320,7 @@ void heath_tlb_device::check_for_reset()
 		m_reset_pending = false;
 		reset();
 		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		m_reset(CLEAR_LINE);
+		m_reset(0);
 	}
 }
 
@@ -341,7 +341,7 @@ void heath_tlb_device::right_shift_w(int state)
 void heath_tlb_device::repeat_key_w(int state)
 {
 	// when repeat key pressed, set duty cycle to 0.5, else 0.
-	m_repeat_clock->set_duty_cycle(state == CLEAR_LINE ? 0.5 : 0);
+	m_repeat_clock->set_duty_cycle(state == 0 ? 0.5 : 0);
 }
 
 void heath_tlb_device::break_key_w(int state)
