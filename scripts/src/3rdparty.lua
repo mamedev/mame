@@ -1469,6 +1469,11 @@ end
 				"BGFX_CONFIG_RENDERER_OPENGL=0",
 			}
 		end
+		if _OPTIONS["USE_WAYLAND"]=="1" then
+			defines {
+				"WL_EGL_PLATFORM=1",
+			}
+		end
 	end
 
 	if _OPTIONS["targetos"]=="macosx" and _OPTIONS["gcc"]~=nil then

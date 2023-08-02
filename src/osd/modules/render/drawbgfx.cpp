@@ -56,7 +56,9 @@ extern void *GetOSWindow(void *wincontroller);
 #endif
 #endif
 
+#if defined(SDLMAME_USE_WAYLAND)
 #include <wayland-egl.h>
+#endif
 
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
@@ -425,7 +427,7 @@ bool video_bgfx::set_platform_data(bgfx::PlatformData &platform_data, osd_window
 		platform_data.nwh = wmi.info.cocoa.window;
 		break;
 #endif
-#if defined(SDL_VIDEO_DRIVER_WAYLAND) && SDL_VERSION_ATLEAST(2, 0, 16)
+#if defined(SDL_VIDEO_DRIVER_WAYLAND) && SDL_VERSION_ATLEAST(2, 0, 16) && defined(SDLMAME_USE_WAYLAND)
 	case SDL_SYSWM_WAYLAND:
 		{
 			platform_data.ndt = wmi.info.wl.display;
@@ -528,7 +530,7 @@ static void *sdlNativeWindowHandle(SDL_Window *window)
 	case SDL_SYSWM_COCOA:
 		return wmi.info.cocoa.window;
 #endif
-#if defined(SDL_VIDEO_DRIVER_WAYLAND) && SDL_VERSION_ATLEAST(2, 0, 16)
+#if defined(SDL_VIDEO_DRIVER_WAYLAND) && SDL_VERSION_ATLEAST(2, 0, 16) && defined(SDLMAME_USE_WAYLAND)
 	case SDL_SYSWM_WAYLAND:
 		{
 			wl_egl_window *win_impl = (wl_egl_window*)SDL_GetWindowData(window, "wl_egl_window");
