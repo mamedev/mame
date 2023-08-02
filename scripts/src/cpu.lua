@@ -1557,10 +1557,19 @@ if opt_tool(CPUS, "MELPS4") then
 end
 
 --------------------------------------------------
+-- Mitsubishi M16C, disassembler only
+--------------------------------------------------
+
+if opt_tool(CPUS, "M16C") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m16c/m16cdasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m16c/m16cdasm.h")
+end
+
+--------------------------------------------------
 -- Mitsubishi M32C, disassembler only
 --------------------------------------------------
 
-if opt_tool(CPUS, "M23C") then
+if opt_tool(CPUS, "M32C") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m32c/m32cdasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m32c/m32cdasm.h")
 end
