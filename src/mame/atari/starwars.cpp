@@ -16,7 +16,7 @@
 
     Known bugs:
         * the monitor "overdrive" effect is not simulated when you
-            get hit by enemy fire
+          get hit by enemy fire
 
 ****************************************************************************
 
@@ -41,14 +41,6 @@
 #define CLOCK_3KHZ   (MASTER_CLOCK / 4096)
 
 
-void starwars_state::quad_pokeyn_w(offs_t offset, uint8_t data)
-{
-	int pokey_num = (offset >> 3) & ~0x04;
-	int control = (offset & 0x20) >> 2;
-	int pokey_reg = (offset % 8) | control;
-
-	m_pokey[pokey_num]->write(pokey_reg, data);
-}
 
 /*************************************
  *
@@ -82,6 +74,21 @@ void starwars_state::irq_ack_w(uint8_t data)
  *  Main CPU memory handlers
  *
  *************************************/
+
+uint8_t starwars_state::starwars_main_ready_flag_r()
+{
+	/* only upper two flag bits mapped */
+	return (m_soundlatch->pending_r() << 7) | (m_mainlatch->pending_r() << 6);
+}
+
+void starwars_state::starwars_soundrst_w(uint8_t data)
+{
+	m_soundlatch->acknowledge_w();
+	m_mainlatch->acknowledge_w();
+
+	/* reset sound CPU here  */
+	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+}
 
 void starwars_state::main_map(address_map &map)
 {
@@ -128,12 +135,21 @@ void starwars_state::esb_main_map(address_map &map)
  *
  *************************************/
 
+void starwars_state::quad_pokeyn_w(offs_t offset, uint8_t data)
+{
+	int pokey_num = (offset >> 3) & ~0x04;
+	int control = (offset & 0x20) >> 2;
+	int pokey_reg = (offset % 8) | control;
+
+	m_pokey[pokey_num]->write(pokey_reg, data);
+}
+
 void starwars_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x07ff).w(m_mainlatch, FUNC(generic_latch_8_device::write));
 	map(0x0800, 0x0fff).r(m_soundlatch, FUNC(generic_latch_8_device::read)); /* SIN Read */
-	map(0x1000, 0x107f).ram();                         /* 6532 ram */
-	map(0x1080, 0x109f).rw(m_riot, FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0x1000, 0x107f).m(m_riot, FUNC(mos6532_device::ram_map));
+	map(0x1080, 0x109f).m(m_riot, FUNC(mos6532_device::io_map));
 	map(0x1800, 0x183f).w(FUNC(starwars_state::quad_pokeyn_w));
 	map(0x2000, 0x27ff).ram();                         /* program RAM */
 	map(0x4000, 0x7fff).rom();                         /* sound roms */
@@ -165,7 +181,7 @@ static INPUT_PORTS_START( starwars )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Diagnostic Step")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Diagnostic Step") // mentioned in schematics, but N/C?
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -222,7 +238,6 @@ static INPUT_PORTS_START( starwars )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	/* 0xc0 and 0xe0 None */
 
-
 	PORT_START("STICKY")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30)
 
@@ -272,12 +287,16 @@ void starwars_state::starwars(machine_config &config)
 	adc.in_callback<1>().set_ioport("STICKX"); // yaw
 	adc.in_callback<2>().set_constant(0); // thrust (unused)
 
-	RIOT6532(config, m_riot, MASTER_CLOCK / 8);
-	m_riot->in_pa_callback().set(FUNC(starwars_state::r6532_porta_r));
-	m_riot->out_pa_callback().set(FUNC(starwars_state::r6532_porta_w));
-	m_riot->in_pb_callback().set("tms", FUNC(tms5220_device::status_r));
-	m_riot->out_pb_callback().set("tms", FUNC(tms5220_device::data_w));
-	m_riot->irq_callback().set_inputline("audiocpu", M6809_IRQ_LINE);
+	MOS6532(config, m_riot, MASTER_CLOCK / 8);
+	m_riot->pa_wr_callback<0>().set(m_tms, FUNC(tms5220_device::wsq_w));
+	m_riot->pa_wr_callback<1>().set(m_tms, FUNC(tms5220_device::rsq_w));
+	m_riot->pa_rd_callback<2>().set(m_tms, FUNC(tms5220_device::readyq_r));
+	m_riot->pa_wr_callback<3>().set_nop(); // hold main CPU in reset? + enable delay circuit?
+	m_riot->pa_rd_callback<4>().set_constant(1); // not sound self test
+	m_riot->pa_wr_callback<5>().set_nop(); // TMS5220 VDD
+	m_riot->pb_rd_callback().set(m_tms, FUNC(tms5220_device::status_r));
+	m_riot->pb_wr_callback().set(m_tms, FUNC(tms5220_device::data_w));
+	m_riot->irq_wr_callback().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 
 	X2212(config, "x2212").set_auto_save(true); /* nvram */
 
@@ -314,11 +333,11 @@ void starwars_state::starwars(machine_config &config)
 	TMS5220(config, m_tms, MASTER_CLOCK/2/9).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set(m_riot, FUNC(riot6532_device::pa7_w));
+	m_soundlatch->data_pending_callback().set(m_riot, FUNC(mos6532_device::pa_bit_w<7>));
 	m_soundlatch->data_pending_callback().append([this](int state) { if (state) machine().scheduler().perfect_quantum(attotime::from_usec(100)); });
 
 	GENERIC_LATCH_8(config, m_mainlatch);
-	m_mainlatch->data_pending_callback().set(m_riot, FUNC(riot6532_device::pa6_w));
+	m_mainlatch->data_pending_callback().set(m_riot, FUNC(mos6532_device::pa_bit_w<6>));
 	m_mainlatch->data_pending_callback().append([this](int state) { if (state) machine().scheduler().perfect_quantum(attotime::from_usec(100)); });
 }
 
@@ -343,7 +362,6 @@ void starwars_state::esb(machine_config &config)
  *  ROM definitions
  *
  *************************************/
-
 
 ROM_START( starwars )
 	ROM_REGION( 0x12000, "maincpu", 0 )     /* 2 64k ROM spaces */
@@ -448,11 +466,7 @@ ROM_START( tomcatsw )
 	ROM_LOAD( "tcavg3.1l",     0x0000, 0x1000, CRC(27188aa9) SHA1(5d9a978a7ac1913b57586e81045a1b955db27b48) )
 
 	/* Sound ROMS */
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "136021-107.1jk",0x4000, 0x2000, NO_DUMP ) /* Sound ROM 0 */
-	ROM_RELOAD(                0xc000, 0x2000 )
-	ROM_LOAD( "136021-208.1h", 0x6000, 0x2000, NO_DUMP ) /* Sound ROM 0 */
-	ROM_RELOAD(                0xe000, 0x2000 )
+	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x100, "avg:prom", 0)
 	ROM_LOAD( "136021-109.4b", 0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */

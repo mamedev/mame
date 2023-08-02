@@ -2292,6 +2292,9 @@ void system1_state::sys1ppi(machine_config &config)
 	m_ppi8255->out_pa_callback().set(FUNC(system1_state::soundport_w));
 	m_ppi8255->out_pb_callback().set(FUNC(system1_state::videomode_w));
 	m_ppi8255->out_pc_callback().set(FUNC(system1_state::sound_control_w));
+	m_ppi8255->tri_pa_callback().set_constant(0x00);
+	m_ppi8255->tri_pb_callback().set_constant(0x40);
+	m_ppi8255->tri_pc_callback().set_constant(0x80);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

@@ -907,13 +907,13 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/clgd542x.h,VIDEOS["PC_VGA_CIRRUS"] = true
+--@src/devices/video/pc_vga_cirrus.h,VIDEOS["PC_VGA_CIRRUS"] = true
 --------------------------------------------------
 
 if (VIDEOS["PC_VGA_CIRRUS"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/video/clgd542x.cpp",
-		MAME_DIR .. "src/devices/video/clgd542x.h",
+		MAME_DIR .. "src/devices/video/pc_vga_cirrus.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_cirrus.h",
 	}
 end
 
@@ -931,6 +931,30 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/pc_vga_paradise.h,VIDEOS["PC_VGA_PARADISE"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_PARADISE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_paradise.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_paradise.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/wd90c26.h,VIDEOS["WD90C26"] = true
+--------------------------------------------------
+
+if (VIDEOS["WD90C26"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/wd90c26.cpp",
+		MAME_DIR .. "src/devices/video/wd90c26.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pc_vga_s3.h,VIDEOS["PC_VGA_S3"] = true
 --------------------------------------------------
 
@@ -938,6 +962,30 @@ if (VIDEOS["PC_VGA_S3"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/pc_vga_s3.cpp",
 		MAME_DIR .. "src/devices/video/pc_vga_s3.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/s3virge.h,VIDEOS["S3VIRGE"] = true
+--------------------------------------------------
+
+if (VIDEOS["S3VIRGE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/s3virge.cpp",
+		MAME_DIR .. "src/devices/video/s3virge.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/pc_vga_sis.h,VIDEOS["PC_VGA_SIS"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_SIS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_sis.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_sis.h",
 	}
 end
 

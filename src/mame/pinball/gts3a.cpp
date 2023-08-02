@@ -87,6 +87,10 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
 
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
 private:
 	void segbank_w(u8 data);
 	u8 u4a_r();
@@ -108,8 +112,7 @@ private:
 	u8 m_row = 0U; // for lamps and switches
 	u8 m_segment = 0U;
 	u8 m_u4b = 0U;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+
 	required_device<m65c02_device> m_maincpu;
 	required_device<m65c02_device> m_dmdcpu;
 	required_memory_bank    m_bank1;
@@ -480,7 +483,7 @@ void gts3a_state::p0(machine_config &config)
 void gts3a_state::p7(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_PIN7(config, m_p7_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
+	GOTTLIEB_SOUND_PIN7(config, m_p7_sound).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 

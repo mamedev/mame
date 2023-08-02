@@ -8,12 +8,14 @@ TODO (old notes, to be resorted with new PCI conversion):
 - BIOS CMOS doesn't save at all (needed for setting up the Hard Disk);
 - DISK BOOT FAILURE after EEPROM checking (many unknown IDE cs1 reads/writes);
 - Partition boot sector is missing from the CHD dump, protection?
-- Detects CPU type as "-S 16 MHz"? Sometimes it detects it as 486SX, unknown repro (after fiddling with CMOS settings anyway)
+- Detects CPU type as "-S 16 MHz"? Sometimes it detects it as 486SX, unknown repro
+  (after fiddling with CMOS settings anyway)
 - VGA BIOS reports being a Cirrus Logic GD5436 / 5446, it is unknown what exactly this game uses.
-- PCI hookups (no idea about what this uses), and improve/device-ify SiS85C49x;
+- PCI hookups (SiS496/SiS497 according to POST), and improve/device-ify SiS85C49x;
 - ISA bus cards are completely guessworked;
 - EEPROM timings are hacked (writes mostly fail otherwise);
-- Eventually needs AudioDrive ES688 / ES1688 / ES1788 & ES1868 devices and serial ports "for linking" before actually booting;
+- Eventually needs AudioDrive ES688 / ES1688 / ES1788 & ES1868 devices and serial ports "for linking"
+  before actually booting;
 
 INFO ABOUT SECURITY DONGLES:
 
@@ -62,7 +64,7 @@ USB Dongle
 #include "machine/lpci.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
-#include "video/clgd542x.h"
+#include "video/pc_vga_cirrus.h"
 
 namespace {
 
@@ -252,9 +254,7 @@ void photoply_state::photoply_io(address_map &map)
 //  map(0x0278, 0x027f).ram(); //parallel port 2
 	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 //  map(0x0378, 0x037f).ram(); //parallel port
-	map(0x03b0, 0x03bf).rw("vga", FUNC(cirrus_gd5446_device::port_03b0_r), FUNC(cirrus_gd5446_device::port_03b0_w));
-	map(0x03c0, 0x03cf).rw("vga", FUNC(cirrus_gd5446_device::port_03c0_r), FUNC(cirrus_gd5446_device::port_03c0_w));
-	map(0x03d0, 0x03df).rw("vga", FUNC(cirrus_gd5446_device::port_03d0_r), FUNC(cirrus_gd5446_device::port_03d0_w));
+	map(0x03b0, 0x03df).m("vga", FUNC(cirrus_gd5446_device::io_map));
 
 	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 

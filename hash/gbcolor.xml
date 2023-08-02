@@ -4579,7 +4579,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dkongcs" cloneof="dkongc">
-		<description>Donkey Kong Country (Europe, USA, Sample)</description>
+		<description>Donkey Kong Country (Europe, USA, sample)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -7334,7 +7334,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="gifts" cloneof="gift">
-		<description>Gift (Europe, Sample)</description>
+		<description>Gift (Europe, sample)</description>
 		<year>2001</year>
 		<publisher>Cryo</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -7709,7 +7709,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="granduels" cloneof="granduel">
-		<description>Granduel - Shinki Dungeon no Hihou (Japan, Sample)</description>
+		<description>Granduel - Shinki Dungeon no Hihou (Japan, sample)</description>
 		<year>1999</year>
 		<publisher>Bottom Up</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -9048,12 +9048,12 @@ license:CC0-1.0
 		<description>Inspector Gadget - Operation Madkactus (Europe)</description>
 		<year>2000</year>
 		<publisher>Ubi Soft</publisher>
-		<info name="serial" value="CGB-BIGP-EUR"/>
-		<sharedfeat name="compatibility" value="GBC"/>
+		<info name="serial" value="CGB-BIGP-EUR" />
+		<sharedfeat name="compatibility" value="GBC" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="1048576">
-				<rom name="inspector gadget - operation madkactus (europe) (en,fr,de,es,it,nl).bin" size="1048576" crc="3390b056" sha1="55c02b81fa854938ca3cb3e5b725a6a72f711e7b"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="inspector gadget - operation madkactus (europe) (en,fr,de,es,it,nl).bin" size="0x100000" crc="3390b056" sha1="55c02b81fa854938ca3cb3e5b725a6a72f711e7b" />
 			</dataarea>
 		</part>
 	</software>
@@ -9062,12 +9062,25 @@ license:CC0-1.0
 		<description>Inspector Gadget - Operation Madkactus (USA)</description>
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
-		<info name="serial" value="CGB-BIGE-USA"/>
-		<sharedfeat name="compatibility" value="GBC"/>
+		<info name="serial" value="CGB-BIGE-USA" />
+		<sharedfeat name="compatibility" value="GBC" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="1048576">
-				<rom name="inspector gadget - operation madkactus (usa).bin" size="1048576" crc="1af0b489" sha1="b0fa81a35e605948df3b7f1fcb5893bab99d9d6a"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="inspector gadget - operation madkactus (usa).bin" size="0x100000" crc="1af0b489" sha1="b0fa81a35e605948df3b7f1fcb5893bab99d9d6a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inspgadgp" cloneof="inspgadg">
+		<description>Inspector Gadget - Operation Madkactus (prototype, French)</description>
+		<year>2000</year>
+		<publisher>Ubi Soft</publisher>
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="inspector gadget - operation madkactus (prototype) (fr).bin" size="0x100000" crc="93ec798b" sha1="8444ff17aa3f865eec33cc49398b450e345376c3" />
 			</dataarea>
 		</part>
 	</software>
@@ -11986,7 +11999,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mmsus" cloneof="mms">
-		<description>M&amp;M's Minis Madness (USA, Sample)</description>
+		<description>M&amp;M's Minis Madness (USA, sample)</description>
 		<year>2000</year>
 		<publisher>Majesco</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -16031,7 +16044,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pokeeun" cloneof="pokesilv">
-		<description>Pocket Monsters Eun (Kor)</description>
+		<description>Pocket Monsters Eun (Korea)</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-AAXK-KOR"/>
@@ -16048,7 +16061,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pokegeum" cloneof="pokegold">
-		<description>Pocket Monsters Geum (Kor)</description>
+		<description>Pocket Monsters Geum (Korea)</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-AAUK-KOR"/>
@@ -21656,7 +21669,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="td6a" cloneof="td6">
-		<description>Test Drive 6 (Europe, Sample 'Destinations Toutes Sensations')</description>
+		<description>Test Drive 6 (Europe, sample 'Destinations Toutes Sensations')</description>
 		<year>1999</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -22318,7 +22331,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tonkaracua" cloneof="tonkarac">
-		<description>Tonka Raceway (USA, Rumble Version)</description>
+		<description>Tonka Raceway (USA, Rumble version)</description>
 		<year>1999</year>
 		<publisher>Hasbro Interactive</publisher>
 		<info name="serial" value="CGB-VTQE-USA"/>
@@ -25223,7 +25236,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="beastfgth" cloneof="beastfgt">
-		<description>Beast Fighter (Taiwan, Hacked?)</description>
+		<description>Beast Fighter (Taiwan, hacked?)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="EB-001?"/>
@@ -25460,7 +25473,7 @@ license:CC0-1.0
 	<software name="leinujsh" cloneof="leinujs">
 	<!-- This version bypasses the protection, but I think it's been hacked by whoever dumped
 	     the real card, so it can be removed once we properly emulate the parent -->
-		<description>Lei Nu Ji Shen (Taiwan, Hacked)</description>
+		<description>Lei Nu Ji Shen (Taiwan, hacked)</description>
 		<year>2000</year>
 		<publisher>GOWIN</publisher>
 		<info name="serial" value="GS-??"/>
@@ -26441,7 +26454,7 @@ license:CC0-1.0
 
 	<software name="digid3h" cloneof="digid3">
 	<!-- This got ripped by m_digi10 -->
-		<description>Chao Jinhua - Shuma Baobei D-3 (China, Ripped from 10 in 1 multicart)</description>
+		<description>Chao Jinhua - Shuma Baobei D-3 (China, ripped from 10 in 1 multicart)</description>
 		<year>200?</year>
 		<publisher>SKOB?</publisher>
 		<info name="alt_title" value="超進化 數碼寶貝D-3"/>
@@ -26456,7 +26469,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="fkdfw">
-		<description>Fengkuang Da Fuweng (China, Ripped from multicart)</description>
+		<description>Fengkuang Da Fuweng (China, ripped from multicart)</description>
 		<year>200?</year>
 		<publisher>V.Fame</publisher>
 		<info name="alt_title" value="疯狂大富翁"/>
@@ -26809,7 +26822,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="qtdsheng" cloneof="xiyouji">
-		<description>Qi Tian Dasheng - Sun Wukong (China, Ripped from 8 in 1 multicart)</description>
+		<description>Qi Tian Dasheng - Sun Wukong (China, ripped from 8 in 1 multicart)</description>
 		<year>200?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="齊天大聖 - 孫悟空"/>
@@ -26822,7 +26835,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sswy">
-		<description>Sheng Shou Wuyu - Shenlong Chuanshuo (China, Ripped from 12 in 1 multicart)</description>
+		<description>Sheng Shou Wuyu - Shenlong Chuanshuo (China, ripped from 12 in 1 multicart)</description>
 		<year>2001</year>
 		<publisher>V.Fame</publisher>
 		<info name="alt_title" value="聖獸物語 - 神龍傳說"/>
@@ -27193,7 +27206,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="3gokum2a" cloneof="3gokum2">
-		<description>Zhen San Guo Wu Shuang 2 - Shin Sangokumusou 2 (China, Pirate)</description>
+		<description>Zhen San Guo Wu Shuang 2 - Shin Sangokumusou 2 (China, pirate)</description>
 		<year>200?</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<info name="alt_title" value="真三國無雙2"/>
@@ -27282,7 +27295,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="xfsb">
-		<description>Xin Feng Shen Bang (China, Ripped from 12 in 1 multicart)</description>
+		<description>Xin Feng Shen Bang (China, ripped from 12 in 1 multicart)</description>
 		<year>2001</year>
 		<publisher>V.Fame</publisher>
 		<info name="alt_title" value="新封神榜"/>
@@ -27614,7 +27627,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="skxs">
-		<description>Shi Kong Xing Shou (China, Ripped from 12 in 1 multicart)</description>
+		<description>Shi Kong Xing Shou (China, ripped from 12 in 1 multicart)</description>
 		<year>2001</year>
 		<publisher>V.Fame</publisher>
 		<info name="alt_title" value="時空星獸"/>
@@ -27858,7 +27871,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="unk01" supported="no">
-		<description>Unknown RPG - Digimon? Zelda? (China, Encrypted?)</description>
+		<description>Unknown RPG - Digimon? Zelda? (China, encrypted?)</description>
 		<year>20??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -27951,7 +27964,7 @@ license:CC0-1.0
 		<!-- This is usually referred to as 'Vietnamese bootleg' of pokecrys
 		(apparently it got sent to US by a Vietnamese guy back in the 2000)
 		it can be seen on youtube. -->
-		<description>Pocket Monsters - Crystal Version (Bootleg)</description>
+		<description>Pocket Monsters - Crystal Version (bootleg)</description>
 		<year>20??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
@@ -28402,6 +28415,36 @@ license:CC0-1.0
 <!-- Freeware games for emulators -->
 
 	<software name="grimaces">
+		<description>Grimace’s Birthday (V1.7)</description>
+		<year>2023</year>
+		<publisher>Krool Toys</publisher>
+		<info name="release" value="20230704" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="bX4TvUeiUEfKRw8bkPGaB.gb" size="0x100000" crc="f3879ef0" sha1="27d7ee2f31bf575185711217c3cc9e08cbc5928a" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="grimaces16" cloneof="grimaces">
+		<description>Grimace’s Birthday (V1.6)</description>
+		<year>2023</year>
+		<publisher>Krool Toys</publisher>
+		<info name="release" value="20230623" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="bX4TvUeiUEfKRw8bkPGaB.gb" size="0x100000" crc="a7b59d7b" sha1="295fdc3218d1699dea6d5832d068b721fccf9bd4" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="grimaces15" cloneof="grimaces">
 		<description>Grimace’s Birthday (V1.5)</description>
 		<year>2023</year>
 		<publisher>Krool Toys</publisher>

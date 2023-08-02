@@ -2676,7 +2676,7 @@ ROM_START( gondo )
 	ROM_CONTINUE(         0x70000, 0x08000 )
 	ROM_LOAD( "dt11.h15", 0x68000, 0x08000, CRC(53e9cf17) SHA1(8cbb45154a60f42f1b1e7299b12d2e92fc194df8) )
 
-	ROM_REGION( 1024, "proms", 0 )
+	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) /* BPROM type MB7122E for Priority (Not yet used) */
 ROM_END
 
@@ -2720,7 +2720,7 @@ ROM_START( gondou )
 	ROM_CONTINUE(         0x70000, 0x08000 )
 	ROM_LOAD( "dt11.h15", 0x68000, 0x08000, CRC(53e9cf17) SHA1(8cbb45154a60f42f1b1e7299b12d2e92fc194df8) )
 
-	ROM_REGION( 1024, "proms", 0 )
+	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) /* BPROM type MB7122E for Priority (Not yet used) */
 ROM_END
 
@@ -2764,7 +2764,7 @@ ROM_START( makyosen )
 	ROM_CONTINUE(         0x70000, 0x08000 )
 	ROM_LOAD( "ds11.h15", 0x68000, 0x08000, CRC(53e9cf17) SHA1(8cbb45154a60f42f1b1e7299b12d2e92fc194df8) )
 
-	ROM_REGION( 1024, "proms", 0 )
+	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) /* BPROM type MB7122E for Priority (Not yet used) */
 
 	ROM_REGION( 0x0600, "plds", 0 )
@@ -3100,15 +3100,14 @@ ROM_END
 
 /*
 
-Meikyuu Hunter G (Japan, set 2)
+Meikyuu Hunter G (Japan, bootleg)
 
-set 2 - the code is very different, but is this an original board? it lacks original labels
-        and the IC positions are different on the sprite roms
+the code is very different, this is a bootleg board. It lacks original labels
+and the IC positions are different on the sprite ROMs
 
 this version lacks the linescroll effects when starting the game / demoplay, but the demoplay seems
-more complete, whereas in set 1 the players appear to get stuck before reaching the boss
-
-also is 27512.15f a good dump? graphic roms usually match, might be a good idea to check 27512.6d too
+more complete, whereas in the original the players appear to get stuck before reaching the boss.
+Probably bootlegged from a different revision.
 
 CPU
 ---
@@ -3134,7 +3133,7 @@ CPUs PCB (AT0789A):
 3x P27256
 2x TMM24512
 5x M27512ZB
-3x N82S137N (not dumped)
+3x N82S137N
 
 ROMs PCB (AT0789B):
 8x M27512ZB
@@ -3151,17 +3150,15 @@ ROMs PCB (AT0789B):
 ------------------------------------
 There is a small piggyback attached under CPUs PCB full of 74Sxx
 
-This boards looks like a legit PCB from Data East, even if a Data East logo is not present.
-
 ALL MEMORIES ARE MASK ROMS!
 
 */
-ROM_START( meikyuha )
+ROM_START( meikyuhbl )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "27256.1d", 0x08000, 0x08000, CRC(d5b5e8a2) SHA1(0155d1d0ddbd764b960148c3c9ef34223e101659) ) // dw-01-5.1d matched 6.552124%
 	ROM_LOAD( "24512.3d", 0x10000, 0x10000, CRC(40c9b0b8) SHA1(81deb25e00eb4d4c5133ea42cda279c318ee771c) )
 	ROM_LOAD( "24512.4d", 0x20000, 0x10000, CRC(5606a8f4) SHA1(e46e887f13f648fe2162cb853b3c20fa60e3d215) )
-	ROM_LOAD( "27512.6d", 0x30000, 0x10000, CRC(8ca6055d) SHA1(37dc5d3b158dc5d7c9677fc4f82e10804181619f) ) // dw-04.6d matched 99.995422%
+	ROM_LOAD( "27512.6d", 0x30000, 0x10000, CRC(8ca6055d) SHA1(37dc5d3b158dc5d7c9677fc4f82e10804181619f) ) // dw-04.6d matched 99.995422% (verified on 2 different PCBs, so almost certainly good)
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "27256.5f", 0x8000, 0x8000, CRC(c28c4d82) SHA1(ad88506bcbc9763e39d6e6bb25ef2bd6aa929f30) )
@@ -3185,12 +3182,18 @@ ROM_START( meikyuha )
 	ROM_REGION( 0x40000, "gfx3", 0 )    /* tiles */
 	ROM_LOAD( "27512.12f", 0x00000, 0x10000, CRC(b65e029d) SHA1(f8791d57f688f16e0f076361603510e7133f4e36) )
 	ROM_LOAD( "27512.14f", 0x10000, 0x10000, CRC(668d995d) SHA1(dc6221de6103168c8e19f2c6eb159b8989ca2208) )
-	ROM_LOAD( "27512.15f", 0x20000, 0x10000, CRC(547fe4e2) SHA1(f8406e7d2bbd2243fcfe27c7ba401f04536dadc9) ) // dw-08.15f matched 99.996948% (bad?)
+	ROM_LOAD( "27512.15f", 0x20000, 0x10000, CRC(bb2cf4a0) SHA1(78806adb6a9ad9fc0707ead567a3220eb2bdb32f) )
 	ROM_LOAD( "27512.17f", 0x30000, 0x10000, CRC(6a528d13) SHA1(f1ef592f1efea637abde26bb8e3d02d552582a43) )
 
-	ROM_REGION( 0x0800, "proms", 0 ) // taken from other set
-	ROM_LOAD( "dw18.9d",  0x0000, 0x0400, CRC(75f1945f) SHA1(6fa436ae21851ec30847d57c31bdd2fd695e08af)  )
-	ROM_LOAD( "dw19.10d", 0x0400, 0x0400, CRC(cc16f3fa) SHA1(4562106ff752f5fc5ae00ff098141e5d74fe4700)  )
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD_NIB_LOW(  "82s137.12d", 0x0000, 0x0400, CRC(bf922733) SHA1(c2566b2ad3d7520aa57a1e8027d4832631bd9a72) )
+	ROM_LOAD_NIB_HIGH( "82s137.13d", 0x0000, 0x0400, CRC(4ccc328e) SHA1(7d527f5265b65ac070c41e89b39c38c1ba42b544) )
+	ROM_LOAD(          "82s137.10d", 0x0400, 0x0400, CRC(cc16f3fa) SHA1(4562106ff752f5fc5ae00ff098141e5d74fe4700) )
+
+	ROM_REGION( 0x600, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "pal16r4anc.16",  0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16r4anc.158", 0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16r4anc.165", 0x400, 0x104, NO_DUMP )
 ROM_END
 
 /*
@@ -3276,47 +3279,51 @@ ROM_START( csilver )
 	ROM_LOAD( "dx09.10f", 0x30000, 0x10000, CRC(3192571d) SHA1(240c6c099f1e6edbf0be7d5a4ec396b056c9f70f) )
 	ROM_LOAD( "dx10.12f",  0x40000, 0x10000, CRC(3ef77a32) SHA1(97b97c35a6ca994d2e7a6e7a63101eda9709bcb1) )
 	ROM_LOAD( "dx11.13f",  0x50000, 0x10000, CRC(9cf3d5b8) SHA1(df4974f8412ab1cf65871b8e4e3dbee478bf4d21) )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "dx-15.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) // BPROM type MB7122E for priority (Not yet used), location on alternate board unknown
 ROM_END
 
-/* Different IC positions to World set? */
+// There is known to exist an identical ROM set with different PCB locations designated for an alternate ROM board (noted on the right of the ROM definition)
 ROM_START( csilverj )
 	ROM_REGION( 0x48000, "maincpu", 0 )
-	ROM_LOAD( "dx03-3.a4", 0x08000, 0x08000, CRC(02dd8cfc) SHA1(f29c0d9dd03e8c52672c0f3dbee44a93c5b4261d) )
-	ROM_LOAD( "dx01.a2", 0x10000, 0x10000, CRC(570fb50c) SHA1(3002f53182834a060fc282be1bc5767906e19ba2) )
-	ROM_LOAD( "dx02.a3", 0x20000, 0x10000, CRC(58625890) SHA1(503a969085f6dcb16687217c48136ea22d07c89f) )
+	ROM_LOAD( "dx03-2.18d", 0x08000, 0x08000, CRC(02dd8cfc) SHA1(f29c0d9dd03e8c52672c0f3dbee44a93c5b4261d) ) // dx03-3.a4 (Different ROM label but identical to dx03-2.18d)
+	ROM_LOAD( "dx01.12d",   0x10000, 0x10000, CRC(570fb50c) SHA1(3002f53182834a060fc282be1bc5767906e19ba2) ) // dx01.a2
+	ROM_LOAD( "dx02.13d",   0x20000, 0x10000, CRC(58625890) SHA1(503a969085f6dcb16687217c48136ea22d07c89f) ) // dx01.a3
 
 	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
-	ROM_LOAD( "dx04-1.a5", 0x0000, 0x10000,  CRC(29432691) SHA1(a76ecd27d217c66a0e43f93e29efe83c657925c3) )
+	ROM_LOAD( "dx04-1.19d", 0x0000, 0x10000,  CRC(29432691) SHA1(a76ecd27d217c66a0e43f93e29efe83c657925c3) ) // dx04-1.a5
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "dx05.a6", 0x00000, 0x10000,  CRC(eb32cf25) SHA1(9390c88033259c65eb15320e31f5d696970987cc) )
+	ROM_LOAD( "dx05.3f", 0x00000, 0x10000,  CRC(eb32cf25) SHA1(9390c88033259c65eb15320e31f5d696970987cc) ) // dx05.a6
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
 	// hand modified version of csilver ROM
 	ROM_LOAD( "id8751h_japan.mcu", 0x0000, 0x1000, BAD_DUMP CRC(6e801217) SHA1(2d8f7ae533dd8146acf8461d61ddd839544adf55) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
-	ROM_LOAD( "dx00.a1",  0x00000, 0x08000, CRC(f01ef985) SHA1(d5b823bd7c0efcf3137f8643c5d99a260bed5675) )
+	ROM_LOAD( "dx00.3d",  0x00000, 0x08000, CRC(f01ef985) SHA1(d5b823bd7c0efcf3137f8643c5d99a260bed5675) ) // dx00.a1
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites (3bpp) */
-	ROM_LOAD( "dx14.b5",  0x00000, 0x10000, CRC(80f07915) SHA1(ea100f12ef3a68110af911fa9beeb73b388f069d) )
+	ROM_LOAD( "dx14.15k",  0x00000, 0x10000, CRC(80f07915) SHA1(ea100f12ef3a68110af911fa9beeb73b388f069d) ) // dx14.b5
 	/* 0x10000-0x1ffff empty */
-	ROM_LOAD( "dx13.b4",  0x20000, 0x10000, CRC(d32c02e7) SHA1(d0518ec31e9e3f7b4e76fba5d7c05c33c61a9c72) )
+	ROM_LOAD( "dx13.13k",  0x20000, 0x10000, CRC(d32c02e7) SHA1(d0518ec31e9e3f7b4e76fba5d7c05c33c61a9c72) ) // dx13.b4
 	/* 0x30000-0x3ffff empty */
-	ROM_LOAD( "dx12.b3",  0x40000, 0x10000, CRC(ac78b76b) SHA1(c2be347fd950894401123ada8b27bfcfce53e66b) )
+	ROM_LOAD( "dx12.10k",  0x40000, 0x10000, CRC(ac78b76b) SHA1(c2be347fd950894401123ada8b27bfcfce53e66b) ) // dx12.b3
 	/* 0x50000-0x5ffff empty */
 	/* 0x60000-0x7ffff empty (no 4th plane) */
 
 	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles (3bpp) */
-	ROM_LOAD( "dx06.a7",  0x00000, 0x10000, CRC(b6fb208c) SHA1(027d33f0b5feb6f0433134213cfcef96790eaace) )
-	ROM_LOAD( "dx07.a8",  0x10000, 0x10000, CRC(ee3e1817) SHA1(013496976a9ffacf1587b3a6fc0f548becb1ab0e) )
-	ROM_LOAD( "dx08.a9",  0x20000, 0x10000, CRC(705900fe) SHA1(53b9d09f9780a3bf3545bc27a2855ebee3884124) )
-	ROM_LOAD( "dx09.a10", 0x30000, 0x10000, CRC(3192571d) SHA1(240c6c099f1e6edbf0be7d5a4ec396b056c9f70f) )
-	ROM_LOAD( "dx10.b1",  0x40000, 0x10000, CRC(3ef77a32) SHA1(97b97c35a6ca994d2e7a6e7a63101eda9709bcb1) )
-	ROM_LOAD( "dx11.b2",  0x50000, 0x10000, CRC(9cf3d5b8) SHA1(df4974f8412ab1cf65871b8e4e3dbee478bf4d21) )
-ROM_END
+	ROM_LOAD( "dx06.5f",  0x00000, 0x10000, CRC(b6fb208c) SHA1(027d33f0b5feb6f0433134213cfcef96790eaace) ) // dx06.a7
+	ROM_LOAD( "dx07.7f",  0x10000, 0x10000, CRC(ee3e1817) SHA1(013496976a9ffacf1587b3a6fc0f548becb1ab0e) ) // dx07.a8
+	ROM_LOAD( "dx08.8f",  0x20000, 0x10000, CRC(705900fe) SHA1(53b9d09f9780a3bf3545bc27a2855ebee3884124) ) // dx08.a9
+	ROM_LOAD( "dx09.10f", 0x30000, 0x10000, CRC(3192571d) SHA1(240c6c099f1e6edbf0be7d5a4ec396b056c9f70f) ) // dx09.a10
+	ROM_LOAD( "dx10.12f",  0x40000, 0x10000, CRC(3ef77a32) SHA1(97b97c35a6ca994d2e7a6e7a63101eda9709bcb1) ) // dx10.b1
+	ROM_LOAD( "dx11.13f",  0x50000, 0x10000, CRC(9cf3d5b8) SHA1(df4974f8412ab1cf65871b8e4e3dbee478bf4d21) ) // dx11.b2
 
-/* Same IC positions to World set */
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "dx-15.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) // BPROM type MB7122E for priority (Not yet used), location on alternate board unknown
+ROM_END
 
 ROM_START( csilverja ) // DE-0250-3 + DE-0251-2
 	ROM_REGION( 0x48000, "maincpu", 0 )
@@ -3353,6 +3360,9 @@ ROM_START( csilverja ) // DE-0250-3 + DE-0251-2
 	ROM_LOAD( "dx09.10f", 0x30000, 0x10000, CRC(3192571d) SHA1(240c6c099f1e6edbf0be7d5a4ec396b056c9f70f) )
 	ROM_LOAD( "dx10.12f",  0x40000, 0x10000, CRC(3ef77a32) SHA1(97b97c35a6ca994d2e7a6e7a63101eda9709bcb1) )
 	ROM_LOAD( "dx11.13f",  0x50000, 0x10000, CRC(9cf3d5b8) SHA1(df4974f8412ab1cf65871b8e4e3dbee478bf4d21) )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "dx-15.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) // BPROM type MB7122E for priority (Not yet used), location on alternate board unknown
 ROM_END
 
 ROM_START( oscar )
@@ -3843,39 +3853,53 @@ ROM_START( cobracomjb )
 ROM_END
 
 
+void dec8_state::init_meikyuhbl()
+{
+	// this bootleg has the high nibble of the first 0x400 bytes with reversed bits.
+	// Address it here instead of hacking the DECO RM-C3 device.
+
+	uint8_t *proms = memregion("proms")->base();
+
+	for (int i = 0; i < 0x400; i++)
+		proms[i] = bitswap<8>(proms[i], 4, 5, 6, 7, 3, 2, 1, 0);
+
+	m_palette->update();
+}
+
+
 /******************************************************************************/
 
-GAME( 1986, lastmisn,   0,        lastmisn, lastmisn,  dec8_state,    empty_init, ROT270, "Data East Corporation", "Last Mission (World revision 8)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnu6, lastmisn, lastmisn, lastmisn,  dec8_state,    empty_init, ROT270, "Data East USA",         "Last Mission (US revision 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnu5, lastmisn, lastmisn, lastmisn,  dec8_state,    empty_init, ROT270, "Data East USA",         "Last Mission (US revision 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnj,  lastmisn, lastmisn, lastmisnj, dec8_state,    empty_init, ROT270, "Data East Corporation", "Last Mission (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, shackled,   0,        shackled, shackled,  dec8_state,    empty_init, ROT0,   "Data East USA",         "Shackled (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, breywood,   shackled, shackled, breywood,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gondo,      0,        gondo,    gondo,     dec8_state,    empty_init, ROT270, "Data East Corporation", "Gondomania (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gondou,     gondo,    gondo,    gondo,     dec8_state,    empty_init, ROT270, "Data East USA",         "Gondomania (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, makyosen,   gondo,    gondo,    gondo,     dec8_state,    empty_init, ROT270, "Data East Corporation", "Makyou Senshi (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, garyoret,   0,        garyoret, garyoret,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb,     0,        ghostb,   ghostb,    dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players, revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb2a,   ghostb,   ghostb,   ghostb2a,  dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb3,    ghostb,   ghostb,   ghostb3,   dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 3B?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb3a,   ghostb,   ghostb,   ghostb3,   dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ROMs confirmed working on PCB - stalls in demo mode
-GAME( 1987, meikyuh,    ghostb,   meikyuh,  meikyuh,   dec8_state,    empty_init, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, meikyuha,   ghostb,   meikyuh,  meikyuh,   dec8_state,    empty_init, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilver,    0,        csilver,  csilver,   csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilverj,   csilver,  csilver,  csilverj,  csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilverja,  csilver,  csilver,  csilverj,  csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscar,      0,        oscar,    oscar,     dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscarbl,    oscar,    oscarbl,  oscar,     dec8_state,    empty_init, ROT0,   "bootleg",               "Psycho-Nics Oscar (World revision 0, bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, oscaru,     oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East USA",         "Psycho-Nics Oscar (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscarj1,    oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscarj2,    oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srdarwin,   0,        srdarwin, srdarwin,  dec8_state,    empty_init, ROT270, "Data East Corporation", "Super Real Darwin (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srdarwinj,  srdarwin, srdarwin, srdarwinj, dec8_state,    empty_init, ROT270, "Data East Corporation", "Super Real Darwin (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisn,   0,        lastmisn, lastmisn,  dec8_state,    empty_init,     ROT270, "Data East Corporation", "Last Mission (World revision 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnu6, lastmisn, lastmisn, lastmisn,  dec8_state,    empty_init,     ROT270, "Data East USA",         "Last Mission (US revision 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnu5, lastmisn, lastmisn, lastmisn,  dec8_state,    empty_init,     ROT270, "Data East USA",         "Last Mission (US revision 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnj,  lastmisn, lastmisn, lastmisnj, dec8_state,    empty_init,     ROT270, "Data East Corporation", "Last Mission (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, shackled,   0,        shackled, shackled,  dec8_state,    empty_init,     ROT0,   "Data East USA",         "Shackled (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, breywood,   shackled, shackled, breywood,  dec8_state,    empty_init,     ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gondo,      0,        gondo,    gondo,     dec8_state,    empty_init,     ROT270, "Data East Corporation", "Gondomania (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gondou,     gondo,    gondo,    gondo,     dec8_state,    empty_init,     ROT270, "Data East USA",         "Gondomania (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, makyosen,   gondo,    gondo,    gondo,     dec8_state,    empty_init,     ROT270, "Data East Corporation", "Makyou Senshi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, garyoret,   0,        garyoret, garyoret,  dec8_state,    empty_init,     ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb,     0,        ghostb,   ghostb,    dec8_state,    empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players, revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb2a,   ghostb,   ghostb,   ghostb2a,  dec8_state,    empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb3,    ghostb,   ghostb,   ghostb3,   dec8_state,    empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 3B?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb3a,   ghostb,   ghostb,   ghostb3,   dec8_state,    empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ROMs confirmed working on PCB - stalls in demo mode
+GAME( 1987, meikyuh,    ghostb,   meikyuh,  meikyuh,   dec8_state,    empty_init,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, meikyuhbl,  ghostb,   meikyuh,  meikyuh,   dec8_state,    init_meikyuhbl, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilver,    0,        csilver,  csilver,   csilver_state, empty_init,     ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilverj,   csilver,  csilver,  csilverj,  csilver_state, empty_init,     ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilverja,  csilver,  csilver,  csilverj,  csilver_state, empty_init,     ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscar,      0,        oscar,    oscar,     dec8_state,    empty_init,     ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarbl,    oscar,    oscarbl,  oscar,     dec8_state,    empty_init,     ROT0,   "bootleg",               "Psycho-Nics Oscar (World revision 0, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, oscaru,     oscar,    oscar,    oscarj,    dec8_state,    empty_init,     ROT0,   "Data East USA",         "Psycho-Nics Oscar (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarj1,    oscar,    oscar,    oscarj,    dec8_state,    empty_init,     ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarj2,    oscar,    oscar,    oscarj,    dec8_state,    empty_init,     ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srdarwin,   0,        srdarwin, srdarwin,  dec8_state,    empty_init,     ROT270, "Data East Corporation", "Super Real Darwin (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srdarwinj,  srdarwin, srdarwin, srdarwinj, dec8_state,    empty_init,     ROT270, "Data East Corporation", "Super Real Darwin (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Unlike most Deco games of this period Cobra Command does not seem to have a Data East USA release.  Instead the Data East Corporation release
 // was used in the US as evidenced by boards with the EL romset bearing AAMA seal stickers (American Amusement Machine Association)
-GAME( 1988, cobracom,   0,        cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracoma,  cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracomb,  cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (World/US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracomj,  cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracomjb, cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "bootleg",               "Cobra-Command (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracom,   0,        cobracom, cobracom,  dec8_state,    empty_init,     ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracoma,  cobracom, cobracom, cobracom,  dec8_state,    empty_init,     ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomb,  cobracom, cobracom, cobracom,  dec8_state,    empty_init,     ROT0,   "Data East Corporation", "Cobra-Command (World/US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomj,  cobracom, cobracom, cobracom,  dec8_state,    empty_init,     ROT0,   "Data East Corporation", "Cobra-Command (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomjb, cobracom, cobracom, cobracom,  dec8_state,    empty_init,     ROT0,   "bootleg",               "Cobra-Command (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )

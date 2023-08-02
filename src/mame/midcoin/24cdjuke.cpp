@@ -309,7 +309,7 @@ void midcoin24cdjuke_state::midcoin24cdjuke(machine_config &config)
 	ic25.out_pc_callback().set(FUNC(midcoin24cdjuke_state::kb_col_w));
 
 	i8255_device &ic31(I8255A(config, "ic31", 0));
-	ic31.out_pb_callback().set_log("PPI8255 - unmapped write port B");
+	ic31.out_pb_callback().set([this](uint8_t data) { logerror("%s ic31 write port B: %02X\n", machine().describe_context(), data); });
 	ic31.in_pc_callback().set_ioport("MD4");
 }
 

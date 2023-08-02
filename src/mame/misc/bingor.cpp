@@ -1057,7 +1057,7 @@ ROM_START( bellstr2 )  // Strings: C1992, AWR. Copyright (c) 1995-1997 Paloma El
 	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )   // i186 code
 	ROM_LOAD16_BYTE( "bell-star+_vip2_25.02.02_l.bin",  0x00000, 0x08000, CRC(82ff28c5) SHA1(b0f7c47f32457ebb7783acb94a2ee7d60dbf000f) )
 	ROM_LOAD16_BYTE( "bell-star+_vip2_25.02.02_h.bin",  0x00001, 0x08000, CRC(b6243a72) SHA1(2d0f5222a1908076658614035c96a69a579ee3a2) )
-//	ROM_LOAD16_BYTE( "bell-star+_vip2_v_25.2.02_h.bin", 0x00001, 0x08000, CRC(c9ab19a0) SHA1(e65a4923a8efb0847b5156b68dbf9f2e5aedfecb) )
+//  ROM_LOAD16_BYTE( "bell-star+_vip2_v_25.2.02_h.bin", 0x00001, 0x08000, CRC(c9ab19a0) SHA1(e65a4923a8efb0847b5156b68dbf9f2e5aedfecb) )
 
 	ROM_REGION16_LE( 0x10000, "alt_h", 0 ) // from identical set, but different high program (to check).
 	ROM_LOAD16_BYTE( "bell-star+_vip2_v_25.2.02_h.bin", 0x00001, 0x08000, CRC(c9ab19a0) SHA1(e65a4923a8efb0847b5156b68dbf9f2e5aedfecb) )
@@ -1099,14 +1099,14 @@ ROM_START( bellstr3 )  // Strings: Copyright (c) 1995-1997 Paloma Elektronik.
 	ROM_REGION( 0x20000, "eeprom", 0 )  // eeprom
 	ROM_LOAD( "24c04a.bin", 0x000000, 0x200, CRC(26ca6607) SHA1(e6f162481bf2e7196f06239e09ed81bb14e99f1e) )
 ROM_END
-	   
+
 
 /* Bell Star Plus
    1998 Paloma Elektronik.
 
    Play Star Austria 0316/821193.
    CBA-Design, Lyon France.
-   
+
    Same PCB layout than bingor2, 3, 4
 
    Serial: 9837
@@ -1128,7 +1128,7 @@ ROM_START( bellstrp )  // Strings: Copyright (c) 1998 Paloma Elektronik. Play St
 ROM_END
 
 
-/* Vip 2000
+/* Vip 2000 (set 1)
    2004 Paloma Elektronik.
 
 */
@@ -1153,6 +1153,66 @@ ROM_START( vip2000 ) // Strings: (c) 2004 Paloma Elektronik. V24.
 	ROM_LOAD( "24c04a.bin", 0x000, 0x200, CRC(4e231420) SHA1(24dcfc90ef9903692030be7de0f04fc9370021fd) )
 ROM_END
 
+/* Vip 2000 (set 2)
+   Awrbell Euro 2003.
+   Awrseven Card +.
+
+   2001 Paloma Elektronik.
+   Play Star Austria 0316/821193.
+
+   Identical to set 3, but different flash ROM and EEPROM.
+*/
+ROM_START( vip2000a ) // Strings: Awrbell Euro 2003. (c) 2001 Paloma Elektronik.
+	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )   // i186 code
+	ROM_LOAD16_BYTE( "vip_bios_5_l.c11", 0x00000, 0x08000, CRC(80172456) SHA1(eca7ebc4410b4e39a459079a8fbaae73ad88acbe) )
+	ROM_LOAD16_BYTE( "vip_bios_5_h.c12", 0x00001, 0x08000, CRC(2e871263) SHA1(a12ce20535a7815c578982869d7e2a9517c87543) )
+
+	ROM_REGION16_BE( 0x80000, "flash", ROMREGION_ERASE00 )
+	ROM_LOAD( "at49f4096.bin", 0x00000, 0x80000, CRC(dea09922) SHA1(fe320dfe3c1e7ce360d44771135e0c4616ea39b7) )
+
+	ROM_REGION( 0x08000, "slavecpu", 0 )
+	ROM_LOAD( "slave_19.09.01.c34", 0x0000, 0x8000, CRC(67feb297) SHA1(442b62e62b614bda2d277e4b827cb89677d6fbce) )
+
+	ROM_REGION( 0x00800, "pic1", 0 )
+	ROM_LOAD( "pic16f627_a.bin", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x00800, "pic2", 0 )
+	ROM_LOAD( "pic16f627_b.bin", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x20000, "eeprom", 0 )
+	ROM_LOAD( "st24c04.bin", 0x000, 0x200, CRC(752a960c) SHA1(de13943ea2015a0a57b5cc30a4ec4737b6e41fd0) )
+ROM_END
+
+/* Vip 2000 (set 3)
+   Awrbell Euro 2003.
+   Awrseven Card +.
+
+   2001 Paloma Elektronik.
+   Play Star Austria 0316/821193.
+
+   Identical to set 2, but different flash ROM and EEPROM.
+*/
+ROM_START( vip2000b ) // Strings: Awrbell Euro 2003. (c) 2001 Paloma Elektronik.
+	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )   // i186 code
+	ROM_LOAD16_BYTE( "vip_bios_5_l.ic11", 0x00000, 0x08000, CRC(80172456) SHA1(eca7ebc4410b4e39a459079a8fbaae73ad88acbe) )
+	ROM_LOAD16_BYTE( "vip_bios_5_h.ic12", 0x00001, 0x08000, CRC(2e871263) SHA1(a12ce20535a7815c578982869d7e2a9517c87543) )
+
+	ROM_REGION16_BE( 0x80000, "flash", ROMREGION_ERASE00 )
+	ROM_LOAD( "at49f4096.ic13", 0x00000, 0x80000, CRC(57a3f487) SHA1(270f110617c868557c5e72639e8dc2641caeb1f3) )
+
+	ROM_REGION( 0x08000, "slavecpu", 0 )
+	ROM_LOAD( "slave_19.09.01.ic34", 0x0000, 0x8000, CRC(67feb297) SHA1(442b62e62b614bda2d277e4b827cb89677d6fbce) )
+
+	ROM_REGION( 0x00800, "pic1", 0 )
+	ROM_LOAD( "pic16f627_a.bin", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x00800, "pic2", 0 )
+	ROM_LOAD( "pic16f627_b.bin", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x20000, "eeprom", 0 )
+	ROM_LOAD( "24c04a.bin", 0x000, 0x200, CRC(2da36c6a) SHA1(002a6e35fb21d3722d40b6c463bda95fa8a9160f) )
+ROM_END
+
 
 /* Rolling Joker
    1998 Paloma Elektronik.
@@ -1161,7 +1221,7 @@ ROM_END
 
    Serial: 9813
 */
-ROM_START( roljokr1 )  // Strings: 
+ROM_START( roljokr1 )  // Strings:
 	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )   // i186 code
 	ROM_LOAD16_BYTE( "rol_l.bin", 0x00000, 0x08000, CRC(df4b5758) SHA1(88dfc7a623e4f200d4c90e6118e1a101242cb8ab) )
 	ROM_LOAD16_BYTE( "rol_h.bin", 0x00001, 0x08000, CRC(02bf6d89) SHA1(57f0bfeb6ad579b7bb0a022b2c1acd217ccae995) )
@@ -1251,7 +1311,9 @@ GAME( 2002, bellstr3, 0,       bingor,   bingor, bingor_state, empty_init, ROT0,
 
 GAME( 1998, bellstrp, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma Elektronik?",            "Bell Star Plus",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2004, vip2000,  0,       vip2000,  bingor, bingor_state, empty_init, ROT0, "Paloma Elektronik?",            "unknown 'VIP 2000' game",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2004, vip2000,  0,       vip2000,  bingor, bingor_state, empty_init, ROT0, "Paloma Elektronik?",            "unknown 'VIP 2000' game (set 1)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, vip2000a, 0,       vip2000,  bingor, bingor_state, empty_init, ROT0, "Paloma Elektronik?",            "unknown 'VIP 2000' game (set 2)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, vip2000b, 0,       vip2000,  bingor, bingor_state, empty_init, ROT0, "Paloma Elektronik?",            "unknown 'VIP 2000' game (set 3)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 GAME( 1999, roljokr1, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma Elektronik?",            "Rolling Joker",                      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1997, roljokr2, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma Elektronik?",            "Rolling Joker (v23.11.91)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

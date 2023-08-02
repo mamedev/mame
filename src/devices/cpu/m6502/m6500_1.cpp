@@ -2,7 +2,7 @@
 // copyright-holders:Vas Crabb
 /***************************************************************************
 
-    m6500_1.h
+    m6500_1.cpp
 
     MOS Technology 6500/1, original NMOS variant with onboard peripherals:
     * 6502 CPU

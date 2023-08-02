@@ -1493,13 +1493,13 @@ uint8_t ibm8514a_device::ibm8514_status_r(offs_t offset)
 		case 0:
 			return m_vga->vga_vblank() << 1;
 		case 2:
-			return m_vga->port_03c0_r(6);
+			return m_vga->ramdac_mask_r(0);
 		case 3:
-			return m_vga->port_03c0_r(7);
+			return m_vga->ramdac_state_r(0);
 		case 4:
-			return m_vga->port_03c0_r(8);
+			return m_vga->ramdac_write_index_r(0);
 		case 5:
-			return m_vga->port_03c0_r(9);
+			return m_vga->ramdac_data_r(0);
 	}
 	return 0;
 }
@@ -1512,16 +1512,16 @@ void ibm8514a_device::ibm8514_htotal_w(offs_t offset, uint8_t data)
 			ibm8514.htotal = data & 0xff;
 			break;
 		case 2:
-			m_vga->port_03c0_w(6, data);
+			m_vga->ramdac_mask_w(0, data);
 			break;
 		case 3:
-			m_vga->port_03c0_w(7, data);
+			m_vga->ramdac_read_index_w(0, data);
 			break;
 		case 4:
-			m_vga->port_03c0_w(8, data);
+			m_vga->ramdac_write_index_w(0, data);
 			break;
 		case 5:
-			m_vga->port_03c0_w(9, data);
+			m_vga->ramdac_data_w(0, data);
 			break;
 	}
 	//vga.crtc.horz_total = data & 0x01ff;

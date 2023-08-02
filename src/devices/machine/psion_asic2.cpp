@@ -36,6 +36,8 @@ psion_asic2_device::psion_asic2_device(const machine_config &mconfig, const char
 	, m_buzvol_cb(*this)
 	, m_dr_cb(*this)
 	, m_col_cb(*this, 0xff)
+	, m_read_pd_cb(*this, 0x00)
+	, m_write_pd_cb(*this)
 	, m_data_r(*this, 0x00)
 	, m_data_w(*this)
 {
@@ -47,10 +49,14 @@ psion_asic2_device::psion_asic2_device(const machine_config &mconfig, const char
 
 void psion_asic2_device::device_start()
 {
-	m_a2_status = 0x01;
+	m_a2_status = 0x00;
 
 	m_busy_timer = timer_alloc(FUNC(psion_asic2_device::busy), this);
 
+	save_item(NAME(m_a2_index));
+	save_item(NAME(m_a2_icontrol0));
+	save_item(NAME(m_a2_icontrol1));
+	save_item(NAME(m_a2_iddr));
 	save_item(NAME(m_a2_control1));
 	save_item(NAME(m_a2_control2));
 	save_item(NAME(m_a2_control3));
@@ -66,12 +72,17 @@ void psion_asic2_device::device_start()
 
 void psion_asic2_device::device_reset()
 {
+	m_a2_index = 0x00;
+	m_a2_icontrol0 = 0x00;
+	m_a2_icontrol1 = 0x00;
+	m_a2_iddr = 0x00;
 	m_a2_control1 = 0x00;
 	m_a2_control2 = 0x00;
 	m_a2_control3 = 0x00;
 	m_a2_serial_data = 0x00;
 	m_a2_serial_control = 0x00;
 	m_a2_interrupt_status = 0x00;
+	m_a2_status = 0x00;
 	m_a2_channel_control = 0x00;
 }
 
@@ -82,6 +93,16 @@ void psion_asic2_device::on_clr_w(int state)
 		m_a2_status |= 0x01; // A1OnKey
 	else
 		m_a2_status &= ~0x01;
+
+	update_interrupts();
+}
+
+void psion_asic2_device::sds_int_w(int state)
+{
+	if (state)
+		m_a2_status |= 0x20; // A2Sdis
+	else
+		m_a2_status &= ~0x20;
 
 	update_interrupts();
 }
@@ -112,7 +133,7 @@ void psion_asic2_device::reset_w(int state)
 
 void psion_asic2_device::update_interrupts()
 {
-	int irq = m_a2_status & 0x01;
+	int irq = m_a2_status & 0x21;
 	int nmi = BIT(m_a2_interrupt_status, 0, 2) & BIT(m_a2_control3, 4, 2);
 
 	m_int_cb(irq ? ASSERT_LINE : CLEAR_LINE);
@@ -136,6 +157,32 @@ uint8_t psion_asic2_device::io_r(offs_t offset)
 
 	switch (offset & 7)
 	{
+	case 0x00: // A2Index - Index Register
+		data = m_a2_index;
+		LOG("%s io_r: A2Index => %02x\n", machine().describe_context(), data);
+		break;
+
+	case 0x01: // A2Control - Indexed Control Register
+		switch (m_a2_index)
+		{
+		case 0: // A2IControl0 - System Control Register 0
+			data = m_a2_icontrol0;
+			LOG("%s io_r: A2IControl0 => %02x\n", machine().describe_context(), data);
+			break;
+		case 1: // A2IControl1 - Serial Clock Control Register
+			data = m_a2_icontrol1;
+			LOG("%s io_r: A2IControl1 => %02x\n", machine().describe_context(), data);
+			break;
+		case 2: // A2IWrite - Port Output Data Register (Write only)
+			LOG("%s io_r: A2IWrite => %02x\n", machine().describe_context(), data);
+			break;
+		case 3: // A2IDDR - Port Data Direction Register
+			data = m_a2_iddr;
+			LOG("%s io_r: A2IDDR => %02x\n", machine().describe_context(), data);
+			break;
+		}
+		break;
+
 	case 0x02: // A2External - External status register
 		switch (m_a2_control1 & 0x0f)
 		{
@@ -161,6 +208,9 @@ uint8_t psion_asic2_device::io_r(offs_t offset)
 		// b2 SlaveDataValid     - Slave data valid, 1 if valid frame arrived
 		// b3 SlaveDataControl   - Slave control or data frame, 1 if control frame
 		// b4 SlaveDataOverrun   - Slave data overrun, 1 if overrun
+		// b5 LowBatteryNMI      - Low battery NMI, 1 if NMI occurred
+		// b6 0
+		// b7 0
 		data = m_a2_interrupt_status;
 		LOG("%s io_r: A2InterruptStatus => %02x\n", machine().describe_context(), data);
 		break;
@@ -172,6 +222,8 @@ uint8_t psion_asic2_device::io_r(offs_t offset)
 		// b3 SerialClockState - 1 if slave clock is high
 		// b4 SerialBusy       - 1 while data serial controller is busy
 		// b5 A2Sdis           - 1 if slave data signal is high
+		// b6 Ext              - 1 in Extended Mode, 0 in Compatible Mode
+		// b7 RevId            - 1 if Revision 4 part
 		data = m_a2_status;
 		if (!machine().side_effects_disabled())
 		{
@@ -189,7 +241,8 @@ uint8_t psion_asic2_device::io_r(offs_t offset)
 		break;
 
 	case 0x06: // A2KeyData - Keyboard poll register
-		data = m_col_cb(m_a2_control1 & 0x0f);
+		// Extended mode read from Port I/O lines
+		data = m_read_pd_cb();
 		LOG("%s io_r: A2KeyData => %02x\n", machine().describe_context(), data);
 		break;
 
@@ -209,6 +262,45 @@ void psion_asic2_device::io_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 7)
 	{
+	case 0x00: // A2Index - Index Register
+		// b0-b1 INDEX0,1 - Register 1 Index
+		LOG("%s io_w: A2Index <= %02x\n", machine().describe_context(), data);
+		m_a2_index = data & 3;
+		break;
+
+	case 0x01: // A2Control - Indexed Control Register
+		switch (m_a2_index)
+		{
+		case 0: // A2IControl0 - System Control Register 0
+			// b0-b1 CLKSEL0-1 - Crystal Divider Select (0,1 - 23.04MHz divider = 3, 2 - 15.36MHz divider = 2, 3 - 7.68MHz divider = 1)
+			// b2    CHEN3     - Serial Channel 3 is enabled when this bit is set
+			// b3    CHEN4     - Serial Channel 4 is enabled when this bit is set
+			// b4    CHEN6     - Serial Channel 6 is enabled when this bit is set
+			// b5    EXONOFF   - EXON & SCKS witch-on is disabled when this bit is set
+			// b6    INTSEL    - Interrupt Source Select (0 - Frame received, 1 - SDIS direct)
+			LOG("%s io_w: A2IControl0 => %02x\n", machine().describe_context(), data);
+			m_a2_icontrol0 = data;
+			break;
+		case 1: // A2IControl1 - Serial Clock Control Register
+			// b0 CKEN1 - Serial Channel 1 continuous clock is enabled when this bit is set
+			// b1 CKEN2 - Serial Channel 2 continuous clock is enabled when this bit is set
+			// b2 CKEN3 - Serial Channel 3 continuous clock is enabled when this bit is set
+			// b3 CKEN4 - Serial Channel 4 continuous clock is enabled when this bit is set
+			LOG("%s io_w: A2IControl1 => %02x\n", machine().describe_context(), data);
+			m_a2_icontrol1 = data;
+			break;
+		case 2: // A2IWrite - Port Output Data Register
+			LOG("%s io_w: A2IWrite => %02x\n", machine().describe_context(), data);
+			m_write_pd_cb(data & m_a2_iddr);
+			break;
+		case 3: // A2IDDR - Port Data Direction Register
+			// b0-b7 DO0-7 - 0 = PD* is and input, 1 = PD* is an output
+			LOG("%s io_w: A2IDDR => %02x\n", machine().describe_context(), data);
+			m_a2_iddr = data;
+			break;
+		}
+		break;
+
 	case 0x02: // A2Control1 - Control register 1
 		// b0-b3 KeyScan         - Values 0-15 drive the keyboard poll columns
 		// b4-b5 SerialClockRate - Sets the clock frequency for channels 1-4 and 7 as below:
@@ -217,7 +309,6 @@ void psion_asic2_device::io_w(offs_t offset, uint8_t data)
 		//                           3 = ClockRateFast   3.84 MHz
 		LOG("%s io_w: A2Control1 <= %02x\n", machine().describe_context(), data);
 		m_a2_control1 = data;
-		//m_a2_external = m_col_cb(data & 0x0f);
 		break;
 
 	case 0x03: // A2Control2 - Control register 2

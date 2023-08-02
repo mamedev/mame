@@ -60,7 +60,7 @@ Dinosaur King Ver 4.000                     ???-?????       MDA-C0061 CF   JP   
 Disney: Magical Dream Dance on Stage        ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Future Police Patrol Chase                  ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Galileo Factory (main)                      834-14773    F*           ROM  JP     ???-????-????   AAFE-01F9856xxxx
-Heat Up Hockey Image                        834000201  TSB0-SEGA00001 CF   JP     ???-????-????   AAFE-xxxxxxxxxxx
+Heat Up Hockey Image                        834000201  TSB0-SEGA00001 CF   JP     253-5508-0606J  AAFE-xxxxxxxxxxx also seen on PCB# 8340002
 Issyouni Turbo Drive                        ???-?????                 no          ???-????-????   AAFE-01E91305101
 Isshoni Wanwan Waiwai Puppy 2008            834-14747                 ROM         253-5508-0496J  AAFE-01E34655005
 Isshoni Wanwan Waiwai Puppy (INW PUPPY)     834-14826       MDA-C0052 no          ???-????-????   AAFE-xxxxxxxxxxx
@@ -886,9 +886,8 @@ ROM_START( huhimage )
 
 	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
 
-	// original PIC missing, brute forced key
 	ROM_REGION( 0x800, "pic_readout", 0 )
-	ROM_LOAD( "317-unknown-jpn.ic15", 0, 0x800, BAD_DUMP CRC(634e1994) SHA1(6ae6538fc5f256bc0de86f57ffd72196a147accf) )
+	ROM_LOAD( "317-0606-jpn.ic15", 0, 0x800, CRC(75638f59) SHA1(2bf8cb4547034f5c2a14e485c9a3f9fcfb7c609e) )
 ROM_END
 
 ROM_START( kingyoch )

@@ -162,7 +162,7 @@ void sweetland_state::sweetland(machine_config &config)
 
 	ym2203_device &ym(YM2203(config, "ym", XTAL(8'000'000)/2));
 	ym.irq_handler().set_inputline("maincpu", 0);
-	ym.port_a_read_callback().set_log("YM2203IOA read");
+	ym.port_a_read_callback().set([this]() { logerror("%s YM2203IOA read\n", machine().describe_context()); return 0; });
 	ym.port_b_read_callback().set_ioport("YM2203IOB");
 	ym.add_route(0, "mono", 0.25);
 	ym.add_route(1, "mono", 0.25);

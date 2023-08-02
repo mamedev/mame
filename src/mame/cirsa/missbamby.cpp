@@ -10,6 +10,7 @@ Known games on this hardware:
  | YES    | Mini Super Fruits | Cirsa              | Cirsa PCB 810601 A |
  | YES    | Lucky Player      | Cirsa              | Cirsa PCB 810702 A |
  | YES    | Miss Bamby        | Automatics Pasqual |                    |
+ | YES    | Mini Azar D       | Arfyc              |                    |
  | YES    | Golden Winner     | Reben              |                    |
  | YES    | Golden Fruits     | Video Game         | 4 dipsw, battery   |
  | NO     | St.-Tropez        | Video Game         |                    |
@@ -151,16 +152,9 @@ void missbamby_state::igoabasket(machine_config &config)
 }
 
 
-// Cirsa PCB 810601 A
-ROM_START( minisupf )
-	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD( "mini_av_1.4.a", 0x0000, 0x0800, CRC(d29a6468) SHA1(9a6d25a6d5602aff226340e8b4a87aa8a55e7c51) )
-	ROM_LOAD( "mini_av_1.4.b", 0x0800, 0x0800, CRC(0ebf0bd8) SHA1(d4a1a551dbeb56f16f17d7c02f926364132fb4a5) )
-	ROM_LOAD( "mini_av_1.4.c", 0x1000, 0x0800, CRC(5f976549) SHA1(5b81e71967719a913c51fe2e027f4477d507c5b6) )
-
-	ROM_REGION(0x20, "prom", 0)
-	ROM_LOAD( "mini_18sa030n.bin", 0x00, 0x20, CRC(fa7822eb) SHA1(586705f64a5fb95e5dd1c7bfc929dccfebc3ec49) )
-ROM_END
+// *****************
+// Games from Cirsa
+// *****************
 
 // Cirsa PCB 810702 A
 ROM_START( luckyplr )
@@ -172,41 +166,21 @@ ROM_START( luckyplr )
 	ROM_LOAD( "lucky_player_18sa030n.bin", 0x00, 0x20, CRC(cf80f260) SHA1(b965017aa871454c54f6175fee486eea810a9c2e) )
 ROM_END
 
-/* Miss Bamby - Automatics Pasqual
-   _____________________________________________________________
-   |                             _______                        |
-   |                             |_PROM_|      ____________     |
-   |                  __________________       | EMPTY     |    |
-   |                  | M5L8085AP       |      |_SOCKET____|    |
-   |                  |_________________|      ____________     |
-   |                       ______________      | ROM1      |    |
-   |         XTAL          |M5L8212P    |      |___________|    |
-   |   __   6.144          |____________|      ____________     |
-   |   |R|                                     | ROM0      |    |
- __|                                           |___________|    |
-|__| ________  ________  ___________________   ____________     |
-|__| |ULN2003A |ULN2003A | M5L8155P         |  |_D5101LC__|     |
-|__|                     |__________________|  ____________     |
-|__|                     ________   _________  |_D5101LC__|     |
-|__|           _______   |74LS393|  |74LS74B1                   |
-|__|           |7407N |                        ________         |
-|__|                     ________   ________   |GD4001B|        |
-|__|                     |74LS14_|  |74LS153|        _________  |
-|__|                                          ____  | BATT    | |
-|__|   _______           ___________________  |D  | | 3.6V    | |
-|__|   |LM380N|          |    AY-3-8910     | |I  | |_________| |
-|__|                     |__________________| |P  | ______      |
-|__|                                  8 dips->|S__| LM311N      |
-   |____________________________________________________________|
-*/
-ROM_START( msbamby )
+// Cirsa PCB 810601 A
+ROM_START( minisupf )
 	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD( "1.bin", 0x0000, 0x2000, CRC(7b5efbd9) SHA1(abb4b4432021945aee474c4bdd83979f6460c671) )
-	ROM_LOAD( "2.bin", 0x2000, 0x2000, CRC(6048d5cd) SHA1(a3bbf43b1474de75aef9957b967ead96b9a18fc5) )
+	ROM_LOAD( "mini_av_1.4.a", 0x0000, 0x0800, CRC(d29a6468) SHA1(9a6d25a6d5602aff226340e8b4a87aa8a55e7c51) )
+	ROM_LOAD( "mini_av_1.4.b", 0x0800, 0x0800, CRC(0ebf0bd8) SHA1(d4a1a551dbeb56f16f17d7c02f926364132fb4a5) )
+	ROM_LOAD( "mini_av_1.4.c", 0x1000, 0x0800, CRC(5f976549) SHA1(5b81e71967719a913c51fe2e027f4477d507c5b6) )
 
 	ROM_REGION(0x20, "prom", 0)
-	ROM_LOAD( "prom.bin", 0x00, 0x20, CRC(f7013c11) SHA1(6e4e6d7f2a041d44359a7f5662bb4302da234ace) ) // Unknown manufacturer, dumped as 82s123
+	ROM_LOAD( "mini_18sa030n.bin", 0x00, 0x20, CRC(fa7822eb) SHA1(586705f64a5fb95e5dd1c7bfc929dccfebc3ec49) )
 ROM_END
+
+
+// *****************
+// **** Clones *****
+// *****************
 
 // 4 dipswitches, battery on PCB, exact clone of Mini Super Fruits PCB
 ROM_START( goldfrts )
@@ -255,42 +229,55 @@ ROM_START( gwinner )
 	ROM_LOAD( "dm74s188n.bin", 0x00, 0x20, CRC(27ed5f29) SHA1(2d5f190fac6be15d3c5b344647333bbf47a04fc3) )
 ROM_END
 
-/* Multy - Deta. The CPU was missing on the dumped PCB (so the exact type is unknown).
-   _______________________________________________________________________
-  |            _______                                                   |
-  |  ________  | BATT |  ________        ___     ________     ________   |
-  |MCM51L01P45 |______| |N82S23N|       |__|     CD4001BE    |_EMPTY_|   |
-  |            ____________  ____________                                |
-  |  ________  | EPROM     || EPROM      |  ________  ________  ________ |
-  |MCM51L01P45 |___________||____________|  74LS74PC  74LS393N |_______| |
-  |            ________________    ________________    ________________  |
-  |  ________  | GI AY-3-8910 |   | Intel P8155H  |   | CPU            | |
-  | 74LS373PC  |______________|   |_______________|   |________________| |
-  |                     ________   ________              (_) <- Switch   |
-  |                     |8xDIPS | |_7417N_|                              |
-  |                                  ________  ________                  |
-  |                                  ULN2003A  ULN2003A                  |
-  |                ____                               ____               |
-  |_______________|    |_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|    |______________|
-*/
-ROM_START( multy )
+ROM_START( miniazard )
 	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD( "tms2564jl.bin", 0x0000, 0x2000, CRC(43fa54fb) SHA1(2e0d0883deb20d68e46d3c5c5c98508c9b5d5411) )
-	ROM_LOAD( "d2764d.bin",    0x2000, 0x1000, CRC(b7c55fc2) SHA1(2dfcc35821971c27178522afe9db1d18e12b3a42) ) // 1xxxxxxxxxxx = 0xFF
+	ROM_LOAD( "mini_azar_rom1.2.bin", 0x0000, 0x2000, CRC(4368a70a) SHA1(fc09b0bfb9c7777b144b909ff306098b77ef1b82) )
+	ROM_LOAD( "mini_azar_rom1.1.bin", 0x2000, 0x2000, CRC(5228f8c8) SHA1(1979905e5728e388f49f9fbc0be604f37455beae) ) // 11xxxxxxxxxxx = 0xFF
 
 	ROM_REGION(0x20, "prom", 0)
-	ROM_LOAD( "n83s23n.bin",   0x00, 0x20, CRC(ea598b2c) SHA1(c0d6367ed2381a4a0f22780773ff4777569e88ab) )
+	ROM_LOAD( "prom.bin", 0x00, 0x20, NO_DUMP )
 ROM_END
 
-/* Pinball from the Spanish company "Regama S.A."
-   CPU:   1 x I8085A
-   IO:    1 x I8155
-   Sound: 1 x AY8910
+/* Miss Bamby - Automatics Pasqual
+   _____________________________________________________________
+   |                             _______                        |
+   |                             |_PROM_|      ____________     |
+   |                  __________________       | EMPTY     |    |
+   |                  | M5L8085AP       |      |_SOCKET____|    |
+   |                  |_________________|      ____________     |
+   |                       ______________      | ROM1      |    |
+   |         XTAL          |M5L8212P    |      |___________|    |
+   |   __   6.144          |____________|      ____________     |
+   |   |R|                                     | ROM0      |    |
+ __|                                           |___________|    |
+|__| ________  ________  ___________________   ____________     |
+|__| |ULN2003A |ULN2003A | M5L8155P         |  |_D5101LC__|     |
+|__|                     |__________________|  ____________     |
+|__|                     ________   _________  |_D5101LC__|     |
+|__|           _______   |74LS393|  |74LS74B1                   |
+|__|           |7407N |                        ________         |
+|__|                     ________   ________   |GD4001B|        |
+|__|                     |74LS14_|  |74LS153|        _________  |
+|__|                                          ____  | BATT    | |
+|__|   _______           ___________________  |D  | | 3.6V    | |
+|__|   |LM380N|          |    AY-3-8910     | |I  | |_________| |
+|__|                     |__________________| |P  | ______      |
+|__|                                  8 dips->|S__| LM311N      |
+   |____________________________________________________________|
 */
-ROM_START( trebol )
+ROM_START( msbamby )
 	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD( "m69.bin", 0x0000, 0x2000, CRC(8fb8cd39) SHA1(4ed505d06b489ce83316fdaa39f7ce128011fb4b) )
+	ROM_LOAD( "1.bin", 0x0000, 0x2000, CRC(7b5efbd9) SHA1(abb4b4432021945aee474c4bdd83979f6460c671) )
+	ROM_LOAD( "2.bin", 0x2000, 0x2000, CRC(6048d5cd) SHA1(a3bbf43b1474de75aef9957b967ead96b9a18fc5) )
+
+	ROM_REGION(0x20, "prom", 0)
+	ROM_LOAD( "prom.bin", 0x00, 0x20, CRC(f7013c11) SHA1(6e4e6d7f2a041d44359a7f5662bb4302da234ace) ) // Unknown manufacturer, dumped as 82s123
 ROM_END
+
+
+// *****************
+// Similar hardware
+// *****************
 
 /*  "Basket" electromechanical machine from the Spanish company IGOA S.A.
     Similar hardware, with two 8155. PCB silkscreened as "CPU 687-1".
@@ -335,14 +322,57 @@ ROM_START( basket )
 	ROM_LOAD( "pal16r4acn.bin", 0x000, 0x104, NO_DUMP )
 ROM_END
 
+/* Multy - Deta. The CPU was missing on the dumped PCB (so the exact type is unknown).
+   _______________________________________________________________________
+  |            _______                                                   |
+  |  ________  | BATT |  ________        ___     ________     ________   |
+  |MCM51L01P45 |______| |N82S23N|       |__|     CD4001BE    |_EMPTY_|   |
+  |            ____________  ____________                                |
+  |  ________  | EPROM     || EPROM      |  ________  ________  ________ |
+  |MCM51L01P45 |___________||____________|  74LS74PC  74LS393N |_______| |
+  |            ________________    ________________    ________________  |
+  |  ________  | GI AY-3-8910 |   | Intel P8155H  |   | CPU            | |
+  | 74LS373PC  |______________|   |_______________|   |________________| |
+  |                     ________   ________              (_) <- Switch   |
+  |                     |8xDIPS | |_7417N_|                              |
+  |                                  ________  ________                  |
+  |                                  ULN2003A  ULN2003A                  |
+  |                ____                               ____               |
+  |_______________|    |_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|    |______________|
+*/
+ROM_START( multy )
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD( "tms2564jl.bin", 0x0000, 0x2000, CRC(43fa54fb) SHA1(2e0d0883deb20d68e46d3c5c5c98508c9b5d5411) )
+	ROM_LOAD( "d2764d.bin",    0x2000, 0x1000, CRC(b7c55fc2) SHA1(2dfcc35821971c27178522afe9db1d18e12b3a42) ) // 1xxxxxxxxxxx = 0xFF
+
+	ROM_REGION(0x20, "prom", 0)
+	ROM_LOAD( "n83s23n.bin",   0x00, 0x20, CRC(ea598b2c) SHA1(c0d6367ed2381a4a0f22780773ff4777569e88ab) )
+ROM_END
+
+/* Pinball from the Spanish company "Regama S.A."
+   CPU:   1 x I8085A
+   IO:    1 x I8155
+   Sound: 1 x AY8910
+*/
+ROM_START( trebol )
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD( "m69.bin", 0x0000, 0x2000, CRC(8fb8cd39) SHA1(4ed505d06b489ce83316fdaa39f7ce128011fb4b) )
+ROM_END
+
+
 } // Anonymous namespace
 
+// From Cirsa
+GAME( 1981,  luckyplr,  0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Lucky Player",      MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1981,  minisupf,  0, missbamby,  c_810601a, missbamby_state, empty_init, ROT0, "Cirsa",              "Mini Super Fruits", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 1981,  minisupf, 0, missbamby,  c_810601a, missbamby_state, empty_init, ROT0, "Cirsa",              "Mini Super Fruits", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1981,  luckyplr, 0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Lucky Player",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 198?,  msbamby,  0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",        MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 198?,  goldfrts, 0, missbamby,  c_810601a, missbamby_state, empty_init, ROT0, "Video Game",         "Golden Fruits",     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1983,  gwinner,  0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner",     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1985,  trebol,   0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Regama",             "Trebol",            MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987?, basket,   0, igoabasket, missbamby, missbamby_state, empty_init, ROT0, "Igoa S.A.",          "Basket",            MACHINE_IS_SKELETON_MECHANICAL ) // v2.0 on ROM string, v2.81 on EPROM label
-GAME( 1987,  multy,    0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Deta",               "Multy",             MACHINE_IS_SKELETON_MECHANICAL )
+// Clones
+GAME( 198?,  goldfrts,  0, missbamby,  c_810601a, missbamby_state, empty_init, ROT0, "Video Game",         "Golden Fruits",     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1983,  gwinner,   0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner",     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1989?, miniazard, 0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Arfyc",              "Mini Azar D",       MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 198?,  msbamby,   0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",        MACHINE_IS_SKELETON_MECHANICAL )
+
+// Similar hardware
+GAME( 1987?, basket,    0, igoabasket, missbamby, missbamby_state, empty_init, ROT0, "Igoa S.A.",          "Basket",            MACHINE_IS_SKELETON_MECHANICAL ) // v2.0 on ROM string, v2.81 on EPROM label
+GAME( 1987,  multy,     0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Deta",               "Multy",             MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985,  trebol,    0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Regama",             "Trebol",            MACHINE_IS_SKELETON_MECHANICAL )

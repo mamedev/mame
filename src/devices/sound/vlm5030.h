@@ -50,7 +50,6 @@ private:
 	const struct tms5100_coeffs *m_coeff;
 
 	/* need to save state */
-
 	uint16_t m_address;
 	uint8_t m_pin_BSY;
 	uint8_t m_pin_ST;

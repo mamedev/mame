@@ -19,7 +19,8 @@
   TODO:
     - determine why ULTRA ROM's self-diag (ESC |) fails for the ROM and
       scratchpad memory
-    - when pressing "REPEAT", the other pressed key should repeatedly trigger
+    - INS8250 needs to implement "Set Break" (LCR, bit 6) before Break key
+      will function as expected.
 
 ****************************************************************************/
 /***************************************************************************
@@ -42,12 +43,12 @@
     ----------------------------------------------------
       0x00    Power-up configuration (primary - SW401)
       0x20    Power-up configuration (secondary - SW402)
-      0x40    ACE (communications)
-      0x60    CRT controller
-      0x80    Keyboard encoder
+      0x40    INS8250 ACE (communications)
+      0x60    MC6845 CRT controller
+      0x80    MM5740 Keyboard encoder
       0xA0    Keyboard status
-      0xC0    Key click enable
-      0xE0    Bell enable
+      0xC0    Trigger key click
+      0xE0    Trigger bell
 
 ****************************************************************************/
 
@@ -93,13 +94,14 @@ heath_tlb_device::heath_tlb_device(const machine_config &mconfig, device_type ty
 	m_p_chargen(*this, "chargen"),
 	m_mm5740(*this, "mm5740"),
 	m_kbdrom(*this, "keyboard"),
-	m_kbspecial(*this, "MODIFIERS")
+	m_kbspecial(*this, "MODIFIERS"),
+	m_repeat_clock(*this, "repeatclock")
 {
 }
 
-void heath_tlb_device::checkBeepState()
+void heath_tlb_device::check_beep_state()
 {
-	if (!m_keyclickactive && !m_bellactive)
+	if (!m_key_click_active && !m_bell_active)
 	{
 		m_beep->set_state(0);
 	}
@@ -107,16 +109,16 @@ void heath_tlb_device::checkBeepState()
 
 TIMER_CALLBACK_MEMBER(heath_tlb_device::key_click_off)
 {
-	m_keyclickactive = false;
+	m_key_click_active = false;
 
-	checkBeepState();
+	check_beep_state();
 }
 
 TIMER_CALLBACK_MEMBER(heath_tlb_device::bell_off)
 {
-	m_bellactive = false;
+	m_bell_active = false;
 
-	checkBeepState();
+	check_beep_state();
 }
 
 void heath_tlb_device::mem_map(address_map &map)
@@ -152,6 +154,7 @@ static constexpr uint8_t KB_STATUS_SHIFT_KEYS_MASK = 0x01;
 static constexpr uint8_t KB_STATUS_CAPS_LOCK_MASK = 0x02;
 static constexpr uint8_t KB_STATUS_BREAK_KEY_MASK = 0x04;
 static constexpr uint8_t KB_STATUS_ONLINE_KEY_MASK = 0x08;
+static constexpr uint8_t KB_STATUS_CONTROL_KEY_MASK = 0x10;
 static constexpr uint8_t KB_STATUS_REPEAT_KEYS_MASK = 0x40;
 static constexpr uint8_t KB_STATUS_KEYBOARD_STROBE_MASK = 0x80;
 
@@ -159,18 +162,24 @@ void heath_tlb_device::device_start()
 {
 	save_item(NAME(m_transchar));
 	save_item(NAME(m_strobe));
-	save_item(NAME(m_keyclickactive));
-	save_item(NAME(m_bellactive));
+	save_item(NAME(m_key_click_active));
+	save_item(NAME(m_bell_active));
 	save_item(NAME(m_reset_pending));
 	save_item(NAME(m_right_shift));
 	save_item(NAME(m_reset_key));
+	save_item(NAME(m_keyboard_irq_raised));
+	save_item(NAME(m_serial_irq_raised));
+	save_item(NAME(m_break_key_irq_raised));
 
 	m_strobe = false;
-	m_keyclickactive = false;
-	m_bellactive = false;
+	m_key_click_active = false;
+	m_bell_active = false;
 	m_reset_pending = false;
 	m_right_shift = false;
 	m_reset_key = false;
+	m_keyboard_irq_raised = false;
+	m_serial_irq_raised = false;
+	m_break_key_irq_raised = false;
 
 	m_key_click_timer = timer_alloc(FUNC(heath_tlb_device::key_click_off), this);
 	m_bell_timer = timer_alloc(FUNC(heath_tlb_device::bell_off), this);
@@ -179,15 +188,15 @@ void heath_tlb_device::device_start()
 void heath_tlb_device::device_reset()
 {
 	m_strobe = false;
-	m_keyclickactive = false;
-	m_bellactive = false;
+	m_key_click_active = false;
+	m_bell_active = false;
 }
 
 void heath_tlb_device::key_click_w(uint8_t data)
 {
 	// Keyclick - 6 mSec
 	m_beep->set_state(1);
-	m_keyclickactive = true;
+	m_key_click_active = true;
 	m_key_click_timer->adjust(attotime::from_msec(6));
 }
 
@@ -195,7 +204,7 @@ void heath_tlb_device::bell_w(uint8_t data)
 {
 	// Bell (^G) - 200 mSec
 	m_beep->set_state(1);
-	m_bellactive = true;
+	m_bell_active = true;
 	m_bell_timer->adjust(attotime::from_msec(200));
 }
 
@@ -223,7 +232,8 @@ uint16_t heath_tlb_device::translate_mm5740_b(uint16_t b)
 
 uint8_t heath_tlb_device::kbd_key_r()
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	m_keyboard_irq_raised = false;
+	set_irq_line();
 	m_strobe = false;
 
 	// high bit is for control key pressed, this is handled in the ROM,
@@ -257,7 +267,7 @@ int heath_tlb_device::mm5740_shift_r()
 
 int heath_tlb_device::mm5740_control_r()
 {
-	return (m_kbspecial->read() & 0x10) ? CLEAR_LINE : ASSERT_LINE;
+	return (m_kbspecial->read() & KB_STATUS_CONTROL_KEY_MASK) ? CLEAR_LINE : ASSERT_LINE;
 }
 
 void heath_tlb_device::mm5740_data_ready_w(int state)
@@ -268,8 +278,22 @@ void heath_tlb_device::mm5740_data_ready_w(int state)
 
 		m_transchar = decode[translate_mm5740_b(m_mm5740->b_r())];
 		m_strobe = true;
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		m_keyboard_irq_raised = true;
+		set_irq_line();
 	}
+}
+
+void heath_tlb_device::serial_irq_w(int state)
+{
+	m_serial_irq_raised = state != CLEAR_LINE;
+	set_irq_line();
+}
+
+void heath_tlb_device::set_irq_line()
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0,
+		(m_keyboard_irq_raised || m_serial_irq_raised || m_break_key_irq_raised) ?
+		 ASSERT_LINE : CLEAR_LINE);
 }
 
 void heath_tlb_device::check_for_reset()
@@ -291,52 +315,79 @@ void heath_tlb_device::check_for_reset()
 
 void heath_tlb_device::reset_key_w(int state)
 {
-	m_reset_key = (state == CLEAR_LINE);
+	m_reset_key = (state == 0);
 
 	check_for_reset();
 }
 
 void heath_tlb_device::right_shift_w(int state)
 {
-	m_right_shift = (state == CLEAR_LINE);
+	m_right_shift = (state == 0);
 
 	check_for_reset();
 }
 
+void heath_tlb_device::repeat_key_w(int state)
+{
+	// when repeat key pressed, set duty cycle to 0.5, else 0.
+	m_repeat_clock->set_duty_cycle(state == CLEAR_LINE ? 0.5 : 0);
+}
+
+void heath_tlb_device::break_key_w(int state)
+{
+	m_break_key_irq_raised = (state == 0);
+
+	set_irq_line();
+}
+
 MC6845_UPDATE_ROW(heath_tlb_device::crtc_update_row)
 {
-	if (!de)
-	{
-		return;
-	}
-
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
 
-	for (uint16_t x = 0; x < x_count; x++)
+	if (de)
 	{
-		uint8_t inv = (x == cursor_x) ? 0xff : 0;
-
-		uint8_t chr = m_p_videoram[(ma + x) & 0x7ff];
-
-		if (chr & 0x80)
+		for (uint16_t x = 0; x < x_count; x++)
 		{
-			inv ^= 0xff;
-			chr &= 0x7f;
+			uint8_t inv = (x == cursor_x) ? 0xff : 0;
+
+			uint8_t chr = m_p_videoram[(ma + x) & 0x7ff];
+
+			if (chr & 0x80)
+			{
+				inv ^= 0xff;
+				chr &= 0x7f;
+			}
+
+			// get pattern of pixels for that character scanline
+			uint8_t const gfx = m_p_chargen[(chr<<4) | ra] ^ inv;
+
+			// Display a scanline of a character (8 pixels)
+			*p++ = palette[BIT(gfx, 7)];
+			*p++ = palette[BIT(gfx, 6)];
+			*p++ = palette[BIT(gfx, 5)];
+			*p++ = palette[BIT(gfx, 4)];
+			*p++ = palette[BIT(gfx, 3)];
+			*p++ = palette[BIT(gfx, 2)];
+			*p++ = palette[BIT(gfx, 1)];
+			*p++ = palette[BIT(gfx, 0)];
 		}
+	}
+	else
+	{
+		const rgb_t color = palette[0];
 
-		// get pattern of pixels for that character scanline
-		uint8_t const gfx = m_p_chargen[(chr<<4) | ra] ^ inv;
-
-		// Display a scanline of a character (8 pixels)
-		*p++ = palette[BIT(gfx, 7)];
-		*p++ = palette[BIT(gfx, 6)];
-		*p++ = palette[BIT(gfx, 5)];
-		*p++ = palette[BIT(gfx, 4)];
-		*p++ = palette[BIT(gfx, 3)];
-		*p++ = palette[BIT(gfx, 2)];
-		*p++ = palette[BIT(gfx, 1)];
-		*p++ = palette[BIT(gfx, 0)];
+		for (uint16_t x = 0; x < x_count; x++)
+		{
+			*p++ = color; // bit 7
+			*p++ = color; // bit 6
+			*p++ = color; // bit 5
+			*p++ = color; // bit 4
+			*p++ = color; // bit 3
+			*p++ = color; // bit 2
+			*p++ = color; // bit 1
+			*p++ = color; // bit 0
+		}
 	}
 }
 
@@ -366,11 +417,11 @@ static INPUT_PORTS_START( tlb )
 	PORT_START("MODIFIERS")
 	// bit 0 - 0x001 connects to B8 of MM5740 - low if either shift key is
 	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CapsLock")   PORT_CODE(KEYCODE_CAPSLOCK)  PORT_TOGGLE
-	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break")      PORT_CODE(KEYCODE_PAUSE)
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break")      PORT_CODE(KEYCODE_PAUSE)     PORT_WRITE_LINE_MEMBER(heath_tlb_device, break_key_w)
 	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("OffLine")    PORT_CODE(KEYCODE_F12)       PORT_TOGGLE
 	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL")       PORT_CODE(KEYCODE_LCONTROL)  PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LeftShift")  PORT_CODE(KEYCODE_LSHIFT)    PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Repeat")     PORT_CODE(KEYCODE_LALT)
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Repeat")     PORT_CODE(KEYCODE_RALT)      PORT_WRITE_LINE_MEMBER(heath_tlb_device, repeat_key_w)
 	// bit 7 - 0x080 is low if a key is pressed
 	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RightShift") PORT_CODE(KEYCODE_RSHIFT)    PORT_WRITE_LINE_MEMBER(heath_tlb_device, right_shift_w)
 	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset")      PORT_CODE(KEYCODE_F10)       PORT_WRITE_LINE_MEMBER(heath_tlb_device, reset_key_w)
@@ -735,7 +786,7 @@ void heath_tlb_device::serial_out_b(uint8_t data)
 	m_write_sd(data);
 }
 
-void heath_tlb_device::cb1_w(int state)
+void heath_tlb_device::serial_in_w(int state)
 {
 	m_ace->rx_w(state);
 }
@@ -761,11 +812,12 @@ void heath_tlb_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(heath_tlb_device::crtc_update_row));
-	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI); // frame pulse
+	// frame pulse
+	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	// serial port
 	INS8250(config, m_ace, INS8250_CLOCK);
-	m_ace->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ace->out_int_callback().set(FUNC(heath_tlb_device::serial_irq_w));
 	m_ace->out_tx_callback().set(FUNC(heath_tlb_device::serial_out_b));
 
 	// keyboard
@@ -786,6 +838,10 @@ void heath_tlb_device::device_add_mconfig(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, H19_BEEP_FRQ).add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	CLOCK(config, m_repeat_clock, 40);
+	m_repeat_clock->set_duty_cycle(0);
+	m_repeat_clock->signal_handler().set(m_mm5740, FUNC(mm5740_device::repeat_line_w));
 }
 
 heath_super19_tlb_device::heath_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

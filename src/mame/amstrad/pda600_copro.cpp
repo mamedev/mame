@@ -364,6 +364,13 @@ void pda600_copro_device::received_byte(u8 byte)
 			return;
 		}
 
+		if (m_buf[1] == 0)
+		{
+			logerror("PDA600: malformed frame\n");
+			send_byte(PDA600_NAK);
+			return;
+		}
+
 		switch (m_buf[2])
 		{
 		case 'T':   // Train a character

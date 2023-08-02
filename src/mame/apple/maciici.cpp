@@ -578,6 +578,7 @@ void maciici_state::maciici(machine_config &config)
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("8M,32M,64M,96M,128M");
 
+	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 
 	RBV(config, m_rbv, C15M);

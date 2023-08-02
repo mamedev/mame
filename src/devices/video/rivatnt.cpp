@@ -219,10 +219,10 @@ ROM_START( rivatnt2_m64 )
 	// following is just an alias of "inno3dpci_125-125mhz.bin" with empty data in the 0x10000-0x1ffff bank (likely inaccessible too)
 	// rivatnt2m64inno3d.BIN                                  1xxxxxxxxxxxxxxxx = 0x00
 	// inno3dpci_125-125mhz.bin            rivatnt2m64inno3d.BIN [1/2]      IDENTICAL
-//	ROMX_LOAD( "rivatnt2m64inno3d.bin", 0x000000, 0x020000, CRC(7241c671) SHA1(24f6f1fbcd3d42ec354185697f8e856d876e2a50), ROM_BIOS(0) )
+//  ROMX_LOAD( "rivatnt2m64inno3d.bin", 0x000000, 0x020000, CRC(7241c671) SHA1(24f6f1fbcd3d42ec354185697f8e856d876e2a50), ROM_BIOS(0) )
 
-//	"rivatnt2m64.bin" is another alias
-//	inno3dpci_125-125mhz.bin            rivatnt2m64.BIN            IDENTICAL
+//  "rivatnt2m64.bin" is another alias
+//  inno3dpci_125-125mhz.bin            rivatnt2m64.BIN            IDENTICAL
 ROM_END
 
 const tiny_rom_entry *rivatnt2_model64_device::device_rom_region() const

@@ -341,18 +341,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/6532riot.h,MACHINES["RIOT6532"] = true
----------------------------------------------------
-
-if (MACHINES["RIOT6532"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/6532riot.cpp",
-		MAME_DIR .. "src/devices/machine/6532riot.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/6821pia.h,MACHINES["6821PIA"] = true
 ---------------------------------------------------
 
@@ -2556,6 +2544,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/mos6530.h,MACHINES["MOS6530"] = true
+---------------------------------------------------
+
+if (MACHINES["MOS6530"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mos6530.cpp",
+		MAME_DIR .. "src/devices/machine/mos6530.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/mos6702.h,MACHINES["MOS6702"] = true
 ---------------------------------------------------
 
@@ -2599,21 +2599,6 @@ if (MACHINES["MOS8726"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/mos8726.cpp",
 		MAME_DIR .. "src/devices/machine/mos8726.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/mos6530.h,MACHINES["MIOT6530"] = true
---@src/devices/machine/mos6530n.h,MACHINES["MIOT6530"] = true
----------------------------------------------------
-
-if (MACHINES["MIOT6530"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/mos6530.cpp",
-		MAME_DIR .. "src/devices/machine/mos6530.h",
-		MAME_DIR .. "src/devices/machine/mos6530n.cpp",
-		MAME_DIR .. "src/devices/machine/mos6530n.h",
 	}
 end
 
@@ -4185,13 +4170,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/dp8573.h,MACHINES["DP8573"] = true
+--@src/devices/machine/dp8573a.h,MACHINES["DP8573A"] = true
 ---------------------------------------------------
 
-if (MACHINES["DP8573"]~=null) then
+if (MACHINES["DP8573A"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/machine/dp8573.cpp",
-		MAME_DIR .. "src/devices/machine/dp8573.h",
+		MAME_DIR .. "src/devices/machine/dp8573a.cpp",
+		MAME_DIR .. "src/devices/machine/dp8573a.h",
 	}
 end
 
@@ -4277,6 +4262,18 @@ if (MACHINES["STEPPERS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/steppers.cpp",
 		MAME_DIR .. "src/devices/machine/steppers.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/em_reel.h,MACHINES["EM_REEL"] = true
+---------------------------------------------------
+
+if (MACHINES["EM_REEL"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/em_reel.cpp",
+		MAME_DIR .. "src/devices/machine/em_reel.h",
 	}
 end
 

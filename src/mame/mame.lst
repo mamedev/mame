@@ -460,8 +460,25 @@ ace                             // [1976 Allied Leisure]
 @source:alliedleisure/aleisttl.cpp
 sburners                        // (c) 1975 Allied Leisure
 
+@source:alliedleisure/aztarac.cpp
+aztarac                         // (c) 1983 Centuri (vector game)
+
 @source:alliedleisure/clayshoo.cpp
 clayshoo                        // [1979 Allied Leisure]
+
+@source:alliedleisure/killcom.cpp
+challeng                        // (c) 1981 Centuri
+kaos                            // (c) 1981
+killcom                         // (c) 1980 Centuri
+leprechn                        // (c) 1982
+leprechna                       // (c) 1982
+megatack                        // (c) 1980 Centuri
+megatacka                       // (c) 1980 Centuri
+piratetr                        // (c) 1982
+potogold                        // (c) 1982
+
+@source:alliedleisure/trvquest.cpp
+trvquest                        // (c) 1984 Techstar / Sunn
 
 @source:alpha/alpha68k.cpp
 btlfield                        // Alpha-68K96II 'BT' (c) 1987
@@ -861,7 +878,9 @@ maccclas                        // 1993 Apple Macintosh Color Classic
 
 @source:apple/maclc3.cpp
 maclc3                          // 1993 Apple Macintosh LC III
+maclc3p                         // 1993 Apple Macintosh LC III+
 maclc520                        // 1993 Apple Macintosh LC 520
+maclc550                        // 1994 Apple Macintosh LC 550
 
 @source:apple/macpdm.cpp
 pmac6100                        // 1993 Apple Power Macintosh 6100
@@ -880,8 +899,20 @@ macpb180                        // 1992 Apple Macintosh PowerBook 180
 macpb180c                       // 1992 Apple Macintosh PowerBook 180c
 macpd210                        // 1992 Apple Macintosh PowerBook Duo 210
 
+@source:apple/macquadra605.cpp
+macqd605                        // 1993 Apple Macintosh Quadra 605
+maclc475                        // 1993 Apple Macintosh LC/Performa 475
+maclc575                        // 1994 Apple Macintosh LC/Performa 575
+
 @source:apple/macquadra700.cpp
 macqd700                        // 1991 Apple Macintosh Quadra 700
+
+@source:apple/macquadra800.cpp
+macqd800                        // 1993 Apple Macintosh Quadra 800
+macct610                        // 1993 Apple Macintosh Centris 610
+macct650                        // 1993 Apple Macintosh Centris 650
+macqd610                        // 1993 Apple Macintosh Quadra 610
+macqd650                        // 1993 Apple Macintosh Quadra 650
 
 @source:apple/newton.cpp
 newtnotp
@@ -1733,6 +1764,7 @@ firefoxa                        // 136026           (c) 1984
 
 @source:atari/firetrk.cpp
 firetrk                         // 030926           1978/06 [6808]
+firetrka                        // 030926           1978/06 [6808]
 montecar                        // 035763-035780    1980/04 [6502]
 superbug                        // 009115-009467    1977/09 [6800]
 
@@ -9261,6 +9293,23 @@ ad5vpaa                         //
 ad5vpab                         //
 ad5vpac                         //
 
+@source:bfm/bfm_blackbox.cpp
+bb_21up                         // 21 Up (Bellfruit)
+bb_21upa                        //
+bb_bellt                        // Bell Trail (Bellfruit)
+bb_cjack                        // Crackerjack (Bellfruit)
+bb_dblit                        // Double It (Bellfruit)
+bb_fiest                        // Fiesta (Associated Leisure)
+bb_firec                        // Fire Cracker (Bellfruit)
+bb_gspin                        // Golden Spin (BWB)
+bb_nudcl                        // Nudge Climber (Bellfruit)
+bb_nudgm                        // The Nudge Machine (ADMC)
+bb_oal                          // Oranges And Lemons (Bellfruit)
+bb_reelg                        // Reel Gambler (Bellfruit)
+bb_spinu                        // Spin Up (CTL)
+bb_upndn                        // Upstairs 'N' Downstairs (Bellfruit)
+bb_upndna                       //
+
 @source:bfm/bfm_sc1.cpp
 m_tppokr                        // (c) 1996 BFM/ELAM,Game Card 95-750-899, uses Adder board for feature gfx
 sc1actv8                        //
@@ -15052,6 +15101,7 @@ mswordu                         // 25/07/1990 (c) 1990 (USA)
 mtwins                          // 19/06/1990 (c) 1990 (World)
 nemo                            // 30/11/1990 (c) 1990 (World)
 nemoj                           // 20/11/1990 (c) 1990 (Japan)
+nemoja                          // 20/11/1990 (c) 1990 (Japan)
 nemor1                          // 09/11/1990 (c) 1990 (World)
 pang3                           // 01/06/1995 (c) 1995 Mitchell (Euro) not listed on Capcom's site
 pang3b                          // bootleg
@@ -15627,6 +15677,7 @@ gngc                            // 9/1985 (c) 1985
 gngprot                         // Capcom/Romstar Proto
 gngt                            // 9/1985 (c) 1985
 makaimur                        // 9/1985 (c) 1985
+makaimurb                       // 9/1985 (c) 1985
 makaimurc                       // 9/1985 (c) 1985
 makaimurg                       // 9/1985 (c) 1985
 
@@ -16054,14 +16105,15 @@ minimonyb
 miniguay
 
 @source:cirsa/missbamby.cpp
-basket                          // (c) 198? IGOA S.A.
+basket                          // (c) 1987? IGOA S.A.
 goldfrts                        //
-gwinner                         // (c) 1983 Reben
-luckyplr                        // (c) 1981 Cirsa
-minisupf                        // (c) 1981 Cirsa
-msbamby                         // (c) 198? Automatics Pasqual
-multy                           // (c) 1987 Deta
-trebol                          // (c) 1985 Regama
+gwinner                         // (c) 1983  Reben
+luckyplr                        // (c) 1981  Cirsa
+miniazard                       // (c) 1989? Arfyc
+minisupf                        // (c) 1981  Cirsa
+msbamby                         // (c) 198?  Automatics Pasqual
+multy                           // (c) 1987  Deta
+trebol                          // (c) 1985  Regama
 
 @source:cirsa/neptunp2.cpp
 bg_barmy                        //
@@ -16183,6 +16235,9 @@ chmate                          //
 
 @source:commodore/clcd.cpp
 clcd                            // Commodore LCD
+
+@source:commodore/kim1.cpp
+kim1                            // Commodore (MOS) KIM-1 1976
 
 @source:commodore/mps1230.cpp
 mps1000                         // 1986 Commodore MPS-1000 (dot matrix printer)
@@ -16540,7 +16595,7 @@ lastmisnu5                      // (c) 1986 Data East USA (US)
 lastmisnu6                      // (c) 1986 Data East USA (US)
 makyosen                        // (c) 1987 Data East Corporation (Japan)
 meikyuh                         // (c) 1987 Data East Corporation (Japan)
-meikyuha                        // (c) 1987 Data East Corporation (Japan)
+meikyuhbl                       // bootleg
 oscar                           // (c) 1988 Data East Corporation (World)
 oscarbl                         // bootleg
 oscarj1                         // (c) 1987 Data East Corporation (Japan)
@@ -17716,12 +17771,12 @@ fdes2325                        //
 @source:fidelity/eag68k.cpp
 feagv10                         //
 feagv11                         //
-feagv2                          //
-feagv3                          //
+feagv4                          //
+feagv4a                         //
 feagv5                          //
-feagv6                          //
 feagv7                          //
 feagv7a                         //
+feagv7b                         //
 feagv9                          //
 fex68k                          //
 fex68ka                         //
@@ -18250,6 +18305,7 @@ frogf                           // bootleg
 frogg                           // bootleg
 frogger                         // GX392 (c) 1981 Konami
 froggeram                       // bootleg
+froggereb                       // bootleg
 froggermc                       // 800-3110 (c) 1981 Sega
 froggers                        // bootleg
 froggers1                       // (c) 1981 Sega
@@ -18559,29 +18615,6 @@ gp2x                            // GP2X 2005
 @source:gamepark/gp32.cpp
 gp32                            // GP32 2001
 
-@source:gameplan/enigma2.cpp
-enigma2                         // (c) 1981 Game Plan (Zilec Electronics license)
-enigma2a                        // (c) 1984 Zilec Electronics (bootleg?)
-enigma2b                        // (c) 1981 Zilec Electronics
-
-@source:gameplan/gameplan.cpp
-challeng                        // (c) 1981 Centuri
-kaos                            // (c) 1981
-killcom                         // (c) 1980 Centuri
-leprechn                        // (c) 1982
-leprechp                        // (c) 1982
-megatack                        // (c) 1980 Centuri
-megatacka                       // (c) 1980 Centuri
-piratetr                        // (c) 1982
-potogold                        // (c) 1982
-
-@source:gameplan/toratora.cpp
-toratora                        // (c) 1980 Game Plan
-toratorab                       // (c) 1980 Game Plan
-
-@source:gameplan/trvquest.cpp
-trvquest                        // (c) 1984 Sunn / Techstar
-
 @source:gametron/gatron.cpp
 bingo                           // Game-A-Tron?
 poker41                         // (c) 1983 Game-A-Tron
@@ -18669,11 +18702,11 @@ lightfgt                        // Milton Bradley
 lilcomp                         // Texas Instruments
 mbaskb2                         // Mattel
 mdallas                         // Mattel
+minspace                        // Mego
 msoccer2                        // Mattel
 plus1                           // Milton Bradley
 qkracera                        // National Semiconductor
 solution                        // SCAT
-unkeinv                         // Gordon Barlow Design
 vidchal                         // Select Merchandise
 
 @source:handheld/hh_cops1.cpp
@@ -19081,10 +19114,10 @@ bmsoccer                        // Bambino
 ctntune                         // Castle Toy
 edracula                        // Epoch
 efball                          // Epoch
+einspace                        // Epoch
 galaxy2                         // Epoch
 galaxy2b                        // Epoch
 grobot9                         // Gakken
-invspace                        // Epoch
 mcompgin                        // Mattel
 mvbfree                         // Mego
 splasfgt                        // Bambino
@@ -20193,6 +20226,7 @@ pepk0810a                       // (c) 1987 IGT - International Game Technology
 pepk0811                        // (c) 1987 IGT - International Game Technology
 pepk0823                        // (c) 1987 IGT - International Game Technology
 pepk0832                        // (c) 1987 IGT - International Game Technology
+pepk0846                        // (c) 1987 IGT - International Game Technology
 pepk0849                        // (c) 1987 IGT - International Game Technology
 pepk0856                        // (c) 1987 IGT - International Game Technology
 pepk0856a                       // (c) 1987 IGT - International Game Technology
@@ -20206,6 +20240,7 @@ pepk1002                        // (c) 1987 IGT - International Game Technology
 pepk1004                        // (c) 1987 IGT - International Game Technology
 pepk1013                        // (c) 1987 IGT - International Game Technology
 pepk1015                        // (c) 1987 IGT - International Game Technology
+pepk1017                        // (c) 1987 IGT - International Game Technology
 pepk1020                        // (c) 1987 IGT - International Game Technology
 pepk1024                        // (c) 1987 IGT - International Game Technology
 pepk1030                        // (c) 1987 IGT - International Game Technology
@@ -27249,6 +27284,7 @@ mazebl                          // bootleg
 mkla1                           // (c) 1992 Midway
 mkla2                           // (c) 1992 Midway
 mkla3                           // (c) 1992 Midway
+mkla3bl                         // bootleg
 mkla4                           // (c) 1992 Midway
 mknifty                         // hack
 mknifty666                      // hack
@@ -28373,6 +28409,8 @@ magibombd                       // (c) 2005  Astro Corp.
 magibombe                       // (c) 2001? Astro Corp.
 magibombf                       // (c) 2002  Astro Corp.
 magibombg                       // (c) 2004  Astro Corp.
+magibombh                       // (c) 2001? Astro Corp.
+magibombi                       // (c) 2001? Astro Corp.
 showhanc                        // (c) 2000  Astro Corp.
 showhand                        // (c) 2000  Astro Corp.
 skilldrp                        // (c) 2002  Astro Corp.
@@ -28435,9 +28473,6 @@ avtnfl                          // (c) 1989 AVT
 avtsym14                        // (c) 1985 AVT
 avtsym25                        // (c) 1985 AVT
 
-@source:misc/aztarac.cpp
-aztarac                         // (c) 1983 Centuri (vector game)
-
 @source:misc/babysuprem.cpp
 bsuprem                         // (c) 198? Andra / Vifico
 
@@ -28486,6 +28521,8 @@ roljokr1                        // (c) 1999 Paloma-Elektronik
 roljokr2                        // (c) 1997 Paloma-Elektronik
 roljokr3                        // (c) 1999 Paloma-Elektronik
 vip2000                         // (c) Paloma-Elektronik
+vip2000a                        // (c) Paloma-Elektronik
+vip2000b                        // (c) Paloma-Elektronik
 
 @source:misc/blitz68k.cpp
 bankrob                         // (c) 1993 Entertainment Technology Corp.
@@ -29393,6 +29430,11 @@ foolrace
 avenger                         // (c) 1975 Electra
 flyingf                         // (c) 1976 Electra
 
+@source:misc/enigma2.cpp
+enigma2                         // (c) 1981 Zilec Electronics (Game Plan license)
+enigma2a                        // (c) 1984 Zilec Electronics (bootleg?)
+enigma2b                        // (c) 1981 Zilec Electronics
+
 @source:misc/epos.cpp
 catapult                        // (c) 1982
 dealer                          // (c) 198?
@@ -29513,11 +29555,10 @@ fortecrd                        // (c) 1994, Fortex Ltd.
 fortecrde                       // (c) 1994, Fortex Ltd.
 
 @source:misc/freekick.cpp
-omega                           // (c) 1986 Nihon System
-omegaa                          // (c) 1986 Nihon System
 countrun                        // (c) 1988 Nihon System (+ optional Sega) NS6201-A 1988.3
 countrunb                       // (c) 1988 bootleg
 countrunb2                      // (c) 1988 bootleg
+countrunb3                      // (c) 1988 bootleg
 freekick                        // (c) 1988 Nihon System licensed to Merit (+ optional Sega) NS6201-A 1987.10
 freekicka                       // (c) 1988 Nihon System (+ optional Sega) NS6201-A 1987.9
 freekickb1                      // (c) 1987 bootleg
@@ -29528,6 +29569,8 @@ gigasb                          // (c) 1986 bootleg
 gigasm2                         // (c) 1986 Sega
 gigasm2b                        // (c) 1986 bootleg
 oigas                           // (c) 1986 bootleg
+omega                           // (c) 1986 Nihon System
+omegaa                          // (c) 1986 Nihon System
 pbillrd                         // (c) 1987 Nihon System
 pbillrdbl                       // (c) 1987 bootleg
 pbillrds                        // (c) 1987 Nihon System (Sega license?)
@@ -30209,6 +30252,9 @@ jungleyo
 
 @source:misc/kas89.cpp
 kas89                           // 1989, SFC S.R.L.
+
+@source:misc/katosmedz80.cpp
+dnbanban
 
 @source:misc/kingpin.cpp
 dealracl                        //
@@ -31640,6 +31686,10 @@ tmspoker                        //
 icecoldice                      // (c) ICE
 tomsadvs                        //
 
+@source:misc/toratora.cpp
+toratora                        // (c) 1980 Game Plan
+toratorab                       // (c) 1980 Game Plan
+
 @source:misc/triton.cpp
 triton41                        // 1978 Transam Triton L4.1
 triton51                        // 1979 Transam Triton L5.1
@@ -31684,6 +31734,9 @@ twinbskt                        // (c) 1995 Recreativos Pasqual
 @source:misc/umipoker.cpp
 saiyukip                        //
 umipoker                        //
+
+@source:misc/unkgolf.cpp
+unkgolf
 
 @source:misc/unkhorse.cpp
 unkhorse                        //
@@ -31854,6 +31907,9 @@ multi8                          //
 @source:mitsubishi/multi16.cpp
 multi16                         //
 
+@source:mitsubishi/trium.cpp
+triumec                         //
+
 @source:mizar/mzr8105.cpp
 mzr8105                         //
 
@@ -31866,9 +31922,6 @@ mpz80                           //
 
 @source:morrow/tricep.cpp
 tricep                          //
-
-@source:mos/kim1.cpp
-kim1                            // Commodore (MOS) KIM-1 1975
 
 @source:motorola/ampscarp.cpp
 ampscarp                        // Motorola Amps Car Phone
@@ -33414,6 +33467,7 @@ terrafb                         // (c) 1987
 terrafj                         // (c) 1987 Nichibutsu Japan
 terrafjb                        // (c) 1987
 terrafu                         // (c) 1987 Nichibutsu USA
+terrafua                        // (c) 1987 Nichibutsu USA
 
 @source:nichibutsu/cclimber.cpp
 bagmanf                         // bootleg on Falcon FCK-00 (Falcon Crazy Kong) PCB
@@ -33898,6 +33952,7 @@ smb3bl
 @source:nintendo/nes_clone.cpp
 afbm7800
 dancexpt
+digezlg
 dnce2000
 hs36blk
 hs36red
@@ -34198,6 +34253,7 @@ endless                         // bootleg
 endlessa                        // bootleg
 ffight2b                        // bootleg
 ffight3b                        // bootleg
+ffight3b2                       // bootleg
 iron                            // bootleg
 legendsb                        // bootleg
 kinstb                          // bootleg
@@ -34209,6 +34265,7 @@ wldgunsb                        // bootleg
 
 @source:nintendo/snesb51.cpp
 fatfurspb
+kinstsnes
 mk3snes
 snes4sl
 snes4sln
@@ -34425,6 +34482,8 @@ vandykejal2                     // UPL-90064 (c) Jaleco
 drail                           // NTC / NMK
 hpierrot                        // NTC / NMK
 omatsuri                        // NMK
+pldoraemon                      // NMK
+plpittashi                      // NMK
 sweethrt                        // NMK
 trocana                         // NTC / NMK
 
@@ -34949,6 +35008,7 @@ mkp286                          // Morse KP-286 motherboard (286)
 n8810m15                        // 1987 Nixdorf 8810 M15 Laptop - PC07
 n8810m16c                       // 1990 Nixdorf 8810 M16 Laptop - PC17 - CGA version
 n8810m16v                       // 1990 Nixdorf 8810 M16 Laptop - PC17 - VGA version
+n8810m20                        // 1989 Nixdorf 8810/20 Laptop VGA
 n8810m30                        // 1990 Nixdorf 8810 M30
 n8810m55                        // 1986 Nixdorf 8810 M55
 ncr3302                         // NCR Class 3302 Model 0110
@@ -34959,6 +35019,7 @@ necapciv                        // NEC APC IV
 o286foxii                       // Octek Fox II motherboard (286)
 ocfoxm                          // Octek Fox M 286
 octekg2                         // Octek motherboard with Headland G2 chipset (286)
+ocxt286                         // Octek XT-286 motherboard
 olim203                         // Olivetti 286 motherboard
 olyport40                       // AEG Olympia Olyport 40
 pc30iii                         // Commodore PC 30-III
@@ -35163,10 +35224,8 @@ at486                           // 19?? IBM AT 486
 atc1415                         // A-Trend ATC-1415 motherboard (486)
 bluenote                        // Highscreen Colani Blue Note (486)
 ch48633c                        // Chicony CH-486-33C motherboard (486)
-ch486spm                        // Chaintech 486SPM motherboard (486)
 ch491e                          // Chicony CH-491E motherboard (486)
 ch4slez1                        // Chaintech 486SLE M106 4SLE-Z1 motherboard (486)
-ch4spi                          // Chaintech 4SPI motherboard (486)
 comt486                         // Commodore Tower 486
 dt486                           // Commodore DT486
 ec4913                          // Elitegroup UC4913 REV:1.1 motherboard (486)
@@ -35184,7 +35243,6 @@ ficpio2                         // 1995 FIC 486-PIO-2
 ficvipio                        // FIC 486-VIP-IO
 ficvipio2                       // FIC 486-VIP-IO2
 fic4386vcv                      // FIC 4386-VC-V motherboard (486)
-ft486f55                        // Freetech 486FT55 motherboard (486)
 ftsserv                         // 1991 Apricot FTs (Scorpion)
 ga486vf                         // Gigabyte GA-486VF motherboard (486)
 ga486vs                         // Gigabyte GA-486VS motherboard (486)
@@ -35197,11 +35255,8 @@ hot409                          // Shuttle HOT-409
 hot419                          // Shuttle HOT-419 motherboard (486)
 hot433                          // Shuttle HOT-433 motherboard (486)
 ibm2133                         // IBM PS/1 2133
-jakms41                         // Jamicon KM-S4-1 VER 1.1
 jwj403tg                        // JETWAY J-403TG motherboard (486)
-jwj446a                         // Jetway J-446A motherboard (486)
 lion3500                        // 1993 Lion 3500C/T notebook
-ls486e                          // LuckyStar LS-486E Rev:C motherboard (486)
 lsucm486v30                     // Lucky Star UCM-486V30
 mb1433aeap                      // BIOSTAR - MB-1433/50 AEA-P - V:1
 mb1433ucv                       // Biostar MB-1433UCV motherboard (486)
@@ -35215,7 +35270,6 @@ ms4125                          // MSI MS-4125 motherboard (486)
 ms4132                          // MSI MS-4132 G VER:1 motherboard (486)
 ms4134                          // MSI MS-4134 motherboard (486)
 ms4138                          // MSI MS-4138 motherboard (486)
-ms4144                          // MSI MS-4144 motherboard (486)
 ms4145                          // MSI MS-4145 motherboard (486)
 nat48pv                         // NAT48PV-1.00 VL motherboard (486)
 ncr3433                         // NCR Class 3433
@@ -35249,8 +35303,6 @@ sm48650usc                      // Vintage Sprite SM 486-50USC motherboard (486)
 so025d2                         // SOYO 486 VESA 025D2
 so025k2                         // SOYO 025K2 motherboard (486)
 so025r2                         // SOYO 025R2 motherboard (486)
-so30h                           // SOYO 30H motherboard (486)
-so4saw2                         // SOYO SY-4SAW2 motherboard (486)
 sto486wb                        // Auva-Cam-33-P2 = See-Thru Sto486Wb motherboard (486)
 td4ipaio                        // TD-4IP-UMC-AIO motherboard (486)
 tmpat48pg4                      // TMC PAT48PG4
@@ -35266,7 +35318,6 @@ uniwb4407                       // UNICHIP 486 WB 4407 REV 1.0 motherboard (486)
 v4p895p3                        // QDI V4P895P3/SMT V5.0 motherboard (486)
 via4386vio                      // Via 4386 VIO / Highscreen universal board (486)
 zi4dvs                          // Zida 4DVS motherboard (486)
-zito4dps                        // ZIDA Tomato board 4DPS (486)
 
 @source:pc/atpci.cpp
 at586                           // 19?? AT 586
@@ -35343,6 +35394,7 @@ gogostrk                        //
 @source:pc/pc.cpp
 ataripc1                        // Atari PC1
 ataripc3                        // Atari PC3
+auvip800                        // AUVA VIP 800
 bw230                           // 1985 Bondwell (CGA)
 cadd810                         // CompuAdd 810
 comdesk                         // Compaq Deskpro
@@ -35356,6 +35408,8 @@ dtkerso                         // 198? PC-XT clones with a DTK/ERSO BIOS
 eaglespirit                     // Eagle PC Spirit
 eppc                            // 1985 Ericsson Portable PC
 hyo88t                          // Hyosung Topstar 88T
+hyu16t                          // Hyundai Super 16 T
+hyu16te                         // Hyundai Super 16 TE
 ibm5550                         //
 iskr3104                        //
 ittxtra                         // 1984 ITT XTRA
@@ -35373,6 +35427,7 @@ mpc1600                         // Columbia Data Products MPC 1600
 mc1702                          //
 mk88                            //
 ncrpc4i                         // NCR PC4i
+ncrpc6                          // NCR PC6
 nixpc01                         // Nixdorf 8810/25 - PC01
 olivm15                         // Olivetti M15
 olystar20f                      // AEG Olympia Olystar 20F
@@ -35434,6 +35489,16 @@ aoap43                          // Aopen AP43 motherboard (486)
 a486sp3                         // ASUS PVI-486SP3
 aa486s                          // ASUS PCI/I-A486S
 sis85c496                       // 486 motherboards using the SiS 85C496/85C497 chipset
+ch486spm                        // Chaintech 486SPM motherboard (486)
+ch4spi                          // Chaintech 4SPI motherboard (486)
+ft486f55                        // Freetech 486FT55 motherboard (486)
+jakms41                         // Jamicon KM-S4-1 VER 1.1
+jwj446a                         // Jetway J-446A motherboard (486)
+ls486e                          // LuckyStar LS-486E Rev:C motherboard (486)
+ms4144                          // MSI MS-4144 motherboard (486)
+so30h                           // SOYO 30H motherboard (486)
+so4saw2                         // SOYO SY-4SAW2 motherboard (486)
+zito4dps                        // ZIDA Tomato board 4DPS (486)
 
 @source:pc/pcxt.cpp
 filetto                         // (c) 1990 Novamatic
@@ -35736,6 +35801,7 @@ kiss                            //
 kosteel                         //
 lostwrlp                        //
 m_mpac                          //
+m_mpacb                         //
 mdntmrdr                        //
 medusa                          //
 monrobwl                        //
@@ -36380,6 +36446,7 @@ hangonp                         //
 nemesisp                        //
 odin                            //
 odin_dlx                        //
+odinp                           //
 odisea                          //
 petaco                          //
 poleposn                        //
@@ -37012,6 +37079,7 @@ elvisl302                       //
 elvisl303                       //
 elvisl4                         //
 elvisp                          //
+elvisp100                       //
 elvisp302                       //
 elvisp303                       //
 elvisp4                         //
@@ -39856,6 +39924,7 @@ twsoc98                         // 1998.04 Tecmo World Soccer '98 (Tecmo)
 vfkids                          // 1996.03 Virtua Fighter Kids
 vfremix                         // 1995.06 Virtua Fighter Remix
 vmahjong                        // 1997.02 Virtual Mahjong (Micronet)
+wasafari                        // 1998.11 Wanpaku Safari
 winterht                        // 1997.10 Winter Heat (Data East)
 yattrmnp                        // 1998.10 Yatterman Plus
 znpwfv                          // 1997.12 Zen Nippon Pro Wrestling featuring Virtua
@@ -40241,6 +40310,7 @@ panicrg                         // Seibu / TV-Tuning (Germany)
 @source:seibu/r2dx_v33.cpp
 nzeroteam                       // (c) 1997 Seibu Kaihatsu
 nzeroteama                      //
+nzeroteamb                      //
 r2dx_v33                        // (c) 1996 Seibu Kaihatsu
 r2dx_v33_r2                     // (c) 1996 Seibu Kaihatsu
 zerotm2k                        // (c) 2000 Seibu Kaihatsu
@@ -40472,6 +40542,7 @@ daioha                          // (C) 1993 Athena
 daiohc                          // (C) 1993 Athena (93111A PCB conversion)
 daiohp                          // (C) 1993 Athena (prototype)
 daiohp2                         // (C) 1993 Athena (prototype, earlier)
+daiohp3                         // (C) 1993 Athena (prototype)
 drgnunit                        // (c) 1989 Athena / Seta + Romstar or Taito license (DSW)
 eightfrc                        // (c) 1994 Tecmo
 extdwnhl                        // (c) 1995 Sammy Japan
@@ -40570,6 +40641,7 @@ nratechu                        // (c) 1996 Seta
 renju                           // (c) 1994 Visco
 
 @source:seta/speedatk.cpp
+daifugo
 speedatk                        // CB-0 (c) SetaKikaku
 
 @source:seta/speglsht.cpp
@@ -40657,24 +40729,27 @@ tim011                          //
 @source:sfrj/tim100.cpp
 tim100                          //
 
-@source:sgi/4dpi.cpp
-4d20                            //  IP6: Personal Iris 4D/20, R2000 @12.5MHz
-4d25                            // IP10: Personal Iris 4D/25, R3000 @20MHz
-4d30                            // IP14: Personal Iris 4D/30, R3000A @30MHz
-4d35                            // IP12: Personal Iris 4D/35, R3000A @36MHz
-
 @source:sgi/crimson.cpp
 crimson                         // (c) 1992 SGI
-
-@source:sgi/indigo.cpp
-indigo3k                        // IP12: Indigo 1, R3000, 33MHz
-indigo4k                        // IP20: Indigo 1, R4400, 150MHz
 
 @source:sgi/indy_indigo2.cpp
 indy_4610                       // IP22: Indy, R4600, 100MHz
 indy_4613                       // IP22: Indy, R4600, 133MHz
 indy_5015                       // IP22: Indy, R5000, 150MHz
 indigo2_4415                    // IP24: Indigo 2, R4400, 150MHz
+
+@source:sgi/ip6.cpp
+pi4d20                          // Personal IRIS 4D/20 (R2000 @ 12.5MHz)
+pi4d25                          // Personal IRIS 4D/25 (R3000 @ 20MHz)
+
+@source:sgi/ip12.cpp
+pi4d30                          // Personal IRIS 4D/30 (R3000A @ 30MHz)
+pi4d35                          // Personal IRIS 4D/35 (R3000A @ 36MHz)
+indigo                          // IRIS Indigo HP1 (R3000A @ 33MHz)
+
+@source:sgi/ip20.cpp
+indigo_r4000                    // Indigo HP2, PM1 (R4000 @ 100MHz)
+indigo_r4400                    // Indigo HP2, PM2 (R4400 @ 150MHz)
 
 @source:sgi/iris3130.cpp
 iris3130                        // IP2: IRIS 3xx0, 68020, 16MHz
@@ -40861,6 +40936,7 @@ kay1024                         //
 profi                           //
 quorum                          //
 scorpio                         //
+scorpiontb                      //
 
 @source:sinclair/spec128.cpp
 hc128                           // 1991 HC-128
@@ -43536,6 +43612,7 @@ rygar                           // 6002 - (c) 1986 Tecmo
 rygar2                          // 6002 - (c) 1986 Tecmo
 rygar3                          // 6002 - (c) 1986 Tecmo
 rygarj                          // 6002 - (c) 1986 Tecmo
+rygarj2                         // 6002 - (c) 1986 Tecmo
 silkworm                        // 6217 - (c) 1988 Tecmo
 silkwormj                       // 6217 - (c) 1988 Tecmo
 silkwormp                       // 6217 - (c) 1988 Tecmo
@@ -45186,6 +45263,7 @@ ojankoy                         // [1986] V-System Co. (Japan)
 @source:vsystem/pipedrm.cpp
 hatris                          // (c) 1990 Video System Co. (US)
 hatrisj                         // (c) 1990 Video System Co. (Japan)
+hatrisp                         // (c) 1990 Video System Co. (prototype)
 pipedrm                         // (c) 1990 Video System Co. (World)
 pipedrmj                        // (c) 1990 Video System Co. (Japan)
 pipedrmt                        // (c) 1990 Video System Co. (Taiwan)
@@ -45627,10 +45705,10 @@ laserbat                        // (c) 1981
 lazarian                        // (c) 1981
 
 @source:zaccaria/seabattl.cpp
+armada                          //
 seabattl                        // (c) 1980
-seabattla                       // (c) 1980
 
-@source:zaccaria/zac2650.cpp
+@source:zaccaria/zac1b1120.cpp
 dodgem                          // (c) 1979
 sia2650                         // (c) 1978
 tinv2650                        // (c) 1978

@@ -5,10 +5,12 @@
 
 #pragma once
 
-#include "machine/nscsi_bus.h"
 #include "imagedev/cdromimg.h"
-#include "cdrom.h"
+#include "machine/nscsi_bus.h"
 #include "sound/cdda.h"
+
+#include "cdrom.h"
+
 
 class nscsi_cdrom_device : public nscsi_full_device
 {
