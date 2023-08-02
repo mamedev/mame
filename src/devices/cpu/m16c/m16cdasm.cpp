@@ -138,7 +138,7 @@ void m16c_disassembler::dasm_ea(std::ostream &stream, offs_t &pc, const data_buf
 	else if (mode < 8)
 		util::stream_format(stream, "[%s]", s_regs[1][mode - 2]);
 	else if (mode < 0xc)
-		format_relative(stream, mode < 0xa ? s_regs[1][mode - 4] : s_cregs[mode - 4], s8(opcodes.r8(pc++)));
+		format_relative(stream, mode < 0xa ? s_regs[1][mode - 4] : s_cregs[mode - 4], mode == 0xb ? s8(opcodes.r8(pc++)) : opcodes.r8(pc++));
 	else
 	{
 		if (mode == 0xf)
@@ -674,12 +674,12 @@ void m16c_disassembler::dasm_7e(std::ostream &stream, offs_t &pc, const data_buf
 		}
 		else if (BIT(op2, 1))
 		{
-			const s8 dsp8 = s8(opcodes.r8(pc++));
+			const u8 dsp8 = opcodes.r8(pc++);
 			util::stream_format(stream, "%d, ", dsp8 & 0x07);
-			format_relative(stream, s_cregs[6 + BIT(op2, 0)], dsp8 >> 3);
+			format_relative(stream, s_cregs[6 + BIT(op2, 0)], BIT(op2, 0) ? s8(dsp8) >> 3 : dsp8 >> 3);
 		}
 		else
-			format_relative(stream, s_regs[1][4 + BIT(op2, 0)], s8(opcodes.r8(pc++)));
+			format_relative(stream, s_regs[1][4 + BIT(op2, 0)], opcodes.r8(pc++));
 		if ((op2 & 0xf0) == 0x20)
 			++pc;
 	}
@@ -762,7 +762,7 @@ offs_t m16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const m16
 				break;
 
 			default:
-				format_relative(stream, s_cregs[5 + (op1 & 3)], s8(opcodes.r8(pc++)));
+				format_relative(stream, s_cregs[5 + (op1 & 3)], BIT(op1, 1) ? s8(opcodes.r8(pc++)): opcodes.r8(pc++));
 				break;
 			}
 			if (op1 >= 0x08)
@@ -772,12 +772,12 @@ offs_t m16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const m16
 	else if (op1 < 0x60)
 	{
 		util::stream_format(stream, "%-8s%d, ", s_bit_ops[op1 >> 3], op1 & 0x07);
-		format_relative(stream, s_cregs[6], s8(opcodes.r8(pc++)));
+		format_relative(stream, s_cregs[6], opcodes.r8(pc++));
 	}
 	else if (op1 < 0x68)
 	{
 		util::stream_format(stream, "%-8s", "jmp.s");
-		format_label(stream, pc + 1 + s8(op1 & 0x07));
+		format_label(stream, pc + 1 + (op1 & 0x07));
 	}
 	else if (op1 < 0x70)
 	{
@@ -847,8 +847,12 @@ offs_t m16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const m16
 			stream << s_regs[0][BIT(op1, 0)];
 			break;
 
-		case 5: case 6:
-			format_relative(stream, s_cregs[(op1 & 0x07) + 1], s8(opcodes.r8(pc++)));
+		case 5:
+			format_relative(stream, s_cregs[6], opcodes.r8(pc++));
+			break;
+
+		case 6:
+			format_relative(stream, s_cregs[7], s8(opcodes.r8(pc++)));
 			break;
 
 		case 7:
@@ -879,8 +883,12 @@ offs_t m16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const m16
 			stream << s_regs[0][BIT(op1, 0)];
 			break;
 
-		case 5: case 6:
-			format_relative(stream, s_cregs[(op1 & 0x07) + 1], s8(opcodes.r8(pc++)));
+		case 5:
+			format_relative(stream, s_cregs[6], opcodes.r8(pc++));
+			break;
+
+		case 6:
+			format_relative(stream, s_cregs[7], s8(opcodes.r8(pc++)));
 			break;
 
 		case 7:
@@ -916,8 +924,12 @@ offs_t m16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const m16
 			stream << s_regs[0][BIT(op1, 0)];
 			break;
 
-		case 5: case 6:
-			format_relative(stream, s_cregs[(op1 & 0x07) + 1], s8(opcodes.r8(pc++)));
+		case 5:
+			format_relative(stream, s_cregs[6], opcodes.r8(pc++));
+			break;
+
+		case 6:
+			format_relative(stream, s_cregs[7], s8(opcodes.r8(pc++)));
 			break;
 
 		case 7:
@@ -957,8 +969,12 @@ offs_t m16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const m16
 			stream << s_regs[0][BIT(op1, 0)];
 			break;
 
-		case 5: case 6:
-			format_relative(stream, s_cregs[(op1 & 0x07) + 1], s8(opcodes.r8(pc++)));
+		case 5:
+			format_relative(stream, s_cregs[6], opcodes.r8(pc++));
+			break;
+
+		case 6:
+			format_relative(stream, s_cregs[7], s8(opcodes.r8(pc++)));
 			break;
 
 		case 7:
@@ -981,8 +997,12 @@ offs_t m16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const m16
 			stream << s_regs[0][BIT(op1, 0)];
 			break;
 
-		case 5: case 6:
-			format_relative(stream, s_cregs[(op1 & 0x07) + 1], s8(opcodes.r8(pc++)));
+		case 5:
+			format_relative(stream, s_cregs[6], opcodes.r8(pc++));
+			break;
+
+		case 6:
+			format_relative(stream, s_cregs[7], s8(opcodes.r8(pc++)));
 			break;
 
 		case 7:
@@ -1027,10 +1047,17 @@ offs_t m16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const m16
 			util::stream_format(stream, ", %s", s_regs[0][BIT(op1, 0)]);
 			break;
 
-		case 5: case 6:
+		case 5:
 			format_imm8(stream, opcodes.r8(pc + 1));
 			stream << ", ";
-			format_relative(stream, s_cregs[(op1 & 0x07) + 1], s8(opcodes.r8(pc)));
+			format_relative(stream, s_cregs[6], opcodes.r8(pc));
+			pc += 2;
+			break;
+
+		case 6:
+			format_imm8(stream, opcodes.r8(pc + 1));
+			stream << ", ";
+			format_relative(stream, s_cregs[7], s8(opcodes.r8(pc)));
 			pc += 2;
 			break;
 
@@ -1064,8 +1091,12 @@ offs_t m16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const m16
 			stream << s_regs[0][BIT(op1, 0)];
 			break;
 
-		case 5: case 6:
-			format_relative(stream, s_cregs[(op1 & 0x07) + 1], s8(opcodes.r8(pc++)));
+		case 5:
+			format_relative(stream, s_cregs[6], opcodes.r8(pc++));
+			break;
+
+		case 6:
+			format_relative(stream, s_cregs[7], s8(opcodes.r8(pc++)));
 			break;
 
 		case 7:
