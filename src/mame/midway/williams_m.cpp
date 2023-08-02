@@ -358,7 +358,20 @@ void sinistar_state::vram_select_w(u8 data)
 	m_blitter_window_enable = data & 0x04;
 }
 
+TIMER_CALLBACK_MEMBER(sinistar_state::deferred_snd_cmd_w)
+{
+	m_pia[2]->portb_w(param);
+	m_pia[2]->cb1_w((param == 0xff) ? 0 : 1);
+	
+	m_pia[3]->portb_w(param);
+	m_pia[3]->cb1_w((param == 0xff) ? 0 : 1);
+}
 
+void sinistar_state::sinistar_snd_cmd_w(u8 data)
+{
+	/* the high two bits are set externally, and should be 1 */
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(sinistar_state::deferred_snd_cmd_w),this), data | 0xc0);
+}
 
 /*************************************
  *
