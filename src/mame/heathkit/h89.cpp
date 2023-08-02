@@ -451,7 +451,7 @@ void h89_state::h89(machine_config & config)
 	INS8250(config, m_console, INS8250_CLOCK);
 	m_console->out_int_callback().set(FUNC(h89_state::console_intr));
 
-	HEATH_ULTRA(config, m_tlb);
+	HEATH_TLB(config, m_tlb);
 
 	// Connect the console port on CPU board to serial port on TLB
 	m_console->out_tx_callback().set(m_tlb, FUNC(heath_tlb_device::serial_in_w));
