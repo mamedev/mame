@@ -19839,7 +19839,7 @@ legacy FM implementations cannot find it.
 		<description>British Bob</description>
 		<year>2009</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="RELEVO Videogames"/>
+		<info name="developer" value="Relevo Videogames"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
@@ -19852,7 +19852,7 @@ legacy FM implementations cannot find it.
 		<description>British Bob (alt)</description>
 		<year>2009</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="RELEVO Videogames"/>
+		<info name="developer" value="Relevo Videogames"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
@@ -21408,7 +21408,7 @@ legacy FM implementations cannot find it.
 	<software name="estapant">
 		<description>Está en el Pantano</description>
 		<year>2010</year>
-		<publisher>RELEVO Videogames</publisher>
+		<publisher>Relevo Videogames</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -21420,7 +21420,7 @@ legacy FM implementations cannot find it.
 	<software name="estacaja">
 		<description>Está en la Caja (v1.1)</description>
 		<year>2009</year>
-		<publisher>RELEVO Videogames</publisher>
+		<publisher>Relevo Videogames</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -21432,7 +21432,7 @@ legacy FM implementations cannot find it.
 	<software name="estacaja10" cloneof="estacaja">
 		<description>Está en la Caja (v1.0)</description>
 		<year>2009</year>
-		<publisher>RELEVO Videogames</publisher>
+		<publisher>Relevo Videogames</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -22236,8 +22236,7 @@ legacy FM implementations cannot find it.
 	<software name="invzombm">
 		<description>Invasion of the Zombie Monsters</description>
 		<year>2010</year>
-		<publisher>RELEVO Videogames</publisher>
-		<info name="developer" value="RELEVO Videogames"/>
+		<publisher>Relevo Videogames</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -22453,7 +22452,7 @@ legacy FM implementations cannot find it.
 	<software name="labbaye">
 		<description>l'Abbaye des Morts (v1.2)</description>
 		<year>2020</year>
-		<publisher>RetroDeluxe</publisher>
+		<publisher>Retro DeLuxe</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<dataarea name="rom" size="0x40000">
@@ -22465,7 +22464,7 @@ legacy FM implementations cannot find it.
 	<software name="labbaye11" cloneof="labbaye">
 		<description>l'Abbaye des Morts (v1.1)</description>
 		<year>2020</year>
-		<publisher>RetroDeluxe</publisher>
+		<publisher>Retro DeLuxe</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<dataarea name="rom" size="0x40000">
@@ -22477,7 +22476,7 @@ legacy FM implementations cannot find it.
 	<software name="labbaye01" cloneof="labbaye">
 		<description>l'Abbaye des Morts (v0.1)</description>
 		<year>2020</year>
-		<publisher>RetroDeluxe</publisher>
+		<publisher>Retro DeLuxe</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<dataarea name="rom" size="0x40000">
@@ -22541,7 +22540,7 @@ legacy FM implementations cannot find it.
 	<software name="lacorencf" cloneof="lacorenc">
 		<description>La Corona Encantada (Spanish, final)</description>
 		<year>2009</year>
-		<publisher>RELEVO Videogames</publisher>
+		<publisher>Relevo Videogames</publisher>
 		<info name="developer" value="Karoshi Corporation"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="0"/>
@@ -22554,7 +22553,7 @@ legacy FM implementations cannot find it.
 	<software name="lacorencfa" cloneof="lacorenc">
 		<description>La Corona Encantada (Spanish, final, alt)</description>
 		<year>2009</year>
-		<publisher>RELEVO Videogames</publisher>
+		<publisher>Relevo Videogames</publisher>
 		<info name="developer" value="Karoshi Corporation"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="0"/>
@@ -22593,11 +22592,11 @@ legacy FM implementations cannot find it.
 	<software name="leilak">
 		<description>Leila K</description>
 		<year>2007</year>
-		<publisher>DVIK &amp; Joyrex productions</publisher>
+		<publisher>dvik &amp; joyrex</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<dataarea name="rom" size="0x80000">
-				<rom name="leila k - dvik &amp; joyrex productions (2007).rom" size="0x80000" crc="b0638377" sha1="e4401a78869ffa879a55f239e5da4990cb6797a6" />
+				<rom name="leila k - dvik &amp; joyrex (2007).rom" size="0x80000" crc="b0638377" sha1="e4401a78869ffa879a55f239e5da4990cb6797a6" />
 			</dataarea>
 		</part>
 	</software>
@@ -22802,11 +22801,11 @@ legacy FM implementations cannot find it.
 		<description>Lotus F3</description>
 		<year>2007</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="DVIK &amp; Joyrex productions"/>
+		<info name="developer" value="dvik &amp; joyrex"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<dataarea name="rom" size="0x20000">
-				<rom name="lotus f3 - dvik &amp; joyrex productions (2007).rom" size="0x20000" crc="3b38cfea" sha1="e348e62e3c4c02d87ff2aa4d55ddebb60c3ea507" />
+				<rom name="lotus f3 - dvik &amp; joyrex (2007).rom" size="0x20000" crc="3b38cfea" sha1="e348e62e3c4c02d87ff2aa4d55ddebb60c3ea507" />
 			</dataarea>
 		</part>
 	</software>
@@ -22815,11 +22814,11 @@ legacy FM implementations cannot find it.
 		<description>Lotus F3 (alt)</description>
 		<year>2007</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="DVIK &amp; Joyrex productions"/>
+		<info name="developer" value="dvik &amp; joyrex"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<dataarea name="rom" size="0x20000">
-				<rom name="lotus f3 - dvik &amp; joyrex productions (2007) (alt).rom" size="0x20000" crc="565022a4" sha1="0f2c5a7c6cc9ff591c911e4f3f204e425bd3cf50" />
+				<rom name="lotus f3 - dvik &amp; joyrex (2007) (alt).rom" size="0x20000" crc="565022a4" sha1="0f2c5a7c6cc9ff591c911e4f3f204e425bd3cf50" />
 			</dataarea>
 		</part>
 	</software>
@@ -22852,11 +22851,11 @@ legacy FM implementations cannot find it.
 	<software name="maze">
 		<description>M.A.Z.E.</description>
 		<year>2008</year>
-		<publisher>DVIK &amp; Joyrex productions</publisher>
+		<publisher>dvik &amp; joyrex</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x2000">
-				<rom name="m.a.z.e - dvik &amp; joyrex productions (2008).rom" size="0x2000" crc="ff889710" sha1="e738a8e4e09b508167b552e9e4350c041ca68c20" />
+				<rom name="m.a.z.e - dvik &amp; joyrex (2008).rom" size="0x2000" crc="ff889710" sha1="e738a8e4e09b508167b552e9e4350c041ca68c20" />
 			</dataarea>
 		</part>
 	</software>
@@ -22864,7 +22863,7 @@ legacy FM implementations cannot find it.
 	<software name="magmagic">
 		<description>Mag the Magician</description>
 		<year>2019</year>
-		<publisher>Hobbyretro</publisher>
+		<publisher>HobbyRetro</publisher>
 		<info name="developer" value="Radastan"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
@@ -23034,7 +23033,7 @@ legacy FM implementations cannot find it.
 		<description>Malaika (v1.2)</description>
 		<year>2013</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="RELEVO Videogames"/>
+		<info name="developer" value="Relevo Videogames"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -23047,7 +23046,7 @@ legacy FM implementations cannot find it.
 		<description>Malaika (v1.1)</description>
 		<year>2013</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="RELEVO Videogames"/>
+		<info name="developer" value="Relevo Videogames"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -23060,7 +23059,7 @@ legacy FM implementations cannot find it.
 		<description>Malaika (v1.0)</description>
 		<year>2013</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="RELEVO Videogames"/>
+		<info name="developer" value="Relevo Videogames"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -23542,7 +23541,7 @@ legacy FM implementations cannot find it.
 		<description>Mr. Cracksman</description>
 		<year>2013</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="RELEVO Videogames"/>
+		<info name="developer" value="Relevo Videogames"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x2000">
@@ -23800,7 +23799,7 @@ legacy FM implementations cannot find it.
 		<description>Ninja Savior</description>
 		<year>2015</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="RELEVO Videogames"/>
+		<info name="developer" value="Relevo Videogames"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -23862,7 +23861,7 @@ legacy FM implementations cannot find it.
 	<software name="nogaliod">
 		<description>Nogalious (demo)</description>
 		<year>2019</year>
-		<publisher>LUEGOLU3GO Studio</publisher>
+		<publisher>LUEGOLU3GO Studios</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<dataarea name="rom" size="0x80000">
@@ -23910,7 +23909,7 @@ legacy FM implementations cannot find it.
 	<software name="olion">
 		<description>Olion</description>
 		<year>2018</year>
-		<publisher>Tiny Yarou</publisher>
+		<publisher>TINY YAROU</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x6000">
@@ -24161,11 +24160,11 @@ legacy FM implementations cannot find it.
 		<description>Peek-A-Boo</description>
 		<year>2008</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="DVIK &amp; Joyrex Productions"/>
+		<info name="developer" value="dvik &amp; joyrex"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="peek-a-boo - dvik &amp; joyrex productions (2008) [msx-dev08].rom" size="0x8000" crc="0ee996cb" sha1="a0b45f208df3091e461e15f6182896d2716c2a11" />
+				<rom name="peek-a-boo - dvik &amp; joyrex (2008) [msx-dev08].rom" size="0x8000" crc="0ee996cb" sha1="a0b45f208df3091e461e15f6182896d2716c2a11" />
 			</dataarea>
 		</part>
 	</software>
@@ -24174,11 +24173,11 @@ legacy FM implementations cannot find it.
 		<description>Peek-A-Boo (older)</description>
 		<year>2008</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="DVIK &amp; Joyrex Productions"/>
+		<info name="developer" value="dvik &amp; joyrex"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="peek-a-boo - dvik &amp; joyrex productions (2008) [msx-dev08] (older).rom" size="0x8000" crc="150e01c8" sha1="d92c82e155cb34f65587d472d4eb5ed1b9e68018" />
+				<rom name="peek-a-boo - dvik &amp; joyrex (2008) [msx-dev08] (older).rom" size="0x8000" crc="150e01c8" sha1="d92c82e155cb34f65587d472d4eb5ed1b9e68018" />
 			</dataarea>
 		</part>
 	</software>
@@ -24456,7 +24455,7 @@ legacy FM implementations cannot find it.
 	<software name="psged">
 		<description>PSGed (v0.82b)</description>
 		<year>2010</year>
-		<publisher>Aorante</publisher>
+		<publisher>aorante</publisher>
 		<info name="developer" value="aorante/303bcn"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
@@ -24469,7 +24468,7 @@ legacy FM implementations cannot find it.
 	<software name="psged08" cloneof="psged">
 		<description>PSGed (v0.8b)</description>
 		<year>2010</year>
-		<publisher>Aorante</publisher>
+		<publisher>aorante</publisher>
 		<info name="developer" value="aorante/303bcn"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
@@ -24482,7 +24481,7 @@ legacy FM implementations cannot find it.
 	<software name="psged04" cloneof="psged">
 		<description>PSGed (v0.4b)</description>
 		<year>2010</year>
-		<publisher>Aorante</publisher>
+		<publisher>aorante</publisher>
 		<info name="developer" value="aorante/303bcn"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
@@ -25236,11 +25235,11 @@ legacy FM implementations cannot find it.
 	<software name="snowclmb">
 		<description>Snowclimber 2K</description>
 		<year>2008</year>
-		<publisher>Joyrex</publisher>
+		<publisher>joyrex</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x2000">
-				<rom name="snow climber - dvik &amp; joyrex productions (2008) [2kbos entry].rom" size="0x2000" crc="8b5620a1" sha1="5dbff5d70978482fd5b79c02715bec1ed463e6bf" />
+				<rom name="snow climber - dvik &amp; joyrex (2008) [2kbos entry].rom" size="0x2000" crc="8b5620a1" sha1="5dbff5d70978482fd5b79c02715bec1ed463e6bf" />
 			</dataarea>
 		</part>
 	</software>
@@ -25248,7 +25247,7 @@ legacy FM implementations cannot find it.
 	<software name="snowclmbo" cloneof="snowclmb">
 		<description>Snowclimber</description>
 		<year>2003</year>
-		<publisher>Joyrex</publisher>
+		<publisher>joyrex</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -25350,7 +25349,7 @@ legacy FM implementations cannot find it.
 	<software name="spheredx">
 		<description>Sphere Redux</description>
 		<year>2007</year>
-		<publisher>impulse9</publisher>
+		<publisher>Impulse9</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -25530,7 +25529,7 @@ legacy FM implementations cannot find it.
 		<description>Subacuatic</description>
 		<year>2012</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="RELEVO Videogames"/>
+		<info name="developer" value="Relevo Videogames"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -25543,7 +25542,7 @@ legacy FM implementations cannot find it.
 		<description>Subacuatic (alt)</description>
 		<year>2012</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="RELEVO Videogames"/>
+		<info name="developer" value="Relevo Videogames"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -25595,11 +25594,11 @@ legacy FM implementations cannot find it.
 		<description>Sudoku</description>
 		<year>2006</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="DVIK &amp; Joyrex Productions"/>
+		<info name="developer" value="dvik &amp; joyrex"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="sudoku - dvik &amp; joyrex productions (2006) [msx-dev06].rom" size="0x8000" crc="8a70a96b" sha1="120d477cd28b48b8a63efb34920ac331b54e66e5" />
+				<rom name="sudoku - dvik &amp; joyrex (2006) [msx-dev06].rom" size="0x8000" crc="8a70a96b" sha1="120d477cd28b48b8a63efb34920ac331b54e66e5" />
 			</dataarea>
 		</part>
 	</software>
@@ -25880,7 +25879,7 @@ legacy FM implementations cannot find it.
 	<software name="lostmine">
 		<description>The Lost Mines</description>
 		<year>2015</year>
-		<publisher>Cesar Rincon</publisher>
+		<publisher>César Rincón</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
@@ -26069,7 +26068,7 @@ legacy FM implementations cannot find it.
 	<software name="tinyslot">
 		<description>Tiny Slot Checker (v3.2)</description>
 		<year>2021</year>
-		<publisher>Tiny Yarou</publisher>
+		<publisher>TINY YAROU</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -26081,7 +26080,7 @@ legacy FM implementations cannot find it.
 	<software name="tinyslot2" cloneof="tinyslot">
 		<description>Tiny Slot Checker (v2)</description>
 		<year>2020</year>
-		<publisher>Tiny Yarou</publisher>
+		<publisher>TINY YAROU</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -26093,7 +26092,7 @@ legacy FM implementations cannot find it.
 	<software name="tinysloto" cloneof="tinyslot">
 		<description>Tiny Slot Checker (older)</description>
 		<year>2018</year>
-		<publisher>Tiny Yarou</publisher>
+		<publisher>TINY YAROU</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -26473,7 +26472,7 @@ legacy FM implementations cannot find it.
 	<software name="twinlght">
 		<description>Twinlight</description>
 		<year>2019</year>
-		<publisher>Retrosouls</publisher>
+		<publisher>RetroSouls</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -26485,7 +26484,7 @@ legacy FM implementations cannot find it.
 	<software name="twinlghta" cloneof="twinlght">
 		<description>Twinlight (alt)</description>
 		<year>2019</year>
-		<publisher>Retrosouls</publisher>
+		<publisher>RetroSouls</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -26510,7 +26509,7 @@ legacy FM implementations cannot find it.
 	<software name="udo">
 		<description>U-Do</description>
 		<year>1990</year>
-		<publisher>MSX-FAN</publisher>
+		<publisher>MSX・FAN</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x2000">
@@ -26522,7 +26521,7 @@ legacy FM implementations cannot find it.
 	<software name="ufo">
 		<description>U.F.O.</description>
 		<year>20??</year>
-		<publisher>MSXosaure</publisher>
+		<publisher>MSXOsaure</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x1000">
@@ -26630,11 +26629,11 @@ legacy FM implementations cannot find it.
 	<software name="utopia">
 		<description>Utopia</description>
 		<year>2008</year>
-		<publisher>DVIK &amp; Joyrex productions</publisher>
+		<publisher>dvik &amp; joyrex</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<dataarea name="rom" size="0x80000">
-				<rom name="utopia - dvik joyrex productions (2008).rom" size="0x80000" crc="20a7c2e9" sha1="b550757c8f5b55dbde16b4a7888f10999f01acfd"/>
+				<rom name="utopia - dvik joyrex (2008).rom" size="0x80000" crc="20a7c2e9" sha1="b550757c8f5b55dbde16b4a7888f10999f01acfd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27348,11 +27347,11 @@ legacy FM implementations cannot find it.
 		<description>Yahtzee</description>
 		<year>2007</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="DVIK &amp; Joyrex productions"/>
+		<info name="developer" value="dvik &amp; joyrex"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
-				<rom name="yahtzee - dvik &amp; joyrex productions (2007) [msx-dev07].rom" size="0x4000" crc="c32c7037" sha1="720054d7ab4da46db8c9fb47d17fb7e0aa79d25b"/>
+				<rom name="yahtzee - dvik &amp; joyrex (2007) [msx-dev07].rom" size="0x4000" crc="c32c7037" sha1="720054d7ab4da46db8c9fb47d17fb7e0aa79d25b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27433,7 +27432,7 @@ legacy FM implementations cannot find it.
 	<software name="z80rogue">
 		<description>z80rogue</description>
 		<year>2019</year>
-		<publisher>Oscar Toledo Gutierrez</publisher>
+		<publisher>Óscar Toledo Gutiérrez</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x2000">
@@ -27497,7 +27496,7 @@ legacy FM implementations cannot find it.
 		<description>Zombie Incident (v1.2)</description>
 		<year>2012</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="Nenefranz"/>
+		<info name="developer" value="nenefranz"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="0"/>
 			<dataarea name="rom" size="0xc000">
@@ -27510,7 +27509,7 @@ legacy FM implementations cannot find it.
 		<description>Zombie Incident (v1.1)</description>
 		<year>2012</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="Nenefranz"/>
+		<info name="developer" value="nenefranz"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="0"/>
 			<dataarea name="rom" size="0xc000">
@@ -27523,7 +27522,7 @@ legacy FM implementations cannot find it.
 		<description>Zombie Incident (v1.0)</description>
 		<year>2012</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="Nenefranz"/>
+		<info name="developer" value="nenefranz"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="0"/>
 			<dataarea name="rom" size="0xc000">
