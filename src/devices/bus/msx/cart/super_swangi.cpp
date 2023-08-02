@@ -3,9 +3,24 @@
 #include "emu.h"
 #include "super_swangi.h"
 
+namespace {
 
-DEFINE_DEVICE_TYPE(MSX_CART_SUPER_SWANGI, msx_cart_super_swangi_device, "msx_cart_super_swangi", "MSX Cartridge - Super Swangi")
+class msx_cart_super_swangi_device : public device_t, public msx_cart_interface
+{
+public:
+	msx_cart_super_swangi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { }
+
+private:
+	void bank_w(u8 data);
+
+	memory_bank_creator m_rombank;
+};
 
 msx_cart_super_swangi_device::msx_cart_super_swangi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_CART_SUPER_SWANGI, tag, owner, clock)
@@ -41,3 +56,7 @@ void msx_cart_super_swangi_device::bank_w(u8 data)
 {
 	m_rombank->set_entry((data >> 1) & 0x03);
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_SUPER_SWANGI, msx_cart_interface, msx_cart_super_swangi_device, "msx_cart_super_swangi", "MSX Cartridge - Super Swangi")

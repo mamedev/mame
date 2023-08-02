@@ -99,4 +99,4 @@ void msx_cart_matra_comp_device::disable_banking_w(u8 data)
 
 } // anonymous namespace
 
-DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_MATRA_COMP, msx_cart_interface,  msx_cart_matra_comp_device,  "msx_cart_matra_comp",  "MSX Cartridge - Matra Compilation")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_MATRA_COMP, msx_cart_interface, msx_cart_matra_comp_device, "msx_cart_matra_comp", "MSX Cartridge - Matra Compilation")

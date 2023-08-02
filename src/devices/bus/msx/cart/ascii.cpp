@@ -3,12 +3,28 @@
 #include "emu.h"
 #include "ascii.h"
 
+namespace {
 
-DEFINE_DEVICE_TYPE(MSX_CART_ASCII8,       msx_cart_ascii8_device,       "msx_cart_ascii8",       "MSX Cartridge - ASCII8")
-DEFINE_DEVICE_TYPE(MSX_CART_ASCII16,      msx_cart_ascii16_device,      "msx_cart_ascii16",      "MSX Cartridge - ASCII16")
-DEFINE_DEVICE_TYPE(MSX_CART_ASCII8_SRAM,  msx_cart_ascii8_sram_device,  "msx_cart_ascii8_sram",  "MSX Cartridge - ASCII8 w/SRAM")
-DEFINE_DEVICE_TYPE(MSX_CART_ASCII16_SRAM, msx_cart_ascii16_sram_device, "msx_cart_ascii16_sram", "MSX Cartridge - ASCII16 w/SRAM")
+class msx_cart_ascii8_device : public device_t, public msx_cart_interface
+{
+public:
+	msx_cart_ascii8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { }
+	virtual void device_reset() override;
+
+private:
+	static constexpr size_t BANK_SIZE = 0x2000;
+
+	template <int Bank> void bank_w(u8 data);
+
+	memory_bank_array_creator<4> m_rombank;
+	u8 m_bank_mask;
+};
 
 msx_cart_ascii8_device::msx_cart_ascii8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_ASCII8, tag, owner, clock)
@@ -66,6 +82,27 @@ void msx_cart_ascii8_device::bank_w(u8 data)
 
 
 
+class msx_cart_ascii16_device : public device_t, public msx_cart_interface
+{
+public:
+	msx_cart_ascii16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { }
+	virtual void device_reset() override;
+
+private:
+	static constexpr size_t BANK_SIZE = 0x4000;
+
+	template <int Bank> void bank_w(u8 data);
+
+	memory_bank_array_creator<2> m_rombank;
+	u8 m_bank_mask;
+};
+
 msx_cart_ascii16_device::msx_cart_ascii16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_ASCII16, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
@@ -119,6 +156,30 @@ void msx_cart_ascii16_device::bank_w(u8 data)
 
 
 
+
+class msx_cart_ascii8_sram_device : public device_t, public msx_cart_interface
+{
+public:
+	msx_cart_ascii8_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { }
+	virtual void device_reset() override;
+
+private:
+	static constexpr size_t BANK_SIZE = 0x2000;
+
+	void mapper_write(offs_t offset, u8 data);
+
+	memory_bank_array_creator<4> m_rombank;
+	memory_view m_view2;
+	memory_view m_view3;
+	u8 m_bank_mask;
+	u8 m_sram_select_mask;
+};
 
 msx_cart_ascii8_sram_device::msx_cart_ascii8_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_ASCII8_SRAM, tag, owner, clock)
@@ -211,6 +272,30 @@ void msx_cart_ascii8_sram_device::mapper_write(offs_t offset, u8 data)
 
 
 
+class msx_cart_ascii16_sram_device : public device_t, public msx_cart_interface
+{
+public:
+	msx_cart_ascii16_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	static constexpr size_t BANK_SIZE = 0x4000;
+
+	void mapper_write_6000(u8 data);
+	void mapper_write_7000(u8 data);
+
+	memory_bank_array_creator<2> m_rombank;
+	memory_view m_view;
+	u8 m_bank_mask;
+	u8 m_sram_select_mask;
+};
+
 msx_cart_ascii16_sram_device::msx_cart_ascii16_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_ASCII16_SRAM, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
@@ -294,3 +379,10 @@ void msx_cart_ascii16_sram_device::mapper_write_7000(u8 data)
 		m_rombank[1]->set_entry(data & m_bank_mask);
 	}
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_ASCII8,       msx_cart_interface, msx_cart_ascii8_device,       "msx_cart_ascii8",       "MSX Cartridge - ASCII8")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_ASCII16,      msx_cart_interface, msx_cart_ascii16_device,      "msx_cart_ascii16",      "MSX Cartridge - ASCII16")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_ASCII8_SRAM,  msx_cart_interface, msx_cart_ascii8_sram_device,  "msx_cart_ascii8_sram",  "MSX Cartridge - ASCII8 w/SRAM")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_ASCII16_SRAM, msx_cart_interface, msx_cart_ascii16_sram_device, "msx_cart_ascii16_sram", "MSX Cartridge - ASCII16 w/SRAM")

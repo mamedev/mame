@@ -11,9 +11,28 @@ for protection.
 
 #include "emu.h"
 #include "ink.h"
+#include "machine/intelfsh.h"
 
-DEFINE_DEVICE_TYPE(MSX_CART_INK, msx_cart_ink_device, "msx_cart_ink", "MSX Cartridge - Ink")
+namespace {
 
+class msx_cart_ink_device : public device_t, public msx_cart_interface
+{
+public:
+	msx_cart_ink_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { }
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	required_device<amd_29f040_device> m_flash;
+
+	template <int Page> void write_page(offs_t offset, u8 data);
+};
 
 msx_cart_ink_device::msx_cart_ink_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_CART_INK, tag, owner, clock)
@@ -67,3 +86,7 @@ void msx_cart_ink_device::write_page(offs_t offset, u8 data)
 	// /RD connects to flashrom A16-A18
 	m_flash->write(offset | 0x70000 | (Page * 0x4000), data);
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_INK, msx_cart_interface, msx_cart_ink_device, "msx_cart_ink", "MSX Cartridge - Ink")

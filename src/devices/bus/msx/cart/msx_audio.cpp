@@ -65,12 +65,29 @@ and/or http://ngs.no.coocan.jp/doc/wiki.cgi/datapack?page=4.2+MSX-AUDIO+%B3%C8%C
 #include "msx_audio_kb.h"
 
 #include "speaker.h"
+#include "sound/ymopl.h"
+#include "machine/6850acia.h"
+#include "bus/midi/midi.h"
 
+namespace {
 
-DEFINE_DEVICE_TYPE(MSX_CART_MSX_AUDIO_HXMU900, msx_cart_msx_audio_hxmu900_device, "msx_audio_hxmu900", "MSX Cartridge - MSX-AUDIO HX-MU900")
-DEFINE_DEVICE_TYPE(MSX_CART_MSX_AUDIO_NMS1205, msx_cart_msx_audio_nms1205_device, "msx_audio_nms1205", "MSX Cartridge - MSX-AUDIO NMS-1205")
-DEFINE_DEVICE_TYPE(MSX_CART_MSX_AUDIO_FSCA1,   msx_cart_msx_audio_fsca1_device,   "msx_audio_fsca1",   "MSX Cartridge - MSX-AUDIO FS-CA1")
+class msx_cart_msx_audio_hxmu900_device : public device_t, public msx_cart_interface
+{
+public:
+	msx_cart_msx_audio_hxmu900_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	virtual void device_start() override;
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	required_device<y8950_device> m_y8950;
+};
 
 msx_cart_msx_audio_hxmu900_device::msx_cart_msx_audio_hxmu900_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_MSX_AUDIO_HXMU900, tag, owner, clock)
@@ -129,6 +146,30 @@ const tiny_rom_entry *msx_cart_msx_audio_hxmu900_device::device_rom_region() con
 
 
 
+
+class msx_cart_msx_audio_nms1205_device : public device_t, public msx_cart_interface
+{
+public:
+	msx_cart_msx_audio_nms1205_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	virtual void device_start() override;
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	void midi_in(int state);
+	void irq_write(int state);
+
+	required_device<y8950_device> m_y8950;
+	required_device<acia6850_device> m_acia6850;
+	required_device<midi_port_device> m_mdout;
+	required_device<midi_port_device> m_mdthru;
+};
 
 msx_cart_msx_audio_nms1205_device::msx_cart_msx_audio_nms1205_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_CART_MSX_AUDIO_NMS1205, tag, owner, clock)
@@ -220,6 +261,39 @@ std::error_condition msx_cart_msx_audio_nms1205_device::initialize_cartridge(std
 
 
 
+
+class msx_cart_msx_audio_fsca1_device : public device_t, public msx_cart_interface
+{
+public:
+	msx_cart_msx_audio_fsca1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	void write_y8950(offs_t offset, u8 data);
+	u8 read_y8950(offs_t offset);
+	void y8950_io_w(u8 data);
+	u8 y8950_io_r();
+	void bank_w(u8 data);
+	void write_7fff(u8 data);
+
+	required_device<y8950_device> m_y8950;
+	required_ioport m_io_config;
+	required_memory_region m_region_y8950;
+	memory_bank_array_creator<2> m_rombank;
+	memory_view m_view0;
+	memory_view m_view1;
+	u8 m_7fff;
+};
 
 msx_cart_msx_audio_fsca1_device::msx_cart_msx_audio_fsca1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_CART_MSX_AUDIO_FSCA1, tag, owner, clock)
@@ -364,3 +438,9 @@ u8 msx_cart_msx_audio_fsca1_device::y8950_io_r()
 {
 	return m_io_config->read();
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_MSX_AUDIO_HXMU900, msx_cart_interface, msx_cart_msx_audio_hxmu900_device, "msx_audio_hxmu900", "MSX Cartridge - MSX-AUDIO HX-MU900")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_MSX_AUDIO_NMS1205, msx_cart_interface, msx_cart_msx_audio_nms1205_device, "msx_audio_nms1205", "MSX Cartridge - MSX-AUDIO NMS-1205")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_MSX_AUDIO_FSCA1,   msx_cart_interface, msx_cart_msx_audio_fsca1_device,   "msx_audio_fsca1",   "MSX Cartridge - MSX-AUDIO FS-CA1")

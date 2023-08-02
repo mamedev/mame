@@ -16,10 +16,33 @@ TODO:
 
 #include "emu.h"
 #include "bm_012.h"
+#include "bus/midi/midi.h"
+#include "cpu/z80/tmpz84c015.h"
 #include "cpu/z80/z80.h"
 
+namespace {
 
-DEFINE_DEVICE_TYPE(MSX_CART_BM_012, msx_cart_bm_012_device, "msx_cart_bm_012", "MSX Cartridge - BM-012")
+class msx_cart_bm_012_device : public device_t, public msx_cart_interface
+{
+public:
+	msx_cart_bm_012_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override;
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	void midi_in(int state);
+
+	void bm_012_memory_map(address_map &map);
+
+	required_device<tmpz84c015_device> m_tmpz84c015af;
+	required_device<z80pio_device> m_bm012_pio;
+	required_device<midi_port_device> m_mdthru;
+};
 
 
 msx_cart_bm_012_device::msx_cart_bm_012_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -104,3 +127,7 @@ void msx_cart_bm_012_device::midi_in(int state)
 	m_mdthru->write_txd(state);
 	m_tmpz84c015af->rxb_w(state);
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_BM_012, msx_cart_interface, msx_cart_bm_012_device, "msx_cart_bm_012", "MSX Cartridge - BM-012")

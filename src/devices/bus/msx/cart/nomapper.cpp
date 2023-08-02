@@ -4,8 +4,24 @@
 #include "emu.h"
 #include "nomapper.h"
 
-DEFINE_DEVICE_TYPE(MSX_CART_NOMAPPER, msx_cart_nomapper_device, "msx_cart_nomapper", "MSX Cartridge - ROM")
+namespace {
 
+class msx_cart_nomapper_device : public device_t, public msx_cart_interface
+{
+public:
+	msx_cart_nomapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override { }
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+private:
+	uint32_t m_start_address;
+	uint32_t m_end_address;
+
+	void install_memory();
+};
 
 msx_cart_nomapper_device::msx_cart_nomapper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_NOMAPPER, tag, owner, clock)
@@ -133,3 +149,7 @@ std::error_condition msx_cart_nomapper_device::initialize_cartridge(std::string 
 
 	return std::error_condition();
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_NOMAPPER, msx_cart_interface, msx_cart_nomapper_device, "msx_cart_nomapper", "MSX Cartridge - ROM")

@@ -3,9 +3,28 @@
 #include "emu.h"
 #include "dooly.h"
 
+namespace {
 
-DEFINE_DEVICE_TYPE(MSX_CART_DOOLY, msx_cart_dooly_device, "msx_cart_dooly", "MSX Cartridge - Dooly")
+class msx_cart_dooly_device : public device_t, public msx_cart_interface
+{
+public:
+	msx_cart_dooly_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { }
+	virtual void device_reset() override;
+
+private:
+	void prot_w(u8 data);
+	u8 mode4_page1_r(offs_t offset);
+	u8 mode4_page2_r(offs_t offset);
+
+	memory_view m_view1;
+	memory_view m_view2;
+};
 
 msx_cart_dooly_device::msx_cart_dooly_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_CART_DOOLY, tag, owner, clock)
@@ -68,3 +87,7 @@ void msx_cart_dooly_device::prot_w(u8 data)
 		logerror("msx_cart_dooly_device: unhandled protection mode %02x\n", data);
 	}
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_DOOLY, msx_cart_interface, msx_cart_dooly_device, "msx_cart_dooly", "MSX Cartridge - Dooly")

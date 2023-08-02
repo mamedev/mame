@@ -4,17 +4,30 @@
 #include "konami.h"
 
 #include "speaker.h"
+#include "sound/k051649.h"
+#include "sound/vlm5030.h"
+#include "sound/dac.h"
 
+namespace {
 
-DEFINE_DEVICE_TYPE(MSX_CART_KONAMI,           msx_cart_konami_device,                  "msx_cart_konami",           "MSX Cartridge - KONAMI")
-DEFINE_DEVICE_TYPE(MSX_CART_KONAMI_SCC,       msx_cart_konami_scc_device,              "msx_cart_konami_scc",       "MSX Cartridge - KONAMI+SCC")
-DEFINE_DEVICE_TYPE(MSX_CART_GAMEMASTER2,      msx_cart_gamemaster2_device,             "msx_cart_gamemaster2",      "MSX Cartridge - GAMEMASTER2")
-DEFINE_DEVICE_TYPE(MSX_CART_SYNTHESIZER,      msx_cart_synthesizer_device,             "msx_cart_synthesizer",      "MSX Cartridge - Synthesizer")
-DEFINE_DEVICE_TYPE(MSX_CART_SOUND_SNATCHER,   msx_cart_konami_sound_snatcher_device,   "msx_cart_sound_snatcher",   "MSX Cartridge - Sound Snatcher")
-DEFINE_DEVICE_TYPE(MSX_CART_SOUND_SDSNATCHER, msx_cart_konami_sound_sdsnatcher_device, "msx_cart_sound_sdsnatcher", "MSX Cartridge - Sound SD Snatcher")
-DEFINE_DEVICE_TYPE(MSX_CART_KEYBOARD_MASTER,  msx_cart_keyboard_master_device,         "msx_cart_keyboard_master",  "MSX Cartridge - Keyboard Master")
-DEFINE_DEVICE_TYPE(MSX_CART_EC701,            msx_cart_ec701_device,                   "msx_cart_ec701",            "MSX Cartridge - Konami EC-701")
+class msx_cart_konami_device : public device_t, public msx_cart_interface
+{
+public:
+	msx_cart_konami_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { }
+	virtual void device_reset() override;
+
+private:
+	template <int Bank> void bank_w(u8 data);
+
+	memory_bank_array_creator<4> m_rombank;
+	u8 m_bank_mask;
+};
 
 msx_cart_konami_device::msx_cart_konami_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_KONAMI, tag, owner, clock)
@@ -76,6 +89,30 @@ void msx_cart_konami_device::bank_w(u8 data)
 
 
 
+
+class msx_cart_konami_scc_device : public device_t, public msx_cart_interface
+{
+public:
+	msx_cart_konami_scc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { }
+	virtual void device_reset() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	template <int Bank> void bank_w(u8 data);
+
+	required_device<k051649_device> m_k051649;
+	memory_bank_array_creator<4> m_rombank;
+	memory_view m_scc_view;
+
+	u8 m_bank_mask;
+};
 
 msx_cart_konami_scc_device::msx_cart_konami_scc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_CART_KONAMI_SCC, tag, owner, clock)
@@ -165,6 +202,28 @@ void msx_cart_konami_scc_device::bank_w(u8 data)
 
 
 
+
+class msx_cart_gamemaster2_device : public device_t, public msx_cart_interface
+{
+public:
+	msx_cart_gamemaster2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { }
+	virtual void device_reset() override;
+
+private:
+	template <int Bank> void bank_w(u8 data);
+
+	memory_bank_array_creator<3> m_rombank;
+	memory_bank_array_creator<3> m_rambank;
+	memory_view m_view0;
+	memory_view m_view1;
+	memory_view m_view2;
+};
 
 msx_cart_gamemaster2_device::msx_cart_gamemaster2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_GAMEMASTER2, tag, owner, clock)
@@ -263,6 +322,23 @@ void msx_cart_gamemaster2_device::bank_w(u8 data)
 
 
 
+class msx_cart_synthesizer_device : public device_t, public msx_cart_interface
+{
+public:
+	msx_cart_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { }
+
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	required_device<dac_8bit_r2r_device> m_dac;
+};
+
 msx_cart_synthesizer_device::msx_cart_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_SYNTHESIZER, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
@@ -300,6 +376,44 @@ std::error_condition msx_cart_synthesizer_device::initialize_cartridge(std::stri
 
 
 
+
+class msx_cart_konami_sound_device : public device_t, public msx_cart_interface
+{
+public:
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	msx_cart_konami_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 min_rambank, u8 max_rambank);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	static constexpr u8 VIEW_READ = 0;
+	static constexpr u8 VIEW_RAM = 1;
+	static constexpr u8 VIEW_INVALID = 2;
+	static constexpr u8 VIEW_SCC = 4;
+
+	template <int Bank> void bank_w(u8 data);
+	template <int Bank> void switch_bank();
+	void control_w(u8 data);
+
+	// This is actually a K052539
+	required_device<k051649_device> m_k052539;
+	memory_bank_array_creator<4> m_rambank;
+	memory_view m_view0;
+	memory_view m_view1;
+	memory_view m_view2;
+	memory_view m_view3;
+
+	u8 m_min_rambank;
+	u8 m_max_rambank;
+	u8 m_selected_bank[4];
+	u8 m_control;
+};
 
 msx_cart_konami_sound_device::msx_cart_konami_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 min_rambank, u8 max_rambank)
 	: device_t(mconfig, type, tag, owner, clock)
@@ -482,6 +596,14 @@ void msx_cart_konami_sound_device::bank_w(u8 data)
 
 
 
+class msx_cart_konami_sound_snatcher_device : public msx_cart_konami_sound_device
+{
+public:
+	msx_cart_konami_sound_snatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+};
+
 // The Snatcher Sound cartridge has 64KB RAM available by selecting ram banks 0-7
 msx_cart_konami_sound_snatcher_device::msx_cart_konami_sound_snatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_cart_konami_sound_device(mconfig, MSX_CART_SOUND_SNATCHER, tag, owner, clock, 0, 7)
@@ -505,6 +627,14 @@ std::error_condition msx_cart_konami_sound_snatcher_device::initialize_cartridge
 	return msx_cart_konami_sound_device::initialize_cartridge(message);
 }
 
+
+class msx_cart_konami_sound_sdsnatcher_device : public msx_cart_konami_sound_device
+{
+public:
+	msx_cart_konami_sound_sdsnatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+};
 
 // The SD Snatcher Sound cartridge has 64KB RAM available by selecting ram banks 8-15
 msx_cart_konami_sound_sdsnatcher_device::msx_cart_konami_sound_sdsnatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -530,6 +660,29 @@ std::error_condition msx_cart_konami_sound_sdsnatcher_device::initialize_cartrid
 }
 
 
+
+class msx_cart_keyboard_master_device : public device_t, public msx_cart_interface
+{
+public:
+	msx_cart_keyboard_master_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+private:
+	required_device<vlm5030_device> m_vlm5030;
+
+	uint8_t read_vlm(offs_t offset);
+	void io_20_w(uint8_t data);
+	uint8_t io_00_r();
+
+	void vlm_map(address_map &map);
+};
 
 msx_cart_keyboard_master_device::msx_cart_keyboard_master_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_KEYBOARD_MASTER, tag, owner, clock)
@@ -606,6 +759,25 @@ uint8_t msx_cart_keyboard_master_device::io_00_r()
 
 
 
+class msx_cart_ec701_device : public device_t, public msx_cart_interface
+{
+public:
+	msx_cart_ec701_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { }
+	virtual void device_reset() override;
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+private:
+	void bank_w(u8 data);
+
+	memory_bank_creator m_rombank;
+	memory_view m_view;
+};
+
 msx_cart_ec701_device::msx_cart_ec701_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_EC701, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
@@ -665,3 +837,14 @@ void msx_cart_ec701_device::bank_w(u8 data)
 		break;
 	}
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_KONAMI,           msx_cart_interface, msx_cart_konami_device,                  "msx_cart_konami",           "MSX Cartridge - KONAMI")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_KONAMI_SCC,       msx_cart_interface, msx_cart_konami_scc_device,              "msx_cart_konami_scc",       "MSX Cartridge - KONAMI+SCC")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_GAMEMASTER2,      msx_cart_interface, msx_cart_gamemaster2_device,             "msx_cart_gamemaster2",      "MSX Cartridge - GAMEMASTER2")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_SYNTHESIZER,      msx_cart_interface, msx_cart_synthesizer_device,             "msx_cart_synthesizer",      "MSX Cartridge - Synthesizer")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_SOUND_SNATCHER,   msx_cart_interface, msx_cart_konami_sound_snatcher_device,   "msx_cart_sound_snatcher",   "MSX Cartridge - Sound Snatcher")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_SOUND_SDSNATCHER, msx_cart_interface, msx_cart_konami_sound_sdsnatcher_device, "msx_cart_sound_sdsnatcher", "MSX Cartridge - Sound SD Snatcher")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_KEYBOARD_MASTER,  msx_cart_interface, msx_cart_keyboard_master_device,         "msx_cart_keyboard_master",  "MSX Cartridge - Keyboard Master")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_EC701,            msx_cart_interface, msx_cart_ec701_device,                   "msx_cart_ec701",            "MSX Cartridge - Konami EC-701")
