@@ -442,7 +442,7 @@ bool video_bgfx::set_platform_data(bgfx::PlatformData &platform_data, osd_window
 				win_impl = wl_egl_window_create(surface, width, height);
 				SDL_SetWindowData(dynamic_cast<sdl_window_info const &>(window).platform_window(), "wl_egl_window", win_impl);
 			}
-			platform_data.nwh = (void*)(uintptr_t)win_impl;
+			platform_data.nwh = (void*)win_impl;
 			break;
 		}
 #endif
@@ -544,7 +544,7 @@ static void *sdlNativeWindowHandle(SDL_Window *window)
 				win_impl = wl_egl_window_create(surface, width, height);
 				SDL_SetWindowData(window, "wl_egl_window", win_impl);
 			}
-			return (void*)(uintptr_t)win_impl;
+			return (void*)win_impl;
 		}
 #endif
 #if defined(SDL_VIDEO_DRIVER_ANDROID)
