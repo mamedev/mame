@@ -24418,6 +24418,7 @@ legacy FM implementations cannot find it.
 		<description>MSX Pong!</description>
 		<year>2015</year>
 		<publisher>NightFox &amp; Co.</publisher>
+		<info name="developer" value="César Rincón"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -27535,7 +27536,7 @@ legacy FM implementations cannot find it.
 		<description>Zombie Near (v1.1)</description>
 		<year>2011</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="Oscar Toledo Gutierrez"/>
+		<info name="developer" value="Óscar Toledo Gutiérrez"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami"/>
 			<dataarea name="rom" size="0x20000">
@@ -27548,7 +27549,7 @@ legacy FM implementations cannot find it.
 		<description>Zombie Near (v1.0)</description>
 		<year>2011</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="Oscar Toledo Gutierrez"/>
+		<info name="developer" value="Óscar Toledo Gutiérrez"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami"/>
 			<dataarea name="rom" size="0x20000">
