@@ -173,14 +173,23 @@ class sinistar_state : public williams_state
 {
 public:
 	sinistar_state(const machine_config &mconfig, device_type type, const char *tag) :
-		williams_state(mconfig, type, tag)
+		williams_state(mconfig, type, tag),
+		m_soundcpu_b(*this, "soundcpu_b")
 	{ }
 
+	void sinistac(machine_config &config);
 	void sinistar(machine_config &config);
 
 private:
 	virtual void vram_select_w(u8 data) override;
 	virtual void main_map(address_map &map) override;
+	
+	optional_device<cpu_device> m_soundcpu_b;
+	
+	TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w);
+	virtual void sinistar_snd_cmd_w(u8 data);
+	
+	void sound2_map(address_map &map);	
 };
 
 // Playball: more soundlatch bits
