@@ -24,7 +24,11 @@ namespace {
 class msx_cart_easispeech_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_easispeech_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msx_cart_easispeech_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_EASISPEECH, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_speech(*this, "speech")
+	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
@@ -40,13 +44,6 @@ private:
 
 	required_device<sp0256_device> m_speech;
 };
-
-msx_cart_easispeech_device::msx_cart_easispeech_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_EASISPEECH, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_speech(*this, "speech")
-{
-}
 
 ROM_START(msx_cart_easispeech)
 	ROM_REGION(0x10000, "speech", 0)

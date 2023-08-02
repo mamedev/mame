@@ -74,7 +74,11 @@ namespace {
 class msx_cart_msx_audio_hxmu900_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_msx_audio_hxmu900_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msx_cart_msx_audio_hxmu900_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_MSX_AUDIO_HXMU900, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_y8950(*this, "y8950")
+	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
@@ -88,13 +92,6 @@ protected:
 private:
 	required_device<y8950_device> m_y8950;
 };
-
-msx_cart_msx_audio_hxmu900_device::msx_cart_msx_audio_hxmu900_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_MSX_AUDIO_HXMU900, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_y8950(*this, "y8950")
-{
-}
 
 void msx_cart_msx_audio_hxmu900_device::device_add_mconfig(machine_config &config)
 {
@@ -150,7 +147,14 @@ const tiny_rom_entry *msx_cart_msx_audio_hxmu900_device::device_rom_region() con
 class msx_cart_msx_audio_nms1205_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_msx_audio_nms1205_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msx_cart_msx_audio_nms1205_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_MSX_AUDIO_NMS1205, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_y8950(*this, "y8950")
+		, m_acia6850(*this, "acia6850")
+		, m_mdout(*this, "mdout")
+		, m_mdthru(*this, "mdthru")
+	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
@@ -170,16 +174,6 @@ private:
 	required_device<midi_port_device> m_mdout;
 	required_device<midi_port_device> m_mdthru;
 };
-
-msx_cart_msx_audio_nms1205_device::msx_cart_msx_audio_nms1205_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_MSX_AUDIO_NMS1205, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_y8950(*this, "y8950")
-	, m_acia6850(*this, "acia6850")
-	, m_mdout(*this, "mdout")
-	, m_mdthru(*this, "mdthru")
-{
-}
 
 void msx_cart_msx_audio_nms1205_device::device_add_mconfig(machine_config &config)
 {
@@ -265,7 +259,17 @@ std::error_condition msx_cart_msx_audio_nms1205_device::initialize_cartridge(std
 class msx_cart_msx_audio_fsca1_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_msx_audio_fsca1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msx_cart_msx_audio_fsca1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_MSX_AUDIO_FSCA1, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_y8950(*this, "y8950")
+		, m_io_config(*this, "CONFIG")
+		, m_region_y8950(*this, "y8950")
+		, m_rombank(*this, "rombank%u", 0U)
+		, m_view0(*this, "view0")
+		, m_view1(*this, "view1")
+		, m_7fff(0)
+	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
@@ -294,19 +298,6 @@ private:
 	memory_view m_view1;
 	u8 m_7fff;
 };
-
-msx_cart_msx_audio_fsca1_device::msx_cart_msx_audio_fsca1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_MSX_AUDIO_FSCA1, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_y8950(*this, "y8950")
-	, m_io_config(*this, "CONFIG")
-	, m_region_y8950(*this, "y8950")
-	, m_rombank(*this, "rombank%u", 0U)
-	, m_view0(*this, "view0")
-	, m_view1(*this, "view1")
-	, m_7fff(0)
-{
-}
 
 void msx_cart_msx_audio_fsca1_device::device_add_mconfig(machine_config &config)
 {

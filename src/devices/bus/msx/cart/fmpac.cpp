@@ -17,7 +17,17 @@ namespace {
 class msx_cart_fmpac_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_fmpac_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msx_cart_fmpac_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_FMPAC, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_ym2413(*this, "ym2413")
+		, m_rombank(*this, "rombank")
+		, m_view(*this, "view")
+		, m_sram_active(false)
+		, m_opll_active(false)
+		, m_sram_unlock{0, 0}
+		, m_control(0)
+	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
@@ -46,28 +56,12 @@ private:
 	u8 m_control;
 };
 
-
-msx_cart_fmpac_device::msx_cart_fmpac_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_FMPAC, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_ym2413(*this, "ym2413")
-	, m_rombank(*this, "rombank")
-	, m_view(*this, "view")
-	, m_sram_active(false)
-	, m_opll_active(false)
-	, m_sram_unlock{0, 0}
-	, m_control(0)
-{
-}
-
-
 void msx_cart_fmpac_device::device_add_mconfig(machine_config &config)
 {
 	YM2413(config, m_ym2413, DERIVED_CLOCK(1, 1));
 	if (parent_slot())
 		m_ym2413->add_route(ALL_OUTPUTS, soundin(), 0.8);
 }
-
 
 void msx_cart_fmpac_device::device_start()
 {

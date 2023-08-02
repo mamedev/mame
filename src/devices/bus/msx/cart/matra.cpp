@@ -8,7 +8,13 @@ namespace {
 class msx_cart_matra_comp_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_matra_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_matra_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, MSX_CART_MATRA_COMP, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_rombank(*this, "rombank%u", 0U)
+		, m_bank_mask(0)
+		, m_banking_enabled(true)
+	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
@@ -26,16 +32,6 @@ private:
 	u8 m_bank_mask;
 	bool m_banking_enabled;
 };
-
-
-msx_cart_matra_comp_device::msx_cart_matra_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_MATRA_COMP, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_rombank(*this, "rombank%u", 0U)
-	, m_bank_mask(0)
-	, m_banking_enabled(true)
-{
-}
 
 void msx_cart_matra_comp_device::device_start()
 {

@@ -23,7 +23,11 @@ namespace {
 class msx_cart_moonsound_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_moonsound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msx_cart_moonsound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_MOONSOUND, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_ymf278b(*this, "ymf278b")
+	{ }
 
 protected:
 	// device-level overrides
@@ -42,13 +46,6 @@ private:
 
 	required_device<ymf278b_device> m_ymf278b;
 };
-
-msx_cart_moonsound_device::msx_cart_moonsound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_MOONSOUND, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_ymf278b(*this, "ymf278b")
-{
-}
 
 void msx_cart_moonsound_device::ymf278b_map(address_map &map)
 {

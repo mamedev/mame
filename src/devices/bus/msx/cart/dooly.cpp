@@ -8,7 +8,12 @@ namespace {
 class msx_cart_dooly_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_dooly_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msx_cart_dooly_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_DOOLY, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_view1(*this, "view1")
+		, m_view2(*this, "view2")
+	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
@@ -25,14 +30,6 @@ private:
 	memory_view m_view1;
 	memory_view m_view2;
 };
-
-msx_cart_dooly_device::msx_cart_dooly_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_DOOLY, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_view1(*this, "view1")
-	, m_view2(*this, "view2")
-{
-}
 
 void msx_cart_dooly_device::device_reset()
 {

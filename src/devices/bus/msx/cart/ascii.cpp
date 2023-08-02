@@ -8,7 +8,12 @@ namespace {
 class msx_cart_ascii8_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_ascii8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msx_cart_ascii8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_ASCII8, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_rombank(*this, "rombank%u", 0U)
+		, m_bank_mask(0)
+	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
@@ -25,14 +30,6 @@ private:
 	memory_bank_array_creator<4> m_rombank;
 	u8 m_bank_mask;
 };
-
-msx_cart_ascii8_device::msx_cart_ascii8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_ASCII8, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_rombank(*this, "rombank%u", 0U)
-	, m_bank_mask(0)
-{
-}
 
 void msx_cart_ascii8_device::device_reset()
 {
@@ -85,7 +82,12 @@ void msx_cart_ascii8_device::bank_w(u8 data)
 class msx_cart_ascii16_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_ascii16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msx_cart_ascii16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_ASCII16, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_rombank(*this, "rombank%u", 0U)
+		, m_bank_mask(0)
+	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
@@ -102,14 +104,6 @@ private:
 	memory_bank_array_creator<2> m_rombank;
 	u8 m_bank_mask;
 };
-
-msx_cart_ascii16_device::msx_cart_ascii16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_ASCII16, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_rombank(*this, "rombank%u", 0U)
-	, m_bank_mask(0)
-{
-}
 
 void msx_cart_ascii16_device::device_reset()
 {
@@ -160,7 +154,15 @@ void msx_cart_ascii16_device::bank_w(u8 data)
 class msx_cart_ascii8_sram_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_ascii8_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msx_cart_ascii8_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_ASCII8_SRAM, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_rombank(*this, "rombank%u", 0U)
+		, m_view2(*this, "view2")
+		, m_view3(*this, "view3")
+		, m_bank_mask(0)
+		, m_sram_select_mask(0)
+	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
@@ -180,17 +182,6 @@ private:
 	u8 m_bank_mask;
 	u8 m_sram_select_mask;
 };
-
-msx_cart_ascii8_sram_device::msx_cart_ascii8_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_ASCII8_SRAM, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_rombank(*this, "rombank%u", 0U)
-	, m_view2(*this, "view2")
-	, m_view3(*this, "view3")
-	, m_bank_mask(0)
-	, m_sram_select_mask(0)
-{
-}
 
 void msx_cart_ascii8_sram_device::device_reset()
 {
@@ -275,13 +266,20 @@ void msx_cart_ascii8_sram_device::mapper_write(offs_t offset, u8 data)
 class msx_cart_ascii16_sram_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_ascii16_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_ascii16_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, MSX_CART_ASCII16_SRAM, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_rombank(*this, "rombank%u", 0U)
+		, m_view(*this, "view")
+		, m_bank_mask(0)
+		, m_sram_select_mask(0)
+	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override { }
 	virtual void device_reset() override;
 
 private:
@@ -295,20 +293,6 @@ private:
 	u8 m_bank_mask;
 	u8 m_sram_select_mask;
 };
-
-msx_cart_ascii16_sram_device::msx_cart_ascii16_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_ASCII16_SRAM, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_rombank(*this, "rombank%u", 0U)
-	, m_view(*this, "view")
-	, m_bank_mask(0)
-	, m_sram_select_mask(0)
-{
-}
-
-void msx_cart_ascii16_sram_device::device_start()
-{
-}
 
 void msx_cart_ascii16_sram_device::device_reset()
 {

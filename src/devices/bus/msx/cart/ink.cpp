@@ -18,7 +18,11 @@ namespace {
 class msx_cart_ink_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_ink_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_ink_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, MSX_CART_INK, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_flash(*this, "flash")
+	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
@@ -33,13 +37,6 @@ private:
 
 	template <int Page> void write_page(offs_t offset, u8 data);
 };
-
-msx_cart_ink_device::msx_cart_ink_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_INK, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_flash(*this, "flash")
-{
-}
 
 ROM_START(msx_cart_ink)
 	ROM_REGION(0x80000, "flash", ROMREGION_ERASEFF)

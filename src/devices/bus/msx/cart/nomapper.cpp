@@ -9,7 +9,12 @@ namespace {
 class msx_cart_nomapper_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_nomapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_nomapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, MSX_CART_NOMAPPER, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_start_address(0)
+		, m_end_address(0)
+	{ }
 
 	// device-level overrides
 	virtual void device_start() override { }
@@ -22,14 +27,6 @@ private:
 
 	void install_memory();
 };
-
-msx_cart_nomapper_device::msx_cart_nomapper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_NOMAPPER, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_start_address(0)
-	, m_end_address(0)
-{
-}
 
 void msx_cart_nomapper_device::install_memory()
 {

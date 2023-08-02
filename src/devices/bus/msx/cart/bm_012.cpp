@@ -25,7 +25,13 @@ namespace {
 class msx_cart_bm_012_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_bm_012_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_bm_012_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, MSX_CART_BM_012, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_tmpz84c015af(*this, "tmpz84c015af")
+		, m_bm012_pio(*this, "bm012_pio")
+		, m_mdthru(*this, "mdthru")
+	{ }
 
 protected:
 	virtual void device_start() override;
@@ -43,16 +49,6 @@ private:
 	required_device<z80pio_device> m_bm012_pio;
 	required_device<midi_port_device> m_mdthru;
 };
-
-
-msx_cart_bm_012_device::msx_cart_bm_012_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_BM_012, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_tmpz84c015af(*this, "tmpz84c015af")
-	, m_bm012_pio(*this, "bm012_pio")
-	, m_mdthru(*this, "mdthru")
-{
-}
 
 
 void msx_cart_bm_012_device::bm_012_memory_map(address_map &map)

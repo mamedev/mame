@@ -13,7 +13,12 @@ namespace {
 class msx_cart_konami_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_konami_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msx_cart_konami_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_KONAMI, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_rombank(*this, "rombank%u", 0U)
+		, m_bank_mask(0)
+	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
@@ -28,14 +33,6 @@ private:
 	memory_bank_array_creator<4> m_rombank;
 	u8 m_bank_mask;
 };
-
-msx_cart_konami_device::msx_cart_konami_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_KONAMI, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_rombank(*this, "rombank%u", 0U)
-	, m_bank_mask(0)
-{
-}
 
 void msx_cart_konami_device::device_reset()
 {
@@ -93,7 +90,14 @@ void msx_cart_konami_device::bank_w(u8 data)
 class msx_cart_konami_scc_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_konami_scc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_konami_scc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, MSX_CART_KONAMI_SCC, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_k051649(*this, "k051649")
+		, m_rombank(*this, "rombank%u", 0U)
+		, m_scc_view(*this, "scc_view")
+		, m_bank_mask(0)
+	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
@@ -113,16 +117,6 @@ private:
 
 	u8 m_bank_mask;
 };
-
-msx_cart_konami_scc_device::msx_cart_konami_scc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_KONAMI_SCC, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_k051649(*this, "k051649")
-	, m_rombank(*this, "rombank%u", 0U)
-	, m_scc_view(*this, "scc_view")
-	, m_bank_mask(0)
-{
-}
 
 void msx_cart_konami_scc_device::device_add_mconfig(machine_config &config)
 {
@@ -206,7 +200,15 @@ void msx_cart_konami_scc_device::bank_w(u8 data)
 class msx_cart_gamemaster2_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_gamemaster2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msx_cart_gamemaster2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_GAMEMASTER2, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_rombank(*this, "rombank%u", 0U)
+		, m_rambank(*this, "rambank%u", 0U)
+		, m_view0(*this, "view0")
+		, m_view1(*this, "view1")
+		, m_view2(*this, "view2")
+	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
@@ -224,17 +226,6 @@ private:
 	memory_view m_view1;
 	memory_view m_view2;
 };
-
-msx_cart_gamemaster2_device::msx_cart_gamemaster2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_GAMEMASTER2, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_rombank(*this, "rombank%u", 0U)
-	, m_rambank(*this, "rambank%u", 0U)
-	, m_view0(*this, "view0")
-	, m_view1(*this, "view1")
-	, m_view2(*this, "view2")
-{
-}
 
 void msx_cart_gamemaster2_device::device_reset()
 {
@@ -325,7 +316,11 @@ void msx_cart_gamemaster2_device::bank_w(u8 data)
 class msx_cart_synthesizer_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msx_cart_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_SYNTHESIZER, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_dac(*this, "dac")
+	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
@@ -338,13 +333,6 @@ protected:
 private:
 	required_device<dac_8bit_r2r_device> m_dac;
 };
-
-msx_cart_synthesizer_device::msx_cart_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_SYNTHESIZER, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_dac(*this, "dac")
-{
-}
 
 void msx_cart_synthesizer_device::device_add_mconfig(machine_config &config)
 {
@@ -383,7 +371,20 @@ public:
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
-	msx_cart_konami_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 min_rambank, u8 max_rambank);
+	msx_cart_konami_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 min_rambank, u8 max_rambank)
+		: device_t(mconfig, type, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_k052539(*this, "k052539")
+		, m_rambank(*this, "rambank%u", 0U)
+		, m_view0(*this, "view0")
+		, m_view1(*this, "view1")
+		, m_view2(*this, "view2")
+		, m_view3(*this, "view3")
+		, m_min_rambank(min_rambank)
+		, m_max_rambank(max_rambank)
+		, m_selected_bank{0, 0, 0, 0}
+		, m_control(0)
+	{ }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -414,22 +415,6 @@ private:
 	u8 m_selected_bank[4];
 	u8 m_control;
 };
-
-msx_cart_konami_sound_device::msx_cart_konami_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 min_rambank, u8 max_rambank)
-	: device_t(mconfig, type, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_k052539(*this, "k052539")
-	, m_rambank(*this, "rambank%u", 0U)
-	, m_view0(*this, "view0")
-	, m_view1(*this, "view1")
-	, m_view2(*this, "view2")
-	, m_view3(*this, "view3")
-	, m_min_rambank(min_rambank)
-	, m_max_rambank(max_rambank)
-	, m_selected_bank{0, 0, 0, 0}
-	, m_control(0)
-{
-}
 
 void msx_cart_konami_sound_device::device_add_mconfig(machine_config &config)
 {
@@ -599,16 +584,13 @@ void msx_cart_konami_sound_device::bank_w(u8 data)
 class msx_cart_konami_sound_snatcher_device : public msx_cart_konami_sound_device
 {
 public:
-	msx_cart_konami_sound_snatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	// The Snatcher Sound cartridge has 64KB RAM available by selecting ram banks 0-7
+	msx_cart_konami_sound_snatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: msx_cart_konami_sound_device(mconfig, MSX_CART_SOUND_SNATCHER, tag, owner, clock, 0, 7)
+	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 };
-
-// The Snatcher Sound cartridge has 64KB RAM available by selecting ram banks 0-7
-msx_cart_konami_sound_snatcher_device::msx_cart_konami_sound_snatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_cart_konami_sound_device(mconfig, MSX_CART_SOUND_SNATCHER, tag, owner, clock, 0, 7)
-{
-}
 
 std::error_condition msx_cart_konami_sound_snatcher_device::initialize_cartridge(std::string &message)
 {
@@ -631,16 +613,13 @@ std::error_condition msx_cart_konami_sound_snatcher_device::initialize_cartridge
 class msx_cart_konami_sound_sdsnatcher_device : public msx_cart_konami_sound_device
 {
 public:
-	msx_cart_konami_sound_sdsnatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	// The SD Snatcher Sound cartridge has 64KB RAM available by selecting ram banks 8-15
+	msx_cart_konami_sound_sdsnatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: msx_cart_konami_sound_device(mconfig, MSX_CART_SOUND_SDSNATCHER, tag, owner, clock, 8, 15)
+	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 };
-
-// The SD Snatcher Sound cartridge has 64KB RAM available by selecting ram banks 8-15
-msx_cart_konami_sound_sdsnatcher_device::msx_cart_konami_sound_sdsnatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_cart_konami_sound_device(mconfig, MSX_CART_SOUND_SDSNATCHER, tag, owner, clock, 8, 15)
-{
-}
 
 std::error_condition msx_cart_konami_sound_sdsnatcher_device::initialize_cartridge(std::string &message)
 {
@@ -664,7 +643,11 @@ std::error_condition msx_cart_konami_sound_sdsnatcher_device::initialize_cartrid
 class msx_cart_keyboard_master_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_keyboard_master_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msx_cart_keyboard_master_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_KEYBOARD_MASTER, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_vlm5030(*this, "vlm5030")
+	{ }
 
 protected:
 	// device-level overrides
@@ -683,13 +666,6 @@ private:
 
 	void vlm_map(address_map &map);
 };
-
-msx_cart_keyboard_master_device::msx_cart_keyboard_master_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_KEYBOARD_MASTER, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_vlm5030(*this, "vlm5030")
-{
-}
 
 void msx_cart_keyboard_master_device::vlm_map(address_map &map)
 {
@@ -762,7 +738,12 @@ uint8_t msx_cart_keyboard_master_device::io_00_r()
 class msx_cart_ec701_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_ec701_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msx_cart_ec701_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_EC701, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_rombank(*this, "rombank")
+		, m_view(*this, "view")
+	{ }
 
 protected:
 	// device-level overrides
@@ -777,14 +758,6 @@ private:
 	memory_bank_creator m_rombank;
 	memory_view m_view;
 };
-
-msx_cart_ec701_device::msx_cart_ec701_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_EC701, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_rombank(*this, "rombank")
-	, m_view(*this, "view")
-{
-}
 
 void msx_cart_ec701_device::device_reset()
 {

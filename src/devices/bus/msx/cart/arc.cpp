@@ -8,7 +8,11 @@ namespace {
 class msx_cart_arc_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_arc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msx_cart_arc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_ARC, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_7f(0)
+	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
@@ -23,13 +27,6 @@ private:
 
 	u8 m_7f;
 };
-
-msx_cart_arc_device::msx_cart_arc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_ARC, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_7f(0)
-{
-}
 
 void msx_cart_arc_device::device_start()
 {

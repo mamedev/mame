@@ -8,7 +8,13 @@ namespace {
 class msx_cart_halnote_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_halnote_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msx_cart_halnote_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_HALNOTE, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_rombank(*this, "rombank%u", 0U)
+		, m_view0(*this, "view0")
+		, m_view1(*this, "view1")
+	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
@@ -31,15 +37,6 @@ private:
 	memory_view m_view0;
 	memory_view m_view1;
 };
-
-msx_cart_halnote_device::msx_cart_halnote_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_HALNOTE, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_rombank(*this, "rombank%u", 0U)
-	, m_view0(*this, "view0")
-	, m_view1(*this, "view1")
-{
-}
 
 void msx_cart_halnote_device::device_reset()
 {
