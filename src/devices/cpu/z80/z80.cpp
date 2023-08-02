@@ -383,7 +383,7 @@ inline void z80_device::leave_halt()
 z80_device::ops_type z80_device::in()
 {
 	return ST_F {
-		TDAT8 = m_io.read_byte(TADR);
+		TDAT8 = m_io.read_interruptible(TADR);
 		T(4 * m_cycles_multiplier);   } EST
 }
 
@@ -393,7 +393,7 @@ z80_device::ops_type z80_device::in()
 z80_device::ops_type z80_device::out()
 {
 	return ST_F {
-		m_io.write_byte(TADR, TDAT8);
+		m_io.write_interruptible(TADR, TDAT8);
 		T(4 * m_cycles_multiplier);   } EST
 }
 
@@ -402,7 +402,7 @@ z80_device::ops_type z80_device::out()
  ***************************************************************/
 u8 z80_device::data_read(u16 addr)
 {
-	const u8 tmp = m_data.read_byte(translate_memory_address(addr));
+	const u8 tmp = m_data.read_interruptible(translate_memory_address(addr));
 	T(MTM);
 	return tmp;
 }
@@ -445,7 +445,7 @@ inline void z80_device::rm16(uint16_t addr, PAIR &r)
  * Write a byte to given memory location
  ***************************************************************/
 void z80_device::data_write(u16 addr, u8 value) {
-	m_data.write_byte(translate_memory_address((u32)addr), value);
+	m_data.write_interruptible(translate_memory_address((u32)addr), value);
 	T(MTM);
 }
 
