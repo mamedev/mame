@@ -36,7 +36,7 @@ DEFINE_DEVICE_TYPE(HEATH_Z37_FDC, heath_z37_fdc_device, "heath_z37_fdc", "Heath 
 
 heath_z37_fdc_device::heath_z37_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
 	device_t(mconfig, HEATH_Z37_FDC, tag, owner, 0),
-	m_fd_irq_cb(*this),
+	m_irq_cb(*this),
 	m_drq_cb(*this),
 	m_block_interrupt_cb(*this),
 	m_fdc(*this, "z37_fdc"),
@@ -49,21 +49,21 @@ void heath_z37_fdc_device::ctrl_w(u8 val)
 {
 	bool motor_on = bool(BIT(val, ctrl_MotorsOn_c));
 
-	m_intrq_allowed = bool(BIT(val, ctrl_EnableIntReq_c));
+	m_irq_allowed = bool(BIT(val, ctrl_EnableIntReq_c));
 	m_drq_allowed = bool(BIT(val, ctrl_EnableDrqInt_c));
-	m_fdc->dden_w(BIT(val, ctrl_SetMFMRecording_c) ? CLEAR_LINE : ASSERT_LINE);
+	m_fdc->dden_w(BIT(~val, ctrl_SetMFMRecording_c));
 
 	LOGREG("%s: motor on: %d, intrq allowed: %d, drq allowed: %d\n",
-		FUNCNAME, motor_on, m_intrq_allowed, m_drq_allowed);
+		FUNCNAME, motor_on, m_irq_allowed, m_drq_allowed);
 
 	if (m_drq_allowed)
 	{
-		m_block_interrupt_cb(ASSERT_LINE);
+		m_block_interrupt_cb(1);
 	}
 	else
 	{
-		m_block_interrupt_cb(CLEAR_LINE);
-		m_drq_cb(CLEAR_LINE);
+		m_block_interrupt_cb(0);
+		m_drq_cb(0);
 	}
 
 	if (BIT(val, ctrl_Drive_0_c))
@@ -176,24 +176,24 @@ u8 heath_z37_fdc_device::read(offs_t reg)
 
 void heath_z37_fdc_device::device_start()
 {
-	save_item(NAME(m_intrq_allowed));
+	save_item(NAME(m_irq_allowed));
 	save_item(NAME(m_drq_allowed));
 	save_item(NAME(m_access_track_sector));
 
-	m_intrq_allowed = false;
+	m_irq_allowed = false;
 	m_drq_allowed = false;
 	m_access_track_sector = false;
 }
 
 void heath_z37_fdc_device::device_reset()
 {
-	m_intrq_allowed = false;
+	m_irq_allowed = false;
 	m_drq_allowed = false;
 	m_access_track_sector = false;
 
-	m_fd_irq_cb(CLEAR_LINE);
-	m_drq_cb(CLEAR_LINE);
-	m_block_interrupt_cb(CLEAR_LINE);
+	m_irq_cb(0);
+	m_drq_cb(0);
+	m_block_interrupt_cb(0);
 }
 
 static void z37_floppies(device_slot_interface &device)
@@ -224,16 +224,16 @@ void heath_z37_fdc_device::device_add_mconfig(machine_config &config)
 	m_floppies[3]->enable_sound(true);
 }
 
-void heath_z37_fdc_device::set_irq(u8 data)
+void heath_z37_fdc_device::set_irq(int state)
 {
-	LOGLINES("set irq, allowed: %d data: %d\n", m_intrq_allowed, data);
+	LOGLINES("set irq, allowed: %d state: %d\n", m_irq_allowed, state);
 
-	m_fd_irq_cb(m_intrq_allowed ? data : CLEAR_LINE);
+	m_irq_cb(m_irq_allowed ? state : 0);
 }
 
-void heath_z37_fdc_device::set_drq(u8 data)
+void heath_z37_fdc_device::set_drq(int state)
 {
-	LOGLINES("set drq, allowed: %d data: %d\n", m_intrq_allowed, data);
+	LOGLINES("set drq, allowed: %d state: %d\n", m_irq_allowed, state);
 
-	m_drq_cb(m_drq_allowed ? data : CLEAR_LINE);
+	m_drq_cb(m_drq_allowed ? state : 0);
 }

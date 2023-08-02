@@ -13,14 +13,14 @@
 DEFINE_DEVICE_TYPE(HEATH_INTR_CNTRL, heath_intr_cntrl, "heath_intr_cntrl", "Heath H/Z-89 Interrupt Controller");
 DEFINE_DEVICE_TYPE(HEATH_Z37_INTR_CNTRL, z37_intr_cntrl, "heath_z37_intr_cntrl", "Heath H/Z-89 with Z-37 Interrupt Controller");
 
-heath_intr_cntrl::heath_intr_cntrl(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: heath_intr_cntrl(mconfig, HEATH_INTR_CNTRL, tag, owner, clock)
+heath_intr_cntrl::heath_intr_cntrl(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+	heath_intr_cntrl(mconfig, HEATH_INTR_CNTRL, tag, owner, clock)
 {
 }
 
-heath_intr_cntrl::heath_intr_cntrl(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, 0)
-	, m_irq_line(*this)
+heath_intr_cntrl::heath_intr_cntrl(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock):
+	device_t(mconfig, type, tag, owner, 0),
+	m_irq_line(*this)
 {
 }
 
@@ -38,7 +38,7 @@ void heath_intr_cntrl::device_reset()
 void heath_intr_cntrl::update_intr_line()
 {
 
-	m_irq_line(m_intr_lines == 0 ? CLEAR_LINE : ASSERT_LINE);
+	m_irq_line((m_intr_lines == 0) ? 0 : 1);
 }
 
 void heath_intr_cntrl::raise_irq(uint8_t level)
@@ -99,21 +99,19 @@ IRQ_CALLBACK_MEMBER(heath_intr_cntrl::irq_callback)
 	return get_instruction();
 }
 
-z37_intr_cntrl::z37_intr_cntrl(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: heath_intr_cntrl(mconfig, HEATH_Z37_INTR_CNTRL, tag, owner, clock)
+z37_intr_cntrl::z37_intr_cntrl(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+	heath_intr_cntrl(mconfig, HEATH_Z37_INTR_CNTRL, tag, owner, clock)
 {
-	m_interrupts_blocked = false;
+	m_intr_blocked = false;
 	m_drq_raised = false;
-	m_fd_irq_raised = false;
+	m_irq_raised = false;
 }
 
 void z37_intr_cntrl::update_intr_line()
 {
-
 	m_irq_line(
-		m_fd_irq_raised ||
-		m_drq_raised ||
-		(!m_interrupts_blocked && (m_intr_lines != 0)) ? ASSERT_LINE : CLEAR_LINE);
+		(m_irq_raised || m_drq_raised ||
+		(!m_intr_blocked && (m_intr_lines != 0))) ? 1 : 0);
 }
 
 uint8_t z37_intr_cntrl::get_instruction()
@@ -125,34 +123,34 @@ uint8_t z37_intr_cntrl::get_instruction()
 		return 0xfb;
 	}
 
-	if (m_fd_irq_raised)
+	if (m_irq_raised)
 	{
 		// RST 20H (Interrupt 4)
 		return 0xe7;
 	}
 
 
-	if (!m_interrupts_blocked)
+	if (!m_intr_blocked)
 	{
 		return heath_intr_cntrl::get_instruction();
 	}
 
 	// shouldn't get here - NO-OP?
-	logerror("Warning: z37 intr get_instruction: fd: %d dr: %d ib: %d\n", m_fd_irq_raised, m_drq_raised, m_interrupts_blocked);
+	logerror("Warning: z37 intr get_instruction: fd: %d dr: %d ib: %d\n", m_irq_raised, m_drq_raised, m_intr_blocked);
 	return 0x00;
 }
 
-void z37_intr_cntrl::set_drq(uint8_t data)
+void z37_intr_cntrl::set_drq(int state)
 {
-	m_drq_raised = (data != CLEAR_LINE);
+	m_drq_raised = bool(state);
 
 	update_intr_line();
 }
 
 
-void z37_intr_cntrl::set_intrq(uint8_t data)
+void z37_intr_cntrl::set_irq(int state)
 {
-	m_fd_irq_raised = (data != CLEAR_LINE);
+	m_irq_raised = bool(state);
 
 	update_intr_line();
 }
@@ -161,13 +159,13 @@ void z37_intr_cntrl::device_start()
 {
 	heath_intr_cntrl::device_start();
 
-	save_item(NAME(m_interrupts_blocked));
+	save_item(NAME(m_intr_blocked));
 	save_item(NAME(m_drq_raised));
-	save_item(NAME(m_fd_irq_raised));
+	save_item(NAME(m_irq_raised));
 
-	m_interrupts_blocked = false;
+	m_intr_blocked = false;
 	m_drq_raised = false;
-	m_fd_irq_raised = false;
+	m_irq_raised = false;
 }
 
 void z37_intr_cntrl::device_reset()
@@ -177,7 +175,7 @@ void z37_intr_cntrl::device_reset()
 
 void z37_intr_cntrl::block_interrupts(uint8_t data)
 {
-	m_interrupts_blocked = (data != CLEAR_LINE);
+	m_intr_blocked = bool(data);
 
 	update_intr_line();
 }
