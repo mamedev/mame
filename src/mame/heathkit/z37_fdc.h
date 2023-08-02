@@ -43,8 +43,8 @@ protected:
 	void data_w(u8 val);
 	u8   data_r();
 
-	void set_irq(u8 data);
-	void set_drq(u8 data);
+	void set_irq(int state);
+	void set_drq(int state);
 
 private:
 	devcb_write_line m_irq_cb;

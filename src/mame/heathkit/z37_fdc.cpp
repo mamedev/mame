@@ -51,7 +51,7 @@ void heath_z37_fdc_device::ctrl_w(u8 val)
 
 	m_irq_allowed = bool(BIT(val, ctrl_EnableIntReq_c));
 	m_drq_allowed = bool(BIT(val, ctrl_EnableDrqInt_c));
-	m_fdc->dden_w(!BIT(val, ctrl_SetMFMRecording_c));
+	m_fdc->dden_w(BIT(~val, ctrl_SetMFMRecording_c));
 
 	LOGREG("%s: motor on: %d, intrq allowed: %d, drq allowed: %d\n",
 		FUNCNAME, motor_on, m_irq_allowed, m_drq_allowed);
@@ -224,16 +224,16 @@ void heath_z37_fdc_device::device_add_mconfig(machine_config &config)
 	m_floppies[3]->enable_sound(true);
 }
 
-void heath_z37_fdc_device::set_irq(u8 data)
+void heath_z37_fdc_device::set_irq(int state)
 {
-	LOGLINES("set irq, allowed: %d data: %d\n", m_irq_allowed, data);
+	LOGLINES("set irq, allowed: %d state: %d\n", m_irq_allowed, state);
 
-	m_irq_cb(m_irq_allowed ? data : 0);
+	m_irq_cb(m_irq_allowed ? state : 0);
 }
 
-void heath_z37_fdc_device::set_drq(u8 data)
+void heath_z37_fdc_device::set_drq(int state)
 {
-	LOGLINES("set drq, allowed: %d data: %d\n", m_irq_allowed, data);
+	LOGLINES("set drq, allowed: %d state: %d\n", m_irq_allowed, state);
 
-	m_drq_cb(m_drq_allowed ? data : 0);
+	m_drq_cb(m_drq_allowed ? state : 0);
 }

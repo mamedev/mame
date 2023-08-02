@@ -38,7 +38,7 @@ void heath_intr_cntrl::device_reset()
 void heath_intr_cntrl::update_intr_line()
 {
 
-	m_irq_line(m_intr_lines == 0 ? 0 : 1);
+	m_irq_line((m_intr_lines == 0) ? 0 : 1);
 }
 
 void heath_intr_cntrl::raise_irq(uint8_t level)
@@ -109,11 +109,9 @@ z37_intr_cntrl::z37_intr_cntrl(const machine_config &mconfig, const char *tag, d
 
 void z37_intr_cntrl::update_intr_line()
 {
-
 	m_irq_line(
-		m_irq_raised ||
-		m_drq_raised ||
-		(!m_intr_blocked && (m_intr_lines != 0)) ? 1 : 0);
+		(m_irq_raised || m_drq_raised ||
+		(!m_intr_blocked && (m_intr_lines != 0))) ? 1 : 0);
 }
 
 uint8_t z37_intr_cntrl::get_instruction()
@@ -142,17 +140,17 @@ uint8_t z37_intr_cntrl::get_instruction()
 	return 0x00;
 }
 
-void z37_intr_cntrl::set_drq(uint8_t data)
+void z37_intr_cntrl::set_drq(int state)
 {
-	m_drq_raised = bool(data);
+	m_drq_raised = bool(state);
 
 	update_intr_line();
 }
 
 
-void z37_intr_cntrl::set_irq(uint8_t data)
+void z37_intr_cntrl::set_irq(int state)
 {
-	m_irq_raised = bool(data);
+	m_irq_raised = bool(state);
 
 	update_intr_line();
 }

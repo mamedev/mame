@@ -52,8 +52,8 @@ class z37_intr_cntrl : public heath_intr_cntrl
 public:
 	z37_intr_cntrl(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	virtual void set_drq(uint8_t data);
-	virtual void set_irq(uint8_t data);
+	virtual void set_drq(int state);
+	virtual void set_irq(int state);
 	virtual void block_interrupts(uint8_t data);
 
 protected:
