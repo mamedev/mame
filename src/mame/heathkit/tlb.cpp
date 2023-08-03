@@ -60,6 +60,8 @@
 
 #include "tlb.h"
 
+#include <algorithm>
+
 // Clocks
 static constexpr XTAL MASTER_CLOCK = XTAL(12'288'000);
 
@@ -374,31 +376,14 @@ MC6845_UPDATE_ROW(heath_tlb_device::crtc_update_row)
 			uint8_t const gfx = m_p_chargen[(chr<<4) | ra] ^ inv;
 
 			// Display a scanline of a character (8 pixels)
-			*p++ = palette[BIT(gfx, 7)];
-			*p++ = palette[BIT(gfx, 6)];
-			*p++ = palette[BIT(gfx, 5)];
-			*p++ = palette[BIT(gfx, 4)];
-			*p++ = palette[BIT(gfx, 3)];
-			*p++ = palette[BIT(gfx, 2)];
-			*p++ = palette[BIT(gfx, 1)];
-			*p++ = palette[BIT(gfx, 0)];
+			for (int b = 0; 8 > b; ++b)
+				*p++ = palette[BIT(gfx, 7 - b)];
 		}
 	}
 	else
 	{
 		const rgb_t color = palette[0];
-
-		for (uint16_t x = 0; x < x_count; x++)
-		{
-			*p++ = color; // bit 7
-			*p++ = color; // bit 6
-			*p++ = color; // bit 5
-			*p++ = color; // bit 4
-			*p++ = color; // bit 3
-			*p++ = color; // bit 2
-			*p++ = color; // bit 1
-			*p++ = color; // bit 0
-		}
+		std::fill_n(p, x_count * 8, color);
 	}
 }
 
@@ -1088,16 +1073,9 @@ MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 		{
 			for (uint16_t x = 0; x < x_count; x++)
 			{
-				uint8_t gfx = m_p_videoram[(ma + x) & 0x3fff] ^ screen_inv;
-
-				*p++ = palette[BIT(gfx, 0)];
-				*p++ = palette[BIT(gfx, 1)];
-				*p++ = palette[BIT(gfx, 2)];
-				*p++ = palette[BIT(gfx, 3)];
-				*p++ = palette[BIT(gfx, 4)];
-				*p++ = palette[BIT(gfx, 5)];
-				*p++ = palette[BIT(gfx, 6)];
-				*p++ = palette[BIT(gfx, 7)];
+				uint8_t const gfx = m_p_videoram[(ma + x) & 0x3fff] ^ screen_inv;
+				for (int b = 0; 8 > b; ++b)
+					*p++ = palette[BIT(gfx, b)];
 			}
 		}
 		else
@@ -1122,32 +1100,15 @@ MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 				uint8_t const gfx = m_p_chargen[base | (chr << 4) | ra] ^ inv;
 
 				// Display a scanline of a character (8 pixels)
-				*p++ = palette[BIT(gfx, 7)];
-				*p++ = palette[BIT(gfx, 6)];
-				*p++ = palette[BIT(gfx, 5)];
-				*p++ = palette[BIT(gfx, 4)];
-				*p++ = palette[BIT(gfx, 3)];
-				*p++ = palette[BIT(gfx, 2)];
-				*p++ = palette[BIT(gfx, 1)];
-				*p++ = palette[BIT(gfx, 0)];
+				for (int b = 0; 8 > b; ++b)
+					*p++ = palette[BIT(gfx, 7 - b)];
 			}
 		}
 	}
 	else
 	{
 		const rgb_t color = palette[0];
-
-		for (uint16_t x = 0; x < x_count; x++)
-		{
-			*p++ = color; // bit 7
-			*p++ = color; // bit 6
-			*p++ = color; // bit 5
-			*p++ = color; // bit 4
-			*p++ = color; // bit 3
-			*p++ = color; // bit 2
-			*p++ = color; // bit 1
-			*p++ = color; // bit 0
-		}
+		std::fill_n(p, x_count * 8, color);
 	}
 }
 
