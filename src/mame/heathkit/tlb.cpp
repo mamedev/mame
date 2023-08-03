@@ -238,7 +238,7 @@ void heath_tlb_device::bell_w(uint8_t data)
 ****************************************************************************/
 uint16_t heath_tlb_device::translate_mm5740_b(uint16_t b)
 {
-	return ((b & 0x100) >> 2) | ((b & 0x0c0) << 1) | (b & 0x03f);
+	return bitswap<9>(b, 7, 6, 8, 5, 4, 3, 2, 1, 0);
 }
 
 uint8_t heath_tlb_device::kbd_key_r()
