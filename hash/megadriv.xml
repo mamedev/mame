@@ -848,6 +848,29 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 	</software>
 
 
+	<software name="smgp2p" cloneof="smgp2">
+		<description>Ayrton Senna's Super Monaco GP II (Europe, Japan, prototype)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL,NTSC-J"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="epr1.bin" size="131072" crc="49d4e5c6" sha1="ff79b4b6869458f1440a86ea5b25f0d325acb93f" offset="0x00000" loadflag="load16_byte"/>
+				<rom name="epr0.bin" size="131072" crc="eb0d0619" sha1="831eee46616596f4a985e6e2616def88eee51198" offset="0x00001" loadflag="load16_byte"/>
+				<rom name="epr3.bin" size="131072" crc="10ddeb8e" sha1="da66eb7780f53c5754106b09c7f8cef53a8b2620" offset="0x40000" loadflag="load16_byte"/>
+				<rom name="epr2.bin" size="131072" crc="99bf91df" sha1="07da2e26015022e7e895d7dbe7ba946d701b2b49" offset="0x40001" loadflag="load16_byte"/>
+				<rom name="epr5.bin" size="131072" crc="91b2e098" sha1="905c76b96ddd85c9edee33dfd4c9ba1f5056e91f" offset="0x80000" loadflag="load16_byte"/>
+				<rom name="epr4.bin" size="131072" crc="561b23a5" sha1="d6747cc415587e6918e936ce07b599e69a2743bb" offset="0x80001" loadflag="load16_byte"/>
+				<rom name="epr7.bin" size="131072" crc="376181c6" sha1="fe24eb3263595056e198a533ffb7c86705dcc37a" offset="0xc0000" loadflag="load16_byte"/>
+				<rom name="epr6.bin" size="131072" crc="7ff276dd" sha1="8264f0deb8607a248638d6bd71db22677bebb35c" offset="0xc0001" loadflag="load16_byte"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="backtof3">
 		<description>Back to the Future Part III (Europe)</description>
 		<year>1991</year>
