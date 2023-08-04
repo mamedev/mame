@@ -3,10 +3,12 @@
 #include "emu.h"
 #include "konami.h"
 
-#include "speaker.h"
 #include "sound/k051649.h"
 #include "sound/vlm5030.h"
 #include "sound/dac.h"
+
+#include "speaker.h"
+
 
 namespace {
 
