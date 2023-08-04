@@ -11,5 +11,4 @@
 DECLARE_DEVICE_TYPE(MSX_CART_KANJI, msx_cart_interface)
 DECLARE_DEVICE_TYPE(MSX_CART_MSXWRITE, msx_cart_interface)
 
-
 #endif // MAME_BUS_MSX_CART_KANJI_H

@@ -31,7 +31,7 @@ public:
 protected:
 	msx_cart_kanji_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -136,7 +136,7 @@ public:
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_reset() override;
 	virtual ioport_constructor device_input_ports() const override;
 

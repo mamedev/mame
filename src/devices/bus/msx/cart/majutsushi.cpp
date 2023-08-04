@@ -3,8 +3,10 @@
 #include "emu.h"
 #include "majutsushi.h"
 
-#include "speaker.h"
 #include "sound/dac.h"
+
+#include "speaker.h"
+
 
 namespace {
 
@@ -21,7 +23,7 @@ public:
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override { }
 
 	virtual void device_add_mconfig(machine_config &config) override;

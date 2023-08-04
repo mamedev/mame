@@ -10,5 +10,4 @@
 
 DECLARE_DEVICE_TYPE(MSX_CART_NOMAPPER, msx_cart_interface)
 
-
 #endif // MAME_BUS_MSX_CART_NOMAPPER_H

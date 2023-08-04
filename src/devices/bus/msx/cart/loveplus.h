@@ -10,5 +10,4 @@
 
 DECLARE_DEVICE_TYPE(MSX_CART_LOVEPLUS, msx_cart_interface)
 
-
 #endif // MAME_BUS_MSX_CART_LOVEPLUS_H

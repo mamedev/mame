@@ -11,8 +11,9 @@ TODO:
 #include "emu.h"
 #include "moonsound.h"
 
-#include "speaker.h"
 #include "sound/ymopl.h"
+
+#include "speaker.h"
 
 
 #define VERBOSE 0
@@ -30,7 +31,7 @@ public:
 	{ }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

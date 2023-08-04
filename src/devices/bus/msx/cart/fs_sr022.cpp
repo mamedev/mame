@@ -18,7 +18,7 @@ public:
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

@@ -16,7 +16,7 @@ public:
 		, m_end_address(0)
 	{ }
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override { }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;

@@ -34,9 +34,8 @@ public:
 	{ }
 
 protected:
+	// device_t implementation
 	virtual void device_start() override;
-
-	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 

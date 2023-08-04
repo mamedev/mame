@@ -62,12 +62,15 @@ and/or http://ngs.no.coocan.jp/doc/wiki.cgi/datapack?page=4.2+MSX-AUDIO+%B3%C8%C
 
 #include "emu.h"
 #include "msx_audio.h"
+
 #include "msx_audio_kb.h"
 
-#include "speaker.h"
-#include "sound/ymopl.h"
-#include "machine/6850acia.h"
 #include "bus/midi/midi.h"
+#include "machine/6850acia.h"
+#include "sound/ymopl.h"
+
+#include "speaker.h"
+
 
 namespace {
 
@@ -83,9 +86,8 @@ public:
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
+	// device_t implementation
 	virtual void device_start() override;
-
-	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -159,9 +161,8 @@ public:
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
+	// device_t implementation
 	virtual void device_start() override;
-
-	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -274,10 +275,9 @@ public:
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
