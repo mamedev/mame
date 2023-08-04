@@ -9,8 +9,11 @@ with: PAC2 BACKUP DATA. We only store the raw sram contents.
 
 #include "emu.h"
 #include "fmpac.h"
-#include "speaker.h"
+
 #include "sound/ymopl.h"
+
+#include "speaker.h"
+
 
 namespace {
 
