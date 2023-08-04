@@ -2162,7 +2162,7 @@ Side B has a copy of Hardball for the Amstrad CPC, was this edition accidentally
 		<year>1989</year>
 		<publisher>Dinamic Software</publisher>
 		<notes><![CDATA[
-This is a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC).
+Dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC).
 ]]></notes>
 		<info name="region" value="Spain" />
 		<part name="flop1" interface="floppy_3">
@@ -2340,6 +2340,17 @@ This is a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Ams
 		<part name="flop2" interface="floppy_3">
 			<dataarea name="flop" size="255232">
 				<rom name="bonanza bros. (1992)(u.s. gold)(side b).dsk" size="255232" crc="bc619eef" sha1="8596ee563127f2ef5dd047feb482e5b1a5834e97"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bonclyde">
+		<description>Bonnie and Clyde</description>
+		<year>2020</year>
+		<publisher>Zosya Entertainment</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="Bonnie_and_Clyde.dsk" size="194816" crc="6f4fa732" sha1="ebf2bfde0f66ee3303ae41d0a8163a76066d0487"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2752,7 +2763,7 @@ This is a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Ams
 	<software name="castlmas">
 		<description>Castle Master</description>
 		<year>1990</year>
-		<publisher>Incentive</publisher>
+		<publisher>Domark</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="castle master (1990)(incentive).dsk" size="194816" crc="4a793e62" sha1="ac429bc3b62f539053e045d025f1332fff32e099"/>
@@ -3762,6 +3773,18 @@ The game doesn't start after choosing the "Loader" option menu.
 		</part>
 	</software>
 
+	<software name="crzcars2a" cloneof="crzcars2">
+		<description>Crazy Cars II (Proein)</description>
+		<year>1988</year>
+		<publisher>Proein Soft Line</publisher>
+		<info name="region" value="Spain" />
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="193792">
+				<rom name="Crazy Cars II (Proein Soft Line).dsk" size="193792" crc="1f81ebae" sha1="a0e1ee871c4484e3a33552c0b2f00cced9f19acf"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cricketm">
 		<description>Cricket Master</description>
 		<year>1989</year>
@@ -3769,6 +3792,19 @@ The game doesn't start after choosing the "Loader" option menu.
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="cricket master (1989)(challenge).dsk" size="194816" crc="636dadcc" sha1="e5a4685b8308834e06be0e329637567b8cf84154"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dizzyvii">
+		<description>Crystal Kingdom Dizzy</description>
+		<year>2017</year>
+		<publisher>Team Yolkfolk</publisher>
+		<info name="version" value="1.0.5" />
+		<info name="developer" value="Barskiy, Ponomarjov, Origin, Kosov, Del Campo" />
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="Dizzy VII - Crystal Kindom Dizzy (2017) v1.0.5.dsk" size="194816" crc="6ce7df16" sha1="baa05aa6ccf2a296485e83e12bb602e174232ba4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4500,6 +4536,17 @@ The game doesn't start after choosing the "Loader" option menu.
 		</part>
 	</software>
 
+	<software name="drift">
+		<description>Drift!</description>
+		<year>2019</year>
+		<publisher>Zosya Entertainment</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="Drift.dsk" size="194816" crc="6634b881" sha1="424d6e8f87a8f63b3e275229b7e38b1f30a23f11"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="driller">
 		<description>Driller</description>
 		<year>1987</year>
@@ -4576,7 +4623,7 @@ The game doesn't start after choosing the "Loader" option menu.
 		</part>
 	</software>
 
-	<software name="gomiland_a">
+	<software name="gomiland_a" cloneof="gomiland">
 		<description>Dungeons of Gomilandia (v0.1)</description>
 		<year>2020</year>
 		<publisher>RetroWorks</publisher>
@@ -8259,6 +8306,30 @@ The game doesn't start
 		</part>
 	</software>
 
+	<software name="espadasag" supported="no">
+		<description>La Espada Sagrada</description>
+		<year>1990</year>
+		<publisher>Topo Soft</publisher>
+		<info name="language" value="Spanish" />
+		<info name="region" value="Spain" />
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="102877">
+				<rom name="La Espada Sagrada.dsk" size="102877" crc="1449c051" sha1="bb658205e9278df591c62fb80fc8b3aa26a656ff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vajillas">
+		<description>La Guerra de las Vajillas</description>
+		<year>1988</year>
+		<publisher>Dinamic Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="101888">
+				<rom name="La Guerra de las Vajillas.dsk" size="101888" crc="328a4a78" sha1="838d96d9ac6645b583f86de86a7da32c99d8719f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pepetrue">
 		<description>Las Aventuras de Pepe Trueno</description>
 		<year>2003</year>
@@ -9533,7 +9604,7 @@ Disk 2 Side B seems to contain an unreadable copy of Disk 2 Side A. Needs invest
 		<year>1991</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
-This is a dual-system Spectrum/Amstrad release (Side A: Amstrad CPC, Side B: ZX Spectrum)
+Dual-system Spectrum/Amstrad release (Side A: Amstrad CPC, Side B: ZX Spectrum)
 ]]></notes>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Amstrad CPC"/>
@@ -10163,7 +10234,7 @@ Spanish version includes Army Moves as a bonus.
 		<year>1988</year>
 		<publisher>Dinamic Software</publisher>
 		<notes><![CDATA[
-This is a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC).
+Dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC).
 Code in both sides is identical to their respective Spanish individual releases.
 ]]></notes>
 		<info name="region" value="Spain" />
@@ -10491,7 +10562,7 @@ Labeled in World of Spectrum as "(CheatVersion)(MasterDisk)", might come from th
 		<year>1989</year>
 		<publisher>Melbourne House</publisher>
 		<notes><![CDATA[
-This is a dual-system Spectrum/Amstrad release (Side A: Amstrad CPC, Side B: ZX Spectrum).
+Dual-system Spectrum/Amstrad release (Side A: Amstrad CPC, Side B: ZX Spectrum).
 ]]></notes>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Amstrad CPC"/>
@@ -13466,7 +13537,7 @@ Both sides contain the same games, dumps are only slightly different by the end
 		<year>1989</year>
 		<publisher>Dinamic Software</publisher>
 		<notes><![CDATA[
-This is a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC).
+Dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC).
 ]]></notes>
 		<info name="region" value="Spain" />
 		<part name="flop1" interface="floppy_3">
@@ -17771,7 +17842,7 @@ The floppy disks don't load after choosing the "Loader" option menu.
 	</software>
 
 	<software name="swoianna">
-		<description>The Sword of IANNA (v1.1)</description>
+		<description>The Sword of Ianna (v1.1)</description>
 		<year>2017</year>
 		<publisher>RetroWorks</publisher>
 		<info name="language" value="Spanish" />
@@ -17792,7 +17863,7 @@ The floppy disks don't load after choosing the "Loader" option menu.
 	</software>
 
 	<software name="swoiannaa" cloneof="swoianna">
-		<description>The Sword of IANNA (v1.0)</description>
+		<description>The Sword of Ianna (v1.0)</description>
 		<year>2017</year>
 		<publisher>RetroWorks</publisher>
 		<info name="language" value="Spanish" />
@@ -18299,7 +18370,8 @@ Disk 3 - Side A: Vindicators (Domark)
 	<software name="tikitaca">
 		<description>Tiki Taca</description>
 		<year>2019</year>
-		<publisher>Climacus / Errazking</publisher>
+		<publisher>Climacus</publisher>
+		<info name="developer" value="Eduardo Martin Torices / Igor Errazkin" />
 		<part name="flop" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="tiki taca (2019)(climacus)(+3)(es)(en).dsk" size="194816" crc="f2e1d3d4" sha1="316de7cd90cb66b1094320d1d65b3fc5eb8543de"/>
@@ -19091,6 +19163,19 @@ Labeled as "bad dump" in TOSEC for some reason, but it's the same dump at World 
 			<feature name="part_id" value="Disk 2, Side B: Nightshade + Gunfright"/>
 			<dataarea name="flop" size="194816">
 				<rom name="ultimate the collected works - disk 2 - side b.dsk" size="194816" crc="4e9c767f" sha1="68200320fdaaac2e634d51bd48a5f41ecaf5f218"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="disccopi">
+		<description>The Ultimate Disc Copier</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="language" value="Spanish" />
+		<info name="region" value="Spain" />
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="204544">
+				<rom name="The Ultimate Disc Copier.dsk" size="204544" crc="2e7dfc08" sha1="dd31cc23289250015ddd29e7defa085f6e1ec68a"/>
 			</dataarea>
 		</part>
 	</software>

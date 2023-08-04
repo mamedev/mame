@@ -18,7 +18,5 @@ MAME’s source or working on scripts that run within the MAME framework.
     memory
     floppy
     nscsi
-    luaengine
-    luareference
     m6502
     poly_manager

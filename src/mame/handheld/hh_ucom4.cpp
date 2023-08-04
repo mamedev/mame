@@ -1623,14 +1623,14 @@ ROM_END
 
 *******************************************************************************/
 
-class invspace_state : public hh_ucom4_state
+class einspace_state : public hh_ucom4_state
 {
 public:
-	invspace_state(const machine_config &mconfig, device_type type, const char *tag) :
+	einspace_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void invspace(machine_config &config);
+	void einspace(machine_config &config);
 
 private:
 	void update_display();
@@ -1640,12 +1640,12 @@ private:
 
 // handlers
 
-void invspace_state::update_display()
+void einspace_state::update_display()
 {
 	m_display->matrix(m_grid, m_plate);
 }
 
-void invspace_state::grid_w(offs_t offset, u8 data)
+void einspace_state::grid_w(offs_t offset, u8 data)
 {
 	// I0: speaker out
 	if (offset == PORTI)
@@ -1657,7 +1657,7 @@ void invspace_state::grid_w(offs_t offset, u8 data)
 	update_display();
 }
 
-void invspace_state::plate_w(offs_t offset, u8 data)
+void einspace_state::plate_w(offs_t offset, u8 data)
 {
 	// E,F,G,H123: vfd plate
 	int shift = (offset - PORTE) * 4;
@@ -1667,7 +1667,7 @@ void invspace_state::plate_w(offs_t offset, u8 data)
 
 // inputs
 
-static INPUT_PORTS_START( invspace )
+static INPUT_PORTS_START( einspace )
 	PORT_START("IN.0") // port A
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START )
@@ -1682,19 +1682,19 @@ INPUT_PORTS_END
 
 // config
 
-void invspace_state::invspace(machine_config &config)
+void einspace_state::einspace(machine_config &config)
 {
 	// basic machine hardware
 	NEC_D552(config, m_maincpu, 400_kHz_XTAL);
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->read_b().set_ioport("IN.1");
-	m_maincpu->write_c().set(FUNC(invspace_state::grid_w));
-	m_maincpu->write_d().set(FUNC(invspace_state::grid_w));
-	m_maincpu->write_e().set(FUNC(invspace_state::plate_w));
-	m_maincpu->write_f().set(FUNC(invspace_state::plate_w));
-	m_maincpu->write_g().set(FUNC(invspace_state::plate_w));
-	m_maincpu->write_h().set(FUNC(invspace_state::plate_w));
-	m_maincpu->write_i().set(FUNC(invspace_state::grid_w));
+	m_maincpu->write_c().set(FUNC(einspace_state::grid_w));
+	m_maincpu->write_d().set(FUNC(einspace_state::grid_w));
+	m_maincpu->write_e().set(FUNC(einspace_state::plate_w));
+	m_maincpu->write_f().set(FUNC(einspace_state::plate_w));
+	m_maincpu->write_g().set(FUNC(einspace_state::plate_w));
+	m_maincpu->write_h().set(FUNC(einspace_state::plate_w));
+	m_maincpu->write_i().set(FUNC(einspace_state::grid_w));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
@@ -1712,12 +1712,12 @@ void invspace_state::invspace(machine_config &config)
 
 // roms
 
-ROM_START( invspace )
+ROM_START( einspace )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c_054", 0x0000, 0x0400, CRC(913d9c13) SHA1(f20edb5458e54d2f6d4e45e5d59efd87e05a6f3f) )
 
 	ROM_REGION( 110894, "screen", 0)
-	ROM_LOAD( "invspace.svg", 0, 110894, CRC(1ec324b8) SHA1(847621c7d6c10b254b715642d63efc9c30a701c1) )
+	ROM_LOAD( "einspace.svg", 0, 110894, CRC(1ec324b8) SHA1(847621c7d6c10b254b715642d63efc9c30a701c1) )
 ROM_END
 
 
@@ -3354,7 +3354,7 @@ SYST( 1982, bcclimbr, 0,        0,      bcclimbr, bcclimbr, bcclimbr_state, empt
 SYST( 1980, tactix,   0,        0,      tactix,   tactix,   tactix_state,   empty_init, "Castle Toy", "Tactix (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1980, ctntune,  0,        0,      ctntune,  ctntune,  ctntune_state,  empty_init, "Castle Toy", "Name That Tune (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
-SYST( 1980, invspace, 0,        0,      invspace, invspace, invspace_state, empty_init, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, einspace, 0,        0,      einspace, einspace, einspace_state, empty_init, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, efball,   0,        0,      efball,   efball,   efball_state,   empty_init, "Epoch", "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
 SYST( 1981, galaxy2,  0,        0,      galaxy2,  galaxy2,  galaxy2_state,  empty_init, "Epoch", "Galaxy II (VFD Rev. D)", MACHINE_SUPPORTS_SAVE )
 SYST( 1981, galaxy2b, galaxy2,  0,      galaxy2b, galaxy2,  galaxy2_state,  empty_init, "Epoch", "Galaxy II (VFD Rev. B)", MACHINE_SUPPORTS_SAVE )

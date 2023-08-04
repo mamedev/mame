@@ -12292,6 +12292,11 @@ logicpr2:
 
 ;@s:sega/mdconsole.cpp
 
+genesis,sspinu:
+megadriv,sspin:
+megadrij,sspinj:
+@:maincpu,program,fff8da,1e,ff,c8
+
 genesis,tf3:
 @:maincpu,program,fff2ac,4,00,90
 

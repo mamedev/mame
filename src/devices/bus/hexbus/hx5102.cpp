@@ -133,6 +133,7 @@ hx5102_device::hx5102_device(const machine_config &mconfig, const char *tag, dev
 	m_motor_on(false),
 	m_mspeed_on(false),
 	m_pending_int(false),
+	m_pending_drq(false),
 	m_dcs(false),
 	m_dack(false),
 	m_dacken(false),

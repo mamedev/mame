@@ -34,9 +34,13 @@ public:
 	auto col_cb() { return m_col_cb.bind(); }
 	auto port_ab_r() { return m_port_ab_r.bind(); }
 	auto port_ab_w() { return m_port_ab_w.bind(); }
+	auto pcm_in() { return m_pcm_in.bind(); }
+	auto pcm_out() { return m_pcm_out.bind(); }
 
 	template <unsigned N> auto data_r() { static_assert(N < 8); return m_data_r[N].bind(); }
 	template <unsigned N> auto data_w() { static_assert(N < 8); return m_data_w[N].bind(); }
+
+	address_space &io_space() const { return m_v30->space(AS_IO); }
 
 	uint16_t io_r(offs_t offset, uint16_t mem_mask);
 	void io_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -47,6 +51,7 @@ public:
 
 	IRQ_CALLBACK_MEMBER(inta_cb);
 
+	void sds_int_w(int state);
 	void eint0_w(int state);
 	void eint1_w(int state);
 	void eint2_w(int state);
@@ -85,12 +90,14 @@ private:
 	emu_timer *m_frc2_timer;
 	emu_timer *m_watchdog_timer;
 	emu_timer *m_rtc_timer;
+	emu_timer *m_snd_timer;
 
 	TIMER_CALLBACK_MEMBER(tick);
 	TIMER_CALLBACK_MEMBER(frc1);
 	TIMER_CALLBACK_MEMBER(frc2);
 	TIMER_CALLBACK_MEMBER(watchdog);
 	TIMER_CALLBACK_MEMBER(rtc);
+	TIMER_CALLBACK_MEMBER(snd);
 
 	void update_interrupts();
 	bool is_protected(offs_t offset);
@@ -111,11 +118,12 @@ private:
 	uint16_t m_frc1_reload;
 	uint16_t m_frc2_count;
 	uint16_t m_frc2_reload;
+	int m_buz_toggle;
 	uint8_t m_watchdog_count;
 	bool m_a9_protection_mode;
 	uint32_t m_a9_protection_upper;
 	uint32_t m_a9_protection_lower;
-	uint8_t m_a9_port_ab_ddr;
+	uint16_t m_a9_port_ab_ddr;
 	uint8_t m_a9_port_c_ddr;
 	uint8_t m_a9_port_d_ddr;
 	uint8_t m_a9_psel_6000;
@@ -124,6 +132,7 @@ private:
 	uint8_t m_a9_psel_9000;
 	uint16_t m_a9_control_extra;
 	uint32_t m_rtc;
+	util::fifo<uint8_t, 16> m_snd_fifo;
 
 	uint8_t m_a9_serial_data;
 	uint8_t m_a9_serial_control;
@@ -133,6 +142,8 @@ private:
 	devcb_write8 m_col_cb;
 	devcb_read16 m_port_ab_r;
 	devcb_write16 m_port_ab_w;
+	devcb_read8 m_pcm_in;
+	devcb_write8 m_pcm_out;
 
 	devcb_read8::array<8> m_data_r;
 	devcb_write16::array<8> m_data_w;

@@ -175,7 +175,7 @@ function hiscore.startplugin()
 			  end
 			elseif string.find(line, rm_match) then --- match this game
 			  current_is_match = true;
-			elseif string.find(line, '^[a-z0-9_]+:') then --- some game
+			elseif string.find(line, '^[a-z0-9_,]+:') then --- some game
 			  if current_is_match and string.len(cluster) > 0 then
 				break; -- we're done
 			  end

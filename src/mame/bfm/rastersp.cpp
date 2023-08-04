@@ -186,7 +186,6 @@ private:
 	bitmap_ind16 m_update_bitmap;
 
 	uint8_t m_port2_data = 0;
-	uint32_t m_last_watchdog = 0;
 	int m_left_volume = 0;
 	int m_right_volume = 0;
 	uint8_t m_interrupt_mask = 0;
@@ -272,7 +271,6 @@ void rastersp_state::machine_start()
 	save_item(NAME(m_speedup_count));
 	save_item(NAME(m_tms_io_regs));
 	save_item(NAME(m_port2_data));
-	save_item(NAME(m_last_watchdog));
 	save_item(NAME(m_left_volume));
 	save_item(NAME(m_right_volume));
 	save_item(NAME(m_interrupt_mask));
@@ -299,7 +297,6 @@ void rastersp_state::machine_reset()
 	m_dlba = 0;
 	m_palette_number = 0;
 
-	m_last_watchdog = 0;
 	m_port2_data = 0;
 	m_left_volume = 0;
 	m_right_volume = 0;
@@ -763,13 +760,7 @@ void rastersp_state::port1_w(uint32_t data)
 		m_dsp->set_input_line(TMS3203X_IRQ2, CLEAR_LINE);
 	}
 
-	if (BIT(data, 7) != m_last_watchdog)
-	{
-		m_last_watchdog = BIT(data, 7);
-
-		if (BIT(data, 7))
-			m_watchdog->watchdog_reset();
-	}
+	m_watchdog->reset_line_w(BIT(data, 7));
 }
 
 
@@ -1617,4 +1608,5 @@ ROM_END
 
 GAME( 1994, rotr,    0,    rastersp, rotr,    rastersp_state, empty_init, ROT0, "BFM/Mirage", "Rise of the Robots (prototype)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1994, rotra,   rotr, rastersp, rotr,    rastersp_state, empty_init, ROT0, "BFM/Mirage", "Rise of the Robots (prototype, older)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1997, fbcrazy, 0,    fbcrazy,  fbcrazy, fbcrazy_state,  empty_init, ROT0, "BFM",        "Football Crazy (Video Quiz)",           MACHINE_SUPPORTS_SAVE )

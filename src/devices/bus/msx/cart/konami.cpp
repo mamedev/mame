@@ -139,8 +139,8 @@ std::error_condition msx_cart_konami_scc_device::initialize_cartridge(std::strin
 	m_scc_view[1].install_write_handler(0x9880, 0x9889, 0, 0x0710, 0, emu::rw_delegate(m_k051649, FUNC(k051649_device::k051649_frequency_w)));
 	m_scc_view[1].install_write_handler(0x988a, 0x988e, 0, 0x0710, 0, emu::rw_delegate(m_k051649, FUNC(k051649_device::k051649_volume_w)));
 	m_scc_view[1].install_write_handler(0x988f, 0x988f, 0, 0x0710, 0, emu::rw_delegate(m_k051649, FUNC(k051649_device::k051649_keyonoff_w)));
-	m_scc_view[1].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k051649, FUNC(k051649_device::k051649_test_r)));
-	m_scc_view[1].install_write_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k051649, FUNC(k051649_device::k051649_test_w)));
+	m_scc_view[1].install_read_handler(0x98e0, 0x98e0, 0, 0x071f, 0, emu::rw_delegate(m_k051649, FUNC(k051649_device::k051649_test_r)));
+	m_scc_view[1].install_write_handler(0x98e0, 0x98e0, 0, 0x071f, 0, emu::rw_delegate(m_k051649, FUNC(k051649_device::k051649_test_w)));
 	page(2)->install_read_bank(0x8000, 0x9fff, m_rombank[2]);
 	page(2)->install_write_handler(0x9000, 0x97ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_scc_device::bank_w<2>)));
 	page(2)->install_read_bank(0xa000, 0xbfff, m_rombank[3]);
@@ -506,7 +506,7 @@ std::error_condition msx_cart_konami_sound_snatcher_device::initialize_cartridge
 }
 
 
-// The SD Snatcher Sound cartrdige has 64KB RAM available by selecting ram banks 8-15
+// The SD Snatcher Sound cartridge has 64KB RAM available by selecting ram banks 8-15
 msx_cart_konami_sound_sdsnatcher_device::msx_cart_konami_sound_sdsnatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_cart_konami_sound_device(mconfig, MSX_CART_SOUND_SDSNATCHER, tag, owner, clock, 8, 15)
 {
@@ -664,5 +664,4 @@ void msx_cart_ec701_device::bank_w(u8 data)
 		m_view.select(2);
 		break;
 	}
-
 }

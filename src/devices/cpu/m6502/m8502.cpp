@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m8502.c
+    m8502.cpp
 
     6510 derivative, capable of running at 2MHz.
 

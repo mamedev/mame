@@ -11669,7 +11669,8 @@ ROM_END
 
   Even though it has a 60 Hz inputline, it doesn't use it to sync the clock.
   Instead, it relies on the MCU frequency, which is not very accurate when
-  using a simple R/C osc.
+  using a simple R/C osc. In 60 Hz mode, it expects a CPU clock of around
+  375 kHz, and in 50 Hz mode around 369 kHz.
 
   Micronta is not a company, but one of the Radio Shack house brands.
   Schematics are included in the manual, they also mention a CM72005 VSM.
@@ -11821,7 +11822,7 @@ INPUT_PORTS_END
 void vclock3_state::vclock3(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 320000); // approximation - RC osc. R=47K, C=47pF
+	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set(FUNC(vclock3_state::read_k));
 	m_maincpu->write_r().set(FUNC(vclock3_state::write_r));
 	m_maincpu->write_o().set(FUNC(vclock3_state::write_o));

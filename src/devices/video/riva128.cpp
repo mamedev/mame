@@ -194,9 +194,7 @@ void riva128_device::legacy_memory_map(address_map &map)
 
 void riva128_device::legacy_io_map(address_map &map)
 {
-	map(0x03b0, 0x03bf).rw(FUNC(riva128_device::vga_3b0_r), FUNC(riva128_device::vga_3b0_w));
-	map(0x03c0, 0x03cf).rw(FUNC(riva128_device::vga_3c0_r), FUNC(riva128_device::vga_3c0_w));
-	map(0x03d0, 0x03df).rw(FUNC(riva128_device::vga_3d0_r), FUNC(riva128_device::vga_3d0_w));
+	map(0, 0x02f).m(m_svga, FUNC(nvidia_nv3_vga_device::io_map));
 }
 
 uint8_t riva128_device::vram_r(offs_t offset)
@@ -209,85 +207,6 @@ void riva128_device::vram_w(offs_t offset, uint8_t data)
 	downcast<nvidia_nv3_vga_device *>(m_svga.target())->mem_w(offset, data);
 }
 
-u32 riva128_device::vga_3b0_r(offs_t offset, uint32_t mem_mask)
-{
-	uint32_t result = 0;
-	if (ACCESSING_BITS_0_7)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03b0_r(offset * 4 + 0) << 0;
-	if (ACCESSING_BITS_8_15)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03b0_r(offset * 4 + 1) << 8;
-	if (ACCESSING_BITS_16_23)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03b0_r(offset * 4 + 2) << 16;
-	if (ACCESSING_BITS_24_31)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03b0_r(offset * 4 + 3) << 24;
-	return result;
-}
-
-void riva128_device::vga_3b0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03b0_w(offset * 4 + 0, data >> 0);
-	if (ACCESSING_BITS_8_15)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03b0_w(offset * 4 + 1, data >> 8);
-	if (ACCESSING_BITS_16_23)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03b0_w(offset * 4 + 2, data >> 16);
-	if (ACCESSING_BITS_24_31)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03b0_w(offset * 4 + 3, data >> 24);
-}
-
-
-u32 riva128_device::vga_3c0_r(offs_t offset, uint32_t mem_mask)
-{
-	uint32_t result = 0;
-	if (ACCESSING_BITS_0_7)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03c0_r(offset * 4 + 0) << 0;
-	if (ACCESSING_BITS_8_15)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03c0_r(offset * 4 + 1) << 8;
-	if (ACCESSING_BITS_16_23)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03c0_r(offset * 4 + 2) << 16;
-	if (ACCESSING_BITS_24_31)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03c0_r(offset * 4 + 3) << 24;
-	return result;
-}
-
-void riva128_device::vga_3c0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03c0_w(offset * 4 + 0, data >> 0);
-	if (ACCESSING_BITS_8_15)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03c0_w(offset * 4 + 1, data >> 8);
-	if (ACCESSING_BITS_16_23)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03c0_w(offset * 4 + 2, data >> 16);
-	if (ACCESSING_BITS_24_31)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03c0_w(offset * 4 + 3, data >> 24);
-}
-
-u32 riva128_device::vga_3d0_r(offs_t offset, uint32_t mem_mask)
-{
-	uint32_t result = 0;
-	if (ACCESSING_BITS_0_7)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03d0_r(offset * 4 + 0) << 0;
-	if (ACCESSING_BITS_8_15)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03d0_r(offset * 4 + 1) << 8;
-	if (ACCESSING_BITS_16_23)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03d0_r(offset * 4 + 2) << 16;
-	if (ACCESSING_BITS_24_31)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03d0_r(offset * 4 + 3) << 24;
-	return result;
-}
-
-void riva128_device::vga_3d0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03d0_w(offset * 4 + 0, data >> 0);
-	if (ACCESSING_BITS_8_15)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03d0_w(offset * 4 + 1, data >> 8);
-	if (ACCESSING_BITS_16_23)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03d0_w(offset * 4 + 2, data >> 16);
-	if (ACCESSING_BITS_24_31)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03d0_w(offset * 4 + 3, data >> 24);
-}
-
 void riva128_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
@@ -295,9 +214,7 @@ void riva128_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 	{
 		memory_space->install_readwrite_handler(0xa0000, 0xbffff, read8sm_delegate(*this, FUNC(riva128_device::vram_r)), write8sm_delegate(*this, FUNC(riva128_device::vram_w)));
 
-		io_space->install_readwrite_handler(0x3b0, 0x3bf, read32s_delegate(*this, FUNC(riva128_device::vga_3b0_r)), write32s_delegate(*this, FUNC(riva128_device::vga_3b0_w)));
-		io_space->install_readwrite_handler(0x3c0, 0x3cf, read32s_delegate(*this, FUNC(riva128_device::vga_3c0_r)), write32s_delegate(*this, FUNC(riva128_device::vga_3c0_w)));
-		io_space->install_readwrite_handler(0x3d0, 0x3df, read32s_delegate(*this, FUNC(riva128_device::vga_3d0_r)), write32s_delegate(*this, FUNC(riva128_device::vga_3d0_w)));
+		io_space->install_device(0x03b0, 0x03df, *this, &riva128_device::legacy_io_map);
 		//memory_space->install_rom(0xc0000, 0xcffff, (void *)expansion_rom);
 	}
 }

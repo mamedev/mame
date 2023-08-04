@@ -24,13 +24,19 @@ public:
 	{
 	}
 
+	// original h19
 	void h19(machine_config &config);
+
+	// replacement ROMs
 	void h19_superh19(machine_config &config);
 	void h19_watzh19(machine_config &config);
 	void h19_ultrah19(machine_config &config);
 
-private:
+	// add-on graphics boards
+	void h19_gp19(machine_config &config);
 
+
+private:
 	required_device<heath_tlb_device> m_tlb;
 
 };
@@ -55,6 +61,11 @@ void h19_state::h19_ultrah19(machine_config &config)
 	HEATH_ULTRA(config, m_tlb);
 }
 
+void h19_state::h19_gp19(machine_config &config)
+{
+	HEATH_GP19(config, m_tlb);
+}
+
 // ROM definition
 ROM_START( h19 )
 ROM_END
@@ -67,6 +78,10 @@ ROM_END
 
 ROM_START( ultra19 )
 ROM_END
+
+ROM_START( gp19 )
+ROM_END
+
 } // anonymous namespace
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE       INPUT   CLASS      INIT        COMPANY          FULLNAME                         FLAGS
@@ -77,3 +92,5 @@ COMP( 1982, super19, h19,    0,      h19_superh19,    0,   h19_state, empty_init
 COMP( 1982, watz19,  h19,    0,      h19_watzh19,     0,   h19_state, empty_init, "Heath Company", "Heathkit H-19 w/ Watzman ROM",  MACHINE_SUPPORTS_SAVE )
 // ULTRA ROM - Software Wizardry, Inc., (c) 1983 William G. Parrott, III
 COMP( 1983, ultra19, h19,    0,      h19_ultrah19,    0,   h19_state, empty_init, "Heath Company", "Heathkit H-19 w/ ULTRA ROM",    MACHINE_SUPPORTS_SAVE )
+// GP-19 - Northwest Digital Systems, (c) 1983
+COMP( 1983, gp19,    h19,    0,      h19_gp19,        0,   h19_state, empty_init, "Heath Company", "Heathkit H-19 w/ GP-19",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -8,14 +8,15 @@
 
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/nubus.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/6522via.h"
-#include "machine/8530scc.h"
 #include "machine/mv_sonora.h"
 #include "machine/ncr53c90.h"
 #include "machine/ram.h"
 #include "machine/swim3.h"
 #include "machine/timer.h"
+#include "machine/z80scc.h"
 #include "sound/awacs.h"
 
 #include "softlist_dev.h"
@@ -45,7 +46,7 @@ private:
 	required_device<cuda_device> m_cuda;
 	required_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
-	required_device<scc8530_legacy_device> m_scc;
+	required_device<z80scc_device> m_scc;
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<ncr53c94_device> m_ncr53c94;
 	required_device<swim3_device> m_fdc;
@@ -529,12 +530,12 @@ void macpdm_state::via2_sifr_w(uint8_t data)
 
 uint8_t macpdm_state::scc_r(offs_t offset)
 {
-	return m_scc->reg_r(offset >> 1);
+	return m_scc->dc_ab_r(offset >> 1);
 }
 
 void macpdm_state::scc_w(offs_t offset, uint8_t data)
 {
-	m_scc->reg_w(offset, data);
+	m_scc->dc_ab_w(offset, data);
 }
 
 uint8_t macpdm_state::fdc_r(offs_t offset)
@@ -1111,6 +1112,7 @@ void macpdm_state::macpdm(machine_config &config)
 																							 ctrl.irq_handler_cb().set(*this, FUNC(macpdm_state::scsi_irq));
 																						 });
 
+	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
@@ -1126,8 +1128,22 @@ void macpdm_state::macpdm(machine_config &config)
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
 
 	// pclk is maincpu:60MHz/4, RTxCA is IO_CLOCK*2/17 or GPI input, RTxCB is IO_CLOCK*2/17
-	SCC8530(config, m_scc, 60000000/4);
-	m_scc->intrq_callback().set(FUNC(macpdm_state::scc_irq));
+	// IO_CLOCK*2/17 is 3'686'400
+	SCC85C30(config, m_scc, 60000000/4);
+	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
+	m_scc->out_int_callback().set(FUNC(macpdm_state::scc_irq));
+	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
+
+	rs232_port_device &rs232a(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
+
+	rs232_port_device &rs232b(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
 
 	R65NC22(config, m_via1, IO_CLOCK/40);
 	m_via1->readpa_handler().set(FUNC(macpdm_state::via1_in_a));

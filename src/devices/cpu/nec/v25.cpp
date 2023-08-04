@@ -630,7 +630,7 @@ void v25_common_device::device_start()
 		m_program->cache(m_cache16);
 		m_dr8 = [this](offs_t address) -> u8 { return m_cache16.read_byte(address); };
 	}
-	m_data = &space(AS_DATA);
+	space(AS_DATA).specific(m_data);
 	m_io = &space(AS_IO);
 
 	state_add( V25_PC,  "PC", m_ip).formatstr("%04X");

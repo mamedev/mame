@@ -100,7 +100,7 @@ quadro_device::quadro_device(const machine_config &mconfig, const char *tag, dev
 
 ROM_START( quadro )
 	ROM_REGION32_LE( 0x10000, "vga_rom", ROMREGION_ERASEFF )
-	// NB: difference between these two is type of RAM used (SDR vs. DDR) and 
+	// NB: difference between these two is type of RAM used (SDR vs. DDR) and
 	//     interface type (AGP x4 vs. Pro)
 	ROM_SYSTEM_BIOS( 0, "elsa",    "Elsa GLoria II (Ver 7.02.02)" )
 	ROMX_LOAD( "elsagloriaii.bin", 0x000000, 0x00ac00, CRC(78a6fbad) SHA1(5517fefc314bd34de7839fb8077aeb252689595d), ROM_BIOS(0) )

@@ -673,8 +673,7 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 			/*
 			    0x80 = WDTCLK
 			*/
-			if (data & 0x80)
-				m_watchdog->watchdog_reset();
+			m_watchdog->reset_line_w(BIT(data, 7));
 			break;
 
 		case 7: // CG Control Register

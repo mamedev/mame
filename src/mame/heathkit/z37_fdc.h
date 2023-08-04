@@ -22,7 +22,7 @@ public:
 
 	void write(offs_t reg, u8 val);
 	u8   read(offs_t reg);
-	auto irq_cb() { return m_fd_irq_cb.bind(); }
+	auto irq_cb() { return m_irq_cb.bind(); }
 	auto drq_cb() { return m_drq_cb.bind(); }
 
 	auto block_interrupt_cb() { return m_block_interrupt_cb.bind(); }
@@ -43,18 +43,18 @@ protected:
 	void data_w(u8 val);
 	u8   data_r();
 
-	void set_irq(u8 data);
-	void set_drq(u8 data);
+	void set_irq(int state);
+	void set_drq(int state);
 
 private:
-	devcb_write_line m_fd_irq_cb;
+	devcb_write_line m_irq_cb;
 	devcb_write_line m_drq_cb;
 	devcb_write_line m_block_interrupt_cb;
 
 	required_device<fd1797_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppies;
 
-	bool m_intrq_allowed;
+	bool m_irq_allowed;
 	bool m_drq_allowed;
 	bool m_access_track_sector;
 

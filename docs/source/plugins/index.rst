@@ -14,7 +14,7 @@ Introduction
 MAME supports plugins that can provide additional functionality.  Plugins
 have been written to communicate with external programs, play games
 automatically, display internal game structures like hitboxes, provide alternate
-user interfaces, and automatically test emulation.  See :ref:`luaengine` for
+user interfaces, and automatically test emulation.  See :ref:`luascript` for
 more information about MAME’s Lua API.
 
 
