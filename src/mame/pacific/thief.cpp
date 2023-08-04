@@ -959,7 +959,7 @@ ROM_START( natodef )
 ROM_END
 
 ROM_START( natodefa )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // Z80 code
+	ROM_REGION( 0x10000, "maincpu", 0 ) // Z80 code - PCB 'ROM' locations silkscreened as 0 through 15
 	ROM_LOAD( "p.n.m._inc._nato_062182_c317h_cpu_0.n1",  0x0000, 0x1000, CRC(8397c787) SHA1(5957613f1ace7dc4612f28f6fba3a7374be905ac) ) // C 1982   P.N.M.  Inc.  NATO  062182  C317H  CPU# 0
 	ROM_LOAD( "p.n.m._inc._nato_062182_21efh_cpu_2.l1",  0x1000, 0x1000, CRC(8cfbf26f) SHA1(a15f0d5d82cd96b80ee91dc91858b660c5895f34) ) // C 1982   P.N.M.  Inc.  NATO  062182  21EFH  CPU# 2
 	ROM_LOAD( "p.n.m._inc._nato_062182_0a9eh_cpu_4.i1",  0x2000, 0x1000, CRC(b4c90fb2) SHA1(3ff4691415433863bfe74d51b9f3aa428f3bf88f) ) // C 1982   P.N.M.  Inc.  NATO  062182  0A9EH  CPU# 4
@@ -978,10 +978,10 @@ ROM_START( natodefa )
 	ROM_REGION( 0x6000, "blitter", 0 ) // image ROMs for coprocessor - same ROMs as natodef, but in a different oder to give different mazes
 	ROM_LOAD16_BYTE( "p.n.m._inc._nato_062182_7058h_cop_d4.d4", 0x0001, 0x1000, CRC(39a868f8) SHA1(870795f18cd8f831b714b809a380e30b5d323a5f) ) // C 1982   P.N.M.  Inc.  NATO  062182  7058H  COP#D4 - PCB silkscreened  O4
 	ROM_LOAD16_BYTE( "p.n.m._inc._nato_062182_f67ah_cop_h4.h4", 0x0000, 0x1000, CRC(b6d1623d) SHA1(0aa15db0e1459a6cc7d2a5bc8e588fd514b71d85) ) // C 1982   P.N.M.  Inc.  NATO  062182  F67AH  COP#H4 - PCB silkscreened  E1
-	ROM_LOAD16_BYTE( "p.n.m._inc._nato_060982_59aah_cop_c4.c4", 0x2001, 0x1000, CRC(77cc9cfd) SHA1(1bbed3cb834b844fb2d9d48a3a142edaeb33ccc6) ) // C 1982   P.N.M.  Inc.  NATO  060982  59AAH  COP#C4 - PCB silkscreened  O3
-	ROM_LOAD16_BYTE( "p.n.m._inc._nato_060982_e987h_cop_j4.j4", 0x2000, 0x1000, CRC(5302410d) SHA1(e166c151d948f474c134802e3f891982bf370596) ) // C 1982   P.N.M.  Inc.  NATO  060982  E987H  COP#J4 - PCB silkscreened  E2
-	ROM_LOAD16_BYTE( "p.n.m._inc._nato_060982_71fch_cop_b4.b4", 0x4001, 0x1000, CRC(b217909a) SHA1(a26eb5bf2c92d79a75376deb6278710426b34cc5) ) // C 1982   P.N.M.  Inc.  NATO  060982  71FCH  COP#B4 - PCB silkscreened  O2
-	ROM_LOAD16_BYTE( "p.n.m._inc._nato_060982_629ch_cop_k4.k4", 0x4000, 0x1000, CRC(886c3f05) SHA1(306c8621455d2d6b7b2f545500b27e56a7159a1b) ) // C 1982   P.N.M.  Inc.  NATO  060982  629CH  COP#K4 - PCB silkscreened  E3
+	ROM_LOAD16_BYTE( "p.n.m._inc._nato_060982_71fch_cop_b4.b4", 0x2001, 0x1000, CRC(b217909a) SHA1(a26eb5bf2c92d79a75376deb6278710426b34cc5) ) // C 1982   P.N.M.  Inc.  NATO  060982  71FCH  COP#B4 - PCB silkscreened  O2
+	ROM_LOAD16_BYTE( "p.n.m._inc._nato_060982_629ch_cop_k4.k4", 0x2000, 0x1000, CRC(886c3f05) SHA1(306c8621455d2d6b7b2f545500b27e56a7159a1b) ) // C 1982   P.N.M.  Inc.  NATO  060982  629CH  COP#K4 - PCB silkscreened  E3
+	ROM_LOAD16_BYTE( "p.n.m._inc._nato_060982_59aah_cop_c4.c4", 0x4001, 0x1000, CRC(77cc9cfd) SHA1(1bbed3cb834b844fb2d9d48a3a142edaeb33ccc6) ) // C 1982   P.N.M.  Inc.  NATO  060982  59AAH  COP#C4 - PCB silkscreened  O3
+	ROM_LOAD16_BYTE( "p.n.m._inc._nato_060982_e987h_cop_j4.j4", 0x4000, 0x1000, CRC(5302410d) SHA1(e166c151d948f474c134802e3f891982bf370596) ) // C 1982   P.N.M.  Inc.  NATO  060982  E987H  COP#J4 - PCB silkscreened  E2
 	// PCB locations silkscreened as O1 and E4 are unpopulated
 ROM_END
 
