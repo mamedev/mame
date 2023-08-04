@@ -63,7 +63,7 @@ void sis630_svga_device::io_3cx_map(address_map &map)
 			return svga.bank_r;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			svga.bank_r = data; 
+			svga.bank_r = data;
 		})
 	);
 	map(0x0d, 0x0d).lrw8(
@@ -92,8 +92,8 @@ void sis630_svga_device::crtc_map(address_map &map)
 	);
 	// TODO: very preliminary, undocumented stuff
 	map(0x30, 0xff).lrw8(
-		NAME([this] (offs_t offset) { 
-			return vga.crtc.data[offset]; 
+		NAME([this] (offs_t offset) {
+			return vga.crtc.data[offset];
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			// TODO: if one of these is 0xff then it enables a single port transfer to $b8000

@@ -1557,10 +1557,19 @@ if opt_tool(CPUS, "MELPS4") then
 end
 
 --------------------------------------------------
+-- Mitsubishi M16C, disassembler only
+--------------------------------------------------
+
+if opt_tool(CPUS, "M16C") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m16c/m16cdasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m16c/m16cdasm.h")
+end
+
+--------------------------------------------------
 -- Mitsubishi M32C, disassembler only
 --------------------------------------------------
 
-if opt_tool(CPUS, "M23C") then
+if opt_tool(CPUS, "M32C") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m32c/m32cdasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m32c/m32cdasm.h")
 end
@@ -1600,6 +1609,7 @@ end
 --@src/devices/cpu/m6502/m5074x.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6500_1.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6502.h,CPUS["M6502"] = true
+--@src/devices/cpu/m6502/m6503.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6504.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6507.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6509.h,CPUS["M6502"] = true
@@ -1645,6 +1655,8 @@ if CPUS["M6502"] then
 		MAME_DIR .. "src/devices/cpu/m6502/m6502.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m6502mcu.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m6502mcu.ipp",
+		MAME_DIR .. "src/devices/cpu/m6502/m6503.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/m6503.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m6504.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m6504.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m6507.cpp",

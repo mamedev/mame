@@ -53,13 +53,12 @@ Keyboard: 23 keys and SST switch
     SST  single step slide switch
 
 Paste test:
-    N-0100=11^22^33^44^55^66^77^88^99^-0100=
+    R-0100=11^22^33^44^55^66^77^88^99^-0100=
     Press UP to verify data.
 
 
 TODO:
 - LEDs should be dark at startup (RS key to activate)
-- hook up Single Step dip switch
 - slots for expansion & application ports
 - add TTY support
 
@@ -70,7 +69,7 @@ TODO:
 #include "cpu/m6502/m6502.h"
 #include "formats/kim1_cas.h"
 #include "imagedev/cassette.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "machine/timer.h"
 #include "video/pwm.h"
 
@@ -108,126 +107,105 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	uint8_t kim1_u2_read_a();
-	void kim1_u2_write_a(uint8_t data);
-	uint8_t kim1_u2_read_b();
-	void kim1_u2_write_b(uint8_t data);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(kim1_cassette_input);
-
-	void mem_map(address_map &map);
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device_array<mos6530_new_device, 2> m_miot;
+	required_device<m6502_device> m_maincpu;
+	required_device_array<mos6530_device, 2> m_miot;
 	required_device<pwm_display_device> m_digit_pwm;
 	required_device<cassette_image_device> m_cass;
-
 	required_ioport_array<3> m_row;
 	required_ioport m_special;
 
+	void mem_map(address_map &map);
+	void sync_map(address_map &map);
+
+	uint8_t sync_r(offs_t offset);
+	void sync_w(int state);
+
+	uint8_t u2_read_a();
+	void u2_write_a(uint8_t data);
+	uint8_t u2_read_b();
+	void u2_write_b(uint8_t data);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(cassette_input);
+
+	int m_sync_state = 0;
+	bool m_k7 = false;
 	uint8_t m_u2_port_b = 0;
 	uint8_t m_311_output = 0;
 	uint32_t m_cassette_high_count = 0;
 };
 
-
-//**************************************************************************
-//  ADDRESS MAPS
-//**************************************************************************
-
-void kim1_state::mem_map(address_map &map)
+void kim1_state::machine_start()
 {
-	map.global_mask(0x1fff);
-	map(0x0000, 0x03ff).ram();
-	map(0x1700, 0x170f).mirror(0x0030).m(m_miot[1], FUNC(mos6530_new_device::io_map));
-	map(0x1740, 0x174f).mirror(0x0030).m(m_miot[0], FUNC(mos6530_new_device::io_map));
-	map(0x1780, 0x17bf).m(m_miot[1], FUNC(mos6530_new_device::ram_map));
-	map(0x17c0, 0x17ff).m(m_miot[0], FUNC(mos6530_new_device::ram_map));
-	map(0x1800, 0x1bff).m(m_miot[1], FUNC(mos6530_new_device::rom_map));
-	map(0x1c00, 0x1fff).m(m_miot[0], FUNC(mos6530_new_device::rom_map));
+	// Register for save states
+	save_item(NAME(m_sync_state));
+	save_item(NAME(m_k7));
+	save_item(NAME(m_u2_port_b));
+	save_item(NAME(m_311_output));
+	save_item(NAME(m_cassette_high_count));
 }
+
+void kim1_state::machine_reset()
+{
+	m_311_output = 0;
+	m_cassette_high_count = 0;
+}
+
+
+//**************************************************************************
+//  I/O
+//**************************************************************************
 
 INPUT_CHANGED_MEMBER(kim1_state::trigger_reset)
 {
-	// RS key input
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	// RS key triggers system reset via 556 timer
+	if (newval)
+		machine().schedule_soft_reset();
 }
 
 INPUT_CHANGED_MEMBER(kim1_state::trigger_nmi)
 {
-	// ST key input
-	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	// ST key triggers NMI via 556 timer
+	if (newval)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-
-//**************************************************************************
-//  INPUT PORTS
-//**************************************************************************
-
-static INPUT_PORTS_START( kim1 )
-	PORT_START("ROW0")
-	PORT_BIT( 0x80, 0x00, IPT_UNUSED )
-	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("0") PORT_CODE(KEYCODE_0)      PORT_CHAR('0') PORT_CODE(KEYCODE_0_PAD)
-	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("1") PORT_CODE(KEYCODE_1)      PORT_CHAR('1') PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x10, 0x10, IPT_KEYBOARD ) PORT_NAME("2") PORT_CODE(KEYCODE_2)      PORT_CHAR('2') PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT( 0x08, 0x08, IPT_KEYBOARD ) PORT_NAME("3") PORT_CODE(KEYCODE_3)      PORT_CHAR('3') PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT( 0x04, 0x04, IPT_KEYBOARD ) PORT_NAME("4") PORT_CODE(KEYCODE_4)      PORT_CHAR('4') PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT( 0x02, 0x02, IPT_KEYBOARD ) PORT_NAME("5") PORT_CODE(KEYCODE_5)      PORT_CHAR('5') PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT( 0x01, 0x01, IPT_KEYBOARD ) PORT_NAME("6") PORT_CODE(KEYCODE_6)      PORT_CHAR('6') PORT_CODE(KEYCODE_6_PAD)
-
-	PORT_START("ROW1")
-	PORT_BIT( 0x80, 0x00, IPT_UNUSED )
-	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("7") PORT_CODE(KEYCODE_7)      PORT_CHAR('7') PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("8") PORT_CODE(KEYCODE_8)      PORT_CHAR('8') PORT_CODE(KEYCODE_8_PAD)
-	PORT_BIT( 0x10, 0x10, IPT_KEYBOARD ) PORT_NAME("9") PORT_CODE(KEYCODE_9)      PORT_CHAR('9') PORT_CODE(KEYCODE_9_PAD)
-	PORT_BIT( 0x08, 0x08, IPT_KEYBOARD ) PORT_NAME("A") PORT_CODE(KEYCODE_A)      PORT_CHAR('A')
-	PORT_BIT( 0x04, 0x04, IPT_KEYBOARD ) PORT_NAME("B") PORT_CODE(KEYCODE_B)      PORT_CHAR('B')
-	PORT_BIT( 0x02, 0x02, IPT_KEYBOARD ) PORT_NAME("C") PORT_CODE(KEYCODE_C)      PORT_CHAR('C')
-	PORT_BIT( 0x01, 0x01, IPT_KEYBOARD ) PORT_NAME("D") PORT_CODE(KEYCODE_D)      PORT_CHAR('D')
-
-	PORT_START("ROW2")
-	PORT_BIT( 0x80, 0x00, IPT_UNUSED )
-	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("E")  PORT_CODE(KEYCODE_E)      PORT_CHAR('E')
-	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("F")  PORT_CODE(KEYCODE_F)      PORT_CHAR('F')
-	PORT_BIT( 0x10, 0x10, IPT_KEYBOARD ) PORT_NAME("AD") PORT_CODE(KEYCODE_MINUS)  PORT_CHAR('-') PORT_CODE(KEYCODE_MINUS_PAD)
-	PORT_BIT( 0x08, 0x08, IPT_KEYBOARD ) PORT_NAME("DA") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=')
-	PORT_BIT( 0x04, 0x04, IPT_KEYBOARD ) PORT_NAME("+")  PORT_CODE(KEYCODE_UP)     PORT_CHAR('^') PORT_CODE(KEYCODE_PLUS_PAD)
-	PORT_BIT( 0x02, 0x02, IPT_KEYBOARD ) PORT_NAME("GO") PORT_CODE(KEYCODE_ENTER)  PORT_CHAR('X') PORT_CODE(KEYCODE_ENTER_PAD)
-	PORT_BIT( 0x01, 0x01, IPT_KEYBOARD ) PORT_NAME("PC") PORT_CODE(KEYCODE_F6)
-
-	PORT_START("SPECIAL")
-	PORT_BIT( 0x80, 0x00, IPT_UNUSED )
-	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("sw1: ST") PORT_CODE(KEYCODE_F7) PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_nmi, 0) PORT_CHAR('S')
-	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("sw2: RS") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_reset, 0) PORT_CHAR('N')
-	PORT_DIPNAME(0x10, 0x10, "sw3: SS")                       PORT_CODE(KEYCODE_NUMLOCK) PORT_TOGGLE
-	PORT_DIPSETTING( 0x00, "single step")
-	PORT_DIPSETTING( 0x10, "run")
-	PORT_BIT( 0x08, 0x00, IPT_UNUSED )
-	PORT_BIT( 0x04, 0x00, IPT_UNUSED )
-	PORT_BIT( 0x02, 0x00, IPT_UNUSED )
-	PORT_BIT( 0x01, 0x00, IPT_UNUSED )
-INPUT_PORTS_END
-
-uint8_t kim1_state::kim1_u2_read_a()
+uint8_t kim1_state::sync_r(offs_t offset)
 {
-	uint8_t data = 0xff;
+	// A10-A12 to 74145
+	if (!machine().side_effects_disabled())
+		m_k7 = bool(~offset & 0x1c00);
+
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
+void kim1_state::sync_w(int state)
+{
+	// Signal NMI at falling edge of SYNC when SST is enabled and K7 line is high
+	if (m_sync_state && !state && m_k7 && BIT(m_special->read(), 2))
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+
+	m_sync_state = state;
+}
+
+uint8_t kim1_state::u2_read_a()
+{
+	uint8_t data = 0x7f;
 
 	// Read from keyboard
 	offs_t const sel = (m_u2_port_b >> 1) & 0x0f;
 	if (3U > sel)
-		data = m_row[sel]->read();
+		data = m_row[sel]->read() & 0x7f;
 
-	return data;
+	return data | 0x80;
 }
 
-void kim1_state::kim1_u2_write_a(uint8_t data)
+void kim1_state::u2_write_a(uint8_t data)
 {
 	// Write to 7-segment LEDs
 	m_digit_pwm->write_mx(data & 0x7f);
 }
 
-uint8_t kim1_state::kim1_u2_read_b()
+uint8_t kim1_state::u2_read_b()
 {
 	if (m_u2_port_b & 0x20)
 		return 0xff;
@@ -236,7 +214,7 @@ uint8_t kim1_state::kim1_u2_read_b()
 	return 0x7f | (m_311_output ^ 0x80);
 }
 
-void kim1_state::kim1_u2_write_b(uint8_t data)
+void kim1_state::u2_write_b(uint8_t data)
 {
 	m_u2_port_b = data;
 
@@ -248,7 +226,7 @@ void kim1_state::kim1_u2_write_b(uint8_t data)
 		m_cass->output((data & 0x80) ? -1.0 : 1.0);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_cassette_input)
+TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::cassette_input)
 {
 	double tap_val = m_cass->input();
 
@@ -265,19 +243,66 @@ TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_cassette_input)
 		m_cassette_high_count++;
 }
 
-void kim1_state::machine_start()
+
+//**************************************************************************
+//  ADDRESS MAPS
+//**************************************************************************
+
+void kim1_state::mem_map(address_map &map)
 {
-	// Register for save states
-	save_item(NAME(m_u2_port_b));
-	save_item(NAME(m_311_output));
-	save_item(NAME(m_cassette_high_count));
+	map.global_mask(0x1fff);
+	map(0x0000, 0x03ff).ram();
+	map(0x1700, 0x170f).mirror(0x0030).m(m_miot[1], FUNC(mos6530_device::io_map));
+	map(0x1740, 0x174f).mirror(0x0030).m(m_miot[0], FUNC(mos6530_device::io_map));
+	map(0x1780, 0x17bf).m(m_miot[1], FUNC(mos6530_device::ram_map));
+	map(0x17c0, 0x17ff).m(m_miot[0], FUNC(mos6530_device::ram_map));
+	map(0x1800, 0x1bff).m(m_miot[1], FUNC(mos6530_device::rom_map));
+	map(0x1c00, 0x1fff).m(m_miot[0], FUNC(mos6530_device::rom_map));
 }
 
-void kim1_state::machine_reset()
+void kim1_state::sync_map(address_map &map)
 {
-	m_311_output = 0;
-	m_cassette_high_count = 0;
+	map(0x0000, 0xffff).r(FUNC(kim1_state::sync_r));
 }
+
+
+//**************************************************************************
+//  INPUT PORTS
+//**************************************************************************
+
+static INPUT_PORTS_START( kim1 )
+	PORT_START("ROW0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('6')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('5')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('4')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CHAR('3')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('2')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0')
+
+	PORT_START("ROW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR('9')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR('8')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('7')
+
+	PORT_START("ROW2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_NAME("PC")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_NAME("GO")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('^') PORT_NAME("+")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_NAME("DA")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR('-') PORT_NAME("AD")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+
+	PORT_START("SPECIAL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_NAME("ST") PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_nmi, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_NAME("RS") PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_reset, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_NAME("SST")
+INPUT_PORTS_END
 
 
 //**************************************************************************
@@ -289,6 +314,8 @@ void kim1_state::kim1(machine_config &config)
 	// basic machine hardware
 	M6502(config, m_maincpu, 1_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kim1_state::mem_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &kim1_state::sync_map);
+	m_maincpu->sync_cb().set(FUNC(kim1_state::sync_w));
 
 	// video hardware
 	PWM_DISPLAY(config, m_digit_pwm).set_size(6, 7);
@@ -296,13 +323,13 @@ void kim1_state::kim1(machine_config &config)
 	config.set_default_layout(layout_kim1);
 
 	// devices
-	MOS6530_NEW(config, m_miot[0], 1_MHz_XTAL); // u2
-	m_miot[0]->pa_rd_callback().set(FUNC(kim1_state::kim1_u2_read_a));
-	m_miot[0]->pa_wr_callback().set(FUNC(kim1_state::kim1_u2_write_a));
-	m_miot[0]->pb_rd_callback().set(FUNC(kim1_state::kim1_u2_read_b));
-	m_miot[0]->pb_wr_callback().set(FUNC(kim1_state::kim1_u2_write_b));
+	MOS6530(config, m_miot[0], 1_MHz_XTAL); // U2
+	m_miot[0]->pa_rd_callback().set(FUNC(kim1_state::u2_read_a));
+	m_miot[0]->pa_wr_callback().set(FUNC(kim1_state::u2_write_a));
+	m_miot[0]->pb_rd_callback().set(FUNC(kim1_state::u2_read_b));
+	m_miot[0]->pb_wr_callback().set(FUNC(kim1_state::u2_write_b));
 
-	MOS6530_NEW(config, m_miot[1], 1_MHz_XTAL); // u3
+	MOS6530(config, m_miot[1], 1_MHz_XTAL); // U3
 
 	CASSETTE(config, m_cass);
 	m_cass->set_formats(kim1_cassette_formats);
@@ -312,7 +339,7 @@ void kim1_state::kim1(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	TIMER(config, "cassette_timer").configure_periodic(FUNC(kim1_state::kim1_cassette_input), attotime::from_hz(44100));
+	TIMER(config, "cassette_timer").configure_periodic(FUNC(kim1_state::cassette_input), attotime::from_hz(44100));
 
 	// software list
 	SOFTWARE_LIST(config, "cass_list").set_original("kim1_cass");

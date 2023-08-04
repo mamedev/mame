@@ -1013,7 +1013,7 @@ void konmedal_state::mario_scrollhack_w(uint8_t data)
 void konmedal_state::shuriboy(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(24'000'000) / 3); // divisor unknown
+	Z80(config, m_maincpu, XTAL(24'000'000) / 4); // divisor unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::shuriboy_main);
 	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal_state::shuri_scanline), "screen", 0, 1);
 
@@ -1031,8 +1031,8 @@ void konmedal_state::shuriboy(machine_config &config)
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xRGB_444, 256); // not verified
-//  m_palette->enable_shadows();
-//  m_palette->enable_hilights();
+	//m_palette->enable_shadows();
+	//m_palette->enable_hilights();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);

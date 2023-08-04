@@ -1861,6 +1861,29 @@ static INPUT_PORTS_START( micrombc )
 	PORT_BIT( 0x0000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( wasafari )
+	PORT_INCLUDE( stv )
+
+	PORT_MODIFY("PORTA")
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTB")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTC")
+	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTE")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTF")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTG")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Winch")
+INPUT_PORTS_END
+
+
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
@@ -1899,32 +1922,34 @@ ROM_LOAD16_WORD_SWAP_BIOS( x, "saturn.bin", 0x000000, 0x080000, CRC(653ff2d8) SH
 
 #define STV_BIOS \
 	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* SH2 code */ \
-	ROM_SYSTEM_BIOS( 0,  "jp",    "EPR-20091 (Japan 97/08/21)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "epr-20091.ic8",   0x000000, 0x080000, CRC(59ed40f4) SHA1(eff0f54c70bce05ff3a289bf30b1027e1c8cd117) ) \
-	ROM_SYSTEM_BIOS( 1,  "jp1",   "EPR-19730 (Japan 97/02/17)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 1,  "epr-19730.ic8",   0x000000, 0x080000, CRC(d0e0889d) SHA1(fae53107c894e0c41c49e191dbe706c9cd6e50bd) ) \
-	ROM_SYSTEM_BIOS( 2,  "jp2",   "EPR-17951A (Japan 95/04/25)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 2,  "epr-17951a.ic8",  0x000000, 0x080000, CRC(2672f9d8) SHA1(63cf4a6432f6c87952f9cf3ab0f977aed2367303) ) \
-	ROM_SYSTEM_BIOS( 3,  "jp3",   "EPR-17740A (Japan 95/02/20)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 3,  "epr-17740a.ic8",  0x000000, 0x080000, CRC(3e23c81f) SHA1(f9b282fd27693e9891843597b2e1823da3d23c7b) ) \
-	ROM_SYSTEM_BIOS( 4,  "jp4",   "EPR-17740 (Japan 95/01/31)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 4,  "epr-17740.ic8",   0x000000, 0x080000, CRC(5c5aa63d) SHA1(06860d96923b81afbc21e0ad32ee19487d8ff6e7) ) \
-	ROM_SYSTEM_BIOS( 5,  "euro",  "EPR-17954A (Europe 95/04/25)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 5,  "epr-17954a.ic8",  0x000000, 0x080000, CRC(f7722da3) SHA1(af79cff317e5b57d49e463af16a9f616ed1eee08) ) \
-	ROM_SYSTEM_BIOS( 6,  "us",    "EPR-17952A (USA 95/04/25)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 6,  "epr-17952a.ic8",  0x000000, 0x080000, CRC(d1be2adf) SHA1(eaf1c3e5d602e1139d2090a78d7e19f04f916794) ) \
-	ROM_SYSTEM_BIOS( 7,  "us1",   "EPR-17741a (USA 95/02/20)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 7,  "epr-17741a.ic8",  0x000000, 0x080000, CRC(4166c663) SHA1(cc41d30de06160083d77e0dc5d69e61fec7fdcb5) ) \
-	ROM_SYSTEM_BIOS( 8,  "tw",    "EPR-19854 (Taiwan 97/05/15)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 8,  "epr-19854.ic8",   0x000000, 0x080000, CRC(e09d1f60) SHA1(b55cdcb45b2a5b0b35e352cf7625f0bd659084df) ) \
-	ROM_SYSTEM_BIOS( 9,  "tw1",   "EPR-17953A (Taiwan 95/04/25)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 9,  "epr-17953a.ic8",  0x000000, 0x080000, CRC(a4c47570) SHA1(9efc73717ec8a13417e65c54344ded9fc25bf5ef) ) \
-	ROM_SYSTEM_BIOS( 10, "tw2",   "EPR-17742A (Taiwan 95/02/20)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 10, "epr-17742a.ic8",  0x000000, 0x080000, CRC(02daf123) SHA1(23185beb1ce9c09b8719e57d1adb7b28c8141fd5) ) \
-	ROM_SYSTEM_BIOS( 11,  "debug","Development (1.10, 95/01/13)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 11,  "stv110.bin",     0x000000, 0x080000, CRC(3dfeda92) SHA1(8eb33192a57df5f3a1dfb57263054867c6b2db6d) ) \
-	ROM_SYSTEM_BIOS( 12, "dev",   "Development (1.061, 94/11/25)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 12, "stv1061.bin",     0x000000, 0x080000, CRC(728dbca3) SHA1(0ed2030177f0aa8285645c395ae9ad9f568ab1d6) ) \
+	ROM_SYSTEM_BIOS( 0,  "jp",    "EPR-23603 (Japan 00/10/24)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "epr-23603.ic8",   0x000000, 0x080000, CRC(f688ae60) SHA1(1a31b6b1a4257fcb6ac6a91e67dd798f91505f48) ) \
+	ROM_SYSTEM_BIOS( 1,  "jp1",   "EPR-20091 (Japan 97/08/21)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 1,  "epr-20091.ic8",   0x000000, 0x080000, CRC(59ed40f4) SHA1(eff0f54c70bce05ff3a289bf30b1027e1c8cd117) ) \
+	ROM_SYSTEM_BIOS( 2,  "jp2",   "EPR-19730 (Japan 97/02/17)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 2,  "epr-19730.ic8",   0x000000, 0x080000, CRC(d0e0889d) SHA1(fae53107c894e0c41c49e191dbe706c9cd6e50bd) ) \
+	ROM_SYSTEM_BIOS( 3,  "jp3",   "EPR-17951A (Japan 95/04/25)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 3,  "epr-17951a.ic8",  0x000000, 0x080000, CRC(2672f9d8) SHA1(63cf4a6432f6c87952f9cf3ab0f977aed2367303) ) \
+	ROM_SYSTEM_BIOS( 4,  "jp4",   "EPR-17740A (Japan 95/02/20)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 4,  "epr-17740a.ic8",  0x000000, 0x080000, CRC(3e23c81f) SHA1(f9b282fd27693e9891843597b2e1823da3d23c7b) ) \
+	ROM_SYSTEM_BIOS( 5,  "jp5",   "EPR-17740 (Japan 95/01/31)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 5,  "epr-17740.ic8",   0x000000, 0x080000, CRC(5c5aa63d) SHA1(06860d96923b81afbc21e0ad32ee19487d8ff6e7) ) \
+	ROM_SYSTEM_BIOS( 6,  "euro",  "EPR-17954A (Europe 95/04/25)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 6,  "epr-17954a.ic8",  0x000000, 0x080000, CRC(f7722da3) SHA1(af79cff317e5b57d49e463af16a9f616ed1eee08) ) \
+	ROM_SYSTEM_BIOS( 7,  "us",    "EPR-17952A (USA 95/04/25)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 7,  "epr-17952a.ic8",  0x000000, 0x080000, CRC(d1be2adf) SHA1(eaf1c3e5d602e1139d2090a78d7e19f04f916794) ) \
+	ROM_SYSTEM_BIOS( 8,  "us1",   "EPR-17741a (USA 95/02/20)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 8,  "epr-17741a.ic8",  0x000000, 0x080000, CRC(4166c663) SHA1(cc41d30de06160083d77e0dc5d69e61fec7fdcb5) ) \
+	ROM_SYSTEM_BIOS( 9,  "tw",    "EPR-19854 (Taiwan 97/05/15)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 9,  "epr-19854.ic8",   0x000000, 0x080000, CRC(e09d1f60) SHA1(b55cdcb45b2a5b0b35e352cf7625f0bd659084df) ) \
+	ROM_SYSTEM_BIOS( 10,  "tw1",  "EPR-17953A (Taiwan 95/04/25)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 10, "epr-17953a.ic8",  0x000000, 0x080000, CRC(a4c47570) SHA1(9efc73717ec8a13417e65c54344ded9fc25bf5ef) ) \
+	ROM_SYSTEM_BIOS( 11, "tw2",   "EPR-17742A (Taiwan 95/02/20)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 11, "epr-17742a.ic8",  0x000000, 0x080000, CRC(02daf123) SHA1(23185beb1ce9c09b8719e57d1adb7b28c8141fd5) ) \
+	ROM_SYSTEM_BIOS( 12,  "debug","Development (1.10, 95/01/13)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 12,  "stv110.bin",     0x000000, 0x080000, CRC(3dfeda92) SHA1(8eb33192a57df5f3a1dfb57263054867c6b2db6d) ) \
+	ROM_SYSTEM_BIOS( 13, "dev",   "Development (1.061, 94/11/25)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 13, "stv1061.bin",     0x000000, 0x080000, CRC(728dbca3) SHA1(0ed2030177f0aa8285645c395ae9ad9f568ab1d6) ) \
 	\
 	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */
 
@@ -3706,14 +3731,9 @@ ROM_START( patocar )
 ROM_END
 
 ROM_START( sackids )
-//  STV_BIOS
+	STV_BIOS
 
-	// wants it's own specific bios, marked "CKBP1.13J0001024" at 0x800
-	// PC=06004150 is where it compares this
-	// it also looks like it has a specific I/O board for the lightpen
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* SH2 code */
-	ROM_LOAD16_WORD_SWAP( "epr-20091.ic8",   0x000000, 0x080000, BAD_DUMP CRC(59ed40f4) SHA1(eff0f54c70bce05ff3a289bf30b1027e1c8cd117) )
-
+	// it looks like game has a specific I/O board for the lightpen
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 	ROM_LOAD16_WORD_SWAP( "ic22.bin",     0x0200000, 0x200000, CRC(4d9d1870) SHA1(c702964af2767b0db4ca1d6c7d07356e675d5efd) )
 	ROM_LOAD16_WORD_SWAP( "ic24.bin",     0x0400000, 0x200000, CRC(39fca3e5) SHA1(29be552f58b69f8f3f237ca14f13af3673559123) )
@@ -3723,8 +3743,20 @@ ROM_START( sackids )
 	ROM_LOAD16_WORD_SWAP( "ic32.bin",     0x0c00000, 0x200000, CRC(1db6c26b) SHA1(2e14b7b021bce145f989295fdc6effcd799f00a4) )
 	ROM_LOAD16_WORD_SWAP( "ic34.bin",     0x0e00000, 0x200000, CRC(0f3622c8) SHA1(69337114d6902675018371101f0fba01902de54a) )
 	ROM_LOAD16_WORD_SWAP( "ic36.bin",     0x1000000, 0x200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) ) // empty / FF filled
+ROM_END
 
-	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */
+ROM_START( wasafari )
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+	ROM_LOAD16_WORD_SWAP( "ic22.bin",     0x0200000, 0x200000, CRC(d8bb2e2c) SHA1(e55714425f8dcf01e8cb68d67c96f19a9d6f4e3a) )
+	ROM_LOAD16_WORD_SWAP( "ic24.bin",     0x0400000, 0x200000, CRC(c1b0e173) SHA1(92e5fe1f9fa70182c5bf8f087686782714cf4416) )
+	ROM_LOAD16_WORD_SWAP( "ic26.bin",     0x0600000, 0x200000, CRC(a5c0577c) SHA1(b6e19001e67c8222af6802eae7b58be65d8ca9fd) )
+	ROM_LOAD16_WORD_SWAP( "ic28.bin",     0x0800000, 0x200000, CRC(2a8cfa97) SHA1(a38ab55e88413e0df3f32f23c2a9dcccca4483be) )
+	ROM_LOAD16_WORD_SWAP( "ic30.bin",     0x0a00000, 0x200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
+	ROM_LOAD( "wasafari.nv", 0x0000, 0x0080, CRC(50861c5a) SHA1(c431703d7b56185f20af1aec04cabb5f49e2d4ba) )
 ROM_END
 
 ROM_START( dfeverg )
@@ -3912,6 +3944,7 @@ GAME( 1998, supgoal,   stvbios, hopper,   patocar,  stv_state,   init_stv,      
 GAME( 1997, techbowl,  stvbios, hopper,   patocar,  stv_state,   init_stv,        ROT0,   "Sega",                         "Technical Bowling (J 971212 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, vfkids,    stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Virtua Fighter Kids (JUET 960319 V0.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, vmahjong,  stvbios, stvmp,    vmahjong, stv_state,   init_stv,        ROT0,   "Micronet",                     "Virtual Mahjong (J 961214 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, wasafari,  stvbios, stv,      wasafari, stv_state,   init_stv,        ROT0,   "Sega",                         "Wanpaku Safari (J 981109 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, winterht,  stvbios, stv,      stv,      stv_state,   init_winterht,   ROT0,   "Sega",                         "Winter Heat (JUET 971012 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, znpwfv,    stvbios, stv,      stv,      stv_state,   init_znpwfv,     ROT0,   "Sega",                         "Zen Nippon Pro-Wrestling Featuring Virtua (J 971123 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, znpwfvt,   znpwfv,  stv,      stv,      stv_state,   init_znpwfv,     ROT0,   "Sega",                         "Zen Nippon Pro-Wrestling Featuring Virtua (T 971123 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

@@ -319,7 +319,7 @@ void isa16_vga_mach64_device::device_start()
 
 	m_isa->install_device(0x1ce, 0x1cf, read8sm_delegate(*m_vga, FUNC(mach64_device::ati_port_ext_r)), write8sm_delegate(*m_vga, FUNC(mach64_device::ati_port_ext_w)));
 	m_isa->install_device(0x2e8, 0x2ef, read8sm_delegate(*m_vga, FUNC(mach64_device::mach32_status_r)), write8sm_delegate(*m_vga, FUNC(mach64_device::ibm8514_htotal_w)));
-	
+
 	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_vga_mach64_device::io_isa_map);
 
 	m_isa->install16_device(0x12e8, 0x12eb, read16smo_delegate(*m_vga, FUNC(mach64_device::ibm8514_vtotal_r)), write16smo_delegate(*m_vga, FUNC(mach64_device::ibm8514_vtotal_w)));

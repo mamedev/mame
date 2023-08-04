@@ -506,7 +506,7 @@ std::error_condition msx_cart_konami_sound_snatcher_device::initialize_cartridge
 }
 
 
-// The SD Snatcher Sound cartrdige has 64KB RAM available by selecting ram banks 8-15
+// The SD Snatcher Sound cartridge has 64KB RAM available by selecting ram banks 8-15
 msx_cart_konami_sound_sdsnatcher_device::msx_cart_konami_sound_sdsnatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_cart_konami_sound_device(mconfig, MSX_CART_SOUND_SDSNATCHER, tag, owner, clock, 8, 15)
 {
@@ -664,5 +664,4 @@ void msx_cart_ec701_device::bank_w(u8 data)
 		m_view.select(2);
 		break;
 	}
-
 }

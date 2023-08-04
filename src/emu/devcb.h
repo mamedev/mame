@@ -361,28 +361,6 @@ private:
 		T m_builder;
 	};
 
-	class log_creator : public creator
-	{
-	public:
-		log_creator(device_t &devbase, std::string &&message) : creator(0U), m_devbase(devbase), m_message(std::move(message)) { }
-
-		virtual bool validity_check(validity_checker &valid) const override { return true; }
-
-		virtual func_t create() override
-		{
-			return
-					[&devbase = m_devbase, message = std::move(m_message)] (offs_t offset, std::make_unsigned_t<Result> mem_mask)
-					{
-						devbase.logerror("%s: %s\n", devbase.machine().describe_context(), message);
-						return Result(0);
-					};
-		}
-
-	private:
-		device_t &m_devbase;
-		std::string m_message;
-	};
-
 	template <typename Source, typename Func> class transform_builder; // workaround for MSVC
 
 	class builder_base
@@ -773,40 +751,6 @@ private:
 		{
 			m_append = true;
 			return set_ioport(std::forward<Params>(args)...);
-		}
-
-		template <typename... Params>
-		void set_log(device_t &devbase, Params &&... args)
-		{
-			set_used();
-			if (!m_append)
-				m_target.m_creators.clear();
-			m_target.m_creators.emplace_back(std::make_unique<log_creator>(devbase, std::string(std::forward<Params>(args)...)));
-		}
-
-		template <typename T, typename... Params>
-		std::enable_if_t<emu::detail::is_device_implementation<std::remove_reference_t<T> >::value> set_log(T &devbase, Params &&... args)
-		{
-			set_log(static_cast<device_t &>(devbase), std::forward<Params>(args)...);
-		}
-
-		template <typename T, typename... Params>
-		std::enable_if_t<emu::detail::is_device_interface<std::remove_reference_t<T> >::value> set_log(T &devbase, Params &&... args)
-		{
-			set_log(devbase.device(), std::forward<Params>(args)...);
-		}
-
-		template <typename... Params>
-		void set_log(Params &&... args)
-		{
-			set_log(m_target.owner().mconfig().current_device(), std::forward<Params>(args)...);
-		}
-
-		template <typename... Params>
-		void append_log(Params &&... args)
-		{
-			m_append = true;
-			set_log(std::forward<Params>(args)...);
 		}
 
 		auto set_constant(Result val) { return set([val] () { return val; }); }
@@ -2013,100 +1957,6 @@ private:
 		}
 	};
 
-	class log_builder : public builder_base, public transform_base<std::make_unsigned_t<Input>, log_builder>
-	{
-	private:
-		class wrapped_builder : public builder_base
-		{
-		public:
-			template <typename T, typename U> friend class first_transform_builder;
-
-			using input_t = Input;
-
-			wrapped_builder(log_builder &&that)
-				: builder_base(std::move(that))
-				, m_devbase(that.m_devbase)
-				, m_message(std::move(that.m_message))
-			{
-				that.consume();
-				that.built();
-			}
-			wrapped_builder(wrapped_builder &&that)
-				: builder_base(std::move(that))
-				, m_devbase(that.m_devbase)
-				, m_message(std::move(that.m_message))
-			{
-				that.consume();
-				that.built();
-			}
-
-			bool validity_check(validity_checker &valid) const { return true; }
-
-			auto build()
-			{
-				assert(this->m_consumed);
-				this->built();
-				return
-						[&devbase = m_devbase, message = std::move(m_message)] (offs_t offset, input_t data, std::make_unsigned_t<input_t> mem_mask)
-						{ if (data) devbase.logerror("%s: %s\n", devbase.machine().describe_context(), message); };
-			}
-
-		private:
-			wrapped_builder(wrapped_builder const &) = delete;
-			wrapped_builder operator=(wrapped_builder const &) = delete;
-			wrapped_builder operator=(wrapped_builder &&that) = delete;
-
-			device_t &m_devbase;
-			std::string m_message;
-		};
-
-		friend class wrapped_builder; // workaround for MSVC
-
-		log_builder(log_builder const &) = delete;
-		log_builder &operator=(log_builder const &) = delete;
-		log_builder &operator=(log_builder &&that) = delete;
-
-		device_t &m_devbase;
-		std::string m_message;
-
-	public:
-		using input_t = Input;
-
-		log_builder(devcb_write &target, bool append, device_t &devbase, std::string &&message)
-			: builder_base(target, append)
-			, transform_base<std::make_unsigned_t<Input>, log_builder>(DefaultMask)
-			, m_devbase(devbase)
-			, m_message(std::move(message))
-		{ }
-		log_builder(log_builder &&that)
-			: builder_base(std::move(that))
-			, transform_base<std::make_unsigned_t<Input>, log_builder>(std::move(that))
-			, m_devbase(that.m_devbase)
-			, m_message(std::move(that.m_message))
-		{
-			that.consume();
-			that.built();
-		}
-		~log_builder() { this->template register_creator<log_builder>(); }
-
-		template <typename T>
-		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
-		{
-			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
-		}
-
-		bool validity_check(validity_checker &valid) const { return true; }
-
-		auto build()
-		{
-			assert(this->m_consumed);
-			this->built();
-			return
-					[&devbase = m_devbase, message = std::move(m_message), exor = this->exor(), mask = this->mask()] (offs_t offset, input_t data, std::make_unsigned_t<input_t> mem_mask)
-					{ if ((data ^ exor) & mask) devbase.logerror("%s: %s\n", devbase.machine().describe_context(), message); };
-		}
-	};
-
 	class binder
 	{
 	public:
@@ -2293,38 +2143,6 @@ private:
 		{
 			m_append = true;
 			return set_output(std::forward<Params>(args)...);
-		}
-
-		template <typename... Params>
-		log_builder set_log(device_t &devbase, Params &&... args)
-		{
-			set_used();
-			return log_builder(m_target, m_append, devbase, std::string(std::forward<Params>(args)...));
-		}
-
-		template <typename T, typename... Params>
-		std::enable_if_t<emu::detail::is_device_implementation<std::remove_reference_t<T> >::value, log_builder> set_log(T &devbase, Params &&... args)
-		{
-			return set_log(static_cast<device_t &>(devbase), std::forward<Params>(args)...);
-		}
-
-		template <typename T, typename... Params>
-		std::enable_if_t<emu::detail::is_device_interface<std::remove_reference_t<T> >::value, log_builder> set_log(T &devbase, Params &&... args)
-		{
-			return set_log(devbase.device(), std::forward<Params>(args)...);
-		}
-
-		template <typename... Params>
-		log_builder set_log(Params &&... args)
-		{
-			return set_log(m_target.owner().mconfig().current_device(), std::forward<Params>(args)...);
-		}
-
-		template <typename... Params>
-		log_builder append_log(Params &&... args)
-		{
-			m_append = true;
-			return set_log(std::forward<Params>(args)...);
 		}
 
 		void set_nop()
@@ -2705,7 +2523,6 @@ extern template class devcb_write8::creator_impl<devcb_write8::latched_inputline
 extern template class devcb_write8::creator_impl<devcb_write8::ioport_builder>;
 extern template class devcb_write8::creator_impl<devcb_write8::membank_builder>;
 extern template class devcb_write8::creator_impl<devcb_write8::output_builder>;
-extern template class devcb_write8::creator_impl<devcb_write8::log_builder>;
 
 extern template class devcb_write16::creator_impl<devcb_write16::delegate_builder<write8s_delegate> >;
 extern template class devcb_write16::creator_impl<devcb_write16::delegate_builder<write16s_delegate> >;
@@ -2725,7 +2542,6 @@ extern template class devcb_write16::creator_impl<devcb_write16::latched_inputli
 extern template class devcb_write16::creator_impl<devcb_write16::ioport_builder>;
 extern template class devcb_write16::creator_impl<devcb_write16::membank_builder>;
 extern template class devcb_write16::creator_impl<devcb_write16::output_builder>;
-extern template class devcb_write16::creator_impl<devcb_write16::log_builder>;
 
 extern template class devcb_write32::creator_impl<devcb_write32::delegate_builder<write8s_delegate> >;
 extern template class devcb_write32::creator_impl<devcb_write32::delegate_builder<write16s_delegate> >;
@@ -2745,7 +2561,6 @@ extern template class devcb_write32::creator_impl<devcb_write32::latched_inputli
 extern template class devcb_write32::creator_impl<devcb_write32::ioport_builder>;
 extern template class devcb_write32::creator_impl<devcb_write32::membank_builder>;
 extern template class devcb_write32::creator_impl<devcb_write32::output_builder>;
-extern template class devcb_write32::creator_impl<devcb_write32::log_builder>;
 
 extern template class devcb_write64::creator_impl<devcb_write64::delegate_builder<write8s_delegate> >;
 extern template class devcb_write64::creator_impl<devcb_write64::delegate_builder<write16s_delegate> >;
@@ -2765,7 +2580,6 @@ extern template class devcb_write64::creator_impl<devcb_write64::latched_inputli
 extern template class devcb_write64::creator_impl<devcb_write64::ioport_builder>;
 extern template class devcb_write64::creator_impl<devcb_write64::membank_builder>;
 extern template class devcb_write64::creator_impl<devcb_write64::output_builder>;
-extern template class devcb_write64::creator_impl<devcb_write64::log_builder>;
 
 extern template class devcb_write_line::creator_impl<devcb_write_line::delegate_builder<write8s_delegate> >;
 extern template class devcb_write_line::creator_impl<devcb_write_line::delegate_builder<write16s_delegate> >;
@@ -2785,6 +2599,5 @@ extern template class devcb_write_line::creator_impl<devcb_write_line::latched_i
 extern template class devcb_write_line::creator_impl<devcb_write_line::ioport_builder>;
 extern template class devcb_write_line::creator_impl<devcb_write_line::membank_builder>;
 extern template class devcb_write_line::creator_impl<devcb_write_line::output_builder>;
-extern template class devcb_write_line::creator_impl<devcb_write_line::log_builder>;
 
 #endif // MAME_EMU_DEVCB_H

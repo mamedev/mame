@@ -379,19 +379,19 @@ void h89_state::raise_NMI_w(uint8_t)
 
 void h89_state::console_intr(uint8_t data)
 {
-	if (data == CLEAR_LINE)
+	if (bool(data))
 	{
-		m_intr_cntrl->lower_irq(3);
+		m_intr_cntrl->raise_irq(3);
 	}
 	else
 	{
-		m_intr_cntrl->raise_irq(3);
+		m_intr_cntrl->lower_irq(3);
 	}
 }
 
 void h89_state::reset_line(int data)
 {
-	if (data == ASSERT_LINE)
+	if (bool(data))
 	{
 		reset();
 	}
@@ -461,7 +461,7 @@ void h89_state::h89(machine_config & config)
 
 	HEATH_Z37_FDC(config, m_h37);
 	m_h37->drq_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::set_drq));
-	m_h37->irq_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::set_intrq));
+	m_h37->irq_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::set_irq));
 	m_h37->block_interrupt_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::block_interrupts));
 
 	// H-88-3 3-port serial board

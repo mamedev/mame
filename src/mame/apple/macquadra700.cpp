@@ -20,6 +20,7 @@
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
 #include "bus/nubus/nubus.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68040.h"
 #include "machine/6522via.h"
 #include "machine/applefdintf.h"
@@ -553,7 +554,19 @@ void macquadra_state::macqd700(machine_config &config)
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
 
 	SCC8530N(config, m_scc, C7M);
-//  m_scc->intrq_callback().set(FUNC(macquadra_state::set_scc_interrupt));
+	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
+	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
+
+	rs232_port_device &rs232a(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
+
+	rs232_port_device &rs232b(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
 
 	// SCSI bus and devices
 	NSCSI_BUS(config, m_scsibus1);
@@ -626,6 +639,7 @@ void macquadra_state::macqd700(machine_config &config)
 	m_ram->set_extra_options("8M,16M,32M,64M,68M,72M,80M,96M,128M");
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 }

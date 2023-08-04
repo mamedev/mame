@@ -63,21 +63,21 @@ void unktop_state::unktop(machine_config &config)
 {
 	HD6303X(config, m_maincpu, 4_MHz_XTAL); // HD63B03XP
 	m_maincpu->set_addrmap(AS_PROGRAM, &unktop_state::program_map);
-	m_maincpu->in_p1_cb().set_log("P1 read");
-	m_maincpu->out_p1_cb().set_log("P1 write");
-	m_maincpu->in_p2_cb().set_log("P2 read");
-	m_maincpu->out_p2_cb().set_log("P2 write");
-	m_maincpu->in_p3_cb().set_log("P3 read");
-	m_maincpu->out_p3_cb().set_log("P3 write");
-	m_maincpu->in_p4_cb().set_log("P4 read");
-	m_maincpu->out_p4_cb().set_log("P4 write");
-	m_maincpu->in_p5_cb().set_log("P5 read");
-	m_maincpu->out_p5_cb().set_log("P5 write");
-	m_maincpu->in_p6_cb().set_log("P6 read");
-	m_maincpu->out_p6_cb().set_log("P6 write");
-	m_maincpu->out_p7_cb().set_log("P7 write");
-	m_maincpu->out_sc2_cb().set_log("SC2 write");
-	m_maincpu->out_ser_tx_cb().set_log("serial TX");
+	m_maincpu->in_p1_cb().set([this] () { logerror("%s: P1 read", machine().describe_context()); return u8(0); });
+	m_maincpu->out_p1_cb().set([this] (u8 data) { logerror("%s: P1 write %02X", machine().describe_context(), data); });
+	m_maincpu->in_p2_cb().set([this] () { logerror("%s: P2 read", machine().describe_context()); return u8(0); });
+	m_maincpu->out_p2_cb().set([this] (u8 data) { logerror("%s: P2 write %02X", machine().describe_context(), data); });
+	m_maincpu->in_p3_cb().set([this] () { logerror("%s: P3 read", machine().describe_context()); return u8(0); });
+	m_maincpu->out_p3_cb().set([this] (u8 data) { logerror("%s: P3 write %02X", machine().describe_context(), data); });
+	m_maincpu->in_p4_cb().set([this] () { logerror("%s: P4 read", machine().describe_context()); return u8(0); });
+	m_maincpu->out_p4_cb().set([this] (u8 data) { logerror("%s: P4 write %02X", machine().describe_context(), data); });
+	m_maincpu->in_p5_cb().set([this] () { logerror("%s: P5 read", machine().describe_context()); return u8(0); });
+	m_maincpu->out_p5_cb().set([this] (u8 data) { logerror("%s: P5 write %02X", machine().describe_context(), data); });
+	m_maincpu->in_p6_cb().set([this] () { logerror("%s: P6 read", machine().describe_context()); return u8(0); });
+	m_maincpu->out_p6_cb().set([this] (u8 data) { logerror("%s: P6 write %02X", machine().describe_context(), data); });
+	m_maincpu->out_p7_cb().set([this] (u8 data) { logerror("%s: P7 write %02X", machine().describe_context(), data); });
+	m_maincpu->out_sc2_cb().set([this] (int state) { logerror("%s: SC2 write %d", machine().describe_context(), state); });
+	m_maincpu->out_ser_tx_cb().set([this] (int state) { logerror("serial TX %d", state); });
 
 	SPEAKER(config, "mono").front_center();
 

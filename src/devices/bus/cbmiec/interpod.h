@@ -16,7 +16,7 @@
 #include "bus/ieee488/ieee488.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "machine/6850acia.h"
 
 
@@ -46,7 +46,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via;
-	required_device<mos6532_new_device> m_riot;
+	required_device<mos6532_device> m_riot;
 	required_device<acia6850_device> m_acia;
 	required_device<ieee488_device> m_ieee;
 	required_device<rs232_port_device> m_rs232;

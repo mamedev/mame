@@ -404,13 +404,13 @@ COMP( 199?, aoap43,    0, 0, sis496, 0, sis496_state, empty_init, "AOpen", "AP43
 COMP( 1994, a486sp3,   0, 0, sis496, 0, sis496_state, empty_init, "Asus", "PVI-486SP3 (SiS 85C496/85C497)", MACHINE_NOT_WORKING ) // hangs during irq check
 COMP( 1995, aa486s,    0, 0, sis496, 0, sis496_state, empty_init, "Asus", "PCI/I-A486S (SiS 85C496/85C497)", MACHINE_NOT_WORKING ) // -bios 0 crashes on boot, -bios 1 hardlocks MAME
 
-COMP( 199?, ch486spm,  0, 0, sis496, 0, sis496_state, empty_init, "Chaintech", "486SPM", MACHINE_NOT_WORKING )	// both versions used to show Award BootBlock, now show a black screen
-COMP( 199?, ch4spi,    0, 0, sis496, 0, sis496_state, empty_init, "Chaintech", "4SPI", MACHINE_NOT_WORKING )	// used to come up, now black screen	
+COMP( 199?, ch486spm,  0, 0, sis496, 0, sis496_state, empty_init, "Chaintech", "486SPM", MACHINE_NOT_WORKING )  // both versions used to show Award BootBlock, now show a black screen
+COMP( 199?, ch4spi,    0, 0, sis496, 0, sis496_state, empty_init, "Chaintech", "4SPI", MACHINE_NOT_WORKING )    // used to come up, now black screen
 
-COMP( 1995, ft486f55,  0, 0, sis496, 0, sis496_state, empty_init, "Freetech", "486FT55", MACHINE_NOT_WORKING )	// used to show Award BootBlow, now black screen
+COMP( 1995, ft486f55,  0, 0, sis496, 0, sis496_state, empty_init, "Freetech", "486FT55", MACHINE_NOT_WORKING )  // used to show Award BootBlow, now black screen
 
-COMP( 199?, jakms41,   0, 0, sis496, 0, sis496_state, empty_init, "Jamicon", "KM-S4-1 VER 1.1", MACHINE_NOT_WORKING ) 
-COMP( 199?, jwj446a,   0, 0, sis496, 0, sis496_state, empty_init, "Jetway",  "J-446A", MACHINE_NOT_WORKING )	// BIOS 0 shows BootBlock, but hangs on beep, BIOS 1 hangs, used to show BootBlock
+COMP( 199?, jakms41,   0, 0, sis496, 0, sis496_state, empty_init, "Jamicon", "KM-S4-1 VER 1.1", MACHINE_NOT_WORKING )
+COMP( 199?, jwj446a,   0, 0, sis496, 0, sis496_state, empty_init, "Jetway",  "J-446A", MACHINE_NOT_WORKING )    // BIOS 0 shows BootBlock, but hangs on beep, BIOS 1 hangs, used to show BootBlock
 
 COMP( 199?, ls486e,    0, 0, sis496, 0, sis496_state, empty_init, "LuckyStar",   "LS-486E Rev:C", MACHINE_NOT_WORKING ) // All versions POST, except LH5 (BootBlock)
 

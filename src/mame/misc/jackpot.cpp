@@ -259,7 +259,7 @@ void jackpot_state::jackpot(machine_config &config) // clocks not verified
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-//	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+//  m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	SPEAKER(config, "mono").front_center();
 

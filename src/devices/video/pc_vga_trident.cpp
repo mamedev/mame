@@ -437,7 +437,7 @@ void trident_vga_device::gc_map(address_map &map)
 	svga_device::gc_map(map);
 	// New Source Address Register (bit 1 is inverted here, also)
 	map(0x0e, 0x0e).lrw8(
-		NAME([this] (offs_t offset) { 
+		NAME([this] (offs_t offset) {
 			return tri.gc0e;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
@@ -450,7 +450,7 @@ void trident_vga_device::gc_map(address_map &map)
 		})
 	);
 	map(0x0f, 0x0f).lrw8(
-		NAME([this] (offs_t offset) { 
+		NAME([this] (offs_t offset) {
 			return tri.gc0f;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
@@ -460,7 +460,7 @@ void trident_vga_device::gc_map(address_map &map)
 	);
 	// XFree86 refers to this register as "MiscIntContReg", setting bit 2, but gives no indication as to what it does
 	map(0x2f, 0x2f).lrw8(
-		NAME([this] (offs_t offset) { 
+		NAME([this] (offs_t offset) {
 			return tri.gc2f;
 		}),
 		NAME([this] (offs_t offset, u8 data) {

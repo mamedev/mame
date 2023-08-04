@@ -3150,9 +3150,6 @@ ROMs PCB (AT0789B):
 ------------------------------------
 There is a small piggyback attached under CPUs PCB full of 74Sxx
 
-This boards looks like a legit PCB from Data East, even if a Data East logo is not present,
-but it's confirmed to be a bootleg.
-
 ALL MEMORIES ARE MASK ROMS!
 
 */

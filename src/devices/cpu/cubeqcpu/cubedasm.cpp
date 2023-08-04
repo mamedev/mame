@@ -2,7 +2,7 @@
 // copyright-holders:Philip Bennett
 /***************************************************************************
 
-    cubedasm.c
+    cubedasm.cpp
 
     Implementation of the Cube Quest AM2901-based CPUs
 

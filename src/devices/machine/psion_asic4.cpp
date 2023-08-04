@@ -82,6 +82,7 @@ void psion_asic4_device::data_w(uint16_t data)
 	switch (data & 0x300)
 	{
 	case NULL_FRAME:
+		device_reset();
 		break;
 
 	case CONTROL_FRAME:

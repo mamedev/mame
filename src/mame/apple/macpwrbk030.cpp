@@ -732,7 +732,7 @@ void macpb030_state::macpb165c_map(address_map &map)
 
 	// on-board color video on 165c/180c
 	map(0xfc000000, 0xfc07ffff).rw(m_vga, FUNC(wd90c26_vga_device::mem_linear_r), FUNC(wd90c26_vga_device::mem_linear_w)).mirror(0x00380000); // 512k of VRAM
-//	map(0xfc400000, 0xfc7fffff).rw(FUNC(macpb030_state::macwd_r), FUNC(macpb030_state::macwd_w));
+//  map(0xfc400000, 0xfc7fffff).rw(FUNC(macpb030_state::macwd_r), FUNC(macpb030_state::macwd_w));
 	map(0xfc4003b0, 0xfc4003df).m(m_vga, FUNC(wd90c26_vga_device::io_map));
 	// something else video related? is at fc800000
 	map(0xfcff8000, 0xfcffffff).rom().region("vrom", 0x0000);
@@ -908,6 +908,7 @@ void macpb030_state::macpb140(machine_config &config)
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("4M,6M,8M");
 
+	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
@@ -1022,6 +1023,7 @@ void macpb030_state::macpb160(machine_config &config)
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("4M,6M,8M");
 
+	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 }

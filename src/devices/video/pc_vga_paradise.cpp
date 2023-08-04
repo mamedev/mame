@@ -341,9 +341,9 @@ void wd90c00_vga_device::crtc_map(address_map &map)
 	m_ext_crtc_view[1](0x2b, 0x2b).ram(); // PR12 scratch pad
 	m_ext_crtc_view[1](0x2c, 0x2d).rw(FUNC(wd90c00_vga_device::interlace_r), FUNC(wd90c00_vga_device::interlace_w));
 	m_ext_crtc_view[1](0x2e, 0x2e).rw(FUNC(wd90c00_vga_device::misc_control_1_r), FUNC(wd90c00_vga_device::misc_control_1_w));
-//	m_ext_crtc_view[1](0x2f, 0x2f) PR16 Misc Control 2
-//	m_ext_crtc_view[1](0x30, 0x30) PR17 Misc Control 3
-//	m_ext_crtc_view[1](0x31, 0x3f) <reserved>
+//  m_ext_crtc_view[1](0x2f, 0x2f) PR16 Misc Control 2
+//  m_ext_crtc_view[1](0x30, 0x30) PR17 Misc Control 3
+//  m_ext_crtc_view[1](0x31, 0x3f) <reserved>
 }
 
 void wd90c00_vga_device::recompute_params()
@@ -364,7 +364,7 @@ void wd90c00_vga_device::recompute_params()
 		case 1: xtal = XTAL(28'636'363).value() * multiplier; break;
 		// VCLK2, selected in 800x600 modes
 		case 2:
-		// TODO: wd90c30 selects this for 1024x768 interlace mode 
+		// TODO: wd90c30 selects this for 1024x768 interlace mode
 		// (~40 Hz, should be 43 according to defined video clocks in WD9710 driver .inf)
 		default:
 			xtal = XTAL(42'000'000).value();
@@ -530,12 +530,12 @@ void wd90c11a_vga_device::sequencer_map(address_map &map)
 			return 0xff;
 		})
 	);
-//	m_ext_seq_view[1](0x07, 0x07) PR21 Display Configuration and Scratch Pad
+//  m_ext_seq_view[1](0x07, 0x07) PR21 Display Configuration and Scratch Pad
 	m_ext_seq_view[1](0x08, 0x08).ram(); // PR22 'C11A only Scratch Pad
 	m_ext_seq_view[1](0x09, 0x09).ram(); // PR23 'C11A only Scratch Pad
-//	m_ext_seq_view[1](0x10, 0x10) PR30 Memory Interface and FIFO Control
+//  m_ext_seq_view[1](0x10, 0x10) PR30 Memory Interface and FIFO Control
 	m_ext_seq_view[1](0x11, 0x11).rw(FUNC(wd90c11a_vga_device::sys_if_control_r), FUNC(wd90c11a_vga_device::sys_if_control_w));
-//	m_ext_seq_view[1](0x12, 0x12) PR32 Miscellaneous Control 4
+//  m_ext_seq_view[1](0x12, 0x12) PR32 Miscellaneous Control 4
 }
 
 // unlock also dictates index mask
@@ -625,17 +625,17 @@ void wd90c30_vga_device::crtc_map(address_map &map)
 {
 	wd90c11a_vga_device::crtc_map(map);
 //  m_ext_crtc_view[1](0x20, 0x21) Signature read data
-//	m_ext_crtc_view[1](0x3d, 0x3d) PR1A CRTC Shadow Register Control
+//  m_ext_crtc_view[1](0x3d, 0x3d) PR1A CRTC Shadow Register Control
 	m_ext_crtc_view[1](0x3e, 0x3e).rw(FUNC(wd90c30_vga_device::vert_timing_overflow_r), FUNC(wd90c30_vga_device::vert_timing_overflow_w));
-//	m_ext_crtc_view[1](0x3f, 0x3f) PR19 Signature Analyzer Control
+//  m_ext_crtc_view[1](0x3f, 0x3f) PR19 Signature Analyzer Control
 }
 
 void wd90c30_vga_device::sequencer_map(address_map &map)
 {
 	wd90c11a_vga_device::sequencer_map(map);
-//	m_ext_seq_view[1](0x13, 0x13) PR33 DRAM Timing and zero Wait State Control
-//	m_ext_seq_view[1](0x14, 0x14) PR34 Video Memory Mapping
-//	m_ext_seq_view[1](0x15, 0x15) PR35 USR0, USR1 Output Select, <reserved> on 'C31A
+//  m_ext_seq_view[1](0x13, 0x13) PR33 DRAM Timing and zero Wait State Control
+//  m_ext_seq_view[1](0x14, 0x14) PR34 Video Memory Mapping
+//  m_ext_seq_view[1](0x15, 0x15) PR35 USR0, USR1 Output Select, <reserved> on 'C31A
 }
 
 /*
@@ -698,10 +698,10 @@ wd90c31_vga_device::wd90c31_vga_device(const machine_config &mconfig, const char
 // maps at $23c0 in normal conditions, 16-bit
 void wd90c31_vga_device::ext_io_map(address_map &map)
 {
-//	map(0x00, 0x01) Index Control register
-//	map(0x02, 0x03) Register Access port
-//	map(0x04, 0x05) BITBLT I/O Port
-//	map(0x06, 0x07) <reserved>
+//  map(0x00, 0x01) Index Control register
+//  map(0x02, 0x03) Register Access port
+//  map(0x04, 0x05) BITBLT I/O Port
+//  map(0x06, 0x07) <reserved>
 }
 
 /*
@@ -761,18 +761,18 @@ wd90c33_vga_device::wd90c33_vga_device(const machine_config &mconfig, const char
 void wd90c33_vga_device::ext_io_map(address_map &map)
 {
 	wd90c31_vga_device::ext_io_map(map);
-//	map(0x04, 0x07) Host Bit Block Transfer (HBLT), same as above but 32-bit?
-//	map(0x08, 0x09) K1 Line Draw Constant 1
-//	map(0x0a, 0x0b) K2 Line Draw Constant 2
-//	map(0x0c, 0x0d) ET Line Draw Error Term
-//	map(0x0e, 0x0f) Command Buffer and Interrupt
+//  map(0x04, 0x07) Host Bit Block Transfer (HBLT), same as above but 32-bit?
+//  map(0x08, 0x09) K1 Line Draw Constant 1
+//  map(0x0a, 0x0b) K2 Line Draw Constant 2
+//  map(0x0c, 0x0d) ET Line Draw Error Term
+//  map(0x0e, 0x0f) Command Buffer and Interrupt
 }
 
 // maps at $23d0 in normal conditions, 8-bit
 void wd90c33_vga_device::localbus_if_map(address_map &map)
 {
-//	map(0x00, 0x00) configuration
-//	map(0x01, 0x01) wait state
-//	map(0x02, 0x02) Video Memory Mapping Register (MMIO)
-//	map(0x03, 0x03) (r/o) Status Register
+//  map(0x00, 0x00) configuration
+//  map(0x01, 0x01) wait state
+//  map(0x02, 0x02) Video Memory Mapping Register (MMIO)
+//  map(0x03, 0x03) (r/o) Status Register
 }

@@ -460,8 +460,25 @@ ace                             // [1976 Allied Leisure]
 @source:alliedleisure/aleisttl.cpp
 sburners                        // (c) 1975 Allied Leisure
 
+@source:alliedleisure/aztarac.cpp
+aztarac                         // (c) 1983 Centuri (vector game)
+
 @source:alliedleisure/clayshoo.cpp
 clayshoo                        // [1979 Allied Leisure]
+
+@source:alliedleisure/killcom.cpp
+challeng                        // (c) 1981 Centuri
+kaos                            // (c) 1981
+killcom                         // (c) 1980 Centuri
+leprechn                        // (c) 1982
+leprechna                       // (c) 1982
+megatack                        // (c) 1980 Centuri
+megatacka                       // (c) 1980 Centuri
+piratetr                        // (c) 1982
+potogold                        // (c) 1982
+
+@source:alliedleisure/trvquest.cpp
+trvquest                        // (c) 1984 Techstar / Sunn
 
 @source:alpha/alpha68k.cpp
 btlfield                        // Alpha-68K96II 'BT' (c) 1987
@@ -882,8 +899,20 @@ macpb180                        // 1992 Apple Macintosh PowerBook 180
 macpb180c                       // 1992 Apple Macintosh PowerBook 180c
 macpd210                        // 1992 Apple Macintosh PowerBook Duo 210
 
+@source:apple/macquadra605.cpp
+macqd605                        // 1993 Apple Macintosh Quadra 605
+maclc475                        // 1993 Apple Macintosh LC/Performa 475
+maclc575                        // 1994 Apple Macintosh LC/Performa 575
+
 @source:apple/macquadra700.cpp
 macqd700                        // 1991 Apple Macintosh Quadra 700
+
+@source:apple/macquadra800.cpp
+macqd800                        // 1993 Apple Macintosh Quadra 800
+macct610                        // 1993 Apple Macintosh Centris 610
+macct650                        // 1993 Apple Macintosh Centris 650
+macqd610                        // 1993 Apple Macintosh Quadra 610
+macqd650                        // 1993 Apple Macintosh Quadra 650
 
 @source:apple/newton.cpp
 newtnotp
@@ -1735,6 +1764,7 @@ firefoxa                        // 136026           (c) 1984
 
 @source:atari/firetrk.cpp
 firetrk                         // 030926           1978/06 [6808]
+firetrka                        // 030926           1978/06 [6808]
 montecar                        // 035763-035780    1980/04 [6502]
 superbug                        // 009115-009467    1977/09 [6800]
 
@@ -15647,6 +15677,7 @@ gngc                            // 9/1985 (c) 1985
 gngprot                         // Capcom/Romstar Proto
 gngt                            // 9/1985 (c) 1985
 makaimur                        // 9/1985 (c) 1985
+makaimurb                       // 9/1985 (c) 1985
 makaimurc                       // 9/1985 (c) 1985
 makaimurg                       // 9/1985 (c) 1985
 
@@ -16074,14 +16105,15 @@ minimonyb
 miniguay
 
 @source:cirsa/missbamby.cpp
-basket                          // (c) 198? IGOA S.A.
+basket                          // (c) 1987? IGOA S.A.
 goldfrts                        //
-gwinner                         // (c) 1983 Reben
-luckyplr                        // (c) 1981 Cirsa
-minisupf                        // (c) 1981 Cirsa
-msbamby                         // (c) 198? Automatics Pasqual
-multy                           // (c) 1987 Deta
-trebol                          // (c) 1985 Regama
+gwinner                         // (c) 1983  Reben
+luckyplr                        // (c) 1981  Cirsa
+miniazard                       // (c) 1989? Arfyc
+minisupf                        // (c) 1981  Cirsa
+msbamby                         // (c) 198?  Automatics Pasqual
+multy                           // (c) 1987  Deta
+trebol                          // (c) 1985  Regama
 
 @source:cirsa/neptunp2.cpp
 bg_barmy                        //
@@ -18583,29 +18615,6 @@ gp2x                            // GP2X 2005
 @source:gamepark/gp32.cpp
 gp32                            // GP32 2001
 
-@source:gameplan/enigma2.cpp
-enigma2                         // (c) 1981 Game Plan (Zilec Electronics license)
-enigma2a                        // (c) 1984 Zilec Electronics (bootleg?)
-enigma2b                        // (c) 1981 Zilec Electronics
-
-@source:gameplan/gameplan.cpp
-challeng                        // (c) 1981 Centuri
-kaos                            // (c) 1981
-killcom                         // (c) 1980 Centuri
-leprechn                        // (c) 1982
-leprechp                        // (c) 1982
-megatack                        // (c) 1980 Centuri
-megatacka                       // (c) 1980 Centuri
-piratetr                        // (c) 1982
-potogold                        // (c) 1982
-
-@source:gameplan/toratora.cpp
-toratora                        // (c) 1980 Game Plan
-toratorab                       // (c) 1980 Game Plan
-
-@source:gameplan/trvquest.cpp
-trvquest                        // (c) 1984 Sunn / Techstar
-
 @source:gametron/gatron.cpp
 bingo                           // Game-A-Tron?
 poker41                         // (c) 1983 Game-A-Tron
@@ -19162,9 +19171,10 @@ h8                              //
 
 @source:heathkit/h19.cpp
 h19                             // Heath H19 (Zenith Z-19)
+gp19                            // H19 with Northwest Digital Systems GP-19
 super19                         // Super19 replacement ROMS for H19
-watz19                          // Watzman replacement ROMS for H19
 ultra19                         // ULTRA ROM replacement ROMS for H19
+watz19                          // Watzman replacement ROMS for H19
 
 @source:heathkit/h89.cpp
 h89                             //
@@ -28464,9 +28474,6 @@ avtnfl                          // (c) 1989 AVT
 avtsym14                        // (c) 1985 AVT
 avtsym25                        // (c) 1985 AVT
 
-@source:misc/aztarac.cpp
-aztarac                         // (c) 1983 Centuri (vector game)
-
 @source:misc/babysuprem.cpp
 bsuprem                         // (c) 198? Andra / Vifico
 
@@ -29424,6 +29431,11 @@ foolrace
 avenger                         // (c) 1975 Electra
 flyingf                         // (c) 1976 Electra
 
+@source:misc/enigma2.cpp
+enigma2                         // (c) 1981 Zilec Electronics (Game Plan license)
+enigma2a                        // (c) 1984 Zilec Electronics (bootleg?)
+enigma2b                        // (c) 1981 Zilec Electronics
+
 @source:misc/epos.cpp
 catapult                        // (c) 1982
 dealer                          // (c) 198?
@@ -30241,6 +30253,9 @@ jungleyo
 
 @source:misc/kas89.cpp
 kas89                           // 1989, SFC S.R.L.
+
+@source:misc/katosmedz80.cpp
+dnbanban
 
 @source:misc/kingpin.cpp
 dealracl                        //
@@ -31671,6 +31686,10 @@ tmspoker                        //
 @source:misc/tomsadvs.cpp
 icecoldice                      // (c) ICE
 tomsadvs                        //
+
+@source:misc/toratora.cpp
+toratora                        // (c) 1980 Game Plan
+toratorab                       // (c) 1980 Game Plan
 
 @source:misc/triton.cpp
 triton41                        // 1978 Transam Triton L4.1
@@ -33934,6 +33953,7 @@ smb3bl
 @source:nintendo/nes_clone.cpp
 afbm7800
 dancexpt
+digezlg
 dnce2000
 hs36blk
 hs36red
@@ -34234,6 +34254,7 @@ endless                         // bootleg
 endlessa                        // bootleg
 ffight2b                        // bootleg
 ffight3b                        // bootleg
+ffight3b2                       // bootleg
 iron                            // bootleg
 legendsb                        // bootleg
 kinstb                          // bootleg
@@ -34245,6 +34266,7 @@ wldgunsb                        // bootleg
 
 @source:nintendo/snesb51.cpp
 fatfurspb
+kinstsnes
 mk3snes
 snes4sl
 snes4sln
@@ -36425,6 +36447,7 @@ hangonp                         //
 nemesisp                        //
 odin                            //
 odin_dlx                        //
+odinp                           //
 odisea                          //
 petaco                          //
 poleposn                        //
@@ -37057,6 +37080,7 @@ elvisl302                       //
 elvisl303                       //
 elvisl4                         //
 elvisp                          //
+elvisp100                       //
 elvisp302                       //
 elvisp303                       //
 elvisp4                         //
@@ -39901,6 +39925,7 @@ twsoc98                         // 1998.04 Tecmo World Soccer '98 (Tecmo)
 vfkids                          // 1996.03 Virtua Fighter Kids
 vfremix                         // 1995.06 Virtua Fighter Remix
 vmahjong                        // 1997.02 Virtual Mahjong (Micronet)
+wasafari                        // 1998.11 Wanpaku Safari
 winterht                        // 1997.10 Winter Heat (Data East)
 yattrmnp                        // 1998.10 Yatterman Plus
 znpwfv                          // 1997.12 Zen Nippon Pro Wrestling featuring Virtua
@@ -40518,6 +40543,7 @@ daioha                          // (C) 1993 Athena
 daiohc                          // (C) 1993 Athena (93111A PCB conversion)
 daiohp                          // (C) 1993 Athena (prototype)
 daiohp2                         // (C) 1993 Athena (prototype, earlier)
+daiohp3                         // (C) 1993 Athena (prototype)
 drgnunit                        // (c) 1989 Athena / Seta + Romstar or Taito license (DSW)
 eightfrc                        // (c) 1994 Tecmo
 extdwnhl                        // (c) 1995 Sammy Japan
@@ -40616,6 +40642,7 @@ nratechu                        // (c) 1996 Seta
 renju                           // (c) 1994 Visco
 
 @source:seta/speedatk.cpp
+daifugo
 speedatk                        // CB-0 (c) SetaKikaku
 
 @source:seta/speglsht.cpp
@@ -40703,24 +40730,27 @@ tim011                          //
 @source:sfrj/tim100.cpp
 tim100                          //
 
-@source:sgi/4dpi.cpp
-4d20                            //  IP6: Personal Iris 4D/20, R2000 @12.5MHz
-4d25                            // IP10: Personal Iris 4D/25, R3000 @20MHz
-4d30                            // IP14: Personal Iris 4D/30, R3000A @30MHz
-4d35                            // IP12: Personal Iris 4D/35, R3000A @36MHz
-
 @source:sgi/crimson.cpp
 crimson                         // (c) 1992 SGI
-
-@source:sgi/indigo.cpp
-indigo3k                        // IP12: Indigo 1, R3000, 33MHz
-indigo4k                        // IP20: Indigo 1, R4400, 150MHz
 
 @source:sgi/indy_indigo2.cpp
 indy_4610                       // IP22: Indy, R4600, 100MHz
 indy_4613                       // IP22: Indy, R4600, 133MHz
 indy_5015                       // IP22: Indy, R5000, 150MHz
 indigo2_4415                    // IP24: Indigo 2, R4400, 150MHz
+
+@source:sgi/ip6.cpp
+pi4d20                          // Personal IRIS 4D/20 (R2000 @ 12.5MHz)
+pi4d25                          // Personal IRIS 4D/25 (R3000 @ 20MHz)
+
+@source:sgi/ip12.cpp
+pi4d30                          // Personal IRIS 4D/30 (R3000A @ 30MHz)
+pi4d35                          // Personal IRIS 4D/35 (R3000A @ 36MHz)
+indigo                          // IRIS Indigo HP1 (R3000A @ 33MHz)
+
+@source:sgi/ip20.cpp
+indigo_r4000                    // Indigo HP2, PM1 (R4000 @ 100MHz)
+indigo_r4400                    // Indigo HP2, PM2 (R4400 @ 150MHz)
 
 @source:sgi/iris3130.cpp
 iris3130                        // IP2: IRIS 3xx0, 68020, 16MHz
@@ -40907,6 +40937,7 @@ kay1024                         //
 profi                           //
 quorum                          //
 scorpio                         //
+scorpiongmx                     //
 scorpiontb                      //
 
 @source:sinclair/spec128.cpp
@@ -43584,6 +43615,7 @@ rygar                           // 6002 - (c) 1986 Tecmo
 rygar2                          // 6002 - (c) 1986 Tecmo
 rygar3                          // 6002 - (c) 1986 Tecmo
 rygarj                          // 6002 - (c) 1986 Tecmo
+rygarj2                         // 6002 - (c) 1986 Tecmo
 silkworm                        // 6217 - (c) 1988 Tecmo
 silkwormj                       // 6217 - (c) 1988 Tecmo
 silkwormp                       // 6217 - (c) 1988 Tecmo

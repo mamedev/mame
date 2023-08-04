@@ -624,8 +624,8 @@ void venture_sound_device::filter_w(uint8_t data)
 void venture_sound_device::venture_audio_map(address_map &map)
 {
 	map.global_mask(0x7fff);
-	map(0x0000, 0x007f).mirror(0x0780).m(m_riot, FUNC(mos6532_new_device::ram_map));
-	map(0x0800, 0x081f).mirror(0x07e0).m(m_riot, FUNC(mos6532_new_device::io_map));
+	map(0x0000, 0x007f).mirror(0x0780).m(m_riot, FUNC(mos6532_device::ram_map));
+	map(0x0800, 0x081f).mirror(0x07e0).m(m_riot, FUNC(mos6532_device::io_map));
 	map(0x1000, 0x1003).mirror(0x07fc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1800, 0x1803).mirror(0x07fc).w(FUNC(venture_sound_device::sh8253_w)).nopr(); // no /RD
 	map(0x2000, 0x2000).mirror(0x07ff).w(FUNC(venture_sound_device::filter_w));
@@ -644,7 +644,7 @@ void venture_sound_device::device_add_mconfig(machine_config &config)
 	m6502_device &audiocpu(M6502(config, "audiocpu", 3.579545_MHz_XTAL / 4));
 	audiocpu.set_addrmap(AS_PROGRAM, &venture_sound_device::venture_audio_map);
 
-	MOS6532_NEW(config, m_riot, SH6532_CLOCK);
+	MOS6532(config, m_riot, SH6532_CLOCK);
 	m_riot->irq_wr_callback().set("audioirq", FUNC(input_merger_device::in_w<0>));
 
 	PIA6821(config, m_pia, 0);
@@ -717,7 +717,7 @@ void mtrap_sound_device::voiceio_w(offs_t offset, uint8_t data)
 		m_cvsd->digit_w(data & 1);
 
 	if (!(offset & 0x20))
-		m_riot->pb0_w(data & 1);
+		m_riot->pb_bit_w<0>(data & 1);
 }
 
 
@@ -915,9 +915,9 @@ void victory_sound_device::main_ack_w(int state)
 
 void victory_sound_device::victory_audio_map(address_map &map)
 {
-	map(0x0000, 0x007f).mirror(0x0f00).m(m_riot, FUNC(mos6532_new_device::ram_map));
+	map(0x0000, 0x007f).mirror(0x0f00).m(m_riot, FUNC(mos6532_device::ram_map));
 	map(0x0080, 0x00ff).mirror(0x0f00).ram();
-	map(0x1000, 0x101f).mirror(0x0fe0).m(m_riot, FUNC(mos6532_new_device::io_map));
+	map(0x1000, 0x101f).mirror(0x0fe0).m(m_riot, FUNC(mos6532_device::io_map));
 	map(0x2000, 0x2003).mirror(0x0ffc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x3000, 0x3003).mirror(0x0ffc).w(FUNC(victory_sound_device::sh8253_w)).nopr(); // no /RD
 	map(0x4000, 0x4fff).noprw();
@@ -937,7 +937,7 @@ void victory_sound_device::device_add_mconfig(machine_config &config)
 	m6502_device &audiocpu(M6502(config, "audiocpu", 3.579545_MHz_XTAL / 4));
 	audiocpu.set_addrmap(AS_PROGRAM, &victory_sound_device::victory_audio_map);
 
-	MOS6532_NEW(config, m_riot, SH6532_CLOCK);
+	MOS6532(config, m_riot, SH6532_CLOCK);
 	m_riot->pa_wr_callback().set(m_tms, FUNC(tms5220_device::data_w));
 	m_riot->pa_rd_callback().set(m_tms, FUNC(tms5220_device::status_r));
 	m_riot->pb_wr_callback<0>().set(m_tms, FUNC(tms5220_device::rsq_w));

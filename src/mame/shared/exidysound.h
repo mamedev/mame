@@ -6,7 +6,7 @@
 #pragma once
 
 #include "machine/6821pia.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "machine/timer.h"
 #include "sound/flt_biquad.h"
 #include "sound/hc55516.h"
@@ -111,7 +111,7 @@ protected:
 
 	sh8253_timer_channel m_sh8253_timer[3];
 
-	required_device<mos6532_new_device> m_riot;
+	required_device<mos6532_device> m_riot;
 	required_device<pia6821_device> m_pia;
 };
 

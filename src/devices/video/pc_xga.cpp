@@ -830,7 +830,7 @@ void oak_oti111_vga_device::device_start()
 void oak_oti111_vga_device::ramdac_mmio_map(address_map &map)
 {
 	map.unmap_value_high();
-//	TODO: 0x04, 0x05 alt accesses for CRTC?
+//  TODO: 0x04, 0x05 alt accesses for CRTC?
 	map(0x06, 0x06).rw(FUNC(oak_oti111_vga_device::ramdac_mask_r), FUNC(oak_oti111_vga_device::ramdac_mask_w));
 	map(0x07, 0x07).rw(FUNC(oak_oti111_vga_device::ramdac_state_r), FUNC(oak_oti111_vga_device::ramdac_read_index_w));
 	map(0x08, 0x08).rw(FUNC(oak_oti111_vga_device::ramdac_write_index_r), FUNC(oak_oti111_vga_device::ramdac_write_index_w));

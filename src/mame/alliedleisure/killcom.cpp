@@ -2,8 +2,7 @@
 // copyright-holders:Chris Moore
 /***************************************************************************
 
-GAME PLAN driver
-
+Killer Comet hardware, by Centuri (formerly known as Allied Leisure)
 driver by Chris Moore
 
 Killer Comet memory map
@@ -64,6 +63,10 @@ Notes:
   Megattack
   Pot Of Gold (Leprechaun)
 
+- Leprechaun and Pirate Treasure were made for the Moppet Video arcade series
+  (Enter-Tech arcade cabs aimed at younger children). That's why the games are
+  so easy.
+
 
 TODO:
 - The board has, instead of a watchdog, a timed reset that has to be disabled
@@ -71,15 +74,184 @@ TODO:
   to that pin in the log. Missing support in machine/6522via.cpp?
 - Investigate and document the 8910 dip switches
 - Fix the input ports of Kaos
+- Some of the games do unmapped reads all over the place, probably just bad
+  programming. One of these is piratetr, and it will lock up eventually when
+  reading from VIA1. It's possible to fix with a simple wire mod/pcb cut trace,
+  like done with piratetr_main_map. Let's assume they did something like that.
+
+BTANB:
+- BGM stops in leprechn when you touch a tree
 
 ****************************************************************************/
 
 #include "emu.h"
-#include "gameplan.h"
+#include "killcom.h"
 
 #include "cpu/m6502/m6502.h"
-#include "sound/ay8910.h"
+#include "machine/input_merger.h"
 #include "speaker.h"
+
+
+
+/*************************************
+ *
+ *  Initialization
+ *
+ *************************************/
+
+void killcom_state::machine_start()
+{
+	// register for save states
+	save_item(NAME(m_current_port));
+	save_item(NAME(m_audio_reset));
+}
+
+void killcom_state::machine_reset()
+{
+	m_video_x = 0;
+	m_video_y = 0;
+	m_video_previous = 0;
+}
+
+
+void killcom_state::video_start()
+{
+	m_videoram = make_unique_clear<uint8_t[]>(0x10000);
+	save_pointer(NAME(m_videoram), 0x10000);
+
+	m_hblank_timer[0] = timer_alloc(FUNC(killcom_state::hblank_callback), this);
+	m_hblank_timer[0]->adjust(attotime::zero, 0, m_screen->scan_period());
+
+	m_hblank_timer[1] = timer_alloc(FUNC(killcom_state::hblank_callback), this);
+	m_hblank_timer[1]->adjust(256 * m_screen->pixel_period(), 1, m_screen->scan_period());
+
+	// register for save states
+	save_item(NAME(m_video_x));
+	save_item(NAME(m_video_y));
+	save_item(NAME(m_video_command));
+	save_item(NAME(m_video_command_trigger));
+	save_item(NAME(m_video_data));
+	save_item(NAME(m_video_previous));
+}
+
+
+
+/*************************************
+ *
+ *  Screen update
+ *
+ *************************************/
+
+uint32_t killcom_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			bitmap.pix(y, x) = m_videoram[y << 8 | x] & 0x07;
+		}
+	}
+
+	return 0;
+}
+
+
+
+/*************************************
+ *
+ *  VIA 1 - video
+ *
+ *************************************/
+
+TIMER_CALLBACK_MEMBER(killcom_state::hblank_callback)
+{
+	// screen HBLANK is tied to VIA1 PB6
+	m_via[0]->write_pb6(param);
+}
+
+
+void killcom_state::video_data_w(uint8_t data)
+{
+	m_video_data = data;
+}
+
+
+void killcom_state::video_command_w(uint8_t data)
+{
+	m_video_command = data & 0x07;
+}
+
+
+uint8_t killcom_state::video_status_r()
+{
+	// video busy flags on the upper bits
+	return 0xff;
+}
+
+
+uint8_t killcom_state::leprechn_videoram_r()
+{
+	return (video_status_r() & 0xf8) | m_video_previous;
+}
+
+
+void killcom_state::video_command_trigger_w(int state)
+{
+	if (state && !m_video_command_trigger)
+	{
+		switch (m_video_command)
+		{
+		// draw pixel
+		case 0:
+			// auto-adjust X?
+			if (m_video_data & 0x10)
+			{
+				if (m_video_data & 0x40)
+					m_video_x = m_video_x - 1;
+				else
+					m_video_x = m_video_x + 1;
+			}
+
+			// auto-adjust Y?
+			if (m_video_data & 0x20)
+			{
+				if (m_video_data & 0x80)
+					m_video_y = m_video_y - 1;
+				else
+					m_video_y = m_video_y + 1;
+			}
+
+			m_video_previous = m_videoram[m_video_y << 8 | m_video_x];
+
+			m_screen->update_now();
+			m_videoram[m_video_y << 8 | m_video_x] = m_video_data & 0x07;
+
+			break;
+
+		// load X register
+		case 1:
+			m_video_x = m_video_data;
+			break;
+
+		// load Y register
+		case 2:
+			m_video_y = m_video_data;
+			break;
+
+		// clear screen
+		case 3:
+			m_screen->update_now();
+			memset(m_videoram.get(), m_video_data & 0x07, 0x10000);
+			break;
+
+		// N/C
+		default:
+			break;
+		}
+	}
+
+	m_video_command_trigger = state;
+}
 
 
 
@@ -89,29 +261,31 @@ TODO:
  *
  *************************************/
 
-void gameplan_state::io_select_w(uint8_t data)
+void killcom_state::io_select_w(uint8_t data)
 {
-	switch (data)
-	{
-	case 0x01: m_current_port = 0; break;
-	case 0x02: m_current_port = 1; break;
-	case 0x04: m_current_port = 2; break;
-	case 0x08: m_current_port = 3; break;
-	case 0x80: m_current_port = 4; break;
-	case 0x40: m_current_port = 5; break;
-	}
+	m_current_port = data;
 }
 
 
-uint8_t gameplan_state::io_port_r()
+uint8_t killcom_state::io_port_r()
 {
-	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "DSW0", "DSW1" };
+	uint8_t data = 0xff;
 
-	return ioport(portnames[m_current_port])->read();
+	// COL A-D (E,F are N/C)
+	for (int i = 0; i < 4; i++)
+		if (BIT(m_current_port, i))
+			data &= m_inputs[i]->read();
+
+	// DS A,B
+	for (int i = 0; i < 2; i++)
+		if (BIT(m_current_port, i ^ 7))
+			data &= m_dsw[i]->read();
+
+	return data;
 }
 
 
-void gameplan_state::coin_w(int state)
+void killcom_state::coin_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, ~state & 1);
 }
@@ -124,42 +298,28 @@ void gameplan_state::coin_w(int state)
  *
  *************************************/
 
-void gameplan_state::audio_reset_w(int state)
+void killcom_state::audio_cmd_w_sync(int param)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+	m_riot->pa_w(0, param, 0x7f);
+}
 
-	if (state == 0)
+
+void killcom_state::audio_trigger_w_sync(int param)
+{
+	m_riot->pa_bit_w<7>(param);
+}
+
+
+void killcom_state::audio_reset_w_sync(int param)
+{
+	if (param && !m_audio_reset)
 	{
+		m_ay->reset();
 		m_riot->reset();
-		machine().scheduler().perfect_quantum(attotime::from_usec(10));
 	}
-}
 
-
-void gameplan_state::audio_cmd_w(uint8_t data)
-{
-	m_riot->porta_in_set(data, 0x7f);
-}
-
-
-void gameplan_state::audio_trigger_w(int state)
-{
-	m_riot->porta_in_set(state << 7, 0x80);
-}
-
-
-
-/*************************************
- *
- *  RIOT - audio
- *
- *************************************/
-
-void gameplan_state::r6532_irq(int state)
-{
-	m_audiocpu->set_input_line(0, state);
-	if (state == ASSERT_LINE)
-		machine().scheduler().perfect_quantum(attotime::from_usec(10));
+	m_audio_reset = param;
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, param ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -170,13 +330,19 @@ void gameplan_state::r6532_irq(int state)
  *
  *************************************/
 
-void gameplan_state::gameplan_main_map(address_map &map)
+void killcom_state::killcom_main_map(address_map &map)
 {
-	map(0x0000, 0x03ff).mirror(0x1c00).ram();
-	map(0x2000, 0x200f).mirror(0x07f0).m(m_via_0, FUNC(via6522_device::map));    /* VIA 1 */
-	map(0x2800, 0x280f).mirror(0x07f0).m(m_via_1, FUNC(via6522_device::map));    /* VIA 2 */
-	map(0x3000, 0x300f).mirror(0x07f0).m(m_via_2, FUNC(via6522_device::map));    /* VIA 3 */
+	map(0x0000, 0x03ff).mirror(0x0400).ram();
+	map(0x2000, 0x200f).mirror(0x07f0).m(m_via[0], FUNC(via6522_device::map)); // VIA 1
+	map(0x2800, 0x280f).mirror(0x07f0).m(m_via[1], FUNC(via6522_device::map)); // VIA 2
+	map(0x3000, 0x300f).mirror(0x07f0).m(m_via[2], FUNC(via6522_device::map)); // VIA 3
 	map(0x8000, 0xffff).rom();
+}
+
+void killcom_state::piratetr_main_map(address_map &map)
+{
+	killcom_main_map(map);
+	map(0x2010, 0x201f).mirror(0x07e0).unmaprw(); // A4, see TODO
 }
 
 
@@ -187,25 +353,19 @@ void gameplan_state::gameplan_main_map(address_map &map)
  *
  *************************************/
 
-void gameplan_state::gameplan_audio_map(address_map &map)
+void killcom_state::killcom_audio_map(address_map &map)
 {
-	map(0x0000, 0x007f).mirror(0x1780).ram();  /* 6532 internal RAM */
-	map(0x0800, 0x081f).mirror(0x17e0).rw(m_riot, FUNC(riot6532_device::read), FUNC(riot6532_device::write));
-	map(0xa000, 0xa000).mirror(0x1ffc).w("aysnd", FUNC(ay8910_device::address_w));
-	map(0xa001, 0xa001).mirror(0x1ffc).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0xa002, 0xa002).mirror(0x1ffc).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x0000, 0x007f).mirror(0x1780).m(m_riot, FUNC(mos6532_device::ram_map));
+	map(0x0800, 0x081f).mirror(0x17e0).m(m_riot, FUNC(mos6532_device::io_map));
+	map(0xa000, 0xa000).mirror(0x1ffc).w(m_ay, FUNC(ay8910_device::address_w));
+	map(0xa001, 0xa001).mirror(0x1ffc).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0xa002, 0xa002).mirror(0x1ffc).w(m_ay, FUNC(ay8910_device::data_w));
 	map(0xe000, 0xe7ff).mirror(0x1800).rom();
 }
 
-
-/* same as Gameplan, but larger ROM */
-void gameplan_state::leprechn_audio_map(address_map &map)
+void killcom_state::leprechn_audio_map(address_map &map)
 {
-	map(0x0000, 0x007f).mirror(0x1780).ram();  /* 6532 internal RAM */
-	map(0x0800, 0x081f).mirror(0x17e0).rw(m_riot, FUNC(riot6532_device::read), FUNC(riot6532_device::write));
-	map(0xa000, 0xa000).mirror(0x1ffc).w("aysnd", FUNC(ay8910_device::address_w));
-	map(0xa001, 0xa001).mirror(0x1ffc).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0xa002, 0xa002).mirror(0x1ffc).w("aysnd", FUNC(ay8910_device::data_w));
+	killcom_audio_map(map);
 	map(0xe000, 0xefff).mirror(0x1000).rom();
 }
 
@@ -506,10 +666,9 @@ static INPUT_PORTS_START( challeng )
 	PORT_DIPSETTING(    0x40, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
 
-// Manual states information which differs from actual settings for DSW1
-// Switches 4 & 5 are factory settings and remain in the OFF position.
-// Switches 6 & 7 are factory settings which remain in the ON position.
-
+	// Manual states information which differs from actual settings for DSW1
+	// Switches 4 & 5 are factory settings and remain in the OFF position.
+	// Switches 6 & 7 are factory settings which remain in the ON position.
 	PORT_START("DSW1")  /* DSW B - from "TEST NO.6 - dip switch B" */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x01, "20000" )
@@ -524,7 +683,7 @@ static INPUT_PORTS_START( challeng )
 	PORT_DIPNAME( 0x10, 0x10, "Monitor View" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, "Direct" )
 	PORT_DIPSETTING(    0x00, "Mirror" )
-	PORT_DIPNAME( 0x20, 0x20, "Monitor Orientation" ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x00, "Monitor Orientation" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, "Horizontal" )
 	PORT_DIPSETTING(    0x00, "Vertical" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:7")
@@ -775,8 +934,8 @@ static INPUT_PORTS_START( leprechn )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:2" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(    0x08, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )
 	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:7,8")
@@ -806,13 +965,13 @@ static INPUT_PORTS_START( leprechn )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW4:8" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( leprechna )
+	PORT_INCLUDE(leprechn)
 
-static INPUT_PORTS_START( potogold )
-		PORT_INCLUDE(leprechn)
-		PORT_MODIFY("DSW1")
+	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x08, "4" )
+	PORT_DIPSETTING(    0x00, "5" )
 INPUT_PORTS_END
 
 
@@ -924,93 +1083,94 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Machine drivers
+ *  Machine configs
  *
  *************************************/
 
-void gameplan_state::machine_start()
+void killcom_state::killcom_video(machine_config &config)
 {
-	/* register for save states */
-	save_item(NAME(m_current_port));
-	save_item(NAME(m_video_x));
-	save_item(NAME(m_video_y));
-	save_item(NAME(m_video_command));
-	save_item(NAME(m_video_data));
-	save_item(NAME(m_video_previous));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(11.6688_MHz_XTAL / 2, 352, 0, 256, 280, 0, 256);
+	m_screen->set_screen_update(FUNC(killcom_state::screen_update));
+	m_screen->screen_vblank().set(m_via[0], FUNC(via6522_device::write_ca1)); // VBLANK is connected to CA1
+	m_screen->set_palette("palette");
+
+	PALETTE(config, "palette", palette_device::RGB_3BIT);
 }
 
-
-void gameplan_state::machine_reset()
+void killcom_state::killcom(machine_config &config)
 {
-	m_current_port = 0;
-	m_video_x = 0;
-	m_video_y = 0;
-	m_video_command = 0;
-	m_video_data = 0;
-	m_video_previous = 0;
-}
+	// basic machine hardware
+	M6502(config, m_maincpu, 3.579545_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &killcom_state::killcom_main_map);
 
-void gameplan_state::gameplan(machine_config &config)
-{
-	M6502(config, m_maincpu, GAMEPLAN_MAIN_CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gameplan_state::gameplan_main_map);
+	input_merger_device &main_irqs(INPUT_MERGER_ANY_HIGH(config, "main_irqs"));
+	main_irqs.output_handler().set_inputline(m_maincpu, 0);
 
-	M6502(config, m_audiocpu, GAMEPLAN_AUDIO_CPU_CLOCK);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &gameplan_state::gameplan_audio_map);
+	M6502(config, m_audiocpu, 3.579545_MHz_XTAL / 4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &killcom_state::killcom_audio_map);
 
-	RIOT6532(config, m_riot, GAMEPLAN_AUDIO_CPU_CLOCK);
-	m_riot->out_pb_callback().set(m_soundlatch, FUNC(generic_latch_8_device::write));
-	m_riot->irq_callback().set(FUNC(gameplan_state::r6532_irq));
+	MOS6532(config, m_riot, 3.579545_MHz_XTAL / 4);
+	m_riot->pb_wr_callback().set(m_via[2], FUNC(via6522_device::write_pb));
+	m_riot->irq_wr_callback().set_inputline(m_audiocpu, 0);
 
-	/* video hardware */
-	gameplan_video(config);
+	// via
+	MOS6522(config, m_via[0], 3.579545_MHz_XTAL / 4);
+	m_via[0]->writepa_handler().set(FUNC(killcom_state::video_data_w));
+	m_via[0]->writepb_handler().set(FUNC(killcom_state::video_command_w));
+	m_via[0]->readpb_handler().set(FUNC(killcom_state::video_status_r));
+	m_via[0]->ca2_handler().set(FUNC(killcom_state::video_command_trigger_w));
+	m_via[0]->irq_handler().set("main_irqs", FUNC(input_merger_device::in_w<0>));
 
-	/* audio hardware */
+	MOS6522(config, m_via[1], 3.579545_MHz_XTAL / 4);
+	m_via[1]->readpa_handler().set(FUNC(killcom_state::io_port_r));
+	m_via[1]->writepb_handler().set(FUNC(killcom_state::io_select_w));
+	m_via[1]->cb2_handler().set(FUNC(killcom_state::coin_w));
+	m_via[1]->irq_handler().set("main_irqs", FUNC(input_merger_device::in_w<1>));
+
+	MOS6522(config, m_via[2], 3.579545_MHz_XTAL / 4);
+	m_via[2]->writepa_handler().set(FUNC(killcom_state::audio_cmd_w));
+	m_via[2]->ca2_handler().set(FUNC(killcom_state::audio_trigger_w));
+	m_via[2]->cb2_handler().set(FUNC(killcom_state::audio_reset_w));
+	m_via[2]->irq_handler().set("main_irqs", FUNC(input_merger_device::in_w<2>));
+
+	// video hardware
+	killcom_video(config);
+
+	// audio hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch, 0);
-
-	ay8910_device &aysnd(AY8910(config, "aysnd", GAMEPLAN_AY8910_CLOCK));
-	aysnd.port_a_read_callback().set_ioport("DSW2");
-	aysnd.port_b_read_callback().set_ioport("DSW3");
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.33);
-
-	/* via */
-	MOS6522(config, m_via_0, GAMEPLAN_MAIN_CPU_CLOCK);
-	m_via_0->writepa_handler().set(FUNC(gameplan_state::video_data_w));
-	m_via_0->writepb_handler().set(FUNC(gameplan_state::gameplan_video_command_w));
-	m_via_0->ca2_handler().set(FUNC(gameplan_state::video_command_trigger_w));
-	m_via_0->irq_handler().set_inputline(m_maincpu, 0);
-
-	MOS6522(config, m_via_1, GAMEPLAN_MAIN_CPU_CLOCK);
-	m_via_1->readpa_handler().set(FUNC(gameplan_state::io_port_r));
-	m_via_1->writepb_handler().set(FUNC(gameplan_state::io_select_w));
-	m_via_1->cb2_handler().set(FUNC(gameplan_state::coin_w));
-
-	MOS6522(config, m_via_2, GAMEPLAN_MAIN_CPU_CLOCK);
-	m_via_2->readpb_handler().set(m_soundlatch, FUNC(generic_latch_8_device::read));
-	m_via_2->writepa_handler().set(FUNC(gameplan_state::audio_cmd_w));
-	m_via_2->ca2_handler().set(FUNC(gameplan_state::audio_trigger_w));
-	m_via_2->cb2_handler().set(FUNC(gameplan_state::audio_reset_w));
+	AY8910(config, m_ay, 3.579545_MHz_XTAL / 2);
+	m_ay->port_a_read_callback().set_ioport("DSW2");
+	m_ay->port_b_read_callback().set_ioport("DSW3");
+	m_ay->add_route(ALL_OUTPUTS, "mono", 0.33);
 }
 
-void gameplan_state::leprechn(machine_config &config)
+void killcom_state::leprechn(machine_config &config)
 {
-	gameplan(config);
-	m_maincpu->set_clock(LEPRECHAUN_MAIN_CPU_CLOCK);
-	m_via_0->set_clock(LEPRECHAUN_MAIN_CPU_CLOCK);
-	m_via_1->set_clock(LEPRECHAUN_MAIN_CPU_CLOCK);
-	m_via_2->set_clock(LEPRECHAUN_MAIN_CPU_CLOCK);
+	killcom(config);
 
-	/* basic machine hardware */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &gameplan_state::leprechn_audio_map);
+	// basic machine hardware
+	m_maincpu->set_clock(4_MHz_XTAL / 4);
+	m_via[0]->set_clock(4_MHz_XTAL / 4);
+	m_via[1]->set_clock(4_MHz_XTAL / 4);
+	m_via[2]->set_clock(4_MHz_XTAL / 4);
 
-	/* video hardware */
-	leprechn_video(config);
+	m_audiocpu->set_clock(4_MHz_XTAL / 4);
+	m_riot->set_clock(4_MHz_XTAL / 4);
+	m_ay->set_clock(4_MHz_XTAL / 2);
 
-	/* via */
-	m_via_0->readpb_handler().set(FUNC(gameplan_state::leprechn_videoram_r));
-	m_via_0->writepb_handler().set(FUNC(gameplan_state::leprechn_video_command_w));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &killcom_state::leprechn_audio_map);
+
+	// via
+	m_via[0]->readpb_handler().set(FUNC(killcom_state::leprechn_videoram_r));
+	m_via[0]->writepb_handler().set(FUNC(killcom_state::video_command_w)).rshift(3);
+}
+
+void killcom_state::piratetr(machine_config &config)
+{
+	leprechn(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &killcom_state::piratetr_main_map);
 }
 
 
@@ -1053,14 +1213,14 @@ ROM_END
 
 ROM_START( megatacka ) // original Centuri PCB
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "meg-e2.bin",  0xc000, 0x0800, CRC(9664c7b1) SHA1(356e7f5f3b2a9b829fac53e7bf9193278b4de2ed) )
-	ROM_LOAD( "meg-f2.bin",  0xc800, 0x0800, CRC(67c42523) SHA1(f9fc88cdea05a2d0e89e3ba9b545bf3476b37d2d) )
-	ROM_LOAD( "meg-g2.bin",  0xd000, 0x0800, CRC(71f36604) SHA1(043988126343b6224e8e1d6c0dbba6b6b08fe493) )
-	ROM_LOAD( "meg-j2.bin",  0xd800, 0x0800, CRC(4ddcc145) SHA1(3a6d42a58c388eaaf6561351fa98936d98975e0b) )
-	ROM_LOAD( "meg-j1.bin",  0xe000, 0x0800, CRC(911d5d9a) SHA1(92bfe0f69a6e563363df59ebee745d7b3cfc0141) )
-	ROM_LOAD( "meg-g1.bin",  0xe800, 0x0800, CRC(22a51c9b) SHA1(556e09216ed85eaf3870f85515c273c7eb1ab13a) )
-	ROM_LOAD( "meg-f1.bin",  0xf000, 0x0800, CRC(2ffa51ac) SHA1(7c5d8295c5e71a9918a02d203139b024bd3bf8f4) )
-	ROM_LOAD( "meg-e1.bin",  0xf800, 0x0800, CRC(01dbe4ad) SHA1(af72778ae112f24a92fb3007bb456331c3896b50) )
+	ROM_LOAD( "meg-e2.e2",    0xc000, 0x0800, CRC(9664c7b1) SHA1(356e7f5f3b2a9b829fac53e7bf9193278b4de2ed) )
+	ROM_LOAD( "meg-f2.f2",    0xc800, 0x0800, CRC(67c42523) SHA1(f9fc88cdea05a2d0e89e3ba9b545bf3476b37d2d) )
+	ROM_LOAD( "meg-g2.g2",    0xd000, 0x0800, CRC(71f36604) SHA1(043988126343b6224e8e1d6c0dbba6b6b08fe493) )
+	ROM_LOAD( "meg-j2.j2",    0xd800, 0x0800, CRC(4ddcc145) SHA1(3a6d42a58c388eaaf6561351fa98936d98975e0b) )
+	ROM_LOAD( "meg-j1.j1",    0xe000, 0x0800, CRC(911d5d9a) SHA1(92bfe0f69a6e563363df59ebee745d7b3cfc0141) )
+	ROM_LOAD( "meg-g1.g1",    0xe800, 0x0800, CRC(22a51c9b) SHA1(556e09216ed85eaf3870f85515c273c7eb1ab13a) )
+	ROM_LOAD( "meg-f1.f1",    0xf000, 0x0800, CRC(2ffa51ac) SHA1(7c5d8295c5e71a9918a02d203139b024bd3bf8f4) )
+	ROM_LOAD( "meg-e1.e1",    0xf800, 0x0800, CRC(01dbe4ad) SHA1(af72778ae112f24a92fb3007bb456331c3896b50) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "megatsnd.e1",  0xe000, 0x0800, CRC(0c186bdb) SHA1(233af9481a3979971f2d5aa75ec8df4333aa5e0d) ) // missing for this board, using the one from the parent
@@ -1100,14 +1260,29 @@ ROM_END
 
 ROM_START( leprechn )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "lep1",         0x8000, 0x1000, CRC(2c4a46ca) SHA1(28a157c1514bc9f27cc27baddb83cf1a1887f3d1) )
-	ROM_LOAD( "lep2",         0x9000, 0x1000, CRC(6ed26b3e) SHA1(4ee5d09200d9e8f94ae29751c8ee838faa268f15) )
-	ROM_LOAD( "lep3",         0xa000, 0x1000, CRC(a2eaa016) SHA1(be992ee787766137fd800ec59529c98ef2e6991e) )
-	ROM_LOAD( "lep4",         0xb000, 0x1000, CRC(6c12a065) SHA1(2acae6a5b94cbdcc550cee88a7be9254fdae908c) )
-	ROM_LOAD( "lep5",         0xc000, 0x1000, CRC(21ddb539) SHA1(b4dd0a1916adc076fa6084c315459fcb2522161e) )
-	ROM_LOAD( "lep6",         0xd000, 0x1000, CRC(03c34dce) SHA1(6dff202e1a3d0643050f3287f6b5906613d56511) )
-	ROM_LOAD( "lep7",         0xe000, 0x1000, CRC(7e06d56d) SHA1(5f68f2047969d803b752a4cd02e0e0af916c8358) )
-	ROM_LOAD( "lep8",         0xf000, 0x1000, CRC(097ede60) SHA1(5509c41167c066fa4e7f4f4bd1ce9cd00773a82c) )
+	ROM_LOAD( "1.u13",        0x8000, 0x1000, CRC(2c4a46ca) SHA1(28a157c1514bc9f27cc27baddb83cf1a1887f3d1) )
+	ROM_LOAD( "2.u14",        0x9000, 0x1000, CRC(6ed26b3e) SHA1(4ee5d09200d9e8f94ae29751c8ee838faa268f15) )
+	ROM_LOAD( "3.u15",        0xa000, 0x1000, CRC(b5f79fd8) SHA1(271f7b55ecda5bb99f40687264256b82649e2141) )
+	ROM_LOAD( "4.u16",        0xb000, 0x1000, CRC(6c12a065) SHA1(2acae6a5b94cbdcc550cee88a7be9254fdae908c) )
+	ROM_LOAD( "5.u17",        0xc000, 0x1000, CRC(21ddb539) SHA1(b4dd0a1916adc076fa6084c315459fcb2522161e) )
+	ROM_LOAD( "6.u18",        0xd000, 0x1000, CRC(03c34dce) SHA1(6dff202e1a3d0643050f3287f6b5906613d56511) )
+	ROM_LOAD( "7.u19",        0xe000, 0x1000, CRC(7e06d56d) SHA1(5f68f2047969d803b752a4cd02e0e0af916c8358) )
+	ROM_LOAD( "8.u20",        0xf000, 0x1000, CRC(097ede60) SHA1(5509c41167c066fa4e7f4f4bd1ce9cd00773a82c) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "lepsound",     0xe000, 0x1000, CRC(6651e294) SHA1(ce2875fc4df61a30d51d3bf2153864b562601151) )
+ROM_END
+
+ROM_START( leprechna )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lep1.u13",     0x8000, 0x1000, CRC(2c4a46ca) SHA1(28a157c1514bc9f27cc27baddb83cf1a1887f3d1) )
+	ROM_LOAD( "lep2.u14",     0x9000, 0x1000, CRC(6ed26b3e) SHA1(4ee5d09200d9e8f94ae29751c8ee838faa268f15) )
+	ROM_LOAD( "lep3.u15",     0xa000, 0x1000, CRC(a2eaa016) SHA1(be992ee787766137fd800ec59529c98ef2e6991e) )
+	ROM_LOAD( "lep4.u16",     0xb000, 0x1000, CRC(6c12a065) SHA1(2acae6a5b94cbdcc550cee88a7be9254fdae908c) )
+	ROM_LOAD( "lep5.u17",     0xc000, 0x1000, CRC(21ddb539) SHA1(b4dd0a1916adc076fa6084c315459fcb2522161e) )
+	ROM_LOAD( "lep6.u18",     0xd000, 0x1000, CRC(03c34dce) SHA1(6dff202e1a3d0643050f3287f6b5906613d56511) )
+	ROM_LOAD( "lep7.u19",     0xe000, 0x1000, CRC(7e06d56d) SHA1(5f68f2047969d803b752a4cd02e0e0af916c8358) )
+	ROM_LOAD( "lep8.u20",     0xf000, 0x1000, CRC(097ede60) SHA1(5509c41167c066fa4e7f4f4bd1ce9cd00773a82c) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "lepsound",     0xe000, 0x1000, CRC(6651e294) SHA1(ce2875fc4df61a30d51d3bf2153864b562601151) )
@@ -1128,34 +1303,19 @@ ROM_START( potogold )
 	ROM_LOAD( "pog.snd",      0xe000, 0x1000, CRC(ec61f0a4) SHA1(26944ecc3e7413259928c8b0a74b2260e67d2c4e) )
 ROM_END
 
-ROM_START( leprechp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "lep1",         0x8000, 0x1000, CRC(2c4a46ca) SHA1(28a157c1514bc9f27cc27baddb83cf1a1887f3d1) )
-	ROM_LOAD( "lep2",         0x9000, 0x1000, CRC(6ed26b3e) SHA1(4ee5d09200d9e8f94ae29751c8ee838faa268f15) )
-	ROM_LOAD( "3u15.bin",     0xa000, 0x1000, CRC(b5f79fd8) SHA1(271f7b55ecda5bb99f40687264256b82649e2141) )
-	ROM_LOAD( "lep4",         0xb000, 0x1000, CRC(6c12a065) SHA1(2acae6a5b94cbdcc550cee88a7be9254fdae908c) )
-	ROM_LOAD( "lep5",         0xc000, 0x1000, CRC(21ddb539) SHA1(b4dd0a1916adc076fa6084c315459fcb2522161e) )
-	ROM_LOAD( "lep6",         0xd000, 0x1000, CRC(03c34dce) SHA1(6dff202e1a3d0643050f3287f6b5906613d56511) )
-	ROM_LOAD( "lep7",         0xe000, 0x1000, CRC(7e06d56d) SHA1(5f68f2047969d803b752a4cd02e0e0af916c8358) )
-	ROM_LOAD( "lep8",         0xf000, 0x1000, CRC(097ede60) SHA1(5509c41167c066fa4e7f4f4bd1ce9cd00773a82c) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "lepsound",     0xe000, 0x1000, CRC(6651e294) SHA1(ce2875fc4df61a30d51d3bf2153864b562601151) )
-ROM_END
-
 ROM_START( piratetr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1u13.bin",     0x8000, 0x1000, CRC(4433bb61) SHA1(eee0d7f356118f8595dd7533541db744a63a8176) )
-	ROM_LOAD( "2u14.bin",     0x9000, 0x1000, CRC(9bdc4b77) SHA1(ebaab8b3024efd3d0b76647085d441ca204ad5d5) )
-	ROM_LOAD( "3u15.bin",     0xa000, 0x1000, CRC(ebced718) SHA1(3a2f4385347f14093360cfa595922254c9badf1a) )
-	ROM_LOAD( "4u16.bin",     0xb000, 0x1000, CRC(f494e657) SHA1(83a31849de8f4f70d7547199f229079f491ddc61) )
-	ROM_LOAD( "5u17.bin",     0xc000, 0x1000, CRC(2789d68e) SHA1(af8f334ce4938cd75143b729c97cfbefd68c9e13) )
-	ROM_LOAD( "6u18.bin",     0xd000, 0x1000, CRC(d91abb3a) SHA1(11170e69686c2a1f2dc31d41516f44b612f99bad) )
-	ROM_LOAD( "7u19.bin",     0xe000, 0x1000, CRC(6e8808c4) SHA1(d1f76fd37d8f78552a9d53467073cc9a571d96ce) )
-	ROM_LOAD( "8u20.bin",     0xf000, 0x1000, CRC(2802d626) SHA1(b0db688500076ee73e0001c00089a8d552c6f607) )
+	ROM_LOAD( "1.u13",        0x8000, 0x1000, CRC(4433bb61) SHA1(eee0d7f356118f8595dd7533541db744a63a8176) )
+	ROM_LOAD( "2.u14",        0x9000, 0x1000, CRC(9bdc4b77) SHA1(ebaab8b3024efd3d0b76647085d441ca204ad5d5) )
+	ROM_LOAD( "3.u15",        0xa000, 0x1000, CRC(ebced718) SHA1(3a2f4385347f14093360cfa595922254c9badf1a) )
+	ROM_LOAD( "4.u16",        0xb000, 0x1000, CRC(f494e657) SHA1(83a31849de8f4f70d7547199f229079f491ddc61) )
+	ROM_LOAD( "5.u17",        0xc000, 0x1000, CRC(2789d68e) SHA1(af8f334ce4938cd75143b729c97cfbefd68c9e13) )
+	ROM_LOAD( "6.u18",        0xd000, 0x1000, CRC(d91abb3a) SHA1(11170e69686c2a1f2dc31d41516f44b612f99bad) )
+	ROM_LOAD( "7.u19",        0xe000, 0x1000, CRC(6e8808c4) SHA1(d1f76fd37d8f78552a9d53467073cc9a571d96ce) )
+	ROM_LOAD( "8.u20",        0xf000, 0x1000, CRC(2802d626) SHA1(b0db688500076ee73e0001c00089a8d552c6f607) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "su31.bin",     0xe000, 0x1000, CRC(2fe86a11) SHA1(aaafe411b9cb3d0221cc2af73d34ad8bb74f8327) )
+	ROM_LOAD( "s.u31",        0xe000, 0x1000, CRC(2fe86a11) SHA1(aaafe411b9cb3d0221cc2af73d34ad8bb74f8327) )
 ROM_END
 
 
@@ -1166,12 +1326,14 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, killcom,   0,        gameplan, killcom,  gameplan_state, empty_init, ROT0,   "Game Plan (Centuri license)",                     "Killer Comet",         MACHINE_SUPPORTS_SAVE )
-GAME( 1980, megatack,  0,        gameplan, megatack, gameplan_state, empty_init, ROT0,   "Game Plan (Centuri license)",                     "Megatack (set 1)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1980, megatacka, megatack, gameplan, megatack, gameplan_state, empty_init, ROT0,   "Game Plan (Centuri license)",                     "Megatack (set 2)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1981, challeng,  0,        gameplan, challeng, gameplan_state, empty_init, ROT0,   "Game Plan (Centuri license)",                     "Challenger",           MACHINE_SUPPORTS_SAVE )
-GAME( 1981, kaos,      0,        gameplan, kaos,     gameplan_state, empty_init, ROT270, "Game Plan",                                       "Kaos",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1982, leprechn,  0,        leprechn, leprechn, gameplan_state, empty_init, ROT0,   "Tong Electronic",                                 "Leprechaun",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, potogold,  leprechn, leprechn, potogold, gameplan_state, empty_init, ROT0,   "Tong Electronic (Game Plan license)",             "Pot of Gold",          MACHINE_SUPPORTS_SAVE )
-GAME( 1982, leprechp,  leprechn, leprechn, potogold, gameplan_state, empty_init, ROT0,   "Tong Electronic (Pacific Polytechnical license)", "Leprechaun (Pacific)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, piratetr,  0,        leprechn, piratetr, gameplan_state, empty_init, ROT0,   "Tong Electronic",                                 "Pirate Treasure",      MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE   INPUT      CLASS          INIT        SCREEN  COMPANY                        FULLNAME            FLAGS
+GAME( 1980, killcom,   0,        killcom,  killcom,   killcom_state, empty_init, ROT0,   "Centuri (Game Plan license)", "Killer Comet",     MACHINE_SUPPORTS_SAVE )
+GAME( 1980, megatack,  0,        killcom,  megatack,  killcom_state, empty_init, ROT0,   "Centuri (Game Plan license)", "Megatack (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, megatacka, megatack, killcom,  megatack,  killcom_state, empty_init, ROT0,   "Centuri (Game Plan license)", "Megatack (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, challeng,  0,        killcom,  challeng,  killcom_state, empty_init, ROT270, "Centuri",                     "Challenger",       MACHINE_SUPPORTS_SAVE ) // cab is vertical
+
+GAME( 1981, kaos,      0,        killcom,  kaos,      killcom_state, empty_init, ROT270, "Pacific Polytechnical Corp. (Game Plan license)",       "Kaos",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, leprechn,  0,        leprechn, leprechn,  killcom_state, empty_init, ROT0,   "Pacific Polytechnical Corp.",                           "Leprechaun (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, leprechna, leprechn, leprechn, leprechna, killcom_state, empty_init, ROT0,   "Pacific Polytechnical Corp. (Tong Electronic license)", "Leprechaun (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, potogold,  leprechn, leprechn, leprechn,  killcom_state, empty_init, ROT0,   "Pacific Polytechnical Corp. (Game Plan license)",       "Pot of Gold",        MACHINE_SUPPORTS_SAVE )
+GAME( 1982, piratetr,  0,        piratetr, piratetr,  killcom_state, empty_init, ROT0,   "Pacific Polytechnical Corp. (Tong Electronic license)", "Pirate Treasure",    MACHINE_SUPPORTS_SAVE )
