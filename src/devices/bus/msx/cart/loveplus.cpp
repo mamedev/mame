@@ -14,12 +14,16 @@ namespace {
 class msx_cart_loveplus_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_loveplus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_loveplus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, MSX_CART_LOVEPLUS, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_rombank(*this, "rombank%u", 0U)
+	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -33,13 +37,6 @@ private:
 	bool m_bank_locked[4];
 };
 
-
-msx_cart_loveplus_device::msx_cart_loveplus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_LOVEPLUS, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_rombank(*this, "rombank%u", 0U)
-{
-}
 
 void msx_cart_loveplus_device::device_start()
 {
