@@ -158,11 +158,12 @@ protected:
 	uint8_t m_fg_tile_bank = 0U;
 	uint8_t m_tx_tile_bank = 0U;
 
-	int m_sprite_dx = 0;
+	uint8_t m_sprite_dx = 0U;
+	uint8_t m_sprite_offset = 0U;
 
 	// lkageb fake MCU
 	uint8_t m_mcu_val = 0U;
-	int m_mcu_ready = 0;    // CPU data/MCU ready status
+	uint8_t m_mcu_ready = 0;    // CPU data/MCU ready status
 
 	void sh_nmi_disable_w(uint8_t data);
 	void sh_nmi_enable_w(uint8_t data);
@@ -196,6 +197,8 @@ public:
 
 	void lkage5232(machine_config &config);
 
+	void init_lkage5232();
+
 protected:
 	virtual void machine_start() override;
 
@@ -209,8 +212,6 @@ private:
 	void exrom_offset_w(offs_t offset, uint8_t data);
 	uint8_t sound_unk_e000_r(offs_t offset);
 
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void program_map(address_map &map);
 	void sound_map(address_map &map);
 };
@@ -314,7 +315,7 @@ void lkage_state::video_start()
 void lkage_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const uint8_t *source = m_spriteram;
-	const uint8_t *finish = source + 0x60;
+	const uint8_t *finish = m_spriteram.bytes() == 0x60 ? source + 0x60 : source + 0x80;
 
 	while (source < finish)
 	{
@@ -349,74 +350,9 @@ void lkage_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 			sx = 239 - sx - 24;
 			flipx = !flipx;
 		}
-		if (flip_screen_y())
-		{
-			sy = 254 - 16 * height - sy;
-			flipy = !flipy;
-		}
-		if (height == 2 && !flipy)
-		{
-			sprite_number ^= 1;
-		}
-
-		for (int y = 0; y < height; y++)
-		{
-			m_gfxdecode->gfx(1)->prio_transpen(
-				bitmap,
-				cliprect,
-				sprite_number ^ y,
-				color,
-				flipx, flipy,
-				sx & 0xff,
-				sy + 16 * y,
-				screen.priority(),
-				priority_mask, 0);
-		}
-		source += 4;
-	}
-}
-
-void lkage5232_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	const uint8_t *source = m_spriteram;
-	const uint8_t *finish = source + 0x80;
-
-	while (source < finish)
-	{
-		int const attributes = source[2];
-		/* 0x01: horizontal flip
-		 * 0x02: vertical flip
-		 * 0x04: bank select
-		 * 0x08: sprite size
-		 * 0x70: color
-		 * 0x80: priority
-		 */
-		int priority_mask = 0;
-		int const color = (attributes >> 4) & 7;
-		int flipx = attributes & 0x01;
-		int flipy = attributes & 0x02;
-		int const height = (attributes & 0x08) ? 2 : 1;
-		int sx = source[0] - 15 + m_sprite_dx;
-		int sy = 256 - 16 * height - source[1];
-		int sprite_number = source[3] + ((attributes & 0x04) << 6);
-
-		if (attributes & 0x80)
-		{
-			priority_mask = (0xf0 | 0xcc);
-		}
 		else
 		{
-			priority_mask = 0xf0;
-		}
-
-		if (flip_screen_x())
-		{
-			sx = 239 - sx;
-			flipx = !flipx;
-		}
-		else
-		{
-			sx += 24;
+			sx += m_sprite_offset;
 		}
 
 		if (flip_screen_y())
@@ -447,62 +383,6 @@ void lkage5232_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, 
 }
 
 uint32_t lkage_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	flip_screen_x_set(~m_vreg[2] & 0x01);
-	flip_screen_y_set(~m_vreg[2] & 0x02);
-
-	int bank = m_vreg[1] & 0x08;
-
-	if (m_bg_tile_bank != bank)
-	{
-		m_bg_tile_bank = bank;
-		m_bg_tilemap->mark_all_dirty();
-	}
-
-	bank = m_vreg[0] & 0x04;
-	if (m_fg_tile_bank != bank)
-	{
-		m_fg_tile_bank = bank;
-		m_fg_tilemap->mark_all_dirty();
-	}
-
-	bank = m_vreg[0] & 0x02;
-	if (m_tx_tile_bank != bank)
-	{
-		m_tx_tile_bank = bank;
-		m_tx_tilemap->mark_all_dirty();
-	}
-
-	m_bg_tilemap->set_palette_offset(0x300 + (m_vreg[1] & 0xf0));
-	m_fg_tilemap->set_palette_offset(0x200 + (m_vreg[1] & 0xf0));
-	m_tx_tilemap->set_palette_offset(0x110);
-
-	m_tx_tilemap->set_scrollx(0, m_scroll[0]);
-	m_tx_tilemap->set_scrolly(0, m_scroll[1]);
-
-	m_fg_tilemap->set_scrollx(0, m_scroll[2]);
-	m_fg_tilemap->set_scrolly(0, m_scroll[3]);
-
-	m_bg_tilemap->set_scrollx(0, m_scroll[4]);
-	m_bg_tilemap->set_scrolly(0, m_scroll[5]);
-
-	screen.priority().fill(0, cliprect);
-	if ((m_vreg[2] & 0xf0) == 0xf0)
-	{
-		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, (m_vreg[1] & 2) ? 2 : 4);
-		m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
-		draw_sprites(screen, bitmap, cliprect);
-	}
-	else
-	{
-		m_tx_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	}
-
-	return 0;
-}
-
-uint32_t lkage5232_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	flip_screen_x_set(~m_vreg[2] & 0x01);
 	flip_screen_y_set(~m_vreg[2] & 0x02);
@@ -1469,23 +1349,33 @@ uint8_t lkage_state::fake_status_r()
 void lkage_state::init_lkage()
 {
 	m_sprite_dx = 0;
+
+	m_sprite_offset = 0;
 }
 
+void lkage5232_state::init_lkage5232()
+{
+	init_lkage();
+
+	m_sprite_offset = 24;
+}
 
 void lkage_state::init_bygone()
 {
 	m_sprite_dx = 1;
+
+	m_sprite_offset = 0;
 }
 
 } // anonymous namespace
 
 
-GAME( 1984, lkage,     0,     lkage,     lkage,  lkage_state,     init_lkage,  ROT0, "Taito Corporation", "The Legend of Kage",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageo,    lkage, lkage,     lkage,  lkage_state,     init_lkage,  ROT0, "Taito Corporation", "The Legend of Kage (older)",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageoo,   lkage, lkage,     lkage,  lkage_state,     init_lkage,  ROT0, "Taito Corporation", "The Legend of Kage (oldest)",        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb,    lkage, lkageb,    lkageb, lkage_state,     init_lkage,  ROT0, "bootleg",           "The Legend of Kage (bootleg set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb2,   lkage, lkageb,    lkageb, lkage_state,     init_lkage,  ROT0, "bootleg",           "The Legend of Kage (bootleg set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb3,   lkage, lkageb,    lkageb, lkage_state,     init_lkage,  ROT0, "bootleg",           "The Legend of Kage (bootleg set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb4,   lkage, lkageb,    lkageb, lkage_state,     init_lkage,  ROT0, "bootleg",           "The Legend of Kage (bootleg set 4)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkage5232, lkage, lkage5232, lkage,  lkage5232_state, init_lkage,  ROT0, "Taito Corporation", "The Legend of Kage (MSM5232 ver)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, bygone,    0,     lkage,     bygone, lkage_state,     init_bygone, ROT0, "Taito Corporation", "Bygone (prototype)",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkage,     0,     lkage,     lkage,  lkage_state,     init_lkage,     ROT0, "Taito Corporation", "The Legend of Kage",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageo,    lkage, lkage,     lkage,  lkage_state,     init_lkage,     ROT0, "Taito Corporation", "The Legend of Kage (older)",           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageoo,   lkage, lkage,     lkage,  lkage_state,     init_lkage,     ROT0, "Taito Corporation", "The Legend of Kage (oldest)",          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb,    lkage, lkageb,    lkageb, lkage_state,     init_lkage,     ROT0, "bootleg",           "The Legend of Kage (bootleg set 1)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb2,   lkage, lkageb,    lkageb, lkage_state,     init_lkage,     ROT0, "bootleg",           "The Legend of Kage (bootleg set 2)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb3,   lkage, lkageb,    lkageb, lkage_state,     init_lkage,     ROT0, "bootleg",           "The Legend of Kage (bootleg set 3)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb4,   lkage, lkageb,    lkageb, lkage_state,     init_lkage,     ROT0, "bootleg",           "The Legend of Kage (bootleg set 4)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkage5232, lkage, lkage5232, lkage,  lkage5232_state, init_lkage5232, ROT0, "Taito Corporation", "The Legend of Kage (MSM5232 version)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // attract is broken, reads and writes from/to MCU addresses
+GAME( 1985, bygone,    0,     lkage,     bygone, lkage_state,     init_bygone,    ROT0, "Taito Corporation", "Bygone (prototype)",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
