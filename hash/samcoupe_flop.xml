@@ -35,6 +35,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="samdos1">
 		<description>Sam Coupe System Disk (SAMDOS v1.1)</description>
 		<year>1990</year>
@@ -45,6 +46,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="samdos2">
 		<description>Sam Coupe System Disk (SAMDOS v2.0)</description>
 		<year>1990</year>
@@ -55,6 +57,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="batnball">
 		<description>Batz 'n Balls</description>
 		<year>1992</year>
@@ -65,6 +68,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="boing">
 		<description>Boing!</description>
 		<year>1992</year>
@@ -75,6 +79,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="castle">
 		<description>Castle</description>
 		<year>1991</year>
@@ -85,6 +90,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="defenders">
 		<description>Defenders Of The Earth</description>
 		<year>1990</year>
@@ -95,6 +101,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="dominobx">
 		<description>Domino Box</description>
 		<year>1997</year>
@@ -105,6 +112,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="doubletp">
 		<description>Double Top</description>
 		<year>1993</year>
@@ -115,6 +123,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="exodus">
 		<description>Exodus</description>
 		<year>1993</year>
@@ -130,6 +139,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="5trislnd">
 		<description>Five on a Treasure Island</description>
 		<year>1990</year>
@@ -140,6 +150,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="lemmings">
 		<description>Lemmings</description>
 		<year>1993</year>
@@ -150,6 +161,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="ppersia">
 		<description>Prince of Persia</description>
 		<year>1990</year>
@@ -160,6 +172,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="quizball">
 		<description>Quizball</description>
 		<year>1991</year>
@@ -170,6 +183,19 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="rickdang">
+		<description>Rick Dangerous</description>
+		<year>2021</year>
+		<publisher>D.T.A. Software Studio</publisher>
+		<info name="developer" value="Anton Javorček" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="860416">
+				<rom name="DTA_RickDangerous.dsk" size="860416" crc="deb55b68" sha1="d34dd9e1d63f8a07b91eba8a4773b34d773a4133"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="samstrikes">
 		<description>Sam Strikes Out!</description>
 		<year>1990</year>
@@ -180,6 +206,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="sophistry">
 		<description>Sophistry</description>
 		<year>1994</year>
@@ -190,6 +217,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="spellmst">
 		<description>Spell Master</description>
 		<year>1992</year>
@@ -201,6 +229,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="sphera">
 		<description>Sphera</description>
 		<year>1990</year>
@@ -211,6 +240,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="splat">
 		<description>Splat!</description>
 		<year>1991</year>
@@ -221,4 +251,17 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="sf">
+		<description>Street Fighter 1</description>
+		<year>2017</year>
+		<publisher>D.T.A. Software Studio</publisher>
+		<info name="developer" value="Anton Javorček" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="DTA_StreetFighter1_v1.mgt" size="819200" crc="33d4efbc" sha1="f7dc378b96d38c44f8936129cbb6f8a74f2fd74d"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
