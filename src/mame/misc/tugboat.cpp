@@ -13,10 +13,41 @@ TODO:
   with IRQ timing that causes it to dislike how tugboat does it?
 - colors might not be entirely accurate
   Suspect berenstn is using the wrong color PROM.
-- convert to use the HD46505 device, it has two?
+- convert to use the HD46505 device, it has two.
 
 Be careful modifying IRQ timing, otherwise controls in tugboat won't work properly,
 noticeable on the 2nd level.
+
+--------------------------------------------------------------------------------
+
+Bottom board:
+What appeared to be a cpu socket was a passthru to the top board.
+4 other smaller chip sockets also passed thru to the top.
+
+HD46505RP
+2*HD46821P
+AY-3-8912
+
+10MHz
+
+2532 u7
+2532 u8
+2532 u9
+
+4716 u67
+2532 u68
+2532 u69
+2532 u70
+
+Top board:
+
+SY6502
+HD46505RP
+
+4716 u-168
+2532 u-169
+4716 u-170
+4716 u-167
 
 *******************************************************************************/
 
