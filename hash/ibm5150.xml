@@ -2240,6 +2240,20 @@ Draws half height in CGA mode if a [VGA] is attached (verify)
 		</part>
 	</software>
 
+	<software name="sorcererb">
+		<description>Sorcerer (release 4, booter)</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<info name="copy_protection" value="Copy protected floppy disk track" />
+		<info name="developer" value="Infocom" />
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1616686">
+				<rom name="Sorcerer r4 (booter) [Infocom] [1984] [5.25SS] [Disk 1 of 1].mfm" size="1616686" crc="e82de2f4" sha1="b8b3d63aae51c45975a3578a3b96a54495bcdef8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spacestr">
 		<description>Space Strike (cracked)</description>
 		<year>1982</year>
@@ -2291,13 +2305,25 @@ Draws half height in CGA mode if a [VGA] is attached (verify)
 	</software>
 
 	<software name="storm">
-		<description>Storm</description>
+		<description>Storm (5.25" single sided)</description>
 		<year>1986</year>
 		<publisher>Mastertronic</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="storm.img" size="184320" crc="34d9574c" sha1="c8781398c4e310aabb8c6d5ac5e727d69b87d999"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="storma" cloneof="storm">
+		<description>Storm (5.25" double sided)</description>
+		<year>1986</year>
+		<publisher>Mastertronic</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="Storm [Mastertronic] [1986] [5.25DD] [Disk 1 of 1].img" size="368640" crc="cf5c2555" sha1="fc18b11cdefc069806d20238dd96e7c5a0a4f6ec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2339,10 +2365,39 @@ Draws half height in CGA mode if a [VGA] is attached (verify)
 		</part>
 	</software>
 
-	<software name="sfootbls">
-		<description>Super Football Sunday</description>
-		<year>1985</year>
+	<software name="sbdash" supported="no">
+		<description>Super Boulder Dash</description>
+		<year>1986</year>
+		<publisher>Electronic Arts</publisher>
+		<notes>Hangs on EOA logo</notes>
+		<info name="copy_protection" value="Copy protected floppy disk track" />
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1101058">
+				<rom name="Super Boulder Dash [Electronic Arts] [1986] [5.25DD] [Disk 1 of 1].mfm" size="1101058" crc="9d27435f" sha1="a86fbcd889d3f7aaa40d7ad0731b279ec7129e5e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spsunday">
+		<description>Super Sunday</description>
+		<year>1986</year>
+		<publisher>The Avalon Hill Game Company</publisher>
+		<info name="alt_title" value="Super Football Sunday" />
+		<info name="copy_protection" value="Copy protected floppy disk track" />
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1100610">
+				<rom name="Super Sunday [Avalon Hill] [1986] [5.25DD] [Disk 1 of 1].mfm" size="1100610" crc="9387716a" sha1="e00113f89dac84c65f41af6e9bd4512c3288493e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spsunday_c" cloneof="spsunday">
+		<description>Super Sunday (cracked)</description>
+		<year>1986</year>
 		<publisher>Avalon Hill</publisher>
+		<info name="alt_title" value="Super Football Sunday" />
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
@@ -2553,9 +2608,41 @@ Draws half height in CGA mode if a [VGA] is attached (verify)
 	</software>
 
 	<software name="wingames">
-		<description>Winter Games</description>
+		<description>Winter Games (3.5")</description>
 		<year>1986</year>
 		<publisher>Epyx</publisher>
+		<info name="copy_protection" value="Copy protected floppy disk track" />
+		<info name="developer" value="Action Graphics" />
+		<info name="ported_by" value="Designer Software" />
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="2152021">
+				<rom name="Winter Games [Epyx] [1986] [3.5DD] [Disk 1 of 1].mfm" size="2152021" crc="2c470644" sha1="258c88b9581426ba6a199bf1872bcb5908521f43"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wingamesa" cloneof="wingames">
+		<description>Winter Games (3.5", alt)</description>
+		<year>1986</year>
+		<publisher>Epyx</publisher>
+		<info name="copy_protection" value="Copy protected floppy disk track" />
+		<info name="developer" value="Action Graphics" />
+		<info name="ported_by" value="Designer Software" />
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="2111187">
+				<rom name="Winter Games (alt) [Epyx] [1986] [3.5DD] [Disk 1 of 1].mfm" size="2111187" crc="136fee23" sha1="10c8d3eb4afa02f96f877aa469ab77275fadefc6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wingames_c" cloneof="wingames">
+		<description>Winter Games (5.25", cracked)</description>
+		<year>1986</year>
+		<publisher>Epyx</publisher>
+		<info name="developer" value="Action Graphics" />
+		<info name="ported_by" value="Designer Software" />
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
@@ -2683,9 +2770,41 @@ Draws half height in CGA mode if a [VGA] is attached (verify)
 	</software>
 
 	<software name="wldgames">
-		<description>World Games</description>
+		<description>World Games (5.25")</description>
 		<year>1986</year>
 		<publisher>Epyx</publisher>
+		<info name="copy_protection" value="Copy protected floppy disk track" />
+		<info name="developer" value="K-Byte" />
+		<info name="ported_by" value="Designer Software" />
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1083633">
+				<rom name="World Games [Epyx] [1986] [5.25DD] [Disk 1 of 1].mfm" size="1083633" crc="4181dd27" sha1="9bfbef66b559df918e38cd5cff1cac515902f064"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wldgames35" cloneof="wldgames">
+		<description>World Games (3.5")</description>
+		<year>1986</year>
+		<publisher>Epyx</publisher>
+		<info name="copy_protection" value="Copy protected floppy disk track" />
+		<info name="developer" value="K-Byte" />
+		<info name="ported_by" value="Designer Software" />
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="2172713">
+				<rom name="World Games [Epyx] [1986] [3.5DD] [Disk 1 of 1].mfm" size="2172713" crc="a6cf2065" sha1="bd0310f27c7b8caad9688294a3cf2e7ee1ca1d92"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wldgames_c" cloneof="wldgames">
+		<description>World Games (5.25", cracked)</description>
+		<year>1986</year>
+		<publisher>Epyx</publisher>
+		<info name="developer" value="K-Byte" />
+		<info name="ported_by" value="Designer Software" />
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
@@ -8615,7 +8734,7 @@ Corrupt graphics on [CGA]
 		<publisher>Geoff. Brayford &amp; Associates Pty</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="America Cup Yacht Racing Simulator [Geoff. Brayford] [1986] [5.25DD] [Disk 1 of 1].img" size="368640" crc="b22babc6" sha1="f47d610d0c539f2e8d41ee9ea95f7246255e3f44"/>
+				<rom name="America Cup Yacht Racing Simulator [Geoff. Brayford] [1986] [5.25DD] [Disk 1 of 1].img" size="368640" crc="b22babc6" sha1="b6e38fa5f61173c40869c72f2abc4f05b1e4bfc6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14186,6 +14305,19 @@ Only works on an installed 5.25" floppy drive on A: (won't work if it is install
 		</part>
 	</software>
 
+	<software name="moonmist">
+		<description>Moonmist</description>
+		<year>1986</year>
+		<publisher>Infocom</publisher>
+		<info name="developer" value="Infocom" />
+		<info name="version" value="Release number 4 / Serial number 860918" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "184320">
+				<rom name="Moonmist r4 [Infocom] [1986] [5.25SS] [Disk 1 of 1].img" size="184320" crc="20d732a8" sha1="72d7ba3fd823b6ad0de48c7f4e63b8cfd1e37e6b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="moonwalk">
 		<description>Moonwalker</description>
 		<year>1989</year>
@@ -14321,6 +14453,19 @@ Only works on an installed 5.25" floppy drive on A: (won't work if it is install
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="Night Shift (alt) [Lucasfilm] [1990] [3.5DD] [Disk 2 of 2].img" size="737280" crc="9ebf9eda" sha1="b838c18addd367c05d3d0184ca3be5738ae09bb7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ninja">
+		<description>Ninja</description>
+		<year>1986</year>
+		<publisher>Mastertronic</publisher>
+		<info name="developer" value="Sculptured Software" />
+		<info name="ported_by" value="SoftArts" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Ninja [Mastertronic] [1986] [5.25DD] [Disk 1 of 1].img" size="368640" crc="406973c2" sha1="ada0b2aab09af5415fb3192b2d2ffda884a0a975"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15992,7 +16137,7 @@ When starting the game, the error "Packed file is corrupt" is shown.
 		<year>1991</year>
 		<publisher>Maxis Software</publisher>
 		<info name="developer" value="Maxis Software" />
-		<info name="language" value="English, French, German" />
+		<info name="language" value="English/French/German" />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -16247,6 +16392,18 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		</part>
 	</software>
 
+	<software name="sorcerer">
+		<description>Sorcerer (release 13)</description>
+		<year>1986</year>
+		<publisher>Infocom</publisher>
+		<info name="developer" value="Infocom" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "184320">
+				<rom name="Sorcerer r13 [Infocom] [1986] [5.25SS][Disk 1 of 1].img" size="184320" crc="e2a0a6e2" sha1="a0920709d9ffe887ef44aecdd35f4cb71e722f8a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spce1889">
 		<description>Space 1889</description>
 		<year>1990</year>
@@ -16274,6 +16431,18 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Space 1889 [Paragon] [1990] [5.25DD] [Disk 5 of 5].img" size="368640" crc="30945dfd" sha1="12d84cab917ce21fdd0ccb35daaaae7c3f4247a2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacebtl">
+		<description>Space Battles</description>
+		<year>1986</year>
+		<publisher>Keypunch Software</publisher>
+		<notes>Includes 4 programs: Spacewar / Meteor Shower / Moon Lander / Space Zombies</notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Space Battles [Keypunch] [1986] [5.25DD] [Disk 1 of 1].img" size="368640" crc="43f944ae" sha1="5786045ef9f7c4a30ee82905c7e6cb8d832549d0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16598,6 +16767,19 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		</part>
 	</software>
 
+	<software name="starcros">
+		<description>Starcross</description>
+		<year>1986</year>
+		<publisher>Infocom</publisher>
+		<info name="developer" value="Infocom" />
+		<info name="version" value="Release 17 / Serial number 821021" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "184320">
+				<rom name="Starcross [Infocom ] [1986] [5.25SS] [Disk 1 of 1].img" size="184320" crc="0107deb2" sha1="efdb2a98a8d84ab198c913b97c50dc9a2928e481"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="starflt">
 		<description>Starflight</description>
 		<year>1986</year>
@@ -16672,6 +16854,21 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Starflight 2 (alt) [Electronic Arts] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="14a815e7" sha1="03e343efbced4c31454e348f1364dc6e68307629"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starglid">
+		<description>Starglider</description>
+		<year>1987</year>
+		<publisher>Rainbird Software</publisher>
+		<info name="copy_protection" value="Manual required" />
+		<info name="developer" value="Argonaut Software" />
+		<info name="language" value="English/German" />
+		<info name="ported_by" value="Realtime Games Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Starglider [Rainbird] [1987] [5.25DD] [Disk 1 of 1].img" size="368640" crc="941f8ed4" sha1="dd3be4a741d1cf0fb1e1e57a3a5a40759247b2dd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16779,6 +16976,7 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<publisher>Mindscape</publisher>
 		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Distinctive Software" />
+		<info name="region" value="Europe" />
 		<info name="version" value="1.1 (Feb 25 1991)" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -16808,6 +17006,7 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<publisher>Mindscape</publisher>
 		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Distinctive Software" />
+		<info name="region" value="Europe" />
 		<info name="version" value="1.1 (Feb 25 1991)" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
@@ -16827,6 +17026,7 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<publisher>Brøderbund Software</publisher>
 		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Distinctive Software" />
+		<info name="region" value="USA" />
 		<info name="version" value="1.1 (Feb 12 1991)" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -16856,6 +17056,7 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<publisher>Brøderbund Software</publisher>
 		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Distinctive Software" />
+		<info name="region" value="USA" />
 		<info name="version" value="1.1 (Feb 12 1991)" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
@@ -17553,6 +17754,19 @@ Disk 1 has a modified "go.bat" file
 		</part>
 	</software>
 
+	<software name="trinity">
+		<description>Trinity</description>
+		<year>1986</year>
+		<publisher>Infocom</publisher>
+		<info name="developer" value="Infocom" />
+		<info name="version" value="Release 12" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Trinity r12 [Infocom] [1986] [5.25DD] [Disk 1 of 1].img" size="368640" crc="e4ef858f" sha1="78c386670f19a81d0a29ad1037a483241c148015"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tntkhazan">
 		<description>Tunnels &amp; Trolls: Crusaders of Khazan</description>
 		<year>1990</year>
@@ -17760,6 +17974,17 @@ ibmpcjr: unsupported, "program too big to fit in memory"
 		</part>
 	</software>
 
+	<software name="wallstrt">
+		<description>Wall Street</description>
+		<year>1986</year>
+		<publisher>Melody Hall Publishing Corp.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "327680">
+				<rom name="Wall Street [Melody Hall Publishing] [1986] [5.25DD] [Disk 1 of 1].img" size="327680" crc="30e57e7a" sha1="3dd9e1569c7ad7779e5d90a1df477e6c1acc1f5b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="waterloo">
 		<description>Waterloo</description>
 		<year>1989</year>
@@ -17926,6 +18151,7 @@ Black screen, incomplete dump? Has autoexec.bat without command.com, requires to
 		<year>1990</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="developer" value="Novalogic" />
+		<info name="region" value="USA" />
 		<info name="version" value="1.10" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
