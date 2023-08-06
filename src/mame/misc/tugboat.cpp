@@ -6,9 +6,9 @@ Enter-Tech Tugboat (Moppet Video series, on improved El Grande hardware)
 6502 hooked up + preliminary video by Ryan Holtz
 
 TODO:
-- check how the score is displayed. I'm quite sure that tugboat_score_w is
-  supposed to access videoram scanning it by columns (like btime_mirrorvideoram_w),
-  but the current implementation is a big kludge, and it still looks wrong.
+- check how the score is displayed. I'm quite sure that score_w is supposed to
+  access videoram scanning it by columns (like btime_mirrorvideoram_w), but
+  the current implementation is a big kludge.
 - why is fine x scroll latched differently for noahsark? or is something wrong
   with IRQ timing that causes it to dislike how tugboat does it?
 - colors might not be entirely accurate
@@ -70,11 +70,12 @@ public:
 	tugboat_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_pia(*this, "pia%u", 0),
+		m_pia(*this, "pia%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_inputs(*this, "IN%u", 0)
+		m_inputs(*this, "IN%u", 0U),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	void tugboat(machine_config &config);
@@ -91,23 +92,24 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_ioport_array<4> m_inputs;
+	output_finder<2> m_lamps;
 
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 
-	uint8_t m_hd46505_regs[2][0x20] = { };
-	uint8_t m_hd46505_reglatch[2] = { };
-	uint16_t m_start_address[2] = { };
-	uint8_t m_control[2] = { };
-	uint8_t m_fine_x_clock = 0;
-	uint8_t m_fine_y_clock = 0;
-	uint8_t m_fine_x_latch = 0;
-	uint8_t m_fine_y_latch = 0;
+	u8 m_hd46505_regs[2][0x20] = { };
+	u8 m_hd46505_reglatch[2] = { };
+	u16 m_start_address[2] = { };
+	u8 m_control[2] = { };
+	u8 m_fine_x_clock = 0;
+	u8 m_fine_y_clock = 0;
+	u8 m_fine_x_latch = 0;
+	u8 m_fine_y_latch = 0;
 
-	template<int N> void hd46505_w(offs_t offset, uint8_t data);
-	void score_w(offs_t offset, uint8_t data);
-	uint8_t input_r();
-	void control0_w(offs_t offset, uint8_t data, uint8_t mem_mask);
-	void control1_w(offs_t offset, uint8_t data, uint8_t mem_mask);
+	template<int N> void hd46505_w(offs_t offset, u8 data);
+	void score_w(offs_t offset, u8 data);
+	u8 input_r();
+	void control0_w(offs_t offset, u8 data, u8 mem_mask);
+	void control1_w(offs_t offset, u8 data, u8 mem_mask);
 
 	void latch_start_address();
 	void tugboat_vblank_w(int state);
@@ -115,7 +117,7 @@ private:
 
 	void tugboat_palette(palette_device &palette) const;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
 
 	void main_map(address_map &map);
@@ -130,6 +132,7 @@ private:
 void tugboat_state::machine_start()
 {
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
+	m_lamps.resolve();
 
 	save_item(NAME(m_hd46505_regs));
 	save_item(NAME(m_hd46505_reglatch));
@@ -156,7 +159,7 @@ void tugboat_state::video_start()
 // there isn't the usual resistor array anywhere near the color PROM, just four 1k resistors.
 void tugboat_state::tugboat_palette(palette_device &palette) const
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	u8 const *const color_prom = memregion("proms")->base();
 	for (int i = 0; i < palette.entries(); i++)
 	{
 		int const brt = BIT(color_prom[i], 3) ? 0xff : 0x80;
@@ -170,9 +173,9 @@ void tugboat_state::tugboat_palette(palette_device &palette) const
 }
 
 
-// see mc6845.cpp, I process the writes here because I need the start_addr register to handle coarse scrolling
+// see mc6845.cpp, coarse scrolling is performed changing the start_addr register (0C/0D)
 template<int N>
-void tugboat_state::hd46505_w(offs_t offset, uint8_t data)
+void tugboat_state::hd46505_w(offs_t offset, u8 data)
 {
 	if (offset == 0)
 		m_hd46505_reglatch[N] = data & 0x1f;
@@ -214,17 +217,15 @@ void tugboat_state::noahsark_vblank_w(int state)
 }
 
 
-void tugboat_state::score_w(offs_t offset, uint8_t data)
+void tugboat_state::score_w(offs_t offset, u8 data)
 {
-	if (offset < 8)
-		m_program.write_byte(0x291d + 32*offset + 32*9,     data ^ 0x0f);
-	else
-		m_program.write_byte(0x291d + 32*offset + 32*(1-8), data ^ 0x0f);
+	// to vram layer 1 column 29
+	m_program.write_byte(0x291d + 32 * (offset ^ 8), ~data & 0xf);
 }
 
 void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer)
 {
-	uint16_t addr = m_start_address[layer];
+	u16 addr = m_start_address[layer];
 
 	for (int y = 0; y < 32; y++)
 	{
@@ -233,23 +234,19 @@ void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect
 			int attr = m_program.read_byte(addr + 0x400);
 			int code = ((attr & 0x01) << 8) | m_program.read_byte(addr);
 			int color = (attr & 0x3c) >> 2;
-			int rgn, transpen, fx = 0, fy = 0;
+			int rgn = layer * 2 + ((attr & 0x02) >> 1);
+			int transpen = -1, fx = 0, fy = 0;
 
-			if (attr & 0x02)
+			if (layer == 1)
 			{
-				rgn = layer * 2 + 1;
-				transpen = 7;
+				transpen = m_gfxdecode->gfx(rgn)->depth() - 1;
+
+				// score panel column doesn't scroll
+				if (x != 29)
+					fy = m_fine_y_latch;
 			}
 			else
-			{
-				rgn = layer * 2;
-				transpen = 1;
-			}
-
-			if (layer == 0)
-				fx = m_fine_x_latch & 7;
-			else if (attr & 0x02)
-				fy = m_fine_y_latch & 7;
+				fx = m_fine_x_latch;
 
 			m_gfxdecode->gfx(rgn)->transpen(bitmap,cliprect,
 					code,
@@ -257,14 +254,14 @@ void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect
 					0, 0,
 					8 * x + fx,
 					8 * y - fy,
-					(layer == 1) ? transpen : -1);
+					transpen);
 
 			addr = (addr & 0xfc00) | ((addr + 1) & 0x03ff);
 		}
 	}
 }
 
-uint32_t tugboat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 tugboat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_tilemap(bitmap, cliprect, 0);
 	draw_tilemap(bitmap, cliprect, 1);
@@ -278,9 +275,9 @@ uint32_t tugboat_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
     Misc. I/O
 *******************************************************************************/
 
-uint8_t tugboat_state::input_r()
+u8 tugboat_state::input_r()
 {
-	uint8_t data = 0xff;
+	u8 data = 0xff;
 
 	for (int i = 0; i < 4; i++)
 		if (BIT(m_control[1], i ^ 7))
@@ -289,17 +286,21 @@ uint8_t tugboat_state::input_r()
 	return data;
 }
 
-void tugboat_state::control0_w(offs_t offset, uint8_t data, uint8_t mem_mask)
+void tugboat_state::control0_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	data |= ~mem_mask;
 	data = ~data;
+
+	// d1,d2: start lamps
+	m_lamps[0] = BIT(data, 1);
+	m_lamps[1] = BIT(data, 2);
 
 	// d5: coincounter
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
 
 	// d6: clock layer 1 fine x scroll
 	if (data & ~m_control[0] & 0x40)
-		m_fine_x_clock++;
+		m_fine_x_clock = (m_fine_x_clock + 1) & 7;
 
 	// d7: clear layer 1 fine x scroll
 	if (data & 0x80)
@@ -308,14 +309,14 @@ void tugboat_state::control0_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 	m_control[0] = data;
 }
 
-void tugboat_state::control1_w(offs_t offset, uint8_t data, uint8_t mem_mask)
+void tugboat_state::control1_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	data |= ~mem_mask;
 	data = ~data;
 
 	// d2: clock layer 2 fine y scroll
 	if (data & ~m_control[1] & 4)
-		m_fine_y_clock++;
+		m_fine_y_clock = (m_fine_y_clock + 1) & 7;
 
 	// d0: clear layer 2 fine y scroll
 	if (data & 1)
@@ -336,7 +337,7 @@ void tugboat_state::main_map(address_map &map)
 	map.global_mask(0x7fff);
 	map(0x0000, 0x01ff).ram();
 	map(0x1060, 0x1061).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0x10a0, 0x10a1).w(FUNC(tugboat_state::hd46505_w<0>)); // coarse scrolling is performed changing the start_addr register (0C/0D)
+	map(0x10a0, 0x10a1).w(FUNC(tugboat_state::hd46505_w<0>));
 	map(0x10c0, 0x10c1).w(FUNC(tugboat_state::hd46505_w<1>));
 	map(0x11e4, 0x11e7).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x11e8, 0x11eb).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -502,8 +503,9 @@ ROM_START( tugboat )
 	ROM_LOAD( "u69.bin", 0x1000, 0x1000, CRC(e6d25878) SHA1(de9096ef3108d031049be1e7f2c5e346d0bc0df1) )
 	ROM_LOAD( "u70.bin", 0x2000, 0x1000, CRC(34ce2850) SHA1(8883126627ed8a1d2c3bed2a3d169ce35eafc8a3) )
 
-	ROM_REGION( 0x0800, "gfx3", 0 )
-	ROM_LOAD( "u168.bin", 0x0000, 0x0800, CRC(279042fd) SHA1(1361fff1bc532251bbd36b7b60776c2cc137cfba) )    /* labeled u-167 */
+	ROM_REGION( 0x0800, "gfx3", ROMREGION_ERASEFF )
+	ROM_LOAD( "u168.bin", 0x0000, 0x0080, CRC(279042fd) SHA1(1361fff1bc532251bbd36b7b60776c2cc137cfba) )    /* labeled u-167 */
+	ROM_IGNORE( 0x0780 )
 
 	ROM_REGION( 0x1800, "gfx4", 0 )
 	ROM_LOAD( "u170.bin", 0x0000, 0x0800, CRC(64d9f4d7) SHA1(3ff7fc099023512c33ec4583e91e6cbab903e7a8) )    /* labeled u-168 */
@@ -530,8 +532,9 @@ ROM_START( noahsark )
 	ROM_LOAD( "u69.bin", 0x1000, 0x1000, CRC(fa2c279c) SHA1(332fcfcfe605c4132114399c32932507b16752e5) )
 	ROM_LOAD( "u70.bin", 0x2000, 0x1000, CRC(dcabc7c5) SHA1(68abfdedea518e3a5c90f9f72173e8c05e190535) )
 
-	ROM_REGION( 0x0800, "gfx3", 0 )
-	ROM_LOAD( "u168.bin", 0x0000, 0x0800, CRC(7fc7280f) SHA1(93bf46e421b580edf81177db85cb220073761c57) )    /* labeled u-167 */
+	ROM_REGION( 0x0800, "gfx3", ROMREGION_ERASEFF )
+	ROM_LOAD( "u168.bin", 0x0000, 0x0080, CRC(7fc7280f) SHA1(93bf46e421b580edf81177db85cb220073761c57) )    /* labeled u-167 */
+	ROM_IGNORE( 0x0780 )
 
 	ROM_REGION( 0x3000, "gfx4", 0 )
 	ROM_LOAD( "u170.bin", 0x0000, 0x1000, CRC(ba36641c) SHA1(df206dc4b6f2da7b60bdaa72c8175de928a630a4) )    /* labeled u-168 */
@@ -558,8 +561,9 @@ ROM_START( berenstn )
 	ROM_LOAD( "u69.bin", 0x1000, 0x1000, CRC(9dc770f6) SHA1(5dc16fac72d68b521dbb415935f5e7f682c26d7f) )
 	ROM_LOAD( "u70.bin", 0x2000, 0x1000, CRC(a810bd45) SHA1(8be531529174c5d4b4f164bd2397116b9d5350db) )
 
-	ROM_REGION( 0x0800, "gfx3", 0 )
-	ROM_LOAD( "u167.bin", 0x0000, 0x0800, CRC(7fc7280f) SHA1(93bf46e421b580edf81177db85cb220073761c57) )
+	ROM_REGION( 0x0800, "gfx3", ROMREGION_ERASEFF )
+	ROM_LOAD( "u167.bin", 0x0000, 0x0080, CRC(7fc7280f) SHA1(93bf46e421b580edf81177db85cb220073761c57) )
+	ROM_IGNORE( 0x0780 )
 
 	ROM_REGION( 0x3000, "gfx4", 0 )
 	ROM_LOAD( "u168.bin", 0x0000, 0x0800, CRC(af532ba3) SHA1(b196e294eaf4c25549278fd040b1dad2799e18d5) )
@@ -567,7 +571,7 @@ ROM_START( berenstn )
 	ROM_LOAD( "u170.bin", 0x2000, 0x0800, CRC(73261eff) SHA1(19edd6957fceb3df12fd29cd5e156a5eb1c70710) )
 
 	ROM_REGION( 0x0100, "proms", 0 ) /* Same as Tugboat but is this actually correct? */
-	ROM_LOAD( "n.t.2-031j.24s10", 0x0000, 0x0100, CRC(236672bf) SHA1(57482d0a23223ef7b211045ad28d3e41e90f961e) )
+	ROM_LOAD( "n.t.2-031j.24s10", 0x0000, 0x0100, BAD_DUMP CRC(236672bf) SHA1(57482d0a23223ef7b211045ad28d3e41e90f961e) )
 ROM_END
 
 } // anonymous namespace
@@ -578,6 +582,6 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-GAME( 1982, tugboat,  0, tugboat,  tugboat,  tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "Tugboat",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, noahsark, 0, noahsark, noahsark, tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "Noah's Ark",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, berenstn, 0, noahsark, noahsark, tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "The Berenstain Bears in Big Paw's Cave", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, tugboat,  0, tugboat,  tugboat,  tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "Tugboat",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, noahsark, 0, noahsark, noahsark, tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "Noah's Ark",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, berenstn, 0, noahsark, noahsark, tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "The Berenstain Bears in Bigpaw's Cave", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
