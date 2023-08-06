@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /*******************************************************************************
 
-Enter-Tech Tugboat (Moppet Video hardware)
+Enter-Tech Tugboat (Moppet Video series, on improved El Grande hardware)
 6502 hooked up + preliminary video by Ryan Holtz
 
 TODO:
@@ -13,7 +13,7 @@ TODO:
   with IRQ timing that causes it to dislike how tugboat does it?
 - colors might not be entirely accurate
   Suspect berenstn is using the wrong color PROM.
-- convert to use the HD46505 device, it has two.
+- convert to use the HD46505 device, it has two?
 
 Be careful modifying IRQ timing, otherwise controls in tugboat won't work properly,
 noticeable on the 2nd level.
@@ -421,14 +421,16 @@ void tugboat_state::tugboat(machine_config &config)
 	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set_ioport("DSW");
 	m_pia[1]->writepb_handler().set(FUNC(tugboat_state::control1_w));
+	m_pia[1]->cb2_handler().set_nop();
+	m_pia[1]->irqb_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_pia[1]->irqb_handler().append_inputline(m_maincpu, 0);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(10_MHz_XTAL/2, 320, 8, 248, 264, 8, 240);
 	m_screen->set_screen_update(FUNC(tugboat_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_screen->screen_vblank().append_inputline(m_maincpu, 0, HOLD_LINE);
+	m_screen->screen_vblank().set(m_pia[1], FUNC(pia6821_device::cb1_w));
 	m_screen->screen_vblank().append(FUNC(tugboat_state::tugboat_vblank_w));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tugboat);
@@ -445,9 +447,7 @@ void tugboat_state::noahsark(machine_config &config)
 	tugboat(config);
 
 	// video hardware
-	m_screen->set_video_attributes(0);
-	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_screen->screen_vblank().append_inputline(m_maincpu, 0, HOLD_LINE);
+	m_screen->screen_vblank().set(m_pia[1], FUNC(pia6821_device::cb1_w));
 	m_screen->screen_vblank().append(FUNC(tugboat_state::noahsark_vblank_w));
 }
 
