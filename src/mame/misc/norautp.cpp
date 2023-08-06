@@ -900,6 +900,19 @@ void norautp_state::norautx8_map(address_map &map)
 }
 #endif
 
+void norautp_state::noraut3_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().region("maincpu", 0x4000);
+	map(0x6000, 0x67ff).ram().share("nvram"); /* 6116 */
+	map(0x8000, 0xbfff).rom().region("maincpu", 0xc000);
+}
+
+void norautp_state::noraut3_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().region("maincpu", 0x0000);
+	map(0x8000, 0xbfff).rom().region("maincpu", 0x8000);
+}
+
 void norautp_state::kimble_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
@@ -1431,6 +1444,16 @@ void norautp_state::norautx8(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
 }
 #endif
+
+void norautp_state::noraut3(machine_config &config)
+{
+	noraut_base(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::noraut3_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &norautp_state::noraut3_decrypted_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+}
 
 void norautp_state::kimble(machine_config &config)
 {
@@ -4457,8 +4480,8 @@ GAMEL( 1988, norautjp, norautp, norautp,  norautp,  norautp_state, empty_init, R
 GAMEL( 1988, norautrh, 0,       norautp,  norautrh, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker",          0,                   layout_noraut12 )
 GAMEL( 198?, norautra, 0,       norautp,  norautrh, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker (alt HW)", 0,                   layout_noraut12 ) // 1-bet?? where??...
 GAME(  1988, norautu,  0,       norautxp, norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Poker (NTX10A)",               MACHINE_NOT_WORKING )
-GAME(  2002, noraut3a, 0,       norautxp, norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Joker Poker (V3.010a)",        MACHINE_NOT_WORKING )
-GAME(  2003, noraut3b, 0,       norautxp, norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Joker Poker (V3.011a)",        MACHINE_NOT_WORKING )
+GAME(  2002, noraut3a, 0,       noraut3,  norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Joker Poker (V3.010a)",        MACHINE_NOT_WORKING )
+GAME(  2003, noraut3b, 0,       noraut3,  norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Joker Poker (V3.011a)",        MACHINE_NOT_WORKING )
 GAMEL( 198?, norautua, 0,       norautu,  norautp,  norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (console, set 1)", MACHINE_NOT_WORKING, layout_noraut12 )
 GAMEL( 198?, norautub, 0,       norautu,  norautp,  norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (console, set 2)", MACHINE_NOT_WORKING, layout_noraut12 )
 GAMEL( 198?, mainline, 0,       norautp,  mainline, norautp_state, empty_init, ROT0, "Mainline London",          "Mainline Double Joker Poker",         0,                   layout_noraut12 )

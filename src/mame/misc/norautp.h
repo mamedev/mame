@@ -46,6 +46,7 @@ public:
 	void dphla(machine_config &config);
 	void drhl(machine_config &config);
 	void norautxp(machine_config &config);
+	void noraut3(machine_config &config);
 	void cgidjp(machine_config &config);
 	void cdrawpkr(machine_config &config);
 
@@ -76,6 +77,8 @@ private:
 	void kimbldhl_map(address_map &map);
 	void kimble_map(address_map &map);
 	void newhilop_map(address_map &map);
+	void noraut3_map(address_map &map);
+	void noraut3_decrypted_opcodes_map(address_map &map);
 	void norautp_map(address_map &map);
 	void norautp_portmap(address_map &map);
 	void norautx4_map(address_map &map);
