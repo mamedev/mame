@@ -74,6 +74,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_vram(*this, "vram"),
 		m_inputs(*this, "IN%u", 0U),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
@@ -91,10 +92,9 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<u8> m_vram;
 	required_ioport_array<4> m_inputs;
 	output_finder<2> m_lamps;
-
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 
 	u8 m_hd46505_regs[2][0x20] = { };
 	u8 m_hd46505_reglatch[2] = { };
@@ -131,7 +131,6 @@ private:
 
 void tugboat_state::machine_start()
 {
-	m_maincpu->space(AS_PROGRAM).specific(m_program);
 	m_lamps.resolve();
 
 	save_item(NAME(m_hd46505_regs));
@@ -220,19 +219,19 @@ void tugboat_state::noahsark_vblank_w(int state)
 void tugboat_state::score_w(offs_t offset, u8 data)
 {
 	// to vram layer 1 column 29
-	m_program.write_byte(0x291d + 32 * (offset ^ 8), ~data & 0xf);
+	m_vram[0x91d + 32 * (offset ^ 8)] = ~data & 0xf;
 }
 
 void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer)
 {
-	u16 addr = m_start_address[layer];
+	u16 addr = layer * 0x800 + (m_start_address[layer] & 0x3ff);
 
 	for (int y = 0; y < 32; y++)
 	{
 		for (int x = 0; x < 32; x++)
 		{
-			int attr = m_program.read_byte(addr + 0x400);
-			int code = ((attr & 0x01) << 8) | m_program.read_byte(addr);
+			int attr = m_vram[addr | 0x400];
+			int code = ((attr & 0x01) << 8) | m_vram[addr];
 			int color = (attr & 0x3c) >> 2;
 			int rgn = layer * 2 + ((attr & 0x02) >> 1);
 			int transpen = -1, fx = 0, fy = 0;
@@ -256,7 +255,7 @@ void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect
 					8 * y - fy,
 					transpen);
 
-			addr = (addr & 0xfc00) | ((addr + 1) & 0x03ff);
+			addr = (addr & 0x800) | ((addr + 1) & 0x3ff);
 		}
 	}
 }
@@ -342,7 +341,7 @@ void tugboat_state::main_map(address_map &map)
 	map(0x11e4, 0x11e7).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x11e8, 0x11eb).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x18e0, 0x18ef).w(FUNC(tugboat_state::score_w)).nopr();
-	map(0x2000, 0x2fff).ram(); // tilemap RAM
+	map(0x2000, 0x2fff).ram().share(m_vram);
 	map(0x4000, 0x7fff).rom();
 }
 
@@ -582,6 +581,7 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-GAME( 1982, tugboat,  0, tugboat,  tugboat,  tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "Tugboat",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, noahsark, 0, noahsark, noahsark, tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "Noah's Ark",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, berenstn, 0, noahsark, noahsark, tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "The Berenstain Bears in Bigpaw's Cave", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS          INIT        SCREEN  COMPANY             FULLNAME                                 FLAGS
+GAME( 1982, tugboat,  0,      tugboat,  tugboat,  tugboat_state, empty_init, ROT90,  "Enter-Tech, Ltd.", "Tugboat",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, noahsark, 0,      noahsark, noahsark, tugboat_state, empty_init, ROT90,  "Enter-Tech, Ltd.", "Noah's Ark",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, berenstn, 0,      noahsark, noahsark, tugboat_state, empty_init, ROT90,  "Enter-Tech, Ltd.", "The Berenstain Bears in Bigpaw's Cave", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
