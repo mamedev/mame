@@ -3,14 +3,26 @@
 #include "emu.h"
 #include "mga2064w.h"
 
+#define LOG_WARN      (1U << 1)
+#define LOG_ALIAS     (1U << 2) // log mgabase1 index setups thru the back door
+
+#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_ALIAS)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
+#define LOGWARN(...)            LOGMASKED(LOG_WARN, __VA_ARGS__)
+#define LOGALIAS(...)           LOGMASKED(LOG_ALIAS, __VA_ARGS__)
+
 DEFINE_DEVICE_TYPE(MGA2064W, mga2064w_device, "mga2064w", "Matrox Millennium \"IS-STORM / MGA-2064W\"")
 
 mga2064w_device::mga2064w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MGA2064W, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
 	, m_svga(*this, "svga")
 	, m_vga_rom(*this, "vga_rom")
 {
 	set_ids(0x102b0519, 0x01, 0x030000, 0x00000000);
+	m_mgabase1_real_space_config = address_space_config("mgabase1_regs", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(FUNC(mga2064w_device::mgabase1_map), this));
 }
 
 ROM_START( mga2064w )
@@ -47,6 +59,7 @@ void mga2064w_device::device_add_mconfig(machine_config &config)
 void mga2064w_device::device_start()
 {
 	pci_device::device_start();
+	// NB: following is swapped on G400
 	add_map(    16*1024, M_MEM, FUNC(mga2064w_device::mgabase1_map));
 	add_map(8*1024*1024, M_MEM, FUNC(mga2064w_device::mgabase2_map));
 	//  add_rom_from_region();
@@ -60,14 +73,22 @@ void mga2064w_device::device_reset()
 
 	// INTA#
 	intr_pin = 1;
+	m_mgabase1_real_index = 0;
+}
+
+device_memory_interface::space_config_vector mga2064w_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_IO, &m_mgabase1_real_space_config)
+	};
 }
 
 void mga2064w_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
 //  map(0x40, 0x43) OPTION
-//  map(0x44, 0x47) MGA_INDEX - aliases for accessing mgabase1 thru PCI config space
-//  map(0x48, 0x4b) MGA_DATA  /
+	map(0x44, 0x47).rw(FUNC(mga2064w_device::mga_index_r), FUNC(mga2064w_device::mga_index_w));
+	map(0x48, 0x4b).rw(FUNC(mga2064w_device::mga_data_r), FUNC(mga2064w_device::mga_data_w));
 }
 
 void mga2064w_device::mgabase1_map(address_map &map)
@@ -116,7 +137,7 @@ void mga2064w_device::mgabase1_map(address_map &map)
 //  map(0x1e54, 0x1e57) OPMODE
 //  map(0x1f00, 0x1fff) VGA CRTC linear I/O
 	map(0x1fb0, 0x1fdf).m(m_svga, FUNC(matrox_vga_device::io_map));
-//  map(0x3c00, 0x3c1f) RAMDAC
+	map(0x3c00, 0x3c1f).m(m_svga, FUNC(matrox_vga_device::ramdac_ext_map));
 //  map(0x3e00, 0x3fff) EXPDEV Expansion bus
 }
 
@@ -157,4 +178,35 @@ void mga2064w_device::map_extra(uint64_t memory_window_start, uint64_t memory_wi
 
 		io_space->install_device(0x03b0, 0x03df, *this, &mga2064w_device::legacy_io_map);
 	}
+}
+
+/*
+ * MGA_INDEX / MGA_DATA
+ * aliases for accessing mgabase1 thru PCI config space
+ * i.e. a backdoor for x86 in real mode
+ */
+
+u32 mga2064w_device::mga_index_r()
+{
+	LOGALIAS("MGA_INDEX read\n");
+	return m_mgabase1_real_index & 0x3ffc;
+}
+
+void mga2064w_device::mga_index_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// VESA BIOS sets up $3c0a while accessing with mask 0x00ff0000
+	// bits 0-1 are reserved and don't respond, assume mistake
+	LOGALIAS("MGA_INDEX write %08x %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_mgabase1_real_index);
+	m_mgabase1_real_index &= 0x3ffc;
+}
+
+u8 mga2064w_device::mga_data_r(offs_t offset)
+{
+	return space(AS_IO).read_byte(offset + m_mgabase1_real_index);
+}
+
+void mga2064w_device::mga_data_w(offs_t offset, u8 data)
+{
+	space(AS_IO).write_byte(offset + m_mgabase1_real_index, data);
 }
