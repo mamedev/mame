@@ -1,34 +1,31 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-/****************************************************************************
+/*******************************************************************************
 
-Tug Boat
+Enter-Tech Tugboat (Moppet Video hardware)
 6502 hooked up + preliminary video by Ryan Holtz
 
 TODO:
-- verify connections of the two PIAs. I only hooked up a couple of ports but
-  there are more.
 - check how the score is displayed. I'm quite sure that tugboat_score_w is
   supposed to access videoram scanning it by columns (like btime_mirrorvideoram_w),
   but the current implementation is a big kludge, and it still looks wrong.
+- why is fine x scroll latched differently for noahsark? or is something wrong
+  with IRQ timing that causes it to dislike how tugboat does it?
 - colors might not be entirely accurate
   Suspect berenstn is using the wrong color PROM.
-- convert to use the H46505 device.
+- convert to use the HD46505 device, it has two.
 
-the problem which caused the controls not to work
----
-There's counter at $000b, counting up from $ff to 0 or from $fe to 0 (initial value depends
-on game level). It's increased in main loop, and used for game flow control (scrolling speed , controls  etc).
-Every interrupt, when (counter&3)!=0 , there's a check for left/right inputs .
-But when init val was $ff (2nd level),  the condition 'counter&3!=0' was
-always false - counter was reloaded and incremented before interrupt occurs
+Be careful modifying IRQ timing, otherwise controls in tugboat won't work properly,
+noticeable on the 2nd level.
 
-****************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -42,60 +39,75 @@ public:
 	tugboat_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_pia(*this, "pia%u", 0),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_inputs(*this, "IN%u", 0)
 	{ }
 
 	void tugboat(machine_config &config);
+	void noahsark(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	virtual void machine_reset() override;
-
-	TIMER_CALLBACK_MEMBER(trigger_int);
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device_array<pia6821_device, 2> m_pia;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_ioport_array<4> m_inputs;
 
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 
-	uint8_t m_hd46505_0_reg[18]{};
-	uint8_t m_hd46505_1_reg[18]{};
-	int m_reg0 = 0;
-	int m_reg1 = 0;
-	int m_ctrl = 0;
-	emu_timer *m_interrupt_timer = nullptr;
+	uint8_t m_hd46505_regs[2][0x20] = { };
+	uint8_t m_hd46505_reglatch[2] = { };
+	uint16_t m_start_address[2] = { };
+	uint8_t m_control[2] = { };
+	uint8_t m_fine_x_clock = 0;
+	uint8_t m_fine_y_clock = 0;
+	uint8_t m_fine_x_latch = 0;
+	uint8_t m_fine_y_latch = 0;
 
-	void hd46505_0_w(offs_t offset, uint8_t data);
-	void hd46505_1_w(offs_t offset, uint8_t data);
+	template<int N> void hd46505_w(offs_t offset, uint8_t data);
 	void score_w(offs_t offset, uint8_t data);
 	uint8_t input_r();
-	void ctrl_w(uint8_t data);
+	void control0_w(offs_t offset, uint8_t data, uint8_t mem_mask);
+	void control1_w(offs_t offset, uint8_t data, uint8_t mem_mask);
+
+	void latch_start_address();
+	void tugboat_vblank_w(int state);
+	void noahsark_vblank_w(int state);
 
 	void tugboat_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, int addr, int gfx0, int gfx1, int transparency);
+	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
 
 	void main_map(address_map &map);
 };
 
 
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
+
 void tugboat_state::machine_start()
 {
-	m_interrupt_timer = timer_alloc(FUNC(tugboat_state::trigger_int), this);
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
-	save_item(NAME(m_hd46505_0_reg));
-	save_item(NAME(m_hd46505_1_reg));
-	save_item(NAME(m_reg0));
-	save_item(NAME(m_reg1));
-	save_item(NAME(m_ctrl));
+	save_item(NAME(m_hd46505_regs));
+	save_item(NAME(m_hd46505_reglatch));
+	save_item(NAME(m_start_address));
+	save_item(NAME(m_control));
+	save_item(NAME(m_fine_x_clock));
+	save_item(NAME(m_fine_y_clock));
+	save_item(NAME(m_fine_x_latch));
+	save_item(NAME(m_fine_y_latch));
 }
 
 void tugboat_state::video_start()
@@ -104,7 +116,13 @@ void tugboat_state::video_start()
 	m_gfxdecode->gfx(2)->set_granularity(8);
 }
 
-//  there isn't the usual resistor array anywhere near the color PROM, just four 1k resistors.
+
+
+/*******************************************************************************
+    Video Hardware
+*******************************************************************************/
+
+// there isn't the usual resistor array anywhere near the color PROM, just four 1k resistors.
 void tugboat_state::tugboat_palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
@@ -121,30 +139,62 @@ void tugboat_state::tugboat_palette(palette_device &palette) const
 }
 
 
-
-/* see mc6845.cpp. That file is only a placeholder, I process the writes here
-   because I need the start_addr register to handle scrolling */
-void tugboat_state::hd46505_0_w(offs_t offset, uint8_t data)
+// see mc6845.cpp, I process the writes here because I need the start_addr register to handle coarse scrolling
+template<int N>
+void tugboat_state::hd46505_w(offs_t offset, uint8_t data)
 {
-	if (offset == 0) m_reg0 = data & 0x0f;
-	else if (m_reg0 < 18) m_hd46505_0_reg[m_reg0] = data;
+	if (offset == 0)
+		m_hd46505_reglatch[N] = data & 0x1f;
+	else
+		m_hd46505_regs[N][m_hd46505_reglatch[N]] = data;
 }
-void tugboat_state::hd46505_1_w(offs_t offset, uint8_t data)
+
+void tugboat_state::latch_start_address()
 {
-	if (offset == 0) m_reg1 = data & 0x0f;
-	else if (m_reg1 < 18) m_hd46505_1_reg[m_reg1] = data;
+	// crtc display start address is latched at end of visarea
+	for (int i = 0; i < 2; i++)
+		m_start_address[i] = m_hd46505_regs[i][0x0c] << 8 | m_hd46505_regs[i][0x0d];
+}
+
+void tugboat_state::tugboat_vblank_w(int state)
+{
+	if (state)
+	{
+		latch_start_address();
+	}
+	else
+	{
+		m_fine_x_latch = m_fine_x_clock;
+		m_fine_y_latch = m_fine_y_clock;
+	}
+}
+
+void tugboat_state::noahsark_vblank_w(int state)
+{
+	if (state)
+	{
+		latch_start_address();
+		m_fine_x_latch = m_fine_x_clock;
+	}
+	else
+	{
+		m_fine_y_latch = m_fine_y_clock;
+	}
 }
 
 
 void tugboat_state::score_w(offs_t offset, uint8_t data)
 {
-	if (offset>=0x8) m_program.write_byte(0x291d + 32*offset + 32*(1-8), data ^ 0x0f);
-	if (offset<0x8 ) m_program.write_byte(0x291d + 32*offset + 32*9,     data ^ 0x0f);
+	if (offset < 8)
+		m_program.write_byte(0x291d + 32*offset + 32*9,     data ^ 0x0f);
+	else
+		m_program.write_byte(0x291d + 32*offset + 32*(1-8), data ^ 0x0f);
 }
 
-void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect,
-		int addr, int gfx0, int gfx1, int transparency)
+void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer)
 {
+	uint16_t addr = m_start_address[layer];
+
 	for (int y = 0; y < 32; y++)
 	{
 		for (int x = 0; x < 32; x++)
@@ -152,25 +202,31 @@ void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect
 			int attr = m_program.read_byte(addr + 0x400);
 			int code = ((attr & 0x01) << 8) | m_program.read_byte(addr);
 			int color = (attr & 0x3c) >> 2;
+			int rgn, transpen, fx = 0, fy = 0;
 
-			int rgn, transpen;
 			if (attr & 0x02)
 			{
-				rgn = gfx1;
+				rgn = layer * 2 + 1;
 				transpen = 7;
 			}
 			else
 			{
-				rgn = gfx0;
+				rgn = layer * 2;
 				transpen = 1;
 			}
+
+			if (layer == 0)
+				fx = m_fine_x_latch & 7;
+			else if (attr & 0x02)
+				fy = m_fine_y_latch & 7;
 
 			m_gfxdecode->gfx(rgn)->transpen(bitmap,cliprect,
 					code,
 					color,
-					0,0,
-					8*x,8*y,
-					transparency ? transpen : -1);
+					0, 0,
+					8 * x + fx,
+					8 * y - fy,
+					(layer == 1) ? transpen : -1);
 
 			addr = (addr & 0xfc00) | ((addr + 1) & 0x03ff);
 		}
@@ -179,63 +235,90 @@ void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 uint32_t tugboat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int const startaddr0 = m_hd46505_0_reg[0x0c]*256 + m_hd46505_0_reg[0x0d];
-	int const startaddr1 = m_hd46505_1_reg[0x0c]*256 + m_hd46505_1_reg[0x0d];
-
-	draw_tilemap(bitmap, cliprect, startaddr0, 0, 1, false);
-	draw_tilemap(bitmap, cliprect, startaddr1, 2, 3, true);
+	draw_tilemap(bitmap, cliprect, 0);
+	draw_tilemap(bitmap, cliprect, 1);
 
 	return 0;
 }
 
 
 
+/*******************************************************************************
+    Misc. I/O
+*******************************************************************************/
+
 uint8_t tugboat_state::input_r()
 {
-	if (~m_ctrl & 0x80)
-		return ioport("IN0")->read();
-	else if (~m_ctrl & 0x40)
-		return ioport("IN1")->read();
-	else if (~m_ctrl & 0x20)
-		return ioport("IN2")->read();
-	else if (~m_ctrl & 0x10)
-		return ioport("IN3")->read();
-	else
-		return ioport("IN4")->read();
+	uint8_t data = 0xff;
+
+	for (int i = 0; i < 4; i++)
+		if (BIT(m_control[1], i ^ 7))
+			data &= m_inputs[i]->read();
+
+	return data;
 }
 
-void tugboat_state::ctrl_w(uint8_t data)
+void tugboat_state::control0_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	m_ctrl = data;
+	data |= ~mem_mask;
+	data = ~data;
+
+	// d5: coincounter
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
+
+	// d6: clock layer 1 fine x scroll
+	if (data & ~m_control[0] & 0x40)
+		m_fine_x_clock++;
+
+	// d7: clear layer 1 fine x scroll
+	if (data & 0x80)
+		m_fine_x_clock = 0;
+
+	m_control[0] = data;
 }
 
-TIMER_CALLBACK_MEMBER(tugboat_state::trigger_int)
+void tugboat_state::control1_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	m_maincpu->set_input_line(0, HOLD_LINE);
-	m_interrupt_timer->adjust(m_screen->frame_period());
+	data |= ~mem_mask;
+	data = ~data;
+
+	// d2: clock layer 2 fine y scroll
+	if (data & ~m_control[1] & 4)
+		m_fine_y_clock++;
+
+	// d0: clear layer 2 fine y scroll
+	if (data & 1)
+		m_fine_y_clock = 0;
+
+	// d4-d7: input select
+	m_control[1] = data;
 }
 
-void tugboat_state::machine_reset()
-{
-	m_interrupt_timer->adjust(m_screen->time_until_pos(0));
-}
 
+
+/*******************************************************************************
+    Address Maps
+*******************************************************************************/
 
 void tugboat_state::main_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x01ff).ram();
 	map(0x1060, 0x1061).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0x10a0, 0x10a1).w(FUNC(tugboat_state::hd46505_0_w));  /* scrolling is performed changing the start_addr register (0C/0D) */
-	map(0x10c0, 0x10c1).w(FUNC(tugboat_state::hd46505_1_w));
-	map(0x11e4, 0x11e7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x11e8, 0x11eb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	//map(0x1700, 0x1fff).ram();
-	map(0x18e0, 0x18ef).w(FUNC(tugboat_state::score_w));
-	map(0x2000, 0x2fff).ram(); /* tilemap RAM */
+	map(0x10a0, 0x10a1).w(FUNC(tugboat_state::hd46505_w<0>)); // coarse scrolling is performed changing the start_addr register (0C/0D)
+	map(0x10c0, 0x10c1).w(FUNC(tugboat_state::hd46505_w<1>));
+	map(0x11e4, 0x11e7).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x11e8, 0x11eb).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x18e0, 0x18ef).w(FUNC(tugboat_state::score_w)).nopr();
+	map(0x2000, 0x2fff).ram(); // tilemap RAM
 	map(0x4000, 0x7fff).rom();
 }
 
+
+
+/*******************************************************************************
+    Input Ports
+*******************************************************************************/
 
 static INPUT_PORTS_START( tugboat )
 	PORT_START("IN0")
@@ -278,18 +361,6 @@ static INPUT_PORTS_START( tugboat )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 	PORT_START("DSW")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -319,6 +390,11 @@ static INPUT_PORTS_START( noahsark )
 INPUT_PORTS_END
 
 
+
+/*******************************************************************************
+    GFX Layouts
+*******************************************************************************/
+
 static GFXDECODE_START( gfx_tugboat )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1,        0x80, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x3_planar, 0x80, 16 )
@@ -327,35 +403,59 @@ static GFXDECODE_START( gfx_tugboat )
 GFXDECODE_END
 
 
+
+/*******************************************************************************
+    Machine Configs
+*******************************************************************************/
+
 void tugboat_state::tugboat(machine_config &config)
 {
-	M6502(config, m_maincpu, 2000000); /* 2 MHz ???? */
+	// basic machine hardware
+	M6502(config, m_maincpu, 10_MHz_XTAL/8); // divider guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &tugboat_state::main_map);
 
-	pia6821_device &pia0(PIA6821(config, "pia0", 0));
-	pia0.readpa_handler().set(FUNC(tugboat_state::input_r));
+	PIA6821(config, m_pia[0]);
+	m_pia[0]->readpa_handler().set(FUNC(tugboat_state::input_r));
+	m_pia[0]->writepb_handler().set(FUNC(tugboat_state::control0_w));
 
-	pia6821_device &pia1(PIA6821(config, "pia1", 0));
-	pia1.readpa_handler().set_ioport("DSW");
-	pia1.writepb_handler().set(FUNC(tugboat_state::ctrl_w));
+	PIA6821(config, m_pia[1]);
+	m_pia[1]->readpa_handler().set_ioport("DSW");
+	m_pia[1]->writepb_handler().set(FUNC(tugboat_state::control1_w));
 
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(32*8,32*8);
-	m_screen->set_visarea(1*8,31*8-1,2*8,30*8-1);
+	m_screen->set_raw(10_MHz_XTAL/2, 320, 8, 248, 264, 8, 240);
 	m_screen->set_screen_update(FUNC(tugboat_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_screen->screen_vblank().append_inputline(m_maincpu, 0, HOLD_LINE);
+	m_screen->screen_vblank().append(FUNC(tugboat_state::tugboat_vblank_w));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tugboat);
 	PALETTE(config, m_palette, FUNC(tugboat_state::tugboat_palette), 256);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-
-	AY8912(config, "aysnd", XTAL(10'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.35);
+	AY8912(config, "aysnd", 10_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.35);
 }
 
+
+void tugboat_state::noahsark(machine_config &config)
+{
+	tugboat(config);
+
+	// video hardware
+	m_screen->set_video_attributes(0);
+	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_screen->screen_vblank().append_inputline(m_maincpu, 0, HOLD_LINE);
+	m_screen->screen_vblank().append(FUNC(tugboat_state::noahsark_vblank_w));
+}
+
+
+
+/*******************************************************************************
+    ROM Definitions
+*******************************************************************************/
 
 ROM_START( tugboat )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -442,6 +542,11 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1982, tugboat,  0, tugboat, tugboat,  tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "Tugboat",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, noahsark, 0, tugboat, noahsark, tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "Noah's Ark",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, berenstn, 0, tugboat, noahsark, tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "The Berenstain Bears in Big Paw's Cave", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+
+/*******************************************************************************
+    Drivers
+*******************************************************************************/
+
+GAME( 1982, tugboat,  0, tugboat,  tugboat,  tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "Tugboat",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, noahsark, 0, noahsark, noahsark, tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "Noah's Ark",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, berenstn, 0, noahsark, noahsark, tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "The Berenstain Bears in Big Paw's Cave", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
