@@ -343,18 +343,6 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/mga2064w.h,VIDEOS["MGA2064W"] = true
---------------------------------------------------
-
-if (VIDEOS["MGA2064W"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/mga2064w.cpp",
-		MAME_DIR .. "src/devices/video/mga2064w.h",
-	}
-end
-
---------------------------------------------------
---
 --@src/devices/video/nt7534.h,VIDEOS["NT7534"] = true
 --------------------------------------------------
 
@@ -914,6 +902,30 @@ if (VIDEOS["PC_VGA_CIRRUS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/pc_vga_cirrus.cpp",
 		MAME_DIR .. "src/devices/video/pc_vga_cirrus.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/pc_vga_matrox.h,VIDEOS["PC_VGA_MATROX"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_MATROX"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_matrox.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_matrox.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/mga2064w.h,VIDEOS["MGA2064W"] = true
+--------------------------------------------------
+
+if (VIDEOS["MGA2064W"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/mga2064w.cpp",
+		MAME_DIR .. "src/devices/video/mga2064w.h",
 	}
 end
 
