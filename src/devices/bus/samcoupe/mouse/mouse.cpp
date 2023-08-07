@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(SAM_MOUSE, sam_mouse_device, "sam_mouse", "SAM Coupé Mouse Interface")
+DEFINE_DEVICE_TYPE(SAM_MOUSE, sam_mouse_device, "sam_mouse", "SAM Coup\xC3\xA9 Mouse Interface")
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports

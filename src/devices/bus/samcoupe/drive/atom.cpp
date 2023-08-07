@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(SAM_ATOM_HDD, sam_atom_hdd_device, "sam_atom_hdd", "SAM Coupé ATOM HDD interface")
+DEFINE_DEVICE_TYPE(SAM_ATOM_HDD, sam_atom_hdd_device, "sam_atom_hdd", "SAM Coup\xC3\xA9 ATOM HDD interface")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration

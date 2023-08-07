@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(SAM_FLOPPY, sam_floppy_device, "sam_floppy", "SAM Coupé Internal Floppy")
+DEFINE_DEVICE_TYPE(SAM_FLOPPY, sam_floppy_device, "sam_floppy", "SAM Coup\xC3\xA9 Internal Floppy")
 
 void sam_floppy_device::floppy_formats(format_registration &fr)
 {
