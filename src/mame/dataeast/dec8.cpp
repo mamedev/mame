@@ -58,9 +58,9 @@ To do:
 /******************************************************************************/
 
 
-void dec8_state::dec8_mxc06_karn_buffer_spriteram_w(uint8_t data)
+void dec8_state_base::buffer_spriteram16_w(u8 data)
 {
-	uint8_t* spriteram = m_spriteram->live();
+	u8* spriteram = m_spriteram->live();
 	// copy to a 16-bit region for the sprite chip
 	for (int i=0;i<0x800/2;i++)
 	{
@@ -69,26 +69,26 @@ void dec8_state::dec8_mxc06_karn_buffer_spriteram_w(uint8_t data)
 }
 
 /* Only used by ghostb, gondo, garyoret, other games can control buffering */
-void dec8_state::screen_vblank_dec8(int state)
+void lastmisn_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
 	{
-		dec8_mxc06_karn_buffer_spriteram_w(0);
+		buffer_spriteram16_w(0);
 	}
 }
 
-uint8_t dec8_state::i8751_h_r()
+u8 dec8_mcu_state_base::i8751_h_r()
 {
 	return m_i8751_return >> 8; /* MSB */
 }
 
-uint8_t dec8_state::i8751_l_r()
+u8 dec8_mcu_state_base::i8751_l_r()
 {
 	return m_i8751_return & 0xff; /* LSB */
 }
 
-void dec8_state::i8751_reset_w(uint8_t data)
+void dec8_mcu_state_base::i8751_reset_w(u8 data)
 {
 	// ? reset the actual MCU?
 	//m_i8751_return = 0;
@@ -96,30 +96,17 @@ void dec8_state::i8751_reset_w(uint8_t data)
 
 /******************************************************************************/
 
-uint8_t dec8_state::gondo_player_1_r(offs_t offset)
+template<unsigned Which>
+u8 gondo_state::player_io_r(offs_t offset)
 {
-	int val = 1 << ioport("AN0")->read();
+	int val = 1 << m_analog_io[Which]->read();
 
 	switch (offset)
 	{
 		case 0: /* Rotary low byte */
 			return ~(val & 0xff);
 		case 1: /* Joystick = bottom 4 bits, rotary = top 4 */
-			return ((~val >> 4) & 0xf0) | (ioport("IN0")->read() & 0xf);
-	}
-	return 0xff;
-}
-
-uint8_t dec8_state::gondo_player_2_r(offs_t offset)
-{
-	int val = 1 << ioport("AN1")->read();
-
-	switch (offset)
-	{
-		case 0: /* Rotary low byte */
-			return ~(val & 0xff);
-		case 1: /* Joystick = bottom 4 bits, rotary = top 4 */
-			return ((~val >> 4) & 0xf0) | (ioport("IN1")->read() & 0xf);
+			return ((~val >> 4) & 0xf0) | (m_in_io[Which]->read() & 0xf);
 	}
 	return 0xff;
 }
@@ -132,21 +119,21 @@ uint8_t dec8_state::gondo_player_2_r(offs_t offset)
 *
 ***************************************************/
 
-TIMER_CALLBACK_MEMBER(dec8_state::mcu_irq_clear)
+TIMER_CALLBACK_MEMBER(dec8_mcu_state_base::mcu_irq_clear)
 {
 	// The schematics show a clocked LS194 shift register (3A) is used to automatically
 	// clear the IRQ request.  The MCU does not clear it itself.
 	m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(dec8_state::audiocpu_nmi_clear)
+TIMER_CALLBACK_MEMBER(dec8_state_base::audiocpu_nmi_clear)
 {
 	// Gondomania schematics show a LS194 for the sound IRQ, sharing the 6502 clock
 	// S1=H, S0=L, LSI=H, and QA is the only output connected (to NMI)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-void dec8_state::dec8_i8751_w(offs_t offset, uint8_t data)
+void dec8_mcu_state_base::i8751_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -163,13 +150,13 @@ void dec8_state::dec8_i8751_w(offs_t offset, uint8_t data)
 
 /******************************************************************************/
 
-void dec8_state::dec8_bank_w(uint8_t data)
+void oscar_state::bank_w(u8 data)
 {
 	m_mainbank->set_entry(data & 0x0f);
 }
 
 /* Used by Ghostbusters, Meikyuu Hunter G & Gondomania */
-void dec8_state::ghostb_bank_w(uint8_t data)
+void lastmisn_state::ghostb_bank_w(u8 data)
 {
 	/* Bit 0: SECCLR - acknowledge interrupt from I8751
 	   Bit 1: NMI enable/disable
@@ -197,7 +184,7 @@ void dec8_state::ghostb_bank_w(uint8_t data)
 	flip_screen_set(BIT(data, 3));
 }
 
-void csilver_state::csilver_control_w(uint8_t data)
+void csilver_state::control_w(u8 data)
 {
 	/*
 	    Bit 0x0f - ROM bank switch.
@@ -209,14 +196,14 @@ void csilver_state::csilver_control_w(uint8_t data)
 	m_mainbank->set_entry(data & 0x0f);
 }
 
-void dec8_state::dec8_sound_w(uint8_t data)
+void dec8_state_base::sound_w(u8 data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(m6502_device::NMI_LINE, ASSERT_LINE);
 	m_m6502_timer->adjust(m_audiocpu->cycles_to_attotime(3));
 }
 
-void csilver_state::csilver_adpcm_int(int state)
+void csilver_state::adpcm_int(int state)
 {
 	m_toggle ^= 1;
 	if (m_toggle)
@@ -226,230 +213,230 @@ void csilver_state::csilver_adpcm_int(int state)
 	m_msm5205next <<= 4;
 }
 
-uint8_t csilver_state::csilver_adpcm_reset_r()
+u8 csilver_state::adpcm_reset_r()
 {
 	m_msm->reset_w(0);
 	return 0;
 }
 
-void csilver_state::csilver_adpcm_data_w(uint8_t data)
+void csilver_state::adpcm_data_w(u8 data)
 {
 	m_msm5205next = data;
 }
 
-void csilver_state::csilver_sound_bank_w(uint8_t data)
+void csilver_state::sound_bank_w(u8 data)
 {
 	m_soundbank->set_entry((data & 0x08) >> 3);
 }
 
 /******************************************************************************/
 
-void dec8_state::main_irq_on_w(uint8_t data)
+void dec8_state_base::main_irq_on_w(u8 data)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-void dec8_state::main_irq_off_w(uint8_t data)
+void dec8_state_base::main_irq_off_w(u8 data)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-void dec8_state::main_firq_off_w(uint8_t data)
+void dec8_state_base::main_firq_off_w(u8 data)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
-void dec8_state::sub_irq_on_w(uint8_t data)
+void dec8_state_base::sub_irq_on_w(u8 data)
 {
 	m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-void dec8_state::sub_irq_off_w(uint8_t data)
+void dec8_state_base::sub_irq_off_w(u8 data)
 {
 	m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-void dec8_state::sub_firq_off_w(uint8_t data)
+void dec8_state_base::sub_firq_off_w(u8 data)
 {
 	m_subcpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 /******************************************************************************/
 
-void dec8_state::flip_screen_w(uint8_t data) { flip_screen_set(data); }
+void dec8_state_base::flip_screen_w(u8 data) { flip_screen_set(data); }
 
 /******************************************************************************/
 
-void dec8_state::lastmisn_map(address_map &map)
+void lastmisn_state::lastmisn_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1800, 0x1800).portr("IN0").w(FUNC(dec8_state::sub_irq_off_w));
-	map(0x1801, 0x1801).portr("IN1").w(FUNC(dec8_state::main_irq_off_w));
-	map(0x1802, 0x1802).portr("IN2").w(FUNC(dec8_state::main_firq_off_w));
-	map(0x1803, 0x1803).portr("DSW0").w(FUNC(dec8_state::main_irq_on_w));
-	map(0x1804, 0x1804).portr("DSW1").w(FUNC(dec8_state::sub_irq_on_w));
-	map(0x1805, 0x1805).w(FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
-	map(0x1806, 0x1806).r(FUNC(dec8_state::i8751_h_r));
-	map(0x1807, 0x1807).rw(FUNC(dec8_state::i8751_l_r), FUNC(dec8_state::flip_screen_w));
-	map(0x1809, 0x1809).w(FUNC(dec8_state::lastmisn_scrollx_w)); /* Scroll LSB */
-	map(0x180b, 0x180b).w(FUNC(dec8_state::lastmisn_scrolly_w)); /* Scroll LSB */
-	map(0x180c, 0x180c).w(FUNC(dec8_state::dec8_sound_w));
-	map(0x180d, 0x180d).w(FUNC(dec8_state::lastmisn_control_w)); /* Bank switch + Scroll MSB */
-	map(0x180e, 0x180f).w(FUNC(dec8_state::dec8_i8751_w));
-	map(0x2000, 0x27ff).ram().w(FUNC(dec8_state::dec8_videoram_w)).share("videoram");
+	map(0x1800, 0x1800).portr("IN0").w(FUNC(lastmisn_state::sub_irq_off_w));
+	map(0x1801, 0x1801).portr("IN1").w(FUNC(lastmisn_state::main_irq_off_w));
+	map(0x1802, 0x1802).portr("IN2").w(FUNC(lastmisn_state::main_firq_off_w));
+	map(0x1803, 0x1803).portr("DSW0").w(FUNC(lastmisn_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(FUNC(lastmisn_state::sub_irq_on_w));
+	map(0x1805, 0x1805).w(FUNC(lastmisn_state::buffer_spriteram16_w)); /* DMA */
+	map(0x1806, 0x1806).r(FUNC(lastmisn_state::i8751_h_r));
+	map(0x1807, 0x1807).rw(FUNC(lastmisn_state::i8751_l_r), FUNC(lastmisn_state::flip_screen_w));
+	map(0x1809, 0x1809).w(FUNC(lastmisn_state::lastmisn_scrollx_w)); /* Scroll LSB */
+	map(0x180b, 0x180b).w(FUNC(lastmisn_state::lastmisn_scrolly_w)); /* Scroll LSB */
+	map(0x180c, 0x180c).w(FUNC(lastmisn_state::sound_w));
+	map(0x180d, 0x180d).w(FUNC(lastmisn_state::lastmisn_control_w)); /* Bank switch + Scroll MSB */
+	map(0x180e, 0x180f).w(FUNC(lastmisn_state::i8751_w));
+	map(0x2000, 0x27ff).ram().w(FUNC(lastmisn_state::videoram_w)).share(m_videoram);
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
-	map(0x3800, 0x3fff).rw(FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w)).share("bg_data");
-	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x3800, 0x3fff).rw(FUNC(lastmisn_state::bg_ram_r), FUNC(lastmisn_state::bg_ram_w)).share(m_bg_ram);
+	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom();
 }
 
-void dec8_state::lastmisn_sub_map(address_map &map)
+void lastmisn_state::lastmisn_sub_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1800, 0x1800).portr("IN0").w(FUNC(dec8_state::sub_irq_off_w));
-	map(0x1801, 0x1801).portr("IN1").w(FUNC(dec8_state::main_irq_off_w));
-	map(0x1802, 0x1802).portr("IN2").w(FUNC(dec8_state::main_firq_off_w));
-	map(0x1803, 0x1803).portr("DSW0").w(FUNC(dec8_state::main_irq_on_w));
-	map(0x1804, 0x1804).portr("DSW1").w(FUNC(dec8_state::sub_irq_on_w));
-	map(0x1805, 0x1805).w(FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
-	map(0x1806, 0x1806).r(FUNC(dec8_state::i8751_h_r));
-	map(0x1807, 0x1807).rw(FUNC(dec8_state::i8751_l_r), FUNC(dec8_state::flip_screen_w));
-	map(0x180c, 0x180c).w(FUNC(dec8_state::dec8_sound_w));
-	map(0x180e, 0x180f).w(FUNC(dec8_state::dec8_i8751_w));
-	map(0x2000, 0x27ff).ram().w(FUNC(dec8_state::dec8_videoram_w));
+	map(0x1800, 0x1800).portr("IN0").w(FUNC(lastmisn_state::sub_irq_off_w));
+	map(0x1801, 0x1801).portr("IN1").w(FUNC(lastmisn_state::main_irq_off_w));
+	map(0x1802, 0x1802).portr("IN2").w(FUNC(lastmisn_state::main_firq_off_w));
+	map(0x1803, 0x1803).portr("DSW0").w(FUNC(lastmisn_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(FUNC(lastmisn_state::sub_irq_on_w));
+	map(0x1805, 0x1805).w(FUNC(lastmisn_state::buffer_spriteram16_w)); /* DMA */
+	map(0x1806, 0x1806).r(FUNC(lastmisn_state::i8751_h_r));
+	map(0x1807, 0x1807).rw(FUNC(lastmisn_state::i8751_l_r), FUNC(lastmisn_state::flip_screen_w));
+	map(0x180c, 0x180c).w(FUNC(lastmisn_state::sound_w));
+	map(0x180e, 0x180f).w(FUNC(lastmisn_state::i8751_w));
+	map(0x2000, 0x27ff).ram().w(FUNC(lastmisn_state::videoram_w));
 	map(0x2800, 0x2fff).writeonly().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
-	map(0x3800, 0x3fff).rw(FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w));
+	map(0x3800, 0x3fff).rw(FUNC(lastmisn_state::bg_ram_r), FUNC(lastmisn_state::bg_ram_w));
 	map(0x4000, 0xffff).rom();
 }
 
-void dec8_state::shackled_map(address_map &map)
+void lastmisn_state::shackled_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1800, 0x1800).portr("IN0").w(FUNC(dec8_state::sub_irq_off_w));
-	map(0x1801, 0x1801).portr("IN1").w(FUNC(dec8_state::main_irq_off_w));
-	map(0x1802, 0x1802).portr("IN2").w(FUNC(dec8_state::sub_firq_off_w));
-	map(0x1803, 0x1803).portr("DSW0").w(FUNC(dec8_state::main_irq_on_w));
-	map(0x1804, 0x1804).portr("DSW1").w(FUNC(dec8_state::sub_irq_on_w));
-	map(0x1805, 0x1805).w(FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
-	map(0x1807, 0x1807).w(FUNC(dec8_state::flip_screen_w));
-	map(0x1809, 0x1809).w(FUNC(dec8_state::lastmisn_scrollx_w)); /* Scroll LSB */
-	map(0x180b, 0x180b).w(FUNC(dec8_state::lastmisn_scrolly_w)); /* Scroll LSB */
-	map(0x180c, 0x180c).w(FUNC(dec8_state::dec8_sound_w));
-	map(0x180d, 0x180d).w(FUNC(dec8_state::shackled_control_w)); /* Bank switch + Scroll MSB */
-	map(0x2000, 0x27ff).ram().w(FUNC(dec8_state::dec8_videoram_w));
+	map(0x1800, 0x1800).portr("IN0").w(FUNC(lastmisn_state::sub_irq_off_w));
+	map(0x1801, 0x1801).portr("IN1").w(FUNC(lastmisn_state::main_irq_off_w));
+	map(0x1802, 0x1802).portr("IN2").w(FUNC(lastmisn_state::sub_firq_off_w));
+	map(0x1803, 0x1803).portr("DSW0").w(FUNC(lastmisn_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(FUNC(lastmisn_state::sub_irq_on_w));
+	map(0x1805, 0x1805).w(FUNC(lastmisn_state::buffer_spriteram16_w)); /* DMA */
+	map(0x1807, 0x1807).w(FUNC(lastmisn_state::flip_screen_w));
+	map(0x1809, 0x1809).w(FUNC(lastmisn_state::lastmisn_scrollx_w)); /* Scroll LSB */
+	map(0x180b, 0x180b).w(FUNC(lastmisn_state::lastmisn_scrolly_w)); /* Scroll LSB */
+	map(0x180c, 0x180c).w(FUNC(lastmisn_state::sound_w));
+	map(0x180d, 0x180d).w(FUNC(lastmisn_state::shackled_control_w)); /* Bank switch + Scroll MSB */
+	map(0x2000, 0x27ff).ram().w(FUNC(lastmisn_state::videoram_w));
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
-	map(0x3800, 0x3fff).rw(FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w)).share("bg_data");
-	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x3800, 0x3fff).rw(FUNC(lastmisn_state::bg_ram_r), FUNC(lastmisn_state::bg_ram_w)).share("bg_ram");
+	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom();
 }
 
-void dec8_state::shackled_sub_map(address_map &map)
+void lastmisn_state::shackled_sub_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1800, 0x1800).portr("IN0").w(FUNC(dec8_state::sub_irq_off_w));
-	map(0x1801, 0x1801).portr("IN1").w(FUNC(dec8_state::main_irq_off_w));
-	map(0x1802, 0x1802).portr("IN2").w(FUNC(dec8_state::sub_firq_off_w));
-	map(0x1803, 0x1803).portr("DSW0").w(FUNC(dec8_state::main_irq_on_w));
-	map(0x1804, 0x1804).portr("DSW1").w(FUNC(dec8_state::sub_irq_on_w));
-	map(0x1805, 0x1805).w(FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
-	map(0x1806, 0x1806).r(FUNC(dec8_state::i8751_h_r));
-	map(0x1807, 0x1807).rw(FUNC(dec8_state::i8751_l_r), FUNC(dec8_state::flip_screen_w));
-	map(0x1809, 0x1809).w(FUNC(dec8_state::lastmisn_scrollx_w)); /* Scroll LSB */
-	map(0x180b, 0x180b).w(FUNC(dec8_state::lastmisn_scrolly_w)); /* Scroll LSB */
-	map(0x180c, 0x180c).w(FUNC(dec8_state::dec8_sound_w));
-	map(0x180d, 0x180d).w(FUNC(dec8_state::shackled_control_w)); /* Bank switch + Scroll MSB */
-	map(0x180e, 0x180f).w(FUNC(dec8_state::dec8_i8751_w));
-	map(0x2000, 0x27ff).ram().w(FUNC(dec8_state::dec8_videoram_w)).share("videoram");
+	map(0x1800, 0x1800).portr("IN0").w(FUNC(lastmisn_state::sub_irq_off_w));
+	map(0x1801, 0x1801).portr("IN1").w(FUNC(lastmisn_state::main_irq_off_w));
+	map(0x1802, 0x1802).portr("IN2").w(FUNC(lastmisn_state::sub_firq_off_w));
+	map(0x1803, 0x1803).portr("DSW0").w(FUNC(lastmisn_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(FUNC(lastmisn_state::sub_irq_on_w));
+	map(0x1805, 0x1805).w(FUNC(lastmisn_state::buffer_spriteram16_w)); /* DMA */
+	map(0x1806, 0x1806).r(FUNC(lastmisn_state::i8751_h_r));
+	map(0x1807, 0x1807).rw(FUNC(lastmisn_state::i8751_l_r), FUNC(lastmisn_state::flip_screen_w));
+	map(0x1809, 0x1809).w(FUNC(lastmisn_state::lastmisn_scrollx_w)); /* Scroll LSB */
+	map(0x180b, 0x180b).w(FUNC(lastmisn_state::lastmisn_scrolly_w)); /* Scroll LSB */
+	map(0x180c, 0x180c).w(FUNC(lastmisn_state::sound_w));
+	map(0x180d, 0x180d).w(FUNC(lastmisn_state::shackled_control_w)); /* Bank switch + Scroll MSB */
+	map(0x180e, 0x180f).w(FUNC(lastmisn_state::i8751_w));
+	map(0x2000, 0x27ff).ram().w(FUNC(lastmisn_state::videoram_w)).share(m_videoram);
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
-	map(0x3800, 0x3fff).rw(FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w));
+	map(0x3800, 0x3fff).rw(FUNC(lastmisn_state::bg_ram_r), FUNC(lastmisn_state::bg_ram_w));
 	map(0x4000, 0xffff).rom();
 }
 
-void dec8_state::gondo_map(address_map &map)
+void gondo_state::gondo_map(address_map &map)
 {
 	map(0x0000, 0x17ff).ram();
-	map(0x1800, 0x1fff).ram().w(FUNC(dec8_state::dec8_videoram_w)).share("videoram");
-	map(0x2000, 0x27ff).rw(FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w)).share("bg_data");
+	map(0x1800, 0x1fff).ram().w(FUNC(gondo_state::videoram_w)).share(m_videoram);
+	map(0x2000, 0x27ff).rw(FUNC(gondo_state::bg_ram_r), FUNC(gondo_state::bg_ram_w)).share("bg_ram");
 	map(0x2800, 0x2bff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x2c00, 0x2fff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
 	map(0x3000, 0x37ff).ram().share("spriteram");   /* Sprites */
 	map(0x3800, 0x3800).portr("DSW0");       /* Dip 1 */
 	map(0x3801, 0x3801).portr("DSW1");       /* Dip 2 */
-	map(0x380a, 0x380b).r(FUNC(dec8_state::gondo_player_1_r));  /* Player 1 rotary */
-	map(0x380c, 0x380d).r(FUNC(dec8_state::gondo_player_2_r));  /* Player 2 rotary */
+	map(0x380a, 0x380b).r(FUNC(gondo_state::player_io_r<0>));  /* Player 1 rotary */
+	map(0x380c, 0x380d).r(FUNC(gondo_state::player_io_r<1>));  /* Player 2 rotary */
 	map(0x380e, 0x380e).portr("IN3");        /* VBL */
 	map(0x380f, 0x380f).portr("IN2");        /* Fire buttons */
-	map(0x3810, 0x3810).w(FUNC(dec8_state::dec8_sound_w));
-	map(0x3818, 0x382f).w(FUNC(dec8_state::gondo_scroll_w));
-	map(0x3830, 0x3830).w(FUNC(dec8_state::ghostb_bank_w)); /* Bank + NMI enable */
-	map(0x3838, 0x3838).r(FUNC(dec8_state::i8751_h_r));
-	map(0x3839, 0x3839).r(FUNC(dec8_state::i8751_l_r));
-	map(0x383a, 0x383b).w(FUNC(dec8_state::dec8_i8751_w));
-	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x3810, 0x3810).w(FUNC(gondo_state::sound_w));
+	map(0x3818, 0x382f).w(FUNC(gondo_state::gondo_scroll_w));
+	map(0x3830, 0x3830).w(FUNC(gondo_state::ghostb_bank_w)); /* Bank + NMI enable */
+	map(0x3838, 0x3838).r(FUNC(gondo_state::i8751_h_r));
+	map(0x3839, 0x3839).r(FUNC(gondo_state::i8751_l_r));
+	map(0x383a, 0x383b).w(FUNC(gondo_state::i8751_w));
+	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom();
 }
 
-void dec8_state::garyoret_map(address_map &map)
+void lastmisn_state::garyoret_map(address_map &map)
 {
 	map(0x0000, 0x17ff).ram();
-	map(0x1800, 0x1fff).ram().w(FUNC(dec8_state::dec8_videoram_w)).share("videoram");
-	map(0x2000, 0x27ff).rw(FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w)).share("bg_data");
+	map(0x1800, 0x1fff).ram().w(FUNC(lastmisn_state::videoram_w)).share(m_videoram);
+	map(0x2000, 0x27ff).rw(FUNC(lastmisn_state::bg_ram_r), FUNC(lastmisn_state::bg_ram_w)).share("bg_ram");
 	map(0x2800, 0x2bff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x2c00, 0x2fff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x3000, 0x37ff).ram().share("spriteram"); /* Sprites */
-	map(0x3800, 0x3800).portr("DSW0");   /* Dip 1 */
-	map(0x3801, 0x3801).portr("DSW1");   /* Dip 2 */
+	map(0x3000, 0x37ff).ram().share("spriteram");   /* Sprites */
+	map(0x3800, 0x3800).portr("DSW0");       /* Dip 1 */
+	map(0x3801, 0x3801).portr("DSW1");       /* Dip 2 */
 	map(0x3808, 0x3808).nopr();     /* ? */
 	map(0x380a, 0x380a).portr("IN1");    /* Player 2 + VBL */
 	map(0x380b, 0x380b).portr("IN0");    /* Player 1 */
-	map(0x3810, 0x3810).w(FUNC(dec8_state::dec8_sound_w));
-	map(0x3818, 0x382f).w(FUNC(dec8_state::gondo_scroll_w));
-	map(0x3830, 0x3830).w(FUNC(dec8_state::ghostb_bank_w)); /* Bank + NMI enable */
-	map(0x3838, 0x3839).w(FUNC(dec8_state::dec8_i8751_w));
-	map(0x383a, 0x383a).r(FUNC(dec8_state::i8751_h_r));
-	map(0x383b, 0x383b).r(FUNC(dec8_state::i8751_l_r));
-	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x3810, 0x3810).w(FUNC(lastmisn_state::sound_w));
+	map(0x3818, 0x382f).w(FUNC(lastmisn_state::gondo_scroll_w));
+	map(0x3830, 0x3830).w(FUNC(lastmisn_state::ghostb_bank_w)); /* Bank + NMI enable */
+	map(0x3838, 0x3839).w(FUNC(lastmisn_state::i8751_w));
+	map(0x383a, 0x383a).r(FUNC(lastmisn_state::i8751_h_r));
+	map(0x383b, 0x383b).r(FUNC(lastmisn_state::i8751_l_r));
+	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom();
 }
 
-void dec8_state::meikyuh_map(address_map &map)
+void lastmisn_state::meikyuh_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x17ff).ram();
-	map(0x1800, 0x1fff).ram().w(FUNC(dec8_state::dec8_videoram_w)).share("videoram");
-	map(0x2000, 0x27ff).rw("tilegen1", FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
+	map(0x1800, 0x1fff).ram().w(FUNC(lastmisn_state::videoram_w)).share(m_videoram);
+	map(0x2000, 0x27ff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
 	map(0x2800, 0x2bff).ram(); // colscroll? mirror?
-	map(0x2c00, 0x2fff).rw("tilegen1", FUNC(deco_bac06_device::pf_rowscroll_8bit_r), FUNC(deco_bac06_device::pf_rowscroll_8bit_w));
+	map(0x2c00, 0x2fff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_rowscroll_8bit_r), FUNC(deco_bac06_device::pf_rowscroll_8bit_w));
 	map(0x3000, 0x37ff).ram().share("spriteram");
 	map(0x3800, 0x3800).portr("IN0");    /* Player 1 */
-	map(0x3800, 0x3800).w(FUNC(dec8_state::dec8_sound_w));
+	map(0x3800, 0x3800).w(FUNC(lastmisn_state::sound_w));
 	map(0x3801, 0x3801).portr("IN1");    /* Player 2 */
 	map(0x3802, 0x3802).portr("IN2");    /* Player 3 */
 	map(0x3803, 0x3803).portr("DSW0");   /* Start buttons + VBL */
 	map(0x3820, 0x3820).portr("DSW1");   /* Dip */
-	map(0x3820, 0x3827).w("tilegen1", FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x3830, 0x383f).rw("tilegen1", FUNC(deco_bac06_device::pf_control1_8bit_r), FUNC(deco_bac06_device::pf_control1_8bit_w));
-	map(0x3840, 0x3840).r(FUNC(dec8_state::i8751_h_r));
-	map(0x3840, 0x3840).w(FUNC(dec8_state::ghostb_bank_w));
-	map(0x3860, 0x3860).r(FUNC(dec8_state::i8751_l_r));
-	map(0x3860, 0x3861).w(FUNC(dec8_state::dec8_i8751_w));
-	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x3820, 0x3827).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control0_8bit_w));
+	map(0x3830, 0x383f).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_control1_8bit_r), FUNC(deco_bac06_device::pf_control1_8bit_w));
+	map(0x3840, 0x3840).r(FUNC(lastmisn_state::i8751_h_r));
+	map(0x3840, 0x3840).w(FUNC(lastmisn_state::ghostb_bank_w));
+	map(0x3860, 0x3860).r(FUNC(lastmisn_state::i8751_l_r));
+	map(0x3860, 0x3861).w(FUNC(lastmisn_state::i8751_w));
+	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom();
 }
 
-void csilver_state::csilver_map(address_map &map)
+void csilver_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
@@ -459,23 +446,23 @@ void csilver_state::csilver_map(address_map &map)
 	map(0x1802, 0x1802).w(FUNC(csilver_state::main_firq_off_w));
 	map(0x1803, 0x1803).portr("IN2").w(FUNC(csilver_state::main_irq_on_w));
 	map(0x1804, 0x1804).portr("DSW1").w(FUNC(csilver_state::sub_irq_on_w));
-	map(0x1805, 0x1805).portr("DSW0").w(FUNC(csilver_state::dec8_mxc06_karn_buffer_spriteram_w)); /* Dip 1, DMA */
+	map(0x1805, 0x1805).portr("DSW0").w(FUNC(csilver_state::buffer_spriteram16_w)); /* Dip 1, DMA */
 	map(0x1807, 0x1807).w(FUNC(csilver_state::flip_screen_w));
-	map(0x1808, 0x180b).w(FUNC(csilver_state::dec8_scroll2_w));
-	map(0x180c, 0x180c).w(FUNC(csilver_state::dec8_sound_w));
-	map(0x180d, 0x180d).w(FUNC(csilver_state::csilver_control_w));
-	map(0x180e, 0x180f).w(FUNC(csilver_state::dec8_i8751_w));
+	map(0x1808, 0x180b).w(FUNC(csilver_state::scroll_w));
+	map(0x180c, 0x180c).w(FUNC(csilver_state::sound_w));
+	map(0x180d, 0x180d).w(FUNC(csilver_state::control_w));
+	map(0x180e, 0x180f).w(FUNC(csilver_state::i8751_w));
 	map(0x1c00, 0x1c00).r(FUNC(csilver_state::i8751_h_r));
 	map(0x1e00, 0x1e00).r(FUNC(csilver_state::i8751_l_r));
-	map(0x2000, 0x27ff).ram().w(FUNC(csilver_state::dec8_videoram_w));
+	map(0x2000, 0x27ff).ram().w(FUNC(csilver_state::videoram_w));
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
-	map(0x3800, 0x3fff).rw(FUNC(csilver_state::dec8_bg_data_r), FUNC(csilver_state::dec8_bg_data_w)).share("bg_data");
-	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x3800, 0x3fff).rw(FUNC(csilver_state::bg_ram_r), FUNC(csilver_state::bg_ram_w)).share("bg_ram");
+	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom();
 }
 
-void csilver_state::csilver_sub_map(address_map &map)
+void csilver_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
@@ -485,22 +472,22 @@ void csilver_state::csilver_sub_map(address_map &map)
 	map(0x1802, 0x1802).w(FUNC(csilver_state::main_firq_off_w));
 	map(0x1803, 0x1803).portr("IN2").w(FUNC(csilver_state::main_irq_on_w));
 	map(0x1804, 0x1804).portr("DSW1").w(FUNC(csilver_state::sub_irq_on_w));
-	map(0x1805, 0x1805).portr("DSW0").w(FUNC(csilver_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
-	map(0x180c, 0x180c).w(FUNC(csilver_state::dec8_sound_w));
-	map(0x2000, 0x27ff).ram().w(FUNC(csilver_state::dec8_videoram_w)).share("videoram");
+	map(0x1805, 0x1805).portr("DSW0").w(FUNC(csilver_state::buffer_spriteram16_w)); /* DMA */
+	map(0x180c, 0x180c).w(FUNC(csilver_state::sound_w));
+	map(0x2000, 0x27ff).ram().w(FUNC(csilver_state::videoram_w)).share(m_videoram);
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
-	map(0x3800, 0x3fff).rw(FUNC(csilver_state::dec8_bg_data_r), FUNC(csilver_state::dec8_bg_data_w));
+	map(0x3800, 0x3fff).rw(FUNC(csilver_state::bg_ram_r), FUNC(csilver_state::bg_ram_w));
 	map(0x4000, 0xffff).rom();
 }
 
-void dec8_state::oscar_map(address_map &map)
+void oscar_state::oscar_map(address_map &map)
 {
 	map(0x0000, 0x0eff).ram().share("share1");
 	map(0x0f00, 0x0fff).ram();
 	map(0x1000, 0x1fff).ram().share("share2");
-	map(0x2000, 0x27ff).ram().w(FUNC(dec8_state::dec8_videoram_w)).share("videoram");
-	map(0x2800, 0x2fff).rw("tilegen1", FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
+	map(0x2000, 0x27ff).ram().w(FUNC(oscar_state::videoram_w)).share(m_videoram);
+	map(0x2800, 0x2fff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
 	map(0x3000, 0x37ff).ram().share("spriteram"); /* Sprites */
 	map(0x3800, 0x3bff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x3c00, 0x3c00).portr("IN0");
@@ -508,63 +495,63 @@ void dec8_state::oscar_map(address_map &map)
 	map(0x3c02, 0x3c02).portr("IN2");    /* VBL & coins */
 	map(0x3c03, 0x3c03).portr("DSW0");   /* Dip 1 */
 	map(0x3c04, 0x3c04).portr("DSW1");
-	map(0x3c00, 0x3c07).w("tilegen1", FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x3c10, 0x3c1f).w("tilegen1", FUNC(deco_bac06_device::pf_control1_8bit_w));
-	map(0x3c80, 0x3c80).w(FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w));   /* DMA */
-	map(0x3d00, 0x3d00).w(FUNC(dec8_state::dec8_bank_w));          /* BNKS */
+	map(0x3c00, 0x3c07).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control0_8bit_w));
+	map(0x3c10, 0x3c1f).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control1_8bit_w));
+	map(0x3c80, 0x3c80).w(FUNC(oscar_state::buffer_spriteram16_w));   /* DMA */
+	map(0x3d00, 0x3d00).w(FUNC(oscar_state::bank_w));          /* BNKS */
 	map(0x3d80, 0x3d80).w(m_soundlatch, FUNC(generic_latch_8_device::write));            /* SOUN */
-	map(0x3e00, 0x3e00).w(FUNC(dec8_state::oscar_coin_clear_w));   /* COINCL */
-	map(0x3e80, 0x3e80).w(FUNC(dec8_state::sub_irq_on_w));         /* IRQ 2 */
-	map(0x3e81, 0x3e81).w(FUNC(dec8_state::main_irq_off_w));       /* IRC 1 */
-	map(0x3e82, 0x3e82).w(FUNC(dec8_state::main_irq_on_w));        /* IRQ 1 */
-	map(0x3e83, 0x3e83).w(FUNC(dec8_state::sub_irq_off_w));        /* IRC 2 */
-	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x3e00, 0x3e00).w(FUNC(oscar_state::coin_clear_w));   /* COINCL */
+	map(0x3e80, 0x3e80).w(FUNC(oscar_state::sub_irq_on_w));         /* IRQ 2 */
+	map(0x3e81, 0x3e81).w(FUNC(oscar_state::main_irq_off_w));       /* IRC 1 */
+	map(0x3e82, 0x3e82).w(FUNC(oscar_state::main_irq_on_w));        /* IRQ 1 */
+	map(0x3e83, 0x3e83).w(FUNC(oscar_state::sub_irq_off_w));        /* IRC 2 */
+	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom();
 }
 
-void dec8_state::oscar_sub_map(address_map &map)
+void oscar_state::oscar_sub_map(address_map &map)
 {
 	map(0x0000, 0x0eff).ram().share("share1");
 	map(0x0f00, 0x0fff).ram();
 	map(0x1000, 0x1fff).ram().share("share2");
-	map(0x3e80, 0x3e80).w(FUNC(dec8_state::sub_irq_on_w));         /* IRQ 2 */
-	map(0x3e81, 0x3e81).w(FUNC(dec8_state::main_irq_off_w));       /* IRC 1 */
-	map(0x3e82, 0x3e82).w(FUNC(dec8_state::main_irq_on_w));        /* IRQ 1 */
-	map(0x3e83, 0x3e83).w(FUNC(dec8_state::sub_irq_off_w));        /* IRC 2 */
+	map(0x3e80, 0x3e80).w(FUNC(oscar_state::sub_irq_on_w));         /* IRQ 2 */
+	map(0x3e81, 0x3e81).w(FUNC(oscar_state::main_irq_off_w));       /* IRC 1 */
+	map(0x3e82, 0x3e82).w(FUNC(oscar_state::main_irq_on_w));        /* IRQ 1 */
+	map(0x3e83, 0x3e83).w(FUNC(oscar_state::sub_irq_off_w));        /* IRC 2 */
 	map(0x4000, 0xffff).rom();
 }
 
-void dec8_state::srdarwin_map(address_map &map)
+void srdarwin_state::main_map(address_map &map)
 {
 	map(0x0000, 0x05ff).ram();
 	map(0x0600, 0x07ff).ram().share("spriteram");
-	map(0x0800, 0x0fff).ram().w(FUNC(dec8_state::srdarwin_videoram_w)).share("videoram");
+	map(0x0800, 0x0fff).ram().w(FUNC(srdarwin_state::srdarwin_videoram_w)).share(m_videoram);
 	map(0x1000, 0x13ff).ram();
-	map(0x1400, 0x17ff).rw(FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w)).share("bg_data");
-	map(0x1800, 0x1801).w(FUNC(dec8_state::dec8_i8751_w));
-	map(0x1802, 0x1802).w(FUNC(dec8_state::i8751_reset_w));        /* Maybe.. */
+	map(0x1400, 0x17ff).rw(FUNC(srdarwin_state::bg_ram_r), FUNC(srdarwin_state::bg_ram_w)).share("bg_ram");
+	map(0x1800, 0x1801).w(FUNC(srdarwin_state::i8751_w));
+	map(0x1802, 0x1802).w(FUNC(srdarwin_state::i8751_reset_w));        /* Maybe.. */
 	map(0x1803, 0x1803).nopw();            /* NMI ack */
 	map(0x1804, 0x1804).w(m_spriteram, FUNC(buffered_spriteram8_device::write)); /* DMA */
-	map(0x1805, 0x1806).w(FUNC(dec8_state::srdarwin_control_w)); /* Scroll & Bank */
-	map(0x2000, 0x2000).rw(FUNC(dec8_state::i8751_h_r), FUNC(dec8_state::dec8_sound_w));  /* Sound */
-	map(0x2001, 0x2001).rw(FUNC(dec8_state::i8751_l_r), FUNC(dec8_state::flip_screen_w));     /* Flipscreen */
+	map(0x1805, 0x1806).w(FUNC(srdarwin_state::control_w)); /* Scroll & Bank */
+	map(0x2000, 0x2000).rw(FUNC(srdarwin_state::i8751_h_r), FUNC(srdarwin_state::sound_w));  /* Sound */
+	map(0x2001, 0x2001).rw(FUNC(srdarwin_state::i8751_l_r), FUNC(srdarwin_state::flip_screen_w));     /* Flipscreen */
 	map(0x2800, 0x288f).w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x3000, 0x308f).w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
 	map(0x3800, 0x3800).portr("DSW0");   /* Dip 1 */
 	map(0x3801, 0x3801).portr("IN0");    /* Player 1 */
 	map(0x3802, 0x3802).portr("IN1");    /* Player 2 (cocktail) + VBL */
 	map(0x3803, 0x3803).portr("DSW1");   /* Dip 2 */
-	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom();
 }
 
-void dec8_state::cobra_map(address_map &map)
+void oscar_state::cobra_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x0fff).rw("tilegen1", FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
-	map(0x1000, 0x17ff).rw("tilegen2", FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
+	map(0x0800, 0x0fff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
+	map(0x1000, 0x17ff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
 	map(0x1800, 0x1fff).ram();
-	map(0x2000, 0x27ff).ram().w(FUNC(dec8_state::dec8_videoram_w)).share("videoram");
+	map(0x2000, 0x27ff).ram().w(FUNC(oscar_state::videoram_w)).share(m_videoram);
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x31ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x3200, 0x37ff).nopw(); /* Unused */
@@ -572,22 +559,22 @@ void dec8_state::cobra_map(address_map &map)
 	map(0x3801, 0x3801).portr("IN1");    /* Player 2 */
 	map(0x3802, 0x3802).portr("DSW0");   /* Dip 1 */
 	map(0x3803, 0x3803).portr("DSW1");   /* Dip 2 */
-	map(0x3800, 0x3807).w("tilegen1", FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x3810, 0x381f).w("tilegen1", FUNC(deco_bac06_device::pf_control1_8bit_w));
+	map(0x3800, 0x3807).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control0_8bit_w));
+	map(0x3810, 0x381f).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control1_8bit_w));
 	map(0x3a00, 0x3a00).portr("IN2");    /* VBL & coins */
-	map(0x3a00, 0x3a07).w("tilegen2", FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x3a10, 0x3a1f).w("tilegen2", FUNC(deco_bac06_device::pf_control1_8bit_w));
-	map(0x3c00, 0x3c00).w(FUNC(dec8_state::dec8_bank_w));
-	map(0x3c02, 0x3c02).w(FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
-	map(0x3e00, 0x3e00).w(FUNC(dec8_state::dec8_sound_w));
-	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x3a00, 0x3a07).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control0_8bit_w));
+	map(0x3a10, 0x3a1f).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control1_8bit_w));
+	map(0x3c00, 0x3c00).w(FUNC(oscar_state::bank_w));
+	map(0x3c02, 0x3c02).w(FUNC(oscar_state::buffer_spriteram16_w)); /* DMA */
+	map(0x3e00, 0x3e00).w(FUNC(oscar_state::sound_w));
+	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom();
 }
 
 /******************************************************************************/
 
 /* Used for Cobra Command, Maze Hunter, Super Real Darwin etc */
-void dec8_state::dec8_s_map(address_map &map)
+void dec8_state_base::dec8_s_map(address_map &map)
 {
 	map(0x0000, 0x05ff).ram();
 	map(0x2000, 0x2001).w("ym1", FUNC(ym2203_device::write));
@@ -597,7 +584,7 @@ void dec8_state::dec8_s_map(address_map &map)
 }
 
 /* Used by Gondomania, Psycho-Nics Oscar & Garyo Retsuden */
-void dec8_state::oscar_s_map(address_map &map)
+void dec8_state_base::oscar_s_map(address_map &map)
 {
 	map(0x0000, 0x05ff).ram();
 	map(0x2000, 0x2001).w("ym1", FUNC(ym2203_device::write));
@@ -607,13 +594,13 @@ void dec8_state::oscar_s_map(address_map &map)
 }
 
 // Used by the bootleg which has a standard M6502 with predecrypted opcodes
-void dec8_state::oscarbl_s_opcodes_map(address_map &map)
+void oscar_state::oscarbl_s_opcodes_map(address_map &map)
 {
 	map(0x8000, 0xffff).rom().region("audiocpu", 0x10000);
 }
 
 /* Used by Last Mission, Shackled & Breywood */
-void dec8_state::ym3526_s_map(address_map &map)
+void lastmisn_state::ym3526_s_map(address_map &map)
 {
 	map(0x0000, 0x05ff).ram();
 	map(0x0800, 0x0801).w("ym1", FUNC(ym2203_device::write));
@@ -623,15 +610,15 @@ void dec8_state::ym3526_s_map(address_map &map)
 }
 
 /* Captain Silver - same sound system as Pocket Gal */
-void csilver_state::csilver_s_map(address_map &map)
+void csilver_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x0800, 0x0801).w("ym1", FUNC(ym2203_device::write));
 	map(0x1000, 0x1001).w("ym2", FUNC(ym3526_device::write));
-	map(0x1800, 0x1800).w(FUNC(csilver_state::csilver_adpcm_data_w)); /* ADPCM data for the MSM5205 chip */
-	map(0x2000, 0x2000).w(FUNC(csilver_state::csilver_sound_bank_w));
+	map(0x1800, 0x1800).w(FUNC(csilver_state::adpcm_data_w)); /* ADPCM data for the MSM5205 chip */
+	map(0x2000, 0x2000).w(FUNC(csilver_state::sound_bank_w));
 	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x3400, 0x3400).r(FUNC(csilver_state::csilver_adpcm_reset_r)); /* ? not sure */
+	map(0x3400, 0x3400).r(FUNC(csilver_state::adpcm_reset_r)); /* ? not sure */
 	map(0x4000, 0x7fff).bankr("soundbank");
 	map(0x8000, 0xffff).rom();
 }
@@ -650,27 +637,27 @@ void csilver_state::csilver_s_map(address_map &map)
 
 */
 
-uint8_t dec8_state::i8751_port0_r()
+u8 dec8_mcu_state_base::i8751_port0_r()
 {
 	return m_i8751_port0;
 }
 
-void dec8_state::i8751_port0_w(uint8_t data)
+void dec8_mcu_state_base::i8751_port0_w(u8 data)
 {
 	m_i8751_port0 = data;
 }
 
-uint8_t dec8_state::i8751_port1_r()
+u8 dec8_mcu_state_base::i8751_port1_r()
 {
 	return m_i8751_port1;
 }
 
-void dec8_state::i8751_port1_w(uint8_t data)
+void dec8_mcu_state_base::i8751_port1_w(u8 data)
 {
 	m_i8751_port1 = data;
 }
 
-void dec8_state::gondo_mcu_to_main_w(uint8_t data)
+void lastmisn_state::gondo_mcu_to_main_w(u8 data)
 {
 	// P2 - controls latches for main CPU communication
 	if ((data&0x10)==0)
@@ -688,7 +675,7 @@ void dec8_state::gondo_mcu_to_main_w(uint8_t data)
 	m_i8751_p2 = data;
 }
 
-void dec8_state::shackled_mcu_to_main_w(uint8_t data)
+void lastmisn_state::shackled_mcu_to_main_w(u8 data)
 {
 	// P2 - controls latches for main CPU communication
 	if ((data&0x10)==0)
@@ -721,7 +708,7 @@ void dec8_state::shackled_mcu_to_main_w(uint8_t data)
     Super Real Darwin is similar but only appears to have a single port
 */
 
-void dec8_state::srdarwin_mcu_to_main_w(uint8_t data)
+void srdarwin_state::mcu_to_main_w(u8 data)
 {
 	// P2 - controls latches for main CPU communication
 	if ((data & 0x10) == 0)
@@ -747,7 +734,7 @@ void dec8_state::srdarwin_mcu_to_main_w(uint8_t data)
 }
 
 
-void csilver_state::csilver_mcu_to_main_w(uint8_t data)
+void csilver_state::mcu_to_main_w(u8 data)
 {
 	if (~data & 0x10)
 		m_i8751_port0 = m_i8751_value >> 8;
@@ -1769,19 +1756,19 @@ GFXDECODE_END
 /******************************************************************************/
 
 /* Coins generate NMI's */
-void dec8_state::oscar_coin_irq(int state)
+void oscar_state::coin_irq(int state)
 {
 	if (state && !m_coin_state)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	m_coin_state = bool(state);
 }
 
-void dec8_state::oscar_coin_clear_w(uint8_t data)
+void oscar_state::coin_clear_w(u8 data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-void dec8_state::shackled_coin_irq(int state)
+void lastmisn_state::shackled_coin_irq(int state)
 {
 	if (state && !m_coin_state)
 		m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
@@ -1791,55 +1778,58 @@ void dec8_state::shackled_coin_irq(int state)
 /******************************************************************************/
 
 
-void dec8_state::machine_start()
+void dec8_state_base::machine_start()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
+	u8 *ROM = memregion("maincpu")->base();
 	uint32_t max_bank = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
 	m_mainbank->configure_entries(0, max_bank, &ROM[0x10000], 0x4000);
 
-	m_i8751_timer = timer_alloc(FUNC(dec8_state::mcu_irq_clear), this);
-	m_m6502_timer = timer_alloc(FUNC(dec8_state::audiocpu_nmi_clear), this);
+	m_m6502_timer = timer_alloc(FUNC(dec8_state_base::audiocpu_nmi_clear), this);
 
-	m_i8751_p2 = 0xff;
-	m_latch = 0;
-
-	save_item(NAME(m_secclr));
-	save_item(NAME(m_i8751_p2));
-	save_item(NAME(m_latch));
 	save_item(NAME(m_coin_state));
+
+	save_item(NAME(m_scroll));
+}
+
+void dec8_state_base::machine_reset()
+{
+	m_scroll[0] = m_scroll[1] = m_scroll[2] = m_scroll[3] = 0;
+}
+
+
+void dec8_mcu_state_base::machine_start()
+{
+	dec8_state_base::machine_start();
+
+	m_i8751_timer = timer_alloc(FUNC(dec8_mcu_state_base::mcu_irq_clear), this);
+	m_i8751_p2 = 0xff;
+
+	save_item(NAME(m_i8751_p2));
 	save_item(NAME(m_i8751_port0));
 	save_item(NAME(m_i8751_port1));
 	save_item(NAME(m_i8751_return));
 	save_item(NAME(m_i8751_value));
-	save_item(NAME(m_coinage_id));
-	save_item(NAME(m_coin1));
-	save_item(NAME(m_coin2));
-	save_item(NAME(m_need1));
-	save_item(NAME(m_need2));
-	save_item(NAME(m_cred1));
-	save_item(NAME(m_cred2));
-	save_item(NAME(m_credits));
-	save_item(NAME(m_snd));
-
-	save_item(NAME(m_scroll2));
-	save_item(NAME(m_bg_control));
-	save_item(NAME(m_pf1_control));
 }
 
-void dec8_state::machine_reset()
+void dec8_mcu_state_base::machine_reset()
 {
+	dec8_state_base::machine_reset();
+
 	m_i8751_port0 = m_i8751_port1 = 0;
 	m_i8751_return = m_i8751_value = 0;
-	m_coinage_id = 0;
-	m_coin1 = m_coin2 = m_credits = m_snd = 0;
-	m_need1 = m_need2 = m_cred1 = m_cred2 = 1;
+}
 
-	m_scroll2[0] = m_scroll2[1] = m_scroll2[2] = m_scroll2[3] = 0;
-	for (int i = 0; i < 0x20; i++)
-	{
-		m_bg_control[i] = 0;
-		m_pf1_control[i] = 0;
-	}
+
+void lastmisn_state::machine_start()
+{
+	dec8_mcu_state_base::machine_start();
+
+	save_item(NAME(m_secclr));
+}
+
+void lastmisn_state::machine_reset()
+{
+	dec8_state_base::machine_reset();
 
 	// reset clears LS273 latch, which disables NMI
 	if (m_nmigate.found())
@@ -1849,9 +1839,9 @@ void dec8_state::machine_reset()
 
 void csilver_state::machine_start()
 {
-	dec8_state::machine_start();
+	lastmisn_state::machine_start();
 
-	uint8_t *RAM = memregion("audiocpu")->base();
+	u8 *RAM = memregion("audiocpu")->base();
 	m_soundbank->configure_entries(0, 2, &RAM[0], 0x4000);
 
 	save_item(NAME(m_msm5205next));
@@ -1860,7 +1850,7 @@ void csilver_state::machine_start()
 
 void csilver_state::machine_reset()
 {
-	dec8_state::machine_reset();
+	lastmisn_state::machine_reset();
 
 	m_msm5205next = 0;
 	m_toggle = 0;
@@ -1868,34 +1858,34 @@ void csilver_state::machine_reset()
 
 
 // DECO video CRTC, unverified
-void dec8_state::set_screen_raw_params_data_east(machine_config &config)
+void dec8_state_base::set_screen_raw_params_data_east(machine_config &config)
 {
 	m_screen->set_raw(XTAL(12'000'000)/2,384,0,256,272,8,248);
 }
 
-void dec8_state::lastmisn(machine_config &config)
+void lastmisn_state::lastmisn(machine_config &config)
 {
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, 2000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &dec8_state::lastmisn_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lastmisn_state::lastmisn_map);
 
 	MC6809E(config, m_subcpu, 2000000);
-	m_subcpu->set_addrmap(AS_PROGRAM, &dec8_state::lastmisn_sub_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &lastmisn_state::lastmisn_sub_map);
 
 	M6502(config, m_audiocpu, 1500000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::ym3526_s_map); /* NMIs are caused by the main CPU */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lastmisn_state::ym3526_s_map); /* NMIs are caused by the main CPU */
 
 	I8751(config, m_mcu, XTAL(8'000'000));
-	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
-	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
-	m_mcu->port_in_cb<1>().set(FUNC(dec8_state::i8751_port1_r));
-	m_mcu->port_out_cb<1>().set(FUNC(dec8_state::i8751_port1_w));
-	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::shackled_mcu_to_main_w));
+	m_mcu->port_in_cb<0>().set(FUNC(lastmisn_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(lastmisn_state::i8751_port0_w));
+	m_mcu->port_in_cb<1>().set(FUNC(lastmisn_state::i8751_port1_r));
+	m_mcu->port_out_cb<1>().set(FUNC(lastmisn_state::i8751_port1_w));
+	m_mcu->port_out_cb<2>().set(FUNC(lastmisn_state::shackled_mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 	config.set_maximum_quantum(attotime::from_hz(12000));
 
-	INPUT_MERGER_ANY_LOW(config, "coin").output_handler().set(FUNC(dec8_state::shackled_coin_irq));
+	INPUT_MERGER_ANY_LOW(config, "coin").output_handler().set(FUNC(lastmisn_state::shackled_coin_irq));
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -1908,13 +1898,13 @@ void dec8_state::lastmisn(machine_config &config)
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	set_screen_raw_params_data_east(config);
-	m_screen->set_screen_update(FUNC(dec8_state::screen_update_lastmisn));
+	m_screen->set_screen_update(FUNC(lastmisn_state::screen_update_lastmisn));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shackled);
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
-	MCFG_VIDEO_START_OVERRIDE(dec8_state,lastmisn)
+	MCFG_VIDEO_START_OVERRIDE(lastmisn_state,lastmisn)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1932,30 +1922,30 @@ void dec8_state::lastmisn(machine_config &config)
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
 }
 
-void dec8_state::shackled(machine_config &config)
+void lastmisn_state::shackled(machine_config &config)
 {
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, 2000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &dec8_state::shackled_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lastmisn_state::shackled_map);
 
 	MC6809E(config, m_subcpu, 2000000);
-	m_subcpu->set_addrmap(AS_PROGRAM, &dec8_state::shackled_sub_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &lastmisn_state::shackled_sub_map);
 
 	M6502(config, m_audiocpu, 1500000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::ym3526_s_map); /* NMIs are caused by the main CPU */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lastmisn_state::ym3526_s_map); /* NMIs are caused by the main CPU */
 
 	I8751(config, m_mcu, XTAL(8'000'000));
-	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
-	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
-	m_mcu->port_in_cb<1>().set(FUNC(dec8_state::i8751_port1_r));
-	m_mcu->port_out_cb<1>().set(FUNC(dec8_state::i8751_port1_w));
-	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::shackled_mcu_to_main_w));
+	m_mcu->port_in_cb<0>().set(FUNC(lastmisn_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(lastmisn_state::i8751_port0_w));
+	m_mcu->port_in_cb<1>().set(FUNC(lastmisn_state::i8751_port1_r));
+	m_mcu->port_out_cb<1>().set(FUNC(lastmisn_state::i8751_port1_w));
+	m_mcu->port_out_cb<2>().set(FUNC(lastmisn_state::shackled_mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 //  config.set_maximum_quantum(attotime::from_hz(100000));
 	config.set_perfect_quantum(m_maincpu); // needs heavy sync, otherwise one of the two CPUs will miss an IRQ and cause the game to hang
 
-	INPUT_MERGER_ANY_LOW(config, "coin").output_handler().set(FUNC(dec8_state::shackled_coin_irq));
+	INPUT_MERGER_ANY_LOW(config, "coin").output_handler().set(FUNC(lastmisn_state::shackled_coin_irq));
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -1968,13 +1958,13 @@ void dec8_state::shackled(machine_config &config)
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	set_screen_raw_params_data_east(config);
-	m_screen->set_screen_update(FUNC(dec8_state::screen_update_shackled));
+	m_screen->set_screen_update(FUNC(lastmisn_state::screen_update_shackled));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shackled);
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
-	MCFG_VIDEO_START_OVERRIDE(dec8_state,shackled)
+	MCFG_VIDEO_START_OVERRIDE(lastmisn_state,shackled)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1992,28 +1982,28 @@ void dec8_state::shackled(machine_config &config)
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
 }
 
-void dec8_state::gondo(machine_config &config)
+void gondo_state::gondo(machine_config &config)
 {
 	/* basic machine hardware */
 	HD6309E(config, m_maincpu, 3000000); /* HD63C09EP */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dec8_state::gondo_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gondo_state::gondo_map);
 
 	M6502(config, m_audiocpu, 1500000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::oscar_s_map); /* NMIs are caused by the main CPU */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gondo_state::oscar_s_map); /* NMIs are caused by the main CPU */
 
 	I8751(config, m_mcu, XTAL(8'000'000));
-	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
-	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
-	m_mcu->port_in_cb<1>().set(FUNC(dec8_state::i8751_port1_r));
-	m_mcu->port_out_cb<1>().set(FUNC(dec8_state::i8751_port1_w));
-	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::gondo_mcu_to_main_w));
+	m_mcu->port_in_cb<0>().set(FUNC(gondo_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(gondo_state::i8751_port0_w));
+	m_mcu->port_in_cb<1>().set(FUNC(gondo_state::i8751_port1_r));
+	m_mcu->port_out_cb<1>().set(FUNC(gondo_state::i8751_port1_w));
+	m_mcu->port_out_cb<2>().set(FUNC(gondo_state::gondo_mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0);
-	m_spritegen_krn->set_colpri_callback(FUNC(dec8_state::gondo_colpri_cb));
+	m_spritegen_krn->set_colpri_callback(FUNC(gondo_state::gondo_colpri_cb));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(58);
@@ -2021,8 +2011,8 @@ void dec8_state::gondo(machine_config &config)
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	set_screen_raw_params_data_east(config);
-	m_screen->set_screen_update(FUNC(dec8_state::screen_update_gondo));
-	m_screen->screen_vblank().set(FUNC(dec8_state::screen_vblank_dec8));
+	m_screen->set_screen_update(FUNC(gondo_state::screen_update_gondo));
+	m_screen->screen_vblank().set(FUNC(gondo_state::screen_vblank));
 	m_screen->screen_vblank().append(m_nmigate, FUNC(input_merger_device::in_w<1>));
 	m_screen->set_palette(m_palette);
 
@@ -2031,8 +2021,6 @@ void dec8_state::gondo(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gondo);
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
-	MCFG_VIDEO_START_OVERRIDE(dec8_state,gondo)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -2049,21 +2037,21 @@ void dec8_state::gondo(machine_config &config)
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
 }
 
-void dec8_state::garyoret(machine_config &config)
+void lastmisn_state::garyoret(machine_config &config)
 {
 	/* basic machine hardware */
 	HD6309E(config, m_maincpu, 3000000); /* HD63C09EP */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dec8_state::garyoret_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lastmisn_state::garyoret_map);
 
 	M6502(config, m_audiocpu, 1500000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::oscar_s_map); /* NMIs are caused by the main CPU */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lastmisn_state::oscar_s_map); /* NMIs are caused by the main CPU */
 
 	I8751(config, m_mcu, XTAL(8'000'000));
-	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
-	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
-	m_mcu->port_in_cb<1>().set(FUNC(dec8_state::i8751_port1_r));
-	m_mcu->port_out_cb<1>().set(FUNC(dec8_state::i8751_port1_w));
-	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::gondo_mcu_to_main_w));
+	m_mcu->port_in_cb<0>().set(FUNC(lastmisn_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(lastmisn_state::i8751_port0_w));
+	m_mcu->port_in_cb<1>().set(FUNC(lastmisn_state::i8751_port1_r));
+	m_mcu->port_out_cb<1>().set(FUNC(lastmisn_state::i8751_port1_w));
+	m_mcu->port_out_cb<2>().set(FUNC(lastmisn_state::gondo_mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 	/* video hardware */
@@ -2077,8 +2065,8 @@ void dec8_state::garyoret(machine_config &config)
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	set_screen_raw_params_data_east(config);
-	m_screen->set_screen_update(FUNC(dec8_state::screen_update_garyoret));
-	m_screen->screen_vblank().set(FUNC(dec8_state::screen_vblank_dec8));
+	m_screen->set_screen_update(FUNC(lastmisn_state::screen_update_garyoret));
+	m_screen->screen_vblank().set(FUNC(lastmisn_state::screen_vblank));
 	m_screen->screen_vblank().append(m_nmigate, FUNC(input_merger_device::in_w<1>));
 	m_screen->set_palette(m_palette);
 
@@ -2087,7 +2075,7 @@ void dec8_state::garyoret(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gondo);
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
-	MCFG_VIDEO_START_OVERRIDE(dec8_state,garyoret)
+	MCFG_VIDEO_START_OVERRIDE(lastmisn_state,garyoret)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2105,21 +2093,21 @@ void dec8_state::garyoret(machine_config &config)
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
 }
 
-void dec8_state::ghostb(machine_config &config)
+void lastmisn_state::ghostb(machine_config &config)
 {
 	/* basic machine hardware */
 	HD6309E(config, m_maincpu, XTAL(12'000'000) / 4);  /* HD63C09EP, clock verified */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dec8_state::meikyuh_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lastmisn_state::meikyuh_map);
 
 	DECO_222(config, m_audiocpu, XTAL(12'000'000) / 8); /* also seen with stock M6502, clock verified */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::dec8_s_map); /* NMIs are caused by the main CPU */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lastmisn_state::dec8_s_map); /* NMIs are caused by the main CPU */
 
 	I8751(config, m_mcu, XTAL(8'000'000)); /* 8.0MHz OSC next to MCU - clock verified */
-	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
-	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
-	m_mcu->port_in_cb<1>().set(FUNC(dec8_state::i8751_port1_r));
-	m_mcu->port_out_cb<1>().set(FUNC(dec8_state::i8751_port1_w));
-	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::gondo_mcu_to_main_w));
+	m_mcu->port_in_cb<0>().set(FUNC(lastmisn_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(lastmisn_state::i8751_port0_w));
+	m_mcu->port_in_cb<1>().set(FUNC(lastmisn_state::i8751_port1_r));
+	m_mcu->port_out_cb<1>().set(FUNC(lastmisn_state::i8751_port1_w));
+	m_mcu->port_out_cb<2>().set(FUNC(lastmisn_state::gondo_mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 	/* video hardware */
@@ -2137,8 +2125,8 @@ void dec8_state::ghostb(machine_config &config)
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	set_screen_raw_params_data_east(config);
-	m_screen->set_screen_update(FUNC(dec8_state::screen_update_ghostb));
-	m_screen->screen_vblank().set(FUNC(dec8_state::screen_vblank_dec8));
+	m_screen->set_screen_update(FUNC(lastmisn_state::screen_update_ghostb));
+	m_screen->screen_vblank().set(FUNC(lastmisn_state::screen_vblank));
 	m_screen->screen_vblank().append([this] (int state) { if (state && m_nmi_enable) m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE); });
 	m_screen->set_palette(m_palette);
 
@@ -2146,7 +2134,7 @@ void dec8_state::ghostb(machine_config &config)
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 	m_palette->set_prom_region("proms");
 	m_palette->set_init(m_palette, FUNC(deco_rmc3_device::palette_init_proms));
-	MCFG_VIDEO_START_OVERRIDE(dec8_state,ghostb)
+	MCFG_VIDEO_START_OVERRIDE(lastmisn_state,ghostb)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2164,11 +2152,11 @@ void dec8_state::ghostb(machine_config &config)
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
 }
 
-void dec8_state::meikyuh(machine_config &config)
+void lastmisn_state::meikyuh(machine_config &config)
 {
 	ghostb(config);
 	M6502(config.replace(), m_audiocpu, 1500000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::dec8_s_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lastmisn_state::dec8_s_map);
 }
 
 
@@ -2176,13 +2164,13 @@ void csilver_state::csilver(machine_config &config)
 {
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, XTAL(12'000'000)/8); /* verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &csilver_state::csilver_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &csilver_state::main_map);
 
 	MC6809E(config, m_subcpu, XTAL(12'000'000)/8); /* verified on pcb */
-	m_subcpu->set_addrmap(AS_PROGRAM, &csilver_state::csilver_sub_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &csilver_state::sub_map);
 
 	M6502(config, m_audiocpu, XTAL(12'000'000)/8); /* verified on pcb */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &csilver_state::csilver_s_map); /* NMIs are caused by the main CPU */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &csilver_state::sound_map); /* NMIs are caused by the main CPU */
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
@@ -2191,7 +2179,7 @@ void csilver_state::csilver(machine_config &config)
 	m_mcu->port_out_cb<0>().set(FUNC(csilver_state::i8751_port0_w));
 	m_mcu->port_in_cb<1>().set(FUNC(csilver_state::i8751_port1_r));
 	m_mcu->port_out_cb<1>().set(FUNC(csilver_state::i8751_port1_w));
-	m_mcu->port_out_cb<2>().set(FUNC(csilver_state::csilver_mcu_to_main_w));
+	m_mcu->port_out_cb<2>().set(FUNC(csilver_state::mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 	config.set_perfect_quantum(m_maincpu);
@@ -2232,26 +2220,26 @@ void csilver_state::csilver(machine_config &config)
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
 
 	MSM5205(config, m_msm, XTAL(384'000)); /* verified on pcb */
-	m_msm->vck_legacy_callback().set(FUNC(csilver_state::csilver_adpcm_int));  /* interrupt function */
+	m_msm->vck_legacy_callback().set(FUNC(csilver_state::adpcm_int));  /* interrupt function */
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      /* 8KHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.88);
 }
 
-void dec8_state::oscar(machine_config &config)
+void oscar_state::oscar(machine_config &config)
 {
 	/* basic machine hardware */
 	HD6309(config, m_maincpu, XTAL(12'000'000)/2); /* PCB seen both HD6309EP or MC6809EP, clock verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dec8_state::oscar_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &oscar_state::oscar_map);
 
 	HD6309(config, m_subcpu, XTAL(12'000'000)/2); /* PCB seen both HD6309EP or MC6809EP, clock verified on pcb */
-	m_subcpu->set_addrmap(AS_PROGRAM, &dec8_state::oscar_sub_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &oscar_state::oscar_sub_map);
 
 	DECO_222(config, m_audiocpu, XTAL(12'000'000)/8); // IC labeled "C10707-1"
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::oscar_s_map); /* NMIs are caused by the main CPU */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &oscar_state::oscar_s_map); /* NMIs are caused by the main CPU */
 
 	config.set_maximum_quantum(attotime::from_hz(2400)); /* 40 CPU slices per frame */
 
-	INPUT_MERGER_ANY_LOW(config, "coin").output_handler().set(FUNC(dec8_state::oscar_coin_irq)); // 1S1588 x3 (D1-D3) + RCDM-I5
+	INPUT_MERGER_ANY_LOW(config, "coin").output_handler().set(FUNC(oscar_state::coin_irq)); // 1S1588 x3 (D1-D3) + RCDM-I5
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -2259,7 +2247,7 @@ void dec8_state::oscar(machine_config &config)
 	DECO_BAC06(config, m_tilegen[0], 0);
 	m_tilegen[0]->set_gfx_region_wide(2, 2, 0);
 	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
-	m_tilegen[0]->set_tile_callback(FUNC(dec8_state::oscar_tile_cb));
+	m_tilegen[0]->set_tile_callback(FUNC(oscar_state::oscar_tile_cb));
 
 	DECO_MXC06(config, m_spritegen_mxc, 0);
 
@@ -2269,13 +2257,13 @@ void dec8_state::oscar(machine_config &config)
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	set_screen_raw_params_data_east(config);
-	m_screen->set_screen_update(FUNC(dec8_state::screen_update_oscar));
+	m_screen->set_screen_update(FUNC(oscar_state::screen_update_oscar));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_oscar);
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
-	MCFG_VIDEO_START_OVERRIDE(dec8_state,oscar)
+	MCFG_VIDEO_START_OVERRIDE(oscar_state,oscar)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2294,28 +2282,28 @@ void dec8_state::oscar(machine_config &config)
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
 }
 
-void dec8_state::oscarbl(machine_config &config)
+void oscar_state::oscarbl(machine_config &config)
 {
 	oscar(config);
 
 	M6502(config.replace(), m_audiocpu, XTAL(12'000'000)/8);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::oscar_s_map); /* NMIs are caused by the main CPU */
-	m_audiocpu->set_addrmap(AS_OPCODES, &dec8_state::oscarbl_s_opcodes_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &oscar_state::oscar_s_map); /* NMIs are caused by the main CPU */
+	m_audiocpu->set_addrmap(AS_OPCODES, &oscar_state::oscarbl_s_opcodes_map);
 }
 
-void dec8_state::srdarwin(machine_config &config)
+void srdarwin_state::srdarwin(machine_config &config)
 {
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, 2000000);  /* MC68A09EP */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dec8_state::srdarwin_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &srdarwin_state::main_map);
 
 	DECO_222(config, m_audiocpu, 1500000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::dec8_s_map); /* NMIs are caused by the main CPU */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &srdarwin_state::dec8_s_map); /* NMIs are caused by the main CPU */
 
 	I8751(config, m_mcu, XTAL(8'000'000)); /* unknown frequency */
-	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
-	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
-	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::srdarwin_mcu_to_main_w));
+	m_mcu->port_in_cb<0>().set(FUNC(srdarwin_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(srdarwin_state::i8751_port0_w));
+	m_mcu->port_out_cb<2>().set(FUNC(srdarwin_state::mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 	config.set_perfect_quantum(m_maincpu); /* needed for stability with emulated MCU or sometimes commands get missed and game crashes at bosses */
@@ -2329,14 +2317,12 @@ void dec8_state::srdarwin(machine_config &config)
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	set_screen_raw_params_data_east(config);
-	m_screen->set_screen_update(FUNC(dec8_state::screen_update_srdarwin));
+	m_screen->set_screen_update(FUNC(srdarwin_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_srdarwin);
 	DECO_RMC3(config, m_palette, 0, 144); // xxxxBBBBGGGGRRRR with custom weighting
-
-	MCFG_VIDEO_START_OVERRIDE(dec8_state,srdarwin)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2354,14 +2340,14 @@ void dec8_state::srdarwin(machine_config &config)
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
 }
 
-void dec8_state::cobracom(machine_config &config)
+void oscar_state::cobracom(machine_config &config)
 {
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, 2000000);  /* MC68B09EP */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dec8_state::cobra_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &oscar_state::cobra_map);
 
 	M6502(config, m_audiocpu, 1500000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::dec8_s_map); /* NMIs are caused by the main CPU */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &oscar_state::dec8_s_map); /* NMIs are caused by the main CPU */
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -2375,7 +2361,7 @@ void dec8_state::cobracom(machine_config &config)
 	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_MXC06(config, m_spritegen_mxc, 0);
-	m_spritegen_mxc->set_colpri_callback(FUNC(dec8_state::cobracom_colpri_cb));
+	m_spritegen_mxc->set_colpri_callback(FUNC(oscar_state::cobracom_colpri_cb));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(58);
@@ -2383,14 +2369,14 @@ void dec8_state::cobracom(machine_config &config)
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	set_screen_raw_params_data_east(config);
-	m_screen->set_screen_update(FUNC(dec8_state::screen_update_cobracom));
+	m_screen->set_screen_update(FUNC(oscar_state::screen_update_cobracom));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cobracom);
 	DECO_RMC3(config, m_palette, 0, 256); // xxxxBBBBGGGGRRRR with custom weighting
 
-	MCFG_VIDEO_START_OVERRIDE(dec8_state,cobracom)
+	MCFG_VIDEO_START_OVERRIDE(oscar_state,cobracom)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3853,12 +3839,12 @@ ROM_START( cobracomjb )
 ROM_END
 
 
-void dec8_state::init_meikyuhbl()
+void lastmisn_state::init_meikyuhbl()
 {
 	// this bootleg has the high nibble of the first 0x400 bytes with reversed bits.
 	// Address it here instead of hacking the DECO RM-C3 device.
 
-	uint8_t *proms = memregion("proms")->base();
+	u8 *proms = memregion("proms")->base();
 
 	for (int i = 0; i < 0x400; i++)
 		proms[i] = bitswap<8>(proms[i], 4, 5, 6, 7, 3, 2, 1, 0);
@@ -3869,37 +3855,37 @@ void dec8_state::init_meikyuhbl()
 
 /******************************************************************************/
 
-GAME( 1986, lastmisn,   0,        lastmisn, lastmisn,  dec8_state,    empty_init,     ROT270, "Data East Corporation", "Last Mission (World revision 8)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnu6, lastmisn, lastmisn, lastmisn,  dec8_state,    empty_init,     ROT270, "Data East USA",         "Last Mission (US revision 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnu5, lastmisn, lastmisn, lastmisn,  dec8_state,    empty_init,     ROT270, "Data East USA",         "Last Mission (US revision 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnj,  lastmisn, lastmisn, lastmisnj, dec8_state,    empty_init,     ROT270, "Data East Corporation", "Last Mission (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, shackled,   0,        shackled, shackled,  dec8_state,    empty_init,     ROT0,   "Data East USA",         "Shackled (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, breywood,   shackled, shackled, breywood,  dec8_state,    empty_init,     ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gondo,      0,        gondo,    gondo,     dec8_state,    empty_init,     ROT270, "Data East Corporation", "Gondomania (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gondou,     gondo,    gondo,    gondo,     dec8_state,    empty_init,     ROT270, "Data East USA",         "Gondomania (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, makyosen,   gondo,    gondo,    gondo,     dec8_state,    empty_init,     ROT270, "Data East Corporation", "Makyou Senshi (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, garyoret,   0,        garyoret, garyoret,  dec8_state,    empty_init,     ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb,     0,        ghostb,   ghostb,    dec8_state,    empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players, revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb2a,   ghostb,   ghostb,   ghostb2a,  dec8_state,    empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb3,    ghostb,   ghostb,   ghostb3,   dec8_state,    empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 3B?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb3a,   ghostb,   ghostb,   ghostb3,   dec8_state,    empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ROMs confirmed working on PCB - stalls in demo mode
-GAME( 1987, meikyuh,    ghostb,   meikyuh,  meikyuh,   dec8_state,    empty_init,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, meikyuhbl,  ghostb,   meikyuh,  meikyuh,   dec8_state,    init_meikyuhbl, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilver,    0,        csilver,  csilver,   csilver_state, empty_init,     ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilverj,   csilver,  csilver,  csilverj,  csilver_state, empty_init,     ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilverja,  csilver,  csilver,  csilverj,  csilver_state, empty_init,     ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscar,      0,        oscar,    oscar,     dec8_state,    empty_init,     ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscarbl,    oscar,    oscarbl,  oscar,     dec8_state,    empty_init,     ROT0,   "bootleg",               "Psycho-Nics Oscar (World revision 0, bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, oscaru,     oscar,    oscar,    oscarj,    dec8_state,    empty_init,     ROT0,   "Data East USA",         "Psycho-Nics Oscar (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscarj1,    oscar,    oscar,    oscarj,    dec8_state,    empty_init,     ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscarj2,    oscar,    oscar,    oscarj,    dec8_state,    empty_init,     ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srdarwin,   0,        srdarwin, srdarwin,  dec8_state,    empty_init,     ROT270, "Data East Corporation", "Super Real Darwin (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srdarwinj,  srdarwin, srdarwin, srdarwinj, dec8_state,    empty_init,     ROT270, "Data East Corporation", "Super Real Darwin (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisn,   0,        lastmisn, lastmisn,  lastmisn_state, empty_init,     ROT270, "Data East Corporation", "Last Mission (World revision 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnu6, lastmisn, lastmisn, lastmisn,  lastmisn_state, empty_init,     ROT270, "Data East USA",         "Last Mission (US revision 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnu5, lastmisn, lastmisn, lastmisn,  lastmisn_state, empty_init,     ROT270, "Data East USA",         "Last Mission (US revision 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnj,  lastmisn, lastmisn, lastmisnj, lastmisn_state, empty_init,     ROT270, "Data East Corporation", "Last Mission (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, shackled,   0,        shackled, shackled,  lastmisn_state, empty_init,     ROT0,   "Data East USA",         "Shackled (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, breywood,   shackled, shackled, breywood,  lastmisn_state, empty_init,     ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gondo,      0,        gondo,    gondo,     gondo_state,    empty_init,     ROT270, "Data East Corporation", "Gondomania (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gondou,     gondo,    gondo,    gondo,     gondo_state,    empty_init,     ROT270, "Data East USA",         "Gondomania (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, makyosen,   gondo,    gondo,    gondo,     gondo_state,    empty_init,     ROT270, "Data East Corporation", "Makyou Senshi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, garyoret,   0,        garyoret, garyoret,  lastmisn_state, empty_init,     ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb,     0,        ghostb,   ghostb,    lastmisn_state, empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players, revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb2a,   ghostb,   ghostb,   ghostb2a,  lastmisn_state, empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb3,    ghostb,   ghostb,   ghostb3,   lastmisn_state, empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 3B?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb3a,   ghostb,   ghostb,   ghostb3,   lastmisn_state, empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ROMs confirmed working on PCB - stalls in demo mode
+GAME( 1987, meikyuh,    ghostb,   meikyuh,  meikyuh,   lastmisn_state, empty_init,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, meikyuhbl,  ghostb,   meikyuh,  meikyuh,   lastmisn_state, init_meikyuhbl, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilver,    0,        csilver,  csilver,   csilver_state,  empty_init,     ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilverj,   csilver,  csilver,  csilverj,  csilver_state,  empty_init,     ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilverja,  csilver,  csilver,  csilverj,  csilver_state,  empty_init,     ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscar,      0,        oscar,    oscar,     oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarbl,    oscar,    oscarbl,  oscar,     oscar_state,    empty_init,     ROT0,   "bootleg",               "Psycho-Nics Oscar (World revision 0, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, oscaru,     oscar,    oscar,    oscarj,    oscar_state,    empty_init,     ROT0,   "Data East USA",         "Psycho-Nics Oscar (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarj1,    oscar,    oscar,    oscarj,    oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarj2,    oscar,    oscar,    oscarj,    oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srdarwin,   0,        srdarwin, srdarwin,  srdarwin_state, empty_init,     ROT270, "Data East Corporation", "Super Real Darwin (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srdarwinj,  srdarwin, srdarwin, srdarwinj, srdarwin_state, empty_init,     ROT270, "Data East Corporation", "Super Real Darwin (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Unlike most Deco games of this period Cobra Command does not seem to have a Data East USA release.  Instead the Data East Corporation release
 // was used in the US as evidenced by boards with the EL romset bearing AAMA seal stickers (American Amusement Machine Association)
-GAME( 1988, cobracom,   0,        cobracom, cobracom,  dec8_state,    empty_init,     ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracoma,  cobracom, cobracom, cobracom,  dec8_state,    empty_init,     ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracomb,  cobracom, cobracom, cobracom,  dec8_state,    empty_init,     ROT0,   "Data East Corporation", "Cobra-Command (World/US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracomj,  cobracom, cobracom, cobracom,  dec8_state,    empty_init,     ROT0,   "Data East Corporation", "Cobra-Command (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracomjb, cobracom, cobracom, cobracom,  dec8_state,    empty_init,     ROT0,   "bootleg",               "Cobra-Command (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracom,   0,        cobracom, cobracom,  oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracoma,  cobracom, cobracom, cobracom,  oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomb,  cobracom, cobracom, cobracom,  oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Cobra-Command (World/US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomj,  cobracom, cobracom, cobracom,  oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Cobra-Command (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomjb, cobracom, cobracom, cobracom,  oscar_state,    empty_init,     ROT0,   "bootleg",               "Cobra-Command (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )

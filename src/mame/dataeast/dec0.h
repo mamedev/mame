@@ -217,7 +217,6 @@ private:
 
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
-	void sound_protection_map(address_map &map);
 };
 
 
