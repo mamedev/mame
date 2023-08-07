@@ -136,6 +136,28 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+	void sh_nmi_disable_w(uint8_t data);
+	void sh_nmi_enable_w(uint8_t data);
+	uint8_t sound_status_r();
+	uint8_t mcu_status_r();
+	uint8_t fake_mcu_r();
+	void fake_mcu_w(uint8_t data);
+	uint8_t fake_status_r();
+
+	void videoram_w(offs_t offset, uint8_t data);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void io_map(address_map &map);
+	void base_program_map(address_map &map);
+	void program_map(address_map &map);
+	void bootleg_program_map(address_map &map);
+	void mcu_map(address_map &map);
+	void sound_map(address_map &map);
+
 	required_shared_ptr<uint8_t> m_vreg;
 	required_shared_ptr<uint8_t> m_scroll;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -164,34 +186,13 @@ protected:
 	// lkageb fake MCU
 	uint8_t m_mcu_val = 0U;
 	uint8_t m_mcu_ready = 0;    // CPU data/MCU ready status
-
-	void sh_nmi_disable_w(uint8_t data);
-	void sh_nmi_enable_w(uint8_t data);
-	uint8_t sound_status_r();
-	uint8_t mcu_status_r();
-	uint8_t fake_mcu_r();
-	void fake_mcu_w(uint8_t data);
-	uint8_t fake_status_r();
-
-	void videoram_w(offs_t offset, uint8_t data);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void io_map(address_map &map);
-	void base_program_map(address_map &map);
-	void program_map(address_map &map);
-	void bootleg_program_map(address_map &map);
-	void mcu_map(address_map &map);
-	void sound_map(address_map &map);
 };
 
 class lkage5232_state : public lkage_state
 {
 public:
-	lkage5232_state(const machine_config &mconfig, device_type type, const char *tag)
-		: lkage_state(mconfig, type, tag),
+	lkage5232_state(const machine_config &mconfig, device_type type, const char *tag) :
+		lkage_state(mconfig, type, tag),
 		m_exrom(*this, "data")
 	{ }
 
@@ -203,10 +204,6 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	required_region_ptr<uint8_t> m_exrom;
-
-	uint8_t m_exrom_offs[2] = { 0x00, 0x00 };
-
 	uint8_t unk_f0e1_r(offs_t offset);
 	uint8_t exrom_data_r(offs_t offset);
 	void exrom_offset_w(offs_t offset, uint8_t data);
@@ -214,6 +211,10 @@ private:
 
 	void program_map(address_map &map);
 	void sound_map(address_map &map);
+
+	required_region_ptr<uint8_t> m_exrom;
+
+	uint8_t m_exrom_offs[2] = { 0x00, 0x00 };
 };
 
 
@@ -314,10 +315,10 @@ void lkage_state::video_start()
 
 void lkage_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const uint8_t *source = m_spriteram;
-	const uint8_t *finish = m_spriteram.bytes() == 0x60 ? source + 0x60 : source + 0x80;
+	uint8_t const *source = m_spriteram;
+	uint8_t const *const finish = source + std::min<unsigned>(m_spriteram.bytes(), 0x80);
 
-	while (source < finish)
+	for ( ; source < finish; source += 4)
 	{
 		int const attributes = source[2];
 		/* 0x01: horizontal flip
@@ -327,23 +328,15 @@ void lkage_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		 * 0x70: color
 		 * 0x80: priority
 		 */
-		int priority_mask = 0;
 		int const color = (attributes >> 4) & 7;
 		int flipx = attributes & 0x01;
 		int flipy = attributes & 0x02;
 		int const height = (attributes & 0x08) ? 2 : 1;
 		int sx = source[0] - 15 + m_sprite_dx;
-		int sy = 256 - 16 * height - source[1];
+		int sy = 256 - (16 * height) - source[1];
 		int sprite_number = source[3] + ((attributes & 0x04) << 6);
 
-		if (attributes & 0x80)
-		{
-			priority_mask = (0xf0 | 0xcc);
-		}
-		else
-		{
-			priority_mask = 0xf0;
-		}
+		int const priority_mask = (attributes & 0x80) ? (0xf0 | 0xcc) : 0xf0;
 
 		if (flip_screen_x())
 		{
@@ -357,7 +350,7 @@ void lkage_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 		if (flip_screen_y())
 		{
-			sy = 254 - 16 * height - sy;
+			sy = 254 - (16 * height) - sy;
 			flipy = !flipy;
 		}
 		if (height == 2 && !flipy)
@@ -368,17 +361,16 @@ void lkage_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		for (int y = 0; y < height; y++)
 		{
 			m_gfxdecode->gfx(1)->prio_transpen(
-				bitmap,
-				cliprect,
-				sprite_number ^ y,
-				color,
-				flipx, flipy,
-				sx & 0xff,
-				sy + 16 * y,
-				screen.priority(),
-				priority_mask, 0);
+					bitmap,
+					cliprect,
+					sprite_number ^ y,
+					color,
+					flipx, flipy,
+					sx & 0xff,
+					sy + 16 * y,
+					screen.priority(),
+					priority_mask, 0);
 		}
-		source += 4;
 	}
 }
 
@@ -387,25 +379,24 @@ uint32_t lkage_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	flip_screen_x_set(~m_vreg[2] & 0x01);
 	flip_screen_y_set(~m_vreg[2] & 0x02);
 
-	int bank = m_vreg[1] & 0x08;
-
-	if (m_bg_tile_bank != bank)
+	int const bg_bank = m_vreg[1] & 0x08;
+	if (m_bg_tile_bank != bg_bank)
 	{
-		m_bg_tile_bank = bank;
+		m_bg_tile_bank = bg_bank;
 		m_bg_tilemap->mark_all_dirty();
 	}
 
-	bank = m_vreg[0] & 0x04;
-	if (m_fg_tile_bank != bank)
+	int const fg_bank = m_vreg[0] & 0x04;
+	if (m_fg_tile_bank != fg_bank)
 	{
-		m_fg_tile_bank = bank;
+		m_fg_tile_bank = fg_bank;
 		m_fg_tilemap->mark_all_dirty();
 	}
 
-	bank = m_vreg[0] & 0x02;
-	if (m_tx_tile_bank != bank)
+	int const tx_bank = m_vreg[0] & 0x02;
+	if (m_tx_tile_bank != tx_bank)
 	{
-		m_tx_tile_bank = bank;
+		m_tx_tile_bank = tx_bank;
 		m_tx_tilemap->mark_all_dirty();
 	}
 
@@ -468,9 +459,9 @@ uint8_t lkage5232_state::exrom_data_r(offs_t offset)
 	uint8_t const data = m_exrom[offs];
 
 	if (offset != 0)
-			return 0xff;
-		else
-			return data;
+		return 0xff;
+	else
+		return data;
 }
 
 void lkage5232_state::exrom_offset_w(offs_t offset, uint8_t data)
