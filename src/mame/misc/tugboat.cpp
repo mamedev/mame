@@ -11,8 +11,6 @@ TODO:
 - check how the score is displayed. I'm quite sure that score_w is supposed to
   access videoram scanning it by columns (like btime_mirrorvideoram_w), but
   the current implementation is a big kludge.
-- why is fine x scroll latched differently for noahsark? or is something wrong
-  with IRQ timing that causes it to dislike how tugboat does it?
 - colors might not be entirely accurate
   Suspect berenstn is using the wrong color PROM.
 - convert to use the HD46505 device, it has two.
@@ -106,10 +104,8 @@ private:
 	u8 m_hd46505_reglatch[2] = { };
 	u16 m_start_address[2] = { };
 	u8 m_control[2] = { };
-	u8 m_fine_x_clock = 0;
-	u8 m_fine_y_clock = 0;
-	u8 m_fine_x_latch = 0;
-	u8 m_fine_y_latch = 0;
+	u8 m_fine_x = 0;
+	u8 m_fine_y = 0;
 
 	template<int N> void hd46505_w(offs_t offset, u8 data);
 	void score_w(offs_t offset, u8 data);
@@ -117,12 +113,8 @@ private:
 	void control0_w(offs_t offset, u8 data, u8 mem_mask);
 	void control1_w(offs_t offset, u8 data, u8 mem_mask);
 
-	void latch_start_address();
-	void tugboat_vblank_w(int state);
-	void noahsark_vblank_w(int state);
-
 	void tugboat_palette(palette_device &palette) const;
-
+	void vblank_w(int state);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
 
@@ -143,10 +135,8 @@ void tugboat_state::machine_start()
 	save_item(NAME(m_hd46505_reglatch));
 	save_item(NAME(m_start_address));
 	save_item(NAME(m_control));
-	save_item(NAME(m_fine_x_clock));
-	save_item(NAME(m_fine_y_clock));
-	save_item(NAME(m_fine_x_latch));
-	save_item(NAME(m_fine_y_latch));
+	save_item(NAME(m_fine_x));
+	save_item(NAME(m_fine_y));
 }
 
 void tugboat_state::video_start()
@@ -188,36 +178,13 @@ void tugboat_state::hd46505_w(offs_t offset, u8 data)
 		m_hd46505_regs[N][m_hd46505_reglatch[N]] = data;
 }
 
-void tugboat_state::latch_start_address()
-{
-	// crtc display start address is latched at end of visarea
-	for (int i = 0; i < 2; i++)
-		m_start_address[i] = m_hd46505_regs[i][0x0c] << 8 | m_hd46505_regs[i][0x0d];
-}
-
-void tugboat_state::tugboat_vblank_w(int state)
+void tugboat_state::vblank_w(int state)
 {
 	if (state)
 	{
-		latch_start_address();
-	}
-	else
-	{
-		m_fine_x_latch = m_fine_x_clock;
-		m_fine_y_latch = m_fine_y_clock;
-	}
-}
-
-void tugboat_state::noahsark_vblank_w(int state)
-{
-	if (state)
-	{
-		latch_start_address();
-		m_fine_x_latch = m_fine_x_clock;
-	}
-	else
-	{
-		m_fine_y_latch = m_fine_y_clock;
+		// latch display start address
+		for (int i = 0; i < 2; i++)
+			m_start_address[i] = m_hd46505_regs[i][0x0c] << 8 | m_hd46505_regs[i][0x0d];
 	}
 }
 
@@ -248,10 +215,10 @@ void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 				// score panel column doesn't scroll
 				if (x != 29)
-					fy = m_fine_y_latch;
+					fy = m_fine_y;
 			}
 			else
-				fx = m_fine_x_latch;
+				fx = m_fine_x;
 
 			m_gfxdecode->gfx(rgn)->transpen(bitmap,cliprect,
 					code,
@@ -305,11 +272,11 @@ void tugboat_state::control0_w(offs_t offset, u8 data, u8 mem_mask)
 
 	// d6: clock layer 1 fine x scroll
 	if (data & ~m_control[0] & 0x40)
-		m_fine_x_clock = (m_fine_x_clock + 1) & 7;
+		m_fine_x = (m_fine_x + 1) & 7;
 
 	// d7: clear layer 1 fine x scroll
 	if (data & 0x80)
-		m_fine_x_clock = 0;
+		m_fine_x = 0;
 
 	m_control[0] = data;
 }
@@ -321,11 +288,11 @@ void tugboat_state::control1_w(offs_t offset, u8 data, u8 mem_mask)
 
 	// d2: clock layer 2 fine y scroll
 	if (data & ~m_control[1] & 4)
-		m_fine_y_clock = (m_fine_y_clock + 1) & 7;
+		m_fine_y = (m_fine_y + 1) & 7;
 
 	// d0: clear layer 2 fine y scroll
 	if (data & 1)
-		m_fine_y_clock = 0;
+		m_fine_y = 0;
 
 	// d4-d7: input select
 	m_control[1] = data;
@@ -468,7 +435,7 @@ void tugboat_state::tugboat(machine_config &config)
 	m_screen->set_screen_update(FUNC(tugboat_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(m_pia[1], FUNC(pia6821_device::cb1_w));
-	m_screen->screen_vblank().append(FUNC(tugboat_state::tugboat_vblank_w));
+	m_screen->screen_vblank().append(FUNC(tugboat_state::vblank_w));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tugboat);
 	PALETTE(config, m_palette, FUNC(tugboat_state::tugboat_palette), 256);
@@ -485,7 +452,7 @@ void tugboat_state::noahsark(machine_config &config)
 
 	// video hardware
 	m_screen->screen_vblank().set(m_pia[1], FUNC(pia6821_device::cb1_w));
-	m_screen->screen_vblank().append(FUNC(tugboat_state::noahsark_vblank_w));
+	m_screen->screen_vblank().append(FUNC(tugboat_state::vblank_w)).invert();
 }
 
 
