@@ -1143,6 +1143,7 @@ void mac_state::macii(machine_config &config)
 	m_ram->set_extra_options("8M,32M,64M,96M,128M");
 
 	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
+	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 }
 
