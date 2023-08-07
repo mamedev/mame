@@ -92,6 +92,19 @@ uint8_t circus_state::paddle_r()
 	return m_paddle->read();
 }
 
+void circus_state::clown_z_w(uint8_t data)
+{
+	// This register triggers the discrete sound circuitry
+	//logerror("Z: %02X\n", data);
+	sound_w(data);
+
+	// also used to enable the amplifier
+	machine().sound().system_mute(data & 0x80);
+
+	// and the clown image currently displayed
+	m_clown_z = data;
+}
+
 
 
 /*******************************************************************************
@@ -595,38 +608,19 @@ ROM_START( ripcord )
 ROM_END
 
 
-void circus_state::init_circus()
-{
-	m_game_id = 1;
-}
-
-void circus_state::init_robotbwl()
-{
-	m_game_id = 2;
-}
-void circus_state::init_crash()
-{
-	m_game_id = 3;
-}
-void circus_state::init_ripcord()
-{
-	m_game_id = 4;
-}
-
-
 
 /*******************************************************************************
     Game Drivers
 *******************************************************************************/
 
-GAMEL( 1977, circus,   0,      circus,   circus,   circus_state,   init_circus,   ROT0, "Exidy / Taito", "Circus / Acrobat TV", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_circus ) // named Acrobat TV when Taito published it in Japan
-GAMEL( 1977, circuso,  circus, circus,   circus,   circus_state,   init_circus,   ROT0, "Exidy / Taito", "Circus / Acrobat TV (older)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_circus ) // "
-GAMEL( 1977, springbd, circus, circus,   circus,   circus_state,   init_circus,   ROT0, "bootleg (Sub-Electro)", "Springboard (bootleg of Circus)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_circus ) // looks like a text hack, but it also had a different bezel
+GAMEL( 1977, circus,   0,      circus,   circus,   circus_state,   empty_init, ROT0, "Exidy / Taito", "Circus / Acrobat TV", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_circus ) // named Acrobat TV when Taito published it in Japan
+GAMEL( 1977, circuso,  circus, circus,   circus,   circus_state,   empty_init, ROT0, "Exidy / Taito", "Circus / Acrobat TV (older)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_circus ) // "
+GAMEL( 1977, springbd, circus, circus,   circus,   circus_state,   empty_init, ROT0, "bootleg (Sub-Electro)", "Springboard (bootleg of Circus)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_circus ) // looks like a text hack, but it also had a different bezel
 
-GAME(  1977, robotbwl, 0,      robotbwl, robotbwl, robotbwl_state, init_robotbwl, ROT0, "Exidy", "Robot Bowl", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME(  1977, robotbwl, 0,      robotbwl, robotbwl, robotbwl_state, empty_init, ROT0, "Exidy", "Robot Bowl", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAMEL( 1979, crash,    0,      crash,    crash,    crash_state,    init_crash,    ROT0, "Exidy", "Crash (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crash )
-GAMEL( 1979, crasha,   crash,  crash,    crash,    crash_state,    init_crash,    ROT0, "Exidy", "Crash (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crasha )
-GAMEL( 1979, smash,    crash,  crash,    crash,    crash_state,    init_crash,    ROT0, "bootleg", "Smash (Crash bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crash ) // looks like a text hack, but it also had a different bezel
+GAMEL( 1979, crash,    0,      crash,    crash,    crash_state,    empty_init, ROT0, "Exidy", "Crash (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crash )
+GAMEL( 1979, crasha,   crash,  crash,    crash,    crash_state,    empty_init, ROT0, "Exidy", "Crash (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crasha )
+GAMEL( 1979, smash,    crash,  crash,    crash,    crash_state,    empty_init, ROT0, "bootleg", "Smash (Crash bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crash ) // looks like a text hack, but it also had a different bezel
 
-GAME(  1979, ripcord,  0,      ripcord,  ripcord,  ripcord_state,  init_ripcord,  ROT0, "Exidy", "Rip Cord", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME(  1979, ripcord,  0,      ripcord,  ripcord,  ripcord_state,  empty_init, ROT0, "Exidy", "Rip Cord", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

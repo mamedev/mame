@@ -32,11 +32,6 @@ public:
 	void base_mcfg(machine_config &config);
 	void circus(machine_config &config);
 
-	void init_ripcord();
-	void init_circus();
-	void init_robotbwl();
-	void init_crash();
-
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -56,12 +51,12 @@ protected:
 	int m_clown_y = 0;
 	int m_clown_z = 0;
 
-	int m_game_id = 0;
 	void videoram_w(offs_t offset, uint8_t data);
 	void clown_x_w(uint8_t data) { m_clown_x = 240 - data; }
 	void clown_y_w(uint8_t data) { m_clown_y = 240 - data; }
 	void clown_z_w(uint8_t data);
 	uint8_t paddle_r();
+	virtual void sound_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -86,10 +81,10 @@ public:
 
 	void robotbwl(machine_config &config);
 
-protected:
-	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
-
 private:
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+	virtual void sound_w(uint8_t data) override;
+
 	void draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y);
 	void draw_scoreboard(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bowling_alley(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -108,10 +103,10 @@ public:
 
 	void crash(machine_config &config);
 
-protected:
-	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
-
 private:
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+	virtual void sound_w(uint8_t data) override;
+
 	void draw_car(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -127,8 +122,9 @@ public:
 
 	void ripcord(machine_config &config);
 
-protected:
+private:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+	virtual void sound_w(uint8_t data) override;
 };
 
 
