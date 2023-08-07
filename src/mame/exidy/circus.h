@@ -47,9 +47,9 @@ protected:
 	required_ioport m_paddle;
 
 	tilemap_t *m_bg_tilemap = nullptr;
-	int m_clown_x = 0;
-	int m_clown_y = 0;
-	int m_clown_z = 0;
+	int16_t m_clown_x = 0;
+	int16_t m_clown_y = 0;
+	uint8_t m_clown_z = 0;
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void clown_x_w(uint8_t data) { m_clown_x = 240 - data; }

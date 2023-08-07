@@ -6,11 +6,11 @@ license:CC0-1.0
 	<element name="overlay">
 		<rect>
 			<bounds x="0" y="0" width="248" height="256" />
-			<color red="0.5" green="0.9" blue="1" />
+			<color red="0.4" green="0.95" blue="1" />
 		</rect>
 		<rect>
 			<bounds xc="123.5" yc="127.5" width="86" height="79" />
-			<color red="0.5" green="1" blue="0.6" />
+			<color red="0.4" green="1" blue="0.6" />
 		</rect>
 	</element>
 
