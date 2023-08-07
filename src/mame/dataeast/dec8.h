@@ -5,17 +5,20 @@
 
 #pragma once
 
+#include "decbac06.h"
+#include "deckarn.h"
+#include "decmxc06.h"
+#include "decrmc3.h"
+
 #include "cpu/mcs51/mcs51.h"
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "sound/msm5205.h"
 #include "video/bufsprite.h"
-#include "decbac06.h"
-#include "deckarn.h"
-#include "decmxc06.h"
-#include "decrmc3.h"
+
 #include "screen.h"
 #include "tilemap.h"
+
 
 class dec8_state_base : public driver_device
 {
@@ -35,26 +38,6 @@ protected:
 		m_videoram(*this, "videoram"),
 		m_bg_ram(*this, "bg_ram")
 	{ }
-
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_subcpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<buffered_spriteram8_device> m_spriteram;
-	required_device<screen_device> m_screen;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<deco_rmc3_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
-	optional_device_array<deco_bac06_device, 2> m_tilegen;
-
-	/* memory regions */
-	required_memory_bank m_mainbank;
-
-	/* memory pointers */
-	required_shared_ptr<u8> m_videoram;
-	optional_shared_ptr<u8> m_bg_ram;
-
-	std::unique_ptr<u16[]>   m_buffered_spriteram16; // for the mxc06 sprite chip emulation (oscar, cobra)
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -76,6 +59,30 @@ protected:
 
 	void set_screen_raw_params_data_east(machine_config &config);
 
+	void allocate_buffered_spriteram16();
+	void dec8_s_map(address_map &map);
+	void oscar_s_map(address_map &map);
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<buffered_spriteram8_device> m_spriteram;
+	required_device<screen_device> m_screen;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<deco_rmc3_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	optional_device_array<deco_bac06_device, 2> m_tilegen;
+
+	/* memory regions */
+	required_memory_bank m_mainbank;
+
+	/* memory pointers */
+	required_shared_ptr<u8> m_videoram;
+	optional_shared_ptr<u8> m_bg_ram;
+
+	std::unique_ptr<u16[]>   m_buffered_spriteram16; // for the mxc06 sprite chip emulation (oscar, cobra)
+
 	/* video-related */
 	tilemap_t  *m_bg_tilemap = nullptr;
 	tilemap_t  *m_fix_tilemap = nullptr;
@@ -86,11 +93,6 @@ protected:
 	bool     m_coin_state = false;
 
 	emu_timer *m_m6502_timer = nullptr;
-
-	void allocate_buffered_spriteram16();
-	void dec8_s_map(address_map &map);
-	void oscar_s_map(address_map &map);
-
 };
 
 // with I8751 MCU
@@ -103,11 +105,6 @@ protected:
 		m_coin_port(*this, "I8751")
 	{
 	}
-
-	required_device<i8751_device> m_mcu;
-
-	/* ports */
-	required_ioport m_coin_port;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -124,6 +121,11 @@ protected:
 	void i8751_port1_w(u8 data);
 
 	void i8751_reset_w(u8 data);
+
+	required_device<i8751_device> m_mcu;
+
+	/* ports */
+	required_ioport m_coin_port;
 
 	// MCU communication
 	u8  m_i8751_p2 = 0;
@@ -143,6 +145,7 @@ public:
 		dec8_mcu_state_base(mconfig, type, tag)
 	{
 	}
+
 	void srdarwin(machine_config &config);
 
 protected:
@@ -182,9 +185,6 @@ public:
 	void init_meikyuhbl();
 
 protected:
-	required_device<deco_karnovsprites_device> m_spritegen_krn;
-	optional_device<input_merger_device> m_nmigate;
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -200,10 +200,10 @@ protected:
 
 	void screen_vblank(int state);
 
-private:
-	bool     m_secclr = false;
-	bool     m_nmi_enable = false;
+	required_device<deco_karnovsprites_device> m_spritegen_krn;
+	optional_device<input_merger_device> m_nmigate;
 
+private:
 	void lastmisn_control_w(u8 data);
 	void shackled_control_w(u8 data);
 	void lastmisn_scrollx_w(u8 data);
@@ -233,6 +233,9 @@ private:
 	void shackled_map(address_map &map);
 	void shackled_sub_map(address_map &map);
 	void ym3526_s_map(address_map &map);
+
+	bool     m_secclr = false;
+	bool     m_nmi_enable = false;
 };
 
 // with rotary joystick
@@ -252,9 +255,6 @@ protected:
 	virtual void video_start() override;
 
 private:
-	required_ioport_array<2> m_analog_io;
-	required_ioport_array<4> m_in_io;
-
 	template<unsigned Which> u8 player_io_r(offs_t offset);
 
 	uint32_t screen_update_gondo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -262,6 +262,9 @@ private:
 	void gondo_colpri_cb(u32 &colour, u32 &pri_mask);
 
 	void gondo_map(address_map &map);
+
+	required_ioport_array<2> m_analog_io;
+	required_ioport_array<4> m_in_io;
 };
 
 // with MXC06 sprite hardware
@@ -279,8 +282,6 @@ public:
 	void oscarbl(machine_config &config);
 
 private:
-	required_device<deco_mxc06_device> m_spritegen_mxc;
-
 	void bank_w(u8 data);
 
 	TILE_GET_INFO_MEMBER(get_cobracom_fix_tile_info);
@@ -301,6 +302,8 @@ private:
 	void oscar_map(address_map &map);
 	void oscarbl_s_opcodes_map(address_map &map);
 	void oscar_sub_map(address_map &map);
+
+	required_device<deco_mxc06_device> m_spritegen_mxc;
 };
 
 // with MSM5205 ADPCM
@@ -321,12 +324,6 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	required_device<msm5205_device> m_msm;
-	required_memory_bank m_soundbank;
-
-	int      m_toggle = 0;
-	int      m_msm5205next = 0;
-
 	void scroll_w(offs_t offset, u8 data);
 	void control_w(u8 data);
 	void adpcm_data_w(u8 data);
@@ -338,6 +335,12 @@ private:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void sub_map(address_map &map);
+
+	required_device<msm5205_device> m_msm;
+	required_memory_bank m_soundbank;
+
+	int      m_toggle = 0;
+	int      m_msm5205next = 0;
 };
 
 #endif // MAME_DATAEAST_DEC8_H
