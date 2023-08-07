@@ -393,6 +393,13 @@ static INPUT_PORTS_START( noahsark )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( berenstn )
+	PORT_INCLUDE( noahsark )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 
 
 /*******************************************************************************
@@ -557,4 +564,4 @@ ROM_END
 //    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS          INIT        SCREEN  COMPANY             FULLNAME                                 FLAGS
 GAME( 1982, tugboat,  0,      tugboat,  tugboat,  tugboat_state, empty_init, ROT90,  "Enter-Tech, Ltd.", "Tugboat",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, noahsark, 0,      noahsark, noahsark, tugboat_state, empty_init, ROT90,  "Enter-Tech, Ltd.", "Noah's Ark",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, berenstn, 0,      noahsark, noahsark, tugboat_state, empty_init, ROT90,  "Enter-Tech, Ltd.", "The Berenstain Bears in Bigpaw's Cave", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, berenstn, 0,      noahsark, berenstn, tugboat_state, empty_init, ROT90,  "Enter-Tech, Ltd.", "The Berenstain Bears in Bigpaw's Cave", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

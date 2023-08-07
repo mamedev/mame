@@ -1,7 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Coates
+/*******************************************************************************
+
+  circus_a.cpp
+
+  Functions to emulate the audio hardware of the machine.
+
+*******************************************************************************/
+
 #include "emu.h"
-#include "sound/samples.h"
 #include "circus.h"
 
 const char *const circus_sample_names[] =
@@ -51,7 +58,7 @@ DISCRETE_SOUND_START(circus_discrete)
 	/************************************************/
 	/* Input register mapping for circus            */
 	/************************************************/
-	DISCRETE_INPUTX_NOT(CIRCUS_MUSIC_BIT,    20000,  0,      1)
+	DISCRETE_INPUTX_NOT(CIRCUS_MUSIC_BIT, 20000, 0, 1)
 
 	/************************************************/
 	/* Music is just a 1 bit DAC                    */
@@ -133,7 +140,7 @@ DISCRETE_SOUND_START(robotbwl_discrete)
 	/************************************************/
 	/* Input register mapping for robotbwl          */
 	/************************************************/
-	DISCRETE_INPUTX_LOGIC(ROBOTBWL_MUSIC_BIT,    30000,  0,      0)
+	DISCRETE_INPUTX_LOGIC(ROBOTBWL_MUSIC_BIT, 30000, 0, 0)
 
 	/************************************************/
 	/* Music is just a 1 bit DAC                    */
