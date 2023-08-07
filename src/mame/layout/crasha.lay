@@ -9,7 +9,7 @@ license:CC0-1.0
 			<color red="0.5" green="0.9" blue="1" />
 		</rect>
 		<rect>
-			<bounds xc="123.5" yc="127.5" width="86" height="93" />
+			<bounds xc="123.5" yc="127.5" width="86" height="79" />
 			<color red="0.5" green="1" blue="0.6" />
 		</rect>
 	</element>
