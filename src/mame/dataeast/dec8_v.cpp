@@ -46,19 +46,19 @@ sprites.
 #include "emu.h"
 #include "dec8.h"
 
-void base_state::bg_ram_w(offs_t offset, u8 data)
+void dec8_state_base::bg_ram_w(offs_t offset, u8 data)
 {
 	m_bg_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-u8 base_state::bg_ram_r(offs_t offset)
+u8 dec8_state_base::bg_ram_r(offs_t offset)
 {
 	return m_bg_ram[offset];
 }
 
 
-void base_state::videoram_w(offs_t offset, u8 data)
+void dec8_state_base::videoram_w(offs_t offset, u8 data)
 {
 	m_videoram[offset] = data;
 	m_fix_tilemap->mark_tile_dirty(offset / 2);
@@ -148,7 +148,7 @@ void lastmisn_state::gondo_scroll_w(offs_t offset, u8 data)
 	}
 }
 
-void base_state::allocate_buffered_spriteram16()
+void dec8_state_base::allocate_buffered_spriteram16()
 {
 	m_buffered_spriteram16 = make_unique_clear<u16[]>(0x800/2);
 	save_pointer(NAME(m_buffered_spriteram16), 0x800/2);

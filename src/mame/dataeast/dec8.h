@@ -17,10 +17,10 @@
 #include "screen.h"
 #include "tilemap.h"
 
-class base_state : public driver_device
+class dec8_state_base : public driver_device
 {
-public:
-	base_state(const machine_config &mconfig, device_type type, const char *tag) :
+protected:
+	dec8_state_base(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
@@ -35,27 +35,6 @@ public:
 		m_videoram(*this, "videoram"),
 		m_bg_ram(*this, "bg_ram")
 	{ }
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	TIMER_CALLBACK_MEMBER(audiocpu_nmi_clear);
-
-	void buffer_spriteram16_w(u8 data);
-	void sound_w(u8 data);
-	void main_irq_on_w(u8 data);
-	void main_irq_off_w(u8 data);
-	void main_firq_off_w(u8 data);
-	void sub_irq_on_w(u8 data);
-	void sub_irq_off_w(u8 data);
-	void sub_firq_off_w(u8 data);
-	void flip_screen_w(u8 data);
-	void bg_ram_w(offs_t offset, u8 data);
-	u8 bg_ram_r(offs_t offset);
-	void videoram_w(offs_t offset, u8 data);
-
-	void set_screen_raw_params_data_east(machine_config &config);
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -77,6 +56,26 @@ protected:
 
 	std::unique_ptr<u16[]>   m_buffered_spriteram16; // for the mxc06 sprite chip emulation (oscar, cobra)
 
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	TIMER_CALLBACK_MEMBER(audiocpu_nmi_clear);
+
+	void buffer_spriteram16_w(u8 data);
+	void sound_w(u8 data);
+	void main_irq_on_w(u8 data);
+	void main_irq_off_w(u8 data);
+	void main_firq_off_w(u8 data);
+	void sub_irq_on_w(u8 data);
+	void sub_irq_off_w(u8 data);
+	void sub_firq_off_w(u8 data);
+	void flip_screen_w(u8 data);
+	void bg_ram_w(offs_t offset, u8 data);
+	u8 bg_ram_r(offs_t offset);
+	void videoram_w(offs_t offset, u8 data);
+
+	void set_screen_raw_params_data_east(machine_config &config);
+
 	/* video-related */
 	tilemap_t  *m_bg_tilemap = nullptr;
 	tilemap_t  *m_fix_tilemap = nullptr;
@@ -95,25 +94,25 @@ protected:
 };
 
 // with I8751 MCU
-class mcu_state : public base_state
+class dec8_mcu_state_base : public dec8_state_base
 {
-public:
-	mcu_state(const machine_config &mconfig, device_type type, const char *tag) :
-		base_state(mconfig, type, tag),
+protected:
+	dec8_mcu_state_base(const machine_config &mconfig, device_type type, const char *tag) :
+		dec8_state_base(mconfig, type, tag),
 		m_mcu(*this, "mcu"),
 		m_coin_port(*this, "I8751")
 	{
 	}
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	TIMER_CALLBACK_MEMBER(mcu_irq_clear);
 
 	required_device<i8751_device> m_mcu;
 
 	/* ports */
 	required_ioport m_coin_port;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	TIMER_CALLBACK_MEMBER(mcu_irq_clear);
 
 	u8 i8751_h_r();
 	u8 i8751_l_r();
@@ -137,11 +136,11 @@ protected:
 };
 
 // with unique sprite hardware
-class srdarwin_state : public mcu_state
+class srdarwin_state : public dec8_mcu_state_base
 {
 public:
 	srdarwin_state(const machine_config &mconfig, device_type type, const char *tag) :
-		mcu_state(mconfig, type, tag)
+		dec8_mcu_state_base(mconfig, type, tag)
 	{
 	}
 	void srdarwin(machine_config &config);
@@ -164,11 +163,11 @@ private:
 };
 
 // with 'karnov' sprite hardware
-class lastmisn_state : public mcu_state
+class lastmisn_state : public dec8_mcu_state_base
 {
 public:
 	lastmisn_state(const machine_config &mconfig, device_type type, const char *tag) :
-		mcu_state(mconfig, type, tag),
+		dec8_mcu_state_base(mconfig, type, tag),
 		m_spritegen_krn(*this, "spritegen_krn"),
 		m_nmigate(*this, "nmigate")
 	{
@@ -183,11 +182,11 @@ public:
 	void init_meikyuhbl();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	required_device<deco_karnovsprites_device> m_spritegen_krn;
 	optional_device<input_merger_device> m_nmigate;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void ghostb_bank_w(u8 data);
 	void gondo_scroll_w(offs_t offset, u8 data);
@@ -266,11 +265,11 @@ private:
 };
 
 // with MXC06 sprite hardware
-class oscar_state : public base_state
+class oscar_state : public dec8_state_base
 {
 public:
 	oscar_state(const machine_config &mconfig, device_type type, const char *tag) :
-		base_state(mconfig, type, tag),
+		dec8_state_base(mconfig, type, tag),
 		m_spritegen_mxc(*this, "spritegen_mxc")
 	{
 	}

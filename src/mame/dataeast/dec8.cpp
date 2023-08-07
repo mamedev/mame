@@ -58,7 +58,7 @@ To do:
 /******************************************************************************/
 
 
-void base_state::buffer_spriteram16_w(u8 data)
+void dec8_state_base::buffer_spriteram16_w(u8 data)
 {
 	u8* spriteram = m_spriteram->live();
 	// copy to a 16-bit region for the sprite chip
@@ -78,17 +78,17 @@ void lastmisn_state::screen_vblank(int state)
 	}
 }
 
-u8 mcu_state::i8751_h_r()
+u8 dec8_mcu_state_base::i8751_h_r()
 {
 	return m_i8751_return >> 8; /* MSB */
 }
 
-u8 mcu_state::i8751_l_r()
+u8 dec8_mcu_state_base::i8751_l_r()
 {
 	return m_i8751_return & 0xff; /* LSB */
 }
 
-void mcu_state::i8751_reset_w(u8 data)
+void dec8_mcu_state_base::i8751_reset_w(u8 data)
 {
 	// ? reset the actual MCU?
 	//m_i8751_return = 0;
@@ -119,21 +119,21 @@ u8 gondo_state::player_io_r(offs_t offset)
 *
 ***************************************************/
 
-TIMER_CALLBACK_MEMBER(mcu_state::mcu_irq_clear)
+TIMER_CALLBACK_MEMBER(dec8_mcu_state_base::mcu_irq_clear)
 {
 	// The schematics show a clocked LS194 shift register (3A) is used to automatically
 	// clear the IRQ request.  The MCU does not clear it itself.
 	m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(base_state::audiocpu_nmi_clear)
+TIMER_CALLBACK_MEMBER(dec8_state_base::audiocpu_nmi_clear)
 {
 	// Gondomania schematics show a LS194 for the sound IRQ, sharing the 6502 clock
 	// S1=H, S0=L, LSI=H, and QA is the only output connected (to NMI)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-void mcu_state::i8751_w(offs_t offset, u8 data)
+void dec8_mcu_state_base::i8751_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -196,7 +196,7 @@ void csilver_state::control_w(u8 data)
 	m_mainbank->set_entry(data & 0x0f);
 }
 
-void base_state::sound_w(u8 data)
+void dec8_state_base::sound_w(u8 data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(m6502_device::NMI_LINE, ASSERT_LINE);
@@ -231,39 +231,39 @@ void csilver_state::sound_bank_w(u8 data)
 
 /******************************************************************************/
 
-void base_state::main_irq_on_w(u8 data)
+void dec8_state_base::main_irq_on_w(u8 data)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-void base_state::main_irq_off_w(u8 data)
+void dec8_state_base::main_irq_off_w(u8 data)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-void base_state::main_firq_off_w(u8 data)
+void dec8_state_base::main_firq_off_w(u8 data)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
-void base_state::sub_irq_on_w(u8 data)
+void dec8_state_base::sub_irq_on_w(u8 data)
 {
 	m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-void base_state::sub_irq_off_w(u8 data)
+void dec8_state_base::sub_irq_off_w(u8 data)
 {
 	m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-void base_state::sub_firq_off_w(u8 data)
+void dec8_state_base::sub_firq_off_w(u8 data)
 {
 	m_subcpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 /******************************************************************************/
 
-void base_state::flip_screen_w(u8 data) { flip_screen_set(data); }
+void dec8_state_base::flip_screen_w(u8 data) { flip_screen_set(data); }
 
 /******************************************************************************/
 
@@ -288,7 +288,7 @@ void lastmisn_state::lastmisn_map(address_map &map)
 	map(0x2000, 0x27ff).ram().w(FUNC(lastmisn_state::videoram_w)).share(m_videoram);
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
-	map(0x3800, 0x3fff).rw(FUNC(lastmisn_state::bg_ram_r), FUNC(lastmisn_state::bg_ram_w)).share("bg_ram");
+	map(0x3800, 0x3fff).rw(FUNC(lastmisn_state::bg_ram_r), FUNC(lastmisn_state::bg_ram_w)).share(m_bg_ram);
 	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom();
 }
@@ -574,7 +574,7 @@ void oscar_state::cobra_map(address_map &map)
 /******************************************************************************/
 
 /* Used for Cobra Command, Maze Hunter, Super Real Darwin etc */
-void base_state::dec8_s_map(address_map &map)
+void dec8_state_base::dec8_s_map(address_map &map)
 {
 	map(0x0000, 0x05ff).ram();
 	map(0x2000, 0x2001).w("ym1", FUNC(ym2203_device::write));
@@ -584,7 +584,7 @@ void base_state::dec8_s_map(address_map &map)
 }
 
 /* Used by Gondomania, Psycho-Nics Oscar & Garyo Retsuden */
-void base_state::oscar_s_map(address_map &map)
+void dec8_state_base::oscar_s_map(address_map &map)
 {
 	map(0x0000, 0x05ff).ram();
 	map(0x2000, 0x2001).w("ym1", FUNC(ym2203_device::write));
@@ -637,22 +637,22 @@ void csilver_state::sound_map(address_map &map)
 
 */
 
-u8 mcu_state::i8751_port0_r()
+u8 dec8_mcu_state_base::i8751_port0_r()
 {
 	return m_i8751_port0;
 }
 
-void mcu_state::i8751_port0_w(u8 data)
+void dec8_mcu_state_base::i8751_port0_w(u8 data)
 {
 	m_i8751_port0 = data;
 }
 
-u8 mcu_state::i8751_port1_r()
+u8 dec8_mcu_state_base::i8751_port1_r()
 {
 	return m_i8751_port1;
 }
 
-void mcu_state::i8751_port1_w(u8 data)
+void dec8_mcu_state_base::i8751_port1_w(u8 data)
 {
 	m_i8751_port1 = data;
 }
@@ -1778,30 +1778,30 @@ void lastmisn_state::shackled_coin_irq(int state)
 /******************************************************************************/
 
 
-void base_state::machine_start()
+void dec8_state_base::machine_start()
 {
 	u8 *ROM = memregion("maincpu")->base();
 	uint32_t max_bank = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
 	m_mainbank->configure_entries(0, max_bank, &ROM[0x10000], 0x4000);
 
-	m_m6502_timer = timer_alloc(FUNC(base_state::audiocpu_nmi_clear), this);
+	m_m6502_timer = timer_alloc(FUNC(dec8_state_base::audiocpu_nmi_clear), this);
 
 	save_item(NAME(m_coin_state));
 
 	save_item(NAME(m_scroll));
 }
 
-void base_state::machine_reset()
+void dec8_state_base::machine_reset()
 {
 	m_scroll[0] = m_scroll[1] = m_scroll[2] = m_scroll[3] = 0;
 }
 
 
-void mcu_state::machine_start()
+void dec8_mcu_state_base::machine_start()
 {
-	base_state::machine_start();
+	dec8_state_base::machine_start();
 
-	m_i8751_timer = timer_alloc(FUNC(mcu_state::mcu_irq_clear), this);
+	m_i8751_timer = timer_alloc(FUNC(dec8_mcu_state_base::mcu_irq_clear), this);
 	m_i8751_p2 = 0xff;
 
 	save_item(NAME(m_i8751_p2));
@@ -1811,9 +1811,9 @@ void mcu_state::machine_start()
 	save_item(NAME(m_i8751_value));
 }
 
-void mcu_state::machine_reset()
+void dec8_mcu_state_base::machine_reset()
 {
-	base_state::machine_reset();
+	dec8_state_base::machine_reset();
 
 	m_i8751_port0 = m_i8751_port1 = 0;
 	m_i8751_return = m_i8751_value = 0;
@@ -1822,14 +1822,14 @@ void mcu_state::machine_reset()
 
 void lastmisn_state::machine_start()
 {
-	mcu_state::machine_start();
+	dec8_mcu_state_base::machine_start();
 
 	save_item(NAME(m_secclr));
 }
 
 void lastmisn_state::machine_reset()
 {
-	base_state::machine_reset();
+	dec8_state_base::machine_reset();
 
 	// reset clears LS273 latch, which disables NMI
 	if (m_nmigate.found())
@@ -1858,7 +1858,7 @@ void csilver_state::machine_reset()
 
 
 // DECO video CRTC, unverified
-void base_state::set_screen_raw_params_data_east(machine_config &config)
+void dec8_state_base::set_screen_raw_params_data_east(machine_config &config)
 {
 	m_screen->set_raw(XTAL(12'000'000)/2,384,0,256,272,8,248);
 }
