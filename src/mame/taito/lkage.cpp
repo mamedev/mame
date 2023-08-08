@@ -270,12 +270,12 @@ void lkage_state::machine_reset()
     Video hardware
 --------------------------------------------------------------------------------
 
-    lkage_scroll[0x00]: text layer horizontal scroll
-    lkage_scroll[0x01]: text layer vertical scroll
-    lkage_scroll[0x02]: foreground layer horizontal scroll
-    lkage_scroll[0x03]: foreground layer vertical scroll
-    lkage_scroll[0x04]: background layer horizontal scroll
-    lkage_scroll[0x05]: background layer vertical scroll
+    m_scroll[0x00]: text layer horizontal scroll
+    m_scroll[0x01]: text layer vertical scroll
+    m_scroll[0x02]: foreground layer horizontal scroll
+    m_scroll[0x03]: foreground layer vertical scroll
+    m_scroll[0x04]: background layer horizontal scroll
+    m_scroll[0x05]: background layer vertical scroll
 
     m_vreg:
         04 7d f3 : title screen 101
