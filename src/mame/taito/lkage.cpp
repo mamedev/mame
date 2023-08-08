@@ -71,10 +71,11 @@ TODO:
 
   - The high score display uses a video attribute flag whose purpose isn't known.
 
-  - purpose of the 0x200 byte prom, "a54-10.2" is unknown.  It contains values in range 0x0..0xf.
+  - purpose of the 0x200 byte prom, "a54-10.2" is unknown. It contains values in
+    range 0x0..0xf.
 
-  - SOUND: lots of unknown writes to the YM2203 I/O ports. Does it have a TA7630
-    or some sort of volume filtering, and if so, only on the SSG channels maybe?
+  - SOUND: lots of unknown writes to the YM2203 I/O ports. Does it have some sort
+    of volume filtering, and if so, only on the SSG channels maybe?
 
   - Note that all the bootlegs are derived from a different version of the
     original which hasn't been found yet.
@@ -188,7 +189,7 @@ protected:
 
 	// lkageb fake MCU
 	uint8_t m_mcu_val = 0U;
-	uint8_t m_mcu_ready = 0;    // CPU data/MCU ready status
+	uint8_t m_mcu_ready = 0; // CPU data/MCU ready status
 };
 
 class lkagem_state : public lkage_state
@@ -1158,29 +1159,29 @@ ROM_END
 
 ROM_START( lkagem )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF ) // Z80 code
-	ROM_LOAD( "a51_11-2.ic", 0x0000, 0x4000, CRC(540fdb1f) SHA1(11d2a5b56d6d72458816aaf7687e490126b468cc) )
-	ROM_LOAD( "a51_12-2.ic", 0x4000, 0x4000, CRC(a625a4b8) SHA1(417e7590f98eadc71cbed749350d6d3a1c1fd413) )
-	ROM_LOAD( "a51_13-2.ic", 0x8000, 0x4000, CRC(aba8c6a3) SHA1(6723138f54a06d3e4719a43e8e3f11b3cabfb6f7) )
-	ROM_LOAD( "a51_10-2.ic", 0xc000, 0x2000, CRC(f6243d5c) SHA1(7b2810afe9c128a290f15c6ea1a6a1c2757ddf55) )
+	ROM_LOAD( "a51_11-2", 0x0000, 0x4000, CRC(540fdb1f) SHA1(11d2a5b56d6d72458816aaf7687e490126b468cc) )
+	ROM_LOAD( "a51_12-2", 0x4000, 0x4000, CRC(a625a4b8) SHA1(417e7590f98eadc71cbed749350d6d3a1c1fd413) )
+	ROM_LOAD( "a51_13-2", 0x8000, 0x4000, CRC(aba8c6a3) SHA1(6723138f54a06d3e4719a43e8e3f11b3cabfb6f7) )
+	ROM_LOAD( "a51_10-2", 0xc000, 0x2000, CRC(f6243d5c) SHA1(7b2810afe9c128a290f15c6ea1a6a1c2757ddf55) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code
-	ROM_LOAD( "a51_01-1.ic", 0x0000, 0x4000, CRC(03c818ba) SHA1(80604726c647495ab76870806cd1fb448cffe34d) )
+	ROM_LOAD( "a51_01-1", 0x0000, 0x4000, CRC(03c818ba) SHA1(80604726c647495ab76870806cd1fb448cffe34d) )
 
 	ROM_REGION( 0x00800, "bmcu:mcu", 0 ) // 68705 code
-	ROM_LOAD( "a54-09.53",   0x0000, 0x0800, CRC(0e8b8846) SHA1(a4a105462b0127229bb7edfadd2e581c7e40f1cc) ) // taken from lkage
+	ROM_LOAD( "a51-09",   0x0000, 0x0800, CRC(0e8b8846) SHA1(a4a105462b0127229bb7edfadd2e581c7e40f1cc) ) // taken from lkage
 
 	ROM_REGION( 0x10000, "gfx", 0 )
-	ROM_LOAD( "a51_03-1.ic", 0x0000, 0x2000, CRC(99847f0a) SHA1(34ea492e82845d0366bd755ddf1cad7f574d867a) ) // tile
-	ROM_LOAD( "a51_07-1.ic", 0x2000, 0x2000, CRC(c9d01e5b) SHA1(16d689ccc9c3cb16e6b4d85f8e50386c78c439e5) ) // spr
-	ROM_LOAD( "a51_02-1.ic", 0x4000, 0x2000, CRC(28bbf964) SHA1(67fb767549d7326133c630f424703abe2b14273d) ) // tile
-	ROM_LOAD( "a51_06-1.ic", 0x6000, 0x2000, CRC(d16c7c95) SHA1(f3cfc995cc072311b3bd831b69ccb229e2734f53) ) // spr
-	ROM_LOAD( "a51_05-1.ic", 0x8000, 0x2000, CRC(38bb3ad0) SHA1(9c24d705e55acaaa99fbb39e06486ca932bda796) ) // tile
-	ROM_LOAD( "a51_09-1.ic", 0xa000, 0x2000, CRC(40fd3d86) SHA1(f92156e5e44483b2683457166cb5b9cfc7fbbf14) ) // spr
-	ROM_LOAD( "a51_04-1.ic", 0xc000, 0x2000, CRC(8e132cc6) SHA1(c7b196e6b8c3b6841a1f4ca0904597085a53cc25) ) // tile
-	ROM_LOAD( "a51_08-1.ic", 0xe000, 0x2000, CRC(2ab68af8) SHA1(6dd91311f2344936590577440898da5f26e35880) ) // spr
+	ROM_LOAD( "a51_03-1", 0x0000, 0x2000, CRC(99847f0a) SHA1(34ea492e82845d0366bd755ddf1cad7f574d867a) ) // tile
+	ROM_LOAD( "a51_07-1", 0x2000, 0x2000, CRC(c9d01e5b) SHA1(16d689ccc9c3cb16e6b4d85f8e50386c78c439e5) ) // spr
+	ROM_LOAD( "a51_02-1", 0x4000, 0x2000, CRC(28bbf964) SHA1(67fb767549d7326133c630f424703abe2b14273d) ) // tile
+	ROM_LOAD( "a51_06-1", 0x6000, 0x2000, CRC(d16c7c95) SHA1(f3cfc995cc072311b3bd831b69ccb229e2734f53) ) // spr
+	ROM_LOAD( "a51_05-1", 0x8000, 0x2000, CRC(38bb3ad0) SHA1(9c24d705e55acaaa99fbb39e06486ca932bda796) ) // tile
+	ROM_LOAD( "a51_09-1", 0xa000, 0x2000, CRC(40fd3d86) SHA1(f92156e5e44483b2683457166cb5b9cfc7fbbf14) ) // spr
+	ROM_LOAD( "a51_04-1", 0xc000, 0x2000, CRC(8e132cc6) SHA1(c7b196e6b8c3b6841a1f4ca0904597085a53cc25) ) // tile
+	ROM_LOAD( "a51_08-1", 0xe000, 0x2000, CRC(2ab68af8) SHA1(6dd91311f2344936590577440898da5f26e35880) ) // spr
 
 	ROM_REGION( 0x4000, "data", 0 )
-	ROM_LOAD( "a51_14.ic",   0x0000, 0x4000, CRC(493e76d8) SHA1(13c6160edd94ba2801fd89bb33bcae3a1e3454ff) )
+	ROM_LOAD( "a51_14",   0x0000, 0x4000, CRC(493e76d8) SHA1(13c6160edd94ba2801fd89bb33bcae3a1e3454ff) )
 ROM_END
 
 ROM_START( lkageb )
