@@ -12,43 +12,43 @@
 
   -- Z80 based --
 
-   * Noraut Poker,                        1988,  Noraut Ltd.
-   * Noraut Deluxe Poker (console),       198?,  Noraut Ltd.
-   * Noraut Deluxe Poker (bootleg),       198?,  Unknown.
-   * Noraut Joker Poker (original),       198?,  Noraut Ltd.
-   * Noraut Joker Poker (Prologic HW),    198?,  Video Fun Games Ltd.
-   * Noraut Joker Poker (alt),            1988,  Noraut Ltd.
-   * Noraut Red Hot Joker Poker,          1988,  Noraut Ltd.
-   * Noraut Red Hot Joker Poker (alt HW), 198?,  Noraut Ltd.
-   * Noraut Poker (NTX10A),               1988,  Noraut Ltd.
-   * Noraut Joker Poker (V3.010a),        2002,  Noraut Ltd.
-   * Noraut Joker Poker (V3.011a),        2003,  Noraut Ltd.
-   * Noraut unknown set 1 (console),      198?,  Noraut Ltd.
-   * Noraut unknown set 2 (console),      198?,  Noraut Ltd.
-   * Mainline Double Joker Poker,         198?,  Mainline London.
-   * Double Joker Poker (45%-75% payout), 199?,  DellFern Ltd.
-   * Royal on Ten (Noraut Deluxe hack),   2005,  Unknown.
-   * Credit Poker (ver.30c, standard),    1999,  CGI.
-   * Kimble Double HI-LO (z80 version),   198?,  Kimble Ireland.
-   * PMA Poker,                           198?,  PMA.
-   * Poker / Black Jack (Model 7521),     198?,  M. Kramer Manufacturing.
-   * Draw Poker (Joker Poker V.01),       1984,  Coinmaster.
+   * Noraut Poker,                               1988,  Noraut Ltd.
+   * Noraut Deluxe Poker (console),              198?,  Noraut Ltd.
+   * Noraut Deluxe Poker (bootleg),              198?,  Unknown.
+   * Noraut Joker Poker (original),              198?,  Noraut Ltd.
+   * Noraut Joker Poker (Prologic HW),           198?,  Video Fun Games Ltd.
+   * Noraut Joker Poker (alt),                   1988,  Noraut Ltd.
+   * Noraut Red Hot Joker Poker,                 1988,  Noraut Ltd.
+   * Noraut Red Hot Joker Poker (alt HW),        198?,  Noraut Ltd.
+   * Noraut Poker (NTX10A),                      1988,  Noraut Ltd.
+   * Noraut Jacks Plus / Joker Poker (V3.010a),  2002,  Noraut Ltd.
+   * Noraut Jacks Plus / Joker Poker (V3.011a),  2003,  Noraut Ltd.
+   * Noraut unknown set 1 (console),             198?,  Noraut Ltd.
+   * Noraut unknown set 2 (console),             198?,  Noraut Ltd.
+   * Mainline Double Joker Poker,                198?,  Mainline London.
+   * Double Joker Poker (45%-75% payout),        199?,  DellFern Ltd.
+   * Royal on Ten (Noraut Deluxe hack),          2005,  Unknown.
+   * Credit Poker (ver.30c, standard),           1999,  CGI.
+   * Kimble Double HI-LO (z80 version),          198?,  Kimble Ireland.
+   * PMA Poker,                                  198?,  PMA.
+   * Poker / Black Jack (Model 7521),            198?,  M. Kramer Manufacturing.
+   * Draw Poker (Joker Poker V.01),              1984,  Coinmaster.
 
   -- 8080 based --
 
-   * Draw Poker HI-LO,                    1983,  M. Kramer Manufacturing.
-   * Draw Poker HI-LO (alt),              1983,  Unknown.
-   * Draw Poker HI-LO (Japanese),         198?,  Unknown.
-   * Kimble Double HI-LO,                 198?,  Kimble Ireland.
-   * GTI Poker,                           1983,  GTI Inc.
-   * HI-LO Double Up Joker Poker,         1983,  SMS Manufacturing Corp.
-   * Drews Revenge (v.2.89, set 1),       1986,  Drews Inc.
-   * Drews Revenge (v.2.89, set 2),       1986,  Drews Inc.
-   * Turbo Poker 2,                       1993,  Micro Manufacturing, Inc.
-   * Southern Systems Joker Poker,        1982,  Southern Systems & Assembly, Ltd.
-   * Fast Draw (poker conversion kit)?,   198?,  Stern Electronics?
-   * Draw Poker HI-LO (unknown, rev 1),   198?,  SMS Manufacturing Corp?.
-   * Draw Poker HI-LO (unknown, rev 2),   198?,  SMS Manufacturing Corp?.
+   * Draw Poker HI-LO,                           1983,  M. Kramer Manufacturing.
+   * Draw Poker HI-LO (alt),                     1983,  Unknown.
+   * Draw Poker HI-LO (Japanese),                198?,  Unknown.
+   * Kimble Double HI-LO,                        198?,  Kimble Ireland.
+   * GTI Poker,                                  1983,  GTI Inc.
+   * HI-LO Double Up Joker Poker,                1983,  SMS Manufacturing Corp.
+   * Drews Revenge (v.2.89, set 1),              1986,  Drews Inc.
+   * Drews Revenge (v.2.89, set 2),              1986,  Drews Inc.
+   * Turbo Poker 2,                              1993,  Micro Manufacturing, Inc.
+   * Southern Systems Joker Poker,               1982,  Southern Systems & Assembly, Ltd.
+   * Fast Draw (poker conversion kit)?,          198?,  Stern Electronics?
+   * Draw Poker HI-LO (unknown, rev 1),          198?,  SMS Manufacturing Corp?.
+   * Draw Poker HI-LO (unknown, rev 2),          198?,  SMS Manufacturing Corp?.
 
 
   This hardware emulation opened a big can of worms. :)
@@ -533,11 +533,23 @@
   - Added PCB description and sound hardware schematics.
 
 
+  [2013-2023]
+
+  - Added more sets.
+  - Partial decryption of norautua & norautub sets.
+  - Decryption of noraut3 sets.
+  - Working inputs, DIP switches, and button-lamps layouts to noraut3 games.
+  - Change game description to noraut3 games, since are dual games selectable
+     through a DIP switch.
+
+
   TODO:
 
-  - Analize and hook the 3rd PPI device at 0xc0-0xc3.
-    /OBF handshake line (PC7) doesn't seems to work properly.
+  - Check the 3rd PPI device at 0xc0-0xc3 (VRAM).
+    /OBF handshake line (PC7) formerly didn't seems to work properly.
   - Interrupts in 8080 based games.
+  - Emulation of 8228 device for the 8080 based games.
+  - Find WTH are the reads at EFh.
   - Find if wide chars are hardcoded or tied to a bit.
   - Save support.
   - Parent/clone relationship.
@@ -560,8 +572,8 @@
 
 #define NORAUT_MASTER_CLOCK     XTAL(18'432'000)
 #define DPHL_MASTER_CLOCK       XTAL(18'000'000)
-#define NORAUT_CPU_CLOCK        NORAUT_MASTER_CLOCK / 8     /* 2.30275 MHz - Measured: 2.305 MHz */
-#define DPHL_CPU_CLOCK          DPHL_MASTER_CLOCK / 9       /* 2 MHz (from 8224) */
+#define NORAUT_CPU_CLOCK        NORAUT_MASTER_CLOCK / 8     // 2.30275 MHz - Measured: 2.305 MHz
+#define DPHL_CPU_CLOCK          DPHL_MASTER_CLOCK / 9       // 2 MHz (from 8224)
 
 
 /*************************
@@ -4518,8 +4530,8 @@ GAMEL( 1988, norautjp, norautp, norautp,  norautp,  norautp_state, empty_init, R
 GAMEL( 1988, norautrh, 0,       norautp,  norautrh, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker",                   0,                    layout_noraut12 )
 GAMEL( 198?, norautra, 0,       norautp,  norautrh, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker (alt HW)",          0,                    layout_noraut12 ) // 1-bet?? where??...
 GAME(  1988, norautu,  0,       norautxp, norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Poker (NTX10A)",                        MACHINE_NOT_WORKING )
-GAME(  2002, noraut3a, 0,       noraut3,  noraut3,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Jacks Plus / Joker Poker (V3.010a)",    MACHINE_NOT_WORKING )
-GAME(  2003, noraut3b, 0,       noraut3,  noraut3,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Jacks Plus / Joker Poker (V3.011a)",    MACHINE_NOT_WORKING )
+GAMEL( 2002, noraut3a, 0,       noraut3,  noraut3,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Jacks Plus / Joker Poker (V3.010a)",    MACHINE_NOT_WORKING,  layout_noraut12 )
+GAMEL( 2003, noraut3b, 0,       noraut3,  noraut3,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Jacks Plus / Joker Poker (V3.011a)",    MACHINE_NOT_WORKING,  layout_noraut12 )
 GAMEL( 198?, norautua, 0,       norautu,  norautp,  norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (console, set 1)",          MACHINE_NOT_WORKING,  layout_noraut12 )
 GAMEL( 198?, norautub, 0,       norautu,  norautp,  norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (console, set 2)",          MACHINE_NOT_WORKING,  layout_noraut12 )
 GAMEL( 198?, mainline, 0,       norautp,  mainline, norautp_state, empty_init, ROT0, "Mainline London",          "Mainline Double Joker Poker",                  0,                    layout_noraut12 )
