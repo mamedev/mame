@@ -17,7 +17,7 @@ public:
 	void berr_w(int state) { m_bus_error = bool(state); }
 
 protected:
-	mips1core_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size);
+	mips1core_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size, bool cache_pws);
 
 	// device_t implementation
 	virtual void device_start() override;
@@ -136,6 +136,7 @@ protected:
 	struct cache m_icache;
 	struct cache m_dcache;
 	translate_result const m_cache;
+	bool const m_cache_pws; // cache supports partial-word store
 
 	// I/O
 	devcb_read_line::array<4> m_in_brcond;
@@ -160,7 +161,7 @@ public:
 	void set_fpu(u32 revision, unsigned interrupt = 3) { m_fcr0 = revision; m_fpu_irq = interrupt; }
 
 protected:
-	mips1_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size);
+	mips1_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size, bool cache_pws);
 
 	// device_t implementation
 	virtual void device_start() override;
