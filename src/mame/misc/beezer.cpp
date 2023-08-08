@@ -5,7 +5,7 @@
 
     Beezer
 
-    (c) 1982 Pacific Polytechnical Corp (PPC). / Tong Electronic
+    (c) 1982 Pacific Polytechnical Corp. (PPC) / Tong Electronic
 
     Notes:
     - To enter test mode, hold down 1P Start and 2P Start, then reset

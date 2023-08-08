@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: Phil Stroffolino, Takahiro Nogi
+// copyright-holders: Phil Stroffolino
 
 /***************************************************************************
 
@@ -66,13 +66,15 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - MCU (same code as lkage) is not used
   - No music ? (could be emulation bug) (the 2nd YM is not used...)
 
+
 TODO:
 
   - The high score display uses a video attribute flag whose purpose isn't known.
 
   - purpose of the 0x200 byte prom, "a54-10.2" is unknown.  It contains values in range 0x0..0xf.
 
-  - SOUND: lots of unknown writes to the YM2203 I/O ports
+  - SOUND: lots of unknown writes to the YM2203 I/O ports. Does it have a TA7630
+    or some sort of volume filtering, and if so, only on the SSG channels maybe?
 
   - Note that all the bootlegs are derived from a different version of the
     original which hasn't been found yet.
@@ -83,6 +85,9 @@ TODO:
     The game works anyway, it never gives the usual Taito "BAD HW" message
     (because there is no test at 0x033b after call at routine at 0xde1d).
 
+  - lkageo, lkageo2, lkagem demo mode messes up, the rest of the game works ok.
+    Maybe it's MCU related? Since main char movement in demo depends on values
+    read from MCU.
 
 ***************************************************************************/
 
@@ -95,8 +100,8 @@ TODO:
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "sound/ay8910.h"
-#include "sound/dac.h"
 #include "sound/msm5232.h"
+#include "sound/ta7630.h"
 #include "sound/ymopn.h"
 
 #include "emupal.h"
@@ -129,7 +134,6 @@ public:
 	void lkage(machine_config &config);
 
 	void init_bygone();
-	void init_lkage();
 
 protected:
 	virtual void machine_start() override;
@@ -151,12 +155,11 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map);
-	void base_program_map(address_map &map);
-	void program_map(address_map &map);
+	virtual void program_map(address_map &map);
+	virtual void io_map(address_map &map);
 	void bootleg_program_map(address_map &map);
 	void mcu_map(address_map &map);
-	void sound_map(address_map &map);
+	virtual void sound_map(address_map &map);
 
 	required_shared_ptr<uint8_t> m_vreg;
 	required_shared_ptr<uint8_t> m_scroll;
@@ -188,39 +191,83 @@ protected:
 	uint8_t m_mcu_ready = 0;    // CPU data/MCU ready status
 };
 
-class lkage5232_state : public lkage_state
+class lkagem_state : public lkage_state
 {
 public:
-	lkage5232_state(const machine_config &mconfig, device_type type, const char *tag) :
+	lkagem_state(const machine_config &mconfig, device_type type, const char *tag) :
 		lkage_state(mconfig, type, tag),
+		m_ta7630(*this, "ta7630"),
+		m_msm(*this, "msm"),
+		m_ay(*this, "ay%u", 1U),
 		m_exrom(*this, "data")
 	{ }
 
-	void lkage5232(machine_config &config);
-
-	void init_lkage5232();
+	void lkagem(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
 
 private:
-	uint8_t unk_f0e1_r(offs_t offset);
 	uint8_t exrom_data_r(offs_t offset);
 	void exrom_offset_w(offs_t offset, uint8_t data);
-	uint8_t sound_unk_e000_r(offs_t offset);
+	void msm_volume_w(uint8_t data);
+	template <uint8_t N> void ay_volume_w(uint8_t data);
 
-	void program_map(address_map &map);
-	void sound_map(address_map &map);
+	virtual void program_map(address_map &map) override;
+	virtual void io_map(address_map &map) override { }
+	virtual void sound_map(address_map &map) override;
 
+	required_device<ta7630_device> m_ta7630;
+	required_device<msm5232_device> m_msm;
+	required_device_array<ay8910_device, 2> m_ay;
 	required_region_ptr<uint8_t> m_exrom;
 
-	uint8_t m_exrom_offs[2] = { 0x00, 0x00 };
+	uint8_t m_exrom_offs[2] = { };
 };
 
 
-// video
 
-/***************************************************************************
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
+
+void lkage_state::machine_start()
+{
+	save_item(NAME(m_bg_tile_bank));
+	save_item(NAME(m_fg_tile_bank));
+	save_item(NAME(m_tx_tile_bank));
+
+	save_item(NAME(m_mcu_val));
+}
+
+void lkagem_state::machine_start()
+{
+	lkage_state::machine_start();
+
+	m_sprite_offset = 24;
+	save_item(NAME(m_exrom_offs));
+}
+
+void lkage_state::init_bygone()
+{
+	m_sprite_dx = 1;
+}
+
+void lkage_state::machine_reset()
+{
+	m_bg_tile_bank = m_fg_tile_bank = m_tx_tile_bank = 0;
+
+	m_mcu_ready = 3;
+	m_mcu_val = 0;
+
+	m_soundnmi->in_w<1>(0);
+}
+
+
+
+/*******************************************************************************
+    Video hardware
+--------------------------------------------------------------------------------
 
     lkage_scroll[0x00]: text layer horizontal scroll
     lkage_scroll[0x01]: text layer vertical scroll
@@ -229,23 +276,7 @@ private:
     lkage_scroll[0x04]: background layer horizontal scroll
     lkage_scroll[0x05]: background layer vertical scroll
 
-    lkage_vreg[0]: 0x00,0x04
-        0x02: tx tile bank select (bygone only?)
-        0x04: fg tile bank select
-        0x08: ?
-
-    lkage_vreg[1]: 0x7d
-        0xf0: background/foreground palette select
-        0x08: bg tile bank select
-        0x07: priority config?
-
-    lkage_vreg[2]: 0xf3
-        0x03: flip screen x/y
-        0xf0: normally 1111, but 1001 and 0001 inbetween stages (while the
-        backgrounds are are being redrawn). These bits are probably used to enable
-        individual layers, but we have no way of knowing the mapping.
-
-    lkage_vreg:
+    m_vreg:
         04 7d f3 : title screen 101
         0c 7d f3 : high score   101
         04 06 f3 : attract#1    110
@@ -253,9 +284,23 @@ private:
         04 1e f3 : attract#3    110
         00 4e f3 : attract#4    110
 
+    m_vreg[0]: 0x00,0x04
+        0x02: tx tile bank select (bygone only?)
+        0x04: fg tile bank select
+        0x08: ?
 
-***************************************************************************/
+    m_vreg[1]: 0x7d
+        0xf0: background/foreground palette select
+        0x08: bg tile bank select
+        0x07: priority config?
 
+    m_vreg[2]: 0xf3
+        0x03: flip screen x/y
+        0xf0: normally 1111, but 1001 and 0001 inbetween stages (while the
+        backgrounds are are being redrawn). These bits are probably used to enable
+        individual layers, but we have no way of knowing the mapping.
+
+*******************************************************************************/
 
 void lkage_state::videoram_w(offs_t offset, uint8_t data)
 {
@@ -316,7 +361,7 @@ void lkage_state::video_start()
 void lkage_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t const *source = m_spriteram;
-	uint8_t const *const finish = source + std::min<unsigned>(m_spriteram.bytes(), 0x80);
+	uint8_t const *const finish = source + m_spriteram.bytes();
 
 	for ( ; source < finish; source += 4)
 	{
@@ -430,7 +475,10 @@ uint32_t lkage_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-// machine
+
+/*******************************************************************************
+    Common handlers
+*******************************************************************************/
 
 void lkage_state::sh_nmi_disable_w(uint8_t data)
 {
@@ -447,35 +495,18 @@ uint8_t lkage_state::sound_status_r()
 	return 0xff;
 }
 
-uint8_t lkage5232_state::unk_f0e1_r(offs_t offset)
+uint8_t lkage_state::mcu_status_r()
 {
-	// Protection?
-	return 0xff;
+	// bit 0 = when 1, MCU is ready to receive data from main CPU
+	// bit 1 = when 1, MCU has sent data to the main CPU
+	return
+		((CLEAR_LINE == m_bmcu->host_semaphore_r()) ? 0x01 : 0x00) |
+		((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x02 : 0x00);
 }
 
-uint8_t lkage5232_state::exrom_data_r(offs_t offset)
-{
-	uint16_t const offs = ((m_exrom_offs[1] & 0x3f) << 8) + (m_exrom_offs[0] & 0xff);
-	uint8_t const data = m_exrom[offs];
+// address maps
 
-	if (offset != 0)
-		return 0xff;
-	else
-		return data;
-}
-
-void lkage5232_state::exrom_offset_w(offs_t offset, uint8_t data)
-{
-	m_exrom_offs[offset] = data;
-}
-
-uint8_t lkage5232_state::sound_unk_e000_r(offs_t offset)
-{
-	return 0xff;
-}
-
-
-void lkage_state::base_program_map(address_map &map)
+void lkage_state::program_map(address_map &map)
 {
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xe7ff).ram(); // work RAM
@@ -493,24 +524,9 @@ void lkage_state::base_program_map(address_map &map)
 	map(0xf0a0, 0xf0a3).ram(); // unknown
 	map(0xf0c0, 0xf0c5).ram().share(m_scroll);
 	map(0xf0e1, 0xf0e1).nopw(); // pulsed
+	map(0xf100, 0xf15f).writeonly().share(m_spriteram);
+	map(0xf160, 0xf1ff).nopw(); // bygone
 	map(0xf400, 0xffff).ram().w(FUNC(lkage_state::videoram_w)).share(m_videoram);
-}
-
-void lkage_state::program_map(address_map &map)
-{
-	base_program_map(map);
-	map(0xf100, 0xf15f).ram().share(m_spriteram);
-	map(0xf160, 0xf1ff).ram(); // unknown - no valid sprite data
-}
-
-void lkage5232_state::program_map(address_map &map)
-{
-	base_program_map(map);
-	//map(0xf060, 0xf060).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xf0a0, 0xf0a1).r(FUNC(lkage5232_state::exrom_data_r)).w(FUNC(lkage5232_state::exrom_offset_w)); // extend ROM read
-	map(0xf0a2, 0xf0a3).noprw(); // unknown
-	map(0xf0e1, 0xf0e1).r(FUNC(lkage5232_state::unk_f0e1_r)).nopw(); // unknown
-	map(0xf100, 0xf1ff).ram().share(m_spriteram);
 }
 
 void lkage_state::mcu_map(address_map &map)
@@ -520,6 +536,148 @@ void lkage_state::mcu_map(address_map &map)
 	map(0xf087, 0xf087).r(FUNC(lkage_state::mcu_status_r));
 }
 
+void lkage_state::io_map(address_map &map)
+{
+	map(0x4000, 0x7fff).rom().region("data", 0);
+}
+
+// sound hardware is almost identical to Bubble Bobble, YM2203 instead of YM3526
+
+void lkage_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xa000, 0xa001).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xb000, 0xb000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw(); // write?
+	map(0xb001, 0xb001).nopr().w(FUNC(lkage_state::sh_nmi_enable_w)); // read?
+	map(0xb002, 0xb002).w(FUNC(lkage_state::sh_nmi_disable_w));
+	map(0xb003, 0xb003).nopw();
+	map(0xe000, 0xefff).rom(); // space for diagnostic ROM?
+}
+
+
+
+/*******************************************************************************
+    MSM5232 version handlers
+*******************************************************************************/
+
+uint8_t lkagem_state::exrom_data_r(offs_t offset)
+{
+	uint16_t const offs = ((m_exrom_offs[1] & 0x3f) << 8) + (m_exrom_offs[0] & 0xff);
+	uint8_t const data = m_exrom[offs];
+
+	if (offset != 0)
+		return 0xff;
+	else
+		return data;
+}
+
+void lkagem_state::exrom_offset_w(offs_t offset, uint8_t data)
+{
+	m_exrom_offs[offset] = data;
+}
+
+void lkagem_state::msm_volume_w(uint8_t data)
+{
+	for (int i = 0; i < 4; i++)
+	{
+		m_ta7630->set_channel_volume(m_msm, i, data & 0xf);
+		m_ta7630->set_channel_volume(m_msm, i + 4, data >> 4);
+	}
+}
+
+template <uint8_t N>
+void lkagem_state::ay_volume_w(uint8_t data)
+{
+	m_ta7630->set_device_volume(m_ay[N], data >> 4);
+}
+
+// address maps
+
+void lkagem_state::program_map(address_map &map)
+{
+	lkage_state::program_map(map);
+	map(0xf0a0, 0xf0a1).r(FUNC(lkagem_state::exrom_data_r)).w(FUNC(lkagem_state::exrom_offset_w)); // extend ROM read
+	map(0xf0a2, 0xf0a3).noprw(); // unknown
+	map(0xf0e0, 0xf0e0).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
+	map(0xf0e1, 0xf0e1).r(FUNC(lkagem_state::mcu_status_r));
+	map(0xf140, 0xf15f).unmapw();
+	map(0xf160, 0xf17f).lw8(NAME([this](offs_t offset, uint8_t data) { m_spriteram[offset | 0x40] = data; }));
+}
+
+// lkagem sound hardware is more similar to Buggy Challenge and Metal Soldier Isaac II
+
+void lkagem_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x8000, 0x8001).w(m_ay[0], FUNC(ym2149_device::address_data_w));
+	map(0x8002, 0x8003).w(m_ay[1], FUNC(ym2149_device::address_data_w));
+	map(0x8010, 0x801d).w(m_msm, FUNC(msm5232_device::write));
+	map(0x8020, 0x8020).w(FUNC(lkagem_state::msm_volume_w));
+	map(0xc000, 0xc000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw(); // write?
+	map(0xc001, 0xc001).nopr().w(FUNC(lkagem_state::sh_nmi_enable_w)); // read?
+	map(0xc002, 0xc002).w(FUNC(lkagem_state::sh_nmi_disable_w));
+	map(0xc003, 0xc003).nopw();
+	map(0xe000, 0xefff).rom(); // space for diagnostic ROM?
+}
+
+
+
+/*******************************************************************************
+    Bootleg handlers
+*******************************************************************************/
+
+// Note: This probably uses another MCU program, which is undumped.
+
+uint8_t lkage_state::fake_mcu_r()
+{
+	int result = 0;
+
+	switch (m_mcu_val)
+	{
+		// These are for the attract mode
+		case 0x01:
+			result = m_mcu_val - 1;
+			break;
+
+		case 0x90:
+			result = m_mcu_val + 0x43;
+			break;
+
+		// Gameplay Protection, checked in this order at a start of a play
+		case 0xa6:
+			result = m_mcu_val + 0x27;
+			break;
+
+		case 0x34:
+			result = m_mcu_val + 0x7f;
+			break;
+
+		case 0x48:
+			result = m_mcu_val + 0xb7;
+			break;
+
+		default:
+			result = m_mcu_val;
+			break;
+	}
+	return result;
+}
+
+void lkage_state::fake_mcu_w(uint8_t data)
+{
+	m_mcu_val = data;
+}
+
+uint8_t lkage_state::fake_status_r()
+{
+	return m_mcu_ready;
+}
+
+// address maps
+
 void lkage_state::bootleg_program_map(address_map &map)
 {
 	program_map(map);
@@ -528,46 +686,10 @@ void lkage_state::bootleg_program_map(address_map &map)
 }
 
 
-void lkage_state::io_map(address_map &map)
-{
-	map(0x4000, 0x7fff).rom().region("data", 0);
-}
 
-
-/***************************************************************************/
-
-// sound section is almost identical to Bubble Bobble, YM2203 instead of YM3526
-
-void lkage_state::sound_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0xa000, 0xa001).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0xb000, 0xb000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw(); // ???
-	map(0xb001, 0xb001).nopr().w(FUNC(lkage_state::sh_nmi_enable_w)); // read ???
-	map(0xb002, 0xb002).w(FUNC(lkage_state::sh_nmi_disable_w));
-	map(0xb003, 0xb003).nopw();
-	map(0xe000, 0xefff).rom(); // space for diagnostic ROM?
-}
-
-void lkage5232_state::sound_map(address_map &map)
-{
-	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x47ff).ram();
-	map(0x8000, 0x8001).w("ay1", FUNC(ym2149_device::address_data_w));
-	map(0x8002, 0x8003).w("ay2", FUNC(ym2149_device::address_data_w));
-	map(0x8010, 0x801d).w("msm", FUNC(msm5232_device::write));
-	map(0x8020, 0x8020).nopw(); // ?
-	map(0xc000, 0xc000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xc001, 0xc001).nopr().w(FUNC(lkage5232_state::sh_nmi_enable_w));
-	map(0xc002, 0xc002).w(FUNC(lkage5232_state::sh_nmi_disable_w));
-//  map(0xc003, 0xc003).w("dac", FUNC(dac_byte_interface::data_w));
-	map(0xc003, 0xc003).nopw();
-	map(0xe000, 0xe000).r(FUNC(lkage5232_state::sound_unk_e000_r));
-}
-
-/***************************************************************************/
+/*******************************************************************************
+    Input ports
+*******************************************************************************/
 
 static INPUT_PORTS_START( lkage )
 	PORT_START("DSW1")
@@ -786,7 +908,6 @@ static INPUT_PORTS_START( bygone )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
@@ -820,6 +941,10 @@ INPUT_PORTS_END
 
 
 
+/*******************************************************************************
+    GFX layouts
+*******************************************************************************/
+
 static const gfx_layout tile_layout =
 {
 	8,8,
@@ -845,39 +970,15 @@ static const gfx_layout sprite_layout =
 };
 
 static GFXDECODE_START( gfx_lkage )
-	GFXDECODE_ENTRY( "gfx", 0x0000, tile_layout,  /*128*/0, 64 )
+	GFXDECODE_ENTRY( "gfx", 0x0000, tile_layout,    0, 64 )
 	GFXDECODE_ENTRY( "gfx", 0x0000, sprite_layout,  0, 16 )
 GFXDECODE_END
 
 
-void lkage_state::machine_start()
-{
-	save_item(NAME(m_bg_tile_bank));
-	save_item(NAME(m_fg_tile_bank));
-	save_item(NAME(m_tx_tile_bank));
 
-	save_item(NAME(m_mcu_val));
-}
-
-void lkage5232_state::machine_start()
-{
-	save_item(NAME(m_bg_tile_bank));
-	save_item(NAME(m_fg_tile_bank));
-	save_item(NAME(m_tx_tile_bank));
-
-	save_item(NAME(m_exrom_offs));
-}
-
-void lkage_state::machine_reset()
-{
-	m_bg_tile_bank = m_fg_tile_bank = m_tx_tile_bank =0;
-
-	m_mcu_ready = 3;
-	m_mcu_val = 0;
-
-	m_soundnmi->in_w<1>(0);
-}
-
+/*******************************************************************************
+    Machine configs
+*******************************************************************************/
 
 void lkage_state::lkage(machine_config &config)
 {
@@ -925,49 +1026,45 @@ void lkage_state::lkage(machine_config &config)
 	ym2.add_route(3, "mono", 0.40);
 }
 
-void lkage_state::lkageb(machine_config &config)
+void lkagem_state::lkagem(machine_config &config)
 {
 	lkage(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &lkage_state::bootleg_program_map);
-
-	config.device_remove("bmcu");
-}
-
-void lkage5232_state::lkage5232(machine_config &config)
-{
-	lkageb(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &lkage5232_state::program_map);
-
-	m_audiocpu->set_addrmap(AS_PROGRAM, &lkage5232_state::sound_map);
-	m_audiocpu->set_periodic_int(FUNC(lkage5232_state::irq0_line_hold), attotime::from_hz(60));
-
-	// 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
-	config.set_maximum_quantum(attotime::from_hz(6000));
-
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(lkage5232_state::screen_update));
+	m_audiocpu->set_periodic_int(FUNC(lkagem_state::irq0_line_hold), attotime::from_hz(60));
 
 	config.device_remove("ym1");
 	config.device_remove("ym2");
 
-	YM2149(config, "ay1", 2_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.18);
-	YM2149(config, "ay2", 2_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.18);
+	YM2149(config, m_ay[0], 2_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.15);
+	m_ay[0]->port_a_write_callback().set(FUNC(lkagem_state::ay_volume_w<0>));
+	m_ay[0]->port_b_write_callback().set_nop(); // also TA7630?
 
-	msm5232_device &msm(MSM5232(config, "msm", 2_MHz_XTAL));
-	msm.set_capacitors(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6);
-	msm.add_route(0, "mono", 1.35);
-	msm.add_route(1, "mono", 1.35);
-	msm.add_route(2, "mono", 1.35);
-	msm.add_route(3, "mono", 1.35);
-	msm.add_route(4, "mono", 1.35);
-	msm.add_route(5, "mono", 1.35);
-	msm.add_route(6, "mono", 1.35);
-	msm.add_route(7, "mono", 1.35);
+	YM2149(config, m_ay[1], 2_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.15);
+	m_ay[1]->port_a_write_callback().set(FUNC(lkagem_state::ay_volume_w<1>));
+	m_ay[1]->port_b_write_callback().set_nop(); // also TA7630?
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	MSM5232(config, m_msm, 2_MHz_XTAL);
+	m_msm->set_capacitors(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6);
+	for (int i = 0; i < 8; i++)
+		m_msm->add_route(i, "mono", 1.00);
+
+	TA7630(config, m_ta7630);
 }
 
+void lkage_state::lkageb(machine_config &config)
+{
+	lkage(config);
+
+	config.device_remove("bmcu");
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &lkage_state::bootleg_program_map);
+}
+
+
+
+/*******************************************************************************
+    ROM definitions
+*******************************************************************************/
 
 ROM_START( lkage )
 	ROM_REGION( 0x14000, "maincpu", 0 ) // Z80 code
@@ -1029,7 +1126,7 @@ ROM_START( lkageo )
 	ROM_LOAD( "pal16l8a-a54-14.35", 0x0600, 0x0104, CRC(a89c644e) SHA1(b41a077d1d070d9563f924c776930c33a4ff27d0) )
 ROM_END
 
-ROM_START( lkageoo )
+ROM_START( lkageo2 )
 	ROM_REGION( 0x14000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "a54-01.37", 0x0000, 0x8000, CRC(34eab2c5) SHA1(25bf2dc80d21aa68c3af5debf10b24c75d83a738) )
 	ROM_LOAD( "a54-02.38", 0x8000, 0x8000, CRC(ea471d8a) SHA1(1ffc7f78e3e983e16a23e97019f7030f9846569b) )
@@ -1057,6 +1154,33 @@ ROM_START( lkageoo )
 	ROM_LOAD( "pal16l8-a54-12.76",  0x0200, 0x0104, CRC(e57c3c89) SHA1(a23f91da254055bb990e8bb730564c40b5725f78) )
 	ROM_LOAD( "pal16l8a-a54-13.27", 0x0400, 0x0104, CRC(c9b1938e) SHA1(2fd1adc4bde8f07cf4b6314d56b48bb3d7144cc3) )
 	ROM_LOAD( "pal16l8a-a54-14.35", 0x0600, 0x0104, CRC(a89c644e) SHA1(b41a077d1d070d9563f924c776930c33a4ff27d0) )
+ROM_END
+
+ROM_START( lkagem )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF ) // Z80 code
+	ROM_LOAD( "a51_11-2.ic", 0x0000, 0x4000, CRC(540fdb1f) SHA1(11d2a5b56d6d72458816aaf7687e490126b468cc) )
+	ROM_LOAD( "a51_12-2.ic", 0x4000, 0x4000, CRC(a625a4b8) SHA1(417e7590f98eadc71cbed749350d6d3a1c1fd413) )
+	ROM_LOAD( "a51_13-2.ic", 0x8000, 0x4000, CRC(aba8c6a3) SHA1(6723138f54a06d3e4719a43e8e3f11b3cabfb6f7) )
+	ROM_LOAD( "a51_10-2.ic", 0xc000, 0x2000, CRC(f6243d5c) SHA1(7b2810afe9c128a290f15c6ea1a6a1c2757ddf55) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code
+	ROM_LOAD( "a51_01-1.ic", 0x0000, 0x4000, CRC(03c818ba) SHA1(80604726c647495ab76870806cd1fb448cffe34d) )
+
+	ROM_REGION( 0x00800, "bmcu:mcu", 0 ) // 68705 code
+	ROM_LOAD( "a54-09.53",   0x0000, 0x0800, CRC(0e8b8846) SHA1(a4a105462b0127229bb7edfadd2e581c7e40f1cc) ) // taken from lkage
+
+	ROM_REGION( 0x10000, "gfx", 0 )
+	ROM_LOAD( "a51_03-1.ic", 0x0000, 0x2000, CRC(99847f0a) SHA1(34ea492e82845d0366bd755ddf1cad7f574d867a) ) // tile
+	ROM_LOAD( "a51_07-1.ic", 0x2000, 0x2000, CRC(c9d01e5b) SHA1(16d689ccc9c3cb16e6b4d85f8e50386c78c439e5) ) // spr
+	ROM_LOAD( "a51_02-1.ic", 0x4000, 0x2000, CRC(28bbf964) SHA1(67fb767549d7326133c630f424703abe2b14273d) ) // tile
+	ROM_LOAD( "a51_06-1.ic", 0x6000, 0x2000, CRC(d16c7c95) SHA1(f3cfc995cc072311b3bd831b69ccb229e2734f53) ) // spr
+	ROM_LOAD( "a51_05-1.ic", 0x8000, 0x2000, CRC(38bb3ad0) SHA1(9c24d705e55acaaa99fbb39e06486ca932bda796) ) // tile
+	ROM_LOAD( "a51_09-1.ic", 0xa000, 0x2000, CRC(40fd3d86) SHA1(f92156e5e44483b2683457166cb5b9cfc7fbbf14) ) // spr
+	ROM_LOAD( "a51_04-1.ic", 0xc000, 0x2000, CRC(8e132cc6) SHA1(c7b196e6b8c3b6841a1f4ca0904597085a53cc25) ) // tile
+	ROM_LOAD( "a51_08-1.ic", 0xe000, 0x2000, CRC(2ab68af8) SHA1(6dd91311f2344936590577440898da5f26e35880) ) // spr
+
+	ROM_REGION( 0x4000, "data", 0 )
+	ROM_LOAD( "a51_14.ic",   0x0000, 0x4000, CRC(493e76d8) SHA1(13c6160edd94ba2801fd89bb33bcae3a1e3454ff) )
 ROM_END
 
 ROM_START( lkageb )
@@ -1140,31 +1264,6 @@ ROM_START( lkageb4 )
 	ROM_LOAD( "8.ic87", 0xc000, 0x4000, CRC(3ff3b230) SHA1(ffcd964efb0af32b5d7a70305dfda615ea95acbe) )
 ROM_END
 
-
-ROM_START( lkage5232 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF ) // Z80 code
-	ROM_LOAD( "a51_11-2.ic", 0x0000, 0x4000, CRC(540fdb1f) SHA1(11d2a5b56d6d72458816aaf7687e490126b468cc) )
-	ROM_LOAD( "a51_12-2.ic", 0x4000, 0x4000, CRC(a625a4b8) SHA1(417e7590f98eadc71cbed749350d6d3a1c1fd413) )
-	ROM_LOAD( "a51_13-2.ic", 0x8000, 0x4000, CRC(aba8c6a3) SHA1(6723138f54a06d3e4719a43e8e3f11b3cabfb6f7) )
-	ROM_LOAD( "a51_10-2.ic", 0xc000, 0x2000, CRC(f6243d5c) SHA1(7b2810afe9c128a290f15c6ea1a6a1c2757ddf55) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code
-	ROM_LOAD( "a51_01-1.ic", 0x0000, 0x4000, CRC(03c818ba) SHA1(80604726c647495ab76870806cd1fb448cffe34d) )
-	ROM_FILL(                0xe000, 0x2000, 0xff ) // diagnostics ROM
-
-	ROM_REGION( 0x10000, "gfx", 0 )
-	ROM_LOAD( "a51_03-1.ic", 0x0000, 0x2000, CRC(99847f0a) SHA1(34ea492e82845d0366bd755ddf1cad7f574d867a) ) // tile
-	ROM_LOAD( "a51_07-1.ic", 0x2000, 0x2000, CRC(c9d01e5b) SHA1(16d689ccc9c3cb16e6b4d85f8e50386c78c439e5) ) // spr
-	ROM_LOAD( "a51_02-1.ic", 0x4000, 0x2000, CRC(28bbf964) SHA1(67fb767549d7326133c630f424703abe2b14273d) ) // tile
-	ROM_LOAD( "a51_06-1.ic", 0x6000, 0x2000, CRC(d16c7c95) SHA1(f3cfc995cc072311b3bd831b69ccb229e2734f53) ) // spr
-	ROM_LOAD( "a51_05-1.ic", 0x8000, 0x2000, CRC(38bb3ad0) SHA1(9c24d705e55acaaa99fbb39e06486ca932bda796) ) // tile
-	ROM_LOAD( "a51_09-1.ic", 0xa000, 0x2000, CRC(40fd3d86) SHA1(f92156e5e44483b2683457166cb5b9cfc7fbbf14) ) // spr
-	ROM_LOAD( "a51_04-1.ic", 0xc000, 0x2000, CRC(8e132cc6) SHA1(c7b196e6b8c3b6841a1f4ca0904597085a53cc25) ) // tile
-	ROM_LOAD( "a51_08-1.ic", 0xe000, 0x2000, CRC(2ab68af8) SHA1(6dd91311f2344936590577440898da5f26e35880) ) // spr
-
-	ROM_REGION( 0x4000, "data", 0 )
-	ROM_LOAD( "a51_14.ic",   0x0000, 0x4000, CRC(493e76d8) SHA1(13c6160edd94ba2801fd89bb33bcae3a1e3454ff) )
-ROM_END
 
 /*
 Bygone
@@ -1277,96 +1376,25 @@ ROM_START( bygone )
 	ROM_LOAD( "a53_04.ic87", 0xc000, 0x4000, CRC(65af72d3) SHA1(759a1dd7548075630ddb9c692bdb32ad4712c579) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "a54-10.ic2",    0x0000, 0x0400, CRC(369722d9) SHA1(2df9932ad8ce87c0a9d2c89222a4cec12c29046d) )   // unknown
+	ROM_LOAD( "a54-10.ic2",    0x0000, 0x0400, CRC(369722d9) SHA1(2df9932ad8ce87c0a9d2c89222a4cec12c29046d) ) // unknown
 ROM_END
-
-
-uint8_t lkage_state::mcu_status_r()
-{
-	// bit 0 = when 1, MCU is ready to receive data from main CPU
-	// bit 1 = when 1, MCU has sent data to the main CPU
-	return
-		((CLEAR_LINE == m_bmcu->host_semaphore_r()) ? 0x01 : 0x00) |
-		((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x02 : 0x00);
-}
-
-// Note: This probably uses another MCU program, which is undumped.
-
-uint8_t lkage_state::fake_mcu_r()
-{
-	int result = 0;
-
-	switch (m_mcu_val)
-	{
-		// These are for the attract mode
-		case 0x01:
-			result = m_mcu_val - 1;
-			break;
-
-		case 0x90:
-			result = m_mcu_val + 0x43;
-			break;
-
-		// Gameplay Protection, checked in this order at a start of a play
-		case 0xa6:
-			result = m_mcu_val + 0x27;
-			break;
-
-		case 0x34:
-			result = m_mcu_val + 0x7f;
-			break;
-
-		case 0x48:
-			result = m_mcu_val + 0xb7;
-			break;
-
-		default:
-			result = m_mcu_val;
-			break;
-	}
-	return result;
-}
-
-void lkage_state::fake_mcu_w(uint8_t data)
-{
-	m_mcu_val = data;
-}
-
-uint8_t lkage_state::fake_status_r()
-{
-	return m_mcu_ready;
-}
-
-void lkage_state::init_lkage()
-{
-	m_sprite_dx = 0;
-
-	m_sprite_offset = 0;
-}
-
-void lkage5232_state::init_lkage5232()
-{
-	init_lkage();
-
-	m_sprite_offset = 24;
-}
-
-void lkage_state::init_bygone()
-{
-	m_sprite_dx = 1;
-
-	m_sprite_offset = 0;
-}
 
 } // anonymous namespace
 
 
-GAME( 1984, lkage,     0,     lkage,     lkage,  lkage_state,     init_lkage,     ROT0, "Taito Corporation", "The Legend of Kage",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageo,    lkage, lkage,     lkage,  lkage_state,     init_lkage,     ROT0, "Taito Corporation", "The Legend of Kage (older)",           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageoo,   lkage, lkage,     lkage,  lkage_state,     init_lkage,     ROT0, "Taito Corporation", "The Legend of Kage (oldest)",          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb,    lkage, lkageb,    lkageb, lkage_state,     init_lkage,     ROT0, "bootleg",           "The Legend of Kage (bootleg set 1)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb2,   lkage, lkageb,    lkageb, lkage_state,     init_lkage,     ROT0, "bootleg",           "The Legend of Kage (bootleg set 2)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb3,   lkage, lkageb,    lkageb, lkage_state,     init_lkage,     ROT0, "bootleg",           "The Legend of Kage (bootleg set 3)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb4,   lkage, lkageb,    lkageb, lkage_state,     init_lkage,     ROT0, "bootleg",           "The Legend of Kage (bootleg set 4)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkage5232, lkage, lkage5232, lkage,  lkage5232_state, init_lkage5232, ROT0, "Taito Corporation", "The Legend of Kage (MSM5232 version)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // attract is broken, reads and writes from/to MCU addresses
-GAME( 1985, bygone,    0,     lkage,     bygone, lkage_state,     init_bygone,    ROT0, "Taito Corporation", "Bygone (prototype)",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+
+/*******************************************************************************
+    Game drivers
+*******************************************************************************/
+
+//    YEAR  NAME     PARENT MACHINE  INPUT   CLASS         INIT         SCREEN COMPANY              FULLNAME                              FLAGS
+GAME( 1984, lkage,   0,     lkage,   lkage,  lkage_state,  empty_init,  ROT0,  "Taito Corporation", "The Legend of Kage",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageo,  lkage, lkage,   lkage,  lkage_state,  empty_init,  ROT0,  "Taito Corporation", "The Legend of Kage (older)",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageo2, lkage, lkage,   lkage,  lkage_state,  empty_init,  ROT0,  "Taito Corporation", "The Legend of Kage (oldest)",        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkagem,  lkage, lkagem,  lkage,  lkagem_state, empty_init,  ROT0,  "Taito Corporation", "The Legend of Kage (MSM5232 sound)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb,  lkage, lkageb,  lkageb, lkage_state,  empty_init,  ROT0,  "bootleg",           "The Legend of Kage (bootleg set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb2, lkage, lkageb,  lkageb, lkage_state,  empty_init,  ROT0,  "bootleg",           "The Legend of Kage (bootleg set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb3, lkage, lkageb,  lkageb, lkage_state,  empty_init,  ROT0,  "bootleg",           "The Legend of Kage (bootleg set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb4, lkage, lkageb,  lkageb, lkage_state,  empty_init,  ROT0,  "bootleg",           "The Legend of Kage (bootleg set 4)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1985, bygone,  0,     lkage,   bygone, lkage_state,  init_bygone, ROT0,  "Taito Corporation", "Bygone (prototype)",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
