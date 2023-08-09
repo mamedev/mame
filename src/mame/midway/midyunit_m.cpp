@@ -490,6 +490,30 @@ void midyunit_state::init_mkyturbo()
 	init_mkyunit();
 }
 
+void midyunit_state::init_mkla3bl()
+{
+	// rearrange GFX so the driver can deal with them
+	uint8_t *gfxrom = memregion("gfx1")->base();
+	std::vector<uint8_t> buffer(0x400000);
+	memcpy(&buffer[0], gfxrom, 0x400000);
+
+	for (int i = 0x000000; i < 0x100000; i++)
+		gfxrom[i] = buffer[0x200000 | ((i & 0xfffff) * 2 + 1)];
+
+	for (int i = 0x100000; i < 0x200000; i++)
+		gfxrom[i] = buffer[(i & 0xfffff) * 2 + 1];
+
+	for (int i = 0x200000; i < 0x300000; i++)
+		gfxrom[i] = buffer[0x200000 | ((i & 0xfffff) * 2)];
+
+	for (int i = 0x300000; i < 0x400000; i++)
+		gfxrom[i] = buffer[(i & 0xfffff) * 2];
+
+	// 0x400000 - 0x5fffff range is already ok
+
+	init_mkyunit();
+}
+
 /********************** Terminator 2 **********************/
 
 void midyunit_state::term2_init_common(write16s_delegate hack_w)

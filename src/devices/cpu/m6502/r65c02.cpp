@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    r65c02.c
+    r65c02.cpp
 
     Rockwell 65c02, CMOS variant with bitwise instructions
 

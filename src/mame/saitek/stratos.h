@@ -3,7 +3,7 @@
 /*
 
   Saitek Stratos family chess computers shared class
-  Used in: saitek_stratos.cpp (main driver), saitek_corona.cpp
+  Used in: stratos.cpp (main driver), corona.cpp
 
 */
 

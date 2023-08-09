@@ -1,12 +1,13 @@
 #include "emu.h"
 #include "h8_dtc.h"
+
 #include "h8.h"
 
 // Verbosity level
 // 0 = no messages
 // 1 = in-memory registers once read
 // 2 = everything
-const int V = 0;
+static constexpr int V = 0;
 
 DEFINE_DEVICE_TYPE(H8_DTC, h8_dtc_device, "h8_dtc", "H8 DTC controller")
 

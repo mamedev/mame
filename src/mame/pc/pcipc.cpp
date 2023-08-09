@@ -27,20 +27,21 @@
 #include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
 #include "machine/fdc37c93x.h"
-#include "machine/w83977tf.h"
+#include "machine/i82371eb_acpi.h"
+#include "machine/i82371eb_ide.h"
+#include "machine/i82371eb_isa.h"
+#include "machine/i82371eb_usb.h"
 #include "machine/i82371sb.h"
 #include "machine/i82439hx.h"
 #include "machine/i82439tx.h"
 #include "machine/i82443bx_host.h"
-#include "machine/i82371eb_isa.h"
-#include "machine/i82371eb_ide.h"
-#include "machine/i82371eb_acpi.h"
-#include "machine/i82371eb_usb.h"
-#include "machine/pci-ide.h"
 #include "machine/pci.h"
+#include "machine/pci-ide.h"
+#include "machine/w83977tf.h"
+#include "video/clgd546x_laguna.h"
 #include "video/mga2064w.h"
-#include "video/virge_pci.h"
 #include "video/riva128.h"
+#include "video/virge_pci.h"
 
 namespace {
 
@@ -526,17 +527,17 @@ void pcipc_state::smc_superio_config(device_t *device)
 void pcipc_state::winbond_superio_config(device_t *device)
 {
 	w83977tf_device &fdc = *downcast<w83977tf_device *>(device);
-//	fdc.set_sysopt_pin(1);
+//  fdc.set_sysopt_pin(1);
 	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
 	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
-	fdc.irq1().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
-	fdc.irq8().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq8n_w));
-//	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
-//	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
-//	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
-//	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
-//	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
-//	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
+	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
+//  fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+//  fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+//  fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+//  fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+//  fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+//  fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 }
 
 
@@ -661,8 +662,8 @@ void pcipc_state::pciagp(machine_config &config)
 	serport1.cts_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ncts2_w));
 #endif
 
-	// TODO: temp, to be converted to a proper AGP card once we make this to boot
-	VIRGE_PCI(config, "pci:0e.0", 0); // J4C1
+	// TODO: temp link, to be moved to quakeat.cpp
+	CIRRUS_GD5465_LAGUNA3D(config, "pci:01.0:00.0", 0);
 }
 
 ROM_START(pcipc)

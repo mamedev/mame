@@ -295,6 +295,30 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/rivatnt.h,VIDEOS["RIVATNT"] = true
+--------------------------------------------------
+
+if (VIDEOS["RIVATNT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/rivatnt.cpp",
+		MAME_DIR .. "src/devices/video/rivatnt.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/geforce.h,VIDEOS["GEFORCE"] = true
+--------------------------------------------------
+
+if (VIDEOS["GEFORCE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/geforce.cpp",
+		MAME_DIR .. "src/devices/video/geforce.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/gf4500.h,VIDEOS["GF4500"] = true
 --------------------------------------------------
 
@@ -314,18 +338,6 @@ if (VIDEOS["GF7600GS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/gf7600gs.cpp",
 		MAME_DIR .. "src/devices/video/gf7600gs.h",
-	}
-end
-
---------------------------------------------------
---
---@src/devices/video/mga2064w.h,VIDEOS["MGA2064W"] = true
---------------------------------------------------
-
-if (VIDEOS["MGA2064W"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/mga2064w.cpp",
-		MAME_DIR .. "src/devices/video/mga2064w.h",
 	}
 end
 
@@ -883,13 +895,37 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/clgd542x.h,VIDEOS["PC_VGA_CIRRUS"] = true
+--@src/devices/video/pc_vga_cirrus.h,VIDEOS["PC_VGA_CIRRUS"] = true
 --------------------------------------------------
 
 if (VIDEOS["PC_VGA_CIRRUS"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/video/clgd542x.cpp",
-		MAME_DIR .. "src/devices/video/clgd542x.h",
+		MAME_DIR .. "src/devices/video/pc_vga_cirrus.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_cirrus.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/pc_vga_matrox.h,VIDEOS["PC_VGA_MATROX"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_MATROX"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_matrox.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_matrox.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/mga2064w.h,VIDEOS["MGA2064W"] = true
+--------------------------------------------------
+
+if (VIDEOS["MGA2064W"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/mga2064w.cpp",
+		MAME_DIR .. "src/devices/video/mga2064w.h",
 	}
 end
 
@@ -907,6 +943,30 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/pc_vga_paradise.h,VIDEOS["PC_VGA_PARADISE"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_PARADISE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_paradise.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_paradise.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/wd90c26.h,VIDEOS["WD90C26"] = true
+--------------------------------------------------
+
+if (VIDEOS["WD90C26"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/wd90c26.cpp",
+		MAME_DIR .. "src/devices/video/wd90c26.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pc_vga_s3.h,VIDEOS["PC_VGA_S3"] = true
 --------------------------------------------------
 
@@ -914,6 +974,30 @@ if (VIDEOS["PC_VGA_S3"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/pc_vga_s3.cpp",
 		MAME_DIR .. "src/devices/video/pc_vga_s3.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/s3virge.h,VIDEOS["S3VIRGE"] = true
+--------------------------------------------------
+
+if (VIDEOS["S3VIRGE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/s3virge.cpp",
+		MAME_DIR .. "src/devices/video/s3virge.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/pc_vga_sis.h,VIDEOS["PC_VGA_SIS"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_SIS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_sis.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_sis.h",
 	}
 end
 
@@ -953,6 +1037,20 @@ if (VIDEOS["PC_XGA"]~=null) then
 	}
 end
 
+
+--------------------------------------------------
+--
+--@src/devices/video/clgd546x_laguna.h,VIDEOS["CLGD546X_LAGUNA"] = true
+--------------------------------------------------
+
+if (VIDEOS["CLGD546X_LAGUNA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/clgd546x_laguna.cpp",
+		MAME_DIR .. "src/devices/video/clgd546x_laguna.h",
+	}
+end
+
+
 --------------------------------------------------
 --
 --@src/devices/video/virge_pci.h,VIDEOS["VIRGE_PCI"] = true
@@ -964,6 +1062,7 @@ if (VIDEOS["VIRGE_PCI"]~=null) then
 		MAME_DIR .. "src/devices/video/virge_pci.h",
 	}
 end
+
 
 --------------------------------------------------
 --

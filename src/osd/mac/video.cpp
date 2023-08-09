@@ -44,9 +44,6 @@ osd_video_config video_config;
 //============================================================
 //  PROTOTYPES
 //============================================================
-
-static void check_osd_inputs(running_machine &machine);
-
 static void get_resolution(const char *defdata, const char *data, osd_window_config *config, int report_error);
 
 

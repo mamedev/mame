@@ -210,12 +210,11 @@
 
 	// create a scroll view for holding everything
 	NSSize desired = [NSScrollView frameSizeForContentSize:[contentView frame].size
-											horizontalScrollerClass:[NSScroller class]
-											verticalScrollerClass:[NSScroller class]
-											borderType: NSNoBorder
-											controlSize: NSControlSizeRegular
-											scrollerStyle: NSScrollerStyleOverlay
-											];
+								   horizontalScrollerClass:[NSScroller class]
+									 verticalScrollerClass:[NSScroller class]
+												borderType:NSNoBorder
+											   controlSize:NSControlSizeRegular
+											 scrollerStyle:NSScrollerStyleOverlay];
 	[window setContentSize:desired];
 	contentScroll = [[NSScrollView alloc] initWithFrame:[[window contentView] bounds]];
 	[contentScroll setDrawsBackground:NO];

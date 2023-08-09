@@ -25,8 +25,14 @@ timer
 b-flag always 1! (only pushed as 0 when break executed!)
 memory changing opcodes accesses memory: read, write data, write modified data
 
-6504
+6503
 only 12 address pins a11..a0
+
+6504
+only 13 address pins a12..a0
+
+6507
+only 13 address pins a12..a0
 
 6508
 8 io pins (p0 bis p7)
@@ -159,5 +165,5 @@ MUL, DIV not in all variants
 Set Overflow Pin
 ----------------
 in 6502 and pin compatibles (65C02 65SC02 65SC802 65CE02), M6509
-no SO pin 6510/7501/8500/8501/8502/65sc816
+no SO pin 6503/6504/6507/6510/7501/8500/8501/8502/65sc816
 6510T ?

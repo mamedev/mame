@@ -11,7 +11,7 @@
 
 #include "atapicdr.h"
 #include "cp2024.h"
-#include "idehd.h"
+#include "hdd.h"
 #include "px320a.h"
 
 //-------------------------------------------------

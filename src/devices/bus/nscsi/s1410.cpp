@@ -55,7 +55,7 @@ void nscsi_s1410_device::scsi_command()
 
 	switch(scsi_cmdbuf[0]) {
 	case SC_TEST_UNIT_READY:
-	case SC_REZERO:
+	case SC_REZERO_UNIT:
 	case SC_REASSIGN_BLOCKS:
 	case SC_READ:
 	case SC_WRITE:

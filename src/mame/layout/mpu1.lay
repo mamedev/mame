@@ -54,7 +54,7 @@ license:CC0-1.0
 			</element>
 			<element ref="Reel" state="0">
 				<bounds x="~x~" y="200" width="30" height="80"/>
-				<yscroll name="sreel~i~" size="0.15" wrap="yes" min="0" max="65535"/>
+				<yscroll name="emreel~i~" size="0.15" wrap="yes" min="0" max="399"/>
 			</element>
 		</repeat>
 		<element ref="rect_black">

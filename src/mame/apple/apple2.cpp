@@ -326,7 +326,7 @@ void apple2_state::machine_reset()
 	// reset the cards
 	m_a2bus->reset_bus();
 	// reset the 6502 now as a card may have pulled /INH on the reset vector
-	printf("machine_reset\n");
+	logerror("machine_reset\n");
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }

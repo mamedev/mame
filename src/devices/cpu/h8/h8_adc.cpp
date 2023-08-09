@@ -6,7 +6,7 @@
 // Verbosity level
 // 0 = no messages
 // 1 = everything
-const int V = 0;
+static constexpr int V = 0;
 
 DEFINE_DEVICE_TYPE(H8_ADC_3337, h8_adc_3337_device, "h8_adc_3337", "H8/3337 ADC")
 DEFINE_DEVICE_TYPE(H8_ADC_3006, h8_adc_3006_device, "h8_adc_3006", "H8/3006 ADC")

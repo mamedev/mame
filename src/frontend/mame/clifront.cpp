@@ -1785,34 +1785,41 @@ void cli_frontend::execute_commands(std::string_view exename)
 	// createconfig?
 	if (m_options.command() == CLICOMMAND_CREATECONFIG)
 	{
-		// attempt to open the output file
+		// attempt to open the output file and generate the updated (mame).ini
 		emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 		if (file.open(std::string(emulator_info::get_configname()) + ".ini"))
 			throw emu_fatalerror("Unable to create file %s.ini\n",emulator_info::get_configname());
 
-		// generate the updated INI
 		file.puts(m_options.output_ini());
 
+		// ui.ini
 		ui_options ui_opts;
 		emu_file file_ui(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 		if (file_ui.open("ui.ini"))
 			throw emu_fatalerror("Unable to create file ui.ini\n");
 
-		// generate the updated INI
 		file_ui.puts(ui_opts.output_ini());
 
+		// plugin.ini
 		plugin_options plugin_opts;
 		path_iterator iter(m_options.plugins_path());
 		std::string pluginpath;
 		while (iter.next(pluginpath))
 			plugin_opts.scan_directory(pluginpath, true);
 
-		emu_file file_plugin(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file_plugin.open("plugin.ini"))
-			throw emu_fatalerror("Unable to create file plugin.ini\n");
+		std::string plugins(plugin_opts.output_ini());
 
-		// generate the updated INI
-		file_plugin.puts(plugin_opts.output_ini());
+		// only update the file when it found plugins
+		if (!plugins.empty())
+		{
+			emu_file file_plugin(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			if (file_plugin.open("plugin.ini"))
+				throw emu_fatalerror("Unable to create file plugin.ini\n");
+
+			file_plugin.puts(plugins);
+		}
+		else
+			osd_printf_error("Skipped plugin.ini, could not find any plugins\n");
 
 		return;
 	}

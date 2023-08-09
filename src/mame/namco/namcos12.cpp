@@ -1897,7 +1897,7 @@ void namcos12_boothack_state::aplarail(machine_config &config)
 	m_sub->read_porta().set(FUNC(namcos12_boothack_state::s12_mcu_pa_r));
 	m_sub->write_porta().set(FUNC(namcos12_boothack_state::s12_mcu_pa_w));
 	m_sub->read_portb().set(FUNC(namcos12_boothack_state::s12_mcu_portB_r));
-	m_sub->write_portb().set(FUNC(namcos12_boothack_state::s12_mcu_portB_w));	
+	m_sub->write_portb().set(FUNC(namcos12_boothack_state::s12_mcu_portB_w));
 
 	h83334_device &iocpu(H83334(config, "iocpu", JVSCLOCK));
 	iocpu.set_addrmap(AS_PROGRAM, &namcos12_boothack_state::plarailjvsmap);

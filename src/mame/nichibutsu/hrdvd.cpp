@@ -149,7 +149,7 @@ void hrdvd_state::p6_w(uint16_t data)
 		m_mpeg->reset();
 
 	m_subcpu->set_input_line(H8_INPUT_LINE_DREQ0, m_mpeg_dreq && !(m_p6 & 0x04));
-	
+
 	logerror("p6 %02x\n", m_p6);
 }
 

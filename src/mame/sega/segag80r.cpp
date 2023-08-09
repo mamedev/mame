@@ -289,8 +289,8 @@ uint8_t segag80r_state::spaceod_port_fc_r()
 
 void segag80r_state::coin_count_w(uint8_t data)
 {
-	machine().bookkeeping().coin_counter_w(0, (data >> 7) & 1);
-	machine().bookkeeping().coin_counter_w(1, (data >> 6) & 1);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 7));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 6));
 }
 
 
@@ -304,7 +304,8 @@ void segag80r_state::coin_count_w(uint8_t data)
 
 void segag80r_state::sindbadm_misc_w(uint8_t data)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 //  osd_printf_debug("Unknown = %02X\n", data);
 }
@@ -962,6 +963,7 @@ void segag80r_state::sindbadm(machine_config &config)
 	i8255_device &ppi(I8255A(config, "ppi8255"));
 	ppi.in_pb_callback().set_ioport("FC");
 	ppi.out_pc_callback().set(FUNC(segag80r_state::sindbadm_misc_w));
+	ppi.tri_pc_callback().set_constant(0x80);
 
 	/* video hardware */
 	m_gfxdecode->set_info(gfx_monsterb);
@@ -1755,7 +1757,7 @@ GAME( 1981, astrob,    0,        astrob,   astrob,   segag80r_state, init_astrob
 GAME( 1981, astrob2,   astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2)", 0 )
 GAME( 1981, astrob2a,  astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2a)", 0 )
 GAME( 1981, astrob2b,  astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2b)", 0 )
-GAME( 1981, astrob1,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 1)", 0 | MACHINE_NOT_WORKING ) // instant death if you start game with 1 credit, protection?, bad dump?
+GAME( 1981, astrob1,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 1)", MACHINE_NOT_WORKING ) // instant death if you start game with 1 credit, protection?, bad dump?
 GAME( 1981, astrobg,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (German)", 0 )
 GAME( 1981, 005,       0,        sega005,  005,      segag80r_state, init_005,      ROT270, "Sega", "005", MACHINE_IMPERFECT_SOUND )
 

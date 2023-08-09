@@ -642,7 +642,7 @@ int a5200_cart_slot_device::identify_cart_type(const uint8_t *header) const
 std::string a800_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	// Nope, will crash when mounting the SDX subslot
-//	std::string slot_default_option = default_option();
+//  std::string slot_default_option = default_option();
 	const bool is_xegs = m_is_xegs;
 
 	if (hook.image_file())

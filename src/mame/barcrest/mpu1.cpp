@@ -26,6 +26,7 @@
 #include "cpu/m6800/m6800.h"
 
 #include "machine/6821pia.h"
+#include "machine/em_reel.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
 
@@ -47,11 +48,11 @@ public:
 	mpu1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_nmi_timer(*this, "nmi"),
 		m_pia1(*this, "pia1"),
 		m_pia2(*this, "pia2"),
 		m_lamps(*this, "lamp%u", 0U),
-		m_reel_out(*this, "reel%u", 1U),
-		m_sreel_out(*this, "sreel%u", 1U),
+		m_reels(*this, "emreel%u", 1U),
 		m_dac(*this, "dac"),
 		m_samples(*this, "samples")
 	{ }
@@ -66,49 +67,39 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	enum { STEPS_PER_SYMBOL = 20 };
+
 	template <unsigned Lamp> void pia_lamp_w(int state) { m_lamps[Lamp] = state; }
+	template <unsigned Reel> void reel_sample_cb(uint8_t state);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(nmi);
+	TIMER_CALLBACK_MEMBER(change_pia2a_bit7);
 
 	void pia1_portb_w(uint8_t data);
 	void pia1_portb_lg_w(uint8_t data);
 	uint8_t pia2_porta_r();
 	void pia2_porta_w(uint8_t data);
 	void pia2_portb_w(uint8_t data);
+	uint8_t reel_pos_r(uint8_t reel);
 	void payout_cash_w(bool state);
 	void payout_token_w(bool state);
 	void meter_w(int meter, bool state);
 	void coin_lockout_w(bool state);
-	void reel_w(int reel, bool state);
 
 	void mpu1_map(address_map &map);
 
 	uint8_t m_reel_select;
 	bool m_pia2a_select;
 	bool m_prev_payout[2];
-	uint8_t m_reel_state[4];
-	uint16_t m_reel_pos[4];
-	emu_timer *m_reel_timer[4];
-	attotime m_reel_speed;
 	uint8_t m_pia2a_bit7_value;
 	emu_timer *m_change_pia2a_bit7_timer;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(nmi);
-	template <unsigned Reel> TIMER_CALLBACK_MEMBER(reel_move);
-	TIMER_CALLBACK_MEMBER(change_pia2a_bit7);
-
-	enum
-	{
-		REEL_STOPPED = 0,
-		REEL_SPINNING,
-		REEL_STOPPING
-	};
-
-	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<timer_device> m_nmi_timer;
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
 	output_finder<13> m_lamps;
-	output_finder<4> m_reel_out;
-	output_finder<4> m_sreel_out;
+	required_device_array<em_reel_device, 4> m_reels;
 	required_device<dac_1bit_device> m_dac;
 	required_device<fruit_samples_device> m_samples;
 };
@@ -127,10 +118,10 @@ void mpu1_state::pia1_portb_w(uint8_t data)
 {
 	if(BIT(data, 7) == 0)
 	{
-		reel_w(0, BIT(data, 0));
-		reel_w(1, BIT(data, 1));
-		reel_w(2, BIT(data, 2));
-		reel_w(3, BIT(data, 3));
+		m_reels[0]->set_state(BIT(data, 0));
+		m_reels[1]->set_state(BIT(data, 1));
+		m_reels[2]->set_state(BIT(data, 2));
+		m_reels[3]->set_state(BIT(data, 3));
 		coin_lockout_w(BIT(data, 4));
 		m_lamps[11] = BIT(data, 5);
 		meter_w(0, BIT(data, 6));
@@ -158,10 +149,10 @@ void mpu1_state::pia1_portb_lg_w(uint8_t data)
 
 	if(BIT(data, 7) == 0)
 	{
-		reel_w(0, BIT(data, 0));
-		reel_w(1, BIT(data, 1));
-		reel_w(2, BIT(data, 2));
-		reel_w(3, BIT(data, 3));
+		m_reels[0]->set_state(BIT(data, 0));
+		m_reels[1]->set_state(BIT(data, 1));
+		m_reels[2]->set_state(BIT(data, 2));
+		m_reels[3]->set_state(BIT(data, 3));
 		coin_lockout_w(BIT(data, 4));
 		// Manual says bit 5 might be "Reel Motor", reels work fine without this
 		m_lamps[11] = BIT(data, 6);
@@ -182,11 +173,7 @@ uint8_t mpu1_state::pia2_porta_r()
 {
 	if(m_pia2a_select == 0)
 	{
-		uint16_t pos = m_reel_pos[m_reel_select];
-		if(pos % 20 == 0)
-			return (pos / 20) + 1;
-		else
-			return 0;
+		return reel_pos_r(m_reel_select);
 	}
 	else
 	{
@@ -204,6 +191,16 @@ void mpu1_state::pia2_porta_w(uint8_t data)
 void mpu1_state::pia2_portb_w(uint8_t data)
 {
 	for(int i = 0; i < 8; i++) m_lamps[i] = BIT(data, i);
+}
+
+uint8_t mpu1_state::reel_pos_r(uint8_t reel)
+{
+	uint16_t pos = m_reels[reel]->get_pos();
+
+	if(pos % STEPS_PER_SYMBOL == 0)
+		return (pos / STEPS_PER_SYMBOL) + 1;
+	else
+		return 0;
 }
 
 void mpu1_state::payout_cash_w(bool state)
@@ -253,58 +250,13 @@ TIMER_CALLBACK_MEMBER( mpu1_state::change_pia2a_bit7 )
 	m_pia2a_bit7_value = 0;
 }
 
-/* MPU1 does not have stepper reels, it instead uses an electromechanical reel system.
-   Each reel has a single output - setting the output high causes the reel to start moving,
-   and once it's set back low, the reel will stop at whichever symbol it's heading towards.
-   Position tracking is done via contacts on index plates below each symbol, which the CPU
-   will read once all reels are stopped.
-
-   I've modeled the reels as having 400 virtual "steps". Every reel has 20 symbols, which
-   gives 20 "steps" between each symbol. */
-void mpu1_state::reel_w(int reel, bool state)
-{
-	if(m_reel_state[reel] == REEL_STOPPED)
-	{
-		if(state)
-		{
-			m_reel_state[reel] = REEL_SPINNING;
-			m_reel_timer[reel]->adjust(m_reel_speed);
-			m_samples->play(fruit_samples_device::SAMPLE_EM_REEL_1_START + reel);
-		}
-	}
-	else if(m_reel_state[reel] == REEL_SPINNING)
-	{
-		if(!state)
-		{
-			if(m_reel_pos[reel] % 20 == 0) // If reel is already on a symbol, then stop it immediately
-			{
-				m_reel_timer[reel]->adjust(attotime::never);
-				m_reel_state[reel] = REEL_STOPPED;
-				m_samples->play(fruit_samples_device::SAMPLE_EM_REEL_1_STOP + reel);
-			}
-			else m_reel_state[reel] = REEL_STOPPING;
-		}
-	}
-}
-
 template <unsigned Reel>
-TIMER_CALLBACK_MEMBER( mpu1_state::reel_move )
+void mpu1_state::reel_sample_cb(uint8_t state)
 {
-	if(m_reel_pos[Reel] == 0)
-		m_reel_pos[Reel] = 400 - 1;
-	else
-		m_reel_pos[Reel]--;
-
-	if(m_reel_state[Reel] == REEL_STOPPING && m_reel_pos[Reel] % 20 == 0) // Stop once a symbol is reached
-	{
-		m_reel_timer[Reel]->adjust(attotime::never);
-		m_reel_state[Reel] = REEL_STOPPED;
+	if(state == 0)
 		m_samples->play(fruit_samples_device::SAMPLE_EM_REEL_1_STOP + Reel);
-	}
-	else m_reel_timer[Reel]->adjust(m_reel_speed);
-
-	m_reel_out[Reel] = m_reel_pos[Reel];
-	m_sreel_out[Reel] = (m_reel_pos[Reel] * 0x10000) / 400;
+	else if(state == 1)
+		m_samples->play(fruit_samples_device::SAMPLE_EM_REEL_1_START + Reel);
 }
 
 static INPUT_PORTS_START( mpu1_inputs )
@@ -377,24 +329,8 @@ INPUT_PORTS_END
 void mpu1_state::machine_start()
 {
 	m_lamps.resolve();
-	m_reel_out.resolve();
-	m_sreel_out.resolve();
 
-	save_item(NAME(m_reel_state));
-	save_item(NAME(m_reel_pos));
-	save_item(NAME(m_reel_speed));
-
-	m_reel_timer[0] = timer_alloc(FUNC(mpu1_state::reel_move<0>), this);
-	m_reel_timer[1] = timer_alloc(FUNC(mpu1_state::reel_move<1>), this);
-	m_reel_timer[2] = timer_alloc(FUNC(mpu1_state::reel_move<2>), this);
-	m_reel_timer[3] = timer_alloc(FUNC(mpu1_state::reel_move<3>), this);
 	m_change_pia2a_bit7_timer = timer_alloc(FUNC(mpu1_state::change_pia2a_bit7), this);
-
-	for(int i = 0; i < 4; i++)
-	{
-		m_reel_state[i] = REEL_STOPPED;
-		m_reel_pos[i] = 0;
-	}
 }
 
 void mpu1_state::machine_reset()
@@ -411,7 +347,8 @@ void mpu1_state::mpu1(machine_config &config)
 	                                        I've set a stable 1 MHz clock here, which is also the case on MPU2. */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu1_state::mpu1_map);
 
-	TIMER(config, "nmi").configure_periodic(FUNC(mpu1_state::nmi), attotime::from_hz(100)); // From AC zero crossing detector
+	TIMER(config, m_nmi_timer).configure_periodic(FUNC(mpu1_state::nmi), attotime::from_hz(100)); // From AC zero crossing detector
+	m_nmi_timer->set_start_delay(attotime::from_msec(1)); // Don't go to NMI at reset time
 
 	PIA6821(config, m_pia1, 0);
 	m_pia1->readpa_handler().set_ioport("IN");
@@ -435,12 +372,23 @@ void mpu1_state::mpu1(machine_config &config)
 	m_pia2->cb1_w(0);
 	m_pia2->cb2_handler().set(FUNC(mpu1_state::pia_lamp_w<10>));
 
-	m_reel_speed = attotime::from_usec(2000); // Seems close enough to footage of a real machine
+	for(int i = 0; i < 4; i++)
+	{
+		std::set<uint16_t> detents;
+		for(int i = 0; i < 20; i++)
+			detents.insert(i * STEPS_PER_SYMBOL);
+
+		EM_REEL(config, m_reels[i], 20 * STEPS_PER_SYMBOL, detents, attotime::from_double(0.8));
+	}
 
 	SPEAKER(config, "mono").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	FRUIT_SAMPLES(config, m_samples);
+	m_reels[0]->state_changed_callback().set(FUNC(mpu1_state::reel_sample_cb<0>));
+	m_reels[1]->state_changed_callback().set(FUNC(mpu1_state::reel_sample_cb<1>));
+	m_reels[2]->state_changed_callback().set(FUNC(mpu1_state::reel_sample_cb<2>));
+	m_reels[3]->state_changed_callback().set(FUNC(mpu1_state::reel_sample_cb<3>));
 }
 
 void mpu1_state::mpu1_lg(machine_config &config)
@@ -449,7 +397,8 @@ void mpu1_state::mpu1_lg(machine_config &config)
 
 	m_pia1->writepb_handler().set(FUNC(mpu1_state::pia1_portb_lg_w));
 
-	m_reel_speed = attotime::from_usec(2600); // Slower reels
+	for(int i = 0; i < 4; i++)
+		m_reels[i]->set_rotation_period(attotime::from_double(1.04)); // Slower reels
 }
 
 // Common mask ROM on most cartridges, also used by MPU2

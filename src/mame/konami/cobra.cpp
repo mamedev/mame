@@ -321,7 +321,7 @@
 #include "windy2.h"
 
 #include "bus/ata/ataintf.h"
-#include "bus/ata/idehd.h"
+#include "bus/ata/hdd.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/lpci.h"
 #include "machine/timekpr.h"

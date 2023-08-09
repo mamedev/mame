@@ -305,17 +305,17 @@ uint32_t coinmvga_state::screen_update_coinmvga(screen_device &screen, bitmap_rg
 
 	for (int y = 0; y < 64; y++)
 	{
-        const u16 y_offs = y * 128;
+		const u16 y_offs = y * 128;
 		for (int x = 0; x < 128; x++)
 		{
-            const u16 tile_offset = y_offs + x;
+			const u16 tile_offset = y_offs + x;
 
-            // background layer
+			// background layer
 			u16 tile = (m_vram[tile_offset] & 0xffff);
 			//int colour = tile>>12;
 			gfx_8bpp->opaque(bitmap, cliprect, tile, 0, 0, 0, x*8, y*8);
 
-            // foreground layer
+			// foreground layer
 			tile = (m_vram[tile_offset + (0x4000/2)] & 0xffff);
 			//int colour = tile>>12;
 			gfx_4bpp->transpen(bitmap, cliprect, tile, 0, 0, 0, x*8, y*8, 0);
@@ -657,7 +657,7 @@ void coinmvga_state::coinmvga(machine_config &config)
 {
 	// basic machine hardware
 	// could be either H8/3002 or H8/3007
-//	H83007(config, m_maincpu, CPU_CLOCK);
+//  H83007(config, m_maincpu, CPU_CLOCK);
 	h83002_device &maincpu(H83002(config, m_maincpu, CPU_CLOCK));
 	maincpu.set_addrmap(AS_PROGRAM, &coinmvga_state::coinmvga_map);
 	maincpu.read_port6().set(FUNC(coinmvga_state::i2c_r));

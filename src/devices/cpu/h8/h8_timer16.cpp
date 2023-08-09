@@ -6,7 +6,7 @@
 // Verbosity level
 // 0 = no messages
 // 1 = everything
-const int V = 0;
+static constexpr int V = 0;
 
 DEFINE_DEVICE_TYPE(H8_TIMER16,          h8_timer16_device,          "h8_timer16",          "H8 16-bit timer")
 DEFINE_DEVICE_TYPE(H8_TIMER16_CHANNEL,  h8_timer16_channel_device,  "h8_timer16_channel",  "H8 16-bit timer channel")

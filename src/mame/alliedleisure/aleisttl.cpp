@@ -41,12 +41,12 @@ namespace {
 #define V_TOTAL         (0x105+1)       // 262
 #define H_TOTAL         (0x1C6+1)       // 454
 
-#define HBSTART                 (H_TOTAL)
-#define HBEND                   (80)
-#define VBSTART                 (V_TOTAL)
-#define VBEND                   (16)
+#define HBSTART         (H_TOTAL)
+#define HBEND           (80)
+#define VBSTART         (V_TOTAL)
+#define VBEND           (16)
 
-#define HRES_MULT                   (1)
+#define HRES_MULT       (1)
 // end
 
 

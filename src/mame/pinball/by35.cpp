@@ -2241,6 +2241,18 @@ ROM_START(m_mpac)
 	ROM_LOAD("872-03_5.532", 0xb000, 0x1000, CRC(8fcdf853) SHA1(7c6bffcd974d2684e7f2c69d926f6cabb53e2f90))
 ROM_END
 
+ROM_START(m_mpacb)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD( "u2", 0x1000, 0x0800, CRC(a697971a) SHA1(e45cbb7822ac159c447877c4c837be5aaa4ac675))
+	ROM_CONTINUE( 0x5000, 0x0800)
+	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
+	ROM_CONTINUE( 0x5800, 0x0800)
+	ROM_RELOAD( 0x7000, 0x1000)
+	ROM_REGION(0x10000, "squawk_n_talk_ay:cpu", 0)
+	ROM_LOAD("872-01_4.532", 0xa000, 0x1000, CRC(d21ce16d) SHA1(3ee6e2629530e7e6e4d7eac713d34c48297a1047))
+	ROM_LOAD("872-03_5.532", 0xb000, 0x1000, CRC(8fcdf853) SHA1(7c6bffcd974d2684e7f2c69d926f6cabb53e2f90))
+ROM_END
+
 /*-----------------------------------------------------------
 / Grand Slam #1311
 /-----------------------------------------------------------*/
@@ -2895,7 +2907,8 @@ GAME( 1981, elektra,    0,        squawk_n_talk_ay, by35_os5x, by35_state, init_
 GAME( 1982, spectrm,    0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spectrum",                              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, spectrm4,   spectrm,  squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spectrum (ver 4)",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, rapidfip,   0,        squawk_n_talk,    by35,      by35_state, init_by35_7, ROT0, "Bally", "Rapid Fire",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, m_mpac,     0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Mr. and Mrs. PacMan",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, m_mpac,     0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Mr. and Mrs. PacMan (set 1)",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, m_mpacb,    m_mpac,   squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Mr. and Mrs. PacMan (set 2)",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, mysteria,   0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Mysterian (prototype)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // uses 2 sound boards
 
 // Cheap Squeak sound

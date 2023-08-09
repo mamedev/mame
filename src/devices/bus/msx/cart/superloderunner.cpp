@@ -3,15 +3,28 @@
 #include "emu.h"
 #include "superloderunner.h"
 
-DEFINE_DEVICE_TYPE(MSX_CART_SUPERLODERUNNER, msx_cart_superloderunner_device, "msx_cart_superloderunner", "MSX Cartridge - Super Lode Runner")
+namespace {
 
-
-msx_cart_superloderunner_device::msx_cart_superloderunner_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_SUPERLODERUNNER, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_rombank(*this, "rombank")
+class msx_cart_superloderunner_device : public device_t, public msx_cart_interface
 {
-}
+public:
+	msx_cart_superloderunner_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_SUPERLODERUNNER, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_rombank(*this, "rombank")
+	{ }
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device_t implementation
+	virtual void device_start() override;
+
+private:
+	void bank_w(u8 data);
+
+	memory_bank_creator m_rombank;
+};
 
 void msx_cart_superloderunner_device::device_start()
 {
@@ -44,3 +57,7 @@ void msx_cart_superloderunner_device::bank_w(u8 data)
 {
 	m_rombank->set_entry(data & 0x07);
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_SUPERLODERUNNER, msx_cart_interface, msx_cart_superloderunner_device, "msx_cart_superloderunner", "MSX Cartridge - Super Lode Runner")

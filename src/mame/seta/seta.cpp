@@ -9902,6 +9902,48 @@ ROM_START( daiohp2 ) /* Found on the same P0-072-2 PCB as the previous Daioh pro
 	ROM_LOAD( "fa-021.u116", 0x000a00, 0x117, CRC(e335cf2e) SHA1(35f6fa2fb2da1dc5b1fad93f44947f76d6ef35aa) )
 ROM_END
 
+ROM_START( daiohp3 ) // P0-072-2 PCB
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "prg0even.u3",    0x000000, 0x020000, CRC(a69bceaa) SHA1(45863eccf32cf2374769ad4517678eb74eaca590) )
+	ROM_LOAD16_BYTE( "prg0odd.u4",     0x000001, 0x020000, CRC(e3462ad8) SHA1(a5a1b0d79bc300a7bcc48fa39a750a0a060293ba) )
+	ROM_LOAD16_BYTE( "prg1even.u103",  0x100001, 0x040000, NO_DUMP ) // unfortunately this set misses one interleaved ROM
+	ROM_LOAD16_BYTE( "prg1odd.u102",   0x100001, 0x040000, CRC(1d6dbc45) SHA1(d626220cfbce5df0d83783c88443f3816a432434) )
+	ROM_LOAD16_BYTE( "data_even.u103", 0x100000, 0x040000, BAD_DUMP CRC(e07776ef) SHA1(5e75dd35fd8eae98182a9798a8b3eceb3e33b780) )  // so to make it show something load the ones from daiohp until there's a good dump for this set
+	ROM_LOAD16_BYTE( "data_odd.u102",  0x100001, 0x040000, BAD_DUMP CRC(b75b9a5c) SHA1(4c187105fe5253cc86862df1f3970fa45d4f7317) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD16_BYTE( "o_1.u140",  0x000000, 0x040000, CRC(8ff6c5a9) SHA1(a2d188d44c8671282bf53f7927e099a212c0ed51) )
+	ROM_LOAD16_BYTE( "o_0.u142",  0x000001, 0x040000, CRC(78f45582) SHA1(021e635ba365558d9bf37a3b33b4c42b63119f0c) )
+	ROM_LOAD16_BYTE( "o_5.u141",  0x080000, 0x040000, CRC(a00e2b63) SHA1(df5a6c4948a8a9f56d9d20b9e65755694f229718) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "o_4.u143",  0x080001, 0x040000, CRC(7f43b8b2) SHA1(665b8bebfa6bf6ed42986b2210dfb2c4cd06e3f1) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "o_3.u144",  0x100000, 0x040000, CRC(d33ca640) SHA1(3d278cb46f2eabd03851ee470adfae5313988a27) )
+	ROM_LOAD16_BYTE( "o_2.u146",  0x100001, 0x040000, CRC(77560a03) SHA1(f766b56a88d49e4b41c9ed3c68e5478991033b5b) )
+	ROM_LOAD16_BYTE( "o_7.u145",  0x180000, 0x040000, CRC(c16df1c5) SHA1(0babac313827168b3a78209e568b57ff45e34930) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "o_6.u147",  0x180001, 0x040000, CRC(06f1ccca) SHA1(eb79aea88ccefd461c2659094f6483d557237614) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
+	ROM_LOAD16_BYTE( "v1_0.u148", 0x000001, 0x080000, CRC(bec48d7a) SHA1(9fdcc8f461e48cb4244827bead980ad48acdfbd8) )
+	ROM_LOAD16_BYTE( "v1_1.u150", 0x000000, 0x080000, CRC(d5793a2f) SHA1(0623d51d405fde69622f1e15512fd8fc41209a59) )
+	ROM_LOAD16_BYTE( "v1_3.u149", 0x100001, 0x080000, CRC(0cef25da) SHA1(7f7447577093009efacff27659a0d8a95c29659a) )
+	ROM_LOAD16_BYTE( "v1_4.u151", 0x100000, 0x080000, CRC(59cd26bc) SHA1(36e9fc43fba2af1d16b7c246b34354e3b93fa0fe) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 )   /* Layer 2 */
+	ROM_LOAD16_BYTE( "v2_0.u164", 0x000001, 0x080000, CRC(7e46a10e) SHA1(a8576f7a140b065b88a0dab648f7b31c75fec006) )
+	ROM_LOAD16_BYTE( "v2_1.u166", 0x000000, 0x080000, CRC(9274123b) SHA1(b58e107a5bd222e454fd435d515e57cab52e6593) )
+	ROM_LOAD16_BYTE( "v2_3.u165", 0x100001, 0x080000, CRC(71dfe0f4) SHA1(fd76966fa447bc2882b0c7dc447fac92ec9c136b) )
+	ROM_LOAD16_BYTE( "v2_4.u167", 0x100000, 0x080000, CRC(49529f86) SHA1(b1953af8fbda87314fe95e893a43c064e0ad7121) )
+
+	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples, the last 3 ROMs were missing but since the first 5 match the dump above they may be the same, too */
+	ROM_LOAD( "s-0.u156",  0x000000, 0x020000, CRC(4d253547) SHA1(87cda11dc86bc121cb8fb0e574006c3627158f51) )
+	ROM_LOAD( "s-1.u157",  0x020000, 0x020000, CRC(79b56e22) SHA1(4b6c62e96dc1e8fb6dc0a76c505f9d805ef4684f) )
+	ROM_LOAD( "s-2.u158",  0x040000, 0x020000, CRC(bc8de02a) SHA1(503c2c9f9ce029701e6a5b134d9407ab06e28913) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "s-3.u159",  0x060000, 0x020000, CRC(939777fd) SHA1(3dd1b89a4f81f745c68037c568c885fe1403ed31) )
+	ROM_LOAD( "s-4.u160",  0x080000, 0x020000, CRC(7b97716d) SHA1(6693e81dc008317c6a985558624f5d5cf00785e9) )
+	ROM_LOAD( "snd5.u161", 0x0a0000, 0x020000, BAD_DUMP CRC(294e1cc9) SHA1(5faef5eb9f15c23686c2f66646c6f6724e7c611f) )
+	ROM_LOAD( "snd6.u162", 0x0c0000, 0x020000, BAD_DUMP CRC(ecab073b) SHA1(f991fb9d9d4ffe24b67b233850ef0727dc6329b6) )
+	ROM_LOAD( "snd7.u163", 0x0e0000, 0x020000, BAD_DUMP CRC(1b7ea768) SHA1(7dfa8cbcb839c76f3f9eefd6abbc2b424c3d970a) )
+ROM_END
+
 ROM_START( daiohc ) /* Found on a 93111A PCB - same PCB as War of Areo & J. J. Squawkers */
 	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "15.u3", 0x000000, 0x040000, CRC(14616abb) SHA1(1ff5331b0de60230baa4ced58bec6a954cb599d5) )
@@ -11236,6 +11278,7 @@ GAME( 1993, daioh,     0,        daioh,     daioh,     seta_state,     empty_ini
 GAME( 1993, daioha,    daioh,    daioh,     daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (earlier)", 0 )
 GAME( 1993, daiohp,    daioh,    daiohp,    daiohp,    seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (prototype)", 0 )
 GAME( 1993, daiohp2,   daioh,    daiohp,    daiohp2,   seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (prototype, earlier)", 0 )
+GAME( 1993, daiohp3,   daioh,    daiohp,    daiohp2,   seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (prototype, earliest)", MACHINE_NOT_WORKING ) // believed earlier as it doesn't have the intro, needs correct program ROMs
 GAME( 1993, daiohc,    daioh,    wrofaero,  daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (93111A PCB conversion)", 0 )
 
 GAME( 1993, jjsquawk,  0,        jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "Athena / Able",             "J. J. Squawkers", MACHINE_IMPERFECT_SOUND )

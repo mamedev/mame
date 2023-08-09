@@ -117,10 +117,8 @@ private:
 };
 
 
-// video
-
 /******************************************************
-          INITIALISATION AND CLEAN-UP
+    INITIALISATION
 ******************************************************/
 
 void volfied_state::video_start()
@@ -134,46 +132,7 @@ void volfied_state::video_start()
 
 
 /*******************************************************
-          READ AND WRITE HANDLERS
-*******************************************************/
-
-void volfied_state::video_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	mem_mask &= m_video_mask;
-
-	COMBINE_DATA(&m_video_ram[offset]);
-}
-
-void volfied_state::video_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_video_ctrl);
-}
-
-uint16_t volfied_state::video_ctrl_r()
-{
-	/* Could this be some kind of hardware collision detection? If bit 6 is
-	   set the game will check for collisions with the large enemy, whereas
-	   bit 5 does the same for small enemies. Bit 7 is also used although
-	   its purpose is unclear. This register is usually read during a VBI
-	   and stored in work RAM for later use. */
-
-	return 0x60;
-}
-
-void volfied_state::video_mask_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_video_mask);
-}
-
-void volfied_state::colpri_cb(uint32_t &sprite_colbank, uint32_t &pri_mask, uint16_t sprite_ctrl)
-{
-	sprite_colbank = 0x100 | ((sprite_ctrl & 0x3c) << 2);
-	pri_mask = 0; // sprites over everything
-}
-
-
-/*******************************************************
-                SCREEN REFRESH
+    SCREEN REFRESH
 *******************************************************/
 
 void volfied_state::refresh_pixel_layer(bitmap_ind16 &bitmap)
@@ -237,17 +196,74 @@ uint32_t volfied_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-// machine
+/*******************************************************
+    READ AND WRITE HANDLERS
+*******************************************************/
+
+void volfied_state::video_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	mem_mask &= m_video_mask;
+
+	COMBINE_DATA(&m_video_ram[offset]);
+}
+
+void volfied_state::video_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_video_ctrl);
+}
+
+uint16_t volfied_state::video_ctrl_r()
+{
+	/* Could this be some kind of hardware collision detection? If bit 6 is
+	   set the game will check for collisions with the large enemy, whereas
+	   bit 5 does the same for small enemies. Bit 7 is also used although
+	   its purpose is unclear. This register is usually read during a VBI
+	   and stored in work RAM for later use. */
+
+	return 0x60;
+}
+
+void volfied_state::video_mask_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_video_mask);
+}
+
+void volfied_state::colpri_cb(uint32_t &sprite_colbank, uint32_t &pri_mask, uint16_t sprite_ctrl)
+{
+	sprite_colbank = 0x100 | ((sprite_ctrl & 0x3c) << 2);
+	pri_mask = 0; // sprites over everything
+}
+
+void volfied_state::counters_w(uint8_t data)
+{
+	machine().bookkeeping().coin_lockout_w(1, data & 0x80);
+	machine().bookkeeping().coin_lockout_w(0, data & 0x40);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
+}
+
+INTERRUPT_GEN_MEMBER(volfied_state::interrupt)
+{
+	m_maincpu->set_input_line(4, HOLD_LINE);
+	m_cchip->ext_interrupt(ASSERT_LINE);
+	m_cchip_irq_clear->adjust(attotime::zero);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(volfied_state::cchip_irq_clear_cb)
+{
+	m_cchip->ext_interrupt(CLEAR_LINE);
+}
+
 
 /***********************************************************
-                MEMORY STRUCTURES
+    MEMORY STRUCTURES
 ***********************************************************/
 
 void volfied_state::main_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();     // program
-	map(0x080000, 0x0fffff).rom();     // tiles
-	map(0x100000, 0x103fff).ram();     // main
+	map(0x000000, 0x03ffff).rom(); // program
+	map(0x080000, 0x0fffff).rom(); // tiles
+	map(0x100000, 0x103fff).ram(); // main
 	map(0x200000, 0x203fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));
 	map(0x400000, 0x47ffff).ram().w(FUNC(volfied_state::video_ram_w)).share(m_video_ram);
 	map(0x500000, 0x503fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
@@ -267,12 +283,12 @@ void volfied_state::z80_map(address_map &map)
 	map(0x8800, 0x8800).w("ciu", FUNC(pc060ha_device::slave_port_w));
 	map(0x8801, 0x8801).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
 	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x9800, 0x9800).nopw();    // ?
+	map(0x9800, 0x9800).nopw(); // ?
 }
 
 
 /***********************************************************
-                INPUT PORTS
+    INPUT PORTS
 ***********************************************************/
 
 static INPUT_PORTS_START( volfied )
@@ -364,29 +380,8 @@ INPUT_PORTS_END
 
 
 /***********************************************************
-                MACHINE DRIVERS
+    MACHINE CONFIGS
 ***********************************************************/
-
-void volfied_state::counters_w(uint8_t data)
-{
-	machine().bookkeeping().coin_lockout_w(1, data & 0x80);
-	machine().bookkeeping().coin_lockout_w(0, data & 0x40);
-	machine().bookkeeping().coin_counter_w(1, data & 0x20);
-	machine().bookkeeping().coin_counter_w(0, data & 0x10);
-}
-
-INTERRUPT_GEN_MEMBER(volfied_state::interrupt)
-{
-	m_maincpu->set_input_line(4, HOLD_LINE);
-	m_cchip->ext_interrupt(ASSERT_LINE);
-	m_cchip_irq_clear->adjust(attotime::zero);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(volfied_state::cchip_irq_clear_cb)
-{
-	m_cchip->ext_interrupt(CLEAR_LINE);
-}
-
 
 void volfied_state::volfied(machine_config &config)
 {
@@ -396,11 +391,11 @@ void volfied_state::volfied(machine_config &config)
 	static constexpr XTAL SOUND_CPU_CLOCK = (32_MHz_XTAL / 8); // 4 MHz clock for Z80 sound CPU
 
 	// basic machine hardware
-	M68000(config, m_maincpu, CPU_CLOCK);   // 8MHz
+	M68000(config, m_maincpu, CPU_CLOCK); // 8MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &volfied_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(volfied_state::interrupt));
 
-	Z80(config, m_audiocpu, SOUND_CPU_CLOCK);   // 4MHz sound CPU, required to run the game
+	Z80(config, m_audiocpu, SOUND_CPU_CLOCK); // 4MHz sound CPU, required to run the game
 	m_audiocpu->set_addrmap(AS_PROGRAM, &volfied_state::z80_map);
 
 	TAITO_CCHIP(config, m_cchip, 20_MHz_XTAL / 2); // 20MHz OSC next to C-Chip
@@ -448,7 +443,7 @@ void volfied_state::volfied(machine_config &config)
 
 
 /***************************************************************************
-                    DRIVERS
+    ROM DEFINITIONS
 ***************************************************************************/
 
 ROM_START( volfied )
@@ -645,6 +640,10 @@ ROM_END
 
 } // anonymous namespace
 
+
+/***************************************************************************
+    DRIVERS
+***************************************************************************/
 
 GAME( 1989, volfied,   0,       volfied, volfied,  volfied_state, empty_init, ROT270, "Taito Corporation Japan",   "Volfied (World, revision 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, volfiedu,  volfied, volfied, volfiedu, volfied_state, empty_init, ROT270, "Taito America Corporation", "Volfied (US, revision 1)",    MACHINE_SUPPORTS_SAVE )

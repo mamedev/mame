@@ -64,8 +64,8 @@ private:
 
 	sound_stream *m_stream;
 
-	uint8_t m_chord; // 4-bit
-	uint8_t m_step; // 3-bit
+	uint8_t m_chord; // 3-bit
+	uint8_t m_step; // 4-bit
 	bool m_sb;
 };
 

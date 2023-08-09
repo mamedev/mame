@@ -496,8 +496,6 @@ if (BUSES["ATA"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/ata/atadev.cpp",
 		MAME_DIR .. "src/devices/bus/ata/atadev.h",
-		MAME_DIR .. "src/devices/bus/ata/atahle.cpp",
-		MAME_DIR .. "src/devices/bus/ata/atahle.h",
 		MAME_DIR .. "src/devices/bus/ata/ataintf.cpp",
 		MAME_DIR .. "src/devices/bus/ata/ataintf.h",
 		MAME_DIR .. "src/devices/bus/ata/atapicdr.cpp",
@@ -508,10 +506,10 @@ if (BUSES["ATA"]~=null) then
 		MAME_DIR .. "src/devices/bus/ata/cp2024.h",
 		MAME_DIR .. "src/devices/bus/ata/cr589.cpp",
 		MAME_DIR .. "src/devices/bus/ata/cr589.h",
+		MAME_DIR .. "src/devices/bus/ata/hdd.cpp",
+		MAME_DIR .. "src/devices/bus/ata/hdd.h",
 		MAME_DIR .. "src/devices/bus/ata/gdrom.cpp",
 		MAME_DIR .. "src/devices/bus/ata/gdrom.h",
-		MAME_DIR .. "src/devices/bus/ata/idehd.cpp",
-		MAME_DIR .. "src/devices/bus/ata/idehd.h",
 		MAME_DIR .. "src/devices/bus/ata/px320a.cpp",
 		MAME_DIR .. "src/devices/bus/ata/px320a.h",
 	}
@@ -1765,8 +1763,6 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/pds.h",
 		MAME_DIR .. "src/devices/bus/isa/pgc.cpp",
 		MAME_DIR .. "src/devices/bus/isa/pgc.h",
-		MAME_DIR .. "src/devices/bus/isa/s3virge.cpp",
-		MAME_DIR .. "src/devices/bus/isa/s3virge.h",
 		MAME_DIR .. "src/devices/bus/isa/sb16.cpp",
 		MAME_DIR .. "src/devices/bus/isa/sb16.h",
 		MAME_DIR .. "src/devices/bus/isa/sblaster.cpp",
@@ -1781,6 +1777,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/stereo_fx.h",
 		MAME_DIR .. "src/devices/bus/isa/svga_cirrus.cpp",
 		MAME_DIR .. "src/devices/bus/isa/svga_cirrus.h",
+		MAME_DIR .. "src/devices/bus/isa/svga_paradise.cpp",
+		MAME_DIR .. "src/devices/bus/isa/svga_paradise.h",
 		MAME_DIR .. "src/devices/bus/isa/svga_s3.cpp",
 		MAME_DIR .. "src/devices/bus/isa/svga_s3.h",
 		MAME_DIR .. "src/devices/bus/isa/svga_trident.cpp",
@@ -1955,6 +1953,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/msx/cart/loveplus.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/majutsushi.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/majutsushi.h",
+		MAME_DIR .. "src/devices/bus/msx/cart/matra.cpp",
+		MAME_DIR .. "src/devices/bus/msx/cart/matra.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/moonsound.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/moonsound.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/msx_audio.cpp",
@@ -2590,6 +2590,10 @@ if (BUSES["VIDBRAIN"]~=null) then
 		MAME_DIR .. "src/devices/bus/vidbrain/exp.h",
 		MAME_DIR .. "src/devices/bus/vidbrain/std.cpp",
 		MAME_DIR .. "src/devices/bus/vidbrain/std.h",
+		MAME_DIR .. "src/devices/bus/vidbrain/comp_language.cpp",
+		MAME_DIR .. "src/devices/bus/vidbrain/comp_language.h",
+		MAME_DIR .. "src/devices/bus/vidbrain/info_manager.cpp",
+		MAME_DIR .. "src/devices/bus/vidbrain/info_manager.h",
 		MAME_DIR .. "src/devices/bus/vidbrain/money_minder.cpp",
 		MAME_DIR .. "src/devices/bus/vidbrain/money_minder.h",
 		MAME_DIR .. "src/devices/bus/vidbrain/timeshare.cpp",
@@ -2637,6 +2641,8 @@ end
 
 if (BUSES["VME"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/vme/mvme187.cpp",
+		MAME_DIR .. "src/devices/bus/vme/mvme187.h",
 		MAME_DIR .. "src/devices/bus/vme/tp881v.cpp",
 		MAME_DIR .. "src/devices/bus/vme/tp881v.h",
 		MAME_DIR .. "src/devices/bus/vme/vme.cpp",
@@ -2869,6 +2875,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/mouse.h",
 		MAME_DIR .. "src/devices/bus/a2bus/nippelclock.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/nippelclock.h",
+		MAME_DIR .. "src/devices/bus/a2bus/noisemaker.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/noisemaker.h",
 		MAME_DIR .. "src/devices/bus/a2bus/pc_xporter.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/pc_xporter.h",
 		MAME_DIR .. "src/devices/bus/a2bus/prodosromdrive.cpp",
@@ -4604,6 +4612,8 @@ if (BUSES["ZXBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/spectrum/zxbus.h",
 		MAME_DIR .. "src/devices/bus/spectrum/neogs.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/neogs.h",
+		MAME_DIR .. "src/devices/bus/spectrum/smuc.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/smuc.h",
 	}
 end
 

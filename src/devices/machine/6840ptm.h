@@ -20,7 +20,7 @@
 
 // ======================> ptm6840_device
 
-class ptm6840_device :  public device_t
+class ptm6840_device : public device_t
 {
 public:
 	// construction/destruction

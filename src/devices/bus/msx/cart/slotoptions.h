@@ -6,6 +6,7 @@
 #pragma once
 
 namespace bus::msx::cart::slotoptions {
+
 extern char const *const ARC;
 extern char const *const ASCII8;
 extern char const *const ASCII8_SRAM;
@@ -51,8 +52,10 @@ extern char const *const KOREAN_25IN1;
 extern char const *const KOREAN_80IN1;
 extern char const *const KOREAN_90IN1;
 extern char const *const KOREAN_126IN1;
+extern char const *const KOREAN_HYDLIDE2;
 extern char const *const LOVEPLUS;
 extern char const *const MAJUSTUSHI;
+extern char const *const MATRA_COMP;
 extern char const *const MM256K;
 extern char const *const MM512K;
 extern char const *const MM768K;
@@ -81,6 +84,7 @@ extern char const *const SUPER_SWANGI;
 extern char const *const SUPERLODERUNNER;
 extern char const *const SYNTHESIZER;
 extern char const *const UCN01;
+
 } // namespace bus::msx::cart::slotoptions
 
 #endif // MAME_BUS_MSX_CART_SLOTOPTIONS_H

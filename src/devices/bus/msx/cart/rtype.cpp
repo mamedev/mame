@@ -3,15 +3,28 @@
 #include "emu.h"
 #include "rtype.h"
 
-DEFINE_DEVICE_TYPE(MSX_CART_RTYPE, msx_cart_rtype_device, "msx_cart_rtype", "MSX Cartridge - R-Type")
+namespace {
 
-
-msx_cart_rtype_device::msx_cart_rtype_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_RTYPE, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_rombank(*this, "rombank")
+class msx_cart_rtype_device : public device_t, public msx_cart_interface
 {
-}
+public:
+	msx_cart_rtype_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_RTYPE, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_rombank(*this, "rombank")
+	{ }
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device_t implementation
+	virtual void device_start() override { }
+
+private:
+	void bank_w(u8 data);
+
+	memory_bank_creator m_rombank;
+};
 
 std::error_condition msx_cart_rtype_device::initialize_cartridge(std::string &message)
 {
@@ -43,3 +56,7 @@ void msx_cart_rtype_device::bank_w(u8 data)
 		data &= 0x17;
 	m_rombank->set_entry(data);
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_RTYPE, msx_cart_interface, msx_cart_rtype_device, "msx_cart_rtype", "MSX Cartridge - R-Type")

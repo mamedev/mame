@@ -1711,7 +1711,6 @@ void tms5220_device::device_reset()
 	m_next_is_address = false;
 	m_addr_bit = 0;
 	m_CTL_buffer = 0;
-
 }
 
 TIMER_CALLBACK_MEMBER(tms5220_device::set_io_ready)
@@ -1828,7 +1827,7 @@ void tms5220_device::wsq_w(int state)
 				LOGMASKED(LOG_RS_WS, "tms5220_wsq_w: illegal\n");
 			return;
 		}
-		else if ( new_val == 3)
+		else if (new_val == 3)
 		{
 			/* high impedance */
 			m_read_latch = 0xff;

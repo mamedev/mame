@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    deco16.c
+    deco16.cpp
 
     6502, reverse-engineered DECO variant
 

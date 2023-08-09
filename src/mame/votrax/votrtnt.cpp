@@ -23,9 +23,6 @@
 *             A0 switches the ACIA between status/command, and data in/out.
 *
 *
-*  ToDo:
-*  - Votrax device needs considerable improvement in sound quality.
-*
 ******************************************************************************/
 
 /* Core includes */

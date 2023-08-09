@@ -45,11 +45,11 @@ license:CC0-1.0
 		<info name="usage" value="Create file for punch device. Press read in switch, then restart after loader halts at 7777."/>
 		<sharedfeat name="compatibility" value="8O"/>
 		<part name="ptp" interface="tx0_ptp">
-		    <!-- Original binary dump contained many errors which have been patched to match the listing. -->
+			<!-- Original binary dump contained many errors which have been patched to match the listing. -->
 			<feature name="blocks_used" value="20-175, 7742-7777 (loader), 17660-17777 (FLITloader)"/>
-    		<dataarea name="ptap" size="931">
+			<dataarea name="ptap" size="931">
 				<rom name="bin_flitLdrPunch.bin" size="931" crc="7888fb81" sha1="e1d79f13d21ba2b263c1d94e17c697c271f408c7" status="baddump"/>
-    		</dataarea>
+			</dataarea>
 		</part>
 	</software>
 

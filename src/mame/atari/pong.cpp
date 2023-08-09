@@ -36,6 +36,7 @@ Notes:
 TODO: Please see netlist include files
 TODO: Breakout Cocktail and Consolette are believed to use the Breakout PCB with different
       cabinet designs, this needs to be verified.
+TODO: Rebound is known to have an orange overlay.
 TODO: Coupe Davis is believed to use the Pong Doubles PCB, just a different cabinet design,
       this needs to be verified.
 TODO: Dr. Pong, Pong In-A-Barrel, Puppy Pong, Snoopy Pong, and Cocktail Pong are all

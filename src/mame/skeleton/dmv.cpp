@@ -837,10 +837,10 @@ void dmv_state::dmv(machine_config &config)
 	m_dmac->out_eop_callback().set(FUNC(dmv_state::dmac_eop));
 	m_dmac->in_memr_callback().set(FUNC(dmv_state::program_r));
 	m_dmac->out_memw_callback().set(FUNC(dmv_state::program_w));
-	m_dmac->in_ior_callback<0>().set_log("Read DMA CH1");
-	m_dmac->out_iow_callback<0>().set_log("Write DMA CH1");
-	m_dmac->in_ior_callback<1>().set_log("Read DMA CH2");
-	m_dmac->out_iow_callback<1>().set_log("Write DMA CH2");
+	m_dmac->in_ior_callback<0>().set([this] () { logerror("Read DMA CH1"); return u8(0); });
+	m_dmac->out_iow_callback<0>().set([this] (u8 data) { logerror("Write DMA CH1 %02X", data); });
+	m_dmac->in_ior_callback<1>().set([this] () { logerror("Read DMA CH2"); return u8(0); });
+	m_dmac->out_iow_callback<1>().set([this] (u8 data) { logerror("Write DMA CH2 %02X", data); });
 	m_dmac->in_ior_callback<2>().set(m_hgdc, FUNC(upd7220_device::dack_r));
 	m_dmac->out_iow_callback<2>().set(m_hgdc, FUNC(upd7220_device::dack_w));
 	m_dmac->in_ior_callback<3>().set(m_fdc, FUNC(i8272a_device::dma_r));

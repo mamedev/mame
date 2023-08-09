@@ -99,7 +99,6 @@ public:
 	void sound_int_write_line(int state);
 
 protected:
-
 	void init_video();
 	INTERRUPT_GEN_MEMBER(hd68k_irq_gen);
 	TIMER_CALLBACK_MEMBER(deferred_adsp_bank_switch);
@@ -267,7 +266,6 @@ protected:
 	void hdds3xdsp_timer_enable_callback(int state);
 	void hdds3xdsp_serial_tx_callback(uint32_t data);
 	uint32_t hdds3xdsp_serial_rx_callback();
-
 
 	void adsp_data_map(address_map &map);
 	void adsp_program_map(address_map &map);
@@ -579,6 +577,7 @@ private:
 	int hdsnddsp_get_bio();
 };
 
+
 /* Hard Drivin' */
 
 class harddriv_board_device_state :  public harddriv_state
@@ -592,6 +591,7 @@ protected:
 //  virtual void device_reset();
 };
 
+
 /* Hard Drivin' Compact */
 
 class harddrivc_board_device_state :  public harddriv_state
@@ -604,6 +604,7 @@ protected:
 	virtual void device_start() override;
 //  virtual void device_reset();
 };
+
 
 /* Race Drivin' */
 
@@ -628,6 +629,7 @@ public:
 protected:
 	virtual void device_start() override;
 };
+
 
 /* Race Drivin' Compact */
 
@@ -677,6 +679,7 @@ protected:
 //  virtual void device_reset();
 };
 
+
 /* Steel Talons */
 
 class steeltal_board_device_state :  public harddriv_state
@@ -711,7 +714,6 @@ protected:
 };
 
 
-
 /* Street Drivin' */
 
 class strtdriv_board_device_state :  public harddriv_state
@@ -724,6 +726,7 @@ protected:
 	virtual void device_start() override;
 //  virtual void device_reset();
 };
+
 
 /* Hard Drivin' Airbourne */
 

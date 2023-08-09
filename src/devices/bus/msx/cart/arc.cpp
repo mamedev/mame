@@ -3,16 +3,30 @@
 #include "emu.h"
 #include "arc.h"
 
+namespace {
 
-DEFINE_DEVICE_TYPE(MSX_CART_ARC, msx_cart_arc_device, "msx_cart_arc", "MSX Cartridge - Arc")
-
-
-msx_cart_arc_device::msx_cart_arc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_ARC, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_7f(0)
+class msx_cart_arc_device : public device_t, public msx_cart_interface
 {
-}
+public:
+	msx_cart_arc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_ARC, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_7f(0)
+	{ }
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device_t implementation
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	void io_7f_w(u8 data);
+	u8 io_7f_r();
+
+	u8 m_7f;
+};
 
 void msx_cart_arc_device::device_start()
 {
@@ -58,3 +72,7 @@ u8 msx_cart_arc_device::io_7f_r()
 {
 	return ((m_7f & 0x03) == 0x03) ? 0xda : 0xff;
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_ARC, msx_cart_interface, msx_cart_arc_device, "msx_cart_arc", "MSX Cartridge - Arc")

@@ -263,7 +263,7 @@ void mac_scsi_helper_device::write_wrapper(bool pseudo_dma, offs_t offset, u8 da
 			{
 				m_write_fifo_data = (m_write_fifo_data << 8) | data;
 				++m_write_fifo_bytes;
-				logerror("%s: CPU writing byte %02X into FIFO (%d/4 filled)\n", machine().describe_context(), data, m_write_fifo_bytes);
+				LOG("%s: CPU writing byte %02X into FIFO (%d/4 filled)\n", machine().describe_context(), data, m_write_fifo_bytes);
 				if (!m_pseudo_dma_timer->enabled())
 				{
 					m_pseudo_dma_timer->adjust(m_timeout);
