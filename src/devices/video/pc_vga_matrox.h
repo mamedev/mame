@@ -19,12 +19,17 @@ public:
 
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
+
+	// TODO: polarity
+	bool vsync_status() { return vga_vblank(); }
+
 protected:
 	virtual void io_3bx_3dx_map(address_map &map) override;
 
 	virtual void device_reset() override;
 
 	virtual uint16_t offset() override;
+	virtual void recompute_params() override;
 
 	void crtcext_map(address_map &map);
 	void ramdac_indexed_map(address_map &map);
@@ -36,12 +41,21 @@ private:
 	address_space_config m_ramdac_indexed_space_config;
 
 	// CRTC
+	u8 crtcext0_address_gen_r();
+	void crtcext0_address_gen_w(offs_t offset, u8 data);
+	u8 crtcext1_horizontal_counter_r();
+	void crtcext1_horizontal_counter_w(offs_t offset, u8 data);
+	u8 crtcext2_vertical_counter_r();
+	void crtcext2_vertical_counter_w(offs_t offset, u8 data);
 	u8 crtcext3_misc_r();
 	void crtcext3_misc_w(offs_t offset, u8 data);
 	u8 m_crtcext_index = 0;
 
 	u8 m_crtcext_misc = 0;
+	u8 m_crtcext_horz_counter = 0;
+	u8 m_crtcext_vert_counter = 0;
 	bool m_mgamode = false;
+	bool m_interlace_mode = false;
 
 	// RAMDAC
 	u8 ramdac_ext_indexed_r();

@@ -40,10 +40,12 @@ private:
 	address_space_config m_mgabase1_real_space_config;
 	u32 mga_index_r();
 	void mga_index_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	u8 mga_data_r(offs_t offset);
-	void mga_data_w(offs_t offset, u8 data);
-
+	u32 mga_data_r(offs_t offset, u32 mem_mask = ~0);
+	void mga_data_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 m_mgabase1_real_index = 0;
+
+	u32 status_r();
+	u32 fifo_status_r();
 };
 
 DECLARE_DEVICE_TYPE(MGA2064W, mga2064w_device);

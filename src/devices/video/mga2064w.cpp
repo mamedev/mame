@@ -22,7 +22,7 @@ mga2064w_device::mga2064w_device(const machine_config &mconfig, const char *tag,
 	, m_vga_rom(*this, "vga_rom")
 {
 	set_ids(0x102b0519, 0x01, 0x030000, 0x00000000);
-	m_mgabase1_real_space_config = address_space_config("mgabase1_regs", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(FUNC(mga2064w_device::mgabase1_map), this));
+	m_mgabase1_real_space_config = address_space_config("mgabase1_regs", ENDIANNESS_LITTLE, 32, 14, 0, address_map_constructor(FUNC(mga2064w_device::mgabase1_map), this));
 }
 
 ROM_START( mga2064w )
@@ -128,8 +128,8 @@ void mga2064w_device::mgabase1_map(address_map &map)
 //  map(0x1cc0, 0x1cff) DR0-DR15 (DR1-5-9-13 <reserved>)
 
 //  map(0x1e00, 0x1eff) HSTREG Host registers
-//  map(0x1e10, 0x1e13) FIFOSTATUS (r/o)
-//  map(0x1e14, 0x1e17) Status (r/o)
+	map(0x1e10, 0x1e13).r(FUNC(mga2064w_device::fifo_status_r));
+	map(0x1e14, 0x1e17).r(FUNC(mga2064w_device::status_r));
 //  map(0x1e18, 0x1e1b) ICLEAR
 //  map(0x1e1c, 0x1e1f) IEN
 //  map(0x1e20, 0x1e23) VCOUNT (r/o)
@@ -146,6 +146,32 @@ void mga2064w_device::mgabase2_map(address_map &map)
 	map(0x000000, 0x7fffff).rw(m_svga, FUNC(matrox_vga_device::mem_linear_r), FUNC(matrox_vga_device::mem_linear_w));
 }
 
+/*
+ * MGABASE1 + 1e10h FIFO Status (r/o)
+ *
+ * ---- -x-- ---- ---- BEMPTY Bus FIFO empty
+ * ---- --x- ---- ---- BFULL Bus FIFO full
+ * ---- ---- ---x xxxx FIFOCOUNT free locations in FIFO (max: 32)
+ */
+u32 mga2064w_device::fifo_status_r()
+{
+	return (1 << 9) | 32;
+}
+
+/*
+ * MGABASE1 + 1e14h Status (r/o)
+ *
+ * ---- ---- ---- ---x ---- ---- ---- ---- DWGENGSTS
+ * ---- ---- ---- ---- ---- ---- -x-- ---- EXTPEN
+ * ---- ---- ---- ---- ---- ---- --x- ---- VLINEPEN
+ * ---- ---- ---- ---- ---- ---- ---x ---- VSYNCPEN
+ * ---- ---- ---- ---- ---- ---- ---- x--- VSYNCSTS
+ * ---- ---- ---- ---- ---- ---- ---- -x-- PICKPEN
+ */
+u32 mga2064w_device::status_r()
+{
+	return m_svga->vsync_status() << 3;
+}
 
 // TODO: this should really be a subclass of VGA
 void mga2064w_device::legacy_memory_map(address_map &map)
@@ -153,7 +179,6 @@ void mga2064w_device::legacy_memory_map(address_map &map)
 	map(0xa0000, 0xbffff).rw(FUNC(mga2064w_device::vram_r), FUNC(mga2064w_device::vram_w));
 }
 
-// TODO: card may not even support MDA access
 void mga2064w_device::legacy_io_map(address_map &map)
 {
 	map(0, 0x02f).m(m_svga, FUNC(matrox_vga_device::io_map));
@@ -201,12 +226,12 @@ void mga2064w_device::mga_index_w(offs_t offset, u32 data, u32 mem_mask)
 	m_mgabase1_real_index &= 0x3ffc;
 }
 
-u8 mga2064w_device::mga_data_r(offs_t offset)
+u32 mga2064w_device::mga_data_r(offs_t offset, u32 mem_mask)
 {
-	return space(AS_IO).read_byte(offset + m_mgabase1_real_index);
+	return space(AS_IO).read_dword(m_mgabase1_real_index, mem_mask);
 }
 
-void mga2064w_device::mga_data_w(offs_t offset, u8 data)
+void mga2064w_device::mga_data_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	space(AS_IO).write_byte(offset + m_mgabase1_real_index, data);
+	space(AS_IO).write_dword(m_mgabase1_real_index, data, mem_mask);
 }

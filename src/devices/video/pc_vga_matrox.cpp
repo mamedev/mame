@@ -31,7 +31,9 @@ void matrox_vga_device::device_reset()
 
 	m_crtcext_index = 0;
 	m_crtcext_misc = 0;
+	m_crtcext_horz_counter = 0;
 	m_mgamode = false;
+	m_interlace_mode = false;
 	m_truecolor_ctrl = 0x80;
 	m_multiplex_ctrl = 0x98;
 }
@@ -60,11 +62,11 @@ void matrox_vga_device::io_3bx_3dx_map(address_map &map)
 // "CRTCEXT*"
 void matrox_vga_device::crtcext_map(address_map &map)
 {
-//  map(0x00, 0x00) Address Generator Extensions
-//  map(0x01, 0x01) Horizontal Counter Extensions
-//  map(0x02, 0x02) Vertical Counter Extensions
+	map(0x00, 0x00).rw(FUNC(matrox_vga_device::crtcext0_address_gen_r), FUNC(matrox_vga_device::crtcext0_address_gen_w));
+	map(0x01, 0x01).rw(FUNC(matrox_vga_device::crtcext1_horizontal_counter_r), FUNC(matrox_vga_device::crtcext1_horizontal_counter_w));
+	map(0x02, 0x02).rw(FUNC(matrox_vga_device::crtcext2_vertical_counter_r), FUNC(matrox_vga_device::crtcext2_vertical_counter_w));
 	map(0x03, 0x03).rw(FUNC(matrox_vga_device::crtcext3_misc_r), FUNC(matrox_vga_device::crtcext3_misc_w));
-//  CRTCEXT4 Memory Page register
+	// CRTCEXT4 Memory Page register
 	map(0x04, 0x04).lrw8(
 		NAME([this] (offs_t offset) { return svga.bank_w & 0x7f; }),
 		NAME([this] (offs_t offset, u8 data) { svga.bank_w = data & 0x7f; })
@@ -73,6 +75,87 @@ void matrox_vga_device::crtcext_map(address_map &map)
 //  map(0x06, 0x07) <Reserved>
 //  \- $07 is actually checked by VESA test (PC=0xc62bb in rev3),
 //     seems to disable SVGA drawing -> diagnostic check?
+}
+
+/*
+ * CRTCEXT0 Address Generator extensions
+ *
+ * x--- ---- Interlace mode
+ * --xx ---- Offset bits 9-8
+ * ---- xxxx Start Address bits 19-16
+ */
+u8 matrox_vga_device::crtcext0_address_gen_r()
+{
+	u8 res = ((vga.crtc.start_addr >> 16) & 0xf);
+	res   |= ((vga.crtc.offset >> 8) & 3) << 4;
+	res   |= (m_interlace_mode) << 7;
+	return res;
+}
+
+void matrox_vga_device::crtcext0_address_gen_w(offs_t offset, u8 data)
+{
+	m_interlace_mode = bool(BIT(data, 7));
+	vga.crtc.offset     = (vga.crtc.offset & 0xff)       | ((data & 0x30) << 4);
+	vga.crtc.start_addr = (vga.crtc.start_addr & 0xffff) | ((data & 0xf) << 16);
+	if (m_interlace_mode)
+		popmessage("MGA2064W: interlace mode enable");
+//  recompute_params();
+}
+
+/*
+ * CRTCEXT1 Horizontal Counter Extensions
+ *
+ * x--- ---- VRSTEN Vertical reset enable
+ * -x-- ---- HBLKEND Horizontal end blank bit 6 (MGA mode only)
+ * --x- ---- VSYNCOFF
+ * ---x ---- HSYNCOFF
+ * ---- x--- HRSTEN Horizontal reset enable
+ * ---- -x-- HSYNCSTR horizontal retrace start bit 8
+ * ---- --x- HBLKSTR horizontal blanking start bit 8
+ * ---- ---x HTOTAL bit 8
+ */
+u8 matrox_vga_device::crtcext1_horizontal_counter_r()
+{
+	return m_crtcext_horz_counter;
+}
+
+void matrox_vga_device::crtcext1_horizontal_counter_w(offs_t offset, u8 data)
+{
+	// TODO: honor CRTC protect enable
+	m_crtcext_horz_counter = data;
+	vga.crtc.horz_total         = (vga.crtc.horz_total & 0xff)         | (BIT(data, 0) << 8);
+	vga.crtc.horz_blank_start   = (vga.crtc.horz_blank_start & 0xff)   | (BIT(data, 1) << 8);
+	vga.crtc.horz_retrace_start = (vga.crtc.horz_retrace_start & 0xff) | (BIT(data, 2) << 8);
+	vga.crtc.horz_blank_end     = (vga.crtc.horz_blank_end & 0x3f)     | (BIT(data, 6) << 6);
+
+	logerror("MGA2064W: CRTCEXT1 reset enable %02x syncoff %02x\n",data & 0x88, data & 0x30);
+	recompute_params();
+}
+
+/*
+ * CRTCEXT1 Vertical Counter Extensions
+ *
+ * x--- ---- LINECOMP Line compare bit 10
+ * -xx- ---- VSYNCSTR Vertical retrace start bits 11-10
+ * ---x x--- VBLKSTR Vertical blank start bits 11-10
+ * ---- -x-- VDISPEND Vertical display end bit 10
+ * ---- --xx VTOTAL bits 11-10
+ */
+u8 matrox_vga_device::crtcext2_vertical_counter_r()
+{
+	return m_crtcext_vert_counter;
+}
+
+void matrox_vga_device::crtcext2_vertical_counter_w(offs_t offset, u8 data)
+{
+	// TODO: honor CRTC protect enable
+	m_crtcext_vert_counter = data;
+	vga.crtc.vert_total         = (vga.crtc.vert_total & 0x3ff)         | ((data & 3) << 10);
+	vga.crtc.vert_disp_end      = (vga.crtc.vert_disp_end & 0x3ff)      | (BIT(data, 2) << 10);
+	vga.crtc.vert_blank_start   = (vga.crtc.vert_blank_start & 0x3ff)   | ((data & 0x18) << (10-3));
+	vga.crtc.vert_retrace_start = (vga.crtc.vert_retrace_start & 0x3ff) | ((data & 0x60) << (10-5));
+	vga.crtc.line_compare       = (vga.crtc.line_compare & 0x3ff)       | (BIT(data, 7) << 10);
+	recompute_params();
 }
 
 /*
@@ -107,15 +190,19 @@ void matrox_vga_device::crtcext3_misc_w(offs_t offset, u8 data)
 	m_mgamode = bool(BIT(data, 7));
 }
 
-// RAMDAC
-// - paired with a Texas Instruments TVP3026 here -> a superset of INMOS IMSG176/IMSG178
-// - integrated with a superset in G400 at least
+/*
+ * RAMDAC
+ * - paired with a Texas Instruments TVP3026 here -> a superset of INMOS IMSG176/IMSG178
+ * - integrated and customized with supersets in the next iteration (Mystique MGA-1064SG) and onward
+ */
 void matrox_vga_device::ramdac_ext_map(address_map &map)
 {
-//  map(0x00, 0x00).rw(FUNC(matrox_vga_device::ramdac_write_index_r), FUNC(matrox_vga_device::ramdac_write_index_w));
-//  map(0x01, 0x01).rw(FUNC(matrox_vga_device::ramdac_data_r), FUNC(matrox_vga_device::ramdac_data_w));
-//  map(0x02, 0x02).rw(FUNC(matrox_vga_device::ramdac_mask_r), FUNC(matrox_vga_device::ramdac_mask_w));
-//  map(0x03, 0x03).rw(FUNC(matrox_vga_device::ramdac_read_index_r), FUNC(matrox_vga_device::ramdac_read_index_w));
+	map(0x00, 0x00).rw(FUNC(matrox_vga_device::ramdac_write_index_r), FUNC(matrox_vga_device::ramdac_write_index_w));
+	map(0x01, 0x01).rw(FUNC(matrox_vga_device::ramdac_data_r), FUNC(matrox_vga_device::ramdac_data_w));
+	map(0x02, 0x02).rw(FUNC(matrox_vga_device::ramdac_mask_r), FUNC(matrox_vga_device::ramdac_mask_w));
+	map(0x03, 0x03).lr8(
+		NAME([this] (offs_t offset) { return vga.dac.read_index; })
+	).w(FUNC(matrox_vga_device::ramdac_read_index_w));
 //  map(0x04, 0x04) Cursor/Overscan Color Write Index
 //  map(0x05, 0x05) Cursor/Overscan Color data
 //  map(0x07, 0x07) Cursor/Overscan Color Read Index
@@ -255,6 +342,8 @@ void matrox_vga_device::flush_true_color_mode()
 				popmessage("TVP3026: Unemulated RGB%c 4-4-4-4 mode", m_truecolor_ctrl & 0x40 ? "X" : "O");
 			break;
 	}
+
+	recompute_params();
 }
 
 uint8_t matrox_vga_device::mem_r(offs_t offset)
@@ -274,10 +363,29 @@ void matrox_vga_device::mem_w(offs_t offset, uint8_t data)
 	svga_device::mem_w(offset, data);
 }
 
+void matrox_vga_device::recompute_params()
+{
+	u8 xtal_select = (vga.miscellaneous_output & 0x0c) >> 2;
+	int xtal;
+
+	switch(xtal_select & 3)
+	{
+		case 0: xtal = XTAL(25'174'800).value(); break;
+		case 1: xtal = XTAL(28'636'363).value(); break;
+		// TODO: stub, derives from RAMDAC PLLs
+		case 2:
+		default:
+			xtal = XTAL(50'000'000).value();
+			break;
+	}
+
+	recompute_params_clock(1, xtal);
+}
+
 uint16_t matrox_vga_device::offset()
 {
 	// TODO: shifts depending on RAMDAC mode + CRTCEXT0 bits 5-4
 	if (svga.rgb16_en)
-		return (vga.crtc.offset << 5);
+		return (vga.crtc.offset << 4);
 	return svga_device::offset();
 }
