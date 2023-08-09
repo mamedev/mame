@@ -58,20 +58,20 @@ namespace {
 class h89_state : public driver_device
 {
 public:
-	h89_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_maincpu_region(*this, "maincpu")
-		, m_mem_view(*this, "rom_bank")
-		, m_ram(*this, RAM_TAG)
-		, m_floppy_ram(*this, "floppyram")
-		, m_tlb(*this, "tlb")
-		, m_h37(*this, "h37")
-		, m_intr_cntrl(*this, "intr_cntrl")
-		, m_console(*this, "console")
-		, m_serial1(*this, "serial1")
-		, m_serial2(*this, "serial2")
-		, m_serial3(*this, "serial3")
+	h89_state(const machine_config &mconfig, device_type type, const char *tag):
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_maincpu_region(*this, "maincpu"),
+		m_mem_view(*this, "rom_bank"),
+		m_ram(*this, RAM_TAG),
+		m_floppy_ram(*this, "floppyram"),
+		m_tlb(*this, "tlb"),
+		m_h37(*this, "h37"),
+		m_intr_cntrl(*this, "intr_cntrl"),
+		m_console(*this, "console"),
+		m_serial1(*this, "serial1"),
+		m_serial2(*this, "serial2"),
+		m_serial3(*this, "serial3")
 	{
 	}
 
@@ -305,6 +305,32 @@ static INPUT_PORTS_START( h89 )
 	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )  PORT_DIPLOCATION("SW501:8")
 	PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING( 0x80, "Auto" )
+
+	// Settings with the MMS 84-B
+//  PORT_START("MTR89_SW501")
+//  PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )  PORT_DIPLOCATION("S1:1,2")
+//  PORT_DIPSETTING( 0x00, "H-88-1" )
+//  PORT_DIPSETTING( 0x01, "H/Z-47 (Not yet implemented)" )
+//  PORT_DIPSETTING( 0x02, "MMS 77320 SASI or Z-67 (Not yet implemented)" )
+//  PORT_DIPSETTING( 0x03, "MMS 77422 Network Controller" )
+//  PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )  PORT_DIPLOCATION("S1:3,4")
+//  PORT_DIPSETTING( 0x00, "H-89-37" )
+//  PORT_DIPSETTING( 0x04, "H/Z-47 (Not yet implemented)" )
+//  PORT_DIPSETTING( 0x08, "MMS 77320 SASI or Z-67 (Not yet implemented)" )
+//  PORT_DIPSETTING( 0x0c, "MMS 77422 Network Controller" )
+//  PORT_DIPNAME( 0x70, 0x00, "Default Boot Device" )  PORT_DIPLOCATION("S1:5,6,7")
+//  PORT_DIPSETTING( 0x00, "MMS 77316 Dbl Den 5\"" )
+//  PORT_DIPSETTING( 0x10, "MMS 77316 Dbl Den 8\"" )
+//  PORT_DIPSETTING( 0x20, "Disk Device at 0x7C" )
+//  PORT_DIPSETTING( 0x30, "Disk Device at 0x78" )
+//  PORT_DIPSETTING( 0x40, "reserved for future use" )
+//  PORT_DIPSETTING( 0x50, "reserved for future use" )
+//  PORT_DIPSETTING( 0x60, "MMS Network (77422)" )
+//  PORT_DIPSETTING( 0x70, "Use MMS I/O board Config Port" )
+//  PORT_DIPNAME( 0x80, 0x00, "Boot mode" )  PORT_DIPLOCATION("S1:8")
+//  PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
+//  PORT_DIPSETTING( 0x80, "Auto" )
+
 INPUT_PORTS_END
 
 
@@ -316,8 +342,8 @@ void h89_state::machine_start()
 	save_item(NAME(m_floppy_ram_wp));
 
 	// update RAM mappings based on RAM size
-	u8 *m_ram_ptr = m_ram->pointer();
-	u32 ram_size = m_ram->size();
+	uint8_t *m_ram_ptr = m_ram->pointer();
+	uint32_t ram_size = m_ram->size();
 
 	if (ram_size == 0x10000)
 	{
@@ -335,7 +361,7 @@ void h89_state::machine_start()
 
 		// for views with ROM visible, the top of memory is 8k higher than
 		// the memory size, since the base starts at 8k.
-		u32 ram_top = ram_size + 0x1fff;
+		uint32_t ram_top = ram_size + 0x1fff;
 
 		m_mem_view[0].install_ram(0x2000, ram_top, m_ram_ptr);
 		m_mem_view[1].install_ram(0x2000, ram_top, m_ram_ptr);
@@ -478,22 +504,25 @@ ROM_START( h89 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("mtr90")
 
-	ROM_LOAD( "2716_444-19_h17.rom", 0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
+	ROM_LOAD( "2716_444-19_h17.u520", 0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
 
 	ROM_SYSTEM_BIOS(0, "mtr90", "MTR-90 (444-142)")
-	ROMX_LOAD("2732_444-142_mtr90.rom", 0x0000, 0x1000, CRC(c4ff47c5) SHA1(d6f3d71ff270a663003ec18a3ed1fa49f627123a), ROM_BIOS(0))
+	ROMX_LOAD("2732_444-142_mtr90.u518", 0x0000, 0x1000, CRC(c4ff47c5) SHA1(d6f3d71ff270a663003ec18a3ed1fa49f627123a), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "mtr88", "MTR-88 (444-40)")
-	ROMX_LOAD("2716_444-40_mtr88.bin", 0x0000, 0x0800, CRC(093afb79) SHA1(bcc1569ad9da7babf0a4199cab96d8cd59b2dd78), ROM_BIOS(1))
+	ROMX_LOAD("2716_444-40_mtr88.u518", 0x0000, 0x0800, CRC(093afb79) SHA1(bcc1569ad9da7babf0a4199cab96d8cd59b2dd78), ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS(2, "mtr89", "MTR-89 (444-62)")
-	ROMX_LOAD("2716_444-62_mtr89.bin", 0x0000, 0x0800, CRC(8f507972) SHA1(ac6c6c1344ee4e09fb60d53c85c9b761217fe9dc), ROM_BIOS(2))
+	ROMX_LOAD("2716_444-62_mtr89.u518", 0x0000, 0x0800, CRC(8f507972) SHA1(ac6c6c1344ee4e09fb60d53c85c9b761217fe9dc), ROM_BIOS(2))
 
-	ROM_SYSTEM_BIOS(3, "mms84a", "MMS 84a (not working)")
-	ROMX_LOAD("2732_mms84a_magnoliamms.bin", 0x0000, 0x1000, CRC(5563f42a) SHA1(1b74cafca8213d5c083f16d8a848933ab56eb43b), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(3, "mms84b", "MMS 84B")
+	ROMX_LOAD("2732_444_84b_mms.u518", 0x0000, 0x1000, CRC(7e75d6f4) SHA1(baf34e036388d1a191197e31f8a93209f04fc58b), ROM_BIOS(3))
 
-	ROM_SYSTEM_BIOS(4, "mtr90a", "MTR-90 (444-84 - not working)")
-	ROMX_LOAD("2732_444-84_mtr84.rom", 0x0000, 0x1000, CRC(c98e5f4c) SHA1(03347206dca145ff69ca08435db822b70ce106af), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(4, "mtr90-84", "Heath's MTR-90 (444-84 - Superseded by 444-142)")
+	ROMX_LOAD("2732_444-84_mtr90.u518", 0x0000, 0x1000, CRC(f10fca03) SHA1(c4a978153af0f2dfcc9ba05be4c1033d33fee30b), ROM_BIOS(4))
+
+	ROM_SYSTEM_BIOS(5, "mms84a", "MMS 84A (Superseded by MMS 84B)")
+	ROMX_LOAD("2732_444_84a_mms.u518", 0x0000, 0x1000, CRC(0e541a7e) SHA1(b1deb620fc89c1068e2e663e14be69d1f337a4b9), ROM_BIOS(5))
 ROM_END
 
 } // anonymous namespace
