@@ -23,15 +23,19 @@
    * Noraut Poker (NTX10A),                      1988,  Noraut Ltd.
    * Noraut Jacks Plus / Joker Poker (V3.010a),  2002,  Noraut Ltd.
    * Noraut Jacks Plus / Joker Poker (V3.011a),  2003,  Noraut Ltd.
-   * Noraut unknown set 1 (console),             198?,  Noraut Ltd.
-   * Noraut unknown set 2 (console),             198?,  Noraut Ltd.
+   * Noraut Joker Poker (console, set 1),        198?,  Noraut Ltd.
+   * Noraut Joker Poker (console, set 2),        198?,  Noraut Ltd.
    * Mainline Double Joker Poker,                198?,  Mainline London.
    * Double Joker Poker (45%-75% payout),        199?,  DellFern Ltd.
    * Royal on Ten (Noraut Deluxe hack),          2005,  Unknown.
    * Credit Poker (ver.30c, standard),           1999,  CGI.
+   * Credit Poker (ver.30b, 7 & 9 bonus),        1999,  CGI.
+   * Credit Poker (ver.23b, 7 & 9 bonus),        1998,  CGI.
+   * Double Joker Poker (CGI),                   19??,  CGI.
    * Kimble Double HI-LO (z80 version),          198?,  Kimble Ireland.
    * PMA Poker,                                  198?,  PMA.
    * Poker / Black Jack (Model 7521),            198?,  M. Kramer Manufacturing.
+   * New Hi-Low Poker,                           19??,  Song won?
    * Draw Poker (Joker Poker V.01),              1984,  Coinmaster.
 
   -- 8080 based --
@@ -41,15 +45,25 @@
    * Draw Poker HI-LO (Japanese),                198?,  Unknown.
    * Kimble Double HI-LO,                        198?,  Kimble Ireland.
    * GTI Poker,                                  1983,  GTI Inc.
+   * GTI Poker? (SMS hardware),                  1983,  GTI Inc.
    * HI-LO Double Up Joker Poker,                1983,  SMS Manufacturing Corp.
    * Drews Revenge (v.2.89, set 1),              1986,  Drews Inc.
    * Drews Revenge (v.2.89, set 2),              1986,  Drews Inc.
-   * Turbo Poker 2,                              1993,  Micro Manufacturing, Inc.
    * Southern Systems Joker Poker,               1982,  Southern Systems & Assembly, Ltd.
+
+  -- 8080 based with MCU --
+
+   * Turbo Poker 2,                              1993,  Micro Manufacturing, Inc.
+
+  -- unknown CPU based --
+
    * Fast Draw (poker conversion kit)?,          198?,  Stern Electronics?
    * Draw Poker HI-LO (unknown, rev 1),          198?,  SMS Manufacturing Corp?.
    * Draw Poker HI-LO (unknown, rev 2),          198?,  SMS Manufacturing Corp?.
+   * unknown poker game PKII/DM,                 198?,  Unknown.
 
+
+*******************************************************************************
 
   This hardware emulation opened a big can of worms. :)
 
