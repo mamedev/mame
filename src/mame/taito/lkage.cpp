@@ -1036,16 +1036,16 @@ void lkagem_state::lkagem(machine_config &config)
 	config.device_remove("ym1");
 	config.device_remove("ym2");
 
-	YM2149(config, m_ay[0], 2_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.15);
+	YM2149(config, m_ay[0], 8_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.20);
 	m_ay[0]->port_a_write_callback().set(FUNC(lkagem_state::ay_volume_w<0>));
 	m_ay[0]->port_b_write_callback().set_nop(); // also TA7630?
 
-	YM2149(config, m_ay[1], 2_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.15);
+	YM2149(config, m_ay[1], 8_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.20);
 	m_ay[1]->port_a_write_callback().set(FUNC(lkagem_state::ay_volume_w<1>));
 	m_ay[1]->port_b_write_callback().set_nop(); // also TA7630?
 
-	MSM5232(config, m_msm, 2_MHz_XTAL);
-	m_msm->set_capacitors(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6);
+	MSM5232(config, m_msm, 8_MHz_XTAL / 4);
+	m_msm->set_capacitors(1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6);
 	for (int i = 0; i < 8; i++)
 		m_msm->add_route(i, "mono", 1.00);
 
