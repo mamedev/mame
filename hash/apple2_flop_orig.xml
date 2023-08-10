@@ -30160,7 +30160,140 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="dungdoom">
+		<description>Dungeon of Doom</description>
+		<year>1980</year>
+		<publisher>Argon Games</publisher>
+		<info name="developer" value="Argon Games" />
+		<info name="programmer" value="Stephen G. Walburn and Robert J. McCredie" />
+		<info name="usage" value="Requires a 13-sector drive, integer basic, and runs on an Apple II." />
+		<sharedfeat name="compatibility" value="A2" />
+		<!--Dump released: 2023-02-26 by DefaultGen-->
+		<!--roleplaying game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234496">
+				<rom name="dungdoom.woz" size="234496" crc="4f5a7f61" sha1="4df3288877e8de350e8c7f54f41ef4507131b6a1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zenith">
+		<description>Zenith</description>
+		<year>1982</year>
+		<publisher>Gebelli Software</publisher>
+		<info name="programmer" value="Nasir Gebelli" />
+		<info name="usage" value="Runs on a 48K Apple ][, ][+, or unenhanced //e. Due to aggressive copy protection, it will not run on later systems." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
+		<!--Dump released: 2023-07-26-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="361742">
+				<rom name="zenith.woz" size="361742" crc="b6f71e0d" sha1="cbac6dbfcc85d407282ee18e8fb02ecc870feba2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceark">
+		<description>The Space Ark</description>
+		<year>1983</year>
+		<publisher>Datamost</publisher>
+		<info name="programmer" value="Bob Flanagan and Art Huff" />
+		<info name="usage" value="Runs on any Apple ][ with 48K." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-07-27-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 program" />
+			<dataarea name="flop" size="241466">
+				<rom name="the space ark disk 1 - program.woz" size="241466" crc="f06d0291" sha1="b6120380d14d27173829e8bf6f373fd4546a5a39" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 scenario" />
+			<dataarea name="flop" size="241467">
+				<rom name="the space ark disk 2 - scenario.woz" size="241467" crc="e71ac6a4" sha1="378102a4c172d168c05b50f290e073d7504b52ad" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavecr">
+		<description>Cavern Creatures</description>
+		<year>1983</year>
+		<publisher>Datamost</publisher>
+		<info name="programmer" value="Paul Lowrance and Art Huff" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-07-27-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234788">
+				<rom name="cavern creatures.woz" size="234788" crc="cfad20b4" sha1="29aca73d6cdd7403712e471027d8d680a51ffe01" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="argos">
+		<description>Argos</description>
+		<year>1983</year>
+		<publisher>Datamost</publisher>
+		<info name="programmer" value="Ron Lowrance" />
+		<info name="usage" value="Runs on any Apple ][ with 48K." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-07-27-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234768">
+				<rom name="argos.woz" size="234768" crc="f07fdc4c" sha1="221c3a3711e0ca4f20d56f45e78f1fe5ea0ea732" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cribsol">
+		<description>Cribbage/Solitaire</description>
+		<year>1982</year>
+		<publisher>Datamost</publisher>
+		<info name="programmer" value="Art Carpet" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-07-27-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241431">
+				<rom name="cribbage-solitaire.woz" size="241431" crc="91f3b311" sha1="32d7713d8d451398b685b507a3cf66d22011588b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cyclotron">
+		<description>Cyclotron</description>
+		<year>1982</year>
+		<publisher>Sensible Software</publisher>
+		<info name="programmer" value="Marv Long" />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced //e. Due to aggressive copy protection, it will not run on later systems." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
+		<!--Dump released: 2023-07-27-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174870">
+				<rom name="cyclotron.woz" size="174870" crc="bae28b68" sha1="2cded44e7647dc325b1a7fc6d39d130a823db676" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wingsshad">
+		<description>Wings Out of Shadow</description>
+		<year>1983</year>
+		<publisher>Berserker Works</publisher>
+		<info name="programmer" value="Scott V. Walker, Joan Saberhagen, Dennis L. Martinez, Mary Martinez, Michael L. Carpenter, Eddie Goldberger, and Bryan Bingham" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-07-27-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234892">
+				<rom name="wings out of shadow.woz" size="234892" crc="3dd30c72" sha1="22ac1989ce534d437c29e35f061b89b5a7f8266a" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
-
-
-
