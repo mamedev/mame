@@ -142,7 +142,7 @@ void sgi_ctl1_device::cpucfg_w(u16 data)
 
 		if ((data & CPUCFG_BAD) && !m_parity && m_memcfg.has_value())
 		{
-			unsigned const ram_size = ((m_memcfg.value() & MEMCFG_MEMSIZE) + 1) * (m_memcfg.value() & MEMCFG_4MRAM) ? 16 : 4;
+			unsigned const ram_size = ((m_memcfg.value() & MEMCFG_MEMSIZE) + 1) * ((m_memcfg.value() & MEMCFG_4MRAM) ? 16 : 4);
 
 			LOGMASKED(LOG_PARITY, "bad parity activated %dM\n", ram_size);
 
