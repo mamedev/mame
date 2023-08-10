@@ -3494,8 +3494,8 @@ z80_device::ops_type z80_device::nomreq_addr(s8 cycles)
 {
     auto steps = op_builder(*this).foo([]() {});
 	while(cycles--) {
-		steps->add([&]() { m_nomreq_cb(TADR, 0x00, 0xff); });
-		steps->add([&]() { T(1); });
+		steps = steps->add([&]() { m_nomreq_cb(TADR, 0x00, 0xff); })
+			->add([&]() { T(1); });
 	}
 	return steps->get_steps();
 }
