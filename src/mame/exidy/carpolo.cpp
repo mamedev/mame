@@ -323,7 +323,7 @@ ROM_START( carpolo )
 	ROM_LOAD( "1022.10u",  0x0200, 0x0100, CRC(00868768) SHA1(2388e428db300a1e0005cccb9165ec604518033d) )
 	ROM_LOAD( "1021.10t",  0x0300, 0x0100, CRC(a508af9c) SHA1(219ba776d8cccf6726519aff17e37f2a6a85d0d1) )
 
-	ROM_REGION( 0x0100, "gfx2", 0 ) // goal
+	ROM_REGION( 0x0100, "gfx2", ROMREGION_INVERT ) // goal
 	ROM_LOAD( "1020.6v",   0x0000, 0x0100, CRC(5e89fbcd) SHA1(6be171168924cd8aa94ff5e1994faecb6f303bd9) )
 
 	ROM_REGION( 0x0200, "gfx3", 0 ) // alpha
@@ -346,13 +346,4 @@ ROM_END
  *
  *************************************/
 
-void carpolo_state::init_carpolo()
-{
-	// invert gfx PROM since the bits are active LO
-	uint8_t *ROM = memregion("gfx2")->base();
-	size_t len = memregion("gfx2")->bytes();
-	for (size_t i = 0; i < len; i++)
-		ROM[i] ^= 0x0f;
-}
-
-GAME( 1977, carpolo, 0, carpolo, carpolo, carpolo_state, init_carpolo, ROT0, "Exidy", "Car Polo", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+GAME( 1977, carpolo, 0, carpolo, carpolo, carpolo_state, empty_init, ROT0, "Exidy", "Car Polo", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )

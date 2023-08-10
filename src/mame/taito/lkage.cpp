@@ -134,8 +134,6 @@ public:
 	void lkageb(machine_config &config);
 	void lkage(machine_config &config);
 
-	void init_bygone();
-
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -183,9 +181,7 @@ protected:
 	uint8_t m_bg_tile_bank = 0U;
 	uint8_t m_fg_tile_bank = 0U;
 	uint8_t m_tx_tile_bank = 0U;
-
-	uint8_t m_sprite_dx = 0U;
-	uint8_t m_sprite_offset = 0U;
+	int8_t m_sprite_dx[2] = { };
 
 	// lkageb fake MCU
 	uint8_t m_mcu_val = 0U;
@@ -207,9 +203,10 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
-	uint8_t exrom_data_r(offs_t offset);
+	uint8_t exrom_data_r();
 	void exrom_offset_w(offs_t offset, uint8_t data);
 	void msm_volume_w(uint8_t data);
 	template <uint8_t N> void ay_volume_w(uint8_t data);
@@ -244,14 +241,7 @@ void lkage_state::machine_start()
 void lkagem_state::machine_start()
 {
 	lkage_state::machine_start();
-
-	m_sprite_offset = 24;
 	save_item(NAME(m_exrom_offs));
-}
-
-void lkage_state::init_bygone()
-{
-	m_sprite_dx = 1;
 }
 
 void lkage_state::machine_reset()
@@ -353,11 +343,17 @@ void lkage_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 	m_tx_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap->set_scrolldx(-5, -5 + 24);
-	m_fg_tilemap->set_scrolldx(-3, -3 + 24);
+	m_bg_tilemap->set_scrolldx(-5, +3 + 24);
+	m_fg_tilemap->set_scrolldx(-3, +1 + 24);
 	m_tx_tilemap->set_scrolldx(-1, -1 + 24);
+	m_sprite_dx[0] = -14; m_sprite_dx[1] = -14;
 }
 
+void lkagem_state::video_start()
+{
+	lkage_state::video_start();
+	m_sprite_dx[0] = 8; m_sprite_dx[1] = -4;
+}
 
 void lkage_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -378,7 +374,7 @@ void lkage_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		int flipx = attributes & 0x01;
 		int flipy = attributes & 0x02;
 		int const height = (attributes & 0x08) ? 2 : 1;
-		int sx = source[0] - 15 + m_sprite_dx;
+		int sx = source[0] + m_sprite_dx[0];
 		int sy = 256 - (16 * height) - source[1];
 		int sprite_number = source[3] + ((attributes & 0x04) << 6);
 
@@ -386,12 +382,8 @@ void lkage_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 		if (flip_screen_x())
 		{
-			sx = 239 - sx - 24;
+			sx = 255 - source[0] + m_sprite_dx[1];
 			flipx = !flipx;
-		}
-		else
-		{
-			sx += m_sprite_offset;
 		}
 
 		if (flip_screen_y())
@@ -522,7 +514,7 @@ void lkage_state::program_map(address_map &map)
 	map(0xf083, 0xf083).portr("SYSTEM");
 	map(0xf084, 0xf084).portr("P1");
 	map(0xf086, 0xf086).portr("P2");
-	map(0xf0a0, 0xf0a3).ram(); // unknown
+	map(0xf0a2, 0xf0a3).ram(); // unknown
 	map(0xf0c0, 0xf0c5).ram().share(m_scroll);
 	map(0xf0e1, 0xf0e1).nopw(); // pulsed
 	map(0xf100, 0xf15f).writeonly().share(m_spriteram);
@@ -563,15 +555,9 @@ void lkage_state::sound_map(address_map &map)
     MSM5232 version handlers
 *******************************************************************************/
 
-uint8_t lkagem_state::exrom_data_r(offs_t offset)
+uint8_t lkagem_state::exrom_data_r()
 {
-	uint16_t const offs = ((m_exrom_offs[1] & 0x3f) << 8) + (m_exrom_offs[0] & 0xff);
-	uint8_t const data = m_exrom[offs];
-
-	if (offset != 0)
-		return 0xff;
-	else
-		return data;
+	return m_exrom[((m_exrom_offs[1] & 0x3f) << 8) | m_exrom_offs[0]];
 }
 
 void lkagem_state::exrom_offset_w(offs_t offset, uint8_t data)
@@ -599,8 +585,8 @@ void lkagem_state::ay_volume_w(uint8_t data)
 void lkagem_state::program_map(address_map &map)
 {
 	lkage_state::program_map(map);
-	map(0xf0a0, 0xf0a1).r(FUNC(lkagem_state::exrom_data_r)).w(FUNC(lkagem_state::exrom_offset_w)); // extend ROM read
-	map(0xf0a2, 0xf0a3).noprw(); // unknown
+	map(0xf0a0, 0xf0a0).r(FUNC(lkagem_state::exrom_data_r));
+	map(0xf0a0, 0xf0a1).w(FUNC(lkagem_state::exrom_offset_w));
 	map(0xf0e0, 0xf0e0).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
 	map(0xf0e1, 0xf0e1).r(FUNC(lkagem_state::mcu_status_r));
 	map(0xf140, 0xf15f).unmapw();
@@ -1377,7 +1363,7 @@ ROM_START( bygone )
 	ROM_LOAD( "a53_04.ic87", 0xc000, 0x4000, CRC(65af72d3) SHA1(759a1dd7548075630ddb9c692bdb32ad4712c579) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "a54-10.ic2",    0x0000, 0x0400, CRC(369722d9) SHA1(2df9932ad8ce87c0a9d2c89222a4cec12c29046d) ) // unknown
+	ROM_LOAD( "a54-10.ic2",  0x0000, 0x0400, CRC(369722d9) SHA1(2df9932ad8ce87c0a9d2c89222a4cec12c29046d) ) // unknown
 ROM_END
 
 } // anonymous namespace
@@ -1388,14 +1374,14 @@ ROM_END
     Game drivers
 *******************************************************************************/
 
-//    YEAR  NAME     PARENT MACHINE  INPUT   CLASS         INIT         SCREEN COMPANY              FULLNAME                              FLAGS
-GAME( 1984, lkage,   0,     lkage,   lkage,  lkage_state,  empty_init,  ROT0,  "Taito Corporation", "The Legend of Kage",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageo,  lkage, lkage,   lkage,  lkage_state,  empty_init,  ROT0,  "Taito Corporation", "The Legend of Kage (older)",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageo2, lkage, lkage,   lkage,  lkage_state,  empty_init,  ROT0,  "Taito Corporation", "The Legend of Kage (oldest)",        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkagem,  lkage, lkagem,  lkage,  lkagem_state, empty_init,  ROT0,  "Taito Corporation", "The Legend of Kage (MSM5232 sound)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb,  lkage, lkageb,  lkageb, lkage_state,  empty_init,  ROT0,  "bootleg",           "The Legend of Kage (bootleg set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb2, lkage, lkageb,  lkageb, lkage_state,  empty_init,  ROT0,  "bootleg",           "The Legend of Kage (bootleg set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb3, lkage, lkageb,  lkageb, lkage_state,  empty_init,  ROT0,  "bootleg",           "The Legend of Kage (bootleg set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb4, lkage, lkageb,  lkageb, lkage_state,  empty_init,  ROT0,  "bootleg",           "The Legend of Kage (bootleg set 4)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT MACHINE  INPUT   CLASS         INIT        SCREEN COMPANY              FULLNAME                              FLAGS
+GAME( 1984, lkage,   0,     lkage,   lkage,  lkage_state,  empty_init, ROT0,  "Taito Corporation", "The Legend of Kage",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageo,  lkage, lkage,   lkage,  lkage_state,  empty_init, ROT0,  "Taito Corporation", "The Legend of Kage (older)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageo2, lkage, lkage,   lkage,  lkage_state,  empty_init, ROT0,  "Taito Corporation", "The Legend of Kage (oldest)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkagem,  lkage, lkagem,  lkage,  lkagem_state, empty_init, ROT0,  "Taito Corporation", "The Legend of Kage (MSM5232 sound)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb,  lkage, lkageb,  lkageb, lkage_state,  empty_init, ROT0,  "bootleg",           "The Legend of Kage (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb2, lkage, lkageb,  lkageb, lkage_state,  empty_init, ROT0,  "bootleg",           "The Legend of Kage (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb3, lkage, lkageb,  lkageb, lkage_state,  empty_init, ROT0,  "bootleg",           "The Legend of Kage (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb4, lkage, lkageb,  lkageb, lkage_state,  empty_init, ROT0,  "bootleg",           "The Legend of Kage (bootleg set 4)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, bygone,  0,     lkage,   bygone, lkage_state,  init_bygone, ROT0,  "Taito Corporation", "Bygone (prototype)",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, bygone,  0,     lkage,   bygone, lkage_state,  empty_init, ROT0,  "Taito Corporation", "Bygone (prototype)",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
