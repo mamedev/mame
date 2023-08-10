@@ -347,12 +347,12 @@ static const u8 cc_ex[0x100] = {
 /***************************************************************
  * define an opcode builder helpers
  ***************************************************************/
-#define DEF(name) z80_device::ops_type z80_device::name { return op_builder(*this).foo([&]() {
+#define DEF(name) z80_device::ops_type z80_device::name { return op_builder(*this).foo([]() {
 #define CALL })->call([&]() -> ops_type { return
 #define THEN })->add([&]() {
 #define IF(cond) })->do_if([&]() -> bool { return cond;
-#define ELSE })->do_else()->foo([&]() {
-#define ENDIF })->edo()->foo([&]() {
+#define ELSE })->do_else()->foo([]() {
+#define ENDIF })->edo()->foo([]() {
 #define ENDDEF })->get_steps(); }
 
 /***************************************************************
@@ -1584,7 +1584,7 @@ inline void z80_device::illegal_2()
 
 void z80_device::init_op_steps() {
 
-#define OP(prefix,opcode) m_op_steps[prefix][0x##opcode] = op_builder(*this).foo([&]() {
+#define OP(prefix,opcode) m_op_steps[prefix][0x##opcode] = op_builder(*this).foo([]() {
 #define THENJP(p_to) })->add([&]() { m_cycle=~0; m_prefix=p_to; m_opcode=TDAT8; calculate_icount(); })->get_steps();
 #define JP(op) })->jump(0x##op);
 #define JPP(p_to,op_to) })->jump(p_to, 0x##op_to);
@@ -3492,7 +3492,7 @@ ENDDEF
 
 z80_device::ops_type z80_device::nomreq_addr(s8 cycles)
 {
-    auto steps = op_builder(*this).foo([&]() {});
+    auto steps = op_builder(*this).foo([]() {});
 	while(cycles--) {
 		steps->add([&]() { m_nomreq_cb(TADR, 0x00, 0xff); });
 		steps->add([&]() { T(1); });
