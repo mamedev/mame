@@ -239,35 +239,35 @@ void matrox_vga_device::ramdac_indexed_map(address_map &map)
 	map(0x01, 0x01).lr8(
 		NAME([] (offs_t offset) { return 0x00; })
 	);
-//	map(0x06, 0x06) CCR indirect cursor control
-//	map(0x0f, 0x0f) LCR latch control
+//  map(0x06, 0x06) CCR indirect cursor control
+//  map(0x0f, 0x0f) LCR latch control
 
 	map(0x18, 0x18).rw(FUNC(matrox_vga_device::truecolor_ctrl_r), FUNC(matrox_vga_device::truecolor_ctrl_w));
 	map(0x19, 0x19).rw(FUNC(matrox_vga_device::multiplex_ctrl_r), FUNC(matrox_vga_device::multiplex_ctrl_w));
-//	map(0x1a, 0x1a) CSR clock selection
-//	map(0x1c, 0x1c) palette page
-//	map(0x1d, 0x1d) GCR general control
-//	map(0x1e, 0x1e) MSC misc control
+//  map(0x1a, 0x1a) CSR clock selection
+//  map(0x1c, 0x1c) palette page
+//  map(0x1d, 0x1d) GCR general control
+//  map(0x1e, 0x1e) MSC misc control
 
-//	map(0x2a, 0x2a) IOC GPIO control (bits 4-0, 1 = data bit as output, 0 = data bit as input)
-//	map(0x2b, 0x2b) GPIO data (bits 4-0)
-//	map(0x2d, 0x2d) pixel clock PLL
-//	map(0x2e, 0x2e) memory clock PLL
-//	map(0x2f, 0x2f) loop clock PLL
-//	map(0x30, 0x31) color key overlay
-//	map(0x32, 0x37) color key r/g/b
-//	map(0x38, 0x38) CKC color key control
-//	map(0x39, 0x39) MKC MCLK & loop clock control
-//	map(0x3a, 0x3a) sense test
-//	map(0x3b, 0x3b) Test mode data (r/o)
-//	map(0x3c, 0x3d) CRC signal test (r/o)
-//	map(0x3e, 0x3e) BSR CRC bit select
+//  map(0x2a, 0x2a) IOC GPIO control (bits 4-0, 1 = data bit as output, 0 = data bit as input)
+//  map(0x2b, 0x2b) GPIO data (bits 4-0)
+//  map(0x2d, 0x2d) pixel clock PLL
+//  map(0x2e, 0x2e) memory clock PLL
+//  map(0x2f, 0x2f) loop clock PLL
+//  map(0x30, 0x31) color key overlay
+//  map(0x32, 0x37) color key r/g/b
+//  map(0x38, 0x38) CKC color key control
+//  map(0x39, 0x39) MKC MCLK & loop clock control
+//  map(0x3a, 0x3a) sense test
+//  map(0x3b, 0x3b) Test mode data (r/o)
+//  map(0x3c, 0x3d) CRC signal test (r/o)
+//  map(0x3e, 0x3e) BSR CRC bit select
 	// chip ID
 	map(0x3f, 0x3f).lr8(
 		NAME([] (offs_t offset) { return 0x26; })
 	);
 
-//	map(0xff, 0xff) software reset (w/o)
+//  map(0xff, 0xff) software reset (w/o)
 }
 
 u8 matrox_vga_device::truecolor_ctrl_r()
@@ -433,8 +433,13 @@ uint16_t matrox_vga_device::offset()
 uint32_t matrox_vga_device::start_addr()
 {
 	// TODO: fails VBEtest scrolling tests
-//	if (m_mgamode)
-//		return (vga.crtc.start_addr << 4);
+//  if (m_mgamode)
+//      return (vga.crtc.start_addr << 4);
 
 	return svga_device::start_addr();
+}
+
+u16 matrox_vga_device::line_compare_mask()
+{
+	return m_mgamode ? 0x7ff : 0x3ff;
 }

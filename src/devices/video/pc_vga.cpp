@@ -1336,7 +1336,6 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int addrmask = vga.crtc.no_wrap ? -1 : 0xffff;
 
 	/* line compare is screen sensitive */
-	// FIXME: some clients extends line compare with bit 10
 	uint16_t mask_comp = 0x3ff; //| (LINES & 0x300);
 
 //  popmessage("%02x %02x",vga.attribute.pel_shift,vga.sequencer.data[4] & 0x08);
@@ -1803,13 +1802,16 @@ void svga_device::device_start()
 	save_item(NAME(svga.id));
 }
 
+u16 svga_device::line_compare_mask()
+{
+	return 0x3ff;
+}
+
 void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
 
-	/* line compare is screen sensitive */
-	// FIXME: some clients extends line compare with bit 10
-	uint16_t mask_comp = 0x3ff;
+	uint16_t mask_comp = line_compare_mask();
 	int curr_addr = 0;
 //  uint16_t line_length;
 //  if(vga.crtc.dw)

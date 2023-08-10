@@ -82,6 +82,12 @@ void s3_vga_device::device_reset()
 	s3.sr11 = 0x41;
 }
 
+u16 s3_vga_device::line_compare_mask()
+{
+	// TODO: pinpoint condition
+	return svga.rgb8_en ? 0x7ff : 0x3ff;
+}
+
 uint16_t s3_vga_device::offset()
 {
 	//popmessage("Offset: %04x  %s %s %s",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD",(s3.memory_config & 0x08)?"31":"--");

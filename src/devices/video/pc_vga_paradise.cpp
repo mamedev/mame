@@ -679,6 +679,11 @@ void wd90c30_vga_device::vert_timing_overflow_w(offs_t offset, u8 data)
 	recompute_params();
 }
 
+u16 wd90c30_vga_device::line_compare_mask()
+{
+	return svga.rgb8_en ? 0x7ff : 0x3ff;
+}
+
 /**************************************
  *
  * Western Digital WD90C31

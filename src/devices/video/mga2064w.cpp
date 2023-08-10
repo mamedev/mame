@@ -132,7 +132,7 @@ void mga2064w_device::mgabase1_map(address_map &map)
 	map(0x1e14, 0x1e17).r(FUNC(mga2064w_device::status_r));
 //  map(0x1e18, 0x1e1b) ICLEAR
 //  map(0x1e1c, 0x1e1f) IEN
-//  map(0x1e20, 0x1e23) VCOUNT (r/o)
+	map(0x1e20, 0x1e23).r(m_svga, FUNC(matrox_vga_device::vcount_r));
 //  map(0x1e40, 0x1e43) Reset
 //  map(0x1e54, 0x1e57) OPMODE
 //  map(0x1f00, 0x1fff) VGA CRTC linear I/O

@@ -20,8 +20,9 @@ public:
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
 
-	// TODO: polarity
+	// TODO: polarity select
 	bool vsync_status() { return vga_vblank(); }
+	u32 vcount_r() { return screen().vpos() & 0xfff; }
 
 protected:
 	virtual void io_3bx_3dx_map(address_map &map) override;
@@ -37,6 +38,7 @@ protected:
 	void flush_true_color_mode();
 private:
 	virtual space_config_vector memory_space_config() const override;
+	virtual u16 line_compare_mask() override;
 
 	address_space_config m_crtcext_space_config;
 	address_space_config m_ramdac_indexed_space_config;
