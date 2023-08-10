@@ -29,6 +29,7 @@ protected:
 	virtual void device_reset() override;
 
 	virtual uint16_t offset() override;
+	virtual uint32_t start_addr() override;
 	virtual void recompute_params() override;
 
 	void crtcext_map(address_map &map);
@@ -54,6 +55,7 @@ private:
 	u8 m_crtcext_misc = 0;
 	u8 m_crtcext_horz_counter = 0;
 	u8 m_crtcext_vert_counter = 0;
+	u8 m_crtcext_horz_half_count = 0;
 	bool m_mgamode = false;
 	bool m_interlace_mode = false;
 

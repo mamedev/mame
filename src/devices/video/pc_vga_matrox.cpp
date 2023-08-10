@@ -32,6 +32,8 @@ void matrox_vga_device::device_reset()
 	m_crtcext_index = 0;
 	m_crtcext_misc = 0;
 	m_crtcext_horz_counter = 0;
+	m_crtcext_horz_half_count = 0;
+
 	m_mgamode = false;
 	m_interlace_mode = false;
 	m_truecolor_ctrl = 0x80;
@@ -71,7 +73,11 @@ void matrox_vga_device::crtcext_map(address_map &map)
 		NAME([this] (offs_t offset) { return svga.bank_w & 0x7f; }),
 		NAME([this] (offs_t offset, u8 data) { svga.bank_w = data & 0x7f; })
 	);
-//  map(0x05, 0x05) Horizontal Video Half Count
+	// CRTCEXT5 Horizontal Video Half Count
+	map(0x05, 0x05).lrw8(
+		NAME([this] (offs_t offset) { return m_crtcext_horz_half_count; }),
+		NAME([this] (offs_t offset, u8 data) { m_crtcext_horz_half_count = data; })
+	);
 //  map(0x06, 0x07) <Reserved>
 //  \- $07 is actually checked by VESA test (PC=0xc62bb in rev3),
 //     seems to disable SVGA drawing -> diagnostic check?
@@ -229,8 +235,39 @@ void matrox_vga_device::ramdac_ext_indexed_w(offs_t offset, u8 data)
 
 void matrox_vga_device::ramdac_indexed_map(address_map &map)
 {
+	// silicon revision
+	map(0x01, 0x01).lr8(
+		NAME([] (offs_t offset) { return 0x00; })
+	);
+//	map(0x06, 0x06) CCR indirect cursor control
+//	map(0x0f, 0x0f) LCR latch control
+
 	map(0x18, 0x18).rw(FUNC(matrox_vga_device::truecolor_ctrl_r), FUNC(matrox_vga_device::truecolor_ctrl_w));
 	map(0x19, 0x19).rw(FUNC(matrox_vga_device::multiplex_ctrl_r), FUNC(matrox_vga_device::multiplex_ctrl_w));
+//	map(0x1a, 0x1a) CSR clock selection
+//	map(0x1c, 0x1c) palette page
+//	map(0x1d, 0x1d) GCR general control
+//	map(0x1e, 0x1e) MSC misc control
+
+//	map(0x2a, 0x2a) IOC GPIO control (bits 4-0, 1 = data bit as output, 0 = data bit as input)
+//	map(0x2b, 0x2b) GPIO data (bits 4-0)
+//	map(0x2d, 0x2d) pixel clock PLL
+//	map(0x2e, 0x2e) memory clock PLL
+//	map(0x2f, 0x2f) loop clock PLL
+//	map(0x30, 0x31) color key overlay
+//	map(0x32, 0x37) color key r/g/b
+//	map(0x38, 0x38) CKC color key control
+//	map(0x39, 0x39) MKC MCLK & loop clock control
+//	map(0x3a, 0x3a) sense test
+//	map(0x3b, 0x3b) Test mode data (r/o)
+//	map(0x3c, 0x3d) CRC signal test (r/o)
+//	map(0x3e, 0x3e) BSR CRC bit select
+	// chip ID
+	map(0x3f, 0x3f).lr8(
+		NAME([] (offs_t offset) { return 0x26; })
+	);
+
+//	map(0xff, 0xff) software reset (w/o)
 }
 
 u8 matrox_vga_device::truecolor_ctrl_r()
@@ -323,12 +360,13 @@ void matrox_vga_device::flush_true_color_mode()
 			break;
 		case 0x04:
 		case 0x44:
-			// 0x04 is selected by VESA 2.4 test, which may be buggy?
+			// 0x04 is selected by VESA 2.4 test for rgb16 mode,
+			// assume program misuse of the mode given that SDD vbetest really expects rgb15 here.
 			// (extended mode 110h, while above uses 111h)
 			if (m_multiplex_ctrl >= 0x52 && m_multiplex_ctrl <= 0x54)
 			{
 				logerror("\tTarga %cRGB 1-5-5-5 mode\n", m_truecolor_ctrl & 0x40 ? "X" : "O");
-				svga.rgb16_en = 1;
+				svga.rgb15_en = 1;
 			}
 			break;
 		case 0x03:
@@ -372,7 +410,7 @@ void matrox_vga_device::recompute_params()
 	{
 		case 0: xtal = XTAL(25'174'800).value(); break;
 		case 1: xtal = XTAL(28'636'363).value(); break;
-		// TODO: stub, derives from RAMDAC PLLs
+		// TODO: stub, derives from RAMDAC PLLs (MGA2064W has usual rates of 220 MHz)
 		case 2:
 		default:
 			xtal = XTAL(50'000'000).value();
@@ -384,8 +422,19 @@ void matrox_vga_device::recompute_params()
 
 uint16_t matrox_vga_device::offset()
 {
-	// TODO: shifts depending on RAMDAC mode + CRTCEXT0 bits 5-4
-	if (svga.rgb16_en)
+	// SuperVGA modes expects a fixed offset multiplier of x16
+	// TODO: is multiplex ratio taken into account here?
+	if (m_mgamode)
 		return (vga.crtc.offset << 4);
+
 	return svga_device::offset();
+}
+
+uint32_t matrox_vga_device::start_addr()
+{
+	// TODO: fails VBEtest scrolling tests
+//	if (m_mgamode)
+//		return (vga.crtc.start_addr << 4);
+
+	return svga_device::start_addr();
 }
