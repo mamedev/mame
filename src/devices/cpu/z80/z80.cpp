@@ -142,7 +142,7 @@
 #define HAS_LDAIR_QUIRK  0
 
 /* All guard blocks must be removed after timings validated for all z80 derivatives */
-#define TIME_GUARD       1
+#define TIME_GUARD       0
 
 
 /****************************************************************************/
@@ -547,9 +547,8 @@ inline u8 z80_device::opcode_read()
 
 DEF( rop() )
 	THEN
-		T(m_m1_cycles);
 		TDAT8 = opcode_read();
-		T(m_memrq_cycles - 2);
+		T(m_m1_cycles + m_memrq_cycles - 2);
 	THEN
 		m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | (m_r & 0x7f), 0x00, 0xff);
 		T(2);
@@ -3492,12 +3491,17 @@ ENDDEF
 
 z80_device::ops_type z80_device::nomreq_addr(s8 cycles)
 {
-    auto steps = op_builder(*this).foo([]() {});
-	while(cycles--) {
-		steps = steps->add([&]() { m_nomreq_cb(TADR, 0x00, 0xff); })
-			->add([&]() { T(1); });
+    auto steps = op_builder(*this)
+			.add([&]() { m_nomreq_cb(TADR, 0x00, 0xff); })
+			->add([&]() { T(1); })
+			->get_steps();
+
+	while(--cycles) {
+		steps.push_back(steps[0]);
+		steps.push_back(steps[1]);
 	}
-	return steps->get_steps();
+
+	return steps;
 }
 
 void nsc800_device::take_interrupt_nsc800()
