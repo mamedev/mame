@@ -443,6 +443,7 @@ bool video_bgfx::set_platform_data(bgfx::PlatformData &platform_data, osd_window
 				SDL_SetWindowData(dynamic_cast<sdl_window_info const &>(window).platform_window(), "wl_egl_window", win_impl);
 			}
 			platform_data.nwh = (void*)win_impl;
+			platform_data.type = bgfx::NativeWindowHandleType::Wayland;
 			break;
 		}
 #endif
