@@ -317,7 +317,7 @@ protected:
 	const u8 *   m_cc_ex;
 
 	u8 m_cycles_multiplier = 1; // multiplier for based cycles. deprecated to use except legacy with synthetic clock (e.g. "system1") till update.
-	u8 m_m1_cycles = 1;         // cycles executed before MREAD in M1. Effectively: NOP = m_m1_cycles + m_memrq_cycles
+	u8 m_m1_cycles = 4;
 	u8 m_memrq_cycles = 3;
 	u8 m_iorq_cycles = 4;
 };

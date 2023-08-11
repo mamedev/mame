@@ -416,6 +416,7 @@ void msx_state::driver_start()
 	m_maincpu->set_input_line_vector(0, 0xff); // Z80
 
 	m_maincpu->z80_set_cycle_tables(cc_op, cc_cb, cc_ed, cc_xy, nullptr, cc_ex);
+	m_maincpu->z80_set_m1_cycles(5);
 
 	save_item(NAME(m_psg_b));
 	save_item(NAME(m_kanji_latch));

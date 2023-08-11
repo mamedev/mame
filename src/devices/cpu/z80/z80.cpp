@@ -462,7 +462,7 @@ DEF( wm() )
 		// As we don't count changes between read and write, simply adjust to the end of requested.
 		if (m_icount_executing != (m_memrq_cycles * m_cycles_multiplier))
 		{
-			LOGTIME("MEMRQ WR8 mismatch [%02X] %02X\n", m_prefix, m_opcode);
+			LOGTIME("MEMRQ WR8 mismatch [%d] %02X by %d\n", u8(m_prefix), m_opcode, m_icount_executing - m_memrq_cycles * m_cycles_multiplier);
 			T((m_icount_executing - (m_memrq_cycles * m_cycles_multiplier)) / m_cycles_multiplier);
 		}
 #endif
@@ -502,7 +502,7 @@ DEF( wm16_sp() )
 		m_icount_executing -= m_memrq_cycles * m_cycles_multiplier;
 		if (m_icount_executing != (m_memrq_cycles * m_cycles_multiplier))
 		{
-			LOGTIME("MEMRQ WR16 mismatch [%02X] %02X\n", m_prefix, m_opcode);
+			LOGTIME("MEMRQ WR16 (SP) mismatch [%d] %02X by %d\n", u8(m_prefix), m_opcode, m_icount_executing - m_memrq_cycles * m_cycles_multiplier);
 			T((m_icount_executing - (m_memrq_cycles * m_cycles_multiplier)) / m_cycles_multiplier);
 		}
 #endif
@@ -524,7 +524,7 @@ inline void z80_device::wm16_sp(PAIR &r)
 	m_icount_executing -= m_memrq_cycles * m_cycles_multiplier;
 	if (m_icount_executing != (m_memrq_cycles * m_cycles_multiplier))
 	{
-		LOGTIME("MEMRQ WR16 (SP) mismatch [%02X] %02X\n", m_prefix, m_opcode);
+		LOGTIME("MEMRQ WR16 (SP) mismatch [%d] %02X by %d\n", u8(m_prefix), m_opcode, m_icount_executing - m_memrq_cycles * m_cycles_multiplier);
 		T((m_icount_executing - (m_memrq_cycles * m_cycles_multiplier)) / m_cycles_multiplier);
 	}
 #endif
@@ -552,7 +552,7 @@ inline u8 z80_device::opcode_read()
 DEF( rop() )
 	THEN
 		TDAT8 = opcode_read();
-		T(m_m1_cycles + m_memrq_cycles - 2);
+		T(m_m1_cycles - 2);
 	THEN
 		m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | (m_r & 0x7f), 0x00, 0xff);
 		T(2);
@@ -3857,7 +3857,7 @@ DEF( next_op() )
 	THEN
 #if TIME_GUARD
 		if (m_icount_executing != 0)
-			LOGTIME("op end mismatch [%02X] %02X\n", m_prefix, m_opcode);
+			LOGTIME("op end mismatch [%d] %02X by %d\n", u8(m_prefix), m_opcode, m_icount_executing);
 		if (m_icount_executing > 0) T(m_icount_executing); else m_icount_executing = 0;
 #endif		
 		// check for interrupts before each instruction

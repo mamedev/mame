@@ -125,14 +125,7 @@ Some bugs left :
    The ROM can be paged into bank 0 and bank 3. */
 void amstrad_state::amstrad_mem(address_map &map)
 {
-	map(0x00000, 0x01fff).bankr("bank1").bankw("bank9");
-	map(0x02000, 0x03fff).bankr("bank2").bankw("bank10");
-	map(0x04000, 0x05fff).bankr("bank3").bankw("bank11");
-	map(0x06000, 0x07fff).bankr("bank4").bankw("bank12");
-	map(0x08000, 0x09fff).bankr("bank5").bankw("bank13");
-	map(0x0a000, 0x0bfff).bankr("bank6").bankw("bank14");
-	map(0x0c000, 0x0dfff).bankr("bank7").bankw("bank15");
-	map(0x0e000, 0x0ffff).bankr("bank8").bankw("bank16");
+	map(0x0000, 0xffff).rw(FUNC(amstrad_state::amstrad_cpc_mem_r), FUNC(amstrad_state::amstrad_cpc_mem_w));
 }
 
 /* I've handled the I/O ports in this way, because the ports
