@@ -25,6 +25,16 @@ device_memory_interface::space_config_vector matrox_vga_device::memory_space_con
 	return r;
 }
 
+void matrox_vga_device::device_start()
+{
+	svga_device::device_start();
+
+	save_item(NAME(m_cursor_read_index));
+	save_item(NAME(m_cursor_write_index));
+	save_item(NAME(m_cursor_index_state));
+	save_pointer(NAME(m_cursor_color), 12);
+}
+
 void matrox_vga_device::device_reset()
 {
 	svga_device::device_reset();
@@ -36,6 +46,8 @@ void matrox_vga_device::device_reset()
 
 	m_mgamode = false;
 	m_interlace_mode = false;
+
+	m_cursor_read_index = m_cursor_write_index = m_cursor_index_state = 0;
 	m_truecolor_ctrl = 0x80;
 	m_multiplex_ctrl = 0x98;
 }
@@ -209,9 +221,9 @@ void matrox_vga_device::ramdac_ext_map(address_map &map)
 	map(0x03, 0x03).lr8(
 		NAME([this] (offs_t offset) { return vga.dac.read_index; })
 	).w(FUNC(matrox_vga_device::ramdac_read_index_w));
-//  map(0x04, 0x04) Cursor/Overscan Color Write Index
-//  map(0x05, 0x05) Cursor/Overscan Color data
-//  map(0x07, 0x07) Cursor/Overscan Color Read Index
+	map(0x04, 0x04).rw(FUNC(matrox_vga_device::cursor_write_index_r), FUNC(matrox_vga_device::cursor_write_index_w));
+	map(0x05, 0x05).rw(FUNC(matrox_vga_device::cursor_data_r), FUNC(matrox_vga_device::cursor_data_w));
+	map(0x07, 0x07).rw(FUNC(matrox_vga_device::cursor_read_index_r), FUNC(matrox_vga_device::cursor_read_index_w));
 //  map(0x09, 0x09) Direct Cursor control
 	map(0x0a, 0x0a).rw(FUNC(matrox_vga_device::ramdac_ext_indexed_r), FUNC(matrox_vga_device::ramdac_ext_indexed_w));
 //  map(0x0b, 0x0b) Cursor RAM data
@@ -224,13 +236,69 @@ u8 matrox_vga_device::ramdac_ext_indexed_r()
 	// Unclear from the docs, according to usage seems to be the write index with no autoincrement
 	logerror("RAMDAC ext read [%02x]\n", vga.dac.write_index);
 	return space(EXT_REG + 1).read_byte(vga.dac.write_index);
-;
 }
 
 void matrox_vga_device::ramdac_ext_indexed_w(offs_t offset, u8 data)
 {
 	logerror("RAMDAC ext [%02x] %02x\n", vga.dac.write_index, data);
 	space(EXT_REG + 1).write_byte(vga.dac.write_index, data);
+}
+
+u8 matrox_vga_device::cursor_write_index_r()
+{
+	return m_cursor_write_index;
+}
+
+void matrox_vga_device::cursor_write_index_w(offs_t offset, u8 data)
+{
+	m_cursor_write_index = data & 3;
+	m_cursor_index_state = 0;
+	if (data & 0xfc)
+		logerror("RAMDAC cursor write index > 3");
+}
+
+u8 matrox_vga_device::cursor_read_index_r()
+{
+	return m_cursor_read_index;
+}
+
+void matrox_vga_device::cursor_read_index_w(offs_t offset, u8 data)
+{
+	m_cursor_read_index = data & 3;
+	m_cursor_index_state = 0;
+	if (data & 0xfc)
+		logerror("RAMDAC cursor read index > 3");
+}
+
+u8 matrox_vga_device::cursor_data_r()
+{
+	const u8 res = m_cursor_color[(m_cursor_read_index * 3) + m_cursor_index_state];
+	if (!machine().side_effects_disabled())
+	{
+		m_cursor_index_state ++;
+		if (m_cursor_index_state > 2)
+		{
+			m_cursor_index_state = 0;
+			m_cursor_read_index ++;
+			m_cursor_read_index &= 3;
+		}
+	}
+	return res;
+}
+
+void matrox_vga_device::cursor_data_w(offs_t offset, u8 data)
+{
+	m_cursor_color[(m_cursor_write_index * 3) + m_cursor_index_state] = data;
+	if (!machine().side_effects_disabled())
+	{
+		m_cursor_index_state ++;
+		if (m_cursor_write_index > 2)
+		{
+			m_cursor_index_state = 0;
+			m_cursor_write_index ++;
+			m_cursor_write_index &= 3;
+		}
+	}
 }
 
 void matrox_vga_device::ramdac_indexed_map(address_map &map)

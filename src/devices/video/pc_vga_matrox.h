@@ -27,6 +27,7 @@ public:
 protected:
 	virtual void io_3bx_3dx_map(address_map &map) override;
 
+	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	virtual uint16_t offset() override;
@@ -64,6 +65,18 @@ private:
 	// RAMDAC
 	u8 ramdac_ext_indexed_r();
 	void ramdac_ext_indexed_w(offs_t offset, u8 data);
+
+	u8 cursor_write_index_r();
+	void cursor_write_index_w(offs_t offset, u8 data);
+	u8 cursor_data_r();
+	void cursor_data_w(offs_t offset, u8 data);
+	u8 cursor_read_index_r();
+	void cursor_read_index_w(offs_t offset, u8 data);
+
+	u8 m_cursor_write_index = 0;
+	u8 m_cursor_read_index = 0;
+	u8 m_cursor_index_state = 0;
+	u8 m_cursor_color[12]{};
 
 	u8 truecolor_ctrl_r();
 	void truecolor_ctrl_w(offs_t offset, u8 data);
