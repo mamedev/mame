@@ -86,9 +86,12 @@ TODO:
     The game works anyway, it never gives the usual Taito "BAD HW" message
     (because there is no test at 0x033b after call at routine at 0xde1d).
 
-  - lkageo, lkageo2, lkagem demo mode messes up, the rest of the game works ok.
-    Maybe it's MCU related? Since main char movement in demo depends on values
-    read from MCU.
+  - Sprite x alignment may be off by 1? An easy way to see it is on the lkage
+    title screen, and look at the left tree ninja stars. There's pcb footage that
+    looks like MAME (holes visible). And there's also pcb footage with the sprites
+    positioned 1 pixel to the left (like MAME with flip-screen).
+    Also see bygone pink energy orbs, alignment looks good on MAME on both normal
+    and flip-screen, but is no pcb reference AFAIK.
 
 ***************************************************************************/
 
@@ -281,15 +284,16 @@ void lkage_state::machine_reset()
         0x08: ?
 
     m_vreg[1]: 0x7d
-        0xf0: background/foreground palette select
+        0xf0: tile palette select
         0x08: bg tile bank select
         0x07: priority config?
 
     m_vreg[2]: 0xf3
         0x03: flip screen x/y
         0xf0: normally 1111, but 1001 and 0001 inbetween stages (while the
-        backgrounds are are being redrawn). These bits are probably used to enable
-        individual layers, but we have no way of knowing the mapping.
+        backgrounds are are being redrawn). These bits are used to enable
+        individual layers. 0x10 is the text layer, 0x80 should be the sprites,
+        the other 2 bits uncertain.
 
 *******************************************************************************/
 
@@ -343,8 +347,8 @@ void lkage_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 	m_tx_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap->set_scrolldx(-5, +3 + 24);
-	m_fg_tilemap->set_scrolldx(-3, +1 + 24);
+	m_bg_tilemap->set_scrolldx(-5, -5 + 32);
+	m_fg_tilemap->set_scrolldx(-3, -3 + 28);
 	m_tx_tilemap->set_scrolldx(-1, -1 + 24);
 	m_sprite_dx[0] = -14; m_sprite_dx[1] = -14;
 }
@@ -375,14 +379,14 @@ void lkage_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		int flipy = attributes & 0x02;
 		int const height = (attributes & 0x08) ? 2 : 1;
 		int sx = source[0] + m_sprite_dx[0];
-		int sy = 256 - (16 * height) - source[1];
+		int sy = 255 - (16 * height) - source[1];
 		int sprite_number = source[3] + ((attributes & 0x04) << 6);
 
 		int const priority_mask = (attributes & 0x80) ? (0xf0 | 0xcc) : 0xf0;
 
 		if (flip_screen_x())
 		{
-			sx = 255 - source[0] + m_sprite_dx[1];
+			sx = 256 - source[0] + m_sprite_dx[1];
 			flipx = !flipx;
 		}
 
@@ -440,7 +444,7 @@ uint32_t lkage_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	m_bg_tilemap->set_palette_offset(0x300 + (m_vreg[1] & 0xf0));
 	m_fg_tilemap->set_palette_offset(0x200 + (m_vreg[1] & 0xf0));
-	m_tx_tilemap->set_palette_offset(0x110);
+	m_tx_tilemap->set_palette_offset(0x100 + (m_vreg[1] & 0xf0));
 
 	m_tx_tilemap->set_scrollx(0, m_scroll[0]);
 	m_tx_tilemap->set_scrolly(0, m_scroll[1]);
@@ -452,17 +456,19 @@ uint32_t lkage_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	m_bg_tilemap->set_scrolly(0, m_scroll[5]);
 
 	screen.priority().fill(0, cliprect);
-	if ((m_vreg[2] & 0xf0) == 0xf0)
-	{
+	bitmap.fill(m_bg_tilemap->palette_offset(), cliprect);
+
+	if (m_vreg[2] & 0x40)
 		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+
+	if (m_vreg[2] & 0x20)
 		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, (m_vreg[1] & 2) ? 2 : 4);
+
+	if (m_vreg[2] & 0x10)
 		m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
+
+	if (m_vreg[2] & 0x80)
 		draw_sprites(screen, bitmap, cliprect);
-	}
-	else
-	{
-		m_tx_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	}
 
 	return 0;
 }
