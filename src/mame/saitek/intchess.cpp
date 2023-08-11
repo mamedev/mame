@@ -140,23 +140,16 @@ u32 intchess_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	// draw the sprites
 	for (int i = 0; i < 64; i++)
 	{
-		int code = (m_vram[i] & 7) << 2;
+		int code = m_vram[i] & 7;
 		int color = m_vram[i] >> 3 & 1;
 		int x = (i % 8) * 20 + 2;
 		int y = (i / 8) * 16;
 
-		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, code+0, color, 0, 0, x+8, y, 0);
-		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, code+1, color, 0, 0, x+8, y+8, 0);
-		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, code+2, color, 0, 0, x, y, 0);
-		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, code+3, color, 0, 0, x, y+8, 0);
+		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, code, color, 0, 0, x, y, 0);
 	}
 
 	return 0;
 }
-
-static GFXDECODE_START( gfx_intchess )
-	GFXDECODE_ENTRY( "gfx", 0, gfx_8x8x1, 0, 2 )
-GFXDECODE_END
 
 void intchess_state::vram_w(offs_t offset, u8 data)
 {
@@ -271,6 +264,27 @@ INPUT_PORTS_END
 
 
 /*******************************************************************************
+    GFX Layouts
+*******************************************************************************/
+
+static const gfx_layout sprite_layout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	1,
+	{ RGN_FRAC(0,1) },
+	{ STEP8(8*16,1), STEP8(0,1) },
+	{ STEP16(0,1*8) },
+	16*16
+};
+
+static GFXDECODE_START( gfx_intchess )
+	GFXDECODE_ENTRY( "sprites", 0, sprite_layout, 0, 2 )
+GFXDECODE_END
+
+
+
+/*******************************************************************************
     Machine Configs
 *******************************************************************************/
 
@@ -332,7 +346,7 @@ ROM_START( intchess )
 	ROM_LOAD("c45015_ytv-lrom.u9", 0xc000, 0x1000, CRC(eef04467) SHA1(5bdcb8d596b91aa06c6ef1ed53ef14d0d13f4194) ) // 2332
 	ROM_LOAD("c45016_ytv-hrom.u8", 0xd000, 0x1000, CRC(7e6f85b4) SHA1(4cd15257eae04067160026f9a062a28581f46227) ) // "
 
-	ROM_REGION( 0x100, "gfx", 0 )
+	ROM_REGION( 0x100, "sprites", 0 )
 	ROM_LOAD("igp.u15", 0x000, 0x100, CRC(bf8358e0) SHA1(880e0d9bd8a75874ba9e51dfb5999b8fcd321a4f) ) // 6336-1
 ROM_END
 
