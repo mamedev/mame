@@ -142,7 +142,7 @@
 #define HAS_LDAIR_QUIRK  0
 
 /* All guard blocks must be removed after timings validated for all z80 derivatives */
-#define TIME_GUARD       0
+#define TIME_GUARD       1
 
 
 /****************************************************************************/
@@ -225,6 +225,7 @@ static u8 SZHV_dec[256]; /* zero, sign, half carry and overflow flags DEC r8 */
 static u8 SZHVC_add[2*256*256];
 static u8 SZHVC_sub[2*256*256];
 
+#if TIME_GUARD
 static const u8 cc_op[0x100] = {
 	4,10, 7, 6, 4, 4, 7, 4, 4,11, 7, 6, 4, 4, 7, 4,
 	8,10, 7, 6, 4, 4, 7, 4,12,11, 7, 6, 4, 4, 7, 4,
@@ -343,6 +344,7 @@ static const u8 cc_ex[0x100] = {
 
 #define m_cc_dd   m_cc_xy
 #define m_cc_fd   m_cc_xy
+#endif
 
 /***************************************************************
  * define an opcode builder helpers
@@ -358,7 +360,9 @@ static const u8 cc_ex[0x100] = {
 /***************************************************************
  * adjust cycle count by n T-states
  ***************************************************************/
+#if TIME_GUARD
 #define CC(prefix,opcode) do { m_icount_executing += m_cc_##prefix == nullptr ? 0 : m_cc_##prefix[opcode]; } while (0)
+#endif
 #define T(icount) execute_cycles(icount)
 
 /***************************************************************
@@ -1247,8 +1251,8 @@ DEF( ldi() )
 	THEN
 		TADR=HL;
 	CALL rm();
-#if TIME_GUARD
 	THEN
+#if TIME_GUARD
 		m_icount_executing -= 2;
 #endif
 		TADR=DE;
@@ -1343,7 +1347,6 @@ DEF( ldd() )
 		TADR=DE;
 	CALL wm();
 #if TIME_GUARD
-
 	THEN
 		m_icount_executing += 2;
 #endif
@@ -3394,7 +3397,9 @@ void z80_device::take_interrupt()
 		// However, experiments have confirmed that IM 2 vectors do not have to be
 		// even, and all 8 bits will be used; even $FF is handled normally.
 		/* CALL opcode timing */
+#if TIME_GUARD
 		CC(op, 0xcd); // 17+2=19
+#endif
 		T(5);
 #if TIME_GUARD
 		m_icount_executing -= (m_memrq_cycles * 2) * m_cycles_multiplier; // save for rm16
@@ -3491,14 +3496,10 @@ ENDDEF
 
 z80_device::ops_type z80_device::nomreq_addr(s8 cycles)
 {
-    auto steps = op_builder(*this)
-			.add([&]() { m_nomreq_cb(TADR, 0x00, 0xff); })
-			->add([&]() { T(1); })
-			->get_steps();
-
-	while(--cycles) {
-		steps.push_back(steps[0]);
-		steps.push_back(steps[1]);
+    ops_type steps;
+	while(cycles--) {
+		steps.push_back([&]() { m_nomreq_cb(TADR, 0x00, 0xff); });
+		steps.push_back([&]() { T(1); });
 	}
 
 	return steps;
@@ -3739,6 +3740,7 @@ void z80_device::device_start()
 	// set our instruction counter
 	set_icountptr(m_icount);
 
+#if TIME_GUARD
 	/* setup cycle tables */
 	m_cc_op = cc_op;
 	m_cc_cb = cc_cb;
@@ -3746,6 +3748,7 @@ void z80_device::device_start()
 	m_cc_xy = cc_xy;
 	m_cc_xycb = cc_xycb;
 	m_cc_ex = cc_ex;
+#endif
 }
 
 void nsc800_device::device_start()
@@ -3790,6 +3793,7 @@ void nsc800_device::device_reset()
 
 void z80_device::calculate_icount()
 {
+#if TIME_GUARD
 	switch (m_prefix)
 	{
 		case NONE:  CC(op,   m_opcode); break;
@@ -3800,6 +3804,7 @@ void z80_device::calculate_icount()
 		case XY_CB: CC(xycb, m_opcode); break;
 		default:    assert(false);
 	}
+#endif
 }
 
 inline void z80_device::execute_cycles(u8 icount)
@@ -3873,8 +3878,9 @@ DEF( next_op() )
 			PC--;
 			m_opcode = 0;
 		}
-
+#if TIME_GUARD
 		calculate_icount();
+#endif
 ENDDEF
 
 void z80_device::check_interrupts()
@@ -4019,12 +4025,14 @@ std::unique_ptr<util::disasm_interface> z80_device::create_disassembler()
 
 void z80_device::z80_set_cycle_tables(const u8 *op, const u8 *cb, const u8 *ed, const u8 *xy, const u8 *xycb, const u8 *ex)
 {
+#if TIME_GUARD
 	m_cc_op = (op != nullptr) ? op : cc_op;
 	m_cc_cb = (cb != nullptr) ? cb : cc_cb;
 	m_cc_ed = (ed != nullptr) ? ed : cc_ed;
 	m_cc_xy = (xy != nullptr) ? xy : cc_xy;
 	m_cc_xycb = (xycb != nullptr) ? xycb : cc_xycb;
 	m_cc_ex = (ex != nullptr) ? ex : cc_ex;
+#endif
 }
 
 z80_device::z80_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
