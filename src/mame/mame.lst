@@ -30924,6 +30924,7 @@ pma                             // 1983, PMA
 smshilo                         // (c) 1983 SMS Manufacturing Corp.
 ssjkrpkr                        // (c) 1982 Southern Systems & Assembly, Ltd.
 tpoker2                         // (c) 1993 Micro Manufacturing, Inc.
+unkljfpk                        // (c) 1989 LJF Corporation
 
 @source:misc/notechan.cpp
 notechan                        // (c) 1995 Banpresto
@@ -37733,6 +37734,7 @@ dvlriderf                       //
 dvlriderg                       //
 dvlrideri                       //
 farfalla                        //
+farfallaf                       //
 farfallag                       //
 farfallai                       //
 mcastle                         //
@@ -37740,12 +37742,15 @@ mcastlef                        //
 mcastleg                        //
 mcastlei                        //
 mexico                          //
+mexicoi                         //
 nstrphnx                        //
 nstrphnxf                       //
 pinchamp                        //
 pinchamp7                       //
+pinchamp7f                      //
 pinchamp7g                      //
 pinchamp7i                      //
+pinchampf                       //
 pinchampg                       //
 pinchampi                       //
 poolcham                        //
@@ -37767,6 +37772,7 @@ thndrman                        //
 tmachzac                        //
 tmachzacf                       //
 tmachzacg                       //
+tmachzaci                       //
 zankor                          //
 zankor2i                        //
 

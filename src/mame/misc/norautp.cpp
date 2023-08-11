@@ -61,6 +61,7 @@
    * Draw Poker HI-LO (unknown, rev 1),          198?,  SMS Manufacturing Corp?.
    * Draw Poker HI-LO (unknown, rev 2),          198?,  SMS Manufacturing Corp?.
    * unknown poker game PKII/DM,                 198?,  Unknown.
+   * unknown LJF Corportaion poker game          1989,  LJF Corporation
 
 
 *******************************************************************************
@@ -1325,28 +1326,28 @@ static INPUT_PORTS_START( noraut3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )		PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Raise Bet" )				PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPNAME( 0x08, 0x08, "Raise Bet" )             PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Game Type" )				PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPNAME( 0x10, 0x10, "Game Type" )             PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x10, "Jacks Plus" )
 	PORT_DIPSETTING(    0x00, "Joker Poker" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Show Bet" )				PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPNAME( 0x40, 0x40, "Show Bet" )              PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3702,6 +3703,17 @@ ROM_START( pkii_dm )
 	ROM_LOAD( "63s141n.u51",  0x0000, 0x0100, CRC(88302127) SHA1(aed1273974917673405f1234ab64e6f8b3856c34) )
 ROM_END
 
+ROM_START( unkljfpk ) // encrypted, has 'Copyright  1982, 1989 LJF Corporation' plaintext in ROM
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "nickphan.u3", 0x0000, 0x8000, CRC(bb03826c) SHA1(249283427dcbfbd16d02cad8e5885e651085954f) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "phan.u31", 0x0000, 0x1000, CRC(0501ac8f) SHA1(98154a049db2343a8ab12193ddf5c547590fc625) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "phanprom.pr", 0x0000, 0x0100, CRC(fc2aace1) SHA1(eba975274da310196db53f799112d8bbac1d0ca8) )
+ROM_END
+
 /*
 
   Draw Poker
@@ -4594,3 +4606,4 @@ GAME(  198?, fastdrwp, 0,       dphl,     norautp, norautp_state, empty_init, RO
 GAME(  198?, dphlunka, 0,       dphl,     norautp, norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 1)",   MACHINE_NOT_WORKING )
 GAME(  198?, dphlunkb, 0,       dphl,     norautp, norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 2)",   MACHINE_NOT_WORKING )
 GAME(  198?, pkii_dm,  0,       nortest1, norautp, norautp_state, empty_init, ROT0, "<unknown>",                "unknown poker game PKII/DM",          MACHINE_NOT_WORKING )
+GAME(  1989, unkljfpk, 0,       nortest1, norautp, norautp_state, empty_init, ROT0, "LJF Corporation",          "unknown LJF Corporation poker game",  MACHINE_NOT_WORKING )
