@@ -31,6 +31,8 @@ protected:
 	void mgabase1_map(address_map &map);
 	void mgabase2_map(address_map &map);
 
+	void dwgreg_map(address_map &map);
+
 	required_device<matrox_vga_device> m_svga;
 	required_memory_region m_vga_rom;
 private:
@@ -46,6 +48,25 @@ private:
 
 	u32 status_r();
 	u32 fifo_status_r();
+
+	// DWGREG section
+	void dwgctl_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	struct {
+		u32 src[4]{};
+		u32 dr[16]{};
+		u32 ar[7]{};
+		u32 dwgctl = 0;
+		u16 pitch = 0;
+		u16 len = 0;
+		u32 cytop = 0;
+		u32 cybot = 0;
+		u16 cxleft = 0;
+		u16 cxright = 0;
+		s16 fxleft = 0;
+		s16 fxright = 0;
+		u32 bcol = 0;
+		u32 fcol = 0;
+	} m_dwgreg;
 };
 
 DECLARE_DEVICE_TYPE(MGA2064W, mga2064w_device);

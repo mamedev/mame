@@ -5,13 +5,15 @@
 
 #define LOG_WARN      (1U << 1)
 #define LOG_ALIAS     (1U << 2) // log mgabase1 index setups thru the back door
+#define LOG_DRAW      (1U << 3) // log drawing engine accesses
 
-#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_ALIAS)
+#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_DRAW)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGWARN(...)            LOGMASKED(LOG_WARN, __VA_ARGS__)
 #define LOGALIAS(...)           LOGMASKED(LOG_ALIAS, __VA_ARGS__)
+#define LOGDRAW(...)            LOGMASKED(LOG_DRAW, __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(MGA2064W, mga2064w_device, "mga2064w", "Matrox Millennium \"IS-STORM / MGA-2064W\"")
 
@@ -94,39 +96,7 @@ void mga2064w_device::config_map(address_map &map)
 void mga2064w_device::mgabase1_map(address_map &map)
 {
 //  map(0x0000, 0x1bff).rw(FUNC(mga2064w_device::dmawin_iload_r), FUNC(mga2064w_device::dmawin_idump_w));
-//  map(0x1c00, 0x1cff).mirror(0x100).m(FUNC(mga2064w_device::dwgreg_map);
-//  map(0x1c00, 0x1c03) DWGCTL
-//  map(0x1c04, 0x1c07) MACCESS
-//  map(0x1c08, 0x1c0b) <reserved> MCTLWTST
-//  map(0x1c0c, 0x1c0f) ZORG
-//  map(0x1c10, 0x1c13) PAT0
-//  map(0x1c14, 0x1c17) PAT1
-//  map(0x1c1c, 0x1c1f) PLNWT
-//  map(0x1c20, 0x1c23) BCOL
-//  map(0x1c24, 0x1c27) FCOL
-//  map(0x1c2c, 0x1c2f) <reserved> SRCBLT
-//  map(0x1c30, 0x1c3f) SRC0-3
-//  map(0x1c40, 0x1c43) XYSTRT
-//  map(0x1c44, 0x1c47) XYEND
-//  map(0x1c50, 0x1c53) SHIFT
-//  map(0x1c58, 0x1c5b) SGN
-//  map(0x1c5c, 0x1c5f) LEN
-//  map(0x1c60, 0x1c7b) AR0-6
-//  map(0x1c80, 0x1c83) CXBNDRY
-//  map(0x1c84, 0x1c87) FXBNDRY
-//  map(0x1c88, 0x1c8b) YDSTLEN
-//  map(0x1c8c, 0x1c8f) PITCH
-//  map(0x1c90, 0x1c93) YDST
-//  map(0x1c94, 0x1c97) YDSTORG
-//  map(0x1c98, 0x1c9b) YTOP
-//  map(0x1c9c, 0x1c9f) YBOT
-//  map(0x1ca0, 0x1ca3) CXLEFT
-//  map(0x1ca4, 0x1ca7) CXRIGHT
-//  map(0x1ca8, 0x1cab) FXLEFT
-//  map(0x1cac, 0x1caf) FXRIGHT
-//  map(0x1cb0, 0x1cb3) XDST
-//  map(0x1cc0, 0x1cff) DR0-DR15 (DR1-5-9-13 <reserved>)
-
+	map(0x1c00, 0x1cff).mirror(0x100).m(FUNC(mga2064w_device::dwgreg_map));
 //  map(0x1e00, 0x1eff) HSTREG Host registers
 	map(0x1e10, 0x1e13).r(FUNC(mga2064w_device::fifo_status_r));
 	map(0x1e14, 0x1e17).r(FUNC(mga2064w_device::status_r));
@@ -144,6 +114,246 @@ void mga2064w_device::mgabase1_map(address_map &map)
 void mga2064w_device::mgabase2_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).rw(m_svga, FUNC(matrox_vga_device::mem_linear_r), FUNC(matrox_vga_device::mem_linear_w));
+}
+
+// base + $1cxx
+void mga2064w_device::dwgreg_map(address_map &map)
+{
+	// DWGCTL
+	map(0x0000, 0x0003).w(FUNC(mga2064w_device::dwgctl_w));
+//  map(0x0004, 0x0007) MACCESS
+//  map(0x0008, 0x000b) <reserved> MCTLWTST
+//  map(0x000c, 0x000f) ZORG
+//  map(0x0010, 0x0013) PAT0
+//  map(0x0014, 0x0017) PAT1
+//  map(0x001c, 0x001f) PLNWT
+	// BCOL / backcol
+	map(0x0020, 0x0023).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			LOGDRAW("dwgreg: BCOL %08x & %08x\n", data, mem_mask);
+			COMBINE_DATA(&m_dwgreg.bcol);
+		})
+	);
+	// FCOL / forcol
+	map(0x0024, 0x0027).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			LOGDRAW("dwgreg: FCOL %08x & %08x\n", data, mem_mask);
+			COMBINE_DATA(&m_dwgreg.fcol);
+		})
+	);
+//  map(0x002c, 0x002f) <reserved> SRCBLT
+	// SRC0-3
+	map(0x0030, 0x003f).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			LOGDRAW("dwgreg: SRC[%01d] -> %08x & %08x\n", offset, data, mem_mask);
+			COMBINE_DATA(&m_dwgreg.src[offset]);
+		})
+	);
+//  map(0x0040, 0x0043) XYSTRT
+//  map(0x0044, 0x0047) XYEND
+//  map(0x0050, 0x0053) SHIFT
+	// SGN
+	map(0x0058, 0x005b).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			LOGDRAW("dwgreg: SGN %08x & %08x\n", offset, data, mem_mask);
+			LOGDRAW("\tsdydxl %s|scanleft %d|sdxl %s|sdy %s|sdxr %d\n"
+				, BIT(data, 0) ? "x major axis" : "y major axis"
+				// not a mistake: sdydxl and scanleft are shared
+				, BIT(data, 0)
+				, BIT(data, 1) ? "-x delta" : "+x delta"
+				, BIT(data, 2) ? "-y delta" : "+y delta"
+				, BIT(data, 5) ? "-x delta" : "+x delta"
+			);
+		})
+	);
+	// LEN
+	map(0x005c, 0x005f).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_dwgreg.len = data & 0xffff;
+			LOGDRAW("dwgreg: LEN %08x & %08x %d\n", data, mem_mask, m_dwgreg.len);
+		})
+	);
+	// AR0-6
+	map(0x0060, 0x007b).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			// TODO: 18-bit signed
+			LOGDRAW("dwgreg: AR[%01d] -> %08x & %08x\n", offset, data, mem_mask);
+			COMBINE_DATA(&m_dwgreg.ar[offset]);
+		})
+	);
+	// CXBNDRY
+	map(0x0080, 0x0083).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_dwgreg.cxleft = data & 0x7ff;
+			m_dwgreg.cxright = (data >> 16) & 0x7ff;
+			LOGDRAW("dwgreg: CXBNDRY %08x & %08x (CXLEFT %d|CXRIGHT %d)\n"
+				, data, mem_mask
+				, m_dwgreg.cxleft, m_dwgreg.cxright
+			);
+		})
+	);
+	// FXBNDRY
+	map(0x0084, 0x0087).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_dwgreg.fxleft = (s16)(data & 0xffff);
+			m_dwgreg.fxright = (s16)(data >> 16);
+			LOGDRAW("dwgreg: FXBNDRY %08x & %08x (FXLEFT %d|FXRIGHT %d)\n"
+				, data, mem_mask
+				, m_dwgreg.fxleft, m_dwgreg.fxright
+			);
+			// accessed thru the mirror at $1d84 on Windows 3.1 boot
+		})
+	);
+	// YDSTLEN
+	// alternative way to access YDST (bits 31-16) and LEN (15-0) with a single dword
+	map(0x0088, 0x008b).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			// TODO: YDST (bits 31-16)
+			// YDST is 22 bits with sign extension ...
+			m_dwgreg.len = data & 0xffff;
+			LOGDRAW("dwgreg: YDSTLEN %08x & %08x (YDST %d|LEN %d)\n"
+				, data, mem_mask
+				, data >> 16, m_dwgreg.len
+			);
+		})
+	);
+	// PITCH
+	map(0x008c, 0x008f).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_dwgreg.pitch = data & 0xfff;
+			LOGDRAW("dwgreg: PITCH %08x & %08x %d|ylin %d\n"
+				, data, mem_mask
+				, m_dwgreg.pitch
+				, BIT(data, 15)
+			);
+		})
+	);
+//  map(0x0090, 0x0093) YDST
+//  map(0x0094, 0x0097) YDSTORG
+	// YTOP / cytop
+	map(0x0098, 0x009b).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_dwgreg.cytop = data & 0x7fffff;
+			LOGDRAW("dwgreg: YTOP %08x & %08x %d\n"
+				, data, mem_mask
+				, m_dwgreg.cytop
+			);
+		})
+	);
+	// YBOT / cybot
+	map(0x009c, 0x009f).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_dwgreg.cybot = data & 0x7fffff;
+			LOGDRAW("dwgreg: YBOT %08x & %08x %d\n"
+				, data, mem_mask
+				, m_dwgreg.cybot
+			);
+		})
+	);
+	// CXLEFT
+	map(0x00a0, 0x00a3).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_dwgreg.cxleft = data & 0x7ff;
+			LOGDRAW("dwgreg: CXLEFT %08x & %08x %d\n"
+				, data, mem_mask
+				, m_dwgreg.cxleft
+			);
+		})
+	);
+	// CXRIGHT
+	map(0x00a4, 0x00a7).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_dwgreg.cxright = data & 0x7ff;
+			LOGDRAW("dwgreg: CXRIGHT %08x & %08x %d\n"
+				, data, mem_mask
+				, m_dwgreg.cxright
+			);
+		})
+	);
+	// FXLEFT
+	map(0x00a8, 0x00ab).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_dwgreg.fxleft = (s16)(data & 0xffff);
+			LOGDRAW("dwgreg: FXLEFT %08x & %08x %d\n"
+				, data, mem_mask
+				, m_dwgreg.fxleft
+			);
+		})
+	);
+	// FXRIGHT
+	map(0x00ac, 0x00af).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_dwgreg.fxright = (s16)(data & 0xffff);
+			LOGDRAW("dwgreg: FXRIGHT %08x & %08x %d\n"
+				, data, mem_mask
+				, m_dwgreg.fxright
+			);
+		})
+	);
+//  map(0x00b0, 0x00b3) XDST
+	// DR0-DR15 (DR1-5-9-13 <reserved>)
+	map(0x00c0, 0x00ff).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			LOGDRAW("dwgreg: DR[%01d] -> %08x\n", offset, data, mem_mask);
+			if ((offset & 3) == 1)
+			{
+				LOGWARN("dwgreg: attempt to setup reserved DR%01d (ignored)\n", offset);
+				return;
+			}
+			COMBINE_DATA(&m_dwgreg.dr[offset]);
+		})
+	);
+}
+
+void mga2064w_device::dwgctl_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_dwgreg.dwgctl);
+	LOGDRAW("dwgreg: DWGCTRL -> %08x & %08x\n", data, mem_mask);
+	const char *const opcode_mnemonics[16] = {
+		"LINE_OPEN", "AUTOLINE_OPEN", "LINE_CLOSE", "AUTOLINE_CLOSE",
+		"TRAP",      "TEXTURE_TRAP",  "<reserved>", "<reserved>",
+		"BITBLT",    "ILOAD",         "IDUMP",      "<reserved>",
+		"FBITBLIT",  "ILOAD_SCALE",   "<reserved>", "ILOAD_FILTER"
+	};
+	const char *const atype_mnemonics[8] = {
+		"RPL", "RSTR",       "<reserved>", "ZI",
+		"BLK", "<reserved>", "<reserved>", "I"
+	};
+	const char *const zmode_mnemonics[8] = {
+		"NOZCMP", "<reserved>", "ZE",  "ZNE",
+		"ZLT",    "ZLTE",       "ZGT", "ZGTE"
+	};
+	const char *const bop_mnemonics[16] = {
+		"0",        "~(D | S)", "D & ~S", "~S",
+		"(~D) & S", "~D",       "D ^ S",  "~(D & S)",
+		"D & S",    "~(D ^ S)", "D",      "D | ~S",
+		"S",        "(~D) | S", "D | S",  "1"
+	};
+	const char *const bltmod_mnemonics[16] = {
+		"BMONOLEF",   "BPLAN",      "BFCOL",      "BU32BGR",
+		"BMONOWF",    "<reserved>", "<reserved>", "BU32RGB",
+		"<reserved>", "<reserved>", "<reserved>", "BU24BGR",
+		"<reserved>", "<reserved>", "BUYUV",      "BU24RGB"
+	};
+	LOGDRAW("\topcod %02x %s|atype %02x %s|%s mode|zmode %02x %s|\n"
+		, m_dwgreg.dwgctl & 0xf, opcode_mnemonics[m_dwgreg.dwgctl & 0xf]
+		, (m_dwgreg.dwgctl >> 4) & 7, atype_mnemonics[(m_dwgreg.dwgctl >> 4) & 7]
+		, BIT(m_dwgreg.dwgctl, 7) ? "linear bitblt" : "xy bitblt"
+		, (m_dwgreg.dwgctl >> 8) & 7, zmode_mnemonics[(m_dwgreg.dwgctl >> 8) & 7]
+	);
+	LOGDRAW("\tbop %02x %s|bltmod %02x %s|pattern %d|transc %d|\n"
+		, (m_dwgreg.dwgctl >> 16) & 0xf, bop_mnemonics[(m_dwgreg.dwgctl >> 16) & 0xf]
+		, (m_dwgreg.dwgctl >> 25) & 0xf, bltmod_mnemonics[(m_dwgreg.dwgctl >> 25) & 0xf]
+		, BIT(m_dwgreg.dwgctl, 29)
+		, BIT(m_dwgreg.dwgctl, 30)
+	);
+	LOGDRAW("\tsolid %d|arzero %d|sgnzero %d|shftzero %d|trans %02x|\n"
+		, BIT(m_dwgreg.dwgctl, 11)
+		, BIT(m_dwgreg.dwgctl, 12)
+		, BIT(m_dwgreg.dwgctl, 13)
+		, BIT(m_dwgreg.dwgctl, 14)
+		, (m_dwgreg.dwgctl >> 20) & 0xf
+	);
 }
 
 /*
