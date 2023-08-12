@@ -552,7 +552,12 @@ inline u8 z80_device::opcode_read()
 DEF( rop() )
 	THEN
 		TDAT8 = opcode_read();
+#if TIME_GUARD
+		T(2);
+		m_icount -= (m_m1_cycles - 4) * m_cycles_multiplier;
+#else
 		T(m_m1_cycles - 2);
+#endif
 	THEN
 		m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | (m_r & 0x7f), 0x00, 0xff);
 		T(2);
