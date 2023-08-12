@@ -51,11 +51,15 @@ private:
 
 	// DWGREG section
 	void dwgctl_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void maccess_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	struct {
 		u32 src[4]{};
 		u32 dr[16]{};
 		u32 ar[7]{};
 		u32 dwgctl = 0;
+		u32 maccess = 0;
+		u32 zorg = 0;
+		u32 plnwt = 0;
 		u16 pitch = 0;
 		u16 len = 0;
 		u32 cytop = 0;
@@ -64,8 +68,12 @@ private:
 		u16 cxright = 0;
 		s16 fxleft = 0;
 		s16 fxright = 0;
+		s16 xdst = 0;
+		int32_t ydst = 0;
+		u32 ydstorg = 0;
 		u32 bcol = 0;
 		u32 fcol = 0;
+		u8 sellin = 0;
 	} m_dwgreg;
 };
 

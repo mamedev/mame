@@ -234,13 +234,13 @@ void matrox_vga_device::ramdac_ext_map(address_map &map)
 u8 matrox_vga_device::ramdac_ext_indexed_r()
 {
 	// Unclear from the docs, according to usage seems to be the write index with no autoincrement
-	logerror("RAMDAC ext read [%02x]\n", vga.dac.write_index);
+//	logerror("RAMDAC ext read [%02x]\n", vga.dac.write_index);
 	return space(EXT_REG + 1).read_byte(vga.dac.write_index);
 }
 
 void matrox_vga_device::ramdac_ext_indexed_w(offs_t offset, u8 data)
 {
-	logerror("RAMDAC ext [%02x] %02x\n", vga.dac.write_index, data);
+//	logerror("RAMDAC ext [%02x] %02x\n", vga.dac.write_index, data);
 	space(EXT_REG + 1).write_byte(vga.dac.write_index, data);
 }
 
