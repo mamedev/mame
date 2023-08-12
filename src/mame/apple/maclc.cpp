@@ -407,7 +407,7 @@ void maclc_state::maccclas(machine_config &config)
 	config.device_remove("egret");
 	config.device_remove("fdc");
 
-	CUDA(config, m_cuda, CUDA_341S0788);  // should be 0417, but that version won't sync up properly with the '030
+	CUDA_V237(config, m_cuda, XTAL(32'768));
 	m_cuda->reset_callback().set(FUNC(maclc_state::egret_reset_w));
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_v8, FUNC(v8_device::cb1_w));

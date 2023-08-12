@@ -47,7 +47,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_memcjr(*this, "memcjr"),
-		m_primetime(*this, "iosb"),
+		m_primetime(*this, "primetime"),
 		m_macadb(*this, "macadb"),
 		m_cuda(*this, "cuda"),
 		m_scc(*this, "scc"),
@@ -199,7 +199,7 @@ void quadra605_state::macqd605(machine_config &config)
 
 	MACADB(config, m_macadb, C15M);
 
-	CUDA(config, m_cuda, CUDA_341S0060);
+	CUDA_V237(config, m_cuda, XTAL(32'768));
 	m_cuda->reset_callback().set(FUNC(quadra605_state::cuda_reset_w));
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_primetime, FUNC(primetime_device::cb1_w));
