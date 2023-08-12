@@ -78,9 +78,9 @@ private:
 
 	void check_beep_state();
 
-	void serial_out_b(uint8_t data);
-	void dtr_out(uint8_t data);
-	void rts_out(uint8_t data);
+	void serial_out_b(int data);
+	void dtr_out(int data);
+	void rts_out(int data);
 
 	int mm5740_shift_r();
 	int mm5740_control_r();

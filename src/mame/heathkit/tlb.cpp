@@ -812,17 +812,17 @@ const tiny_rom_entry *heath_tlb_device::device_rom_region() const
 	return ROM_NAME(h19);
 }
 
-void heath_tlb_device::serial_out_b(uint8_t data)
+void heath_tlb_device::serial_out_b(int data)
 {
 	m_write_sd(data);
 }
 
-void heath_tlb_device::dtr_out(uint8_t data)
+void heath_tlb_device::dtr_out(int data)
 {
 	m_dtr_cb(data);
 }
 
-void heath_tlb_device::rts_out(uint8_t data)
+void heath_tlb_device::rts_out(int data)
 {
 	m_rts_cb(data);
 }
