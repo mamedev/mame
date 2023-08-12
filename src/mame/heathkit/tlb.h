@@ -30,9 +30,14 @@ public:
 
 	// interface routines
 	auto serial_data_callback() { return m_write_sd.bind(); }
+	auto dtr_callback() { return m_dtr_cb.bind(); }
+	auto rts_callback() { return m_rts_cb.bind(); }
 	auto reset_cb() { return m_reset.bind(); }
 
 	void serial_in_w(int state);
+	void rlsd_in_w(int state);
+	void dsr_in_w(int state);
+	void cts_int_w(int state);
 
 	void reset_key_w(int state);
 	void right_shift_w(int state);
@@ -73,7 +78,9 @@ private:
 
 	void check_beep_state();
 
-	void serial_out_b(uint8_t data);
+	void serial_out_b(int data);
+	void dtr_out(int data);
+	void rts_out(int data);
 
 	int mm5740_shift_r();
 	int mm5740_control_r();
@@ -86,6 +93,8 @@ private:
 	emu_timer *m_bell_timer;
 
 	devcb_write_line m_write_sd;
+	devcb_write_line m_dtr_cb;
+	devcb_write_line m_rts_cb;
 	devcb_write_line m_reset;
 
 	required_device<ins8250_device> m_ace;
