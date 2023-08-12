@@ -469,8 +469,8 @@ void system1_state::machine_start()
 	}
 
 	m_maincpu->z80_set_cycle_tables(cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex);
-	/* system1 hardware change clock for m1. There are two possobilities to get rid of custom tables here (suprloco requires the same).
-		1. Keep overcloked z80 and use multipliter + adjust icount respectevly in m1 (opcode_read)
+	/* system1 hardware change clock for m1. There are two possibilities to get rid of custom tables here (suprloco requires the same).
+		1. Keep overclocked z80 and use multipliter + adjust icount respectively in m1 (opcode_read)
 			pros: more precise timings
 			cons: z80 requires extra multiplier state which no other drivers use
 		2. Use proper z80 clock and only adjust icount in certain m1 reads
