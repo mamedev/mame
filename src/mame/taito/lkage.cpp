@@ -103,6 +103,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"
 #include "sound/ta7630.h"
@@ -351,6 +352,9 @@ void lkage_state::video_start()
 	m_fg_tilemap->set_scrolldx(-3, -3 + 28);
 	m_tx_tilemap->set_scrolldx(-1, -1 + 24);
 	m_sprite_dx[0] = -14; m_sprite_dx[1] = -14;
+
+	for (int i = 0; i < m_videoram.bytes(); i++)
+		m_videoram[i] = 0xff;
 }
 
 void lkagem_state::video_start()
@@ -520,7 +524,7 @@ void lkage_state::program_map(address_map &map)
 	map(0xf083, 0xf083).portr("SYSTEM");
 	map(0xf084, 0xf084).portr("P1");
 	map(0xf086, 0xf086).portr("P2");
-	map(0xf0a2, 0xf0a3).ram(); // unknown
+	map(0xf0a3, 0xf0a3).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
 	map(0xf0c0, 0xf0c5).ram().share(m_scroll);
 	map(0xf0e1, 0xf0e1).nopw(); // pulsed
 	map(0xf100, 0xf15f).writeonly().share(m_spriteram);
@@ -699,7 +703,7 @@ static INPUT_PORTS_START( lkage )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x08, "5" )
 	PORT_DIPSETTING(    0x00, "255 (Cheat)")
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x20, 0x20 )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -744,11 +748,11 @@ static INPUT_PORTS_START( lkage )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
 
 	PORT_START("DSW3")
-	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x01, 0x01 )
 	PORT_DIPNAME( 0x02, 0x02, "Initial Season" )
 	PORT_DIPSETTING(    0x02, "Spring" )
 	PORT_DIPSETTING(    0x00, "Winter" )                    // same as if you saved the princess twice ("HOWEVER ...")
-	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x04, 0x04 )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) )       // see notes
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
@@ -817,13 +821,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( bygone )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) ) //
+	PORT_DIPUNKNOWN( 0x01, 0x01 )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )
@@ -831,7 +831,7 @@ static INPUT_PORTS_START( bygone )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x08, "5" )
 	PORT_DIPSETTING(    0x00, "255 (Cheat)")
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
@@ -876,30 +876,20 @@ static INPUT_PORTS_START( bygone )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x01, 0x01 )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x08, 0x08, "Freeze After Game Over")
+	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
 	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -985,6 +975,8 @@ void lkage_state::lkage(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &lkage_state::sound_map); // IRQs are triggered by the YM2203
 
 	TAITO68705_MCU(config, m_bmcu, 12_MHz_XTAL / 4);
+
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
