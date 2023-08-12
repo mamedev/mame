@@ -12,6 +12,7 @@
 #include "emu.h"
 
 #include "tlb.h"
+#include "bus/rs232/rs232.h"
 
 namespace {
 
@@ -44,26 +45,46 @@ private:
 void h19_state::h19(machine_config &config)
 {
 	HEATH_TLB(config, m_tlb);
+	m_tlb->serial_data_callback().set("dte", FUNC(rs232_port_device::write_txd));
+
+	rs232_port_device &dte(RS232_PORT(config, "dte", default_rs232_devices, "loopback"));
+	dte.rxd_handler().set(m_tlb, FUNC(heath_tlb_device::serial_in_w));
 }
 
 void h19_state::h19_superh19(machine_config &config)
 {
 	HEATH_SUPER19(config, m_tlb);
+	m_tlb->serial_data_callback().set("dte", FUNC(rs232_port_device::write_txd));
+
+	rs232_port_device &dte(RS232_PORT(config, "dte", default_rs232_devices, "loopback"));
+	dte.rxd_handler().set(m_tlb, FUNC(heath_tlb_device::serial_in_w));
 }
 
 void h19_state::h19_watzh19(machine_config &config)
 {
 	HEATH_WATZ(config, m_tlb);
+	m_tlb->serial_data_callback().set("dte", FUNC(rs232_port_device::write_txd));
+
+	rs232_port_device &dte(RS232_PORT(config, "dte", default_rs232_devices, "loopback"));
+	dte.rxd_handler().set(m_tlb, FUNC(heath_tlb_device::serial_in_w));
 }
 
 void h19_state::h19_ultrah19(machine_config &config)
 {
 	HEATH_ULTRA(config, m_tlb);
+	m_tlb->serial_data_callback().set("dte", FUNC(rs232_port_device::write_txd));
+
+	rs232_port_device &dte(RS232_PORT(config, "dte", default_rs232_devices, "loopback"));
+	dte.rxd_handler().set(m_tlb, FUNC(heath_tlb_device::serial_in_w));
 }
 
 void h19_state::h19_gp19(machine_config &config)
 {
 	HEATH_GP19(config, m_tlb);
+	m_tlb->serial_data_callback().set("dte", FUNC(rs232_port_device::write_txd));
+
+	rs232_port_device &dte(RS232_PORT(config, "dte", default_rs232_devices, "loopback"));
+	dte.rxd_handler().set(m_tlb, FUNC(heath_tlb_device::serial_in_w));
 }
 
 // ROM definition
