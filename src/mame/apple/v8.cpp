@@ -213,7 +213,7 @@ void v8_device::device_reset()
 u32 v8_device::rom_switch_r(offs_t offset)
 {
 	// disable the overlay
-	if (m_overlay)
+	if (m_overlay && !machine().side_effects_disabled())
 	{
 		ram_size(0xc0); // full SIMM, full 4MB onboard
 		m_overlay = false;
