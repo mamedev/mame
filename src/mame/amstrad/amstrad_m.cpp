@@ -1827,8 +1827,6 @@ Expansion Peripherals Read/Write -   -   -   -   -   0   -   -   -   -   -   -  
 
 uint8_t amstrad_state::amstrad_cpc_io_r(offs_t offset)
 {
-	m_maincpu->adjust_icount(-((4 - m_maincpu->total_cycles() % 4) % 4));
-
 	uint8_t data = 0xFF;
 	unsigned int r1r0 = (unsigned int)((offset & 0x0300) >> 8);
 //  m6845_personality_t crtc_type;
@@ -2007,8 +2005,6 @@ void amstrad_state::rom_select(uint8_t data)
 /* Offset handler for write */
 void amstrad_state::amstrad_cpc_io_w(offs_t offset, uint8_t data)
 {
-	m_maincpu->adjust_icount(-((4 - m_maincpu->total_cycles() % 4) % 4));
-
 	cpc_multiface2_device* mface2;
 
 	if ((offset & (1<<15)) == 0)
@@ -2186,7 +2182,8 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 
 uint8_t amstrad_state::amstrad_cpc_mem_r(offs_t offset)
 {
-	m_maincpu->adjust_icount(-((4 - m_maincpu->total_cycles() % 4) % 4));
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-((4 - m_maincpu->total_cycles() % 4) % 4));
 	return ((u8*)m_banks[(offset >> 13)]->base())[offset & 0x1fff];
 }
 
