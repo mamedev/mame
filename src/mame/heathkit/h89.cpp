@@ -307,7 +307,7 @@ static INPUT_PORTS_START( h89 )
 	PORT_DIPSETTING( 0x80, "Auto" )
 
 	// Settings with the MMS 84-B
-//  PORT_START("MTR89_SW501")
+//  PORT_START("MMS84B_SW501")
 //  PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )  PORT_DIPLOCATION("S1:1,2")
 //  PORT_DIPSETTING( 0x00, "H-88-1" )
 //  PORT_DIPSETTING( 0x01, "H/Z-47 (Not yet implemented)" )
