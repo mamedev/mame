@@ -16246,8 +16246,8 @@ ROM_START( tdracula )
 	ROM_REGION( 557, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1400_tdracula_output.pla", 0, 557, CRC(54408672) SHA1(8fdc6910a27c22c1df2cadeb25c74118d5774481) )
 
-	ROM_REGION( 416612, "screen", 0)
-	ROM_LOAD( "tdracula.svg", 0, 416612, CRC(b4e723dc) SHA1(7d90aa92755727fc21f3b2913cd5d86f8594ea20) )
+	ROM_REGION( 417508, "screen", 0)
+	ROM_LOAD( "tdracula.svg", 0, 417508, CRC(03438ea0) SHA1(33c6561e3a73eee754b5fbe0e6d0b61fc99c92f0) )
 ROM_END
 
 
