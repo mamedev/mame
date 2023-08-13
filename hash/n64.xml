@@ -10682,7 +10682,7 @@ Backgrounds leaves trails during intro and main menu
 	</software>
 
 	<software name="razmoket" cloneof="rugrats" supported="no">
-		<description>Les Razmoket - La Chasse aux Tresors (France)</description>
+		<description>Les Razmoket - La Chasse aux Trésors (France)</description>
 		<year>1999</year>
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="NUS-NRGF-FRA"/>
