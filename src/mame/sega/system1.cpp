@@ -2156,7 +2156,7 @@ void system1_state::sys1ppi(machine_config &config)
 		if (!machine().side_effects_disabled())
 		{
 			m_m1_num = ++m_m1_num % 5;
-			if (m_m1_num == 5)
+			if (m_m1_num == 4)
 				m_maincpu->adjust_icount(-1);
 		}
 	});
