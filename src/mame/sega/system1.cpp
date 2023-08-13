@@ -301,6 +301,14 @@ and bonus options).  There is no screen which shows the bonus lives values like 
 other two sets, either.  flickys1 allows for DEMO SOUND which none of the others sets
 seem to have access to.
 
+About main CPU clocking:
+
+  A 20MHz crystal clocks an LS161 which counts up from either 10 or 11 to 16 before
+carrying out and forcing a reload. The low bit of the reload value comes from the
+Z80's /M1 signal. When /M1 is low (an opcode is being fetched), the reload count
+is 10, which means the 20MHz clock is divided by 6. When /M1 is high, the reload
+count is 11, which means the clock is divided by 5.
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -2145,7 +2153,7 @@ GFXDECODE_END
 void system1_state::sys1ppi(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK / 5);  /* not really, see notes above */
+	Z80(config, m_maincpu, MASTER_CLOCK / 5);
 	m_maincpu->set_addrmap(AS_PROGRAM, &system1_state::system1_map);
 	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_ppi_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(system1_state::irq0_line_hold));
@@ -2155,7 +2163,7 @@ void system1_state::sys1ppi(machine_config &config)
 	m_maincpu->refresh_cb().set([this](offs_t offset, u8 data) {
 		if (!machine().side_effects_disabled())
 		{
-			m_m1_num = ++m_m1_num % 5;
+			m_m1_num = (m_m1_num + 1) % 5;
 			if (!m_m1_num)
 				m_maincpu->adjust_icount(-1);
 		}

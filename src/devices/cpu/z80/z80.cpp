@@ -128,21 +128,17 @@
 #define LOG_INT   (1U << 2)
 #define LOG_TIME  (1U << 3)
 
-#define VERBOSE ( LOG_UNDOC /*| LOG_INT | LOG_TIME*/ )
+#define VERBOSE ( LOG_UNDOC /*| LOG_INT*/ )
 #include "logmacro.h"
 
 #define LOGUNDOC(...) LOGMASKED(LOG_UNDOC, __VA_ARGS__)
 #define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
-#define LOGTIME(...)  LOGMASKED(LOG_TIME,  __VA_ARGS__)
 
 
 /* On an NMOS Z80, if LD A,I or LD A,R is interrupted, P/V flag gets reset,
    even if IFF2 was set before this instruction. This issue was fixed on
    the CMOS Z80, so until knowing (most) Z80 types on hardware, it's disabled */
 #define HAS_LDAIR_QUIRK  0
-
-/* All guard blocks must be removed after timings validated for all z80 derivatives */
-#define TIME_GUARD       1
 
 
 /****************************************************************************/
@@ -225,126 +221,6 @@ static u8 SZHV_dec[256]; /* zero, sign, half carry and overflow flags DEC r8 */
 static u8 SZHVC_add[2*256*256];
 static u8 SZHVC_sub[2*256*256];
 
-#if TIME_GUARD
-static const u8 cc_op[0x100] = {
-	4,10, 7, 6, 4, 4, 7, 4, 4,11, 7, 6, 4, 4, 7, 4,
-	8,10, 7, 6, 4, 4, 7, 4,12,11, 7, 6, 4, 4, 7, 4,
-	7,10,16, 6, 4, 4, 7, 4, 7,11,16, 6, 4, 4, 7, 4,
-	7,10,13, 6,11,11,10, 4, 7,11,13, 6, 4, 4, 7, 4,
-	4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
-	4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
-	4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
-	7, 7, 7, 7, 7, 7, 4, 7, 4, 4, 4, 4, 4, 4, 7, 4,
-	4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
-	4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
-	4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
-	4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
-	5,10,10,10,10,11, 7,11, 5,10,10, 4,10,17, 7,11, /* cb -> cc_cb */
-	5,10,10,11,10,11, 7,11, 5, 4,10,11,10, 4, 7,11, /* dd -> cc_xy */
-	5,10,10,19,10,11, 7,11, 5, 4,10, 4,10, 4, 7,11, /* ed -> cc_ed */
-	5,10,10, 4,10,11, 7,11, 5, 6,10, 4,10, 4, 7,11  /* fd -> cc_xy */
-};
-
-static const u8 cc_cb[0x100] = {
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-	4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-	4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-	4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4
-};
-
-static const u8 cc_ed[0x100] = {
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	8, 8,11,16, 4,10, 4, 5, 8, 8,11,16, 4,10, 4, 5,
-	8, 8,11,16, 4,10, 4, 5, 8, 8,11,16, 4,10, 4, 5,
-	8, 8,11,16, 4,10, 4,14, 8, 8,11,16, 4,10, 4,14,
-	8, 8,11,16, 4,10, 4, 4, 8, 8,11,16, 4,10, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	12,12,12,12,4, 4, 4, 4,12,12,12,12, 4, 4, 4, 4,
-	12,12,12,12,4, 4, 4, 4,12,12,12,12, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4
-};
-
-/* ix/iy: with the exception of (i+offset) opcodes, for total add t-states from main_opcode_table[DD/FD] == 4 */
-static const u8 cc_xy[0x100] = {
-	 4,10, 7, 6, 4, 4, 7, 4, 4,11, 7, 6, 4, 4, 7, 4,
-	 8,10, 7, 6, 4, 4, 7, 4,12,11, 7, 6, 4, 4, 7, 4,
-	 7,10,16, 6, 4, 4, 7, 4, 7,11,16, 6, 4, 4, 7, 4,
-	 7,10,13, 6,19,19,15, 4, 7,11,13, 6, 4, 4, 7, 4,
-	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
-	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
-	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
-	15,15,15,15,15,15, 4,15, 4, 4, 4, 4, 4, 4,15, 4,
-	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
-	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
-	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
-	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
-	 5,10,10,10,10,11, 7,11, 5,10,10, 7,10,17, 7,11, /* cb -> cc_xycb */
-	 5,10,10,11,10,11, 7,11, 5, 4,10,11,10, 4, 7,11, /* dd -> cc_xy again */
-	 5,10,10,19,10,11, 7,11, 5, 4,10, 4,10, 4, 7,11, /* ed -> cc_ed */
-	 5,10,10, 4,10,11, 7,11, 5, 6,10, 4,10, 4, 7,11  /* fd -> cc_xy again */
-};
-
-static const u8 cc_xycb[0x100] = {
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12
-};
-
-/* extra cycles if jr/jp/call taken and 'interrupt latency' on rst 0-7 */
-static const u8 cc_ex[0x100] = {
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* DJNZ */
-	5, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, /* JR NZ/JR Z */
-	5, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, /* JR NC/JR C */
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	5, 5, 5, 5, 0, 0, 0, 0, 5, 5, 5, 5, 0, 0, 0, 0, /* LDIR/CPIR/INIR/OTIR LDDR/CPDR/INDR/OTDR */
-	6, 0, 0, 0, 7, 0, 0, 2, 6, 0, 0, 0, 7, 0, 0, 2,
-	6, 0, 0, 0, 7, 0, 0, 2, 6, 0, 0, 0, 7, 0, 0, 2,
-	6, 0, 0, 0, 7, 0, 0, 2, 6, 0, 0, 0, 7, 0, 0, 2,
-	6, 0, 0, 0, 7, 0, 0, 2, 6, 0, 0, 0, 7, 0, 0, 2
-};
-
-#define m_cc_dd   m_cc_xy
-#define m_cc_fd   m_cc_xy
-#endif
 
 /***************************************************************
  * define an opcode builder helpers
@@ -360,9 +236,6 @@ static const u8 cc_ex[0x100] = {
 /***************************************************************
  * adjust cycle count by n T-states
  ***************************************************************/
-#if TIME_GUARD
-#define CC(prefix,opcode) do { m_icount_executing += m_cc_##prefix == nullptr ? 0 : m_cc_##prefix[opcode]; } while (0)
-#endif
 #define T(icount) execute_cycles(icount)
 
 /***************************************************************
@@ -458,14 +331,6 @@ inline void z80_device::data_write(u16 addr, u8 value) {
 
 DEF( wm() )
 	THEN
-#if TIME_GUARD
-		// As we don't count changes between read and write, simply adjust to the end of requested.
-		if (m_icount_executing != (m_memrq_cycles * m_cycles_multiplier))
-		{
-			LOGTIME("MEMRQ WR8 mismatch [%d] %02X by %d\n", u8(m_prefix), m_opcode, m_icount_executing - m_memrq_cycles * m_cycles_multiplier);
-			T((m_icount_executing - (m_memrq_cycles * m_cycles_multiplier)) / m_cycles_multiplier);
-		}
-#endif
 		data_write(TADR, TDAT8);
 		T(m_memrq_cycles);
 ENDDEF
@@ -475,16 +340,8 @@ ENDDEF
  *  in: TADR, TDAT
  ***************************************************************/
 DEF( wm16() )
-#if TIME_GUARD
-	THEN
-	    // wm() eats unused cycles. save what required for extra wm()
-		m_icount_executing -= m_memrq_cycles * m_cycles_multiplier;
-#endif
 	CALL wm();
 	THEN
-#if TIME_GUARD
-		m_icount_executing += m_memrq_cycles * m_cycles_multiplier;
-#endif
 		TADR++;
 		TDAT8=TDAT_H;
 	CALL wm();
@@ -498,19 +355,8 @@ DEF( wm16_sp() )
 	THEN
 		SP--;
 	THEN
-#if TIME_GUARD
-		m_icount_executing -= m_memrq_cycles * m_cycles_multiplier;
-		if (m_icount_executing != (m_memrq_cycles * m_cycles_multiplier))
-		{
-			LOGTIME("MEMRQ WR16 (SP) mismatch [%d] %02X by %d\n", u8(m_prefix), m_opcode, m_icount_executing - m_memrq_cycles * m_cycles_multiplier);
-			T((m_icount_executing - (m_memrq_cycles * m_cycles_multiplier)) / m_cycles_multiplier);
-		}
-#endif
 		data_write(SPD, TDAT_H);
 		T(m_memrq_cycles);
-#if TIME_GUARD
-		m_icount_executing += m_memrq_cycles * m_cycles_multiplier;
-#endif
 	THEN
 		SP--;
 	THEN
@@ -520,20 +366,9 @@ ENDDEF
 
 inline void z80_device::wm16_sp(PAIR &r)
 {
-#if TIME_GUARD
-	m_icount_executing -= m_memrq_cycles * m_cycles_multiplier;
-	if (m_icount_executing != (m_memrq_cycles * m_cycles_multiplier))
-	{
-		LOGTIME("MEMRQ WR16 (SP) mismatch [%d] %02X by %d\n", u8(m_prefix), m_opcode, m_icount_executing - m_memrq_cycles * m_cycles_multiplier);
-		T((m_icount_executing - (m_memrq_cycles * m_cycles_multiplier)) / m_cycles_multiplier);
-	}
-#endif
 	SP--;
 	data_write(SPD, r.b.h);
 	T(m_memrq_cycles);
-#if TIME_GUARD
-	m_icount_executing += m_memrq_cycles * m_cycles_multiplier;
-#endif
 	SP--;
 	data_write(SPD, r.b.l);
 	T(m_memrq_cycles);
@@ -552,12 +387,7 @@ inline u8 z80_device::opcode_read()
 DEF( rop() )
 	THEN
 		TDAT8 = opcode_read();
-#if TIME_GUARD
-		T(2);
-		m_icount -= (m_m1_cycles - 4) * m_cycles_multiplier;
-#else
 		T(m_m1_cycles - 2);
-#endif
 	THEN
 		m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | (m_r & 0x7f), 0x00, 0xff);
 		T(2);
@@ -683,9 +513,6 @@ ENDDEF
  ***************************************************************/
 DEF( jr_cond(u8 opcode) )
 	IF ( TDAT8 )
-#if TIME_GUARD
-		})->add([&, opcode]() { CC(ex, opcode);
-#endif
 		CALL jr();
 	ELSE
 		CALL arg();
@@ -714,9 +541,6 @@ ENDDEF
  ***************************************************************/
 DEF( call_cond(u8 opcode) )
 	IF ( TDAT8 )
-#if TIME_GUARD
-		})->add([&, opcode]() { CC(ex, opcode);
-#endif
 		CALL call();
 	ELSE
 		CALL arg16();
@@ -731,9 +555,6 @@ ENDDEF
 DEF( ret_cond(u8 opcode) )
 	CALL nomreq_ir(1);
 	IF ( TDAT8 )
-#if TIME_GUARD
-	 	})->add([&, opcode]() { CC(ex, opcode);
-#endif
 		CALL pop();
 		THEN
 			PC=TDAT;
@@ -1052,14 +873,8 @@ DEF( ex_sp() )
 	CALL nomreq_addr(1);
 	THEN
 		std::swap(TDAT, TDAT2);
-#if TIME_GUARD
-		m_icount_executing -= 2;
-#endif
 	CALL wm16_sp();
 	THEN
-#if TIME_GUARD
-		m_icount_executing += 2;
-#endif
 		TADR=SP;
 	CALL nomreq_addr(2);
 	THEN
@@ -1257,15 +1072,8 @@ DEF( ldi() )
 		TADR=HL;
 	CALL rm();
 	THEN
-#if TIME_GUARD
-		m_icount_executing -= 2;
-#endif
 		TADR=DE;
 	CALL wm();
-#if TIME_GUARD
-	THEN
-		m_icount_executing += 2;
-#endif
 	CALL nomreq_addr(2);
 	THEN
 		F &= SF | ZF | CF;
@@ -1346,15 +1154,8 @@ DEF( ldd() )
 		TADR=HL;
 	CALL rm();
 	THEN
-#if TIME_GUARD
-		m_icount_executing -= 2;
-#endif
 		TADR=DE;
 	CALL wm();
-#if TIME_GUARD
-	THEN
-		m_icount_executing += 2;
-#endif
 	CALL nomreq_addr(2);
 	THEN
 		F &= SF | ZF | CF;
@@ -1436,9 +1237,6 @@ DEF( ldir() )
 	CALL ldi();
 	IF ( BC != 0 )
 		THEN
-#if TIME_GUARD
-			CC(ex, 0xb0);
-#endif
 			TADR=DE;
 		CALL nomreq_addr(5);
 		THEN
@@ -1454,9 +1252,6 @@ DEF( cpir() )
 	CALL cpi();
 	IF ( BC != 0 && !(F & ZF) )
 		THEN
-#if TIME_GUARD
-			CC(ex, 0xb1);
-#endif
 			TADR=HL;
 		CALL nomreq_addr(5);
 		THEN
@@ -1472,9 +1267,6 @@ DEF( inir() )
 	CALL ini();
 	IF ( B != 0 )
 		THEN
-#if TIME_GUARD
-			CC(ex, 0xb2);
-#endif
 			TADR=HL;
 		CALL nomreq_addr(5);
 		THEN
@@ -1489,9 +1281,6 @@ DEF( otir() )
 	CALL outi();
 	IF ( B != 0 )
 		THEN
-#if TIME_GUARD
-			CC(ex, 0xb3);
-#endif
 			TADR=BC;
 		CALL nomreq_addr(5);
 		THEN
@@ -1506,9 +1295,6 @@ DEF( lddr() )
 	CALL ldd();
 	IF ( BC != 0 )
 		THEN
-#if TIME_GUARD
-			CC(ex, 0xb8);
-#endif
 			TADR=DE;
 		CALL nomreq_addr(5);
 		THEN
@@ -1524,9 +1310,6 @@ DEF( cpdr() )
 	CALL cpd();
 	IF ( BC != 0 && !(F & ZF) )
 		THEN
-#if TIME_GUARD
-			CC(ex, 0xb9);
-#endif
 			TADR=HL;
 		CALL nomreq_addr(5);
 		THEN
@@ -1542,9 +1325,6 @@ DEF( indr() )
 	CALL ind();
 	IF ( B != 0 )
 		THEN
-#if TIME_GUARD
-			CC(ex, 0xba);
-#endif
 			TADR=HL;
 		CALL nomreq_addr(5);
 		THEN
@@ -1559,9 +1339,6 @@ DEF( otdr() )
 	CALL outd();
 	IF ( B != 0 )
 		THEN
-#if TIME_GUARD
-			CC(ex, 0xbb);
-#endif
 			TADR=BC;
 		CALL nomreq_addr(5);
 		THEN
@@ -1592,7 +1369,7 @@ inline void z80_device::illegal_2()
 void z80_device::init_op_steps() {
 
 #define OP(prefix,opcode) m_op_steps[prefix][0x##opcode] = op_builder(*this).foo([]() {
-#define THENJP(p_to) })->add([&]() { m_cycle=~0; m_prefix=p_to; m_opcode=TDAT8; calculate_icount(); })->get_steps();
+#define THENJP(p_to) })->add([&]() { m_cycle=~0; m_prefix=p_to; m_opcode=TDAT8; })->get_steps();
 #define JP(op) })->jump(0x##op);
 #define JPP(p_to,op_to) })->jump(p_to, 0x##op_to);
 #define ENDOP })->build();
@@ -3360,9 +3137,6 @@ void z80_device::take_nmi()
 	m_iff1 = 0;
 	m_r++;
 
-#if TIME_GUARD
-	m_icount_executing = 11;
-#endif
 	T(5);
 	wm16_sp(m_pc);
 	PCD = 0x0066;
@@ -3389,10 +3163,6 @@ void z80_device::take_interrupt()
 	LOGINT("single INT irq_vector $%02x\n", irq_vector);
 
 	/* 'interrupt latency' cycles */
-#if TIME_GUARD
-	m_icount_executing = 0;
-	CC(ex, 0xff); // 2
-#endif
 	T(2);
 
 	/* Interrupt mode 2. Call [i:databyte] */
@@ -3402,17 +3172,8 @@ void z80_device::take_interrupt()
 		// However, experiments have confirmed that IM 2 vectors do not have to be
 		// even, and all 8 bits will be used; even $FF is handled normally.
 		/* CALL opcode timing */
-#if TIME_GUARD
-		CC(op, 0xcd); // 17+2=19
-#endif
 		T(5);
-#if TIME_GUARD
-		m_icount_executing -= (m_memrq_cycles * 2) * m_cycles_multiplier; // save for rm16
-#endif
 		wm16_sp(m_pc);
-#if TIME_GUARD
-		m_icount_executing += (m_memrq_cycles * 2) * m_cycles_multiplier;
-#endif
 		irq_vector = (irq_vector & 0xff) | (m_i << 8);
 		rm16(irq_vector, m_pc);
 		LOGINT("IM2 [$%04x] = $%04x\n", irq_vector, PCD);
@@ -3423,9 +3184,6 @@ void z80_device::take_interrupt()
 	{
 		LOGINT("'%s' IM1 $0038\n", tag());
 		/* RST $38 */
-#if TIME_GUARD
-		CC(op, 0xff); // 11+2=13
-#endif
 		T(5);
 		wm16_sp(m_pc);
 		PCD = 0x0038;
@@ -3444,18 +3202,12 @@ void z80_device::take_interrupt()
 			{
 				case 0xcd0000:  /* call */
 					/* CALL $xxxx cycles */
-#if TIME_GUARD
-					CC(op, 0xcd); // 17
-#endif
 					T(11);
 					wm16_sp(m_pc);
 					PCD = irq_vector & 0xffff;
 					break;
 				case 0xc30000:  /* jump */
 					/* JP $xxxx cycles */
-#if TIME_GUARD
-					CC(op, 0xc3); // 10
-#endif
 					T(10);
 					PCD = irq_vector & 0xffff;
 					break;
@@ -3463,18 +3215,12 @@ void z80_device::take_interrupt()
 					if (irq_vector == 0xfb)
 					{
 						// EI
-#if TIME_GUARD
-						CC(op, 0xfb); // 4
-#endif
 						T(4);
 						ei();
 					}
 					else if ((irq_vector & 0xc7) == 0xc7)
 					{
 						/* RST $xx cycles */
-#if TIME_GUARD
-						CC(op, 0xff); // 11
-#endif
 						T(5);
 						wm16_sp(m_pc);
 						PCD = irq_vector & 0x0038;
@@ -3518,13 +3264,7 @@ void nsc800_device::take_interrupt_nsc800()
 	/* Clear both interrupt flip flops */
 	m_iff1 = m_iff2 = 0;
 
-#if TIME_GUARD
 	/* 'interrupt latency' cycles */
-	m_icount_executing = 0;
-	CC(op, 0xff); // 11
-	CC(ex, 0xff); // 2
-#endif
-
 	T(7);
 	if (m_nsc800_irq_state[NSC800_RSTA])
 	{
@@ -3636,7 +3376,6 @@ void z80_device::device_start()
 	}
 	init_op_steps();
 
-	save_item(NAME(m_icount_executing));
 	save_item(NAME(m_cycle));
 	save_item(NAME(m_prefix));
 	save_item(NAME(m_opcode));
@@ -3744,16 +3483,6 @@ void z80_device::device_start()
 
 	// set our instruction counter
 	set_icountptr(m_icount);
-
-#if TIME_GUARD
-	/* setup cycle tables */
-	m_cc_op = cc_op;
-	m_cc_cb = cc_cb;
-	m_cc_ed = cc_ed;
-	m_cc_xy = cc_xy;
-	m_cc_xycb = cc_xycb;
-	m_cc_ex = cc_ex;
-#endif
 }
 
 void nsc800_device::device_start()
@@ -3770,9 +3499,6 @@ void z80_device::device_reset()
 {
 	leave_halt();
 
-#if TIME_GUARD
-	m_icount_executing = 0;
-#endif
 	m_cycle = 0;
 	m_prefix = NONE;
 	m_opcode = 0;
@@ -3796,29 +3522,9 @@ void nsc800_device::device_reset()
 	memset(m_nsc800_irq_state, 0, sizeof(m_nsc800_irq_state));
 }
 
-void z80_device::calculate_icount()
-{
-#if TIME_GUARD
-	switch (m_prefix)
-	{
-		case NONE:  CC(op,   m_opcode); break;
-		case CB:    CC(cb,   m_opcode); break;
-		case DD:    CC(dd,   m_opcode); break;
-		case ED:    CC(ed,   m_opcode); break;
-		case FD:    CC(fd,   m_opcode); break;
-		case XY_CB: CC(xycb, m_opcode); break;
-		default:    assert(false);
-	}
-#endif
-}
-
 inline void z80_device::execute_cycles(u8 icount)
 {
-	//assert(icount >= 0);
-	m_icount -= icount * m_cycles_multiplier;
-#if TIME_GUARD
-	m_icount_executing -= icount * m_cycles_multiplier;
-#endif
+	m_icount -= icount;
 }
 
 /****************************************************************************
@@ -3837,17 +3543,10 @@ void z80_device::execute_run()
 				return;
 			}
 			const int icount = m_icount;
-#if TIME_GUARD
-			const int executing = m_icount_executing;
-#endif
 			v[m_cycle++]();
 			if ((m_icount < 0) && access_to_be_redone())
 			{
 				m_icount = icount;
-				printf("!");
-#if TIME_GUARD
-				m_icount_executing = executing;
-#endif
 				m_cycle--;
 				return;
 			}
@@ -3860,11 +3559,6 @@ void z80_device::execute_run()
 
 DEF( next_op() )
 	THEN
-#if TIME_GUARD
-		if (m_icount_executing != 0)
-			LOGTIME("op end mismatch [%d] %02X by %d\n", u8(m_prefix), m_opcode, m_icount_executing);
-		if (m_icount_executing > 0) T(m_icount_executing); else m_icount_executing = 0;
-#endif		
 		// check for interrupts before each instruction
 		check_interrupts();
 	//THEN
@@ -3883,9 +3577,6 @@ DEF( next_op() )
 			PC--;
 			m_opcode = 0;
 		}
-#if TIME_GUARD
-		calculate_icount();
-#endif
 ENDDEF
 
 void z80_device::check_interrupts()
@@ -4026,18 +3717,6 @@ void z80_device::state_string_export(const device_state_entry &entry, std::strin
 std::unique_ptr<util::disasm_interface> z80_device::create_disassembler()
 {
 	return std::make_unique<z80_disassembler>();
-}
-
-void z80_device::z80_set_cycle_tables(const u8 *op, const u8 *cb, const u8 *ed, const u8 *xy, const u8 *xycb, const u8 *ex)
-{
-#if TIME_GUARD
-	m_cc_op = (op != nullptr) ? op : cc_op;
-	m_cc_cb = (cb != nullptr) ? cb : cc_cb;
-	m_cc_ed = (ed != nullptr) ? ed : cc_ed;
-	m_cc_xy = (xy != nullptr) ? xy : cc_xy;
-	m_cc_xycb = (xycb != nullptr) ? xycb : cc_xycb;
-	m_cc_ex = (ex != nullptr) ? ex : cc_ex;
-#endif
 }
 
 z80_device::z80_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
