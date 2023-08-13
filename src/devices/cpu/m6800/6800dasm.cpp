@@ -188,10 +188,10 @@ offs_t m680x_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			util::stream_format(stream, "#$%04X", params.r16(pc+1));
 			return 3 | flags | SUPPORTED;
 		case idx:  /* indexed + byte offset */
-			util::stream_format(stream, "(x+$%02X)", params.r8(pc+1));
+			util::stream_format(stream, "$%02X,x", params.r8(pc+1));
 			return 2 | flags | SUPPORTED;
 		case imx:  /* immediate, indexed + byte offset */
-			util::stream_format(stream, "#$%02X,(x+$%02x)", params.r8(pc+1), params.r8(pc+2));
+			util::stream_format(stream, "#$%02X,$%02x,x", params.r8(pc+1), params.r8(pc+2));
 			return 3 | flags | SUPPORTED;
 		case dir:  /* direct address */
 			util::stream_format(stream, "$%02X", params.r8(pc+1));
@@ -203,7 +203,7 @@ offs_t m680x_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			util::stream_format(stream, "$%04X", params.r16(pc+1));
 			return 3 | flags | SUPPORTED;
 		case sx1:  /* byte from address (s + 1) */
-			util::stream_format(stream, "(s+1)");
+			util::stream_format(stream, "1,s");
 			return 1 | flags | SUPPORTED;
 		default:
 			return 1 | flags | SUPPORTED;
