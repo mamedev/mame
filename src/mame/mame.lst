@@ -40748,6 +40748,9 @@ indy_4613                       // IP22: Indy, R4600, 133MHz
 indy_5015                       // IP22: Indy, R5000, 150MHz
 indigo2_4415                    // IP24: Indigo 2, R4400, 150MHz
 
+@source:sgi/ip4.cpp
+pi4d50                          // Professional IRIS 4D/50 (R2000 @ 8MHz)
+
 @source:sgi/ip6.cpp
 pi4d20                          // Personal IRIS 4D/20 (R2000 @ 12.5MHz)
 pi4d25                          // Personal IRIS 4D/25 (R3000 @ 20MHz)
