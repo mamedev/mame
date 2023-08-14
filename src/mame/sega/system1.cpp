@@ -2161,12 +2161,9 @@ void system1_state::sys1ppi(machine_config &config)
 		the divider is 5 for any z80 cycle that M1 is high, and 6 if M1 is low
 		since M1 is low for 2 cycles during opcode fetch, this makes every opcode fetch take an extra 2 20mhz clocks */
 	m_maincpu->refresh_cb().set([this](offs_t offset, u8 data) {
-		if (!machine().side_effects_disabled())
-		{
-			m_m1_num = (m_m1_num + 1) % 5;
-			if (!m_m1_num)
-				m_maincpu->adjust_icount(-1);
-		}
+		m_m1_num = (m_m1_num + 1) % 5;
+		if (m_m1_num == 2)
+			m_maincpu->adjust_icount(-1);
 	});
 
 	Z80(config, m_soundcpu, SOUND_CLOCK/2);
