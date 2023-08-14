@@ -1,11 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
+
 /*
  * Silicon Graphics Personal IRIS 4D/20 and 4D/25.
  *
  *   Year  Model  Board  Type  CPU    Clock    I/D Cache    Code Name
  *   1988  4D/20  IP6    IP6   R2000  12.5MHz  16KiB/8KiB   Eclipse
  *   1989  4D/25  IP10   IP6   R3000  20MHz    64KiB/32KiB  Eclipse
+ *         VIP10  VIP10  IP6   R3000  20MHz    64KiB/32KiB  VME Eclipse
  *
  * Sources:
  *   - VME-Eclipse CPU (VIP10) Specification, Silicon Graphics, Inc.
@@ -55,14 +57,12 @@
 #include "machine/eepromser.h"
 
 // other devices
-#include "machine/wd33c9x.h"
 #include "machine/am79c90.h"
+#include "machine/dp8573a.h"
+#include "machine/edlc.h"
 #include "machine/mc68681.h"
 #include "machine/pit8253.h"
-#include "machine/dp8573a.h"
-#include "machine/z80scc.h"
-#include "machine/edlc.h"
-#include "machine/input_merger.h"
+#include "machine/wd33c9x.h"
 
 // buses and connectors
 #include "machine/nscsi_bus.h"
@@ -82,7 +82,6 @@
 
 #include "softlist.h"
 
-
 namespace {
 
 class ip6_state : public driver_device
@@ -90,7 +89,7 @@ class ip6_state : public driver_device
 public:
 	ip6_state(machine_config const &mconfig, device_type type, char const *tag)
 		: driver_device(mconfig, type, tag)
-		, m_cpu(*this, "maincpu")
+		, m_cpu(*this, "cpu")
 		, m_ctl(*this, "ctl")
 		, m_eeprom(*this, "eeprom")
 		, m_rtc(*this, "rtc")
@@ -98,7 +97,7 @@ public:
 		, m_scsi(*this, "scsi:0:wd33c93")
 		, m_enet(*this, "enet")
 		, m_duart(*this, "duart%u", 0U)
-		, m_serial(*this, "serial%u", 1U)
+		, m_serial(*this, "serial%u", 0U)
 		, m_gfx(*this, "gfx")
 		, m_softlist(*this, "softlist")
 		, m_leds(*this, "led%u", 0U)
@@ -109,7 +108,8 @@ public:
 	void pi4d20(machine_config &config);
 	void pi4d25(machine_config &config);
 
-	void initialize();
+protected:
+	virtual void machine_start() override;
 
 private:
 	required_device<mips1_device_base> m_cpu;
@@ -203,7 +203,6 @@ private:
 	u16 m_dmalo = 0;
 	u8 m_mapindex = 0;
 	std::unique_ptr<u16 []> m_dmahi;
-	offs_t m_dmaaddr = 0;
 
 	u32 m_gdma_dabr = 0;   // descriptor array base
 	u32 m_gdma_bufadr = 0; // buffer address
@@ -267,8 +266,6 @@ void ip6_state::map(address_map &map)
 		{
 			m_dmalo = data;
 			m_mapindex = 0;
-
-			m_dmaaddr = (u32(m_dmahi[m_mapindex]) << 12) | (m_dmalo & 0x0ffc);
 		}, "dmalo_w").umask32(0x0000ffff);
 
 	map(0x1f910000, 0x1f910003).lrw8(
@@ -552,7 +549,7 @@ void ip6_state::common(machine_config &config)
 	config.set_default_layout(layout_4dpi);
 }
 
-void ip6_state::initialize()
+void ip6_state::machine_start()
 {
 	m_sysid = 0;
 
@@ -597,13 +594,17 @@ void ip6_state::scsi_drq(int state)
 {
 	if (state)
 	{
-		if (m_dmalo & 0x8000)
-			m_cpu->space(0).write_byte(m_dmaaddr++, m_scsi->dma_r());
-		else
-			m_scsi->dma_w(m_cpu->space(0).read_byte(m_dmaaddr++));
+		u32 const addr = (u32(m_dmahi[m_mapindex]) << 12) | (m_dmalo & 0x0fff);
 
-		if (!(m_dmaaddr & 0xfff))
-			m_dmaaddr = u32(m_dmahi[++m_mapindex]) << 12;
+		if (m_dmalo & 0x8000)
+			m_cpu->space(0).write_byte(addr, m_scsi->dma_r());
+		else
+			m_scsi->dma_w(m_cpu->space(0).read_byte(addr));
+
+		m_dmalo = (m_dmalo + 1) & 0x8fff;
+
+		if (!(m_dmalo & 0xfff))
+			m_mapindex++;
 	}
 }
 
@@ -651,5 +652,5 @@ ROM_END
 } // anonymous namespace
 
 //   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY             FULLNAME               FLAGS
-COMP(1988, pi4d20, 0,      0,      pi4d20,  0,     ip6_state, initialize, "Silicon Graphics", "Personal IRIS 4D/20", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS)
-COMP(1989, pi4d25, 0,      0,      pi4d25,  0,     ip6_state, initialize, "Silicon Graphics", "Personal IRIS 4D/25", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS)
+COMP(1988, pi4d20, 0,      0,      pi4d20,  0,     ip6_state, empty_init, "Silicon Graphics", "Personal IRIS 4D/20", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS)
+COMP(1989, pi4d25, 0,      0,      pi4d25,  0,     ip6_state, empty_init, "Silicon Graphics", "Personal IRIS 4D/25", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS)

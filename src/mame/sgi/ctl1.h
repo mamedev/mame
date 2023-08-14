@@ -37,6 +37,9 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
+	void parity_r(offs_t offset, u32 &data, u32 mem_mask);
+	void parity_w(offs_t offset, u32 &data, u32 mem_mask);
+
 	required_address_space m_bus;
 	required_ioport m_simms;
 

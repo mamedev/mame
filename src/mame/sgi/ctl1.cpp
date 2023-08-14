@@ -148,66 +148,8 @@ void sgi_ctl1_device::cpucfg_w(u16 data)
 
 			m_parity = std::make_unique<u8[]>(ram_size << (20 - 3));
 			m_parity_mph = m_bus->install_readwrite_tap(0, (ram_size << 20) - 1, "parity",
-				[this](offs_t offset, u32 &data, u32 mem_mask)
-				{
-					if (m_cpucfg & CPUCFG_RPAR)
-					{
-						bool error = false;
-						for (unsigned byte = 0; byte < 4; byte++)
-						{
-							if (BIT(mem_mask, 24 - byte * 8, 8) && BIT(m_parity[offset >> 3], BIT(offset, 2) * 4 + byte))
-							{
-								m_parerr |= (PARERR_B0 >> byte) | PARERR_CPU;
-								error = true;
-
-								LOGMASKED(LOG_PARITY, "bad parity err 0x%08x byte %d count %d\n", offset, byte, m_parity_bad);
-							}
-						}
-
-						if (error)
-						{
-							m_erradr = offset;
-							m_cpuberr(1);
-						}
-					}
-				},
-				[this](offs_t offset, u32 &data, u32 mem_mask)
-				{
-					if (m_cpucfg & CPUCFG_BAD)
-					{
-						for (unsigned byte = 0; byte < 4; byte++)
-						{
-							if (BIT(mem_mask, 24 - byte * 8, 8) && !BIT(m_parity[offset >> 3], BIT(offset, 2) * 4 + byte))
-							{
-								m_parity[offset >> 3] |= 1U << (BIT(offset, 2) * 4 + byte);
-								m_parity_bad++;
-
-								LOGMASKED(LOG_PARITY, "bad parity set 0x%08x byte %d count %d\n", offset, byte, m_parity_bad);
-							}
-						}
-					}
-					else
-					{
-						for (unsigned byte = 0; byte < 4; byte++)
-						{
-							if (BIT(mem_mask, 24 - byte * 8, 8) && BIT(m_parity[offset >> 3], BIT(offset, 2) * 4 + byte))
-							{
-								m_parity[offset >> 3] &= ~(1U << (BIT(offset, 2) * 4 + byte));
-								m_parity_bad--;
-
-								LOGMASKED(LOG_PARITY, "bad parity clr 0x%08x byte %d count %d\n", offset, byte, m_parity_bad);
-							}
-						}
-
-						if (m_parity_bad == 0)
-						{
-							LOGMASKED(LOG_PARITY, "bad parity deactivated\n");
-
-							m_parity_mph.remove();
-							m_parity.reset();
-						}
-					}
-				});
+				std::bind(&sgi_ctl1_device::parity_r, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3),
+				std::bind(&sgi_ctl1_device::parity_w, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 		}
 	}
 
@@ -264,6 +206,68 @@ void sgi_ctl1_device::refadr_w(u32 data)
 {
 	m_refadr = data;
 	m_refresh_timer = machine().time();
+}
+
+void sgi_ctl1_device::parity_r(offs_t offset, u32 &data, u32 mem_mask)
+{
+	if (m_cpucfg & CPUCFG_RPAR)
+	{
+		bool error = false;
+		for (unsigned byte = 0; byte < 4; byte++)
+		{
+			if (BIT(mem_mask, 24 - byte * 8, 8) && BIT(m_parity[offset >> 3], BIT(offset, 2) * 4 + byte))
+			{
+				m_parerr |= (PARERR_B0 >> byte) | PARERR_CPU;
+				error = true;
+
+				LOGMASKED(LOG_PARITY, "bad parity err 0x%08x byte %d count %d\n", offset, byte, m_parity_bad);
+			}
+		}
+
+		if (error)
+		{
+			m_erradr = offset;
+			m_cpuberr(1);
+		}
+	}
+}
+
+void sgi_ctl1_device::parity_w(offs_t offset, u32 &data, u32 mem_mask)
+{
+	if (m_cpucfg & CPUCFG_BAD)
+	{
+		for (unsigned byte = 0; byte < 4; byte++)
+		{
+			if (BIT(mem_mask, 24 - byte * 8, 8) && !BIT(m_parity[offset >> 3], BIT(offset, 2) * 4 + byte))
+			{
+				m_parity[offset >> 3] |= 1U << (BIT(offset, 2) * 4 + byte);
+				m_parity_bad++;
+
+				LOGMASKED(LOG_PARITY, "bad parity set 0x%08x byte %d count %d\n", offset, byte, m_parity_bad);
+			}
+		}
+	}
+	else
+	{
+		for (unsigned byte = 0; byte < 4; byte++)
+		{
+			if (BIT(mem_mask, 24 - byte * 8, 8) && BIT(m_parity[offset >> 3], BIT(offset, 2) * 4 + byte))
+			{
+				m_parity[offset >> 3] &= ~(1U << (BIT(offset, 2) * 4 + byte));
+				m_parity_bad--;
+
+				LOGMASKED(LOG_PARITY, "bad parity clr 0x%08x byte %d count %d\n", offset, byte, m_parity_bad);
+			}
+		}
+
+		if (m_parity_bad == 0)
+		{
+			LOGMASKED(LOG_PARITY, "bad parity deactivated\n");
+
+			m_parity_mph.remove();
+			m_parity.reset();
+		}
+	}
 }
 
 static INPUT_PORTS_START(ctl1)
