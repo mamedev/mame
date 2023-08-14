@@ -20,34 +20,37 @@ Special Thanks to Raki(Sehyeon Kim) for tracing out the PCB schematics
 
 TODO:
  * Sprite colors are still not 100% correct, because 3 of the color bits in
-   the PROM come from the tilemap attribute bits for the tile behind (or,
-   in the case of tilemaps with the priority bit set, potentially in front
-   of) the sprite! This is hacked around by assuming one particular bit is
-   always set, to make the colors correct during super locomotive mode.
+    the PROM come from the tilemap attribute bits for the tile behind (or,
+    in the case of tilemaps with the priority bit set, potentially in front
+    of) the sprite! This is hacked around by assuming one particular bit is
+    always set, to make the colors correct during super locomotive mode.
    There is currently a very nasty hack in the sprite code to make this look
-   correct; the correct solution will most likely require the sprite drawing
-   code to be rewritten.
+    correct; the correct solution will most likely require the sprite drawing
+    code to be rewritten, or perhaps merged with the more-capable code
+    in system1_v.cpp, as noted below.
  * Consider merging parts of or the complete driver with system1.cpp
-   and system1_v.cpp, or deriving common code to its own file.
+    and system1_v.cpp, or deriving common code to its own file.
    The sprite systems use the same customs, although hooked up somewhat
-   differently (system1 uses some of the sprite X bits in register 3 for
-   color banking, for instance, while suprloco uses them as fractional X
-   bits, which are seemingly ignored by the sprite chips). The sound map
-   is the same, the clocks are the same (although derived differently).
+    differently (system1 uses some of the sprite X bits in register 3 for
+    color banking, for instance, while suprloco uses them for some other
+    unknown purpose as they are seemingly ignored by the sprite chipset).
+   The sound map is the same, the sound cpu and sound chip clocks are the
+    same (although derived differently).
    The PPI hookup is different, and the maincpu memory map is different.
    The tilemap systems are also very similar, particularly to the early
    system1 boards like up'n down.
- * The MUTE output isn't hooked up yet.
+ * The MUTE output isn't hooked up properly yet.
  * The bg rowscroll system should have 'overflow' pixels from the right screen
-   edge show on the very left screen edge for scroll values where the low 3
-   bits are not zero. This is an original hardware bug and can be seen in pcb
-   videos, particularly at the end of the bonus stage when the man runs on
-   screen followed by the text "GO ON TO NEXT ROUND!"
+    edge show on the very left screen edge for scroll values where the low 3
+    bits are not zero. This is an original hardware bug and can be seen in pcb
+    videos, particularly at the end of the bonus stage when the man runs on
+    screen followed by the text "GO ON TO NEXT ROUND!"
 
 BTANBs:
  * When passing through the trestle bridge, there is one light green dot per
-   trestle triangle that appears in front of the player train instead of behind
-   it. This happens on the real PCB too.
+    trestle triangle that appears in front of the player train instead of
+    behind it.
+   This happens on the real PCB too.
 
 ******************************************************************************/
 
@@ -117,15 +120,15 @@ private:
 
 	enum
 	{
-		SPR_Y_TOP = 0, // y offset
-		SPR_Y_BOTTOM,  // "
+		SPR_Y_TOP = 0, // y offset of top of sprite
+		SPR_Y_BOTTOM,  // y offset of bottom of sprite
 		SPR_X,         // x offset
-		SPR_COL,       // " (system 1 uses this as MSB and color bank, but here it seems like it is used differently?)
+		SPR_COL,       // ??? (system 1 uses this as x offset MSB and color bank, but here it is unknown but used)
 		SPR_SKIP_LO,   // stride
 		SPR_SKIP_HI,   // "
 		SPR_GFXOFS_LO, // source
 		SPR_GFXOFS_HI  // "
-		// technically each sprite word is 16 bytes long, but the latter 8 bytes have unclear purpose.
+		// technically each sprite word is 16 bytes long, but the latter 8 bytes have unclear purpose, yet are used.
 	};
 
 	void videoram_w(offs_t offset, uint8_t data);
@@ -174,6 +177,8 @@ void suprloco_state::machine_start()
   These 3 arrays then each connect to a Murata DST310-55Y5S222M100 EMI/RFI
    Suppression Filter Disc (2200pF w/Ferrite Beads, 100V tolerance) and then
    connect to the harness R, G and B contacts.
+  These same EMI/RFI suppression filters are used on all the input contacts
+   as well.
 
 ***************************************************************************/
 void suprloco_state::palette(palette_device &palette) const
@@ -195,7 +200,7 @@ void suprloco_state::palette(palette_device &palette) const
 		bit2 = BIT(color_prom[i], 5);
 		int const g = 0x24 * bit0 + 0x49 * bit1 + 0x92 * bit2;
 		// blue component
-		bit0 = 0; // this is correct, the low resistor in the blue array is simply left floating
+		bit0 = 0; // the low resistor in the blue array is simply left floating
 		bit1 = BIT(color_prom[i], 6);
 		bit2 = BIT(color_prom[i], 7);
 		int const b = 0x24 * bit0 + 0x49 * bit1 + 0x92 * bit2;
@@ -227,7 +232,7 @@ TILE_GET_INFO_MEMBER(suprloco_state::get_tile_info)
 	uint16_t const tile_attr = (m_videoram[2*tile_index] | (m_videoram[2*tile_index+1]<<8));
 	tileinfo.set(0,
 			BIT(tile_attr,0,10),
-			((BIT(tile_attr,10,3) << 4) | 0x80 | (BIT(m_control,5,2) << 8)) >> 4, // this overlaps bit 10 and this is intentional
+			((BIT(tile_attr,10,3) << 4) | 0x80 | (BIT(m_control,5,2) << 8)) >> 4, // this overlaps bit 10 intentionally
 			0);
 	tileinfo.category = BIT(tile_attr,13);
 }
@@ -245,17 +250,9 @@ void suprloco_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suprloco_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_rows(32);
-	for (int i = 0; i < 1024; i++) // pen color 0 on every row is opaque only on layer 0, everything else is opaque on all layers.
-	{
-		if (!(i&0xf))
-		{
-			m_bg_tilemap->map_pen_to_layer(0, i, TILEMAP_PIXEL_LAYER0);
-		}
-		else
-		{
-			m_bg_tilemap->map_pen_to_layer(0, i, TILEMAP_PIXEL_LAYER0 | TILEMAP_PIXEL_LAYER1);
-		}
-	}
+	// pen color 0 on every palette "bank" is opaque only on layer 0, everything else is opaque on all layers.
+	for (int i = 0; i < 1024; i++)
+		m_bg_tilemap->map_pen_to_layer(0, i, (i & 0xf) ? TILEMAP_PIXEL_LAYER0 | TILEMAP_PIXEL_LAYER1 : TILEMAP_PIXEL_LAYER0);
 }
 
 
@@ -339,7 +336,10 @@ void suprloco_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect
 	}
 	else
 	{
-		adjy = sy + 31 + height; //sprites are offset by 256-(224+1)=31 pixels in flipscreen mode due to the way the video timing pals and sprite line compare counter reload value works
+		adjy = sy + 31 + height; // sprites are offset by 256-(224+1)=31 pixels
+								 //  in flipscreen mode due to the way the
+								 //  video timing pals and sprite line compare
+								 //  counter reload value works
 		dy = -1;
 	}
 
@@ -351,12 +351,22 @@ void suprloco_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect
 	||||||////- currently selected color based on the 4 tilemap color bits or 4 sprite bits
 	9876543210
 	*/
-	//pen_t const pen_base = 0x100 + (0x20 * (spr_reg[SPR_COL] & 0x07)) + ((m_control & 0x20) ? 0x10 : 0);
 	pen_t const pen_base = ((BIT(m_control,5,2)<<8)
 							| 0 /* bit 7 will always be zero for sprites */
-							/*| (spr_reg[SPR_COL] & 0x3) << 4 bits 6,5,4 come from the sprite asic, somehow */
-							| ((adjy<128)?0x10:0x00) ///TODO: horrible hack, until we rewrite for a line-based renderer. basically, we should be pulling this bit, 0x20 and 0x40 from the tilemap 'behind' the sprite... or rendering the sprite's color prom address, instead of its actual color data, into a sprite bitmap. When baking the bitmap and the tilemap together, the sprite colors, if they have priority, need to use those bits from whatever tilemap tile they are on top of! This hack makes it so this bit should be set on the top half of the screen and clear on the bottom half, regardless of flipscreen state (i.e. it will be on the bottom half when flipped). It's totally wrong, but looks correct.
+							| ((adjy<128)?0x10:0x00) ///TODO: horrible hack, see below.
 							);
+	/* Horrible hack explanation: The 0x10 bit should be pulled, along with
+	    0x20 and 0x40, from the tilemap 'behind' the sprite.
+	   To actually implement this, we could be doing something like rendering
+	    the sprite's color prom address, instead of its actual color data, into
+	    a sprite bitmap. Then, when baking the bitmap and the tilemap together,
+	    the sprite colors, if they are to be displayed (and not masked by bg),
+	    need to use those bits from whatever tilemap pixel they are on top of!
+	   This hack makes it so this bit should be set on the top half of the
+	    screen and clear on the bottom half, regardless of flipscreen state
+	    (i.e. it will be on the bottom half when flipped).
+	   It's technically wrong, but looks correct.
+	*/
 
 	for (int row = 0; row < height; row++, adjy += dy)
 	{
@@ -431,7 +441,9 @@ uint32_t suprloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 0  1  *  *  *  *  *  *  *  *  *  *  *  *  *  *  R   - 0x4000 - EPROM@IC15
 1  0  *  *  *  *  *  *  *  *  *  *  *  *  *  *  R   - 0x8000 - EPROM@IC28
 1  1  *  *  *                                         MMIO DECODER 74LS138@IC54
-1  1  0  0  0  *  *  *  *  *  *  *  *  *  *  *  RW  - 0xC000 - OBJRAM (MBM2148L-55 1kx4 srams arranged as a 16-bit-wide array @IC19, IC18, IC17, IC16, accessed via sprite custom 315-5012@IC4)
+1  1  0  0  0  *  *  *  *  *  *  *  *  *  *  *  RW  - 0xC000 - OBJRAM (MBM2148L-55 1kx4 srams arranged
+                                                       as a 16-bit-wide array @IC19, IC18, IC17, IC16,
+                                                       accessed via sprite custom 315-5012@IC4)
 1  1  0  0  1  x  x  x  x  x  x  x  x  x  x  x  R   - 0xC800 - SYSTEM optoisolated inputs from harness connector
 1  1  0  1  0  x  x  x  x  x  x  x  x  x  x  x  R   - 0xD000 - P1 optoisolated inputs from harness connector
 1  1  0  1  1  x  x  x  x  x  x  x  x  x  x  x  R   - 0xD800 - P2 optoisolated inputs from harness connector
@@ -589,7 +601,10 @@ GFXDECODE_END
 void suprloco_state::suprloco(machine_config &config)
 {
 	// basic machine hardware
-	SEGA_315_5015(config, m_maincpu, MASTER_CLOCK / 5); // this is actually /5 vs /6 depending on the /M1 line state from the z80 during counter reload; see system1.cpp which uses an identical circuit.
+	SEGA_315_5015(config, m_maincpu, MASTER_CLOCK / 5); // see below
+	// this divider is actually /5 vs /6 depending on the /M1 line state from
+	//  the z80 during the 74LS161 counter reload; see system1.cpp which uses
+	//  an identical circuit.
 	m_maincpu->set_addrmap(AS_PROGRAM, &suprloco_state::main_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &suprloco_state::decrypted_opcodes_map);
 	m_maincpu->set_vblank_int("screen", FUNC(suprloco_state::irq0_line_hold));
@@ -598,14 +613,20 @@ void suprloco_state::suprloco(machine_config &config)
 		if (!machine().side_effects_disabled())
 		{
 			m_m1_num = (m_m1_num + 1) % 5;
-			if (m_m1_num == 2) // if we've passed 5 M1 cycles, steal an additional 5x-20mhz-cycle-long cpu cycle. We do this at the third cycle to average the correct speed.
+			// if we've passed 5 M1 cycles, steal an additional
+			//  5x-20mhz-cycle-long cpu cycle. We do this at the third cycle to
+			//  average the correct speed.
+			if (m_m1_num == 2)
 				m_maincpu->adjust_icount(-1);
 		}
 	});
 
-	Z80(config, m_audiocpu, MASTER_CLOCK/5); // 4mhz, through a very clever /5 circuit with a 74LS390 in bi-quinary mode; this divider produces a very lopsided duty cycle output, which might be why this circuit was replaced a plain 8mhz crystal and a /2 divider in the system1 boardset.
+	Z80(config, m_audiocpu, MASTER_CLOCK/5); // 4mhz
+	// This divide-by-five is done by a clever circuit with a 74LS390 in
+	//  bi-quinary mode.
 	m_audiocpu->set_addrmap(AS_PROGRAM, &suprloco_state::sound_map);
-	// Audio CPU INTs are caused by the falling edge of the V5 line counter (4x per frame) and are auto-acked.
+	// Audio CPU INTs are caused by the falling edge of the V5 line counter
+	//  (4x per frame) and are auto-acked.
 	///TODO: once pals are dumped, make sure this uses the correct timing!
 	m_audiocpu->set_periodic_int(FUNC(suprloco_state::irq0_line_hold), attotime::from_hz(4 * 60));
 	// Audio CPU NMIs are caused by the main CPU via PPI portC bit7, see below
