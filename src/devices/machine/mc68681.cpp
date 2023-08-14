@@ -1557,9 +1557,15 @@ void duart_channel::write_CR(uint8_t data)
 	case 3: /* Reset channel transmitter */
 		SR &= ~(STATUS_TRANSMITTER_READY | STATUS_TRANSMITTER_EMPTY);
 		if (m_ch == 0)
+		{
+			m_uart->write_a_tx(1);
 			m_uart->clear_ISR_bits(INT_TXRDYA);
+		}
 		else
+		{
+			m_uart->write_b_tx(1);
 			m_uart->clear_ISR_bits(INT_TXRDYB);
+		}
 		transmit_register_reset();
 		m_bits_transmitted = 255;
 		m_tx_data_in_buffer = false;
