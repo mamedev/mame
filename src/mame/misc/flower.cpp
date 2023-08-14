@@ -8,6 +8,8 @@
     original "wiped off due of not anymore licensable" driver by insideoutboy.
 
     TODO:
+    - CPU speed is probably wrong. The pacing is fine at 3.072MHz, but then
+      the game locks up sometimes. Or is the cause elsewhere?
     - priority might be wrong in some places (title screen stars around the
       galaxy, planet ship 3rd boss, 2nd boss);
     - sound chips (similar to Namco custom chips?)
@@ -503,13 +505,13 @@ void flower_state::slave_irq_ack_w(int state)
 
 void flower_state::flower(machine_config &config)
 {
-	Z80(config, m_mastercpu, MASTER_CLOCK / 6); // divider unknown
+	Z80(config, m_mastercpu, MASTER_CLOCK / 4); // divider unknown
 	m_mastercpu->set_addrmap(AS_PROGRAM, &flower_state::shared_map);
 
-	Z80(config, m_slavecpu, MASTER_CLOCK / 6); // divider unknown
+	Z80(config, m_slavecpu, MASTER_CLOCK / 4); // divider unknown
 	m_slavecpu->set_addrmap(AS_PROGRAM, &flower_state::shared_map);
 
-	Z80(config, m_audiocpu, MASTER_CLOCK / 6); // divider unknown
+	Z80(config, m_audiocpu, MASTER_CLOCK / 4); // divider unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &flower_state::audio_map);
 	m_audiocpu->set_periodic_int(FUNC(flower_state::irq0_line_hold), attotime::from_hz(90));
 

@@ -3,17 +3,32 @@
 #include "emu.h"
 #include "fs_sr022.h"
 
+namespace {
 
-DEFINE_DEVICE_TYPE(MSX_CART_FS_SR022, msx_cart_fs_sr022_device, "msx_cart_fs_sr022", "MSX Cartridge - FS-SR022")
-
-
-msx_cart_fs_sr022_device::msx_cart_fs_sr022_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_FS_SR022, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_bunsetsu_rom(nullptr)
-	, m_bunsetsu_address(0)
+class msx_cart_fs_sr022_device : public device_t, public msx_cart_interface
 {
-}
+public:
+	msx_cart_fs_sr022_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, MSX_CART_FS_SR022, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_bunsetsu_rom(nullptr)
+		, m_bunsetsu_address(0)
+	{ }
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device_t implementation
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	u8 buns_r();
+	void buns_w(offs_t offset, u8 data);
+
+	u8 *m_bunsetsu_rom;
+	u32 m_bunsetsu_address;
+};
 
 void msx_cart_fs_sr022_device::device_start()
 {
@@ -74,3 +89,7 @@ void msx_cart_fs_sr022_device::buns_w(offs_t offset, uint8_t data)
 			break;
 	}
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_FS_SR022, msx_cart_interface, msx_cart_fs_sr022_device, "msx_cart_fs_sr022", "MSX Cartridge - FS-SR022")

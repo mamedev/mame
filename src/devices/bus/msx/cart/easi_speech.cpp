@@ -17,17 +17,33 @@ or a$=usr9("string")
 
 #include "emu.h"
 #include "easi_speech.h"
+#include "sound/sp0256.h"
 
+namespace {
 
-DEFINE_DEVICE_TYPE(MSX_CART_EASISPEECH, msx_cart_easispeech_device, "msx_cart_easispeech", "MSX Cartridge - Easi-Speech")
-
-
-msx_cart_easispeech_device::msx_cart_easispeech_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_EASISPEECH, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_speech(*this, "speech")
+class msx_cart_easispeech_device : public device_t, public msx_cart_interface
 {
-}
+public:
+	msx_cart_easispeech_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_EASISPEECH, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_speech(*this, "speech")
+	{ }
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device_t implementation
+	virtual void device_start() override { }
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	u8 speech_r();
+	void speech_w(u8 data);
+
+	required_device<sp0256_device> m_speech;
+};
 
 ROM_START(msx_cart_easispeech)
 	ROM_REGION(0x10000, "speech", 0)
@@ -76,3 +92,7 @@ void msx_cart_easispeech_device::speech_w(u8 data)
 {
 	m_speech->ald_w(bitswap<6>(data,3,5,7,6,4,2));
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_EASISPEECH, msx_cart_interface, msx_cart_easispeech_device, "msx_cart_easispeech", "MSX Cartridge - Easi-Speech")

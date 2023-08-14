@@ -121,6 +121,7 @@ protected:
 	virtual void sequencer_map(address_map &map) override;
 
 	virtual void device_reset() override;
+	virtual u16 line_compare_mask() override;
 private:
 	u8 vert_timing_overflow_r(offs_t offset);
 	void vert_timing_overflow_w(offs_t offset, u8 data);

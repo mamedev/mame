@@ -94,7 +94,7 @@ void sgi_pic1_device::device_reset()
 	if (bank16m > 1)
 		logerror("invalid memory configuration, at most one bank may contain 4M SIMMs\n");
 
-	m_cpuctrl = CONFIG_BIGEND;
+	m_cpucfg = CONFIG_BIGEND;
 
 	// assume memory configuration is invalidated by reset
 	memcfg_w(0, 0x003f003f);
@@ -108,7 +108,7 @@ void sgi_pic1_device::device_reset()
 void sgi_pic1_device::map(address_map &map)
 {
 	// system registers
-	map(0x0'0000, 0x0'0003).rw(FUNC(sgi_pic1_device::cpuctrl_r), FUNC(sgi_pic1_device::cpuctrl_w));
+	map(0x0'0000, 0x0'0003).rw(FUNC(sgi_pic1_device::cpucfg_r), FUNC(sgi_pic1_device::cpucfg_w));
 	//map(0x0'0004, 0x0'0007); // RSTCONFIG system mode register
 	map(0x0'0008, 0x0'000b).r(FUNC(sgi_pic1_device::sid_r));
 

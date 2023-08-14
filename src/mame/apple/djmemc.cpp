@@ -97,7 +97,7 @@ void djmemc_device::device_reset()
 u32 djmemc_device::rom_switch_r(offs_t offset)
 {
 	// disable the overlay
-	if (m_overlay)
+	if (m_overlay && !machine().side_effects_disabled())
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 		const u32 memory_end = m_ram_size - 1;

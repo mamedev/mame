@@ -176,7 +176,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  *MP3493   TMS1100   1980, Milton Bradley OMNI Entertainment System (1/2)
  *MP3494   TMS1100   1980, Milton Bradley OMNI Entertainment System (2/2)
   MP3496   TMS1100   1980, Microvision cartridge: Sea Duel
-  M34009   TMS1100   1981, Microvision cartridge: Alien Raiders (note: MP3498, MP3499, M3400x..)
+ *M34004A  TMS1100   1981, Ideal Sky-Writer (note: MP3498, MP3499, M3400x..)
+  M34009   TMS1100   1981, Microvision cartridge: Alien Raiders
  @M34012   TMS1100   1980, Mattel Dungeons & Dragons: Computer Labyrinth Game
  *M34014   TMS1100   1981, Coleco Bowlatronic
   M34017   TMS1100   1981, Microvision cartridge: Cosmic Hunter
@@ -191,6 +192,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
  @MP6354   TMS1475   1982, Tsukuda The Dracula
+ *MP6358   TMS1475?  1982, Bandai U-Boat
  *MP6361   TMS1475?  1983, <unknown> Defender Strikes
  @MP7302   TMS1400   1980, Tiger Deluxe Football with Instant Replay
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
@@ -16244,8 +16246,8 @@ ROM_START( tdracula )
 	ROM_REGION( 557, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1400_tdracula_output.pla", 0, 557, CRC(54408672) SHA1(8fdc6910a27c22c1df2cadeb25c74118d5774481) )
 
-	ROM_REGION( 416612, "screen", 0)
-	ROM_LOAD( "tdracula.svg", 0, 416612, CRC(b4e723dc) SHA1(7d90aa92755727fc21f3b2913cd5d86f8594ea20) )
+	ROM_REGION( 417508, "screen", 0)
+	ROM_LOAD( "tdracula.svg", 0, 417508, CRC(03438ea0) SHA1(33c6561e3a73eee754b5fbe0e6d0b61fc99c92f0) )
 ROM_END
 
 

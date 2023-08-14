@@ -50,7 +50,7 @@ void nscsi_harddisk_device::device_reset()
 
 void nscsi_harddisk_device::device_add_mconfig(machine_config &config)
 {
-	HARDDISK(config, image).set_interface("scsi_hdd");
+	HARDDISK(config, image).set_interface("scsi_hdd,hdd");
 }
 
 uint8_t nscsi_harddisk_device::scsi_get_data(int id, int pos)

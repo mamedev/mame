@@ -312,6 +312,12 @@ bool ata_hle_device_base::set_features()
 	case IDE_SET_FEATURES_ENABLE_REVERTING_TO_POWER_ON_DEFAULTS:
 		m_revert_to_defaults = true;
 		return true;
+
+	// not actually handled, but reply as if we did
+	case IDE_SET_FEATURES_ENABLE_ECC:
+	case IDE_SET_FEATURES_ENABLE_RETRIES:
+	case IDE_SET_FEATURES_ENABLE_READ_LOOK_AHEAD:
+		return true;
 	}
 
 	return false;

@@ -29,9 +29,9 @@ public:
 	scorpion_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_128_state(mconfig, type, tag)
 		, m_bankio(*this, "bankio")
+		, m_bank0_rom(*this, "bank0_rom")
 		, m_beta(*this, BETA_DISK_TAG)
 		, m_ay(*this, "ay%u", 0U)
-		, m_bank0_rom(*this, "bank0_rom")
 		, m_io_mouse(*this, "mouse_input%u", 1U)
 		, m_mod_ay(*this, "MOD_AY")
 	{ }
@@ -43,34 +43,44 @@ public:
 	INPUT_CHANGED_MEMBER(on_nmi);
 
 protected:
+	static constexpr u8 ROM_PAGE_SYS = 2;
+	static constexpr u8 ROM_PAGE_DOS = 3;
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+
+	bool dos()    const { return m_beta->is_active(); }
+	bool romram() const { return BIT(m_port_1ffd_data, 0); }
+	bool rom1()   const { return BIT(m_port_7ffd_data, 4); }
 
 	void scorpion_io(address_map &map);
 	void scorpion_mem(address_map &map);
 	void scorpion_switch(address_map &map);
 	virtual void scorpion_ioext(address_map &map);
-	void port_7ffd_w(offs_t offset, u8 data);
-	void port_1ffd_w(offs_t offset, u8 data);
+	u8 port_ff_r();
+	void port_7ffd_w(u8 data);
+	void port_1ffd_w(u8 data);
 	virtual void ay_address_w(u8 data);
 
-	rectangle get_screen_area() override;
+	virtual rectangle get_screen_area() override;
 	virtual void scorpion_update_memory();
+	virtual void do_nmi();
 
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	memory_access<17, 0, 0, ENDIANNESS_LITTLE>::specific m_ioext;
 	required_device<address_map_bank_device> m_bankio;
+	memory_view m_bank0_rom;
 	required_device<beta_disk_device> m_beta;
 	required_device_array<ay8912_device, 2> m_ay;
 
 	u8 m_is_m1_even;
 	u8 m_nmi_pending;
+	u8 m_magic_lock;
 	u8 m_ay_selected;
+	u8 m_ram_banks;
 
 private:
-	memory_view m_bank0_rom;
-
 	u8 beta_neutral_r(offs_t offset);
 	u8 beta_enable_r(offs_t offset);
 	u8 beta_disable_r(offs_t offset);
@@ -78,7 +88,6 @@ private:
 
 	required_ioport_array<3> m_io_mouse;
 	required_ioport m_mod_ay;
-	u8 m_ram_banks;
 };
 
 class scorpiontb_state : public scorpion_state
@@ -90,6 +99,8 @@ public:
 
 	void scorpiontb(machine_config &config);
 
+	INPUT_CHANGED_MEMBER(turbo_changed);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -100,13 +111,61 @@ protected:
 
 	virtual void scorpion_update_memory() override;
 
+	u8 m_turbo;
+	u8 m_prof_plane;
+
 private:
 	u8 ay_data_r();
 
-	u8 m_prof_plane;
 	u8 m_ay_reg;
 
 };
+
+class scorpiongmx_state : public scorpiontb_state
+{
+public:
+	scorpiongmx_state(const machine_config &mconfig, device_type type, const char *tag)
+		: scorpiontb_state(mconfig, type, tag)
+		, m_io_gmx(*this, "io_gmx")
+	{ }
+
+	void scorpiongmx(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	virtual void scorpion_ioext(address_map &map) override;
+	void global_cfg_w(u8 data);
+	u8 port_78fd_r();
+	u8 port_7afd_r();
+	u8 port_7efd_r();
+	void port_7efd_w(u8 data);
+
+	virtual void scorpion_update_memory() override;
+	virtual void spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+	virtual rectangle get_screen_area() override;
+	virtual void do_nmi() override;
+
+	memory_view m_io_gmx;
+
+private:
+	bool fixrom() const { return BIT(m_port_00_data, 4); }
+
+	u8 m_magic_shift;
+	u8 m_gfx_ext = 0;
+	u8 m_magic_disabled;
+	u8 m_port_00_data;
+	u8 m_port_78fd_data;
+	u8 m_port_7afd_lock_data;
+	u8 m_scroll_lo;
+	u8 m_scroll_hi;
+	u8 m_port_7efd_lock_data;
+	u8 m_port_dffd_data;
+
+};
+
 
 /****************************************************************************************************/
 /* Zs Scorpion 256 */
@@ -138,24 +197,25 @@ D6-D7 - not used. ( yet ? )
 
 void scorpion_state::scorpion_update_memory()
 {
-	if (BIT(m_port_1ffd_data, 0) && !m_nmi_pending)
+	if (romram() && !m_nmi_pending)
 	{
 		m_bank_ram[0]->set_entry(0);
 		m_bank0_rom.select(0);
-		LOGMEM("mem: 0=RAM,");
+		LOGMEM("mem: RAM0(0)");
 	}
 	else
 	{
-		const u8 rom_page = (BIT(m_port_1ffd_data, 1) && !m_nmi_pending)
-			? 2
-			: ((m_beta->is_active() << 1) | BIT(m_port_7ffd_data, 4));
+		const u8 rom_page = BIT(m_port_1ffd_data, 1)
+			? ROM_PAGE_SYS
+			: (((m_nmi_pending || dos()) << 1) | rom1());
 
 		m_bank_rom[0]->set_entry(rom_page);
 		m_bank0_rom.disable();
-		LOGMEM("mem: 0=ROM(%x),", m_bank_rom[0]->entry());
+		LOGMEM("mem: ROM0(%x)", m_bank_rom[0]->entry());
 	}
-	m_bank_ram[3]->set_entry(((m_port_7ffd_data & 0x07) | ((m_port_1ffd_data & 0x10) >> 1) | ((m_port_1ffd_data & 0xc0) >> 2)) % m_ram_banks);
-	LOGMEM("3=RAM(%x)\n", m_bank_ram[3]->entry());
+
+	m_bank_ram[3]->set_entry(((((m_port_1ffd_data & 0xc0) >> 2) | (m_port_1ffd_data & 0x10) >> 1) | (m_port_7ffd_data & 0x07)) % m_ram_banks);
+	LOGMEM(", RAM3(%x)\n", m_bank_ram[3]->entry());
 }
 
 INTERRUPT_GEN_MEMBER(scorpion_state::scorpion_interrupt)
@@ -168,7 +228,25 @@ INPUT_CHANGED_MEMBER(scorpion_state::on_nmi)
 	m_nmi_pending = newval;
 }
 
-void scorpion_state::port_7ffd_w(offs_t offset, u8 data)
+void scorpion_state::do_nmi()
+{
+	m_beta->enable();
+	scorpion_update_memory();
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	m_nmi_pending = 0;
+}
+
+u8 scorpion_state::port_ff_r()
+{
+	if (m_magic_lock && !machine().side_effects_disabled())
+	{
+		LOGIO("Registers lock released\n");
+		m_magic_lock = 0;
+	}
+	return scorpion_state::floating_bus_r();
+}
+
+void scorpion_state::port_7ffd_w(u8 data)
 {
 	/* disable paging */
 	if (BIT(m_port_7ffd_data, 5))
@@ -181,7 +259,7 @@ void scorpion_state::port_7ffd_w(offs_t offset, u8 data)
 	m_screen_location = m_ram->pointer() + ((BIT(m_port_7ffd_data, 3) ? 7 : 5) << 14);
 }
 
-void scorpion_state::port_1ffd_w(offs_t offset, u8 data)
+void scorpion_state::port_1ffd_w(u8 data)
 {
 	m_port_1ffd_data = data;
 	scorpion_update_memory();
@@ -207,7 +285,7 @@ u8 scorpion_state::beta_enable_r(offs_t offset)
 	if (!machine().side_effects_disabled())
 	{
 		if (m_is_m1_even && (m_maincpu->total_cycles() & 1)) m_maincpu->eat_cycles(1);
-		if (m_beta->started() && !m_beta->is_active())
+		if (!dos() && rom1())
 		{
 			m_beta->enable();
 			scorpion_update_memory();
@@ -223,13 +301,9 @@ u8 scorpion_state::beta_disable_r(offs_t offset)
 		if (m_is_m1_even && (m_maincpu->total_cycles() & 1)) m_maincpu->eat_cycles(1);
 		if (m_nmi_pending)
 		{
-			m_port_1ffd_data |= 0x02;
-			m_beta->enable();
-			scorpion_update_memory();
-			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-			m_nmi_pending = 0;
+			do_nmi();
 		}
-		else if (m_beta->started() && m_beta->is_active())
+		else if (dos())
 		{
 			m_beta->disable();
 			scorpion_update_memory();
@@ -242,10 +316,10 @@ void scorpion_state::scorpion_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).bankr(m_bank_rom[0]);
 	map(0x0000, 0x3fff).view(m_bank0_rom);
-	m_bank0_rom[0](0x0000, 0x3fff).bankr(m_bank_ram[0]).w(FUNC(scorpion_state::spectrum_128_ram_w<0>));
+	m_bank0_rom[0](0x0000, 0x3fff).bankrw(m_bank_ram[0]);
 
 	map(0x4000, 0x7fff).bankr(m_bank_ram[1]).w(FUNC(scorpion_state::spectrum_128_ram_w<1>));
-	map(0x8000, 0xbfff).bankrw(m_bank_ram[2]);
+	map(0x8000, 0xbfff).bankr(m_bank_ram[2]).w(FUNC(scorpion_state::spectrum_128_ram_w<2>));
 	map(0xc000, 0xffff).bankr(m_bank_ram[3]).w(FUNC(scorpion_state::spectrum_128_ram_w<3>));
 }
 
@@ -255,15 +329,15 @@ void scorpion_state::scorpion_ioext(address_map &map)
 	map(0x0022, 0x0022).select(0xffdc) // FE | xxxxxxxxxx1xxx10
 		.rw(FUNC(scorpion_state::spectrum_ula_r), FUNC(scorpion_state::spectrum_ula_w));
 	map(0x0023, 0x0023).mirror(0xffdc) // FF | xxxxxxxxxx1xxx11
-		.r(FUNC(scorpion_state::floating_bus_r));
+		.r(FUNC(scorpion_state::port_ff_r));
 	map(0x0021, 0x0021).mirror(0x13fdc) // 1FFD | 00xxxxxxxx1xxx01
 		.w(FUNC(scorpion_state::port_1ffd_w));
 	map(0x4021, 0x4021).mirror(0x13fdc) // 7FFD | 01xxxxxxxx1xxx01
 		.w(FUNC(scorpion_state::port_7ffd_w));
 
-	map(0xa021, 0xa021).mirror(0x1fdc) // BFFD | 101xxxxxxx1xxx01
+	map(0xa021, 0xa021).mirror(0x11fdc) // BFFD | 101xxxxxxx1xxx01
 		.lw8(NAME([this](u8 data) { m_ay[m_ay_selected]->data_w(data); }));
-	map(0xe021, 0xe021).mirror(0x1fdc) // FFFD | 111xxxxxxx1xxx01
+	map(0xe021, 0xe021).mirror(0x11fdc) // FFFD | 111xxxxxxx1xxx01
 		.lr8(NAME([this]() { return m_ay[m_ay_selected]->data_r(); })).w(FUNC(scorpion_state::ay_address_w));
 
 	// Mouse
@@ -271,7 +345,7 @@ void scorpion_state::scorpion_ioext(address_map &map)
 	map(0xfbdf, 0xfbdf).lr8(NAME([this]() -> u8 { return m_io_mouse[0]->read(); }));
 	map(0xffdf, 0xffdf).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));
 	map(0x0003, 0x0003) // 1F | xxxxxxxx0x0xxx11
-		.select(0xff5c).lr8(NAME([]() -> u8 { return 0xc0; })); // TODO Kepmston Joystick
+		.select(0xff5c).lr8(NAME([this]() -> u8 { return (m_beta->state_r() & 0xc0) | 0x00; })); // TODO Kepmston Joystick
 
 	// Shadow
 	// DOS + xxxxxxxx0nnxxx11
@@ -285,8 +359,8 @@ void scorpion_state::scorpion_ioext(address_map &map)
 void scorpion_state::scorpion_io(address_map &map)
 {
 	map(0x0000, 0xffff).lrw8(
-		NAME([this](offs_t offset) { return m_ioext.read_byte((m_beta->is_active() || BIT(m_port_1ffd_data, 3)) << 16 | offset); }),
-		NAME([this](offs_t offset, u8 data) { m_ioext.write_byte((m_beta->is_active() || BIT(m_port_1ffd_data, 3)) << 16 | offset, data); }));
+		NAME([this](offs_t offset) { return m_ioext.read_byte((dos() << 16) | offset); }),
+		NAME([this](offs_t offset, u8 data) { m_ioext.write_byte((dos() << 16) | offset, data); }));
 }
 
 void scorpion_state::scorpion_switch(address_map &map)
@@ -302,6 +376,7 @@ void scorpion_state::machine_start()
 
 	save_item(NAME(m_port_1ffd_data));
 	save_item(NAME(m_nmi_pending));
+	save_item(NAME(m_magic_lock));
 	save_item(NAME(m_ay_selected));
 	save_item(NAME(m_ram_banks));
 
@@ -313,18 +388,22 @@ void scorpion_state::machine_start()
 	m_bank_rom[0]->configure_entries(0, rom->bytes() / 0x4000, rom->base() + 0x10000, 0x4000);
 	m_ram_banks = m_ram->size() / 0x4000;
 	m_bank_ram[0]->configure_entries(0, m_ram_banks, m_ram->pointer(), 0x4000);
+	m_bank_ram[2]->configure_entries(0, m_ram_banks, m_ram->pointer(), 0x4000);
 }
 
 void scorpion_state::machine_reset()
 {
 	m_is_m1_even = 1;
 	m_nmi_pending = 0;
+	m_magic_lock = 0;
 	m_ay_selected = 0;
 	m_beta->disable();
 
 	m_port_fe_data = 255;
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = 0;
+
+	m_bank_ram[2]->set_entry(2);
 
 	scorpion_update_memory();
 }
@@ -393,11 +472,7 @@ INPUT_PORTS_START( scorpion )
 	PORT_INCLUDE( spec_plus )
 
 	PORT_MODIFY("NMI")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, scorpion_state, on_nmi, 0)
-
-	//PORT_START("TURBO")
-	//PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Turbo") PORT_CODE(KEYCODE_F12) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, sprinter_state, turbo_changed, 0)
-	//PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, scorpion_state, on_nmi, 0)
 
 
 	PORT_START("mouse_input1")
@@ -487,6 +562,23 @@ u8 scorpiontb_state::ay_data_r()
 		: m_ay[m_ay_selected]->data_r();
 }
 
+INPUT_CHANGED_MEMBER(scorpiontb_state::turbo_changed)
+{
+	if (newval == 1)
+	{
+		m_turbo = !m_turbo;
+		m_maincpu->set_clock_scale(1 << m_turbo);
+		popmessage("Turbo %s\n", m_turbo ? "ON" : "OFF");
+	}
+}
+
+INPUT_PORTS_START( scorpiontb )
+	PORT_INCLUDE( scorpion )
+
+	PORT_START("TURBO")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TURBO") PORT_CODE(KEYCODE_F11) PORT_CHANGED_MEMBER(DEVICE_SELF, scorpiontb_state, turbo_changed, 0)
+INPUT_PORTS_END
+
 void scorpiontb_state::scorpiontb(machine_config &config)
 {
 	scorpion(config);
@@ -511,6 +603,7 @@ void scorpiontb_state::machine_start()
 
 	save_item(NAME(m_prof_plane));
 	save_item(NAME(m_ay_reg));
+	save_item(NAME(m_turbo));
 }
 
 void scorpiontb_state::machine_reset()
@@ -520,6 +613,7 @@ void scorpiontb_state::machine_reset()
 
 	scorpion_state::machine_reset();
 	m_is_m1_even = 0;
+	m_turbo = 0;
 	m_maincpu->set_clock_scale(1);
 }
 
@@ -536,9 +630,9 @@ void scorpiontb_state::video_start()
 	scorpion_state::video_start();
 
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
-	prg.install_read_tap(0x0100, 0x010c, "accel_read", [this](offs_t offset, u8 &data, u8 mem_mask)
+	prg.install_read_tap(0x0100, 0x010c, "plane_switch", [this](offs_t offset, u8 &data, u8 mem_mask)
 	{
-		if (!machine().side_effects_disabled() && (m_port_1ffd_data & 0x02))
+		if (!machine().side_effects_disabled() && !romram() && ((m_bank_rom[0]->entry() & 3) == ROM_PAGE_SYS))
 		{
 			const u8 offs = offset & 0x000f;
 			if ((offs == 0) || (offs == 4) || (offs == 8) || (offs == 0x0c))
@@ -558,15 +652,244 @@ void scorpiontb_state::scorpion_ioext(address_map &map)
 {
 	scorpion_state::scorpion_ioext(map);
 	map(0x0021, 0x0021).mirror(0x13fdc) // 1FFD | 00xxxxxxxx1xxx01
-		.lr8(NAME([this](offs_t offset) { m_maincpu->set_clock_scale(1); return 0xff; }));
+		.lr8(NAME([this](offs_t offset) -> u8 { m_turbo = 0; m_maincpu->set_clock_scale(1); return 0xff; }));
 	map(0x4021, 0x4021).mirror(0x13fdc) // 7FFD | 01xxxxxxxx1xxx01
-		.lr8(NAME([this](offs_t offset) { m_maincpu->set_clock_scale(2); return 0xff; }));
-	map(0xe021, 0xe021).mirror(0x1fdc) // FFFD | 111xxxxxxx1xxx01
+		.lr8(NAME([this](offs_t offset) -> u8 { m_turbo = 1; m_maincpu->set_clock_scale(2); return 0xff; }));
+	map(0xe021, 0xe021).mirror(0x11fdc) // FFFD | 111xxxxxxx1xxx01
 		.rw(FUNC(scorpiontb_state::ay_data_r),  FUNC(scorpiontb_state::ay_address_w));
 
 	// Centronics
 	map(0x0001, 0x0001).mirror(0xffdc).nopw();
 }
+
+
+/******************************************************************************
+ * Scorpion GMX
+ * ***************************************************************************/
+void scorpiongmx_state::scorpion_update_memory()
+{
+	scorpiontb_state::scorpion_update_memory();
+	if (BIT(m_port_1ffd_data, 2))
+	{
+		m_bank_rom[0]->set_entry((m_prof_plane << 2) | ROM_PAGE_DOS);
+		m_bank0_rom.disable();
+		m_beta->enable();
+		LOGMEM("... ROM0(%x)", m_bank_rom[0]->entry());
+	}
+	m_bank_ram[2]->set_entry((m_port_78fd_data ^ 2) % m_ram_banks);
+	LOGMEM("... RAM2(%x)", m_bank_ram[2]->entry());
+	m_bank_ram[3]->set_entry((((m_port_dffd_data & 7) << 4) | ((m_port_1ffd_data & 0x10) >> 1) | (m_port_7ffd_data & 0x07)) % m_ram_banks);
+	LOGMEM(", RAM3(%x)\n", m_bank_ram[3]->entry());
+}
+
+void scorpiongmx_state::spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (!m_gfx_ext)
+		return scorpiontb_state::spectrum_update_screen(screen, bitmap, cliprect);
+
+	// 640x200 ...
+	spectrum_update_border(screen, bitmap, cliprect);
+
+	const bool invert_attrs = u64(screen.frame_number() / m_frame_invert_count) & 1;
+	const u8 *screen_location = m_ram->pointer() + ((BIT(m_port_7ffd_data, 3) ? 0x3b : 0x39) << 14);
+	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
+	{
+		const u16 y = (vpos - get_screen_area().top() + (((m_scroll_hi << 8) | m_scroll_lo) / 80)) % (25 * 8);
+		for (u16 hpos = cliprect.left() & 0xfff8; hpos <= cliprect.right();)
+		{
+			const u16 x = hpos - get_screen_area().left();
+			const u8 *scr = screen_location + (y * 80) + (x >> 3);
+
+			const u8 attr = *(scr + (0x40 << 14));
+			const u16 fg = ((attr >> 3) & 0x08) | (attr & 0x07);
+			const u16 bg = (attr >> 3) & 0x0f;
+			const bool invert = (attr & 0x80) && invert_attrs;
+
+			const u8 chunk = *scr;
+			for (u8 i = 0x80; i; i >>= 1)
+				bitmap.pix(vpos, hpos++) = (chunk & i)
+					? (invert ? bg : fg)
+					: (invert ? fg : bg);
+		}
+	}
+}
+
+rectangle scorpiongmx_state::get_screen_area()
+{
+	return m_gfx_ext
+		? rectangle { 80, 80 + 639, 80, 80 + 199 }
+		: scorpiontb_state::get_screen_area();
+}
+
+void scorpiongmx_state::do_nmi()
+{
+	if (m_magic_disabled)
+	{
+		LOGIO("NMI ignored as Magic disabled");
+		m_nmi_pending = 0;
+	}
+	else
+	{
+		m_port_7afd_lock_data = port_7afd_r() & 0x7f;
+		m_port_7efd_lock_data = port_7efd_r() & 0x4f;
+		LOGIO("NMI: registers locked 7afd=%02x, 7efd=%02x\n", m_port_7afd_lock_data, m_port_7efd_lock_data);
+		scorpion_state::do_nmi();
+		m_magic_lock = 1;
+	}
+}
+
+void scorpiongmx_state::global_cfg_w(u8 data)
+{
+	m_port_00_data = data;
+	if (BIT(data, 5)) // BLKEXT
+	{
+		LOGIO("GMX ports disabled\n");
+		m_io_gmx.disable();
+	}
+	else
+		m_io_gmx.select(0);
+
+	if (BIT(data, 3))
+	{
+		m_magic_shift = 0x88 | (data & 7);
+		if (!fixrom())
+			m_maincpu->reset();
+	}
+}
+
+u8 scorpiongmx_state::port_78fd_r()
+{
+	u8 tmp = (BIT(m_port_fe_data, 1) << 7) // BRD1
+		| (m_port_78fd_data & 0x7f);
+	tmp |= (m_magic_shift & 1);
+
+	if(!machine().side_effects_disabled())
+		m_magic_shift >>= 1;
+
+	return tmp;
+}
+
+u8 scorpiongmx_state::port_7afd_r()
+{
+	u8 data;
+	if (m_magic_lock)
+		data = m_port_7afd_lock_data;
+	else
+		data = (BIT(m_port_dffd_data, 0, 3) << 4) | (BIT(m_port_1ffd_data, 4) << 3) | BIT(m_port_7ffd_data, 0, 3);
+
+	data |= BIT(m_port_fe_data, 0) << 7; // BRD0
+
+	return data;
+}
+
+u8 scorpiongmx_state::port_7efd_r()
+{
+	u8 data;
+	if (m_magic_lock)
+		data = m_port_7efd_lock_data;
+	else
+		data = (BIT(m_port_1ffd_data, 0) << 6)
+			| (m_gfx_ext << 3)
+			| (m_turbo << 2)
+			| (BIT(m_port_7ffd_data, 3) << 1)
+			| BIT(m_port_7ffd_data, 5);
+
+	data |= BIT(m_port_fe_data, 2) << 7 // BRD2
+		| (BIT(m_port_00_data, 5) << 5)
+		| (BIT(m_port_00_data, 7) << 4);
+
+	return data;
+}
+
+void scorpiongmx_state::port_7efd_w(u8 data)
+{
+	m_turbo = BIT(data, 7);
+	m_maincpu->set_clock_scale(1 << m_turbo);
+
+	if (!fixrom())
+	{
+		m_prof_plane = BIT(data, 4, 3); // D4..6 - A16..18: 28F400
+		scorpion_update_memory();
+	}
+
+	m_gfx_ext = BIT(data, 3);
+	const rectangle scr = get_screen_area();
+	const rectangle broder = m_gfx_ext
+		? rectangle {24, 24, 40, 40}
+		: rectangle {SPEC_LEFT_BORDER, SPEC_RIGHT_BORDER, SPEC_TOP_BORDER, SPEC_BOTTOM_BORDER};
+	m_screen->configure((SPEC_CYCLES_PER_LINE * 2) << m_gfx_ext, m_screen->height()
+		, {scr.left() - broder.left(), scr.right() + broder.right()
+		, scr.top() - broder.top(), scr.bottom() + broder.bottom()}
+		, m_screen->frame_period().as_attoseconds());
+
+	m_magic_disabled = BIT(data, 2);
+
+	// D1 - Vpp: 28F400 PowerOn
+	// D0 - EWR: 28F400 W
+}
+
+void scorpiongmx_state::scorpiongmx(machine_config &config)
+{
+	scorpiontb(config);
+	m_ram->set_default_size("2M");
+}
+
+void scorpiongmx_state::machine_start()
+{
+	scorpiontb_state::machine_start();
+
+	save_item(NAME(m_gfx_ext));
+	save_item(NAME(m_magic_disabled));
+	save_item(NAME(m_port_00_data));
+	save_item(NAME(m_port_78fd_data));
+	save_item(NAME(m_port_7afd_lock_data));
+	save_item(NAME(m_scroll_lo));
+	save_item(NAME(m_scroll_hi));
+	save_item(NAME(m_port_7efd_lock_data));
+	save_item(NAME(m_port_dffd_data));
+
+	m_port_00_data = 0;
+}
+
+void scorpiongmx_state::machine_reset()
+{
+	m_io_gmx.select(0);
+
+	m_magic_shift = 0;
+	m_gfx_ext = 0;
+	m_magic_disabled = 0;
+	m_port_78fd_data = 0;
+	m_port_7afd_lock_data = 0;
+	m_scroll_lo = 0;
+	m_scroll_hi = 0;
+	m_port_7efd_lock_data = 0;
+	m_port_dffd_data = 0;
+
+	scorpiontb_state::machine_reset();
+}
+
+void scorpiongmx_state::video_start()
+{
+	scorpion_state::video_start();
+}
+
+void scorpiongmx_state::scorpion_ioext(address_map &map)
+{
+	scorpiontb_state::scorpion_ioext(map);
+	map(0x0000, 0x0000).mirror(0xff00).w(FUNC(scorpiongmx_state::global_cfg_w));
+
+	map(0x0000, 0x1ffff).view(m_io_gmx);
+	m_io_gmx[0](0x78fd, 0x78fd).mirror(0x10000).r(FUNC(scorpiongmx_state::port_78fd_r))
+		.lw8(NAME([this](u8 data) { m_port_78fd_data = data & 0x7f; scorpion_update_memory(); }));
+	m_io_gmx[0](0x7afd, 0x7afd).mirror(0x10000).r(FUNC(scorpiongmx_state::port_7afd_r))
+		.lw8(NAME([this](u8 data) { m_scroll_lo = data & 0xf0; }));
+	m_io_gmx[0](0x7cfd, 0x7cfd).mirror(0x10000)
+		.lw8(NAME([this](u8 data) { m_scroll_hi = data & 0x3f; }));
+	m_io_gmx[0](0x7efd, 0x7efd).mirror(0x10000).rw(FUNC(scorpiongmx_state::port_7efd_r), FUNC(scorpiongmx_state::port_7efd_w));
+	m_io_gmx[0](0xdffd, 0xdffd).mirror(0x10000)
+		.lw8(NAME([this](u8 data) { m_port_dffd_data = data & 0x07; scorpion_update_memory(); }));
+}
+
 
 /***************************************************************************
 
@@ -608,7 +931,7 @@ ROM_END
 
 ROM_START(scorpiontb)
 	ROM_REGION(0x90000, "maincpu", 0)
-	ROM_DEFAULT_BIOS("v4.01.29lg")
+	ROM_DEFAULT_BIOS("v4.01.31lg_3d2f")
 
 	ROM_SYSTEM_BIOS(0, "v3.9f", "ProfROM V.3.9f")
 	ROMX_LOAD( "prof_39f.rom", 0x010000, 0x20000, CRC(c55e64da) SHA1(cec7770fe26350f57f6c325a29db78787dc4521e), ROM_BIOS(0))
@@ -644,8 +967,40 @@ ROM_START(scorpiontb)
 	ROMX_LOAD( "prof4xx029.rom", 0x010000, 0x40000, CRC(aebe12a3) SHA1(31c5481587554a8173016ccda46e1490cbd9fa5c), ROM_BIOS(15))
 	ROM_SYSTEM_BIOS(16, "v4.01.29lg", "ProfROM V.4.xx.029 (Basic Looking Glass)")
 	ROMX_LOAD( "prof4xx029lg.rom", 0x010000, 0x40000, CRC(1ae71a4c) SHA1(c7d8f20134f5623f2498feea5c9efbcb2fd686a3), ROM_BIOS(16))
-	ROM_SYSTEM_BIOS(17, "scorp_test", "Scorpion Test")
-	ROMX_LOAD( "scorp_test.rom", 0x010000, 0x10000, CRC(e0230ca7) SHA1(f38e4d23cb29b4ae3fe8b00a52d7b0f9bb845407), ROM_BIOS(17))
+	ROM_SYSTEM_BIOS(17, "v4.01.31", "ProfROM V.4.xx.031")
+	ROMX_LOAD( "prof4xx031.rom", 0x010000, 0x40000, CRC(43ab9b83) SHA1(cc95edf10ee6bfd16cf738ea648cf4ce35b3b232), ROM_BIOS(17))
+	ROM_SYSTEM_BIOS(18, "v4.01.31lg", "ProfROM V.4.xx.031 (Basic Looking Glass)")
+	ROMX_LOAD( "prof4xx031lg.rom", 0x010000, 0x40000, CRC(f7f2936c) SHA1(61f8ca193624c7ed23d54f35cbebb76bc94e96e2), ROM_BIOS(18))
+	ROM_SYSTEM_BIOS(19, "v4.01.31_3d2f", "ProfROM V.4.xx.031(3D2F)")
+	ROMX_LOAD( "prof4xx031_3d2f.rom", 0x010000, 0x40000, CRC(e850e0d1) SHA1(48d41013130a5d92c2b2fd04142d5ba6ce5a324a), ROM_BIOS(19))
+	ROM_SYSTEM_BIOS(20, "v4.01.31lg_3d2f", "ProfROM V.4.xx.031 (Basic Looking Glass) (3D2F)")
+	ROMX_LOAD( "prof4xx031lg_3d2f.rom", 0x010000, 0x40000, CRC(cc525181) SHA1(985b437e8b35c0c3493a347e76f683e498bd40e4), ROM_BIOS(20))
+	ROM_SYSTEM_BIOS(21, "scorp_test", "Scorpion Test")
+	ROMX_LOAD( "scorp_test.rom", 0x010000, 0x10000, CRC(e0230ca7) SHA1(f38e4d23cb29b4ae3fe8b00a52d7b0f9bb845407), ROM_BIOS(21))
+ROM_END
+
+ROM_START(scorpiongmx)
+	ROM_REGION(0x90000, "maincpu", 0)
+	ROM_DEFAULT_BIOS("v5.01.31_3d2f")
+
+	ROM_SYSTEM_BIOS(0, "v12500", "GMX Boot Rom 1.2 V. 5.00")
+	ROMX_LOAD( "gmx12500.rom", 0x010000, 0x80000, CRC(00df8568) SHA1(dd303d298f96ec4f9fe736eefd3c36fff1dfcdf5), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v12501", "GMX Boot Rom 1.2 V. 5.01")
+	ROMX_LOAD( "gmx12501.rom", 0x010000, 0x80000, CRC(34c8d210) SHA1(433237c8b5cd9de3bff3b074b6c7065788306995), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "v13500", "GMX Boot Rom 1.3 V. 5.00")
+	ROMX_LOAD( "gmx13500.rom", 0x010000, 0x80000, CRC(47c9df88) SHA1(e26823989ce111a086a9e44bfa07fa631019c19d), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "v5.01.27", "ProfROM +GMX V.5.xx.027")
+	ROMX_LOAD( "profgmx5xx027.rom", 0x010000, 0x80000, CRC(05dc16f5) SHA1(b786c78e9f332010e3996f3281adf3f75924bede), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(4, "v5.01.29", "ProfROM +GMX V.5.xx.029")
+	ROMX_LOAD( "profgmx5xx029.rom", 0x010000, 0x80000, CRC(41016b99) SHA1(86f324d45f4f181c9231a7001b30d5ce3d1512c6), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(5, "v5.01.30", "ProfROM +GMX V.5.xx.030")
+	ROMX_LOAD( "profgmx5xx030.rom", 0x010000, 0x80000, CRC(21edd18e) SHA1(90fc58600e2da85fea7dc033a22dcc88633530bc), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(6, "v5.01.30_3d2f", "ProfROM +GMX V.5.xx.030 (3D2F)")
+	ROMX_LOAD( "profgmx5xx030_3d2f.rom", 0x010000, 0x80000, CRC(ab6e2380) SHA1(6bd2904364badb00700a7d4576d8396c62916d67), ROM_BIOS(6))
+	ROM_SYSTEM_BIOS(7, "v5.01.31", "ProfROM +GMX V.5.xx.031")
+	ROMX_LOAD( "profgmx5xx031.rom", 0x010000, 0x80000, CRC(a2ec83d5) SHA1(e2a022c1bdea516b43828752fc52b112c0bad59c), ROM_BIOS(7))
+	ROM_SYSTEM_BIOS(8, "v5.01.31_3d2f", "ProfROM +GMX V.5.xx.031 (3D2F)")
+	ROMX_LOAD( "profgmx5xx031_3d2f.rom", 0x010000, 0x80000, CRC(bb900382) SHA1(1e01444e3eb65dffcb9c41b2b8e034a020198a1e), ROM_BIOS(8))
 ROM_END
 
 ROM_START(profi)
@@ -690,10 +1045,11 @@ ROM_END
 } // Anonymous namespace
 
 
-//    YEAR  NAME        PARENT   COMPAT  MACHINE     INPUT     CLASS             INIT        COMPANY              FULLNAME                        FLAGS
-COMP( 1992, scorpio,    spec128, 0,      scorpion,   scorpion, scorpion_state,   empty_init, "Scorpion, Ltd.",    "Scorpion ZS-256 (Yellow PCB)", 0 )
-COMP( 1996, scorpiontb, spec128, 0,      scorpiontb, scorpion, scorpiontb_state, empty_init, "Scorpion, Ltd.",    "Scorpion ZS-256 TURBO+",       0 )
-COMP( 1991, profi,      spec128, 0,      profi,      scorpion, scorpion_state,   empty_init, "Kondor and Kramis", "Profi",                        MACHINE_NOT_WORKING )
-COMP( 1998, kay1024,    spec128, 0,      scorpion,   scorpion, scorpion_state,   empty_init, "NEMO",              "Kay 1024",                     MACHINE_NOT_WORKING )
-COMP( 19??, quorum,     spec128, 0,      quorum,     scorpion, scorpion_state,   empty_init, "<unknown>",         "Quorum",                       MACHINE_NOT_WORKING )
-COMP( 19??, bestzx,     spec128, 0,      scorpion,   scorpion, scorpion_state,   empty_init, "<unknown>",         "BestZX",                       MACHINE_NOT_WORKING )
+//    YEAR  NAME         PARENT   COMPAT  MACHINE      INPUT       CLASS               INIT        COMPANY              FULLNAME                        FLAGS
+COMP( 1992, scorpio,     spec128, 0,      scorpion,    scorpion,   scorpion_state,     empty_init, "Scorpion, Ltd.",    "Scorpion ZS-256 (Yellow PCB)", 0 )
+COMP( 1996, scorpiontb,  spec128, 0,      scorpiontb,  scorpiontb, scorpiontb_state,   empty_init, "Scorpion, Ltd.",    "Scorpion ZS-256 TURBO+",       0 )
+COMP( 1998, scorpiongmx, spec128, 0,      scorpiongmx, scorpiontb, scorpiongmx_state,  empty_init, "Scorpion, Ltd.",    "Scorpion GMX",                 0 )
+COMP( 1991, profi,       spec128, 0,      profi,       scorpion,   scorpion_state,     empty_init, "Kondor and Kramis", "Profi",                        MACHINE_NOT_WORKING )
+COMP( 1998, kay1024,     spec128, 0,      scorpion,    scorpion,   scorpion_state,     empty_init, "NEMO",              "Kay 1024",                     MACHINE_NOT_WORKING )
+COMP( 19??, quorum,      spec128, 0,      quorum,      scorpion,   scorpion_state,     empty_init, "<unknown>",         "Quorum",                       MACHINE_NOT_WORKING )
+COMP( 19??, bestzx,      spec128, 0,      scorpion,    scorpion,   scorpion_state,     empty_init, "<unknown>",         "BestZX",                       MACHINE_NOT_WORKING )

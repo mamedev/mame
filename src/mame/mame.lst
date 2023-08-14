@@ -1957,6 +1957,7 @@ missilea                        // bootleg (Ugames)
 missilem                        // hack
 suprmatk                        // (c) 1980 + (c) 1981 Gencomp
 suprmatkd                       // (c) 1980 + (c) 1981 Gencomp
+x80wc                           // bootleg (ManilaMatic)
 
 @source:atari/nitedrvr.cpp
 nitedrvr                        // 006321           1976/10 [6502]
@@ -19171,9 +19172,10 @@ h8                              //
 
 @source:heathkit/h19.cpp
 h19                             // Heath H19 (Zenith Z-19)
+gp19                            // H19 with Northwest Digital Systems GP-19
 super19                         // Super19 replacement ROMS for H19
-watz19                          // Watzman replacement ROMS for H19
 ultra19                         // ULTRA ROM replacement ROMS for H19
+watz19                          // Watzman replacement ROMS for H19
 
 @source:heathkit/h89.cpp
 h89                             //
@@ -30329,8 +30331,10 @@ belslots                        // (c) 1999 Impera
 bigdeal0                        // (c) 2001 Impera
 dallaspk                        // 1993, unknown
 hotslots                        // (c) 2002 Impera
+jjokeri                         // (c) 199? Impera
 kajotcrd                        // (c) 1993 Amatic
 lucky7i                         // (c) 1991 Impera
+lucky7x                         // (c) 1991 Impera
 magicard                        // (c) 1994 Impera
 magicrd1                        // (c) 1994 Impera
 magicrd1a                       // (c) 1993 Impera
@@ -30920,6 +30924,7 @@ pma                             // 1983, PMA
 smshilo                         // (c) 1983 SMS Manufacturing Corp.
 ssjkrpkr                        // (c) 1982 Southern Systems & Assembly, Ltd.
 tpoker2                         // (c) 1993 Micro Manufacturing, Inc.
+unkljfpk                        // (c) 1989 LJF Corporation
 
 @source:misc/notechan.cpp
 notechan                        // (c) 1995 Banpresto
@@ -37729,6 +37734,7 @@ dvlriderf                       //
 dvlriderg                       //
 dvlrideri                       //
 farfalla                        //
+farfallaf                       //
 farfallag                       //
 farfallai                       //
 mcastle                         //
@@ -37736,12 +37742,15 @@ mcastlef                        //
 mcastleg                        //
 mcastlei                        //
 mexico                          //
+mexicoi                         //
 nstrphnx                        //
 nstrphnxf                       //
 pinchamp                        //
 pinchamp7                       //
+pinchamp7f                      //
 pinchamp7g                      //
 pinchamp7i                      //
+pinchampf                       //
 pinchampg                       //
 pinchampi                       //
 poolcham                        //
@@ -37763,6 +37772,7 @@ thndrman                        //
 tmachzac                        //
 tmachzacf                       //
 tmachzacg                       //
+tmachzaci                       //
 zankor                          //
 zankor2i                        //
 
@@ -40738,6 +40748,9 @@ indy_4613                       // IP22: Indy, R4600, 133MHz
 indy_5015                       // IP22: Indy, R5000, 150MHz
 indigo2_4415                    // IP24: Indigo 2, R4400, 150MHz
 
+@source:sgi/ip4.cpp
+pi4d50                          // Professional IRIS 4D/50 (R2000 @ 8MHz)
+
 @source:sgi/ip6.cpp
 pi4d20                          // Personal IRIS 4D/20 (R2000 @ 12.5MHz)
 pi4d25                          // Personal IRIS 4D/25 (R3000 @ 20MHz)
@@ -40936,6 +40949,7 @@ kay1024                         //
 profi                           //
 quorum                          //
 scorpio                         //
+scorpiongmx                     //
 scorpiontb                      //
 
 @source:sinclair/spec128.cpp
@@ -41739,6 +41753,7 @@ bbustersja                      //
 @source:snk/dmndrby.cpp
 dmndrby                         // G4001 'DD' (c) 1986
 dmndrbya                        // G4001 'DD' (c) 1986
+dmndrbybl                       // bootleg
 
 @source:snk/hng64.cpp
 bbust2                          // 004 1998/09/11 Beast Busters: Second Nightmare
@@ -42631,8 +42646,9 @@ lkageb                          // bootleg
 lkageb2                         // bootleg
 lkageb3                         // bootleg
 lkageb4                         // bootleg
+lkagem                          //
 lkageo                          // A54 (c) 1984 Taito Corporation
-lkageoo                         // A54 (c) 1984 Taito Corporation
+lkageo2                         // A54 (c) 1984 Taito Corporation
 
 @source:taito/lsasquad.cpp
 daikaiju                        // A74 (c) 1986 Taito

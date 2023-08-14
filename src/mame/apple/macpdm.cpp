@@ -1113,6 +1113,7 @@ void macpdm_state::macpdm(machine_config &config)
 																						 });
 
 	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
+	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
@@ -1158,7 +1159,7 @@ void macpdm_state::macpdm(machine_config &config)
 	m_ram->set_extra_options("16M,32M,64M,128M");
 
 	MACADB(config, m_macadb, IO_CLOCK/2);
-	CUDA(config, m_cuda, CUDA_341S0060);
+	CUDA_V240(config, m_cuda, XTAL(32'768));
 	m_cuda->reset_callback().set(FUNC(macpdm_state::cuda_reset_w));
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));

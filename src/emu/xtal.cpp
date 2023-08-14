@@ -179,6 +179,7 @@ const double XTAL::known_xtals[] = {
 	 10'480'000, /* 10.48_MHz_XTAL         System-80 (50 Hz) */
 	 10'500'000, /* 10.5_MHz_XTAL          Agat-7 */
 	 10'595'000, /* 10.595_MHz_XTAL        Mad Alien */
+	 10'644'000, /* 10.644_MHz_XTAL        Northwest Digitial Systems GP-19 */
 	 10'644'500, /* 10.6445_MHz_XTAL       TRS-80 Model I */
 	 10'687'500, /* 10.6875_MHz_XTAL       BBC Bridge Companion */
 	 10'694'250, /* 10.69425_MHz_XTAL      Xerox 820 */
@@ -205,6 +206,7 @@ const double XTAL::known_xtals[] = {
 	 12'057'600, /* 12.0576_MHz_XTAL       Poly 1 (38400 * 314) */
 	 12'096'000, /* 12.096_MHz_XTAL        Some early 80's Atari games */
 	 12'288'000, /* 12.288_MHz_XTAL        Sega Model 3 digital audio board */
+	 12'292'000, /* 12.292_MHz_XTAL        Northwest Digitial Systems GP-19 */
 	 12'324'000, /* 12.324_MHz_XTAL        Otrona Attache */
 	 12'432'000, /* 12.432_MHz_XTAL        Kaneko Fly Boy/Fast Freddie Hardware */
 	 12'472'500, /* 12.4725_MHz_XTAL       Bonanza's Mini Boy 7 */
@@ -317,6 +319,7 @@ const double XTAL::known_xtals[] = {
 	 20'000'000, /* 20_MHz_XTAL            - */
 	 20'160'000, /* 20.16_MHz_XTAL         Nintendo 8080 */
 	 20'275'200, /* 20.2752_MHz_XTAL       TRS-80 Model III */
+	 20'282'000, /* 20.282_MHz_XTAL        Northwest Digitial Systems GP-19 */
 	 20'375'040, /* 20.37504_MHz_XTAL      Apple Lisa dot clock (197-0019A) */
 	 20'625'000, /* 20.625_MHz_XTAL        SM 7238 */
 	 20'790'000, /* 20.79_MHz_XTAL         Blockade-hardware Gremlin games */

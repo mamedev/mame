@@ -1327,7 +1327,8 @@ void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 	}
 }
 
-/* TODO: I'm guessing that in 256 colors mode every pixel actually outputs two pixels. Is it right? */
+// In mode 13h (256 colors) every pixel actually double height/width
+// i.e. a 320x200 is really 640x400
 void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
@@ -1801,12 +1802,16 @@ void svga_device::device_start()
 	save_item(NAME(svga.id));
 }
 
+u16 svga_device::line_compare_mask()
+{
+	return 0x3ff;
+}
+
 void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
 
-	/* line compare is screen sensitive */
-	uint16_t  mask_comp = 0x3ff;
+	uint16_t mask_comp = line_compare_mask();
 	int curr_addr = 0;
 //  uint16_t line_length;
 //  if(vga.crtc.dw)

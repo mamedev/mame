@@ -447,7 +447,6 @@ void carpolo_state::machine_reset()
 	m_ttl7474_2u_2->d_w     (1);
 	m_ttl7474_2u_2->preset_w(1);
 
-
 	/* set up the steering handling flip-flops */
 	m_ttl7474_1f_1->d_w     (1);
 	m_ttl7474_1f_1->preset_w(1);

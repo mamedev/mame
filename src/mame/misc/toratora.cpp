@@ -223,7 +223,7 @@ void toratora_state::sn1_w(uint8_t data)
 	m_sn[0]->slf_cap_voltage_w(res == 0x7 ? 2.5 : sn76477_device::EXTERNAL_VOLTAGE_DISCONNECT);
 
 	// Seems like the output should be muted when res == 0, but unsure of exact mechanism
-	m_sn[0]->amplitude_res_w(resistances[res]);
+	m_sn[0]->amplitude_res_w((res == 0x0) ? RES_INF : RES_K(47));
 }
 
 // U15
