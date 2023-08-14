@@ -3862,3 +3862,13 @@ if opt_tool(CPUS, "ST9") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/st9/st9dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/st9/st9dasm.h")
 end
+
+--------------------------------------------------
+-- 3C/Honeywell DDP-516, disassembler only
+--@src/devices/cpu/ddp516/ddp516.h,CPUS["DDP516"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "DDP516") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ddp516/ddp516d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ddp516/ddp516d.h")
+end

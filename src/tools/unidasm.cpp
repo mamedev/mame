@@ -41,6 +41,7 @@ using util::BIT;
 #include "cpu/cr16b/cr16bdasm.h"
 #include "cpu/cr16c/cr16cdasm.h"
 #include "cpu/cubeqcpu/cubedasm.h"
+#include "cpu/ddp516/ddp516d.h"
 #include "cpu/dsp16/dsp16dis.h"
 #include "cpu/dsp32/dsp32dis.h"
 #include "cpu/dsp56000/dsp56000d.h"
@@ -429,6 +430,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "cquestrot",       be, -3, []() -> util::disasm_interface * { return new cquestrot_disassembler; } },
 	{ "cquestsnd",       be, -3, []() -> util::disasm_interface * { return new cquestsnd_disassembler; } },
 	{ "cyber18",         be, -1, []() -> util::disasm_interface * { return new cyber18_disassembler; } },
+	{ "ddp516",          be, -1, []() -> util::disasm_interface * { return new ddp516_disassembler; } },
 	{ "dp8344",          le, -1, []() -> util::disasm_interface * { return new dp8344_disassembler; } },
 	{ "ds5002fp",        le,  0, []() -> util::disasm_interface * { return new ds5002fp_disassembler; } },
 	{ "ds80c320",        le,  0, []() -> util::disasm_interface * { return new ds80c320_disassembler; } },
@@ -566,6 +568,11 @@ static const dasm_table_entry dasm_table[] =
 	{ "power",           be,  0, []() -> util::disasm_interface * { return new power_disassembler; } },
 	{ "powerpc",         be,  0, []() -> util::disasm_interface * { return new powerpc_disassembler; } },
 	{ "pps4",            le,  0, []() -> util::disasm_interface * { return new pps4_disassembler; } },
+	{ "prime16s",        be, -1, []() -> util::disasm_interface * { return new prime16s_disassembler; } },
+	{ "prime32r",        be, -1, []() -> util::disasm_interface * { return new prime32r_disassembler; } },
+	{ "prime32s",        be, -1, []() -> util::disasm_interface * { return new prime32s_disassembler; } },
+	{ "prime64r",        be, -1, []() -> util::disasm_interface * { return new prime64r_disassembler; } },
+	{ "prime64v",        be, -1, []() -> util::disasm_interface * { return new prime64v_disassembler; } },
 	{ "psxcpu",          le,  0, []() -> util::disasm_interface * { return new psxcpu_disassembler; } },
 	{ "r65c02",          le,  0, []() -> util::disasm_interface * { return new r65c02_disassembler; } },
 	{ "r65c19",          le,  0, []() -> util::disasm_interface * { return new r65c19_disassembler; } },
