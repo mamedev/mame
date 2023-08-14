@@ -352,6 +352,7 @@ void system1_state::machine_start()
 	m_m1_num = 0;
 
 	save_item(NAME(m_dakkochn_mux_data));
+	save_item(NAME(m_m1_num));
 	save_item(NAME(m_videomode_prev));
 	save_item(NAME(m_mcu_control));
 	save_item(NAME(m_nob_maincpu_latch));
