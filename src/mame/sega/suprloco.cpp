@@ -610,15 +610,12 @@ void suprloco_state::suprloco(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(suprloco_state::irq0_line_hold));
 	m_maincpu->set_decrypted_tag(":decrypted_opcodes");
 	m_maincpu->refresh_cb().set([this](offs_t offset, u8 data) {
-		if (!machine().side_effects_disabled())
-		{
-			m_m1_num = (m_m1_num + 1) % 5;
-			// if we've passed 5 M1 cycles, steal an additional
-			//  5x-20mhz-cycle-long cpu cycle. We do this at the third cycle to
-			//  average the correct speed.
-			if (m_m1_num == 2)
-				m_maincpu->adjust_icount(-1);
-		}
+		m_m1_num = (m_m1_num + 1) % 5;
+		// if we've passed 5 M1 cycles, steal an additional
+		//  5x-20mhz-cycle-long cpu cycle. We do this at the third cycle to
+		//  average the correct speed.
+		if (m_m1_num == 2)
+			m_maincpu->adjust_icount(-1);
 	});
 
 	Z80(config, m_audiocpu, MASTER_CLOCK/5); // 4mhz
