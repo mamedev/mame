@@ -19,7 +19,7 @@
 #define VERBOSE (0)
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(VALKYRIE, valkyrie_device, "valkyrie", "Apple Valkyrie video")
+DEFINE_DEVICE_TYPE(VALKYRIE, valkyrie_device, "apvalkyrie", "Apple Valkyrie video")
 
 //-------------------------------------------------
 //  ADDRESS_MAP
