@@ -8595,11 +8595,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="moneynet">
+	<!-- Windows (3.1?) -->
+	<software name="moneynet" supported="no">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
 		<description>Reuters Money Network</description>
 		<year>1994</year>
 		<publisher>Reuters</publisher>
+		<notes><![CDATA[
+Punts with a "Severe" error message at start of install operation
+]]></notes>
 		<info name="version" value="2.0R3" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
