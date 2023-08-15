@@ -15,12 +15,12 @@
     - The "Turbo SCSI" logic from the standalone versions of DAFB and DAFB II
     - Support logic for various external subsystems (ADB, SCC, SONIC Ethernet)
 
-	IOSB and PrimeTime are similar to Sonora, but replace the RBV/V8/VASP/Sonora pseudo-VIA with a
-	real VIA core that has the timers disabled and some IER and PCR bits hard-wired to specific values.
-	The pseudo-VIA returns in AMIC on the PDM-class PowerMacs and goes away forever in the TNT-class.
+    IOSB and PrimeTime are similar to Sonora, but replace the RBV/V8/VASP/Sonora pseudo-VIA with a
+    real VIA core that has the timers disabled and some IER and PCR bits hard-wired to specific values.
+    The pseudo-VIA returns in AMIC on the PDM-class PowerMacs and goes away forever in the TNT-class.
 
-	PrimeTime swaps the GI/Microchip ADB modem interface for the standard Cuda hookup found in Sonora,
-	and doesn't bring out the 4 VIA ID pins.  PrimeTime II is similar.
+    PrimeTime swaps the GI/Microchip ADB modem interface for the standard Cuda hookup found in Sonora,
+    and doesn't bring out the 4 VIA ID pins.  PrimeTime II is similar.
 */
 
 #include "emu.h"
@@ -44,6 +44,7 @@ static constexpr u32 C15M = (C7M * 2);
 
 DEFINE_DEVICE_TYPE(IOSB, iosb_device, "iosb", "Apple IOSB I/O ASIC")
 DEFINE_DEVICE_TYPE(PRIMETIME, primetime_device, "primetime", "Apple PrimeTime I/O ASIC")
+DEFINE_DEVICE_TYPE(PRIMETIMEII, primetimeii_device, "primetime2", "Apple PrimeTime II I/O ASIC")
 
 //-------------------------------------------------
 //  ADDRESS_MAP
@@ -125,6 +126,11 @@ iosb_base::iosb_base(const machine_config &mconfig, device_type type, const char
 	m_asc(*this, "asc"),
 	m_fdc(*this, "fdc"),
 	m_floppy(*this, "fdc:%d", 0U),
+	m_nubus_irqs(0xff),
+	m_via_interrupt(0),
+	m_via2_interrupt(0),
+	m_scc_interrupt(0),
+	m_last_taken_interrupt(-1),
 	m_cur_floppy(nullptr),
 	m_hdsel(0),
 	m_adb_interrupt(0),
@@ -147,12 +153,24 @@ iosb_device::iosb_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
-primetime_device::primetime_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	iosb_base(mconfig, PRIMETIME, tag, owner, clock),
+primetime_device::primetime_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	iosb_base(mconfig, type, tag, owner, clock),
 	write_pb4(*this),
 	write_pb5(*this),
 	read_pb3(*this, 0)
 {
+}
+
+primetime_device::primetime_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	primetime_device(mconfig, PRIMETIME, tag, owner, clock)
+{
+}
+
+primetimeii_device::primetimeii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	primetime_device(mconfig, PRIMETIMEII, tag, owner, clock),
+	m_ata_irq(0)
+{
+	std::fill(std::begin(m_primetimeii_regs), std::end(m_primetimeii_regs), 0);
 }
 
 //-------------------------------------------------
@@ -184,11 +202,6 @@ void iosb_base::device_reset()
 {
 	// start 60.15 Hz timer
 	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
-
-	m_via_interrupt = m_via2_interrupt = m_scc_interrupt = 0;
-	m_last_taken_interrupt = -1;
-	m_hdsel = 0;
-	m_nubus_irqs = 0xff;
 
 	m_via2_ca1_hack = 1;
 	m_via2->write_ca1(1);
@@ -293,7 +306,7 @@ void iosb_base::field_interrupts()
 
 void iosb_base::scc_irq_w(int state)
 {
-	m_scc_interrupt = (state == ASSERT_LINE);
+	m_scc_interrupt = (state == ASSERT_LINE) ? 1 : 0;
 	field_interrupts();
 }
 
@@ -545,6 +558,8 @@ u32 iosb_base::turboscsi_dma_r(offs_t offset, u32 mem_mask)
 		return 0xffff;
 	}
 
+	LOGMASKED(LOG_TURBOSCSI, "dma_r mask %08x (%s)\n", mem_mask, machine().describe_context());
+
 	if (mem_mask == 0xffffffff)
 	{
 		if (!m_scsi_second_half)
@@ -627,7 +642,6 @@ void iosb_base::scsi_drq_w(int state)
 
 u16 iosb_base::iosb_regs_r(offs_t offset)
 {
-	LOGMASKED(LOG_IOSBREGS, "iosb_regs_r: @ %x\n", offset>>7);
 	return m_iosb_regs[offset>>7];
 }
 
@@ -670,4 +684,40 @@ void primetime_device::via_out_b(uint8_t data)
 {
 	write_pb4(BIT(data, 4));
 	write_pb5(BIT(data, 5));
+}
+
+// ------------------------------------------- PrimeTime II device
+void primetimeii_device::device_start()
+{
+	primetime_device::device_start();
+	save_item(NAME(m_ata_irq));
+	save_item(NAME(m_primetimeii_regs));
+}
+
+void primetimeii_device::map(address_map &map)
+{
+	iosb_base::map(map);
+	map(0x0001a100, 0x0001a10f).r(FUNC(primetimeii_device::ata_regs_r)).mirror(0x00f00000);
+}
+
+// This may actually be in F108, the boundaries between the two chips aren't completely clear
+u16 primetimeii_device::ata_regs_r(offs_t offset)
+{
+	switch (offset)
+	{
+		case 0: // special interrupt status: bit 6 = VBL IRQ, bit 5 = ATA IRQ
+			return ((m_nubus_irqs ^ 0xff) & 0x40) | (m_ata_irq << 5);
+
+		default:
+			LOGMASKED(LOG_IOSBREGS, "%s: Unhandled ata_regs_r @ %x\n", tag(), offset);
+			break;
+	}
+
+	return 0;
+}
+
+void primetimeii_device::ata_irq_w(int state)
+{
+	via2_irq_w<0x10>(state);
+	m_ata_irq = state;
 }

@@ -904,6 +904,10 @@ macqd605                        // 1993 Apple Macintosh Quadra 605
 maclc475                        // 1993 Apple Macintosh LC/Performa 475
 maclc575                        // 1994 Apple Macintosh LC/Performa 575
 
+@source:apple/macquadra630.cpp
+macqd630                        // July 18, 1994 Apple Macintosh Quadra 630
+maclc580                        // April 3, 1995 Apple Macintosh LC/Performa 580
+
 @source:apple/macquadra700.cpp
 macqd700                        // 1991 Apple Macintosh Quadra 700
 
