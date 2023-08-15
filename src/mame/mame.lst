@@ -41081,6 +41081,10 @@ dialog80                        // Ampex Dialogue 80
 ampex210p                       //
 ampex230p                       //
 
+@source:skeleton/antonelli_hd6305.cpp
+anto2495                        //
+anto2614                        //
+
 @source:skeleton/argox.cpp
 os214                           //
 
