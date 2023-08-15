@@ -255,7 +255,7 @@ void s3virge_vga_device::crtc_map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			s3.cr53 = data;
-			//m_linear_config_changed_cb(s3virge.linear_address_enable);
+			m_linear_config_changed_cb(s3virge.linear_address_enable);
 		})
 	);
 	map(0x58, 0x58).lrw8(
@@ -585,6 +585,10 @@ void s3virge_vga_device::poly3d_step()
 }
 
 
+// ROP names are in Reverse Polish
+// Upper cases denotes an entity (Dst, Src, Pat)
+// Lower cases the type of instruction (xor, not, and, or)
+// leftmost lowercase applies to rightmost uppercase first.
 uint32_t s3virge_vga_device::GetROP(uint8_t rop, uint32_t src, uint32_t dst, uint32_t pat)
 {
 	uint32_t ret = 0;
@@ -620,6 +624,9 @@ uint32_t s3virge_vga_device::GetROP(uint8_t rop, uint32_t src, uint32_t dst, uin
 			break;
 		case 0xbb:  // DSno
 			ret = (dst | (~src));
+			break;
+		case 0xca:  // DPSDxax (moneynet install screen, no effective change?)
+			ret = ((src ^ dst) & pat) ^ dst;
 			break;
 		case 0xcc:
 			ret = src;
