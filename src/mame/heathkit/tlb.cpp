@@ -15,8 +15,6 @@
     Input can also come from the serial port.
 
   TODO:
-    - determine why ULTRA ROM's self-diag (ESC |) fails for the ROM and
-      scratchpad memory
     - INS8250 needs to implement "Set Break" (LCR, bit 6) before Break key
       will function as expected.
     - 49/50 row mode does not work when DOT clocks are programmed as documented
@@ -161,8 +159,9 @@ void heath_tlb_device::io_map(address_map &map)
 	map(0x00, 0x00).mirror(0x1f).portr("SW401");
 	map(0x20, 0x20).mirror(0x1f).portr("SW402");
 	map(0x40, 0x47).mirror(0x18).rw(m_ace, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
-	map(0x60, 0x60).mirror(0x1e).w(m_crtc, FUNC(mc6845_device::address_w));
-	map(0x61, 0x61).mirror(0x1e).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x60, 0x60).mirror(0x1a).select(0x04).w(FUNC(heath_tlb_device::crtc_addr_w));
+	map(0x61, 0x61).mirror(0x1a).select(0x04).rw(FUNC(heath_tlb_device::crtc_reg_r), FUNC(heath_tlb_device::crtc_reg_w));
+
 	map(0x80, 0x80).mirror(0x1f).r(FUNC(heath_tlb_device::kbd_key_r));
 	map(0xa0, 0xa0).mirror(0x1f).r(FUNC(heath_tlb_device::kbd_flags_r));
 	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(heath_tlb_device::key_click_w));
@@ -181,6 +180,7 @@ void heath_tlb_device::device_start()
 	save_item(NAME(m_keyboard_irq_raised));
 	save_item(NAME(m_serial_irq_raised));
 	save_item(NAME(m_break_key_irq_raised));
+	save_item(NAME(m_allow_vsync_nmi));
 
 	m_strobe = false;
 	m_key_click_active = false;
@@ -191,6 +191,7 @@ void heath_tlb_device::device_start()
 	m_keyboard_irq_raised = false;
 	m_serial_irq_raised = false;
 	m_break_key_irq_raised = false;
+	m_allow_vsync_nmi = false;
 
 	m_key_click_timer = timer_alloc(FUNC(heath_tlb_device::key_click_off), this);
 	m_bell_timer = timer_alloc(FUNC(heath_tlb_device::bell_off), this);
@@ -201,6 +202,7 @@ void heath_tlb_device::device_reset()
 	m_strobe = false;
 	m_key_click_active = false;
 	m_bell_active = false;
+	m_allow_vsync_nmi = false;
 }
 
 void heath_tlb_device::key_click_w(uint8_t data)
@@ -278,6 +280,32 @@ void heath_tlb_device::mm5740_data_ready_w(int state)
 		m_keyboard_irq_raised = true;
 		set_irq_line();
 	}
+}
+
+void heath_tlb_device::crtc_addr_w(offs_t reg, uint8_t val)
+{
+	m_allow_vsync_nmi = bool(BIT(reg,2));
+
+	m_crtc->address_w(val);
+}
+
+uint8_t heath_tlb_device::crtc_reg_r(offs_t reg)
+{
+	m_allow_vsync_nmi = bool(BIT(reg,2));
+
+	return m_crtc->register_r();
+}
+
+void heath_tlb_device::crtc_reg_w(offs_t reg, uint8_t val)
+{
+	m_allow_vsync_nmi = bool(BIT(reg,2));
+
+	m_crtc->register_w(val);
+}
+
+void heath_tlb_device::crtc_vsync_w(int val)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, m_allow_vsync_nmi ? val: CLEAR_LINE);
 }
 
 void heath_tlb_device::serial_irq_w(int state)
@@ -871,7 +899,7 @@ void heath_tlb_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(heath_tlb_device::crtc_update_row));
 	// frame pulse
-	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_crtc->out_vsync_callback().set(FUNC(heath_tlb_device::crtc_vsync_w));
 
 	// serial port
 	INS8250(config, m_ace, INS8250_CLOCK);
