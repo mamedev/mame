@@ -284,7 +284,7 @@ void am7990_device_base::recv_complete_cb(int result)
 			LOGMASKED(LOG_RXTX, "receive complete rmd1 0x%04x rmd3 %d\n", m_rx_md[1], result & RMD3_MCNT);
 
 			m_dma_out_cb(ring_address | 2, m_rx_md[1]);
-			m_dma_out_cb(ring_address | 6, result & RMD3_MCNT);
+			m_dma_out_cb(ring_address | 6, (m_rx_md[1] & RMD1_ERR) ? 0 : (result & RMD3_MCNT));
 
 			// advance the ring
 			m_rx_ring_pos = (m_rx_ring_pos + 1) & m_rx_ring_mask;
