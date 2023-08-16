@@ -65,7 +65,8 @@ public:
 		floppy1(*this, "1"),
 		floppy2(*this, "2"),
 		floppy3(*this, "3"),
-		m_reset_latch(false)
+		m_reset_latch(false),
+		m_nmi_latch(false)
 	{
 	}
 
@@ -129,6 +130,7 @@ public:
 	void a2bus_nmi_w(int state);
 	void vbl_w(int state);
 	void a2bus_inh_w(int state);
+	DECLARE_INPUT_CHANGED_MEMBER(keyb_special_changed);
 
 	// these need to be public for now
 	uint32_t m_flags = 0;
@@ -138,6 +140,7 @@ public:
 	void apple3_map(address_map &map);
 private:
 	bool m_reset_latch;
+	bool m_nmi_latch;
 	uint8_t m_via_0_a = 0;
 	uint8_t m_via_0_b = 0;
 	uint8_t m_via_1_a = 0;
