@@ -433,16 +433,16 @@ void macxl_fdc_device::update_pwm()
 		return;
 	// Use a ramp somewhat similar to the macs
 	// The documentation requires:
-	// - duty cycle of 9.4%, 305 < rpm < 380 (middle 342.5)
-	// - duty cycle of 91%,  625 < rpm < 780 (middle 702.5)
+	// - duty cycle of 9.4%, 305 < rpm < 380 (middle 342.5, rom expectation 361)
+	// - duty cycle of 91%,  625 < rpm < 780 (middle 702.5, rom expectation 723.5)
 	// - linear between these two points
 
-	// Assume 0 = duty cycle of 0%, ff = duty cycle of 100%
+	// Assume 0 = duty cycle of 100%, ff = duty cycle of 0%
 
-	float duty_cycle = (255-m_pwm) / 255.0;
-	float rpm = (duty_cycle - 0.094) * (702.5 - 342.5) / (0.91 - 0.094) + 342.5;
+	float duty_cycle = (255 - m_pwm) / 255.0;
+	float rpm = (duty_cycle - 0.094) * (723.5 - 361) / (0.91 - 0.094) + 361;
 
-	logerror("rpm %f\n", rpm);
+	logerror("rpm %02x -> %f (%s)\n", m_pwm, rpm, machine().describe_context());
 	m_cur_floppy->set_rpm(rpm);
 }
 

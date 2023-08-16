@@ -2873,12 +2873,12 @@ bool mac_floppy_device::wpt_r()
 	case 0xa: // Not on track 0?
 		return cyl != 0;
 
-	case 0xb:{// Tachometer, 60 pulses/rotation
+	case 0xb:{// Tachometer, 120 inversions/rotation
 		if(image.get() != nullptr && !mon) {
 			attotime base;
 			uint32_t pos = find_position(base, machine().time());
 			uint32_t subpos = pos % 3333334;
-			return subpos < 20000;
+			return subpos < 3333334/2;
 		} else
 			return false;
 	}
