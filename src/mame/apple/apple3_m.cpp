@@ -1123,15 +1123,27 @@ TIMER_CALLBACK_MEMBER(apple3_state::scanend_cb)
 	m_via[1]->write_pb6(1);
 
 	m_scanstart->adjust(m_screen->time_until_pos((scanline+1) % 224, 0));
+}
 
-	// check for ctrl-reset
-	if ((m_kbspecial->read() & 0x88) == 0x88)
+INPUT_CHANGED_MEMBER(apple3_state::keyb_special_changed)
+{
+	// check for ctrl-reset (RESET)
+	if (((m_kbspecial->read() & 0x88) == 0x88) && (m_via_0_a & ENV_NMIENABLE))
 	{
 		if (!m_reset_latch)
 		{
 			m_reset_latch = true;
 			m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		}
+	}
+	// check for reset key only (NMI)
+	else if ((m_kbspecial->read() & 0x80) && (m_via_0_a & ENV_NMIENABLE))
+	{
+		if (!m_nmi_latch)
+		{
+			m_nmi_latch = true;
+			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		}		
 	}
 	else
 	{
@@ -1141,6 +1153,11 @@ TIMER_CALLBACK_MEMBER(apple3_state::scanend_cb)
 			// allow cards to see reset
 			m_a2bus->reset_bus();
 			m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		}
+		else if (m_nmi_latch)
+		{
+			m_nmi_latch = false;
+			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 		}
 	}
 }
