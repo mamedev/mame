@@ -105,8 +105,6 @@ void lisa_video_device::device_reset()
 void lisa_video_device::vtmsk_0()
 {
 	m_vtmsk = false;
-
-	logerror("vtmsk off\n");
 }
 
 void lisa_video_device::vtmsk_1()
@@ -116,7 +114,6 @@ void lisa_video_device::vtmsk_1()
 		m_vint_masked = false;
 		m_vint_cb(false);
 	}
-	logerror("vtmsk on\n");
 }
 
 void lisa_video_device::tick_1()

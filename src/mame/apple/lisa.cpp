@@ -117,6 +117,9 @@ void lisa_state::lisa_special_io_map(address_map &map)
 
 void lisa_state::lisa_io_map(address_map &map)
 {
+	// Extension cards range
+	map(0x000000, 0x00bfff).lr16(NAME([]() -> u16 { return 0xffff; })).nopw();
+
 	map(0x00c000, 0x00c7ff).rw(m_fdc, FUNC(lisa_base_fdc_device::ram_r), FUNC(lisa_base_fdc_device::ram_w)).umask16(0x00ff);
 
 	map(0x00d241, 0x00d241).rw(m_scc, FUNC(z80scc_device::cb_r), FUNC(z80scc_device::cb_w));
