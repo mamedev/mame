@@ -86,6 +86,11 @@ private:
 	int mm5740_control_r();
 	void mm5740_data_ready_w(int state);
 
+	void crtc_addr_w(offs_t reg, uint8_t val);
+	uint8_t crtc_reg_r(offs_t reg);
+	void crtc_reg_w(offs_t reg, uint8_t val);
+	void crtc_vsync_w(int val);
+
 	TIMER_CALLBACK_MEMBER(key_click_off);
 	TIMER_CALLBACK_MEMBER(bell_off);
 
@@ -114,6 +119,7 @@ private:
 	bool     m_keyboard_irq_raised;
 	bool     m_serial_irq_raised;
 	bool     m_break_key_irq_raised;
+	bool     m_allow_vsync_nmi;
 };
 
 // Heath TLB with Super19 ROM
