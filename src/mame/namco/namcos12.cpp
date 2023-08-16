@@ -15,13 +15,18 @@
   Issues:
     - not all games work due to either banking, dma or protection issues.
     - graphics are glitchy in some games.
-    - kartduel does a "BSOD" crash when you start the game in race mode, or after finishing a race in time trial mode
+    - kartduel needs a redump to fix "BSOD" issue. Graphic data is corrupt which is causing the game to throw an error internally causing the BSOD.
     - kartduel frame rate is choppy, it freezes every half second
+        memo: this is due to the link PCB not being implemented, it keeps trying to communicate over the network causing hitching.
+        Forcing 0x1f781701 (which is within the shared RAM between the PCBs) to 0xff will stop the hitching.
     - truckk doesn't boot: the H8/3002 never enters InitJVSBoards @ 1DE2.  1DE2 is referenced in a table of commands at 4032,
       which is called by the routine at 3FEA.  It is not clear how execution is intended to get to 3FEA - there are no direct
       branches to that location, and the bytes 3F EA don't appear at all in the program.
     - technodr: printer not emulated. To play the game, press F2 to enter the test menu, navigate to GAME OPTIONS and disable
       the printer by setting "PRINTER" to OFF.
+    - sws2001 crashes at random times in-game, and always after the opening video. You can spam insert coin and start to get in-game.
+    - sws2000 also crashes after opening video
+    - toukon3 has garbage graphics
 
 Namco System 12 - Arcade Playstation-based Hardware
 ===================================================
@@ -1143,7 +1148,7 @@ public:
 	void init_namcos12();
 	void init_ptblank2();
 	void init_technodr();
-	void init_golgo13();
+	void init_alt_bank1();
 
 protected:
 	virtual void machine_reset() override;
@@ -1264,12 +1269,40 @@ uint16_t namcos12_state::sharedram_r(offs_t offset, uint16_t mem_mask)
 
 void namcos12_state::bankoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	// Golgo 13 has different banking (maybe the keycus controls it?)
-	if(m_alt_bank)
+	/*
+	Banking notes for various alt bank games:
+	mdhorse, kaiunqz:
+		*0x1f000000 = ((val >> 0x17) & 0xe) | 8;
+
+	golgo13, g13knd:
+		*0x1f000000 = ((val >> 0x17) & 0x6) + 8;
+		followed by
+		*0x1f000000 = (val >> 0x15) & 0x7;
+
+	truckk:
+		*0x1f000000 = ((val >> 0x17) & 0x1e) + 8;
+		followed by
+		*0x1f000000 = (val >> 0x15) & 0x7ff; (lower bits only set for manual transfers, mask is implicit)
+
+	sws2001:
+		The upper bits are set using fixed range checks:
+		if (val <= 0x0ffffff)
+			*0x1f000000 = 0x08;
+		else if (val >= 0x1000000 && val <= 0x1ffffff)
+			*0x1f000000 = 0x0a;
+		else if (val >= 0x2000000 && val <= 0x2ffffff)
+			*0x1f000000 = 0x0c;
+		else if (val >= 0x3000000)
+			*0x1f000000 = 0x0e;
+
+		The function at 8004d01c is the same logic as above + logic for the lower 3 bits:
+		*0x1f000000 = (val >> 0x15) & 0x7;
+	*/
+	if( m_alt_bank == 1 )
 	{
 		if( ( data & 8 ) != 0 )
 		{
-			m_n_bankoffset = ( data & 0x6 ) << 2;
+			m_n_bankoffset = ( data - 8 ) << 2;
 		}
 		else
 		{
@@ -1307,28 +1340,33 @@ void namcos12_state::namcos12_rom_read( uint32_t *p_n_psxram, uint32_t n_address
 	// TODO: the check for going past the end of ram should be in dma.c
 	uint32_t m_n_psxramsize = m_ram->size();
 
-	if(m_has_tektagt_dma && !m_n_dmaoffset)
+	n_offset = m_has_tektagt_dma ? m_n_tektagdmaoffset : m_n_dmaoffset;
+
+	// Depending on the game, the method of specifying the main ROM region is different.
+	// Some games set exp_base to 0x1f300000 (toukon3, tenkomor) and others set the msb of the DMA offset to 1 (tekken3, sws2000 for example).
+	const bool is_mainrom = BIT( n_offset, 31 ) || m_maincpu->exp_base() == 0x1f300000;
+
+	if ( is_mainrom )
 	{
-		n_region = m_bankedroms;
-		n_offset = m_n_tektagdmaoffset & 0x7fffffff;
-		verboselog(1, "namcos12_rom_read( %08x, %08x ) tektagt %08x\n", n_address, n_size, n_offset );
-	}
-	else if( m_n_dmaoffset >= 0x80000000 || m_maincpu->exp_base() == 0x1f300000 )
-	{
-		/// HACK: it's unclear how exp_cfg & exp_base really play a part in this, tenkomor needs the test here and not in dmaoffset_w().
 		n_region = m_mainrom;
-		n_offset = m_n_dmaoffset & 0x003fffff;
-		verboselog(1, "namcos12_rom_read( %08x, %08x ) boot %08x\n", n_address, n_size, n_offset );
+		n_offset &= 0xffffff; // although the area should really be masked with 0x3fffff, the bootloader used by sws2000, sws2001, kaiunqz intentionally go over by a small amount when copying the program code into memory
 	}
 	else
 	{
 		n_region = m_bankedroms;
-		n_offset = m_n_dmaoffset & 0x7fffffff;
-		verboselog(1, "namcos12_rom_read( %08x, %08x ) game %08x\n", n_address, n_size, n_offset );
+		n_offset &= 0x7fffffff;
 	}
 
+	if( !m_has_tektagt_dma && m_alt_bank ) // alt bank method stores the upper bits of the bank into m_n_bankoffset
+		n_offset += m_n_bankoffset * 0x200000;
+
+	m_has_tektagt_dma = 0;
+
+	verboselog(1, "namcos12_rom_read( %08x, %08x ) %s %08x %08x\n", n_address, n_size, is_mainrom ? "mainrom" : "game", m_n_dmaoffset, n_offset );
+
 	source = (uint16_t *) n_region->base();
-	n_romleft = ( n_region->bytes() - n_offset ) / 4;
+	n_romleft = int32_t( n_region->bytes() - n_offset ) / 4; // without the cast this math never becomes negative so the truncation logic never happens (needed by sws2000, sws2001, kaiunqz)
+
 	if( n_size > n_romleft )
 	{
 		verboselog(1, "namcos12_rom_read dma truncated %d to %d passed end of rom\n", n_size, n_romleft );
@@ -1337,7 +1375,7 @@ void namcos12_state::namcos12_rom_read( uint32_t *p_n_psxram, uint32_t n_address
 
 	destination = (uint16_t *)p_n_psxram;
 
-	n_ramleft = ( m_n_psxramsize - n_address ) / 4;
+	n_ramleft = int32_t( m_n_psxramsize - n_address ) / 4;
 	if( n_size > n_ramleft )
 	{
 		verboselog(1, "namcos12_rom_read dma truncated %d to %d passed end of ram\n", n_size, n_ramleft );
@@ -1368,8 +1406,10 @@ void namcos12_state::namcos12_map(address_map &map)
 {
 	map(0x1f000000, 0x1f000003).nopr();
 	map(0x1f000000, 0x1f000001).w(FUNC(namcos12_state::bankoffset_w));          /* banking */
+	map(0x1f010000, 0x1f010003).nopw(); // very spammy
 	map(0x1f080000, 0x1f083fff).rw(FUNC(namcos12_state::sharedram_r), FUNC(namcos12_state::sharedram_w)); /* shared ram?? */
 	map(0x1f140000, 0x1f140fff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask32(0x00ff00ff); /* EEPROM */
+	map(0x1f018000, 0x1f018003).nopw(); // very spammy
 	map(0x1f1bff08, 0x1f1bff0f).nopw();    /* ?? */
 	map(0x1f700000, 0x1f70ffff).w(FUNC(namcos12_state::dmaoffset_w));  /* dma */
 	/* Network area */
@@ -1679,7 +1719,7 @@ void namcos12_state::init_technodr()
 	*( (uint32_t *)( memregion( "sub" )->base() + 0x14b6 ) ) = 0;
 }
 
-void namcos12_state::init_golgo13()
+void namcos12_state::init_alt_bank1()
 {
 	init_namcos12();
 	m_alt_bank = 1;
@@ -2368,13 +2408,14 @@ ROM_START( kaiunqz )
 ROM_END
 
 ROM_START( kartduel )
+	// Needs a redump
 	ROM_REGION32_LE( 0x00400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "ktd1vera.2l",  0x0000000, 0x200000, CRC(0c207249) SHA1(6c57de25d452226a25f658638d89b81257960741) )
 	ROM_LOAD16_BYTE( "ktd1vera.2p",  0x0000001, 0x200000, CRC(f6e2581f) SHA1(06eb108c2775290590dba75f964f26443a585d70) )
 
 	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 ) /* main data */
-	ROM_LOAD16_BYTE( "kdt1rom0l.ic12", 0x000000, 0x800000, CRC(4a3bac12) SHA1(7758d97049d30a00b7bede3688d451fbf4eddbfb) )
-	ROM_LOAD16_BYTE( "kdt1rom0u.ic11", 0x000001, 0x800000, CRC(bab0d328) SHA1(9a15bfb38c63b0012f29755b2be071e9c82d1c20) )
+	ROM_LOAD16_BYTE( "kdt1rom0l.ic12", 0x000000, 0x800000, BAD_DUMP CRC(4a3bac12) SHA1(7758d97049d30a00b7bede3688d451fbf4eddbfb) ) // Shows signs of corruption. bit 0 is set to 1 on 4-byte boundaries in only some areas, resulting in bad data crashing the game at certain points
+	ROM_LOAD16_BYTE( "kdt1rom0u.ic11", 0x000001, 0x800000, BAD_DUMP CRC(bab0d328) SHA1(9a15bfb38c63b0012f29755b2be071e9c82d1c20) )
 
 	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
 	ROM_LOAD16_WORD_SWAP( "ktd1vera.11s", 0x000000, 0x080000, CRC(c2ff1971) SHA1(32ee2afe08e92049d8139c9324a0ea1a3b7ee5a1) )
@@ -2701,7 +2742,7 @@ ROM_START( sws98 )
 	ROM_LOAD16_BYTE( "ss81vera.2l",  0x0000000, 0x200000, CRC(94b1f34c) SHA1(0c8491fda366b5b2874e5f49959dccd11d372e46) )
 	ROM_LOAD16_BYTE( "ss81vera.2p",  0x0000001, 0x200000, CRC(7d0ed33d) SHA1(34342ce57b29ee15c6279c099bb145ac7ad262f3) )
 
-	ROM_REGION32_LE( 0x2000000, "bankedroms", 0 ) /* main data */
+	ROM_REGION32_LE( 0x1c00000, "bankedroms", 0 ) /* main data */
 	ROM_LOAD16_BYTE( "ss81fl1l.9",   0x1000000, 0x200000, CRC(b0b5dc77) SHA1(abce4e6ae60858b7c7408d10975b7a1e0d183115) )
 	ROM_LOAD16_BYTE( "ss81fl1u.10",  0x1000001, 0x200000, CRC(e526dba5) SHA1(889fdfba17282eb05a3e254af81ee15c3e16acc4) )
 	ROM_LOAD16_BYTE( "ss81fl2l.7",   0x1400000, 0x200000, CRC(2dc6f6b5) SHA1(e6c7bb804d7d027acca5adb15b0bb95321905ff3) )
@@ -2764,12 +2805,12 @@ ROM_START( sws2001 )
 	ROM_LOAD16_BYTE( "ss11vera.2l",  0x000000, 0x200000, CRC(a7b4dbe5) SHA1(1bcb8d127388e2ead9ca04b527779896c69daf7f) )
 	ROM_LOAD16_BYTE( "ss11vera.2p",  0x000001, 0x200000, CRC(3ef76b4e) SHA1(34c21b6002d3f88aa3f4b4606c8aace24be92920) )
 
-	ROM_REGION32_LE( 0x2800000, "bankedroms", 0 ) /* main data */
+	ROM_REGION32_LE( 0x4000000, "bankedroms", 0 ) /* main data */
 	ROM_LOAD( "ss01rom0.9",   0x0000000, 0x800000, CRC(c08cc59c) SHA1(f2d8064491c98acbb40260d7f13d0f9b394c1383) )
-	ROM_LOAD( "ss01rom1.10",  0x0800000, 0x800000, CRC(d4aa1dc6) SHA1(68fcb60aadf35668d7d746da1e29d5d985e40aec) )
-	ROM_LOAD( "ss01rom2.11",  0x1000000, 0x800000, CRC(3371904a) SHA1(58bbf98a44560bc021bac4bc513fe89deea85b50) )
-	ROM_LOAD16_BYTE( "ss11fl1l.5",   0x1800000, 0x800000, CRC(0546a2b4) SHA1(b61457c9c5136f94ace48e83de8043ce20ca4d99) )
-	ROM_LOAD16_BYTE( "ss11fl1u.6",   0x1800001, 0x800000, CRC(b3de0b2c) SHA1(a89d3a2eb0952a98cc4765af2897b94136ca58ad) )
+	ROM_LOAD( "ss01rom1.10",  0x1000000, 0x800000, CRC(d4aa1dc6) SHA1(68fcb60aadf35668d7d746da1e29d5d985e40aec) )
+	ROM_LOAD( "ss01rom2.11",  0x2000000, 0x800000, CRC(3371904a) SHA1(58bbf98a44560bc021bac4bc513fe89deea85b50) )
+	ROM_LOAD( "ss11fl1l.5",   0x3000000, 0x800000, CRC(0546a2b4) SHA1(b61457c9c5136f94ace48e83de8043ce20ca4d99) )
+	ROM_LOAD( "ss11fl1u.6",   0x3800000, 0x800000, CRC(b3de0b2c) SHA1(a89d3a2eb0952a98cc4765af2897b94136ca58ad) )
 
 	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
 	ROM_LOAD16_WORD_SWAP( "ss01vera.11s", 0x000000, 0x080000, CRC(641e6584) SHA1(dfc0ac21bea5b19dbce5d50fb681854889d756dc) )
@@ -3235,7 +3276,7 @@ ROM_START( toukon3 )
 	ROM_LOAD16_BYTE( "tr1vera.2e",  0x000000, 0x200000, CRC(126ebb73) SHA1(de429e335e03f2b5116fc50f556a5507475a0535) )
 	ROM_LOAD16_BYTE( "tr1vera.2j",  0x000001, 0x200000, CRC(2edb3ad2) SHA1(d1d2d78b781c7f6fb5a201785295daa825ad057e) )
 
-	ROM_REGION32_LE( 0x1c00000, "bankedroms", 0 ) /* main data */
+	ROM_REGION32_LE( 0x00800000, "bankedroms", 0 ) /* main data */
 	ROM_LOAD16_BYTE( "tr1rom0l.6", 0x0000000, 0x400000, CRC(42946d26) SHA1(dc7944cb6daceda41ecee7a4e3f549cba916ab87) )
 	ROM_LOAD16_BYTE( "tr1rom0u.9", 0x0000001, 0x400000, CRC(e3cd0be0) SHA1(f27d14cd086b5961be33e635662aca89a5e8c857) )
 
@@ -3343,7 +3384,7 @@ GAME( 1996, tekken3ua, tekken3,  coh700,   namcos12,  namcos12_state,          i
 GAME( 1996, tekken3je1,tekken3,  coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.E1)", 0 ) /* KC006 */
 GAME( 1996, tekken3ja, tekken3,  coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.A)", 0 ) /* KC006 */
 GAME( 1997, lbgrande,  0,        coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Libero Grande (World, LG2/VER.A)", 0 ) /* KC014 */
-GAME( 1997, toukon3,   0,        coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco / Tomy",    "Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (Japan, TR1/VER.A)", 0 ) /* KC019 */
+GAME( 1997, toukon3,   0,        coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco / Tomy",    "Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (Japan, TR1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC019 */
 GAME( 1998, soulclbr,  0,        coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Soul Calibur (Asia, SOC14/VER.C)", 0 )
 GAME( 1998, soulclbrab,soulclbr, coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Soul Calibur (Asia, SOC14/VER.B)", 0 )
 GAME( 1998, soulclbra, soulclbr, coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Soul Calibur (World, SOC12/VER.A2)", 0 ) /* KC020 */
@@ -3355,7 +3396,7 @@ GAME( 1998, soulclbrja,soulclbr, coh700,   namcos12,  namcos12_state,          i
 GAME( 1998, ehrgeiz,   0,        coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Square / Namco",  "Ehrgeiz (World, EG2/VER.A)", 0 ) /* KC021 */
 GAME( 1998, ehrgeizua, ehrgeiz,  coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Square / Namco",  "Ehrgeiz (US, EG3/VER.A)", 0 ) /* KC021 */
 GAME( 1998, ehrgeizja, ehrgeiz,  coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Square / Namco",  "Ehrgeiz (Japan, EG1/VER.A)", 0 ) /* KC021 */
-GAME( 1998, mdhorse,   0,        coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "MOSS / Namco",    "Derby Quiz My Dream Horse (Japan, MDH1/VER.A2)", MACHINE_NOT_WORKING ) /* KC035 */
+GAME( 1998, mdhorse,   0,        coh700,   namcos12,  namcos12_state,          init_alt_bank1,ROT0, "MOSS / Namco",    "Derby Quiz My Dream Horse (Japan, MDH1/VER.A2)", 0 ) /* KC035 */
 GAME( 1998, aplarail,  0,        aplarail, aplarail,  namcos12_boothack_state, init_namcos12, ROT0, "Namco / Tomy",    "Attack Pla Rail (Japan, AP1/VER.A)", 0 ) /* KC032 */
 GAME( 1998, sws98,     0,        coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Super World Stadium '98 (Japan, SS81/VER.A)", 0 ) /* KC0?? */
 GAME( 1998, technodr,  0,        technodr, technodr,  namcos12_boothack_state, init_technodr, ROT0, "Namco",           "Techno Drive (Japan, TH1/VER.B)", MACHINE_NODEVICE_PRINTER ) /* KC056 */
@@ -3379,12 +3420,12 @@ GAME( 1999, ohbakyuun, ghlpanic, ptblank2, ghlpanic,  namcos12_boothack_state, i
 GAME( 1999, pacapp2,   0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Produce / Namco", "Paca Paca Passion 2 (Japan, PKS1/VER.A)", 0 ) /* KC046 */
 GAME( 1999, mrdrillr,  0,        coh700,   namcos124w,namcos12_boothack_state, init_namcos12, ROT0, "Namco",           "Mr. Driller (US, DRI3/VER.A2)", 0 ) /* KC048 */
 GAME( 1999, mrdrillrj, mrdrillr, coh700,   namcos124w,namcos12_boothack_state, init_namcos12, ROT0, "Namco",           "Mr. Driller (Japan, DRI1/VER.A2)", 0 ) /* KC048 */
-GAME( 1999, kaiunqz,   0,        coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Kaiun Quiz (Japan, KW1/VER.A)", MACHINE_NOT_WORKING ) /* KC050 */
+GAME( 1999, kaiunqz,   0,        coh700,   namcos12,  namcos12_state,          init_alt_bank1,ROT0, "Namco",           "Kaiun Quiz (Japan, KW1/VER.A)", 0 ) /* KC050 */
 GAME( 1999, pacappsp,  0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Produce / Namco", "Paca Paca Passion Special (Japan, PSP1/VER.A)", 0 ) /* KC052 */
 GAME( 1999, aquarush,  0,        coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Aqua Rush (Japan, AQ1/VER.A1)", 0 ) /* KC053 */
-GAME( 1999, golgo13,   0,        golgo13,  golgo13,   namcos12_boothack_state, init_golgo13,  ROT0, "Eighting / Raizing / Namco", "Golgo 13 (Japan, GLG1/VER.A)", 0 ) /* KC054 */
-GAME( 2000, g13knd,    0,        golgo13,  golgo13,   namcos12_boothack_state, init_golgo13,  ROT0, "Eighting / Raizing / Namco", "Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)", 0 ) /* KC059 */
+GAME( 1999, golgo13,   0,        golgo13,  golgo13,   namcos12_boothack_state, init_alt_bank1,ROT0, "Eighting / Raizing / Namco", "Golgo 13 (Japan, GLG1/VER.A)", 0 ) /* KC054 */
+GAME( 2000, g13knd,    0,        golgo13,  golgo13,   namcos12_boothack_state, init_alt_bank1,ROT0, "Eighting / Raizing / Namco", "Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)", 0 ) /* KC059 */
 GAME( 2000, sws2000,   0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Namco",           "Super World Stadium 2000 (Japan, SS01/VER.A)", MACHINE_NOT_WORKING ) /* KC055 */
-GAME( 2000, truckk,    0,        truckk,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Metro / Namco",   "Truck Kyosokyoku (Japan, TKK2/VER.A)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC056 */
+GAME( 2000, truckk,    0,        truckk,   namcos12,  namcos12_boothack_state, init_alt_bank1,ROT0, "Metro / Namco",   "Truck Kyosokyoku (Japan, TKK2/VER.A)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC056 */
 GAME( 2000, kartduel,  0,        kartduel, kartduel,  namcos12_boothack_state, init_namcos12, ROT0, "Gaps / Namco",    "Kart Duel (Japan, KTD1/VER.A)", MACHINE_NOT_WORKING ) /* KC057 */
-GAME( 2001, sws2001,   sws2000,  coh716,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Namco",           "Super World Stadium 2001 (Japan, SS11/VER.A)", MACHINE_NOT_WORKING ) /* KC061 */
+GAME( 2001, sws2001,   sws2000,  coh716,   namcos12,  namcos12_boothack_state, init_alt_bank1,ROT0, "Namco",           "Super World Stadium 2001 (Japan, SS11/VER.A)", MACHINE_NOT_WORKING ) /* KC061 */
