@@ -91,7 +91,7 @@ u16 lisa_mmu_device::mmu::read(offs_t addr, u16 mem_mask)
 		if(m_maincpu->access_before_time((cyc|3) + 1, cyc))
 			return 0;
 
-	int slot = m_current_base | (addr >> 17);
+	int slot = m_current_base | ((addr & 0xffffff) >> 17);
  retry:
 	offs_t newaddr = m_base_address[slot] + (addr & 0x01ffff);
 	switch(m_mode[slot]) {
@@ -143,7 +143,7 @@ void lisa_mmu_device::mmu::write(offs_t addr, u16 data, u16 mem_mask)
 		if(m_maincpu->access_before_time((cyc|3) + 1, cyc))
 			return;
 
-	int slot = m_current_base | (addr >> 17);
+	int slot = m_current_base | ((addr & 0xffffff) >> 17);
  retry:
 	offs_t newaddr = m_base_address[slot] + (addr & 0x01ffff);
 	switch(m_mode[slot]) {
