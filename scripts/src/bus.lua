@@ -2641,6 +2641,8 @@ end
 
 if (BUSES["VME"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/vme/enp10.cpp",
+		MAME_DIR .. "src/devices/bus/vme/enp10.h",
 		MAME_DIR .. "src/devices/bus/vme/mvme187.cpp",
 		MAME_DIR .. "src/devices/bus/vme/mvme187.h",
 		MAME_DIR .. "src/devices/bus/vme/tp881v.cpp",
