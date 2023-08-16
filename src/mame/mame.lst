@@ -41701,6 +41701,9 @@ prose2ko                        //
 @source:skeleton/tulip1.cpp
 tulip1                          // (c) 1983 CompuData
 
+@source:skeleton/tvcobrasd.cpp
+cobrasd                         // (c) 1998 TourVisión
+
 @source:skeleton/unistar.cpp
 unistar                         //
 
