@@ -880,6 +880,24 @@ void toaplan2_state::dogyuun_68k_mem(address_map &map)
 }
 
 
+void toaplan2_state::dogyuunto_68k_mem(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x103fff).ram();
+	map(0x218000, 0x218fff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w)).umask16(0x00ff); // reads the same area as the finished game on startup, but then uses only this part
+	map(0x21c01d, 0x21c01d).w(FUNC(toaplan2_state::coin_sound_reset_w)); // Coin count/lock + Z80 reset line
+	map(0x21c020, 0x21c021).portr("IN1");
+	map(0x21c024, 0x21c025).portr("IN2");
+	map(0x21c028, 0x21c029).portr("SYS");
+	map(0x21c02c, 0x21c02d).portr("DSWA");
+	map(0x21c030, 0x21c031).portr("DSWB");
+	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
+	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x500000, 0x50000d).rw(m_vdp[1], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
+	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));         // test bit 8
+}
+
+
 void toaplan2_state::kbash_68k_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
@@ -1416,6 +1434,15 @@ void truxton2_state::bbakraid_sound_z80_port(address_map &map)
 	map(0x48, 0x48).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 	map(0x4a, 0x4a).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
 	map(0x80, 0x81).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
+}
+
+
+void toaplan2_state::dogyuunto_sound_z80_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram().share(m_shared_ram);
+	map(0xe000, 0xe001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xe004, 0xe004).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
 
@@ -3581,6 +3608,20 @@ void toaplan2_state::dogyuun(machine_config &config)
 }
 
 
+void toaplan2_state::dogyuunto(machine_config &config)
+{
+	dogyuun(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::dogyuunto_68k_mem);
+	m_maincpu->set_clock(24_MHz_XTAL / 2); // 24 MHz instead of 25
+
+	z80_device &audiocpu(Z80(config.replace(), "audiocpu", 27_MHz_XTAL / 8)); // guessed divisor
+	audiocpu.set_addrmap(AS_PROGRAM, &toaplan2_state::dogyuunto_sound_z80_mem);
+
+	m_oki[0]->set_clock(1.056_MHz_XTAL); // blue resonator 1056J
+}
+
+
 void toaplan2_state::kbash(machine_config &config)
 {
 	/* basic machine hardware */
@@ -4568,6 +4609,40 @@ ROM_START( dogyuunt )
 
 	ROM_REGION( 0x40000, "oki1", 0 )     /* ADPCM Samples */
 	ROM_LOAD( "tp022_2.w30", 0x00000, 0x40000, CRC(043271b3) SHA1(c7eaa929e55dd956579b824ea9d20a1d0129a925) )
+ROM_END
+
+
+/*
+This set came on a TX-022 PCB (different from the final version, TP-022).
+Seems the game is always in 'debug mode' according to the test menu (dip has no effect). Still, it has no invicibility effect.
+Couldn't find a read for the region settings jumpers.
+Hardware differences according to the dumper:
+* Two GCUs have nearly identical sections copy-pasted, one above the other.
+* Toaplan HK-1000 ceramic module is used for inputs; the final implements the logic separately.
+* Inputs mapped in the main CPU address space.
+* No NEC V25 sound CPU; instead, there is a Z80 with its own ROM.
+* Sound amp pinout is reversed; mounted to the underside as a bodge fix (this is how I received it).
+* Board is marked "TX-022" instead of "TP-022". A halfway point from the development code "GX-022"
+*/
+ROM_START( dogyuunto )
+	ROM_REGION( 0x080000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "8-25.u11", 0x000000, 0x080000, CRC(4d3c952f) SHA1(194f3065c513238921047ead8b425c3d0538b9a7) ) // real hand-written label is '8/25'
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )
+	ROM_LOAD( "u25", 0x00000, 0x08000, CRC(41a34a7e) SHA1(c4f7833249436fd064c7088c9776d12dee4a7d39) ) // only had a white label
+
+	// the GP9001 mask ROMs were not dumped for this set, but the ROM codes match so they are believed identical
+	ROM_REGION( 0x200000, "gp9001_0", 0 )
+	ROM_LOAD16_WORD_SWAP( "tp022_3.w92", 0x000000, 0x100000, CRC(191b595f) SHA1(89344946daa18087cc83f92027cf5da659b1c7a5) )
+	ROM_LOAD16_WORD_SWAP( "tp022_4.w93", 0x100000, 0x100000, CRC(d58d29ca) SHA1(90d142fef37764ef817347a2bed77892a288a077) )
+
+	ROM_REGION( 0x400000, "gp9001_1", 0 )
+	ROM_LOAD16_WORD_SWAP( "tp022_5.w16", 0x000000, 0x200000, CRC(d4c1db45) SHA1(f5655467149ba737128c2f54c9c6cdaca6e4c35c) )
+	ROM_LOAD16_WORD_SWAP( "tp022_6.w17", 0x200000, 0x200000, CRC(d48dc74f) SHA1(081b5a00a2ff2bd82b98b30aab3cb5b6ae1014d5) )
+
+	// this may have some corruption (only 24, apparently random, bytes differ from the standard ROM), however preserve it for now until it has been verified.
+	ROM_REGION( 0x40000, "oki1", 0 )
+	ROM_LOAD( "2m.u29", 0x00000, 0x40000, CRC(5e7a77d8) SHA1(da6beb5e8e015965ff42fd52f5aa0c0ae5bcee4f) ) // '2M' hand-written
 ROM_END
 
 
@@ -6209,10 +6284,11 @@ GAME( 1991, ghox,        0,        ghox,         ghox,       ghox_state,     emp
 GAME( 1991, ghoxj,       ghox,     ghox,         ghox,       ghox_state,     empty_init,    ROT270, "Toaplan",         "Ghox (joystick)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ghoxjo,      ghox,     ghox,         ghoxjo,     ghox_state,     empty_init,    ROT270, "Toaplan",         "Ghox (joystick, older)",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, dogyuun,     0,        dogyuun,      dogyuun,    toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dogyuuna,    dogyuun,  dogyuun,      dogyuuna,   toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun (older set)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dogyuunb,    dogyuun,  dogyuun,      dogyuunt,   toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun (oldest set)",      MACHINE_SUPPORTS_SAVE ) // maybe a newer location test version, instead
-GAME( 1992, dogyuunt,    dogyuun,  dogyuun,      dogyuunt,   toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun (location test)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dogyuun,     0,        dogyuun,      dogyuun,    toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dogyuuna,    dogyuun,  dogyuun,      dogyuuna,   toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun (older set)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dogyuunb,    dogyuun,  dogyuun,      dogyuunt,   toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun (oldest set)",           MACHINE_SUPPORTS_SAVE ) // maybe a newer location test version, instead
+GAME( 1992, dogyuunt,    dogyuun,  dogyuun,      dogyuunt,   toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun (location test)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dogyuunto,   dogyuun,  dogyuunto,    dogyuunt,   toaplan2_state, init_vfive,    ROT270, "Toaplan",         "Dogyuun (location test, older)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1993, kbash,       0,        kbash,        kbash,      toaplan2_state, empty_init,    ROT0,   "Toaplan / Atari", "Knuckle Bash",                 MACHINE_SUPPORTS_SAVE ) // Atari license shown for some regions.
 GAME( 1993, kbashk,      kbash,    kbash,        kbashk,     toaplan2_state, empty_init,    ROT0,   "Toaplan / Taito", "Knuckle Bash (Korean PCB)",    MACHINE_SUPPORTS_SAVE ) // Japan region has optional Taito license, maybe the original Japan release?

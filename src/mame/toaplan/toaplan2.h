@@ -43,6 +43,7 @@ public:
 	void batsugun(machine_config &config);
 	void batsugunbl(machine_config &config);
 	void dogyuun(machine_config &config);
+	void dogyuunto(machine_config &config);
 	void enmadaio(machine_config &config);
 	void kbash(machine_config &config);
 	void kbash2(machine_config &config);
@@ -115,6 +116,8 @@ protected:
 	void batsugun_68k_mem(address_map &map);
 	void batsugunbl_68k_mem(address_map &map);
 	void dogyuun_68k_mem(address_map &map);
+	void dogyuunto_68k_mem(address_map &map);
+	void dogyuunto_sound_z80_mem(address_map &map);
 	void enmadaio_68k_mem(address_map &map);
 	void enmadaio_oki(address_map &map);
 	void fixeightbl_oki(address_map &map);
