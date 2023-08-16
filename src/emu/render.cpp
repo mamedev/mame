@@ -3259,12 +3259,7 @@ float render_manager::ui_aspect(render_container *rc)
 	}
 
 	// clamp for extreme proportions
-	if (aspect < 0.66f)
-		aspect = 0.66f;
-	if (aspect > 1.5f)
-		aspect = 1.5f;
-
-	return aspect;
+	return std::clamp(aspect, 0.66f, 1.5f);
 }
 
 
