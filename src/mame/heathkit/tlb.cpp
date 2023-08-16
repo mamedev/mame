@@ -284,28 +284,28 @@ void heath_tlb_device::mm5740_data_ready_w(int state)
 
 void heath_tlb_device::crtc_addr_w(offs_t reg, uint8_t val)
 {
-	m_allow_vsync_nmi = bool(BIT(reg,2));
+	m_allow_vsync_nmi = bool(BIT(reg, 2));
 
 	m_crtc->address_w(val);
 }
 
 uint8_t heath_tlb_device::crtc_reg_r(offs_t reg)
 {
-	m_allow_vsync_nmi = bool(BIT(reg,2));
+	m_allow_vsync_nmi = bool(BIT(reg, 2));
 
 	return m_crtc->register_r();
 }
 
 void heath_tlb_device::crtc_reg_w(offs_t reg, uint8_t val)
 {
-	m_allow_vsync_nmi = bool(BIT(reg,2));
+	m_allow_vsync_nmi = bool(BIT(reg, 2));
 
 	m_crtc->register_w(val);
 }
 
 void heath_tlb_device::crtc_vsync_w(int val)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, m_allow_vsync_nmi ? val: CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, m_allow_vsync_nmi ? val : CLEAR_LINE);
 }
 
 void heath_tlb_device::serial_irq_w(int state)

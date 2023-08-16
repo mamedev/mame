@@ -2215,7 +2215,7 @@ bool render_target::load_layout_file(device_t &device, util::xml::data_node cons
 	{
 		m_filelist.emplace_back(device, rootnode, searchpath, dirname);
 	}
-	catch (emu_fatalerror &err)
+	catch (emu_fatalerror const &err)
 	{
 		osd_printf_warning("%s\n", err.what());
 		return false;

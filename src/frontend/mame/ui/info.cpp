@@ -21,8 +21,10 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#include "utf8.h"
+#include "util/unicode.h"
+#include "util/utf8.h"
 
+#include <locale>
 #include <set>
 #include <sstream>
 #include <type_traits>
@@ -364,6 +366,13 @@ std::string machine_info::game_info_string() const
 {
 	std::ostringstream buf;
 
+	// get decimal separator
+	std::string point;
+	{
+		wchar_t const s(std::use_facet<std::numpunct<wchar_t> >(std::locale()).decimal_point());
+		point = utf8_from_wstring(std::wstring_view(&s, 1));
+	}
+
 	// print description, manufacturer, and CPU:
 	std::string_view src(m_machine.system().type.source());
 	auto prefix(src.find("src/mame/"));
@@ -402,7 +411,7 @@ std::string machine_info::game_info_string() const
 		if (d > 0)
 		{
 			size_t dpos = hz.length() - d;
-			hz.insert(dpos, ".");
+			hz.insert(dpos, point);
 			size_t last = hz.find_last_not_of('0');
 			hz = hz.substr(0, last + (last != dpos ? 1 : 0));
 		}
@@ -445,7 +454,7 @@ std::string machine_info::game_info_string() const
 		if (d > 0)
 		{
 			size_t dpos = hz.length() - d;
-			hz.insert(dpos, ".");
+			hz.insert(dpos, point);
 			size_t last = hz.find_last_not_of('0');
 			hz = hz.substr(0, last + (last != dpos ? 1 : 0));
 		}
@@ -480,7 +489,7 @@ std::string machine_info::game_info_string() const
 				if (valid)
 				{
 					size_t dpos = hz.length() - 6;
-					hz.insert(dpos, ".");
+					hz.insert(dpos, point);
 					size_t last = hz.find_last_not_of('0');
 					hz = hz.substr(0, last + (last != dpos ? 1 : 0));
 				}

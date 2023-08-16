@@ -1127,18 +1127,18 @@ TIMER_CALLBACK_MEMBER(apple3_state::scanend_cb)
 
 INPUT_CHANGED_MEMBER(apple3_state::keyb_special_changed)
 {
-	// check for ctrl-reset (RESET)
 	if (((m_kbspecial->read() & 0x88) == 0x88) && (m_via_0_a & ENV_NMIENABLE))
 	{
+		// ctrl-reset pressed (RESET)
 		if (!m_reset_latch)
 		{
 			m_reset_latch = true;
 			m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		}
 	}
-	// check for reset key only (NMI)
 	else if ((m_kbspecial->read() & 0x80) && (m_via_0_a & ENV_NMIENABLE))
 	{
+		// reset key only pressed (NMI)
 		if (!m_nmi_latch)
 		{
 			m_nmi_latch = true;

@@ -10,7 +10,7 @@
 
     These machines took the cost-reduced but still decent Quadra 605/LC 575
     and made them even cheaper by replacing the full-featured DAFB video chip
-    with "Valkyrie".  Which appears to offer only a few pre-programmed video
+    with "Valkyrie".  It appears to offer only a few pre-programmed video
     mode timings.
 
     Further cost reduction occured by replacing the hard disk with an ATA/IDE
@@ -32,7 +32,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "softlist_dev.h"
 
 #include "cuda.h"
 #include "f108.h"
@@ -44,6 +43,9 @@
 #include "cpu/m68000/m68040.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
+
+#include "softlist_dev.h"
+
 
 #define C32M 31.3344_MHz_XTAL
 #define C15M (C32M/2)

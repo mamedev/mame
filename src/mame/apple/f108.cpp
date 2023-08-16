@@ -13,13 +13,13 @@
 */
 
 #include "emu.h"
-
 #include "f108.h"
-
-#include "softlist_dev.h"
 
 #include "bus/nscsi/devices.h"
 #include "bus/rs232/rs232.h"
+
+#include "softlist_dev.h"
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
