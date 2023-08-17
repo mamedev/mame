@@ -1659,19 +1659,13 @@ ROM_START( countrunb3 ) // mostly similar to countrunb2, last routine at 0xb2a2 
 	ROM_LOAD( "electric_15.c2", 0x8000, 0x4000, CRC(39fc7e8d) SHA1(6ea88c8d9cf857802cc48c62e4c87cd913194c07) ) // 0xxxxxxxxxxxxxx = 0xFF
 	ROM_CONTINUE(               0x8000, 0x4000 )
 
-	ROM_REGION( 0x600, "proms", 0 ) // not dumped, probably identical to the other sets but PCB positions don't match, so marked as no dump to avoid confusion and loaded the other sets' ones
-	ROM_LOAD( "n82s129n.8h", 0x000, 0x100, NO_DUMP )
-	ROM_LOAD( "n82s129n.8l", 0x100, 0x100, NO_DUMP )
-	ROM_LOAD( "n82s129n.8m", 0x200, 0x100, NO_DUMP )
-	ROM_LOAD( "n82s129n.9h", 0x300, 0x100, NO_DUMP )
-	ROM_LOAD( "n82s129n.9l", 0x400, 0x100, NO_DUMP )
-	ROM_LOAD( "n82s129n.9m", 0x500, 0x100, NO_DUMP )
-	ROM_LOAD( "24s10n.8j", 0x000, 0x100, BAD_DUMP CRC(63c114ad) SHA1(db881c4ff92cb04a94988587503346a44eb89b69) ) // TODO: remove these PROMs when the ones for this bootleg are dumped
-	ROM_LOAD( "24s10n.7j", 0x100, 0x100, BAD_DUMP CRC(d16f95cc) SHA1(041bb84576bd8492c1ad3e492d8cb3e04d316527) )
-	ROM_LOAD( "24s10n.8k", 0x200, 0x100, BAD_DUMP CRC(217db2c1) SHA1(f2af1a74b0ce56290b1c119e1a9707287132194a) )
-	ROM_LOAD( "24s10n.7k", 0x300, 0x100, BAD_DUMP CRC(8d983949) SHA1(d7331900d18a53ceb133f8a8848d3c108e03323a) )
-	ROM_LOAD( "24s10n.8h", 0x400, 0x100, BAD_DUMP CRC(33e87550) SHA1(951ce0dc975b799c1056ce8eb005256cbb43a112) )
-	ROM_LOAD( "24s10n.7h", 0x500, 0x100, BAD_DUMP CRC(c77d0077) SHA1(4cbbf625ad5e45d00ca6aebe9566538ff0a3348d) )
+	ROM_REGION( 0x600, "proms", 0 )
+	ROM_LOAD( "n82s129n.9l", 0x000, 0x100, CRC(63c114ad) SHA1(db881c4ff92cb04a94988587503346a44eb89b69) )
+	ROM_LOAD( "n82s129n.8l", 0x100, 0x100, CRC(d16f95cc) SHA1(041bb84576bd8492c1ad3e492d8cb3e04d316527) )
+	ROM_LOAD( "n82s129n.9h", 0x200, 0x100, CRC(217db2c1) SHA1(f2af1a74b0ce56290b1c119e1a9707287132194a) )
+	ROM_LOAD( "n82s129n.8h", 0x300, 0x100, CRC(8d983949) SHA1(d7331900d18a53ceb133f8a8848d3c108e03323a) )
+	ROM_LOAD( "n82s129n.9m", 0x400, 0x100, CRC(33e87550) SHA1(951ce0dc975b799c1056ce8eb005256cbb43a112) )
+	ROM_LOAD( "n82s129n.8m", 0x500, 0x100, CRC(c77d0077) SHA1(4cbbf625ad5e45d00ca6aebe9566538ff0a3348d) )
 ROM_END
 
 ROM_START( gigas ) // From an actual Sega board "834-6167 // GIGAS" with MC-8123: 317-5002
