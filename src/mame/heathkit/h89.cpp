@@ -242,7 +242,7 @@ void h89_state::h89_io(address_map &map)
 
 // Input ports
 static INPUT_PORTS_START( h89 )
-
+/*
 	// Settings with the MTR-88 ROM (#444-40)
 	PORT_START("MTR88_SW501")
 	PORT_DIPNAME( 0x1f, 0x00, "Unused" )  PORT_DIPLOCATION("S1:1,2,3,4,5")
@@ -279,7 +279,7 @@ static INPUT_PORTS_START( h89 )
 	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )  PORT_DIPLOCATION("S1:8")
 	PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING( 0x80, "Auto" )
-
+*/
 	// Settings with the MTR-90 ROM (#444-84 or 444-142)
 	PORT_START("MTR90_SW501")
 	PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )  PORT_DIPLOCATION("SW501:1,2")
@@ -297,14 +297,14 @@ static INPUT_PORTS_START( h89 )
 	PORT_DIPSETTING( 0x10, "Disk I/O #1" )
 	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )  PORT_DIPLOCATION("SW501:6")
 	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPSETTING( 0x00, "On" )
 	PORT_DIPNAME( 0x40, 0x00, "Console Baud rate" )  PORT_DIPLOCATION("SW501:7")
 	PORT_DIPSETTING( 0x00, "9600" )
 	PORT_DIPSETTING( 0x40, "19200" )
 	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )  PORT_DIPLOCATION("SW501:8")
 	PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING( 0x80, "Auto" )
-
+/*
 	// Settings with the MMS 84-B
 	PORT_START("MMS84B_SW501")
 	PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )  PORT_DIPLOCATION("S1:1,2")
@@ -329,7 +329,7 @@ static INPUT_PORTS_START( h89 )
 	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )  PORT_DIPLOCATION("S1:8")
 	PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING( 0x80, "Auto" )
-
+*/
 INPUT_PORTS_END
 
 
