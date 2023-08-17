@@ -2850,7 +2850,7 @@ void z80_device::init_op_steps() {
 /* LD   B,n        */ OP(NONE,06) CALL arg(); THEN B = TDAT8;                                                 ENDOP
 /* RLCA            */ OP(NONE,07) THEN rlca();                                                               ENDOP
 
-/* EX   AF,AF'     */ OP(NONE,08) THEN std::swap(m_af, m_af2); m_qtemp = 0
+/* EX   AF,AF'     */ OP(NONE,08) THEN std::swap(m_af, m_af2);
 ;                                   ENDOP
 /* ADD  HL,BC      */ OP(NONE,09) THEN TDAT=HL; TDAT2=BC; CALL add16(); THEN HL=TDAT;                         ENDOP
 /* LD   A,(BC)     */ OP(NONE,0a) THEN TADR=BC; CALL rm(); THEN A=TDAT8;  WZ=BC+1;                            ENDOP
