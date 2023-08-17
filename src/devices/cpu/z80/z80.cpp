@@ -16,10 +16,9 @@
  *       - LD A,I/R P/V flag reset glitch is fixed on CMOS Z80
  *       - OUT (C),0 outputs 0 on NMOS Z80, $FF on CMOS Z80
  *       - SCF/CCF X/Y flags is ((flags | A) & 0x28) on SGS/SHARP/ZiLOG NMOS Z80,
- *         (flags & A & 0x28) on NEC NMOS Z80, other models unknown.
+ *         (flags & A & 0x28).
  *         However, recent findings say that SCF/CCF X/Y results depend on whether
- *         or not the previous instruction touched the flag register. And the exact
- *         behaviour on NEC Z80 is still unknown.
+ *         or not the previous instruction touched the flag register.
  *      This Z80 emulator assumes a ZiLOG NMOS model.
  *
  *   Changes in 0.243:
@@ -171,6 +170,7 @@
 #define AF      m_af.w.l
 #define A       m_af.b.h
 #define F       m_af.b.l
+#define Q       m_q
 
 #define BCD     m_bc.d
 #define BC      m_bc.w.l
@@ -394,6 +394,8 @@ DEF( rop() )
 	THEN
 		PC++;
 		m_r++;
+		Q = m_qtemp;
+		m_qtemp = YF | XF;
 ENDDEF
 
 /****************************************************************
@@ -603,7 +605,7 @@ DEF( ld_a_r() )
 	CALL nomreq_ir(1);
 	THEN
 		A = (m_r & 0x7f) | m_r2;
-		F = (F & CF) | SZ[A] | (m_iff2 << 2);
+		set_f((F & CF) | SZ[A] | (m_iff2 << 2));
 		m_after_ldair = true;
 ENDDEF
 
@@ -623,7 +625,7 @@ DEF( ld_a_i() )
 	CALL nomreq_ir(1);
 	THEN
 		A = m_i;
-		F = (F & CF) | SZ[A] | (m_iff2 << 2);
+		set_f((F & CF) | SZ[A] | (m_iff2 << 2));
 		m_after_ldair = true;
 ENDDEF
 
@@ -645,7 +647,7 @@ ENDDEF
 inline void z80_device::inc(u8 &r)
 {
 	++r;
-	F = (F & CF) | SZHV_inc[r];
+	set_f((F & CF) | SZHV_inc[r]);
 }
 
 /***************************************************************
@@ -654,7 +656,7 @@ inline void z80_device::inc(u8 &r)
 inline void z80_device::dec(u8 &r)
 {
 	--r;
-	F = (F & CF) | SZHV_dec[r];
+	set_f((F & CF) | SZHV_dec[r]);
 }
 
 /***************************************************************
@@ -663,7 +665,7 @@ inline void z80_device::dec(u8 &r)
 inline void z80_device::rlca()
 {
 	A = (A << 1) | (A >> 7);
-	F = (F & (SF | ZF | PF)) | (A & (YF | XF | CF));
+	set_f((F & (SF | ZF | PF)) | (A & (YF | XF | CF)));
 }
 
 /***************************************************************
@@ -671,7 +673,7 @@ inline void z80_device::rlca()
  ***************************************************************/
 inline void z80_device::rrca()
 {
-	F = (F & (SF | ZF | PF)) | (A & CF);
+	set_f((F & (SF | ZF | PF)) | (A & CF));
 	A = (A >> 1) | (A << 7);
 	F |= (A & (YF | XF));
 }
@@ -683,7 +685,7 @@ inline void z80_device::rla()
 {
 	u8 res = (A << 1) | (F & CF);
 	u8 c = (A & 0x80) ? CF : 0;
-	F = (F & (SF | ZF | PF)) | c | (res & (YF | XF));
+	set_f((F & (SF | ZF | PF)) | c | (res & (YF | XF)));
 	A = res;
 }
 
@@ -694,7 +696,7 @@ inline void z80_device::rra()
 {
 	u8 res = (A >> 1) | (F << 7);
 	u8 c = (A & 0x01) ? CF : 0;
-	F = (F & (SF | ZF | PF)) | c | (res & (YF | XF));
+	set_f((F & (SF | ZF | PF)) | c | (res & (YF | XF)));
 	A = res;
 }
 
@@ -714,7 +716,7 @@ DEF( rrd() )
 	CALL wm();
 	THEN
 		A = (A & 0xf0) | (TDAT_H & 0x0f);
-		F = (F & CF) | SZP[A];
+		set_f((F & CF) | SZP[A]);
 ENDDEF
 
 /***************************************************************
@@ -733,7 +735,7 @@ DEF( rld() )
 	CALL wm();
 	THEN
 		A = (A & 0xf0) | (TDAT_H >> 4);
-		F = (F & CF) | SZP[A];
+		set_f((F & CF) | SZP[A]);
 ENDDEF
 
 /***************************************************************
@@ -743,7 +745,7 @@ inline void z80_device::add_a(u8 value)
 {
 	u32 ah = AFD & 0xff00;
 	u32 res = (u8)((ah >> 8) + value);
-	F = SZHVC_add[ah | res];
+	set_f(SZHVC_add[ah | res]);
 	A = res;
 }
 
@@ -754,7 +756,7 @@ inline void z80_device::adc_a(u8 value)
 {
 	u32 ah = AFD & 0xff00, c = AFD & 1;
 	u32 res = (u8)((ah >> 8) + value + c);
-	F = SZHVC_add[(c << 16) | ah | res];
+	set_f(SZHVC_add[(c << 16) | ah | res]);
 	A = res;
 }
 
@@ -765,7 +767,7 @@ inline void z80_device::sub(u8 value)
 {
 	u32 ah = AFD & 0xff00;
 	u32 res = (u8)((ah >> 8) - value);
-	F = SZHVC_sub[ah | res];
+	set_f(SZHVC_sub[ah | res]);
 	A = res;
 }
 
@@ -776,7 +778,7 @@ inline void z80_device::sbc_a(u8 value)
 {
 	u32 ah = AFD & 0xff00, c = AFD & 1;
 	u32 res = (u8)((ah >> 8) - value - c);
-	F = SZHVC_sub[(c<<16) | ah | res];
+	set_f(SZHVC_sub[(c<<16) | ah | res]);
 	A = res;
 }
 
@@ -807,7 +809,7 @@ inline void z80_device::daa()
 		if ((F&CF) | (A>0x99)) a+=0x60;
 	}
 
-	F = (F&(CF|NF)) | (A>0x99) | ((A^a)&HF) | SZP[a];
+	set_f((F&(CF|NF)) | (A>0x99) | ((A^a)&HF) | SZP[a]);
 	A = a;
 }
 
@@ -817,7 +819,7 @@ inline void z80_device::daa()
 inline void z80_device::and_a(u8 value)
 {
 	A &= value;
-	F = SZP[A] | HF;
+	set_f(SZP[A] | HF);
 }
 
 /***************************************************************
@@ -826,7 +828,7 @@ inline void z80_device::and_a(u8 value)
 inline void z80_device::or_a(u8 value)
 {
 	A |= value;
-	F = SZP[A];
+	set_f(SZP[A]);
 }
 
 /***************************************************************
@@ -835,7 +837,7 @@ inline void z80_device::or_a(u8 value)
 inline void z80_device::xor_a(u8 value)
 {
 	A ^= value;
-	F = SZP[A];
+	set_f(SZP[A]);
 }
 
 /***************************************************************
@@ -846,8 +848,7 @@ inline void z80_device::cp(u8 value)
 	unsigned val = value;
 	u32 ah = AFD & 0xff00;
 	u32 res = (u8)((ah >> 8) - val);
-	F = (SZHVC_sub[ah | res] & ~(YF | XF)) |
-		(val & (YF | XF));
+	set_f((SZHVC_sub[ah | res] & ~(YF | XF)) | (val & (YF | XF)));
 }
 
 /***************************************************************
@@ -890,9 +891,9 @@ DEF( add16() )
 	THEN
 		u32 res = TDAT + TDAT2;
 		WZ = TDAT + 1;
-		F = (F & (SF | ZF | VF)) |
+		set_f((F & (SF | ZF | VF)) |
 			(((TDAT ^ res ^ TDAT2) >> 8) & HF) |
-			((res >> 16) & CF) | ((res >> 8) & (YF | XF));
+			((res >> 16) & CF) | ((res >> 8) & (YF | XF)));
 		TDAT = (u16)res;
 ENDDEF
 
@@ -904,11 +905,11 @@ DEF( adc_hl() )
 	THEN
 		u32 res = HLD + TDAT + (F & CF);
 		WZ = HL + 1;
-		F = (((HLD ^ res ^ TDAT) >> 8) & HF) |
+		set_f((((HLD ^ res ^ TDAT) >> 8) & HF) |
 			((res >> 16) & CF) |
 			((res >> 8) & (SF | YF | XF)) |
 			((res & 0xffff) ? 0 : ZF) |
-			(((TDAT ^ HLD ^ 0x8000) & (TDAT ^ res) & 0x8000) >> 13);
+			(((TDAT ^ HLD ^ 0x8000) & (TDAT ^ res) & 0x8000) >> 13));
 		HL = (u16)res;
 ENDDEF
 
@@ -920,11 +921,11 @@ DEF( sbc_hl() )
 	THEN
 		u32 res = HLD - TDAT - (F & CF);
 		WZ = HL + 1;
-		F = (((HLD ^ res ^ TDAT) >> 8) & HF) | NF |
+		set_f((((HLD ^ res ^ TDAT) >> 8) & HF) | NF |
 			((res >> 16) & CF) |
 			((res >> 8) & (SF | YF | XF)) |
 			((res & 0xffff) ? 0 : ZF) |
-			(((TDAT ^ HLD) & (HLD ^ res) &0x8000) >> 13);
+			(((TDAT ^ HLD) & (HLD ^ res) &0x8000) >> 13));
 		HL = (u16)res;
 ENDDEF
 
@@ -936,7 +937,7 @@ inline u8 z80_device::rlc(u8 value)
 	unsigned res = value;
 	unsigned c = (res & 0x80) ? CF : 0;
 	res = ((res << 1) | (res >> 7)) & 0xff;
-	F = SZP[res] | c;
+	set_f(SZP[res] | c);
 	return res;
 }
 
@@ -948,7 +949,7 @@ inline u8 z80_device::rrc(u8 value)
 	unsigned res = value;
 	unsigned c = (res & 0x01) ? CF : 0;
 	res = ((res >> 1) | (res << 7)) & 0xff;
-	F = SZP[res] | c;
+	set_f(SZP[res] | c);
 	return res;
 }
 
@@ -960,7 +961,7 @@ inline u8 z80_device::rl(u8 value)
 	unsigned res = value;
 	unsigned c = (res & 0x80) ? CF : 0;
 	res = ((res << 1) | (F & CF)) & 0xff;
-	F = SZP[res] | c;
+	set_f(SZP[res] | c);
 	return res;
 }
 
@@ -972,7 +973,7 @@ inline u8 z80_device::rr(u8 value)
 	unsigned res = value;
 	unsigned c = (res & 0x01) ? CF : 0;
 	res = ((res >> 1) | (F << 7)) & 0xff;
-	F = SZP[res] | c;
+	set_f(SZP[res] | c);
 	return res;
 }
 
@@ -984,7 +985,7 @@ inline u8 z80_device::sla(u8 value)
 	unsigned res = value;
 	unsigned c = (res & 0x80) ? CF : 0;
 	res = (res << 1) & 0xff;
-	F = SZP[res] | c;
+	set_f(SZP[res] | c);
 	return res;
 }
 
@@ -996,7 +997,7 @@ inline u8 z80_device::sra(u8 value)
 	unsigned res = value;
 	unsigned c = (res & 0x01) ? CF : 0;
 	res = ((res >> 1) | (res & 0x80)) & 0xff;
-	F = SZP[res] | c;
+	set_f(SZP[res] | c);
 	return res;
 }
 
@@ -1008,7 +1009,7 @@ inline u8 z80_device::sll(u8 value)
 	unsigned res = value;
 	unsigned c = (res & 0x80) ? CF : 0;
 	res = ((res << 1) | 0x01) & 0xff;
-	F = SZP[res] | c;
+	set_f(SZP[res] | c);
 	return res;
 }
 
@@ -1020,7 +1021,7 @@ inline u8 z80_device::srl(u8 value)
 	unsigned res = value;
 	unsigned c = (res & 0x01) ? CF : 0;
 	res = (res >> 1) & 0xff;
-	F = SZP[res] | c;
+	set_f(SZP[res] | c);
 	return res;
 }
 
@@ -1029,7 +1030,7 @@ inline u8 z80_device::srl(u8 value)
  ***************************************************************/
 inline void z80_device::bit(int bit, u8 value)
 {
-	F = (F & CF) | HF | (SZ_BIT[value & (1<<bit)] & ~(YF|XF)) | (value & (YF|XF));
+	set_f((F & CF) | HF | (SZ_BIT[value & (1<<bit)] & ~(YF|XF)) | (value & (YF|XF)));
 }
 
 /***************************************************************
@@ -1037,7 +1038,7 @@ inline void z80_device::bit(int bit, u8 value)
  ***************************************************************/
 inline void z80_device::bit_hl(int bit, u8 value)
 {
-	F = (F & CF) | HF | (SZ_BIT[value & (1<<bit)] & ~(YF|XF)) | (WZ_H & (YF|XF));
+	set_f((F & CF) | HF | (SZ_BIT[value & (1<<bit)] & ~(YF|XF)) | (WZ_H & (YF|XF)));
 }
 
 /***************************************************************
@@ -1045,7 +1046,7 @@ inline void z80_device::bit_hl(int bit, u8 value)
  ***************************************************************/
 inline void z80_device::bit_xy(int bit, u8 value)
 {
-	F = (F & CF) | HF | (SZ_BIT[value & (1<<bit)] & ~(YF|XF)) | ((m_ea>>8) & (YF|XF));
+	set_f((F & CF) | HF | (SZ_BIT[value & (1<<bit)] & ~(YF|XF)) | ((m_ea>>8) & (YF|XF)));
 }
 
 /***************************************************************
@@ -1076,7 +1077,7 @@ DEF( ldi() )
 	CALL wm();
 	CALL nomreq_addr(2);
 	THEN
-		F &= SF | ZF | CF;
+		set_f(F & (SF | ZF | CF));
 		if ((A + TDAT8) & 0x02) F |= YF; /* bit 1 -> flag 5 */
 		if ((A + TDAT8) & 0x08) F |= XF; /* bit 3 -> flag 3 */
 		HL++; DE++; BC--;
@@ -1095,7 +1096,7 @@ DEF( cpi() )
 		u8 res = A - TDAT8;
 		WZ++;
 		HL++; BC--;
-		F = (F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF;
+		set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
 		if (F & HF) res -= 1;
 		if (res & 0x02) F |= YF; /* bit 1 -> flag 5 */
 		if (res & 0x08) F |= XF; /* bit 3 -> flag 3 */
@@ -1117,7 +1118,7 @@ DEF( ini() )
 	CALL wm();
 	THEN
 		HL++;
-		F = SZ[B];
+		set_f(SZ[B]);
 		unsigned t = (unsigned)((C + 1) & 0xff) + (unsigned)TDAT8;
 		if (TDAT8 & SF) F |= NF;
 		if (t & 0x100) F |= HF | CF;
@@ -1139,7 +1140,7 @@ DEF( outi() )
 	CALL out();
 	THEN
 		HL++;
-		F = SZ[B];
+		set_f(SZ[B]);
 		unsigned t = (unsigned)L + (unsigned)TDAT8;
 		if (TDAT8 & SF) F |= NF;
 		if (t & 0x100) F |= HF | CF;
@@ -1179,7 +1180,7 @@ DEF( cpd() )
 		u8 res = A - TDAT8;
 		WZ--;
 		HL--; BC--;
-		F = (F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF;
+		set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
 		if (F & HF) res -= 1;
 		if (res & 0x02) F |= YF; /* bit 1 -> flag 5 */
 		if (res & 0x08) F |= XF; /* bit 3 -> flag 3 */
@@ -1201,7 +1202,7 @@ DEF( ind() )
 	CALL wm();
 	THEN
 		HL--;
-		F = SZ[B];
+		set_f(SZ[B]);
 		unsigned t = ((unsigned)(C - 1) & 0xff) + (unsigned)TDAT8;
 		if (TDAT8 & SF) F |= NF;
 		if (t & 0x100) F |= HF | CF;
@@ -1223,7 +1224,7 @@ DEF( outd() )
 	CALL out();
 	THEN
 		HL--;
-		F = SZ[B];
+		set_f(SZ[B]);
 		unsigned t = (unsigned)L + (unsigned)TDAT8;
 		if (TDAT8 & SF) F |= NF;
 		if (t & 0x100) F |= HF | CF;
@@ -1353,6 +1354,12 @@ inline void z80_device::ei()
 {
 	m_iff1 = m_iff2 = 1;
 	m_after_ei = true;
+}
+
+inline void z80_device::set_f(u8 f)
+{
+	m_qtemp = 0;
+	F = f;
 }
 
 inline void z80_device::illegal_1() {
@@ -2615,7 +2622,7 @@ void z80_device::init_op_steps() {
 /* DB   ED         */ OP(ED,3e) THEN illegal_2();                                               ENDOP
 /* DB   ED         */ OP(ED,3f) THEN illegal_2();                                               ENDOP
 
-/* IN   B,(C)      */ OP(ED,40) THEN TADR=BC; CALL in(); THEN B = TDAT8; F = (F & CF) | SZP[B]; WZ = TADR + 1; ENDOP
+/* IN   B,(C)      */ OP(ED,40) THEN TADR=BC; CALL in(); THEN B = TDAT8; set_f((F & CF) | SZP[B]); WZ = TADR + 1; ENDOP
 /* OUT  (C),B      */ OP(ED,41) THEN TADR=BC; TDAT8=B; CALL out(); THEN WZ = TADR + 1; ENDOP
 /* SBC  HL,BC      */ OP(ED,42) THEN TDAT=BC; CALL sbc_hl();                             ENDOP
 /* LD   (w),BC     */ OP(ED,43) CALL arg16(); THEN m_ea=TDAT; TADR=m_ea; TDAT=BC; CALL wm16(); THEN WZ = m_ea + 1; ENDOP
@@ -2624,7 +2631,7 @@ void z80_device::init_op_steps() {
 /* IM   0          */ OP(ED,46) THEN m_im = 0;                                        ENDOP
 /* LD   i,A        */ OP(ED,47) CALL ld_i_a();                                           ENDOP
 
-/* IN   C,(C)      */ OP(ED,48) THEN TADR=BC; CALL in(); THEN C = TDAT8; F = (F & CF) | SZP[C]; WZ = TADR + 1;ENDOP
+/* IN   C,(C)      */ OP(ED,48) THEN TADR=BC; CALL in(); THEN C = TDAT8; set_f((F & CF) | SZP[C]); WZ = TADR + 1;ENDOP
 /* OUT  (C),C      */ OP(ED,49) THEN TADR=BC; TDAT8=C; CALL out(); THEN WZ = TADR + 1; ENDOP
 /* ADC  HL,BC      */ OP(ED,4a) THEN TDAT=BC; CALL adc_hl();                             ENDOP
 /* LD   BC,(w)     */ OP(ED,4b) CALL arg16(); THEN m_ea=TDAT; TADR=m_ea; CALL rm16(); THEN BC=TDAT; WZ = m_ea + 1; ENDOP
@@ -2633,7 +2640,7 @@ void z80_device::init_op_steps() {
 /* IM   0          */ OP(ED,4e) THEN m_im = 0;                                        ENDOP
 /* LD   r,A        */ OP(ED,4f) CALL ld_r_a();                                           ENDOP
 
-/* IN   D,(C)      */ OP(ED,50) THEN TADR=BC; CALL in(); THEN D = TDAT8; F = (F & CF) | SZP[D]; WZ = TADR + 1; ENDOP
+/* IN   D,(C)      */ OP(ED,50) THEN TADR=BC; CALL in(); THEN D = TDAT8; set_f((F & CF) | SZP[D]); WZ = TADR + 1; ENDOP
 /* OUT  (C),D      */ OP(ED,51) THEN TADR=BC; TDAT8=D; CALL out(); THEN WZ = TADR + 1; ENDOP
 /* SBC  HL,DE      */ OP(ED,52) THEN TDAT=DE; CALL sbc_hl();                             ENDOP
 /* LD   (w),DE     */ OP(ED,53) CALL arg16(); THEN m_ea=TDAT; TADR=m_ea; TDAT=DE; CALL wm16(); THEN WZ = m_ea + 1; ENDOP
@@ -2642,7 +2649,7 @@ void z80_device::init_op_steps() {
 /* IM   1          */ OP(ED,56) THEN m_im = 1;                                        ENDOP
 /* LD   A,i        */ OP(ED,57) CALL ld_a_i();                                           ENDOP
 
-/* IN   E,(C)      */ OP(ED,58) THEN TADR=BC; CALL in(); THEN E = TDAT8; F = (F & CF) | SZP[E]; WZ = TADR + 1; ENDOP
+/* IN   E,(C)      */ OP(ED,58) THEN TADR=BC; CALL in(); THEN E = TDAT8; set_f((F & CF) | SZP[E]); WZ = TADR + 1; ENDOP
 /* OUT  (C),E      */ OP(ED,59) THEN TADR=BC; TDAT8=E; CALL out(); THEN WZ = TADR + 1; ENDOP
 /* ADC  HL,DE      */ OP(ED,5a) THEN TDAT=DE; CALL adc_hl();                             ENDOP
 /* LD   DE,(w)     */ OP(ED,5b) CALL arg16(); THEN m_ea=TDAT; TADR=m_ea; CALL rm16(); THEN DE=TDAT; WZ = m_ea + 1; ENDOP
@@ -2651,7 +2658,7 @@ void z80_device::init_op_steps() {
 /* IM   2          */ OP(ED,5e) THEN m_im = 2;                                        ENDOP
 /* LD   A,r        */ OP(ED,5f) CALL ld_a_r();                                           ENDOP
 
-/* IN   H,(C)      */ OP(ED,60) THEN TADR=BC; CALL in(); THEN H = TDAT8; F = (F & CF) | SZP[H]; WZ = TADR + 1; ENDOP
+/* IN   H,(C)      */ OP(ED,60) THEN TADR=BC; CALL in(); THEN H = TDAT8; set_f((F & CF) | SZP[H]); WZ = TADR + 1; ENDOP
 /* OUT  (C),H      */ OP(ED,61) THEN TADR=BC; TDAT8=H; CALL out(); THEN WZ = TADR + 1; ENDOP
 /* SBC  HL,HL      */ OP(ED,62) THEN TDAT=HL; CALL sbc_hl();                             ENDOP
 /* LD   (w),HL     */ OP(ED,63) CALL arg16(); THEN m_ea=TDAT; TADR=m_ea; TDAT=HL; CALL wm16(); THEN WZ = m_ea + 1; ENDOP
@@ -2660,7 +2667,7 @@ void z80_device::init_op_steps() {
 /* IM   0          */ OP(ED,66) THEN m_im = 0;                                        ENDOP
 /* RRD  (HL)       */ OP(ED,67) CALL rrd();                                              ENDOP
 
-/* IN   L,(C)      */ OP(ED,68) THEN TADR=BC; CALL in(); THEN L = TDAT8; F = (F & CF) | SZP[L]; WZ = TADR + 1; ENDOP
+/* IN   L,(C)      */ OP(ED,68) THEN TADR=BC; CALL in(); THEN L = TDAT8; set_f((F & CF) | SZP[L]); WZ = TADR + 1; ENDOP
 /* OUT  (C),L      */ OP(ED,69) THEN TADR=BC; TDAT8=L; CALL out(); THEN WZ = TADR + 1; ENDOP
 /* ADC  HL,HL      */ OP(ED,6a) THEN TDAT=HL; CALL adc_hl();                             ENDOP
 /* LD   HL,(w)     */ OP(ED,6b) CALL arg16(); THEN m_ea=TDAT; TADR=m_ea; CALL rm16(); THEN HL=TDAT; WZ = m_ea + 1; ENDOP
@@ -2669,7 +2676,7 @@ void z80_device::init_op_steps() {
 /* IM   0          */ OP(ED,6e) THEN m_im = 0;                                        ENDOP
 /* RLD  (HL)       */ OP(ED,6f) CALL rld();                                              ENDOP
 
-/* IN   0,(C)      */ OP(ED,70) THEN TADR=BC; CALL in(); THEN F = (F & CF) | SZP[TDAT8]; WZ = TADR + 1; ENDOP
+/* IN   0,(C)      */ OP(ED,70) THEN TADR=BC; CALL in(); THEN set_f((F & CF) | SZP[TDAT8]); WZ = TADR + 1; ENDOP
 /* OUT  (C),0      */ OP(ED,71) THEN TADR=BC; TDAT8=0; CALL out(); THEN WZ = TADR + 1; ENDOP
 /* SBC  HL,SP      */ OP(ED,72) THEN TDAT=SP; CALL sbc_hl();                             ENDOP
 /* LD   (w),SP     */ OP(ED,73) CALL arg16(); THEN m_ea=TDAT; TADR=m_ea; TDAT=SP; CALL wm16(); THEN WZ = m_ea + 1; ENDOP
@@ -2678,7 +2685,7 @@ void z80_device::init_op_steps() {
 /* IM   1          */ OP(ED,76) THEN m_im = 1;                                        ENDOP
 /* DB   ED,77      */ OP(ED,77) THEN illegal_2();                                               ENDOP
 
-/* IN   A,(C)      */ OP(ED,78) THEN TADR=BC; CALL in(); THEN A = TDAT8; F = (F & CF) | SZP[A]; WZ = TADR + 1; ENDOP
+/* IN   A,(C)      */ OP(ED,78) THEN TADR=BC; CALL in(); THEN A = TDAT8; set_f((F & CF) | SZP[A]); WZ = TADR + 1; ENDOP
 /* OUT  (C),A      */ OP(ED,79) THEN TADR=BC; TDAT8=A; CALL out(); THEN WZ = TADR + 1; ENDOP
 /* ADC  HL,SP      */ OP(ED,7a) THEN TDAT=SP; CALL adc_hl();                             ENDOP
 /* LD   SP,(w)     */ OP(ED,7b) CALL arg16(); THEN m_ea=TDAT; TADR=m_ea; CALL rm16(); THEN SP=TDAT; WZ = m_ea + 1; ENDOP
@@ -2843,7 +2850,8 @@ void z80_device::init_op_steps() {
 /* LD   B,n        */ OP(NONE,06) CALL arg(); THEN B = TDAT8;                                                 ENDOP
 /* RLCA            */ OP(NONE,07) THEN rlca();                                                               ENDOP
 
-/* EX   AF,AF'     */ OP(NONE,08) THEN std::swap(m_af, m_af2);                                               ENDOP
+/* EX   AF,AF'     */ OP(NONE,08) THEN std::swap(m_af, m_af2); m_qtemp = 0
+;                                   ENDOP
 /* ADD  HL,BC      */ OP(NONE,09) THEN TDAT=HL; TDAT2=BC; CALL add16(); THEN HL=TDAT;                         ENDOP
 /* LD   A,(BC)     */ OP(NONE,0a) THEN TADR=BC; CALL rm(); THEN A=TDAT8;  WZ=BC+1;                            ENDOP
 /* DEC  BC         */ OP(NONE,0b) CALL nomreq_ir(2); THEN BC--;                                               ENDOP
@@ -2886,7 +2894,7 @@ void z80_device::init_op_steps() {
 /* INC  L          */ OP(NONE,2c) THEN inc(L);                                                               ENDOP
 /* DEC  L          */ OP(NONE,2d) THEN dec(L);                                                               ENDOP
 /* LD   L,n        */ OP(NONE,2e) CALL arg(); THEN L=TDAT8;                                                   ENDOP
-/* CPL             */ OP(NONE,2f) THEN A ^= 0xff; F = (F & (SF | ZF | PF | CF)) | HF | NF | (A & (YF | XF)); ENDOP
+/* CPL             */ OP(NONE,2f) THEN A ^= 0xff; set_f((F & (SF | ZF | PF | CF)) | HF | NF | (A & (YF | XF))); ENDOP
 
 /* JR   NC,o       */ OP(NONE,30) THEN TDAT8=!(F & CF); CALL jr_cond(0x30);                                               ENDOP
 /* LD   SP,w       */ OP(NONE,31) CALL arg16(); THEN SP = TDAT;                                               ENDOP
@@ -2895,7 +2903,7 @@ void z80_device::init_op_steps() {
 /* INC  (HL)       */ OP(NONE,34) THEN TADR=HL; CALL rm_reg(); THEN inc(TDAT8); CALL wm();                       ENDOP
 /* DEC  (HL)       */ OP(NONE,35) THEN TADR=HL; CALL rm_reg(); THEN dec(TDAT8); CALL wm();                       ENDOP
 /* LD   (HL),n     */ OP(NONE,36) CALL arg(); THEN TADR=HL; CALL wm();                                           ENDOP
-/* SCF             */ OP(NONE,37) THEN F = (F & (SF | ZF | YF | XF | PF)) | CF | (A & (YF | XF));            ENDOP
+/* SCF             */ OP(NONE,37) THEN set_f((F & (SF | ZF | PF)) | CF | (((F & Q) | A) & (YF | XF)));            ENDOP
 
 /* JR   C,o        */ OP(NONE,38) THEN TDAT8=F & CF; CALL jr_cond(0x38);                                        ENDOP
 /* ADD  HL,SP      */ OP(NONE,39) THEN TDAT=HL; TDAT2=SP; CALL add16(); THEN HL=TDAT;                         ENDOP
@@ -2904,7 +2912,7 @@ void z80_device::init_op_steps() {
 /* INC  A          */ OP(NONE,3c) THEN inc(A);                                                               ENDOP
 /* DEC  A          */ OP(NONE,3d) THEN dec(A);                                                               ENDOP
 /* LD   A,n        */ OP(NONE,3e) CALL arg(); THEN A = TDAT8;                                                 ENDOP
-/* CCF             */ OP(NONE,3f) THEN F = ((F&(SF|ZF|YF|XF|PF|CF))|((F&CF)<<4)|(A&(YF|XF)))^CF;                                               ENDOP
+/* CCF             */ OP(NONE,3f) THEN set_f(((F & (SF | ZF | PF | CF)) ^ CF) | ((F & CF) << 4) | (((F & Q) | A) & (YF | XF)));         ENDOP
 
 /* LD   B,B        */ OP(NONE,40)                                                                        ENDOP
 /* LD   B,C        */ OP(NONE,41) THEN B = C;                                                                ENDOP
@@ -3396,6 +3404,8 @@ void z80_device::device_start()
 	save_item(NAME(m_hl2.w.l));
 	save_item(NAME(m_r));
 	save_item(NAME(m_r2));
+	save_item(NAME(m_q));
+	save_item(NAME(m_qtemp));
 	save_item(NAME(m_iff1));
 	save_item(NAME(m_iff2));
 	save_item(NAME(m_halt));
@@ -3448,8 +3458,8 @@ void z80_device::device_start()
 	space(AS_PROGRAM).specific(m_data);
 	space(AS_IO).specific(m_io);
 
-	IX = IY = 0xffff; /* IX and IY are FFFF after a reset! */
-	F = ZF;           /* Zero flag is set */
+	IX = IY = 0xffff; // IX and IY are FFFF after a reset!
+	set_f(ZF);        // Zero flag is set
 
 	/* set up the state table */
 	state_add(STATE_GENPC,     "PC",        m_pc.w.l).callimport();

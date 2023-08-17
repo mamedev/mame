@@ -13,7 +13,7 @@ enum
 	NSC800_RSTB,
 	NSC800_RSTC,
 	Z80_INPUT_LINE_WAIT,
-	Z80_INPUT_LINE_BOGUSWAIT, /* WAIT pin implementation used to be nonexistent, please remove this when all drivers are updated with Z80_INPUT_LINE_WAIT */
+	Z80_INPUT_LINE_BOGUSWAIT, // WAIT pin implementation used to be nonexistent, please remove this when all drivers are updated with Z80_INPUT_LINE_WAIT
 	Z80_INPUT_LINE_BUSRQ
 };
 
@@ -242,6 +242,7 @@ protected:
 	ops_type indr();
 	ops_type otdr();
 	void ei();
+	void set_f(u8 f);
 
 	ops_type next_op();
 	virtual void check_interrupts();
@@ -278,6 +279,8 @@ protected:
 	PAIR              m_bc2;
 	PAIR              m_de2;
 	PAIR              m_hl2;
+	u8                m_qtemp;
+	u8                m_q;
 	u8                m_r;
 	u8                m_r2;
 	u8                m_iff1;
@@ -285,13 +288,13 @@ protected:
 	u8                m_halt;
 	u8                m_im;
 	u8                m_i;
-	u8                m_nmi_state;          /* nmi line state */
-	u8                m_nmi_pending;        /* nmi pending */
-	u8                m_irq_state;          /* irq line state */
+	u8                m_nmi_state;          // nmi line state
+	u8                m_nmi_pending;        // nmi pending
+	u8                m_irq_state;          // irq line state
 	int               m_wait_state;         // wait line state
 	int               m_busrq_state;        // bus request line state
-	u8                m_after_ei;           /* are we in the EI shadow? */
-	u8                m_after_ldair;        /* same, but for LD A,I or LD A,R */
+	u8                m_after_ei;           // are we in the EI shadow?
+	u8                m_after_ldair;        // same, but for LD A,I or LD A,R
 	u32               m_ea;
 
 	u8                m_cycle;
@@ -328,7 +331,7 @@ protected:
 
 	virtual void check_interrupts() override;
 	void take_interrupt_nsc800();
-	u8 m_nsc800_irq_state[4]; /* state of NSC800 restart interrupts A, B, C */
+	u8 m_nsc800_irq_state[4]; // state of NSC800 restart interrupts A, B, C
 };
 
 DECLARE_DEVICE_TYPE(NSC800, nsc800_device)
