@@ -105,6 +105,11 @@ private:
 	bool m_cassbit = 0;
 	bool m_cassold = 0;
 
+	// clocks
+	static constexpr XTAL H8_CLOCK = XTAL(12'288'000) / 6; // 2.048 MHz
+	static constexpr XTAL H8_BEEP_FRQ = H8_CLOCK / 2048;   // 1 kHz
+	static constexpr XTAL H8_IRQ_PULSE = H8_BEEP_FRQ / 2;
+
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<cassette_image_device> m_cass;
@@ -116,11 +121,6 @@ private:
 	output_finder<> m_ion_led;
 	output_finder<> m_run_led;
 };
-
-
-#define H8_CLOCK (XTAL(12'288'000) / 6)
-#define H8_BEEP_FRQ (H8_CLOCK / 1024)
-#define H8_IRQ_PULSE (H8_BEEP_FRQ / 2)
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_irq_pulse)
