@@ -6422,18 +6422,18 @@ static INPUT_PORTS_START( zingzip )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // no coin 2
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT     )
-	PORT_CONFNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_CONFNAME( 0x0010, 0x0010, "Unknown (bit 4)" )
 	PORT_CONFSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( On ) )
-	PORT_CONFNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_CONFNAME( 0x0020, 0x0020, "Unknown (bit 5)" )
 	PORT_CONFSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( On ) )
-	PORT_CONFNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_CONFNAME( 0x0040, 0x0040, "Unknown (bit 6)" )
 	PORT_CONFSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( On ) )
-	PORT_CONFNAME( 0x0080, 0x0080, "Title" )           // Not listed in manual
-	PORT_CONFSETTING(      0x0080, "With Chinese" )
-	PORT_CONFSETTING(      0x0000, "Without Chinese" ) // Without 真真急炮
+	PORT_CONFNAME( 0x0080, 0x0080, "Title Language" )		// Not listed in manual
+	PORT_CONFSETTING(      0x0080, "English and Chinese" )
+	PORT_CONFSETTING(      0x0000, "English only" )			// Without 真真急炮
 
 	PORT_START("DSW") //2 DSWs - $600001 & 3.b
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1")
