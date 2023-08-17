@@ -46,6 +46,8 @@ public:
 	// getters
 	bool playing(uint8_t channel) const;
 	uint32_t base_frequency(uint8_t channel) const;
+	uint8_t channels() { return m_channels; }
+	size_t samples() { return m_sample.size(); }
 
 	// start/stop helpers
 	void start(uint8_t channel, uint32_t samplenum, bool loop = false);
@@ -64,14 +66,14 @@ public:
 		// shouldn't need a copy, but in case it happens, catch it here
 		sample_t &operator=(const sample_t &rhs) { assert(false); return *this; }
 
-		uint32_t          frequency;      // frequency of the sample
-		std::vector<int16_t> data;      // 16-bit signed data
+		uint32_t frequency;         // frequency of the sample
+		std::vector<int16_t> data;  // 16-bit signed data
 	};
 	static bool read_sample(emu_file &file, sample_t &sample);
 
 	// interface
-	uint8_t       m_channels;         // number of discrete audio channels needed
-	const char *const *m_names;     // array of sample names
+	uint8_t m_channels;         // number of discrete audio channels needed
+	const char *const *m_names; // array of sample names
 
 protected:
 	// subclasses can do it this way
@@ -88,8 +90,8 @@ protected:
 	// internal classes
 	struct channel_t
 	{
-		sound_stream *  stream;
-		const int16_t * source;
+		sound_stream    *stream;
+		const int16_t   *source;
 		int32_t         source_num;
 		uint32_t        source_len;
 		double          pos;
@@ -107,8 +109,8 @@ protected:
 	start_cb_delegate m_samples_start_cb; // optional callback
 
 	// internal state
-	std::vector<channel_t>    m_channel;
-	std::vector<sample_t>     m_sample;
+	std::vector<channel_t> m_channel;
+	std::vector<sample_t> m_sample;
 
 	// internal constants
 	static constexpr uint8_t FRAC_BITS = 24;

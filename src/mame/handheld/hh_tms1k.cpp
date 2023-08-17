@@ -7265,6 +7265,248 @@ ROM_END
 
 /*******************************************************************************
 
+  Ideal Sky-Writer (model 6070-7)
+  * PCB label: ITC 5A-3917-02, 201101
+  * TMS1100 M34004A (die label: 1100E, M34004A)
+  * 7 LEDs, no sound
+
+  It's a toy wand that the user waves around to display a message in the air,
+  relying on human persistence of vision. A keyboard is included, making the
+  whole thing quite tiring to wave around for a kid.
+
+  The display is simulated in MAME with a screen.
+
+*******************************************************************************/
+
+static constexpr u32 SKYWRITER_WIDTH = 0x300; // screen width (wave range)
+
+class skywriter_state : public hh_tms1k_state
+{
+public:
+	skywriter_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void skywriter(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
+
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(check_pos);
+
+	std::unique_ptr<u16[]> m_display;
+	u8 m_led_data[2] = { };
+	u16 m_wand_pos[2] = { };
+	attotime m_shake;
+};
+
+void skywriter_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+
+	m_display = make_unique_clear<u16[]>(7 * SKYWRITER_WIDTH);
+	save_pointer(NAME(m_display), 7 * SKYWRITER_WIDTH);
+
+	save_item(NAME(m_led_data));
+	save_item(NAME(m_wand_pos));
+	save_item(NAME(m_shake));
+}
+
+// handlers
+
+u32 skywriter_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	for (int i = 0; i < 7 * SKYWRITER_WIDTH; i++)
+	{
+		int dx = i % SKYWRITER_WIDTH;
+		int dy = (i / SKYWRITER_WIDTH) * 4 + 1;
+
+		// write current led state to pixels
+		u8 red = std::clamp<u16>(m_display[i], 0, 0xff);
+		u8 green = red / 16;
+		u8 blue = red / 12;
+
+		for (int j = 0; j < 3; j++)
+		{
+			if (cliprect.contains(dx, dy))
+				bitmap.pix(dy + j, dx) = red << 16 | green << 8 | blue;
+		}
+
+		// decay led brightness
+		const double rate = 1.15;
+		m_display[i] /= rate;
+	}
+
+	return 0;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(skywriter_state::check_pos)
+{
+	u16 inp = m_inputs[11]->read() % SKYWRITER_WIDTH;
+
+	if (inp != m_wand_pos[0])
+	{
+		// set shake sensor if wand changed direction from left to right
+		if (inp > m_wand_pos[0] && m_wand_pos[0] < m_wand_pos[1])
+			m_shake = machine().time() + attotime::from_msec(10);
+
+		m_wand_pos[1] = m_wand_pos[0];
+		m_wand_pos[0] = inp;
+	}
+
+	// write lit leds to display
+	for (int i = 0; i < 7; i++)
+	{
+		if (BIT(m_led_data[0] | m_led_data[1], i))
+			m_display[i * SKYWRITER_WIDTH + inp] = 0x180;
+	}
+
+	m_led_data[1] = m_led_data[0];
+}
+
+void skywriter_state::write_r(u32 data)
+{
+	// R0-R10: input mux
+	m_inp_mux = data;
+}
+
+void skywriter_state::write_o(u16 data)
+{
+	// O0-O3, O5-O7: leds
+	m_led_data[0] = bitswap<7>(data,1,5,6,7,3,2,0);
+
+	// O4: enable shake sensor
+	m_o = data;
+}
+
+u8 skywriter_state::read_k()
+{
+	// K: multiplexed inputs + shake sensor
+	u8 shake = (m_o & 0x10 && m_shake > machine().time()) ? 4 : 0;
+	return read_inputs(11) | shake;
+}
+
+// inputs
+
+static INPUT_PORTS_START( skywriter )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CHAR(127) PORT_NAME("CL")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(13) PORT_NAME("Start")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // factory test?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_NAME("BS")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_NAME("SP")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR('9')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('?')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR('8')
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('7')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('6')
+
+	PORT_START("IN.6") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('5')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+
+	PORT_START("IN.7") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('4')
+
+	PORT_START("IN.8") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CHAR('3')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+
+	PORT_START("IN.9") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('2')
+
+	PORT_START("IN.10") // R10
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+
+	PORT_START("IN.11") // fake
+	PORT_BIT( 0xfff, SKYWRITER_WIDTH / 2, IPT_PADDLE ) PORT_MINMAX(0, SKYWRITER_WIDTH - 1) PORT_SENSITIVITY(25) PORT_KEYDELTA(300) PORT_CENTERDELTA(0) PORT_NAME("Wave Wand")
+INPUT_PORTS_END
+
+// config
+
+void skywriter_state::skywriter(machine_config &config)
+{
+	// basic machine hardware
+	TMS1100(config, m_maincpu, 475000); // approximation - RC osc. R=27K, C=100pF
+	m_maincpu->read_k().set(FUNC(skywriter_state::read_k));
+	m_maincpu->write_r().set(FUNC(skywriter_state::write_r));
+	m_maincpu->write_o().set(FUNC(skywriter_state::write_o));
+
+	TIMER(config, "check_pos").configure_periodic(FUNC(skywriter_state::check_pos), attotime::from_usec(1));
+
+	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE); // for led decay
+	screen.set_physical_aspect(16, 1);
+	screen.set_refresh_hz(60);
+	screen.set_size(SKYWRITER_WIDTH, 4 * 7 + 1);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(skywriter_state::screen_update));
+
+	// no sound!
+}
+
+// roms
+
+ROM_START( skywriter )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "m34004a", 0x0000, 0x0800, CRC(8e218dcc) SHA1(d3d5e0fa02c947d49d5bba1297edb7cecc0356da) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_skywriter_output.pla", 0, 365, CRC(407cb3b5) SHA1(f5830d25ec0ff8682993a2d03001606f1f30b46f) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
   Star Wars: Electronic Laser Battle Game (model 40090)
   * TMS1000NLL MP3209 (die label: 1000C, MP3209)
   * 12 LEDs, 1 lamp, 1-bit sound
@@ -16966,6 +17208,7 @@ SYST( 1982, ginv2000,   0,         0,      ginv2000,  ginv2000,  ginv2000_state,
 SYST( 1981, fxmcr165,   0,         0,      fxmcr165,  fxmcr165,  fxmcr165_state,  empty_init, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 SYST( 1979, elecdet,    0,         0,      elecdet,   elecdet,   elecdet_state,   empty_init, "Ideal Toy Corporation", "Electronic Detective", MACHINE_SUPPORTS_SAVE ) // ***
+SYST( 1981, skywriter,  0,         0,      skywriter, skywriter, skywriter_state, empty_init, "Ideal Toy Corporation", "Sky-Writer: The Electronic Message Sender", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
 
 SYST( 1978, starwlb,    0,         0,      starwlb,   starwlb,   starwlb_state,   empty_init, "Kenner", "Star Wars: Electronic Laser Battle Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1979, starwbc,    0,         0,      starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars: Electronic Battle Command Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

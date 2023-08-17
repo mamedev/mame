@@ -60,20 +60,20 @@ namespace {
 class advision_state : public driver_device
 {
 public:
-	advision_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_soundcpu(*this, "soundcpu")
-		, m_dac(*this, "dac")
-		, m_volume(*this, "volume")
-		, m_screen(*this, "screen")
-		, m_mirror_sync(*this, "mirror_sync")
-		, m_led_update(*this, "led_update")
-		, m_led_off(*this, "led_off")
-		, m_cart(*this, "cartslot")
-		, m_ea_bank(*this, "ea_bank")
-		, m_joy(*this, "JOY")
-		, m_conf(*this, "CONF")
+	advision_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"),
+		m_dac(*this, "dac"),
+		m_volume(*this, "volume"),
+		m_screen(*this, "screen"),
+		m_mirror_sync(*this, "mirror_sync"),
+		m_led_update(*this, "led_update"),
+		m_led_off(*this, "led_off"),
+		m_cart(*this, "cartslot"),
+		m_ea_bank(*this, "ea_bank"),
+		m_joy(*this, "JOY"),
+		m_conf(*this, "CONF")
 	{ }
 
 	void advision(machine_config &config);
@@ -126,7 +126,7 @@ private:
 	u32 m_video_hpos = 0;
 	u8 m_led_output[5] = { };
 	u8 m_led_latch[5] = { };
-	std::unique_ptr<u8 []> m_display;
+	std::unique_ptr<u8[]> m_display;
 
 	memory_region *m_cart_rom = nullptr;
 	std::vector<u8> m_ext_ram;
@@ -362,8 +362,10 @@ static INPUT_PORTS_START( advision )
 	PORT_CONFSETTING(    30, "320" )
 	PORT_CONFSETTING(    20, "480" )
 	PORT_CONFSETTING(    15, "640" )
+	PORT_CONFSETTING(    12, "800" )
 	PORT_CONFSETTING(    10, "960" )
 	PORT_CONFNAME( 0xc0, 0x80, "LED Height" ) PORT_CHANGED_MEMBER(DEVICE_SELF, advision_state, set_screensize, 0)
+	PORT_CONFSETTING(    0x00, "25%" )
 	PORT_CONFSETTING(    0x40, "50%" )
 	PORT_CONFSETTING(    0x80, "75%" )
 	PORT_CONFSETTING(    0xc0, "100%" )
@@ -470,13 +472,13 @@ void advision_state::advision(machine_config &config)
 
 ROM_START( advision )
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "b225__ins8048-11kdp_n.u5", 0x000, 0x400, CRC(279e33d1) SHA1(bf7b0663e9125c9bfb950232eab627d9dbda8460) ) // "<natsemi logo> /B225 \\ INS8048-11KDP/N"
+	ROM_LOAD( "ins8048-11kdp_n.u5", 0x000, 0x400, CRC(279e33d1) SHA1(bf7b0663e9125c9bfb950232eab627d9dbda8460) ) // "<natsemi logo> /B8225 \\ INS8048-11KDP/N"
 
 	ROM_REGION( 0x200, "soundcpu", 0 )
-	ROM_LOAD( "b8223__cop411l-kcn_n.u8", 0x000, 0x200, CRC(81e95975) SHA1(8b6f8c30dd3e9d8e43f1ea20fba2361b383790eb) ) // "<natsemi logo> /B8223 \\ COP411L-KCN/N"
+	ROM_LOAD( "cop411l-kcn_n.u8", 0x000, 0x200, CRC(81e95975) SHA1(8b6f8c30dd3e9d8e43f1ea20fba2361b383790eb) ) // "<natsemi logo> /B8223 \\ COP411L-KCN/N"
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 

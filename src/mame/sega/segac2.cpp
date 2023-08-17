@@ -47,8 +47,7 @@
     1996  Print Club (Vol.5)         Atlus             ?                C2
 
 
-    Notes:
-            Bloxeed doesn't Read from the Protection Chip at all; all of the other games do.
+    Notes:  Bloxeed doesn't read from the protection chip at all; all of the other games do.
             Currently the protection chip is mostly understood, and needs a table of 256
             4-bit values for each game. In all cases except for Poto Poto and Puyo Puyo 2,
             the table is embedded in the code. Workarounds for the other 2 cases are
