@@ -1512,6 +1512,8 @@ end
 	}
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
+			MAME_DIR .. "3rdparty/bgfx/src/glcontext_eagl.mm",
+			MAME_DIR .. "3rdparty/bgfx/src/glcontext_nsgl.mm",
 			MAME_DIR .. "3rdparty/bgfx/src/renderer_mtl.mm",
 		}
 		buildoptions {
