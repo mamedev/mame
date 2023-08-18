@@ -12,11 +12,6 @@ license:CC0-1.0
 			<color red="0.0" green="1.0" blue="0.0" />
 		</rect>
 	</element>
-	<element name="turbo_name">
-		<text string="Turbo" align="1">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-	</element>
 	<element name="orange_led">
 		<rect state="0">
 			<color red="0.2" green="0.2" blue="0.2" />
@@ -25,18 +20,28 @@ license:CC0-1.0
 			<color red="1.0" green="0.6" blue="0.0" />
 		</rect>
 	</element>
-	<element name="fdd0">
+	<element name="turbo_name">
+		<text string="Turbo" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="fdd0_name">
 		<text string="Drive A" align="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 	</element>
-	<element name="fdd1">
+	<element name="fdd1_name">
 		<text string="Drive B" align="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 	</element>
-	<element name="hdd0">
+	<element name="hdd0_name">
 		<text string="HDD" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="neogs_name">
+		<text string="NeoGS" align="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 	</element>
@@ -51,23 +56,32 @@ license:CC0-1.0
 		<element name="turbo_led" ref="green_led">
 			<bounds left="0" right="20" top="31" bottom="39" />
 		</element>
-		<element name="fdd0_name" ref="fdd0">
+
+		<element name="fdd0_led_name" ref="fdd0_name">
 			<bounds left="0" right="74" top="80" bottom="110" />
 		</element>
 		<element name="fdd0_led" ref="orange_led">
 			<bounds left="0" right="20" top="111" bottom="119" />
 		</element>
-		<element name="fdd1_name" ref="fdd1">
+		<element name="fdd1_led_name" ref="fdd1_name">
 			<bounds left="0" right="74" top="120" bottom="150" />
 		</element>
 		<element name="fdd1_led" ref="orange_led">
 			<bounds left="0" right="20" top="151" bottom="159" />
 		</element>
-		<element name="hdd0_name" ref="hdd0">
+
+		<element name="hdd0_led_name" ref="hdd0_name">
 			<bounds left="0" right="74" top="200" bottom="230" />
 		</element>
 		<element name="ata_busy_led" ref="orange_led">
 			<bounds left="0" right="20" top="231" bottom="239" />
+		</element>
+
+		<element name="neogs_led_name" ref="neogs_name">
+			<bounds left="0" right="74" top="280" bottom="310" />
+		</element>
+		<element name="neogs_led" ref="green_led">
+			<bounds left="0" right="20" top="311" bottom="319" />
 		</element>
 	</view>
 </mamelayout>
