@@ -980,13 +980,13 @@ void toaplan2_state::pipibibi_bootleg_68k_mem(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x082fff).ram();
-	map(0x083000, 0x0837ff).rw(m_vdp[0], FUNC(gp9001vdp_device::pipibibi_bootleg_spriteram16_r), FUNC(gp9001vdp_device::pipibibi_bootleg_spriteram16_w));   // SpriteRAM
+	map(0x083000, 0x0837ff).rw(m_vdp[0], FUNC(gp9001vdp_device::bootleg_spriteram16_r), FUNC(gp9001vdp_device::bootleg_spriteram16_w));   // SpriteRAM
 	map(0x083800, 0x087fff).ram();             // SpriteRAM (unused)
 	map(0x0c0000, 0x0c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x120000, 0x120fff).ram();             // Copy of SpriteRAM ?
 //  map(0x13f000, 0x13f001).nopw();        // ???
-	map(0x180000, 0x182fff).rw(m_vdp[0], FUNC(gp9001vdp_device::pipibibi_bootleg_videoram16_r), FUNC(gp9001vdp_device::pipibibi_bootleg_videoram16_w)); // TileRAM
-	map(0x188000, 0x18800f).w(m_vdp[0], FUNC(gp9001vdp_device::pipibibi_bootleg_scroll_w));
+	map(0x180000, 0x182fff).rw(m_vdp[0], FUNC(gp9001vdp_device::bootleg_videoram16_r), FUNC(gp9001vdp_device::bootleg_videoram16_w)); // TileRAM
+	map(0x188000, 0x18800f).w(m_vdp[0], FUNC(gp9001vdp_device::bootleg_scroll_w));
 	map(0x190003, 0x190003).r(FUNC(toaplan2_state::shared_ram_r));  // Z80 ready ?
 	map(0x190011, 0x190011).w(FUNC(toaplan2_state::shared_ram_w)); // Z80 task to perform
 	map(0x19c01d, 0x19c01d).w(FUNC(toaplan2_state::coin_w));
@@ -1195,6 +1195,26 @@ void toaplan2_state::snowbro2_68k_mem(address_map &map)
 	map(0x70001c, 0x70001d).portr("SYS");
 	map(0x700031, 0x700031).w(FUNC(toaplan2_state::oki_bankswitch_w<0>));
 	map(0x700035, 0x700035).w(FUNC(toaplan2_state::coin_w));
+}
+
+void toaplan2_state::snowbro2b3_68k_mem(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x10ffff).ram();
+	map(0x404000, 0x404fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x500000, 0x500003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
+	map(0x600001, 0x600001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x700004, 0x700005).portr("DSWA");
+	map(0x700008, 0x700009).portr("DSWB");
+	map(0x70000c, 0x70000d).portr("IN1");
+	map(0x700010, 0x700011).portr("IN2");
+	map(0x700014, 0x700015).portr("IN3");
+	map(0x700018, 0x700019).portr("IN4");
+	map(0x700035, 0x700035).w(FUNC(toaplan2_state::coin_w));
+	map(0x700041, 0x700041).w(FUNC(toaplan2_state::oki_bankswitch_w<0>));
+	map(0xff0000, 0xff2fff).rw(m_vdp[0], FUNC(gp9001vdp_device::bootleg_videoram16_r), FUNC(gp9001vdp_device::bootleg_videoram16_w));
+	map(0xff3000, 0xff37ff).rw(m_vdp[0], FUNC(gp9001vdp_device::bootleg_spriteram16_r), FUNC(gp9001vdp_device::bootleg_spriteram16_w));
+	map(0xff8000, 0xff800f).w(m_vdp[0], FUNC(gp9001vdp_device::bootleg_scroll_w));
 }
 
 
@@ -2909,6 +2929,105 @@ static INPUT_PORTS_START( snowbro2 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( snowbro2b3 )
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_TILT )
+	TOAPLAN_TEST_SWITCH( 0x0400, IP_ACTIVE_HIGH )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(3) PORT_8WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3) PORT_8WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3) PORT_8WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3) PORT_8WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START3 )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN4")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START4 )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Continue_Price ) ) PORT_DIPLOCATION("SW1:!1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, "Discount" )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:!2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_HIGH, "SW1:!3" )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:!4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:!5,!6")
+	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:!7,!8")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:!1,!2")
+	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x000c,   0x0000, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!3,!4")
+	PORT_DIPSETTING(        0x000c, DEF_STR( None ) )
+	PORT_DIPSETTING(        0x0008, "200k only" )
+	PORT_DIPSETTING(        0x0000, "100k only" )
+	PORT_DIPSETTING(        0x0004, "100k and every 500k" )
+	PORT_DIPNAME( 0x0030,   0x0000, DEF_STR( Lives ) )      PORT_DIPLOCATION("SW2:!5,!6")
+	PORT_DIPSETTING(        0x0030, "1" )
+	PORT_DIPSETTING(        0x0020, "2" )
+	PORT_DIPSETTING(        0x0000, "3" )
+	PORT_DIPSETTING(        0x0010, "4" )
+	PORT_DIPNAME( 0x0040,   0x0000, "Invulnerability (Cheat)" )     PORT_DIPLOCATION("SW2:!7")
+	PORT_DIPSETTING(        0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(        0x0040, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080,   0x0000, "Maximum Players" )     PORT_DIPLOCATION("SW2:!8")
+	PORT_DIPSETTING(        0x0080, "2" )
+	PORT_DIPSETTING(        0x0000, "4" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( sstriker )
 	PORT_INCLUDE( toaplan2_3b )
 
@@ -3815,6 +3934,7 @@ void toaplan2_state::pipibibsbl(machine_config &config)
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL); // FIXME: bootleg has no VDP
 	m_vdp[0]->set_palette(m_palette);
 	m_vdp[0]->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
+	m_vdp[0]->set_bootleg_extra_offsets(0x01f, 0x1ef, 0x01d, 0x1ef, 0x01b, 0x1ef, 0x1d4, 0x1f7);
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -4181,6 +4301,17 @@ void toaplan2_state::snowbro2(machine_config &config)
 
 	OKIM6295(config, m_oki[0], 16_MHz_XTAL/4, okim6295_device::PIN7_LOW);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
+}
+
+void toaplan2_state::snowbro2b3(machine_config &config)
+{
+	snowbro2(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::snowbro2b3_68k_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(toaplan2_state::irq2_line_hold));
+
+	m_vdp[0]->vint_out_cb().set_nop();
+	m_vdp[0]->set_bootleg_extra_offsets(0x02e, 0x1f0, 0x02e, 0x1ee, 0x02e, 0x1ef, 0x1e9, 0x1ef);
 }
 
 
@@ -5406,6 +5537,20 @@ ROM_START( snowbro2b2 ) // seems to mostly be the same data, but with copyright 
 	ROM_LOAD( "rom09.bin", 0x00000, 0x80000, CRC(638f341e) SHA1(aa3fca25f099339ece1878ea730c5e9f18ec4823) )
 ROM_END
 
+ROM_START( snowbro2b3 ) // SK000616 PCB, no original parts, seems hardcoded on Europe region
+	ROM_REGION( 0x080000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "prg", 0x000000, 0x080000, CRC(8ce2ede2) SHA1(ddd8a2aa442cd5bb3a7d393b9b5c06fd981e7c61) )
+
+	ROM_REGION( 0x400000, "gp9001_0", 0 ) // not actually a GP9001
+	ROM_LOAD( "gfx2", 0x100000, 0x100000, CRC(a3be41af) SHA1(4cb1ce9c47bf8bbf7d1e36f6a1d276ce52957cfb) )
+	ROM_CONTINUE(     0x000000, 0x100000 )
+	ROM_LOAD( "gfx1", 0x300000, 0x100000, CRC(8df1ab06) SHA1(2a28caf7d545dc05acfcd2a8d2ffbd9f710af45d) )
+	ROM_CONTINUE(     0x200000, 0x100000 )
+
+	ROM_REGION( 0x80000, "oki1", 0 )
+	ROM_LOAD( "voice", 0x00000, 0x80000, CRC(638f341e) SHA1(aa3fca25f099339ece1878ea730c5e9f18ec4823) )
+ROM_END
+
 ROM_START( snowbro2ny ) // Nyanko
 	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "rom1_c8.u61", 0x000000, 0x080000, CRC(9e6eb76b) SHA1(9e8b356dabedeb4ae9e08d60fbf6ed4a09edc0bd) )
@@ -6346,6 +6491,7 @@ GAME( 1994, snowbro2,    0,        snowbro2,   snowbro2,   toaplan2_state, empty
 GAME( 1994, snowbro2ny,  snowbro2, snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "Nyanko",           "Snow Bros. 2 - With New Elves / Otenki Paradise (Nyanko)",         MACHINE_SUPPORTS_SAVE ) // not a bootleg, has original parts (the "GP9001 L7A0498 TOA PLAN" IC and the three mask ROMs)
 GAME( 1998, snowbro2b,   snowbro2, snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "bootleg",          "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, snowbro2b2,  snowbro2, snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "bootleg (Q Elec)", "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg, set 2)", MACHINE_SUPPORTS_SAVE ) // possibly not a bootleg, has some original parts
+GAME( 1994, snowbro2b3,  snowbro2, snowbro2b3, snowbro2b3, toaplan2_state, empty_init,      ROT0,   "bootleg",          "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg, set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // GFX offsets not 100% correct
 
 GAME( 1993, sstriker,    0,        mahoudai,   sstriker,   truxton2_state, empty_init,      ROT270, "Raizing",                         "Sorcer Striker",           MACHINE_SUPPORTS_SAVE ) // verified on two different PCBs
 GAME( 1993, sstrikerk,   sstriker, mahoudai,   sstrikerk,  truxton2_state, empty_init,      ROT270, "Raizing (Unite Trading license)", "Sorcer Striker (Korea)" ,  MACHINE_SUPPORTS_SAVE ) // Although the region jumper is functional, it's a Korean board / version
