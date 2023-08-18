@@ -1136,7 +1136,7 @@ INPUT_CHANGED_MEMBER(apple3_state::keyb_special_changed)
 			m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		}
 	}
-	else if ((m_kbspecial->read() & 0x80) && (m_via_0_a & ENV_NMIENABLE))
+	else if ((m_kbspecial->read() & 0x80) && (m_via_0_a & ENV_NMIENABLE) && !m_reset_latch)
 	{
 		// reset key only pressed (NMI)
 		if (!m_nmi_latch)
