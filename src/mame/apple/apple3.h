@@ -173,6 +173,7 @@ private:
 	int m_smoothscr = 0;
 
 	int m_inh_state = 0;
+	bool m_flash = false;
 };
 
 #endif // MAME_APPLE_APPLE3_H
