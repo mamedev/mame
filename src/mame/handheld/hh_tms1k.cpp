@@ -176,7 +176,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  *MP3493   TMS1100   1980, Milton Bradley OMNI Entertainment System (1/2)
  *MP3494   TMS1100   1980, Milton Bradley OMNI Entertainment System (2/2)
   MP3496   TMS1100   1980, Microvision cartridge: Sea Duel
- *M34004A  TMS1100   1981, Ideal Sky-Writer (note: MP3498, MP3499, M3400x..)
+ @M34004A  TMS1100   1981, Ideal Sky-Writer (note: MP3498, MP3499, M3400x..)
   M34009   TMS1100   1981, Microvision cartridge: Alien Raiders
  @M34012   TMS1100   1980, Mattel Dungeons & Dragons: Computer Labyrinth Game
  *M34014   TMS1100   1981, Coleco Bowlatronic
@@ -285,7 +285,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "efootb4.lh"
 #include "einvader.lh"
 #include "elecbowl.lh"
-#include "elecdet.lh"
+#include "elecdet.lh" // clickable
 #include "eleciq.lh" // clickable
 #include "esbattle.lh"
 #include "esoccer.lh"
@@ -4113,8 +4113,8 @@ ROM_END
 /*******************************************************************************
 
   Conic Electronic I.Q.
-  * PCB labels: main: CONIC 101-037 (other side: HG-15, 11*00198*00), button PCB:
-    CONIC 102-001, led PCB: CONIC 100-003 REV A itac
+  * PCB labels: main: CONIC 101-037 (other side: HG-15, 11*00198*00),
+    button PCB: CONIC 102-001, led PCB: CONIC 100-003 REV A itac
   * TMS1000NLL MP0908 (die label: 1000B, MP0908)
   * 2 7seg LEDs, 30 other LEDs, 1-bit sound
 
@@ -7117,7 +7117,7 @@ ROM_END
 
   Ideal Electronic Detective
   * TMS0980NLL MP6100A (die label: 0980B-00)
-  * 10-digit 7seg LED display, 2-level sound
+  * 9-digit 7seg LED display (2 unused), 2-level sound
 
   hardware (and concept) is very similar to Parker Brothers Stop Thief
 
@@ -7274,7 +7274,7 @@ ROM_END
   relying on human persistence of vision. A keyboard is included, making the
   whole thing quite tiring to wave around for a kid.
 
-  The display is simulated in MAME with a screen.
+  The display is simulated in MAME with a screen and slowly fading pixels.
 
 *******************************************************************************/
 
@@ -7348,23 +7348,23 @@ u32 skywriter_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 TIMER_DEVICE_CALLBACK_MEMBER(skywriter_state::check_pos)
 {
-	u16 inp = m_inputs[11]->read() % SKYWRITER_WIDTH;
+	u16 pos = m_inputs[11]->read() % SKYWRITER_WIDTH;
 
-	if (inp != m_wand_pos[0])
+	if (pos != m_wand_pos[0])
 	{
 		// set shake sensor if wand changed direction from left to right
-		if (inp > m_wand_pos[0] && m_wand_pos[0] < m_wand_pos[1])
+		if (pos > m_wand_pos[0] && m_wand_pos[0] < m_wand_pos[1])
 			m_shake = machine().time() + attotime::from_msec(10);
 
 		m_wand_pos[1] = m_wand_pos[0];
-		m_wand_pos[0] = inp;
+		m_wand_pos[0] = pos;
 	}
 
 	// write lit leds to display
 	for (int i = 0; i < 7; i++)
 	{
 		if (BIT(m_led_data[0] | m_led_data[1], i))
-			m_display[i * SKYWRITER_WIDTH + inp] = 0x180;
+			m_display[i * SKYWRITER_WIDTH + pos] = 0x180;
 	}
 
 	m_led_data[1] = m_led_data[0];
@@ -7493,7 +7493,7 @@ void skywriter_state::skywriter(machine_config &config)
 
 ROM_START( skywriter )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "m34004a", 0x0000, 0x0800, CRC(8e218dcc) SHA1(d3d5e0fa02c947d49d5bba1297edb7cecc0356da) )
+	ROM_LOAD( "m34004a.ic1", 0x0000, 0x0800, CRC(8e218dcc) SHA1(d3d5e0fa02c947d49d5bba1297edb7cecc0356da) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
@@ -7507,7 +7507,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Star Wars: Electronic Laser Battle Game (model 40090)
+  Kenner Star Wars: Electronic Laser Battle Game (model 40090)
   * TMS1000NLL MP3209 (die label: 1000C, MP3209)
   * 12 LEDs, 1 lamp, 1-bit sound
 
@@ -17207,7 +17207,7 @@ SYST( 1981, ginv1000,   0,         0,      ginv1000,  ginv1000,  ginv1000_state,
 SYST( 1982, ginv2000,   0,         0,      ginv2000,  ginv2000,  ginv2000_state,  empty_init, "Gakken", "Invader 2000", MACHINE_SUPPORTS_SAVE )
 SYST( 1981, fxmcr165,   0,         0,      fxmcr165,  fxmcr165,  fxmcr165_state,  empty_init, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-SYST( 1979, elecdet,    0,         0,      elecdet,   elecdet,   elecdet_state,   empty_init, "Ideal Toy Corporation", "Electronic Detective", MACHINE_SUPPORTS_SAVE ) // ***
+SYST( 1979, elecdet,    0,         0,      elecdet,   elecdet,   elecdet_state,   empty_init, "Ideal Toy Corporation", "Electronic Detective", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 SYST( 1981, skywriter,  0,         0,      skywriter, skywriter, skywriter_state, empty_init, "Ideal Toy Corporation", "Sky-Writer: The Electronic Message Sender", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
 
 SYST( 1978, starwlb,    0,         0,      starwlb,   starwlb,   starwlb_state,   empty_init, "Kenner", "Star Wars: Electronic Laser Battle Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
