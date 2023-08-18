@@ -145,6 +145,8 @@ The MCUs used were not imported from Sharp, but cloned by USSR, renamed to
 #include "emu.h"
 #include "hh_sm510.h"
 
+#include "sound/samples.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -363,8 +365,8 @@ void hh_sm510_state::piezo2bit_input_w(u8 data)
 void hh_sm510_state::mcfg_cpu_common(machine_config &config)
 {
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->read_ba().set([this] () { return m_io_ba.read_safe(1); });
-	m_maincpu->read_b().set([this] () { return m_io_b.read_safe(1); });
+	m_maincpu->read_ba().set([this]() { return m_io_ba.read_safe(1); });
+	m_maincpu->read_b().set([this]() { return m_io_b.read_safe(1); });
 }
 
 void hh_sm510_state::mcfg_cpu_sm5a(machine_config &config)
@@ -5279,7 +5281,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Konami Lone Ranger
+  Konami The Lone Ranger
   * PCB label: BH009
   * Sharp SM511 under epoxy (die label KMS73B, 781)
   * lcd screen with custom segments, 1-bit sound
@@ -5475,14 +5477,144 @@ ROM_END
 
 
 
+/***************************************************************************
+
+  Konami Teenage Mutant Ninja Turtles II: Splinter Speaks (model 13012)
+  * PCB label: BH012
+  * Sharp SM511 under epoxy (die label KMS73B, 785)
+  * lcd screen with custom segments, 1-bit sound
+  * OKI MSM6373 ADPCM under epoxy
+
+***************************************************************************/
+
+class ktmnt2_state : public hh_sm510_state
+{
+public:
+	ktmnt2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag),
+		m_samples(*this, "samples")
+	{ }
+
+	void ktmnt2(machine_config &config);
+
+private:
+	required_device<samples_device> m_samples;
+
+	void sound_w(u8 data);
+	int sound_busy_r();
+};
+
+// handlers
+
+void ktmnt2_state::sound_w(u8 data)
+{
+	// S8: ADPCM reset
+	if (~data & 0x80)
+		m_samples->stop(0);
+
+	// S7: ADPCM ST
+	else if (~data & m_inp_mux & 0x40)
+	{
+		// latch from S1-S5
+		u8 sample = data & 0x1f;
+
+		if (sample == 0)
+			m_samples->stop(0); // stop command
+		else if (sample < m_samples->samples() + 1)
+			m_samples->start(0, sample - 1);
+	}
+
+	// S1-S3: input mux
+	input_w(data);
+}
+
+int ktmnt2_state::sound_busy_r()
+{
+	// B: ADPCM busy
+	return m_samples->playing(0) ? 0 : 1;
+}
+
+// config
+
+static INPUT_PORTS_START( ktmnt2 )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+static const char *const ktmnt2_sample_names[] =
+{
+	"*ktmnt2",
+	"cowabunga",
+	"pizzapower",
+	"lookoutforshredder",
+	"bebop",
+	"rocksteady",
+	"radicaldude",
+	"gameover",
+	"yeow",
+	"what",
+	"oof",
+	"yeah",
+	nullptr
+};
+
+void ktmnt2_state::ktmnt2(machine_config &config)
+{
+	sm511_common(config, 1513, 1080);
+	m_maincpu->write_s().set(FUNC(ktmnt2_state::sound_w));
+	m_maincpu->read_b().set(FUNC(ktmnt2_state::sound_busy_r));
+
+	// sound hardware
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_names(ktmnt2_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
+}
+
+// roms
+
+ROM_START( ktmnt2 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "785.program", 0x0000, 0x1000, CRC(de10cfbc) SHA1(10251abae89317258d3fa45f9378ec458128b080) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "785.melody", 0x000, 0x100, CRC(cdcecef2) SHA1(f29e3dd268b2f2c6d5ed6ffb68051ac462bcac8a) )
+
+	ROM_REGION( 520607, "screen", 0)
+	ROM_LOAD( "ktmnt2.svg", 0, 520607, CRC(cdbdd320) SHA1(cb2569426eec18c3fb4cedfc4d1f95a92e818e9a) )
+
+	ROM_REGION( 0x8000, "adpcm", 0)
+	ROM_LOAD( "msm6373", 0, 0x8000, NO_DUMP )
+ROM_END
+
+
+
+
+
 /*******************************************************************************
 
-  Konami NFL Football
+  Konami NFL Football (model 13013)
   * PCB label: BH013
   * Sharp SM511 under epoxy (die label KMS73B, 786)
   * lcd screen with custom segments, 1-bit sound
 
-  This is the 1989 version. It was rereleased in 1992, assumed to be the same
+  This is the 1990 version. It was rereleased in 1992, assumed to be the same
   game underneath.
 
 *******************************************************************************/
@@ -5549,10 +5681,13 @@ ROM_END
 
 /***************************************************************************
 
-  Konami Teenage Mutant Ninja Turtles 3: Shredder's Last Stand
+  Konami Teenage Mutant Ninja Turtles 3: Shredder's Last Stand (model 13017)
   * PCB label: BH018
   * Sharp SM511 under epoxy (die label KMS73B, 794)
   * lcd screen with custom segments, 1-bit sound
+
+  This game was also embedded in a PDA sold by Takara, called Teenage Mutant
+  Ninja Turtles: Electrical Note.
 
 ***************************************************************************/
 
@@ -5582,7 +5717,7 @@ static INPUT_PORTS_START( ktmnt3 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
 
 	PORT_START("IN.2") // S3
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Attack")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("ACL")
@@ -5613,7 +5748,7 @@ ROM_END
 
 /***************************************************************************
 
-  Konami Teenage Mutant Ninja Turtles: Basketball
+  Konami Teenage Mutant Ninja Turtles: Basketball (model 13018)
   * PCB label: BH019
   * Sharp SM511 under epoxy (die label KMS73B, 793)
   * lcd screen with custom segments, 1-bit sound
@@ -5646,7 +5781,7 @@ static INPUT_PORTS_START( ktmntbb )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
 
 	PORT_START("IN.2") // S3
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Shot")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("ACL")
@@ -5677,7 +5812,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Konami Bucky O'Hare
+  Konami Bucky O'Hare (model 13019)
   * PCB label: BH020
   * Sharp SM511 under epoxy (die label KMS73B, N58)
   * lcd screen with custom segments, 1-bit sound
@@ -11131,9 +11266,10 @@ SYST( 1989, ktmnt,        0,           0,      ktmnt,        ktmnt,        ktmnt
 SYST( 1989, kskatedie,    0,           0,      kskatedie,    kskatedie,    kskatedie_state,    empty_init, "Konami (licensed from Electronic Arts)", "Skate or Die (Konami, handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, kbilly,       0,           0,      kbilly,       kbilly,       kbilly_state,       empty_init, "Konami", "The Adventures of Bayou Billy (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, kbottom9,     0,           0,      kbottom9,     kbottom9,     kbottom9_state,     empty_init, "Konami", "Bottom of the Ninth (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1990, kloneran,     0,           0,      kloneran,     kloneran,     kloneran_state,     empty_init, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, kloneran,     0,           0,      kloneran,     kloneran,     kloneran_state,     empty_init, "Konami", "The Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, knascar,      0,           0,      knascar,      knascar,      knascar_state,      empty_init, "Konami", "Bill Elliott's NASCAR Racing (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, kblades,      0,           0,      kblades,      kblades,      kblades_state,      empty_init, "Konami", "Blades of Steel (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, ktmnt2,       0,           0,      ktmnt2,       ktmnt2,       ktmnt2_state,       empty_init, "Konami", "Teenage Mutant Ninja Turtles II: Splinter Speaks (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, knfl,         0,           0,      knfl,         knfl,         knfl_state,         empty_init, "Konami", "NFL Football (Konami, handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, ktmnt3,       0,           0,      ktmnt3,       ktmnt3,       ktmnt3_state,       empty_init, "Konami", "Teenage Mutant Ninja Turtles 3: Shredder's Last Stand (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, ktmntbb,      0,           0,      ktmntbb,      ktmntbb,      ktmntbb_state,      empty_init, "Konami", "Teenage Mutant Ninja Turtles: Basketball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
