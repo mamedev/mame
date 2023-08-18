@@ -65,7 +65,9 @@ ata_hle_device_base::ata_hle_device_base(const machine_config &mconfig, device_t
 	m_pdiagin(0),
 	m_pdiagout(0),
 	m_single_device(0),
-	m_resetting(0), m_busy_timer(nullptr), m_buffer_empty_timer(nullptr)
+	m_resetting(0),
+	m_ata_busy_led(*this, "ata_busy_led"),
+	m_busy_timer(nullptr), m_buffer_empty_timer(nullptr)
 {
 }
 
@@ -106,6 +108,8 @@ void ata_hle_device_base::device_start()
 
 	m_busy_timer = timer_alloc(FUNC(ata_hle_device_base::busy_tick), this);
 	m_buffer_empty_timer = timer_alloc(FUNC(ata_hle_device_base::empty_tick), this);
+
+	m_ata_busy_led.resolve();
 }
 
 void ata_hle_device_base::device_reset()
@@ -148,6 +152,7 @@ void ata_hle_device_base::soft_reset()
 TIMER_CALLBACK_MEMBER(ata_hle_device_base::busy_tick)
 {
 	m_status &= ~IDE_STATUS_BSY;
+	m_ata_busy_led = 0;
 	finished_busy(param);
 }
 
@@ -409,12 +414,14 @@ void ata_hle_device_base::update_irq()
 void ata_hle_device_base::start_busy(const attotime &time, int param)
 {
 	m_status |= IDE_STATUS_BSY;
+	m_ata_busy_led = 1;
 	m_busy_timer->adjust(time, param);
 }
 
 void ata_hle_device_base::stop_busy()
 {
 	m_status &= ~IDE_STATUS_BSY;
+	m_ata_busy_led = 0;
 	m_busy_timer->adjust(attotime::never);
 }
 

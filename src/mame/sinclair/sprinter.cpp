@@ -58,6 +58,8 @@ TODO:
 
 #include <algorithm>
 
+#include "sprinter.lh"
+
 
 #define LOG_IO    (1U << 1)
 #define LOG_MEM   (1U << 2)
@@ -98,6 +100,7 @@ public:
 		, m_bank0_fastram(*this, "bank0_fastram")
 		, m_bank_view0(*this, "bank_view0")
 		, m_bank_view3(*this, "bank_view3")
+		, m_turbo_led(*this, "turbo_led")
 	{ }
 
 	void sprinter(machine_config &config);
@@ -222,6 +225,7 @@ private:
 	memory_view m_bank_view0;
 	memory_view m_bank_view3;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	output_finder<> m_turbo_led;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -346,6 +350,7 @@ void sprinter_state::update_memory()
 
 void sprinter_state::update_cpu()
 {
+	m_turbo_led = m_turbo && m_turbo_hard;
 	m_maincpu->set_clock_scale((m_turbo && m_turbo_hard) ? 6 : 1); // 1 - 21MHz, 0 - 3.5MHz
 }
 
@@ -1268,6 +1273,8 @@ void sprinter_state::machine_start()
 
 	spectrum_128_state::machine_start();
 
+	m_turbo_led.resolve();
+
 	save_item(NAME(m_ram_pages));
 	save_item(NAME(m_pages));
 	save_item(NAME(m_z80_m1));
@@ -1521,8 +1528,6 @@ INPUT_CHANGED_MEMBER(sprinter_state::turbo_changed)
 {
 	m_turbo_hard = !m_turbo_hard;
 	update_cpu();
-
-	popmessage("Turbo %s\n", (m_turbo && m_turbo_hard) ? "ON" : "OFF");
 }
 
 INPUT_PORTS_START( sprinter )
@@ -1670,6 +1675,7 @@ void sprinter_state::sprinter(machine_config &config)
 {
 	spectrum_128(config);
 	config.device_remove("palette");
+	config.set_default_layout(layout_sprinter);
 
 	m_ram->set_default_size("64M");
 
