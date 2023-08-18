@@ -14,6 +14,8 @@
 #include "ui/systemlist.h"
 #include "ui/ui.h"
 
+#include "infoxml.h"
+
 #include "drivenum.h"
 #include "emuopts.h"
 #include "romload.h"
@@ -374,17 +376,11 @@ std::string machine_info::game_info_string() const
 	}
 
 	// print description, manufacturer, and CPU:
-	std::string_view src(m_machine.system().type.source());
-	auto prefix(src.find("src/mame/"));
-	if (std::string_view::npos == prefix)
-		prefix = src.find("src\\mame\\");
-	if (std::string_view::npos != prefix)
-		src.remove_prefix(prefix + 9);
 	util::stream_format(buf, _("%1$s\n%2$s %3$s\nDriver: %4$s\n\nCPU:\n"),
 			system_list::instance().systems()[driver_list::find(m_machine.system().name)].description,
 			m_machine.system().year,
 			m_machine.system().manufacturer,
-			src);
+			info_xml_creator::format_sourcefile(m_machine.system().type.source()));
 
 	// loop over all CPUs
 	execute_interface_enumerator execiter(m_machine.root_device());
