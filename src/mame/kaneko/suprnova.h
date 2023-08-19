@@ -7,7 +7,7 @@
 
 #include "sknsspr.h"
 
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh7604.h"
 #include "machine/timer.h"
 
 #include "emupal.h"
@@ -84,7 +84,7 @@ private:
 		uint8_t disconnect = 0;
 	};
 
-	required_device<sh2_device> m_maincpu;
+	required_device<sh2_sh7604_device> m_maincpu;
 	required_device<sknsspr_device> m_spritegen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
