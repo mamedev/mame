@@ -218,6 +218,7 @@ void quadra605_state::macqd605(machine_config &config)
 	m_ram->set_extra_options("8M,16M,32M,64M,96M,128M,192M,256M,320M,384M,512M,640M");
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68040");
 }
 
 void quadra605_state::maclc475(machine_config &config)

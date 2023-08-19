@@ -313,6 +313,7 @@ void maciivx_state::maciiv_base(machine_config &config)
 	m_scsihelp->timeout_error_callback().set(FUNC(maciivx_state::scsi_berr_w));
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68030,MC68030_32");
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 
 	SCC85C30(config, m_scc, C7M);

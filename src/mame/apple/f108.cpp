@@ -70,6 +70,7 @@ void f108_device::device_add_mconfig(machine_config &config)
 		});
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68040");
 
 	SCC85C30(config, m_scc, 31.3344_MHz_XTAL/4);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);

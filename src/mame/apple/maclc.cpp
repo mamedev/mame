@@ -327,6 +327,7 @@ void maclc_state::maclc_base(machine_config &config)
 	m_scsihelp->timeout_error_callback().set(FUNC(maclc_state::scsi_berr_w));
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68020");
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 
 	SCC85C30(config, m_scc, C7M);
@@ -394,6 +395,8 @@ void maclc_state::maclc2(machine_config &config)
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("6M,8M,10M");
 	m_v8->set_baseram_is_4M(true);
+
+	SOFTWARE_LIST(config.replace(), "cd_list").set_original("mac_cdrom").set_filter("MC68030");
 }
 
 void maclc_state::maccclas(machine_config &config)
@@ -427,6 +430,8 @@ void maclc_state::maccclas(machine_config &config)
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("6M,8M,10M");
 	m_v8->set_baseram_is_4M(true);
+
+	SOFTWARE_LIST(config.replace(), "cd_list").set_original("mac_cdrom").set_filter("MC68030");
 }
 
 void maclc_state::macclas2(machine_config &config)
@@ -449,6 +454,8 @@ void maclc_state::macclas2(machine_config &config)
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("6M,8M,10M");
 	m_v8->set_baseram_is_4M(true);
+
+	SOFTWARE_LIST(config.replace(), "cd_list").set_original("mac_cdrom").set_filter("MC68030");
 }
 
 ROM_START(maclc)

@@ -502,6 +502,7 @@ void maciifx_state::maciifx(machine_config &config)
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
 
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68030");
 
 	SCC85C30(config, m_scc, C7M);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);

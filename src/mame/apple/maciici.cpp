@@ -573,6 +573,7 @@ void maciici_state::maciici(machine_config &config)
 	m_scsihelp->timeout_error_callback().set(FUNC(maciici_state::scsi_berr_w));
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68030,MC68030_32");
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("2M");

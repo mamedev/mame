@@ -1139,7 +1139,6 @@ void mac128_state::mac512ke(machine_config &config)
 	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
 	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
-	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 }
 
 void mac128_state::mac128k(machine_config &config)
@@ -1176,7 +1175,7 @@ void mac128_state::macplus(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:2", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:3", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:4", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", mac_scsi_devices, "cdrom");
 	NSCSI_CONNECTOR(config, "scsibus:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", mac_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr5380", NCR5380).machine_config([this](device_t *device) {
@@ -1184,6 +1183,9 @@ void mac128_state::macplus(machine_config &config)
 		adapter.irq_handler().set(*this, FUNC(mac128_state::scsi_irq_w));
 		adapter.drq_handler().set(*this, FUNC(mac128_state::scsi_drq_w));
 	});
+
+	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68000");
 
 	/* internal ram */
 	m_ram->set_default_size("4M");
