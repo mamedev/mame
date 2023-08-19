@@ -65,7 +65,7 @@ public:
 		m_mem_view(*this, "rom_bank"),
 		m_ram(*this, RAM_TAG),
 		m_floppy_ram(*this, "floppyram"),
-		m_tlb(*this, "tlb"),
+		m_tlbc(*this,"tlbc"),
 		m_h37(*this, "h37"),
 		m_intr_cntrl(*this, "intr_cntrl"),
 		m_console(*this, "console"),
@@ -85,7 +85,8 @@ private:
 	memory_view m_mem_view;
 	required_device<ram_device> m_ram;
 	required_shared_ptr<uint8_t> m_floppy_ram;
-	required_device<heath_tlb_device> m_tlb;
+	required_device<heath_tlb_connector> m_tlbc;
+
 	required_device<heath_z37_fdc_device> m_h37;
 	required_device<heath_intr_cntrl> m_intr_cntrl;
 	required_device<ins8250_device> m_console;
@@ -460,6 +461,16 @@ void h89_state::port_f2_w(uint8_t data)
 	m_intr_cntrl->lower_irq(1);
 }
 
+static void tlb_options(device_slot_interface &device)
+{
+	device.option_add("heath", HEATH_TLB);
+	device.option_add("gp19", HEATH_GP19);
+	device.option_add("super19", HEATH_SUPER19);
+	device.option_add("ultrarom", HEATH_ULTRA);
+	device.option_add("watzman", HEATH_WATZ);
+}
+
+
 void h89_state::h89(machine_config & config)
 {
 	// basic machine hardware
@@ -476,13 +487,13 @@ void h89_state::h89(machine_config & config)
 	INS8250(config, m_console, INS8250_CLOCK);
 	m_console->out_int_callback().set(FUNC(h89_state::console_intr));
 
-	HEATH_TLB(config, m_tlb);
+	HEATH_TLB_CONNECTOR(config, m_tlbc, tlb_options, "heath");
 
-	// Connect the console port on CPU board to serial port on TLB
-	m_console->out_tx_callback().set(m_tlb, FUNC(heath_tlb_device::serial_in_w));
-	m_tlb->serial_data_callback().set(m_console, FUNC(ins8250_uart_device::rx_w));
+	// Connect the console port on CPU board to TLB connector
+	m_console->out_tx_callback().set(m_tlbc, FUNC(heath_tlb_connector::serial_in_w));
+	m_tlbc->serial_data_callback().set(m_console, FUNC(ins8250_uart_device::rx_w));
 
-	m_tlb->reset_cb().set(FUNC(h89_state::reset_line));
+	m_tlbc->reset_cb().set(FUNC(h89_state::reset_line));
 
 	HEATH_Z37_FDC(config, m_h37);
 	m_h37->drq_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::set_drq));

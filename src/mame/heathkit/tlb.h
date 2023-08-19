@@ -22,22 +22,44 @@
 #include "speaker.h"
 
 
+
+class heath_tlb_connector;
+
+class device_heath_tlb_card_interface : public device_interface
+{
+public:
+
+	// required operation overrides
+	virtual void serial_in_w(int state) = 0;
+
+
+	// optional operation overrides
+	virtual void rlsd_in_w(int state) {}
+	virtual void dsr_in_w(int state)  {}
+	virtual void cts_int_w(int state) {}
+
+protected:
+	// construction/destruction
+	device_heath_tlb_card_interface(const machine_config &mconfig, device_t &device);
+
+	heath_tlb_connector  *m_slot;
+
+	friend class heath_tlb_device;
+};
+
+
+
 // Standard Heath Terminal logic board
-class heath_tlb_device : public device_t
+class heath_tlb_device : public device_t,
+						   public device_heath_tlb_card_interface
 {
 public:
 	heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	// interface routines
-	auto serial_data_callback() { return m_write_sd.bind(); }
-	auto dtr_callback() { return m_dtr_cb.bind(); }
-	auto rts_callback() { return m_rts_cb.bind(); }
-	auto reset_cb() { return m_reset.bind(); }
-
-	void serial_in_w(int state);
-	void rlsd_in_w(int state);
-	void dsr_in_w(int state);
-	void cts_int_w(int state);
+	virtual void serial_in_w(int state) override;
+	virtual void rlsd_in_w(int state) override;
+	virtual void dsr_in_w(int state) override;
+	virtual void cts_int_w(int state) override;
 
 	void reset_key_w(int state);
 	void right_shift_w(int state);
@@ -96,11 +118,6 @@ private:
 
 	emu_timer *m_key_click_timer;
 	emu_timer *m_bell_timer;
-
-	devcb_write_line m_write_sd;
-	devcb_write_line m_dtr_cb;
-	devcb_write_line m_rts_cb;
-	devcb_write_line m_reset;
 
 	required_device<ins8250_device> m_ace;
 	required_device<beep_device>    m_beep;
@@ -189,5 +206,63 @@ DECLARE_DEVICE_TYPE(HEATH_GP19, heath_gp19_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_SUPER19, heath_super19_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_WATZ, heath_watz_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_ULTRA, heath_ultra_tlb_device)
+
+
+
+class heath_tlb_connector : public device_t,
+							public device_single_card_slot_interface<device_heath_tlb_card_interface>
+{
+public:
+
+	template <typename T>
+	heath_tlb_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, bool fixed = false) :
+		 heath_tlb_connector(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(fixed);
+	}
+
+	heath_tlb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	virtual ~heath_tlb_connector();
+
+	device_heath_tlb_card_interface *get_device();
+
+	// computer interface
+	auto serial_data_callback() { return m_write_sd.bind(); }
+	auto dtr_callback() { return m_dtr_cb.bind(); }
+	auto rts_callback() { return m_rts_cb.bind(); }
+	auto reset_cb() { return m_reset.bind(); }
+
+	// card interface
+	void serial_in_w(int state) { if (m_tlb) m_tlb->serial_in_w(state); };
+	void rlsd_in_w(int state) { if (m_tlb) m_tlb->rlsd_in_w(state); };
+	void dsr_in_w(int state) { if (m_tlb) m_tlb->dsr_in_w(state); };
+	void cts_int_w(int state) { if (m_tlb) m_tlb->cts_int_w(state); };
+
+	void serial_out_b(int data) { m_write_sd(data); };
+	void dtr_out(int data)  { m_dtr_cb(data); };
+	void rts_out(int data)  { m_rts_cb(data); };
+	void reset_out(int data) { m_reset(data); };
+
+
+protected:
+	virtual void device_start() override;
+
+	devcb_write_line m_write_sd;
+	devcb_write_line m_dtr_cb;
+	devcb_write_line m_rts_cb;
+	devcb_write_line m_reset;
+
+	device_heath_tlb_card_interface *m_tlb;
+};
+
+
+// device type definition
+DECLARE_DEVICE_TYPE(HEATH_TLB_CONNECTOR, heath_tlb_connector)
+
+extern template class device_finder<heath_tlb_connector, false>;
+extern template class device_finder<heath_tlb_connector, true>;
 
 #endif // MAME_HEATHKIT_TLB_H

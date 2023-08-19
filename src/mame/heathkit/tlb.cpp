@@ -85,12 +85,21 @@ static constexpr uint8_t KB_STATUS_SHIFT_KEYS_MASK = 0x01;
 static constexpr uint8_t KB_STATUS_CONTROL_KEY_MASK = 0x10;
 static constexpr uint8_t KB_STATUS_KEYBOARD_STROBE_MASK = 0x80;
 
+DEFINE_DEVICE_TYPE(HEATH_TLB_CONNECTOR, heath_tlb_connector, "heath_tlb_connector", "Heath Terminal Logic board connector abstraction")
 
 DEFINE_DEVICE_TYPE(HEATH_TLB, heath_tlb_device, "heath_tlb", "Heath Terminal Logic Board");
 DEFINE_DEVICE_TYPE(HEATH_SUPER19, heath_super19_tlb_device, "heath_super19_tlb", "Heath Terminal Logic Board w/Super19 ROM");
 DEFINE_DEVICE_TYPE(HEATH_WATZ, heath_watz_tlb_device, "heath_watz_tlb", "Heath Terminal Logic Board w/Watzman ROM");
 DEFINE_DEVICE_TYPE(HEATH_ULTRA, heath_ultra_tlb_device, "heath_ultra_tlb", "Heath Terminal Logic Board w/Ultra ROM");
 DEFINE_DEVICE_TYPE(HEATH_GP19, heath_gp19_tlb_device, "heath_gp19_tlb", "Heath Terminal Logic Board plus Northwest Digital Systems GP-19")
+
+
+
+device_heath_tlb_card_interface::device_heath_tlb_card_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "heathtlbdevice")
+{
+	m_slot = dynamic_cast<heath_tlb_connector *>(device.owner());
+}
 
 
 /**
@@ -103,16 +112,13 @@ heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *ta
 
 heath_tlb_device::heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
+	device_heath_tlb_card_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
 	m_screen(*this, "screen"),
 	m_palette(*this, "palette"),
 	m_crtc(*this, "crtc"),
 	m_p_videoram(*this, "videoram"),
 	m_p_chargen(*this, "chargen"),
-	m_write_sd(*this),
-	m_dtr_cb(*this),
-	m_rts_cb(*this),
-	m_reset(*this),
 	m_ace(*this, "ins8250"),
 	m_beep(*this, "beeper"),
 	m_mm5740(*this, "mm5740"),
@@ -326,7 +332,7 @@ void heath_tlb_device::check_for_reset()
 	if (m_reset_key && m_right_shift)
 	{
 		m_reset_pending = true;
-		m_reset(1);
+		m_slot->reset_out(1);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 	else if (m_reset_pending)
@@ -334,7 +340,7 @@ void heath_tlb_device::check_for_reset()
 		m_reset_pending = false;
 		reset();
 		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		m_reset(0);
+		m_slot->reset_out(0);
 	}
 }
 
@@ -842,17 +848,17 @@ const tiny_rom_entry *heath_tlb_device::device_rom_region() const
 
 void heath_tlb_device::serial_out_b(int data)
 {
-	m_write_sd(data);
+	m_slot->serial_out_b(data);
 }
 
 void heath_tlb_device::dtr_out(int data)
 {
-	m_dtr_cb(data);
+	m_slot->dtr_out(data);
 }
 
 void heath_tlb_device::rts_out(int data)
 {
-	m_rts_cb(data);
+	m_slot->rts_out(data);
 }
 
 void heath_tlb_device::serial_in_w(int state)
@@ -1173,4 +1179,38 @@ const tiny_rom_entry *heath_gp19_tlb_device::device_rom_region() const
 ioport_constructor heath_gp19_tlb_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(gp19);
+}
+
+
+heath_tlb_connector::heath_tlb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, HEATH_TLB_CONNECTOR, tag, owner, clock),
+	device_single_card_slot_interface(mconfig, *this),
+	m_write_sd(*this),
+	m_dtr_cb(*this),
+	m_rts_cb(*this),
+	m_reset(*this),
+	m_tlb(nullptr)
+{
+}
+
+heath_tlb_connector::~heath_tlb_connector()
+{
+}
+
+void heath_tlb_connector::device_start()
+{
+	m_tlb = get_device();
+}
+
+device_heath_tlb_card_interface *heath_tlb_connector::get_device()
+{
+	device_heath_tlb_card_interface *const connected = dynamic_cast<device_heath_tlb_card_interface *>(get_card_device());
+	if (connected)
+	{
+		return connected;
+	}
+	else
+	{
+		return nullptr;
+	}
 }
