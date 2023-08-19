@@ -84,7 +84,7 @@ PPC750 - PowerPC 750 (G3) CPU
 		</part>
 	</software>
 	<software name="mac76">
-		<description>System Software 7.6 (US English)</description>
+		<description>Mac OS 7.6 (US English)</description>
 		<year>1997</year>
 		<publisher>Apple</publisher>
 		<info name="usage" value="Runs on any 68030 with 32-bit clean ROMs, 68040, or PowerPC" />
@@ -144,7 +144,7 @@ PPC750 - PowerPC 750 (G3) CPU
 		</part>
 	</software>
 	<software name="pwrmaccd">
-		<description>Power Macintosh 6100/7100/8100 CD (System Software 7.1.2P, US English)</description>
+		<description>Power Macintosh 6100/7100/8100 CD (System Software 7.1.2P) (US English)</description>
 		<year>1994</year>
 		<publisher>Apple</publisher>
 		<info name="usage" value="Runs on most 68040s and NuBus Power Macs" />
