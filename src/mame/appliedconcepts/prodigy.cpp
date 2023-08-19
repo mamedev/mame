@@ -72,7 +72,7 @@ The keypad is connected to the 12 pin KPDCN connector left to right KP1:
 #include "speaker.h"
 
 // internal artwork
-#include "aci_prodigy.lh" // clickable
+#include "aci_prodigy.lh"
 
 
 namespace {

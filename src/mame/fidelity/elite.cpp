@@ -77,9 +77,9 @@ uninteresting to emulate as separate drivers.
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_eag.lh" // clickable
-#include "fidel_eas.lh" // clickable
-#include "fidel_pc.lh" // clickable
+#include "fidel_eag.lh"
+#include "fidel_eas.lh"
+#include "fidel_pc.lh"
 
 
 namespace {

@@ -36,7 +36,7 @@ Capturing pieces is also unintuitive, having to press the destination square twi
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_cp2000.lh" // clickable
+#include "saitek_cp2000.lh"
 
 
 namespace {

@@ -50,8 +50,8 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "mephisto_mm1.lh" // clickable
-#include "mephisto_mirage.lh" // clickable
+#include "mephisto_mm1.lh"
+#include "mephisto_mirage.lh"
 
 
 namespace {

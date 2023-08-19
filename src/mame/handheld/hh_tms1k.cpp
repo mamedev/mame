@@ -255,26 +255,26 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 // internal artwork
 #include "t7in1ss.lh"
 #include "alphie.lh"
-#include "amaztron.lh" // clickable
-#include "arcmania.lh" // clickable
+#include "amaztron.lh"
+#include "arcmania.lh"
 #include "arrball.lh"
 #include "astro.lh"
 #include "bankshot.lh"
 #include "bcheetah.lh"
 #include "bigtrak.lh"
 #include "blastit.lh"
-#include "bship.lh" // clickable
+#include "bship.lh"
 #include "cmsport.lh"
 #include "cnbaskb.lh"
 #include "cnfball.lh"
 #include "cnfball2.lh"
-#include "cnsector.lh" // clickable
-#include "comp4.lh" // clickable
-#include "comparc.lh" // clickable
-#include "copycat.lh" // clickable
-#include "copycata.lh" // clickable
+#include "cnsector.lh"
+#include "comp4.lh"
+#include "comparc.lh"
+#include "copycat.lh"
+#include "copycata.lh"
 #include "dataman.lh"
-#include "ditto.lh" // clickable
+#include "ditto.lh"
 #include "dxfootb.lh"
 #include "cqback.lh"
 #include "ebball.lh"
@@ -285,14 +285,14 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "efootb4.lh"
 #include "einvader.lh"
 #include "elecbowl.lh"
-#include "elecdet.lh" // clickable
-#include "eleciq.lh" // clickable
+#include "elecdet.lh"
+#include "eleciq.lh"
 #include "esbattle.lh"
 #include "esoccer.lh"
 #include "f2pbball.lh"
 #include "f3in1.lh"
-#include "fingbowl.lh" // clickable
-#include "fxmcr165.lh" // clickable
+#include "fingbowl.lh"
+#include "fxmcr165.lh"
 #include "gjackpot.lh"
 #include "gpoker.lh"
 #include "h2hbaseb.lh"
@@ -301,17 +301,17 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "h2hfootb.lh"
 #include "h2hhockey.lh"
 #include "horseran.lh"
-#include "litelrn.lh" // clickable
+#include "litelrn.lh"
 #include "liveafb.lh"
-#include "lostreas.lh" // clickable
-#include "matchnum.lh" // clickable
+#include "lostreas.lh"
+#include "matchnum.lh"
 #include "mathmagi.lh"
 #include "mathmarv.lh"
-#include "mbdtower.lh" // clickable
-#include "mdndclab.lh" // clickable
-#include "merlin.lh" // clickable
-#include "mmarvin.lh" // clickable
-#include "mmerlin.lh" // clickable
+#include "mbdtower.lh"
+#include "mdndclab.lh"
+#include "merlin.lh"
+#include "mmarvin.lh"
+#include "mmerlin.lh"
 #include "monkeysee.lh"
 #include "mrmusical.lh"
 #include "palmf31.lh"
@@ -319,19 +319,19 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "pbmastm.lh"
 #include "phpball.lh"
 #include "playmaker.lh"
-#include "qfire.lh" // clickable
+#include "qfire.lh"
 #include "quizwizc.lh"
 #include "raisedvl.lh"
 #include "scruiser.lh"
-#include "simon.lh" // clickable
+#include "simon.lh"
 #include "speechp.lh"
 #include "splitsec.lh"
-#include "ssimon.lh" // clickable
+#include "ssimon.lh"
 #include "ssports4.lh"
-#include "starwbc.lh" // clickable
-#include "starwlb.lh" // clickable
-#include "stopthief.lh" // clickable
-#include "strobe.lh" // clickable
+#include "starwbc.lh"
+#include "starwlb.lh"
+#include "stopthief.lh"
+#include "strobe.lh"
 #include "subwars.lh"
 #include "t3in1sa.lh"
 #include "tbreakup.lh"
@@ -350,11 +350,11 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "timaze.lh"
 #include "tisr16.lh"
 #include "tithermos.lh"
-#include "tmvolleyb.lh" // clickable
+#include "tmvolleyb.lh"
 #include "vclock3.lh"
 #include "wizatron.lh"
-#include "xl25.lh" // clickable
-#include "zodiac.lh" // clickable
+#include "xl25.lh"
+#include "zodiac.lh"
 
 //#include "hh_tms1k_test.lh" // common test-layout - use external artwork
 

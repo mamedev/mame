@@ -23,7 +23,7 @@ There's also a version with a Toshiba TMP47C200.
 
 #include "speaker.h"
 
-#include "pylo.lh" // clickable
+#include "pylo.lh"
 
 
 namespace {

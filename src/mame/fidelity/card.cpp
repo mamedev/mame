@@ -181,9 +181,9 @@ Two card decks exist (red and blue), each has the same set of barcodes.
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_brc.lh" // clickable
-#include "fidel_bv3.lh" // clickable
-#include "fidel_gin.lh" // clickable
+#include "fidel_brc.lh"
+#include "fidel_bv3.lh"
+#include "fidel_gin.lh"
 
 
 namespace {

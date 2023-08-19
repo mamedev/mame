@@ -70,7 +70,7 @@ Overall, the hardware has similarities with Wacky Gator, see wacky_gator.cpp.
 #include "speaker.h"
 
 // internal artwork
-#include "cgang.lh" // clickable
+#include "cgang.lh"
 
 
 namespace {

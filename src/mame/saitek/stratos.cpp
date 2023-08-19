@@ -63,8 +63,8 @@ very few bytes difference between revisions. The first Corona is engine version 
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_stratos.lh" // clickable
-#include "saitek_tking.lh" // clickable
+#include "saitek_stratos.lh"
+#include "saitek_tking.lh"
 
 
 class stratos_state : public saitek_stratos_state

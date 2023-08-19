@@ -23,7 +23,7 @@ Hardware notes:
 #include "screen.h"
 
 // internal artwork
-#include "saitek_exchess.lh" // clickable
+#include "saitek_exchess.lh"
 
 
 namespace {

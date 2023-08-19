@@ -39,7 +39,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "novag_savant.lh" // clickable
+#include "novag_savant.lh"
 
 
 namespace {

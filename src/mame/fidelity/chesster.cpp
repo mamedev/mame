@@ -37,7 +37,7 @@ the S14001A in the 70s), this time a 65C02 software solution.
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_chesster.lh" // clickable
+#include "fidel_chesster.lh"
 
 
 namespace {

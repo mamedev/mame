@@ -33,7 +33,7 @@ and 4 TMM27128 with identical ROM contents as the newer version.
 #include "speaker.h"
 
 // internal artwork
-#include "novag_cexpert.lh" // clickable
+#include "novag_cexpert.lh"
 
 
 namespace {

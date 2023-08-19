@@ -82,10 +82,10 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "novag_const.lh" // clickable
-#include "novag_constq.lh" // clickable
-#include "novag_ssensor4.lh" // clickable
-#include "novag_supercon.lh" // clickable
+#include "novag_const.lh"
+#include "novag_constq.lh"
+#include "novag_ssensor4.lh"
+#include "novag_supercon.lh"
 
 
 namespace {

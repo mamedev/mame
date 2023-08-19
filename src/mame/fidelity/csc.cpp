@@ -217,9 +217,9 @@ clicking on the game board.
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_csc.lh" // clickable
-#include "fidel_rsc.lh" // clickable
-#include "fidel_su9.lh" // clickable
+#include "fidel_csc.lh"
+#include "fidel_rsc.lh"
+#include "fidel_su9.lh"
 
 
 namespace {

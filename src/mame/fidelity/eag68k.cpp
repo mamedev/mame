@@ -190,8 +190,8 @@ B0000x-xxxxxx: see V7, -800000
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_ex_68k.lh" // clickable
-#include "fidel_eag_68k.lh" // clickable
+#include "fidel_ex_68k.lh"
+#include "fidel_eag_68k.lh"
 
 
 namespace {

@@ -58,8 +58,8 @@ The model number is still 881, ROM is the same as the standard fake-wood version
 #include "speaker.h"
 
 // internal artwork
-#include "novag_snova.lh" // clickable
-#include "novag_supremo.lh" // clickable
+#include "novag_snova.lh"
+#include "novag_supremo.lh"
 
 
 namespace {

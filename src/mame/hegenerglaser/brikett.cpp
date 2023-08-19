@@ -86,10 +86,10 @@ BTANB:
 #include "speaker.h"
 
 // internal artwork
-#include "mephisto_1.lh" // clickable
-#include "mephisto_esb2.lh" // clickable
-#include "mephisto_3.lh" // clickable
-#include "mephisto_junior.lh" // clickable
+#include "mephisto_1.lh"
+#include "mephisto_esb2.lh"
+#include "mephisto_3.lh"
+#include "mephisto_junior.lh"
 
 
 namespace {

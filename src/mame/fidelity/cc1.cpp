@@ -65,9 +65,9 @@ with CCX and CC7.
 #include "video/pwm.h"
 
 // internal artwork
-#include "fidel_cc1.lh" // clickable
-#include "fidel_cc3.lh" // clickable
-#include "fidel_cc10c.lh" // clickable
+#include "fidel_cc1.lh"
+#include "fidel_cc3.lh"
+#include "fidel_cc10c.lh"
 
 
 namespace {

@@ -54,7 +54,7 @@ Keypad legend:
 #include "speaker.h"
 
 // internal artwork
-#include "debutm.lh" // clickable
+#include "debutm.lh"
 
 
 namespace {

@@ -32,7 +32,7 @@ Hardware notes:
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_sc8.lh" // clickable
+#include "fidel_sc8.lh"
 
 
 namespace {

@@ -31,7 +31,7 @@ Hardware notes:
 #include "speaker.h"
 
 // internal artwork
-#include "cxg_ch2001.lh" // clickable
+#include "cxg_ch2001.lh"
 
 
 namespace {

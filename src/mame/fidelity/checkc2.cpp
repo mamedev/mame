@@ -26,7 +26,7 @@ TODO:
 #include "video/pwm.h"
 
 // internal artwork
-#include "fidel_cr.lh" // clickable
+#include "fidel_cr.lh"
 
 
 namespace {

@@ -31,9 +31,9 @@ This engine was also used in the newer Mephisto Modena.
 #include "speaker.h"
 
 // internal artwork
-#include "cxg_dominator.lh" // clickable
-#include "cxg_galaxy.lh" // clickable
-#include "cxg_commander.lh" // clickable
+#include "cxg_dominator.lh"
+#include "cxg_galaxy.lh"
+#include "cxg_commander.lh"
 
 
 namespace {

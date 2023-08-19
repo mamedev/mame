@@ -29,7 +29,7 @@ switch tied to pin #4 (VSB: RAM standby power).
 #include "speaker.h"
 
 // internal artwork
-#include "novag_micro.lh" // clickable
+#include "novag_micro.lh"
 
 
 namespace {

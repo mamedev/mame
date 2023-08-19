@@ -40,7 +40,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_intchess.lh" // clickable
+#include "saitek_intchess.lh"
 
 
 namespace {

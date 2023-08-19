@@ -110,7 +110,7 @@ determination and give you a language option on power up or something.
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_vcc.lh" // clickable
+#include "fidel_vcc.lh"
 
 
 namespace {

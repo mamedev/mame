@@ -37,7 +37,7 @@ and one for MCS48. A12 is forced high or low to select the bank.
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_msc_v1.lh" // clickable
+#include "fidel_msc_v1.lh"
 
 
 namespace {

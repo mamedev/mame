@@ -52,8 +52,8 @@ TODO:
 #include "screen.h"
 
 // internal artwork
-#include "avrmax.lh" // clickable
-#include "atm18mcc.lh" // clickable
+#include "avrmax.lh"
+#include "atm18mcc.lh"
 
 
 namespace {

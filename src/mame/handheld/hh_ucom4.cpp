@@ -103,13 +103,13 @@ ROM source notes when dumped from another title, but confident it's the same:
 // internal artwork
 #include "alnchase.lh"
 #include "bmsafari.lh"
-#include "ctntune.lh" // clickable
+#include "ctntune.lh"
 #include "efball.lh"
-#include "grobot9.lh" // clickable
+#include "grobot9.lh"
 #include "mcompgin.lh"
 #include "mvbfree.lh"
 #include "splasfgt.lh"
-#include "tactix.lh" // clickable
+#include "tactix.lh"
 #include "tccombat.lh"
 #include "tmtennis.lh"
 #include "ufombs.lh"

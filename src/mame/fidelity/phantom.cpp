@@ -56,8 +56,8 @@ BTANB:
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_cphantom.lh" // clickable
-#include "fidel_phantom.lh" // clickable
+#include "fidel_cphantom.lh"
+#include "fidel_phantom.lh"
 
 
 namespace {

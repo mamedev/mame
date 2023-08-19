@@ -31,7 +31,7 @@ NVRAM fails at next power-on.
 #include "speaker.h"
 
 // internal artwork
-#include "regence.lh" // clickable
+#include "regence.lh"
 
 
 namespace {

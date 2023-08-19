@@ -31,7 +31,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "ck_master.lh" // clickable
+#include "ck_master.lh"
 
 
 namespace {

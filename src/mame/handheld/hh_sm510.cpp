@@ -911,8 +911,7 @@ ROM_END
   * Sharp SM5A label MH-06 5104 (no decap)
   * lcd screen with custom segments, 1-bit sound
 
-  This is the Gold Series version, there's also a new wide screen version
-  (NH-103)
+  This is the Gold Series version, there's also a new wide screen version (NH-103)
 
 *******************************************************************************/
 
@@ -3165,9 +3164,8 @@ ROM_END
 /*******************************************************************************
 
   Nintendo Game & Watch: Mario's Cement Factory (model CM-72)
-  * PCB labels: CM-72 M (main board)
-                CM-72 C (joystick controller board)
-                CM-72 S (buttons controller board)
+  * PCB labels: CM-72 M (main board), CM-72 C (joystick controller board),
+    CM-72 S (buttons controller board)
   * Sharp SM511 label CM-72 534A, or CM-72A 536C (no decap)
   * inverted lcd screen with custom segments, 1-bit sound
 
@@ -3565,9 +3563,9 @@ ROM_END
   Nintendo Game & Watch: Mickey Mouse (model DC-95),
   Nintendo Game & Watch: Donkey Kong Circus (model MK-96)
   * PCB labels: DC-95M (main board), DC-95C (controller board)
-  * Sharp SM511
-     - label DC-95 284C (Mickey Mouse) (no decap)
-     - label DC-95 541D (Donkey Kong Circus) (no decap)
+  * Sharp SM511:
+    label DC-95 284C (Mickey Mouse) (no decap)
+    label DC-95 541D (Donkey Kong Circus) (no decap)
   * inverted lcd screen with custom segments, 1-bit sound
 
   This is the panorama version of Mickey Mouse. There's also a wide screen
@@ -3944,9 +3942,9 @@ ROM_END
 
   Nintendo Game & Watch: Super Mario Bros. (model: see below)
   * PCB label: YM-801 (Crystal Screen), YM-105 (New Wide Screen)
-  * Sharp SM511
-     - label YM-801 8034A (Crystal Screen) (not dumped yet)
-     - label YM-105 9024B (New Wide Screen) (die label ?)
+  * Sharp SM511:
+    label YM-801 8034A (Crystal Screen) (not dumped yet)
+    label YM-105 9024B (New Wide Screen) (die label ?)
   * lcd screen with custom segments, 1-bit sound
 
   First released in 1986 on Crystal Screen (model YM-801), rereleased on
@@ -4041,9 +4039,9 @@ ROM_END
   Nintendo Game & Watch: Climber Crystal Screen (model DR-802),
   Nintendo Game & Watch: Climber New Wide Screen (model DR-106)
   * PCB label: DR-802 (Crystal Screen), DR-106 (New Wide Screen)
-  * Sharp SM511
-     - label DR-802 8626A (Crystal Screen) (not dumped yet)
-     - label DR-106 9038B (New Wide Screen) (no decap)
+  * Sharp SM511:
+    label DR-802 8626A (Crystal Screen) (not dumped yet)
+    label DR-106 9038B (New Wide Screen) (no decap)
   * lcd screen with custom segments, 1-bit sound
 
   First released in 1986 on Crystal Screen (model DR-802), rereleased on
@@ -4138,9 +4136,9 @@ ROM_END
   Nintendo Game & Watch: Balloon Fight Crystal Screen (model BF-803),
   Nintendo Game & Watch: Balloon Fight New Wide Screen (model BF-107)
   * PCB label: DR-802-2 (Crystal Screen), DR-106 (New Wide Screen)
-  * Sharp SM511
-     - label BF-803 8646A (Crystal Sscreen) (not dumped yet)
-     - label BF-107 9031B (New Wide Screen) (no decap)
+  * Sharp SM511:
+    label BF-803 8646A (Crystal Screen) (not dumped yet)
+    label BF-107 9031B (New Wide Screen) (no decap)
   * lcd screen with custom segments, 1-bit sound
 
   First released in 1986 on Crystal Screen (model BF-803), rereleased on
@@ -5477,7 +5475,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Konami Teenage Mutant Ninja Turtles II: Splinter Speaks (model 13012)
   * PCB label: BH012
@@ -5485,7 +5483,7 @@ ROM_END
   * lcd screen with custom segments, 1-bit sound
   * OKI MSM6373 ADPCM under epoxy
 
-***************************************************************************/
+*******************************************************************************/
 
 class ktmnt2_state : public hh_sm510_state
 {
@@ -5534,7 +5532,7 @@ int ktmnt2_state::sound_busy_r()
 	return m_samples->playing(0) ? 0 : 1;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ktmnt2 )
 	PORT_START("IN.0") // S1
@@ -5556,6 +5554,8 @@ static INPUT_PORTS_START( ktmnt2 )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 static const char *const ktmnt2_sample_names[] =
 {
@@ -5679,7 +5679,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Konami Teenage Mutant Ninja Turtles 3: Shredder's Last Stand (model 13017)
   * PCB label: BH018
@@ -5689,7 +5689,7 @@ ROM_END
   This game was also embedded in a PDA sold by Takara, called Teenage Mutant
   Ninja Turtles: Electrical Note.
 
-***************************************************************************/
+*******************************************************************************/
 
 class ktmnt3_state : public hh_sm510_state
 {
@@ -5701,7 +5701,7 @@ public:
 	void ktmnt3(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ktmnt3 )
 	PORT_START("IN.0") // S1
@@ -5723,6 +5723,8 @@ static INPUT_PORTS_START( ktmnt3 )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void ktmnt3_state::ktmnt3(machine_config &config)
 {
@@ -5746,14 +5748,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Konami Teenage Mutant Ninja Turtles: Basketball (model 13018)
   * PCB label: BH019
   * Sharp SM511 under epoxy (die label KMS73B, 793)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class ktmntbb_state : public hh_sm510_state
 {
@@ -5765,7 +5767,7 @@ public:
 	void ktmntbb(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ktmntbb )
 	PORT_START("IN.0") // S1
@@ -5787,6 +5789,8 @@ static INPUT_PORTS_START( ktmntbb )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void ktmntbb_state::ktmntbb(machine_config &config)
 {

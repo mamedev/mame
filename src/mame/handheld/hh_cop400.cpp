@@ -32,19 +32,19 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "bshipg.lh" // clickable
-#include "comparca.lh" // clickable
-#include "ctstein.lh" // clickable
+#include "bshipg.lh"
+#include "comparca.lh"
+#include "ctstein.lh"
 #include "einvaderc.lh"
-#include "funjacks.lh" // clickable
-#include "funrlgl.lh" // clickable
-#include "funtag.lh" // clickable
+#include "funjacks.lh"
+#include "funrlgl.lh"
+#include "funtag.lh"
 #include "h2hbaskbc.lh"
 #include "h2hhockeyc.lh"
 #include "h2hsoccerc.lh"
 #include "lafootb.lh"
-#include "lchicken.lh" // clickable
-#include "lightfgt.lh" // clickable
+#include "lchicken.lh"
+#include "lightfgt.lh"
 #include "lilcomp.lh"
 #include "mbaskb2.lh"
 #include "mdallas.lh"

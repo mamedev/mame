@@ -79,8 +79,8 @@ BTANB (ssystem3):
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_ssystem3.lh" // clickable
-#include "saitek_ssystem4.lh" // clickable
+#include "saitek_ssystem3.lh"
+#include "saitek_ssystem4.lh"
 
 
 namespace {
