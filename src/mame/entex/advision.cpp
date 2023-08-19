@@ -446,7 +446,7 @@ void advision_state::advision(machine_config &config)
 	m_screen->set_refresh_hz(4 * 14); // see notes
 	m_screen->set_vblank_time(0);
 	m_screen->set_size(960, 40 * 4 + 4);
-	m_screen->set_visarea(0, 480 - 1, 0, 40 * 4); // default setting
+	m_screen->set_visarea(0, 480 - 1, 0, 40 * 4 - 0); // default setting
 	m_screen->set_screen_update(FUNC(advision_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(advision_state::vblank));
 
