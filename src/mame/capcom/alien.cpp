@@ -166,8 +166,8 @@ u32 alien_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 			count ++;
 		}
 	}
-	return 0;
 #endif
+	return 0;
 }
 
 u8 alien_state::fpga_r()
