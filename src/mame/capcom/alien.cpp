@@ -84,8 +84,9 @@ class alien_state : public driver_device
 {
 public:
 	alien_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_vram(*this, "vram%d", 0U)
 	{ }
 
 	void alien(machine_config &config);
@@ -101,6 +102,7 @@ private:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr_array<uint64_t, 2> m_vram;
 
 	// driver_device overrides
 	virtual void machine_reset() override;
@@ -108,7 +110,64 @@ private:
 
 u32 alien_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+// mariojjl / mmaruchan has two RGB555 charsets at $36d80 & $150600 (pitch=128)
+// pingu has one at $96000
+// all Medalusion games also loads up a display list at $780000, which references above and
+// (presumably) do clipped ROP transfers to whatever the framebuffer VRAM is.
+#if 0
+	static int m_test_x = 128, m_test_y = 256, m_start_offs;
+
+	if(machine().input().code_pressed(KEYCODE_Z))
+		m_test_x+=4;
+
+	if(machine().input().code_pressed(KEYCODE_X))
+		m_test_x-=4;
+
+	if(machine().input().code_pressed(KEYCODE_A))
+		m_test_y++;
+
+	if(machine().input().code_pressed(KEYCODE_S))
+		m_test_y--;
+
+	if(machine().input().code_pressed(KEYCODE_Q))
+		m_start_offs+=0x2000;
+
+	if(machine().input().code_pressed(KEYCODE_W))
+		m_start_offs-=0x2000;
+
+	if(machine().input().code_pressed_once(KEYCODE_E))
+		m_start_offs+=0x1000;
+
+	if(machine().input().code_pressed_once(KEYCODE_R))
+		m_start_offs-=0x1000;
+
+	popmessage("%d %d %04x", m_test_x, m_test_y, m_start_offs);
+
+	bitmap.fill(0, cliprect);
+
+	int count = m_start_offs / 8;
+
+	for(int y = 0; y < m_test_y; y++)
+	{
+		for(int x = 0; x < m_test_x; x += 4)
+		{
+			for (int xi = 0; xi < 4; xi ++)
+			{
+				uint16_t color = (m_vram[0][count] >> (xi * 16)) & 0xffff;
+
+				u8 r = pal5bit((color >> 0) & 0x1f);
+				u8 g = pal5bit((color >> 5) & 0x1f);
+				u8 b = pal5bit((color >> 10) & 0x1f);
+
+				if(cliprect.contains(x + xi, y))
+					bitmap.pix(y, x + xi) = (r << 16) | (g << 8) | b;
+			}
+
+			count ++;
+		}
+	}
 	return 0;
+#endif
 }
 
 u8 alien_state::fpga_r()
@@ -125,10 +184,11 @@ void alien_state::alien_map(address_map &map)
 	map(0x04a00000, 0x04a00007).nopw(); // FPGA config
 	map(0x08000000, 0x08000007).portr("DSW");
 	map(0x0c000000, 0x0cffffff).ram(); // main RAM
-	map(0x10000000, 0x107fffff).ram().share("vram1"); // GPU 1 VRAM
-	map(0x11fc0000, 0x11ffffff).ram().share("vregs1"); // GPU 1 regs
-	//map(0x12000000, 0x127fffff).ram(); // GPU 2 VRAM
-	//map(0x13fc0000, 0x13ffffff).ram(); // GPU 2 regs
+	// TODO: convert to MB86292 devices
+	map(0x10000000, 0x107fffff).ram().share(m_vram[0]); // GPU 1 VRAM
+	map(0x11fc0000, 0x11ffffff).ram().share("vregs1");  // GPU 1 regs
+	map(0x12000000, 0x127fffff).ram().share(m_vram[1]); // GPU 2 VRAM
+	map(0x13fc0000, 0x13ffffff).ram().share("vregs2");  // GPU 2 regs
 	//map(0x18000000, 0x1800000f).r(FUNC(alien_state::test_r)).nopw(); // Alien CF ATA, other games have it other way
 }
 

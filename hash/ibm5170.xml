@@ -8602,7 +8602,8 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>Reuters</publisher>
 		<notes><![CDATA[
-Punts with a "Severe" error message at start of install operation
+win95/win98: Punts with a "Severe" error message at start of install operation (broken version check)
+Missing [modem] features, assume requiring a connection to a Reuters device such as sk101bl
 ]]></notes>
 		<info name="version" value="2.0R3" />
 		<part name="flop1" interface="floppy_3_5">
