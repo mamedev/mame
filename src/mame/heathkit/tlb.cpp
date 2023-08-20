@@ -167,7 +167,6 @@ void heath_tlb_device::io_map(address_map &map)
 	map(0x40, 0x47).mirror(0x18).rw(m_ace, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 	map(0x60, 0x60).mirror(0x1a).select(0x04).w(FUNC(heath_tlb_device::crtc_addr_w));
 	map(0x61, 0x61).mirror(0x1a).select(0x04).rw(FUNC(heath_tlb_device::crtc_reg_r), FUNC(heath_tlb_device::crtc_reg_w));
-
 	map(0x80, 0x80).mirror(0x1f).r(FUNC(heath_tlb_device::kbd_key_r));
 	map(0xa0, 0xa0).mirror(0x1f).r(FUNC(heath_tlb_device::kbd_flags_r));
 	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(heath_tlb_device::key_click_w));
@@ -237,9 +236,10 @@ uint16_t heath_tlb_device::translate_mm5740_b(uint16_t b)
 
 uint8_t heath_tlb_device::kbd_key_r()
 {
-	m_keyboard_irq_raised = false;
-	set_irq_line();
 	m_strobe = false;
+	m_keyboard_irq_raised = false;
+
+	set_irq_line();
 
 	// high bit is for control key pressed, this is handled in the ROM,
 	// no processing needed.
@@ -284,6 +284,7 @@ void heath_tlb_device::mm5740_data_ready_w(int state)
 		m_transchar = decode[translate_mm5740_b(m_mm5740->b_r())];
 		m_strobe = true;
 		m_keyboard_irq_raised = true;
+
 		set_irq_line();
 	}
 }
@@ -317,6 +318,7 @@ void heath_tlb_device::crtc_vsync_w(int val)
 void heath_tlb_device::serial_irq_w(int state)
 {
 	m_serial_irq_raised = bool(state);
+
 	set_irq_line();
 }
 
@@ -360,7 +362,7 @@ void heath_tlb_device::right_shift_w(int state)
 
 void heath_tlb_device::repeat_key_w(int state)
 {
-	// when repeat key pressed, set duty cycle to 0.5, else 0.
+	// when repeat key pressed, set duty cycle to 50%, else 0%.
 	m_repeat_clock->set_duty_cycle(state == 0 ? 0.5 : 0);
 }
 
@@ -390,7 +392,7 @@ MC6845_UPDATE_ROW(heath_tlb_device::crtc_update_row)
 			}
 
 			// get pattern of pixels for that character scanline
-			uint8_t const gfx = m_p_chargen[(chr<<4) | ra] ^ inv;
+			uint8_t const gfx = m_p_chargen[(chr << 4) | ra] ^ inv;
 
 			// Display a scanline of a character (8 pixels)
 			for (int b = 0; 8 > b; ++b)
@@ -454,7 +456,7 @@ static INPUT_PORTS_START( tlb )
 
 	PORT_START("X2")
 	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("; :")        PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR(':')
-	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\' \"")      PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR('\'') PORT_CHAR('"')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("' \"")       PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR('\'') PORT_CHAR('"')
 	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("{ }")        PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('{') PORT_CHAR('}')
 	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return")     PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
 	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -566,7 +568,7 @@ static INPUT_PORTS_START( tlb )
 	PORT_DIPNAME( 0x30, 0x00, "Parity")              PORT_DIPLOCATION("SW401:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR(None))
 	PORT_DIPSETTING(    0x10, "Odd")
-	PORT_DIPSETTING(    0x20, "None")
+	PORT_DIPSETTING(    0x20, DEF_STR(None))
 	PORT_DIPSETTING(    0x30, "Even")
 	PORT_DIPNAME( 0x40, 0x00, "Parity Type")         PORT_DIPLOCATION("SW401:7")
 	PORT_DIPSETTING(    0x00, DEF_STR(Normal))
@@ -640,8 +642,8 @@ static INPUT_PORTS_START( super19 )
 	PORT_DIPSETTING(    0x00, DEF_STR(Normal))
 	PORT_DIPSETTING(    0x02, "Slow")
 	PORT_DIPNAME( 0x80, 0x00, "DEC Keypad Codes")    PORT_DIPLOCATION("SW402:8")
-	PORT_DIPSETTING(    0x00, "Off")
-	PORT_DIPSETTING(    0x80, "On")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x80, DEF_STR(On))
 INPUT_PORTS_END
 
 
@@ -687,8 +689,8 @@ static INPUT_PORTS_START( ultra19 )
 	PORT_DIPSETTING(    0x40, "Fast Blink")
 	PORT_DIPSETTING(    0x60, "Slow Blink")
 	PORT_DIPNAME( 0x80, 0x00, "Interlace Scan Mode") PORT_DIPLOCATION("SW402:8")
-	PORT_DIPSETTING(    0x00, "Off")
-	PORT_DIPSETTING(    0x80, "On")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x80, DEF_STR(On))
 INPUT_PORTS_END
 
 
@@ -732,12 +734,12 @@ static INPUT_PORTS_START( gp19 )
 
 	PORT_START("SW1")
 	PORT_DIPNAME( 0x03, 0x01, "Trailing Characters for Tektronix Message")   PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(    0x00, "None")
+	PORT_DIPSETTING(    0x00, DEF_STR(None))
 	PORT_DIPSETTING(    0x01, "CR")
-	PORT_DIPSETTING(    0x02, "None")
+	PORT_DIPSETTING(    0x02, DEF_STR(None))
 	PORT_DIPSETTING(    0x03, "CR,EOT")
 	PORT_DIPNAME( 0x04, 0x01, "Shift Key")                                   PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, "Normal")
+	PORT_DIPSETTING(    0x00, DEF_STR(Normal))
 	PORT_DIPSETTING(    0x04, "Shift key inverts CAPS LOCK")
 	PORT_DIPNAME( 0x08, 0x00, "Terminal Transmission Rate")                  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "Only limited by baud rate")
