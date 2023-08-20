@@ -1707,9 +1707,20 @@ void sinistar_state::cockpit(machine_config &config)
 	SPEAKER(config, "rspeaker").rear_center();
 	MC1408(config, "rdac").add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
 
-	// uncomment this to route front/rear to left/right
-	//subdevice<speaker_device>("speaker")->front_left();
-	//subdevice<speaker_device>("rspeaker")->front_right();
+	// Williams "cheated" with the cockpit by treating stereo audio as a surround sound setup.
+	// While the speakers in the cockpit cabinet use center front/rear placement, the logical routing
+	// in MAME should be left/right for two reasons:
+	//
+	// 1) the current OSD code doesn't allow for re-routing speakers yet, but if the end-user
+	// desires accuracy then physically placing speakers in front and behind the player will work instead.
+	//
+	// 2) routing the sound to center front/rear actually duplicates the audio in both left/right
+	// channels, which ruins the stereo separation effect.  This effect is only audible when routing to
+	// left/right and is more accurate to what the developers originally intended.
+	//
+	// comment this code to re-route left/right to front/rear
+	subdevice<speaker_device>("speaker")->front_left();
+	subdevice<speaker_device>("rspeaker")->front_right();
 
 	// pia
 	INPUT_MERGER_ANY_HIGH(config, "soundirq_b").output_handler().set_inputline("soundcpu_b", M6808_IRQ_LINE);
@@ -3160,7 +3171,7 @@ There is known to be a "perfect" version of Sinistar, that being the original ve
 
 Sinistar's cockpit cabinet features two sound boards, one for the front speakers and another for the rear.  The rear
   sound board uses a different ROM, Video Sound ROM 10.  It adds a slight delay to some of the sound effects,
-  producing a reverberation effect, and ignores the extra ship and bounce effects.  It has no speech ROMs.
+  producing a stereo separation effect, and ignores the extra ship and bounce effects.  It has no speech ROMs.
 
 If you disconnect the speech ROMs from the upright sound board, Video Sound ROM 9 will play two replacement sound
   effects for the Sinistar's missing audio.  Any line of dialogue will be replaced by a generic alarm noise,
