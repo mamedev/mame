@@ -611,9 +611,7 @@ void pcipc_state::pcipctx(machine_config &config)
 void pcipc_state::pcinv3(machine_config &config)
 {
 	pcipc_state::pcipc(config);
-//	RIVA128(config.replace(), "pci:12.0", 0);
-	MGA2064W(config.replace(), "pci:12.0", 0);
-
+	RIVA128(config.replace(), "pci:12.0", 0);
 }
 
 void pcipc_state::pciagp(machine_config &config)
@@ -686,6 +684,9 @@ ROM_START(pcipctx)
 	ROM_REGION32_LE(0x40000, "pci:07.0", 0) /* PC bios */
 	ROM_SYSTEM_BIOS(0, "ga586t2", "Gigabyte GA-586T2") // ITE 8679 I/O
 	ROMX_LOAD("gb_ga586t2.bin",  0x20000, 0x20000, CRC(3a50a6e1) SHA1(dea859b4f1492d0d08aacd260ed1e83e00ebac08), ROM_BIOS(0))
+
+	ROM_REGION(0x8000,"ibm_vga", 0)
+	ROM_LOAD("ibm-vga.bin", 0x00000, 0x8000, BAD_DUMP CRC(74e3fadb) SHA1(dce6491424f1726203776dfae9a967a98a4ba7b5) )
 ROM_END
 
 ROM_START(pcinv3)
