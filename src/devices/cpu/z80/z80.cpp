@@ -1078,8 +1078,8 @@ DEF( ldi() )
 	CALL nomreq_addr(2);
 	THEN
 		set_f(F & (SF | ZF | CF));
-		if ((A + TDAT8) & 0x02) F |= YF; /* bit 1 -> flag 5 */
-		if ((A + TDAT8) & 0x08) F |= XF; /* bit 3 -> flag 3 */
+		if ((A + TDAT8) & 0x02) F |= YF; // bit 1 -> flag 5
+		if ((A + TDAT8) & 0x08) F |= XF; // bit 3 -> flag 3
 		HL++; DE++; BC--;
 		if(BC) F |= VF;
 ENDDEF
@@ -1098,8 +1098,8 @@ DEF( cpi() )
 		HL++; BC--;
 		set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
 		if (F & HF) res -= 1;
-		if (res & 0x02) F |= YF; /* bit 1 -> flag 5 */
-		if (res & 0x08) F |= XF; /* bit 3 -> flag 3 */
+		if (res & 0x02) F |= YF; // bit 1 -> flag 5
+		if (res & 0x08) F |= XF; // bit 3 -> flag 3
 		if (BC) F |= VF;
 ENDDEF
 
@@ -1159,9 +1159,9 @@ DEF( ldd() )
 	CALL wm();
 	CALL nomreq_addr(2);
 	THEN
-		F &= SF | ZF | CF;
-		if ((A + TDAT8) & 0x02) F |= YF; /* bit 1 -> flag 5 */
-		if ((A + TDAT8) & 0x08) F |= XF; /* bit 3 -> flag 3 */
+		set_f(F & (SF | ZF | CF));
+		if ((A + TDAT8) & 0x02) F |= YF; // bit 1 -> flag 5
+		if ((A + TDAT8) & 0x08) F |= XF; // bit 3 -> flag 3
 		HL--; DE--; BC--;
 		if (BC) F |= VF;
 ENDDEF
@@ -1182,8 +1182,8 @@ DEF( cpd() )
 		HL--; BC--;
 		set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
 		if (F & HF) res -= 1;
-		if (res & 0x02) F |= YF; /* bit 1 -> flag 5 */
-		if (res & 0x08) F |= XF; /* bit 3 -> flag 3 */
+		if (res & 0x02) F |= YF; // bit 1 -> flag 5
+		if (res & 0x08) F |= XF; // bit 3 -> flag 3
 		if (BC) F |= VF;
 ENDDEF
 
@@ -1243,6 +1243,8 @@ DEF( ldir() )
 		THEN
 			PC -= 2;
 			WZ = PC + 1;
+			F &= ~(YF | XF);
+			F |= (PC >> 8) & (YF | XF);
 	ENDIF
 ENDDEF
 
@@ -1258,8 +1260,34 @@ DEF( cpir() )
 		THEN
 			PC -= 2;
 			WZ = PC + 1;
+			F &= ~(YF | XF);
+			F |= (PC >> 8) & (YF | XF);
 	ENDIF
 ENDDEF
+
+inline void z80_device::block_io_interrupted_flags()
+{
+	F &= ~(YF | XF);
+	F |= (PC >> 8) & (YF | XF);
+	if (F & CF)
+	{
+		F &= ~HF;
+		if (TDAT8 & 0x80)
+		{
+			F ^= (SZP[(B - 1) & 0x07] ^ PF) & PF;
+			if ((B & 0x0f) == 0x00) F |= HF;
+		}
+		else
+		{
+			F ^= (SZP[(B + 1) & 0x07] ^ PF) & PF;
+			if ((B & 0x0f) == 0x0f) F |= HF;
+		}
+	}
+	else
+	{
+		F ^=(SZP[B & 0x07] ^ PF) & PF;
+	}
+}
 
 /***************************************************************
  * INIR
@@ -1272,6 +1300,7 @@ DEF( inir() )
 		CALL nomreq_addr(5);
 		THEN
 			PC -= 2;
+			block_io_interrupted_flags();
 	ENDIF
 ENDDEF
 
@@ -1286,6 +1315,7 @@ DEF( otir() )
 		CALL nomreq_addr(5);
 		THEN
 			PC -= 2;
+			block_io_interrupted_flags();
 	ENDIF
 ENDDEF
 
@@ -1301,6 +1331,8 @@ DEF( lddr() )
 		THEN
 			PC -= 2;
 			WZ = PC + 1;
+			F &= ~(YF | XF);
+			F |= (PC >> 8) & (YF | XF);
 	ENDIF
 ENDDEF
 
@@ -1316,6 +1348,8 @@ DEF( cpdr() )
 		THEN
 			PC -= 2;
 			WZ = PC + 1;
+			F &= ~(YF | XF);
+			F |= (PC >> 8) & (YF | XF);
 	ENDIF
 ENDDEF
 
@@ -1330,6 +1364,7 @@ DEF( indr() )
 		CALL nomreq_addr(5);
 		THEN
 			PC -= 2;
+			block_io_interrupted_flags();
 	ENDIF
 ENDDEF
 
@@ -1344,6 +1379,7 @@ DEF( otdr() )
 		CALL nomreq_addr(5);
 		THEN
 			PC -= 2;
+			block_io_interrupted_flags();
 	ENDIF
 ENDDEF
 

@@ -243,6 +243,7 @@ protected:
 	ops_type otdr();
 	void ei();
 	void set_f(u8 f);
+	void block_io_interrupted_flags();
 
 	ops_type next_op();
 	virtual void check_interrupts();
