@@ -760,6 +760,16 @@ void t10mmc::ExecCommand()
 		break;
 	}
 
+	case T10SBC_CMD_SEEK_10:
+		m_lba = get_u32be(&command[2]);
+
+		m_device->logerror("T10SBC: SEEK EXTENDED to LBA %x\n", m_lba);
+
+		m_phase = SCSI_PHASE_STATUS;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
+		m_transfer_length = 0;
+		break;
+
 	default:
 		t10spc::ExecCommand();
 	}
