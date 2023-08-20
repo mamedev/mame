@@ -9,14 +9,16 @@
 #define LOG_WARN      (1U << 1)
 #define LOG_REGS      (1U << 2)
 #define LOG_CRTC      (1U << 3)
+#define LOG_DASM      (1U << 4) // display list FIFO commands
 
-#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_REGS | LOG_CRTC)
+#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_REGS | LOG_CRTC | LOG_DASM)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGWARN(...)            LOGMASKED(LOG_WARN, __VA_ARGS__)
 #define LOGREGS(...)            LOGMASKED(LOG_REGS, __VA_ARGS__)
 #define LOGCRTC(...)            LOGMASKED(LOG_CRTC, __VA_ARGS__)
+#define LOGDASM(...)            LOGMASKED(LOG_DASM, __VA_ARGS__)
 
 //DEFINE_DEVICE_TYPE(MB86290A, mb86290a_device, "mb86290a", "Fujitsu MB86290A \"Cremson\" Graphics Controller")
 //DEFINE_DEVICE_TYPE(MB86291, mb86291_device, "mb86291", "Fujitsu MB86291 \"Scarlet\" Graphics Controller")
@@ -50,6 +52,9 @@ mb86292_device::mb86292_device(machine_config const &mconfig, char const *tag, d
 void mb86292_device::device_start()
 {
 	save_item(NAME(m_dce));
+	save_item(STRUCT_MEMBER(m_displaylist, lsa));
+	save_item(STRUCT_MEMBER(m_displaylist, lco));
+	save_item(STRUCT_MEMBER(m_displaylist, lreq));
 	save_item(STRUCT_MEMBER(m_crtc, hdp));
 	save_item(STRUCT_MEMBER(m_crtc, hdb));
 	save_item(STRUCT_MEMBER(m_crtc, hsp));
@@ -58,11 +63,19 @@ void mb86292_device::device_start()
 	save_item(STRUCT_MEMBER(m_crtc, vsp));
 	save_item(STRUCT_MEMBER(m_crtc, vdp));
 	save_item(STRUCT_MEMBER(m_crtc, vsw));
+	save_item(STRUCT_MEMBER(m_fb, xres));
+	save_item(STRUCT_MEMBER(m_clayer, cm));
+	save_item(STRUCT_MEMBER(m_clayer, cc));
+	save_item(STRUCT_MEMBER(m_clayer, ch));
+	save_item(STRUCT_MEMBER(m_clayer, cw));
+	save_item(STRUCT_MEMBER(m_clayer, cda));
 }
 
 void mb86292_device::device_reset()
 {
 	m_dce = 0;
+	m_displaylist.lsa = m_displaylist.lco = 0;
+	m_displaylist.lreq = false;
 }
 
 void mb86292_device::vregs_map(address_map &map)
@@ -79,9 +92,39 @@ void mb86292_device::vregs_map(address_map &map)
 //  map(0x00020, 0x00023) IST Interrupt STatus
 //  map(0x00024, 0x00027) MASK Interrupt MASK
 //  map(0x0002c, 0x0002c) SRST Software ReSeT
-//  map(0x00040, 0x00043) LSA display List Source Address
-//  map(0x00044, 0x00047) LCO display List COunt
-//  map(0x00048, 0x00048) LREQ display List transfer REQuest
+	// LSA display List Source Address
+	map(0x00040, 0x00043).lrw32(
+		NAME([this] (offs_t offset) {
+			return m_displaylist.lsa;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_displaylist.lsa);
+			m_displaylist.lsa &= 0xffffff;
+			LOGREGS("LSA %08x & %08x -> %08x\n", data, mem_mask, m_displaylist.lsa);
+		})
+	);
+	// LCO display List COunt
+	map(0x00044, 0x00047).lrw32(
+		NAME([this] (offs_t offset) {
+			return m_displaylist.lco;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_displaylist.lco);
+			m_displaylist.lco &= 0xffffff;
+			LOGREGS("LCO %08x & %08x -> %08x\n", data, mem_mask, m_displaylist.lco);
+		})
+	);
+	// LREQ display List transfer REQuest
+	map(0x00048, 0x00048).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_displaylist.lreq;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_displaylist.lreq = bool(BIT(data, 0));
+			LOGREGS("LREQ %02x\n", data, m_displaylist.lreq);
+			process_display_list();
+		})
+	);
 //  map(0x0fffc, 0x0ffff) MMR Memory I/F Mode Register
 
 	// 0x1fd0000 Display engine DisplayBase
@@ -207,9 +250,39 @@ void mb86292_device::vregs_map(address_map &map)
 //  map(0x1001a, 0x1001b) WX Window position Y
 //  map(0x1001c, 0x1001d) WW Window Width
 //  map(0x1001e, 0x1001f) WH Window Height
-//  map(0x10020, 0x10023) CM C[onsole] layer Mode
+	// CM C[onsole] layer Mode
+	map(0x10020, 0x10023).lrw32(
+		NAME([this] (offs_t offset) {
+			return m_clayer.cm;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_clayer.cm);
+			m_clayer.ch = (m_clayer.cm & 0xfff) + 1;
+			m_clayer.cw = ((m_clayer.cm >> 16) & 0x3f) * 64;
+			m_clayer.cc = bool(BIT(m_clayer.cm, 31));
+			LOGREGS("CM %08x & %08x -> CW %d CH %d CC %d\n"
+				, data, mem_mask
+				, m_clayer.cw
+				, m_clayer.ch
+				, m_clayer.cc
+			);
+		})
+	);
 //  map(0x10024, 0x10027) COA C layer Origin Address
-//  map(0x10028, 0x1002b) CDA C layer Display Address
+	// CDA C layer Display Address
+	map(0x10028, 0x1002b).lrw32(
+		NAME([this] (offs_t offset) {
+			return m_clayer.cda;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_clayer.cda);
+			m_clayer.cda &= 0x3ffffff;
+			LOGREGS("CDA %08x & %08x -> %08x\n"
+				, data, mem_mask
+				, m_clayer.cda
+			);
+		})
+	);
 //  map(0x1002c, 0x1002d) CDX C layer Display position X
 //  map(0x1002e, 0x1002f) CDY C layer Display position Y
 //  map(0x10030, 0x10033) WM W[indow] layer Mode
@@ -290,7 +363,17 @@ void mb86292_device::vregs_map(address_map &map)
 //  map(0x3042c, 0x3042f) MDR3 MoDe Register 3 (texture)
 //  map(0x30430, 0x30433) MDR4 MoDe Register 4 (BitBLT)
 //  map(0x30440, 0x30443) FBR Frame Buffer Register base address
-//  map(0x30444, 0x30447) XRES X RESoultion
+	// XRES X RESoultion
+	map(0x30444, 0x30447).lrw32(
+		NAME([this] (offs_t offset) {
+			return m_fb.xres;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_fb.xres);
+			m_fb.xres &= 0xfff;
+			LOGCRTC("XRES %04x & %04x -> %d\n", data, mem_mask, m_fb.xres);
+		})
+	);
 //  map(0x30448, 0x3044b) ZBR Z-Buffer Register base address
 //  map(0x3044c, 0x3044f) TBR Texture memory Base address
 //  map(0x30450, 0x30453) PFBR 2d Polygon Flag Buffer base address
@@ -315,6 +398,10 @@ void mb86292_device::vregs_map(address_map &map)
 //  map(0x38048, 0x3804b) GMDR2 Geometry MoDe Register 2 (triangle)
 //  map(0x38400, 0x38403) DFIFOG Display List FIFO for Geometry
 }
+
+/*
+ * CRTC section
+ */
 
 void mb86292_device::reconfigure_screen()
 {
@@ -360,6 +447,85 @@ void mb86292_device::reconfigure_screen()
 	screen().configure(htp, vtr, visarea, screen().frame_period().attoseconds());
 }
 
+/*
+ *
+ * Display list
+ *
+ */
+
+// Quick and dirty snippet to have something drawn,
+// this is all done in FIFO and requires a timer (and loads of profiling ...)
+void mb86292_device::process_display_list()
+{
+	if (!m_displaylist.lreq)
+		return;
+
+	m_displaylist.cur_address = m_displaylist.lsa;
+	const u32 count = m_displaylist.lco == 0 ? 0x1000000 : (m_displaylist.lco << 2);
+	const u32 end_address = m_displaylist.lsa + count;
+//  printf("%08x %08x %08x\n", m_displaylist.cur_address, end_address, count);
+
+	while (m_displaylist.cur_address < end_address)
+	{
+		u32 opcode = vram_read_dword(m_displaylist.cur_address);
+		LOGDASM("PC=%08x %08x ", m_displaylist.cur_address, opcode);
+		const u8 op_type = opcode >> 24;
+		const u8 op_command = (opcode >> 16) & 0xff;
+		u16 param_list = 1;
+		switch(op_type)
+		{
+			case 0x0f:
+			{
+				u32 saddr = vram_read_dword(m_displaylist.cur_address + 0x04);
+				u32 sstride = vram_read_dword(m_displaylist.cur_address + 0x08);
+				u16 sry = vram_read_word(m_displaylist.cur_address + 0x0e);
+				u16 srx = vram_read_word(m_displaylist.cur_address + 0x0c);
+				u32 daddr = vram_read_dword(m_displaylist.cur_address + 0x10);
+				u32 dstride = vram_read_dword(m_displaylist.cur_address + 0x14);
+				u16 dry = vram_read_word(m_displaylist.cur_address + 0x1a);
+				u16 drx = vram_read_word(m_displaylist.cur_address + 0x18);
+				u16 brsizey = vram_read_word(m_displaylist.cur_address + 0x1e);
+				u16 brsizex = vram_read_word(m_displaylist.cur_address + 0x1c);
+				param_list += 7;
+				LOGDASM("BltCopyAlternateP (%s)\n", op_command == 0x44 ? "TopLeft" : "<unknown>");
+				LOGDASM("\t%08x %08x %04x|%04x\n"
+					, saddr
+					, sstride
+					, sry
+					, srx
+				);
+				LOGDASM("\t%08x %08x %04x|%04x\n"
+					, daddr
+					, dstride
+					, dry
+					, drx
+				);
+				LOGDASM("\t%04x|%04x\n", brsizey, brsizex);
+				for (u16 yi = 0; yi < brsizey; yi ++)
+				{
+					const u32 src_ptr = saddr + (((sry + yi) * sstride) << 1);
+					const u32 dst_ptr = daddr + (((dry + yi) * dstride) << 1);
+					for (u16 xi = 0; xi < brsizex; xi ++)
+					{
+						u16 src_pixel = vram_read_word(src_ptr + ((srx + xi) << 1));
+						vram_write_word(dst_ptr + ((drx + xi) << 1), src_pixel);
+					}
+				}
+				break;
+			}
+			default:
+				LOGDASM("<unsupported>\n");
+				break;
+		}
+
+		m_displaylist.cur_address += param_list * 4;
+	}
+
+
+	m_displaylist.lreq = false;
+}
+
+
 u32 mb86292_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
 {
 	if (!BIT(m_dce, 15) || ((m_dce & 0x0f) == 0))
@@ -368,10 +534,18 @@ u32 mb86292_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, r
 		return 0;
 	}
 
-// mariojjl / mmaruchan has two RGB555 charsets at $36d80 & $150600 (pitch=128)
-// pingu has one at $96000
-// all Medalusion games also loads up a display list at $780000, which references above and
-// (presumably) do clipped ROP transfers to whatever the framebuffer VRAM is.
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		const u32 clayer_addr = (m_clayer.cw * y);
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			u16 pixel = vram_read_word(clayer_addr + (x << 1));
+			bitmap.pix(y, x) = pal555(pixel, 10, 5, 0);
+		}
+	}
+
+// quick debug GFX viewer, to be moved as a debug switch
 #if 0
 	static int m_test_x = 128, m_test_y = 256, m_start_offs;
 

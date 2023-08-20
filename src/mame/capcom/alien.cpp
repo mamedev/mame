@@ -183,12 +183,14 @@ void alien_state::alien(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &alien_state::alien_map);
 	m_maincpu->set_force_no_drc(true);
 
+	// Configured as FCRAM 16MBit with 8MB / 64-bit data bus thru MMR register
 	RAM(config, m_vram);
 	m_vram->set_default_size("8M");
 	m_vram->set_default_value(0);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// FIXME: configured by main GPU
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_screen_update(FUNC(alien_state::screen_update));
