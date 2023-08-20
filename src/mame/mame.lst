@@ -2275,10 +2275,20 @@ m_gndgit                        // Golden Nudge It (Barcrest)
 m_lndg                          // Lucky Nudge (Leisure Games)
 m_mtchit                        // Match It (Barcrest)
 m_mtchup                        // Match Up (Barcrest)
-
-@source:barcrest/mpu2.cpp
-m2hilite                        // Hi-Lights (Barcrest) (MPU2)
-m2svlite                        // Silver Lights (Barcrest) (MPU2)
+m2comet                         // Comet Catcher (Leisure Games)
+m2frpoly                        // Fruitopoly (VFS)
+m2hilite                        // Hi Lights (Barcrest)
+m2jmt9                          // JMT9 Test Program (Barcrest)
+m2luckyl                        // Lucky Line (Leisure Games)
+m2luckys                        // Lucky Strike (Associated Leisure)
+m2rockon                        // Rock On (Barcrest)
+m2splite                        // Spot Light (Barcrest)
+m2splitea                       //
+m2spliteb                       //
+m2sstar                         // Super Star (Barcrest)
+m2starl                         // Star Light (Barcrest)
+m2svlite                        // Silver Lights
+m2triple                        // Triple Chance (VFS)
 
 @source:barcrest/mpu3.cpp
 m3acech                         // Ace Chase (Bwb)
