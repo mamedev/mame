@@ -481,7 +481,7 @@ void matrox_vga_device::recompute_params()
 		// TODO: stub, derives from RAMDAC PLLs (MGA2064W has usual rates of 220 MHz)
 		case 2:
 		default:
-			xtal = XTAL(50'000'000).value();
+			xtal = XTAL(50'000'000 / 2).value();
 			break;
 	}
 
@@ -501,7 +501,8 @@ uint16_t matrox_vga_device::offset()
 uint32_t matrox_vga_device::start_addr()
 {
 	// TODO: fails VBEtest scrolling tests
-//  if (m_mgamode)
+	if (m_mgamode)
+		popmessage("%08x", vga.crtc.start_addr);
 //      return (vga.crtc.start_addr << 4);
 
 	return svga_device::start_addr();
