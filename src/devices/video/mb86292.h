@@ -8,7 +8,7 @@
 #include "machine/ram.h"
 
 class mb86292_device : public device_t,
-                       public device_video_interface
+					   public device_video_interface
 {
 public:
 	mb86292_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -30,6 +30,15 @@ protected:
 
 	required_device<screen_device> m_screen;
 	required_device<ram_device> m_vram;
+
+	void reconfigure_screen();
+private:
+	u16 m_dce = 0;
+	struct {
+		u16 htp = 0, hdp = 0, hdb = 0, hsp = 0;
+		u16 vtr = 0, vsp = 0, vdp = 0;
+		u8 hsw = 0, vsw = 0;
+	} m_crtc;
 };
 
 DECLARE_DEVICE_TYPE(MB86292, mb86292_device)
