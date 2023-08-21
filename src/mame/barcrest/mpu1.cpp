@@ -75,22 +75,6 @@ namespace {
 class mpu12_base_state : public driver_device
 {
 public:
-	mpu12_base_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_nmi_timer(*this, "nmi"),
-		m_pia1(*this, "pia1"),
-		m_pia2(*this, "pia2"),
-		m_lamps(*this, "lamp%u", 0U),
-		m_dac(*this, "dac"),
-		m_samples(*this, "samples"),
-		m_pia3(*this, "pia3"),
-		m_pia4(*this, "pia4"),
-		m_nvram(*this, "nvram", 0x100, ENDIANNESS_BIG)
-	{ }
-
-	void mpu12_base(machine_config &config);
-
 	DECLARE_INPUT_CHANGED_MEMBER(coin_input);
 
 protected:
@@ -102,6 +86,19 @@ protected:
 		RELAY_BOTH = 0x3
 	};
 
+	mpu12_base_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_nmi_timer(*this, "nmi"),
+		m_pia1(*this, "pia1"),
+		m_pia2(*this, "pia2"),
+		m_lamps(*this, "lamp%u", 0U),
+		m_dac(*this, "dac"),
+		m_samples(*this, "samples")
+	{ }
+
+	void mpu12_base(machine_config &config);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -109,8 +106,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(change_pia2a_bit7);
 
 	void pia_lamp_update(int data) { update_pia_lamps(); }
-	uint8_t nvram_r(offs_t offset) { return m_nvram[offset] & 0xf; }
-	void nvram_w(offs_t offset, uint8_t data) { m_nvram[offset] = data & 0xf; }
 	virtual void update_pia_lamps() {}
 	void set_lamp(bool state, int lamp1, int lamp2 = 0, lamp_flags flags = lamp_flags::IGNORE_RELAY);
 	void update_lamp_relay(uint8_t state);
@@ -121,8 +116,6 @@ protected:
 	void coin_lockout_w(bool state);
 
 	void mpu1_map(address_map &map);
-	void mpu2_map(address_map &map);
-	void mpu2_nvram_map(address_map &map);
 
 	uint8_t m_lamp_relay;
 	lamp_flags m_lamp_flags_pia2b[8];
@@ -147,11 +140,6 @@ protected:
 	output_finder<56> m_lamps;
 	required_device<dac_1bit_device> m_dac;
 	required_device<fruit_samples_device> m_samples;
-
-	// MPU2 devices
-	optional_device<pia6821_device> m_pia3;
-	optional_device<pia6821_device> m_pia4;
-	memory_share_creator<uint8_t> m_nvram;
 };
 
 class mpu1_state : public mpu12_base_state
@@ -162,13 +150,13 @@ public:
 		m_reels(*this, "emreel%u", 1U)
 	{ }
 
-	void add_em_reels(machine_config &config, int symbols, attotime period);
 	void mpu1(machine_config &config);
 	void mpu1_lg(machine_config &config);
 
 protected:
 	enum { STEPS_PER_SYMBOL = 20 };
 
+	void add_em_reels(machine_config &config, int symbols, attotime period);
 	template <unsigned Reel> void reel_sample_cb(int state);
 
 	void pia1_portb_w(uint8_t data);
@@ -188,8 +176,11 @@ class mpu2_em_state : public mpu1_state
 public:
 	mpu2_em_state(const machine_config &mconfig, device_type type, const char *tag) :
 		mpu1_state(mconfig, type, tag),
+		m_pia3(*this, "pia3"),
+		m_pia4(*this, "pia4"),
 		m_disp_persist_timers(*this, "disp_timer%u", 0U),
-		m_digits(*this, "digit%u", 0U)
+		m_digits(*this, "digit%u", 0U),
+		m_nvram(*this, "nvram", 0x100, ENDIANNESS_BIG)
 	{ }
 
 	void mpu2_em(machine_config &config);
@@ -208,12 +199,20 @@ private:
 	void pia1_portb_lg_w(uint8_t data);
 	void pia3_porta_w(uint8_t data);
 	void pia3_portb_disp_w(uint8_t data);
+	uint8_t nvram_r(offs_t offset) { return m_nvram[offset] & 0xf; }
+	void nvram_w(offs_t offset, uint8_t data) { m_nvram[offset] = data & 0xf; }
 	virtual void update_pia_lamps() override;
+
+	void mpu2_em_map(address_map &map);
 
 	uint8_t m_disp_digit;
 
+	required_device<pia6821_device> m_pia3;
+	required_device<pia6821_device> m_pia4;
 	required_device_array<timer_device, 8> m_disp_persist_timers;
 	output_finder<8> m_digits;
+
+	memory_share_creator<uint8_t> m_nvram;
 };
 
 class mpu2_stepper_state : public mpu12_base_state
@@ -221,6 +220,8 @@ class mpu2_stepper_state : public mpu12_base_state
 public:
 	mpu2_stepper_state(const machine_config &mconfig, device_type type, const char *tag) :
 		mpu12_base_state(mconfig, type, tag),
+		m_pia3(*this, "pia3"),
+		m_pia4(*this, "pia4"),
 		m_reels(*this, "reel%u", 0U)
 	{ }
 
@@ -250,9 +251,13 @@ private:
 	void reel_w(int reel, uint8_t data);
 	virtual void update_pia_lamps() override;
 
+	void mpu2_stepper_map(address_map &map);
+
 	uint8_t m_optos[3];
 	uint8_t m_reel1;
 
+	required_device<pia6821_device> m_pia3;
+	required_device<pia6821_device> m_pia4;
 	required_device_array<stepper_device, 3> m_reels;
 };
 
@@ -265,19 +270,21 @@ void mpu12_base_state::mpu1_map(address_map &map)
 	map(0x2004, 0x2007).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 }
 
-void mpu12_base_state::mpu2_map(address_map &map)
+void mpu2_em_state::mpu2_em_map(address_map &map)
+{
+	mpu1_map(map);
+
+	map(0x2400, 0x24ff).ram().rw(FUNC(mpu2_em_state::nvram_r), FUNC(mpu2_em_state::nvram_w)).share("nvram");
+	map(0x4000, 0x4003).rw(m_pia3, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x4008, 0x400b).rw(m_pia4, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+}
+
+void mpu2_stepper_state::mpu2_stepper_map(address_map &map)
 {
 	mpu1_map(map);
 
 	map(0x4000, 0x4003).rw(m_pia3, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x4008, 0x400b).rw(m_pia4, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-}
-
-void mpu12_base_state::mpu2_nvram_map(address_map &map)
-{
-	mpu2_map(map);
-
-	map(0x2400, 0x24ff).ram().rw(FUNC(mpu12_base_state::nvram_r), FUNC(mpu12_base_state::nvram_w)).share("nvram");
 }
 
 void mpu1_state::pia1_portb_w(uint8_t data)
@@ -1161,7 +1168,7 @@ void mpu2_em_state::mpu2_em(machine_config &config)
 {
 	mpu12_base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu2_em_state::mpu2_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu2_em_state::mpu2_em_map);
 
 	m_pia1->writepb_handler().set(FUNC(mpu2_em_state::pia1_portb_w));
 
@@ -1202,8 +1209,6 @@ void mpu2_em_state::mpu2_em_starl(machine_config &config)
 {
 	mpu2_em(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu2_em_state::mpu2_nvram_map);
-
 	m_pia1->writepb_handler().set(FUNC(mpu2_em_state::pia1_portb_starl_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -1233,7 +1238,7 @@ void mpu2_stepper_state::mpu2_stepper(machine_config &config)
 {
 	mpu12_base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu2_stepper_state::mpu2_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu2_stepper_state::mpu2_stepper_map);
 
 	m_pia2->readpa_handler().set(FUNC(mpu2_stepper_state::pia2_porta_r));
 	m_pia2->writepa_handler().set(FUNC(mpu2_stepper_state::pia2_porta_w));
