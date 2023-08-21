@@ -22,6 +22,8 @@
 #define LOGDASM(...)            LOGMASKED(LOG_DASM, __VA_ARGS__)
 #define LOGIRQ(...)             LOGMASKED(LOG_IRQ, __VA_ARGS__)
 
+#define DEBUG_VRAM_VIEWER 0
+
 //DEFINE_DEVICE_TYPE(MB86290A, mb86290a_device, "mb86290a", "Fujitsu MB86290A \"Cremson\" Graphics Controller")
 //DEFINE_DEVICE_TYPE(MB86291, mb86291_device, "mb86291", "Fujitsu MB86291 \"Scarlet\" Graphics Controller")
 DEFINE_DEVICE_TYPE(MB86292, mb86292_device, "mb86292", "Fujitsu MB86292 \"Orchid\" Graphics Controller")
@@ -41,10 +43,12 @@ DEFINE_DEVICE_TYPE(MB86292, mb86292_device, "mb86292", "Fujitsu MB86292 \"Orchid
 mb86292_device::mb86292_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
+	, device_memory_interface(mconfig, *this)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_vram(*this, finder_base::DUMMY_TAG)
 	, m_xint_cb(*this)
 {
+	m_draw_io_space_config = address_space_config("draw_regs", ENDIANNESS_LITTLE, 32, 16, 0, address_map_constructor(FUNC(mb86292_device::draw_io_map), this));
 }
 
 mb86292_device::mb86292_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
@@ -52,9 +56,17 @@ mb86292_device::mb86292_device(machine_config const &mconfig, char const *tag, d
 {
 }
 
+device_memory_interface::space_config_vector mb86292_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_IO, &m_draw_io_space_config)
+	};
+}
+
 void mb86292_device::device_start()
 {
 	m_vsync_timer = timer_alloc(FUNC(mb86292_device::vsync_cb), this);
+	screen().register_screen_bitmap(m_fb_bitmap);
 
 	save_item(NAME(m_dce));
 	save_item(STRUCT_MEMBER(m_displaylist, lsa));
@@ -70,7 +82,10 @@ void mb86292_device::device_start()
 	save_item(STRUCT_MEMBER(m_crtc, vsw));
 	save_item(STRUCT_MEMBER(m_irq, ist));
 	save_item(STRUCT_MEMBER(m_irq, mask));
+	save_item(STRUCT_MEMBER(m_fb, base));
 	save_item(STRUCT_MEMBER(m_fb, xres));
+	save_item(STRUCT_MEMBER(m_draw, fc));
+	save_item(STRUCT_MEMBER(m_draw, bc));
 	save_item(STRUCT_MEMBER(m_clayer, cm));
 	save_item(STRUCT_MEMBER(m_clayer, cc));
 	save_item(STRUCT_MEMBER(m_clayer, ch));
@@ -380,53 +395,89 @@ void mb86292_device::vregs_map(address_map &map)
 	// 0x1fe0000 Internal texture memory TextureBase
 //  map(0x20000, ...)
 	// 0x1ff0000 Drawing engine DrawBase
-//  map(0x30400, 0x30403) CTR ConTrol Register
-//  map(0x30404, 0x30407) IFSR Input FIFO Status Register (CTR bits 14-12 alias)
-//  map(0x30408, 0x3040b) IFCNT Input FIFO CouNTer (CTR bits 19-15 alias)
-//  map(0x3040c, 0x3040f) SST Setup engine STatus (CTR bits 9-8 alias)
-//  map(0x30410, 0x30413) DST DDA STatus (CTR bits 5-4 alias)
-//  map(0x30414, 0x30417) PST Pixel engine STatus (CTR bits 1-0 alias)
-//  map(0x30418, 0x3041b) EST Error STatus (CTR bits 24-22 alias)
-//  map(0x30420, 0x30423) MDR0 MoDe Register 0 (miscellaneous)
-//  map(0x30424, 0x30427) MDR1 MoDe Register 1 (line)
-//  map(0x30428, 0x3042b) MDR2 MoDe Register 2 (polygon)
-//  map(0x3042c, 0x3042f) MDR3 MoDe Register 3 (texture)
-//  map(0x30430, 0x30433) MDR4 MoDe Register 4 (BitBLT)
-//  map(0x30440, 0x30443) FBR Frame Buffer Register base address
+	// 0x1ff8000 Geometry engine GeometryBase
+	map(0x30000, 0x3ffff).m(FUNC(mb86292_device::draw_io_map));
+}
+
+void mb86292_device::draw_io_map(address_map &map)
+{
+//  map(0x0400, 0x0403) CTR ConTrol Register
+//  map(0x0404, 0x0407) IFSR Input FIFO Status Register (CTR bits 14-12 alias)
+//  map(0x0408, 0x040b) IFCNT Input FIFO CouNTer (CTR bits 19-15 alias)
+//  map(0x040c, 0x040f) SST Setup engine STatus (CTR bits 9-8 alias)
+//  map(0x0410, 0x0413) DST DDA STatus (CTR bits 5-4 alias)
+//  map(0x0414, 0x0417) PST Pixel engine STatus (CTR bits 1-0 alias)
+//  map(0x0418, 0x041b) EST Error STatus (CTR bits 24-22 alias)
+//  map(0x0420, 0x0423) MDR0 MoDe Register 0 (miscellaneous)
+//  map(0x0424, 0x0427) MDR1 MoDe Register 1 (line)
+//  map(0x0428, 0x042b) MDR2 MoDe Register 2 (polygon)
+//  map(0x042c, 0x042f) MDR3 MoDe Register 3 (texture)
+//  map(0x0430, 0x0433) MDR4 MoDe Register 4 (BitBLT)
+	// FBR Frame Buffer Register base address
+	map(0x0440, 0x0443).lrw32(
+		NAME([this] (offs_t offset) {
+			return m_fb.base;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_fb.base);
+			m_fb.base &= 0x3ffffff;
+			LOGREGS("FBASE %08x & %08x -> %08x\n", data, mem_mask, m_fb.base);
+		})
+	);
 	// XRES X RESoultion
-	map(0x30444, 0x30447).lrw32(
+	map(0x0444, 0x0447).lrw32(
 		NAME([this] (offs_t offset) {
 			return m_fb.xres;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			COMBINE_DATA(&m_fb.xres);
 			m_fb.xres &= 0xfff;
-			LOGCRTC("XRES %04x & %04x -> %d\n", data, mem_mask, m_fb.xres);
+			LOGREGS("XRES %04x & %04x -> %d\n", data, mem_mask, m_fb.xres);
 		})
 	);
-//  map(0x30448, 0x3044b) ZBR Z-Buffer Register base address
-//  map(0x3044c, 0x3044f) TBR Texture memory Base address
-//  map(0x30450, 0x30453) PFBR 2d Polygon Flag Buffer base address
-//  map(0x30454, 0x30457) CXMIN Clip X MINimum
-//  map(0x30458, 0x3045b) CXMAX Clip X MAXimum
-//  map(0x3045c, 0x3045f) CYMIN Clip Y MINimum
-//  map(0x30460, 0x30463) CYMAX Clip Y MAXimum
-//  map(0x30464, 0x30467) TXS TeXture Size
-//  map(0x30468, 0x3046b) TIle Size
-//  map(0x3046c, 0x3046f) TOA Texture buffer Offset Address
-//  map(0x30480, 0x30483) FC Foreground Color
-//  map(0x30484, 0x30487) BC Background Color
-//  map(0x30488, 0x3048b) ALF ALpha Factor
-//  map(0x3048c, 0x3048f) BLP Broken Line Pattern
-//  map(0x303e0?, 0x303e3?) BLPO Broken Line Pattern Offset <- assume doc mistake, 0x490 seems more realistic
-//  map(0x30494, 0x30497) TBC Texture Border Color
+//  map(0x0448, 0x044b) ZBR Z-Buffer Register base address
+//  map(0x044c, 0x044f) TBR Texture memory Base address
+//  map(0x0450, 0x0453) PFBR 2d Polygon Flag Buffer base address
+//  map(0x0454, 0x0457) CXMIN Clip X MINimum
+//  map(0x0458, 0x045b) CXMAX Clip X MAXimum
+//  map(0x045c, 0x045f) CYMIN Clip Y MINimum
+//  map(0x0460, 0x0463) CYMAX Clip Y MAXimum
+//  map(0x0464, 0x0467) TXS TeXture Size
+//  map(0x0468, 0x046b) TIle Size
+//  map(0x046c, 0x046f) TOA Texture buffer Offset Address
+	// FC Foreground Color
+	map(0x0480, 0x0483).lrw32(
+		NAME([this] (offs_t offset) {
+			return m_draw.fc;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_draw.fc);
+			m_draw.fc &= 0xffff;
+			LOGREGS("FC %08x & %08x\n", data, mem_mask);
+		})
+	);
+	// BC Background Color
+	map(0x0484, 0x0487).lrw32(
+		NAME([this] (offs_t offset) {
+			return m_draw.bc;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_draw.bc);
+			m_draw.bc &= 0xffff;
+			LOGREGS("BC %08x & %08x\n", data, mem_mask);
+		})
+	);
+//  map(0x0488, 0x048b) ALF ALpha Factor
+//  map(0x048c, 0x048f) BLP Broken Line Pattern
+//  map(0x03e0?, 0x03e3?) BLPO Broken Line Pattern Offset <- assume doc mistake, 0x490 seems more realistic
+//  map(0x0494, 0x0497) TBC Texture Border Color
 //  Other stuff in the area are apparently r/o copies of the drawing engine internals.
-	// 0x1ff8000 Geometry engine GeometryBase
-//  map(0x38000, 0x38000) GCTR Geometry ConTrol Register
-//  map(0x38040, 0x38043) GMDR0 Geometry MoDe Register 0 (vertex)
-//  map(0x38044, 0x38047) GMDR1 Geometry MoDe Register 1 (line)
-//  map(0x38048, 0x3804b) GMDR2 Geometry MoDe Register 2 (triangle)
-//  map(0x38400, 0x38403) DFIFOG Display List FIFO for Geometry
+
+//  map(0x8000, 0x8000) GCTR Geometry ConTrol Register
+//  map(0x8040, 0x8043) GMDR0 Geometry MoDe Register 0 (vertex)
+//  map(0x8044, 0x8047) GMDR1 Geometry MoDe Register 1 (line)
+//  map(0x8048, 0x804b) GMDR2 Geometry MoDe Register 2 (triangle)
+//  map(0x8400, 0x8403) DFIFOG Display List FIFO for Geometry
 }
 
 /*
@@ -477,6 +528,7 @@ void mb86292_device::reconfigure_screen()
 		return;
 	}
 
+	// FIXME: offset with htp according to manual (expected: 636, actual: 608)
 	LOGCRTC("\tSetting screen to %d x %d (total: %d x %d)\n", hdp, vdp, htp, vtr);
 	rectangle visarea(0, hdp - 1, 0, vdp - 1);
 	screen().configure(htp, vtr, visarea, screen().frame_period().attoseconds());
@@ -543,6 +595,13 @@ void mb86292_device::process_display_list()
 						LOGDASM("(BltFill)\n");
 						LOGDASM("\t%04x|%04x\n", rys, rxs);
 						LOGDASM("\t%04x|%04x\n", rsizey, rsizex);
+						// color should be FC according to usage
+						for (u16 yi = 0; yi < rsizey; yi ++)
+						{
+							const u32 dst_ptr = m_fb.base + yi * (m_fb.xres << 1);
+							for (u16 xi = 0; xi < rsizex; xi ++)
+								vram_write_word(dst_ptr + (xi << 1), m_draw.fc);
+						}
 						break;
 					case 0xe2:
 						LOGDASM(" (ClearPolyFlag)\n");
@@ -648,7 +707,7 @@ void mb86292_device::process_display_list()
 				{
 					case 0xc1:
 						LOGDASM("(Flush_FB)\n");
-						// mixing with layers?
+						fb_commit();
 						break;
 					case 0xc2:
 						LOGDASM("(Flush_Z)\n");
@@ -670,6 +729,7 @@ void mb86292_device::process_display_list()
 				{
 					const u32 reg_data = vram_read_dword(m_displaylist.cur_address + 0x04 + (i << 2));
 					LOGDASM("\t[%05x] -> %08x\n", (reg_address << 2) | 0x30000, reg_data);
+					space(AS_IO).write_dword((reg_address << 2), reg_data, 0xffffffff);
 				}
 
 				param_list += op_command;
@@ -695,6 +755,20 @@ void mb86292_device::process_display_list()
 	m_displaylist.lreq = false;
 }
 
+void mb86292_device::fb_commit()
+{
+	for (int y = 0; y <= m_crtc.vdp; y++)
+	{
+		const u32 fb_addr = m_fb.base + y * (m_fb.xres << 1);
+		const u32 clayer_addr = m_clayer.cda + (m_clayer.cw * y);
+
+		for (int x = 0; x <= m_crtc.hdp; x++)
+		{
+			u16 pixel = vram_read_word(clayer_addr + (x << 1));
+			vram_write_word(fb_addr + (x << 1), pixel);
+		}
+	}
+}
 
 u32 mb86292_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
 {
@@ -706,18 +780,19 @@ u32 mb86292_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, r
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 clayer_addr = (m_clayer.cw * y);
+		const u32 fb_addr = (m_fb.base + y * (m_fb.xres << 1));
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			u16 pixel = vram_read_word(clayer_addr + (x << 1));
+			u16 pixel = vram_read_word(fb_addr + (x << 1));
 			bitmap.pix(y, x) = pal555(pixel, 10, 5, 0);
 		}
 	}
 
 // quick debug GFX viewer, to be moved as a debug switch
-#if 0
+#if DEBUG_VRAM_VIEWER
 	static int m_test_x = 128, m_test_y = 256, m_start_offs;
+	static int m_test_trigger = 1;
 
 	if(machine().input().code_pressed(KEYCODE_Z))
 		m_test_x+=4;
@@ -743,6 +818,12 @@ u32 mb86292_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, r
 	if(machine().input().code_pressed_once(KEYCODE_R))
 		m_start_offs-=0x1000;
 
+	if(machine().input().code_pressed_once(KEYCODE_C))
+		m_test_trigger ^= 1;
+
+	if (!m_test_trigger)
+		return 0;
+
 	popmessage("%d %d %04x", m_test_x, m_test_y, m_start_offs);
 
 	bitmap.fill(0, cliprect);
@@ -755,12 +836,8 @@ u32 mb86292_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, r
 		{
 			uint16_t color = m_vram->read(count) | (m_vram->read(count + 1) << 8);
 
-			u8 r = pal5bit((color >> 0) & 0x1f);
-			u8 g = pal5bit((color >> 5) & 0x1f);
-			u8 b = pal5bit((color >> 10) & 0x1f);
-
 			if(cliprect.contains(x, y))
-				bitmap.pix(y, x) = (r << 16) | (g << 8) | b;
+				bitmap.pix(y, x) = pal555(color, 10, 5, 0);
 
 			count +=2;
 		}

@@ -8,7 +8,8 @@
 #include "machine/ram.h"
 
 class mb86292_device : public device_t,
-					   public device_video_interface
+					   public device_video_interface,
+					   public device_memory_interface
 {
 public:
 	mb86292_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -28,7 +29,11 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual space_config_vector memory_space_config() const override;
 
+	virtual void draw_io_map(address_map &map);
+
+	address_space_config m_draw_io_space_config;
 	required_device<screen_device> m_screen;
 	required_device<ram_device> m_vram;
 	devcb_write_line m_xint_cb;
@@ -64,7 +69,12 @@ private:
 
 	struct {
 		u16 xres = 0;
+		u32 base = 0;
 	} m_fb;
+
+	struct {
+		u16 fc = 0, bc = 0;
+	} m_draw;
 
 	struct {
 		u32 cm = 0;
@@ -78,6 +88,9 @@ private:
 
 	void check_irqs();
 	TIMER_CALLBACK_MEMBER(vsync_cb);
+
+	bitmap_rgb32     m_fb_bitmap;
+	void fb_commit();
 
 	// NOTE: the access must always be aligned
 	u32 vram_read_word(offs_t offset) {
