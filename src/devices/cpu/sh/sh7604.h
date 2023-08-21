@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Juergen Buchmueller, R. Belmont, Angelo Salese, ...
+// copyright-holders:Juergen Buchmueller, R. Belmont, Angelo Salese
 
 #ifndef MAME_CPU_SH_SH7604_H
 #define MAME_CPU_SH_SH7604_H
@@ -20,7 +20,6 @@ public:
 	typedef device_delegate<int (uint32_t src, uint32_t dst, uint32_t data, int size)> dma_fifo_data_available_delegate;
 	typedef device_delegate<void (uint32_t data)> ftcsr_read_delegate;
 
-	// construction/destruction
 	sh2_sh7604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_is_slave(int slave) { m_is_slave = slave; }
@@ -36,7 +35,6 @@ public:
 protected:
 	sh2_sh7604_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type,address_map_constructor internal_map, int addrlines);
 
-	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

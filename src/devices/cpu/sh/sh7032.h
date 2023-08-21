@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Juergen Buchmueller, R. Belmont, Angelo Salese, ...
+// copyright-holders:Juergen Buchmueller, R. Belmont, Angelo Salese
 
 #ifndef MAME_CPU_SH_SH7032_H
 #define MAME_CPU_SH_SH7032_H
@@ -11,11 +11,9 @@
 class sh1_sh7032_device : public sh2_device
 {
 public:
-	// construction/destruction
 	sh1_sh7032_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 protected:
-	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

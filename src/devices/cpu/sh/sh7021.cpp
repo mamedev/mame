@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Juergen Buchmueller, R. Belmont, Angelo Salese, ...
+// copyright-holders:Juergen Buchmueller, R. Belmont, Angelo Salese
 
 #include "sh7021.h"
 
@@ -31,7 +31,8 @@ void sh2a_sh7021_device::device_reset()
 
 	m_dmaor = 0;
 
-	for (int i = 0; i < 4; i++) {
+	for(int i = 0; i < 4; i++)
+	{
 		m_dma[i].sar = 0;
 		m_dma[i].dar = 0;
 		m_dma[i].tcr = 0;

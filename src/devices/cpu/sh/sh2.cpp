@@ -14,9 +14,9 @@
 
 
 #include "emu.h"
-#include "cpu/drcumlsh.h"
 #include "sh2.h"
 #include "sh_dasm.h"
+#include "cpu/drcumlsh.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -68,14 +68,14 @@ void sh2_device::device_start()
 	m_pr16 = [this](offs_t address) -> u16 { return m_cache32.read_word(address); };
 	if (m_decrypted_program->endianness() != ENDIANNESS_NATIVE)
 		m_prptr = [this](offs_t address) -> const void * {
-			const u16 *ptr = static_cast<u16 *>(m_cache32.read_ptr(address & ~3));
+			const u16 *ptr = reinterpret_cast<u16 *>(m_cache32.read_ptr(address & ~3));
 			if(!(address & 2))
 				ptr++;
 			return ptr;
 		};
 	else
 		m_prptr = [this](offs_t address) -> const void * {
-			const u16 *ptr = static_cast<u16 *>(m_cache32.read_ptr(address & ~3));
+			const u16 *ptr = reinterpret_cast<u16 *>(m_cache32.read_ptr(address & ~3));
 			if(address & 2)
 				ptr++;
 			return ptr;
