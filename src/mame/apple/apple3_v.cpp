@@ -175,7 +175,7 @@ void apple3_state::text40(bitmap_ind16 &bitmap, const rectangle &cliprect)
 					uint16_t *const dest = &bitmap.pix(y * 8 + row, x * 14 + col * 2);
 
 					// Flash or Inverse
-					if ((!(ch & 0x80) && (char_data[row] & 0x80) && m_flash) || (!(ch & 0x80) && !(char_data[row] & 0x80)))
+					if (!(ch & 0x80) && (!(char_data[row] & 0x80) || m_flash))
 					{
 						dest[0] = (char_data[row] & (1 << col)) ? bg : fg;
 						dest[1] = (char_data[row] & (1 << col)) ? bg : fg;
@@ -223,7 +223,7 @@ void apple3_state::text80(bitmap_ind16 &bitmap, const rectangle &cliprect)
 					uint16_t *const dest = &bitmap.pix(y * 8 + row, x * 14 + col + 0);
 
 					// Flash or Inverse
-					if ((!(ch & 0x80) && (char_data[row] & 0x80) && m_flash) || (!(ch & 0x80) && !(char_data[row] & 0x80)))
+					if (!(ch & 0x80) && (!(char_data[row] & 0x80) || m_flash))
 					{
 						*dest = (char_data[row] & (1 << col)) ? bg : fg;
 					}
@@ -245,7 +245,7 @@ void apple3_state::text80(bitmap_ind16 &bitmap, const rectangle &cliprect)
 					uint16_t *const dest = &bitmap.pix(y * 8 + row, x * 14 + col + 7);
 
 					// Flash or Inverse
-					if ((!(ch & 0x80) && (char_data[row] & 0x80) && m_flash) || (!(ch & 0x80) && !(char_data[row] & 0x80)))
+					if (!(ch & 0x80) && (!(char_data[row] & 0x80) || m_flash))
 					{
 						*dest = (char_data[row] & (1 << col)) ? bg : fg;
 					}
