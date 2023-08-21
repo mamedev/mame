@@ -106,13 +106,15 @@ private:
 	void alien_map(address_map &map);
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<sh4_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<mb86292_device> m_gpu;
 	required_device<ram_device> m_vram;
 
 	// driver_device overrides
 	virtual void machine_reset() override;
+
+	template <unsigned N> void gpu_irq_w(int state);
 };
 
 u32 alien_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -176,6 +178,13 @@ void alien_state::machine_reset()
 	//m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
+template <unsigned N> void alien_state::gpu_irq_w(int state)
+{
+	// TODO: configured by FPGA
+	const unsigned level = N == 1 ? 4 : 2;
+	m_maincpu->sh4_set_irln_input(state ? level : 15);
+}
+
 void alien_state::alien(machine_config &config)
 {
 	/* basic machine hardware */
@@ -190,16 +199,14 @@ void alien_state::alien(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// FIXME: configured by main GPU
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	// configured by main GPU
+	m_screen->set_raw(MASTER_CLOCK / 20, 608, 0, 480, 262, 0, 234);
 	m_screen->set_screen_update(FUNC(alien_state::screen_update));
-	m_screen->set_size((32)*8, (32)*8);
-	m_screen->set_visarea_full();
 
 	MB86292(config, m_gpu, 0);
 	m_gpu->set_screen(m_screen);
 	m_gpu->set_vram(m_vram);
+	m_gpu->set_xint_cb().set(FUNC(alien_state::gpu_irq_w<0>));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -382,7 +389,7 @@ GAME( 2004, masmario,  0,        alien, alien, alien_state, empty_init,    ROT0,
 GAME( 2004, masmarios, 0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party (satellite)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2005, masmario2, 0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // Medalusion 1
-GAME( 2006, mariojjl,  0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no JanJanLand", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, mariojjl,  0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no JanJanLand (Ver.1.00C, 06/08/29)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2005, mmaruchan, 0,        alien, alien, alien_state, empty_init,    ROT0, "Capcom",               "Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki (Ver.1.00B, 05/06/22)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ちびまる子ちゃん「みんなですごろく遊び」の巻
 GAME( 2004, mmaruchana,mmaruchan,alien, alien, alien_state, empty_init,    ROT0, "Capcom",               "Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki (Ver.1.00A, 04/04/20)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ちびまる子ちゃん「みんなですごろく遊び」の巻
 // Medalusion 2

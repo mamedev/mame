@@ -10,6 +10,7 @@
 #define LOG_REGS      (1U << 2)
 #define LOG_CRTC      (1U << 3)
 #define LOG_DASM      (1U << 4) // display list FIFO commands
+#define LOG_IRQ       (1U << 5)
 
 #define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_REGS | LOG_CRTC | LOG_DASM)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -19,6 +20,7 @@
 #define LOGREGS(...)            LOGMASKED(LOG_REGS, __VA_ARGS__)
 #define LOGCRTC(...)            LOGMASKED(LOG_CRTC, __VA_ARGS__)
 #define LOGDASM(...)            LOGMASKED(LOG_DASM, __VA_ARGS__)
+#define LOGIRQ(...)             LOGMASKED(LOG_IRQ, __VA_ARGS__)
 
 //DEFINE_DEVICE_TYPE(MB86290A, mb86290a_device, "mb86290a", "Fujitsu MB86290A \"Cremson\" Graphics Controller")
 //DEFINE_DEVICE_TYPE(MB86291, mb86291_device, "mb86291", "Fujitsu MB86291 \"Scarlet\" Graphics Controller")
@@ -41,6 +43,7 @@ mb86292_device::mb86292_device(machine_config const &mconfig, device_type type, 
 	, device_video_interface(mconfig, *this)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_vram(*this, finder_base::DUMMY_TAG)
+	, m_xint_cb(*this)
 {
 }
 
@@ -51,6 +54,8 @@ mb86292_device::mb86292_device(machine_config const &mconfig, char const *tag, d
 
 void mb86292_device::device_start()
 {
+	m_vsync_timer = timer_alloc(FUNC(mb86292_device::vsync_cb), this);
+
 	save_item(NAME(m_dce));
 	save_item(STRUCT_MEMBER(m_displaylist, lsa));
 	save_item(STRUCT_MEMBER(m_displaylist, lco));
@@ -63,6 +68,8 @@ void mb86292_device::device_start()
 	save_item(STRUCT_MEMBER(m_crtc, vsp));
 	save_item(STRUCT_MEMBER(m_crtc, vdp));
 	save_item(STRUCT_MEMBER(m_crtc, vsw));
+	save_item(STRUCT_MEMBER(m_irq, ist));
+	save_item(STRUCT_MEMBER(m_irq, mask));
 	save_item(STRUCT_MEMBER(m_fb, xres));
 	save_item(STRUCT_MEMBER(m_clayer, cm));
 	save_item(STRUCT_MEMBER(m_clayer, cc));
@@ -73,9 +80,12 @@ void mb86292_device::device_start()
 
 void mb86292_device::device_reset()
 {
+	m_vsync_timer->adjust(attotime::never);
+
 	m_dce = 0;
 	m_displaylist.lsa = m_displaylist.lco = 0;
 	m_displaylist.lreq = false;
+	m_irq.ist = m_irq.mask = 0;
 }
 
 void mb86292_device::vregs_map(address_map &map)
@@ -89,8 +99,28 @@ void mb86292_device::vregs_map(address_map &map)
 //  map(0x00009, 0x00009) LTS display [List] Transfer Stop
 //  map(0x00010, 0x00010) LSTA display List Transfer STAtus
 //  map(0x00018, 0x00018) DRQ DMA ReQuest
-//  map(0x00020, 0x00023) IST Interrupt STatus
-//  map(0x00024, 0x00027) MASK Interrupt MASK
+	// IST Interrupt STatus
+	map(0x00020, 0x00023).lrw32(
+		NAME([this] (offs_t offset) {
+			return m_irq.ist;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_irq.ist &= data;
+			check_irqs();
+			LOGIRQ("IST ack %08x & %08x -> %08x\n", data, mem_mask, m_irq.ist);
+		})
+	);
+	// MASK Interrupt MASK
+	map(0x00024, 0x00027).lrw32(
+			NAME([this] (offs_t offset) {
+			return m_irq.mask;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_irq.mask);
+			check_irqs();
+			LOGIRQ("MASK %08x & %08x -> %08x\n", data, mem_mask, m_irq.mask);
+		})
+	);
 //  map(0x0002c, 0x0002c) SRST Software ReSeT
 	// LSA display List Source Address
 	map(0x00040, 0x00043).lrw32(
@@ -403,6 +433,7 @@ void mb86292_device::vregs_map(address_map &map)
  * CRTC section
  */
 
+ // TODO: refresh rate, interlace, sync
 void mb86292_device::reconfigure_screen()
 {
 	const u16 hdb = m_crtc.hdb + 1;
@@ -410,17 +441,21 @@ void mb86292_device::reconfigure_screen()
 	const u16 hsp = m_crtc.hsp + 1;
 	const u16 hse = hsp + m_crtc.hsw + 1;
 	const u16 htp = m_crtc.htp + 1;
+	// Supported resolutions:
+	// 1024x768, 1024x600, 800x600, 854x480, 640x480, 480x234, 400x234, 320x234
 	// 0 < m_crtc.hdb <= m_crtc.hdp < m_crtc.hsp < (m_crtc.hsp + m_crtc.hsw + 1) < m_crtc.htp
-	std::array<bool, 5> horiz_assert = {
+	std::array<bool, 6> horiz_assert = {
 		0 < hdb,
 		hdb <= hdp,
 		hdp < hsp,
 		hsp < hse,
-		hse < htp
+		hse < htp,
+		hdp >= 320
 	};
 	if (!std::all_of(horiz_assert.begin(), horiz_assert.end(), [](bool res) { return res; }))
 	{
 		LOGCRTC("\tScreen off (H)\n");
+		m_vsync_timer->adjust(attotime::never);
 		return;
 	}
 	const u16 vdp = m_crtc.vdp + 1;
@@ -428,23 +463,43 @@ void mb86292_device::reconfigure_screen()
 	const u16 vse = (vsp + m_crtc.vsw + 1);
 	const u16 vtr = m_crtc.vtr + 1;
 	// 0 < m_crtc.vdp < m_crtc.vsp < (m_crtc.vsp + m_crtc.vsw + 1) < m_crtc.vtr
-	std::array<bool, 4> vert_assert = {
+	std::array<bool, 5> vert_assert = {
 		0 < vdp,
 		vdp <= vsp,
 		vsp < vse,
-		vse < vtr
+		vse < vtr,
+		vdp >= 234
 	};
 	if (!std::all_of(vert_assert.begin(), vert_assert.end(), [](bool res) { return res; }))
 	{
 		LOGCRTC("\tScreen off (V)\n");
+		m_vsync_timer->adjust(attotime::never);
 		return;
 	}
-	// TODO: refresh rate, interlace, sync
-	// Supported resolutions:
-	// 1024x768, 1024x600, 800x600, 854x480, 640x480, 480x234, 400x234, 320x234
+
 	LOGCRTC("\tSetting screen to %d x %d (total: %d x %d)\n", hdp, vdp, htp, vtr);
 	rectangle visarea(0, hdp - 1, 0, vdp - 1);
 	screen().configure(htp, vtr, visarea, screen().frame_period().attoseconds());
+	m_vsync_timer->adjust(screen().time_until_pos(vdp));
+}
+
+/*
+ *
+ * IRQ
+ *
+ */
+
+void mb86292_device::check_irqs()
+{
+	int xint_state = (m_irq.ist & m_irq.mask) ? 1 : 0;
+	m_xint_cb(xint_state);
+}
+
+TIMER_CALLBACK_MEMBER(mb86292_device::vsync_cb)
+{
+	m_irq.ist |= IRQ_VSYNC;
+	check_irqs();
+	m_vsync_timer->adjust(screen().time_until_pos(m_crtc.vdp + 1));
 }
 
 /*
@@ -463,7 +518,6 @@ void mb86292_device::process_display_list()
 	m_displaylist.cur_address = m_displaylist.lsa;
 	const u32 count = m_displaylist.lco == 0 ? 0x1000000 : (m_displaylist.lco << 2);
 	const u32 end_address = m_displaylist.lsa + count;
-//  printf("%08x %08x %08x\n", m_displaylist.cur_address, end_address, count);
 
 	while (m_displaylist.cur_address < end_address)
 	{
@@ -474,8 +528,34 @@ void mb86292_device::process_display_list()
 		u16 param_list = 1;
 		switch(op_type)
 		{
+			case 0x09:
+			{
+				LOGDASM("DrawRectP ");
+				u16 rys = vram_read_word(m_displaylist.cur_address + 0x06);
+				u16 rxs = vram_read_word(m_displaylist.cur_address + 0x04);
+				u16 rsizey = vram_read_word(m_displaylist.cur_address + 0x0a);
+				u16 rsizex = vram_read_word(m_displaylist.cur_address + 0x08);
+				param_list += 2;
+
+				switch(op_command)
+				{
+					case 0x41:
+						LOGDASM("(BltFill)\n");
+						LOGDASM("\t%04x|%04x\n", rys, rxs);
+						LOGDASM("\t%04x|%04x\n", rsizey, rsizex);
+						break;
+					case 0xe2:
+						LOGDASM(" (ClearPolyFlag)\n");
+						break;
+					default:
+						LOGDASM(" (<reserved>)\n");
+						break;
+				}
+				break;
+			}
 			case 0x0f:
 			{
+				LOGDASM("BltCopyAlternateP (%s)\n", op_command == 0x44 ? "TopLeft" : "<reserved>");
 				u32 saddr = vram_read_dword(m_displaylist.cur_address + 0x04);
 				u32 sstride = vram_read_dword(m_displaylist.cur_address + 0x08);
 				u16 sry = vram_read_word(m_displaylist.cur_address + 0x0e);
@@ -487,7 +567,6 @@ void mb86292_device::process_display_list()
 				u16 brsizey = vram_read_word(m_displaylist.cur_address + 0x1e);
 				u16 brsizex = vram_read_word(m_displaylist.cur_address + 0x1c);
 				param_list += 7;
-				LOGDASM("BltCopyAlternateP (%s)\n", op_command == 0x44 ? "TopLeft" : "<unknown>");
 				LOGDASM("\t%08x %08x %04x|%04x\n"
 					, saddr
 					, sstride
@@ -511,6 +590,97 @@ void mb86292_device::process_display_list()
 						vram_write_word(dst_ptr + ((drx + xi) << 1), src_pixel);
 					}
 				}
+				break;
+			}
+			case 0x20:
+			{
+				LOGDASM("G_Nop\n");
+				break;
+			}
+			case 0x40:
+			{
+				LOGDASM("G_Init\n");
+				break;
+			}
+			case 0x41:
+			{
+				LOGDASM("G_Viewport\n");
+				u32 x_scaling = vram_read_dword(m_displaylist.cur_address + 0x04);
+				u32 x_offset = vram_read_dword(m_displaylist.cur_address + 0x08);
+				u32 y_scaling = vram_read_dword(m_displaylist.cur_address + 0x0c);
+				u32 y_offset = vram_read_dword(m_displaylist.cur_address + 0x10);
+				LOGDASM("\t%08x %08x %08x %08x\n", x_scaling, x_offset, y_scaling, y_offset);
+				param_list += 4;
+				break;
+			}
+			case 0x42:
+			{
+				LOGDASM("G_DepthRange\n");
+				u32 z_scaling = vram_read_dword(m_displaylist.cur_address + 0x04);
+				u32 z_offset = vram_read_dword(m_displaylist.cur_address + 0x08);
+				LOGDASM("\t%08x %08x\n", z_scaling, z_offset);
+				param_list += 2;
+				break;
+			}
+			case 0x44:
+			{
+				LOGDASM("G_ViewVolumeXYClip\n");
+				u32 xmin = vram_read_dword(m_displaylist.cur_address + 0x04);
+				u32 xmax = vram_read_dword(m_displaylist.cur_address + 0x08);
+				u32 ymin = vram_read_dword(m_displaylist.cur_address + 0x0c);
+				u32 ymax = vram_read_dword(m_displaylist.cur_address + 0x10);
+				LOGDASM("\t%08x %08x %08x %08x\n", xmin, xmax, ymin, ymax);
+				param_list += 4;
+				break;
+			}
+			case 0x45:
+			{
+				LOGDASM("G_ViewVolumeZClip\n");
+				u32 zmin = vram_read_dword(m_displaylist.cur_address + 0x04);
+				u32 zmax = vram_read_dword(m_displaylist.cur_address + 0x08);
+				LOGDASM("\t%08x %08x\n", zmin, zmax);
+				param_list += 2;
+				break;
+			}
+			case 0xf0:
+				LOGDASM("Draw ");
+				switch(op_command)
+				{
+					case 0xc1:
+						LOGDASM("(Flush_FB)\n");
+						// mixing with layers?
+						break;
+					case 0xc2:
+						LOGDASM("(Flush_Z)\n");
+						break;
+					case 0xe1:
+						LOGDASM("(PolygonEnd)\n");
+						break;
+					default:
+						LOGDASM("(<reserved>)\n");
+						break;
+				}
+
+				break;
+			case 0xf1:
+			{
+				const u16 reg_address = (opcode & 0xffff);
+				LOGDASM("SetRegister (count=%d)\n", op_command);
+				for (int i = 0; i < op_command; i ++)
+				{
+					const u32 reg_data = vram_read_dword(m_displaylist.cur_address + 0x04 + (i << 2));
+					LOGDASM("\t[%05x] -> %08x\n", (reg_address << 2) | 0x30000, reg_data);
+				}
+
+				param_list += op_command;
+				break;
+			}
+			case 0xfd:
+			{
+				LOGDASM("Interrupt\n");
+				// mariojjl
+				m_irq.ist |= IRQ_CEND;
+				check_irqs();
 				break;
 			}
 			default:

@@ -17,6 +17,7 @@ public:
 
 	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_vram(T &&tag) { m_vram.set_tag(std::forward<T>(tag)); }
+	auto set_xint_cb() { return m_xint_cb.bind(); }
 
 	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
@@ -30,6 +31,7 @@ protected:
 
 	required_device<screen_device> m_screen;
 	required_device<ram_device> m_vram;
+	devcb_write_line m_xint_cb;
 
 	void reconfigure_screen();
 	void process_display_list();
@@ -47,6 +49,19 @@ private:
 		u8 hsw = 0, vsw = 0;
 	} m_crtc;
 
+	enum {
+		IRQ_CERR = 1 << 0,
+		IRQ_CEND = 1 << 1,
+		IRQ_VSYNC = 1 << 2,
+		IRQ_FSYNC = 1 << 3,
+		IRQ_SYNCERR = 1 << 4,
+		//bit 16 and 17 <reserved> (?)
+	};
+
+	struct {
+		u32 ist = 0, mask = 0;
+	} m_irq;
+
 	struct {
 		u16 xres = 0;
 	} m_fb;
@@ -58,6 +73,11 @@ private:
 		bool cc = false;
 		u32 cda = 0;
 	} m_clayer;
+
+	emu_timer* m_vsync_timer;
+
+	void check_irqs();
+	TIMER_CALLBACK_MEMBER(vsync_cb);
 
 	// NOTE: the access must always be aligned
 	u32 vram_read_word(offs_t offset) {
