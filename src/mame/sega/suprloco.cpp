@@ -229,12 +229,12 @@ void suprloco_state::palette(palette_device &palette) const
 
 TILE_GET_INFO_MEMBER(suprloco_state::get_tile_info)
 {
-	uint16_t const tile_attr = (m_videoram[2*tile_index] | (m_videoram[2*tile_index+1]<<8));
+	uint16_t const tile_attr = (m_videoram[2 * tile_index] | (m_videoram[2 * tile_index + 1] << 8));
 	tileinfo.set(0,
-			BIT(tile_attr,0,10),
-			((BIT(tile_attr,10,3) << 4) | 0x80 | (BIT(m_control,5,2) << 8)) >> 4, // this overlaps bit 10 intentionally
+			BIT(tile_attr, 0, 10),
+			(BIT(tile_attr, 10, 3) | 0x8 | (BIT(m_control, 5, 2) << 4)), // this overlaps m_control bit 10 intentionally
 			0);
-	tileinfo.category = BIT(tile_attr,13);
+	tileinfo.category = BIT(tile_attr, 13);
 }
 
 
@@ -294,7 +294,7 @@ void suprloco_state::control_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 
-	flip_screen_set(BIT(data,7));
+	flip_screen_set(BIT(data, 7));
 
 	m_control = data;
 }
@@ -351,9 +351,9 @@ void suprloco_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect
 	||||||////- currently selected color based on the 4 tilemap color bits or 4 sprite bits
 	9876543210
 	*/
-	pen_t const pen_base = ((BIT(m_control,5,2)<<8)
+	pen_t const pen_base = ((BIT(m_control, 5, 2) << 8)
 							| 0 /* bit 7 will always be zero for sprites */
-							| ((adjy<128)?0x10:0x00) ///TODO: horrible hack, see below.
+							| ((adjy < 128) ? 0x10 : 0x00) ///TODO: horrible hack, see below.
 							);
 	/* Horrible hack explanation: The 0x10 bit should be pulled, along with
 	    0x20 and 0x40, from the tilemap 'behind' the sprite.
@@ -398,11 +398,11 @@ void suprloco_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 			if (color1 == 15) break; // stop rendering this sprite immediately if its color is 0xf
 			if (color1)
-				draw_pixel(bitmap, cliprect,sx + col, adjy, pen_base + color1, flip);
+				draw_pixel(bitmap, cliprect, sx + col, adjy, pen_base + color1, flip);
 
 			if (color2 == 15) break;
 			if (color2)
-				draw_pixel(bitmap, cliprect,sx + col + 1, adjy, pen_base + color2, flip);
+				draw_pixel(bitmap, cliprect, sx + col + 1, adjy, pen_base + color2, flip);
 
 			col += 2;
 		}
