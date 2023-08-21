@@ -632,9 +632,9 @@ void t10mmc::ExecCommand()
 				|| (read_cd_flags == (T10MMC_READ_CD_FIELD_SYNC | T10MMC_READ_CD_FIELD_HEADER | T10MMC_READ_CD_FIELD_SUBHEADER | T10MMC_READ_CD_FIELD_ECC));
 
 			// Mode 2 form 1/2 sectors have additional restrictions that CDDA, mode 1, and mode 2 formless tracks don't
-			if (track_type == cdrom_file::CD_TRACK_MODE2_FORM1 || track_type == cdrom_file::CD_TRACK_MODE2_FORM2 || mode2_form > 0)
+			if (!is_illegal_combo && (track_type == cdrom_file::CD_TRACK_MODE2_FORM1 || track_type == cdrom_file::CD_TRACK_MODE2_FORM2 || mode2_form > 0))
 			{
-				is_illegal_combo |= (read_cd_flags == (T10MMC_READ_CD_FIELD_HEADER | T10MMC_READ_CD_FIELD_USER_DATA))
+				is_illegal_combo = (read_cd_flags == (T10MMC_READ_CD_FIELD_HEADER | T10MMC_READ_CD_FIELD_USER_DATA))
 					|| (read_cd_flags == (T10MMC_READ_CD_FIELD_HEADER | T10MMC_READ_CD_FIELD_USER_DATA | T10MMC_READ_CD_FIELD_ECC))
 					|| (read_cd_flags == (T10MMC_READ_CD_FIELD_SYNC | T10MMC_READ_CD_FIELD_HEADER | T10MMC_READ_CD_FIELD_USER_DATA))
 					|| (read_cd_flags == (T10MMC_READ_CD_FIELD_SYNC | T10MMC_READ_CD_FIELD_HEADER | T10MMC_READ_CD_FIELD_USER_DATA | T10MMC_READ_CD_FIELD_ECC));
