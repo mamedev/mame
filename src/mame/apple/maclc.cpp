@@ -354,7 +354,7 @@ void maclc_state::maclc_base(machine_config &config)
 
 	MACADB(config, m_macadb, C15M);
 
-	EGRET(config, m_egret, EGRET_341S0850);
+	EGRET_V101_EARLY(config, m_egret, XTAL(32'768));
 	m_egret->reset_callback().set(FUNC(maclc_state::egret_reset_w));
 	m_egret->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_egret->via_clock_callback().set(m_v8, FUNC(v8_device::cb1_w));
