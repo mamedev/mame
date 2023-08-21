@@ -18,7 +18,7 @@
  * WIP
  * ---
  *  - 0xef'8010-0xef'802f appears to be a uart, but doesn't match scn2681 per ENP-30 documentation?
- *  - following text is output to 0xef'008025 at startup:
+ *  - following text is output to 0xef'8025 at startup:
  *      CMC ENP/10 CMOS - 112708 Bytes Free
  *      Ethernet Address: 02CF1F123456
  *      Allocating 30 receive buffers
@@ -45,9 +45,14 @@ cmc_enp10_device::cmc_enp10_device(machine_config const &mconfig, char const *ta
 
 ROM_START(enp10)
 	ROM_REGION16_BE(0x4000, "eprom", 0)
-	ROM_SYSTEM_BIOS(0, "enp10", "CMC ENP/10 CMOS")
-	ROMX_LOAD("link_10_2.0_nh_rev.4.1h.u4",  0x0000, 0x2000, CRC(7532f2b1) SHA1(bdef6c525f451fbc67f3d4625c9db18975e7e1e4), ROM_SKIP(1) | ROM_BIOS(0)) // AM2764A
-	ROMX_LOAD("link_10_2.0_nh_rev.k4.1l.u3", 0x0001, 0x2000, CRC(f2decb78) SHA1(795623274bfff6273790c30445e4dca4064859ed), ROM_SKIP(1) | ROM_BIOS(0)) // AM2764A
+
+	ROM_SYSTEM_BIOS(0, "enp10_0", "CMC ENP/10 CMOS")
+	ROMX_LOAD("link_10_2.0_nh_rev.4.1h.u4",  0x0000, 0x2000, CRC(7532f2b1) SHA1(bdef6c525f451fbc67f3d4625c9db18975e7e1e4), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("link_10_2.0_nh_rev.k4.1l.u3", 0x0001, 0x2000, CRC(f2decb78) SHA1(795623274bfff6273790c30445e4dca4064859ed), ROM_SKIP(1) | ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "enp10_1", "CMC ENP/10 CMOS (SGI?)")
+	ROMX_LOAD("8845__070_0132_002s.u4", 0x0000, 0x2000, CRC(3ea05f63) SHA1(ee523928d27b854cd1be7e6aa2b8bb093d240022), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("8845__070_0131_002s.u3", 0x0001, 0x2000, CRC(d4439fb9) SHA1(51466000b613ab5c03b2bf933e1a485fe2e53d04), ROM_SKIP(1) | ROM_BIOS(1))
 
 	// hand-crafted prom containing address 02:cf:1f:12:34:56
 	ROM_REGION16_BE(0x20, "mac", 0)
@@ -97,7 +102,7 @@ void cmc_enp10_device::device_reset()
 
 void cmc_enp10_device::device_add_mconfig(machine_config &config)
 {
-	M68000(config, m_cpu, 10_MHz_XTAL / 2);
+	M68000(config, m_cpu, 20_MHz_XTAL / 2);
 	m_cpu->set_addrmap(AS_PROGRAM, &cmc_enp10_device::cpu_mem);
 
 	AM7990(config, m_net, 20_MHz_XTAL / 2);
@@ -108,17 +113,16 @@ void cmc_enp10_device::device_add_mconfig(machine_config &config)
 
 void cmc_enp10_device::cpu_mem(address_map &map)
 {
+	map(0xf0'0000, 0xf1'ffff).ram().share("ram");
 	map(0xf8'0000, 0xf8'3fff).rom().region("eprom", 0).mirror(0x02'0000);
 
 	map(0x00'0000, 0xf1'ffff).view(m_boot);
-	// map 1k of eprom at 0x00'0000
+	// map first 1k of eprom at 0x00'0000
 	m_boot[0](0x00'0000, 0x00'0fff).rom().region("eprom", 0);
-	m_boot[0](0xf0'0000, 0xf1'ffff).ram().share("ram");
 
-	// map 1k of ram at 0x00'0000, unmap at 0xf0'0000
+	// map first 1k of ram at 0x00'0000, unmap at 0xf0'0000
 	m_boot[1](0x00'0000, 0x01'ffff).ram().share("ram");
 	m_boot[1](0x00'1000, 0x01'ffff).unmaprw();
-	m_boot[1](0xf0'0000, 0xf1'ffff).ram().share("ram");
 	m_boot[1](0xf0'0000, 0xf0'0fff).unmaprw();
 
 	// uart: 16 byte registers 10-2f?
