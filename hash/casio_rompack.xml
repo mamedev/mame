@@ -243,8 +243,8 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Casio</publisher>
 		<part name="cart" interface="casio_rompack">
-			<dataarea name="rom" size="0x2000">
-				<rom name="ro257.bin" size="0x2000" crc="dccf23d0" sha1="9659f4013ef5028df5af65ff1a92f9f7b8108c10"/>
+			<dataarea name="rom" size="0x1800">
+				<rom name="ro257.bin" size="0x1800" crc="223e407d" sha1="79f7088c694b8b04a284bcd652ec1f84def75b5c"/>
 			</dataarea>
 		</part>
 	</software>
