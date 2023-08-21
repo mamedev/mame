@@ -232,7 +232,7 @@ TILE_GET_INFO_MEMBER(suprloco_state::get_tile_info)
 	uint16_t const tile_attr = (m_videoram[2 * tile_index] | (m_videoram[2 * tile_index + 1] << 8));
 	tileinfo.set(0,
 			BIT(tile_attr, 0, 10),
-			(BIT(tile_attr, 10, 3) | 0x8 | (BIT(m_control, 5, 2) << 4)), // this overlaps m_control bit 10 intentionally
+			(BIT(tile_attr, 10, 3) | 0x8 | (BIT(m_control, 5, 2) << 4)), // this overlaps tile_attr bit 10 intentionally
 			0);
 	tileinfo.category = BIT(tile_attr, 13);
 }
