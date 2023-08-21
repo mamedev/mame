@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Juergen Buchmueller, R. Belmont, Angelo Salese
+// copyright-holders:Angelo Salese
 
 #ifndef MAME_CPU_SH_SH7021_H
 #define MAME_CPU_SH_SH7021_H

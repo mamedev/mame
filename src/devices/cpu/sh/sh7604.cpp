@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Juergen Buchmueller, R. Belmont, Angelo Salese
+// copyright-holders:Juergen Buchmueller, R. Belmont
 /*****************************************************************************
  *
  *   sh2.c
@@ -33,11 +33,42 @@ DEFINE_DEVICE_TYPE(SH2_SH7604,  sh2_sh7604_device,  "sh2_7604",  "Hitachi SH-2 (
 
 sh2_sh7604_device::sh2_sh7604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sh2_device(mconfig, SH2_SH7604, tag, owner, clock, CPU_TYPE_SH2, address_map_constructor(FUNC(sh2_sh7604_device::sh7604_map), this), 32, 0xc7ffffff)
+	, m_test_irq(0), m_internal_irq_vector(0)
+	, m_smr(0), m_brr(0), m_scr(0), m_tdr(0), m_ssr(0)
+	, m_tier(0), m_ftcsr(0), m_frc_tcr(0), m_tocr(0), m_frc(0), m_ocra(0), m_ocrb(0), m_frc_icr(0)
+	, m_ipra(0), m_iprb(0), m_vcra(0), m_vcrb(0), m_vcrc(0), m_vcrd(0), m_vcrwdt(0), m_vcrdiv(0), m_intc_icr(0), m_vecmd(false), m_nmie(false)
+	, m_divu_ovf(false), m_divu_ovfie(false), m_dvsr(0), m_dvdntl(0), m_dvdnth(0)
+	, m_wtcnt(0), m_wtcsr(0), m_rstcsr(0)
+	, m_dmaor(0)
+	, m_sbycr(0), m_ccr(0)
+	, m_bcr1(0), m_bcr2(0), m_wcr(0), m_mcr(0), m_rtcsr(0), m_rtcor(0), m_rtcnt(0)
+	, m_frc_base(0), m_frt_input(0)
+	, m_timer(nullptr), m_wdtimer(nullptr)
 	, m_is_slave(0)
 	, m_dma_kludge_cb(*this)
 	, m_dma_fifo_data_available_cb(*this)
 	, m_ftcsr_read_cb(*this)
 {
+	std::fill(std::begin(m_vcrdma), std::end(m_vcrdma), 0);
+	std::fill(std::begin(m_dma_timer_active), std::end(m_dma_timer_active), 0);
+	std::fill(std::begin(m_dma_irq), std::end(m_dma_irq), 0);
+	std::fill(std::begin(m_active_dma_incs), std::end(m_active_dma_incs), 0);
+	std::fill(std::begin(m_active_dma_incd), std::end(m_active_dma_incd), 0);
+	std::fill(std::begin(m_active_dma_size), std::end(m_active_dma_size), 0);
+	std::fill(std::begin(m_active_dma_steal), std::end(m_active_dma_steal), 0);
+	std::fill(std::begin(m_active_dma_src), std::end(m_active_dma_src), 0);
+	std::fill(std::begin(m_active_dma_dst), std::end(m_active_dma_dst), 0);
+	std::fill(std::begin(m_active_dma_count), std::end(m_active_dma_count), 0);
+	std::fill(std::begin(m_wtcw), std::end(m_wtcw), 0);
+	std::fill(std::begin(m_dma_current_active_timer), std::end(m_dma_current_active_timer), nullptr);
+
+	m_irq_vector.fic = m_irq_vector.foc = m_irq_vector.fov = m_irq_vector.divu = 0;
+	std::fill(std::begin(m_irq_vector.dmac), std::end(m_irq_vector.dmac), 0);
+
+	m_irq_level.frc = m_irq_level.sci = m_irq_level.divu = m_irq_level.dmac = m_irq_level.wdt = 0;
+
+	for(int i = 0; i < 2; i++)
+		m_dmac[i].drcr = m_dmac[i].sar = m_dmac[i].dar = m_dmac[i].tcr = m_dmac[i].chcr = 0;
 }
 
 void sh2_sh7604_device::device_start()
@@ -1404,4 +1435,104 @@ void sh2_sh7604_device::sh2_recalc_irq()
 	m_sh2_state->internal_irq_level = irq;
 	m_internal_irq_vector = vector;
 	m_test_irq = 1;
+}
+
+/*
+ * DMAC
+ */
+
+template <int Channel>
+uint32_t sh2_sh7604_device::vcrdma_r()
+{
+	return m_vcrdma[Channel] & 0x7f;
+}
+
+template <int Channel>
+void sh2_sh7604_device::vcrdma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	COMBINE_DATA(&m_vcrdma[Channel]);
+	m_irq_vector.dmac[Channel] = m_vcrdma[Channel] & 0x7f;
+	sh2_recalc_irq();
+}
+
+template <int Channel>
+uint8_t sh2_sh7604_device::drcr_r() {
+	return m_dmac[Channel].drcr & 3;
+}
+
+template <int Channel>
+void sh2_sh7604_device::drcr_w(uint8_t data)
+{
+	m_dmac[Channel].drcr = data & 3;
+	sh2_recalc_irq();
+}
+
+template <int Channel>
+uint32_t sh2_sh7604_device::sar_r()
+{
+	return m_dmac[Channel].sar;
+}
+
+template <int Channel>
+void sh2_sh7604_device::sar_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	COMBINE_DATA(&m_dmac[Channel].sar);
+}
+
+template <int Channel>
+uint32_t sh2_sh7604_device::dar_r()
+{
+	return m_dmac[Channel].dar;
+}
+
+template <int Channel>
+void sh2_sh7604_device::dar_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	COMBINE_DATA(&m_dmac[Channel].dar);
+}
+
+template <int Channel>
+uint32_t sh2_sh7604_device::dmac_tcr_r()
+{
+	return m_dmac[Channel].tcr;
+}
+
+template <int Channel>
+void sh2_sh7604_device::dmac_tcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	COMBINE_DATA(&m_dmac[Channel].tcr);
+	m_dmac[Channel].tcr &= 0xffffff;
+}
+
+template <int Channel>
+uint32_t sh2_sh7604_device::chcr_r()
+{
+	return m_dmac[Channel].chcr;
+}
+
+template <int Channel>
+void sh2_sh7604_device::chcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	uint32_t old;
+	old = m_dmac[Channel].chcr;
+	COMBINE_DATA(&m_dmac[Channel].chcr);
+	m_dmac[Channel].chcr = (data & ~2) | (old & m_dmac[Channel].chcr & 2);
+	sh2_dmac_check(Channel);
+}
+
+uint32_t sh2_sh7604_device::dmaor_r()
+{
+	return m_dmaor & 0xf;
+}
+
+void sh2_sh7604_device::dmaor_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	if(ACCESSING_BITS_0_7)
+	{
+		uint8_t old;
+		old = m_dmaor & 0xf;
+		m_dmaor = (data & ~6) | (old & m_dmaor & 6); // TODO: should this be old & data & 6? bug?
+		sh2_dmac_check(0);
+		sh2_dmac_check(1);
+	}
 }

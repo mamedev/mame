@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Juergen Buchmueller, R. Belmont, Angelo Salese
+// copyright-holders:Angelo Salese
 
 #include "sh7021.h"
 

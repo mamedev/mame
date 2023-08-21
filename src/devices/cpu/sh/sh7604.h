@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Juergen Buchmueller, R. Belmont, Angelo Salese
+// copyright-holders:Juergen Buchmueller, R. Belmont
 
 #ifndef MAME_CPU_SH_SH7604_H
 #define MAME_CPU_SH_SH7604_H
@@ -40,8 +40,8 @@ protected:
 
 	virtual void sh2_exception(const char *message, int irqline) override;
 
-	uint32_t  m_test_irq = 0;
-	int     m_internal_irq_vector = 0;
+	uint32_t m_test_irq;
+	int m_internal_irq_vector;
 
 private:
 	enum
@@ -119,47 +119,20 @@ private:
 	void dvcr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	// DMAC
-	template <int Channel> uint32_t vcrdma_r()
-	{
-		return m_vcrdma[Channel] & 0x7f;
-	}
-
-	template <int Channel> void vcrdma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0)
-	{
-		COMBINE_DATA(&m_vcrdma[Channel]);
-		m_irq_vector.dmac[Channel] = m_vcrdma[Channel] & 0x7f;
-		sh2_recalc_irq();
-	}
-
-	template <int Channel> uint8_t drcr_r() { return m_dmac[Channel].drcr & 3; }
-	template <int Channel> void drcr_w(uint8_t data) { m_dmac[Channel].drcr = data & 3; sh2_recalc_irq(); }
-	template <int Channel> uint32_t sar_r() { return m_dmac[Channel].sar; }
-	template <int Channel> void sar_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { COMBINE_DATA(&m_dmac[Channel].sar); }
-	template <int Channel> uint32_t dar_r() { return m_dmac[Channel].dar; }
-	template <int Channel> void dar_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { COMBINE_DATA(&m_dmac[Channel].dar); }
-	template <int Channel> uint32_t dmac_tcr_r() { return m_dmac[Channel].tcr; }
-	template <int Channel> void dmac_tcr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { COMBINE_DATA(&m_dmac[Channel].tcr); m_dmac[Channel].tcr &= 0xffffff; }
-	template <int Channel> uint32_t chcr_r() { return m_dmac[Channel].chcr; }
-	template <int Channel> void chcr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0)
-	{
-		uint32_t old;
-		old = m_dmac[Channel].chcr;
-		COMBINE_DATA(&m_dmac[Channel].chcr);
-		m_dmac[Channel].chcr = (data & ~2) | (old & m_dmac[Channel].chcr & 2);
-		sh2_dmac_check(Channel);
-	}
-	uint32_t dmaor_r() { return m_dmaor & 0xf; }
-	void dmaor_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0)
-	{
-		if(ACCESSING_BITS_0_7)
-		{
-			uint8_t old;
-			old = m_dmaor & 0xf;
-			m_dmaor = (data & ~6) | (old & m_dmaor & 6); // TODO: should this be old & data & 6? bug?
-			sh2_dmac_check(0);
-			sh2_dmac_check(1);
-		}
-	}
+	template <int Channel> uint32_t vcrdma_r();
+	template <int Channel> void vcrdma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template <int Channel> uint8_t drcr_r();
+	template <int Channel> void drcr_w(uint8_t data);
+	template <int Channel> uint32_t sar_r();
+	template <int Channel> void sar_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template <int Channel> uint32_t dar_r();
+	template <int Channel> void dar_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template <int Channel> uint32_t dmac_tcr_r();
+	template <int Channel> void dmac_tcr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template <int Channel> uint32_t chcr_r();
+	template <int Channel> void chcr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t dmaor_r();
+	void dmaor_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	// WTC
 	uint16_t wtcnt_r();
@@ -192,74 +165,79 @@ private:
 	virtual void set_frt_input(int state) override;
 
 	// SCI
-	uint8_t m_smr = 0, m_brr = 0, m_scr = 0, m_tdr = 0, m_ssr = 0;
+	uint8_t m_smr, m_brr, m_scr, m_tdr, m_ssr;
+
 	// FRT / FRC
-	uint8_t m_tier = 0, m_ftcsr = 0, m_frc_tcr = 0, m_tocr = 0;
-	uint16_t m_frc = 0;
-	uint16_t m_ocra = 0, m_ocrb = 0, m_frc_icr = 0;
+	uint8_t m_tier, m_ftcsr, m_frc_tcr, m_tocr;
+	uint16_t m_frc;
+	uint16_t m_ocra, m_ocrb, m_frc_icr;
+
 	// INTC
 	struct {
-		uint8_t frc = 0;
-		uint8_t sci = 0;
-		uint8_t divu = 0;
-		uint8_t dmac = 0;
-		uint8_t wdt = 0;
+		uint8_t frc;
+		uint8_t sci;
+		uint8_t divu;
+		uint8_t dmac;
+		uint8_t wdt;
 	} m_irq_level;
+
 	struct {
-		uint8_t fic = 0;
-		uint8_t foc = 0;
-		uint8_t fov = 0;
-		uint8_t divu = 0;
-		uint8_t dmac[2] = { 0, 0 };
+		uint8_t fic;
+		uint8_t foc;
+		uint8_t fov;
+		uint8_t divu;
+		uint8_t dmac[2];
 	} m_irq_vector;
-	uint16_t m_ipra = 0, m_iprb = 0;
-	uint16_t m_vcra = 0, m_vcrb = 0, m_vcrc = 0, m_vcrd = 0, m_vcrwdt = 0, m_vcrdiv = 0, m_intc_icr = 0, m_vcrdma[2] = { 0, 0, };
-	bool m_vecmd = false, m_nmie = false;
+
+	uint16_t m_ipra, m_iprb;
+	uint16_t m_vcra, m_vcrb, m_vcrc, m_vcrd, m_vcrwdt, m_vcrdiv, m_intc_icr, m_vcrdma[2];
+	bool m_vecmd, m_nmie;
 
 	// DIVU
-	bool m_divu_ovf = false, m_divu_ovfie = false;
-	uint32_t m_dvsr = 0, m_dvdntl = 0, m_dvdnth = 0;
+	bool m_divu_ovf, m_divu_ovfie;
+	uint32_t m_dvsr, m_dvdntl, m_dvdnth;
 
 	// WTC
-	uint8_t m_wtcnt = 0, m_wtcsr = 0;
-	uint8_t m_rstcsr = 0;
-	uint16_t m_wtcw[2] = { 0, 0 };
+	uint8_t m_wtcnt, m_wtcsr;
+	uint8_t m_rstcsr;
+	uint16_t m_wtcw[2];
 
 	// DMAC
 	struct {
-		uint8_t drcr = 0;
-		uint32_t sar = 0;
-		uint32_t dar = 0;
-		uint32_t tcr = 0;
-		uint32_t chcr = 0;
+		uint8_t drcr;
+		uint32_t sar;
+		uint32_t dar;
+		uint32_t tcr;
+		uint32_t chcr;
 	} m_dmac[2];
-	uint8_t m_dmaor = 0;
+	uint8_t m_dmaor;
 
 	// misc
-	uint8_t m_sbycr = 0, m_ccr = 0;
+	uint8_t m_sbycr, m_ccr;
 
 	// BSC
-	uint32_t m_bcr1 = 0, m_bcr2 = 0, m_wcr = 0, m_mcr = 0, m_rtcsr = 0, m_rtcor = 0, m_rtcnt = 0;
+	uint32_t m_bcr1, m_bcr2, m_wcr, m_mcr, m_rtcsr, m_rtcor, m_rtcnt;
 
-	uint64_t  m_frc_base = 0;
+	uint64_t m_frc_base;
 
-	int     m_frt_input = 0;
+	int m_frt_input;
 
-	emu_timer *m_timer = nullptr;
-	emu_timer *m_wdtimer = nullptr;
-	emu_timer *m_dma_current_active_timer[2] { nullptr, nullptr };
-	int     m_dma_timer_active[2] = { 0, 0 };
-	uint8_t  m_dma_irq[2] = { 0, 0 };
+	emu_timer *m_timer;
+	emu_timer *m_wdtimer;
+	emu_timer *m_dma_current_active_timer[2];
+	int m_dma_timer_active[2];
+	uint8_t m_dma_irq[2];
 
-	int m_active_dma_incs[2] = { 0, 0 };
-	int m_active_dma_incd[2] = { 0, 0 };
-	int m_active_dma_size[2] = { 0, 0 };
-	int m_active_dma_steal[2] = { 0, 0 };
-	uint32_t m_active_dma_src[2] = { 0, 0 };
-	uint32_t m_active_dma_dst[2] = { 0, 0 };
-	uint32_t m_active_dma_count[2] = { 0, 0 };
+	int m_active_dma_incs[2];
+	int m_active_dma_incd[2];
+	int m_active_dma_size[2];
+	int m_active_dma_steal[2];
+	uint32_t m_active_dma_src[2];
+	uint32_t m_active_dma_dst[2];
+	uint32_t m_active_dma_count[2];
 
-	int     m_is_slave = 0;
+	int m_is_slave;
+
 	dma_kludge_delegate              m_dma_kludge_cb;
 	dma_fifo_data_available_delegate m_dma_fifo_data_available_cb;
 	ftcsr_read_delegate              m_ftcsr_read_cb;
