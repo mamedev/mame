@@ -65,7 +65,7 @@ public:
 		m_mem_view(*this, "rom_bank"),
 		m_ram(*this, RAM_TAG),
 		m_floppy_ram(*this, "floppyram"),
-		m_tlbc(*this,"tlbc"),
+		m_tlbc(*this, "tlbc"),
 		m_h37(*this, "h37"),
 		m_intr_socket(*this, "intr_socket"),
 		m_console(*this, "console"),
@@ -499,9 +499,6 @@ void h89_state::h89(machine_config & config)
 	m_h37->drq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_drq));
 	m_h37->irq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_irq));
 	m_h37->block_interrupt_cb().set(m_intr_socket, FUNC(heath_intr_socket::block_interrupts));
-	//m_h37->drq_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::set_drq));
-	//m_h37->irq_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::set_irq));
-	//m_h37->block_interrupt_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::block_interrupts));
 
 	// H-88-3 3-port serial board
 	INS8250(config, m_serial1, INS8250_CLOCK);

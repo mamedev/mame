@@ -21,7 +21,7 @@ class h19_state : public driver_device
 public:
 	h19_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_tlbc(*this,"tlbc")
+		m_tlbc(*this, "tlbc")
 	{
 	}
 
