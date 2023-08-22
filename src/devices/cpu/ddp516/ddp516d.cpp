@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /***************************************************************************
 
-    Computer Control Company/Honeywell DDP-516 disassembler
+    Honeywell (Computer Control Division) DDP-516 disassembler
 
     Alternate disassemblers are provided for Prime Computer's 16S, 32S,
     32R, 64R and 64V instruction modes, which are increasingly elaborate

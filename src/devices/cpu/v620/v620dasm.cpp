@@ -17,8 +17,13 @@ v620_disassembler::v620_disassembler()
 {
 }
 
-v75_disassembler::v75_disassembler()
+v620f_disassembler::v620f_disassembler()
 	: v620_disassembler()
+{
+}
+
+v75_disassembler::v75_disassembler()
+	: v620f_disassembler()
 {
 }
 
@@ -85,28 +90,32 @@ static const char *const s_rr_ops[3] =
 	"ADR", "SBR", "T"
 };
 
-const std::unordered_map<u16, std::array<const char *, 3>> s_cond_map =
+static const char *const s_jxif_ops[10][3] =
 {
-	{ 0000, { "JMP", "JMPM", "XEC" } },     // unconditional
-	{ 0001, { "JOF", "JOFM", "XOF" } },     // overflow set
-	{ 0002, { "JAP", "JAPM", "XAP" } },     // A positive
-	{ 0004, { "JAN", "JANM", "XAN" } },     // A negative
-	{ 0007, { "JOFN", "JOFNM", "XOFN" } },  // overflow not set (620/f)
-	{ 0010, { "JAZ", "JAZM", "XAZ" } },     // A zero
-	{ 0016, { "JANZ", "JANZM", "XANZ" } },  // A not zero (620/f)
-	{ 0020, { "JBZ", "JBZM", "XBZ" } },     // B zero
-	{ 0026, { "JBNZ", "JBNZM", "XBNZ" } },  // B not zero (620/f)
-	{ 0040, { "JXZ", "JXZM", "XXZ" } },     // X zero
-	{ 0046, { "JXNZ", "JXNZM", "XXNZ" } },  // X not zero (620/f)
-	{ 0100, { "JSS1", "JS1M", "XS1M" } },   // sense switch 1 set
-	{ 0106, { "JS1N", "JS1NM", "XS1NM" } }, // sense switch 1 not set (620/f)
-	{ 0200, { "JSS2", "JS2M", "XS2M" } },   // sense switch 2 set
-	{ 0206, { "JS2N", "JS2NM", "XS2NM" } }, // sense switch 2 not set (620/f)
-	{ 0400, { "JSS3", "JS3M", "XS3M" } },   // sense switch 3 set
-	{ 0406, { "JS3N", "JS3NM", "XS3NM" } }  // sense switch 3 not set (620/f)
+	{ "JMP", "JMPM", "XEC" },       // unconditional      (00x000)
+	{ "JOF", "JOFM", "XOF" },       // overflow set       (00x001)
+	{ "JAP", "JAPM", "XAP" },       // A positive         (00x002)
+	{ "JAN", "JANM", "XAN" },       // A negative         (00x004)
+	{ "JAZ", "JAZM", "XAZ" },       // A zero             (00x010)
+	{ "JBZ", "JBZM", "XBZ" },       // B zero             (00x020)
+	{ "JXZ", "JXZM", "XXZ" },       // X zero             (00x040)
+	{ "JSS1", "JS1M", "XS1M" },     // sense switch 1 set (00x100)
+	{ "JSS2", "JS2M", "XS2M" },     // sense switch 2 set (00x200)
+	{ "JSS3", "JS3M", "XS3M" }      // sense switch 3 set (00x400)
 };
 
-const std::unordered_map<u8, const char *> s_fpp_map =
+static const char *const s_jxif_ext_ops[7][3] =
+{
+	{ "JOFN", "JOFNM", "XOFN" },    // overflow not set       (00x007)
+	{ "JANZ", "JANZM", "XANZ" },    // A not zero             (00x016)
+	{ "JBNZ", "JBNZM", "XBNZ" },    // B not zero             (00x026)
+	{ "JXNZ", "JXNZM", "XXNZ" },    // X not zero             (00x046)
+	{ "JS1N", "JS1NM", "XS1NM" },   // sense switch 1 not set (00x106)
+	{ "JS2N", "JS2NM", "XS2NM" },   // sense switch 2 not set (00x206)
+	{ "JS3N", "JS3NM", "XS3NM" }    // sense switch 3 not set (00x406)
+};
+
+static const std::unordered_map<u8, const char *> s_fpp_map =
 {
 	{ 0001, "FDV" },
 	{ 0010, "FAD" },
@@ -138,6 +147,53 @@ void v620_disassembler::format_address(std::ostream &stream, u16 addr) const
 	if (addr >= 010000)
 		stream << '0';
 	util::stream_format(stream, "%05o", addr);
+}
+
+offs_t v620_disassembler::dasm_jxif(std::ostream &stream, u16 inst, u16 dest, offs_t pc, const v620_disassembler::data_buffer &opcodes) const
+{
+	// Jump and execute instructions
+	const u16 cond = BIT(inst, 0, 9);
+	if ((cond & (cond - 1)) == 0)
+	{
+		const char *op = s_jxif_ops[32 - count_leading_zeros_32(cond)][BIT(inst, 9, 2) - 1];
+		if (BIT(dest, 15))
+			util::stream_format(stream, "%-8s", std::string(op) + "*");
+		else
+			util::stream_format(stream, "%-8s", op);
+	}
+	else
+	{
+		std::string name = util::string_format("%cIF", inst < 03000 ? 'J' : 'X');
+		if (!BIT(inst, 9))
+			name += 'M';
+		if (BIT(dest, 15))
+			name += '*';
+		util::stream_format(stream, "%-8s", name);
+		format_number(stream, cond);
+		stream << ',';
+	}
+	format_address(stream, dest & 077777);
+	if (inst == 001000 && BIT(dest, 15))
+		return 2 | STEP_OUT | SUPPORTED;
+	else
+		return 2 | (BIT(inst, 10) ? STEP_OVER : 0) | (cond != 0 ? STEP_COND : 0) | SUPPORTED;
+}
+
+offs_t v620f_disassembler::dasm_jxif(std::ostream &stream, u16 inst, u16 dest, offs_t pc, const v620_disassembler::data_buffer &opcodes) const
+{
+	const u16 cond = BIT(inst, 0, 9);
+	if (cond == 0007 || (cond >= 0016 && (((cond - 6) & (cond - 7)) == 0)))
+	{
+		const char *op = s_jxif_ext_ops[32 - 3 - count_leading_zeros_32(cond)][BIT(inst, 9, 2) - 1];
+		if (BIT(dest, 15))
+			util::stream_format(stream, "%-8s", std::string(op) + "*");
+		else
+			util::stream_format(stream, "%-8s", op);
+		format_address(stream, dest & 077777);
+		return 2 | (BIT(inst, 10) ? STEP_OVER : 0) | STEP_COND | SUPPORTED;
+	}
+	else
+		return v620_disassembler::dasm_jxif(stream, inst, dest, pc, opcodes);
 }
 
 offs_t v620_disassembler::dasm_004xxx(std::ostream &stream, u16 inst, offs_t pc, const v620_disassembler::data_buffer &opcodes) const
@@ -176,14 +232,28 @@ offs_t v75_disassembler::dasm_004xxx(std::ostream &stream, u16 inst, offs_t pc, 
 		return 2 | SUPPORTED;
 	}
 	else
-		return v620_disassembler::dasm_004xxx(stream, inst, pc, opcodes);
+		return v620f_disassembler::dasm_004xxx(stream, inst, pc, opcodes);
 }
 
 offs_t v620_disassembler::dasm_misc(std::ostream &stream, u16 inst, offs_t pc, const v620_disassembler::data_buffer &opcodes) const
 {
+	if (inst == 007400)
+		stream << "ROF";
+	else if (inst == 007401)
+		stream << "SOF";
+	else
+	{
+		util::stream_format(stream, "%-8s", "DATA");
+		format_number(stream, inst);
+	}
+	return 1 | SUPPORTED;
+}
+
+offs_t v620f_disassembler::dasm_misc(std::ostream &stream, u16 inst, offs_t pc, const v620f_disassembler::data_buffer &opcodes) const
+{
 	if ((inst & 0177700) == 006400)
 	{
-		// Bit test (620/f)
+		// Bit test (620/f-10 Optional Instruction Set)
 		u16 dest = opcodes.r16(pc + 1);
 		util::stream_format(stream, "%s%-6c", "BT", BIT(dest, 15) ? '*' : ' ');
 		format_number(stream, BIT(inst, 0, 6));
@@ -193,7 +263,7 @@ offs_t v620_disassembler::dasm_misc(std::ostream &stream, u16 inst, offs_t pc, c
 	}
 	else if (inst == 006505 || inst == 006506)
 	{
-		// Jump and set return in index (620/f)
+		// Jump and set return in index
 		u16 dest = opcodes.r16(pc + 1);
 		util::stream_format(stream, "%s%-5c", "JSR", BIT(dest, 15) ? '*' : ' ');
 		format_address(stream, dest & 077777);
@@ -202,7 +272,7 @@ offs_t v620_disassembler::dasm_misc(std::ostream &stream, u16 inst, offs_t pc, c
 	}
 	else if ((inst & 0177704) == 006604)
 	{
-		// Skip on register equal (620/f)
+		// Skip on register equal (620/f-10 Optional Instruction Set)
 		u8 mode = BIT(inst, 0, 3);
 		u16 addr = opcodes.r16(pc + 1);
 		util::stream_format(stream, "%s%-5c", "SRE", BIT(addr, 15) ? '*' : ' ');
@@ -219,7 +289,7 @@ offs_t v620_disassembler::dasm_misc(std::ostream &stream, u16 inst, offs_t pc, c
 	}
 	else if ((inst & 0177774) == 006704)
 	{
-		// Indexed jump (620/f)
+		// Indexed jump
 		u8 mode = BIT(inst, 0, 3);
 		u16 dest = opcodes.r16(pc + 1);
 		util::stream_format(stream, "%s%-4c", "IJMP", BIT(dest, 15) ? '*' : ' ');
@@ -232,21 +302,13 @@ offs_t v620_disassembler::dasm_misc(std::ostream &stream, u16 inst, offs_t pc, c
 			format_address(stream, (mode == 4 ? pc + 1 + dest : dest) & 077777);
 		return 2 | SUPPORTED;
 	}
-	else
+	else if (inst == 007402)
 	{
-		if (inst == 007400)
-			stream << "ROF";
-		else if (inst == 007401)
-			stream << "SOF";
-		else if (inst == 007402)
-			stream << "TSA"; // switches to A (620/f)
-		else
-		{
-			util::stream_format(stream, "%-8s", "DATA");
-			format_number(stream, inst);
-		}
+		stream << "TSA"; // switches to A
 		return 1 | SUPPORTED;
 	}
+	else
+		return v620_disassembler::dasm_misc(stream, inst, pc, opcodes);
 }
 
 offs_t v75_disassembler::dasm_misc(std::ostream &stream, u16 inst, offs_t pc, const v75_disassembler::data_buffer &opcodes) const
@@ -307,7 +369,7 @@ offs_t v75_disassembler::dasm_misc(std::ostream &stream, u16 inst, offs_t pc, co
 		return 2 | STEP_COND | SUPPORTED;
 	}
 	else
-		return v620_disassembler::dasm_misc(stream, inst, pc, opcodes);
+		return v620f_disassembler::dasm_misc(stream, inst, pc, opcodes);
 }
 
 offs_t v620_disassembler::dasm_io(std::ostream &stream, u16 inst, offs_t pc, const v620_disassembler::data_buffer &opcodes) const
@@ -349,7 +411,7 @@ offs_t v620_disassembler::dasm_io(std::ostream &stream, u16 inst, offs_t pc, con
 	}
 }
 
-offs_t v75_disassembler::dasm_io(std::ostream &stream, u16 inst, offs_t pc, const v620_disassembler::data_buffer &opcodes) const
+offs_t v620f_disassembler::dasm_io(std::ostream &stream, u16 inst, offs_t pc, const v620f_disassembler::data_buffer &opcodes) const
 {
 	if ((inst & 0177000) == 0104000)
 	{
@@ -358,6 +420,11 @@ offs_t v75_disassembler::dasm_io(std::ostream &stream, u16 inst, offs_t pc, cons
 		return 1 | SUPPORTED;
 	}
 
+	return v620_disassembler::dasm_io(stream, inst, pc, opcodes);
+}
+
+offs_t v75_disassembler::dasm_io(std::ostream &stream, u16 inst, offs_t pc, const v75_disassembler::data_buffer &opcodes) const
+{
 	if ((inst & 0177400) == 0105400)
 	{
 		// Floating point processor option
@@ -374,7 +441,7 @@ offs_t v75_disassembler::dasm_io(std::ostream &stream, u16 inst, offs_t pc, cons
 		}
 	}
 
-	return v620_disassembler::dasm_io(stream, inst, pc, opcodes);
+	return v620f_disassembler::dasm_io(stream, inst, pc, opcodes);
 }
 
 offs_t v620_disassembler::disassemble(std::ostream &stream, offs_t pc, const v620_disassembler::data_buffer &opcodes, const v620_disassembler::data_buffer &params)
@@ -450,6 +517,18 @@ offs_t v620_disassembler::disassemble(std::ostream &stream, offs_t pc, const v62
 			// Increment or decrement
 			switch (inst & 000477)
 			{
+			case 001:
+				util::stream_format(stream, "%cCA", BIT(inst, 7) ? 'D' : 'I');
+				break;
+
+			case 002:
+				util::stream_format(stream, "%cCB", BIT(inst, 7) ? 'D' : 'I');
+				break;
+
+			case 004:
+				util::stream_format(stream, "%cCX", BIT(inst, 7) ? 'D' : 'I');
+				break;
+
 			case 011:
 				util::stream_format(stream, "%cAR", BIT(inst, 7) ? 'D' : 'I');
 				break;
@@ -549,33 +628,13 @@ offs_t v620_disassembler::disassemble(std::ostream &stream, offs_t pc, const v62
 		return dasm_004xxx(stream, inst, pc, opcodes);
 	else if (inst >= 001000 && inst < 004000)
 	{
-		// Jump and execute instructions
-		u16 dest = opcodes.r16(pc + 1);
-		u16 cond = BIT(inst, 0, 9);
-		auto lookup = s_cond_map.find(cond);
-		if (lookup != s_cond_map.end())
+		if (inst == 001006)
 		{
-			if (BIT(dest, 15))
-				util::stream_format(stream, "%-8s", std::string(lookup->second[BIT(inst, 9, 2) - 1]) + "*");
-			else
-				util::stream_format(stream, "%-8s", lookup->second[BIT(inst, 9, 2) - 1]);
+			stream << "USKP"; // first documented for 620/f, but probably supported on earlier models
+			return 1 | SUPPORTED;
 		}
 		else
-		{
-			std::string name = util::string_format("%cIF", inst < 03000 ? 'J' : 'X');
-			if (!BIT(inst, 9))
-				name += 'M';
-			if (BIT(dest, 15))
-				name += '*';
-			util::stream_format(stream, "%-8s", name);
-			format_number(stream, cond);
-			stream << ',';
-		}
-		format_address(stream, dest & 077777);
-		if (inst == 001000 && BIT(dest, 15))
-			return 2 | STEP_OUT | SUPPORTED;
-		else
-			return 2 | (BIT(inst, 10) ? STEP_OVER : 0) | (cond != 0 ? STEP_COND : 0) | SUPPORTED;
+			return dasm_jxif(stream, inst, opcodes.r16(pc + 1), pc, opcodes);
 	}
 	else
 	{
