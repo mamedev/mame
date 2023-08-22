@@ -596,10 +596,10 @@ void mb86292_device::process_display_list()
 						LOGDASM("\t%04x|%04x\n", rys, rxs);
 						LOGDASM("\t%04x|%04x\n", rsizey, rsizex);
 						// color should be FC according to usage
-						for (u16 yi = 0; yi < rsizey; yi ++)
+						for (u16 yi = rys; yi < rsizey; yi ++)
 						{
 							const u32 dst_ptr = m_fb.base + yi * (m_fb.xres << 1);
-							for (u16 xi = 0; xi < rsizex; xi ++)
+							for (u16 xi = rxs; xi < rsizex; xi ++)
 								vram_write_word(dst_ptr + (xi << 1), m_draw.fc);
 						}
 						break;
