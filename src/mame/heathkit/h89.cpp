@@ -67,7 +67,7 @@ public:
 		m_floppy_ram(*this, "floppyram"),
 		m_tlbc(*this,"tlbc"),
 		m_h37(*this, "h37"),
-		m_intr_cntrl(*this, "intr_cntrl"),
+		m_intr_socket(*this, "intr_socket"),
 		m_console(*this, "console"),
 		m_serial1(*this, "serial1"),
 		m_serial2(*this, "serial2"),
@@ -87,7 +87,7 @@ private:
 	required_shared_ptr<uint8_t> m_floppy_ram;
 	required_device<heath_tlb_connector> m_tlbc;
 	required_device<heath_z37_fdc_device> m_h37;
-	required_device<heath_intr_cntrl> m_intr_cntrl;
+	required_device<heath_intr_socket> m_intr_socket;
 	required_device<ins8250_device> m_console;
 	required_device<ins8250_device> m_serial1;
 	required_device<ins8250_device> m_serial2;
@@ -404,14 +404,7 @@ void h89_state::raise_NMI_w(uint8_t)
 
 void h89_state::console_intr(uint8_t data)
 {
-	if (bool(data))
-	{
-		m_intr_cntrl->raise_irq(3);
-	}
-	else
-	{
-		m_intr_cntrl->lower_irq(3);
-	}
+	m_intr_socket->set_irq_level(3, data);
 }
 
 void h89_state::reset_line(int data)
@@ -427,7 +420,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(h89_state::h89_irq_timer)
 {
 	if (m_timer_intr_enabled)
 	{
-		m_intr_cntrl->raise_irq(1);
+		m_intr_socket->set_irq_level(1, ASSERT_LINE);
 	}
 }
 
@@ -457,7 +450,7 @@ void h89_state::port_f2_w(uint8_t data)
 {
 	update_gpp(data);
 
-	m_intr_cntrl->lower_irq(1);
+	m_intr_socket->set_irq_level(1, CLEAR_LINE);
 }
 
 static void tlb_options(device_slot_interface &device)
@@ -469,6 +462,11 @@ static void tlb_options(device_slot_interface &device)
 	device.option_add("watzman", HEATH_WATZ);
 }
 
+static void intr_ctrl_options(device_slot_interface &device)
+{
+	device.option_add("original", HEATH_INTR_CNTRL);
+	device.option_add("h37", HEATH_Z37_INTR_CNTRL);
+}
 
 void h89_state::h89(machine_config & config)
 {
@@ -476,10 +474,13 @@ void h89_state::h89(machine_config & config)
 	Z80(config, m_maincpu, H89_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &h89_state::h89_mem);
 	m_maincpu->set_addrmap(AS_IO, &h89_state::h89_io);
-	m_maincpu->set_irq_acknowledge_callback("intr_cntrl", FUNC(heath_intr_cntrl::irq_callback));
+	m_maincpu->set_irq_acknowledge_callback("intr_socket", FUNC(heath_intr_socket::irq_callback));
 
-	HEATH_Z37_INTR_CNTRL(config, m_intr_cntrl);
-	m_intr_cntrl->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	HEATH_INTR_SOCKET(config, m_intr_socket, intr_ctrl_options, "h37");
+	m_intr_socket->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	//HEATH_Z37_INTR_CNTRL(config, m_intr_cntrl);
+	//m_intr_cntrl->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("16K,32K,48K").set_default_value(0x00);
 
@@ -494,10 +495,13 @@ void h89_state::h89(machine_config & config)
 
 	m_tlbc->reset_cb().set(FUNC(h89_state::reset_line));
 
-	HEATH_Z37_FDC(config, m_h37);
-	m_h37->drq_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::set_drq));
-	m_h37->irq_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::set_irq));
-	m_h37->block_interrupt_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::block_interrupts));
+	HEATH_Z37_FDC(config, m_h37); // heath_intr_socket
+	m_h37->drq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_drq));
+	m_h37->irq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_irq));
+	m_h37->block_interrupt_cb().set(m_intr_socket, FUNC(heath_intr_socket::block_interrupts));
+	//m_h37->drq_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::set_drq));
+	//m_h37->irq_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::set_irq));
+	//m_h37->block_interrupt_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::block_interrupts));
 
 	// H-88-3 3-port serial board
 	INS8250(config, m_serial1, INS8250_CLOCK);

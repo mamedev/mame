@@ -22,7 +22,6 @@
 #include "speaker.h"
 
 
-
 class heath_tlb_connector;
 
 class device_heath_tlb_card_interface : public device_interface
@@ -43,8 +42,6 @@ protected:
 	device_heath_tlb_card_interface(const machine_config &mconfig, device_t &device);
 
 	heath_tlb_connector  *m_slot;
-
-	friend class heath_tlb_device;
 };
 
 
