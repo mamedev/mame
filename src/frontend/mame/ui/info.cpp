@@ -376,7 +376,7 @@ std::string machine_info::game_info_string() const
 	}
 
 	// print description, manufacturer, and CPU:
-	util::stream_format(buf, _("%1$s\n%2$s %3$s\nDriver: %4$s\n\nCPU:\n"),
+	util::stream_format(buf, _("%1$s\n%2$s %3$s\nSource file: %4$s\n\nCPU:\n"),
 			system_list::instance().systems()[driver_list::find(m_machine.system().name)].description,
 			m_machine.system().year,
 			m_machine.system().manufacturer,

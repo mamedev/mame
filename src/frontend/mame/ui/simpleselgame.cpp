@@ -354,7 +354,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), driver->year, driver->manufacturer);
 
 		// next line source path
-		tempbuf[2] = string_format(_("Driver: %1$s"), info_xml_creator::format_sourcefile(driver->type.source()));
+		tempbuf[2] = string_format(_("Source file: %1$s"), info_xml_creator::format_sourcefile(driver->type.source()));
 
 		// update cached values if selection changed
 		if (driver != m_cached_driver)

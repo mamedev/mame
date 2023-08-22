@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 #include "emu.h"
-#include "coreutil.h"
 #include "bus/nscsi/cd.h"
+
+#include "coreutil.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
