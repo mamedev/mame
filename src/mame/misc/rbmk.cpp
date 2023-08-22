@@ -103,7 +103,7 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<ym2151_device> m_ymsnd;
+	optional_device<ym2151_device> m_ymsnd;
 	required_ioport_array<3> m_dsw;
 
 	uint16_t m_tilebank = 0;
@@ -221,10 +221,10 @@ void rbmk_state::super555_mem(address_map &map)
 	map(0x600000, 0x600001).rw(FUNC(rbmk_state::dip_mux_r), FUNC(rbmk_state::dip_mux_w));
 	map(0x608000, 0x608001).portr("IN1").w(FUNC(rbmk_state::tilebank_w)); // ok
 	map(0x610000, 0x610001).portr("IN2");
-	// map(0x618080, 0x618081).lr16(NAME([this] () -> uint16_t { return m_prot_data; })); // reads something here from below, if these are hooked up booting stops with '0x09 U64 ERROR', like it's failing some checksum test
-	map(0x620000, 0x620001).portr("IN3");
+	map(0x618080, 0x618081).nopr();//.lr16(NAME([this] () -> uint16_t { return m_prot_data; })); // reads something here from below, if these are hooked up booting stops with '0x09 U64 ERROR', like it's failing some checksum test
+	map(0x620000, 0x620001).r("oki", FUNC(okim6295_device::read)); // TODO: Oki controlled through a GAL at 18C, should be banked, too
 	// map(0x620080, 0x620081).lw16(NAME([this] (uint16_t data) { m_prot_data = data; })); // writes something here that expects to read above
-	map(0x628000, 0x628001).w(FUNC(rbmk_state::unk_w));
+	map(0x628000, 0x628000).w("oki", FUNC(okim6295_device::write));
 	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x940000, 0x940fff).ram().share(m_vidram[1]);
 	map(0x980000, 0x983fff).ram();
@@ -1065,6 +1065,7 @@ void rbmk_state::super555(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &rbmk_state::super555_mem);
 
 	config.device_remove("mcu");
+	config.device_remove("ymsnd");
 }
 
 void rbmk_state::magslot(machine_config &config)
@@ -1216,8 +1217,8 @@ GAME( 1998, rbmk,     0, rbmk,     rbmk,     rbmk_state, empty_init,    ROT0,  "
 GAME( 1998, rbspm,    0, rbspm,    rbspm,    rbmk_state, empty_init,    ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)",    MACHINE_NOT_WORKING )
 
 // card games
-GAME( 1999, super555, 0, super555, super555, rbmk_state, init_super555, ROT0,  "GMS", "Super 555 (English version V1.5)",          MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now
+GAME( 1999, super555, 0, super555, super555, rbmk_state, init_super555, ROT0,  "GMS", "Super 555 (English version V1.5)",          MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
 GAME( 2001, sc2in1,   0, magslot,  magslot,  rbmk_state, empty_init,    ROT0,  "GMS", "Super Card 2 in 1 (English version 03.23)", MACHINE_NOT_WORKING ) // stops during boot
 
 // slot, on slightly different PCB
-GAME( 2003, magslot,  0, magslot,  magslot,  rbmk_state, empty_init,    ROT0,  "GMS", "Magic Slot (normal 1.0C)",                  MACHINE_NOT_WORKING ) // needs implementing of 3rd GFX layer, correct GFX decode for 1st layer, inputs
+GAME( 2003, magslot,  0, magslot,  magslot,  rbmk_state, empty_init,    ROT0,  "GMS", "Magic Slot (normal 1.0C)",                  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // needs implementing of 3rd GFX layer, correct GFX decode for 1st layer, inputs
