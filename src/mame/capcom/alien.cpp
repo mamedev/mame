@@ -70,11 +70,16 @@
 
 
 #include "emu.h"
+
 #include "cpu/sh/sh4.h"
 #include "machine/ram.h"
 #include "machine/timekpr.h"
 #include "sound/ymz770.h"
 #include "video/mb86292.h"
+
+#include "bus/ata/ataintf.h"
+#include "bus/ata/hdd.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -91,8 +96,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_gpu(*this, "gpu")
-//		, m_vram(*this, "vram%d", 0U)
+//      , m_vram(*this, "vram%d", 0U)
 		, m_vram(*this, "vram")
+		, m_ata(*this, "ata")
 	{ }
 
 	void alien(machine_config &config);
@@ -111,8 +117,9 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<mb86292_device> m_gpu;
 	required_device<ram_device> m_vram;
+	required_device<ata_interface_device> m_ata;
 
-	// driver_device overrides
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	template <unsigned N> void gpu_irq_w(int state);
@@ -141,9 +148,34 @@ void alien_state::alien_map(address_map &map)
 
 	map(0x10000000, 0x107fffff).rw(m_vram, FUNC(ram_device::read), FUNC(ram_device::write)); // GPU 1 VRAM
 	map(0x11fc0000, 0x11ffffff).m(m_gpu, FUNC(mb86292_device::vregs_map));  // GPU 1 regs
-//	map(0x12000000, 0x127fffff).ram().share(m_vram[1]); // GPU 2 VRAM
-//	map(0x13fc0000, 0x13ffffff).ram().share("vregs2");  // GPU 2 regs
+//  map(0x12000000, 0x127fffff).ram().share(m_vram[1]); // GPU 2 VRAM
+//  map(0x13fc0000, 0x13ffffff).ram().share("vregs2");  // GPU 2 regs
 	//map(0x18000000, 0x1800000f).r(FUNC(alien_state::test_r)).nopw(); // Alien CF ATA, other games have it other way
+	// pingu, similar i/f to konami/konamigs.cpp
+	map(0x18800000, 0x18800007).lrw16(
+		NAME([this] (offs_t offset, u16 mem_mask) {
+			offset *= 2;
+			u16 data = 0;
+			if (ACCESSING_BITS_0_7)
+				data |= m_ata->cs0_r(offset, 0xff) & 0xff;
+			if (ACCESSING_BITS_8_15)
+				data |= (m_ata->cs0_r(offset + 1, 0xff) << 8);
+			return data;
+		}),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			offset *= 2;
+			if (ACCESSING_BITS_0_7)
+				m_ata->cs0_w(offset, data & 0xff, 0xff);
+			if (ACCESSING_BITS_8_15)
+				m_ata->cs0_w(offset + 1, data >> 8, 0xff);
+		})
+	);
+	map(0x18800400, 0x18800403).lrw16(
+		NAME([this] (offs_t offset, u16 mem_mask) { return m_ata->cs0_r(0, mem_mask); }),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			m_ata->cs0_w(0, data, mem_mask);
+		})
+	);
 }
 
 
@@ -174,6 +206,10 @@ static INPUT_PORTS_START( alien )
 INPUT_PORTS_END
 
 
+void alien_state::machine_start()
+{
+}
+
 void alien_state::machine_reset()
 {
 	//m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -184,6 +220,11 @@ template <unsigned N> void alien_state::gpu_irq_w(int state)
 	// TODO: configured by FPGA
 	const unsigned level = N == 1 ? 4 : 2;
 	m_maincpu->sh4_set_irln_input(state ? level : 15);
+}
+
+void medalusion_devices(device_slot_interface &device)
+{
+	device.option_add("cfcard", ATA_CF);
 }
 
 void alien_state::alien(machine_config &config)
@@ -199,6 +240,8 @@ void alien_state::alien(machine_config &config)
 	RAM(config, m_vram);
 	m_vram->set_default_size("8M");
 	m_vram->set_default_value(0);
+
+	ATA_INTERFACE(config, m_ata).options(medalusion_devices, "cfcard", nullptr, true);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -242,7 +285,7 @@ ROM_START( alien )
 	ROM_REGION( 0x800100, "ymz770", 0 ) //sound samples flash rom, not really needed, programmed by boot loader
 	ROM_LOAD( "s29jl064hxxtfi00.u35", 0x000000, 0x800100, CRC(01890c61) SHA1(4fad321f42eab835351c6d5f73539bdbed80affe) )
 
-	DISK_REGION( "card" ) //compact flash
+	DISK_REGION( "ata:0:cfcard" )
 	DISK_IMAGE( "alien", 0, SHA1(0328f12765db41a9ef5c8bfb88d4983345093072) )
 ROM_END
 
@@ -257,7 +300,7 @@ ROM_START( dkbanana )
 
 	// contain host.abs and sate.abs ELF executables and game assets
 	// same card was used in both Host and Satellite units
-	DISK_REGION( "card" ) //compact flash
+	DISK_REGION( "ata:0:cfcard" )
 	DISK_IMAGE( "dkbanana", 0, SHA1(c6b50486f2a6382a7eb36167712342212f87c189) )
 ROM_END
 
@@ -272,7 +315,7 @@ ROM_START( dkbanans )
 
 	// contain host.abs and sate.abs ELF executables and game assets
 	// same card was used in both Host and Satellite units
-	DISK_REGION( "card" ) //compact flash
+	DISK_REGION( "ata:0:cfcard" )
 	DISK_IMAGE( "dkbanana", 0, SHA1(c6b50486f2a6382a7eb36167712342212f87c189) )
 ROM_END
 
@@ -306,7 +349,7 @@ ROM_START( masmario2 )
 
 	ROM_REGION( 0x1000000, "ymz770", ROMREGION_ERASEFF )
 
-	DISK_REGION( "card" ) //compact flash
+	DISK_REGION( "ata:0:cfcard" )
 	DISK_IMAGE( "massmario2", 0, SHA1(9632c91bf2e4983ee29f417e3122e9380baee25b) )
 ROM_END
 
@@ -355,7 +398,7 @@ ROM_START( dokodemo )
 
 	ROM_REGION( 0x800100, "ymz770", ROMREGION_ERASEFF ) //sound samples flash rom, not really needed, programmed by boot loader
 
-	DISK_REGION( "card" ) //compact flash
+	DISK_REGION( "ata:0:cfcard" )
 	DISK_IMAGE( "dokodemo", 0, SHA1(0c786b6857a29b26971578abe1c8439fe43d94b5) )
 ROM_END
 
@@ -367,7 +410,7 @@ ROM_START( pingu )
 	ROM_REGION( 0x800100, "ymz770", 0 ) //sound samples flash rom, not really needed, programmed by boot loader
 	ROM_LOAD( "ic10", 0x000000, 0x800100, CRC(04cf9722) SHA1(854e056a03d6f7ac9b438ba9ce8a0499a79bdec8) )
 
-	DISK_REGION( "card" ) //compact flash
+	DISK_REGION( "ata:0:cfcard" )
 	DISK_IMAGE( "pingu", 0, SHA1(9c74e30906f229eba4bff8262c98e556d3ea1c23) )
 ROM_END
 
@@ -379,7 +422,7 @@ ROM_START( wontame )
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF )
 
-	DISK_REGION( "card" ) //compact flash
+	DISK_REGION( "ata:0:cfcard" )
 	DISK_IMAGE( "wontame", 0, SHA1(eb4fe73d5f723b3af08d96c6d3061c9bbc7b2488) )
 ROM_END
 
