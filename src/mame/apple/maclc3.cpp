@@ -297,7 +297,8 @@ void macvail_state::maclc3(machine_config &config)
 	maclc3_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macvail_state::maclc3_map);
 
-	EGRET_V101(config, m_egret, XTAL(32'768));
+	EGRET(config, m_egret, XTAL(32'768));
+	m_egret->set_default_bios_tag("341s0851");
 	m_egret->reset_callback().set(FUNC(macvail_state::cuda_reset_w));
 	m_egret->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_egret->via_clock_callback().set(m_sonora, FUNC(sonora_device::cb1_w));

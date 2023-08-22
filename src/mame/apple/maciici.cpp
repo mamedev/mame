@@ -630,7 +630,8 @@ void maciici_state::maciisi(machine_config &config)
 	m_via1->writepb_handler().set(FUNC(maciici_state::via_out_b_iisi));
 	m_via1->cb2_handler().set(FUNC(maciici_state::via_out_cb2_iisi));
 
-	EGRET_V100(config, m_egret, XTAL(32'768));
+	EGRET(config, m_egret, XTAL(32'768));
+	m_egret->set_default_bios_tag("344s0100");
 	m_egret->reset_callback().set(FUNC(maciici_state::egret_reset_w));
 	m_egret->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_egret->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));

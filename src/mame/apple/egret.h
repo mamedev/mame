@@ -25,7 +25,7 @@ class egret_device :  public device_t, public device_nvram_interface
 {
 public:
 	// construction/destruction
-	egret_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	egret_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// device_config_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -123,36 +123,8 @@ private:
 
 	void send_port(u8 offset, u8 data);
 };
-class egret_100_device : public egret_device
-{
-public:
-	egret_100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-};
-
-class egret_101early_device : public egret_device
-{
-public:
-	egret_101early_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-};
-
-class egret_101_device : public egret_device
-{
-public:
-	egret_101_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-};
 
 // device type definition
-DECLARE_DEVICE_TYPE(EGRET_V100, egret_100_device)
-DECLARE_DEVICE_TYPE(EGRET_V101_EARLY, egret_101early_device)
-DECLARE_DEVICE_TYPE(EGRET_V101, egret_101_device)
+DECLARE_DEVICE_TYPE(EGRET, egret_device)
 
 #endif // MAME_APPLE_EGRET_H

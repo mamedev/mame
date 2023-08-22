@@ -63,29 +63,37 @@
 #define VERBOSE (0)
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(EGRET_V100, egret_100_device, "egret100", "Apple Egret 1.00 ADB/I2C")
-DEFINE_DEVICE_TYPE(EGRET_V101_EARLY, egret_101early_device, "egret101e", "Apple Egret 1.01 (early) ADB/I2C")
-DEFINE_DEVICE_TYPE(EGRET_V101, egret_101_device, "egret101", "Apple Egret 1.01 ADB/I2C")
+DEFINE_DEVICE_TYPE(EGRET, egret_device, "egret", "Apple Egret ADB/I2C")
 
 ROM_START( egret )
 	ROM_REGION(0x1100, "roms", 0)
+	ROM_DEFAULT_BIOS("341s0851")
+
+	ROM_SYSTEM_BIOS(0, "344s0100", "Egret 1.00 (344S0100)")
+	ROM_LOAD("344s0100.bin", 0x0000, 0x1100, CRC(59e2b6b6) SHA1(540e752b7da521f1bdb16e0ad7c5f46ddc92d4e9))
+
+	ROM_SYSTEM_BIOS(1, "341s0850", "Egret 1.01 (earlier) (341S0850)")
+	ROM_LOAD("341s0850.bin", 0x0000, 0x1100, CRC(4906ecd0) SHA1(95e08ba0c5d4b242f115f104aba9905dbd3fd87c))
+
+	ROM_SYSTEM_BIOS(2, "341s0851", "Egret 1.01 (341S0851)")
+	ROM_LOAD("341s0851.bin", 0x0000, 0x1100, CRC(ea9ea6e4) SHA1(8b0dae3ec66cdddbf71567365d2c462688aeb571))
 ROM_END
 
-//-------------------------------------------------
-//  ADDRESS_MAP
-//-------------------------------------------------
+	//-------------------------------------------------
+	//  ADDRESS_MAP
+	//-------------------------------------------------
 
-void egret_device::egret_map(address_map &map)
-{
-	map(0x0000, 0x0002).rw(FUNC(egret_device::ports_r), FUNC(egret_device::ports_w));
-	map(0x0004, 0x0006).rw(FUNC(egret_device::ddr_r), FUNC(egret_device::ddr_w));
-	map(0x0007, 0x0007).rw(FUNC(egret_device::pll_r), FUNC(egret_device::pll_w));
-	map(0x0008, 0x0008).rw(FUNC(egret_device::timer_ctrl_r), FUNC(egret_device::timer_ctrl_w));
-	map(0x0009, 0x0009).rw(FUNC(egret_device::timer_counter_r), FUNC(egret_device::timer_counter_w));
-	map(0x0012, 0x0012).rw(FUNC(egret_device::onesec_r), FUNC(egret_device::onesec_w));
-	map(0x0090, 0x00ff).ram().share(m_internal_ram);    // work RAM and stack
-	map(0x0100, 0x01ff).rw(FUNC(egret_device::pram_r), FUNC(egret_device::pram_w));
-	map(0x0f00, 0x1fff).rom().region("roms", 0);
+	void egret_device::egret_map(address_map &map)
+	{
+		map(0x0000, 0x0002).rw(FUNC(egret_device::ports_r), FUNC(egret_device::ports_w));
+		map(0x0004, 0x0006).rw(FUNC(egret_device::ddr_r), FUNC(egret_device::ddr_w));
+		map(0x0007, 0x0007).rw(FUNC(egret_device::pll_r), FUNC(egret_device::pll_w));
+		map(0x0008, 0x0008).rw(FUNC(egret_device::timer_ctrl_r), FUNC(egret_device::timer_ctrl_w));
+		map(0x0009, 0x0009).rw(FUNC(egret_device::timer_counter_r), FUNC(egret_device::timer_counter_w));
+		map(0x0012, 0x0012).rw(FUNC(egret_device::onesec_r), FUNC(egret_device::onesec_w));
+		map(0x0090, 0x00ff).ram().share(m_internal_ram); // work RAM and stack
+		map(0x0100, 0x01ff).rw(FUNC(egret_device::pram_r), FUNC(egret_device::pram_w));
+		map(0x0f00, 0x1fff).rom().region("roms", 0);
 }
 
 
@@ -111,8 +119,8 @@ const tiny_rom_entry *egret_device::device_rom_region() const
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
-egret_device::egret_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, type, tag, owner, clock),
+egret_device::egret_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, EGRET, tag, owner, clock),
 	  device_nvram_interface(mconfig, *this),
 	  write_reset(*this),
 	  write_linechange(*this),
@@ -555,55 +563,4 @@ bool egret_device::nvram_write(util::write_stream &file)
 {
 	size_t actual;
 	return !file.write(m_pram, 0x100, actual) && actual == 0x100;
-}
-
-// Egret v1.00 ------------------------------------------------------------------------
-
-ROM_START(egret100)
-	ROM_REGION(0x1100, "roms", 0)
-	ROM_LOAD("344s0100.bin", 0x0000, 0x1100, CRC(59e2b6b6) SHA1(540e752b7da521f1bdb16e0ad7c5f46ddc92d4e9))
-ROM_END
-
-const tiny_rom_entry *egret_100_device::device_rom_region() const
-{
-	return ROM_NAME(egret100);
-}
-
-egret_100_device::egret_100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: egret_device(mconfig, EGRET_V100, tag, owner, clock)
-{
-}
-
-// Egret v1.01 (early) ------------------------------------------------------------------------
-
-ROM_START(egret101early)
-	ROM_REGION(0x1100, "roms", 0)
-	ROM_LOAD("341s0850.bin", 0x0000, 0x1100, CRC(4906ecd0) SHA1(95e08ba0c5d4b242f115f104aba9905dbd3fd87c))
-ROM_END
-
-const tiny_rom_entry *egret_101early_device::device_rom_region() const
-{
-	return ROM_NAME(egret101early);
-}
-
-egret_101early_device::egret_101early_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: egret_device(mconfig, EGRET_V101_EARLY, tag, owner, clock)
-{
-}
-
-// Egret v1.01 ------------------------------------------------------------------------
-
-ROM_START(egret101)
-	ROM_REGION(0x1100, "roms", 0)
-	ROM_LOAD("341s0851.bin", 0x0000, 0x1100, CRC(ea9ea6e4) SHA1(8b0dae3ec66cdddbf71567365d2c462688aeb571))
-ROM_END
-
-const tiny_rom_entry *egret_101_device::device_rom_region() const
-{
-	return ROM_NAME(egret101);
-}
-
-egret_101_device::egret_101_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: egret_device(mconfig, EGRET_V101, tag, owner, clock)
-{
 }
