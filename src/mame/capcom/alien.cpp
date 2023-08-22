@@ -73,6 +73,7 @@
 #include "cpu/sh/sh4.h"
 #include "machine/ram.h"
 #include "machine/timekpr.h"
+#include "sound/ymz770.h"
 #include "video/mb86292.h"
 #include "screen.h"
 #include "speaker.h"
@@ -191,6 +192,8 @@ void alien_state::alien(machine_config &config)
 	SH4LE(config, m_maincpu, MASTER_CLOCK);    /* 200MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &alien_state::alien_map);
 	m_maincpu->set_force_no_drc(true);
+	// TODO: SIO handling
+	//m_maincpu->sh4_set_irln_input(8);
 
 	// Configured as FCRAM 16MBit with 8MB / 64-bit data bus thru MMR register
 	RAM(config, m_vram);
@@ -210,6 +213,8 @@ void alien_state::alien(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+	// YMZ770B on all games but wontame (YMZ770C)
+	YMZ770(config, "ymz770", 16.384_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	M48T35(config, "m48t35");
 }
@@ -234,7 +239,7 @@ ROM_START( alien )
 	ROM_LOAD32_WORD( "aln_s04.4.ic30", 0x000000, 0x400000, CRC(11777d3f) SHA1(8cc9fcae7911e6be273b4532d89b44a309687ead) )
 	ROM_LOAD32_WORD( "aln_s05.5.ic33", 0x000002, 0x400000, CRC(71d2f22c) SHA1(16b25aa34f8b0d988565e7ab7cecc4df62ee8cf3) )
 
-	ROM_REGION( 0x800100, "ymz770b", 0 ) //sound samples flash rom, not really needed, programmed by boot loader
+	ROM_REGION( 0x800100, "ymz770", 0 ) //sound samples flash rom, not really needed, programmed by boot loader
 	ROM_LOAD( "s29jl064hxxtfi00.u35", 0x000000, 0x800100, CRC(01890c61) SHA1(4fad321f42eab835351c6d5f73539bdbed80affe) )
 
 	DISK_REGION( "card" ) //compact flash
@@ -247,7 +252,7 @@ ROM_START( dkbanana )
 	ROM_LOAD32_WORD( "dnk_m04.ic30", 0x000000, 0x400000, CRC(a294f17c) SHA1(7e0f865342f63f93a9a31ad7e6d3b70c59f3fa1b) )
 	ROM_LOAD32_WORD( "dnk_m05.ic33", 0x000002, 0x400000, CRC(22f5db87) SHA1(bdca65d39e94d88979218c8c586c6f20bb00e5ce) )
 
-	ROM_REGION( 0x800100, "ymz770b", 0 ) //sound samples flash rom, not really needed, programmed by boot loader
+	ROM_REGION( 0x800100, "ymz770", 0 ) //sound samples flash rom, not really needed, programmed by boot loader
 	ROM_LOAD( "29lj064.ic10", 0x000000, 0x800100, CRC(67cec133) SHA1(1412287fe977eb422a3cca6a0da1523859c2562e) )
 
 	// contain host.abs and sate.abs ELF executables and game assets
@@ -262,7 +267,7 @@ ROM_START( dkbanans )
 	ROM_LOAD32_WORD( "dnk_s04.ic30", 0x000000, 0x400000, CRC(eed7d46f) SHA1(43edb15ff72952f7c9825e5735faa238edfd934d) )
 	ROM_LOAD32_WORD( "dnk_s05.ic33", 0x000002, 0x400000, BAD_DUMP CRC(2fc88385) SHA1(03393bdb1fa526c70d766469c37b453f0e1eb8a3) ) // 2 first bytes is bad/wrong or (unlikely) supplied by protection, see driver init
 
-	ROM_REGION( 0x1000000, "ymz770b", 0 ) //sound samples flash rom, not really needed, programmed by boot loader
+	ROM_REGION( 0x1000000, "ymz770", 0 ) //sound samples flash rom, not really needed, programmed by boot loader
 	ROM_LOAD( "ic10", 0x000000, 0x1000000, NO_DUMP )
 
 	// contain host.abs and sate.abs ELF executables and game assets
@@ -277,7 +282,7 @@ ROM_START( masmario )
 	ROM_LOAD32_WORD( "mpf_m04f.ic30", 0x000000, 0x200000, CRC(f83ffb1a) SHA1(fa0ec83c21d81288b69e23ee46db359a3902648e) )
 	ROM_LOAD32_WORD( "mpf_m05f.ic33", 0x000002, 0x200000, CRC(fe19dfb7) SHA1(2fdc2feb86840448eb9e47f7bd4dcc9adfc36bdf) )
 
-	ROM_REGION( 0x800000, "ymz770b", ROMREGION_ERASEFF ) // not populated
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF ) // not populated
 ROM_END
 
 // Satellite unit
@@ -288,7 +293,7 @@ ROM_START( masmarios )
 	ROM_LOAD32_WORD( "mpf_s06j.ic39", 0x800000, 0x400000, CRC(dc20e3cc) SHA1(5b9bd0fc4a6abdda16781727b01014b0a68ef8df) )
 	ROM_LOAD32_WORD( "mpf_s07j.ic42", 0x800002, 0x400000, CRC(cb08dc74) SHA1(31e658f8bd03fea3dffa5f32dc7ac2e73930b383) )
 
-	ROM_REGION( 0x800000, "ymz770b", 0 )
+	ROM_REGION( 0x800000, "ymz770", 0 )
 	ROM_LOAD16_WORD_SWAP( "mpf_s01.ic31", 0x000000, 0x400000, CRC(99688b6d) SHA1(2052471e2a742c05c2bbd6bcb24deca681df41c3) )
 	ROM_LOAD16_WORD_SWAP( "mpf_s02.ic38", 0x400000, 0x400000, CRC(251f7111) SHA1(4d6e4111d76e7f56e9aeff19686dd84717ccb78a) )
 ROM_END
@@ -299,7 +304,7 @@ ROM_START( masmario2 )
 	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, BAD_DUMP CRC(6b2d2ef1) SHA1(0db6490b40c5716c1271b7f99608e8c7ad916516) ) //
 	ROM_LOAD32_WORD( "ic33", 0x000002, 0x400000, BAD_DUMP CRC(64049fc3) SHA1(b373b2c8cb4d66b9c700e0542bd26444484fae40) ) // modified boot roms from dkbanans
 
-	ROM_REGION( 0x1000000, "ymz770b", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000000, "ymz770", ROMREGION_ERASEFF )
 
 	DISK_REGION( "card" ) //compact flash
 	DISK_IMAGE( "massmario2", 0, SHA1(9632c91bf2e4983ee29f417e3122e9380baee25b) )
@@ -316,7 +321,7 @@ ROM_START( mariojjl )
 	ROM_LOAD32_WORD( "spm_04c.ic30", 0x000000, 0x400000, CRC(159e912d) SHA1(5db1434d34e52f9c35d71e05675dd035765d2e6f) )
 	ROM_LOAD32_WORD( "spm_05c.ic33", 0x000002, 0x400000, CRC(482d2b32) SHA1(01fb4b5f2441dc8c0f07943f190429c19c60b9d6) )
 
-	ROM_REGION( 0x400000, "ymz770b", 0 )
+	ROM_REGION( 0x400000, "ymz770", 0 )
 	ROM_LOAD16_WORD_SWAP( "spm_01.ic31", 0x000000, 0x400000, CRC(141761a7) SHA1(ab1029c9277b3932d43308a7b4c106cd526a82c7) )
 ROM_END
 
@@ -325,7 +330,7 @@ ROM_START( mmaruchan )
 	ROM_LOAD32_WORD( "spt_04b.ic30", 0x000000, 0x400000, CRC(9899f171) SHA1(d114c1ef0608c0740b7d58561c9f39c13b453e3a) )
 	ROM_LOAD32_WORD( "spt_05b.ic33", 0x000002, 0x400000, CRC(108efb71) SHA1(3f9e1c59f7af60976d140bf68b75c270a364f3a2) )
 
-	ROM_REGION( 0x400000, "ymz770b", 0 )
+	ROM_REGION( 0x400000, "ymz770", 0 )
 	ROM_LOAD16_WORD_SWAP( "spt_01.ic31", 0x000000, 0x400000, CRC(790b4bed) SHA1(3df68610f8b81dd5f74dca0f05da47a539b45163) )
 ROM_END
 
@@ -334,7 +339,7 @@ ROM_START( mmaruchana )
 	ROM_LOAD32_WORD( "spt_04a.ic30", 0x000000, 0x400000, CRC(9c919870) SHA1(376a5f51e09ea0f32f511994d6a492bccdbbe0e2) )
 	ROM_LOAD32_WORD( "spt_05a.ic33", 0x000002, 0x400000, CRC(f8794160) SHA1(86a44ce678f38413fc40bdc0bd5633fa00af8ddb) )
 
-	ROM_REGION( 0x400000, "ymz770b", 0 )
+	ROM_REGION( 0x400000, "ymz770", 0 )
 	ROM_LOAD16_WORD_SWAP( "spt_01.ic31", 0x000000, 0x400000, CRC(790b4bed) SHA1(3df68610f8b81dd5f74dca0f05da47a539b45163) )
 ROM_END
 
@@ -348,7 +353,7 @@ ROM_START( dokodemo )
 	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, BAD_DUMP CRC(6b2d2ef1) SHA1(0db6490b40c5716c1271b7f99608e8c7ad916516) ) //
 	ROM_LOAD32_WORD( "ic33", 0x000002, 0x400000, BAD_DUMP CRC(64049fc3) SHA1(b373b2c8cb4d66b9c700e0542bd26444484fae40) ) // modified boot roms from dkbanans
 
-	ROM_REGION( 0x800100, "ymz770b", ROMREGION_ERASEFF ) //sound samples flash rom, not really needed, programmed by boot loader
+	ROM_REGION( 0x800100, "ymz770", ROMREGION_ERASEFF ) //sound samples flash rom, not really needed, programmed by boot loader
 
 	DISK_REGION( "card" ) //compact flash
 	DISK_IMAGE( "dokodemo", 0, SHA1(0c786b6857a29b26971578abe1c8439fe43d94b5) )
@@ -359,7 +364,7 @@ ROM_START( pingu )
 	ROM_LOAD32_WORD( "stp_04.ic30", 0x000000, 0x400000, CRC(74687757) SHA1(96b6e3725bcf16e92c6966f9b9ce93cfdd7ba641) )
 	ROM_LOAD32_WORD( "stp_05.ic33", 0x000002, 0x400000, CRC(ba2e6716) SHA1(49c5abb9d96e3f4a78ed4dced7a9f052a96b186d) )
 
-	ROM_REGION( 0x800100, "ymz770b", 0 ) //sound samples flash rom, not really needed, programmed by boot loader
+	ROM_REGION( 0x800100, "ymz770", 0 ) //sound samples flash rom, not really needed, programmed by boot loader
 	ROM_LOAD( "ic10", 0x000000, 0x800100, CRC(04cf9722) SHA1(854e056a03d6f7ac9b438ba9ce8a0499a79bdec8) )
 
 	DISK_REGION( "card" ) //compact flash
@@ -372,7 +377,7 @@ ROM_START( wontame )
 	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, BAD_DUMP CRC(6b2d2ef1) SHA1(0db6490b40c5716c1271b7f99608e8c7ad916516) ) //
 	ROM_LOAD32_WORD( "ic33", 0x000002, 0x400000, BAD_DUMP CRC(64049fc3) SHA1(b373b2c8cb4d66b9c700e0542bd26444484fae40) ) // modified boot roms from dkbanans
 
-	ROM_REGION( 0x800000, "ymz770c", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF )
 
 	DISK_REGION( "card" ) //compact flash
 	DISK_IMAGE( "wontame", 0, SHA1(eb4fe73d5f723b3af08d96c6d3061c9bbc7b2488) )
