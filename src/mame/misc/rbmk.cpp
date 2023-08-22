@@ -193,8 +193,8 @@ void rbmk_state::rbmk_mem(address_map &map)
 	map(0xc08000, 0xc08001).portr("IN1").w(FUNC(rbmk_state::tilebank_w));
 	map(0xc10000, 0xc10001).portr("IN2");
 	map(0xc18080, 0xc18081).r(FUNC(rbmk_state::unk_r));
-	map(0xc20000, 0xc20001).portr("IN3");
-	map(0xc28000, 0xc28001).w(FUNC(rbmk_state::unk_w));
+	map(0xc20000, 0xc20000).r("oki", FUNC(okim6295_device::read));
+	map(0xc28000, 0xc28000).w("oki", FUNC(okim6295_device::write));
 }
 
 void rbmk_state::rbspm_mem(address_map &map)
@@ -222,7 +222,7 @@ void rbmk_state::super555_mem(address_map &map)
 	map(0x608000, 0x608001).portr("IN1").w(FUNC(rbmk_state::tilebank_w)); // ok
 	map(0x610000, 0x610001).portr("IN2");
 	map(0x618080, 0x618081).nopr();//.lr16(NAME([this] () -> uint16_t { return m_prot_data; })); // reads something here from below, if these are hooked up booting stops with '0x09 U64 ERROR', like it's failing some checksum test
-	map(0x620000, 0x620001).r("oki", FUNC(okim6295_device::read)); // TODO: Oki controlled through a GAL at 18C, should be banked, too
+	map(0x620000, 0x620000).r("oki", FUNC(okim6295_device::read)); // TODO: Oki controlled through a GAL at 18C, should be banked, too
 	// map(0x620080, 0x620081).lw16(NAME([this] (uint16_t data) { m_prot_data = data; })); // writes something here that expects to read above
 	map(0x628000, 0x628000).w("oki", FUNC(okim6295_device::write));
 	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -348,7 +348,7 @@ static INPUT_PORTS_START( rbmk )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(      0x0000, "Keyboard" )
 
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:1")
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW4:1")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:2")
@@ -1213,7 +1213,7 @@ void rbmk_state::init_super555()
 
 
 // mahjong
-GAME( 1998, rbmk,     0, rbmk,     rbmk,     rbmk_state, empty_init,    ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",        MACHINE_NOT_WORKING )
+GAME( 1998, rbmk,     0, rbmk,     rbmk,     rbmk_state, empty_init,    ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // misses YM2151 hookup, Oki hookup may be imperfect
 GAME( 1998, rbspm,    0, rbspm,    rbspm,    rbmk_state, empty_init,    ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)",    MACHINE_NOT_WORKING )
 
 // card games
