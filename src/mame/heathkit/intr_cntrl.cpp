@@ -26,12 +26,6 @@ device_heath_intr_interface::device_heath_intr_interface(const machine_config &m
 	m_socket = dynamic_cast<heath_intr_socket *>(device.owner());
 }
 
-IRQ_CALLBACK_MEMBER(device_heath_intr_interface::irq_callback)
-{
-	return get_instruction();
-}
-
-
 /**
  * Original Heath interrrupt controller
  *
@@ -91,21 +85,33 @@ uint8_t heath_intr_cntrl::get_instruction()
 
 		return 0x00;
 	}
-	uint8_t level = ffs(m_intr_lines) - 1;
+
+	// ideally this would be handled with a function like ffs()
+	uint8_t level = 0;
+	uint8_t mask = 0x01;
+
+	while (mask)
+	{
+		if (m_intr_lines & mask)
+		{
+			break;
+		}
+		level++;
+		mask <<= 1;
+	}
+
+	if (level > 7)
+	{
+		logerror("bad level: %d\n", level);
+	}
 
 	// return RST based on level
 	return 0xc7 | ((level & 0x7) << 3);
 }
 
-IRQ_CALLBACK_MEMBER(heath_intr_cntrl::irq_callback)
-{
-	return get_instruction();
-}
-
-
 /**
  * Interrupt controller for the Z37 soft-sectored controller.
- * 
+ *
  * It will take control of the interrupt system and block all other
  * interrupts while it is waiting for Z37 events.
  */
@@ -182,6 +188,11 @@ void z37_intr_cntrl::block_interrupts(uint8_t data)
 }
 
 
+/**
+ * Heath Interrupt socket
+ *
+ * Allows choice of interrupt controllers for Heath 8-bit computers.
+ */
 heath_intr_socket::heath_intr_socket(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, HEATH_INTR_SOCKET, tag, owner, clock),
 	device_single_card_slot_interface(mconfig, *this),
@@ -196,15 +207,10 @@ heath_intr_socket::~heath_intr_socket()
 
 void heath_intr_socket::device_start()
 {
-	m_cntrl = get_device();
+	m_cntrl = get_card_device();
 }
 
 IRQ_CALLBACK_MEMBER(heath_intr_socket::irq_callback)
-{
-	return get_instruction();
-}
-
-uint8_t heath_intr_socket::get_instruction()
 {
 	// assume NO-OP
 	uint8_t instr = 0x00;
@@ -215,17 +221,4 @@ uint8_t heath_intr_socket::get_instruction()
 	}
 
 	return instr;
-}
-
-device_heath_intr_interface *heath_intr_socket::get_device()
-{
-	device_heath_intr_interface *const connected = dynamic_cast<device_heath_intr_interface *>(get_card_device());
-	if (connected)
-	{
-		return connected;
-	}
-	else
-	{
-		return nullptr;
-	}
 }

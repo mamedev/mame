@@ -46,7 +46,9 @@ protected:
 
 
 
-// Standard Heath Terminal logic board
+/**
+ *  Standard Heath Terminal logic board
+ */
 class heath_tlb_device : public device_t,
 						   public device_heath_tlb_card_interface
 {
@@ -136,7 +138,9 @@ private:
 	bool     m_allow_vsync_nmi;
 };
 
-// Heath TLB with Super19 ROM
+/**
+ *  Heath TLB with Super19 ROM
+ */
 class heath_super19_tlb_device : public heath_tlb_device
 {
 public:
@@ -158,7 +162,9 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 };
 
-// Heath TLB with Ultra ROM
+/**
+ *  Heath TLB with Ultra ROM
+ */
 class heath_ultra_tlb_device : public heath_tlb_device
 {
 public:
@@ -172,7 +178,9 @@ protected:
 	void mem_map(address_map &map);
 };
 
-// Heath TLB plus Northwest Digital Systems GP-19
+/**
+ *  Heath TLB plus Northwest Digital Systems GP-19
+ */
 class heath_gp19_tlb_device : public heath_tlb_device
 {
 public:
@@ -207,7 +215,9 @@ DECLARE_DEVICE_TYPE(HEATH_WATZ, heath_watz_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_ULTRA, heath_ultra_tlb_device)
 
 
-
+/**
+ * Connector for the Terminal Logic Board in an H-89 class computer
+ */
 class heath_tlb_connector : public device_t,
 							public device_single_card_slot_interface<device_heath_tlb_card_interface>
 {
@@ -226,8 +236,6 @@ public:
 	heath_tlb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~heath_tlb_connector();
 
-	device_heath_tlb_card_interface *get_device();
-
 	// computer interface
 	auto serial_data_callback() { return m_write_sd.bind(); }
 	auto dtr_callback() { return m_dtr_cb.bind(); }
@@ -244,7 +252,6 @@ public:
 	void dtr_out(int data)  { m_dtr_cb(data); };
 	void rts_out(int data)  { m_rts_cb(data); };
 	void reset_out(int data) { m_reset(data); };
-
 
 protected:
 	virtual void device_start() override;

@@ -1195,24 +1195,12 @@ heath_tlb_connector::heath_tlb_connector(const machine_config &mconfig, const ch
 {
 }
 
+
 heath_tlb_connector::~heath_tlb_connector()
 {
 }
 
 void heath_tlb_connector::device_start()
 {
-	m_tlb = get_device();
-}
-
-device_heath_tlb_card_interface *heath_tlb_connector::get_device()
-{
-	device_heath_tlb_card_interface *const connected = dynamic_cast<device_heath_tlb_card_interface *>(get_card_device());
-	if (connected)
-	{
-		return connected;
-	}
-	else
-	{
-		return nullptr;
-	}
+	m_tlb = get_card_device();
 }

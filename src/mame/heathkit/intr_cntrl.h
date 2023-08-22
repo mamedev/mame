@@ -25,8 +25,6 @@ public:
 	virtual void set_irq(int state) {};
 	virtual void block_interrupts(uint8_t data) {};
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
-
 protected:
 	// construction/destruction
 	device_heath_intr_interface(const machine_config &mconfig, device_t &device);
@@ -50,8 +48,6 @@ public:
 	heath_intr_cntrl(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void set_irq_level(uint8_t level, int state) override;
-
-	IRQ_CALLBACK_MEMBER(irq_callback);
 
 protected:
 	heath_intr_cntrl(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -100,7 +96,7 @@ public:
 
 	template <typename T>
 	heath_intr_socket(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, bool fixed = false) :
-		 heath_intr_socket(mconfig, tag, owner, 0)
+		heath_intr_socket(mconfig, tag, owner, 0)
 	{
 		option_reset();
 		opts(*this);
@@ -111,21 +107,18 @@ public:
 	heath_intr_socket(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~heath_intr_socket();
 
+	auto irq_line_cb() { return m_irq_line.bind(); }
+
 	// required operation overrides
-	virtual void set_irq_level(uint8_t level, int state) { if (m_cntrl) { m_cntrl->set_irq_level(level, state); }};
+	void set_irq_level(uint8_t level, int state) { if (m_cntrl) { m_cntrl->set_irq_level(level, state); }};
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
-
-	auto irq_line_cb() { return m_irq_line.bind(); }
-	virtual uint8_t get_instruction();
 
 	void raise_irq(int state) { m_irq_line(state); }
 
 	void set_irq(int state) { if (m_cntrl) { m_cntrl->set_irq(state); }};
 	void set_drq(int state) { if (m_cntrl) { m_cntrl->set_drq(state); }};
 	void block_interrupts(uint8_t data) { if (m_cntrl) { m_cntrl->block_interrupts(data); }};
-
-	device_heath_intr_interface *get_device();
 
 protected:
 
