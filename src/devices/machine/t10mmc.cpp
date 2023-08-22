@@ -31,6 +31,7 @@ void t10mmc::t10_start(device_t &device)
 	device.save_item(NAME(m_cur_subblock));
 	device.save_item(NAME(m_audio_sense));
 	device.save_item(NAME(m_sotc));
+	device.save_item(NAME(m_read_cd_flags));
 }
 
 void t10mmc::t10_reset()
@@ -50,6 +51,7 @@ void t10mmc::t10_reset()
 	m_cur_subblock = 0;
 	m_audio_sense = 0;
 	m_sotc = 0;
+	m_read_cd_flags = 0;
 }
 
 // scsicd_exec_command
@@ -539,58 +541,220 @@ void t10mmc::ExecCommand()
 			break;
 		}
 
-		// TODO: Implement reladr bit, flag bits, test and handle other conditions besides reads to "any type" sector types
 		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
 		m_blocks = command[6]<<16 | command[7]<<8 | command[8];
+		m_read_cd_flags = command[9];
+		m_transfer_length = 0;
 
 		// m_device->logerror("T10MMC: READ CD start_lba[%08x] block_len[%06x] %02x %02x %02x %02x\n", m_lba, m_blocks, command[1], command[9], command[10], command[11]);
 
-		auto expected_sector_type = BIT(command[1], 2, 3);
-		auto trk = m_image->get_track(m_lba);
-		auto track_type = m_image->get_track_type(trk);
-		if (expected_sector_type != 0)
-		{
-			m_device->logerror("T10MMC: READ CD requested a sector type of %d which is unhandled\n", expected_sector_type);
+		if (command[10] != 0)
+			m_device->logerror("T10MMC: READ CD requested sub-channel data which is not implemented %02x\n", command[10]);
 
-			if ((expected_sector_type == 1 && track_type != cdrom_file::CD_TRACK_AUDIO)
-			|| (expected_sector_type == 2 && track_type != cdrom_file::CD_TRACK_MODE1 && track_type != cdrom_file::CD_TRACK_MODE1_RAW)
-			|| (expected_sector_type == 3 && track_type != cdrom_file::CD_TRACK_MODE2 && track_type != cdrom_file::CD_TRACK_MODE2_RAW)
-			|| (expected_sector_type == 4 && track_type != cdrom_file::CD_TRACK_MODE2_FORM1)
-			|| (expected_sector_type == 5 && track_type != cdrom_file::CD_TRACK_MODE2_FORM2))
+		const int expected_sector_type = BIT(command[1], 2, 3);
+		int last_track_type = -1;
+		uint8_t last_read_cd_flags = 0;
+		for (int lba = m_lba; lba < m_lba + m_blocks; lba++)
+		{
+			auto trk = m_image->get_track(lba);
+			auto track_type = m_image->get_track_type(trk);
+
+			// If there's a transition between CD data and CD audio anywhere in the requested range then return an error
+			if ((last_track_type == cdrom_file::CD_TRACK_AUDIO && track_type != cdrom_file::CD_TRACK_AUDIO)
+			|| (last_track_type != cdrom_file::CD_TRACK_AUDIO && track_type == cdrom_file::CD_TRACK_AUDIO))
 			{
 				set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_ILLEGAL_MODE_FOR_THIS_TRACK);
 
 				m_phase = SCSI_PHASE_STATUS;
 				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
 				m_transfer_length = 0;
-				break;
+				return;
 			}
+
+			// Must read the subheader to figure out what sector type it is exactly when dealing with these specific track types
+			int mode2_form = 0;
+			if (track_type == cdrom_file::CD_TRACK_MODE2_RAW || track_type == cdrom_file::CD_TRACK_MODE2_FORM_MIX)
+			{
+				uint8_t tmp_buffer[2352];
+				const int submode_offset = track_type == cdrom_file::CD_TRACK_MODE2_FORM_MIX ? 2 : 0x12;
+
+				if (!m_image->read_data(lba, tmp_buffer, cdrom_file::CD_TRACK_RAW_DONTCARE))
+				{
+					m_device->logerror("T10MMC: CD read error! (%08x)\n", lba);
+					return;
+				}
+
+				mode2_form = BIT(tmp_buffer[submode_offset], 5) + 1;
+			}
+
+			// If the expected sector type field is set then all tracks within the specified range must be the same
+			if ((expected_sector_type == T10MMC_READ_CD_SECTOR_TYPE_CDDA && track_type != cdrom_file::CD_TRACK_AUDIO)
+			|| (expected_sector_type == T10MMC_READ_CD_SECTOR_TYPE_MODE1 && track_type != cdrom_file::CD_TRACK_MODE1 && track_type != cdrom_file::CD_TRACK_MODE1_RAW)
+			|| (expected_sector_type == T10MMC_READ_CD_SECTOR_TYPE_MODE2 && track_type != cdrom_file::CD_TRACK_MODE2)
+			|| (expected_sector_type == T10MMC_READ_CD_SECTOR_TYPE_MODE2_FORM1 && track_type != cdrom_file::CD_TRACK_MODE2_FORM1 && mode2_form != 1)
+			|| (expected_sector_type == T10MMC_READ_CD_SECTOR_TYPE_MODE2_FORM2 && track_type != cdrom_file::CD_TRACK_MODE2_FORM2 && mode2_form != 2))
+			{
+				set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_ILLEGAL_MODE_FOR_THIS_TRACK);
+
+				m_phase = SCSI_PHASE_STATUS;
+				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+				m_transfer_length = 0;
+				return;
+			}
+
+			// No fields selected is a valid request but none of the rest of the verification code is required in that case
+			if (m_read_cd_flags == 0)
+			{
+				last_track_type = track_type;
+				continue;
+			}
+
+			// Check for illegal combinations
+			// t10 mmc spec gives a table which shows illegal combinations and combinations that get demoted
+			auto read_cd_flags = m_read_cd_flags & 0xf8;
+
+			// CDDA tracks can only ever be user data or no data (0), requesting other fields is not illegal but will be demoted to just user data
+			if (track_type == cdrom_file::CD_TRACK_AUDIO)
+				read_cd_flags = read_cd_flags ? T10MMC_READ_CD_FIELD_USER_DATA : 0;
+
+			// All of these combinations will be illegal for all tracks besides CDDA tracks
+			bool is_illegal_combo = (read_cd_flags == (T10MMC_READ_CD_FIELD_HEADER | T10MMC_READ_CD_FIELD_ECC))
+				|| (read_cd_flags == (T10MMC_READ_CD_FIELD_SUBHEADER | T10MMC_READ_CD_FIELD_ECC))
+				|| (read_cd_flags == (T10MMC_READ_CD_FIELD_HEADER | T10MMC_READ_CD_FIELD_SUBHEADER | T10MMC_READ_CD_FIELD_ECC))
+				|| (read_cd_flags == (T10MMC_READ_CD_FIELD_SYNC | T10MMC_READ_CD_FIELD_ECC))
+				|| (read_cd_flags == (T10MMC_READ_CD_FIELD_SYNC | T10MMC_READ_CD_FIELD_USER_DATA))
+				|| (read_cd_flags == (T10MMC_READ_CD_FIELD_SYNC | T10MMC_READ_CD_FIELD_USER_DATA | T10MMC_READ_CD_FIELD_ECC))
+				|| (read_cd_flags == (T10MMC_READ_CD_FIELD_SYNC | T10MMC_READ_CD_FIELD_HEADER | T10MMC_READ_CD_FIELD_ECC))
+				|| (read_cd_flags == (T10MMC_READ_CD_FIELD_SYNC | T10MMC_READ_CD_FIELD_SUBHEADER))
+				|| (read_cd_flags == (T10MMC_READ_CD_FIELD_SYNC | T10MMC_READ_CD_FIELD_SUBHEADER | T10MMC_READ_CD_FIELD_ECC))
+				|| (read_cd_flags == (T10MMC_READ_CD_FIELD_SYNC | T10MMC_READ_CD_FIELD_SUBHEADER | T10MMC_READ_CD_FIELD_USER_DATA))
+				|| (read_cd_flags == (T10MMC_READ_CD_FIELD_SYNC | T10MMC_READ_CD_FIELD_SUBHEADER | T10MMC_READ_CD_FIELD_USER_DATA | T10MMC_READ_CD_FIELD_ECC))
+				|| (read_cd_flags == (T10MMC_READ_CD_FIELD_SYNC | T10MMC_READ_CD_FIELD_HEADER | T10MMC_READ_CD_FIELD_SUBHEADER | T10MMC_READ_CD_FIELD_ECC));
+
+			// Mode 2 form 1/2 sectors have additional restrictions that CDDA, mode 1, and mode 2 formless tracks don't
+			if (!is_illegal_combo && (track_type == cdrom_file::CD_TRACK_MODE2_FORM1 || track_type == cdrom_file::CD_TRACK_MODE2_FORM2 || mode2_form > 0))
+			{
+				is_illegal_combo = (read_cd_flags == (T10MMC_READ_CD_FIELD_HEADER | T10MMC_READ_CD_FIELD_USER_DATA))
+					|| (read_cd_flags == (T10MMC_READ_CD_FIELD_HEADER | T10MMC_READ_CD_FIELD_USER_DATA | T10MMC_READ_CD_FIELD_ECC))
+					|| (read_cd_flags == (T10MMC_READ_CD_FIELD_SYNC | T10MMC_READ_CD_FIELD_HEADER | T10MMC_READ_CD_FIELD_USER_DATA))
+					|| (read_cd_flags == (T10MMC_READ_CD_FIELD_SYNC | T10MMC_READ_CD_FIELD_HEADER | T10MMC_READ_CD_FIELD_USER_DATA | T10MMC_READ_CD_FIELD_ECC));
+			}
+
+			// Mask out flags that can't be used for specific track types
+			if (track_type == cdrom_file::CD_TRACK_MODE1 || track_type == cdrom_file::CD_TRACK_MODE1_RAW)
+			{
+				// Sub header only is valid but will return 0 bytes, otherwise subheader is always demoted
+				if (read_cd_flags != T10MMC_READ_CD_FIELD_SUBHEADER)
+					read_cd_flags &= ~T10MMC_READ_CD_FIELD_SUBHEADER;
+			}
+			else if (track_type == cdrom_file::CD_TRACK_MODE2)
+			{
+				// Mode 2 formless
+				// No EDC/ECC data
+				read_cd_flags &= ~T10MMC_READ_CD_FIELD_ECC;
+
+				// Sub header only is valid but will return 0 bytes, otherwise subheader is always demoted
+				if (read_cd_flags != T10MMC_READ_CD_FIELD_SUBHEADER)
+					read_cd_flags &= ~T10MMC_READ_CD_FIELD_SUBHEADER;
+			}
+			else if (track_type == cdrom_file::CD_TRACK_MODE2_FORM2 || mode2_form == 2)
+			{
+				// No EDC/ECC data
+				read_cd_flags &= ~T10MMC_READ_CD_FIELD_ECC;
+			}
+
+			// Requested fields must be valid for all tracks within the selected range
+			if (is_illegal_combo || (last_track_type != -1 && read_cd_flags != last_read_cd_flags))
+			{
+				m_device->logerror("T10MMC: READ CD called with invalid data request for given track type %d %02x\n", track_type, command[9]);
+				set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_ILLEGAL_FIELD_IN_CDB);
+				m_phase = SCSI_PHASE_STATUS;
+				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+				m_transfer_length = 0;
+				return;
+			}
+
+			// The actual transfer size must be calculated for every possible valid requested data
+			const int c2_error_codes = BIT(m_read_cd_flags, 1, 2);
+			const bool requested_c2 = c2_error_codes == T10MMC_READ_CD_C2_ONLY;
+			const bool requested_c2_error_block = c2_error_codes == T10MMC_READ_CD_C2_BLOCK;
+
+			const bool requested_edc_ecc = (read_cd_flags & T10MMC_READ_CD_FIELD_ECC) != 0;
+			const bool requested_user_data = (read_cd_flags & T10MMC_READ_CD_FIELD_USER_DATA) != 0;
+			const bool requested_header = (read_cd_flags & T10MMC_READ_CD_FIELD_HEADER) != 0;
+			const bool requested_subheader = (read_cd_flags & T10MMC_READ_CD_FIELD_SUBHEADER) != 0;
+			const bool requested_sync = (read_cd_flags & T10MMC_READ_CD_FIELD_SYNC) != 0;
+
+			if (requested_c2 || requested_c2_error_block)
+				m_transfer_length += 294;
+
+			if (requested_c2_error_block)
+				m_transfer_length += 2;
+
+			if (track_type == cdrom_file::CD_TRACK_AUDIO)
+			{
+				if (requested_user_data)
+					m_transfer_length += 2352;
+			}
+			else if (track_type == cdrom_file::CD_TRACK_MODE1 || track_type == cdrom_file::CD_TRACK_MODE1_RAW)
+			{
+				if (requested_sync)
+					m_transfer_length += 12;
+				if (requested_header)
+					m_transfer_length += 4;
+				if (requested_user_data)
+					m_transfer_length += 2048;
+				if (requested_edc_ecc)
+					m_transfer_length += 288;
+			}
+			else if (track_type == cdrom_file::CD_TRACK_MODE2)
+			{
+				if (requested_sync)
+					m_transfer_length += 12;
+				if (requested_header)
+					m_transfer_length += 4;
+				if (requested_user_data)
+					m_transfer_length += 2336;
+			}
+			else if (track_type == cdrom_file::CD_TRACK_MODE2_FORM1 || mode2_form == 1)
+			{
+				if (requested_sync)
+					m_transfer_length += 12;
+				if (requested_header)
+					m_transfer_length += 4;
+				if (requested_subheader)
+					m_transfer_length += 8;
+				if (requested_user_data)
+					m_transfer_length += 2048;
+				if (requested_edc_ecc)
+					m_transfer_length += 280;
+			}
+			else if (track_type == cdrom_file::CD_TRACK_MODE2_FORM2 || mode2_form == 2)
+			{
+				if (requested_sync)
+					m_transfer_length += 12;
+				if (requested_header)
+					m_transfer_length += 4;
+				if (requested_subheader)
+					m_transfer_length += 8;
+				if (requested_user_data)
+					m_transfer_length += 2328;
+			}
+
+			last_track_type = track_type;
+			last_read_cd_flags = read_cd_flags;
 		}
 
-		if ((track_type != cdrom_file::CD_TRACK_MODE1 && track_type != cdrom_file::CD_TRACK_MODE1_RAW) || command[9] != 0x10)
-		{
-			// TODO: Only mode 1 user data reads are supported for now
-			m_device->logerror("T10MMC: READ CD called with unimplemented parameters\n");
-
-			m_phase = SCSI_PHASE_STATUS;
-			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
-			m_transfer_length = 0;
-			break;
-		}
-
+		// Only worry about SGI block extension stuff if it ever becomes an issue
 		if (m_num_subblocks > 1)
-		{
-			m_cur_subblock = m_lba % m_num_subblocks;
-			m_lba /= m_num_subblocks;
-		}
-		else
-		{
-			m_cur_subblock = 0;
-		}
+			m_device->logerror("T10MMC: READ CD does not handle sub blocks currently\n");
 
+		// All fields were matched between all tracks, so store the simplified version
+		m_read_cd_flags = last_read_cd_flags | (m_read_cd_flags & ~0xf8);
+
+		m_cur_subblock = 0;
 		m_phase = SCSI_PHASE_DATAIN;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
-		m_transfer_length = m_blocks * m_sector_bytes;
 		break;
 	}
 
@@ -606,7 +770,7 @@ void t10mmc::ExecCommand()
 void t10mmc::ReadData( uint8_t *data, int dataLength )
 {
 	uint32_t temp;
-	uint8_t tmp_buffer[2048];
+	uint8_t tmp_buffer[2352];
 
 	switch ( command[0] )
 	{
@@ -640,7 +804,6 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 
 	case T10SBC_CMD_READ_10:
 	case T10SBC_CMD_READ_12:
-	case T10MMC_CMD_READ_CD: // TODO: Will need its own logic once more support is implemented
 		//m_device->logerror("T10MMC: read %x dataLength lba=%x\n", dataLength, m_lba);
 		if ((m_image) && (m_blocks))
 		{
@@ -668,6 +831,245 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 				m_last_lba = m_lba;
 				dataLength -= m_sector_bytes;
 				data += m_sector_bytes;
+			}
+		}
+		break;
+
+	case T10MMC_CMD_READ_CD:
+		//m_device->logerror("T10MMC: read CD %x dataLength lba=%x\n", dataLength, m_lba);
+		if ((m_image) && (m_blocks))
+		{
+			const int c2_error_codes = BIT(m_read_cd_flags, 1, 2);
+			const bool requested_c2 = c2_error_codes == T10MMC_READ_CD_C2_ONLY;
+			const bool requested_c2_error_block = c2_error_codes == T10MMC_READ_CD_C2_BLOCK;
+
+			const bool requested_edc_ecc = (m_read_cd_flags & T10MMC_READ_CD_FIELD_ECC) != 0;
+			const bool requested_user_data = (m_read_cd_flags & T10MMC_READ_CD_FIELD_USER_DATA) != 0;
+			const bool requested_header = (m_read_cd_flags & T10MMC_READ_CD_FIELD_HEADER) != 0;
+			const bool requested_subheader = (m_read_cd_flags & T10MMC_READ_CD_FIELD_SUBHEADER) != 0;
+			const bool requested_sync = (m_read_cd_flags & T10MMC_READ_CD_FIELD_SYNC) != 0;
+
+			// m_device->logerror("T10MMC: read CD flags c2[%d] c2block[%d] edc/ecc[%d] user[%d] header[%d] subheader[%d] sync[%d]\n", requested_c2, requested_c2_error_block, requested_edc_ecc, requested_user_data, requested_header, requested_subheader, requested_sync);
+
+			if (m_read_cd_flags == 0)
+			{
+				// No data is supposed to be returned
+				if (dataLength > 0)
+					memset(data, 0, dataLength);
+
+				data += dataLength;
+				dataLength = 0;
+			}
+
+			while (dataLength > 0)
+			{
+				int data_idx = 0;
+				auto trk = m_image->get_track(m_lba);
+				auto track_type = m_image->get_track_type(trk);
+
+				// Some CHDs don't have the required data so just log the error and return zeros as required
+				// CD_TRACK_MODE1: Only has user data
+				// CD_TRACK_MODE1_RAW: Has all fields required
+				// CD_TRACK_MODE2: Only has user data
+				// CD_TRACK_MODE2_FORM1: ?
+				// CD_TRACK_MODE2_FORM2: ?
+				// CD_TRACK_MODE2_FORM_MIX: Subheader data + user data + EDC/ECC data
+				// CD_TRACK_MODE2_RAW: Has all fields required
+				// CD_TRACK_AUDIO: Only returns user data
+
+				auto read_track_type = track_type;
+				if (track_type == cdrom_file::CD_TRACK_MODE1)
+					read_track_type = cdrom_file::CD_TRACK_MODE1_RAW; // mode1 has code for partial promotion to mode1_raw so make use of it
+
+				if (!m_image->read_data(m_lba, tmp_buffer, read_track_type))
+				{
+					m_device->logerror("T10MMC: CD read error! (%08x)\n", m_lba);
+					return;
+				}
+
+				int mode2_form = 0;
+				if (track_type == cdrom_file::CD_TRACK_MODE2_RAW)
+					mode2_form = BIT(tmp_buffer[0x12], 5) + 1;
+				else if (track_type == cdrom_file::CD_TRACK_MODE2_FORM_MIX)
+					mode2_form = BIT(tmp_buffer[2], 5) + 1;
+
+				if (requested_sync)
+				{
+					if (track_type == cdrom_file::CD_TRACK_MODE2 || track_type == cdrom_file::CD_TRACK_MODE2_FORM1 || track_type == cdrom_file::CD_TRACK_MODE2_FORM2 || track_type == cdrom_file::CD_TRACK_MODE2_FORM_MIX)
+					{
+						m_device->logerror("T10MMC: sync data is not available for track type %d, inserting fake sync data\n", track_type);
+						constexpr uint8_t sync_field[] = { 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00 };
+						memcpy(data + data_idx, sync_field, std::size(sync_field));
+					}
+					else
+						memcpy(data + data_idx, tmp_buffer, 12);
+
+					data_idx += 12;
+				}
+
+				if (requested_header)
+				{
+					if (track_type == cdrom_file::CD_TRACK_MODE2 || track_type == cdrom_file::CD_TRACK_MODE2_FORM1 || track_type == cdrom_file::CD_TRACK_MODE2_FORM2 || track_type == cdrom_file::CD_TRACK_MODE2_FORM_MIX)
+					{
+						m_device->logerror("T10MMC: header data is not available for track type %d, inserting fake header data\n", track_type);
+
+						uint32_t msf = to_msf(m_lba);
+						data[data_idx] = BIT(msf, 16, 8);
+						data[data_idx+1] = BIT(msf, 8, 8);
+						data[data_idx+2] = BIT(msf, 0, 8);
+						data[data_idx+3] = 2; // mode 2
+					}
+					else
+						memcpy(data + data_idx, tmp_buffer + 12, 4);
+
+					data_idx += 4;
+				}
+
+				if (requested_subheader)
+				{
+					if (track_type == cdrom_file::CD_TRACK_MODE2_RAW)
+					{
+						memcpy(data + data_idx, tmp_buffer + 16, 8);
+					}
+					else if (track_type == cdrom_file::CD_TRACK_MODE2_FORM_MIX)
+					{
+						// Only been able to verify 1 CHD for form mix, appears to have the 8 subheader bytes at the top of the sector
+						memcpy(data + data_idx, tmp_buffer, 8);
+					}
+					else if (track_type == cdrom_file::CD_TRACK_MODE2_FORM1 || track_type == cdrom_file::CD_TRACK_MODE2_FORM2)
+					{
+						// It's not possible to generate a fake subheader for mode 2 tracks because the submode byte contains detailed info
+						// about what actual data is inside the block
+						m_device->logerror("T10MMC: subheader data is not available for track type %d\n", track_type);
+						memset(data + data_idx, 0, 8);
+
+						if (track_type == cdrom_file::CD_TRACK_MODE2_FORM2)
+							data[data_idx+2] = data[data_idx+6] = 1 << 5; // The form 2 flag can at least be set accurately
+					}
+
+					// Mode 1 and mode 2 formless return 0 bytes
+					if (track_type != cdrom_file::CD_TRACK_MODE1 && track_type != cdrom_file::CD_TRACK_MODE1_RAW && track_type != cdrom_file::CD_TRACK_MODE2)
+						data_idx += 8;
+				}
+
+				if (requested_user_data)
+				{
+					int buffer_offset = 0;
+					int data_len = 0;
+
+					if (track_type == cdrom_file::CD_TRACK_AUDIO)
+					{
+						buffer_offset = 0;
+						data_len = 2352;
+					}
+					else if (track_type == cdrom_file::CD_TRACK_MODE1)
+					{
+						buffer_offset = 0;
+						data_len = 2048;
+					}
+					else if (track_type == cdrom_file::CD_TRACK_MODE1_RAW)
+					{
+						buffer_offset = 16;
+						data_len = 2048;
+					}
+					else if ((track_type == cdrom_file::CD_TRACK_MODE2_RAW && mode2_form == 1))
+					{
+						buffer_offset = 24;
+						data_len = 2048;
+					}
+					else if ((track_type == cdrom_file::CD_TRACK_MODE2_RAW && mode2_form == 2))
+					{
+						buffer_offset = 24;
+						data_len = 2328;
+					}
+					else if (track_type == cdrom_file::CD_TRACK_MODE2_FORM_MIX && mode2_form == 1)
+					{
+						buffer_offset = 8;
+						data_len = 2048;
+					}
+					else if (track_type == cdrom_file::CD_TRACK_MODE2_FORM_MIX && mode2_form == 2)
+					{
+						buffer_offset = 8;
+						data_len = 2328;
+					}
+					else if (track_type == cdrom_file::CD_TRACK_MODE2)
+					{
+						// Untested
+						buffer_offset = 0;
+						data_len = 2336;
+					}
+					else if (track_type == cdrom_file::CD_TRACK_MODE2_FORM1)
+					{
+						// Untested
+						m_device->logerror("T10MMC: reading user data from untested mode 2 form 1 track\n");
+						buffer_offset = 0;
+						data_len = 2048;
+					}
+					else if (track_type == cdrom_file::CD_TRACK_MODE2_FORM2)
+					{
+						// Untested
+						m_device->logerror("T10MMC: reading user data from untested mode 2 form 2 track\n");
+						buffer_offset = 0;
+						data_len = 2324;
+					}
+
+					memcpy(data + data_idx, tmp_buffer + buffer_offset, data_len);
+					data_idx += data_len;
+
+					if (track_type == cdrom_file::CD_TRACK_MODE2_FORM2)
+					{
+						// Untested, but the sector size of 2324 as noted in cdrom.h
+						// implies the lack of the last 4 bytes for the (optional) CRC
+						memset(data + data_idx, 0, 4);
+						data_idx += 4;
+					}
+				}
+
+				if (requested_edc_ecc)
+				{
+					if (track_type == cdrom_file::CD_TRACK_MODE1_RAW)
+					{
+						// Includes the 8 bytes of padding
+						memcpy(data + data_idx, tmp_buffer + 16 + 2048, 288);
+					}
+					else if (track_type == cdrom_file::CD_TRACK_MODE2_RAW && mode2_form == 1)
+					{
+						memcpy(data + data_idx, tmp_buffer + 24 + 2048, 280);
+					}
+					else if (track_type == cdrom_file::CD_TRACK_MODE2_FORM_MIX && mode2_form == 1)
+					{
+						memcpy(data + data_idx, tmp_buffer + 8 + 2048, 280);
+					}
+					else
+					{
+						m_device->logerror("T10MMC: EDC/ECC data is not available for track type %d\n", track_type);
+						memset(data + data_idx, 0, 280);
+					}
+
+					data_idx += 280;
+				}
+
+				if (requested_c2 || requested_c2_error_block)
+				{
+					m_device->logerror("T10MMC: C2 field is not supported, returning zero data\n");
+					memset(data + data_idx, 0, 294);
+					data_idx += 294;
+				}
+
+				if (requested_c2_error_block)
+				{
+					m_device->logerror("T10MMC: error block field is not supported, returning zero data\n");
+					memset(data + data_idx, 0, 2);
+					data_idx += 2;
+				}
+
+				m_lba++;
+				m_blocks--;
+
+				m_last_lba = m_lba;
+				dataLength -= data_idx;
+				data += data_idx;
+				data_idx = 0;
 			}
 		}
 		break;
