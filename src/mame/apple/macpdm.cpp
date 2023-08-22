@@ -6,6 +6,7 @@
 #include "cuda.h"
 #include "macadb.h"
 
+#include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/nubus.h"
 #include "bus/rs232/rs232.h"
@@ -1101,22 +1102,30 @@ void macpdm_state::macpdm(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:0", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:2", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:3", default_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsibus:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
+		[](device_t *device)
+		{
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
+		});
 	NSCSI_CONNECTOR(config, "scsibus:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:5", default_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsibus:6", default_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr53c94", NCR53C94).machine_config([this] (device_t *device) {
-																							 auto &ctrl = downcast<ncr53c94_device &>(*device);
-																							 ctrl.set_clock(ENET_CLOCK/2);
-																							 ctrl.drq_handler_cb().set(*this, FUNC(macpdm_state::scsi_drq));
-																							 ctrl.irq_handler_cb().set(*this, FUNC(macpdm_state::scsi_irq));
-																						 });
+	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr53c94", NCR53C94).machine_config(
+		[this] (device_t *device)
+		{
+			auto &ctrl = downcast<ncr53c94_device &>(*device);
+			ctrl.set_clock(ENET_CLOCK/2);
+			ctrl.drq_handler_cb().set(*this, FUNC(macpdm_state::scsi_drq));
+			ctrl.irq_handler_cb().set(*this, FUNC(macpdm_state::scsi_irq));
+		});
 
 	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
 	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("PPC601");
 
 	SWIM3(config, m_fdc, IO_CLOCK);
 	m_fdc->irq_cb().set(FUNC(macpdm_state::fdc_irq));

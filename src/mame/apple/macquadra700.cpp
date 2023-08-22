@@ -17,6 +17,7 @@
 #include "macrtc.h"
 #include "mactoolbox.h"
 
+#include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
 #include "bus/nubus/nubus.h"
@@ -573,8 +574,13 @@ void macquadra_state::macqd700(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi1:0", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:2", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi1:3", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi1:4", mac_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsi1:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
+		[](device_t *device)
+		{
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
+		});
+	NSCSI_CONNECTOR(config, "scsi1:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:6", mac_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi1:7").option_set("ncr53c96", NCR53C96).clock(50_MHz_XTAL / 2).machine_config(
