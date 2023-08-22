@@ -324,7 +324,8 @@ void macvail_state::maclc520(machine_config &config)
 	maclc3_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macvail_state::maclc520_map);
 
-	CUDA_V240(config, m_cuda, XTAL(32'768));
+	CUDA_V2XX(config, m_cuda, XTAL(32'768));
+	m_cuda->set_default_bios_tag("341s0060");
 	m_cuda->reset_callback().set(FUNC(macvail_state::cuda_reset_w));
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_sonora, FUNC(sonora_device::cb1_w));

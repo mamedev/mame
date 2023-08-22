@@ -205,7 +205,8 @@ void quadra605_state::macqd605(machine_config &config)
 
 	MACADB(config, m_macadb, C15M);
 
-	CUDA_V237(config, m_cuda, XTAL(32'768));
+	CUDA_V2XX(config, m_cuda, XTAL(32'768));
+	m_cuda->set_default_bios_tag("341s0788");
 	m_cuda->reset_callback().set(FUNC(quadra605_state::cuda_reset_w));
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_primetime, FUNC(primetime_device::cb1_w));

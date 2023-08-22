@@ -95,37 +95,10 @@ private:
 	void send_port(u8 offset, u8 data);
 };
 
-class cuda_235_device : public cuda_device
+class cuda_2xx_device : public cuda_device
 {
 public:
-	cuda_235_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-};
-
-class cuda_237_device : public cuda_device
-{
-public:
-	cuda_237_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-};
-
-class cuda_238_device : public cuda_device
-{
-public:
-	cuda_238_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-};
-
-class cuda_240_device : public cuda_device
-{
-public:
-	cuda_240_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cuda_2xx_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -160,10 +133,7 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(CUDA_V235, cuda_235_device)
-DECLARE_DEVICE_TYPE(CUDA_V237, cuda_237_device)
-DECLARE_DEVICE_TYPE(CUDA_V238, cuda_238_device)
-DECLARE_DEVICE_TYPE(CUDA_V240, cuda_240_device)
+DECLARE_DEVICE_TYPE(CUDA_V2XX, cuda_2xx_device)
 DECLARE_DEVICE_TYPE(CUDA_LITE, cuda_lite_device)
 DECLARE_DEVICE_TYPE(CUDA_V302, cuda_302_device)
 

@@ -166,7 +166,8 @@ void quadra630_state::macqd630(machine_config &config)
 
 	// TODO: recapamac.com.au's logic board photos show Cuda 2.40 for both Q630 and LC580,
 	// but both ROM versions have issues syncing with 2.38 and 2.40 while 2.37 works.
-	CUDA_V237(config, m_cuda, XTAL(32'768));
+	CUDA_V2XX(config, m_cuda, XTAL(32'768));
+	m_cuda->set_default_bios_tag("341s0788");
 	m_cuda->reset_callback().set(FUNC(quadra630_state::cuda_reset_w));
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_primetimeii, FUNC(primetime_device::cb1_w));

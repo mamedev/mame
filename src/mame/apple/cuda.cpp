@@ -53,7 +53,6 @@
 #include "emu.h"
 #include "cuda.h"
 #include "cpu/m6805/m6805.h"
-#include "sound/asc.h"
 
 #define LOG_ADB         (1U << 1)   // low-level ADB details
 #define LOG_I2C         (1U << 2)   // low-level I2C details
@@ -68,10 +67,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(CUDA_V235, cuda_235_device, "cuda235", "Apple Cuda v2.35 ADB/I2C")
-DEFINE_DEVICE_TYPE(CUDA_V237, cuda_237_device, "cuda237", "Apple Cuda v2.37 ADB/I2C")
-DEFINE_DEVICE_TYPE(CUDA_V238, cuda_238_device, "cuda238", "Apple Cuda v2.38 ADB/I2C")
-DEFINE_DEVICE_TYPE(CUDA_V240, cuda_240_device, "cuda240", "Apple Cuda v2.40 ADB/I2C")
+DEFINE_DEVICE_TYPE(CUDA_V2XX, cuda_2xx_device, "cuda", "Apple Cuda v2.xx ADB/I2C")
 DEFINE_DEVICE_TYPE(CUDA_V302, cuda_302_device, "cuda302", "Apple Cuda v3.02 ADB/I2C")
 DEFINE_DEVICE_TYPE(CUDA_LITE, cuda_lite_device,"cudalite","Apple Cuda Lite ADB+I2C+PS/2")
 
@@ -126,6 +122,10 @@ cuda_device::cuda_device(const machine_config &mconfig, device_type type, const 
 	m_iic_sda(0), m_last_adb_time(0), m_cuda_controls_power(false), m_adb_in(false),
 	m_reset_line(0), m_adb_dtime(0), m_pram_loaded(false)
 {
+	std::fill(std::begin(m_pram), std::end(m_pram), 0);
+	std::fill(std::begin(m_disk_pram), std::end(m_disk_pram), 0);
+	std::fill(std::begin(m_ports), std::end(m_ports), 0);
+	std::fill(std::begin(m_ddrs), std::end(m_ddrs), 0);
 }
 
 void cuda_device::device_start()
@@ -165,25 +165,10 @@ void cuda_device::device_start()
 
 void cuda_device::device_reset()
 {
-	m_ddrs[0] = m_ddrs[1] = m_ddrs[2] = 0;
-	m_ports[0] = m_ports[1] = m_ports[2] = 0;
-
 	m_timer->adjust(attotime::never);
 	m_prog_timer->adjust(attotime::never);
 
-	m_cuda_controls_power = false;    // set to hard power control
-	m_adb_in = true;  // line is pulled up to +5v, so nothing plugged in would read as "1"
-	m_reset_line = 0;
-	m_tip = 0;
-	m_treq = 0;
-	m_byteack = 0;
-	m_via_data = 0;
-	m_via_clock = 0;
-	m_pll_ctrl = 0;
-	m_timer_ctrl = 0;
 	m_last_adb_time = m_maincpu->total_cycles();
-	m_onesec = 0;
-	m_last_adb = 0;
 }
 
 void cuda_device::send_port(u8 offset, u8 data)
@@ -516,83 +501,35 @@ bool cuda_device::nvram_write(util::write_stream &file)
 	return !file.write(m_pram, 0x100, actual) && actual == 0x100;
 }
 
-// Cuda v2.35 ------------------------------------------------------------------------
+// Cuda v2.XX ------------------------------------------------------------------------
 
-ROM_START( cuda235 )
+ROM_START( cuda2xx )
 	ROM_REGION(0x1100, "roms", 0)
-	ROM_LOAD( "341s0417.bin",  0x0000, 0x1100, CRC(571f24c9) SHA1(a2ae12492389a00e5f4b1ef19b267d6f3a8eadc3) )
+	ROM_DEFAULT_BIOS("341s0788")
+
+	ROM_SYSTEM_BIOS(0, "341s0417", "Cuda 2.35 (341S0417)")
+	ROMX_LOAD( "341s0417.bin",  0x0000, 0x1100, CRC(571f24c9) SHA1(a2ae12492389a00e5f4b1ef19b267d6f3a8eadc3), ROM_BIOS(0) )
+
+	ROM_SYSTEM_BIOS(1, "341s0788", "Cuda 2.37 (341S0788)")
+	ROMX_LOAD("341s0788.bin", 0x0000, 0x1100, CRC(df6e1b43) SHA1(ec23cc6214c472d61b98964928c40589517a3172), ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(2, "341s0789", "Cuda 2.38 (341S0789)")
+	ROMX_LOAD("341s0789.bin", 0x0000, 0x1100, CRC(682d2ace) SHA1(81a9e25204f58363ed2f5945763ac19a1a66234e), ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS(3, "341s0060", "Cuda 2.40 (341S0060)")
+	ROMX_LOAD("341s0060.bin", 0x0000, 0x1100, CRC(0f5e7b4a) SHA1(972b3778146d9787b18c3a9874d505cf606b3e15), ROM_BIOS(3))
 
 	ROM_REGION(0x100, "defaultnv", 0)
 	ROM_LOAD( "cuda_nvram.bin", 0x000000, 0x000100, CRC(6e3da389) SHA1(e5b13a2a904cc9fc612ed25b76718c501c11b00a) )
 ROM_END
 
-const tiny_rom_entry *cuda_235_device::device_rom_region() const
+const tiny_rom_entry *cuda_2xx_device::device_rom_region() const
 {
-	return ROM_NAME( cuda235 );
+	return ROM_NAME( cuda2xx );
 }
 
-cuda_235_device::cuda_235_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	cuda_device(mconfig, CUDA_V235, tag, owner, clock)
-{
-}
-
-// Cuda v2.37 ------------------------------------------------------------------------
-
-ROM_START( cuda237 )
-	ROM_REGION(0x1100, "roms", 0)
-	ROM_LOAD( "341s0788.bin",  0x0000, 0x1100, CRC(df6e1b43) SHA1(ec23cc6214c472d61b98964928c40589517a3172) )
-
-	ROM_REGION(0x100, "defaultnv", 0)
-	ROM_LOAD( "cuda_nvram.bin", 0x000000, 0x000100, CRC(6e3da389) SHA1(e5b13a2a904cc9fc612ed25b76718c501c11b00a) )
-ROM_END
-
-const tiny_rom_entry *cuda_237_device::device_rom_region() const
-{
-	return ROM_NAME( cuda237 );
-}
-
-cuda_237_device::cuda_237_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	cuda_device(mconfig, CUDA_V237, tag, owner, clock)
-{
-}
-
-// Cuda v2.38 ------------------------------------------------------------------------
-
-ROM_START( cuda238 )
-	ROM_REGION(0x1100, "roms", 0)
-	ROM_LOAD( "cuda2_38d.bin", 0x0000, 0x1100, CRC(682d2ace) SHA1(81a9e25204f58363ed2f5945763ac19a1a66234e) )
-
-	ROM_REGION(0x100, "defaultnv", 0)
-	ROM_LOAD( "cuda_nvram.bin", 0x000000, 0x000100, CRC(6e3da389) SHA1(e5b13a2a904cc9fc612ed25b76718c501c11b00a) )
-ROM_END
-
-const tiny_rom_entry *cuda_238_device::device_rom_region() const
-{
-	return ROM_NAME( cuda238 );
-}
-
-cuda_238_device::cuda_238_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	cuda_device(mconfig, CUDA_V238, tag, owner, clock)
-{
-}
-
-// Cuda v2.40 ------------------------------------------------------------------------
-
-ROM_START( cuda240 )
-	ROM_REGION(0x1100, "roms", 0)
-	ROM_LOAD( "341s0060.bin",  0x0000, 0x1100, CRC(0f5e7b4a) SHA1(972b3778146d9787b18c3a9874d505cf606b3e15) )
-
-	ROM_REGION(0x100, "defaultnv", 0)
-	ROM_LOAD( "cuda_nvram.bin", 0x000000, 0x000100, CRC(6e3da389) SHA1(e5b13a2a904cc9fc612ed25b76718c501c11b00a) )
-ROM_END
-
-const tiny_rom_entry *cuda_240_device::device_rom_region() const
-{
-	return ROM_NAME( cuda240 );
-}
-
-cuda_240_device::cuda_240_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	cuda_device(mconfig, CUDA_V240, tag, owner, clock)
+cuda_2xx_device::cuda_2xx_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	cuda_device(mconfig, CUDA_V2XX, tag, owner, clock)
 {
 }
 
