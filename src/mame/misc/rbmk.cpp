@@ -142,11 +142,13 @@ uint16_t rbmk_state::dip_mux_r()
 {
 	uint16_t res = 0xffff;
 
+	// TODO: & 0x00ff are the inputs for keyboard mode in rbmk
 	switch (m_dip_mux & 0x7000)
 	{
 		case 0x1000: res = m_dsw[0]->read(); break;
 		case 0x2000: res = m_dsw[1]->read(); break;
 		case 0x4000: res = m_dsw[2]->read(); break;
+		// TODO: 0x8000 is checked at startup by super555, which has 4 DIP banks. However the game doesn`t use the 4th anywhere.
 	}
 
 	return res;
@@ -192,8 +194,9 @@ void rbmk_state::rbmk_mem(address_map &map)
 	map(0xc00000, 0xc00001).rw(FUNC(rbmk_state::dip_mux_r), FUNC(rbmk_state::dip_mux_w));
 	map(0xc08000, 0xc08001).portr("IN1").w(FUNC(rbmk_state::tilebank_w));
 	map(0xc10000, 0xc10001).portr("IN2");
-	map(0xc18080, 0xc18081).r(FUNC(rbmk_state::unk_r));
+	map(0xc18080, 0xc18081).r(FUNC(rbmk_state::unk_r));  // TODO: from MCU?
 	map(0xc20000, 0xc20000).r("oki", FUNC(okim6295_device::read));
+	//map(0xc20080, 0xc20081) // TODO: to MCU?
 	map(0xc28000, 0xc28000).w("oki", FUNC(okim6295_device::write));
 }
 

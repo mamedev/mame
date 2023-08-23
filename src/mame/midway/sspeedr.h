@@ -17,6 +17,8 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_digits(*this, "digit%u", 0U)
+		, m_lampgo(*this, "lampGO")
+		, m_lampep(*this, "lampEP")
 		, m_pedal_bit0(*this, "sound_nl:pedal_bit0")
 		, m_pedal_bit1(*this, "sound_nl:pedal_bit1")
 		, m_pedal_bit2(*this, "sound_nl:pedal_bit2")
@@ -35,7 +37,7 @@ public:
 
 protected:
 	virtual void video_start() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void machine_start() override;
 
 private:
 	void int_ack_w(uint8_t data);
@@ -82,6 +84,8 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	output_finder<26> m_digits;
+	output_finder<> m_lampgo;
+	output_finder<> m_lampep;
 	required_device<netlist_mame_logic_input_device> m_pedal_bit0;
 	required_device<netlist_mame_logic_input_device> m_pedal_bit1;
 	required_device<netlist_mame_logic_input_device> m_pedal_bit2;

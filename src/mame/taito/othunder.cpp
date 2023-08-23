@@ -342,8 +342,8 @@ void othunder_state::eeprom_w(u8 data)
                 x0000000    eeprom out data  */
 
 	/* Recoil Piston Motor Status */
-	output().set_value("Player1_Recoil_Piston", data & 0x1 );
-	output().set_value("Player2_Recoil_Piston", (data & 0x2) >>1 );
+	m_recoil_piston[0] = data & 0x1;
+	m_recoil_piston[1] = (data & 0x2) >> 1;
 
 	if (data & 4)
 		popmessage("OBPRI SET!");
@@ -572,6 +572,8 @@ GFXDECODE_END
 
 void othunder_state::machine_start()
 {
+	m_recoil_piston.resolve();
+
 	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
 	save_item(NAME(m_pan));

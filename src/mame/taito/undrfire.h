@@ -31,13 +31,18 @@ public:
 		m_spritemaphi(*this, "spritemaphi"),
 		m_in_gunx(*this, "GUNX%u", 1U),
 		m_in_guny(*this, "GUNY%u", 1U),
-		m_io_fake(*this, "FAKE")
+		m_io_fake(*this, "FAKE"),
+		m_lamp_start(*this, "P%u_lamp_start", 1U),
+		m_gun_recoil(*this, "P%u_gun_recoil", 1U),
+		m_lamp(*this, "Lamp_%", 1U),
+		m_wheel_vibration(*this, "Wheel_vibration")
 	{ }
 
 	void undrfire(machine_config &config);
 	void cbombers(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
 private:
@@ -76,6 +81,10 @@ private:
 	optional_ioport_array<2> m_in_gunx;
 	optional_ioport_array<2> m_in_guny;
 	optional_ioport m_io_fake;
+	output_finder<2> m_lamp_start;
+	output_finder<2> m_gun_recoil;
+	output_finder<6> m_lamp;
+	output_finder<> m_wheel_vibration;
 
 	void coin_word_w(u8 data);
 	u16 shared_ram_r(offs_t offset);
