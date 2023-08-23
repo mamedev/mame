@@ -5516,13 +5516,17 @@ void ktmnt2_state::sound_w(u8 data)
 		// latch from S1-S5
 		u8 sample = data & 0x1f;
 
-		if (sample == 0)
-			m_samples->stop(0); // stop command
+		if (m_samples->playing(0))
+		{
+			// stop command
+			if (sample == 0)
+				m_samples->stop(0);
+		}
 		else if (sample < m_samples->samples() + 1)
 			m_samples->start(0, sample - 1);
 	}
 
-	// S1-S3: input mux
+	// other: input mux
 	input_w(data);
 }
 

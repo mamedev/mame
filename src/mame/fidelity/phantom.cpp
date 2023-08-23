@@ -75,6 +75,7 @@ public:
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_inputs(*this, "IN.%u", 0),
+		m_piece_hand(*this, "cpu_hand"),
 		m_out_motor(*this, "motor.%u", 0U),
 		m_out_motorx(*this, "motorx%u", 0U),
 		m_out_motory(*this, "motory")
@@ -94,6 +95,7 @@ protected:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	optional_ioport_array<2> m_inputs;
+	output_finder<> m_piece_hand;
 	output_finder<5> m_out_motor;
 	output_finder<2> m_out_motorx;
 	output_finder<> m_out_motory;
@@ -128,12 +130,12 @@ protected:
 	bool m_vmotor_sensor1_ff;
 	bool m_hmotor_sensor0_ff;
 	bool m_hmotor_sensor1_ff;
-	int m_piece;
 	u8 m_pieces_map[0x40][0x40];
 };
 
 void phantom_state::machine_start()
 {
+	m_piece_hand.resolve();
 	m_out_motor.resolve();
 	m_out_motorx.resolve();
 	m_out_motory.resolve();
@@ -149,7 +151,6 @@ void phantom_state::machine_start()
 	save_item(NAME(m_vmotor_sensor1_ff));
 	save_item(NAME(m_hmotor_sensor0_ff));
 	save_item(NAME(m_hmotor_sensor1_ff));
-	save_item(NAME(m_piece));
 	save_item(NAME(m_pieces_map));
 }
 
@@ -220,8 +221,8 @@ void phantom_state::init_motors()
 	m_vmotor_sensor1_ff = false;
 	m_hmotor_sensor0_ff = false;
 	m_hmotor_sensor1_ff = false;
-	m_piece = 0;
 	memset(m_pieces_map, 0, sizeof(m_pieces_map));
+	m_piece_hand = 0;
 }
 
 void phantom_state::check_rotation()
@@ -276,19 +277,19 @@ void phantom_state::update_pieces_position(int state)
 			// check if piece was picked up by user
 			int pos = (y << 4 & 0xf0) | (x & 0x0f);
 			if (pos == m_board->get_handpos())
-				m_piece = 0;
+				m_piece_hand = 0;
 			else
-				m_piece = m_board->read_piece(x, y);
+				m_piece_hand = m_board->read_piece(x, y);
 
-			if (m_piece != 0)
+			if (m_piece_hand != 0)
 				m_board->write_piece(x, y, 0);
 		}
 		else
-			m_piece = m_pieces_map[m_vmotor_pos / 4][m_hmotor_pos / 4];
+			m_piece_hand = m_pieces_map[m_vmotor_pos / 4][m_hmotor_pos / 4];
 
 		m_pieces_map[m_vmotor_pos / 4][m_hmotor_pos / 4] = 0;
 	}
-	else if (m_piece != 0)
+	else if (m_piece_hand != 0)
 	{
 		// check for pieces collisions
 		if (valid_pos && m_board->read_piece(x, y) != 0)
@@ -298,10 +299,10 @@ void phantom_state::update_pieces_position(int state)
 		}
 
 		if (valid_pos)
-			m_board->write_piece(x, y, m_piece);
+			m_board->write_piece(x, y, m_piece_hand);
 
-		m_pieces_map[m_vmotor_pos / 4][m_hmotor_pos / 4] = m_piece;
-		m_piece = 0;
+		m_pieces_map[m_vmotor_pos / 4][m_hmotor_pos / 4] = m_piece_hand;
+		m_piece_hand = 0;
 	}
 
 	m_board->refresh();

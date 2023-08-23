@@ -13818,14 +13818,14 @@ ROM_END
 
 ROM_START( tiprog )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD16_WORD( "za0675nl", 0x0000, 0x1000, CRC(82355854) SHA1(03fab373bce04df8ea3fe25352525e8539213626) ) // tmc0983
+	ROM_LOAD16_WORD( "za0675nl", 0x0000, 0x1000, CRC(82355854) SHA1(03fab373bce04df8ea3fe25352525e8539213626) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 1982, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0980_tiprog_micro.pla", 0, 1982, CRC(57043284) SHA1(0fa06d5865830ecdb3d870271cb92ac917bed3ca) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_tiprog_output.pla", 0, 352, BAD_DUMP CRC(125c4ee6) SHA1(b8d865c42fd37c3d9b92c5edbecfc831be558597) ) // corrected by hand
+	ROM_LOAD( "tms0980_tiprog_output.pla", 0, 352, CRC(125c4ee6) SHA1(b8d865c42fd37c3d9b92c5edbecfc831be558597) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
 	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
 ROM_END

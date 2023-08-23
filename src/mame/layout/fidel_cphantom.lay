@@ -534,6 +534,7 @@ license:CC0-1.0
 		<element ref="text_uih1"><bounds x="0" y="51" width="10" height="2" /></element>
 		<element ref="cwhite"><bounds x="1" y="53.5" width="8" height="6" /></element>
 		<element name="piece_ui0" ref="piece"><bounds x="2" y="53.5" width="6" height="6" /></element>
+		<element name="cpu_hand" ref="piece"><bounds x="2" y="53.5" width="6" height="6" /><color alpha="0.5" /></element>
 
 		<element ref="cwhite"><bounds x="1" y="60.5" width="8" height="2.5" /></element>
 		<element ref="text_uih2"><bounds x="1.5" y="60.75" width="7" height="2" /></element>
