@@ -90,6 +90,10 @@ void apple3_state::apple3(machine_config &config)
 	m_ay3600->shift().set(FUNC(apple3_state::ay3600_shift_r));
 	m_ay3600->control().set(FUNC(apple3_state::ay3600_control_r));
 	m_ay3600->data_ready().set(FUNC(apple3_state::ay3600_data_ready_w));
+	m_ay3600->ako().set(FUNC(apple3_state::ay3600_ako_w));
+
+	/* repeat timer */
+	TIMER(config, "repttimer").configure_generic(FUNC(apple3_state::ay3600_repeat));
 
 	/* slot bus */
 	A2BUS(config, m_a2bus, 0);

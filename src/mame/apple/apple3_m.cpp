@@ -1294,6 +1294,46 @@ void apple3_state::ay3600_data_ready_w(int state)
 	}
 }
 
+void apple3_state::ay3600_ako_w(int state)
+{
+	m_anykeydown = (state == ASSERT_LINE) ? true : false;
+
+	if (m_anykeydown)
+	{
+		m_repeatdelay = 5;
+		m_repttimer->adjust(attotime::from_hz(10));
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::ay3600_repeat)
+{
+	// is the key still down?
+	if (m_anykeydown)
+	{
+		if (m_repeatdelay)
+		{
+			m_repeatdelay--;
+			m_repttimer->adjust(attotime::from_hz(10));
+		}
+		else
+		{
+			// Closed Apple key
+			if (m_kbspecial->read() & 0x20)
+			{
+				m_repttimer->adjust(attotime::from_hz(30));
+			}
+			else
+			{
+				m_repttimer->adjust(attotime::from_hz(10));
+			}
+
+			m_strobe = 0x80;
+			m_via[1]->write_ca2(ASSERT_LINE);
+			m_via[1]->write_ca2(CLEAR_LINE);
+		}
+	}
+}
+
 void apple3_state::pdl_handler(int offset)
 {
 	uint8_t pdlread;
