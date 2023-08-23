@@ -28,20 +28,19 @@ class device_heath_tlb_card_interface : public device_interface
 {
 public:
 
-	// required operation overrides
+	// required operation
 	virtual void serial_in_w(int state) = 0;
 
-
-	// optional operation overrides
+	// optional operations
 	virtual void rlsd_in_w(int state) {}
 	virtual void dsr_in_w(int state)  {}
-	virtual void cts_int_w(int state) {}
+	virtual void cts_in_w(int state) {}
 
 protected:
 	// construction/destruction
 	device_heath_tlb_card_interface(const machine_config &mconfig, device_t &device);
 
-	heath_tlb_connector  *m_slot;
+	heath_tlb_connector * const m_slot;
 };
 
 
@@ -58,7 +57,7 @@ public:
 	virtual void serial_in_w(int state) override;
 	virtual void rlsd_in_w(int state) override;
 	virtual void dsr_in_w(int state) override;
-	virtual void cts_int_w(int state) override;
+	virtual void cts_in_w(int state) override;
 
 	void reset_key_w(int state);
 	void right_shift_w(int state);
@@ -238,20 +237,20 @@ public:
 
 	// computer interface
 	auto serial_data_callback() { return m_write_sd.bind(); }
-	auto dtr_callback() { return m_dtr_cb.bind(); }
-	auto rts_callback() { return m_rts_cb.bind(); }
-	auto reset_cb() { return m_reset.bind(); }
+	auto dtr_callback()         { return m_dtr_cb.bind(); }
+	auto rts_callback()         { return m_rts_cb.bind(); }
+	auto reset_cb()             { return m_reset.bind(); }
 
 	// card interface
-	void serial_in_w(int state) { if (m_tlb) m_tlb->serial_in_w(state); };
-	void rlsd_in_w(int state) { if (m_tlb) m_tlb->rlsd_in_w(state); };
-	void dsr_in_w(int state) { if (m_tlb) m_tlb->dsr_in_w(state); };
-	void cts_int_w(int state) { if (m_tlb) m_tlb->cts_int_w(state); };
+	void serial_in_w(int state) { if (m_tlb) m_tlb->serial_in_w(state); }
+	void rlsd_in_w(int state)   { if (m_tlb) m_tlb->rlsd_in_w(state); }
+	void dsr_in_w(int state)    { if (m_tlb) m_tlb->dsr_in_w(state); }
+	void cts_in_w(int state)    { if (m_tlb) m_tlb->cts_in_w(state); }
 
-	void serial_out_b(int data) { m_write_sd(data); };
-	void dtr_out(int data)  { m_dtr_cb(data); };
-	void rts_out(int data)  { m_rts_cb(data); };
-	void reset_out(int data) { m_reset(data); };
+	void serial_out_b(int data) { m_write_sd(data); }
+	void dtr_out(int data)      { m_dtr_cb(data); }
+	void rts_out(int data)      { m_rts_cb(data); }
+	void reset_out(int data)    { m_reset(data); }
 
 protected:
 	virtual void device_start() override;
@@ -267,8 +266,5 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(HEATH_TLB_CONNECTOR, heath_tlb_connector)
-
-extern template class device_finder<heath_tlb_connector, false>;
-extern template class device_finder<heath_tlb_connector, true>;
 
 #endif // MAME_HEATHKIT_TLB_H

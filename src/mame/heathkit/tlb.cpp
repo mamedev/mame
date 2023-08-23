@@ -96,9 +96,9 @@ DEFINE_DEVICE_TYPE(HEATH_GP19, heath_gp19_tlb_device, "heath_gp19_tlb", "Heath T
 
 
 device_heath_tlb_card_interface::device_heath_tlb_card_interface(const machine_config &mconfig, device_t &device) :
-	device_interface(device, "heathtlbdevice")
+	device_interface(device, "heathtlbdevice"),
+	m_slot(dynamic_cast<heath_tlb_connector *>(device.owner()))
 {
-	m_slot = dynamic_cast<heath_tlb_connector *>(device.owner());
 }
 
 
@@ -878,7 +878,7 @@ void heath_tlb_device::dsr_in_w(int state)
 	m_ace->dsr_w(state);
 }
 
-void heath_tlb_device::cts_int_w(int state)
+void heath_tlb_device::cts_in_w(int state)
 {
 	m_ace->cts_w(state);
 }

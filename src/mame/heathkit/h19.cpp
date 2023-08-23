@@ -52,7 +52,7 @@ void h19_state::h19(machine_config &config)
 	dte.rxd_handler().set(m_tlbc, FUNC(heath_tlb_connector::serial_in_w));
 	dte.dcd_handler().set(m_tlbc, FUNC(heath_tlb_connector::rlsd_in_w));
 	dte.dsr_handler().set(m_tlbc, FUNC(heath_tlb_connector::dsr_in_w));
-	dte.cts_handler().set(m_tlbc, FUNC(heath_tlb_connector::cts_int_w));
+	dte.cts_handler().set(m_tlbc, FUNC(heath_tlb_connector::cts_in_w));
 }
 
 // ROM definition

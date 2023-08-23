@@ -10,8 +10,6 @@
 
 #include "intr_cntrl.h"
 
-#include <strings.h>
-
 DEFINE_DEVICE_TYPE(HEATH_INTR_CNTRL, heath_intr_cntrl, "heath_intr_cntrl", "Heath H/Z-89 Interrupt Controller");
 DEFINE_DEVICE_TYPE(HEATH_Z37_INTR_CNTRL, z37_intr_cntrl, "heath_z37_intr_cntrl", "Heath H/Z-89 with Z-37 Interrupt Controller");
 
@@ -21,9 +19,9 @@ DEFINE_DEVICE_TYPE(HEATH_INTR_SOCKET, heath_intr_socket, "heath_intr_socket", "H
  * Heath interrupt interface
  */
 device_heath_intr_interface::device_heath_intr_interface(const machine_config &mconfig, device_t &device) :
-	device_interface(device, "heathintrdevice")
+	device_interface(device, "heathintrdevice"),
+	m_socket(dynamic_cast<heath_intr_socket *>(device.owner()))
 {
-	m_socket = dynamic_cast<heath_intr_socket *>(device.owner());
 }
 
 /**
@@ -217,7 +215,7 @@ IRQ_CALLBACK_MEMBER(heath_intr_socket::irq_callback)
 
 	if (m_cntrl)
 	{
-		 instr = m_cntrl->get_instruction();
+		instr = m_cntrl->get_instruction();
 	}
 
 	return instr;

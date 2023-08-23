@@ -18,12 +18,12 @@ class heath_intr_socket;
 class device_heath_intr_interface : public device_interface
 {
 public:
-	// required operation overrides
+	// required operation
 	virtual void set_irq_level(uint8_t level, int state) = 0;
 
-	virtual void set_drq(int state) {};
-	virtual void set_irq(int state) {};
-	virtual void block_interrupts(uint8_t data) {};
+	virtual void set_drq(int state) {}
+	virtual void set_irq(int state) {}
+	virtual void block_interrupts(uint8_t data) {}
 
 protected:
 	// construction/destruction
@@ -31,7 +31,7 @@ protected:
 
 	virtual uint8_t get_instruction() = 0;
 
-	heath_intr_socket  *m_socket;
+	heath_intr_socket * const m_socket;
 
 	friend heath_intr_socket;
 };
@@ -109,16 +109,16 @@ public:
 
 	auto irq_line_cb() { return m_irq_line.bind(); }
 
-	// required operation overrides
-	void set_irq_level(uint8_t level, int state) { if (m_cntrl) { m_cntrl->set_irq_level(level, state); }};
+	// required operation
+	void set_irq_level(uint8_t level, int state) { if (m_cntrl) { m_cntrl->set_irq_level(level, state); }}
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	void raise_irq(int state) { m_irq_line(state); }
 
-	void set_irq(int state) { if (m_cntrl) { m_cntrl->set_irq(state); }};
-	void set_drq(int state) { if (m_cntrl) { m_cntrl->set_drq(state); }};
-	void block_interrupts(uint8_t data) { if (m_cntrl) { m_cntrl->block_interrupts(data); }};
+	void set_irq(int state) { if (m_cntrl) { m_cntrl->set_irq(state); }}
+	void set_drq(int state) { if (m_cntrl) { m_cntrl->set_drq(state); }}
+	void block_interrupts(uint8_t data) { if (m_cntrl) { m_cntrl->block_interrupts(data); }}
 
 protected:
 
@@ -126,7 +126,7 @@ protected:
 
 	devcb_write8 m_irq_line;
 
-	device_heath_intr_interface  *m_cntrl;
+	device_heath_intr_interface *m_cntrl;
 };
 
 
