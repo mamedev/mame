@@ -253,7 +253,6 @@ private:
 
 	bool m_single_device;
 	bool m_resetting;
-	output_finder<> m_ata_busy_led;
 
 	emu_timer *m_busy_timer;
 	emu_timer *m_buffer_empty_timer;
