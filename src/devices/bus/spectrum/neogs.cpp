@@ -81,6 +81,7 @@ public:
 		, m_view(*this, "view")
 		, m_dac(*this, "dac%u", 0U)
 		, m_sdcard(*this, "sdcard")
+		, m_neogs_led(*this, "neogs_led")
 	{ }
 
 protected:
@@ -106,6 +107,7 @@ protected:
 	memory_view m_view;
 	required_device_array<dac_word_interface, 2> m_dac;
 	required_device<spi_sdcard_sdhc_device> m_sdcard;
+	output_finder<> m_neogs_led;
 
 private:
 	TIMER_CALLBACK_MEMBER(spi_clock);
@@ -212,8 +214,7 @@ void neogs_device::neogs_ctrl_w(u8 data)
 		LOG("NMI Request\n");
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
-	if (data & 0x20)
-		; // LED data:0 - 1-on, 0-off
+	m_neogs_led = BIT(data, 5);
 }
 
 template <u8 Bank> u8 neogs_device::ram_bank_r(offs_t offset)
@@ -451,6 +452,8 @@ void neogs_device::device_start()
 			});
 
 	m_zxbus->install_device(0x0000, 0xffff, *this, &neogs_device::neogsmap);
+
+	m_neogs_led.resolve();
 }
 
 void neogs_device::device_reset()
