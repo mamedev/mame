@@ -8,6 +8,11 @@
  Note: since protection here involves accesses to ROM, we include the scrambling in this
  file rather than in a separate prot_* source
 
+ TODO:
+ - level token counter on the right stays stuck after finishing level 1 (internal token
+   counter still works, so you can still progress)
+ - any other protection checks later on?
+
  ***********************************************************************************************************/
 
 
@@ -22,6 +27,10 @@ neogeo_sbp_cart_device::neogeo_sbp_cart_device(const machine_config &mconfig, co
 }
 
 
+//-------------------------------------------------
+//  mapper specific start/reset
+//-------------------------------------------------
+
 void neogeo_sbp_cart_device::device_start()
 {
 }
@@ -31,6 +40,9 @@ void neogeo_sbp_cart_device::device_reset()
 }
 
 
+//-------------------------------------------------
+//  protection
+//-------------------------------------------------
 
 uint16_t neogeo_sbp_cart_device::protection_r(address_space &space, offs_t offset)
 {
@@ -54,8 +66,7 @@ void neogeo_sbp_cart_device::protection_w(offs_t offset, uint16_t data, uint16_t
 	int realoffset = 0x200 + (offset * 2);
 
 	// the actual data written is just pulled from the end of the rom, and unused space
-	// maybe this is just some kind of watchdog for the protection device and it doesn't
-	// matter?
+	// maybe this is just some kind of watchdog for the protection device and it doesn't matter?
 	if (realoffset == 0x1080)
 	{
 		if (data == 0x4e75)
