@@ -65,6 +65,7 @@ public:
 		floppy1(*this, "1"),
 		floppy2(*this, "2"),
 		floppy3(*this, "3"),
+		m_repttimer(*this, "repttimer"),
 		m_reset_latch(false),
 		m_nmi_latch(false)
 	{
@@ -89,6 +90,7 @@ public:
 	required_device<floppy_connector> floppy1;
 	required_device<floppy_connector> floppy2;
 	required_device<floppy_connector> floppy3;
+	required_device<timer_device> m_repttimer;
 
 	uint8_t apple3_memory_r(offs_t offset);
 	void apple3_memory_w(offs_t offset, uint8_t data);
@@ -122,6 +124,8 @@ public:
 	int ay3600_shift_r();
 	int ay3600_control_r();
 	void ay3600_data_ready_w(int state);
+	void ay3600_ako_w(int state);
+	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
 	virtual void device_post_load() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(paddle_timer);
 	void pdl_handler(int offset);
@@ -162,6 +166,7 @@ private:
 	int m_c040_time = 0;
 	uint16_t m_lastchar = 0, m_strobe = 0;
 	uint8_t m_transchar = 0;
+	bool m_anykeydown;
 	bool m_charwrt = false;
 
 	emu_timer *m_scanstart = nullptr, *m_scanend = nullptr;
