@@ -72,6 +72,8 @@ public:
 	}
 	void set_char_width(int pixels) { m_hpixels_per_column = pixels; }
 
+	void enable_allow_interlace_video_mode() { m_allow_interlace_video_mode = true; };
+
 	template <typename... T> void set_reconfigure_callback(T &&... args) { m_reconfigure_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_begin_update_callback(T &&... args) { m_begin_update_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_update_row_callback(T &&... args) { m_update_row_cb.set(std::forward<T>(args)...); }
@@ -124,8 +126,6 @@ public:
 	   followed by update_row() repeatedly and after all row
 	   updating is complete, end_update() */
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	void set_allow_interlace_video_mode(bool allow) { m_allow_interlace_video_mode = allow; };
 
 protected:
 	mc6845_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

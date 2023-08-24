@@ -1038,7 +1038,7 @@ void heath_gp19_tlb_device::device_add_mconfig(machine_config &config)
 
 	// Allow proper handling of Interlace/video mode of CRTC
 	// This is needed to properly display 50 line mode.
-	m_crtc->set_allow_interlace_video_mode(true);
+	m_crtc->enable_allow_interlace_video_mode();
 
 	m_screen->set_raw(GP19_DOT_CLOCK_2, 776, 32, 672, 264, 10, 250);
 }
