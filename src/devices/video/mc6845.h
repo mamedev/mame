@@ -125,6 +125,8 @@ public:
 	   updating is complete, end_update() */
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void set_allow_interlace_video_mode(bool allow) { m_allow_interlace_video_mode = allow; };
+
 protected:
 	mc6845_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -143,6 +145,7 @@ protected:
 	bool m_supports_status_reg_d6;
 	bool m_supports_status_reg_d7;
 	bool m_supports_transparent;
+	bool m_allow_interlace_video_mode;
 
 	/* register file */
 	uint8_t   m_horiz_char_total;     /* 0x00 */

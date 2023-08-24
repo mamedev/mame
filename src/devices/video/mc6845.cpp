@@ -82,6 +82,7 @@ DEFINE_DEVICE_TYPE(AMS40489, ams40489_device, "ams40489", "AMS40489 ASIC (CRTC)"
 mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this, false)
+	, m_allow_interlace_video_mode(false)
 	, m_show_border_area(true)
 	, m_noninterlace_adjust(0)
 	, m_interlace_adjust(0)
@@ -454,7 +455,8 @@ void mc6845_device::recompute_parameters(bool postload)
 		(horiz_pix_total != m_horiz_pix_total) || (vert_pix_total != m_vert_pix_total) ||
 		(max_visible_x != m_max_visible_x) || (max_visible_y != m_max_visible_y) ||
 		(hsync_on_pos != m_hsync_on_pos) || (vsync_on_pos != m_vsync_on_pos) ||
-		(hsync_off_pos != m_hsync_off_pos) || (vsync_off_pos != m_vsync_off_pos))
+		(hsync_off_pos != m_hsync_off_pos) || (vsync_off_pos != m_vsync_off_pos) ||
+		(MODE_INTERLACE_AND_VIDEO && m_allow_interlace_video_mode))
 	{
 		/* update the screen if we have valid data */
 		if ((horiz_pix_total > 0) && (max_visible_x < horiz_pix_total) &&
@@ -469,12 +471,11 @@ void mc6845_device::recompute_parameters(bool postload)
 			// This doubles the vertical resolution, required for 'interlace and video' mode support.
 			// Tested and works for super80v, which was designed with this in mind (choose green or monochrome colour in config switches).
 			// However it breaks some other drivers (apricot,a6809,victor9k,bbc(mode7)).
-			// So, it is commented out for now.
-			// Also, the mode-register change needs to be added to the changed-parameter tests above.
-			if (MODE_INTERLACE_AND_VIDEO)
+			// So, it is protected by the m_allow_interlace_video_mode
+			if (MODE_INTERLACE_AND_VIDEO && m_allow_interlace_video_mode)
 			{
-				//max_visible_y *= 2;
-				//vert_pix_total *= 2;
+				max_visible_y *= 2;
+				vert_pix_total *= 2;
 			}
 
 			if(m_show_border_area)
@@ -1121,6 +1122,7 @@ void mc6845_device::device_start()
 	save_item(NAME(m_line_address));
 	save_item(NAME(m_cursor_x));
 	save_item(NAME(m_has_valid_parameters));
+	save_item(NAME(m_allow_interlace_video_mode));
 }
 
 

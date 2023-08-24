@@ -17,10 +17,6 @@
   TODO:
     - INS8250 needs to implement "Set Break" (LCR, bit 6) before Break key
       will function as expected.
-    - 49/50 row mode does not work when DOT clocks are programmed as documented
-      in the manual. It does work when DOT clock is fixed at the 20.282 MHz
-      rate.
-    - In 49/50 row mode, character descenders are cut off.
     - fix GP-19 graphics mode only showing the top half of the image (on the
       visible screen).
 
@@ -1056,6 +1052,10 @@ void heath_gp19_tlb_device::device_start()
 	m_graphic_mode = false;
 	m_col_132 = false;
 	m_reverse_video = false;
+
+	// Allow proper handling of Interlace/video mode of CRTC
+	// This is needed to properly display 50 line mode.
+	m_crtc->set_allow_interlace_video_mode(true);
 }
 
 void heath_gp19_tlb_device::mem_map(address_map &map)
