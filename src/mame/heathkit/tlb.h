@@ -17,6 +17,7 @@
 #include "machine/mm5740.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -34,13 +35,13 @@ public:
 	// optional operations
 	virtual void rlsd_in_w(int state) {}
 	virtual void dsr_in_w(int state)  {}
-	virtual void cts_in_w(int state) {}
+	virtual void cts_in_w(int state)  {}
 
 protected:
 	// construction/destruction
 	device_heath_tlb_card_interface(const machine_config &mconfig, device_t &device);
 
-	heath_tlb_connector * const m_slot;
+	heath_tlb_connector *const m_slot;
 };
 
 

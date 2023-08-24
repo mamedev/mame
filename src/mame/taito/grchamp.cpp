@@ -199,7 +199,7 @@ void grchamp_state::cpu0_outputs_w(offs_t offset, uint8_t data)
 			/* bit 5:   Game Over lamp */
 			/* bit 6-7: n/c */
 			machine().bookkeeping().coin_lockout_global_w((data >> 4) & 1);
-			m_led0 = (~data >> 5) & 1;
+			m_led0 = BIT(~data, 5);
 			break;
 
 		case 0x0a:  /* OUT10 */

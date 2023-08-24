@@ -832,7 +832,7 @@ void captflag_state::motor_move(int side, uint16_t data)
 		dev.reset();
 	}
 
-	(side == RIGHT) ? (m_motor_right_output = pos) : (m_motor_left_output = pos) ;
+	((side == RIGHT) ? m_motor_right_output : m_motor_left_output) = pos;
 }
 
 template <int N>

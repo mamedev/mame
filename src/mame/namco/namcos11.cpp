@@ -565,10 +565,10 @@ void namcos11_state::lightgun_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	switch( offset )
 	{
 	case 0:
-		m_led[0] = !( data & 0x08 );
-		m_led[1] = !( data & 0x04 );
-		m_recoil[0] = !( data & 0x02 );
-		m_recoil[1] = !( data & 0x01 );
+		m_led[0] = BIT(~data, 3);
+		m_led[1] = BIT(~data, 2);
+		m_recoil[0] = BIT(~data, 1);
+		m_recoil[1] = BIT(~data, 0);
 
 		verboselog(1, "lightgun_w: outputs (%08x %08x)\n", data, mem_mask );
 		break;

@@ -31,7 +31,7 @@ protected:
 
 	virtual uint8_t get_instruction() = 0;
 
-	heath_intr_socket * const m_socket;
+	heath_intr_socket *const m_socket;
 
 	friend heath_intr_socket;
 };
@@ -116,9 +116,9 @@ public:
 
 	void raise_irq(int state) { m_irq_line(state); }
 
-	void set_irq(int state) { if (m_cntrl) { m_cntrl->set_irq(state); }}
-	void set_drq(int state) { if (m_cntrl) { m_cntrl->set_drq(state); }}
-	void block_interrupts(uint8_t data) { if (m_cntrl) { m_cntrl->block_interrupts(data); }}
+	void set_irq(int state) { if (m_cntrl) { m_cntrl->set_irq(state); } }
+	void set_drq(int state) { if (m_cntrl) { m_cntrl->set_drq(state); } }
+	void block_interrupts(uint8_t data) { if (m_cntrl) { m_cntrl->block_interrupts(data); } }
 
 protected:
 

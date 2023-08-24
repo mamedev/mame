@@ -342,15 +342,15 @@ void othunder_state::eeprom_w(u8 data)
                 x0000000    eeprom out data  */
 
 	/* Recoil Piston Motor Status */
-	m_recoil_piston[0] = data & 0x1;
-	m_recoil_piston[1] = (data & 0x2) >> 1;
+	m_recoil_piston[0] = BIT(data, 0);
+	m_recoil_piston[1] = BIT(data, 1);
 
 	if (data & 4)
 		popmessage("OBPRI SET!");
 
-	m_eeprom->di_write((data & 0x40) >> 6);
-	m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write(BIT(data, 6));
+	m_eeprom->clk_write(BIT(data, 5));
+	m_eeprom->cs_write(BIT(data, 4));
 }
 
 void othunder_state::coins_w(u8 data)
