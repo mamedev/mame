@@ -167,7 +167,6 @@ private:
 	uint16_t m_lastchar = 0, m_strobe = 0;
 	uint8_t m_transchar = 0;
 	bool m_anykeydown;
-	int m_repeatdelay;
 	bool m_charwrt = false;
 
 	emu_timer *m_scanstart = nullptr, *m_scanend = nullptr;

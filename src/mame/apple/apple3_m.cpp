@@ -1300,8 +1300,11 @@ void apple3_state::ay3600_ako_w(int state)
 
 	if (m_anykeydown)
 	{
-		m_repeatdelay = 5;
-		m_repttimer->adjust(attotime::from_hz(10));
+		m_repttimer->adjust(attotime::from_hz(2));
+	}
+	else
+	{
+		m_repttimer->adjust(attotime::never);
 	}
 }
 
@@ -1310,27 +1313,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::ay3600_repeat)
 	// is the key still down?
 	if (m_anykeydown)
 	{
-		if (m_repeatdelay)
+		// Closed Apple key
+		if (m_kbspecial->read() & 0x20)
 		{
-			m_repeatdelay--;
-			m_repttimer->adjust(attotime::from_hz(10));
+			m_repttimer->adjust(attotime::from_hz(30));
 		}
 		else
 		{
-			// Closed Apple key
-			if (m_kbspecial->read() & 0x20)
-			{
-				m_repttimer->adjust(attotime::from_hz(30));
-			}
-			else
-			{
-				m_repttimer->adjust(attotime::from_hz(10));
-			}
-
-			m_strobe = 0x80;
-			m_via[1]->write_ca2(ASSERT_LINE);
-			m_via[1]->write_ca2(CLEAR_LINE);
+			m_repttimer->adjust(attotime::from_hz(10));
 		}
+
+		m_strobe = 0x80;
+		m_via[1]->write_ca2(ASSERT_LINE);
+		m_via[1]->write_ca2(CLEAR_LINE);
 	}
 }
 
