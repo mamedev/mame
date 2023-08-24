@@ -3,7 +3,7 @@
 /*
     Konami PowerPC medal hardware
 
-	G1 Turf Wild 3 (c) 2005  GSF51
+    G1 Turf Wild 3 (c) 2005  GSF51
 */
 
 #include "emu.h"
@@ -165,7 +165,8 @@ ROM_START( turfwld3 )
 	ROM_LOAD("29f016.u130", 0x000000, 0x200000, CRC(4aed68b5) SHA1(40e019d389a252f6f210b2a6ebadd2a92d5b692a))
 
 	DISK_REGION("ata:0:cfcard")
-	DISK_IMAGE("f51-pce-a02", 0, SHA1(a2971e1c10071c6ae8d9e74c632d0d0b175f69f4))
+	// Sector 0 appears to have been overwritten by Windows, the information needed to chain the boot is now "Replace the disk and press any key"
+	DISK_IMAGE("f51-pce-a02", 0, BAD_DUMP SHA1(a2971e1c10071c6ae8d9e74c632d0d0b175f69f4))
 ROM_END
 
 } // Anonymous namespace
