@@ -13,10 +13,6 @@
 #include <cmath>
 #define CX4_Tan(a) (CX4_CosTable[a] ? ((((int32_t)CX4_SinTable[a]) << 16) / CX4_CosTable[a]) : 0x80000000)
 #define CX4_sar(b, n) ((b) >> (n))
-#ifdef PI
-#undef PI
-#endif
-#define PI 3.1415926535897932384626433832795
 
 //Wireframe Helpers
 static void CX4_C4TransfWireFrame(void)
@@ -26,17 +22,17 @@ static void CX4_C4TransfWireFrame(void)
 	cx4.c4z = (double)cx4.C4WFZVal - 0x95;
 
 	//Rotate X
-	cx4.tanval = -(double)cx4.C4WFX2Val * PI * 2 / 128;
+	cx4.tanval = -(double)cx4.C4WFX2Val * M_PI * 2 / 128;
 	cx4.c4y2   = cx4.c4y * cos(cx4.tanval) - cx4.c4z * sin(cx4.tanval);
 	cx4.c4z2   = cx4.c4y * sin(cx4.tanval) + cx4.c4z * cos(cx4.tanval);
 
 	//Rotate Y
-	cx4.tanval = -(double)cx4.C4WFY2Val * PI * 2 / 128;
+	cx4.tanval = -(double)cx4.C4WFY2Val * M_PI * 2 / 128;
 	cx4.c4x2   = cx4.c4x * cos(cx4.tanval)  + cx4.c4z2 * sin(cx4.tanval);
 	cx4.c4z    = cx4.c4x * -sin(cx4.tanval) + cx4.c4z2 * cos(cx4.tanval);
 
 	//Rotate Z
-	cx4.tanval = -(double)cx4.C4WFDist * PI * 2 / 128;
+	cx4.tanval = -(double)cx4.C4WFDist * M_PI * 2 / 128;
 	cx4.c4x    = cx4.c4x2 * cos(cx4.tanval) - cx4.c4y2 * sin(cx4.tanval);
 	cx4.c4y    = cx4.c4x2 * sin(cx4.tanval) + cx4.c4y2 * cos(cx4.tanval);
 
@@ -75,17 +71,17 @@ static void CX4_C4TransfWireFrame2(void)
 	cx4.c4z = (double)cx4.C4WFZVal;
 
 	//Rotate X
-	cx4.tanval = -(double)cx4.C4WFX2Val * PI * 2 / 128;
+	cx4.tanval = -(double)cx4.C4WFX2Val * M_PI * 2 / 128;
 	cx4.c4y2   = cx4.c4y * cos(cx4.tanval) - cx4.c4z * sin(cx4.tanval);
 	cx4.c4z2   = cx4.c4y * sin(cx4.tanval) + cx4.c4z * cos(cx4.tanval);
 
 	//Rotate Y
-	cx4.tanval = -(double)cx4.C4WFY2Val * PI * 2 / 128;
+	cx4.tanval = -(double)cx4.C4WFY2Val * M_PI * 2 / 128;
 	cx4.c4x2   = cx4.c4x * cos(cx4.tanval)  + cx4.c4z2 * sin(cx4.tanval);
 	cx4.c4z    = cx4.c4x * -sin(cx4.tanval) + cx4.c4z2 * cos(cx4.tanval);
 
 	//Rotate Z
-	cx4.tanval = -(double)cx4.C4WFDist * PI * 2 / 128;
+	cx4.tanval = -(double)cx4.C4WFDist * M_PI * 2 / 128;
 	cx4.c4x    = cx4.c4x2 * cos(cx4.tanval) - cx4.c4y2 * sin(cx4.tanval);
 	cx4.c4y    = cx4.c4x2 * sin(cx4.tanval) + cx4.c4y2 * cos(cx4.tanval);
 
