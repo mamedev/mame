@@ -1,4 +1,5 @@
-# MAME 패키지에 대한 한국어 현지화
+# Korean translations for MAME package
+# MAME 패키지에 대한 한국어 번역문.
 # Copyright (C) 1997-2023 MAMEdev and contributors
 # This file is distributed under the same license as the MAME package.
 # Automatically generated, 2023.
@@ -8,14 +9,15 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-18 05:29+1100\n"
-"PO-Revision-Date: 2023-08-23 04:42+0900\n"
-"Last-Translator: Potmarigold(Nise)\n"
+"PO-Revision-Date: 2023-08-22 23:53+0900\n"
+"Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.3.2\n"
 
 #: src/frontend/mame/ui/ui.cpp:474 src/frontend/mame/ui/ui.cpp:547
 msgid ""
@@ -30,7 +32,7 @@ msgstr ""
 #: src/frontend/mame/ui/ui.cpp:559
 msgid ""
 "This system requires media images to be mounted for the following device(s): "
-msgstr "현 시스템에서는 다음 장치에 대해 미디어 이미지를 마운트해야 함 : "
+msgstr "현 시스템에서는 다음 장치에 대해 매체 이미지를 마운트해야 함 : "
 
 #: src/frontend/mame/ui/ui.cpp:1275
 #, c-format
@@ -57,7 +59,7 @@ msgstr "기본 음량"
 #: src/frontend/mame/ui/ui.cpp:1495
 #, c-format
 msgid "%1$s Volume"
-msgstr "%1$s 음ㄹ"
+msgstr "%1$s 음량"
 
 #: src/frontend/mame/ui/ui.cpp:1517
 #, c-format
@@ -502,7 +504,7 @@ msgstr "삽화 설정"
 
 #: src/frontend/mame/ui/submenu.cpp:73
 msgid "Zoom to screen area"
-msgstr "화면 영역 확대/축소"
+msgstr "화면 영역 확대"
 
 #: src/frontend/mame/ui/submenu.cpp:75
 msgid "State/Playback Options"
@@ -522,7 +524,7 @@ msgstr "되감기 영역"
 
 #: src/frontend/mame/ui/submenu.cpp:79
 msgid "Bilinear filtering for snapshots"
-msgstr "스냅샷을 위한 이진 필터링"
+msgstr "스냅샷을 위한 쌍선형 필터링"
 
 #: src/frontend/mame/ui/submenu.cpp:80
 msgid "Burn-in"
@@ -841,7 +843,7 @@ msgstr "마우스"
 #: src/frontend/mame/ui/info.cpp:52
 msgctxt "emulation-feature"
 msgid "media"
-msgstr "미디어"
+msgstr "매체"
 
 #: src/frontend/mame/ui/info.cpp:53
 msgctxt "emulation-feature"
@@ -871,7 +873,7 @@ msgstr "자기 드럼"
 #: src/frontend/mame/ui/info.cpp:58
 msgctxt "emulation-feature"
 msgid "solid state storage"
-msgstr "SSD"
+msgstr "솔리드 스테이트 스토리지"
 
 #: src/frontend/mame/ui/info.cpp:59
 msgctxt "emulation-feature"
@@ -1074,7 +1076,7 @@ msgstr "%1$s :\n"
 
 #: src/frontend/mame/ui/info.cpp:633
 msgid "Media Image Information"
-msgstr "미디어 이미지 정보"
+msgstr "매체 이미지 정보"
 
 #: src/frontend/mame/ui/info.cpp:681
 msgid "Not supported"
@@ -2143,7 +2145,7 @@ msgstr "롬"
 #: src/frontend/mame/ui/dirmenu.cpp:41
 msgctxt "path-option"
 msgid "Software Media"
-msgstr "소프트웨어 미디어"
+msgstr "소프트웨어 매체"
 
 #: src/frontend/mame/ui/dirmenu.cpp:42
 msgctxt "path-option"
@@ -2340,13 +2342,13 @@ msgstr "폴더 변경"
 #, c-format
 msgctxt "gfxview"
 msgid "Zoom = 1/%1$d"
-msgstr "확대/축소 = 1/%1$d"
+msgstr "축소 = 1/%1$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:790 src/frontend/mame/ui/viewgfx.cpp:795
 #, c-format
 msgctxt "gfxview"
 msgid "Zoom = %1$d"
-msgstr "확대/축소 = %1$d"
+msgstr "확대 = %1$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:800
 msgctxt "gfxview"
@@ -2440,7 +2442,7 @@ msgstr " (%1$u %2$u) = GFX%3$u #%4$X:%5$X"
 #, c-format
 msgctxt "gfxview"
 msgid " %1$d×%2$d origin (%3$d %4$d)"
-msgstr " 1$d×%2$d 원본(%3$d %4$d)"
+msgstr " 1$d×%2$d 원점(%3$d %4$d)"
 
 #: src/frontend/mame/ui/selgame.cpp:463
 msgid "System Settings"
@@ -2493,7 +2495,7 @@ msgid ""
 "Auditing media for system %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
-"3$u의 %2$u 시스템에 대한 미디어를 심사 중...\n"
+"3$u의 %2$u 시스템에 대한 매체를 심사 중...\n"
 "%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:128
@@ -3695,7 +3697,7 @@ msgstr "  키보드 입력    [%1$d 입력]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:321
 msgid "* Media Options:\n"
-msgstr "* 미디어 설정 :\n"
+msgstr "* 매체 설정 :\n"
 
 #: src/frontend/mame/ui/devopt.cpp:326
 #, c-format
