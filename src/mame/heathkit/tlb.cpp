@@ -85,12 +85,21 @@ static constexpr uint8_t KB_STATUS_SHIFT_KEYS_MASK = 0x01;
 static constexpr uint8_t KB_STATUS_CONTROL_KEY_MASK = 0x10;
 static constexpr uint8_t KB_STATUS_KEYBOARD_STROBE_MASK = 0x80;
 
+DEFINE_DEVICE_TYPE(HEATH_TLB_CONNECTOR, heath_tlb_connector, "heath_tlb_connector", "Heath Terminal Logic board connector abstraction")
 
 DEFINE_DEVICE_TYPE(HEATH_TLB, heath_tlb_device, "heath_tlb", "Heath Terminal Logic Board");
 DEFINE_DEVICE_TYPE(HEATH_SUPER19, heath_super19_tlb_device, "heath_super19_tlb", "Heath Terminal Logic Board w/Super19 ROM");
 DEFINE_DEVICE_TYPE(HEATH_WATZ, heath_watz_tlb_device, "heath_watz_tlb", "Heath Terminal Logic Board w/Watzman ROM");
 DEFINE_DEVICE_TYPE(HEATH_ULTRA, heath_ultra_tlb_device, "heath_ultra_tlb", "Heath Terminal Logic Board w/Ultra ROM");
 DEFINE_DEVICE_TYPE(HEATH_GP19, heath_gp19_tlb_device, "heath_gp19_tlb", "Heath Terminal Logic Board plus Northwest Digital Systems GP-19")
+
+
+
+device_heath_tlb_card_interface::device_heath_tlb_card_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "heathtlbdevice"),
+	m_slot(dynamic_cast<heath_tlb_connector *>(device.owner()))
+{
+}
 
 
 /**
@@ -103,16 +112,13 @@ heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *ta
 
 heath_tlb_device::heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
+	device_heath_tlb_card_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
 	m_screen(*this, "screen"),
 	m_palette(*this, "palette"),
 	m_crtc(*this, "crtc"),
 	m_p_videoram(*this, "videoram"),
 	m_p_chargen(*this, "chargen"),
-	m_write_sd(*this),
-	m_dtr_cb(*this),
-	m_rts_cb(*this),
-	m_reset(*this),
 	m_ace(*this, "ins8250"),
 	m_beep(*this, "beeper"),
 	m_mm5740(*this, "mm5740"),
@@ -161,7 +167,6 @@ void heath_tlb_device::io_map(address_map &map)
 	map(0x40, 0x47).mirror(0x18).rw(m_ace, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 	map(0x60, 0x60).mirror(0x1a).select(0x04).w(FUNC(heath_tlb_device::crtc_addr_w));
 	map(0x61, 0x61).mirror(0x1a).select(0x04).rw(FUNC(heath_tlb_device::crtc_reg_r), FUNC(heath_tlb_device::crtc_reg_w));
-
 	map(0x80, 0x80).mirror(0x1f).r(FUNC(heath_tlb_device::kbd_key_r));
 	map(0xa0, 0xa0).mirror(0x1f).r(FUNC(heath_tlb_device::kbd_flags_r));
 	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(heath_tlb_device::key_click_w));
@@ -231,9 +236,10 @@ uint16_t heath_tlb_device::translate_mm5740_b(uint16_t b)
 
 uint8_t heath_tlb_device::kbd_key_r()
 {
-	m_keyboard_irq_raised = false;
-	set_irq_line();
 	m_strobe = false;
+	m_keyboard_irq_raised = false;
+
+	set_irq_line();
 
 	// high bit is for control key pressed, this is handled in the ROM,
 	// no processing needed.
@@ -278,6 +284,7 @@ void heath_tlb_device::mm5740_data_ready_w(int state)
 		m_transchar = decode[translate_mm5740_b(m_mm5740->b_r())];
 		m_strobe = true;
 		m_keyboard_irq_raised = true;
+
 		set_irq_line();
 	}
 }
@@ -311,6 +318,7 @@ void heath_tlb_device::crtc_vsync_w(int val)
 void heath_tlb_device::serial_irq_w(int state)
 {
 	m_serial_irq_raised = bool(state);
+
 	set_irq_line();
 }
 
@@ -326,7 +334,7 @@ void heath_tlb_device::check_for_reset()
 	if (m_reset_key && m_right_shift)
 	{
 		m_reset_pending = true;
-		m_reset(1);
+		m_slot->reset_out(1);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 	else if (m_reset_pending)
@@ -334,7 +342,7 @@ void heath_tlb_device::check_for_reset()
 		m_reset_pending = false;
 		reset();
 		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		m_reset(0);
+		m_slot->reset_out(0);
 	}
 }
 
@@ -354,7 +362,7 @@ void heath_tlb_device::right_shift_w(int state)
 
 void heath_tlb_device::repeat_key_w(int state)
 {
-	// when repeat key pressed, set duty cycle to 0.5, else 0.
+	// when repeat key pressed, set duty cycle to 50%, else 0%.
 	m_repeat_clock->set_duty_cycle(state == 0 ? 0.5 : 0);
 }
 
@@ -384,7 +392,7 @@ MC6845_UPDATE_ROW(heath_tlb_device::crtc_update_row)
 			}
 
 			// get pattern of pixels for that character scanline
-			uint8_t const gfx = m_p_chargen[(chr<<4) | ra] ^ inv;
+			uint8_t const gfx = m_p_chargen[(chr << 4) | ra] ^ inv;
 
 			// Display a scanline of a character (8 pixels)
 			for (int b = 0; 8 > b; ++b)
@@ -414,7 +422,7 @@ static const gfx_layout h19_charlayout =
 	8*16                    // every char takes 16 bytes
 };
 
-static GFXDECODE_START(gfx_h19)
+static GFXDECODE_START( gfx_h19 )
 	GFXDECODE_ENTRY("chargen", 0x0000, h19_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -448,7 +456,7 @@ static INPUT_PORTS_START( tlb )
 
 	PORT_START("X2")
 	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("; :")        PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR(':')
-	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\' \"")      PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR('\'') PORT_CHAR('"')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("' \"")       PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR('\'') PORT_CHAR('"')
 	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("{ }")        PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('{') PORT_CHAR('}')
 	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return")     PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
 	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -558,12 +566,12 @@ static INPUT_PORTS_START( tlb )
 	PORT_DIPSETTING(    0x0c, "9600")
 	PORT_DIPSETTING(    0x0d, "19200")
 	PORT_DIPNAME( 0x30, 0x00, "Parity")              PORT_DIPLOCATION("SW401:5,6")
-	PORT_DIPSETTING(    0x00, DEF_STR(None))
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x10, "Odd")
-	PORT_DIPSETTING(    0x20, "None")
+	PORT_DIPSETTING(    0x20, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x30, "Even")
 	PORT_DIPNAME( 0x40, 0x00, "Parity Type")         PORT_DIPLOCATION("SW401:7")
-	PORT_DIPSETTING(    0x00, DEF_STR(Normal))
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x40, "Stick")
 	PORT_DIPNAME( 0x80, 0x80, "Duplex")              PORT_DIPLOCATION("SW401:8")
 	PORT_DIPSETTING(    0x00, "Half")
@@ -574,23 +582,23 @@ static INPUT_PORTS_START( tlb )
 	PORT_DIPSETTING(    0x00, "Underline")
 	PORT_DIPSETTING(    0x01, "Block")
 	PORT_DIPNAME( 0x02, 0x00, "Keyclick")            PORT_DIPLOCATION("SW402:2")
-	PORT_DIPSETTING(    0x02, DEF_STR(No))
-	PORT_DIPSETTING(    0x00, DEF_STR(Yes))
+	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x04, 0x00, "Wrap at EOL")         PORT_DIPLOCATION("SW402:3")
-	PORT_DIPSETTING(    0x00, DEF_STR(No))
-	PORT_DIPSETTING(    0x04, DEF_STR(Yes))
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x08, 0x00, "Auto LF on CR")       PORT_DIPLOCATION("SW402:4")
-	PORT_DIPSETTING(    0x00, DEF_STR(No))
-	PORT_DIPSETTING(    0x08, DEF_STR(Yes))
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x10, 0x00, "Auto CR on LF")       PORT_DIPLOCATION("SW402:5")
-	PORT_DIPSETTING(    0x00, DEF_STR(No))
-	PORT_DIPSETTING(    0x10, DEF_STR(Yes))
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x20, 0x00, "Mode")                PORT_DIPLOCATION("SW402:6")
 	PORT_DIPSETTING(    0x00, "Heath/VT52")
 	PORT_DIPSETTING(    0x20, "ANSI")
 	PORT_DIPNAME( 0x40, 0x00, "Keypad Shifted")      PORT_DIPLOCATION("SW402:7")
-	PORT_DIPSETTING(    0x00, DEF_STR(No))
-	PORT_DIPSETTING(    0x40, DEF_STR(Yes))
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x80, 0x00, "Refresh")             PORT_DIPLOCATION("SW402:8")
 	PORT_DIPSETTING(    0x00, "60Hz")
 	PORT_DIPSETTING(    0x80, "50Hz")
@@ -631,11 +639,11 @@ static INPUT_PORTS_START( super19 )
 
 	PORT_MODIFY("SW402")
 	PORT_DIPNAME( 0x02, 0x00, "Transmit mode")       PORT_DIPLOCATION("SW402:2")
-	PORT_DIPSETTING(    0x00, DEF_STR(Normal))
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x02, "Slow")
 	PORT_DIPNAME( 0x80, 0x00, "DEC Keypad Codes")    PORT_DIPLOCATION("SW402:8")
-	PORT_DIPSETTING(    0x00, "Off")
-	PORT_DIPSETTING(    0x80, "On")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -670,8 +678,8 @@ static INPUT_PORTS_START( ultra19 )
 
 	PORT_MODIFY("SW402")
 	PORT_DIPNAME( 0x08, 0x00, "Keypad Shifted")      PORT_DIPLOCATION("SW402:4")
-	PORT_DIPSETTING(    0x00, DEF_STR(No))
-	PORT_DIPSETTING(    0x08, DEF_STR(Yes))
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x10, 0x00, "Default Key Values")  PORT_DIPLOCATION("SW402:5")
 	PORT_DIPSETTING(    0x00, "HDOS Values")
 	PORT_DIPSETTING(    0x10, "CP/M Values")
@@ -681,8 +689,8 @@ static INPUT_PORTS_START( ultra19 )
 	PORT_DIPSETTING(    0x40, "Fast Blink")
 	PORT_DIPSETTING(    0x60, "Slow Blink")
 	PORT_DIPNAME( 0x80, 0x00, "Interlace Scan Mode") PORT_DIPLOCATION("SW402:8")
-	PORT_DIPSETTING(    0x00, "Off")
-	PORT_DIPSETTING(    0x80, "On")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -726,12 +734,12 @@ static INPUT_PORTS_START( gp19 )
 
 	PORT_START("SW1")
 	PORT_DIPNAME( 0x03, 0x01, "Trailing Characters for Tektronix Message")   PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(    0x00, "None")
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x01, "CR")
-	PORT_DIPSETTING(    0x02, "None")
+	PORT_DIPSETTING(    0x02, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x03, "CR,EOT")
 	PORT_DIPNAME( 0x04, 0x01, "Shift Key")                                   PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, "Normal")
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, "Shift key inverts CAPS LOCK")
 	PORT_DIPNAME( 0x08, 0x00, "Terminal Transmission Rate")                  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "Only limited by baud rate")
@@ -842,17 +850,17 @@ const tiny_rom_entry *heath_tlb_device::device_rom_region() const
 
 void heath_tlb_device::serial_out_b(int data)
 {
-	m_write_sd(data);
+	m_slot->serial_out_b(data);
 }
 
 void heath_tlb_device::dtr_out(int data)
 {
-	m_dtr_cb(data);
+	m_slot->dtr_out(data);
 }
 
 void heath_tlb_device::rts_out(int data)
 {
-	m_rts_cb(data);
+	m_slot->rts_out(data);
 }
 
 void heath_tlb_device::serial_in_w(int state)
@@ -870,7 +878,7 @@ void heath_tlb_device::dsr_in_w(int state)
 	m_ace->dsr_w(state);
 }
 
-void heath_tlb_device::cts_int_w(int state)
+void heath_tlb_device::cts_in_w(int state)
 {
 	m_ace->cts_w(state);
 }
@@ -1173,4 +1181,26 @@ const tiny_rom_entry *heath_gp19_tlb_device::device_rom_region() const
 ioport_constructor heath_gp19_tlb_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(gp19);
+}
+
+
+heath_tlb_connector::heath_tlb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, HEATH_TLB_CONNECTOR, tag, owner, clock),
+	device_single_card_slot_interface(mconfig, *this),
+	m_write_sd(*this),
+	m_dtr_cb(*this),
+	m_rts_cb(*this),
+	m_reset(*this),
+	m_tlb(nullptr)
+{
+}
+
+
+heath_tlb_connector::~heath_tlb_connector()
+{
+}
+
+void heath_tlb_connector::device_start()
+{
+	m_tlb = get_card_device();
 }

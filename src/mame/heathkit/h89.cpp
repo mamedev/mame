@@ -65,9 +65,9 @@ public:
 		m_mem_view(*this, "rom_bank"),
 		m_ram(*this, RAM_TAG),
 		m_floppy_ram(*this, "floppyram"),
-		m_tlb(*this, "tlb"),
+		m_tlbc(*this, "tlbc"),
 		m_h37(*this, "h37"),
-		m_intr_cntrl(*this, "intr_cntrl"),
+		m_intr_socket(*this, "intr_socket"),
 		m_console(*this, "console"),
 		m_serial1(*this, "serial1"),
 		m_serial2(*this, "serial2"),
@@ -85,9 +85,9 @@ private:
 	memory_view m_mem_view;
 	required_device<ram_device> m_ram;
 	required_shared_ptr<uint8_t> m_floppy_ram;
-	required_device<heath_tlb_device> m_tlb;
+	required_device<heath_tlb_connector> m_tlbc;
 	required_device<heath_z37_fdc_device> m_h37;
-	required_device<heath_intr_cntrl> m_intr_cntrl;
+	required_device<heath_intr_socket> m_intr_socket;
 	required_device<ins8250_device> m_console;
 	required_device<ins8250_device> m_serial1;
 	required_device<ins8250_device> m_serial2;
@@ -181,7 +181,6 @@ void h89_state::h89_mem(address_map &map)
 	// Floppy ROM
 	m_mem_view[0](0x1800, 0x1fff).rom().region("maincpu", 0x1800).unmapw();
 	m_mem_view[1](0x1800, 0x1fff).rom().region("maincpu", 0x1800).unmapw();
-
 }
 
 /*                                 PORT
@@ -243,42 +242,42 @@ void h89_state::h89_io(address_map &map)
 // Input ports
 static INPUT_PORTS_START( h89 )
 /*
-	// Settings with the MTR-88 ROM (#444-40)
-	PORT_START("MTR88_SW501")
-	PORT_DIPNAME( 0x1f, 0x00, "Unused" )  PORT_DIPLOCATION("S1:1,2,3,4,5")
-	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )  PORT_DIPLOCATION("S1:6")
-	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0x00, "Console Baud rate" )  PORT_DIPLOCATION("S1:7,8")
-	PORT_DIPSETTING( 0x00, "9600" )
-	PORT_DIPSETTING( 0x40, "19200" )
-	PORT_DIPSETTING( 0x80, "38400" )
-	PORT_DIPSETTING( 0xc0, "57600" )
+    // Settings with the MTR-88 ROM (#444-40)
+    PORT_START("MTR88_SW501")
+    PORT_DIPNAME( 0x1f, 0x00, "Unused" )  PORT_DIPLOCATION("S1:1,2,3,4,5")
+    PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )  PORT_DIPLOCATION("S1:6")
+    PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
+    PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0xc0, 0x00, "Console Baud rate" )  PORT_DIPLOCATION("S1:7,8")
+    PORT_DIPSETTING( 0x00, "9600" )
+    PORT_DIPSETTING( 0x40, "19200" )
+    PORT_DIPSETTING( 0x80, "38400" )
+    PORT_DIPSETTING( 0xc0, "57600" )
 
-	// Settings with the MTR-89 ROM (#444-62)
-	PORT_START("MTR89_SW501")
-	PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )  PORT_DIPLOCATION("S1:1,2")
-	PORT_DIPSETTING( 0x00, "H-88-1" )
-	PORT_DIPSETTING( 0x01, "H/Z-47" )
-	PORT_DIPSETTING( 0x02, "Undefined" )
-	PORT_DIPSETTING( 0x03, "Undefined" )
-	PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )  PORT_DIPLOCATION("S1:3,4")
-	PORT_DIPSETTING( 0x00, "Unused" )
-	PORT_DIPSETTING( 0x04, "H/Z-47" )
-	PORT_DIPSETTING( 0x08, "Undefined" )
-	PORT_DIPSETTING( 0x0c, "Undefined" )
-	PORT_DIPNAME( 0x10, 0x00, "Primary Boot from" )  PORT_DIPLOCATION("S1:5")
-	PORT_DIPSETTING( 0x00, "Disk I/O #2" )
-	PORT_DIPSETTING( 0x10, "Disk I/O #1" )
-	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )  PORT_DIPLOCATION("S1:6")
-	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Console Baud rate" )  PORT_DIPLOCATION("S1:7")
-	PORT_DIPSETTING( 0x00, "9600" )
-	PORT_DIPSETTING( 0x40, "19200" )
-	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )  PORT_DIPLOCATION("S1:8")
-	PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING( 0x80, "Auto" )
+    // Settings with the MTR-89 ROM (#444-62)
+    PORT_START("MTR89_SW501")
+    PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )  PORT_DIPLOCATION("S1:1,2")
+    PORT_DIPSETTING( 0x00, "H-88-1" )
+    PORT_DIPSETTING( 0x01, "H/Z-47" )
+    PORT_DIPSETTING( 0x02, "Undefined" )
+    PORT_DIPSETTING( 0x03, "Undefined" )
+    PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )  PORT_DIPLOCATION("S1:3,4")
+    PORT_DIPSETTING( 0x00, "Unused" )
+    PORT_DIPSETTING( 0x04, "H/Z-47" )
+    PORT_DIPSETTING( 0x08, "Undefined" )
+    PORT_DIPSETTING( 0x0c, "Undefined" )
+    PORT_DIPNAME( 0x10, 0x00, "Primary Boot from" )  PORT_DIPLOCATION("S1:5")
+    PORT_DIPSETTING( 0x00, "Disk I/O #2" )
+    PORT_DIPSETTING( 0x10, "Disk I/O #1" )
+    PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )  PORT_DIPLOCATION("S1:6")
+    PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
+    PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x40, 0x00, "Console Baud rate" )  PORT_DIPLOCATION("S1:7")
+    PORT_DIPSETTING( 0x00, "9600" )
+    PORT_DIPSETTING( 0x40, "19200" )
+    PORT_DIPNAME( 0x80, 0x00, "Boot mode" )  PORT_DIPLOCATION("S1:8")
+    PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
+    PORT_DIPSETTING( 0x80, "Auto" )
 */
 	// Settings with the MTR-90 ROM (#444-84 or 444-142)
 	PORT_START("MTR90_SW501")
@@ -305,30 +304,30 @@ static INPUT_PORTS_START( h89 )
 	PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING( 0x80, "Auto" )
 /*
-	// Settings with the MMS 84-B
-	PORT_START("MMS84B_SW501")
-	PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )  PORT_DIPLOCATION("S1:1,2")
-	PORT_DIPSETTING( 0x00, "H-88-1" )
-	PORT_DIPSETTING( 0x01, "H/Z-47 (Not yet implemented)" )
-	PORT_DIPSETTING( 0x02, "MMS 77320 SASI or Z-67 (Not yet implemented)" )
-	PORT_DIPSETTING( 0x03, "MMS 77422 Network Controller" )
-	PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )  PORT_DIPLOCATION("S1:3,4")
-	PORT_DIPSETTING( 0x00, "H-89-37" )
-	PORT_DIPSETTING( 0x04, "H/Z-47 (Not yet implemented)" )
-	PORT_DIPSETTING( 0x08, "MMS 77320 SASI or Z-67 (Not yet implemented)" )
-	PORT_DIPSETTING( 0x0c, "MMS 77422 Network Controller" )
-	PORT_DIPNAME( 0x70, 0x00, "Default Boot Device" )  PORT_DIPLOCATION("S1:5,6,7")
-	PORT_DIPSETTING( 0x00, "MMS 77316 Dbl Den 5\"" )
-	PORT_DIPSETTING( 0x10, "MMS 77316 Dbl Den 8\"" )
-	PORT_DIPSETTING( 0x20, "Disk Device at 0x7C" )
-	PORT_DIPSETTING( 0x30, "Disk Device at 0x78" )
-	PORT_DIPSETTING( 0x40, "reserved for future use" )
-	PORT_DIPSETTING( 0x50, "reserved for future use" )
-	PORT_DIPSETTING( 0x60, "MMS Network (77422)" )
-	PORT_DIPSETTING( 0x70, "Use MMS I/O board Config Port" )
-	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )  PORT_DIPLOCATION("S1:8")
-	PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING( 0x80, "Auto" )
+    // Settings with the MMS 84-B
+    PORT_START("MMS84B_SW501")
+    PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )  PORT_DIPLOCATION("S1:1,2")
+    PORT_DIPSETTING( 0x00, "H-88-1" )
+    PORT_DIPSETTING( 0x01, "H/Z-47 (Not yet implemented)" )
+    PORT_DIPSETTING( 0x02, "MMS 77320 SASI or Z-67 (Not yet implemented)" )
+    PORT_DIPSETTING( 0x03, "MMS 77422 Network Controller" )
+    PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )  PORT_DIPLOCATION("S1:3,4")
+    PORT_DIPSETTING( 0x00, "H-89-37" )
+    PORT_DIPSETTING( 0x04, "H/Z-47 (Not yet implemented)" )
+    PORT_DIPSETTING( 0x08, "MMS 77320 SASI or Z-67 (Not yet implemented)" )
+    PORT_DIPSETTING( 0x0c, "MMS 77422 Network Controller" )
+    PORT_DIPNAME( 0x70, 0x00, "Default Boot Device" )  PORT_DIPLOCATION("S1:5,6,7")
+    PORT_DIPSETTING( 0x00, "MMS 77316 Dbl Den 5\"" )
+    PORT_DIPSETTING( 0x10, "MMS 77316 Dbl Den 8\"" )
+    PORT_DIPSETTING( 0x20, "Disk Device at 0x7C" )
+    PORT_DIPSETTING( 0x30, "Disk Device at 0x78" )
+    PORT_DIPSETTING( 0x40, "reserved for future use" )
+    PORT_DIPSETTING( 0x50, "reserved for future use" )
+    PORT_DIPSETTING( 0x60, "MMS Network (77422)" )
+    PORT_DIPSETTING( 0x70, "Use MMS I/O board Config Port" )
+    PORT_DIPNAME( 0x80, 0x00, "Boot mode" )  PORT_DIPLOCATION("S1:8")
+    PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
+    PORT_DIPSETTING( 0x80, "Auto" )
 */
 INPUT_PORTS_END
 
@@ -375,6 +374,7 @@ void h89_state::machine_start()
 	m_rom_enabled = true;
 	m_timer_intr_enabled = true;
 	m_floppy_ram_wp = false;
+
 	update_gpp(0);
 	update_mem_view();
 }
@@ -404,14 +404,7 @@ void h89_state::raise_NMI_w(uint8_t)
 
 void h89_state::console_intr(uint8_t data)
 {
-	if (bool(data))
-	{
-		m_intr_cntrl->raise_irq(3);
-	}
-	else
-	{
-		m_intr_cntrl->lower_irq(3);
-	}
+	m_intr_socket->set_irq_level(3, data);
 }
 
 void h89_state::reset_line(int data)
@@ -427,7 +420,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(h89_state::h89_irq_timer)
 {
 	if (m_timer_intr_enabled)
 	{
-		m_intr_cntrl->raise_irq(1);
+		m_intr_socket->set_irq_level(1, ASSERT_LINE);
 	}
 }
 
@@ -457,7 +450,22 @@ void h89_state::port_f2_w(uint8_t data)
 {
 	update_gpp(data);
 
-	m_intr_cntrl->lower_irq(1);
+	m_intr_socket->set_irq_level(1, CLEAR_LINE);
+}
+
+static void tlb_options(device_slot_interface &device)
+{
+	device.option_add("heath", HEATH_TLB);
+	device.option_add("gp19", HEATH_GP19);
+	device.option_add("super19", HEATH_SUPER19);
+	device.option_add("ultrarom", HEATH_ULTRA);
+	device.option_add("watzman", HEATH_WATZ);
+}
+
+static void intr_ctrl_options(device_slot_interface &device)
+{
+	device.option_add("original", HEATH_INTR_CNTRL);
+	device.option_add("h37", HEATH_Z37_INTR_CNTRL);
 }
 
 void h89_state::h89(machine_config & config)
@@ -466,28 +474,28 @@ void h89_state::h89(machine_config & config)
 	Z80(config, m_maincpu, H89_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &h89_state::h89_mem);
 	m_maincpu->set_addrmap(AS_IO, &h89_state::h89_io);
-	m_maincpu->set_irq_acknowledge_callback("intr_cntrl", FUNC(heath_intr_cntrl::irq_callback));
+	m_maincpu->set_irq_acknowledge_callback("intr_socket", FUNC(heath_intr_socket::irq_callback));
 
-	HEATH_Z37_INTR_CNTRL(config, m_intr_cntrl);
-	m_intr_cntrl->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	HEATH_INTR_SOCKET(config, m_intr_socket, intr_ctrl_options, "h37");
+	m_intr_socket->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("16K,32K,48K").set_default_value(0x00);
 
 	INS8250(config, m_console, INS8250_CLOCK);
 	m_console->out_int_callback().set(FUNC(h89_state::console_intr));
 
-	HEATH_TLB(config, m_tlb);
+	HEATH_TLB_CONNECTOR(config, m_tlbc, tlb_options, "heath");
 
-	// Connect the console port on CPU board to serial port on TLB
-	m_console->out_tx_callback().set(m_tlb, FUNC(heath_tlb_device::serial_in_w));
-	m_tlb->serial_data_callback().set(m_console, FUNC(ins8250_uart_device::rx_w));
+	// Connect the console port on CPU board to TLB connector
+	m_console->out_tx_callback().set(m_tlbc, FUNC(heath_tlb_connector::serial_in_w));
+	m_tlbc->serial_data_callback().set(m_console, FUNC(ins8250_uart_device::rx_w));
 
-	m_tlb->reset_cb().set(FUNC(h89_state::reset_line));
+	m_tlbc->reset_cb().set(FUNC(h89_state::reset_line));
 
 	HEATH_Z37_FDC(config, m_h37);
-	m_h37->drq_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::set_drq));
-	m_h37->irq_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::set_irq));
-	m_h37->block_interrupt_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::block_interrupts));
+	m_h37->drq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_drq));
+	m_h37->irq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_irq));
+	m_h37->block_interrupt_cb().set(m_intr_socket, FUNC(heath_intr_socket::block_interrupts));
 
 	// H-88-3 3-port serial board
 	INS8250(config, m_serial1, INS8250_CLOCK);
