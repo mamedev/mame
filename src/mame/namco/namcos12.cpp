@@ -1138,6 +1138,8 @@ public:
 		, m_mainbank(*this, "mainbank")
 		, m_lightgun_io(*this, {"LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIGHT1_Y"})
 		, m_service_io(*this, "SERVICE")
+		, m_start_lamp(*this, "P%u_Start_lamp", 1U)
+		, m_gun_recoil(*this, "Player%u_Gun_Recoil", 1U)
 	{
 	}
 
@@ -1151,6 +1153,7 @@ public:
 	void init_alt_bank1();
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	void jvsmap(address_map &map);
@@ -1191,6 +1194,9 @@ private:
 
 	optional_ioport_array<4> m_lightgun_io;
 	optional_ioport m_service_io;
+
+	output_finder<2> m_start_lamp;
+	output_finder<2> m_gun_recoil;
 
 	uint16_t m_n_bankoffset;
 	uint32_t m_n_dmaoffset;
@@ -1445,13 +1451,13 @@ void namcos12_state::system11gun_w(offs_t offset, uint16_t data, uint16_t mem_ma
 		/* blowback 1 */
 		/* blowback 2 */
 		/* Note: output label has been changed for the Engrish Impaired ;-) */
-		output().set_value("Player1_Gun_Recoil", (~data & 0x02)>>1);
-		output().set_value("Player2_Gun_Recoil", (~data & 0x01));
+		m_gun_recoil[0] =  BIT(~data, 1);
+		m_gun_recoil[1] =  BIT(~data, 0);
 
 		/* start 1 */
-		output().set_value("P2_Start_lamp", (~data & 0x08)>>3);
+		m_start_lamp[0] =  BIT(~data, 3);
 		/* start 2 */
-		output().set_value("P2_Start_lamp", (~data & 0x04)>>2);
+		m_start_lamp[1] =  BIT(~data, 2);
 
 		verboselog(1, "system11gun_w: outputs (%08x %08x)\n", data, mem_mask );
 		break;
@@ -1583,6 +1589,12 @@ uint16_t namcos12_state::tektagt_protection_3_r()
 	m_has_tektagt_dma = 1;
 	// Always ignored
 	return 0;
+}
+
+void namcos12_state::machine_start()
+{
+	m_start_lamp.resolve();
+	m_gun_recoil.resolve();
 }
 
 void namcos12_state::machine_reset()

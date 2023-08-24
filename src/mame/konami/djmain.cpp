@@ -102,6 +102,12 @@ public:
 		, m_turntable(*this, "TT%u", 1U)
 		, m_sndram(*this, "sndram")
 		, m_leds(*this, "led%u", 0U)
+		, m_right_red_hlt(*this, "right-red-hlt")
+		, m_left_red_hlt(*this, "left-red-hlt")
+		, m_right_blue_hlt(*this, "right-blue-hlt")
+		, m_left_blue_hlt(*this, "left-blue-hlt")
+		, m_right_ssr(*this, "right-ssr")
+		, m_left_ssr(*this, "left-ssr")
 	{
 	}
 
@@ -168,6 +174,12 @@ private:
 	optional_ioport_array<2> m_turntable;
 	required_shared_ptr<uint8_t> m_sndram;
 	output_finder<3> m_leds;
+	output_finder<> m_right_red_hlt;
+	output_finder<> m_left_red_hlt;
+	output_finder<> m_right_blue_hlt;
+	output_finder<> m_left_blue_hlt;
+	output_finder<> m_right_ssr;
+	output_finder<> m_left_ssr;
 
 	int m_sndram_bank = 0;
 	int m_turntable_select = 0;
@@ -559,10 +571,10 @@ void djmain_state::light_ctrl_1_w(offs_t offset, uint32_t data, uint32_t mem_mas
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		output().set_value("right-red-hlt",  !(data & 0x08000000));   // Right red HIGHLIGHT
-		output().set_value("left-red-hlt",   !(data & 0x04000000));   // Left red HIGHLIGHT
-		output().set_value("left-blue-hlt",  !(data & 0x02000000));   // Left blue HIGHLIGHT
-		output().set_value("right-blue-hlt", !(data & 0x00200000));   // Right blue HIGHLIGHT
+		m_right_red_hlt = !BIT(data, 27);   // Right red HIGHLIGHT
+		m_left_red_hlt = !BIT(data, 26);   // Left red HIGHLIGHT
+		m_left_blue_hlt = !BIT(data, 25);   // Left blue HIGHLIGHT
+		m_right_blue_hlt = !BIT(data, 21);   // Right blue HIGHLIGHT
 	}
 }
 
@@ -570,8 +582,8 @@ void djmain_state::light_ctrl_2_w(offs_t offset, uint32_t data, uint32_t mem_mas
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		output().set_value("left-ssr",       !!(data & 0x08000000));  // SSR
-		output().set_value("right-ssr",      !!(data & 0x08000000));  // SSR
+		m_left_ssr = !!BIT(data, 27);  // SSR
+		m_right_ssr = !!BIT(data, 27);    // SSR
 		m_leds[0] = BIT(data, 16);            // 1P START
 		m_leds[1] = BIT(data, 17);            // 2P START
 		m_leds[2] = BIT(data, 18);            // EFFECT
@@ -1623,6 +1635,12 @@ void djmain_state::machine_start()
 		hdd->set_user_password(m_ata_user_password);
 
 	m_leds.resolve();
+	m_right_red_hlt.resolve();
+	m_left_red_hlt.resolve();
+	m_right_blue_hlt.resolve();
+	m_left_blue_hlt.resolve();
+	m_right_ssr.resolve();
+	m_left_ssr.resolve();
 
 	save_item(NAME(m_sndram_bank));
 	save_item(NAME(m_pending_vb_int));
