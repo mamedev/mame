@@ -476,11 +476,8 @@ void h89_state::h89(machine_config & config)
 	m_maincpu->set_addrmap(AS_IO, &h89_state::h89_io);
 	m_maincpu->set_irq_acknowledge_callback("intr_socket", FUNC(heath_intr_socket::irq_callback));
 
-
 	HEATH_INTR_SOCKET(config, m_intr_socket, intr_ctrl_options, "h37");
 	m_intr_socket->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	//HEATH_Z37_INTR_CNTRL(config, m_intr_cntrl);
-	//m_intr_cntrl->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("16K,32K,48K").set_default_value(0x00);
 
@@ -495,7 +492,7 @@ void h89_state::h89(machine_config & config)
 
 	m_tlbc->reset_cb().set(FUNC(h89_state::reset_line));
 
-	HEATH_Z37_FDC(config, m_h37); // heath_intr_socket
+	HEATH_Z37_FDC(config, m_h37);
 	m_h37->drq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_drq));
 	m_h37->irq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_irq));
 	m_h37->block_interrupt_cb().set(m_intr_socket, FUNC(heath_intr_socket::block_interrupts));
