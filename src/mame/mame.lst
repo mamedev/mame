@@ -23798,6 +23798,9 @@ unkkonmd
 ymcapsul
 pikkaric
 
+@source:konami/konmedalppc.cpp
+konmdlunk						// GSF51 (c)????
+
 @source:konami/kontest.cpp
 kontest                         // GX800 (c) 198? (Japan)
 
