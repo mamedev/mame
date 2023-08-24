@@ -129,6 +129,8 @@ void get_device_warnings(std::ostream &buf, device_t::feature_type unemulated, d
 
 void get_system_warnings(std::ostream &buf, running_machine &machine, machine_flags::type flags, device_t::feature_type unemulated, device_t::feature_type imperfect)
 {
+	std::streampos start_position = buf.tellp();
+
 	// start with the unemulated/imperfect features
 	get_device_warnings(buf, unemulated, imperfect);
 
@@ -143,10 +145,18 @@ void get_system_warnings(std::ostream &buf, running_machine &machine, machine_fl
 		buf << _("This system has no sound hardware, MAME will produce no sounds, this is expected behaviour.\n");
 
 	// these are more severe warnings
-	if (flags & ::machine_flags::NOT_WORKING)
-		buf << _("\nTHIS SYSTEM DOESN'T WORK. The emulation for this system is not yet complete. There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n");
 	if (flags & ::machine_flags::MECHANICAL)
-		buf << _("\nElements of this system cannot be emulated accurately as they require physical interaction or consist of mechanical devices. It is not possible to fully experience this system.\n");
+	{
+		if (buf.tellp() > start_position)
+			buf << '\n';
+		buf << _("Elements of this system cannot be emulated accurately as they require physical interaction or consist of mechanical devices. It is not possible to fully experience this system.\n");
+	}
+	if (flags & ::machine_flags::NOT_WORKING)
+	{
+		if (buf.tellp() > start_position)
+			buf << '\n';
+		buf << _("THIS SYSTEM DOESN'T WORK. The emulation for this system is not yet complete. There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n");
+	}
 
 	if ((flags & MACHINE_ERRORS) || ((machine.system().type.unemulated_features() | machine.system().type.imperfect_features()) & device_t::feature::PROTECTION))
 	{
