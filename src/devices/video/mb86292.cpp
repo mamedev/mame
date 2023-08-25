@@ -86,16 +86,25 @@ void mb86292_device::device_start()
 	save_item(STRUCT_MEMBER(m_fb, xres));
 	save_item(STRUCT_MEMBER(m_draw, fc));
 	save_item(STRUCT_MEMBER(m_draw, bc));
-	save_item(STRUCT_MEMBER(m_clayer, cm));
-	save_item(STRUCT_MEMBER(m_clayer, cc));
-	save_item(STRUCT_MEMBER(m_clayer, ch));
-	save_item(STRUCT_MEMBER(m_clayer, cw));
-	save_item(STRUCT_MEMBER(m_clayer, cda));
+	//save_item(STRUCT_MEMBER(m_draw, fifo));
+	//save_item(STRUCT_MEMBER(m_draw, state));
+	save_item(STRUCT_MEMBER(m_c_layer, cm));
+	save_item(STRUCT_MEMBER(m_c_layer, cc));
+	save_item(STRUCT_MEMBER(m_c_layer, ch));
+	save_item(STRUCT_MEMBER(m_c_layer, cw));
+	save_item(STRUCT_MEMBER(m_c_layer, cda));
+	save_item(STRUCT_MEMBER(m_c_layer, tc));
+	save_item(STRUCT_MEMBER(m_ml_layer, mlda));
 }
 
 void mb86292_device::device_reset()
 {
 	m_vsync_timer->adjust(attotime::never);
+
+	m_draw.fifo.clear();
+	m_draw.state = DRAW_IDLE;
+	m_draw.command_count = 0;
+	m_draw.data_count = 0;
 
 	m_dce = 0;
 	m_displaylist.lsa = m_displaylist.lco = 0;
@@ -298,18 +307,18 @@ void mb86292_device::vregs_map(address_map &map)
 	// CM C[onsole] layer Mode
 	map(0x10020, 0x10023).lrw32(
 		NAME([this] (offs_t offset) {
-			return m_clayer.cm;
+			return m_c_layer.cm;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			COMBINE_DATA(&m_clayer.cm);
-			m_clayer.ch = (m_clayer.cm & 0xfff) + 1;
-			m_clayer.cw = ((m_clayer.cm >> 16) & 0x3f) * 64;
-			m_clayer.cc = bool(BIT(m_clayer.cm, 31));
+			COMBINE_DATA(&m_c_layer.cm);
+			m_c_layer.ch = (m_c_layer.cm & 0xfff) + 1;
+			m_c_layer.cw = ((m_c_layer.cm >> 16) & 0x3f) * 64;
+			m_c_layer.cc = bool(BIT(m_c_layer.cm, 31));
 			LOGREGS("CM %08x & %08x -> CW %d CH %d CC %d\n"
 				, data, mem_mask
-				, m_clayer.cw
-				, m_clayer.ch
-				, m_clayer.cc
+				, m_c_layer.cw
+				, m_c_layer.ch
+				, m_c_layer.cc
 			);
 		})
 	);
@@ -317,14 +326,14 @@ void mb86292_device::vregs_map(address_map &map)
 	// CDA C layer Display Address
 	map(0x10028, 0x1002b).lrw32(
 		NAME([this] (offs_t offset) {
-			return m_clayer.cda;
+			return m_c_layer.cda;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			COMBINE_DATA(&m_clayer.cda);
-			m_clayer.cda &= 0x3ffffff;
+			COMBINE_DATA(&m_c_layer.cda);
+			m_c_layer.cda &= 0x3ffffff;
 			LOGREGS("CDA %08x & %08x -> %08x\n"
 				, data, mem_mask
-				, m_clayer.cda
+				, m_c_layer.cda
 			);
 		})
 	);
@@ -335,9 +344,11 @@ void mb86292_device::vregs_map(address_map &map)
 //  map(0x10038, 0x1003b) WDA W layer Display Address
 //  map(0x10040, 0x10043) MLM M[iddle] L[eft] layer Mode
 //  map(0x10044, 0x10047) MLOA0 ML Origin Address 0
-//  map(0x10048, 0x1004b) MLDA0 ML Display Address 0
+	// MLDA0 ML Display Address 0
+	map(0x10048, 0x1004b).rw(FUNC(mb86292_device::mlda_r<0>), FUNC(mb86292_device::mlda_w<0>));
 //  map(0x1004c, 0x1004f) MLOA1 ML Origin Address 1
-//  map(0x10050, 0x10053) MLDA1 ML Display Address 1
+	// MLDA1 ML Display Address 1
+	map(0x10050, 0x10053).rw(FUNC(mb86292_device::mlda_r<1>), FUNC(mb86292_device::mlda_w<1>));
 //  map(0x10054, 0x10055) MLDX ML Display position X
 //  map(0x10056, 0x10057) MLDY ML Display position Y
 //  map(0x10058, 0x1005b) MRM M[iddle] R[ight] layer Mode
@@ -371,7 +382,20 @@ void mb86292_device::vregs_map(address_map &map)
 //  map(0x100b2, 0x100b3) CUY1 CUrsor 1 Y position
 //  map(0x100b4, 0x100b5) BRATIO Blend RATIO
 //  map(0x100b6, 0x100b7) BMODE Blend MODE
-//  map(0x100bc, 0x100bd) CTC C layer Transparent Control
+	//  CTC C layer Transparent Control
+	map(0x100bc, 0x100bd).lrw16(
+		NAME([this] (offs_t offset) { return m_c_layer.tc; }),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			COMBINE_DATA(&m_c_layer.tc);
+			m_c_layer.transpen = (m_c_layer.tc == 0)
+				? 0xffff
+				: m_c_layer.tc & 0x8000 ? 0 : m_c_layer.tc & 0x7fff;
+			LOGREGS("CTC %04x & %04x -> %04x\n"
+				, data, mem_mask
+				, m_c_layer.tc
+			);
+		})
+	);
 //  map(0x100c0, 0x100c1) MRTC MR layer Transparent Control
 //  map(0x100c2, 0x100c3) MLTC ML layer Transparent Control
 //  map(0x10400, 0x107ff) CPAL C layer PALette
@@ -398,6 +422,21 @@ void mb86292_device::vregs_map(address_map &map)
 	// 0x1ff8000 Geometry engine GeometryBase
 	map(0x30000, 0x3ffff).m(FUNC(mb86292_device::draw_io_map));
 }
+
+template <unsigned N> u32 mb86292_device::mlda_r(offs_t offset)
+{
+	return m_ml_layer.mlda[N];
+}
+
+template <unsigned N> void mb86292_device::mlda_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_ml_layer.mlda[N]);
+	LOGREGS("MLDA%d %04x & %08x -> %08x\n"
+		, N, data, mem_mask
+		, m_ml_layer.mlda[N]
+	);
+}
+
 
 void mb86292_device::draw_io_map(address_map &map)
 {
@@ -477,7 +516,12 @@ void mb86292_device::draw_io_map(address_map &map)
 //  map(0x8040, 0x8043) GMDR0 Geometry MoDe Register 0 (vertex)
 //  map(0x8044, 0x8047) GMDR1 Geometry MoDe Register 1 (line)
 //  map(0x8048, 0x804b) GMDR2 Geometry MoDe Register 2 (triangle)
-//  map(0x8400, 0x8403) DFIFOG Display List FIFO for Geometry
+	// DFIFOG Display List FIFO for Geometry
+	map(0x8400, 0x8403).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			process_display_opcode(data);
+		})
+	);
 }
 
 /*
@@ -560,6 +604,327 @@ TIMER_CALLBACK_MEMBER(mb86292_device::vsync_cb)
  *
  */
 
+void mb86292_device::process_display_opcode(u32 opcode)
+{
+	if (m_draw.state == DRAW_IDLE)
+	{
+		m_draw.current_command = opcode;
+		m_draw.state = DRAW_COMMAND;
+		m_draw.command_count = 0;
+		LOGDASM("PC=%08x %08x ", m_displaylist.cur_address, opcode);
+	}
+	else
+	{
+		m_draw.fifo.enqueue(opcode);
+		if (m_draw.state == DRAW_COMMAND && m_draw.fifo.queue_length() < m_draw.command_count)
+			return;
+		else
+			m_draw.state = DRAW_DATA;
+		opcode = m_draw.current_command;
+	}
+	const u8 op_type = opcode >> 24;
+	const u8 op_command = (opcode >> 16) & 0xff;
+	u32 temp_buf = 0;
+
+	switch(op_type)
+	{
+		case 0x05:
+		{
+			if (m_draw.state == DRAW_COMMAND)
+			{
+				m_draw.command_count = 9;
+				return;
+			}
+			LOGDASM("DrawTrap (%s)", op_command == 0x40 ? "TrapRight" : op_command == 0x41 ? "TrapLeft" : "<reserved>");
+			u16 ys = m_draw.fifo.dequeue() >> 16;
+			u32 xs = m_draw.fifo.dequeue();
+			u32 dxdy = m_draw.fifo.dequeue();
+			u32 xus = m_draw.fifo.dequeue();
+			u32 dxudy = m_draw.fifo.dequeue();
+			u32 xls = m_draw.fifo.dequeue();
+			u32 dxldy = m_draw.fifo.dequeue();
+			u16 usn = m_draw.fifo.dequeue() >> 16;
+			u16 lsn = m_draw.fifo.dequeue() >> 16;
+			LOGDASM("\tys %04x|xs %08x|dxdy %08x|xus %08x|dxudy %08x|xls %08x|dxldy %08x|usn %04x|lsn %04x\n"
+				, ys, xs, dxdy, xus
+				, dxudy, xls, dxldy, usn, lsn
+			);
+			// ...
+			break;
+		}
+		case 0x09:
+		{
+			if (m_draw.state == DRAW_COMMAND)
+			{
+				m_draw.command_count = 2;
+				return;
+			}
+			LOGDASM("DrawRectP ");
+			temp_buf = m_draw.fifo.dequeue();
+			u16 rys = temp_buf >> 16;
+			u16 rxs = temp_buf & 0xffff;
+			temp_buf = m_draw.fifo.dequeue();
+			u16 rsizey = temp_buf >> 16;
+			u16 rsizex = temp_buf & 0xffff;
+
+			switch(op_command)
+			{
+				case 0x41:
+					LOGDASM("(BltFill)\n");
+					LOGDASM("\t%04x|%04x\n", rys, rxs);
+					LOGDASM("\t%04x|%04x\n", rsizey, rsizex);
+					// color should be FC according to usage
+					for (u16 yi = rys; yi < rsizey + rys; yi ++)
+					{
+						const u32 dst_ptr = m_fb.base + yi * (m_fb.xres << 1);
+						for (u16 xi = rxs; xi < rsizex + rxs; xi ++)
+							vram_write_word(dst_ptr + (xi << 1), m_draw.fc);
+					}
+					break;
+				case 0xe2:
+					LOGDASM(" (ClearPolyFlag)\n");
+					break;
+				default:
+					LOGDASM(" (<reserved>)\n");
+					break;
+			}
+			break;
+		}
+		case 0x0b:
+		{
+			if (m_draw.state == DRAW_COMMAND)
+			{
+				m_draw.command_count = 2;
+				m_draw.data_count = 0;
+				return;
+			}
+
+			if (m_draw.data_count == 0)
+			{
+				m_draw.command_count = 0;
+				temp_buf = m_draw.fifo.dequeue();
+				m_draw.ryi = m_draw.ry = temp_buf >> 16;
+				m_draw.rxi = m_draw.rx = temp_buf & 0xffff;
+				temp_buf = m_draw.fifo.dequeue();
+				m_draw.rsizey = temp_buf >> 16;
+				m_draw.rsizex = temp_buf & 0xffff;
+
+				// NOTE: usage assumes that header command counts +2 for accounting the initial params
+				// I'm puzzled about what happens if (rsizex + rsizey) != (header_count - 2) ...
+				m_draw.data_count = (opcode & 0xffff) - 2;
+				m_draw.state = DRAW_DATA;
+				LOGDASM("DrawBitmapP (%s) %d\n"
+					, op_command == 0x42 ? "BltDraw" : op_command == 0x43 ? "Bitmap" : "<reserved>"
+					, m_draw.data_count
+				);
+				LOGDASM("\t(%d %d) (%d %d) %d %d\n", m_draw.rx, m_draw.rxi, m_draw.ry, m_draw.ryi, m_draw.rsizex, m_draw.rsizey);
+				return;
+			}
+			else
+			{
+				switch(op_command)
+				{
+					// BltDraw
+					case 0x42:
+					{
+						temp_buf = m_draw.fifo.dequeue();
+						for (int word_idx = 0; word_idx < 2; word_idx ++)
+						{
+							u32 dst_ptr = m_fb.base + m_draw.ryi * (m_fb.xres << 1);
+							//printf("%d %d %08x\n", m_draw.rxi, m_draw.ryi, temp_buf);
+							if (m_draw.ryi < m_draw.ry + m_draw.rsizey)
+								vram_write_word(dst_ptr + (m_draw.rxi << 1), (temp_buf >> (word_idx * 16)) & 0xffff);
+							m_draw.rxi ++;
+							if (m_draw.rxi >= m_draw.rx + m_draw.rsizex)
+							{
+								m_draw.ryi ++;
+								m_draw.rxi = m_draw.rx;
+							}
+						}
+						break;
+					}
+					// Bitmap
+					case 0x43:
+						// ...
+						break;
+				}
+				m_draw.data_count --;
+				if (m_draw.data_count > 0)
+					return;
+			}
+			break;
+		}
+		case 0x0f:
+		{
+			if (m_draw.state == DRAW_COMMAND)
+			{
+				m_draw.command_count = 7;
+				return;
+			}
+			LOGDASM("BltCopyAlternateP (%s)\n", op_command == 0x44 ? "TopLeft" : "<reserved>");
+			u32 saddr = m_draw.fifo.dequeue();
+			u32 sstride = m_draw.fifo.dequeue();
+			temp_buf = m_draw.fifo.dequeue();
+			u16 sry = temp_buf >> 16;
+			u16 srx = temp_buf & 0xffff;
+			u32 daddr = m_draw.fifo.dequeue();
+			u32 dstride = m_draw.fifo.dequeue();
+			temp_buf = m_draw.fifo.dequeue();
+			u16 dry = temp_buf >> 16;
+			u16 drx = temp_buf & 0xffff;
+			temp_buf = m_draw.fifo.dequeue();
+			u16 brsizey = temp_buf >> 16;
+			u16 brsizex = temp_buf & 0xffff;
+
+			LOGDASM("\t%08x %08x %04x|%04x\n"
+				, saddr
+				, sstride
+				, sry
+				, srx
+			);
+			LOGDASM("\t%08x %08x %04x|%04x\n"
+				, daddr
+				, dstride
+				, dry
+				, drx
+			);
+			LOGDASM("\t%04x|%04x\n", brsizey, brsizex);
+			for (u16 yi = 0; yi < brsizey; yi ++)
+			{
+				const u32 src_ptr = saddr + (((sry + yi) * sstride) << 1);
+				const u32 dst_ptr = daddr + (((dry + yi) * dstride) << 1);
+				for (u16 xi = 0; xi < brsizex; xi ++)
+				{
+					u16 src_pixel = vram_read_word(src_ptr + ((srx + xi) << 1));
+					vram_write_word(dst_ptr + ((drx + xi) << 1), src_pixel);
+				}
+			}
+			break;
+		}
+		case 0x20:
+		{
+			LOGDASM("G_Nop\n");
+			break;
+		}
+		case 0x40:
+		{
+			LOGDASM("G_Init\n");
+			break;
+		}
+		case 0x41:
+		{
+			LOGDASM("G_Viewport\n");
+			if (m_draw.state == DRAW_COMMAND)
+			{
+				m_draw.command_count = 4;
+				return;
+			}
+			u32 x_scaling = m_draw.fifo.dequeue();
+			u32 x_offset = m_draw.fifo.dequeue();
+			u32 y_scaling = m_draw.fifo.dequeue();
+			u32 y_offset = m_draw.fifo.dequeue();
+			LOGDASM("\t%08x %08x %08x %08x\n", x_scaling, x_offset, y_scaling, y_offset);
+			break;
+		}
+		case 0x42:
+		{
+			if (m_draw.state == DRAW_COMMAND)
+			{
+				m_draw.command_count = 2;
+				return;
+			}
+			LOGDASM("G_DepthRange\n");
+			u32 z_scaling = m_draw.fifo.dequeue();
+			u32 z_offset = m_draw.fifo.dequeue();
+			LOGDASM("\t%08x %08x\n", z_scaling, z_offset);
+			break;
+		}
+		case 0x44:
+		{
+			if (m_draw.state == DRAW_COMMAND)
+			{
+				m_draw.command_count = 4;
+				return;
+			}
+			LOGDASM("G_ViewVolumeXYClip\n");
+			u32 xmin = m_draw.fifo.dequeue();
+			u32 xmax = m_draw.fifo.dequeue();
+			u32 ymin = m_draw.fifo.dequeue();
+			u32 ymax = m_draw.fifo.dequeue();
+			LOGDASM("\t%08x %08x %08x %08x\n", xmin, xmax, ymin, ymax);
+			break;
+		}
+		case 0x45:
+		{
+			if (m_draw.state == DRAW_COMMAND)
+			{
+				m_draw.command_count = 2;
+				return;
+			}
+			LOGDASM("G_ViewVolumeZClip\n");
+			u32 zmin = m_draw.fifo.dequeue();
+			u32 zmax = m_draw.fifo.dequeue();
+			LOGDASM("\t%08x %08x\n", zmin, zmax);
+			break;
+		}
+		case 0xf0:
+			LOGDASM("Draw ");
+			switch(op_command)
+			{
+				case 0xc1:
+					LOGDASM("(Flush_FB)\n");
+					fb_commit();
+					break;
+				case 0xc2:
+					LOGDASM("(Flush_Z)\n");
+					break;
+				case 0xe1:
+					LOGDASM("(PolygonEnd)\n");
+					break;
+				default:
+					LOGDASM("(<reserved>)\n");
+					break;
+			}
+
+			break;
+		case 0xf1:
+		{
+			LOGDASM("SetRegister (count=%d)\n", op_command);
+
+			if (m_draw.state == DRAW_COMMAND)
+			{
+				m_draw.data_count = op_command;
+				m_draw.state = DRAW_DATA;
+				return;
+			}
+			const u16 reg_address = (opcode & 0xffff);
+			temp_buf = m_draw.fifo.dequeue();
+			LOGDASM("\t[%05x] -> %08x\n", (reg_address << 2) | 0x30000, temp_buf);
+			space(AS_IO).write_dword((reg_address << 2), temp_buf, 0xffffffff);
+			m_draw.data_count --;
+			m_draw.current_command = (m_draw.current_command & 0xffff0000) | ((reg_address + 1) & 0xffff);
+			if (m_draw.data_count > 0)
+				return;
+			break;
+		}
+		case 0xfd:
+		{
+			LOGDASM("Interrupt\n");
+			// mariojjl
+			m_irq.ist |= IRQ_CEND;
+			check_irqs();
+			break;
+		}
+		default:
+			LOGDASM("<unsupported type = %02x command = %02x count = %04x>\n", op_type, op_command, opcode & 0xffff);
+			//machine().debug_break();
+			break;
+	}
+
+	// if we got up to this point then idle punt
+	m_draw.state = DRAW_IDLE;
+}
+
 // Quick and dirty snippet to have something drawn,
 // this is all done in FIFO and requires a timer (and loads of profiling ...)
 void mb86292_device::process_display_list()
@@ -574,183 +939,9 @@ void mb86292_device::process_display_list()
 	while (m_displaylist.cur_address < end_address)
 	{
 		u32 opcode = vram_read_dword(m_displaylist.cur_address);
-		LOGDASM("PC=%08x %08x ", m_displaylist.cur_address, opcode);
-		const u8 op_type = opcode >> 24;
-		const u8 op_command = (opcode >> 16) & 0xff;
-		u16 param_list = 1;
-		switch(op_type)
-		{
-			case 0x09:
-			{
-				LOGDASM("DrawRectP ");
-				u16 rys = vram_read_word(m_displaylist.cur_address + 0x06);
-				u16 rxs = vram_read_word(m_displaylist.cur_address + 0x04);
-				u16 rsizey = vram_read_word(m_displaylist.cur_address + 0x0a);
-				u16 rsizex = vram_read_word(m_displaylist.cur_address + 0x08);
-				param_list += 2;
-
-				switch(op_command)
-				{
-					case 0x41:
-						LOGDASM("(BltFill)\n");
-						LOGDASM("\t%04x|%04x\n", rys, rxs);
-						LOGDASM("\t%04x|%04x\n", rsizey, rsizex);
-						// color should be FC according to usage
-						for (u16 yi = rys; yi < rsizey; yi ++)
-						{
-							const u32 dst_ptr = m_fb.base + yi * (m_fb.xres << 1);
-							for (u16 xi = rxs; xi < rsizex; xi ++)
-								vram_write_word(dst_ptr + (xi << 1), m_draw.fc);
-						}
-						break;
-					case 0xe2:
-						LOGDASM(" (ClearPolyFlag)\n");
-						break;
-					default:
-						LOGDASM(" (<reserved>)\n");
-						break;
-				}
-				break;
-			}
-			case 0x0f:
-			{
-				LOGDASM("BltCopyAlternateP (%s)\n", op_command == 0x44 ? "TopLeft" : "<reserved>");
-				u32 saddr = vram_read_dword(m_displaylist.cur_address + 0x04);
-				u32 sstride = vram_read_dword(m_displaylist.cur_address + 0x08);
-				u16 sry = vram_read_word(m_displaylist.cur_address + 0x0e);
-				u16 srx = vram_read_word(m_displaylist.cur_address + 0x0c);
-				u32 daddr = vram_read_dword(m_displaylist.cur_address + 0x10);
-				u32 dstride = vram_read_dword(m_displaylist.cur_address + 0x14);
-				u16 dry = vram_read_word(m_displaylist.cur_address + 0x1a);
-				u16 drx = vram_read_word(m_displaylist.cur_address + 0x18);
-				u16 brsizey = vram_read_word(m_displaylist.cur_address + 0x1e);
-				u16 brsizex = vram_read_word(m_displaylist.cur_address + 0x1c);
-				param_list += 7;
-				LOGDASM("\t%08x %08x %04x|%04x\n"
-					, saddr
-					, sstride
-					, sry
-					, srx
-				);
-				LOGDASM("\t%08x %08x %04x|%04x\n"
-					, daddr
-					, dstride
-					, dry
-					, drx
-				);
-				LOGDASM("\t%04x|%04x\n", brsizey, brsizex);
-				for (u16 yi = 0; yi < brsizey; yi ++)
-				{
-					const u32 src_ptr = saddr + (((sry + yi) * sstride) << 1);
-					const u32 dst_ptr = daddr + (((dry + yi) * dstride) << 1);
-					for (u16 xi = 0; xi < brsizex; xi ++)
-					{
-						u16 src_pixel = vram_read_word(src_ptr + ((srx + xi) << 1));
-						vram_write_word(dst_ptr + ((drx + xi) << 1), src_pixel);
-					}
-				}
-				break;
-			}
-			case 0x20:
-			{
-				LOGDASM("G_Nop\n");
-				break;
-			}
-			case 0x40:
-			{
-				LOGDASM("G_Init\n");
-				break;
-			}
-			case 0x41:
-			{
-				LOGDASM("G_Viewport\n");
-				u32 x_scaling = vram_read_dword(m_displaylist.cur_address + 0x04);
-				u32 x_offset = vram_read_dword(m_displaylist.cur_address + 0x08);
-				u32 y_scaling = vram_read_dword(m_displaylist.cur_address + 0x0c);
-				u32 y_offset = vram_read_dword(m_displaylist.cur_address + 0x10);
-				LOGDASM("\t%08x %08x %08x %08x\n", x_scaling, x_offset, y_scaling, y_offset);
-				param_list += 4;
-				break;
-			}
-			case 0x42:
-			{
-				LOGDASM("G_DepthRange\n");
-				u32 z_scaling = vram_read_dword(m_displaylist.cur_address + 0x04);
-				u32 z_offset = vram_read_dword(m_displaylist.cur_address + 0x08);
-				LOGDASM("\t%08x %08x\n", z_scaling, z_offset);
-				param_list += 2;
-				break;
-			}
-			case 0x44:
-			{
-				LOGDASM("G_ViewVolumeXYClip\n");
-				u32 xmin = vram_read_dword(m_displaylist.cur_address + 0x04);
-				u32 xmax = vram_read_dword(m_displaylist.cur_address + 0x08);
-				u32 ymin = vram_read_dword(m_displaylist.cur_address + 0x0c);
-				u32 ymax = vram_read_dword(m_displaylist.cur_address + 0x10);
-				LOGDASM("\t%08x %08x %08x %08x\n", xmin, xmax, ymin, ymax);
-				param_list += 4;
-				break;
-			}
-			case 0x45:
-			{
-				LOGDASM("G_ViewVolumeZClip\n");
-				u32 zmin = vram_read_dword(m_displaylist.cur_address + 0x04);
-				u32 zmax = vram_read_dword(m_displaylist.cur_address + 0x08);
-				LOGDASM("\t%08x %08x\n", zmin, zmax);
-				param_list += 2;
-				break;
-			}
-			case 0xf0:
-				LOGDASM("Draw ");
-				switch(op_command)
-				{
-					case 0xc1:
-						LOGDASM("(Flush_FB)\n");
-						fb_commit();
-						break;
-					case 0xc2:
-						LOGDASM("(Flush_Z)\n");
-						break;
-					case 0xe1:
-						LOGDASM("(PolygonEnd)\n");
-						break;
-					default:
-						LOGDASM("(<reserved>)\n");
-						break;
-				}
-
-				break;
-			case 0xf1:
-			{
-				const u16 reg_address = (opcode & 0xffff);
-				LOGDASM("SetRegister (count=%d)\n", op_command);
-				for (int i = 0; i < op_command; i ++)
-				{
-					const u32 reg_data = vram_read_dword(m_displaylist.cur_address + 0x04 + (i << 2));
-					LOGDASM("\t[%05x] -> %08x\n", (reg_address << 2) | 0x30000, reg_data);
-					space(AS_IO).write_dword((reg_address << 2), reg_data, 0xffffffff);
-				}
-
-				param_list += op_command;
-				break;
-			}
-			case 0xfd:
-			{
-				LOGDASM("Interrupt\n");
-				// mariojjl
-				m_irq.ist |= IRQ_CEND;
-				check_irqs();
-				break;
-			}
-			default:
-				LOGDASM("<unsupported>\n");
-				break;
-		}
-
-		m_displaylist.cur_address += param_list * 4;
+		process_display_opcode(opcode);
+		m_displaylist.cur_address += 4;
 	}
-
 
 	m_displaylist.lreq = false;
 }
@@ -760,11 +951,13 @@ void mb86292_device::fb_commit()
 	for (int y = 0; y <= m_crtc.vdp; y++)
 	{
 		const u32 fb_addr = m_fb.base + y * (m_fb.xres << 1);
-		const u32 clayer_addr = m_clayer.cda + (m_clayer.cw * y);
+		const u32 c_layer_addr = m_c_layer.cda + (m_c_layer.cw * y);
 
 		for (int x = 0; x <= m_crtc.hdp; x++)
 		{
-			u16 pixel = vram_read_word(clayer_addr + (x << 1));
+			u16 pixel = vram_read_word(c_layer_addr + (x << 1));
+			if ((pixel & 0x7fff) == m_c_layer.transpen)
+				pixel = 0;
 			vram_write_word(fb_addr + (x << 1), pixel);
 		}
 	}
