@@ -111,7 +111,7 @@ license:CC0-1.0
 		<description>Professional Publisher (Brazil)</description>
 		<year>1990</year>
 		<publisher>Discovery Informatica</publisher>
-		<info name="usage" value="Requires the instructions to enter password."/>
+		<info name="usage" value="Requires the instructions to enter password." />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="professonal publisher - discovery informatica.dsk" size="368640" crc="ebf4ca7a" sha1="e85ff831a494d7569b24dda18c28de052246c299" />
@@ -123,7 +123,7 @@ license:CC0-1.0
 		<description>Serra Pelada (Brazil)</description>
 		<year>1987</year>
 		<publisher>Pro Kit</publisher>
-		<info name="usage" value="RUN&quot;SERRA.BAS&quot;"/>
+		<info name="usage" value="RUN&quot;SERRA.BAS&quot;" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="serra pelada - pro kit.dsk" size="368640" crc="48312507" sha1="46fd964d8cc3210661c08ed53bf215c8d00d45ef" />

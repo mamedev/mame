@@ -1143,7 +1143,7 @@ INPUT_CHANGED_MEMBER(apple3_state::keyb_special_changed)
 		{
 			m_nmi_latch = true;
 			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		}		
+		}
 	}
 	else
 	{

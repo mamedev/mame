@@ -1008,15 +1008,15 @@ void nscsi_cdrom_apple_device::scsi_command()
 						scsi_cmdbuf[pos++] = dec_2_bcd(BIT(start_frame, 8, 8));  // seconds
 						scsi_cmdbuf[pos++] = dec_2_bcd(BIT(start_frame, 0, 8));  // frames
 					}
-					else	// keep returning the last track if necessary
+					else    // keep returning the last track if necessary
 					{
 						const uint32_t start_lba = image->get_track_start(image->get_last_track());
 						const uint32_t start_frame = to_msf(start_lba);
 
 						scsi_cmdbuf[pos++] = image->get_adr_control(image->get_last_track());
 						scsi_cmdbuf[pos++] = dec_2_bcd(BIT(start_frame, 16, 8)); // minutes
-						scsi_cmdbuf[pos++] = dec_2_bcd(BIT(start_frame, 8, 8));	 // seconds
-						scsi_cmdbuf[pos++] = dec_2_bcd(BIT(start_frame, 0, 8));	 // frames
+						scsi_cmdbuf[pos++] = dec_2_bcd(BIT(start_frame, 8, 8));  // seconds
+						scsi_cmdbuf[pos++] = dec_2_bcd(BIT(start_frame, 0, 8));  // frames
 					}
 				}
 

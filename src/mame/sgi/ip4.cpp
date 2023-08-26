@@ -39,6 +39,8 @@
 
 #include "emu.h"
 
+#include "kbd.h"
+
 // cpu and memory
 #include "cpu/mips/mips1.h"
 
@@ -57,7 +59,6 @@
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/hlemouse.h"
 
-#include "kbd.h"
 #include "speaker.h"
 
 #define LOG_PARITY (1U << 1)

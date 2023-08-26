@@ -55,23 +55,21 @@
 
 #include "emu.h"
 
+#include "hpc3.h"
+#include "ioc2.h"
+#include "mc.h"
+#include "vino.h"
+
 #include "bus/gio64/gio64.h"
-
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
 #include "cpu/mips/mips3.h"
-
 #include "machine/ds1386.h"
 #include "machine/edlc.h"
 #include "machine/eepromser.h"
-#include "hpc3.h"
-#include "ioc2.h"
 #include "machine/nscsi_bus.h"
-#include "bus/nscsi/cd.h"
-#include "bus/nscsi/hd.h"
-#include "mc.h"
-#include "vino.h"
 #include "machine/saa7191.h"
 #include "machine/wd33c9x.h"
-
 #include "sound/cdda.h"
 
 #include "emupal.h"

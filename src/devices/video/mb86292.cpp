@@ -115,8 +115,8 @@ void mb86292_device::device_reset()
 
 	m_vsync_timer->adjust(attotime::never);
 
-//	m_crtc.vtr = m_crtc.htp = m_crtc.hdp = m_crtc.hdb = m_crtc.hsp = m_crtc.hsw = 0;
-//	m_crtc.vtr = m_crtc.vsp = m_crtc.vdp = m_crtc.vsw = 0;
+//  m_crtc.vtr = m_crtc.htp = m_crtc.hdp = m_crtc.hdb = m_crtc.hsp = m_crtc.hsw = 0;
+//  m_crtc.vtr = m_crtc.vsp = m_crtc.vdp = m_crtc.vsw = 0;
 	m_irq.ist = m_irq.mask = 0;
 	m_dce = 0;
 }
@@ -652,36 +652,36 @@ TIMER_CALLBACK_MEMBER(mb86292_device::vsync_cb)
 }
 
 /*
-	GCTR Geometry ConTrol Register
-	---- ---x ---- ---- ---- ---- ---- ---- FO FIFO Overflow
-	---- ---- ---x xxxx x--- ---- ---- ---- FCNT FIFO Counter (up to 0x100000)
-	---- ---- ---- ---- -x-- ---- ---- ---- NF FIFO Near Full (actually FIFO half size reached)
-	---- ---- ---- ---- --x- ---- ---- ---- FF FIFO full
-	---- ---- ---- ---- ---x ---- ---- ---- FE FIFO empty
-	---- ---- ---- ---- ---- --xx ---- ---- GS Geometry engine Status
-	---- ---- ---- ---- ---- --00 ---- ---- Idle
-	---- ---- ---- ---- ---- --01 ---- ---- Processing, assume pixels rather than commands
-	---- ---- ---- ---- ---- --1x ---- ---- <reserved>
-	---- ---- ---- ---- ---- ---- --xx ---- SS geometry Setup engine Status
-	---- ---- ---- ---- ---- ---- --00 ---- Idle
-	---- ---- ---- ---- ---- ---- --01 ---- Processing
-	---- ---- ---- ---- ---- ---- --10 ---- Processing (separate stage?)
-	---- ---- ---- ---- ---- ---- --11 ---- <reserved>
-	---- ---- ---- ---- ---- ---- ---- --xx PS Pixel engine Status
-	---- ---- ---- ---- ---- ---- ---- --00 Idle
-	---- ---- ---- ---- ---- ---- ---- --01 Processing, assume pixels rather than commands
-	---- ---- ---- ---- ---- ---- ---- --1x <reserved>
+    GCTR Geometry ConTrol Register
+    ---- ---x ---- ---- ---- ---- ---- ---- FO FIFO Overflow
+    ---- ---- ---x xxxx x--- ---- ---- ---- FCNT FIFO Counter (up to 0x100000)
+    ---- ---- ---- ---- -x-- ---- ---- ---- NF FIFO Near Full (actually FIFO half size reached)
+    ---- ---- ---- ---- --x- ---- ---- ---- FF FIFO full
+    ---- ---- ---- ---- ---x ---- ---- ---- FE FIFO empty
+    ---- ---- ---- ---- ---- --xx ---- ---- GS Geometry engine Status
+    ---- ---- ---- ---- ---- --00 ---- ---- Idle
+    ---- ---- ---- ---- ---- --01 ---- ---- Processing, assume pixels rather than commands
+    ---- ---- ---- ---- ---- --1x ---- ---- <reserved>
+    ---- ---- ---- ---- ---- ---- --xx ---- SS geometry Setup engine Status
+    ---- ---- ---- ---- ---- ---- --00 ---- Idle
+    ---- ---- ---- ---- ---- ---- --01 ---- Processing
+    ---- ---- ---- ---- ---- ---- --10 ---- Processing (separate stage?)
+    ---- ---- ---- ---- ---- ---- --11 ---- <reserved>
+    ---- ---- ---- ---- ---- ---- ---- --xx PS Pixel engine Status
+    ---- ---- ---- ---- ---- ---- ---- --00 Idle
+    ---- ---- ---- ---- ---- ---- ---- --01 Processing, assume pixels rather than commands
+    ---- ---- ---- ---- ---- ---- ---- --1x <reserved>
 */
 u32 mb86292_device::gctr_r(offs_t offset)
 {
 	u32 res;
 	res =  (m_draw.state == DRAW_DATA) << 0;
-//	res |= (m_geo.state == SETUP) << 4;
-//	res |= (m_geo.state == DRAW_DATA) << 8;
+//  res |= (m_geo.state == SETUP) << 4;
+//  res |= (m_geo.state == DRAW_DATA) << 8;
 	res |= (m_draw.fifo.queue_length() == 0) << 12;
 	res |= (m_draw.fifo.queue_length() == 16) << 13;
 	// TODO: pingu just hangs
-//	res |= (m_draw.fifo.queue_length() >= 8) << 14;
+//  res |= (m_draw.fifo.queue_length() >= 8) << 14;
 	// fcnt << 15;
 	// fo << 24;
 	return res;

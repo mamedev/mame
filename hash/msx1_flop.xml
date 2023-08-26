@@ -769,13 +769,13 @@ The following floppies came with the machines.
 		<info name="alt_title" value="コナミゲームコレクションＶｏｌ．１ アクションシリーズ" />
 		<info name="serial" value="RA006" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk A"/>
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="737280">
 				<rom name="konami_game_collection_vol.1_(1988)_(konami)_(j)_(disk_1_of_2).dsk" size="737280" crc="bfab140f" sha1="37cfed5a5886637ca1dd866ea4e2e1ac23ab4841" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk B"/>
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="737280">
 				<rom name="konami_game_collection_vol.1_(1988)_(konami)_(j)_(disk_2_of_2).dsk" size="737280" crc="5f947098" sha1="d7ff2ec76ab2d198fdfe9bcbd9743c1e78939605" />
 			</dataarea>
@@ -4398,7 +4398,7 @@ The following floppies came with the machines.
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="dizzy ball (1983)(pony canyon)(jp).dsk" size="737280" crc="5c4decca" sha1="118ce1269b81d14e1533f453c3e72ab258baada0"/>
+				<rom name="dizzy ball (1983)(pony canyon)(jp).dsk" size="737280" crc="5c4decca" sha1="118ce1269b81d14e1533f453c3e72ab258baada0" />
 			</dataarea>
 		</part>
 	</software>
