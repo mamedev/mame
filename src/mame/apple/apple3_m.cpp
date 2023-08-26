@@ -159,7 +159,7 @@ uint8_t apple3_state::apple3_c0xx_r(offs_t offset)
 
 		case 0x50: case 0x51: case 0x52: case 0x53:
 		case 0x54: case 0x55: case 0x56: case 0x57:
-			//m_screen->update_partial(m_screen->vpos());
+			m_screen->update_partial(m_screen->vpos());
 			/* graphics softswitches */
 			if (offset & 1)
 				m_flags |= 1 << ((offset - 0x50) / 2);
@@ -374,7 +374,7 @@ void apple3_state::apple3_c0xx_w(offs_t offset, uint8_t data)
 
 		case 0x50: case 0x51: case 0x52: case 0x53:
 		case 0x54: case 0x55: case 0x56: case 0x57:
-			//m_screen->update_partial(m_screen->vpos());
+			m_screen->update_partial(m_screen->vpos());
 			/* graphics softswitches */
 			if (offset & 1)
 				m_flags |= 1 << ((offset - 0x50) / 2);
