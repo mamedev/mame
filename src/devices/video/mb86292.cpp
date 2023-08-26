@@ -97,10 +97,8 @@ void mb86292_device::device_start()
 	save_item(STRUCT_MEMBER(m_ml_layer, mlda));
 }
 
-void mb86292_device::device_reset()
+void mb86292_device::reset_drawing_engine()
 {
-	m_vsync_timer->adjust(attotime::never);
-
 	m_draw.fifo.clear();
 	m_draw.state = DRAW_IDLE;
 	m_draw.command_count = 0;
@@ -109,7 +107,18 @@ void mb86292_device::device_reset()
 	m_dce = 0;
 	m_displaylist.lsa = m_displaylist.lco = 0;
 	m_displaylist.lreq = false;
+}
+
+void mb86292_device::device_reset()
+{
+	reset_drawing_engine();
+
+	m_vsync_timer->adjust(attotime::never);
+
+//	m_crtc.vtr = m_crtc.htp = m_crtc.hdp = m_crtc.hdb = m_crtc.hsp = m_crtc.hsw = 0;
+//	m_crtc.vtr = m_crtc.vsp = m_crtc.vdp = m_crtc.vsw = 0;
 	m_irq.ist = m_irq.mask = 0;
+	m_dce = 0;
 }
 
 void mb86292_device::vregs_map(address_map &map)
@@ -136,7 +145,7 @@ void mb86292_device::vregs_map(address_map &map)
 	);
 	// MASK Interrupt MASK
 	map(0x00024, 0x00027).lrw32(
-			NAME([this] (offs_t offset) {
+		NAME([this] (offs_t offset) {
 			return m_irq.mask;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
@@ -145,7 +154,14 @@ void mb86292_device::vregs_map(address_map &map)
 			LOGIRQ("MASK %08x & %08x -> %08x\n", data, mem_mask, m_irq.mask);
 		})
 	);
-//  map(0x0002c, 0x0002c) SRST Software ReSeT
+	// SRST Software ReSeT
+	map(0x0002c, 0x0002c).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			if (BIT(data, 0))
+				reset_drawing_engine();
+			LOGREGS("SRST %02x\n", data);
+		})
+	);
 	// LSA display List Source Address
 	map(0x00040, 0x00043).lrw32(
 		NAME([this] (offs_t offset) {
@@ -304,7 +320,8 @@ void mb86292_device::vregs_map(address_map &map)
 //  map(0x1001a, 0x1001b) WX Window position Y
 //  map(0x1001c, 0x1001d) WW Window Width
 //  map(0x1001e, 0x1001f) WH Window Height
-	// CM C[onsole] layer Mode
+	// C[onsole] layer
+	// CM C layer Mode
 	map(0x10020, 0x10023).lrw32(
 		NAME([this] (offs_t offset) {
 			return m_c_layer.cm;
@@ -342,12 +359,11 @@ void mb86292_device::vregs_map(address_map &map)
 //  map(0x10030, 0x10033) WM W[indow] layer Mode
 //  map(0x10034, 0x10037) WOA W layer Origin Address
 //  map(0x10038, 0x1003b) WDA W layer Display Address
-//  map(0x10040, 0x10043) MLM M[iddle] L[eft] layer Mode
+	// M[iddle] L[eft] layer
+//  map(0x10040, 0x10043) MLM ML layer Mode
 //  map(0x10044, 0x10047) MLOA0 ML Origin Address 0
-	// MLDA0 ML Display Address 0
 	map(0x10048, 0x1004b).rw(FUNC(mb86292_device::mlda_r<0>), FUNC(mb86292_device::mlda_w<0>));
 //  map(0x1004c, 0x1004f) MLOA1 ML Origin Address 1
-	// MLDA1 ML Display Address 1
 	map(0x10050, 0x10053).rw(FUNC(mb86292_device::mlda_r<1>), FUNC(mb86292_device::mlda_w<1>));
 //  map(0x10054, 0x10055) MLDX ML Display position X
 //  map(0x10056, 0x10057) MLDY ML Display position Y
@@ -358,11 +374,31 @@ void mb86292_device::vregs_map(address_map &map)
 //  map(0x10068, 0x1006b) MRDA1 MR Display Address 1
 //  map(0x1006c, 0x1006d) MRDX MR Display position X
 //  map(0x1006e, 0x1006f) MRDY MR Display position Y
-//  map(0x10070, 0x10073) BLM B[ase] L[eft] layer Mode
+	// B[ase] L[eft] layer
+	// BLM BL layer Mode
+	map(0x10070, 0x10073).lrw32(
+		NAME([this] (offs_t offset) {
+			return m_bl_layer.blm;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_bl_layer.blm);
+			m_bl_layer.blh = (m_bl_layer.blm & 0xfff) + 1;
+			m_bl_layer.blw = ((m_bl_layer.blm >> 16) & 0xff) * 64;
+			m_bl_layer.blflp = (m_bl_layer.blm >> 29) & 3;
+			m_bl_layer.blc = bool(BIT(m_bl_layer.blm, 31));
+			LOGREGS("BLM %08x & %08x -> BLH %d BLW %d BLFLP %01x BLC %d\n"
+				, data, mem_mask
+				, m_bl_layer.blh
+				, m_bl_layer.blw
+				, m_bl_layer.blflp
+				, m_bl_layer.blc
+			);
+		})
+	);
 //  map(0x10074, 0x10077) BLOA0 BL Origin Address 0
-//  map(0x10078, 0x1007b) BLDA0 BL Display Address 0
+	map(0x10078, 0x1007b).rw(FUNC(mb86292_device::blda_r<0>), FUNC(mb86292_device::blda_w<0>));
 //  map(0x1007c, 0x1007f) BLOA1 BL Origin Address 1
-//  map(0x10080, 0x10083) BLDA1 BL Display Address 1
+	map(0x10080, 0x10083).rw(FUNC(mb86292_device::blda_r<1>), FUNC(mb86292_device::blda_w<1>));
 //  map(0x10084, 0x10085) BLDX BL Display position X
 //  map(0x10086, 0x10087) BLDY BL Display position Y
 //  map(0x10088, 0x1008b) BRM B[ase] R[ight] layer Mode
@@ -423,6 +459,7 @@ void mb86292_device::vregs_map(address_map &map)
 	map(0x30000, 0x3ffff).m(FUNC(mb86292_device::draw_io_map));
 }
 
+// MLDA0/MLDA1 ML Display Address 0/1
 template <unsigned N> u32 mb86292_device::mlda_r(offs_t offset)
 {
 	return m_ml_layer.mlda[N];
@@ -437,6 +474,20 @@ template <unsigned N> void mb86292_device::mlda_w(offs_t offset, u32 data, u32 m
 	);
 }
 
+// BLDA0/BLDA1 BL Display Address 0/1
+template <unsigned N> u32 mb86292_device::blda_r(offs_t offset)
+{
+	return m_bl_layer.blda[N];
+}
+
+template <unsigned N> void mb86292_device::blda_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_bl_layer.blda[N]);
+	LOGREGS("BLDA%d %04x & %08x -> %08x\n"
+		, N, data, mem_mask
+		, m_bl_layer.blda[N]
+	);
+}
 
 void mb86292_device::draw_io_map(address_map &map)
 {
@@ -512,7 +563,7 @@ void mb86292_device::draw_io_map(address_map &map)
 //  map(0x0494, 0x0497) TBC Texture Border Color
 //  Other stuff in the area are apparently r/o copies of the drawing engine internals.
 
-//  map(0x8000, 0x8000) GCTR Geometry ConTrol Register
+	map(0x8000, 0x8003).r(FUNC(mb86292_device::gctr_r));
 //  map(0x8040, 0x8043) GMDR0 Geometry MoDe Register 0 (vertex)
 //  map(0x8044, 0x8047) GMDR1 Geometry MoDe Register 1 (line)
 //  map(0x8048, 0x804b) GMDR2 Geometry MoDe Register 2 (triangle)
@@ -594,8 +645,46 @@ void mb86292_device::check_irqs()
 TIMER_CALLBACK_MEMBER(mb86292_device::vsync_cb)
 {
 	m_irq.ist |= IRQ_VSYNC;
+	m_irq.ist |= IRQ_FSYNC;
+
 	check_irqs();
 	m_vsync_timer->adjust(screen().time_until_pos(m_crtc.vdp + 1));
+}
+
+/*
+	GCTR Geometry ConTrol Register
+	---- ---x ---- ---- ---- ---- ---- ---- FO FIFO Overflow
+	---- ---- ---x xxxx x--- ---- ---- ---- FCNT FIFO Counter (up to 0x100000)
+	---- ---- ---- ---- -x-- ---- ---- ---- NF FIFO Near Full (actually FIFO half size reached)
+	---- ---- ---- ---- --x- ---- ---- ---- FF FIFO full
+	---- ---- ---- ---- ---x ---- ---- ---- FE FIFO empty
+	---- ---- ---- ---- ---- --xx ---- ---- GS Geometry engine Status
+	---- ---- ---- ---- ---- --00 ---- ---- Idle
+	---- ---- ---- ---- ---- --01 ---- ---- Processing, assume pixels rather than commands
+	---- ---- ---- ---- ---- --1x ---- ---- <reserved>
+	---- ---- ---- ---- ---- ---- --xx ---- SS geometry Setup engine Status
+	---- ---- ---- ---- ---- ---- --00 ---- Idle
+	---- ---- ---- ---- ---- ---- --01 ---- Processing
+	---- ---- ---- ---- ---- ---- --10 ---- Processing (separate stage?)
+	---- ---- ---- ---- ---- ---- --11 ---- <reserved>
+	---- ---- ---- ---- ---- ---- ---- --xx PS Pixel engine Status
+	---- ---- ---- ---- ---- ---- ---- --00 Idle
+	---- ---- ---- ---- ---- ---- ---- --01 Processing, assume pixels rather than commands
+	---- ---- ---- ---- ---- ---- ---- --1x <reserved>
+*/
+u32 mb86292_device::gctr_r(offs_t offset)
+{
+	u32 res;
+	res =  (m_draw.state == DRAW_DATA) << 0;
+//	res |= (m_geo.state == SETUP) << 4;
+//	res |= (m_geo.state == DRAW_DATA) << 8;
+	res |= (m_draw.fifo.queue_length() == 0) << 12;
+	res |= (m_draw.fifo.queue_length() == 16) << 13;
+	// TODO: pingu just hangs
+//	res |= (m_draw.fifo.queue_length() >= 8) << 14;
+	// fcnt << 15;
+	// fo << 24;
+	return res;
 }
 
 /*
@@ -619,7 +708,9 @@ void mb86292_device::process_display_opcode(u32 opcode)
 		if (m_draw.state == DRAW_COMMAND && m_draw.fifo.queue_length() < m_draw.command_count)
 			return;
 		else
+		{
 			m_draw.state = DRAW_DATA;
+		}
 		opcode = m_draw.current_command;
 	}
 	const u8 op_type = opcode >> 24;
@@ -868,6 +959,7 @@ void mb86292_device::process_display_opcode(u32 opcode)
 			break;
 		}
 		case 0xf0:
+		{
 			LOGDASM("Draw ");
 			switch(op_command)
 			{
@@ -885,8 +977,8 @@ void mb86292_device::process_display_opcode(u32 opcode)
 					LOGDASM("(<reserved>)\n");
 					break;
 			}
-
 			break;
+		}
 		case 0xf1:
 		{
 			LOGDASM("SetRegister (count=%d)\n", op_command);
@@ -948,16 +1040,18 @@ void mb86292_device::process_display_list()
 
 void mb86292_device::fb_commit()
 {
+	const u8 blflp = m_bl_layer.blflp & 2 ? screen().frame_number() & 1 : m_bl_layer.blflp & 1;
 	for (int y = 0; y <= m_crtc.vdp; y++)
 	{
 		const u32 fb_addr = m_fb.base + y * (m_fb.xres << 1);
 		const u32 c_layer_addr = m_c_layer.cda + (m_c_layer.cw * y);
+		const u32 bl_layer_addr = m_bl_layer.blda[blflp] + (m_bl_layer.blw * y);
 
 		for (int x = 0; x <= m_crtc.hdp; x++)
 		{
 			u16 pixel = vram_read_word(c_layer_addr + (x << 1));
 			if ((pixel & 0x7fff) == m_c_layer.transpen)
-				pixel = 0;
+				pixel = vram_read_word(bl_layer_addr + (x << 1));;
 			vram_write_word(fb_addr + (x << 1), pixel);
 		}
 	}
@@ -1000,10 +1094,10 @@ u32 mb86292_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, r
 		m_test_y--;
 
 	if(machine().input().code_pressed(KEYCODE_Q))
-		m_start_offs+=0x2000;
+		m_start_offs+=0x10000;
 
 	if(machine().input().code_pressed(KEYCODE_W))
-		m_start_offs-=0x2000;
+		m_start_offs-=0x10000;
 
 	if(machine().input().code_pressed_once(KEYCODE_E))
 		m_start_offs+=0x1000;
