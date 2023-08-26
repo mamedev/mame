@@ -4129,7 +4129,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="basicpsw" supported="no">
 		<description>BASIC Program Status Window v3 (UK, ripped from Amstrad Action Issue 105 covertape)</description>
 		<year>1994</year>
-		<publisher>Amstrad Action</publisher>
+		<publisher>Future Publishing</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="9493">
@@ -5042,7 +5042,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="blitz" supported="no">
 		<description>Blitz! (UK, ripped from Amstrad Action Issue 105 covertape)</description>
 		<year>1994</year>
-		<publisher>Amstrad Action</publisher>
+		<publisher>Future Publishing</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="16909">
@@ -7175,7 +7175,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="cheatmd2" supported="no">
 		<description>Cheat Mode II The Revenge! (UK)</description>
 		<year>1990</year>
-		<publisher>Amstrad Action</publisher>
+		<publisher>Future Publishing</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="165728">
@@ -41157,19 +41157,21 @@ Covertapes
 -->
 
 
-	<software name="amsac004" supported="no">
-		<description>Amstrad Action - Issue 004 (UK)</description>
+	<software name="amsac004">
+		<description>Amstrad Action (Issue 004) Christmas Gift</description>
 		<year>1986</year>
-		<publisher>&lt;covertape&gt;</publisher>
+		<publisher>Future Publishing</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="magazine" value="Amstrad Action 4" />
 		<info name="release" value="198601xx" />
 		<part name="cass1" interface="cpc_cass">
+			<feature name="part_id" value="Side 1: Kung-Fu"/>
 			<dataarea name="cass" size="36841">
 				<rom name="amstrad action issue 004 (uk) (face a) (1986) [amstrad action] [original] [tape] [compilation].cdt" size="36841" crc="892c6541" sha1="e9ebcf84b310d2f46af956fd55499a861a9e9039"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="cpc_cass">
+			<feature name="part_id" value="Side 2: No.1"/>
 			<dataarea name="cass" size="37656">
 				<rom name="amstrad action issue 004 (uk) (face b) (1986) [amstrad action] [original] [tape] [compilation].cdt" size="37656" crc="246eabf4" sha1="4e2e3e2df2f01b587ef0ed8b3934559f4345b133"/>
 			</dataarea>
@@ -41177,9 +41179,9 @@ Covertapes
 	</software>
 
 	<software name="amsac016" supported="no">
-		<description>Amstrad Action - Issue 016 (UK)</description>
+		<description>Amstrad Action (Issue 016) Christmas Avalanche</description>
 		<year>1986</year>
-		<publisher>&lt;covertape&gt;</publisher>
+		<publisher>Future Publishing</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="magazine" value="Amstrad Action 16" />
 		<info name="release" value="198701xx" />
@@ -41196,9 +41198,9 @@ Covertapes
 	</software>
 
 	<software name="amsac028" supported="no">
-		<description>Amstrad Action - Issue 028 (UK)</description>
+		<description>Amstrad Action (Issue 028) AA Christmas Gift-Pack</description>
 		<year>1988</year>
-		<publisher>&lt;covertape&gt;</publisher>
+		<publisher>Future Publishing</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="magazine" value="Amstrad Action 28" />
 		<info name="release" value="198801xx" />
@@ -41215,9 +41217,9 @@ Covertapes
 	</software>
 
 	<software name="amsac037" supported="no">
-		<description>Amstrad Action - Issue 037 (UK)</description>
+		<description>Amstrad Action (Issue 037) Birthday Gift Pack</description>
 		<year>1988</year>
-		<publisher>&lt;covertape&gt;</publisher>
+		<publisher>Future Publishing</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="magazine" value="Amstrad Action 37" />
 		<info name="release" value="198810xx" />
@@ -41234,9 +41236,9 @@ Covertapes
 	</software>
 
 	<software name="amsac049" supported="no">
-		<description>Amstrad Action - Issue 049 (UK)</description>
+		<description>Amstrad Action (Issue 049) Birthday Gift Pack</description>
 		<year>1989</year>
-		<publisher>&lt;covertape&gt;</publisher>
+		<publisher>Future Publishing</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="magazine" value="Amstrad Action 49" />
 		<info name="release" value="198910xx" />
@@ -41253,9 +41255,9 @@ Covertapes
 	</software>
 
 	<software name="amsac052" supported="no">
-		<description>Amstrad Action - Issue 052 (UK)</description>
+		<description>Amstrad Action (Issue 052) AA Christmas Cassette</description>
 		<year>1990</year>
-		<publisher>&lt;covertape&gt;</publisher>
+		<publisher>Future Publishing</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="magazine" value="Amstrad Action 52" />
 		<info name="release" value="199001xx" />
@@ -41272,9 +41274,9 @@ Covertapes
 	</software>
 
 	<software name="amsac061" supported="no">
-		<description>Amstrad Action - Issue 061 (UK)</description>
+		<description>Amstrad Action (Issue 061) Birthday Gift Pack</description>
 		<year>1990</year>
-		<publisher>&lt;covertape&gt;</publisher>
+		<publisher>Future Publishing</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="magazine" value="Amstrad Action 61" />
 		<info name="release" value="199010xx" />
@@ -41291,9 +41293,9 @@ Covertapes
 	</software>
 
 	<software name="amsac064" supported="no">
-		<description>Amstrad Action - Issue 064 (UK)</description>
+		<description>Amstrad Action (Issue 064) Christmas Covertape</description>
 		<year>1991</year>
-		<publisher>&lt;covertape&gt;</publisher>
+		<publisher>Future Publishing</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="magazine" value="Amstrad Action 64" />
 		<info name="release" value="199101xx" />
@@ -41310,9 +41312,9 @@ Covertapes
 	</software>
 
 	<software name="amsac067" supported="no">
-		<description>Amstrad Action - Tape 1 (UK)</description>
+		<description>Amstrad Action (Issue 067) Tape 01: Action Pack</description>
 		<year>1991</year>
-		<publisher>&lt;covertape&gt;</publisher>
+		<publisher>Future Publishing</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="magazine" value="Amstrad Action 67" />
 		<info name="release" value="199104xx" />
@@ -41329,9 +41331,9 @@ Covertapes
 	</software>
 
 	<software name="amsac068" supported="no">
-		<description>Amstrad Action - Tape 2 (UK)</description>
+		<description>Amstrad Action (Issue 068) Tape 02: Action Pack</description>
 		<year>1991</year>
-		<publisher>&lt;covertape&gt;</publisher>
+		<publisher>Future Publishing</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="magazine" value="Amstrad Action 68" />
 		<info name="release" value="199105xx" />
@@ -41348,9 +41350,9 @@ Covertapes
 	</software>
 
 	<software name="amsac079" supported="no">
-		<description>Amstrad Action - Tape 13 (UK)</description>
+		<description>Amstrad Action (Issue 079) Tape 13: Action Pack</description>
 		<year>1992</year>
-		<publisher>&lt;covertape&gt;</publisher>
+		<publisher>Future Publishing</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="magazine" value="Amstrad Action 79" />
 		<info name="release" value="199204xx" />
@@ -41367,9 +41369,9 @@ Covertapes
 	</software>
 
 	<software name="amsac081" supported="no">
-		<description>Amstrad Action - Tape 15 (UK)</description>
+		<description>Amstrad Action (Issue 081) Tape 15: Action Pack</description>
 		<year>1992</year>
-		<publisher>&lt;covertape&gt;</publisher>
+		<publisher>Future Publishing</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="magazine" value="Amstrad Action 81" />
 		<info name="release" value="199206xx" />
@@ -41386,9 +41388,9 @@ Covertapes
 	</software>
 
 	<software name="amsac084" supported="no">
-		<description>Amstrad Action - Tape 18 (UK)</description>
+		<description>Amstrad Action (Issue 084) Tape 18: Action Pack</description>
 		<year>1992</year>
-		<publisher>&lt;covertape&gt;</publisher>
+		<publisher>Future Publishing</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="magazine" value="Amstrad Action 84" />
 		<info name="release" value="199209xx" />
@@ -41405,9 +41407,9 @@ Covertapes
 	</software>
 
 	<software name="amsac092" supported="no">
-		<description>Amstrad Action - Tape 26 (UK)</description>
+		<description>Amstrad Action (Issue 092) Tape 26: Classic Collection</description>
 		<year>1993</year>
-		<publisher>&lt;covertape&gt;</publisher>
+		<publisher>Future Publishing</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="magazine" value="Amstrad Action 92" />
 		<info name="release" value="199305xx" />
@@ -41424,9 +41426,9 @@ Covertapes
 	</software>
 
 	<software name="amsac093" supported="no">
-		<description>Amstrad Action - Tape 27 (UK)</description>
+		<description>Amstrad Action (Issue 093) Tape 27: Classic Collection</description>
 		<year>1993</year>
-		<publisher>&lt;covertape&gt;</publisher>
+		<publisher>Future Publishing</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="magazine" value="Amstrad Action 93" />
 		<info name="release" value="199306xx" />
@@ -41443,9 +41445,9 @@ Covertapes
 	</software>
 
 	<software name="amsac094" supported="no">
-		<description>Amstrad Action - Tape 28 (UK)</description>
+		<description>Amstrad Action (Issue 094) Tape 28: Classic Collection</description>
 		<year>1993</year>
-		<publisher>&lt;covertape&gt;</publisher>
+		<publisher>Future Publishing</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="magazine" value="Amstrad Action 94" />
 		<info name="release" value="199307xx" />
@@ -41462,9 +41464,9 @@ Covertapes
 	</software>
 
 	<software name="amsac097" supported="no">
-		<description>Amstrad Action - Tape 31 (UK)</description>
+		<description>Amstrad Action (Issue 097) Tape 31: Classic Collection</description>
 		<year>1993</year>
-		<publisher>&lt;covertape&gt;</publisher>
+		<publisher>Future Publishing</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="magazine" value="Amstrad Action 97" />
 		<info name="release" value="199310xx" />
@@ -41481,9 +41483,9 @@ Covertapes
 	</software>
 
 	<software name="amsac104" supported="no">
-		<description>Amstrad Action - Issue 104 (UK)</description>
+		<description>Amstrad Action (Issue 104) Tape 38: Serious Action</description>
 		<year>1994</year>
-		<publisher>&lt;covertape&gt;</publisher>
+		<publisher>Future Publishing</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="magazine" value="Amstrad Action 104" />
 		<info name="release" value="199405xx" />
