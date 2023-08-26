@@ -23,7 +23,7 @@ msgid ""
 "\n"
 "\n"
 "Press any key to continue"
-msgstr ""
+msgstr "Devam etmek için bir tuşa basın"
 
 #: src/frontend/mame/ui/ui.cpp:559
 msgid ""
@@ -35,14 +35,16 @@ msgstr ""
 msgid ""
 "UI controls enabled\n"
 "Use %1$s to toggle"
-msgstr ""
+msgstr "UI kontrolleri açıldı\n"
+"Kapatmak için %1$s 'e basın"
 
 #: src/frontend/mame/ui/ui.cpp:1277
 #, c-format
 msgid ""
 "UI controls disabled\n"
 "Use %1$s to toggle"
-msgstr ""
+msgstr "UI kontrolleri kapatıldı\n"
+"Açmak için %1$s 'e basın"
 
 #: src/frontend/mame/ui/ui.cpp:1486
 msgid "Master Volume"
@@ -150,11 +152,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/ui.cpp:1614 src/frontend/mame/ui/ui.cpp:1616
 msgid "X"
-msgstr ""
+msgstr "X"
 
 #: src/frontend/mame/ui/ui.cpp:1614 src/frontend/mame/ui/ui.cpp:1616
 msgid "Y"
-msgstr ""
+msgstr "Y"
 
 #: src/frontend/mame/ui/ui.cpp:1616
 #, c-format
@@ -220,7 +222,7 @@ msgstr ""
 #: src/frontend/mame/ui/ui.cpp:2196
 #, c-format
 msgid "**Error saving %s.ini**"
-msgstr ""
+msgstr "**%s.ini dosyasını kaydederken hata**"
 
 #: src/frontend/mame/ui/ui.cpp:2200 src/frontend/mame/ui/miscmenu.cpp:773
 msgid ""
@@ -228,6 +230,9 @@ msgid ""
 "    Settings saved    \n"
 "\n"
 msgstr ""
+"\n"
+"   Ayarla kaydedildi    \n"
+"\n"
 
 #: src/frontend/mame/ui/selsoft.cpp:510 src/frontend/mame/ui/selgame.cpp:318
 #, c-format
@@ -235,6 +240,8 @@ msgid ""
 "%s\n"
 " added to favorites list."
 msgstr ""
+"%s\n"
+favori listesine eklendi."
 
 #: src/frontend/mame/ui/selsoft.cpp:515 src/frontend/mame/ui/selgame.cpp:323
 #: src/frontend/mame/ui/selgame.cpp:329
@@ -243,14 +250,15 @@ msgid ""
 "%s\n"
 " removed from favorites list."
 msgstr ""
+" favori listesinden kaldırıldı."
 
 #: src/frontend/mame/ui/selsoft.cpp:576
 msgid "[Start empty]"
-msgstr ""
+msgstr "[Boş Başlat]"
 
 #: src/frontend/mame/ui/selsoft.cpp:576
 msgid "[Use file manager]"
-msgstr ""
+msgstr "[Dosya yöneticisini kullan]"
 
 #: src/frontend/mame/ui/selsoft.cpp:756
 #, c-format
@@ -260,7 +268,7 @@ msgstr ""
 #: src/frontend/mame/ui/selsoft.cpp:757
 #, c-format
 msgid "%1$s - select software"
-msgstr ""
+msgstr "%1$s - yazılım seç"
 
 #: src/frontend/mame/ui/selsoft.cpp:762 src/frontend/mame/ui/selgame.cpp:1092
 #, c-format
