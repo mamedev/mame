@@ -23796,7 +23796,7 @@ ymcapsul
 pikkaric
 
 @source:konami/konmedalppc.cpp
-turfwld3						// GSF51 (c) 2005 Konami
+turfwld3                        // GSF51 (c) 2005 Konami
 
 @source:konami/kontest.cpp
 kontest                         // GX800 (c) 198? (Japan)
@@ -26857,6 +26857,7 @@ pangpomsn                       // (c) 1992 Nova
 poitto                          // (c) 1993 Metro / Able Corp.
 poittoc                         // (c) 1993 Metro / Able Corp.
 pururun                         // (c) 1995 Metro / Banpresto
+pururuna                        // (c) 1995 Metro / Banpresto
 puzzlet                         // (c) 2000 Yunizu Corporation (Japan)
 puzzli                          // (c) 1995 Metro / Banpresto
 puzzlia                         // (c) 1995 Metro / Banpresto
@@ -35043,7 +35044,7 @@ k286i                           // 1985 Kaypro 286i
 kma202f                         // KMA-202F-12R motherboard (286)
 kt216wb5                        // KT216WB5-HI Rev.2
 lm103s                          // LM-103S
-m250e							// Olivetti M250E
+m250e                           // Olivetti M250E
 m290                            // Olivetti M290
 magb233                         // Magitronic B233
 magb236                         // Magitronic B236
