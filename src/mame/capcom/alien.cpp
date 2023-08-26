@@ -96,6 +96,7 @@ public:
 	alien_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_workram(*this, "workram")
 		, m_screen(*this, "screen")
 		, m_gpu(*this, "gpu")
 //      , m_vram(*this, "vram%d", 0U)
@@ -119,6 +120,7 @@ private:
 
 	// devices
 	required_device<sh4_device> m_maincpu;
+	required_shared_ptr<u64> m_workram;
 	required_device<screen_device> m_screen;
 	required_device<mb86292_device> m_gpu;
 	required_device<ram_device> m_vram;
@@ -155,14 +157,14 @@ void alien_state::alien_map(address_map &map)
 	map(0x04800000, 0x04800000).r(FUNC(alien_state::fpga_r));
 	map(0x04a00000, 0x04a00007).nopw(); // FPGA config
 	map(0x08000000, 0x08000007).portr("DSW");
-	map(0x0c000000, 0x0cffffff).ram(); // main RAM
+	map(0x0c000000, 0x0cffffff).ram().share("workram"); // main RAM
 
 	map(0x10000000, 0x107fffff).rw(m_vram, FUNC(ram_device::read), FUNC(ram_device::write)); // GPU 1 VRAM
 	map(0x11fc0000, 0x11ffffff).m(m_gpu, FUNC(mb86292_device::vregs_map));  // GPU 1 regs
 //  map(0x12000000, 0x127fffff).ram().share(m_vram[1]); // GPU 2 VRAM
 //  map(0x13fc0000, 0x13ffffff).ram().share("vregs2");  // GPU 2 regs
 	// pingu accesses the mirror
-	map(0x14000000, 0x1400000f).mirror(0x100000).lr32(
+	map(0x14000000, 0x1400000f).mirror(0x100000).lrw32(
 		NAME([this] (offs_t offset, u32 mem_mask) {
 			switch(offset)
 			{
@@ -173,9 +175,11 @@ void alien_state::alien_map(address_map &map)
 					return (u32)0;
 			}
 			return 0xffffffff;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			// writing to 0x14000000: outputs
 		})
 	);
-	// writing to 0x14000000: outputs
 	//map(0x18000000, 0x1800000f).r(FUNC(alien_state::test_r)).nopw(); // Alien CF ATA, other games have it other way
 
 	// pingu ATA i/f, similar to konami/konamigs.cpp
@@ -260,19 +264,7 @@ static INPUT_PORTS_START( alien )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20000000, 0x20000000, "SW2:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40000000, 0x40000000, "SW2:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80000000, 0x80000000, "SW2:8" )
-
 INPUT_PORTS_END
-
-
-void alien_state::machine_start()
-{
-}
-
-void alien_state::machine_reset()
-{
-	//m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	m_sio_irq_state = false;
-}
 
 template <unsigned N> void alien_state::gpu_irq_w(int state)
 {
@@ -293,13 +285,25 @@ void medalusion_devices(device_slot_interface &device)
 	device.option_add("cfcard", ATA_CF);
 }
 
+void alien_state::machine_start()
+{
+	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0cffffff, 0, &m_workram[0]);
+}
+
+void alien_state::machine_reset()
+{
+	//m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_sio_irq_state = false;
+}
+
 void alien_state::alien(machine_config &config)
 {
 	/* basic machine hardware */
 	SH4LE(config, m_maincpu, MASTER_CLOCK);    /* 200MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &alien_state::alien_map);
 	m_maincpu->set_periodic_int(FUNC(alien_state::sio_irq_w), attotime::from_hz(60));
-	m_maincpu->set_force_no_drc(true);
+//	m_maincpu->set_force_no_drc(true);
 
 	// Configured as FCRAM 16MBit with 8MB / 64-bit data bus thru MMR register
 	RAM(config, m_vram);
