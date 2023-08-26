@@ -560,7 +560,6 @@ void wd_fdc_device_base::read_sector_start()
 
 	main_state = READ_SECTOR;
 	status &= ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM);
-	drop_drq();
 	update_sso();
 	set_hld();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
@@ -664,7 +663,6 @@ void wd_fdc_device_base::read_track_start()
 
 	main_state = READ_TRACK;
 	status &= ~(S_LOST|S_RNF);
-	drop_drq();
 	update_sso();
 	set_hld();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
@@ -743,7 +741,6 @@ void wd_fdc_device_base::read_id_start()
 
 	main_state = READ_ID;
 	status &= ~(S_WP|S_DDM|S_LOST|S_RNF);
-	drop_drq();
 	update_sso();
 	set_hld();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
@@ -820,7 +817,6 @@ void wd_fdc_device_base::write_track_start()
 
 	main_state = WRITE_TRACK;
 	status &= ~(S_WP|S_DDM|S_LOST|S_RNF);
-	drop_drq();
 	update_sso();
 	set_hld();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
@@ -947,7 +943,6 @@ void wd_fdc_device_base::write_sector_start()
 
 	main_state = WRITE_SECTOR;
 	status &= ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM);
-	drop_drq();
 	update_sso();
 	set_hld();
 	sub_state = motor_control  ? SPINUP : SPINUP_DONE;
@@ -1288,6 +1283,7 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 	else
 	{
 		intrq_cond = 0;
+		drop_drq();
 		// set busy, then set a timer to process the command
 		status |= S_BUSY;
 		delay_cycles(t_cmd, dden ? delay_command_commit*2 : delay_command_commit);
@@ -2353,11 +2349,6 @@ void wd_fdc_device_base::drop_drq()
 	if(drq) {
 		drq = false;
 		drq_cb(false);
-		if(main_state == IDLE && (status & S_BUSY)) {
-			status &= ~S_BUSY;
-			intrq = true;
-			intrq_cb(intrq);
-		}
 	}
 }
 
