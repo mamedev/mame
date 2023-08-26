@@ -176,7 +176,7 @@ void alien_state::alien_map(address_map &map)
 			}
 			return 0xffffffff;
 		}),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+		NAME([] (offs_t offset, u32 data, u32 mem_mask) {
 			// writing to 0x14000000: outputs
 		})
 	);
