@@ -231,7 +231,7 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"   Ayarla kaydedildi    \n"
+"   Ayarlar kaydedildi    \n"
 "\n"
 
 #: src/frontend/mame/ui/selsoft.cpp:510 src/frontend/mame/ui/selgame.cpp:318
@@ -241,7 +241,7 @@ msgid ""
 " added to favorites list."
 msgstr ""
 "%s\n"
-favori listesine eklendi."
+" favori listesine eklendi."
 
 #: src/frontend/mame/ui/selsoft.cpp:515 src/frontend/mame/ui/selgame.cpp:323
 #: src/frontend/mame/ui/selgame.cpp:329
