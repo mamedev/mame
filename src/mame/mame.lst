@@ -24257,6 +24257,9 @@ simpsons4pe2                    // GX072 (c) 1991 (World)
 spy                             // GX857 (c) 1989 (World)
 spyu                            // GX857 (c) 1989 (US)
 
+@source:konami/stingnet.cpp
+tropchnc						// GC968 (c) 1999
+
 @source:konami/surpratk.cpp
 suratk                          // GX911 (c) 1990 (World)
 suratka                         // GX911 (c) 1990 (Asia)
