@@ -15,11 +15,6 @@
     GC965 Magic Timer Poker
     GC966 Joker Time
     GC967 Egyptian Slot
-
-    TODO: With VBL IRQs working, the deferred function to load the first stage boot from the CD-ROM is jumped to
-    at 0xFFFA9578 but it immediately hits an alignment fault trying to store a 32-bit word to a 16-bit aligned
-    address.  (Does the 403 maybe not have that exception?  The PPC architecture docs indicate it's not a requirement
-    for all implementations.  Or is this an early security failure?).
 */
 
 #include "emu.h"
@@ -94,6 +89,7 @@ void stingnet_state::main_map(address_map &map)
 	map(0x71000000, 0x71000007).noprw();    // TODO: what is going on here?
 	map(0x71000010, 0x71000013).ram();
 	map(0x72000000, 0x7200000f).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w));
+	map(0x72000010, 0x7200001f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w));
 	map(0x73000000, 0x730000ff).rw(m_gcu, FUNC(k057714_device::read), FUNC(k057714_device::write));
 	map(0x7ff00000, 0x7ff7ffff).mirror(0x00080000).rom().region("program", 0);
 }
