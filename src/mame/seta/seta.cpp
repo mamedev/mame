@@ -10995,8 +10995,8 @@ ROM_END
 
 ROM_START( gderby )
 	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE(      "2even.new", 0x000000, 0x10000, CRC(c499bf4d) SHA1(2417eac2972bbb0f8f0a4a1fd72c9d78537367c7) )
-	ROM_LOAD16_BYTE(      "3odd.new",  0x000001, 0x10000, CRC(e7b0677e) SHA1(90dbd710623ff57b953483240e1006c9bda3fc91) )
+	ROM_LOAD16_BYTE(      "2even.new", 0x000000, 0x10000, CRC(9f96a2ed) SHA1(b5d112f6e795863e3daffa4707ca4e059e6fa667) )
+	ROM_LOAD16_BYTE(      "3odd.new",  0x000001, 0x10000, CRC(16507ed8) SHA1(26bcebb18baf94307fdf6c67c73714cd4a5beb63) )
 	ROM_FILL(                               0x020000, 0xe0000, 0xff )
 	ROM_LOAD16_WORD_SWAP( "ya-002-001.u18", 0x100000, 0x80000, CRC(dd108016) SHA1(1554de4cc1a9436a1e62400cd96c9752a2098f99) )
 	ROM_FILL(                               0x180000, 0x80000, 0xff )
