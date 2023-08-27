@@ -23,11 +23,11 @@ TODO:
     the PROM come from the tilemap attribute bits for the tile behind (or,
     in the case of tilemaps with the priority bit set, potentially in front
     of) the sprite! This is hacked around by assuming one particular bit is
-    always set, to make the colors correct during super locomotive mode.
-   There is currently a very nasty hack in the sprite code to make this look
-    correct; the correct solution will most likely require the sprite drawing
-    code to be rewritten, or perhaps merged with the more-capable code
-    in system1_v.cpp, as noted below.
+    always set on the top half of the screen, to make the colors correct
+    during super locomotive mode.
+   The correct solution will most likely require the sprite drawing code to
+   be rewritten, or perhaps merged with the more-capable code in
+   system1_v.cpp, as noted below.
  * Consider merging parts of or the complete driver with system1.cpp
     and system1_v.cpp, or deriving common code to its own file.
    The sprite systems use the same customs, although hooked up somewhat
@@ -39,12 +39,14 @@ TODO:
    The PPI hookup is different, and the maincpu memory map is different.
    The tilemap systems are also very similar, particularly to the early
    system1 boards like up'n down.
- * The MUTE output isn't hooked up properly yet.
  * The bg rowscroll system should have 'overflow' pixels from the right screen
     edge show on the very left screen edge for scroll values where the low 3
     bits are not zero. This is an original hardware bug and can be seen in pcb
     videos, particularly at the end of the bonus stage when the man runs on
     screen followed by the text "GO ON TO NEXT ROUND!"
+ * Not enough tiles are rendered at the extreme left and right edges of the
+    screen; there should be at least one more bg tile visible on each edge.
+   This means the game's current horizontal resolution is wrong.
 
 BTANBs:
  * When passing through the trestle bridge, there is one light green dot per
@@ -421,7 +423,7 @@ void suprloco_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 uint32_t suprloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (!BIT(m_control,4)) // force blank
+	if (!BIT(m_control, 4)) // force blank
 	{
 		bitmap.fill(0, cliprect);
 		return 0;
@@ -486,7 +488,7 @@ void suprloco_state::decrypted_opcodes_map(address_map &map)
 1  0  0  x  x  *  *  *  *  *  *  *  *  *  *  *  RW  - 0x8000 - RAM@IC65
 1  0  1  x  x  x  x  x  x  x  x  x  x  x  x  x   W  - 0xA000 - SN76489A@IC78
 1  1  0  x  x  x  x  x  x  x  x  x  x  x  x  x   W  - 0xC000 - SN76489A@IC79
-1  1  1  x  x  x  x  x  x  x  x  x  x  x  x  x  R   - 0xE000 - read byte from maincpu PPI@IC41 (in MODE 1?)'s port A by strobing PC6 low
+1  1  1  x  x  x  x  x  x  x  x  x  x  x  x  x  R   - 0xE000 - read byte from maincpu PPI@IC41's port A by strobing PC6 low
 */
 
 void suprloco_state::sound_map(address_map &map)
@@ -631,7 +633,9 @@ void suprloco_state::suprloco(machine_config &config)
 	i8255_device &ppi(I8255A(config, "ppi"));
 	ppi.out_pb_callback().set(FUNC(suprloco_state::control_w));
 	ppi.tri_pb_callback().set_constant(0);
-	ppi.out_pc_callback().set_output("lamp0").bit(0).invert(); ///TODO: 8255 portc bit 0 is MUTE, same as in system1, not a lamp.
+	ppi.out_pc_callback().set([this](offs_t offset, u8 data) {
+		machine().sound().system_mute(BIT(data, 0));
+	});
 	ppi.out_pc_callback().append_inputline(m_audiocpu, INPUT_LINE_NMI).bit(7).invert();
 
 	// video hardware
@@ -651,12 +655,12 @@ void suprloco_state::suprloco(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	///TODO: sn1 goes into the pin 9 input of sn2, which is poorly documented for mixing; instead, we just duplicate the second filter here for now
-	FILTER_RC(config, m_filter_1).set_rc(filter_rc_device::HIGHPASS, RES_K(27), 0, 0, CAP_U(10)); //CR high-pass R5+C78+VR1(2kohm)
+	FILTER_RC(config, m_filter_1).set_rc(filter_rc_device::HIGHPASS, RES_K(27), 0, 0, CAP_U(10)); // R5+C78+VR1(2kohm)
 	m_filter_1->add_route(ALL_OUTPUTS, "mono", 0.707);
-	FILTER_RC(config, m_filter_1a).set_rc(filter_rc_device::HIGHPASS, RES_K(22), 0, 0, CAP_U(10)); //CR high-pass R2+C72
+	FILTER_RC(config, m_filter_1a).set_rc(filter_rc_device::HIGHPASS, RES_K(22), 0, 0, CAP_U(10)); // R2+C72
 	m_filter_1a->add_route(ALL_OUTPUTS, m_filter_1, 1.0);
 	SN76489A(config, "sn1", MASTER_CLOCK/5).add_route(ALL_OUTPUTS, m_filter_1a, 1.0); // see above re: /5 divider
-	FILTER_RC(config, m_filter_2).set_rc(filter_rc_device::HIGHPASS, RES_K(27), 0, 0, CAP_U(10)); //CR high-pass R5+C78+VR1(2kohm)
+	FILTER_RC(config, m_filter_2).set_rc(filter_rc_device::HIGHPASS, RES_K(27), 0, 0, CAP_U(10)); // R5+C78+VR1(2kohm)
 	m_filter_2->add_route(ALL_OUTPUTS, "mono", 0.707);
 	SN76489A(config, "sn2", MASTER_CLOCK/10).add_route(ALL_OUTPUTS, m_filter_2, 1.0); // see above re: /5 divider (itself divided by 2)
 }
@@ -696,10 +700,10 @@ ROM_START( suprloco )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "pr-5221.7",       0x0000, 0x0020, CRC(89ba674f) SHA1(17c87840c8011968675a5a6f55966467df02364b) ) // tilemap palette latch timing
 
-	// Two undumped PALS:
+	// Two undumped PALs:
 	// PAL16R4@IC20: horizontal counter carry, CSYNC generation, and sprite DMA timing
 	// PAL16R4@IC30: vertical counter handling, maincpu INT generation, and VSYNC timing
-	// These are NOT the same as the two pals in System1, and some of the functions are switched around there!
+	// These are NOT the same as the two PALs in System 1, and some of the functions are switched around there!
 ROM_END
 
 ROM_START( suprlocoo )
@@ -730,10 +734,10 @@ ROM_START( suprlocoo )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "pr-5221.7",       0x0000, 0x0020, CRC(89ba674f) SHA1(17c87840c8011968675a5a6f55966467df02364b) ) // tilemap palette latch timing
 
-	// Two undumped PALS:
+	// Two undumped PALs:
 	// PAL16R4@IC20: horizontal counter carry, CSYNC generation, and sprite DMA timing
 	// PAL16R4@IC30: vertical counter handling, maincpu INT generation, and VSYNC timing
-	// These are NOT the same as the two pals in System1, and some of the functions are switched around there!
+	// These are NOT the same as the two PALs in System 1, and some of the functions are switched around there!
 ROM_END
 
 void suprloco_state::init_suprloco()
