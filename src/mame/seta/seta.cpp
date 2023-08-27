@@ -11304,7 +11304,7 @@ void jockeyc_state::init_inttoote()
 ***************************************************************************/
 
 GAME( 1989?, setaroul,  0,        setaroul,  setaroul,  setaroul_state, empty_init,    ROT270, "Visco",                     "The Roulette (Visco)", MACHINE_CLICKABLE_ARTWORK )
-GAME( 1989?, setaroula, setaroul, setaroul,  setaroul,  setaroul_state, empty_init,    ROT270, "hack (CODERE)",             "Super Ruleta 36 (hack of The Roulette)", MACHINE_CLICKABLE_ARTWORK )
+GAME( 1989?, setaroula, setaroul, setaroul,  setaroul,  setaroul_state, empty_init,    ROT270, "hack (CODERE)",             "Super Ruleta 36 (Spanish hack of The Roulette)", MACHINE_CLICKABLE_ARTWORK )
 
 GAME( 1989, drgnunit,  0,        drgnunit,  drgnunit,  seta_state,     empty_init,     ROT0,   "Athena / Seta",             "Dragon Unit / Castle of Dragon", 0 ) // Country/License: DSW
 
