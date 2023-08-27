@@ -122,7 +122,6 @@ private:
 	void ifu_dpram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void gcu_interrupt(int state);
-	INTERRUPT_GEN_MEMBER(vbl_interrupt);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -382,19 +381,11 @@ void konendev_state::gcu_interrupt(int state)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ3, state);
 }
 
-
-INTERRUPT_GEN_MEMBER(konendev_state::vbl_interrupt)
-{
-	device.execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
-	device.execute().set_input_line(INPUT_LINE_IRQ3, ASSERT_LINE);
-}
-
 void konendev_state::konendev(machine_config &config)
 {
 	// basic machine hardware
 	PPC403GCX(config, m_maincpu, 32'000'000); // Clock unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &konendev_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(konendev_state::vbl_interrupt));
 
 	H83007(config, m_ifu, 8'000'000); // Clock unknown
 	m_ifu->set_addrmap(AS_PROGRAM, &konendev_state::ifu_map);
@@ -421,6 +412,7 @@ void konendev_state::konendev(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480); // Based on Firebeat settings
 	screen.set_screen_update(FUNC(konendev_state::screen_update));
 	screen.set_palette("palette");
+	screen.screen_vblank().set(m_gcu, FUNC(k057714_device::vblank_w));
 
 	K057714(config, m_gcu, 0).set_screen("screen");
 	m_gcu->irq_callback().set(FUNC(konendev_state::gcu_interrupt));
