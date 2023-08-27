@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh7604.h"
 #include "cpu/scudsp/scudsp.h"
 
 #define IRQ_VBLANK_IN  1 << 0
@@ -84,7 +84,7 @@ private:
 	bool m_t1md;
 	bool m_tenb;
 
-	required_device<sh2_device> m_hostcpu;
+	required_device<sh2_sh7604_device> m_hostcpu;
 	address_space *m_hostspace;
 	void test_pending_irqs();
 
