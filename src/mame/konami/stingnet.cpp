@@ -164,7 +164,7 @@ ROM_START( tropchnc )
 	ROM_REGION32_BE(0x80000, "program", 0) // PowerPC program ROMs
 	ROM_LOAD("839ssua01.bin", 0x000000, 0x080000, CRC(007ae177) SHA1(7ded12ee3c07ce1d607d1c9fba2c0e3a69dfb294))
 
-	ROM_REGION(0x200000, "ymz280b", 0)  // YMZ280B samples
+	ROM_REGION(0x200000, "ymz280b", ROMREGION_ERASE00)  // YMZ280B samples
 
 	DISK_REGION("ata:0:cdrom")
 	DISK_IMAGE("gc968_ver_01", 0, SHA1(e96731a68e306876b9665cb9c1d69b9aa38acc3b))
