@@ -10990,6 +10990,37 @@ ROM_START( inttoote )
 	ROM_LOAD( "ya_011_012.u64", 0x80000, 0x80000, CRC(a8015ce6) SHA1(bb0b589856ec82e1fd42be9af89b07ba1d17e595) )
 ROM_END
 
+// Gran Derby (Spanish hack of Jockey Club)
+// CODERE massive production.
+
+ROM_START( gderby )
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE(      "2even.new", 0x000000, 0x10000, CRC(c499bf4d) SHA1(2417eac2972bbb0f8f0a4a1fd72c9d78537367c7) )
+	ROM_LOAD16_BYTE(      "3odd.new",  0x000001, 0x10000, CRC(e7b0677e) SHA1(90dbd710623ff57b953483240e1006c9bda3fc91) )
+	ROM_FILL(                               0x020000, 0xe0000, 0xff )
+	ROM_LOAD16_WORD_SWAP( "ya-002-001.u18", 0x100000, 0x80000, CRC(dd108016) SHA1(1554de4cc1a9436a1e62400cd96c9752a2098f99) )
+	ROM_FILL(                               0x180000, 0x80000, 0xff )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD16_BYTE( "ya-001-007-t77.u27", 0x000000, 0x80000, CRC(2dc7a294) SHA1(97f2aa9939a45aaa94d4aeb2fcd5b7f30204b942) )
+	ROM_LOAD16_BYTE( "ya-001-006-t76.u22", 0x000001, 0x80000, CRC(bfae01a5) SHA1(3be83972c3987e9bf722cd6db7770f074587301c) )
+	ROM_LOAD16_BYTE( "ya-001-005-t75.u17", 0x100000, 0x80000, CRC(4a6c804b) SHA1(b596b9b0b3b453c26f9c7f976ff4d56eac4fac04) )
+	ROM_LOAD16_BYTE( "ya-001-004-t74.u10", 0x100001, 0x80000, CRC(eb74d2e0) SHA1(221ff6cc03ce57a7fcbe418f1c12a293990f8a7d) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )    /* Layer 1 */
+	ROM_LOAD16_BYTE( "ya-001-008-t59.u35", 0x000000, 0x40000, CRC(4b890f83) SHA1(fde6544898a0691b550f3045803f2e81cfeb5fe9) )
+	ROM_LOAD16_BYTE( "ya-001-009-t60.u41", 0x000001, 0x40000, CRC(caa5e3c1) SHA1(63cccc5479040a02872febc8d7f2d46096e138d1) )
+
+	ROM_REGION( 0x400, "proms", 0 ) /* Colours */
+	ROM_LOAD16_BYTE( "ya1-010.prom", 0x000, 0x200, CRC(778094b3) SHA1(270329a0d544dc7a8240d6dab08ccd54ea87ab70) )
+	ROM_LOAD16_BYTE( "ya1-011.prom", 0x001, 0x200, CRC(bd4fe2f6) SHA1(83d9f9db3fbfa2d172f5227c397ea4d5a9687015) )
+
+	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
+	ROM_LOAD( "ya-001-013.u71", 0x00000, 0x80000, CRC(2bccaf47) SHA1(1658643444d575410f11b648e0d7ae6c43fcf1ea) )
+	ROM_LOAD( "ya-001-012.u64", 0x80000, 0x80000, CRC(a8015ce6) SHA1(bb0b589856ec82e1fd42be9af89b07ba1d17e595) )
+ROM_END
+
+
 /***************************************************************************
 
 The Roulette (Visco)
@@ -11273,7 +11304,7 @@ void jockeyc_state::init_inttoote()
 ***************************************************************************/
 
 GAME( 1989?, setaroul,  0,        setaroul,  setaroul,  setaroul_state, empty_init,    ROT270, "Visco",                     "The Roulette (Visco)", MACHINE_CLICKABLE_ARTWORK )
-GAME( 1989?, setaroula, setaroul, setaroul,  setaroul,  setaroul_state, empty_init,    ROT270, "hack (CODERE)",             "Super Ruleta 36 (hack of 'The Roulette')", MACHINE_CLICKABLE_ARTWORK )
+GAME( 1989?, setaroula, setaroul, setaroul,  setaroul,  setaroul_state, empty_init,    ROT270, "hack (CODERE)",             "Super Ruleta 36 (hack of The Roulette)", MACHINE_CLICKABLE_ARTWORK )
 
 GAME( 1989, drgnunit,  0,        drgnunit,  drgnunit,  seta_state,     empty_init,     ROT0,   "Athena / Seta",             "Dragon Unit / Castle of Dragon", 0 ) // Country/License: DSW
 
@@ -11290,6 +11321,7 @@ GAME( 1994, superbar,  wiggie,   superbar,  thunderl,  seta_state,     init_wigg
 GAME( 1990, jockeyc,   0,        jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "Seta (Visco license)",      "Jockey Club (v1.18)", MACHINE_CLICKABLE_ARTWORK )
 GAME( 1993, inttoote2, jockeyc,  jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "bootleg (Coinmaster)",      "International Toote II (v1.24, P387.V01)", MACHINE_CLICKABLE_ARTWORK )
 GAME( 1998, inttoote,  jockeyc,  inttoote,  inttoote,  jockeyc_state,  init_inttoote,  ROT0,   "bootleg (Coinmaster)",      "International Toote (Germany, P523.V01)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_CLICKABLE_ARTWORK )
+GAME( 1990, gderby,    jockeyc,  jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "hack (CODERE)",             "Gran Derby (Spanish hack of Jockey Club)", MACHINE_CLICKABLE_ARTWORK )
 
 GAME( 1991, rezon,     0,        rezon,     rezon,     seta_state,     init_rezon,     ROT0,   "Allumer",                   "Rezon", 0 )
 GAME( 1992, rezont,    rezon,    rezon,     rezont,    seta_state,     init_rezon,     ROT0,   "Allumer (Taito license)",   "Rezon (Taito)", 0 )
