@@ -11167,6 +11167,38 @@ ROM_START( setaroul )
 	ROM_LOAD16_BYTE( "uf0-018.u51", 0x001, 0x200, CRC(1c584d5f) SHA1(f1c7e3da8b108d78b459cae53fabb6e28d3a7ee8) )
 ROM_END
 
+// Super Ruleta 36 (hack of The Roulette)
+// CODERE Argentina. Massive production.
+
+ROM_START( setaroula )
+	ROM_REGION( 0x0c0000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "2_sp_old.bin", 0x000000, 0x010000, CRC(5561caae) SHA1(facab731a8c5fce39be72c9988b8e10ba62a0a37) )
+	ROM_LOAD16_BYTE( "3_sp_old.bin", 0x000001, 0x010000, CRC(554aa3e2) SHA1(7d8ef54fc3349be079c60dcb244dd3c2336a6bd1) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD16_BYTE( "005_sp_old.bin", 0x010001, 0x008000, CRC(5a289858) SHA1(3f698e5f09fb124c590cf4481b370c2985e92852) )
+	ROM_LOAD16_BYTE( "006_sp_old.bin", 0x010000, 0x008000, CRC(07b275ee) SHA1(77064e8f9ff85e8930eac43fc158ccf0a165f81e) )
+	ROM_LOAD16_BYTE( "007_sp_old.bin", 0x000001, 0x008000, CRC(deebf76e) SHA1(f9b794e08eabb76f38f991ebe653863e4e23dd83) )
+	ROM_LOAD16_BYTE( "008_sp_old.bin", 0x000000, 0x008000, CRC(e7363dc6) SHA1(759f271ec0b0079d686f2bd7b4379b762a7c7331) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* Layer 1 - 8bpp */
+	ROM_LOAD32_BYTE( "uf0-010.u15", 0x000000, 0x080000, CRC(0af13a56) SHA1(c294b7947d004c0e0b280ca44636e4059e05a57e) )
+	ROM_LOAD32_BYTE( "uf0-012.u29", 0x000001, 0x080000, CRC(cba2a6b7) SHA1(8627eda24c6980a0e786fd9dc06176893a33c58f) )
+	ROM_LOAD32_BYTE( "uf0-014.u38", 0x000002, 0x080000, CRC(da2bd4e4) SHA1(244af8705f2fa4ab3f3a002af16a0e4d60e03de8) )
+	ROM_LOAD32_BYTE( "uf0-015.u40", 0x000003, 0x080000, CRC(11dc19fa) SHA1(e7084f61d075a61249d924a523c32e7993d9ae46) )
+	ROM_LOAD32_BYTE( "uf0-009.u13", 0x200000, 0x080000, CRC(20f2d7f5) SHA1(343a8fac76d6ee7f845f9988c491698ebd0150d4) )
+	ROM_LOAD32_BYTE( "uf0-011.u22", 0x200001, 0x080000, CRC(af60adf9) SHA1(6505cbce6e066d75b779fdbe2c034ba4daabbefe) )
+	ROM_LOAD32_BYTE( "uf0-013.u37", 0x200002, 0x080000, CRC(645ec3c3) SHA1(e9b8056c68bf33b0b7130a5ce2bafd11dfd6c29b) )
+	ROM_LOAD32_BYTE( "uf0-016.u48", 0x200003, 0x080000, CRC(10f99fa8) SHA1(7ef9a3f71dd071483cf3513ef57e2fcfe8702994) )
+
+	ROM_REGION( 0x100000, "x1snd", ROMREGION_ERASE00 )  /* Samples */
+	ROM_LOAD( "uf1-004.u52",     0x040000, 0x020000, CRC(6638054d) SHA1(f5c4a4c822ee56cfcbb4e8401253ae0a2c2c1df7) )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD16_BYTE( "uf0-017.u50", 0x000, 0x200, CRC(bf50c303) SHA1(31685ed4849e5c27654f02945678db425d54bf5e) )
+	ROM_LOAD16_BYTE( "uf0-018.u51", 0x001, 0x200, CRC(1c584d5f) SHA1(f1c7e3da8b108d78b459cae53fabb6e28d3a7ee8) )
+ROM_END
+
 
 void seta_state::init_bankx1()
 {
@@ -11240,7 +11272,8 @@ void jockeyc_state::init_inttoote()
 
 ***************************************************************************/
 
-GAME( 1989?,setaroul,  0,        setaroul,  setaroul,  setaroul_state, empty_init,     ROT270, "Visco",                     "The Roulette (Visco)", MACHINE_CLICKABLE_ARTWORK )
+GAME( 1989?, setaroul,  0,        setaroul,  setaroul,  setaroul_state, empty_init,    ROT270, "Visco",                     "The Roulette (Visco)", MACHINE_CLICKABLE_ARTWORK )
+GAME( 1989?, setaroula, setaroul, setaroul,  setaroul,  setaroul_state, empty_init,    ROT270, "hack (CODERE)",             "Super Ruleta 36 (hack of 'The Roulette')", MACHINE_CLICKABLE_ARTWORK )
 
 GAME( 1989, drgnunit,  0,        drgnunit,  drgnunit,  seta_state,     empty_init,     ROT0,   "Athena / Seta",             "Dragon Unit / Castle of Dragon", 0 ) // Country/License: DSW
 
