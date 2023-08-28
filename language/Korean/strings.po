@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-18 05:29+1100\n"
-"PO-Revision-Date: 2023-08-24 15:00+0900\n"
+"PO-Revision-Date: 2023-08-28 13:32+0900\n"
 "Last-Translator: Potmarigold(Nise)\n"
 "Language-Team: MAME Language Team\n"
 "Language: ko\n"
@@ -275,7 +275,7 @@ msgstr "%1$s %2$s ( %3$d / %4$d 소프트웨어 패키지 )"
 #: src/frontend/mame/ui/selsoft.cpp:757
 #, c-format
 msgid "%1$s - select software"
-msgstr "1$s - 소프트웨어 선택"
+msgstr "%1$s - 소프트웨어 선택"
 
 #: src/frontend/mame/ui/selsoft.cpp:762 src/frontend/mame/ui/selgame.cpp:1092
 #, c-format
@@ -290,7 +290,7 @@ msgstr "검색 : %1$s_"
 #: src/frontend/mame/ui/selsoft.cpp:771
 #, c-format
 msgid "Software list/item: %1$s:%2$s"
-msgstr "소프트웨어 목록/항목 : 1$s:%2$s"
+msgstr "소프트웨어 목록/항목 : %1$s:%2$s"
 
 #: src/frontend/mame/ui/optsmenu.cpp:45 src/frontend/mame/ui/selgame.cpp:462
 msgid "General Settings"
@@ -1002,7 +1002,7 @@ msgid ""
 "CPU:\n"
 msgstr ""
 "%1$s\n"
-"2$s %3$s\n"
+"%2$s %3$s\n"
 "드라이버 : %4$s\n"
 "\n"
 "CPU :\n"
@@ -1840,24 +1840,24 @@ msgstr "잘못된 조합 입력"
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog"
-msgstr "1$s 아날로그"
+msgstr "%1$s 아날로그"
 
 #: src/frontend/mame/ui/inputmap.cpp:565
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Inc"
-msgstr "1$s 아날로그 증가"
+msgstr "%1$s 아날로그 증가"
 
 #: src/frontend/mame/ui/inputmap.cpp:566
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Dec"
-msgstr "1$s 아날로그 감소"
+msgstr "%1$s 아날로그 감소"
 
 #: src/frontend/mame/ui/inputmap.cpp:608
 #, c-format
 msgid "Press %1$s to set\n"
-msgstr "설정하려면 1$s을(를) 누르세요.\n"
+msgstr "설정하려면 %1$s을(를) 누르세요.\n"
 
 #: src/frontend/mame/ui/inputmap.cpp:609
 #, c-format
@@ -2036,11 +2036,11 @@ msgid ""
 "If this is your first time using %2$s, please see the %2$s.pdf file in the "
 "docs folder for information on setting up and using %2$s."
 msgstr ""
-"시스템 ROM을 찾을 수 없습니다. 1$s.ini 파일에 지정된 롬 경로 설정을 확인하십"
+"시스템 ROM을 찾을 수 없습니다. %1$s.ini 파일에 지정된 롬 경로 설정을 확인하십"
 "시오.\n"
 "\n"
-"2$s를 처음 사용하는 경우 문서 폴더에 있는 %2$s.pdf 파일에서 %2$s 설정 및 사용"
-"에 대한 정보를 참조하세요."
+"%2$s를 처음 사용하는 경우 문서 폴더에 있는 %2$s.pdf 파일에서 %2$s 설정 및 사"
+"용에 대한 정보를 참조하세요."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:329
 #, c-format
@@ -2442,7 +2442,7 @@ msgstr " (%1$u %2$u) = GFX%3$u #%4$X:%5$X"
 #, c-format
 msgctxt "gfxview"
 msgid " %1$d×%2$d origin (%3$d %4$d)"
-msgstr " 1$d×%2$d 원점(%3$d %4$d)"
+msgstr " %1$d×%2$d 원점(%3$d %4$d)"
 
 #: src/frontend/mame/ui/selgame.cpp:463
 msgid "System Settings"
@@ -2451,7 +2451,7 @@ msgstr "시스템 설정"
 #: src/frontend/mame/ui/selgame.cpp:1076
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d systems (%5$d BIOS) )"
-msgstr "1$s %2$s ( %3$d / %4$d 시스템 (%5$d 바이오스) )"
+msgstr "%1$s %2$s ( %3$d / %4$d 시스템 (%5$d 바이오스) )"
 
 #: src/frontend/mame/ui/selgame.cpp:1104
 #, c-format
@@ -2495,7 +2495,7 @@ msgid ""
 "Auditing media for system %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
-"3$u의 %2$u 시스템에 대한 매체를 심사 중...\n"
+"%3$u의 %2$u 시스템에 대한 매체를 심사 중...\n"
 "%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:128
@@ -2514,7 +2514,7 @@ msgstr ""
 #: src/frontend/mame/ui/auditmenu.cpp:148
 #, c-format
 msgid "Audit media for %1$u systems marked unavailable"
-msgstr "1$u 시스템에 대한 심사 매체가 사용 불가능으로 표시됨"
+msgstr "%1$u 시스템에 대한 심사 매체가 사용 불가능으로 표시됨"
 
 #: src/frontend/mame/ui/auditmenu.cpp:149
 #, c-format
@@ -2865,25 +2865,25 @@ msgstr "아날로그 입력 설정 도움말"
 #, c-format
 msgctxt "menu-analoginput"
 msgid "%1$s Increment/Decrement Speed"
-msgstr "1$s 증가/감소 속도"
+msgstr "%1$s 증가/감소 속도"
 
 #: src/frontend/mame/ui/analogipt.cpp:426
 #, c-format
 msgctxt "menu-analoginput"
 msgid "%1$s Auto-centering Speed"
-msgstr "1$s 자동 센터링 속도"
+msgstr "%1$s 자동 센터링 속도"
 
 #: src/frontend/mame/ui/analogipt.cpp:431
 #, c-format
 msgctxt "menu-analoginput"
 msgid "%1$s Reverse"
-msgstr "1$s 반전"
+msgstr "%1$s 반전"
 
 #: src/frontend/mame/ui/analogipt.cpp:436
 #, c-format
 msgctxt "menu-analoginput"
 msgid "%1$s Sensitivity"
-msgstr "1$s 감도"
+msgstr "%1$s 감도"
 
 #: src/frontend/mame/ui/analogipt.cpp:451
 msgctxt "menu-analoginput"
@@ -3753,25 +3753,25 @@ msgstr "위에서 아래로(간격 없음)"
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom"
-msgstr "1$u×%2$u 왼쪽에서 오른쪽으로, 위에서 아래로"
+msgstr "%1$u×%2$u 왼쪽에서 오른쪽으로, 위에서 아래로"
 
 #: src/emu/render.cpp:2065
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom (Gapless)"
-msgstr "1$u×%2$u 왼쪽에서 오른쪽으로, 위에서 아래로(간격 없음)"
+msgstr "%1$u×%2$u 왼쪽에서 오른쪽으로, 위에서 아래로(간격 없음)"
 
 #: src/emu/render.cpp:2074
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right"
-msgstr "1$u×%2$u 위에서 아래로, 왼쪽에서 오른쪽으로"
+msgstr "%1$u×%2$u 위에서 아래로, 왼쪽에서 오른쪽으로"
 
 #: src/emu/render.cpp:2083
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right (Gapless)"
-msgstr "1$u×%2$u 위에서 아래로, 왼쪽에서 오른쪽으로(간격 없음)"
+msgstr "%1$u×%2$u 위에서 아래로, 왼쪽에서 오른쪽으로(간격 없음)"
 
 #: src/emu/ioport.cpp:271
 #, c-format
@@ -6177,7 +6177,7 @@ msgstr "타임코드 : 추가 %d 기간 %s"
 #, lua-format
 msgctxt "plugin-timecode"
 msgid " %s%s%02d:%02d [paused] "
-msgstr "s%s%02d:%02d [일시 중지]"
+msgstr "%s%s%02d:%02d [일시 중지]"
 
 #: plugins/timecode/init.lua:207
 #, lua-format
