@@ -24258,7 +24258,7 @@ spy                             // GX857 (c) 1989 (World)
 spyu                            // GX857 (c) 1989 (US)
 
 @source:konami/stingnet.cpp
-tropchnc						// GC968 (c) 1999
+tropchnc                        // GC968 (c) 1999
 
 @source:konami/surpratk.cpp
 suratk                          // GX911 (c) 1990 (World)
@@ -30212,6 +30212,11 @@ houseball                       // (c) 1989 Olakoa
 @source:misc/imolagp.cpp
 imolagp                         // (c) 198? RB Bologna
 imolagpo                        // (c) 198? RB Bologna
+
+@source:misc/interflip8035.cpp
+cbrava                          //
+sevilla                         //
+toledo                          //
 
 @source:misc/intrscti.cpp
 intrscti                        // ????

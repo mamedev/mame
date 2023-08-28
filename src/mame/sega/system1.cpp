@@ -3025,7 +3025,7 @@ ROM_START( swat ) /* Sega game ID# 834-5388 SWAT */
 ROM_END
 
 
-ROM_START( flicky )
+ROM_START( flicky ) /* Sega game ID# 834-5411-04 FLICKY */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-5978a.116",  0x0000, 0x4000, CRC(296f1492) SHA1(52e2c63ce376ab8124b2c68bdfa432b6621cfa78) ) /* encrypted */
 	ROM_LOAD( "epr-5979a.109",  0x4000, 0x4000, CRC(64b03ef9) SHA1(7519aa7f036bce6d52a5d4be2418139559f9a8a5) ) /* encrypted */
@@ -3049,8 +3049,7 @@ ROM_START( flicky )
 	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
-// PCB label: 834-5411-11 FLICKY
-ROM_START( flickya )
+ROM_START( flickya ) /* Sega game ID# 834-5411-11 FLICKY */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-5978a.116",  0x0000, 0x4000, CRC(296f1492) SHA1(52e2c63ce376ab8124b2c68bdfa432b6621cfa78) ) /* encrypted */
 	ROM_LOAD( "epr-5979a.109",  0x4000, 0x4000, CRC(64b03ef9) SHA1(7519aa7f036bce6d52a5d4be2418139559f9a8a5) ) /* encrypted */
@@ -3121,12 +3120,12 @@ ROM_START( flickys1 )
 	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
-ROM_START( flickyo )
+ROM_START( flickyo ) /* Sega game ID# 834-5411  FLICKY */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr-5857.bin",   0x0000, 0x2000, CRC(a65ac88e) SHA1(1d1c276f7ffb33bc9f216b6b69517f1783d435a4) ) /* encrypted */
-	ROM_LOAD( "epr-5858a.bin",  0x2000, 0x2000, CRC(18b412f4) SHA1(6205dc2a6c1092f9bc7752672b7c06d5faf2f65e) ) /* encrypted */
-	ROM_LOAD( "epr-5859.bin",   0x4000, 0x2000, CRC(a5558d7e) SHA1(ca59c7e57ae45f960f769db9a04ffa5c870005dd) ) /* encrypted */
-	ROM_LOAD( "epr-5860.bin",   0x6000, 0x2000, CRC(1b35fef1) SHA1(53ca5361309c59a2b3490ea0037c6e58f07837d9) ) /* encrypted */
+	ROM_LOAD( "epr-5857.ic129",  0x0000, 0x2000, CRC(a65ac88e) SHA1(1d1c276f7ffb33bc9f216b6b69517f1783d435a4) ) /* encrypted */
+	ROM_LOAD( "epr-5858a.ic30",  0x2000, 0x2000, CRC(18b412f4) SHA1(6205dc2a6c1092f9bc7752672b7c06d5faf2f65e) ) /* encrypted */
+	ROM_LOAD( "epr-5859.ic31",   0x4000, 0x2000, CRC(a5558d7e) SHA1(ca59c7e57ae45f960f769db9a04ffa5c870005dd) ) /* encrypted */
+	ROM_LOAD( "epr-5860.ic32",   0x6000, 0x2000, CRC(1b35fef1) SHA1(53ca5361309c59a2b3490ea0037c6e58f07837d9) ) /* encrypted */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-5869.120",   0x0000, 0x2000, CRC(6d220d4e) SHA1(fe02a7a94a1ad046fc775a7f67f460c8d0f6dca6) )
