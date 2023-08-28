@@ -34620,6 +34620,9 @@ nmicro
 @source:novag/micro2.cpp
 nmicro2
 
+@source:novag/robotadv.cpp
+robotadv
+
 @source:novag/savant.cpp
 savant                          //
 savant2                         //

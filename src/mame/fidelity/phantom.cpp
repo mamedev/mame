@@ -76,9 +76,9 @@ public:
 		m_display(*this, "display"),
 		m_inputs(*this, "IN.%u", 0),
 		m_piece_hand(*this, "cpu_hand"),
-		m_out_motor(*this, "motor.%u", 0U),
-		m_out_motorx(*this, "motorx%u", 0U),
-		m_out_motory(*this, "motory")
+		m_out_motor(*this, "motor%u", 0U),
+		m_out_magnetx(*this, "magnetx%u", 0U),
+		m_out_magnety(*this, "magnety")
 	{ }
 
 	void phantom(machine_config &config);
@@ -97,18 +97,13 @@ protected:
 	optional_ioport_array<2> m_inputs;
 	output_finder<> m_piece_hand;
 	output_finder<5> m_out_motor;
-	output_finder<2> m_out_motorx;
-	output_finder<> m_out_motory;
+	output_finder<2> m_out_magnetx;
+	output_finder<> m_out_magnety;
 
 	// address maps
 	virtual void main_map(address_map &map);
 
 	// I/O handlers
-	void init_motors();
-	void check_rotation();
-	TIMER_DEVICE_CALLBACK_MEMBER(motors_timer);
-	void update_pieces_position(int state);
-
 	void update_lcd(u8 select);
 	virtual void control_w(offs_t offset, u8 data);
 	void lcd_w(offs_t offset, u8 data);
@@ -119,26 +114,35 @@ protected:
 	u8 hmotor_ff_clear_r();
 	u8 vmotor_ff_clear_r();
 
+	void check_rotation();
+	TIMER_DEVICE_CALLBACK_MEMBER(motors_timer);
+	void update_pieces_position(int state);
+	void output_magnet_pos();
+
 	u8 m_mux = 0;
 	u8 m_select = 0;
 	u32 m_lcd_data = 0;
 
-	u8 m_motors_ctrl;
-	int m_hmotor_pos;
-	int m_vmotor_pos;
-	bool m_vmotor_sensor0_ff;
-	bool m_vmotor_sensor1_ff;
-	bool m_hmotor_sensor0_ff;
-	bool m_hmotor_sensor1_ff;
-	u8 m_pieces_map[0x40][0x40];
+	u8 m_motors_ctrl = 0;
+	int m_hmotor_pos = 0;
+	int m_vmotor_pos = 0;
+	bool m_vmotor_sensor0_ff = false;
+	bool m_vmotor_sensor1_ff = false;
+	bool m_hmotor_sensor0_ff = false;
+	bool m_hmotor_sensor1_ff = false;
+	u8 m_pieces_map[0x80][0x80] = { };
 };
 
 void phantom_state::machine_start()
 {
+	m_hmotor_pos = 0x23;
+	m_vmotor_pos = 0x0e;
+
+	// resolve outputs
 	m_piece_hand.resolve();
 	m_out_motor.resolve();
-	m_out_motorx.resolve();
-	m_out_motory.resolve();
+	m_out_magnetx.resolve();
+	m_out_magnety.resolve();
 
 	// register for savestates
 	save_item(NAME(m_mux));
@@ -156,8 +160,11 @@ void phantom_state::machine_start()
 
 void phantom_state::machine_reset()
 {
-	init_motors();
 	m_rombank->set_entry(0);
+
+	memset(m_pieces_map, 0, sizeof(m_pieces_map));
+	m_piece_hand = 0;
+	output_magnet_pos();
 }
 
 void phantom_state::init_phantom()
@@ -212,19 +219,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(chessterp_state::nmi_timer)
     Motor Sim
 *******************************************************************************/
 
-void phantom_state::init_motors()
-{
-	m_motors_ctrl = 0;
-	m_hmotor_pos = 0x23;
-	m_vmotor_pos = 0x0e;
-	m_vmotor_sensor0_ff = false;
-	m_vmotor_sensor1_ff = false;
-	m_hmotor_sensor0_ff = false;
-	m_hmotor_sensor1_ff = false;
-	memset(m_pieces_map, 0, sizeof(m_pieces_map));
-	m_piece_hand = 0;
-}
-
 void phantom_state::check_rotation()
 {
 	if (m_vmotor_pos != 0 && m_vmotor_pos != 0x88)
@@ -239,6 +233,14 @@ void phantom_state::check_rotation()
 	}
 }
 
+void phantom_state::output_magnet_pos()
+{
+	int on = BIT(m_motors_ctrl, 4);
+	m_out_magnetx[on ^ 1] = 0xd0; // hide
+	m_out_magnetx[on] = m_hmotor_pos;
+	m_out_magnety = m_vmotor_pos;
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER(phantom_state::motors_timer)
 {
 	check_rotation();
@@ -250,16 +252,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(phantom_state::motors_timer)
 	if ((m_motors_ctrl & 0x08) && m_hmotor_pos < 0xc0) m_hmotor_pos++;
 
 	check_rotation();
-
-	// output motor position
-	int magnet = BIT(m_motors_ctrl, 4);
-	m_out_motorx[magnet ^ 1] = 0xd0; // hide
-	m_out_motorx[magnet] = m_hmotor_pos;
-	m_out_motory = m_vmotor_pos;
+	output_magnet_pos();
 }
 
 void phantom_state::update_pieces_position(int state)
 {
+	int mx = m_hmotor_pos / 3;
+	int my = m_vmotor_pos / 3;
+
 	// convert motors position into board coordinates
 	int x = m_hmotor_pos / 16 - 2;
 	int y = m_vmotor_pos / 16;
@@ -274,38 +274,60 @@ void phantom_state::update_pieces_position(int state)
 	{
 		if (valid_pos)
 		{
-			// check if piece was picked up by user
+			// pick up piece, unless it was picked up by the user
 			int pos = (y << 4 & 0xf0) | (x & 0x0f);
-			if (pos == m_board->get_handpos())
-				m_piece_hand = 0;
-			else
+			if (pos != m_board->get_handpos())
 				m_piece_hand = m_board->read_piece(x, y);
 
 			if (m_piece_hand != 0)
+			{
 				m_board->write_piece(x, y, 0);
+				m_board->refresh();
+			}
 		}
 		else
-			m_piece_hand = m_pieces_map[m_vmotor_pos / 4][m_hmotor_pos / 4];
+		{
+			int count = 0;
 
-		m_pieces_map[m_vmotor_pos / 4][m_hmotor_pos / 4] = 0;
+			// check surrounding area for piece
+			for (int sy = my - 1; sy <= my + 1; sy++)
+				for (int sx = mx - 1; sx <= mx + 1; sx++)
+					if (sy >= 0 && sx >= 0 && m_pieces_map[sy][sx] != 0)
+					{
+						m_piece_hand = m_pieces_map[sy][sx];
+						m_pieces_map[sy][sx] = 0;
+						count++;
+					}
+
+			// more than one piece found (shouldn't happen)
+			if (count > 1)
+				popmessage("Internal collision!");
+		}
 	}
 	else if (m_piece_hand != 0)
 	{
-		// check for pieces collisions
-		if (valid_pos && m_board->read_piece(x, y) != 0)
+		if (valid_pos)
 		{
-			valid_pos = false;
-			logerror("Chesspiece collision at %C%d\n", x + 'A', y + 1);
+			// collision with piece on board (user interference)
+			if (m_board->read_piece(x, y) != 0)
+				popmessage("Collision at %c%d!", x + 'A', y + 1);
+			else
+			{
+				m_board->write_piece(x, y, m_piece_hand);
+				m_board->refresh();
+			}
+		}
+		else
+		{
+			// collision with internal pieces map (shouldn't happen)
+			if (m_pieces_map[my][mx] != 0)
+				popmessage("Internal collision!");
+			else
+				m_pieces_map[my][mx] = m_piece_hand;
 		}
 
-		if (valid_pos)
-			m_board->write_piece(x, y, m_piece_hand);
-
-		m_pieces_map[m_vmotor_pos / 4][m_hmotor_pos / 4] = m_piece_hand;
 		m_piece_hand = 0;
 	}
-
-	m_board->refresh();
 }
 
 
@@ -547,7 +569,7 @@ static INPUT_PORTS_START( cphantom )
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Hint / Yes")
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("Move / No/Stop")
 
-	PORT_START("IN.1") // motion sensor is inverted here, eg. hold down key to pretend noone's there
+	PORT_START("IN.1") // motion sensor is inverted here, eg. hold down key to pretend that nobody's there
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_NAME("Motion Sensor")
 INPUT_PORTS_END
 
@@ -569,7 +591,7 @@ void phantom_state::phantom(machine_config &config)
 	TIMER(config, "motors_timer").configure_periodic(FUNC(phantom_state::motors_timer), irq_period * 9);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
-	m_board->set_size(12, 8);
+	m_board->set_size(8+4, 8);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(100));
 
@@ -633,6 +655,6 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT          COMPANY, FULLNAME, FLAGS
-SYST( 1988, fphantom, 0,      0,      phantom,  phantom,  phantom_state,   init_phantom, "Fidelity Electronics", "Phantom (Fidelity)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL )
+SYST( 1988, fphantom, 0,      0,      phantom,  phantom,  phantom_state,   init_phantom, "Fidelity Electronics", "Phantom (Fidelity)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )
 
-SYST( 1991, cphantom, 0,      0,      cphantom, cphantom, chessterp_state, init_phantom, "Fidelity Electronics", "Chesster Phantom (model 6126)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL )
+SYST( 1991, cphantom, 0,      0,      cphantom, cphantom, chessterp_state, init_phantom, "Fidelity Electronics", "Chesster Phantom (model 6126)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )
