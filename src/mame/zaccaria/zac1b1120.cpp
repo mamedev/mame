@@ -52,12 +52,13 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
-		m_s2636_0_ram(*this, "s2636_0_ram"),
-		m_1e80(*this, "1E80")
+		m_s2636_0_ram(*this, "s2636_0_ram")
 	{ }
 
 	void tinvader(machine_config &config);
 	void dodgem(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(bg_collision_r) { return m_collision_background; }
 
 protected:
 	virtual void video_start() override;
@@ -74,8 +75,6 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_s2636_0_ram;
 
-	required_ioport m_1e80;
-
 	bitmap_ind16 m_bitmap;
 	bitmap_ind16 m_spritebitmap;
 	uint8_t m_collision_background = 0;
@@ -86,7 +85,6 @@ private:
 	void videoram_w(offs_t offset, uint8_t data);
 	uint8_t s2636_r(offs_t offset);
 	void s2636_w(offs_t offset, uint8_t data);
-	uint8_t port_0_r();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -98,7 +96,7 @@ private:
 
 
 /*******************************************************************************
-    Video hardware
+    Video
 *******************************************************************************/
 
 /*
@@ -137,8 +135,6 @@ void zac1b1120_state::video_start()
 	m_gfxdecode->gfx(1)->set_source(m_s2636_0_ram);
 	m_gfxdecode->gfx(2)->set_source(m_s2636_0_ram);
 
-	save_item(NAME(m_bitmap));
-	save_item(NAME(m_spritebitmap));
 	save_item(NAME(m_collision_background));
 	save_item(NAME(m_collision_sprite));
 }
@@ -164,9 +160,7 @@ void zac1b1120_state::s2636_w(offs_t offset, uint8_t data)
 	m_gfxdecode->gfx(2)->mark_dirty(offset / 8);
 
 	if (offset == 0xc7)
-	{
 		m_s2636->write_data(offset, data);
-	}
 }
 
 int zac1b1120_state::sprite_collision(int first, int second)
@@ -270,7 +264,7 @@ void zac1b1120_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipre
 					if (visarea.contains(x, y))
 						if (bitmap.pix(y, x) != m_bitmap.pix(y, x))
 						{
-							m_collision_background = 0x80;
+							m_collision_background = 1;
 							break;
 						}
 				}
@@ -303,13 +297,8 @@ uint32_t zac1b1120_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 
 
 /*******************************************************************************
-    Misc. I/O
+    Sound
 *******************************************************************************/
-
-uint8_t zac1b1120_state::port_0_r()
-{
-	return m_1e80->read() - m_collision_background;
-}
 
 void zac1b1120_state::sound_w(uint8_t data)
 {
@@ -335,7 +324,7 @@ void zac1b1120_state::main_map(address_map &map)
 	map(0x1800, 0x1bff).ram().w(FUNC(zac1b1120_state::videoram_w)).share(m_videoram);
 	map(0x1c00, 0x1cff).ram();
 	map(0x1d00, 0x1dff).ram();
-	map(0x1e80, 0x1e80).r(FUNC(zac1b1120_state::port_0_r)).w(FUNC(zac1b1120_state::sound_w));
+	map(0x1e80, 0x1e80).portr("1E80").w(FUNC(zac1b1120_state::sound_w));
 	map(0x1e81, 0x1e81).portr("1E81");
 	map(0x1e82, 0x1e82).portr("1E82");
 	map(0x1e85, 0x1e85).portr("1E85"); // Dodgem only
@@ -357,7 +346,7 @@ static INPUT_PORTS_START( tinvader )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Missile-background collision
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(zac1b1120_state, bg_collision_r)
 
 	PORT_START("1E81")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )
@@ -419,7 +408,7 @@ static INPUT_PORTS_START( dodgem )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Missile-background collision
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(zac1b1120_state, bg_collision_r)
 
 	PORT_START("1E81")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )
@@ -506,8 +495,8 @@ static const gfx_layout s2636_character =
 
 static GFXDECODE_START( gfx_tinvader )
 	GFXDECODE_SCALE( "gfx1", 0, gfx_8x8x1, 0, 2, 3, 1 )
-	GFXDECODE_SCALE( nullptr, 0x1f00, s2636_character, 0, 2, 4, 1 )  // dynamic
-	GFXDECODE_SCALE( nullptr, 0x1f00, s2636_character, 0, 2, 8, 2 )  // dynamic
+	GFXDECODE_SCALE( nullptr, 0x1f00, s2636_character, 0, 2, 4, 1 ) // dynamic
+	GFXDECODE_SCALE( nullptr, 0x1f00, s2636_character, 0, 2, 8, 2 ) // dynamic
 GFXDECODE_END
 
 
