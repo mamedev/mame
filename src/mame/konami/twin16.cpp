@@ -1105,7 +1105,7 @@ ROM_START( fround )
 	ROM_LOAD( "870_c02.7c", 0x00000, 0x20000, CRC(54e12c6d) SHA1(8171441aeb1a1dc4d65fae59c7c217f992f70cbc) )
 
 	ROM_REGION( 0x0100, "proms", 0 ) // from a GX870 PWB351311A board
-	ROM_LOAD( "63s141n.e16", 0x0100, 0x0100, CRC(ed87c1f1) SHA1(08ddbdeeccbfc2c61129946653016d2e56c8bd4e) )  // priority (not used)
+	ROM_LOAD( "63s141n.e16", 0x0000, 0x0100, CRC(ed87c1f1) SHA1(08ddbdeeccbfc2c61129946653016d2e56c8bd4e) )  // priority (not used)
 ROM_END
 
 ROM_START( froundl )
@@ -1134,7 +1134,7 @@ ROM_START( froundl )
 	ROM_LOAD( "870_c02.7c", 0x00000, 0x20000, CRC(54e12c6d) SHA1(8171441aeb1a1dc4d65fae59c7c217f992f70cbc) )
 
 	ROM_REGION( 0x0100, "proms", 0 ) // from a GX870 PWB351311A board
-	ROM_LOAD( "63s141n.e16", 0x0100, 0x0100, CRC(ed87c1f1) SHA1(08ddbdeeccbfc2c61129946653016d2e56c8bd4e) )  // priority (not used)
+	ROM_LOAD( "63s141n.e16", 0x0000, 0x0100, CRC(ed87c1f1) SHA1(08ddbdeeccbfc2c61129946653016d2e56c8bd4e) )  // priority (not used)
 ROM_END
 
 ROM_START( hpuncher )
@@ -1169,7 +1169,7 @@ ROM_START( hpuncher )
 	ROM_LOAD( "870_c02.7c", 0x00000, 0x20000, CRC(54e12c6d) SHA1(8171441aeb1a1dc4d65fae59c7c217f992f70cbc) )
 
 	ROM_REGION( 0x0100, "proms", 0 ) // from a GX870 PWB351311A board
-	ROM_LOAD( "63s141n.e16", 0x0100, 0x0100, CRC(ed87c1f1) SHA1(08ddbdeeccbfc2c61129946653016d2e56c8bd4e) )  // priority (not used)
+	ROM_LOAD( "63s141n.e16", 0x0000, 0x0100, CRC(ed87c1f1) SHA1(08ddbdeeccbfc2c61129946653016d2e56c8bd4e) )  // priority (not used)
 ROM_END
 
 ROM_START( miaj )
