@@ -35,6 +35,7 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+#include "dodgem.lh"
 #include "tinv2650.lh"
 
 
@@ -96,7 +97,51 @@ private:
 };
 
 
-// video
+/*******************************************************************************
+    Video hardware
+*******************************************************************************/
+
+/*
+
+Video is slightly odd on these zac boards
+
+background is 256 x 240 pixels, but the sprite chips run at a different frequency, which means
+that the output of 196x240 is stretched to fill the same screen space.
+
+to 'properly' accomplish this, we set the screen up as 768x720 and do the background at 3 times
+the size, and the sprites as 4 times the size - everything then matches up correctly.
+
+*/
+
+void zac1b1120_state::palette(palette_device &palette) const
+{
+	// FIXME: this PCB actually outputs RGB signals, not monochrome video!
+	palette.set_pen_color(0, rgb_t::black());
+	palette.set_pen_color(1, rgb_t::white());
+	palette.set_pen_color(2, rgb_t::black());
+	palette.set_pen_color(3, rgb_t::black());
+}
+
+TILE_GET_INFO_MEMBER(zac1b1120_state::get_bg_tile_info)
+{
+	tileinfo.set(0, m_videoram[tile_index], 0, 0);
+}
+
+void zac1b1120_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(zac1b1120_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8 * 3, 8, 32, 32);
+
+	m_screen->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_spritebitmap);
+
+	m_gfxdecode->gfx(1)->set_source(m_s2636_0_ram);
+	m_gfxdecode->gfx(2)->set_source(m_s2636_0_ram);
+
+	save_item(NAME(m_bitmap));
+	save_item(NAME(m_spritebitmap));
+	save_item(NAME(m_collision_background));
+	save_item(NAME(m_collision_sprite));
+}
 
 void zac1b1120_state::videoram_w(offs_t offset, uint8_t data)
 {
@@ -124,20 +169,14 @@ void zac1b1120_state::s2636_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t zac1b1120_state::port_0_r()
-{
-	return m_1e80->read() - m_collision_background;
-}
-
 int zac1b1120_state::sprite_collision(int first, int second)
 {
 	int checksum = 0;
 	const rectangle &visarea = m_screen->visible_area();
 
-	// Check for collision between 2 sprites
 	if ((m_s2636_0_ram[first * 0x10 + 10] < 0xf0) && (m_s2636_0_ram[second * 0x10 + 10] < 0xf0))
 	{
-		int const fx = (m_s2636_0_ram[first * 0x10 + 10] * 4 )- 22;
+		int const fx = (m_s2636_0_ram[first * 0x10 + 10] * 4) - 22;
 		int const fy = m_s2636_0_ram[first * 0x10 + 12] + 1;
 		int const expand = (first == 1) ? 2 : 1;
 
@@ -184,27 +223,6 @@ int zac1b1120_state::sprite_collision(int first, int second)
 	}
 
 	return checksum;
-}
-
-TILE_GET_INFO_MEMBER(zac1b1120_state::get_bg_tile_info)
-{
-	tileinfo.set(0, m_videoram[tile_index], 0, 0);
-}
-
-void zac1b1120_state::video_start()
-{
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(zac1b1120_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8 * 3, 8, 32, 32);
-
-	m_screen->register_screen_bitmap(m_bitmap);
-	m_screen->register_screen_bitmap(m_spritebitmap);
-
-	m_gfxdecode->gfx(1)->set_source(m_s2636_0_ram);
-	m_gfxdecode->gfx(2)->set_source(m_s2636_0_ram);
-
-	save_item(NAME(m_bitmap));
-	save_item(NAME(m_spritebitmap));
-	save_item(NAME(m_collision_background));
-	save_item(NAME(m_collision_sprite));
 }
 
 void zac1b1120_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -284,9 +302,32 @@ uint32_t zac1b1120_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-// machine
+/*******************************************************************************
+    Misc. I/O
+*******************************************************************************/
 
-/***********************************************************************************************/
+uint8_t zac1b1120_state::port_0_r()
+{
+	return m_1e80->read() - m_collision_background;
+}
+
+void zac1b1120_state::sound_w(uint8_t data)
+{
+	// sounds are NOT the same as space invaders
+	logerror("Register %x = Data %d\n", data & 0xfe, data & 0x01);
+
+	// 08 = hit invader
+	// 20 = bonus (extra base)
+	// 40 = saucer
+	// 84 = fire
+	// 90 = die
+	// c4 = hit saucer
+}
+
+
+/*******************************************************************************
+    Address Maps
+*******************************************************************************/
 
 void zac1b1120_state::main_map(address_map &map)
 {
@@ -301,6 +342,11 @@ void zac1b1120_state::main_map(address_map &map)
 	map(0x1e86, 0x1e86).portr("1E86").nopw(); // Dodgem only
 	map(0x1f00, 0x1fff).rw(FUNC(zac1b1120_state::s2636_r), FUNC(zac1b1120_state::s2636_w)).share(m_s2636_0_ram);
 }
+
+
+/*******************************************************************************
+    Input Ports
+*******************************************************************************/
 
 static INPUT_PORTS_START( tinvader )
 	PORT_START("1E80")
@@ -443,27 +489,9 @@ static INPUT_PORTS_START( dodgem )
 INPUT_PORTS_END
 
 
-void zac1b1120_state::palette(palette_device &palette) const
-{
-	// FIXME: this PCB actually outputs RGB signals, not monochrome video!
-	palette.set_pen_color(0, rgb_t::black());
-	palette.set_pen_color(1, rgb_t::white());
-	palette.set_pen_color(2, rgb_t::black());
-	palette.set_pen_color(3, rgb_t::black());
-}
-
-/************************************************************************************************
-
- Video is slightly odd on these zac boards
-
- background is 256 x 240 pixels, but the sprite chips run at a different frequency, which means
- that the output of 196x240 is stretched to fill the same screen space.
-
- to 'properly' accomplish this, we set the screen up as 768x720 and do the background at 3 times
- the size, and the sprites as 4 times the size - everything then matches up correctly.
-
-************************************************************************************************/
-
+/*******************************************************************************
+    GFX Layouts
+*******************************************************************************/
 
 static const gfx_layout s2636_character =
 {
@@ -481,6 +509,11 @@ static GFXDECODE_START( gfx_tinvader )
 	GFXDECODE_SCALE( nullptr, 0x1f00, s2636_character, 0, 2, 4, 1 )  // dynamic
 	GFXDECODE_SCALE( nullptr, 0x1f00, s2636_character, 0, 2, 8, 2 )  // dynamic
 GFXDECODE_END
+
+
+/*******************************************************************************
+    Machine Configs
+*******************************************************************************/
 
 void zac1b1120_state::tinvader(machine_config &config)
 {
@@ -515,18 +548,10 @@ void zac1b1120_state::dodgem(machine_config &config)
 	// TODO: sound board (different from The Invaders)
 }
 
-void zac1b1120_state::sound_w(uint8_t data)
-{
-	// sounds are NOT the same as space invaders
-	logerror("Register %x = Data %d\n", data & 0xfe, data & 0x01);
 
-	// 08 = hit invader
-	// 20 = bonus (extra base)
-	// 40 = saucer
-	// 84 = fire
-	// 90 = die
-	// c4 = hit saucer
-}
+/*******************************************************************************
+    ROM Definitions
+*******************************************************************************/
 
 ROM_START( sia2650 )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -570,6 +595,10 @@ ROM_END
 } // anonymous namespace
 
 
+/*******************************************************************************
+    Game Drivers
+*******************************************************************************/
+
 GAMEL( 1979?, tinv2650, 0,        tinvader, tinvader, zac1b1120_state, empty_init, ROT270, "Zaccaria / Zelco", "The Invaders",                                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_tinv2650 )
 GAME(  1979?, sia2650,  tinv2650, tinvader, sinvader, zac1b1120_state, empty_init, ROT270, "bootleg (Sidam)",  "Super Invader Attack (bootleg of The Invaders)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 1980?
-GAME(  1979,  dodgem,   0,        dodgem,   dodgem,   zac1b1120_state, empty_init, ROT0,   "Zaccaria",         "Dodgem",                                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1979,  dodgem,   0,        dodgem,   dodgem,   zac1b1120_state, empty_init, ROT0,   "Zaccaria",         "Dodgem",                                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_dodgem )
