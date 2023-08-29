@@ -21,7 +21,6 @@ license:CC0-1.0
 			<color red="1" green="1" blue="1" />
 		</rect>
 	</element>
-
 	<element name="border2">
 		<rect>
 			<bounds xc="0" yc="0" width="20.15" height="80.15" />
@@ -52,26 +51,15 @@ license:CC0-1.0
 		<rect state="1"><color red="1.0" green="0.1" blue="0.15" /></rect>
 	</element>
 
-	<element name="clawpos0" defstate="0">
+	<element name="clawpos" defstate="0">
 		<rect>
-			<bounds x="0" y="0" width="1600" height="6.25" />
+			<bounds x="0" y="0" width="4096" height="6.25" />
 			<color alpha="0" />
 		</rect>
 		<disk>
 			<bounds state="0" x="0" y="0" width="6.25" height="6.25" />
-			<bounds state="1500" x="1500" y="0" width="6.25" height="6.25" />
-			<color red="0.9" green="0.0" blue="0.6" alpha="0.35" />
-		</disk>
-	</element>
-	<element name="clawpos1" defstate="0">
-		<rect>
-			<bounds x="0" y="0" width="1600" height="6.25" />
-			<color alpha="0" />
-		</rect>
-		<disk>
-			<bounds state="0" x="0" y="0" width="6.25" height="6.25" />
-			<bounds state="1500" x="1500" y="0" width="6.25" height="6.25" />
-			<color red="0.9" green="0.0" blue="0.6" alpha="0.9" />
+			<bounds state="3600" x="3600" y="0" width="6.25" height="6.25" />
+			<color red="1.0" green="0.2" blue="0.8" />
 		</disk>
 	</element>
 
@@ -735,17 +723,20 @@ license:CC0-1.0
 
 		<!-- optional claw position overlay -->
 		<collection name="Claw Position">
-			<repeat count="2">
-				<param name="i" start="0" increment="1" />
+			<element name="clawx" ref="clawpos">
+				<animate name="clawy" />
+				<bounds state="0" x="-106.625" y="-168.625" width="819.2" height="1.25" />
+				<bounds state="1500" x="-106.625" y="131.375" width="819.2" height="1.25" />
+				<color alpha="0.4" />
+			</element>
+			<element name="clawx" ref="clawpos">
+				<animate name="clawy" />
+				<bounds state="0" x="-516.225" y="-168.625" width="819.2" height="1.25" />
+				<bounds state="1500" x="-516.225" y="131.375" width="819.2" height="1.25" />
+				<color alpha="0.9" />
+			</element>
 
-				<element name="clawx~i~" ref="clawpos~i~">
-					<animate name="clawy" />
-					<bounds state="0" x="-106.625" y="-168.625" width="320" height="1.25" />
-					<bounds state="1500" x="-106.625" y="131.375" width="320" height="1.25" />
-				</element>
-			</repeat>
-
-			<element ref="blackb"><bounds x="189" y="-200" width="10" height="400" /></element>
+			<element ref="blackb"><bounds x="-516.225" y="-200" width="409.6" height="400" /></element>
 		</collection>
 
 	</view>

@@ -77,7 +77,7 @@ public:
 		m_inputs(*this, "IN.%u", 0),
 		m_piece_hand(*this, "cpu_hand"),
 		m_out_motor(*this, "motor%u", 0U),
-		m_out_magnetx(*this, "magnetx%u", 0U),
+		m_out_magnetx(*this, "magnetx"),
 		m_out_magnety(*this, "magnety")
 	{ }
 
@@ -97,7 +97,7 @@ protected:
 	optional_ioport_array<2> m_inputs;
 	output_finder<> m_piece_hand;
 	output_finder<5> m_out_motor;
-	output_finder<2> m_out_magnetx;
+	output_finder<> m_out_magnetx;
 	output_finder<> m_out_magnety;
 
 	// address maps
@@ -235,9 +235,9 @@ void phantom_state::check_rotation()
 
 void phantom_state::output_magnet_pos()
 {
-	int on = BIT(m_motors_ctrl, 4);
-	m_out_magnetx[on ^ 1] = 0xd0; // hide
-	m_out_magnetx[on] = m_hmotor_pos;
+	// put active state on x bit 8
+	const int active = BIT(m_motors_ctrl, 4) ? 0x100 : 0;
+	m_out_magnetx = m_hmotor_pos | active;
 	m_out_magnety = m_vmotor_pos;
 }
 

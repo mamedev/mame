@@ -38,26 +38,15 @@ license:CC0-1.0
 		</disk>
 	</element>
 
-	<element name="mpos0" defstate="0">
+	<element name="mpos" defstate="0">
 		<rect>
-			<bounds x="0" y="0" width="256" height="2" />
+			<bounds x="0" y="0" width="512" height="2" />
 			<color alpha="0" />
 		</rect>
 		<disk>
 			<bounds state="0" x="0" y="0" width="2" height="2" />
-			<bounds state="240" x="240" y="0" width="2" height="2" />
-			<color red="0.9" green="0.0" blue="0.6" alpha="0.35" />
-		</disk>
-	</element>
-	<element name="mpos1" defstate="0">
-		<rect>
-			<bounds x="0" y="0" width="256" height="2" />
-			<color alpha="0" />
-		</rect>
-		<disk>
-			<bounds state="0" x="0" y="0" width="2" height="2" />
-			<bounds state="240" x="240" y="0" width="2" height="2" />
-			<color red="0.9" green="0.0" blue="0.6" alpha="0.9" />
+			<bounds state="500" x="500" y="0" width="2" height="2" />
+			<color red="1.0" green="0.2" blue="0.8" />
 		</disk>
 	</element>
 
@@ -701,17 +690,20 @@ license:CC0-1.0
 
 		<!-- optional magnet position overlay -->
 		<collection name="Magnet Position">
-			<repeat count="2">
-				<param name="i" start="0" increment="1" />
+			<element name="magnetx" ref="mpos">
+				<animate name="magnety" />
+				<bounds state="4" x="-17.5" y="84.0" width="320" height="1.25" />
+				<bounds state="136" x="-17.5" y="1.5" width="320" height="1.25" />
+				<color alpha="0.4" />
+			</element>
+			<element name="magnetx" ref="mpos">
+				<animate name="magnety" />
+				<bounds state="4" x="-177.5" y="84.0" width="320" height="1.25" />
+				<bounds state="136" x="-177.5" y="1.5" width="320" height="1.25" />
+				<color alpha="0.9" />
+			</element>
 
-				<element name="magnetx~i~" ref="mpos~i~">
-					<animate name="magnety" />
-					<bounds state="4" x="-17.5" y="84.0" width="160" height="1.25" />
-					<bounds state="136" x="-17.5" y="1.5" width="160" height="1.25" />
-				</element>
-			</repeat>
-
-			<element ref="blackb"><bounds x="110" y="0" width="5" height="100" /></element>
+			<element ref="blackb"><bounds x="-177.5" y="0" width="140" height="100" /></element>
 		</collection>
 
 	</view>

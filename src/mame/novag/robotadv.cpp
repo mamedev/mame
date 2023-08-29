@@ -64,7 +64,7 @@ public:
 		m_inputs(*this, "IN.%u", 0),
 		m_piece_hand(*this, "cpu_hand"),
 		m_out_motor(*this, "motor%u", 0U),
-		m_out_clawx(*this, "clawx%u", 0U),
+		m_out_clawx(*this, "clawx"),
 		m_out_clawy(*this, "clawy")
 	{ }
 
@@ -82,7 +82,7 @@ private:
 	required_ioport_array<3> m_inputs;
 	output_finder<> m_piece_hand;
 	output_finder<6> m_out_motor;
-	output_finder<2> m_out_clawx;
+	output_finder<> m_out_clawx;
 	output_finder<> m_out_clawy;
 
 	void main_map(address_map &map);
@@ -311,9 +311,8 @@ void robotadv_state::refresh()
 		update_piece(x, y);
 
 	// output claw position
-	int open = m_limits & 1;
-	m_out_clawx[open ^ 1] = 1500; // hide
-	m_out_clawx[open] = int((x + 15.0) * 50.0);
+	const int open = (m_limits & 1) ? 0x800 : 0; // put open state on x bit 11
+	m_out_clawx = int((x + 15.0) * 50.0) | open;
 	m_out_clawy = int((y + 15.0) * 50.0);
 }
 
@@ -367,7 +366,7 @@ void robotadv_state::control2_w(u8 data)
 
 void robotadv_state::latch_w(u8 data)
 {
-	// d0-d7: led data, sound data, chessboard mux
+	// led data, sound data, chessboard mux
 	m_display->write_mx(data);
 	m_latch = data;
 }
