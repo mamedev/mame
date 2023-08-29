@@ -483,6 +483,7 @@ template <unsigned N> u32 mb86292_device::blda_r(offs_t offset)
 template <unsigned N> void mb86292_device::blda_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_bl_layer.blda[N]);
+	m_bl_layer.blda[N] &= 0x3ffffff;
 	LOGREGS("BLDA%d %04x & %08x -> %08x\n"
 		, N, data, mem_mask
 		, m_bl_layer.blda[N]
@@ -492,6 +493,7 @@ template <unsigned N> void mb86292_device::blda_w(offs_t offset, u32 data, u32 m
 void mb86292_device::draw_io_map(address_map &map)
 {
 //  map(0x0400, 0x0403) CTR ConTrol Register
+	map(0x0400, 0x0403).r(FUNC(mb86292_device::ctr_r));
 //  map(0x0404, 0x0407) IFSR Input FIFO Status Register (CTR bits 14-12 alias)
 //  map(0x0408, 0x040b) IFCNT Input FIFO CouNTer (CTR bits 19-15 alias)
 //  map(0x040c, 0x040f) SST Setup engine STatus (CTR bits 9-8 alias)
@@ -652,6 +654,44 @@ TIMER_CALLBACK_MEMBER(mb86292_device::vsync_cb)
 }
 
 /*
+    CTR [Draw] ConTrol Register
+    ---- ---x ---- ---- ---- ---- ---- ---- FO FIFO Overflow
+    ---- ---- x--- ---- ---- ---- ---- ---- PE display list Packet code Error (clearable by write 1)
+    ---- ---- -x-- ---- ---- ---- ---- ---- CE display list Command Error (clearable by write 1)
+    ---- ---- ---x xxxx x--- ---- ---- ---- FCNT FIFO Counter (up to 32)
+    ---- ---- ---- ---- -x-- ---- ---- ---- NF FIFO Near Full (actually FIFO half size reached)
+    ---- ---- ---- ---- --x- ---- ---- ---- FF FIFO full
+    ---- ---- ---- ---- ---x ---- ---- ---- FE FIFO empty
+    ---- ---- ---- ---- ---- --xx ---- ---- SS Setup Status
+    ---- ---- ---- ---- ---- --00 ---- ---- Idle
+    ---- ---- ---- ---- ---- --01 ---- ---- Busy, assume pixels rather than commands
+    ---- ---- ---- ---- ---- --1x ---- ---- <reserved>
+    ---- ---- ---- ---- ---- ---- --xx ---- DS DDA Status
+    ---- ---- ---- ---- ---- ---- --00 ---- Idle
+    ---- ---- ---- ---- ---- ---- --01 ---- Busy
+    ---- ---- ---- ---- ---- ---- --10 ---- Busy (separate stage?)
+    ---- ---- ---- ---- ---- ---- --11 ---- <reserved>
+    ---- ---- ---- ---- ---- ---- ---- --xx PS Pixel engine Status
+    ---- ---- ---- ---- ---- ---- ---- --00 Idle
+    ---- ---- ---- ---- ---- ---- ---- --01 Busy
+    ---- ---- ---- ---- ---- ---- ---- --1x <reserved>
+*/
+u32 mb86292_device::ctr_r(offs_t offset)
+{
+	u32 res;
+	res =  (m_draw.state == DRAW_DATA) << 0;
+//  res |= (m_geo.state == SETUP) << 4;
+//  res |= (m_geo.state == DRAW_DATA) << 8;
+	res |= (m_draw.fifo.queue_length() == 0) << 12;
+	res |= (m_draw.fifo.queue_length() == 32) << 13;
+	res |= (m_draw.fifo.queue_length() >= 16) << 14;
+	res |= (32 - m_draw.fifo.queue_length()) << 15;
+	// fcnt << 15;
+	// fo << 24;
+	return res;
+}
+
+/*
     GCTR Geometry ConTrol Register
     ---- ---x ---- ---- ---- ---- ---- ---- FO FIFO Overflow
     ---- ---- ---x xxxx x--- ---- ---- ---- FCNT FIFO Counter (up to 0x100000)
@@ -674,17 +714,8 @@ TIMER_CALLBACK_MEMBER(mb86292_device::vsync_cb)
 */
 u32 mb86292_device::gctr_r(offs_t offset)
 {
-	u32 res;
-	res =  (m_draw.state == DRAW_DATA) << 0;
-//  res |= (m_geo.state == SETUP) << 4;
-//  res |= (m_geo.state == DRAW_DATA) << 8;
-	res |= (m_draw.fifo.queue_length() == 0) << 12;
-	res |= (m_draw.fifo.queue_length() == 16) << 13;
-	// TODO: pingu just hangs
-//  res |= (m_draw.fifo.queue_length() >= 8) << 14;
-	// fcnt << 15;
-	// fo << 24;
-	return res;
+	// TODO
+	return 0;
 }
 
 /*
@@ -1040,6 +1071,7 @@ void mb86292_device::process_display_list()
 
 void mb86292_device::fb_commit()
 {
+	// TODO: layers should really be self contained class objects instead of structs in order to make this workable
 	const u8 blflp = m_bl_layer.blflp & 2 ? screen().frame_number() & 1 : m_bl_layer.blflp & 1;
 	for (int y = 0; y <= m_crtc.vdp; y++)
 	{
