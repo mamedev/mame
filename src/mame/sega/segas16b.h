@@ -132,6 +132,8 @@ public:
 	void init_altbeas4_5521();
 	void init_aliensyn7_5358_small();
 
+	DECLARE_INPUT_CHANGED_MEMBER(handy_w);
+
 protected:
 	// memory mapping
 	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
