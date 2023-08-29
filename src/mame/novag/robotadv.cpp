@@ -64,8 +64,7 @@ public:
 		m_inputs(*this, "IN.%u", 0),
 		m_piece_hand(*this, "cpu_hand"),
 		m_out_motor(*this, "motor%u", 0U),
-		m_out_clawx(*this, "clawx"),
-		m_out_clawy(*this, "clawy")
+		m_out_pos(*this, "pos_%c", unsigned('x'))
 	{ }
 
 	void robotadv(machine_config &config);
@@ -82,8 +81,7 @@ private:
 	required_ioport_array<3> m_inputs;
 	output_finder<> m_piece_hand;
 	output_finder<6> m_out_motor;
-	output_finder<> m_out_clawx;
-	output_finder<> m_out_clawy;
+	output_finder<2> m_out_pos;
 
 	void main_map(address_map &map);
 	void io_map(address_map &map);
@@ -118,8 +116,7 @@ void robotadv_state::machine_start()
 	// resolve outputs
 	m_piece_hand.resolve();
 	m_out_motor.resolve();
-	m_out_clawx.resolve();
-	m_out_clawy.resolve();
+	m_out_pos.resolve();
 
 	// register for savestates
 	save_item(NAME(m_control1));
@@ -312,8 +309,8 @@ void robotadv_state::refresh()
 
 	// output claw position
 	const int open = (m_limits & 1) ? 0x800 : 0; // put open state on x bit 11
-	m_out_clawx = int((x + 15.0) * 50.0) | open;
-	m_out_clawy = int((y + 15.0) * 50.0);
+	m_out_pos[0] = int((x + 15.0) * 50.0) | open;
+	m_out_pos[1] = int((y + 15.0) * 50.0);
 }
 
 

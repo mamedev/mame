@@ -690,20 +690,21 @@ license:CC0-1.0
 
 		<!-- optional magnet position overlay -->
 		<collection name="Magnet Position">
-			<element name="magnetx" ref="mpos">
-				<animate name="magnety" />
+			<element name="pos_x" ref="mpos">
+				<animate name="pos_y" />
 				<bounds state="4" x="-17.5" y="84.0" width="320" height="1.25" />
 				<bounds state="136" x="-17.5" y="1.5" width="320" height="1.25" />
 				<color alpha="0.4" />
 			</element>
-			<element name="magnetx" ref="mpos">
-				<animate name="magnety" />
+			<element name="pos_x" ref="mpos">
+				<animate name="pos_y" />
 				<bounds state="4" x="-177.5" y="84.0" width="320" height="1.25" />
 				<bounds state="136" x="-177.5" y="1.5" width="320" height="1.25" />
 				<color alpha="0.9" />
 			</element>
 
 			<element ref="blackb"><bounds x="-177.5" y="0" width="140" height="100" /></element>
+			<element ref="blackb"><bounds x="142.5" y="0" width="160" height="100" /></element>
 		</collection>
 
 	</view>
