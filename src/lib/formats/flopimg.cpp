@@ -35,15 +35,30 @@ floppy_image::~floppy_image()
 {
 }
 
-void floppy_image::set_index_array(std::vector<uint32_t> arr)
+void floppy_image::set_variant(uint32_t _variant)
 {
-	uint32_t prev = 0;
-	for(uint32_t index : arr) {
-		if(prev > index || index > 200000000)
-			throw std::invalid_argument(util::string_format("Index outside expected range, expected %d-199999999, got %d", prev+1, index));
-		prev = index;
+	variant = _variant;
+
+	// Initialize hard sectors
+	index_array.clear();
+
+	uint32_t sectors;
+	switch(variant) {
+	case SSDD16:
+	case SSQD16:
+	case DSDD16:
+	case DSQD16:
+		sectors = 16;
+		break;
+	default:
+		sectors = 0;
 	}
-	index_array = arr;
+	if(sectors) {
+		uint32_t sector_angle = 200000000/sectors;
+		for(int i = 1; i < sectors; i++)
+			index_array.push_back(i*sector_angle);
+		index_array.push_back((sectors-1)*sector_angle + sector_angle/2);
+	}
 }
 
 void floppy_image::find_index_hole(uint32_t pos, uint32_t &last, uint32_t &next)
@@ -118,13 +133,17 @@ bool floppy_image::track_is_formatted(int track, int head, int subtrack)
 const char *floppy_image::get_variant_name(uint32_t form_factor, uint32_t variant)
 {
 	switch(variant) {
-	case SSSD: return "Single side, single density";
-	case SSDD: return "Single side, double density";
-	case SSQD: return "Single side, quad density";
-	case DSDD: return "Double side, double density";
-	case DSQD: return "Double side, quad density";
-	case DSHD: return "Double side, high density";
-	case DSED: return "Double side, extended density";
+	case SSSD:   return "Single side, single density";
+	case SSDD:   return "Single side, double density";
+	case SSDD16: return "Single side, double density, 16 hard sector";
+	case SSQD:   return "Single side, quad density";
+	case SSQD16: return "Single side, quad density, 16 hard sector";
+	case DSDD:   return "Double side, double density";
+	case DSDD16: return "Double side, double density, 16 hard sector";
+	case DSQD:   return "Double side, quad density";
+	case DSQD16: return "Double side, quad density, 16 hard sector";
+	case DSHD:   return "Double side, high density";
+	case DSED:   return "Double side, extended density";
 	}
 	return "Unknown";
 }
@@ -140,11 +159,6 @@ bool floppy_image_format_t::has_variant(const std::vector<uint32_t> &variants, u
 bool floppy_image_format_t::save(util::random_read_write &io, const std::vector<uint32_t> &, floppy_image *) const
 {
 	return false;
-}
-
-bool floppy_image_format_t::create(const std::vector<uint32_t> &variants, floppy_image *image) const
-{
-	return true;
 }
 
 bool floppy_image_format_t::extension_matches(const char *file_name) const

@@ -32,10 +32,10 @@ struct format {
 };
 
 static const format formats[] = {
-	{1, 35, floppy_image::SSDD}, // MOD-I
-	{2, 35, floppy_image::DSDD},
-	{1, 77, floppy_image::SSQD}, // MOD-II
-	{2, 77, floppy_image::DSQD},
+	{1, 35, floppy_image::SSDD16}, // MOD-I
+	{2, 35, floppy_image::DSDD16},
+	{1, 77, floppy_image::SSQD16}, // MOD-II
+	{2, 77, floppy_image::DSQD16},
 	{}
 };
 
@@ -69,8 +69,6 @@ bool micropolis_vgi_format::load(util::random_read &io, uint32_t form_factor, co
 	if (!fmt.head_count)
 		return false;
 	image->set_variant(fmt.variant);
-
-	create(variants, image);
 
 	std::vector<uint32_t> buf;
 	uint8_t sector_bytes[275];
@@ -142,17 +140,6 @@ bool micropolis_vgi_format::save(util::random_read_write &io, const std::vector<
 			}
 		}
 	}
-	return true;
-}
-
-bool micropolis_vgi_format::create(const std::vector<uint32_t> &variants, floppy_image *image) const
-{
-	uint32_t sector_angle = 200000000/16;
-	std::vector<uint32_t> index_array(16);
-	for (int i = 1; i < 16; i++)
-		index_array.push_back(i*sector_angle);
-	index_array.push_back(15*sector_angle + sector_angle/2);
-	image->set_index_array(index_array);
 	return true;
 }
 

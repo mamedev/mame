@@ -334,7 +334,7 @@ void s100_vector_dualmode_device::device_reset()
 
 static void vector4_floppies(device_slot_interface &device)
 {
-	device.option_add("525", FLOPPY_525_QD);
+	device.option_add("525", FLOPPY_525_QD16);
 }
 
 static void vector4_formats(format_registration &fr)

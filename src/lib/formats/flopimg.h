@@ -80,15 +80,6 @@ public:
 	*/
 	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const;
 
-	/*! @brief Initialize an unformatted image.
-	 The create function initializes an image of a new, unformatted floppy.
-	 This can initialize physical characteristics of the disk, like
-	 hard-sector index holes.
-	 @param image floppy disk to configure
-	 @return true on success, false otherwise.
-	*/
-	virtual bool create(const std::vector<uint32_t> &variants, floppy_image *image) const;
-
 	//! @returns string containing name of format.
 	virtual const char *name() const = 0;
 	//! @returns string containing description of format.
@@ -534,14 +525,18 @@ public:
 
 	//! Variants
 	enum {
-		SSSD  = 0x44535353, //!< "SSSD", Single-sided single-density
-		SSDD  = 0x44445353, //!< "SSDD", Single-sided double-density
-		SSQD  = 0x44515353, //!< "SSQD", Single-sided quad-density
-		DSSD  = 0x44535344, //!< "DSSD", Double-sided single-density
-		DSDD  = 0x44445344, //!< "DSDD", Double-sided double-density (720K in 3.5, 360K in 5.25)
-		DSQD  = 0x44515344, //!< "DSQD", Double-sided quad-density (720K in 5.25, means DD+80 tracks)
-		DSHD  = 0x44485344, //!< "DSHD", Double-sided high-density (1440K)
-		DSED  = 0x44455344  //!< "DSED", Double-sided extra-density (2880K)
+		SSSD   = 0x44535353, //!< "SSSD", Single-sided single-density
+		SSDD   = 0x44445353, //!< "SSDD", Single-sided double-density
+		SSDD16 = 0x36314453, //!< "SD16", Single-sided double-density 16 hard sector
+		SSQD   = 0x44515353, //!< "SSQD", Single-sided quad-density
+		SSQD16 = 0x36315153, //!< "SQ16", Single-sided quad-density 16 hard sector
+		DSSD   = 0x44535344, //!< "DSSD", Double-sided single-density
+		DSDD   = 0x44445344, //!< "DSDD", Double-sided double-density (720K in 3.5, 360K in 5.25)
+		DSDD16 = 0x36314444, //!< "DD16", Double-sided double-density 16 hard sector (360K in 5.25)
+		DSQD   = 0x44515344, //!< "DSQD", Double-sided quad-density (720K in 5.25, means DD+80 tracks)
+		DSQD16 = 0x36315144, //!< "DQ16", Double-sided quad-density 16 hard sector (720K in 5.25, means DD+80 tracks)
+		DSHD   = 0x44485344, //!< "DSHD", Double-sided high-density (1440K)
+		DSED   = 0x44455344  //!< "DSED", Double-sided extra-density (2880K)
 	};
 
 	//! Encodings
@@ -568,18 +563,9 @@ public:
 	//! @return the variant.
 	uint32_t get_variant() const { return variant; }
 	//! @param v the variant.
-	void set_variant(uint32_t v) { variant = v; }
+	void set_variant(uint32_t v);
 	//! @param v the variant.
-	void set_form_variant(uint32_t f, uint32_t v) { if(form_factor == FF_UNKNOWN) form_factor = f; variant = v; }
-
-	//! Sets additional index holes. Entries are absolute positions of index
-	//! holes in the same units as cell_data. The positions are the start of
-	//! the hole, not the center of the hole. The hole at angular position
-	//! 0 is implicit, so an empty list encodes a regular soft-sectored
-	//! disk. Additional holes are found on hard-sectored disks. Values must
-	//! be in increasing order.
-	//! @param arr
-	void set_index_array(std::vector<uint32_t> arr);
+	void set_form_variant(uint32_t f, uint32_t v) { if(form_factor == FF_UNKNOWN) form_factor = f; set_variant(variant); }
 
 	//! Find most recent and next index hole for provided angular position.
 	//! The most recent hole may be equal to provided position. The next

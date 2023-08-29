@@ -70,6 +70,7 @@ DEFINE_DEVICE_TYPE(FLOPPY_525_SSDD,     floppy_525_ssdd,     "floppy_525_ssdd", 
 DEFINE_DEVICE_TYPE(FLOPPY_525_DD,       floppy_525_dd,       "floppy_525_dd",       "5.25\" double density floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_525_SSQD,     floppy_525_ssqd,     "floppy_525_ssqd",     "5.25\" single-sided quad density floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_525_QD,       floppy_525_qd,       "floppy_525_qd",       "5.25\" quad density floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_525_QD16,     floppy_525_qd16,     "floppy_525_qd16",     "5.25\" quad density 16 hard sector floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_525_HD,       floppy_525_hd,       "floppy_525_hd",       "5.25\" high density floppy drive")
 
 // generic 8" drives
@@ -804,10 +805,6 @@ std::pair<std::error_condition, std::string> floppy_image_device::call_create(in
 		// Use MFI as a default.
 		if (!strcmp(i->name(), "mfi"))
 			output_format = i;
-	}
-	if (!output_format->create(variants, image.get())) {
-		image.reset();
-		return std::make_pair(image_error::UNSUPPORTED, "Image format unable to create new disk");
 	}
 
 	init_floppy_load(true);
@@ -2186,6 +2183,32 @@ void floppy_525_qd::setup_characteristics()
 	variants.push_back(floppy_image::DSSD);
 	variants.push_back(floppy_image::DSDD);
 	variants.push_back(floppy_image::DSQD);
+}
+
+//-------------------------------------------------
+//  5.25" double-sided quad density 16 hard sector
+//-------------------------------------------------
+
+floppy_525_qd16::floppy_525_qd16(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_525_QD16, tag, owner, clock)
+{
+}
+
+floppy_525_qd16::~floppy_525_qd16()
+{
+}
+
+void floppy_525_qd16::setup_characteristics()
+{
+	form_factor = floppy_image::FF_525;
+	tracks = 84;
+	sides = 2;
+	set_rpm(300);
+
+	variants.push_back(floppy_image::SSDD16);
+	variants.push_back(floppy_image::SSQD16);
+	variants.push_back(floppy_image::DSDD16);
+	variants.push_back(floppy_image::DSQD16);
 }
 
 //-------------------------------------------------
