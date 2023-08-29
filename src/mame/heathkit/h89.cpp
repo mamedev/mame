@@ -102,7 +102,7 @@ private:
 	bool m_timer_intr_enabled;
 	bool m_floppy_ram_wp;
 
-	int m_cpu_speed_multiplier;
+	uint32_t m_cpu_speed_multiplier;
 
 	// Clocks
 	static constexpr XTAL H89_CLOCK = XTAL(12'288'000) / 6;
@@ -336,11 +336,10 @@ static INPUT_PORTS_START( h89 )
 */
 
 	PORT_START("CONFIG")
-	PORT_CONFNAME(0x03, 0x00, "CPU Clock Speedup Upgrade")
+	PORT_CONFNAME(0x03, 0x00, "CPU Clock Speed Upgrade")
 	PORT_CONFSETTING(0x00, DEF_STR( None ) )
 	PORT_CONFSETTING(0x01, "2 / 4 MHz")
 	PORT_CONFSETTING(0x02, "2 / 6 MHz")
-	PORT_CONFSETTING(0x03, DEF_STR( None ) )
 INPUT_PORTS_END
 
 
@@ -350,6 +349,7 @@ void h89_state::machine_start()
 	save_item(NAME(m_rom_enabled));
 	save_item(NAME(m_timer_intr_enabled));
 	save_item(NAME(m_floppy_ram_wp));
+	save_item(NAME(m_cpu_speed_multiplier));
 
 	// update RAM mappings based on RAM size
 	uint8_t *m_ram_ptr = m_ram->pointer();
@@ -401,7 +401,7 @@ void h89_state::machine_reset()
 	ioport_value const cfg(m_config->read());
 
 	// CPU clock speed
-	uint8_t selected_clock_upgrade = cfg & 0x3;
+	const uint8_t selected_clock_upgrade = cfg & 0x3;
 
 	switch (selected_clock_upgrade)
 	{
@@ -414,7 +414,6 @@ void h89_state::machine_reset()
 		// 6 MHz was offered by at least ANAPRO, and a how to article in CHUG newsletter
 		m_cpu_speed_multiplier = 3;
 		break;
-	case 0x03:
 	case 0x00:
 	default:
 		// No speed upgrade installed - Standard Clock
@@ -465,6 +464,19 @@ void h89_state::update_mem_view()
 	m_mem_view.select(m_rom_enabled ? (m_floppy_ram_wp ? 0 : 1) : 2);
 }
 
+// General Purpose Port
+//
+// Bit     OUTPUT
+// ---------------------
+//  0    Single-step enable
+//  1    2 mSec interrupt enable
+//  2    Latched bit MEM 1 H on memory exp connector
+//  3    Not used
+//  4    Latched bit MEM 0 H on memory expansion connector (Commonly used for Speed upgrades)
+//  5    ORG-0 (CP/M map)
+//  6    Latched bit I/O 0 on I/O exp connector
+//  7    Latched bit I/O 1 on I/O exp connector
+//
 void h89_state::update_gpp(uint8_t gpp)
 {
 	uint8_t changed_gpp = gpp ^ m_gpp;
