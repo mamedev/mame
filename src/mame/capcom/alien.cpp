@@ -4,6 +4,17 @@
 
 Capcom Medal / Medalusion / Medalusion 2 hardware (c) 2005 Capcom
 
+TODO:
+- S29JL064H needs support the "unlock bypass" for ATA -> flash ROM reprogramming to work.
+  This is currently bypassed by giving default roms instead (also because it's extremely slow for
+  end user to care).
+  The BAD_DUMP also denotes that we are missing the 256 bytes "secured silicon sector" data for
+  those.
+- pingu/wontame/dokudemo sets up GPU with a comparison between DrawTrap output with DrawBitmap,
+  failing in the process;
+- YMZ770B for anything but wontame;
+- Proper SIO handling, particularly IRQ source;
+
 ===================================================================================================
 
    Main boards:
@@ -74,6 +85,7 @@ Capcom Medal / Medalusion / Medalusion 2 hardware (c) 2005 Capcom
 #include "emu.h"
 
 #include "cpu/sh/sh4.h"
+#include "machine/intelfsh.h"
 #include "machine/ram.h"
 #include "machine/timekpr.h"
 #include "sound/ymz770.h"
@@ -103,11 +115,12 @@ public:
 		, m_vram(*this, "vram")
 		, m_ata(*this, "ata")
 		, m_ymz(*this, "ymz770")
-		, m_ymz_region(*this, "ymz770")
+		, m_ymz_flash(*this, "ymz770_flash%d", 1U)
 		, m_io_in0(*this, "IN0")
 	{ }
 
 	void alien(machine_config &config);
+	void masmario2(machine_config &config);
 
 	void init_dkbanans();
 
@@ -117,6 +130,7 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void alien_map(address_map &map);
+	void masmario2_map(address_map &map);
 
 	// devices
 	required_device<sh4_device> m_maincpu;
@@ -126,7 +140,7 @@ private:
 	required_device<ram_device> m_vram;
 	required_device<ata_interface_device> m_ata;
 	required_device<ymz770_device> m_ymz;
-	required_memory_region m_ymz_region;
+	optional_device_array<spansion_s29gl064s_device, 2> m_ymz_flash;
 	required_ioport m_io_in0;
 
 	virtual void machine_start() override;
@@ -153,6 +167,7 @@ u8 alien_state::fpga_r()
 void alien_state::alien_map(address_map &map)
 {
 	map(0x00000000, 0x00ffffff).rom();
+//	map(0x02000000, ...) accessed by dkbanana
 	map(0x04000000, 0x04007fff).rw("m48t35", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
 	map(0x04800000, 0x04800000).r(FUNC(alien_state::fpga_r));
 	map(0x04a00000, 0x04a00007).nopw(); // FPGA config
@@ -168,6 +183,7 @@ void alien_state::alien_map(address_map &map)
 		NAME([this] (offs_t offset, u32 mem_mask) {
 			switch(offset)
 			{
+				// data in
 				case 1:
 					return m_io_in0->read();
 				case 2:
@@ -177,10 +193,11 @@ void alien_state::alien_map(address_map &map)
 			return 0xffffffff;
 		}),
 		NAME([] (offs_t offset, u32 data, u32 mem_mask) {
-			// writing to 0x14000000: outputs
+			// writing to 0x14000000: data out
 		})
 	);
-	//map(0x18000000, 0x1800000f).r(FUNC(alien_state::test_r)).nopw(); // Alien CF ATA, other games have it other way
+//	map(0x14100010, 0x14100070) masmario2/dkbanans satellite terminal comms?
+//	map(0x18000000, 0x1800000f).r(FUNC(alien_state::test_r)).nopw(); // Alien CF ATA, other games have it other way
 
 	// pingu ATA i/f, similar to konami/konamigs.cpp
 	map(0x18800000, 0x18800007).lrw16(
@@ -207,17 +224,14 @@ void alien_state::alien_map(address_map &map)
 			m_ata->cs0_w(0, data, mem_mask);
 		})
 	);
-	// TODO: flash ROM
-	map(0x1b000000, 0x1b7fffff).lr8(
-		NAME([this] (offs_t offset) {
-			if (m_ymz_region->bytes() < offset)
-				return (u8)0xff;
-			return (u8)m_ymz_region->base()[offset];
-		})
-	);
+	map(0x1b000000, 0x1b7fffff).rw(m_ymz_flash[0], FUNC(spansion_s29gl064s_device::read), FUNC(spansion_s29gl064s_device::write));
 }
 
-
+void alien_state::masmario2_map(address_map &map)
+{
+	alien_map(map);
+	map(0x1b800000, 0x1bffffff).rw(m_ymz_flash[1], FUNC(spansion_s29gl064s_device::read), FUNC(spansion_s29gl064s_device::write));
+}
 
 
 static INPUT_PORTS_START( alien )
@@ -287,7 +301,8 @@ void medalusion_devices(device_slot_interface &device)
 
 void alien_state::machine_start()
 {
-	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY);
+	m_maincpu->sh2drc_add_fastram(0x00000000, 0x00ffffff, 0, memregion("maincpu")->base());
 	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0cffffff, 0, &m_workram[0]);
 }
 
@@ -310,6 +325,8 @@ void alien_state::alien(machine_config &config)
 	m_vram->set_default_size("8M");
 	m_vram->set_default_value(0);
 
+	SPANSION_S29GL064S(config, m_ymz_flash[0]);
+
 	ATA_INTERFACE(config, m_ata).options(medalusion_devices, "cfcard", nullptr, true);
 
 	/* video hardware */
@@ -329,6 +346,14 @@ void alien_state::alien(machine_config &config)
 	YMZ770(config, m_ymz, 16.384_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	M48T35(config, "m48t35");
+}
+
+void alien_state::masmario2(machine_config &config)
+{
+	alien(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &alien_state::masmario2_map);
+
+	SPANSION_S29GL064S(config, m_ymz_flash[1]);
 }
 
 void alien_state::init_dkbanans()
@@ -351,8 +376,11 @@ ROM_START( alien )
 	ROM_LOAD32_WORD( "aln_s04.4.ic30", 0x000000, 0x400000, CRC(11777d3f) SHA1(8cc9fcae7911e6be273b4532d89b44a309687ead) )
 	ROM_LOAD32_WORD( "aln_s05.5.ic33", 0x000002, 0x400000, CRC(71d2f22c) SHA1(16b25aa34f8b0d988565e7ab7cecc4df62ee8cf3) )
 
-	ROM_REGION( 0x800100, "ymz770", ROMREGION_ERASEFF ) //sound samples flash rom, not really needed, programmed by boot loader
+	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF ) //sound samples flash rom, not really needed, programmed by boot loader
 	ROM_LOAD( "s29jl064hxxtfi00.u35", 0x000000, 0x800100, CRC(01890c61) SHA1(4fad321f42eab835351c6d5f73539bdbed80affe) )
+
+	ROM_REGION( 0x800000, "ymz770", 0 )
+	ROM_COPY( "ymz770_flash1", 0, 0, 0x800000 )
 
 	DISK_REGION( "ata:0:cfcard" )
 	DISK_IMAGE( "alien", 0, SHA1(0328f12765db41a9ef5c8bfb88d4983345093072) )
@@ -364,8 +392,11 @@ ROM_START( dkbanana )
 	ROM_LOAD32_WORD( "dnk_m04.ic30", 0x000000, 0x400000, CRC(a294f17c) SHA1(7e0f865342f63f93a9a31ad7e6d3b70c59f3fa1b) )
 	ROM_LOAD32_WORD( "dnk_m05.ic33", 0x000002, 0x400000, CRC(22f5db87) SHA1(bdca65d39e94d88979218c8c586c6f20bb00e5ce) )
 
-	ROM_REGION( 0x800100, "ymz770", ROMREGION_ERASEFF ) //sound samples flash rom, not really needed, programmed by boot loader
+	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF ) //sound samples flash rom, not really needed, programmed by boot loader
 	ROM_LOAD( "29lj064.ic10", 0x000000, 0x800100, CRC(67cec133) SHA1(1412287fe977eb422a3cca6a0da1523859c2562e) )
+
+	ROM_REGION( 0x800000, "ymz770", 0 )
+	ROM_COPY( "ymz770_flash1", 0, 0, 0x800000 )
 
 	// contain host.abs and sate.abs ELF executables and game assets
 	// same card was used in both Host and Satellite units
@@ -379,8 +410,15 @@ ROM_START( dkbanans )
 	ROM_LOAD32_WORD( "dnk_s04.ic30", 0x000000, 0x400000, CRC(eed7d46f) SHA1(43edb15ff72952f7c9825e5735faa238edfd934d) )
 	ROM_LOAD32_WORD( "dnk_s05.ic33", 0x000002, 0x400000, BAD_DUMP CRC(2fc88385) SHA1(03393bdb1fa526c70d766469c37b453f0e1eb8a3) ) // 2 first bytes is bad/wrong or (unlikely) supplied by protection, see driver init
 
-	ROM_REGION( 0x1000000, "ymz770", ROMREGION_ERASEFF ) //sound samples flash rom, not really needed, programmed by boot loader
-	ROM_LOAD( "ic10", 0x000000, 0x1000000, NO_DUMP )
+	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "flash1", 0x000000, 0x800000, BAD_DUMP CRC(97e43944) SHA1(dc5c4e0f9db6497638bb80c5050acd4ec865d0e4) )
+
+	ROM_REGION( 0x800100, "ymz770_flash2", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "flash2", 0x000000, 0x800000, BAD_DUMP CRC(8c04f3a0) SHA1(b66ef92530c5cc581470c4eea3a7c350288f1f88) )
+
+	ROM_REGION( 0x1000000, "ymz770", 0 )
+	ROM_COPY( "ymz770_flash1", 0, 0,        0x800000 )
+	ROM_COPY( "ymz770_flash2", 0, 0x800000, 0x800000 )
 
 	// contain host.abs and sate.abs ELF executables and game assets
 	// same card was used in both Host and Satellite units
@@ -394,7 +432,10 @@ ROM_START( masmario )
 	ROM_LOAD32_WORD( "mpf_m04f.ic30", 0x000000, 0x200000, CRC(f83ffb1a) SHA1(fa0ec83c21d81288b69e23ee46db359a3902648e) )
 	ROM_LOAD32_WORD( "mpf_m05f.ic33", 0x000002, 0x200000, CRC(fe19dfb7) SHA1(2fdc2feb86840448eb9e47f7bd4dcc9adfc36bdf) )
 
-	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF ) // not populated
+	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF ) // not populated
+
+	ROM_REGION( 0x800000, "ymz770", 0 )
+	ROM_COPY( "ymz770_flash1", 0, 0, 0x800000 )
 ROM_END
 
 // Satellite unit
@@ -405,9 +446,12 @@ ROM_START( masmarios )
 	ROM_LOAD32_WORD( "mpf_s06j.ic39", 0x800000, 0x400000, CRC(dc20e3cc) SHA1(5b9bd0fc4a6abdda16781727b01014b0a68ef8df) )
 	ROM_LOAD32_WORD( "mpf_s07j.ic42", 0x800002, 0x400000, CRC(cb08dc74) SHA1(31e658f8bd03fea3dffa5f32dc7ac2e73930b383) )
 
-	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "mpf_s01.ic31", 0x000000, 0x400000, CRC(99688b6d) SHA1(2052471e2a742c05c2bbd6bcb24deca681df41c3) )
 	ROM_LOAD16_WORD_SWAP( "mpf_s02.ic38", 0x400000, 0x400000, CRC(251f7111) SHA1(4d6e4111d76e7f56e9aeff19686dd84717ccb78a) )
+
+	ROM_REGION( 0x800000, "ymz770", 0 )
+	ROM_COPY( "ymz770_flash1", 0, 0, 0x800000 )
 ROM_END
 
 // CF card only dumped, boot ROMs is missing
@@ -416,7 +460,15 @@ ROM_START( masmario2 )
 	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, BAD_DUMP CRC(6b2d2ef1) SHA1(0db6490b40c5716c1271b7f99608e8c7ad916516) ) //
 	ROM_LOAD32_WORD( "ic33", 0x000002, 0x400000, BAD_DUMP CRC(64049fc3) SHA1(b373b2c8cb4d66b9c700e0542bd26444484fae40) ) // modified boot roms from dkbanans
 
-	ROM_REGION( 0x1000000, "ymz770", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "flash1", 0x000000, 0x800000, BAD_DUMP CRC(30a7c77e) SHA1(3764a096ae22ecad4fba37ec62dc39c5381c5825) )
+
+	ROM_REGION( 0x800100, "ymz770_flash2", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "flash2", 0x000000, 0x800000, BAD_DUMP CRC(35d015cf) SHA1(564313bca5bc85abc0d0d84b132981bfce386bc5) )
+
+	ROM_REGION( 0x1000000, "ymz770", 0 )
+	ROM_COPY( "ymz770_flash1", 0, 0,        0x800000 )
+	ROM_COPY( "ymz770_flash2", 0, 0x800000, 0x800000 )
 
 	DISK_REGION( "ata:0:cfcard" )
 	DISK_IMAGE( "massmario2", 0, SHA1(9632c91bf2e4983ee29f417e3122e9380baee25b) )
@@ -433,8 +485,11 @@ ROM_START( mariojjl )
 	ROM_LOAD32_WORD( "spm_04c.ic30", 0x000000, 0x400000, CRC(159e912d) SHA1(5db1434d34e52f9c35d71e05675dd035765d2e6f) )
 	ROM_LOAD32_WORD( "spm_05c.ic33", 0x000002, 0x400000, CRC(482d2b32) SHA1(01fb4b5f2441dc8c0f07943f190429c19c60b9d6) )
 
-	ROM_REGION( 0x400000, "ymz770", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "spm_01.ic31", 0x000000, 0x400000, CRC(141761a7) SHA1(ab1029c9277b3932d43308a7b4c106cd526a82c7) )
+
+	ROM_REGION( 0x800000, "ymz770", 0 )
+	ROM_COPY( "ymz770_flash1", 0, 0, 0x800000 )
 ROM_END
 
 ROM_START( mmaruchan )
@@ -442,8 +497,11 @@ ROM_START( mmaruchan )
 	ROM_LOAD32_WORD( "spt_04b.ic30", 0x000000, 0x400000, CRC(9899f171) SHA1(d114c1ef0608c0740b7d58561c9f39c13b453e3a) )
 	ROM_LOAD32_WORD( "spt_05b.ic33", 0x000002, 0x400000, CRC(108efb71) SHA1(3f9e1c59f7af60976d140bf68b75c270a364f3a2) )
 
-	ROM_REGION( 0x400000, "ymz770", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "spt_01.ic31", 0x000000, 0x400000, CRC(790b4bed) SHA1(3df68610f8b81dd5f74dca0f05da47a539b45163) )
+
+	ROM_REGION( 0x800000, "ymz770", 0 )
+	ROM_COPY( "ymz770_flash1", 0, 0, 0x800000 )
 ROM_END
 
 ROM_START( mmaruchana )
@@ -451,8 +509,11 @@ ROM_START( mmaruchana )
 	ROM_LOAD32_WORD( "spt_04a.ic30", 0x000000, 0x400000, CRC(9c919870) SHA1(376a5f51e09ea0f32f511994d6a492bccdbbe0e2) )
 	ROM_LOAD32_WORD( "spt_05a.ic33", 0x000002, 0x400000, CRC(f8794160) SHA1(86a44ce678f38413fc40bdc0bd5633fa00af8ddb) )
 
-	ROM_REGION( 0x400000, "ymz770", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "spt_01.ic31", 0x000000, 0x400000, CRC(790b4bed) SHA1(3df68610f8b81dd5f74dca0f05da47a539b45163) )
+
+	ROM_REGION( 0x800000, "ymz770", 0 )
+	ROM_COPY( "ymz770_flash1", 0, 0, 0x800000 )
 ROM_END
 
 ////////////////////////
@@ -465,7 +526,11 @@ ROM_START( dokodemo )
 	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, BAD_DUMP CRC(6b2d2ef1) SHA1(0db6490b40c5716c1271b7f99608e8c7ad916516) ) //
 	ROM_LOAD32_WORD( "ic33", 0x000002, 0x400000, BAD_DUMP CRC(64049fc3) SHA1(b373b2c8cb4d66b9c700e0542bd26444484fae40) ) // modified boot roms from dkbanans
 
-	ROM_REGION( 0x800100, "ymz770", ROMREGION_ERASEFF ) //sound samples flash rom, not really needed, programmed by boot loader
+	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF ) //sound samples flash rom, not really needed, programmed by boot loader
+	ROM_LOAD16_WORD_SWAP( "flash1", 0x000000, 0x800000, BAD_DUMP CRC(dda4879f) SHA1(4aa06247ca674e86be6c111db7f6abf1ed6e121d) )
+
+	ROM_REGION( 0x800000, "ymz770", 0 )
+	ROM_COPY( "ymz770_flash1", 0, 0, 0x800000 )
 
 	DISK_REGION( "ata:0:cfcard" )
 	DISK_IMAGE( "dokodemo", 0, SHA1(0c786b6857a29b26971578abe1c8439fe43d94b5) )
@@ -476,8 +541,11 @@ ROM_START( pingu )
 	ROM_LOAD32_WORD( "stp_04.ic30", 0x000000, 0x400000, CRC(74687757) SHA1(96b6e3725bcf16e92c6966f9b9ce93cfdd7ba641) )
 	ROM_LOAD32_WORD( "stp_05.ic33", 0x000002, 0x400000, CRC(ba2e6716) SHA1(49c5abb9d96e3f4a78ed4dced7a9f052a96b186d) )
 
-	ROM_REGION( 0x800100, "ymz770", 0 ) //sound samples flash rom, not really needed, programmed by boot loader
+	ROM_REGION( 0x800100, "ymz770_flash1", 0 ) //sound samples flash rom, not really needed, programmed by boot loader
 	ROM_LOAD( "ic10", 0x000000, 0x800100, CRC(04cf9722) SHA1(854e056a03d6f7ac9b438ba9ce8a0499a79bdec8) )
+
+	ROM_REGION( 0x800000, "ymz770", 0 )
+	ROM_COPY( "ymz770_flash1", 0, 0, 0x800000 )
 
 	DISK_REGION( "ata:0:cfcard" )
 	DISK_IMAGE( "pingu", 0, SHA1(9c74e30906f229eba4bff8262c98e556d3ea1c23) )
@@ -489,7 +557,11 @@ ROM_START( wontame )
 	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, BAD_DUMP CRC(6b2d2ef1) SHA1(0db6490b40c5716c1271b7f99608e8c7ad916516) ) //
 	ROM_LOAD32_WORD( "ic33", 0x000002, 0x400000, BAD_DUMP CRC(64049fc3) SHA1(b373b2c8cb4d66b9c700e0542bd26444484fae40) ) // modified boot roms from dkbanans
 
-	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "flash1", 0x000000, 0x800000, BAD_DUMP CRC(056e982e) SHA1(4b29218b00d7023c0b748aae13752f0c12539750) )
+
+	ROM_REGION( 0x800000, "ymz770", 0 )
+	ROM_COPY( "ymz770_flash1", 0, 0, 0x800000 )
 
 	DISK_REGION( "ata:0:cfcard" )
 	DISK_IMAGE( "wontame", 0, SHA1(eb4fe73d5f723b3af08d96c6d3061c9bbc7b2488) )
@@ -499,17 +571,17 @@ ROM_END
 
 
 // Custom
-GAME( 2005, alien,     0,        alien, alien, alien_state, empty_init,    ROT0, "Capcom",               "Alien: The Arcade Medal Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2007, dkbanana,  0,        alien, alien, alien_state, empty_init,    ROT0, "Capcom",               "Donkey Kong Banana Kingdom (host)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2007, dkbanans,  dkbanana, alien, alien, alien_state, init_dkbanans, ROT0, "Capcom",               "Donkey Kong Banana Kingdom (satellite)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2004, masmario,  0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party (center)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2004, masmarios, 0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party (satellite)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2005, masmario2, 0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, alien,     0,        alien,     alien, alien_state, empty_init,    ROT0, "Capcom",               "Alien: The Arcade Medal Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, dkbanana,  0,        alien,     alien, alien_state, empty_init,    ROT0, "Capcom",               "Donkey Kong Banana Kingdom (host)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, dkbanans,  dkbanana, masmario2, alien, alien_state, init_dkbanans, ROT0, "Capcom",               "Donkey Kong Banana Kingdom (satellite)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004, masmario,  0,        alien,     alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party (center)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004, masmarios, 0,        alien,     alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party (satellite)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, masmario2, 0,        masmario2, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // Medalusion 1
-GAME( 2006, mariojjl,  0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no JanJanLand (Ver.1.00C, 06/08/29)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2005, mmaruchan, 0,        alien, alien, alien_state, empty_init,    ROT0, "Capcom",               "Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki (Ver.1.00B, 05/06/22)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ちびまる子ちゃん「みんなですごろく遊び」の巻
-GAME( 2004, mmaruchana,mmaruchan,alien, alien, alien_state, empty_init,    ROT0, "Capcom",               "Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki (Ver.1.00A, 04/04/20)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ちびまる子ちゃん「みんなですごろく遊び」の巻
+GAME( 2006, mariojjl,  0,        alien,     alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no JanJanLand (Ver.1.00C, 06/08/29)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, mmaruchan, 0,        alien,     alien, alien_state, empty_init,    ROT0, "Capcom",               "Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki (Ver.1.00B, 05/06/22)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ちびまる子ちゃん「みんなですごろく遊び」の巻
+GAME( 2004, mmaruchana,mmaruchan,alien,     alien, alien_state, empty_init,    ROT0, "Capcom",               "Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki (Ver.1.00A, 04/04/20)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ちびまる子ちゃん「みんなですごろく遊び」の巻
 // Medalusion 2
-GAME( 2006, dokodemo,  0,        alien, alien, alien_state, empty_init,    ROT0, "Sony / Capcom",        "Doko Demo Issho: Toro's Fishing", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2006, pingu,     0,        alien, alien, alien_state, empty_init,    ROT0, "Pygos Group / Capcom", "Pingu's Ice Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2008, wontame,   0,        alien, alien, alien_state, empty_init,    ROT0, "Capcom / Tomy",        "Won! Tertainment Happy Channel (Ver E)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, dokodemo,  0,        alien,     alien, alien_state, empty_init,    ROT0, "Sony / Capcom",        "Doko Demo Issho: Toro's Fishing", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, pingu,     0,        alien,     alien, alien_state, empty_init,    ROT0, "Pygos Group / Capcom", "Pingu's Ice Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2008, wontame,   0,        alien,     alien, alien_state, empty_init,    ROT0, "Capcom / Tomy",        "Won! Tertainment Happy Channel (Ver E)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
