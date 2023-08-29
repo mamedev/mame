@@ -706,7 +706,7 @@ hd6305v0_device::hd6305v0_device(const machine_config &mconfig, const char *tag,
 			owner,
 			clock,
 			HD6305V0,
-			{ s_hmos_s_ops, s_hmos_cycles, 14, 0x00ff, 0x00c0, 0x1ffc },
+			{ s_hmos_s_ops, s_hmos_cycles, 14, 0x00ff, 0x00c0, 0x1fff, 0x1ffc },
 			address_map_constructor(FUNC(hd6305v0_device::internal_map), this))
 {
 }
@@ -725,7 +725,7 @@ hd6305y2_device::hd6305y2_device(const machine_config &mconfig, const char *tag,
 			owner,
 			clock,
 			HD6305Y2,
-			{ s_hmos_s_ops, s_hmos_cycles, 14, 0x00ff, 0x00c0, 0x1ffc },
+			{ s_hmos_s_ops, s_hmos_cycles, 14, 0x00ff, 0x00c0, 0x1fff, 0x1ffc },
 			address_map_constructor(FUNC(hd6305y2_device::internal_map), this))
 {
 }
@@ -743,7 +743,7 @@ hd63705z0_device::hd63705z0_device(const machine_config &mconfig, const char *ta
 			owner,
 			clock,
 			HD63705Z0,
-			{ s_hmos_b_ops, s_hmos_cycles, 16, 0x017f, 0x0100, 0x1ffa },
+			{ s_hmos_b_ops, s_hmos_cycles, 16, 0x017f, 0x0100, 0x1fff, 0x1ffa },
 			address_map_constructor(FUNC(hd63705z0_device::internal_map), this))
 {
 }
@@ -758,13 +758,6 @@ void hd63705z0_device::internal_map(address_map &map)
 void hd6305_device::device_reset()
 {
 	m6805_base_device::device_reset();
-
-	m_s.w.l = SP_MASK;
-
-	if (m_params.m_addr_width > 14)
-		rm16<true>(0x1ffe, m_pc);
-	else
-		rm16<false>(0x1ffe, m_pc);
 }
 
 void hd6305_device::execute_set_input(int inputnum, int state)
