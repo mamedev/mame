@@ -2,7 +2,7 @@
 // copyright-holders:Nigel Barnes
 /**********************************************************************
 
-    Psion 3Link RS232 Serial Interface / Parallel Printer Interface
+    Psion 3-Link RS232 Serial Interface / Parallel Printer Interface
 
 **********************************************************************/
 
@@ -10,7 +10,9 @@
 #define MAME_BUS_PSION_SIBO_3LINK_H
 
 #include "slot.h"
+#include "machine/output_latch.h"
 #include "machine/psion_asic5.h"
+#include "bus/rs232/rs232.h"
 
 
 //**************************************************************************
@@ -19,15 +21,13 @@
 
 // ======================> psion_3link_serial_device
 
-class psion_3link_serial_device :
-	public device_t,
-	public device_psion_sibo_interface
+class psion_3link_serial_device : public device_t, public device_psion_sibo_interface
 {
 public:
 	// construction/destruction
 	psion_3link_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static constexpr feature_type unemulated_features() { return feature::COMMS; }
+	static constexpr feature_type imperfect_features() { return feature::COMMS; }
 
 protected:
 	// device_t overrides
@@ -44,6 +44,7 @@ protected:
 private:
 	required_region_ptr<uint8_t> m_rom;
 	required_device<psion_asic5_device> m_asic5;
+	required_device<rs232_port_device> m_rs232;
 
 	uint32_t m_addr_latch;
 };
@@ -51,9 +52,7 @@ private:
 
 // ======================> psion_3link_parallel_device
 
-class psion_3link_parallel_device :
-	public device_t,
-	public device_psion_sibo_interface
+class psion_3link_parallel_device : public device_t, public device_psion_sibo_interface
 {
 public:
 	// construction/destruction
@@ -72,6 +71,7 @@ protected:
 
 private:
 	required_device<psion_asic5_device> m_asic5;
+	required_device<output_latch_device> m_cent_ctrl_out;
 };
 
 

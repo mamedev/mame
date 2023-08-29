@@ -43,12 +43,14 @@ public:
 	void batsugun(machine_config &config);
 	void batsugunbl(machine_config &config);
 	void dogyuun(machine_config &config);
+	void dogyuunto(machine_config &config);
 	void enmadaio(machine_config &config);
 	void kbash(machine_config &config);
 	void kbash2(machine_config &config);
 	void pipibibs(machine_config &config);
 	void pipibibsbl(machine_config &config);
 	void snowbro2(machine_config &config);
+	void snowbro2b3(machine_config &config);
 	void tekipaki(machine_config &config);
 	void vfive(machine_config &config);
 
@@ -115,6 +117,8 @@ protected:
 	void batsugun_68k_mem(address_map &map);
 	void batsugunbl_68k_mem(address_map &map);
 	void dogyuun_68k_mem(address_map &map);
+	void dogyuunto_68k_mem(address_map &map);
+	void dogyuunto_sound_z80_mem(address_map &map);
 	void enmadaio_68k_mem(address_map &map);
 	void enmadaio_oki(address_map &map);
 	void fixeightbl_oki(address_map &map);
@@ -126,6 +130,7 @@ protected:
 	void pipibibs_68k_mem(address_map &map);
 	void pipibibs_sound_z80_mem(address_map &map);
 	void snowbro2_68k_mem(address_map &map);
+	void snowbro2b3_68k_mem(address_map &map);
 	void tekipaki_68k_mem(address_map &map);
 	void v25_mem(address_map &map);
 	void vfive_68k_mem(address_map &map);

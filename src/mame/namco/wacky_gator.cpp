@@ -92,7 +92,7 @@ private:
 	uint8_t   m_adpcm_ctrl;
 
 	uint8_t   m_alligators_ctrl;
-	int     m_motors_pos[5];
+	int       m_motors_pos[5] = { };
 };
 
 
@@ -199,6 +199,7 @@ void wackygtr_state::machine_reset()
 	m_adpcm_pos = 0;
 	m_adpcm_sel = 0;
 	m_adpcm_ctrl = 0x80;
+	m_alligators_ctrl = 0;
 }
 
 void wackygtr_state::set_digits(int p, uint8_t value)

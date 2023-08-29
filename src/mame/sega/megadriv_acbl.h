@@ -22,6 +22,7 @@ public:
 	void init_barek2();
 	void init_barek2ch();
 	void init_barek3();
+	void init_barek3a();
 	void init_sonic2mb();
 	void init_twinktmb();
 	void init_jparkmb();
@@ -35,6 +36,7 @@ private:
 	void aladmdb_w(uint16_t data);
 	uint16_t aladmdb_r();
 	uint16_t barek2mb_r();
+	uint16_t barek3mba_r();
 	uint16_t jparkmb_r();
 	uint16_t twinktmb_r();
 

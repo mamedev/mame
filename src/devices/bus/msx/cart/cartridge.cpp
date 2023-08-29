@@ -24,6 +24,7 @@
 #include "korean.h"
 #include "loveplus.h"
 #include "majutsushi.h"
+#include "matra.h"
 #include "moonsound.h"
 #include "msx_audio.h"
 #include "msxdos2.h"
@@ -72,8 +73,10 @@ void msx_cart(device_slot_interface &device, bool is_in_subslot)
 	device.option_add_internal(slotoptions::KOREAN_80IN1,    MSX_CART_KOREAN_80IN1);
 	device.option_add_internal(slotoptions::KOREAN_90IN1,    MSX_CART_KOREAN_90IN1);
 	device.option_add_internal(slotoptions::KOREAN_126IN1,   MSX_CART_KOREAN_126IN1);
+	device.option_add_internal(slotoptions::KOREAN_HYDLIDE2, MSX_CART_KOREAN_HYDLIDE2);
 	device.option_add_internal(slotoptions::LOVEPLUS,        MSX_CART_LOVEPLUS);
 	device.option_add_internal(slotoptions::MAJUSTUSHI,      MSX_CART_MAJUTSUSHI);
+	device.option_add_internal(slotoptions::MATRA_COMP,      MSX_CART_MATRA_COMP);
 	device.option_add_internal(slotoptions::MSXAUD_FSCA1,    MSX_CART_MSX_AUDIO_FSCA1);
 	device.option_add_internal(slotoptions::MSXAUD_HXMU900,  MSX_CART_MSX_AUDIO_HXMU900);
 	device.option_add_internal(slotoptions::MSXAUD_NMS1205,  MSX_CART_MSX_AUDIO_NMS1205);

@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+
+<mamelayout version="2">
+	<element name="green_led">
+		<rect state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<rect state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="orange_led">
+		<rect state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="0.6" blue="0.0" />
+		</rect>
+	</element>
+	<element name="turbo_name">
+		<text string="Turbo" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="fdd0_name">
+		<text string="Drive A" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="fdd1_name">
+		<text string="Drive B" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="neogs_name">
+		<text string="NeoGS" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<view name="System LEDs">
+		<screen index="0">
+			<bounds x="75" y="0" width="1024" height="768" />
+		</screen>
+		<element name="turbo_led_name" ref="turbo_name">
+			<bounds left="0" right="74" top="0" bottom="30" />
+		</element>
+		<element name="turbo_led" ref="green_led">
+			<bounds left="0" right="20" top="31" bottom="39" />
+		</element>
+
+		<element name="fdd0_led_name" ref="fdd0_name">
+			<bounds left="0" right="74" top="80" bottom="110" />
+		</element>
+		<element name="fdd0_led" ref="orange_led">
+			<bounds left="0" right="20" top="111" bottom="119" />
+		</element>
+		<element name="fdd1_led_name" ref="fdd1_name">
+			<bounds left="0" right="74" top="120" bottom="150" />
+		</element>
+		<element name="fdd1_led" ref="orange_led">
+			<bounds left="0" right="20" top="151" bottom="159" />
+		</element>
+
+		<element name="neogs_led_name" ref="neogs_name">
+			<bounds left="0" right="74" top="200" bottom="230" />
+		</element>
+		<element name="neogs_led" ref="green_led">
+			<bounds left="0" right="20" top="231" bottom="239" />
+		</element>
+	</view>
+</mamelayout>

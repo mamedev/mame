@@ -3,6 +3,7 @@
 /**********************************************************************
 
     VideoBrain Money Minder cartridge emulation
+    4KB ROM (Rockwell R2332C), 1KB RAM (2*Synertek 2114)
 
 **********************************************************************/
 
@@ -35,16 +36,7 @@ videobrain_money_minder_cartridge_device::videobrain_money_minder_cartridge_devi
 
 
 //-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void videobrain_money_minder_cartridge_device::device_start()
-{
-}
-
-
-//-------------------------------------------------
-//  videobrain_cd_r - cartridge data read
+//  videobrain_bo_r - cartridge data read
 //-------------------------------------------------
 
 uint8_t videobrain_money_minder_cartridge_device::videobrain_bo_r(offs_t offset, int cs1, int cs2)

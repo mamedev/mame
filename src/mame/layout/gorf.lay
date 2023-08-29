@@ -3,177 +3,131 @@
 license:CC0-1.0
 -->
 <mamelayout version="2">
-	<element name="empty" />
-	<element name="white">
-		<rect>
-			<color red="1.0" green="1.0" blue="1.0" />
-		</rect>
-	</element>
-	<element name="yellow">
-		<rect>
-			<color red="1.0" green="0.85" blue="0" />
-		</rect>
-	</element>
-	<element name="black">
-		<rect>
-			<color red="0" green="0" blue="0" />
-		</rect>
-	</element>
+
+<!-- define elements -->
+
+	<element name="white"><rect><color red="1" green="1" blue="1" /></rect></element>
+	<element name="whitem"><rect><color red="0.65" green="0.65" blue="0.66" /></rect></element>
+	<element name="yellowm"><rect><color red="1" green="0.85" blue="0.1" /></rect></element>
+	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
+
 	<element name="lamp" defstate="0">
-		<rect state="1">
-			<color red="1.0" green="0.85" blue="0.0" />
-		</rect>
+		<rect state="0"><color red="0.5" green="0.5" blue="0.5" /></rect>
+		<rect state="1"><color red="1" green="1" blue="1" /></rect>
 	</element>
-	<element name="spacetext">
-		<text string="SPACE">
-			<color red="0" green="0" blue="0" />
-		</text>
+
+	<element name="nothing"><rect><color alpha="0" /></rect></element>
+
+	<element name="text_1s"><text string="*"></text></element>
+	<element name="text_2s"><text string="*  *"></text></element>
+	<element name="text_3s"><text string="*  *  *"></text></element>
+
+	<element name="text_spacerank">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="SPACE RANK"><color red="0" green="0" blue="0" /></text>
 	</element>
-	<element name="rank">
-		<text string="SPACE RANK">
-			<color red="0" green="0" blue="0" />
-		</text>
+	<element name="text_space">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="SPACE"><color red="0" green="0" blue="0" /></text>
 	</element>
-	<element name="cadet">
-		<text string="CADET">
-			<color red="0" green="0" blue="0" />
-		</text>
+	<element name="text_cadet">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="CADET"><color red="0" green="0" blue="0" /></text>
 	</element>
-	<element name="captain">
-		<text string="CAPTAIN">
-			<color red="0" green="0" blue="0" />
-		</text>
+	<element name="text_captain">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="CAPTAIN"><color red="0" green="0" blue="0" /></text>
 	</element>
-	<element name="colonel">
-		<text string="COLONEL">
-			<color red="0" green="0" blue="0" />
-		</text>
+	<element name="text_colonel">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="COLONEL"><color red="0" green="0" blue="0" /></text>
 	</element>
-	<element name="general">
-		<text string="GENERAL">
-			<color red="0" green="0" blue="0" />
-		</text>
+	<element name="text_general">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="GENERAL"><color red="0" green="0" blue="0" /></text>
 	</element>
-	<element name="warrior">
-		<text string="WARRIOR">
-			<color red="0" green="0" blue="0" />
-		</text>
+	<element name="text_warrior">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="WARRIOR"><color red="0" green="0" blue="0" /></text>
 	</element>
-	<element name="avenger">
-		<text string="AVENGER">
-			<color red="0" green="0" blue="0" />
-		</text>
+	<element name="text_avenger">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="AVENGER"><color red="0" green="0" blue="0" /></text>
 	</element>
+
+
+<!-- build screen -->
+
+	<group name="lamps">
+		<element ref="white"><bounds x="0" y="-5" width="100" height="205" /></element>
+		<element ref="text_spacerank"><bounds xc="50" yc="3" width="80" height="12" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="0" y="-5" width="100" height="205" /></element>
+
+		<element ref="black"><bounds xc="25" yc="41" width="44" height="60" /></element>
+		<element ref="black"><bounds xc="75" yc="41" width="44" height="60" /></element>
+		<element ref="black"><bounds xc="25" yc="104" width="44" height="60" /></element>
+		<element ref="black"><bounds xc="75" yc="104" width="44" height="60" /></element>
+		<element ref="black"><bounds xc="25" yc="167" width="44" height="60" /></element>
+		<element ref="black"><bounds xc="75" yc="167" width="44" height="60" /></element>
+
+		<element ref="white"><bounds xc="25" yc="41" width="38" height="40" /></element>
+		<element ref="white"><bounds xc="75" yc="41" width="38" height="40" /></element>
+		<element ref="white"><bounds xc="25" yc="104" width="38" height="40" /></element>
+		<element ref="white"><bounds xc="75" yc="104" width="38" height="40" /></element>
+		<element ref="white"><bounds xc="25" yc="167" width="38" height="40" /></element>
+		<element ref="white"><bounds xc="75" yc="167" width="38" height="40" /></element>
+
+		<element ref="text_1s"><bounds xc="25" yc="17" width="44" height="10" /></element>
+		<element ref="nothing"><bounds xc="25" yc="67" width="44" height="10" /></element>
+		<element ref="text_2s"><bounds xc="75" yc="17" width="44" height="10" /></element>
+		<element ref="nothing"><bounds xc="75" yc="67" width="44" height="10" /></element>
+
+		<element ref="text_3s"><bounds xc="25" yc="80" width="44" height="10" /></element>
+		<element ref="nothing"><bounds xc="25" yc="130" width="44" height="10" /></element>
+		<element ref="text_3s"><bounds xc="75" yc="80" width="44" height="10" /></element>
+		<element ref="text_1s"><bounds xc="75" yc="130" width="44" height="10" /></element>
+
+		<element ref="text_3s"><bounds xc="25" yc="143" width="44" height="10" /></element>
+		<element ref="text_2s"><bounds xc="25" yc="193" width="44" height="10" /></element>
+		<element ref="text_3s"><bounds xc="75" yc="143" width="44" height="10" /></element>
+		<element ref="text_3s"><bounds xc="75" yc="193" width="44" height="10" /></element>
+
+		<element ref="text_space" blend="multiply"><bounds xc="25" yc="37" width="44" height="8" /></element>
+		<element ref="text_cadet" blend="multiply"><bounds xc="25" yc="44" width="44" height="8" /></element>
+		<element ref="text_space" blend="multiply"><bounds xc="75" yc="37" width="44" height="8" /></element>
+		<element ref="text_captain" blend="multiply"><bounds xc="75" yc="44" width="44" height="8" /></element>
+
+		<element ref="text_space" blend="multiply"><bounds xc="25" yc="100" width="44" height="8" /></element>
+		<element ref="text_colonel" blend="multiply"><bounds xc="25" yc="107" width="44" height="8" /></element>
+		<element ref="text_space" blend="multiply"><bounds xc="75" yc="100" width="44" height="8" /></element>
+		<element ref="text_general" blend="multiply"><bounds xc="75" yc="107" width="44" height="8" /></element>
+
+		<element ref="text_space" blend="multiply"><bounds xc="25" yc="163" width="44" height="8" /></element>
+		<element ref="text_warrior" blend="multiply"><bounds xc="25" yc="170" width="44" height="8" /></element>
+		<element ref="text_space" blend="multiply"><bounds xc="75" yc="163" width="44" height="8" /></element>
+		<element ref="text_avenger" blend="multiply"><bounds xc="75" yc="170" width="44" height="8" /></element>
+
+		<element ref="yellowm" blend="multiply"><bounds xc="25" yc="41" width="44" height="60" /></element>
+		<element ref="yellowm" blend="multiply"><bounds xc="75" yc="41" width="44" height="60" /></element>
+		<element ref="yellowm" blend="multiply"><bounds xc="25" yc="104" width="44" height="60" /></element>
+		<element ref="yellowm" blend="multiply"><bounds xc="75" yc="104" width="44" height="60" /></element>
+		<element ref="yellowm" blend="multiply"><bounds xc="25" yc="167" width="44" height="60" /></element>
+		<element ref="yellowm" blend="multiply"><bounds xc="75" yc="167" width="44" height="60" /></element>
+
+		<element name="lamp0" ref="lamp" blend="multiply"><bounds xc="25" yc="41" width="44" height="60" /></element>
+		<element name="lamp1" ref="lamp" blend="multiply"><bounds xc="75" yc="41" width="44" height="60" /></element>
+		<element name="lamp2" ref="lamp" blend="multiply"><bounds xc="25" yc="104" width="44" height="60" /></element>
+		<element name="lamp3" ref="lamp" blend="multiply"><bounds xc="75" yc="104" width="44" height="60" /></element>
+		<element name="lamp4" ref="lamp" blend="multiply"><bounds xc="25" yc="167" width="44" height="60" /></element>
+		<element name="lamp5" ref="lamp" blend="multiply"><bounds xc="75" yc="167" width="44" height="60" /></element>
+	</group>
+
 	<view name="Lamps">
 		<collection name="Centre Display">
-			<element ref="empty">
-				<bounds x="-112" y="0" width="524" height="400" />
-			</element>
+			<element ref="nothing"><bounds x="-96" y="0" width="492" height="400" /></element>
 		</collection>
-		<screen index="0">
-			<bounds x="0" y="0" width="300" height="400" />
-		</screen>
-		<element ref="white">
-			<bounds x="324" y="213" width="88" height="180" />
-		</element>
-		<element ref="rank">
-			<bounds x="330" y="214" width="76" height="10" />
-		</element>
-		<element ref="black">
-			<bounds x="328" y="227" width="38" height="50" />
-		</element>
-		<element ref="black">
-			<bounds x="370" y="227" width="38" height="50" />
-		</element>
-		<element ref="black">
-			<bounds x="328" y="283" width="38" height="50" />
-		</element>
-		<element ref="black">
-			<bounds x="370" y="283" width="38" height="50" />
-		</element>
-		<element ref="black">
-			<bounds x="328" y="339" width="38" height="50" />
-		</element>
-		<element ref="black">
-			<bounds x="370" y="339" width="38" height="50" />
-		</element>
-		<element name="lamp0" ref="lamp">
-			<bounds x="332" y="234" width="30" height="36" />
-		</element>
-		<element name="lamp1" ref="lamp">
-			<bounds x="374" y="234" width="30" height="36" />
-		</element>
-		<element name="lamp2" ref="lamp">
-			<bounds x="332" y="290" width="30" height="36" />
-		</element>
-		<element name="lamp3" ref="lamp">
-			<bounds x="374" y="290" width="30" height="36" />
-		</element>
-		<element name="lamp4" ref="lamp">
-			<bounds x="332" y="346" width="30" height="36" />
-		</element>
-		<element name="lamp5" ref="lamp">
-			<bounds x="374" y="346" width="30" height="36" />
-		</element>
-		<element ref="yellow">
-			<bounds x="332" y="234" width="30" height="36" />
-			<color alpha=".5" />
-		</element>
-		<element ref="yellow">
-			<bounds x="374" y="234" width="30" height="36" />
-			<color alpha=".5" />
-		</element>
-		<element ref="yellow">
-			<bounds x="332" y="290" width="30" height="36" />
-			<color alpha=".5" />
-		</element>
-		<element ref="yellow">
-			<bounds x="374" y="290" width="30" height="36" />
-			<color alpha=".5" />
-		</element>
-		<element ref="yellow">
-			<bounds x="332" y="346" width="30" height="36" />
-			<color alpha=".5" />
-		</element>
-		<element ref="yellow">
-			<bounds x="374" y="346" width="30" height="36" />
-			<color alpha=".5" />
-		</element>
-		<element ref="spacetext">
-			<bounds x="332" y="244" width="30" height="7" />
-		</element>
-		<element ref="cadet">
-			<bounds x="332" y="251" width="30" height="7" />
-		</element>
-		<element ref="spacetext">
-			<bounds x="374" y="244" width="30" height="7" />
-		</element>
-		<element ref="captain">
-			<bounds x="374" y="251" width="30" height="7" />
-		</element>
-		<element ref="spacetext">
-			<bounds x="332" y="300" width="30" height="7" />
-		</element>
-		<element ref="colonel">
-			<bounds x="332" y="307" width="30" height="7" />
-		</element>
-		<element ref="spacetext">
-			<bounds x="374" y="300" width="30" height="7" />
-		</element>
-		<element ref="general">
-			<bounds x="374" y="307" width="30" height="7" />
-		</element>
-		<element ref="spacetext">
-			<bounds x="332" y="356" width="30" height="7" />
-		</element>
-		<element ref="warrior">
-			<bounds x="332" y="363" width="30" height="7" />
-		</element>
-		<element ref="spacetext">
-			<bounds x="374" y="356" width="30" height="7" />
-		</element>
-		<element ref="avenger">
-			<bounds x="374" y="363" width="30" height="7" />
-		</element>
+		<screen index="0"><bounds x="0" y="0" width="300" height="400" /></screen>
+		<group ref="lamps"><bounds x="308" y="220" width="88" height="180" /></group>
 	</view>
+
 </mamelayout>

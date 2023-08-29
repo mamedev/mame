@@ -350,29 +350,29 @@ int running_machine::run(bool quiet)
 			nvram_save();
 		m_configuration->save_settings();
 	}
-	catch (emu_fatalerror &fatal)
+	catch (emu_fatalerror const &fatal)
 	{
 		osd_printf_error("Fatal error: %s\n", fatal.what());
 		error = EMU_ERR_FATALERROR;
 		if (fatal.exitcode() != 0)
 			error = fatal.exitcode();
 	}
-	catch (emu_exception &)
+	catch (emu_exception const &)
 	{
 		osd_printf_error("Caught unhandled emulator exception\n");
 		error = EMU_ERR_FATALERROR;
 	}
-	catch (binding_type_exception &btex)
+	catch (binding_type_exception const &btex)
 	{
 		osd_printf_error("Error performing a late bind of function expecting type %s to instance of type %s\n", btex.target_type().name(), btex.actual_type().name());
 		error = EMU_ERR_FATALERROR;
 	}
-	catch (tag_add_exception &aex)
+	catch (tag_add_exception const &aex)
 	{
 		osd_printf_error("Tag '%s' already exists in tagged map\n", aex.tag());
 		error = EMU_ERR_FATALERROR;
 	}
-	catch (std::exception &ex)
+	catch (std::exception const &ex)
 	{
 		osd_printf_error("Caught unhandled %s exception: %s\n", typeid(ex).name(), ex.what());
 		error = EMU_ERR_FATALERROR;

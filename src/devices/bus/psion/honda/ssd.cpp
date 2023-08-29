@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(PSION_SIENA_SSD, psion_siena_ssd_device, "psion_siena_ssd", "
 void psion_siena_ssd_device::device_add_mconfig(machine_config &config)
 {
 	PSION_SSD(config, m_ssd);
-	m_ssd->door_cb().set(DEVICE_SELF_OWNER, FUNC(psion_honda_slot_device::int_w));
+	m_ssd->door_cb().set(DEVICE_SELF_OWNER, FUNC(psion_honda_slot_device::write_sdoe));
 
 	RS232_PORT(config, "rs232", default_rs232_devices, nullptr);
 }

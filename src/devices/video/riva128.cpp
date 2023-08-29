@@ -28,10 +28,11 @@ References:
 #define LOGTODO(...)            LOGMASKED(LOG_TODO, __VA_ARGS__)
 
 
-DEFINE_DEVICE_TYPE(RIVA128, riva128_device, "riva128", "SGS-Thompson/nVidia Riva 128 (NV3)")
+DEFINE_DEVICE_TYPE(RIVA128,   riva128_device,   "riva128",   "SGS-Thompson/nVidia Riva 128 (NV3)")
+DEFINE_DEVICE_TYPE(RIVA128ZX, riva128zx_device, "riva128zx", "SGS-Thompson/nVidia Riva 128 ZX (NV3T)")
 
-riva128_device::riva128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, RIVA128, tag, owner, clock)
+riva128_device::riva128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, type, tag, owner, clock)
 	, m_svga(*this, "svga")
 	, m_vga_rom(*this, "vga_rom")
 {
@@ -40,6 +41,11 @@ riva128_device::riva128_device(const machine_config &mconfig, const char *tag, d
 	// 0x0019 RIVA 128 ZX (NV3T)
 	// TODO: STB uses 0x10b4xxxx, unknown for ASUS
 	set_ids_agp(0x12d20018, 0x00, 0x10921092);
+}
+
+riva128_device::riva128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: riva128_device(mconfig, RIVA128, tag, owner, clock)
+{
 }
 
 ROM_START( riva128 )
@@ -107,11 +113,11 @@ void riva128_device::config_map(address_map &map)
 	pci_device::config_map(map);
 	map(0x34, 0x34).lr8(NAME([] () { return 0x44; }));
 
-//	map(0x40, 0x43) subsystem ID alias (writeable)
-//	map(0x44, 0x4f) AGP i/f
-//	map(0x50, 0x53) ROM shadow enable
+//  map(0x40, 0x43) subsystem ID alias (writeable)
+//  map(0x44, 0x4f) AGP i/f
+//  map(0x50, 0x53) ROM shadow enable
 	map(0x54, 0x57).lrw8(
-		NAME([this] (offs_t offset) { return m_vga_legacy_enable; }), 
+		NAME([this] (offs_t offset) { return m_vga_legacy_enable; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			if (ACCESSING_BITS_0_7)
 			{
@@ -139,33 +145,33 @@ void riva128_device::mmio_map(address_map &map)
 			COMBINE_DATA(&m_main_scratchpad_id);
 		})
 	);
-//	map(0x00000000, 0x00000fff) PMC card master control
-//	map(0x00001000, 0x00001fff) PBUS bus control
-//	map(0x00002000, 0x00003fff) PFIFO
-//	map(0x00007000, 0x00007***) PRMA real mode BAR Access
-//	map(0x00009000, 0x00009***) PTIMER
-//	map(0x000a0000, 0x000bffff) PRMFB legacy VGA memory
-//	map(0x000c0000, 0x000c****) PRMVIO VGA sequencer & VGA gfx regs (multiple on NV40+)
-//	map(0x00100000, 0x0010*fff) PFB memory interface
-//	map(0x00110000, 0x0011ffff) PROM ROM access window
-//	map(0x00120000, 0x0012ffff) PALT External memory access window
-//	map(0x00400000, 0x00400fff) PGRAPH 2d/3d graphics engine
-//	map(0x00401000, 0x00401***) PDMA system memory DMA engine (NV3/NV4 only)
-//	map(0x00600000, 0x00600***) PCRTC CRTC controls (on NV4+ only?)
-//	map(0x00601000, 0x0060****) PRMCIO VGA CRTC controls
-//	map(0x00680000, 0x0068****) PRAMDAC
-//	map(0x00681000, 0x00681***) VGA DAC registers
-//	map(0x00800000, 0x00******) PFIFO MMIO submission area
+//  map(0x00000000, 0x00000fff) PMC card master control
+//  map(0x00001000, 0x00001fff) PBUS bus control
+//  map(0x00002000, 0x00003fff) PFIFO
+//  map(0x00007000, 0x00007***) PRMA real mode BAR Access
+//  map(0x00009000, 0x00009***) PTIMER
+//  map(0x000a0000, 0x000bffff) PRMFB legacy VGA memory
+//  map(0x000c0000, 0x000c****) PRMVIO VGA sequencer & VGA gfx regs (multiple on NV40+)
+//  map(0x00100000, 0x0010*fff) PFB memory interface
+//  map(0x00110000, 0x0011ffff) PROM ROM access window
+//  map(0x00120000, 0x0012ffff) PALT External memory access window
+//  map(0x00400000, 0x00400fff) PGRAPH 2d/3d graphics engine
+//  map(0x00401000, 0x00401***) PDMA system memory DMA engine (NV3/NV4 only)
+//  map(0x00600000, 0x00600***) PCRTC CRTC controls (on NV4+ only?)
+//  map(0x00601000, 0x0060****) PRMCIO VGA CRTC controls
+//  map(0x00680000, 0x0068****) PRAMDAC
+//  map(0x00681000, 0x00681***) VGA DAC registers
+//  map(0x00800000, 0x00******) PFIFO MMIO submission area
 }
 
 void riva128_device::vram_aperture_map(address_map &map)
 {
-	
+
 }
 
 void riva128_device::indirect_io_map(address_map &map)
 {
-	
+
 }
 
 u32 riva128_device::unmap_log_r(offs_t offset, u32 mem_mask)
@@ -188,9 +194,7 @@ void riva128_device::legacy_memory_map(address_map &map)
 
 void riva128_device::legacy_io_map(address_map &map)
 {
-	map(0x03b0, 0x03bf).rw(FUNC(riva128_device::vga_3b0_r), FUNC(riva128_device::vga_3b0_w));
-	map(0x03c0, 0x03cf).rw(FUNC(riva128_device::vga_3c0_r), FUNC(riva128_device::vga_3c0_w));
-	map(0x03d0, 0x03df).rw(FUNC(riva128_device::vga_3d0_r), FUNC(riva128_device::vga_3d0_w));
+	map(0, 0x02f).m(m_svga, FUNC(nvidia_nv3_vga_device::io_map));
 }
 
 uint8_t riva128_device::vram_r(offs_t offset)
@@ -203,85 +207,6 @@ void riva128_device::vram_w(offs_t offset, uint8_t data)
 	downcast<nvidia_nv3_vga_device *>(m_svga.target())->mem_w(offset, data);
 }
 
-u32 riva128_device::vga_3b0_r(offs_t offset, uint32_t mem_mask)
-{
-	uint32_t result = 0;
-	if (ACCESSING_BITS_0_7)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03b0_r(offset * 4 + 0) << 0;
-	if (ACCESSING_BITS_8_15)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03b0_r(offset * 4 + 1) << 8;
-	if (ACCESSING_BITS_16_23)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03b0_r(offset * 4 + 2) << 16;
-	if (ACCESSING_BITS_24_31)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03b0_r(offset * 4 + 3) << 24;
-	return result;
-}
-
-void riva128_device::vga_3b0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03b0_w(offset * 4 + 0, data >> 0);
-	if (ACCESSING_BITS_8_15)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03b0_w(offset * 4 + 1, data >> 8);
-	if (ACCESSING_BITS_16_23)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03b0_w(offset * 4 + 2, data >> 16);
-	if (ACCESSING_BITS_24_31)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03b0_w(offset * 4 + 3, data >> 24);
-}
-
-
-u32 riva128_device::vga_3c0_r(offs_t offset, uint32_t mem_mask)
-{
-	uint32_t result = 0;
-	if (ACCESSING_BITS_0_7)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03c0_r(offset * 4 + 0) << 0;
-	if (ACCESSING_BITS_8_15)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03c0_r(offset * 4 + 1) << 8;
-	if (ACCESSING_BITS_16_23)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03c0_r(offset * 4 + 2) << 16;
-	if (ACCESSING_BITS_24_31)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03c0_r(offset * 4 + 3) << 24;
-	return result;
-}
-
-void riva128_device::vga_3c0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03c0_w(offset * 4 + 0, data >> 0);
-	if (ACCESSING_BITS_8_15)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03c0_w(offset * 4 + 1, data >> 8);
-	if (ACCESSING_BITS_16_23)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03c0_w(offset * 4 + 2, data >> 16);
-	if (ACCESSING_BITS_24_31)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03c0_w(offset * 4 + 3, data >> 24);
-}
-
-u32 riva128_device::vga_3d0_r(offs_t offset, uint32_t mem_mask)
-{
-	uint32_t result = 0;
-	if (ACCESSING_BITS_0_7)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03d0_r(offset * 4 + 0) << 0;
-	if (ACCESSING_BITS_8_15)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03d0_r(offset * 4 + 1) << 8;
-	if (ACCESSING_BITS_16_23)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03d0_r(offset * 4 + 2) << 16;
-	if (ACCESSING_BITS_24_31)
-		result |= downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03d0_r(offset * 4 + 3) << 24;
-	return result;
-}
-
-void riva128_device::vga_3d0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03d0_w(offset * 4 + 0, data >> 0);
-	if (ACCESSING_BITS_8_15)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03d0_w(offset * 4 + 1, data >> 8);
-	if (ACCESSING_BITS_16_23)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03d0_w(offset * 4 + 2, data >> 16);
-	if (ACCESSING_BITS_24_31)
-		downcast<nvidia_nv3_vga_device *>(m_svga.target())->port_03d0_w(offset * 4 + 3, data >> 24);
-}
-
 void riva128_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
@@ -289,9 +214,37 @@ void riva128_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 	{
 		memory_space->install_readwrite_handler(0xa0000, 0xbffff, read8sm_delegate(*this, FUNC(riva128_device::vram_r)), write8sm_delegate(*this, FUNC(riva128_device::vram_w)));
 
-		io_space->install_readwrite_handler(0x3b0, 0x3bf, read32s_delegate(*this, FUNC(riva128_device::vga_3b0_r)), write32s_delegate(*this, FUNC(riva128_device::vga_3b0_w)));
-		io_space->install_readwrite_handler(0x3c0, 0x3cf, read32s_delegate(*this, FUNC(riva128_device::vga_3c0_r)), write32s_delegate(*this, FUNC(riva128_device::vga_3c0_w)));
-		io_space->install_readwrite_handler(0x3d0, 0x3df, read32s_delegate(*this, FUNC(riva128_device::vga_3d0_r)), write32s_delegate(*this, FUNC(riva128_device::vga_3d0_w)));
+		io_space->install_device(0x03b0, 0x03df, *this, &riva128_device::legacy_io_map);
 		//memory_space->install_rom(0xc0000, 0xcffff, (void *)expansion_rom);
 	}
+}
+
+/********************************************
+ *
+ * Riva 128ZX overrides
+ *
+ *******************************************/
+
+riva128zx_device::riva128zx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: riva128_device(mconfig, RIVA128ZX, tag, owner, clock)
+{
+	// $54-$57 in ROM for subvendor ID (if FBA[1] config is 1)
+	set_ids_agp(0x12d20019, 0x00, 0x12d20019);
+}
+
+ROM_START( riva128zx )
+	ROM_REGION32_LE( 0x8000, "vga_rom", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS( 0, "asus", "ASUS AGP-V3000 ZX TV (V1.70D.03)" )
+	ROMX_LOAD( "asus_agp-v3000zx.vbi", 0x000000, 0x008000, CRC(8319de18) SHA1(837fe8afdf03196550c51ff4987e7f25cc75222c), ROM_BIOS(0) )
+	// TODO: confirm if this is really a 128ZX
+	// (underlying ROM PCIR has 0x0018 not 0x0019)
+	ROM_SYSTEM_BIOS( 1, "elsa", "ELSA VICTORY Erazor/LT (Ver. 1.58.00)" )
+	ROMX_LOAD( "elsa.vbi",     0x000000, 0x008000, CRC(8dd4627a) SHA1(cfb10d9a370a951f9ed23719b2c5fa79c9e49668), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "creative", "Creative Graphics Blaster Riva 128ZX (V1.72.3D)" )
+	ROMX_LOAD( "creative_ct6730.vbi", 0x000000, 0x008000, CRC(72f03a0e) SHA1(7126c4c4d20c48848defc5dd05f0d5b698948015), ROM_BIOS(2) )
+ROM_END
+
+const tiny_rom_entry *riva128zx_device::device_rom_region() const
+{
+	return ROM_NAME(riva128zx);
 }

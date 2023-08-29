@@ -18,9 +18,9 @@ audio/video equipment, and it's used in some handheld toys too.
 #include "speaker.h"
 
 // internal artwork
-#include "compperf.lh" // clickable
+#include "compperf.lh"
 #include "scrablexa.lh"
-#include "tmbaskb.lh" // clickable
+#include "tmbaskb.lh"
 
 //#include "hh_mn1400_test.lh" // common test-layout - use external artwork
 

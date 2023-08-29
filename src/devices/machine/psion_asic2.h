@@ -32,6 +32,8 @@ public:
 	auto buzvol_cb() { return m_buzvol_cb.bind(); }
 	auto dr_cb() { return m_dr_cb.bind(); }
 	auto col_cb() { return m_col_cb.bind(); }
+	auto read_pd_cb() { return m_read_pd_cb.bind(); }
+	auto write_pd_cb() { return m_write_pd_cb.bind(); }
 
 	template <unsigned N> auto data_r() { static_assert(N < 8); return m_data_r[N].bind(); }
 	template <unsigned N> auto data_w() { static_assert(N < 8); return m_data_w[N].bind(); }
@@ -40,6 +42,7 @@ public:
 	void io_w(offs_t offset, uint8_t data);
 
 	void on_clr_w(int state);
+	void sds_int_w(int state);
 	void dnmi_w(int state);
 	void frcovl_w(int state);
 	void reset_w(int state);
@@ -51,6 +54,10 @@ protected:
 private:
 	void update_interrupts();
 
+	uint8_t m_a2_index;
+	uint8_t m_a2_icontrol0;
+	uint8_t m_a2_icontrol1;
+	uint8_t m_a2_iddr;
 	uint8_t m_a2_control1;
 	uint8_t m_a2_control2;
 	uint8_t m_a2_control3;
@@ -59,7 +66,6 @@ private:
 	uint8_t m_a2_interrupt_status;
 	uint8_t m_a2_status;
 	uint8_t m_a2_channel_control;
-	//uint8_t m_a2_external;
 
 	devcb_write_line m_int_cb;
 	devcb_write_line m_nmi_cb;
@@ -68,6 +74,8 @@ private:
 	devcb_write_line m_buzvol_cb;
 	devcb_write_line m_dr_cb;
 	devcb_read8 m_col_cb;
+	devcb_read8 m_read_pd_cb;
+	devcb_write8 m_write_pd_cb;
 
 	devcb_read8::array<8> m_data_r;
 	devcb_write16::array<8> m_data_w;

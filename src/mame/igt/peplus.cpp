@@ -1632,7 +1632,7 @@ ROM_START( peivc006 ) // Normal board : Clear Chip (IVC006) - PE+ Clear CMOS / E
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
 ROM_END
 
-ROM_START( pepk0719 ) // Normal board (non-plus) : Jacks or Better (PK0719)
+ROM_START( pepk0719 ) // Normal board (non-plus) : Standard Draw Poker (PK0719)
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -1654,7 +1654,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap791.u37", 0x0000, 0x0100, CRC(6957242b) SHA1(e4a8decbf6f62d46eac1734b4fdb3d3b02ee4c90) )
 ROM_END
 
-ROM_START( pepk0719a ) // Normal board (non-plus) : Jacks or Better (PK0719)
+ROM_START( pepk0719a ) // Normal board (non-plus) : Standard Draw Poker (PK0719)
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -1676,7 +1676,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap435.u37", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
 ROM_END
 
-ROM_START( pepk0719b ) // Normal board (non-plus) : Jacks or Better (PK0719)
+ROM_START( pepk0719b ) // Normal board (non-plus) : Standard Draw Poker (PK0719)
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -1698,7 +1698,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap435.u37", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
 ROM_END
 
-ROM_START( pepk0756 ) // Normal board (non-plus) : Jacks or Better (PK0756)
+ROM_START( pepk0756 ) // Normal board (non-plus) : Standard Draw Poker (PK0756)
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -1720,7 +1720,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap435.u37", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
 ROM_END
 
-ROM_START( pepk0756a ) // Normal board (non-plus) : Jacks or Better (PK0756)
+ROM_START( pepk0756a ) // Normal board (non-plus) : Standard Draw Poker (PK0756)
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -1742,7 +1742,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap857.u37", 0x0000, 0x0100, CRC(6957242b) SHA1(e4a8decbf6f62d46eac1734b4fdb3d3b02ee4c90) )
 ROM_END
 
-ROM_START( pepk0756b ) // Normal board (non-plus) : Jacks or Better (PK0756)
+ROM_START( pepk0756b ) // Normal board (non-plus) : Standard Draw Poker (PK0756)
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -1764,7 +1764,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap435.u37", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
 ROM_END
 
-ROM_START( pepk0756c ) // Normal board (non-plus) : Jacks or Better (PK0756)
+ROM_START( pepk0756c ) // Normal board (non-plus) : Standard Draw Poker (PK0756)
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -1786,7 +1786,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap435.u37", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
 ROM_END
 
-ROM_START( pepk0756d ) // Normal board (non-plus) : Jacks or Better (PK0756)
+ROM_START( pepk0756d ) // Normal board (non-plus) : Standard Draw Poker (PK0756)
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -1830,7 +1830,7 @@ PayTable  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap435.u37", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
 ROM_END
 
-ROM_START( pepk0758 ) // Normal (non-plus) board : Jacks or Better (PK0758)
+ROM_START( pepk0758 ) // Normal (non-plus) board : Standard Draw Poker (PK0758)
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -1852,7 +1852,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap435.u37", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
 ROM_END
 
-ROM_START( pepk0769 ) // Normal board (non-plus) : Jacks or Better (PK0769)
+ROM_START( pepk0769 ) // Normal board (non-plus) : Standard Draw Poker (PK0769)
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -1874,7 +1874,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap435.u37", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
 ROM_END
 
-ROM_START( pepk0773 ) // Normal board (non-plus) : Jacks or Better (PK0773)
+ROM_START( pepk0773 ) // Normal board (non-plus) : Standard Draw Poker (PK0773)
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -2008,7 +2008,7 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 	ROM_LOAD( "cap435.u37", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
 ROM_END
 
-ROM_START( pepk0823 ) // Normal (non-plus) board : Jacks or Better (PK0823)
+ROM_START( pepk0823 ) // Normal (non-plus) board : Standard Draw Poker (PK0823)
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -2048,6 +2048,27 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 	ROM_LOAD( "mg0-cg702.u53",   0x08000, 0x4000, CRC(b6a5c792) SHA1(f010773b911cbbdb7f184e07aa1595021063e8d6) )
 	ROM_LOAD( "mb0-cg702.u54",   0x10000, 0x4000, CRC(bc7873c3) SHA1(0a4b7f1e2a6af43c7681d7c1986e917bb166e518) )
 	ROM_LOAD( "mx0-cg702.u55",   0x18000, 0x4000, CRC(f2b852d1) SHA1(4a65bf04587d035e1f72d488ae40ec47887f4d56) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap435.u37", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
+ROM_END
+
+ROM_START( pepk0846 ) // Normal board (non-plus) : Standard Draw Poker (PK0846)
+/*
+PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
+----------------------------------------------------------
+  ????      1    1    3    4    5   7  25 100 400   1200
+     Programs Available: PK0846
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pk0846-pc098.u58",   0x00000, 0x8000, CRC(0b514444) SHA1(8c2dbcabe6a7844a9e040b959289f07c8d79fa36) ) // Game Version: PC098
+	ROM_RELOAD(                     0x08000, 0x8000) // 32K version build for the original PE boards (non-plus)
+
+	ROM_REGION( 0x020000, "tiles", 0 )
+	ROM_LOAD( "mr0-cg534.u52",   0x00000, 0x4000, CRC(57180734) SHA1(39ed464e6dbe6d17af1528aa5031349b6c4eb029) )
+	ROM_LOAD( "mg0-cg534.u53",   0x08000, 0x4000, CRC(4ef5ef35) SHA1(94b9f37c4a3a8dea1eaeeafa31e19819dcad7290) )
+	ROM_LOAD( "mb0-cg534.u54",   0x10000, 0x4000, CRC(dd0d224c) SHA1(39d1d62e12a7f8edc76cb498b006006b52ba007f) )
+	ROM_LOAD( "mx0-cg534.u55",   0x18000, 0x4000, CRC(079dfe4b) SHA1(a767eba04c11b67c61654b513cf077869a216295) )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "cap435.u37", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
@@ -2308,7 +2329,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "cap435.u37", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
 ROM_END
 
-ROM_START( pepk1013 ) // Normal board (non-plus) : Jacks or Better (PK1013)
+ROM_START( pepk1013 ) // Normal board (non-plus) : Standard Draw Poker (PK1013)
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -2341,6 +2362,28 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pk1015-pc088.u58",   0x00000, 0x8000, CRC(4db2c014) SHA1(eccada973b6c3b511bd8079573fba383f7519262) ) // Game Version: PC088
+	ROM_RELOAD(                     0x08000, 0x8000) // 32K version build for the original PE boards (non-plus)
+
+	ROM_REGION( 0x020000, "tiles", 0 )
+	ROM_LOAD( "mr0-cg534.u52",   0x00000, 0x4000, CRC(57180734) SHA1(39ed464e6dbe6d17af1528aa5031349b6c4eb029) )
+	ROM_LOAD( "mg0-cg534.u53",   0x08000, 0x4000, CRC(4ef5ef35) SHA1(94b9f37c4a3a8dea1eaeeafa31e19819dcad7290) )
+	ROM_LOAD( "mb0-cg534.u54",   0x10000, 0x4000, CRC(dd0d224c) SHA1(39d1d62e12a7f8edc76cb498b006006b52ba007f) )
+	ROM_LOAD( "mx0-cg534.u55",   0x18000, 0x4000, CRC(079dfe4b) SHA1(a767eba04c11b67c61654b513cf077869a216295) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap435.u37", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
+ROM_END
+
+ROM_START( pepk1017 ) // Normal board (non-plus) : Standard Draw Poker (PK1017)
+/*
+PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
+----------------------------------------------------------
+  P11A      1    2    3    4    5   7  25  50 250    800
+  % Range: 92.1-94.1%  Optimum: 96.1%  Hit Frequency: 45.3%
+     Programs Available: PK1017
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pk1017-pc041.u58",   0x00000, 0x8000, CRC(51211abd) SHA1(7cd896370b3bdf4db73f425453049ac640142c77) ) // Game Version: PC041
 	ROM_RELOAD(                     0x08000, 0x8000) // 32K version build for the original PE boards (non-plus)
 
 	ROM_REGION( 0x020000, "tiles", 0 )
@@ -3388,6 +3431,32 @@ Superseded by PP0428 (Non Double-up) / PP0459
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0051_554-544.u68",   0x00000, 0x8000, CRC(66329607) SHA1(bc980257645225a24cd71a10b4a4cb592f878b3b) ) // Game Version: 554, Library Version: 544, Video Lib Ver: 544
+	ROM_RELOAD(                       0x08000, 0x8000) // 32K version built using earlier gaming libraries
+
+	ROM_REGION( 0x020000, "tiles", 0 )
+	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) ) //  08/12/87   @ IGT  L87-2243
+	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
+	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
+	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
+ROM_END
+
+ROM_START( pepp0052 ) // Normal board Joker Poker (Aces or Better) (PP0052)
+/*
+                                            w/J     w/oJ
+PayTable   As   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
+----------------------------------------------------------------
+  P18A      1    1   2   3    5   6  20  50 100 200 500    800
+  % Range: 89.8-91.8%  Optimum: 93.8%  Hit Frequency: 37.6%
+     Programs Available: PP0052
+
+Superseded by PP0429 (Non Double-up) / PP0458
+
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pp0052_554-544.u68",   0x00000, 0x8000, CRC(c3baee09) SHA1(d9892c7163d84c1f8ef8298bbadfffd43df3f3c4) ) // Game Version: 554, Library Version: 544, Video Lib Ver: 544
 	ROM_RELOAD(                       0x08000, 0x8000) // 32K version built using earlier gaming libraries
 
 	ROM_REGION( 0x020000, "tiles", 0 )
@@ -11412,6 +11481,33 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) )
 ROM_END
 
+ROM_START( pex0444p ) // Superboard : Standard Draw Poker (X000444P+XP000038) - PSR Verified
+/*
+PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
+----------------------------------------------------------
+ P223A      1    2    3    4    5   8  30  50 250    800
+  % Range: 94.5-96.5%  Optimum: 98.5%  Hit Frequency: 45.5%
+     Programs Available: X000444P
+
+4 of a Kind pays out at 30 per coin in vs. the usual 25 per coin in.
+
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) //  09/05/95   @ IGT  L95-2452
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "x000444p.u66",   0x00000, 0x10000, CRC(eb76d89f) SHA1(ab435d8af92d4c6b07246cdd50c6ffcacc00303a) ) // Standard Draw Poker - 03/07/95   @ IGT  L95-0771
+
+	ROM_REGION( 0x020000, "tiles", 0 )
+	ROM_LOAD( "mro-cg2242.u77",  0x00000, 0x8000, CRC(963a7e7d) SHA1(ebb159f6c731a3f912382745ef9a9c6d4fa2fc99) ) //  03/19/96   @ IGT  L96-0703
+	ROM_LOAD( "mgo-cg2242.u78",  0x08000, 0x8000, CRC(53eed56f) SHA1(e79f31c5c817b8b96b4970c1a702d1892961d441) )
+	ROM_LOAD( "mbo-cg2242.u79",  0x10000, 0x8000, CRC(af092f50) SHA1(53a3536593bb14c4072e8a5ee9e05af332feceb1) )
+	ROM_LOAD( "mxo-cg2242.u80",  0x18000, 0x8000, CRC(ecacb6b2) SHA1(32660adcc266fbbb3702a0cd30e25d11b953d23d) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) )
+ROM_END
+
 ROM_START( pex0447p ) // Superboard : Standard Draw Poker (X000447P+XP000038) - PSR Verified
 /*
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  SF  RF  (Bonus)
@@ -15764,9 +15860,9 @@ GAMEL( 1987, pepk0756b, pepk0719, peplus, nonplus_poker, peplus_state, init_nonp
 GAMEL( 1987, pepk0756c, pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0756-PC011) Standard Draw Poker",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepk0756d, pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0756-PC001) Standard Draw Poker",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepk0757,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0757-PC074) Two Pair or Better",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
-GAMEL( 1987, pepk0758,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0758-PC041) Jacks or Better",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0758,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0758-PC041) Standard Draw Poker",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepk0769,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0769-PC092) Standard Draw Poker",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
-GAMEL( 1987, pepk0773,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0773-PC041) Jacks or Better",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0773,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0773-PC041) Standard Draw Poker",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepk0785,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0785-PC041) Tens or Better",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepk0788,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0788-PC041) Tens or Better",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepk0810,  0,        peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0810-PC041) Joker Poker",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
@@ -15774,6 +15870,7 @@ GAMEL( 1987, pepk0810a, pepk0810, peplus, nonplus_poker, peplus_state, init_nonp
 GAMEL( 1987, pepk0811,  pepk0810, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0811-PC041) Joker Poker",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepk0823,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0823-PC009) Standard Draw Poker",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepk0832,  pepk0810, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0832-PC041) Joker Poker",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0846,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0846-PC098) Standard Draw Poker",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepk0849,  pepk0810, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0849-PC041) Joker Poker (Two Pair or Better)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepk0856,  pepk0810, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0856-PC092) Joker Poker",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepk0856a, pepk0810, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0856-PC011) Joker Poker",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
@@ -15787,6 +15884,7 @@ GAMEL( 1987, pepk1002,  0,        peplus, nonplus_poker, peplus_state, init_nonp
 GAMEL( 1987, pepk1004,  pepk0858, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK1004-PC075) Deuces Wild Poker",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepk1013,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK1013-PC087) Tens or Better",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepk1015,  0,        peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK1015-PC088) 4 of a Kind Bonus Poker",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk1017,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK1017-PC041) Standard Draw Poker",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepk1020,  pepk1015, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK1020-PC078) 4 of a Kind Bonus Poker",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepk1024,  0,        peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK1024-PC095) Aces and Faces Bonus Poker",       MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepk1030,  pepk1015, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK1030-PC088) 4 of a Kind Bonus Poker",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
@@ -15837,6 +15935,7 @@ GAMEL( 1987, pepp0050a, pepp0048, peplus, peplus_poker,  peplus_state, init_nonp
 GAMEL( 1987, pepp0050b, pepp0048, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0050) Joker Poker (set 3)",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepp0050c, pepp0048, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0050) Joker Poker (set 4, El Cortez)",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepp0051,  pepp0048, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0051) Joker Poker",                   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0052,  pepp0048, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0052) Joker Poker (Aces or Better)",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepp0053,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0053) Joker Poker (Aces or Better)",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepp0054,  0,        peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0054) Deuces Wild Poker (El Cortez)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepp0055,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0055) Deuces Wild Poker (set 1)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
@@ -16075,11 +16174,11 @@ GAMEL( 1987, peip0120,  peip0031, peplus, peplus_poker,  peplus_state, init_nonp
 
 // Normal board : Player's Choice Poker */
 GAMEL(1987, pcramclr,   0,        peplus,  peplus_poker, peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Choice RAM Clear",                                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
-GAMEL(1987, pc644vz,    0,        peplus,  peplus_poker, peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Choice (PC644VZ) Jacks or Better",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
-GAMEL(1987, pc679cy,    pc644vz,  peplus,  peplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Choice (PC679CY) Jacks or Better",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
-GAMEL(1987, pc714vz,    pc644vz,  peplus,  peplus_poker, peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Choice (PC714VZ) Jacks or Better",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
-GAMEL(1987, pc716vy,    pc644vz,  peplus,  peplus_poker, peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Choice (PC716VY) Jacks or Better",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
-GAMEL(1987, pc718vy,    pc644vz,  peplus,  peplus_poker, peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Choice (PC718VY) Jacks or Better",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL(1987, pc644vz,    0,        peplus,  peplus_poker, peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Choice (PC644VZ) Standard Draw Poker",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL(1987, pc679cy,    pc644vz,  peplus,  peplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Choice (PC679CY) Standard Draw Poker",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL(1987, pc714vz,    pc644vz,  peplus,  peplus_poker, peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Choice (PC714VZ) Standard Draw Poker",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL(1987, pc716vy,    pc644vz,  peplus,  peplus_poker, peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Choice (PC716VY) Standard Draw Poker",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL(1987, pc718vy,    pc644vz,  peplus,  peplus_poker, peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Choice (PC718VY) Standard Draw Poker",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 
 
 // Normal board Multi-Game - Player's Choice - Some sets require a printer (not yet supported)
@@ -16229,6 +16328,7 @@ GAMEL( 1995, pex0417p,  0,        peplus, peplus_poker,  peplus_state, init_pepl
 GAMEL( 1995, pex0426p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000426P+XP000038) Joker Poker",         MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1995, pex0430p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000430P+XP000079) Deuces Joker Wild Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1995, pex0434p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000434P+XP000038) Bonus Poker Deluxe",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0444p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000444P+XP000038) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1995, pex0447p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000447P+XP000038) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1995, pex0449p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000449P+XP000038) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1995, pex0451p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000451P+XP000038) Bonus Poker Deluxe",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )

@@ -11,9 +11,10 @@
 
 #pragma once
 
+#include "machine/eepromser.h"
 #include "video/ati_mach8.h"
 #include "video/pc_vga_ati.h"
-#include "machine/eepromser.h"
+
 
 // 8514/A module of the Mach32
 class mach32_8514a_device : public mach8_device

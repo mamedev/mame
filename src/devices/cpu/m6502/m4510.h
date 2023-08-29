@@ -4,7 +4,7 @@
 
     m4510.h
 
-    65ce02 with a mmu and a port
+    65ce02 with a mmu and a cia integrated
 
 ***************************************************************************/
 

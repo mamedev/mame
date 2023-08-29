@@ -57,7 +57,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sokoban">
-		<description>Sokoban - Store Keepers</description>
+		<description>Sokoban: Store Keepers</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<info name="serial" value="5" />

@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="ledr" defstate="0">
+		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+	</element>
+	<element name="ledg" defstate="0">
+		<disk state="0"><color red="0.01" green="0.1" blue="0.015" /></disk>
+		<disk state="1"><color red="0.1" green="1.0" blue="0.15" /></disk>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-0.5" right="23.5" top="-0.5" bottom="17.5" />
+
+		<!-- invaders -->
+		<repeat count="5">
+			<param name="y" start="0" increment="2" />
+			<param name="i" start="0" increment="1" />
+			<repeat count="6">
+				<param name="x" start="0" increment="4" />
+				<param name="j" start="0" increment="1" />
+				<element name="~i~.~j~" ref="ledr"><bounds x="~x~" y="~y~" width="1" height="1" /></element>
+			</repeat>
+		</repeat>
+
+		<!-- barriers -->
+		<repeat count="6">
+			<param name="x" start="2" increment="4" />
+			<param name="i" start="0" increment="1" />
+			<element name="5.~i~" ref="ledg"><bounds x="~x~" y="12" width="1" height="1" /></element>
+		</repeat>
+
+		<!-- wand (bullets) -->
+		<repeat count="4">
+			<param name="y" start="0" increment="2" />
+			<param name="i" start="0" increment="1" />
+			<element ref="ledr" blend="add" name="~i~.7">
+				<animate inputtag="IN.1" mask="0xfff" />
+				<bounds state="0x000" x="-1" y="~y~" width="1" height="1" />
+				<bounds state="0xc00" x="23" y="~y~" width="1" height="1" />
+			</element>
+		</repeat>
+		<repeat count="4">
+			<param name="y" start="8" increment="2" />
+			<param name="i" start="0" increment="1" />
+			<element ref="ledr" blend="add" name="~i~.6">
+				<animate inputtag="IN.1" mask="0xfff" />
+				<bounds state="0x000" x="-1" y="~y~" width="1" height="1" />
+				<bounds state="0xc00" x="23" y="~y~" width="1" height="1" />
+			</element>
+		</repeat>
+
+		<!-- wand (player) -->
+		<element ref="ledg" blend="add" name="4.6">
+			<animate inputtag="IN.1" mask="0xfff" />
+			<bounds state="0x000" x="-1" y="16" width="1" height="1" />
+			<bounds state="0xc00" x="23" y="16" width="1" height="1" />
+		</element>
+
+	</view>
+</mamelayout>

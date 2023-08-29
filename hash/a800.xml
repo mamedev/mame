@@ -7288,4 +7288,95 @@ Garbage row strip at bottom of screen
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- aDawilah releases, QA presumes using a65xea main set -->
+	<!-- TODO: Language barrier for all (Arabic) -->
+	<software name="adaw_akh" supported="no">
+		<!-- "IQ Test" -->
+		<description>Akhtabar Dhakayik</description>
+		<year>198?</year>
+		<publisher>aDawliah</publisher>
+		<notes><![CDATA[
+Needs Arabic keyboard layout
+During gameplay the timer/question (?) has offset char (verify)
+]]></notes>
+		<info name="alt_title" value="اختبر ذكائك"/>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_adawliah" />
+			<dataarea name="rom" size="32768">
+				<rom name="akhtabir dhakayik (198x)(adawliah)(sa).bin" size="32768" crc="a0252f95" sha1="5cf9325f3dde797cf22e323983e64ce88fcabd44"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adaw_alta" supported="no">
+		<!-- "Power" -->
+		<description>al-Taaqa</description>
+		<year>198?</year>
+		<publisher>aDawliah</publisher>
+		<notes><![CDATA[
+Needs Arabic keyboard layout
+[ANTIC] background pens and timing looks odd (verify)
+]]></notes>
+		<info name="alt_title" value="الطاقة"/>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_adawliah" />
+			<dataarea name="rom" size="32768">
+				<rom name="altaaqa (198x)(adawliah)(sa).bin" size="32768" crc="0483fa8b" sha1="83cdc8fe569cb1cfdc23ec2ff577d691a1e0fd67"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adaw_bank" supported="no">
+		<!-- "Data Bank" -->
+		<description>Bank al-Maelumat</description>
+		<year>198?</year>
+		<publisher>aDawliah</publisher>
+		<notes><![CDATA[
+Needs Arabic keyboard layout
+]]></notes>
+		<info name="alt_title" value="بنك المعلومات"/>
+		<part name="cart" interface="a8bit_cart">
+			<!-- TODO: Original .car ROM set as #56 (SIC! 512KB), unlikely? -->
+			<!-- <feature name="slot" value="a800_adawliah" /> -->
+			<feature name="slot" value="sic_512kb" />
+			<dataarea name="rom" size="524288">
+				<rom name="bank almaelumat (198x)(adawliah)(sa).bin" size="524288" crc="80fa21eb" sha1="d97f1333cb4dd292a12fb6752a357aecbefefca4" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adaw_kayf" supported="no">
+		<!-- "How Computers Work" -->
+		<description>Kayf Yaemal al-Computer</description>
+		<year>198?</year>
+		<publisher>aDawliah</publisher>
+		<notes><![CDATA[
+Needs Arabic keyboard layout
+]]></notes>
+		<info name="alt_title" value="كيف يعمل الكمبيوتر"/>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_adawliah" />
+			<dataarea name="rom" size="32768">
+				<rom name="kayf yaemal alkumbuyutar (198x)(adawliah)(sa).bin" size="32768" crc="b793b32e" sha1="45d33eac87756ec2865f398d5ccdd203a79b933a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adaw_qam" supported="no">
+		<!-- "Star Dictionary" -->
+		<description>Qamus Najm</description>
+		<year>198?</year>
+		<publisher>aDawliah</publisher>
+		<notes><![CDATA[
+Needs Arabic keyboard layout, prompts using arrow keys that aren't available in English layout
+]]></notes>
+		<info name="alt_title" value="قاموس نجم"/>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_adawliah" />
+			<dataarea name="rom" size="32768">
+				<rom name="qamus najm (198x)(adawliah)(sa).bin" size="32768" crc="79457426" sha1="fcce458bc72a39132c3a09cfbb1cac6b982245f0"/>
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

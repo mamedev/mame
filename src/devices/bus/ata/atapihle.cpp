@@ -3,8 +3,8 @@
 #include "emu.h"
 #include "atapihle.h"
 
-atapi_hle_device::atapi_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: ata_hle_device(mconfig, type, tag, owner, clock),
+atapi_hle_device::atapi_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	ata_hle_device_base(mconfig, type, tag, owner, clock),
 	m_packet(0),
 	m_data_size(0)
 {
@@ -13,13 +13,13 @@ atapi_hle_device::atapi_hle_device(const machine_config &mconfig, device_type ty
 void atapi_hle_device::device_start()
 {
 	t10_start(*this);
-	ata_hle_device::device_start();
+	ata_hle_device_base::device_start();
 }
 
 void atapi_hle_device::device_reset()
 {
 	t10_reset();
-	ata_hle_device::device_reset();
+	ata_hle_device_base::device_reset();
 }
 
 void atapi_hle_device::process_buffer()
@@ -257,7 +257,7 @@ void atapi_hle_device::process_command()
 		break;
 
 	default:
-		ata_hle_device::process_command();
+		ata_hle_device_base::process_command();
 		break;
 	}
 }
@@ -267,7 +267,7 @@ void atapi_hle_device::finished_command()
 	switch (m_command)
 	{
 	default:
-		ata_hle_device::finished_command();
+		ata_hle_device_base::finished_command();
 		break;
 	}
 }

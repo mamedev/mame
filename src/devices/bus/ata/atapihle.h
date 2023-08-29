@@ -13,10 +13,10 @@
 
 #pragma once
 
-#include "atahle.h"
+#include "machine/atahle.h"
 #include "machine/t10spc.h"
 
-class atapi_hle_device : public ata_hle_device, public virtual t10spc
+class atapi_hle_device : public ata_hle_device_base, public virtual t10spc
 {
 public:
 	enum atapi_features_flag_t

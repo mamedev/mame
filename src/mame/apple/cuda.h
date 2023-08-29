@@ -5,68 +5,46 @@
 
 #pragma once
 
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define CUDA_TAG    "cuda"
-
-#define CUDA_341S0060   0x1100  // v2.40 (Most common: Performa/Quadra 6xx, PowerMac x200, x400, x500, Pippin, Gossamer G3)
-#define CUDA_341S0788   0x2200  // v2.37 (LC 475/575/Quadra 605, Quadra 660AV/840AV, PowerMac x200)
-#define CUDA_341S0417   0x3300  // v2.35 (Color Classic)
-
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> cuda_device
-
+/// \brief Base class for Apple Cuda devices.
+///
+/// Cuda is a semi-custom Motorola 68HC05 microcontroller with
+/// on-board RAM and ROM plus several GPIO pins.  Cuda handles
+/// simple power management, the Apple Desktop Bus, I2C, real-time
+/// clock, and parameter RAM.
 class cuda_device :  public device_t, public device_nvram_interface
 {
 public:
 	// construction/destruction
-	cuda_device(const machine_config &mconfig, const char *tag, device_t *owner, int type)
-		: cuda_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		set_type(type);
-	}
-
-	cuda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// inline configuration helpers
-	void set_type(int type) { rom_offset = type; }
+	cuda_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_config_nvram_interface overrides
 	virtual void nvram_default() override;
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
 
-	uint8_t ddr_r(offs_t offset);
-	void ddr_w(offs_t offset, uint8_t data);
-	uint8_t ports_r(offs_t offset);
-	void ports_w(offs_t offset, uint8_t data);
-	uint8_t pll_r();
-	void pll_w(uint8_t data);
-	uint8_t timer_ctrl_r();
-	void timer_ctrl_w(uint8_t data);
-	uint8_t timer_counter_r();
-	void timer_counter_w(uint8_t data);
-	uint8_t onesec_r();
-	void onesec_w(uint8_t data);
-	uint8_t pram_r(offs_t offset);
-	void pram_w(offs_t offset, uint8_t data);
+	u8 ddr_r(offs_t offset);
+	void ddr_w(offs_t offset, u8 data);
+	u8 ports_r(offs_t offset);
+	void ports_w(offs_t offset, u8 data);
+	u8 pll_r();
+	void pll_w(u8 data);
+	u8 timer_ctrl_r();
+	void timer_ctrl_w(u8 data);
+	u8 timer_counter_r();
+	u8 onesec_r();
+	void onesec_w(u8 data);
+	u8 pram_r(offs_t offset);
+	void pram_w(offs_t offset, u8 data);
 
 	// VIA interface routines
-	uint8_t get_treq() { return treq; }
-	void set_tip(uint8_t val) { tip = val; }
-	void set_byteack(uint8_t val) { byteack = val; }
-	uint8_t get_via_data() { return via_data; }
-	void set_via_data(uint8_t dat) { via_data = dat; }
-	uint8_t get_via_clock() { return via_clock; }
-	void set_adb_line(int linestate) { adb_in = (linestate == ASSERT_LINE) ? true : false; }
-	void set_iic_sda(uint8_t data) { iic_sda = (data & 1); }
+	u8 get_treq() { return m_treq; }
+	void set_tip(u8 val) { m_tip = val; }
+	void set_byteack(u8 val) { m_byteack = val; }
+	u8 get_via_data() { return m_via_data; }
+	void set_via_data(u8 dat) { m_via_data = dat; }
+	u8 get_via_clock() { return m_via_clock; }
+	void set_adb_line(int linestate) { m_adb_in = (linestate == ASSERT_LINE) ? true : false; }
+	void set_iic_sda(u8 data) { m_iic_sda = (data & 1); }
 	int get_adb_dtime() { return m_adb_dtime; }
 
 	int rom_offset;
@@ -80,7 +58,8 @@ public:
 
 	devcb_write_line write_reset, write_linechange, write_via_clock, write_via_data, write_iic_scl, write_iic_sda;
 
-	void cuda_map(address_map &map);
+	virtual void cuda_map(address_map &map);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -92,29 +71,70 @@ protected:
 	TIMER_CALLBACK_MEMBER(timer_tick);
 
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<u8> m_internal_ram;
+	required_region_ptr<u8> m_rom;
+	required_region_ptr<u8> m_default_nvram;
 
 private:
-	uint8_t ddrs[3]{};
-	uint8_t ports[3]{};
-	uint8_t pll_ctrl = 0;
-	uint8_t timer_ctrl = 0;
-	uint8_t timer_counter = 0, ripple_counter = 0;
-	uint8_t onesec = 0;
-	uint8_t treq = 0, byteack = 0, tip = 0, via_data = 0, via_clock = 0, last_adb = 0;
-	uint8_t iic_sda;
-	uint64_t last_adb_time = 0;
-	bool cuda_controls_power = false;
-	bool adb_in = false;
-	int reset_line = 0;
-	int m_adb_dtime = 0;
-	emu_timer *m_timer = nullptr, *m_prog_timer = nullptr;
-	uint8_t pram[0x100]{}, disk_pram[0x100]{};
-	bool pram_loaded = false;
+	u8 m_ddrs[3]{};
+	u8 m_ports[3]{};
+	u8 m_pll_ctrl;
+	u8 m_timer_ctrl;
+	u8 m_onesec;
+	u8 m_treq, m_byteack, m_tip, m_via_data, m_via_clock, m_last_adb;
+	u8 m_iic_sda;
+	u64 m_last_adb_time;
+	bool m_cuda_controls_power;
+	bool m_adb_in;
+	s32 m_reset_line;
+	s32 m_adb_dtime;
+	emu_timer *m_timer, *m_prog_timer;
+	u8 m_pram[0x100]{}, m_disk_pram[0x100]{};
+	bool m_pram_loaded;
 
-	void send_port(uint8_t offset, uint8_t data);
+	void send_port(u8 offset, u8 data);
+};
+
+class cuda_2xx_device : public cuda_device
+{
+public:
+	cuda_2xx_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+class cuda_302_device : public cuda_device
+{
+public:
+	cuda_302_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	void cuda_map(address_map &map) override;
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	u8 portb_r();
+};
+
+class cuda_lite_device : public cuda_device
+{
+public:
+	cuda_lite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	void cuda_map(address_map &map) override;
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	u8 portb_r();
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(CUDA, cuda_device)
+DECLARE_DEVICE_TYPE(CUDA_V2XX, cuda_2xx_device)
+DECLARE_DEVICE_TYPE(CUDA_LITE, cuda_lite_device)
+DECLARE_DEVICE_TYPE(CUDA_V302, cuda_302_device)
 
 #endif // MAME_APPLE_CUDA_H

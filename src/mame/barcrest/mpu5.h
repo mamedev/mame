@@ -17,9 +17,13 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_sec(*this, "sec")
+		, m_statuslamp(*this, "statuslamp%u", 1U)
 	{ }
 
 	void mpu5(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	uint16_t mpu5_mem_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -33,7 +37,6 @@ private:
 	uint16_t pic_r(offs_t offset);
 	void pic_w(offs_t offset, uint16_t data);
 
-	virtual void machine_start() override;
 	void mpu5_map(address_map &map);
 
 	uint16_t* m_cpuregion = nullptr;
@@ -53,6 +56,8 @@ private:
 	// devices
 	required_device<m68340_cpu_device> m_maincpu;
 	required_device<sec_device> m_sec;
+
+	output_finder<2> m_statuslamp;
 };
 
 INPUT_PORTS_EXTERN( mpu5 );

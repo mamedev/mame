@@ -400,8 +400,8 @@ protected:
 	address_space_config m_program_config_be;
 
 	// memory access helpers
-	memory_access<36, 3, 0, ENDIANNESS_LITTLE>::cache m_le;
-	memory_access<36, 3, 0, ENDIANNESS_BIG>::cache m_be;
+	memory_access<32, 3, 0, ENDIANNESS_LITTLE>::specific m_le;
+	memory_access<32, 3, 0, ENDIANNESS_BIG>::specific m_be;
 
 	std::function<u8(offs_t offset)> read_byte;
 	std::function<u16(offs_t offset)> read_word;

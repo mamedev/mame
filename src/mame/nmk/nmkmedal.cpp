@@ -101,6 +101,7 @@ NMK MAC96117
 
 -------
 Shimura Ken no Bakatono-sama Ooedomatsuri by NMK
+The Power Link PCB is basically the same, but with ROMs on a daughterboard.
 
 Video of the game: https://www.youtube.com/watch?v=9HGdS2ydZDo
 
@@ -410,11 +411,33 @@ ROM_START( omatsuri ) // seems to hit some unimplemented CPU regs
 	ROM_LOAD( "3", 0x80000, 0x80000, CRC(0e6afb1f) SHA1(e016a684fb41acb55057797b22a07dab72ff9e9d) )
 ROM_END
 
+// POW98200 main PCB + POW98202 ROM PCB with small label "9810 ムラカミ" (9810 murakami)
+ROM_START( pldoraemon )
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "doraemon_p.l._v992040.1", 0x00000, 0x10000, CRC(4f5c5300) SHA1(42d8d63e85886d9f3482dcd11fe3117521e06c56) ) // ドラえもんP.L. V992040
+
+	ROM_REGION(0x100000, "ymz", 0)
+	ROM_LOAD( "doraemon_a_snd8c090.2", 0x00000, 0x80000, CRC(239b8d04) SHA1(173ec0fbdde5b5f3709151ac1c2087b127bfc546) ) // ドラえもん A SND8C090
+	ROM_LOAD( "doraemon_snd9105b.3",   0x80000, 0x80000, CRC(f77fd552) SHA1(95e030f5324d9f2d3eb800f4a48baa03516dde7e) ) // ドラえもん SND9105B
+ROM_END
+
+// POW98200 main PCB + POW98202 ROM PCB with small label "9806 マノ" (9806 mano)
+ROM_START( plpittashi ) // all ROM labels handwritten
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "pittashi_1_v986220.1", 0x00000, 0x10000, CRC(eb19cda9) SHA1(ca572a6e362d0c8e82ed86e4f02f13adf8189273) ) // actual label "ピッタシ" (transliterated to pittashi)
+
+	ROM_REGION(0x100000, "ymz", ROMREGION_ERASE00)
+	ROM_LOAD( "pittashi_2_snd86180.2", 0x00000, 0x80000, CRC(b65808f3) SHA1(a076f9e121ab310bae99880ecd4c860f47ff8769) )
+	// empty second socket
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1995, drail,    0, drail,    trocana, hpierrot_state, empty_init, ROT0, "NTC / NMK",  "Dream Rail",                                MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, N.T.C., H07051, V39, TEST2, V07  strings
-GAME( 1996, trocana,  0, trocana,  trocana, trocana_state,  empty_init, ROT0, "NTC / NMK",  "Trocana",                                   MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, NTC LTD, V96313 strings
-GAME( 1996, hpierrot, 0, hpierrot, trocana, hpierrot_state, empty_init, ROT0, "NTC / NMK",  "Happy Pierrot",                             MACHINE_IS_SKELETON_MECHANICAL ) // NTC LTD, NMK LTD, V96821 strings
-GAME( 1996, sweethrt, 0, sweethrt, trocana, hpierrot_state, empty_init, ROT0, "NMK",        "Sweetheart",                                MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, V96B29° strings
-GAME( 1999, omatsuri, 0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK / Sega", "Shimura Ken no Bakatono-sama Ooedomatsuri", MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, V99422 strings. Cabinet has NMK logo, manual has Sega logo
+GAME( 1995, drail,      0, drail,    trocana, hpierrot_state, empty_init, ROT0, "NTC / NMK",  "Dream Rail",                                MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, N.T.C., H07051, V39, TEST2, V07  strings
+GAME( 1996, trocana,    0, trocana,  trocana, trocana_state,  empty_init, ROT0, "NTC / NMK",  "Trocana",                                   MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, NTC LTD, V96313 strings
+GAME( 1996, hpierrot,   0, hpierrot, trocana, hpierrot_state, empty_init, ROT0, "NTC / NMK",  "Happy Pierrot",                             MACHINE_IS_SKELETON_MECHANICAL ) // NTC LTD, NMK LTD, V96821 strings
+GAME( 1996, sweethrt,   0, sweethrt, trocana, hpierrot_state, empty_init, ROT0, "NMK",        "Sweetheart",                                MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, V96B29° strings
+GAME( 1999, omatsuri,   0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK / Sega", "Shimura Ken no Bakatono-sama Ooedomatsuri", MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, V99422 strings. Cabinet has NMK logo, manual has Sega logo
+GAME( 1999, pldoraemon, 0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "Doraemon (Power Link)",                     MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, V99204°, DORAMON (sic), STEPPING_PCB200_CAP75 strings
+GAME( 1998, plpittashi, 0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "Love Pi Chan (Power Link)",                 MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, V98622°, LOVE PI, CHAN strings (title taken from string, very probably wrong)

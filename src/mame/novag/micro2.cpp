@@ -50,7 +50,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "novag_micro2.lh" // clickable
+#include "novag_micro2.lh"
 
 
 namespace {

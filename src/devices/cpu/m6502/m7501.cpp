@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m7501.c
+    m7501.cpp
 
     6510 derivative, essentially identical.  Also known as the 8501.
 

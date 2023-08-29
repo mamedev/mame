@@ -33,7 +33,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_dsc.lh" // clickable
+#include "fidel_dsc.lh"
 
 
 namespace {

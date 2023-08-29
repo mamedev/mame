@@ -50,8 +50,8 @@ D0-D3: keypad row
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_bcc.lh" // clickable
-#include "fidel_bkc.lh" // clickable
+#include "fidel_bcc.lh"
+#include "fidel_bkc.lh"
 
 
 namespace {

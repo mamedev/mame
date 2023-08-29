@@ -554,8 +554,7 @@ void imolagp_state::imolagp(machine_config &config)
 	i8255_device &ppi(I8255A(config, "ppi8255", 0));
 	// mode $91 - ports A & C-lower as input, ports B & C-upper as output
 	ppi.in_pa_callback().set_ioport("IN0");
-	ppi.in_pb_callback().set_log("PPI8255 - unmapped read port B");
-	ppi.out_pb_callback().set_log("PPI8255 - unmapped write port B");
+	ppi.out_pb_callback().set([this](uint8_t data) { logerror("%s PPI write port B: %02X\n", machine().describe_context(), data); });
 	ppi.in_pc_callback().set_ioport("IN1");
 
 	/* video hardware */

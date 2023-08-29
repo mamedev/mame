@@ -7,7 +7,7 @@
 
 #include "bus/msx/slot/cartridge.h"
 
-DECLARE_DEVICE_TYPE(MSX_CART_HBI55, msx_cart_interface)
 
+DECLARE_DEVICE_TYPE(MSX_CART_HBI55, msx_cart_interface)
 
 #endif // MAME_BUS_MSX_CART_HBI55_H

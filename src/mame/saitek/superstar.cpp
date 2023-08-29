@@ -52,8 +52,8 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_sstar28k.lh" // clickable
-#include "saitek_tstar432.lh" // clickable
+#include "saitek_sstar28k.lh"
+#include "saitek_tstar432.lh"
 
 
 namespace {

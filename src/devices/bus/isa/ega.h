@@ -7,6 +7,7 @@
 
 #include "isa.h"
 #include "video/crtc_ega.h"
+#include "screen.h"
 #include "emupal.h"
 
 //**************************************************************************
@@ -107,6 +108,7 @@ public:
 	uint8_t   m_irq;
 	int     m_video_mode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 };
 
 

@@ -1451,7 +1451,7 @@ It can also be used with Final Furlong when wired correctly.
 #include "cpu/h8/h83002.h"
 #include "cpu/h8/h83337.h"
 #include "cpu/mips/mips3.h"
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh7604.h"
 #include "namco_settings.h"
 #include "machine/nvram.h"
 #include "machine/rtc4543.h"
@@ -1764,7 +1764,7 @@ private:
 	required_shared_ptr<uint32_t> m_charram;
 	required_shared_ptr<uint32_t> m_textram;
 	optional_shared_ptr<uint32_t> m_czattr;
-	optional_device<cpu_device> m_gmen_sh2;
+	optional_device<sh2_sh7604_device> m_gmen_sh2;
 	optional_shared_ptr<uint32_t> m_gmen_sh2_shared;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_ioport m_lightx;
@@ -3643,7 +3643,10 @@ static INPUT_PORTS_START( timecrs2 )
 	PORT_MODIFY("IN01")
 	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gun Trigger")
 	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Foot Pedal")
-	PORT_BIT(0x00fc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_CONFNAME( 0x0004, 0x0004, "Link ID" )
+	PORT_CONFSETTING(      0x0000, "Right/Blue" )
+	PORT_CONFSETTING(      0x0004, "Left/Red" )
+	PORT_BIT(0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // this is the "coin acceptor connected" signal
@@ -3979,7 +3982,7 @@ void namcos23_state::gmen(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos23_state::gmen_mips_map);
 
-	SH2(config, m_gmen_sh2, XTAL(28'700'000));
+	SH2_SH7604(config, m_gmen_sh2, XTAL(28'700'000));
 	m_gmen_sh2->set_addrmap(AS_PROGRAM, &namcos23_state::gmen_sh2_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(namcos23_state,gmen)

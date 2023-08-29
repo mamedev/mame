@@ -8,6 +8,8 @@
     original "wiped off due of not anymore licensable" driver by insideoutboy.
 
     TODO:
+    - CPU speed is probably wrong. The pacing is fine at 3.072MHz, but then
+      the game locks up sometimes. Or is the cause elsewhere?
     - priority might be wrong in some places (title screen stars around the
       galaxy, planet ship 3rd boss, 2nd boss);
     - sound chips (similar to Namco custom chips?)
@@ -132,7 +134,6 @@ private:
 	void txvram_w(offs_t offset, u8 data);
 	void master_irq_ack_w(int state);
 	void slave_irq_ack_w(int state);
-	void vblank_irq_w(int state);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -501,25 +502,16 @@ void flower_state::slave_irq_ack_w(int state)
 		m_slavecpu->set_input_line(0, CLEAR_LINE);
 }
 
-void flower_state::vblank_irq_w(int state)
-{
-	if (state)
-	{
-		m_mastercpu->set_input_line(0, ASSERT_LINE);
-		m_slavecpu->set_input_line(0, ASSERT_LINE);
-	}
-}
-
 
 void flower_state::flower(machine_config &config)
 {
-	Z80(config, m_mastercpu, MASTER_CLOCK / 6); // divider unknown
+	Z80(config, m_mastercpu, MASTER_CLOCK / 4); // divider unknown
 	m_mastercpu->set_addrmap(AS_PROGRAM, &flower_state::shared_map);
 
-	Z80(config, m_slavecpu, MASTER_CLOCK / 6); // divider unknown
+	Z80(config, m_slavecpu, MASTER_CLOCK / 4); // divider unknown
 	m_slavecpu->set_addrmap(AS_PROGRAM, &flower_state::shared_map);
 
-	Z80(config, m_audiocpu, MASTER_CLOCK / 6); // divider unknown
+	Z80(config, m_audiocpu, MASTER_CLOCK / 4); // divider unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &flower_state::audio_map);
 	m_audiocpu->set_periodic_int(FUNC(flower_state::irq0_line_hold), attotime::from_hz(90));
 
@@ -537,7 +529,8 @@ void flower_state::flower(machine_config &config)
 	m_screen->set_screen_update(FUNC(flower_state::screen_update));
 	m_screen->set_raw(MASTER_CLOCK / 3, 384, 0, 288, 264, 16, 240); // derived from Galaxian HW, 60.606060
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(flower_state::vblank_irq_w));
+	m_screen->screen_vblank().set_inputline(m_mastercpu, 0, ASSERT_LINE);
+	m_screen->screen_vblank().append_inputline(m_slavecpu, 0, ASSERT_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_flower);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);

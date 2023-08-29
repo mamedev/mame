@@ -49,7 +49,7 @@ After boot, it copies ROM to RAM, probably to circumvent waitstates on slow ROM.
 #include "mmdisplay2.h"
 
 // internal artwork
-#include "mephisto_modular_tm.lh" // clickable
+#include "mephisto_modular_tm.lh"
 
 
 namespace {

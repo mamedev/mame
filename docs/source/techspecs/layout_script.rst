@@ -36,9 +36,8 @@ Practical examples
 Before diving into the technical details of how it works, we’ll start with some
 example layout files using Lua script for enhancement.  It’s assumed that you’re
 familiar with MAME’s artwork system and have a basic understanding of Lua
-scripting.  For details on MAME’s layout file, see :ref:`layfile`; for an
-introduction to Lua scripting in MAME, see :ref:`luaengine`; for detailed
-descriptions of MAME’s Lua classes, see :ref:`luareference`.
+scripting.  For details on MAME’s layout file, see :ref:`layfile`;  for detailed
+descriptions of MAME’s Lua interface, see :ref:`luascript`.
 
 .. _layscript-examples-espial:
 
@@ -188,19 +187,21 @@ as a function by the layout plugin when the layout file is loaded.  The layout
 views have been built at this point, but the emulated system has not finished
 starting.  In particular, it’s not safe to access inputs and outputs at this
 time.  The key variable in the script environment is ``file``, which gives the
-script access to its layout file.
+script access to its :ref:`layout file <luascript-ref-renderlayfile>`.
 
 We supply a function to be called after tags in the layout file have been
 resolved.  At this point, the emulated system will have completed starting.
 This function does the following tasks:
 
-* Looks up the two I/O ports used for player input.  I/O ports can be looked up
-  by tag relative to the device that caused the layout file to be loaded.
-* Looks up the two view items used to display joystick state.  Views can be
-  looked up by name (i.e. value of the ``name`` attribute), and items within a
-  view can be looked up by ID (i.e. the value of the ``id`` attribute).
+* Looks up the two :ref:`I/O ports <luascript-ref-ioport>` used for player
+  input.  I/O ports can be looked up by tag relative to the device that caused
+  the layout file to be loaded.
+* Looks up the two :ref:`view items <luascript-ref-renderlayitem>` used to
+  display joystick state.  Views can be looked up by name (i.e. value of the
+  ``name`` attribute), and items within a view can be looked up by ID (i.e. the
+  value of the ``id`` attribute).
 * Supplies a function to be called before view items are added to the render
-  target.
+  target when drawing a frame.
 * Hides the warning that reminds the user to enable the layout plugin by setting
   the element state for the item to 0 (the text component is only drawn when
   the element state is 1).
@@ -414,20 +415,20 @@ Here’s our layout file:
 The layout has a ``script`` element containing the Lua script, to be called as a
 function by the layout plugin when the layout file is loaded.  This happens
 after the layout views have been build, but before the emulated system has
-finished starting.  The layout file object is supplied to the script in the
-``file`` variable.
+finished starting.  The :ref:`layout file <luascript-ref-renderlayfile>` object
+is supplied to the script in the ``file`` variable.
 
 We supply a function to be called after tags in the layout file have been
 resolved.  This function does the following:
 
-* Looks up the analog axis inputs.
-* Looks up the view item that draws the outline of area where the yoke position
-  is displayed.
+* Looks up the analog axis :ref:`inputs <luascript-ref-ioport>`.
+* Looks up the :ref:`view item <luascript-ref-renderlayitem>` that draws the
+  outline of area where the yoke position is displayed.
 * Declares some variables to hold calculated values across function calls.
 * Supplies a function to be called when the view’s dimensions have been
   recomputed.
 * Supplies a function to be called before adding view items to the render
-  container.
+  container when drawing a frame.
 * Supplies functions that will supply the bounds for the animated items.
 * Hides the warning that reminds the user to enable the layout plugin by setting
   the element state for the item to 0 (the text component is only drawn when
@@ -472,18 +473,23 @@ The layout script environment
 The Lua environment is provided by the layout plugin.  It’s fairly minimal, only
 providing what’s needed:
 
-* ``file`` giving the script’s layout file object.  Has a ``device`` property
-  for obtaining the device that caused the layout file to be loaded, and a
-  ``views`` property for obtaining the layout’s views (indexed by name).
-* ``machine`` giving MAME’s current running machine.
-* ``emu.render_bounds`` and ``emu.render_color`` functions for creating bounds
-  and colour objects.
-* ``emu.print_error``, ``emu.print_info`` and ``emu.print_debug`` functions for
-  diagnostic output.
-* Standard Lua ``pairs``, ``ipairs``, ``table.insert`` and ``table.remove``
-  functions for manipulating tables and other containers.
+* ``file`` giving the script’s :ref:`layout file <luascript-ref-renderlayfile>`
+  object.  Has a ``device`` property for obtaining the :ref:`device
+  <luascript-ref-device>` that caused the layout file to be loaded, and a
+  ``views`` property for obtaining the layout’s :ref:`views
+  <luascript-ref-renderlayview>` (indexed by name).
+* ``machine`` giving MAME’s current :ref:`running machine
+  <luascript-ref-machine>`.
+* ``emu.attotime``, ``emu.render_bounds`` and ``emu.render_color`` functions for
+  creating :ref:`attotime <luascript-ref-attotime>`, :ref:`bounds
+  <luascript-ref-renderbounds>` and :ref:`colour <luascript-ref-rendercolor>`
+  objects.
+* ``emu.print_verbose``, ``emu.print_error``, ``emu.print_warning``,
+  ``emu.print_info`` and ``emu.print_debug`` functions for diagnostic output.
+* Standard Lua ``tonumber``, ``tostring``, ``pairs`` and ``ipairs`` functions,
+  and ``table`` and ``string`` objects for manipulating strings, tables and
+  other containers.
 * Standard Lua ``print`` function for text output to the console.
-* Standard Lua ``string.format`` function for string formatting.
 
 
 .. _layscript-events:

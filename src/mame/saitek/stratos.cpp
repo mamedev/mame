@@ -8,7 +8,7 @@ SciSys/Saitek Stratos chesscomputer family (1987-1990)
 
 - Stratos
 - Turbo King
-- Corona --> saitek_corona.cpp
+- Corona --> corona.cpp
 
 IMPORTANT: The user is expected to press the STOP button to turn off the computer.
 When not using -autosave, press that button before exiting MAME, or NVRAM can get corrupt.
@@ -63,8 +63,8 @@ very few bytes difference between revisions. The first Corona is engine version 
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_stratos.lh" // clickable
-#include "saitek_tking.lh" // clickable
+#include "saitek_stratos.lh"
+#include "saitek_tking.lh"
 
 
 class stratos_state : public saitek_stratos_state

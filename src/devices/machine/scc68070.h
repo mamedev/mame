@@ -193,6 +193,7 @@ protected:
 	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_config_complete() override;
 
 	// device_execute_interface implementation
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 2 - 1) / 2; }

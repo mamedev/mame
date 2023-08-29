@@ -9,7 +9,7 @@
 #include "bus/generic/carts.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh7604.h"
 
 #include "315-5881_crypt.h"
 #include "315-5838_317-0229_comp.h"
@@ -119,8 +119,8 @@ protected:
 		int       old_tvmd = 0;
 	}m_vdp2;
 
-	required_device<sh2_device> m_maincpu;
-	required_device<sh2_device> m_slave;
+	required_device<sh2_sh7604_device> m_maincpu;
+	required_device<sh2_sh7604_device> m_slave;
 	required_device<m68000_base_device> m_audiocpu;
 	required_device<scsp_device> m_scsp;
 	required_device<smpc_hle_device> m_smpc_hle;

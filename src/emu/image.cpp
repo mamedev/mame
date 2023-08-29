@@ -58,15 +58,24 @@ image_manager::image_manager(running_machine &machine)
 
 			// try as a softlist
 			if (software_name_parse(startup_image))
+			{
+				osd_printf_verbose("%s: attempting to load software item %s\n", image.device().tag(), startup_image);
 				result = image.load_software(startup_image);
+			}
 
 			// failing that, try as an image
 			if (result.first)
+			{
+				osd_printf_verbose("%s: attempting to load media image %s\n", image.device().tag(), startup_image);
 				result = image.load(startup_image);
+			}
 
 			// failing that, try creating it (if appropriate)
 			if (result.first && image.support_command_line_image_creation())
+			{
+				osd_printf_verbose("%s: attempting to create media image %s\n", image.device().tag(), startup_image);
 				result = image.create(startup_image);
+			}
 
 			// did the image load fail?
 			if (result.first)

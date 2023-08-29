@@ -159,7 +159,6 @@ void nemesis_state::salamand_control_port_word_w(offs_t offset, uint16_t data, u
 void nemesis_state::create_palette_lookups()
 {
 	// driver is 74LS09 (AND gates with open collector)
-
 	static const res_net_info nemesis_net_info =
 	{
 		RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_OPEN_COL,

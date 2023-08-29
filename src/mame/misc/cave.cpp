@@ -2231,6 +2231,9 @@ void cave_state::gaia(machine_config &config)
 
 	/* sound hardware */
 	add_ymz(config);
+
+	// Unlike other games also using ymz, gaia (and theroes) has 16MHz clock for it
+	subdevice<ymz280b_device>("ymz")->set_clock(16_MHz_XTAL);
 }
 
 

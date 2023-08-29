@@ -68,7 +68,7 @@ TODO:
 #include "softlist_dev.h"
 
 // internal artwork
-#include "aci_ggm.lh" // clickable
+#include "aci_ggm.lh"
 
 
 namespace {

@@ -66,6 +66,7 @@ public:
 	{ }
 
 	void seabattl(machine_config &config);
+	void armada(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -87,12 +88,11 @@ private:
 	void score2_display_w(uint8_t data);
 	template <unsigned N> void digit_w(uint8_t data) { m_7segs[N] = data; }
 
-	INTERRUPT_GEN_MEMBER(seabattl_interrupt);
-
 	void seabattl_palette(palette_device &palette) const;
 	uint32_t screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void seabattl_data_map(address_map &map);
 	void seabattl_map(address_map &map);
+	void armada_map(address_map &map);
 
 	required_device<s2650_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -256,7 +256,6 @@ void seabattl_state::video_start()
 
 void seabattl_state::seabattl_map(address_map &map)
 {
-	map.global_mask(0x7fff);
 	map(0x0000, 0x13ff).rom();
 	map(0x2000, 0x33ff).rom();
 	map(0x1400, 0x17ff).mirror(0x2000).ram().w(FUNC(seabattl_state::seabattl_colorram_w)).share("colorram");
@@ -271,6 +270,26 @@ void seabattl_state::seabattl_map(address_map &map)
 	map(0x1e07, 0x1e07).mirror(0x20f0).portr("DIPS0").w(FUNC(seabattl_state::sound2_w));
 	map(0x1f00, 0x1fff).mirror(0x2000).rw(m_s2636, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
 	map(0x1fcc, 0x1fcc).mirror(0x2000).portr("IN1");
+}
+
+void seabattl_state::armada_map(address_map &map)
+{
+	map(0x0000, 0x0bff).rom();
+	map(0x2000, 0x2bff).rom();
+	map(0x4000, 0x4bff).rom();
+	map(0x6000, 0x6bff).rom();
+	map(0x1400, 0x17ff).mirror(0x6000).ram().w(FUNC(seabattl_state::seabattl_colorram_w)).share("colorram");
+	map(0x1800, 0x1bff).mirror(0x6000).ram().w(FUNC(seabattl_state::seabattl_videoram_w)).share("videoram");
+	map(0x1c00, 0x1cff).mirror(0x6000).ram();
+	map(0x1d00, 0x1dff).mirror(0x6000).ram().share("objram");
+	map(0x1e00, 0x1e00).mirror(0x60f0).w(FUNC(seabattl_state::time_display_w));
+	map(0x1e01, 0x1e01).mirror(0x60f0).w(FUNC(seabattl_state::score_display_w));
+	map(0x1e02, 0x1e02).mirror(0x60f0).portr("IN0").w(FUNC(seabattl_state::score2_display_w));
+	map(0x1e05, 0x1e05).mirror(0x60f0).portr("DIPS2");
+	map(0x1e06, 0x1e06).mirror(0x60f0).portr("DIPS1").w(FUNC(seabattl_state::sound_w));
+	map(0x1e07, 0x1e07).mirror(0x60f0).portr("DIPS0").w(FUNC(seabattl_state::sound2_w));
+	map(0x1f00, 0x1fff).mirror(0x6000).rw(m_s2636, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1fcc, 0x1fcc).mirror(0x6000).portr("IN1");
 }
 
 void seabattl_state::seabattl_data_map(address_map &map)
@@ -447,11 +466,6 @@ void seabattl_state::machine_reset()
 {
 }
 
-INTERRUPT_GEN_MEMBER(seabattl_state::seabattl_interrupt)
-{
-	m_maincpu->set_input_line(0, ASSERT_LINE);
-}
-
 static const gfx_layout tiles32x16x3_layout =
 {
 	32,16,
@@ -476,7 +490,6 @@ void seabattl_state::seabattl(machine_config &config)
 	S2650(config, m_maincpu, 14318180/4/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &seabattl_state::seabattl_map);
 	m_maincpu->set_addrmap(AS_DATA, &seabattl_state::seabattl_data_map);
-	m_maincpu->set_vblank_int("screen", FUNC(seabattl_state::seabattl_interrupt));
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 	S2636(config, m_s2636, 0);
@@ -499,6 +512,7 @@ void seabattl_state::seabattl(machine_config &config)
 	m_screen->set_visarea(1*8, 29*8-1, 2*8, 32*8-1);
 	m_screen->set_screen_update(FUNC(seabattl_state::screen_update_seabattl));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seabattl);
 	PALETTE(config, m_palette, FUNC(seabattl_state::seabattl_palette), 26);
@@ -509,53 +523,103 @@ void seabattl_state::seabattl(machine_config &config)
 	/* discrete sound */
 }
 
+// very different looking PCB (bootleg maybe?)
+void seabattl_state::armada(machine_config &config)
+{
+	seabattl(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &seabattl_state::armada_map);
+
+	// TODO: Z80-based sound board
+}
+
 
 
 /******************************************************************************/
 
 ROM_START( seabattl )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "sea b b_1 1.prg",  0x0000, 0x0400, CRC(16a475c0) SHA1(5380d3be39c421227e52012d1bcf0516e99f6a3f) )
-	ROM_CONTINUE(                 0x2000, 0x0400 )
-	ROM_LOAD( "sea b b_1 2.prg",  0x0400, 0x0400, CRC(4bd73a82) SHA1(9ab4edf24fcd437ecd8e9e551ce0ed33be3bbad7) )
-	ROM_CONTINUE(                 0x2400, 0x0400 )
-	ROM_LOAD( "sea b b_1 3.prg",  0x0800, 0x0400, CRC(e251492b) SHA1(a152f9b6f189909ff478b4d95ee764f1898405b5) )
-	ROM_CONTINUE(                 0x2800, 0x0400 )
-	ROM_LOAD( "sea b b_1 4.prg",  0x0c00, 0x0400, CRC(6012b83f) SHA1(57de9e45253609b71f14fb3541760fd33647a651) )
-	ROM_CONTINUE(                 0x2c00, 0x0400 )
-	ROM_LOAD( "sea b b_1 5.prg",  0x1000, 0x0400, CRC(55c263f6) SHA1(33eba61cb8c9318cf19b771c93a14397b4ee0ace) )
-	ROM_CONTINUE(                 0x3000, 0x0400 )
+	ROM_LOAD( "sea_b_b_1_1.2b",  0x0000, 0x0400, CRC(16a475c0) SHA1(5380d3be39c421227e52012d1bcf0516e99f6a3f) )
+	ROM_CONTINUE(                0x2000, 0x0400 )
+	ROM_LOAD( "sea_b_b_1_2.2c",  0x0400, 0x0400, CRC(4bd73a82) SHA1(9ab4edf24fcd437ecd8e9e551ce0ed33be3bbad7) )
+	ROM_CONTINUE(                0x2400, 0x0400 )
+	ROM_LOAD( "sea_b_b_1_3.2d",  0x0800, 0x0400, CRC(e251492b) SHA1(a152f9b6f189909ff478b4d95ee764f1898405b5) )
+	ROM_CONTINUE(                0x2800, 0x0400 )
+	ROM_LOAD( "sea_b_b_1_4.4b",  0x0c00, 0x0400, CRC(6012b83f) SHA1(57de9e45253609b71f14fb3541760fd33647a651) )
+	ROM_CONTINUE(                0x2c00, 0x0400 )
+	ROM_LOAD( "sea_b_b_1_5.4c",  0x1000, 0x0400, CRC(55c263f6) SHA1(33eba61cb8c9318cf19b771c93a14397b4ee0ace) )
+	ROM_CONTINUE(                0x3000, 0x0400 )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_LOAD( "sea b red.prg",    0x0000, 0x0800, CRC(fe7192df) SHA1(0b262bc1ac959d8dd79d71780e16237075f4a099) )
-	ROM_LOAD( "sea b green.prg",  0x0800, 0x0800, CRC(cea4c0c9) SHA1(697c136ef363676b346692740d3c3a482dde6207) )
-	ROM_LOAD( "sea b blu.prg",    0x1000, 0x0800, CRC(cd972c4a) SHA1(fcb8149bc462912c8393431ccb792ea4b1b1109d) )
+	ROM_LOAD( "sea_b_red.8d",    0x0000, 0x0800, CRC(fe7192df) SHA1(0b262bc1ac959d8dd79d71780e16237075f4a099) )
+	ROM_LOAD( "sea_b_green.8c",  0x0800, 0x0800, CRC(cea4c0c9) SHA1(697c136ef363676b346692740d3c3a482dde6207) )
+	ROM_LOAD( "sea_b_blu.8a",    0x1000, 0x0800, CRC(cd972c4a) SHA1(fcb8149bc462912c8393431ccb792ea4b1b1109d) )
 
 	ROM_REGION( 0x0800, "gfx2", 0 )
-	ROM_LOAD( "sea b screen.prg", 0x0000, 0x0800, CRC(8e4391dd) SHA1(f5698d66e5a3c46082b515ce86f9d3e96fd9ff77) )
+	ROM_LOAD( "sea_b_screen.7f", 0x0000, 0x0800, CRC(8e4391dd) SHA1(f5698d66e5a3c46082b515ce86f9d3e96fd9ff77) )
 
 	ROM_REGION( 0x0800, "gfx3", 0 )
-	ROM_LOAD( "sea b wawe.prg",   0x0000, 0x0800, CRC(7e356dc5) SHA1(71d34fa39ff0b7d0fa6d32ba2b9dc0006a03d1bb) )
+	ROM_LOAD( "sea_b_wawe.10k",  0x0000, 0x0800, CRC(7e356dc5) SHA1(71d34fa39ff0b7d0fa6d32ba2b9dc0006a03d1bb) ) // sic
 ROM_END
 
-ROM_START( seabattla ) // this was a very different looking PCB (bootleg called armada maybe?) most parts had been stripped
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "program roms",     0x0000, 0x0400, NO_DUMP )
+/*
+Zaccaria Armada
+---------------
 
-	ROM_REGION( 0xc00, "gfx1", 0 ) // probably the same as above without the blank data at the start
-	ROM_LOAD( "armadared.ic26",   0x0000, 0x0400, CRC(b588f509) SHA1(073f9dc584aba1351969ef597cd80a0037938dfb) )
-	ROM_LOAD( "armadagreen.ic25", 0x0400, 0x0400, CRC(3cc861c9) SHA1(d9159ee045cc0994f468035ae28cd8b79b5985ee) )
-	ROM_LOAD( "armadablu.ic24",   0x0800, 0x0400, CRC(3689e530) SHA1(b30ab0d5ddc9b296437aa1bc2887f1416eb69f9c) )
+Serial No.: V143107
+
+Main PCB looks like it's a revised Sea Battle main PCB (I.G.R. LC26 C)
+ - 2650 CPU
+ - 2636 PVI
+ - DIP switch block (8) (at IC11)
+
+Sound PCB looks similar to Scorpion (I.G.R. LC241)
+ - Z80 CPU
+ - 3 x AY-3-8910
+ - 2 x 8255
+ - Stereo amplifiers
+ - Epoxy block like Scorpion
+ - Shaved off 40-pin IC likely the same speech IC as Scorpion
+ - DIP switch block (8) (at IC55)
+*/
+ROM_START( armada )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "armada-1.ic83", 0x0000, 0x0400, CRC(8528510c) SHA1(fbb653a0a4c77dd31fa106f1aeab985d02ebad50) )
+	ROM_CONTINUE(              0x2000, 0x0400 )
+	ROM_CONTINUE(              0x4000, 0x0400 )
+	ROM_CONTINUE(              0x6000, 0x0400 )
+	ROM_LOAD( "armada-2.ic84", 0x0400, 0x0400, CRC(7f5a2089) SHA1(be15d9c31c8bd33c029dfa7fcfc4e36d6dc8e04f) )
+	ROM_CONTINUE(              0x2400, 0x0400 )
+	ROM_CONTINUE(              0x4400, 0x0400 )
+	ROM_CONTINUE(              0x6400, 0x0400 )
+	ROM_LOAD( "armada-3.ic85", 0x0800, 0x0400, CRC(43e4c8c9) SHA1(b2f3a492cef183875370bd0c4e75e9bdb70c9cf2) )
+	ROM_CONTINUE(              0x2800, 0x0400 )
+	ROM_CONTINUE(              0x4800, 0x0400 )
+	ROM_CONTINUE(              0x6800, 0x0400 )
+	// 2 adjacent DIP28 positions (IC72, IC73) are unpopulated
+
+	ROM_REGION( 0x1800, "gfx1", 0 ) // probably the same as above without the blank data at the start
+	ROM_LOAD( "armada-red.ic26",   0x0400, 0x0400, CRC(b588f509) SHA1(073f9dc584aba1351969ef597cd80a0037938dfb) )
+	ROM_LOAD( "armada-green.ic25", 0x0c00, 0x0400, CRC(3cc861c9) SHA1(d9159ee045cc0994f468035ae28cd8b79b5985ee) )
+	ROM_LOAD( "armada-blu.ic24",   0x1400, 0x0400, CRC(3689e530) SHA1(b30ab0d5ddc9b296437aa1bc2887f1416eb69f9c) )
 
 	ROM_REGION( 0x0800, "gfx2", 0 )
-	ROM_LOAD( "greenobj.ic38",    0x0000, 0x0800, CRC(81a9a741) SHA1(b2725c320a232d4abf6e6fc58ccf6a5edb8dd9a0) )
+	ROM_LOAD( "greenobj.ic38",     0x0000, 0x0800, CRC(81a9a741) SHA1(b2725c320a232d4abf6e6fc58ccf6a5edb8dd9a0) )
 
 	ROM_REGION( 0x0800, "gfx3", 0 )
-	ROM_LOAD( "seawawe.ic9",      0x0000, 0x0800, CRC(7e356dc5) SHA1(71d34fa39ff0b7d0fa6d32ba2b9dc0006a03d1bb) ) // identical to above set
+	ROM_LOAD( "seawave.ic9",       0x0000, 0x0800, CRC(7e356dc5) SHA1(71d34fa39ff0b7d0fa6d32ba2b9dc0006a03d1bb) ) // identical to above set
+
+	ROM_REGION( 0x3000, "soundcpu", 0 )
+	ROM_LOAD( "sound-1.ic12", 0x0000, 0x1000, CRC(3ea7fa75) SHA1(57bc4bc3b21a300c10313a79e6d535573b2e9a54) )
+	ROM_LOAD( "sound-2.ic13", 0x1000, 0x1000, CRC(3bcef3ca) SHA1(a9ebeb54a41d08a6ebd3fc2821e3fcda998ec484) )
+	ROM_LOAD( "sound-3.ic14", 0x2000, 0x1000, CRC(6409f99b) SHA1(e8d7f457e9a315d7f89b817c2b7cda1f2f3e5877) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD( "speach-1.ic25", 0x0000, 0x1000, CRC(b72a8559) SHA1(08c60b950c2ed345840a65b427b19788c66d1e27) ) // sic
+	ROM_LOAD( "speach-2.ic24", 0x1000, 0x1000, CRC(93133519) SHA1(12848b80eb313df9cd552122fdee9d335b32972f) ) // "
 ROM_END
 
 } // anonymous namespace
 
 
-GAMEL(1980, seabattl,  0,        seabattl, seabattl, seabattl_state, empty_init, ROT0, "Zaccaria", "Sea Battle (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_seabattl )
-GAMEL(1980, seabattla, seabattl, seabattl, seabattl, seabattl_state, empty_init, ROT0, "Zaccaria", "Sea Battle (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING, layout_seabattl ) // incomplete dump
+GAMEL(1980, seabattl,  0,        seabattl, seabattl, seabattl_state, empty_init, ROT0, "Zaccaria",          "Sea Battle", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_seabattl )
+GAMEL(1980, armada,    seabattl, armada,   seabattl, seabattl_state, empty_init, ROT0, "Zaccaria / I.G.R.", "Armada",     MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING, layout_seabattl ) // different hardware

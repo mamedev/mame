@@ -31,7 +31,7 @@ BTANB:
 
 #include "speaker.h"
 
-#include "tchess.lh" // clickable
+#include "tchess.lh"
 
 
 namespace {

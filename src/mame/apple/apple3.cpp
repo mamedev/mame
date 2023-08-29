@@ -90,6 +90,10 @@ void apple3_state::apple3(machine_config &config)
 	m_ay3600->shift().set(FUNC(apple3_state::ay3600_shift_r));
 	m_ay3600->control().set(FUNC(apple3_state::ay3600_control_r));
 	m_ay3600->data_ready().set(FUNC(apple3_state::ay3600_data_ready_w));
+	m_ay3600->ako().set(FUNC(apple3_state::ay3600_ako_w));
+
+	/* repeat timer */
+	TIMER(config, m_repttimer).configure_generic(FUNC(apple3_state::ay3600_repeat));
 
 	/* slot bus */
 	A2BUS(config, m_a2bus, 0);
@@ -316,10 +320,10 @@ static INPUT_PORTS_START( apple3 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps Lock")    PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control") PORT_CHANGED_MEMBER(DEVICE_SELF, apple3_state, apple3_state::keyb_special_changed, 0) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Open Apple")   PORT_CODE(KEYCODE_LALT)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CHANGED_MEMBER(DEVICE_SELF, apple3_state, apple3_state::keyb_special_changed, 0) PORT_CODE(KEYCODE_F12)
 
 	PORT_START("joy_1_x")      /* Joystick 1 X Axis */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_NAME("P1 Joystick X")

@@ -125,10 +125,11 @@ protected:
 public:
 	virtual u16 get_fc() const noexcept override;
 	void set_hmmu_enable(int enable);
-	void set_emmu_enable(int enable);
-	int get_pmmu_enable() const {return m_pmmu_enabled;}
-	void set_fpu_enable(int enable);
+	void set_emmu_enable(bool enable);
+	bool get_pmmu_enable() const {return m_pmmu_enabled;}
+	void set_fpu_enable(bool enable);
 	void set_buserror_details(u32 fault_addr, u8 rw, u8 fc, bool rerun = false);
+	void restart_this_instruction();
 
 protected:
 	m68000_musashi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock,
@@ -137,7 +138,7 @@ protected:
 	m68000_musashi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock,
 						const device_type type, u32 prg_data_width, u32 prg_address_bits, address_map_constructor internal_map);
 
-	int    m_has_fpu;      /* Indicates if a FPU is available (yes on 030, 040, may be on 020) */
+	bool m_has_fpu;     /* Indicates if a FPU is available (yes on 030, 040, may be on 020) */
 
 	u32 m_cpu_type;     /* CPU Type: 68000, 68008, 68010, 68EC020, 68020, 68EC030, 68030, 68EC040, or 68040 */
 //
@@ -172,13 +173,14 @@ protected:
 	u32 m_sr_mask;      /* Implemented status register bits */
 	u32 m_instr_mode;   /* Stores whether we are in instruction mode or group 0/1 exception mode */
 	u32 m_run_mode;     /* Stores whether we are processing a reset, bus error, address error, or something else */
-	int    m_has_pmmu;     /* Indicates if a PMMU available (yes on 030, 040, no on EC030) */
-	int    m_has_hmmu;     /* Indicates if an Apple HMMU is available in place of the 68851 (020 only) */
-	int    m_pmmu_enabled; /* Indicates if the PMMU is enabled */
-	int    m_hmmu_enabled; /* Indicates if the HMMU is enabled */
-	int    m_emmu_enabled; /* Indicates if external MMU is enabled */
-	int    m_instruction_restart; /* Save DA regs for potential instruction restart */
-	int    m_fpu_just_reset; /* Indicates the FPU was just reset */
+	bool m_has_pmmu;     /* Indicates if a PMMU available (yes on 030, 040, no on EC030) */
+	bool m_has_hmmu;     /* Indicates if an Apple HMMU is available in place of the 68851 (020 only) */
+	bool m_pmmu_enabled; /* Indicates if the PMMU is enabled */
+	int m_hmmu_enabled;  /* Indicates if the HMMU is enabled */
+	bool m_emmu_enabled; /* Indicates if external MMU is enabled */
+	bool m_instruction_restart; /* Save DA regs for potential instruction restart */
+	bool m_fpu_just_reset; /* Indicates the FPU was just reset */
+	bool m_restart_instruction; /* Indicates the instruction should be restarted */
 
 	/* Clocks required for instructions / exceptions */
 	u32 m_cyc_bcc_notake_b;

@@ -73,7 +73,7 @@ protected:
 	void atm_update_screen_tx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual u16 atm_update_memory_get_page(u8 bank);
 	virtual u8 get_border_color(u16 hpos, u16 vpos) override;
-	rectangle get_screen_area() override;
+	virtual rectangle get_screen_area() override;
 	INTERRUPT_GEN_MEMBER(atm_interrupt);
 
 	memory_view m_bank_view0;

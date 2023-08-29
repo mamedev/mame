@@ -39,7 +39,7 @@ public:
 	u8 read();
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	msx_audio_kb_port_interface *m_keyboard;

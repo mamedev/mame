@@ -142,11 +142,14 @@ static core_options create_core_options(const plugin_options &plugin_opts)
 	// create an entry for each option
 	for (const plugin_options::plugin &p : plugin_opts.plugins())
 	{
-		opts.add_entry(
-			{ p.m_name },
-			nullptr,
-			core_options::option_type::BOOLEAN,
-			p.m_start ? "1" : "0");
+		if (p.m_type != "library")
+		{
+			opts.add_entry(
+				{ p.m_name },
+				nullptr,
+				core_options::option_type::BOOLEAN,
+				p.m_start ? "1" : "0");
+		}
 	}
 
 	return opts;

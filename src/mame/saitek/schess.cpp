@@ -45,7 +45,7 @@ Expansion modules: (* denotes not dumped)
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_schess.lh" // clickable
+#include "saitek_schess.lh"
 
 
 namespace {

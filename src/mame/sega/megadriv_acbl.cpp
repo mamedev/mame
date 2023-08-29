@@ -209,7 +209,7 @@ void md_boot_state::aladmdb_w(uint16_t data)
 
 uint16_t md_boot_state::aladmdb_r()
 {
-	if (m_maincpu->pc()==0x1b2a56)
+	if (m_maincpu->pc() == 0x1b2a56)
 	{
 		m_aladmdb_mcu_port = ioport("MCU")->read();
 
@@ -218,9 +218,9 @@ uint16_t md_boot_state::aladmdb_r()
 		else
 			return (0x100); //MCU status, needed if you fall into a pitfall
 	}
-	if (m_maincpu->pc()==0x1b2a72) return 0x0000;
-	if (m_maincpu->pc()==0x1b2d24) return (ioport("MCU")->read() & 0x00f0) | 0x1200;    // difficulty
-	if (m_maincpu->pc()==0x1b2d4e) return 0x0000;
+	if (m_maincpu->pc() == 0x1b2a72) return 0x0000;
+	if (m_maincpu->pc() == 0x1b2d24) return (ioport("MCU")->read() & 0x00f0) | 0x1200;    // difficulty
+	if (m_maincpu->pc() == 0x1b2d4e) return 0x0000;
 
 	logerror("aladbl_r : %06x\n",m_maincpu->pc());
 	return 0x0000;
@@ -228,10 +228,10 @@ uint16_t md_boot_state::aladmdb_r()
 
 uint16_t md_boot_state::twinktmb_r()
 {
-	if (m_maincpu->pc()==0x02f81e)
+	if (m_maincpu->pc() == 0x02f81e)
 		return ioport("COIN")->read(); // TODO: coins don't respond well
 
-	if (m_maincpu->pc()==0x02f84e) return 0x0000; // what's this? dips?
+	if (m_maincpu->pc() == 0x02f84e) return 0x0000; // what's this? dips?
 
 	//logerror("twinktmb_r : %06x\n",m_maincpu->pc());
 
@@ -240,10 +240,10 @@ uint16_t md_boot_state::twinktmb_r()
 
 uint16_t md_boot_state::jparkmb_r()
 {
-	if (m_maincpu->pc()==0x1e327a)
+	if (m_maincpu->pc() == 0x1e327a)
 		return ioport("COIN")->read(); // TODO: coins don't respond well
 
-	if (m_maincpu->pc()==0x1e3254) return 0x0000; // what's this? dips?
+	if (m_maincpu->pc() == 0x1e3254) return 0x0000; // what's this? dips?
 
 	//logerror("jparkmb_r : %06x\n",m_maincpu->pc());
 
@@ -252,13 +252,25 @@ uint16_t md_boot_state::jparkmb_r()
 
 uint16_t md_boot_state::barek2mb_r()
 {
-	if (m_maincpu->pc()==0xfa40)
+	if (m_maincpu->pc() == 0xfa40)
 		return 0x0400; // TODO: what's this? Needed or the game doesn't boot
 
-	if (m_maincpu->pc()==0xfa88)
+	if (m_maincpu->pc() == 0xfa88)
 		return 0x0ff0; // TODO: fix this, should probably read coin inputs, as is gives 9 credits at start up
 
-	logerror("aladbl_r : %06x\n",m_maincpu->pc());
+	logerror("barek2mb_r : %06x\n", m_maincpu->pc());
+	return 0x0000;
+}
+
+uint16_t md_boot_state::barek3mba_r() // missing PIC dump, simulated for now
+{
+	if (m_maincpu->pc() == 0x4dbc6)
+		return 0x0300;
+
+	if (m_maincpu->pc() == 0x4dc34)
+		return 0x0ff0; // TODO: fix this, should probably read coin inputs, as is gives 9 credits at start up
+
+	logerror("barek3mba_r : %06x\n", m_maincpu->pc());
 	return 0x0000;
 }
 
@@ -1009,6 +1021,13 @@ void md_boot_state::init_barek3()
 	init_megadrij();
 }
 
+void md_boot_state::init_barek3a()
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16smo_delegate(*this, FUNC(md_boot_state::barek3mba_r)));
+
+	init_megadrij();
+}
+
 void md_boot_6button_state::init_bk3ssrmb()
 {
 	uint8_t* rom = memregion("maincpu")->base();
@@ -1177,6 +1196,19 @@ ROM_START( barek3mb )
 	ROM_LOAD16_BYTE( "2.u16", 0x200001, 0x080000,  CRC(bba4a585) SHA1(32c59729943d7b4c1a39f2a2b0dae9ce16991e9c) )
 ROM_END
 
+ROM_START( barek3mba )
+	ROM_REGION( 0x400000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "u4", 0x000000, 0x080000,  CRC(6b116813) SHA1(df9811c5da9f58f2bba462447b792f3067b10411) )
+	ROM_LOAD16_BYTE( "u3", 0x000001, 0x080000,  CRC(8c891e5a) SHA1(aa1fb1aa2c68b1ae24e1ac30a82bc4e454b952b5) )
+	ROM_LOAD16_BYTE( "u6", 0x100000, 0x080000,  CRC(a2ec29e2) SHA1(8e8eee64554396070455a737f4009d33d2ffa535) )
+	ROM_LOAD16_BYTE( "u5", 0x100001, 0x080000,  CRC(f79e0028) SHA1(54022eadc6e345c049b7357b17b636b31d2af914) )
+	ROM_LOAD16_BYTE( "u8", 0x200000, 0x080000,  CRC(55be9542) SHA1(f78c273858f3ae77b36f1229797e80a4ab102a03) )
+	ROM_LOAD16_BYTE( "u7", 0x200001, 0x080000,  CRC(bba4a585) SHA1(32c59729943d7b4c1a39f2a2b0dae9ce16991e9c) )
+
+	ROM_REGION( 0x1000, "pic", ROMREGION_ERASE00 )
+	ROM_LOAD( "bk_pic16c57rcp.bin", 0x0000, 0x1000, NO_DUMP )
+ROM_END
+
 ROM_START( bk3ssrmb )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "1.u15", 0x000000, 0x080000,  CRC(120a4b64) SHA1(7084fde0d08143f48f83d2afef30522d75c7889c) )
@@ -1232,18 +1264,19 @@ ROM_END
  *
  *************************************/
 
-GAME( 1993, aladmdb,  0, megadrvb,     aladmdb,  md_boot_state,         init_aladmdb,  ROT0, "bootleg / Sega",   "Aladdin (bootleg of Japanese Mega Drive version)",                                       0 )
-GAME( 1996, mk3mdb,   0, megadrvb_6b,  mk3mdb,   md_boot_6button_state, init_mk3mdb,   ROT0, "bootleg / Midway", "Mortal Kombat 3 (bootleg of Mega Drive version)",                                        0 )
-GAME( 1994, ssf2mdb,  0, ssf2mdb,      ssf2mdb,  md_boot_6button_state, init_megadrij, ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (bootleg of Japanese Mega Drive version)", 0 )
-GAME( 1993, srmdb,    0, megadrvb,     srmdb,    md_boot_state,         init_srmdb,    ROT0, "bootleg / Konami", "Sunset Riders (bootleg of Mega Drive version)",                                          0 )
-GAME( 1993, sonic2mb, 0, md_bootleg,   sonic2mb, md_boot_state,         init_sonic2mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 2 (bootleg of Mega Drive version)",                                   0 ) // Flying wires going through the empty PIC space aren't completely understood
-GAME( 1993, sonic3mb, 0, md_bootleg,   sonic3mb, md_sonic3bl_state,     init_sonic3mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 3 (bootleg of Mega Drive version)",                                   MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // undumped PIC
-GAME( 1994, barek2mb, 0, md_bootleg,   barek2,   md_boot_state,         init_barek2,   ROT0, "bootleg / Sega",   "Bare Knuckle II (bootleg of Mega Drive version)",                                        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC hook up
-GAME( 1994, barek3mb, 0, megadrvb,     barek3,   md_boot_state,         init_barek3,   ROT0, "bootleg / Sega",   "Bare Knuckle III (bootleg of Mega Drive version)",                                       0 )
-GAME( 1994, bk3ssrmb, 0, megadrvb_6b,  bk3ssrmb, md_boot_6button_state, init_bk3ssrmb, ROT0, "bootleg / Sega",   "Bare Knuckle III / Sunset Riders (bootleg of Mega Drive versions)",                      MACHINE_NOT_WORKING ) // Currently boots as Bare Knuckle III, mechanism to switch game not found yet
-GAME( 1993, twinktmb, 0, md_bootleg,   twinktmb, md_boot_state,         init_twinktmb, ROT0, "bootleg / Sega",   "Twinkle Tale (bootleg of Mega Drive version)",                                           MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC decap or simulation
-GAME( 1993, jparkmb,  0, md_bootleg,   twinktmb, md_boot_state,         init_jparkmb,  ROT0, "bootleg / Sega",   "Jurassic Park (bootleg of Mega Drive version)",                                          MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC decap or simulation
+GAME( 1993, aladmdb,   0,        megadrvb,     aladmdb,   md_boot_state,         init_aladmdb,  ROT0, "bootleg / Sega",   "Aladdin (bootleg of Japanese Mega Drive version)",                                       0 )
+GAME( 1996, mk3mdb,    0,        megadrvb_6b,  mk3mdb,    md_boot_6button_state, init_mk3mdb,   ROT0, "bootleg / Midway", "Mortal Kombat 3 (bootleg of Mega Drive version)",                                        0 )
+GAME( 1994, ssf2mdb,   0,        ssf2mdb,      ssf2mdb,   md_boot_6button_state, init_megadrij, ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (bootleg of Japanese Mega Drive version)", 0 )
+GAME( 1993, srmdb,     0,        megadrvb,     srmdb,     md_boot_state,         init_srmdb,    ROT0, "bootleg / Konami", "Sunset Riders (bootleg of Mega Drive version)",                                          0 )
+GAME( 1993, sonic2mb,  0,        md_bootleg,   sonic2mb,  md_boot_state,         init_sonic2mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 2 (bootleg of Mega Drive version)",                                   0 ) // Flying wires going through the empty PIC space aren't completely understood
+GAME( 1993, sonic3mb,  0,        md_bootleg,   sonic3mb,  md_sonic3bl_state,     init_sonic3mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 3 (bootleg of Mega Drive version)",                                   MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // undumped PIC
+GAME( 1994, barek2mb,  0,        md_bootleg,   barek2,    md_boot_state,         init_barek2,   ROT0, "bootleg / Sega",   "Bare Knuckle II (bootleg of Mega Drive version)",                                        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC hook up
+GAME( 1994, barek3mb,  0,        megadrvb,     barek3,    md_boot_state,         init_barek3,   ROT0, "bootleg / Sega",   "Bare Knuckle III (bootleg of Mega Drive version)",                                       0 )
+GAME( 1994, barek3mba, barek3mb, megadrvb,     barek3,    md_boot_state,         init_barek3a,  ROT0, "bootleg / Sega",   "Bare Knuckle III (bootleg of Mega Drive version, protected)",                            MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // undumped PIC
+GAME( 1994, bk3ssrmb,  0,        megadrvb_6b,  bk3ssrmb,  md_boot_6button_state, init_bk3ssrmb, ROT0, "bootleg / Sega",   "Bare Knuckle III / Sunset Riders (bootleg of Mega Drive versions)",                      MACHINE_NOT_WORKING ) // Currently boots as Bare Knuckle III, mechanism to switch game not found yet
+GAME( 1993, twinktmb,  0,        md_bootleg,   twinktmb,  md_boot_state,         init_twinktmb, ROT0, "bootleg / Sega",   "Twinkle Tale (bootleg of Mega Drive version)",                                           MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC decap or simulation
+GAME( 1993, jparkmb,   0,        md_bootleg,   twinktmb,  md_boot_state,         init_jparkmb,  ROT0, "bootleg / Sega",   "Jurassic Park (bootleg of Mega Drive version)",                                          MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC decap or simulation
 
 // Chinese bootlegs. Very clean looking with custom chips marked TA-04, TA-05 and TA-06.
-GAME( 1994, barekch,  0, megadrvb_6b,  barekch,  md_boot_6button_state, init_barekch,  ROT0, "bootleg",          "Bare Knuckle (Chinese bootleg of Mega Drive version)",                                   0 )
-GAME( 1994, barek2ch, 0, md_bootleg,   barek2ch, md_boot_state,         init_barek2ch, ROT0, "bootleg",          "Bare Knuckle II (Chinese bootleg of Mega Drive version)",                                0 )
+GAME( 1994, barekch,   0,        megadrvb_6b,  barekch,   md_boot_6button_state, init_barekch,  ROT0, "bootleg",          "Bare Knuckle (Chinese bootleg of Mega Drive version)",                                   0 )
+GAME( 1994, barek2ch,  0,        md_bootleg,   barek2ch,  md_boot_state,         init_barek2ch, ROT0, "bootleg",          "Bare Knuckle II (Chinese bootleg of Mega Drive version)",                                0 )

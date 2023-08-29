@@ -76,10 +76,10 @@ const tiny_rom_entry *c8280_device::device_rom_region() const
 
 void c8280_device::c8280_main_mem(address_map &map)
 {
-	map(0x0000, 0x007f).mirror(0x100).m(M6532_0_TAG, FUNC(mos6532_new_device::ram_map));
-	map(0x0080, 0x00ff).mirror(0x100).m(M6532_1_TAG, FUNC(mos6532_new_device::ram_map));
-	map(0x0200, 0x021f).mirror(0xd60).m(M6532_0_TAG, FUNC(mos6532_new_device::io_map));
-	map(0x0280, 0x029f).mirror(0xd60).m(M6532_1_TAG, FUNC(mos6532_new_device::io_map));
+	map(0x0000, 0x007f).mirror(0x100).m(M6532_0_TAG, FUNC(mos6532_device::ram_map));
+	map(0x0080, 0x00ff).mirror(0x100).m(M6532_1_TAG, FUNC(mos6532_device::ram_map));
+	map(0x0200, 0x021f).mirror(0xd60).m(M6532_0_TAG, FUNC(mos6532_device::io_map));
+	map(0x0280, 0x029f).mirror(0xd60).m(M6532_1_TAG, FUNC(mos6532_device::io_map));
 	map(0x1000, 0x13ff).mirror(0xc00).ram().share("share1");
 	map(0x2000, 0x23ff).mirror(0xc00).ram().share("share2");
 	map(0x3000, 0x33ff).mirror(0xc00).ram().share("share3");
@@ -300,11 +300,11 @@ void c8280_device::device_add_mconfig(machine_config &config)
 	M6502(config, m_maincpu, XTAL(12'000'000)/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c8280_device::c8280_main_mem);
 
-	MOS6532_NEW(config, m_riot0, XTAL(12'000'000)/8);
+	MOS6532(config, m_riot0, XTAL(12'000'000)/8);
 	m_riot0->pa_rd_callback().set(FUNC(c8280_device::dio_r));
 	m_riot0->pb_wr_callback().set(FUNC(c8280_device::dio_w));
 
-	MOS6532_NEW(config, m_riot1, XTAL(12'000'000)/8);
+	MOS6532(config, m_riot1, XTAL(12'000'000)/8);
 	m_riot1->pa_rd_callback().set(FUNC(c8280_device::riot1_pa_r));
 	m_riot1->pa_wr_callback().set(FUNC(c8280_device::riot1_pa_w));
 	m_riot1->pb_rd_callback().set(FUNC(c8280_device::riot1_pb_r));
@@ -434,7 +434,7 @@ void c8280_device::device_reset()
 	m_riot1->reset();
 	m_fdc->reset();
 
-	m_riot1->pa7_w(1);
+	m_riot1->pa_bit_w<7>(1);
 
 	m_fk5 = 0;
 	m_floppy = nullptr;
@@ -451,7 +451,7 @@ void c8280_device::ieee488_atn(int state)
 {
 	update_ieee_signals();
 
-	m_riot1->pa7_w(state);
+	m_riot1->pa_bit_w<7>(state);
 }
 
 

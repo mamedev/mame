@@ -50,7 +50,7 @@ Keypad legend:
 #include "speaker.h"
 
 // internal artwork
-#include "intellect02.lh" // clickable
+#include "intellect02.lh"
 
 
 namespace {

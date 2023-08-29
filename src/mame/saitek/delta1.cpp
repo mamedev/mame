@@ -37,7 +37,7 @@ In the Delta-1 ROM is even some fragmented code remaining of the message:
 #include "video/pwm.h"
 
 // internal artwork
-#include "saitek_delta1.lh" // clickable
+#include "saitek_delta1.lh"
 
 
 namespace {

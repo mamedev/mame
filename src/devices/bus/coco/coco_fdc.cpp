@@ -73,22 +73,24 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "cococart.h"
 #include "coco_fdc.h"
+
 #include "meb_intrf.h"
+
+#include "imagedev/floppy.h"
 #include "machine/ds1315.h"
 #include "machine/input_merger.h"
 #include "machine/msm6242.h"
 #include "machine/wd_fdc.h"
-#include "imagedev/floppy.h"
+
 #include "formats/dmk_dsk.h"
+#include "formats/flex_dsk.h"
 #include "formats/fs_coco_os9.h"
 #include "formats/fs_coco_rsdos.h"
 #include "formats/jvc_dsk.h"
 #include "formats/os9_dsk.h"
 #include "formats/sdf_dsk.h"
 #include "formats/vdk_dsk.h"
-#include "formats/flex_dsk.h"
 
 #define LOG_WDFDC   (1U << 1) // Shows register setup
 #define LOG_WDIO    (1U << 2) // Shows data read and write

@@ -127,14 +127,18 @@ public:
 		m_bg15_1_ram(*this, "bg15_1_ram"),
 		m_scroll(*this, "scroll"),
 		m_enable(*this, "enable"),
-		m_outputs(*this, "outputs")
+		m_outputs(*this, "outputs"),
+		m_blocker(*this, "blocker"),
+		m_error_lamp(*this, "error_lamp"),
+		m_photo_lamp(*this, "photo_lamp"),
+		m_ok_button_led(*this, "ok_button_led"),
+		m_cancel_button_led(*this, "cancel_button_led")
 	{ }
 
 	void joystand(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 private:
@@ -156,6 +160,13 @@ private:
 	required_shared_ptr<uint16_t> m_scroll;
 	required_shared_ptr<uint16_t> m_enable;
 	required_shared_ptr<uint16_t> m_outputs;
+
+	// I/O
+	output_finder<> m_blocker;
+	output_finder<> m_error_lamp;
+	output_finder<> m_photo_lamp;
+	output_finder<> m_ok_button_led;
+	output_finder<> m_cancel_button_led;
 
 	// tilemaps
 	tilemap_t *m_bg1_tmap = nullptr;
@@ -392,14 +403,14 @@ void joystand_state::outputs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		machine().bookkeeping().coin_counter_w(0,            BIT(data, 0)); // coin counter 1
 		machine().bookkeeping().coin_counter_w(1,            BIT(data, 1)); // coin counter 2
 
-		output().set_value("blocker",             BIT(data, 2));
-		output().set_value("error_lamp",          BIT(data, 3)); // counter error
-		output().set_value("photo_lamp",          BIT(data, 4)); // during photo
+		m_blocker = BIT(data, 2);
+		m_error_lamp = BIT(data, 3); // counter error
+		m_photo_lamp = BIT(data, 4); // during photo
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_value("ok_button_led",       BIT(data, 8));
-		output().set_value("cancel_button_led",   BIT(data, 9));
+		m_ok_button_led = BIT(data, 8);
+		m_cancel_button_led = BIT(data, 9);
 	}
 }
 
@@ -549,11 +560,13 @@ GFXDECODE_END
 
 void joystand_state::machine_start()
 {
+	m_blocker.resolve();
+	m_error_lamp.resolve();
+	m_photo_lamp.resolve();
+	m_ok_button_led.resolve();
+	m_cancel_button_led.resolve();
 }
 
-void joystand_state::machine_reset()
-{
-}
 
 void joystand_state::joystand(machine_config &config)
 {

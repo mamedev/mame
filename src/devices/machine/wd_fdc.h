@@ -99,7 +99,7 @@ protected:
 	bool disable_mfm;
 	bool enmf;
 	bool has_enmf;
-	bool inverted_bus;
+	uint8_t bus_invert_value;
 	bool side_control;
 	bool side_compare;
 	bool head_control;

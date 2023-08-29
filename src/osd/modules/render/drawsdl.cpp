@@ -717,7 +717,7 @@ public:
 	virtual std::unique_ptr<osd_renderer> create(osd_window &window) override;
 
 protected:
-	virtual unsigned flags() const override { return FLAG_INTERACTIVE | FLAG_SDL_NEEDS_OPENGL; }
+	virtual unsigned flags() const override { return FLAG_INTERACTIVE; }
 
 private:
 	static int get_scale_mode(char const *modestr);

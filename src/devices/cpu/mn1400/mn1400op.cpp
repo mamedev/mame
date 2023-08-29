@@ -86,7 +86,7 @@ void mn1400_cpu_device::op_ldc()
 
 void mn1400_cpu_device::op_st()
 {
-	// S: store A into memory
+	// ST: store A into memory
 	ram_w(m_a);
 }
 

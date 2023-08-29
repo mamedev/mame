@@ -337,21 +337,23 @@ Notes:
 #include "emu.h"
 #include "jaguar.h"
 
+#include "bus/ata/hdd.h"
 #include "bus/generic/carts.h"
-#include "bus/ata/idehd.h"
+#include "cpu/jaguar/jaguar.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m68000/m68020.h"
 #include "cpu/mips/mips1.h"
-#include "cpu/jaguar/jaguar.h"
 #include "imagedev/cdromimg.h"
 #include "imagedev/snapquik.h"
 #include "machine/eepromser.h"
-#include "machine/watchdog.h"
 #include "machine/vt83c461.h"
+#include "machine/watchdog.h"
 #include "sound/cdda.h"
-#include "cdrom.h"
+
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include "cdrom.h"
 
 #define COJAG_CLOCK         XTAL(52'000'000)
 #define R3000_CLOCK         XTAL(40'000'000)

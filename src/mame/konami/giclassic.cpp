@@ -44,12 +44,15 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/k053252.h"
+
 #include "k055555.h"
 #include "k054156_k054157_k056832.h"
 #include "k053246_k053247_k055673.h"
 #include "konami_helper.h"
+
+#include "cpu/m68000/m68000.h"
+#include "machine/k053252.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -69,6 +72,11 @@ public:
 
 	void giclassic(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<k056832_device> m_k056832;
@@ -76,9 +84,6 @@ private:
 
 	INTERRUPT_GEN_MEMBER(giclassic_interrupt);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_giclassic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K056832_CB_MEMBER(tile_callback);
 
@@ -157,8 +162,8 @@ void giclassic_state::satellite_main(address_map &map)
 	map(0xb00000, 0xb01fff).r(FUNC(giclassic_state::vrom_r));
 	map(0xc00000, 0xc00001).w(FUNC(giclassic_state::control_w));
 	map(0xd00000, 0xd0003f).ram(); // these must read/write or 26S (LCD controller) fails
-	map(0xe00000, 0xe0001f).w(m_k056832, FUNC(k056832_device::b_w)).umask16(0xff00);
-	map(0xf00000, 0xf00001).noprw().nopw(); // watchdog reset
+	map(0xe00000, 0xe00007).w(m_k056832, FUNC(k056832_device::b_w)).umask16(0xff00); // ?
+	map(0xf00000, 0xf00001).noprw(); // watchdog reset
 }
 
 static INPUT_PORTS_START( giclassic )
@@ -179,14 +184,21 @@ void giclassic_state::machine_reset()
 class giclassicsvr_state : public driver_device
 {
 public:
-	giclassicsvr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	giclassicsvr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_k056832(*this, "k056832"),
 		m_k055673(*this, "k055673"),
 		m_palette(*this, "palette")
 	{ }
 
+	void giclassvr(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<k056832_device> m_k056832;
 	required_device<k055673_device> m_k055673;
@@ -194,8 +206,6 @@ public:
 
 	INTERRUPT_GEN_MEMBER(giclassicsvr_interrupt);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	uint32_t screen_update_giclassicsvr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K056832_CB_MEMBER(tile_callback);
 	K055673_CB_MEMBER(sprite_callback);
@@ -203,9 +213,8 @@ public:
 	void control_w(uint16_t data);
 	uint16_t control_r();
 
-	void giclassvr(machine_config &config);
 	void server_main(address_map &map);
-private:
+
 	uint16_t m_control = 0;
 };
 
@@ -314,7 +323,7 @@ void giclassic_state::giclassic(machine_config &config)
 	screen.set_screen_update(FUNC(giclassic_state::screen_update_giclassic));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 256);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 2048);
 	m_palette->enable_shadows();
 
 	K056832(config, m_k056832, 0);

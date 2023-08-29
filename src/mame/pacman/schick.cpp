@@ -45,8 +45,7 @@ public:
 		m_colorram(*this, "colorram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_ay(*this, "ay%u", 1U),
-		m_irq_mask(0)
+		m_ay(*this, "ay%u", 1U)
 	{
 	}
 
@@ -106,10 +105,10 @@ private:
 
 	uint8_t soundlatch_read_and_clear();
 
-	uint8_t m_irq_mask;
 	uint32_t screen_update_schick(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_irq_mask = 0;
 	uint8_t m_charbank = 0;
 	uint8_t m_spritebank = 0;
 	uint8_t m_palettebank = 0;
@@ -593,9 +592,9 @@ void schick_state::schick(machine_config &config) // all dividers unknown
 
 	LS259(config, m_latch); // 3I, TODO: identify bits' function. 0 is correct, 2, 6 and 7 seem to be set when switching from title screen to game screen, 1, 3, 4 and 5 seem to never be set during gameplay
 	m_latch->q_out_cb<0>().set(FUNC(schick_state::irq_mask_w));
-	m_latch->q_out_cb<1>().set_log("m_latch bit 1 set");
+	m_latch->q_out_cb<1>().set([this](int state) { logerror("%s latch bit 1 w: %d\n", machine().describe_context(), state); });
 	m_latch->q_out_cb<2>().set(FUNC(schick_state::schick_palettebank_w));
-	m_latch->q_out_cb<3>().set_log("m_latch bit 3 set");
+	m_latch->q_out_cb<3>().set([this](int state) { logerror("%s latch bit 3 w: %d\n", machine().describe_context(), state); });
 	m_latch->q_out_cb<4>().set(FUNC(schick_state::coin_counter_1_w));
 	m_latch->q_out_cb<5>().set(FUNC(schick_state::coin_counter_2_w));
 	m_latch->q_out_cb<6>().set(FUNC(schick_state::schick_colortablebank_w));

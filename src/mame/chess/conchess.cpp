@@ -77,7 +77,7 @@ is integrated.
 #include "speaker.h"
 
 // internal artwork
-#include "conchess.lh" // clickable
+#include "conchess.lh"
 
 
 namespace {

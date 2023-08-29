@@ -119,7 +119,6 @@ public:
 	supertnk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_watchdog(*this, "watchdog")
 		, m_videoram(*this, "videoram%u", 0U, 0x2000U, ENDIANNESS_BIG)
 		, m_prgbank(*this, "prgbank")
 	{ }
@@ -136,7 +135,6 @@ private:
 	void bankswitch_0_w(int state);
 	void bankswitch_1_w(int state);
 	void interrupt_enable_w(int state);
-	void watchdog_reset_w(int state);
 	void videoram_w(offs_t offset, uint8_t data);
 	uint8_t videoram_r(offs_t offset);
 	void bitplane_select_0_w(int state);
@@ -156,7 +154,6 @@ private:
 	bool m_interrupt_enable = false;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<watchdog_timer_device> m_watchdog;
 	memory_share_array_creator<uint8_t, 3> m_videoram;
 	required_memory_bank m_prgbank;
 };
@@ -213,11 +210,6 @@ void supertnk_state::interrupt_enable_w(int state)
 		m_maincpu->set_input_line(INT_9980A_LEVEL4, CLEAR_LINE);
 }
 
-
-void supertnk_state::watchdog_reset_w(int state)
-{
-	m_watchdog->watchdog_enable(!state);
-}
 
 
 /*************************************
@@ -435,15 +427,15 @@ void supertnk_state::supertnk(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &supertnk_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &supertnk_state::io_map);
 
+	WATCHDOG_TIMER(config, "watchdog");
+
 	ls259_device &outlatch(LS259(config, "outlatch")); // on CPU board near 2114 SRAM
 	outlatch.q_out_cb<0>().set(FUNC(supertnk_state::bitplane_select_0_w));
 	outlatch.q_out_cb<1>().set(FUNC(supertnk_state::bitplane_select_1_w));
 	outlatch.q_out_cb<2>().set(FUNC(supertnk_state::bankswitch_0_w));
 	outlatch.q_out_cb<4>().set(FUNC(supertnk_state::bankswitch_1_w));
-	outlatch.q_out_cb<6>().set(FUNC(supertnk_state::watchdog_reset_w)).invert();
+	outlatch.q_out_cb<6>().set("watchdog", FUNC(watchdog_timer_device::watchdog_enable)).invert();
 	outlatch.q_out_cb<7>().set(FUNC(supertnk_state::interrupt_enable_w));
-
-	WATCHDOG_TIMER(config, m_watchdog);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

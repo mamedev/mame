@@ -22,6 +22,8 @@ public:
 	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void fifo_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
+	void vblank_w(int state);
+
 	struct framebuffer
 	{
 		uint32_t base;
@@ -86,6 +88,8 @@ private:
 	uint32_t m_display_v_syncpulse;
 
 	uint32_t m_pixclock;
+
+	uint16_t m_irqctrl;
 
 	devcb_write_line m_irq;
 };

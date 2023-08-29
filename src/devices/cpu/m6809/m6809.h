@@ -86,7 +86,7 @@ protected:
 		ADDRESSING_MODE_EA          = 1,
 		ADDRESSING_MODE_REGISTER_A  = 2,
 		ADDRESSING_MODE_REGISTER_B  = 3,
-		ADDRESSING_MODE_REGISTER_D = 4
+		ADDRESSING_MODE_REGISTER_D  = 4
 	};
 
 	// flag bits in the cc register
@@ -277,7 +277,7 @@ private:
 	const address_space_config  m_sprogram_config;
 
 	// other state
-	uint32_t                      m_state;
+	uint32_t                    m_state;
 	bool                        m_cond;
 	bool                        m_free_run;
 

@@ -1049,7 +1049,8 @@ void ngcd_state::neocd_ntsc(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ngcd_state::neocd_audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &ngcd_state::neocd_audio_io_map);
 
-	subdevice<hc259_device>("systemlatch")->q_out_cb<1>().set_log("NeoCD: write to regular vector change address?"); // what IS going on with "neocdz doubledr" and why do games write here if it's hooked up to nothing?
+	// what IS going on with "neocdz doubledr" and why do games write here if it's hooked up to nothing?
+	subdevice<hc259_device>("systemlatch")->q_out_cb<1>().set([this](int state) { logerror("%s NeoCD: write %d to regular vector change address?\n", machine().describe_context(), state); });
 
 	m_screen->set_screen_update(FUNC(ngcd_state::screen_update));
 

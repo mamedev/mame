@@ -57,6 +57,7 @@ void midvunit_state::machine_start()
 	save_item(NAME(m_comm_data));
 
 	m_optional_drivers.resolve();
+	m_wheel_motor.resolve();
 }
 
 
@@ -177,11 +178,10 @@ void midvunit_state::midvunit_control_w(offs_t offset, uint32_t data, uint32_t m
 	/* bit 7 is the LED */
 
 	/* bit 3 is the watchdog */
-	if ((olddata ^ m_control_data) & 0x0008)
-		m_watchdog->watchdog_reset();
+	m_watchdog->reset_line_w(BIT(m_control_data, 3));
 
 	/* bit 1 is the DCS sound reset */
-	m_dcs->reset_w((m_control_data >> 1) & 1);
+	m_dcs->reset_w(BIT(m_control_data, 1));
 
 	/* log anything unusual */
 	if ((olddata ^ m_control_data) & ~0x00e8)
@@ -195,11 +195,10 @@ void midvunit_state::crusnwld_control_w(offs_t offset, uint32_t data, uint32_t m
 	COMBINE_DATA(&m_control_data);
 
 	/* bit 11 is the DCS sound reset */
-	m_dcs->reset_w((m_control_data >> 11) & 1);
+	m_dcs->reset_w(BIT(m_control_data, 11));
 
 	/* bit 9 is the watchdog */
-	if ((olddata ^ m_control_data) & 0x0200)
-		m_watchdog->watchdog_reset();
+	m_watchdog->reset_line_w(BIT(m_control_data, 9));
 
 	/* bit 8 is the LED */
 
@@ -435,7 +434,7 @@ void midvunit_state::midvunit_wheel_board_w(uint32_t data)
 					logerror("Wheel board (ATODRDZ) = %02X\n", arg);
 					break;
 				case 4: // WHLCTLZ
-					output().set_value("wheel", arg);
+					m_wheel_motor = arg;
 					//logerror("Wheel board (U4 74HC574; Motor) = %02X\n", arg);
 					break;
 				case 5: // DRVCTLZ
@@ -562,12 +561,10 @@ void midvunit_state::midvplus_misc_w(offs_t offset, uint32_t data, uint32_t mem_
 	switch (offset)
 	{
 		case 0:
-			/* bit 0x10 resets watchdog */
-			if ((olddata ^ m_midvplus_misc[offset]) & 0x0010)
-			{
-				m_watchdog->watchdog_reset();
-				logit = false;
-			}
+			/* bit 4 resets watchdog */
+			m_watchdog->reset_line_w(BIT(data, 4));
+
+			logit = bool((olddata ^ m_midvplus_misc[offset]) & ~0x0010);
 			break;
 
 		case 3:
@@ -2188,13 +2185,13 @@ GAMEL( 1996, crusnwld19, crusnwld, crusnwld, crusnwld, midvunit_state, init_crus
 GAMEL( 1996, crusnwld17, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (v1.7)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 GAMEL( 1996, crusnwld13, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (v1.3)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 
-GAMEL( 1997, offroadc,  0,        offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.63)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1997, offroadc5, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.50)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1997, offroadc4, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.40)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1997, offroadc3, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.30)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1997, offroadc1, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.10)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1997, offroadc0, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.00)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc,  0,         offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.63)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc5, offroadc,  offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.50)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc4, offroadc,  offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.40)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc3, offroadc,  offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.30)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc1, offroadc,  offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.10)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc0, offroadc,  offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.00)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 
-GAME( 1995, wargods,   0,        midvplus, wargods, midvunit_state,  init_wargods,  ROT0, "Midway", "War Gods (HD 10/09/1996 - Dual Resolution)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wargodsa,  wargods,  midvplus, wargodsa, midvunit_state, init_wargods,  ROT0, "Midway", "War Gods (HD 08/15/1996)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wargodsb,  wargods,  midvplus, wargodsa, midvunit_state, init_wargods,  ROT0, "Midway", "War Gods (HD 12/11/1995)", MACHINE_SUPPORTS_SAVE )
+GAME(  1995, wargods,   0,         midvplus, wargods,  midvunit_state, init_wargods,  ROT0, "Midway", "War Gods (HD 10/09/1996 - Dual Resolution)", MACHINE_SUPPORTS_SAVE )
+GAME(  1995, wargodsa,  wargods,   midvplus, wargodsa, midvunit_state, init_wargods,  ROT0, "Midway", "War Gods (HD 08/15/1996)", MACHINE_SUPPORTS_SAVE )
+GAME(  1995, wargodsb,  wargods,   midvplus, wargodsa, midvunit_state, init_wargods,  ROT0, "Midway", "War Gods (HD 12/11/1995)", MACHINE_SUPPORTS_SAVE )

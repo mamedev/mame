@@ -57,8 +57,8 @@ HD44801C89 used in:
 #include "speaker.h"
 
 // internal artwork
-#include "cxg_scptchess_v1.lh" // clickable
-#include "cxg_scptchess_v2.lh" // clickable
+#include "cxg_scptchess_v1.lh"
+#include "cxg_scptchess_v2.lh"
 
 
 namespace {

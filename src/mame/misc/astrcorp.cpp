@@ -53,8 +53,8 @@ TODO:
 - Fix mirror ROM checksum / ROM overlay without code patches (in games with heavier encryption).
 - Find source of level 2 interrupt (sprite DMA end?).
 - magibomba, westvent: need a redump of one of the program ROMs.
-- magibombd, hacher: need a redump of the sprite ROMs.
-- astoneag, dinodino, magibombd: exiting from test menu goes haywire (requires a soft-reset with F3).
+- magibombd, magibombg, hacher: need a redump of the sprite ROMs.
+- astoneag, dinodino, magibombd, magibombg: exiting from test menu goes haywire (requires a soft-reset with F3).
 - magibombg: needs RE of the CPU code and correct EEPROM.
 
 *************************************************************************************************************/
@@ -999,6 +999,18 @@ static INPUT_PORTS_START( magibombd )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", astro_cpucode_device, cs_write)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( magibombg )
+	PORT_INCLUDE( magibomb )
+
+	PORT_START( "CPUCODE_IN" )
+	PORT_BIT( 0xfff7, IP_ACTIVE_LOW,  IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE_MEMBER("astro_cpucode", astro_cpucode_device, do_read)
+
+	PORT_START( "CPUCODE_OUT" )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", astro_cpucode_device, clk_write)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", astro_cpucode_device, cs_write)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( dinodino )
 	PORT_INCLUDE( magibomb )
 
@@ -1675,6 +1687,37 @@ ROM_START( magibombg )
 	ROM_REGION16_LE( 0x02, "astro_cpucode", ROMREGION_ERASE00 )
 	ROM_LOAD( "magibombg_cpucode.key", 0x00, 0x02, NO_DUMP ) // TODO: RE correct one
 ROM_END
+
+ROM_START( magibombh )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rom1.u21", 0x00000, 0x10000, CRC(9bc790f5) SHA1(f75c6378a0067013556bf6e63cfa28475dfbe8f4) )
+	ROM_LOAD16_BYTE( "rom2.u20", 0x00001, 0x10000, CRC(b8ff0c2d) SHA1(422ea7578dbe1093ea886621ebefad0cc8e74eb4) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "29f1610mc.u26", 0x000000, 0x200000, BAD_DUMP CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // dumped for the Ver. A3.1 set, should be the same for most sets, marking as bad as precaution
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "rom5.u33", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(845be081) SHA1(af42f41148cc28c2b6717cff44bb90caaa088184) ) // factory default
+ROM_END
+
+ROM_START( magibombi )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rom1.u21", 0x00000, 0x10000, CRC(9e7201df) SHA1(b4439639d3c0827172ffe1a801df9b9f3330711e) )
+	ROM_LOAD16_BYTE( "rom2.u20", 0x00001, 0x10000, CRC(0880e66d) SHA1(cef642ced8718a9cbe12b3e4c087debfa9591a9b) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "29f1610mc.u26", 0x000000, 0x200000, BAD_DUMP CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // dumped for the Ver. A3.1 set, should be the same for most sets, marking as bad as precaution
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "rom5.u33", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(4ea5fdb1) SHA1(0c1aefc517587ee7456d158d3614201da34beb14) ) // factory default
+ROM_END
+
 
 /***************************************************************************
 
@@ -2497,13 +2540,15 @@ GAMEL( 2002,  magibombb, magibomb, magibombb, magibomb,  magibomb_state,  init_m
 GAMEL( 2001,  magibombc, magibomb, magibombb, magibomb,  magibomb_state,  init_magibomb,  ROT0, "Astro Corp.", "Magic Bomb (Ver. AB4.2, 11/10/01)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  )
 GAMEL( 2001?, magibombe, magibomb, magibombb, magibomb,  magibomb_state,  init_magibomb,  ROT0, "Astro Corp.", "Magic Bomb (Ver. A3.1)",                        MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_magibomb  )
 GAMEL( 2002,  magibombf, magibomb, magibombf, magibomb,  magibomb_state,  init_magibomb,  ROT0, "Astro Corp.", "Magic Bomb (Ver. NB4.5, 06/14/02S)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  )
+GAMEL( 2001?, magibombh, magibomb, magibombb, magibomb,  magibomb_state,  init_magibomb,  ROT0, "Astro Corp.", "Magic Bomb (Ver. A4.0A)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  )
+GAMEL( 2001?, magibombi, magibomb, magibombb, magibomb,  magibomb_state,  init_magibomb,  ROT0, "Astro Corp.", "Magic Bomb (Ver. A3.6A)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  )
 
 // Heavier encryption
 GAMEL( 2004,  zoo,       0,        zoo,       magibombd, zoo_state,       init_zoo,       ROT0, "Astro Corp.", "Zoo (Ver. ZO.02.D, Aug 27 2004)",               MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_zoo       ) // 10:53:44 Aug 27 2004
 GAMEL( 2005,  dinodino,  0,        dinodino,  dinodino,  zoo_state,       init_dinodino,  ROT0, "Astro Corp.", "Dino Dino (Ver. A1.1, 01/13/2005)",             MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_dinodino  ) // 13/01.2005 10:59
 GAMEL( 2005,  astoneag,  0,        astoneag,  astoneag,  astoneag_state,  init_astoneag,  ROT0, "Astro Corp.", "Stone Age (Astro, Ver. EN.03.A, 2005/02/21)",   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_astoneag  )
 GAMEL( 2005,  magibombd, magibomb, magibombd, magibombd, zoo_state,       init_magibombd, ROT0, "Astro Corp.", "Magic Bomb (Ver. AA.72.D, 14/11/05)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibombb ) // 15/11/05 09:31. Undumped sprite ROM
-GAMEL( 2004,  magibombg, magibomb, magibombg, magibombd, zoo_state,       init_magibombg, ROT0, "Astro Corp.", "Magic Bomb (Ver. NB6.1, 26/04/04)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 26/04/04. Undumped sprite ROM
+GAMEL( 2004,  magibombg, magibomb, magibombg, magibombg, zoo_state,       init_magibombg, ROT0, "Astro Corp.", "Magic Bomb (Ver. NB6.1, 26/04/04)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 26/04/04. Undumped sprite ROM
 GAMEL( 2006,  winbingo,  0,        winbingo,  winbingo,  zoo_state,       init_winbingo,  ROT0, "Astro Corp.", "Win Win Bingo (Ver. GM.03.3, Feb 23 2006)",     MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_winbingo  ) // 15:47:48 Feb 23 2006
 GAMEL( 2006,  winbingoa, winbingo, winbingo,  winbingo,  zoo_state,       init_winbingoa, ROT0, "Astro Corp.", "Win Win Bingo (Ver. GM.05.1, May 11 2006)",     MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_winbingo  ) // 11:02:07 May 11 2006. Undumped sprite ROMs
 GAMEL( 2005,  hacher,    winbingo, hacher,    winbingo,  zoo_state,       init_hacher,    ROT0, "bootleg (Gametron)", "Hacher (hack of Win Win Bingo EN.01.6)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS, layout_winbingo  ) // 14:25:46 Mar 10 2005. One bad sprite ROM

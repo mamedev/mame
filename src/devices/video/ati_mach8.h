@@ -6,8 +6,9 @@
 
 #pragma once
 
-#include "video/pc_vga.h"
 #include "video/ibm8514a.h"
+#include "video/pc_vga.h"
+
 
 class mach8_device : public ibm8514a_device
 {

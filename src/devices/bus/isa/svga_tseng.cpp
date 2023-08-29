@@ -118,11 +118,14 @@ void isa8_svga_et4k_device::remap(int space_id, offs_t start, offs_t end)
 		map_io();
 }
 
+void isa8_svga_et4k_device::io_isa_map(address_map &map)
+{
+	map(0x00, 0x2f).m(m_vga, FUNC(tseng_vga_device::io_map));
+}
+
 void isa8_svga_et4k_device::map_io()
 {
-	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*m_vga, FUNC(tseng_vga_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(tseng_vga_device::port_03b0_w)));
-	m_isa->install_device(0x3c0, 0x3cf, read8sm_delegate(*m_vga, FUNC(tseng_vga_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(tseng_vga_device::port_03c0_w)));
-	m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*m_vga, FUNC(tseng_vga_device::port_03d0_r)), write8sm_delegate(*m_vga, FUNC(tseng_vga_device::port_03d0_w)));
+	m_isa->install_device(0x03b0, 0x03df, *this, &isa8_svga_et4k_device::io_isa_map);
 }
 
 void isa8_svga_et4k_device::map_ram()

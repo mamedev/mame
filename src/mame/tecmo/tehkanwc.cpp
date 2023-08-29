@@ -430,7 +430,7 @@ void tehkanwc_state::shared_mem(address_map &map)
 	map(0xd000, 0xd3ff).ram().w(FUNC(tehkanwc_state::videoram_w)).share("videoram");
 	map(0xd400, 0xd7ff).ram().w(FUNC(tehkanwc_state::colorram_w)).share("colorram");
 	map(0xd800, 0xddff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xde00, 0xdfff).nopw(); // unused part of the palette RAM, I think? Gridiron uses it
+	map(0xde00, 0xdfff).nopw(); // unused part of the palette RAM, I think? Gridiron writes here
 	map(0xe000, 0xe7ff).ram().w(FUNC(tehkanwc_state::videoram2_w)).share("videoram2");
 	map(0xe800, 0xebff).ram().share("spriteram");
 	map(0xec00, 0xec01).w(FUNC(tehkanwc_state::scroll_x_w));

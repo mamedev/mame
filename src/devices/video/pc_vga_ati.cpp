@@ -43,23 +43,6 @@ void ati_vga_device::device_add_mconfig(machine_config &config)
 	EEPROM_93C46_16BIT(config, "ati_eeprom");
 }
 
-uint8_t ati_vga_device::port_03c0_r(offs_t offset)
-{
-	uint8_t data = 0xff;
-
-	switch(offset)
-	{
-	case 1:
-		if ((vga.attribute.index&0x1f) < sizeof(vga.attribute.data))
-			data = vga.attribute.data[vga.attribute.index&0x1f];
-		break;
-	default:
-		data = vga_device::port_03c0_r(offset);
-		break;
-	}
-	return data;
-}
-
 uint16_t ati_vga_device::offset()
 {
 	//popmessage("Offset: %04x  %s %s %s %s",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD",(ati.ext_reg[0x33] & 0x40) ? "PEL" : "---",(ati.ext_reg[0x30] & 0x20) ? "256" : "---");

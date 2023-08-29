@@ -27,7 +27,7 @@ ROM labeled 007-7027-00.
 #include "video/pwm.h"
 
 // internal artwork
-#include "aci_boris.lh" // clickable
+#include "aci_boris.lh"
 
 
 namespace {

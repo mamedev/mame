@@ -6,7 +6,7 @@
 
     Systems supported by this driver:
 
-    Oric 1,
+    Oric-1,
     Oric Atmos,
     Oric Telestrat,
     Pravetz 8D
@@ -985,7 +985,7 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT        COMPANY      FULLNAME                 FLAGS
-COMP( 1983, oric1,    0,      0,      oric,     oric,     oric_state,      empty_init, "Tangerine", "Oric 1" ,               MACHINE_SUPPORTS_SAVE )
+COMP( 1983, oric1,    0,      0,      oric,     oric,     oric_state,      empty_init, "Tangerine", "Oric-1" ,               MACHINE_SUPPORTS_SAVE )
 COMP( 1984, orica,    oric1,  0,      oric,     orica,    oric_state,      empty_init, "Tangerine", "Oric Atmos" ,           MACHINE_SUPPORTS_SAVE )
 COMP( 1985, prav8d,   oric1,  0,      prav8d,   prav8d,   oric_state,      empty_init, "Pravetz",   "Pravetz 8D",            MACHINE_SUPPORTS_SAVE )
 COMP( 1989, prav8dd,  oric1,  0,      prav8d,   prav8d,   oric_state,      empty_init, "Pravetz",   "Pravetz 8D (Disk ROM)", MACHINE_UNOFFICIAL | MACHINE_SUPPORTS_SAVE )

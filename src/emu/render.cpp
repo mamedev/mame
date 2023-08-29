@@ -2215,7 +2215,7 @@ bool render_target::load_layout_file(device_t &device, util::xml::data_node cons
 	{
 		m_filelist.emplace_back(device, rootnode, searchpath, dirname);
 	}
-	catch (emu_fatalerror &err)
+	catch (emu_fatalerror const &err)
 	{
 		osd_printf_warning("%s\n", err.what());
 		return false;
@@ -3259,12 +3259,7 @@ float render_manager::ui_aspect(render_container *rc)
 	}
 
 	// clamp for extreme proportions
-	if (aspect < 0.66f)
-		aspect = 0.66f;
-	if (aspect > 1.5f)
-		aspect = 1.5f;
-
-	return aspect;
+	return std::clamp(aspect, 0.66f, 1.5f);
 }
 
 

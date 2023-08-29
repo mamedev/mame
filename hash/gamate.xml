@@ -353,7 +353,7 @@ C1066 - ??
 		</part>
 	</software>
 
-<!-- This maybe comes from a cart with "Bomb Blaster" label? -->
+	<!-- This maybe comes from a cart with "Bomb Blaster" label? -->
 	<software name="bomblasta" cloneof="bomblast">
 		<description>Bomb Blaster (alt)</description>
 		<year>1990</year>

@@ -7,8 +7,7 @@
 #pragma once
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/sh/sh2.h"
-#include "cpu/sh/sh2comn.h"
+#include "cpu/sh/sh7604.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "emupal.h"
@@ -116,8 +115,8 @@ protected:
 
 	/* our main vblank handler resets this */
 	required_device<m68000_base_device> m_main_cpu;
-	required_device<sh2_device> m_master_cpu;
-	required_device<sh2_device> m_slave_cpu;
+	required_device<sh2_sh7604_device> m_master_cpu;
+	required_device<sh2_sh7604_device> m_slave_cpu;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
 	required_device<timer_device> m_scan_timer;

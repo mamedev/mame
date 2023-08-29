@@ -545,7 +545,7 @@ void psx1_state::psj(machine_config &config)
 void psx1_state::psu(machine_config &config)
 {
 	psj(config);
-	HD63705(config, "subcpu", 4166667).set_addrmap(AS_PROGRAM, &psx1_state::subcpu_map); // MC68HC05G6
+	HD63705Z0(config, "subcpu", 4166667).set_addrmap(AS_PROGRAM, &psx1_state::subcpu_map); // FIXME: actually MC68HC05G6
 }
 
 void psx1_state::pse(machine_config &config)

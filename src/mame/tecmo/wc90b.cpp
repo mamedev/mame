@@ -884,6 +884,49 @@ ROM_START( twcup90b2 )
 ROM_END
 
 
+ROM_START( twcup90b3 ) // most similar to twcup90b1. First main CPU ROM has a small routine added
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "03.bin", 0x00000, 0x10000, CRC(1e6e94c9) SHA1(1731e3e3b5d17ba676a7e42638d7206212a0080d) )  // c000-ffff is not used
+	ROM_LOAD( "02.bin", 0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )  // banked at f000-f7ff
+
+	ROM_REGION( 0x20000, "sub", 0 )
+	ROM_LOAD( "05.bin", 0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )  // c000-ffff is not used
+	ROM_LOAD( "04.bin", 0x10000, 0x10000, CRC(9e421c4b) SHA1(e23a1f1d5d1e960696f45df653869712eb889839) )  // banked at f000-f7ff
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "01.bin", 0x00000, 0x10000, CRC(3d317622) SHA1(ae4e8c5247bc215a2769786cb8639bce2f80db22) )
+
+	ROM_REGION( 0x010000, "chargfx", 0 ) // uses 0x10000 size ROMs instead of 0x4000
+	ROM_LOAD( "07.bin", 0x000000, 0x04000, CRC(b82d19ba) SHA1(e6fcfee178d4b5c7a07af8b5637791d02703c5b7) )
+	ROM_IGNORE(                   0x0c000 ) // BADADDR        --xxxxxxxxxxxxxx
+	ROM_LOAD( "09.bin", 0x004000, 0x04000, CRC(0a488017) SHA1(134606f9328118be6f8a5b403041b57ef2eaac90) )
+	ROM_IGNORE(                   0x0c000 ) // BADADDR        --xxxxxxxxxxxxxx
+	ROM_LOAD( "11.bin", 0x008000, 0x04000, CRC(cf0dec64) SHA1(b66712408379572d5c0dc28a8207b08dd53f3d8f) )
+	ROM_IGNORE(                   0x0c000 ) // BADADDR        --xxxxxxxxxxxxxx
+	ROM_LOAD( "13.bin", 0x00c000, 0x04000, CRC(11489cc6) SHA1(34aa4e4da2b5125d555b89894a77901673b89dd1) )
+	ROM_IGNORE(                   0x0c000 ) // BADADDR        --xxxxxxxxxxxxxx
+
+	ROM_REGION( 0x080000, "tilegfx", 0 )
+	ROM_LOAD( "06.bin", 0x000000, 0x20000, CRC(38c31817) SHA1(cb24ed8702d62066366924c033c07ffc78bd1fad) )
+	ROM_LOAD( "08.bin", 0x020000, 0x20000, CRC(32e39e29) SHA1(44f22ed6c983541c7fea5857ba0456aaa87b36d1) )
+	ROM_LOAD( "10.bin", 0x040000, 0x20000, CRC(5ccec796) SHA1(2cc191a4267819eb31962726e2ed4567c825c39e) )
+	ROM_LOAD( "12.bin", 0x060000, 0x20000, CRC(0c54a091) SHA1(3eecb285b5a7bbc310c87492516d7ffb2841aa3b) )
+
+	ROM_REGION( 0x080000, "spritegfx", ROMREGION_INVERT )
+	ROM_LOAD( "15.bin", 0x000000, 0x10000, CRC(516b6c09) SHA1(9d02514dece864b087f67886009ce54bd51b5575) )
+	ROM_LOAD( "14.bin", 0x010000, 0x10000, CRC(f36390a9) SHA1(e5ea36e91b3ced068281524ee79d0432f489715c) )
+	ROM_LOAD( "17.bin", 0x020000, 0x10000, CRC(0da825f9) SHA1(cfba0c85fc767726c1d63f87468335d1c2f1eed8) )
+	ROM_LOAD( "16.bin", 0x030000, 0x10000, CRC(228429d8) SHA1(3b2dbea53807929c24d593c469a83172f7747f66) )
+	ROM_LOAD( "19.bin", 0x040000, 0x10000, CRC(26371c18) SHA1(0887041d86dc9f19dad264ae27dc56fb89ac3265) )
+	ROM_LOAD( "18.bin", 0x050000, 0x10000, CRC(75aa9b86) SHA1(0c221bd2e8a5472bb0e515f27fb72b0c8e8c0ca4) )
+	ROM_LOAD( "21.bin", 0x060000, 0x10000, CRC(d5a60096) SHA1(a8e351a4b020b4fc2b2cb7d3f0fdfb43fc44d7d9) )
+	ROM_LOAD( "20.bin", 0x070000, 0x10000, CRC(36bbf467) SHA1(627b5847ffb098c92edfd58c25391799f3b209e0) )
+
+	ROM_REGION( 0x1000, "plds", 0 ) // from twcup90b2 set
+	TWCUP90B_PLD_DEVICES
+ROM_END
+
+
 /*
   World Cup '90
   Hack with European teams, like 'Euro League'
@@ -1013,6 +1056,7 @@ void wc90b_state::init_wc90b()
 
 GAME( 1989, twcup90b1, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, twcup90ba, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90b3, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90, set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, twcup90b2, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bootleg", "Worldcup '90 (hack)",                                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, twcup90bb, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bootleg", "World Cup '90 (European hack, different title)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 // not sure if it best fits here, in wc90.cpp, or in a new driver, it shares the weird tile decoding with the bootlegs tho

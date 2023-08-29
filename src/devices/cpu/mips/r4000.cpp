@@ -3642,7 +3642,7 @@ r4000_base_device::translate_result r4000_base_device::translate(int intention, 
 	// address needs translation, using a combination of VPN2 and ASID
 	u64 const key = (address & (extended ? (EH_R | EH_VPN2_64) : EH_VPN2_32)) | (m_cp0[CP0_EntryHi] & EH_ASID);
 
-	unsigned *mru = m_tlb_mru[intention & device_vtlb_interface::TR_TYPE];
+	unsigned *mru = m_tlb_mru[intention];
 	if (VERBOSE & LOG_STATS)
 		m_tlb_scans++;
 
@@ -3673,7 +3673,7 @@ r4000_base_device::translate_result r4000_base_device::translate(int intention, 
 		}
 
 		// test dirty
-		if ((intention & TR_WRITE) && !(pfn & EL_D))
+		if ((intention == TR_WRITE) && !(pfn & EL_D))
 		{
 			modify = true;
 			break;
@@ -3702,7 +3702,7 @@ r4000_base_device::translate_result r4000_base_device::translate(int intention, 
 					m_cp0[CP0_EntryHi] & EH_ASID, address, machine().describe_context());
 			else
 				LOGMASKED(LOG_TLB, "tlb miss %c asid 0x%02x address 0x%016x (%s)\n",
-					mode[intention & device_vtlb_interface::TR_TYPE], m_cp0[CP0_EntryHi] & EH_ASID, address, machine().describe_context());
+					mode[intention], m_cp0[CP0_EntryHi] & EH_ASID, address, machine().describe_context());
 		}
 
 		// load tlb exception registers
@@ -3712,9 +3712,9 @@ r4000_base_device::translate_result r4000_base_device::translate(int intention, 
 		m_cp0[CP0_XContext] = (m_cp0[CP0_XContext] & XCONTEXT_PTEBASE) | ((address >> 31) & XCONTEXT_R) | ((address >> 9) & XCONTEXT_BADVPN2);
 
 		if (invalid || modify || (SR & SR_EXL))
-			cpu_exception(modify ? EXCEPTION_MOD : (intention & TR_WRITE) ? EXCEPTION_TLBS : EXCEPTION_TLBL);
+			cpu_exception(modify ? EXCEPTION_MOD : (intention == TR_WRITE) ? EXCEPTION_TLBS : EXCEPTION_TLBL);
 		else
-			cpu_exception((intention & TR_WRITE) ? EXCEPTION_TLBS : EXCEPTION_TLBL, extended ? 0x080 : 0x000);
+			cpu_exception((intention == TR_WRITE) ? EXCEPTION_TLBS : EXCEPTION_TLBL, extended ? 0x080 : 0x000);
 	}
 
 	return MISS;
@@ -3730,7 +3730,7 @@ void r4000_base_device::address_error(int intention, u64 const address)
 		if (!(SR & SR_EXL))
 			m_cp0[CP0_BadVAddr] = address;
 
-		cpu_exception((intention & TR_WRITE) ? EXCEPTION_ADES : EXCEPTION_ADEL);
+		cpu_exception((intention == TR_WRITE) ? EXCEPTION_ADES : EXCEPTION_ADEL);
 
 		// address errors shouldn't typically occur, so a breakpoint is handy
 		machine().debug_break();
@@ -3739,7 +3739,7 @@ void r4000_base_device::address_error(int intention, u64 const address)
 
 template <typename T> void r4000_base_device::accessors(T &m)
 {
-	space(AS_PROGRAM).cache(m);
+	space(AS_PROGRAM).specific(m);
 
 	read_byte = [&m](offs_t offset) { return m.read_byte(offset); };
 	read_word = [&m](offs_t offset) { return m.read_word(offset); };

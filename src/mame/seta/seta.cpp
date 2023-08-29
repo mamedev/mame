@@ -6422,10 +6422,18 @@ static INPUT_PORTS_START( zingzip )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // no coin 2
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT     )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_CONFNAME( 0x0010, 0x0010, "Unknown (bit 4)" )
+	PORT_CONFSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_CONFSETTING(      0x0000, DEF_STR( On ) )
+	PORT_CONFNAME( 0x0020, 0x0020, "Unknown (bit 5)" )
+	PORT_CONFSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_CONFSETTING(      0x0000, DEF_STR( On ) )
+	PORT_CONFNAME( 0x0040, 0x0040, "Unknown (bit 6)" )
+	PORT_CONFSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_CONFSETTING(      0x0000, DEF_STR( On ) )
+	PORT_CONFNAME( 0x0080, 0x0080, "Title Language" )       // Not listed in manual
+	PORT_CONFSETTING(      0x0080, "English and Chinese" )
+	PORT_CONFSETTING(      0x0000, "English only" )         // Without 真真急炮
 
 	PORT_START("DSW") //2 DSWs - $600001 & 3.b
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1")
@@ -6434,11 +6442,11 @@ static INPUT_PORTS_START( zingzip )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x0004, 0x0004, "SW2:3" ) /* Manual States dips 3-7 are unused */
-	PORT_DIPUNUSED_DIPLOC( 0x0008, 0x0008, "SW2:4" ) /* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW2:5" ) /* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SW2:6" ) /* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW2:7" ) /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x0004, 0x0004, "SW2:3" ) // Manual States dips 3-7 are unused
+	PORT_DIPUNUSED_DIPLOC( 0x0008, 0x0008, "SW2:4" ) // Listed as "Unused"
+	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW2:5" ) // Listed as "Unused"
+	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SW2:6" ) // Listed as "Unused"
+	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW2:7" ) // Listed as "Unused"
 	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW2:8" )
 
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
@@ -9902,6 +9910,48 @@ ROM_START( daiohp2 ) /* Found on the same P0-072-2 PCB as the previous Daioh pro
 	ROM_LOAD( "fa-021.u116", 0x000a00, 0x117, CRC(e335cf2e) SHA1(35f6fa2fb2da1dc5b1fad93f44947f76d6ef35aa) )
 ROM_END
 
+ROM_START( daiohp3 ) // P0-072-2 PCB
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "prg0even.u3",    0x000000, 0x020000, CRC(a69bceaa) SHA1(45863eccf32cf2374769ad4517678eb74eaca590) )
+	ROM_LOAD16_BYTE( "prg0odd.u4",     0x000001, 0x020000, CRC(e3462ad8) SHA1(a5a1b0d79bc300a7bcc48fa39a750a0a060293ba) )
+	ROM_LOAD16_BYTE( "prg1even.u103",  0x100001, 0x040000, NO_DUMP ) // unfortunately this set misses one interleaved ROM
+	ROM_LOAD16_BYTE( "prg1odd.u102",   0x100001, 0x040000, CRC(1d6dbc45) SHA1(d626220cfbce5df0d83783c88443f3816a432434) )
+	ROM_LOAD16_BYTE( "data_even.u103", 0x100000, 0x040000, BAD_DUMP CRC(e07776ef) SHA1(5e75dd35fd8eae98182a9798a8b3eceb3e33b780) )  // so to make it show something load the ones from daiohp until there's a good dump for this set
+	ROM_LOAD16_BYTE( "data_odd.u102",  0x100001, 0x040000, BAD_DUMP CRC(b75b9a5c) SHA1(4c187105fe5253cc86862df1f3970fa45d4f7317) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD16_BYTE( "o_1.u140",  0x000000, 0x040000, CRC(8ff6c5a9) SHA1(a2d188d44c8671282bf53f7927e099a212c0ed51) )
+	ROM_LOAD16_BYTE( "o_0.u142",  0x000001, 0x040000, CRC(78f45582) SHA1(021e635ba365558d9bf37a3b33b4c42b63119f0c) )
+	ROM_LOAD16_BYTE( "o_5.u141",  0x080000, 0x040000, CRC(a00e2b63) SHA1(df5a6c4948a8a9f56d9d20b9e65755694f229718) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "o_4.u143",  0x080001, 0x040000, CRC(7f43b8b2) SHA1(665b8bebfa6bf6ed42986b2210dfb2c4cd06e3f1) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "o_3.u144",  0x100000, 0x040000, CRC(d33ca640) SHA1(3d278cb46f2eabd03851ee470adfae5313988a27) )
+	ROM_LOAD16_BYTE( "o_2.u146",  0x100001, 0x040000, CRC(77560a03) SHA1(f766b56a88d49e4b41c9ed3c68e5478991033b5b) )
+	ROM_LOAD16_BYTE( "o_7.u145",  0x180000, 0x040000, CRC(c16df1c5) SHA1(0babac313827168b3a78209e568b57ff45e34930) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "o_6.u147",  0x180001, 0x040000, CRC(06f1ccca) SHA1(eb79aea88ccefd461c2659094f6483d557237614) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
+	ROM_LOAD16_BYTE( "v1_0.u148", 0x000001, 0x080000, CRC(bec48d7a) SHA1(9fdcc8f461e48cb4244827bead980ad48acdfbd8) )
+	ROM_LOAD16_BYTE( "v1_1.u150", 0x000000, 0x080000, CRC(d5793a2f) SHA1(0623d51d405fde69622f1e15512fd8fc41209a59) )
+	ROM_LOAD16_BYTE( "v1_3.u149", 0x100001, 0x080000, CRC(0cef25da) SHA1(7f7447577093009efacff27659a0d8a95c29659a) )
+	ROM_LOAD16_BYTE( "v1_4.u151", 0x100000, 0x080000, CRC(59cd26bc) SHA1(36e9fc43fba2af1d16b7c246b34354e3b93fa0fe) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 )   /* Layer 2 */
+	ROM_LOAD16_BYTE( "v2_0.u164", 0x000001, 0x080000, CRC(7e46a10e) SHA1(a8576f7a140b065b88a0dab648f7b31c75fec006) )
+	ROM_LOAD16_BYTE( "v2_1.u166", 0x000000, 0x080000, CRC(9274123b) SHA1(b58e107a5bd222e454fd435d515e57cab52e6593) )
+	ROM_LOAD16_BYTE( "v2_3.u165", 0x100001, 0x080000, CRC(71dfe0f4) SHA1(fd76966fa447bc2882b0c7dc447fac92ec9c136b) )
+	ROM_LOAD16_BYTE( "v2_4.u167", 0x100000, 0x080000, CRC(49529f86) SHA1(b1953af8fbda87314fe95e893a43c064e0ad7121) )
+
+	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples, the last 3 ROMs were missing but since the first 5 match the dump above they may be the same, too */
+	ROM_LOAD( "s-0.u156",  0x000000, 0x020000, CRC(4d253547) SHA1(87cda11dc86bc121cb8fb0e574006c3627158f51) )
+	ROM_LOAD( "s-1.u157",  0x020000, 0x020000, CRC(79b56e22) SHA1(4b6c62e96dc1e8fb6dc0a76c505f9d805ef4684f) )
+	ROM_LOAD( "s-2.u158",  0x040000, 0x020000, CRC(bc8de02a) SHA1(503c2c9f9ce029701e6a5b134d9407ab06e28913) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "s-3.u159",  0x060000, 0x020000, CRC(939777fd) SHA1(3dd1b89a4f81f745c68037c568c885fe1403ed31) )
+	ROM_LOAD( "s-4.u160",  0x080000, 0x020000, CRC(7b97716d) SHA1(6693e81dc008317c6a985558624f5d5cf00785e9) )
+	ROM_LOAD( "snd5.u161", 0x0a0000, 0x020000, BAD_DUMP CRC(294e1cc9) SHA1(5faef5eb9f15c23686c2f66646c6f6724e7c611f) )
+	ROM_LOAD( "snd6.u162", 0x0c0000, 0x020000, BAD_DUMP CRC(ecab073b) SHA1(f991fb9d9d4ffe24b67b233850ef0727dc6329b6) )
+	ROM_LOAD( "snd7.u163", 0x0e0000, 0x020000, BAD_DUMP CRC(1b7ea768) SHA1(7dfa8cbcb839c76f3f9eefd6abbc2b424c3d970a) )
+ROM_END
+
 ROM_START( daiohc ) /* Found on a 93111A PCB - same PCB as War of Areo & J. J. Squawkers */
 	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "15.u3", 0x000000, 0x040000, CRC(14616abb) SHA1(1ff5331b0de60230baa4ced58bec6a954cb599d5) )
@@ -10940,6 +10990,37 @@ ROM_START( inttoote )
 	ROM_LOAD( "ya_011_012.u64", 0x80000, 0x80000, CRC(a8015ce6) SHA1(bb0b589856ec82e1fd42be9af89b07ba1d17e595) )
 ROM_END
 
+// Gran Derby (Spanish hack of Jockey Club)
+// CODERE massive production.
+
+ROM_START( gderby )
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE(      "2even.new", 0x000000, 0x10000, CRC(9f96a2ed) SHA1(b5d112f6e795863e3daffa4707ca4e059e6fa667) )
+	ROM_LOAD16_BYTE(      "3odd.new",  0x000001, 0x10000, CRC(16507ed8) SHA1(26bcebb18baf94307fdf6c67c73714cd4a5beb63) )
+	ROM_FILL(                               0x020000, 0xe0000, 0xff )
+	ROM_LOAD16_WORD_SWAP( "ya-002-001.u18", 0x100000, 0x80000, CRC(dd108016) SHA1(1554de4cc1a9436a1e62400cd96c9752a2098f99) )
+	ROM_FILL(                               0x180000, 0x80000, 0xff )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD16_BYTE( "007.u27", 0x000000, 0x80000, CRC(66076d4d) SHA1(96af5113c003f2e1f07e527a4fdfd8d01afe177d) )
+	ROM_LOAD16_BYTE( "006.u22", 0x000001, 0x80000, CRC(efd15539) SHA1(90b1862eef44394837e90edd84edcb472228ad97) )
+	ROM_LOAD16_BYTE( "005.u17", 0x100000, 0x80000, CRC(db177298) SHA1(ba7316df9554b8bd78835f324dc8e755434f709d) )
+	ROM_LOAD16_BYTE( "004.u10", 0x100001, 0x80000, CRC(42b3aa98) SHA1(da6dd900902adf5a4bc01e39eab31306602b43ff) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )    /* Layer 1 */
+	ROM_LOAD16_BYTE( "008.u37", 0x000000, 0x40000, CRC(5fbdfa14) SHA1(271dbdf0510a135c54adb90e685ee2abbe6a946f) )
+	ROM_LOAD16_BYTE( "009.u41", 0x000001, 0x40000, CRC(86e9c33c) SHA1(e2558533626daf21578215b8bfd950a799f858b9) )
+
+	ROM_REGION( 0x400, "proms", 0 ) /* Colours */
+	ROM_LOAD16_BYTE( "ya1-010.prom", 0x000, 0x200, CRC(778094b3) SHA1(270329a0d544dc7a8240d6dab08ccd54ea87ab70) )
+	ROM_LOAD16_BYTE( "ya1-011.prom", 0x001, 0x200, CRC(bd4fe2f6) SHA1(83d9f9db3fbfa2d172f5227c397ea4d5a9687015) )
+
+	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
+	ROM_LOAD( "ya-001-013.u71", 0x00000, 0x80000, CRC(2bccaf47) SHA1(1658643444d575410f11b648e0d7ae6c43fcf1ea) )
+	ROM_LOAD( "ya-001-012.u64", 0x80000, 0x80000, CRC(a8015ce6) SHA1(bb0b589856ec82e1fd42be9af89b07ba1d17e595) )
+ROM_END
+
+
 /***************************************************************************
 
 The Roulette (Visco)
@@ -11117,6 +11198,38 @@ ROM_START( setaroul )
 	ROM_LOAD16_BYTE( "uf0-018.u51", 0x001, 0x200, CRC(1c584d5f) SHA1(f1c7e3da8b108d78b459cae53fabb6e28d3a7ee8) )
 ROM_END
 
+// Super Ruleta 36 (hack of The Roulette)
+// CODERE Argentina. Massive production.
+
+ROM_START( setaroula )
+	ROM_REGION( 0x0c0000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "2_sp_old.bin", 0x000000, 0x010000, CRC(5561caae) SHA1(facab731a8c5fce39be72c9988b8e10ba62a0a37) )
+	ROM_LOAD16_BYTE( "3_sp_old.bin", 0x000001, 0x010000, CRC(554aa3e2) SHA1(7d8ef54fc3349be079c60dcb244dd3c2336a6bd1) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD16_BYTE( "005_sp_old.bin", 0x010001, 0x008000, CRC(5a289858) SHA1(3f698e5f09fb124c590cf4481b370c2985e92852) )
+	ROM_LOAD16_BYTE( "006_sp_old.bin", 0x010000, 0x008000, CRC(07b275ee) SHA1(77064e8f9ff85e8930eac43fc158ccf0a165f81e) )
+	ROM_LOAD16_BYTE( "007_sp_old.bin", 0x000001, 0x008000, CRC(deebf76e) SHA1(f9b794e08eabb76f38f991ebe653863e4e23dd83) )
+	ROM_LOAD16_BYTE( "008_sp_old.bin", 0x000000, 0x008000, CRC(e7363dc6) SHA1(759f271ec0b0079d686f2bd7b4379b762a7c7331) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* Layer 1 - 8bpp */
+	ROM_LOAD32_BYTE( "uf0-010.u15", 0x000000, 0x080000, CRC(0af13a56) SHA1(c294b7947d004c0e0b280ca44636e4059e05a57e) )
+	ROM_LOAD32_BYTE( "uf0-012.u29", 0x000001, 0x080000, CRC(cba2a6b7) SHA1(8627eda24c6980a0e786fd9dc06176893a33c58f) )
+	ROM_LOAD32_BYTE( "uf0-014.u38", 0x000002, 0x080000, CRC(da2bd4e4) SHA1(244af8705f2fa4ab3f3a002af16a0e4d60e03de8) )
+	ROM_LOAD32_BYTE( "uf0-015.u40", 0x000003, 0x080000, CRC(11dc19fa) SHA1(e7084f61d075a61249d924a523c32e7993d9ae46) )
+	ROM_LOAD32_BYTE( "uf0-009.u13", 0x200000, 0x080000, CRC(20f2d7f5) SHA1(343a8fac76d6ee7f845f9988c491698ebd0150d4) )
+	ROM_LOAD32_BYTE( "uf0-011.u22", 0x200001, 0x080000, CRC(af60adf9) SHA1(6505cbce6e066d75b779fdbe2c034ba4daabbefe) )
+	ROM_LOAD32_BYTE( "uf0-013.u37", 0x200002, 0x080000, CRC(645ec3c3) SHA1(e9b8056c68bf33b0b7130a5ce2bafd11dfd6c29b) )
+	ROM_LOAD32_BYTE( "uf0-016.u48", 0x200003, 0x080000, CRC(10f99fa8) SHA1(7ef9a3f71dd071483cf3513ef57e2fcfe8702994) )
+
+	ROM_REGION( 0x100000, "x1snd", ROMREGION_ERASE00 )  /* Samples */
+	ROM_LOAD( "uf1-004.u52",     0x040000, 0x020000, CRC(6638054d) SHA1(f5c4a4c822ee56cfcbb4e8401253ae0a2c2c1df7) )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD16_BYTE( "uf0-017.u50", 0x000, 0x200, CRC(bf50c303) SHA1(31685ed4849e5c27654f02945678db425d54bf5e) )
+	ROM_LOAD16_BYTE( "uf0-018.u51", 0x001, 0x200, CRC(1c584d5f) SHA1(f1c7e3da8b108d78b459cae53fabb6e28d3a7ee8) )
+ROM_END
+
 
 void seta_state::init_bankx1()
 {
@@ -11190,7 +11303,8 @@ void jockeyc_state::init_inttoote()
 
 ***************************************************************************/
 
-GAME( 1989?,setaroul,  0,        setaroul,  setaroul,  setaroul_state, empty_init,     ROT270, "Visco",                     "The Roulette (Visco)", MACHINE_CLICKABLE_ARTWORK )
+GAME( 1989?, setaroul,  0,        setaroul,  setaroul,  setaroul_state, empty_init,    ROT270, "Visco",                     "The Roulette (Visco)", MACHINE_CLICKABLE_ARTWORK )
+GAME( 1989?, setaroula, setaroul, setaroul,  setaroul,  setaroul_state, empty_init,    ROT270, "hack (CODERE)",             "Super Ruleta 36 (Spanish hack of The Roulette)", MACHINE_CLICKABLE_ARTWORK )
 
 GAME( 1989, drgnunit,  0,        drgnunit,  drgnunit,  seta_state,     empty_init,     ROT0,   "Athena / Seta",             "Dragon Unit / Castle of Dragon", 0 ) // Country/License: DSW
 
@@ -11207,6 +11321,7 @@ GAME( 1994, superbar,  wiggie,   superbar,  thunderl,  seta_state,     init_wigg
 GAME( 1990, jockeyc,   0,        jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "Seta (Visco license)",      "Jockey Club (v1.18)", MACHINE_CLICKABLE_ARTWORK )
 GAME( 1993, inttoote2, jockeyc,  jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "bootleg (Coinmaster)",      "International Toote II (v1.24, P387.V01)", MACHINE_CLICKABLE_ARTWORK )
 GAME( 1998, inttoote,  jockeyc,  inttoote,  inttoote,  jockeyc_state,  init_inttoote,  ROT0,   "bootleg (Coinmaster)",      "International Toote (Germany, P523.V01)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_CLICKABLE_ARTWORK )
+GAME( 1990, gderby,    jockeyc,  jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "hack (CODERE)",             "Gran Derby (Spanish hack of Jockey Club)", MACHINE_CLICKABLE_ARTWORK )
 
 GAME( 1991, rezon,     0,        rezon,     rezon,     seta_state,     init_rezon,     ROT0,   "Allumer",                   "Rezon", 0 )
 GAME( 1992, rezont,    rezon,    rezon,     rezont,    seta_state,     init_rezon,     ROT0,   "Allumer (Taito license)",   "Rezon (Taito)", 0 )
@@ -11236,6 +11351,7 @@ GAME( 1993, daioh,     0,        daioh,     daioh,     seta_state,     empty_ini
 GAME( 1993, daioha,    daioh,    daioh,     daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (earlier)", 0 )
 GAME( 1993, daiohp,    daioh,    daiohp,    daiohp,    seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (prototype)", 0 )
 GAME( 1993, daiohp2,   daioh,    daiohp,    daiohp2,   seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (prototype, earlier)", 0 )
+GAME( 1993, daiohp3,   daioh,    daiohp,    daiohp2,   seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (prototype, earliest)", MACHINE_NOT_WORKING ) // believed earlier as it doesn't have the intro, needs correct program ROMs
 GAME( 1993, daiohc,    daioh,    wrofaero,  daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (93111A PCB conversion)", 0 )
 
 GAME( 1993, jjsquawk,  0,        jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "Athena / Able",             "J. J. Squawkers", MACHINE_IMPERFECT_SOUND )

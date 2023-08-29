@@ -28,15 +28,22 @@ namespace {
 class clayshoo_state : public driver_device
 {
 public:
-	clayshoo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu")
+	clayshoo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_videoram(*this, "videoram")
 	{ }
 
 	void clayshoo(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_videoram;
+
 	void analog_reset_w(uint8_t data);
 	uint8_t analog_r();
 	void input_port_select_w(uint8_t data);
@@ -46,21 +53,12 @@ protected:
 	uint8_t difficulty_input_port_r(int bit);
 	void create_analog_timers();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	void main_io_map(address_map &map);
 	void main_map(address_map &map);
 
-private:
-	/* memory pointers */
-	required_shared_ptr<uint8_t> m_videoram;
-
-	/* misc */
 	emu_timer *m_analog_timer_1 = nullptr, *m_analog_timer_2 = nullptr;
 	uint8_t m_input_port_select = 0;
 	uint8_t m_analog_port_val = 0;
-
-	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -81,7 +79,7 @@ uint8_t clayshoo_state::difficulty_input_port_r( int bit )
 	uint8_t ret = 0;
 
 	/* read fake port and remap the buttons to 2 bits */
-	uint8_t   raw = ioport("FAKE")->read();
+	uint8_t raw = ioport("FAKE")->read();
 
 	if (raw & (1 << (bit + 1)))
 		ret = 0x03;     /* expert */
@@ -100,13 +98,12 @@ uint8_t clayshoo_state::input_port_r()
 
 	switch (m_input_port_select)
 	{
-	case 0x01:  ret = ioport("IN0")->read(); break;
-	case 0x02:  ret = ioport("IN1")->read(); break;
-	case 0x04:  ret = (ioport("IN2")->read() & 0xf0) | difficulty_input_port_r(0) |
-						(difficulty_input_port_r(3) << 2); break;
-	case 0x08:  ret = ioport("IN3")->read(); break;
+	case 0x01: ret = ioport("IN0")->read(); break;
+	case 0x02: ret = ioport("IN1")->read(); break;
+	case 0x04: ret = (ioport("IN2")->read() & 0xf0) | difficulty_input_port_r(0) | (difficulty_input_port_r(3) << 2); break;
+	case 0x08: ret = ioport("IN3")->read(); break;
 	case 0x10:
-	case 0x20:  break;  /* these two are not really used */
+	case 0x20: break;  /* these two are not really used */
 	default: logerror("Unexpected port read: %02X\n", m_input_port_select);
 	}
 	return ret;
@@ -139,7 +136,6 @@ void clayshoo_state::analog_reset_w(uint8_t data)
 	/* reset the analog value, and start the two times that will fire
 	   off in a short period proportional to the position of the
 	   analog control and set the appropriate bit. */
-
 	m_analog_port_val = 0xff;
 
 	m_analog_timer_1->adjust(compute_duration(m_maincpu.target(), ioport("AN1")->read()), 0x02);
@@ -190,12 +186,11 @@ uint32_t clayshoo_state::screen_update_clayshoo(screen_device &screen, bitmap_rg
 
 	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		int i;
 		uint8_t x = offs << 3;
 		uint8_t y = ~(offs >> 5);
 		uint8_t data = m_videoram[offs];
 
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			pen_t pen = (data & 0x80) ? rgb_t::white() : rgb_t::black();
 			bitmap.pix(y, x) = pen;

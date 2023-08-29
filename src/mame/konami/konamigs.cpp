@@ -38,13 +38,15 @@
 **************************************************************************/
 
 #include "emu.h"
+
+#include "bus/ata/ataintf.h"
+#include "bus/ata/hdd.h"
 #include "cpu/sh/sh3comn.h"
 #include "cpu/sh/sh4.h"
-#include "bus/ata/ataintf.h"
-#include "machine/ataflash.h"
 #include "machine/s3520cf.h"
 #include "machine/ticket.h"
 #include "sound/ymz280b.h"
+
 #include "speaker.h"
 #include "screen.h"
 
@@ -1030,7 +1032,7 @@ void gsan_state::machine_reset()
 
 static void gsan_devices(device_slot_interface &device)
 {
-	device.option_add("cfcard", ATA_FLASH_PCCARD);
+	device.option_add("cfcard", ATA_CF);
 }
 
 void gsan_state::gsan(machine_config &config)

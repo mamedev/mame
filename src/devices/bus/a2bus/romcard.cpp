@@ -12,6 +12,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "a2bus.h"
 #include "romcard.h"
 #include <errno.h>
@@ -104,11 +105,13 @@ ROM_START( romcardfp )
 ROM_END
 
 ROM_START( romcardint )
+	/* Integer ROM card: Integer BASIC, the old Monitor, and Programmer's Aid #1 */
 	ROM_REGION(0x3000, "romcard", 0)
+	ROM_LOAD ( "341-0016-00.d0", 0x0000, 0x0800, CRC(4234e88a) SHA1(c9a81d704dc2f0c3416c20f9c4ab71fedda937ed))
 	ROM_LOAD ( "341-0001-00.e0", 0x1000, 0x0800, CRC(c0a4ad3b) SHA1(bf32195efcb34b694c893c2d342321ec3a24b98f))
 	ROM_LOAD ( "341-0002-00.e8", 0x1800, 0x0800, CRC(a99c2cf6) SHA1(9767d92d04fc65c626223f25564cca31f5248980))
 	ROM_LOAD ( "341-0003-00.f0", 0x2000, 0x0800, CRC(62230d38) SHA1(f268022da555e4c809ca1ae9e5d2f00b388ff61c))
-	ROM_LOAD ( "341-0020-00.f8", 0x2800, 0x0800, CRC(079589c4) SHA1(a28852ff997b4790e53d8d0352112c4b1a395098))
+	ROM_LOAD ( "341-0004-00.f8", 0x2800, 0x0800, CRC(020a86d0) SHA1(52a18bd578a4694420009cad7a7a5779a8c00226))
 ROM_END
 
 static INPUT_PORTS_START( romcard )
@@ -270,4 +273,4 @@ std::pair<std::error_condition, std::string> a2bus_romcarduser_device::call_load
 
 DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_ROMCARDUSER, device_a2bus_card_interface, a2bus_romcarduser_device, "a2romusr", "Apple II ROM Card (Custom)")
 DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_ROMCARDFP, device_a2bus_card_interface, a2bus_romcardfp_device, "a2romfp", "Apple II ROM Card (Applesoft BASIC)")
-DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_ROMCARDINT, device_a2bus_card_interface, a2bus_romcardint_device, "a2romint", "Apple II ROM Card (Integer BASIC))")
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_ROMCARDINT, device_a2bus_card_interface, a2bus_romcardint_device, "a2romint", "Apple II ROM Card (Integer BASIC)")

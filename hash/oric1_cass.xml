@@ -86,6 +86,20 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="4kkong">
+		<description>4K Kong</description>
+		<year>2003</year>
+		<publisher>Defence Force</publisher>
+		<info name="developer" value="Mickael Pointier (Dbug)" />
+		<info name="region" value="France" />
+		<sharedfeat name="compatibility" value="Atmos"/>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="4093">
+				<rom name="4KKong.tap" size="4093" crc="1335cca5" sha1="fc52ce11b70ab3a95d7780b33e6ed95ae3aea150"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="3dtunnel">
 		<description>The 3D Tunnel</description>
 		<year>1998</year>
@@ -258,6 +272,26 @@ license:CC0-1.0
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="7704">
 				<rom name="Arena 3000 (1984)(Microdeal)(FR)[b].tap" size="7704" crc="bcf88c17" sha1="7a3564f6036299372082cde7499a66f35f9bf732"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arsenelp" supported="no">
+		<description>Arsène Lapin</description>
+		<year>1984</year>
+		<publisher>Infogrames</publisher>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass1" interface="oric1_cass">
+			<feature name="part_id" value="1 - Oric Atmos"/>
+			<dataarea name="cass" size="35157">
+				<rom name="arsenea.tap" size="35157" crc="b2a2a2c8" sha1="e4512ae9fbcff9fc9219086cf1f9405f2f7f51cc"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="2 - Oric 1 48K"/>
+			<dataarea name="cass" size="35198">
+				<rom name="arseneo.tap" size="35198" crc="e04acb4a" sha1="ade382af114c623b4e0d70f9f821a0073354fd11"/>
 			</dataarea>
 		</part>
 	</software>
@@ -742,6 +776,26 @@ Type-in from magazine
 		</part>
 	</software>
 
+	<software name="cobra">
+		<description>Cobra</description>
+		<year>1985</year>
+		<publisher>Norsoft</publisher>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass1" interface="oric1_cass">
+			<feature name="part_id" value="A - Atmos"/>
+			<dataarea name="cass" size="28603">
+				<rom name="cobra-atmos.tap" size="28603" crc="ac37a350" sha1="ddf95e9816baa396ea93ec673d362e22e695dcc6"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="B - Oric 1"/>
+			<dataarea name="cass" size="28472">
+				<rom name="cobra-oric1.tap" size="28472" crc="94d82839" sha1="5b713765d3f01a3e660f68eb32cf7c31c62d4033"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cobrainvader">
 		<description>Cobra Invader</description>
 		<year>1985</year>
@@ -808,24 +862,48 @@ Type-in from magazine
 		</part>
 	</software>
 
-	<software name="contract">
-		<description>Contract Bridge</description>
-		<year>1984</year>
-		<publisher>Alligata Software</publisher>
-		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="16564">
-				<rom name="Contract Bridge (1984)(Alligata Software)(GB).tap" size="16564" crc="5c4872d4" sha1="90abf753244392d8cc1079c9c47339c184f91654"/>
+	<software name="composer" supported="no">
+		<description>Composer</description>
+		<year>1983</year>
+		<publisher>Sector 7 Software</publisher>
+		<part name="cass1" interface="oric1_cass">
+			<feature name="part_id" value="1 - Composer"/>
+			<dataarea name="cass" size="24938">
+				<rom name="composer.tap" size="24938" crc="a4e8849f" sha1="1c04df5c8eec267fa4a84bdac6e91882afd16e83"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="2 - Golliwog"/>
+			<dataarea name="cass" size="4727">
+				<rom name="golliwog.tap" size="4727" crc="eb75a912" sha1="b123ff9206dc245638b54df493cf4adaa522739d"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="oric1_cass">
+			<feature name="part_id" value="3 - Sakura"/>
+			<dataarea name="cass" size="5013">
+				<rom name="sakura.tap" size="5013" crc="7a954cf8" sha1="950ad33553511448e92190540753360245f10cef"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="contract1" cloneof="contract">
-		<description>Contract Bridge (doc)</description>
+	<software name="cbridge">
+		<description>Contract Bridge</description>
 		<year>1984</year>
 		<publisher>Alligata Software</publisher>
-		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="4725">
-				<rom name="Contract Bridge (1984)(Alligata Software)(GB)[documentation].tap" size="4725" crc="66ce657a" sha1="6afcbb60561233f0bb84c308f1919026fca23183"/>
+		<notes><![CDATA[
+Side A: The game is recorded onde at slow speed
+Side B: An instruction program is recorded at fast speed
+]]></notes>
+		<part name="cass1" interface="oric1_cass">
+			<feature name="part_id" value="SIDE A"/>
+			<dataarea name="cass" size="16564">
+				<rom name="cbri_a.tap" size="16564" crc="875b17f5" sha1="d632b130fe008f2135444b8318a9ef2a00d0629b"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="SIDE B"/>
+			<dataarea name="cass" size="4713">
+				<rom name="cbri_b.tap" size="4713" crc="525beded" sha1="19a1d7305cf69948816107405b05858e6beb48db"/>
 			</dataarea>
 		</part>
 	</software>
@@ -898,7 +976,7 @@ Type-in from magazine
 
 	<software name="crossbomber1" cloneof="crossbomber">
 		<description>Cross Bomber (2021-05-13)</description>
-		<year>2022</year>
+		<year>2021</year>
 		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="6684">
@@ -932,7 +1010,7 @@ Type-in from magazine
 	<software name="crosshorde">
 		<description>Cross Horde v1.0</description>
 		<year>2021</year>
-		<publisher>Fabrizio, Carus</publisher>
+		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="10604">
 				<rom name="Cross Horde v1.0 (2021-05-01)(Caruso, Fabrizio)[48K].tap" size="10604" crc="77953696" sha1="a5860a886232f1689bb8294c214742dd3b944b03"/>
@@ -980,6 +1058,27 @@ Type-in from magazine
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="12110">
 				<rom name="Cross Snake v1.0 (2020-12-12)(Caruso, Fabrizio)[48K].tap" size="12110" crc="6fc09666" sha1="5079c5565a3dd2944ff40b5585a06cc7072062fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cryptshw">
+		<description>Crypt Show</description>
+		<year>1985</year>
+		<publisher>Norsoft</publisher>
+		<info name="developer" value="Guillaume Saviard" />
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass1" interface="oric1_cass">
+			<feature name="part_id" value="A - INTRODUCTION"/>
+			<dataarea name="cass" size="934732">
+				<rom name="cryptsh1.wav" size="934732" crc="8210f7a8" sha1="19c73800b41d914e3cb30e60943f59f926d3b131"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="B - GAME"/>
+			<dataarea name="cass" size="1389236">
+				<rom name="cryptsh2.wav" size="1389236" crc="56f0ed98" sha1="bcc99139db992e982564c2d88f02ca422746a148"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1061,6 +1160,44 @@ Type-in from magazine
 		</part>
 	</software>
 
+	<software name="dermetro">
+		<description>Dernier Metro</description>
+		<year>1983</year>
+		<publisher>Micro Programmes 5</publisher>
+		<info name="developer" value="Claude Akriche / MP5" />
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="55124">
+				<rom name="dernier.tap" size="55124" crc="e8f55591" sha1="19bddd0cfff094b70a412b087f4434e50365827a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dtvstory" supported="no">
+		<description>Detective Story</description>
+		<year>1985</year>
+		<publisher>No Man's Land</publisher>
+		<notes><![CDATA[
+Side A with the game's rule, side B with the game.
+The side B (the game) doesn't work.
+]]></notes>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass1" interface="oric1_cass">
+			<feature name="part_id" value="FACE A - REGLE DU JEU"/>
+			<dataarea name="cass" size="11491">
+				<rom name="Detective Story - Face A.tap" size="11491" crc="86cb9130" sha1="ec69ef1d947350f17fe365eb77afe8a5daabf873"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="FACE B - JEU"/>
+			<dataarea name="cass" size="35037">
+				<rom name="Detective Story - Face B.tap" size="35037" crc="8cdba029" sha1="b854b179ee45568edf6f4be4fb2149b723e8b84d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dexterite">
 		<description>Dexterite</description>
 		<year>1983</year>
@@ -1118,7 +1255,7 @@ Type-in from magazine
 	</software>
 
 	<software name="digdog">
-		<description>Dig Dog (Oric 1)</description>
+		<description>Dig Dog (Oric-1)</description>
 		<year>1983</year>
 		<publisher>Taskset</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -1128,7 +1265,7 @@ Type-in from magazine
 		</part>
 	</software>
 
-	<software name="digdog1" cloneof="digdog">
+	<software name="digdog1" cloneof="digdog" supported="no">
 		<description>Dig Dog (Atmos)</description>
 		<year>1983</year>
 		<publisher>Taskset</publisher>
@@ -1376,6 +1513,45 @@ Type-in from magazine
 		</part>
 	</software>
 
+	<software name="amnukor">
+		<description>Le Fer d'Amnukor</description>
+		<year>1986</year>
+		<publisher>Norsoft</publisher>
+		<notes><![CDATA[
+The game was divided on 2 tapes (with both sides):
+Tape 1 Side A - JEU: The game itself (load it then load your team)
+Tape 1 Side B - SCENARIO TYPE: Which is a pre-made team if you want to play without creating your own team
+Tape 2 Side A - UTILITAIRES: To create the team (you have to save them once created)
+Tape 2 Side B - VOYAGES: Which is loaded when you go from one town to another
+]]></notes>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass1" interface="oric1_cass">
+			<feature name="part_id" value="Tape 1 - Side A - JEU" />
+			<dataarea name="cass" size="1360652">
+				<rom name="Le Fer d'Amnukor - Jeu.wav" size="1360652" crc="e326e23e" sha1="995bfb2b5910c7e452b2a30e5cb70be7312ef032"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="Tape 1 - Side B - SCENARIO TYPE" />
+			<dataarea name="cass" size="108448">
+				<rom name="Le Fer d'Amnukor - Scenario Type.wav" size="108448" crc="41e168d8" sha1="7ae5c9a01b0c6427b39e3745134ddaa1d4803cc4"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="oric1_cass">
+			<feature name="part_id" value="Tape 2 - Side A - UTILITAIRES" />
+			<dataarea name="cass" size="579620">
+				<rom name="Le Fer d'Amnukor - Utilitaires.wav" size="579620" crc="a902b018" sha1="ceccfbb4aea5a7ab4d19ba3caa3f1a6796544a00"/>
+			</dataarea>
+		</part>
+		<part name="cass4" interface="oric1_cass">
+			<feature name="part_id" value="Tape 2 - Side B - VOYAGES" />
+			<dataarea name="cass" size="359708">
+				<rom name="Le Fer d'Amnukor - Voyages.wav" size="359708" crc="e68ebf27" sha1="ac88887267272cbe9e9d36816b12ef0df0acf003"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="feuxcroises">
 		<description>Feux Croises</description>
 		<year>1984</year>
@@ -1391,18 +1567,14 @@ Type-in from magazine
 		<description>Fire Flash</description>
 		<year>1984</year>
 		<publisher>No Man's Land</publisher>
-		<part name="cass" interface="oric1_cass">
+		<part name="cass1" interface="oric1_cass">
+			<feature name="part_id" value="A - FAST" />
 			<dataarea name="cass" size="18456">
 				<rom name="Fire Flash (1984)(No Man's Land)(FR)(Side A)(Fast).tap" size="18456" crc="764f23fc" sha1="6a404942cad5fd064c947f370c4bd70cfe5f919d"/>
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="fireflash1" cloneof="fireflash">
-		<description>Fire Flash (alt)</description>
-		<year>1984</year>
-		<publisher>No Man's Land</publisher>
-		<part name="cass" interface="oric1_cass">
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="B - SLOW" />
 			<dataarea name="cass" size="18455">
 				<rom name="Fire Flash (1984)(No Man's Land)(FR)(Side B)(Slow)[b errors].tap" size="18455" crc="3f46e827" sha1="08f4cbda5de1f7b95a13cc7c8d6e32edc77f986c"/>
 			</dataarea>
@@ -1471,6 +1643,26 @@ Type-in from magazine
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="7288">
 				<rom name="Flight Simulator (19xx)(Quark Data)(GB)[a].tap" size="7288" crc="74712f3b" sha1="f6addd22937f0fa45c77eb1b6e5d306e19044723"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="formule1">
+		<description>Formule 1</description>
+		<year>1985</year>
+		<publisher>Cobra Soft</publisher>
+		<info name="language" value="English" />
+		<info name="region" value="France" />
+		<part name="cass1" interface="oric1_cass">
+			<feature name="part_id" value="A - ATMOS" />
+			<dataarea name="cass" size="35684">
+				<rom name="formulea.tap" size="35684" crc="30a9207f" sha1="3729af169e7a1fe8e59cd80ab4a186831ac747c8"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="B - ORIC-1" />
+			<dataarea name="cass" size="35607">
+				<rom name="formuleo.tap" size="35607" crc="c26a6611" sha1="a2c62c062c3253daed55fe984dde54723d5aadf0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1647,6 +1839,20 @@ Type-in from magazine
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="13078">
 				<rom name="Green X Toad (1984)(IJK Software)(GB).tap" size="13078" crc="090b3a36" sha1="9e1cce64a7fb1288d62f36b21e77eb6ceff36b6f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gubbie">
+		<description>Gubbie</description>
+		<year>1985</year>
+		<publisher>IJK Software</publisher>
+		<info name="developer" value="Alexander Aghassipour" />
+		<info name="language" value="English" />
+		<info name="region" value="UK" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="34892">
+				<rom name="gubbie.tap" size="34892" crc="1128a00c" sha1="108097afa4269f05be0e033d4afd8fc166e89d54"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1849,6 +2055,30 @@ Type-in from magazine
 		</part>
 	</software>
 
+	<software name="impomiss">
+		<description>Impossible Mission (Atmos 50Hz)</description>
+		<year>2010</year>
+		<publisher>Defence Force</publisher>
+		<sharedfeat name="compatibility" value="Atmos"/>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="48110">
+				<rom name="im10.tap" size="48110" crc="0a02a6de" sha1="abfc6eee380488c8548001b17f1b6e2716f430ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impomiss_a" cloneof="impomiss">
+		<description>Impossible Mission (Atmos 60Hz)</description>
+		<year>2010</year>
+		<publisher>Defence Force</publisher>
+		<sharedfeat name="compatibility" value="Atmos"/>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="48110">
+				<rom name="im10-60.tap" size="48110" crc="225c6d82" sha1="09009d75d67e7e7501561028898559a68280820e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="incrust">
 		<description>Incrust</description>
 		<year>19??</year>
@@ -1894,12 +2124,23 @@ Type-in from magazine
 	</software>
 
 	<software name="invaders">
-		<description>Invaders</description>
+		<description>Invaders (IJK)</description>
 		<year>1983</year>
 		<publisher>IJK Software</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="11790">
 				<rom name="Invaders (1983)(IJK Software)(GB).tap" size="11790" crc="8bc5bf8d" sha1="9351c29e6bdb0e7064885a46def3594e0245a55e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invad_pf">
+		<description>Invaders (Program Factory)</description>
+		<year>1983</year>
+		<publisher>Program Factory</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="7255">
+				<rom name="Invaders (1983)(Program Factory)(GB).tap" size="7255" crc="b2ad4768" sha1="766b5d99661552a70605b0dd09d3bb5a765bcf3f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2305,6 +2546,20 @@ The cassette stops during the game loading
 		</part>
 	</software>
 
+	<software name="maisonmt">
+		<description>La Maison de la Mort</description>
+		<year>1984</year>
+		<publisher>Micro Programmes 5</publisher>
+		<info name="developer" value="Geoff Phillips" />
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="33678">
+				<rom name="maison.tap" size="33678" crc="d213504d" sha1="6fc0696ed99ccde811b9f07b535157a8ca3ded88"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="manicminer">
 		<description>Manic Miner</description>
 		<year>1985</year>
@@ -2338,6 +2593,18 @@ The cassette stops during the game loading
 		</part>
 	</software>
 
+	<software name="memory">
+		<description>Memory</description>
+		<year>2022</year>
+		<publisher>Raxiss</publisher>
+		<sharedfeat name="compatibility" value="Atmos"/>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="17895">
+				<rom name="memory-v03.tap" size="17895" crc="f398e714" sha1="cd9010d2721449885e5c560a118c70c01ca65ee8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mentor">
 		<description>Mentor</description>
 		<year>1984</year>
@@ -2356,6 +2623,29 @@ The cassette stops during the game loading
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="2659">
 				<rom name="Meteor Run (1983)(The Oric-1 Program Book)(GB)[type-in].tap" size="2659" crc="4a8b6e6d" sha1="c02554e9813a5b3bca5f9b0a914b812c2f044784"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meurtregv">
+		<description>Meurtre a Grande Vitesse</description>
+		<year>1985</year>
+		<publisher>Cobra Soft</publisher>
+		<notes>Side A: Game / Side B: Audio tape</notes>
+		<info name="copy_protection" value="Color codes required" />
+		<info name="developer" value="Bertrand Brocard" />
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass1" interface="oric1_cass">
+			<feature name="part_id" value="Meurtre a Grande Vitesse" />
+			<dataarea name="cass" size="2849891">
+				<rom name="mgv.wav" size="2849891" crc="88b90d3d" sha1="26c2556529747ee82277b90a3c946166a896ef8b"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="Diktaphon" />
+			<dataarea name="cass" size="497789">
+				<rom name="mgv_dikt.mp3" size="497789" crc="417a1194" sha1="ea3ce601990d3e17de0ac2a0ea03c0155cfb7e0c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2389,6 +2679,17 @@ The cassette stops during the game loading
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="11930">
 				<rom name="Mines of Moria, The (1983)(Severn Software)(GB).tap" size="11930" crc="6ae04a6d" sha1="f014b3f30180437ffc2fc2165f9a7b2c35518420"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mineswee">
+		<description>Minesweeper</description>
+		<year>2021</year>
+		<publisher>Raxiss</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="17935">
+				<rom name="minesw-v1.00.tap" size="17935" crc="2f8c18fe" sha1="e694cdeac2582405418b261a2d550713b4383ae8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2439,24 +2740,23 @@ The cassette stops during the game loading
 		</part>
 	</software>
 
-	<software name="missimp">
+	<software name="missimpo">
 		<description>Mission Impossible</description>
 		<year>1984</year>
 		<publisher>No Man's Land</publisher>
-		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="23762">
-				<rom name="Mission Impossible (1984)(No Man's Land)(FR).tap" size="23762" crc="c3a97231" sha1="e22d7957cd8c4537d5190ec29aa59df1598f2631"/>
+		<notes>This game is in two parts: Instructions + Game.</notes>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass1" interface="oric1_cass">
+			<feature name="part_id" value="FACE A - ORIC 48K"/>
+			<dataarea name="cass" size="47175">
+				<rom name="Mission Impossible - Face A.tap" size="47175" crc="1aba6c78" sha1="8b8ac2594946a2fdbfe30520b392a6b335f9ec60"/>
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="missimp1" cloneof="missimp">
-		<description>Mission Impossible (alt)</description>
-		<year>1984</year>
-		<publisher>No Man's Land</publisher>
-		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="39135">
-				<rom name="Mission Impossible (1984)(No Man's Land)(FR)[a no title screen].tap" size="39135" crc="b66e6ab6" sha1="f879ee133a822a3cb23b5eeccb1cd8b7fa37551e"/>
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="FACE B - ATMOS"/>
+			<dataarea name="cass" size="0">
+				<rom name="Mission Impossible - Face B.tap" size="0" status="nodump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2780,6 +3080,18 @@ The cassette stops during the game loading
 		</part>
 	</software>
 
+	<software name="oricium">
+		<description>Oricium</description>
+		<year>2014</year>
+		<publisher>Defence Force</publisher>
+		<info name="version" value="v1.2" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="46458">
+				<rom name="Oricium12.tap" size="46458" crc="bfcc6132" sha1="675c466968fa3e44df2dea26b3a5feca65c9c080"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="oricqs">
 		<description>Oricqs</description>
 		<year>1984</year>
@@ -2946,6 +3258,17 @@ The cassette stops during the game loading
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="18121">
 				<rom name="Pilote (19xx)(C.C.O.I)(Atmos)(FR)[48K].tap" size="18121" crc="96ebc4b4" sha1="3393002fd512f2aa27eadfc53f5ae58df73ed8e1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thepits">
+		<description>The Pits</description>
+		<year>1983</year>
+		<publisher>Touchstone</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="21624">
+				<rom name="thepits.tap" size="21624" crc="b39b8b3b" sha1="f240a3aa1b986bb0d87ff528aeedc349007bea87"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3294,10 +3617,22 @@ The cassette stops during the game loading
 	<software name="rushhour">
 		<description>Rush Hour</description>
 		<year>19??</year>
-		<publisher>F., Frances</publisher>
+		<publisher>Fabrice Francès</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="18084">
 				<rom name="Rush Hour (demo) (19xx)(F., Frances)(FR)[b].tap" size="18084" crc="da1f933a" sha1="7e834462345a9cac1a320d7e431ab1175512c6a8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rushhr4k">
+		<description>Rush Hour 4K</description>
+		<year>2003</year>
+		<publisher>Fabrice Francès</publisher>
+		<sharedfeat name="compatibility" value="Atmos"/>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="4095">
+				<rom name="RushHour.tap" size="4095" crc="b0bae580" sha1="56ac4c00275e1687cb9beab232c24bfc4ce5d6ca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3372,20 +3707,19 @@ The cassette stops during the game loading
 		<description>Le Secret du Tombeau</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
-		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="37181">
-				<rom name="Secret du Tombeau, Le (1985-06)(Loriciels)(FR)[AKA Tombeau d'Axayacatl, Le.tap" size="37181" crc="425f37e7" sha1="dd8eed7eb2e0ffe0243ee198a636308f7a304895"/>
+		<info name="alt_title" value="Le Tombeau d'Axayacatl"/>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass1" interface="oric1_cass">
+			<feature name="part_id" value="A - PRESENTATION"/>
+			<dataarea name="cass" size="37183">
+				<rom name="Secret du Tombeau - presentation.tap" size="37183" crc="6bc914cb" sha1="5ec26b332cae2ccba016a1b936bfa06e182ea2f7"/>
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="secret1" cloneof="secret">
-		<description>Le Secret du Tombeau (alt)</description>
-		<year>1985</year>
-		<publisher>Loriciels</publisher>
-		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="37183">
-				<rom name="Secret du Tombeau, Le (1985-06)(Loriciels)(FR)[a][AKA Tombeau d'Axayacatl, Le].tap" size="37183" crc="6bc914cb" sha1="5ec26b332cae2ccba016a1b936bfa06e182ea2f7"/>
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="B - PROGRAMME PRINCIPAL"/>
+			<dataarea name="cass" size="37181">
+				<rom name="Secret du Tombeau - programme principal.tap" size="37181" crc="99869ba0" sha1="f753811f495304493da9661dc1421b6db532157c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3441,6 +3775,17 @@ The cassette stops during the game loading
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="35865">
 				<rom name="Sjefen (1989)(O.N. Software)(Atmos)(NO)[48K].tap" size="35865" crc="34eb2a8c" sha1="30d045f72aca669ca8ad169a47e7b4c810e101c6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skoodaze">
+		<description>Skool Daze</description>
+		<year>2012</year>
+		<publisher>Defence Force</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="47868">
+				<rom name="SkoolDaze10.tap" size="47868" crc="7f5ef5b5" sha1="de4f9060196c951b45a9b547b5d44675e6d03caf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3650,6 +3995,29 @@ The cassette stops during the game loading
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="12118">
 				<rom name="Stock Market (1983)(ASP)(GB).tap" size="12118" crc="ba6a94bd" sha1="7259f1b7dcec4d9e48f46720de31cc82985b0efb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stormlrd">
+		<description>Stormlord</description>
+		<year>2010</year>
+		<publisher>Defence Force</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="47254">
+				<rom name="sl-oric1.tap" size="47254" crc="8eceb4d8" sha1="ddfe4017c4a9e75fae47312761143b1fb1fe8f48"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stormlrd_a" cloneof="stormlrd">
+		<description>Stormlord (Atmos)</description>
+		<year>2010</year>
+		<publisher>Defence Force</publisher>
+		<sharedfeat name="compatibility" value="Atmos"/>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="47254">
+				<rom name="Storm.tap" size="47254" crc="04e4b66e" sha1="6a810866c2ab75e1faca9410e6144729350fb55b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3896,24 +4264,25 @@ The cassette stops during the game loading
 		</part>
 	</software>
 
-	<software name="tourdu">
+	<software name="tourmond">
 		<description>Le Tour du Monde en 80 Jours</description>
 		<year>1984</year>
 		<publisher>No Man's Land</publisher>
-		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="41980">
-				<rom name="Tour Du Monde En 80 Jours, Le (1984)(No Man's Land)(FR).tap" size="41980" crc="149771a1" sha1="7ee333536d880d5fbf6c2493c2df6b745bf11e6e"/>
+		<notes><![CDATA[
+Side A with the game's rule, side B with the game.
+]]></notes>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass1" interface="oric1_cass">
+			<feature name="part_id" value="FACE A"/>
+			<dataarea name="cass" size="15093">
+				<rom name="tdm_demo.tap" size="15093" crc="0e944618" sha1="b4061e69db617d2023006048d7a1533afa5e8b00"/>
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="tourdu1" cloneof="tourdu">
-		<description>Le Tour du Monde en 80 Jours (demo)</description>
-		<year>1984</year>
-		<publisher>No Man's Land</publisher>
-		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="14758">
-				<rom name="Tour Du Monde En 80 Jours, Le (demo-slideshow) (1984)(No Man's Land)(FR).tap" size="14758" crc="148e8dcf" sha1="8d8ce24745cb51c59e4ef8ad841773bc89a9fe0a"/>
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="FACE B"/>
+			<dataarea name="cass" size="42058">
+				<rom name="tdm_jeu.tap" size="42058" crc="44b755fa" sha1="ccc572fb6189940af3f89135f20570d462af6749"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3936,6 +4305,19 @@ The cassette stops during the game loading
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="1462">
 				<rom name="Trace (19xx)(-)(fr).tap" size="1462" crc="c6b46abf" sha1="9fb5cb0845c83c53a145d6204c6b6b3554c043ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transat">
+		<description>Transat One</description>
+		<year>1984</year>
+		<publisher>No Man's Land</publisher>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="40928">
+				<rom name="transat.tap" size="40928" crc="8cce352f" sha1="5f634986ccb7883007b163891c02613fd2eb89c1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4068,20 +4450,18 @@ The cassette stops during the game loading
 		<description>The Ultra</description>
 		<year>1983</year>
 		<publisher>Personal Software Services</publisher>
-		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="9078">
-				<rom name="Ultra, The (1983)(Personal Software Services)(GB)[no title screen].tap" size="9078" crc="a45726b7" sha1="fcc1cce201d9a9ee51a4446494cd80431068b425"/>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass1" interface="oric1_cass">
+			<feature name="part_id" value="1 - Oric 16/48K"/>
+			<dataarea name="cass" size="11741">
+				<rom name="ultra_o.tap" size="11741" crc="d73bda04" sha1="af29d52a81947ffbff944c359be34e416256e5dd"/>
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="ultra1" cloneof="ultra">
-		<description>The Ultra (alt)</description>
-		<year>1983</year>
-		<publisher>Personal Software Services</publisher>
-		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="9083">
-				<rom name="Ultra, The (1983)(Personal Software Services)(GB)[a][no title screen].tap" size="9083" crc="4b2519d6" sha1="51cd3c65f31d3ac237489979a78751229dfa6730"/>
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="2 - Oric V1.1 &amp; Atmos"/>
+			<dataarea name="cass" size="12121">
+				<rom name="ultra_a.tap" size="12121" crc="22758d5b" sha1="8353756f76cd137381ef525b5ae9520ce65befef"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4269,6 +4649,19 @@ The cassette stops during the game loading
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="8588">
 				<rom name="Yatzy v5.1 (1984)(Lundgren, Lars)(SE).tap" size="8588" crc="884badec" sha1="3b087fbbb16f72caeb47c35778e000940c1ccff5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="leyiking">
+		<description>Le Yi-King</description>
+		<year>1984</year>
+		<publisher>No Man's Land</publisher>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="37102">
+				<rom name="yiking.tap" size="37102" crc="89417c82" sha1="c52757f60da83a40662bb10653c69ac549374b8b" />
 			</dataarea>
 		</part>
 	</software>

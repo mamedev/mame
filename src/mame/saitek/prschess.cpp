@@ -31,7 +31,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_prschess.lh" // clickable
+#include "saitek_prschess.lh"
 
 
 namespace {

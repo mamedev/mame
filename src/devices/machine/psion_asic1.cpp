@@ -120,8 +120,7 @@ TIMER_CALLBACK_MEMBER(psion_asic1_device::frc)
 	switch (--m_frc_count)
 	{
 	case 0x0000:
-		m_frc_ovl ^= 1;
-		m_frcovl_cb(m_frc_ovl);
+		m_frcovl_cb(m_frc_ovl ^= 1);
 
 		m_a1_interrupt_status |= 0x20; // FrcExpired
 		update_interrupts();
@@ -281,7 +280,7 @@ uint16_t psion_asic1_device::io_r(offs_t offset, uint16_t mem_mask)
 		break;
 
 	case 0x06: // A1InterruptStatus
-		data = m_a1_interrupt_status;
+		data = m_a1_interrupt_status & m_a1_interrupt_mask;
 		LOG("%s io_r: A1InterruptStatus => %02x\n", machine().describe_context(), data);
 		break;
 

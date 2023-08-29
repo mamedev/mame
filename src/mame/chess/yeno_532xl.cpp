@@ -33,7 +33,7 @@ not have an edge connector or empty ROM socket for it.
 #include "speaker.h"
 
 // internal artwork
-#include "yeno_532xl.lh" // clickable
+#include "yeno_532xl.lh"
 
 
 namespace {

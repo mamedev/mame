@@ -11,7 +11,7 @@ Known releases:
 5304    Backgammon (UK)
 5305    Le Mans 2 (UK)
 5306/1  The Wreck (UK)
-*5307    Barnstormer (UK)
+5307    Barnstormer (UK)
 *5310    Sweet Acorn (UK)
 *5311    Chack'n Pop (UK)
 *5312    ChoroQ (UK)
@@ -36,6 +36,18 @@ No dump known for entries marked with a *
 		<part name="cart" interface="softcard">
 			<dataarea name="rom" size="0x8000">
 				<rom name="backgammon (europe).rom" size="0x8000" crc="b3694e5a" sha1="363b5a8c94cdb63a7ee72b9d25f7b5053cab319a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barnstrm">
+		<description>Barnstormer (UK)</description>
+		<year>1985</year>
+		<publisher>Electric Software</publisher>
+		<info name="serial" value="5307" />
+		<part name="cart" interface="softcard">
+			<dataarea name="rom" size="0x8000">
+				<rom name="barnstormer (europe).rom" size="0x8000" crc="1dec79d6" sha1="f3dbd4bca83cb9edc364ca49d440f1642e1e2f20" />
 			</dataarea>
 		</part>
 	</software>

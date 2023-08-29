@@ -10,8 +10,8 @@
 #include "machine/8042kbdc.h"
 #include "machine/ds128x.h"
 
-class w83977tf_device : public device_t, 
-                         public device_isa16_card_interface,
+class w83977tf_device : public device_t,
+						 public device_isa16_card_interface,
 						 public device_memory_interface
 {
 public:
@@ -25,12 +25,12 @@ public:
 	auto irq1() { return m_irq1_callback.bind(); }
 	auto irq8() { return m_irq8_callback.bind(); }
 	auto irq9() { return m_irq9_callback.bind(); }
-//	auto txd1() { return m_txd1_callback.bind(); }
-//	auto ndtr1() { return m_ndtr1_callback.bind(); }
-//	auto nrts1() { return m_nrts1_callback.bind(); }
-//	auto txd2() { return m_txd2_callback.bind(); }
-//	auto ndtr2() { return m_ndtr2_callback.bind(); }
-//	auto nrts2() { return m_nrts2_callback.bind(); }
+//  auto txd1() { return m_txd1_callback.bind(); }
+//  auto ndtr1() { return m_ndtr1_callback.bind(); }
+//  auto nrts1() { return m_nrts1_callback.bind(); }
+//  auto txd2() { return m_txd2_callback.bind(); }
+//  auto ndtr2() { return m_ndtr2_callback.bind(); }
+//  auto nrts2() { return m_nrts2_callback.bind(); }
 
 protected:
 	virtual void device_start() override;
@@ -51,12 +51,12 @@ private:
 	devcb_write_line m_irq1_callback;
 	devcb_write_line m_irq8_callback;
 	devcb_write_line m_irq9_callback;
-//	devcb_write_line m_txd1_callback;
-//	devcb_write_line m_ndtr1_callback;
-//	devcb_write_line m_nrts1_callback;
-//	devcb_write_line m_txd2_callback;
-//	devcb_write_line m_ndtr2_callback;
-//	devcb_write_line m_nrts2_callback;
+//  devcb_write_line m_txd1_callback;
+//  devcb_write_line m_ndtr1_callback;
+//  devcb_write_line m_nrts1_callback;
+//  devcb_write_line m_txd2_callback;
+//  devcb_write_line m_ndtr2_callback;
+//  devcb_write_line m_nrts2_callback;
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, u8 data);
@@ -81,6 +81,9 @@ private:
 	u8 keybc_status_r(offs_t offset);
 	void keybc_command_w(offs_t offset, u8 data);
 
+	u8 keyb_io_address_r(offs_t offset);
+	void keyb_io_address_w(offs_t offset, u8 data);
+
 	void kbdp21_gp25_gatea20_w(int state);
 	void kbdp20_gp20_reset_w(int state);
 
@@ -99,6 +102,7 @@ private:
 	u8 m_keyb_irq_line = 0;
 	u8 m_mouse_irq_line = 0;
 	u8 m_rtc_irq_line = 0;
+	u16 m_keyb_address[2]{};
 };
 
 DECLARE_DEVICE_TYPE(W83977TF, w83977tf_device);

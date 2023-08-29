@@ -430,8 +430,7 @@ void zwackery_state::pia0_porta_w(uint8_t data)
 	// bits 5 and 6 control hflip/vflip
 
 	// bit 7, watchdog
-	if (BIT(data, 7) == 0)
-		m_watchdog->watchdog_reset();
+	m_watchdog->reset_line_w(BIT(data, 7));
 }
 
 void zwackery_state::pia0_irq_w(int state)

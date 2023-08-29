@@ -83,9 +83,9 @@ To summarize, known MCU chip ROM serials+year:
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_gambit.lh" // clickable
-#include "fidel_msc_v2.lh" // clickable
-#include "fidel_sc6.lh" // clickable
+#include "fidel_gambit.lh"
+#include "fidel_msc_v2.lh"
+#include "fidel_sc6.lh"
 
 
 namespace {

@@ -430,15 +430,15 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 
 #include "emu.h"
 
+#include "jvs13551.h"
 #include "xbox_pci.h"
 #include "xbox.h"
 
 #include "machine/pci.h"
 #include "machine/idectrl.h"
 
-#include "bus/ata/idehd.h"
+#include "bus/ata/hdd.h"
 #include "cpu/i386/i386.h"
-#include "jvs13551.h"
 #include "machine/jvshost.h"
 #include "naomigd.h"
 
@@ -1506,22 +1506,46 @@ void ohci_hlean2131sc_device::device_start()
 
 // ======================> ide_baseboard_device
 
-class ide_baseboard_device : public ata_mass_storage_device
+class ide_baseboard_device : public ata_mass_storage_device_base, public device_ata_interface
 {
 public:
 	// construction/destruction
 	ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// device_ata_interface implementation
+	virtual uint16_t read_dma() override { return dma_r(); }
+	virtual uint16_t read_cs0(offs_t offset, uint16_t mem_mask) override { return command_r(offset); }
+	virtual uint16_t read_cs1(offs_t offset, uint16_t mem_mask) override { return control_r(offset); }
+
+	virtual void write_dma(uint16_t data) override { dma_w(data); }
+	virtual void write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask) override { command_w(offset, data); }
+	virtual void write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask) override { control_w(offset, data); }
+
+	virtual void write_dmack(int state) override { set_dmack_in(state); }
+	virtual void write_csel(int state) override { set_csel_in(state); }
+	virtual void write_dasp(int state) override { set_dasp_in(state); }
+	virtual void write_pdiag(int state) override { set_pdiag_in(state); }
+
+	// ata_mass_storage_device_base implementation
 	virtual int  read_sector(uint32_t lba, void *buffer) override;
 	virtual int  write_sector(uint32_t lba, const void *buffer) override;
+
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
 	uint8_t read_buffer[0x20]{};
 	uint8_t write_buffer[0x20]{};
 	chihiro_state *chihirosystem{};
 	static const int size_factor = 2;
+
+private:
+	// ata_hle_device_base implementation
+	virtual void set_irq_out(int state) override { device_ata_interface::set_irq(state); }
+	virtual void set_dmarq_out(int state) override { device_ata_interface::set_dmarq(state); }
+	virtual void set_dasp_out(int state) override { device_ata_interface::set_dasp(state); }
+	virtual void set_pdiag_out(int state) override { device_ata_interface::set_pdiag(state); }
 };
 
 //**************************************************************************
@@ -1536,7 +1560,8 @@ DEFINE_DEVICE_TYPE(IDE_BASEBOARD, ide_baseboard_device, "ide_baseboard", "IDE Ba
 //-------------------------------------------------
 
 ide_baseboard_device::ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ata_mass_storage_device(mconfig, IDE_BASEBOARD, tag, owner, clock)
+	: ata_mass_storage_device_base(mconfig, IDE_BASEBOARD, tag, owner, clock)
+	, device_ata_interface(mconfig, *this)
 {
 }
 
@@ -1546,7 +1571,7 @@ ide_baseboard_device::ide_baseboard_device(const machine_config &mconfig, const 
 
 void ide_baseboard_device::device_start()
 {
-	ata_mass_storage_device::device_start();
+	ata_mass_storage_device_base::device_start();
 	chihirosystem = machine().driver_data<chihiro_state>();
 	// savestates
 	save_item(NAME(read_buffer));
@@ -1568,7 +1593,7 @@ void ide_baseboard_device::device_reset()
 		m_can_identify_device = 1;
 	}
 
-	ata_mass_storage_device::device_reset();
+	ata_mass_storage_device_base::device_reset();
 }
 
 int ide_baseboard_device::read_sector(uint32_t lba, void *buffer)

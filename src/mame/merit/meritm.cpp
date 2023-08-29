@@ -206,7 +206,10 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_banks(*this, "bank%u", 0U),
 			m_region_maincpu(*this, "maincpu"),
-			m_region_extra(*this, "extra")
+			m_region_extra(*this, "extra"),
+			m_p1_disc_lamp(*this, "P1 DISC %u LAMP", 1U),
+			m_p1_play_lamp(*this, "P1 PLAY LAMP"),
+			m_p1_cancel_lamp(*this, "P1 CANCEL LAMP")
 	{ }
 
 	void init_megat3te();
@@ -232,6 +235,9 @@ private:
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_extra;
 	std::unique_ptr<uint8_t[]> m_ram;
+	output_finder<5> m_p1_disc_lamp;
+	output_finder<> m_p1_play_lamp;
+	output_finder<> m_p1_cancel_lamp;
 
 	int m_vint;
 	int m_interrupt_vdp0_state;
@@ -875,13 +881,10 @@ uint8_t meritm_state::_8255_port_c_r()
 void meritm_state::crt250_port_b_w(uint8_t data)
 {
 	//popmessage("Lamps: %d %d %d %d %d %d %d", BIT(data,0), BIT(data,1), BIT(data,2), BIT(data,3), BIT(data,4), BIT(data,5), BIT(data,6) );
-	output().set_value("P1 DISC 1 LAMP", !BIT(data,0));
-	output().set_value("P1 DISC 2 LAMP", !BIT(data,1));
-	output().set_value("P1 DISC 3 LAMP", !BIT(data,2));
-	output().set_value("P1 DISC 4 LAMP", !BIT(data,3));
-	output().set_value("P1 DISC 5 LAMP", !BIT(data,4));
-	output().set_value("P1 PLAY LAMP", !BIT(data,5));
-	output().set_value("P1 CANCEL LAMP", !BIT(data,6));
+	for (int i = 0; i < 5; i++)
+		m_p1_disc_lamp[i] = !BIT(data, i);
+	m_p1_play_lamp = !BIT(data, 5);
+	m_p1_cancel_lamp = !BIT(data, 6);
 }
 
 /*************************************
@@ -1042,6 +1045,9 @@ MACHINE_START_MEMBER(meritm_state, common)
 
 void meritm_state::machine_start()
 {
+	m_p1_disc_lamp.resolve();
+	m_p1_play_lamp.resolve();
+	m_p1_cancel_lamp.resolve();
 	m_banks[0]->configure_entries(0, 8, m_region_maincpu->base(), 0x10000);
 	m_bank = 0xff;
 	crt250_switch_banks();

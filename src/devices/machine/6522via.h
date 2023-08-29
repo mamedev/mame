@@ -97,7 +97,7 @@ public:
 	void write_pa5(int state) { set_pa_line(5, state); }
 	void write_pa6(int state) { set_pa_line(6, state); }
 	void write_pa7(int state) { set_pa_line(7, state); }
-	void write_pa( u8 data );
+	void write_pa(u8 data);
 	void write_ca1(int state);
 	void write_ca2(int state);
 
@@ -109,7 +109,7 @@ public:
 	void write_pb5(int state) { set_pb_line(5, state); }
 	void write_pb6(int state) { set_pb_line(6, state); }
 	void write_pb7(int state) { set_pb_line(7, state); }
-	void write_pb( u8 data );
+	void write_pb(u8 data);
 	void write_cb1(int state);
 	void write_cb2(int state);
 

@@ -98,8 +98,8 @@ private:
 	uint8_t m_firq_select = 0U;
 	uint8_t m_palettebank_io = 0U;
 	uint8_t m_palettebank_vis = 0U;
-	emu_timer *m_beam_firq_timer = nullptr;
-	emu_timer *m_collide_firq_timer = nullptr;
+	emu_timer *m_beam_firq_timer;
+	emu_timer *m_collide_firq_timer[128];
 	uint8_t m_beam_firq_count = 0U;
 };
 

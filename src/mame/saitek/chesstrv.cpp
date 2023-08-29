@@ -53,8 +53,8 @@ TODO:
 #include "video/pwm.h"
 
 // internal artwork
-#include "saitek_chesstrv.lh" // clickable
-#include "saitek_chesstrvi.lh" // clickable
+#include "saitek_chesstrv.lh"
+#include "saitek_chesstrvi.lh"
 
 
 namespace {

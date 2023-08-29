@@ -33,7 +33,7 @@ It works on the old A34 MCU because the game keeps reading D0 while computing.
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_minichess.lh" // clickable
+#include "saitek_minichess.lh"
 
 
 namespace {

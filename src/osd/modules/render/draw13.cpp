@@ -365,7 +365,7 @@ void renderer_sdl2::render_quad(texture_info *texture, const render_primitive &p
 			copyinfo->time += (m_last_blit_time * (int64_t) (texture->raw_width() * texture->raw_height())) / (int64_t) m_last_blit_pixels;
 		}
 		copyinfo->samples++;
-		copyinfo->perf = ( texture->m_copyinfo->pixel_count * (osd_ticks_per_second()/1000)) / texture->m_copyinfo->time;
+		copyinfo->perf = (texture->m_copyinfo->pixel_count * (osd_ticks_per_second()/1000)) / std::max<int64_t>(texture->m_copyinfo->time, 1);
 	}
 	else
 	{

@@ -314,7 +314,7 @@ uint8_t jailbrek_state::speech_r()
 
 void jailbrek_state::speech_w(uint8_t data)
 {
-	// bit 0 could be latch direction like in yiear
+	// bit 0 is latch direction like in yiear
 	m_vlm->st((data >> 1) & 1);
 	m_vlm->rst((data >> 2) & 1);
 }

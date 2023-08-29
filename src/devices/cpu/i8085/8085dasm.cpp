@@ -40,7 +40,7 @@ offs_t i8085_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case 0x0d: util::stream_format(stream, "dcr  c"); break;
 		case 0x0e: util::stream_format(stream, "mvi  c,$%02x", params.r8(pc)); pc++; break;
 		case 0x0f: util::stream_format(stream, "rrc"); break;
-		case 0x10: util::stream_format(stream, "asrh (*)"); break;
+		case 0x10: util::stream_format(stream, "arhl (*)"); break;
 		case 0x11: util::stream_format(stream, "lxi  d,$%04x", params.r16(pc)); pc+=2; break;
 		case 0x12: util::stream_format(stream, "stax d"); break;
 		case 0x13: util::stream_format(stream, "inx  d"); break;
@@ -48,7 +48,7 @@ offs_t i8085_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case 0x15: util::stream_format(stream, "dcr  d"); break;
 		case 0x16: util::stream_format(stream, "mvi  d,$%02x", params.r8(pc)); pc++; break;
 		case 0x17: util::stream_format(stream, "ral"); break;
-		case 0x18: util::stream_format(stream, "rlde (*)"); break;
+		case 0x18: util::stream_format(stream, "rdel (*)"); break;
 		case 0x19: util::stream_format(stream, "dad  d"); break;
 		case 0x1a: util::stream_format(stream, "ldax d"); break;
 		case 0x1b: util::stream_format(stream, "dcx  d"); break;
@@ -64,7 +64,7 @@ offs_t i8085_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case 0x25: util::stream_format(stream, "dcr  h"); break;
 		case 0x26: util::stream_format(stream, "mvi  h,$%02x", params.r8(pc)); pc++; break;
 		case 0x27: util::stream_format(stream, "daa"); break;
-		case 0x28: util::stream_format(stream, "ldeh $%02x (*)", params.r8(pc)); pc++; break;
+		case 0x28: util::stream_format(stream, "ldhi $%02x (*)", params.r8(pc)); pc++; break;
 		case 0x29: util::stream_format(stream, "dad  h"); break;
 		case 0x2a: util::stream_format(stream, "lhld $%04x", params.r16(pc)); pc+=2; break;
 		case 0x2b: util::stream_format(stream, "dcx  h"); break;
@@ -80,7 +80,7 @@ offs_t i8085_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case 0x35: util::stream_format(stream, "dcr  m"); break;
 		case 0x36: util::stream_format(stream, "mvi  m,$%02x", params.r8(pc)); pc++; break;
 		case 0x37: util::stream_format(stream, "stc"); break;
-		case 0x38: util::stream_format(stream, "ldes $%02x (*)", params.r8(pc)); pc++; break;
+		case 0x38: util::stream_format(stream, "ldsi $%02x (*)", params.r8(pc)); pc++; break;
 		case 0x39: util::stream_format(stream, "dad  sp"); break;
 		case 0x3a: util::stream_format(stream, "lda  $%04x", params.r16(pc)); pc+=2; break;
 		case 0x3b: util::stream_format(stream, "dcx  sp"); break;
@@ -245,7 +245,7 @@ offs_t i8085_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case 0xda: util::stream_format(stream, "jc   $%04x", params.r16(pc)); pc+=2; flags = STEP_COND; break;
 		case 0xdb: util::stream_format(stream, "in   $%02x", params.r8(pc)); pc++; break;
 		case 0xdc: util::stream_format(stream, "cc   $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER | STEP_COND; break;
-		case 0xdd: util::stream_format(stream, "jnx  $%04x (*)", params.r16(pc)); pc+=2; flags = STEP_COND; break;
+		case 0xdd: util::stream_format(stream, "jnx5 $%04x (*)", params.r16(pc)); pc+=2; flags = STEP_COND; break;
 		case 0xde: util::stream_format(stream, "sbi  $%02x", params.r8(pc)); pc++; break;
 		case 0xdf: util::stream_format(stream, "rst  3"); flags = STEP_OVER; break;
 		case 0xe0: util::stream_format(stream, "rpo"); flags = STEP_OUT | STEP_COND; break;
@@ -277,7 +277,7 @@ offs_t i8085_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case 0xfa: util::stream_format(stream, "jm   $%04x", params.r16(pc)); pc+=2; flags = STEP_COND; break;
 		case 0xfb: util::stream_format(stream, "ei"); break;
 		case 0xfc: util::stream_format(stream, "cm   $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER | STEP_COND; break;
-		case 0xfd: util::stream_format(stream, "jx   $%04x (*)", params.r16(pc)); pc+=2; flags = STEP_COND; break;
+		case 0xfd: util::stream_format(stream, "jx5  $%04x (*)", params.r16(pc)); pc+=2; flags = STEP_COND; break;
 		case 0xfe: util::stream_format(stream, "cpi  $%02x", params.r8(pc)); pc++; break;
 		case 0xff: util::stream_format(stream, "rst  7"); flags = STEP_OVER; break;
 	}

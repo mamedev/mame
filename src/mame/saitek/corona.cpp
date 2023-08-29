@@ -24,7 +24,7 @@ different compared to Stratos/Turbo King.
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_corona.lh" // clickable
+#include "saitek_corona.lh"
 
 
 namespace {

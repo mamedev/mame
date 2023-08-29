@@ -186,7 +186,7 @@ license:CC0-1.0
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Source"/>
 			<dataarea name="flop" size="162886">
-				<rom name="asteriods_source.ccvf" size="162886" crc="14af4de7" sha1="43a76ffda8b4e2f5513c8cd9ac6390ab15854280"/>
+				<rom name="asteroids_source.ccvf" size="162886" crc="14af4de7" sha1="43a76ffda8b4e2f5513c8cd9ac6390ab15854280"/>
 			</dataarea>
 		</part>
 	</software>
@@ -204,7 +204,7 @@ license:CC0-1.0
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Source"/>
 			<dataarea name="flop" size="162886">
-				<rom name="asteriods_source.ccvf" size="162886" crc="14af4de7" sha1="43a76ffda8b4e2f5513c8cd9ac6390ab15854280"/>
+				<rom name="asteroids_source.ccvf" size="162886" crc="14af4de7" sha1="43a76ffda8b4e2f5513c8cd9ac6390ab15854280"/>
 			</dataarea>
 		</part>
 	</software>

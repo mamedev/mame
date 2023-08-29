@@ -2,7 +2,7 @@
 // copyright-holders:Nigel Barnes
 /**********************************************************************
 
-    Psion 3Fax Modem
+    Psion 3-Fax Modem
 
     TODO: add other devices
     - 32K RAM (KM62256)
@@ -19,7 +19,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(PSION_3FAX_MODEM, psion_3fax_modem_device, "psion_3fax", "Psion 3Fax Modem")
+DEFINE_DEVICE_TYPE(PSION_3FAX_MODEM, psion_3fax_modem_device, "psion_3fax", "Psion 3-Fax Modem")
 
 
 //-------------------------------------------------

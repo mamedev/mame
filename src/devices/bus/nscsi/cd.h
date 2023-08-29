@@ -5,10 +5,12 @@
 
 #pragma once
 
-#include "machine/nscsi_bus.h"
 #include "imagedev/cdromimg.h"
-#include "cdrom.h"
+#include "machine/nscsi_bus.h"
 #include "sound/cdda.h"
+
+#include "cdrom.h"
+
 
 class nscsi_cdrom_device : public nscsi_full_device
 {
@@ -125,10 +127,16 @@ class nscsi_cdrom_apple_device : public nscsi_cdrom_device
 {
 public:
 	nscsi_cdrom_apple_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	virtual void device_start() override;
 
 protected:
 	virtual void scsi_command() override;
 	virtual bool scsi_command_done(uint8_t command, uint8_t length) override;
+	virtual void scsi_put_data(int buf, int offset, uint8_t data) override;
+
+private:
+	bool m_stopped;
+	uint32_t m_stop_position;
 };
 
 DECLARE_DEVICE_TYPE(NSCSI_CDROM, nscsi_cdrom_device)

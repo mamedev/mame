@@ -131,7 +131,6 @@ public:
 
 	void timer_w(int state) { m_timer.timer_w(state); }
 
-protected:
 	// state index constants
 	enum
 	{
@@ -162,6 +161,7 @@ protected:
 		M68705_MOR
 	};
 
+protected:
 	static unsigned const PORT_COUNT = 4;
 
 	m6805_hmos_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, u32 addr_width, unsigned ram_size);

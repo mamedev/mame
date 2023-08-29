@@ -469,6 +469,8 @@ public:
 		, m_bankedroms(*this, "bankedroms")
 		, m_bank(*this, "bank%u", 1)
 		, m_lightgun_io(*this, {"GUN1X", "GUN1Y", "GUN2X", "GUN2Y"})
+		, m_led(*this, "led%u", 0U)
+		, m_recoil(*this, "recoil%u", 0U)
 	{
 	}
 
@@ -516,6 +518,8 @@ private:
 	optional_memory_region m_bankedroms;
 	optional_memory_bank_array<8> m_bank;
 	optional_ioport_array<4> m_lightgun_io;
+	output_finder<2> m_led;
+	output_finder<2> m_recoil;
 
 	uint32_t m_n_bankoffset;
 	uint8_t m_su_83;
@@ -561,10 +565,10 @@ void namcos11_state::lightgun_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	switch( offset )
 	{
 	case 0:
-		output().set_value( "led0", !( data & 0x08 ) );
-		output().set_value( "led1", !( data & 0x04 ) );
-		output().set_value( "recoil0", !( data & 0x02 ) );
-		output().set_value( "recoil1", !( data & 0x01 ) );
+		m_led[0] = BIT(~data, 3);
+		m_led[1] = BIT(~data, 2);
+		m_recoil[0] = BIT(~data, 1);
+		m_recoil[1] = BIT(~data, 0);
 
 		verboselog(1, "lightgun_w: outputs (%08x %08x)\n", data, mem_mask );
 		break;
@@ -703,6 +707,9 @@ void namcos11_state::c76_speedup_w(offs_t offset, uint16_t data, uint16_t mem_ma
 
 void namcos11_state::driver_start()
 {
+	m_led.resolve();
+	m_recoil.resolve();
+
 	// C76 idle skipping, large speedboost
 	if (C76_SPEEDUP)
 	{

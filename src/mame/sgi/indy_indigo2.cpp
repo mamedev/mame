@@ -55,23 +55,21 @@
 
 #include "emu.h"
 
+#include "hpc3.h"
+#include "ioc2.h"
+#include "mc.h"
+#include "vino.h"
+
 #include "bus/gio64/gio64.h"
-
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
 #include "cpu/mips/mips3.h"
-
 #include "machine/ds1386.h"
 #include "machine/edlc.h"
 #include "machine/eepromser.h"
-#include "hpc3.h"
-#include "ioc2.h"
 #include "machine/nscsi_bus.h"
-#include "bus/nscsi/cd.h"
-#include "bus/nscsi/hd.h"
-#include "sgi.h"
-#include "vino.h"
 #include "machine/saa7191.h"
 #include "machine/wd33c9x.h"
-
 #include "sound/cdda.h"
 
 #include "emupal.h"
@@ -89,7 +87,6 @@ public:
 	ip24_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_mainram(*this, "mainram")
 		, m_mem_ctrl(*this, "memctrl")
 		, m_scsi_ctrl(*this, "scsibus:0:wd33c93")
 		, m_edlc(*this, "edlc")
@@ -117,7 +114,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void write_ram(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	template <uint32_t addr_base> uint64_t bus_error_r(offs_t offset, uint64_t mem_mask = ~0);
 	template <uint32_t addr_base> void bus_error_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 
@@ -138,7 +134,6 @@ protected:
 	static void scsi_devices(device_slot_interface &device);
 
 	required_device<mips3_device> m_maincpu;
-	required_shared_ptr<uint64_t> m_mainram;
 	required_device<sgi_mc_device> m_mem_ctrl;
 	required_device<wd33c93b_device> m_scsi_ctrl;
 	required_device<seeq80c03_device> m_edlc;
@@ -203,25 +198,6 @@ uint32_t ip22_state::eisa_io_r()
 	return 0xffffffff;
 }
 
-// a bit hackish, but makes the memory detection work properly and allows a big cleanup of the mapping
-void ip24_state::write_ram(offs_t offset, uint64_t data, uint64_t mem_mask)
-{
-	// if banks 2 or 3 are enabled, do nothing, we don't support that much memory
-	if (m_mem_ctrl->get_mem_config(1) & 0x10001000)
-	{
-		// a random perturbation so the memory test fails
-		data ^= 0xffffffffffffffffULL;
-	}
-
-	// if banks 0 or 1 have 2 membanks, also kill it, we only want 128 MB
-	if (m_mem_ctrl->get_mem_config(0) & 0x40004000)
-	{
-		// a random perturbation so the memory test fails
-		data ^= 0xffffffffffffffffULL;
-	}
-	COMBINE_DATA(&m_mainram[offset]);
-}
-
 uint8_t ip24_state::volume_r(offs_t offset)
 {
 	if (offset == 0)
@@ -246,14 +222,11 @@ void ip24_state::volume_w(offs_t offset, uint8_t data)
 
 void ip24_state::ip24_base_map(address_map &map)
 {
-	map(0x00000000, 0x0007ffff).bankrw("bank1");    /* mirror of first 512k of main RAM */
-	map(0x08000000, 0x0fffffff).share("mainram").ram().w(FUNC(ip24_state::write_ram));     /* 128 MB of main RAM */
 	map(0x1f000000, 0x1f9fffff).rw(m_gio64, FUNC(gio64_device::read), FUNC(gio64_device::write));
 	map(0x1fa00000, 0x1fa1ffff).rw(m_mem_ctrl, FUNC(sgi_mc_device::read), FUNC(sgi_mc_device::write));
 	map(0x1fb00000, 0x1fb7ffff).rw(FUNC(ip24_state::bus_error_r<0x1fb00000>), FUNC(ip24_state::bus_error_w<0x1fb00000>));
 	map(0x1fb80000, 0x1fbfffff).m(m_hpc3, FUNC(hpc3_device::map));
 	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0);
-	map(0x20000000, 0x27ffffff).share("mainram").ram().w(FUNC(ip24_state::write_ram));
 }
 
 void ip24_state::ip24_map(address_map &map)
@@ -306,9 +279,6 @@ void ip24_state::machine_start()
 
 void ip24_state::machine_reset()
 {
-	// set up low RAM mirror
-	membank("bank1")->set_base(m_mainram);
-
 	//m_maincpu->mips3drc_set_options(MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
 }
 
@@ -328,6 +298,14 @@ void ip24_state::scsi_devices(device_slot_interface &device)
 	device.option_add("harddisk", NSCSI_HARDDISK);
 	//device.set_option_machine_config("cdrom", cdrom_config);
 }
+
+static DEVICE_INPUT_DEFAULTS_START(ip22_mc)
+	DEVICE_INPUT_DEFAULTS("VALID", 0x0f, 0x07)
+DEVICE_INPUT_DEFAULTS_END
+
+static DEVICE_INPUT_DEFAULTS_START(ip24_mc)
+	DEVICE_INPUT_DEFAULTS("VALID", 0x0f, 0x03)
+DEVICE_INPUT_DEFAULTS_END
 
 void ip24_state::ip24_base(machine_config &config, uint32_t system_clock)
 {
@@ -390,6 +368,7 @@ void ip24_state::ip24_base(machine_config &config, uint32_t system_clock)
 void ip24_state::ip24(machine_config &config, uint32_t system_clock)
 {
 	ip24_base(config, system_clock);
+	m_mem_ctrl->set_input_default(DEVICE_INPUT_DEFAULTS_NAME(ip24_mc));
 
 	m_hpc3->set_addrmap(hpc3_device::AS_PIO6, &ip24_state::pio6_map);
 
@@ -456,6 +435,7 @@ void ip22_state::indigo2_4415(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
 
 	ip24_base(config, system_clock);
+	m_mem_ctrl->set_input_default(DEVICE_INPUT_DEFAULTS_NAME(ip22_mc));
 
 	NSCSI_BUS(config, "scsibus2", 0);
 	NSCSI_CONNECTOR(config, "scsibus2:0").option_set("wd33c93", WD33C93B)

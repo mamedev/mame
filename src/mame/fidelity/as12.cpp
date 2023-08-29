@@ -45,7 +45,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_as12.lh" // clickable
+#include "fidel_as12.lh"
 
 
 namespace {

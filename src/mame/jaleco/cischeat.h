@@ -213,6 +213,8 @@ public:
 		, m_motor_right(*this, "motor_right")
 		, m_oki1_bank(*this, "oki1_bank")
 		, m_oki2_bank(*this, "oki2_bank")
+		, m_motor_left_output(*this, "left")
+		, m_motor_right_output(*this, "right")
 	{
 		for (int side = 0; side < 2; ++side)
 			m_motor_command[side] = m_motor_pos[side] = 0;
@@ -224,6 +226,9 @@ public:
 	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(motor_pos_r);
 	void init_captflag();
 	void init_vscaptfl();
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	void motor_command_right_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -246,6 +251,9 @@ private:
 
 	required_memory_bank m_oki1_bank;
 	required_memory_bank m_oki2_bank;
+
+	output_finder<> m_motor_left_output;
+	output_finder<> m_motor_right_output;
 
 	uint16_t m_captflag_leds;
 	uint16_t m_motor_command[2];

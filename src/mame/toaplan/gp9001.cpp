@@ -215,6 +215,14 @@ gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, const char *ta
 	, device_video_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)
 	, m_space_config("gp9001vdp", ENDIANNESS_BIG, 16, 14, 0, address_map_constructor(FUNC(gp9001vdp_device::map), this))
+	, m_bootleg_tm0x_offs(0)
+	, m_bootleg_tm0y_offs(0)
+	, m_bootleg_tm1x_offs(0)
+	, m_bootleg_tm1y_offs(0)
+	, m_bootleg_tm2x_offs(0)
+	, m_bootleg_tm2y_offs(0)
+	, m_bootleg_spx_offs(0)
+	, m_bootleg_spy_offs(0)
 	, m_vram(*this, "vram_%u", 0)
 	, m_spriteram(*this, "spriteram")
 	, m_gp9001_cb(*this)
@@ -549,24 +557,24 @@ void gp9001vdp_device::write(offs_t offset, u16 data, u16 mem_mask)
 }
 
 
-/***************************************************************************/
-/**************** PIPIBIBI bootleg interface into this video driver ********/
+/*************************************************************************************/
+/**************** bootlegs without GM9001 VDP interface into this video driver *******/
 
-void gp9001vdp_device::pipibibi_bootleg_scroll_w(offs_t offset, u16 data, u16 mem_mask)
+void gp9001vdp_device::bootleg_scroll_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7)
 	{
 		switch (offset)
 		{
-			case 0x00:  data -= 0x01f; break;
-			case 0x01:  data += 0x1ef; break;
-			case 0x02:  data -= 0x01d; break;
-			case 0x03:  data += 0x1ef; break;
-			case 0x04:  data -= 0x01b; break;
-			case 0x05:  data += 0x1ef; break;
-			case 0x06:  data += 0x1d4; break;
-			case 0x07:  data += 0x1f7; break;
-			default:    logerror("PIPIBIBI writing %04x to unknown scroll register %04x",data, offset);
+			case 0x00:  data -= m_bootleg_tm0x_offs; break;
+			case 0x01:  data += m_bootleg_tm0y_offs; break;
+			case 0x02:  data -= m_bootleg_tm1x_offs; break;
+			case 0x03:  data += m_bootleg_tm1y_offs; break;
+			case 0x04:  data -= m_bootleg_tm2x_offs; break;
+			case 0x05:  data += m_bootleg_tm2y_offs; break;
+			case 0x06:  data += m_bootleg_spx_offs; break;
+			case 0x07:  data += m_bootleg_spy_offs; break;
+			default:    logerror("bootleg writing %04x to unknown scroll register %04x", data, offset);
 		}
 
 		m_scroll_reg = offset;
@@ -574,25 +582,25 @@ void gp9001vdp_device::pipibibi_bootleg_scroll_w(offs_t offset, u16 data, u16 me
 	}
 }
 
-u16 gp9001vdp_device::pipibibi_bootleg_videoram16_r(offs_t offset)
+u16 gp9001vdp_device::bootleg_videoram16_r(offs_t offset)
 {
 	voffs_w(offset, 0xffff);
 	return videoram16_r();
 }
 
-void gp9001vdp_device::pipibibi_bootleg_videoram16_w(offs_t offset, u16 data, u16 mem_mask)
+void gp9001vdp_device::bootleg_videoram16_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	voffs_w(offset, 0xffff);
 	videoram16_w(data, mem_mask);
 }
 
-u16 gp9001vdp_device::pipibibi_bootleg_spriteram16_r(offs_t offset)
+u16 gp9001vdp_device::bootleg_spriteram16_r(offs_t offset)
 {
 	voffs_w((0x1800 + offset), 0);
 	return videoram16_r();
 }
 
-void gp9001vdp_device::pipibibi_bootleg_spriteram16_w(offs_t offset, u16 data, u16 mem_mask)
+void gp9001vdp_device::bootleg_spriteram16_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	voffs_w((0x1800 + offset), mem_mask);
 	videoram16_w(data, mem_mask);

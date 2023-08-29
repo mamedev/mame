@@ -108,6 +108,7 @@ void k28_state::machine_start()
 
 void k28_state::machine_reset()
 {
+	m_vfd_data = 0;
 	m_power_on = true;
 	m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 

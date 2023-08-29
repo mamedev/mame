@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Al Kossow
+// copyright-holders: Al Kossow
+
 /*          Ramtek M79 Ambush
 
 
@@ -57,27 +58,109 @@ and two large (paddles pretending to be) guns.
 */
 
 #include "emu.h"
-#include "m79amb.h"
+
+#include "m79amb_a.h"
+
+#include "cpu/i8085/i8085.h"
+#include "sound/discrete.h"
 
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
+class m79amb_state : public driver_device
+{
+public:
+	m79amb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram"),
+		m_mask(*this, "mask"),
+		m_discrete(*this, "discrete"),
+		m_maincpu(*this, "maincpu"),
+		m_gun_port(*this, "800%u", 4U),
+		m_gun_pos(*this, "GUN%u", 1U),
+		m_self_test(*this, "SELF_TEST"),
+		m_exp_lamp(*this, "EXP_LAMP")
+	{ }
+
+	void m79amb(machine_config &config);
+
+	void init_m79amb();
+
+protected:
+	void machine_start() override;
+
+private:
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_mask;
+
+	required_device<discrete_device> m_discrete;
+	required_device<i8080_cpu_device> m_maincpu;
+
+	required_ioport_array<2> m_gun_port;
+	required_ioport_array<2> m_gun_pos;
+	output_finder<> m_self_test;
+	output_finder<> m_exp_lamp;
+
+	// misc
+	uint8_t m_lut_gun[2][0x100]{};
+
+	void videoram_w(offs_t offset, uint8_t data);
+	template <uint8_t Which> uint8_t gray5bit_controller_r();
+	void _8000_w(uint8_t data);
+	void _8002_w(uint8_t data);
+	void _8003_w(uint8_t data);
+	uint8_t inta_r();
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void main_map(address_map &map);
+};
+
+
+// the ports are guessed from operation
+// the schematics do not show the actual hookup
+
+void m79amb_state::_8000_w(uint8_t data)
+{
+	// these values are not latched
+	// they are pulsed when the port is addressed
+	// the discrete system will just trigger from them
+	m_discrete->write(M79AMB_SHOT_EN, data & 0x01);
+	m_discrete->write(M79AMB_BOOM_EN, data & 0x02);
+	m_discrete->write(M79AMB_THUD_EN, data & 0x04);
+}
+
+void m79amb_state::_8003_w(uint8_t data)
+{
+	// Self Test goes low on reset and lights LED
+	// LED goes off on pass
+	m_self_test = BIT(data, 0);
+	m_discrete->write(M79AMB_MC_REV_EN, data & 0x02);
+	m_discrete->write(M79AMB_MC_CONTROL_EN, data & 0x04);
+	m_discrete->write(M79AMB_TANK_TRUCK_JEEP_EN, data & 0x08);
+	m_discrete->write(M79AMB_WHISTLE_B_EN, data & 0x10);
+	m_discrete->write(M79AMB_WHISTLE_A_EN, data & 0x20);
+}
+
 void m79amb_state::machine_start()
 {
 	m_self_test.resolve();
+	m_exp_lamp.resolve();
 }
 
-void m79amb_state::ramtek_videoram_w(offs_t offset, uint8_t data)
+void m79amb_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data & ~*m_mask;
 }
 
-uint32_t m79amb_state::screen_update_ramtek(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t m79amb_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	for (offs_t offs = 0; offs < 0x2000; offs++)
 	{
 		uint8_t data = m_videoram[offs];
-		int y = offs >> 5;
+		int const y = offs >> 5;
 		int x = (offs & 0x1f) << 3;
 
 		for (int i = 0; i < 8; i++)
@@ -94,42 +177,35 @@ uint32_t m79amb_state::screen_update_ramtek(screen_device &screen, bitmap_rgb32 
 }
 
 
-uint8_t m79amb_state::gray5bit_controller0_r()
+template <uint8_t Which>
+uint8_t m79amb_state::gray5bit_controller_r()
 {
-	uint8_t port_data = ioport("8004")->read();
-	uint8_t gun_pos = ioport("GUN1")->read();
+	uint8_t const port_data = m_gun_port[Which]->read();
+	uint8_t const gun_pos = m_gun_pos[Which]->read();
 
-	return (port_data & 0xe0) | m_lut_gun1[gun_pos];
+	return (port_data & 0xe0) | m_lut_gun[Which][gun_pos];
 }
 
-uint8_t m79amb_state::gray5bit_controller1_r()
+void m79amb_state::_8002_w(uint8_t data)
 {
-	uint8_t port_data = ioport("8005")->read();
-	uint8_t gun_pos = ioport("GUN2")->read();
-
-	return (port_data & 0xe0) | m_lut_gun2[gun_pos];
-}
-
-void m79amb_state::m79amb_8002_w(uint8_t data)
-{
-	/* D1 may also be watchdog reset */
-	/* port goes to 0x7f to turn on explosion lamp */
-	output().set_value("EXP_LAMP", data ? 1 : 0);
+	// D1 may also be watchdog reset
+	// port goes to 0x7f to turn on explosion lamp
+	m_exp_lamp = data ? 1 : 0;
 }
 
 void m79amb_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x4000, 0x5fff).ram().w(FUNC(m79amb_state::ramtek_videoram_w)).share("videoram");
-	map(0x6000, 0x63ff).ram();                 /* ?? */
-	map(0x8000, 0x8000).portr("8000").w(FUNC(m79amb_state::m79amb_8000_w));
+	map(0x4000, 0x5fff).ram().w(FUNC(m79amb_state::videoram_w)).share(m_videoram);
+	map(0x6000, 0x63ff).ram();                 // ??
+	map(0x8000, 0x8000).portr("8000").w(FUNC(m79amb_state::_8000_w));
 	map(0x8001, 0x8001).writeonly().share("mask");
-	map(0x8002, 0x8002).portr("8002").w(FUNC(m79amb_state::m79amb_8002_w));
-	map(0x8003, 0x8003).w(FUNC(m79amb_state::m79amb_8003_w));
-	map(0x8004, 0x8004).r(FUNC(m79amb_state::gray5bit_controller0_r));
-	map(0x8005, 0x8005).r(FUNC(m79amb_state::gray5bit_controller1_r));
-	map(0xc000, 0xc07f).ram();                 /* ?? */
-	map(0xc200, 0xc27f).ram();                 /* ?? */
+	map(0x8002, 0x8002).portr("8002").w(FUNC(m79amb_state::_8002_w));
+	map(0x8003, 0x8003).w(FUNC(m79amb_state::_8003_w));
+	map(0x8004, 0x8004).r(FUNC(m79amb_state::gray5bit_controller_r<0>));
+	map(0x8005, 0x8005).r(FUNC(m79amb_state::gray5bit_controller_r<1>));
+	map(0xc000, 0xc07f).ram();                 // ??
+	map(0xc200, 0xc27f).ram();                 // ??
 }
 
 
@@ -194,18 +270,18 @@ uint8_t m79amb_state::inta_r()
 
 void m79amb_state::m79amb(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I8080(config, m_maincpu, 19.6608_MHz_XTAL / 10);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m79amb_state::main_map);
 	m_maincpu->in_inta_func().set(FUNC(m79amb_state::inta_r));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(19.6608_MHz_XTAL / 4, 320, 0, 256, 262, 32, 256);
-	screen.set_screen_update(FUNC(m79amb_state::screen_update_ramtek));
+	screen.set_screen_update(FUNC(m79amb_state::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	DISCRETE(config, m_discrete, m79amb_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -269,12 +345,15 @@ void m79amb_state::init_m79amb()
 
 		// gun 1, start at left 18
 		while (j < 0x100 && j <= lut_cross[i])
-			m_lut_gun1[j++] = gray;
+			m_lut_gun[0][j++] = gray;
 
 		// gun 2, start at right 235
 		while (k >= 0 && k >= 253 - lut_cross[i])
-			m_lut_gun2[k--] = gray;
+			m_lut_gun[1][k--] = gray;
 	}
 }
+
+} // anonymous namespace
+
 
 GAME( 1977, m79amb, 0, m79amb, m79amb, m79amb_state, init_m79amb, ROT0, "Ramtek", "M-79 Ambush", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

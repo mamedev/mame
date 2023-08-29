@@ -297,6 +297,18 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="3dzapper">
+		<description>3-D Zapper (prototype)</description>
+		<year>1983</year>
+		<publisher>U.S. Games Corporation / Vidtec</publisher>
+		<info name="programmer" value="Todd Marshall" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="3-D Zapper.bin" size="4096" crc="4f405595" sha1="af75d0e4b9c3f46d444121c9cf96ceb3a349fc1d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="32in1">
 		<description>32 in 1 (PAL)</description>
 		<year>1988</year>
@@ -477,6 +489,18 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="action force.bin" size="4096" crc="896446cf" sha1="9e6fb047ee9fa0a454ca23673ed9693430032dc6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="actnauts">
+		<description>Actionauts (NTSC)</description>
+		<year>2008</year>
+		<publisher>Imagic</publisher>
+		<info name="programmer" value="Rob Fulop" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="Actionauts.bin" size="4096" crc="ceddf26b" sha1="1804ad169e2af9e14876ffb1261817b7eb846f1b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2587,6 +2611,18 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="boom bang (rainbow vision - suntek) (ss-016) (pal).bin" size="4096" crc="3beda93b" sha1="dd3494a1e3ffa063803b1f02716e87e89dc3c574"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbbunnies">
+		<description>Bouncin' Baby Bunnies (prototype)</description>
+		<year>1983</year>
+		<publisher>Telesys</publisher>
+		<info name="programmer" value="Alex Leavens" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="Bouncin Baby Bunnies.bin" size="4096" crc="09a70e23" sha1="af4a8a31f8dd24fe9904b5685da8780bea078236"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7065,6 +7101,18 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="goodluck">
+		<description>Good Luck, Charlie Brown (prototype)</description>
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26112" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="Good Luck Charlie Brown.bin" size="8192" crc="b89aaeaf" sha1="39548425a97b185aec9364a343e92d518bb702c0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gopher">
 		<description>Gopher</description>
 		<year>1982</year>
@@ -7475,6 +7523,17 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="harbor escape (aka river raid) (1983) (panda) (110).bin" size="4096" crc="85998ae2" sha1="d6db71da02ae194140bf812be34d6e8a6785d138"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hardhead">
+		<description>Hard-Head (NTSC, prototype)</description>
+		<year>1983</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="Hard-Head.bin" size="4096" crc="5c009ea0" sha1="a25c4b33e1c86895cb63635bd6ca5b8379a206b3"/>
 			</dataarea>
 		</part>
 	</software>

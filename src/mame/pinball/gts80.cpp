@@ -78,8 +78,12 @@ public:
 	void p0(machine_config &config);  // no sound card
 	void p2(machine_config &config);  // multi-mode card
 	void r1v(machine_config &config); // r1 with votrax
-	void r1(machine_config &config);  // r1
+	void marspp(machine_config &config); // marspp has either SC-01 or SC-01-A
 	DECLARE_INPUT_CHANGED_MEMBER(slam_w);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 
 private:
 	u8 port1a_r();
@@ -96,12 +100,11 @@ private:
 	u8 m_swrow = 0U;
 	u8 m_soundex = 0U;
 	u8 m_sol_state[9][2]{};
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+
 	required_device<m6502_device> m_maincpu;
-	required_device<riot6532_device> m_riot1;
-	required_device<riot6532_device> m_riot2;
-	required_device<riot6532_device> m_riot3;
+	required_device<mos6532_device> m_riot1;
+	required_device<mos6532_device> m_riot2;
+	required_device<mos6532_device> m_riot3;
 	required_ioport_array<4> m_io_dips;
 	required_ioport_array<9> m_io_keyboard;
 	optional_device<gottlieb_sound_p2_device> m_p2_sound;
@@ -113,11 +116,13 @@ private:
 void gts80_state::gts80_map(address_map &map)
 {
 	map.global_mask(0x3fff);
-	map(0x0000, 0x017f).ram();
+	map(0x0000, 0x007f).m(m_riot1, FUNC(mos6532_device::ram_map));
+	map(0x0080, 0x00ff).m(m_riot2, FUNC(mos6532_device::ram_map));
+	map(0x0100, 0x017f).m(m_riot3, FUNC(mos6532_device::ram_map));
 	map(0x01cb, 0x01cb).lr8(NAME([] () { return 0xff; }));  // continual read
-	map(0x0200, 0x027f).rw("riot1", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
-	map(0x0280, 0x02ff).rw("riot2", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
-	map(0x0300, 0x037f).rw("riot3", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0x0200, 0x021f).mirror(0x0060).m(m_riot1, FUNC(mos6532_device::io_map));
+	map(0x0280, 0x029f).mirror(0x0060).m(m_riot2, FUNC(mos6532_device::io_map));
+	map(0x0300, 0x031f).mirror(0x0060).m(m_riot3, FUNC(mos6532_device::io_map));
 	map(0x1000, 0x17ff).rom();
 	map(0x1800, 0x18ff).ram().share("nvram"); // 5101L-1 256x4
 	map(0x2000, 0x2fff).rom();
@@ -315,7 +320,7 @@ INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( gts80_state::slam_w )
 {
-	m_riot2->porta_in_set(newval ? 0x80 : 0, 0x80);
+	m_riot2->pa_bit_w<7>(newval);
 }
 
 u8 gts80_state::port1a_r()
@@ -511,21 +516,21 @@ void gts80_state::p0(machine_config &config)
 	config.set_default_layout(layout_gts80);
 
 	/* Devices */
-	RIOT6532(config, m_riot1, XTAL(3'579'545)/4);
-	m_riot1->in_pa_callback().set(FUNC(gts80_state::port1a_r)); // sw_r
-	m_riot1->out_pb_callback().set(FUNC(gts80_state::port1b_w)); // sw_w
-	m_riot1->irq_callback().set("irq", FUNC(input_merger_device::in_w<0>));
+	MOS6532(config, m_riot1, XTAL(3'579'545)/4);
+	m_riot1->pa_rd_callback().set(FUNC(gts80_state::port1a_r)); // sw_r
+	m_riot1->pb_wr_callback().set(FUNC(gts80_state::port1b_w)); // sw_w
+	m_riot1->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<0>));
 
-	RIOT6532(config, m_riot2, XTAL(3'579'545)/4);
-	m_riot2->in_pa_callback().set(FUNC(gts80_state::port2a_r)); // pa7 - slam tilt
-	m_riot2->out_pa_callback().set(FUNC(gts80_state::port2a_w)); // digit select
-	m_riot2->out_pb_callback().set(FUNC(gts80_state::port2b_w)); // seg
-	m_riot2->irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
+	MOS6532(config, m_riot2, XTAL(3'579'545)/4);
+	m_riot2->pa_rd_callback().set(FUNC(gts80_state::port2a_r)); // pa7 - slam tilt
+	m_riot2->pa_wr_callback().set(FUNC(gts80_state::port2a_w)); // digit select
+	m_riot2->pb_wr_callback().set(FUNC(gts80_state::port2b_w)); // seg
+	m_riot2->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<1>));
 
-	RIOT6532(config, m_riot3, XTAL(3'579'545)/4);
-	m_riot3->out_pa_callback().set(FUNC(gts80_state::port3a_w)); // sol, snd
-	m_riot3->out_pb_callback().set(FUNC(gts80_state::port3b_w)); // lamps
-	m_riot3->irq_callback().set("irq", FUNC(input_merger_device::in_w<2>));
+	MOS6532(config, m_riot3, XTAL(3'579'545)/4);
+	m_riot3->pa_wr_callback().set(FUNC(gts80_state::port3a_w)); // sol, snd
+	m_riot3->pb_wr_callback().set(FUNC(gts80_state::port3b_w)); // lamps
+	m_riot3->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<2>));
 
 	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set_inputline("maincpu", m6502_device::IRQ_LINE);
 
@@ -537,19 +542,19 @@ void gts80_state::p0(machine_config &config)
 void gts80_state::p2(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_PIN2(config, m_p2_sound, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
-}
-
-void gts80_state::r1(machine_config &config)
-{
-	p0(config);
-	GOTTLIEB_SOUND_REV1(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
+	GOTTLIEB_SOUND_PIN2(config, m_p2_sound).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 void gts80_state::r1v(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
+	GOTTLIEB_SOUND_SPEECH_REV1A(config, m_r1_sound).add_route(ALL_OUTPUTS, "mono", 0.75);
+}
+
+void gts80_state::marspp(machine_config &config)
+{
+	p0(config);
+	GOTTLIEB_SOUND_SPEECH_REV1(config, m_r1_sound).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 /* SYSTEM-80 ALTERNATE ROMS =======================================================================
@@ -625,8 +630,9 @@ ROM_START(blckhols)
 
 	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("668-a-s.snd", 0x0400, 0x0400, CRC(5175f307) SHA1(97be8f2bbc393cc45a07fa43daec4bbba2336af8))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sy80.bin", 0x0000, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -641,8 +647,9 @@ ROM_START(circusp)
 
 	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("654.snd", 0x0400, 0x0400, CRC(75c3ad67) SHA1(4f59c451b8659d964d5242728814c2d97f68445b))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sy80.bin", 0x0000, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -657,8 +664,9 @@ ROM_START(cntforce)
 
 	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("656.snd", 0x0400, 0x0400, CRC(0be2cbe9) SHA1(306a3e7d93733562360285de35b331b5daae7250))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sy80.bin", 0x0000, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -675,8 +683,9 @@ ROM_START(eclipse)
 
 	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("671-a-s.snd", 0x0400, 0x0400, CRC(5175f307) SHA1(97be8f2bbc393cc45a07fa43daec4bbba2336af8))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sy80.bin", 0x0000, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -688,8 +697,9 @@ ROM_START(forceii)
 
 	ROM_REGION(0x1000, "p2sound:audiocpu", 0) // no sound
 	ROM_LOAD("661.snd", 0x0400, 0x0400, CRC(650158a7) SHA1(c7a9d521d1e7de1e00e7abc3a97aaaee04f8052e))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sy80.bin", 0x0000, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -722,8 +732,9 @@ ROM_START(jamesb)
 
 	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("658.snd", 0x0400, 0x0400, CRC(962c03df) SHA1(e8ff5d502a038531a921380b75c27ef79b6feac8))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sy80.bin", 0x0000, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 ROM_END
 
 ROM_START(jamesb2)
@@ -732,8 +743,9 @@ ROM_START(jamesb2)
 
 	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("658.snd", 0x0400, 0x0400, CRC(962c03df) SHA1(e8ff5d502a038531a921380b75c27ef79b6feac8))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sy80.bin", 0x0000, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -775,8 +787,9 @@ ROM_START(panthera)
 
 	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("652.snd", 0x0400, 0x0400, CRC(4d0cf2c0) SHA1(0da5d118ffd19b1e78dfaaee3e31c43750d45c8d))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sy80.bin", 0x0000, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 ROM_END
 
 ROM_START(grand8)
@@ -797,8 +810,9 @@ ROM_START(pnkpnthr)
 
 	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("664.snd", 0x0400, 0x0400, CRC(18f4abfd) SHA1(9e85eb7e9b1e2fe71be828ff1b5752424ed42588))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sy80.bin", 0x0000, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -813,8 +827,9 @@ ROM_START(starrace)
 
 	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("657.snd", 0x0400, 0x0400, CRC(3a1d3995) SHA1(6f0bdb34c4fa11d5f8ecbb98ae55bafeb5d62c9e))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sy80.bin", 0x0000, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -829,8 +844,9 @@ ROM_START(spidermn)
 
 	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("653.snd", 0x0400, 0x0400, CRC(f5650c46) SHA1(2d0e50fa2f4b3d633daeaa7454630e3444453cb2))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sy80.bin", 0x0000, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -847,8 +863,9 @@ ROM_START(timeline)
 
 	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("659.snd", 0x0400, 0x0400, CRC(28185568) SHA1(2fd26e7e0a8f050d67159f17634df2b1fc47cbd3))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sy80.bin", 0x0000, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -869,8 +886,9 @@ ROM_START(vlcno_1c)
 
 	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("667-a-s.snd", 0x0400, 0x0400, CRC(894b4e2e) SHA1(d888f8e00b2b50cef5cc916d46e4c5e6699914a1))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sy80.bin", 0x0000, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 ROM_END
 
 ROM_START(vlcno_1b)
@@ -879,8 +897,9 @@ ROM_START(vlcno_1b)
 
 	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("667-a-s.snd", 0x0400, 0x0400, CRC(894b4e2e) SHA1(d888f8e00b2b50cef5cc916d46e4c5e6699914a1))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sy80.bin", 0x0000, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 ROM_END
 
 ROM_START(vlcno_1a)
@@ -889,8 +908,9 @@ ROM_START(vlcno_1a)
 
 	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("667-a-s.snd", 0x0400, 0x0400, CRC(894b4e2e) SHA1(d888f8e00b2b50cef5cc916d46e4c5e6699914a1))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sy80.bin", 0x0000, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -907,29 +927,29 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1981, s80tst,    0,        r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "System 80 Test",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, s80tst,    0,        r1v,    gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "System 80 Test",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
-GAME(1980, panthera,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Panthera",                          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, grand8,    panthera, p0,  gts80, gts80_state, empty_init, ROT0, "Christian Tabart", "Le Grand 8",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, spidermn,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "The Amazing Spider-Man",            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, circusp,   0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Circus",                            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, cntforce,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Counterforce",                      MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, starrace,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Star Race",                         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, jamesb,    0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "James Bond (Timed Play)",           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, jamesb2,   jamesb,   p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "James Bond (3/5-Ball)",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, timeline,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Time Line",                         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, forceii,   0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Force II",                          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, pnkpnthr,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Pink Panther",                      MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, marsp,     0,        r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Mars - God of War",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, marspf,    marsp,    r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Mars - God of War (French speech)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, marspp,    marsp,    r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Mars - God of War (Prototype)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, vlcno_ax,  0,        r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, vlcno_1c,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano (Sound Only set 1)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, vlcno_1b,  vlcno_1c, p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano (Sound Only set 2)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, vlcno_1a,  vlcno_1c, p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano (Sound Only set 3)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, blckhole,  0,        r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Black Hole (Rev. 4)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, blckhole2, blckhole, r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Black Hole (Rev. 2)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, blckhols,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Black Hole (Sound Only)",           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1982, hh,        0,        r1,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Haunted House (Rev. 2)",            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1982, hh_1,      hh,       r1,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Haunted House (Rev. 1)",            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, eclipse,   0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Eclipse",                           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, panthera,  0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Panthera",                          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, grand8,    panthera, p0,     gts80, gts80_state, empty_init, ROT0, "Christian Tabart", "Le Grand 8",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, spidermn,  0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "The Amazing Spider-Man",            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, circusp,   0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Circus",                            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, cntforce,  0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Counterforce",                      MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, starrace,  0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Star Race",                         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, jamesb,    0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "James Bond (Timed Play)",           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, jamesb2,   jamesb,   p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "James Bond (3/5-Ball)",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, timeline,  0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Time Line",                         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, forceii,   0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Force II",                          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, pnkpnthr,  0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Pink Panther",                      MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, marsp,     0,        r1v,    gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Mars - God of War",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, marspf,    marsp,    r1v,    gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Mars - God of War (French speech)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, marspp,    marsp,    marspp, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Mars - God of War (Prototype)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, vlcno_ax,  0,        r1v,    gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, vlcno_1c,  0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano (Sound Only set 1)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, vlcno_1b,  vlcno_1c, p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano (Sound Only set 2)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, vlcno_1a,  vlcno_1c, p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano (Sound Only set 3)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, blckhole,  0,        r1v,    gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Black Hole (Rev. 4)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, blckhole2, blckhole, r1v,    gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Black Hole (Rev. 2)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, blckhols,  0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Black Hole (Sound Only)",           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1982, hh,        0,        r1v,    gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Haunted House (Rev. 2)",            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1982, hh_1,      hh,       r1v,    gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Haunted House (Rev. 1)",            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, eclipse,   0,        p2,     gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Eclipse",                           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

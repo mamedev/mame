@@ -458,9 +458,8 @@ void cdi_state::cdimono1_base(machine_config &config)
 	CDI_SLAVE_HLE(config, m_slave_hle, 0);
 	m_slave_hle->int_callback().set(m_maincpu, FUNC(scc68070_device::in2_w));
 
-	cdrom_image_device &cdrom(CDROM(config, "cdrom"));
-	cdrom.set_interface("cdi_cdrom");
-	cdrom.add_region("cdrom");
+	CDROM(config, m_cdrom);
+	m_cdrom->set_interface("cdi_cdrom");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -504,7 +503,7 @@ void cdi_state::cdimono2(machine_config &config)
 	M68HC05C8(config, m_servo, 4_MHz_XTAL);
 	M68HC05C8(config, m_slave, 4_MHz_XTAL);
 
-	CDROM(config, "cdrom").set_interface("cdi_cdrom");
+	CDROM(config, m_cdrom).set_interface("cdi_cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
 
 	/* sound hardware */
@@ -579,6 +578,8 @@ void cdi_state::cdimono1(machine_config &config)
 void quizard_state::quizard(machine_config &config)
 {
 	cdimono1_base(config);
+	m_cdrom->add_region("cdrom");
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &quizard_state::cdimono1_mem);
 	m_maincpu->uart_rtsn_callback().set(FUNC(quizard_state::mcu_rtsn_from_cpu));
 	m_maincpu->uart_tx_callback().set(FUNC(quizard_state::mcu_rx_from_cpu));

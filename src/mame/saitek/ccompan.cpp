@@ -29,7 +29,7 @@ Hardware notes:
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_ccompan.lh" // clickable
+#include "saitek_ccompan.lh"
 
 
 namespace {

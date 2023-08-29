@@ -32,7 +32,7 @@ BTANB:
 
 #include "speaker.h"
 
-#include "omar.lh" // clickable
+#include "omar.lh"
 
 
 namespace {

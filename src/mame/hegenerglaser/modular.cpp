@@ -94,9 +94,9 @@ Reminder: unsupported on Almeria and Portorose 1.01, this is not a bug.
 #include "mmdisplay2.h"
 
 // internal artwork
-#include "mephisto_alm16.lh" // clickable
-#include "mephisto_alm32.lh" // clickable
-#include "mephisto_gen32.lh" // clickable
+#include "mephisto_alm16.lh"
+#include "mephisto_alm32.lh"
+#include "mephisto_gen32.lh"
 
 
 namespace {

@@ -90,11 +90,11 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	void apply_settings(void);
 
-	u8 m_pla_auto;
-	u16 m_butmask_auto;
-	u16 m_button_mask;
-	bool m_paddle_auto;
-	bool m_paddle_on;
+	u8 m_pla_auto = 0;
+	u16 m_butmask_auto = 0;
+	u16 m_button_mask = 0;
+	bool m_paddle_auto = false;
+	bool m_paddle_on = false;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void lcd_output_w(offs_t offset, u16 data) { m_lcd_pwm->matrix(offset, data); }

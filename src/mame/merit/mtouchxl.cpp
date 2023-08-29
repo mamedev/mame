@@ -31,7 +31,7 @@
 
 #include "emu.h"
 #include "bus/ata/atapicdr.h"
-#include "bus/ata/idehd.h"
+#include "bus/ata/hdd.h"
 #include "bus/isa/isa_cards.h"
 #include "cpu/i386/i386.h"
 #include "machine/at.h"

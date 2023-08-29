@@ -10,15 +10,19 @@
     - A full VIA (VIA1) and a "pseudo-VIA", which is basically a combination GPIO and
       interrupt controller that looks somewhat like a VIA with no timers and no shift register.
     - A SWIM2 floppy controller
-    - An ASC-like 4-channel audio controller
-    - 16/25 MHz CPU clock generator
+    - An EASC-like 4-channel audio controller
+    - A 16/25/33 MHz CPU clock generator
     - Support logic for various external subsystems (ADB, PDS, SCC, SCSI, SONIC)
 
-    The "Ardbeg" ASIC (LC 520) appears to be a modest update of Sonora, adding support for
-    pushbuttons controlling display brightness and sound volume, plus monitor power saver mode.
-    "Prime Time" (LC 475/575 and Quadra 605) adapts the peripheral section of Sonora to the
-    68040 bus, but omits the DRAM and video controllers.  "Prime Time II" is similar but adds
-    an ATA controller.
+    The "Ardbeg" ASIC (LC 520) is a modest update of Sonora, adding support for pushbuttons
+    controlling display brightness and sound volume, plus monitor power saver mode and PWM
+    outputs for software control of the display brightness and contrast.
+
+    Macintosh TV has a Sonora/Ardbeg derivative called "Tinker Bell" which adds video
+    overlay support.
+
+    Sonora was succeeded for 68040 machines by IOSB, PrimeTime, and PrimeTime II, with similar
+    functionality but became pure I/O hubs with no memory controller or video.
 
     Sonora's video controller is in some of the PowerMac chipsets as well.
 */
@@ -175,7 +179,7 @@ void sonora_device::device_reset()
 u32 sonora_device::rom_switch_r(offs_t offset)
 {
 	// disable the overlay
-	if (m_overlay)
+	if (m_overlay && !machine().side_effects_disabled())
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 		const u32 memory_end = m_ram_size - 1;

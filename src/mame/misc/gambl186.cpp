@@ -57,7 +57,7 @@ TODO:
 #include "cpu/mcs51/mcs51.h"
 #include "machine/nvram.h"
 #include "sound/upd7759.h"
-#include "video/clgd542x.h"
+#include "video/pc_vga_cirrus.h"
 
 #include "speaker.h"
 
@@ -393,9 +393,7 @@ void gambl186_state::gambl186_map(address_map &map)
 
 void gambl186_state::gambl186_io(address_map &map)
 {
-	map(0x03b0, 0x03bf).rw("vga", FUNC(cirrus_gd5428_device::port_03b0_r), FUNC(cirrus_gd5428_device::port_03b0_w));
-	map(0x03c0, 0x03cf).rw("vga", FUNC(cirrus_gd5428_device::port_03c0_r), FUNC(cirrus_gd5428_device::port_03c0_w));
-	map(0x03d0, 0x03df).rw("vga", FUNC(cirrus_gd5428_device::port_03d0_r), FUNC(cirrus_gd5428_device::port_03d0_w));
+	map(0x03b0, 0x03df).m("vga", FUNC(cirrus_gd5428_device::io_map));
 	map(0x0400, 0x0401).w(FUNC(gambl186_state::upd_w));      // upd7759 sample index/input
 	map(0x0500, 0x0501).portr("IN0");
 	map(0x0502, 0x0503).portr("IN1");

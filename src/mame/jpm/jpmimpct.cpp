@@ -246,6 +246,8 @@ void jpmimpct_state::machine_start()
 {
 	m_digits.resolve();
 	m_lamp_output.resolve();
+	m_pwrled.resolve();
+	m_statled.resolve();
 
 	save_item(NAME(m_optic_pattern));
 	save_item(NAME(m_payen));
@@ -373,8 +375,8 @@ uint16_t jpmimpct_state::jpmio_r()
 
 void jpmimpct_state::pwrled_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	output().set_value("PWRLED",!(data&0x100));
-	output().set_value("STATLED",!(data&0x200));
+	m_pwrled = !(data & 0x100);
+	m_statled = !(data & 0x200);
 }
 
 void jpmimpct_state::reels_0123_w(offs_t offset, uint16_t data, uint16_t mem_mask)

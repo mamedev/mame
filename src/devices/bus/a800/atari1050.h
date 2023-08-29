@@ -12,7 +12,7 @@
 #pragma once
 
 #include "a8sio.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "machine/wd_fdc.h"
 
 
@@ -38,7 +38,7 @@ private:
 
 	void mem_map(address_map &map);
 
-	required_device<mos6532_new_device> m_pia;
+	required_device<mos6532_device> m_pia;
 	required_device<wd2793_device> m_fdc;
 };
 

@@ -359,45 +359,47 @@ void harddriv_state::hd68k_wr0_write(offs_t offset, uint16_t data)
 
 void harddriv_state::hd68k_wr1_write(offs_t offset, uint16_t data)
 {
-	if (offset == 0) {
+	if (offset == 0)
+	{
 		// logerror("Shifter Interface Latch = %02X\n", data);
 		data = data >> 8;
 		switch (m_sel_select)
 		{
-		case 1: /* SEL1 */
-			m_sel1_data = data;
-			m_sel[0] = m_sel1_data;
-			break;
+			case 1: /* SEL1 */
+				m_sel1_data = data;
+				m_sel[0] = m_sel1_data;
+				break;
 
-		case 2: /* SEL2 */
-			m_sel2_data = data;
-			m_sel[1] = m_sel2_data;
-			break;
+			case 2: /* SEL2 */
+				m_sel2_data = data;
+				m_sel[1] = m_sel2_data;
+				break;
 
-		case 3: /* SEL3 */
-			m_sel3_data = data;
-			m_sel[2] = m_sel3_data;
-			break;
+			case 3: /* SEL3 */
+				m_sel3_data = data;
+				m_sel[2] = m_sel3_data;
+				break;
 
-		case 4: /* SEL4 */
-			m_sel4_data = data;
-			m_sel[3] = m_sel4_data;
-			break;
+			case 4: /* SEL4 */
+				m_sel4_data = data;
+				m_sel[3] = m_sel4_data;
+				break;
 		}
-	} else {
-		logerror("/WR1(%04X)=%02X\n", offset, data);
 	}
+	else
+		logerror("/WR1(%04X)=%02X\n", offset, data);
 }
 
 
 void harddriv_state::hd68k_wr2_write(offs_t offset, uint16_t data)
 {
-	if (offset == 0) {
+	if (offset == 0)
+	{
 		// logerror("Steering Wheel Latch = %02X\n", data);
 		m_wheel = data >> 8;
-	} else {
-		logerror("/WR2(%04X)=%02X\n", offset, data);
 	}
+	else
+		logerror("/WR2(%04X)=%02X\n", offset, data);
 }
 
 

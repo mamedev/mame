@@ -113,7 +113,7 @@
 #include "deco156_m.h"
 #include "machine/eepromser.h"
 #include "cpu/arm/arm.h"
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh7604.h"
 #include "speaker.h"
 
 #include <algorithm>
@@ -539,7 +539,7 @@ void deco_mlc_state::machine_reset()
 void deco_mlc_state::avengrgs(machine_config &config)
 {
 	// basic machine hardware
-	SH2(config, m_maincpu, 42000000/2); // 21 MHz clock confirmed on real board
+	SH2_SH7604(config, m_maincpu, 42000000/2); // 21 MHz clock confirmed on real board
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::avengrgs_map);
 
 	EEPROM_93C46_16BIT(config, m_eeprom); // Actually 93c45
@@ -1014,16 +1014,16 @@ u32 deco_mlc_state::avengrgs_speedup_r()
 void deco_mlc_state::init_avengrgs()
 {
 	// init options
-	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	dynamic_cast<sh2_sh7604_device *>(m_maincpu.target())->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 
 	// set up speed cheat
-	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_pcflush(0x3234);
-	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_pcflush(0x32dc);
+	dynamic_cast<sh2_sh7604_device *>(m_maincpu.target())->sh2drc_add_pcflush(0x3234);
+	dynamic_cast<sh2_sh7604_device *>(m_maincpu.target())->sh2drc_add_pcflush(0x32dc);
 
-	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0100000, 0x01088ff, 0, &m_mainram[0]);
-	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0108a00, 0x011ffff, 0, &m_mainram[0x8a00 / 4]);
-	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0200080, 0x02000ff, 0, &m_clip_ram[0]);
-	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0280000, 0x029ffff, 0, &m_vram[0]);
+	dynamic_cast<sh2_sh7604_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0100000, 0x01088ff, 0, &m_mainram[0]);
+	dynamic_cast<sh2_sh7604_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0108a00, 0x011ffff, 0, &m_mainram[0x8a00 / 4]);
+	dynamic_cast<sh2_sh7604_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0200080, 0x02000ff, 0, &m_clip_ram[0]);
+	dynamic_cast<sh2_sh7604_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0280000, 0x029ffff, 0, &m_vram[0]);
 
 	m_irqLevel = 1;
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01089a0, 0x01089a3, read32smo_delegate(*this, FUNC(deco_mlc_state::avengrgs_speedup_r)));

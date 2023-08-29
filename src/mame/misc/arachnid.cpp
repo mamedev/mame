@@ -133,7 +133,7 @@ THE OFF POSIION UNLESS THE COINAGES
     - Test Mode Won't Activate
     - Layout with Lamps
     - Default monitor is yellow/amber, no colour (board does have an extra
-      composite-out connector though, allowing a standard tv)
+      composite-out connector though, allowing a standard TV)
 */
 
 #include "emu.h"
@@ -538,14 +538,19 @@ void arachnid_state::arachnid(machine_config &config)
     ROMS
 ***************************************************************************/
 
-ROM_START( arac6000 )
+ROM_START( arac6k33 )
+	ROM_REGION( 0x8000, M6809_TAG, 0 )
+	ROM_LOAD( "arachnid_6300t_v33.u15",         0x0000, 0x8000, CRC(6c1b12df) SHA1(a78f19aaa4f3d1f2786cbaf0f19b1b36839a1be0) )
+ROM_END
+
+ROM_START( arac6k27 )
 	ROM_REGION( 0x8000, M6809_TAG, 0 )
 	ROM_LOAD( "01-0140-6300-v2.7-19910208.u15", 0x0000, 0x8000, CRC(f1c4412d) SHA1(6ff9a8f25f315c2df5c0785043521d036ec0964e) )
 ROM_END
 
-ROM_START( arac6spa )
+ROM_START( arac6k28sp )
 	ROM_REGION( 0x8000, M6809_TAG, 0 )
-	ROM_LOAD( "1.u15", 0x0000, 0x8000, CRC(397e890e) SHA1(5b532b046f36dcfbd7118bd5a0fab3436b0b8dc1) )
+	ROM_LOAD( "1.u15",                          0x0000, 0x8000, CRC(397e890e) SHA1(5b532b046f36dcfbd7118bd5a0fab3436b0b8dc1) )
 ROM_END
 
 } // anonymous namespace
@@ -555,6 +560,7 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT        MONITOR  COMPANY     FULLNAME
-GAME( 1990, arac6000, 0,        arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // 6300 v2.7
-GAME( 1990, arac6spa, arac6000, arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts (Spanish)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // 6307 v2.8
+//    YEAR  NAME        PARENT    MACHINE   INPUT     STATE           INIT        MONITOR  COMPANY     FULLNAME
+GAME( 1994, arac6k33,   0,        arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts (v3.3)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // 6300T v3.3
+GAME( 1990, arac6k27,   arac6k33, arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts (v2.7)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // 6300 v2.7
+GAME( 1990, arac6k28sp, arac6k33, arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts (v2.8, Spanish)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // 6307 v2.8

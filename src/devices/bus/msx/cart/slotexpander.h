@@ -7,6 +7,7 @@
 
 #include "bus/msx/slot/cartridge.h"
 
+
 DECLARE_DEVICE_TYPE(MSX_CART_SLOTEXPANDER, msx_cart_interface)
 
 #endif // MAME_BUS_MSX_CART_SLOTEXPANDER_H

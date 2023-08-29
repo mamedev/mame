@@ -25,7 +25,7 @@ and GROM clocked by 3.12MHz/8=390kHz.
 #include "speaker.h"
 
 // internal artwork
-#include "milton.lh" // clickable
+#include "milton.lh"
 
 class milton_filter_device;
 

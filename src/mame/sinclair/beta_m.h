@@ -53,6 +53,7 @@ private:
 
 	required_device<kr1818vg93_device> m_wd179x;
 	required_device_array<floppy_connector, 4> m_floppy;
+	output_finder<4> m_floppy_led;
 	void fdc_hld_w(int state);
 	void motors_control();
 	u8 m_control;

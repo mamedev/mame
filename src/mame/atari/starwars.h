@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "machine/6532riot.h"
 #include "machine/gen_latch.h"
+#include "machine/mos6530.h"
 #include "slapstic.h"
 #include "machine/x2212.h"
 #include "sound/pokey.h"
@@ -47,7 +47,7 @@ public:
 private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_mainlatch;
-	required_device<riot6532_device> m_riot;
+	required_device<mos6532_device> m_riot;
 	required_shared_ptr<uint8_t> m_mathram;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -88,8 +88,6 @@ private:
 	void quad_pokeyn_w(offs_t offset, uint8_t data);
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(math_run_clear);
-	uint8_t r6532_porta_r();
-	void r6532_porta_w(uint8_t data);
 
 	void starwars_mproc_init();
 	void starwars_mproc_reset();

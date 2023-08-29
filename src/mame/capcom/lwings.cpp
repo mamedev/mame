@@ -12,11 +12,6 @@
 To Do:
 -   sectionz does "false contacts" on the coin counters, causing them to
     increment twice per coin.
--   clean up Avengers protection; it currently checks against hard-coded program
-    counter rather than behaving as a memory-mapped black box.
--   Avengers had a protection chip underneath the sound module. Needs to be hooked up.
-    The protection is extensive: palette data, calculates player movement,
-    even a hand in the sound.  The angle/movement stuff isn't 100% accurate either.
 -   accurate music tempo (audiocpu irq freq)
 -   accurate video timing, raw params
 
@@ -32,6 +27,10 @@ FEB-2003 (AT)
     lwingsc37b7gre: incorrect sprite clipping in all games
 
 Notes:
+
+  Avengers has a protection chip underneath the sound module.
+  The protection is extensive: palette data, calculates player movement,
+  even a hand in the sound.
 
   avengers061gre2: corrupted graphics in Avengers' ending not fixed.
   This bug is not in the Japanese set "Buraiken".
@@ -58,14 +57,150 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "lwings.h"
 
+#include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
+#include "sound/msm5205.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
+#include "video/bufsprite.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+namespace {
+
+class lwings_state : public driver_device
+{
+public:
+	lwings_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"),
+		m_adpcmcpu(*this, "adpcmcpu"),
+		m_mcu(*this, "mcu"),
+		m_mculatch(*this, "mculatch%u", 0U),
+		m_msm(*this, "5205"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch"),
+		m_spriteram(*this, "spriteram"),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_bg1videoram(*this, "bg1videoram"),
+		m_soundlatch2(*this, "soundlatch_2"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_samplebank(*this, "samplebank")
+	{ }
+
+	void lwings(machine_config &config);
+	void sectionz(machine_config &config);
+	void trojan(machine_config &config);
+	void fball(machine_config &config);
+	void avengers(machine_config &config);
+	void buraikenb(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	optional_device<cpu_device> m_adpcmcpu;
+	optional_device<i8751_device> m_mcu;
+	optional_device_array<generic_latch_8_device, 3> m_mculatch;
+	optional_device<msm5205_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	// memory pointers
+	required_device<buffered_spriteram8_device> m_spriteram;
+	required_shared_ptr<uint8_t> m_fgvideoram;
+	required_shared_ptr<uint8_t> m_bg1videoram;
+	optional_shared_ptr<uint8_t> m_soundlatch2;
+	required_memory_bank m_bank1;
+	optional_memory_bank m_bank2;
+	optional_memory_bank m_samplebank;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_maincpu_program;
+
+	// video-related
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg1_tilemap = nullptr;
+	tilemap_t *m_bg2_tilemap = nullptr;
+	uint8_t   m_bg2_image = 0U;
+	int       m_spr_avenger_hw = 0;
+	uint8_t   m_scroll_x[2]{};
+	uint8_t   m_scroll_y[2]{};
+
+	// misc
+	uint8_t   m_soundstate = 0U;
+	uint8_t   m_adpcm = 0U;
+	uint8_t   m_nmi_mask = 0U;
+	int       m_sprbank = 0;
+
+	// MCU-related (avengers)
+	uint8_t   m_mcu_data[2]{};
+	uint8_t   m_mcu_control = 0xff;
+
+	void avengers_adpcm_w(uint8_t data);
+	uint8_t avengers_adpcm_r();
+	void lwings_bankswitch_w(uint8_t data);
+	uint8_t avengers_m1_r(offs_t offset);
+	uint8_t avengers_soundlatch2_r();
+	void lwings_fgvideoram_w(offs_t offset, uint8_t data);
+	void lwings_bg1videoram_w(offs_t offset, uint8_t data);
+	void lwings_bg1_scrollx_w(offs_t offset, uint8_t data);
+	void lwings_bg1_scrolly_w(offs_t offset, uint8_t data);
+	void trojan_bg2_scrollx_w(uint8_t data);
+	void trojan_bg2_image_w(uint8_t data);
+	void msm5205_w(uint8_t data);
+	void fball_oki_bank_w(uint8_t data);
+
+	uint8_t mcu_p0_r();
+	uint8_t mcu_p1_r();
+	uint8_t mcu_p2_r();
+	void mcu_p0_w(uint8_t data);
+	void mcu_p2_w(uint8_t data);
+	void mcu_control_w(uint8_t data);
+
+	TILEMAP_MAPPER_MEMBER(get_bg2_memory_offset);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(lwings_get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(trojan_get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	DECLARE_VIDEO_START(trojan);
+	DECLARE_VIDEO_START(avengers);
+	uint32_t screen_update_lwings(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_trojan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void lwings_interrupt(int state);
+	void avengers_interrupt(int state);
+	bool is_sprite_on(uint8_t const *buffered_spriteram, int offs);
+	void lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+
+	void avengers_adpcm_io_map(address_map &map);
+	void avengers_map(address_map &map);
+	void avengers_m1_map(address_map &map);
+	void buraikenb_map(address_map &map);
+	void fball_map(address_map &map);
+	void fball_oki_map(address_map &map);
+	void fball_sound_map(address_map &map);
+	void lwings_map(address_map &map);
+	void lwings_sound_map(address_map &map);
+	void trojan_adpcm_io_map(address_map &map);
+	void trojan_adpcm_map(address_map &map);
+	void trojan_map(address_map &map);
+};
 
 /* Avengers runs on hardware almost identical to Trojan, but with a protection
  * device and some small changes to the memory map and video hardware.
@@ -96,7 +231,7 @@ void lwings_state::lwings_bankswitch_w(uint8_t data)
 	flip_screen_set(~data & 0x01);
 
 	/* bits 1 and 2 select ROM bank */
-	membank("bank1")->set_entry((data & 0x06) >> 1);
+	m_bank1->set_entry((data & 0x06) >> 1);
 
 	/* bit 3 enables NMI */
 	m_nmi_mask = data & 8;
@@ -119,163 +254,61 @@ void lwings_state::avengers_interrupt(int state)
 }
 
 
-void lwings_state::avengers_protection_w(uint8_t data)
+uint8_t lwings_state::mcu_p0_r()
 {
-	int pc = m_maincpu->pc();
+	if (!BIT(m_mcu_control, 7))
+		return m_mculatch[0]->read();
+	else
+		return 0xff;
+}
 
-	if (pc == 0x2eeb)
+uint8_t lwings_state::mcu_p1_r()
+{
+	// this is used to decide if we're sending angle params or a sound write? compares against 0xf0, vpos like 1943?
+	return m_screen->vpos();
+}
+
+uint8_t lwings_state::mcu_p2_r()
+{
+	if (!BIT(m_mcu_control, 7))
+		return m_mculatch[1]->read();
+	else
+		return 0xff;
+}
+
+void lwings_state::mcu_p0_w(uint8_t data)
+{
+	m_mcu_data[0] = data;
+}
+
+void lwings_state::mcu_p2_w(uint8_t data)
+{
+	m_mcu_data[1] = data;
+}
+
+void lwings_state::mcu_control_w(uint8_t data)
+{
+	if (!BIT(m_mcu_control, 6) && BIT(data, 6))
 	{
-		m_param[0] = data;
-	}
-	else if (pc == 0x2f09)
-	{
-		m_param[1] = data;
-	}
-	else if(pc == 0x2f26)
-	{
-		m_param[2] = data;
-	}
-	else if (pc == 0x2f43)
-	{
-		m_param[3] = data;
-	}
-	else if (pc == 0x0445)
-	{
+		//logerror("%s: MCU writes %02X back to main CPU\n", machine().time().to_string(), m_mcu_data[0]);
+		m_mculatch[2]->write(m_mcu_data[0]);
+		m_soundlatch->write(m_mcu_data[1]);
 		m_soundstate = 0x80;
-		m_soundlatch->write(data);
-	}
-}
-
-void lwings_state::avengers_prot_bank_w(uint8_t data)
-{
-	m_palette_pen = data * 64;
-}
-
-int lwings_state::avengers_fetch_paldata(  )
-{
-	static const char pal_data[] =
-	/* page 1: 0x03,0x02,0x01,0x00 */
-	"0000000000000000" "A65486A6364676D6" "C764C777676778A7" "A574E5E5C5756AE5"
-	"0000000000000000" "F51785D505159405" "A637B6A636269636" "F45744E424348824"
-	"0000000000000000" "A33263B303330203" "4454848454440454" "A27242C232523632"
-	"0000000000000000" "1253327202421102" "3386437373631373" "41A331A161715461"
-	"0000000000000000" "1341715000711203" "4442635191622293" "5143D48383D37186"
-	"0000000000000000" "2432423000412305" "6633343302333305" "7234A565A5A4A2A8"
-	"0000000000000000" "46232422A02234A7" "88241624A21454A7" "A3256747A665D3AA"
-	"0000000000000000" "070406020003050B" "0A05090504050508" "05060A090806040C"
-
-	/* page2: 0x07,0x06,0x05,0x04 */
-	"0000000000000000" "2472030503230534" "6392633B23433B53" "0392846454346423"
-	"0000000000000000" "1313052405050423" "3223754805354832" "323346A38686A332"
-	"0000000000000000" "72190723070723D2" "81394776070776D1" "A15929F25959F2F1"
-	"0000000000000000" "650706411A2A1168" "770737C43A3A3466" "87071F013C0C3175"
-	"0000000000000000" "2001402727302020" "4403048F4A484344" "4A050B074E0E4440"
-	"0000000000000000" "3003800C35683130" "5304035C587C5453" "5607080C5B265550"
-	"0000000000000000" "4801D00043854245" "6C020038669A6569" "6604050A69446764"
-	"0000000000000000" "0504000001030504" "0A05090504060307" "04090D0507010403"
-
-	/* page3: 0x0b,0x0a,0x09,0x08 */
-	"0000000000000000" "685A586937F777F7" "988A797A67A7A7A7" "B8CA898DC737F787"
-	"0000000000000000" "4738A61705150505" "8797672835250535" "7777072A25350525"
-	"0000000000000000" "3525642404340404" "6554453554440454" "5544053634540434"
-	"0000000000000000" "2301923203430303" "4333834383630373" "3324034473730363"
-	"0000000000000000" "3130304000762005" "5352525291614193" "6463635483D06581"
-	"0000000000000000" "4241415100483107" "6463631302335304" "76757415A5A077A3"
-	"0000000000000000" "53525282A02A43AA" "76747424A31565A5" "88888536A66089A4"
-	"0000000000000000" "05040304000D050C" "0806050604070707" "0A0A060808000C06"
-
-	/* page4: 0x0f,0x0e,0x0d,0x0c */
-	"0000000000000000" "3470365956342935" "5590578997554958" "73C078A8C573687A"
-	"0000000000000000" "5355650685030604" "2427362686042607" "010A070584010508"
-	"0000000000000000" "0208432454022403" "737A243455733406" "000D050353000307"
-	"0000000000000000" "000A023233003202" "424C134234424204" "000F241132001105"
-	"0000000000000000" "3031113030300030" "5152215252512051" "7273337374723272"
-	"0000000000000000" "4141214041411041" "6263326363623162" "8385448585834383"
-	"0000000000000000" "5153225152512051" "7375437475734273" "9598559697946495"
-	"0000000000000000" "0205020303020102" "0407040606040304" "060A060809060506"
-
-	/* page5: 0x13,0x12,0x11,0x10 */
-	"0000000000000000" "4151D141D3D177F7" "5454C44482C4A7A7" "0404D45491D4F787"
-	"0000000000000000" "0303032374230505" "9696962673560535" "0505054502850525"
-	"0000000000000000" "0303030355030404" "7777770754470454" "0606060603760434"
-	"0000000000000000" "0505053547050303" "4949492945390373" "0808083804580363"
-	"0000000000000000" "0B0C444023442005" "3D3F333433334193" "0000043504046581"
-	"0000000000000000" "0809565085863107" "0B6A352374455304" "00700644050677A3"
-	"0000000000000000" "06073879C8C843AA" "09492739A58765A5" "0050084A060889A4"
-	"0000000000000000" "05060B070B0B050C" "0707090707090707" "00000B08070B0C06"
-
-	/* page6: 0x17,0x16,0x15,0x14 */
-	"0000000000000000" "0034308021620053" "0034417042512542" "0034526064502E31"
-	"0000000000000000" "0106412032733060" "11A6522053628350" "22A6632072620D42"
-	"0000000000000000" "1308223052242080" "2478233071235170" "3578243090230960"
-	"0000000000000000" "2111334333331404" "3353324232324807" "45B5314131310837"
-	"0000000000000000" "3232445444445302" "445443534343B725" "567642524242B745"
-	"0000000000000000" "4343556555550201" "5575546454540524" "6787536353537554"
-	"0000000000000000" "6474667676660100" "7696657575650423" "88A8647474645473"
-	"0000000000000000" "0001070701050004" "0003060603040303" "0005050505040302";
-
-	int bank = m_palette_pen / 64;
-	int offs = m_palette_pen % 64;
-	int page = bank / 4;                    /* 0..7 */
-	int base = (3 - (bank & 3));            /* 0..3 */
-	int row = offs & 0xf;                   /* 0..15 */
-	int col = offs / 16 + base * 4;         /* 0..15 */
-	int digit0 = pal_data[page * 256 * 2 + (31 - row * 2) * 16 + col];
-	int digit1 = pal_data[page * 256 * 2 + (30 - row * 2) * 16 + col];
-	int result;
-
-	if (digit0 >= 'A')
-		digit0 += 10 - 'A';
-	else
-		digit0 -= '0';
-
-	if (digit1 >= 'A')
-		digit1 += 10 - 'A';
-	else
-		digit1 -= '0';
-
-	result = digit0 * 16 + digit1;
-
-	if ((m_palette_pen & 0x3f) != 0x3f)
-		m_palette_pen++;
-
-	return result;
-}
-
-uint8_t lwings_state::avengers_protection_r()
-{
-	static const int xpos[8] = { 10, 7,  0, -7, -10, -7,   0,  7 };
-	static const int ypos[8] = {  0, 7, 10,  7,   0, -7, -10, -7 };
-	int best_dist = 0;
-	int best_dir = 0;
-	int x, y;
-	int dx, dy, dist, dir;
-
-	if (m_maincpu->pc() == 0x7c7)
-	{
-		/* palette data */
-		return avengers_fetch_paldata();
+		machine().scheduler().perfect_quantum(attotime::from_usec(60));
 	}
 
-	/*  Point to Angle Function
+	if (BIT(m_mcu_control, 7) != BIT(data, 7))
+		m_mculatch[0]->acknowledge_w();
 
-	    Input: two cartesian points
-	    Output: direction code (north, northeast, east, ...)
-	 */
-	x = m_param[0] - m_param[2];
-	y = m_param[1] - m_param[3];
-	for (dir = 0; dir < 8; dir++)
-	{
-		dx = xpos[dir] - x;
-		dy = ypos[dir] - y;
-		dist = dx * dx + dy * dy;
-		if (dist < best_dist || dir == 0)
-		{
-			best_dir = dir;
-			best_dist = dist;
-		}
-	}
-	return best_dir << 5;
+	m_mcu_control = data;
+}
+
+uint8_t lwings_state::avengers_m1_r(offs_t offset)
+{
+	// 2 wait states on each M1 access (needed to keep in sync with MCU)
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-2);
+	return m_maincpu_program.read_byte(offset);
 }
 
 uint8_t lwings_state::avengers_soundlatch2_r()
@@ -322,9 +355,14 @@ void lwings_state::avengers_map(address_map &map)
 {
 	buraikenb_map(map);
 
-	map(0xf809, 0xf809).w(FUNC(lwings_state::avengers_protection_w));
-	map(0xf80c, 0xf80c).w(FUNC(lwings_state::avengers_prot_bank_w));
-	map(0xf80d, 0xf80d).r(FUNC(lwings_state::avengers_protection_r));
+	map(0xf809, 0xf809).w(m_mculatch[0], FUNC(generic_latch_8_device::write));
+	map(0xf80c, 0xf80c).w(m_mculatch[1], FUNC(generic_latch_8_device::write));
+	map(0xf80d, 0xf80d).r(m_mculatch[2], FUNC(generic_latch_8_device::read));
+}
+
+void lwings_state::avengers_m1_map(address_map &map)
+{
+	map(0x0000, 0xffff).r(FUNC(lwings_state::avengers_m1_r));
 }
 
 void lwings_state::lwings_map(address_map &map)
@@ -414,7 +452,7 @@ void lwings_state::fball_map(address_map &map)
 void lwings_state::fball_oki_bank_w(uint8_t data)
 {
 	//printf("fball_oki_bank_w %02x\n", data);
-	membank("samplebank")->set_entry((data >> 1) & 0x7);
+	m_samplebank->set_entry((data >> 1) & 0x7);
 }
 
 void lwings_state::fball_oki_map(address_map &map)
@@ -451,6 +489,260 @@ void lwings_state::trojan_adpcm_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch2", FUNC(generic_latch_8_device::read));
 	map(0x01, 0x01).w(FUNC(lwings_state::msm5205_w));
+}
+
+
+/***************************************************************************
+
+  Callbacks for the TileMap code
+
+***************************************************************************/
+
+TILEMAP_MAPPER_MEMBER(lwings_state::get_bg2_memory_offset)
+{
+	return (row * 0x800) | (col * 2);
+}
+
+TILE_GET_INFO_MEMBER(lwings_state::get_fg_tile_info)
+{
+	int code = m_fgvideoram[tile_index];
+	int color = m_fgvideoram[tile_index + 0x400];
+	tileinfo.set(0,
+			code + ((color & 0xc0) << 2),
+			color & 0x0f,
+			TILE_FLIPYX((color & 0x30) >> 4));
+}
+
+TILE_GET_INFO_MEMBER(lwings_state::lwings_get_bg1_tile_info)
+{
+	int code = m_bg1videoram[tile_index];
+	int color = m_bg1videoram[tile_index + 0x400];
+	tileinfo.set(1,
+			code + ((color & 0xe0) << 3),
+			color & 0x07,
+			TILE_FLIPYX((color & 0x18) >> 3));
+}
+
+TILE_GET_INFO_MEMBER(lwings_state::trojan_get_bg1_tile_info)
+{
+	int code = m_bg1videoram[tile_index];
+	int color = m_bg1videoram[tile_index + 0x400];
+	code += (color & 0xe0)<<3;
+	tileinfo.set(1,
+			code,
+			(color & 7),
+			((color & 0x10) ? TILE_FLIPX : 0));
+
+	tileinfo.group = (color & 0x08) >> 3;
+}
+
+TILE_GET_INFO_MEMBER(lwings_state::get_bg2_tile_info)
+{
+	int code, color;
+	uint8_t *rom = memregion("gfx5")->base();
+	int mask = memregion("gfx5")->bytes() - 1;
+
+	tile_index = (tile_index + m_bg2_image * 0x20) & mask;
+	code = rom[tile_index];
+	color = rom[tile_index + 1];
+	tileinfo.set(3,
+			code + ((color & 0x80) << 1),
+			color & 0x07,
+			TILE_FLIPYX((color & 0x30) >> 4));
+}
+
+
+/***************************************************************************
+
+  Start the video hardware emulation.
+
+***************************************************************************/
+
+void lwings_state::video_start()
+{
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::lwings_get_bg1_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+
+	m_fg_tilemap->set_transparent_pen(3);
+}
+
+VIDEO_START_MEMBER(lwings_state,trojan)
+{
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::trojan_get_bg1_tile_info)),TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::get_bg2_tile_info)), tilemap_mapper_delegate(*this, FUNC(lwings_state::get_bg2_memory_offset)), 16, 16, 32, 16);
+
+	m_fg_tilemap->set_transparent_pen(3);
+	m_bg1_tilemap->set_transmask(0, 0xffff, 0x0001); // split type 0 is totally transparent in front half
+	m_bg1_tilemap->set_transmask(1, 0xf07f, 0x0f81); // split type 1 has pens 7-11 opaque in front half
+
+	m_spr_avenger_hw = 0;
+}
+
+VIDEO_START_MEMBER(lwings_state,avengers)
+{
+	VIDEO_START_CALL_MEMBER(trojan);
+	m_spr_avenger_hw = 1;
+}
+
+
+/***************************************************************************
+
+  Memory handlers
+
+***************************************************************************/
+
+void lwings_state::lwings_fgvideoram_w(offs_t offset, uint8_t data)
+{
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+}
+
+void lwings_state::lwings_bg1videoram_w(offs_t offset, uint8_t data)
+{
+	m_bg1videoram[offset] = data;
+	m_bg1_tilemap->mark_tile_dirty(offset & 0x3ff);
+}
+
+
+void lwings_state::lwings_bg1_scrollx_w(offs_t offset, uint8_t data)
+{
+	m_scroll_x[offset] = data;
+	m_bg1_tilemap->set_scrollx(0, m_scroll_x[0] | (m_scroll_x[1] << 8));
+}
+
+void lwings_state::lwings_bg1_scrolly_w(offs_t offset, uint8_t data)
+{
+	m_scroll_y[offset] = data;
+	m_bg1_tilemap->set_scrolly(0, m_scroll_y[0] | (m_scroll_y[1] << 8));
+}
+
+void lwings_state::trojan_bg2_scrollx_w(uint8_t data)
+{
+	m_bg2_tilemap->set_scrollx(0, data);
+}
+
+void lwings_state::trojan_bg2_image_w(uint8_t data)
+{
+	if (m_bg2_image != data)
+	{
+		m_bg2_image = data;
+		m_bg2_tilemap->mark_all_dirty();
+	}
+}
+
+
+/***************************************************************************
+
+  Display refresh
+
+***************************************************************************/
+
+inline bool lwings_state::is_sprite_on(uint8_t const *buffered_spriteram, int offs)
+{
+	int const sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
+	int const sy = buffered_spriteram[offs + 2];
+
+	return sx || sy;
+}
+
+void lwings_state::lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+{
+	uint8_t const *const buffered_spriteram = m_spriteram->buffer();
+
+	for (int offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
+	{
+		if (is_sprite_on(buffered_spriteram, offs))
+		{
+			int sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
+			int sy = buffered_spriteram[offs + 2];
+			if (sy > 0xf8)
+				sy -= 0x100;
+			int code = buffered_spriteram[offs] | (buffered_spriteram[offs + 1] & 0xc0) << 2;
+			int color = (buffered_spriteram[offs + 1] & 0x38) >> 3;
+			int flipx = buffered_spriteram[offs + 1] & 0x02;
+			int flipy = buffered_spriteram[offs + 1] & 0x04;
+
+			if (flip_screen())
+			{
+				sx = 240 - sx;
+				sy = 240 - sy;
+				flipx = !flipx;
+				flipy = !flipy;
+			}
+
+			m_gfxdecode->gfx(2)->transpen(
+					bitmap, cliprect,
+					code + (m_sprbank * 0x400), color,
+					flipx, flipy, sx, sy,
+					15);
+		}
+	}
+}
+
+void lwings_state::trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+{
+	uint8_t const *const buffered_spriteram = m_spriteram->buffer();
+
+	for (int offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
+	{
+		if (is_sprite_on(buffered_spriteram, offs))
+		{
+			int sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
+			int sy = buffered_spriteram[offs + 2];
+			if (sy > 0xf8)
+				sy -= 0x100;
+			int code = buffered_spriteram[offs] |
+					((buffered_spriteram[offs + 1] & 0x20) << 4) |
+					((buffered_spriteram[offs + 1] & 0x40) << 2) |
+					((buffered_spriteram[offs + 1] & 0x80) << 3);
+			int color = (buffered_spriteram[offs + 1] & 0x0e) >> 1;
+
+			int flipx, flipy;
+			if (m_spr_avenger_hw)
+			{
+				flipx = 0;                                      /* Avengers */
+				flipy = ~buffered_spriteram[offs + 1] & 0x10;
+			}
+			else
+			{
+				flipx = buffered_spriteram[offs + 1] & 0x10;    /* Trojan */
+				flipy = 1;
+			}
+
+			if (flip_screen())
+			{
+				sx = 240 - sx;
+				sy = 240 - sy;
+				flipx = !flipx;
+				flipy = !flipy;
+			}
+
+			m_gfxdecode->gfx(2)->transpen(
+					bitmap, cliprect,
+					code, color,
+					flipx, flipy, sx, sy,
+					15);
+		}
+	}
+}
+
+uint32_t lwings_state::screen_update_lwings(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	lwings_draw_sprites(bitmap, cliprect);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+uint32_t lwings_state::screen_update_trojan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	trojan_draw_sprites(bitmap, cliprect);
+	m_bg1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
 }
 
 
@@ -869,22 +1161,22 @@ void lwings_state::machine_start()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	m_bank1->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+
+	m_maincpu->space(AS_PROGRAM).specific(m_maincpu_program);
 
 	save_item(NAME(m_bg2_image));
 	save_item(NAME(m_scroll_x));
 	save_item(NAME(m_scroll_y));
-	save_item(NAME(m_param));
-	save_item(NAME(m_palette_pen));
 	save_item(NAME(m_soundstate));
 	save_item(NAME(m_adpcm));
 	save_item(NAME(m_nmi_mask));
 	save_item(NAME(m_sprbank));
 
 	/*
-	Fireball has 2 copies of the 'fixed' code in the main program rom, with only slight changes.
-	it might be possible the hardware can bank that whole area or alternatively only see one version of the program
-	the only difference is 2 pieces of code have been swapped around.  It is unknown when this code is called.
+	Fireball has 2 copies of the 'fixed' code in the main program ROM, with only slight changes.
+	It might be possible the hardware can bank that whole area or alternatively only see one version of the program
+	The only difference is 2 pieces of code have been swapped around.  It is unknown when this code is called.
 
 	3822:   CD  73
 	3823:   00  23
@@ -909,18 +1201,23 @@ void lwings_state::machine_start()
 
 	*/
 
-	if (membank("bank2"))
+	if (m_bank2.found())
 	{
-		membank("bank2")->configure_entries(0, 2, &ROM[0x0000], 0x8000);
-		membank("bank2")->set_entry(0);
+		m_bank2->configure_entries(0, 2, &ROM[0x0000], 0x8000);
+		m_bank2->set_entry(0);
 	}
 
-	if (membank("samplebank"))
+	if (m_samplebank.found())
 	{
 		uint8_t *OKIROM = memregion("oki")->base();
-		membank("samplebank")->configure_entries(0, 8, OKIROM, 0x20000);
+		m_samplebank->configure_entries(0, 8, OKIROM, 0x20000);
 	}
 
+	if (m_mcu.found())
+	{
+		save_item(NAME(m_mcu_data));
+		save_item(NAME(m_mcu_control));
+	}
 }
 
 void lwings_state::machine_reset()
@@ -930,11 +1227,6 @@ void lwings_state::machine_reset()
 	m_scroll_x[1] = 0;
 	m_scroll_y[0] = 0;
 	m_scroll_y[1] = 0;
-	m_param[0] = 0;
-	m_param[1] = 0;
-	m_param[2] = 0;
-	m_param[3] = 0;
-	m_palette_pen = 0;
 	m_soundstate = 0;
 	m_adpcm = 0;
 }
@@ -955,15 +1247,15 @@ void lwings_state::lwings(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(lwings_state::screen_update_lwings));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
-	screen.screen_vblank().append(FUNC(lwings_state::lwings_interrupt));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(lwings_state::screen_update_lwings));
+	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	m_screen->screen_vblank().append(FUNC(lwings_state::lwings_interrupt));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lwings);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
@@ -992,7 +1284,7 @@ void lwings_state::sectionz(machine_config &config)
 
 	m_maincpu->set_clock(12_MHz_XTAL/4); // XTAL and clock verified on an original PCB and on a bootleg with ROMs matching those of sectionza
 
-	subdevice<screen_device>("screen")->set_refresh_hz(55.37); // verified on an original PCB
+	m_screen->set_refresh_hz(55.37); // verified on an original PCB
 }
 
 void lwings_state::fball(machine_config &config)
@@ -1010,15 +1302,15 @@ void lwings_state::fball(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1); // the 16-pixel black border on left edge is correct, test mode actually uses that area
-	screen.set_screen_update(FUNC(lwings_state::screen_update_lwings));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
-	screen.screen_vblank().append(FUNC(lwings_state::avengers_interrupt));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1); // the 16-pixel black border on left edge is correct, test mode actually uses that area
+	m_screen->set_screen_update(FUNC(lwings_state::screen_update_lwings));
+	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	m_screen->screen_vblank().append(FUNC(lwings_state::avengers_interrupt));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lwings);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
@@ -1052,7 +1344,7 @@ void lwings_state::trojan(machine_config &config)
 	m_gfxdecode->set_info(gfx_trojan);
 
 	MCFG_VIDEO_START_OVERRIDE(lwings_state,trojan)
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(lwings_state::screen_update_trojan));
+	m_screen->set_screen_update(FUNC(lwings_state::screen_update_trojan));
 
 	// sound hardware
 	GENERIC_LATCH_8(config, "soundlatch2");
@@ -1067,13 +1359,28 @@ void lwings_state::avengers(machine_config &config)
 	trojan(config);
 
 	// basic machine hardware
+	m_maincpu->set_clock(12_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::avengers_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &lwings_state::avengers_m1_map);
 
 	I8751(config, m_mcu, 12_MHz_XTAL/2);
+	m_mcu->port_in_cb<0>().set(FUNC(lwings_state::mcu_p0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(lwings_state::mcu_p0_w));
+	m_mcu->port_in_cb<1>().set(FUNC(lwings_state::mcu_p1_r));
+	m_mcu->port_in_cb<2>().set(FUNC(lwings_state::mcu_p2_r));
+	m_mcu->port_out_cb<2>().set(FUNC(lwings_state::mcu_p2_w));
+	m_mcu->port_out_cb<3>().set(FUNC(lwings_state::mcu_control_w));
 
-	screen_device &screen(*subdevice<screen_device>("screen"));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
-	screen.screen_vblank().append(FUNC(lwings_state::avengers_interrupt)); // RST 38h triggered by software
+	GENERIC_LATCH_8(config, m_mculatch[0]);
+	m_mculatch[0]->data_pending_callback().set_inputline(m_mcu, MCS51_INT0_LINE);
+	m_mculatch[0]->data_pending_callback().append([this] (int state) { if (state) machine().scheduler().perfect_quantum(attotime::from_usec(192)); });
+	m_mculatch[0]->set_separate_acknowledge(true);
+
+	GENERIC_LATCH_8(config, m_mculatch[1]);
+	GENERIC_LATCH_8(config, m_mculatch[2]);
+
+	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	m_screen->screen_vblank().append(FUNC(lwings_state::avengers_interrupt)); // RST 38h triggered by software
 
 	m_adpcmcpu->set_addrmap(AS_IO, &lwings_state::avengers_adpcm_io_map);
 
@@ -1088,9 +1395,9 @@ void lwings_state::buraikenb(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::buraikenb_map);
 	config.device_remove("mcu");
-
-	// video hardware
-	MCFG_VIDEO_START_OVERRIDE(lwings_state,buraikenb)
+	config.device_remove("mculatch0");
+	config.device_remove("mculatch1");
+	config.device_remove("mculatch2");
 }
 
 
@@ -1656,6 +1963,18 @@ It was common for Capcom to use the same ROM label across regional sets but add 
   with and without the "U" being stamped.
 
 */
+
+// there is definitely at least one bad opcode in this dump, there could be others affecting enemy movement
+#define AVENGERS_MCU \
+	ROM_REGION( 0x1000, "mcu", 0 ) /* Intel C8751H - 88 */ \
+	ROM_LOAD( "av.13k", 0x0000, 0x1000, BAD_DUMP CRC(505a0987) SHA1(ea1d855a9870d79d0e00eaa88a23038355a1203a) ) \
+	ROM_FILL(0x0b84, 0x01, 0x02) /* bad code! bit 0x80 was flipped */ \
+	/* these palette entries look wrong, but the low bit is unused, so could just be like that */ \
+	ROM_FILL(0x0481, 0x01, 0x00) \
+	ROM_FILL(0x04e0, 0x01, 0x00) \
+	ROM_FILL(0x0483, 0x01, 0xa0) \
+	ROM_FILL(0x04c3, 0x01, 0x30)
+
 ROM_START( avengers )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "avu_04c.10n",  0x00000, 0x8000, CRC(4555b925) SHA1(49829272b23a39798bcaeb6d847a4091031b3dec) ) /* Red stripe across label for US region */
@@ -1668,8 +1987,7 @@ ROM_START( avengers )
 	ROM_REGION( 0x10000, "adpcmcpu", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "av_01.6d",     0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
-	ROM_REGION( 0x1000, "mcu", 0 ) // Intel C8751H-88
-	ROM_LOAD( "av.13k", 0x0000, 0x1000, CRC(505a0987) SHA1(ea1d855a9870d79d0e00eaa88a23038355a1203a) )
+	AVENGERS_MCU
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "av_03.8k",     0x00000, 0x8000, CRC(efb5883e) SHA1(08aebf579f2c5ff472db66597cde1c6871d7d757) )  /* characters */
@@ -1718,8 +2036,7 @@ ROM_START( avengersa )
 	ROM_REGION( 0x10000, "adpcmcpu", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "av_01.6d",     0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
-	ROM_REGION( 0x1000, "mcu", 0 ) // Intel C8751H-88
-	ROM_LOAD( "av.13k", 0x0000, 0x1000, CRC(505a0987) SHA1(ea1d855a9870d79d0e00eaa88a23038355a1203a) )
+	AVENGERS_MCU
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "av_03.8k",     0x00000, 0x8000, CRC(efb5883e) SHA1(08aebf579f2c5ff472db66597cde1c6871d7d757) )  /* characters */
@@ -1768,8 +2085,7 @@ ROM_START( avengersb )
 	ROM_REGION( 0x10000, "adpcmcpu", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "av_01.6d",     0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
-	ROM_REGION( 0x1000, "mcu", 0 ) // Intel C8751H-88
-	ROM_LOAD( "av.13k", 0x0000, 0x1000, CRC(505a0987) SHA1(ea1d855a9870d79d0e00eaa88a23038355a1203a) )
+	AVENGERS_MCU
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "av_03.8k",     0x00000, 0x8000, CRC(efb5883e) SHA1(08aebf579f2c5ff472db66597cde1c6871d7d757) )  /* characters */
@@ -1818,8 +2134,7 @@ ROM_START( avengersc )
 	ROM_REGION( 0x10000, "adpcmcpu", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "av_01.6d",     0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
-	ROM_REGION( 0x1000, "mcu", 0 ) // Intel C8751H-88
-	ROM_LOAD( "av.13k", 0x0000, 0x1000, CRC(505a0987) SHA1(ea1d855a9870d79d0e00eaa88a23038355a1203a) )
+	AVENGERS_MCU
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "av_03.8k",     0x00000, 0x8000, CRC(efb5883e) SHA1(08aebf579f2c5ff472db66597cde1c6871d7d757) )  /* characters */
@@ -1868,8 +2183,7 @@ ROM_START( buraiken )
 	ROM_REGION( 0x10000, "adpcmcpu", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "av_01.6d",     0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
-	ROM_REGION( 0x1000, "mcu", 0 ) // Intel C8751H-88
-	ROM_LOAD( "av.13k", 0x0000, 0x1000, CRC(505a0987) SHA1(ea1d855a9870d79d0e00eaa88a23038355a1203a) )
+	AVENGERS_MCU
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "av_03.8k",     0x00000, 0x8000, CRC(efb5883e) SHA1(08aebf579f2c5ff472db66597cde1c6871d7d757) )  /* characters */
@@ -1952,6 +2266,8 @@ ROM_START( buraikenb )
 	ROM_LOAD( "tbb_2bpr.7j",  0x0000,  0x0100, CRC(d96bcc98) SHA1(99e69a624d5586e5eedacd2083fa68b36e7b5e40) )   /* timing (not used) */
 	ROM_LOAD( "tbb_1bpr.1e",  0x0100,  0x0100, CRC(5052fa9d) SHA1(8cd240f4795a7ae76499573c09069dba37182be2) )   /* priority (not used) */
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

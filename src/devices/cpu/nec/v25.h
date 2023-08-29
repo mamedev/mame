@@ -63,6 +63,7 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -126,7 +127,7 @@ private:
 
 	address_space *m_program;
 	std::function<u8 (offs_t address)> m_dr8;
-	address_space *m_data;
+	memory_access<9, 1, 0, ENDIANNESS_LITTLE>::specific m_data;
 	address_space *m_io;
 	int     m_icount;
 

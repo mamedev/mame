@@ -143,27 +143,24 @@
 	NSSize const    regCurrent = [regScroll frame].size;
 	NSSize const    regSize = [NSScrollView frameSizeForContentSize:[regView maximumFrameSize]
 											horizontalScrollerClass:[NSScroller class]
-											verticalScrollerClass:[NSScroller class]
-											borderType:[regScroll borderType]
-											controlSize: NSControlSizeRegular
-											scrollerStyle: NSScrollerStyleOverlay
-											];
+											  verticalScrollerClass:[NSScroller class]
+														 borderType:[regScroll borderType]
+														controlSize:NSControlSizeRegular
+													  scrollerStyle:NSScrollerStyleOverlay];
 	NSSize const    dasmCurrent = [dasmScroll frame].size;
 	NSSize const    dasmSize = [NSScrollView frameSizeForContentSize:[dasmView maximumFrameSize]
-											horizontalScrollerClass:[NSScroller class]
-											verticalScrollerClass:[NSScroller class]
-											borderType:[dasmScroll borderType]
-											controlSize: NSControlSizeRegular
-											scrollerStyle: NSScrollerStyleOverlay
-											];
+											 horizontalScrollerClass:[NSScroller class]
+											   verticalScrollerClass:[NSScroller class]
+														  borderType:[dasmScroll borderType]
+														 controlSize:NSControlSizeRegular
+													   scrollerStyle:NSScrollerStyleOverlay];
 	NSSize const    consoleCurrent = [consoleContainer frame].size;
 	NSSize          consoleSize = [NSScrollView frameSizeForContentSize:[consoleView maximumFrameSize]
-											horizontalScrollerClass:[NSScroller class]
-											verticalScrollerClass:[NSScroller class]
-											borderType:[consoleScroll borderType]
-											controlSize: NSControlSizeRegular
-											scrollerStyle: NSScrollerStyleOverlay
-											];
+												horizontalScrollerClass:[NSScroller class]
+												  verticalScrollerClass:[NSScroller class]
+															 borderType:[consoleScroll borderType]
+															controlSize:NSControlSizeRegular
+														  scrollerStyle:NSScrollerStyleOverlay];
 	NSRect          windowFrame = [window frame];
 	NSSize          adjustment;
 

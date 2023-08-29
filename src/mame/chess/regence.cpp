@@ -4,7 +4,7 @@
 
 La Régence, French chess computer by "France Double R". German distribution
 by Sandy Electronic, who sub-titled it TSB 4 (Turniersensorbrett), the EPROM
-contents is the same.
+contents is the same. There is no English version.
 
 The chess engine is Richard Lang's Cyrus.
 
@@ -31,7 +31,7 @@ NVRAM fails at next power-on.
 #include "speaker.h"
 
 // internal artwork
-#include "regence.lh" // clickable
+#include "regence.lh"
 
 
 namespace {

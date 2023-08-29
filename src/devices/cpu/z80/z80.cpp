@@ -33,7 +33,7 @@
  *    Now:
  *      + fetch opcode
  *      + call EXEC()
-          + execute instruction adjusting icount per each Read (arg(), recursive rop()) and Write
+ *        + execute instruction adjusting icount per each Read (arg(), recursive rop()) and Write
  *   Changes in 3.9:
  *    - Fixed cycle counts for LD IYL/IXL/IYH/IXH,n [Marshmellow]
  *    - Fixed X/Y flags in CCF/SCF/BIT, ZEXALL is happy now [hap]

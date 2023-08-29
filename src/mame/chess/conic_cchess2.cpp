@@ -37,7 +37,7 @@ BTANB:
 #include "speaker.h"
 
 // internal artwork
-#include "conic_cchess2.lh" // clickable
+#include "conic_cchess2.lh"
 
 
 namespace {

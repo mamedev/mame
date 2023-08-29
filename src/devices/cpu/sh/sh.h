@@ -506,4 +506,4 @@ protected:
 	sh_common_execution *m_sh;
 };
 
-#endif // MAME_CPU_SH2_SH2_H
+#endif // MAME_CPU_SH_SH_H

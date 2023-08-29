@@ -10110,6 +10110,48 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="nightmov">
+		<description>Night Moves</description>
+		<year>1990</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Shadow Warriors"/>
+			<dataarea name="cass" size="1219882">
+				<rom name="Night_Moves_Tape_1_Side_1.tap" size="1219882" crc="90262580" sha1="29d733c2e862d4a13c0379e5279b7cda3b8367f7"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Sly Spy Secret Agent Tape 1"/>
+			<dataarea name="cass" size="1887906">
+				<rom name="Night_Moves_Tape_2_Side_1.tap" size="1887906" crc="b240930f" sha1="c8688cd9915b1a0ed06addef964b3efdcbcb754c"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Sly Spy Secret Agent Tape 2"/>
+			<dataarea name="cass" size="2168074">
+				<rom name="Night_Moves_Tape_3_Side_1.tap" size="2168074" crc="a6cc802c" sha1="35a4149be36f1bf778fa5e3cbf79c0529d0f125f"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Midnight Resistance"/>
+			<dataarea name="cass" size="1132466">
+				<rom name="Night_Moves_Tape_4_Side_1.tap" size="1132466" crc="4d2e699a" sha1="fbcea22668912264bb75289286fe3cd2b5f2b505"/>
+			</dataarea>
+		</part>
+
+		<part name="cass5" interface="cbm_cass">
+			<feature name="part_id" value="Nightbreed"/>
+			<dataarea name="cass" size="2466088">
+				<rom name="Night_Moves_Tape_5_Side_1.tap" size="2466088" crc="7e6ac7a2" sha1="f8e16f45fe0f1a6f69842e66b63418dd77343851"/>
+			</dataarea>
+		</part>
+
+	</software>
+
 	<software name="nghtracr">
 		<description>Night Racer</description>
 		<year>1988</year>
@@ -12757,6 +12799,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="seuck">
+		<description>Shoot-'em-Up Construction Kit</description>
+		<year>1992</year>
+		<publisher>GBH</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="1233082">
+				<rom name="Shoot'em-Up_Construction_Kit_Side_1.tap" size="1233082" crc="1b77bc30" sha1="141bcb860c682805490969e7e826fac710c53bf9"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="1016688">
+				<rom name="Shoot'em-Up_Construction_Kit_Side_2.tap" size="1016688" crc="541dbc2b" sha1="43ad0cdfc6e9722bddd7c8c50bbf5600d37962a9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shrtcirc">
 		<description>Short Circuit</description>
 		<year>1989</year>
@@ -13709,6 +13771,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="462635">
 				<rom name="Steel.tap" size="462635" crc="17c8128f" sha1="a21c18703d1d8d9686e6099647c5975b2ab32b27"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stegslug">
+		<description>Steg the Slug</description>
+		<year>1992</year>
+		<publisher>Codemasters</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="744667">
+				<rom name="Steg_The_Slug.tap" size="744667" crc="defbc02d" sha1="a8b38a06f706c0df6b8eafd4dc14e211638dc2a5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15549,6 +15623,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="717000">
 				<rom name="Trollie_Wallie.tap" size="717000" crc="047f5190" sha1="0bdb884d5a2d8eb7a5034fa580d1619a61d3470a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trbochrg">
+		<description>Turbocharge</description>
+		<year>1991</year>
+		<publisher>System 3</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="3125982">
+				<rom name="Turbo_Charge.tap" size="3125982" crc="e8d1dd51" sha1="98a84c49ccdc99b13d7724c3fbbe5abf85400f68"/>
 			</dataarea>
 		</part>
 	</software>

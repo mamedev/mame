@@ -58,6 +58,7 @@ private:
 	required_ioport_array<4> m_keypad;
 };
 
+
 /*********************************************************************************
  *
  *  Memory maps
@@ -84,10 +85,11 @@ void astrocde_home_state::astrocade_mem(address_map &map)
 void astrocde_home_state::astrocade_io(address_map &map)
 {
 	map(0x00, 0x0f).select(0xff00).rw(FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
-	map(0x10, 0x1f).select(0xff00).r("astrocade1", FUNC(astrocade_io_device::read));
-	map(0x10, 0x18).select(0xff00).w("astrocade1", FUNC(astrocade_io_device::write));
+	map(0x10, 0x1f).select(0xff00).r(m_astrocade_sound[0], FUNC(astrocade_io_device::read));
+	map(0x10, 0x18).select(0xff00).w(m_astrocade_sound[0], FUNC(astrocade_io_device::write));
 	map(0x19, 0x19).mirror(0xff00).w(FUNC(astrocde_state::expand_register_w));
 }
+
 
 /*************************************
  *
@@ -210,13 +212,13 @@ void astrocde_home_state::astrocde(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ASTROCADE_IO(config, m_astrocade_sound1, ASTROCADE_CLOCK/4);
-	m_astrocade_sound1->si_cb().set(FUNC(astrocde_home_state::inputs_r));
-	m_astrocade_sound1->pot_cb<0>().set(m_ctrl[0], FUNC(astrocade_ctrl_port_device::read_knob));
-	m_astrocade_sound1->pot_cb<1>().set(m_ctrl[1], FUNC(astrocade_ctrl_port_device::read_knob));
-	m_astrocade_sound1->pot_cb<2>().set(m_ctrl[2], FUNC(astrocade_ctrl_port_device::read_knob));
-	m_astrocade_sound1->pot_cb<3>().set(m_ctrl[3], FUNC(astrocade_ctrl_port_device::read_knob));
-	m_astrocade_sound1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	ASTROCADE_IO(config, m_astrocade_sound[0], ASTROCADE_CLOCK/4);
+	m_astrocade_sound[0]->si_cb().set(FUNC(astrocde_home_state::inputs_r));
+	m_astrocade_sound[0]->pot_cb<0>().set(m_ctrl[0], FUNC(astrocade_ctrl_port_device::read_knob));
+	m_astrocade_sound[0]->pot_cb<1>().set(m_ctrl[1], FUNC(astrocade_ctrl_port_device::read_knob));
+	m_astrocade_sound[0]->pot_cb<2>().set(m_ctrl[2], FUNC(astrocade_ctrl_port_device::read_knob));
+	m_astrocade_sound[0]->pot_cb<3>().set(m_ctrl[3], FUNC(astrocade_ctrl_port_device::read_knob));
+	m_astrocade_sound[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* expansion port */
 	ASTROCADE_EXP_SLOT(config, m_exp, astrocade_exp, nullptr);
@@ -253,6 +255,7 @@ ROM_START( astrocdw )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bioswhit.bin",  0x0000, 0x2000, CRC(6eb53e79) SHA1(d84341feec1a0a0e8aa6151b649bc3cf6ef69fbf) )
 ROM_END
+
 
 /*************************************
  *

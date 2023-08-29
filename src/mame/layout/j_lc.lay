@@ -130,34 +130,34 @@ license:CC0-1.0
 			<param name="i" start="1" increment="1" />
 			<param name="x" start="20" increment="60" />
 			<element ref="rect_white">
-				<bounds x="~x~" y="320" width="40" height="80"/>
+				<bounds x="~x~" y="220" width="40" height="80"/>
 			</element>
 			<element ref="Reel ~i~" state="0">
-				<bounds x="~x~" y="320" width="40" height="80"/>
+				<bounds x="~x~" y="220" width="40" height="80"/>
 				<yscroll name="sreel~i~" size="0.15" wrap="yes" min="65536" max="0"/>
 			</element>
 		</repeat>
 		<element ref="rect_black">
-			<bounds x="20" y="360" width="240" height="1"/>
+			<bounds x="20" y="260" width="240" height="1"/>
 		</element>
-		<element name="digit1" ref="LCD"><bounds x="260" y="390" width="18" height="30" /></element>
-		<element name="digit0" ref="LCD"><bounds x="284" y="390" width="18" height="30" /></element>
+		<element name="digit1" ref="LCD"><bounds x="260" y="290" width="18" height="30" /></element>
+		<element name="digit0" ref="LCD"><bounds x="284" y="290" width="18" height="30" /></element>
 		<element ref="text_credits">
-			<bounds x="260" y="420" width="36" height="15"/>
+			<bounds x="260" y="320" width="36" height="15"/>
 		</element>
 		<repeat count="9">
 			<param name="i" start="0" increment="8" />
-			<param name="y" start="0" increment="8" />
+			<param name="y" start="0" increment="12" />
 			<repeat count="8">
 				<param name="j" start="~i~" increment="1" />
-				<param name="x" start="0" increment="8" />
+				<param name="x" start="0" increment="12" />
 				<element name="lamp~j~" ref="matrixlamp" state="0">
-					<bounds x="~x~" y="~y~" width="7" height="7"/>
+					<bounds x="~x~" y="~y~" width="11" height="11"/>
 				</element>
 			</repeat>
 		</repeat>
 		<element name="lamp73" ref="matrixlamp" state="0"> <!-- One more lamp -->
-			<bounds x="0" y="72" width="7" height="7"/>
+			<bounds x="0" y="108" width="11" height="11"/>
 		</element>
 	</view>
 </mamelayout>

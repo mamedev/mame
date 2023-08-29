@@ -54,7 +54,7 @@ LCD module
 #include "speaker.h"
 
 // internal artwork
-#include "cxg_sphinx40.lh" // clickable
+#include "cxg_sphinx40.lh"
 
 
 namespace {

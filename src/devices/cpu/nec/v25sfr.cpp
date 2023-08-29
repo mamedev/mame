@@ -605,7 +605,7 @@ void v25_common_device::idb_w(uint8_t d)
 uint8_t v25_common_device::v25_read_byte(unsigned a)
 {
 	if (((a & 0xffe00) == m_IDB && (m_RAMEN || BIT(a, 8))) || a == 0xfffff)
-		return m_data->read_byte(a & 0x1ff);
+		return m_data.read_byte(a & 0x1ff);
 	else
 		return m_program->read_byte(a);
 }
@@ -617,9 +617,9 @@ uint16_t v25_common_device::v25_read_word(unsigned a)
 
 	// not sure about this - manual says FFFFC-FFFFE are "reserved"
 	if (a == 0xffffe)
-		return (m_program->read_byte(a) | (m_data->read_byte(0x1ff) << 8));
+		return (m_program->read_byte(a) | (m_data.read_byte(0x1ff) << 8));
 	else if ((a & 0xffe00) == m_IDB && (m_RAMEN || BIT(a, 8)))
-		return m_data->read_word(a & 0x1ff);
+		return m_data.read_word(a & 0x1ff);
 	else
 		return m_program->read_word(a);
 }
@@ -627,7 +627,7 @@ uint16_t v25_common_device::v25_read_word(unsigned a)
 void v25_common_device::v25_write_byte(unsigned a, uint8_t d)
 {
 	if (((a & 0xffe00) == m_IDB && (m_RAMEN || BIT(a, 8))) || a == 0xfffff)
-		m_data->write_byte(a & 0x1ff, d);
+		m_data.write_byte(a & 0x1ff, d);
 	else
 		m_program->write_byte(a, d);
 }
@@ -645,10 +645,22 @@ void v25_common_device::v25_write_word(unsigned a, uint16_t d)
 	if (a == 0xffffe)
 	{
 		m_program->write_byte(a, d);
-		m_data->write_byte(0x1ff, d >> 8);
+		m_data.write_byte(0x1ff, d >> 8);
 	}
 	else if ((a & 0xffe00) == m_IDB && (m_RAMEN || BIT(a, 8)))
-		m_data->write_word(a & 0x1ff, d);
+		m_data.write_word(a & 0x1ff, d);
 	else
 		m_program->write_word(a, d);
+}
+
+bool v25_common_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
+{
+	if (spacenum == AS_PROGRAM && intention != TR_FETCH && (((address & 0xffe00) == m_IDB && (m_RAMEN || BIT(address, 8))) || address == 0xfffff))
+	{
+		address &= 0x1ff;
+		target_space = &m_data.space();
+	}
+	else
+		target_space = &space(spacenum);
+	return true;
 }

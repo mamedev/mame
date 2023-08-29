@@ -393,13 +393,13 @@ void slapfght_ms_state::slapfighm(machine_config &config)
 	ym2203_device &ym1(YM2203(config, "ym1", 20_MHz_XTAL / 5)); // divisor unknown
 	ym1.port_a_read_callback().set_ioport("IN0");
 	ym1.port_b_read_callback().set_ioport("IN1");
-	ym1.irq_handler().set_log("ym 1 IRQ");
+	ym1.irq_handler().set([this](int state) { if (state) logerror("ym 1 IRQ\n"); });
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	ym2203_device &ym2(YM2203(config, "ym2", 20_MHz_XTAL / 5)); // divisor unknown
 	ym2.port_a_read_callback().set_ioport("SW1");
 	ym2.port_b_read_callback().set_ioport("SW2");
-	ym2.irq_handler().set_log("ym 2 IRQ");
+	ym2.irq_handler().set([this](int state) { if (state) logerror("ym 2 IRQ\n"); });
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.15);
 }
 

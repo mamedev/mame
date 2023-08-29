@@ -21,6 +21,7 @@ atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, const char
 
 atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	atapi_hle_device(mconfig, type, tag, owner, clock),
+	device_ata_interface(mconfig, *this),
 	ultra_dma_mode(0)
 {
 }
@@ -161,6 +162,7 @@ void atapi_cdrom_device::ExecCommand()
 		case T10MMC_CMD_PLAY_AUDIO_TRACK_INDEX:
 		case T10MMC_CMD_PAUSE_RESUME:
 		case T10MMC_CMD_PLAY_AUDIO_12:
+		case T10MMC_CMD_READ_CD:
 		case T10SBC_CMD_READ_12:
 			if(!m_image->exists())
 			{

@@ -53,7 +53,6 @@ public:
 		, m_player_crash(*this, "sound_nl:player_crash%u", 1U)
 	{ }
 
-	void init_carpolo();
 	void carpolo(machine_config &config);
 
 protected:

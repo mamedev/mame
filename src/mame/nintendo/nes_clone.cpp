@@ -1249,6 +1249,11 @@ ROM_START( dancexpt )
 	ROM_LOAD( "dancingexpert27c020.bin", 0x00000, 0x40000, CRC(b653c40c) SHA1(9b74e56768ea5b5309df9761fb442b9be0be46e9) )
 ROM_END
 
+ROM_START( digezlg )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "15-in-1_digitalezlg.bin", 0x00000, 0x80000, CRC(11944bf2) SHA1(7c3744926cd1be9d7d81d29333b1839be201fefc) )
+ROM_END
+
 void nes_clone_state::init_nes_clone()
 {
 }
@@ -1297,3 +1302,6 @@ CONS( 200?, vtvsocr,     0,  0,  nes_clone_vtvsocr, nes_clone, nes_clone_vtvsocr
 CONS( 2010, hs36red, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "HengSheng", "HengSheng 36-in-1 (Red pad)", MACHINE_NOT_WORKING )
 CONS( 2010, hs36blk, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "HengSheng", "HengSheng 36-in-1 (Black pad)", MACHINE_NOT_WORKING )
 
+
+// in early 2000s LG TVs
+CONS( 200?, digezlg, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "LG", "Digital ez LG", MACHINE_NOT_WORKING )

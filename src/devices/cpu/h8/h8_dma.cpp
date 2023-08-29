@@ -72,7 +72,7 @@ void h8gen_dma_device::start_stop_test()
 		if(BIT(chnmap, i)) {
 			if(!(m_dmach[i >> 1]->m_state[i & 1].m_flags & h8_dma_state::ACTIVE))
 				m_dmach[i >> 1]->start(i & 1);
-			
+
 		} else {
 			if(m_dmach[i >> 1] && (m_dmach[i >> 1]->m_state[i & 1].m_flags & h8_dma_state::ACTIVE)) {
 				logerror("forced abort %d\n", i);
@@ -138,7 +138,7 @@ void h8gen_dma_channel_device::set_dreq(int state)
 		return;
 
 	m_dreq = state;
-	
+
 	// Only subchannel B/1 can react to dreq.
 
 	if(m_dreq) {
@@ -317,7 +317,7 @@ void h8gen_dma_channel_device::start(int submodule)
 	int step = m_state[submodule].m_flags & h8_dma_state::MODE_16 ? 2 : 1;
 
 	m_state[submodule].m_incs = m_state[submodule].m_flags & h8_dma_state::SOURCE_IDLE ? 0 :  m_state[submodule].m_flags & h8_dma_state::SOURCE_DECREMENT ? -step : step;
-	m_state[submodule].m_incd = m_state[submodule].m_flags & h8_dma_state::DEST_IDLE ? 0 :  m_state[submodule].m_flags & h8_dma_state::DEST_DECREMENT ? -step : step;		
+	m_state[submodule].m_incd = m_state[submodule].m_flags & h8_dma_state::DEST_IDLE ? 0 :  m_state[submodule].m_flags & h8_dma_state::DEST_DECREMENT ? -step : step;
 
 	logerror("%c: setup src=%s%s dst=%s%s count=%x bcount=%x trigger=%s%s%s%s%s%s%s%s%s\n",
 			 'A' + submodule,
@@ -597,7 +597,7 @@ u16 h8h_dma_channel_device::channel_flags(int submodule) const
 			res |= h8_dma_state::MAR_IS_DEST | h8_dma_state::SOURCE_IDLE;
 		else
 			res |= h8_dma_state::DEST_IDLE;
-			
+
 		if(BIT(m_dtcr[submodule], 5))
 			res |= (res & h8_dma_state::MAR_IS_DEST) ? h8_dma_state::DEST_DECREMENT : h8_dma_state::SOURCE_DECREMENT;
 
@@ -725,7 +725,7 @@ u16 h8s_dma_channel_device::channel_flags(int submodule) const
 			res |= h8_dma_state::MAR_IS_DEST | h8_dma_state::SOURCE_IDLE;
 		else
 			res |= h8_dma_state::DEST_IDLE;
-			
+
 		if(BIT(cr, 6))
 			res |= (res & h8_dma_state::MAR_IS_DEST) ? h8_dma_state::DEST_DECREMENT : h8_dma_state::SOURCE_DECREMENT;
 

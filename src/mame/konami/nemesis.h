@@ -86,19 +86,19 @@ private:
 	int       m_spriteram_words = 0;
 	int       m_tilemap_flip = 0;
 	int       m_flipscreen = 0;
-	uint8_t     m_irq_port_last = 0;
-	uint8_t     m_blank_tile[8*8];
-	uint8_t     m_palette_lookup[32];
+	uint8_t   m_irq_port_last = 0;
+	uint8_t   m_blank_tile[8*8] = { };
+	uint8_t   m_palette_lookup[32] = { };
 
 	/* misc */
 	int       m_irq_on = 0;
 	int       m_irq1_on = 0;
 	int       m_irq2_on = 0;
 	int       m_irq4_on = 0;
-	uint8_t    m_selected_ip = 0; // needed for Hyper Crash
+	uint8_t   m_selected_ip = 0; // needed for Hyper Crash
 	int       m_gx400_irq1_cnt = 0;
-	uint8_t     m_frame_counter = 0;
-	uint16_t    m_scanline_counter = 0;
+	uint8_t   m_gx400_speech_offset = 0;
+	uint16_t  m_scanline_counter = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -128,7 +128,6 @@ private:
 	void selected_ip_w(uint8_t data);
 	uint8_t selected_ip_r();
 	void bubsys_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint8_t wd_r();
 	void gfx_flipx_w(int state);
 	void gfx_flipy_w(int state);
 	void salamand_control_port_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -141,6 +140,7 @@ private:
 	void nemesis_filter_w(offs_t offset, uint8_t data);
 	void gx400_speech_w(offs_t offset, uint8_t data);
 	void salamand_speech_start_w(uint8_t data);
+	uint8_t salamand_speech_busy_r();
 	uint8_t nemesis_portA_r();
 	void city_sound_bank_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

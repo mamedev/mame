@@ -67,8 +67,8 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_galileo.lh" // clickable
-#include "saitek_leonardo.lh" // clickable
+#include "saitek_galileo.lh"
+#include "saitek_leonardo.lh"
 
 
 namespace {

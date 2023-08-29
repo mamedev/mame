@@ -17,7 +17,7 @@
     arkanoidu   USA version. MCU code properly dumped.
     arkanoidj   Japanese version. Final revision, MCU code properly dumped.
     arkanoidja  Japanese version. A later revision with level selector, MCU code properly dumped.
-    arkanoidpe  Licensed to Phoenix Electronics Co. MCU code not dumped.
+    arkanoidpe  Licensed to Phoenix Electronics Co. MCU code properly dumped.
 
     arkatour    Tournament Arkanoid, US version, MCU code properly dumped.
     arkatour2   Tournament Arkanoid, US version (newer? higher ROM numbers), MCU code not dumped.
@@ -1690,7 +1690,7 @@ ROM_START( arkanoidpe ) // Licensed to Phoenix Electronics Co.
 	ROM_LOAD( "22.ic16",    0x8000, 0x8000, CRC(bf784501) SHA1(32491746f71f95ac47737761032ae8884b6d9a8d) )
 
 	ROM_REGION( 0x0800, "mcu:mcu", 0 ) // 2k for the microcontroller
-	ROM_LOAD( "a75__15.ic14",   0x0000, 0x0800, NO_DUMP )
+	ROM_LOAD( "a75__15.ic14",   0x0000, 0x0800, CRC(d45327a9) SHA1(02ec8ecc818571caab2ecd93e6c5744cb4b7f559) ) // verified authentic, dumped from actual MCU
 
 	ROM_REGION( 0x18000, "gfx1", 0 ) // round green labels with numbers, data matches standard Arkanoid sets
 	ROM_LOAD( "23.ic64",    0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) ) // == a75-03.ic64
@@ -2291,7 +2291,7 @@ GAME( 1986, arkanoiduo,   arkanoid, arkanoid, arkanoid,  arkanoid_state, empty_i
 GAME( 1986, arkanoidj,    arkanoid, arkanoid, arkanoidj, arkanoid_state, empty_init,     ROT90, "Taito Corporation",                                   "Arkanoid (Japan, newer)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1986, arkanoidja,   arkanoid, arkanoid, arkanoidj, arkanoid_state, empty_init,     ROT90, "Taito Corporation",                                   "Arkanoid (Japan, newer w/level select)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1986, arkanoidjb,   arkanoid, arkanoid, arkanoidj, arkanoid_state, empty_init,     ROT90, "Taito Corporation",                                   "Arkanoid (Japan, older)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, arkanoidpe,   arkanoid, arkanoid, arkanoidj, arkanoid_state, empty_init,     ROT90, "Taito Corporation (Phoenix Electronics Co. license)", "Arkanoid (Phoenix Electronics Co. license)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkanoidpe,   arkanoid, arkanoid, arkanoid,  arkanoid_state, empty_init,     ROT90, "Taito Corporation (Phoenix Electronics Co. license)", "Arkanoid (Phoenix Electronics Co. license)",  MACHINE_SUPPORTS_SAVE )
 // bootlegs of Arkanoid
 GAME( 1986, arkanoidjbl,  arkanoid, p3mcu,    arkanoidj, arkanoid_state, empty_init,     ROT90, "bootleg",                                             "Arkanoid (bootleg with MCU, set 1)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1986, arkanoidjbl2, arkanoid, p3mcu,    arkanoidj, arkanoid_state, empty_init,     ROT90, "bootleg (Beta)",                                      "Arkanoid (bootleg with MCU, set 2)",          MACHINE_SUPPORTS_SAVE )

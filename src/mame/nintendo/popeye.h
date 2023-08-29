@@ -9,7 +9,9 @@
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+
 #include "emupal.h"
+#include "screen.h"
 #include "tilemap.h"
 
 #include <array>
@@ -23,6 +25,7 @@ public:
 		m_aysnd(*this, "aysnd"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
 		m_dmasource(*this, "dmasource"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -42,8 +45,8 @@ public:
 		m_field(0)
 	{ }
 
+	DECLARE_INPUT_CHANGED_MEMBER(change_il);
 	int dsw1_read();
-	int pop_field_r();
 
 	virtual void config(machine_config &config);
 
@@ -52,6 +55,7 @@ protected:
 	required_device<ay8910_device> m_aysnd;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_dmasource;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -111,6 +115,10 @@ protected:
 class tpp1_state : public tnx1_state
 {
 	using tnx1_state::tnx1_state;
+
+public:
+	int pop_field_r();
+
 protected:
 	virtual void tnx1_palette(palette_device &palette) override;
 	virtual void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
@@ -122,8 +130,10 @@ protected:
 class popeyebl_state : public tpp1_state
 {
 	using tpp1_state::tpp1_state;
+
 public:
 	virtual void config(machine_config& config) override;
+
 protected:
 	virtual void decrypt_rom() override;
 	virtual void maincpu_program_map(address_map &map) override;
@@ -135,8 +145,10 @@ protected:
 class tpp2_state : public tpp1_state
 {
 	using tpp1_state::tpp1_state;
+
 public:
 	virtual void config(machine_config &config) override;
+
 protected:
 	bool m_watchdog_enabled = false;
 	uint8_t m_watchdog_counter = 0;

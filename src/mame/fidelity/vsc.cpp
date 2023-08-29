@@ -160,7 +160,7 @@ IFP: Impact Printer - also compatible with C64 apparently.
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_vsc.lh" // clickable
+#include "fidel_vsc.lh"
 
 
 namespace {

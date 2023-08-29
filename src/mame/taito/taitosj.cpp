@@ -1769,31 +1769,26 @@ void taitosj_state::dacvol_w(uint8_t data)
 void taitosj_state::nomcu(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(8'000'000)/2);      // on CPU board
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2); // on CPU board
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitosj_state::main_nomcu_map);
-	m_maincpu->set_vblank_int("screen", FUNC(taitosj_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(6'000'000)/2);    // on GAME board
+	Z80(config, m_audiocpu, 12_MHz_XTAL / 4); // on GAME board
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitosj_state::taitosj_audio_map);
-			/* interrupts:
-			   - no interrupts synced with vblank
-			   - NMI triggered by the main CPU
-			   - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz, */
-	m_audiocpu->set_periodic_int(FUNC(taitosj_state::irq0_line_hold), attotime::from_hz(XTAL(6'000'000)/(4*16*16*10*16)));
-
+	// interrupts:
+	// - no interrupts synced with vblank
+	// - NMI triggered by the main CPU
+	// - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz.
+	m_audiocpu->set_periodic_int(FUNC(taitosj_state::irq0_line_hold), attotime::from_hz(12_MHz_XTAL / (2*4*16*16*10*16)));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 256, 264, 16, 240); // verified from schematics
 	m_screen->set_screen_update(FUNC(taitosj_state::screen_update));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taitosj);
 	PALETTE(config, m_palette).set_entries(64);
-
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
@@ -1802,30 +1797,27 @@ void taitosj_state::nomcu(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, m_soundnmi[1]).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	AY8910(config, m_ay[0], XTAL(6'000'000)/4); // on GAME board, AY-3-8910 @ IC53 (this is the only AY which uses proper mixing resistors, the 3 below have outputs tied together)
+	AY8910(config, m_ay[0], 12_MHz_XTAL / 8); // on GAME board, AY-3-8910 @ IC53 (this is the only AY which uses proper mixing resistors, the 3 below have outputs tied together)
 	m_ay[0]->port_a_read_callback().set_ioport("DSW2");
 	m_ay[0]->port_b_read_callback().set_ioport("DSW3");
 	m_ay[0]->add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	AY8910(config, m_ay[1], XTAL(6'000'000)/4); // on GAME board, AY-3-8910 @ IC51
+	AY8910(config, m_ay[1], 12_MHz_XTAL / 8); // on GAME board, AY-3-8910 @ IC51
 	m_ay[1]->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay[1]->port_a_write_callback().set(m_dac, FUNC(dac_byte_interface::data_w));
 	m_ay[1]->port_b_write_callback().set(FUNC(taitosj_state::dacvol_w));
 	m_ay[1]->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	AY8910(config, m_ay[2], XTAL(6'000'000)/4); // on GAME board, AY-3-8910 @ IC49
+	AY8910(config, m_ay[2], 12_MHz_XTAL / 8); // on GAME board, AY-3-8910 @ IC49
 	m_ay[2]->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay[2]->port_a_write_callback().set(FUNC(taitosj_state::input_port_4_f0_w));
 	m_ay[2]->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	AY8910(config, m_ay[3], XTAL(6'000'000)/4); // on GAME board, AY-3-8910 @ IC50
+	AY8910(config, m_ay[3], 12_MHz_XTAL / 8); // on GAME board, AY-3-8910 @ IC50
+	// TODO: Implement ay4 Port A bits 0 and 1 which connect to a 7416 open collector inverter, to selectively
+	// tie none, either or both of two capacitors between the ay4 audio output signal and ground,
+	// or between audio output signal and high-z (i.e. do nothing). Bio Attack uses this?
 	m_ay[3]->set_flags(AY8910_SINGLE_OUTPUT);
-	/* TODO: Implement ay4 Port A bits 0 and 1 which connect to a 7416 open
-	   collector inverter, to selectively tie none, either or both of two
-	   capacitors between the ay4 audio output signal and ground, or between
-	   audio output signal and high-z (i.e. do nothing).
-	   Bio Attack uses this?
-	*/
 	m_ay[3]->port_b_write_callback().set(FUNC(taitosj_state::sndnmi_msk_w));
 	m_ay[3]->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
@@ -1846,7 +1838,7 @@ void taitosj_state::mcu(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitosj_state::main_mcu_map);
 
-	TAITO_SJ_SECURITY_MCU(config, m_mcu, XTAL(3'000'000));   // divided by 4 internally
+	TAITO_SJ_SECURITY_MCU(config, m_mcu, 3_MHz_XTAL); // divided by 4 internally
 	m_mcu->set_int_mode(taito_sj_security_mcu_device::int_mode::LATCH);
 	m_mcu->m68read_cb().set(FUNC(taitosj_state::mcu_mem_r));
 	m_mcu->m68write_cb().set(FUNC(taitosj_state::mcu_mem_w));
@@ -2929,7 +2921,7 @@ GAME( 1983, elevatorb, elevator, nomcu,    elevator, taitosj_state, init_taitosj
 GAME( 1983, tinstar,   0,        mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "The Tin Star (A10, 4 PCB version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, tinstara,  tinstar,  mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "The Tin Star (TS, 5 PCB version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, waterski,  0,        nomcu,    waterski, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Water Ski", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, bioatack,  0,        nomcu,    bioatack, taitosj_state, init_taitosj, ROT270, "Taito Corporation (Fox Video Games license)", "Bio Attack", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bioatack,  0,        nomcu,    bioatack, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Bio Attack", MACHINE_SUPPORTS_SAVE ) // Fox Video Games = licensor of movie rights
 GAME( 1984, sfposeid,  0,        mcu,      sfposeid, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Sea Fighter Poseidon", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hwrace,    0,        nomcu,    hwrace,   taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "High Way Race", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kikstart,  0,        kikstart, kikstart, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Kick Start - Wheelie King", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kikstart,  0,        kikstart, kikstart, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Kick Start: Wheelie King", MACHINE_SUPPORTS_SAVE )

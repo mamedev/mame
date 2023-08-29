@@ -34,7 +34,7 @@ TODO:
 #include "cpu/m6800/m6800.h"
 #include "video/pwm.h"
 
-#include "gammonm2.lh" // clickable
+#include "gammonm2.lh"
 
 
 namespace {

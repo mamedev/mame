@@ -14,6 +14,85 @@ license:CC0-1.0
 
 <softwarelist name="spectrum_betadisc_flop" description="Sinclair ZX Spectrum Beta Disc / TR-DOS disk images">
 
+	<software name="alterego2">
+		<description>DreamWalker: Alter Ego 2 (v1.1)</description>
+		<year>2014</year>
+		<publisher>RetroSouls</publisher>
+		<info name="version" value="v1.1" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="dwpentagon.trd" size="655360" crc="2598e5bd" sha1="87e2bfd71749ae127adaf1248896c84b21c5b8aa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alterego2a" cloneof="alterego2">
+		<description>DreamWalker: Alter Ego 2 (v1.0)</description>
+		<year>2014</year>
+		<publisher>RetroSouls</publisher>
+		<info name="version" value="v1.0" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DreamWalker.trd" size="655360" crc="4395c7d0" sha1="74f525fdd6927d3da001ae14026ba51cfec0a85c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gluf">
+		<description>Gluf</description>
+		<year>2019</year>
+		<publisher>RetroSouls</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="gluf.trd" size="655360" crc="14e42b31" sha1="d3af21315d6cb9e2f6034d69e0d59a827cf3fb42"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gravibot">
+		<description>Gravibots</description>
+		<year>2014</year>
+		<publisher>RetroSouls</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="gravibots.trd" size="655360" crc="9d6d8e1b" sha1="edd0eb9a663783b5efc16e6512ad14efc418031f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lirus">
+		<description>Lirus</description>
+		<year>2016</year>
+		<publisher>RetroSouls</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="lirus.trd" size="655360" crc="43ecd3ff" sha1="dfd55f10333d3f5554985672d0c94e5c8f8759f5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lcdizzy">
+		<description>Log Cabin Dizzy (v1.04, English)</description>
+		<year>2018</year>
+		<publisher>Verm-V</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="log cabin dizzy v1.04 eng.trd" size="655360" crc="5da2c1e8" sha1="20d6de7d678882d4ba746fa5fca5bab86d9692a0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lcdizzya" cloneof="lcdizzy">
+		<description>Log Cabin Dizzy (v1.04, Russian)</description>
+		<year>2018</year>
+		<publisher>Verm-V</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="log cabin dizzy v1.04 rus.trd" size="655360" crc="ee927a33" sha1="a9dbb02328846b3d83d982c0ef7292655d0061c8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mightyff">
 		<description>Mighty Final Fight (v1.2)</description>
 		<year>2018</year>
@@ -58,63 +137,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="lcdizzy">
-		<description>Log Cabin Dizzy (v1.04, English)</description>
-		<year>2018</year>
-		<publisher>Verm-V</publisher>
-		<part name="flop" interface="floppy_5_25">
-			<dataarea name="flop" size="655360">
-				<rom name="log cabin dizzy v1.04 eng.trd" size="655360" crc="5da2c1e8" sha1="20d6de7d678882d4ba746fa5fca5bab86d9692a0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lcdizzya" cloneof="lcdizzy">
-		<description>Log Cabin Dizzy (v1.04, Russian)</description>
-		<year>2018</year>
-		<publisher>Verm-V</publisher>
-		<part name="flop" interface="floppy_5_25">
-			<dataarea name="flop" size="655360">
-				<rom name="log cabin dizzy v1.04 rus.trd" size="655360" crc="ee927a33" sha1="a9dbb02328846b3d83d982c0ef7292655d0061c8"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dwpentag">
-		<description>DreamWalker: Alter Ego 2 (Pentagon)</description>
-		<year>2014</year>
-		<publisher>RetroSouls</publisher>
-		<part name="flop" interface="floppy_5_25">
-			<dataarea name="flop" size="655360">
-				<rom name="dwpentagon.trd" size="655360" crc="2598e5bd" sha1="87e2bfd71749ae127adaf1248896c84b21c5b8aa"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gravibot">
-		<description>Gravibots</description>
-		<year>2014</year>
-		<publisher>RetroSouls</publisher>
-		<part name="flop" interface="floppy_5_25">
-			<dataarea name="flop" size="655360">
-				<rom name="gravibots.trd" size="655360" crc="9d6d8e1b" sha1="edd0eb9a663783b5efc16e6512ad14efc418031f"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lirus">
-		<description>Lirus</description>
-		<year>2016</year>
-		<publisher>RetroSouls</publisher>
-		<part name="flop" interface="floppy_5_25">
-			<dataarea name="flop" size="655360">
-				<rom name="lirus.trd" size="655360" crc="43ecd3ff" sha1="dfd55f10333d3f5554985672d0c94e5c8f8759f5"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="multidud">
-		<description>MultiDude (Pengaton)</description>
+		<description>MultiDude</description>
 		<year>2014</year>
 		<publisher>RetroSouls</publisher>
 		<part name="flop" interface="floppy_5_25">
@@ -131,6 +155,18 @@ license:CC0-1.0
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="sectorinvasion.trd" size="655360" crc="b95db2c6" sha1="796603b97c22aefaf5c00a20210798165574774b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sunbucket">
+		<description>Sun Bucket</description>
+		<year>2014</year>
+		<publisher>Stonechat Productions</publisher>
+		<info name="developer" value="Dave Hughes / Lee Prince" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="Sunbucket.trd" size="655360" crc="63084771" sha1="043586c8db70000af084d8af231ed8e193be8656"/>
 			</dataarea>
 		</part>
 	</software>

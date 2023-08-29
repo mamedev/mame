@@ -53,7 +53,9 @@ void exidy440_state::video_start()
 	memset(m_local_paletteram.get(), 0, 512 * 2);
 
 	m_beam_firq_timer = timer_alloc(FUNC(exidy440_state::beam_firq_callback), this);
-	m_collide_firq_timer = timer_alloc(FUNC(exidy440_state::collide_firq_callback), this);
+
+	for (int i = 0; i < 128; i++)
+		m_collide_firq_timer[i] = timer_alloc(FUNC(exidy440_state::collide_firq_callback), this);
 }
 
 
@@ -355,8 +357,11 @@ void exidy440_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 						bitmap.pix(yoffs, currx) = pen;
 
 						/* check the collisions bit */
-						if (check_collision && (palette[2 * pen] & 0x80) && (count++ < 128))
-							m_collide_firq_timer->adjust(screen.time_until_pos(yoffs, currx), currx);
+						if (check_collision && (palette[2 * pen] & 0x80) && count < 128)
+						{
+							m_collide_firq_timer[count]->adjust(screen.time_until_pos(yoffs, currx), currx);
+							count++;
+						}
 					}
 					currx++;
 
@@ -368,8 +373,11 @@ void exidy440_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 						bitmap.pix(yoffs, currx) = pen;
 
 						/* check the collisions bit */
-						if (check_collision && (palette[2 * pen] & 0x80) && (count++ < 128))
-							m_collide_firq_timer->adjust(screen.time_until_pos(yoffs, currx), currx);
+						if (check_collision && (palette[2 * pen] & 0x80) && count < 128)
+						{
+							m_collide_firq_timer[count]->adjust(screen.time_until_pos(yoffs, currx), currx);
+							count++;
+						}
 					}
 					currx++;
 				}

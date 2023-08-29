@@ -143,23 +143,6 @@ uint32_t cxhumax_state::cx_scratch_r(offs_t offset)
 {
 	uint32_t data = m_scratch_reg;
 	LOG("%s: (SCRATCH) %08X -> %08X\n", machine().describe_context(), 0xE0400024 + (offset << 2), data);
-
-	if((m_maincpu->pc()==0xF0003BB8) || (m_maincpu->pc()==0x01003724) || (m_maincpu->pc()==0x00005d8c)) { // HDCI-2000
-		//we're in disabled debug_printf
-		unsigned char* buf = (unsigned char *)alloca(200);
-		unsigned char temp;
-		address_space &program = m_maincpu->space(AS_PROGRAM);
-
-		memset(buf,0,200);
-
-		int i = 0;
-		while ((temp=program.read_byte(m_maincpu->state_int(ARM7_R0)+i))) {
-			buf[i++]=temp;
-			//m_terminal->write(temp);
-		}
-		osd_printf_debug("%s", buf);
-		LOG("%s: (DEBUG) %s", machine().describe_context(), buf);
-	}
 	return data;
 }
 

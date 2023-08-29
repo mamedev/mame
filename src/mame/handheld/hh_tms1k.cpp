@@ -176,7 +176,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  *MP3493   TMS1100   1980, Milton Bradley OMNI Entertainment System (1/2)
  *MP3494   TMS1100   1980, Milton Bradley OMNI Entertainment System (2/2)
   MP3496   TMS1100   1980, Microvision cartridge: Sea Duel
-  M34009   TMS1100   1981, Microvision cartridge: Alien Raiders (note: MP3498, MP3499, M3400x..)
+ @M34004A  TMS1100   1981, Ideal Sky-Writer (note: MP3498, MP3499, M3400x..)
+  M34009   TMS1100   1981, Microvision cartridge: Alien Raiders
  @M34012   TMS1100   1980, Mattel Dungeons & Dragons: Computer Labyrinth Game
  *M34014   TMS1100   1981, Coleco Bowlatronic
   M34017   TMS1100   1981, Microvision cartridge: Cosmic Hunter
@@ -191,6 +192,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
  @MP6354   TMS1475   1982, Tsukuda The Dracula
+ *MP6358   TMS1475?  1982, Bandai U-Boat
  *MP6361   TMS1475?  1983, <unknown> Defender Strikes
  @MP7302   TMS1400   1980, Tiger Deluxe Football with Instant Replay
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
@@ -253,26 +255,26 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 // internal artwork
 #include "t7in1ss.lh"
 #include "alphie.lh"
-#include "amaztron.lh" // clickable
-#include "arcmania.lh" // clickable
+#include "amaztron.lh"
+#include "arcmania.lh"
 #include "arrball.lh"
 #include "astro.lh"
 #include "bankshot.lh"
 #include "bcheetah.lh"
 #include "bigtrak.lh"
 #include "blastit.lh"
-#include "bship.lh" // clickable
+#include "bship.lh"
 #include "cmsport.lh"
 #include "cnbaskb.lh"
 #include "cnfball.lh"
 #include "cnfball2.lh"
-#include "cnsector.lh" // clickable
-#include "comp4.lh" // clickable
-#include "comparc.lh" // clickable
-#include "copycat.lh" // clickable
-#include "copycata.lh" // clickable
+#include "cnsector.lh"
+#include "comp4.lh"
+#include "comparc.lh"
+#include "copycat.lh"
+#include "copycata.lh"
 #include "dataman.lh"
-#include "ditto.lh" // clickable
+#include "ditto.lh"
 #include "dxfootb.lh"
 #include "cqback.lh"
 #include "ebball.lh"
@@ -284,13 +286,13 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "einvader.lh"
 #include "elecbowl.lh"
 #include "elecdet.lh"
-#include "eleciq.lh" // clickable
+#include "eleciq.lh"
 #include "esbattle.lh"
 #include "esoccer.lh"
 #include "f2pbball.lh"
 #include "f3in1.lh"
-#include "fingbowl.lh" // clickable
-#include "fxmcr165.lh" // clickable
+#include "fingbowl.lh"
+#include "fxmcr165.lh"
 #include "gjackpot.lh"
 #include "gpoker.lh"
 #include "h2hbaseb.lh"
@@ -299,17 +301,17 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "h2hfootb.lh"
 #include "h2hhockey.lh"
 #include "horseran.lh"
-#include "litelrn.lh" // clickable
+#include "litelrn.lh"
 #include "liveafb.lh"
-#include "lostreas.lh" // clickable
-#include "matchnum.lh" // clickable
+#include "lostreas.lh"
+#include "matchnum.lh"
 #include "mathmagi.lh"
 #include "mathmarv.lh"
-#include "mbdtower.lh" // clickable
-#include "mdndclab.lh" // clickable
-#include "merlin.lh" // clickable
-#include "mmarvin.lh" // clickable
-#include "mmerlin.lh" // clickable
+#include "mbdtower.lh"
+#include "mdndclab.lh"
+#include "merlin.lh"
+#include "mmarvin.lh"
+#include "mmerlin.lh"
 #include "monkeysee.lh"
 #include "mrmusical.lh"
 #include "palmf31.lh"
@@ -317,19 +319,19 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "pbmastm.lh"
 #include "phpball.lh"
 #include "playmaker.lh"
-#include "qfire.lh" // clickable
+#include "qfire.lh"
 #include "quizwizc.lh"
 #include "raisedvl.lh"
 #include "scruiser.lh"
-#include "simon.lh" // clickable
+#include "simon.lh"
 #include "speechp.lh"
 #include "splitsec.lh"
-#include "ssimon.lh" // clickable
+#include "ssimon.lh"
 #include "ssports4.lh"
-#include "starwbc.lh" // clickable
-#include "starwlb.lh" // clickable
-#include "stopthief.lh" // clickable
-#include "strobe.lh" // clickable
+#include "starwbc.lh"
+#include "starwlb.lh"
+#include "stopthief.lh"
+#include "strobe.lh"
 #include "subwars.lh"
 #include "t3in1sa.lh"
 #include "tbreakup.lh"
@@ -348,11 +350,11 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "timaze.lh"
 #include "tisr16.lh"
 #include "tithermos.lh"
-#include "tmvolleyb.lh" // clickable
+#include "tmvolleyb.lh"
 #include "vclock3.lh"
 #include "wizatron.lh"
-#include "xl25.lh" // clickable
-#include "zodiac.lh" // clickable
+#include "xl25.lh"
+#include "zodiac.lh"
 
 //#include "hh_tms1k_test.lh" // common test-layout - use external artwork
 
@@ -4111,8 +4113,8 @@ ROM_END
 /*******************************************************************************
 
   Conic Electronic I.Q.
-  * PCB labels: main: CONIC 101-037 (other side: HG-15, 11*00198*00), button PCB:
-    CONIC 102-001, led PCB: CONIC 100-003 REV A itac
+  * PCB labels: main: CONIC 101-037 (other side: HG-15, 11*00198*00),
+    button PCB: CONIC 102-001, led PCB: CONIC 100-003 REV A itac
   * TMS1000NLL MP0908 (die label: 1000B, MP0908)
   * 2 7seg LEDs, 30 other LEDs, 1-bit sound
 
@@ -7115,7 +7117,7 @@ ROM_END
 
   Ideal Electronic Detective
   * TMS0980NLL MP6100A (die label: 0980B-00)
-  * 10-digit 7seg LED display, 2-level sound
+  * 9-digit 7seg LED display (2 unused), 2-level sound
 
   hardware (and concept) is very similar to Parker Brothers Stop Thief
 
@@ -7263,7 +7265,249 @@ ROM_END
 
 /*******************************************************************************
 
-  Star Wars: Electronic Laser Battle Game (model 40090)
+  Ideal Sky-Writer (model 6070-7)
+  * PCB label: ITC 5A-3917-02, 201101
+  * TMS1100 M34004A (die label: 1100E, M34004A)
+  * 7 LEDs, no sound
+
+  It's a toy wand that the user waves around to display a message in the air,
+  relying on human persistence of vision. A keyboard is included, making the
+  whole thing quite tiring to wave around for a kid.
+
+  The display is simulated in MAME with a screen and slowly fading pixels.
+
+*******************************************************************************/
+
+static constexpr u32 SKYWRITER_WIDTH = 0x300; // screen width (wave range)
+
+class skywriter_state : public hh_tms1k_state
+{
+public:
+	skywriter_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void skywriter(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
+
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(check_pos);
+
+	std::unique_ptr<u16[]> m_display;
+	u8 m_led_data[2] = { };
+	u16 m_wand_pos[2] = { };
+	attotime m_shake;
+};
+
+void skywriter_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+
+	m_display = make_unique_clear<u16[]>(7 * SKYWRITER_WIDTH);
+	save_pointer(NAME(m_display), 7 * SKYWRITER_WIDTH);
+
+	save_item(NAME(m_led_data));
+	save_item(NAME(m_wand_pos));
+	save_item(NAME(m_shake));
+}
+
+// handlers
+
+u32 skywriter_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	for (int i = 0; i < 7 * SKYWRITER_WIDTH; i++)
+	{
+		int dx = i % SKYWRITER_WIDTH;
+		int dy = (i / SKYWRITER_WIDTH) * 4 + 1;
+
+		// write current led state to pixels
+		u8 red = std::clamp<u16>(m_display[i], 0, 0xff);
+		u8 green = red / 16;
+		u8 blue = red / 12;
+
+		for (int j = 0; j < 3; j++)
+		{
+			if (cliprect.contains(dx, dy))
+				bitmap.pix(dy + j, dx) = red << 16 | green << 8 | blue;
+		}
+
+		// decay led brightness
+		const double rate = 1.15;
+		m_display[i] /= rate;
+	}
+
+	return 0;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(skywriter_state::check_pos)
+{
+	u16 pos = m_inputs[11]->read() % SKYWRITER_WIDTH;
+
+	if (pos != m_wand_pos[0])
+	{
+		// set shake sensor if wand changed direction from left to right
+		if (pos > m_wand_pos[0] && m_wand_pos[0] < m_wand_pos[1])
+			m_shake = machine().time() + attotime::from_msec(10);
+
+		m_wand_pos[1] = m_wand_pos[0];
+		m_wand_pos[0] = pos;
+	}
+
+	// write lit leds to display
+	for (int i = 0; i < 7; i++)
+	{
+		if (BIT(m_led_data[0] | m_led_data[1], i))
+			m_display[i * SKYWRITER_WIDTH + pos] = 0x180;
+	}
+
+	m_led_data[1] = m_led_data[0];
+}
+
+void skywriter_state::write_r(u32 data)
+{
+	// R0-R10: input mux
+	m_inp_mux = data;
+}
+
+void skywriter_state::write_o(u16 data)
+{
+	// O0-O3, O5-O7: leds
+	m_led_data[0] = bitswap<7>(data,1,5,6,7,3,2,0);
+
+	// O4: enable shake sensor
+	m_o = data;
+}
+
+u8 skywriter_state::read_k()
+{
+	// K: multiplexed inputs + shake sensor
+	u8 shake = (m_o & 0x10 && m_shake > machine().time()) ? 4 : 0;
+	return read_inputs(11) | shake;
+}
+
+// inputs
+
+static INPUT_PORTS_START( skywriter )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CHAR(127) PORT_NAME("CL")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(13) PORT_NAME("Start")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // factory test?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_NAME("BS")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_NAME("SP")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR('9')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('?')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR('8')
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('7')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('6')
+
+	PORT_START("IN.6") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('5')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+
+	PORT_START("IN.7") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('4')
+
+	PORT_START("IN.8") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CHAR('3')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+
+	PORT_START("IN.9") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('2')
+
+	PORT_START("IN.10") // R10
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+
+	PORT_START("IN.11") // fake
+	PORT_BIT( 0xfff, SKYWRITER_WIDTH / 2, IPT_PADDLE ) PORT_MINMAX(0, SKYWRITER_WIDTH - 1) PORT_SENSITIVITY(25) PORT_KEYDELTA(300) PORT_CENTERDELTA(0) PORT_NAME("Wave Wand")
+INPUT_PORTS_END
+
+// config
+
+void skywriter_state::skywriter(machine_config &config)
+{
+	// basic machine hardware
+	TMS1100(config, m_maincpu, 475000); // approximation - RC osc. R=27K, C=100pF
+	m_maincpu->read_k().set(FUNC(skywriter_state::read_k));
+	m_maincpu->write_r().set(FUNC(skywriter_state::write_r));
+	m_maincpu->write_o().set(FUNC(skywriter_state::write_o));
+
+	TIMER(config, "check_pos").configure_periodic(FUNC(skywriter_state::check_pos), attotime::from_usec(1));
+
+	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE); // for led decay
+	screen.set_physical_aspect(16, 1);
+	screen.set_refresh_hz(60);
+	screen.set_size(SKYWRITER_WIDTH, 4 * 7 + 1);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(skywriter_state::screen_update));
+
+	// no sound!
+}
+
+// roms
+
+ROM_START( skywriter )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "m34004a.ic1", 0x0000, 0x0800, CRC(8e218dcc) SHA1(d3d5e0fa02c947d49d5bba1297edb7cecc0356da) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_skywriter_output.pla", 0, 365, CRC(407cb3b5) SHA1(f5830d25ec0ff8682993a2d03001606f1f30b46f) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Kenner Star Wars: Electronic Laser Battle Game (model 40090)
   * TMS1000NLL MP3209 (die label: 1000C, MP3209)
   * 12 LEDs, 1 lamp, 1-bit sound
 
@@ -11669,7 +11913,8 @@ ROM_END
 
   Even though it has a 60 Hz inputline, it doesn't use it to sync the clock.
   Instead, it relies on the MCU frequency, which is not very accurate when
-  using a simple R/C osc.
+  using a simple R/C osc. In 60 Hz mode, it expects a CPU clock of around
+  375 kHz, and in 50 Hz mode around 369 kHz.
 
   Micronta is not a company, but one of the Radio Shack house brands.
   Schematics are included in the manual, they also mention a CM72005 VSM.
@@ -11821,7 +12066,7 @@ INPUT_PORTS_END
 void vclock3_state::vclock3(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 320000); // approximation - RC osc. R=47K, C=47pF
+	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set(FUNC(vclock3_state::read_k));
 	m_maincpu->write_r().set(FUNC(vclock3_state::write_r));
 	m_maincpu->write_o().set(FUNC(vclock3_state::write_o));
@@ -13573,14 +13818,14 @@ ROM_END
 
 ROM_START( tiprog )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD16_WORD( "za0675nl", 0x0000, 0x1000, CRC(82355854) SHA1(03fab373bce04df8ea3fe25352525e8539213626) ) // tmc0983
+	ROM_LOAD16_WORD( "za0675nl", 0x0000, 0x1000, CRC(82355854) SHA1(03fab373bce04df8ea3fe25352525e8539213626) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 1982, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0980_tiprog_micro.pla", 0, 1982, CRC(57043284) SHA1(0fa06d5865830ecdb3d870271cb92ac917bed3ca) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_tiprog_output.pla", 0, 352, BAD_DUMP CRC(125c4ee6) SHA1(b8d865c42fd37c3d9b92c5edbecfc831be558597) ) // corrected by hand
+	ROM_LOAD( "tms0980_tiprog_output.pla", 0, 352, CRC(125c4ee6) SHA1(b8d865c42fd37c3d9b92c5edbecfc831be558597) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
 	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
 ROM_END
@@ -16243,8 +16488,8 @@ ROM_START( tdracula )
 	ROM_REGION( 557, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1400_tdracula_output.pla", 0, 557, CRC(54408672) SHA1(8fdc6910a27c22c1df2cadeb25c74118d5774481) )
 
-	ROM_REGION( 416612, "screen", 0)
-	ROM_LOAD( "tdracula.svg", 0, 416612, CRC(b4e723dc) SHA1(7d90aa92755727fc21f3b2913cd5d86f8594ea20) )
+	ROM_REGION( 417508, "screen", 0)
+	ROM_LOAD( "tdracula.svg", 0, 417508, CRC(03438ea0) SHA1(33c6561e3a73eee754b5fbe0e6d0b61fc99c92f0) )
 ROM_END
 
 
@@ -16962,7 +17207,8 @@ SYST( 1981, ginv1000,   0,         0,      ginv1000,  ginv1000,  ginv1000_state,
 SYST( 1982, ginv2000,   0,         0,      ginv2000,  ginv2000,  ginv2000_state,  empty_init, "Gakken", "Invader 2000", MACHINE_SUPPORTS_SAVE )
 SYST( 1981, fxmcr165,   0,         0,      fxmcr165,  fxmcr165,  fxmcr165_state,  empty_init, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-SYST( 1979, elecdet,    0,         0,      elecdet,   elecdet,   elecdet_state,   empty_init, "Ideal Toy Corporation", "Electronic Detective", MACHINE_SUPPORTS_SAVE ) // ***
+SYST( 1979, elecdet,    0,         0,      elecdet,   elecdet,   elecdet_state,   empty_init, "Ideal Toy Corporation", "Electronic Detective", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
+SYST( 1981, skywriter,  0,         0,      skywriter, skywriter, skywriter_state, empty_init, "Ideal Toy Corporation", "Sky-Writer: The Electronic Message Sender", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
 
 SYST( 1978, starwlb,    0,         0,      starwlb,   starwlb,   starwlb_state,   empty_init, "Kenner", "Star Wars: Electronic Laser Battle Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1979, starwbc,    0,         0,      starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars: Electronic Battle Command Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -11,7 +11,7 @@
 #pragma once
 
 #include "machine/pci.h"
-#include "bus/isa/s3virge.h"
+#include "video/s3virge.h"
 
 class virge_pci_device : public pci_device
 {
@@ -37,16 +37,12 @@ public:
 	void lfb_map(address_map &map);
 	void mmio_map(address_map& map);
 
-	uint32_t vga_3b0_r(offs_t offset, uint32_t mem_mask = ~0);
-	void vga_3b0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t vga_3c0_r(offs_t offset, uint32_t mem_mask = ~0);
-	void vga_3c0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t vga_3d0_r(offs_t offset, uint32_t mem_mask = ~0);
-	void vga_3d0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
 	uint32_t base_address_r();
 	void base_address_w(offs_t offset, uint32_t data);
+
+	void legacy_io_map(address_map &map);
 
 protected:
 	virtual void device_start() override;
@@ -63,10 +59,10 @@ protected:
 	required_memory_region m_bios;
 	optional_device<screen_device> m_screen;
 
+	void linear_config_changed_w(int state);
+
 private:
 	void refresh_linear_window();
-
-	uint8_t m_current_crtc_reg;
 };
 
 class virgedx_pci_device : public virge_pci_device

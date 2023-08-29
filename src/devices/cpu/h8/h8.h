@@ -35,15 +35,16 @@ public:
 		STATE_DTC_WRITEBACK      = 0x10006
 	};
 
-	template<int port> auto read_adc() { return m_read_adc[port].bind(); }
-	template<int sci> auto write_sci_tx() { return m_sci_tx[sci].bind(); }
-	template<int sci> auto write_sci_clk() { return m_sci_clk[sci].bind(); }
-	template<int sci> void sci_rx_w(int state) { m_sci[sci]->do_rx_w(state); }
-	template<int sci> void sci_clk_w(int state) { m_sci[sci]->do_clk_w(state); }
+	template<int Port> auto read_adc() { return m_read_adc[Port].bind(); }
+	template<int Sci> auto write_sci_tx() { return m_sci_tx[Sci].bind(); }
+	template<int Sci> auto write_sci_clk() { return m_sci_clk[Sci].bind(); }
 
 	void sci_set_external_clock_period(int sci, const attotime &period) {
 		m_sci[sci].lookup()->do_set_external_clock_period(period);
 	}
+
+	template<int Sci> void sci_rx_w(int state) { m_sci[Sci]->do_rx_w(state); }
+	template<int Sci> void sci_clk_w(int state) { m_sci[Sci]->do_clk_w(state); }
 
 	void internal_update();
 	void set_irq(int irq_vector, int irq_level, bool irq_nmi);

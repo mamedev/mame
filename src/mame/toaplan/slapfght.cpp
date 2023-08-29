@@ -1015,12 +1015,12 @@ void slapfght_state::tigerhb4(machine_config &config)
 
 	// TODO: hook up
 	m68705p_device &mcu(M68705P5(config, "mcu", 6000000)); // unverified clock
-	mcu.porta_r().set_log("port A read");
-	mcu.portb_r().set_log("port B read");
-	mcu.portc_r().set_log("port C read");
-	mcu.porta_w().set([this](uint8_t data) { logerror("port a write: %02x\n", data); });
-	mcu.portb_w().set([this](uint8_t data) { logerror("port b write: %02x\n", data); });
-	mcu.portc_w().set([this](uint8_t data) { logerror("port c write: %02x\n", data); });
+	mcu.porta_r().set([this]() { logerror("%s MCU port A read\n", machine().describe_context()); return 0xff; });
+	mcu.portb_r().set([this]() { logerror("%s MCU port B read\n", machine().describe_context()); return 0xff; });
+	mcu.portc_r().set([this]() { logerror("%s MCU port C read\n", machine().describe_context()); return 0xff; });
+	mcu.porta_w().set([this](uint8_t data) { logerror("%s MCU port a write: %02X\n", machine().describe_context(), data); });
+	mcu.portb_w().set([this](uint8_t data) { logerror("%s MCU port b write: %02X\n", machine().describe_context(), data); });
+	mcu.portc_w().set([this](uint8_t data) { logerror("%s MCU port c write: %02X\n", machine().describe_context(), data); });
 }
 
 void slapfght_state::slapfigh(machine_config &config)

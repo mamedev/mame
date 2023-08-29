@@ -26,16 +26,19 @@ public:
 
 	// watchdog control
 	void watchdog_reset();
-	void watchdog_enable(bool enable = true);
+	void watchdog_enable(int state = 1);
 	int32_t get_vblank_counter() const { return m_counter; }
 
-	// read/write handlers
+	// watchdog reset read/write handlers (strobe on R/W pin)
 	void reset_w(u8 data = 0);
 	u8 reset_r(address_space &space);
 	void reset16_w(u16 data = 0);
 	u16 reset16_r(address_space &space);
 	void reset32_w(u32 data = 0);
 	u32 reset32_r(address_space &space);
+
+	// watchdog reset writeline strobe
+	void reset_line_w(int state);
 
 protected:
 	// device-level overrides
@@ -57,6 +60,7 @@ private:
 
 	// internal state
 	bool                    m_enabled;      // is the watchdog enabled?
+	int                     m_reset_line;   // watchdog reset writeline state
 	int32_t                 m_counter;      // counter for VBLANK tracking
 	emu_timer *             m_timer;        // timer for triggering reset
 };

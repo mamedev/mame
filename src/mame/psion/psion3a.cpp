@@ -5,15 +5,16 @@
     Psion Series 3a/3c/3mx
 
     TODO:
-    - battery backed RAM
-    - sound devices
+    - sound devices, replace fake Psion Codec device with M7542 and M7702-03
     - serial ports
     - fix RAM detection for 3mx
 
 ******************************************************************************/
 
 #include "emu.h"
+#include "machine/nvram.h"
 #include "machine/psion_asic9.h"
+//#include "machine/psion_condor.h"
 #include "machine/psion_ssd.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
@@ -27,45 +28,96 @@
 #include "utf8.h"
 
 
-namespace {
-
-class psion3a_state : public driver_device
+class psion3a_codec_device : public device_t, public device_sound_interface
 {
 public:
-	psion3a_state(const machine_config &mconfig, device_type type, const char *tag)
+	psion3a_codec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	void pcm_in(uint8_t data);
+
+protected:
+	void device_start() override;
+	void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+
+private:
+	sound_stream *m_stream;
+	int16_t m_audio_out;
+};
+
+DEFINE_DEVICE_TYPE(PSION_S3A_CODEC, psion3a_codec_device, "psion3a_codec", "Series 3a A-law Codec")
+
+psion3a_codec_device::psion3a_codec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PSION_S3A_CODEC, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_stream(nullptr)
+	, m_audio_out(0)
+{
+}
+
+void psion3a_codec_device::device_start()
+{
+	m_stream = stream_alloc(0, 1, 8000);
+}
+
+void psion3a_codec_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+{
+	outputs[0].fill(stream_buffer::sample_t(m_audio_out) * (1.0 / 4096.0));
+}
+
+void psion3a_codec_device::pcm_in(uint8_t data)
+{
+	m_stream->update();
+
+	// Expand 8-bit signed compressed number to 16-bit 2's complement integer (13-bit magnitude) using A-law
+	data ^= 0x55;
+
+	uint8_t seg = (data & 0x70) >> 4;
+	m_audio_out = 0;
+	if (seg)
+	{
+		m_audio_out = 0x10;
+		seg--;
+	}
+	m_audio_out = (((m_audio_out + (data & 0x0f)) << 1) + 1) << seg;
+
+	m_audio_out *= (data & 0x80) ? -1.0 : 1.0;
+}
+
+
+namespace {
+
+class psion3a_base_state : public driver_device
+{
+public:
+	psion3a_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_asic9(*this, "asic9")
 		, m_ram(*this, "ram")
+		, m_nvram(*this, "nvram")
 		, m_palette(*this, "palette")
 		, m_keyboard(*this, "COL%u", 0U)
 		, m_speaker(*this, "speaker")
+		, m_codec(*this, "codec")
 		, m_ssd(*this, "ssd%u", 1U)
-		, m_sibo(*this, "sibo")
-		, m_honda(*this, "honda")
 	{ }
 
 	void psion_asic9(machine_config &config);
-	void psion3a(machine_config &config);
-	void psion3a2(machine_config &config);
-	void psion3c(machine_config &config);
-	void psion3mx(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(wakeup);
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
-private:
 	required_device<psion_asic9_device> m_asic9;
 	required_device<ram_device> m_ram;
+	required_device<nvram_device> m_nvram;
 	required_device<palette_device> m_palette;
 	required_ioport_array<8> m_keyboard;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<psion3a_codec_device> m_codec;
 	required_device_array<psion_ssd_device, 2> m_ssd;
-	optional_device<psion_sibo_slot_device> m_sibo;
-	optional_device<psion_honda_slot_device> m_honda;
 
+private:
 	void palette_init(palette_device &palette);
 
 	uint16_t kbd_r();
@@ -73,13 +125,63 @@ private:
 	uint8_t m_key_col = 0;
 };
 
-
-void psion3a_state::machine_start()
+class psion3a_state : public psion3a_base_state
 {
+public:
+	psion3a_state(const machine_config &mconfig, device_type type, const char *tag)
+		: psion3a_base_state(mconfig, type, tag)
+		, m_sibo(*this, "sibo")
+	{ }
+
+	void psion3a(machine_config &config);
+	void psion3a2(machine_config &config);
+
+private:
+	required_device<psion_sibo_slot_device> m_sibo;
+};
+
+class psion3c_state : public psion3a_base_state
+{
+public:
+	psion3c_state(const machine_config &mconfig, device_type type, const char *tag)
+		: psion3a_base_state(mconfig, type, tag)
+		//, m_condor(*this, "condor")
+		, m_honda(*this, "honda")
+	{ }
+
+	void psion3c(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	//required_device<psion_condor_device> m_condor;
+	required_device<psion_honda_slot_device> m_honda;
+};
+
+class psion3mx_state : public psion3a_base_state
+{
+public:
+	psion3mx_state(const machine_config &mconfig, device_type type, const char *tag)
+		: psion3a_base_state(mconfig, type, tag)
+		, m_honda(*this, "honda")
+	{ }
+
+	void psion3mx(machine_config &config);
+
+private:
+	required_device<psion_honda_slot_device> m_honda;
+};
+
+
+void psion3a_base_state::machine_start()
+{
+	m_nvram->set_base(m_ram->pointer(), m_ram->size());
 }
 
-void psion3a_state::machine_reset()
+void psion3c_state::machine_reset()
 {
+	//m_asic9->io_space().install_readwrite_handler(0x0100, 0x011f, read8sm_delegate(*m_condor, FUNC(psion_condor_device::read)), write8sm_delegate(*m_condor, FUNC(psion_condor_device::write)), 0x00ff);
 }
 
 
@@ -260,13 +362,13 @@ static INPUT_PORTS_START( pocketbk2 )
 INPUT_PORTS_END
 
 
-INPUT_CHANGED_MEMBER(psion3a_state::wakeup)
+INPUT_CHANGED_MEMBER(psion3a_base_state::wakeup)
 {
 	m_asic9->eint0_w(newval);
 }
 
 
-uint16_t psion3a_state::kbd_r()
+uint16_t psion3a_base_state::kbd_r()
 {
 	uint16_t data = 0x00;
 
@@ -280,7 +382,7 @@ uint16_t psion3a_state::kbd_r()
 }
 
 
-void psion3a_state::palette_init(palette_device &palette)
+void psion3a_base_state::palette_init(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(190, 220, 190));
 	palette.set_pen_color(1, rgb_t(130, 130, 110));
@@ -288,11 +390,12 @@ void psion3a_state::palette_init(palette_device &palette)
 }
 
 
-void psion3a_state::psion_asic9(machine_config &config)
+void psion3a_base_state::psion_asic9(machine_config &config)
 {
 	PSION_ASIC9(config, m_asic9, 7.68_MHz_XTAL); // V30H
+	m_asic9->set_screen("screen");
 	m_asic9->set_ram_rom("ram", "rom");
-	m_asic9->port_ab_r().set(FUNC(psion3a_state::kbd_r));
+	m_asic9->port_ab_r().set(FUNC(psion3a_base_state::kbd_r));
 	m_asic9->buz_cb().set(m_speaker, FUNC(speaker_sound_device::level_w));
 	//m_asic9->buzvol_cb().set([this](int state) { m_speaker->set_output_gain(ALL_OUTPUTS, state ? 1.0 : 0.25); });
 	m_asic9->col_cb().set([this](uint8_t data) { m_key_col = data; });
@@ -307,12 +410,13 @@ void psion3a_state::psion_asic9(machine_config &config)
 	screen.set_refresh_hz(66);
 	screen.set_screen_update(m_asic9, FUNC(psion_asic9_device::screen_update));
 	screen.set_palette(m_palette);
-	PALETTE(config, "palette", FUNC(psion3a_state::palette_init), 3);
+	PALETTE(config, "palette", FUNC(psion3a_base_state::palette_init), 3);
 
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00); // Piezo buzzer
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	RAM(config, m_ram);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	PSION_SSD(config, m_ssd[0]);
 	m_ssd[0]->door_cb().set(m_asic9, FUNC(psion_asic9_device::medchng_w));
@@ -330,11 +434,12 @@ void psion3a_state::psion3a(machine_config &config)
 
 	// SIBO expansion port
 	PSION_SIBO_SLOT(config, m_sibo, psion_sibo_devices, nullptr);
-	//m_sibo->int_cb().set(m_asic9, FUNC(psion_asic9_device::eint_w)); // TODO: unknown interrupt line
+	m_sibo->int_cb().set(m_asic9, FUNC(psion_asic9_device::sds_int_w));
 	m_asic9->data_r<4>().set(m_sibo, FUNC(psion_sibo_slot_device::data_r));
 	m_asic9->data_w<4>().set(m_sibo, FUNC(psion_sibo_slot_device::data_w));
 
-	// TODO: M7542
+	PSION_S3A_CODEC(config, m_codec).add_route(ALL_OUTPUTS, "mono", 1.00); // TODO: M7542
+	m_asic9->pcm_out().set(m_codec, FUNC(psion3a_codec_device::pcm_in));
 }
 
 void psion3a_state::psion3a2(machine_config &config)
@@ -344,24 +449,33 @@ void psion3a_state::psion3a2(machine_config &config)
 	m_ram->set_default_size("2M").set_extra_options("1M");
 }
 
-void psion3a_state::psion3c(machine_config &config)
+void psion3c_state::psion3c(machine_config &config)
 {
 	psion_asic9(config);
 
 	m_ram->set_default_size("2M").set_extra_options("1M");
 
-	// TODO: M7702
+	PSION_S3A_CODEC(config, m_codec).add_route(ALL_OUTPUTS, "mono", 1.00); // TODO: M7702-03
+	m_asic9->pcm_out().set(m_codec, FUNC(psion3a_codec_device::pcm_in));
 
-	// TODO: unknown Temic device, likely provides RS232/Parallel to Honda port
+	//PSION_CONDOR(config, m_condor);
+	//m_condor->txd_handler().set(m_honda, FUNC(psion_honda_slot_device::write_txd));
+	//m_condor->rts_handler().set(m_honda, FUNC(psion_honda_slot_device::write_rts));
+	//m_condor->dtr_handler().set(m_honda, FUNC(psion_honda_slot_device::write_dtr));
+	//m_condor->int_handler().set(m_asic9, FUNC(psion_asic9_device::eint1_w));
 
 	// Honda expansion port
 	PSION_HONDA_SLOT(config, m_honda, psion_honda_devices, nullptr);
-	//m_honda->int_cb().set(m_asic9, FUNC(psion_asic9_device::eint_w)); // TODO: unknown interrupt line
+	//m_honda->rxd_handler().set(m_condor, FUNC(psion_condor_device::write_rxd));
+	//m_honda->dcd_handler().set(m_condor, FUNC(psion_condor_device::write_dcd));
+	//m_honda->dsr_handler().set(m_condor, FUNC(psion_condor_device::write_dsr));
+	//m_honda->cts_handler().set(m_condor, FUNC(psion_condor_device::write_cts));
+	m_honda->sdoe_handler().set(m_asic9, FUNC(psion_asic9_device::medchng_w)); // TODO: verify input line
 	m_asic9->data_r<4>().set(m_honda, FUNC(psion_honda_slot_device::data_r));
 	m_asic9->data_w<4>().set(m_honda, FUNC(psion_honda_slot_device::data_w));
 }
 
-void psion3a_state::psion3mx(machine_config &config)
+void psion3mx_state::psion3mx(machine_config &config)
 {
 	psion_asic9(config);
 
@@ -369,23 +483,30 @@ void psion3a_state::psion3mx(machine_config &config)
 
 	m_ram->set_default_size("2M").set_extra_options("");
 
-	// TODO: M7702
+	PSION_S3A_CODEC(config, m_codec).add_route(ALL_OUTPUTS, "mono", 1.00); // TODO: M7702-03
+	m_asic9->pcm_out().set(m_codec, FUNC(psion3a_codec_device::pcm_in));
 
 	// Honda expansion port
 	PSION_HONDA_SLOT(config, m_honda, psion_honda_devices, nullptr);
-	//m_honda->int_cb().set(m_asic9, FUNC(psion_asic9_device::eint_w)); // TODO: unknown interrupt line
+	//m_honda->rxd_handler().set(m_asic9mx, FUNC(psion_condor_device::write_rxd));
+	//m_honda->dcd_handler().set(m_asic9mx, FUNC(psion_condor_device::write_dcd));
+	//m_honda->dsr_handler().set(m_asic9mx, FUNC(psion_condor_device::write_dsr));
+	//m_honda->cts_handler().set(m_asic9mx, FUNC(psion_condor_device::write_cts));
+	m_honda->sdoe_handler().set(m_asic9, FUNC(psion_asic9_device::medchng_w)); // TODO: verify input line
 	m_asic9->data_r<4>().set(m_honda, FUNC(psion_honda_slot_device::data_r));
 	m_asic9->data_w<4>().set(m_honda, FUNC(psion_honda_slot_device::data_w));
 }
 
 
 ROM_START(psion3a)
+	// Known versions: English, Belgian, Dutch, German
 	ROM_REGION16_LE(0x100000, "rom", 0)
 	ROM_SYSTEM_BIOS(0, "322f", "V3.22F/ENG")
 	ROMX_LOAD("s3a_v3.22f_eng.bin", 0x000000, 0x100000, CRC(fafa3820) SHA1(c1a320b43280cfdb74fc1cb1363fca88dd187487), ROM_BIOS(0))
 ROM_END
 
 ROM_START(psion3a2)
+	// Known versions: English, Dutch, French, German, Italian, Russian
 	ROM_REGION16_LE(0x200000, "rom", 0)
 	ROM_SYSTEM_BIOS(0, "340f", "V3.40F/ENG")
 	ROMX_LOAD("s3a_v3.40f_eng.bin", 0x000000, 0x200000, CRC(f0adf12c) SHA1(3eb4e7f1fc5611a4d6e65d27d336969ebae94395), ROM_BIOS(0))
@@ -404,13 +525,14 @@ ROM_START(psion3a2_ru)
 ROM_END
 
 ROM_START(psion3c)
-	// Versions advertised: English, German, French, Flemish and Dutch
+	// Known versions: English, French, German, Italian, Flemish and Dutch
 	ROM_REGION16_LE(0x200000, "rom", 0)
 	ROM_SYSTEM_BIOS(0, "520f", "V5.20F/ENG")
 	ROMX_LOAD("oak_v5.20f_eng.bin", 0x000000, 0x200000, CRC(d8e672ca) SHA1(23e7570ddbecbfd50953ce6a6b7ead7128814402), ROM_BIOS(0))
 ROM_END
 
 ROM_START(psion3mx)
+	// Known versions: English, Dutch, French, German, Italian
 	ROM_REGION16_LE(0x200000, "rom", 0)
 	ROM_SYSTEM_BIOS(0, "616f", "V6.16F/ENG")
 	ROMX_LOAD("maple_v6.16f_uk.bin", 0x000000, 0x200000, CRC(10011d9d) SHA1(8c657414513ed57ccf6beddc65dca1fe5ab600fb), ROM_BIOS(0))
@@ -425,11 +547,11 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME          PARENT    COMPAT  MACHINE    INPUT        CLASS          INIT         COMPANY             FULLNAME                    FLAGS
-COMP( 1993, psion3a,      0,        0,      psion3a,   psion3a,     psion3a_state, empty_init,  "Psion",            "Series 3a",                MACHINE_NOT_WORKING )
-COMP( 1994, pocketbk2,    psion3a,  0,      psion3a,   pocketbk2,   psion3a_state, empty_init,  "Acorn Computers",  "Pocket Book II",           MACHINE_NOT_WORKING )
-COMP( 1995, psion3a2,     psion3a,  0,      psion3a2,  psion3a,     psion3a_state, empty_init,  "Psion",            "Series 3a (2M)",           MACHINE_NOT_WORKING )
-COMP( 1995, psion3a2_de,  psion3a,  0,      psion3a2,  psion3a_de,  psion3a_state, empty_init,  "Psion",            "Series 3a (2M) (German)",  MACHINE_NOT_WORKING )
-COMP( 1997, psion3a2_ru,  psion3a,  0,      psion3a2,  psion3a,     psion3a_state, empty_init,  "Psion",            "Series 3a (2M) (Russian)", MACHINE_NOT_WORKING )
-COMP( 1996, psion3c,      0,        0,      psion3c,   psion3c,     psion3a_state, empty_init,  "Psion",            "Series 3c",                MACHINE_NOT_WORKING )
-COMP( 1998, psion3mx,     0,        0,      psion3mx,  psion3c,     psion3a_state, empty_init,  "Psion",            "Series 3mx",               MACHINE_NOT_WORKING )
+//    YEAR  NAME          PARENT    COMPAT  MACHINE    INPUT        CLASS           INIT         COMPANY             FULLNAME                    FLAGS
+COMP( 1993, psion3a,      0,        0,      psion3a,   psion3a,     psion3a_state,  empty_init,  "Psion",            "Series 3a",                0 )
+COMP( 1994, pocketbk2,    psion3a,  0,      psion3a,   pocketbk2,   psion3a_state,  empty_init,  "Acorn Computers",  "Pocket Book II",           0 )
+COMP( 1995, psion3a2,     psion3a,  0,      psion3a2,  psion3a,     psion3a_state,  empty_init,  "Psion",            "Series 3a (2M)",           0 )
+COMP( 1995, psion3a2_de,  psion3a,  0,      psion3a2,  psion3a_de,  psion3a_state,  empty_init,  "Psion",            "Series 3a (2M) (German)",  0 )
+COMP( 1997, psion3a2_ru,  psion3a,  0,      psion3a2,  psion3a,     psion3a_state,  empty_init,  "Psion",            "Series 3a (2M) (Russian)", 0 )
+COMP( 1996, psion3c,      0,        0,      psion3c,   psion3c,     psion3c_state,  empty_init,  "Psion",            "Series 3c",                0 )
+COMP( 1998, psion3mx,     0,        0,      psion3mx,  psion3c,     psion3mx_state, empty_init,  "Psion",            "Series 3mx",               0 )

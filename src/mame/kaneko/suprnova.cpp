@@ -149,7 +149,6 @@ NEP-16
 #include "emu.h"
 #include "suprnova.h"
 
-#include "cpu/sh/sh2.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "sound/ymz280b.h"
@@ -764,7 +763,7 @@ GFXDECODE_END
 // XTALs : 28.636MHz, 33.3333MHz, 21.504MHz
 void skns_state::skns(machine_config &config)
 {
-	SH2(config, m_maincpu, XTAL(28'636'000));
+	SH2_SH7604(config, m_maincpu, XTAL(28'636'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &skns_state::skns_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(skns_state::irq), "screen", 0, 1);

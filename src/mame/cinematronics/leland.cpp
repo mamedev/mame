@@ -3508,21 +3508,21 @@ void ataxx_state::init_asylum()
  *************************************/
 
 /* small master banks, small slave banks */
-GAME( 1985, cerberus,   0,        leland,   cerberus,   leland_state, init_cerberus, ROT0,   "Cinematronics", "Cerberus", 0 )
-GAME( 1985, mayhem,     0,        leland,   mayhem,     leland_state, init_mayhem,   ROT0,   "Cinematronics", "Mayhem 2002", 0 )
-GAME( 1985, powrplay,   0,        leland,   mayhem,     leland_state, init_powrplay, ROT0,   "Cinematronics", "Power Play", 0 )
-GAME( 1985, wseries,    0,        leland,   wseries,    leland_state, init_wseries,  ROT0,   "Cinematronics", "World Series: The Season (rev 1)", 0 )
-GAME( 1985, wseries0,   wseries,  leland,   wseries,    leland_state, init_wseries,  ROT0,   "Cinematronics", "World Series: The Season (rev 0)", 0 )
-GAME( 1986, alleymas,   0,        leland,   alleymas,   leland_state, init_alleymas, ROT270, "Cinematronics", "Alley Master", 0 )
-GAME( 1986, upyoural,   alleymas, leland,   upyoural,   leland_state, init_upyoural, ROT270, "Cinematronics", "Up Your Alley", 0 ) // prototype of Alley Master?
+GAME( 1985, cerberus,   0,        leland,   cerberus,   leland_state,  init_cerberus, ROT0,   "Cinematronics", "Cerberus", 0 )
+GAME( 1985, mayhem,     0,        leland,   mayhem,     leland_state,  init_mayhem,   ROT0,   "Cinematronics", "Mayhem 2002", 0 )
+GAME( 1985, powrplay,   0,        leland,   mayhem,     leland_state,  init_powrplay, ROT0,   "Cinematronics", "Power Play", 0 )
+GAME( 1985, wseries,    0,        leland,   wseries,    leland_state,  init_wseries,  ROT0,   "Cinematronics", "World Series: The Season (rev 1)", 0 )
+GAME( 1985, wseries0,   wseries,  leland,   wseries,    leland_state,  init_wseries,  ROT0,   "Cinematronics", "World Series: The Season (rev 0)", 0 )
+GAME( 1986, alleymas,   0,        leland,   alleymas,   leland_state,  init_alleymas, ROT270, "Cinematronics", "Alley Master", 0 )
+GAME( 1986, upyoural,   alleymas, leland,   upyoural,   leland_state,  init_upyoural, ROT270, "Cinematronics", "Up Your Alley", 0 ) // prototype of Alley Master?
 
 /* odd master banks, small slave banks */
-GAME( 1986, dangerz,    0,        leland,   dangerz,    leland_state, init_dangerz,  ROT0,   "Cinematronics", "Danger Zone (rev 2)", 0 )
+GAME( 1986, dangerz,    0,        leland,   dangerz,    leland_state,  init_dangerz,  ROT0,   "Cinematronics", "Danger Zone (rev 2)", 0 )
 
 /* small master banks + extra top board, small slave banks */
-GAME( 1987, basebal2,   0,        leland,   basebal2,   leland_state, init_basebal2, ROT0,   "Cinematronics", "Baseball: The Season II", 0 )
-GAME( 1987, dblplay,    0,        leland,   basebal2,   leland_state, init_dblplay,  ROT0,   "Leland Corporation / Tradewest", "Super Baseball Double Play Home Run Derby", 0 )
-GAME( 1988, strkzone,   0,        leland,   basebal2,   leland_state, init_strkzone, ROT0,   "Leland Corporation", "Strike Zone Baseball", 0 )
+GAME( 1987, basebal2,   0,        leland,   basebal2,   leland_state,  init_basebal2, ROT0,   "Cinematronics", "Baseball: The Season II", 0 )
+GAME( 1987, dblplay,    0,        leland,   basebal2,   leland_state,  init_dblplay,  ROT0,   "Leland Corporation / Tradewest", "Super Baseball Double Play Home Run Derby", 0 )
+GAME( 1988, strkzone,   0,        leland,   basebal2,   leland_state,  init_strkzone, ROT0,   "Leland Corporation", "Strike Zone Baseball", 0 )
 
 /* large master banks, small slave banks, 80186 sound */
 GAME( 1987, redlin2p,   0,        redline,  redline,    redline_state, init_redlin2p, ROT270, "Cinematronics (Tradewest license)", "Redline Racer (2 players)", 0 )
@@ -3535,7 +3535,7 @@ GAME( 1988, viper,      0,        lelandi,  dangerz,    redline_state, init_vipe
 GAME( 1988, teamqb,     0,        lelandi,  teamqb,     redline_state, init_teamqb,   ROT270, "Leland Corporation", "John Elway's Team Quarterback (rev 3)", 0 )
 GAME( 1988, teamqb2,    teamqb,   lelandi,  teamqb,     redline_state, init_teamqb,   ROT270, "Leland Corporation", "John Elway's Team Quarterback (rev 2)", 0 )
 GAME( 1989, aafb,       0,        lelandi,  teamqb,     redline_state, init_aafb,     ROT270, "Leland Corporation", "All American Football (rev E)", 0 )
-GAME( 1989, aafbd2p,    aafb,     lelandi,  aafb2p,     redline_state, init_aafbd2p,  ROT270, "Leland Corporation", "All American Football (rev D, 2 Players)", 0 )
+GAME( 1989, aafbd2p,    aafb,     lelandi,  aafb2p,     redline_state, init_aafbd2p,  ROT270, "Leland Corporation", "All American Football (rev D, 2 players)", 0 )
 GAME( 1989, aafbc,      aafb,     lelandi,  teamqb,     redline_state, init_aafbb,    ROT270, "Leland Corporation", "All American Football (rev C)", 0 )
 GAME( 1989, aafbb,      aafb,     lelandi,  teamqb,     redline_state, init_aafbb,    ROT270, "Leland Corporation", "All American Football (rev B)", MACHINE_NOT_WORKING )
 
@@ -3543,7 +3543,7 @@ GAME( 1989, aafbb,      aafb,     lelandi,  teamqb,     redline_state, init_aafb
 GAME( 1989, offroad,    0,        lelandi,  offroad,    redline_state, init_offroad,  ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road (rev 4)", 0 )
 GAME( 1989, offroad3,   offroad,  lelandi,  offroad,    redline_state, init_offroad,  ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road (rev 3)", 0 )
 GAME( 1989, offroadt,   0,        lelandi,  offroad,    redline_state, init_offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak (rev 4?)", 0 ) // need to verify revision
-GAME( 1989, offroadt2p, offroadt, lelandi,  offroadt2p, redline_state, init_offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak (rev 4, 2 Players)", 0 )
+GAME( 1989, offroadt2p, offroadt, lelandi,  offroadt2p, redline_state, init_offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak (rev 4, 2 players)", 0 )
 GAME( 1990, pigout,     0,        lelandi,  pigout,     redline_state, init_pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (rev 2?)", 0 ) // need to verify revision
 GAME( 1990, pigouta,    pigout,   lelandi,  pigout,     redline_state, init_pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (rev 1)", 0 )
 

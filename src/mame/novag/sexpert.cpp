@@ -53,8 +53,8 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "novag_sexpert.lh" // clickable
-#include "novag_sforte.lh" // clickable
+#include "novag_sexpert.lh"
+#include "novag_sforte.lh"
 
 
 namespace {

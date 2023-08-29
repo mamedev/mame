@@ -282,6 +282,7 @@ uint32_t funkybee_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	draw_columns(bitmap, cliprect);
+
 	return 0;
 }
 
@@ -290,7 +291,9 @@ uint32_t funkybee_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 uint8_t funkybee_state::input_port_0_r()
 {
-	m_watchdog->watchdog_reset();
+	if (!machine().side_effects_disabled())
+		m_watchdog->watchdog_reset();
+
 	return m_in0->read();
 }
 

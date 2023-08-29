@@ -175,7 +175,9 @@ uint16_t xtheball_state::analogx_r()
 uint16_t xtheball_state::analogy_watchdog_r()
 {
 	/* doubles as a watchdog address */
-	m_watchdog->watchdog_reset();
+	if (!machine().side_effects_disabled())
+		m_watchdog->watchdog_reset();
+
 	return (m_analog_y->read() << 8) | 0x00ff;
 }
 

@@ -6,7 +6,7 @@ license:CC0-1.0
 
 <softwarelist name="psion_ssd" description="Psion Solid State Disks">
 
-	<!-- Series 3 -->
+	<!-- Series 3/3a -->
 
 	<software name="3achess">
 		<description>3a Chess</description>
@@ -117,7 +117,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="games1">
+	<software name="games1" supported="partial">
 		<description>Games 1</description>
 		<year>1993</year>
 		<publisher>Psion</publisher>
@@ -129,7 +129,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="games2">
+	<software name="games2" supported="partial">
 		<description>Games 2</description>
 		<year>1993</year>
 		<publisher>Psion</publisher>
@@ -202,11 +202,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="paint">
+	<software name="paint" supported="partial">
 		<description>Paint &amp; Compose</description>
 		<year>1994</year>
 		<publisher>Widget Software</publisher>
-		<sharedfeat name="compatibility" value="S3A"/>
+		<sharedfeat name="compatibility" value="S3"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="131072">
 				<rom name="Paint_Compose.rom" size="131072" crc="772c4ebf" sha1="84587c43e70dd56c40ad9dc5c71a53d9cfcc7301"/>
@@ -299,12 +299,74 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="wgames3a">
+		<description>Widget Games 3a</description>
+		<year>1995</year>
+		<publisher>Widget Software</publisher>
+		<sharedfeat name="compatibility" value="S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="Widget_Games_3a.bin" size="131072" crc="72ce5182" sha1="cf693592a53a7638aabe26a298ffca126012b882"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wineguide">
+		<description>Hugh Johnson's Wine Guide</description>
+		<year>1994</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="S3"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="524288">
+				<rom name="Hugh_Johnsons_Wine_Guide.rom" size="524288" crc="a954dd77" sha1="95a13ad99a8afaf478870ee391905e7796e82537"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Pocket Book -->
+
+	<software name="plotter">
+		<description>Plotter</description>
+		<year>1992</year>
+		<publisher>Acorn</publisher>
+		<sharedfeat name="compatibility" value="S3"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="Plotter.rom" size="131072" crc="16467037" sha1="bac48caa15192f8e385fcc9b9904721cbbf745e0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="schedule">
+		<description>Schedule</description>
+		<year>1992</year>
+		<publisher>Acorn</publisher>
+		<sharedfeat name="compatibility" value="S3"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="524288">
+				<rom name="Schedule.rom" size="524288" crc="7e5684b4" sha1="3fb4ff3764ac5e9104c3a20a8bdf45cf40ea09ea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spell">
+		<description>Spell</description>
+		<year>1992</year>
+		<publisher>Acorn</publisher>
+		<sharedfeat name="compatibility" value="S3"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="524288">
+				<rom name="Spell.rom" size="524288" crc="2e55032a" sha1="560a425a19b3f3d12da9a0e2127f2c67aa829082"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Non-Commercial -->
 
 	<software name="psionman">
 		<description>PsionMan v1.3</description>
 		<year>1993</year>
-		<publisher>&lt;homebrew&gt;</publisher>
+		<publisher>&lt;freeware&gt;</publisher>
 		<info name="author" value="Andrew Baldwin"/>
 		<sharedfeat name="compatibility" value="S3"/>
 		<part name="cart" interface="psion_ssd">
@@ -315,11 +377,11 @@ license:CC0-1.0
 	</software>
 
 	<software name="pyramid">
-		<description>Pyramid v1.0a</description>
+		<description>Pyramid 1.0a</description>
 		<year>1993</year>
-		<publisher>&lt;homebrew&gt;</publisher>
+		<publisher>&lt;freeware&gt;</publisher>
 		<info name="author" value="J.Cade Roux"/>
-		<sharedfeat name="compatibility" value="S3,S3A,SIENA"/>
+		<sharedfeat name="compatibility" value="S3,SIENA"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="131072">
 				<rom name="Pyramid-1.0a.rom" size="131072" crc="70d86e7f" sha1="41a918760ffe6ee21304485bedceeaa996ce074b"/>

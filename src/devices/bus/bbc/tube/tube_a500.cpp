@@ -81,8 +81,8 @@ void bbc_tube_a500_device::device_add_mconfig(machine_config &config)
 	m_ioc->kout_w().set("keyboard", FUNC(archimedes_keyboard_device::kin_w));
 	m_ioc->peripheral_r<4>().set(m_ula, FUNC(tube_device::parasite_r));
 	m_ioc->peripheral_w<4>().set(m_ula, FUNC(tube_device::parasite_w));
-	m_ioc->peripheral_r<6>().set_log("IOC: External Expansion R");
-	m_ioc->peripheral_w<6>().set_log("IOC: External Expansion W");
+	m_ioc->peripheral_r<6>().set([this]() { logerror("%s IOC: External Expansion R\n", machine().describe_context()); return 0xffffffff; });
+	m_ioc->peripheral_w<6>().set([this](uint32_t data) { logerror("%s IOC: External Expansion W %08X\n", machine().describe_context(), data); });
 
 	ARCHIMEDES_KEYBOARD(config, "keyboard").kout().set(m_ioc, FUNC(acorn_ioc_device::kin_w));
 

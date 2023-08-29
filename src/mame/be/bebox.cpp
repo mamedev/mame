@@ -13,13 +13,14 @@
 #include "bebox.h"
 
 /* Components */
-#include "video/clgd542x.h"
 #include "bus/lpci/cirrus.h"
+#include "bus/lpci/mpc105.h"
+#include "bus/scsi/scsi.h"
 #include "sound/ymopl.h"
 #include "machine/mc146818.h"
 #include "machine/pckeybrd.h"
-#include "bus/lpci/mpc105.h"
-#include "bus/scsi/scsi.h"
+#include "video/pc_vga_cirrus.h"
+
 #include "speaker.h"
 
 /* Devices */
@@ -51,9 +52,7 @@ void bebox_state::main_mem(address_map &map)
 	map(0x800002F8, 0x800002FF).rw("ns16550_1", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x80000380, 0x80000387).rw("ns16550_2", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x80000388, 0x8000038F).rw("ns16550_3", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
-	map(0x800003b0, 0x800003bf).rw(m_vga, FUNC(cirrus_gd5428_device::port_03b0_r), FUNC(cirrus_gd5428_device::port_03b0_w));
-	map(0x800003c0, 0x800003cf).rw(m_vga, FUNC(cirrus_gd5428_device::port_03c0_r), FUNC(cirrus_gd5428_device::port_03c0_w));
-	map(0x800003d0, 0x800003df).rw(m_vga, FUNC(cirrus_gd5428_device::port_03d0_r), FUNC(cirrus_gd5428_device::port_03d0_w));
+	map(0x800003B0, 0x800003DF).m(m_vga, FUNC(cirrus_gd5428_device::io_map));
 	map(0x800003F0, 0x800003F7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
 	map(0x800003F0, 0x800003F7).m(m_smc37c78, FUNC(smc37c78_device::map));
 	map(0x800003F8, 0x800003FF).rw("ns16550_0", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));

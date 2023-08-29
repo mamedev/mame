@@ -63,8 +63,6 @@ sis950_lpc_device::sis950_lpc_device(const machine_config &mconfig, const char *
 	, m_keybc(*this, "keybc")
 	, m_speaker(*this, "speaker")
 	, m_rtc(*this, "rtc")
-	, m_ps2_con(*this, "ps2_con")
-	, m_aux_con(*this, "aux_con")
 	, m_uart(*this, "uart")
 	, m_acpi(*this, "acpi")
 	, m_smbus(*this, "smbus")
@@ -158,26 +156,14 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 
 	// TODO: EISA, from virtual bridge
 
-	PC_KBDC(config, m_ps2_con, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
-	m_ps2_con->out_clock_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
-	m_ps2_con->out_data_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
-
-	PC_KBDC(config, m_aux_con, ps2_mice, STR_HLE_PS2_MOUSE);
-	m_aux_con->out_clock_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
-	m_aux_con->out_data_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::aux_data_w));
-
 	// TODO: selectable between PCI clock / 4 (33 MHz) or 7.159 MHz, via reg $47 bit 5
-	PS2_KEYBOARD_CONTROLLER(config, m_keybc, DERIVED_CLOCK(1, 4));
-	// TODO: default ibm BIOS doesn't cope with this too well
-	m_keybc->set_default_bios_tag("compaq");
-	m_keybc->hot_res().set(FUNC(sis950_lpc_device::cpu_reset_w));
-	m_keybc->gate_a20().set(FUNC(sis950_lpc_device::cpu_a20_w));
-	m_keybc->kbd_irq().set(m_pic_master, FUNC(pic8259_device::ir1_w));
-	m_keybc->kbd_clk().set(m_ps2_con, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_keybc->kbd_data().set(m_ps2_con, FUNC(pc_kbdc_device::data_write_from_mb));
-	m_keybc->aux_irq().set(m_pic_slave, FUNC(pic8259_device::ir4_w));
-	m_keybc->aux_clk().set(m_aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_keybc->aux_data().set(m_aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
+	KBDC8042(config, m_keybc);
+	m_keybc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);
+	m_keybc->set_interrupt_type(kbdc8042_device::KBDC8042_DOUBLE);
+	m_keybc->input_buffer_full_callback().set(m_pic_master, FUNC(pic8259_device::ir1_w));
+	m_keybc->input_buffer_full_mouse_callback().set(m_pic_slave, FUNC(pic8259_device::ir4_w));
+	m_keybc->system_reset_callback().set(FUNC(sis950_lpc_device::cpu_reset_w));
+	m_keybc->gate_a20_callback().set(FUNC(sis950_lpc_device::cpu_a20_w));
 
 	// TODO: unknown RTC type
 	// Has external RTC bank select at $48, using this one as convenience
@@ -399,6 +385,26 @@ void sis950_lpc_device::acpi_base_w(u8 data)
 	remap_cb();
 }
 
+u8 sis950_lpc_device::at_keybc_r(offs_t offset)
+{
+	return m_keybc->data_r(0);
+}
+
+void sis950_lpc_device::at_keybc_w(offs_t offset, u8 data)
+{
+	m_keybc->data_w(0, data);
+}
+
+u8 sis950_lpc_device::keybc_status_r(offs_t offset)
+{
+	return (m_keybc->data_r(4) & 0xfb) | 0x10; // bios needs bit 2 to be 0 as powerup and bit 4 to be 1
+}
+
+void sis950_lpc_device::keybc_command_w(offs_t offset, u8 data)
+{
+	m_keybc->data_w(4, data);
+}
+
 template <unsigned N> void sis950_lpc_device::memory_map(address_map &map)
 {
 	map(0x00000000, 0x0001ffff).lrw8(
@@ -416,11 +422,11 @@ void sis950_lpc_device::io_map(address_map &map)
 	map(0x0020, 0x0021).rw(m_pic_master, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	// map(0x0040, 0x0043) PIT
 	map(0x0040, 0x0043).rw(m_pit, FUNC(pit8254_device::read), FUNC(pit8254_device::write));
-	map(0x0060, 0x0060).rw(m_keybc, FUNC(ps2_keyboard_controller_device::data_r), FUNC(ps2_keyboard_controller_device::data_w));
+	map(0x0060, 0x0060).rw(FUNC(sis950_lpc_device::at_keybc_r), FUNC(sis950_lpc_device::at_keybc_w));
 	// map(0x0061, 0x0061) NMI Status Register
 	map(0x0061, 0x0061).rw(FUNC(sis950_lpc_device::nmi_status_r), FUNC(sis950_lpc_device::nmi_control_w));
 	// undocumented but read, assume LPC complaint
-	map(0x0064, 0x0064).rw(m_keybc, FUNC(ps2_keyboard_controller_device::status_r), FUNC(ps2_keyboard_controller_device::command_w));
+	map(0x0064, 0x0064).rw(FUNC(sis950_lpc_device::keybc_status_r), FUNC(sis950_lpc_device::keybc_command_w));
 	// map(0x0070, 0x0070) CMOS and NMI Mask
 	map(0x0070, 0x0070).w(FUNC(sis950_lpc_device::rtc_index_w));
 	map(0x0071, 0x0071).rw(FUNC(sis950_lpc_device::rtc_data_r), FUNC(sis950_lpc_device::rtc_data_w));

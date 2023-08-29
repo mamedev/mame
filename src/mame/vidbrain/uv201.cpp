@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "uv201.h"
 
-#define VERBOSE (1)
+//#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 //**************************************************************************
@@ -333,6 +333,7 @@ uint8_t uv201_device::read(offs_t offset)
 			data = m_ram[offset];
 		else
 			LOG("Unknown VLSI read from %02x!\n", offset);
+		break;
 	}
 
 	return data;
@@ -437,6 +438,7 @@ void uv201_device::write(offs_t offset, uint8_t data)
 			m_ram[offset] = data;
 		else
 			logerror("Unknown VLSI write %02x to %02x!\n", data, offset);
+		break;
 	}
 }
 

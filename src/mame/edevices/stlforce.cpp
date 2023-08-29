@@ -13,7 +13,7 @@ inputs etc. by stephh
 ----------------------------------------
 
 68000P12 processor
-15mHZ crystal next to it
+15MHz crystal next to it
 
 2 of these:
 
@@ -21,8 +21,7 @@ TPC 1020AFN-084c
 
 32MHz crystal close to this.
 
-1 GAL
-5 PROMS  (16S25H)
+8 PLDs: 3 x GAL16V8 + 4 x 16S25HBJ + 1 x GAL22V10
 
 27c4001
 u1, u27, u28, u29, u30
@@ -275,7 +274,7 @@ GFXDECODE_END
 void stlforce_state::stlforce(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, XTAL(15'000'000));
+	M68000(config, m_maincpu, 15_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &stlforce_state::program_map);
 	m_maincpu->set_vblank_int("screen", FUNC(stlforce_state::irq4_line_hold));
 
@@ -310,7 +309,7 @@ void stlforce_state::stlforce(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", XTAL(32'000'000) / 32, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+	OKIM6295(config, "oki", 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void twinbrat_state::twinbrat(machine_config &config)
@@ -319,7 +318,7 @@ void twinbrat_state::twinbrat(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &twinbrat_state::program_map);
-	m_maincpu->set_clock(XTAL(14'745'600));
+	m_maincpu->set_clock(14.7456_MHz_XTAL);
 
 	subdevice<screen_device>("screen")->set_visarea(3*8, 44*8-1, 0*8, 30*8-1);
 
@@ -334,6 +333,8 @@ void stlforce_state::mortalr(machine_config &config)
 	stlforce(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &stlforce_state::mortalr_map);
+
+	subdevice<okim6295_device>("oki")->set_clock(32.22_MHz_XTAL / 32);
 }
 
 
@@ -416,6 +417,16 @@ ROM_START( mortalr )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "1.u1", 0x00000, 0x80000, CRC(e5c730c2) SHA1(a153a204c1452a0c95fe207d750b2df07c5e63f3) )
+
+	ROM_REGION( 0x02e5, "plds", 0 )
+	ROM_LOAD( "1_16s25hb1.bin",       0x00000, 0x00117, NO_DUMP )
+	ROM_LOAD( "2_16s25hb1.bin",       0x00000, 0x00117, NO_DUMP )
+	ROM_LOAD( "3_16s25hb1.bin",       0x00000, 0x00117, NO_DUMP )
+	ROM_LOAD( "4_16s25hb1.bin",       0x00000, 0x00117, NO_DUMP )
+	ROM_LOAD( "5_gal22v10-25lnc.bin", 0x00000, 0x002e5, NO_DUMP )
+	ROM_LOAD( "6_16s25hb1.bin",       0x00000, 0x00117, NO_DUMP )
+	ROM_LOAD( "7_16s25hb1.bin",       0x00000, 0x00117, NO_DUMP )
+	ROM_LOAD( "8_16s25hb1.bin",       0x00000, 0x00117, NO_DUMP )
 ROM_END
 
 
@@ -578,7 +589,7 @@ ROM_END
 
 GAME( 1994, stlforce,  0,        stlforce, stlforce, stlforce_state, empty_init, ROT0, "Electronic Devices Italy / Ecogames S.L. Spain", "Steel Force", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, mortalr,   0,        mortalr,  stlforce, stlforce_state, empty_init, ROT0, "New Dream Games", "Mortal Race", MACHINE_SUPPORTS_SAVE ) // based on the same rough codebase as Top Driving tch/topdrive.cpp but not the same game, so not a clone 
+GAME( 1995, mortalr,   0,        mortalr,  stlforce, stlforce_state, empty_init, ROT0, "New Dream Games", "Mortal Race", MACHINE_SUPPORTS_SAVE ) // based on the same rough codebase as Top Driving tch/topdrive.cpp but not the same game, so not a clone
 
 GAME( 1995, twinbrat,  0,        twinbrat, stlforce, twinbrat_state, empty_init, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, twinbrata, twinbrat, twinbrat, stlforce, twinbrat_state, empty_init, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 2)", MACHINE_SUPPORTS_SAVE )

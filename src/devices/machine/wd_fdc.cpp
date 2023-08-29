@@ -560,7 +560,6 @@ void wd_fdc_device_base::read_sector_start()
 
 	main_state = READ_SECTOR;
 	status &= ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM);
-	drop_drq();
 	update_sso();
 	set_hld();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
@@ -664,7 +663,6 @@ void wd_fdc_device_base::read_track_start()
 
 	main_state = READ_TRACK;
 	status &= ~(S_LOST|S_RNF);
-	drop_drq();
 	update_sso();
 	set_hld();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
@@ -743,7 +741,6 @@ void wd_fdc_device_base::read_id_start()
 
 	main_state = READ_ID;
 	status &= ~(S_WP|S_DDM|S_LOST|S_RNF);
-	drop_drq();
 	update_sso();
 	set_hld();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
@@ -820,7 +817,6 @@ void wd_fdc_device_base::write_track_start()
 
 	main_state = WRITE_TRACK;
 	status &= ~(S_WP|S_DDM|S_LOST|S_RNF);
-	drop_drq();
 	update_sso();
 	set_hld();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
@@ -947,7 +943,6 @@ void wd_fdc_device_base::write_sector_start()
 
 	main_state = WRITE_SECTOR;
 	status &= ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM);
-	drop_drq();
 	update_sso();
 	set_hld();
 	sub_state = motor_control  ? SPINUP : SPINUP_DONE;
@@ -1253,7 +1248,7 @@ void wd_fdc_device_base::do_cmd_w()
 
 void wd_fdc_device_base::cmd_w(uint8_t val)
 {
-	if (inverted_bus) val ^= 0xff;
+	val ^= bus_invert_value;
 	if (!mr) {
 		logerror("Not initiating command %02x during master reset\n", val);
 		return;
@@ -1288,6 +1283,7 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 	else
 	{
 		intrq_cond = 0;
+		drop_drq();
 		// set busy, then set a timer to process the command
 		status |= S_BUSY;
 		delay_cycles(t_cmd, dden ? delay_command_commit*2 : delay_command_commit);
@@ -1338,8 +1334,7 @@ uint8_t wd_fdc_device_base::status_r()
 			status &= ~S_NRDY;
 	}
 
-	uint8_t val = status;
-	if (inverted_bus) val ^= 0xff;
+	uint8_t val = status ^ bus_invert_value;
 
 	LOGCOMP("Status value: %02X\n",val);
 
@@ -1354,22 +1349,17 @@ void wd_fdc_device_base::do_track_w()
 
 void wd_fdc_device_base::track_w(uint8_t val)
 {
-	if (inverted_bus) val ^= 0xff;
-
 	// No more than one write in flight
 	if(track_buffer != -1 || !mr)
 		return;
 
-	track_buffer = val;
+	track_buffer = val ^ bus_invert_value;
 	delay_cycles(t_track, dden ? delay_register_commit*2 : delay_register_commit);
 }
 
 uint8_t wd_fdc_device_base::track_r()
 {
-	uint8_t val = track;
-	if (inverted_bus) val ^= 0xff;
-
-	return val;
+	return track ^ bus_invert_value;
 }
 
 void wd_fdc_device_base::do_sector_w()
@@ -1382,15 +1372,13 @@ void wd_fdc_device_base::sector_w(uint8_t val)
 {
 	if (!mr) return;
 
-	if (inverted_bus) val ^= 0xff;
-
 	// No more than one write in flight
 	// C1581 accesses this register with an INC opcode,
 	// i.e. write old value, write new value, and the new value gets ignored by this
 	//if(sector_buffer != -1)
 	//  return;
 
-	sector_buffer = val;
+	sector_buffer = val ^ bus_invert_value;
 
 	// set a timer to write the new value to the register, but only if we aren't in
 	// the middle of an already occurring update
@@ -1400,19 +1388,14 @@ void wd_fdc_device_base::sector_w(uint8_t val)
 
 uint8_t wd_fdc_device_base::sector_r()
 {
-	uint8_t val = sector;
-	if (inverted_bus) val ^= 0xff;
-
-	return val;
+	return sector ^ bus_invert_value;
 }
 
 void wd_fdc_device_base::data_w(uint8_t val)
 {
 	if (!mr) return;
 
-	if (inverted_bus) val ^= 0xff;
-
-	data = val;
+	data = val ^ bus_invert_value;
 	drop_drq();
 }
 
@@ -1421,10 +1404,7 @@ uint8_t wd_fdc_device_base::data_r()
 	if (!machine().side_effects_disabled())
 		drop_drq();
 
-	uint8_t val = data;
-	if (inverted_bus) val ^= 0xff;
-
-	return val;
+	return data ^ bus_invert_value;
 }
 
 void wd_fdc_device_base::write(offs_t reg, uint8_t val)
@@ -2369,11 +2349,6 @@ void wd_fdc_device_base::drop_drq()
 	if(drq) {
 		drq = false;
 		drq_cb(false);
-		if(main_state == IDLE && (status & S_BUSY)) {
-			status &= ~S_BUSY;
-			intrq = true;
-			intrq_cb(intrq);
-		}
 	}
 }
 
@@ -2703,7 +2678,7 @@ fd1771_device::fd1771_device(const machine_config &mconfig, const char *tag, dev
 	delay_register_commit = 16/2; // will became x2 later due to FM
 	delay_command_commit = 20/2;  // same as above
 	disable_mfm = true;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = false;
 	side_compare = false;
 	head_control = true;
@@ -2730,7 +2705,7 @@ fd1781_device::fd1781_device(const machine_config &mconfig, const char *tag, dev
 	delay_register_commit = 16;
 	delay_command_commit = 12;
 	disable_mfm = false;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = false;
 	side_compare = false;
 	head_control = true;
@@ -2757,7 +2732,7 @@ fd1791_device::fd1791_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -2773,7 +2748,7 @@ fd1792_device::fd1792_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = true;
 	has_enmf = false;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -2789,7 +2764,7 @@ fd1793_device::fd1793_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -2805,7 +2780,7 @@ kr1818vg93_device::kr1818vg93_device(const machine_config &mconfig, const char *
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -2821,7 +2796,7 @@ fd1794_device::fd1794_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = true;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -2837,7 +2812,7 @@ fd1795_device::fd1795_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = true;
 	side_compare = false;
 	head_control = true;
@@ -2861,7 +2836,7 @@ fd1797_device::fd1797_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = true;
 	side_compare = false;
 	head_control = true;
@@ -2885,7 +2860,7 @@ mb8866_device::mb8866_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -2901,7 +2876,7 @@ mb8876_device::mb8876_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -2917,7 +2892,7 @@ mb8877_device::mb8877_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -2933,7 +2908,7 @@ fd1761_device::fd1761_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -2949,7 +2924,7 @@ fd1763_device::fd1763_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -2965,7 +2940,7 @@ fd1765_device::fd1765_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = true;
 	side_compare = false;
 	head_control = true;
@@ -2989,7 +2964,7 @@ fd1767_device::fd1767_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = true;
 	side_compare = false;
 	head_control = true;
@@ -3013,7 +2988,7 @@ wd2791_device::wd2791_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = true;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -3030,7 +3005,7 @@ wd2793_device::wd2793_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = true;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -3046,7 +3021,7 @@ wd2795_device::wd2795_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = true;
 	side_compare = false;
 	head_control = true;
@@ -3070,7 +3045,7 @@ wd2797_device::wd2797_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = true;
 	side_compare = false;
 	head_control = true;
@@ -3094,7 +3069,7 @@ wd1770_device::wd1770_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 36; // official 48 is too high for oric jasmin boot
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = false;
 	side_compare = false;
 	head_control = false;
@@ -3112,7 +3087,7 @@ wd1772_device::wd1772_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 48;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = false;
 	side_compare = false;
 	head_control = false;
@@ -3138,7 +3113,7 @@ wd1773_device::wd1773_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 48;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = false;
 	side_compare = true;
 	head_control = false;

@@ -48,9 +48,12 @@ void victory_state::video_start()
 	m_bgcoll = m_bgcollx = m_bgcolly = 0;
 	m_scrollx = m_scrolly = 0;
 	m_video_control = 0;
+
 	memset(&m_micro, 0, sizeof(m_micro));
 	m_micro.timer = machine().scheduler().timer_alloc(timer_expired_delegate());
-	m_bgcoll_irq_timer = timer_alloc(FUNC(victory_state::bgcoll_irq_callback), this);
+
+	for (int i = 0; i < 128; i++)
+		m_bgcoll_irq_timer[i] = timer_alloc(FUNC(victory_state::bgcoll_irq_callback), this);
 
 	/* register for state saving */
 	save_item(NAME(m_paletteram));
@@ -603,13 +606,12 @@ int victory_state::command3()
 	int xcount = 8 - (micro.r >> 5);
 	int shift = micro.xp & 7;
 	int nshift = 8 - shift;
-	int x, y, sy;
 
-	for (x = 0; x < xcount; x++, micro.xp += 8)
+	for (int x = 0; x < xcount; x++, micro.xp += 8)
 	{
-		sy = micro.yp;
+		uint8_t sy = micro.yp;
 
-		for (y = 0; y < ycount; y++)
+		for (int y = 0; y < ycount; y++)
 		{
 			int srcoffs = micro.i++ & 0x3fff;
 			int dstoffs = (sy++ & 0xff) * 32 + micro.xp / 8;
@@ -800,12 +802,11 @@ int victory_state::command5()
 	uint8_t y = micro.yp;
 	int acc = 0x80;
 	int i = micro.i >> 8;
-	int c;
 
 	/* non-collision-detect case */
 	if (!(micro.cmd & 0x08) || m_fgcoll)
 	{
-		for (c = micro.i & 0xff; c < 0x100; c++)
+		for (int c = micro.i & 0xff; c < 0x100; c++)
 		{
 			int addr = y * 32 + x / 8;
 			int shift = x & 7;
@@ -836,7 +837,7 @@ int victory_state::command5()
 	/* collision-detect case */
 	else
 	{
-		for (c = micro.i & 0xff; c < 0x100; c++)
+		for (int c = micro.i & 0xff; c < 0x100; c++)
 		{
 			int addr = y * 32 + x / 8;
 			int shift = x & 7;
@@ -1119,8 +1120,11 @@ uint32_t victory_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			int fpix = *fg++;
 			int bpix = bg[(x + m_scrollx) & 255];
 			scanline[x] = bpix | (fpix << 3);
-			if (fpix && (bpix & bgcollmask) && count++ < 128)
-				m_bgcoll_irq_timer->adjust(screen.time_until_pos(y, x), x | (y << 8));
+			if (fpix && (bpix & bgcollmask) && count < 128)
+			{
+				m_bgcoll_irq_timer[count]->adjust(screen.time_until_pos(y, x), x | (y << 8));
+				count++;
+			}
 		}
 	}
 

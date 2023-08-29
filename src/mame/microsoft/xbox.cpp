@@ -8,14 +8,14 @@
 
 
 #include "emu.h"
-#include "machine/pci.h"
-#include "machine/idectrl.h"
 #include "xbox_pci.h"
 #include "xbox.h"
 
-#include "cpu/i386/i386.h"
 #include "bus/ata/atapicdr.h"
-#include "bus/ata/idehd.h"
+#include "bus/ata/hdd.h"
+#include "cpu/i386/i386.h"
+#include "machine/idectrl.h"
+#include "machine/pci.h"
 
 #include "speaker.h"
 
@@ -49,7 +49,7 @@ protected:
 
 	// devices
 	optional_device<bus_master_ide_controller_device> m_ide;
-	required_device<ata_mass_storage_device> m_devh;
+	required_device<ata_mass_storage_device_base> m_devh;
 	required_device<atapi_cdrom_device> m_devc;
 };
 

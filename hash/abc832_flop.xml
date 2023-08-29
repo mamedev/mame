@@ -289,4 +289,121 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="abc16" supported="no">
+		<description>ABC16</description>
+		<year>1985</year>
+		<publisher>MYAB Mikrokonsult</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<!--
+			Skiva START ABC16
+			MYAB version 1.1 850307
+
+			För ABC-800,802 och 806
+			Format Luxor 832
+			Copyright (C) Luxor
+			MYAB Mikrokonsult AB
+			-->
+			<dataarea name="flop" size="88205">
+				<rom name="disk003.imd" size="88205" crc="c259b9ba" sha1="e40df5ab5eaea8ad30fee948b86ca29df9f1ecfd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccdos31" supported="no">
+		<description>Concurrent-DOS v3.1 för ABC16</description>
+		<year>198?</year>
+		<publisher>MYAB Mikrokonsult</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<!--
+			Concurrent-DOS v3.1 för ABC16
+			Boot-disk MYAB XIOS v 1.0 850208
+			Serienr 328-100066
+			För ABC-800,802 och 806
+			Format Luxor 832
+			Copyright (C) Digital Research
+			MYAB Mikrokonsult AB
+			-->
+			<feature name="part_id" value="boot" />
+			<dataarea name="flop" size="104228">
+				<rom name="disk006.imd" size="104228" crc="8d1df685" sha1="a93555788776541a655a22416e0ab04b135f9967"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<!--
+			Hjälp-program (PC-DOS 1.1)
+			För ABC16 och CC-DOS 3.1
+
+			Format MYAB/CC-DOS
+			80 Spår Dubbel sida 8 sekt
+			Copyright (C) Digital Research
+			MYAB Mikrokonsult AB
+			-->
+			<feature name="part_id" value="help1" />
+			<dataarea name="flop" size="203098">
+				<rom name="disk004.imd" size="203098" crc="d62f2084" sha1="a060d5235a6907ba654d93b514137673be4c5abd"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<!--
+			Hjälp-program (CP/M-86) Vers 1.1
+			För ABC16 och CC-DOS 3.1
+
+			Format MYAB/CC-DOS
+			80 Spår Dubbel sida 8 sekt
+			Copyright (C) Digital Research
+			MYAB Mikrokonsult AB
+			-->
+			<feature name="part_id" value="help2" />
+			<dataarea name="flop" size="270392">
+				<rom name="disk005.imd" size="270392" crc="9393ba53" sha1="920a3e04293fff6ca1dd999d29f92c34f47d0993"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<!--
+			Demo skiva för ABC16
+			SuperCalc 3 och dBASE III
+
+			Format MYAB/CC-DOS
+			80 Spår Dubbel sida 8 sekt
+			Demo startas med SCDEMO eller DBDEMO
+			-->
+			<feature name="part_id" value="demo1" />
+			<dataarea name="flop" size="419741">
+				<rom name="disk001.imd" size="419741" crc="94cf7a73" sha1="2bff273a16a86fb313b70d6152f7355d8c47e9f9"/>
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<!--
+			Demo skiva för ABC16
+			WordStar och InfoStar
+
+			Format MYAB/CC-DOS
+			80 Spår Dubbel sida 8 sekt
+			Demo startas med WSINTRO, HELSKRAJ
+			RSTUTOR eller DSTUTOR
+			-->
+			<feature name="part_id" value="demo2" />
+			<dataarea name="flop" size="243463">
+				<rom name="disk002.imd" size="243463" crc="d081be42" sha1="211ed93ab5329d8e0a278d63ad4b5634efa1d710"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccdos41" supported="no">
+		<description>Concurrent-DOS v4.1 för ABC16</description>
+		<year>198?</year>
+		<publisher>MYAB Mikrokonsult</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="137544">
+				<rom name="disk007.imd" size="137544" crc="f08b9876" sha1="9331b3d3cf2eaf1144d5dc5524346391dd32eb4a"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

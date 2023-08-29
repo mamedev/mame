@@ -3,15 +3,28 @@
 #include "emu.h"
 #include "crossblaim.h"
 
-DEFINE_DEVICE_TYPE(MSX_CART_CROSSBLAIM, msx_cart_crossblaim_device, "msx_cart_crossblaim", "MSX Cartridge Cross Blaim")
+namespace {
 
-
-msx_cart_crossblaim_device::msx_cart_crossblaim_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_CROSSBLAIM, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_rombank(*this, "rombank")
+class msx_cart_crossblaim_device : public device_t, public msx_cart_interface
 {
-}
+public:
+	msx_cart_crossblaim_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, MSX_CART_CROSSBLAIM, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_rombank(*this, "rombank")
+	{ }
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device_t implementation
+	virtual void device_start() override { }
+
+private:
+	void mapper_write(u8 data);
+
+	memory_bank_creator m_rombank;
+};
 
 std::error_condition msx_cart_crossblaim_device::initialize_cartridge(std::string &message)
 {
@@ -44,3 +57,7 @@ void msx_cart_crossblaim_device::mapper_write(u8 data)
 
 	m_rombank->set_entry(data);
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_CROSSBLAIM, msx_cart_interface, msx_cart_crossblaim_device, "msx_cart_crossblaim", "MSX Cartridge Cross Blaim")

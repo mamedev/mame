@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m65ce02.c
+    m65ce02.cpp
 
     6502 with Z register and some more stuff
 

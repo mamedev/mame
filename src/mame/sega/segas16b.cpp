@@ -1416,19 +1416,8 @@ uint16_t segas16b_state::aceattac_custom_io_r(address_space &space, offs_t offse
 		case 0x3000/2:
 			if (BIT(offset, 4))
 				return m_cxdio->read(offset & 0x0f);
-			else // TODO: use uPD4701A device
-			switch (offset & 0x1b)
-			{
-				case 0x00: return ioport("TRACKX1")->read() & 0xff;
-				case 0x01: return (ioport("TRACKX1")->read() >> 8 & 0x0f) | (ioport("HANDY1")->read() << 4 & 0xf0);
-				case 0x02: return ioport("TRACKY1")->read();
-				case 0x03: return ioport("TRACKY1")->read() >> 8 & 0x0f;
-
-				case 0x08: return ioport("TRACKX2")->read() & 0xff;
-				case 0x09: return (ioport("TRACKX2")->read() >> 8 & 0x0f) | (ioport("HANDY2")->read() << 4 & 0xf0);
-				case 0x0a: return ioport("TRACKY2")->read();
-				case 0x0b: return ioport("TRACKY2")->read() >> 8 & 0xff;
-			}
+			else
+				return m_upd4701a[BIT(offset, 3)]->read_xy(offset & 3);
 			break;
 	}
 
@@ -1448,6 +1437,14 @@ void segas16b_state::aceattac_custom_io_w(address_space &space, offs_t offset, u
 			break;
 	}
 	standard_io_w(space, offset, data, mem_mask);
+}
+
+INPUT_CHANGED_MEMBER(segas16b_state::handy_w)
+{
+	upd4701_device &upd = *m_upd4701a[param];
+	upd.left_w(!BIT(newval, 2));
+	upd.right_w(!BIT(newval, 1));
+	upd.middle_w(!BIT(newval, 0));
 }
 
 
@@ -2084,7 +2081,7 @@ static INPUT_PORTS_START( aceattac )
 	PORT_BIT( 0xfff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(TMP_PL1BALL)
 
 	PORT_START("HANDY1") // power of "hand" device
-	PORT_BIT( 0x07, 0x04, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(2) PORT_PLAYER(TMP_PL1HAND)
+	PORT_BIT( 0x07, 0x04, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(2) PORT_PLAYER(TMP_PL1HAND) PORT_CHANGED_MEMBER(DEVICE_SELF, segas16b_state, handy_w, 0)
 
 	PORT_START("DIAL1") // toss formation
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(10) PORT_WRAPS PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1) PORT_INVERT PORT_FULL_TURN_COUNT(10)
@@ -2104,7 +2101,7 @@ static INPUT_PORTS_START( aceattac )
 	PORT_BIT( 0xfff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(TMP_PL2BALL)
 
 	PORT_START("HANDY2") // power of "hand" device
-	PORT_BIT( 0x07, 0x04, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(2) PORT_PLAYER(TMP_PL2HAND)
+	PORT_BIT( 0x07, 0x04, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(2) PORT_PLAYER(TMP_PL2HAND) PORT_CHANGED_MEMBER(DEVICE_SELF, segas16b_state, handy_w, 1)
 
 	PORT_START("DIAL2") // toss formation
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(10) PORT_WRAPS PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_INVERT PORT_FULL_TURN_COUNT(10)
@@ -4072,9 +4069,15 @@ void segas16b_state::system16b_fd1094(machine_config &config)
 void segas16b_state::aceattacb_fd1094(machine_config &config)
 {
 	system16b_fd1094(config);
+
 	// 834-6602 I/O board
 	UPD4701A(config, m_upd4701a[0]);
+	m_upd4701a[0]->set_portx_tag("TRACKX1");
+	m_upd4701a[0]->set_porty_tag("TRACKY1");
+
 	UPD4701A(config, m_upd4701a[1]);
+	m_upd4701a[1]->set_portx_tag("TRACKX2");
+	m_upd4701a[1]->set_porty_tag("TRACKY2");
 
 	CXD1095(config, m_cxdio);
 	m_cxdio->in_porta_cb().set_ioport("HANDX1");

@@ -180,20 +180,20 @@
  * Keyboard controller output port
  *  4: select 1M/4M SIMMs?
  *
+ * rs3230 -window -nomax -ui_active -tty1 terminal -numscreens 2
  * PON failures
- *   kseg0/kseg1 cache
- *   instruction cache functionality (skipped)
+ *   instruction cache functionality (failed)
  *   instruction cache mats+ (skipped)
- *   data cache block refill
+ *   data cache block refill (failed)
  *   instruction cache block refill (skipped)
- *   scc - requires z80scc zero count interrupt
+ *   id prom (failed)
  *   tod - loop <1 second real time?
  *   color frame buffer (skipped)
  *   dma controller chip
  *   scsi controller chip
  *   tlb (skipped) - all pass except tlb_n (requires cpu data cache)
  *   exception (skipped)
- *   parity
+ *   parity (failed)
  *   dma parity (skipped)
  *   at serial board (skipped)
  */

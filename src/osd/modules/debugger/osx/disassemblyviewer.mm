@@ -120,12 +120,11 @@
 
 	// calculate the optimal size for everything
 	NSSize const desired = [NSScrollView frameSizeForContentSize:[dasmView maximumFrameSize]
-											horizontalScrollerClass:[NSScroller class]
-											verticalScrollerClass:[NSScroller class]
-											borderType:[dasmScroll borderType]
-											controlSize: NSControlSizeRegular
-											scrollerStyle: NSScrollerStyleOverlay
-											];
+										 horizontalScrollerClass:[NSScroller class]
+										   verticalScrollerClass:[NSScroller class]
+													  borderType:[dasmScroll borderType]
+													 controlSize:NSControlSizeRegular
+												   scrollerStyle:NSScrollerStyleOverlay];
 	[self cascadeWindowWithDesiredSize:desired forView:dasmScroll];
 
 	// don't forget the result

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    Videa Gridlee hardware
+    Videa (predecessor to Sente) Gridlee hardware
 
     driver by Aaron Giles
 

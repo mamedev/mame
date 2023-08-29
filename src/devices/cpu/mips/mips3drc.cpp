@@ -2610,7 +2610,7 @@ bool mips3_device::generate_set_cop0_reg(drcuml_block &block, compiler_state &co
 	{
 		case COP0_Cause:
 			UML_ROLINS(block, CPR032(COP0_Cause), I0, 0, ~0xfc00);              // rolins  [Cause],i0,0,~0xfc00
-			compiler.checkints = true;
+			compiler.checksoftints = true;
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, true);
 			return true;

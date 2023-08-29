@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 #include "machine/intelfsh.h"
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh7604.h"
 #include "cps3_a.h"
 #include "machine/timer.h"
 #include "emupal.h"
@@ -82,7 +82,7 @@ protected:
 
 	void copy_from_nvram();
 	u32 m_current_table_address;
-	required_device<sh2_device> m_maincpu;
+	required_device<sh2_sh7604_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<cps3_sound_device> m_cps3sound;

@@ -901,8 +901,11 @@ void towns_state::towns_sound_ctrl_w(offs_t offset, uint8_t data)
 // Joysticks are multiplexed, with fire buttons available when bits 0 and 1 of port 0x4d6 are high. (bits 2 and 3 for second port)
 uint8_t towns_state::towns_padport_r(offs_t offset)
 {
+	// Documentation indicates bit 7 is unused and should be ignored.
+	// Tatsujin Ou expects it to read as zero to navigate menus.
+	// Unclear whether it always reads as zero, or it's affected by something undocumented.
 	unsigned const pad = BIT(offset, 1);
-	return m_pad_ports[pad]->read() & (0x8f | (bitswap<3>(m_towns_pad_mask, pad + 4, (pad * 2) + 1, pad * 2) << 4));
+	return m_pad_ports[pad]->read() & (0x0f | (bitswap<3>(m_towns_pad_mask, pad + 4, (pad * 2) + 1, pad * 2) << 4));
 }
 
 void towns_state::towns_pad_mask_w(uint8_t data)

@@ -9,11 +9,11 @@ license:CC0-1.0
 	Nearly all of the cartridges on this Dragon software list will also run on the CoCo 2/3, CP400.
 
 	ROMs dumped from RAM and marked as "bad dumps":
-		Cumana DOS v2.0
+	    Cumana DOS v2.0
 
 	TODO:
-		Most cartridges with two EPROMs have been dumped as one single file, such entries should be marked as "bad dump" until proper split dumps exist.
-		Add compatibility tags where needed.
+	    Most cartridges with two EPROMs have been dumped as one single file, such entries should be marked as "bad dump" until proper split dumps exist.
+	    Add compatibility tags where needed.
 
 	-->
 
@@ -424,8 +424,8 @@ license:CC0-1.0
 		<publisher>Belrampa Servicios, SA</publisher>
 		<info name="usage" value="Disable Cart Auto-Start, EXEC 49152" />
 		<part name="cart" interface="coco_cart">
-			<feature name="pcb" value="RE-075" />		<!--	PCB with "59" written with marker	-->
-			<feature name="ic1" value="TMS ?" />			<!--	Illegible	-->
+			<feature name="pcb" value="RE-075" />       <!--    PCB with "59" written with marker   -->
+			<feature name="ic1" value="TMS ?" />            <!--    Illegible   -->
 			<feature name="ic2" value="TMS 2564JDL-45 DBP8127" />
 			<dataarea name="rom" size="0x4000">
 				<rom name="1.ic1" size="0x2000" offset="0x0000" crc="65d3153d" sha1="c44277f3d7ec615947465d20674b0771bdd44867" />

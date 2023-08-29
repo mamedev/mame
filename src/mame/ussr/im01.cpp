@@ -95,8 +95,8 @@ CТА: -                                                   - Enter Move
 #include "speaker.h"
 
 // internal artwork
-#include "im01.lh" // clickable
-#include "im05.lh" // clickable
+#include "im01.lh"
+#include "im05.lh"
 
 
 namespace {
