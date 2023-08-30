@@ -301,14 +301,6 @@ and bonus options).  There is no screen which shows the bonus lives values like 
 other two sets, either.  flickys1 allows for DEMO SOUND which none of the others sets
 seem to have access to.
 
-About main CPU clocking:
-
-  A 20MHz crystal clocks an LS161 which counts up from either 10 or 11 to 16 before
-carrying out and forcing a reload. The low bit of the reload value comes from the
-Z80's /M1 signal. When /M1 is low (an opcode is being fetched), the reload count
-is 10, which means the 20MHz clock is divided by 6. When /M1 is high, the reload
-count is 11, which means the clock is divided by 5.
-
 ******************************************************************************/
 
 #include "emu.h"
@@ -347,12 +339,8 @@ void system1_state::machine_start()
 		m_bank1d->set_entry(0);
 	}
 
-	m_mute_xor = 0x00;
-	m_dakkochn_mux_data = 0x00;
-	m_m1_num = 0;
-
 	save_item(NAME(m_dakkochn_mux_data));
-	save_item(NAME(m_m1_num));
+	save_item(NAME(m_cycle_adjust));
 	save_item(NAME(m_videomode_prev));
 	save_item(NAME(m_mcu_control));
 	save_item(NAME(m_nob_maincpu_latch));
@@ -371,6 +359,34 @@ MACHINE_START_MEMBER(system1_state,system2)
 void system1_state::machine_reset()
 {
 	m_dakkochn_mux_data = 0;
+}
+
+
+/*************************************
+ *
+ *  Main CPU clocking
+ *
+ *************************************/
+
+/*
+    A 20MHz crystal clocks an LS161 which counts up from either 10 or 11 to 16 before
+    carrying out and forcing a reload. The low bit of the reload value comes from the
+    Z80's /M1 signal. When /M1 is low (an opcode is being fetched), the reload count
+    is 10, which means the 20MHz clock is divided by 6. When /M1 is high, the reload
+    count is 11, which means the clock is divided by 5.
+
+	Since /M1 is low for 2 cycles during opcode fetch, this makes every opcode fetch
+	take an extra 2 20MHz clocks, which is 0.4 cycles at 4MHz.
+*/
+
+void system1_state::refresh_cb(u8 data)
+{
+	m_cycle_adjust += 0.4;
+	if (m_cycle_adjust >= 1.0)
+	{
+		m_cycle_adjust -= 1.0;
+		m_maincpu->adjust_icount(-1);
+	}
 }
 
 
@@ -2154,18 +2170,11 @@ GFXDECODE_END
 void system1_state::sys1ppi(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK / 5);
+	Z80(config, m_maincpu, MASTER_CLOCK/5);
 	m_maincpu->set_addrmap(AS_PROGRAM, &system1_state::system1_map);
 	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_ppi_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(system1_state::irq0_line_hold));
-	/* Lord Nightmare:
-		the divider is 5 for any z80 cycle that M1 is high, and 6 if M1 is low
-		since M1 is low for 2 cycles during opcode fetch, this makes every opcode fetch take an extra 2 20mhz clocks */
-	m_maincpu->refresh_cb().set([this](offs_t offset, u8 data) {
-		m_m1_num = (m_m1_num + 1) % 5;
-		if (m_m1_num == 2)
-			m_maincpu->adjust_icount(-1);
-	});
+	m_maincpu->refresh_cb().set(FUNC(system1_state::refresh_cb));
 
 	Z80(config, m_soundcpu, SOUND_CLOCK/2);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &system1_state::sound_map);
@@ -2233,6 +2242,7 @@ void system1_state::encrypted_sys1ppi_maps(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::decrypted_opcodes_map);
 	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_ppi_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(system1_state::irq0_line_hold));
+	m_maincpu->refresh_cb().set(FUNC(system1_state::refresh_cb));
 }
 
 void system1_state::encrypted_sys1pio_maps(machine_config &config)
@@ -2241,6 +2251,7 @@ void system1_state::encrypted_sys1pio_maps(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::decrypted_opcodes_map);
 	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_pio_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(system1_state::irq0_line_hold));
+	m_maincpu->refresh_cb().set(FUNC(system1_state::refresh_cb));
 }
 
 void system1_state::encrypted_sys2_mc8123_maps(machine_config &config)
@@ -2249,12 +2260,13 @@ void system1_state::encrypted_sys2_mc8123_maps(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::banked_decrypted_opcodes_map);
 	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_ppi_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(system1_state::irq0_line_hold));
+	m_maincpu->refresh_cb().set(FUNC(system1_state::refresh_cb));
 }
 
 void system1_state::sys1pioxb(machine_config &config)
 {
 	sys1pio(config);
-	MC8123(config.replace(), m_maincpu, MASTER_CLOCK);
+	MC8123(config.replace(), m_maincpu, MASTER_CLOCK/5);
 	encrypted_sys1pio_maps(config);
 }
 
@@ -2267,7 +2279,7 @@ void system1_state::blockgal(machine_config &config)
 void system1_state::sys1ppix_315_5178(machine_config &config)
 {
 	sys1ppi(config);
-	segacrp2_z80_device &z80(SEGA_315_5178(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrp2_z80_device &z80(SEGA_315_5178(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1ppi_maps(config);
 	z80.set_decrypted_tag(m_decrypted_opcodes);
 }
@@ -2275,7 +2287,7 @@ void system1_state::sys1ppix_315_5178(machine_config &config)
 void system1_state::sys1ppix_315_5179(machine_config &config)
 {
 	sys1ppi(config);
-	segacrp2_z80_device &z80(SEGA_315_5179(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrp2_z80_device &z80(SEGA_315_5179(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1ppi_maps(config);
 	z80.set_decrypted_tag(m_decrypted_opcodes);
 }
@@ -2283,7 +2295,7 @@ void system1_state::sys1ppix_315_5179(machine_config &config)
 void system1_state::sys1ppix_315_5051(machine_config &config)
 {
 	sys1ppi(config);
-	segacrpt_z80_device &z80(SEGA_315_5051(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrpt_z80_device &z80(SEGA_315_5051(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1ppi_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
@@ -2291,7 +2303,7 @@ void system1_state::sys1ppix_315_5051(machine_config &config)
 void system1_state::sys1ppix_315_5048(machine_config &config)
 {
 	sys1ppi(config);
-	segacrpt_z80_device &z80(SEGA_315_5048(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrpt_z80_device &z80(SEGA_315_5048(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1ppi_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
@@ -2299,7 +2311,7 @@ void system1_state::sys1ppix_315_5048(machine_config &config)
 void system1_state::sys1ppix_315_5033(machine_config &config)
 {
 	sys1ppi(config);
-	segacrpt_z80_device &z80(SEGA_315_5033(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrpt_z80_device &z80(SEGA_315_5033(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1ppi_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
@@ -2307,7 +2319,7 @@ void system1_state::sys1ppix_315_5033(machine_config &config)
 void system1_state::sys1ppix_315_5065(machine_config &config)
 {
 	sys1ppi(config);
-	segacrpt_z80_device &z80(SEGA_315_5065(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrpt_z80_device &z80(SEGA_315_5065(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1ppi_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
@@ -2315,7 +2327,7 @@ void system1_state::sys1ppix_315_5065(machine_config &config)
 void system1_state::sys1ppix_315_5098(machine_config &config)
 {
 	sys1ppi(config);
-	segacrpt_z80_device &z80(SEGA_315_5098(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrpt_z80_device &z80(SEGA_315_5098(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1ppi_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
@@ -2323,7 +2335,7 @@ void system1_state::sys1ppix_315_5098(machine_config &config)
 void system1_state::sys1piox_315_5177(machine_config &config)
 {
 	sys1pio(config);
-	segacrp2_z80_device &z80(SEGA_315_5177(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrp2_z80_device &z80(SEGA_315_5177(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1pio_maps(config);
 	z80.set_decrypted_tag(m_decrypted_opcodes);
 }
@@ -2331,7 +2343,7 @@ void system1_state::sys1piox_315_5177(machine_config &config)
 void system1_state::sys1piox_315_5162(machine_config &config)
 {
 	sys1pio(config);
-	segacrp2_z80_device &z80(SEGA_315_5162(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrp2_z80_device &z80(SEGA_315_5162(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1pio_maps(config);
 	z80.set_decrypted_tag(m_decrypted_opcodes);
 }
@@ -2339,7 +2351,7 @@ void system1_state::sys1piox_315_5162(machine_config &config)
 void system1_state::sys1piox_317_0006(machine_config &config)
 {
 	sys1pio(config);
-	segacrp2_z80_device &z80(SEGA_317_0006(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrp2_z80_device &z80(SEGA_317_0006(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1pio_maps(config);
 	z80.set_decrypted_tag(m_decrypted_opcodes);
 
@@ -2349,7 +2361,7 @@ void system1_state::sys1piox_317_0006(machine_config &config)
 void system1_state::sys1piox_315_5135(machine_config &config)
 {
 	sys1pio(config);
-	segacrpt_z80_device &z80(SEGA_315_5135(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrpt_z80_device &z80(SEGA_315_5135(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1pio_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
@@ -2357,7 +2369,7 @@ void system1_state::sys1piox_315_5135(machine_config &config)
 void system1_state::sys1piox_315_5132(machine_config &config)
 {
 	sys1pio(config);
-	segacrpt_z80_device &z80(SEGA_315_5132(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrpt_z80_device &z80(SEGA_315_5132(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1pio_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
@@ -2365,7 +2377,7 @@ void system1_state::sys1piox_315_5132(machine_config &config)
 void system1_state::sys1piox_315_5155(machine_config &config)
 {
 	sys1pio(config);
-	segacrpt_z80_device &z80(SEGA_315_5155(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrpt_z80_device &z80(SEGA_315_5155(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1pio_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
@@ -2373,7 +2385,7 @@ void system1_state::sys1piox_315_5155(machine_config &config)
 void system1_state::sys1piox_315_5111(machine_config &config)
 {
 	sys1pio(config);
-	segacrpt_z80_device &z80(SEGA_315_5111(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrpt_z80_device &z80(SEGA_315_5111(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1pio_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
@@ -2381,7 +2393,7 @@ void system1_state::sys1piox_315_5111(machine_config &config)
 void system1_state::sys1piox_315_5110(machine_config &config)
 {
 	sys1pio(config);
-	segacrpt_z80_device &z80(SEGA_315_5110(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrpt_z80_device &z80(SEGA_315_5110(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1pio_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
@@ -2389,7 +2401,7 @@ void system1_state::sys1piox_315_5110(machine_config &config)
 void system1_state::sys1piox_315_5051(machine_config &config)
 {
 	sys1pio(config);
-	segacrpt_z80_device &z80(SEGA_315_5051(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrpt_z80_device &z80(SEGA_315_5051(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1pio_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
@@ -2397,7 +2409,7 @@ void system1_state::sys1piox_315_5051(machine_config &config)
 void system1_state::sys1piox_315_5098(machine_config &config)
 {
 	sys1pio(config);
-	segacrpt_z80_device &z80(SEGA_315_5098(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrpt_z80_device &z80(SEGA_315_5098(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1pio_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
@@ -2405,7 +2417,7 @@ void system1_state::sys1piox_315_5098(machine_config &config)
 void system1_state::sys1piox_315_5102(machine_config &config)
 {
 	sys1pio(config);
-	segacrpt_z80_device &z80(SEGA_315_5102(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrpt_z80_device &z80(SEGA_315_5102(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1pio_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
@@ -2413,7 +2425,7 @@ void system1_state::sys1piox_315_5102(machine_config &config)
 void system1_state::sys1piox_315_5133(machine_config &config)
 {
 	sys1pio(config);
-	segacrpt_z80_device &z80(SEGA_315_5133(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrpt_z80_device &z80(SEGA_315_5133(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1pio_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
@@ -2421,7 +2433,7 @@ void system1_state::sys1piox_315_5133(machine_config &config)
 void system1_state::sys1piox_315_5093(machine_config &config)
 {
 	sys1pio(config);
-	segacrpt_z80_device &z80(SEGA_315_5093(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrpt_z80_device &z80(SEGA_315_5093(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1pio_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
@@ -2429,7 +2441,7 @@ void system1_state::sys1piox_315_5093(machine_config &config)
 void system1_state::sys1piox_315_5065(machine_config &config)
 {
 	sys1pio(config);
-	segacrpt_z80_device &z80(SEGA_315_5065(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrpt_z80_device &z80(SEGA_315_5065(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1pio_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
@@ -2444,7 +2456,7 @@ void system1_state::sys1pios(machine_config &config)
 void system1_state::sys1piosx_315_5099(machine_config &config)
 {
 	sys1pio(config);
-	segacrpt_z80_device &z80(SEGA_315_5099(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrpt_z80_device &z80(SEGA_315_5099(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1pio_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
@@ -2452,7 +2464,7 @@ void system1_state::sys1piosx_315_5099(machine_config &config)
 void system1_state::sys1piosx_315_5096(machine_config &config)
 {
 	sys1pios(config);
-	segacrpt_z80_device &z80(SEGA_315_5096(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrpt_z80_device &z80(SEGA_315_5096(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1pio_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
@@ -2460,7 +2472,7 @@ void system1_state::sys1piosx_315_5096(machine_config &config)
 void system1_state::sys1ppisx_315_5064(machine_config &config)
 {
 	sys1ppis(config);
-	segacrpt_z80_device &z80(SEGA_315_5064(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrpt_z80_device &z80(SEGA_315_5064(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1ppi_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
@@ -2468,7 +2480,7 @@ void system1_state::sys1ppisx_315_5064(machine_config &config)
 void system1_state::sys1ppisx_315_5041(machine_config &config)
 {
 	sys1ppis(config);
-	segacrpt_z80_device &z80(SEGA_315_5041(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrpt_z80_device &z80(SEGA_315_5041(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1ppi_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
@@ -2536,7 +2548,7 @@ void system1_state::sys2x(machine_config &config)
 void system1_state::sys2_315_5177(machine_config &config)
 {
 	sys2(config);
-	segacrp2_z80_device &z80(SEGA_315_5177(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrp2_z80_device &z80(SEGA_315_5177(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1ppi_maps(config);
 	z80.set_decrypted_tag(m_decrypted_opcodes);
 }
@@ -2544,7 +2556,7 @@ void system1_state::sys2_315_5177(machine_config &config)
 void system1_state::sys2_315_5176(machine_config &config)
 {
 	sys2(config);
-	segacrp2_z80_device &z80(SEGA_315_5176(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrp2_z80_device &z80(SEGA_315_5176(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1ppi_maps(config);
 	z80.set_decrypted_tag(m_decrypted_opcodes);
 }
@@ -2552,7 +2564,7 @@ void system1_state::sys2_315_5176(machine_config &config)
 void system1_state::sys2_317_0006(machine_config &config)
 {
 	sys2(config);
-	segacrp2_z80_device &z80(SEGA_317_0006(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrp2_z80_device &z80(SEGA_317_0006(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1ppi_maps(config);
 	z80.set_decrypted_tag(m_decrypted_opcodes);
 
@@ -2562,7 +2574,7 @@ void system1_state::sys2_317_0006(machine_config &config)
 void system1_state::sys2_317_0007(machine_config &config)
 {
 	sys2(config);
-	segacrp2_z80_device &z80(SEGA_317_0007(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrp2_z80_device &z80(SEGA_317_0007(config.replace(), m_maincpu, MASTER_CLOCK/5));
 	encrypted_sys1ppi_maps(config);
 	z80.set_decrypted_tag(m_decrypted_opcodes);
 
@@ -2572,7 +2584,7 @@ void system1_state::sys2_317_0007(machine_config &config)
 void system1_state::sys2xb(machine_config &config)
 {
 	sys2(config);
-	MC8123(config.replace(), m_maincpu, MASTER_CLOCK);
+	MC8123(config.replace(), m_maincpu, MASTER_CLOCK/5);
 	encrypted_sys2_mc8123_maps(config);
 }
 
@@ -2600,7 +2612,7 @@ void system1_state::sys2row(machine_config &config)
 void system1_state::sys2rowxb(machine_config &config)
 {
 	sys2row(config);
-	MC8123(config.replace(), m_maincpu, MASTER_CLOCK);
+	MC8123(config.replace(), m_maincpu, MASTER_CLOCK/5);
 	encrypted_sys2_mc8123_maps(config);
 }
 
@@ -5496,6 +5508,11 @@ void system1_state::init_wbml()
 
 void system1_state::init_tokisens()
 {
+	// HACK: otherwise player dies in attract mode and game gives a continue screen,
+	// probably the other Z80 timing kludges aren't quite accurate (or the encrypted CPU differs)
+	// could also be different screen refresh, or even just exactly when the first interrupt occurs
+	m_maincpu->set_clock_scale(1.07f);
+
 	init_wbml();
 }
 

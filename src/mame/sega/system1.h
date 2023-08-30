@@ -137,6 +137,7 @@ private:
 	u8 m_tilemap_pages = 0;
 
 	// protection, miscs
+	float m_cycle_adjust = 0.0;
 	u8 m_mute_xor = 0;
 	u8 m_dakkochn_mux_data = 0;
 	u8 m_mcu_control = 0;
@@ -144,8 +145,6 @@ private:
 	u8 m_nob_mcu_latch = 0;
 	u8 m_nob_mcu_status = 0;
 	int m_nobb_inport23_step = 0;
-
-	u8 m_m1_num = 0;
 
 	// video handlers
 	void common_videomode_w(u8 data);
@@ -167,6 +166,7 @@ private:
 	void sound_control_w(u8 data);
 
 	// misc handlers
+	void refresh_cb(u8 data);
 	void mcu_control_w(u8 data);
 	u8 mcu_io_r(offs_t offset);
 	void mcu_io_w(offs_t offset, u8 data);
