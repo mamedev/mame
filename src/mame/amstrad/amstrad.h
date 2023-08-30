@@ -211,8 +211,6 @@ private:
 	void aleste_msx_mapper(offs_t offset, uint8_t data);
 	uint8_t amstrad_cpc_io_r(offs_t offset);
 	void amstrad_cpc_io_w(offs_t offset, uint8_t data);
-	uint8_t amstrad_cpc_mem_r(offs_t offset);
-	void amstrad_cpc_mem_w(offs_t offset, uint8_t data);
 	uint8_t amstrad_psg_porta_read();
 	void amstrad_plus_seqcheck(int data);
 	DECLARE_MACHINE_START(amstrad);
@@ -268,7 +266,7 @@ private:
 
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_user1;
-	memory_bank_array_creator<16> m_banks;
+	required_memory_bank_array<16> m_banks;
 	optional_ioport_array<11> m_io_kbrow;
 	optional_ioport_array<4> m_io_analog;
 	optional_ioport_array<3> m_io_mouse;
