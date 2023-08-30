@@ -340,7 +340,7 @@ void system1_state::machine_start()
 	}
 
 	save_item(NAME(m_dakkochn_mux_data));
-	save_item(NAME(m_cycle_adjust));
+	save_item(NAME(m_adjust_cycles));
 	save_item(NAME(m_videomode_prev));
 	save_item(NAME(m_mcu_control));
 	save_item(NAME(m_nob_maincpu_latch));
@@ -375,18 +375,15 @@ void system1_state::machine_reset()
     is 10, which means the 20MHz clock is divided by 6. When /M1 is high, the reload
     count is 11, which means the clock is divided by 5.
 
-	Since /M1 is low for 2 cycles during opcode fetch, this makes every opcode fetch
-	take an extra 2 20MHz clocks, which is 0.4 cycles at 4MHz.
+    Since /M1 is low for 2 cycles during opcode fetch, this makes every opcode fetch
+    take an extra 2 20MHz clocks, which is 2/5th cycles at 4MHz.
 */
 
-void system1_state::refresh_cb(u8 data)
+void system1_state::adjust_cycles(u8 data)
 {
-	m_cycle_adjust += 0.4;
-	if (m_cycle_adjust >= 1.0)
-	{
-		m_cycle_adjust -= 1.0;
+	m_adjust_cycles = (m_adjust_cycles + 2) % 5;
+	if (m_adjust_cycles <= 1)
 		m_maincpu->adjust_icount(-1);
-	}
 }
 
 
@@ -2174,7 +2171,7 @@ void system1_state::sys1ppi(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &system1_state::system1_map);
 	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_ppi_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(system1_state::irq0_line_hold));
-	m_maincpu->refresh_cb().set(FUNC(system1_state::refresh_cb));
+	m_maincpu->refresh_cb().set(FUNC(system1_state::adjust_cycles));
 
 	Z80(config, m_soundcpu, SOUND_CLOCK/2);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &system1_state::sound_map);
@@ -2193,7 +2190,7 @@ void system1_state::sys1ppi(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);  /* needed for proper hardware collisions */
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); /* needed for proper hardware collisions */
 	m_screen->set_raw(MASTER_CLOCK/2, 640, 0, 512, 260, 0, 224);
 	m_screen->set_screen_update(FUNC(system1_state::screen_update_system1));
 	m_screen->set_palette(m_palette);
@@ -2242,7 +2239,7 @@ void system1_state::encrypted_sys1ppi_maps(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::decrypted_opcodes_map);
 	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_ppi_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(system1_state::irq0_line_hold));
-	m_maincpu->refresh_cb().set(FUNC(system1_state::refresh_cb));
+	m_maincpu->refresh_cb().set(FUNC(system1_state::adjust_cycles));
 }
 
 void system1_state::encrypted_sys1pio_maps(machine_config &config)
@@ -2251,7 +2248,7 @@ void system1_state::encrypted_sys1pio_maps(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::decrypted_opcodes_map);
 	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_pio_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(system1_state::irq0_line_hold));
-	m_maincpu->refresh_cb().set(FUNC(system1_state::refresh_cb));
+	m_maincpu->refresh_cb().set(FUNC(system1_state::adjust_cycles));
 }
 
 void system1_state::encrypted_sys2_mc8123_maps(machine_config &config)
@@ -2260,7 +2257,7 @@ void system1_state::encrypted_sys2_mc8123_maps(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::banked_decrypted_opcodes_map);
 	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_ppi_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(system1_state::irq0_line_hold));
-	m_maincpu->refresh_cb().set(FUNC(system1_state::refresh_cb));
+	m_maincpu->refresh_cb().set(FUNC(system1_state::adjust_cycles));
 }
 
 void system1_state::sys1pioxb(machine_config &config)

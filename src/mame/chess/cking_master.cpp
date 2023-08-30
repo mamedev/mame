@@ -74,6 +74,28 @@ private:
 	u16 m_inp_mux = 0;
 };
 
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
+
+void master_state::init_master()
+{
+	u8 *rom = memregion("maincpu")->base();
+	const u32 len = memregion("maincpu")->bytes();
+
+	// descramble data lines
+	for (int i = 0; i < len; i++)
+		rom[i] = bitswap<8>(rom[i], 4,5,0,7,6,1,3,2);
+
+	// descramble address lines
+	std::vector<u8> buf(len);
+	memcpy(&buf[0], rom, len);
+	for (int i = 0; i < len; i++)
+		rom[i] = buf[bitswap<16>(i, 15,14,13,12,11,3,7,9, 10,8,6,5,4,2,1,0)];
+}
+
 void master_state::machine_start()
 {
 	// register for savestates
@@ -114,22 +136,6 @@ u8 master_state::input_r()
 		data = m_inputs[m_inp_mux - 8]->read();
 
 	return ~data;
-}
-
-void master_state::init_master()
-{
-	u8 *rom = memregion("maincpu")->base();
-	const u32 len = memregion("maincpu")->bytes();
-
-	// descramble data lines
-	for (int i = 0; i < len; i++)
-		rom[i] = bitswap<8>(rom[i], 4,5,0,7,6,1,3,2);
-
-	// descramble address lines
-	std::vector<u8> buf(len);
-	memcpy(&buf[0], rom, len);
-	for (int i = 0; i < len; i++)
-		rom[i] = buf[bitswap<16>(i, 15,14,13,12,11,3,7,9, 10,8,6,5,4,2,1,0)];
 }
 
 
