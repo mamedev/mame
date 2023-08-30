@@ -1426,7 +1426,7 @@ The following floppies came with the machines.
 		<info name="serial" value="8217" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="368640">
-				<rom name="penguin (1988)(eurosoft)(nl).dsk" size="368640" crc="d0252c04" sha1="8b5e5de08ce07b929e07be2d4eca84eb5bac1748" status="baddump" />
+				<rom name="penguin (1988)(eurosoft)(nl)(alt).dsk" size="368640" crc="d0252c04" sha1="8b5e5de08ce07b929e07be2d4eca84eb5bac1748" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -3207,8 +3207,8 @@ The following floppies came with the machines.
 		<year>2019</year>
 		<publisher>Mr Retro</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="rom" size="737280">
-				<rom name="xor - mr retro.dsk" size="737280" crc="b185d199" sha1="0b53fa00f665204b1a4996b3bc69efd95f0cf054"/>
+			<dataarea name="rom" size="368640">
+				<rom name="xor - mr retro.dsk" size="368640" crc="b185d199" sha1="0b53fa00f665204b1a4996b3bc69efd95f0cf054"/>
 			</dataarea>
 		</part>
 	</software>
