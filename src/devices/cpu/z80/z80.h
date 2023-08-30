@@ -13,7 +13,7 @@ enum
 	NSC800_RSTB,
 	NSC800_RSTC,
 	Z80_INPUT_LINE_WAIT,
-	Z80_INPUT_LINE_BOGUSWAIT, /* WAIT pin implementation used to be nonexistent, please remove this when all drivers are updated with Z80_INPUT_LINE_WAIT */
+	Z80_INPUT_LINE_BOGUSWAIT, // WAIT pin implementation used to be nonexistent, please remove this when all drivers are updated with Z80_INPUT_LINE_WAIT
 	Z80_INPUT_LINE_BUSRQ
 };
 
@@ -30,10 +30,11 @@ enum
 class z80_device : public cpu_device, public z80_daisy_chain_interface
 {
 public:
-	z80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z80_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, const uint8_t *ed, const uint8_t *xy, const uint8_t *xycb, const uint8_t *ex);
-	void set_mtm_cycles(uint8_t mtm_cycles);
+	void z80_set_m1_cycles(u8 m1_cycles) { m_m1_cycles = m1_cycles; }
+	void z80_set_memrq_cycles(u8 memrq_cycles) { m_memrq_cycles = memrq_cycles; }
+	void z80_set_iorq_cycles(u8 iorq_cycles) { m_iorq_cycles = iorq_cycles; }
 	template <typename... T> void set_memory_map(T &&... args) { set_addrmap(AS_PROGRAM, std::forward<T>(args)...); }
 	template <typename... T> void set_m1_map(T &&... args) { set_addrmap(AS_OPCODES, std::forward<T>(args)...); }
 	template <typename... T> void set_io_map(T &&... args) { set_addrmap(AS_IO, std::forward<T>(args)...); }
@@ -43,17 +44,91 @@ public:
 	auto halt_cb() { return m_halt_cb.bind(); }
 
 protected:
-	z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	using ops_type = std::vector<std::function<void()>>;
+
+	enum op_prefix : u8
+	{
+		NONE = 0, CB, DD, ED, FD, XY_CB
+	};
+
+	class op_builder
+	{
+	public:
+		op_builder (z80_device& z80) : m_z80(z80) {};
+
+		ops_type get_steps() { return m_steps; }
+
+		op_builder * foo(std::function<void()> step) { return this; } // discards content. needed to make macros balanced
+		op_builder * add(ops_type steps)
+		{
+			assert(!steps.empty());
+			auto to = m_if_condition == nullptr ? &m_steps : &m_if_steps;
+			to->insert(to->end(), steps.begin(), steps.end());
+			return this;
+		}
+		op_builder * add(std::function<void()> step)
+		{
+			auto to = m_if_condition == nullptr ? &m_steps : &m_if_steps;
+			to->push_back(step);
+			return this;
+		}
+		op_builder * call(std::function<ops_type()> steps) { return add(steps()); }
+		op_builder * do_if(std::function<bool()> if_condition) { m_if_condition = if_condition;  return this; }
+		op_builder * do_else() { assert(!m_if_steps.empty()); m_else_at = m_if_steps.size(); return this; }
+		op_builder * edo()
+		{
+			assert(!m_if_steps.empty());
+			auto cond = m_if_condition;
+			m_if_condition = nullptr;
+			z80_device& z80 = m_z80;
+			if (m_else_at)
+			{
+				auto steps = m_else_at + 1;
+				add([&z80, steps, cond](){ if (!cond()) { z80.m_cycle += steps; }});
+				add({m_if_steps.begin(), m_if_steps.begin() + m_else_at});
+				steps = m_if_steps.size() - m_else_at;
+				add([&z80, steps](){ z80.m_cycle += steps; });
+				add({m_if_steps.begin() + m_else_at, m_if_steps.end()});
+				m_else_at = 0;
+			}
+			else
+			{
+				auto steps = m_if_steps.size();
+				add([&z80, steps, cond](){ if (!cond()) { z80.m_cycle += steps; }});
+				add(m_if_steps);
+			}
+			m_if_steps.clear();
+  			return this;
+		}
+		ops_type jump(op_prefix prefix, u8 opcode)
+		{ 
+			z80_device& z80 = m_z80;
+			add([&z80, prefix, opcode](){ z80.m_cycle = ~0; z80.m_prefix = prefix; z80.m_opcode = opcode; });
+			return m_steps;
+		}
+		ops_type jump(u8 opcode) { return jump(NONE, opcode); }
+		ops_type build() { add(m_z80.next_op()); return m_steps; }
+	private:
+		z80_device& m_z80;
+		ops_type m_steps;
+		std::function<bool()> m_if_condition = nullptr;
+		ops_type m_if_steps;
+		u8 m_else_at = 0;
+	};
+
+	z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	void init_op_steps();
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const noexcept override { return 2; }
-	virtual uint32_t execute_max_cycles() const noexcept override { return 16; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 4; }
-	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0xff; }
+	virtual bool cpu_is_interruptible() const override { return true; }
+	virtual u32 execute_min_cycles() const noexcept override { return 2; }
+	virtual u32 execute_max_cycles() const noexcept override { return 16; }
+	virtual u32 execute_input_lines() const noexcept override { return 4; }
+	virtual u32 execute_default_irq_vector(int inputnum) const noexcept override { return 0xff; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -70,175 +145,112 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-#undef PROTOTYPES
-#define PROTOTYPES(prefix) \
-	void prefix##_00(); void prefix##_01(); void prefix##_02(); void prefix##_03(); \
-	void prefix##_04(); void prefix##_05(); void prefix##_06(); void prefix##_07(); \
-	void prefix##_08(); void prefix##_09(); void prefix##_0a(); void prefix##_0b(); \
-	void prefix##_0c(); void prefix##_0d(); void prefix##_0e(); void prefix##_0f(); \
-	void prefix##_10(); void prefix##_11(); void prefix##_12(); void prefix##_13(); \
-	void prefix##_14(); void prefix##_15(); void prefix##_16(); void prefix##_17(); \
-	void prefix##_18(); void prefix##_19(); void prefix##_1a(); void prefix##_1b(); \
-	void prefix##_1c(); void prefix##_1d(); void prefix##_1e(); void prefix##_1f(); \
-	void prefix##_20(); void prefix##_21(); void prefix##_22(); void prefix##_23(); \
-	void prefix##_24(); void prefix##_25(); void prefix##_26(); void prefix##_27(); \
-	void prefix##_28(); void prefix##_29(); void prefix##_2a(); void prefix##_2b(); \
-	void prefix##_2c(); void prefix##_2d(); void prefix##_2e(); void prefix##_2f(); \
-	void prefix##_30(); void prefix##_31(); void prefix##_32(); void prefix##_33(); \
-	void prefix##_34(); void prefix##_35(); void prefix##_36(); void prefix##_37(); \
-	void prefix##_38(); void prefix##_39(); void prefix##_3a(); void prefix##_3b(); \
-	void prefix##_3c(); void prefix##_3d(); void prefix##_3e(); void prefix##_3f(); \
-	void prefix##_40(); void prefix##_41(); void prefix##_42(); void prefix##_43(); \
-	void prefix##_44(); void prefix##_45(); void prefix##_46(); void prefix##_47(); \
-	void prefix##_48(); void prefix##_49(); void prefix##_4a(); void prefix##_4b(); \
-	void prefix##_4c(); void prefix##_4d(); void prefix##_4e(); void prefix##_4f(); \
-	void prefix##_50(); void prefix##_51(); void prefix##_52(); void prefix##_53(); \
-	void prefix##_54(); void prefix##_55(); void prefix##_56(); void prefix##_57(); \
-	void prefix##_58(); void prefix##_59(); void prefix##_5a(); void prefix##_5b(); \
-	void prefix##_5c(); void prefix##_5d(); void prefix##_5e(); void prefix##_5f(); \
-	void prefix##_60(); void prefix##_61(); void prefix##_62(); void prefix##_63(); \
-	void prefix##_64(); void prefix##_65(); void prefix##_66(); void prefix##_67(); \
-	void prefix##_68(); void prefix##_69(); void prefix##_6a(); void prefix##_6b(); \
-	void prefix##_6c(); void prefix##_6d(); void prefix##_6e(); void prefix##_6f(); \
-	void prefix##_70(); void prefix##_71(); void prefix##_72(); void prefix##_73(); \
-	void prefix##_74(); void prefix##_75(); void prefix##_76(); void prefix##_77(); \
-	void prefix##_78(); void prefix##_79(); void prefix##_7a(); void prefix##_7b(); \
-	void prefix##_7c(); void prefix##_7d(); void prefix##_7e(); void prefix##_7f(); \
-	void prefix##_80(); void prefix##_81(); void prefix##_82(); void prefix##_83(); \
-	void prefix##_84(); void prefix##_85(); void prefix##_86(); void prefix##_87(); \
-	void prefix##_88(); void prefix##_89(); void prefix##_8a(); void prefix##_8b(); \
-	void prefix##_8c(); void prefix##_8d(); void prefix##_8e(); void prefix##_8f(); \
-	void prefix##_90(); void prefix##_91(); void prefix##_92(); void prefix##_93(); \
-	void prefix##_94(); void prefix##_95(); void prefix##_96(); void prefix##_97(); \
-	void prefix##_98(); void prefix##_99(); void prefix##_9a(); void prefix##_9b(); \
-	void prefix##_9c(); void prefix##_9d(); void prefix##_9e(); void prefix##_9f(); \
-	void prefix##_a0(); void prefix##_a1(); void prefix##_a2(); void prefix##_a3(); \
-	void prefix##_a4(); void prefix##_a5(); void prefix##_a6(); void prefix##_a7(); \
-	void prefix##_a8(); void prefix##_a9(); void prefix##_aa(); void prefix##_ab(); \
-	void prefix##_ac(); void prefix##_ad(); void prefix##_ae(); void prefix##_af(); \
-	void prefix##_b0(); void prefix##_b1(); void prefix##_b2(); void prefix##_b3(); \
-	void prefix##_b4(); void prefix##_b5(); void prefix##_b6(); void prefix##_b7(); \
-	void prefix##_b8(); void prefix##_b9(); void prefix##_ba(); void prefix##_bb(); \
-	void prefix##_bc(); void prefix##_bd(); void prefix##_be(); void prefix##_bf(); \
-	void prefix##_c0(); void prefix##_c1(); void prefix##_c2(); void prefix##_c3(); \
-	void prefix##_c4(); void prefix##_c5(); void prefix##_c6(); void prefix##_c7(); \
-	void prefix##_c8(); void prefix##_c9(); void prefix##_ca(); void prefix##_cb(); \
-	void prefix##_cc(); void prefix##_cd(); void prefix##_ce(); void prefix##_cf(); \
-	void prefix##_d0(); void prefix##_d1(); void prefix##_d2(); void prefix##_d3(); \
-	void prefix##_d4(); void prefix##_d5(); void prefix##_d6(); void prefix##_d7(); \
-	void prefix##_d8(); void prefix##_d9(); void prefix##_da(); void prefix##_db(); \
-	void prefix##_dc(); void prefix##_dd(); void prefix##_de(); void prefix##_df(); \
-	void prefix##_e0(); void prefix##_e1(); void prefix##_e2(); void prefix##_e3(); \
-	void prefix##_e4(); void prefix##_e5(); void prefix##_e6(); void prefix##_e7(); \
-	void prefix##_e8(); void prefix##_e9(); void prefix##_ea(); void prefix##_eb(); \
-	void prefix##_ec(); void prefix##_ed(); void prefix##_ee(); void prefix##_ef(); \
-	void prefix##_f0(); void prefix##_f1(); void prefix##_f2(); void prefix##_f3(); \
-	void prefix##_f4(); void prefix##_f5(); void prefix##_f6(); void prefix##_f7(); \
-	void prefix##_f8(); void prefix##_f9(); void prefix##_fa(); void prefix##_fb(); \
-	void prefix##_fc(); void prefix##_fd(); void prefix##_fe(); void prefix##_ff();
+	void execute_cycles(u8 icount);
+	void halt();
+	void leave_halt();
+
+	virtual u8 data_read(u16 addr);
+	virtual void data_write(u16 addr, u8 value);
+	virtual u8 opcode_read();
+	virtual u8 arg_read();
+
+	/* deprecated */ void rm16(u16 addr, PAIR &r);
+	/* deprecated */ void wm16_sp(PAIR &r);
 
 	void illegal_1();
 	void illegal_2();
+	ops_type in();
+	ops_type out();
+	ops_type rm();
+	ops_type rm_reg();
+	ops_type rm16();
+	ops_type wm();
+	ops_type wm16();
+	ops_type wm16_sp();
+	ops_type rop();
+	ops_type arg();
+	ops_type arg16();
 
-	PROTOTYPES(op)
-	PROTOTYPES(cb)
-	PROTOTYPES(dd)
-	PROTOTYPES(ed)
-	PROTOTYPES(fd)
-	PROTOTYPES(xycb)
-
-	void halt();
-	void leave_halt();
-	uint8_t in(uint16_t port);
-	void out(uint16_t port, uint8_t value);
-	virtual uint8_t rm(uint16_t addr);
-	uint8_t rm_reg(uint16_t addr);
-	void rm16(uint16_t addr, PAIR &r);
-	virtual void wm(uint16_t addr, uint8_t value);
-	void wm16(uint16_t addr, PAIR &r);
-	void wm16_sp(PAIR &r);
-	virtual uint8_t rop();
-	virtual uint8_t arg();
-	virtual uint16_t arg16();
-	void eax();
-	void eay();
-	void pop(PAIR &r);
-	void push(PAIR &r);
-	void jp(void);
-	void jp_cond(bool cond);
-	void jr();
-	void jr_cond(bool cond, uint8_t opcode);
-	void call();
-	void call_cond(bool cond, uint8_t opcode);
-	void ret_cond(bool cond, uint8_t opcode);
-	void retn();
-	void reti();
-	void ld_r_a();
-	void ld_a_r();
-	void ld_i_a();
-	void ld_a_i();
-	void rst(uint16_t addr);
-	uint8_t inc(uint8_t value);
-	uint8_t dec(uint8_t value);
+	ops_type eax();
+	ops_type eay();
+	ops_type push();
+	ops_type pop();
+	ops_type jp();
+	ops_type jp_cond();
+	ops_type jr();
+	ops_type jr_cond(u8 opcode);
+	ops_type call();
+	ops_type call_cond(u8 opcode);
+	ops_type ret_cond(u8 opcode);
+	ops_type retn();
+	ops_type reti();
+	ops_type ld_r_a();
+	ops_type ld_a_r();
+	ops_type ld_i_a();
+	ops_type ld_a_i();
+	ops_type rst(u16 addr);
+	void inc(u8 &r);
+	void dec(u8 &r);
 	void rlca();
 	void rrca();
 	void rla();
 	void rra();
-	void rrd();
-	void rld();
-	void add_a(uint8_t value);
-	void adc_a(uint8_t value);
-	void sub(uint8_t value);
-	void sbc_a(uint8_t value);
+	ops_type rrd();
+	ops_type rld();
+	void add_a(u8 value);
+	void adc_a(u8 value);
+	void sub(u8 value);
+	void sbc_a(u8 value);
 	void neg();
 	void daa();
-	void and_a(uint8_t value);
-	void or_a(uint8_t value);
-	void xor_a(uint8_t value);
-	void cp(uint8_t value);
-	void ex_af();
-	void ex_de_hl();
+	void and_a(u8 value);
+	void or_a(u8 value);
+	void xor_a(u8 value);
+	void cp(u8 value);
 	void exx();
-	void ex_sp(PAIR &r);
-	void add16(PAIR &dr, PAIR &sr);
-	void adc_hl(PAIR &r);
-	void sbc_hl(PAIR &r);
-	uint8_t rlc(uint8_t value);
-	uint8_t rrc(uint8_t value);
-	uint8_t rl(uint8_t value);
-	uint8_t rr(uint8_t value);
-	uint8_t sla(uint8_t value);
-	uint8_t sra(uint8_t value);
-	uint8_t sll(uint8_t value);
-	uint8_t srl(uint8_t value);
-	void bit(int bit, uint8_t value);
-	void bit_hl(int bit, uint8_t value);
-	void bit_xy(int bit, uint8_t value);
-	uint8_t res(int bit, uint8_t value);
-	uint8_t set(int bit, uint8_t value);
-	void ldi();
-	void cpi();
-	void ini();
-	void outi();
-	void ldd();
-	void cpd();
-	void ind();
-	void outd();
-	void ldir();
-	void cpir();
-	void inir();
-	void otir();
-	void lddr();
-	void cpdr();
-	void indr();
-	void otdr();
+	ops_type ex_sp();
+	ops_type add16();
+	ops_type adc_hl();
+	ops_type sbc_hl();
+	u8 rlc(u8 value);
+	u8 rrc(u8 value);
+	u8 rl(u8 value);
+	u8 rr(u8 value);
+	u8 sla(u8 value);
+	u8 sra(u8 value);
+	u8 sll(u8 value);
+	u8 srl(u8 value);
+	void bit(int bit, u8 value);
+	void bit_hl(int bit, u8 value);
+	void bit_xy(int bit, u8 value);
+	u8 res(int bit, u8 value);
+	u8 set(int bit, u8 value);
+	ops_type ldi();
+	ops_type cpi();
+	ops_type ini();
+	ops_type outi();
+	ops_type ldd();
+	ops_type cpd();
+	ops_type ind();
+	ops_type outd();
+	ops_type ldir();
+	ops_type cpir();
+	ops_type inir();
+	ops_type otir();
+	ops_type lddr();
+	ops_type cpdr();
+	ops_type indr();
+	ops_type otdr();
 	void ei();
+	void set_f(u8 f);
+	void block_io_interrupted_flags();
 
+	ops_type next_op();
 	virtual void check_interrupts();
 	void take_interrupt();
 	void take_nmi();
-	void nomreq_ir(s8 cycles);
-	void nomreq_addr(u16 addr, s8 cycles);
+	ops_type nomreq_ir(s8 cycles);
+	ops_type nomreq_addr(s8 cycles);
 
 	// address spaces
 	const address_space_config m_program_config;
@@ -268,32 +280,38 @@ protected:
 	PAIR              m_bc2;
 	PAIR              m_de2;
 	PAIR              m_hl2;
-	uint8_t           m_r;
-	uint8_t           m_r2;
-	uint8_t           m_iff1;
-	uint8_t           m_iff2;
-	uint8_t           m_halt;
-	uint8_t           m_im;
-	uint8_t           m_i;
-	uint8_t           m_nmi_state;          /* nmi line state */
-	uint8_t           m_nmi_pending;        /* nmi pending */
-	uint8_t           m_irq_state;          /* irq line state */
+	u8                m_qtemp;
+	u8                m_q;
+	u8                m_r;
+	u8                m_r2;
+	u8                m_iff1;
+	u8                m_iff2;
+	u8                m_halt;
+	u8                m_im;
+	u8                m_i;
+	u8                m_nmi_state;          // nmi line state
+	u8                m_nmi_pending;        // nmi pending
+	u8                m_irq_state;          // irq line state
 	int               m_wait_state;         // wait line state
 	int               m_busrq_state;        // bus request line state
-	uint8_t           m_after_ei;           /* are we in the EI shadow? */
-	uint8_t           m_after_ldair;        /* same, but for LD A,I or LD A,R */
-	uint32_t          m_ea;
+	u8                m_after_ei;           // are we in the EI shadow?
+	u8                m_after_ldair;        // same, but for LD A,I or LD A,R
+	u32               m_ea;
 
+	u8                m_cycle;
+	op_prefix         m_prefix;
+	u8                m_opcode;
 	int               m_icount;
-	int               m_icount_executing;
-	uint8_t           m_rtemp;
-	const uint8_t *   m_cc_op;
-	const uint8_t *   m_cc_cb;
-	const uint8_t *   m_cc_ed;
-	const uint8_t *   m_cc_xy;
-	const uint8_t *   m_cc_xycb;
-	const uint8_t *   m_cc_ex;
-	uint8_t           m_mtm_cycles;
+	PAIR16            m_m_shared_addr;
+	PAIR16            m_m_shared_data;
+	PAIR16            m_m_shared_data2;
+	u8                m_rtemp;
+
+	ops_type m_op_steps[6][0x100];
+
+	u8 m_m1_cycles = 4;
+	u8 m_memrq_cycles = 3;
+	u8 m_iorq_cycles = 4;
 };
 
 DECLARE_DEVICE_TYPE(Z80, z80_device)
@@ -301,7 +319,7 @@ DECLARE_DEVICE_TYPE(Z80, z80_device)
 class nsc800_device : public z80_device
 {
 public:
-	nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// device-level overrides
@@ -309,12 +327,12 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_input_lines() const noexcept override { return 7; }
+	virtual u32 execute_input_lines() const noexcept override { return 7; }
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	virtual void check_interrupts() override;
 	void take_interrupt_nsc800();
-	uint8_t m_nsc800_irq_state[4]; /* state of NSC800 restart interrupts A, B, C */
+	u8 m_nsc800_irq_state[4]; // state of NSC800 restart interrupts A, B, C
 };
 
 DECLARE_DEVICE_TYPE(NSC800, nsc800_device)

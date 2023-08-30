@@ -145,6 +145,8 @@ private:
 	u8 m_nob_mcu_status = 0;
 	int m_nobb_inport23_step = 0;
 
+	u8 m_m1_num = 0;
+
 	// video handlers
 	void common_videomode_w(u8 data);
 	void videomode_w(u8 data);

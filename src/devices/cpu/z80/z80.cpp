@@ -16,14 +16,13 @@
  *       - LD A,I/R P/V flag reset glitch is fixed on CMOS Z80
  *       - OUT (C),0 outputs 0 on NMOS Z80, $FF on CMOS Z80
  *       - SCF/CCF X/Y flags is ((flags | A) & 0x28) on SGS/SHARP/ZiLOG NMOS Z80,
- *         (flags & A & 0x28) on NEC NMOS Z80, other models unknown.
+ *         (flags & A & 0x28).
  *         However, recent findings say that SCF/CCF X/Y results depend on whether
- *         or not the previous instruction touched the flag register. And the exact
- *         behaviour on NEC Z80 is still unknown.
+ *         or not the previous instruction touched the flag register.
  *      This Z80 emulator assumes a ZiLOG NMOS model.
  *
  *   Changes in 0.243:
- *    Fundation for M cycles emulation. Currently we preserve cc_* tables with total timings.
+ *    Foundation for M cycles emulation. Currently we preserve cc_* tables with total timings.
  *    execute_run() behavior (simplified) ...
  *    Before:
  *      + fetch opcode
@@ -109,7 +108,7 @@
  *      now also adjust the r register depending on the skipped opcodes.
  *   Changes in 2.2:
  *    - Fixed bugs in CPL, SCF and CCF instructions flag handling.
- *    - Changed variable ea and arg16() function to uint32_t; this
+ *    - Changed variable ea and arg16() function to u32; this
  *      produces slightly more efficient code.
  *    - The DD/FD XY CB opcodes where XY is 40-7F and Y is not 6/E
  *      are changed to calls to the X6/XE opcodes to reduce object size.
@@ -124,14 +123,21 @@
 #include "z80.h"
 #include "z80dasm.h"
 
-#define VERBOSE             0
+#define LOG_UNDOC (1U << 1)
+#define LOG_INT   (1U << 2)
+#define LOG_TIME  (1U << 3)
+
+#define VERBOSE ( LOG_UNDOC /*| LOG_INT*/ )
+#include "logmacro.h"
+
+#define LOGUNDOC(...) LOGMASKED(LOG_UNDOC, __VA_ARGS__)
+#define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
+
 
 /* On an NMOS Z80, if LD A,I or LD A,R is interrupted, P/V flag gets reset,
    even if IFF2 was set before this instruction. This issue was fixed on
    the CMOS Z80, so until knowing (most) Z80 types on hardware, it's disabled */
-#define HAS_LDAIR_QUIRK     0
-
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+#define HAS_LDAIR_QUIRK  0
 
 
 /****************************************************************************/
@@ -164,6 +170,7 @@
 #define AF      m_af.w.l
 #define A       m_af.b.h
 #define F       m_af.b.l
+#define Q       m_q
 
 #define BCD     m_bc.d
 #define BC      m_bc.w.l
@@ -195,225 +202,41 @@
 #define WZ_L    m_wz.b.l
 
 
+#define TADR     m_m_shared_addr.w   // Typically represents values from A0..15 pins. 16bit input in steps.
+#define TADR_H   m_m_shared_addr.b.h
+#define TADR_L   m_m_shared_addr.b.l
+#define TDAT     m_m_shared_data.w   // 16bit input(if use as second parameter) or output in steps.
+#define TDAT2    m_m_shared_data2.w
+#define TDAT_H   m_m_shared_data.b.h
+#define TDAT_L   m_m_shared_data.b.l
+#define TDAT8    m_m_shared_data.b.l // Typically represents values from D0..8 pins. 8bit input or output in steps.
+
 static bool tables_initialised = false;
-static uint8_t SZ[256];       /* zero and sign flags */
-static uint8_t SZ_BIT[256];   /* zero, sign and parity/overflow (=zero) flags for BIT opcode */
-static uint8_t SZP[256];      /* zero, sign and parity flags */
-static uint8_t SZHV_inc[256]; /* zero, sign, half carry and overflow flags INC r8 */
-static uint8_t SZHV_dec[256]; /* zero, sign, half carry and overflow flags DEC r8 */
+static u8 SZ[256];       /* zero and sign flags */
+static u8 SZ_BIT[256];   /* zero, sign and parity/overflow (=zero) flags for BIT opcode */
+static u8 SZP[256];      /* zero, sign and parity flags */
+static u8 SZHV_inc[256]; /* zero, sign, half carry and overflow flags INC r8 */
+static u8 SZHV_dec[256]; /* zero, sign, half carry and overflow flags DEC r8 */
 
-static uint8_t SZHVC_add[2*256*256];
-static uint8_t SZHVC_sub[2*256*256];
+static u8 SZHVC_add[2*256*256];
+static u8 SZHVC_sub[2*256*256];
 
-static const uint8_t cc_op[0x100] = {
-	4,10, 7, 6, 4, 4, 7, 4, 4,11, 7, 6, 4, 4, 7, 4,
-	8,10, 7, 6, 4, 4, 7, 4,12,11, 7, 6, 4, 4, 7, 4,
-	7,10,16, 6, 4, 4, 7, 4, 7,11,16, 6, 4, 4, 7, 4,
-	7,10,13, 6,11,11,10, 4, 7,11,13, 6, 4, 4, 7, 4,
-	4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
-	4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
-	4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
-	7, 7, 7, 7, 7, 7, 4, 7, 4, 4, 4, 4, 4, 4, 7, 4,
-	4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
-	4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
-	4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
-	4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
-	5,10,10,10,10,11, 7,11, 5,10,10, 4,10,17, 7,11, /* cb -> cc_cb */
-	5,10,10,11,10,11, 7,11, 5, 4,10,11,10, 4, 7,11, /* dd -> cc_xy */
-	5,10,10,19,10,11, 7,11, 5, 4,10, 4,10, 4, 7,11, /* ed -> cc_ed */
-	5,10,10, 4,10,11, 7,11, 5, 6,10, 4,10, 4, 7,11  /* fd -> cc_xy */
-};
-
-static const u8 cc_cb[0x100] = {
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-	4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-	4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-	4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4,
-	4, 4, 4, 4, 4, 4,11, 4, 4, 4, 4, 4, 4, 4,11, 4
-};
-
-static const uint8_t cc_ed[0x100] = {
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	8, 8,11,16, 4,10, 4, 5, 8, 8,11,16, 4,10, 4, 5,
-	8, 8,11,16, 4,10, 4, 5, 8, 8,11,16, 4,10, 4, 5,
-	8, 8,11,16, 4,10, 4,14, 8, 8,11,16, 4,10, 4,14,
-	8, 8,11,16, 4,10, 4, 4, 8, 8,11,16, 4,10, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	12,12,12,12,4, 4, 4, 4,12,12,12,12, 4, 4, 4, 4,
-	12,12,12,12,4, 4, 4, 4,12,12,12,12, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4
-};
-
-/* ix/iy: with the exception of (i+offset) opcodes, for total add t-states from main_opcode_table[DD/FD] == 4 */
-static const uint8_t cc_xy[0x100] = {
-	 4,10, 7, 6, 4, 4, 7, 4, 4,11, 7, 6, 4, 4, 7, 4,
-	 8,10, 7, 6, 4, 4, 7, 4,12,11, 7, 6, 4, 4, 7, 4,
-	 7,10,16, 6, 4, 4, 7, 4, 7,11,16, 6, 4, 4, 7, 4,
-	 7,10,13, 6,19,19,15, 4, 7,11,13, 6, 4, 4, 7, 4,
-	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
-	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
-	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
-	15,15,15,15,15,15, 4,15, 4, 4, 4, 4, 4, 4,15, 4,
-	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
-	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
-	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
-	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
-	 5,10,10,10,10,11, 7,11, 5,10,10, 7,10,17, 7,11, /* cb -> cc_xycb */
-	 5,10,10,11,10,11, 7,11, 5, 4,10,11,10, 4, 7,11, /* dd -> cc_xy again */
-	 5,10,10,19,10,11, 7,11, 5, 4,10, 4,10, 4, 7,11, /* ed -> cc_ed */
-	 5,10,10, 4,10,11, 7,11, 5, 6,10, 4,10, 4, 7,11  /* fd -> cc_xy again */
-};
-
-static const uint8_t cc_xycb[0x100] = {
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12
-};
-
-/* extra cycles if jr/jp/call taken and 'interrupt latency' on rst 0-7 */
-static const uint8_t cc_ex[0x100] = {
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* DJNZ */
-	5, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, /* JR NZ/JR Z */
-	5, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, /* JR NC/JR C */
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	5, 5, 5, 5, 0, 0, 0, 0, 5, 5, 5, 5, 0, 0, 0, 0, /* LDIR/CPIR/INIR/OTIR LDDR/CPDR/INDR/OTDR */
-	6, 0, 0, 0, 7, 0, 0, 2, 6, 0, 0, 0, 7, 0, 0, 2,
-	6, 0, 0, 0, 7, 0, 0, 2, 6, 0, 0, 0, 7, 0, 0, 2,
-	6, 0, 0, 0, 7, 0, 0, 2, 6, 0, 0, 0, 7, 0, 0, 2,
-	6, 0, 0, 0, 7, 0, 0, 2, 6, 0, 0, 0, 7, 0, 0, 2
-};
-
-#define m_cc_dd   m_cc_xy
-#define m_cc_fd   m_cc_xy
 
 /***************************************************************
- * define an opcode function
+ * define an opcode builder helpers
  ***************************************************************/
-#define OP(prefix,opcode) inline void z80_device::prefix##_##opcode()
+#define DEF(name) z80_device::ops_type z80_device::name { return op_builder(*this).foo([]() {
+#define CALL })->call([&]() -> ops_type { return
+#define THEN })->add([&]() {
+#define IF(cond) })->do_if([&]() -> bool { return cond;
+#define ELSE })->do_else()->foo([]() {
+#define ENDIF })->edo()->foo([]() {
+#define ENDDEF })->get_steps(); }
 
 /***************************************************************
  * adjust cycle count by n T-states
  ***************************************************************/
-#define CC(prefix,opcode) do { m_icount_executing += m_cc_##prefix == nullptr ? 0 : m_cc_##prefix[opcode]; } while (0)
-
-#define T(icount) do { \
-	m_icount -= icount; \
-	m_icount_executing -= icount; \
-} while (0)
-
-// T Memory Address
-#define MTM (m_mtm_cycles)
-
-#define EXEC(prefix,opcode) do { \
-	unsigned op = opcode; \
-	CC(prefix,op); \
-	switch(op) \
-	{  \
-	case 0x00:prefix##_##00();break; case 0x01:prefix##_##01();break; case 0x02:prefix##_##02();break; case 0x03:prefix##_##03();break; \
-	case 0x04:prefix##_##04();break; case 0x05:prefix##_##05();break; case 0x06:prefix##_##06();break; case 0x07:prefix##_##07();break; \
-	case 0x08:prefix##_##08();break; case 0x09:prefix##_##09();break; case 0x0a:prefix##_##0a();break; case 0x0b:prefix##_##0b();break; \
-	case 0x0c:prefix##_##0c();break; case 0x0d:prefix##_##0d();break; case 0x0e:prefix##_##0e();break; case 0x0f:prefix##_##0f();break; \
-	case 0x10:prefix##_##10();break; case 0x11:prefix##_##11();break; case 0x12:prefix##_##12();break; case 0x13:prefix##_##13();break; \
-	case 0x14:prefix##_##14();break; case 0x15:prefix##_##15();break; case 0x16:prefix##_##16();break; case 0x17:prefix##_##17();break; \
-	case 0x18:prefix##_##18();break; case 0x19:prefix##_##19();break; case 0x1a:prefix##_##1a();break; case 0x1b:prefix##_##1b();break; \
-	case 0x1c:prefix##_##1c();break; case 0x1d:prefix##_##1d();break; case 0x1e:prefix##_##1e();break; case 0x1f:prefix##_##1f();break; \
-	case 0x20:prefix##_##20();break; case 0x21:prefix##_##21();break; case 0x22:prefix##_##22();break; case 0x23:prefix##_##23();break; \
-	case 0x24:prefix##_##24();break; case 0x25:prefix##_##25();break; case 0x26:prefix##_##26();break; case 0x27:prefix##_##27();break; \
-	case 0x28:prefix##_##28();break; case 0x29:prefix##_##29();break; case 0x2a:prefix##_##2a();break; case 0x2b:prefix##_##2b();break; \
-	case 0x2c:prefix##_##2c();break; case 0x2d:prefix##_##2d();break; case 0x2e:prefix##_##2e();break; case 0x2f:prefix##_##2f();break; \
-	case 0x30:prefix##_##30();break; case 0x31:prefix##_##31();break; case 0x32:prefix##_##32();break; case 0x33:prefix##_##33();break; \
-	case 0x34:prefix##_##34();break; case 0x35:prefix##_##35();break; case 0x36:prefix##_##36();break; case 0x37:prefix##_##37();break; \
-	case 0x38:prefix##_##38();break; case 0x39:prefix##_##39();break; case 0x3a:prefix##_##3a();break; case 0x3b:prefix##_##3b();break; \
-	case 0x3c:prefix##_##3c();break; case 0x3d:prefix##_##3d();break; case 0x3e:prefix##_##3e();break; case 0x3f:prefix##_##3f();break; \
-	case 0x40:prefix##_##40();break; case 0x41:prefix##_##41();break; case 0x42:prefix##_##42();break; case 0x43:prefix##_##43();break; \
-	case 0x44:prefix##_##44();break; case 0x45:prefix##_##45();break; case 0x46:prefix##_##46();break; case 0x47:prefix##_##47();break; \
-	case 0x48:prefix##_##48();break; case 0x49:prefix##_##49();break; case 0x4a:prefix##_##4a();break; case 0x4b:prefix##_##4b();break; \
-	case 0x4c:prefix##_##4c();break; case 0x4d:prefix##_##4d();break; case 0x4e:prefix##_##4e();break; case 0x4f:prefix##_##4f();break; \
-	case 0x50:prefix##_##50();break; case 0x51:prefix##_##51();break; case 0x52:prefix##_##52();break; case 0x53:prefix##_##53();break; \
-	case 0x54:prefix##_##54();break; case 0x55:prefix##_##55();break; case 0x56:prefix##_##56();break; case 0x57:prefix##_##57();break; \
-	case 0x58:prefix##_##58();break; case 0x59:prefix##_##59();break; case 0x5a:prefix##_##5a();break; case 0x5b:prefix##_##5b();break; \
-	case 0x5c:prefix##_##5c();break; case 0x5d:prefix##_##5d();break; case 0x5e:prefix##_##5e();break; case 0x5f:prefix##_##5f();break; \
-	case 0x60:prefix##_##60();break; case 0x61:prefix##_##61();break; case 0x62:prefix##_##62();break; case 0x63:prefix##_##63();break; \
-	case 0x64:prefix##_##64();break; case 0x65:prefix##_##65();break; case 0x66:prefix##_##66();break; case 0x67:prefix##_##67();break; \
-	case 0x68:prefix##_##68();break; case 0x69:prefix##_##69();break; case 0x6a:prefix##_##6a();break; case 0x6b:prefix##_##6b();break; \
-	case 0x6c:prefix##_##6c();break; case 0x6d:prefix##_##6d();break; case 0x6e:prefix##_##6e();break; case 0x6f:prefix##_##6f();break; \
-	case 0x70:prefix##_##70();break; case 0x71:prefix##_##71();break; case 0x72:prefix##_##72();break; case 0x73:prefix##_##73();break; \
-	case 0x74:prefix##_##74();break; case 0x75:prefix##_##75();break; case 0x76:prefix##_##76();break; case 0x77:prefix##_##77();break; \
-	case 0x78:prefix##_##78();break; case 0x79:prefix##_##79();break; case 0x7a:prefix##_##7a();break; case 0x7b:prefix##_##7b();break; \
-	case 0x7c:prefix##_##7c();break; case 0x7d:prefix##_##7d();break; case 0x7e:prefix##_##7e();break; case 0x7f:prefix##_##7f();break; \
-	case 0x80:prefix##_##80();break; case 0x81:prefix##_##81();break; case 0x82:prefix##_##82();break; case 0x83:prefix##_##83();break; \
-	case 0x84:prefix##_##84();break; case 0x85:prefix##_##85();break; case 0x86:prefix##_##86();break; case 0x87:prefix##_##87();break; \
-	case 0x88:prefix##_##88();break; case 0x89:prefix##_##89();break; case 0x8a:prefix##_##8a();break; case 0x8b:prefix##_##8b();break; \
-	case 0x8c:prefix##_##8c();break; case 0x8d:prefix##_##8d();break; case 0x8e:prefix##_##8e();break; case 0x8f:prefix##_##8f();break; \
-	case 0x90:prefix##_##90();break; case 0x91:prefix##_##91();break; case 0x92:prefix##_##92();break; case 0x93:prefix##_##93();break; \
-	case 0x94:prefix##_##94();break; case 0x95:prefix##_##95();break; case 0x96:prefix##_##96();break; case 0x97:prefix##_##97();break; \
-	case 0x98:prefix##_##98();break; case 0x99:prefix##_##99();break; case 0x9a:prefix##_##9a();break; case 0x9b:prefix##_##9b();break; \
-	case 0x9c:prefix##_##9c();break; case 0x9d:prefix##_##9d();break; case 0x9e:prefix##_##9e();break; case 0x9f:prefix##_##9f();break; \
-	case 0xa0:prefix##_##a0();break; case 0xa1:prefix##_##a1();break; case 0xa2:prefix##_##a2();break; case 0xa3:prefix##_##a3();break; \
-	case 0xa4:prefix##_##a4();break; case 0xa5:prefix##_##a5();break; case 0xa6:prefix##_##a6();break; case 0xa7:prefix##_##a7();break; \
-	case 0xa8:prefix##_##a8();break; case 0xa9:prefix##_##a9();break; case 0xaa:prefix##_##aa();break; case 0xab:prefix##_##ab();break; \
-	case 0xac:prefix##_##ac();break; case 0xad:prefix##_##ad();break; case 0xae:prefix##_##ae();break; case 0xaf:prefix##_##af();break; \
-	case 0xb0:prefix##_##b0();break; case 0xb1:prefix##_##b1();break; case 0xb2:prefix##_##b2();break; case 0xb3:prefix##_##b3();break; \
-	case 0xb4:prefix##_##b4();break; case 0xb5:prefix##_##b5();break; case 0xb6:prefix##_##b6();break; case 0xb7:prefix##_##b7();break; \
-	case 0xb8:prefix##_##b8();break; case 0xb9:prefix##_##b9();break; case 0xba:prefix##_##ba();break; case 0xbb:prefix##_##bb();break; \
-	case 0xbc:prefix##_##bc();break; case 0xbd:prefix##_##bd();break; case 0xbe:prefix##_##be();break; case 0xbf:prefix##_##bf();break; \
-	case 0xc0:prefix##_##c0();break; case 0xc1:prefix##_##c1();break; case 0xc2:prefix##_##c2();break; case 0xc3:prefix##_##c3();break; \
-	case 0xc4:prefix##_##c4();break; case 0xc5:prefix##_##c5();break; case 0xc6:prefix##_##c6();break; case 0xc7:prefix##_##c7();break; \
-	case 0xc8:prefix##_##c8();break; case 0xc9:prefix##_##c9();break; case 0xca:prefix##_##ca();break; case 0xcb:prefix##_##cb();break; \
-	case 0xcc:prefix##_##cc();break; case 0xcd:prefix##_##cd();break; case 0xce:prefix##_##ce();break; case 0xcf:prefix##_##cf();break; \
-	case 0xd0:prefix##_##d0();break; case 0xd1:prefix##_##d1();break; case 0xd2:prefix##_##d2();break; case 0xd3:prefix##_##d3();break; \
-	case 0xd4:prefix##_##d4();break; case 0xd5:prefix##_##d5();break; case 0xd6:prefix##_##d6();break; case 0xd7:prefix##_##d7();break; \
-	case 0xd8:prefix##_##d8();break; case 0xd9:prefix##_##d9();break; case 0xda:prefix##_##da();break; case 0xdb:prefix##_##db();break; \
-	case 0xdc:prefix##_##dc();break; case 0xdd:prefix##_##dd();break; case 0xde:prefix##_##de();break; case 0xdf:prefix##_##df();break; \
-	case 0xe0:prefix##_##e0();break; case 0xe1:prefix##_##e1();break; case 0xe2:prefix##_##e2();break; case 0xe3:prefix##_##e3();break; \
-	case 0xe4:prefix##_##e4();break; case 0xe5:prefix##_##e5();break; case 0xe6:prefix##_##e6();break; case 0xe7:prefix##_##e7();break; \
-	case 0xe8:prefix##_##e8();break; case 0xe9:prefix##_##e9();break; case 0xea:prefix##_##ea();break; case 0xeb:prefix##_##eb();break; \
-	case 0xec:prefix##_##ec();break; case 0xed:prefix##_##ed();break; case 0xee:prefix##_##ee();break; case 0xef:prefix##_##ef();break; \
-	case 0xf0:prefix##_##f0();break; case 0xf1:prefix##_##f1();break; case 0xf2:prefix##_##f2();break; case 0xf3:prefix##_##f3();break; \
-	case 0xf4:prefix##_##f4();break; case 0xf5:prefix##_##f5();break; case 0xf6:prefix##_##f6();break; case 0xf7:prefix##_##f7();break; \
-	case 0xf8:prefix##_##f8();break; case 0xf9:prefix##_##f9();break; case 0xfa:prefix##_##fa();break; case 0xfb:prefix##_##fb();break; \
-	case 0xfc:prefix##_##fc();break; case 0xfd:prefix##_##fd();break; case 0xfe:prefix##_##fe();break; case 0xff:prefix##_##ff();break; \
-	} \
-	if(m_icount_executing > 0) T(m_icount_executing); else m_icount_executing = 0; \
-} while (0)
+#define T(icount) execute_cycles(icount)
 
 /***************************************************************
  * Enter halt state; write 1 to callback on first execution
@@ -442,81 +265,113 @@ inline void z80_device::leave_halt()
 /***************************************************************
  * Input a byte from given I/O port
  ***************************************************************/
-inline uint8_t z80_device::in(uint16_t port)
-{
-	u8 res = m_io.read_byte(port);
-	T(4);
-	return res;
-}
+DEF( in() )
+	THEN
+		TDAT8 = m_io.read_interruptible(TADR);
+		T(m_iorq_cycles);
+ENDDEF
 
 /***************************************************************
  * Output a byte to given I/O port
  ***************************************************************/
-inline void z80_device::out(uint16_t port, uint8_t value)
-{
-	m_io.write_byte(port, value);
-	T(4);
-}
+DEF( out() )
+	THEN
+		m_io.write_interruptible(TADR, TDAT8);
+		T(m_iorq_cycles);
+ENDDEF
 
 /***************************************************************
  * Read a byte from given memory location
  ***************************************************************/
-uint8_t z80_device::rm(uint16_t addr)
+inline u8 z80_device::data_read(u16 addr)
 {
-	u8 res = m_data.read_byte(translate_memory_address(addr));
-	T(MTM);
-	return res;
+	return m_data.read_interruptible(translate_memory_address(addr));
 }
 
-uint8_t z80_device::rm_reg(uint16_t addr)
-{
-	u8 res = rm(addr);
-	nomreq_addr(addr, 1);
-	return res;
-}
+DEF( rm() )
+	THEN
+		TDAT8 = data_read(TADR);
+		T(m_memrq_cycles);
+ENDDEF
+
+DEF( rm_reg() )
+	CALL rm();
+	CALL nomreq_addr(1);
+ENDDEF
 
 /***************************************************************
  * Read a word from given memory location
+ *  in: TADR
+ * out: TDAT
  ***************************************************************/
+DEF( rm16() )
+	CALL rm();
+	THEN
+		TDAT_H = TDAT_L;
+		TADR++;
+	CALL rm();
+	THEN
+		std::swap(TDAT_H, TDAT_L);
+ENDDEF
+
 inline void z80_device::rm16(uint16_t addr, PAIR &r)
 {
-	r.b.l = rm(addr);
-	r.b.h = rm(addr+1);
+	r.b.l = data_read(addr);
+	T(m_memrq_cycles);
+	r.b.h = data_read(addr+1);
+	T(m_memrq_cycles);
 }
 
 /***************************************************************
  * Write a byte to given memory location
  ***************************************************************/
-void z80_device::wm(uint16_t addr, uint8_t value)
-{
-	// As we don't count changes between read and write, simply adjust to the end of requested.
-	if(m_icount_executing != MTM) T(m_icount_executing - MTM);
-	m_data.write_byte(translate_memory_address(addr), value);
-	T(MTM);
+inline void z80_device::data_write(u16 addr, u8 value) {
+	m_data.write_interruptible(translate_memory_address((u32)addr), value);
 }
+
+DEF( wm() )
+	THEN
+		data_write(TADR, TDAT8);
+		T(m_memrq_cycles);
+ENDDEF
 
 /***************************************************************
  * Write a word to given memory location
+ *  in: TADR, TDAT
  ***************************************************************/
-inline void z80_device::wm16(uint16_t addr, PAIR &r)
-{
-	m_icount_executing -= MTM;
-	wm(addr, r.b.l);
-	m_icount_executing += MTM;
-	wm(addr+1, r.b.h);
-}
+DEF( wm16() )
+	CALL wm();
+	THEN
+		TADR++;
+		TDAT8=TDAT_H;
+	CALL wm();
+ENDDEF
 
 /***************************************************************
  * Write a word to (SP)
+ *  in: TDAT
  ***************************************************************/
+DEF( wm16_sp() )
+	THEN
+		SP--;
+	THEN
+		data_write(SPD, TDAT_H);
+		T(m_memrq_cycles);
+	THEN
+		SP--;
+	THEN
+		data_write(SPD, TDAT_L);
+		T(m_memrq_cycles);
+ENDDEF
+
 inline void z80_device::wm16_sp(PAIR &r)
 {
 	SP--;
-	m_icount_executing -= MTM;
-	wm(SPD, r.b.h);
-	m_icount_executing += MTM;
+	data_write(SPD, r.b.h);
+	T(m_memrq_cycles);
 	SP--;
-	wm(SPD, r.b.l);
+	data_write(SPD, r.b.l);
+	T(m_memrq_cycles);
 }
 
 /***************************************************************
@@ -524,264 +379,284 @@ inline void z80_device::wm16_sp(PAIR &r)
  * reading opcodes. In case of system with memory mapped I/O,
  * this function can be used to greatly speed up emulation
  ***************************************************************/
-uint8_t z80_device::rop()
+inline u8 z80_device::opcode_read()
 {
-	// Use leftovers from previous instruction. Mainly to support recursive EXEC(.., rop())
-	if(m_icount_executing) T(m_icount_executing);
-	uint8_t res = m_opcodes.read_byte(translate_memory_address(PCD));
-	T(execute_min_cycles());
-	m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | (m_r & 0x7f), 0x00, 0xff);
-	T(execute_min_cycles());
-	PC++;
-	m_r++;
-
-	return res;
+	return m_opcodes.read_byte(translate_memory_address(PCD));
 }
+
+DEF( rop() )
+	THEN
+		TDAT8 = opcode_read();
+		T(m_m1_cycles - 2);
+	THEN
+		m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | (m_r & 0x7f), 0x00, 0xff);
+		T(2);
+	THEN
+		PC++;
+		m_r++;
+		Q = m_qtemp;
+		m_qtemp = YF | XF;
+ENDDEF
 
 /****************************************************************
  * arg() is identical to rop() except it is used
  * for reading opcode arguments. This difference can be used to
  * support systems that use different encoding mechanisms for
  * opcodes and opcode arguments
+ * out: TDAT8
  ***************************************************************/
-uint8_t z80_device::arg()
+inline u8 z80_device::arg_read()
 {
-	u8 res = m_args.read_byte(translate_memory_address(PCD));
-	T(MTM);
-	PC++;
-
-	return res;
+	return m_args.read_byte(translate_memory_address(PCD));
 }
 
-uint16_t z80_device::arg16()
-{
-	u8 const res = arg();
+DEF( arg() )
+	THEN
+		TDAT8 = arg_read();
+		T(m_memrq_cycles);
+	THEN
+		PC++;
+ENDDEF
 
-	return (u16(arg()) << 8) | res;
-}
+DEF( arg16() )
+	CALL arg();
+	THEN
+		TDAT_H = TDAT_L;
+	CALL arg();
+	THEN
+		std::swap(TDAT_H, TDAT_L);
+ENDDEF
 
 /***************************************************************
  * Calculate the effective address EA of an opcode using
  * IX+offset resp. IY+offset addressing.
  ***************************************************************/
-inline void z80_device::eax()
-{
-	m_ea = (uint32_t)(uint16_t)(IX + (int8_t)arg());
-	WZ = m_ea;
-}
+DEF( eax() )
+	CALL arg();
+	THEN
+		m_ea = (u32)(u16)(IX + (s8)TDAT8);
+		WZ = m_ea;
+ENDDEF
 
-inline void z80_device::eay()
-{
-	m_ea = (uint32_t)(uint16_t)(IY + (int8_t)arg());
-	WZ = m_ea;
-}
+DEF( eay() )
+	CALL arg();
+	THEN
+		m_ea = (u32)(u16)(IY + (s8)TDAT8);
+		WZ = m_ea;
+ENDDEF
 
 /***************************************************************
  * POP
  ***************************************************************/
-inline void z80_device::pop(PAIR &r)
-{
-	rm16(SPD, r);
-	SP += 2;
-}
+DEF( pop() )
+	THEN
+		TDAT_L = data_read(SPD);
+		T(m_memrq_cycles);
+	THEN
+		SP++;
+	THEN
+		TDAT_H = data_read(SPD); 
+		T(m_memrq_cycles);
+	THEN
+		SP++;
+ENDDEF
 
 /***************************************************************
  * PUSH
+ *  in: TDAT
  ***************************************************************/
-inline void z80_device::push(PAIR &r)
-{
-	nomreq_ir(1);
-	wm16_sp(r);
-}
+DEF( push() )
+	CALL nomreq_ir(1);
+	CALL wm16_sp();
+ENDDEF
 
 /***************************************************************
  * JP
  ***************************************************************/
-inline void z80_device::jp(void)
-{
-	PCD = arg16();
-	WZ = PCD;
-}
+DEF( jp() )
+	CALL arg16();
+	THEN
+		PCD = TDAT;
+		WZ = PC;
+ENDDEF
 
 /***************************************************************
  * JP_COND
  ***************************************************************/
-inline void z80_device::jp_cond(bool cond)
-{
-	if (cond)
-	{
-		PCD = arg16();
-		WZ = PCD;
-	}
-	else
-		WZ = arg16(); /* implicit do PC += 2 */
-}
+DEF( jp_cond() )
+	IF ( TDAT8 )
+		CALL arg16();
+		THEN
+			PC=TDAT;
+			WZ=PCD;
+	ELSE
+		/* implicit do PC += 2 */
+		CALL arg16();
+		THEN
+			WZ=TDAT;
+	ENDIF
+ENDDEF
 
 /***************************************************************
  * JR
  ***************************************************************/
-inline void z80_device::jr()
-{
-	int8_t a = (int8_t)arg(); /* arg() also increments PC */
-	nomreq_addr(PCD-1, 5);
-	PC += a;                  /* so don't do PC += arg() */
-	WZ = PC;
-}
+DEF( jr() )
+	CALL arg();
+	THEN
+		TADR=PCD-1;
+	CALL nomreq_addr(5);
+	THEN
+		PC += (s8)TDAT8;
+		WZ = PC;
+ENDDEF
 
 /***************************************************************
  * JR_COND
  ***************************************************************/
-inline void z80_device::jr_cond(bool cond, uint8_t opcode)
-{
-	if (cond)
-	{
-		CC(ex, opcode);
-		jr();
-	}
-	else
-	{
-		arg();
-		//nomreq_addr(PCD, 3);
-		//PC++;
-	}
-}
+DEF( jr_cond(u8 opcode) )
+	IF ( TDAT8 )
+		CALL jr();
+	ELSE
+		CALL arg();
+	ENDIF
+ENDDEF
 
 /***************************************************************
  * CALL
  ***************************************************************/
-inline void z80_device::call()
-{
-	m_ea = arg16();
-	nomreq_addr(PCD-1, 1);
-	WZ = m_ea;
-	wm16_sp(m_pc);
-	PCD = m_ea;
-}
+DEF( call() )
+	CALL arg16();
+	THEN
+		m_ea=TDAT;
+		TADR=PCD-1;
+	CALL nomreq_addr(1);
+	THEN
+		WZ = m_ea;
+		TDAT=PC;
+	CALL wm16_sp();
+	THEN
+		PCD=m_ea;
+ENDDEF
 
 /***************************************************************
  * CALL_COND
  ***************************************************************/
-inline void z80_device::call_cond(bool cond, uint8_t opcode)
-{
-	if (cond)
-	{
-		CC(ex, opcode);
-		m_ea = arg16();
-		nomreq_addr(PCD-1, 1);
-		WZ = m_ea;
-		wm16_sp(m_pc);
-		PCD = m_ea;
-	}
-	else
-		WZ = arg16(); /* implicit call PC+=2; */
-}
+DEF( call_cond(u8 opcode) )
+	IF ( TDAT8 )
+		CALL call();
+	ELSE
+		CALL arg16();
+		THEN
+			WZ=TDAT;
+	ENDIF
+ENDDEF
 
 /***************************************************************
  * RET_COND
  ***************************************************************/
-inline void z80_device::ret_cond(bool cond, uint8_t opcode)
-{
-	nomreq_ir(1);
-	if (cond)
-	{
-		CC(ex, opcode);
-		pop(m_pc);
-		WZ = PC;
-	}
-}
+DEF( ret_cond(u8 opcode) )
+	CALL nomreq_ir(1);
+	IF ( TDAT8 )
+		CALL pop();
+		THEN
+			PC=TDAT;
+			WZ = PC;
+	ENDIF
+ENDDEF
 
 /***************************************************************
  * RETN
  ***************************************************************/
-inline void z80_device::retn()
-{
-	LOG(("Z80 RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2));
-	pop(m_pc);
-	WZ = PC;
-	m_iff1 = m_iff2;
-}
+DEF( retn() )
+	CALL pop();
+	THEN
+		PC=TDAT;
+		LOGINT("RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2);
+		WZ = PC;
+		m_iff1 = m_iff2;
+ENDDEF
 
 /***************************************************************
  * RETI
  ***************************************************************/
-inline void z80_device::reti()
-{
-	pop(m_pc);
-	WZ = PC;
-	m_iff1 = m_iff2;
-	daisy_call_reti_device();
-}
+DEF( reti() )
+	CALL pop();
+	THEN
+		PC=TDAT;
+		WZ = PC;
+		m_iff1 = m_iff2;
+		daisy_call_reti_device();
+ENDDEF
 
 /***************************************************************
  * LD   R,A
  ***************************************************************/
-inline void z80_device::ld_r_a()
-{
-	nomreq_ir(1);
-	m_r = A;
-	m_r2 = A & 0x80; /* keep bit 7 of r */
-}
+DEF( ld_r_a() )
+	CALL nomreq_ir(1);
+	THEN
+		m_r = A;
+		m_r2 = A & 0x80; /* keep bit 7 of r */
+ENDDEF
 
 /***************************************************************
  * LD   A,R
  ***************************************************************/
-inline void z80_device::ld_a_r()
-{
-	nomreq_ir(1);
-	A = (m_r & 0x7f) | m_r2;
-	F = (F & CF) | SZ[A] | (m_iff2 << 2);
-	m_after_ldair = true;
-}
+DEF( ld_a_r() )
+	CALL nomreq_ir(1);
+	THEN
+		A = (m_r & 0x7f) | m_r2;
+		set_f((F & CF) | SZ[A] | (m_iff2 << 2));
+		m_after_ldair = true;
+ENDDEF
 
 /***************************************************************
  * LD   I,A
  ***************************************************************/
-inline void z80_device::ld_i_a()
-{
-	nomreq_ir(1);
-	m_i = A;
-}
+DEF( ld_i_a() )
+	CALL nomreq_ir(1);
+	THEN
+		m_i = A;
+ENDDEF
 
 /***************************************************************
  * LD   A,I
  ***************************************************************/
-inline void z80_device::ld_a_i()
-{
-	nomreq_ir(1);
-	A = m_i;
-	F = (F & CF) | SZ[A] | (m_iff2 << 2);
-	m_after_ldair = true;
-}
+DEF( ld_a_i() )
+	CALL nomreq_ir(1);
+	THEN
+		A = m_i;
+		set_f((F & CF) | SZ[A] | (m_iff2 << 2));
+		m_after_ldair = true;
+ENDDEF
 
 /***************************************************************
  * RST
  ***************************************************************/
-inline void z80_device::rst(uint16_t addr)
-{
-	//nomreq_ir(1);
-	push(m_pc);
-	PCD = addr;
-	WZ = PC;
-}
+DEF( rst(u16 addr) )
+	THEN
+		TDAT=PC;
+	CALL push();
+	})->add([&, addr]() { // single occurrence. does it worth to have macro?
+		PC=addr;
+		WZ=PC;
+ENDDEF
 
 /***************************************************************
  * INC  r8
  ***************************************************************/
-inline uint8_t z80_device::inc(uint8_t value)
+inline void z80_device::inc(u8 &r)
 {
-	uint8_t res = value + 1;
-	F = (F & CF) | SZHV_inc[res];
-	return (uint8_t)res;
+	++r;
+	set_f((F & CF) | SZHV_inc[r]);
 }
 
 /***************************************************************
  * DEC  r8
  ***************************************************************/
-inline uint8_t z80_device::dec(uint8_t value)
+inline void z80_device::dec(u8 &r)
 {
-	uint8_t res = value - 1;
-	F = (F & CF) | SZHV_dec[res];
-	return res;
+	--r;
+	set_f((F & CF) | SZHV_dec[r]);
 }
 
 /***************************************************************
@@ -790,7 +665,7 @@ inline uint8_t z80_device::dec(uint8_t value)
 inline void z80_device::rlca()
 {
 	A = (A << 1) | (A >> 7);
-	F = (F & (SF | ZF | PF)) | (A & (YF | XF | CF));
+	set_f((F & (SF | ZF | PF)) | (A & (YF | XF | CF)));
 }
 
 /***************************************************************
@@ -798,7 +673,7 @@ inline void z80_device::rlca()
  ***************************************************************/
 inline void z80_device::rrca()
 {
-	F = (F & (SF | ZF | PF)) | (A & CF);
+	set_f((F & (SF | ZF | PF)) | (A & CF));
 	A = (A >> 1) | (A << 7);
 	F |= (A & (YF | XF));
 }
@@ -808,9 +683,9 @@ inline void z80_device::rrca()
  ***************************************************************/
 inline void z80_device::rla()
 {
-	uint8_t res = (A << 1) | (F & CF);
-	uint8_t c = (A & 0x80) ? CF : 0;
-	F = (F & (SF | ZF | PF)) | c | (res & (YF | XF));
+	u8 res = (A << 1) | (F & CF);
+	u8 c = (A & 0x80) ? CF : 0;
+	set_f((F & (SF | ZF | PF)) | c | (res & (YF | XF)));
 	A = res;
 }
 
@@ -819,79 +694,91 @@ inline void z80_device::rla()
  ***************************************************************/
 inline void z80_device::rra()
 {
-	uint8_t res = (A >> 1) | (F << 7);
-	uint8_t c = (A & 0x01) ? CF : 0;
-	F = (F & (SF | ZF | PF)) | c | (res & (YF | XF));
+	u8 res = (A >> 1) | (F << 7);
+	u8 c = (A & 0x01) ? CF : 0;
+	set_f((F & (SF | ZF | PF)) | c | (res & (YF | XF)));
 	A = res;
 }
 
 /***************************************************************
  * RRD
  ***************************************************************/
-inline void z80_device::rrd()
-{
-	uint8_t n = rm(HL);
-	WZ = HL+1;
-	nomreq_addr(HL, 4);
-	wm(HL, (n >> 4) | (A << 4));
-	A = (A & 0xf0) | (n & 0x0f);
-	F = (F & CF) | SZP[A];
-}
+DEF( rrd() )
+	THEN
+		TADR=HL;
+	CALL rm();
+	THEN
+		WZ = HL+1;
+	CALL nomreq_addr(4);
+	THEN
+		TDAT_H=TDAT8;
+		TDAT8=(TDAT8 >> 4) | (A << 4);
+	CALL wm();
+	THEN
+		A = (A & 0xf0) | (TDAT_H & 0x0f);
+		set_f((F & CF) | SZP[A]);
+ENDDEF
 
 /***************************************************************
  * RLD
  ***************************************************************/
-inline void z80_device::rld()
-{
-	uint8_t n = rm(HL);
-	WZ = HL+1;
-	nomreq_addr(HL, 4);
-	wm(HL, (n << 4) | (A & 0x0f));
-	A = (A & 0xf0) | (n >> 4);
-	F = (F & CF) | SZP[A];
-}
+DEF( rld() )
+	THEN
+		TADR=HL;
+	CALL rm();
+	THEN
+		WZ = HL+1;
+	CALL nomreq_addr(4);
+	THEN
+		TDAT_H=TDAT8;
+		TDAT8=(TDAT8 << 4) | (A & 0x0f);
+	CALL wm();
+	THEN
+		A = (A & 0xf0) | (TDAT_H >> 4);
+		set_f((F & CF) | SZP[A]);
+ENDDEF
 
 /***************************************************************
  * ADD  A,n
  ***************************************************************/
-inline void z80_device::add_a(uint8_t value)
+inline void z80_device::add_a(u8 value)
 {
-	uint32_t ah = AFD & 0xff00;
-	uint32_t res = (uint8_t)((ah >> 8) + value);
-	F = SZHVC_add[ah | res];
+	u32 ah = AFD & 0xff00;
+	u32 res = (u8)((ah >> 8) + value);
+	set_f(SZHVC_add[ah | res]);
 	A = res;
 }
 
 /***************************************************************
  * ADC  A,n
  ***************************************************************/
-inline void z80_device::adc_a(uint8_t value)
+inline void z80_device::adc_a(u8 value)
 {
-	uint32_t ah = AFD & 0xff00, c = AFD & 1;
-	uint32_t res = (uint8_t)((ah >> 8) + value + c);
-	F = SZHVC_add[(c << 16) | ah | res];
+	u32 ah = AFD & 0xff00, c = AFD & 1;
+	u32 res = (u8)((ah >> 8) + value + c);
+	set_f(SZHVC_add[(c << 16) | ah | res]);
 	A = res;
 }
 
 /***************************************************************
  * SUB  n
  ***************************************************************/
-inline void z80_device::sub(uint8_t value)
+inline void z80_device::sub(u8 value)
 {
-	uint32_t ah = AFD & 0xff00;
-	uint32_t res = (uint8_t)((ah >> 8) - value);
-	F = SZHVC_sub[ah | res];
+	u32 ah = AFD & 0xff00;
+	u32 res = (u8)((ah >> 8) - value);
+	set_f(SZHVC_sub[ah | res]);
 	A = res;
 }
 
 /***************************************************************
  * SBC  A,n
  ***************************************************************/
-inline void z80_device::sbc_a(uint8_t value)
+inline void z80_device::sbc_a(u8 value)
 {
-	uint32_t ah = AFD & 0xff00, c = AFD & 1;
-	uint32_t res = (uint8_t)((ah >> 8) - value - c);
-	F = SZHVC_sub[(c<<16) | ah | res];
+	u32 ah = AFD & 0xff00, c = AFD & 1;
+	u32 res = (u8)((ah >> 8) - value - c);
+	set_f(SZHVC_sub[(c<<16) | ah | res]);
 	A = res;
 }
 
@@ -900,7 +787,7 @@ inline void z80_device::sbc_a(uint8_t value)
  ***************************************************************/
 inline void z80_device::neg()
 {
-	uint8_t value = A;
+	u8 value = A;
 	A = 0;
 	sub(value);
 }
@@ -910,7 +797,7 @@ inline void z80_device::neg()
  ***************************************************************/
 inline void z80_device::daa()
 {
-	uint8_t a = A;
+	u8 a = A;
 	if (F & NF)
 	{
 		if ((F&HF) | ((A&0xf)>9)) a-=6;
@@ -922,65 +809,46 @@ inline void z80_device::daa()
 		if ((F&CF) | (A>0x99)) a+=0x60;
 	}
 
-	F = (F&(CF|NF)) | (A>0x99) | ((A^a)&HF) | SZP[a];
+	set_f((F&(CF|NF)) | (A>0x99) | ((A^a)&HF) | SZP[a]);
 	A = a;
 }
 
 /***************************************************************
  * AND  n
  ***************************************************************/
-inline void z80_device::and_a(uint8_t value)
+inline void z80_device::and_a(u8 value)
 {
 	A &= value;
-	F = SZP[A] | HF;
+	set_f(SZP[A] | HF);
 }
 
 /***************************************************************
  * OR   n
  ***************************************************************/
-inline void z80_device::or_a(uint8_t value)
+inline void z80_device::or_a(u8 value)
 {
 	A |= value;
-	F = SZP[A];
+	set_f(SZP[A]);
 }
 
 /***************************************************************
  * XOR  n
  ***************************************************************/
-inline void z80_device::xor_a(uint8_t value)
+inline void z80_device::xor_a(u8 value)
 {
 	A ^= value;
-	F = SZP[A];
+	set_f(SZP[A]);
 }
 
 /***************************************************************
  * CP   n
  ***************************************************************/
-inline void z80_device::cp(uint8_t value)
+inline void z80_device::cp(u8 value)
 {
 	unsigned val = value;
-	uint32_t ah = AFD & 0xff00;
-	uint32_t res = (uint8_t)((ah >> 8) - val);
-	F = (SZHVC_sub[ah | res] & ~(YF | XF)) |
-		(val & (YF | XF));
-}
-
-/***************************************************************
- * EX   AF,AF'
- ***************************************************************/
-inline void z80_device::ex_af()
-{
-	PAIR tmp;
-	tmp = m_af; m_af = m_af2; m_af2 = tmp;
-}
-
-/***************************************************************
- * EX   DE,HL
- ***************************************************************/
-inline void z80_device::ex_de_hl()
-{
-	PAIR tmp;
-	tmp = m_de; m_de = m_hl; m_hl = tmp;
+	u32 ah = AFD & 0xff00;
+	u32 res = (u8)((ah >> 8) - val);
+	set_f((SZHVC_sub[ah | res] & ~(YF | XF)) | (val & (YF | XF)));
 }
 
 /***************************************************************
@@ -988,198 +856,203 @@ inline void z80_device::ex_de_hl()
  ***************************************************************/
 inline void z80_device::exx()
 {
-	PAIR tmp;
-	tmp = m_bc; m_bc = m_bc2; m_bc2 = tmp;
-	tmp = m_de; m_de = m_de2; m_de2 = tmp;
-	tmp = m_hl; m_hl = m_hl2; m_hl2 = tmp;
+	std::swap(m_bc, m_bc2);
+	std::swap(m_de, m_de2);
+	std::swap(m_hl, m_hl2);
 }
 
 /***************************************************************
  * EX   (SP),r16
+ *  in: TDAT
  ***************************************************************/
-inline void z80_device::ex_sp(PAIR &r)
-{
-	PAIR tmp = { { 0, 0, 0, 0 } };
-	pop(tmp);
-	nomreq_addr(SPD - 1, 1);
-	m_icount_executing -= 2;
-	wm16_sp(r);
-	m_icount_executing += 2;
-	nomreq_addr(SPD, 2);
-	r = tmp;
-	WZ = r.d;
-}
+DEF( ex_sp() )
+	THEN
+		TDAT2=TDAT;
+	CALL pop();
+	THEN
+		TADR=SP-1;
+	CALL nomreq_addr(1);
+	THEN
+		std::swap(TDAT, TDAT2);
+	CALL wm16_sp();
+	THEN
+		TADR=SP;
+	CALL nomreq_addr(2);
+	THEN
+		std::swap(TDAT, TDAT2);
+		WZ=TDAT;
+ENDDEF
 
 /***************************************************************
  * ADD16
  ***************************************************************/
-inline void z80_device::add16(PAIR &dr, PAIR &sr)
-{
-	nomreq_ir(7);
-	uint32_t res = dr.d + sr.d;
-	WZ = dr.d + 1;
-	F = (F & (SF | ZF | VF)) |
-		(((dr.d ^ res ^ sr.d) >> 8) & HF) |
-		((res >> 16) & CF) | ((res >> 8) & (YF | XF));
-	dr.w.l = (uint16_t)res;
-}
+DEF( add16() )
+	CALL nomreq_ir(7);
+	THEN
+		u32 res = TDAT + TDAT2;
+		WZ = TDAT + 1;
+		set_f((F & (SF | ZF | VF)) |
+			(((TDAT ^ res ^ TDAT2) >> 8) & HF) |
+			((res >> 16) & CF) | ((res >> 8) & (YF | XF)));
+		TDAT = (u16)res;
+ENDDEF
 
 /***************************************************************
  * ADC  HL,r16
  ***************************************************************/
-inline void z80_device::adc_hl(PAIR &r)
-{
-	nomreq_ir(7);
-	uint32_t res = HLD + r.d + (F & CF);
-	WZ = HL + 1;
-	F = (((HLD ^ res ^ r.d) >> 8) & HF) |
-		((res >> 16) & CF) |
-		((res >> 8) & (SF | YF | XF)) |
-		((res & 0xffff) ? 0 : ZF) |
-		(((r.d ^ HLD ^ 0x8000) & (r.d ^ res) & 0x8000) >> 13);
-	HL = (uint16_t)res;
-}
+DEF( adc_hl() )
+	CALL nomreq_ir(7);
+	THEN
+		u32 res = HLD + TDAT + (F & CF);
+		WZ = HL + 1;
+		set_f((((HLD ^ res ^ TDAT) >> 8) & HF) |
+			((res >> 16) & CF) |
+			((res >> 8) & (SF | YF | XF)) |
+			((res & 0xffff) ? 0 : ZF) |
+			(((TDAT ^ HLD ^ 0x8000) & (TDAT ^ res) & 0x8000) >> 13));
+		HL = (u16)res;
+ENDDEF
 
 /***************************************************************
  * SBC  HL,r16
  ***************************************************************/
-inline void z80_device::sbc_hl(PAIR &r)
-{
-	nomreq_ir(7);
-	uint32_t res = HLD - r.d - (F & CF);
-	WZ = HL + 1;
-	F = (((HLD ^ res ^ r.d) >> 8) & HF) | NF |
-		((res >> 16) & CF) |
-		((res >> 8) & (SF | YF | XF)) |
-		((res & 0xffff) ? 0 : ZF) |
-		(((r.d ^ HLD) & (HLD ^ res) &0x8000) >> 13);
-	HL = (uint16_t)res;
-}
+DEF( sbc_hl() )
+	CALL nomreq_ir(7);
+	THEN
+		u32 res = HLD - TDAT - (F & CF);
+		WZ = HL + 1;
+		set_f((((HLD ^ res ^ TDAT) >> 8) & HF) | NF |
+			((res >> 16) & CF) |
+			((res >> 8) & (SF | YF | XF)) |
+			((res & 0xffff) ? 0 : ZF) |
+			(((TDAT ^ HLD) & (HLD ^ res) &0x8000) >> 13));
+		HL = (u16)res;
+ENDDEF
 
 /***************************************************************
  * RLC  r8
  ***************************************************************/
-inline uint8_t z80_device::rlc(uint8_t value)
+inline u8 z80_device::rlc(u8 value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x80) ? CF : 0;
 	res = ((res << 1) | (res >> 7)) & 0xff;
-	F = SZP[res] | c;
+	set_f(SZP[res] | c);
 	return res;
 }
 
 /***************************************************************
  * RRC  r8
  ***************************************************************/
-inline uint8_t z80_device::rrc(uint8_t value)
+inline u8 z80_device::rrc(u8 value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x01) ? CF : 0;
 	res = ((res >> 1) | (res << 7)) & 0xff;
-	F = SZP[res] | c;
+	set_f(SZP[res] | c);
 	return res;
 }
 
 /***************************************************************
  * RL   r8
  ***************************************************************/
-inline uint8_t z80_device::rl(uint8_t value)
+inline u8 z80_device::rl(u8 value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x80) ? CF : 0;
 	res = ((res << 1) | (F & CF)) & 0xff;
-	F = SZP[res] | c;
+	set_f(SZP[res] | c);
 	return res;
 }
 
 /***************************************************************
  * RR   r8
  ***************************************************************/
-inline uint8_t z80_device::rr(uint8_t value)
+inline u8 z80_device::rr(u8 value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x01) ? CF : 0;
 	res = ((res >> 1) | (F << 7)) & 0xff;
-	F = SZP[res] | c;
+	set_f(SZP[res] | c);
 	return res;
 }
 
 /***************************************************************
  * SLA  r8
  ***************************************************************/
-inline uint8_t z80_device::sla(uint8_t value)
+inline u8 z80_device::sla(u8 value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x80) ? CF : 0;
 	res = (res << 1) & 0xff;
-	F = SZP[res] | c;
+	set_f(SZP[res] | c);
 	return res;
 }
 
 /***************************************************************
  * SRA  r8
  ***************************************************************/
-inline uint8_t z80_device::sra(uint8_t value)
+inline u8 z80_device::sra(u8 value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x01) ? CF : 0;
 	res = ((res >> 1) | (res & 0x80)) & 0xff;
-	F = SZP[res] | c;
+	set_f(SZP[res] | c);
 	return res;
 }
 
 /***************************************************************
  * SLL  r8
  ***************************************************************/
-inline uint8_t z80_device::sll(uint8_t value)
+inline u8 z80_device::sll(u8 value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x80) ? CF : 0;
 	res = ((res << 1) | 0x01) & 0xff;
-	F = SZP[res] | c;
+	set_f(SZP[res] | c);
 	return res;
 }
 
 /***************************************************************
  * SRL  r8
  ***************************************************************/
-inline uint8_t z80_device::srl(uint8_t value)
+inline u8 z80_device::srl(u8 value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x01) ? CF : 0;
 	res = (res >> 1) & 0xff;
-	F = SZP[res] | c;
+	set_f(SZP[res] | c);
 	return res;
 }
 
 /***************************************************************
  * BIT  bit,r8
  ***************************************************************/
-inline void z80_device::bit(int bit, uint8_t value)
+inline void z80_device::bit(int bit, u8 value)
 {
-	F = (F & CF) | HF | (SZ_BIT[value & (1<<bit)] & ~(YF|XF)) | (value & (YF|XF));
+	set_f((F & CF) | HF | (SZ_BIT[value & (1<<bit)] & ~(YF|XF)) | (value & (YF|XF)));
 }
 
 /***************************************************************
  * BIT  bit,(HL)
  ***************************************************************/
-inline void z80_device::bit_hl(int bit, uint8_t value)
+inline void z80_device::bit_hl(int bit, u8 value)
 {
-	F = (F & CF) | HF | (SZ_BIT[value & (1<<bit)] & ~(YF|XF)) | (WZ_H & (YF|XF));
+	set_f((F & CF) | HF | (SZ_BIT[value & (1<<bit)] & ~(YF|XF)) | (WZ_H & (YF|XF)));
 }
 
 /***************************************************************
  * BIT  bit,(IX/Y+o)
  ***************************************************************/
-inline void z80_device::bit_xy(int bit, uint8_t value)
+inline void z80_device::bit_xy(int bit, u8 value)
 {
-	F = (F & CF) | HF | (SZ_BIT[value & (1<<bit)] & ~(YF|XF)) | ((m_ea>>8) & (YF|XF));
+	set_f((F & CF) | HF | (SZ_BIT[value & (1<<bit)] & ~(YF|XF)) | ((m_ea>>8) & (YF|XF)));
 }
 
 /***************************************************************
  * RES  bit,r8
  ***************************************************************/
-inline uint8_t z80_device::res(int bit, uint8_t value)
+inline u8 z80_device::res(int bit, u8 value)
 {
 	return value & ~(1<<bit);
 }
@@ -1187,7 +1060,7 @@ inline uint8_t z80_device::res(int bit, uint8_t value)
 /***************************************************************
  * SET  bit,r8
  ***************************************************************/
-inline uint8_t z80_device::set(int bit, uint8_t value)
+inline u8 z80_device::set(int bit, u8 value)
 {
 	return value | (1<<bit);
 }
@@ -1195,262 +1068,320 @@ inline uint8_t z80_device::set(int bit, uint8_t value)
 /***************************************************************
  * LDI
  ***************************************************************/
-inline void z80_device::ldi()
-{
-	uint8_t io = rm(HL);
-	m_icount_executing -= 2;
-	wm(DE, io);
-	m_icount_executing += 2;
-	nomreq_addr(DE, 2);
-	F &= SF | ZF | CF;
-	if ((A + io) & 0x02) F |= YF; /* bit 1 -> flag 5 */
-	if ((A + io) & 0x08) F |= XF; /* bit 3 -> flag 3 */
-	HL++; DE++; BC--;
-	if(BC) F |= VF;
-}
+DEF( ldi() )
+	THEN
+		TADR=HL;
+	CALL rm();
+	THEN
+		TADR=DE;
+	CALL wm();
+	CALL nomreq_addr(2);
+	THEN
+		set_f(F & (SF | ZF | CF));
+		if ((A + TDAT8) & 0x02) F |= YF; // bit 1 -> flag 5
+		if ((A + TDAT8) & 0x08) F |= XF; // bit 3 -> flag 3
+		HL++; DE++; BC--;
+		if(BC) F |= VF;
+ENDDEF
 
 /***************************************************************
  * CPI
  ***************************************************************/
-inline void z80_device::cpi()
-{
-	uint8_t val = rm(HL);
-	nomreq_addr(HL, 5);
-	uint8_t res = A - val;
-	WZ++;
-	HL++; BC--;
-	F = (F & CF) | (SZ[res]&~(YF|XF)) | ((A^val^res)&HF) | NF;
-	if (F & HF) res -= 1;
-	if (res & 0x02) F |= YF; /* bit 1 -> flag 5 */
-	if (res & 0x08) F |= XF; /* bit 3 -> flag 3 */
-	if (BC) F |= VF;
-}
+DEF( cpi() )
+	THEN
+		TADR=HL;
+	CALL rm();
+	CALL nomreq_addr(5);
+	THEN
+		u8 res = A - TDAT8;
+		WZ++;
+		HL++; BC--;
+		set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
+		if (F & HF) res -= 1;
+		if (res & 0x02) F |= YF; // bit 1 -> flag 5
+		if (res & 0x08) F |= XF; // bit 3 -> flag 3
+		if (BC) F |= VF;
+ENDDEF
 
 /***************************************************************
  * INI
  ***************************************************************/
-inline void z80_device::ini()
-{
-	nomreq_ir(1);
-	unsigned t;
-	uint8_t io = in(BC);
-	WZ = BC + 1;
-	B--;
-	wm(HL, io);
-	HL++;
-	F = SZ[B];
-	t = (unsigned)((C + 1) & 0xff) + (unsigned)io;
-	if (io & SF) F |= NF;
-	if (t & 0x100) F |= HF | CF;
-	F |= SZP[(uint8_t)(t & 0x07) ^ B] & PF;
-}
+DEF( ini() )
+	CALL nomreq_ir(1);
+	THEN
+		TADR=BC;
+	CALL in();
+	THEN
+		WZ = BC + 1;
+		B--;
+		TADR=HL;
+	CALL wm();
+	THEN
+		HL++;
+		set_f(SZ[B]);
+		unsigned t = (unsigned)((C + 1) & 0xff) + (unsigned)TDAT8;
+		if (TDAT8 & SF) F |= NF;
+		if (t & 0x100) F |= HF | CF;
+		F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+ENDDEF
 
 /***************************************************************
  * OUTI
  ***************************************************************/
-inline void z80_device::outi()
-{
-	nomreq_ir(1);
-	unsigned t;
-	uint8_t io = rm(HL);
-	B--;
-	WZ = BC + 1;
-	out(BC, io);
-	HL++;
-	F = SZ[B];
-	t = (unsigned)L + (unsigned)io;
-	if (io & SF) F |= NF;
-	if (t & 0x100) F |= HF | CF;
-	F |= SZP[(uint8_t)(t & 0x07) ^ B] & PF;
-}
+DEF( outi() )
+	CALL nomreq_ir(1);
+	THEN
+		TADR=HL;
+	CALL rm();
+	THEN
+		B--;
+		WZ = BC + 1;
+		TADR=BC;
+	CALL out();
+	THEN
+		HL++;
+		set_f(SZ[B]);
+		unsigned t = (unsigned)L + (unsigned)TDAT8;
+		if (TDAT8 & SF) F |= NF;
+		if (t & 0x100) F |= HF | CF;
+		F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+ENDDEF
 
 /***************************************************************
  * LDD
  ***************************************************************/
-inline void z80_device::ldd()
-{
-	uint8_t io = rm(HL);
-	m_icount_executing -= 2;
-	wm(DE, io);
-	m_icount_executing += 2;
-	nomreq_addr(DE, 2);
-	F &= SF | ZF | CF;
-	if ((A + io) & 0x02) F |= YF; /* bit 1 -> flag 5 */
-	if ((A + io) & 0x08) F |= XF; /* bit 3 -> flag 3 */
-	HL--; DE--; BC--;
-	if (BC) F |= VF;
-}
+DEF( ldd() )
+	THEN
+		TADR=HL;
+	CALL rm();
+	THEN
+		TADR=DE;
+	CALL wm();
+	CALL nomreq_addr(2);
+	THEN
+		set_f(F & (SF | ZF | CF));
+		if ((A + TDAT8) & 0x02) F |= YF; // bit 1 -> flag 5
+		if ((A + TDAT8) & 0x08) F |= XF; // bit 3 -> flag 3
+		HL--; DE--; BC--;
+		if (BC) F |= VF;
+ENDDEF
 
 /***************************************************************
  * CPD
  ***************************************************************/
-inline void z80_device::cpd()
-{
-	uint8_t val = rm(HL);
-	nomreq_addr(HL, 5);
-	uint8_t res = A - val;
-	WZ--;
-	HL--; BC--;
-	F = (F & CF) | (SZ[res]&~(YF|XF)) | ((A^val^res)&HF) | NF;
-	if (F & HF) res -= 1;
-	if (res & 0x02) F |= YF; /* bit 1 -> flag 5 */
-	if (res & 0x08) F |= XF; /* bit 3 -> flag 3 */
-	if (BC) F |= VF;
-}
+DEF( cpd() )
+	THEN
+		TADR=HL;
+	CALL rm();
+	THEN
+		TADR=HL;
+	CALL nomreq_addr(5);
+	THEN
+		u8 res = A - TDAT8;
+		WZ--;
+		HL--; BC--;
+		set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
+		if (F & HF) res -= 1;
+		if (res & 0x02) F |= YF; // bit 1 -> flag 5
+		if (res & 0x08) F |= XF; // bit 3 -> flag 3
+		if (BC) F |= VF;
+ENDDEF
 
 /***************************************************************
  * IND
  ***************************************************************/
-inline void z80_device::ind()
-{
-	nomreq_ir(1);
-	unsigned t;
-	uint8_t io = in(BC);
-	WZ = BC - 1;
-	B--;
-	wm(HL, io);
-	HL--;
-	F = SZ[B];
-	t = ((unsigned)(C - 1) & 0xff) + (unsigned)io;
-	if (io & SF) F |= NF;
-	if (t & 0x100) F |= HF | CF;
-	F |= SZP[(uint8_t)(t & 0x07) ^ B] & PF;
-}
+DEF( ind() )
+	CALL nomreq_ir(1);
+	THEN
+		TADR=BC;
+	CALL in();
+	THEN
+		WZ = BC - 1;
+		B--;
+		TADR=HL;
+	CALL wm();
+	THEN
+		HL--;
+		set_f(SZ[B]);
+		unsigned t = ((unsigned)(C - 1) & 0xff) + (unsigned)TDAT8;
+		if (TDAT8 & SF) F |= NF;
+		if (t & 0x100) F |= HF | CF;
+		F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+ENDDEF
 
 /***************************************************************
  * OUTD
  ***************************************************************/
-inline void z80_device::outd()
-{
-	nomreq_ir(1);
-	unsigned t;
-	uint8_t io = rm(HL);
-	B--;
-	WZ = BC - 1;
-	out(BC, io);
-	HL--;
-	F = SZ[B];
-	t = (unsigned)L + (unsigned)io;
-	if (io & SF) F |= NF;
-	if (t & 0x100) F |= HF | CF;
-	F |= SZP[(uint8_t)(t & 0x07) ^ B] & PF;
-}
+DEF( outd() )
+	CALL nomreq_ir(1);
+	THEN
+		TADR=HL;
+	CALL rm();
+	THEN
+		B--;
+		WZ = BC - 1;
+		TADR=BC;
+	CALL out();
+	THEN
+		HL--;
+		set_f(SZ[B]);
+		unsigned t = (unsigned)L + (unsigned)TDAT8;
+		if (TDAT8 & SF) F |= NF;
+		if (t & 0x100) F |= HF | CF;
+		F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+ENDDEF
 
 /***************************************************************
  * LDIR
  ***************************************************************/
-inline void z80_device::ldir()
-{
-	ldi();
-	if (BC != 0)
-	{
-		CC(ex, 0xb0);
-		nomreq_addr(DE, 5);
-		PC -= 2;
-		WZ = PC + 1;
-	}
-}
+DEF( ldir() )
+	CALL ldi();
+	IF ( BC != 0 )
+		THEN
+			TADR=DE;
+		CALL nomreq_addr(5);
+		THEN
+			PC -= 2;
+			WZ = PC + 1;
+			F &= ~(YF | XF);
+			F |= (PC >> 8) & (YF | XF);
+	ENDIF
+ENDDEF
 
 /***************************************************************
  * CPIR
  ***************************************************************/
-inline void z80_device::cpir()
+DEF( cpir() )
+	CALL cpi();
+	IF ( BC != 0 && !(F & ZF) )
+		THEN
+			TADR=HL;
+		CALL nomreq_addr(5);
+		THEN
+			PC -= 2;
+			WZ = PC + 1;
+			F &= ~(YF | XF);
+			F |= (PC >> 8) & (YF | XF);
+	ENDIF
+ENDDEF
+
+inline void z80_device::block_io_interrupted_flags()
 {
-	cpi();
-	if (BC != 0 && !(F & ZF))
+	F &= ~(YF | XF);
+	F |= (PC >> 8) & (YF | XF);
+	if (F & CF)
 	{
-		CC(ex, 0xb1);
-		nomreq_addr(HL, 5);
-		PC -= 2;
-		WZ = PC + 1;
+		F &= ~HF;
+		if (TDAT8 & 0x80)
+		{
+			F ^= (SZP[(B - 1) & 0x07] ^ PF) & PF;
+			if ((B & 0x0f) == 0x00) F |= HF;
+		}
+		else
+		{
+			F ^= (SZP[(B + 1) & 0x07] ^ PF) & PF;
+			if ((B & 0x0f) == 0x0f) F |= HF;
+		}
+	}
+	else
+	{
+		F ^=(SZP[B & 0x07] ^ PF) & PF;
 	}
 }
 
 /***************************************************************
  * INIR
  ***************************************************************/
-inline void z80_device::inir()
-{
-	ini();
-	if (B != 0)
-	{
-		CC(ex, 0xb2);
-		nomreq_addr(HL, 5);
-		PC -= 2;
-	}
-}
+DEF( inir() )
+	CALL ini();
+	IF ( B != 0 )
+		THEN
+			TADR=HL;
+		CALL nomreq_addr(5);
+		THEN
+			PC -= 2;
+			block_io_interrupted_flags();
+	ENDIF
+ENDDEF
 
 /***************************************************************
  * OTIR
  ***************************************************************/
-inline void z80_device::otir()
-{
-	outi();
-	if (B != 0)
-	{
-		CC(ex, 0xb3);
-		nomreq_addr(BC, 5);
-		PC -= 2;
-	}
-}
+DEF( otir() )
+	CALL outi();
+	IF ( B != 0 )
+		THEN
+			TADR=BC;
+		CALL nomreq_addr(5);
+		THEN
+			PC -= 2;
+			block_io_interrupted_flags();
+	ENDIF
+ENDDEF
 
 /***************************************************************
  * LDDR
  ***************************************************************/
-inline void z80_device::lddr()
-{
-	ldd();
-	if (BC != 0)
-	{
-		CC(ex, 0xb8);
-		nomreq_addr(DE, 5);
-		PC -= 2;
-		WZ = PC + 1;
-	}
-}
+DEF( lddr() )
+	CALL ldd();
+	IF ( BC != 0 )
+		THEN
+			TADR=DE;
+		CALL nomreq_addr(5);
+		THEN
+			PC -= 2;
+			WZ = PC + 1;
+			F &= ~(YF | XF);
+			F |= (PC >> 8) & (YF | XF);
+	ENDIF
+ENDDEF
 
 /***************************************************************
  * CPDR
  ***************************************************************/
-inline void z80_device::cpdr()
-{
-	cpd();
-	if (BC != 0 && !(F & ZF))
-	{
-		CC(ex, 0xb9);
-		nomreq_addr(HL, 5);
-		PC -= 2;
-		WZ = PC + 1;
-	}
-}
+DEF( cpdr() )
+	CALL cpd();
+	IF ( BC != 0 && !(F & ZF) )
+		THEN
+			TADR=HL;
+		CALL nomreq_addr(5);
+		THEN
+			PC -= 2;
+			WZ = PC + 1;
+			F &= ~(YF | XF);
+			F |= (PC >> 8) & (YF | XF);
+	ENDIF
+ENDDEF
 
 /***************************************************************
  * INDR
  ***************************************************************/
-inline void z80_device::indr()
-{
-	ind();
-	if (B != 0)
-	{
-		CC(ex, 0xba);
-		nomreq_addr(HL, 5);
-		PC -= 2;
-	}
-}
+DEF( indr() )
+	CALL ind();
+	IF ( B != 0 )
+		THEN
+			TADR=HL;
+		CALL nomreq_addr(5);
+		THEN
+			PC -= 2;
+			block_io_interrupted_flags();
+	ENDIF
+ENDDEF
 
 /***************************************************************
  * OTDR
  ***************************************************************/
-inline void z80_device::otdr()
-{
-	outd();
-	if (B != 0)
-	{
-		CC(ex, 0xbb);
-		nomreq_addr(BC, 5);
-		PC -= 2;
-	}
-}
+DEF( otdr() )
+	CALL outd();
+	IF ( B != 0 )
+		THEN
+			TADR=BC;
+		CALL nomreq_addr(5);
+		THEN
+			PC -= 2;
+			block_io_interrupted_flags();
+	ENDIF
+ENDDEF
 
 /***************************************************************
  * EI
@@ -1461,1767 +1392,1781 @@ inline void z80_device::ei()
 	m_after_ei = true;
 }
 
+inline void z80_device::set_f(u8 f)
+{
+	m_qtemp = 0;
+	F = f;
+}
+
+inline void z80_device::illegal_1() {
+	LOGUNDOC("ill. opcode $%02x $%02x ($%04x)\n",
+			m_opcodes.read_byte(translate_memory_address((PCD-1)&0xffff)), m_opcodes.read_byte(translate_memory_address(PCD)), PCD-1);
+}
+
+inline void z80_device::illegal_2()
+{
+	LOGUNDOC("ill. opcode $ed $%02x\n",
+			m_opcodes.read_byte(translate_memory_address((PCD-1)&0xffff)));
+}
+
+void z80_device::init_op_steps() {
+
+#define OP(prefix,opcode) m_op_steps[prefix][0x##opcode] = op_builder(*this).foo([]() {
+#define THENJP(p_to) })->add([&]() { m_cycle=~0; m_prefix=p_to; m_opcode=TDAT8; })->get_steps();
+#define JP(op) })->jump(0x##op);
+#define JPP(p_to,op_to) })->jump(p_to, 0x##op_to);
+#define ENDOP })->build();
+
 /**********************************************************
  * opcodes with CB prefix
  * rotate, shift and bit operations
  **********************************************************/
-OP(cb,00) { B = rlc(B);             } /* RLC  B           */
-OP(cb,01) { C = rlc(C);             } /* RLC  C           */
-OP(cb,02) { D = rlc(D);             } /* RLC  D           */
-OP(cb,03) { E = rlc(E);             } /* RLC  E           */
-OP(cb,04) { H = rlc(H);             } /* RLC  H           */
-OP(cb,05) { L = rlc(L);             } /* RLC  L           */
-OP(cb,06) { wm(HL, rlc(rm_reg(HL)));} /* RLC  (HL)        */
-OP(cb,07) { A = rlc(A);             } /* RLC  A           */
+/* RLC  B          */ OP(CB,00) THEN B = rlc(B);                                               ENDOP
+/* RLC  C          */ OP(CB,01) THEN C = rlc(C);                                               ENDOP
+/* RLC  D          */ OP(CB,02) THEN D = rlc(D);                                               ENDOP
+/* RLC  E          */ OP(CB,03) THEN E = rlc(E);                                               ENDOP
+/* RLC  H          */ OP(CB,04) THEN H = rlc(H);                                               ENDOP
+/* RLC  L          */ OP(CB,05) THEN L = rlc(L);                                               ENDOP
+/* RLC  (HL)       */ OP(CB,06) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=rlc(TDAT8); CALL wm(); ENDOP
+/* RLC  A          */ OP(CB,07) THEN A = rlc(A);                                               ENDOP
 
-OP(cb,08) { B = rrc(B);             } /* RRC  B           */
-OP(cb,09) { C = rrc(C);             } /* RRC  C           */
-OP(cb,0a) { D = rrc(D);             } /* RRC  D           */
-OP(cb,0b) { E = rrc(E);             } /* RRC  E           */
-OP(cb,0c) { H = rrc(H);             } /* RRC  H           */
-OP(cb,0d) { L = rrc(L);             } /* RRC  L           */
-OP(cb,0e) { wm(HL, rrc(rm_reg(HL)));} /* RRC  (HL)        */
-OP(cb,0f) { A = rrc(A);             } /* RRC  A           */
+/* RRC  B          */ OP(CB,08) THEN B = rrc(B);                                               ENDOP
+/* RRC  C          */ OP(CB,09) THEN C = rrc(C);                                               ENDOP
+/* RRC  D          */ OP(CB,0a) THEN D = rrc(D);                                               ENDOP
+/* RRC  E          */ OP(CB,0b) THEN E = rrc(E);                                               ENDOP
+/* RRC  H          */ OP(CB,0c) THEN H = rrc(H);                                               ENDOP
+/* RRC  L          */ OP(CB,0d) THEN L = rrc(L);                                               ENDOP
+/* RRC  (HL)       */ OP(CB,0e) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=rrc(TDAT8); CALL wm(); ENDOP
+/* RRC  A          */ OP(CB,0f) THEN A = rrc(A);                                               ENDOP
 
-OP(cb,10) { B = rl(B);              } /* RL   B           */
-OP(cb,11) { C = rl(C);              } /* RL   C           */
-OP(cb,12) { D = rl(D);              } /* RL   D           */
-OP(cb,13) { E = rl(E);              } /* RL   E           */
-OP(cb,14) { H = rl(H);              } /* RL   H           */
-OP(cb,15) { L = rl(L);              } /* RL   L           */
-OP(cb,16) { wm(HL, rl(rm_reg(HL)));     } /* RL   (HL)        */
-OP(cb,17) { A = rl(A);              } /* RL   A           */
+/* RL   B          */ OP(CB,10) THEN B = rl(B);                                                ENDOP
+/* RL   C          */ OP(CB,11) THEN C = rl(C);                                                ENDOP
+/* RL   D          */ OP(CB,12) THEN D = rl(D);                                                ENDOP
+/* RL   E          */ OP(CB,13) THEN E = rl(E);                                                ENDOP
+/* RL   H          */ OP(CB,14) THEN H = rl(H);                                                ENDOP
+/* RL   L          */ OP(CB,15) THEN L = rl(L);                                                ENDOP
+/* RL   (HL)       */ OP(CB,16) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=rl(TDAT8); CALL wm();  ENDOP
+/* RL   A          */ OP(CB,17) THEN A = rl(A);                                                ENDOP
 
-OP(cb,18) { B = rr(B);              } /* RR   B           */
-OP(cb,19) { C = rr(C);              } /* RR   C           */
-OP(cb,1a) { D = rr(D);              } /* RR   D           */
-OP(cb,1b) { E = rr(E);              } /* RR   E           */
-OP(cb,1c) { H = rr(H);              } /* RR   H           */
-OP(cb,1d) { L = rr(L);              } /* RR   L           */
-OP(cb,1e) { wm(HL, rr(rm_reg(HL)));     } /* RR   (HL)        */
-OP(cb,1f) { A = rr(A);              } /* RR   A           */
+/* RR   B          */ OP(CB,18) THEN B = rr(B);                                                ENDOP
+/* RR   C          */ OP(CB,19) THEN C = rr(C);                                                ENDOP
+/* RR   D          */ OP(CB,1a) THEN D = rr(D);                                                ENDOP
+/* RR   E          */ OP(CB,1b) THEN E = rr(E);                                                ENDOP
+/* RR   H          */ OP(CB,1c) THEN H = rr(H);                                                ENDOP
+/* RR   L          */ OP(CB,1d) THEN L = rr(L);                                                ENDOP
+/* RR   (HL)       */ OP(CB,1e) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=rr(TDAT8); CALL wm();  ENDOP
+/* RR   A          */ OP(CB,1f) THEN A = rr(A);                                                ENDOP
 
-OP(cb,20) { B = sla(B);             } /* SLA  B           */
-OP(cb,21) { C = sla(C);             } /* SLA  C           */
-OP(cb,22) { D = sla(D);             } /* SLA  D           */
-OP(cb,23) { E = sla(E);             } /* SLA  E           */
-OP(cb,24) { H = sla(H);             } /* SLA  H           */
-OP(cb,25) { L = sla(L);             } /* SLA  L           */
-OP(cb,26) { wm(HL, sla(rm_reg(HL)));} /* SLA  (HL)        */
-OP(cb,27) { A = sla(A);             } /* SLA  A           */
+/* SLA  B          */ OP(CB,20) THEN B = sla(B);                                               ENDOP
+/* SLA  C          */ OP(CB,21) THEN C = sla(C);                                               ENDOP
+/* SLA  D          */ OP(CB,22) THEN D = sla(D);                                               ENDOP
+/* SLA  E          */ OP(CB,23) THEN E = sla(E);                                               ENDOP
+/* SLA  H          */ OP(CB,24) THEN H = sla(H);                                               ENDOP
+/* SLA  L          */ OP(CB,25) THEN L = sla(L);                                               ENDOP
+/* SLA  (HL)       */ OP(CB,26) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=sla(TDAT8); CALL wm(); ENDOP
+/* SLA  A          */ OP(CB,27) THEN A = sla(A);                                               ENDOP
 
-OP(cb,28) { B = sra(B);             } /* SRA  B           */
-OP(cb,29) { C = sra(C);             } /* SRA  C           */
-OP(cb,2a) { D = sra(D);             } /* SRA  D           */
-OP(cb,2b) { E = sra(E);             } /* SRA  E           */
-OP(cb,2c) { H = sra(H);             } /* SRA  H           */
-OP(cb,2d) { L = sra(L);             } /* SRA  L           */
-OP(cb,2e) { wm(HL, sra(rm_reg(HL)));} /* SRA  (HL)        */
-OP(cb,2f) { A = sra(A);             } /* SRA  A           */
+/* SRA  B          */ OP(CB,28) THEN B = sra(B);                                               ENDOP
+/* SRA  C          */ OP(CB,29) THEN C = sra(C);                                               ENDOP
+/* SRA  D          */ OP(CB,2a) THEN D = sra(D);                                               ENDOP
+/* SRA  E          */ OP(CB,2b) THEN E = sra(E);                                               ENDOP
+/* SRA  H          */ OP(CB,2c) THEN H = sra(H);                                               ENDOP
+/* SRA  L          */ OP(CB,2d) THEN L = sra(L);                                               ENDOP
+/* SRA  (HL)       */ OP(CB,2e) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=sra(TDAT8); CALL wm(); ENDOP
+/* SRA  A          */ OP(CB,2f) THEN A = sra(A);                                               ENDOP
 
-OP(cb,30) { B = sll(B);             } /* SLL  B           */
-OP(cb,31) { C = sll(C);             } /* SLL  C           */
-OP(cb,32) { D = sll(D);             } /* SLL  D           */
-OP(cb,33) { E = sll(E);             } /* SLL  E           */
-OP(cb,34) { H = sll(H);             } /* SLL  H           */
-OP(cb,35) { L = sll(L);             } /* SLL  L           */
-OP(cb,36) { wm(HL, sll(rm_reg(HL)));} /* SLL  (HL)        */
-OP(cb,37) { A = sll(A);             } /* SLL  A           */
+/* SLL  B          */ OP(CB,30) THEN B = sll(B);                                               ENDOP
+/* SLL  C          */ OP(CB,31) THEN C = sll(C);                                               ENDOP
+/* SLL  D          */ OP(CB,32) THEN D = sll(D);                                               ENDOP
+/* SLL  E          */ OP(CB,33) THEN E = sll(E);                                               ENDOP
+/* SLL  H          */ OP(CB,34) THEN H = sll(H);                                               ENDOP
+/* SLL  L          */ OP(CB,35) THEN L = sll(L);                                               ENDOP
+/* SLL  (HL)       */ OP(CB,36) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=sll(TDAT8); CALL wm(); ENDOP
+/* SLL  A          */ OP(CB,37) THEN A = sll(A);                                               ENDOP
 
-OP(cb,38) { B = srl(B);             } /* SRL  B           */
-OP(cb,39) { C = srl(C);             } /* SRL  C           */
-OP(cb,3a) { D = srl(D);             } /* SRL  D           */
-OP(cb,3b) { E = srl(E);             } /* SRL  E           */
-OP(cb,3c) { H = srl(H);             } /* SRL  H           */
-OP(cb,3d) { L = srl(L);             } /* SRL  L           */
-OP(cb,3e) { wm(HL, srl(rm_reg(HL)));} /* SRL  (HL)        */
-OP(cb,3f) { A = srl(A);             } /* SRL  A           */
+/* SRL  B          */ OP(CB,38) THEN B = srl(B);                                               ENDOP
+/* SRL  C          */ OP(CB,39) THEN C = srl(C);                                               ENDOP
+/* SRL  D          */ OP(CB,3a) THEN D = srl(D);                                               ENDOP
+/* SRL  E          */ OP(CB,3b) THEN E = srl(E);                                               ENDOP
+/* SRL  H          */ OP(CB,3c) THEN H = srl(H);                                               ENDOP
+/* SRL  L          */ OP(CB,3d) THEN L = srl(L);                                               ENDOP
+/* SRL  (HL)       */ OP(CB,3e) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=srl(TDAT8); CALL wm(); ENDOP
+/* SRL  A          */ OP(CB,3f) THEN A = srl(A);                                               ENDOP
 
-OP(cb,40) { bit(0, B);              } /* BIT  0,B         */
-OP(cb,41) { bit(0, C);              } /* BIT  0,C         */
-OP(cb,42) { bit(0, D);              } /* BIT  0,D         */
-OP(cb,43) { bit(0, E);              } /* BIT  0,E         */
-OP(cb,44) { bit(0, H);              } /* BIT  0,H         */
-OP(cb,45) { bit(0, L);              } /* BIT  0,L         */
-OP(cb,46) { bit_hl(0, rm_reg(HL));      } /* BIT  0,(HL)      */
-OP(cb,47) { bit(0, A);              } /* BIT  0,A         */
+/* BIT  0,B        */ OP(CB,40) THEN bit(0, B);                                                ENDOP
+/* BIT  0,C        */ OP(CB,41) THEN bit(0, C);                                                ENDOP
+/* BIT  0,D        */ OP(CB,42) THEN bit(0, D);                                                ENDOP
+/* BIT  0,E        */ OP(CB,43) THEN bit(0, E);                                                ENDOP
+/* BIT  0,H        */ OP(CB,44) THEN bit(0, H);                                                ENDOP
+/* BIT  0,L        */ OP(CB,45) THEN bit(0, L);                                                ENDOP
+/* BIT  0,(HL)     */ OP(CB,46) THEN TADR=HL; CALL rm_reg(); THEN bit_hl(0, TDAT8);            ENDOP
+/* BIT  0,A        */ OP(CB,47) THEN bit(0, A);                                                ENDOP
 
-OP(cb,48) { bit(1, B);              } /* BIT  1,B         */
-OP(cb,49) { bit(1, C);              } /* BIT  1,C         */
-OP(cb,4a) { bit(1, D);              } /* BIT  1,D         */
-OP(cb,4b) { bit(1, E);              } /* BIT  1,E         */
-OP(cb,4c) { bit(1, H);              } /* BIT  1,H         */
-OP(cb,4d) { bit(1, L);              } /* BIT  1,L         */
-OP(cb,4e) { bit_hl(1, rm_reg(HL));      } /* BIT  1,(HL)      */
-OP(cb,4f) { bit(1, A);              } /* BIT  1,A         */
+/* BIT  1,B        */ OP(CB,48) THEN bit(1, B);                                                ENDOP
+/* BIT  1,C        */ OP(CB,49) THEN bit(1, C);                                                ENDOP
+/* BIT  1,D        */ OP(CB,4a) THEN bit(1, D);                                                ENDOP
+/* BIT  1,E        */ OP(CB,4b) THEN bit(1, E);                                                ENDOP
+/* BIT  1,H        */ OP(CB,4c) THEN bit(1, H);                                                ENDOP
+/* BIT  1,L        */ OP(CB,4d) THEN bit(1, L);                                                ENDOP
+/* BIT  1,(HL)     */ OP(CB,4e) THEN TADR=HL; CALL rm_reg(); THEN bit_hl(1, TDAT8);            ENDOP
+/* BIT  1,A        */ OP(CB,4f) THEN bit(1, A);                                                ENDOP
 
-OP(cb,50) { bit(2, B);              } /* BIT  2,B         */
-OP(cb,51) { bit(2, C);              } /* BIT  2,C         */
-OP(cb,52) { bit(2, D);              } /* BIT  2,D         */
-OP(cb,53) { bit(2, E);              } /* BIT  2,E         */
-OP(cb,54) { bit(2, H);              } /* BIT  2,H         */
-OP(cb,55) { bit(2, L);              } /* BIT  2,L         */
-OP(cb,56) { bit_hl(2, rm_reg(HL));      } /* BIT  2,(HL)      */
-OP(cb,57) { bit(2, A);              } /* BIT  2,A         */
+/* BIT  2,B        */ OP(CB,50) THEN bit(2, B);                                                ENDOP
+/* BIT  2,C        */ OP(CB,51) THEN bit(2, C);                                                ENDOP
+/* BIT  2,D        */ OP(CB,52) THEN bit(2, D);                                                ENDOP
+/* BIT  2,E        */ OP(CB,53) THEN bit(2, E);                                                ENDOP
+/* BIT  2,H        */ OP(CB,54) THEN bit(2, H);                                                ENDOP
+/* BIT  2,L        */ OP(CB,55) THEN bit(2, L);                                                ENDOP
+/* BIT  2,(HL)     */ OP(CB,56) THEN TADR=HL; CALL rm_reg(); THEN bit_hl(2, TDAT8);            ENDOP
+/* BIT  2,A        */ OP(CB,57) THEN bit(2, A);                                                ENDOP
 
-OP(cb,58) { bit(3, B);              } /* BIT  3,B         */
-OP(cb,59) { bit(3, C);              } /* BIT  3,C         */
-OP(cb,5a) { bit(3, D);              } /* BIT  3,D         */
-OP(cb,5b) { bit(3, E);              } /* BIT  3,E         */
-OP(cb,5c) { bit(3, H);              } /* BIT  3,H         */
-OP(cb,5d) { bit(3, L);              } /* BIT  3,L         */
-OP(cb,5e) { bit_hl(3, rm_reg(HL));      } /* BIT  3,(HL)      */
-OP(cb,5f) { bit(3, A);              } /* BIT  3,A         */
+/* BIT  3,B        */ OP(CB,58) THEN bit(3, B);                                                ENDOP
+/* BIT  3,C        */ OP(CB,59) THEN bit(3, C);                                                ENDOP
+/* BIT  3,D        */ OP(CB,5a) THEN bit(3, D);                                                ENDOP
+/* BIT  3,E        */ OP(CB,5b) THEN bit(3, E);                                                ENDOP
+/* BIT  3,H        */ OP(CB,5c) THEN bit(3, H);                                                ENDOP
+/* BIT  3,L        */ OP(CB,5d) THEN bit(3, L);                                                ENDOP
+/* BIT  3,(HL)     */ OP(CB,5e) THEN TADR=HL; CALL rm_reg(); THEN bit_hl(3, TDAT8);            ENDOP
+/* BIT  3,A        */ OP(CB,5f) THEN bit(3, A);                                                ENDOP
 
-OP(cb,60) { bit(4, B);              } /* BIT  4,B         */
-OP(cb,61) { bit(4, C);              } /* BIT  4,C         */
-OP(cb,62) { bit(4, D);              } /* BIT  4,D         */
-OP(cb,63) { bit(4, E);              } /* BIT  4,E         */
-OP(cb,64) { bit(4, H);              } /* BIT  4,H         */
-OP(cb,65) { bit(4, L);              } /* BIT  4,L         */
-OP(cb,66) { bit_hl(4, rm_reg(HL));      } /* BIT  4,(HL)      */
-OP(cb,67) { bit(4, A);              } /* BIT  4,A         */
+/* BIT  4,B        */ OP(CB,60) THEN bit(4, B);                                                ENDOP
+/* BIT  4,C        */ OP(CB,61) THEN bit(4, C);                                                ENDOP
+/* BIT  4,D        */ OP(CB,62) THEN bit(4, D);                                                ENDOP
+/* BIT  4,E        */ OP(CB,63) THEN bit(4, E);                                                ENDOP
+/* BIT  4,H        */ OP(CB,64) THEN bit(4, H);                                                ENDOP
+/* BIT  4,L        */ OP(CB,65) THEN bit(4, L);                                                ENDOP
+/* BIT  4,(HL)     */ OP(CB,66) THEN TADR=HL; CALL rm_reg(); THEN bit_hl(4, TDAT8);            ENDOP
+/* BIT  4,A        */ OP(CB,67) THEN bit(4, A);                                                ENDOP
 
-OP(cb,68) { bit(5, B);              } /* BIT  5,B         */
-OP(cb,69) { bit(5, C);              } /* BIT  5,C         */
-OP(cb,6a) { bit(5, D);              } /* BIT  5,D         */
-OP(cb,6b) { bit(5, E);              } /* BIT  5,E         */
-OP(cb,6c) { bit(5, H);              } /* BIT  5,H         */
-OP(cb,6d) { bit(5, L);              } /* BIT  5,L         */
-OP(cb,6e) { bit_hl(5, rm_reg(HL));      } /* BIT  5,(HL)      */
-OP(cb,6f) { bit(5, A);              } /* BIT  5,A         */
+/* BIT  5,B        */ OP(CB,68) THEN bit(5, B);                                                ENDOP
+/* BIT  5,C        */ OP(CB,69) THEN bit(5, C);                                                ENDOP
+/* BIT  5,D        */ OP(CB,6a) THEN bit(5, D);                                                ENDOP
+/* BIT  5,E        */ OP(CB,6b) THEN bit(5, E);                                                ENDOP
+/* BIT  5,H        */ OP(CB,6c) THEN bit(5, H);                                                ENDOP
+/* BIT  5,L        */ OP(CB,6d) THEN bit(5, L);                                                ENDOP
+/* BIT  5,(HL)     */ OP(CB,6e) THEN TADR=HL; CALL rm_reg(); THEN bit_hl(5, TDAT8);            ENDOP
+/* BIT  5,A        */ OP(CB,6f) THEN bit(5, A);                                                ENDOP
 
-OP(cb,70) { bit(6, B);              } /* BIT  6,B         */
-OP(cb,71) { bit(6, C);              } /* BIT  6,C         */
-OP(cb,72) { bit(6, D);              } /* BIT  6,D         */
-OP(cb,73) { bit(6, E);              } /* BIT  6,E         */
-OP(cb,74) { bit(6, H);              } /* BIT  6,H         */
-OP(cb,75) { bit(6, L);              } /* BIT  6,L         */
-OP(cb,76) { bit_hl(6, rm_reg(HL));      } /* BIT  6,(HL)      */
-OP(cb,77) { bit(6, A);              } /* BIT  6,A         */
+/* BIT  6,B        */ OP(CB,70) THEN bit(6, B);                                                ENDOP
+/* BIT  6,C        */ OP(CB,71) THEN bit(6, C);                                                ENDOP
+/* BIT  6,D        */ OP(CB,72) THEN bit(6, D);                                                ENDOP
+/* BIT  6,E        */ OP(CB,73) THEN bit(6, E);                                                ENDOP
+/* BIT  6,H        */ OP(CB,74) THEN bit(6, H);                                                ENDOP
+/* BIT  6,L        */ OP(CB,75) THEN bit(6, L);                                                ENDOP
+/* BIT  6,(HL)     */ OP(CB,76) THEN TADR=HL; CALL rm_reg(); THEN bit_hl(6, TDAT8);            ENDOP
+/* BIT  6,A        */ OP(CB,77) THEN bit(6, A);                                                ENDOP
 
-OP(cb,78) { bit(7, B);              } /* BIT  7,B         */
-OP(cb,79) { bit(7, C);              } /* BIT  7,C         */
-OP(cb,7a) { bit(7, D);              } /* BIT  7,D         */
-OP(cb,7b) { bit(7, E);              } /* BIT  7,E         */
-OP(cb,7c) { bit(7, H);              } /* BIT  7,H         */
-OP(cb,7d) { bit(7, L);              } /* BIT  7,L         */
-OP(cb,7e) { bit_hl(7, rm_reg(HL));      } /* BIT  7,(HL)      */
-OP(cb,7f) { bit(7, A);              } /* BIT  7,A         */
+/* BIT  7,B        */ OP(CB,78) THEN bit(7, B);                                                ENDOP
+/* BIT  7,C        */ OP(CB,79) THEN bit(7, C);                                                ENDOP
+/* BIT  7,D        */ OP(CB,7a) THEN bit(7, D);                                                ENDOP
+/* BIT  7,E        */ OP(CB,7b) THEN bit(7, E);                                                ENDOP
+/* BIT  7,H        */ OP(CB,7c) THEN bit(7, H);                                                ENDOP
+/* BIT  7,L        */ OP(CB,7d) THEN bit(7, L);                                                ENDOP
+/* BIT  7,(HL)     */ OP(CB,7e) THEN TADR=HL; CALL rm_reg(); THEN bit_hl(7, TDAT8);            ENDOP
+/* BIT  7,A        */ OP(CB,7f) THEN bit(7, A);                                                ENDOP
 
-OP(cb,80) { B = res(0, B);          } /* RES  0,B         */
-OP(cb,81) { C = res(0, C);          } /* RES  0,C         */
-OP(cb,82) { D = res(0, D);          } /* RES  0,D         */
-OP(cb,83) { E = res(0, E);          } /* RES  0,E         */
-OP(cb,84) { H = res(0, H);          } /* RES  0,H         */
-OP(cb,85) { L = res(0, L);          } /* RES  0,L         */
-OP(cb,86) { wm(HL, res(0, rm_reg(HL))); }   /* RES  0,(HL)      */
-OP(cb,87) { A = res(0, A);          } /* RES  0,A         */
+/* RES  0,B        */ OP(CB,80) THEN B = res(0, B);                                               ENDOP
+/* RES  0,C        */ OP(CB,81) THEN C = res(0, C);                                               ENDOP
+/* RES  0,D        */ OP(CB,82) THEN D = res(0, D);                                               ENDOP
+/* RES  0,E        */ OP(CB,83) THEN E = res(0, E);                                               ENDOP
+/* RES  0,H        */ OP(CB,84) THEN H = res(0, H);                                               ENDOP
+/* RES  0,L        */ OP(CB,85) THEN L = res(0, L);                                               ENDOP
+/* RES  0,(HL)     */ OP(CB,86) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=res(0, TDAT8); CALL wm(); ENDOP
+/* RES  0,A        */ OP(CB,87) THEN A = res(0, A);                                               ENDOP
 
-OP(cb,88) { B = res(1, B);          } /* RES  1,B         */
-OP(cb,89) { C = res(1, C);          } /* RES  1,C         */
-OP(cb,8a) { D = res(1, D);          } /* RES  1,D         */
-OP(cb,8b) { E = res(1, E);          } /* RES  1,E         */
-OP(cb,8c) { H = res(1, H);          } /* RES  1,H         */
-OP(cb,8d) { L = res(1, L);          } /* RES  1,L         */
-OP(cb,8e) { wm(HL, res(1, rm_reg(HL))); }   /* RES  1,(HL)      */
-OP(cb,8f) { A = res(1, A);          } /* RES  1,A         */
+/* RES  1,B        */ OP(CB,88) THEN B = res(1, B);                                               ENDOP
+/* RES  1,C        */ OP(CB,89) THEN C = res(1, C);                                               ENDOP
+/* RES  1,D        */ OP(CB,8a) THEN D = res(1, D);                                               ENDOP
+/* RES  1,E        */ OP(CB,8b) THEN E = res(1, E);                                               ENDOP
+/* RES  1,H        */ OP(CB,8c) THEN H = res(1, H);                                               ENDOP
+/* RES  1,L        */ OP(CB,8d) THEN L = res(1, L);                                               ENDOP
+/* RES  1,(HL)     */ OP(CB,8e) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=res(1, TDAT8); CALL wm(); ENDOP
+/* RES  1,A        */ OP(CB,8f) THEN A = res(1, A);                                               ENDOP
 
-OP(cb,90) { B = res(2, B);          } /* RES  2,B         */
-OP(cb,91) { C = res(2, C);          } /* RES  2,C         */
-OP(cb,92) { D = res(2, D);          } /* RES  2,D         */
-OP(cb,93) { E = res(2, E);          } /* RES  2,E         */
-OP(cb,94) { H = res(2, H);          } /* RES  2,H         */
-OP(cb,95) { L = res(2, L);          } /* RES  2,L         */
-OP(cb,96) { wm(HL, res(2, rm_reg(HL))); }   /* RES  2,(HL)      */
-OP(cb,97) { A = res(2, A);          } /* RES  2,A         */
+/* RES  2,B        */ OP(CB,90) THEN B = res(2, B);                                               ENDOP
+/* RES  2,C        */ OP(CB,91) THEN C = res(2, C);                                               ENDOP
+/* RES  2,D        */ OP(CB,92) THEN D = res(2, D);                                               ENDOP
+/* RES  2,E        */ OP(CB,93) THEN E = res(2, E);                                               ENDOP
+/* RES  2,H        */ OP(CB,94) THEN H = res(2, H);                                               ENDOP
+/* RES  2,L        */ OP(CB,95) THEN L = res(2, L);                                               ENDOP
+/* RES  2,(HL)     */ OP(CB,96) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=res(2, TDAT8); CALL wm(); ENDOP
+/* RES  2,A        */ OP(CB,97) THEN A = res(2, A);                                               ENDOP
 
-OP(cb,98) { B = res(3, B);          } /* RES  3,B         */
-OP(cb,99) { C = res(3, C);          } /* RES  3,C         */
-OP(cb,9a) { D = res(3, D);          } /* RES  3,D         */
-OP(cb,9b) { E = res(3, E);          } /* RES  3,E         */
-OP(cb,9c) { H = res(3, H);          } /* RES  3,H         */
-OP(cb,9d) { L = res(3, L);          } /* RES  3,L         */
-OP(cb,9e) { wm(HL, res(3, rm_reg(HL))); }   /* RES  3,(HL)      */
-OP(cb,9f) { A = res(3, A);          } /* RES  3,A         */
+/* RES  3,B        */ OP(CB,98) THEN B = res(3, B);                                               ENDOP
+/* RES  3,C        */ OP(CB,99) THEN C = res(3, C);                                               ENDOP
+/* RES  3,D        */ OP(CB,9a) THEN D = res(3, D);                                               ENDOP
+/* RES  3,E        */ OP(CB,9b) THEN E = res(3, E);                                               ENDOP
+/* RES  3,H        */ OP(CB,9c) THEN H = res(3, H);                                               ENDOP
+/* RES  3,L        */ OP(CB,9d) THEN L = res(3, L);                                               ENDOP
+/* RES  3,(HL)     */ OP(CB,9e) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=res(3, TDAT8); CALL wm(); ENDOP
+/* RES  3,A        */ OP(CB,9f) THEN A = res(3, A);                                               ENDOP
 
-OP(cb,a0) { B = res(4, B);          } /* RES  4,B         */
-OP(cb,a1) { C = res(4, C);          } /* RES  4,C         */
-OP(cb,a2) { D = res(4, D);          } /* RES  4,D         */
-OP(cb,a3) { E = res(4, E);          } /* RES  4,E         */
-OP(cb,a4) { H = res(4, H);          } /* RES  4,H         */
-OP(cb,a5) { L = res(4, L);          } /* RES  4,L         */
-OP(cb,a6) {wm(HL, res(4, rm_reg(HL))); }   /* RES  4,(HL)      */
-OP(cb,a7) { A = res(4, A);          } /* RES  4,A         */
+/* RES  4,B        */ OP(CB,a0) THEN B = res(4, B);                                               ENDOP
+/* RES  4,C        */ OP(CB,a1) THEN C = res(4, C);                                               ENDOP
+/* RES  4,D        */ OP(CB,a2) THEN D = res(4, D);                                               ENDOP
+/* RES  4,E        */ OP(CB,a3) THEN E = res(4, E);                                               ENDOP
+/* RES  4,H        */ OP(CB,a4) THEN H = res(4, H);                                               ENDOP
+/* RES  4,L        */ OP(CB,a5) THEN L = res(4, L);                                               ENDOP
+/* RES  4,(HL)     */ OP(CB,a6) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=res(4, TDAT8); CALL wm(); ENDOP
+/* RES  4,A        */ OP(CB,a7) THEN A = res(4, A);                                               ENDOP
 
-OP(cb,a8) { B = res(5, B);          } /* RES  5,B         */
-OP(cb,a9) { C = res(5, C);          } /* RES  5,C         */
-OP(cb,aa) { D = res(5, D);          } /* RES  5,D         */
-OP(cb,ab) { E = res(5, E);          } /* RES  5,E         */
-OP(cb,ac) { H = res(5, H);          } /* RES  5,H         */
-OP(cb,ad) { L = res(5, L);          } /* RES  5,L         */
-OP(cb,ae) { wm(HL, res(5, rm_reg(HL))); }   /* RES  5,(HL)      */
-OP(cb,af) { A = res(5, A);          } /* RES  5,A         */
+/* RES  5,B        */ OP(CB,a8) THEN B = res(5, B);                                               ENDOP
+/* RES  5,C        */ OP(CB,a9) THEN C = res(5, C);                                               ENDOP
+/* RES  5,D        */ OP(CB,aa) THEN D = res(5, D);                                               ENDOP
+/* RES  5,E        */ OP(CB,ab) THEN E = res(5, E);                                               ENDOP
+/* RES  5,H        */ OP(CB,ac) THEN H = res(5, H);                                               ENDOP
+/* RES  5,L        */ OP(CB,ad) THEN L = res(5, L);                                               ENDOP
+/* RES  5,(HL)     */ OP(CB,ae) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=res(5, TDAT8); CALL wm(); ENDOP
+/* RES  5,A        */ OP(CB,af) THEN A = res(5, A);                                               ENDOP
 
-OP(cb,b0) { B = res(6, B);          } /* RES  6,B         */
-OP(cb,b1) { C = res(6, C);          } /* RES  6,C         */
-OP(cb,b2) { D = res(6, D);          } /* RES  6,D         */
-OP(cb,b3) { E = res(6, E);          } /* RES  6,E         */
-OP(cb,b4) { H = res(6, H);          } /* RES  6,H         */
-OP(cb,b5) { L = res(6, L);          } /* RES  6,L         */
-OP(cb,b6) { wm(HL, res(6, rm_reg(HL))); }   /* RES  6,(HL)      */
-OP(cb,b7) { A = res(6, A);          } /* RES  6,A         */
+/* RES  6,B        */ OP(CB,b0) THEN B = res(6, B);                                               ENDOP
+/* RES  6,C        */ OP(CB,b1) THEN C = res(6, C);                                               ENDOP
+/* RES  6,D        */ OP(CB,b2) THEN D = res(6, D);                                               ENDOP
+/* RES  6,E        */ OP(CB,b3) THEN E = res(6, E);                                               ENDOP
+/* RES  6,H        */ OP(CB,b4) THEN H = res(6, H);                                               ENDOP
+/* RES  6,L        */ OP(CB,b5) THEN L = res(6, L);                                               ENDOP
+/* RES  6,(HL)     */ OP(CB,b6) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=res(6, TDAT8); CALL wm(); ENDOP
+/* RES  6,A        */ OP(CB,b7) THEN A = res(6, A);                                               ENDOP
 
-OP(cb,b8) { B = res(7, B);          } /* RES  7,B         */
-OP(cb,b9) { C = res(7, C);          } /* RES  7,C         */
-OP(cb,ba) { D = res(7, D);          } /* RES  7,D         */
-OP(cb,bb) { E = res(7, E);          } /* RES  7,E         */
-OP(cb,bc) { H = res(7, H);          } /* RES  7,H         */
-OP(cb,bd) { L = res(7, L);          } /* RES  7,L         */
-OP(cb,be) { wm(HL, res(7, rm_reg(HL))); }   /* RES  7,(HL)      */
-OP(cb,bf) { A = res(7, A);          } /* RES  7,A         */
+/* RES  7,B        */ OP(CB,b8) THEN B = res(7, B);                                               ENDOP
+/* RES  7,C        */ OP(CB,b9) THEN C = res(7, C);                                               ENDOP
+/* RES  7,D        */ OP(CB,ba) THEN D = res(7, D);                                               ENDOP
+/* RES  7,E        */ OP(CB,bb) THEN E = res(7, E);                                               ENDOP
+/* RES  7,H        */ OP(CB,bc) THEN H = res(7, H);                                               ENDOP
+/* RES  7,L        */ OP(CB,bd) THEN L = res(7, L);                                               ENDOP
+/* RES  7,(HL)     */ OP(CB,be) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=res(7, TDAT8); CALL wm(); ENDOP
+/* RES  7,A        */ OP(CB,bf) THEN A = res(7, A);                                               ENDOP
 
-OP(cb,c0) { B = set(0, B);          } /* SET  0,B         */
-OP(cb,c1) { C = set(0, C);          } /* SET  0,C         */
-OP(cb,c2) { D = set(0, D);          } /* SET  0,D         */
-OP(cb,c3) { E = set(0, E);          } /* SET  0,E         */
-OP(cb,c4) { H = set(0, H);          } /* SET  0,H         */
-OP(cb,c5) { L = set(0, L);          } /* SET  0,L         */
-OP(cb,c6) { wm(HL, set(0, rm_reg(HL))); }   /* SET  0,(HL)      */
-OP(cb,c7) { A = set(0, A);          } /* SET  0,A         */
+/* SET  0,B        */ OP(CB,c0) THEN B = set(0, B);                                               ENDOP
+/* SET  0,C        */ OP(CB,c1) THEN C = set(0, C);                                               ENDOP
+/* SET  0,D        */ OP(CB,c2) THEN D = set(0, D);                                               ENDOP
+/* SET  0,E        */ OP(CB,c3) THEN E = set(0, E);                                               ENDOP
+/* SET  0,H        */ OP(CB,c4) THEN H = set(0, H);                                               ENDOP
+/* SET  0,L        */ OP(CB,c5) THEN L = set(0, L);                                               ENDOP
+/* SET  0,(HL)     */ OP(CB,c6) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=set(0, TDAT8); CALL wm(); ENDOP
+/* SET  0,A        */ OP(CB,c7) THEN A = set(0, A);                                               ENDOP
 
-OP(cb,c8) { B = set(1, B);          } /* SET  1,B         */
-OP(cb,c9) { C = set(1, C);          } /* SET  1,C         */
-OP(cb,ca) { D = set(1, D);          } /* SET  1,D         */
-OP(cb,cb) { E = set(1, E);          } /* SET  1,E         */
-OP(cb,cc) { H = set(1, H);          } /* SET  1,H         */
-OP(cb,cd) { L = set(1, L);          } /* SET  1,L         */
-OP(cb,ce) { wm(HL, set(1, rm_reg(HL))); }   /* SET  1,(HL)      */
-OP(cb,cf) { A = set(1, A);          } /* SET  1,A         */
+/* SET  1,B        */ OP(CB,c8) THEN B = set(1, B);                                               ENDOP
+/* SET  1,C        */ OP(CB,c9) THEN C = set(1, C);                                               ENDOP
+/* SET  1,D        */ OP(CB,ca) THEN D = set(1, D);                                               ENDOP
+/* SET  1,E        */ OP(CB,cb) THEN E = set(1, E);                                               ENDOP
+/* SET  1,H        */ OP(CB,cc) THEN H = set(1, H);                                               ENDOP
+/* SET  1,L        */ OP(CB,cd) THEN L = set(1, L);                                               ENDOP
+/* SET  1,(HL)     */ OP(CB,ce) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=set(1, TDAT8); CALL wm(); ENDOP
+/* SET  1,A        */ OP(CB,cf) THEN A = set(1, A);                                               ENDOP
 
-OP(cb,d0) { B = set(2, B);          } /* SET  2,B         */
-OP(cb,d1) { C = set(2, C);          } /* SET  2,C         */
-OP(cb,d2) { D = set(2, D);          } /* SET  2,D         */
-OP(cb,d3) { E = set(2, E);          } /* SET  2,E         */
-OP(cb,d4) { H = set(2, H);          } /* SET  2,H         */
-OP(cb,d5) { L = set(2, L);          } /* SET  2,L         */
-OP(cb,d6) { wm(HL, set(2, rm_reg(HL))); }   /* SET  2,(HL)      */
-OP(cb,d7) { A = set(2, A);          } /* SET  2,A         */
+/* SET  2,B        */ OP(CB,d0) THEN B = set(2, B);                                               ENDOP
+/* SET  2,C        */ OP(CB,d1) THEN C = set(2, C);                                               ENDOP
+/* SET  2,D        */ OP(CB,d2) THEN D = set(2, D);                                               ENDOP
+/* SET  2,E        */ OP(CB,d3) THEN E = set(2, E);                                               ENDOP
+/* SET  2,H        */ OP(CB,d4) THEN H = set(2, H);                                               ENDOP
+/* SET  2,L        */ OP(CB,d5) THEN L = set(2, L);                                               ENDOP
+/* SET  2,(HL)     */ OP(CB,d6) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=set(2, TDAT8); CALL wm(); ENDOP
+/* SET  2,A        */ OP(CB,d7) THEN A = set(2, A);                                               ENDOP
 
-OP(cb,d8) { B = set(3, B);          } /* SET  3,B         */
-OP(cb,d9) { C = set(3, C);          } /* SET  3,C         */
-OP(cb,da) { D = set(3, D);          } /* SET  3,D         */
-OP(cb,db) { E = set(3, E);          } /* SET  3,E         */
-OP(cb,dc) { H = set(3, H);          } /* SET  3,H         */
-OP(cb,dd) { L = set(3, L);          } /* SET  3,L         */
-OP(cb,de) { wm(HL, set(3, rm_reg(HL))); }   /* SET  3,(HL)      */
-OP(cb,df) { A = set(3, A);          } /* SET  3,A         */
+/* SET  3,B        */ OP(CB,d8) THEN B = set(3, B);                                               ENDOP
+/* SET  3,C        */ OP(CB,d9) THEN C = set(3, C);                                               ENDOP
+/* SET  3,D        */ OP(CB,da) THEN D = set(3, D);                                               ENDOP
+/* SET  3,E        */ OP(CB,db) THEN E = set(3, E);                                               ENDOP
+/* SET  3,H        */ OP(CB,dc) THEN H = set(3, H);                                               ENDOP
+/* SET  3,L        */ OP(CB,dd) THEN L = set(3, L);                                               ENDOP
+/* SET  3,(HL)     */ OP(CB,de) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=set(3, TDAT8); CALL wm(); ENDOP
+/* SET  3,A        */ OP(CB,df) THEN A = set(3, A);                                               ENDOP
 
-OP(cb,e0) { B = set(4, B);          } /* SET  4,B         */
-OP(cb,e1) { C = set(4, C);          } /* SET  4,C         */
-OP(cb,e2) { D = set(4, D);          } /* SET  4,D         */
-OP(cb,e3) { E = set(4, E);          } /* SET  4,E         */
-OP(cb,e4) { H = set(4, H);          } /* SET  4,H         */
-OP(cb,e5) { L = set(4, L);          } /* SET  4,L         */
-OP(cb,e6) { wm(HL, set(4, rm_reg(HL))); }   /* SET  4,(HL)      */
-OP(cb,e7) { A = set(4, A);          } /* SET  4,A         */
+/* SET  4,B        */ OP(CB,e0) THEN B = set(4, B);                                               ENDOP
+/* SET  4,C        */ OP(CB,e1) THEN C = set(4, C);                                               ENDOP
+/* SET  4,D        */ OP(CB,e2) THEN D = set(4, D);                                               ENDOP
+/* SET  4,E        */ OP(CB,e3) THEN E = set(4, E);                                               ENDOP
+/* SET  4,H        */ OP(CB,e4) THEN H = set(4, H);                                               ENDOP
+/* SET  4,L        */ OP(CB,e5) THEN L = set(4, L);                                               ENDOP
+/* SET  4,(HL)     */ OP(CB,e6) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=set(4, TDAT8); CALL wm(); ENDOP
+/* SET  4,A        */ OP(CB,e7) THEN A = set(4, A);                                               ENDOP
 
-OP(cb,e8) { B = set(5, B);          } /* SET  5,B         */
-OP(cb,e9) { C = set(5, C);          } /* SET  5,C         */
-OP(cb,ea) { D = set(5, D);          } /* SET  5,D         */
-OP(cb,eb) { E = set(5, E);          } /* SET  5,E         */
-OP(cb,ec) { H = set(5, H);          } /* SET  5,H         */
-OP(cb,ed) { L = set(5, L);          } /* SET  5,L         */
-OP(cb,ee) { wm(HL, set(5, rm_reg(HL))); }   /* SET  5,(HL)      */
-OP(cb,ef) { A = set(5, A);          } /* SET  5,A         */
+/* SET  5,B        */ OP(CB,e8) THEN B = set(5, B);                                               ENDOP
+/* SET  5,C        */ OP(CB,e9) THEN C = set(5, C);                                               ENDOP
+/* SET  5,D        */ OP(CB,ea) THEN D = set(5, D);                                               ENDOP
+/* SET  5,E        */ OP(CB,eb) THEN E = set(5, E);                                               ENDOP
+/* SET  5,H        */ OP(CB,ec) THEN H = set(5, H);                                               ENDOP
+/* SET  5,L        */ OP(CB,ed) THEN L = set(5, L);                                               ENDOP
+/* SET  5,(HL)     */ OP(CB,ee) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=set(5, TDAT8); CALL wm(); ENDOP
+/* SET  5,A        */ OP(CB,ef) THEN A = set(5, A);                                               ENDOP
 
-OP(cb,f0) { B = set(6, B);          } /* SET  6,B         */
-OP(cb,f1) { C = set(6, C);          } /* SET  6,C         */
-OP(cb,f2) { D = set(6, D);          } /* SET  6,D         */
-OP(cb,f3) { E = set(6, E);          } /* SET  6,E         */
-OP(cb,f4) { H = set(6, H);          } /* SET  6,H         */
-OP(cb,f5) { L = set(6, L);          } /* SET  6,L         */
-OP(cb,f6) { wm(HL, set(6, rm_reg(HL))); }   /* SET  6,(HL)      */
-OP(cb,f7) { A = set(6, A);          } /* SET  6,A         */
+/* SET  6,B        */ OP(CB,f0) THEN B = set(6, B);                                               ENDOP
+/* SET  6,C        */ OP(CB,f1) THEN C = set(6, C);                                               ENDOP
+/* SET  6,D        */ OP(CB,f2) THEN D = set(6, D);                                               ENDOP
+/* SET  6,E        */ OP(CB,f3) THEN E = set(6, E);                                               ENDOP
+/* SET  6,H        */ OP(CB,f4) THEN H = set(6, H);                                               ENDOP
+/* SET  6,L        */ OP(CB,f5) THEN L = set(6, L);                                               ENDOP
+/* SET  6,(HL)     */ OP(CB,f6) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=set(6, TDAT8); CALL wm(); ENDOP
+/* SET  6,A        */ OP(CB,f7) THEN A = set(6, A);                                               ENDOP
 
-OP(cb,f8) { B = set(7, B);          } /* SET  7,B         */
-OP(cb,f9) { C = set(7, C);          } /* SET  7,C         */
-OP(cb,fa) { D = set(7, D);          } /* SET  7,D         */
-OP(cb,fb) { E = set(7, E);          } /* SET  7,E         */
-OP(cb,fc) { H = set(7, H);          } /* SET  7,H         */
-OP(cb,fd) { L = set(7, L);          } /* SET  7,L         */
-OP(cb,fe) { wm(HL, set(7, rm_reg(HL))); }   /* SET  7,(HL)      */
-OP(cb,ff) { A = set(7, A);          } /* SET  7,A         */
-
+/* SET  7,B        */ OP(CB,f8) THEN B = set(7, B);                                               ENDOP
+/* SET  7,C        */ OP(CB,f9) THEN C = set(7, C);                                               ENDOP
+/* SET  7,D        */ OP(CB,fa) THEN D = set(7, D);                                               ENDOP
+/* SET  7,E        */ OP(CB,fb) THEN E = set(7, E);                                               ENDOP
+/* SET  7,H        */ OP(CB,fc) THEN H = set(7, H);                                               ENDOP
+/* SET  7,L        */ OP(CB,fd) THEN L = set(7, L);                                               ENDOP
+/* SET  7,(HL)     */ OP(CB,fe) THEN TADR=HL; CALL rm_reg(); THEN TDAT8=set(7, TDAT8); CALL wm(); ENDOP
+/* SET  7,A        */ OP(CB,ff) THEN A = set(7, A);                                               ENDOP
 
 /**********************************************************
 * opcodes with DD/FD CB prefix
 * rotate, shift and bit operations with (IX+o)
 **********************************************************/
-OP(xycb,00) { B = rlc(rm_reg(m_ea)); wm(m_ea, B);    } /* RLC  B=(XY+o)    */
-OP(xycb,01) { C = rlc(rm_reg(m_ea)); wm(m_ea, C);    } /* RLC  C=(XY+o)    */
-OP(xycb,02) { D = rlc(rm_reg(m_ea)); wm(m_ea, D);    } /* RLC  D=(XY+o)    */
-OP(xycb,03) { E = rlc(rm_reg(m_ea)); wm(m_ea, E);    } /* RLC  E=(XY+o)    */
-OP(xycb,04) { H = rlc(rm_reg(m_ea)); wm(m_ea, H);    } /* RLC  H=(XY+o)    */
-OP(xycb,05) { L = rlc(rm_reg(m_ea)); wm(m_ea, L);    } /* RLC  L=(XY+o)    */
-OP(xycb,06) { wm(m_ea, rlc(rm_reg(m_ea)));           } /* RLC  (XY+o)      */
-OP(xycb,07) { A = rlc(rm_reg(m_ea)); wm(m_ea, A);    } /* RLC  A=(XY+o)    */
+/* RLC  B=(XY+o)   */ OP(XY_CB,00) THEN TADR=m_ea; CALL rm_reg(); THEN B=rlc(TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* RLC  C=(XY+o)   */ OP(XY_CB,01) THEN TADR=m_ea; CALL rm_reg(); THEN C=rlc(TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* RLC  D=(XY+o)   */ OP(XY_CB,02) THEN TADR=m_ea; CALL rm_reg(); THEN D=rlc(TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* RLC  E=(XY+o)   */ OP(XY_CB,03) THEN TADR=m_ea; CALL rm_reg(); THEN E=rlc(TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* RLC  H=(XY+o)   */ OP(XY_CB,04) THEN TADR=m_ea; CALL rm_reg(); THEN H=rlc(TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* RLC  L=(XY+o)   */ OP(XY_CB,05) THEN TADR=m_ea; CALL rm_reg(); THEN L=rlc(TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* RLC  (XY+o)     */ OP(XY_CB,06) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=rlc(TDAT8); CALL wm();      ENDOP
+/* RLC  A=(XY+o)   */ OP(XY_CB,07) THEN TADR=m_ea; CALL rm_reg(); THEN A=rlc(TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,08) { B = rrc(rm_reg(m_ea)); wm(m_ea, B);    } /* RRC  B=(XY+o)    */
-OP(xycb,09) { C = rrc(rm_reg(m_ea)); wm(m_ea, C);    } /* RRC  C=(XY+o)    */
-OP(xycb,0a) { D = rrc(rm_reg(m_ea)); wm(m_ea, D);    } /* RRC  D=(XY+o)    */
-OP(xycb,0b) { E = rrc(rm_reg(m_ea)); wm(m_ea, E);    } /* RRC  E=(XY+o)    */
-OP(xycb,0c) { H = rrc(rm_reg(m_ea)); wm(m_ea, H);    } /* RRC  H=(XY+o)    */
-OP(xycb,0d) { L = rrc(rm_reg(m_ea)); wm(m_ea, L);    } /* RRC  L=(XY+o)    */
-OP(xycb,0e) { wm(m_ea,rrc(rm_reg(m_ea)));            } /* RRC  (XY+o)      */
-OP(xycb,0f) { A = rrc(rm_reg(m_ea)); wm(m_ea, A);    } /* RRC  A=(XY+o)    */
+/* RRC  B=(XY+o)   */ OP(XY_CB,08) THEN TADR=m_ea; CALL rm_reg(); THEN B=rrc(TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* RRC  C=(XY+o)   */ OP(XY_CB,09) THEN TADR=m_ea; CALL rm_reg(); THEN C=rrc(TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* RRC  D=(XY+o)   */ OP(XY_CB,0a) THEN TADR=m_ea; CALL rm_reg(); THEN D=rrc(TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* RRC  E=(XY+o)   */ OP(XY_CB,0b) THEN TADR=m_ea; CALL rm_reg(); THEN E=rrc(TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* RRC  H=(XY+o)   */ OP(XY_CB,0c) THEN TADR=m_ea; CALL rm_reg(); THEN H=rrc(TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* RRC  L=(XY+o)   */ OP(XY_CB,0d) THEN TADR=m_ea; CALL rm_reg(); THEN L=rrc(TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* RRC  (XY+o)     */ OP(XY_CB,0e) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=rrc(TDAT8); CALL wm();      ENDOP
+/* RRC  A=(XY+o)   */ OP(XY_CB,0f) THEN TADR=m_ea; CALL rm_reg(); THEN A=rrc(TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,10) { B = rl(rm_reg(m_ea)); wm(m_ea, B);     } /* RL   B=(XY+o)    */
-OP(xycb,11) { C = rl(rm_reg(m_ea)); wm(m_ea, C);     } /* RL   C=(XY+o)    */
-OP(xycb,12) { D = rl(rm_reg(m_ea)); wm(m_ea, D);     } /* RL   D=(XY+o)    */
-OP(xycb,13) { E = rl(rm_reg(m_ea)); wm(m_ea, E);     } /* RL   E=(XY+o)    */
-OP(xycb,14) { H = rl(rm_reg(m_ea)); wm(m_ea, H);     } /* RL   H=(XY+o)    */
-OP(xycb,15) { L = rl(rm_reg(m_ea)); wm(m_ea, L);     } /* RL   L=(XY+o)    */
-OP(xycb,16) { wm(m_ea,rl(rm_reg(m_ea)));             } /* RL   (XY+o)      */
-OP(xycb,17) { A = rl(rm_reg(m_ea)); wm(m_ea, A);     } /* RL   A=(XY+o)    */
+/* RL   B=(XY+o)   */ OP(XY_CB,10) THEN TADR=m_ea; CALL rm_reg(); THEN B=rl(TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* RL   C=(XY+o)   */ OP(XY_CB,11) THEN TADR=m_ea; CALL rm_reg(); THEN C=rl(TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* RL   D=(XY+o)   */ OP(XY_CB,12) THEN TADR=m_ea; CALL rm_reg(); THEN D=rl(TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* RL   E=(XY+o)   */ OP(XY_CB,13) THEN TADR=m_ea; CALL rm_reg(); THEN E=rl(TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* RL   H=(XY+o)   */ OP(XY_CB,14) THEN TADR=m_ea; CALL rm_reg(); THEN H=rl(TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* RL   L=(XY+o)   */ OP(XY_CB,15) THEN TADR=m_ea; CALL rm_reg(); THEN L=rl(TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* RL   (XY+o)     */ OP(XY_CB,16) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=rl(TDAT8); CALL wm();      ENDOP
+/* RL   A=(XY+o)   */ OP(XY_CB,17) THEN TADR=m_ea; CALL rm_reg(); THEN A=rl(TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,18) { B = rr(rm_reg(m_ea)); wm(m_ea, B);     } /* RR   B=(XY+o)    */
-OP(xycb,19) { C = rr(rm_reg(m_ea)); wm(m_ea, C);     } /* RR   C=(XY+o)    */
-OP(xycb,1a) { D = rr(rm_reg(m_ea)); wm(m_ea, D);     } /* RR   D=(XY+o)    */
-OP(xycb,1b) { E = rr(rm_reg(m_ea)); wm(m_ea, E);     } /* RR   E=(XY+o)    */
-OP(xycb,1c) { H = rr(rm_reg(m_ea)); wm(m_ea, H);     } /* RR   H=(XY+o)    */
-OP(xycb,1d) { L = rr(rm_reg(m_ea)); wm(m_ea, L);     } /* RR   L=(XY+o)    */
-OP(xycb,1e) { wm(m_ea, rr(rm_reg(m_ea)));            } /* RR   (XY+o)      */
-OP(xycb,1f) { A = rr(rm_reg(m_ea)); wm(m_ea, A);     } /* RR   A=(XY+o)    */
+/* RR   B=(XY+o)   */ OP(XY_CB,18) THEN TADR=m_ea; CALL rm_reg(); THEN B=rr(TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* RR   C=(XY+o)   */ OP(XY_CB,19) THEN TADR=m_ea; CALL rm_reg(); THEN C=rr(TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* RR   D=(XY+o)   */ OP(XY_CB,1a) THEN TADR=m_ea; CALL rm_reg(); THEN D=rr(TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* RR   E=(XY+o)   */ OP(XY_CB,1b) THEN TADR=m_ea; CALL rm_reg(); THEN E=rr(TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* RR   H=(XY+o)   */ OP(XY_CB,1c) THEN TADR=m_ea; CALL rm_reg(); THEN H=rr(TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* RR   L=(XY+o)   */ OP(XY_CB,1d) THEN TADR=m_ea; CALL rm_reg(); THEN L=rr(TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* RR   (XY+o)     */ OP(XY_CB,1e) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=rr(TDAT8); CALL wm();      ENDOP
+/* RR   A=(XY+o)   */ OP(XY_CB,1f) THEN TADR=m_ea; CALL rm_reg(); THEN A=rr(TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,20) { B = sla(rm_reg(m_ea)); wm(m_ea, B);    } /* SLA  B=(XY+o)    */
-OP(xycb,21) { C = sla(rm_reg(m_ea)); wm(m_ea, C);    } /* SLA  C=(XY+o)    */
-OP(xycb,22) { D = sla(rm_reg(m_ea)); wm(m_ea, D);    } /* SLA  D=(XY+o)    */
-OP(xycb,23) { E = sla(rm_reg(m_ea)); wm(m_ea, E);    } /* SLA  E=(XY+o)    */
-OP(xycb,24) { H = sla(rm_reg(m_ea)); wm(m_ea, H);    } /* SLA  H=(XY+o)    */
-OP(xycb,25) { L = sla(rm_reg(m_ea)); wm(m_ea, L);    } /* SLA  L=(XY+o)    */
-OP(xycb,26) { wm(m_ea, sla(rm_reg(m_ea)));           } /* SLA  (XY+o)      */
-OP(xycb,27) { A = sla(rm_reg(m_ea)); wm(m_ea, A);    } /* SLA  A=(XY+o)    */
+/* SLA  B=(XY+o)   */ OP(XY_CB,20) THEN TADR=m_ea; CALL rm_reg(); THEN B=sla(TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* SLA  C=(XY+o)   */ OP(XY_CB,21) THEN TADR=m_ea; CALL rm_reg(); THEN C=sla(TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* SLA  D=(XY+o)   */ OP(XY_CB,22) THEN TADR=m_ea; CALL rm_reg(); THEN D=sla(TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* SLA  E=(XY+o)   */ OP(XY_CB,23) THEN TADR=m_ea; CALL rm_reg(); THEN E=sla(TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* SLA  H=(XY+o)   */ OP(XY_CB,24) THEN TADR=m_ea; CALL rm_reg(); THEN H=sla(TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* SLA  L=(XY+o)   */ OP(XY_CB,25) THEN TADR=m_ea; CALL rm_reg(); THEN L=sla(TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* SLA  (XY+o)     */ OP(XY_CB,26) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=sla(TDAT8); CALL wm();      ENDOP
+/* SLA  A=(XY+o)   */ OP(XY_CB,27) THEN TADR=m_ea; CALL rm_reg(); THEN A=sla(TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,28) { B = sra(rm_reg(m_ea)); wm(m_ea, B);    } /* SRA  B=(XY+o)    */
-OP(xycb,29) { C = sra(rm_reg(m_ea)); wm(m_ea, C);    } /* SRA  C=(XY+o)    */
-OP(xycb,2a) { D = sra(rm_reg(m_ea)); wm(m_ea, D);    } /* SRA  D=(XY+o)    */
-OP(xycb,2b) { E = sra(rm_reg(m_ea)); wm(m_ea, E);    } /* SRA  E=(XY+o)    */
-OP(xycb,2c) { H = sra(rm_reg(m_ea)); wm(m_ea, H);    } /* SRA  H=(XY+o)    */
-OP(xycb,2d) { L = sra(rm_reg(m_ea)); wm(m_ea, L);    } /* SRA  L=(XY+o)    */
-OP(xycb,2e) { wm(m_ea, sra(rm_reg(m_ea)));           } /* SRA  (XY+o)      */
-OP(xycb,2f) { A = sra(rm_reg(m_ea)); wm(m_ea, A);    } /* SRA  A=(XY+o)    */
+/* SRA  B=(XY+o)   */ OP(XY_CB,28) THEN TADR=m_ea; CALL rm_reg(); THEN B=sra(TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* SRA  C=(XY+o)   */ OP(XY_CB,29) THEN TADR=m_ea; CALL rm_reg(); THEN C=sra(TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* SRA  D=(XY+o)   */ OP(XY_CB,2a) THEN TADR=m_ea; CALL rm_reg(); THEN D=sra(TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* SRA  E=(XY+o)   */ OP(XY_CB,2b) THEN TADR=m_ea; CALL rm_reg(); THEN E=sra(TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* SRA  H=(XY+o)   */ OP(XY_CB,2c) THEN TADR=m_ea; CALL rm_reg(); THEN H=sra(TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* SRA  L=(XY+o)   */ OP(XY_CB,2d) THEN TADR=m_ea; CALL rm_reg(); THEN L=sra(TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* SRA  (XY+o)     */ OP(XY_CB,2e) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=sra(TDAT8); CALL wm();      ENDOP
+/* SRA  A=(XY+o)   */ OP(XY_CB,2f) THEN TADR=m_ea; CALL rm_reg(); THEN A=sra(TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,30) { B = sll(rm_reg(m_ea)); wm(m_ea, B);    } /* SLL  B=(XY+o)    */
-OP(xycb,31) { C = sll(rm_reg(m_ea)); wm(m_ea, C);    } /* SLL  C=(XY+o)    */
-OP(xycb,32) { D = sll(rm_reg(m_ea)); wm(m_ea, D);    } /* SLL  D=(XY+o)    */
-OP(xycb,33) { E = sll(rm_reg(m_ea)); wm(m_ea, E);    } /* SLL  E=(XY+o)    */
-OP(xycb,34) { H = sll(rm_reg(m_ea)); wm(m_ea, H);    } /* SLL  H=(XY+o)    */
-OP(xycb,35) { L = sll(rm_reg(m_ea)); wm(m_ea, L);    } /* SLL  L=(XY+o)    */
-OP(xycb,36) { wm(m_ea, sll(rm_reg(m_ea)));           } /* SLL  (XY+o)      */
-OP(xycb,37) { A = sll(rm_reg(m_ea)); wm(m_ea, A);    } /* SLL  A=(XY+o)    */
+/* SLL  B=(XY+o)   */ OP(XY_CB,30) THEN TADR=m_ea; CALL rm_reg(); THEN B=sll(TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* SLL  C=(XY+o)   */ OP(XY_CB,31) THEN TADR=m_ea; CALL rm_reg(); THEN C=sll(TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* SLL  D=(XY+o)   */ OP(XY_CB,32) THEN TADR=m_ea; CALL rm_reg(); THEN D=sll(TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* SLL  E=(XY+o)   */ OP(XY_CB,33) THEN TADR=m_ea; CALL rm_reg(); THEN E=sll(TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* SLL  H=(XY+o)   */ OP(XY_CB,34) THEN TADR=m_ea; CALL rm_reg(); THEN H=sll(TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* SLL  L=(XY+o)   */ OP(XY_CB,35) THEN TADR=m_ea; CALL rm_reg(); THEN L=sll(TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* SLL  (XY+o)     */ OP(XY_CB,36) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=sll(TDAT8); CALL wm();      ENDOP
+/* SLL  A=(XY+o)   */ OP(XY_CB,37) THEN TADR=m_ea; CALL rm_reg(); THEN A=sll(TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,38) { B = srl(rm_reg(m_ea)); wm(m_ea, B);    } /* SRL  B=(XY+o)    */
-OP(xycb,39) { C = srl(rm_reg(m_ea)); wm(m_ea, C);    } /* SRL  C=(XY+o)    */
-OP(xycb,3a) { D = srl(rm_reg(m_ea)); wm(m_ea, D);    } /* SRL  D=(XY+o)    */
-OP(xycb,3b) { E = srl(rm_reg(m_ea)); wm(m_ea, E);    } /* SRL  E=(XY+o)    */
-OP(xycb,3c) { H = srl(rm_reg(m_ea)); wm(m_ea, H);    } /* SRL  H=(XY+o)    */
-OP(xycb,3d) { L = srl(rm_reg(m_ea)); wm(m_ea, L);    } /* SRL  L=(XY+o)    */
-OP(xycb,3e) { wm(m_ea, srl(rm_reg(m_ea)));           } /* SRL  (XY+o)      */
-OP(xycb,3f) { A = srl(rm_reg(m_ea)); wm(m_ea, A);    } /* SRL  A=(XY+o)    */
+/* SRL  B=(XY+o)   */ OP(XY_CB,38) THEN TADR=m_ea; CALL rm_reg(); THEN B=srl(TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* SRL  C=(XY+o)   */ OP(XY_CB,39) THEN TADR=m_ea; CALL rm_reg(); THEN C=srl(TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* SRL  D=(XY+o)   */ OP(XY_CB,3a) THEN TADR=m_ea; CALL rm_reg(); THEN D=srl(TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* SRL  E=(XY+o)   */ OP(XY_CB,3b) THEN TADR=m_ea; CALL rm_reg(); THEN E=srl(TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* SRL  H=(XY+o)   */ OP(XY_CB,3c) THEN TADR=m_ea; CALL rm_reg(); THEN H=srl(TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* SRL  L=(XY+o)   */ OP(XY_CB,3d) THEN TADR=m_ea; CALL rm_reg(); THEN L=srl(TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* SRL  (XY+o)     */ OP(XY_CB,3e) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=srl(TDAT8); CALL wm();      ENDOP
+/* SRL  A=(XY+o)   */ OP(XY_CB,3f) THEN TADR=m_ea; CALL rm_reg(); THEN A=srl(TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,40) { xycb_46();                         } /* BIT  0,(XY+o)    */
-OP(xycb,41) { xycb_46();                         } /* BIT  0,(XY+o)    */
-OP(xycb,42) { xycb_46();                         } /* BIT  0,(XY+o)    */
-OP(xycb,43) { xycb_46();                         } /* BIT  0,(XY+o)    */
-OP(xycb,44) { xycb_46();                         } /* BIT  0,(XY+o)    */
-OP(xycb,45) { xycb_46();                         } /* BIT  0,(XY+o)    */
-OP(xycb,46) { bit_xy(0, rm_reg(m_ea));           } /* BIT  0,(XY+o)    */
-OP(xycb,47) { xycb_46();                         } /* BIT  0,(XY+o)    */
+/* BIT  0,(XY+o)   */ OP(XY_CB,40) JPP(XY_CB, 46)
+/* BIT  0,(XY+o)   */ OP(XY_CB,41) JPP(XY_CB, 46)
+/* BIT  0,(XY+o)   */ OP(XY_CB,42) JPP(XY_CB, 46)
+/* BIT  0,(XY+o)   */ OP(XY_CB,43) JPP(XY_CB, 46)
+/* BIT  0,(XY+o)   */ OP(XY_CB,44) JPP(XY_CB, 46)
+/* BIT  0,(XY+o)   */ OP(XY_CB,45) JPP(XY_CB, 46)
+/* BIT  0,(XY+o)   */ OP(XY_CB,46) THEN TADR=m_ea; CALL rm_reg(); THEN bit_xy(0, TDAT8); ENDOP
+/* BIT  0,(XY+o)   */ OP(XY_CB,47) JPP(XY_CB, 46)
 
-OP(xycb,48) { xycb_4e();                         } /* BIT  1,(XY+o)    */
-OP(xycb,49) { xycb_4e();                         } /* BIT  1,(XY+o)    */
-OP(xycb,4a) { xycb_4e();                         } /* BIT  1,(XY+o)    */
-OP(xycb,4b) { xycb_4e();                         } /* BIT  1,(XY+o)    */
-OP(xycb,4c) { xycb_4e();                         } /* BIT  1,(XY+o)    */
-OP(xycb,4d) { xycb_4e();                         } /* BIT  1,(XY+o)    */
-OP(xycb,4e) { bit_xy(1, rm_reg(m_ea));           } /* BIT  1,(XY+o)    */
-OP(xycb,4f) { xycb_4e();                         } /* BIT  1,(XY+o)    */
+/* BIT  1,(XY+o)   */ OP(XY_CB,48) JPP(XY_CB, 4e)
+/* BIT  1,(XY+o)   */ OP(XY_CB,49) JPP(XY_CB, 4e)
+/* BIT  1,(XY+o)   */ OP(XY_CB,4a) JPP(XY_CB, 4e)
+/* BIT  1,(XY+o)   */ OP(XY_CB,4b) JPP(XY_CB, 4e)
+/* BIT  1,(XY+o)   */ OP(XY_CB,4c) JPP(XY_CB, 4e)
+/* BIT  1,(XY+o)   */ OP(XY_CB,4d) JPP(XY_CB, 4e)
+/* BIT  1,(XY+o)   */ OP(XY_CB,4e) THEN TADR=m_ea; CALL rm_reg(); THEN bit_xy(1, TDAT8); ENDOP
+/* BIT  1,(XY+o)   */ OP(XY_CB,4f) JPP(XY_CB, 4e)
 
-OP(xycb,50) { xycb_56();                         } /* BIT  2,(XY+o)    */
-OP(xycb,51) { xycb_56();                         } /* BIT  2,(XY+o)    */
-OP(xycb,52) { xycb_56();                         } /* BIT  2,(XY+o)    */
-OP(xycb,53) { xycb_56();                         } /* BIT  2,(XY+o)    */
-OP(xycb,54) { xycb_56();                         } /* BIT  2,(XY+o)    */
-OP(xycb,55) { xycb_56();                         } /* BIT  2,(XY+o)    */
-OP(xycb,56) { bit_xy(2, rm_reg(m_ea));           } /* BIT  2,(XY+o)    */
-OP(xycb,57) { xycb_56();                         } /* BIT  2,(XY+o)    */
+/* BIT  2,(XY+o)   */ OP(XY_CB,50) JPP(XY_CB, 56)
+/* BIT  2,(XY+o)   */ OP(XY_CB,51) JPP(XY_CB, 56)
+/* BIT  2,(XY+o)   */ OP(XY_CB,52) JPP(XY_CB, 56)
+/* BIT  2,(XY+o)   */ OP(XY_CB,53) JPP(XY_CB, 56)
+/* BIT  2,(XY+o)   */ OP(XY_CB,54) JPP(XY_CB, 56)
+/* BIT  2,(XY+o)   */ OP(XY_CB,55) JPP(XY_CB, 56)
+/* BIT  2,(XY+o)   */ OP(XY_CB,56) THEN TADR=m_ea; CALL rm_reg(); THEN bit_xy(2, TDAT8); ENDOP
+/* BIT  2,(XY+o)   */ OP(XY_CB,57) JPP(XY_CB, 56)
 
-OP(xycb,58) { xycb_5e();                         } /* BIT  3,(XY+o)    */
-OP(xycb,59) { xycb_5e();                         } /* BIT  3,(XY+o)    */
-OP(xycb,5a) { xycb_5e();                         } /* BIT  3,(XY+o)    */
-OP(xycb,5b) { xycb_5e();                         } /* BIT  3,(XY+o)    */
-OP(xycb,5c) { xycb_5e();                         } /* BIT  3,(XY+o)    */
-OP(xycb,5d) { xycb_5e();                         } /* BIT  3,(XY+o)    */
-OP(xycb,5e) { bit_xy(3, rm_reg(m_ea));           } /* BIT  3,(XY+o)    */
-OP(xycb,5f) { xycb_5e();                         } /* BIT  3,(XY+o)    */
+/* BIT  3,(XY+o)   */ OP(XY_CB,58) JPP(XY_CB, 5e)
+/* BIT  3,(XY+o)   */ OP(XY_CB,59) JPP(XY_CB, 5e)
+/* BIT  3,(XY+o)   */ OP(XY_CB,5a) JPP(XY_CB, 5e)
+/* BIT  3,(XY+o)   */ OP(XY_CB,5b) JPP(XY_CB, 5e)
+/* BIT  3,(XY+o)   */ OP(XY_CB,5c) JPP(XY_CB, 5e)
+/* BIT  3,(XY+o)   */ OP(XY_CB,5d) JPP(XY_CB, 5e)
+/* BIT  3,(XY+o)   */ OP(XY_CB,5e) THEN TADR=m_ea; CALL rm_reg(); THEN bit_xy(3, TDAT8); ENDOP
+/* BIT  3,(XY+o)   */ OP(XY_CB,5f) JPP(XY_CB, 5e)
 
-OP(xycb,60) { xycb_66();                         } /* BIT  4,(XY+o)    */
-OP(xycb,61) { xycb_66();                         } /* BIT  4,(XY+o)    */
-OP(xycb,62) { xycb_66();                         } /* BIT  4,(XY+o)    */
-OP(xycb,63) { xycb_66();                         } /* BIT  4,(XY+o)    */
-OP(xycb,64) { xycb_66();                         } /* BIT  4,(XY+o)    */
-OP(xycb,65) { xycb_66();                         } /* BIT  4,(XY+o)    */
-OP(xycb,66) { bit_xy(4, rm_reg(m_ea));           } /* BIT  4,(XY+o)    */
-OP(xycb,67) { xycb_66();                         } /* BIT  4,(XY+o)    */
+/* BIT  4,(XY+o)   */ OP(XY_CB,60) JPP(XY_CB, 66)
+/* BIT  4,(XY+o)   */ OP(XY_CB,61) JPP(XY_CB, 66)
+/* BIT  4,(XY+o)   */ OP(XY_CB,62) JPP(XY_CB, 66)
+/* BIT  4,(XY+o)   */ OP(XY_CB,63) JPP(XY_CB, 66)
+/* BIT  4,(XY+o)   */ OP(XY_CB,64) JPP(XY_CB, 66)
+/* BIT  4,(XY+o)   */ OP(XY_CB,65) JPP(XY_CB, 66)
+/* BIT  4,(XY+o)   */ OP(XY_CB,66) THEN TADR=m_ea; CALL rm_reg(); THEN bit_xy(4, TDAT8); ENDOP
+/* BIT  4,(XY+o)   */ OP(XY_CB,67) JPP(XY_CB, 66)
 
-OP(xycb,68) { xycb_6e();                         } /* BIT  5,(XY+o)    */
-OP(xycb,69) { xycb_6e();                         } /* BIT  5,(XY+o)    */
-OP(xycb,6a) { xycb_6e();                         } /* BIT  5,(XY+o)    */
-OP(xycb,6b) { xycb_6e();                         } /* BIT  5,(XY+o)    */
-OP(xycb,6c) { xycb_6e();                         } /* BIT  5,(XY+o)    */
-OP(xycb,6d) { xycb_6e();                         } /* BIT  5,(XY+o)    */
-OP(xycb,6e) { bit_xy(5, rm_reg(m_ea));           } /* BIT  5,(XY+o)    */
-OP(xycb,6f) { xycb_6e();                         } /* BIT  5,(XY+o)    */
+/* BIT  5,(XY+o)   */ OP(XY_CB,68) JPP(XY_CB, 6e)
+/* BIT  5,(XY+o)   */ OP(XY_CB,69) JPP(XY_CB, 6e)
+/* BIT  5,(XY+o)   */ OP(XY_CB,6a) JPP(XY_CB, 6e)
+/* BIT  5,(XY+o)   */ OP(XY_CB,6b) JPP(XY_CB, 6e)
+/* BIT  5,(XY+o)   */ OP(XY_CB,6c) JPP(XY_CB, 6e)
+/* BIT  5,(XY+o)   */ OP(XY_CB,6d) JPP(XY_CB, 6e)
+/* BIT  5,(XY+o)   */ OP(XY_CB,6e) THEN TADR=m_ea; CALL rm_reg(); THEN bit_xy(5, TDAT8); ENDOP
+/* BIT  5,(XY+o)   */ OP(XY_CB,6f) JPP(XY_CB, 6e)
 
-OP(xycb,70) { xycb_76();                         } /* BIT  6,(XY+o)    */
-OP(xycb,71) { xycb_76();                         } /* BIT  6,(XY+o)    */
-OP(xycb,72) { xycb_76();                         } /* BIT  6,(XY+o)    */
-OP(xycb,73) { xycb_76();                         } /* BIT  6,(XY+o)    */
-OP(xycb,74) { xycb_76();                         } /* BIT  6,(XY+o)    */
-OP(xycb,75) { xycb_76();                         } /* BIT  6,(XY+o)    */
-OP(xycb,76) { bit_xy(6, rm_reg(m_ea));           } /* BIT  6,(XY+o)    */
-OP(xycb,77) { xycb_76();                         } /* BIT  6,(XY+o)    */
+/* BIT  6,(XY+o)   */ OP(XY_CB,70) JPP(XY_CB, 76)
+/* BIT  6,(XY+o)   */ OP(XY_CB,71) JPP(XY_CB, 76)
+/* BIT  6,(XY+o)   */ OP(XY_CB,72) JPP(XY_CB, 76)
+/* BIT  6,(XY+o)   */ OP(XY_CB,73) JPP(XY_CB, 76)
+/* BIT  6,(XY+o)   */ OP(XY_CB,74) JPP(XY_CB, 76)
+/* BIT  6,(XY+o)   */ OP(XY_CB,75) JPP(XY_CB, 76)
+/* BIT  6,(XY+o)   */ OP(XY_CB,76) THEN TADR=m_ea; CALL rm_reg(); THEN bit_xy(6, TDAT8); ENDOP
+/* BIT  6,(XY+o)   */ OP(XY_CB,77) JPP(XY_CB, 76)
 
-OP(xycb,78) { xycb_7e();                         } /* BIT  7,(XY+o)    */
-OP(xycb,79) { xycb_7e();                         } /* BIT  7,(XY+o)    */
-OP(xycb,7a) { xycb_7e();                         } /* BIT  7,(XY+o)    */
-OP(xycb,7b) { xycb_7e();                         } /* BIT  7,(XY+o)    */
-OP(xycb,7c) { xycb_7e();                         } /* BIT  7,(XY+o)    */
-OP(xycb,7d) { xycb_7e();                         } /* BIT  7,(XY+o)    */
-OP(xycb,7e) { bit_xy(7, rm_reg(m_ea));           } /* BIT  7,(XY+o)    */
-OP(xycb,7f) { xycb_7e();                         } /* BIT  7,(XY+o)    */
+/* BIT  7,(XY+o)   */ OP(XY_CB,78) JPP(XY_CB, 7e)
+/* BIT  7,(XY+o)   */ OP(XY_CB,79) JPP(XY_CB, 7e)
+/* BIT  7,(XY+o)   */ OP(XY_CB,7a) JPP(XY_CB, 7e)
+/* BIT  7,(XY+o)   */ OP(XY_CB,7b) JPP(XY_CB, 7e)
+/* BIT  7,(XY+o)   */ OP(XY_CB,7c) JPP(XY_CB, 7e)
+/* BIT  7,(XY+o)   */ OP(XY_CB,7d) JPP(XY_CB, 7e)
+/* BIT  7,(XY+o)   */ OP(XY_CB,7e) THEN TADR=m_ea; CALL rm_reg(); THEN bit_xy(7, TDAT8); ENDOP
+/* BIT  7,(XY+o)   */ OP(XY_CB,7f) JPP(XY_CB, 7e)
 
-OP(xycb,80) { B = res(0, rm_reg(m_ea)); wm(m_ea, B); } /* RES  0,B=(XY+o)  */
-OP(xycb,81) { C = res(0, rm_reg(m_ea)); wm(m_ea, C); } /* RES  0,C=(XY+o)  */
-OP(xycb,82) { D = res(0, rm_reg(m_ea)); wm(m_ea, D); } /* RES  0,D=(XY+o)  */
-OP(xycb,83) { E = res(0, rm_reg(m_ea)); wm(m_ea, E); } /* RES  0,E=(XY+o)  */
-OP(xycb,84) { H = res(0, rm_reg(m_ea)); wm(m_ea, H); } /* RES  0,H=(XY+o)  */
-OP(xycb,85) { L = res(0, rm_reg(m_ea)); wm(m_ea, L); } /* RES  0,L=(XY+o)  */
-OP(xycb,86) { wm(m_ea, res(0, rm_reg(m_ea)));        } /* RES  0,(XY+o)    */
-OP(xycb,87) { A = res(0, rm_reg(m_ea)); wm(m_ea, A); } /* RES  0,A=(XY+o)  */
+/* RES  0,B=(XY+o) */ OP(XY_CB,80) THEN TADR=m_ea; CALL rm_reg(); THEN B=res(0, TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* RES  0,C=(XY+o) */ OP(XY_CB,81) THEN TADR=m_ea; CALL rm_reg(); THEN C=res(0, TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* RES  0,D=(XY+o) */ OP(XY_CB,82) THEN TADR=m_ea; CALL rm_reg(); THEN D=res(0, TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* RES  0,E=(XY+o) */ OP(XY_CB,83) THEN TADR=m_ea; CALL rm_reg(); THEN E=res(0, TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* RES  0,H=(XY+o) */ OP(XY_CB,84) THEN TADR=m_ea; CALL rm_reg(); THEN H=res(0, TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* RES  0,L=(XY+o) */ OP(XY_CB,85) THEN TADR=m_ea; CALL rm_reg(); THEN L=res(0, TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* RES  0,(XY+o)   */ OP(XY_CB,86) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=res(0, TDAT8); CALL wm();      ENDOP
+/* RES  0,A=(XY+o) */ OP(XY_CB,87) THEN TADR=m_ea; CALL rm_reg(); THEN A=res(0, TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,88) { B = res(1, rm_reg(m_ea)); wm(m_ea, B); } /* RES  1,B=(XY+o)  */
-OP(xycb,89) { C = res(1, rm_reg(m_ea)); wm(m_ea, C); } /* RES  1,C=(XY+o)  */
-OP(xycb,8a) { D = res(1, rm_reg(m_ea)); wm(m_ea, D); } /* RES  1,D=(XY+o)  */
-OP(xycb,8b) { E = res(1, rm_reg(m_ea)); wm(m_ea, E); } /* RES  1,E=(XY+o)  */
-OP(xycb,8c) { H = res(1, rm_reg(m_ea)); wm(m_ea, H); } /* RES  1,H=(XY+o)  */
-OP(xycb,8d) { L = res(1, rm_reg(m_ea)); wm(m_ea, L); } /* RES  1,L=(XY+o)  */
-OP(xycb,8e) { wm(m_ea, res(1, rm_reg(m_ea)));        } /* RES  1,(XY+o)    */
-OP(xycb,8f) { A = res(1, rm_reg(m_ea)); wm(m_ea, A); } /* RES  1,A=(XY+o)  */
+/* RES  1,B=(XY+o) */ OP(XY_CB,88) THEN TADR=m_ea; CALL rm_reg(); THEN B=res(1, TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* RES  1,C=(XY+o) */ OP(XY_CB,89) THEN TADR=m_ea; CALL rm_reg(); THEN C=res(1, TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* RES  1,D=(XY+o) */ OP(XY_CB,8a) THEN TADR=m_ea; CALL rm_reg(); THEN D=res(1, TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* RES  1,E=(XY+o) */ OP(XY_CB,8b) THEN TADR=m_ea; CALL rm_reg(); THEN E=res(1, TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* RES  1,H=(XY+o) */ OP(XY_CB,8c) THEN TADR=m_ea; CALL rm_reg(); THEN H=res(1, TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* RES  1,L=(XY+o) */ OP(XY_CB,8d) THEN TADR=m_ea; CALL rm_reg(); THEN L=res(1, TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* RES  1,(XY+o)   */ OP(XY_CB,8e) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=res(1, TDAT8); CALL wm();      ENDOP
+/* RES  1,A=(XY+o) */ OP(XY_CB,8f) THEN TADR=m_ea; CALL rm_reg(); THEN A=res(1, TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,90) { B = res(2, rm_reg(m_ea)); wm(m_ea, B); } /* RES  2,B=(XY+o)  */
-OP(xycb,91) { C = res(2, rm_reg(m_ea)); wm(m_ea, C); } /* RES  2,C=(XY+o)  */
-OP(xycb,92) { D = res(2, rm_reg(m_ea)); wm(m_ea, D); } /* RES  2,D=(XY+o)  */
-OP(xycb,93) { E = res(2, rm_reg(m_ea)); wm(m_ea, E); } /* RES  2,E=(XY+o)  */
-OP(xycb,94) { H = res(2, rm_reg(m_ea)); wm(m_ea, H); } /* RES  2,H=(XY+o)  */
-OP(xycb,95) { L = res(2, rm_reg(m_ea)); wm(m_ea, L); } /* RES  2,L=(XY+o)  */
-OP(xycb,96) { wm(m_ea, res(2, rm_reg(m_ea)));        } /* RES  2,(XY+o)    */
-OP(xycb,97) { A = res(2, rm_reg(m_ea)); wm(m_ea, A); } /* RES  2,A=(XY+o)  */
+/* RES  2,B=(XY+o) */ OP(XY_CB,90) THEN TADR=m_ea; CALL rm_reg(); THEN B=res(2, TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* RES  2,C=(XY+o) */ OP(XY_CB,91) THEN TADR=m_ea; CALL rm_reg(); THEN C=res(2, TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* RES  2,D=(XY+o) */ OP(XY_CB,92) THEN TADR=m_ea; CALL rm_reg(); THEN D=res(2, TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* RES  2,E=(XY+o) */ OP(XY_CB,93) THEN TADR=m_ea; CALL rm_reg(); THEN E=res(2, TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* RES  2,H=(XY+o) */ OP(XY_CB,94) THEN TADR=m_ea; CALL rm_reg(); THEN H=res(2, TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* RES  2,L=(XY+o) */ OP(XY_CB,95) THEN TADR=m_ea; CALL rm_reg(); THEN L=res(2, TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* RES  2,(XY+o)   */ OP(XY_CB,96) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=res(2, TDAT8); CALL wm();      ENDOP
+/* RES  2,A=(XY+o) */ OP(XY_CB,97) THEN TADR=m_ea; CALL rm_reg(); THEN A=res(2, TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,98) { B = res(3, rm_reg(m_ea)); wm(m_ea, B); } /* RES  3,B=(XY+o)  */
-OP(xycb,99) { C = res(3, rm_reg(m_ea)); wm(m_ea, C); } /* RES  3,C=(XY+o)  */
-OP(xycb,9a) { D = res(3, rm_reg(m_ea)); wm(m_ea, D); } /* RES  3,D=(XY+o)  */
-OP(xycb,9b) { E = res(3, rm_reg(m_ea)); wm(m_ea, E); } /* RES  3,E=(XY+o)  */
-OP(xycb,9c) { H = res(3, rm_reg(m_ea)); wm(m_ea, H); } /* RES  3,H=(XY+o)  */
-OP(xycb,9d) { L = res(3, rm_reg(m_ea)); wm(m_ea, L); } /* RES  3,L=(XY+o)  */
-OP(xycb,9e) { wm(m_ea, res(3, rm_reg(m_ea)));        } /* RES  3,(XY+o)    */
-OP(xycb,9f) { A = res(3, rm_reg(m_ea)); wm(m_ea, A); } /* RES  3,A=(XY+o)  */
+/* RES  3,B=(XY+o) */ OP(XY_CB,98) THEN TADR=m_ea; CALL rm_reg(); THEN B=res(3, TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* RES  3,C=(XY+o) */ OP(XY_CB,99) THEN TADR=m_ea; CALL rm_reg(); THEN C=res(3, TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* RES  3,D=(XY+o) */ OP(XY_CB,9a) THEN TADR=m_ea; CALL rm_reg(); THEN D=res(3, TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* RES  3,E=(XY+o) */ OP(XY_CB,9b) THEN TADR=m_ea; CALL rm_reg(); THEN E=res(3, TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* RES  3,H=(XY+o) */ OP(XY_CB,9c) THEN TADR=m_ea; CALL rm_reg(); THEN H=res(3, TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* RES  3,L=(XY+o) */ OP(XY_CB,9d) THEN TADR=m_ea; CALL rm_reg(); THEN L=res(3, TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* RES  3,(XY+o)   */ OP(XY_CB,9e) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=res(3, TDAT8); CALL wm();      ENDOP
+/* RES  3,A=(XY+o) */ OP(XY_CB,9f) THEN TADR=m_ea; CALL rm_reg(); THEN A=res(3, TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,a0) { B = res(4, rm_reg(m_ea)); wm(m_ea, B); } /* RES  4,B=(XY+o)  */
-OP(xycb,a1) { C = res(4, rm_reg(m_ea)); wm(m_ea, C); } /* RES  4,C=(XY+o)  */
-OP(xycb,a2) { D = res(4, rm_reg(m_ea)); wm(m_ea, D); } /* RES  4,D=(XY+o)  */
-OP(xycb,a3) { E = res(4, rm_reg(m_ea)); wm(m_ea, E); } /* RES  4,E=(XY+o)  */
-OP(xycb,a4) { H = res(4, rm_reg(m_ea)); wm(m_ea, H); } /* RES  4,H=(XY+o)  */
-OP(xycb,a5) { L = res(4, rm_reg(m_ea)); wm(m_ea, L); } /* RES  4,L=(XY+o)  */
-OP(xycb,a6) { wm(m_ea, res(4, rm_reg(m_ea)));        } /* RES  4,(XY+o)    */
-OP(xycb,a7) { A = res(4, rm_reg(m_ea)); wm(m_ea, A); } /* RES  4,A=(XY+o)  */
+/* RES  4,B=(XY+o) */ OP(XY_CB,a0) THEN TADR=m_ea; CALL rm_reg(); THEN B=res(4, TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* RES  4,C=(XY+o) */ OP(XY_CB,a1) THEN TADR=m_ea; CALL rm_reg(); THEN C=res(4, TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* RES  4,D=(XY+o) */ OP(XY_CB,a2) THEN TADR=m_ea; CALL rm_reg(); THEN D=res(4, TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* RES  4,E=(XY+o) */ OP(XY_CB,a3) THEN TADR=m_ea; CALL rm_reg(); THEN E=res(4, TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* RES  4,H=(XY+o) */ OP(XY_CB,a4) THEN TADR=m_ea; CALL rm_reg(); THEN H=res(4, TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* RES  4,L=(XY+o) */ OP(XY_CB,a5) THEN TADR=m_ea; CALL rm_reg(); THEN L=res(4, TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* RES  4,(XY+o)   */ OP(XY_CB,a6) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=res(4, TDAT8); CALL wm();      ENDOP
+/* RES  4,A=(XY+o) */ OP(XY_CB,a7) THEN TADR=m_ea; CALL rm_reg(); THEN A=res(4, TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,a8) { B = res(5, rm_reg(m_ea)); wm(m_ea, B); } /* RES  5,B=(XY+o)  */
-OP(xycb,a9) { C = res(5, rm_reg(m_ea)); wm(m_ea, C); } /* RES  5,C=(XY+o)  */
-OP(xycb,aa) { D = res(5, rm_reg(m_ea)); wm(m_ea, D); } /* RES  5,D=(XY+o)  */
-OP(xycb,ab) { E = res(5, rm_reg(m_ea)); wm(m_ea, E); } /* RES  5,E=(XY+o)  */
-OP(xycb,ac) { H = res(5, rm_reg(m_ea)); wm(m_ea, H); } /* RES  5,H=(XY+o)  */
-OP(xycb,ad) { L = res(5, rm_reg(m_ea)); wm(m_ea, L); } /* RES  5,L=(XY+o)  */
-OP(xycb,ae) { wm(m_ea, res(5, rm_reg(m_ea)));        } /* RES  5,(XY+o)    */
-OP(xycb,af) { A = res(5, rm_reg(m_ea)); wm(m_ea, A); } /* RES  5,A=(XY+o)  */
+/* RES  5,B=(XY+o) */ OP(XY_CB,a8) THEN TADR=m_ea; CALL rm_reg(); THEN B=res(5, TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* RES  5,C=(XY+o) */ OP(XY_CB,a9) THEN TADR=m_ea; CALL rm_reg(); THEN C=res(5, TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* RES  5,D=(XY+o) */ OP(XY_CB,aa) THEN TADR=m_ea; CALL rm_reg(); THEN D=res(5, TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* RES  5,E=(XY+o) */ OP(XY_CB,ab) THEN TADR=m_ea; CALL rm_reg(); THEN E=res(5, TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* RES  5,H=(XY+o) */ OP(XY_CB,ac) THEN TADR=m_ea; CALL rm_reg(); THEN H=res(5, TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* RES  5,L=(XY+o) */ OP(XY_CB,ad) THEN TADR=m_ea; CALL rm_reg(); THEN L=res(5, TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* RES  5,(XY+o)   */ OP(XY_CB,ae) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=res(5, TDAT8); CALL wm();      ENDOP
+/* RES  5,A=(XY+o) */ OP(XY_CB,af) THEN TADR=m_ea; CALL rm_reg(); THEN A=res(5, TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,b0) { B = res(6, rm_reg(m_ea)); wm(m_ea, B); } /* RES  6,B=(XY+o)  */
-OP(xycb,b1) { C = res(6, rm_reg(m_ea)); wm(m_ea, C); } /* RES  6,C=(XY+o)  */
-OP(xycb,b2) { D = res(6, rm_reg(m_ea)); wm(m_ea, D); } /* RES  6,D=(XY+o)  */
-OP(xycb,b3) { E = res(6, rm_reg(m_ea)); wm(m_ea, E); } /* RES  6,E=(XY+o)  */
-OP(xycb,b4) { H = res(6, rm_reg(m_ea)); wm(m_ea, H); } /* RES  6,H=(XY+o)  */
-OP(xycb,b5) { L = res(6, rm_reg(m_ea)); wm(m_ea, L); } /* RES  6,L=(XY+o)  */
-OP(xycb,b6) { wm(m_ea, res(6, rm_reg(m_ea)));        } /* RES  6,(XY+o)    */
-OP(xycb,b7) { A = res(6, rm_reg(m_ea)); wm(m_ea, A); } /* RES  6,A=(XY+o)  */
+/* RES  6,B=(XY+o) */ OP(XY_CB,b0) THEN TADR=m_ea; CALL rm_reg(); THEN B=res(6, TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* RES  6,C=(XY+o) */ OP(XY_CB,b1) THEN TADR=m_ea; CALL rm_reg(); THEN C=res(6, TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* RES  6,D=(XY+o) */ OP(XY_CB,b2) THEN TADR=m_ea; CALL rm_reg(); THEN D=res(6, TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* RES  6,E=(XY+o) */ OP(XY_CB,b3) THEN TADR=m_ea; CALL rm_reg(); THEN E=res(6, TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* RES  6,H=(XY+o) */ OP(XY_CB,b4) THEN TADR=m_ea; CALL rm_reg(); THEN H=res(6, TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* RES  6,L=(XY+o) */ OP(XY_CB,b5) THEN TADR=m_ea; CALL rm_reg(); THEN L=res(6, TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* RES  6,(XY+o)   */ OP(XY_CB,b6) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=res(6, TDAT8); CALL wm();      ENDOP
+/* RES  6,A=(XY+o) */ OP(XY_CB,b7) THEN TADR=m_ea; CALL rm_reg(); THEN A=res(6, TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,b8) { B = res(7, rm_reg(m_ea)); wm(m_ea, B); } /* RES  7,B=(XY+o)  */
-OP(xycb,b9) { C = res(7, rm_reg(m_ea)); wm(m_ea, C); } /* RES  7,C=(XY+o)  */
-OP(xycb,ba) { D = res(7, rm_reg(m_ea)); wm(m_ea, D); } /* RES  7,D=(XY+o)  */
-OP(xycb,bb) { E = res(7, rm_reg(m_ea)); wm(m_ea, E); } /* RES  7,E=(XY+o)  */
-OP(xycb,bc) { H = res(7, rm_reg(m_ea)); wm(m_ea, H); } /* RES  7,H=(XY+o)  */
-OP(xycb,bd) { L = res(7, rm_reg(m_ea)); wm(m_ea, L); } /* RES  7,L=(XY+o)  */
-OP(xycb,be) { wm(m_ea, res(7, rm_reg(m_ea)));        } /* RES  7,(XY+o)    */
-OP(xycb,bf) { A = res(7, rm_reg(m_ea)); wm(m_ea, A); } /* RES  7,A=(XY+o)  */
+/* RES  7,B=(XY+o) */ OP(XY_CB,b8) THEN TADR=m_ea; CALL rm_reg(); THEN B=res(7, TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* RES  7,C=(XY+o) */ OP(XY_CB,b9) THEN TADR=m_ea; CALL rm_reg(); THEN C=res(7, TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* RES  7,D=(XY+o) */ OP(XY_CB,ba) THEN TADR=m_ea; CALL rm_reg(); THEN D=res(7, TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* RES  7,E=(XY+o) */ OP(XY_CB,bb) THEN TADR=m_ea; CALL rm_reg(); THEN E=res(7, TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* RES  7,H=(XY+o) */ OP(XY_CB,bc) THEN TADR=m_ea; CALL rm_reg(); THEN H=res(7, TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* RES  7,L=(XY+o) */ OP(XY_CB,bd) THEN TADR=m_ea; CALL rm_reg(); THEN L=res(7, TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* RES  7,(XY+o)   */ OP(XY_CB,be) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=res(7, TDAT8); CALL wm();      ENDOP
+/* RES  7,A=(XY+o) */ OP(XY_CB,bf) THEN TADR=m_ea; CALL rm_reg(); THEN A=res(7, TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,c0) { B = set(0, rm_reg(m_ea)); wm(m_ea, B); } /* SET  0,B=(XY+o)  */
-OP(xycb,c1) { C = set(0, rm_reg(m_ea)); wm(m_ea, C); } /* SET  0,C=(XY+o)  */
-OP(xycb,c2) { D = set(0, rm_reg(m_ea)); wm(m_ea, D); } /* SET  0,D=(XY+o)  */
-OP(xycb,c3) { E = set(0, rm_reg(m_ea)); wm(m_ea, E); } /* SET  0,E=(XY+o)  */
-OP(xycb,c4) { H = set(0, rm_reg(m_ea)); wm(m_ea, H); } /* SET  0,H=(XY+o)  */
-OP(xycb,c5) { L = set(0, rm_reg(m_ea)); wm(m_ea, L); } /* SET  0,L=(XY+o)  */
-OP(xycb,c6) { wm(m_ea, set(0, rm_reg(m_ea)));        } /* SET  0,(XY+o)    */
-OP(xycb,c7) { A = set(0, rm_reg(m_ea)); wm(m_ea, A); } /* SET  0,A=(XY+o)  */
+/* SET  0,B=(XY+o) */ OP(XY_CB,c0) THEN TADR=m_ea; CALL rm_reg(); THEN B=set(0, TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* SET  0,C=(XY+o) */ OP(XY_CB,c1) THEN TADR=m_ea; CALL rm_reg(); THEN C=set(0, TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* SET  0,D=(XY+o) */ OP(XY_CB,c2) THEN TADR=m_ea; CALL rm_reg(); THEN D=set(0, TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* SET  0,E=(XY+o) */ OP(XY_CB,c3) THEN TADR=m_ea; CALL rm_reg(); THEN E=set(0, TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* SET  0,H=(XY+o) */ OP(XY_CB,c4) THEN TADR=m_ea; CALL rm_reg(); THEN H=set(0, TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* SET  0,L=(XY+o) */ OP(XY_CB,c5) THEN TADR=m_ea; CALL rm_reg(); THEN L=set(0, TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* SET  0,(XY+o)   */ OP(XY_CB,c6) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=set(0, TDAT8); CALL wm();      ENDOP
+/* SET  0,A=(XY+o) */ OP(XY_CB,c7) THEN TADR=m_ea; CALL rm_reg(); THEN A=set(0, TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,c8) { B = set(1, rm_reg(m_ea)); wm(m_ea, B); } /* SET  1,B=(XY+o)  */
-OP(xycb,c9) { C = set(1, rm_reg(m_ea)); wm(m_ea, C); } /* SET  1,C=(XY+o)  */
-OP(xycb,ca) { D = set(1, rm_reg(m_ea)); wm(m_ea, D); } /* SET  1,D=(XY+o)  */
-OP(xycb,cb) { E = set(1, rm_reg(m_ea)); wm(m_ea, E); } /* SET  1,E=(XY+o)  */
-OP(xycb,cc) { H = set(1, rm_reg(m_ea)); wm(m_ea, H); } /* SET  1,H=(XY+o)  */
-OP(xycb,cd) { L = set(1, rm_reg(m_ea)); wm(m_ea, L); } /* SET  1,L=(XY+o)  */
-OP(xycb,ce) { wm(m_ea, set(1, rm_reg(m_ea)));        } /* SET  1,(XY+o)    */
-OP(xycb,cf) { A = set(1, rm_reg(m_ea)); wm(m_ea, A); } /* SET  1,A=(XY+o)  */
+/* SET  1,B=(XY+o) */ OP(XY_CB,c8) THEN TADR=m_ea; CALL rm_reg(); THEN B=set(1, TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* SET  1,C=(XY+o) */ OP(XY_CB,c9) THEN TADR=m_ea; CALL rm_reg(); THEN C=set(1, TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* SET  1,D=(XY+o) */ OP(XY_CB,ca) THEN TADR=m_ea; CALL rm_reg(); THEN D=set(1, TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* SET  1,E=(XY+o) */ OP(XY_CB,cb) THEN TADR=m_ea; CALL rm_reg(); THEN E=set(1, TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* SET  1,H=(XY+o) */ OP(XY_CB,cc) THEN TADR=m_ea; CALL rm_reg(); THEN H=set(1, TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* SET  1,L=(XY+o) */ OP(XY_CB,cd) THEN TADR=m_ea; CALL rm_reg(); THEN L=set(1, TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* SET  1,(XY+o)   */ OP(XY_CB,ce) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=set(1, TDAT8); CALL wm();      ENDOP
+/* SET  1,A=(XY+o) */ OP(XY_CB,cf) THEN TADR=m_ea; CALL rm_reg(); THEN A=set(1, TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,d0) { B = set(2, rm_reg(m_ea)); wm(m_ea, B); } /* SET  2,B=(XY+o)  */
-OP(xycb,d1) { C = set(2, rm_reg(m_ea)); wm(m_ea, C); } /* SET  2,C=(XY+o)  */
-OP(xycb,d2) { D = set(2, rm_reg(m_ea)); wm(m_ea, D); } /* SET  2,D=(XY+o)  */
-OP(xycb,d3) { E = set(2, rm_reg(m_ea)); wm(m_ea, E); } /* SET  2,E=(XY+o)  */
-OP(xycb,d4) { H = set(2, rm_reg(m_ea)); wm(m_ea, H); } /* SET  2,H=(XY+o)  */
-OP(xycb,d5) { L = set(2, rm_reg(m_ea)); wm(m_ea, L); } /* SET  2,L=(XY+o)  */
-OP(xycb,d6) { wm(m_ea, set(2, rm_reg(m_ea)));        } /* SET  2,(XY+o)    */
-OP(xycb,d7) { A = set(2, rm_reg(m_ea)); wm(m_ea, A); } /* SET  2,A=(XY+o)  */
+/* SET  2,B=(XY+o) */ OP(XY_CB,d0) THEN TADR=m_ea; CALL rm_reg(); THEN B=set(2, TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* SET  2,C=(XY+o) */ OP(XY_CB,d1) THEN TADR=m_ea; CALL rm_reg(); THEN C=set(2, TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* SET  2,D=(XY+o) */ OP(XY_CB,d2) THEN TADR=m_ea; CALL rm_reg(); THEN D=set(2, TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* SET  2,E=(XY+o) */ OP(XY_CB,d3) THEN TADR=m_ea; CALL rm_reg(); THEN E=set(2, TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* SET  2,H=(XY+o) */ OP(XY_CB,d4) THEN TADR=m_ea; CALL rm_reg(); THEN H=set(2, TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* SET  2,L=(XY+o) */ OP(XY_CB,d5) THEN TADR=m_ea; CALL rm_reg(); THEN L=set(2, TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* SET  2,(XY+o)   */ OP(XY_CB,d6) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=set(2, TDAT8); CALL wm();      ENDOP
+/* SET  2,A=(XY+o) */ OP(XY_CB,d7) THEN TADR=m_ea; CALL rm_reg(); THEN A=set(2, TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,d8) { B = set(3, rm_reg(m_ea)); wm(m_ea, B); } /* SET  3,B=(XY+o)  */
-OP(xycb,d9) { C = set(3, rm_reg(m_ea)); wm(m_ea, C); } /* SET  3,C=(XY+o)  */
-OP(xycb,da) { D = set(3, rm_reg(m_ea)); wm(m_ea, D); } /* SET  3,D=(XY+o)  */
-OP(xycb,db) { E = set(3, rm_reg(m_ea)); wm(m_ea, E); } /* SET  3,E=(XY+o)  */
-OP(xycb,dc) { H = set(3, rm_reg(m_ea)); wm(m_ea, H); } /* SET  3,H=(XY+o)  */
-OP(xycb,dd) { L = set(3, rm_reg(m_ea)); wm(m_ea, L); } /* SET  3,L=(XY+o)  */
-OP(xycb,de) { wm(m_ea, set(3, rm_reg(m_ea)));        } /* SET  3,(XY+o)    */
-OP(xycb,df) { A = set(3, rm_reg(m_ea)); wm(m_ea, A); } /* SET  3,A=(XY+o)  */
+/* SET  3,B=(XY+o) */ OP(XY_CB,d8) THEN TADR=m_ea; CALL rm_reg(); THEN B=set(3, TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* SET  3,C=(XY+o) */ OP(XY_CB,d9) THEN TADR=m_ea; CALL rm_reg(); THEN C=set(3, TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* SET  3,D=(XY+o) */ OP(XY_CB,da) THEN TADR=m_ea; CALL rm_reg(); THEN D=set(3, TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* SET  3,E=(XY+o) */ OP(XY_CB,db) THEN TADR=m_ea; CALL rm_reg(); THEN E=set(3, TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* SET  3,H=(XY+o) */ OP(XY_CB,dc) THEN TADR=m_ea; CALL rm_reg(); THEN H=set(3, TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* SET  3,L=(XY+o) */ OP(XY_CB,dd) THEN TADR=m_ea; CALL rm_reg(); THEN L=set(3, TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* SET  3,(XY+o)   */ OP(XY_CB,de) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=set(3, TDAT8); CALL wm();      ENDOP
+/* SET  3,A=(XY+o) */ OP(XY_CB,df) THEN TADR=m_ea; CALL rm_reg(); THEN A=set(3, TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,e0) { B = set(4, rm_reg(m_ea)); wm(m_ea, B); } /* SET  4,B=(XY+o)  */
-OP(xycb,e1) { C = set(4, rm_reg(m_ea)); wm(m_ea, C); } /* SET  4,C=(XY+o)  */
-OP(xycb,e2) { D = set(4, rm_reg(m_ea)); wm(m_ea, D); } /* SET  4,D=(XY+o)  */
-OP(xycb,e3) { E = set(4, rm_reg(m_ea)); wm(m_ea, E); } /* SET  4,E=(XY+o)  */
-OP(xycb,e4) { H = set(4, rm_reg(m_ea)); wm(m_ea, H); } /* SET  4,H=(XY+o)  */
-OP(xycb,e5) { L = set(4, rm_reg(m_ea)); wm(m_ea, L); } /* SET  4,L=(XY+o)  */
-OP(xycb,e6) { wm(m_ea, set(4, rm_reg(m_ea)));        } /* SET  4,(XY+o)    */
-OP(xycb,e7) { A = set(4, rm_reg(m_ea)); wm(m_ea, A); } /* SET  4,A=(XY+o)  */
+/* SET  4,B=(XY+o) */ OP(XY_CB,e0) THEN TADR=m_ea; CALL rm_reg(); THEN B=set(4, TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* SET  4,C=(XY+o) */ OP(XY_CB,e1) THEN TADR=m_ea; CALL rm_reg(); THEN C=set(4, TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* SET  4,D=(XY+o) */ OP(XY_CB,e2) THEN TADR=m_ea; CALL rm_reg(); THEN D=set(4, TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* SET  4,E=(XY+o) */ OP(XY_CB,e3) THEN TADR=m_ea; CALL rm_reg(); THEN E=set(4, TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* SET  4,H=(XY+o) */ OP(XY_CB,e4) THEN TADR=m_ea; CALL rm_reg(); THEN H=set(4, TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* SET  4,L=(XY+o) */ OP(XY_CB,e5) THEN TADR=m_ea; CALL rm_reg(); THEN L=set(4, TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* SET  4,(XY+o)   */ OP(XY_CB,e6) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=set(4, TDAT8); CALL wm();      ENDOP
+/* SET  4,A=(XY+o) */ OP(XY_CB,e7) THEN TADR=m_ea; CALL rm_reg(); THEN A=set(4, TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,e8) { B = set(5, rm_reg(m_ea)); wm(m_ea, B); } /* SET  5,B=(XY+o)  */
-OP(xycb,e9) { C = set(5, rm_reg(m_ea)); wm(m_ea, C); } /* SET  5,C=(XY+o)  */
-OP(xycb,ea) { D = set(5, rm_reg(m_ea)); wm(m_ea, D); } /* SET  5,D=(XY+o)  */
-OP(xycb,eb) { E = set(5, rm_reg(m_ea)); wm(m_ea, E); } /* SET  5,E=(XY+o)  */
-OP(xycb,ec) { H = set(5, rm_reg(m_ea)); wm(m_ea, H); } /* SET  5,H=(XY+o)  */
-OP(xycb,ed) { L = set(5, rm_reg(m_ea)); wm(m_ea, L); } /* SET  5,L=(XY+o)  */
-OP(xycb,ee) { wm(m_ea, set(5, rm_reg(m_ea)));        } /* SET  5,(XY+o)    */
-OP(xycb,ef) { A = set(5, rm_reg(m_ea)); wm(m_ea, A); } /* SET  5,A=(XY+o)  */
+/* SET  5,B=(XY+o) */ OP(XY_CB,e8) THEN TADR=m_ea; CALL rm_reg(); THEN B=set(5, TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* SET  5,C=(XY+o) */ OP(XY_CB,e9) THEN TADR=m_ea; CALL rm_reg(); THEN C=set(5, TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* SET  5,D=(XY+o) */ OP(XY_CB,ea) THEN TADR=m_ea; CALL rm_reg(); THEN D=set(5, TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* SET  5,E=(XY+o) */ OP(XY_CB,eb) THEN TADR=m_ea; CALL rm_reg(); THEN E=set(5, TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* SET  5,H=(XY+o) */ OP(XY_CB,ec) THEN TADR=m_ea; CALL rm_reg(); THEN H=set(5, TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* SET  5,L=(XY+o) */ OP(XY_CB,ed) THEN TADR=m_ea; CALL rm_reg(); THEN L=set(5, TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* SET  5,(XY+o)   */ OP(XY_CB,ee) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=set(5, TDAT8); CALL wm();      ENDOP
+/* SET  5,A=(XY+o) */ OP(XY_CB,ef) THEN TADR=m_ea; CALL rm_reg(); THEN A=set(5, TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,f0) { B = set(6, rm_reg(m_ea)); wm(m_ea, B); } /* SET  6,B=(XY+o)  */
-OP(xycb,f1) { C = set(6, rm_reg(m_ea)); wm(m_ea, C); } /* SET  6,C=(XY+o)  */
-OP(xycb,f2) { D = set(6, rm_reg(m_ea)); wm(m_ea, D); } /* SET  6,D=(XY+o)  */
-OP(xycb,f3) { E = set(6, rm_reg(m_ea)); wm(m_ea, E); } /* SET  6,E=(XY+o)  */
-OP(xycb,f4) { H = set(6, rm_reg(m_ea)); wm(m_ea, H); } /* SET  6,H=(XY+o)  */
-OP(xycb,f5) { L = set(6, rm_reg(m_ea)); wm(m_ea, L); } /* SET  6,L=(XY+o)  */
-OP(xycb,f6) { wm(m_ea, set(6, rm_reg(m_ea)));        } /* SET  6,(XY+o)    */
-OP(xycb,f7) { A = set(6, rm_reg(m_ea)); wm(m_ea, A); } /* SET  6,A=(XY+o)  */
+/* SET  6,B=(XY+o) */ OP(XY_CB,f0) THEN TADR=m_ea; CALL rm_reg(); THEN B=set(6, TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* SET  6,C=(XY+o) */ OP(XY_CB,f1) THEN TADR=m_ea; CALL rm_reg(); THEN C=set(6, TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* SET  6,D=(XY+o) */ OP(XY_CB,f2) THEN TADR=m_ea; CALL rm_reg(); THEN D=set(6, TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* SET  6,E=(XY+o) */ OP(XY_CB,f3) THEN TADR=m_ea; CALL rm_reg(); THEN E=set(6, TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* SET  6,H=(XY+o) */ OP(XY_CB,f4) THEN TADR=m_ea; CALL rm_reg(); THEN H=set(6, TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* SET  6,L=(XY+o) */ OP(XY_CB,f5) THEN TADR=m_ea; CALL rm_reg(); THEN L=set(6, TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* SET  6,(XY+o)   */ OP(XY_CB,f6) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=set(6, TDAT8); CALL wm();      ENDOP
+/* SET  6,A=(XY+o) */ OP(XY_CB,f7) THEN TADR=m_ea; CALL rm_reg(); THEN A=set(6, TDAT8); TDAT8=A; CALL wm(); ENDOP
 
-OP(xycb,f8) { B = set(7, rm_reg(m_ea)); wm(m_ea, B); } /* SET  7,B=(XY+o)  */
-OP(xycb,f9) { C = set(7, rm_reg(m_ea)); wm(m_ea, C); } /* SET  7,C=(XY+o)  */
-OP(xycb,fa) { D = set(7, rm_reg(m_ea)); wm(m_ea, D); } /* SET  7,D=(XY+o)  */
-OP(xycb,fb) { E = set(7, rm_reg(m_ea)); wm(m_ea, E); } /* SET  7,E=(XY+o)  */
-OP(xycb,fc) { H = set(7, rm_reg(m_ea)); wm(m_ea, H); } /* SET  7,H=(XY+o)  */
-OP(xycb,fd) { L = set(7, rm_reg(m_ea)); wm(m_ea, L); } /* SET  7,L=(XY+o)  */
-OP(xycb,fe) { wm(m_ea, set(7, rm_reg(m_ea)));        } /* SET  7,(XY+o)    */
-OP(xycb,ff) { A = set(7, rm_reg(m_ea)); wm(m_ea, A); } /* SET  7,A=(XY+o)  */
-
-OP(illegal,1) {
-	logerror("Z80 ill. opcode $%02x $%02x ($%04x)\n",
-			m_opcodes.read_byte(translate_memory_address((PCD-1)&0xffff)), m_opcodes.read_byte(translate_memory_address(PCD)), PCD-1);
-}
+/* SET  7,B=(XY+o) */ OP(XY_CB,f8) THEN TADR=m_ea; CALL rm_reg(); THEN B=set(7, TDAT8); TDAT8=B; CALL wm(); ENDOP
+/* SET  7,C=(XY+o) */ OP(XY_CB,f9) THEN TADR=m_ea; CALL rm_reg(); THEN C=set(7, TDAT8); TDAT8=C; CALL wm(); ENDOP
+/* SET  7,D=(XY+o) */ OP(XY_CB,fa) THEN TADR=m_ea; CALL rm_reg(); THEN D=set(7, TDAT8); TDAT8=D; CALL wm(); ENDOP
+/* SET  7,E=(XY+o) */ OP(XY_CB,fb) THEN TADR=m_ea; CALL rm_reg(); THEN E=set(7, TDAT8); TDAT8=E; CALL wm(); ENDOP
+/* SET  7,H=(XY+o) */ OP(XY_CB,fc) THEN TADR=m_ea; CALL rm_reg(); THEN H=set(7, TDAT8); TDAT8=H; CALL wm(); ENDOP
+/* SET  7,L=(XY+o) */ OP(XY_CB,fd) THEN TADR=m_ea; CALL rm_reg(); THEN L=set(7, TDAT8); TDAT8=L; CALL wm(); ENDOP
+/* SET  7,(XY+o)   */ OP(XY_CB,fe) THEN TADR=m_ea; CALL rm_reg(); THEN TDAT8=set(7, TDAT8); CALL wm();      ENDOP
+/* SET  7,A=(XY+o) */ OP(XY_CB,ff) THEN TADR=m_ea; CALL rm_reg(); THEN A=set(7, TDAT8); TDAT8=A; CALL wm(); ENDOP
 
 /**********************************************************
  * IX register related opcodes (DD prefix)
  **********************************************************/
-OP(dd,00) { illegal_1(); op_00();                            } /* DB   DD          */
-OP(dd,01) { illegal_1(); op_01();                            } /* DB   DD          */
-OP(dd,02) { illegal_1(); op_02();                            } /* DB   DD          */
-OP(dd,03) { illegal_1(); op_03();                            } /* DB   DD          */
-OP(dd,04) { illegal_1(); op_04();                            } /* DB   DD          */
-OP(dd,05) { illegal_1(); op_05();                            } /* DB   DD          */
-OP(dd,06) { illegal_1(); op_06();                            } /* DB   DD          */
-OP(dd,07) { illegal_1(); op_07();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,00) THEN illegal_1(); JP(00)
+/* DB   DD         */ OP(DD,01) THEN illegal_1(); JP(01)
+/* DB   DD         */ OP(DD,02) THEN illegal_1(); JP(02)
+/* DB   DD         */ OP(DD,03) THEN illegal_1(); JP(03)
+/* DB   DD         */ OP(DD,04) THEN illegal_1(); JP(04)
+/* DB   DD         */ OP(DD,05) THEN illegal_1(); JP(05)
+/* DB   DD         */ OP(DD,06) THEN illegal_1(); JP(06)
+/* DB   DD         */ OP(DD,07) THEN illegal_1(); JP(07)
 
-OP(dd,08) { illegal_1(); op_08();                            } /* DB   DD          */
-OP(dd,09) { add16(m_ix, m_bc);                               } /* ADD  IX,BC       */
-OP(dd,0a) { illegal_1(); op_0a();                            } /* DB   DD          */
-OP(dd,0b) { illegal_1(); op_0b();                            } /* DB   DD          */
-OP(dd,0c) { illegal_1(); op_0c();                            } /* DB   DD          */
-OP(dd,0d) { illegal_1(); op_0d();                            } /* DB   DD          */
-OP(dd,0e) { illegal_1(); op_0e();                            } /* DB   DD          */
-OP(dd,0f) { illegal_1(); op_0f();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,08) THEN illegal_1(); JP(08)
+/* ADD  IX,BC      */ OP(DD,09) THEN TDAT=IX; TDAT2=BC; CALL add16(); THEN IX=TDAT;    ENDOP
+/* DB   DD         */ OP(DD,0a) THEN illegal_1(); JP(0a)
+/* DB   DD         */ OP(DD,0b) THEN illegal_1(); JP(0b)
+/* DB   DD         */ OP(DD,0c) THEN illegal_1(); JP(0c)
+/* DB   DD         */ OP(DD,0d) THEN illegal_1(); JP(0d)
+/* DB   DD         */ OP(DD,0e) THEN illegal_1(); JP(0e)
+/* DB   DD         */ OP(DD,0f) THEN illegal_1(); JP(0f)
 
-OP(dd,10) { illegal_1(); op_10();                            } /* DB   DD          */
-OP(dd,11) { illegal_1(); op_11();                            } /* DB   DD          */
-OP(dd,12) { illegal_1(); op_12();                            } /* DB   DD          */
-OP(dd,13) { illegal_1(); op_13();                            } /* DB   DD          */
-OP(dd,14) { illegal_1(); op_14();                            } /* DB   DD          */
-OP(dd,15) { illegal_1(); op_15();                            } /* DB   DD          */
-OP(dd,16) { illegal_1(); op_16();                            } /* DB   DD          */
-OP(dd,17) { illegal_1(); op_17();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,10) THEN illegal_1(); JP(10)
+/* DB   DD         */ OP(DD,11) THEN illegal_1(); JP(11)
+/* DB   DD         */ OP(DD,12) THEN illegal_1(); JP(12)
+/* DB   DD         */ OP(DD,13) THEN illegal_1(); JP(13)
+/* DB   DD         */ OP(DD,14) THEN illegal_1(); JP(14)
+/* DB   DD         */ OP(DD,15) THEN illegal_1(); JP(15)
+/* DB   DD         */ OP(DD,16) THEN illegal_1(); JP(16)
+/* DB   DD         */ OP(DD,17) THEN illegal_1(); JP(17)
 
-OP(dd,18) { illegal_1(); op_18();                            } /* DB   DD          */
-OP(dd,19) { add16(m_ix, m_de);                               } /* ADD  IX,DE       */
-OP(dd,1a) { illegal_1(); op_1a();                            } /* DB   DD          */
-OP(dd,1b) { illegal_1(); op_1b();                            } /* DB   DD          */
-OP(dd,1c) { illegal_1(); op_1c();                            } /* DB   DD          */
-OP(dd,1d) { illegal_1(); op_1d();                            } /* DB   DD          */
-OP(dd,1e) { illegal_1(); op_1e();                            } /* DB   DD          */
-OP(dd,1f) { illegal_1(); op_1f();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,18) THEN illegal_1(); JP(18)
+/* ADD  IX,DE      */ OP(DD,19) THEN TDAT=IX; TDAT2=DE; CALL add16(); THEN IX=TDAT;    ENDOP
+/* DB   DD         */ OP(DD,1a) THEN illegal_1(); JP(1a)
+/* DB   DD         */ OP(DD,1b) THEN illegal_1(); JP(1b)
+/* DB   DD         */ OP(DD,1c) THEN illegal_1(); JP(1c)
+/* DB   DD         */ OP(DD,1d) THEN illegal_1(); JP(1d)
+/* DB   DD         */ OP(DD,1e) THEN illegal_1(); JP(1e)
+/* DB   DD         */ OP(DD,1f) THEN illegal_1(); JP(1f)
 
-OP(dd,20) { illegal_1(); op_20();                            } /* DB   DD          */
-OP(dd,21) { IX = arg16();                                    } /* LD   IX,w        */
-OP(dd,22) { m_ea = arg16(); wm16(m_ea, m_ix); WZ = m_ea + 1; } /* LD   (w),IX      */
-OP(dd,23) { nomreq_ir(2); IX++;                              } /* INC  IX          */
-OP(dd,24) { HX = inc(HX);                                    } /* INC  HX          */
-OP(dd,25) { HX = dec(HX);                                    } /* DEC  HX          */
-OP(dd,26) { HX = arg();                                      } /* LD   HX,n        */
-OP(dd,27) { illegal_1(); op_27();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,20) THEN illegal_1(); JP(20)
+/* LD   IX,w       */ OP(DD,21) CALL arg16(); THEN IX = TDAT;                          ENDOP
+/* LD   (w),IX     */ OP(DD,22) CALL arg16(); THEN m_ea=TDAT; TADR=m_ea; TDAT=IX; CALL wm16(); THEN WZ = m_ea + 1; ENDOP
+/* INC  IX         */ OP(DD,23) CALL nomreq_ir(2); THEN IX++;                          ENDOP
+/* INC  HX         */ OP(DD,24) THEN inc(HX);                                          ENDOP
+/* DEC  HX         */ OP(DD,25) THEN dec(HX);                                          ENDOP
+/* LD   HX,n       */ OP(DD,26) CALL arg(); THEN HX = TDAT8;                           ENDOP
+/* DB   DD         */ OP(DD,27) THEN illegal_1(); JP(27)
 
-OP(dd,28) { illegal_1(); op_28();                            } /* DB   DD          */
-OP(dd,29) { add16(m_ix, m_ix);                               } /* ADD  IX,IX       */
-OP(dd,2a) { m_ea = arg16(); rm16(m_ea, m_ix); WZ = m_ea + 1; } /* LD   IX,(w)      */
-OP(dd,2b) { nomreq_ir(2); IX--;                              } /* DEC  IX          */
-OP(dd,2c) { LX = inc(LX);                                    } /* INC  LX          */
-OP(dd,2d) { LX = dec(LX);                                    } /* DEC  LX          */
-OP(dd,2e) { LX = arg();                                      } /* LD   LX,n        */
-OP(dd,2f) { illegal_1(); op_2f();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,28) THEN illegal_1(); JP(28)
+/* ADD  IX,IX      */ OP(DD,29) THEN TDAT=IX; TDAT2=IX; CALL add16(); THEN IX=TDAT;    ENDOP
+/* LD   IX,(w)     */ OP(DD,2a) CALL arg16(); THEN m_ea=TDAT; TADR=m_ea; CALL rm16(); THEN IX=TDAT; WZ = m_ea + 1; ENDOP
+/* DEC  IX         */ OP(DD,2b) CALL nomreq_ir(2); THEN IX--;                          ENDOP
+/* INC  LX         */ OP(DD,2c) THEN inc(LX);                                          ENDOP
+/* DEC  LX         */ OP(DD,2d) THEN dec(LX);                                          ENDOP
+/* LD   LX,n       */ OP(DD,2e) CALL arg(); THEN LX = TDAT8;                           ENDOP
+/* DB   DD         */ OP(DD,2f) THEN illegal_1(); JP(2f)
 
-OP(dd,30) { illegal_1(); op_30();                            } /* DB   DD          */
-OP(dd,31) { illegal_1(); op_31();                            } /* DB   DD          */
-OP(dd,32) { illegal_1(); op_32();                            } /* DB   DD          */
-OP(dd,33) { illegal_1(); op_33();                            } /* DB   DD          */
-OP(dd,34) { eax(); nomreq_addr(PCD-1, 5); wm(m_ea, inc(rm_reg(m_ea))); } /* INC  (IX+o)      */
-OP(dd,35) { eax(); nomreq_addr(PCD-1, 5); wm(m_ea, dec(rm_reg(m_ea))); } /* DEC  (IX+o)      */
-OP(dd,36) { eax(); u8 a = arg(); nomreq_addr(PCD-1, 2); wm(m_ea, a);               } /* LD   (IX+o),n    */
-OP(dd,37) { illegal_1(); op_37();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,30) THEN illegal_1(); JP(30)
+/* DB   DD         */ OP(DD,31) THEN illegal_1(); JP(31)
+/* DB   DD         */ OP(DD,32) THEN illegal_1(); JP(32)
+/* DB   DD         */ OP(DD,33) THEN illegal_1(); JP(33)
+/* INC  (IX+o)     */ OP(DD,34) CALL eax(); THEN TADR=PCD-1; CALL nomreq_addr(5); THEN TADR=m_ea; CALL rm_reg(); THEN inc(TDAT8); CALL wm(); ENDOP
+/* DEC  (IX+o)     */ OP(DD,35) CALL eax(); THEN TADR=PCD-1; CALL nomreq_addr(5); THEN TADR=m_ea; CALL rm_reg(); THEN dec(TDAT8); CALL wm(); ENDOP
+/* LD   (IX+o),n   */ OP(DD,36) CALL eax(); CALL arg(); THEN TADR=PCD-1; CALL nomreq_addr(2); THEN TADR=m_ea; CALL wm(); ENDOP
+/* DB   DD         */ OP(DD,37) THEN illegal_1(); JP(37)
 
-OP(dd,38) { illegal_1(); op_38();                            } /* DB   DD          */
-OP(dd,39) { add16(m_ix, m_sp);                               } /* ADD  IX,SP       */
-OP(dd,3a) { illegal_1(); op_3a();                            } /* DB   DD          */
-OP(dd,3b) { illegal_1(); op_3b();                            } /* DB   DD          */
-OP(dd,3c) { illegal_1(); op_3c();                            } /* DB   DD          */
-OP(dd,3d) { illegal_1(); op_3d();                            } /* DB   DD          */
-OP(dd,3e) { illegal_1(); op_3e();                            } /* DB   DD          */
-OP(dd,3f) { illegal_1(); op_3f();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,38) THEN illegal_1(); JP(38)
+/* ADD  IX,SP      */ OP(DD,39) THEN TDAT=IX; TDAT2=SP; CALL add16(); THEN IX=TDAT;   ENDOP
+/* DB   DD         */ OP(DD,3a) THEN illegal_1(); JP(3a)
+/* DB   DD         */ OP(DD,3b) THEN illegal_1(); JP(3b)
+/* DB   DD         */ OP(DD,3c) THEN illegal_1(); JP(3c)
+/* DB   DD         */ OP(DD,3d) THEN illegal_1(); JP(3d)
+/* DB   DD         */ OP(DD,3e) THEN illegal_1(); JP(3e)
+/* DB   DD         */ OP(DD,3f) THEN illegal_1(); JP(3f)
 
-OP(dd,40) { illegal_1(); op_40();                            } /* DB   DD          */
-OP(dd,41) { illegal_1(); op_41();                            } /* DB   DD          */
-OP(dd,42) { illegal_1(); op_42();                            } /* DB   DD          */
-OP(dd,43) { illegal_1(); op_43();                            } /* DB   DD          */
-OP(dd,44) { B = HX;                                          } /* LD   B,HX        */
-OP(dd,45) { B = LX;                                          } /* LD   B,LX        */
-OP(dd,46) { eax(); nomreq_addr(PCD-1, 5); B = rm(m_ea);      } /* LD   B,(IX+o)    */
-OP(dd,47) { illegal_1(); op_47();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,40) THEN illegal_1(); JP(40)
+/* DB   DD         */ OP(DD,41) THEN illegal_1(); JP(41)
+/* DB   DD         */ OP(DD,42) THEN illegal_1(); JP(42)
+/* DB   DD         */ OP(DD,43) THEN illegal_1(); JP(43)
+/* LD   B,HX       */ OP(DD,44) THEN B = HX;                                          ENDOP
+/* LD   B,LX       */ OP(DD,45) THEN B = LX;                                          ENDOP
+/* LD   B,(IX+o)   */ OP(DD,46) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN B = TDAT8; ENDOP
+/* DB   DD         */ OP(DD,47) THEN illegal_1(); JP(47)
 
-OP(dd,48) { illegal_1(); op_48();                            } /* DB   DD          */
-OP(dd,49) { illegal_1(); op_49();                            } /* DB   DD          */
-OP(dd,4a) { illegal_1(); op_4a();                            } /* DB   DD          */
-OP(dd,4b) { illegal_1(); op_4b();                            } /* DB   DD          */
-OP(dd,4c) { C = HX;                                          } /* LD   C,HX        */
-OP(dd,4d) { C = LX;                                          } /* LD   C,LX        */
-OP(dd,4e) { eax(); nomreq_addr(PCD-1, 5); C = rm(m_ea);      } /* LD   C,(IX+o)    */
-OP(dd,4f) { illegal_1(); op_4f();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,48) THEN illegal_1(); JP(48)
+/* DB   DD         */ OP(DD,49) THEN illegal_1(); JP(49)
+/* DB   DD         */ OP(DD,4a) THEN illegal_1(); JP(4a)
+/* DB   DD         */ OP(DD,4b) THEN illegal_1(); JP(4b)
+/* LD   C,HX       */ OP(DD,4c) THEN C = HX;                                          ENDOP
+/* LD   C,LX       */ OP(DD,4d) THEN C = LX;                                          ENDOP
+/* LD   C,(IX+o)   */ OP(DD,4e) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN C = TDAT8; ENDOP
+/* DB   DD         */ OP(DD,4f) THEN illegal_1(); JP(4f)
 
-OP(dd,50) { illegal_1(); op_50();                            } /* DB   DD          */
-OP(dd,51) { illegal_1(); op_51();                            } /* DB   DD          */
-OP(dd,52) { illegal_1(); op_52();                            } /* DB   DD          */
-OP(dd,53) { illegal_1(); op_53();                            } /* DB   DD          */
-OP(dd,54) { D = HX;                                          } /* LD   D,HX        */
-OP(dd,55) { D = LX;                                          } /* LD   D,LX        */
-OP(dd,56) { eax(); nomreq_addr(PCD-1, 5); D = rm(m_ea);      } /* LD   D,(IX+o)    */
-OP(dd,57) { illegal_1(); op_57();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,50) THEN illegal_1(); JP(50)
+/* DB   DD         */ OP(DD,51) THEN illegal_1(); JP(51)
+/* DB   DD         */ OP(DD,52) THEN illegal_1(); JP(52)
+/* DB   DD         */ OP(DD,53) THEN illegal_1(); JP(53)
+/* LD   D,HX       */ OP(DD,54) THEN D = HX;                                          ENDOP
+/* LD   D,LX       */ OP(DD,55) THEN D = LX;                                          ENDOP
+/* LD   D,(IX+o)   */ OP(DD,56) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN D = TDAT8; ENDOP
+/* DB   DD         */ OP(DD,57) THEN illegal_1(); JP(57)
 
-OP(dd,58) { illegal_1(); op_58();                            } /* DB   DD          */
-OP(dd,59) { illegal_1(); op_59();                            } /* DB   DD          */
-OP(dd,5a) { illegal_1(); op_5a();                            } /* DB   DD          */
-OP(dd,5b) { illegal_1(); op_5b();                            } /* DB   DD          */
-OP(dd,5c) { E = HX;                                          } /* LD   E,HX        */
-OP(dd,5d) { E = LX;                                          } /* LD   E,LX        */
-OP(dd,5e) { eax(); nomreq_addr(PCD-1, 5); E = rm(m_ea);      } /* LD   E,(IX+o)    */
-OP(dd,5f) { illegal_1(); op_5f();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,58) THEN illegal_1(); JP(58)
+/* DB   DD         */ OP(DD,59) THEN illegal_1(); JP(59)
+/* DB   DD         */ OP(DD,5a) THEN illegal_1(); JP(5a)
+/* DB   DD         */ OP(DD,5b) THEN illegal_1(); JP(5b)
+/* LD   E,HX       */ OP(DD,5c) THEN E = HX;                                          ENDOP
+/* LD   E,LX       */ OP(DD,5d) THEN E = LX;                                          ENDOP
+/* LD   E,(IX+o)   */ OP(DD,5e) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN E = TDAT8; ENDOP
+/* DB   DD         */ OP(DD,5f) THEN illegal_1(); JP(5f)
 
-OP(dd,60) { HX = B;                                          } /* LD   HX,B        */
-OP(dd,61) { HX = C;                                          } /* LD   HX,C        */
-OP(dd,62) { HX = D;                                          } /* LD   HX,D        */
-OP(dd,63) { HX = E;                                          } /* LD   HX,E        */
-OP(dd,64) {                                                  } /* LD   HX,HX       */
-OP(dd,65) { HX = LX;                                         } /* LD   HX,LX       */
-OP(dd,66) { eax(); nomreq_addr(PCD-1, 5); H = rm(m_ea);      } /* LD   H,(IX+o)    */
-OP(dd,67) { HX = A;                                          } /* LD   HX,A        */
+/* LD   HX,B       */ OP(DD,60) THEN HX = B;                                          ENDOP
+/* LD   HX,C       */ OP(DD,61) THEN HX = C;                                          ENDOP
+/* LD   HX,D       */ OP(DD,62) THEN HX = D;                                          ENDOP
+/* LD   HX,E       */ OP(DD,63) THEN HX = E;                                          ENDOP
+/* LD   HX,HX      */ OP(DD,64)                                                   ENDOP
+/* LD   HX,LX      */ OP(DD,65) THEN HX = LX;                                         ENDOP
+/* LD   H,(IX+o)   */ OP(DD,66) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN H = TDAT8; ENDOP
+/* LD   HX,A       */ OP(DD,67) THEN HX = A;                                          ENDOP
 
-OP(dd,68) { LX = B;                                          } /* LD   LX,B        */
-OP(dd,69) { LX = C;                                          } /* LD   LX,C        */
-OP(dd,6a) { LX = D;                                          } /* LD   LX,D        */
-OP(dd,6b) { LX = E;                                          } /* LD   LX,E        */
-OP(dd,6c) { LX = HX;                                         } /* LD   LX,HX       */
-OP(dd,6d) {                                                  } /* LD   LX,LX       */
-OP(dd,6e) { eax(); nomreq_addr(PCD-1, 5); L = rm(m_ea);      } /* LD   L,(IX+o)    */
-OP(dd,6f) { LX = A;                                          } /* LD   LX,A        */
+/* LD   LX,B       */ OP(DD,68) THEN LX = B;                                          ENDOP
+/* LD   LX,C       */ OP(DD,69) THEN LX = C;                                          ENDOP
+/* LD   LX,D       */ OP(DD,6a) THEN LX = D;                                          ENDOP
+/* LD   LX,E       */ OP(DD,6b) THEN LX = E;                                          ENDOP
+/* LD   LX,HX      */ OP(DD,6c) THEN LX = HX;                                         ENDOP
+/* LD   LX,LX      */ OP(DD,6d)                                                   ENDOP
+/* LD   L,(IX+o)   */ OP(DD,6e) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN L = TDAT8; ENDOP
+/* LD   LX,A       */ OP(DD,6f) THEN LX = A;                                          ENDOP
 
-OP(dd,70) { eax(); nomreq_addr(PCD-1, 5); wm(m_ea, B);       } /* LD   (IX+o),B    */
-OP(dd,71) { eax(); nomreq_addr(PCD-1, 5); wm(m_ea, C);       } /* LD   (IX+o),C    */
-OP(dd,72) { eax(); nomreq_addr(PCD-1, 5); wm(m_ea, D);       } /* LD   (IX+o),D    */
-OP(dd,73) { eax(); nomreq_addr(PCD-1, 5); wm(m_ea, E);       } /* LD   (IX+o),E    */
-OP(dd,74) { eax(); nomreq_addr(PCD-1, 5); wm(m_ea, H);       } /* LD   (IX+o),H    */
-OP(dd,75) { eax(); nomreq_addr(PCD-1, 5); wm(m_ea, L);       } /* LD   (IX+o),L    */
-OP(dd,76) { illegal_1(); op_76();                            } /* DB   DD          */
-OP(dd,77) { eax(); nomreq_addr(PCD-1, 5); wm(m_ea, A);       } /* LD   (IX+o),A    */
+/* LD   (IX+o),B   */ OP(DD,70) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; TDAT8 = B; CALL wm(); ENDOP
+/* LD   (IX+o),C   */ OP(DD,71) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; TDAT8 = C; CALL wm(); ENDOP
+/* LD   (IX+o),D   */ OP(DD,72) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; TDAT8 = D; CALL wm(); ENDOP
+/* LD   (IX+o),E   */ OP(DD,73) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; TDAT8 = E; CALL wm(); ENDOP
+/* LD   (IX+o),H   */ OP(DD,74) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; TDAT8 = H; CALL wm(); ENDOP
+/* LD   (IX+o),L   */ OP(DD,75) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; TDAT8 = L; CALL wm(); ENDOP
+/* DB   DD         */ OP(DD,76) THEN illegal_1(); JP(76)
+/* LD   (IX+o),A   */ OP(DD,77) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; TDAT8 = A; CALL wm(); ENDOP
 
-OP(dd,78) { illegal_1(); op_78();                            } /* DB   DD          */
-OP(dd,79) { illegal_1(); op_79();                            } /* DB   DD          */
-OP(dd,7a) { illegal_1(); op_7a();                            } /* DB   DD          */
-OP(dd,7b) { illegal_1(); op_7b();                            } /* DB   DD          */
-OP(dd,7c) { A = HX;                                          } /* LD   A,HX        */
-OP(dd,7d) { A = LX;                                          } /* LD   A,LX        */
-OP(dd,7e) { eax(); nomreq_addr(PCD-1, 5); A = rm(m_ea);      } /* LD   A,(IX+o)    */
-OP(dd,7f) { illegal_1(); op_7f();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,78) THEN illegal_1(); JP(78)
+/* DB   DD         */ OP(DD,79) THEN illegal_1(); JP(79)
+/* DB   DD         */ OP(DD,7a) THEN illegal_1(); JP(7a)
+/* DB   DD         */ OP(DD,7b) THEN illegal_1(); JP(7b)
+/* LD   A,HX       */ OP(DD,7c) THEN A = HX;                                          ENDOP
+/* LD   A,LX       */ OP(DD,7d) THEN A = LX;                                          ENDOP
+/* LD   A,(IX+o)   */ OP(DD,7e) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN A = TDAT8; ENDOP
+/* DB   DD         */ OP(DD,7f) THEN illegal_1(); JP(7f)
 
-OP(dd,80) { illegal_1(); op_80();                            } /* DB   DD          */
-OP(dd,81) { illegal_1(); op_81();                            } /* DB   DD          */
-OP(dd,82) { illegal_1(); op_82();                            } /* DB   DD          */
-OP(dd,83) { illegal_1(); op_83();                            } /* DB   DD          */
-OP(dd,84) { add_a(HX);                                       } /* ADD  A,HX        */
-OP(dd,85) { add_a(LX);                                       } /* ADD  A,LX        */
-OP(dd,86) { eax(); nomreq_addr(PCD-1, 5); add_a(rm(m_ea));   } /* ADD  A,(IX+o)    */
-OP(dd,87) { illegal_1(); op_87();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,80) THEN illegal_1(); JP(80)
+/* DB   DD         */ OP(DD,81) THEN illegal_1(); JP(81)
+/* DB   DD         */ OP(DD,82) THEN illegal_1(); JP(82)
+/* DB   DD         */ OP(DD,83) THEN illegal_1(); JP(83)
+/* ADD  A,HX       */ OP(DD,84) THEN add_a(HX);                                       ENDOP
+/* ADD  A,LX       */ OP(DD,85) THEN add_a(LX);                                       ENDOP
+/* ADD  A,(IX+o)   */ OP(DD,86) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN add_a(TDAT8); ENDOP
+/* DB   DD         */ OP(DD,87) THEN illegal_1(); JP(87)
 
-OP(dd,88) { illegal_1(); op_88();                            } /* DB   DD          */
-OP(dd,89) { illegal_1(); op_89();                            } /* DB   DD          */
-OP(dd,8a) { illegal_1(); op_8a();                            } /* DB   DD          */
-OP(dd,8b) { illegal_1(); op_8b();                            } /* DB   DD          */
-OP(dd,8c) { adc_a(HX);                                       } /* ADC  A,HX        */
-OP(dd,8d) { adc_a(LX);                                       } /* ADC  A,LX        */
-OP(dd,8e) { eax(); nomreq_addr(PCD-1, 5); adc_a(rm(m_ea));   } /* ADC  A,(IX+o)    */
-OP(dd,8f) { illegal_1(); op_8f();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,88) THEN illegal_1(); JP(88)
+/* DB   DD         */ OP(DD,89) THEN illegal_1(); JP(89)
+/* DB   DD         */ OP(DD,8a) THEN illegal_1(); JP(8a)
+/* DB   DD         */ OP(DD,8b) THEN illegal_1(); JP(8b)
+/* ADC  A,HX       */ OP(DD,8c) THEN adc_a(HX);                                       ENDOP
+/* ADC  A,LX       */ OP(DD,8d) THEN adc_a(LX);                                       ENDOP
+/* ADC  A,(IX+o)   */ OP(DD,8e) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN adc_a(TDAT8); ENDOP
+/* DB   DD         */ OP(DD,8f) THEN illegal_1(); JP(8f)
 
-OP(dd,90) { illegal_1(); op_90();                            } /* DB   DD          */
-OP(dd,91) { illegal_1(); op_91();                            } /* DB   DD          */
-OP(dd,92) { illegal_1(); op_92();                            } /* DB   DD          */
-OP(dd,93) { illegal_1(); op_93();                            } /* DB   DD          */
-OP(dd,94) { sub(HX);                                         } /* SUB  HX          */
-OP(dd,95) { sub(LX);                                         } /* SUB  LX          */
-OP(dd,96) { eax(); nomreq_addr(PCD-1, 5); sub(rm(m_ea));     } /* SUB  (IX+o)      */
-OP(dd,97) { illegal_1(); op_97();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,90) THEN illegal_1(); JP(90)
+/* DB   DD         */ OP(DD,91) THEN illegal_1(); JP(91)
+/* DB   DD         */ OP(DD,92) THEN illegal_1(); JP(92)
+/* DB   DD         */ OP(DD,93) THEN illegal_1(); JP(93)
+/* SUB  HX         */ OP(DD,94) THEN sub(HX);                                         ENDOP
+/* SUB  LX         */ OP(DD,95) THEN sub(LX);                                         ENDOP
+/* SUB  (IX+o)     */ OP(DD,96) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN sub(TDAT8); ENDOP
+/* DB   DD         */ OP(DD,97) THEN illegal_1(); JP(97)
 
-OP(dd,98) { illegal_1(); op_98();                            } /* DB   DD          */
-OP(dd,99) { illegal_1(); op_99();                            } /* DB   DD          */
-OP(dd,9a) { illegal_1(); op_9a();                            } /* DB   DD          */
-OP(dd,9b) { illegal_1(); op_9b();                            } /* DB   DD          */
-OP(dd,9c) { sbc_a(HX);                                       } /* SBC  A,HX        */
-OP(dd,9d) { sbc_a(LX);                                       } /* SBC  A,LX        */
-OP(dd,9e) { eax(); nomreq_addr(PCD-1, 5); sbc_a(rm(m_ea));   } /* SBC  A,(IX+o)    */
-OP(dd,9f) { illegal_1(); op_9f();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,98) THEN illegal_1(); JP(98)
+/* DB   DD         */ OP(DD,99) THEN illegal_1(); JP(99)
+/* DB   DD         */ OP(DD,9a) THEN illegal_1(); JP(9a)
+/* DB   DD         */ OP(DD,9b) THEN illegal_1(); JP(9b)
+/* SBC  A,HX       */ OP(DD,9c) THEN sbc_a(HX);                                       ENDOP
+/* SBC  A,LX       */ OP(DD,9d) THEN sbc_a(LX);                                       ENDOP
+/* SBC  A,(IX+o)   */ OP(DD,9e) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN sbc_a(TDAT8); ENDOP
+/* DB   DD         */ OP(DD,9f) THEN illegal_1(); JP(9f)
 
-OP(dd,a0) { illegal_1(); op_a0();                            } /* DB   DD          */
-OP(dd,a1) { illegal_1(); op_a1();                            } /* DB   DD          */
-OP(dd,a2) { illegal_1(); op_a2();                            } /* DB   DD          */
-OP(dd,a3) { illegal_1(); op_a3();                            } /* DB   DD          */
-OP(dd,a4) { and_a(HX);                                       } /* AND  HX          */
-OP(dd,a5) { and_a(LX);                                       } /* AND  LX          */
-OP(dd,a6) { eax(); nomreq_addr(PCD-1, 5); and_a(rm(m_ea));   } /* AND  (IX+o)      */
-OP(dd,a7) { illegal_1(); op_a7();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,a0) THEN illegal_1(); JP(a0)
+/* DB   DD         */ OP(DD,a1) THEN illegal_1(); JP(a1)
+/* DB   DD         */ OP(DD,a2) THEN illegal_1(); JP(a2)
+/* DB   DD         */ OP(DD,a3) THEN illegal_1(); JP(a3)
+/* AND  HX         */ OP(DD,a4) THEN and_a(HX);                                       ENDOP
+/* AND  LX         */ OP(DD,a5) THEN and_a(LX);                                       ENDOP
+/* AND  (IX+o)     */ OP(DD,a6) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN and_a(TDAT8); ENDOP
+/* DB   DD         */ OP(DD,a7) THEN illegal_1(); JP(a7)
 
-OP(dd,a8) { illegal_1(); op_a8();                            } /* DB   DD          */
-OP(dd,a9) { illegal_1(); op_a9();                            } /* DB   DD          */
-OP(dd,aa) { illegal_1(); op_aa();                            } /* DB   DD          */
-OP(dd,ab) { illegal_1(); op_ab();                            } /* DB   DD          */
-OP(dd,ac) { xor_a(HX);                                       } /* XOR  HX          */
-OP(dd,ad) { xor_a(LX);                                       } /* XOR  LX          */
-OP(dd,ae) { eax(); nomreq_addr(PCD-1, 5); xor_a(rm(m_ea));   } /* XOR  (IX+o)      */
-OP(dd,af) { illegal_1(); op_af();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,a8) THEN illegal_1(); JP(a8)
+/* DB   DD         */ OP(DD,a9) THEN illegal_1(); JP(a9)
+/* DB   DD         */ OP(DD,aa) THEN illegal_1(); JP(aa)
+/* DB   DD         */ OP(DD,ab) THEN illegal_1(); JP(ab)
+/* XOR  HX         */ OP(DD,ac) THEN xor_a(HX);                                       ENDOP
+/* XOR  LX         */ OP(DD,ad) THEN xor_a(LX);                                       ENDOP
+/* XOR  (IX+o)     */ OP(DD,ae) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN xor_a(TDAT8); ENDOP
+/* DB   DD         */ OP(DD,af) THEN illegal_1(); JP(af)
 
-OP(dd,b0) { illegal_1(); op_b0();                            } /* DB   DD          */
-OP(dd,b1) { illegal_1(); op_b1();                            } /* DB   DD          */
-OP(dd,b2) { illegal_1(); op_b2();                            } /* DB   DD          */
-OP(dd,b3) { illegal_1(); op_b3();                            } /* DB   DD          */
-OP(dd,b4) { or_a(HX);                                        } /* OR   HX          */
-OP(dd,b5) { or_a(LX);                                        } /* OR   LX          */
-OP(dd,b6) { eax(); nomreq_addr(PCD-1, 5); or_a(rm(m_ea));    } /* OR   (IX+o)      */
-OP(dd,b7) { illegal_1(); op_b7();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,b0) THEN illegal_1(); JP(b0)
+/* DB   DD         */ OP(DD,b1) THEN illegal_1(); JP(b1)
+/* DB   DD         */ OP(DD,b2) THEN illegal_1(); JP(b2)
+/* DB   DD         */ OP(DD,b3) THEN illegal_1(); JP(b3)
+/* OR   HX         */ OP(DD,b4) THEN or_a(HX);                                        ENDOP
+/* OR   LX         */ OP(DD,b5) THEN or_a(LX);                                        ENDOP
+/* OR   (IX+o)     */ OP(DD,b6) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN or_a(TDAT8); ENDOP
+/* DB   DD         */ OP(DD,b7) THEN illegal_1(); JP(b7)
 
-OP(dd,b8) { illegal_1(); op_b8();                            } /* DB   DD          */
-OP(dd,b9) { illegal_1(); op_b9();                            } /* DB   DD          */
-OP(dd,ba) { illegal_1(); op_ba();                            } /* DB   DD          */
-OP(dd,bb) { illegal_1(); op_bb();                            } /* DB   DD          */
-OP(dd,bc) { cp(HX);                                          } /* CP   HX          */
-OP(dd,bd) { cp(LX);                                          } /* CP   LX          */
-OP(dd,be) { eax(); nomreq_addr(PCD-1, 5); cp(rm(m_ea));      } /* CP   (IX+o)      */
-OP(dd,bf) { illegal_1(); op_bf();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,b8) THEN illegal_1(); JP(b8)
+/* DB   DD         */ OP(DD,b9) THEN illegal_1(); JP(b9)
+/* DB   DD         */ OP(DD,ba) THEN illegal_1(); JP(ba)
+/* DB   DD         */ OP(DD,bb) THEN illegal_1(); JP(bb)
+/* CP   HX         */ OP(DD,bc) THEN cp(HX);                                          ENDOP
+/* CP   LX         */ OP(DD,bd) THEN cp(LX);                                          ENDOP
+/* CP   (IX+o)     */ OP(DD,be) CALL eax(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN cp(TDAT8); ENDOP
+/* DB   DD         */ OP(DD,bf) THEN illegal_1(); JP(bf)
 
-OP(dd,c0) { illegal_1(); op_c0();                            } /* DB   DD          */
-OP(dd,c1) { illegal_1(); op_c1();                            } /* DB   DD          */
-OP(dd,c2) { illegal_1(); op_c2();                            } /* DB   DD          */
-OP(dd,c3) { illegal_1(); op_c3();                            } /* DB   DD          */
-OP(dd,c4) { illegal_1(); op_c4();                            } /* DB   DD          */
-OP(dd,c5) { illegal_1(); op_c5();                            } /* DB   DD          */
-OP(dd,c6) { illegal_1(); op_c6();                            } /* DB   DD          */
-OP(dd,c7) { illegal_1(); op_c7();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,c0) THEN illegal_1(); JP(c0)
+/* DB   DD         */ OP(DD,c1) THEN illegal_1(); JP(c1)
+/* DB   DD         */ OP(DD,c2) THEN illegal_1(); JP(c2)
+/* DB   DD         */ OP(DD,c3) THEN illegal_1(); JP(c3)
+/* DB   DD         */ OP(DD,c4) THEN illegal_1(); JP(c4)
+/* DB   DD         */ OP(DD,c5) THEN illegal_1(); JP(c5)
+/* DB   DD         */ OP(DD,c6) THEN illegal_1(); JP(c6)
+/* DB   DD         */ OP(DD,c7) THEN illegal_1(); JP(c7)
 
-OP(dd,c8) { illegal_1(); op_c8();                            } /* DB   DD          */
-OP(dd,c9) { illegal_1(); op_c9();                            } /* DB   DD          */
-OP(dd,ca) { illegal_1(); op_ca();                            } /* DB   DD          */
-OP(dd,cb) { eax(); u8 a = arg(); nomreq_addr(PCD-1, 2); EXEC(xycb, a);  } /* **   DD CB xx    */
-OP(dd,cc) { illegal_1(); op_cc();                            } /* DB   DD          */
-OP(dd,cd) { illegal_1(); op_cd();                            } /* DB   DD          */
-OP(dd,ce) { illegal_1(); op_ce();                            } /* DB   DD          */
-OP(dd,cf) { illegal_1(); op_cf();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,c8) THEN illegal_1(); JP(c8)
+/* DB   DD         */ OP(DD,c9) THEN illegal_1(); JP(c9)
+/* DB   DD         */ OP(DD,ca) THEN illegal_1(); JP(ca)
+/* **   DD CB xx   */ OP(DD,cb) CALL eax(); CALL arg(); THEN TADR=PCD-1; CALL nomreq_addr(2); THENJP(XY_CB)
+/* DB   DD         */ OP(DD,cc) THEN illegal_1(); JP(cc)
+/* DB   DD         */ OP(DD,cd) THEN illegal_1(); JP(cd)
+/* DB   DD         */ OP(DD,ce) THEN illegal_1(); JP(ce)
+/* DB   DD         */ OP(DD,cf) THEN illegal_1(); JP(cf)
 
-OP(dd,d0) { illegal_1(); op_d0();                            } /* DB   DD          */
-OP(dd,d1) { illegal_1(); op_d1();                            } /* DB   DD          */
-OP(dd,d2) { illegal_1(); op_d2();                            } /* DB   DD          */
-OP(dd,d3) { illegal_1(); op_d3();                            } /* DB   DD          */
-OP(dd,d4) { illegal_1(); op_d4();                            } /* DB   DD          */
-OP(dd,d5) { illegal_1(); op_d5();                            } /* DB   DD          */
-OP(dd,d6) { illegal_1(); op_d6();                            } /* DB   DD          */
-OP(dd,d7) { illegal_1(); op_d7();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,d0) THEN illegal_1(); JP(d0)
+/* DB   DD         */ OP(DD,d1) THEN illegal_1(); JP(d1)
+/* DB   DD         */ OP(DD,d2) THEN illegal_1(); JP(d2)
+/* DB   DD         */ OP(DD,d3) THEN illegal_1(); JP(d3)
+/* DB   DD         */ OP(DD,d4) THEN illegal_1(); JP(d4)
+/* DB   DD         */ OP(DD,d5) THEN illegal_1(); JP(d5)
+/* DB   DD         */ OP(DD,d6) THEN illegal_1(); JP(d6)
+/* DB   DD         */ OP(DD,d7) THEN illegal_1(); JP(d7)
 
-OP(dd,d8) { illegal_1(); op_d8();                            } /* DB   DD          */
-OP(dd,d9) { illegal_1(); op_d9();                            } /* DB   DD          */
-OP(dd,da) { illegal_1(); op_da();                            } /* DB   DD          */
-OP(dd,db) { illegal_1(); op_db();                            } /* DB   DD          */
-OP(dd,dc) { illegal_1(); op_dc();                            } /* DB   DD          */
-OP(dd,dd) { illegal_1(); op_dd();                            } /* DB   DD          */
-OP(dd,de) { illegal_1(); op_de();                            } /* DB   DD          */
-OP(dd,df) { illegal_1(); op_df();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,d8) THEN illegal_1(); JP(d8)
+/* DB   DD         */ OP(DD,d9) THEN illegal_1(); JP(d9)
+/* DB   DD         */ OP(DD,da) THEN illegal_1(); JP(da)
+/* DB   DD         */ OP(DD,db) THEN illegal_1(); JP(db)
+/* DB   DD         */ OP(DD,dc) THEN illegal_1(); JP(dc)
+/* DB   DD         */ OP(DD,dd) THEN illegal_1(); JP(dd)
+/* DB   DD         */ OP(DD,de) THEN illegal_1(); JP(de)
+/* DB   DD         */ OP(DD,df) THEN illegal_1(); JP(df)
 
-OP(dd,e0) { illegal_1(); op_e0();                            } /* DB   DD          */
-OP(dd,e1) { pop(m_ix);                                       } /* POP  IX          */
-OP(dd,e2) { illegal_1(); op_e2();                            } /* DB   DD          */
-OP(dd,e3) { ex_sp(m_ix);                                     } /* EX   (SP),IX     */
-OP(dd,e4) { illegal_1(); op_e4();                            } /* DB   DD          */
-OP(dd,e5) { push(m_ix);                                      } /* PUSH IX          */
-OP(dd,e6) { illegal_1(); op_e6();                            } /* DB   DD          */
-OP(dd,e7) { illegal_1(); op_e7();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,e0) THEN illegal_1(); JP(e0)
+/* POP  IX         */ OP(DD,e1) CALL pop(); THEN IX=TDAT;                              ENDOP
+/* DB   DD         */ OP(DD,e2) THEN illegal_1(); JP(e2)
+/* EX   (SP),IX    */ OP(DD,e3) THEN TDAT=IX; CALL ex_sp(); THEN IX=TDAT;              ENDOP
+/* DB   DD         */ OP(DD,e4) THEN illegal_1(); JP(e4)
+/* PUSH IX         */ OP(DD,e5) THEN TDAT=IX; CALL push();                             ENDOP
+/* DB   DD         */ OP(DD,e6) THEN illegal_1(); JP(e6)
+/* DB   DD         */ OP(DD,e7) THEN illegal_1(); JP(e7)
 
-OP(dd,e8) { illegal_1(); op_e8();                            } /* DB   DD          */
-OP(dd,e9) { PC = IX;                                         } /* JP   (IX)        */
-OP(dd,ea) { illegal_1(); op_ea();                            } /* DB   DD          */
-OP(dd,eb) { illegal_1(); op_eb();                            } /* DB   DD          */
-OP(dd,ec) { illegal_1(); op_ec();                            } /* DB   DD          */
-OP(dd,ed) { illegal_1(); op_ed();                            } /* DB   DD          */
-OP(dd,ee) { illegal_1(); op_ee();                            } /* DB   DD          */
-OP(dd,ef) { illegal_1(); op_ef();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,e8) THEN illegal_1(); JP(e8)
+/* JP   (IX)       */ OP(DD,e9) THEN PC = IX;                                          ENDOP
+/* DB   DD         */ OP(DD,ea) THEN illegal_1(); JP(ea)
+/* DB   DD         */ OP(DD,eb) THEN illegal_1(); JP(eb)
+/* DB   DD         */ OP(DD,ec) THEN illegal_1(); JP(ec)
+/* DB   DD         */ OP(DD,ed) THEN illegal_1(); JP(ed)
+/* DB   DD         */ OP(DD,ee) THEN illegal_1(); JP(ee)
+/* DB   DD         */ OP(DD,ef) THEN illegal_1(); JP(ef)
 
-OP(dd,f0) { illegal_1(); op_f0();                            } /* DB   DD          */
-OP(dd,f1) { illegal_1(); op_f1();                            } /* DB   DD          */
-OP(dd,f2) { illegal_1(); op_f2();                            } /* DB   DD          */
-OP(dd,f3) { illegal_1(); op_f3();                            } /* DB   DD          */
-OP(dd,f4) { illegal_1(); op_f4();                            } /* DB   DD          */
-OP(dd,f5) { illegal_1(); op_f5();                            } /* DB   DD          */
-OP(dd,f6) { illegal_1(); op_f6();                            } /* DB   DD          */
-OP(dd,f7) { illegal_1(); op_f7();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,f0) THEN illegal_1(); JP(f0)
+/* DB   DD         */ OP(DD,f1) THEN illegal_1(); JP(f1)
+/* DB   DD         */ OP(DD,f2) THEN illegal_1(); JP(f2)
+/* DB   DD         */ OP(DD,f3) THEN illegal_1(); JP(f3)
+/* DB   DD         */ OP(DD,f4) THEN illegal_1(); JP(f4)
+/* DB   DD         */ OP(DD,f5) THEN illegal_1(); JP(f5)
+/* DB   DD         */ OP(DD,f6) THEN illegal_1(); JP(f6)
+/* DB   DD         */ OP(DD,f7) THEN illegal_1(); JP(f7)
 
-OP(dd,f8) { illegal_1(); op_f8();                            } /* DB   DD          */
-OP(dd,f9) { nomreq_ir(2); SP = IX;                           } /* LD   SP,IX       */
-OP(dd,fa) { illegal_1(); op_fa();                            } /* DB   DD          */
-OP(dd,fb) { illegal_1(); op_fb();                            } /* DB   DD          */
-OP(dd,fc) { illegal_1(); op_fc();                            } /* DB   DD          */
-OP(dd,fd) { illegal_1(); op_fd();                            } /* DB   DD          */
-OP(dd,fe) { illegal_1(); op_fe();                            } /* DB   DD          */
-OP(dd,ff) { illegal_1(); op_ff();                            } /* DB   DD          */
+/* DB   DD         */ OP(DD,f8) THEN illegal_1(); JP(f8)
+/* LD   SP,IX      */ OP(DD,f9) CALL nomreq_ir(2); THEN SP = IX;                       ENDOP
+/* DB   DD         */ OP(DD,fa) THEN illegal_1(); JP(fa)
+/* DB   DD         */ OP(DD,fb) THEN illegal_1(); JP(fb)
+/* DB   DD         */ OP(DD,fc) THEN illegal_1(); JP(fc)
+/* DB   DD         */ OP(DD,fd) THEN illegal_1(); JP(fd)
+/* DB   DD         */ OP(DD,fe) THEN illegal_1(); JP(fe)
+/* DB   DD         */ OP(DD,ff) THEN illegal_1(); JP(ff)
 
 /**********************************************************
  * IY register related opcodes (FD prefix)
  **********************************************************/
-OP(fd,00) { illegal_1(); op_00();                            } /* DB   FD          */
-OP(fd,01) { illegal_1(); op_01();                            } /* DB   FD          */
-OP(fd,02) { illegal_1(); op_02();                            } /* DB   FD          */
-OP(fd,03) { illegal_1(); op_03();                            } /* DB   FD          */
-OP(fd,04) { illegal_1(); op_04();                            } /* DB   FD          */
-OP(fd,05) { illegal_1(); op_05();                            } /* DB   FD          */
-OP(fd,06) { illegal_1(); op_06();                            } /* DB   FD          */
-OP(fd,07) { illegal_1(); op_07();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,00) THEN illegal_1(); JP(00)
+/* DB   FD         */ OP(FD,01) THEN illegal_1(); JP(01)
+/* DB   FD         */ OP(FD,02) THEN illegal_1(); JP(02)
+/* DB   FD         */ OP(FD,03) THEN illegal_1(); JP(03)
+/* DB   FD         */ OP(FD,04) THEN illegal_1(); JP(04)
+/* DB   FD         */ OP(FD,05) THEN illegal_1(); JP(05)
+/* DB   FD         */ OP(FD,06) THEN illegal_1(); JP(06)
+/* DB   FD         */ OP(FD,07) THEN illegal_1(); JP(07)
 
-OP(fd,08) { illegal_1(); op_08();                            } /* DB   FD          */
-OP(fd,09) { add16(m_iy, m_bc);                               } /* ADD  IY,BC       */
-OP(fd,0a) { illegal_1(); op_0a();                            } /* DB   FD          */
-OP(fd,0b) { illegal_1(); op_0b();                            } /* DB   FD          */
-OP(fd,0c) { illegal_1(); op_0c();                            } /* DB   FD          */
-OP(fd,0d) { illegal_1(); op_0d();                            } /* DB   FD          */
-OP(fd,0e) { illegal_1(); op_0e();                            } /* DB   FD          */
-OP(fd,0f) { illegal_1(); op_0f();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,08) THEN illegal_1(); JP(08)
+/* ADD  IY,BC      */ OP(FD,09) THEN TDAT=IY; TDAT2=BC; CALL add16(); THEN IY=TDAT;    ENDOP
+/* DB   FD         */ OP(FD,0a) THEN illegal_1(); JP(0a)
+/* DB   FD         */ OP(FD,0b) THEN illegal_1(); JP(0b)
+/* DB   FD         */ OP(FD,0c) THEN illegal_1(); JP(0c)
+/* DB   FD         */ OP(FD,0d) THEN illegal_1(); JP(0d)
+/* DB   FD         */ OP(FD,0e) THEN illegal_1(); JP(0e)
+/* DB   FD         */ OP(FD,0f) THEN illegal_1(); JP(0f)
 
-OP(fd,10) { illegal_1(); op_10();                            } /* DB   FD          */
-OP(fd,11) { illegal_1(); op_11();                            } /* DB   FD          */
-OP(fd,12) { illegal_1(); op_12();                            } /* DB   FD          */
-OP(fd,13) { illegal_1(); op_13();                            } /* DB   FD          */
-OP(fd,14) { illegal_1(); op_14();                            } /* DB   FD          */
-OP(fd,15) { illegal_1(); op_15();                            } /* DB   FD          */
-OP(fd,16) { illegal_1(); op_16();                            } /* DB   FD          */
-OP(fd,17) { illegal_1(); op_17();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,10) THEN illegal_1(); JP(10)
+/* DB   FD         */ OP(FD,11) THEN illegal_1(); JP(11)
+/* DB   FD         */ OP(FD,12) THEN illegal_1(); JP(12)
+/* DB   FD         */ OP(FD,13) THEN illegal_1(); JP(13)
+/* DB   FD         */ OP(FD,14) THEN illegal_1(); JP(14)
+/* DB   FD         */ OP(FD,15) THEN illegal_1(); JP(15)
+/* DB   FD         */ OP(FD,16) THEN illegal_1(); JP(16)
+/* DB   FD         */ OP(FD,17) THEN illegal_1(); JP(17)
 
-OP(fd,18) { illegal_1(); op_18();                            } /* DB   FD          */
-OP(fd,19) { add16(m_iy, m_de);                               } /* ADD  IY,DE       */
-OP(fd,1a) { illegal_1(); op_1a();                            } /* DB   FD          */
-OP(fd,1b) { illegal_1(); op_1b();                            } /* DB   FD          */
-OP(fd,1c) { illegal_1(); op_1c();                            } /* DB   FD          */
-OP(fd,1d) { illegal_1(); op_1d();                            } /* DB   FD          */
-OP(fd,1e) { illegal_1(); op_1e();                            } /* DB   FD          */
-OP(fd,1f) { illegal_1(); op_1f();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,18) THEN illegal_1(); JP(18)
+/* ADD  IY,DE      */ OP(FD,19) THEN TDAT=IY; TDAT2=DE; CALL add16(); THEN IY=TDAT;    ENDOP
+/* DB   FD         */ OP(FD,1a) THEN illegal_1(); JP(1a)
+/* DB   FD         */ OP(FD,1b) THEN illegal_1(); JP(1b)
+/* DB   FD         */ OP(FD,1c) THEN illegal_1(); JP(1c)
+/* DB   FD         */ OP(FD,1d) THEN illegal_1(); JP(1d)
+/* DB   FD         */ OP(FD,1e) THEN illegal_1(); JP(1e)
+/* DB   FD         */ OP(FD,1f) THEN illegal_1(); JP(1f)
 
-OP(fd,20) { illegal_1(); op_20();                            } /* DB   FD          */
-OP(fd,21) { IY = arg16();                                    } /* LD   IY,w        */
-OP(fd,22) { m_ea = arg16(); wm16(m_ea, m_iy); WZ = m_ea + 1; } /* LD   (w),IY      */
-OP(fd,23) { nomreq_ir(2); IY++;                              } /* INC  IY          */
-OP(fd,24) { HY = inc(HY);                                    } /* INC  HY          */
-OP(fd,25) { HY = dec(HY);                                    } /* DEC  HY          */
-OP(fd,26) { HY = arg();                                      } /* LD   HY,n        */
-OP(fd,27) { illegal_1(); op_27();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,20) THEN illegal_1(); JP(20)
+/* LD   IY,w       */ OP(FD,21) CALL arg16(); THEN IY = TDAT;                          ENDOP
+/* LD   (w),IY     */ OP(FD,22) CALL arg16(); THEN m_ea=TDAT; TADR=m_ea; TDAT=IY; CALL wm16(); THEN WZ = m_ea + 1; ENDOP
+/* INC  IY         */ OP(FD,23) CALL nomreq_ir(2); THEN IY++;                          ENDOP
+/* INC  HY         */ OP(FD,24) THEN inc(HY);                                          ENDOP
+/* DEC  HY         */ OP(FD,25) THEN dec(HY);                                          ENDOP
+/* LD   HY,n       */ OP(FD,26) CALL arg(); THEN HY = TDAT8;                           ENDOP
+/* DB   FD         */ OP(FD,27) THEN illegal_1(); JP(27)
 
-OP(fd,28) { illegal_1(); op_28();                            } /* DB   FD          */
-OP(fd,29) { add16(m_iy, m_iy);                               } /* ADD  IY,IY       */
-OP(fd,2a) { m_ea = arg16(); rm16(m_ea, m_iy); WZ = m_ea + 1; } /* LD   IY,(w)      */
-OP(fd,2b) { nomreq_ir(2); IY--;                              } /* DEC  IY          */
-OP(fd,2c) { LY = inc(LY);                                    } /* INC  LY          */
-OP(fd,2d) { LY = dec(LY);                                    } /* DEC  LY          */
-OP(fd,2e) { LY = arg();                                      } /* LD   LY,n        */
-OP(fd,2f) { illegal_1(); op_2f();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,28) THEN illegal_1(); JP(28)
+/* ADD  IY,IY      */ OP(FD,29) THEN TDAT=IY; TDAT2=IY; CALL add16(); THEN IY=TDAT;    ENDOP
+/* LD   IY,(w)     */ OP(FD,2a) CALL arg16(); THEN m_ea=TDAT; TADR=m_ea; CALL rm16(); THEN IY=TDAT; WZ = m_ea + 1; ENDOP
+/* DEC  IY         */ OP(FD,2b) CALL nomreq_ir(2); THEN IY--;                          ENDOP
+/* INC  LY         */ OP(FD,2c) THEN inc(LY);                                          ENDOP
+/* DEC  LY         */ OP(FD,2d) THEN dec(LY);                                          ENDOP
+/* LD   LY,n       */ OP(FD,2e) CALL arg(); THEN LY = TDAT8;                           ENDOP
+/* DB   FD         */ OP(FD,2f) THEN illegal_1(); JP(2f)
 
-OP(fd,30) { illegal_1(); op_30();                            } /* DB   FD          */
-OP(fd,31) { illegal_1(); op_31();                            } /* DB   FD          */
-OP(fd,32) { illegal_1(); op_32();                            } /* DB   FD          */
-OP(fd,33) { illegal_1(); op_33();                            } /* DB   FD          */
-OP(fd,34) { eay(); nomreq_addr(PCD-1, 5); wm(m_ea, inc(rm_reg(m_ea))); }   /* INC  (IY+o)      */
-OP(fd,35) { eay(); nomreq_addr(PCD-1, 5); wm(m_ea, dec(rm_reg(m_ea))); }   /* DEC  (IY+o)      */
-OP(fd,36) { eay(); u8 a = arg(); nomreq_addr(PCD-1, 2); wm(m_ea, a);               }   /* LD   (IY+o),n    */
-OP(fd,37) { illegal_1(); op_37();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,30) THEN illegal_1(); JP(30)
+/* DB   FD         */ OP(FD,31) THEN illegal_1(); JP(31)
+/* DB   FD         */ OP(FD,32) THEN illegal_1(); JP(32)
+/* DB   FD         */ OP(FD,33) THEN illegal_1(); JP(33)
+/* INC  (IY+o)     */ OP(FD,34) CALL eay(); THEN TADR=PCD-1; CALL nomreq_addr(5); THEN TADR=m_ea; CALL rm_reg(); THEN inc(TDAT8); CALL wm(); ENDOP
+/* DEC  (IY+o)     */ OP(FD,35) CALL eay(); THEN TADR=PCD-1; CALL nomreq_addr(5); THEN TADR=m_ea; CALL rm_reg(); THEN dec(TDAT8); CALL wm(); ENDOP
+/* LD   (IY+o),n   */ OP(FD,36) CALL eay(); CALL arg(); THEN TADR=PCD-1; CALL nomreq_addr(2); THEN TADR=m_ea; CALL wm(); ENDOP
+/* DB   FD         */ OP(FD,37) THEN illegal_1(); JP(37)
 
-OP(fd,38) { illegal_1(); op_38();                            } /* DB   FD          */
-OP(fd,39) { add16(m_iy, m_sp);                               } /* ADD  IY,SP       */
-OP(fd,3a) { illegal_1(); op_3a();                            } /* DB   FD          */
-OP(fd,3b) { illegal_1(); op_3b();                            } /* DB   FD          */
-OP(fd,3c) { illegal_1(); op_3c();                            } /* DB   FD          */
-OP(fd,3d) { illegal_1(); op_3d();                            } /* DB   FD          */
-OP(fd,3e) { illegal_1(); op_3e();                            } /* DB   FD          */
-OP(fd,3f) { illegal_1(); op_3f();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,38) THEN illegal_1(); JP(38)
+/* ADD  IY,SP      */ OP(FD,39) THEN TDAT=IY; TDAT2=SP; CALL add16(); THEN IY=TDAT;    ENDOP
+/* DB   FD         */ OP(FD,3a) THEN illegal_1(); JP(3a)
+/* DB   FD         */ OP(FD,3b) THEN illegal_1(); JP(3b)
+/* DB   FD         */ OP(FD,3c) THEN illegal_1(); JP(3c)
+/* DB   FD         */ OP(FD,3d) THEN illegal_1(); JP(3d)
+/* DB   FD         */ OP(FD,3e) THEN illegal_1(); JP(3e)
+/* DB   FD         */ OP(FD,3f) THEN illegal_1(); JP(3f)
 
-OP(fd,40) { illegal_1(); op_40();                            } /* DB   FD          */
-OP(fd,41) { illegal_1(); op_41();                            } /* DB   FD          */
-OP(fd,42) { illegal_1(); op_42();                            } /* DB   FD          */
-OP(fd,43) { illegal_1(); op_43();                            } /* DB   FD          */
-OP(fd,44) { B = HY;                                          } /* LD   B,HY        */
-OP(fd,45) { B = LY;                                          } /* LD   B,LY        */
-OP(fd,46) { eay(); nomreq_addr(PCD-1, 5); B = rm(m_ea);      } /* LD   B,(IY+o)    */
-OP(fd,47) { illegal_1(); op_47();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,40) THEN illegal_1(); JP(40)
+/* DB   FD         */ OP(FD,41) THEN illegal_1(); JP(41)
+/* DB   FD         */ OP(FD,42) THEN illegal_1(); JP(42)
+/* DB   FD         */ OP(FD,43) THEN illegal_1(); JP(43)
+/* LD   B,HY       */ OP(FD,44) THEN B = HY;                                           ENDOP
+/* LD   B,LY       */ OP(FD,45) THEN B = LY;                                           ENDOP
+/* LD   B,(IY+o)   */ OP(FD,46) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN B = TDAT8; ENDOP
+/* DB   FD         */ OP(FD,47) THEN illegal_1(); JP(47)
 
-OP(fd,48) { illegal_1(); op_48();                            } /* DB   FD          */
-OP(fd,49) { illegal_1(); op_49();                            } /* DB   FD          */
-OP(fd,4a) { illegal_1(); op_4a();                            } /* DB   FD          */
-OP(fd,4b) { illegal_1(); op_4b();                            } /* DB   FD          */
-OP(fd,4c) { C = HY;                                          } /* LD   C,HY        */
-OP(fd,4d) { C = LY;                                          } /* LD   C,LY        */
-OP(fd,4e) { eay(); nomreq_addr(PCD-1, 5); C = rm(m_ea);      } /* LD   C,(IY+o)    */
-OP(fd,4f) { illegal_1(); op_4f();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,48) THEN illegal_1(); JP(48)
+/* DB   FD         */ OP(FD,49) THEN illegal_1(); JP(49)
+/* DB   FD         */ OP(FD,4a) THEN illegal_1(); JP(4a)
+/* DB   FD         */ OP(FD,4b) THEN illegal_1(); JP(4b)
+/* LD   C,HY       */ OP(FD,4c) THEN C = HY;                                           ENDOP
+/* LD   C,LY       */ OP(FD,4d) THEN C = LY;                                           ENDOP
+/* LD   C,(IY+o)   */ OP(FD,4e) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN C = TDAT8; ENDOP
+/* DB   FD         */ OP(FD,4f) THEN illegal_1(); JP(4f)
 
-OP(fd,50) { illegal_1(); op_50();                            } /* DB   FD          */
-OP(fd,51) { illegal_1(); op_51();                            } /* DB   FD          */
-OP(fd,52) { illegal_1(); op_52();                            } /* DB   FD          */
-OP(fd,53) { illegal_1(); op_53();                            } /* DB   FD          */
-OP(fd,54) { D = HY;                                          } /* LD   D,HY        */
-OP(fd,55) { D = LY;                                          } /* LD   D,LY        */
-OP(fd,56) { eay(); nomreq_addr(PCD-1, 5); D = rm(m_ea);      } /* LD   D,(IY+o)    */
-OP(fd,57) { illegal_1(); op_57();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,50) THEN illegal_1(); JP(50)
+/* DB   FD         */ OP(FD,51) THEN illegal_1(); JP(51)
+/* DB   FD         */ OP(FD,52) THEN illegal_1(); JP(52)
+/* DB   FD         */ OP(FD,53) THEN illegal_1(); JP(53)
+/* LD   D,HY       */ OP(FD,54) THEN D = HY;                                           ENDOP
+/* LD   D,LY       */ OP(FD,55) THEN D = LY;                                           ENDOP
+/* LD   D,(IY+o)   */ OP(FD,56) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN D = TDAT8; ENDOP
+/* DB   FD         */ OP(FD,57) THEN illegal_1(); JP(57)
 
-OP(fd,58) { illegal_1(); op_58();                            } /* DB   FD          */
-OP(fd,59) { illegal_1(); op_59();                            } /* DB   FD          */
-OP(fd,5a) { illegal_1(); op_5a();                            } /* DB   FD          */
-OP(fd,5b) { illegal_1(); op_5b();                            } /* DB   FD          */
-OP(fd,5c) { E = HY;                                          } /* LD   E,HY        */
-OP(fd,5d) { E = LY;                                          } /* LD   E,LY        */
-OP(fd,5e) { eay(); nomreq_addr(PCD-1, 5); E = rm(m_ea);      } /* LD   E,(IY+o)    */
-OP(fd,5f) { illegal_1(); op_5f();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,58) THEN illegal_1(); JP(58)
+/* DB   FD         */ OP(FD,59) THEN illegal_1(); JP(59)
+/* DB   FD         */ OP(FD,5a) THEN illegal_1(); JP(5a)
+/* DB   FD         */ OP(FD,5b) THEN illegal_1(); JP(5b)
+/* LD   E,HY       */ OP(FD,5c) THEN E = HY;                                           ENDOP
+/* LD   E,LY       */ OP(FD,5d) THEN E = LY;                                           ENDOP
+/* LD   E,(IY+o)   */ OP(FD,5e) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN E = TDAT8; ENDOP
+/* DB   FD         */ OP(FD,5f) THEN illegal_1(); JP(5f)
 
-OP(fd,60) { HY = B;                                          } /* LD   HY,B        */
-OP(fd,61) { HY = C;                                          } /* LD   HY,C        */
-OP(fd,62) { HY = D;                                          } /* LD   HY,D        */
-OP(fd,63) { HY = E;                                          } /* LD   HY,E        */
-OP(fd,64) {                                                  } /* LD   HY,HY       */
-OP(fd,65) { HY = LY;                                         } /* LD   HY,LY       */
-OP(fd,66) { eay(); nomreq_addr(PCD-1, 5); H = rm(m_ea);      } /* LD   H,(IY+o)    */
-OP(fd,67) { HY = A;                                          } /* LD   HY,A        */
+/* LD   HY,B       */ OP(FD,60) THEN HY = B;                                           ENDOP
+/* LD   HY,C       */ OP(FD,61) THEN HY = C;                                           ENDOP
+/* LD   HY,D       */ OP(FD,62) THEN HY = D;                                           ENDOP
+/* LD   HY,E       */ OP(FD,63) THEN HY = E;                                           ENDOP
+/* LD   HY,HY      */ OP(FD,64)                                                        ENDOP
+/* LD   HY,LY      */ OP(FD,65) THEN HY = LY;                                          ENDOP
+/* LD   H,(IY+o)   */ OP(FD,66) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN H = TDAT8; ENDOP
+/* LD   HY,A       */ OP(FD,67) THEN HY = A;                                           ENDOP
 
-OP(fd,68) { LY = B;                                          } /* LD   LY,B        */
-OP(fd,69) { LY = C;                                          } /* LD   LY,C        */
-OP(fd,6a) { LY = D;                                          } /* LD   LY,D        */
-OP(fd,6b) { LY = E;                                          } /* LD   LY,E        */
-OP(fd,6c) { LY = HY;                                         } /* LD   LY,HY       */
-OP(fd,6d) {                                                  } /* LD   LY,LY       */
-OP(fd,6e) { eay(); nomreq_addr(PCD-1, 5); L = rm(m_ea);      } /* LD   L,(IY+o)    */
-OP(fd,6f) { LY = A;                                          } /* LD   LY,A        */
+/* LD   LY,B       */ OP(FD,68) THEN LY = B;                                           ENDOP
+/* LD   LY,C       */ OP(FD,69) THEN LY = C;                                           ENDOP
+/* LD   LY,D       */ OP(FD,6a) THEN LY = D;                                           ENDOP
+/* LD   LY,E       */ OP(FD,6b) THEN LY = E;                                           ENDOP
+/* LD   LY,HY      */ OP(FD,6c) THEN LY = HY;                                          ENDOP
+/* LD   LY,LY      */ OP(FD,6d)                                                        ENDOP
+/* LD   L,(IY+o)   */ OP(FD,6e) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN L = TDAT8; ENDOP
+/* LD   LY,A       */ OP(FD,6f) THEN LY = A;                                           ENDOP
 
-OP(fd,70) { eay(); nomreq_addr(PCD-1, 5); wm(m_ea, B);       } /* LD   (IY+o),B    */
-OP(fd,71) { eay(); nomreq_addr(PCD-1, 5); wm(m_ea, C);       } /* LD   (IY+o),C    */
-OP(fd,72) { eay(); nomreq_addr(PCD-1, 5); wm(m_ea, D);       } /* LD   (IY+o),D    */
-OP(fd,73) { eay(); nomreq_addr(PCD-1, 5); wm(m_ea, E);       } /* LD   (IY+o),E    */
-OP(fd,74) { eay(); nomreq_addr(PCD-1, 5); wm(m_ea, H);       } /* LD   (IY+o),H    */
-OP(fd,75) { eay(); nomreq_addr(PCD-1, 5); wm(m_ea, L);       } /* LD   (IY+o),L    */
-OP(fd,76) { illegal_1(); op_76();                            } /* DB   FD          */
-OP(fd,77) { eay(); nomreq_addr(PCD-1, 5); wm(m_ea, A);       } /* LD   (IY+o),A    */
+/* LD   (IY+o),B   */ OP(FD,70) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; TDAT8 = B; CALL wm(); ENDOP
+/* LD   (IY+o),C   */ OP(FD,71) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; TDAT8 = C; CALL wm(); ENDOP
+/* LD   (IY+o),D   */ OP(FD,72) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; TDAT8 = D; CALL wm(); ENDOP
+/* LD   (IY+o),E   */ OP(FD,73) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; TDAT8 = E; CALL wm(); ENDOP
+/* LD   (IY+o),H   */ OP(FD,74) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; TDAT8 = H; CALL wm(); ENDOP
+/* LD   (IY+o),L   */ OP(FD,75) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; TDAT8 = L; CALL wm(); ENDOP
+/* DB   FD         */ OP(FD,76) THEN illegal_1(); JP(76)
+/* LD   (IY+o),A   */ OP(FD,77) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; TDAT8 = A; CALL wm(); ENDOP
 
-OP(fd,78) { illegal_1(); op_78();                            } /* DB   FD          */
-OP(fd,79) { illegal_1(); op_79();                            } /* DB   FD          */
-OP(fd,7a) { illegal_1(); op_7a();                            } /* DB   FD          */
-OP(fd,7b) { illegal_1(); op_7b();                            } /* DB   FD          */
-OP(fd,7c) { A = HY;                                          } /* LD   A,HY        */
-OP(fd,7d) { A = LY;                                          } /* LD   A,LY        */
-OP(fd,7e) { eay(); nomreq_addr(PCD-1, 5); A = rm(m_ea);      } /* LD   A,(IY+o)    */
-OP(fd,7f) { illegal_1(); op_7f();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,78) THEN illegal_1(); JP(78)
+/* DB   FD         */ OP(FD,79) THEN illegal_1(); JP(79)
+/* DB   FD         */ OP(FD,7a) THEN illegal_1(); JP(7a)
+/* DB   FD         */ OP(FD,7b) THEN illegal_1(); JP(7b)
+/* LD   A,HY       */ OP(FD,7c) THEN A = HY;                                          ENDOP
+/* LD   A,LY       */ OP(FD,7d) THEN A = LY;                                          ENDOP
+/* LD   A,(IY+o)   */ OP(FD,7e) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN A = TDAT8; ENDOP
+/* DB   FD         */ OP(FD,7f) THEN illegal_1(); JP(7f)
 
-OP(fd,80) { illegal_1(); op_80();                            } /* DB   FD          */
-OP(fd,81) { illegal_1(); op_81();                            } /* DB   FD          */
-OP(fd,82) { illegal_1(); op_82();                            } /* DB   FD          */
-OP(fd,83) { illegal_1(); op_83();                            } /* DB   FD          */
-OP(fd,84) { add_a(HY);                                       } /* ADD  A,HY        */
-OP(fd,85) { add_a(LY);                                       } /* ADD  A,LY        */
-OP(fd,86) { eay(); nomreq_addr(PCD-1, 5); add_a(rm(m_ea));   } /* ADD  A,(IY+o)    */
-OP(fd,87) { illegal_1(); op_87();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,80) THEN illegal_1(); JP(80)
+/* DB   FD         */ OP(FD,81) THEN illegal_1(); JP(81)
+/* DB   FD         */ OP(FD,82) THEN illegal_1(); JP(82)
+/* DB   FD         */ OP(FD,83) THEN illegal_1(); JP(83)
+/* ADD  A,HY       */ OP(FD,84) THEN add_a(HY);                                       ENDOP
+/* ADD  A,LY       */ OP(FD,85) THEN add_a(LY);                                       ENDOP
+/* ADD  A,(IY+o)   */ OP(FD,86) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN add_a(TDAT8); ENDOP
+/* DB   FD         */ OP(FD,87) THEN illegal_1(); JP(87)
 
-OP(fd,88) { illegal_1(); op_88();                            } /* DB   FD          */
-OP(fd,89) { illegal_1(); op_89();                            } /* DB   FD          */
-OP(fd,8a) { illegal_1(); op_8a();                            } /* DB   FD          */
-OP(fd,8b) { illegal_1(); op_8b();                            } /* DB   FD          */
-OP(fd,8c) { adc_a(HY);                                       } /* ADC  A,HY        */
-OP(fd,8d) { adc_a(LY);                                       } /* ADC  A,LY        */
-OP(fd,8e) { eay(); nomreq_addr(PCD-1, 5); adc_a(rm(m_ea));   } /* ADC  A,(IY+o)    */
-OP(fd,8f) { illegal_1(); op_8f();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,88) THEN illegal_1(); JP(88)
+/* DB   FD         */ OP(FD,89) THEN illegal_1(); JP(89)
+/* DB   FD         */ OP(FD,8a) THEN illegal_1(); JP(8a)
+/* DB   FD         */ OP(FD,8b) THEN illegal_1(); JP(8b)
+/* ADC  A,HY       */ OP(FD,8c) THEN adc_a(HY);                                       ENDOP
+/* ADC  A,LY       */ OP(FD,8d) THEN adc_a(LY);                                       ENDOP
+/* ADC  A,(IY+o)   */ OP(FD,8e) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN adc_a(TDAT8); ENDOP
+/* DB   FD         */ OP(FD,8f) THEN illegal_1(); JP(8f)
 
-OP(fd,90) { illegal_1(); op_90();                            } /* DB   FD          */
-OP(fd,91) { illegal_1(); op_91();                            } /* DB   FD          */
-OP(fd,92) { illegal_1(); op_92();                            } /* DB   FD          */
-OP(fd,93) { illegal_1(); op_93();                            } /* DB   FD          */
-OP(fd,94) { sub(HY);                                         } /* SUB  HY          */
-OP(fd,95) { sub(LY);                                         } /* SUB  LY          */
-OP(fd,96) { eay(); nomreq_addr(PCD-1, 5); sub(rm(m_ea));     } /* SUB  (IY+o)      */
-OP(fd,97) { illegal_1(); op_97();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,90) THEN illegal_1(); JP(90)
+/* DB   FD         */ OP(FD,91) THEN illegal_1(); JP(91)
+/* DB   FD         */ OP(FD,92) THEN illegal_1(); JP(92)
+/* DB   FD         */ OP(FD,93) THEN illegal_1(); JP(93)
+/* SUB  HY         */ OP(FD,94) THEN sub(HY);                                         ENDOP
+/* SUB  LY         */ OP(FD,95) THEN sub(LY);                                         ENDOP
+/* SUB  (IY+o)     */ OP(FD,96) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN sub(TDAT8); ENDOP
+/* DB   FD         */ OP(FD,97) THEN illegal_1(); JP(97)
 
-OP(fd,98) { illegal_1(); op_98();                            } /* DB   FD          */
-OP(fd,99) { illegal_1(); op_99();                            } /* DB   FD          */
-OP(fd,9a) { illegal_1(); op_9a();                            } /* DB   FD          */
-OP(fd,9b) { illegal_1(); op_9b();                            } /* DB   FD          */
-OP(fd,9c) { sbc_a(HY);                                       } /* SBC  A,HY        */
-OP(fd,9d) { sbc_a(LY);                                       } /* SBC  A,LY        */
-OP(fd,9e) { eay(); nomreq_addr(PCD-1, 5); sbc_a(rm(m_ea));   } /* SBC  A,(IY+o)    */
-OP(fd,9f) { illegal_1(); op_9f();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,98) THEN illegal_1(); JP(98)
+/* DB   FD         */ OP(FD,99) THEN illegal_1(); JP(99)
+/* DB   FD         */ OP(FD,9a) THEN illegal_1(); JP(9a)
+/* DB   FD         */ OP(FD,9b) THEN illegal_1(); JP(9b)
+/* SBC  A,HY       */ OP(FD,9c) THEN sbc_a(HY);                                       ENDOP
+/* SBC  A,LY       */ OP(FD,9d) THEN sbc_a(LY);                                       ENDOP
+/* SBC  A,(IY+o)   */ OP(FD,9e) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN sbc_a(TDAT8); ENDOP
+/* DB   FD         */ OP(FD,9f) THEN illegal_1(); JP(9f)
 
-OP(fd,a0) { illegal_1(); op_a0();                            } /* DB   FD          */
-OP(fd,a1) { illegal_1(); op_a1();                            } /* DB   FD          */
-OP(fd,a2) { illegal_1(); op_a2();                            } /* DB   FD          */
-OP(fd,a3) { illegal_1(); op_a3();                            } /* DB   FD          */
-OP(fd,a4) { and_a(HY);                                       } /* AND  HY          */
-OP(fd,a5) { and_a(LY);                                       } /* AND  LY          */
-OP(fd,a6) { eay(); nomreq_addr(PCD-1, 5); and_a(rm(m_ea));   } /* AND  (IY+o)      */
-OP(fd,a7) { illegal_1(); op_a7();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,a0) THEN illegal_1(); JP(a0)
+/* DB   FD         */ OP(FD,a1) THEN illegal_1(); JP(a1)
+/* DB   FD         */ OP(FD,a2) THEN illegal_1(); JP(a2)
+/* DB   FD         */ OP(FD,a3) THEN illegal_1(); JP(a3)
+/* AND  HY         */ OP(FD,a4) THEN and_a(HY);                                       ENDOP
+/* AND  LY         */ OP(FD,a5) THEN and_a(LY);                                       ENDOP
+/* AND  (IY+o)     */ OP(FD,a6) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN and_a(TDAT8); ENDOP
+/* DB   FD         */ OP(FD,a7) THEN illegal_1(); JP(a7)
 
-OP(fd,a8) { illegal_1(); op_a8();                            } /* DB   FD          */
-OP(fd,a9) { illegal_1(); op_a9();                            } /* DB   FD          */
-OP(fd,aa) { illegal_1(); op_aa();                            } /* DB   FD          */
-OP(fd,ab) { illegal_1(); op_ab();                            } /* DB   FD          */
-OP(fd,ac) { xor_a(HY);                                       } /* XOR  HY          */
-OP(fd,ad) { xor_a(LY);                                       } /* XOR  LY          */
-OP(fd,ae) { eay(); nomreq_addr(PCD-1, 5); xor_a(rm(m_ea));   } /* XOR  (IY+o)      */
-OP(fd,af) { illegal_1(); op_af();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,a8) THEN illegal_1(); JP(a8)
+/* DB   FD         */ OP(FD,a9) THEN illegal_1(); JP(a9)
+/* DB   FD         */ OP(FD,aa) THEN illegal_1(); JP(aa)
+/* DB   FD         */ OP(FD,ab) THEN illegal_1(); JP(ab)
+/* XOR  HY         */ OP(FD,ac) THEN xor_a(HY);                                       ENDOP
+/* XOR  LY         */ OP(FD,ad) THEN xor_a(LY);                                       ENDOP
+/* XOR  (IY+o)     */ OP(FD,ae) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN xor_a(TDAT8); ENDOP
+/* DB   FD         */ OP(FD,af) THEN illegal_1(); JP(af)
 
-OP(fd,b0) { illegal_1(); op_b0();                            } /* DB   FD          */
-OP(fd,b1) { illegal_1(); op_b1();                            } /* DB   FD          */
-OP(fd,b2) { illegal_1(); op_b2();                            } /* DB   FD          */
-OP(fd,b3) { illegal_1(); op_b3();                            } /* DB   FD          */
-OP(fd,b4) { or_a(HY);                                        } /* OR   HY          */
-OP(fd,b5) { or_a(LY);                                        } /* OR   LY          */
-OP(fd,b6) { eay(); nomreq_addr(PCD-1, 5); or_a(rm(m_ea));    } /* OR   (IY+o)      */
-OP(fd,b7) { illegal_1(); op_b7();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,b0) THEN illegal_1(); JP(b0)
+/* DB   FD         */ OP(FD,b1) THEN illegal_1(); JP(b1)
+/* DB   FD         */ OP(FD,b2) THEN illegal_1(); JP(b2)
+/* DB   FD         */ OP(FD,b3) THEN illegal_1(); JP(b3)
+/* OR   HY         */ OP(FD,b4) THEN or_a(HY);                                        ENDOP
+/* OR   LY         */ OP(FD,b5) THEN or_a(LY);                                        ENDOP
+/* OR   (IY+o)     */ OP(FD,b6) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN or_a(TDAT8); ENDOP
+/* DB   FD         */ OP(FD,b7) THEN illegal_1(); JP(b7)
 
-OP(fd,b8) { illegal_1(); op_b8();                            } /* DB   FD          */
-OP(fd,b9) { illegal_1(); op_b9();                            } /* DB   FD          */
-OP(fd,ba) { illegal_1(); op_ba();                            } /* DB   FD          */
-OP(fd,bb) { illegal_1(); op_bb();                            } /* DB   FD          */
-OP(fd,bc) { cp(HY);                                          } /* CP   HY          */
-OP(fd,bd) { cp(LY);                                          } /* CP   LY          */
-OP(fd,be) { eay(); nomreq_addr(PCD-1, 5); cp(rm(m_ea));      } /* CP   (IY+o)      */
-OP(fd,bf) { illegal_1(); op_bf();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,b8) THEN illegal_1(); JP(b8)
+/* DB   FD         */ OP(FD,b9) THEN illegal_1(); JP(b9)
+/* DB   FD         */ OP(FD,ba) THEN illegal_1(); JP(ba)
+/* DB   FD         */ OP(FD,bb) THEN illegal_1(); JP(bb)
+/* CP   HY         */ OP(FD,bc) THEN cp(HY);                                          ENDOP
+/* CP   LY         */ OP(FD,bd) THEN cp(LY);                                          ENDOP
+/* CP   (IY+o)     */ OP(FD,be) CALL eay(); THEN TADR = PCD-1; CALL nomreq_addr(5); THEN TADR = m_ea; CALL rm(); THEN cp(TDAT8); ENDOP
+/* DB   FD         */ OP(FD,bf) THEN illegal_1(); JP(bf)
 
-OP(fd,c0) { illegal_1(); op_c0();                            } /* DB   FD          */
-OP(fd,c1) { illegal_1(); op_c1();                            } /* DB   FD          */
-OP(fd,c2) { illegal_1(); op_c2();                            } /* DB   FD          */
-OP(fd,c3) { illegal_1(); op_c3();                            } /* DB   FD          */
-OP(fd,c4) { illegal_1(); op_c4();                            } /* DB   FD          */
-OP(fd,c5) { illegal_1(); op_c5();                            } /* DB   FD          */
-OP(fd,c6) { illegal_1(); op_c6();                            } /* DB   FD          */
-OP(fd,c7) { illegal_1(); op_c7();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,c0) THEN illegal_1(); JP(c0)
+/* DB   FD         */ OP(FD,c1) THEN illegal_1(); JP(c1)
+/* DB   FD         */ OP(FD,c2) THEN illegal_1(); JP(c2)
+/* DB   FD         */ OP(FD,c3) THEN illegal_1(); JP(c3)
+/* DB   FD         */ OP(FD,c4) THEN illegal_1(); JP(c4)
+/* DB   FD         */ OP(FD,c5) THEN illegal_1(); JP(c5)
+/* DB   FD         */ OP(FD,c6) THEN illegal_1(); JP(c6)
+/* DB   FD         */ OP(FD,c7) THEN illegal_1(); JP(c7)
 
-OP(fd,c8) { illegal_1(); op_c8();                            } /* DB   FD          */
-OP(fd,c9) { illegal_1(); op_c9();                            } /* DB   FD          */
-OP(fd,ca) { illegal_1(); op_ca();                            } /* DB   FD          */
-OP(fd,cb) { eay(); u8 a = arg(); nomreq_addr(PCD-1, 2); EXEC(xycb, a);  } /* **   FD CB xx    */
-OP(fd,cc) { illegal_1(); op_cc();                            } /* DB   FD          */
-OP(fd,cd) { illegal_1(); op_cd();                            } /* DB   FD          */
-OP(fd,ce) { illegal_1(); op_ce();                            } /* DB   FD          */
-OP(fd,cf) { illegal_1(); op_cf();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,c8) THEN illegal_1(); JP(c8)
+/* DB   FD         */ OP(FD,c9) THEN illegal_1(); JP(c9)
+/* DB   FD         */ OP(FD,ca) THEN illegal_1(); JP(ca)
+/* **   FD CB xx   */ OP(FD,cb) CALL eay(); CALL arg(); THEN TADR=PCD-1; CALL nomreq_addr(2); THENJP(XY_CB)
+/* DB   FD         */ OP(FD,cc) THEN illegal_1(); JP(cc)
+/* DB   FD         */ OP(FD,cd) THEN illegal_1(); JP(cd)
+/* DB   FD         */ OP(FD,ce) THEN illegal_1(); JP(ce)
+/* DB   FD         */ OP(FD,cf) THEN illegal_1(); JP(cf)
 
-OP(fd,d0) { illegal_1(); op_d0();                            } /* DB   FD          */
-OP(fd,d1) { illegal_1(); op_d1();                            } /* DB   FD          */
-OP(fd,d2) { illegal_1(); op_d2();                            } /* DB   FD          */
-OP(fd,d3) { illegal_1(); op_d3();                            } /* DB   FD          */
-OP(fd,d4) { illegal_1(); op_d4();                            } /* DB   FD          */
-OP(fd,d5) { illegal_1(); op_d5();                            } /* DB   FD          */
-OP(fd,d6) { illegal_1(); op_d6();                            } /* DB   FD          */
-OP(fd,d7) { illegal_1(); op_d7();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,d0) THEN illegal_1(); JP(d0)
+/* DB   FD         */ OP(FD,d1) THEN illegal_1(); JP(d1)
+/* DB   FD         */ OP(FD,d2) THEN illegal_1(); JP(d2)
+/* DB   FD         */ OP(FD,d3) THEN illegal_1(); JP(d3)
+/* DB   FD         */ OP(FD,d4) THEN illegal_1(); JP(d4)
+/* DB   FD         */ OP(FD,d5) THEN illegal_1(); JP(d5)
+/* DB   FD         */ OP(FD,d6) THEN illegal_1(); JP(d6)
+/* DB   FD         */ OP(FD,d7) THEN illegal_1(); JP(d7)
 
-OP(fd,d8) { illegal_1(); op_d8();                            } /* DB   FD          */
-OP(fd,d9) { illegal_1(); op_d9();                            } /* DB   FD          */
-OP(fd,da) { illegal_1(); op_da();                            } /* DB   FD          */
-OP(fd,db) { illegal_1(); op_db();                            } /* DB   FD          */
-OP(fd,dc) { illegal_1(); op_dc();                            } /* DB   FD          */
-OP(fd,dd) { illegal_1(); op_dd();                            } /* DB   FD          */
-OP(fd,de) { illegal_1(); op_de();                            } /* DB   FD          */
-OP(fd,df) { illegal_1(); op_df();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,d8) THEN illegal_1(); JP(d8)
+/* DB   FD         */ OP(FD,d9) THEN illegal_1(); JP(d9)
+/* DB   FD         */ OP(FD,da) THEN illegal_1(); JP(da)
+/* DB   FD         */ OP(FD,db) THEN illegal_1(); JP(db)
+/* DB   FD         */ OP(FD,dc) THEN illegal_1(); JP(dc)
+/* DB   FD         */ OP(FD,dd) THEN illegal_1(); JP(dd)
+/* DB   FD         */ OP(FD,de) THEN illegal_1(); JP(de)
+/* DB   FD         */ OP(FD,df) THEN illegal_1(); JP(df)
 
-OP(fd,e0) { illegal_1(); op_e0();                            } /* DB   FD          */
-OP(fd,e1) { pop(m_iy);                                       } /* POP  IY          */
-OP(fd,e2) { illegal_1(); op_e2();                            } /* DB   FD          */
-OP(fd,e3) { ex_sp(m_iy);                                     } /* EX   (SP),IY     */
-OP(fd,e4) { illegal_1(); op_e4();                            } /* DB   FD          */
-OP(fd,e5) { push(m_iy);                                      } /* PUSH IY          */
-OP(fd,e6) { illegal_1(); op_e6();                            } /* DB   FD          */
-OP(fd,e7) { illegal_1(); op_e7();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,e0) THEN illegal_1(); JP(e0)
+/* POP  IY         */ OP(FD,e1) CALL pop(); THEN IY=TDAT;                 ENDOP
+/* DB   FD         */ OP(FD,e2) THEN illegal_1(); JP(e2)
+/* EX   (SP),IY    */ OP(FD,e3) THEN TDAT=IY; CALL ex_sp(); THEN IY=TDAT; ENDOP
+/* DB   FD         */ OP(FD,e4) THEN illegal_1(); JP(e4)
+/* PUSH IY         */ OP(FD,e5) THEN TDAT=IY; CALL push();                ENDOP
+/* DB   FD         */ OP(FD,e6) THEN illegal_1(); JP(e6)
+/* DB   FD         */ OP(FD,e7) THEN illegal_1(); JP(e7)
 
-OP(fd,e8) { illegal_1(); op_e8();                            } /* DB   FD          */
-OP(fd,e9) { PC = IY;                                         } /* JP   (IY)        */
-OP(fd,ea) { illegal_1(); op_ea();                            } /* DB   FD          */
-OP(fd,eb) { illegal_1(); op_eb();                            } /* DB   FD          */
-OP(fd,ec) { illegal_1(); op_ec();                            } /* DB   FD          */
-OP(fd,ed) { illegal_1(); op_ed();                            } /* DB   FD          */
-OP(fd,ee) { illegal_1(); op_ee();                            } /* DB   FD          */
-OP(fd,ef) { illegal_1(); op_ef();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,e8) THEN illegal_1(); JP(e8)
+/* JP   (IY)       */ OP(FD,e9) THEN PC = IY;                             ENDOP
+/* DB   FD         */ OP(FD,ea) THEN illegal_1(); JP(ea)
+/* DB   FD         */ OP(FD,eb) THEN illegal_1(); JP(eb)
+/* DB   FD         */ OP(FD,ec) THEN illegal_1(); JP(ec)
+/* DB   FD         */ OP(FD,ed) THEN illegal_1(); JP(ed)
+/* DB   FD         */ OP(FD,ee) THEN illegal_1(); JP(ee)
+/* DB   FD         */ OP(FD,ef) THEN illegal_1(); JP(ef)
 
-OP(fd,f0) { illegal_1(); op_f0();                            } /* DB   FD          */
-OP(fd,f1) { illegal_1(); op_f1();                            } /* DB   FD          */
-OP(fd,f2) { illegal_1(); op_f2();                            } /* DB   FD          */
-OP(fd,f3) { illegal_1(); op_f3();                            } /* DB   FD          */
-OP(fd,f4) { illegal_1(); op_f4();                            } /* DB   FD          */
-OP(fd,f5) { illegal_1(); op_f5();                            } /* DB   FD          */
-OP(fd,f6) { illegal_1(); op_f6();                            } /* DB   FD          */
-OP(fd,f7) { illegal_1(); op_f7();                            } /* DB   FD          */
+/* DB   FD         */ OP(FD,f0) THEN illegal_1(); JP(f0)
+/* DB   FD         */ OP(FD,f1) THEN illegal_1(); JP(f1)
+/* DB   FD         */ OP(FD,f2) THEN illegal_1(); JP(f2)
+/* DB   FD         */ OP(FD,f3) THEN illegal_1(); JP(f3)
+/* DB   FD         */ OP(FD,f4) THEN illegal_1(); JP(f4)
+/* DB   FD         */ OP(FD,f5) THEN illegal_1(); JP(f5)
+/* DB   FD         */ OP(FD,f6) THEN illegal_1(); JP(f6)
+/* DB   FD         */ OP(FD,f7) THEN illegal_1(); JP(f7)
 
-OP(fd,f8) { illegal_1(); op_f8();                            } /* DB   FD          */
-OP(fd,f9) { nomreq_ir(2); SP = IY;                           } /* LD   SP,IY       */
-OP(fd,fa) { illegal_1(); op_fa();                            } /* DB   FD          */
-OP(fd,fb) { illegal_1(); op_fb();                            } /* DB   FD          */
-OP(fd,fc) { illegal_1(); op_fc();                            } /* DB   FD          */
-OP(fd,fd) { illegal_1(); op_fd();                            } /* DB   FD          */
-OP(fd,fe) { illegal_1(); op_fe();                            } /* DB   FD          */
-OP(fd,ff) { illegal_1(); op_ff();                            } /* DB   FD          */
-
-OP(illegal,2)
-{
-	logerror("Z80 ill. opcode $ed $%02x\n",
-			m_opcodes.read_byte(translate_memory_address((PCD-1)&0xffff)));
-}
+/* DB   FD         */ OP(FD,f8) THEN illegal_1(); JP(f8)
+/* LD   SP,IY      */ OP(FD,f9) CALL nomreq_ir(2); THEN SP = IY;                       ENDOP
+/* DB   FD         */ OP(FD,fa) THEN illegal_1(); JP(fa)
+/* DB   FD         */ OP(FD,fb) THEN illegal_1(); JP(fb)
+/* DB   FD         */ OP(FD,fc) THEN illegal_1(); JP(fc)
+/* DB   FD         */ OP(FD,fd) THEN illegal_1(); JP(fd)
+/* DB   FD         */ OP(FD,fe) THEN illegal_1(); JP(fe)
+/* DB   FD         */ OP(FD,ff) THEN illegal_1(); JP(ff)
 
 /**********************************************************
  * special opcodes (ED prefix)
  **********************************************************/
-OP(ed,00) { illegal_2();                                     } /* DB   ED          */
-OP(ed,01) { illegal_2();                                     } /* DB   ED          */
-OP(ed,02) { illegal_2();                                     } /* DB   ED          */
-OP(ed,03) { illegal_2();                                     } /* DB   ED          */
-OP(ed,04) { illegal_2();                                     } /* DB   ED          */
-OP(ed,05) { illegal_2();                                     } /* DB   ED          */
-OP(ed,06) { illegal_2();                                     } /* DB   ED          */
-OP(ed,07) { illegal_2();                                     } /* DB   ED          */
+/* DB   ED         */ OP(ED,00) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,01) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,02) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,03) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,04) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,05) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,06) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,07) THEN illegal_2();                                               ENDOP
 
-OP(ed,08) { illegal_2();                                     } /* DB   ED          */
-OP(ed,09) { illegal_2();                                     } /* DB   ED          */
-OP(ed,0a) { illegal_2();                                     } /* DB   ED          */
-OP(ed,0b) { illegal_2();                                     } /* DB   ED          */
-OP(ed,0c) { illegal_2();                                     } /* DB   ED          */
-OP(ed,0d) { illegal_2();                                     } /* DB   ED          */
-OP(ed,0e) { illegal_2();                                     } /* DB   ED          */
-OP(ed,0f) { illegal_2();                                     } /* DB   ED          */
+/* DB   ED         */ OP(ED,08) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,09) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,0a) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,0b) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,0c) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,0d) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,0e) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,0f) THEN illegal_2();                                               ENDOP
 
-OP(ed,10) { illegal_2();                                     } /* DB   ED          */
-OP(ed,11) { illegal_2();                                     } /* DB   ED          */
-OP(ed,12) { illegal_2();                                     } /* DB   ED          */
-OP(ed,13) { illegal_2();                                     } /* DB   ED          */
-OP(ed,14) { illegal_2();                                     } /* DB   ED          */
-OP(ed,15) { illegal_2();                                     } /* DB   ED          */
-OP(ed,16) { illegal_2();                                     } /* DB   ED          */
-OP(ed,17) { illegal_2();                                     } /* DB   ED          */
+/* DB   ED         */ OP(ED,10) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,11) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,12) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,13) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,14) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,15) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,16) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,17) THEN illegal_2();                                               ENDOP
 
-OP(ed,18) { illegal_2();                                     } /* DB   ED          */
-OP(ed,19) { illegal_2();                                     } /* DB   ED          */
-OP(ed,1a) { illegal_2();                                     } /* DB   ED          */
-OP(ed,1b) { illegal_2();                                     } /* DB   ED          */
-OP(ed,1c) { illegal_2();                                     } /* DB   ED          */
-OP(ed,1d) { illegal_2();                                     } /* DB   ED          */
-OP(ed,1e) { illegal_2();                                     } /* DB   ED          */
-OP(ed,1f) { illegal_2();                                     } /* DB   ED          */
+/* DB   ED         */ OP(ED,18) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,19) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,1a) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,1b) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,1c) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,1d) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,1e) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,1f) THEN illegal_2();                                               ENDOP
 
-OP(ed,20) { illegal_2();                                     } /* DB   ED          */
-OP(ed,21) { illegal_2();                                     } /* DB   ED          */
-OP(ed,22) { illegal_2();                                     } /* DB   ED          */
-OP(ed,23) { illegal_2();                                     } /* DB   ED          */
-OP(ed,24) { illegal_2();                                     } /* DB   ED          */
-OP(ed,25) { illegal_2();                                     } /* DB   ED          */
-OP(ed,26) { illegal_2();                                     } /* DB   ED          */
-OP(ed,27) { illegal_2();                                     } /* DB   ED          */
+/* DB   ED         */ OP(ED,20) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,21) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,22) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,23) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,24) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,25) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,26) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,27) THEN illegal_2();                                               ENDOP
 
-OP(ed,28) { illegal_2();                                     } /* DB   ED          */
-OP(ed,29) { illegal_2();                                     } /* DB   ED          */
-OP(ed,2a) { illegal_2();                                     } /* DB   ED          */
-OP(ed,2b) { illegal_2();                                     } /* DB   ED          */
-OP(ed,2c) { illegal_2();                                     } /* DB   ED          */
-OP(ed,2d) { illegal_2();                                     } /* DB   ED          */
-OP(ed,2e) { illegal_2();                                     } /* DB   ED          */
-OP(ed,2f) { illegal_2();                                     } /* DB   ED          */
+/* DB   ED         */ OP(ED,28) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,29) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,2a) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,2b) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,2c) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,2d) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,2e) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,2f) THEN illegal_2();                                               ENDOP
 
-OP(ed,30) { illegal_2();                                     } /* DB   ED          */
-OP(ed,31) { illegal_2();                                     } /* DB   ED          */
-OP(ed,32) { illegal_2();                                     } /* DB   ED          */
-OP(ed,33) { illegal_2();                                     } /* DB   ED          */
-OP(ed,34) { illegal_2();                                     } /* DB   ED          */
-OP(ed,35) { illegal_2();                                     } /* DB   ED          */
-OP(ed,36) { illegal_2();                                     } /* DB   ED          */
-OP(ed,37) { illegal_2();                                     } /* DB   ED          */
+/* DB   ED         */ OP(ED,30) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,31) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,32) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,33) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,34) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,35) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,36) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,37) THEN illegal_2();                                               ENDOP
 
-OP(ed,38) { illegal_2();                                     } /* DB   ED          */
-OP(ed,39) { illegal_2();                                     } /* DB   ED          */
-OP(ed,3a) { illegal_2();                                     } /* DB   ED          */
-OP(ed,3b) { illegal_2();                                     } /* DB   ED          */
-OP(ed,3c) { illegal_2();                                     } /* DB   ED          */
-OP(ed,3d) { illegal_2();                                     } /* DB   ED          */
-OP(ed,3e) { illegal_2();                                     } /* DB   ED          */
-OP(ed,3f) { illegal_2();                                     } /* DB   ED          */
+/* DB   ED         */ OP(ED,38) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,39) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,3a) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,3b) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,3c) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,3d) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,3e) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,3f) THEN illegal_2();                                               ENDOP
 
-OP(ed,40) { B = in(BC); F = (F & CF) | SZP[B]; WZ = BC + 1;  } /* IN   B,(C)       */
-OP(ed,41) { out(BC, B); WZ = BC + 1;                         } /* OUT  (C),B       */
-OP(ed,42) { sbc_hl(m_bc);                                    } /* SBC  HL,BC       */
-OP(ed,43) { m_ea = arg16(); wm16(m_ea, m_bc); WZ = m_ea + 1; } /* LD   (w),BC      */
-OP(ed,44) { neg();                                           } /* NEG              */
-OP(ed,45) { retn();                                          } /* RETN             */
-OP(ed,46) { m_im = 0;                                        } /* IM   0           */
-OP(ed,47) { ld_i_a();                                        } /* LD   i,A         */
+/* IN   B,(C)      */ OP(ED,40) THEN TADR=BC; CALL in(); THEN B = TDAT8; set_f((F & CF) | SZP[B]); WZ = TADR + 1; ENDOP
+/* OUT  (C),B      */ OP(ED,41) THEN TADR=BC; TDAT8=B; CALL out(); THEN WZ = TADR + 1; ENDOP
+/* SBC  HL,BC      */ OP(ED,42) THEN TDAT=BC; CALL sbc_hl();                             ENDOP
+/* LD   (w),BC     */ OP(ED,43) CALL arg16(); THEN m_ea=TDAT; TADR=m_ea; TDAT=BC; CALL wm16(); THEN WZ = m_ea + 1; ENDOP
+/* NEG             */ OP(ED,44) THEN neg();                                           ENDOP
+/* RETN            */ OP(ED,45) CALL retn();                                             ENDOP
+/* IM   0          */ OP(ED,46) THEN m_im = 0;                                        ENDOP
+/* LD   i,A        */ OP(ED,47) CALL ld_i_a();                                           ENDOP
 
-OP(ed,48) { C = in(BC); F = (F & CF) | SZP[C]; WZ = BC + 1;  } /* IN   C,(C)       */
-OP(ed,49) { out(BC, C); WZ = BC + 1;                         } /* OUT  (C),C       */
-OP(ed,4a) { adc_hl(m_bc);                                    } /* ADC  HL,BC       */
-OP(ed,4b) { m_ea = arg16(); rm16(m_ea, m_bc); WZ = m_ea + 1; } /* LD   BC,(w)      */
-OP(ed,4c) { neg();                                           } /* NEG              */
-OP(ed,4d) { reti();                                          } /* RETI             */
-OP(ed,4e) { m_im = 0;                                        } /* IM   0           */
-OP(ed,4f) { ld_r_a();                                        } /* LD   r,A         */
+/* IN   C,(C)      */ OP(ED,48) THEN TADR=BC; CALL in(); THEN C = TDAT8; set_f((F & CF) | SZP[C]); WZ = TADR + 1;ENDOP
+/* OUT  (C),C      */ OP(ED,49) THEN TADR=BC; TDAT8=C; CALL out(); THEN WZ = TADR + 1; ENDOP
+/* ADC  HL,BC      */ OP(ED,4a) THEN TDAT=BC; CALL adc_hl();                             ENDOP
+/* LD   BC,(w)     */ OP(ED,4b) CALL arg16(); THEN m_ea=TDAT; TADR=m_ea; CALL rm16(); THEN BC=TDAT; WZ = m_ea + 1; ENDOP
+/* NEG             */ OP(ED,4c) THEN neg();                                           ENDOP
+/* RETI            */ OP(ED,4d) CALL reti();                                             ENDOP
+/* IM   0          */ OP(ED,4e) THEN m_im = 0;                                        ENDOP
+/* LD   r,A        */ OP(ED,4f) CALL ld_r_a();                                           ENDOP
 
-OP(ed,50) { D = in(BC); F = (F & CF) | SZP[D]; WZ = BC + 1;  } /* IN   D,(C)       */
-OP(ed,51) { out(BC, D); WZ = BC + 1;                         } /* OUT  (C),D       */
-OP(ed,52) { sbc_hl(m_de);                                    } /* SBC  HL,DE       */
-OP(ed,53) { m_ea = arg16(); wm16(m_ea, m_de); WZ = m_ea + 1; } /* LD   (w),DE      */
-OP(ed,54) { neg();                                           } /* NEG              */
-OP(ed,55) { retn();                                          } /* RETN             */
-OP(ed,56) { m_im = 1;                                        } /* IM   1           */
-OP(ed,57) { ld_a_i();                                        } /* LD   A,i         */
+/* IN   D,(C)      */ OP(ED,50) THEN TADR=BC; CALL in(); THEN D = TDAT8; set_f((F & CF) | SZP[D]); WZ = TADR + 1; ENDOP
+/* OUT  (C),D      */ OP(ED,51) THEN TADR=BC; TDAT8=D; CALL out(); THEN WZ = TADR + 1; ENDOP
+/* SBC  HL,DE      */ OP(ED,52) THEN TDAT=DE; CALL sbc_hl();                             ENDOP
+/* LD   (w),DE     */ OP(ED,53) CALL arg16(); THEN m_ea=TDAT; TADR=m_ea; TDAT=DE; CALL wm16(); THEN WZ = m_ea + 1; ENDOP
+/* NEG             */ OP(ED,54) THEN neg();                                           ENDOP
+/* RETN            */ OP(ED,55) CALL retn();                                             ENDOP
+/* IM   1          */ OP(ED,56) THEN m_im = 1;                                        ENDOP
+/* LD   A,i        */ OP(ED,57) CALL ld_a_i();                                           ENDOP
 
-OP(ed,58) { E = in(BC); F = (F & CF) | SZP[E]; WZ = BC + 1;  } /* IN   E,(C)       */
-OP(ed,59) { out(BC, E); WZ = BC + 1;                         } /* OUT  (C),E       */
-OP(ed,5a) { adc_hl(m_de);                                    } /* ADC  HL,DE       */
-OP(ed,5b) { m_ea = arg16(); rm16(m_ea, m_de); WZ = m_ea + 1; } /* LD   DE,(w)      */
-OP(ed,5c) { neg();                                           } /* NEG              */
-OP(ed,5d) { reti();                                          } /* RETI             */
-OP(ed,5e) { m_im = 2;                                        } /* IM   2           */
-OP(ed,5f) { ld_a_r();                                        } /* LD   A,r         */
+/* IN   E,(C)      */ OP(ED,58) THEN TADR=BC; CALL in(); THEN E = TDAT8; set_f((F & CF) | SZP[E]); WZ = TADR + 1; ENDOP
+/* OUT  (C),E      */ OP(ED,59) THEN TADR=BC; TDAT8=E; CALL out(); THEN WZ = TADR + 1; ENDOP
+/* ADC  HL,DE      */ OP(ED,5a) THEN TDAT=DE; CALL adc_hl();                             ENDOP
+/* LD   DE,(w)     */ OP(ED,5b) CALL arg16(); THEN m_ea=TDAT; TADR=m_ea; CALL rm16(); THEN DE=TDAT; WZ = m_ea + 1; ENDOP
+/* NEG             */ OP(ED,5c) THEN neg();                                           ENDOP
+/* RETI            */ OP(ED,5d) CALL reti();                                             ENDOP
+/* IM   2          */ OP(ED,5e) THEN m_im = 2;                                        ENDOP
+/* LD   A,r        */ OP(ED,5f) CALL ld_a_r();                                           ENDOP
 
-OP(ed,60) { H = in(BC); F = (F & CF) | SZP[H]; WZ = BC + 1;  } /* IN   H,(C)       */
-OP(ed,61) { out(BC, H); WZ = BC + 1;                         } /* OUT  (C),H       */
-OP(ed,62) { sbc_hl(m_hl);                                    } /* SBC  HL,HL       */
-OP(ed,63) { m_ea = arg16(); wm16(m_ea, m_hl); WZ = m_ea + 1; } /* LD   (w),HL      */
-OP(ed,64) { neg();                                           } /* NEG              */
-OP(ed,65) { retn();                                          } /* RETN             */
-OP(ed,66) { m_im = 0;                                        } /* IM   0           */
-OP(ed,67) { rrd();                                           } /* RRD  (HL)        */
+/* IN   H,(C)      */ OP(ED,60) THEN TADR=BC; CALL in(); THEN H = TDAT8; set_f((F & CF) | SZP[H]); WZ = TADR + 1; ENDOP
+/* OUT  (C),H      */ OP(ED,61) THEN TADR=BC; TDAT8=H; CALL out(); THEN WZ = TADR + 1; ENDOP
+/* SBC  HL,HL      */ OP(ED,62) THEN TDAT=HL; CALL sbc_hl();                             ENDOP
+/* LD   (w),HL     */ OP(ED,63) CALL arg16(); THEN m_ea=TDAT; TADR=m_ea; TDAT=HL; CALL wm16(); THEN WZ = m_ea + 1; ENDOP
+/* NEG             */ OP(ED,64) THEN neg();                                           ENDOP
+/* RETN            */ OP(ED,65) CALL retn();                                             ENDOP
+/* IM   0          */ OP(ED,66) THEN m_im = 0;                                        ENDOP
+/* RRD  (HL)       */ OP(ED,67) CALL rrd();                                              ENDOP
 
-OP(ed,68) { L = in(BC); F = (F & CF) | SZP[L]; WZ = BC + 1;  } /* IN   L,(C)       */
-OP(ed,69) { out(BC, L); WZ = BC + 1;                         } /* OUT  (C),L       */
-OP(ed,6a) { adc_hl(m_hl);                                    } /* ADC  HL,HL       */
-OP(ed,6b) { m_ea = arg16(); rm16(m_ea, m_hl); WZ = m_ea + 1; } /* LD   HL,(w)      */
-OP(ed,6c) { neg();                                           } /* NEG              */
-OP(ed,6d) { reti();                                          } /* RETI             */
-OP(ed,6e) { m_im = 0;                                        } /* IM   0           */
-OP(ed,6f) { rld();                                           } /* RLD  (HL)        */
+/* IN   L,(C)      */ OP(ED,68) THEN TADR=BC; CALL in(); THEN L = TDAT8; set_f((F & CF) | SZP[L]); WZ = TADR + 1; ENDOP
+/* OUT  (C),L      */ OP(ED,69) THEN TADR=BC; TDAT8=L; CALL out(); THEN WZ = TADR + 1; ENDOP
+/* ADC  HL,HL      */ OP(ED,6a) THEN TDAT=HL; CALL adc_hl();                             ENDOP
+/* LD   HL,(w)     */ OP(ED,6b) CALL arg16(); THEN m_ea=TDAT; TADR=m_ea; CALL rm16(); THEN HL=TDAT; WZ = m_ea + 1; ENDOP
+/* NEG             */ OP(ED,6c) THEN neg();                                           ENDOP
+/* RETI            */ OP(ED,6d) CALL reti();                                             ENDOP
+/* IM   0          */ OP(ED,6e) THEN m_im = 0;                                        ENDOP
+/* RLD  (HL)       */ OP(ED,6f) CALL rld();                                              ENDOP
 
-OP(ed,70) { u8 res = in(BC); F = (F & CF) | SZP[res]; WZ = BC + 1; } /* IN   0,(C)       */
-OP(ed,71) { out(BC, 0); WZ = BC + 1;                         } /* OUT  (C),0       */
-OP(ed,72) { sbc_hl(m_sp);                                    } /* SBC  HL,SP       */
-OP(ed,73) { m_ea = arg16(); wm16(m_ea, m_sp); WZ = m_ea + 1; } /* LD   (w),SP      */
-OP(ed,74) { neg();                                           } /* NEG              */
-OP(ed,75) { retn();                                          } /* RETN             */
-OP(ed,76) { m_im = 1;                                        } /* IM   1           */
-OP(ed,77) { illegal_2();                                     } /* DB   ED,77       */
+/* IN   0,(C)      */ OP(ED,70) THEN TADR=BC; CALL in(); THEN set_f((F & CF) | SZP[TDAT8]); WZ = TADR + 1; ENDOP
+/* OUT  (C),0      */ OP(ED,71) THEN TADR=BC; TDAT8=0; CALL out(); THEN WZ = TADR + 1; ENDOP
+/* SBC  HL,SP      */ OP(ED,72) THEN TDAT=SP; CALL sbc_hl();                             ENDOP
+/* LD   (w),SP     */ OP(ED,73) CALL arg16(); THEN m_ea=TDAT; TADR=m_ea; TDAT=SP; CALL wm16(); THEN WZ = m_ea + 1; ENDOP
+/* NEG             */ OP(ED,74) THEN neg();                                           ENDOP
+/* RETN            */ OP(ED,75) CALL retn();                                             ENDOP
+/* IM   1          */ OP(ED,76) THEN m_im = 1;                                        ENDOP
+/* DB   ED,77      */ OP(ED,77) THEN illegal_2();                                               ENDOP
 
-OP(ed,78) { A = in(BC); F = (F & CF) | SZP[A]; WZ = BC + 1;  } /* IN   A,(C)       */
-OP(ed,79) { out(BC, A);  WZ = BC + 1;                        } /* OUT  (C),A       */
-OP(ed,7a) { adc_hl(m_sp);                                    } /* ADC  HL,SP       */
-OP(ed,7b) { m_ea = arg16(); rm16(m_ea, m_sp); WZ = m_ea + 1; } /* LD   SP,(w)      */
-OP(ed,7c) { neg();                                           } /* NEG              */
-OP(ed,7d) { reti();                                          } /* RETI             */
-OP(ed,7e) { m_im = 2;                                        } /* IM   2           */
-OP(ed,7f) { illegal_2();                                     } /* DB   ED,7F       */
+/* IN   A,(C)      */ OP(ED,78) THEN TADR=BC; CALL in(); THEN A = TDAT8; set_f((F & CF) | SZP[A]); WZ = TADR + 1; ENDOP
+/* OUT  (C),A      */ OP(ED,79) THEN TADR=BC; TDAT8=A; CALL out(); THEN WZ = TADR + 1; ENDOP
+/* ADC  HL,SP      */ OP(ED,7a) THEN TDAT=SP; CALL adc_hl();                             ENDOP
+/* LD   SP,(w)     */ OP(ED,7b) CALL arg16(); THEN m_ea=TDAT; TADR=m_ea; CALL rm16(); THEN SP=TDAT; WZ = m_ea + 1; ENDOP
+/* NEG             */ OP(ED,7c) THEN neg();                                           ENDOP
+/* RETI            */ OP(ED,7d) CALL reti();                                             ENDOP
+/* IM   2          */ OP(ED,7e) THEN m_im = 2;                                        ENDOP
+/* DB   ED,7F      */ OP(ED,7f) THEN illegal_2();                                               ENDOP
 
-OP(ed,80) { illegal_2();                                     } /* DB   ED          */
-OP(ed,81) { illegal_2();                                     } /* DB   ED          */
-OP(ed,82) { illegal_2();                                     } /* DB   ED          */
-OP(ed,83) { illegal_2();                                     } /* DB   ED          */
-OP(ed,84) { illegal_2();                                     } /* DB   ED          */
-OP(ed,85) { illegal_2();                                     } /* DB   ED          */
-OP(ed,86) { illegal_2();                                     } /* DB   ED          */
-OP(ed,87) { illegal_2();                                     } /* DB   ED          */
+/* DB   ED         */ OP(ED,80) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,81) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,82) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,83) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,84) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,85) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,86) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,87) THEN illegal_2();                                               ENDOP
 
-OP(ed,88) { illegal_2();                                     } /* DB   ED          */
-OP(ed,89) { illegal_2();                                     } /* DB   ED          */
-OP(ed,8a) { illegal_2();                                     } /* DB   ED          */
-OP(ed,8b) { illegal_2();                                     } /* DB   ED          */
-OP(ed,8c) { illegal_2();                                     } /* DB   ED          */
-OP(ed,8d) { illegal_2();                                     } /* DB   ED          */
-OP(ed,8e) { illegal_2();                                     } /* DB   ED          */
-OP(ed,8f) { illegal_2();                                     } /* DB   ED          */
+/* DB   ED         */ OP(ED,88) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,89) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,8a) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,8b) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,8c) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,8d) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,8e) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,8f) THEN illegal_2();                                               ENDOP
 
-OP(ed,90) { illegal_2();                                     } /* DB   ED          */
-OP(ed,91) { illegal_2();                                     } /* DB   ED          */
-OP(ed,92) { illegal_2();                                     } /* DB   ED          */
-OP(ed,93) { illegal_2();                                     } /* DB   ED          */
-OP(ed,94) { illegal_2();                                     } /* DB   ED          */
-OP(ed,95) { illegal_2();                                     } /* DB   ED          */
-OP(ed,96) { illegal_2();                                     } /* DB   ED          */
-OP(ed,97) { illegal_2();                                     } /* DB   ED          */
+/* DB   ED         */ OP(ED,90) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,91) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,92) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,93) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,94) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,95) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,96) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,97) THEN illegal_2();                                               ENDOP
 
-OP(ed,98) { illegal_2();                                     } /* DB   ED          */
-OP(ed,99) { illegal_2();                                     } /* DB   ED          */
-OP(ed,9a) { illegal_2();                                     } /* DB   ED          */
-OP(ed,9b) { illegal_2();                                     } /* DB   ED          */
-OP(ed,9c) { illegal_2();                                     } /* DB   ED          */
-OP(ed,9d) { illegal_2();                                     } /* DB   ED          */
-OP(ed,9e) { illegal_2();                                     } /* DB   ED          */
-OP(ed,9f) { illegal_2();                                     } /* DB   ED          */
+/* DB   ED         */ OP(ED,98) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,99) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,9a) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,9b) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,9c) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,9d) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,9e) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,9f) THEN illegal_2();                                               ENDOP
 
-OP(ed,a0) { ldi();                                           } /* LDI              */
-OP(ed,a1) { cpi();                                           } /* CPI              */
-OP(ed,a2) { ini();                                           } /* INI              */
-OP(ed,a3) { outi();                                          } /* OUTI             */
-OP(ed,a4) { illegal_2();                                     } /* DB   ED          */
-OP(ed,a5) { illegal_2();                                     } /* DB   ED          */
-OP(ed,a6) { illegal_2();                                     } /* DB   ED          */
-OP(ed,a7) { illegal_2();                                     } /* DB   ED          */
+/* LDI             */ OP(ED,a0) CALL ldi();                                              ENDOP
+/* CPI             */ OP(ED,a1) CALL cpi();                                              ENDOP
+/* INI             */ OP(ED,a2) CALL ini();                                              ENDOP
+/* OUTI            */ OP(ED,a3) CALL outi();                                             ENDOP
+/* DB   ED         */ OP(ED,a4) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,a5) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,a6) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,a7) THEN illegal_2();                                               ENDOP
 
-OP(ed,a8) { ldd();                                           } /* LDD              */
-OP(ed,a9) { cpd();                                           } /* CPD              */
-OP(ed,aa) { ind();                                           } /* IND              */
-OP(ed,ab) { outd();                                          } /* OUTD             */
-OP(ed,ac) { illegal_2();                                     } /* DB   ED          */
-OP(ed,ad) { illegal_2();                                     } /* DB   ED          */
-OP(ed,ae) { illegal_2();                                     } /* DB   ED          */
-OP(ed,af) { illegal_2();                                     } /* DB   ED          */
+/* LDD             */ OP(ED,a8) CALL ldd();                                              ENDOP
+/* CPD             */ OP(ED,a9) CALL cpd();                                              ENDOP
+/* IND             */ OP(ED,aa) CALL ind();                                              ENDOP
+/* OUTD            */ OP(ED,ab) CALL outd();                                             ENDOP
+/* DB   ED         */ OP(ED,ac) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,ad) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,ae) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,af) THEN illegal_2();                                               ENDOP
 
-OP(ed,b0) { ldir();                                          } /* LDIR             */
-OP(ed,b1) { cpir();                                          } /* CPIR             */
-OP(ed,b2) { inir();                                          } /* INIR             */
-OP(ed,b3) { otir();                                          } /* OTIR             */
-OP(ed,b4) { illegal_2();                                     } /* DB   ED          */
-OP(ed,b5) { illegal_2();                                     } /* DB   ED          */
-OP(ed,b6) { illegal_2();                                     } /* DB   ED          */
-OP(ed,b7) { illegal_2();                                     } /* DB   ED          */
+/* LDIR            */ OP(ED,b0) CALL ldir();                                             ENDOP
+/* CPIR            */ OP(ED,b1) CALL cpir();                                             ENDOP
+/* INIR            */ OP(ED,b2) CALL inir();                                             ENDOP
+/* OTIR            */ OP(ED,b3) CALL otir();                                             ENDOP
+/* DB   ED         */ OP(ED,b4) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,b5) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,b6) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,b7) THEN illegal_2();                                               ENDOP
 
-OP(ed,b8) { lddr();                                          } /* LDDR             */
-OP(ed,b9) { cpdr();                                          } /* CPDR             */
-OP(ed,ba) { indr();                                          } /* INDR             */
-OP(ed,bb) { otdr();                                          } /* OTDR             */
-OP(ed,bc) { illegal_2();                                     } /* DB   ED          */
-OP(ed,bd) { illegal_2();                                     } /* DB   ED          */
-OP(ed,be) { illegal_2();                                     } /* DB   ED          */
-OP(ed,bf) { illegal_2();                                     } /* DB   ED          */
+/* LDDR            */ OP(ED,b8) CALL lddr();                                             ENDOP
+/* CPDR            */ OP(ED,b9) CALL cpdr();                                             ENDOP
+/* INDR            */ OP(ED,ba) CALL indr();                                             ENDOP
+/* OTDR            */ OP(ED,bb) CALL otdr();                                             ENDOP
+/* DB   ED         */ OP(ED,bc) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,bd) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,be) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,bf) THEN illegal_2();                                               ENDOP
 
-OP(ed,c0) { illegal_2();                                     } /* DB   ED          */
-OP(ed,c1) { illegal_2();                                     } /* DB   ED          */
-OP(ed,c2) { illegal_2();                                     } /* DB   ED          */
-OP(ed,c3) { illegal_2();                                     } /* DB   ED          */
-OP(ed,c4) { illegal_2();                                     } /* DB   ED          */
-OP(ed,c5) { illegal_2();                                     } /* DB   ED          */
-OP(ed,c6) { illegal_2();                                     } /* DB   ED          */
-OP(ed,c7) { illegal_2();                                     } /* DB   ED          */
+/* DB   ED         */ OP(ED,c0) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,c1) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,c2) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,c3) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,c4) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,c5) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,c6) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,c7) THEN illegal_2();                                               ENDOP
 
-OP(ed,c8) { illegal_2();                                     } /* DB   ED          */
-OP(ed,c9) { illegal_2();                                     } /* DB   ED          */
-OP(ed,ca) { illegal_2();                                     } /* DB   ED          */
-OP(ed,cb) { illegal_2();                                     } /* DB   ED          */
-OP(ed,cc) { illegal_2();                                     } /* DB   ED          */
-OP(ed,cd) { illegal_2();                                     } /* DB   ED          */
-OP(ed,ce) { illegal_2();                                     } /* DB   ED          */
-OP(ed,cf) { illegal_2();                                     } /* DB   ED          */
+/* DB   ED         */ OP(ED,c8) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,c9) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,ca) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,cb) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,cc) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,cd) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,ce) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,cf) THEN illegal_2();                                               ENDOP
 
-OP(ed,d0) { illegal_2();                                     } /* DB   ED          */
-OP(ed,d1) { illegal_2();                                     } /* DB   ED          */
-OP(ed,d2) { illegal_2();                                     } /* DB   ED          */
-OP(ed,d3) { illegal_2();                                     } /* DB   ED          */
-OP(ed,d4) { illegal_2();                                     } /* DB   ED          */
-OP(ed,d5) { illegal_2();                                     } /* DB   ED          */
-OP(ed,d6) { illegal_2();                                     } /* DB   ED          */
-OP(ed,d7) { illegal_2();                                     } /* DB   ED          */
+/* DB   ED         */ OP(ED,d0) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,d1) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,d2) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,d3) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,d4) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,d5) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,d6) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,d7) THEN illegal_2();                                               ENDOP
 
-OP(ed,d8) { illegal_2();                                     } /* DB   ED          */
-OP(ed,d9) { illegal_2();                                     } /* DB   ED          */
-OP(ed,da) { illegal_2();                                     } /* DB   ED          */
-OP(ed,db) { illegal_2();                                     } /* DB   ED          */
-OP(ed,dc) { illegal_2();                                     } /* DB   ED          */
-OP(ed,dd) { illegal_2();                                     } /* DB   ED          */
-OP(ed,de) { illegal_2();                                     } /* DB   ED          */
-OP(ed,df) { illegal_2();                                     } /* DB   ED          */
+/* DB   ED         */ OP(ED,d8) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,d9) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,da) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,db) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,dc) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,dd) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,de) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,df) THEN illegal_2();                                               ENDOP
 
-OP(ed,e0) { illegal_2();                                     } /* DB   ED          */
-OP(ed,e1) { illegal_2();                                     } /* DB   ED          */
-OP(ed,e2) { illegal_2();                                     } /* DB   ED          */
-OP(ed,e3) { illegal_2();                                     } /* DB   ED          */
-OP(ed,e4) { illegal_2();                                     } /* DB   ED          */
-OP(ed,e5) { illegal_2();                                     } /* DB   ED          */
-OP(ed,e6) { illegal_2();                                     } /* DB   ED          */
-OP(ed,e7) { illegal_2();                                     } /* DB   ED          */
+/* DB   ED         */ OP(ED,e0) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,e1) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,e2) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,e3) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,e4) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,e5) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,e6) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,e7) THEN illegal_2();                                               ENDOP
 
-OP(ed,e8) { illegal_2();                                     } /* DB   ED          */
-OP(ed,e9) { illegal_2();                                     } /* DB   ED          */
-OP(ed,ea) { illegal_2();                                     } /* DB   ED          */
-OP(ed,eb) { illegal_2();                                     } /* DB   ED          */
-OP(ed,ec) { illegal_2();                                     } /* DB   ED          */
-OP(ed,ed) { illegal_2();                                     } /* DB   ED          */
-OP(ed,ee) { illegal_2();                                     } /* DB   ED          */
-OP(ed,ef) { illegal_2();                                     } /* DB   ED          */
+/* DB   ED         */ OP(ED,e8) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,e9) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,ea) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,eb) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,ec) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,ed) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,ee) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,ef) THEN illegal_2();                                               ENDOP
 
-OP(ed,f0) { illegal_2();                                     } /* DB   ED          */
-OP(ed,f1) { illegal_2();                                     } /* DB   ED          */
-OP(ed,f2) { illegal_2();                                     } /* DB   ED          */
-OP(ed,f3) { illegal_2();                                     } /* DB   ED          */
-OP(ed,f4) { illegal_2();                                     } /* DB   ED          */
-OP(ed,f5) { illegal_2();                                     } /* DB   ED          */
-OP(ed,f6) { illegal_2();                                     } /* DB   ED          */
-OP(ed,f7) { illegal_2();                                     } /* DB   ED          */
+/* DB   ED         */ OP(ED,f0) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,f1) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,f2) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,f3) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,f4) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,f5) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,f6) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,f7) THEN illegal_2();                                               ENDOP
 
-OP(ed,f8) { illegal_2();                                     } /* DB   ED          */
-OP(ed,f9) { illegal_2();                                     } /* DB   ED          */
-OP(ed,fa) { illegal_2();                                     } /* DB   ED          */
-OP(ed,fb) { illegal_2();                                     } /* DB   ED          */
-OP(ed,fc) { illegal_2();                                     } /* DB   ED          */
-OP(ed,fd) { illegal_2();                                     } /* DB   ED          */
-OP(ed,fe) { illegal_2();                                     } /* DB   ED          */
-OP(ed,ff) { illegal_2();                                     } /* DB   ED          */
-
+/* DB   ED         */ OP(ED,f8) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,f9) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,fa) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,fb) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,fc) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,fd) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,fe) THEN illegal_2();                                               ENDOP
+/* DB   ED         */ OP(ED,ff) THEN illegal_2();                                               ENDOP
 
 /**********************************************************
  * main opcodes
  **********************************************************/
-OP(op,00) {                                                                       } /* NOP              */
-OP(op,01) { BC = arg16();                                                         } /* LD   BC,w        */
-OP(op,02) { wm(BC,A); WZ_L = (BC + 1) & 0xFF;  WZ_H = A;                          } /* LD (BC),A        */
-OP(op,03) { nomreq_ir(2); BC++;                                                   } /* INC  BC          */
-OP(op,04) { B = inc(B);                                                           } /* INC  B           */
-OP(op,05) { B = dec(B);                                                           } /* DEC  B           */
-OP(op,06) { B = arg();                                                            } /* LD   B,n         */
-OP(op,07) { rlca();                                                               } /* RLCA             */
+/* NOP             */ OP(NONE,00)                                                                        ENDOP
+/* LD   BC,w       */ OP(NONE,01) CALL arg16(); THEN BC = TDAT;                                               ENDOP
+/* LD (BC),A       */ OP(NONE,02) THEN TADR=BC; TDAT8=A; CALL wm(); THEN WZ_L = (BC + 1) & 0xFF;  WZ_H = A;   ENDOP
+/* INC  BC         */ OP(NONE,03) CALL nomreq_ir(2); THEN BC++;                                               ENDOP
+/* INC  B          */ OP(NONE,04) THEN inc(B);                                                               ENDOP
+/* DEC  B          */ OP(NONE,05) THEN dec(B);                                                               ENDOP
+/* LD   B,n        */ OP(NONE,06) CALL arg(); THEN B = TDAT8;                                                 ENDOP
+/* RLCA            */ OP(NONE,07) THEN rlca();                                                               ENDOP
 
-OP(op,08) { ex_af();                                                              } /* EX   AF,AF'      */
-OP(op,09) { add16(m_hl, m_bc);                                      } /* ADD  HL,BC       */
-OP(op,0a) { A = rm(BC);  WZ=BC+1;                                                 } /* LD   A,(BC)      */
-OP(op,0b) { nomreq_ir(2); BC--;                                                   } /* DEC  BC          */
-OP(op,0c) { C = inc(C);                                                           } /* INC  C           */
-OP(op,0d) { C = dec(C);                                                           } /* DEC  C           */
-OP(op,0e) { C = arg();                                                            } /* LD   C,n         */
-OP(op,0f) { rrca();                                                               } /* RRCA             */
+/* EX   AF,AF'     */ OP(NONE,08) THEN std::swap(m_af, m_af2);
+;                                   ENDOP
+/* ADD  HL,BC      */ OP(NONE,09) THEN TDAT=HL; TDAT2=BC; CALL add16(); THEN HL=TDAT;                         ENDOP
+/* LD   A,(BC)     */ OP(NONE,0a) THEN TADR=BC; CALL rm(); THEN A=TDAT8;  WZ=BC+1;                            ENDOP
+/* DEC  BC         */ OP(NONE,0b) CALL nomreq_ir(2); THEN BC--;                                               ENDOP
+/* INC  C          */ OP(NONE,0c) THEN inc(C);                                                               ENDOP
+/* DEC  C          */ OP(NONE,0d) THEN dec(C);                                                               ENDOP
+/* LD   C,n        */ OP(NONE,0e) CALL arg(); THEN C = TDAT8;                                                 ENDOP
+/* RRCA            */ OP(NONE,0f) THEN rrca();                                                               ENDOP
 
-OP(op,10) { nomreq_ir(1); B--; jr_cond(B, 0x10);                                  } /* DJNZ o           */
-OP(op,11) { DE = arg16();                                                         } /* LD   DE,w        */
-OP(op,12) { wm(DE,A); WZ_L = (DE + 1) & 0xFF;  WZ_H = A;                          } /* LD (DE),A        */
-OP(op,13) { nomreq_ir(2); DE++;                                                   } /* INC  DE          */
-OP(op,14) { D = inc(D);                                                           } /* INC  D           */
-OP(op,15) { D = dec(D);                                                           } /* DEC  D           */
-OP(op,16) { D = arg();                                                            } /* LD   D,n         */
-OP(op,17) { rla();                                                                } /* RLA              */
+/* DJNZ o          */ OP(NONE,10) CALL nomreq_ir(1); THEN TDAT8=--B; CALL jr_cond(0x10);                         ENDOP
+/* LD   DE,w       */ OP(NONE,11) CALL arg16(); THEN DE = TDAT;                                               ENDOP
+/* LD (DE),A       */ OP(NONE,12) THEN TADR=DE; TDAT8=A; CALL wm(); THEN WZ_L = (DE + 1) & 0xFF;  WZ_H = A;   ENDOP
+/* INC  DE         */ OP(NONE,13) CALL nomreq_ir(2); THEN DE++;                                               ENDOP
+/* INC  D          */ OP(NONE,14) THEN inc(D);                                                               ENDOP
+/* DEC  D          */ OP(NONE,15) THEN dec(D);                                                               ENDOP
+/* LD   D,n        */ OP(NONE,16) CALL arg(); THEN D=TDAT8;                                                   ENDOP
+/* RLA             */ OP(NONE,17) THEN rla();                                                                ENDOP
 
-OP(op,18) { jr();                                                                 } /* JR   o           */
-OP(op,19) { add16(m_hl, m_de);                                      } /* ADD  HL,DE       */
-OP(op,1a) { A = rm(DE); WZ = DE + 1;                                              } /* LD   A,(DE)      */
-OP(op,1b) { nomreq_ir(2); DE--;                                                   } /* DEC  DE          */
-OP(op,1c) { E = inc(E);                                                           } /* INC  E           */
-OP(op,1d) { E = dec(E);                                                           } /* DEC  E           */
-OP(op,1e) { E = arg();                                                            } /* LD   E,n         */
-OP(op,1f) { rra();                                                                } /* RRA              */
+/* JR   o          */ OP(NONE,18) CALL jr();                                                                    ENDOP
+/* ADD  HL,DE      */ OP(NONE,19) THEN TDAT=HL; TDAT2=DE; CALL add16(); THEN HL=TDAT;                         ENDOP
+/* LD   A,(DE)     */ OP(NONE,1a) THEN TADR=DE; CALL rm(); THEN A=TDAT8; WZ = DE + 1;                         ENDOP
+/* DEC  DE         */ OP(NONE,1b) CALL nomreq_ir(2); THEN DE--;                                               ENDOP
+/* INC  E          */ OP(NONE,1c) THEN inc(E);                                                               ENDOP
+/* DEC  E          */ OP(NONE,1d) THEN dec(E);                                                               ENDOP
+/* LD   E,n        */ OP(NONE,1e) CALL arg(); THEN E=TDAT8;                                                   ENDOP
+/* RRA             */ OP(NONE,1f) THEN rra();                                                                ENDOP
 
-OP(op,20) { jr_cond(!(F & ZF), 0x20);                                             } /* JR   NZ,o        */
-OP(op,21) { HL = arg16();                                                         } /* LD   HL,w        */
-OP(op,22) { m_ea = arg16(); wm16(m_ea, m_hl); WZ = m_ea + 1;                      } /* LD   (w),HL      */
-OP(op,23) { nomreq_ir(2); HL++;                                                   } /* INC  HL          */
-OP(op,24) { H = inc(H);                                                           } /* INC  H           */
-OP(op,25) { H = dec(H);                                                           } /* DEC  H           */
-OP(op,26) { H = arg();                                                            } /* LD   H,n         */
-OP(op,27) { daa();                                                                } /* DAA              */
+/* JR   NZ,o       */ OP(NONE,20) THEN TDAT8=!(F & ZF); CALL jr_cond(0x20);                                               ENDOP
+/* LD   HL,w       */ OP(NONE,21) CALL arg16(); THEN HL = TDAT;                                               ENDOP
+/* LD   (w),HL     */ OP(NONE,22) CALL arg16(); THEN m_ea=TDAT; TADR=TDAT; TDAT=HL; CALL wm16(); THEN WZ = m_ea + 1; ENDOP
+/* INC  HL         */ OP(NONE,23) CALL nomreq_ir(2); THEN HL++;                                               ENDOP
+/* INC  H          */ OP(NONE,24) THEN inc(H);                                                               ENDOP
+/* DEC  H          */ OP(NONE,25) THEN dec(H);                                                               ENDOP
+/* LD   H,n        */ OP(NONE,26) CALL arg(); THEN H=TDAT8;                                                   ENDOP
+/* DAA             */ OP(NONE,27) THEN daa();                                                                ENDOP
 
-OP(op,28) { jr_cond(F & ZF, 0x28);                                                } /* JR   Z,o         */
-OP(op,29) { add16(m_hl, m_hl);                                      } /* ADD  HL,HL       */
-OP(op,2a) { m_ea = arg16(); rm16(m_ea, m_hl); WZ = m_ea + 1;                      } /* LD   HL,(w)      */
-OP(op,2b) { nomreq_ir(2); HL--;                                                   } /* DEC  HL          */
-OP(op,2c) { L = inc(L);                                                           } /* INC  L           */
-OP(op,2d) { L = dec(L);                                                           } /* DEC  L           */
-OP(op,2e) { L = arg();                                                            } /* LD   L,n         */
-OP(op,2f) { A ^= 0xff; F = (F & (SF | ZF | PF | CF)) | HF | NF | (A & (YF | XF)); } /* CPL              */
+/* JR   Z,o        */ OP(NONE,28) THEN TDAT8=F & ZF; CALL jr_cond(0x28);                                        ENDOP
+/* ADD  HL,HL      */ OP(NONE,29) THEN TDAT=HL; TDAT2=HL; CALL add16(); THEN HL=TDAT;                         ENDOP
+/* LD   HL,(w)     */ OP(NONE,2a) CALL arg16(); THEN m_ea=TDAT; TADR=TDAT; CALL rm16(); THEN HL=TDAT; WZ = m_ea + 1; ENDOP
+/* DEC  HL         */ OP(NONE,2b) CALL nomreq_ir(2); THEN HL--;                                               ENDOP
+/* INC  L          */ OP(NONE,2c) THEN inc(L);                                                               ENDOP
+/* DEC  L          */ OP(NONE,2d) THEN dec(L);                                                               ENDOP
+/* LD   L,n        */ OP(NONE,2e) CALL arg(); THEN L=TDAT8;                                                   ENDOP
+/* CPL             */ OP(NONE,2f) THEN A ^= 0xff; set_f((F & (SF | ZF | PF | CF)) | HF | NF | (A & (YF | XF))); ENDOP
 
-OP(op,30) { jr_cond(!(F & CF), 0x30);                                             } /* JR   NC,o        */
-OP(op,31) { SP = arg16();                                                         } /* LD   SP,w        */
-OP(op,32) { m_ea = arg16(); wm(m_ea, A); WZ_L = (m_ea + 1) & 0xFF; WZ_H = A;      } /* LD   (w),A       */
-OP(op,33) { nomreq_ir(2); SP++;                                                   } /* INC  SP          */
-OP(op,34) { wm(HL, inc(rm_reg(HL)));                                              } /* INC  (HL)        */
-OP(op,35) { wm(HL, dec(rm_reg(HL)));                                              } /* DEC  (HL)        */
-OP(op,36) { wm(HL, arg());                                                        } /* LD   (HL),n      */
-OP(op,37) { F = (F & (SF | ZF | YF | XF | PF)) | CF | (A & (YF | XF));            } /* SCF              */
+/* JR   NC,o       */ OP(NONE,30) THEN TDAT8=!(F & CF); CALL jr_cond(0x30);                                               ENDOP
+/* LD   SP,w       */ OP(NONE,31) CALL arg16(); THEN SP = TDAT;                                               ENDOP
+/* LD   (w),A      */ OP(NONE,32) CALL arg16(); THEN m_ea=TDAT; TADR=m_ea; TDAT8=A; CALL wm(); THEN WZ_L = (m_ea + 1) & 0xFF; WZ_H = A; ENDOP
+/* INC  SP         */ OP(NONE,33) CALL nomreq_ir(2); THEN SP++;                                               ENDOP
+/* INC  (HL)       */ OP(NONE,34) THEN TADR=HL; CALL rm_reg(); THEN inc(TDAT8); CALL wm();                       ENDOP
+/* DEC  (HL)       */ OP(NONE,35) THEN TADR=HL; CALL rm_reg(); THEN dec(TDAT8); CALL wm();                       ENDOP
+/* LD   (HL),n     */ OP(NONE,36) CALL arg(); THEN TADR=HL; CALL wm();                                           ENDOP
+/* SCF             */ OP(NONE,37) THEN set_f((F & (SF | ZF | PF)) | CF | (((F & Q) | A) & (YF | XF)));            ENDOP
 
-OP(op,38) { jr_cond(F & CF, 0x38);                                                } /* JR   C,o         */
-OP(op,39) { add16(m_hl, m_sp);                                                    } /* ADD  HL,SP       */
-OP(op,3a) { m_ea = arg16(); A = rm(m_ea); WZ = m_ea + 1;                          } /* LD   A,(w)       */
-OP(op,3b) { nomreq_ir(2); SP--;                                                   } /* DEC  SP          */
-OP(op,3c) { A = inc(A);                                                           } /* INC  A           */
-OP(op,3d) { A = dec(A);                                                           } /* DEC  A           */
-OP(op,3e) { A = arg();                                                            } /* LD   A,n         */
-OP(op,3f) { F = ((F&(SF|ZF|YF|XF|PF|CF))|((F&CF)<<4)|(A&(YF|XF)))^CF;             } /* CCF              */
+/* JR   C,o        */ OP(NONE,38) THEN TDAT8=F & CF; CALL jr_cond(0x38);                                        ENDOP
+/* ADD  HL,SP      */ OP(NONE,39) THEN TDAT=HL; TDAT2=SP; CALL add16(); THEN HL=TDAT;                         ENDOP
+/* LD   A,(w)      */ OP(NONE,3a) CALL arg16(); THEN m_ea=TDAT; TADR=TDAT; CALL rm(); THEN A=TDAT8; WZ = m_ea + 1; ENDOP
+/* DEC  SP         */ OP(NONE,3b) CALL nomreq_ir(2); THEN SP--;                                               ENDOP
+/* INC  A          */ OP(NONE,3c) THEN inc(A);                                                               ENDOP
+/* DEC  A          */ OP(NONE,3d) THEN dec(A);                                                               ENDOP
+/* LD   A,n        */ OP(NONE,3e) CALL arg(); THEN A = TDAT8;                                                 ENDOP
+/* CCF             */ OP(NONE,3f) THEN set_f(((F & (SF | ZF | PF | CF)) ^ CF) | ((F & CF) << 4) | (((F & Q) | A) & (YF | XF)));         ENDOP
 
-OP(op,40) {                                                                       } /* LD   B,B         */
-OP(op,41) { B = C;                                                                } /* LD   B,C         */
-OP(op,42) { B = D;                                                                } /* LD   B,D         */
-OP(op,43) { B = E;                                                                } /* LD   B,E         */
-OP(op,44) { B = H;                                                                } /* LD   B,H         */
-OP(op,45) { B = L;                                                                } /* LD   B,L         */
-OP(op,46) { B = rm(HL);                                                           } /* LD   B,(HL)      */
-OP(op,47) { B = A;                                                                } /* LD   B,A         */
+/* LD   B,B        */ OP(NONE,40)                                                                        ENDOP
+/* LD   B,C        */ OP(NONE,41) THEN B = C;                                                                ENDOP
+/* LD   B,D        */ OP(NONE,42) THEN B = D;                                                                ENDOP
+/* LD   B,E        */ OP(NONE,43) THEN B = E;                                                                ENDOP
+/* LD   B,H        */ OP(NONE,44) THEN B = H;                                                                ENDOP
+/* LD   B,L        */ OP(NONE,45) THEN B = L;                                                                ENDOP
+/* LD   B,(HL)     */ OP(NONE,46) THEN TADR=HL; CALL rm(); THEN B = TDAT8;                                    ENDOP
+/* LD   B,A        */ OP(NONE,47) THEN B = A;                                                                ENDOP
 
-OP(op,48) { C = B;                                                                } /* LD   C,B         */
-OP(op,49) {                                                                       } /* LD   C,C         */
-OP(op,4a) { C = D;                                                                } /* LD   C,D         */
-OP(op,4b) { C = E;                                                                } /* LD   C,E         */
-OP(op,4c) { C = H;                                                                } /* LD   C,H         */
-OP(op,4d) { C = L;                                                                } /* LD   C,L         */
-OP(op,4e) { C = rm(HL);                                                           } /* LD   C,(HL)      */
-OP(op,4f) { C = A;                                                                } /* LD   C,A         */
+/* LD   C,B        */ OP(NONE,48) THEN C = B;                                                                ENDOP
+/* LD   C,C        */ OP(NONE,49)                                                                        ENDOP
+/* LD   C,D        */ OP(NONE,4a) THEN C = D;                                                                ENDOP
+/* LD   C,E        */ OP(NONE,4b) THEN C = E;                                                                ENDOP
+/* LD   C,H        */ OP(NONE,4c) THEN C = H;                                                                ENDOP
+/* LD   C,L        */ OP(NONE,4d) THEN C = L;                                                                ENDOP
+/* LD   C,(HL)     */ OP(NONE,4e) THEN TADR=HL; CALL rm(); THEN C = TDAT8;                                    ENDOP
+/* LD   C,A        */ OP(NONE,4f) THEN C = A;                                                                ENDOP
 
-OP(op,50) { D = B;                                                                } /* LD   D,B         */
-OP(op,51) { D = C;                                                                } /* LD   D,C         */
-OP(op,52) {                                                                       } /* LD   D,D         */
-OP(op,53) { D = E;                                                                } /* LD   D,E         */
-OP(op,54) { D = H;                                                                } /* LD   D,H         */
-OP(op,55) { D = L;                                                                } /* LD   D,L         */
-OP(op,56) { D = rm(HL);                                                           } /* LD   D,(HL)      */
-OP(op,57) { D = A;                                                                } /* LD   D,A         */
+/* LD   D,B        */ OP(NONE,50) THEN D = B;                                                                ENDOP
+/* LD   D,C        */ OP(NONE,51) THEN D = C;                                                                ENDOP
+/* LD   D,D        */ OP(NONE,52)                                                                        ENDOP
+/* LD   D,E        */ OP(NONE,53) THEN D = E;                                                                ENDOP
+/* LD   D,H        */ OP(NONE,54) THEN D = H;                                                                ENDOP
+/* LD   D,L        */ OP(NONE,55) THEN D = L;                                                                ENDOP
+/* LD   D,(HL)     */ OP(NONE,56) THEN TADR=HL; CALL rm(); THEN D = TDAT8;                                    ENDOP
+/* LD   D,A        */ OP(NONE,57) THEN D = A;                                                                ENDOP
 
-OP(op,58) { E = B;                                                                } /* LD   E,B         */
-OP(op,59) { E = C;                                                                } /* LD   E,C         */
-OP(op,5a) { E = D;                                                                } /* LD   E,D         */
-OP(op,5b) {                                                                       } /* LD   E,E         */
-OP(op,5c) { E = H;                                                                } /* LD   E,H         */
-OP(op,5d) { E = L;                                                                } /* LD   E,L         */
-OP(op,5e) { E = rm(HL);                                                           } /* LD   E,(HL)      */
-OP(op,5f) { E = A;                                                                } /* LD   E,A         */
+/* LD   E,B        */ OP(NONE,58) THEN E = B;                                                                ENDOP
+/* LD   E,C        */ OP(NONE,59) THEN E = C;                                                                ENDOP
+/* LD   E,D        */ OP(NONE,5a) THEN E = D;                                                                ENDOP
+/* LD   E,E        */ OP(NONE,5b)                                                                        ENDOP
+/* LD   E,H        */ OP(NONE,5c) THEN E = H;                                                                ENDOP
+/* LD   E,L        */ OP(NONE,5d) THEN E = L;                                                                ENDOP
+/* LD   E,(HL)     */ OP(NONE,5e) THEN TADR=HL; CALL rm(); THEN E = TDAT8;                                    ENDOP
+/* LD   E,A        */ OP(NONE,5f) THEN E = A;                                                                ENDOP
 
-OP(op,60) { H = B;                                                                } /* LD   H,B         */
-OP(op,61) { H = C;                                                                } /* LD   H,C         */
-OP(op,62) { H = D;                                                                } /* LD   H,D         */
-OP(op,63) { H = E;                                                                } /* LD   H,E         */
-OP(op,64) {                                                                       } /* LD   H,H         */
-OP(op,65) { H = L;                                                                } /* LD   H,L         */
-OP(op,66) { H = rm(HL);                                                           } /* LD   H,(HL)      */
-OP(op,67) { H = A;                                                                } /* LD   H,A         */
+/* LD   H,B        */ OP(NONE,60) THEN H = B;                                                                ENDOP
+/* LD   H,C        */ OP(NONE,61) THEN H = C;                                                                ENDOP
+/* LD   H,D        */ OP(NONE,62) THEN H = D;                                                                ENDOP
+/* LD   H,E        */ OP(NONE,63) THEN H = E;                                                                ENDOP
+/* LD   H,H        */ OP(NONE,64)                                                                        ENDOP
+/* LD   H,L        */ OP(NONE,65) THEN H = L;                                                                ENDOP
+/* LD   H,(HL)     */ OP(NONE,66) THEN TADR=HL; CALL rm(); THEN H = TDAT8;                                    ENDOP
+/* LD   H,A        */ OP(NONE,67) THEN H = A;                                                                ENDOP
 
-OP(op,68) { L = B;                                                                } /* LD   L,B         */
-OP(op,69) { L = C;                                                                } /* LD   L,C         */
-OP(op,6a) { L = D;                                                                } /* LD   L,D         */
-OP(op,6b) { L = E;                                                                } /* LD   L,E         */
-OP(op,6c) { L = H;                                                                } /* LD   L,H         */
-OP(op,6d) {                                                                       } /* LD   L,L         */
-OP(op,6e) { L = rm(HL);                                                           } /* LD   L,(HL)      */
-OP(op,6f) { L = A;                                                                } /* LD   L,A         */
+/* LD   L,B        */ OP(NONE,68) THEN L = B;                                                                ENDOP
+/* LD   L,C        */ OP(NONE,69) THEN L = C;                                                                ENDOP
+/* LD   L,D        */ OP(NONE,6a) THEN L = D;                                                                ENDOP
+/* LD   L,E        */ OP(NONE,6b) THEN L = E;                                                                ENDOP
+/* LD   L,H        */ OP(NONE,6c) THEN L = H;                                                                ENDOP
+/* LD   L,L        */ OP(NONE,6d)                                                                        ENDOP
+/* LD   L,(HL)     */ OP(NONE,6e) THEN TADR=HL; CALL rm(); THEN L = TDAT8;                                    ENDOP
+/* LD   L,A        */ OP(NONE,6f) THEN L = A;                                                                ENDOP
 
-OP(op,70) { wm(HL, B);                                                            } /* LD   (HL),B      */
-OP(op,71) { wm(HL, C);                                                            } /* LD   (HL),C      */
-OP(op,72) { wm(HL, D);                                                            } /* LD   (HL),D      */
-OP(op,73) { wm(HL, E);                                                            } /* LD   (HL),E      */
-OP(op,74) { wm(HL, H);                                                            } /* LD   (HL),H      */
-OP(op,75) { wm(HL, L);                                                            } /* LD   (HL),L      */
-OP(op,76) { halt();                                                               } /* HALT             */
-OP(op,77) { wm(HL, A);                                                            } /* LD   (HL),A      */
+/* LD   (HL),B     */ OP(NONE,70) THEN TADR=HL; TDAT=B; CALL wm();                                              ENDOP
+/* LD   (HL),C     */ OP(NONE,71) THEN TADR=HL; TDAT=C; CALL wm();                                              ENDOP
+/* LD   (HL),D     */ OP(NONE,72) THEN TADR=HL; TDAT=D; CALL wm();                                              ENDOP
+/* LD   (HL),E     */ OP(NONE,73) THEN TADR=HL; TDAT=E; CALL wm();                                              ENDOP
+/* LD   (HL),H     */ OP(NONE,74) THEN TADR=HL; TDAT=H; CALL wm();                                              ENDOP
+/* LD   (HL),L     */ OP(NONE,75) THEN TADR=HL; TDAT=L; CALL wm();                                              ENDOP
+/* HALT            */ OP(NONE,76) THEN halt();                                                               ENDOP
+/* LD   (HL),A     */ OP(NONE,77) THEN TADR=HL; TDAT=A; CALL wm();                                              ENDOP
 
-OP(op,78) { A = B;                                                                } /* LD   A,B         */
-OP(op,79) { A = C;                                                                } /* LD   A,C         */
-OP(op,7a) { A = D;                                                                } /* LD   A,D         */
-OP(op,7b) { A = E;                                                                } /* LD   A,E         */
-OP(op,7c) { A = H;                                                                } /* LD   A,H         */
-OP(op,7d) { A = L;                                                                } /* LD   A,L         */
-OP(op,7e) { A = rm(HL);                                                           } /* LD   A,(HL)      */
-OP(op,7f) {                                                                       } /* LD   A,A         */
+/* LD   A,B        */ OP(NONE,78) THEN A = B;                                                                ENDOP
+/* LD   A,C        */ OP(NONE,79) THEN A = C;                                                                ENDOP
+/* LD   A,D        */ OP(NONE,7a) THEN A = D;                                                                ENDOP
+/* LD   A,E        */ OP(NONE,7b) THEN A = E;                                                                ENDOP
+/* LD   A,H        */ OP(NONE,7c) THEN A = H;                                                                ENDOP
+/* LD   A,L        */ OP(NONE,7d) THEN A = L;                                                                ENDOP
+/* LD   A,(HL)     */ OP(NONE,7e) THEN TADR=HL; CALL rm(); THEN A = TDAT8;                                    ENDOP
+/* LD   A,A        */ OP(NONE,7f)                                                                        ENDOP
 
-OP(op,80) { add_a(B);                                                             } /* ADD  A,B         */
-OP(op,81) { add_a(C);                                                             } /* ADD  A,C         */
-OP(op,82) { add_a(D);                                                             } /* ADD  A,D         */
-OP(op,83) { add_a(E);                                                             } /* ADD  A,E         */
-OP(op,84) { add_a(H);                                                             } /* ADD  A,H         */
-OP(op,85) { add_a(L);                                                             } /* ADD  A,L         */
-OP(op,86) { add_a(rm(HL));                                                        } /* ADD  A,(HL)      */
-OP(op,87) { add_a(A);                                                             } /* ADD  A,A         */
+/* ADD  A,B        */ OP(NONE,80) THEN add_a(B);                                                             ENDOP
+/* ADD  A,C        */ OP(NONE,81) THEN add_a(C);                                                             ENDOP
+/* ADD  A,D        */ OP(NONE,82) THEN add_a(D);                                                             ENDOP
+/* ADD  A,E        */ OP(NONE,83) THEN add_a(E);                                                             ENDOP
+/* ADD  A,H        */ OP(NONE,84) THEN add_a(H);                                                             ENDOP
+/* ADD  A,L        */ OP(NONE,85) THEN add_a(L);                                                             ENDOP
+/* ADD  A,(HL)     */ OP(NONE,86) THEN TADR=HL; CALL rm(); THEN add_a(TDAT8);                                 ENDOP
+/* ADD  A,A        */ OP(NONE,87) THEN add_a(A);                                                             ENDOP
 
-OP(op,88) { adc_a(B);                                                             } /* ADC  A,B         */
-OP(op,89) { adc_a(C);                                                             } /* ADC  A,C         */
-OP(op,8a) { adc_a(D);                                                             } /* ADC  A,D         */
-OP(op,8b) { adc_a(E);                                                             } /* ADC  A,E         */
-OP(op,8c) { adc_a(H);                                                             } /* ADC  A,H         */
-OP(op,8d) { adc_a(L);                                                             } /* ADC  A,L         */
-OP(op,8e) { adc_a(rm(HL));                                                        } /* ADC  A,(HL)      */
-OP(op,8f) { adc_a(A);                                                             } /* ADC  A,A         */
+/* ADC  A,B        */ OP(NONE,88) THEN adc_a(B);                                                             ENDOP
+/* ADC  A,C        */ OP(NONE,89) THEN adc_a(C);                                                             ENDOP
+/* ADC  A,D        */ OP(NONE,8a) THEN adc_a(D);                                                             ENDOP
+/* ADC  A,E        */ OP(NONE,8b) THEN adc_a(E);                                                             ENDOP
+/* ADC  A,H        */ OP(NONE,8c) THEN adc_a(H);                                                             ENDOP
+/* ADC  A,L        */ OP(NONE,8d) THEN adc_a(L);                                                             ENDOP
+/* ADC  A,(HL)     */ OP(NONE,8e) THEN TADR=HL; CALL rm(); THEN adc_a(TDAT8);                                 ENDOP
+/* ADC  A,A        */ OP(NONE,8f) THEN adc_a(A);                                                             ENDOP
 
-OP(op,90) { sub(B);                                                               } /* SUB  B           */
-OP(op,91) { sub(C);                                                               } /* SUB  C           */
-OP(op,92) { sub(D);                                                               } /* SUB  D           */
-OP(op,93) { sub(E);                                                               } /* SUB  E           */
-OP(op,94) { sub(H);                                                               } /* SUB  H           */
-OP(op,95) { sub(L);                                                               } /* SUB  L           */
-OP(op,96) { sub(rm(HL));                                                          } /* SUB  (HL)        */
-OP(op,97) { sub(A);                                                               } /* SUB  A           */
+/* SUB  B          */ OP(NONE,90) THEN sub(B);                                                               ENDOP
+/* SUB  C          */ OP(NONE,91) THEN sub(C);                                                               ENDOP
+/* SUB  D          */ OP(NONE,92) THEN sub(D);                                                               ENDOP
+/* SUB  E          */ OP(NONE,93) THEN sub(E);                                                               ENDOP
+/* SUB  H          */ OP(NONE,94) THEN sub(H);                                                               ENDOP
+/* SUB  L          */ OP(NONE,95) THEN sub(L);                                                               ENDOP
+/* SUB  (HL)       */ OP(NONE,96) THEN TADR=HL; CALL rm(); THEN sub(TDAT8);                                   ENDOP
+/* SUB  A          */ OP(NONE,97) THEN sub(A);                                                               ENDOP
 
-OP(op,98) { sbc_a(B);                                                             } /* SBC  A,B         */
-OP(op,99) { sbc_a(C);                                                             } /* SBC  A,C         */
-OP(op,9a) { sbc_a(D);                                                             } /* SBC  A,D         */
-OP(op,9b) { sbc_a(E);                                                             } /* SBC  A,E         */
-OP(op,9c) { sbc_a(H);                                                             } /* SBC  A,H         */
-OP(op,9d) { sbc_a(L);                                                             } /* SBC  A,L         */
-OP(op,9e) { sbc_a(rm(HL));                                                        } /* SBC  A,(HL)      */
-OP(op,9f) { sbc_a(A);                                                             } /* SBC  A,A         */
+/* SBC  A,B        */ OP(NONE,98) THEN sbc_a(B);                                                             ENDOP
+/* SBC  A,C        */ OP(NONE,99) THEN sbc_a(C);                                                             ENDOP
+/* SBC  A,D        */ OP(NONE,9a) THEN sbc_a(D);                                                             ENDOP
+/* SBC  A,E        */ OP(NONE,9b) THEN sbc_a(E);                                                             ENDOP
+/* SBC  A,H        */ OP(NONE,9c) THEN sbc_a(H);                                                             ENDOP
+/* SBC  A,L        */ OP(NONE,9d) THEN sbc_a(L);                                                             ENDOP
+/* SBC  A,(HL)     */ OP(NONE,9e) THEN TADR=HL; CALL rm(); THEN sbc_a(TDAT8);                                 ENDOP
+/* SBC  A,A        */ OP(NONE,9f) THEN sbc_a(A);                                                             ENDOP
 
-OP(op,a0) { and_a(B);                                                             } /* AND  B           */
-OP(op,a1) { and_a(C);                                                             } /* AND  C           */
-OP(op,a2) { and_a(D);                                                             } /* AND  D           */
-OP(op,a3) { and_a(E);                                                             } /* AND  E           */
-OP(op,a4) { and_a(H);                                                             } /* AND  H           */
-OP(op,a5) { and_a(L);                                                             } /* AND  L           */
-OP(op,a6) { and_a(rm(HL));                                                        } /* AND  (HL)        */
-OP(op,a7) { and_a(A);                                                             } /* AND  A           */
+/* AND  B          */ OP(NONE,a0) THEN and_a(B);                                                             ENDOP
+/* AND  C          */ OP(NONE,a1) THEN and_a(C);                                                             ENDOP
+/* AND  D          */ OP(NONE,a2) THEN and_a(D);                                                             ENDOP
+/* AND  E          */ OP(NONE,a3) THEN and_a(E);                                                             ENDOP
+/* AND  H          */ OP(NONE,a4) THEN and_a(H);                                                             ENDOP
+/* AND  L          */ OP(NONE,a5) THEN and_a(L);                                                             ENDOP
+/* AND  (HL)       */ OP(NONE,a6) THEN TADR=HL; CALL rm(); THEN and_a(TDAT8);                                 ENDOP
+/* AND  A          */ OP(NONE,a7) THEN and_a(A);                                                             ENDOP
 
-OP(op,a8) { xor_a(B);                                                             } /* XOR  B           */
-OP(op,a9) { xor_a(C);                                                             } /* XOR  C           */
-OP(op,aa) { xor_a(D);                                                             } /* XOR  D           */
-OP(op,ab) { xor_a(E);                                                             } /* XOR  E           */
-OP(op,ac) { xor_a(H);                                                             } /* XOR  H           */
-OP(op,ad) { xor_a(L);                                                             } /* XOR  L           */
-OP(op,ae) { xor_a(rm(HL));                                                        } /* XOR  (HL)        */
-OP(op,af) { xor_a(A);                                                             } /* XOR  A           */
+/* XOR  B          */ OP(NONE,a8) THEN xor_a(B);                                                             ENDOP
+/* XOR  C          */ OP(NONE,a9) THEN xor_a(C);                                                             ENDOP
+/* XOR  D          */ OP(NONE,aa) THEN xor_a(D);                                                             ENDOP
+/* XOR  E          */ OP(NONE,ab) THEN xor_a(E);                                                             ENDOP
+/* XOR  H          */ OP(NONE,ac) THEN xor_a(H);                                                             ENDOP
+/* XOR  L          */ OP(NONE,ad) THEN xor_a(L);                                                             ENDOP
+/* XOR  (HL)       */ OP(NONE,ae) THEN TADR=HL; CALL rm(); THEN xor_a(TDAT8);                                 ENDOP
+/* XOR  A          */ OP(NONE,af) THEN xor_a(A);                                                             ENDOP
 
-OP(op,b0) { or_a(B);                                                              } /* OR   B           */
-OP(op,b1) { or_a(C);                                                              } /* OR   C           */
-OP(op,b2) { or_a(D);                                                              } /* OR   D           */
-OP(op,b3) { or_a(E);                                                              } /* OR   E           */
-OP(op,b4) { or_a(H);                                                              } /* OR   H           */
-OP(op,b5) { or_a(L);                                                              } /* OR   L           */
-OP(op,b6) { or_a(rm(HL));                                                         } /* OR   (HL)        */
-OP(op,b7) { or_a(A);                                                              } /* OR   A           */
+/* OR   B          */ OP(NONE,b0) THEN or_a(B);                                                              ENDOP
+/* OR   C          */ OP(NONE,b1) THEN or_a(C);                                                              ENDOP
+/* OR   D          */ OP(NONE,b2) THEN or_a(D);                                                              ENDOP
+/* OR   E          */ OP(NONE,b3) THEN or_a(E);                                                              ENDOP
+/* OR   H          */ OP(NONE,b4) THEN or_a(H);                                                              ENDOP
+/* OR   L          */ OP(NONE,b5) THEN or_a(L);                                                              ENDOP
+/* OR   (HL)       */ OP(NONE,b6) THEN TADR=HL; CALL rm(); THEN or_a(TDAT8);                                  ENDOP
+/* OR   A          */ OP(NONE,b7) THEN or_a(A);                                                              ENDOP
 
-OP(op,b8) { cp(B);                                                                } /* CP   B           */
-OP(op,b9) { cp(C);                                                                } /* CP   C           */
-OP(op,ba) { cp(D);                                                                } /* CP   D           */
-OP(op,bb) { cp(E);                                                                } /* CP   E           */
-OP(op,bc) { cp(H);                                                                } /* CP   H           */
-OP(op,bd) { cp(L);                                                                } /* CP   L           */
-OP(op,be) { cp(rm(HL));                                                           } /* CP   (HL)        */
-OP(op,bf) { cp(A);                                                                } /* CP   A           */
+/* CP   B          */ OP(NONE,b8) THEN cp(B);                                                                ENDOP
+/* CP   C          */ OP(NONE,b9) THEN cp(C);                                                                ENDOP
+/* CP   D          */ OP(NONE,ba) THEN cp(D);                                                                ENDOP
+/* CP   E          */ OP(NONE,bb) THEN cp(E);                                                                ENDOP
+/* CP   H          */ OP(NONE,bc) THEN cp(H);                                                                ENDOP
+/* CP   L          */ OP(NONE,bd) THEN cp(L);                                                                ENDOP
+/* CP   (HL)       */ OP(NONE,be) THEN TADR=HL; CALL rm(); THEN cp(TDAT8);                                    ENDOP
+/* CP   A          */ OP(NONE,bf) THEN cp(A);                                                                ENDOP
 
-OP(op,c0) { ret_cond(!(F & ZF), 0xc0);                                            } /* RET  NZ          */
-OP(op,c1) { pop(m_bc);                                                            } /* POP  BC          */
-OP(op,c2) { jp_cond(!(F & ZF));                                                   } /* JP   NZ,a        */
-OP(op,c3) { jp();                                                                 } /* JP   a           */
-OP(op,c4) { call_cond(!(F & ZF), 0xc4);                                           } /* CALL NZ,a        */
-OP(op,c5) { push(m_bc);                                                           } /* PUSH BC          */
-OP(op,c6) { add_a(arg());                                                         } /* ADD  A,n         */
-OP(op,c7) { rst(0x00);                                                            } /* RST  0           */
+/* RET  NZ         */ OP(NONE,c0) THEN TDAT8=!(F & ZF); CALL ret_cond(0xc0);                                    ENDOP
+/* POP  BC         */ OP(NONE,c1) CALL pop(); THEN BC=TDAT;                                                   ENDOP
+/* JP   NZ,a       */ OP(NONE,c2) THEN TDAT8=!(F & ZF); CALL jp_cond();                                         ENDOP
+/* JP   a          */ OP(NONE,c3) CALL jp();                                                                    ENDOP
+/* CALL NZ,a       */ OP(NONE,c4) THEN TDAT8=!(F & ZF); CALL call_cond(0xc4);                                   ENDOP
+/* PUSH BC         */ OP(NONE,c5) THEN TDAT=BC; CALL push();                                                    ENDOP
+/* ADD  A,n        */ OP(NONE,c6) CALL arg(); THEN add_a(TDAT8);                                              ENDOP
+/* RST  0          */ OP(NONE,c7) CALL rst(0x00);                                                               ENDOP
 
-OP(op,c8) { ret_cond(F & ZF, 0xc8);                                               } /* RET  Z           */
-OP(op,c9) { pop(m_pc); WZ = PCD;                                                  } /* RET              */
-OP(op,ca) { jp_cond(F & ZF);                                                      } /* JP   Z,a         */
-OP(op,cb) { EXEC(cb, rop());                                                      } /* **** CB xx       */
-OP(op,cc) { call_cond(F & ZF, 0xcc);                                              } /* CALL Z,a         */
-OP(op,cd) { call();                                                               } /* CALL a           */
-OP(op,ce) { adc_a(arg());                                                         } /* ADC  A,n         */
-OP(op,cf) { rst(0x08);                                                            } /* RST  1           */
+/* RET  Z          */ OP(NONE,c8) THEN TDAT8=(F & ZF); CALL ret_cond(0xc8);                                               ENDOP
+/* RET             */ OP(NONE,c9) CALL pop(); THEN PC=TDAT; WZ = PCD;                                         ENDOP
+/* JP   Z,a        */ OP(NONE,ca) THEN TDAT8=F & ZF; CALL jp_cond();                                            ENDOP
+/* **** CB xx      */ OP(NONE,cb) CALL rop(); THENJP(CB)
+/* CALL Z,a        */ OP(NONE,cc) THEN TDAT8=F & ZF; CALL call_cond(0xcc);                                      ENDOP
+/* CALL a          */ OP(NONE,cd) CALL call();                                                                  ENDOP
+/* ADC  A,n        */ OP(NONE,ce) CALL arg(); THEN adc_a(TDAT8);                                              ENDOP
+/* RST  1          */ OP(NONE,cf) CALL rst(0x08);                                                               ENDOP
 
-OP(op,d0) { ret_cond(!(F & CF), 0xd0);                                            } /* RET  NC          */
-OP(op,d1) { pop(m_de);                                                            } /* POP  DE          */
-OP(op,d2) { jp_cond(!(F & CF));                                                   } /* JP   NC,a        */
-OP(op,d3) { unsigned n = arg() | (A << 8); out(n, A); WZ_L = ((n & 0xff) + 1) & 0xff;  WZ_H = A;   } /* OUT  (n),A       */
-OP(op,d4) { call_cond(!(F & CF), 0xd4);                                           } /* CALL NC,a        */
-OP(op,d5) { push(m_de);                                                           } /* PUSH DE          */
-OP(op,d6) { sub(arg());                                                           } /* SUB  n           */
-OP(op,d7) { rst(0x10);                                                            } /* RST  2           */
+/* RET  NC         */ OP(NONE,d0) THEN TDAT8=!(F & CF); CALL ret_cond(0xd0);                                    ENDOP
+/* POP  DE         */ OP(NONE,d1) CALL pop(); THEN DE=TDAT;                                                   ENDOP
+/* JP   NC,a       */ OP(NONE,d2) THEN TDAT8=!(F & CF); CALL jp_cond();                                         ENDOP
+/* OUT  (n),A      */ OP(NONE,d3) CALL arg(); THEN TADR = TDAT8 | (A << 8); TDAT=A; CALL out(); THEN WZ_L = ((TADR & 0xff) + 1) & 0xff;  WZ_H = A; ENDOP
+/* CALL NC,a       */ OP(NONE,d4) THEN TDAT8=!(F & CF); CALL call_cond(0xd4);                                   ENDOP
+/* PUSH DE         */ OP(NONE,d5) THEN TDAT=DE; CALL push();                                                    ENDOP
+/* SUB  n          */ OP(NONE,d6) CALL arg(); THEN sub(TDAT8);                                                ENDOP
+/* RST  2          */ OP(NONE,d7) CALL rst(0x10);                                                               ENDOP
 
-OP(op,d8) { ret_cond(F & CF, 0xd8);                                               } /* RET  C           */
-OP(op,d9) { exx();                                                                } /* EXX              */
-OP(op,da) { jp_cond(F & CF);                                                      } /* JP   C,a         */
-OP(op,db) { unsigned n = arg() | (A << 8); A = in(n); WZ = n + 1;                 } /* IN   A,(n)       */
-OP(op,dc) { call_cond(F & CF, 0xdc);                                              } /* CALL C,a         */
-OP(op,dd) { EXEC(dd, rop());                                                      } /* **** DD xx       */
-OP(op,de) { sbc_a(arg());                                                         } /* SBC  A,n         */
-OP(op,df) { rst(0x18);                                                            } /* RST  3           */
+/* RET  C          */ OP(NONE,d8) THEN TDAT8=(F & CF); CALL ret_cond(0xd8);                                               ENDOP
+/* EXX             */ OP(NONE,d9) THEN exx();                                                                ENDOP
+/* JP   C,a        */ OP(NONE,da) THEN TDAT8=F & CF; CALL jp_cond();                                            ENDOP
+/* IN   A,(n)      */ OP(NONE,db) CALL arg(); THEN TADR = TDAT8 | (A << 8); CALL in(); THEN A = TDAT8; WZ = TADR + 1; ENDOP
+/* CALL C,a        */ OP(NONE,dc) THEN TDAT8=F & CF; CALL call_cond(0xdc);                                      ENDOP
+/* **** DD xx      */ OP(NONE,dd) CALL rop(); THENJP(DD)
+/* SBC  A,n        */ OP(NONE,de) CALL arg(); THEN sbc_a(TDAT8);                                              ENDOP
+/* RST  3          */ OP(NONE,df) CALL rst(0x18);                                                               ENDOP
 
-OP(op,e0) { ret_cond(!(F & PF), 0xe0);                                            } /* RET  PO          */
-OP(op,e1) { pop(m_hl);                                                            } /* POP  HL          */
-OP(op,e2) { jp_cond(!(F & PF));                                                   } /* JP   PO,a        */
-OP(op,e3) { ex_sp(m_hl);                                                          } /* EX   HL,(SP)     */
-OP(op,e4) { call_cond(!(F & PF), 0xe4);                                           } /* CALL PO,a        */
-OP(op,e5) { push(m_hl);                                                           } /* PUSH HL          */
-OP(op,e6) { and_a(arg());                                                         } /* AND  n           */
-OP(op,e7) { rst(0x20);                                                            } /* RST  4           */
+/* RET  PO         */ OP(NONE,e0) THEN TDAT8=!(F & PF); CALL ret_cond(0xe0);                                    ENDOP
+/* POP  HL         */ OP(NONE,e1) CALL pop(); THEN HL=TDAT;                                                   ENDOP
+/* JP   PO,a       */ OP(NONE,e2) THEN TDAT8=!(F & PF); CALL jp_cond();                                         ENDOP
+/* EX   HL,(SP)    */ OP(NONE,e3) THEN TDAT=HL; CALL ex_sp(); THEN HL=TDAT;                                    ENDOP
+/* CALL PO,a       */ OP(NONE,e4) THEN TDAT8=!(F & PF); CALL call_cond(0xe4);                                   ENDOP
+/* PUSH HL         */ OP(NONE,e5) THEN TDAT=HL; CALL push();                                                    ENDOP
+/* AND  n          */ OP(NONE,e6) CALL arg(); THEN and_a(TDAT8);                                              ENDOP
+/* RST  4          */ OP(NONE,e7) CALL rst(0x20);                                                               ENDOP
 
-OP(op,e8) { ret_cond(F & PF, 0xe8);                                               } /* RET  PE          */
-OP(op,e9) { PC = HL;                                                              } /* JP   (HL)        */
-OP(op,ea) { jp_cond(F & PF);                                                      } /* JP   PE,a        */
-OP(op,eb) { ex_de_hl();                                                           } /* EX   DE,HL       */
-OP(op,ec) { call_cond(F & PF, 0xec);                                              } /* CALL PE,a        */
-OP(op,ed) { EXEC(ed, rop());                                                      } /* **** ED xx       */
-OP(op,ee) { xor_a(arg());                                                         } /* XOR  n           */
-OP(op,ef) { rst(0x28);                                                            } /* RST  5           */
+/* RET  PE         */ OP(NONE,e8) THEN TDAT8=(F & PF); CALL ret_cond(0xe8);                                               ENDOP
+/* JP   (HL)       */ OP(NONE,e9) THEN PC = HL;                                                              ENDOP
+/* JP   PE,a       */ OP(NONE,ea) THEN TDAT8=F & PF; CALL jp_cond();                                            ENDOP
+/* EX   DE,HL      */ OP(NONE,eb) THEN std::swap(DE, HL);                                                    ENDOP
+/* CALL PE,a       */ OP(NONE,ec) THEN TDAT8=F & PF; CALL call_cond(0xec);                                      ENDOP
+/* **** ED xx      */ OP(NONE,ed) CALL rop(); THENJP(ED)
+/* XOR  n          */ OP(NONE,ee) CALL arg(); THEN xor_a(TDAT8);                                              ENDOP
+/* RST  5          */ OP(NONE,ef) CALL rst(0x28);                                                               ENDOP
 
-OP(op,f0) { ret_cond(!(F & SF), 0xf0);                                            } /* RET  P           */
-OP(op,f1) { pop(m_af);                                                            } /* POP  AF          */
-OP(op,f2) { jp_cond(!(F & SF));                                                   } /* JP   P,a         */
-OP(op,f3) { m_iff1 = m_iff2 = 0;                                                  } /* DI               */
-OP(op,f4) { call_cond(!(F & SF), 0xf4);                                           } /* CALL P,a         */
-OP(op,f5) { push(m_af);                                                           } /* PUSH AF          */
-OP(op,f6) { or_a(arg());                                                          } /* OR   n           */
-OP(op,f7) { rst(0x30);                                                            } /* RST  6           */
+/* RET  P          */ OP(NONE,f0) THEN TDAT8=!(F & SF); CALL ret_cond(0xf0);                                    ENDOP
+/* POP  AF         */ OP(NONE,f1) CALL pop(); THEN AF=TDAT;                                                   ENDOP
+/* JP   P,a        */ OP(NONE,f2) THEN TDAT8=!(F & SF); CALL jp_cond();                                         ENDOP
+/* DI              */ OP(NONE,f3) THEN m_iff1 = m_iff2 = 0;                                                  ENDOP
+/* CALL P,a        */ OP(NONE,f4) THEN TDAT8=!(F & SF); CALL call_cond(0xf4);                                   ENDOP
+/* PUSH AF         */ OP(NONE,f5) THEN TDAT=AF; CALL push();                                                    ENDOP
+/* OR   n          */ OP(NONE,f6) CALL arg(); THEN or_a(TDAT8);                                               ENDOP
+/* RST  6          */ OP(NONE,f7) CALL rst(0x30);                                                               ENDOP
 
-OP(op,f8) { ret_cond(F & SF, 0xf8);                                               } /* RET  M           */
-OP(op,f9) { nomreq_ir(2); SP = HL;                                                } /* LD   SP,HL       */
-OP(op,fa) { jp_cond(F & SF);                                                      } /* JP   M,a         */
-OP(op,fb) { ei();                                                                 } /* EI               */
-OP(op,fc) { call_cond(F & SF, 0xfc);                                              } /* CALL M,a         */
-OP(op,fd) { EXEC(fd, rop());                                                      } /* **** FD xx       */
-OP(op,fe) { cp(arg());                                                            } /* CP   n           */
-OP(op,ff) { rst(0x38);                                                            } /* RST  7           */
+/* RET  M          */ OP(NONE,f8) THEN TDAT8=(F & SF); CALL ret_cond(0xf8);                                               ENDOP
+/* LD   SP,HL      */ OP(NONE,f9) CALL nomreq_ir(2); THEN SP = HL;                                            ENDOP
+/* JP   M,a        */ OP(NONE,fa) THEN TDAT8=F & SF; CALL jp_cond();                                            ENDOP
+/* EI              */ OP(NONE,fb) THEN ei();                                                                 ENDOP
+/* CALL M,a        */ OP(NONE,fc) THEN TDAT8=F & SF; CALL call_cond(0xfc);                                      ENDOP
+/* **** FD xx      */ OP(NONE,fd) CALL rop(); THENJP(FD)
+/* CP   n          */ OP(NONE,fe) CALL arg(); THEN cp(TDAT8);                                                 ENDOP
+/* RST  7          */ OP(NONE,ff) CALL rst(0x38);                                                               ENDOP
 
+} // end: init_op_steps()
 
 void z80_device::take_nmi()
 {
@@ -3236,8 +3181,7 @@ void z80_device::take_nmi()
 	m_iff1 = 0;
 	m_r++;
 
-	m_icount_executing = 11;
-	T(m_icount_executing - MTM * 2);
+	T(5);
 	wm16_sp(m_pc);
 	PCD = 0x0066;
 	WZ=PCD;
@@ -3260,12 +3204,10 @@ void z80_device::take_interrupt()
 	// fetch the IRQ vector
 	device_z80daisy_interface *intf = daisy_get_irq_device();
 	int irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w.l);
-	LOG(("Z80 single int. irq_vector $%02x\n", irq_vector));
+	LOGINT("single INT irq_vector $%02x\n", irq_vector);
 
 	/* 'interrupt latency' cycles */
-	m_icount_executing = 0;
-	CC(ex, 0xff); // 2
-	T(m_icount_executing);
+	T(2);
 
 	/* Interrupt mode 2. Call [i:databyte] */
 	if( m_im == 2 )
@@ -3274,23 +3216,19 @@ void z80_device::take_interrupt()
 		// However, experiments have confirmed that IM 2 vectors do not have to be
 		// even, and all 8 bits will be used; even $FF is handled normally.
 		/* CALL opcode timing */
-		CC(op, 0xcd); // 17+2=19
-		T(m_icount_executing - MTM * 4);
-		m_icount_executing -= MTM * 2; // save for rm16
+		T(5);
 		wm16_sp(m_pc);
-		m_icount_executing += MTM * 2;
 		irq_vector = (irq_vector & 0xff) | (m_i << 8);
 		rm16(irq_vector, m_pc);
-		LOG(("Z80 IM2 [$%04x] = $%04x\n", irq_vector, PCD));
+		LOGINT("IM2 [$%04x] = $%04x\n", irq_vector, PCD);
 	}
 	else
 	/* Interrupt mode 1. RST 38h */
 	if( m_im == 1 )
 	{
-		LOG(("Z80 '%s' IM1 $0038\n", tag()));
+		LOGINT("'%s' IM1 $0038\n", tag());
 		/* RST $38 */
-		CC(op, 0xff); // 11+2=13
-		T(m_icount_executing - MTM * 2);
+		T(5);
 		wm16_sp(m_pc);
 		PCD = 0x0038;
 	}
@@ -3299,7 +3237,7 @@ void z80_device::take_interrupt()
 		/* Interrupt mode 0. We check for CALL and JP instructions, */
 		/* if neither of these were found we assume a 1 byte opcode */
 		/* was placed on the databus                                */
-		LOG(("Z80 IM0 $%04x\n", irq_vector));
+		LOGINT("IM0 $%04x\n", irq_vector);
 
 		/* check for nop */
 		if (irq_vector != 0x00)
@@ -3308,30 +3246,26 @@ void z80_device::take_interrupt()
 			{
 				case 0xcd0000:  /* call */
 					/* CALL $xxxx cycles */
-					CC(op, 0xcd);
-					T(m_icount_executing - MTM * 2);
+					T(11);
 					wm16_sp(m_pc);
 					PCD = irq_vector & 0xffff;
 					break;
 				case 0xc30000:  /* jump */
 					/* JP $xxxx cycles */
-					CC(op, 0xc3);
-					T(m_icount_executing);
+					T(10);
 					PCD = irq_vector & 0xffff;
 					break;
 				default:        /* rst (or other opcodes?) */
 					if (irq_vector == 0xfb)
 					{
 						// EI
-						CC(op, 0xfb);
-						T(m_icount_executing);
+						T(4);
 						ei();
 					}
 					else if ((irq_vector & 0xc7) == 0xc7)
 					{
 						/* RST $xx cycles */
-						CC(op, 0xff);
-						T(m_icount_executing - MTM * 2);
+						T(5);
 						wm16_sp(m_pc);
 						PCD = irq_vector & 0x0038;
 					}
@@ -3349,18 +3283,21 @@ void z80_device::take_interrupt()
 #endif
 }
 
-void z80_device::nomreq_ir(s8 cycles)
-{
-	nomreq_addr((m_i << 8) | (m_r2 & 0x80) | (m_r & 0x7f), cycles);
-}
+DEF( nomreq_ir(s8 cycles) )
+	THEN
+		TADR = (m_i << 8) | (m_r2 & 0x80) | (m_r & 0x7f);
+	CALL nomreq_addr(cycles);
+ENDDEF
 
-void z80_device::nomreq_addr(u16 addr, s8 cycles)
+z80_device::ops_type z80_device::nomreq_addr(s8 cycles)
 {
-	for (; cycles; cycles--)
-	{
-		m_nomreq_cb(addr, 0x00, 0xff);
-		T(1);
+    ops_type steps;
+	while(cycles--) {
+		steps.push_back([&]() { m_nomreq_cb(TADR, 0x00, 0xff); });
+		steps.push_back([&]() { T(1); });
 	}
+
+	return steps;
 }
 
 void nsc800_device::take_interrupt_nsc800()
@@ -3372,11 +3309,7 @@ void nsc800_device::take_interrupt_nsc800()
 	m_iff1 = m_iff2 = 0;
 
 	/* 'interrupt latency' cycles */
-	m_icount_executing = 0;
-	CC(op, 0xff);
-	CC(ex, 0xff); //2
-
-	T(m_icount_executing - MTM * 2);
+	T(7);
 	if (m_nsc800_irq_state[NSC800_RSTA])
 	{
 		wm16_sp(m_pc);
@@ -3392,7 +3325,10 @@ void nsc800_device::take_interrupt_nsc800()
 		wm16_sp(m_pc);
 		PCD = 0x002c;
 	}
-	T(m_icount_executing);
+	else
+	{
+		T(2 * m_memrq_cycles);
+	}
 
 	WZ=PCD;
 
@@ -3405,14 +3341,15 @@ void nsc800_device::take_interrupt_nsc800()
 /****************************************************************************
  * Processor initialization
  ****************************************************************************/
+ALLOW_SAVE_TYPE(z80_device::op_prefix);
 void z80_device::device_start()
 {
 	if( !tables_initialised )
 	{
-		uint8_t *padd = &SZHVC_add[  0*256];
-		uint8_t *padc = &SZHVC_add[256*256];
-		uint8_t *psub = &SZHVC_sub[  0*256];
-		uint8_t *psbc = &SZHVC_sub[256*256];
+		u8 *padd = &SZHVC_add[  0*256];
+		u8 *padc = &SZHVC_add[256*256];
+		u8 *psub = &SZHVC_sub[  0*256];
+		u8 *psbc = &SZHVC_sub[256*256];
 		for (int oldval = 0; oldval < 256; oldval++)
 		{
 			for (int newval = 0; newval < 256; newval++)
@@ -3481,6 +3418,11 @@ void z80_device::device_start()
 
 		tables_initialised = true;
 	}
+	init_op_steps();
+
+	save_item(NAME(m_cycle));
+	save_item(NAME(m_prefix));
+	save_item(NAME(m_opcode));
 
 	save_item(NAME(m_prvpc.w.l));
 	save_item(NAME(PC));
@@ -3498,6 +3440,8 @@ void z80_device::device_start()
 	save_item(NAME(m_hl2.w.l));
 	save_item(NAME(m_r));
 	save_item(NAME(m_r2));
+	save_item(NAME(m_q));
+	save_item(NAME(m_qtemp));
 	save_item(NAME(m_iff1));
 	save_item(NAME(m_iff2));
 	save_item(NAME(m_halt));
@@ -3510,6 +3454,9 @@ void z80_device::device_start()
 	save_item(NAME(m_busrq_state));
 	save_item(NAME(m_after_ei));
 	save_item(NAME(m_after_ldair));
+	save_item(NAME(m_m_shared_addr.w));
+	save_item(NAME(m_m_shared_data.w));
+	save_item(NAME(m_m_shared_data2.w));
 
 	/* Reset registers to their initial values */
 	PRVPC = 0;
@@ -3547,8 +3494,8 @@ void z80_device::device_start()
 	space(AS_PROGRAM).specific(m_data);
 	space(AS_IO).specific(m_io);
 
-	IX = IY = 0xffff; /* IX and IY are FFFF after a reset! */
-	F = ZF;           /* Zero flag is set */
+	IX = IY = 0xffff; // IX and IY are FFFF after a reset!
+	set_f(ZF);        // Zero flag is set
 
 	/* set up the state table */
 	state_add(STATE_GENPC,     "PC",        m_pc.w.l).callimport();
@@ -3582,15 +3529,6 @@ void z80_device::device_start()
 
 	// set our instruction counter
 	set_icountptr(m_icount);
-	m_icount_executing = 0;
-
-	/* setup cycle tables */
-	m_cc_op = cc_op;
-	m_cc_cb = cc_cb;
-	m_cc_ed = cc_ed;
-	m_cc_xy = cc_xy;
-	m_cc_xycb = cc_xycb;
-	m_cc_ex = cc_ex;
 }
 
 void nsc800_device::device_start()
@@ -3606,6 +3544,10 @@ void nsc800_device::device_start()
 void z80_device::device_reset()
 {
 	leave_halt();
+
+	m_cycle = 0;
+	m_prefix = NONE;
+	m_opcode = 0;
 
 	PC = 0x0000;
 	m_i = 0;
@@ -3626,42 +3568,62 @@ void nsc800_device::device_reset()
 	memset(m_nsc800_irq_state, 0, sizeof(m_nsc800_irq_state));
 }
 
+inline void z80_device::execute_cycles(u8 icount)
+{
+	m_icount -= icount;
+}
+
 /****************************************************************************
  * Execute 'cycles' T-states.
  ****************************************************************************/
-
 void z80_device::execute_run()
 {
-	do
+	while (m_icount > 0)
 	{
-		if (m_wait_state)
+		ops_type &v = m_op_steps[m_prefix][m_opcode];
+		while (m_cycle < v.size() && m_icount > 0)
 		{
-			// stalled
-			m_icount = 0;
-			return;
+			if (m_wait_state)
+			{
+				m_icount = 0; // stalled
+				return;
+			}
+			const int icount = m_icount;
+			v[m_cycle++]();
+			if ((m_icount < 0) && access_to_be_redone())
+			{
+				m_icount = icount;
+				m_cycle--;
+				return;
+			}
 		}
 
+		if(m_cycle >= v.size())
+			m_cycle = 0;
+	}
+}
+
+DEF( next_op() )
+	THEN
 		// check for interrupts before each instruction
 		check_interrupts();
-		m_icount_executing = 0;
-
+	//THEN
 		m_after_ei = false;
 		m_after_ldair = false;
 
 		PRVPC = PCD;
 		debugger_instruction_hook(PCD);
-
-		uint8_t opcode = rop();
-
+	CALL rop();
+	THEN
+		m_prefix = NONE;
+		m_opcode = TDAT8;
 		// when in HALT state, the fetched opcode is not dispatched (aka a NOP)
 		if (m_halt)
 		{
 			PC--;
-			opcode = 0;
+			m_opcode = 0;
 		}
-		EXEC(op,opcode);
-	} while (m_icount > 0);
-}
+ENDDEF
 
 void z80_device::check_interrupts()
 {
@@ -3741,7 +3703,6 @@ void nsc800_device::execute_set_input(int inputnum, int state)
 /**************************************************************************
  * STATE IMPORT/EXPORT
  **************************************************************************/
-
 void z80_device::state_import( const device_state_entry &entry )
 {
 	switch (entry.index())
@@ -3796,44 +3757,20 @@ void z80_device::state_string_export(const device_state_entry &entry, std::strin
 	}
 }
 
-//-------------------------------------------------
-//  disassemble - call the disassembly
-//  helper function
-//-------------------------------------------------
-
+/**************************************************************************
+ * disassemble - call the disassembly helper function
+ **************************************************************************/
 std::unique_ptr<util::disasm_interface> z80_device::create_disassembler()
 {
 	return std::make_unique<z80_disassembler>();
 }
 
-
-/**************************************************************************
- * Generic set_info
- **************************************************************************/
-
-void z80_device::z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, const uint8_t *ed, const uint8_t *xy, const uint8_t *xycb, const uint8_t *ex)
-{
-	m_cc_op = (op != nullptr) ? op : cc_op;
-	m_cc_cb = (cb != nullptr) ? cb : cc_cb;
-	m_cc_ed = (ed != nullptr) ? ed : cc_ed;
-	m_cc_xy = (xy != nullptr) ? xy : cc_xy;
-	m_cc_xycb = (xycb != nullptr) ? xycb : cc_xycb;
-	m_cc_ex = (ex != nullptr) ? ex : cc_ex;
-}
-
-
-void z80_device::set_mtm_cycles(uint8_t mtm_cycles)
-{
-	m_mtm_cycles = mtm_cycles;
-}
-
-
-z80_device::z80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+z80_device::z80_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	z80_device(mconfig, Z80, tag, owner, clock)
 {
 }
 
-z80_device::z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+z80_device::z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	z80_daisy_chain_interface(mconfig, *this),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0),
@@ -3842,8 +3779,7 @@ z80_device::z80_device(const machine_config &mconfig, device_type type, const ch
 	m_irqack_cb(*this),
 	m_refresh_cb(*this),
 	m_nomreq_cb(*this),
-	m_halt_cb(*this),
-	m_mtm_cycles(3)
+	m_halt_cb(*this)
 {
 }
 
@@ -3864,7 +3800,7 @@ device_memory_interface::space_config_vector z80_device::memory_space_config() c
 
 DEFINE_DEVICE_TYPE(Z80, z80_device, "z80", "Zilog Z80")
 
-nsc800_device::nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nsc800_device::nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: z80_device(mconfig, NSC800, tag, owner, clock)
 {
 }
