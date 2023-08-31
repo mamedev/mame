@@ -5,9 +5,7 @@
 
 #include "imagedev/floppy.h"
 
-#include "debugger.h"
-
-#define LOG_SETUP   (1U << 1) // Shows register setup
+#define LOG_DATA    (1U << 1) // Shows data reads and writes
 #define LOG_SHIFT   (1U << 2) // Shows shift register contents
 #define LOG_COMP    (1U << 3) // Shows operations on the CPU side
 #define LOG_COMMAND (1U << 4) // Shows command invocation
@@ -29,7 +27,7 @@
 
 #include "logmacro.h"
 
-#define LOGSETUP(...)   LOGMASKED(LOG_SETUP,  __VA_ARGS__)
+#define LOGDATA(...)    LOGMASKED(LOG_DATA, __VA_ARGS__)
 #define LOGSHIFT(...)   LOGMASKED(LOG_SHIFT, __VA_ARGS__)
 #define LOGCOMP(...)    LOGMASKED(LOG_COMP, __VA_ARGS__)
 #define LOGCOMMAND(...) LOGMASKED(LOG_COMMAND, __VA_ARGS__)
@@ -1396,13 +1394,17 @@ void wd_fdc_device_base::data_w(uint8_t val)
 	if (!mr) return;
 
 	data = val ^ bus_invert_value;
+	LOGDATA("%s: Write %02X to data register (DRQ=%d)\n", machine().describe_context(), data, drq);
 	drop_drq();
 }
 
 uint8_t wd_fdc_device_base::data_r()
 {
 	if (!machine().side_effects_disabled())
+	{
+		LOGDATA("%s: Read %02X from data register (DRQ=%d)\n", machine().describe_context(), data, drq);
 		drop_drq();
+	}
 
 	return data ^ bus_invert_value;
 }
