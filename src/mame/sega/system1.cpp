@@ -5661,7 +5661,7 @@ GAME( 1984, swat,       0,        sys1ppix_315_5048, swat,      system1_state, e
 GAME( 1984, flickyo,    flicky,   sys1ppix_315_5051, flicky,    system1_state, empty_init,        ROT0,   "Sega", "Flicky (64k Version, 315-5051, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, flickys1,   flicky,   sys1ppix_315_5051, flickys1,  system1_state, empty_init,        ROT0,   "Sega", "Flicky (64k Version, 315-5051, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, flickyup,   flicky,   sys1ppix_315_5051, flicky,    system1_state, empty_init,        ROT0,   "Sega", "Flicky (64k Version, on Up'n Down boardset, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, flickyupa,  flicky,   sys1ppix_315_5051, flicky,    system1_state, empty_init,        ROT0,   "Sega", "Flicky (64k Version, on Up'n Down boardset, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, flickyupa,  flicky,   sys1ppix_315_5051, flicky,    system1_state, empty_init,        ROT0,   "bootleg", "Flicky (64k Version, on Up'n Down boardset, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, wmatch,     0,        sys1ppisx_315_5064,wmatch,    system1_state, empty_init,        ROT270, "Sega", "Water Match (315-5064)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, bullfgt,    0,        sys1ppix_315_5065, bullfgt,   system1_state, empty_init,        ROT0,   "Coreland / Sega", "Bullfight (315-5065)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, nprinces,   seganinj, sys1ppix_315_5051, seganinj,  system1_state, empty_init,        ROT0,   "bootleg?", "Ninja Princess (315-5051, 64k Ver. bootleg?)", MACHINE_SUPPORTS_SAVE )
