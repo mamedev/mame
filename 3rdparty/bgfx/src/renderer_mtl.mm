@@ -2354,7 +2354,7 @@ BX_STATIC_ASSERT(BX_COUNTOF(s_accessNames) == Access::Count, "Invalid s_accessNa
 
 					if (NULL != reflection)
 					{
-						processArguments(pso, reflection.vertexBindings, reflection.fragmentBindings);
+						processArguments(pso, reflection.vertexArguments, reflection.fragmentArguments);
 					}
 				}
 
@@ -2401,7 +2401,7 @@ BX_STATIC_ASSERT(BX_COUNTOF(s_accessNames) == Access::Count, "Invalid s_accessNa
 					, MTLPipelineOptionBufferTypeInfo
 					, &reflection
 					);
-				processArguments(pso, reflection.bindings, NULL);
+				processArguments(pso, reflection.arguments, NULL);
 
 				for (uint32_t ii = 0; ii < 3; ++ii)
 				{
