@@ -24,15 +24,6 @@
  *   Changes in 0.243:
  *    Foundation for M cycles emulation. Currently we preserve cc_* tables with total timings.
  *    execute_run() behavior (simplified) ...
- *    Before:
- *      + fetch opcode
- *      + call EXEC()
- *        + adjust icount base on cc_* (all T are used after M1 == wrong)
- *          + execute instruction
- *    Now:
- *      + fetch opcode
- *      + call EXEC()
- *        + execute instruction adjusting icount per each Read (arg(), recursive rop()) and Write
  *   Changes in 3.9:
  *    - Fixed cycle counts for LD IYL/IXL/IYH/IXH,n [Marshmellow]
  *    - Fixed X/Y flags in CCF/SCF/BIT, ZEXALL is happy now [hap]
@@ -140,11 +131,10 @@
 #define HAS_LDAIR_QUIRK  0
 
 
-/****************************************************************************/
-/* The Z80 registers. halt is set to 1 when the CPU is halted, the refresh  */
-/* register is calculated as follows: refresh=(r&127)|(r2&128)              */
-/****************************************************************************/
-
+/****************************************************************************
+ * The Z80 registers. halt is set to 1 when the CPU is halted, the refresh
+ * register is calculated as follows: refresh = (r & 127) | (r2 & 128)
+ ****************************************************************************/
 #define CF      0x01
 #define NF      0x02
 #define PF      0x04
@@ -158,7 +148,7 @@
 #define INT_IRQ 0x01
 #define NMI_IRQ 0x02
 
-#define PRVPC   m_prvpc.d     /* previous program counter */
+#define PRVPC   m_prvpc.d     // previous program counter
 
 #define PCD     m_pc.d
 #define PC      m_pc.w.l
@@ -203,11 +193,11 @@
 
 
 static bool tables_initialised = false;
-static u8 SZ[256];       /* zero and sign flags */
-static u8 SZ_BIT[256];   /* zero, sign and parity/overflow (=zero) flags for BIT opcode */
-static u8 SZP[256];      /* zero, sign and parity flags */
-static u8 SZHV_inc[256]; /* zero, sign, half carry and overflow flags INC r8 */
-static u8 SZHV_dec[256]; /* zero, sign, half carry and overflow flags DEC r8 */
+static u8 SZ[256];       // zero and sign flags
+static u8 SZ_BIT[256];   // zero, sign and parity/overflow (=zero) flags for BIT opcode
+static u8 SZP[256];      // zero, sign and parity flags
+static u8 SZHV_inc[256]; // zero, sign, half carry and overflow flags INC r8
+static u8 SZHV_dec[256]; // zero, sign, half carry and overflow flags DEC r8
 
 static u8 SZHVC_add[2*256*256];
 static u8 SZHVC_sub[2*256*256];
@@ -366,14 +356,15 @@ inline void z80_device::rm16(u16 addr, PAIR &r)
 {
 	r.b.l = data_read(addr);
 	T(m_memrq_cycles);
-	r.b.h = data_read(addr+1);
+	r.b.h = data_read(addr + 1);
 	T(m_memrq_cycles);
 }
 
 /***************************************************************
  * Write a byte to given memory location
  ***************************************************************/
-inline void z80_device::data_write(u16 addr, u8 value) {
+inline void z80_device::data_write(u16 addr, u8 value)
+{
 	m_data.write_byte(translate_memory_address((u32)addr), value);
 }
 
@@ -389,7 +380,7 @@ inline void z80_device::wm(u16 addr, u8 value)
 inline void z80_device::wm16(u16 addr, PAIR &r)
 {
 	wm(addr, r.b.l);
-	wm(addr+1, r.b.h);
+	wm(addr + 1, r.b.h);
 }
 
 /***************************************************************
@@ -462,13 +453,13 @@ u16 z80_device::arg16()
  ***************************************************************/
 inline void z80_device::eax()
 {
-	m_ea = (u32)(u16)(IX + (int8_t)arg());
+	m_ea = (u32)(u16)(IX + (s8)arg());
 	WZ = m_ea;
 }
 
 inline void z80_device::eay()
 {
-	m_ea = (u32)(u16)(IY + (int8_t)arg());
+	m_ea = (u32)(u16)(IY + (s8)arg());
 	WZ = m_ea;
 }
 
@@ -483,7 +474,6 @@ inline void z80_device::pop(PAIR &r)
 
 /***************************************************************
  * PUSH
- *  in: TDAT
  ***************************************************************/
 inline void z80_device::push(PAIR &r)
 {
@@ -511,7 +501,7 @@ inline void z80_device::jp_cond(bool cond)
 		WZ = PCD;
 	}
 	else
-		WZ = arg16(); /* implicit do PC += 2 */
+		WZ = arg16(); // implicit do PC += 2
 }
 
 /***************************************************************
@@ -519,9 +509,9 @@ inline void z80_device::jp_cond(bool cond)
  ***************************************************************/
 inline void z80_device::jr()
 {
-	int8_t a = (int8_t)arg(); /* arg() also increments PC */
+	s8 a = (s8)arg(); // arg() also increments PC
 	nomreq_addr(PCD - 1, 5);
-	PC += a; /* so don't do PC += arg() */
+	PC += a; // so don't do PC += arg()
 	WZ = PC;
 }
 
@@ -568,7 +558,7 @@ inline void z80_device::call_cond(bool cond, u8 opcode)
 		PCD = m_ea;
 	}
 	else
-		WZ = arg16(); /* implicit call PC+=2; */
+		WZ = arg16(); // implicit call PC+=2;
 }
 
 /***************************************************************
@@ -613,7 +603,7 @@ inline void z80_device::ld_r_a()
 {
 	nomreq_ir(1);
 	m_r = A;
-	m_r2 = A & 0x80; /* keep bit 7 of r */
+	m_r2 = A & 0x80; // keep bit 7 of r
 }
 
 /***************************************************************
@@ -866,9 +856,10 @@ inline void z80_device::cp(u8 value)
  ***************************************************************/
 inline void z80_device::exx()
 {
-	std::swap(m_bc, m_bc2);
-	std::swap(m_de, m_de2);
-	std::swap(m_hl, m_hl2);
+	using std::swap;
+	swap(m_bc, m_bc2);
+	swap(m_de, m_de2);
+	swap(m_hl, m_hl2);
 }
 
 /***************************************************************
@@ -1401,15 +1392,16 @@ inline void z80_device::set_f(u8 f)
 	F = f;
 }
 
-inline void z80_device::illegal_1() {
+inline void z80_device::illegal_1()
+{
 	LOGUNDOC("ill. opcode $%02x $%02x ($%04x)\n",
-			m_opcodes.read_byte(translate_memory_address((PCD-1)&0xffff)), m_opcodes.read_byte(translate_memory_address(PCD)), PCD-1);
+			 m_opcodes.read_byte(translate_memory_address((PCD - 1) & 0xffff)), m_opcodes.read_byte(translate_memory_address(PCD)), PCD - 1);
 }
 
 inline void z80_device::illegal_2()
 {
 	LOGUNDOC("ill. opcode $ed $%02x\n",
-			m_opcodes.read_byte(translate_memory_address((PCD-1)&0xffff)));
+			 m_opcodes.read_byte(translate_memory_address((PCD - 1) & 0xffff)));
 }
 
 /**********************************************************
@@ -2885,7 +2877,7 @@ OP(op,05) { B = dec(B);                                                         
 OP(op,06) { B = arg();                                                            } /* LD   B,n         */
 OP(op,07) { rlca();                                                               } /* RLCA             */
 
-OP(op,08) { std::swap(m_af, m_af2);                                               } /* EX   AF,AF'      */
+OP(op,08) { using std::swap; swap(m_af, m_af2);                                   } /* EX   AF,AF'      */
 OP(op,09) { add16(m_hl, m_bc);                                                    } /* ADD  HL,BC       */
 OP(op,0a) { A = rm(BC);  WZ=BC+1;                                                 } /* LD   A,(BC)      */
 OP(op,0b) { nomreq_ir(2); BC--;                                                   } /* DEC  BC          */
@@ -3140,7 +3132,7 @@ OP(op,e7) { rst(0x20);                                                          
 OP(op,e8) { ret_cond(F & PF, 0xe8);                                               } /* RET  PE          */
 OP(op,e9) { PC = HL;                                                              } /* JP   (HL)        */
 OP(op,ea) { jp_cond(F & PF);                                                      } /* JP   PE,a        */
-OP(op,eb) { std::swap(DE, HL);                                                    } /* EX   DE,HL       */
+OP(op,eb) { using std::swap; swap(DE, HL);                                        } /* EX   DE,HL       */
 OP(op,ec) { call_cond(F & PF, 0xec);                                              } /* CALL PE,a        */
 OP(op,ed) { EXEC(ed, rop());                                                      } /* **** ED xx       */
 OP(op,ee) { xor_a(arg());                                                         } /* XOR  n           */
@@ -3167,11 +3159,11 @@ OP(op,ff) { rst(0x38);                                                          
 
 void z80_device::take_nmi()
 {
-	/* Check if processor was halted */
+	// Check if processor was halted
 	leave_halt();
 
 #if HAS_LDAIR_QUIRK
-	/* reset parity flag after LD A,I or LD A,R */
+	// reset parity flag after LD A,I or LD A,R
 	if (m_after_ldair) F &= ~PF;
 #endif
 
@@ -3181,7 +3173,7 @@ void z80_device::take_nmi()
 	T(5);
 	wm16_sp(m_pc);
 	PCD = 0x0066;
-	WZ=PCD;
+	WZ = PCD;
 	m_nmi_pending = false;
 }
 
@@ -3203,16 +3195,16 @@ void z80_device::take_interrupt()
 	int irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w.l);
 	LOGINT("single INT irq_vector $%02x\n", irq_vector);
 
-	/* 'interrupt latency' cycles */
+	// 'interrupt latency' cycles
 	T(2);
 
-	/* Interrupt mode 2. Call [i:databyte] */
-	if( m_im == 2 )
+	// Interrupt mode 2. Call [i:databyte]
+	if (m_im == 2)
 	{
 		// Zilog's datasheet claims that "the least-significant bit must be a zero."
 		// However, experiments have confirmed that IM 2 vectors do not have to be
 		// even, and all 8 bits will be used; even $FF is handled normally.
-		/* CALL opcode timing */
+		// CALL opcode timing
 		T(5);
 		wm16_sp(m_pc);
 		irq_vector = (irq_vector & 0xff) | (m_i << 8);
@@ -3220,39 +3212,39 @@ void z80_device::take_interrupt()
 		LOGINT("IM2 [$%04x] = $%04x\n", irq_vector, PCD);
 	}
 	else
-	/* Interrupt mode 1. RST 38h */
-	if( m_im == 1 )
-	{
-		LOGINT("'%s' IM1 $0038\n", tag());
-		/* RST $38 */
-		T(5);
-		wm16_sp(m_pc);
-		PCD = 0x0038;
-	}
-	else
-	{
-		/* Interrupt mode 0. We check for CALL and JP instructions, */
-		/* if neither of these were found we assume a 1 byte opcode */
-		/* was placed on the databus                                */
-		LOGINT("IM0 $%04x\n", irq_vector);
-
-		/* check for nop */
-		if (irq_vector != 0x00)
+		// Interrupt mode 1. RST 38h
+		if (m_im == 1)
 		{
-			switch (irq_vector & 0xff0000)
+			LOGINT("'%s' IM1 $0038\n", tag());
+			// RST $38
+			T(5);
+			wm16_sp(m_pc);
+			PCD = 0x0038;
+		}
+		else
+		{
+			/* Interrupt mode 0. We check for CALL and JP instructions,
+			   if neither of these were found we assume a 1 byte opcode
+			   was placed on the databus                                */
+			LOGINT("IM0 $%04x\n", irq_vector);
+
+			// check for nop
+			if (irq_vector != 0x00)
 			{
-				case 0xcd0000:  /* call */
-					/* CALL $xxxx cycles */
+				switch (irq_vector & 0xff0000)
+				{
+				case 0xcd0000: // call
+					// CALL $xxxx cycles
 					T(11);
 					wm16_sp(m_pc);
 					PCD = irq_vector & 0xffff;
 					break;
-				case 0xc30000:  /* jump */
-					/* JP $xxxx cycles */
+				case 0xc30000: // jump
+					// JP $xxxx cycles
 					T(10);
 					PCD = irq_vector & 0xffff;
 					break;
-				default:        /* rst (or other opcodes?) */
+				default: // rst (or other opcodes?)
 					if (irq_vector == 0xfb)
 					{
 						// EI
@@ -3261,7 +3253,7 @@ void z80_device::take_interrupt()
 					}
 					else if ((irq_vector & 0xc7) == 0xc7)
 					{
-						/* RST $xx cycles */
+						// RST $xx cycles
 						T(5);
 						wm16_sp(m_pc);
 						PCD = irq_vector & 0x0038;
@@ -3269,13 +3261,13 @@ void z80_device::take_interrupt()
 					else
 						logerror("take_interrupt: unexpected opcode in im0 mode: 0x%02x\n", irq_vector);
 					break;
+				}
 			}
 		}
-	}
-	WZ=PCD;
+	WZ = PCD;
 
 #if HAS_LDAIR_QUIRK
-	/* reset parity flag after LD A,I or LD A,R */
+	// reset parity flag after LD A,I or LD A,R
 	if (m_after_ldair) F &= ~PF;
 #endif
 }
@@ -3287,7 +3279,7 @@ void z80_device::nomreq_ir(s8 cycles)
 
 void z80_device::nomreq_addr(u16 addr, s8 cycles)
 {
-	while(cycles--)
+	while (cycles--)
 	{
 		m_nomreq_cb(addr, 0x00, 0xff);
 		T(1);
@@ -3296,13 +3288,13 @@ void z80_device::nomreq_addr(u16 addr, s8 cycles)
 
 void nsc800_device::take_interrupt_nsc800()
 {
-	/* Check if processor was halted */
+	// Check if processor was halted
 	leave_halt();
 
-	/* Clear both interrupt flip flops */
+	// Clear both interrupt flip flops
 	m_iff1 = m_iff2 = 0;
 
-	/* 'interrupt latency' cycles */
+	// 'interrupt latency' cycles
 	T(7);
 	if (m_nsc800_irq_state[NSC800_RSTA])
 	{
@@ -3324,10 +3316,10 @@ void nsc800_device::take_interrupt_nsc800()
 		T(2 * m_memrq_cycles);
 	}
 
-	WZ=PCD;
+	WZ = PCD;
 
 #if HAS_LDAIR_QUIRK
-	/* reset parity flag after LD A,I or LD A,R */
+	// reset parity flag after LD A,I or LD A,R
 	if (m_after_ldair) F &= ~PF;
 #endif
 }
@@ -3337,7 +3329,7 @@ void nsc800_device::take_interrupt_nsc800()
  ****************************************************************************/
 void z80_device::device_start()
 {
-	if( !tables_initialised )
+	if (!tables_initialised)
 	{
 		u8 *padd = &SZHVC_add[  0*256];
 		u8 *padc = &SZHVC_add[256*256];
@@ -3347,34 +3339,34 @@ void z80_device::device_start()
 		{
 			for (int newval = 0; newval < 256; newval++)
 			{
-				/* add or adc w/o carry set */
+				// add or adc w/o carry set
 				int val = newval - oldval;
 				*padd = (newval) ? ((newval & 0x80) ? SF : 0) : ZF;
-				*padd |= (newval & (YF | XF));  /* undocumented flag bits 5+3 */
+				*padd |= (newval & (YF | XF));  // undocumented flag bits 5+3
 				if( (newval & 0x0f) < (oldval & 0x0f) ) *padd |= HF;
 				if( newval < oldval ) *padd |= CF;
 				if( (val^oldval^0x80) & (val^newval) & 0x80 ) *padd |= VF;
 				padd++;
 
-				/* adc with carry set */
+				// adc with carry set
 				val = newval - oldval - 1;
 				*padc = (newval) ? ((newval & 0x80) ? SF : 0) : ZF;
-				*padc |= (newval & (YF | XF));  /* undocumented flag bits 5+3 */
+				*padc |= (newval & (YF | XF));  // undocumented flag bits 5+3
 				if( (newval & 0x0f) <= (oldval & 0x0f) ) *padc |= HF;
 				if( newval <= oldval ) *padc |= CF;
 				if( (val^oldval^0x80) & (val^newval) & 0x80 ) *padc |= VF;
 				padc++;
 
-				/* cp, sub or sbc w/o carry set */
+				// cp, sub or sbc w/o carry set
 				val = oldval - newval;
 				*psub = NF | ((newval) ? ((newval & 0x80) ? SF : 0) : ZF);
-				*psub |= (newval & (YF | XF));  /* undocumented flag bits 5+3 */
+				*psub |= (newval & (YF | XF));  // undocumented flag bits 5+3
 				if( (newval & 0x0f) > (oldval & 0x0f) ) *psub |= HF;
 				if( newval > oldval ) *psub |= CF;
 				if( (val^oldval) & (oldval^newval) & 0x80 ) *psub |= VF;
 				psub++;
 
-				/* sbc with carry set */
+				// sbc with carry set
 				val = oldval - newval - 1;
 				*psbc = NF | ((newval) ? ((newval & 0x80) ? SF : 0) : ZF);
 				*psbc |= (newval & (YF | XF));  /* undocumented flag bits 5+3 */
@@ -3397,9 +3389,9 @@ void z80_device::device_start()
 			if( i&0x40 ) ++p;
 			if( i&0x80 ) ++p;
 			SZ[i] = i ? i & SF : ZF;
-			SZ[i] |= (i & (YF | XF));       /* undocumented flag bits 5+3 */
+			SZ[i] |= (i & (YF | XF));         // undocumented flag bits 5+3
 			SZ_BIT[i] = i ? i & SF : ZF | PF;
-			SZ_BIT[i] |= (i & (YF | XF));   /* undocumented flag bits 5+3 */
+			SZ_BIT[i] |= (i & (YF | XF));     // undocumented flag bits 5+3
 			SZP[i] = SZ[i] | ((p & 1) ? 0 : PF);
 			SZHV_inc[i] = SZ[i];
 			if( i == 0x80 ) SZHV_inc[i] |= VF;
@@ -3443,7 +3435,7 @@ void z80_device::device_start()
 	save_item(NAME(m_after_ei));
 	save_item(NAME(m_after_ldair));
 
-	/* Reset registers to their initial values */
+	// Reset registers to their initial values
 	PRVPC = 0;
 	PCD = 0;
 	SPD = 0;
@@ -3482,7 +3474,7 @@ void z80_device::device_start()
 	IX = IY = 0xffff; // IX and IY are FFFF after a reset!
 	set_f(ZF);        // Zero flag is set
 
-	/* set up the state table */
+	// set up the state table
 	state_add(STATE_GENPC,     "PC",        m_pc.w.l).callimport();
 	state_add(STATE_GENPCBASE, "CURPC",     m_prvpc.w.l).callimport().noshow();
 	state_add(Z80_SP,          "SP",        SP);
@@ -3540,7 +3532,7 @@ void z80_device::device_reset()
 	m_iff1 = 0;
 	m_iff2 = 0;
 
-	WZ=PCD;
+	WZ = PCD;
 }
 
 void nsc800_device::device_reset()
@@ -3585,7 +3577,7 @@ void z80_device::execute_run()
 			PC--;
 			opcode = 0;
 		}
-		EXEC(op,opcode);
+		EXEC(op, opcode);
 	} while (m_icount > 0);
 }
 
@@ -3606,19 +3598,19 @@ void z80_device::execute_set_input(int inputnum, int state)
 		break;
 
 	case INPUT_LINE_NMI:
-		/* mark an NMI pending on the rising edge */
+		// mark an NMI pending on the rising edge
 		if (m_nmi_state == CLEAR_LINE && state != CLEAR_LINE)
 			m_nmi_pending = true;
 		m_nmi_state = state;
 		break;
 
 	case INPUT_LINE_IRQ0:
-		/* update the IRQ state via the daisy chain */
+		// update the IRQ state via the daisy chain
 		m_irq_state = state;
 		if (daisy_chain_present())
-			m_irq_state = (daisy_update_irq_state() == ASSERT_LINE ) ? ASSERT_LINE : m_irq_state;
+			m_irq_state = (daisy_update_irq_state() == ASSERT_LINE) ? ASSERT_LINE : m_irq_state;
 
-		/* the main execute loop will take the interrupt */
+		// the main execute loop will take the interrupt
 		break;
 
 	case Z80_INPUT_LINE_WAIT:
@@ -3662,44 +3654,41 @@ void nsc800_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-
-
 /**************************************************************************
  * STATE IMPORT/EXPORT
  **************************************************************************/
-void z80_device::state_import( const device_state_entry &entry )
+void z80_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
-		case STATE_GENPC:
-			m_prvpc = m_pc;
-			break;
+	case STATE_GENPC:
+		m_prvpc = m_pc;
+		break;
 
-		case STATE_GENPCBASE:
-			m_pc = m_prvpc;
-			break;
+	case STATE_GENPCBASE:
+		m_pc = m_prvpc;
+		break;
 
-		case Z80_R:
-			m_r = m_rtemp & 0x7f;
-			m_r2 = m_rtemp & 0x80;
-			break;
+	case Z80_R:
+		m_r = m_rtemp & 0x7f;
+		m_r2 = m_rtemp & 0x80;
+		break;
 
-		default:
-			fatalerror("CPU_IMPORT_STATE() called for unexpected value\n");
+	default:
+		fatalerror("CPU_IMPORT_STATE() called for unexpected value\n");
 	}
 }
 
-
-void z80_device::state_export( const device_state_entry &entry )
+void z80_device::state_export(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
-		case Z80_R:
-			m_rtemp = (m_r & 0x7f) | (m_r2 & 0x80);
-			break;
+	case Z80_R:
+		m_rtemp = (m_r & 0x7f) | (m_r2 & 0x80);
+		break;
 
-		default:
-			fatalerror("CPU_EXPORT_STATE() called for unexpected value\n");
+	default:
+		fatalerror("CPU_EXPORT_STATE() called for unexpected value\n");
 	}
 }
 
@@ -3729,8 +3718,7 @@ std::unique_ptr<util::disasm_interface> z80_device::create_disassembler()
 	return std::make_unique<z80_disassembler>();
 }
 
-z80_device::z80_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	z80_device(mconfig, Z80, tag, owner, clock)
+z80_device::z80_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) : z80_device(mconfig, Z80, tag, owner, clock)
 {
 }
 

@@ -2184,13 +2184,13 @@ uint8_t amstrad_state::amstrad_cpc_mem_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 		m_maincpu->adjust_icount(-((4 - m_maincpu->total_cycles() % 4) % 4));
-	return ((u8*)m_banks[(offset >> 13)]->base())[offset & 0x1fff];
+	return ((uint8_t*)m_banks[(offset >> 13)]->base())[offset & 0x1fff];
 }
 
 void amstrad_state::amstrad_cpc_mem_w(offs_t offset, uint8_t data)
 {
 	m_maincpu->adjust_icount(-((4 - m_maincpu->total_cycles() % 4) % 4));
-	((u8*)m_banks[(offset >> 13) + 8]->base())[offset & 0x1fff] = data;
+	((uint8_t*)m_banks[(offset >> 13) + 8]->base())[offset & 0x1fff] = data;
 }
 
 /* load CPCEMU style snapshots */
