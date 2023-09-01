@@ -463,6 +463,56 @@ ROM_END
 
 // Complete sets
 
+// Amazon Spirit (NSW)
+ROM_START( amazonsp )
+	ROM_REGION32_BE( 0x200000, "program", 0 )
+	ROM_LOAD32_WORD_SWAP( "ams2nb25_01h.u75", 0x00000, 0x080000, CRC(7de70685) SHA1(c04b691fb290bab02e7aaf244da15db50f02319a) )
+	ROM_LOAD32_WORD_SWAP( "ams2nb25_02l.u66", 0x00002, 0x080000, CRC(029d4328) SHA1(873bae41ec92b35008b919d12d7c05a4a508245a) )
+
+	ROM_REGION( 0x200000, "ifu", 0 )
+	ROM_LOAD( "2n12prog_ifu.u190", 0x00000, 0x080000, CRC(c9c4ac89) SHA1(8eebda327892d00951355a86e927fa2e4ad3c9a0) )
+
+	ROM_REGION( 0x200000, "prgflash1", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200000, "prgflash2", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200000, "prgflash3", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200000, "prgflash4", ROMREGION_ERASE00 )
+	// not populated
+
+	// AMS21111.FMU Chk-GR: 4C3E, SD: D799 AMAZON_S 6 x 2M Konami
+	ROM_REGION( 0x200000, "prgflash5", ROMREGION_ERASE00 )
+	ROM_LOAD( "amazon_s.c4.u4", 0x000000, 0x200000, CRC(8e1142ab) SHA1(67e4ff742006d4566d55fade451f1cf3b744cecd) )
+
+	ROM_REGION( 0x200000, "prgflash6", ROMREGION_ERASE00 )
+	ROM_LOAD( "amazon_s.c3.u3", 0x000000, 0x200000, CRC(0841873e) SHA1(b8e23a17499897eaafabac4239da171f72cb6b89) )
+
+	ROM_REGION( 0x200000, "prgflash7", ROMREGION_ERASE00 )
+	ROM_LOAD( "amazon_s.c2.u2", 0x000000, 0x200000, CRC(f6b8a1e7) SHA1(d0ce554bd438b49a1d4cb81cef82db14f1c1904d) )
+
+	ROM_REGION( 0x200000, "prgflash8", ROMREGION_ERASE00 )
+	ROM_LOAD( "amazon_s.c1.u1", 0x000000, 0x200000, CRC(5d61cbf2) SHA1(9077705aa733a61e93ef6d6c5bdafb04066f25af) )
+
+	ROM_REGION( 0x200000, "sndflash1.u8", ROMREGION_ERASE00 )
+	ROM_LOAD( "amazon_s.a4.u8", 0x000000, 0x200000, CRC(b94d87bf) SHA1(d870db0e81f3289c48e70d500b2a2f9fa1d33cc9) )
+
+	ROM_REGION( 0x200000, "sndflash2.u7", ROMREGION_ERASE00 )
+	ROM_LOAD( "amazon_s.a3.u7", 0x000000, 0x200000, CRC(0a00bb2b) SHA1(a068f61d7fbbb4d20dcf468945dd3f5b77d9ec0c) )
+
+	ROM_REGION( 0x200000, "sndflash3.u6", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200000, "sndflash4.u5", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION16_BE( 0x100, "eeprom", 0 )
+	ROM_LOAD( "93c56.u98", 0x00, 0x100, CRC(b2521a6a) SHA1(f44711545bee7e9c772a3dc23b79f0ea8059ec50) ) // empty eeprom with Konami header
+ROM_END
+
 // Enchanted Lamp (Russia)
 ROM_START( enchlamp ) // the flash dumps have been split from an aggregated dump. They pass the checksum so they are assumed good, but a redump wouldn't hurt, either.
 	ENDEAVOUR_BIOS
@@ -552,6 +602,56 @@ ROM_START( rapfire5 )
 
 	ROM_REGION( 0x200000, "sndflash2.u7", ROMREGION_ERASE00 )
 	ROM_LOAD( "r_fire05.a3.u7", 0x000000, 0x200000, CRC(26d365d3) SHA1(7dfeeb0880d917b54b89694dfe434577d64fad90) )
+
+	ROM_REGION( 0x200000, "sndflash3.u6", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200000, "sndflash4.u5", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION16_BE( 0x100, "eeprom", 0 )
+	ROM_LOAD( "93c56.u98", 0x00, 0x100, CRC(b2521a6a) SHA1(f44711545bee7e9c772a3dc23b79f0ea8059ec50) ) // empty eeprom with Konami header
+ROM_END
+
+// Safe Money (NSW)
+ROM_START( safemonn )
+	ROM_REGION32_BE( 0x200000, "program", 0 )
+	ROM_LOAD32_WORD_SWAP( "sam2ng12_01h.u75", 0x00000, 0x080000, CRC(33a21093) SHA1(e9f4257b70b17f29c2a91b85e0ff4af98fa98b63) )
+	ROM_LOAD32_WORD_SWAP( "sam2ng12_02l.u66", 0x00002, 0x080000, CRC(4b69944c) SHA1(2e7205e3471c97b38e558c33c3b0bb1e593354ce) )
+
+	ROM_REGION( 0x200000, "ifu", 0 )
+	ROM_LOAD( "2n12prog_ifu.u190", 0x00000, 0x080000, CRC(c9c4ac89) SHA1(8eebda327892d00951355a86e927fa2e4ad3c9a0) )
+
+	ROM_REGION( 0x200000, "prgflash1", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200000, "prgflash2", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200000, "prgflash3", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200000, "prgflash4", ROMREGION_ERASE00 )
+	// not populated
+
+	// SAM21111.FMU Chk-GR: 8FA4, SD: D85D SAFMONEY 6 x 2M Konami
+	ROM_REGION( 0x200000, "prgflash5", ROMREGION_ERASE00 )
+	ROM_LOAD( "safmoney.c4.u4", 0x000000, 0x200000, CRC(1706b876) SHA1(c3e53e2a8cab4bd6027eca2f5ccef00424b025ef) )
+
+	ROM_REGION( 0x200000, "prgflash6", ROMREGION_ERASE00 )
+	ROM_LOAD( "safmoney.c3.u3", 0x000000, 0x200000, CRC(6ac3a8e6) SHA1(3a1dcc67af92ed84a8e61f3b884364a77d10ad2d) )
+
+	ROM_REGION( 0x200000, "prgflash7", ROMREGION_ERASE00 )
+	ROM_LOAD( "safmoney.c2.u2", 0x000000, 0x200000, CRC(3fdbd6f4) SHA1(d864534370a6f636e6f011779fa8eddf5579f155) )
+
+	ROM_REGION( 0x200000, "prgflash8", ROMREGION_ERASE00 )
+	ROM_LOAD( "safmoney.c1.u1", 0x000000, 0x200000, CRC(193e47c1) SHA1(aeaa5d3aad784b2326cd8425118c8544f5c1fcc2) )
+
+	ROM_REGION( 0x200000, "sndflash1.u8", ROMREGION_ERASE00 )
+	ROM_LOAD( "safmoney.a4.u8", 0x000000, 0x200000, CRC(bbf4f9db) SHA1(b2e12d6b84c31cc9180c976134cbf2b602d540d2) )
+
+	ROM_REGION( 0x200000, "sndflash2.u7", ROMREGION_ERASE00 )
+	ROM_LOAD( "safmoney.a3.u7", 0x000000, 0x200000, CRC(a991cf14) SHA1(d0d9086c108e76441307f71d276d59681dc49853) )
 
 	ROM_REGION( 0x200000, "sndflash3.u6", ROMREGION_ERASE00 )
 	// not populated
@@ -754,8 +854,10 @@ ROM_END
 GAME( 200?, konendev, 0,        konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "Konami Endeavour BIOS",                                           MACHINE_NOT_WORKING | MACHINE_IS_BIOS_ROOT )
 
 // have flash dump
+GAME( 200?, amazonsp, safemon,  konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "Amazon Spirit (Konami Endeavour, NSW)",                           MACHINE_NOT_WORKING )
 GAME( 200?, enchlamp, konendev, konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "Enchanted Lamp (Konami Endeavour, Russia)",                       MACHINE_NOT_WORKING )
 GAME( 200?, rapfire5, 0,        konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "Rapid Fire 5 (Konami Endeavour, NSW)",                            MACHINE_NOT_WORKING )
+GAME( 200?, safemonn, safemon,  konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "Safe Money (Konami Endeavour, NSW)",                              MACHINE_NOT_WORKING )
 
 // missing flash
 GAME( 200?, aadvent,  konendev, konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "African Adventure (Konami Endeavour, Russia)",                    MACHINE_NOT_WORKING )
