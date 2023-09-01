@@ -135,7 +135,7 @@ void memoryview_info::update_context_menu(HMENU menu)
 	debug_view_memory &memview(*view<debug_view_memory>());
 	debug_view_memory_source const &source = downcast<debug_view_memory_source const &>(*memview.source());
 	auto [mintf, spacenum] = source.space();
-	address_space *const space = &mintf->space(spacenum)
+	address_space *const space = &mintf->space(spacenum);
 	if (space)
 	{
 		if (memview.cursor_visible())
