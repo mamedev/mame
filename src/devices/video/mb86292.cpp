@@ -707,14 +707,14 @@ u32 mb86292_device::ctr_r(offs_t offset)
     ---- ---- ---- ---- ---- ---- --01 ---- Processing
     ---- ---- ---- ---- ---- ---- --10 ---- Processing (separate stage?)
     ---- ---- ---- ---- ---- ---- --11 ---- <reserved>
-    ---- ---- ---- ---- ---- ---- ---- --xx PS Pixel engine Status
+    ---- ---- ---- ---- ---- ---- ---- --xx PS Pixel engine Status (mirror of above or runs in different thread?)
     ---- ---- ---- ---- ---- ---- ---- --00 Idle
     ---- ---- ---- ---- ---- ---- ---- --01 Processing, assume pixels rather than commands
     ---- ---- ---- ---- ---- ---- ---- --1x <reserved>
 */
 u32 mb86292_device::gctr_r(offs_t offset)
 {
-	// TODO
+	// TBD in tandem with DrawTrap support
 	return 0;
 }
 
