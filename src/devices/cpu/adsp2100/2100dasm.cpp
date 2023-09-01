@@ -243,8 +243,8 @@ offs_t adsp21xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			stream << "NOP";
 			break;
 		case 0x01:
-			// 00000000 0xxxxxxx xxxxxxxx  dst = IO(x)
-			// 00000000 1xxxxxxx xxxxxxxx  IO(x) = dst
+			// 00000001 0xxxxxxx xxxxxxxx  dst = IO(x)
+			// 00000001 1xxxxxxx xxxxxxxx  IO(x) = dst
 			// ADSP-218x only
 			if (!BIT(op, 15))
 				util::stream_format(stream, "%s = IO($%X)", reg_grp[0][BIT(op, 0, 4)], BIT(op, 4, 11));
