@@ -2434,6 +2434,79 @@ static INPUT_PORTS_START( cotton )
 	//"SW2:8" unused
 INPUT_PORTS_END
 
+INPUT_PORTS_START( dddoor ) // port names are taken from test mode
+	PORT_INCLUDE( system16b_generic )
+
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("D. HAND") // this is Doraemon's hand on the control panel
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("L.P.SRV") // no idea what this is.. Large Prize Service?
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("SWT. 01") // this and the following are 12 buttons on the control panel (4 each line, 3 each row)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("SWT. 03")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("SWT. 05")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("SWT. 07")
+
+	PORT_MODIFY("UNUSED")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("SWT. 09")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("SWT. 11")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("SWT. 10")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("SWT. 12")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("S.P.SRV") // no idea what this is.. Small Prize Service?
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("SWT. 02")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("SWT. 04")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("SWT. 06")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("SWT. 08")
+
+	PORT_MODIFY("DSW2") // rest unused according to test mode
+	PORT_DIPNAME( 0x03, 0x03, "Advertising Interval" ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "30 Seconds" )
+	PORT_DIPSETTING(    0x02, "1 Minute" )
+	PORT_DIPSETTING(    0x01, "3 Minutes" )
+	PORT_DIPSETTING(    0x00, "5 Minutes" )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) ) // lots of duplicates here
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW1:5" ) // not listed in test mode
+	PORT_DIPNAME( 0xe0, 0xe0, "Large Prize Discharge Rate" ) PORT_DIPLOCATION("SW1:6,7,8") // Daikeihin Haisyutsu Ritsu
+	PORT_DIPSETTING(    0xe0, "14%" )
+	PORT_DIPSETTING(    0xc0, "16%" )
+	PORT_DIPSETTING(    0xa0, "18%" )
+	PORT_DIPSETTING(    0x80, "20%" )
+	PORT_DIPSETTING(    0x60, "22%" )
+	PORT_DIPSETTING(    0x40, "24%" )
+	PORT_DIPSETTING(    0x20, "26%" )
+	PORT_DIPSETTING(    0x00, "50%" )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( ddux )
 	PORT_INCLUDE( system16b_generic )
@@ -6090,6 +6163,45 @@ ROM_START( cottonjad )
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-13860.a10", 0x00000, 0x08000, CRC(6a57b027) SHA1(8f9de548df203605bb4ab9eececf09739b55adf1) )
 	ROM_LOAD( "opr-13061.a11", 0x10000, 0x20000, CRC(4d21153f) SHA1(173ddd9633f255c39ca508c37d0562e374704e7b) )
+
+	ROM_REGION( 0x0100, "plds", 0 )
+	ROM_LOAD( "315-5298.b9",  0x0000, 0x00eb, CRC(39b47212) SHA1(432b47aee5ecbf08a8a6dc2f8379c816feb86328) ) // PLS153
+ROM_END
+
+
+//*************************************************************************************************************************
+//*************************************************************************************************************************
+//*************************************************************************************************************************
+//  Doraemon no Dokodemo Door, Sega System 16B
+//  CPU: 68000
+//  ROM Board type: 171-5797
+//  Sega game ID: 834-11170-91 DOKODEMO DOOR
+//     ROM board: 837-11171-91
+
+ROM_START( dddoor )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-17226a.ic1",  0x00001, 0x40000, CRC(8f80b8d9) SHA1(bfc5200a0a368da88eb3c17fc71129d608dcf39d) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "epr-17227a.ic2",  0x00000, 0x40000, CRC(96759398) SHA1(ca271dba68403b0a0f13b0dacc221a09b3e3e367) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-17235.ic19", 0x00000, 0x40000, CRC(b08db95a) SHA1(88d91e46798a7211a9fdcf8f0f76ea87d658c92c) )
+	ROM_LOAD( "epr-17236.ic20", 0x40000, 0x40000, CRC(d1d40335) SHA1(b606d8188aebe501b2a694b7259e15e67324a5e4) )
+	ROM_LOAD( "epr-17237.ic21", 0x80000, 0x40000, CRC(dc890881) SHA1(7c8da9c1fdf4251d6cf57da960d84fbb319c992e) )
+
+	ROM_REGION16_BE( 0x180000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "epr-17231.ic9",  0x000001, 0x20000, CRC(39389104) SHA1(e089a85ef3f49cd593524a254cf540cb5d983f12) )
+	ROM_CONTINUE(                      0x100001, 0x20000 )
+	ROM_LOAD16_BYTE( "epr-17233.ic12", 0x000000, 0x20000, CRC(14e3ba16) SHA1(f82138c6a0c7367947348b2dafa897ced2874b48) )
+	ROM_CONTINUE(                      0x100000, 0x20000 )
+	ROM_LOAD16_BYTE( "epr-17232.ic10", 0x040001, 0x20000, CRC(45c3ff8b) SHA1(f66cf53fbce7d032a73aa1c573ce3696b8cf6bd3) )
+	ROM_CONTINUE(                      0x140001, 0x20000 )
+	ROM_LOAD16_BYTE( "epr-17234.ic13", 0x040000, 0x20000, CRC(a628a987) SHA1(3af0d4cd55e7d5f38523e8dabfcdd4efc8e1b9b1) )
+	ROM_CONTINUE(                      0x140000, 0x20000 )
+
+	ROM_REGION( 0x90000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-17230.ic8", 0x00000,  0x08000, CRC(1523cb27) SHA1(6a27f3c2f0a8f44fc637850b3556abd1bb71aa29) )
+	ROM_LOAD( "epr-17228.ic6", 0x10000,  0x40000, CRC(254cfee2) SHA1(63f84f6f1b452720c8c3f67deb1a19ee38833d6a) )
+	ROM_LOAD( "epr-17229.ic7", 0x50000,  0x40000, CRC(5aa094f4) SHA1(6aa5dc2867be11ae000a5a5f308354267c131414) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x0100, "plds", 0 )
 	ROM_LOAD( "315-5298.b9",  0x0000, 0x00eb, CRC(39b47212) SHA1(432b47aee5ecbf08a8a6dc2f8379c816feb86328) ) // PLS153
@@ -9970,6 +10082,8 @@ GAME( 1991, cotton,     0,        system16b_fd1094,      cotton,   segas16b_stat
 GAME( 1991, cottonu,    cotton,   system16b_fd1094,      cotton,   segas16b_state, init_generic_5704,       ROT0,   "Success / Sega", "Cotton (set 3, US) (FD1094 317-0180)", 0 )
 GAME( 1991, cottonj,    cotton,   system16b_fd1094,      cotton,   segas16b_state, init_generic_5704,       ROT0,   "Success / Sega", "Cotton (set 2, Japan, Rev B) (FD1094 317-0179b)", 0 )
 GAME( 1991, cottonja,   cotton,   system16b_fd1094,      cotton,   segas16b_state, init_generic_5704,       ROT0,   "Success / Sega", "Cotton (set 1, Japan, Rev A) (FD1094 317-0179a)", 0 )
+
+GAME( 1993, dddoor,     0,        system16b_5797,        dddoor,   segas16b_state, init_generic_5797,       ROT270, "Sega", "Doraemon no Dokodemo Door", MACHINE_NOT_WORKING ) // needs custom I/O emulated, unthrottle and it will run after some time
 
 GAME( 1988, ddux,       0,        system16b_fd1094,      ddux,     segas16b_state, init_generic_5521,       ROT0,   "Sega", "Dynamite Dux (set 3, World) (FD1094 317-0096)", 0 )
 GAME( 1988, dduxj,      ddux,     system16b_fd1094,      ddux,     segas16b_state, init_generic_5521,       ROT0,   "Sega", "Dynamite Dux (set 2, Japan) (FD1094 317-0094)", 0 )
