@@ -26,8 +26,13 @@ atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, device_typ
 {
 }
 
+atapi_fixed_cdrom_device::atapi_fixed_cdrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	atapi_cdrom_device(mconfig, type, tag, owner, clock)
+{
+}
+
 atapi_fixed_cdrom_device::atapi_fixed_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	atapi_cdrom_device(mconfig, ATAPI_FIXED_CDROM, tag, owner, clock)
+	atapi_fixed_cdrom_device(mconfig, ATAPI_FIXED_CDROM, tag, owner, clock)
 {
 }
 
