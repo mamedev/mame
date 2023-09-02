@@ -548,8 +548,9 @@ void pgm_state::get_sprites()
 			yzom = 0x10 - yzom;
 		}
 
-		m_sprite_ptr_pre->xzoom = (sprite_zoomtable[xzom * 2] << 16) | sprite_zoomtable[xzom * 2 + 1];
-		m_sprite_ptr_pre->yzoom = (sprite_zoomtable[yzom * 2] << 16) | sprite_zoomtable[yzom * 2 + 1];
+		// it's maybe hardware bug or hardcoded?
+		m_sprite_ptr_pre->xzoom = (xzom == 0xf) ? 0x00000001 : ((sprite_zoomtable[xzom * 2] << 16) | sprite_zoomtable[xzom * 2 + 1]);
+		m_sprite_ptr_pre->yzoom = (yzom == 0xf) ? 0x00000001 : ((sprite_zoomtable[yzom * 2] << 16) | sprite_zoomtable[yzom * 2 + 1]);
 		m_sprite_ptr_pre->xgrow = xgrow;
 		m_sprite_ptr_pre->ygrow = ygrow;
 		m_sprite_ptr_pre++;
