@@ -4612,6 +4612,8 @@ if (BUSES["ZXBUS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/spectrum/zxbus.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/zxbus.h",
+		MAME_DIR .. "src/devices/bus/spectrum/nemoide.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/nemoide.h",
 		MAME_DIR .. "src/devices/bus/spectrum/neogs.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/neogs.h",
 		MAME_DIR .. "src/devices/bus/spectrum/smuc.cpp",
