@@ -24,7 +24,6 @@ public:
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 private:
 	void map_io(address_map &map);
@@ -39,7 +38,7 @@ private:
 
 u8 nemoide_device::ata_r(offs_t offset)
 {
-    const u16 data = m_ata->cs0_r(offset & 7);
+    const u16 data = m_ata->cs0_r((offset >> 5) & 7);
 	if (!machine().side_effects_disabled())
 		m_ata_data_latch = data >> 8;
 
@@ -49,15 +48,14 @@ u8 nemoide_device::ata_r(offs_t offset)
 void nemoide_device::ata_w(offs_t offset, u8 data)
 {
 	const u16 ata_data = (m_ata_data_latch << 8) | data;
-    m_ata->cs0_w(offset & 7, ata_data);
+    m_ata->cs0_w((offset >> 5) & 7, ata_data);
 }
 
 void nemoide_device::map_io(address_map &map)
 {
 	map(0x00011, 0x00011).mirror(0xff00).lrw8(NAME([this]() { return m_ata_data_latch; })
 		, NAME([this](offs_t offset, u8 data) { m_ata_data_latch = data; }));
-	map(0x00010, 0x00010).select(0xffe0).lrw8(NAME([this](offs_t offset) { return ata_r(offset >> 5); })
-		, NAME([this](offs_t offset, u8 data) { ata_w(offset >> 5, data); }));
+	map(0x00010, 0x00010).select(0xffe0).rw(FUNC(nemoide_device::ata_r), FUNC(nemoide_device::ata_w));
 	map(0x000c8, 0x000c8).mirror(0xff00).lrw8(NAME([this]() { return m_ata->cs1_r(6); })
 		, NAME([this](offs_t offset, u8 data) { m_ata->cs1_w(6, data); }));
 }
@@ -80,12 +78,8 @@ void nemoide_device::device_start()
 	m_zxbus->install_device(0x00000, 0x1ffff, *this, &nemoide_device::map_io);
 }
 
-void nemoide_device::device_reset()
-{
-}
-
 } // anonymous namespace
 
 } // namespace bus::spectrum::zxbus
 
-DEFINE_DEVICE_TYPE_PRIVATE(ZXBUS_NEMOIDE, device_zxbus_card_interface, bus::spectrum::zxbus::nemoide_device, "nemoid", "Nemo IDE Controller")
+DEFINE_DEVICE_TYPE_PRIVATE(ZXBUS_NEMOIDE, device_zxbus_card_interface, bus::spectrum::zxbus::nemoide_device, "nemoide", "Nemo IDE Controller")
