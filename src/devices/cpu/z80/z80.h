@@ -35,6 +35,7 @@ public:
 	void z80_set_m1_cycles(u8 m1_cycles) { m_m1_cycles = m1_cycles; }
 	void z80_set_memrq_cycles(u8 memrq_cycles) { m_memrq_cycles = memrq_cycles; }
 	void z80_set_iorq_cycles(u8 iorq_cycles) { m_iorq_cycles = iorq_cycles; }
+
 	template <typename... T> void set_memory_map(T &&... args) { set_addrmap(AS_PROGRAM, std::forward<T>(args)...); }
 	template <typename... T> void set_m1_map(T &&... args) { set_addrmap(AS_OPCODES, std::forward<T>(args)...); }
 	template <typename... T> void set_io_map(T &&... args) { set_addrmap(AS_IO, std::forward<T>(args)...); }
@@ -46,11 +47,12 @@ public:
 protected:
 	z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
+	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual u32 execute_min_cycles() const noexcept override { return 2; }
 	virtual u32 execute_max_cycles() const noexcept override { return 16; }
 	virtual u32 execute_input_lines() const noexcept override { return 4; }
@@ -59,16 +61,16 @@ protected:
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 	virtual u32 translate_memory_address(u16 address) { return address; }
 
-	// device_state_interface overrides
+	// device_state_interface implementation
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 #undef PROTOTYPES
@@ -296,9 +298,9 @@ protected:
 	int          m_icount;
 	u8           m_rtemp;
 
-	u8 m_m1_cycles = 4;
-	u8 m_memrq_cycles = 3;
-	u8 m_iorq_cycles = 4;
+	u8 m_m1_cycles;
+	u8 m_memrq_cycles;
+	u8 m_iorq_cycles;
 };
 
 DECLARE_DEVICE_TYPE(Z80, z80_device)
@@ -309,11 +311,11 @@ public:
 	nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual u32 execute_input_lines() const noexcept override { return 7; }
 	virtual void execute_set_input(int inputnum, int state) override;
 

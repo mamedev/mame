@@ -82,4 +82,4 @@ void nemoide_device::device_start()
 
 } // namespace bus::spectrum::zxbus
 
-DEFINE_DEVICE_TYPE_PRIVATE(ZXBUS_NEMOIDE, device_zxbus_card_interface, bus::spectrum::zxbus::nemoide_device, "nemoide", "Nemo IDE Controller")
+DEFINE_DEVICE_TYPE_PRIVATE(ZXBUS_NEMOIDE, device_zxbus_card_interface, bus::spectrum::zxbus::nemoide_device, "zxbus_nemoide", "Nemo IDE Controller")

@@ -3211,59 +3211,58 @@ void z80_device::take_interrupt()
 		rm16(irq_vector, m_pc);
 		LOGINT("IM2 [$%04x] = $%04x\n", irq_vector, PCD);
 	}
-	else
+	else if (m_im == 1)
+	{
 		// Interrupt mode 1. RST 38h
-		if (m_im == 1)
-		{
-			LOGINT("'%s' IM1 $0038\n", tag());
-			// RST $38
-			T(5);
-			wm16_sp(m_pc);
-			PCD = 0x0038;
-		}
-		else
-		{
-			/* Interrupt mode 0. We check for CALL and JP instructions,
-			   if neither of these were found we assume a 1 byte opcode
-			   was placed on the databus                                */
-			LOGINT("IM0 $%04x\n", irq_vector);
+		LOGINT("'%s' IM1 $0038\n", tag());
+		// RST $38
+		T(5);
+		wm16_sp(m_pc);
+		PCD = 0x0038;
+	}
+	else
+	{
+		/* Interrupt mode 0. We check for CALL and JP instructions,
+		   if neither of these were found we assume a 1 byte opcode
+		   was placed on the databus                                */
+		LOGINT("IM0 $%04x\n", irq_vector);
 
-			// check for nop
-			if (irq_vector != 0x00)
+		// check for nop
+		if (irq_vector != 0x00)
+		{
+			switch (irq_vector & 0xff0000)
 			{
-				switch (irq_vector & 0xff0000)
+			case 0xcd0000: // call
+				// CALL $xxxx cycles
+				T(11);
+				wm16_sp(m_pc);
+				PCD = irq_vector & 0xffff;
+				break;
+			case 0xc30000: // jump
+				// JP $xxxx cycles
+				T(10);
+				PCD = irq_vector & 0xffff;
+				break;
+			default: // rst (or other opcodes?)
+				if (irq_vector == 0xfb)
 				{
-				case 0xcd0000: // call
-					// CALL $xxxx cycles
-					T(11);
-					wm16_sp(m_pc);
-					PCD = irq_vector & 0xffff;
-					break;
-				case 0xc30000: // jump
-					// JP $xxxx cycles
-					T(10);
-					PCD = irq_vector & 0xffff;
-					break;
-				default: // rst (or other opcodes?)
-					if (irq_vector == 0xfb)
-					{
-						// EI
-						T(4);
-						ei();
-					}
-					else if ((irq_vector & 0xc7) == 0xc7)
-					{
-						// RST $xx cycles
-						T(5);
-						wm16_sp(m_pc);
-						PCD = irq_vector & 0x0038;
-					}
-					else
-						logerror("take_interrupt: unexpected opcode in im0 mode: 0x%02x\n", irq_vector);
-					break;
+					// EI
+					T(4);
+					ei();
 				}
+				else if ((irq_vector & 0xc7) == 0xc7)
+				{
+					// RST $xx cycles
+					T(5);
+					wm16_sp(m_pc);
+					PCD = irq_vector & 0x0038;
+				}
+				else
+					logerror("take_interrupt: unexpected opcode in im0 mode: 0x%02x\n", irq_vector);
+				break;
 			}
 		}
+	}
 	WZ = PCD;
 
 #if HAS_LDAIR_QUIRK
@@ -3327,6 +3326,18 @@ void nsc800_device::take_interrupt_nsc800()
 /****************************************************************************
  * Processor initialization
  ****************************************************************************/
+void z80_device::device_validity_check(validity_checker &valid) const
+{
+	cpu_device::device_validity_check(valid);
+
+	if (4 > m_m1_cycles)
+		osd_printf_error("M1 cycles %u is less than minimum 4\n", m_m1_cycles);
+	if (3 > m_memrq_cycles)
+		osd_printf_error("MEMRQ cycles %u is less than minimum 3\n", m_memrq_cycles);
+	if (4 > m_iorq_cycles)
+		osd_printf_error("IORQ cycles %u is less than minimum 4\n", m_iorq_cycles);
+}
+
 void z80_device::device_start()
 {
 	if (!tables_initialised)
@@ -3731,23 +3742,28 @@ z80_device::z80_device(const machine_config &mconfig, device_type type, const ch
 	m_irqack_cb(*this),
 	m_refresh_cb(*this),
 	m_nomreq_cb(*this),
-	m_halt_cb(*this)
+	m_halt_cb(*this),
+	m_m1_cycles(4),
+	m_memrq_cycles(3),
+	m_iorq_cycles(4)
 {
 }
 
 device_memory_interface::space_config_vector z80_device::memory_space_config() const
 {
-	if(has_configured_map(AS_OPCODES))
+	if (has_configured_map(AS_OPCODES))
+	{
 		return space_config_vector {
-			std::make_pair(AS_PROGRAM, &m_program_config),
-			std::make_pair(AS_OPCODES, &m_opcodes_config),
-			std::make_pair(AS_IO,      &m_io_config)
-		};
+				std::make_pair(AS_PROGRAM, &m_program_config),
+				std::make_pair(AS_OPCODES, &m_opcodes_config),
+				std::make_pair(AS_IO,      &m_io_config) };
+	}
 	else
+	{
 		return space_config_vector {
-			std::make_pair(AS_PROGRAM, &m_program_config),
-			std::make_pair(AS_IO,      &m_io_config)
-		};
+				std::make_pair(AS_PROGRAM, &m_program_config),
+				std::make_pair(AS_IO,      &m_io_config) };
+	}
 }
 
 DEFINE_DEVICE_TYPE(Z80, z80_device, "z80", "Zilog Z80")

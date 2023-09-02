@@ -480,4 +480,4 @@ void neogs_device::device_reset()
 } // namespace bus::spectrum::zxbus
 
 
-DEFINE_DEVICE_TYPE_PRIVATE(ZXBUS_NEOGS, device_zxbus_card_interface, bus::spectrum::zxbus::neogs_device, "neogs", "NeoGS / General Sound")
+DEFINE_DEVICE_TYPE_PRIVATE(ZXBUS_NEOGS, device_zxbus_card_interface, bus::spectrum::zxbus::neogs_device, "zxbus_neogs", "NeoGS / General Sound")
