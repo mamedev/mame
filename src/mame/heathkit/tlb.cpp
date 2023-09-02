@@ -71,6 +71,10 @@ static constexpr XTAL GP19_DOT_CLOCK_3 = XTAL(10'644'000);   // Graphics mode
 
 // Standard H19 used a 2.048 MHz clock for Z80
 static constexpr XTAL H19_CLOCK = MASTER_CLOCK / 6;
+static constexpr XTAL H19_3MHZ = MASTER_CLOCK / 4;
+static constexpr XTAL H19_4MHZ = MASTER_CLOCK / 3;
+static constexpr XTAL H19_6MHZ = MASTER_CLOCK / 2;
+
 static constexpr XTAL INS8250_CLOCK = MASTER_CLOCK / 4;
 
 // Beep Frequency is 1 KHz
@@ -119,6 +123,7 @@ heath_tlb_device::heath_tlb_device(const machine_config &mconfig, device_type ty
 	m_crtc(*this, "crtc"),
 	m_p_videoram(*this, "videoram"),
 	m_p_chargen(*this, "chargen"),
+	m_config(*this, "CONFIG"),
 	m_ace(*this, "ins8250"),
 	m_beep(*this, "beeper"),
 	m_mm5740(*this, "mm5740"),
@@ -208,6 +213,42 @@ void heath_tlb_device::device_reset()
 	m_key_click_active = false;
 	m_bell_active = false;
 	m_allow_vsync_nmi = false;
+
+	ioport_value const cfg(m_config->read());
+
+	// CPU clock speed
+	switch (BIT(cfg, 0, 2))
+	{
+	case 0x01:
+		m_maincpu->set_clock(H19_3MHZ);
+		break;
+	case 0x02:
+		m_maincpu->set_clock(H19_4MHZ);
+		break;
+	case 0x03:
+		m_maincpu->set_clock(H19_6MHZ);
+		break;
+	case 0x00:
+	default:
+		// Standard Clock
+		m_maincpu->set_clock(H19_CLOCK);
+		break;
+	}
+
+	// Set screen color
+	switch(BIT(cfg,2, 2))
+	{
+	case 0x01:
+		m_screen->set_color(rgb_t::white());
+		break;
+	case 0x02:
+		m_screen->set_color(rgb_t::amber());
+		break;
+	case 0x00:
+	default:
+		m_screen->set_color(rgb_t::green());
+		break;
+	}
 }
 
 void heath_tlb_device::key_click_w(uint8_t data)
@@ -470,8 +511,8 @@ static INPUT_PORTS_START( tlb )
 	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P")          PORT_CODE(KEYCODE_P)          PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[ ]")        PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR(']')
 	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\\ |")       PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line Feed")  PORT_CODE(KEYCODE_RWIN)
-	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL")        PORT_CODE(KEYCODE_DEL)        PORT_CHAR(UCHAR_MAMEKEY(DEL))
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line Feed")  PORT_CODE(KEYCODE_RWIN)       PORT_CHAR(10)
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL")        PORT_CODE(KEYCODE_DEL)        PORT_CHAR(127)
 	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-4 LEFT")  PORT_CODE(KEYCODE_4_PAD)      PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-5 HOME")  PORT_CODE(KEYCODE_5_PAD)      PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
@@ -536,7 +577,7 @@ static INPUT_PORTS_START( tlb )
 	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U")          PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I")          PORT_CODE(KEYCODE_I)          PORT_CHAR('i') PORT_CHAR('I')
 	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O")          PORT_CODE(KEYCODE_O)          PORT_CHAR('o') PORT_CHAR('O')
-	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab")        PORT_CODE(KEYCODE_TAB)        PORT_CHAR(UCHAR_MAMEKEY(TAB))
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab")        PORT_CODE(KEYCODE_TAB)        PORT_CHAR(9)
 
 	PORT_START("X9")
 	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 !")        PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!')
@@ -548,7 +589,7 @@ static INPUT_PORTS_START( tlb )
 	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 &")        PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('&')
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 *")        PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('*')
 	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 (")        PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR('(')
-	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc")        PORT_CODE(KEYCODE_ESC)        PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc")        PORT_CODE(KEYCODE_ESC)        PORT_CHAR(27)
 
 	PORT_START("SW401")
 	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")           PORT_DIPLOCATION("SW401:1,2,3,4")
@@ -602,6 +643,17 @@ static INPUT_PORTS_START( tlb )
 	PORT_DIPNAME( 0x80, 0x00, "Refresh")             PORT_DIPLOCATION("SW402:8")
 	PORT_DIPSETTING(    0x00, "60Hz")
 	PORT_DIPSETTING(    0x80, "50Hz")
+
+	PORT_START("CONFIG")
+	PORT_CONFNAME(0x03, 0x00, "CPU Clock")
+	PORT_CONFSETTING(0x00, "2 MHz")
+	PORT_CONFSETTING(0x01, "3 MHz")
+	PORT_CONFSETTING(0x02, "4 MHz")
+	PORT_CONFSETTING(0x03, "6 MHz")
+	PORT_CONFNAME(0x0C, 0x00, "CRT Color")
+	PORT_CONFSETTING(0x00, "Green")
+	PORT_CONFSETTING(0x04, "White")
+	PORT_CONFSETTING(0x08, "Amber")
 INPUT_PORTS_END
 
 
@@ -761,7 +813,7 @@ INPUT_PORTS_END
 
 ROM_START( h19 )
 	// Original terminal code
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "2732_444-46_h19code.u437", 0x0000, 0x1000, CRC(f4447da0) SHA1(fb4093d5b763be21a9580a0defebed664b1f7a7b))
 
 	// Original font
@@ -769,13 +821,13 @@ ROM_START( h19 )
 	ROM_LOAD( "2716_444-29_h19font.u420", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
 
 	// Original keyboard
-	ROM_REGION( 0x1000, "keyboard", 0 )
+	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD( "2716_444-37_h19keyb.u445", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
 ROM_END
 
 ROM_START( super19 )
-	// Super H19 ROM
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	// Super-19 ROM
+	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "2732_super19_h447.u437", 0x0000, 0x1000, CRC(6c51aaa6) SHA1(5e368b39fe2f1af44a905dc474663198ab630117))
 
 	// Original font
@@ -783,12 +835,12 @@ ROM_START( super19 )
 	ROM_LOAD( "2716_444-29_h19font.u420", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
 
 	// Original keyboard
-	ROM_REGION( 0x1000, "keyboard", 0 )
+	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD( "2716_444-37_h19keyb.u445", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
 ROM_END
 
 ROM_START( watz19 )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("watzman-a")
 
 	// Watzman ROM
@@ -803,13 +855,13 @@ ROM_START( watz19 )
 	ROM_LOAD( "2716_444-29_h19font.u420", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
 
 	// Watzman keyboard
-	ROM_REGION( 0x1000, "keyboard", 0 )
+	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD( "keybd.u445", 0x0000, 0x0800, CRC(58dc8217) SHA1(1b23705290bdf9fc6342065c6a528c04bff67b13))
 ROM_END
 
 ROM_START( ultra19 )
-	// ULTRA ROM
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	// Ultra ROM
+	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "2532_h19_ultra_firmware.u437", 0x0000, 0x1000, CRC(8ad4cdb4) SHA1(d6e1fc37a1f52abfce5e9adb1819e0030bed1df3))
 
 	// Original font
@@ -817,7 +869,7 @@ ROM_START( ultra19 )
 	ROM_LOAD( "2716_444-29_h19font.u420", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
 
 	// Ultra keyboard
-	ROM_REGION( 0x1000, "keyboard", 0 )
+	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD( "2716_h19_ultra_keyboard.u445", 0x0000, 0x0800, CRC(76130c92) SHA1(ca39c602af48505139d2750a084b5f8f0e662ff7))
 ROM_END
 
@@ -833,7 +885,7 @@ ROM_START( gp19 )
 	ROM_LOAD( "gp19_char_gen_cg_1.u21", 0x0000, 0x1000, CRC(49ec9242) SHA1(770a8c7b5b15bcfe465fd84326d0ae3dcaa85311))
 
 	// Original keyboard
-	ROM_REGION( 0x1000, "keyboard", 0 )
+	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD( "2716_444-37_h19keyb.u445", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
 ROM_END
 
@@ -891,7 +943,6 @@ void heath_tlb_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &heath_tlb_device::io_map);
 
 	// video hardware
-	// TODO: make configurable, Heath offered 2 different CRTs - White, Green
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
 	// based on the H19 ROM code for 60 Hz
 	m_screen->set_raw(BASE_DOT_CLOCK, 768, 32, 672, 270, 0, 250);
