@@ -57,7 +57,8 @@
     Hopper Disconnected
     Hard Meters Disconnected
     Logic Door Port
-    IFU2 Failure
+    IFU2 Failure (enchlamp only)
+    IFU2 Version Mismatch (amazonsp and safemonn, need correct BIOS dump)
     LCD Display Disconnected (when enchlamp is set to Wild Fire jackpot mode)
 */
 
@@ -90,17 +91,10 @@ public:
 		, m_ifu(*this, "ifu")
 		, m_gcu(*this, "gcu")
 		, m_eeprom(*this, "eeprom")
-		, m_dpram(*this, "dpram")
 		, m_dsw(*this, "DSW")
 	{ }
 
 	void konendev(machine_config &config) ATTR_COLD;
-
-protected:
-	virtual void machine_start() override ATTR_COLD
-	{
-		m_dpram_base = (uint16_t *)m_dpram.target();
-	}
 
 private:
 	// devices
@@ -108,18 +102,13 @@ private:
 	required_device<h83007_device> m_ifu;
 	required_device<k057714_device> m_gcu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_shared_ptr<uint32_t> m_dpram;
 	required_ioport m_dsw;
-
-	uint16_t *m_dpram_base = nullptr;
 
 	uint32_t mcu2_r(offs_t offset, uint32_t mem_mask = ~0);
 	uint32_t ifu2_r(offs_t offset, uint32_t mem_mask = ~0);
 	void eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	uint16_t ifu_unk_r();
-	uint16_t ifu_dpram_r(offs_t offset);
-	void ifu_dpram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void gcu_interrupt(int state);
 
@@ -196,7 +185,7 @@ void konendev_state::main_map(address_map &map)
 	map(0x78800004, 0x78800007).portr("IN1"); // doors, switches
 	map(0x78a00000, 0x78a00003).portr("IN2"); // hard meter access, hopper
 	map(0x78a00004, 0x78a00007).portr("IN3"); // main door optic
-	map(0x78c00000, 0x78c003ff).ram().share("dpram");
+	map(0x78c00000, 0x78c003ff).rw("dpram", FUNC(cy7c131_device::right_r), FUNC(cy7c131_device::right_w));
 	map(0x78e00000, 0x78e00003).portr("IN0"); // buttons
 	map(0x79000000, 0x79000003).w(m_gcu, FUNC(k057714_device::fifo_w));
 	map(0x79800000, 0x798000ff).rw(m_gcu, FUNC(k057714_device::read), FUNC(k057714_device::write));
@@ -218,22 +207,12 @@ uint16_t konendev_state::ifu_unk_r()
 	return 0xc3c3;  // H8 program crashes immediately if it doesn't see
 }
 
-uint16_t konendev_state::ifu_dpram_r(offs_t offset)
-{
-	return m_dpram_base[offset];
-}
-
-void konendev_state::ifu_dpram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_dpram_base[offset]);
-}
-
 void konendev_state::ifu_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().region("ifu", 0);
 	map(0x200000, 0x20ffff).ram();
 	map(0x210000, 0x217fff).ram();
-	map(0x800000, 0x8003ff).rw(FUNC(konendev_state::ifu_dpram_r), FUNC(konendev_state::ifu_dpram_w));
+	map(0x800000, 0x8003ff).rw("dpram", FUNC(cy7c131_device::left_r), FUNC(cy7c131_device::left_w));
 	map(0xa40000, 0xa40001).nopw();
 	map(0xfee010, 0xfee011).r(FUNC(konendev_state::ifu_unk_r));
 };
@@ -403,7 +382,7 @@ void konendev_state::konendev(machine_config &config)
 	FUJITSU_29F016A(config, "sndflash3.u6");
 	FUJITSU_29F016A(config, "sndflash4.u5");
 
-	CY7C131(config, "dpram"); // TODO: hook up instead of custom methods
+	CY7C131(config, "dpram");
 
 	// video hardware
 	PALETTE(config, "palette", palette_device::RGB_555);
@@ -469,7 +448,7 @@ ROM_START( amazonsp )
 	ROM_LOAD32_WORD_SWAP( "ams2nb25_01h.u75", 0x00000, 0x080000, CRC(7de70685) SHA1(c04b691fb290bab02e7aaf244da15db50f02319a) )
 	ROM_LOAD32_WORD_SWAP( "ams2nb25_02l.u66", 0x00002, 0x080000, CRC(029d4328) SHA1(873bae41ec92b35008b919d12d7c05a4a508245a) )
 
-	ROM_REGION( 0x200000, "ifu", 0 )
+	ROM_REGION( 0x200000, "ifu", 0 ) // this gives IFU2 Version Mismatch error, probably needs another version of the BIOS
 	ROM_LOAD( "2n12prog_ifu.u190", 0x00000, 0x080000, CRC(c9c4ac89) SHA1(8eebda327892d00951355a86e927fa2e4ad3c9a0) )
 
 	ROM_REGION( 0x200000, "prgflash1", ROMREGION_ERASE00 )
@@ -619,7 +598,7 @@ ROM_START( safemonn )
 	ROM_LOAD32_WORD_SWAP( "sam2ng12_01h.u75", 0x00000, 0x080000, CRC(33a21093) SHA1(e9f4257b70b17f29c2a91b85e0ff4af98fa98b63) )
 	ROM_LOAD32_WORD_SWAP( "sam2ng12_02l.u66", 0x00002, 0x080000, CRC(4b69944c) SHA1(2e7205e3471c97b38e558c33c3b0bb1e593354ce) )
 
-	ROM_REGION( 0x200000, "ifu", 0 )
+	ROM_REGION( 0x200000, "ifu", 0 ) // this gives IFU2 Version Mismatch error, probably needs another version of the BIOS
 	ROM_LOAD( "2n12prog_ifu.u190", 0x00000, 0x080000, CRC(c9c4ac89) SHA1(8eebda327892d00951355a86e927fa2e4ad3c9a0) )
 
 	ROM_REGION( 0x200000, "prgflash1", ROMREGION_ERASE00 )
@@ -854,7 +833,7 @@ ROM_END
 GAME( 200?, konendev, 0,        konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "Konami Endeavour BIOS",                                           MACHINE_NOT_WORKING | MACHINE_IS_BIOS_ROOT )
 
 // have flash dump
-GAME( 200?, amazonsp, safemon,  konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "Amazon Spirit (Konami Endeavour, NSW)",                           MACHINE_NOT_WORKING )
+GAME( 200?, amazonsp, 0,        konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "Amazon Spirit (Konami Endeavour, NSW)",                           MACHINE_NOT_WORKING )
 GAME( 200?, enchlamp, konendev, konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "Enchanted Lamp (Konami Endeavour, Russia)",                       MACHINE_NOT_WORKING )
 GAME( 200?, rapfire5, 0,        konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "Rapid Fire 5 (Konami Endeavour, NSW)",                            MACHINE_NOT_WORKING )
 GAME( 200?, safemonn, safemon,  konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "Safe Money (Konami Endeavour, NSW)",                              MACHINE_NOT_WORKING )
