@@ -51,7 +51,7 @@ public:
 	{
 	}
 
-	virtual void device_start()
+	virtual void device_start() override
 	{
 		m_sector_timer = timer_alloc(FUNC(stingnet_cdr::sector_tick), this);
 		m_sector_timer->adjust(attotime::never);
@@ -65,7 +65,7 @@ public:
 	// Without this, the next sector's IRQ fires before the code clears the first IRQ,
 	// resulting in the IRQ being lost and the code twiddling its thumbs waiting for
 	// an IRQ that never comes.
-	virtual void fill_buffer()
+	virtual void fill_buffer() override
 	{
 		// tropchnc issues a SET CD SPEED command to 2822KiB/second, which is roughly 18X.
 		// 1X is a sector every 75th of a second, so 18X is 75 * 18 = 1350 Hz
