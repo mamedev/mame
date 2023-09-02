@@ -902,7 +902,7 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				if(form_factor == floppy_image::FF_525)
 					image->set_variant(floppy_image::SSQD);
 				else
-					return false; // single side 3.5?
+					image->set_variant(floppy_image::SSDD);
 			}
 			break;
 		case 5:
