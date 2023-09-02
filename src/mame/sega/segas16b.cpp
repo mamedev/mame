@@ -1277,7 +1277,6 @@ void segas16b_state::machine_start()
 void segas16b_state::machine_reset()
 {
 	m_atomicp_sound_count = 0;
-	m_hwc_input_value = 0;
 	m_mj_input_num = 0;
 	m_mj_last_val = 0;
 
@@ -1490,10 +1489,8 @@ uint16_t segas16b_state::hwchamp_custom_io_r(address_space &space, offs_t offset
 			switch (offset & 0x30/2)
 			{
 				case 0x20/2:
-					result = (m_hwc_input_value & 0x80) >> 7;
-					if (!machine().side_effects_disabled())
-						m_hwc_input_value <<= 1;
-					return result;
+					return m_adc->d0_r(space);
+
 				case 0x30/2: // c43035
 					/*
 					    Signals, affects blocking and stance (both fists down, both fists up, up/down or down/up)
@@ -1535,25 +1532,7 @@ void segas16b_state::hwchamp_custom_io_w(address_space &space, offs_t offset, ui
 			switch (offset & 0x30/2)
 			{
 				case 0x20/2:
-					switch (offset & 3)
-					{
-						case 0:
-							m_hwc_input_value = m_hwc_monitor->read();
-							break;
-
-						// TODO: order of these two flipped when returning a status of 0xf0 instead of open bus in r 0x30?
-						case 1:
-							m_hwc_input_value = m_hwc_right->read();
-							break;
-
-						case 2:
-							m_hwc_input_value = m_hwc_left->read();
-							break;
-
-						default:
-							m_hwc_input_value = 0xff;
-							break;
-					}
+					m_adc->address_w(offset & 3, 0);
 					break;
 
 				case 0x30/2:
@@ -4155,6 +4134,26 @@ void segas16b_state::aceattacb_fd1094(machine_config &config)
 	CXD1095(config, m_cxdio);
 	m_cxdio->in_porta_cb().set_ioport("HANDX1");
 	m_cxdio->in_portb_cb().set_ioport("HANDX2");
+}
+
+void segas16b_state::hwchamp(machine_config &config)
+{
+	system16b(config);
+	MSM6253(config, m_adc, 0);
+	m_adc->set_input_tag<0>("MONITOR");
+	// TODO: order of these two flipped when returning a status of 0xf0 instead of open bus in r 0x30?
+	m_adc->set_input_tag<1>("RIGHT");
+	m_adc->set_input_tag<2>("LEFT");
+}
+
+void segas16b_state::hwchamp_fd1094(machine_config &config)
+{
+	system16b_fd1094(config);
+	MSM6253(config, m_adc, 0);
+	m_adc->set_input_tag<0>("MONITOR");
+	// TODO: order of these two flipped when returning a status of 0xf0 instead of open bus in r 0x30?
+	m_adc->set_input_tag<1>("RIGHT");
+	m_adc->set_input_tag<2>("LEFT");
 }
 
 void segas16b_state::system16b_i8751(machine_config &config)
@@ -9861,7 +9860,6 @@ void segas16b_state::init_generic(segas16b_rom_board rom_board)
 
 	// save state
 	save_item(NAME(m_atomicp_sound_count));
-	save_item(NAME(m_hwc_input_value));
 	save_item(NAME(m_mj_input_num));
 	save_item(NAME(m_mj_last_val));
 }
@@ -10110,9 +10108,9 @@ GAME( 1989, goldnaxe3,  goldnaxe, system16b_fd1094,      goldnaxe, segas16b_stat
 GAME( 1989, goldnaxe2,  goldnaxe, system16b_i8751,       goldnaxe, segas16b_state, init_generic_5704,       ROT0,   "Sega", "Golden Axe (set 2, US) (8751 317-0112)", 0 )
 GAME( 1989, goldnaxe1,  goldnaxe, system16b_fd1094_5797, goldnaxe, segas16b_state, init_generic_5797,       ROT0,   "Sega", "Golden Axe (set 1, World) (FD1094 317-0110)", 0 )
 
-GAME( 1987, hwchamp,    0,        system16b,             hwchamp,  segas16b_state, init_hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ (set 1)", 0 )
-GAME( 1987, hwchampa,   hwchamp,  system16b,             hwchamp,  segas16b_state, init_hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ (set 2)", 0 )
-GAME( 1987, hwchampj,   hwchamp,  system16b_fd1094,      hwchamp,  segas16b_state, init_hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ (Japan) (FD1094 317-0046)", 0 )
+GAME( 1987, hwchamp,    0,        hwchamp,               hwchamp,  segas16b_state, init_hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ (set 1)", 0 )
+GAME( 1987, hwchampa,   hwchamp,  hwchamp,               hwchamp,  segas16b_state, init_hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ (set 2)", 0 )
+GAME( 1987, hwchampj,   hwchamp,  hwchamp_fd1094,        hwchamp,  segas16b_state, init_hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ (Japan) (FD1094 317-0046)", 0 )
 
 GAME( 1989, mvp,        0,        system16b_fd1094_5797, mvp,      segas16b_state, init_generic_5797,       ROT0,   "Sega", "MVP (set 2, US) (FD1094 317-0143)", 0 )
 GAME( 1989, mvpj,       mvp,      system16b_fd1094,      mvp,      segas16b_state, init_generic_5704,       ROT0,   "Sega", "MVP (set 1, Japan) (FD1094 317-0142)", 0 )
@@ -10217,7 +10215,7 @@ GAME( 1987, sonicbomd,  sonicbom, system16b,             sonicbom, segas16b_stat
 
 GAME( 1990, ryukyud,    ryukyu,   system16b,             ryukyu,   segas16b_state, init_generic_5704,       ROT0,   "bootleg", "RyuKyu (Japan) (bootleg of FD1094 317-5023 set)", 0 )
 
-GAME( 1987, hwchampjd,  hwchamp,  system16b,             hwchamp,  segas16b_state, init_hwchamp_5521,       ROT0,   "bootleg", "Heavyweight Champ (Japan) (bootleg of FD1094 317-0046 set)", 0 )
+GAME( 1987, hwchampjd,  hwchamp,  hwchamp,               hwchamp,  segas16b_state, init_hwchamp_5521,       ROT0,   "bootleg", "Heavyweight Champ (Japan) (bootleg of FD1094 317-0046 set)", 0 )
 
 GAME( 1987, bulletd,    bullet,   system16b,             bullet,   segas16b_state, init_generic_5358_small, ROT0,   "bootleg", "Bullet (bootleg of FD1094 317-0041 set)", 0 )
 
