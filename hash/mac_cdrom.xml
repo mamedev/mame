@@ -15,7 +15,7 @@ PPC603 - PowerPC 603/603E/603EV CPU
 PPC604 - PowerPC 604 CPU
 PPC750 - PowerPC 750 (G3) CPU
 -->
-<softwarelist name="mac_cdrom" description="Mac CD-ROMs">
+<softwarelist name="mac_cdrom" description="Apple Macintosh CD-ROMs">
 	<software name="aplegrec">
 		<description>Apple Legacy Recovery</description>
 		<year>1998</year>
