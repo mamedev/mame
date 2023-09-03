@@ -548,8 +548,10 @@ void pgm_state::get_sprites()
 			yzom = 0x10 - yzom;
 		}
 
-		m_sprite_ptr_pre->xzoom = (sprite_zoomtable[xzom * 2] << 16) | sprite_zoomtable[xzom * 2 + 1];
-		m_sprite_ptr_pre->yzoom = (sprite_zoomtable[yzom * 2] << 16) | sprite_zoomtable[yzom * 2 + 1];
+		// some games (e.g. ddp3) have zero in last zoom table entry but expect 1
+		// is the last entry hard-coded to 1, or does zero have the same effect as 1?
+		m_sprite_ptr_pre->xzoom = (xzom == 0xf) ? 1 : ((u32(sprite_zoomtable[xzom * 2]) << 16) | sprite_zoomtable[xzom * 2 + 1]);
+		m_sprite_ptr_pre->yzoom = (yzom == 0xf) ? 1 : ((u32(sprite_zoomtable[yzom * 2]) << 16) | sprite_zoomtable[yzom * 2 + 1]);
 		m_sprite_ptr_pre->xgrow = xgrow;
 		m_sprite_ptr_pre->ygrow = ygrow;
 		m_sprite_ptr_pre++;
