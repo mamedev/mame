@@ -203,7 +203,7 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float square(float _a);
 
-	/// Returns the cosine of the argument _a.
+	/// Returns the sine of the argument _a.
 	///
 	BX_CONST_FUNC float sin(float _a);
 
