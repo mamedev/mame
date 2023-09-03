@@ -35,6 +35,8 @@ public:
 	auto alarm() { return m_out_alarm_cb.bind(); }
 	auto clkout() { return m_out_clkout_cb.bind(); }
 
+	void set_epoch(int epoch) { m_epoch = epoch; }
+
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
@@ -42,6 +44,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
+	virtual bool rtc_feature_y2k() const override { return m_epoch != 0; }
 	// device_rtc_interface overrides
 	virtual bool rtc_feature_leap_year() const override { return true; }
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
@@ -69,6 +72,8 @@ private:
 	int m_1hz;                  // 1 Hz condition
 	int m_16hz;                 // 16 Hz condition
 	int m_clkout;               // clock output
+
+	int m_epoch = 0;
 
 	// timers
 	emu_timer *m_clock_timer;

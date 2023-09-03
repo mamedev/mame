@@ -278,8 +278,10 @@ TIMER_CALLBACK_MEMBER(rp5c15_device::advance_output_clock)
 
 void rp5c15_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
-	m_reg[MODE01][REGISTER_LEAP_YEAR] = year % 4;
-	write_counter(REGISTER_1_YEAR, year);
+	// x68k wants an epoch base (1980-2079), mz2500 do not ("print date$" under basicv2)
+	const int year_calc = (year - m_epoch) % 100;
+	m_reg[MODE01][REGISTER_LEAP_YEAR] = year_calc % 4;
+	write_counter(REGISTER_1_YEAR, year_calc);
 	write_counter(REGISTER_1_MONTH, month);
 	write_counter(REGISTER_1_DAY, day);
 	m_reg[MODE00][REGISTER_DAY_OF_THE_WEEK] = day_of_week;
@@ -368,11 +370,15 @@ void rp5c15_device::write(offs_t offset, uint8_t data)
 		switch (m_mode & MODE_MASK)
 		{
 		case MODE00:
+		{
 			m_reg[MODE00][offset] = data & register_write_mask[MODE00][offset];
 
+			// x68k wants "pure" year when date is changed (i.e. 2023 -> 43)
+			m_epoch = 0;
 			set_time(false, read_counter(REGISTER_1_YEAR), read_counter(REGISTER_1_MONTH), read_counter(REGISTER_1_DAY), m_reg[MODE00][REGISTER_DAY_OF_THE_WEEK],
 				read_counter(REGISTER_1_HOUR), read_counter(REGISTER_1_MINUTE), read_counter(REGISTER_1_SECOND));
 			break;
+		}
 
 		case MODE01:
 			switch (offset)
