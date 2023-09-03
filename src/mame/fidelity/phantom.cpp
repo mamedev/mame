@@ -265,21 +265,23 @@ void phantom_state::update_pieces_position(int state)
 		x += 12;
 
 	// check if the magnet is in the center of a square
-	bool valid_pos = ((m_hmotor_pos & 0x0f) > 0 && (m_hmotor_pos & 0x0f) <= 7) && ((m_vmotor_pos & 0x0f) > 8 && (m_vmotor_pos & 0x0f) <= 0xf);
+	const bool valid_pos = ((m_hmotor_pos & 0x0f) > 0 && (m_hmotor_pos & 0x0f) <= 7) && ((m_vmotor_pos & 0x0f) > 8 && (m_vmotor_pos & 0x0f) <= 0xf);
 
 	if (state)
 	{
 		if (valid_pos)
 		{
 			// pick up piece, unless it was picked up by the user
-			int pos = (y << 4 & 0xf0) | (x & 0x0f);
+			const int pos = (y << 4 & 0xf0) | (x & 0x0f);
 			if (pos != m_board->get_handpos())
+			{
 				m_piece_hand = m_board->read_piece(x, y);
 
-			if (m_piece_hand != 0)
-			{
-				m_board->write_piece(x, y, 0);
-				m_board->refresh();
+				if (m_piece_hand != 0)
+				{
+					m_board->write_piece(x, y, 0);
+					m_board->refresh();
+				}
 			}
 		}
 		else

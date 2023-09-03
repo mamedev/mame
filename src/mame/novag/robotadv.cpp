@@ -6,7 +6,7 @@ Novag Chess Robot Adversary, chess computer with robotic arm. The chess engine
 is MyChess by David Kittinger, just like the one in Novag Savant.
 
 Hardware notes:
-- PCB label: PACIFIC MICROELECTRONICS GROUP, 743-279A/280A/281A
+- PCB label: GOODNIGHT DESIGN, PACIFIC MICROELECTRONICS GROUP, 743-279A/280A/281A
 - Zilog Z8400B PS, 6 MHz XTAL
 - 40KB ROM (4*2764 or equivalent, 4*MSM2716AS) + 1 socket for expansion
 - 5KB RAM (8*TMM314APL-1, 2*TC5514AP-8 battery-backed)
@@ -278,14 +278,16 @@ void robotadv_state::update_piece(double x, double y)
 			return;
 
 		// pick up piece, unless it was picked up by the user
-		int pos = (by << 4 & 0xf0) | (bx & 0x0f);
+		const int pos = (by << 4 & 0xf0) | (bx & 0x0f);
 		if (pos != m_board->get_handpos())
+		{
 			m_piece_hand = m_board->read_piece(bx, by);
 
-		if (m_piece_hand != 0)
-		{
-			m_board->write_piece(bx, by, 0);
-			m_board->refresh();
+			if (m_piece_hand != 0)
+			{
+				m_board->write_piece(bx, by, 0);
+				m_board->refresh();
+			}
 		}
 	}
 }
@@ -309,8 +311,8 @@ void robotadv_state::refresh()
 
 	// output claw position
 	const int open = (m_limits & 1) ? 0x800 : 0; // put open state on x bit 11
-	m_out_pos[0] = int((x + 15.0) * 50.0) | open;
-	m_out_pos[1] = int((y + 15.0) * 50.0);
+	m_out_pos[0] = int((x + 15.0) * 50.0 + 0.5) | open;
+	m_out_pos[1] = int((y + 15.0) * 50.0 + 0.5);
 }
 
 
