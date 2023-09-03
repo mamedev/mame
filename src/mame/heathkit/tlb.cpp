@@ -236,7 +236,7 @@ void heath_tlb_device::device_reset()
 	}
 
 	// Set screen color
-	switch(BIT(cfg,2, 2))
+	switch (BIT(cfg,2, 2))
 	{
 	case 0x01:
 		m_screen->set_color(rgb_t::white());
