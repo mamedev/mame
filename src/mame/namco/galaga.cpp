@@ -3531,7 +3531,8 @@ GAME( 1982, xevious,   0,       xevious, xevious,  xevious_state, init_xevious, 
 GAME( 1982, xeviousa,  xevious, xevious, xeviousa, xevious_state, init_xevious, ROT90,  "Namco (Atari license)", "Xevious (Atari, harder)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, xeviousb,  xevious, xevious, xeviousb, xevious_state, init_xevious, ROT90,  "Namco (Atari license)", "Xevious (Atari)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, xeviousc,  xevious, xevious, xeviousa, xevious_state, init_xevious, ROT90,  "Namco (Atari license)", "Xevious (Atari, Namco PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sxevious,  xevious, xevious, sxevious, xevious_state, init_xevious, ROT90,  "Namco", "Super Xevious", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1984, sxevious,  0,       xevious, sxevious, xevious_state, init_xevious, ROT90,  "Namco", "Super Xevious", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, sxeviousj, xevious, xevious, sxevious, xevious_state, init_xevious, ROT90,  "Namco", "Super Xevious (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, digdug,    0,       digdug,  digdug,   digdug_state,  empty_init,   ROT90,  "Namco", "Dig Dug (rev 2)", MACHINE_SUPPORTS_SAVE )
