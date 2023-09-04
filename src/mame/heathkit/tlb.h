@@ -86,6 +86,7 @@ protected:
 	required_device<mc6845_device>  m_crtc;
 	required_shared_ptr<uint8_t>    m_p_videoram;
 	required_region_ptr<uint8_t>    m_p_chargen;
+	required_ioport                 m_config;
 
 private:
 	void set_irq_line();
@@ -151,7 +152,9 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 };
 
-// Heath TLB with Watzman (HUG) ROM
+/**
+ *  Heath TLB with Watzman (HUG) ROM
+ */
 class heath_watz_tlb_device : public heath_tlb_device
 {
 public:
