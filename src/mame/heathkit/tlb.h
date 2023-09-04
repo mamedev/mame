@@ -87,6 +87,7 @@ protected:
 	required_shared_ptr<uint8_t>    m_p_videoram;
 	required_region_ptr<uint8_t>    m_p_chargen;
 	required_ioport                 m_config;
+	required_device<ins8250_device> m_ace;
 
 private:
 	void set_irq_line();
@@ -119,7 +120,6 @@ private:
 	emu_timer *m_key_click_timer;
 	emu_timer *m_bell_timer;
 
-	required_device<ins8250_device> m_ace;
 	required_device<beep_device>    m_beep;
 	required_device<mm5740_device>  m_mm5740;
 	required_memory_region          m_kbdrom;
@@ -150,6 +150,32 @@ public:
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
+};
+
+/**
+ *  Heath TLB with Superset ROM
+ */
+class heath_superset_tlb_device : public heath_tlb_device
+{
+public:
+	heath_superset_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
+
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	void mem_map(address_map &map);
+
+	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
+
+	void dtr_internal(int data);
+	void out1_internal(int data);
+	void out2_internal(int data);
+
+	uint8_t m_selected_char_set;
 };
 
 /**
@@ -214,6 +240,7 @@ protected:
 DECLARE_DEVICE_TYPE(HEATH_TLB, heath_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_GP19, heath_gp19_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_SUPER19, heath_super19_tlb_device)
+DECLARE_DEVICE_TYPE(HEATH_SUPERSET, heath_superset_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_WATZ, heath_watz_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_ULTRA, heath_ultra_tlb_device)
 
