@@ -455,9 +455,8 @@ void x68k_crtc_device::crtc_w(offs_t offset, u16 data, u16 mem_mask)
 					}
 				}
 			}
-
 		}
-		m_operation_end_timer->adjust(attotime::from_msec(5), 0x02);  // time taken to do operation is a complete guess.
+		if (data & 0x02) m_operation_end_timer->adjust(attotime::from_msec(5), 0x02);  // time taken to do operation is a complete guess.
 		break;
 	}
 //  LOG("%s CRTC: Wrote %04x to CRTC register %i\n",machine().describe_context(), data, offset);
