@@ -908,7 +908,8 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::index_resync)
 
 	uint32_t last_index = 0, next_index = 200000000;
 	// if hard-sectored floppy, has extra IDX pulses
-	if (image) image->find_index_hole(position, last_index, next_index);
+	if(image)
+		image->find_index_hole(position, last_index, next_index);
 	int new_idx = position - last_index < 2000000;
 
 	if(new_idx) {

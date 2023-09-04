@@ -636,6 +636,12 @@ private:
 	// last array size may be bigger than actual track size
 	std::vector<std::vector<track_info> > track_array;
 
+	// Additional index holes in increasing order. Entries are absolute
+	// positions of index holes in the same units as cell_data. The
+	// positions are the start of the hole, not the center of the hole. The
+	// hole at angular position 0 is implicit, so an empty list encodes a
+	// regular soft-sectored disk. Additional holes are found on
+	// hard-sectored disks.
 	std::vector<uint32_t> index_array;
 };
 
