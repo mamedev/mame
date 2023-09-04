@@ -112,6 +112,7 @@ protected:
 	u8 hmotor_ff_clear_r();
 	u8 vmotor_ff_clear_r();
 
+	void clear_board(int state);
 	void check_rotation();
 	TIMER_DEVICE_CALLBACK_MEMBER(motors_timer);
 	void update_pieces_position(int state);
@@ -158,10 +159,14 @@ void phantom_state::machine_start()
 void phantom_state::machine_reset()
 {
 	m_rombank->set_entry(0);
+	output_magnet_pos();
+}
 
+void phantom_state::clear_board(int state)
+{
 	memset(m_pieces_map, 0, sizeof(m_pieces_map));
 	m_piece_hand = 0;
-	output_magnet_pos();
+	m_board->clear_board();
 }
 
 void phantom_state::init_phantom()
@@ -591,6 +596,7 @@ void phantom_state::phantom(machine_config &config)
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->set_size(8+4, 8);
+	m_board->clear_cb().set(FUNC(phantom_state::clear_board));
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(100));
 
