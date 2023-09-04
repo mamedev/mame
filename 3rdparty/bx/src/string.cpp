@@ -1197,7 +1197,7 @@ namespace bx
 
 	int32_t vsnprintf(char* _out, int32_t _max, const char* _format, va_list _argList)
 	{
-		if (1 < _max)
+		if (0 < _max)
 		{
 			StaticMemoryBlockWriter writer(_out, uint32_t(_max) );
 
