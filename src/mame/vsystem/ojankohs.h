@@ -129,7 +129,7 @@ protected:
 
 	void map(address_map &map);
 
-	void rombank_w(uint8_t data);
+	void rombank_adpcm_reset_w(uint8_t data);
 
 private:
 	void coinctr_w(uint8_t data);
@@ -147,6 +147,9 @@ public:
 	{ }
 
 	void ccasino(machine_config &config);
+
+protected:
+	virtual void machine_start() override { ojankohs_state::machine_start(); }
 
 private:
 	required_ioport_array<2> m_extra_dsw;
