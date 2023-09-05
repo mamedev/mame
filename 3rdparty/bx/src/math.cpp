@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2023 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -10,7 +10,8 @@
 
 namespace bx
 {
-	const float kInfinity = bitsToFloat(UINT32_C(0x7f800000) );
+	const float  kFloatInfinity  = bitsToFloat(kFloatExponentMask);
+	const double kDoubleInfinity = bitsToDouble(kDoubleExponentMask);
 
 	namespace
 	{
@@ -135,11 +136,11 @@ namespace bx
 	BX_CONST_FUNC float ldexp(float _a, int32_t _b)
 	{
 		const uint32_t ftob     = floatToBits(_a);
-		const uint32_t masked   = uint32_and(ftob, UINT32_C(0xff800000) );
+		const uint32_t masked   = uint32_and(ftob, kFloatSignMask | kFloatExponentMask);
 		const uint32_t expsign0 = uint32_sra(masked, 23);
 		const uint32_t tmp      = uint32_iadd(expsign0, _b);
 		const uint32_t expsign1 = uint32_sll(tmp, 23);
-		const uint32_t mantissa = uint32_and(ftob, UINT32_C(0x007fffff) );
+		const uint32_t mantissa = uint32_and(ftob, kFloatMantissaMask);
 		const uint32_t bits     = uint32_or(mantissa, expsign1);
 		const float    result   = bitsToFloat(bits);
 
@@ -149,9 +150,9 @@ namespace bx
 	float frexp(float _a, int32_t* _outExp)
 	{
 		const uint32_t ftob     = floatToBits(_a);
-		const uint32_t masked0  = uint32_and(ftob, UINT32_C(0x7f800000) );
+		const uint32_t masked0  = uint32_and(ftob, kFloatExponentMask);
 		const uint32_t exp0     = uint32_srl(masked0, 23);
-		const uint32_t masked1  = uint32_and(ftob,   UINT32_C(0x807fffff) );
+		const uint32_t masked1  = uint32_and(ftob,   kFloatSignMask | kFloatMantissaMask);
 		const uint32_t bits     = uint32_or(masked1, UINT32_C(0x3f000000) );
 		const float    result   = bitsToFloat(bits);
 
@@ -242,31 +243,43 @@ namespace bx
 
 	void mtxLookAt(float* _result, const Vec3& _eye, const Vec3& _at, const Vec3& _up, Handedness::Enum _handedness)
 	{
-		const Vec3 view = normalize(
-			  Handedness::Right == _handedness
-			? sub(_eye, _at)
-			: sub(_at, _eye)
-			);
-		const Vec3 uxv   = cross(_up, view);
-		const Vec3 right = normalize(uxv);
-		const Vec3 up    = cross(view, right);
+		const Vec3 eye  = Handedness::Left == _handedness ? _eye : neg(_eye);
+		const Vec3 view = normalize(sub(_at, eye) );
 
-		memSet(_result, 0, sizeof(float)*16);
+		Vec3 right = bx::InitNone;
+		Vec3 up    = bx::InitNone;
+
+		const Vec3 uxv = cross(_up, view);
+
+		if (0.0f == dot(uxv, uxv) )
+		{
+			right = { Handedness::Left == _handedness ? -1.0f : 1.0f, 0.0f, 0.0f };
+		}
+		else
+		{
+			right = normalize(uxv);
+		}
+
+		up = cross(view, right);
+
 		_result[ 0] = right.x;
 		_result[ 1] = up.x;
 		_result[ 2] = view.x;
+		_result[ 3] = 0.0f;
 
 		_result[ 4] = right.y;
 		_result[ 5] = up.y;
 		_result[ 6] = view.y;
+		_result[ 7] = 0.0f;
 
 		_result[ 8] = right.z;
 		_result[ 9] = up.z;
 		_result[10] = view.z;
+		_result[11] = 0.0f;
 
-		_result[12] = -dot(right, _eye);
-		_result[13] = -dot(up,    _eye);
-		_result[14] = -dot(view,  _eye);
+		_result[12] = -dot(right, eye);
+		_result[13] = -dot(up,    eye);
+		_result[14] = -dot(view,  eye);
 		_result[15] = 1.0f;
 	}
 

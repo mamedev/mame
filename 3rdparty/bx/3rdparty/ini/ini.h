@@ -3,7 +3,7 @@
           Licensing information can be found at the end of the file.
 ------------------------------------------------------------------------------
 
-ini.h - v1.1 - Simple ini-file reader for C/C++.
+ini.h - v1.2 - Simple ini-file reader for C/C++.
 
 Do this:
     #define INI_IMPLEMENTATION
@@ -19,7 +19,7 @@ before you include this file in *one* C/C++ file to create the implementation.
 typedef struct ini_t ini_t;
 
 ini_t* ini_create( void* memctx );
-ini_t* ini_load( char const* data, void* memctx );
+ini_t* ini_load( char const* data, unsigned int len, void* memctx );
 
 int ini_save( ini_t const* ini, char* data, int size );
 void ini_destroy( ini_t* ini );
@@ -48,11 +48,16 @@ void ini_property_value_set( ini_t* ini, int section, int property, char const* 
 
 /**
 
-Examples
-========
+ini.h
+=====
 
-Loading an ini file and retrieving values
------------------------------------------
+Simple ini-file reader for C/C++.
+
+
+Examples
+--------
+
+#### Loading an ini file and retrieving values
 
     #define INI_IMPLEMENTATION
     #include "ini.h"
@@ -71,13 +76,13 @@ Loading an ini file and retrieving values
         data[ size ] = '\0';
         fclose( fp );
 
-        ini_t* ini = ini_load( data );
+        ini_t* ini = ini_load( data, NULL );
         free( data );
-        int second_index = ini_find_property( ini, INI_GLOBAL_SECTION, "SecondSetting" );
+        int second_index = ini_find_property( ini, INI_GLOBAL_SECTION, "SecondSetting", 0 );
         char const* second = ini_property_value( ini, INI_GLOBAL_SECTION, second_index );
         printf( "%s=%s\n", "SecondSetting", second );
-        int section = ini_find_section( ini, "MySection" );
-        int third_index = ini_find_property( ini, section, "ThirdSetting" );
+        int section = ini_find_section( ini, "MySection", 0 );
+        int third_index = ini_find_property( ini, section, "ThirdSetting", 0 );
         char const* third = ini_property_value( ini, section, third_index );
         printf( "%s=%s\n", "ThirdSetting", third );
         ini_destroy( ini );
@@ -85,9 +90,9 @@ Loading an ini file and retrieving values
         return 0;
         }
 
+-----------------------------------------------------------------------------------------------
 
-Creating a new ini file
------------------------
+#### Creating a new ini file
 
     #define INI_IMPLEMENTATION
     #include "ini.h"
@@ -97,11 +102,11 @@ Creating a new ini file
 
     int main()
         {
-        ini_t* ini = ini_create();
-        ini_property_add( ini, INI_GLOBAL_SECTION, "FirstSetting", "Test" );
-        ini_property_add( ini, INI_GLOBAL_SECTION, "SecondSetting", "2" );
-        int section = ini_section_add( ini, "MySection" );
-        ini_property_add( ini, section, "ThirdSetting", "Three" );
+        ini_t* ini = ini_create( NULL );
+        ini_property_add( ini, INI_GLOBAL_SECTION, "FirstSetting", 0, "Test", 0 );
+        ini_property_add( ini, INI_GLOBAL_SECTION, "SecondSetting", 0, "2", 0 );
+        int section = ini_section_add( ini, "MySection", 0 );
+        ini_property_add( ini, section, "ThirdSetting", 0, "Three", 0 );
 
         int size = ini_save( ini, NULL, 0 ); // Find the size needed
         char* data = (char*) malloc( size );
@@ -109,7 +114,7 @@ Creating a new ini file
         ini_destroy( ini );
 
         FILE* fp = fopen( "test.ini", "w" );
-        fwrite( data, 1, size, fp );
+        fwrite( data, 1, size - 1, fp );
         fclose( fp );
         free( data );
 
@@ -119,7 +124,7 @@ Creating a new ini file
 
 
 API Documentation
-=================
+-----------------
 
 ini.h is a small library for reading classic .ini files. It is a single-header library, and does not need any .lib files
 or other binaries, or any build scripts. To use it, you just include ini.h to get the API declarations. To get the
@@ -127,8 +132,8 @@ definitions, you must include ini.h from *one* single C or C++ file, and #define
 you do.
 
 
-Customization
--------------
+### Customization
+
 There are a few different things in ini.h which are configurable by #defines. The customizations only affect the
 implementation, so will only need to be defined in the file where you have the #define INI_IMPLEMENTATION.
 
@@ -136,7 +141,7 @@ Note that if all customizations are utilized, ini.h will include no external fil
 if you need full control over what code is being built.
 
 
-### Custom memory allocators
+#### Custom memory allocators
 
 To store the internal data structures, ini.h needs to do dynamic allocation by calling `malloc`. Programs might want to
 keep track of allocations done, or use custom defined pools to allocate memory from. ini.h allows for specifying custom
@@ -158,7 +163,7 @@ right type, and access the tracking data.
 If no custom allocator is defined, ini.h will default to `malloc` and `free` from the C runtime library.
 
 
-### Custom C runtime function
+#### Custom C runtime function
 
 The library makes use of three additional functions from the C runtime library, and for full flexibility, it allows you
 to substitute them for your own. Here's an example:
@@ -374,7 +379,7 @@ returned by `ini_property_count`. The defined constant `INI_GLOBAL_SECTION` can 
 `length` specifies the number of characters in `value`, which does not have to be zero-terminated. If `length` is zero,
 the length is determined automatically, but in this case `value` has to be zero-terminated.
 
-**/
+*/
 
 
 /*
@@ -388,14 +393,10 @@ the length is determined automatically, but in this case `value` has to be zero-
 
 #define INITIAL_CAPACITY ( 256 )
 
-#ifndef _CRT_NONSTDC_NO_DEPRECATE
-    #define _CRT_NONSTDC_NO_DEPRECATE
-#endif
-
-#ifndef _CRT_SECURE_NO_WARNINGS
-    #define _CRT_SECURE_NO_WARNINGS
-#endif
-
+#undef _CRT_NONSTDC_NO_DEPRECATE
+#define _CRT_NONSTDC_NO_DEPRECATE
+#undef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 #include <stddef.h>
 
 #ifndef INI_MALLOC
@@ -520,12 +521,12 @@ ini_t* ini_load( char const* data, unsigned int len, void* memctx )
                 ++ptr;
 
             /* done? */
-            if( !*ptr ) break;
+            if( ptr == end || !*ptr ) break;
 
             /* comment */
             else if( *ptr == ';' )
                 {
-                while( *ptr && *ptr !='\n' )
+                while( ptr < end && *ptr && *ptr !='\n' )
                     ++ptr;
                 }
             /* section */
@@ -533,7 +534,7 @@ ini_t* ini_load( char const* data, unsigned int len, void* memctx )
                 {
                 ++ptr;
                 start = ptr;
-                while( *ptr && *ptr !=']' && *ptr != '\n' )
+                while( ptr < end && *ptr && *ptr !=']' && *ptr != '\n' )
                     ++ptr;
 
                 if( *ptr == ']' )
@@ -558,10 +559,13 @@ ini_t* ini_load( char const* data, unsigned int len, void* memctx )
                     start2 = ptr;
                     while( ptr < end && *ptr && *ptr != '\n' )
                         ++ptr;
-                    while( *(--ptr) <= ' ' )
+                    while( ptr >= start2 && *(--ptr) <= ' ' )
                         (void)ptr;
                     ptr++;
-                    ini_property_add( ini, s, start, l, start2, (int)( ptr - start2) );
+                    if( ptr == start2 )
+                        ini_property_add( ini, s, start, l, "", 1 );
+                    else
+                        ini_property_add( ini, s, start, l, start2, (int)( ptr - start2 ) );
                     }
                 }
             }
@@ -740,7 +744,7 @@ int ini_find_section( ini_t const* ini, char const* name, int name_length )
             {
             char const* const other =
                 ini->sections[ i ].name_large ? ini->sections[ i ].name_large : ini->sections[ i ].name;
-            if( (int) INI_STRLEN( other ) == name_length && INI_STRNICMP( name, other, name_length ) == 0 )
+            if( INI_STRLEN( other ) == name_length && INI_STRNICMP( name, other, (size_t)name_length ) == 0 )
                 return i;
             }
         }
@@ -758,13 +762,13 @@ int ini_find_property( ini_t const* ini, int section, char const* name, int name
         {
         if( name_length <= 0 ) name_length = (int) INI_STRLEN( name );
         c = 0;
-        for( i = 0; i < ini->property_capacity; ++i )
+        for( i = 0; i < ini->property_count; ++i )
             {
             if( ini->properties[ i ].section == section )
                 {
                 char const* const other =
                     ini->properties[ i ].name_large ? ini->properties[ i ].name_large : ini->properties[ i ].name;
-                if( (int) INI_STRLEN( other ) == name_length && INI_STRNICMP( name, other, name_length ) == 0 )
+                if( INI_STRLEN( other ) == name_length && INI_STRNICMP( name, other, (size_t) name_length ) == 0 )
                     return c;
                 ++c;
                 }
@@ -793,7 +797,7 @@ int ini_section_add( ini_t* ini, char const* name, int length )
             }
 
         ini->sections[ ini->section_count ].name_large = 0;
-        if( length + 1 >= sizeof( ini->sections[ 0 ].name ) )
+        if( (size_t) length + 1 >= sizeof( ini->sections[ 0 ].name ) )
             {
             ini->sections[ ini->section_count ].name_large = (char*) INI_MALLOC( ini->memctx, (size_t) length + 1 );
             INI_MEMCPY( ini->sections[ ini->section_count ].name_large, name, (size_t) length );
@@ -835,7 +839,7 @@ void ini_property_add( ini_t* ini, int section, char const* name, int name_lengt
         ini->properties[ ini->property_count ].name_large = 0;
         ini->properties[ ini->property_count ].value_large = 0;
 
-        if( name_length + 1 >= sizeof( ini->properties[ 0 ].name ) )
+        if( (size_t) name_length + 1 >= sizeof( ini->properties[ 0 ].name ) )
             {
             ini->properties[ ini->property_count ].name_large = (char*) INI_MALLOC( ini->memctx, (size_t) name_length + 1 );
             INI_MEMCPY( ini->properties[ ini->property_count ].name_large, name, (size_t) name_length );
@@ -847,7 +851,7 @@ void ini_property_add( ini_t* ini, int section, char const* name, int name_lengt
             ini->properties[ ini->property_count ].name[ name_length ] = '\0';
             }
 
-        if( value_length + 1 >= sizeof( ini->properties[ 0 ].value ) )
+        if( (size_t) value_length + 1 >= sizeof( ini->properties[ 0 ].value ) )
             {
             ini->properties[ ini->property_count ].value_large = (char*) INI_MALLOC( ini->memctx, (size_t) value_length + 1 );
             INI_MEMCPY( ini->properties[ ini->property_count ].value_large, value, (size_t) value_length );
@@ -918,7 +922,7 @@ void ini_section_name_set( ini_t* ini, int section, char const* name, int length
         if( ini->sections[ section ].name_large ) INI_FREE( ini->memctx, ini->sections[ section ].name_large );
         ini->sections[ section ].name_large = 0;
 
-        if( length + 1 >= sizeof( ini->sections[ 0 ].name ) )
+        if( (size_t) length + 1 >= sizeof( ini->sections[ 0 ].name ) )
             {
             ini->sections[ section ].name_large = (char*) INI_MALLOC( ini->memctx, (size_t) length + 1 );
             INI_MEMCPY( ini->sections[ section ].name_large, name, (size_t) length );
@@ -946,7 +950,7 @@ void ini_property_name_set( ini_t* ini, int section, int property, char const* n
             if( ini->properties[ p ].name_large ) INI_FREE( ini->memctx, ini->properties[ p ].name_large );
             ini->properties[ ini->property_count ].name_large = 0;
 
-            if( length + 1 >= sizeof( ini->properties[ 0 ].name ) )
+            if( (size_t) length + 1 >= sizeof( ini->properties[ 0 ].name ) )
                 {
                 ini->properties[ p ].name_large = (char*) INI_MALLOC( ini->memctx, (size_t) length + 1 );
                 INI_MEMCPY( ini->properties[ p ].name_large, name, (size_t) length );
@@ -975,16 +979,16 @@ void ini_property_value_set( ini_t* ini, int section, int property, char const* 
             if( ini->properties[ p ].value_large ) INI_FREE( ini->memctx, ini->properties[ p ].value_large );
             ini->properties[ ini->property_count ].value_large = 0;
 
-            if( length + 1 >= sizeof( ini->properties[ 0 ].value ) )
+            if( (size_t) length + 1 >= sizeof( ini->properties[ 0 ].value ) )
                 {
                 ini->properties[ p ].value_large = (char*) INI_MALLOC( ini->memctx, (size_t) length + 1 );
-                INI_MEMCPY( ini->properties[ p ].name_large, value, (size_t) length );
+                INI_MEMCPY( ini->properties[ p ].value_large, value, (size_t) length );
                 ini->properties[ p ].value_large[ length ] = '\0';
                 }
             else
                 {
                 INI_MEMCPY( ini->properties[ p ].value, value, (size_t) length );
-                ini->properties[ p ].name[ length ] = '\0';
+                ini->properties[ p ].value[ length ] = '\0';
                 }
             }
         }
@@ -994,9 +998,16 @@ void ini_property_value_set( ini_t* ini, int section, int property, char const* 
 #endif /* INI_IMPLEMENTATION */
 
 /*
+
+contributors:
+    Randy Gaul (copy-paste bug in ini_property_value_set)
+    Branimir Karadzic (INI_STRNICMP bugfix)
+
 revision history:
+    1.2     using strnicmp for correct length compares, fixed copy-paste bug in ini_property_value_set
     1.1     customization, added documentation, cleanup
     1.0     first publicly released version
+
 */
 
 /*

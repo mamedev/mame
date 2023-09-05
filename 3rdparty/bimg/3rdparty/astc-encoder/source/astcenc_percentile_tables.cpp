@@ -1166,11 +1166,11 @@ const float *get_2d_percentile_table(
 	unsigned int xdim,
 	unsigned int ydim
 ) {
-	float* unpacked_table = new float[2048];
+	float* unpacked_table = new float[WEIGHTS_MAX_BLOCK_MODES];
 	const packed_percentile_table *apt = get_packed_table(xdim, ydim);
 
 	// Set the default percentile
-	for (unsigned int i = 0; i < 2048; i++)
+	for (unsigned int i = 0; i < WEIGHTS_MAX_BLOCK_MODES; i++)
 	{
 		unpacked_table[i] = 1.0f;
 	}

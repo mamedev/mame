@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2023 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -160,7 +160,7 @@
 #		define NOMINMAX
 #	endif // NOMINMAX
 //  If _USING_V110_SDK71_ is defined it means we are using the v110_xp or v120_xp toolset.
-#	if defined(_MSC_VER) && (_MSC_VER >= 1700) && (!_USING_V110_SDK71_)
+#	if defined(_MSC_VER) && (_MSC_VER >= 1700) && !defined(_USING_V110_SDK71_)
 #		include <winapifamily.h>
 #	endif // defined(_MSC_VER) && (_MSC_VER >= 1700) && (!_USING_V110_SDK71_)
 #	if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
@@ -460,5 +460,19 @@
 #else
 #	define BX_CPP_NAME "C++Unknown"
 #endif // defined(__cplusplus)
+
+#if BX_PLATFORM_BSD   \
+ || BX_PLATFORM_HAIKU \
+ || BX_PLATFORM_HURD
+static_assert(false, "\n\n"
+	"\t** IMPORTANT! **\n\n"
+	"\tYou're compiling for unsupported platform!\n"
+	"\tIf you wish to support this platform, make your own fork, and modify code for _yourself_.\n"
+	"\t\n"
+	"\tDo not submit PR to main repo, it won't be considered, and it would code rot anyway. I have no ability\n"
+	"\tto test on these platforms, and over years there wasn't any serious contributor who wanted to take\n"
+	"\tburden of maintaining code for these platforms.\n"
+	"\t\n");
+#endif // BX_PLATFORM_*
 
 #endif // BX_PLATFORM_H_HEADER_GUARD

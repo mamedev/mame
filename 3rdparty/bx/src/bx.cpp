@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2023 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -12,6 +12,16 @@
 
 namespace bx
 {
+	Location Location::current(const char* _filePath, uint32_t _line)
+	{
+		return Location(_filePath, _line);
+	}
+
+	LocationFull LocationFull::current(const char* _function, const char* _filePath, uint32_t _line)
+	{
+		return LocationFull(_function, _filePath, _line);
+	}
+
 	void swap(void* _a, void* _b, size_t _numBytes)
 	{
 		uint8_t* lhs = (uint8_t*)_a;

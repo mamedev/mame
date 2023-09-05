@@ -1,4 +1,4 @@
-// Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+// Copyright 2011-2023 Branimir Karadzic. All rights reserved.
 // License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
 
 
@@ -708,11 +708,14 @@ pub const CapsFlags_VertexAttribUint10: CapsFlags     = 0x0000000004000000;
 /// Rendering with VertexID only is supported.
 pub const CapsFlags_VertexId: CapsFlags               = 0x0000000008000000;
 
+/// PrimitiveID is available in fragment shader.
+pub const CapsFlags_PrimitiveId: CapsFlags            = 0x0000000010000000;
+
 /// Viewport layer is available in vertex shader.
-pub const CapsFlags_ViewportLayerArray: CapsFlags     = 0x0000000010000000;
+pub const CapsFlags_ViewportLayerArray: CapsFlags     = 0x0000000020000000;
 
 /// Draw indirect with indirect count is supported.
-pub const CapsFlags_DrawIndirectCount: CapsFlags      = 0x0000000020000000;
+pub const CapsFlags_DrawIndirectCount: CapsFlags      = 0x0000000040000000;
 
 /// All texture compare modes are supported.
 pub const CapsFlags_TextureCompareAll: CapsFlags      = 0x0000000000300000;
@@ -1338,6 +1341,7 @@ pub const Caps = extern struct {
         reset: u32,
         numBackBuffers: u8,
         maxFrameLatency: u8,
+        debugTextScale: u8,
     };
 
 pub const Init = extern struct {
@@ -1699,7 +1703,7 @@ pub const Init = extern struct {
         /// Set instance data buffer for draw primitive.
         /// <param name="_handle">Vertex buffer.</param>
         /// <param name="_startVertex">First instance data.</param>
-        /// <param name="_num">Number of data instances. Set instance data buffer for draw primitive.</param>
+        /// <param name="_num">Number of data instances.</param>
         pub inline fn setInstanceDataFromVertexBuffer(self: ?*Encoder, _handle: VertexBufferHandle, _startVertex: u32, _num: u32) void {
             return bgfx_encoder_set_instance_data_from_vertex_buffer(self, _handle, _startVertex, _num);
         }
@@ -3066,7 +3070,7 @@ extern fn bgfx_encoder_set_instance_data_buffer(self: ?*Encoder, _idb: [*c]const
 /// Set instance data buffer for draw primitive.
 /// <param name="_handle">Vertex buffer.</param>
 /// <param name="_startVertex">First instance data.</param>
-/// <param name="_num">Number of data instances. Set instance data buffer for draw primitive.</param>
+/// <param name="_num">Number of data instances.</param>
 extern fn bgfx_encoder_set_instance_data_from_vertex_buffer(self: ?*Encoder, _handle: VertexBufferHandle, _startVertex: u32, _num: u32) void;
 
 /// Set instance data buffer for draw primitive.
@@ -3497,7 +3501,7 @@ extern fn bgfx_set_instance_data_buffer(_idb: [*c]const InstanceDataBuffer, _sta
 /// Set instance data buffer for draw primitive.
 /// <param name="_handle">Vertex buffer.</param>
 /// <param name="_startVertex">First instance data.</param>
-/// <param name="_num">Number of data instances. Set instance data buffer for draw primitive.</param>
+/// <param name="_num">Number of data instances.</param>
 pub inline fn setInstanceDataFromVertexBuffer(_handle: VertexBufferHandle, _startVertex: u32, _num: u32) void {
     return bgfx_set_instance_data_from_vertex_buffer(_handle, _startVertex, _num);
 }

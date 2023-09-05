@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2023 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -27,6 +27,12 @@ namespace bx
 	inline int32_t compareAscending<const char*>(const void* _lhs, const void* _rhs)
 	{
 		return strCmp(*(const char**)_lhs, *(const char**)_rhs);
+	}
+
+	template<>
+	inline int32_t compareAscending<StringLiteral>(const void* _lhs, const void* _rhs)
+	{
+		return strCmp(*(const StringLiteral*)_lhs, *(const StringLiteral*)_rhs);
 	}
 
 	template<>

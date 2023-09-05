@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2023 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -23,9 +23,10 @@ namespace bx
 		/// Special OS directories:
 		enum Enum
 		{
-			Current, //!< Current directory.
-			Temp,    //!< Temporary directory.
-			Home,    //!< User's home directory.
+			Current,    //!< Current directory.
+			Executable, //!< Executable file path.
+			Home,       //!< User's home directory.
+			Temp,       //!< Temporary directory.
 
 			Count
 		};

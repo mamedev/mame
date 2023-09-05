@@ -1,0 +1,4 @@
+The following upstream commits have been reverted in order to preserve compatibility with older macOS versions:
+* https://github.com/bkaradzic/bgfx/commit/5f564db0d5338c7204efc060ba82b41d80f3682a
+* https://github.com/bkaradzic/bgfx/commit/928800feab95d7bc3f4680d91c3e4754c852d783
+Additionally, reflection.vertexBindings, reflection.fragmentBindings and reflection.bindings have been reverted to reflection.vertexArguments, reflection.fragmentArguments and reflection.arguments, respectively.

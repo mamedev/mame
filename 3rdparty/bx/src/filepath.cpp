@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2023 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -16,7 +16,12 @@
 #endif // !BX_CRT_NONE
 
 #if BX_PLATFORM_WINDOWS
-extern "C" __declspec(dllimport) unsigned long __stdcall GetTempPathA(unsigned long _max, char* _ptr);
+#if !defined(GetModuleFileName)
+extern "C" __declspec(dllimport) unsigned long __stdcall GetModuleFileNameA(void* _module, char* _outFilePath, unsigned long _size);
+#endif
+extern "C" __declspec(dllimport) unsigned long __stdcall GetTempPathA(unsigned long _max, char* _outFilePath);
+#elif BX_PLATFORM_OSX
+extern "C" int _NSGetExecutablePath(char* _buf, uint32_t* _bufSize);
 #endif // BX_PLATFORM_WINDOWS
 
 namespace bx
@@ -180,7 +185,7 @@ namespace bx
 		return ::_getcwd(_buffer, (int32_t)_size);
 #else
 		return ::getcwd(_buffer, _size);
-#endif // BX_COMPILER_
+#endif // BX_PLATFORM_*
 	}
 
 	static bool getCurrentPath(char* _out, uint32_t* _inOutSize)
@@ -191,6 +196,35 @@ namespace bx
 			*_inOutSize = strLen(_out);
 			return true;
 		}
+
+		return false;
+	}
+
+	static bool getExecutablePath(char* _out, uint32_t* _inOutSize)
+	{
+#if BX_PLATFORM_WINDOWS
+		uint32_t len = ::GetModuleFileNameA(NULL, _out, *_inOutSize);
+		bool result = len != 0 && len < *_inOutSize;
+		*_inOutSize = len;
+		return result;
+#elif BX_PLATFORM_LINUX
+		char tmp[64];
+		snprintf(tmp, sizeof(tmp), "/proc/%d/exe", getpid() );
+		ssize_t result = readlink(tmp, _out, *_inOutSize);
+
+		if (-1 < result)
+		{
+			*_inOutSize = uint32_t(result);
+			return true;
+		}
+#elif BX_PLATFORM_OSX
+		uint32_t len = *_inOutSize;
+		bool result = _NSGetExecutablePath(_out, &len);
+		if (0 == result)
+		{
+			return true;
+		}
+#endif // BX_PLATFORM_*
 
 		return false;
 	}
@@ -287,27 +321,21 @@ namespace bx
 
 	void FilePath::set(Dir::Enum _dir)
 	{
+		bool ok = false;
 		char tmp[kMaxFilePath];
 		uint32_t len = BX_COUNTOF(tmp);
 
 		switch (_dir)
 		{
-		case Dir::Current:
-			getCurrentPath(tmp, &len);
-			break;
+		case Dir::Current:    ok = getCurrentPath(tmp, &len);    break;
+		case Dir::Executable: ok = getExecutablePath(tmp, &len); break;
+		case Dir::Home:       ok = getHomePath(tmp, &len);       break;
+		case Dir::Temp:       ok = getTempPath(tmp, &len);       break;
 
-		case Dir::Temp:
-			getTempPath(tmp, &len);
-			break;
-
-		case Dir::Home:
-			getHomePath(tmp, &len);
-			break;
-
-		default:
-			len = 0;
-			break;
+		default: break;
 		}
+
+		len = ok ? len : 0;
 
 		set(StringView(tmp, len) );
 	}
