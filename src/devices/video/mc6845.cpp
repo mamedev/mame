@@ -474,7 +474,7 @@ void mc6845_device::recompute_parameters(bool postload)
 			// So, it is protected by the m_allow_interlace_video_mode
 			if (MODE_INTERLACE_AND_VIDEO && m_allow_interlace_video_mode)
 			{
-				max_visible_y *= 2;
+				max_visible_y = ((max_visible_y + 1) * 2) - 1;
 				vert_pix_total *= 2;
 			}
 
