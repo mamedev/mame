@@ -72,8 +72,6 @@ public:
 	}
 	void set_char_width(int pixels) { m_hpixels_per_column = pixels; }
 
-	void enable_allow_interlace_video_mode() { m_allow_interlace_video_mode = true; };
-
 	template <typename... T> void set_reconfigure_callback(T &&... args) { m_reconfigure_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_begin_update_callback(T &&... args) { m_begin_update_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_update_row_callback(T &&... args) { m_update_row_cb.set(std::forward<T>(args)...); }
@@ -145,7 +143,7 @@ protected:
 	bool m_supports_status_reg_d6;
 	bool m_supports_status_reg_d7;
 	bool m_supports_transparent;
-	bool m_allow_interlace_video_mode;
+	bool m_double_r6_in_interlace_video_mode;
 
 	/* register file */
 	uint8_t   m_horiz_char_total;     /* 0x00 */

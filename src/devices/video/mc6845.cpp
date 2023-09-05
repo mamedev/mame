@@ -59,7 +59,7 @@
 DEFINE_DEVICE_TYPE(MC6845,   mc6845_device,   "mc6845",   "Motorola MC6845 CRTC")
 DEFINE_DEVICE_TYPE(MC6845_1, mc6845_1_device, "mc6845_1", "Motorola MC6845-1 CRTC")
 DEFINE_DEVICE_TYPE(R6545_1,  r6545_1_device,  "r6545_1",  "Rockwell R6545-1 CRTC")
-DEFINE_DEVICE_TYPE(C6545_1,  c6545_1_device,  "c6545_1",  "C6545-1 CRTC")
+DEFINE_DEVICE_TYPE(C6545_1,  c6545_1_device,  "c6545_1",  "Commodore C6545-1 CRTC")
 DEFINE_DEVICE_TYPE(HD6845S,  hd6845s_device,  "hd6845s",  "Hitachi HD6845S CRTC") // same as HD46505S
 DEFINE_DEVICE_TYPE(SY6545_1, sy6545_1_device, "sy6545_1", "Synertek SY6545-1 CRTC")
 DEFINE_DEVICE_TYPE(SY6845E,  sy6845e_device,  "sy6845e",  "Synertek SY6845E CRTC")
@@ -82,7 +82,6 @@ DEFINE_DEVICE_TYPE(AMS40489, ams40489_device, "ams40489", "AMS40489 ASIC (CRTC)"
 mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this, false)
-	, m_allow_interlace_video_mode(false)
 	, m_show_border_area(true)
 	, m_noninterlace_adjust(0)
 	, m_interlace_adjust(0)
@@ -456,7 +455,7 @@ void mc6845_device::recompute_parameters(bool postload)
 		(max_visible_x != m_max_visible_x) || (max_visible_y != m_max_visible_y) ||
 		(hsync_on_pos != m_hsync_on_pos) || (vsync_on_pos != m_vsync_on_pos) ||
 		(hsync_off_pos != m_hsync_off_pos) || (vsync_off_pos != m_vsync_off_pos) ||
-		(MODE_INTERLACE_AND_VIDEO && m_allow_interlace_video_mode))
+		(MODE_INTERLACE_AND_VIDEO && m_double_r6_in_interlace_video_mode))
 	{
 		/* update the screen if we have valid data */
 		if ((horiz_pix_total > 0) && (max_visible_x < horiz_pix_total) &&
@@ -468,11 +467,7 @@ void mc6845_device::recompute_parameters(bool postload)
 
 			attotime refresh = cclks_to_attotime((m_horiz_char_total + 1) * vert_pix_total);
 
-			// This doubles the vertical resolution, required for 'interlace and video' mode support.
-			// Tested and works for super80v, which was designed with this in mind (choose green or monochrome colour in config switches).
-			// However it breaks some other drivers (apricot,a6809,victor9k,bbc(mode7)).
-			// So, it is protected by the m_allow_interlace_video_mode
-			if (MODE_INTERLACE_AND_VIDEO && m_allow_interlace_video_mode)
+			if (MODE_INTERLACE_AND_VIDEO && m_double_r6_in_interlace_video_mode)
 			{
 				max_visible_y = ((max_visible_y + 1) * 2) - 1;
 				vert_pix_total *= 2;
@@ -1049,6 +1044,7 @@ void mc6845_device::device_start()
 	m_supports_status_reg_d6 = false;
 	m_supports_status_reg_d7 = false;
 	m_supports_transparent = false;
+	m_double_r6_in_interlace_video_mode = true;
 	m_has_valid_parameters = false;
 	m_display_disabled_msg_shown = false;
 	m_line_enable_ff = false;
@@ -1122,7 +1118,7 @@ void mc6845_device::device_start()
 	save_item(NAME(m_line_address));
 	save_item(NAME(m_cursor_x));
 	save_item(NAME(m_has_valid_parameters));
-	save_item(NAME(m_allow_interlace_video_mode));
+	save_item(NAME(m_double_r6_in_interlace_video_mode));
 }
 
 
@@ -1136,6 +1132,7 @@ void mc6845_1_device::device_start()
 	m_supports_status_reg_d6 = false;
 	m_supports_status_reg_d7 = false;
 	m_supports_transparent = false;
+	m_double_r6_in_interlace_video_mode = true;
 }
 
 
@@ -1149,6 +1146,7 @@ void c6545_1_device::device_start()
 	m_supports_status_reg_d6 = true;
 	m_supports_status_reg_d7 = false;
 	m_supports_transparent = false;
+	m_double_r6_in_interlace_video_mode = false; // does not support any interlaced mode
 }
 
 
@@ -1162,6 +1160,7 @@ void r6545_1_device::device_start()
 	m_supports_status_reg_d6 = true;
 	m_supports_status_reg_d7 = true;
 	m_supports_transparent = true;
+	m_double_r6_in_interlace_video_mode = false; // does not support any interlaced mode
 }
 
 
@@ -1175,6 +1174,7 @@ void hd6845s_device::device_start()
 	m_supports_status_reg_d6 = false;
 	m_supports_status_reg_d7 = false;
 	m_supports_transparent = false;
+	m_double_r6_in_interlace_video_mode = false;
 
 	// Non-interlace Mode, Interlace Sync Mode - When total number of rasters is RN, RN-1 shall be programmed.
 	m_noninterlace_adjust = 1;
@@ -1193,6 +1193,7 @@ void sy6545_1_device::device_start()
 	m_supports_status_reg_d6 = true;
 	m_supports_status_reg_d7 = true;
 	m_supports_transparent = true;
+	m_double_r6_in_interlace_video_mode = false; // does not support any interlaced mode
 }
 
 
@@ -1206,6 +1207,7 @@ void sy6845e_device::device_start()
 	m_supports_status_reg_d6 = true;
 	m_supports_status_reg_d7 = true;
 	m_supports_transparent = true;
+	m_double_r6_in_interlace_video_mode = false;
 }
 
 
@@ -1258,6 +1260,7 @@ void ams40489_device::device_start()
 	m_supports_status_reg_d6 = false;
 	m_supports_status_reg_d7 = false;
 	m_supports_transparent = false;
+	m_double_r6_in_interlace_video_mode = false; // tbd: could not find datasheet for chip.
 }
 
 
