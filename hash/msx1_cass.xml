@@ -176,7 +176,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="teachysb">
-		<description>Teach Yourself Basic (United Kingdom)</description>
+		<description>TEACH YOURSELF BASIC (United Kingdom)</description>
 		<year>1985</year>
 		<publisher>Toshiba</publisher>
 		<notes>Bundled with Toshiba HX-10.</notes>
@@ -13702,7 +13702,7 @@ license:CC0-1.0
 	<software name="skydiver">
 		<description>Sky Diver (Japan)</description>
 		<year>1984</year>
-		<publisher>SoftBank</publisher>
+		<publisher>Hudson Soft</publisher>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -13715,7 +13715,7 @@ license:CC0-1.0
 	<software name="skydivera" cloneof="skydiver">
 		<description>Sky Diver (Japan, alt)</description>
 		<year>1984</year>
-		<publisher>SoftBank</publisher>
+		<publisher>Hudson Soft</publisher>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="11732">
@@ -16768,7 +16768,7 @@ Side B
 		<description>W Series 1 - Biotech / Killer Station (Japan)</description>
 		<year>1983</year>
 		<publisher>Hudson Soft</publisher>
-		<info name="alt_title" value="バイオテック／キラーステーション"/>
+		<info name="alt_title" value="Wシリーズ1"/>
 		<info name="serial" value="MX-1003"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
 		<part name="cass1a" interface="msx_cass">
@@ -16789,7 +16789,7 @@ Side B
 		<description>W Series 3 - Akarui Nouen / Fire Ball (Japan)</description>
 		<year>1983</year>
 		<publisher>Hudson Soft</publisher>
-		<info name="alt_title" value="明るい農園／ファイアーボール"/>
+		<info name="alt_title" value="Wシリーズ3"/>
 		<info name="serial" value="MX-1005"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
 		<part name="cass1a" interface="msx_cass">
@@ -16810,7 +16810,7 @@ Side B
 		<description>W Series 4 - Super Doors / Busy Rainy Day (Japan)</description>
 		<year>1983</year>
 		<publisher>Hudson Soft</publisher>
-		<info name="alt_title" value="雨の日は大忙し／スーパードアーズ"/>
+		<info name="alt_title" value="Wシリーズ4"/>
 		<info name="serial" value="MX-1006"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
 		<part name="cass1a" interface="msx_cass">
@@ -17352,7 +17352,7 @@ Side B
 	</software>
 
 	<software name="wldmscpp">
-		<description>World Map Software for Color Plotter Printer (Japan)</description>
+		<description>Color Plotter/Printer-you yō Sekai Chizu Soft (Japan)</description>
 		<year>1984</year>
 		<publisher>National</publisher>
 		<info name="alt_title" value="カラープロッタプリンタ用世界地図ソフト"/>
@@ -17654,8 +17654,8 @@ Side B
 	<software name="chiteidb">
 		<description>Chitei Daibouken (Japan)</description>
 		<year>1987</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Yasunori Takahara"/>
+		<publisher>Yasunori Takahara</publisher>
+		<info name="alt_title" value="地底大冒険"/>
 		<info name="usage" value="Load with CLOAD + RUN"/>
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="30048">
