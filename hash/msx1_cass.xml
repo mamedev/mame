@@ -13137,12 +13137,12 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 		<part name="cass2" interface="msx_cass">
-			<dataarea name="cass" size="57975">
+			<dataarea name="cass" size="60407">
 				<rom name="scapeghost - level 9 computing (part 2).cas" size="60407" crc="24375acf" sha1="90d08b32b264bd6fcf81794d973d4dbfe0a8f2c5"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="msx_cass">
-			<dataarea name="cass" size="57975">
+			<dataarea name="cass" size="60407">
 				<rom name="scapeghost - level 9 computing (part 3).cas" size="60407" crc="f6fdb73d" sha1="58d8c07b8f90c7456ea52610f801e5228830b049"/>
 			</dataarea>
 		</part>
