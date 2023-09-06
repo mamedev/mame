@@ -1074,7 +1074,7 @@ void w5100_device::recv_cb(uint8_t *buffer, int length)
 					process_arp_reply(data, data_length);
 					break;
 				case ARP_OPCODE_REQUEST:
-					process_arp_request(data, data_length);
+					process_arp_request(eth.src_mac, data, data_length);
 					break;
 			}
 		}
@@ -1100,7 +1100,9 @@ bool w5100_device::is_broadcast_ip(uint32_t ip, uint8_t *mac) const
 /* if ip is outside the subnet, return arp is for the gateway */
 uint32_t w5100_device::arp_ip(uint32_t ip) const
 {
-	if ((ip & m_subnet) != (m_ip & m_subnet) && (ip & ~m_subnet) != 0)
+	// erratum #2/3 - 0.0.0.0 does an arp for the gateway.
+	// (w5100s does arp for 0.0.0.0)
+	if ((ip ^ m_ip) & m_subnet)
 		return m_gateway;
 	return ip;
 }
@@ -1134,8 +1136,14 @@ void w5100_device::send_arp_request(uint32_t ip)
 	send_or_queue(frame, FRAME_SIZE);
 }
 
-void w5100_device::process_arp_request(const uint8_t *arp, int length)
+void w5100_device::process_arp_request(const uint8_t *mac, const uint8_t *arp, int length)
 {
+	// w5100 erratum:
+	// ARP SHA is ignored; mac address is from the ethernet header (also true in w5100s)
+	// sender ip is checked against the subnet so response will go to the
+	// gateway if it's outside the subnet.
+
+
 	static const int FRAME_SIZE = 60;
 	uint8_t frame[FRAME_SIZE];
 	memset(frame, 0, sizeof(frame));
@@ -1151,7 +1159,11 @@ void w5100_device::process_arp_request(const uint8_t *arp, int length)
 	if (m_ip != be_read(arp + o_ARP_TPA, 4))
 		return;
 
-	std::memcpy(frame + o_ETHERNET_DEST, arp + o_ARP_SHA, 6);
+	// erratum #2
+	uint32_t dest_ip = arp_ip(be_read(arp + o_ARP_SPA, 4));
+
+
+	std::memcpy(frame + o_ETHERNET_DEST, mac, 6);
 	std::memcpy(frame + o_ETHERNET_SRC, m_shar, 6);
 	be_write(frame + o_ETHERNET_TYPE, ETHERNET_TYPE_ARP, 2);
 
@@ -1164,7 +1176,8 @@ void w5100_device::process_arp_request(const uint8_t *arp, int length)
 	be_write(ptr + o_ARP_OPCODE, ARP_OPCODE_REPLY, 2);
 	std::memcpy(ptr + o_ARP_SHA, m_shar, 6); //sender mac
 	be_write(ptr + o_ARP_SPA, m_ip, 4); // sender ip
-	std::memcpy(ptr + o_ARP_THA, arp + o_ARP_SHA, 10); // dest mac + ip.
+	std::memcpy(ptr + o_ARP_THA, mac, 6); // dest mac.
+	be_write(ptr + o_ARP_TPA, dest_ip, 4); // dest ip -- see erratum 3
 
 	LOGMASKED(LOG_ARP, "Replying to ARP request from %s\n", ip_to_string(be_read(arp + o_ARP_SPA, 4)));
 	send_or_queue(frame, FRAME_SIZE);

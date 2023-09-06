@@ -134,7 +134,7 @@ private:
 	uint8_t read_register(offs_t offset);
 
 
-	void process_arp_request(const uint8_t *arp, int length);
+	void process_arp_request(const uint8_t *mac, const uint8_t *arp, int length);
 	void process_arp_reply(const uint8_t *arp, int length);
 	void process_icmp_unreachable(const uint8_t *data, int length);
 
