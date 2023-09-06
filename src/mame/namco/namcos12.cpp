@@ -15,7 +15,6 @@
   Issues:
     - not all games work due to either banking, dma or protection issues.
     - graphics are glitchy in some games.
-    - kartduel needs a redump to fix "BSOD" issue. Graphic data is corrupt which is causing the game to throw an error internally causing the BSOD.
     - kartduel frame rate is choppy, it freezes every half second
         memo: this is due to the link PCB not being implemented, it keeps trying to communicate over the network causing hitching.
         Forcing 0x1f781701 (which is within the shared RAM between the PCBs) to 0xff will stop the hitching.
@@ -2420,14 +2419,13 @@ ROM_START( kaiunqz )
 ROM_END
 
 ROM_START( kartduel )
-	// Needs a redump
 	ROM_REGION32_LE( 0x00400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "ktd1vera.2l",  0x0000000, 0x200000, CRC(0c207249) SHA1(6c57de25d452226a25f658638d89b81257960741) )
 	ROM_LOAD16_BYTE( "ktd1vera.2p",  0x0000001, 0x200000, CRC(f6e2581f) SHA1(06eb108c2775290590dba75f964f26443a585d70) )
 
 	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 ) /* main data */
-	ROM_LOAD16_BYTE( "kdt1rom0l.ic12", 0x000000, 0x800000, BAD_DUMP CRC(4a3bac12) SHA1(7758d97049d30a00b7bede3688d451fbf4eddbfb) ) // Shows signs of corruption. bit 0 is set to 1 on 4-byte boundaries in only some areas, resulting in bad data crashing the game at certain points
-	ROM_LOAD16_BYTE( "kdt1rom0u.ic11", 0x000001, 0x800000, BAD_DUMP CRC(bab0d328) SHA1(9a15bfb38c63b0012f29755b2be071e9c82d1c20) )
+	ROM_LOAD16_BYTE( "kdt1rom0l.ic12", 0x000000, 0x800000, CRC(f8a79aef) SHA1(8c2a6aef5cc0ffe4b5e9f2a98ef5a29edd59eb4d) )
+	ROM_LOAD16_BYTE( "kdt1rom0u.ic11", 0x000001, 0x800000, CRC(bab0d328) SHA1(9a15bfb38c63b0012f29755b2be071e9c82d1c20) )
 
 	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
 	ROM_LOAD16_WORD_SWAP( "ktd1vera.11s", 0x000000, 0x080000, CRC(c2ff1971) SHA1(32ee2afe08e92049d8139c9324a0ea1a3b7ee5a1) )
