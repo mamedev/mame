@@ -27,16 +27,16 @@ namespace {
 spv_result_t ValidateEntryPoint(ValidationState_t& _, const Instruction* inst) {
   const auto entry_point_id = inst->GetOperandAs<uint32_t>(1);
   auto entry_point = _.FindDef(entry_point_id);
-  if (!entry_point || spv::Op::OpFunction != entry_point->opcode()) {
+  if (!entry_point || SpvOpFunction != entry_point->opcode()) {
     return _.diag(SPV_ERROR_INVALID_ID, inst)
            << "OpEntryPoint Entry Point <id> " << _.getIdName(entry_point_id)
            << " is not a function.";
   }
 
   // Only check the shader execution models
-  const spv::ExecutionModel execution_model =
-      inst->GetOperandAs<spv::ExecutionModel>(0);
-  if (execution_model != spv::ExecutionModel::Kernel) {
+  const SpvExecutionModel execution_model =
+      inst->GetOperandAs<SpvExecutionModel>(0);
+  if (execution_model != SpvExecutionModelKernel) {
     const auto entry_point_type_id = entry_point->GetOperandAs<uint32_t>(3);
     const auto entry_point_type = _.FindDef(entry_point_type_id);
     if (!entry_point_type || 3 != entry_point_type->words().size()) {
@@ -48,7 +48,7 @@ spv_result_t ValidateEntryPoint(ValidationState_t& _, const Instruction* inst) {
   }
 
   auto return_type = _.FindDef(entry_point->type_id());
-  if (!return_type || spv::Op::OpTypeVoid != return_type->opcode()) {
+  if (!return_type || SpvOpTypeVoid != return_type->opcode()) {
     return _.diag(SPV_ERROR_INVALID_ID, inst)
            << _.VkErrorID(4633) << "OpEntryPoint Entry Point <id> "
            << _.getIdName(entry_point_id)
@@ -56,31 +56,31 @@ spv_result_t ValidateEntryPoint(ValidationState_t& _, const Instruction* inst) {
   }
 
   const auto* execution_modes = _.GetExecutionModes(entry_point_id);
-  if (_.HasCapability(spv::Capability::Shader)) {
+  if (_.HasCapability(SpvCapabilityShader)) {
     switch (execution_model) {
-      case spv::ExecutionModel::Fragment:
+      case SpvExecutionModelFragment:
         if (execution_modes &&
-            execution_modes->count(spv::ExecutionMode::OriginUpperLeft) &&
-            execution_modes->count(spv::ExecutionMode::OriginLowerLeft)) {
+            execution_modes->count(SpvExecutionModeOriginUpperLeft) &&
+            execution_modes->count(SpvExecutionModeOriginLowerLeft)) {
           return _.diag(SPV_ERROR_INVALID_DATA, inst)
                  << "Fragment execution model entry points can only specify "
                     "one of OriginUpperLeft or OriginLowerLeft execution "
                     "modes.";
         }
         if (!execution_modes ||
-            (!execution_modes->count(spv::ExecutionMode::OriginUpperLeft) &&
-             !execution_modes->count(spv::ExecutionMode::OriginLowerLeft))) {
+            (!execution_modes->count(SpvExecutionModeOriginUpperLeft) &&
+             !execution_modes->count(SpvExecutionModeOriginLowerLeft))) {
           return _.diag(SPV_ERROR_INVALID_DATA, inst)
                  << "Fragment execution model entry points require either an "
                     "OriginUpperLeft or OriginLowerLeft execution mode.";
         }
         if (execution_modes &&
             1 < std::count_if(execution_modes->begin(), execution_modes->end(),
-                              [](const spv::ExecutionMode& mode) {
+                              [](const SpvExecutionMode& mode) {
                                 switch (mode) {
-                                  case spv::ExecutionMode::DepthGreater:
-                                  case spv::ExecutionMode::DepthLess:
-                                  case spv::ExecutionMode::DepthUnchanged:
+                                  case SpvExecutionModeDepthGreater:
+                                  case SpvExecutionModeDepthLess:
+                                  case SpvExecutionModeDepthUnchanged:
                                     return true;
                                   default:
                                     return false;
@@ -94,15 +94,14 @@ spv_result_t ValidateEntryPoint(ValidationState_t& _, const Instruction* inst) {
         if (execution_modes &&
             1 < std::count_if(
                     execution_modes->begin(), execution_modes->end(),
-                    [](const spv::ExecutionMode& mode) {
+                    [](const SpvExecutionMode& mode) {
                       switch (mode) {
-                        case spv::ExecutionMode::PixelInterlockOrderedEXT:
-                        case spv::ExecutionMode::PixelInterlockUnorderedEXT:
-                        case spv::ExecutionMode::SampleInterlockOrderedEXT:
-                        case spv::ExecutionMode::SampleInterlockUnorderedEXT:
-                        case spv::ExecutionMode::ShadingRateInterlockOrderedEXT:
-                        case spv::ExecutionMode::
-                            ShadingRateInterlockUnorderedEXT:
+                        case SpvExecutionModePixelInterlockOrderedEXT:
+                        case SpvExecutionModePixelInterlockUnorderedEXT:
+                        case SpvExecutionModeSampleInterlockOrderedEXT:
+                        case SpvExecutionModeSampleInterlockUnorderedEXT:
+                        case SpvExecutionModeShadingRateInterlockOrderedEXT:
+                        case SpvExecutionModeShadingRateInterlockUnorderedEXT:
                           return true;
                         default:
                           return false;
@@ -115,11 +114,11 @@ spv_result_t ValidateEntryPoint(ValidationState_t& _, const Instruction* inst) {
         if (execution_modes &&
             1 < std::count_if(
                     execution_modes->begin(), execution_modes->end(),
-                    [](const spv::ExecutionMode& mode) {
+                    [](const SpvExecutionMode& mode) {
                       switch (mode) {
-                        case spv::ExecutionMode::StencilRefUnchangedFrontAMD:
-                        case spv::ExecutionMode::StencilRefLessFrontAMD:
-                        case spv::ExecutionMode::StencilRefGreaterFrontAMD:
+                        case SpvExecutionModeStencilRefUnchangedFrontAMD:
+                        case SpvExecutionModeStencilRefLessFrontAMD:
+                        case SpvExecutionModeStencilRefGreaterFrontAMD:
                           return true;
                         default:
                           return false;
@@ -134,11 +133,11 @@ spv_result_t ValidateEntryPoint(ValidationState_t& _, const Instruction* inst) {
         if (execution_modes &&
             1 < std::count_if(
                     execution_modes->begin(), execution_modes->end(),
-                    [](const spv::ExecutionMode& mode) {
+                    [](const SpvExecutionMode& mode) {
                       switch (mode) {
-                        case spv::ExecutionMode::StencilRefUnchangedBackAMD:
-                        case spv::ExecutionMode::StencilRefLessBackAMD:
-                        case spv::ExecutionMode::StencilRefGreaterBackAMD:
+                        case SpvExecutionModeStencilRefUnchangedBackAMD:
+                        case SpvExecutionModeStencilRefLessBackAMD:
+                        case SpvExecutionModeStencilRefGreaterBackAMD:
                           return true;
                         default:
                           return false;
@@ -151,21 +150,20 @@ spv_result_t ValidateEntryPoint(ValidationState_t& _, const Instruction* inst) {
                     "execution modes.";
         }
         break;
-      case spv::ExecutionModel::TessellationControl:
-      case spv::ExecutionModel::TessellationEvaluation:
+      case SpvExecutionModelTessellationControl:
+      case SpvExecutionModelTessellationEvaluation:
         if (execution_modes &&
-            1 < std::count_if(
-                    execution_modes->begin(), execution_modes->end(),
-                    [](const spv::ExecutionMode& mode) {
-                      switch (mode) {
-                        case spv::ExecutionMode::SpacingEqual:
-                        case spv::ExecutionMode::SpacingFractionalEven:
-                        case spv::ExecutionMode::SpacingFractionalOdd:
-                          return true;
-                        default:
-                          return false;
-                      }
-                    })) {
+            1 < std::count_if(execution_modes->begin(), execution_modes->end(),
+                              [](const SpvExecutionMode& mode) {
+                                switch (mode) {
+                                  case SpvExecutionModeSpacingEqual:
+                                  case SpvExecutionModeSpacingFractionalEven:
+                                  case SpvExecutionModeSpacingFractionalOdd:
+                                    return true;
+                                  default:
+                                    return false;
+                                }
+                              })) {
           return _.diag(SPV_ERROR_INVALID_DATA, inst)
                  << "Tessellation execution model entry points can specify at "
                     "most one of SpacingEqual, SpacingFractionalOdd or "
@@ -173,11 +171,11 @@ spv_result_t ValidateEntryPoint(ValidationState_t& _, const Instruction* inst) {
         }
         if (execution_modes &&
             1 < std::count_if(execution_modes->begin(), execution_modes->end(),
-                              [](const spv::ExecutionMode& mode) {
+                              [](const SpvExecutionMode& mode) {
                                 switch (mode) {
-                                  case spv::ExecutionMode::Triangles:
-                                  case spv::ExecutionMode::Quads:
-                                  case spv::ExecutionMode::Isolines:
+                                  case SpvExecutionModeTriangles:
+                                  case SpvExecutionModeQuads:
+                                  case SpvExecutionModeIsolines:
                                     return true;
                                   default:
                                     return false;
@@ -189,10 +187,10 @@ spv_result_t ValidateEntryPoint(ValidationState_t& _, const Instruction* inst) {
         }
         if (execution_modes &&
             1 < std::count_if(execution_modes->begin(), execution_modes->end(),
-                              [](const spv::ExecutionMode& mode) {
+                              [](const SpvExecutionMode& mode) {
                                 switch (mode) {
-                                  case spv::ExecutionMode::VertexOrderCw:
-                                  case spv::ExecutionMode::VertexOrderCcw:
+                                  case SpvExecutionModeVertexOrderCw:
+                                  case SpvExecutionModeVertexOrderCcw:
                                     return true;
                                   default:
                                     return false;
@@ -204,22 +202,21 @@ spv_result_t ValidateEntryPoint(ValidationState_t& _, const Instruction* inst) {
                     "modes.";
         }
         break;
-      case spv::ExecutionModel::Geometry:
+      case SpvExecutionModelGeometry:
         if (!execution_modes ||
-            1 != std::count_if(
-                     execution_modes->begin(), execution_modes->end(),
-                     [](const spv::ExecutionMode& mode) {
-                       switch (mode) {
-                         case spv::ExecutionMode::InputPoints:
-                         case spv::ExecutionMode::InputLines:
-                         case spv::ExecutionMode::InputLinesAdjacency:
-                         case spv::ExecutionMode::Triangles:
-                         case spv::ExecutionMode::InputTrianglesAdjacency:
-                           return true;
-                         default:
-                           return false;
-                       }
-                     })) {
+            1 != std::count_if(execution_modes->begin(), execution_modes->end(),
+                               [](const SpvExecutionMode& mode) {
+                                 switch (mode) {
+                                   case SpvExecutionModeInputPoints:
+                                   case SpvExecutionModeInputLines:
+                                   case SpvExecutionModeInputLinesAdjacency:
+                                   case SpvExecutionModeTriangles:
+                                   case SpvExecutionModeInputTrianglesAdjacency:
+                                     return true;
+                                   default:
+                                     return false;
+                                 }
+                               })) {
           return _.diag(SPV_ERROR_INVALID_DATA, inst)
                  << "Geometry execution model entry points must specify "
                     "exactly one of InputPoints, InputLines, "
@@ -228,11 +225,11 @@ spv_result_t ValidateEntryPoint(ValidationState_t& _, const Instruction* inst) {
         }
         if (!execution_modes ||
             1 != std::count_if(execution_modes->begin(), execution_modes->end(),
-                               [](const spv::ExecutionMode& mode) {
+                               [](const SpvExecutionMode& mode) {
                                  switch (mode) {
-                                   case spv::ExecutionMode::OutputPoints:
-                                   case spv::ExecutionMode::OutputLineStrip:
-                                   case spv::ExecutionMode::OutputTriangleStrip:
+                                   case SpvExecutionModeOutputPoints:
+                                   case SpvExecutionModeOutputLineStrip:
+                                   case SpvExecutionModeOutputTriangleStrip:
                                      return true;
                                    default:
                                      return false;
@@ -244,14 +241,14 @@ spv_result_t ValidateEntryPoint(ValidationState_t& _, const Instruction* inst) {
                     "OutputTriangleStrip execution modes.";
         }
         break;
-      case spv::ExecutionModel::MeshEXT:
+      case SpvExecutionModelMeshEXT:
         if (!execution_modes ||
             1 != std::count_if(execution_modes->begin(), execution_modes->end(),
-                               [](const spv::ExecutionMode& mode) {
+                               [](const SpvExecutionMode& mode) {
                                  switch (mode) {
-                                   case spv::ExecutionMode::OutputPoints:
-                                   case spv::ExecutionMode::OutputLinesEXT:
-                                   case spv::ExecutionMode::OutputTrianglesEXT:
+                                   case SpvExecutionModeOutputPoints:
+                                   case SpvExecutionModeOutputLinesEXT:
+                                   case SpvExecutionModeOutputTrianglesEXT:
                                      return true;
                                    default:
                                      return false;
@@ -263,10 +260,10 @@ spv_result_t ValidateEntryPoint(ValidationState_t& _, const Instruction* inst) {
                     "OutputTrianglesEXT Execution Modes.";
         } else if (2 != std::count_if(
                             execution_modes->begin(), execution_modes->end(),
-                            [](const spv::ExecutionMode& mode) {
+                            [](const SpvExecutionMode& mode) {
                               switch (mode) {
-                                case spv::ExecutionMode::OutputPrimitivesEXT:
-                                case spv::ExecutionMode::OutputVertices:
+                                case SpvExecutionModeOutputPrimitivesEXT:
+                                case SpvExecutionModeOutputVertices:
                                   return true;
                                 default:
                                   return false;
@@ -284,25 +281,23 @@ spv_result_t ValidateEntryPoint(ValidationState_t& _, const Instruction* inst) {
 
   if (spvIsVulkanEnv(_.context()->target_env)) {
     switch (execution_model) {
-      case spv::ExecutionModel::GLCompute:
+      case SpvExecutionModelGLCompute:
         if (!execution_modes ||
-            !execution_modes->count(spv::ExecutionMode::LocalSize)) {
+            !execution_modes->count(SpvExecutionModeLocalSize)) {
           bool ok = false;
           for (auto& i : _.ordered_instructions()) {
-            if (i.opcode() == spv::Op::OpDecorate) {
+            if (i.opcode() == SpvOpDecorate) {
               if (i.operands().size() > 2) {
-                if (i.GetOperandAs<spv::Decoration>(1) ==
-                        spv::Decoration::BuiltIn &&
-                    i.GetOperandAs<spv::BuiltIn>(2) ==
-                        spv::BuiltIn::WorkgroupSize) {
+                if (i.GetOperandAs<SpvDecoration>(1) == SpvDecorationBuiltIn &&
+                    i.GetOperandAs<SpvBuiltIn>(2) == SpvBuiltInWorkgroupSize) {
                   ok = true;
                   break;
                 }
               }
             }
-            if (i.opcode() == spv::Op::OpExecutionModeId) {
-              const auto mode = i.GetOperandAs<spv::ExecutionMode>(1);
-              if (mode == spv::ExecutionMode::LocalSizeId) {
+            if (i.opcode() == SpvOpExecutionModeId) {
+              const auto mode = i.GetOperandAs<SpvExecutionMode>(1);
+              if (mode == SpvExecutionModeLocalSizeId) {
                 ok = true;
                 break;
               }
@@ -338,15 +333,15 @@ spv_result_t ValidateExecutionMode(ValidationState_t& _,
               "operand of an OpEntryPoint.";
   }
 
-  const auto mode = inst->GetOperandAs<spv::ExecutionMode>(1);
-  if (inst->opcode() == spv::Op::OpExecutionModeId) {
+  const auto mode = inst->GetOperandAs<SpvExecutionMode>(1);
+  if (inst->opcode() == SpvOpExecutionModeId) {
     size_t operand_count = inst->operands().size();
     for (size_t i = 2; i < operand_count; ++i) {
       const auto operand_id = inst->GetOperandAs<uint32_t>(2);
       const auto* operand_inst = _.FindDef(operand_id);
-      if (mode == spv::ExecutionMode::SubgroupsPerWorkgroupId ||
-          mode == spv::ExecutionMode::LocalSizeHintId ||
-          mode == spv::ExecutionMode::LocalSizeId) {
+      if (mode == SpvExecutionModeSubgroupsPerWorkgroupId ||
+          mode == SpvExecutionModeLocalSizeHintId ||
+          mode == SpvExecutionModeLocalSizeId) {
         if (!spvOpcodeIsConstant(operand_inst->opcode())) {
           return _.diag(SPV_ERROR_INVALID_ID, inst)
                  << "For OpExecutionModeId all Extra Operand ids must be "
@@ -360,9 +355,9 @@ spv_result_t ValidateExecutionMode(ValidationState_t& _,
                   "operands.";
       }
     }
-  } else if (mode == spv::ExecutionMode::SubgroupsPerWorkgroupId ||
-             mode == spv::ExecutionMode::LocalSizeHintId ||
-             mode == spv::ExecutionMode::LocalSizeId) {
+  } else if (mode == SpvExecutionModeSubgroupsPerWorkgroupId ||
+             mode == SpvExecutionModeLocalSizeHintId ||
+             mode == SpvExecutionModeLocalSizeId) {
     return _.diag(SPV_ERROR_INVALID_DATA, inst)
            << "OpExecutionMode is only valid when the Mode operand is an "
               "execution mode that takes no Extra Operands, or takes Extra "
@@ -371,39 +366,39 @@ spv_result_t ValidateExecutionMode(ValidationState_t& _,
 
   const auto* models = _.GetExecutionModels(entry_point_id);
   switch (mode) {
-    case spv::ExecutionMode::Invocations:
-    case spv::ExecutionMode::InputPoints:
-    case spv::ExecutionMode::InputLines:
-    case spv::ExecutionMode::InputLinesAdjacency:
-    case spv::ExecutionMode::InputTrianglesAdjacency:
-    case spv::ExecutionMode::OutputLineStrip:
-    case spv::ExecutionMode::OutputTriangleStrip:
+    case SpvExecutionModeInvocations:
+    case SpvExecutionModeInputPoints:
+    case SpvExecutionModeInputLines:
+    case SpvExecutionModeInputLinesAdjacency:
+    case SpvExecutionModeInputTrianglesAdjacency:
+    case SpvExecutionModeOutputLineStrip:
+    case SpvExecutionModeOutputTriangleStrip:
       if (!std::all_of(models->begin(), models->end(),
-                       [](const spv::ExecutionModel& model) {
-                         return model == spv::ExecutionModel::Geometry;
+                       [](const SpvExecutionModel& model) {
+                         return model == SpvExecutionModelGeometry;
                        })) {
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Execution mode can only be used with the Geometry execution "
                   "model.";
       }
       break;
-    case spv::ExecutionMode::OutputPoints:
-      if (!std::all_of(
-              models->begin(), models->end(),
-              [&_](const spv::ExecutionModel& model) {
-                switch (model) {
-                  case spv::ExecutionModel::Geometry:
-                    return true;
-                  case spv::ExecutionModel::MeshNV:
-                    return _.HasCapability(spv::Capability::MeshShadingNV);
-                  case spv::ExecutionModel::MeshEXT:
-                    return _.HasCapability(spv::Capability::MeshShadingEXT);
-                  default:
-                    return false;
-                }
-              })) {
-        if (_.HasCapability(spv::Capability::MeshShadingNV) ||
-            _.HasCapability(spv::Capability::MeshShadingEXT)) {
+    case SpvExecutionModeOutputPoints:
+      if (!std::all_of(models->begin(), models->end(),
+                       [&_](const SpvExecutionModel& model) {
+                         switch (model) {
+                           case SpvExecutionModelGeometry:
+                             return true;
+                           case SpvExecutionModelMeshNV:
+                             return _.HasCapability(SpvCapabilityMeshShadingNV);
+                           case SpvExecutionModelMeshEXT:
+                             return _.HasCapability(
+                                 SpvCapabilityMeshShadingEXT);
+                           default:
+                             return false;
+                         }
+                       })) {
+        if (_.HasCapability(SpvCapabilityMeshShadingNV) ||
+            _.HasCapability(SpvCapabilityMeshShadingEXT)) {
           return _.diag(SPV_ERROR_INVALID_DATA, inst)
                  << "Execution mode can only be used with the Geometry "
                     "MeshNV or MeshEXT execution model.";
@@ -415,32 +410,32 @@ spv_result_t ValidateExecutionMode(ValidationState_t& _,
         }
       }
       break;
-    case spv::ExecutionMode::SpacingEqual:
-    case spv::ExecutionMode::SpacingFractionalEven:
-    case spv::ExecutionMode::SpacingFractionalOdd:
-    case spv::ExecutionMode::VertexOrderCw:
-    case spv::ExecutionMode::VertexOrderCcw:
-    case spv::ExecutionMode::PointMode:
-    case spv::ExecutionMode::Quads:
-    case spv::ExecutionMode::Isolines:
+    case SpvExecutionModeSpacingEqual:
+    case SpvExecutionModeSpacingFractionalEven:
+    case SpvExecutionModeSpacingFractionalOdd:
+    case SpvExecutionModeVertexOrderCw:
+    case SpvExecutionModeVertexOrderCcw:
+    case SpvExecutionModePointMode:
+    case SpvExecutionModeQuads:
+    case SpvExecutionModeIsolines:
       if (!std::all_of(
               models->begin(), models->end(),
-              [](const spv::ExecutionModel& model) {
-                return (model == spv::ExecutionModel::TessellationControl) ||
-                       (model == spv::ExecutionModel::TessellationEvaluation);
+              [](const SpvExecutionModel& model) {
+                return (model == SpvExecutionModelTessellationControl) ||
+                       (model == SpvExecutionModelTessellationEvaluation);
               })) {
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Execution mode can only be used with a tessellation "
                   "execution model.";
       }
       break;
-    case spv::ExecutionMode::Triangles:
+    case SpvExecutionModeTriangles:
       if (!std::all_of(models->begin(), models->end(),
-                       [](const spv::ExecutionModel& model) {
+                       [](const SpvExecutionModel& model) {
                          switch (model) {
-                           case spv::ExecutionModel::Geometry:
-                           case spv::ExecutionModel::TessellationControl:
-                           case spv::ExecutionModel::TessellationEvaluation:
+                           case SpvExecutionModelGeometry:
+                           case SpvExecutionModelTessellationControl:
+                           case SpvExecutionModelTessellationEvaluation:
                              return true;
                            default:
                              return false;
@@ -451,25 +446,25 @@ spv_result_t ValidateExecutionMode(ValidationState_t& _,
                   "tessellation execution model.";
       }
       break;
-    case spv::ExecutionMode::OutputVertices:
-      if (!std::all_of(
-              models->begin(), models->end(),
-              [&_](const spv::ExecutionModel& model) {
-                switch (model) {
-                  case spv::ExecutionModel::Geometry:
-                  case spv::ExecutionModel::TessellationControl:
-                  case spv::ExecutionModel::TessellationEvaluation:
-                    return true;
-                  case spv::ExecutionModel::MeshNV:
-                    return _.HasCapability(spv::Capability::MeshShadingNV);
-                  case spv::ExecutionModel::MeshEXT:
-                    return _.HasCapability(spv::Capability::MeshShadingEXT);
-                  default:
-                    return false;
-                }
-              })) {
-        if (_.HasCapability(spv::Capability::MeshShadingNV) ||
-            _.HasCapability(spv::Capability::MeshShadingEXT)) {
+    case SpvExecutionModeOutputVertices:
+      if (!std::all_of(models->begin(), models->end(),
+                       [&_](const SpvExecutionModel& model) {
+                         switch (model) {
+                           case SpvExecutionModelGeometry:
+                           case SpvExecutionModelTessellationControl:
+                           case SpvExecutionModelTessellationEvaluation:
+                             return true;
+                           case SpvExecutionModelMeshNV:
+                             return _.HasCapability(SpvCapabilityMeshShadingNV);
+                           case SpvExecutionModelMeshEXT:
+                             return _.HasCapability(
+                                 SpvCapabilityMeshShadingEXT);
+                           default:
+                             return false;
+                         }
+                       })) {
+        if (_.HasCapability(SpvCapabilityMeshShadingNV) ||
+            _.HasCapability(SpvCapabilityMeshShadingEXT)) {
           return _.diag(SPV_ERROR_INVALID_DATA, inst)
                  << "Execution mode can only be used with a Geometry, "
                     "tessellation, MeshNV or MeshEXT execution model.";
@@ -480,13 +475,13 @@ spv_result_t ValidateExecutionMode(ValidationState_t& _,
         }
       }
       break;
-    case spv::ExecutionMode::OutputLinesEXT:
-    case spv::ExecutionMode::OutputTrianglesEXT:
-    case spv::ExecutionMode::OutputPrimitivesEXT:
+    case SpvExecutionModeOutputLinesEXT:
+    case SpvExecutionModeOutputTrianglesEXT:
+    case SpvExecutionModeOutputPrimitivesEXT:
       if (!std::all_of(models->begin(), models->end(),
-                       [](const spv::ExecutionModel& model) {
-                         return (model == spv::ExecutionModel::MeshEXT ||
-                                 model == spv::ExecutionModel::MeshNV);
+                       [](const SpvExecutionModel& model) {
+                         return (model == SpvExecutionModelMeshEXT ||
+                                 model == SpvExecutionModelMeshNV);
                        })) {
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Execution mode can only be used with the MeshEXT or MeshNV "
@@ -494,77 +489,74 @@ spv_result_t ValidateExecutionMode(ValidationState_t& _,
                   "model.";
       }
       break;
-    case spv::ExecutionMode::PixelCenterInteger:
-    case spv::ExecutionMode::OriginUpperLeft:
-    case spv::ExecutionMode::OriginLowerLeft:
-    case spv::ExecutionMode::EarlyFragmentTests:
-    case spv::ExecutionMode::DepthReplacing:
-    case spv::ExecutionMode::DepthGreater:
-    case spv::ExecutionMode::DepthLess:
-    case spv::ExecutionMode::DepthUnchanged:
-    case spv::ExecutionMode::NonCoherentColorAttachmentReadEXT:
-    case spv::ExecutionMode::NonCoherentDepthAttachmentReadEXT:
-    case spv::ExecutionMode::NonCoherentStencilAttachmentReadEXT:
-    case spv::ExecutionMode::PixelInterlockOrderedEXT:
-    case spv::ExecutionMode::PixelInterlockUnorderedEXT:
-    case spv::ExecutionMode::SampleInterlockOrderedEXT:
-    case spv::ExecutionMode::SampleInterlockUnorderedEXT:
-    case spv::ExecutionMode::ShadingRateInterlockOrderedEXT:
-    case spv::ExecutionMode::ShadingRateInterlockUnorderedEXT:
-    case spv::ExecutionMode::EarlyAndLateFragmentTestsAMD:
-    case spv::ExecutionMode::StencilRefUnchangedFrontAMD:
-    case spv::ExecutionMode::StencilRefGreaterFrontAMD:
-    case spv::ExecutionMode::StencilRefLessFrontAMD:
-    case spv::ExecutionMode::StencilRefUnchangedBackAMD:
-    case spv::ExecutionMode::StencilRefGreaterBackAMD:
-    case spv::ExecutionMode::StencilRefLessBackAMD:
+    case SpvExecutionModePixelCenterInteger:
+    case SpvExecutionModeOriginUpperLeft:
+    case SpvExecutionModeOriginLowerLeft:
+    case SpvExecutionModeEarlyFragmentTests:
+    case SpvExecutionModeDepthReplacing:
+    case SpvExecutionModeDepthGreater:
+    case SpvExecutionModeDepthLess:
+    case SpvExecutionModeDepthUnchanged:
+    case SpvExecutionModePixelInterlockOrderedEXT:
+    case SpvExecutionModePixelInterlockUnorderedEXT:
+    case SpvExecutionModeSampleInterlockOrderedEXT:
+    case SpvExecutionModeSampleInterlockUnorderedEXT:
+    case SpvExecutionModeShadingRateInterlockOrderedEXT:
+    case SpvExecutionModeShadingRateInterlockUnorderedEXT:
+    case SpvExecutionModeEarlyAndLateFragmentTestsAMD:
+    case SpvExecutionModeStencilRefUnchangedFrontAMD:
+    case SpvExecutionModeStencilRefGreaterFrontAMD:
+    case SpvExecutionModeStencilRefLessFrontAMD:
+    case SpvExecutionModeStencilRefUnchangedBackAMD:
+    case SpvExecutionModeStencilRefGreaterBackAMD:
+    case SpvExecutionModeStencilRefLessBackAMD:
       if (!std::all_of(models->begin(), models->end(),
-                       [](const spv::ExecutionModel& model) {
-                         return model == spv::ExecutionModel::Fragment;
+                       [](const SpvExecutionModel& model) {
+                         return model == SpvExecutionModelFragment;
                        })) {
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Execution mode can only be used with the Fragment execution "
                   "model.";
       }
       break;
-    case spv::ExecutionMode::LocalSizeHint:
-    case spv::ExecutionMode::VecTypeHint:
-    case spv::ExecutionMode::ContractionOff:
-    case spv::ExecutionMode::LocalSizeHintId:
+    case SpvExecutionModeLocalSizeHint:
+    case SpvExecutionModeVecTypeHint:
+    case SpvExecutionModeContractionOff:
+    case SpvExecutionModeLocalSizeHintId:
       if (!std::all_of(models->begin(), models->end(),
-                       [](const spv::ExecutionModel& model) {
-                         return model == spv::ExecutionModel::Kernel;
+                       [](const SpvExecutionModel& model) {
+                         return model == SpvExecutionModelKernel;
                        })) {
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Execution mode can only be used with the Kernel execution "
                   "model.";
       }
       break;
-    case spv::ExecutionMode::LocalSize:
-    case spv::ExecutionMode::LocalSizeId:
-      if (mode == spv::ExecutionMode::LocalSizeId && !_.IsLocalSizeIdAllowed())
+    case SpvExecutionModeLocalSize:
+    case SpvExecutionModeLocalSizeId:
+      if (mode == SpvExecutionModeLocalSizeId && !_.IsLocalSizeIdAllowed())
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "LocalSizeId mode is not allowed by the current environment.";
 
-      if (!std::all_of(
-              models->begin(), models->end(),
-              [&_](const spv::ExecutionModel& model) {
-                switch (model) {
-                  case spv::ExecutionModel::Kernel:
-                  case spv::ExecutionModel::GLCompute:
-                    return true;
-                  case spv::ExecutionModel::TaskNV:
-                  case spv::ExecutionModel::MeshNV:
-                    return _.HasCapability(spv::Capability::MeshShadingNV);
-                  case spv::ExecutionModel::TaskEXT:
-                  case spv::ExecutionModel::MeshEXT:
-                    return _.HasCapability(spv::Capability::MeshShadingEXT);
-                  default:
-                    return false;
-                }
-              })) {
-        if (_.HasCapability(spv::Capability::MeshShadingNV) ||
-            _.HasCapability(spv::Capability::MeshShadingEXT)) {
+      if (!std::all_of(models->begin(), models->end(),
+                       [&_](const SpvExecutionModel& model) {
+                         switch (model) {
+                           case SpvExecutionModelKernel:
+                           case SpvExecutionModelGLCompute:
+                             return true;
+                           case SpvExecutionModelTaskNV:
+                           case SpvExecutionModelMeshNV:
+                             return _.HasCapability(SpvCapabilityMeshShadingNV);
+                           case SpvExecutionModelTaskEXT:
+                           case SpvExecutionModelMeshEXT:
+                             return _.HasCapability(
+                                 SpvCapabilityMeshShadingEXT);
+                           default:
+                             return false;
+                         }
+                       })) {
+        if (_.HasCapability(SpvCapabilityMeshShadingNV) ||
+            _.HasCapability(SpvCapabilityMeshShadingEXT)) {
           return _.diag(SPV_ERROR_INVALID_DATA, inst)
                  << "Execution mode can only be used with a Kernel, GLCompute, "
                     "MeshNV, MeshEXT, TaskNV or TaskEXT execution model.";
@@ -580,13 +572,13 @@ spv_result_t ValidateExecutionMode(ValidationState_t& _,
   }
 
   if (spvIsVulkanEnv(_.context()->target_env)) {
-    if (mode == spv::ExecutionMode::OriginLowerLeft) {
+    if (mode == SpvExecutionModeOriginLowerLeft) {
       return _.diag(SPV_ERROR_INVALID_DATA, inst)
              << _.VkErrorID(4653)
              << "In the Vulkan environment, the OriginLowerLeft execution mode "
                 "must not be used.";
     }
-    if (mode == spv::ExecutionMode::PixelCenterInteger) {
+    if (mode == SpvExecutionModePixelCenterInteger) {
       return _.diag(SPV_ERROR_INVALID_DATA, inst)
              << _.VkErrorID(4654)
              << "In the Vulkan environment, the PixelCenterInteger execution "
@@ -601,30 +593,29 @@ spv_result_t ValidateMemoryModel(ValidationState_t& _,
                                  const Instruction* inst) {
   // Already produced an error if multiple memory model instructions are
   // present.
-  if (_.memory_model() != spv::MemoryModel::VulkanKHR &&
-      _.HasCapability(spv::Capability::VulkanMemoryModelKHR)) {
+  if (_.memory_model() != SpvMemoryModelVulkanKHR &&
+      _.HasCapability(SpvCapabilityVulkanMemoryModelKHR)) {
     return _.diag(SPV_ERROR_INVALID_DATA, inst)
            << "VulkanMemoryModelKHR capability must only be specified if "
               "the VulkanKHR memory model is used.";
   }
 
   if (spvIsOpenCLEnv(_.context()->target_env)) {
-    if ((_.addressing_model() != spv::AddressingModel::Physical32) &&
-        (_.addressing_model() != spv::AddressingModel::Physical64)) {
+    if ((_.addressing_model() != SpvAddressingModelPhysical32) &&
+        (_.addressing_model() != SpvAddressingModelPhysical64)) {
       return _.diag(SPV_ERROR_INVALID_DATA, inst)
              << "Addressing model must be Physical32 or Physical64 "
              << "in the OpenCL environment.";
     }
-    if (_.memory_model() != spv::MemoryModel::OpenCL) {
+    if (_.memory_model() != SpvMemoryModelOpenCL) {
       return _.diag(SPV_ERROR_INVALID_DATA, inst)
              << "Memory model must be OpenCL in the OpenCL environment.";
     }
   }
 
   if (spvIsVulkanEnv(_.context()->target_env)) {
-    if ((_.addressing_model() != spv::AddressingModel::Logical) &&
-        (_.addressing_model() !=
-         spv::AddressingModel::PhysicalStorageBuffer64)) {
+    if ((_.addressing_model() != SpvAddressingModelLogical) &&
+        (_.addressing_model() != SpvAddressingModelPhysicalStorageBuffer64)) {
       return _.diag(SPV_ERROR_INVALID_DATA, inst)
              << _.VkErrorID(4635)
              << "Addressing model must be Logical or PhysicalStorageBuffer64 "
@@ -638,14 +629,14 @@ spv_result_t ValidateMemoryModel(ValidationState_t& _,
 
 spv_result_t ModeSettingPass(ValidationState_t& _, const Instruction* inst) {
   switch (inst->opcode()) {
-    case spv::Op::OpEntryPoint:
+    case SpvOpEntryPoint:
       if (auto error = ValidateEntryPoint(_, inst)) return error;
       break;
-    case spv::Op::OpExecutionMode:
-    case spv::Op::OpExecutionModeId:
+    case SpvOpExecutionMode:
+    case SpvOpExecutionModeId:
       if (auto error = ValidateExecutionMode(_, inst)) return error;
       break;
-    case spv::Op::OpMemoryModel:
+    case SpvOpMemoryModel:
       if (auto error = ValidateMemoryModel(_, inst)) return error;
       break;
     default:

@@ -18,13 +18,16 @@
 
 #include <vector>
 
+#include "source/opt/iterator.h"
 #include "source/util/string_utils.h"
 
 namespace spvtools {
 namespace opt {
 namespace {
-constexpr uint32_t kStoreValIdInIdx = 1;
-}  // namespace
+
+const uint32_t kStoreValIdInIdx = 1;
+
+}  // anonymous namespace
 
 bool LocalSingleBlockLoadStoreElimPass::HasOnlySupportedRefs(uint32_t ptrId) {
   if (supported_ref_ptrs_.find(ptrId) != supported_ref_ptrs_.end()) return true;
@@ -34,13 +37,13 @@ bool LocalSingleBlockLoadStoreElimPass::HasOnlySupportedRefs(uint32_t ptrId) {
             dbg_op == CommonDebugInfoDebugValue) {
           return true;
         }
-        spv::Op op = user->opcode();
-        if (IsNonPtrAccessChain(op) || op == spv::Op::OpCopyObject) {
+        SpvOp op = user->opcode();
+        if (IsNonPtrAccessChain(op) || op == SpvOpCopyObject) {
           if (!HasOnlySupportedRefs(user->result_id())) {
             return false;
           }
-        } else if (op != spv::Op::OpStore && op != spv::Op::OpLoad &&
-                   op != spv::Op::OpName && !IsNonTypeDecorate(op)) {
+        } else if (op != SpvOpStore && op != SpvOpLoad && op != SpvOpName &&
+                   !IsNonTypeDecorate(op)) {
           return false;
         }
         return true;
@@ -65,7 +68,7 @@ bool LocalSingleBlockLoadStoreElimPass::LocalSingleBlockLoadStoreElim(
     for (auto ii = next; ii != bi->end(); ii = next) {
       ++next;
       switch (ii->opcode()) {
-        case spv::Op::OpStore: {
+        case SpvOpStore: {
           // Verify store variable is target type
           uint32_t varId;
           Instruction* ptrInst = GetPtr(&*ii, &varId);
@@ -74,7 +77,7 @@ bool LocalSingleBlockLoadStoreElimPass::LocalSingleBlockLoadStoreElim(
           // If a store to the whole variable, remember it for succeeding
           // loads and stores. Otherwise forget any previous store to that
           // variable.
-          if (ptrInst->opcode() == spv::Op::OpVariable) {
+          if (ptrInst->opcode() == SpvOpVariable) {
             // If a previous store to same variable, mark the store
             // for deletion if not still used. Don't delete store
             // if debugging; let ssa-rewrite and DCE handle it
@@ -111,14 +114,14 @@ bool LocalSingleBlockLoadStoreElimPass::LocalSingleBlockLoadStoreElim(
             var2load_.erase(varId);
           }
         } break;
-        case spv::Op::OpLoad: {
+        case SpvOpLoad: {
           // Verify store variable is target type
           uint32_t varId;
           Instruction* ptrInst = GetPtr(&*ii, &varId);
           if (!IsTargetVar(varId)) continue;
           if (!HasOnlySupportedRefs(varId)) continue;
           uint32_t replId = 0;
-          if (ptrInst->opcode() == spv::Op::OpVariable) {
+          if (ptrInst->opcode() == SpvOpVariable) {
             // If a load from a variable, look for a previous store or
             // load from that variable and use its value.
             auto si = var2store_.find(varId);
@@ -143,11 +146,11 @@ bool LocalSingleBlockLoadStoreElimPass::LocalSingleBlockLoadStoreElim(
             instructions_to_kill.push_back(&*ii);
             modified = true;
           } else {
-            if (ptrInst->opcode() == spv::Op::OpVariable)
+            if (ptrInst->opcode() == SpvOpVariable)
               var2load_[varId] = &*ii;  // register load
           }
         } break;
-        case spv::Op::OpFunctionCall: {
+        case SpvOpFunctionCall: {
           // Conservatively assume all locals are redefined for now.
           // TODO(): Handle more optimally
           var2store_.clear();
@@ -189,7 +192,7 @@ bool LocalSingleBlockLoadStoreElimPass::AllExtensionsSupported() const {
   // around unknown extended
   // instruction sets even if they are non-semantic
   for (auto& inst : context()->module()->ext_inst_imports()) {
-    assert(inst.opcode() == spv::Op::OpExtInstImport &&
+    assert(inst.opcode() == SpvOpExtInstImport &&
            "Expecting an import of an extension's instruction set.");
     const std::string extension_name = inst.GetInOperand(0).AsString();
     if (spvtools::utils::starts_with(extension_name, "NonSemantic.") &&
@@ -202,15 +205,14 @@ bool LocalSingleBlockLoadStoreElimPass::AllExtensionsSupported() const {
 
 Pass::Status LocalSingleBlockLoadStoreElimPass::ProcessImpl() {
   // Assumes relaxed logical addressing only (see instruction.h).
-  if (context()->get_feature_mgr()->HasCapability(spv::Capability::Addresses))
+  if (context()->get_feature_mgr()->HasCapability(SpvCapabilityAddresses))
     return Status::SuccessWithoutChange;
 
   // Do not process if module contains OpGroupDecorate. Additional
   // support required in KillNamesAndDecorates().
   // TODO(greg-lunarg): Add support for OpGroupDecorate
   for (auto& ai : get_module()->annotations())
-    if (ai.opcode() == spv::Op::OpGroupDecorate)
-      return Status::SuccessWithoutChange;
+    if (ai.opcode() == SpvOpGroupDecorate) return Status::SuccessWithoutChange;
   // If any extensions in the module are not explicitly supported,
   // return unmodified.
   if (!AllExtensionsSupported()) return Status::SuccessWithoutChange;
@@ -233,61 +235,60 @@ Pass::Status LocalSingleBlockLoadStoreElimPass::Process() {
 
 void LocalSingleBlockLoadStoreElimPass::InitExtensions() {
   extensions_allowlist_.clear();
-  extensions_allowlist_.insert({"SPV_AMD_shader_explicit_vertex_parameter",
-                                "SPV_AMD_shader_trinary_minmax",
-                                "SPV_AMD_gcn_shader",
-                                "SPV_KHR_shader_ballot",
-                                "SPV_AMD_shader_ballot",
-                                "SPV_AMD_gpu_shader_half_float",
-                                "SPV_KHR_shader_draw_parameters",
-                                "SPV_KHR_subgroup_vote",
-                                "SPV_KHR_8bit_storage",
-                                "SPV_KHR_16bit_storage",
-                                "SPV_KHR_device_group",
-                                "SPV_KHR_multiview",
-                                "SPV_NVX_multiview_per_view_attributes",
-                                "SPV_NV_viewport_array2",
-                                "SPV_NV_stereo_view_rendering",
-                                "SPV_NV_sample_mask_override_coverage",
-                                "SPV_NV_geometry_shader_passthrough",
-                                "SPV_AMD_texture_gather_bias_lod",
-                                "SPV_KHR_storage_buffer_storage_class",
-                                "SPV_KHR_variable_pointers",
-                                "SPV_AMD_gpu_shader_int16",
-                                "SPV_KHR_post_depth_coverage",
-                                "SPV_KHR_shader_atomic_counter_ops",
-                                "SPV_EXT_shader_stencil_export",
-                                "SPV_EXT_shader_viewport_index_layer",
-                                "SPV_AMD_shader_image_load_store_lod",
-                                "SPV_AMD_shader_fragment_mask",
-                                "SPV_EXT_fragment_fully_covered",
-                                "SPV_AMD_gpu_shader_half_float_fetch",
-                                "SPV_GOOGLE_decorate_string",
-                                "SPV_GOOGLE_hlsl_functionality1",
-                                "SPV_GOOGLE_user_type",
-                                "SPV_NV_shader_subgroup_partitioned",
-                                "SPV_EXT_demote_to_helper_invocation",
-                                "SPV_EXT_descriptor_indexing",
-                                "SPV_NV_fragment_shader_barycentric",
-                                "SPV_NV_compute_shader_derivatives",
-                                "SPV_NV_shader_image_footprint",
-                                "SPV_NV_shading_rate",
-                                "SPV_NV_mesh_shader",
-                                "SPV_NV_ray_tracing",
-                                "SPV_KHR_ray_tracing",
-                                "SPV_KHR_ray_query",
-                                "SPV_EXT_fragment_invocation_density",
-                                "SPV_EXT_physical_storage_buffer",
-                                "SPV_KHR_terminate_invocation",
-                                "SPV_KHR_subgroup_uniform_control_flow",
-                                "SPV_KHR_integer_dot_product",
-                                "SPV_EXT_shader_image_int64",
-                                "SPV_KHR_non_semantic_info",
-                                "SPV_KHR_uniform_group_instructions",
-                                "SPV_KHR_fragment_shader_barycentric",
-                                "SPV_KHR_vulkan_memory_model",
-                                "SPV_NV_bindless_texture",
-                                "SPV_EXT_shader_atomic_float_add"});
+  extensions_allowlist_.insert({
+      "SPV_AMD_shader_explicit_vertex_parameter",
+      "SPV_AMD_shader_trinary_minmax",
+      "SPV_AMD_gcn_shader",
+      "SPV_KHR_shader_ballot",
+      "SPV_AMD_shader_ballot",
+      "SPV_AMD_gpu_shader_half_float",
+      "SPV_KHR_shader_draw_parameters",
+      "SPV_KHR_subgroup_vote",
+      "SPV_KHR_8bit_storage",
+      "SPV_KHR_16bit_storage",
+      "SPV_KHR_device_group",
+      "SPV_KHR_multiview",
+      "SPV_NVX_multiview_per_view_attributes",
+      "SPV_NV_viewport_array2",
+      "SPV_NV_stereo_view_rendering",
+      "SPV_NV_sample_mask_override_coverage",
+      "SPV_NV_geometry_shader_passthrough",
+      "SPV_AMD_texture_gather_bias_lod",
+      "SPV_KHR_storage_buffer_storage_class",
+      "SPV_KHR_variable_pointers",
+      "SPV_AMD_gpu_shader_int16",
+      "SPV_KHR_post_depth_coverage",
+      "SPV_KHR_shader_atomic_counter_ops",
+      "SPV_EXT_shader_stencil_export",
+      "SPV_EXT_shader_viewport_index_layer",
+      "SPV_AMD_shader_image_load_store_lod",
+      "SPV_AMD_shader_fragment_mask",
+      "SPV_EXT_fragment_fully_covered",
+      "SPV_AMD_gpu_shader_half_float_fetch",
+      "SPV_GOOGLE_decorate_string",
+      "SPV_GOOGLE_hlsl_functionality1",
+      "SPV_GOOGLE_user_type",
+      "SPV_NV_shader_subgroup_partitioned",
+      "SPV_EXT_demote_to_helper_invocation",
+      "SPV_EXT_descriptor_indexing",
+      "SPV_NV_fragment_shader_barycentric",
+      "SPV_NV_compute_shader_derivatives",
+      "SPV_NV_shader_image_footprint",
+      "SPV_NV_shading_rate",
+      "SPV_NV_mesh_shader",
+      "SPV_NV_ray_tracing",
+      "SPV_KHR_ray_tracing",
+      "SPV_KHR_ray_query",
+      "SPV_EXT_fragment_invocation_density",
+      "SPV_EXT_physical_storage_buffer",
+      "SPV_KHR_terminate_invocation",
+      "SPV_KHR_subgroup_uniform_control_flow",
+      "SPV_KHR_integer_dot_product",
+      "SPV_EXT_shader_image_int64",
+      "SPV_KHR_non_semantic_info",
+      "SPV_KHR_uniform_group_instructions",
+      "SPV_KHR_fragment_shader_barycentric",
+  });
 }
 
 }  // namespace opt

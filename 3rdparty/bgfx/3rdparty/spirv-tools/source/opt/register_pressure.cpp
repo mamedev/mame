@@ -26,6 +26,7 @@
 
 namespace spvtools {
 namespace opt {
+
 namespace {
 // Predicate for the FilterIterator to only consider instructions that are not
 // phi instructions defined in the basic block |bb|.
@@ -35,7 +36,7 @@ class ExcludePhiDefinedInBlock {
       : context_(context), bb_(bb) {}
 
   bool operator()(Instruction* insn) const {
-    return !(insn->opcode() == spv::Op::OpPhi &&
+    return !(insn->opcode() == SpvOpPhi &&
              context_->get_instr_block(insn) == bb_);
   }
 
@@ -48,9 +49,9 @@ class ExcludePhiDefinedInBlock {
 // physical register.
 bool CreatesRegisterUsage(Instruction* insn) {
   if (!insn->HasResultId()) return false;
-  if (insn->opcode() == spv::Op::OpUndef) return false;
+  if (insn->opcode() == SpvOpUndef) return false;
   if (IsConstantInst(insn->opcode())) return false;
-  if (insn->opcode() == spv::Op::OpLabel) return false;
+  if (insn->opcode() == SpvOpLabel) return false;
   return true;
 }
 
@@ -146,7 +147,7 @@ class ComputeRegisterLiveness {
 
     live_inout->live_in_ = live_inout->live_out_;
     for (Instruction& insn : make_range(bb->rbegin(), bb->rend())) {
-      if (insn.opcode() == spv::Op::OpPhi) {
+      if (insn.opcode() == SpvOpPhi) {
         live_inout->live_in_.insert(&insn);
         break;
       }
@@ -223,7 +224,7 @@ class ComputeRegisterLiveness {
       for (Instruction& insn : make_range(bb.rbegin(), bb.rend())) {
         // If it is a phi instruction, the register pressure will not change
         // anymore.
-        if (insn.opcode() == spv::Op::OpPhi) {
+        if (insn.opcode() == SpvOpPhi) {
           break;
         }
 
@@ -270,7 +271,7 @@ void RegisterLiveness::RegionRegisterLiveness::AddRegisterClass(
   RegisterLiveness::RegisterClass reg_class{type, false};
 
   insn->context()->get_decoration_mgr()->WhileEachDecoration(
-      insn->result_id(), uint32_t(spv::Decoration::Uniform),
+      insn->result_id(), SpvDecorationUniform,
       [&reg_class](const Instruction&) {
         reg_class.is_uniform_ = true;
         return false;
@@ -324,7 +325,7 @@ void RegisterLiveness::ComputeLoopRegisterPressure(
         loop_reg_pressure->used_registers_, live_inout->used_registers_);
 
     for (Instruction& insn : *bb) {
-      if (insn.opcode() == spv::Op::OpPhi || !CreatesRegisterUsage(&insn) ||
+      if (insn.opcode() == SpvOpPhi || !CreatesRegisterUsage(&insn) ||
           seen_insn.count(insn.result_id())) {
         continue;
       }
@@ -385,7 +386,7 @@ void RegisterLiveness::SimulateFusion(
       [&l1, &l2](Instruction* insn) {
         BasicBlock* bb = insn->context()->get_instr_block(insn);
         return insn->HasResultId() &&
-               !(insn->opcode() == spv::Op::OpPhi &&
+               !(insn->opcode() == SpvOpPhi &&
                  (bb == l1.GetHeaderBlock() || bb == l2.GetHeaderBlock()));
       });
 
@@ -402,7 +403,7 @@ void RegisterLiveness::SimulateFusion(
                      live_inout_info->live_out_.size());
 
     for (Instruction& insn : *bb) {
-      if (insn.opcode() == spv::Op::OpPhi || !CreatesRegisterUsage(&insn) ||
+      if (insn.opcode() == SpvOpPhi || !CreatesRegisterUsage(&insn) ||
           seen_insn.count(insn.result_id())) {
         continue;
       }
@@ -433,7 +434,7 @@ void RegisterLiveness::SimulateFusion(
                      live_inout_info->live_out_.size());
 
     for (Instruction& insn : *bb) {
-      if (insn.opcode() == spv::Op::OpPhi || !CreatesRegisterUsage(&insn) ||
+      if (insn.opcode() == SpvOpPhi || !CreatesRegisterUsage(&insn) ||
           seen_insn.count(insn.result_id())) {
         continue;
       }
@@ -531,7 +532,7 @@ void RegisterLiveness::SimulateFission(
 
     std::unordered_set<uint32_t> die_in_block;
     for (Instruction& insn : make_range(bb->rbegin(), bb->rend())) {
-      if (insn.opcode() == spv::Op::OpPhi) {
+      if (insn.opcode() == SpvOpPhi) {
         break;
       }
 

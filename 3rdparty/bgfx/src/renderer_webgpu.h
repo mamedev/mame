@@ -98,7 +98,7 @@ namespace bgfx { namespace webgpu
 
 			if(NULL != m_dynamic)
 			{
-				bx::deleteObject(g_allocator, m_dynamic);
+				BX_DELETE(g_allocator, m_dynamic);
 				m_dynamic = NULL;
 			}
 		}
@@ -278,12 +278,12 @@ namespace bgfx { namespace webgpu
 
 	void release(RenderPassStateWgpu* _ptr)
 	{
-		bx::deleteObject(g_allocator, _ptr);
+		BX_DELETE(g_allocator, _ptr);
 	}
 
 	void release(PipelineStateWgpu* _ptr)
 	{
-		bx::deleteObject(g_allocator, _ptr);
+		BX_DELETE(g_allocator, _ptr);
 	}
 
 	class StagingBufferWgpu
@@ -413,7 +413,7 @@ namespace bgfx { namespace webgpu
 
 	void release(SamplerStateWgpu* _ptr)
 	{
-		bx::deleteObject(g_allocator, _ptr);
+		BX_DELETE(g_allocator, _ptr);
 	}
 
 	struct FrameBufferWgpu;

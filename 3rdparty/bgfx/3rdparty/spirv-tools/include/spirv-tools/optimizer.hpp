@@ -19,7 +19,6 @@
 #include <ostream>
 #include <string>
 #include <unordered_map>
-#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -97,24 +96,12 @@ class Optimizer {
   // Registers passes that attempt to improve performance of generated code.
   // This sequence of passes is subject to constant review and will change
   // from time to time.
-  //
-  // If |preserve_interface| is true, all non-io variables in the entry point
-  // interface are considered live and are not eliminated.
-  // |preserve_interface| should be true if HLSL is generated
-  // from the SPIR-V bytecode.
   Optimizer& RegisterPerformancePasses();
-  Optimizer& RegisterPerformancePasses(bool preserve_interface);
 
   // Registers passes that attempt to improve the size of generated code.
   // This sequence of passes is subject to constant review and will change
   // from time to time.
-  //
-  // If |preserve_interface| is true, all non-io variables in the entry point
-  // interface are considered live and are not eliminated.
-  // |preserve_interface| should be true if HLSL is generated
-  // from the SPIR-V bytecode.
   Optimizer& RegisterSizePasses();
-  Optimizer& RegisterSizePasses(bool preserve_interface);
 
   // Registers passes that attempt to legalize the generated code.
   //
@@ -124,13 +111,7 @@ class Optimizer {
   //
   // This sequence of passes is subject to constant review and will change
   // from time to time.
-  //
-  // If |preserve_interface| is true, all non-io variables in the entry point
-  // interface are considered live and are not eliminated.
-  // |preserve_interface| should be true if HLSL is generated
-  // from the SPIR-V bytecode.
   Optimizer& RegisterLegalizationPasses();
-  Optimizer& RegisterLegalizationPasses(bool preserve_interface);
 
   // Register passes specified in the list of |flags|.  Each flag must be a
   // string of a form accepted by Optimizer::FlagHasValidForm().
@@ -539,14 +520,8 @@ Optimizer::PassToken CreateDeadInsertElimPass();
 // interface are considered live and are not eliminated. This mode is needed
 // by GPU-Assisted validation instrumentation, where a change in the interface
 // is not allowed.
-//
-// If |remove_outputs| is true, allow outputs to be removed from the interface.
-// This is only safe if the caller knows that there is no corresponding input
-// variable in the following shader. It is false by default.
 Optimizer::PassToken CreateAggressiveDCEPass();
 Optimizer::PassToken CreateAggressiveDCEPass(bool preserve_interface);
-Optimizer::PassToken CreateAggressiveDCEPass(bool preserve_interface,
-                                             bool remove_outputs);
 
 // Creates a remove-unused-interface-variables pass.
 // Removes variables referenced on the |OpEntryPoint| instruction that are not
@@ -769,8 +744,16 @@ Optimizer::PassToken CreateCombineAccessChainsPass();
 // The instrumentation will read and write buffers in debug
 // descriptor set |desc_set|. It will write |shader_id| in each output record
 // to identify the shader module which generated the record.
-Optimizer::PassToken CreateInstBindlessCheckPass(uint32_t desc_set,
-                                                 uint32_t shader_id);
+// |desc_length_enable| controls instrumentation of runtime descriptor array
+// references, |desc_init_enable| controls instrumentation of descriptor
+// initialization checking, and |buff_oob_enable| controls instrumentation
+// of storage and uniform buffer bounds checking, all of which require input
+// buffer support. |texbuff_oob_enable| controls instrumentation of texel
+// buffers, which does not require input buffer support.
+Optimizer::PassToken CreateInstBindlessCheckPass(
+    uint32_t desc_set, uint32_t shader_id, bool desc_length_enable = false,
+    bool desc_init_enable = false, bool buff_oob_enable = false,
+    bool texbuff_oob_enable = false);
 
 // Create a pass to instrument physical buffer address checking
 // This pass instruments all physical buffer address references to check that
@@ -904,58 +887,11 @@ Optimizer::PassToken CreateAmdExtToKhrPass();
 Optimizer::PassToken CreateInterpolateFixupPass();
 
 // Removes unused components from composite input variables. Current
-// implementation just removes trailing unused components from input arrays
-// and structs. The pass performs best after maximizing dead code removal.
-// A subsequent dead code elimination pass would be beneficial in removing
-// newly unused component types.
-//
-// WARNING: This pass can only be safely applied standalone to vertex shaders
-// as it can otherwise cause interface incompatibilities with the preceding
-// shader in the pipeline. If applied to non-vertex shaders, the user should
-// follow by applying EliminateDeadOutputStores and
-// EliminateDeadOutputComponents to the preceding shader.
+// implementation just removes trailing unused components from input arrays.
+// The pass performs best after maximizing dead code removal. A subsequent dead
+// code elimination pass would be beneficial in removing newly unused component
+// types.
 Optimizer::PassToken CreateEliminateDeadInputComponentsPass();
-
-// Removes unused components from composite output variables. Current
-// implementation just removes trailing unused components from output arrays
-// and structs. The pass performs best after eliminating dead output stores.
-// A subsequent dead code elimination pass would be beneficial in removing
-// newly unused component types. Currently only supports vertex and fragment
-// shaders.
-//
-// WARNING: This pass cannot be safely applied standalone as it can cause
-// interface incompatibility with the following shader in the pipeline. The
-// user should first apply EliminateDeadInputComponents to the following
-// shader, then apply EliminateDeadOutputStores to this shader.
-Optimizer::PassToken CreateEliminateDeadOutputComponentsPass();
-
-// Removes unused components from composite input variables. This safe
-// version will not cause interface incompatibilities since it only changes
-// vertex shaders. The current implementation just removes trailing unused
-// components from input structs and input arrays. The pass performs best
-// after maximizing dead code removal. A subsequent dead code elimination
-// pass would be beneficial in removing newly unused component types.
-Optimizer::PassToken CreateEliminateDeadInputComponentsSafePass();
-
-// Analyzes shader and populates |live_locs| and |live_builtins|. Best results
-// will be obtained if shader has all dead code eliminated first. |live_locs|
-// and |live_builtins| are subsequently used when calling
-// CreateEliminateDeadOutputStoresPass on the preceding shader. Currently only
-// supports tesc, tese, geom, and frag shaders.
-Optimizer::PassToken CreateAnalyzeLiveInputPass(
-    std::unordered_set<uint32_t>* live_locs,
-    std::unordered_set<uint32_t>* live_builtins);
-
-// Removes stores to output locations not listed in |live_locs| or
-// |live_builtins|. Best results are obtained if constant propagation is
-// performed first. A subsequent call to ADCE will eliminate any dead code
-// created by the removal of the stores. A subsequent call to
-// CreateEliminateDeadOutputComponentsPass will eliminate any dead output
-// components created by the elimination of the stores. Currently only supports
-// vert, tesc, tese, and geom shaders.
-Optimizer::PassToken CreateEliminateDeadOutputStoresPass(
-    std::unordered_set<uint32_t>* live_locs,
-    std::unordered_set<uint32_t>* live_builtins);
 
 // Creates a convert-to-sampled-image pass to convert images and/or
 // samplers with given pairs of descriptor set and binding to sampled image.
@@ -981,17 +917,6 @@ Optimizer::PassToken CreateRemoveDontInlinePass();
 // object, currently the pass would remove accesschain pointer argument passed
 // to the function
 Optimizer::PassToken CreateFixFuncCallArgumentsPass();
-
-// Creates a trim-capabilities pass.
-// This pass removes unused capabilities for a given module, and if possible,
-// associated extensions.
-// See `trim_capabilities.h` for the list of supported capabilities.
-//
-// If the module contains unsupported capabilities, this pass will ignore them.
-// This should be fine in most cases, but could yield to incorrect results if
-// the unknown capability interacts with one of the trimmed capabilities.
-Optimizer::PassToken CreateTrimCapabilitiesPass();
-
 }  // namespace spvtools
 
 #endif  // INCLUDE_SPIRV_TOOLS_OPTIMIZER_HPP_

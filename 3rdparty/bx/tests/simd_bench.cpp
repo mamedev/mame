@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2023 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -103,7 +103,7 @@ void simd_bench()
 
 	const uint32_t numVertices = 1024*1024;
 
-	uint8_t* data = (uint8_t*)bx::alloc(&allocator, 2*numVertices*sizeof(bx::simd128_t), 16);
+	uint8_t* data = (uint8_t*)BX_ALIGNED_ALLOC(&allocator, 2*numVertices*sizeof(bx::simd128_t), 16);
 	bx::simd128_t* src = (bx::simd128_t*)data;
 	bx::simd128_t* dst = &src[numVertices];
 
@@ -129,5 +129,5 @@ void simd_bench()
 
 	simd_bench_pass(dst, src, numVertices);
 
-	bx::free(&allocator, data, 16);
+	BX_ALIGNED_FREE(&allocator, data, 16);
 }

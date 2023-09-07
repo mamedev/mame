@@ -23,21 +23,21 @@ Pass::Status FreezeSpecConstantValuePass::Process() {
   auto ctx = context();
   ctx->module()->ForEachInst([&modified, ctx](Instruction* inst) {
     switch (inst->opcode()) {
-      case spv::Op::OpSpecConstant:
-        inst->SetOpcode(spv::Op::OpConstant);
+      case SpvOp::SpvOpSpecConstant:
+        inst->SetOpcode(SpvOp::SpvOpConstant);
         modified = true;
         break;
-      case spv::Op::OpSpecConstantTrue:
-        inst->SetOpcode(spv::Op::OpConstantTrue);
+      case SpvOp::SpvOpSpecConstantTrue:
+        inst->SetOpcode(SpvOp::SpvOpConstantTrue);
         modified = true;
         break;
-      case spv::Op::OpSpecConstantFalse:
-        inst->SetOpcode(spv::Op::OpConstantFalse);
+      case SpvOp::SpvOpSpecConstantFalse:
+        inst->SetOpcode(SpvOp::SpvOpConstantFalse);
         modified = true;
         break;
-      case spv::Op::OpDecorate:
-        if (spv::Decoration(inst->GetSingleWordInOperand(1)) ==
-            spv::Decoration::SpecId) {
+      case SpvOp::SpvOpDecorate:
+        if (inst->GetSingleWordInOperand(1) ==
+            SpvDecoration::SpvDecorationSpecId) {
           ctx->KillInst(inst);
           modified = true;
         }

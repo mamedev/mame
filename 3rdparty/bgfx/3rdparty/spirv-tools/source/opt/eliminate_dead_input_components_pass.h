@@ -13,24 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SOURCE_OPT_ANALYZE_LIVE_INPUT_H_
-#define SOURCE_OPT_ANALYZE_LIVE_INPUT_H_
+#ifndef SOURCE_OPT_ELIMINATE_DEAD_INPUT_COMPONENTS_H_
+#define SOURCE_OPT_ELIMINATE_DEAD_INPUT_COMPONENTS_H_
 
-#include <unordered_set>
+#include <unordered_map>
 
+#include "source/opt/ir_context.h"
+#include "source/opt/module.h"
 #include "source/opt/pass.h"
 
 namespace spvtools {
 namespace opt {
 
 // See optimizer.hpp for documentation.
-class AnalyzeLiveInputPass : public Pass {
+class EliminateDeadInputComponentsPass : public Pass {
  public:
-  explicit AnalyzeLiveInputPass(std::unordered_set<uint32_t>* live_locs,
-                                std::unordered_set<uint32_t>* live_builtins)
-      : live_locs_(live_locs), live_builtins_(live_builtins) {}
+  explicit EliminateDeadInputComponentsPass() {}
 
-  const char* name() const override { return "analyze-live-input"; }
+  const char* name() const override {
+    return "eliminate-dead-input-components";
+  }
+
   Status Process() override;
 
   // Return the mask of preserved Analyses.
@@ -44,14 +47,19 @@ class AnalyzeLiveInputPass : public Pass {
   }
 
  private:
-  // Do live input analysis
-  Status DoLiveInputAnalysis();
+  // Find the max constant used to index the variable declared by |var|
+  // through OpAccessChain or OpInBoundsAccessChain. If any non-constant
+  // indices or non-Op*AccessChain use of |var|, return |original_max|.
+  unsigned FindMaxIndex(Instruction& var, unsigned original_max);
 
-  std::unordered_set<uint32_t>* live_locs_;
-  std::unordered_set<uint32_t>* live_builtins_;
+  // Change the length of the array |inst| to |length|
+  void ChangeArrayLength(Instruction& inst, unsigned length);
+
+  // Change the length of the struct |struct_var| to |length|
+  void ChangeStructLength(Instruction& struct_var, unsigned length);
 };
 
 }  // namespace opt
 }  // namespace spvtools
 
-#endif  // SOURCE_OPT_ANALYZE_LIVE_INPUT_H_
+#endif  // SOURCE_OPT_ELIMINATE_DEAD_INPUT_COMPONENTS_H_

@@ -64,7 +64,7 @@ bool DominatorAnalysisBase::Dominates(Instruction* a, Instruction* b) const {
 
   // We handle OpLabel instructions explicitly since they are not stored in the
   // instruction list.
-  if (current->opcode() == spv::Op::OpLabel) {
+  if (current->opcode() == SpvOpLabel) {
     return true;
   }
 

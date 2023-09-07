@@ -42,13 +42,14 @@ inline bimg::TextureFormat::Enum indexToFormat(int32_t index)
 	{
 		return bimg::TextureFormat::Enum(index);
 	}
-
-	if (index >= kNumCompressedFormats && index < kNumFormats)
+	else if (index >= kNumCompressedFormats && index < kNumFormats)
 	{
 		return bimg::TextureFormat::Enum(index + 1);
 	}
-
-	return bimg::TextureFormat::Unknown;
+	else
+	{
+		return bimg::TextureFormat::Unknown;
+	}
 }
 
 struct TextureStatus
@@ -66,11 +67,11 @@ struct TextureStatus
 	{
 		switch (value)
 		{
-			case Ok:                     return "Ok";
-			case NotInitialized:         return "Texture was not initialized";
-			case FormatNotSupported:     return "Format not supported by GPU/backend";
+			case Ok: return "Ok";
+			case NotInitialized: return "Texture was not initialized";
+			case FormatNotSupported: return "Format not supported by GPU/backend";
 			case ConversionNotSupported: return "Conversion from RGBA8 not supported";
-			case FormatIgnored:          return "Format is ignored by this example";
+			case FormatIgnored: return "Format is ignored by this example";
 		}
 
 		return "Unknown";
@@ -86,7 +87,7 @@ struct TextureStatus
 
 struct Texture
 {
-	uint16_t m_width  = 0;
+	uint16_t m_width = 0;
 	uint16_t m_height = 0;
 	TextureStatus::Enum m_status = TextureStatus::NotInitialized;
 	bgfx::TextureHandle m_texture = BGFX_INVALID_HANDLE;
@@ -95,7 +96,7 @@ struct Texture
 struct TextureSet
 {
 	stl::string m_name;
-	uint16_t m_maxWidth  = 0;
+	uint16_t m_maxWidth = 0;
 	uint16_t m_maxHeight = 0;
 	bool m_hasCompressedTextures = false;
 	Texture m_textures[kNumFormats];
@@ -265,8 +266,8 @@ static void textureSetPopulateUncompressedFormats(TextureSet& textureSet, bimg::
 			continue;
 		}
 
-		if (formatName[formatNameLen - 1] == 'I'
-		||  formatName[formatNameLen - 1] == 'U')
+		if (    formatName[formatNameLen - 1] == 'I'
+			||  formatName[formatNameLen - 1] == 'U')
 		{
 			texture.m_status  = TextureStatus::FormatIgnored;
 			continue;
@@ -282,7 +283,7 @@ static void textureSetPopulateUncompressedFormats(TextureSet& textureSet, bimg::
 			, false
 			, 1
 			, format
-			);
+		);
 
 		const bgfx::Memory* mem = bgfx::alloc(info.storageSize);
 		bimg::imageConvert(
@@ -294,7 +295,7 @@ static void textureSetPopulateUncompressedFormats(TextureSet& textureSet, bimg::
 			, source->m_width
 			, source->m_height
 			, 1
-			);
+		);
 
 		texture.m_width = info.width;
 		texture.m_height = info.height;
@@ -307,7 +308,7 @@ static void textureSetPopulateUncompressedFormats(TextureSet& textureSet, bimg::
 			, bgfx::TextureFormat::Enum(info.format)
 			, flags
 			, mem
-			);
+		);
 
 		bgfx::setName(texture.m_texture, formatName);
 
@@ -429,7 +430,6 @@ public:
 		init.vendorId = args.m_pciId;
 		init.platformData.nwh  = entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
 		init.platformData.ndt  = entry::getNativeDisplayHandle();
-		init.platformData.type = entry::getNativeWindowHandleType(entry::kDefaultWindowHandle);
 		init.resolution.width  = m_width;
 		init.resolution.height = m_height;
 		init.resolution.reset  = m_reset;
@@ -635,13 +635,9 @@ public:
 
 			ImVec2 previewSize = ImVec2(m_previewSize, m_previewSize);
 			if (m_currentTextureSet->m_maxWidth > m_currentTextureSet->m_maxHeight)
-			{
 				previewSize.y /= float(m_currentTextureSet->m_maxWidth) / m_currentTextureSet->m_maxHeight;
-			}
 			else if (m_currentTextureSet->m_maxWidth < m_currentTextureSet->m_maxHeight)
-			{
 				previewSize.x *= float(m_currentTextureSet->m_maxWidth) / m_currentTextureSet->m_maxHeight;
-			}
 
 			float cellWidth = previewSize.x;
 			for (int32_t i = 0; i < kNumFormats; ++i)
@@ -662,15 +658,11 @@ public:
 					{
 						m_currentTextureSet = &textureSet;
 						if (!m_currentTextureSet->m_hasCompressedTextures && formatToIndex(m_selectedFormat) < kNumCompressedFormats)
-						{
 							m_selectedFormat = bimg::TextureFormat::RGBA8;
-						}
 					}
 				}
-
 				ImGui::EndCombo();
 			}
-
 			ImGui::DragFloat("Preview Size", &m_previewSize, 1.0f, 10.0f, m_largestTextureSize, "%.0f px");
 			ImGui::SameLine();
 			ImGui::Checkbox("Alpha", &m_useAlpha);
@@ -699,7 +691,6 @@ public:
 				label.append(bimg::getName(bimg::TextureFormat::Enum(format) ) );
 				ImGui::PushStyleColor(ImGuiCol_Text, labelColor);
 				imguiTextBoxUnformatted(ImVec2(cellWidth, 0.0f), label.c_str() );
-
 				if (TextureStatus::isError(texture.m_status) )
 				{
 					imguiStrikethroughItem();
@@ -720,7 +711,7 @@ public:
 				if (ImGui::Selectable(
 					  "##selectable"
 					, &isSelected
-					, ImGuiSelectableFlags_AllowOverlap
+					, ImGuiSelectableFlags_AllowItemOverlap
 					, ImGui::GetItemRectSize()
 					) )
 				{

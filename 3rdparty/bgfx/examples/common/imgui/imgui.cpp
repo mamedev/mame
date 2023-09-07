@@ -188,8 +188,6 @@ struct OcornutImguiContext
 
 	void create(float _fontSize, bx::AllocatorI* _allocator)
 	{
-		IMGUI_CHECKVERSION();
-
 		m_allocator = _allocator;
 
 		if (NULL == _allocator)
@@ -509,13 +507,13 @@ static OcornutImguiContext s_ctx;
 static void* memAlloc(size_t _size, void* _userData)
 {
 	BX_UNUSED(_userData);
-	return bx::alloc(s_ctx.m_allocator, _size);
+	return BX_ALLOC(s_ctx.m_allocator, _size);
 }
 
 static void memFree(void* _ptr, void* _userData)
 {
 	BX_UNUSED(_userData);
-	bx::free(s_ctx.m_allocator, _ptr);
+	BX_FREE(s_ctx.m_allocator, _ptr);
 }
 
 void imguiCreate(float _fontSize, bx::AllocatorI* _allocator)

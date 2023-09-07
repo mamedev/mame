@@ -23,7 +23,7 @@ namespace spvtools {
 namespace opt {
 
 Pass::Status IfConversion::Process() {
-  if (!context()->get_feature_mgr()->HasCapability(spv::Capability::Shader)) {
+  if (!context()->get_feature_mgr()->HasCapability(SpvCapabilityShader)) {
     return Status::SuccessWithoutChange;
   }
 
@@ -40,7 +40,7 @@ Pass::Status IfConversion::Process() {
 
       // Get an insertion point.
       auto iter = block.begin();
-      while (iter != block.end() && iter->opcode() == spv::Op::OpPhi) {
+      while (iter != block.end() && iter->opcode() == SpvOpPhi) {
         ++iter;
       }
 
@@ -171,26 +171,23 @@ bool IfConversion::CheckBlock(BasicBlock* block, DominatorAnalysis* dominators,
   *common = dominators->CommonDominator(inc0, inc1);
   if (!*common || cfg()->IsPseudoEntryBlock(*common)) return false;
   Instruction* branch = (*common)->terminator();
-  if (branch->opcode() != spv::Op::OpBranchConditional) return false;
+  if (branch->opcode() != SpvOpBranchConditional) return false;
   auto merge = (*common)->GetMergeInst();
-  if (!merge || merge->opcode() != spv::Op::OpSelectionMerge) return false;
-  if (spv::SelectionControlMask(merge->GetSingleWordInOperand(1)) ==
-      spv::SelectionControlMask::DontFlatten) {
+  if (!merge || merge->opcode() != SpvOpSelectionMerge) return false;
+  if (merge->GetSingleWordInOperand(1) == SpvSelectionControlDontFlattenMask)
     return false;
-  }
   if ((*common)->MergeBlockIdIfAny() != block->id()) return false;
 
   return true;
 }
 
 bool IfConversion::CheckPhiUsers(Instruction* phi, BasicBlock* block) {
-  return get_def_use_mgr()->WhileEachUser(
-      phi, [block, this](Instruction* user) {
-        if (user->opcode() == spv::Op::OpPhi &&
-            context()->get_instr_block(user) == block)
-          return false;
-        return true;
-      });
+  return get_def_use_mgr()->WhileEachUser(phi, [block,
+                                                this](Instruction* user) {
+    if (user->opcode() == SpvOpPhi && context()->get_instr_block(user) == block)
+      return false;
+    return true;
+  });
 }
 
 uint32_t IfConversion::SplatCondition(analysis::Vector* vec_data_ty,
@@ -210,9 +207,9 @@ uint32_t IfConversion::SplatCondition(analysis::Vector* vec_data_ty,
 
 bool IfConversion::CheckType(uint32_t id) {
   Instruction* type = get_def_use_mgr()->GetDef(id);
-  spv::Op op = type->opcode();
-  if (spvOpcodeIsScalarType(op) || op == spv::Op::OpTypePointer ||
-      op == spv::Op::OpTypeVector)
+  SpvOp op = type->opcode();
+  if (spvOpcodeIsScalarType(op) || op == SpvOpTypePointer ||
+      op == SpvOpTypeVector)
     return true;
   return false;
 }
@@ -258,7 +255,7 @@ void IfConversion::HoistInstruction(Instruction* inst, BasicBlock* target_block,
       });
 
   Instruction* insertion_pos = target_block->terminator();
-  if ((insertion_pos)->PreviousNode()->opcode() == spv::Op::OpSelectionMerge) {
+  if ((insertion_pos)->PreviousNode()->opcode() == SpvOpSelectionMerge) {
     insertion_pos = insertion_pos->PreviousNode();
   }
   inst->RemoveFromList();

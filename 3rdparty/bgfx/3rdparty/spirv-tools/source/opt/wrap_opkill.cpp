@@ -28,8 +28,7 @@ Pass::Status WrapOpKill::Process() {
     Function* func = context()->GetFunction(func_id);
     bool successful = func->WhileEachInst([this, &modified](Instruction* inst) {
       const auto opcode = inst->opcode();
-      if ((opcode == spv::Op::OpKill) ||
-          (opcode == spv::Op::OpTerminateInvocation)) {
+      if ((opcode == SpvOpKill) || (opcode == SpvOpTerminateInvocation)) {
         modified = true;
         if (!ReplaceWithFunctionCall(inst)) {
           return false;
@@ -57,8 +56,8 @@ Pass::Status WrapOpKill::Process() {
 }
 
 bool WrapOpKill::ReplaceWithFunctionCall(Instruction* inst) {
-  assert((inst->opcode() == spv::Op::OpKill ||
-          inst->opcode() == spv::Op::OpTerminateInvocation) &&
+  assert((inst->opcode() == SpvOpKill ||
+          inst->opcode() == SpvOpTerminateInvocation) &&
          "|inst| must be an OpKill or OpTerminateInvocation instruction.");
   InstructionBuilder ir_builder(
       context(), inst,
@@ -77,15 +76,14 @@ bool WrapOpKill::ReplaceWithFunctionCall(Instruction* inst) {
   Instruction* return_inst = nullptr;
   uint32_t return_type_id = GetOwningFunctionsReturnType(inst);
   if (return_type_id != GetVoidTypeId()) {
-    Instruction* undef =
-        ir_builder.AddNullaryOp(return_type_id, spv::Op::OpUndef);
+    Instruction* undef = ir_builder.AddNullaryOp(return_type_id, SpvOpUndef);
     if (undef == nullptr) {
       return false;
     }
     return_inst =
-        ir_builder.AddUnaryOp(0, spv::Op::OpReturnValue, undef->result_id());
+        ir_builder.AddUnaryOp(0, SpvOpReturnValue, undef->result_id());
   } else {
-    return_inst = ir_builder.AddNullaryOp(0, spv::Op::OpReturn);
+    return_inst = ir_builder.AddNullaryOp(0, SpvOpReturn);
   }
 
   if (return_inst == nullptr) {
@@ -117,13 +115,13 @@ uint32_t WrapOpKill::GetVoidFunctionTypeId() {
   return type_mgr->GetTypeInstruction(&func_type);
 }
 
-uint32_t WrapOpKill::GetKillingFuncId(spv::Op opcode) {
+uint32_t WrapOpKill::GetKillingFuncId(SpvOp opcode) {
   //  Parameterize by opcode
-  assert(opcode == spv::Op::OpKill || opcode == spv::Op::OpTerminateInvocation);
+  assert(opcode == SpvOpKill || opcode == SpvOpTerminateInvocation);
 
   std::unique_ptr<Function>* const killing_func =
-      (opcode == spv::Op::OpKill) ? &opkill_function_
-                                  : &opterminateinvocation_function_;
+      (opcode == SpvOpKill) ? &opkill_function_
+                            : &opterminateinvocation_function_;
 
   if (*killing_func != nullptr) {
     return (*killing_func)->result_id();
@@ -141,14 +139,14 @@ uint32_t WrapOpKill::GetKillingFuncId(spv::Op opcode) {
 
   // Generate the function start instruction
   std::unique_ptr<Instruction> func_start(new Instruction(
-      context(), spv::Op::OpFunction, void_type_id, killing_func_id, {}));
+      context(), SpvOpFunction, void_type_id, killing_func_id, {}));
   func_start->AddOperand({SPV_OPERAND_TYPE_FUNCTION_CONTROL, {0}});
   func_start->AddOperand({SPV_OPERAND_TYPE_ID, {GetVoidFunctionTypeId()}});
   (*killing_func).reset(new Function(std::move(func_start)));
 
   // Generate the function end instruction
   std::unique_ptr<Instruction> func_end(
-      new Instruction(context(), spv::Op::OpFunctionEnd, 0, 0, {}));
+      new Instruction(context(), SpvOpFunctionEnd, 0, 0, {}));
   (*killing_func)->SetFunctionEnd(std::move(func_end));
 
   // Create the one basic block for the function.
@@ -157,7 +155,7 @@ uint32_t WrapOpKill::GetKillingFuncId(spv::Op opcode) {
     return 0;
   }
   std::unique_ptr<Instruction> label_inst(
-      new Instruction(context(), spv::Op::OpLabel, 0, lab_id, {}));
+      new Instruction(context(), SpvOpLabel, 0, lab_id, {}));
   std::unique_ptr<BasicBlock> bb(new BasicBlock(std::move(label_inst)));
 
   // Add the OpKill to the basic block

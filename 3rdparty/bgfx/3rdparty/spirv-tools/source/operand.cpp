@@ -155,7 +155,6 @@ const char* spvOperandTypeStr(spv_operand_type_t type) {
     case SPV_OPERAND_TYPE_LITERAL_INTEGER:
     case SPV_OPERAND_TYPE_OPTIONAL_LITERAL_INTEGER:
     case SPV_OPERAND_TYPE_OPTIONAL_LITERAL_NUMBER:
-    case SPV_OPERAND_TYPE_LITERAL_FLOAT:
       return "literal number";
     case SPV_OPERAND_TYPE_OPTIONAL_TYPED_LITERAL_INTEGER:
       return "possibly multi-word literal integer";
@@ -237,13 +236,6 @@ const char* spvOperandTypeStr(spv_operand_type_t type) {
     case SPV_OPERAND_TYPE_PACKED_VECTOR_FORMAT:
     case SPV_OPERAND_TYPE_OPTIONAL_PACKED_VECTOR_FORMAT:
       return "packed vector format";
-    case SPV_OPERAND_TYPE_COOPERATIVE_MATRIX_OPERANDS:
-    case SPV_OPERAND_TYPE_OPTIONAL_COOPERATIVE_MATRIX_OPERANDS:
-      return "cooperative matrix operands";
-    case SPV_OPERAND_TYPE_COOPERATIVE_MATRIX_LAYOUT:
-      return "cooperative matrix layout";
-    case SPV_OPERAND_TYPE_COOPERATIVE_MATRIX_USE:
-      return "cooperative matrix use";
     case SPV_OPERAND_TYPE_IMAGE:
     case SPV_OPERAND_TYPE_OPTIONAL_IMAGE:
       return "image";
@@ -333,7 +325,6 @@ bool spvOperandIsConcrete(spv_operand_type_t type) {
   }
   switch (type) {
     case SPV_OPERAND_TYPE_LITERAL_INTEGER:
-    case SPV_OPERAND_TYPE_LITERAL_FLOAT:
     case SPV_OPERAND_TYPE_EXTENSION_INSTRUCTION_NUMBER:
     case SPV_OPERAND_TYPE_SPEC_CONSTANT_OP_NUMBER:
     case SPV_OPERAND_TYPE_TYPED_LITERAL_NUMBER:
@@ -378,8 +369,6 @@ bool spvOperandIsConcrete(spv_operand_type_t type) {
     case SPV_OPERAND_TYPE_QUANTIZATION_MODES:
     case SPV_OPERAND_TYPE_OVERFLOW_MODES:
     case SPV_OPERAND_TYPE_PACKED_VECTOR_FORMAT:
-    case SPV_OPERAND_TYPE_COOPERATIVE_MATRIX_LAYOUT:
-    case SPV_OPERAND_TYPE_COOPERATIVE_MATRIX_USE:
       return true;
     default:
       break;
@@ -398,7 +387,6 @@ bool spvOperandIsConcreteMask(spv_operand_type_t type) {
     case SPV_OPERAND_TYPE_FRAGMENT_SHADING_RATE:
     case SPV_OPERAND_TYPE_DEBUG_INFO_FLAGS:
     case SPV_OPERAND_TYPE_CLDEBUG100_DEBUG_INFO_FLAGS:
-    case SPV_OPERAND_TYPE_COOPERATIVE_MATRIX_OPERANDS:
       return true;
     default:
       break;
@@ -417,7 +405,6 @@ bool spvOperandIsOptional(spv_operand_type_t type) {
     case SPV_OPERAND_TYPE_OPTIONAL_LITERAL_STRING:
     case SPV_OPERAND_TYPE_OPTIONAL_ACCESS_QUALIFIER:
     case SPV_OPERAND_TYPE_OPTIONAL_PACKED_VECTOR_FORMAT:
-    case SPV_OPERAND_TYPE_OPTIONAL_COOPERATIVE_MATRIX_OPERANDS:
     case SPV_OPERAND_TYPE_OPTIONAL_CIV:
       return true;
     default:
@@ -525,7 +512,7 @@ bool spvIsInIdType(spv_operand_type_t type) {
 }
 
 std::function<bool(unsigned)> spvOperandCanBeForwardDeclaredFunction(
-    spv::Op opcode) {
+    SpvOp opcode) {
   std::function<bool(unsigned index)> out;
   if (spvOpcodeGeneratesType(opcode)) {
     // All types can use forward pointers.
@@ -533,57 +520,57 @@ std::function<bool(unsigned)> spvOperandCanBeForwardDeclaredFunction(
     return out;
   }
   switch (opcode) {
-    case spv::Op::OpExecutionMode:
-    case spv::Op::OpExecutionModeId:
-    case spv::Op::OpEntryPoint:
-    case spv::Op::OpName:
-    case spv::Op::OpMemberName:
-    case spv::Op::OpSelectionMerge:
-    case spv::Op::OpDecorate:
-    case spv::Op::OpMemberDecorate:
-    case spv::Op::OpDecorateId:
-    case spv::Op::OpDecorateStringGOOGLE:
-    case spv::Op::OpMemberDecorateStringGOOGLE:
-    case spv::Op::OpBranch:
-    case spv::Op::OpLoopMerge:
+    case SpvOpExecutionMode:
+    case SpvOpExecutionModeId:
+    case SpvOpEntryPoint:
+    case SpvOpName:
+    case SpvOpMemberName:
+    case SpvOpSelectionMerge:
+    case SpvOpDecorate:
+    case SpvOpMemberDecorate:
+    case SpvOpDecorateId:
+    case SpvOpDecorateStringGOOGLE:
+    case SpvOpMemberDecorateStringGOOGLE:
+    case SpvOpBranch:
+    case SpvOpLoopMerge:
       out = [](unsigned) { return true; };
       break;
-    case spv::Op::OpGroupDecorate:
-    case spv::Op::OpGroupMemberDecorate:
-    case spv::Op::OpBranchConditional:
-    case spv::Op::OpSwitch:
+    case SpvOpGroupDecorate:
+    case SpvOpGroupMemberDecorate:
+    case SpvOpBranchConditional:
+    case SpvOpSwitch:
       out = [](unsigned index) { return index != 0; };
       break;
 
-    case spv::Op::OpFunctionCall:
+    case SpvOpFunctionCall:
       // The Function parameter.
       out = [](unsigned index) { return index == 2; };
       break;
 
-    case spv::Op::OpPhi:
+    case SpvOpPhi:
       out = [](unsigned index) { return index > 1; };
       break;
 
-    case spv::Op::OpEnqueueKernel:
+    case SpvOpEnqueueKernel:
       // The Invoke parameter.
       out = [](unsigned index) { return index == 8; };
       break;
 
-    case spv::Op::OpGetKernelNDrangeSubGroupCount:
-    case spv::Op::OpGetKernelNDrangeMaxSubGroupSize:
+    case SpvOpGetKernelNDrangeSubGroupCount:
+    case SpvOpGetKernelNDrangeMaxSubGroupSize:
       // The Invoke parameter.
       out = [](unsigned index) { return index == 3; };
       break;
 
-    case spv::Op::OpGetKernelWorkGroupSize:
-    case spv::Op::OpGetKernelPreferredWorkGroupSizeMultiple:
+    case SpvOpGetKernelWorkGroupSize:
+    case SpvOpGetKernelPreferredWorkGroupSizeMultiple:
       // The Invoke parameter.
       out = [](unsigned index) { return index == 2; };
       break;
-    case spv::Op::OpTypeForwardPointer:
+    case SpvOpTypeForwardPointer:
       out = [](unsigned index) { return index == 0; };
       break;
-    case spv::Op::OpTypeArray:
+    case SpvOpTypeArray:
       out = [](unsigned index) { return index == 1; };
       break;
     default:

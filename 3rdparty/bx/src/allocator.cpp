@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2023 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -21,7 +21,7 @@ namespace bx
 	{
 	}
 
-	void* DefaultAllocator::realloc(void* _ptr, size_t _size, size_t _align, const char* _filePath, uint32_t _line)
+	void* DefaultAllocator::realloc(void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line)
 	{
 		if (0 == _size)
 		{
@@ -34,10 +34,10 @@ namespace bx
 				}
 
 #	if BX_COMPILER_MSVC
-				BX_UNUSED(_filePath, _line);
+				BX_UNUSED(_file, _line);
 				_aligned_free(_ptr);
 #	else
-				alignedFree(this, _ptr, _align, Location(_filePath, _line) );
+				alignedFree(this, _ptr, _align, _file, _line);
 #	endif // BX_
 			}
 
@@ -51,10 +51,10 @@ namespace bx
 			}
 
 #	if BX_COMPILER_MSVC
-			BX_UNUSED(_filePath, _line);
+			BX_UNUSED(_file, _line);
 			return _aligned_malloc(_size, _align);
 #	else
-			return alignedAlloc(this, _size, _align, Location(_filePath, _line) );
+			return alignedAlloc(this, _size, _align, _file, _line);
 #	endif // BX_
 		}
 
@@ -64,10 +64,10 @@ namespace bx
 		}
 
 #	if BX_COMPILER_MSVC
-		BX_UNUSED(_filePath, _line);
+		BX_UNUSED(_file, _line);
 		return _aligned_realloc(_ptr, _size, _align);
 #	else
-		return alignedRealloc(this, _ptr, _size, _align, Location(_filePath, _line) );
+		return alignedRealloc(this, _ptr, _size, _align, _file, _line);
 #	endif // BX_
 	}
 

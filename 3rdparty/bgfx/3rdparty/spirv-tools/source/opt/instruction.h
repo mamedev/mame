@@ -36,8 +36,8 @@
 #include "source/util/string_utils.h"
 #include "spirv-tools/libspirv.h"
 
-constexpr uint32_t kNoDebugScope = 0;
-constexpr uint32_t kNoInlinedAt = 0;
+const uint32_t kNoDebugScope = 0;
+const uint32_t kNoInlinedAt = 0;
 
 namespace spvtools {
 namespace opt {
@@ -190,7 +190,7 @@ class Instruction : public utils::IntrusiveNodeBase<Instruction> {
   Instruction()
       : utils::IntrusiveNodeBase<Instruction>(),
         context_(nullptr),
-        opcode_(spv::Op::OpNop),
+        opcode_(SpvOpNop),
         has_type_id_(false),
         has_result_id_(false),
         unique_id_(0),
@@ -200,7 +200,7 @@ class Instruction : public utils::IntrusiveNodeBase<Instruction> {
   Instruction(IRContext*);
   // Creates an instruction with the given opcode |op| and no additional logical
   // operands.
-  Instruction(IRContext*, spv::Op);
+  Instruction(IRContext*, SpvOp);
   // Creates an instruction using the given spv_parsed_instruction_t |inst|. All
   // the data inside |inst| will be copied and owned in this instance. And keep
   // record of line-related debug instructions |dbg_line| ahead of this
@@ -213,7 +213,7 @@ class Instruction : public utils::IntrusiveNodeBase<Instruction> {
 
   // Creates an instruction with the given opcode |op|, type id: |ty_id|,
   // result id: |res_id| and input operands: |in_operands|.
-  Instruction(IRContext* c, spv::Op op, uint32_t ty_id, uint32_t res_id,
+  Instruction(IRContext* c, SpvOp op, uint32_t ty_id, uint32_t res_id,
               const OperandList& in_operands);
 
   // TODO: I will want to remove these, but will first have to remove the use of
@@ -235,12 +235,12 @@ class Instruction : public utils::IntrusiveNodeBase<Instruction> {
 
   IRContext* context() const { return context_; }
 
-  spv::Op opcode() const { return opcode_; }
+  SpvOp opcode() const { return opcode_; }
   // Sets the opcode of this instruction to a specific opcode. Note this may
   // invalidate the instruction.
   // TODO(qining): Remove this function when instruction building and insertion
   // is well implemented.
-  void SetOpcode(spv::Op op) { opcode_ = op; }
+  void SetOpcode(SpvOp op) { opcode_ = op; }
   uint32_t type_id() const {
     return has_type_id_ ? GetSingleWordOperand(0) : 0;
   }
@@ -294,8 +294,6 @@ class Instruction : public utils::IntrusiveNodeBase<Instruction> {
   // It is the responsibility of the caller to make sure
   // that the instruction remains valid.
   inline void AddOperand(Operand&& operand);
-  // Adds a copy of |operand| to the list of operands of this instruction.
-  inline void AddOperand(const Operand& operand);
   // Gets the |index|-th logical operand as a single SPIR-V word. This method is
   // not expected to be used with logical operands consisting of multiple SPIR-V
   // words.
@@ -524,10 +522,6 @@ class Instruction : public utils::IntrusiveNodeBase<Instruction> {
   // constant value by |FoldScalar|.
   bool IsFoldableByFoldScalar() const;
 
-  // Returns true if |this| is an instruction which could be folded into a
-  // constant value by |FoldVector|.
-  bool IsFoldableByFoldVector() const;
-
   // Returns true if we are allowed to fold or otherwise manipulate the
   // instruction that defines |id| in the given context. This includes not
   // handling NaN values.
@@ -631,7 +625,7 @@ class Instruction : public utils::IntrusiveNodeBase<Instruction> {
   bool IsValidBaseImage() const;
 
   IRContext* context_;  // IR Context
-  spv::Op opcode_;      // Opcode
+  SpvOp opcode_;        // Opcode
   bool has_type_id_;    // True if the instruction has a type id
   bool has_result_id_;  // True if the instruction has a result id
   uint32_t unique_id_;  // Unique instruction id
@@ -680,10 +674,6 @@ inline const Operand& Instruction::GetOperand(uint32_t index) const {
 
 inline void Instruction::AddOperand(Operand&& operand) {
   operands_.push_back(std::move(operand));
-}
-
-inline void Instruction::AddOperand(const Operand& operand) {
-  operands_.push_back(operand);
 }
 
 inline void Instruction::SetInOperand(uint32_t index,
@@ -742,12 +732,12 @@ inline void Instruction::SetResultType(uint32_t ty_id) {
 }
 
 inline bool Instruction::IsNop() const {
-  return opcode_ == spv::Op::OpNop && !has_type_id_ && !has_result_id_ &&
+  return opcode_ == SpvOpNop && !has_type_id_ && !has_result_id_ &&
          operands_.empty();
 }
 
 inline void Instruction::ToNop() {
-  opcode_ = spv::Op::OpNop;
+  opcode_ = SpvOpNop;
   has_type_id_ = false;
   has_result_id_ = false;
   operands_.clear();
@@ -889,12 +879,12 @@ inline void Instruction::ForEachInOperand(
 
 inline bool Instruction::HasLabels() const {
   switch (opcode_) {
-    case spv::Op::OpSelectionMerge:
-    case spv::Op::OpBranch:
-    case spv::Op::OpLoopMerge:
-    case spv::Op::OpBranchConditional:
-    case spv::Op::OpSwitch:
-    case spv::Op::OpPhi:
+    case SpvOpSelectionMerge:
+    case SpvOpBranch:
+    case SpvOpLoopMerge:
+    case SpvOpBranchConditional:
+    case SpvOpSwitch:
+    case SpvOpPhi:
       return true;
       break;
     default:
@@ -916,7 +906,7 @@ bool Instruction::IsAtomicWithLoad() const {
 bool Instruction::IsAtomicOp() const { return spvOpcodeIsAtomicOp(opcode()); }
 
 bool Instruction::IsConstant() const {
-  return IsConstantInst(opcode()) && !IsSpecConstantInst(opcode());
+  return IsCompileTimeConstantInst(opcode());
 }
 }  // namespace opt
 }  // namespace spvtools

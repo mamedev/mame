@@ -22,20 +22,23 @@
 #include "source/opt/ir_context.h"
 #include "source/util/bit_vector.h"
 
+namespace {
+
+const uint32_t kExtractCompositeIdInIdx = 0;
+const uint32_t kVariableStorageClassInIdx = 0;
+const uint32_t kLoadPointerInIdx = 0;
+
+}  // namespace
+
 namespace spvtools {
 namespace opt {
-namespace {
-constexpr uint32_t kExtractCompositeIdInIdx = 0;
-constexpr uint32_t kVariableStorageClassInIdx = 0;
-constexpr uint32_t kLoadPointerInIdx = 0;
-}  // namespace
 
 Pass::Status ReduceLoadSize::Process() {
   bool modified = false;
 
   for (auto& func : *get_module()) {
     func.ForEachInst([&modified, this](Instruction* inst) {
-      if (inst->opcode() == spv::Op::OpCompositeExtract) {
+      if (inst->opcode() == SpvOpCompositeExtract) {
         if (ShouldReplaceExtract(inst)) {
           modified |= ReplaceExtract(inst);
         }
@@ -47,7 +50,7 @@ Pass::Status ReduceLoadSize::Process() {
 }
 
 bool ReduceLoadSize::ReplaceExtract(Instruction* inst) {
-  assert(inst->opcode() == spv::Op::OpCompositeExtract &&
+  assert(inst->opcode() == SpvOpCompositeExtract &&
          "Wrong opcode.  Should be OpCompositeExtract.");
   analysis::DefUseManager* def_use_mgr = context()->get_def_use_mgr();
   analysis::TypeManager* type_mgr = context()->get_type_mgr();
@@ -57,7 +60,7 @@ bool ReduceLoadSize::ReplaceExtract(Instruction* inst) {
       inst->GetSingleWordInOperand(kExtractCompositeIdInIdx);
   Instruction* composite_inst = def_use_mgr->GetDef(composite_id);
 
-  if (composite_inst->opcode() != spv::Op::OpLoad) {
+  if (composite_inst->opcode() != SpvOpLoad) {
     return false;
   }
 
@@ -68,16 +71,16 @@ bool ReduceLoadSize::ReplaceExtract(Instruction* inst) {
   }
 
   Instruction* var = composite_inst->GetBaseAddress();
-  if (var == nullptr || var->opcode() != spv::Op::OpVariable) {
+  if (var == nullptr || var->opcode() != SpvOpVariable) {
     return false;
   }
 
-  spv::StorageClass storage_class = static_cast<spv::StorageClass>(
+  SpvStorageClass storage_class = static_cast<SpvStorageClass>(
       var->GetSingleWordInOperand(kVariableStorageClassInIdx));
   switch (storage_class) {
-    case spv::StorageClass::Uniform:
-    case spv::StorageClass::UniformConstant:
-    case spv::StorageClass::Input:
+    case SpvStorageClassUniform:
+    case SpvStorageClassUniformConstant:
+    case SpvStorageClassInput:
       break;
     default:
       return false;
@@ -121,7 +124,7 @@ bool ReduceLoadSize::ShouldReplaceExtract(Instruction* inst) {
   Instruction* op_inst = def_use_mgr->GetDef(
       inst->GetSingleWordInOperand(kExtractCompositeIdInIdx));
 
-  if (op_inst->opcode() != spv::Op::OpLoad) {
+  if (op_inst->opcode() != SpvOpLoad) {
     return false;
   }
 
@@ -136,7 +139,7 @@ bool ReduceLoadSize::ShouldReplaceExtract(Instruction* inst) {
   all_elements_used =
       !def_use_mgr->WhileEachUser(op_inst, [&elements_used](Instruction* use) {
         if (use->IsCommonDebugInstr()) return true;
-        if (use->opcode() != spv::Op::OpCompositeExtract ||
+        if (use->opcode() != SpvOpCompositeExtract ||
             use->NumInOperands() == 1) {
           return false;
         }

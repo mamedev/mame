@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // ----------------------------------------------------------------------------
-// Copyright 2021-2023 Arm Limited
+// Copyright 2021-2022 Arm Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License. You may obtain a copy
@@ -24,8 +24,6 @@
 #include <cassert>
 #include <cstdarg>
 #include <cstdio>
-#include <cmath>
-#include <limits>
 #include <string>
 
 #include "astcenc_diagnostic_trace.h"
@@ -205,20 +203,7 @@ void trace_add_data(
 	const char* key,
 	float value
 ) {
-	// Turn infinities into parseable values
-	if (std::isinf(value))
-	{
-		if (value > 0.0f)
-		{
-			value = std::numeric_limits<float>::max();
-		}
-		else
-		{
-			value = -std::numeric_limits<float>::max();
-		}
-	}
-
-	char buffer[256];
+  	char buffer[256];
 	sprintf(buffer, "%.20g", (double)value);
 	TraceNode* node = g_TraceLog->get_current_leaf();
 	node->add_attrib("float", key, buffer);

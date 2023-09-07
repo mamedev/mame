@@ -15,6 +15,7 @@
 #include "source/opt/loop_unroller.h"
 
 #include <limits>
+#include <map>
 #include <memory>
 #include <unordered_map>
 #include <utility>
@@ -67,10 +68,10 @@ namespace opt {
 namespace {
 
 // Loop control constant value for DontUnroll flag.
-constexpr uint32_t kLoopControlDontUnrollIndex = 2;
+static const uint32_t kLoopControlDontUnrollIndex = 2;
 
 // Operand index of the loop control parameter of the OpLoopMerge.
-constexpr uint32_t kLoopControlIndex = 2;
+static const uint32_t kLoopControlIndex = 2;
 
 // This utility class encapsulates some of the state we need to maintain between
 // loop unrolls. Specifically it maintains key blocks and the induction variable
@@ -335,7 +336,8 @@ class LoopUnrollerUtilsImpl {
 
 // Retrieve the index of the OpPhi instruction |phi| which corresponds to the
 // incoming |block| id.
-uint32_t GetPhiIndexFromLabel(const BasicBlock* block, const Instruction* phi) {
+static uint32_t GetPhiIndexFromLabel(const BasicBlock* block,
+                                     const Instruction* phi) {
   for (uint32_t i = 1; i < phi->NumInOperands(); i += 2) {
     if (block->id() == phi->GetSingleWordInOperand(i)) {
       return i;
@@ -380,7 +382,7 @@ void LoopUnrollerUtilsImpl::PartiallyUnrollResidualFactor(Loop* loop,
                                                           size_t factor) {
   // TODO(1841): Handle id overflow.
   std::unique_ptr<Instruction> new_label{new Instruction(
-      context_, spv::Op::OpLabel, 0, context_->TakeNextId(), {})};
+      context_, SpvOp::SpvOpLabel, 0, context_->TakeNextId(), {})};
   std::unique_ptr<BasicBlock> new_exit_bb{new BasicBlock(std::move(new_label))};
   new_exit_bb->SetParent(&function_);
 
@@ -989,7 +991,7 @@ bool LoopUtils::CanPerformUnroll() {
 
   // Check that we can find and process the induction variable.
   const Instruction* induction = loop_->FindConditionVariable(condition);
-  if (!induction || induction->opcode() != spv::Op::OpPhi) return false;
+  if (!induction || induction->opcode() != SpvOpPhi) return false;
 
   // Check that we can find the number of loop iterations.
   if (!loop_->FindNumberOfIterations(induction, &*condition->ctail(), nullptr))
@@ -1000,7 +1002,7 @@ bool LoopUtils::CanPerformUnroll() {
   // iteration counts. This can cause timeouts and memouts during fuzzing that
   // are not classed as bugs. To avoid this noise, loop unrolling is not applied
   // to loops with large iteration counts when fuzzing.
-  constexpr size_t kFuzzerIterationLimit = 100;
+  const size_t kFuzzerIterationLimit = 100;
   size_t num_iterations;
   loop_->FindNumberOfIterations(induction, &*condition->ctail(),
                                 &num_iterations);
@@ -1013,7 +1015,7 @@ bool LoopUtils::CanPerformUnroll() {
   // block.
   const Instruction& branch = *loop_->GetLatchBlock()->ctail();
   bool branching_assumption =
-      branch.opcode() == spv::Op::OpBranch &&
+      branch.opcode() == SpvOpBranch &&
       branch.GetSingleWordInOperand(0) == loop_->GetHeaderBlock()->id();
   if (!branching_assumption) {
     return false;
@@ -1041,10 +1043,10 @@ bool LoopUtils::CanPerformUnroll() {
   // exit the loop.
   for (uint32_t label_id : loop_->GetBlocks()) {
     const BasicBlock* block = context_->cfg()->block(label_id);
-    if (block->ctail()->opcode() == spv::Op::OpKill ||
-        block->ctail()->opcode() == spv::Op::OpReturn ||
-        block->ctail()->opcode() == spv::Op::OpReturnValue ||
-        block->ctail()->opcode() == spv::Op::OpTerminateInvocation) {
+    if (block->ctail()->opcode() == SpvOp::SpvOpKill ||
+        block->ctail()->opcode() == SpvOp::SpvOpReturn ||
+        block->ctail()->opcode() == SpvOp::SpvOpReturnValue ||
+        block->ctail()->opcode() == SpvOp::SpvOpTerminateInvocation) {
       return false;
     }
   }

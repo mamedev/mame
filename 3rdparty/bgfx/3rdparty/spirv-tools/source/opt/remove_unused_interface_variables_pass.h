@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SOURCE_OPT_REMOVE_UNUSED_INTERFACE_VARIABLES_PASS_H_
-#define SOURCE_OPT_REMOVE_UNUSED_INTERFACE_VARIABLES_PASS_H_
-
 #include "source/opt/pass.h"
 namespace spvtools {
 namespace opt {
@@ -27,5 +24,3 @@ class RemoveUnusedInterfaceVariablesPass : public Pass {
 };
 }  // namespace opt
 }  // namespace spvtools
-
-#endif  // SOURCE_OPT_REMOVE_UNUSED_INTERFACE_VARIABLES_PASS_H_

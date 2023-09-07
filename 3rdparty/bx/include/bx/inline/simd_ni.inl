@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2023 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -384,14 +384,14 @@ namespace bx
 	template<typename Ty>
 	BX_SIMD_INLINE Ty simd_log2_ni(Ty _a)
 	{
-		const Ty expmask  = simd_isplat<Ty>(kFloatExponentMask);
-		const Ty mantmask = simd_isplat<Ty>(kFloatMantissaMask);
+		const Ty expmask  = simd_isplat<Ty>(0x7f800000);
+		const Ty mantmask = simd_isplat<Ty>(0x007fffff);
 		const Ty one      = simd_splat<Ty>(1.0f);
 
-		const Ty expbias  = simd_isplat<Ty>(kFloatExponentBias);
+		const Ty c127     = simd_isplat<Ty>(127);
 		const Ty aexp     = simd_and(_a, expmask);
-		const Ty aexpsr   = simd_srl(aexp, kFloatExponentBitShift);
-		const Ty tmp0     = simd_isub(aexpsr, expbias);
+		const Ty aexpsr   = simd_srl(aexp, 23);
+		const Ty tmp0     = simd_isub(aexpsr, c127);
 		const Ty exp      = simd_itof(tmp0);
 
 		const Ty amask    = simd_and(_a, mantmask);
@@ -419,8 +419,8 @@ namespace bx
 		const Ty iround   = simd_itof(ipart);
 		const Ty fpart    = simd_sub(aaaa, iround);
 
-		const Ty expbias  = simd_isplat<Ty>(kFloatExponentBias);
-		const Ty tmp5     = simd_iadd(ipart, expbias);
+		const Ty c127     = simd_isplat<Ty>(127);
+		const Ty tmp5     = simd_iadd(ipart, c127);
 		const Ty expipart = simd_sll(tmp5, 23);
 
 		const Ty expfpart = simd_logexp_detail::simd_exppoly(fpart);

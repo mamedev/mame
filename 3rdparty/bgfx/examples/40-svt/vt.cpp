@@ -296,7 +296,7 @@ Quadtree::~Quadtree()
 	{
 		if (m_children[i] != nullptr)
 		{
-			bx::deleteObject(VirtualTexture::getAllocator(), m_children[i]);
+			BX_DELETE(VirtualTexture::getAllocator(), m_children[i]);
 		}
 	}
 }
@@ -344,7 +344,7 @@ void Quadtree::remove(Page request)
 
 	if (node != nullptr)
 	{
-		bx::deleteObject(VirtualTexture::getAllocator(), node->m_children[index]);
+		BX_DELETE(VirtualTexture::getAllocator(), node->m_children[index]);
 		node->m_children[index] = nullptr;
 	}
 }
@@ -459,12 +459,12 @@ PageTable::PageTable(PageCache* _cache, VirtualTextureInfo* _info, PageIndexer* 
 
 PageTable::~PageTable()
 {
-	bx::deleteObject(VirtualTexture::getAllocator(), m_quadtree);
+	BX_DELETE(VirtualTexture::getAllocator(), m_quadtree);
 	bgfx::destroy(m_texture);
 
 	for (int i = 0; i < (int)m_images.size(); ++i)
 	{
-		bx::deleteObject(VirtualTexture::getAllocator(), m_images[i]);
+		BX_DELETE(VirtualTexture::getAllocator(), m_images[i]);
 	}
 
 	for (int i = 0; i < (int)m_stagingTextures.size(); ++i)
@@ -785,7 +785,7 @@ FeedbackBuffer::FeedbackBuffer(VirtualTextureInfo* _info, int _width, int _heigh
 
 FeedbackBuffer::~FeedbackBuffer()
 {
-	bx::deleteObject(VirtualTexture::getAllocator(), m_indexer);
+	BX_DELETE(VirtualTexture::getAllocator(), m_indexer);
 	bgfx::destroy(m_feedbackFrameBuffer);
 }
 
@@ -906,11 +906,11 @@ VirtualTexture::VirtualTexture(TileDataFile* _tileDataFile, VirtualTextureInfo* 
 VirtualTexture::~VirtualTexture()
 {
 	// Destroy
-	bx::deleteObject(VirtualTexture::getAllocator(), m_indexer);
-	bx::deleteObject(VirtualTexture::getAllocator(), m_atlas);
-	bx::deleteObject(VirtualTexture::getAllocator(), m_loader);
-	bx::deleteObject(VirtualTexture::getAllocator(), m_cache);
-	bx::deleteObject(VirtualTexture::getAllocator(), m_pageTable);
+	BX_DELETE(VirtualTexture::getAllocator(), m_indexer);
+	BX_DELETE(VirtualTexture::getAllocator(), m_atlas);
+	BX_DELETE(VirtualTexture::getAllocator(), m_loader);
+	BX_DELETE(VirtualTexture::getAllocator(), m_cache);
+	BX_DELETE(VirtualTexture::getAllocator(), m_pageTable);
 	// Destroy all uniforms and textures
 	bgfx::destroy(u_vt_settings_1);
 	bgfx::destroy(u_vt_settings_2);
@@ -1155,13 +1155,13 @@ TileGenerator::~TileGenerator()
 		bimg::imageFree(m_sourceImage);
 	}
 
-	bx::deleteObject(VirtualTexture::getAllocator(), m_indexer);
+	BX_DELETE(VirtualTexture::getAllocator(), m_indexer);
 
-	bx::deleteObject(VirtualTexture::getAllocator(), m_page1Image);
-	bx::deleteObject(VirtualTexture::getAllocator(), m_page2Image);
-	bx::deleteObject(VirtualTexture::getAllocator(), m_2xtileImage);
-	bx::deleteObject(VirtualTexture::getAllocator(), m_4xtileImage);
-	bx::deleteObject(VirtualTexture::getAllocator(), m_tileImage);
+	BX_DELETE(VirtualTexture::getAllocator(), m_page1Image);
+	BX_DELETE(VirtualTexture::getAllocator(), m_page2Image);
+	BX_DELETE(VirtualTexture::getAllocator(), m_2xtileImage);
+	BX_DELETE(VirtualTexture::getAllocator(), m_4xtileImage);
+	BX_DELETE(VirtualTexture::getAllocator(), m_tileImage);
 }
 
 bool TileGenerator::generate(const bx::FilePath& _filePath)
@@ -1210,7 +1210,7 @@ bool TileGenerator::generate(const bx::FilePath& _filePath)
 			return false;
 		}
 
-		uint8_t* rawImage = (uint8_t*)bx::alloc(VirtualTexture::getAllocator(), size_t(size) );
+		uint8_t* rawImage = (uint8_t*)BX_ALLOC(VirtualTexture::getAllocator(), size_t(size) );
 
 		bx::read(&fileReader, rawImage, int32_t(size), &err);
 		bx::close(&fileReader);
@@ -1218,12 +1218,12 @@ bool TileGenerator::generate(const bx::FilePath& _filePath)
 		if (!err.isOk() )
 		{
 			bx::debugPrintf("Image read failed'%s'.\n", _filePath.getCPtr() );
-			bx::free(VirtualTexture::getAllocator(), rawImage);
+			BX_FREE(VirtualTexture::getAllocator(), rawImage);
 			return false;
 		}
 
 		m_sourceImage = bimg::imageParse(VirtualTexture::getAllocator(), rawImage, uint32_t(size), bimg::TextureFormat::BGRA8, &err);
-		bx::free(VirtualTexture::getAllocator(), rawImage);
+		BX_FREE(VirtualTexture::getAllocator(), rawImage);
 
 		if (!err.isOk() )
 		{
@@ -1267,7 +1267,7 @@ bool TileGenerator::generate(const bx::FilePath& _filePath)
 	// Write header
 	m_tileDataFile->writeInfo();
 	// Close tile file
-	bx::deleteObject(VirtualTexture::getAllocator(), m_tileDataFile);
+	BX_DELETE(VirtualTexture::getAllocator(), m_tileDataFile);
 	m_tileDataFile = nullptr;
 	bx::debugPrintf("Done!\n");
 	return true;

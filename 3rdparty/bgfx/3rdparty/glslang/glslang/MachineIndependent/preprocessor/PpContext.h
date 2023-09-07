@@ -102,7 +102,6 @@ public:
         i64val = 0;
         loc.init();
         name[0] = 0;
-        fullyExpanded = false;
     }
 
     // Used for comparing macro definitions, so checks what is relevant for that.
@@ -118,8 +117,6 @@ public:
     // True if a space (for white space or a removed comment) should also be
     // recognized, in front of the token returned:
     bool space;
-
-    bool fullyExpanded;
     // Numeric value of the token:
     union {
         int ival;
@@ -478,27 +475,16 @@ protected:
     //
     // From PpTokens.cpp
     //
-    void pushTokenStreamInput(TokenStream&, bool pasting = false, bool expanded = false);
+    void pushTokenStreamInput(TokenStream&, bool pasting = false);
     void UngetToken(int token, TPpToken*);
 
     class tTokenInput : public tInput {
     public:
-        tTokenInput(TPpContext* pp, TokenStream* t, bool prepasting, bool expanded) :
+        tTokenInput(TPpContext* pp, TokenStream* t, bool prepasting) :
             tInput(pp),
             tokens(t),
-            lastTokenPastes(prepasting),
-            preExpanded(expanded) { }
-        virtual int scan(TPpToken *ppToken) override {
-            int token = tokens->getToken(pp->parseContext, ppToken);
-            ppToken->fullyExpanded = preExpanded;
-            if (tokens->atEnd() && token == PpAtomIdentifier) {
-                int macroAtom = pp->atomStrings.getAtom(ppToken->name);
-                MacroSymbol* macro = macroAtom == 0 ? nullptr : pp->lookupMacroDef(macroAtom);
-                if (macro && macro->functionLike)
-                    ppToken->fullyExpanded = false;
-            }
-            return token;
-        }
+            lastTokenPastes(prepasting) { }
+        virtual int scan(TPpToken *ppToken) override { return tokens->getToken(pp->parseContext, ppToken); }
         virtual int getch() override { assert(0); return EndOfInput; }
         virtual void ungetch() override { assert(0); }
         virtual bool peekPasting() override { return tokens->peekTokenizedPasting(lastTokenPastes); }
@@ -506,7 +492,6 @@ protected:
     protected:
         TokenStream* tokens;
         bool lastTokenPastes; // true if the last token in the input is to be pasted, rather than consumed as a token
-        bool preExpanded;
     };
 
     class tUngotTokenInput : public tInput {

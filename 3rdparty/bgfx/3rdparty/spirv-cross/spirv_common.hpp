@@ -644,8 +644,7 @@ struct SPIRExtension : IVariant
 		SPV_AMD_shader_trinary_minmax,
 		SPV_AMD_gcn_shader,
 		NonSemanticDebugPrintf,
-		NonSemanticShaderDebugInfo,
-		NonSemanticGeneric
+		NonSemanticShaderDebugInfo
 	};
 
 	explicit SPIRExtension(Extension ext_)
@@ -728,9 +727,6 @@ struct SPIRExpression : IVariant
 
 	// Whether or not this is an access chain expression.
 	bool access_chain = false;
-
-	// Whether or not gl_MeshVerticesEXT[].gl_Position (as a whole or .y) is referenced
-	bool access_meshlet_position_y = false;
 
 	// A list of expressions which this expression depends on.
 	SmallVector<ID> expression_dependencies;
@@ -1583,7 +1579,6 @@ struct AccessChainMeta
 	bool storage_is_invariant = false;
 	bool flattened_struct = false;
 	bool relaxed_precision = false;
-	bool access_meshlet_position_y = false;
 };
 
 enum ExtendedDecorations
@@ -1667,7 +1662,6 @@ struct Meta
 		std::string alias;
 		std::string qualified_alias;
 		std::string hlsl_semantic;
-		std::string user_type;
 		Bitset decoration_flags;
 		spv::BuiltIn builtin_type = spv::BuiltInMax;
 		uint32_t location = 0;

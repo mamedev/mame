@@ -85,6 +85,9 @@ NVIDIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #endif
+#if (defined(_MSC_VER) && _MSC_VER < 1900 /*vs2015*/)
+#define snprintf sprintf_s
+#endif
 
 #include <cassert>
 #include <cstdlib>
@@ -113,15 +116,17 @@ int TPpContext::TokenStream::getToken(TParseContextBase& parseContext, TPpToken 
     int atom = stream[currentPos++].get(*ppToken);
     ppToken->loc = parseContext.getCurrentLoc();
 
+#ifndef GLSLANG_WEB
     // Check for ##, unless the current # is the last character
     if (atom == '#') {
         if (peekToken('#')) {
             parseContext.requireProfile(ppToken->loc, ~EEsProfile, "token pasting (##)");
-            parseContext.profileRequires(ppToken->loc, ~EEsProfile, 130, nullptr, "token pasting (##)");
+            parseContext.profileRequires(ppToken->loc, ~EEsProfile, 130, 0, "token pasting (##)");
             currentPos++;
             atom = PpAtomPaste;
         }
     }
+#endif
 
     return atom;
 }
@@ -190,9 +195,9 @@ bool TPpContext::TokenStream::peekUntokenizedPasting()
     return pasting;
 }
 
-void TPpContext::pushTokenStreamInput(TokenStream& ts, bool prepasting, bool expanded)
+void TPpContext::pushTokenStreamInput(TokenStream& ts, bool prepasting)
 {
-    pushInput(new tTokenInput(this, &ts, prepasting, expanded));
+    pushInput(new tTokenInput(this, &ts, prepasting));
     ts.reset();
 }
 

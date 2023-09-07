@@ -14,6 +14,7 @@
 
 #include "source/opt/dataflow.h"
 
+#include <algorithm>
 #include <cstdint>
 
 namespace spvtools {
@@ -77,7 +78,7 @@ void ForwardDataFlowAnalysis::EnqueueUsers(Instruction* inst) {
 }
 
 void ForwardDataFlowAnalysis::EnqueueBlockSuccessors(Instruction* inst) {
-  if (inst->opcode() != spv::Op::OpLabel) return;
+  if (inst->opcode() != SpvOpLabel) return;
   context()
       .cfg()
       ->block(inst->result_id())

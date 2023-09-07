@@ -30,7 +30,7 @@ spv_result_t ValidateUndef(ValidationState_t& _, const Instruction* inst) {
     return _.diag(SPV_ERROR_INVALID_ID, inst)
            << "Cannot create undefined values with void type";
   }
-  if (_.HasCapability(spv::Capability::Shader) &&
+  if (_.HasCapability(SpvCapabilityShader) &&
       _.ContainsLimitedUseIntOrFloatType(inst->type_id()) &&
       !_.IsPointerType(inst->type_id())) {
     return _.diag(SPV_ERROR_INVALID_ID, inst)
@@ -50,8 +50,7 @@ spv_result_t ValidateShaderClock(ValidationState_t& _,
   bool is_int32 = false, is_const_int32 = false;
   uint32_t value = 0;
   std::tie(is_int32, is_const_int32, value) = _.EvalInt32IfConst(scope);
-  if (is_const_int32 && spv::Scope(value) != spv::Scope::Subgroup &&
-      spv::Scope(value) != spv::Scope::Device) {
+  if (is_const_int32 && value != SpvScopeSubgroup && value != SpvScopeDevice) {
     return _.diag(SPV_ERROR_INVALID_DATA, inst)
            << _.VkErrorID(4652) << "Scope must be Subgroup or Device";
   }
@@ -105,18 +104,18 @@ spv_result_t ValidateExpect(ValidationState_t& _, const Instruction* inst) {
 
 spv_result_t MiscPass(ValidationState_t& _, const Instruction* inst) {
   switch (inst->opcode()) {
-    case spv::Op::OpUndef:
+    case SpvOpUndef:
       if (auto error = ValidateUndef(_, inst)) return error;
       break;
     default:
       break;
   }
   switch (inst->opcode()) {
-    case spv::Op::OpBeginInvocationInterlockEXT:
-    case spv::Op::OpEndInvocationInterlockEXT:
+    case SpvOpBeginInvocationInterlockEXT:
+    case SpvOpEndInvocationInterlockEXT:
       _.function(inst->function()->id())
           ->RegisterExecutionModelLimitation(
-              spv::ExecutionModel::Fragment,
+              SpvExecutionModelFragment,
               "OpBeginInvocationInterlockEXT/OpEndInvocationInterlockEXT "
               "require Fragment execution model");
 
@@ -127,14 +126,14 @@ spv_result_t MiscPass(ValidationState_t& _, const Instruction* inst) {
             const auto* execution_modes =
                 state.GetExecutionModes(entry_point->id());
 
-            auto find_interlock = [](const spv::ExecutionMode& mode) {
+            auto find_interlock = [](const SpvExecutionMode& mode) {
               switch (mode) {
-                case spv::ExecutionMode::PixelInterlockOrderedEXT:
-                case spv::ExecutionMode::PixelInterlockUnorderedEXT:
-                case spv::ExecutionMode::SampleInterlockOrderedEXT:
-                case spv::ExecutionMode::SampleInterlockUnorderedEXT:
-                case spv::ExecutionMode::ShadingRateInterlockOrderedEXT:
-                case spv::ExecutionMode::ShadingRateInterlockUnorderedEXT:
+                case SpvExecutionModePixelInterlockOrderedEXT:
+                case SpvExecutionModePixelInterlockUnorderedEXT:
+                case SpvExecutionModeSampleInterlockOrderedEXT:
+                case SpvExecutionModeSampleInterlockUnorderedEXT:
+                case SpvExecutionModeShadingRateInterlockOrderedEXT:
+                case SpvExecutionModeShadingRateInterlockUnorderedEXT:
                   return true;
                 default:
                   return false;
@@ -157,18 +156,18 @@ spv_result_t MiscPass(ValidationState_t& _, const Instruction* inst) {
             return true;
           });
       break;
-    case spv::Op::OpDemoteToHelperInvocationEXT:
+    case SpvOpDemoteToHelperInvocationEXT:
       _.function(inst->function()->id())
           ->RegisterExecutionModelLimitation(
-              spv::ExecutionModel::Fragment,
+              SpvExecutionModelFragment,
               "OpDemoteToHelperInvocationEXT requires Fragment execution "
               "model");
       break;
-    case spv::Op::OpIsHelperInvocationEXT: {
+    case SpvOpIsHelperInvocationEXT: {
       const uint32_t result_type = inst->type_id();
       _.function(inst->function()->id())
           ->RegisterExecutionModelLimitation(
-              spv::ExecutionModel::Fragment,
+              SpvExecutionModelFragment,
               "OpIsHelperInvocationEXT requires Fragment execution model");
       if (!_.IsBoolScalarType(result_type))
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
@@ -176,17 +175,17 @@ spv_result_t MiscPass(ValidationState_t& _, const Instruction* inst) {
                << spvOpcodeString(inst->opcode());
       break;
     }
-    case spv::Op::OpReadClockKHR:
+    case SpvOpReadClockKHR:
       if (auto error = ValidateShaderClock(_, inst)) {
         return error;
       }
       break;
-    case spv::Op::OpAssumeTrueKHR:
+    case SpvOpAssumeTrueKHR:
       if (auto error = ValidateAssumeTrue(_, inst)) {
         return error;
       }
       break;
-    case spv::Op::OpExpectKHR:
+    case SpvOpExpectKHR:
       if (auto error = ValidateExpect(_, inst)) {
         return error;
       }

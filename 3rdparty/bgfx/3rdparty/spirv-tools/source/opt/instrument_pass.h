@@ -55,14 +55,13 @@
 
 namespace spvtools {
 namespace opt {
-namespace {
+
 // Validation Ids
 // These are used to identify the general validation being done and map to
 // its output buffers.
-constexpr uint32_t kInstValidationIdBindless = 0;
-constexpr uint32_t kInstValidationIdBuffAddr = 1;
-constexpr uint32_t kInstValidationIdDebugPrintf = 2;
-}  // namespace
+static const uint32_t kInstValidationIdBindless = 0;
+static const uint32_t kInstValidationIdBuffAddr = 1;
+static const uint32_t kInstValidationIdDebugPrintf = 2;
 
 class InstrumentPass : public Pass {
   using cbb_ptr = const BasicBlock*;
@@ -196,8 +195,7 @@ class InstrumentPass : public Pass {
   // Because the code that is generated checks against the size of the buffer
   // before writing, the size of the debug out buffer can be used by the
   // validation layer to control the number of error records that are written.
-  void GenDebugStreamWrite(uint32_t shader_id, uint32_t instruction_idx_id,
-                           uint32_t stage_info_id,
+  void GenDebugStreamWrite(uint32_t instruction_idx, uint32_t stage_idx,
                            const std::vector<uint32_t>& validation_ids,
                            InstructionBuilder* builder);
 
@@ -215,10 +213,6 @@ class InstrumentPass : public Pass {
   uint32_t GenDebugDirectRead(const std::vector<uint32_t>& offset_ids,
                               InstructionBuilder* builder);
 
-  uint32_t GenReadFunctionCall(uint32_t return_id, uint32_t func_id,
-                               const std::vector<uint32_t>& args,
-                               InstructionBuilder* builder);
-
   // Generate code to convert integer |value_id| to 32bit, if needed. Return
   // an id to the 32bit equivalent.
   uint32_t Gen32BitCvtCode(uint32_t value_id, InstructionBuilder* builder);
@@ -226,15 +220,6 @@ class InstrumentPass : public Pass {
   // Generate code to cast integer |value_id| to 32bit unsigned, if needed.
   // Return an id to the Uint equivalent.
   uint32_t GenUintCastCode(uint32_t value_id, InstructionBuilder* builder);
-
-  std::unique_ptr<Function> StartFunction(
-      uint32_t func_id, const analysis::Type* return_type,
-      const std::vector<const analysis::Type*>& param_types);
-
-  std::vector<uint32_t> AddParameters(
-      Function& func, const std::vector<const analysis::Type*>& param_types);
-
-  std::unique_ptr<Instruction> EndFunction();
 
   // Return new label.
   std::unique_ptr<Instruction> NewLabel(uint32_t label_id);
@@ -267,21 +252,12 @@ class InstrumentPass : public Pass {
   // Return id for void type
   uint32_t GetVoidId();
 
-  // Get registered type structures
-  analysis::Integer* GetInteger(uint32_t width, bool is_signed);
-  analysis::Struct* GetStruct(const std::vector<const analysis::Type*>& fields);
-  analysis::RuntimeArray* GetRuntimeArray(const analysis::Type* element);
-  analysis::Array* GetArray(const analysis::Type* element, uint32_t size);
-  analysis::Function* GetFunction(
-      const analysis::Type* return_val,
-      const std::vector<const analysis::Type*>& args);
+  // Return pointer to type for runtime array of uint
+  analysis::Type* GetUintXRuntimeArrayType(uint32_t width,
+                                           analysis::Type** rarr_ty);
 
   // Return pointer to type for runtime array of uint
-  analysis::RuntimeArray* GetUintXRuntimeArrayType(
-      uint32_t width, analysis::RuntimeArray** rarr_ty);
-
-  // Return pointer to type for runtime array of uint
-  analysis::RuntimeArray* GetUintRuntimeArrayType(uint32_t width);
+  analysis::Type* GetUintRuntimeArrayType(uint32_t width);
 
   // Return id for buffer uint type
   uint32_t GetOutputBufferPtrId();
@@ -324,7 +300,8 @@ class InstrumentPass : public Pass {
 
   // Return id for output function. Define if it doesn't exist with
   // |val_spec_param_cnt| validation-specific uint32 parameters.
-  uint32_t GetStreamWriteFunctionId(uint32_t val_spec_param_cnt);
+  uint32_t GetStreamWriteFunctionId(uint32_t stage_idx,
+                                    uint32_t val_spec_param_cnt);
 
   // Return id for input function taking |param_cnt| uint32 parameters. Define
   // if it doesn't exist.
@@ -340,8 +317,8 @@ class InstrumentPass : public Pass {
   // If code is generated for an instruction, replace the instruction's
   // block with the new blocks that are generated. Continue processing at the
   // top of the last new block.
-  virtual bool InstrumentFunction(Function* func, uint32_t stage_idx,
-                                  InstProcessFunction& pfn);
+  bool InstrumentFunction(Function* func, uint32_t stage_idx,
+                          InstProcessFunction& pfn);
 
   // Call |pfn| on all functions in the call tree of the function
   // ids in |roots|.
@@ -355,11 +332,34 @@ class InstrumentPass : public Pass {
                                uint32_t field_value_id,
                                InstructionBuilder* builder);
 
+  // Generate instructions into |builder| which will write the members
+  // of the debug output record common for all stages and validations at
+  // |base_off|.
+  void GenCommonStreamWriteCode(uint32_t record_sz, uint32_t instruction_idx,
+                                uint32_t stage_idx, uint32_t base_off,
+                                InstructionBuilder* builder);
+
+  // Generate instructions into |builder| which will write
+  // |uint_frag_coord_id| at |component| of the record at |base_offset_id| of
+  // the debug output buffer .
+  void GenFragCoordEltDebugOutputCode(uint32_t base_offset_id,
+                                      uint32_t uint_frag_coord_id,
+                                      uint32_t component,
+                                      InstructionBuilder* builder);
+
   // Generate instructions into |builder| which will load |var_id| and return
   // its result id.
   uint32_t GenVarLoad(uint32_t var_id, InstructionBuilder* builder);
 
-  uint32_t GenStageInfo(uint32_t stage_idx, InstructionBuilder* builder);
+  // Generate instructions into |builder| which will load the uint |builtin_id|
+  // and write it into the debug output buffer at |base_off| + |builtin_off|.
+  void GenBuiltinOutputCode(uint32_t builtin_id, uint32_t builtin_off,
+                            uint32_t base_off, InstructionBuilder* builder);
+
+  // Generate instructions into |builder| which will write the |stage_idx|-
+  // specific members of the debug output stream at |base_off|.
+  void GenStageStreamWriteCode(uint32_t stage_idx, uint32_t base_off,
+                               InstructionBuilder* builder);
 
   // Return true if instruction must be in the same block that its result
   // is used.
@@ -447,10 +447,10 @@ class InstrumentPass : public Pass {
   bool storage_buffer_ext_defined_;
 
   // runtime array of uint type
-  analysis::RuntimeArray* uint64_rarr_ty_;
+  analysis::Type* uint64_rarr_ty_;
 
   // runtime array of uint type
-  analysis::RuntimeArray* uint32_rarr_ty_;
+  analysis::Type* uint32_rarr_ty_;
 
   // Pre-instrumentation same-block insts
   std::unordered_map<uint32_t, Instruction*> same_block_pre_;

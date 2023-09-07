@@ -35,28 +35,34 @@
 #include "../Include/Common.h"
 #include "../Include/PoolAlloc.h"
 
+#include "../Include/InitializeGlobals.h"
+#include "../OSDependent/osinclude.h"
+
 namespace glslang {
 
-namespace {
-thread_local TPoolAllocator* threadPoolAllocator = nullptr;
-
-TPoolAllocator* GetDefaultThreadPoolAllocator()
-{
-    thread_local TPoolAllocator defaultAllocator;
-    return &defaultAllocator;
-}
-} // anonymous namespace
+// Process-wide TLS index
+OS_TLSIndex PoolIndex;
 
 // Return the thread-specific current pool.
 TPoolAllocator& GetThreadPoolAllocator()
 {
-    return *(threadPoolAllocator ? threadPoolAllocator : GetDefaultThreadPoolAllocator());
+    return *static_cast<TPoolAllocator*>(OS_GetTLSValue(PoolIndex));
 }
 
 // Set the thread-specific current pool.
 void SetThreadPoolAllocator(TPoolAllocator* poolAllocator)
 {
-    threadPoolAllocator = poolAllocator;
+    OS_SetTLSValue(PoolIndex, poolAllocator);
+}
+
+// Process-wide set up of the TLS pool storage.
+bool InitializePoolIndex()
+{
+    // Allocate a TLS index.
+    if ((PoolIndex = OS_AllocTLSIndex()) == OS_INVALID_TLS_INDEX)
+        return false;
+
+    return true;
 }
 
 //
@@ -261,8 +267,8 @@ void* TPoolAllocator::allocate(size_t numBytes)
         //
         size_t numBytesToAlloc = allocationSize + headerSkip;
         tHeader* memory = reinterpret_cast<tHeader*>(::new char[numBytesToAlloc]);
-        if (memory == nullptr)
-            return nullptr;
+        if (memory == 0)
+            return 0;
 
         // Use placement-new to initialize header
         new(memory) tHeader(inUseList, (numBytesToAlloc + pageSize - 1) / pageSize);
@@ -283,8 +289,8 @@ void* TPoolAllocator::allocate(size_t numBytes)
         freeList = freeList->nextPage;
     } else {
         memory = reinterpret_cast<tHeader*>(::new char[pageSize]);
-        if (memory == nullptr)
-            return nullptr;
+        if (memory == 0)
+            return 0;
     }
 
     // Use placement-new to initialize header
@@ -302,7 +308,7 @@ void* TPoolAllocator::allocate(size_t numBytes)
 //
 void TAllocation::checkAllocList() const
 {
-    for (const TAllocation* alloc = this; alloc != nullptr; alloc = alloc->prevAlloc)
+    for (const TAllocation* alloc = this; alloc != 0; alloc = alloc->prevAlloc)
         alloc->check();
 }
 

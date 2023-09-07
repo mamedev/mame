@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2023 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -150,7 +150,7 @@ namespace entry
 	{
 		if (kDefaultWindowHandle.idx == _handle.idx)
 		{
-			return s_ctx->m_window;
+			return s_ctx.m_window;
 		}
 
 		return NULL;
@@ -159,12 +159,6 @@ namespace entry
 	void* getNativeDisplayHandle()
 	{
 		return NULL;
-	}
-
-	bgfx::NativeWindowHandleType::Enum getNativeWindowHandleType(WindowHandle _handle)
-	{
-		BX_UNUSED(_handle);
-		return bgfx::NativeWindowHandleType::Default;
 	}
 
 } // namespace entry
@@ -217,6 +211,8 @@ using namespace entry;
 	{
 		return nil;
 	}
+
+	s_ctx->m_window = self.layer;
 
 	return self;
 }
@@ -339,7 +335,6 @@ using namespace entry;
 	[m_view setContentScaleFactor: scaleFactor ];
 
 	s_ctx = new Context((uint32_t)(scaleFactor*rect.size.width), (uint32_t)(scaleFactor*rect.size.height));
-	s_ctx->m_window = m_view.layer;
 	return YES;
 }
 

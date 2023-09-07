@@ -20,6 +20,7 @@
 namespace spvtools {
 namespace opt {
 namespace blockmergeutil {
+
 namespace {
 
 // Returns true if |block| contains a merge instruction.
@@ -33,15 +34,14 @@ bool IsHeader(IRContext* context, uint32_t id) {
 
 // Returns true if |id| is the merge target of a merge instruction.
 bool IsMerge(IRContext* context, uint32_t id) {
-  return !context->get_def_use_mgr()->WhileEachUse(
-      id, [](Instruction* user, uint32_t index) {
-        spv::Op op = user->opcode();
-        if ((op == spv::Op::OpLoopMerge || op == spv::Op::OpSelectionMerge) &&
-            index == 0u) {
-          return false;
-        }
-        return true;
-      });
+  return !context->get_def_use_mgr()->WhileEachUse(id, [](Instruction* user,
+                                                          uint32_t index) {
+    SpvOp op = user->opcode();
+    if ((op == SpvOpLoopMerge || op == SpvOpSelectionMerge) && index == 0u) {
+      return false;
+    }
+    return true;
+  });
 }
 
 // Returns true if |block| is the merge target of a merge instruction.
@@ -53,8 +53,8 @@ bool IsMerge(IRContext* context, BasicBlock* block) {
 bool IsContinue(IRContext* context, uint32_t id) {
   return !context->get_def_use_mgr()->WhileEachUse(
       id, [](Instruction* user, uint32_t index) {
-        spv::Op op = user->opcode();
-        if (op == spv::Op::OpLoopMerge && index == 1u) {
+        SpvOp op = user->opcode();
+        if (op == SpvOpLoopMerge && index == 1u) {
           return false;
         }
         return true;
@@ -82,7 +82,7 @@ bool CanMergeWithSuccessor(IRContext* context, BasicBlock* block) {
   auto ii = block->end();
   --ii;
   Instruction* br = &*ii;
-  if (br->opcode() != spv::Op::OpBranch) {
+  if (br->opcode() != SpvOpBranch) {
     return false;
   }
 
@@ -119,10 +119,9 @@ bool CanMergeWithSuccessor(IRContext* context, BasicBlock* block) {
     // The merge must be a loop merge because a selection merge cannot be
     // followed by an unconditional branch.
     BasicBlock* succ_block = context->get_instr_block(lab_id);
-    spv::Op succ_term_op = succ_block->terminator()->opcode();
-    assert(merge_inst->opcode() == spv::Op::OpLoopMerge);
-    if (succ_term_op != spv::Op::OpBranch &&
-        succ_term_op != spv::Op::OpBranchConditional) {
+    SpvOp succ_term_op = succ_block->terminator()->opcode();
+    assert(merge_inst->opcode() == SpvOpLoopMerge);
+    if (succ_term_op != SpvOpBranch && succ_term_op != SpvOpBranchConditional) {
       return false;
     }
   }
@@ -170,11 +169,6 @@ void MergeWithSuccessor(IRContext* context, Function* func,
   // If bi is sbi's only predecessor, it dominates sbi and thus
   // sbi must follow bi in func's ordering.
   assert(sbi != func->end());
-
-  if (sbi->tail()->opcode() == spv::Op::OpSwitch &&
-      sbi->MergeBlockIdIfAny() != 0) {
-    context->InvalidateAnalyses(IRContext::Analysis::kAnalysisStructuredCFG);
-  }
 
   // Update the inst-to-block mapping for the instructions in sbi.
   for (auto& inst : *sbi) {

@@ -55,8 +55,7 @@ enum class FunctionDecl {
 class Function {
  public:
   Function(uint32_t id, uint32_t result_type_id,
-           spv::FunctionControlMask function_control,
-           uint32_t function_type_id);
+           SpvFunctionControlMask function_control, uint32_t function_type_id);
 
   /// Registers a function parameter in the current function
   /// @return Returns SPV_SUCCESS if the call was successful
@@ -81,8 +80,7 @@ class Function {
   ///
   /// @return Returns SPV_SUCCESS if the call was successful
   spv_result_t RegisterBlockVariable(uint32_t type_id, uint32_t id,
-                                     spv::StorageClass storage,
-                                     uint32_t init_id);
+                                     SpvStorageClass storage, uint32_t init_id);
 
   /// Registers a loop merge construct in the function
   ///
@@ -207,12 +205,12 @@ class Function {
 
   /// Registers execution model limitation such as "Feature X is only available
   /// with Execution Model Y".
-  void RegisterExecutionModelLimitation(spv::ExecutionModel model,
+  void RegisterExecutionModelLimitation(SpvExecutionModel model,
                                         const std::string& message);
 
   /// Registers execution model limitation with an |is_compatible| functor.
   void RegisterExecutionModelLimitation(
-      std::function<bool(spv::ExecutionModel, std::string*)> is_compatible) {
+      std::function<bool(SpvExecutionModel, std::string*)> is_compatible) {
     execution_model_limitations_.push_back(is_compatible);
   }
 
@@ -229,7 +227,7 @@ class Function {
   /// Returns true if the given execution model passes the limitations stored in
   /// execution_model_limitations_. Returns false otherwise and fills optional
   /// |reason| parameter.
-  bool IsCompatibleWithExecutionModel(spv::ExecutionModel model,
+  bool IsCompatibleWithExecutionModel(SpvExecutionModel model,
                                       std::string* reason = nullptr) const;
 
   // Inserts id to the set of functions called from this function.
@@ -288,7 +286,7 @@ class Function {
   uint32_t result_type_id_;
 
   /// The control fo the function
-  spv::FunctionControlMask function_control_;
+  SpvFunctionControlMask function_control_;
 
   /// The type of declaration of each function
   FunctionDecl declaration_type_;
@@ -383,7 +381,7 @@ class Function {
   /// function. The functor stored in the list return true if execution model
   /// is compatible, false otherwise. If the functor returns false, it can also
   /// optionally fill the string parameter with the reason for incompatibility.
-  std::list<std::function<bool(spv::ExecutionModel, std::string*)>>
+  std::list<std::function<bool(SpvExecutionModel, std::string*)>>
       execution_model_limitations_;
 
   /// Stores limitations imposed by instructions used within the function.

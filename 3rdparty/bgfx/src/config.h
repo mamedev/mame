@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2023 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -194,11 +194,6 @@
 #ifndef BGFX_CONFIG_USE_TINYSTL
 #	define BGFX_CONFIG_USE_TINYSTL 1
 #endif // BGFX_CONFIG_USE_TINYSTL
-
-/// Debug text maximum scale factor.
-#ifndef BGFX_CONFIG_DEBUG_TEXT_MAX_SCALE
-#	define BGFX_CONFIG_DEBUG_TEXT_MAX_SCALE 4
-#endif // BGFX_CONFIG_DEBUG_TEXT_MAX_SCALE
 
 /// Enable nVidia PerfHUD integration.
 #ifndef BGFX_CONFIG_DEBUG_PERFHUD

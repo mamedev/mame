@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2023 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -88,7 +88,7 @@ static const FilePathSplit s_filePathSplit[] =
 	{ "/tmp/abv/gd/", true, "/tmp/abv/gd/", "", "", "" },
 };
 
-TEST_CASE("FilePath", "[filepath][string]")
+TEST_CASE("FilePath", "")
 {
 	bx::FilePath fp;
 	for (uint32_t ii = 0; ii < BX_COUNTOF(s_filePathTest); ++ii)
@@ -118,7 +118,7 @@ TEST_CASE("FilePath", "[filepath][string]")
 	};
 }
 
-TEST_CASE("FilePath temp", "[filepath]")
+TEST_CASE("FilePath temp", "")
 {
 	bx::FilePath tmp(bx::Dir::Temp);
 	REQUIRE(0 != bx::strCmp(".", tmp.getPath().getPtr() ) );
@@ -132,31 +132,4 @@ TEST_CASE("FilePath temp", "[filepath]")
 	tmp.join("test");
 	REQUIRE(bx::removeAll(tmp, &err) );
 	REQUIRE(err.isOk() );
-}
-
-TEST_CASE("FilePath special", "[filepath]")
-{
-	{
-		bx::FilePath tmp(bx::Dir::Current);
-		bx::StringView sv(tmp);
-		DBG("%S", &sv);
-	}
-
-	{
-		bx::FilePath tmp(bx::Dir::Executable);
-		bx::StringView sv(tmp);
-		DBG("%S", &sv);
-	}
-
-	{
-		bx::FilePath tmp(bx::Dir::Home);
-		bx::StringView sv(tmp);
-		DBG("%S", &sv);
-	}
-
-	{
-		bx::FilePath tmp(bx::Dir::Temp);
-		bx::StringView sv(tmp);
-		DBG("%S", &sv);
-	}
 }

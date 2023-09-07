@@ -24,15 +24,19 @@
 
 #include "source/opt/fold.h"
 #include "source/opt/function.h"
+#include "source/opt/module.h"
 #include "source/opt/propagator.h"
 
 namespace spvtools {
 namespace opt {
+
 namespace {
+
 // This SSA id is never defined nor referenced in the IR.  It is a special ID
 // which represents varying values.  When an ID is found to have a varying
 // value, its entry in the |values_| table maps to kVaryingSSAId.
-constexpr uint32_t kVaryingSSAId = std::numeric_limits<uint32_t>::max();
+const uint32_t kVaryingSSAId = std::numeric_limits<uint32_t>::max();
+
 }  // namespace
 
 bool CCPPass::IsVaryingValue(uint32_t id) const { return id == kVaryingSSAId; }
@@ -132,7 +136,7 @@ SSAPropagator::PropStatus CCPPass::VisitAssignment(Instruction* instr) {
 
   // If this is a copy operation, and the RHS is a known constant, assign its
   // value to the LHS.
-  if (instr->opcode() == spv::Op::OpCopyObject) {
+  if (instr->opcode() == SpvOpCopyObject) {
     uint32_t rhs_id = instr->GetSingleWordInOperand(0);
     auto it = values_.find(rhs_id);
     if (it != values_.end()) {
@@ -207,10 +211,10 @@ SSAPropagator::PropStatus CCPPass::VisitBranch(Instruction* instr,
 
   *dest_bb = nullptr;
   uint32_t dest_label = 0;
-  if (instr->opcode() == spv::Op::OpBranch) {
+  if (instr->opcode() == SpvOpBranch) {
     // An unconditional jump always goes to its unique destination.
     dest_label = instr->GetSingleWordInOperand(0);
-  } else if (instr->opcode() == spv::Op::OpBranchConditional) {
+  } else if (instr->opcode() == SpvOpBranchConditional) {
     // For a conditional branch, determine whether the predicate selector has a
     // known value in |values_|.  If it does, set the destination block
     // according to the selector's boolean value.
@@ -239,7 +243,7 @@ SSAPropagator::PropStatus CCPPass::VisitBranch(Instruction* instr,
     // For an OpSwitch, extract the value taken by the switch selector and check
     // which of the target literals it matches.  The branch associated with that
     // literal is the taken branch.
-    assert(instr->opcode() == spv::Op::OpSwitch);
+    assert(instr->opcode() == SpvOpSwitch);
     if (instr->GetOperand(0).words.size() != 1) {
       // If the selector is wider than 32-bits, return varying. TODO(dnovillo):
       // Add support for wider constants.
@@ -286,7 +290,7 @@ SSAPropagator::PropStatus CCPPass::VisitBranch(Instruction* instr,
 SSAPropagator::PropStatus CCPPass::VisitInstruction(Instruction* instr,
                                                     BasicBlock** dest_bb) {
   *dest_bb = nullptr;
-  if (instr->opcode() == spv::Op::OpPhi) {
+  if (instr->opcode() == SpvOpPhi) {
     return VisitPhi(instr);
   } else if (instr->IsBranch()) {
     return VisitBranch(instr, dest_bb);

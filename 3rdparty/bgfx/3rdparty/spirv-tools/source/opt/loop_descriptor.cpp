@@ -15,14 +15,17 @@
 #include "source/opt/loop_descriptor.h"
 
 #include <algorithm>
+#include <iostream>
 #include <limits>
 #include <stack>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
 #include "source/opt/cfg.h"
 #include "source/opt/constants.h"
 #include "source/opt/dominator_tree.h"
+#include "source/opt/ir_builder.h"
 #include "source/opt/ir_context.h"
 #include "source/opt/iterator.h"
 #include "source/opt/tree_iterator.h"
@@ -36,7 +39,7 @@ namespace opt {
 Instruction* Loop::GetInductionStepOperation(
     const Instruction* induction) const {
   // Induction must be a phi instruction.
-  assert(induction->opcode() == spv::Op::OpPhi);
+  assert(induction->opcode() == SpvOpPhi);
 
   Instruction* step = nullptr;
 
@@ -72,8 +75,8 @@ Instruction* Loop::GetInductionStepOperation(
     return nullptr;
   }
 
-  if (def_use_manager->GetDef(lhs)->opcode() != spv::Op::OpConstant &&
-      def_use_manager->GetDef(rhs)->opcode() != spv::Op::OpConstant) {
+  if (def_use_manager->GetDef(lhs)->opcode() != SpvOp::SpvOpConstant &&
+      def_use_manager->GetDef(rhs)->opcode() != SpvOp::SpvOpConstant) {
     return nullptr;
   }
 
@@ -82,31 +85,31 @@ Instruction* Loop::GetInductionStepOperation(
 
 // Returns true if the |step| operation is an induction variable step operation
 // which is currently handled.
-bool Loop::IsSupportedStepOp(spv::Op step) const {
+bool Loop::IsSupportedStepOp(SpvOp step) const {
   switch (step) {
-    case spv::Op::OpISub:
-    case spv::Op::OpIAdd:
+    case SpvOp::SpvOpISub:
+    case SpvOp::SpvOpIAdd:
       return true;
     default:
       return false;
   }
 }
 
-bool Loop::IsSupportedCondition(spv::Op condition) const {
+bool Loop::IsSupportedCondition(SpvOp condition) const {
   switch (condition) {
     // <
-    case spv::Op::OpULessThan:
-    case spv::Op::OpSLessThan:
+    case SpvOp::SpvOpULessThan:
+    case SpvOp::SpvOpSLessThan:
     // >
-    case spv::Op::OpUGreaterThan:
-    case spv::Op::OpSGreaterThan:
+    case SpvOp::SpvOpUGreaterThan:
+    case SpvOp::SpvOpSGreaterThan:
 
     // >=
-    case spv::Op::OpSGreaterThanEqual:
-    case spv::Op::OpUGreaterThanEqual:
+    case SpvOp::SpvOpSGreaterThanEqual:
+    case SpvOp::SpvOpUGreaterThanEqual:
     // <=
-    case spv::Op::OpSLessThanEqual:
-    case spv::Op::OpULessThanEqual:
+    case SpvOp::SpvOpSLessThanEqual:
+    case SpvOp::SpvOpULessThanEqual:
 
       return true;
     default:
@@ -114,8 +117,7 @@ bool Loop::IsSupportedCondition(spv::Op condition) const {
   }
 }
 
-int64_t Loop::GetResidualConditionValue(spv::Op condition,
-                                        int64_t initial_value,
+int64_t Loop::GetResidualConditionValue(SpvOp condition, int64_t initial_value,
                                         int64_t step_value,
                                         size_t number_of_iterations,
                                         size_t factor) {
@@ -126,13 +128,13 @@ int64_t Loop::GetResidualConditionValue(spv::Op condition,
   // loop where just less than or greater than. Adding or subtracting one should
   // give a functionally equivalent value.
   switch (condition) {
-    case spv::Op::OpSGreaterThanEqual:
-    case spv::Op::OpUGreaterThanEqual: {
+    case SpvOp::SpvOpSGreaterThanEqual:
+    case SpvOp::SpvOpUGreaterThanEqual: {
       remainder -= 1;
       break;
     }
-    case spv::Op::OpSLessThanEqual:
-    case spv::Op::OpULessThanEqual: {
+    case SpvOp::SpvOpSLessThanEqual:
+    case SpvOp::SpvOpULessThanEqual: {
       remainder += 1;
       break;
     }
@@ -150,7 +152,7 @@ Instruction* Loop::GetConditionInst() const {
   }
   Instruction* branch_conditional = &*condition_block->tail();
   if (!branch_conditional ||
-      branch_conditional->opcode() != spv::Op::OpBranchConditional) {
+      branch_conditional->opcode() != SpvOpBranchConditional) {
     return nullptr;
   }
   Instruction* condition_inst = context_->get_def_use_mgr()->GetDef(
@@ -316,7 +318,7 @@ void Loop::SetMergeBlock(BasicBlock* merge) {
 void Loop::SetPreHeaderBlock(BasicBlock* preheader) {
   if (preheader) {
     assert(!IsInsideLoop(preheader) && "The preheader block is in the loop");
-    assert(preheader->tail()->opcode() == spv::Op::OpBranch &&
+    assert(preheader->tail()->opcode() == SpvOpBranch &&
            "The preheader block does not unconditionally branch to the header "
            "block");
     assert(preheader->tail()->GetSingleWordOperand(0) ==
@@ -385,7 +387,7 @@ void Loop::GetMergingBlocks(
 
 namespace {
 
-inline bool IsBasicBlockSafeToClone(IRContext* context, BasicBlock* bb) {
+static inline bool IsBasicBlockSafeToClone(IRContext* context, BasicBlock* bb) {
   for (Instruction& inst : *bb) {
     if (!inst.IsBranch() && !context->IsCombinatorInstruction(&inst))
       return false;
@@ -441,7 +443,7 @@ bool Loop::IsLCSSA() const {
                 BasicBlock* parent = ir_context->get_instr_block(use);
                 assert(parent && "Invalid analysis");
                 if (IsInsideLoop(parent)) return true;
-                if (use->opcode() != spv::Op::OpPhi) return false;
+                if (use->opcode() != SpvOpPhi) return false;
                 return exit_blocks.count(parent->id());
               }))
         return false;
@@ -450,20 +452,25 @@ bool Loop::IsLCSSA() const {
   return true;
 }
 
-bool Loop::ShouldHoistInstruction(const Instruction& inst) const {
-  return inst.IsOpcodeCodeMotionSafe() && AreAllOperandsOutsideLoop(inst) &&
-         (!inst.IsLoad() || inst.IsReadOnlyLoad());
+bool Loop::ShouldHoistInstruction(IRContext* context, Instruction* inst) {
+  return AreAllOperandsOutsideLoop(context, inst) &&
+         inst->IsOpcodeCodeMotionSafe();
 }
 
-bool Loop::AreAllOperandsOutsideLoop(const Instruction& inst) const {
-  analysis::DefUseManager* def_use_mgr = GetContext()->get_def_use_mgr();
+bool Loop::AreAllOperandsOutsideLoop(IRContext* context, Instruction* inst) {
+  analysis::DefUseManager* def_use_mgr = context->get_def_use_mgr();
+  bool all_outside_loop = true;
 
-  const std::function<bool(const uint32_t*)> operand_outside_loop =
-      [this, &def_use_mgr](const uint32_t* id) {
-        return !this->IsInsideLoop(def_use_mgr->GetDef(*id));
+  const std::function<void(uint32_t*)> operand_outside_loop =
+      [this, &def_use_mgr, &all_outside_loop](uint32_t* id) {
+        if (this->IsInsideLoop(def_use_mgr->GetDef(*id))) {
+          all_outside_loop = false;
+          return;
+        }
       };
 
-  return inst.WhileEachInId(operand_outside_loop);
+  inst->ForEachInId(operand_outside_loop);
+  return all_outside_loop;
 }
 
 void Loop::ComputeLoopStructuredOrder(
@@ -479,7 +486,7 @@ void Loop::ComputeLoopStructuredOrder(
     ordered_loop_blocks->push_back(loop_preheader_);
 
   bool is_shader =
-      context_->get_feature_mgr()->HasCapability(spv::Capability::Shader);
+      context_->get_feature_mgr()->HasCapability(SpvCapabilityShader);
   if (!is_shader) {
     cfg.ForEachBlockInReversePostOrder(
         loop_header_, [ordered_loop_blocks, this](BasicBlock* bb) {
@@ -640,7 +647,7 @@ BasicBlock* Loop::FindConditionBlock() const {
   const Instruction& branch = *bb->ctail();
 
   // Make sure the branch is a conditional branch.
-  if (branch.opcode() != spv::Op::OpBranchConditional) return nullptr;
+  if (branch.opcode() != SpvOpBranchConditional) return nullptr;
 
   // Make sure one of the two possible branches is to the merge block.
   if (branch.GetSingleWordInOperand(1) == loop_merge_->id() ||
@@ -709,7 +716,7 @@ bool Loop::FindNumberOfIterations(const Instruction* induction,
   }
 
   // If this is a subtraction step we should negate the step value.
-  if (step_inst->opcode() == spv::Op::OpISub) {
+  if (step_inst->opcode() == SpvOp::SpvOpISub) {
     step_value = -step_value;
   }
 
@@ -746,7 +753,7 @@ bool Loop::FindNumberOfIterations(const Instruction* induction,
 // |step_value| where diff is calculated differently according to the
 // |condition| and uses the |condition_value| and |init_value|. If diff /
 // |step_value| is NOT cleanly divisible then we add one to the sum.
-int64_t Loop::GetIterations(spv::Op condition, int64_t condition_value,
+int64_t Loop::GetIterations(SpvOp condition, int64_t condition_value,
                             int64_t init_value, int64_t step_value) const {
   if (step_value == 0) {
     return 0;
@@ -755,8 +762,8 @@ int64_t Loop::GetIterations(spv::Op condition, int64_t condition_value,
   int64_t diff = 0;
 
   switch (condition) {
-    case spv::Op::OpSLessThan:
-    case spv::Op::OpULessThan: {
+    case SpvOp::SpvOpSLessThan:
+    case SpvOp::SpvOpULessThan: {
       // If the condition is not met to begin with the loop will never iterate.
       if (!(init_value < condition_value)) return 0;
 
@@ -771,8 +778,8 @@ int64_t Loop::GetIterations(spv::Op condition, int64_t condition_value,
 
       break;
     }
-    case spv::Op::OpSGreaterThan:
-    case spv::Op::OpUGreaterThan: {
+    case SpvOp::SpvOpSGreaterThan:
+    case SpvOp::SpvOpUGreaterThan: {
       // If the condition is not met to begin with the loop will never iterate.
       if (!(init_value > condition_value)) return 0;
 
@@ -788,12 +795,12 @@ int64_t Loop::GetIterations(spv::Op condition, int64_t condition_value,
       break;
     }
 
-    case spv::Op::OpSGreaterThanEqual:
-    case spv::Op::OpUGreaterThanEqual: {
+    case SpvOp::SpvOpSGreaterThanEqual:
+    case SpvOp::SpvOpUGreaterThanEqual: {
       // If the condition is not met to begin with the loop will never iterate.
       if (!(init_value >= condition_value)) return 0;
 
-      // We subtract one to make it the same as spv::Op::OpGreaterThan as it is
+      // We subtract one to make it the same as SpvOpGreaterThan as it is
       // functionally equivalent.
       diff = init_value - (condition_value - 1);
 
@@ -807,13 +814,13 @@ int64_t Loop::GetIterations(spv::Op condition, int64_t condition_value,
       break;
     }
 
-    case spv::Op::OpSLessThanEqual:
-    case spv::Op::OpULessThanEqual: {
+    case SpvOp::SpvOpSLessThanEqual:
+    case SpvOp::SpvOpULessThanEqual: {
       // If the condition is not met to begin with the loop will never iterate.
       if (!(init_value <= condition_value)) return 0;
 
-      // We add one to make it the same as spv::Op::OpLessThan as it is
-      // functionally equivalent.
+      // We add one to make it the same as SpvOpLessThan as it is functionally
+      // equivalent.
       diff = (condition_value + 1) - init_value;
 
       // If the operation is a less than operation then the diff and step must
@@ -847,7 +854,7 @@ int64_t Loop::GetIterations(spv::Op condition, int64_t condition_value,
 void Loop::GetInductionVariables(
     std::vector<Instruction*>& induction_variables) const {
   for (Instruction& inst : *loop_header_) {
-    if (inst.opcode() == spv::Op::OpPhi) {
+    if (inst.opcode() == SpvOp::SpvOpPhi) {
       induction_variables.push_back(&inst);
     }
   }
@@ -860,7 +867,7 @@ Instruction* Loop::FindConditionVariable(
 
   Instruction* induction = nullptr;
   // Verify that the branch instruction is a conditional branch.
-  if (branch_inst.opcode() == spv::Op::OpBranchConditional) {
+  if (branch_inst.opcode() == SpvOp::SpvOpBranchConditional) {
     // From the branch instruction find the branch condition.
     analysis::DefUseManager* def_use_manager = context_->get_def_use_mgr();
 
@@ -876,8 +883,7 @@ Instruction* Loop::FindConditionVariable(
           def_use_manager->GetDef(condition->GetSingleWordOperand(2));
 
       // Make sure the variable instruction used is a phi.
-      if (!variable_inst || variable_inst->opcode() != spv::Op::OpPhi)
-        return nullptr;
+      if (!variable_inst || variable_inst->opcode() != SpvOpPhi) return nullptr;
 
       // Make sure the phi instruction only has two incoming blocks. Each
       // incoming block will be represented by two in operands in the phi

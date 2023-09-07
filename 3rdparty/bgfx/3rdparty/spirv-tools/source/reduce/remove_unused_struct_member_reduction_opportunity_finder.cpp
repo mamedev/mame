@@ -43,7 +43,7 @@ RemoveUnusedStructMemberReductionOpportunityFinder::GetAvailableOpportunities(
 
   // Consider every struct type in the module.
   for (auto& type_or_value : context->types_values()) {
-    if (type_or_value.opcode() != spv::Op::OpTypeStruct) {
+    if (type_or_value.opcode() != SpvOpTypeStruct) {
       continue;
     }
 
@@ -60,7 +60,7 @@ RemoveUnusedStructMemberReductionOpportunityFinder::GetAvailableOpportunities(
         &type_or_value,
         [&unused_members](opt::Instruction* user, uint32_t /*operand_index*/) {
           switch (user->opcode()) {
-            case spv::Op::OpMemberName:
+            case SpvOpMemberName:
               unused_members.erase(user->GetSingleWordInOperand(1));
               break;
             default:
@@ -91,8 +91,8 @@ RemoveUnusedStructMemberReductionOpportunityFinder::GetAvailableOpportunities(
           // The way the helper is invoked depends on whether the instruction
           // uses literal or id indices, and the offset into the instruction's
           // input operands from which index operands are provided.
-          case spv::Op::OpAccessChain:
-          case spv::Op::OpInBoundsAccessChain: {
+          case SpvOpAccessChain:
+          case SpvOpInBoundsAccessChain: {
             auto composite_type_id =
                 context->get_def_use_mgr()
                     ->GetDef(context->get_def_use_mgr()
@@ -102,8 +102,8 @@ RemoveUnusedStructMemberReductionOpportunityFinder::GetAvailableOpportunities(
             MarkAccessedMembersAsUsed(context, composite_type_id, 1, false,
                                       inst, &unused_member_to_structs);
           } break;
-          case spv::Op::OpPtrAccessChain:
-          case spv::Op::OpInBoundsPtrAccessChain: {
+          case SpvOpPtrAccessChain:
+          case SpvOpInBoundsPtrAccessChain: {
             auto composite_type_id =
                 context->get_def_use_mgr()
                     ->GetDef(context->get_def_use_mgr()
@@ -113,7 +113,7 @@ RemoveUnusedStructMemberReductionOpportunityFinder::GetAvailableOpportunities(
             MarkAccessedMembersAsUsed(context, composite_type_id, 2, false,
                                       inst, &unused_member_to_structs);
           } break;
-          case spv::Op::OpCompositeExtract: {
+          case SpvOpCompositeExtract: {
             auto composite_type_id =
                 context->get_def_use_mgr()
                     ->GetDef(inst.GetSingleWordInOperand(0))
@@ -121,7 +121,7 @@ RemoveUnusedStructMemberReductionOpportunityFinder::GetAvailableOpportunities(
             MarkAccessedMembersAsUsed(context, composite_type_id, 1, true, inst,
                                       &unused_member_to_structs);
           } break;
-          case spv::Op::OpCompositeInsert: {
+          case SpvOpCompositeInsert: {
             auto composite_type_id =
                 context->get_def_use_mgr()
                     ->GetDef(inst.GetSingleWordInOperand(1))
@@ -163,13 +163,13 @@ void RemoveUnusedStructMemberReductionOpportunityFinder::
        i < composite_access_instruction.NumInOperands(); i++) {
     auto type_inst = context->get_def_use_mgr()->GetDef(next_type);
     switch (type_inst->opcode()) {
-      case spv::Op::OpTypeArray:
-      case spv::Op::OpTypeMatrix:
-      case spv::Op::OpTypeRuntimeArray:
-      case spv::Op::OpTypeVector:
+      case SpvOpTypeArray:
+      case SpvOpTypeMatrix:
+      case SpvOpTypeRuntimeArray:
+      case SpvOpTypeVector:
         next_type = type_inst->GetSingleWordInOperand(0);
         break;
-      case spv::Op::OpTypeStruct: {
+      case SpvOpTypeStruct: {
         uint32_t index_operand =
             composite_access_instruction.GetSingleWordInOperand(i);
         uint32_t member = literal_indices ? index_operand

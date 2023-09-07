@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2023 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -27,7 +27,7 @@ namespace bx
 		{
 			Node* node = m_first;
 			m_first = node->m_next;
-			bx::deleteObject(m_allocator, node);
+			BX_DELETE(m_allocator, node);
 		}
 	}
 
@@ -39,7 +39,7 @@ namespace bx
 		{
 			Node* node = m_first;
 			m_first = m_first->m_next;
-			bx::deleteObject(m_allocator, node);
+			BX_DELETE(m_allocator, node);
 		}
 	}
 

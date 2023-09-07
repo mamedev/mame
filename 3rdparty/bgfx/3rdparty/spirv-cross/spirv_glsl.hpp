@@ -258,10 +258,6 @@ public:
 	// require_extension("GL_KHR_my_extension");
 	void require_extension(const std::string &ext);
 
-	// Returns the list of required extensions. After compilation this will contains any other 
-	// extensions that the compiler used automatically, in addition to the user specified ones.
-	const SmallVector<std::string> &get_required_extensions() const;
-
 	// Legacy GLSL compatibility method.
 	// Takes a uniform or push constant variable and flattens it into a (i|u)vec4 array[N]; array instead.
 	// For this to work, all types in the block must be the same basic type, e.g. mixing vec2 and vec4 is fine, but
@@ -296,7 +292,6 @@ protected:
 			KHR_shader_subgroup_ballot,
 			KHR_shader_subgroup_basic,
 			KHR_shader_subgroup_vote,
-			KHR_shader_subgroup_arithmetic,
 			NV_gpu_shader_5,
 			NV_shader_thread_group,
 			NV_shader_thread_shuffle,
@@ -329,18 +324,7 @@ protected:
 			SubgroupInverseBallot_InclBitCount_ExclBitCout = 13,
 			SubgroupBallotBitExtract = 14,
 			SubgroupBallotBitCount = 15,
-			SubgroupArithmeticIAddReduce = 16,
-			SubgroupArithmeticIAddExclusiveScan = 17,
-			SubgroupArithmeticIAddInclusiveScan = 18,
-			SubgroupArithmeticFAddReduce = 19,
-			SubgroupArithmeticFAddExclusiveScan = 20,
-			SubgroupArithmeticFAddInclusiveScan = 21,
-			SubgroupArithmeticIMulReduce = 22,
-			SubgroupArithmeticIMulExclusiveScan = 23,
-			SubgroupArithmeticIMulInclusiveScan = 24,
-			SubgroupArithmeticFMulReduce = 25,
-			SubgroupArithmeticFMulExclusiveScan = 26,
-			SubgroupArithmeticFMulInclusiveScan = 27,
+
 			FeatureCount
 		};
 
@@ -374,7 +358,7 @@ protected:
 	};
 
 	// TODO remove this function when all subgroup ops are supported (or make it always return true)
-	static bool is_supported_subgroup_op_in_opengl(spv::Op op, const uint32_t *ops);
+	static bool is_supported_subgroup_op_in_opengl(spv::Op op);
 
 	void reset(uint32_t iteration_count);
 	void emit_function(SPIRFunction &func, const Bitset &return_flags);
@@ -397,7 +381,6 @@ protected:
 	};
 	TemporaryCopy handle_instruction_precision(const Instruction &instr);
 	void emit_block_instructions(SPIRBlock &block);
-	void emit_block_instructions_with_masked_debug(SPIRBlock &block);
 
 	// For relax_nan_checks.
 	GLSLstd450 get_remapped_glsl_op(GLSLstd450 std450_op) const;
@@ -431,9 +414,7 @@ protected:
 	                                const std::string &qualifier = "", uint32_t base_offset = 0);
 	virtual void emit_struct_padding_target(const SPIRType &type);
 	virtual std::string image_type_glsl(const SPIRType &type, uint32_t id = 0);
-	std::string constant_expression(const SPIRConstant &c,
-	                                bool inside_block_like_struct_scope = false,
-	                                bool inside_struct_scope = false);
+	std::string constant_expression(const SPIRConstant &c, bool inside_block_like_struct_scope = false);
 	virtual std::string constant_op_expression(const SPIRConstantOp &cop);
 	virtual std::string constant_expression_vector(const SPIRConstant &c, uint32_t vector);
 	virtual void emit_fixup();
@@ -467,7 +448,7 @@ protected:
 		TextureFunctionArguments() = default;
 		TextureFunctionBaseArguments base;
 		uint32_t coord = 0, coord_components = 0, dref = 0;
-		uint32_t grad_x = 0, grad_y = 0, lod = 0, offset = 0;
+		uint32_t grad_x = 0, grad_y = 0, lod = 0, coffset = 0, offset = 0;
 		uint32_t bias = 0, component = 0, sample = 0, sparse_texel = 0, min_lod = 0;
 		bool nonuniform_expression = false;
 	};
@@ -483,8 +464,6 @@ protected:
 	                                           bool packed_type, bool row_major);
 
 	virtual bool builtin_translates_to_nonarray(spv::BuiltIn builtin) const;
-
-	virtual bool is_user_type_structured(uint32_t id) const;
 
 	void emit_copy_logical_type(uint32_t lhs_id, uint32_t lhs_type_id, uint32_t rhs_id, uint32_t rhs_type_id,
 	                            SmallVector<uint32_t> chain);
@@ -546,7 +525,6 @@ protected:
 	SmallVector<std::string> *redirect_statement = nullptr;
 	const SPIRBlock *current_continue_block = nullptr;
 	bool block_temporary_hoisting = false;
-	bool block_debug_directives = false;
 
 	void begin_scope();
 	void end_scope();
@@ -574,8 +552,7 @@ protected:
 	bool member_is_remapped_physical_type(const SPIRType &type, uint32_t index) const;
 	bool member_is_packed_physical_type(const SPIRType &type, uint32_t index) const;
 	virtual std::string convert_row_major_matrix(std::string exp_str, const SPIRType &exp_type,
-	                                             uint32_t physical_type_id, bool is_packed,
-	                                             bool relaxed = false);
+	                                             uint32_t physical_type_id, bool is_packed);
 
 	std::unordered_set<std::string> local_variable_names;
 	std::unordered_set<std::string> resource_names;
@@ -612,7 +589,6 @@ protected:
 		const char *uint16_t_literal_suffix = "us";
 		const char *nonuniform_qualifier = "nonuniformEXT";
 		const char *boolean_mix_function = "mix";
-		SPIRType::BaseType boolean_in_struct_remapped_type = SPIRType::Boolean;
 		bool swizzle_is_function = false;
 		bool shared_is_implied = false;
 		bool unsized_array_supported = true;
@@ -650,8 +626,6 @@ protected:
 	void emit_struct(SPIRType &type);
 	void emit_resources();
 	void emit_extension_workarounds(spv::ExecutionModel model);
-	void emit_subgroup_arithmetic_workaround(const std::string &func, spv::Op op, spv::GroupOperation group_op);
-	void emit_polyfills(uint32_t polyfills, bool relaxed);
 	void emit_buffer_block_native(const SPIRVariable &var);
 	void emit_buffer_reference_block(uint32_t type_id, bool forward_declaration);
 	void emit_buffer_block_legacy(const SPIRVariable &var);
@@ -689,7 +663,6 @@ protected:
 	bool should_suppress_usage_tracking(uint32_t id) const;
 	void emit_mix_op(uint32_t result_type, uint32_t id, uint32_t left, uint32_t right, uint32_t lerp);
 	void emit_nminmax_op(uint32_t result_type, uint32_t id, uint32_t op0, uint32_t op1, GLSLstd450 op);
-	void emit_emulated_ahyper_op(uint32_t result_type, uint32_t result_id, uint32_t op0, GLSLstd450 op);
 	bool to_trivial_mix_op(const SPIRType &type, std::string &op, uint32_t left, uint32_t right, uint32_t lerp);
 	void emit_quaternary_func_op(uint32_t result_type, uint32_t result_id, uint32_t op0, uint32_t op1, uint32_t op2,
 	                             uint32_t op3, const char *op);
@@ -732,7 +705,6 @@ protected:
 
 	void emit_unary_op(uint32_t result_type, uint32_t result_id, uint32_t op0, const char *op);
 	void emit_unary_op_cast(uint32_t result_type, uint32_t result_id, uint32_t op0, const char *op);
-	virtual void emit_mesh_tasks(SPIRBlock &block);
 	bool expression_is_forwarded(uint32_t id) const;
 	bool expression_suppresses_usage_tracking(uint32_t id) const;
 	bool expression_read_implies_multiple_reads(uint32_t id) const;
@@ -781,8 +753,8 @@ protected:
 	void append_global_func_args(const SPIRFunction &func, uint32_t index, SmallVector<std::string> &arglist);
 	std::string to_non_uniform_aware_expression(uint32_t id);
 	std::string to_expression(uint32_t id, bool register_expression_read = true);
-	std::string to_composite_constructor_expression(const SPIRType &parent_type, uint32_t id, bool block_like_type);
-	std::string to_rerolled_array_expression(const SPIRType &parent_type, const std::string &expr, const SPIRType &type);
+	std::string to_composite_constructor_expression(uint32_t id, bool block_like_type);
+	std::string to_rerolled_array_expression(const std::string &expr, const SPIRType &type);
 	std::string to_enclosed_expression(uint32_t id, bool register_expression_read = true);
 	std::string to_unpacked_expression(uint32_t id, bool register_expression_read = true);
 	std::string to_unpacked_row_major_matrix_expression(uint32_t id);
@@ -793,7 +765,6 @@ protected:
 	std::string to_extract_component_expression(uint32_t id, uint32_t index);
 	std::string to_extract_constant_composite_expression(uint32_t result_type, const SPIRConstant &c,
 	                                                     const uint32_t *chain, uint32_t length);
-	static bool needs_enclose_expression(const std::string &expr);
 	std::string enclose_expression(const std::string &expr);
 	std::string dereference_expression(const SPIRType &expression_type, const std::string &expr);
 	std::string address_of_expression(const std::string &expr);
@@ -815,7 +786,7 @@ protected:
 	std::string layout_for_variable(const SPIRVariable &variable);
 	std::string to_combined_image_sampler(VariableID image_id, VariableID samp_id);
 	virtual bool skip_argument(uint32_t id) const;
-	virtual bool emit_array_copy(const char *expr, uint32_t lhs_id, uint32_t rhs_id,
+	virtual void emit_array_copy(const std::string &lhs, uint32_t lhs_id, uint32_t rhs_id,
 	                             spv::StorageClass lhs_storage, spv::StorageClass rhs_storage);
 	virtual void emit_block_hints(const SPIRBlock &block);
 	virtual std::string to_initializer_expression(const SPIRVariable &var);
@@ -912,23 +883,9 @@ protected:
 		return !options.es && options.version < 130;
 	}
 
-	enum Polyfill : uint32_t
-	{
-		PolyfillTranspose2x2 = 1 << 0,
-		PolyfillTranspose3x3 = 1 << 1,
-		PolyfillTranspose4x4 = 1 << 2,
-		PolyfillDeterminant2x2 = 1 << 3,
-		PolyfillDeterminant3x3 = 1 << 4,
-		PolyfillDeterminant4x4 = 1 << 5,
-		PolyfillMatrixInverse2x2 = 1 << 6,
-		PolyfillMatrixInverse3x3 = 1 << 7,
-		PolyfillMatrixInverse4x4 = 1 << 8,
-	};
-
-	uint32_t required_polyfills = 0;
-	uint32_t required_polyfills_relaxed = 0;
-	void require_polyfill(Polyfill polyfill, bool relaxed);
-
+	bool requires_transpose_2x2 = false;
+	bool requires_transpose_3x3 = false;
+	bool requires_transpose_4x4 = false;
 	bool ray_tracing_is_khr = false;
 	bool barycentric_is_nv = false;
 	void ray_tracing_khr_fixup_locations();

@@ -32,7 +32,7 @@ TrueTypeHandle loadTtf(FontManager* _fm, const char* _filePath)
 	if (NULL != data)
 	{
 		TrueTypeHandle handle = _fm->createTtf( (uint8_t*)data, size);
-		bx::free(entry::getAllocator(), data);
+		BX_FREE(entry::getAllocator(), data);
 		return handle;
 	}
 
@@ -73,7 +73,6 @@ public:
 		init.vendorId = args.m_pciId;
 		init.platformData.nwh  = entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
 		init.platformData.ndt  = entry::getNativeDisplayHandle();
-		init.platformData.type = entry::getNativeWindowHandleType(entry::kDefaultWindowHandle);
 		init.resolution.width  = m_width;
 		init.resolution.height = m_height;
 		init.resolution.reset  = m_reset;

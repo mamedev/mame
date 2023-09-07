@@ -37,13 +37,13 @@ Pass::Status StripDebugInfoPass::Process() {
   if (uses_non_semantic_info) {
     for (auto& inst : context()->module()->debugs1()) {
       switch (inst.opcode()) {
-        case spv::Op::OpString: {
+        case SpvOpString: {
           analysis::DefUseManager* def_use = context()->get_def_use_mgr();
 
           // see if this string is used anywhere by a non-semantic instruction
           bool no_nonsemantic_use =
               def_use->WhileEachUser(&inst, [def_use](Instruction* use) {
-                if (use->opcode() == spv::Op::OpExtInst) {
+                if (use->opcode() == SpvOpExtInst) {
                   auto ext_inst_set =
                       def_use->GetDef(use->GetSingleWordInOperand(0u));
                   const std::string extension_name =
@@ -83,8 +83,7 @@ Pass::Status StripDebugInfoPass::Process() {
   // when that instruction is killed, which will lead to a double kill.
   std::sort(to_kill.begin(), to_kill.end(),
             [](Instruction* lhs, Instruction* rhs) -> bool {
-              if (lhs->opcode() == spv::Op::OpName &&
-                  rhs->opcode() != spv::Op::OpName)
+              if (lhs->opcode() == SpvOpName && rhs->opcode() != SpvOpName)
                 return true;
               return false;
             });

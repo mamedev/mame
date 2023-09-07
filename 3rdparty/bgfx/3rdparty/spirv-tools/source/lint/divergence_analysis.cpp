@@ -19,6 +19,7 @@
 #include "source/opt/dataflow.h"
 #include "source/opt/function.h"
 #include "source/opt/instruction.h"
+#include "spirv/unified1/spirv.h"
 
 namespace spvtools {
 namespace lint {
@@ -31,7 +32,7 @@ void DivergenceAnalysis::EnqueueSuccessors(opt::Instruction* inst) {
   uint32_t block_id;
   if (inst->IsBlockTerminator()) {
     block_id = context().get_instr_block(inst)->id();
-  } else if (inst->opcode() == spv::Op::OpLabel) {
+  } else if (inst->opcode() == SpvOpLabel) {
     block_id = inst->result_id();
     opt::BasicBlock* bb = context().cfg()->block(block_id);
     // Only enqueue phi instructions, as other uses don't affect divergence.
@@ -53,7 +54,7 @@ void DivergenceAnalysis::EnqueueSuccessors(opt::Instruction* inst) {
 
 opt::DataFlowAnalysis::VisitResult DivergenceAnalysis::Visit(
     opt::Instruction* inst) {
-  if (inst->opcode() == spv::Op::OpLabel) {
+  if (inst->opcode() == SpvOpLabel) {
     return VisitBlock(inst->result_id());
   } else {
     return VisitInstruction(inst);
@@ -127,12 +128,12 @@ DivergenceAnalysis::ComputeInstructionDivergence(opt::Instruction* inst) {
   // Device/QueueFamily could satisfy fully uniform.
   uint32_t id = inst->result_id();
   // Handle divergence roots.
-  if (inst->opcode() == spv::Op::OpFunctionParameter) {
+  if (inst->opcode() == SpvOpFunctionParameter) {
     divergence_source_[id] = 0;
     return divergence_[id] = DivergenceLevel::kDivergent;
   } else if (inst->IsLoad()) {
     spvtools::opt::Instruction* var = inst->GetBaseAddress();
-    if (var->opcode() != spv::Op::OpVariable) {
+    if (var->opcode() != SpvOpVariable) {
       // Assume divergent.
       divergence_source_[id] = 0;
       return DivergenceLevel::kDivergent;
@@ -165,30 +166,29 @@ DivergenceAnalysis::ComputeVariableDivergence(opt::Instruction* var) {
   uint32_t def_id = var->result_id();
   DivergenceLevel ret;
   switch (type->storage_class()) {
-    case spv::StorageClass::Function:
-    case spv::StorageClass::Generic:
-    case spv::StorageClass::AtomicCounter:
-    case spv::StorageClass::StorageBuffer:
-    case spv::StorageClass::PhysicalStorageBuffer:
-    case spv::StorageClass::Output:
-    case spv::StorageClass::Workgroup:
-    case spv::StorageClass::Image:  // Image atomics probably aren't uniform.
-    case spv::StorageClass::Private:
+    case SpvStorageClassFunction:
+    case SpvStorageClassGeneric:
+    case SpvStorageClassAtomicCounter:
+    case SpvStorageClassStorageBuffer:
+    case SpvStorageClassPhysicalStorageBuffer:
+    case SpvStorageClassOutput:
+    case SpvStorageClassWorkgroup:
+    case SpvStorageClassImage:  // Image atomics probably aren't uniform.
+    case SpvStorageClassPrivate:
       ret = DivergenceLevel::kDivergent;
       break;
-    case spv::StorageClass::Input:
+    case SpvStorageClassInput:
       ret = DivergenceLevel::kDivergent;
       // If this variable has a Flat decoration, it is partially uniform.
       // TODO(kuhar): Track access chain indices and also consider Flat members
       // of a structure.
       context().get_decoration_mgr()->WhileEachDecoration(
-          def_id, static_cast<uint32_t>(spv::Decoration::Flat),
-          [&ret](const opt::Instruction&) {
+          def_id, SpvDecorationFlat, [&ret](const opt::Instruction&) {
             ret = DivergenceLevel::kPartiallyUniform;
             return false;
           });
       break;
-    case spv::StorageClass::UniformConstant:
+    case SpvStorageClassUniformConstant:
       // May be a storage image which is also written to; mark those as
       // divergent.
       if (!var->IsVulkanStorageImage() || var->IsReadOnlyPointer()) {
@@ -197,10 +197,9 @@ DivergenceAnalysis::ComputeVariableDivergence(opt::Instruction* var) {
         ret = DivergenceLevel::kDivergent;
       }
       break;
-    case spv::StorageClass::Uniform:
-    case spv::StorageClass::PushConstant:
-    case spv::StorageClass::CrossWorkgroup:  // Not for shaders; default
-                                             // uniform.
+    case SpvStorageClassUniform:
+    case SpvStorageClassPushConstant:
+    case SpvStorageClassCrossWorkgroup:  // Not for shaders; default uniform.
     default:
       ret = DivergenceLevel::kUniform;
       break;
@@ -217,7 +216,7 @@ void DivergenceAnalysis::Setup(opt::Function* function) {
       function->entry().get(), [this](const opt::BasicBlock* bb) {
         uint32_t id = bb->id();
         if (bb->terminator() == nullptr ||
-            bb->terminator()->opcode() != spv::Op::OpBranch) {
+            bb->terminator()->opcode() != SpvOpBranch) {
           follow_unconditional_branches_[id] = id;
         } else {
           uint32_t target_id = bb->terminator()->GetSingleWordInOperand(0);

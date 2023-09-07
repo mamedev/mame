@@ -26,7 +26,7 @@ Pass::Status FixStorageClass::Process() {
   bool modified = false;
 
   get_module()->ForEachInst([this, &modified](Instruction* inst) {
-    if (inst->opcode() == spv::Op::OpVariable) {
+    if (inst->opcode() == SpvOpVariable) {
       std::set<uint32_t> seen;
       std::vector<std::pair<Instruction*, uint32_t>> uses;
       get_def_use_mgr()->ForEachUse(inst,
@@ -37,7 +37,7 @@ Pass::Status FixStorageClass::Process() {
       for (auto& use : uses) {
         modified |= PropagateStorageClass(
             use.first,
-            static_cast<spv::StorageClass>(inst->GetSingleWordInOperand(0)),
+            static_cast<SpvStorageClass>(inst->GetSingleWordInOperand(0)),
             &seen);
         assert(seen.empty() && "Seen was not properly reset.");
         modified |=
@@ -50,14 +50,14 @@ Pass::Status FixStorageClass::Process() {
 }
 
 bool FixStorageClass::PropagateStorageClass(Instruction* inst,
-                                            spv::StorageClass storage_class,
+                                            SpvStorageClass storage_class,
                                             std::set<uint32_t>* seen) {
   if (!IsPointerResultType(inst)) {
     return false;
   }
 
   if (IsPointerToStorageClass(inst, storage_class)) {
-    if (inst->opcode() == spv::Op::OpPhi) {
+    if (inst->opcode() == SpvOpPhi) {
       if (!seen->insert(inst->result_id()).second) {
         return false;
       }
@@ -71,34 +71,34 @@ bool FixStorageClass::PropagateStorageClass(Instruction* inst,
       modified |= PropagateStorageClass(use, storage_class, seen);
     }
 
-    if (inst->opcode() == spv::Op::OpPhi) {
+    if (inst->opcode() == SpvOpPhi) {
       seen->erase(inst->result_id());
     }
     return modified;
   }
 
   switch (inst->opcode()) {
-    case spv::Op::OpAccessChain:
-    case spv::Op::OpPtrAccessChain:
-    case spv::Op::OpInBoundsAccessChain:
-    case spv::Op::OpCopyObject:
-    case spv::Op::OpPhi:
-    case spv::Op::OpSelect:
+    case SpvOpAccessChain:
+    case SpvOpPtrAccessChain:
+    case SpvOpInBoundsAccessChain:
+    case SpvOpCopyObject:
+    case SpvOpPhi:
+    case SpvOpSelect:
       FixInstructionStorageClass(inst, storage_class, seen);
       return true;
-    case spv::Op::OpFunctionCall:
+    case SpvOpFunctionCall:
       // We cannot be sure of the actual connection between the storage class
       // of the parameter and the storage class of the result, so we should not
       // do anything.  If the result type needs to be fixed, the function call
       // should be inlined.
       return false;
-    case spv::Op::OpImageTexelPointer:
-    case spv::Op::OpLoad:
-    case spv::Op::OpStore:
-    case spv::Op::OpCopyMemory:
-    case spv::Op::OpCopyMemorySized:
-    case spv::Op::OpVariable:
-    case spv::Op::OpBitcast:
+    case SpvOpImageTexelPointer:
+    case SpvOpLoad:
+    case SpvOpStore:
+    case SpvOpCopyMemory:
+    case SpvOpCopyMemorySized:
+    case SpvOpVariable:
+    case SpvOpBitcast:
       // Nothing to change for these opcode.  The result type is the same
       // regardless of the storage class of the operand.
       return false;
@@ -109,9 +109,9 @@ bool FixStorageClass::PropagateStorageClass(Instruction* inst,
   }
 }
 
-void FixStorageClass::FixInstructionStorageClass(
-    Instruction* inst, spv::StorageClass storage_class,
-    std::set<uint32_t>* seen) {
+void FixStorageClass::FixInstructionStorageClass(Instruction* inst,
+                                                 SpvStorageClass storage_class,
+                                                 std::set<uint32_t>* seen) {
   assert(IsPointerResultType(inst) &&
          "The result type of the instruction must be a pointer.");
 
@@ -126,10 +126,10 @@ void FixStorageClass::FixInstructionStorageClass(
 }
 
 void FixStorageClass::ChangeResultStorageClass(
-    Instruction* inst, spv::StorageClass storage_class) const {
+    Instruction* inst, SpvStorageClass storage_class) const {
   analysis::TypeManager* type_mgr = context()->get_type_mgr();
   Instruction* result_type_inst = get_def_use_mgr()->GetDef(inst->type_id());
-  assert(result_type_inst->opcode() == spv::Op::OpTypePointer);
+  assert(result_type_inst->opcode() == SpvOpTypePointer);
   uint32_t pointee_type_id = result_type_inst->GetSingleWordInOperand(1);
   uint32_t new_result_type_id =
       type_mgr->FindPointerToType(pointee_type_id, storage_class);
@@ -147,7 +147,7 @@ bool FixStorageClass::IsPointerResultType(Instruction* inst) {
 }
 
 bool FixStorageClass::IsPointerToStorageClass(Instruction* inst,
-                                              spv::StorageClass storage_class) {
+                                              SpvStorageClass storage_class) {
   analysis::TypeManager* type_mgr = context()->get_type_mgr();
   analysis::Type* pType = type_mgr->GetType(inst->type_id());
   const analysis::Pointer* result_type = pType->AsPointer();
@@ -180,39 +180,39 @@ bool FixStorageClass::PropagateType(Instruction* inst, uint32_t type_id,
   // particular type, then we want find that type.
   uint32_t new_type_id = 0;
   switch (inst->opcode()) {
-    case spv::Op::OpAccessChain:
-    case spv::Op::OpPtrAccessChain:
-    case spv::Op::OpInBoundsAccessChain:
-    case spv::Op::OpInBoundsPtrAccessChain:
+    case SpvOpAccessChain:
+    case SpvOpPtrAccessChain:
+    case SpvOpInBoundsAccessChain:
+    case SpvOpInBoundsPtrAccessChain:
       if (op_idx == 2) {
         new_type_id = WalkAccessChainType(inst, type_id);
       }
       break;
-    case spv::Op::OpCopyObject:
+    case SpvOpCopyObject:
       new_type_id = type_id;
       break;
-    case spv::Op::OpPhi:
+    case SpvOpPhi:
       if (seen->insert(inst->result_id()).second) {
         new_type_id = type_id;
       }
       break;
-    case spv::Op::OpSelect:
+    case SpvOpSelect:
       if (op_idx > 2) {
         new_type_id = type_id;
       }
       break;
-    case spv::Op::OpFunctionCall:
+    case SpvOpFunctionCall:
       // We cannot be sure of the actual connection between the type
       // of the parameter and the type of the result, so we should not
       // do anything.  If the result type needs to be fixed, the function call
       // should be inlined.
       return false;
-    case spv::Op::OpLoad: {
+    case SpvOpLoad: {
       Instruction* type_inst = get_def_use_mgr()->GetDef(type_id);
       new_type_id = type_inst->GetSingleWordInOperand(1);
       break;
     }
-    case spv::Op::OpStore: {
+    case SpvOpStore: {
       uint32_t obj_id = inst->GetSingleWordInOperand(1);
       Instruction* obj_inst = get_def_use_mgr()->GetDef(obj_id);
       uint32_t obj_type_id = obj_inst->type_id();
@@ -237,18 +237,18 @@ bool FixStorageClass::PropagateType(Instruction* inst, uint32_t type_id,
         context()->UpdateDefUse(inst);
       }
     } break;
-    case spv::Op::OpCopyMemory:
-    case spv::Op::OpCopyMemorySized:
+    case SpvOpCopyMemory:
+    case SpvOpCopyMemorySized:
       // TODO: May need to expand the copy as we do with the stores.
       break;
-    case spv::Op::OpCompositeConstruct:
-    case spv::Op::OpCompositeExtract:
-    case spv::Op::OpCompositeInsert:
+    case SpvOpCompositeConstruct:
+    case SpvOpCompositeExtract:
+    case SpvOpCompositeInsert:
       // TODO: DXC does not seem to generate code that will require changes to
       // these opcode.  The can be implemented when they come up.
       break;
-    case spv::Op::OpImageTexelPointer:
-    case spv::Op::OpBitcast:
+    case SpvOpImageTexelPointer:
+    case SpvOpBitcast:
       // Nothing to change for these opcode.  The result type is the same
       // regardless of the type of the operand.
       return false;
@@ -278,7 +278,7 @@ bool FixStorageClass::PropagateType(Instruction* inst, uint32_t type_id,
       PropagateType(use.first, new_type_id, use.second, seen);
     }
 
-    if (inst->opcode() == spv::Op::OpPhi) {
+    if (inst->opcode() == SpvOpPhi) {
       seen->erase(inst->result_id());
     }
   }
@@ -288,12 +288,12 @@ bool FixStorageClass::PropagateType(Instruction* inst, uint32_t type_id,
 uint32_t FixStorageClass::WalkAccessChainType(Instruction* inst, uint32_t id) {
   uint32_t start_idx = 0;
   switch (inst->opcode()) {
-    case spv::Op::OpAccessChain:
-    case spv::Op::OpInBoundsAccessChain:
+    case SpvOpAccessChain:
+    case SpvOpInBoundsAccessChain:
       start_idx = 1;
       break;
-    case spv::Op::OpPtrAccessChain:
-    case spv::Op::OpInBoundsPtrAccessChain:
+    case SpvOpPtrAccessChain:
+    case SpvOpInBoundsPtrAccessChain:
       start_idx = 2;
       break;
     default:
@@ -302,19 +302,19 @@ uint32_t FixStorageClass::WalkAccessChainType(Instruction* inst, uint32_t id) {
   }
 
   Instruction* orig_type_inst = get_def_use_mgr()->GetDef(id);
-  assert(orig_type_inst->opcode() == spv::Op::OpTypePointer);
+  assert(orig_type_inst->opcode() == SpvOpTypePointer);
   id = orig_type_inst->GetSingleWordInOperand(1);
 
   for (uint32_t i = start_idx; i < inst->NumInOperands(); ++i) {
     Instruction* type_inst = get_def_use_mgr()->GetDef(id);
     switch (type_inst->opcode()) {
-      case spv::Op::OpTypeArray:
-      case spv::Op::OpTypeRuntimeArray:
-      case spv::Op::OpTypeMatrix:
-      case spv::Op::OpTypeVector:
+      case SpvOpTypeArray:
+      case SpvOpTypeRuntimeArray:
+      case SpvOpTypeMatrix:
+      case SpvOpTypeVector:
         id = type_inst->GetSingleWordInOperand(0);
         break;
-      case spv::Op::OpTypeStruct: {
+      case SpvOpTypeStruct: {
         const analysis::Constant* index_const =
             context()->get_constant_mgr()->FindDeclaredConstant(
                 inst->GetSingleWordInOperand(i));
@@ -330,8 +330,8 @@ uint32_t FixStorageClass::WalkAccessChainType(Instruction* inst, uint32_t id) {
   }
 
   return context()->get_type_mgr()->FindPointerToType(
-      id, static_cast<spv::StorageClass>(
-              orig_type_inst->GetSingleWordInOperand(0)));
+      id,
+      static_cast<SpvStorageClass>(orig_type_inst->GetSingleWordInOperand(0)));
 }
 
 // namespace opt

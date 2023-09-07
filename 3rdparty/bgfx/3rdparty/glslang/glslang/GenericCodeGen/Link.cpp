@@ -82,7 +82,7 @@ void DeleteUniformMap(TUniformMap* map)
 
 TShHandleBase* ConstructBindings()
 {
-    return nullptr;
+    return 0;
 }
 
 void DeleteBindingList(TShHandleBase* bindingList)

@@ -26,7 +26,6 @@
 
 #include "spirv_cross_error_handling.hpp"
 #include <algorithm>
-#include <exception>
 #include <functional>
 #include <iterator>
 #include <limits>
@@ -227,7 +226,7 @@ public:
 	}
 
 	template <typename U, size_t M>
-	explicit SmallVector(const U (&init)[M]) SPIRV_CROSS_NOEXCEPT : SmallVector(init, init + M)
+	SmallVector(const U (&init)[M]) SPIRV_CROSS_NOEXCEPT : SmallVector(init, init + M)
 	{
 	}
 

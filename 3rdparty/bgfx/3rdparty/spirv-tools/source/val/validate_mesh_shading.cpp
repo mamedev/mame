@@ -23,13 +23,13 @@ namespace spvtools {
 namespace val {
 
 spv_result_t MeshShadingPass(ValidationState_t& _, const Instruction* inst) {
-  const spv::Op opcode = inst->opcode();
+  const SpvOp opcode = inst->opcode();
   switch (opcode) {
-    case spv::Op::OpEmitMeshTasksEXT: {
+    case SpvOpEmitMeshTasksEXT: {
       _.function(inst->function()->id())
           ->RegisterExecutionModelLimitation(
-              [](spv::ExecutionModel model, std::string* message) {
-                if (model != spv::ExecutionModel::TaskEXT) {
+              [](SpvExecutionModel model, std::string* message) {
+                if (model != SpvExecutionModelTaskEXT) {
                   if (message) {
                     *message =
                         "OpEmitMeshTasksEXT requires TaskEXT execution model";
@@ -62,12 +62,12 @@ spv_result_t MeshShadingPass(ValidationState_t& _, const Instruction* inst) {
 
       if (inst->operands().size() == 4) {
         const auto payload = _.FindDef(inst->GetOperandAs<uint32_t>(3));
-        if (payload->opcode() != spv::Op::OpVariable) {
+        if (payload->opcode() != SpvOpVariable) {
           return _.diag(SPV_ERROR_INVALID_DATA, inst)
                  << "Payload must be the result of a OpVariable";
         }
-        if (payload->GetOperandAs<spv::StorageClass>(2) !=
-            spv::StorageClass::TaskPayloadWorkgroupEXT) {
+        if (SpvStorageClass(payload->GetOperandAs<uint32_t>(2)) !=
+            SpvStorageClassTaskPayloadWorkgroupEXT) {
           return _.diag(SPV_ERROR_INVALID_DATA, inst)
                  << "Payload OpVariable must have a storage class of "
                     "TaskPayloadWorkgroupEXT";
@@ -76,11 +76,11 @@ spv_result_t MeshShadingPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpSetMeshOutputsEXT: {
+    case SpvOpSetMeshOutputsEXT: {
       _.function(inst->function()->id())
           ->RegisterExecutionModelLimitation(
-              [](spv::ExecutionModel model, std::string* message) {
-                if (model != spv::ExecutionModel::MeshEXT) {
+              [](SpvExecutionModel model, std::string* message) {
+                if (model != SpvExecutionModelMeshEXT) {
                   if (message) {
                     *message =
                         "OpSetMeshOutputsEXT requires MeshEXT execution model";
@@ -107,7 +107,7 @@ spv_result_t MeshShadingPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpWritePackedPrimitiveIndices4x8NV: {
+    case SpvOpWritePackedPrimitiveIndices4x8NV: {
       // No validation rules (for the moment).
       break;
     }

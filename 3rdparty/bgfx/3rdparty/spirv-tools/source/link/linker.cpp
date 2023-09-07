@@ -57,12 +57,12 @@ using opt::analysis::TypeManager;
 
 // Stores various information about an imported or exported symbol.
 struct LinkageSymbolInfo {
-  spv::Id id;        // ID of the symbol
-  spv::Id type_id;   // ID of the type of the symbol
+  SpvId id;          // ID of the symbol
+  SpvId type_id;     // ID of the type of the symbol
   std::string name;  // unique name defining the symbol and used for matching
                      // imports and exports together
-  std::vector<spv::Id> parameter_ids;  // ID of the parameters of the symbol, if
-                                       // it is a function
+  std::vector<SpvId> parameter_ids;  // ID of the parameters of the symbol, if
+                                     // it is a function
 };
 struct LinkageEntry {
   LinkageSymbolInfo imported_symbol;
@@ -226,7 +226,7 @@ spv_result_t GenerateHeader(const MessageConsumer& consumer,
              << " (input module " << (i + 1) << ").";
   }
 
-  header->magic_number = spv::MagicNumber;
+  header->magic_number = SpvMagicNumber;
   header->version = linked_version;
   header->generator = SPV_GENERATOR_WORD(SPV_GENERATOR_KHRONOS_LINKER, 0);
   header->bound = max_id_bound;
@@ -367,7 +367,7 @@ spv_result_t MergeModules(const MessageConsumer& consumer,
     std::vector<uint32_t> processed_words =
         spvtools::utils::MakeVector(processed_string);
     linked_module->AddDebug3Inst(std::unique_ptr<Instruction>(
-        new Instruction(linked_context, spv::Op::OpModuleProcessed, 0u, 0u,
+        new Instruction(linked_context, SpvOpModuleProcessed, 0u, 0u,
                         {{SPV_OPERAND_TYPE_LITERAL_STRING, processed_words}})));
   }
 
@@ -377,7 +377,7 @@ spv_result_t MergeModules(const MessageConsumer& consumer,
           std::unique_ptr<Instruction>(inst.Clone(linked_context)));
 
   // TODO(pierremoreau): Since the modules have not been validate, should we
-  //                     expect spv::StorageClass::Function variables outside
+  //                     expect SpvStorageClassFunction variables outside
   //                     functions?
   for (const auto& module : input_modules) {
     for (const auto& inst : module->types_values()) {
@@ -414,18 +414,16 @@ spv_result_t GetImportExportPairs(const MessageConsumer& consumer,
 
   // Figure out the imports and exports
   for (const auto& decoration : linked_context.annotations()) {
-    if (decoration.opcode() != spv::Op::OpDecorate ||
-        spv::Decoration(decoration.GetSingleWordInOperand(1u)) !=
-            spv::Decoration::LinkageAttributes)
+    if (decoration.opcode() != SpvOpDecorate ||
+        decoration.GetSingleWordInOperand(1u) != SpvDecorationLinkageAttributes)
       continue;
 
-    const spv::Id id = decoration.GetSingleWordInOperand(0u);
+    const SpvId id = decoration.GetSingleWordInOperand(0u);
     // Ignore if the targeted symbol is a built-in
     bool is_built_in = false;
     for (const auto& id_decoration :
          decoration_manager.GetDecorationsFor(id, false)) {
-      if (spv::Decoration(id_decoration->GetSingleWordInOperand(1u)) ==
-          spv::Decoration::BuiltIn) {
+      if (id_decoration->GetSingleWordInOperand(1u) == SpvDecorationBuiltIn) {
         is_built_in = true;
         break;
       }
@@ -449,9 +447,9 @@ spv_result_t GetImportExportPairs(const MessageConsumer& consumer,
       return DiagnosticStream(position, consumer, "", SPV_ERROR_INVALID_BINARY)
              << "ID " << id << " is never defined:\n";
 
-    if (def_inst->opcode() == spv::Op::OpVariable) {
+    if (def_inst->opcode() == SpvOpVariable) {
       symbol_info.type_id = def_inst->type_id();
-    } else if (def_inst->opcode() == spv::Op::OpFunction) {
+    } else if (def_inst->opcode() == SpvOpFunction) {
       symbol_info.type_id = def_inst->GetSingleWordInOperand(1u);
 
       // range-based for loop calls begin()/end(), but never cbegin()/cend(),
@@ -469,9 +467,9 @@ spv_result_t GetImportExportPairs(const MessageConsumer& consumer,
              << " LinkageAttributes; " << id << " is neither of them.\n";
     }
 
-    if (spv::LinkageType(type) == spv::LinkageType::Import)
+    if (type == SpvLinkageTypeImport)
       imports.push_back(symbol_info);
-    else if (spv::LinkageType(type) == spv::LinkageType::Export)
+    else if (type == SpvLinkageTypeExport)
       exports[symbol_info.name].push_back(symbol_info);
   }
 
@@ -587,7 +585,7 @@ spv_result_t RemoveLinkageSpecificInstructions(
   // TODO(pierremoreau): This will not work if the decoration is applied
   //                     through a group, but the linker does not support that
   //                     either.
-  std::unordered_set<spv::Id> imports;
+  std::unordered_set<SpvId> imports;
   if (options.GetAllowPartialLinkage()) {
     imports.reserve(linkings_to_do.size());
     for (const auto& linking_entry : linkings_to_do)
@@ -603,11 +601,9 @@ spv_result_t RemoveLinkageSpecificInstructions(
     // * if we do not allow partial linkage, remove all import annotations;
     // * otherwise, remove the annotation only if there was a corresponding
     //   export.
-    if (inst->opcode() == spv::Op::OpDecorate &&
-        spv::Decoration(inst->GetSingleWordOperand(1u)) ==
-            spv::Decoration::LinkageAttributes &&
-        spv::LinkageType(inst->GetSingleWordOperand(3u)) ==
-            spv::LinkageType::Import &&
+    if (inst->opcode() == SpvOpDecorate &&
+        inst->GetSingleWordOperand(1u) == SpvDecorationLinkageAttributes &&
+        inst->GetSingleWordOperand(3u) == SpvLinkageTypeImport &&
         (!options.GetAllowPartialLinkage() ||
          imports.find(inst->GetSingleWordOperand(0u)) != imports.end())) {
       linked_context->KillInst(&*inst);
@@ -620,11 +616,9 @@ spv_result_t RemoveLinkageSpecificInstructions(
     for (auto inst = next; inst != linked_context->annotation_end();
          inst = next) {
       ++next;
-      if (inst->opcode() == spv::Op::OpDecorate &&
-          spv::Decoration(inst->GetSingleWordOperand(1u)) ==
-              spv::Decoration::LinkageAttributes &&
-          spv::LinkageType(inst->GetSingleWordOperand(3u)) ==
-              spv::LinkageType::Export) {
+      if (inst->opcode() == SpvOpDecorate &&
+          inst->GetSingleWordOperand(1u) == SpvDecorationLinkageAttributes &&
+          inst->GetSingleWordOperand(3u) == SpvLinkageTypeExport) {
         linked_context->KillInst(&*inst);
       }
     }
@@ -634,11 +628,10 @@ spv_result_t RemoveLinkageSpecificInstructions(
   // not allowed
   if (!options.GetCreateLibrary() && !options.GetAllowPartialLinkage()) {
     for (auto& inst : linked_context->capabilities())
-      if (spv::Capability(inst.GetSingleWordInOperand(0u)) ==
-          spv::Capability::Linkage) {
+      if (inst.GetSingleWordInOperand(0u) == SpvCapabilityLinkage) {
         linked_context->KillInst(&inst);
         // The RemoveDuplicatesPass did remove duplicated capabilities, so we
-        // now there aren’t more spv::Capability::Linkage further down.
+        // now there aren’t more SpvCapabilityLinkage further down.
         break;
       }
   }
@@ -678,7 +671,7 @@ spv_result_t VerifyLimits(const MessageConsumer& consumer,
 
   size_t num_global_values = 0u;
   for (const auto& inst : linked_context.module()->types_values()) {
-    num_global_values += inst.opcode() == spv::Op::OpVariable;
+    num_global_values += inst.opcode() == SpvOpVariable;
   }
   if (num_global_values >= SPV_LIMIT_GLOBAL_VARIABLES_MAX)
     DiagnosticStream(position, consumer, "", SPV_WARNING)

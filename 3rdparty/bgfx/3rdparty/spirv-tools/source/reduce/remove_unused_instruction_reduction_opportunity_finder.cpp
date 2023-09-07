@@ -103,8 +103,8 @@ RemoveUnusedInstructionReductionOpportunityFinder::GetAvailableOpportunities(
           continue;
         }
         if (spvOpcodeIsBlockTerminator(inst.opcode()) ||
-            inst.opcode() == spv::Op::OpSelectionMerge ||
-            inst.opcode() == spv::Op::OpLoopMerge) {
+            inst.opcode() == SpvOpSelectionMerge ||
+            inst.opcode() == SpvOpLoopMerge) {
           // In this reduction pass we do not want to affect static
           // control flow.
           continue;
@@ -133,7 +133,7 @@ bool RemoveUnusedInstructionReductionOpportunityFinder::
       &inst, [this](opt::Instruction* user, uint32_t use_index) -> bool {
         return (user->IsDecoration() &&
                 !IsIndependentlyRemovableDecoration(*user)) ||
-               (user->opcode() == spv::Op::OpEntryPoint && use_index > 2);
+               (user->opcode() == SpvOpEntryPoint && use_index > 2);
       });
 }
 
@@ -141,13 +141,13 @@ bool RemoveUnusedInstructionReductionOpportunityFinder::
     IsIndependentlyRemovableDecoration(const opt::Instruction& inst) const {
   uint32_t decoration;
   switch (inst.opcode()) {
-    case spv::Op::OpDecorate:
-    case spv::Op::OpDecorateId:
-    case spv::Op::OpDecorateString:
+    case SpvOpDecorate:
+    case SpvOpDecorateId:
+    case SpvOpDecorateString:
       decoration = inst.GetSingleWordInOperand(1u);
       break;
-    case spv::Op::OpMemberDecorate:
-    case spv::Op::OpMemberDecorateString:
+    case SpvOpMemberDecorate:
+    case SpvOpMemberDecorateString:
       decoration = inst.GetSingleWordInOperand(2u);
       break;
     default:
@@ -160,12 +160,12 @@ bool RemoveUnusedInstructionReductionOpportunityFinder::
   // not change the shader interface, will not make the shader invalid, will
   // actually be found in practice, etc.
 
-  switch (spv::Decoration(decoration)) {
-    case spv::Decoration::RelaxedPrecision:
-    case spv::Decoration::NoSignedWrap:
-    case spv::Decoration::NoContraction:
-    case spv::Decoration::NoUnsignedWrap:
-    case spv::Decoration::UserSemantic:
+  switch (decoration) {
+    case SpvDecorationRelaxedPrecision:
+    case SpvDecorationNoSignedWrap:
+    case SpvDecorationNoContraction:
+    case SpvDecorationNoUnsignedWrap:
+    case SpvDecorationUserSemantic:
       return true;
     default:
       return false;

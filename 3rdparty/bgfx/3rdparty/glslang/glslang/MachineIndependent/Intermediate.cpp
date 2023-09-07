@@ -352,7 +352,7 @@ TIntermTyped* TIntermediate::addIndex(TOperator op, TIntermTyped* base, TIntermT
 TIntermTyped* TIntermediate::addUnaryMath(TOperator op, TIntermTyped* child,
     const TSourceLoc& loc)
 {
-    if (child == nullptr)
+    if (child == 0)
         return nullptr;
 
     if (child->getType().getBasicType() == EbtBlock)
@@ -388,6 +388,7 @@ TIntermTyped* TIntermediate::addUnaryMath(TOperator op, TIntermTyped* child,
     case EOpConstructFloat:  newType = EbtFloat;  break;
     case EOpConstructInt:    newType = EbtInt;    break;
     case EOpConstructUint:   newType = EbtUint;   break;
+#ifndef GLSLANG_WEB
     case EOpConstructInt8:   newType = EbtInt8;   break;
     case EOpConstructUint8:  newType = EbtUint8;  break;
     case EOpConstructInt16:  newType = EbtInt16;  break;
@@ -396,6 +397,7 @@ TIntermTyped* TIntermediate::addUnaryMath(TOperator op, TIntermTyped* child,
     case EOpConstructUint64: newType = EbtUint64; break;
     case EOpConstructDouble: newType = EbtDouble; break;
     case EOpConstructFloat16: newType = EbtFloat16; break;
+#endif
     default: break; // some compilers want this
     }
 
@@ -567,6 +569,7 @@ bool TIntermediate::isConversionAllowed(TOperator op, TIntermTyped* node) const
 bool TIntermediate::buildConvertOp(TBasicType dst, TBasicType src, TOperator& newOp) const
 {
     switch (dst) {
+#ifndef GLSLANG_WEB
     case EbtDouble:
         switch (src) {
         case EbtUint:    newOp = EOpConvUintToDouble;    break;
@@ -584,11 +587,13 @@ bool TIntermediate::buildConvertOp(TBasicType dst, TBasicType src, TOperator& ne
             return false;
         }
         break;
+#endif
     case EbtFloat:
         switch (src) {
         case EbtInt:     newOp = EOpConvIntToFloat;     break;
         case EbtUint:    newOp = EOpConvUintToFloat;    break;
         case EbtBool:    newOp = EOpConvBoolToFloat;    break;
+#ifndef GLSLANG_WEB
         case EbtDouble:  newOp = EOpConvDoubleToFloat;  break;
         case EbtInt8:    newOp = EOpConvInt8ToFloat;    break;
         case EbtUint8:   newOp = EOpConvUint8ToFloat;   break;
@@ -597,10 +602,12 @@ bool TIntermediate::buildConvertOp(TBasicType dst, TBasicType src, TOperator& ne
         case EbtFloat16: newOp = EOpConvFloat16ToFloat; break;
         case EbtInt64:   newOp = EOpConvInt64ToFloat;   break;
         case EbtUint64:  newOp = EOpConvUint64ToFloat;  break;
+#endif
         default:
             return false;
         }
         break;
+#ifndef GLSLANG_WEB
     case EbtFloat16:
         switch (src) {
         case EbtInt8:   newOp = EOpConvInt8ToFloat16;   break;
@@ -618,11 +625,13 @@ bool TIntermediate::buildConvertOp(TBasicType dst, TBasicType src, TOperator& ne
             return false;
         }
         break;
+#endif
     case EbtBool:
         switch (src) {
         case EbtInt:     newOp = EOpConvIntToBool;     break;
         case EbtUint:    newOp = EOpConvUintToBool;    break;
         case EbtFloat:   newOp = EOpConvFloatToBool;   break;
+#ifndef GLSLANG_WEB
         case EbtDouble:  newOp = EOpConvDoubleToBool;  break;
         case EbtInt8:    newOp = EOpConvInt8ToBool;    break;
         case EbtUint8:   newOp = EOpConvUint8ToBool;   break;
@@ -631,10 +640,12 @@ bool TIntermediate::buildConvertOp(TBasicType dst, TBasicType src, TOperator& ne
         case EbtFloat16: newOp = EOpConvFloat16ToBool; break;
         case EbtInt64:   newOp = EOpConvInt64ToBool;   break;
         case EbtUint64:  newOp = EOpConvUint64ToBool;  break;
+#endif
         default:
             return false;
         }
         break;
+#ifndef GLSLANG_WEB
     case EbtInt8:
         switch (src) {
         case EbtUint8:   newOp = EOpConvUint8ToInt8;   break;
@@ -704,12 +715,14 @@ bool TIntermediate::buildConvertOp(TBasicType dst, TBasicType src, TOperator& ne
             return false;
         }
         break;
+#endif
 
     case EbtInt:
         switch (src) {
         case EbtUint:    newOp = EOpConvUintToInt;    break;
         case EbtBool:    newOp = EOpConvBoolToInt;    break;
         case EbtFloat:   newOp = EOpConvFloatToInt;   break;
+#ifndef GLSLANG_WEB
         case EbtInt8:    newOp = EOpConvInt8ToInt;    break;
         case EbtUint8:   newOp = EOpConvUint8ToInt;   break;
         case EbtInt16:   newOp = EOpConvInt16ToInt;   break;
@@ -718,6 +731,7 @@ bool TIntermediate::buildConvertOp(TBasicType dst, TBasicType src, TOperator& ne
         case EbtFloat16: newOp = EOpConvFloat16ToInt; break;
         case EbtInt64:   newOp = EOpConvInt64ToInt;   break;
         case EbtUint64:  newOp = EOpConvUint64ToInt;  break;
+#endif
         default:
             return false;
         }
@@ -727,6 +741,7 @@ bool TIntermediate::buildConvertOp(TBasicType dst, TBasicType src, TOperator& ne
         case EbtInt:     newOp = EOpConvIntToUint;     break;
         case EbtBool:    newOp = EOpConvBoolToUint;    break;
         case EbtFloat:   newOp = EOpConvFloatToUint;   break;
+#ifndef GLSLANG_WEB
         case EbtInt8:    newOp = EOpConvInt8ToUint;    break;
         case EbtUint8:   newOp = EOpConvUint8ToUint;   break;
         case EbtInt16:   newOp = EOpConvInt16ToUint;   break;
@@ -735,15 +750,12 @@ bool TIntermediate::buildConvertOp(TBasicType dst, TBasicType src, TOperator& ne
         case EbtFloat16: newOp = EOpConvFloat16ToUint; break;
         case EbtInt64:   newOp = EOpConvInt64ToUint;   break;
         case EbtUint64:  newOp = EOpConvUint64ToUint;  break;
-        // For bindless texture type conversion, add a dummy convert op, just
-        // to generate a new TIntermTyped
-        // uvec2(any sampler type)
-        // uvec2(any image type)
-        case EbtSampler: newOp = EOpConvIntToUint;  break;
+#endif
         default:
             return false;
         }
         break;
+#ifndef GLSLANG_WEB
     case EbtInt64:
         switch (src) {
         case EbtInt8:    newOp = EOpConvInt8ToInt64;    break;
@@ -778,6 +790,7 @@ bool TIntermediate::buildConvertOp(TBasicType dst, TBasicType src, TOperator& ne
             return false;
         }
         break;
+#endif
     default:
         return false;
     }
@@ -793,6 +806,7 @@ TIntermTyped* TIntermediate::createConversion(TBasicType convertTo, TIntermTyped
     // Add a new newNode for the conversion.
     //
 
+#ifndef GLSLANG_WEB
     bool convertToIntTypes = (convertTo == EbtInt8  || convertTo == EbtUint8  ||
                               convertTo == EbtInt16 || convertTo == EbtUint16 ||
                               convertTo == EbtInt   || convertTo == EbtUint   ||
@@ -829,6 +843,7 @@ TIntermTyped* TIntermediate::createConversion(TBasicType convertTo, TIntermTyped
             return nullptr;
         }
     }
+#endif
 
     TIntermUnary* newNode = nullptr;
     TOperator newOp = EOpNull;
@@ -840,11 +855,13 @@ TIntermTyped* TIntermediate::createConversion(TBasicType convertTo, TIntermTyped
     newNode = addUnaryNode(newOp, node, node->getLoc(), newType);
 
     if (node->getAsConstantUnion()) {
+#ifndef GLSLANG_WEB
         // 8/16-bit storage extensions don't support 8/16-bit constants, so don't fold conversions
         // to those types
         if ((getArithemeticInt8Enabled() || !(convertTo == EbtInt8 || convertTo == EbtUint8)) &&
             (getArithemeticInt16Enabled() || !(convertTo == EbtInt16 || convertTo == EbtUint16)) &&
             (getArithemeticFloat16Enabled() || !(convertTo == EbtFloat16)))
+#endif
         {
             TIntermTyped* folded = node->getAsConstantUnion()->fold(newOp, newType);
             if (folded)
@@ -1027,12 +1044,6 @@ TIntermTyped* TIntermediate::addConversion(TOperator op, const TType& type, TInt
     if (type.isArray() || node->getType().isArray())
         return nullptr;
 
-    // Reject implicit conversions to cooperative matrix types
-    if (node->getType().isCoopMat() &&
-        op != EOpConstructCooperativeMatrixNV &&
-        op != EOpConstructCooperativeMatrixKHR)
-        return nullptr;
-
     // Note: callers are responsible for other aspects of shape,
     // like vector and matrix sizes.
 
@@ -1044,6 +1055,7 @@ TIntermTyped* TIntermediate::addConversion(TOperator op, const TType& type, TInt
     case EOpConstructFloat:
     case EOpConstructInt:
     case EOpConstructUint:
+#ifndef GLSLANG_WEB
     case EOpConstructDouble:
     case EOpConstructFloat16:
     case EOpConstructInt8:
@@ -1053,6 +1065,8 @@ TIntermTyped* TIntermediate::addConversion(TOperator op, const TType& type, TInt
     case EOpConstructInt64:
     case EOpConstructUint64:
         break;
+
+#endif
 
     //
     // Implicit conversions
@@ -1098,8 +1112,7 @@ TIntermTyped* TIntermediate::addConversion(TOperator op, const TType& type, TInt
 
     case EOpSequence:
     case EOpConstructStruct:
-    case EOpConstructCooperativeMatrixNV:
-    case EOpConstructCooperativeMatrixKHR:
+    case EOpConstructCooperativeMatrix:
 
         if (type.isReference() || node->getType().isReference()) {
             // types must match to assign a reference
@@ -1141,6 +1154,7 @@ TIntermTyped* TIntermediate::addConversion(TOperator op, const TType& type, TInt
     }
 
     bool canPromoteConstant = true;
+#ifndef GLSLANG_WEB
     // GL_EXT_shader_16bit_storage can't do OpConstantComposite with
     // 16-bit types, so disable promotion for those types.
     // Many issues with this, from JohnK:
@@ -1168,6 +1182,7 @@ TIntermTyped* TIntermediate::addConversion(TOperator op, const TType& type, TInt
     default:
         break;
     }
+#endif
 
     if (canPromoteConstant && node->getAsConstantUnion())
         return promoteConstantUnion(type.getBasicType(), node->getAsConstantUnion());
@@ -1464,6 +1479,10 @@ bool TIntermediate::isFPPromotion(TBasicType from, TBasicType to) const
 
 bool TIntermediate::isIntegralConversion(TBasicType from, TBasicType to) const
 {
+#ifdef GLSLANG_WEB
+    return false;
+#endif
+
     switch (from) {
     case EbtInt:
         switch(to) {
@@ -1544,6 +1563,10 @@ bool TIntermediate::isIntegralConversion(TBasicType from, TBasicType to) const
 
 bool TIntermediate::isFPConversion(TBasicType from, TBasicType to) const
 {
+#ifdef GLSLANG_WEB
+    return false;
+#endif
+
     if (to == EbtFloat && from == EbtFloat16) {
         return true;
     } else {
@@ -1564,6 +1587,7 @@ bool TIntermediate::isFPIntegralConversion(TBasicType from, TBasicType to) const
             break;
         }
         break;
+#ifndef GLSLANG_WEB
     case EbtInt8:
     case EbtUint8:
     case EbtInt16:
@@ -1583,6 +1607,7 @@ bool TIntermediate::isFPIntegralConversion(TBasicType from, TBasicType to) const
             return true;
         }
         break;
+#endif
     default:
         break;
     }
@@ -1784,6 +1809,10 @@ bool TIntermediate::canImplicitlyPromote(TBasicType from, TBasicType to, TOperat
 
 static bool canSignedIntTypeRepresentAllUnsignedValues(TBasicType sintType, TBasicType uintType)
 {
+#ifdef GLSLANG_WEB
+    return false;
+#endif
+
     switch(sintType) {
     case EbtInt8:
         switch(uintType) {
@@ -1844,6 +1873,11 @@ static bool canSignedIntTypeRepresentAllUnsignedValues(TBasicType sintType, TBas
 
 static TBasicType getCorrespondingUnsignedType(TBasicType type)
 {
+#ifdef GLSLANG_WEB
+    assert(type == EbtInt);
+    return EbtUint;
+#endif
+
     switch(type) {
     case EbtInt8:
         return EbtUint8;
@@ -1969,11 +2003,8 @@ TOperator TIntermediate::mapTypeToConstructorOp(const TType& type) const
     if (type.getQualifier().isNonUniform())
         return EOpConstructNonuniform;
 
-    if (type.isCoopMatNV())
-        return EOpConstructCooperativeMatrixNV;
-
-    if (type.isCoopMatKHR())
-        return EOpConstructCooperativeMatrixKHR;
+    if (type.isCoopMat())
+        return EOpConstructCooperativeMatrix;
 
     switch (type.getBasicType()) {
     case EbtStruct:
@@ -2136,6 +2167,7 @@ TOperator TIntermediate::mapTypeToConstructorOp(const TType& type) const
             }
         }
         break;
+#ifndef GLSLANG_WEB
     case EbtDouble:
         if (type.getMatrixCols()) {
             switch (type.getMatrixCols()) {
@@ -2274,6 +2306,7 @@ TOperator TIntermediate::mapTypeToConstructorOp(const TType& type) const
     case EbtAccStruct:
         op = EOpConstructAccStruct;
         break;
+#endif
     default:
         break;
     }
@@ -2754,6 +2787,7 @@ bool TIntermediate::postProcess(TIntermNode* root, EShLanguage /*language*/)
     if (aggRoot && aggRoot->getOp() == EOpNull)
         aggRoot->setOperator(EOpSequence);
 
+#ifndef GLSLANG_WEB
     // Propagate 'noContraction' label in backward from 'precise' variables.
     glslang::PropagateNoContraction(*this);
 
@@ -2767,6 +2801,7 @@ bool TIntermediate::postProcess(TIntermNode* root, EShLanguage /*language*/)
         assert(0);
         break;
     }
+#endif
 
     return true;
 }
@@ -3486,28 +3521,20 @@ bool TIntermediate::promoteBinary(TIntermBinary& node)
     }
 
     if (left->getType().isCoopMat() || right->getType().isCoopMat()) {
-        // Operations on two cooperative matrices must have identical types
         if (left->getType().isCoopMat() && right->getType().isCoopMat() &&
-            left->getType() != right->getType()) {
+            *left->getType().getTypeParameters() != *right->getType().getTypeParameters()) {
             return false;
         }
         switch (op) {
         case EOpMul:
         case EOpMulAssign:
-            // Mul not supported in NV_cooperative_matrix
-            if (left->getType().isCoopMatNV() && right->getType().isCoopMatNV()) {
+            if (left->getType().isCoopMat() && right->getType().isCoopMat()) {
                 return false;
             }
-            // NV_cooperative_matrix supports MulAssign is for mat*=scalar only.
-            // KHR_cooperative_matrix supports it for mat*=mat as well.
-            if (op == EOpMulAssign && right->getType().isCoopMatNV()) {
+            if (op == EOpMulAssign && right->getType().isCoopMat()) {
                 return false;
             }
-            // Use MatrixTimesScalar if either operand is not a matrix. Otherwise use Mul.
-            if (!left->getType().isCoopMat() || !right->getType().isCoopMat()) {
-                node.setOp(op == EOpMulAssign ? EOpMatrixTimesScalarAssign : EOpMatrixTimesScalar);
-            }
-            // In case of scalar*matrix, take the result type from the matrix.
+            node.setOp(op == EOpMulAssign ? EOpMatrixTimesScalarAssign : EOpMatrixTimesScalar);
             if (right->getType().isCoopMat()) {
                 node.setType(right->getType());
             }
@@ -3860,6 +3887,16 @@ TIntermTyped* TIntermediate::promoteConstantUnion(TBasicType promoteTo, TIntermC
 #define PROMOTE(Set, CType, Get) leftUnionArray[i].Set(static_cast<CType>(rightUnionArray[i].Get()))
 #define PROMOTE_TO_BOOL(Get) leftUnionArray[i].setBConst(rightUnionArray[i].Get() != 0)
 
+#ifdef GLSLANG_WEB
+#define TO_ALL(Get)   \
+        switch (promoteTo) { \
+        case EbtFloat: PROMOTE(setDConst, double, Get); break; \
+        case EbtInt: PROMOTE(setIConst, int, Get); break; \
+        case EbtUint: PROMOTE(setUConst, unsigned int, Get); break; \
+        case EbtBool: PROMOTE_TO_BOOL(Get); break; \
+        default: return node; \
+        }
+#else
 #define TO_ALL(Get)   \
         switch (promoteTo) { \
         case EbtFloat16: PROMOTE(setDConst, double, Get); break; \
@@ -3876,12 +3913,14 @@ TIntermTyped* TIntermediate::promoteConstantUnion(TBasicType promoteTo, TIntermC
         case EbtBool: PROMOTE_TO_BOOL(Get); break; \
         default: return node; \
         }
+#endif
 
         switch (node->getType().getBasicType()) {
         case EbtFloat: TO_ALL(getDConst); break;
         case EbtInt: TO_ALL(getIConst); break;
         case EbtUint: TO_ALL(getUConst); break;
         case EbtBool: TO_ALL(getBConst); break;
+#ifndef GLSLANG_WEB
         case EbtFloat16: TO_ALL(getDConst); break;
         case EbtDouble: TO_ALL(getDConst); break;
         case EbtInt8: TO_ALL(getI8Const); break;
@@ -3890,6 +3929,7 @@ TIntermTyped* TIntermediate::promoteConstantUnion(TBasicType promoteTo, TIntermC
         case EbtUint8: TO_ALL(getU8Const); break;
         case EbtUint16: TO_ALL(getU16Const); break;
         case EbtUint64: TO_ALL(getU64Const); break;
+#endif
         default: return node;
         }
     }

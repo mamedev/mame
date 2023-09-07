@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2023 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -872,19 +872,6 @@ namespace entry
 #		endif // ENTRY_CONFIG_USE_WAYLAND
 #	else
 		return NULL;
-#	endif // BX_PLATFORM_*
-	}
-
-	bgfx::NativeWindowHandleType::Enum getNativeWindowHandleType(WindowHandle _handle)
-	{
-#	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
-#		if ENTRY_CONFIG_USE_WAYLAND
-		return bgfx::NativeWindowHandleType::Wayland;
-#		else
-		return bgfx::NativeWindowHandleType::Default;
-#		endif // ENTRY_CONFIG_USE_WAYLAND
-#	else
-		return bgfx::NativeWindowHandleType::Default;
 #	endif // BX_PLATFORM_*
 	}
 

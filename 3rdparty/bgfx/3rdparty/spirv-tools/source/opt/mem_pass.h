@@ -80,7 +80,7 @@ class MemPass : public Pass {
   bool IsTargetType(const Instruction* typeInst) const;
 
   // Returns true if |opcode| is a non-ptr access chain op
-  bool IsNonPtrAccessChain(const spv::Op opcode) const;
+  bool IsNonPtrAccessChain(const SpvOp opcode) const;
 
   // Given the id |ptrId|, return true if the top-most non-CopyObj is
   // a variable, a non-ptr access chain or a parameter of pointer type.
@@ -117,8 +117,8 @@ class MemPass : public Pass {
   bool CFGCleanup(Function* func);
 
   // Return true if |op| is supported decorate.
-  inline bool IsNonTypeDecorate(spv::Op op) const {
-    return (op == spv::Op::OpDecorate || op == spv::Op::OpDecorateId);
+  inline bool IsNonTypeDecorate(uint32_t op) const {
+    return (op == SpvOpDecorate || op == SpvOpDecorateId);
   }
 
   // Return the id of an undef value with type |type_id|.  Create and insert an

@@ -36,14 +36,14 @@ void RemoveStructMemberReductionOpportunity::Apply() {
       struct_type_, [this, &decorations_to_kill](opt::Instruction* user,
                                                  uint32_t /*operand_index*/) {
         switch (user->opcode()) {
-          case spv::Op::OpCompositeConstruct:
-          case spv::Op::OpConstantComposite:
+          case SpvOpCompositeConstruct:
+          case SpvOpConstantComposite:
             // This use is constructing a composite of the struct type, so we
             // must remove the id that was provided for the member we are
             // removing.
             user->RemoveInOperand(member_index_);
             break;
-          case spv::Op::OpMemberDecorate:
+          case SpvOpMemberDecorate:
             // This use is decorating a member of the struct.
             if (user->GetSingleWordInOperand(1) == member_index_) {
               // The member we are removing is being decorated, so we record
@@ -78,8 +78,8 @@ void RemoveStructMemberReductionOpportunity::Apply() {
     for (auto& block : function) {
       for (auto& inst : block) {
         switch (inst.opcode()) {
-          case spv::Op::OpAccessChain:
-          case spv::Op::OpInBoundsAccessChain: {
+          case SpvOpAccessChain:
+          case SpvOpInBoundsAccessChain: {
             // These access chain instructions take sequences of ids for
             // indexing, starting from input operand 1.
             auto composite_type_id =
@@ -90,8 +90,8 @@ void RemoveStructMemberReductionOpportunity::Apply() {
                     ->GetSingleWordInOperand(1);
             AdjustAccessedIndices(composite_type_id, 1, false, context, &inst);
           } break;
-          case spv::Op::OpPtrAccessChain:
-          case spv::Op::OpInBoundsPtrAccessChain: {
+          case SpvOpPtrAccessChain:
+          case SpvOpInBoundsPtrAccessChain: {
             // These access chain instructions take sequences of ids for
             // indexing, starting from input operand 2.
             auto composite_type_id =
@@ -102,7 +102,7 @@ void RemoveStructMemberReductionOpportunity::Apply() {
                     ->GetSingleWordInOperand(1);
             AdjustAccessedIndices(composite_type_id, 2, false, context, &inst);
           } break;
-          case spv::Op::OpCompositeExtract: {
+          case SpvOpCompositeExtract: {
             // OpCompositeExtract uses literals for indexing, starting at input
             // operand 1.
             auto composite_type_id =
@@ -111,7 +111,7 @@ void RemoveStructMemberReductionOpportunity::Apply() {
                     ->type_id();
             AdjustAccessedIndices(composite_type_id, 1, true, context, &inst);
           } break;
-          case spv::Op::OpCompositeInsert: {
+          case SpvOpCompositeInsert: {
             // OpCompositeInsert uses literals for indexing, starting at input
             // operand 2.
             auto composite_type_id =
@@ -146,13 +146,13 @@ void RemoveStructMemberReductionOpportunity::AdjustAccessedIndices(
        i < composite_access_instruction->NumInOperands(); i++) {
     auto type_inst = context->get_def_use_mgr()->GetDef(next_type);
     switch (type_inst->opcode()) {
-      case spv::Op::OpTypeArray:
-      case spv::Op::OpTypeMatrix:
-      case spv::Op::OpTypeRuntimeArray:
-      case spv::Op::OpTypeVector:
+      case SpvOpTypeArray:
+      case SpvOpTypeMatrix:
+      case SpvOpTypeRuntimeArray:
+      case SpvOpTypeVector:
         next_type = type_inst->GetSingleWordInOperand(0);
         break;
-      case spv::Op::OpTypeStruct: {
+      case SpvOpTypeStruct: {
         // Struct types are special because (a) we may need to adjust the index
         // being used, if the struct type is the one from which we are removing
         // a member, and (b) the type encountered by following the current index

@@ -15,7 +15,6 @@
 #ifndef SOURCE_EXTENSIONS_H_
 #define SOURCE_EXTENSIONS_H_
 
-#include <cstdint>
 #include <string>
 
 #include "source/enum_set.h"
@@ -24,7 +23,7 @@
 namespace spvtools {
 
 // The known SPIR-V extensions.
-enum Extension : uint32_t {
+enum Extension {
 #include "extension_enum.inc"
 };
 

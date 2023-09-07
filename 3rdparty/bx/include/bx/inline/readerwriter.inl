@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2023 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -67,7 +67,7 @@ namespace bx
 
 	inline MemoryBlock::~MemoryBlock()
 	{
-		bx::free(m_allocator, m_data);
+		BX_FREE(m_allocator, m_data);
 	}
 
 	inline void* MemoryBlock::more(uint32_t _size)
@@ -75,7 +75,7 @@ namespace bx
 		if (0 < _size)
 		{
 			m_size += _size;
-			m_data = bx::realloc(m_allocator, m_data, m_size);
+			m_data = BX_REALLOC(m_allocator, m_data, m_size);
 		}
 
 		return m_data;
@@ -297,6 +297,16 @@ namespace bx
 		return _writer->write(_data, _size, _err);
 	}
 
+	inline int32_t write(WriterI* _writer, const char* _str, Error* _err)
+	{
+		return write(_writer, _str, strLen(_str), _err);
+	}
+
+	inline int32_t write(WriterI* _writer, const StringView& _str, Error* _err)
+	{
+		return write(_writer, _str.getPtr(), _str.getLength(), _err);
+	}
+
 	inline int32_t writeRep(WriterI* _writer, uint8_t _byte, int32_t _size, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
@@ -324,23 +334,6 @@ namespace bx
 		BX_ERROR_SCOPE(_err);
 		BX_STATIC_ASSERT(isTriviallyCopyable<Ty>() );
 		return _writer->write(&_value, sizeof(Ty), _err);
-	}
-
-	template<>
-	inline int32_t write(WriterI* _writer, const StringView& _str, Error* _err)
-	{
-		return write(_writer, _str.getPtr(), _str.getLength(), _err);
-	}
-
-	template<>
-	inline int32_t write(WriterI* _writer, const StringLiteral& _str, Error* _err)
-	{
-		return write<StringView>(_writer, _str, _err);
-	}
-
-	inline int32_t write(WriterI* _writer, const char* _str, Error* _err)
-	{
-		return write<StringView>(_writer, _str, _err);
 	}
 
 	template<typename Ty>

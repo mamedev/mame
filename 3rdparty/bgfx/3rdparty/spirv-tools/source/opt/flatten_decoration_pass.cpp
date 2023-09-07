@@ -49,16 +49,16 @@ Pass::Status FlattenDecorationPass::Process() {
   // Rely on unordered_map::operator[] to create its entries on first access.
   for (const auto& inst : annotations) {
     switch (inst.opcode()) {
-      case spv::Op::OpDecorationGroup:
+      case SpvOp::SpvOpDecorationGroup:
         group_ids.insert(inst.result_id());
         break;
-      case spv::Op::OpGroupDecorate: {
+      case SpvOp::SpvOpGroupDecorate: {
         Words& words = normal_uses[inst.GetSingleWordInOperand(0)];
         for (uint32_t i = 1; i < inst.NumInOperandWords(); i++) {
           words.push_back(inst.GetSingleWordInOperand(i));
         }
       } break;
-      case spv::Op::OpGroupMemberDecorate: {
+      case SpvOp::SpvOpGroupMemberDecorate: {
         Words& words = member_uses[inst.GetSingleWordInOperand(0)];
         for (uint32_t i = 1; i < inst.NumInOperandWords(); i++) {
           words.push_back(inst.GetSingleWordInOperand(i));
@@ -77,12 +77,12 @@ Pass::Status FlattenDecorationPass::Process() {
     // Should we replace this instruction?
     bool replace = false;
     switch (inst_iter->opcode()) {
-      case spv::Op::OpDecorationGroup:
-      case spv::Op::OpGroupDecorate:
-      case spv::Op::OpGroupMemberDecorate:
+      case SpvOp::SpvOpDecorationGroup:
+      case SpvOp::SpvOpGroupDecorate:
+      case SpvOp::SpvOpGroupMemberDecorate:
         replace = true;
         break;
-      case spv::Op::OpDecorate: {
+      case SpvOp::SpvOpDecorate: {
         // If this decoration targets a group, then replace it
         // by sets of normal and member decorations.
         const uint32_t group = inst_iter->GetSingleWordOperand(0);
@@ -115,7 +115,7 @@ Pass::Status FlattenDecorationPass::Process() {
             operands.insert(operands.end(), decoration_operands_iter,
                             inst_iter->end());
             std::unique_ptr<Instruction> new_inst(new Instruction(
-                context(), spv::Op::OpMemberDecorate, 0, 0, operands));
+                context(), SpvOp::SpvOpMemberDecorate, 0, 0, operands));
             inst_iter = inst_iter.InsertBefore(std::move(new_inst));
             ++inst_iter;
             replace = true;
@@ -146,7 +146,7 @@ Pass::Status FlattenDecorationPass::Process() {
   if (!group_ids.empty()) {
     for (auto debug_inst_iter = context()->debug2_begin();
          debug_inst_iter != context()->debug2_end();) {
-      if (debug_inst_iter->opcode() == spv::Op::OpName) {
+      if (debug_inst_iter->opcode() == SpvOp::SpvOpName) {
         const uint32_t target = debug_inst_iter->GetSingleWordOperand(0);
         if (group_ids.count(target)) {
           debug_inst_iter = debug_inst_iter.Erase();

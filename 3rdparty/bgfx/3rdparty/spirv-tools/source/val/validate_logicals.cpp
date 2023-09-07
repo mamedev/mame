@@ -14,9 +14,11 @@
 
 // Validates correctness of logical SPIR-V instructions.
 
+#include "source/val/validate.h"
+
+#include "source/diagnostic.h"
 #include "source/opcode.h"
 #include "source/val/instruction.h"
-#include "source/val/validate.h"
 #include "source/val/validation_state.h"
 
 namespace spvtools {
@@ -24,12 +26,12 @@ namespace val {
 
 // Validates correctness of logical instructions.
 spv_result_t LogicalsPass(ValidationState_t& _, const Instruction* inst) {
-  const spv::Op opcode = inst->opcode();
+  const SpvOp opcode = inst->opcode();
   const uint32_t result_type = inst->type_id();
 
   switch (opcode) {
-    case spv::Op::OpAny:
-    case spv::Op::OpAll: {
+    case SpvOpAny:
+    case SpvOpAll: {
       if (!_.IsBoolScalarType(result_type))
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected bool scalar type as Result Type: "
@@ -44,11 +46,11 @@ spv_result_t LogicalsPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpIsNan:
-    case spv::Op::OpIsInf:
-    case spv::Op::OpIsFinite:
-    case spv::Op::OpIsNormal:
-    case spv::Op::OpSignBitSet: {
+    case SpvOpIsNan:
+    case SpvOpIsInf:
+    case SpvOpIsFinite:
+    case SpvOpIsNormal:
+    case SpvOpSignBitSet: {
       if (!_.IsBoolScalarType(result_type) && !_.IsBoolVectorType(result_type))
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected bool scalar or vector type as Result Type: "
@@ -70,21 +72,21 @@ spv_result_t LogicalsPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpFOrdEqual:
-    case spv::Op::OpFUnordEqual:
-    case spv::Op::OpFOrdNotEqual:
-    case spv::Op::OpFUnordNotEqual:
-    case spv::Op::OpFOrdLessThan:
-    case spv::Op::OpFUnordLessThan:
-    case spv::Op::OpFOrdGreaterThan:
-    case spv::Op::OpFUnordGreaterThan:
-    case spv::Op::OpFOrdLessThanEqual:
-    case spv::Op::OpFUnordLessThanEqual:
-    case spv::Op::OpFOrdGreaterThanEqual:
-    case spv::Op::OpFUnordGreaterThanEqual:
-    case spv::Op::OpLessOrGreater:
-    case spv::Op::OpOrdered:
-    case spv::Op::OpUnordered: {
+    case SpvOpFOrdEqual:
+    case SpvOpFUnordEqual:
+    case SpvOpFOrdNotEqual:
+    case SpvOpFUnordNotEqual:
+    case SpvOpFOrdLessThan:
+    case SpvOpFUnordLessThan:
+    case SpvOpFOrdGreaterThan:
+    case SpvOpFUnordGreaterThan:
+    case SpvOpFOrdLessThanEqual:
+    case SpvOpFUnordLessThanEqual:
+    case SpvOpFOrdGreaterThanEqual:
+    case SpvOpFUnordGreaterThanEqual:
+    case SpvOpLessOrGreater:
+    case SpvOpOrdered:
+    case SpvOpUnordered: {
       if (!_.IsBoolScalarType(result_type) && !_.IsBoolVectorType(result_type))
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected bool scalar or vector type as Result Type: "
@@ -111,10 +113,10 @@ spv_result_t LogicalsPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpLogicalEqual:
-    case spv::Op::OpLogicalNotEqual:
-    case spv::Op::OpLogicalOr:
-    case spv::Op::OpLogicalAnd: {
+    case SpvOpLogicalEqual:
+    case SpvOpLogicalNotEqual:
+    case SpvOpLogicalOr:
+    case SpvOpLogicalAnd: {
       if (!_.IsBoolScalarType(result_type) && !_.IsBoolVectorType(result_type))
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected bool scalar or vector type as Result Type: "
@@ -129,7 +131,7 @@ spv_result_t LogicalsPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpLogicalNot: {
+    case SpvOpLogicalNot: {
       if (!_.IsBoolScalarType(result_type) && !_.IsBoolVectorType(result_type))
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected bool scalar or vector type as Result Type: "
@@ -143,7 +145,7 @@ spv_result_t LogicalsPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpSelect: {
+    case SpvOpSelect: {
       uint32_t dimension = 1;
       {
         const Instruction* type_inst = _.FindDef(result_type);
@@ -157,10 +159,10 @@ spv_result_t LogicalsPass(ValidationState_t& _, const Instruction* inst) {
                  << " type as Result Type: " << spvOpcodeString(opcode);
         };
 
-        const spv::Op type_opcode = type_inst->opcode();
+        const SpvOp type_opcode = type_inst->opcode();
         switch (type_opcode) {
-          case spv::Op::OpTypePointer: {
-            if (_.addressing_model() == spv::AddressingModel::Logical &&
+          case SpvOpTypePointer: {
+            if (_.addressing_model() == SpvAddressingModelLogical &&
                 !_.features().variable_pointers)
               return _.diag(SPV_ERROR_INVALID_DATA, inst)
                      << "Using pointers with OpSelect requires capability "
@@ -168,31 +170,31 @@ spv_result_t LogicalsPass(ValidationState_t& _, const Instruction* inst) {
             break;
           }
 
-          case spv::Op::OpTypeSampledImage:
-          case spv::Op::OpTypeImage:
-          case spv::Op::OpTypeSampler: {
-            if (!_.HasCapability(spv::Capability::BindlessTextureNV))
+          case SpvOpTypeSampledImage:
+          case SpvOpTypeImage:
+          case SpvOpTypeSampler: {
+            if (!_.HasCapability(SpvCapabilityBindlessTextureNV))
               return _.diag(SPV_ERROR_INVALID_DATA, inst)
                      << "Using image/sampler with OpSelect requires capability "
                      << "BindlessTextureNV";
             break;
           }
 
-          case spv::Op::OpTypeVector: {
+          case SpvOpTypeVector: {
             dimension = type_inst->word(3);
             break;
           }
 
-          case spv::Op::OpTypeBool:
-          case spv::Op::OpTypeInt:
-          case spv::Op::OpTypeFloat: {
+          case SpvOpTypeBool:
+          case SpvOpTypeInt:
+          case SpvOpTypeFloat: {
             break;
           }
 
           // Not RuntimeArray because of other rules.
-          case spv::Op::OpTypeArray:
-          case spv::Op::OpTypeMatrix:
-          case spv::Op::OpTypeStruct: {
+          case SpvOpTypeArray:
+          case SpvOpTypeMatrix:
+          case SpvOpTypeStruct: {
             if (!composites) return fail();
             break;
           }
@@ -233,16 +235,16 @@ spv_result_t LogicalsPass(ValidationState_t& _, const Instruction* inst) {
       }
     }
 
-    case spv::Op::OpIEqual:
-    case spv::Op::OpINotEqual:
-    case spv::Op::OpUGreaterThan:
-    case spv::Op::OpUGreaterThanEqual:
-    case spv::Op::OpULessThan:
-    case spv::Op::OpULessThanEqual:
-    case spv::Op::OpSGreaterThan:
-    case spv::Op::OpSGreaterThanEqual:
-    case spv::Op::OpSLessThan:
-    case spv::Op::OpSLessThanEqual: {
+    case SpvOpIEqual:
+    case SpvOpINotEqual:
+    case SpvOpUGreaterThan:
+    case SpvOpUGreaterThanEqual:
+    case SpvOpULessThan:
+    case SpvOpULessThanEqual:
+    case SpvOpSGreaterThan:
+    case SpvOpSGreaterThanEqual:
+    case SpvOpSLessThan:
+    case SpvOpSLessThanEqual: {
       if (!_.IsBoolScalarType(result_type) && !_.IsBoolVectorType(result_type))
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected bool scalar or vector type as Result Type: "

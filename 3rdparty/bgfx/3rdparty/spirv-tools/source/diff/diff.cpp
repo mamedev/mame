@@ -44,8 +44,8 @@ using IdGroup = std::vector<uint32_t>;
 // different implementations produce identical results.
 using IdGroupMapByName = std::map<std::string, IdGroup>;
 using IdGroupMapByTypeId = std::map<uint32_t, IdGroup>;
-using IdGroupMapByOp = std::map<spv::Op, IdGroup>;
-using IdGroupMapByStorageClass = std::map<spv::StorageClass, IdGroup>;
+using IdGroupMapByOp = std::map<SpvOp, IdGroup>;
+using IdGroupMapByStorageClass = std::map<SpvStorageClass, IdGroup>;
 
 // A set of potential id mappings that haven't been resolved yet.  Any id in src
 // may map in any id in dst.  Note that ids are added in the same order as they
@@ -101,12 +101,9 @@ class IdMap {
     return from < id_map_.size() && id_map_[from] != 0;
   }
 
-  bool IsMapped(const opt::Instruction* from_inst) const {
-    assert(from_inst != nullptr);
-    assert(!from_inst->HasResultId());
-
-    return inst_map_.find(from_inst) != inst_map_.end();
-  }
+  // Map any ids in src and dst that have not been mapped to new ids in dst and
+  // src respectively.
+  void MapUnmatchedIds(IdMap& other_way);
 
   // Some instructions don't have result ids.  Those are mapped by pointer.
   void MapInsts(const opt::Instruction* from_inst,
@@ -119,12 +116,6 @@ class IdMap {
   }
 
   uint32_t IdBound() const { return static_cast<uint32_t>(id_map_.size()); }
-
-  // Generate a fresh id in this mapping's domain.
-  uint32_t MakeFreshId() {
-    id_map_.push_back(0);
-    return static_cast<uint32_t>(id_map_.size()) - 1;
-  }
 
  private:
   // Given an id, returns the corresponding id in the other module, or 0 if not
@@ -159,16 +150,10 @@ class SrcDstIdMap {
 
   bool IsSrcMapped(uint32_t src) { return src_to_dst_.IsMapped(src); }
   bool IsDstMapped(uint32_t dst) { return dst_to_src_.IsMapped(dst); }
-  bool IsDstMapped(const opt::Instruction* dst_inst) {
-    return dst_to_src_.IsMapped(dst_inst);
-  }
 
   // Map any ids in src and dst that have not been mapped to new ids in dst and
-  // src respectively. Use src_insn_defined and dst_insn_defined to ignore ids
-  // that are simply never defined. (Since we assume the inputs are valid
-  // SPIR-V, this implies they are also never used.)
-  void MapUnmatchedIds(std::function<bool(uint32_t)> src_insn_defined,
-                       std::function<bool(uint32_t)> dst_insn_defined);
+  // src respectively.
+  void MapUnmatchedIds();
 
   // Some instructions don't have result ids.  Those are mapped by pointer.
   void MapInsts(const opt::Instruction* src_inst,
@@ -217,11 +202,6 @@ struct IdInstructions {
   }
 
   void MapIdToInstruction(uint32_t id, const opt::Instruction* inst);
-
-  // Return true if id is mapped to any instruction, false otherwise.
-  bool IsDefined(uint32_t id) {
-    return id < inst_map_.size() && inst_map_[id] != nullptr;
-  }
 
   void MapIdsToInstruction(
       opt::IteratorRange<opt::Module::const_inst_iterator> section);
@@ -321,10 +301,10 @@ class Differ {
   // Get various properties from an id.  These Helper functions are passed to
   // `GroupIds` and `GroupIdsAndMatch` below (as the `get_group` argument).
   uint32_t GroupIdsHelperGetTypeId(const IdInstructions& id_to, uint32_t id);
-  spv::StorageClass GroupIdsHelperGetTypePointerStorageClass(
+  SpvStorageClass GroupIdsHelperGetTypePointerStorageClass(
       const IdInstructions& id_to, uint32_t id);
-  spv::Op GroupIdsHelperGetTypePointerTypeOp(const IdInstructions& id_to,
-                                             uint32_t id);
+  SpvOp GroupIdsHelperGetTypePointerTypeOp(const IdInstructions& id_to,
+                                           uint32_t id);
 
   // Given a list of ids, groups them based on some value.  The `get_group`
   // function extracts a piece of information corresponding to each id, and the
@@ -355,59 +335,6 @@ class Differ {
   void GroupIdsAndMatch(
       const IdGroup& src_ids, const IdGroup& dst_ids, T invalid_group_key,
       T (Differ::*get_group)(const IdInstructions&, uint32_t),
-      std::function<void(const IdGroup& src_group, const IdGroup& dst_group)>
-          match_group);
-
-  // Bucket `src_ids` and `dst_ids` by the key ids returned by `get_group`, and
-  // then call `match_group` on pairs of buckets whose key ids are matched with
-  // each other.
-  //
-  // For example, suppose we want to pair up groups of instructions with the
-  // same type. Naturally, the source instructions refer to their types by their
-  // ids in the source, and the destination instructions use destination type
-  // ids, so simply comparing source and destination type ids as integers, as
-  // `GroupIdsAndMatch` would do, is meaningless. But if a prior call to
-  // `MatchTypeIds` has established type matches between the two modules, then
-  // we can consult those to pair source and destination buckets whose types are
-  // equivalent.
-  //
-  // Suppose our input groups are as follows:
-  //
-  // - src_ids: { 1 -> 100, 2 -> 300, 3 -> 100, 4 -> 200 }
-  // - dst_ids: { 5 -> 10, 6 -> 20, 7 -> 10, 8 -> 300 }
-  //
-  // Here, `X -> Y` means that the instruction with SPIR-V id `X` is a member of
-  // the group, and `Y` is the id of its type. If we use
-  // `Differ::GroupIdsHelperGetTypeId` for `get_group`, then
-  // `get_group(X) == Y`.
-  //
-  // These instructions are bucketed by type as follows:
-  //
-  // - source:      [1, 3] -> 100
-  //                [4] -> 200
-  //                [2] -> 300
-  //
-  // - destination: [5, 7] -> 10
-  //                [6] -> 20
-  //                [8] -> 300
-  //
-  // Now suppose that we have previously matched up src type 100 with dst type
-  // 10, and src type 200 with dst type 20, but no other types are matched.
-  //
-  // Then `match_group` is called twice:
-  // - Once with ([1,3], [5, 7]), corresponding to 100/10
-  // - Once with ([4],[6]), corresponding to 200/20
-  //
-  // The source type 300 isn't matched with anything, so the fact that there's a
-  // destination type 300 is irrelevant, and thus 2 and 8 are never passed to
-  // `match_group`.
-  //
-  // This function isn't specific to types; it simply buckets by the ids
-  // returned from `get_group`, and consults existing matches to pair up the
-  // resulting buckets.
-  void GroupIdsAndMatchByMappedId(
-      const IdGroup& src_ids, const IdGroup& dst_ids,
-      uint32_t (Differ::*get_group)(const IdInstructions&, uint32_t),
       std::function<void(const IdGroup& src_group, const IdGroup& dst_group)>
           match_group);
 
@@ -487,8 +414,8 @@ class Differ {
   // Helper functions to retrieve information pertaining to an id
   const opt::Instruction* GetInst(const IdInstructions& id_to, uint32_t id);
   uint32_t GetConstantUint(const IdInstructions& id_to, uint32_t constant_id);
-  spv::ExecutionModel GetExecutionModel(const opt::Module* module,
-                                        uint32_t entry_point_id);
+  SpvExecutionModel GetExecutionModel(const opt::Module* module,
+                                      uint32_t entry_point_id);
   bool HasName(const IdInstructions& id_to, uint32_t id);
   // Get the OpName associated with an id
   std::string GetName(const IdInstructions& id_to, uint32_t id, bool* has_name);
@@ -497,21 +424,20 @@ class Differ {
   // string, and this improves diff between SPIR-V from those tools and others.
   std::string GetSanitizedName(const IdInstructions& id_to, uint32_t id);
   uint32_t GetVarTypeId(const IdInstructions& id_to, uint32_t var_id,
-                        spv::StorageClass* storage_class);
+                        SpvStorageClass* storage_class);
   bool GetDecorationValue(const IdInstructions& id_to, uint32_t id,
-                          spv::Decoration decoration,
-                          uint32_t* decoration_value);
+                          SpvDecoration decoration, uint32_t* decoration_value);
   const opt::Instruction* GetForwardPointerInst(const IdInstructions& id_to,
                                                 uint32_t id);
   bool IsIntType(const IdInstructions& id_to, uint32_t type_id);
   bool IsFloatType(const IdInstructions& id_to, uint32_t type_id);
   bool IsConstantUint(const IdInstructions& id_to, uint32_t id);
   bool IsVariable(const IdInstructions& id_to, uint32_t pointer_id);
-  bool IsOp(const IdInstructions& id_to, uint32_t id, spv::Op opcode);
+  bool IsOp(const IdInstructions& id_to, uint32_t id, SpvOp opcode);
   bool IsPerVertexType(const IdInstructions& id_to, uint32_t type_id);
   bool IsPerVertexVariable(const IdInstructions& id_to, uint32_t type_id);
-  spv::StorageClass GetPerVertexStorageClass(const opt::Module* module,
-                                             uint32_t type_id);
+  SpvStorageClass GetPerVertexStorageClass(const opt::Module* module,
+                                           uint32_t type_id);
   spv_ext_inst_type_t GetExtInstType(const IdInstructions& id_to,
                                      uint32_t set_id);
   spv_number_kind_t GetNumberKind(const IdInstructions& id_to,
@@ -577,25 +503,34 @@ class Differ {
   FunctionMap dst_funcs_;
 };
 
-void SrcDstIdMap::MapUnmatchedIds(
-    std::function<bool(uint32_t)> src_insn_defined,
-    std::function<bool(uint32_t)> dst_insn_defined) {
-  const uint32_t src_id_bound = static_cast<uint32_t>(src_to_dst_.IdBound());
-  const uint32_t dst_id_bound = static_cast<uint32_t>(dst_to_src_.IdBound());
+void IdMap::MapUnmatchedIds(IdMap& other_way) {
+  const uint32_t src_id_bound = static_cast<uint32_t>(id_map_.size());
+  const uint32_t dst_id_bound = static_cast<uint32_t>(other_way.id_map_.size());
+
+  uint32_t next_src_id = src_id_bound;
+  uint32_t next_dst_id = dst_id_bound;
 
   for (uint32_t src_id = 1; src_id < src_id_bound; ++src_id) {
-    if (!src_to_dst_.IsMapped(src_id) && src_insn_defined(src_id)) {
-      uint32_t fresh_dst_id = dst_to_src_.MakeFreshId();
-      MapIds(src_id, fresh_dst_id);
+    if (!IsMapped(src_id)) {
+      MapIds(src_id, next_dst_id);
+
+      other_way.id_map_.push_back(0);
+      other_way.MapIds(next_dst_id++, src_id);
     }
   }
 
   for (uint32_t dst_id = 1; dst_id < dst_id_bound; ++dst_id) {
-    if (!dst_to_src_.IsMapped(dst_id) && dst_insn_defined(dst_id)) {
-      uint32_t fresh_src_id = src_to_dst_.MakeFreshId();
-      MapIds(fresh_src_id, dst_id);
+    if (!other_way.IsMapped(dst_id)) {
+      id_map_.push_back(0);
+      MapIds(next_src_id, dst_id);
+
+      other_way.MapIds(dst_id, next_src_id++);
     }
   }
+}
+
+void SrcDstIdMap::MapUnmatchedIds() {
+  src_to_dst_.MapUnmatchedIds(dst_to_src_);
 }
 
 void IdInstructions::MapIdToInstruction(uint32_t id,
@@ -626,19 +561,19 @@ void IdInstructions::MapIdsToInfos(
     uint32_t id_operand = 0;
 
     switch (inst.opcode()) {
-      case spv::Op::OpName:
+      case SpvOpName:
         info_map = &name_map_;
         break;
-      case spv::Op::OpMemberName:
+      case SpvOpMemberName:
         info_map = &name_map_;
         break;
-      case spv::Op::OpDecorate:
+      case SpvOpDecorate:
         info_map = &decoration_map_;
         break;
-      case spv::Op::OpMemberDecorate:
+      case SpvOpMemberDecorate:
         info_map = &decoration_map_;
         break;
-      case spv::Op::OpTypeForwardPointer: {
+      case SpvOpTypeForwardPointer: {
         uint32_t id = inst.GetSingleWordOperand(0);
         assert(id != 0);
 
@@ -796,10 +731,10 @@ int Differ::ComparePreambleInstructions(const opt::Instruction* a,
   // Instead of comparing OpExecutionMode entry point ids as ids, compare them
   // through their corresponding execution model.  This simplifies traversing
   // the sorted list of instructions between src and dst modules.
-  if (a->opcode() == spv::Op::OpExecutionMode) {
-    const spv::ExecutionModel src_model =
+  if (a->opcode() == SpvOpExecutionMode) {
+    const SpvExecutionModel src_model =
         GetExecutionModel(src_inst_module, a->GetSingleWordOperand(0));
-    const spv::ExecutionModel dst_model =
+    const SpvExecutionModel dst_model =
         GetExecutionModel(dst_inst_module, b->GetSingleWordOperand(0));
 
     if (src_model < dst_model) {
@@ -883,17 +818,17 @@ uint32_t Differ::GroupIdsHelperGetTypeId(const IdInstructions& id_to,
   return GetInst(id_to, id)->type_id();
 }
 
-spv::StorageClass Differ::GroupIdsHelperGetTypePointerStorageClass(
+SpvStorageClass Differ::GroupIdsHelperGetTypePointerStorageClass(
     const IdInstructions& id_to, uint32_t id) {
   const opt::Instruction* inst = GetInst(id_to, id);
-  assert(inst && inst->opcode() == spv::Op::OpTypePointer);
-  return spv::StorageClass(inst->GetSingleWordInOperand(0));
+  assert(inst && inst->opcode() == SpvOpTypePointer);
+  return SpvStorageClass(inst->GetSingleWordInOperand(0));
 }
 
-spv::Op Differ::GroupIdsHelperGetTypePointerTypeOp(const IdInstructions& id_to,
-                                                   uint32_t id) {
+SpvOp Differ::GroupIdsHelperGetTypePointerTypeOp(const IdInstructions& id_to,
+                                                 uint32_t id) {
   const opt::Instruction* inst = GetInst(id_to, id);
-  assert(inst && inst->opcode() == spv::Op::OpTypePointer);
+  assert(inst && inst->opcode() == SpvOpTypePointer);
 
   const uint32_t type_id = inst->GetSingleWordInOperand(1);
   const opt::Instruction* type_inst = GetInst(id_to, type_id);
@@ -950,37 +885,6 @@ void Differ::GroupIdsAndMatch(
 
     // Let the caller match the groups as appropriate.
     match_group(src_group, dst_group);
-  }
-}
-
-void Differ::GroupIdsAndMatchByMappedId(
-    const IdGroup& src_ids, const IdGroup& dst_ids,
-    uint32_t (Differ::*get_group)(const IdInstructions&, uint32_t),
-    std::function<void(const IdGroup& src_group, const IdGroup& dst_group)>
-        match_group) {
-  // Group the ids based on a key (get_group)
-  std::map<uint32_t, IdGroup> src_groups;
-  std::map<uint32_t, IdGroup> dst_groups;
-
-  GroupIds<uint32_t>(src_ids, true, &src_groups, get_group);
-  GroupIds<uint32_t>(dst_ids, false, &dst_groups, get_group);
-
-  // Iterate over pairs of groups whose keys map to each other.
-  for (const auto& iter : src_groups) {
-    const uint32_t& src_key = iter.first;
-    const IdGroup& src_group = iter.second;
-
-    if (src_key == 0) {
-      continue;
-    }
-
-    if (id_map_.IsSrcMapped(src_key)) {
-      const uint32_t& dst_key = id_map_.MappedDstId(src_key);
-      const IdGroup& dst_group = dst_groups[dst_key];
-
-      // Let the caller match the groups as appropriate.
-      match_group(src_group, dst_group);
-    }
   }
 }
 
@@ -1116,7 +1020,7 @@ bool Differ::DoInstructionsMatchFuzzy(const opt::Instruction* src_inst,
   }
   // For external instructions, make sure the set and opcode of the external
   // instruction matches too.
-  if (src_inst->opcode() == spv::Op::OpExtInst) {
+  if (src_inst->opcode() == SpvOpExtInst) {
     if (!DoOperandsMatch(src_inst, dst_inst, 0, 2)) {
       return false;
     }
@@ -1160,26 +1064,26 @@ bool Differ::DoDebugAndAnnotationInstructionsMatch(
   }
 
   switch (src_inst->opcode()) {
-    case spv::Op::OpString:
-    case spv::Op::OpSourceExtension:
-    case spv::Op::OpModuleProcessed:
+    case SpvOpString:
+    case SpvOpSourceExtension:
+    case SpvOpModuleProcessed:
       return DoesOperandMatch(src_inst->GetOperand(0), dst_inst->GetOperand(0));
-    case spv::Op::OpSource:
+    case SpvOpSource:
       return DoOperandsMatch(src_inst, dst_inst, 0, 2);
-    case spv::Op::OpSourceContinued:
+    case SpvOpSourceContinued:
       return true;
-    case spv::Op::OpName:
+    case SpvOpName:
       return DoOperandsMatch(src_inst, dst_inst, 0, 1);
-    case spv::Op::OpMemberName:
+    case SpvOpMemberName:
       return DoOperandsMatch(src_inst, dst_inst, 0, 2);
-    case spv::Op::OpDecorate:
+    case SpvOpDecorate:
       return DoOperandsMatch(src_inst, dst_inst, 0, 2);
-    case spv::Op::OpMemberDecorate:
+    case SpvOpMemberDecorate:
       return DoOperandsMatch(src_inst, dst_inst, 0, 3);
-    case spv::Op::OpExtInst:
-    case spv::Op::OpDecorationGroup:
-    case spv::Op::OpGroupDecorate:
-    case spv::Op::OpGroupMemberDecorate:
+    case SpvOpExtInst:
+    case SpvOpDecorationGroup:
+    case SpvOpGroupDecorate:
+    case SpvOpGroupMemberDecorate:
       return false;
     default:
       return false;
@@ -1191,9 +1095,9 @@ bool Differ::AreVariablesMatchable(uint32_t src_id, uint32_t dst_id,
   // Variables must match by their built-in decorations.
   uint32_t src_built_in_decoration = 0, dst_built_in_decoration = 0;
   const bool src_is_built_in = GetDecorationValue(
-      src_id_to_, src_id, spv::Decoration::BuiltIn, &src_built_in_decoration);
+      src_id_to_, src_id, SpvDecorationBuiltIn, &src_built_in_decoration);
   const bool dst_is_built_in = GetDecorationValue(
-      dst_id_to_, dst_id, spv::Decoration::BuiltIn, &dst_built_in_decoration);
+      dst_id_to_, dst_id, SpvDecorationBuiltIn, &dst_built_in_decoration);
 
   if (src_is_built_in != dst_is_built_in) {
     return false;
@@ -1203,7 +1107,7 @@ bool Differ::AreVariablesMatchable(uint32_t src_id, uint32_t dst_id,
   }
 
   // Check their types and storage classes.
-  spv::StorageClass src_storage_class, dst_storage_class;
+  SpvStorageClass src_storage_class, dst_storage_class;
   const uint32_t src_type_id =
       GetVarTypeId(src_id_to_, src_id, &src_storage_class);
   const uint32_t dst_type_id =
@@ -1223,14 +1127,12 @@ bool Differ::AreVariablesMatchable(uint32_t src_id, uint32_t dst_id,
         // Allow one of the two to be Private while the other is Input or
         // Output, this allows matching in/out variables that have been turned
         // global as part of linking two stages (as done in ANGLE).
-        const bool src_is_io = src_storage_class == spv::StorageClass::Input ||
-                               src_storage_class == spv::StorageClass::Output;
-        const bool dst_is_io = dst_storage_class == spv::StorageClass::Input ||
-                               dst_storage_class == spv::StorageClass::Output;
-        const bool src_is_private =
-            src_storage_class == spv::StorageClass::Private;
-        const bool dst_is_private =
-            dst_storage_class == spv::StorageClass::Private;
+        const bool src_is_io = src_storage_class == SpvStorageClassInput ||
+                               src_storage_class == SpvStorageClassOutput;
+        const bool dst_is_io = dst_storage_class == SpvStorageClassInput ||
+                               dst_storage_class == SpvStorageClassOutput;
+        const bool src_is_private = src_storage_class == SpvStorageClassPrivate;
+        const bool dst_is_private = dst_storage_class == SpvStorageClassPrivate;
 
         if (!((src_is_io && dst_is_private) || (src_is_private && dst_is_io))) {
           return false;
@@ -1375,16 +1277,16 @@ bool Differ::MatchOpSpecConstant(const opt::Instruction* src_inst,
   // Otherwise, match them by SpecId.
   uint32_t src_spec_id, dst_spec_id;
 
-  if (GetDecorationValue(src_id_to_, src_id, spv::Decoration::SpecId,
+  if (GetDecorationValue(src_id_to_, src_id, SpvDecorationSpecId,
                          &src_spec_id) &&
-      GetDecorationValue(dst_id_to_, dst_id, spv::Decoration::SpecId,
+      GetDecorationValue(dst_id_to_, dst_id, SpvDecorationSpecId,
                          &dst_spec_id)) {
     return src_spec_id == dst_spec_id;
   }
 
   // There is no SpecId decoration, while not practical, still valid.
   // SpecConstantOp don't have SpecId and can be matched by operands
-  if (src_inst->opcode() == spv::Op::OpSpecConstantOp) {
+  if (src_inst->opcode() == SpvOpSpecConstantOp) {
     if (src_inst->NumInOperandWords() == dst_inst->NumInOperandWords()) {
       return DoOperandsMatch(src_inst, dst_inst, 0,
                              src_inst->NumInOperandWords());
@@ -1425,13 +1327,13 @@ bool Differ::MatchOpVariable(const opt::Instruction* src_inst,
   // built-in decorations.
   uint32_t src_built_in_decoration;
   const bool src_is_built_in = GetDecorationValue(
-      src_id_to_, src_id, spv::Decoration::BuiltIn, &src_built_in_decoration);
+      src_id_to_, src_id, SpvDecorationBuiltIn, &src_built_in_decoration);
 
   if (src_is_built_in && AreVariablesMatchable(src_id, dst_id, flexibility)) {
     return true;
   }
 
-  spv::StorageClass src_storage_class, dst_storage_class;
+  SpvStorageClass src_storage_class, dst_storage_class;
   GetVarTypeId(src_id_to_, src_id, &src_storage_class);
   GetVarTypeId(dst_id_to_, dst_id, &dst_storage_class);
 
@@ -1446,13 +1348,13 @@ bool Differ::MatchOpVariable(const opt::Instruction* src_inst,
     uint32_t src_binding = 0, dst_binding = 0;
 
     const bool src_has_set = GetDecorationValue(
-        src_id_to_, src_id, spv::Decoration::DescriptorSet, &src_set);
+        src_id_to_, src_id, SpvDecorationDescriptorSet, &src_set);
     const bool dst_has_set = GetDecorationValue(
-        dst_id_to_, dst_id, spv::Decoration::DescriptorSet, &dst_set);
-    const bool src_has_binding = GetDecorationValue(
-        src_id_to_, src_id, spv::Decoration::Binding, &src_set);
-    const bool dst_has_binding = GetDecorationValue(
-        dst_id_to_, dst_id, spv::Decoration::Binding, &dst_set);
+        dst_id_to_, dst_id, SpvDecorationDescriptorSet, &dst_set);
+    const bool src_has_binding =
+        GetDecorationValue(src_id_to_, src_id, SpvDecorationBinding, &src_set);
+    const bool dst_has_binding =
+        GetDecorationValue(dst_id_to_, dst_id, SpvDecorationBinding, &dst_set);
 
     if (src_has_set && dst_has_set && src_has_binding && dst_has_binding) {
       return src_set == dst_set && src_binding == dst_binding;
@@ -1465,9 +1367,9 @@ bool Differ::MatchOpVariable(const opt::Instruction* src_inst,
     uint32_t src_location, dst_location;
 
     const bool src_has_location = GetDecorationValue(
-        src_id_to_, src_id, spv::Decoration::Location, &src_location);
+        src_id_to_, src_id, SpvDecorationLocation, &src_location);
     const bool dst_has_location = GetDecorationValue(
-        dst_id_to_, dst_id, spv::Decoration::Location, &dst_location);
+        dst_id_to_, dst_id, SpvDecorationLocation, &dst_location);
 
     if (src_has_location && dst_has_location) {
       return src_location == dst_location;
@@ -1482,25 +1384,25 @@ bool Differ::MatchPerVertexType(uint32_t src_type_id, uint32_t dst_type_id) {
   // For gl_PerVertex, find the type pointer of this type (array) and make sure
   // the storage classes of src and dst match; geometry and tessellation shaders
   // have two instances of gl_PerVertex.
-  spv::StorageClass src_storage_class =
+  SpvStorageClass src_storage_class =
       GetPerVertexStorageClass(src_, src_type_id);
-  spv::StorageClass dst_storage_class =
+  SpvStorageClass dst_storage_class =
       GetPerVertexStorageClass(dst_, dst_type_id);
 
-  assert(src_storage_class == spv::StorageClass::Input ||
-         src_storage_class == spv::StorageClass::Output);
-  assert(dst_storage_class == spv::StorageClass::Input ||
-         dst_storage_class == spv::StorageClass::Output);
+  assert(src_storage_class == SpvStorageClassInput ||
+         src_storage_class == SpvStorageClassOutput);
+  assert(dst_storage_class == SpvStorageClassInput ||
+         dst_storage_class == SpvStorageClassOutput);
 
   return src_storage_class == dst_storage_class;
 }
 
 bool Differ::MatchPerVertexVariable(const opt::Instruction* src_inst,
                                     const opt::Instruction* dst_inst) {
-  spv::StorageClass src_storage_class =
-      spv::StorageClass(src_inst->GetSingleWordInOperand(0));
-  spv::StorageClass dst_storage_class =
-      spv::StorageClass(dst_inst->GetSingleWordInOperand(0));
+  SpvStorageClass src_storage_class =
+      SpvStorageClass(src_inst->GetSingleWordInOperand(0));
+  SpvStorageClass dst_storage_class =
+      SpvStorageClass(dst_inst->GetSingleWordInOperand(0));
 
   return src_storage_class == dst_storage_class;
 }
@@ -1514,6 +1416,7 @@ void Differ::MatchTypeForwardPointersByName(const IdGroup& src,
   GroupIdsAndMatch<std::string>(
       src, dst, "", &Differ::GetSanitizedName,
       [this](const IdGroup& src_group, const IdGroup& dst_group) {
+
         // Match only if there's a unique forward declaration with this debug
         // name.
         if (src_group.size() == 1 && dst_group.size() == 1) {
@@ -1576,7 +1479,7 @@ InstructionList Differ::GetFunctionHeader(const opt::Function& function) {
   InstructionList body;
   function.WhileEachInst(
       [&body](const opt::Instruction* inst) {
-        if (inst->opcode() == spv::Op::OpLabel) {
+        if (inst->opcode() == SpvOpLabel) {
           return false;
         }
         body.push_back(inst);
@@ -1668,8 +1571,6 @@ void Differ::BestEffortMatchFunctions(const IdGroup& src_func_ids,
 
     id_map_.MapIds(match_result.src_id, match_result.dst_id);
 
-    MatchFunctionParamIds(src_funcs_[match_result.src_id],
-                          dst_funcs_[match_result.dst_id]);
     MatchIdsInFunctionBodies(src_func_insts.at(match_result.src_id),
                              dst_func_insts.at(match_result.dst_id),
                              match_result.src_match, match_result.dst_match, 0);
@@ -1694,6 +1595,7 @@ void Differ::MatchFunctionParamIds(const opt::Function* src_func,
   GroupIdsAndMatch<std::string>(
       src_params, dst_params, "", &Differ::GetSanitizedName,
       [this](const IdGroup& src_group, const IdGroup& dst_group) {
+
         // There shouldn't be two parameters with the same name, so the ids
         // should match. There is nothing restricting the SPIR-V however to have
         // two parameters with the same name, so be resilient against that.
@@ -1704,17 +1606,17 @@ void Differ::MatchFunctionParamIds(const opt::Function* src_func,
 
   // Then match the parameters by their type.  If there are multiple of them,
   // match them by their order.
-  GroupIdsAndMatchByMappedId(
-      src_params, dst_params, &Differ::GroupIdsHelperGetTypeId,
+  GroupIdsAndMatch<uint32_t>(
+      src_params, dst_params, 0, &Differ::GroupIdsHelperGetTypeId,
       [this](const IdGroup& src_group_by_type_id,
              const IdGroup& dst_group_by_type_id) {
+
         const size_t shared_param_count =
             std::min(src_group_by_type_id.size(), dst_group_by_type_id.size());
 
         for (size_t param_index = 0; param_index < shared_param_count;
              ++param_index) {
-          id_map_.MapIds(src_group_by_type_id[param_index],
-                         dst_group_by_type_id[param_index]);
+          id_map_.MapIds(src_group_by_type_id[0], dst_group_by_type_id[0]);
         }
       });
 }
@@ -1792,12 +1694,12 @@ void Differ::MatchVariablesUsedByMatchedInstructions(
     default:
       // TODO: match functions based on OpFunctionCall?
       break;
-    case spv::Op::OpAccessChain:
-    case spv::Op::OpInBoundsAccessChain:
-    case spv::Op::OpPtrAccessChain:
-    case spv::Op::OpInBoundsPtrAccessChain:
-    case spv::Op::OpLoad:
-    case spv::Op::OpStore:
+    case SpvOpAccessChain:
+    case SpvOpInBoundsAccessChain:
+    case SpvOpPtrAccessChain:
+    case SpvOpInBoundsPtrAccessChain:
+    case SpvOpLoad:
+    case SpvOpStore:
       const uint32_t src_pointer_id = src_inst->GetSingleWordInOperand(0);
       const uint32_t dst_pointer_id = dst_inst->GetSingleWordInOperand(0);
       if (IsVariable(src_id_to_, src_pointer_id) &&
@@ -1825,24 +1727,23 @@ const opt::Instruction* Differ::GetInst(const IdInstructions& id_to,
 uint32_t Differ::GetConstantUint(const IdInstructions& id_to,
                                  uint32_t constant_id) {
   const opt::Instruction* constant_inst = GetInst(id_to, constant_id);
-  assert(constant_inst->opcode() == spv::Op::OpConstant);
-  assert(GetInst(id_to, constant_inst->type_id())->opcode() ==
-         spv::Op::OpTypeInt);
+  assert(constant_inst->opcode() == SpvOpConstant);
+  assert(GetInst(id_to, constant_inst->type_id())->opcode() == SpvOpTypeInt);
 
   return constant_inst->GetSingleWordInOperand(0);
 }
 
-spv::ExecutionModel Differ::GetExecutionModel(const opt::Module* module,
-                                              uint32_t entry_point_id) {
+SpvExecutionModel Differ::GetExecutionModel(const opt::Module* module,
+                                            uint32_t entry_point_id) {
   for (const opt::Instruction& inst : module->entry_points()) {
-    assert(inst.opcode() == spv::Op::OpEntryPoint);
+    assert(inst.opcode() == SpvOpEntryPoint);
     if (inst.GetSingleWordOperand(1) == entry_point_id) {
-      return spv::ExecutionModel(inst.GetSingleWordOperand(0));
+      return SpvExecutionModel(inst.GetSingleWordOperand(0));
     }
   }
 
   assert(false && "Unreachable");
-  return spv::ExecutionModel(0xFFF);
+  return SpvExecutionModel(0xFFF);
 }
 
 bool Differ::HasName(const IdInstructions& id_to, uint32_t id) {
@@ -1850,7 +1751,7 @@ bool Differ::HasName(const IdInstructions& id_to, uint32_t id) {
   assert(id < id_to.name_map_.size());
 
   for (const opt::Instruction* inst : id_to.name_map_[id]) {
-    if (inst->opcode() == spv::Op::OpName) {
+    if (inst->opcode() == SpvOpName) {
       return true;
     }
   }
@@ -1864,7 +1765,7 @@ std::string Differ::GetName(const IdInstructions& id_to, uint32_t id,
   assert(id < id_to.name_map_.size());
 
   for (const opt::Instruction* inst : id_to.name_map_[id]) {
-    if (inst->opcode() == spv::Op::OpName) {
+    if (inst->opcode() == SpvOpName) {
       *has_name = true;
       return inst->GetOperand(1).AsString();
     }
@@ -1887,11 +1788,11 @@ std::string Differ::GetSanitizedName(const IdInstructions& id_to, uint32_t id) {
 }
 
 uint32_t Differ::GetVarTypeId(const IdInstructions& id_to, uint32_t var_id,
-                              spv::StorageClass* storage_class) {
+                              SpvStorageClass* storage_class) {
   const opt::Instruction* var_inst = GetInst(id_to, var_id);
-  assert(var_inst->opcode() == spv::Op::OpVariable);
+  assert(var_inst->opcode() == SpvOpVariable);
 
-  *storage_class = spv::StorageClass(var_inst->GetSingleWordInOperand(0));
+  *storage_class = SpvStorageClass(var_inst->GetSingleWordInOperand(0));
 
   // Get the type pointer from the variable.
   const uint32_t type_pointer_id = var_inst->type_id();
@@ -1902,15 +1803,15 @@ uint32_t Differ::GetVarTypeId(const IdInstructions& id_to, uint32_t var_id,
 }
 
 bool Differ::GetDecorationValue(const IdInstructions& id_to, uint32_t id,
-                                spv::Decoration decoration,
+                                SpvDecoration decoration,
                                 uint32_t* decoration_value) {
   assert(id != 0);
   assert(id < id_to.decoration_map_.size());
 
   for (const opt::Instruction* inst : id_to.decoration_map_[id]) {
-    if (inst->opcode() == spv::Op::OpDecorate &&
+    if (inst->opcode() == SpvOpDecorate &&
         inst->GetSingleWordOperand(0) == id &&
-        spv::Decoration(inst->GetSingleWordOperand(1)) == decoration) {
+        inst->GetSingleWordOperand(1) == decoration) {
       *decoration_value = inst->GetSingleWordOperand(2);
       return true;
     }
@@ -1927,28 +1828,28 @@ const opt::Instruction* Differ::GetForwardPointerInst(
 }
 
 bool Differ::IsIntType(const IdInstructions& id_to, uint32_t type_id) {
-  return IsOp(id_to, type_id, spv::Op::OpTypeInt);
+  return IsOp(id_to, type_id, SpvOpTypeInt);
 }
 
 bool Differ::IsFloatType(const IdInstructions& id_to, uint32_t type_id) {
-  return IsOp(id_to, type_id, spv::Op::OpTypeFloat);
+  return IsOp(id_to, type_id, SpvOpTypeFloat);
 }
 
 bool Differ::IsConstantUint(const IdInstructions& id_to, uint32_t id) {
   const opt::Instruction* constant_inst = GetInst(id_to, id);
-  if (constant_inst->opcode() != spv::Op::OpConstant) {
+  if (constant_inst->opcode() != SpvOpConstant) {
     return false;
   }
 
   const opt::Instruction* type_inst = GetInst(id_to, constant_inst->type_id());
-  return type_inst->opcode() == spv::Op::OpTypeInt;
+  return type_inst->opcode() == SpvOpTypeInt;
 }
 
 bool Differ::IsVariable(const IdInstructions& id_to, uint32_t pointer_id) {
-  return IsOp(id_to, pointer_id, spv::Op::OpVariable);
+  return IsOp(id_to, pointer_id, SpvOpVariable);
 }
 
-bool Differ::IsOp(const IdInstructions& id_to, uint32_t id, spv::Op op) {
+bool Differ::IsOp(const IdInstructions& id_to, uint32_t id, SpvOp op) {
   return GetInst(id_to, id)->opcode() == op;
 }
 
@@ -1957,18 +1858,17 @@ bool Differ::IsPerVertexType(const IdInstructions& id_to, uint32_t type_id) {
   assert(type_id < id_to.decoration_map_.size());
 
   for (const opt::Instruction* inst : id_to.decoration_map_[type_id]) {
-    if (inst->opcode() == spv::Op::OpMemberDecorate &&
+    if (inst->opcode() == SpvOpMemberDecorate &&
         inst->GetSingleWordOperand(0) == type_id &&
-        spv::Decoration(inst->GetSingleWordOperand(2)) ==
-            spv::Decoration::BuiltIn) {
-      spv::BuiltIn built_in = spv::BuiltIn(inst->GetSingleWordOperand(3));
+        inst->GetSingleWordOperand(2) == SpvDecorationBuiltIn) {
+      SpvBuiltIn built_in = SpvBuiltIn(inst->GetSingleWordOperand(3));
 
       // Only gl_PerVertex can have, and it can only have, the following
       // built-in decorations.
-      return built_in == spv::BuiltIn::Position ||
-             built_in == spv::BuiltIn::PointSize ||
-             built_in == spv::BuiltIn::ClipDistance ||
-             built_in == spv::BuiltIn::CullDistance;
+      return built_in == SpvBuiltInPosition ||
+             built_in == SpvBuiltInPointSize ||
+             built_in == SpvBuiltInClipDistance ||
+             built_in == SpvBuiltInCullDistance;
     }
   }
 
@@ -1977,12 +1877,12 @@ bool Differ::IsPerVertexType(const IdInstructions& id_to, uint32_t type_id) {
 
 bool Differ::IsPerVertexVariable(const IdInstructions& id_to, uint32_t var_id) {
   // Get the type from the type pointer.
-  spv::StorageClass storage_class;
+  SpvStorageClass storage_class;
   uint32_t type_id = GetVarTypeId(id_to, var_id, &storage_class);
   const opt::Instruction* type_inst = GetInst(id_to, type_id);
 
   // If array, get the element type.
-  if (type_inst->opcode() == spv::Op::OpTypeArray) {
+  if (type_inst->opcode() == SpvOpTypeArray) {
     type_id = type_inst->GetSingleWordInOperand(0);
   }
 
@@ -1990,21 +1890,21 @@ bool Differ::IsPerVertexVariable(const IdInstructions& id_to, uint32_t var_id) {
   return IsPerVertexType(id_to, type_id);
 }
 
-spv::StorageClass Differ::GetPerVertexStorageClass(const opt::Module* module,
-                                                   uint32_t type_id) {
+SpvStorageClass Differ::GetPerVertexStorageClass(const opt::Module* module,
+                                                 uint32_t type_id) {
   for (const opt::Instruction& inst : module->types_values()) {
     switch (inst.opcode()) {
-      case spv::Op::OpTypeArray:
+      case SpvOpTypeArray:
         // The gl_PerVertex instance could be an array, look for a variable of
         // the array type instead.
         if (inst.GetSingleWordInOperand(0) == type_id) {
           type_id = inst.result_id();
         }
         break;
-      case spv::Op::OpTypePointer:
+      case SpvOpTypePointer:
         // Find the storage class of the pointer to this type.
         if (inst.GetSingleWordInOperand(1) == type_id) {
-          return spv::StorageClass(inst.GetSingleWordInOperand(0));
+          return SpvStorageClass(inst.GetSingleWordInOperand(0));
         }
         break;
       default:
@@ -2015,7 +1915,7 @@ spv::StorageClass Differ::GetPerVertexStorageClass(const opt::Module* module,
   // gl_PerVertex is declared, but is unused.  Return either of Input or Output
   // classes just so it matches one in the other module.  This should be highly
   // unlikely, perhaps except for ancient GS-used-to-emulate-CS scenarios.
-  return spv::StorageClass::Output;
+  return SpvStorageClassOutput;
 }
 
 spv_ext_inst_type_t Differ::GetExtInstType(const IdInstructions& id_to,
@@ -2038,16 +1938,12 @@ spv_number_kind_t Differ::GetNumberKind(const IdInstructions& id_to,
       // Always unsigned integers.
       *number_bit_width = 32;
       return SPV_NUMBER_UNSIGNED_INT;
-    case SPV_OPERAND_TYPE_LITERAL_FLOAT:
-      // Always float.
-      *number_bit_width = 32;
-      return SPV_NUMBER_FLOATING;
     case SPV_OPERAND_TYPE_TYPED_LITERAL_NUMBER:
     case SPV_OPERAND_TYPE_OPTIONAL_TYPED_LITERAL_INTEGER:
       switch (inst.opcode()) {
-        case spv::Op::OpSwitch:
-        case spv::Op::OpConstant:
-        case spv::Op::OpSpecConstant:
+        case SpvOpSwitch:
+        case SpvOpConstant:
+        case SpvOpSpecConstant:
           // Same kind of number as the selector (OpSwitch) or the type
           // (Op*Constant).
           return GetTypeNumberKind(id_to, inst.GetSingleWordOperand(0),
@@ -2073,12 +1969,12 @@ spv_number_kind_t Differ::GetTypeNumberKind(const IdInstructions& id_to,
   }
 
   switch (type_inst->opcode()) {
-    case spv::Op::OpTypeInt:
+    case SpvOpTypeInt:
       *number_bit_width = type_inst->GetSingleWordOperand(1);
       return type_inst->GetSingleWordOperand(2) == 0 ? SPV_NUMBER_UNSIGNED_INT
                                                      : SPV_NUMBER_SIGNED_INT;
       break;
-    case spv::Op::OpTypeFloat:
+    case SpvOpTypeFloat:
       *number_bit_width = type_inst->GetSingleWordOperand(1);
       return SPV_NUMBER_FLOATING;
     default:
@@ -2163,10 +2059,9 @@ void Differ::MatchEntryPointIds() {
     }
 
     // Otherwise match them by name.
+    bool matched = false;
     for (const opt::Instruction* src_inst : src_insts) {
       for (const opt::Instruction* dst_inst : dst_insts) {
-        if (id_map_.IsDstMapped(dst_inst)) continue;
-
         const opt::Operand& src_name = src_inst->GetOperand(2);
         const opt::Operand& dst_name = dst_inst->GetOperand(2);
 
@@ -2175,8 +2070,12 @@ void Differ::MatchEntryPointIds() {
           uint32_t dst_id = dst_inst->GetSingleWordOperand(1);
           id_map_.MapIds(src_id, dst_id);
           id_map_.MapInsts(src_inst, dst_inst);
+          matched = true;
           break;
         }
+      }
+      if (matched) {
+        break;
       }
     }
   }
@@ -2193,7 +2092,7 @@ void Differ::MatchTypeForwardPointers() {
     return inst.GetSingleWordOperand(0);
   };
   auto accept_type_forward_pointer_ops = [](const opt::Instruction& inst) {
-    return inst.opcode() == spv::Op::OpTypeForwardPointer;
+    return inst.opcode() == SpvOpTypeForwardPointer;
   };
 
   PoolPotentialIds(src_->types_values(), potential_id_map.src_ids, true,
@@ -2217,18 +2116,20 @@ void Differ::MatchTypeForwardPointers() {
   //     - If leftover is unique, match
 
   // Group forwarded pointers by storage class first and loop over them.
-  GroupIdsAndMatch<spv::StorageClass>(
-      potential_id_map.src_ids, potential_id_map.dst_ids,
-      spv::StorageClass::Max, &Differ::GroupIdsHelperGetTypePointerStorageClass,
+  GroupIdsAndMatch<SpvStorageClass>(
+      potential_id_map.src_ids, potential_id_map.dst_ids, SpvStorageClassMax,
+      &Differ::GroupIdsHelperGetTypePointerStorageClass,
       [this](const IdGroup& src_group_by_storage_class,
              const IdGroup& dst_group_by_storage_class) {
+
         // Group them further by the type they are pointing to and loop over
         // them.
-        GroupIdsAndMatch<spv::Op>(
-            src_group_by_storage_class, dst_group_by_storage_class,
-            spv::Op::Max, &Differ::GroupIdsHelperGetTypePointerTypeOp,
+        GroupIdsAndMatch<SpvOp>(
+            src_group_by_storage_class, dst_group_by_storage_class, SpvOpMax,
+            &Differ::GroupIdsHelperGetTypePointerTypeOp,
             [this](const IdGroup& src_group_by_type_op,
                    const IdGroup& dst_group_by_type_op) {
+
               // Group them even further by debug info, if possible and match by
               // debug name.
               MatchTypeForwardPointersByName(src_group_by_type_op,
@@ -2281,8 +2182,8 @@ void Differ::MatchTypeIds() {
     MatchIds(potential_id_map, [this, flexibility](
                                    const opt::Instruction* src_inst,
                                    const opt::Instruction* dst_inst) {
-      const spv::Op src_op = src_inst->opcode();
-      const spv::Op dst_op = dst_inst->opcode();
+      const SpvOp src_op = src_inst->opcode();
+      const SpvOp dst_op = dst_inst->opcode();
 
       // Don't match if the opcode is not the same.
       if (src_op != dst_op) {
@@ -2290,28 +2191,26 @@ void Differ::MatchTypeIds() {
       }
 
       switch (src_op) {
-        case spv::Op::OpTypeVoid:
-        case spv::Op::OpTypeBool:
-        case spv::Op::OpTypeSampler:
-        case spv::Op::OpTypeAccelerationStructureNV:
-        case spv::Op::OpTypeRayQueryKHR:
-          // the above types have no operands and are unique, match them.
+        case SpvOpTypeVoid:
+        case SpvOpTypeBool:
+        case SpvOpTypeSampler:
+          // void, bool and sampler are unique, match them.
           return true;
-        case spv::Op::OpTypeInt:
-        case spv::Op::OpTypeFloat:
-        case spv::Op::OpTypeVector:
-        case spv::Op::OpTypeMatrix:
-        case spv::Op::OpTypeSampledImage:
-        case spv::Op::OpTypeRuntimeArray:
-        case spv::Op::OpTypePointer:
+        case SpvOpTypeInt:
+        case SpvOpTypeFloat:
+        case SpvOpTypeVector:
+        case SpvOpTypeMatrix:
+        case SpvOpTypeSampledImage:
+        case SpvOpTypeRuntimeArray:
+        case SpvOpTypePointer:
           // Match these instructions when all operands match.
           assert(src_inst->NumInOperandWords() ==
                  dst_inst->NumInOperandWords());
           return DoOperandsMatch(src_inst, dst_inst, 0,
                                  src_inst->NumInOperandWords());
 
-        case spv::Op::OpTypeFunction:
-        case spv::Op::OpTypeImage:
+        case SpvOpTypeFunction:
+        case SpvOpTypeImage:
           // Match function types only if they have the same number of operands,
           // and they all match.
           // Match image types similarly, expecting the optional final parameter
@@ -2322,7 +2221,7 @@ void Differ::MatchTypeIds() {
           return DoOperandsMatch(src_inst, dst_inst, 0,
                                  src_inst->NumInOperandWords());
 
-        case spv::Op::OpTypeArray:
+        case SpvOpTypeArray:
           // Match arrays only if the element type and length match.  The length
           // is an id of a constant, so the actual constant it's defining is
           // compared instead.
@@ -2339,7 +2238,7 @@ void Differ::MatchTypeIds() {
           // example if a spec contant is used).
           return DoOperandsMatch(src_inst, dst_inst, 1, 1);
 
-        case spv::Op::OpTypeStruct:
+        case SpvOpTypeStruct:
           return MatchOpTypeStruct(src_inst, dst_inst, flexibility);
 
         default:
@@ -2371,8 +2270,8 @@ void Differ::MatchConstants() {
     MatchIds(potential_id_map, [this, flexibility](
                                    const opt::Instruction* src_inst,
                                    const opt::Instruction* dst_inst) {
-      const spv::Op src_op = src_inst->opcode();
-      const spv::Op dst_op = dst_inst->opcode();
+      const SpvOp src_op = src_inst->opcode();
+      const SpvOp dst_op = dst_inst->opcode();
 
       // Don't match if the opcode is not the same.
       if (src_op != dst_op) {
@@ -2380,14 +2279,14 @@ void Differ::MatchConstants() {
       }
 
       switch (src_op) {
-        case spv::Op::OpConstantTrue:
-        case spv::Op::OpConstantFalse:
+        case SpvOpConstantTrue:
+        case SpvOpConstantFalse:
           // true and false are unique, match them.
           return true;
-        case spv::Op::OpConstant:
+        case SpvOpConstant:
           return MatchOpConstant(src_inst, dst_inst, flexibility);
-        case spv::Op::OpConstantComposite:
-        case spv::Op::OpSpecConstantComposite:
+        case SpvOpConstantComposite:
+        case SpvOpSpecConstantComposite:
           // Composite constants must match in type and value.
           //
           // TODO: match OpConstantNull with OpConstantComposite with all zeros
@@ -2400,7 +2299,7 @@ void Differ::MatchConstants() {
                                   dst_inst->GetOperand(0)) &&
                  DoOperandsMatch(src_inst, dst_inst, 0,
                                  src_inst->NumInOperandWords());
-        case spv::Op::OpConstantSampler:
+        case SpvOpConstantSampler:
           // Match sampler constants exactly.
           // TODO: Allow flexibility in parameters to better diff shaders where
           // the sampler param has changed.
@@ -2408,15 +2307,15 @@ void Differ::MatchConstants() {
                  dst_inst->NumInOperandWords());
           return DoOperandsMatch(src_inst, dst_inst, 0,
                                  src_inst->NumInOperandWords());
-        case spv::Op::OpConstantNull:
+        case SpvOpConstantNull:
           // Match null constants as long as the type matches.
           return DoesOperandMatch(src_inst->GetOperand(0),
                                   dst_inst->GetOperand(0));
 
-        case spv::Op::OpSpecConstantTrue:
-        case spv::Op::OpSpecConstantFalse:
-        case spv::Op::OpSpecConstant:
-        case spv::Op::OpSpecConstantOp:
+        case SpvOpSpecConstantTrue:
+        case SpvOpSpecConstantFalse:
+        case SpvOpSpecConstant:
+        case SpvOpSpecConstantOp:
           // Match spec constants by name if available, then by the SpecId
           // decoration.
           return MatchOpSpecConstant(src_inst, dst_inst);
@@ -2435,7 +2334,7 @@ void Differ::MatchVariableIds() {
     return inst.result_id();
   };
   auto accept_type_ops = [](const opt::Instruction& inst) {
-    return inst.opcode() == spv::Op::OpVariable;
+    return inst.opcode() == SpvOpVariable;
   };
 
   PoolPotentialIds(src_->types_values(), potential_id_map.src_ids, true,
@@ -2451,8 +2350,8 @@ void Differ::MatchVariableIds() {
     MatchIds(potential_id_map,
              [this, flexibility](const opt::Instruction* src_inst,
                                  const opt::Instruction* dst_inst) {
-               assert(src_inst->opcode() == spv::Op::OpVariable);
-               assert(dst_inst->opcode() == spv::Op::OpVariable);
+               assert(src_inst->opcode() == SpvOpVariable);
+               assert(dst_inst->opcode() == SpvOpVariable);
 
                return MatchOpVariable(src_inst, dst_inst, flexibility);
              });
@@ -2474,6 +2373,7 @@ void Differ::MatchFunctions() {
   GroupIdsAndMatch<std::string>(
       src_func_ids, dst_func_ids, "", &Differ::GetSanitizedName,
       [this](const IdGroup& src_group, const IdGroup& dst_group) {
+
         // If there is a single function with this name in src and dst, it's a
         // definite match.
         if (src_group.size() == 1 && dst_group.size() == 1) {
@@ -2487,6 +2387,7 @@ void Differ::MatchFunctions() {
                                    &Differ::GroupIdsHelperGetTypeId,
                                    [this](const IdGroup& src_group_by_type_id,
                                           const IdGroup& dst_group_by_type_id) {
+
                                      if (src_group_by_type_id.size() == 1 &&
                                          dst_group_by_type_id.size() == 1) {
                                        id_map_.MapIds(src_group_by_type_id[0],
@@ -2531,6 +2432,7 @@ void Differ::MatchFunctions() {
       src_func_ids, dst_func_ids, 0, &Differ::GroupIdsHelperGetTypeId,
       [this](const IdGroup& src_group_by_type_id,
              const IdGroup& dst_group_by_type_id) {
+
         BestEffortMatchFunctions(src_group_by_type_id, dst_group_by_type_id,
                                  src_func_insts_, dst_func_insts_);
       });
@@ -2695,7 +2597,7 @@ void Differ::ToParsedInstruction(
   parsed_inst->num_words = static_cast<uint16_t>(inst_binary.size());
   parsed_inst->opcode = static_cast<uint16_t>(inst.opcode());
   parsed_inst->ext_inst_type =
-      inst.opcode() == spv::Op::OpExtInst
+      inst.opcode() == SpvOpExtInst
           ? GetExtInstType(id_to, original_inst.GetSingleWordInOperand(0))
           : SPV_EXT_INST_TYPE_NONE;
   parsed_inst->type_id =
@@ -2740,9 +2642,7 @@ opt::Instruction Differ::ToMappedSrcIds(const opt::Instruction& dst_inst) {
 }
 
 spv_result_t Differ::Output() {
-  id_map_.MapUnmatchedIds(
-      [this](uint32_t src_id) { return src_id_to_.IsDefined(src_id); },
-      [this](uint32_t dst_id) { return dst_id_to_.IsDefined(dst_id); });
+  id_map_.MapUnmatchedIds();
   src_id_to_.inst_map_.resize(id_map_.SrcToDstMap().IdBound(), nullptr);
   dst_id_to_.inst_map_.resize(id_map_.DstToSrcMap().IdBound(), nullptr);
 

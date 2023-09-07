@@ -23,16 +23,16 @@ namespace opt {
 Pass::Status ReplaceInvalidOpcodePass::Process() {
   bool modified = false;
 
-  if (context()->get_feature_mgr()->HasCapability(spv::Capability::Linkage)) {
+  if (context()->get_feature_mgr()->HasCapability(SpvCapabilityLinkage)) {
     return Status::SuccessWithoutChange;
   }
 
-  spv::ExecutionModel execution_model = GetExecutionModel();
-  if (execution_model == spv::ExecutionModel::Kernel) {
+  SpvExecutionModel execution_model = GetExecutionModel();
+  if (execution_model == SpvExecutionModelKernel) {
     // We do not handle kernels.
     return Status::SuccessWithoutChange;
   }
-  if (execution_model == spv::ExecutionModel::Max) {
+  if (execution_model == SpvExecutionModelMax) {
     // Mixed execution models for the entry points.  This case is not currently
     // handled.
     return Status::SuccessWithoutChange;
@@ -44,19 +44,19 @@ Pass::Status ReplaceInvalidOpcodePass::Process() {
   return (modified ? Status::SuccessWithChange : Status::SuccessWithoutChange);
 }
 
-spv::ExecutionModel ReplaceInvalidOpcodePass::GetExecutionModel() {
-  spv::ExecutionModel result = spv::ExecutionModel::Max;
+SpvExecutionModel ReplaceInvalidOpcodePass::GetExecutionModel() {
+  SpvExecutionModel result = SpvExecutionModelMax;
   bool first = true;
   for (Instruction& entry_point : get_module()->entry_points()) {
     if (first) {
-      result = static_cast<spv::ExecutionModel>(
-          entry_point.GetSingleWordInOperand(0));
+      result =
+          static_cast<SpvExecutionModel>(entry_point.GetSingleWordInOperand(0));
       first = false;
     } else {
-      spv::ExecutionModel current_model = static_cast<spv::ExecutionModel>(
-          entry_point.GetSingleWordInOperand(0));
+      SpvExecutionModel current_model =
+          static_cast<SpvExecutionModel>(entry_point.GetSingleWordInOperand(0));
       if (current_model != result) {
-        result = spv::ExecutionModel::Max;
+        result = SpvExecutionModelMax;
         break;
       }
     }
@@ -65,13 +65,13 @@ spv::ExecutionModel ReplaceInvalidOpcodePass::GetExecutionModel() {
 }
 
 bool ReplaceInvalidOpcodePass::RewriteFunction(Function* function,
-                                               spv::ExecutionModel model) {
+                                               SpvExecutionModel model) {
   bool modified = false;
   Instruction* last_line_dbg_inst = nullptr;
   function->ForEachInst(
       [model, &modified, &last_line_dbg_inst, this](Instruction* inst) {
         // Track the debug information so we can have a meaningful message.
-        if (inst->opcode() == spv::Op::OpLabel || inst->IsNoLine()) {
+        if (inst->opcode() == SpvOpLabel || inst->IsNoLine()) {
           last_line_dbg_inst = nullptr;
           return;
         } else if (inst->IsLine()) {
@@ -80,16 +80,15 @@ bool ReplaceInvalidOpcodePass::RewriteFunction(Function* function,
         }
 
         bool replace = false;
-        if (model != spv::ExecutionModel::Fragment &&
+        if (model != SpvExecutionModelFragment &&
             IsFragmentShaderOnlyInstruction(inst)) {
           replace = true;
         }
 
-        if (model != spv::ExecutionModel::TessellationControl &&
-            model != spv::ExecutionModel::GLCompute &&
-            !context()->IsTargetEnvAtLeast(SPV_ENV_UNIVERSAL_1_3)) {
-          if (inst->opcode() == spv::Op::OpControlBarrier) {
-            assert(model != spv::ExecutionModel::Kernel &&
+        if (model != SpvExecutionModelTessellationControl &&
+            model != SpvExecutionModelGLCompute) {
+          if (inst->opcode() == SpvOpControlBarrier) {
+            assert(model != SpvExecutionModelKernel &&
                    "Expecting to be working on a shader module.");
             replace = true;
           }
@@ -102,7 +101,7 @@ bool ReplaceInvalidOpcodePass::RewriteFunction(Function* function,
           } else {
             // Get the name of the source file.
             uint32_t file_name_id = 0;
-            if (last_line_dbg_inst->opcode() == spv::Op::OpLine) {
+            if (last_line_dbg_inst->opcode() == SpvOpLine) {
               file_name_id = last_line_dbg_inst->GetSingleWordInOperand(0);
             } else {  // Shader100::DebugLine
               uint32_t debug_source_id =
@@ -132,26 +131,26 @@ bool ReplaceInvalidOpcodePass::RewriteFunction(Function* function,
 bool ReplaceInvalidOpcodePass::IsFragmentShaderOnlyInstruction(
     Instruction* inst) {
   switch (inst->opcode()) {
-    case spv::Op::OpDPdx:
-    case spv::Op::OpDPdy:
-    case spv::Op::OpFwidth:
-    case spv::Op::OpDPdxFine:
-    case spv::Op::OpDPdyFine:
-    case spv::Op::OpFwidthFine:
-    case spv::Op::OpDPdxCoarse:
-    case spv::Op::OpDPdyCoarse:
-    case spv::Op::OpFwidthCoarse:
-    case spv::Op::OpImageSampleImplicitLod:
-    case spv::Op::OpImageSampleDrefImplicitLod:
-    case spv::Op::OpImageSampleProjImplicitLod:
-    case spv::Op::OpImageSampleProjDrefImplicitLod:
-    case spv::Op::OpImageSparseSampleImplicitLod:
-    case spv::Op::OpImageSparseSampleDrefImplicitLod:
-    case spv::Op::OpImageQueryLod:
+    case SpvOpDPdx:
+    case SpvOpDPdy:
+    case SpvOpFwidth:
+    case SpvOpDPdxFine:
+    case SpvOpDPdyFine:
+    case SpvOpFwidthFine:
+    case SpvOpDPdxCoarse:
+    case SpvOpDPdyCoarse:
+    case SpvOpFwidthCoarse:
+    case SpvOpImageSampleImplicitLod:
+    case SpvOpImageSampleDrefImplicitLod:
+    case SpvOpImageSampleProjImplicitLod:
+    case SpvOpImageSampleProjDrefImplicitLod:
+    case SpvOpImageSparseSampleImplicitLod:
+    case SpvOpImageSparseSampleDrefImplicitLod:
+    case SpvOpImageQueryLod:
       // TODO: Teach |ReplaceInstruction| to handle block terminators.  Then
       // uncomment the OpKill case.
-      // case spv::Op::OpKill:
-      // case spv::Op::OpTerminateInstruction:
+      // case SpvOpKill:
+      // case SpvOpTerminateInstruction:
       return true;
     default:
       return false;
@@ -184,7 +183,7 @@ uint32_t ReplaceInvalidOpcodePass::GetSpecialConstant(uint32_t type_id) {
   analysis::TypeManager* type_mgr = context()->get_type_mgr();
 
   Instruction* type = context()->get_def_use_mgr()->GetDef(type_id);
-  if (type->opcode() == spv::Op::OpTypeVector) {
+  if (type->opcode() == SpvOpTypeVector) {
     uint32_t component_const =
         GetSpecialConstant(type->GetSingleWordInOperand(0));
     std::vector<uint32_t> ids;
@@ -193,8 +192,7 @@ uint32_t ReplaceInvalidOpcodePass::GetSpecialConstant(uint32_t type_id) {
     }
     special_const = const_mgr->GetConstant(type_mgr->GetType(type_id), ids);
   } else {
-    assert(type->opcode() == spv::Op::OpTypeInt ||
-           type->opcode() == spv::Op::OpTypeFloat);
+    assert(type->opcode() == SpvOpTypeInt || type->opcode() == SpvOpTypeFloat);
     std::vector<uint32_t> literal_words;
     for (uint32_t i = 0; i < type->GetSingleWordInOperand(0); i += 32) {
       literal_words.push_back(0xDEADBEEF);
@@ -206,7 +204,7 @@ uint32_t ReplaceInvalidOpcodePass::GetSpecialConstant(uint32_t type_id) {
   return const_mgr->GetDefiningInstruction(special_const)->result_id();
 }
 
-std::string ReplaceInvalidOpcodePass::BuildWarningMessage(spv::Op opcode) {
+std::string ReplaceInvalidOpcodePass::BuildWarningMessage(SpvOp opcode) {
   spv_opcode_desc opcode_info;
   context()->grammar().lookupOpcode(opcode, &opcode_info);
   std::string message = "Removing ";

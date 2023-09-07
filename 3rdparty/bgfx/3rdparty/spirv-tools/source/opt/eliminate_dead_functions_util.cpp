@@ -28,18 +28,16 @@ Module::iterator EliminateFunction(IRContext* context,
       ->ForEachInst(
           [context, first_func, func_iter, &seen_func_end,
            &to_kill](Instruction* inst) {
-            if (inst->opcode() == spv::Op::OpFunctionEnd) {
+            if (inst->opcode() == SpvOpFunctionEnd) {
               seen_func_end = true;
             }
             // Move non-semantic instructions to the previous function or
             // global values if this is the first function.
-            if (seen_func_end && inst->opcode() == spv::Op::OpExtInst) {
+            if (seen_func_end && inst->opcode() == SpvOpExtInst) {
               assert(inst->IsNonSemanticInstruction());
               if (to_kill.find(inst) != to_kill.end()) return;
               std::unique_ptr<Instruction> clone(inst->Clone(context));
-              // Clear uses of "inst" to in case this moves a dependent chain of
-              // instructions.
-              context->get_def_use_mgr()->ClearInst(inst);
+              context->ForgetUses(inst);
               context->AnalyzeDefUse(clone.get());
               if (first_func) {
                 context->AddGlobalValue(std::move(clone));

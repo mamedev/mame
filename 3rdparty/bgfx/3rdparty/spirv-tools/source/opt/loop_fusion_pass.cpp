@@ -14,6 +14,7 @@
 
 #include "source/opt/loop_fusion_pass.h"
 
+#include "source/opt/ir_context.h"
 #include "source/opt/loop_descriptor.h"
 #include "source/opt/loop_fusion.h"
 #include "source/opt/register_pressure.h"

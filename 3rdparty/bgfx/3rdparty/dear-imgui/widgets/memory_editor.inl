@@ -207,7 +207,7 @@ namespace ImGui
 
         AlignTextToFramePadding();
         PushItemWidth(50);
-        PushTabStop(false);
+        PushAllowKeyboardFocus(false);
         int rows_backup = Rows;
         if (DragInt("##rows", &Rows, 0.2f, 4, 32, "%.0f rows"))
         {
@@ -216,7 +216,7 @@ namespace ImGui
             SetWindowSize(new_window_size);
         }
 
-        PopTabStop();
+        PopAllowKeyboardFocus();
         PopItemWidth();
         SameLine();
         Text("Range %0*x..%0*x", addr_digits_count, (int)base_display_addr, addr_digits_count, (int)base_display_addr+mem_size-1);

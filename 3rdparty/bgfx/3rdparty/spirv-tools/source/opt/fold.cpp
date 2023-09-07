@@ -21,6 +21,7 @@
 #include "source/opt/const_folding_rules.h"
 #include "source/opt/def_use_manager.h"
 #include "source/opt/folding_rules.h"
+#include "source/opt/ir_builder.h"
 #include "source/opt/ir_context.h"
 
 namespace spvtools {
@@ -41,24 +42,23 @@ namespace {
 
 }  // namespace
 
-uint32_t InstructionFolder::UnaryOperate(spv::Op opcode,
-                                         uint32_t operand) const {
+uint32_t InstructionFolder::UnaryOperate(SpvOp opcode, uint32_t operand) const {
   switch (opcode) {
     // Arthimetics
-    case spv::Op::OpSNegate: {
+    case SpvOp::SpvOpSNegate: {
       int32_t s_operand = static_cast<int32_t>(operand);
       if (s_operand == std::numeric_limits<int32_t>::min()) {
         return s_operand;
       }
       return -s_operand;
     }
-    case spv::Op::OpNot:
+    case SpvOp::SpvOpNot:
       return ~operand;
-    case spv::Op::OpLogicalNot:
+    case SpvOp::SpvOpLogicalNot:
       return !static_cast<bool>(operand);
-    case spv::Op::OpUConvert:
+    case SpvOp::SpvOpUConvert:
       return operand;
-    case spv::Op::OpSConvert:
+    case SpvOp::SpvOpSConvert:
       return operand;
     default:
       assert(false &&
@@ -67,31 +67,31 @@ uint32_t InstructionFolder::UnaryOperate(spv::Op opcode,
   }
 }
 
-uint32_t InstructionFolder::BinaryOperate(spv::Op opcode, uint32_t a,
+uint32_t InstructionFolder::BinaryOperate(SpvOp opcode, uint32_t a,
                                           uint32_t b) const {
   switch (opcode) {
     // Arthimetics
-    case spv::Op::OpIAdd:
+    case SpvOp::SpvOpIAdd:
       return a + b;
-    case spv::Op::OpISub:
+    case SpvOp::SpvOpISub:
       return a - b;
-    case spv::Op::OpIMul:
+    case SpvOp::SpvOpIMul:
       return a * b;
-    case spv::Op::OpUDiv:
+    case SpvOp::SpvOpUDiv:
       if (b != 0) {
         return a / b;
       } else {
         // Dividing by 0 is undefined, so we will just pick 0.
         return 0;
       }
-    case spv::Op::OpSDiv:
+    case SpvOp::SpvOpSDiv:
       if (b != 0u) {
         return (static_cast<int32_t>(a)) / (static_cast<int32_t>(b));
       } else {
         // Dividing by 0 is undefined, so we will just pick 0.
         return 0;
       }
-    case spv::Op::OpSRem: {
+    case SpvOp::SpvOpSRem: {
       // The sign of non-zero result comes from the first operand: a. This is
       // guaranteed by C++11 rules for integer division operator. The division
       // result is rounded toward zero, so the result of '%' has the sign of
@@ -103,10 +103,10 @@ uint32_t InstructionFolder::BinaryOperate(spv::Op opcode, uint32_t a,
         return 0;
       }
     }
-    case spv::Op::OpSMod: {
+    case SpvOp::SpvOpSMod: {
       // The sign of non-zero result comes from the second operand: b
       if (b != 0u) {
-        int32_t rem = BinaryOperate(spv::Op::OpSRem, a, b);
+        int32_t rem = BinaryOperate(SpvOp::SpvOpSRem, a, b);
         int32_t b_prim = static_cast<int32_t>(b);
         return (rem + b_prim) % b_prim;
       } else {
@@ -114,7 +114,7 @@ uint32_t InstructionFolder::BinaryOperate(spv::Op opcode, uint32_t a,
         return 0;
       }
     }
-    case spv::Op::OpUMod:
+    case SpvOp::SpvOpUMod:
       if (b != 0u) {
         return (a % b);
       } else {
@@ -123,7 +123,7 @@ uint32_t InstructionFolder::BinaryOperate(spv::Op opcode, uint32_t a,
       }
 
     // Shifting
-    case spv::Op::OpShiftRightLogical:
+    case SpvOp::SpvOpShiftRightLogical:
       if (b >= 32) {
         // This is undefined behaviour when |b| > 32.  Choose 0 for consistency.
         // When |b| == 32, doing the shift in C++ in undefined, but the result
@@ -131,7 +131,7 @@ uint32_t InstructionFolder::BinaryOperate(spv::Op opcode, uint32_t a,
         return 0;
       }
       return a >> b;
-    case spv::Op::OpShiftRightArithmetic:
+    case SpvOp::SpvOpShiftRightArithmetic:
       if (b > 32) {
         // This is undefined behaviour.  Choose 0 for consistency.
         return 0;
@@ -146,7 +146,7 @@ uint32_t InstructionFolder::BinaryOperate(spv::Op opcode, uint32_t a,
         }
       }
       return (static_cast<int32_t>(a)) >> b;
-    case spv::Op::OpShiftLeftLogical:
+    case SpvOp::SpvOpShiftLeftLogical:
       if (b >= 32) {
         // This is undefined behaviour when |b| > 32.  Choose 0 for consistency.
         // When |b| == 32, doing the shift in C++ in undefined, but the result
@@ -156,43 +156,43 @@ uint32_t InstructionFolder::BinaryOperate(spv::Op opcode, uint32_t a,
       return a << b;
 
     // Bitwise operations
-    case spv::Op::OpBitwiseOr:
+    case SpvOp::SpvOpBitwiseOr:
       return a | b;
-    case spv::Op::OpBitwiseAnd:
+    case SpvOp::SpvOpBitwiseAnd:
       return a & b;
-    case spv::Op::OpBitwiseXor:
+    case SpvOp::SpvOpBitwiseXor:
       return a ^ b;
 
     // Logical
-    case spv::Op::OpLogicalEqual:
+    case SpvOp::SpvOpLogicalEqual:
       return (static_cast<bool>(a)) == (static_cast<bool>(b));
-    case spv::Op::OpLogicalNotEqual:
+    case SpvOp::SpvOpLogicalNotEqual:
       return (static_cast<bool>(a)) != (static_cast<bool>(b));
-    case spv::Op::OpLogicalOr:
+    case SpvOp::SpvOpLogicalOr:
       return (static_cast<bool>(a)) || (static_cast<bool>(b));
-    case spv::Op::OpLogicalAnd:
+    case SpvOp::SpvOpLogicalAnd:
       return (static_cast<bool>(a)) && (static_cast<bool>(b));
 
     // Comparison
-    case spv::Op::OpIEqual:
+    case SpvOp::SpvOpIEqual:
       return a == b;
-    case spv::Op::OpINotEqual:
+    case SpvOp::SpvOpINotEqual:
       return a != b;
-    case spv::Op::OpULessThan:
+    case SpvOp::SpvOpULessThan:
       return a < b;
-    case spv::Op::OpSLessThan:
+    case SpvOp::SpvOpSLessThan:
       return (static_cast<int32_t>(a)) < (static_cast<int32_t>(b));
-    case spv::Op::OpUGreaterThan:
+    case SpvOp::SpvOpUGreaterThan:
       return a > b;
-    case spv::Op::OpSGreaterThan:
+    case SpvOp::SpvOpSGreaterThan:
       return (static_cast<int32_t>(a)) > (static_cast<int32_t>(b));
-    case spv::Op::OpULessThanEqual:
+    case SpvOp::SpvOpULessThanEqual:
       return a <= b;
-    case spv::Op::OpSLessThanEqual:
+    case SpvOp::SpvOpSLessThanEqual:
       return (static_cast<int32_t>(a)) <= (static_cast<int32_t>(b));
-    case spv::Op::OpUGreaterThanEqual:
+    case SpvOp::SpvOpUGreaterThanEqual:
       return a >= b;
-    case spv::Op::OpSGreaterThanEqual:
+    case SpvOp::SpvOpSGreaterThanEqual:
       return (static_cast<int32_t>(a)) >= (static_cast<int32_t>(b));
     default:
       assert(false &&
@@ -201,10 +201,10 @@ uint32_t InstructionFolder::BinaryOperate(spv::Op opcode, uint32_t a,
   }
 }
 
-uint32_t InstructionFolder::TernaryOperate(spv::Op opcode, uint32_t a,
-                                           uint32_t b, uint32_t c) const {
+uint32_t InstructionFolder::TernaryOperate(SpvOp opcode, uint32_t a, uint32_t b,
+                                           uint32_t c) const {
   switch (opcode) {
-    case spv::Op::OpSelect:
+    case SpvOp::SpvOpSelect:
       return (static_cast<bool>(a)) ? b : c;
     default:
       assert(false &&
@@ -214,7 +214,7 @@ uint32_t InstructionFolder::TernaryOperate(spv::Op opcode, uint32_t a,
 }
 
 uint32_t InstructionFolder::OperateWords(
-    spv::Op opcode, const std::vector<uint32_t>& operand_words) const {
+    SpvOp opcode, const std::vector<uint32_t>& operand_words) const {
   switch (operand_words.size()) {
     case 1:
       return UnaryOperate(opcode, operand_words.front());
@@ -233,7 +233,7 @@ bool InstructionFolder::FoldInstructionInternal(Instruction* inst) const {
   auto identity_map = [](uint32_t id) { return id; };
   Instruction* folded_inst = FoldInstructionToConstant(inst, identity_map);
   if (folded_inst != nullptr) {
-    inst->SetOpcode(spv::Op::OpCopyObject);
+    inst->SetOpcode(SpvOpCopyObject);
     inst->SetInOperands({{SPV_OPERAND_TYPE_ID, {folded_inst->result_id()}}});
     return true;
   }
@@ -256,7 +256,7 @@ bool InstructionFolder::FoldInstructionInternal(Instruction* inst) const {
 // result in 32 bit word. Scalar constants with longer than 32-bit width are
 // not accepted in this function.
 uint32_t InstructionFolder::FoldScalars(
-    spv::Op opcode,
+    SpvOp opcode,
     const std::vector<const analysis::Constant*>& operands) const {
   assert(IsFoldableOpcode(opcode) &&
          "Unhandled instruction opcode in FoldScalars");
@@ -282,7 +282,7 @@ uint32_t InstructionFolder::FoldScalars(
 bool InstructionFolder::FoldBinaryIntegerOpToConstant(
     Instruction* inst, const std::function<uint32_t(uint32_t)>& id_map,
     uint32_t* result) const {
-  spv::Op opcode = inst->opcode();
+  SpvOp opcode = inst->opcode();
   analysis::ConstantManager* const_manger = context_->get_constant_mgr();
 
   uint32_t ids[2];
@@ -300,7 +300,7 @@ bool InstructionFolder::FoldBinaryIntegerOpToConstant(
 
   switch (opcode) {
     // Arthimetics
-    case spv::Op::OpIMul:
+    case SpvOp::SpvOpIMul:
       for (uint32_t i = 0; i < 2; i++) {
         if (constants[i] != nullptr && constants[i]->IsZero()) {
           *result = 0;
@@ -308,11 +308,11 @@ bool InstructionFolder::FoldBinaryIntegerOpToConstant(
         }
       }
       break;
-    case spv::Op::OpUDiv:
-    case spv::Op::OpSDiv:
-    case spv::Op::OpSRem:
-    case spv::Op::OpSMod:
-    case spv::Op::OpUMod:
+    case SpvOp::SpvOpUDiv:
+    case SpvOp::SpvOpSDiv:
+    case SpvOp::SpvOpSRem:
+    case SpvOp::SpvOpSMod:
+    case SpvOp::SpvOpUMod:
       // This changes undefined behaviour (ie divide by 0) into a 0.
       for (uint32_t i = 0; i < 2; i++) {
         if (constants[i] != nullptr && constants[i]->IsZero()) {
@@ -323,8 +323,8 @@ bool InstructionFolder::FoldBinaryIntegerOpToConstant(
       break;
 
     // Shifting
-    case spv::Op::OpShiftRightLogical:
-    case spv::Op::OpShiftLeftLogical:
+    case SpvOp::SpvOpShiftRightLogical:
+    case SpvOp::SpvOpShiftLeftLogical:
       if (constants[1] != nullptr) {
         // When shifting by a value larger than the size of the result, the
         // result is undefined.  We are setting the undefined behaviour to a
@@ -339,7 +339,7 @@ bool InstructionFolder::FoldBinaryIntegerOpToConstant(
       break;
 
     // Bitwise operations
-    case spv::Op::OpBitwiseOr:
+    case SpvOp::SpvOpBitwiseOr:
       for (uint32_t i = 0; i < 2; i++) {
         if (constants[i] != nullptr) {
           // TODO: Change the mask against a value based on the bit width of the
@@ -353,7 +353,7 @@ bool InstructionFolder::FoldBinaryIntegerOpToConstant(
         }
       }
       break;
-    case spv::Op::OpBitwiseAnd:
+    case SpvOp::SpvOpBitwiseAnd:
       for (uint32_t i = 0; i < 2; i++) {
         if (constants[i] != nullptr) {
           if (constants[i]->IsZero()) {
@@ -365,7 +365,7 @@ bool InstructionFolder::FoldBinaryIntegerOpToConstant(
       break;
 
     // Comparison
-    case spv::Op::OpULessThan:
+    case SpvOp::SpvOpULessThan:
       if (constants[0] != nullptr &&
           constants[0]->GetU32BitValue() == UINT32_MAX) {
         *result = false;
@@ -376,7 +376,7 @@ bool InstructionFolder::FoldBinaryIntegerOpToConstant(
         return true;
       }
       break;
-    case spv::Op::OpSLessThan:
+    case SpvOp::SpvOpSLessThan:
       if (constants[0] != nullptr &&
           constants[0]->GetS32BitValue() == INT32_MAX) {
         *result = false;
@@ -388,7 +388,7 @@ bool InstructionFolder::FoldBinaryIntegerOpToConstant(
         return true;
       }
       break;
-    case spv::Op::OpUGreaterThan:
+    case SpvOp::SpvOpUGreaterThan:
       if (constants[0] != nullptr && constants[0]->IsZero()) {
         *result = false;
         return true;
@@ -399,7 +399,7 @@ bool InstructionFolder::FoldBinaryIntegerOpToConstant(
         return true;
       }
       break;
-    case spv::Op::OpSGreaterThan:
+    case SpvOp::SpvOpSGreaterThan:
       if (constants[0] != nullptr &&
           constants[0]->GetS32BitValue() == INT32_MIN) {
         *result = false;
@@ -411,7 +411,7 @@ bool InstructionFolder::FoldBinaryIntegerOpToConstant(
         return true;
       }
       break;
-    case spv::Op::OpULessThanEqual:
+    case SpvOp::SpvOpULessThanEqual:
       if (constants[0] != nullptr && constants[0]->IsZero()) {
         *result = true;
         return true;
@@ -422,7 +422,7 @@ bool InstructionFolder::FoldBinaryIntegerOpToConstant(
         return true;
       }
       break;
-    case spv::Op::OpSLessThanEqual:
+    case SpvOp::SpvOpSLessThanEqual:
       if (constants[0] != nullptr &&
           constants[0]->GetS32BitValue() == INT32_MIN) {
         *result = true;
@@ -434,7 +434,7 @@ bool InstructionFolder::FoldBinaryIntegerOpToConstant(
         return true;
       }
       break;
-    case spv::Op::OpUGreaterThanEqual:
+    case SpvOp::SpvOpUGreaterThanEqual:
       if (constants[0] != nullptr &&
           constants[0]->GetU32BitValue() == UINT32_MAX) {
         *result = true;
@@ -445,7 +445,7 @@ bool InstructionFolder::FoldBinaryIntegerOpToConstant(
         return true;
       }
       break;
-    case spv::Op::OpSGreaterThanEqual:
+    case SpvOp::SpvOpSGreaterThanEqual:
       if (constants[0] != nullptr &&
           constants[0]->GetS32BitValue() == INT32_MAX) {
         *result = true;
@@ -466,7 +466,7 @@ bool InstructionFolder::FoldBinaryIntegerOpToConstant(
 bool InstructionFolder::FoldBinaryBooleanOpToConstant(
     Instruction* inst, const std::function<uint32_t(uint32_t)>& id_map,
     uint32_t* result) const {
-  spv::Op opcode = inst->opcode();
+  SpvOp opcode = inst->opcode();
   analysis::ConstantManager* const_manger = context_->get_constant_mgr();
 
   uint32_t ids[2];
@@ -484,7 +484,7 @@ bool InstructionFolder::FoldBinaryBooleanOpToConstant(
 
   switch (opcode) {
     // Logical
-    case spv::Op::OpLogicalOr:
+    case SpvOp::SpvOpLogicalOr:
       for (uint32_t i = 0; i < 2; i++) {
         if (constants[i] != nullptr) {
           if (constants[i]->value()) {
@@ -494,7 +494,7 @@ bool InstructionFolder::FoldBinaryBooleanOpToConstant(
         }
       }
       break;
-    case spv::Op::OpLogicalAnd:
+    case SpvOp::SpvOpLogicalAnd:
       for (uint32_t i = 0; i < 2; i++) {
         if (constants[i] != nullptr) {
           if (!constants[i]->value()) {
@@ -526,7 +526,7 @@ bool InstructionFolder::FoldIntegerOpToConstant(
 }
 
 std::vector<uint32_t> InstructionFolder::FoldVectors(
-    spv::Op opcode, uint32_t num_dims,
+    SpvOp opcode, uint32_t num_dims,
     const std::vector<const analysis::Constant*>& operands) const {
   assert(IsFoldableOpcode(opcode) &&
          "Unhandled instruction opcode in FoldVectors");
@@ -570,44 +570,44 @@ std::vector<uint32_t> InstructionFolder::FoldVectors(
   return result;
 }
 
-bool InstructionFolder::IsFoldableOpcode(spv::Op opcode) const {
+bool InstructionFolder::IsFoldableOpcode(SpvOp opcode) const {
   // NOTE: Extend to more opcodes as new cases are handled in the folder
   // functions.
   switch (opcode) {
-    case spv::Op::OpBitwiseAnd:
-    case spv::Op::OpBitwiseOr:
-    case spv::Op::OpBitwiseXor:
-    case spv::Op::OpIAdd:
-    case spv::Op::OpIEqual:
-    case spv::Op::OpIMul:
-    case spv::Op::OpINotEqual:
-    case spv::Op::OpISub:
-    case spv::Op::OpLogicalAnd:
-    case spv::Op::OpLogicalEqual:
-    case spv::Op::OpLogicalNot:
-    case spv::Op::OpLogicalNotEqual:
-    case spv::Op::OpLogicalOr:
-    case spv::Op::OpNot:
-    case spv::Op::OpSDiv:
-    case spv::Op::OpSelect:
-    case spv::Op::OpSGreaterThan:
-    case spv::Op::OpSGreaterThanEqual:
-    case spv::Op::OpShiftLeftLogical:
-    case spv::Op::OpShiftRightArithmetic:
-    case spv::Op::OpShiftRightLogical:
-    case spv::Op::OpSLessThan:
-    case spv::Op::OpSLessThanEqual:
-    case spv::Op::OpSMod:
-    case spv::Op::OpSNegate:
-    case spv::Op::OpSRem:
-    case spv::Op::OpSConvert:
-    case spv::Op::OpUConvert:
-    case spv::Op::OpUDiv:
-    case spv::Op::OpUGreaterThan:
-    case spv::Op::OpUGreaterThanEqual:
-    case spv::Op::OpULessThan:
-    case spv::Op::OpULessThanEqual:
-    case spv::Op::OpUMod:
+    case SpvOp::SpvOpBitwiseAnd:
+    case SpvOp::SpvOpBitwiseOr:
+    case SpvOp::SpvOpBitwiseXor:
+    case SpvOp::SpvOpIAdd:
+    case SpvOp::SpvOpIEqual:
+    case SpvOp::SpvOpIMul:
+    case SpvOp::SpvOpINotEqual:
+    case SpvOp::SpvOpISub:
+    case SpvOp::SpvOpLogicalAnd:
+    case SpvOp::SpvOpLogicalEqual:
+    case SpvOp::SpvOpLogicalNot:
+    case SpvOp::SpvOpLogicalNotEqual:
+    case SpvOp::SpvOpLogicalOr:
+    case SpvOp::SpvOpNot:
+    case SpvOp::SpvOpSDiv:
+    case SpvOp::SpvOpSelect:
+    case SpvOp::SpvOpSGreaterThan:
+    case SpvOp::SpvOpSGreaterThanEqual:
+    case SpvOp::SpvOpShiftLeftLogical:
+    case SpvOp::SpvOpShiftRightArithmetic:
+    case SpvOp::SpvOpShiftRightLogical:
+    case SpvOp::SpvOpSLessThan:
+    case SpvOp::SpvOpSLessThanEqual:
+    case SpvOp::SpvOpSMod:
+    case SpvOp::SpvOpSNegate:
+    case SpvOp::SpvOpSRem:
+    case SpvOp::SpvOpSConvert:
+    case SpvOp::SpvOpUConvert:
+    case SpvOp::SpvOpUDiv:
+    case SpvOp::SpvOpUGreaterThan:
+    case SpvOp::SpvOpUGreaterThanEqual:
+    case SpvOp::SpvOpULessThan:
+    case SpvOp::SpvOpULessThanEqual:
+    case SpvOp::SpvOpUMod:
       return true;
     default:
       return false;
@@ -627,8 +627,7 @@ Instruction* InstructionFolder::FoldInstructionToConstant(
     Instruction* inst, std::function<uint32_t(uint32_t)> id_map) const {
   analysis::ConstantManager* const_mgr = context_->get_constant_mgr();
 
-  if (!inst->IsFoldableByFoldScalar() && !inst->IsFoldableByFoldVector() &&
-      !GetConstantFoldingRules().HasFoldingRule(inst)) {
+  if (!inst->IsFoldableByFoldScalar() && !HasConstFoldingRule(inst)) {
     return nullptr;
   }
   // Collect the values of the constant parameters.
@@ -662,78 +661,36 @@ Instruction* InstructionFolder::FoldInstructionToConstant(
     }
   }
 
+  uint32_t result_val = 0;
   bool successful = false;
-
   // If all parameters are constant, fold the instruction to a constant.
-  if (inst->IsFoldableByFoldScalar()) {
-    uint32_t result_val = 0;
-
-    if (!missing_constants) {
-      result_val = FoldScalars(inst->opcode(), constants);
-      successful = true;
-    }
-
-    if (!successful) {
-      successful = FoldIntegerOpToConstant(inst, id_map, &result_val);
-    }
-
-    if (successful) {
-      const analysis::Constant* result_const =
-          const_mgr->GetConstant(const_mgr->GetType(inst), {result_val});
-      Instruction* folded_inst =
-          const_mgr->GetDefiningInstruction(result_const, inst->type_id());
-      return folded_inst;
-    }
-  } else if (inst->IsFoldableByFoldVector()) {
-    std::vector<uint32_t> result_val;
-
-    if (!missing_constants) {
-      if (Instruction* inst_type =
-              context_->get_def_use_mgr()->GetDef(inst->type_id())) {
-        result_val = FoldVectors(
-            inst->opcode(), inst_type->GetSingleWordInOperand(1), constants);
-        successful = true;
-      }
-    }
-
-    if (successful) {
-      const analysis::Constant* result_const =
-          const_mgr->GetNumericVectorConstantWithWords(
-              const_mgr->GetType(inst)->AsVector(), result_val);
-      Instruction* folded_inst =
-          const_mgr->GetDefiningInstruction(result_const, inst->type_id());
-      return folded_inst;
-    }
+  if (!missing_constants && inst->IsFoldableByFoldScalar()) {
+    result_val = FoldScalars(inst->opcode(), constants);
+    successful = true;
   }
 
+  if (!successful && inst->IsFoldableByFoldScalar()) {
+    successful = FoldIntegerOpToConstant(inst, id_map, &result_val);
+  }
+
+  if (successful) {
+    const analysis::Constant* result_const =
+        const_mgr->GetConstant(const_mgr->GetType(inst), {result_val});
+    Instruction* folded_inst =
+        const_mgr->GetDefiningInstruction(result_const, inst->type_id());
+    return folded_inst;
+  }
   return nullptr;
 }
 
 bool InstructionFolder::IsFoldableType(Instruction* type_inst) const {
-  return IsFoldableScalarType(type_inst) || IsFoldableVectorType(type_inst);
-}
-
-bool InstructionFolder::IsFoldableScalarType(Instruction* type_inst) const {
   // Support 32-bit integers.
-  if (type_inst->opcode() == spv::Op::OpTypeInt) {
+  if (type_inst->opcode() == SpvOpTypeInt) {
     return type_inst->GetSingleWordInOperand(0) == 32;
   }
   // Support booleans.
-  if (type_inst->opcode() == spv::Op::OpTypeBool) {
+  if (type_inst->opcode() == SpvOpTypeBool) {
     return true;
-  }
-  // Nothing else yet.
-  return false;
-}
-
-bool InstructionFolder::IsFoldableVectorType(Instruction* type_inst) const {
-  // Support vectors with foldable components
-  if (type_inst->opcode() == spv::Op::OpTypeVector) {
-    uint32_t component_type_id = type_inst->GetSingleWordInOperand(0);
-    Instruction* def_component_type =
-        context_->get_def_use_mgr()->GetDef(component_type_id);
-    return def_component_type != nullptr &&
-           IsFoldableScalarType(def_component_type);
   }
   // Nothing else yet.
   return false;
@@ -742,7 +699,7 @@ bool InstructionFolder::IsFoldableVectorType(Instruction* type_inst) const {
 bool InstructionFolder::FoldInstruction(Instruction* inst) const {
   bool modified = false;
   Instruction* folded_inst(inst);
-  while (folded_inst->opcode() != spv::Op::OpCopyObject &&
+  while (folded_inst->opcode() != SpvOpCopyObject &&
          FoldInstructionInternal(&*folded_inst)) {
     modified = true;
   }

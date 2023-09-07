@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2023 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -114,6 +114,7 @@ namespace bx
 	template<typename Ty>  using RemoveVolatileType = typename RemoveVolatileT<Ty>::Type;
 
 	//---
+
 	template<typename Ty>               struct IsBoundedArrayT            : FalseConstant {};
 	template<typename Ty, size_t SizeT> struct IsBoundedArrayT<Ty[SizeT]> :  TrueConstant {};
 
@@ -123,7 +124,6 @@ namespace bx
 		return IsBoundedArrayT<Ty>::value;
 	}
 
-	//---
 	template<typename Ty> struct IsUnboundedArrayT       : FalseConstant {};
 	template<typename Ty> struct IsUnboundedArrayT<Ty[]> :  TrueConstant {};
 
@@ -133,255 +133,194 @@ namespace bx
 		return IsUnboundedArrayT<Ty>::value;
 	}
 
-	//---
-	template<typename Ty> struct IsArrayT : public BoolConstantT<false
-		|| IsBoundedArrayT<Ty>::value
-		|| IsUnboundedArrayT<Ty>::value
-	> {};
-
 	template<typename Ty>
 	inline constexpr bool isArray()
 	{
-		return IsArrayT<Ty>::value;
+		return isBoundedArray<Ty>()
+			|| isUnboundedArray<Ty>()
+			;
 	}
-
-	//---
-	template<typename Ty> struct IsEnumT : public BoolConstantT<__is_enum(Ty)> {};
 
 	template<typename Ty>
 	inline constexpr bool isEnum()
 	{
-		return IsEnumT<Ty>::value;
+		return !!__is_enum(Ty);
 	}
-
-	//---
-	template<typename Ty> struct IsUnionT : public BoolConstantT<__is_union(Ty)> {};
 
 	template<typename Ty>
 	inline constexpr bool isUnion()
 	{
-		return IsUnionT<Ty>::value;
+		return !!__is_union(Ty);
 	}
-
-	//---
-	template<typename Ty> struct IsAbstractT : public BoolConstantT<__is_abstract(Ty)> {};
 
 	template<typename Ty>
 	inline constexpr bool isAbstract()
 	{
-		return IsAbstractT<Ty>::value;
+		return !!__is_abstract(Ty);
 	}
-
-	//---
-	template<typename Ty> struct IsAggregateT : public BoolConstantT<__is_aggregate(Ty)> {};
 
 	template<typename Ty>
 	inline constexpr bool isAggregate()
 	{
-		return IsAggregateT<Ty>::value;
+		return !!__is_aggregate(Ty);
 	}
-
-	//---
-	template<typename BaseT, typename DerivedT> struct IsBaseOfT : public BoolConstantT<__is_base_of(BaseT, DerivedT)> {};
 
 	template<typename BaseT, typename DerivedT>
 	inline constexpr bool isBaseOf()
 	{
-		return IsBaseOfT<BaseT, DerivedT>::value;
+		return !!__is_base_of(BaseT, DerivedT);
 	}
-
-	//---
-	template<typename Ty> struct IsPolymorphicT : public BoolConstantT<__is_polymorphic(Ty)> {};
 
 	template<typename Ty>
 	inline constexpr bool isPolymorphic()
 	{
-		return IsPolymorphicT<Ty>::value;
+		return !!__is_polymorphic(Ty);
 	}
-
-	//---
-	template<typename Ty> struct IsDestructorVirtualT : public BoolConstantT<__has_virtual_destructor(Ty)> {};
 
 	template<typename Ty>
 	inline constexpr bool isDestructorVirtual()
 	{
-		return IsDestructorVirtualT<Ty>::value;
+		return __has_virtual_destructor(Ty);
 	}
-
-	//---
-	template<typename Ty> struct IsClassT : public BoolConstantT<__is_class(Ty)> {};
 
 	template<typename Ty>
 	inline constexpr bool isClass()
 	{
-		return IsClassT<Ty>::value;
+		return !!__is_class(Ty);
 	}
-
-	//---
-	template<typename Ty> struct IsFinalT : public BoolConstantT<__is_final(Ty)> {};
 
 	template<typename Ty>
 	inline constexpr bool isFinal()
 	{
-		return IsFinalT<Ty>::value;
+		return !!__is_final(Ty);
 	}
-
-	//---
-	template<typename Ty> struct IsEmptyT : public BoolConstantT<__is_empty(Ty)> {};
 
 	template<typename Ty>
 	inline constexpr bool isEmpty()
 	{
-		return IsEmptyT<Ty>::value;
+		return !!__is_empty(Ty);
 	}
-
-	//---
-	template<typename Ty> struct IsStandardLayoutT : public BoolConstantT<__is_standard_layout(Ty)> {};
 
 	template<typename Ty>
 	inline constexpr bool isStandardLayout()
 	{
-		return IsStandardLayoutT<Ty>::value;
+		return !!__is_standard_layout(Ty);
 	}
-
-	//---
-	template<typename Ty> struct IsTrivialT : public BoolConstantT<__is_trivial(Ty)> {};
 
 	template<typename Ty>
 	inline constexpr bool isTrivial()
 	{
-		return IsTrivialT<Ty>::value;
+		return !!__is_trivial(Ty);
 	}
-
-	//---
-	template<typename Ty> struct IsPodT : public BoolConstantT<true
-		&& IsStandardLayoutT<Ty>::value
-		&& IsTrivialT<Ty>::value
-	> {};
 
 	template<typename Ty>
 	inline constexpr bool isPod()
 	{
-		return IsPodT<Ty>::value;
+		return isStandardLayout<Ty>()
+			&& isTrivial<Ty>()
+			;
 	}
-
-	//---
-	template<typename Ty, typename FromT> struct IsAssignableT     : public BoolConstantT<__is_assignable(Ty, FromT)> {};
-	template<typename Ty>                 struct IsCopyAssignableT : public IsAssignableT<AddLvalueReferenceType<Ty>, AddRvalueReferenceType<const Ty>> {};
-	template<typename Ty>                 struct IsMoveAssignableT : public IsAssignableT<AddLvalueReferenceType<Ty>, AddRvalueReferenceType<Ty>> {};
 
 	template<typename Ty, typename FromT>
 	inline constexpr bool isAssignable()
 	{
-		return IsAssignableT<Ty, FromT>::value;
+		return !!__is_assignable(Ty, FromT);
 	}
 
 	template<typename Ty>
 	inline constexpr bool isCopyAssignable()
 	{
-		return IsCopyAssignableT<Ty>::value;
+		return isAssignable<
+				  AddLvalueReferenceType<Ty>
+				, AddLvalueReferenceType<const Ty>
+				>();
 	}
 
 	template<typename Ty>
 	inline constexpr bool isMoveAssignable()
 	{
-		return IsMoveAssignableT<Ty>::value;
+		return isAssignable<
+				  AddLvalueReferenceType<Ty>
+				, AddRvalueReferenceType<Ty>
+				>();
 	}
-
-	//---
-	template<typename Ty, typename FromT> struct IsTriviallyAssignableT     : public BoolConstantT<__is_trivially_assignable(Ty, FromT)>                                  {};
-	template<typename Ty>                 struct IsTriviallyCopyAssignableT : public IsTriviallyAssignableT<AddLvalueReferenceType<Ty>, AddRvalueReferenceType<const Ty>> {};
-	template<typename Ty>                 struct IsTriviallyMoveAssignableT : public IsTriviallyAssignableT<AddLvalueReferenceType<Ty>, AddRvalueReferenceType<Ty>>       {};
 
 	template<typename Ty, typename FromT>
 	inline constexpr bool isTriviallyAssignable()
 	{
-		return IsTriviallyAssignableT<Ty, FromT>::value;
+		return !!__is_trivially_assignable(Ty, FromT);
 	}
 
 	template<typename Ty>
 	inline constexpr bool isTriviallyCopyAssignable()
 	{
-		return IsTriviallyCopyAssignableT<Ty>::value;
+		return isTriviallyAssignable<
+				  AddLvalueReferenceType<Ty>
+				, AddRvalueReferenceType<const Ty>
+				>();
 	}
 
 	template<typename Ty>
 	inline constexpr bool isTriviallyMoveAssignable()
 	{
-		return IsTriviallyMoveAssignableT<Ty>::value;
+		return isTriviallyAssignable<
+				  AddLvalueReferenceType<Ty>
+				, AddRvalueReferenceType<Ty>
+				>();
 	}
-
-	//---
-	template<typename Ty, typename... ArgsT> struct IsConstructibleT     : public BoolConstantT<__is_constructible(Ty, ArgsT...)>  {};
-	template<typename Ty>                    struct IsCopyConstructibleT : public IsConstructibleT<Ty, AddLvalueReferenceType<Ty>> {};
-	template<typename Ty>                    struct IsMoveConstructibleT : public IsConstructibleT<Ty, AddRvalueReferenceType<Ty>> {};
 
 	template<typename Ty, typename... ArgsT>
 	inline constexpr bool isConstructible()
 	{
-		return IsConstructibleT<Ty, ArgsT...>::value;
+		return !!__is_constructible(Ty, ArgsT...);
 	}
 
 	template<typename Ty>
 	inline constexpr bool isCopyConstructible()
 	{
-		return IsCopyConstructibleT<Ty>::value;
+		return isConstructible<Ty, AddLvalueReferenceType<Ty>>();
 	}
 
 	template<typename Ty>
 	inline constexpr bool isMoveConstructible()
 	{
-		return IsMoveConstructibleT<Ty>::value;
+		return isConstructible<Ty, AddRvalueReferenceType<Ty>>();
 	}
 
-	//---
-	template<typename Ty, typename... ArgsT> struct IsTriviallyConstructibleT     : public BoolConstantT<__is_trivially_constructible(Ty, ArgsT...)> {};
-	template<typename Ty>                    struct IsTriviallyCopyConstructibleT : public IsTriviallyConstructibleT<Ty, AddLvalueReferenceType<Ty>>  {};
-	template<typename Ty>                    struct IsTriviallyMoveConstructibleT : public IsTriviallyConstructibleT<Ty, AddRvalueReferenceType<Ty>>  {};
-
 	template<typename Ty, typename... ArgsT>
-	constexpr bool isTriviallyConstructible()
+	inline constexpr bool isTriviallyConstructible()
 	{
-		return IsTriviallyConstructibleT<Ty, ArgsT...>::value;
+		return !!__is_trivially_constructible(Ty, ArgsT...);
 	}
 
 	template<typename Ty>
 	inline constexpr bool isTriviallyCopyConstructible()
 	{
-		return IsTriviallyCopyConstructibleT<Ty>::value;
+		return isTriviallyConstructible<Ty, AddLvalueReferenceType<Ty>>();
 	}
 
 	template<typename Ty>
 	inline constexpr bool isTriviallyMoveConstructible()
 	{
-		return IsTriviallyMoveConstructibleT<Ty>::value;
+		return isTriviallyConstructible<Ty, AddRvalueReferenceType<Ty>>();
 	}
-
-	//---
-	template<typename Ty> struct IsTriviallyCopyableT : public BoolConstantT<__is_trivially_copyable(Ty)> {};
 
 	template<typename Ty>
 	inline constexpr bool isTriviallyCopyable()
 	{
-		return IsTriviallyCopyableT<Ty>::value;
+		return !!__is_trivially_copyable(Ty);
 	}
-
-	//---
-	template<typename Ty> struct IsTriviallyDestructibleT : public BoolConstantT<
-#if BX_COMPILER_GCC
-		__has_trivial_destructor(Ty)
-#else
-		__is_trivially_destructible(Ty)
-#endif // BX_COMPILER_GCC
-	> {};
 
 	template<typename Ty>
 	inline constexpr bool isTriviallyDestructible()
 	{
-		return IsTriviallyDestructibleT<Ty>::value;
+#if BX_COMPILER_GCC
+		return !!__has_trivial_destructor(Ty);
+#else
+		return !!__is_trivially_destructible(Ty);
+#endif // BX_COMPILER_GCC
 	}
 
-	//---
 	template<typename Ty> struct IsConstT           : FalseConstant {};
 	template<typename Ty> struct IsConstT<const Ty> :  TrueConstant {};
 
@@ -391,7 +330,6 @@ namespace bx
 		return IsConstT<Ty>::value;
 	}
 
-	//---
 	template<typename Ty> struct IsVolatileT              : FalseConstant {};
 	template<typename Ty> struct IsVolatileT<volatile Ty> :  TrueConstant {};
 
@@ -401,7 +339,6 @@ namespace bx
 		return IsVolatileT<Ty>::value;
 	}
 
-	//---
 	template<typename Ty> struct IsLvalueReferenceT      : FalseConstant {};
 	template<typename Ty> struct IsLvalueReferenceT<Ty&> :  TrueConstant {};
 
@@ -411,7 +348,6 @@ namespace bx
 		return IsLvalueReferenceT<Ty>::value;
 	}
 
-	//---
 	template<typename Ty> struct IsRvalueReferenceT       : FalseConstant {};
 	template<typename Ty> struct IsRvalueReferenceT<Ty&&> :  TrueConstant {};
 
@@ -421,19 +357,14 @@ namespace bx
 		return IsRvalueReferenceT<Ty>::value;
 	}
 
-	//---
-	template<typename Ty> struct IsReferenceT : public BoolConstantT<false
-		|| IsLvalueReferenceT<Ty>::value
-		|| IsRvalueReferenceT<Ty>::value
-	> {};
-
 	template<typename Ty>
 	inline constexpr bool isReference()
 	{
-		return IsReferenceT<Ty>::value;
+		return isLvalueReference<Ty>()
+			|| isRvalueReference<Ty>()
+			;
 	}
 
-	//---
 	template<typename Ty> struct IsPointerT                     : FalseConstant {};
 	template<typename Ty> struct IsPointerT<Ty*>                :  TrueConstant {};
 	template<typename Ty> struct IsPointerT<Ty* const>          :  TrueConstant {};
@@ -446,25 +377,18 @@ namespace bx
 		return IsPointerT<Ty>::value;
 	}
 
-	//---
-	template<typename Ty> struct IsSignedT : public BoolConstantT<Ty(-1) < Ty(0)> {};
-
 	template<typename Ty>
 	inline constexpr bool isSigned()
 	{
-		return IsSignedT<Ty>::value;
+		return Ty(-1) < Ty(0);
 	}
-
-	//---
-	template<typename Ty> struct IsUnsignedT : public BoolConstantT<Ty(0) < Ty(-1)> {};
 
 	template<typename Ty>
 	inline constexpr bool isUnsigned()
 	{
-		return IsUnsignedT<Ty>::value;
+		return Ty(-1) > Ty(0);
 	}
 
-	//---
 	template<typename Ty> struct IsIntegerT                     : FalseConstant {};
 	template<>            struct IsIntegerT<bool              > :  TrueConstant {};
 	template<>            struct IsIntegerT<char              > :  TrueConstant {};
@@ -488,7 +412,6 @@ namespace bx
 		return IsIntegerT<Ty>::value;
 	}
 
-	//---
 	template<typename Ty> struct IsFloatingPointT              : FalseConstant {};
 	template<>            struct IsFloatingPointT<float      > :  TrueConstant {};
 	template<>            struct IsFloatingPointT<     double> :  TrueConstant {};
@@ -500,20 +423,14 @@ namespace bx
 		return IsFloatingPointT<Ty>::value;
 	}
 
-	//---
-	template<typename Ty> struct IsArithmeticT : BoolConstantT<false
-		|| IsIntegerT<Ty>::value
-		|| IsFloatingPointT<Ty>::value
-	>
-	{};
-
 	template<typename Ty>
 	inline constexpr bool isArithmetic()
 	{
-		return IsArithmeticT<Ty>::value;
+		return isInteger<Ty>()
+			|| isFloatingPoint<Ty>()
+			;
 	}
 
-	//---
 	template<typename Ty, typename Uy> struct IsSameT         : FalseConstant {};
 	template<typename Ty>              struct IsSameT<Ty, Ty> :  TrueConstant {};
 
@@ -523,7 +440,6 @@ namespace bx
 		return IsSameT<Ty, Uy>::value;
 	}
 
-	//---
 	template<typename Ty>
 	inline constexpr RemoveReferenceType<Ty>&& move(Ty&& _a)
 	{

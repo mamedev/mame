@@ -1,8 +1,9 @@
 bx
 ==
 
-Base X-platform library.
+Base library.
 
+[![Build status](https://ci.appveyor.com/api/projects/status/edras3mltmoy31g5?svg=true)](https://ci.appveyor.com/project/bkaradzic/bx)
 [![License](https://img.shields.io/badge/license-BSD--2%20clause-blue.svg)](https://bkaradzic.github.io/bgfx/license.html)
 [![Join the chat at https://discord.gg/9eMbv7J](https://img.shields.io/discord/712512073522872352?color=%237289DA&label=bx&logo=discord&logoColor=white)](https://discord.gg/9eMbv7J)
 
@@ -21,7 +22,7 @@ https://github.com/bkaradzic/bx
 <img align="right" src="http://opensource.org/trademarks/opensource/OSI-Approved-License-100x137.png">
 </a>
 
-	Copyright 2010-2023 Branimir Karadzic
+	Copyright 2010-2022 Branimir Karadzic
 	
 	Redistribution and use in source and binary forms, with or without modification,
 	are permitted provided that the following conditions are met:

@@ -16,8 +16,11 @@
 
 #include "source/opt/block_merge_pass.h"
 
+#include <vector>
+
 #include "source/opt/block_merge_util.h"
 #include "source/opt/ir_context.h"
+#include "source/opt/iterator.h"
 
 namespace spvtools {
 namespace opt {

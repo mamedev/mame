@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2023 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -17,12 +17,12 @@ namespace bx
 
 	bool isSpace(char _ch)
 	{
-		return ' '  == _ch // Space.
-			|| '\t' == _ch // Horizontal tab.
-			|| '\n' == _ch // Line feed / new line.
-			|| '\r' == _ch // Carriage return.
-			|| '\v' == _ch // Vertical tab.
-			|| '\f' == _ch // Form feed / new page.
+		return ' '  == _ch
+			|| '\t' == _ch
+			|| '\n' == _ch
+			|| '\v' == _ch
+			|| '\f' == _ch
+			|| '\r' == _ch
 			;
 	}
 
@@ -302,6 +302,11 @@ namespace bx
 		return int32_t(ptr - _str);
 	}
 
+	int32_t strLen(const StringView& _str, int32_t _max)
+	{
+		return strLen(_str.getPtr(), min(_str.getLength(), _max) );
+	}
+
 	inline int32_t strCopy(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
 	{
 		BX_ASSERT(NULL != _dst, "_dst can't be NULL!");
@@ -539,7 +544,7 @@ namespace bx
 					return StringView(ptr, ii + 1);
 				}
 			}
-
+			
 			return StringView(_str.getPtr(), _str.getPtr());
 		}
 
@@ -729,12 +734,12 @@ namespace bx
 			int32_t width;
 			int32_t base;
 			int32_t prec;
-			char    fill;
+			char fill;
 			uint8_t bits;
-			bool    left;
-			bool    upper;
-			bool    spec;
-			bool    sign;
+			bool left;
+			bool upper;
+			bool spec;
+			bool sign;
 		};
 
 		static int32_t write(WriterI* _writer, const char* _str, int32_t _len, const Param& _param, Error* _err)
@@ -951,7 +956,7 @@ namespace bx
 			}
 			else if ('%' == ch)
 			{
-				// %[Flags][Width][.Precision][Length]Type
+				// %[Flags][Width][.Precision][Leegth]Type
 				read(&reader, ch, &err);
 
 				Param param;
@@ -1069,8 +1074,8 @@ namespace bx
 							{
 								case 'h': param.bits = sizeof(signed char  )*8; break;
 								case 'l': param.bits = sizeof(long long int)*8; break;
-
-								case '3': case '6':
+								case '3':
+								case '6':
 									read(&reader, ch, &err);
 									switch (ch)
 									{
@@ -1129,9 +1134,12 @@ namespace bx
 						};
 						break;
 
-					case 'e': case 'E':
-					case 'f': case 'F':
-					case 'g': case 'G':
+					case 'e':
+					case 'E':
+					case 'f':
+					case 'F':
+					case 'g':
+					case 'G':
 						param.upper = isUpper(ch);
 						size += write(_writer, va_arg(_argList, double), param, _err);
 						break;
@@ -1140,7 +1148,8 @@ namespace bx
 						size += write(_writer, va_arg(_argList, void*), param, _err);
 						break;
 
-					case 'x': case 'X':
+					case 'x':
+					case 'X':
 						param.base  = 16;
 						param.upper = isUpper(ch);
 						switch (param.bits)
@@ -1207,14 +1216,15 @@ namespace bx
 			int32_t size = write(&writer, _format, argListCopy, &err);
 			va_end(argListCopy);
 
-			size += write(&writer, '\0', &err);
-
 			if (err.isOk() )
 			{
+				size += write(&writer, '\0', &err);
 				return size - 1 /* size without '\0' terminator */;
 			}
-
-			_out[_max-1] = '\0';
+			else
+			{
+				_out[_max-1] = '\0';
+			}
 		}
 
 		Error err;

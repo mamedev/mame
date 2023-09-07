@@ -20,10 +20,12 @@
 #include <vector>
 
 #include "source/opt/def_use_manager.h"
+#include "source/opt/ir_context.h"
 #include "source/util/make_unique.h"
 
 namespace spvtools {
 namespace opt {
+
 namespace {
 
 // The trie that stores a bunch of result ids and, for a given instruction,
@@ -101,7 +103,7 @@ class ResultIdTrie {
 
   std::unique_ptr<Node> root_;  // The root node of the trie.
 };
-}  // namespace
+}  // anonymous namespace
 
 Pass::Status UnifyConstantPass::Process() {
   bool modified = false;
@@ -137,12 +139,12 @@ Pass::Status UnifyConstantPass::Process() {
     // processing is up to a descendant. This makes comparing the key array
     // always valid for judging duplication.
     switch (inst->opcode()) {
-      case spv::Op::OpConstantTrue:
-      case spv::Op::OpConstantFalse:
-      case spv::Op::OpConstant:
-      case spv::Op::OpConstantNull:
-      case spv::Op::OpConstantSampler:
-      case spv::Op::OpConstantComposite:
+      case SpvOp::SpvOpConstantTrue:
+      case SpvOp::SpvOpConstantFalse:
+      case SpvOp::SpvOpConstant:
+      case SpvOp::SpvOpConstantNull:
+      case SpvOp::SpvOpConstantSampler:
+      case SpvOp::SpvOpConstantComposite:
       // Only spec constants defined with OpSpecConstantOp and
       // OpSpecConstantComposite should be processed in this pass. Spec
       // constants defined with OpSpecConstant{|True|False} are decorated with
@@ -152,8 +154,8 @@ Pass::Status UnifyConstantPass::Process() {
       // unique. When all the operands/components are the same between two
       // OpSpecConstant{Op|Composite} results, their result values must be the
       // same so are unifiable.
-      case spv::Op::OpSpecConstantOp:
-      case spv::Op::OpSpecConstantComposite: {
+      case SpvOp::SpvOpSpecConstantOp:
+      case SpvOp::SpvOpSpecConstantComposite: {
         uint32_t id = defined_constants.LookupEquivalentResultFor(*inst);
         if (id != inst->result_id()) {
           // The constant is a duplicated one, use the cached constant to

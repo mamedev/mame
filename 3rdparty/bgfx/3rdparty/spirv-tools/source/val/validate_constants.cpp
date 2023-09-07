@@ -24,7 +24,7 @@ namespace {
 spv_result_t ValidateConstantBool(ValidationState_t& _,
                                   const Instruction* inst) {
   auto type = _.FindDef(inst->type_id());
-  if (!type || type->opcode() != spv::Op::OpTypeBool) {
+  if (!type || type->opcode() != SpvOpTypeBool) {
     return _.diag(SPV_ERROR_INVALID_ID, inst)
            << "Op" << spvOpcodeString(inst->opcode()) << " Result Type <id> "
            << _.getIdName(inst->type_id()) << " is not a boolean type.";
@@ -46,7 +46,7 @@ spv_result_t ValidateConstantComposite(ValidationState_t& _,
 
   const auto constituent_count = inst->words().size() - 3;
   switch (result_type->opcode()) {
-    case spv::Op::OpTypeVector: {
+    case SpvOpTypeVector: {
       const auto component_count = result_type->GetOperandAs<uint32_t>(2);
       if (component_count != constituent_count) {
         // TODO: Output ID's on diagnostic
@@ -76,7 +76,7 @@ spv_result_t ValidateConstantComposite(ValidationState_t& _,
         }
         const auto constituent_result_type = _.FindDef(constituent->type_id());
         if (!constituent_result_type ||
-            component_type->id() != constituent_result_type->id()) {
+            component_type->opcode() != constituent_result_type->opcode()) {
           return _.diag(SPV_ERROR_INVALID_ID, inst)
                  << opcode_name << " Constituent <id> "
                  << _.getIdName(constituent_id)
@@ -85,7 +85,7 @@ spv_result_t ValidateConstantComposite(ValidationState_t& _,
         }
       }
     } break;
-    case spv::Op::OpTypeMatrix: {
+    case SpvOpTypeMatrix: {
       const auto column_count = result_type->GetOperandAs<uint32_t>(2);
       if (column_count != constituent_count) {
         // TODO: Output ID's on diagnostic
@@ -155,7 +155,7 @@ spv_result_t ValidateConstantComposite(ValidationState_t& _,
         }
       }
     } break;
-    case spv::Op::OpTypeArray: {
+    case SpvOpTypeArray: {
       auto element_type = _.FindDef(result_type->GetOperandAs<uint32_t>(1));
       if (!element_type) {
         return _.diag(SPV_ERROR_INVALID_ID, result_type)
@@ -203,7 +203,7 @@ spv_result_t ValidateConstantComposite(ValidationState_t& _,
         }
       }
     } break;
-    case spv::Op::OpTypeStruct: {
+    case SpvOpTypeStruct: {
       const auto member_count = result_type->words().size() - 2;
       if (member_count != constituent_count) {
         return _.diag(SPV_ERROR_INVALID_ID, inst)
@@ -243,8 +243,7 @@ spv_result_t ValidateConstantComposite(ValidationState_t& _,
         }
       }
     } break;
-    case spv::Op::OpTypeCooperativeMatrixKHR:
-    case spv::Op::OpTypeCooperativeMatrixNV: {
+    case SpvOpTypeCooperativeMatrixNV: {
       if (1 != constituent_count) {
         return _.diag(SPV_ERROR_INVALID_ID, inst)
                << opcode_name << " Constituent <id> "
@@ -282,7 +281,7 @@ spv_result_t ValidateConstantComposite(ValidationState_t& _,
 spv_result_t ValidateConstantSampler(ValidationState_t& _,
                                      const Instruction* inst) {
   const auto result_type = _.FindDef(inst->type_id());
-  if (!result_type || result_type->opcode() != spv::Op::OpTypeSampler) {
+  if (!result_type || result_type->opcode() != SpvOpTypeSampler) {
     return _.diag(SPV_ERROR_INVALID_ID, result_type)
            << "OpConstantSampler Result Type <id> "
            << _.getIdName(inst->type_id()) << " is not a sampler type.";
@@ -299,24 +298,23 @@ bool IsTypeNullable(const std::vector<uint32_t>& instruction,
   uint16_t opcode;
   uint16_t word_count;
   spvOpcodeSplit(instruction[0], &word_count, &opcode);
-  switch (static_cast<spv::Op>(opcode)) {
-    case spv::Op::OpTypeBool:
-    case spv::Op::OpTypeInt:
-    case spv::Op::OpTypeFloat:
-    case spv::Op::OpTypeEvent:
-    case spv::Op::OpTypeDeviceEvent:
-    case spv::Op::OpTypeReserveId:
-    case spv::Op::OpTypeQueue:
+  switch (static_cast<SpvOp>(opcode)) {
+    case SpvOpTypeBool:
+    case SpvOpTypeInt:
+    case SpvOpTypeFloat:
+    case SpvOpTypeEvent:
+    case SpvOpTypeDeviceEvent:
+    case SpvOpTypeReserveId:
+    case SpvOpTypeQueue:
       return true;
-    case spv::Op::OpTypeArray:
-    case spv::Op::OpTypeMatrix:
-    case spv::Op::OpTypeCooperativeMatrixNV:
-    case spv::Op::OpTypeCooperativeMatrixKHR:
-    case spv::Op::OpTypeVector: {
+    case SpvOpTypeArray:
+    case SpvOpTypeMatrix:
+    case SpvOpTypeCooperativeMatrixNV:
+    case SpvOpTypeVector: {
       auto base_type = _.FindDef(instruction[2]);
       return base_type && IsTypeNullable(base_type->words(), _);
     }
-    case spv::Op::OpTypeStruct: {
+    case SpvOpTypeStruct: {
       for (size_t elementIndex = 2; elementIndex < instruction.size();
            ++elementIndex) {
         auto element = _.FindDef(instruction[elementIndex]);
@@ -324,9 +322,8 @@ bool IsTypeNullable(const std::vector<uint32_t>& instruction,
       }
       return true;
     }
-    case spv::Op::OpTypePointer:
-      if (spv::StorageClass(instruction[2]) ==
-          spv::StorageClass::PhysicalStorageBuffer) {
+    case SpvOpTypePointer:
+      if (instruction[2] == SpvStorageClassPhysicalStorageBuffer) {
         return false;
       }
       return true;
@@ -354,8 +351,7 @@ spv_result_t ValidateSpecConstant(ValidationState_t& _,
   auto type_id = inst->GetOperandAs<const uint32_t>(0);
   auto type_instruction = _.FindDef(type_id);
   auto type_opcode = type_instruction->opcode();
-  if (type_opcode != spv::Op::OpTypeInt &&
-      type_opcode != spv::Op::OpTypeFloat) {
+  if (type_opcode != SpvOpTypeInt && type_opcode != SpvOpTypeFloat) {
     return _.diag(SPV_ERROR_INVALID_DATA, inst) << "Specialization constant "
                                                    "must be an integer or "
                                                    "floating-point number.";
@@ -365,22 +361,22 @@ spv_result_t ValidateSpecConstant(ValidationState_t& _,
 
 spv_result_t ValidateSpecConstantOp(ValidationState_t& _,
                                     const Instruction* inst) {
-  const auto op = inst->GetOperandAs<spv::Op>(2);
+  const auto op = inst->GetOperandAs<SpvOp>(2);
 
   // The binary parser already ensures that the op is valid for *some*
   // environment.  Here we check restrictions.
   switch (op) {
-    case spv::Op::OpQuantizeToF16:
-      if (!_.HasCapability(spv::Capability::Shader)) {
+    case SpvOpQuantizeToF16:
+      if (!_.HasCapability(SpvCapabilityShader)) {
         return _.diag(SPV_ERROR_INVALID_ID, inst)
                << "Specialization constant operation " << spvOpcodeString(op)
                << " requires Shader capability";
       }
       break;
 
-    case spv::Op::OpUConvert:
+    case SpvOpUConvert:
       if (!_.features().uconvert_spec_constant_op &&
-          !_.HasCapability(spv::Capability::Kernel)) {
+          !_.HasCapability(SpvCapabilityKernel)) {
         return _.diag(SPV_ERROR_INVALID_ID, inst)
                << "Prior to SPIR-V 1.4, specialization constant operation "
                   "UConvert requires Kernel capability or extension "
@@ -388,27 +384,27 @@ spv_result_t ValidateSpecConstantOp(ValidationState_t& _,
       }
       break;
 
-    case spv::Op::OpConvertFToS:
-    case spv::Op::OpConvertSToF:
-    case spv::Op::OpConvertFToU:
-    case spv::Op::OpConvertUToF:
-    case spv::Op::OpConvertPtrToU:
-    case spv::Op::OpConvertUToPtr:
-    case spv::Op::OpGenericCastToPtr:
-    case spv::Op::OpPtrCastToGeneric:
-    case spv::Op::OpBitcast:
-    case spv::Op::OpFNegate:
-    case spv::Op::OpFAdd:
-    case spv::Op::OpFSub:
-    case spv::Op::OpFMul:
-    case spv::Op::OpFDiv:
-    case spv::Op::OpFRem:
-    case spv::Op::OpFMod:
-    case spv::Op::OpAccessChain:
-    case spv::Op::OpInBoundsAccessChain:
-    case spv::Op::OpPtrAccessChain:
-    case spv::Op::OpInBoundsPtrAccessChain:
-      if (!_.HasCapability(spv::Capability::Kernel)) {
+    case SpvOpConvertFToS:
+    case SpvOpConvertSToF:
+    case SpvOpConvertFToU:
+    case SpvOpConvertUToF:
+    case SpvOpConvertPtrToU:
+    case SpvOpConvertUToPtr:
+    case SpvOpGenericCastToPtr:
+    case SpvOpPtrCastToGeneric:
+    case SpvOpBitcast:
+    case SpvOpFNegate:
+    case SpvOpFAdd:
+    case SpvOpFSub:
+    case SpvOpFMul:
+    case SpvOpFDiv:
+    case SpvOpFRem:
+    case SpvOpFMod:
+    case SpvOpAccessChain:
+    case SpvOpInBoundsAccessChain:
+    case SpvOpPtrAccessChain:
+    case SpvOpInBoundsPtrAccessChain:
+      if (!_.HasCapability(SpvCapabilityKernel)) {
         return _.diag(SPV_ERROR_INVALID_ID, inst)
                << "Specialization constant operation " << spvOpcodeString(op)
                << " requires Kernel capability";
@@ -427,26 +423,26 @@ spv_result_t ValidateSpecConstantOp(ValidationState_t& _,
 
 spv_result_t ConstantPass(ValidationState_t& _, const Instruction* inst) {
   switch (inst->opcode()) {
-    case spv::Op::OpConstantTrue:
-    case spv::Op::OpConstantFalse:
-    case spv::Op::OpSpecConstantTrue:
-    case spv::Op::OpSpecConstantFalse:
+    case SpvOpConstantTrue:
+    case SpvOpConstantFalse:
+    case SpvOpSpecConstantTrue:
+    case SpvOpSpecConstantFalse:
       if (auto error = ValidateConstantBool(_, inst)) return error;
       break;
-    case spv::Op::OpConstantComposite:
-    case spv::Op::OpSpecConstantComposite:
+    case SpvOpConstantComposite:
+    case SpvOpSpecConstantComposite:
       if (auto error = ValidateConstantComposite(_, inst)) return error;
       break;
-    case spv::Op::OpConstantSampler:
+    case SpvOpConstantSampler:
       if (auto error = ValidateConstantSampler(_, inst)) return error;
       break;
-    case spv::Op::OpConstantNull:
+    case SpvOpConstantNull:
       if (auto error = ValidateConstantNull(_, inst)) return error;
       break;
-    case spv::Op::OpSpecConstant:
+    case SpvOpSpecConstant:
       if (auto error = ValidateSpecConstant(_, inst)) return error;
       break;
-    case spv::Op::OpSpecConstantOp:
+    case SpvOpSpecConstantOp:
       if (auto error = ValidateSpecConstantOp(_, inst)) return error;
       break;
     default:
@@ -456,7 +452,7 @@ spv_result_t ConstantPass(ValidationState_t& _, const Instruction* inst) {
   // Generally disallow creating 8- or 16-bit constants unless the full
   // capabilities are present.
   if (spvOpcodeIsConstant(inst->opcode()) &&
-      _.HasCapability(spv::Capability::Shader) &&
+      _.HasCapability(SpvCapabilityShader) &&
       !_.IsPointerType(inst->type_id()) &&
       _.ContainsLimitedUseIntOrFloatType(inst->type_id())) {
     return _.diag(SPV_ERROR_INVALID_ID, inst)

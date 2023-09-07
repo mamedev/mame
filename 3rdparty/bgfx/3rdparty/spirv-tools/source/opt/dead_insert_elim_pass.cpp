@@ -23,29 +23,32 @@
 
 namespace spvtools {
 namespace opt {
+
 namespace {
-constexpr uint32_t kTypeVectorCountInIdx = 1;
-constexpr uint32_t kTypeMatrixCountInIdx = 1;
-constexpr uint32_t kTypeArrayLengthIdInIdx = 1;
-constexpr uint32_t kTypeIntWidthInIdx = 0;
-constexpr uint32_t kConstantValueInIdx = 0;
-constexpr uint32_t kInsertObjectIdInIdx = 0;
-constexpr uint32_t kInsertCompositeIdInIdx = 1;
-}  // namespace
+
+const uint32_t kTypeVectorCountInIdx = 1;
+const uint32_t kTypeMatrixCountInIdx = 1;
+const uint32_t kTypeArrayLengthIdInIdx = 1;
+const uint32_t kTypeIntWidthInIdx = 0;
+const uint32_t kConstantValueInIdx = 0;
+const uint32_t kInsertObjectIdInIdx = 0;
+const uint32_t kInsertCompositeIdInIdx = 1;
+
+}  // anonymous namespace
 
 uint32_t DeadInsertElimPass::NumComponents(Instruction* typeInst) {
   switch (typeInst->opcode()) {
-    case spv::Op::OpTypeVector: {
+    case SpvOpTypeVector: {
       return typeInst->GetSingleWordInOperand(kTypeVectorCountInIdx);
     } break;
-    case spv::Op::OpTypeMatrix: {
+    case SpvOpTypeMatrix: {
       return typeInst->GetSingleWordInOperand(kTypeMatrixCountInIdx);
     } break;
-    case spv::Op::OpTypeArray: {
+    case SpvOpTypeArray: {
       uint32_t lenId =
           typeInst->GetSingleWordInOperand(kTypeArrayLengthIdInIdx);
       Instruction* lenInst = get_def_use_mgr()->GetDef(lenId);
-      if (lenInst->opcode() != spv::Op::OpConstant) return 0;
+      if (lenInst->opcode() != SpvOpConstant) return 0;
       uint32_t lenTypeId = lenInst->type_id();
       Instruction* lenTypeInst = get_def_use_mgr()->GetDef(lenTypeId);
       // TODO(greg-lunarg): Support non-32-bit array length
@@ -53,7 +56,7 @@ uint32_t DeadInsertElimPass::NumComponents(Instruction* typeInst) {
         return 0;
       return lenInst->GetSingleWordInOperand(kConstantValueInIdx);
     } break;
-    case spv::Op::OpTypeStruct: {
+    case SpvOpTypeStruct: {
       return typeInst->NumInOperands();
     } break;
     default: { return 0; } break;
@@ -65,10 +68,10 @@ void DeadInsertElimPass::MarkInsertChain(
     uint32_t extOffset, std::unordered_set<uint32_t>* visited_phis) {
   // Not currently optimizing array inserts.
   Instruction* typeInst = get_def_use_mgr()->GetDef(insertChain->type_id());
-  if (typeInst->opcode() == spv::Op::OpTypeArray) return;
+  if (typeInst->opcode() == SpvOpTypeArray) return;
   // Insert chains are only composed of inserts and phis
-  if (insertChain->opcode() != spv::Op::OpCompositeInsert &&
-      insertChain->opcode() != spv::Op::OpPhi)
+  if (insertChain->opcode() != SpvOpCompositeInsert &&
+      insertChain->opcode() != SpvOpPhi)
     return;
   // If extract indices are empty, mark all subcomponents if type
   // is constant length.
@@ -86,7 +89,7 @@ void DeadInsertElimPass::MarkInsertChain(
     }
   }
   Instruction* insInst = insertChain;
-  while (insInst->opcode() == spv::Op::OpCompositeInsert) {
+  while (insInst->opcode() == SpvOpCompositeInsert) {
     // If no extract indices, mark insert and inserted object (which might
     // also be an insert chain) and continue up the chain though the input
     // composite.
@@ -136,7 +139,7 @@ void DeadInsertElimPass::MarkInsertChain(
     insInst = get_def_use_mgr()->GetDef(compId);
   }
   // If insert chain ended with phi, do recursive call on each operand
-  if (insInst->opcode() != spv::Op::OpPhi) return;
+  if (insInst->opcode() != SpvOpPhi) return;
   // Mark phi visited to prevent potential infinite loop. If phi is already
   // visited, return to avoid infinite loop.
   if (visited_phis->count(insInst->result_id()) != 0) return;
@@ -176,17 +179,17 @@ bool DeadInsertElimPass::EliminateDeadInsertsOnePass(Function* func) {
   for (auto bi = func->begin(); bi != func->end(); ++bi) {
     for (auto ii = bi->begin(); ii != bi->end(); ++ii) {
       // Only process Inserts and composite Phis
-      spv::Op op = ii->opcode();
+      SpvOp op = ii->opcode();
       Instruction* typeInst = get_def_use_mgr()->GetDef(ii->type_id());
-      if (op != spv::Op::OpCompositeInsert &&
-          (op != spv::Op::OpPhi || !spvOpcodeIsComposite(typeInst->opcode())))
+      if (op != SpvOpCompositeInsert &&
+          (op != SpvOpPhi || !spvOpcodeIsComposite(typeInst->opcode())))
         continue;
       // The marking algorithm can be expensive for large arrays and the
       // efficacy of eliminating dead inserts into arrays is questionable.
       // Skip optimizing array inserts for now. Just mark them live.
       // TODO(greg-lunarg): Eliminate dead array inserts
-      if (op == spv::Op::OpCompositeInsert) {
-        if (typeInst->opcode() == spv::Op::OpTypeArray) {
+      if (op == SpvOpCompositeInsert) {
+        if (typeInst->opcode() == SpvOpTypeArray) {
           liveInserts_.insert(ii->result_id());
           continue;
         }
@@ -195,11 +198,11 @@ bool DeadInsertElimPass::EliminateDeadInsertsOnePass(Function* func) {
       get_def_use_mgr()->ForEachUser(id, [&ii, this](Instruction* user) {
         if (user->IsCommonDebugInstr()) return;
         switch (user->opcode()) {
-          case spv::Op::OpCompositeInsert:
-          case spv::Op::OpPhi:
+          case SpvOpCompositeInsert:
+          case SpvOpPhi:
             // Use by insert or phi does not initiate marking
             break;
-          case spv::Op::OpCompositeExtract: {
+          case SpvOpCompositeExtract: {
             // Capture extract indices
             std::vector<uint32_t> extIndices;
             uint32_t icnt = 0;
@@ -223,7 +226,7 @@ bool DeadInsertElimPass::EliminateDeadInsertsOnePass(Function* func) {
   std::vector<Instruction*> dead_instructions;
   for (auto bi = func->begin(); bi != func->end(); ++bi) {
     for (auto ii = bi->begin(); ii != bi->end(); ++ii) {
-      if (ii->opcode() != spv::Op::OpCompositeInsert) continue;
+      if (ii->opcode() != SpvOpCompositeInsert) continue;
       const uint32_t id = ii->result_id();
       if (liveInserts_.find(id) != liveInserts_.end()) continue;
       const uint32_t replId =

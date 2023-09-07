@@ -29,15 +29,15 @@ SimpleConditionalBranchToBranchOpportunityFinder::GetAvailableOpportunities(
   for (auto* function : GetTargetFunctions(context, target_function)) {
     // Consider every block in the function.
     for (auto& block : *function) {
-      // The terminator must be spv::Op::OpBranchConditional.
+      // The terminator must be SpvOpBranchConditional.
       opt::Instruction* terminator = block.terminator();
-      if (terminator->opcode() != spv::Op::OpBranchConditional) {
+      if (terminator->opcode() != SpvOpBranchConditional) {
         continue;
       }
       // It must not be a selection header, as these cannot be followed by
       // OpBranch.
       if (block.GetMergeInst() &&
-          block.GetMergeInst()->opcode() == spv::Op::OpSelectionMerge) {
+          block.GetMergeInst()->opcode() == SpvOpSelectionMerge) {
         continue;
       }
       // The conditional branch must be simplified.

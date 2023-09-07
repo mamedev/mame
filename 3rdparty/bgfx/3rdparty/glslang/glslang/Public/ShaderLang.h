@@ -728,6 +728,8 @@ private:
     TShader& operator=(TShader&);
 };
 
+#if !defined(GLSLANG_WEB)
+
 //
 // A reflection database and its interface, consistent with the OpenGL API reflection queries.
 //
@@ -844,6 +846,8 @@ public:
     virtual void addStage(EShLanguage stage, TIntermediate& stageIntermediate) = 0;
 };
 
+#endif // !GLSLANG_WEB
+
 // Make one TProgram per set of shaders that will get linked together.  Add all
 // the shaders that are to be linked together.  After calling shader.parse()
 // for all shaders, call link().
@@ -862,6 +866,8 @@ public:
     GLSLANG_EXPORT const char* getInfoDebugLog();
 
     TIntermediate* getIntermediate(EShLanguage stage) const { return intermediate[stage]; }
+
+#if !defined(GLSLANG_WEB)
 
     // Reflection Interface
 
@@ -955,6 +961,7 @@ public:
     // If resolver is not provided it uses the previous approach
     // and respects auto assignment and offsets.
     GLSLANG_EXPORT bool mapIO(TIoMapResolver* pResolver = nullptr, TIoMapper* pIoMapper = nullptr);
+#endif // !GLSLANG_WEB
 
 protected:
     GLSLANG_EXPORT bool linkStage(EShLanguage, EShMessages);
@@ -965,7 +972,9 @@ protected:
     TIntermediate* intermediate[EShLangCount];
     bool newedIntermediate[EShLangCount];      // track which intermediate were "new" versus reusing a singleton unit in a stage
     TInfoSink* infoSink;
+#if !defined(GLSLANG_WEB)
     TReflection* reflection;
+#endif
     bool linked;
 
 private:

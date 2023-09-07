@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2023 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bimg/blob/master/LICENSE
  */
 
@@ -403,16 +403,16 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 						, 1
 						, bimg::TextureFormat::RGBA32F
 						);
-					temp = bx::alloc(_allocator, size);
-					float* rgba32f = (float*)temp;
-					float* rgbaDst = (float*)bx::alloc(_allocator, size);
+					temp = BX_ALLOC(_allocator, size);
+					float* rgba = (float*)temp;
+					float* rgbaDst = (float*)BX_ALLOC(_allocator, size);
 
 					bimg::imageDecodeToRgba32f(_allocator
-						, rgba32f
+						, rgba
 						, mip.m_data
-						, mip.m_width
-						, mip.m_height
-						, mip.m_depth
+						, dstMip.m_width
+						, dstMip.m_height
+						, dstMip.m_depth
 						, dstMip.m_width*16
 						, mip.m_format
 						);
@@ -424,7 +424,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 							for (uint32_t xx = 0; xx < mip.m_width; ++xx)
 							{
 								const uint32_t offset = (yy*mip.m_width + xx) * 4;
-								float* inout = &rgba32f[offset];
+								float* inout = &rgba[offset];
 								inout[0] = inout[0] * 2.0f - 1.0f;
 								inout[1] = inout[1] * 2.0f - 1.0f;
 								inout[2] = inout[2] * 2.0f - 1.0f;
@@ -433,26 +433,23 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 						}
 					}
 
-					imageRgba32fNormalize(
-						  rgba32f
+					imageRgba32fNormalize(rgba
 						, dstMip.m_width
 						, dstMip.m_height
 						, dstMip.m_width*16
-						, rgba32f
+						, rgba
 						);
 
-					bimg::imageRgba32f11to01(
-						  rgbaDst
+					bimg::imageRgba32f11to01(rgbaDst
 						, dstMip.m_width
 						, dstMip.m_height
 						, dstMip.m_depth
 						, dstMip.m_width*16
-						, rgba32f
+						, rgba
 						);
 
 					bimg::Quality::Enum nmapQuality = bimg::Quality::Enum(_options.quality + bimg::Quality::NormalMapDefault);
-					bimg::imageEncodeFromRgba32f(
-						  _allocator
+					bimg::imageEncodeFromRgba32f(_allocator
 						, dstData
 						, rgbaDst
 						, dstMip.m_width
@@ -465,29 +462,26 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 
 					for (uint8_t lod = 1; lod < numMips && _err->isOk(); ++lod)
 					{
-						bimg::imageRgba32fDownsample2x2NormalMap(
-							  rgba32f
+						bimg::imageRgba32fDownsample2x2NormalMap(rgba
 							, dstMip.m_width
 							, dstMip.m_height
 							, dstMip.m_width*16
 							, bx::strideAlign(dstMip.m_width/2, blockWidth)*16
-							, rgba32f
+							, rgba
 							);
 
-						bimg::imageRgba32f11to01(
-							  rgbaDst
+						bimg::imageRgba32f11to01(rgbaDst
 							, dstMip.m_width
 							, dstMip.m_height
 							, dstMip.m_depth
 							, dstMip.m_width*16
-							, rgba32f
+							, rgba
 							);
 
 						bimg::imageGetRawData(*output, side, lod, output->m_data, output->m_size, dstMip);
 						dstData = const_cast<uint8_t*>(dstMip.m_data);
 
-						bimg::imageEncodeFromRgba32f(
-							  _allocator
+						bimg::imageEncodeFromRgba32f(_allocator
 							, dstData
 							, rgbaDst
 							, dstMip.m_width
@@ -499,7 +493,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 							);
 					}
 
-					bx::free(_allocator, rgbaDst);
+					BX_FREE(_allocator, rgbaDst);
 				}
 				// HDR
 				else if ( (!bimg::isCompressed(inputFormat) && 8 != inputBlockInfo.rBits)
@@ -517,18 +511,17 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 						, 1
 						, bimg::TextureFormat::RGBA32F
 						);
-					temp = bx::alloc(_allocator, size);
+					temp = BX_ALLOC(_allocator, size);
 					float* rgba32f = (float*)temp;
-					float* rgbaDst = (float*)bx::alloc(_allocator, size);
+					float* rgbaDst = (float*)BX_ALLOC(_allocator, size);
 
-					bimg::imageDecodeToRgba32f(
-						  _allocator
+					bimg::imageDecodeToRgba32f(_allocator
 						, rgba32f
 						, mip.m_data
 						, mip.m_width
 						, mip.m_height
 						, mip.m_depth
-						, dstMip.m_width*16
+						, mip.m_width*16
 						, mip.m_format
 						);
 
@@ -543,8 +536,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 							);
 					}
 
-					bimg::imageEncodeFromRgba32f(
-						  _allocator
+					bimg::imageEncodeFromRgba32f(_allocator
 						, dstData
 						, rgba32f
 						, dstMip.m_width
@@ -568,8 +560,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 
 						for (uint8_t lod = 1; lod < numMips && _err->isOk(); ++lod)
 						{
-							bimg::imageRgba32fLinearDownsample2x2(
-								  rgba32f
+							bimg::imageRgba32fLinearDownsample2x2(rgba32f
 								, dstMip.m_width
 								, dstMip.m_height
 								, dstMip.m_depth
@@ -591,8 +582,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 							bimg::imageGetRawData(*output, side, lod, output->m_data, output->m_size, dstMip);
 							dstData = const_cast<uint8_t*>(dstMip.m_data);
 
-							bimg::imageRgba32fToGamma(
-								  rgbaDst
+							bimg::imageRgba32fToGamma(rgbaDst
 								, mip.m_width
 								, mip.m_height
 								, mip.m_depth
@@ -600,8 +590,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 								, rgba32f
 								);
 
-							bimg::imageEncodeFromRgba32f(
-								  _allocator
+							bimg::imageEncodeFromRgba32f(_allocator
 								, dstData
 								, rgbaDst
 								, dstMip.m_width
@@ -614,7 +603,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 						}
 					}
 
-					bx::free(_allocator, rgbaDst);
+					BX_FREE(_allocator, rgbaDst);
 				}
 				// SDF
 				else if (_options.sdf)
@@ -629,11 +618,10 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 						, 1
 						, bimg::TextureFormat::R8
 						);
-					temp = bx::alloc(_allocator, size);
+					temp = BX_ALLOC(_allocator, size);
 					uint8_t* r8 = (uint8_t*)temp;
 
-					bimg::imageDecodeToR8(
-						  _allocator
+					bimg::imageDecodeToR8(_allocator
 						, r8
 						, mip.m_data
 						, mip.m_width
@@ -656,14 +644,13 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 
 					if (_options.mips) {
 						const float alphaRef = 0.5f;
-						float coverage = bimg::imageAlphaTestCoverage(
-							  bimg::TextureFormat::A8
+						float coverage = bimg::imageAlphaTestCoverage(bimg::TextureFormat::A8
 							, mip.m_width
 							, mip.m_height
 							, mip.m_width
 							, r8
 							, alphaRef
-							);
+						);
 
 						size = bimg::imageGetSize(
 							NULL
@@ -675,7 +662,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 							, 1
 							, bimg::TextureFormat::RGBA8
 						);
-						void* rgbaTemp = bx::alloc(_allocator, size);
+						void* rgbaTemp = BX_ALLOC(_allocator, size);
 						uint8_t* rgba = (uint8_t*)rgbaTemp;
 
 						bimg::imageDecodeToRgba8(
@@ -689,23 +676,21 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 						);
 
 						for (uint8_t lod = 1; lod < numMips && _err->isOk(); ++lod) {
-							bimg::imageRgba8Downsample2x2(
-								  rgba
+							bimg::imageRgba8Downsample2x2(rgba
 								, dstMip.m_width
 								, dstMip.m_height
 								, dstMip.m_depth
 								, dstMip.m_width * 4
 								, bx::strideAlign(dstMip.m_width / 2, blockWidth) * 4
 								, rgba
-								);
+							);
 
 							// For each mip, upscale to original size,
 							// scale image alpha to get same coverage as mip0
 							uint32_t upsample   = 1 << lod;
 							uint32_t destWidth  = dstMip.m_width / 2;
 							uint32_t destHeight = dstMip.m_height / 2;
-							bimg::imageScaleAlphaToCoverage(
-								  bimg::TextureFormat::RGBA8
+							bimg::imageScaleAlphaToCoverage(bimg::TextureFormat::RGBA8
 								, destWidth
 								, destHeight
 								, destWidth * 4
@@ -713,7 +698,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 								, coverage
 								, alphaRef
 								, upsample
-								);
+							);
 
 							bimg::imageGetRawData(*output, side, lod, output->m_data, output->m_size, dstMip);
 							dstData = const_cast<uint8_t*>(dstMip.m_data);
@@ -731,7 +716,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 							);
 						}
 
-						bx::free(_allocator, rgbaTemp);
+						BX_FREE(_allocator, rgbaTemp);
 					}
 				}
 				// RGBA8
@@ -747,7 +732,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 						, 1
 						, bimg::TextureFormat::RGBA8
 						);
-					temp = bx::alloc(_allocator, size);
+					temp = BX_ALLOC(_allocator, size);
 					uint8_t* rgba = (uint8_t*)temp;
 
 					bimg::imageDecodeToRgba8(
@@ -775,7 +760,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 					void* ref = NULL;
 					if (_options.iqa)
 					{
-						ref = bx::alloc(_allocator, size);
+						ref = BX_ALLOC(_allocator, size);
 						bx::memCopy(ref, rgba, size);
 					}
 
@@ -876,11 +861,11 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 
 						bx::printf("%f\n", result);
 
-						bx::free(_allocator, ref);
+						BX_FREE(_allocator, ref);
 					}
 				}
 
-				bx::free(_allocator, temp);
+				BX_FREE(_allocator, temp);
 			}
 		}
 
@@ -911,7 +896,7 @@ void help(const char* _error = NULL, bool _showHelp = true)
 
 	bx::printf(
 		  "texturec, bgfx texture compiler tool, version %d.%d.%d.\n"
-		  "Copyright 2011-2023 Branimir Karadzic. All rights reserved.\n"
+		  "Copyright 2011-2022 Branimir Karadzic. All rights reserved.\n"
 		  "License: https://github.com/bkaradzic/bimg/blob/master/LICENSE\n\n"
 		, BIMG_TEXTUREC_VERSION_MAJOR
 		, BIMG_TEXTUREC_VERSION_MINOR
@@ -1218,7 +1203,7 @@ int main(int _argc, const char* _argv[])
 	bx::DefaultAllocator defaultAllocator;
 	AlignedAllocator allocator(&defaultAllocator, 16);
 
-	uint8_t* inputData = (uint8_t*)bx::alloc(&allocator, inputSize);
+	uint8_t* inputData = (uint8_t*)BX_ALLOC(&allocator, inputSize);
 
 	bx::read(&reader, inputData, inputSize, &err);
 	bx::close(&reader);
@@ -1231,7 +1216,7 @@ int main(int _argc, const char* _argv[])
 
 	bimg::ImageContainer* output = convert(&allocator, inputData, inputSize, options, &err);
 
-	bx::free(&allocator, inputData);
+	BX_FREE(&allocator, inputData);
 
 	if (NULL != output)
 	{
@@ -1326,7 +1311,7 @@ int main(int _argc, const char* _argv[])
 				return bx::kExitFailure;
 			}
 
-			inputData = (uint8_t*)bx::alloc(&allocator, inputSize);
+			inputData = (uint8_t*)BX_ALLOC(&allocator, inputSize);
 			bx::read(&reader, inputData, inputSize, &err);
 			bx::close(&reader);
 
@@ -1385,7 +1370,7 @@ int main(int _argc, const char* _argv[])
 				}
 			}
 
-			bx::free(&allocator, inputData);
+			BX_FREE(&allocator, inputData);
 		}
 
 		bimg::imageFree(output);

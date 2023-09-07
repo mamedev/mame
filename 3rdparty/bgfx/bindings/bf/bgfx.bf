@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2023 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -1148,19 +1148,14 @@ public static class bgfx
 		VertexId               = 0x0000000008000000,
 	
 		/// <summary>
-		/// PrimitiveID is available in fragment shader.
-		/// </summary>
-		PrimitiveId            = 0x0000000010000000,
-	
-		/// <summary>
 		/// Viewport layer is available in vertex shader.
 		/// </summary>
-		ViewportLayerArray     = 0x0000000020000000,
+		ViewportLayerArray     = 0x0000000010000000,
 	
 		/// <summary>
 		/// Draw indirect with indirect count is supported.
 		/// </summary>
-		DrawIndirectCount      = 0x0000000040000000,
+		DrawIndirectCount      = 0x0000000020000000,
 	
 		/// <summary>
 		/// All texture compare modes are supported.
@@ -2119,7 +2114,6 @@ public static class bgfx
 		public uint32 reset;
 		public uint8 numBackBuffers;
 		public uint8 maxFrameLatency;
-		public uint8 debugTextScale;
 	}
 	
 	[CRepr]
@@ -3875,7 +3869,7 @@ public static class bgfx
 	///
 	/// <param name="_handle">Vertex buffer.</param>
 	/// <param name="_startVertex">First instance data.</param>
-	/// <param name="_num">Number of data instances.</param>
+	/// <param name="_num">Number of data instances. Set instance data buffer for draw primitive.</param>
 	///
 	[LinkName("bgfx_encoder_set_instance_data_from_vertex_buffer")]
 	public static extern void encoder_set_instance_data_from_vertex_buffer(Encoder* _this, VertexBufferHandle _handle, uint32 _startVertex, uint32 _num);
@@ -4453,7 +4447,7 @@ public static class bgfx
 	///
 	/// <param name="_handle">Vertex buffer.</param>
 	/// <param name="_startVertex">First instance data.</param>
-	/// <param name="_num">Number of data instances.</param>
+	/// <param name="_num">Number of data instances. Set instance data buffer for draw primitive.</param>
 	///
 	[LinkName("bgfx_set_instance_data_from_vertex_buffer")]
 	public static extern void set_instance_data_from_vertex_buffer(VertexBufferHandle _handle, uint32 _startVertex, uint32 _num);

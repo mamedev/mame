@@ -15,6 +15,7 @@
 #include "source/opt/licm_pass.h"
 
 #include <queue>
+#include <utility>
 
 #include "source/opt/module.h"
 #include "source/opt/pass.h"
@@ -84,7 +85,7 @@ Pass::Status LICMPass::AnalyseAndHoistFromBB(
   bool modified = false;
   std::function<bool(Instruction*)> hoist_inst =
       [this, &loop, &modified](Instruction* inst) {
-        if (loop->ShouldHoistInstruction(*inst)) {
+        if (loop->ShouldHoistInstruction(this->context(), inst)) {
           if (!HoistInstruction(loop, inst)) {
             return false;
           }
@@ -125,8 +126,8 @@ bool LICMPass::HoistInstruction(Loop* loop, Instruction* inst) {
   }
   Instruction* insertion_point = &*pre_header_bb->tail();
   Instruction* previous_node = insertion_point->PreviousNode();
-  if (previous_node && (previous_node->opcode() == spv::Op::OpLoopMerge ||
-                        previous_node->opcode() == spv::Op::OpSelectionMerge)) {
+  if (previous_node && (previous_node->opcode() == SpvOpLoopMerge ||
+                        previous_node->opcode() == SpvOpSelectionMerge)) {
     insertion_point = previous_node;
   }
 

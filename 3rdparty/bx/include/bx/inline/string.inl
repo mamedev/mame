@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2023 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -37,45 +37,9 @@ namespace bx
 		va_end(argList);
 	}
 
-	inline constexpr StringLiteral::StringLiteral()
-		: m_ptr("")
-		, m_len(0)
-	{
-	}
-
-	template<int32_t SizeT>
-	inline constexpr StringLiteral::StringLiteral(const char (&str)[SizeT])
-		: m_ptr(str)
-		, m_len(SizeT - 1)
-	{
-		BX_ASSERT('\0' == m_ptr[SizeT - 1], "Must be 0 terminated.");
-	}
-
-	inline constexpr int32_t StringLiteral::getLength() const
-	{
-		return m_len;
-	}
-
-	inline constexpr const char* StringLiteral::getCPtr() const
-	{
-		return m_ptr;
-	}
-
 	inline StringView::StringView()
 	{
 		clear();
-	}
-
-	inline constexpr StringView::StringView(const StringLiteral& _str)
-		: m_ptr(_str.getCPtr() )
-		, m_len(_str.getLength() )
-		, m_0terminated(true)
-	{
-	}
-
-	inline StringView::StringView(const StringView& _rhs)
-	{
-		set(_rhs);
 	}
 
 	inline StringView::StringView(const StringView& _rhs, int32_t _start, int32_t _len)
@@ -130,11 +94,6 @@ namespace bx
 	inline void StringView::set(const char* _ptr, const char* _term)
 	{
 		set(_ptr, int32_t(_term-_ptr) );
-	}
-
-	inline void StringView::set(const StringView& _str)
-	{
-		set(_str, 0, INT32_MAX);
 	}
 
 	inline void StringView::set(const StringView& _str, int32_t _start, int32_t _len)
@@ -233,7 +192,7 @@ namespace bx
 			if (len+1 > m_capacity)
 			{
 				const int32_t capacity = alignUp(len+1, 256);
-				ptr = (char*)bx::realloc(*AllocatorT, 0 != m_capacity ? ptr : NULL, capacity);
+				ptr = (char*)BX_REALLOC(*AllocatorT, 0 != m_capacity ? ptr : NULL, capacity);
 
 				*const_cast<char**>(&m_ptr) = ptr;
 				m_capacity = capacity;
@@ -257,7 +216,7 @@ namespace bx
 
 		if (0 != m_capacity)
 		{
-			bx::free(*AllocatorT, const_cast<char*>(m_ptr) );
+			BX_FREE(*AllocatorT, const_cast<char*>(m_ptr) );
 
 			StringView::clear();
 			m_capacity = 0;
@@ -312,11 +271,6 @@ namespace bx
 	inline uint32_t LineReader::getLine() const
 	{
 		return m_line;
-	}
-
-	inline int32_t strLen(const StringView& _str, int32_t _max)
-	{
-		return min(_str.getLength(), _max);
 	}
 
 	inline bool hasPrefix(const StringView& _str, const StringView& _prefix)

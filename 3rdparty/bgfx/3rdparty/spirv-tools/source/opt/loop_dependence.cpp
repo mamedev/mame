@@ -15,12 +15,14 @@
 #include "source/opt/loop_dependence.h"
 
 #include <functional>
+#include <memory>
 #include <numeric>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "source/opt/instruction.h"
+#include "source/opt/scalar_analysis.h"
 #include "source/opt/scalar_analysis_nodes.h"
 
 namespace spvtools {
@@ -190,8 +192,8 @@ bool LoopDependenceAnalysis::GetDependence(const Instruction* source,
   Instruction* destination_access_chain = GetOperandDefinition(destination, 0);
 
   auto num_access_chains =
-      (source_access_chain->opcode() == spv::Op::OpAccessChain) +
-      (destination_access_chain->opcode() == spv::Op::OpAccessChain);
+      (source_access_chain->opcode() == SpvOpAccessChain) +
+      (destination_access_chain->opcode() == SpvOpAccessChain);
 
   // If neither is an access chain, then they are load/store to a variable.
   if (num_access_chains == 0) {
@@ -209,8 +211,7 @@ bool LoopDependenceAnalysis::GetDependence(const Instruction* source,
 
   // If only one is an access chain, it could be accessing a part of a struct
   if (num_access_chains == 1) {
-    auto source_is_chain =
-        source_access_chain->opcode() == spv::Op::OpAccessChain;
+    auto source_is_chain = source_access_chain->opcode() == SpvOpAccessChain;
     auto access_chain =
         source_is_chain ? source_access_chain : destination_access_chain;
     auto variable =
@@ -237,8 +238,8 @@ bool LoopDependenceAnalysis::GetDependence(const Instruction* source,
       GetOperandDefinition(destination_access_chain, 0);
 
   // Nested access chains are not supported yet, bail out.
-  if (source_array->opcode() == spv::Op::OpAccessChain ||
-      destination_array->opcode() == spv::Op::OpAccessChain) {
+  if (source_array->opcode() == SpvOpAccessChain ||
+      destination_array->opcode() == SpvOpAccessChain) {
     for (auto& entry : distance_vector->GetEntries()) {
       entry = DistanceEntry();
     }

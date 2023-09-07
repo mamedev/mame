@@ -29,19 +29,19 @@ spv_result_t ValidateRayQueryPointer(ValidationState_t& _,
   const uint32_t ray_query_id = inst->GetOperandAs<uint32_t>(ray_query_index);
   auto variable = _.FindDef(ray_query_id);
   const auto var_opcode = variable->opcode();
-  if (!variable || (var_opcode != spv::Op::OpVariable &&
-                    var_opcode != spv::Op::OpFunctionParameter &&
-                    var_opcode != spv::Op::OpAccessChain)) {
+  if (!variable ||
+      (var_opcode != SpvOpVariable && var_opcode != SpvOpFunctionParameter &&
+       var_opcode != SpvOpAccessChain)) {
     return _.diag(SPV_ERROR_INVALID_DATA, inst)
            << "Ray Query must be a memory object declaration";
   }
   auto pointer = _.FindDef(variable->GetOperandAs<uint32_t>(0));
-  if (!pointer || pointer->opcode() != spv::Op::OpTypePointer) {
+  if (!pointer || pointer->opcode() != SpvOpTypePointer) {
     return _.diag(SPV_ERROR_INVALID_DATA, inst)
            << "Ray Query must be a pointer";
   }
   auto type = _.FindDef(pointer->GetOperandAs<uint32_t>(2));
-  if (!type || type->opcode() != spv::Op::OpTypeRayQueryKHR) {
+  if (!type || type->opcode() != SpvOpTypeRayQueryKHR) {
     return _.diag(SPV_ERROR_INVALID_DATA, inst)
            << "Ray Query must be a pointer to OpTypeRayQueryKHR";
   }
@@ -54,7 +54,7 @@ spv_result_t ValidateIntersectionId(ValidationState_t& _,
   const uint32_t intersection_id =
       inst->GetOperandAs<uint32_t>(intersection_index);
   const uint32_t intersection_type = _.GetTypeId(intersection_id);
-  const spv::Op intersection_opcode = _.GetIdOpcode(intersection_id);
+  const SpvOp intersection_opcode = _.GetIdOpcode(intersection_id);
   if (!_.IsIntScalarType(intersection_type) ||
       _.GetBitWidth(intersection_type) != 32 ||
       !spvOpcodeIsConstant(intersection_opcode)) {
@@ -68,15 +68,15 @@ spv_result_t ValidateIntersectionId(ValidationState_t& _,
 }  // namespace
 
 spv_result_t RayQueryPass(ValidationState_t& _, const Instruction* inst) {
-  const spv::Op opcode = inst->opcode();
+  const SpvOp opcode = inst->opcode();
   const uint32_t result_type = inst->type_id();
 
   switch (opcode) {
-    case spv::Op::OpRayQueryInitializeKHR: {
+    case SpvOpRayQueryInitializeKHR: {
       if (auto error = ValidateRayQueryPointer(_, inst, 0)) return error;
 
       if (_.GetIdOpcode(_.GetOperandTypeId(inst, 1)) !=
-          spv::Op::OpTypeAccelerationStructureKHR) {
+          SpvOpTypeAccelerationStructureKHR) {
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected Acceleration Structure to be of type "
                   "OpTypeAccelerationStructureKHR";
@@ -123,13 +123,13 @@ spv_result_t RayQueryPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpRayQueryTerminateKHR:
-    case spv::Op::OpRayQueryConfirmIntersectionKHR: {
+    case SpvOpRayQueryTerminateKHR:
+    case SpvOpRayQueryConfirmIntersectionKHR: {
       if (auto error = ValidateRayQueryPointer(_, inst, 0)) return error;
       break;
     }
 
-    case spv::Op::OpRayQueryGenerateIntersectionKHR: {
+    case SpvOpRayQueryGenerateIntersectionKHR: {
       if (auto error = ValidateRayQueryPointer(_, inst, 0)) return error;
 
       const uint32_t hit_t_id = _.GetOperandTypeId(inst, 1);
@@ -141,9 +141,9 @@ spv_result_t RayQueryPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpRayQueryGetIntersectionFrontFaceKHR:
-    case spv::Op::OpRayQueryProceedKHR:
-    case spv::Op::OpRayQueryGetIntersectionCandidateAABBOpaqueKHR: {
+    case SpvOpRayQueryGetIntersectionFrontFaceKHR:
+    case SpvOpRayQueryProceedKHR:
+    case SpvOpRayQueryGetIntersectionCandidateAABBOpaqueKHR: {
       if (auto error = ValidateRayQueryPointer(_, inst, 2)) return error;
 
       if (!_.IsBoolScalarType(result_type)) {
@@ -151,15 +151,15 @@ spv_result_t RayQueryPass(ValidationState_t& _, const Instruction* inst) {
                << "expected Result Type to be bool scalar type";
       }
 
-      if (opcode == spv::Op::OpRayQueryGetIntersectionFrontFaceKHR) {
+      if (opcode == SpvOpRayQueryGetIntersectionFrontFaceKHR) {
         if (auto error = ValidateIntersectionId(_, inst, 3)) return error;
       }
 
       break;
     }
 
-    case spv::Op::OpRayQueryGetIntersectionTKHR:
-    case spv::Op::OpRayQueryGetRayTMinKHR: {
+    case SpvOpRayQueryGetIntersectionTKHR:
+    case SpvOpRayQueryGetRayTMinKHR: {
       if (auto error = ValidateRayQueryPointer(_, inst, 2)) return error;
 
       if (!_.IsFloatScalarType(result_type) ||
@@ -168,21 +168,20 @@ spv_result_t RayQueryPass(ValidationState_t& _, const Instruction* inst) {
                << "expected Result Type to be 32-bit float scalar type";
       }
 
-      if (opcode == spv::Op::OpRayQueryGetIntersectionTKHR) {
+      if (opcode == SpvOpRayQueryGetIntersectionTKHR) {
         if (auto error = ValidateIntersectionId(_, inst, 3)) return error;
       }
 
       break;
     }
 
-    case spv::Op::OpRayQueryGetIntersectionTypeKHR:
-    case spv::Op::OpRayQueryGetIntersectionInstanceCustomIndexKHR:
-    case spv::Op::OpRayQueryGetIntersectionInstanceIdKHR:
-    case spv::Op::
-        OpRayQueryGetIntersectionInstanceShaderBindingTableRecordOffsetKHR:
-    case spv::Op::OpRayQueryGetIntersectionGeometryIndexKHR:
-    case spv::Op::OpRayQueryGetIntersectionPrimitiveIndexKHR:
-    case spv::Op::OpRayQueryGetRayFlagsKHR: {
+    case SpvOpRayQueryGetIntersectionTypeKHR:
+    case SpvOpRayQueryGetIntersectionInstanceCustomIndexKHR:
+    case SpvOpRayQueryGetIntersectionInstanceIdKHR:
+    case SpvOpRayQueryGetIntersectionInstanceShaderBindingTableRecordOffsetKHR:
+    case SpvOpRayQueryGetIntersectionGeometryIndexKHR:
+    case SpvOpRayQueryGetIntersectionPrimitiveIndexKHR:
+    case SpvOpRayQueryGetRayFlagsKHR: {
       if (auto error = ValidateRayQueryPointer(_, inst, 2)) return error;
 
       if (!_.IsIntScalarType(result_type) || _.GetBitWidth(result_type) != 32) {
@@ -190,17 +189,17 @@ spv_result_t RayQueryPass(ValidationState_t& _, const Instruction* inst) {
                << "expected Result Type to be 32-bit int scalar type";
       }
 
-      if (opcode != spv::Op::OpRayQueryGetRayFlagsKHR) {
+      if (opcode != SpvOpRayQueryGetRayFlagsKHR) {
         if (auto error = ValidateIntersectionId(_, inst, 3)) return error;
       }
 
       break;
     }
 
-    case spv::Op::OpRayQueryGetIntersectionObjectRayDirectionKHR:
-    case spv::Op::OpRayQueryGetIntersectionObjectRayOriginKHR:
-    case spv::Op::OpRayQueryGetWorldRayDirectionKHR:
-    case spv::Op::OpRayQueryGetWorldRayOriginKHR: {
+    case SpvOpRayQueryGetIntersectionObjectRayDirectionKHR:
+    case SpvOpRayQueryGetIntersectionObjectRayOriginKHR:
+    case SpvOpRayQueryGetWorldRayDirectionKHR:
+    case SpvOpRayQueryGetWorldRayOriginKHR: {
       if (auto error = ValidateRayQueryPointer(_, inst, 2)) return error;
 
       if (!_.IsFloatVectorType(result_type) ||
@@ -211,15 +210,15 @@ spv_result_t RayQueryPass(ValidationState_t& _, const Instruction* inst) {
                   "vector type";
       }
 
-      if (opcode == spv::Op::OpRayQueryGetIntersectionObjectRayDirectionKHR ||
-          opcode == spv::Op::OpRayQueryGetIntersectionObjectRayOriginKHR) {
+      if (opcode == SpvOpRayQueryGetIntersectionObjectRayDirectionKHR ||
+          opcode == SpvOpRayQueryGetIntersectionObjectRayOriginKHR) {
         if (auto error = ValidateIntersectionId(_, inst, 3)) return error;
       }
 
       break;
     }
 
-    case spv::Op::OpRayQueryGetIntersectionBarycentricsKHR: {
+    case SpvOpRayQueryGetIntersectionBarycentricsKHR: {
       if (auto error = ValidateRayQueryPointer(_, inst, 2)) return error;
       if (auto error = ValidateIntersectionId(_, inst, 3)) return error;
 
@@ -234,8 +233,8 @@ spv_result_t RayQueryPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpRayQueryGetIntersectionObjectToWorldKHR:
-    case spv::Op::OpRayQueryGetIntersectionWorldToObjectKHR: {
+    case SpvOpRayQueryGetIntersectionObjectToWorldKHR:
+    case SpvOpRayQueryGetIntersectionWorldToObjectKHR: {
       if (auto error = ValidateRayQueryPointer(_, inst, 2)) return error;
       if (auto error = ValidateIntersectionId(_, inst, 3)) return error;
 

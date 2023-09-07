@@ -21,58 +21,61 @@
 #include <stack>
 
 #include "source/cfa.h"
+#include "source/latest_version_glsl_std_450_header.h"
 #include "source/opt/eliminate_dead_functions_util.h"
 #include "source/opt/ir_builder.h"
+#include "source/opt/iterator.h"
 #include "source/opt/reflect.h"
 #include "source/spirv_constant.h"
 #include "source/util/string_utils.h"
 
 namespace spvtools {
 namespace opt {
+
 namespace {
 
-constexpr uint32_t kTypePointerStorageClassInIdx = 0;
-constexpr uint32_t kEntryPointFunctionIdInIdx = 1;
-constexpr uint32_t kSelectionMergeMergeBlockIdInIdx = 0;
-constexpr uint32_t kLoopMergeContinueBlockIdInIdx = 1;
-constexpr uint32_t kCopyMemoryTargetAddrInIdx = 0;
-constexpr uint32_t kCopyMemorySourceAddrInIdx = 1;
-constexpr uint32_t kLoadSourceAddrInIdx = 0;
-constexpr uint32_t kDebugDeclareOperandVariableIndex = 5;
-constexpr uint32_t kGlobalVariableVariableIndex = 12;
+const uint32_t kTypePointerStorageClassInIdx = 0;
+const uint32_t kEntryPointFunctionIdInIdx = 1;
+const uint32_t kSelectionMergeMergeBlockIdInIdx = 0;
+const uint32_t kLoopMergeContinueBlockIdInIdx = 1;
+const uint32_t kCopyMemoryTargetAddrInIdx = 0;
+const uint32_t kCopyMemorySourceAddrInIdx = 1;
+const uint32_t kLoadSourceAddrInIdx = 0;
+const uint32_t kDebugDeclareOperandVariableIndex = 5;
+const uint32_t kGlobalVariableVariableIndex = 12;
 
 // Sorting functor to present annotation instructions in an easy-to-process
 // order. The functor orders by opcode first and falls back on unique id
 // ordering if both instructions have the same opcode.
 //
 // Desired priority:
-// spv::Op::OpGroupDecorate
-// spv::Op::OpGroupMemberDecorate
-// spv::Op::OpDecorate
-// spv::Op::OpMemberDecorate
-// spv::Op::OpDecorateId
-// spv::Op::OpDecorateStringGOOGLE
-// spv::Op::OpDecorationGroup
+// SpvOpGroupDecorate
+// SpvOpGroupMemberDecorate
+// SpvOpDecorate
+// SpvOpMemberDecorate
+// SpvOpDecorateId
+// SpvOpDecorateStringGOOGLE
+// SpvOpDecorationGroup
 struct DecorationLess {
   bool operator()(const Instruction* lhs, const Instruction* rhs) const {
     assert(lhs && rhs);
-    spv::Op lhsOp = lhs->opcode();
-    spv::Op rhsOp = rhs->opcode();
+    SpvOp lhsOp = lhs->opcode();
+    SpvOp rhsOp = rhs->opcode();
     if (lhsOp != rhsOp) {
 #define PRIORITY_CASE(opcode)                          \
   if (lhsOp == opcode && rhsOp != opcode) return true; \
   if (rhsOp == opcode && lhsOp != opcode) return false;
       // OpGroupDecorate and OpGroupMember decorate are highest priority to
       // eliminate dead targets early and simplify subsequent checks.
-      PRIORITY_CASE(spv::Op::OpGroupDecorate)
-      PRIORITY_CASE(spv::Op::OpGroupMemberDecorate)
-      PRIORITY_CASE(spv::Op::OpDecorate)
-      PRIORITY_CASE(spv::Op::OpMemberDecorate)
-      PRIORITY_CASE(spv::Op::OpDecorateId)
-      PRIORITY_CASE(spv::Op::OpDecorateStringGOOGLE)
+      PRIORITY_CASE(SpvOpGroupDecorate)
+      PRIORITY_CASE(SpvOpGroupMemberDecorate)
+      PRIORITY_CASE(SpvOpDecorate)
+      PRIORITY_CASE(SpvOpMemberDecorate)
+      PRIORITY_CASE(SpvOpDecorateId)
+      PRIORITY_CASE(SpvOpDecorateStringGOOGLE)
       // OpDecorationGroup is lowest priority to ensure use/def chains remain
       // usable for instructions that target this group.
-      PRIORITY_CASE(spv::Op::OpDecorationGroup)
+      PRIORITY_CASE(SpvOpDecorationGroup)
 #undef PRIORITY_CASE
     }
 
@@ -83,26 +86,25 @@ struct DecorationLess {
 
 }  // namespace
 
-bool AggressiveDCEPass::IsVarOfStorage(uint32_t varId,
-                                       spv::StorageClass storageClass) {
+bool AggressiveDCEPass::IsVarOfStorage(uint32_t varId, uint32_t storageClass) {
   if (varId == 0) return false;
   const Instruction* varInst = get_def_use_mgr()->GetDef(varId);
-  const spv::Op op = varInst->opcode();
-  if (op != spv::Op::OpVariable) return false;
+  const SpvOp op = varInst->opcode();
+  if (op != SpvOpVariable) return false;
   const uint32_t varTypeId = varInst->type_id();
   const Instruction* varTypeInst = get_def_use_mgr()->GetDef(varTypeId);
-  if (varTypeInst->opcode() != spv::Op::OpTypePointer) return false;
-  return spv::StorageClass(varTypeInst->GetSingleWordInOperand(
-             kTypePointerStorageClassInIdx)) == storageClass;
+  if (varTypeInst->opcode() != SpvOpTypePointer) return false;
+  return varTypeInst->GetSingleWordInOperand(kTypePointerStorageClassInIdx) ==
+         storageClass;
 }
 
 bool AggressiveDCEPass::IsLocalVar(uint32_t varId, Function* func) {
-  if (IsVarOfStorage(varId, spv::StorageClass::Function)) {
+  if (IsVarOfStorage(varId, SpvStorageClassFunction)) {
     return true;
   }
 
-  if (!IsVarOfStorage(varId, spv::StorageClass::Private) &&
-      !IsVarOfStorage(varId, spv::StorageClass::Workgroup)) {
+  if (!IsVarOfStorage(varId, SpvStorageClassPrivate) &&
+      !IsVarOfStorage(varId, SpvStorageClassWorkgroup)) {
     return false;
   }
 
@@ -120,21 +122,21 @@ void AggressiveDCEPass::AddStores(Function* func, uint32_t ptrId) {
     if (blk && blk->GetParent() != func) return;
 
     switch (user->opcode()) {
-      case spv::Op::OpAccessChain:
-      case spv::Op::OpInBoundsAccessChain:
-      case spv::Op::OpCopyObject:
+      case SpvOpAccessChain:
+      case SpvOpInBoundsAccessChain:
+      case SpvOpCopyObject:
         this->AddStores(func, user->result_id());
         break;
-      case spv::Op::OpLoad:
+      case SpvOpLoad:
         break;
-      case spv::Op::OpCopyMemory:
-      case spv::Op::OpCopyMemorySized:
+      case SpvOpCopyMemory:
+      case SpvOpCopyMemorySized:
         if (user->GetSingleWordInOperand(kCopyMemoryTargetAddrInIdx) == ptrId) {
           AddToWorklist(user);
         }
         break;
       // If default, assume it stores e.g. frexp, modf, function call
-      case spv::Op::OpStore:
+      case SpvOpStore:
       default:
         AddToWorklist(user);
         break;
@@ -152,12 +154,11 @@ bool AggressiveDCEPass::AllExtensionsSupported() const {
   // Only allow NonSemantic.Shader.DebugInfo.100, we cannot safely optimise
   // around unknown extended instruction sets even if they are non-semantic
   for (auto& inst : context()->module()->ext_inst_imports()) {
-    assert(inst.opcode() == spv::Op::OpExtInstImport &&
+    assert(inst.opcode() == SpvOpExtInstImport &&
            "Expecting an import of an extension's instruction set.");
     const std::string extension_name = inst.GetInOperand(0).AsString();
     if (spvtools::utils::starts_with(extension_name, "NonSemantic.") &&
-        (extension_name != "NonSemantic.Shader.DebugInfo.100") &&
-        (extension_name != "NonSemantic.DebugPrintf")) {
+        extension_name != "NonSemantic.Shader.DebugInfo.100") {
       return false;
     }
   }
@@ -171,11 +172,11 @@ bool AggressiveDCEPass::IsTargetDead(Instruction* inst) {
     // This must be a decoration group. We go through annotations in a specific
     // order. So if this is not used by any group or group member decorates, it
     // is dead.
-    assert(tInst->opcode() == spv::Op::OpDecorationGroup);
+    assert(tInst->opcode() == SpvOpDecorationGroup);
     bool dead = true;
     get_def_use_mgr()->ForEachUser(tInst, [&dead](Instruction* user) {
-      if (user->opcode() == spv::Op::OpGroupDecorate ||
-          user->opcode() == spv::Op::OpGroupMemberDecorate)
+      if (user->opcode() == SpvOpGroupDecorate ||
+          user->opcode() == SpvOpGroupMemberDecorate)
         dead = false;
     });
     return dead;
@@ -196,7 +197,7 @@ void AggressiveDCEPass::ProcessLoad(Function* func, uint32_t varId) {
 
 void AggressiveDCEPass::AddBranch(uint32_t labelId, BasicBlock* bp) {
   std::unique_ptr<Instruction> newBranch(
-      new Instruction(context(), spv::Op::OpBranch, 0, 0,
+      new Instruction(context(), SpvOpBranch, 0, 0,
                       {{spv_operand_type_t::SPV_OPERAND_TYPE_ID, {labelId}}}));
   context()->AnalyzeDefUse(&*newBranch);
   context()->set_instr_block(&*newBranch, bp);
@@ -205,8 +206,8 @@ void AggressiveDCEPass::AddBranch(uint32_t labelId, BasicBlock* bp) {
 
 void AggressiveDCEPass::AddBreaksAndContinuesToWorklist(
     Instruction* mergeInst) {
-  assert(mergeInst->opcode() == spv::Op::OpSelectionMerge ||
-         mergeInst->opcode() == spv::Op::OpLoopMerge);
+  assert(mergeInst->opcode() == SpvOpSelectionMerge ||
+         mergeInst->opcode() == SpvOpLoopMerge);
 
   BasicBlock* header = context()->get_instr_block(mergeInst);
   const uint32_t mergeId = mergeInst->GetSingleWordInOperand(0);
@@ -222,7 +223,7 @@ void AggressiveDCEPass::AddBreaksAndContinuesToWorklist(
     }
   });
 
-  if (mergeInst->opcode() != spv::Op::OpLoopMerge) {
+  if (mergeInst->opcode() != SpvOpLoopMerge) {
     return;
   }
 
@@ -230,27 +231,26 @@ void AggressiveDCEPass::AddBreaksAndContinuesToWorklist(
   const uint32_t contId =
       mergeInst->GetSingleWordInOperand(kLoopMergeContinueBlockIdInIdx);
   get_def_use_mgr()->ForEachUser(contId, [&contId, this](Instruction* user) {
-    spv::Op op = user->opcode();
-    if (op == spv::Op::OpBranchConditional || op == spv::Op::OpSwitch) {
+    SpvOp op = user->opcode();
+    if (op == SpvOpBranchConditional || op == SpvOpSwitch) {
       // A conditional branch or switch can only be a continue if it does not
       // have a merge instruction or its merge block is not the continue block.
       Instruction* hdrMerge = GetMergeInstruction(user);
-      if (hdrMerge != nullptr &&
-          hdrMerge->opcode() == spv::Op::OpSelectionMerge) {
+      if (hdrMerge != nullptr && hdrMerge->opcode() == SpvOpSelectionMerge) {
         uint32_t hdrMergeId =
             hdrMerge->GetSingleWordInOperand(kSelectionMergeMergeBlockIdInIdx);
         if (hdrMergeId == contId) return;
         // Need to mark merge instruction too
         AddToWorklist(hdrMerge);
       }
-    } else if (op == spv::Op::OpBranch) {
+    } else if (op == SpvOpBranch) {
       // An unconditional branch can only be a continue if it is not
       // branching to its own merge block.
       BasicBlock* blk = context()->get_instr_block(user);
       Instruction* hdrBranch = GetHeaderBranch(blk);
       if (hdrBranch == nullptr) return;
       Instruction* hdrMerge = GetMergeInstruction(hdrBranch);
-      if (hdrMerge->opcode() == spv::Op::OpLoopMerge) return;
+      if (hdrMerge->opcode() == SpvOpLoopMerge) return;
       uint32_t hdrMergeId =
           hdrMerge->GetSingleWordInOperand(kSelectionMergeMergeBlockIdInIdx);
       if (contId == hdrMergeId) return;
@@ -277,11 +277,11 @@ bool AggressiveDCEPass::KillDeadInstructions(
     uint32_t merge_block_id = 0;
     (*bi)->ForEachInst([this, &modified, &merge_block_id](Instruction* inst) {
       if (IsLive(inst)) return;
-      if (inst->opcode() == spv::Op::OpLabel) return;
+      if (inst->opcode() == SpvOpLabel) return;
       // If dead instruction is selection merge, remember merge block
       // for new branch at end of block
-      if (inst->opcode() == spv::Op::OpSelectionMerge ||
-          inst->opcode() == spv::Op::OpLoopMerge)
+      if (inst->opcode() == SpvOpSelectionMerge ||
+          inst->opcode() == SpvOpLoopMerge)
         merge_block_id = inst->GetSingleWordInOperand(0);
       to_kill_.push_back(inst);
       modified = true;
@@ -295,19 +295,19 @@ bool AggressiveDCEPass::KillDeadInstructions(
       }
 
       auto merge_terminator = (*bi)->terminator();
-      if (merge_terminator->opcode() == spv::Op::OpUnreachable) {
+      if (merge_terminator->opcode() == SpvOpUnreachable) {
         // The merge was unreachable. This is undefined behaviour so just
         // return (or return an undef). Then mark the new return as live.
         auto func_ret_type_inst = get_def_use_mgr()->GetDef(func->type_id());
-        if (func_ret_type_inst->opcode() == spv::Op::OpTypeVoid) {
-          merge_terminator->SetOpcode(spv::Op::OpReturn);
+        if (func_ret_type_inst->opcode() == SpvOpTypeVoid) {
+          merge_terminator->SetOpcode(SpvOpReturn);
         } else {
           // Find an undef for the return value and make sure it gets kept by
           // the pass.
           auto undef_id = Type2Undef(func->type_id());
           auto undef = get_def_use_mgr()->GetDef(undef_id);
           live_insts_.Set(undef->unique_id());
-          merge_terminator->SetOpcode(spv::Op::OpReturnValue);
+          merge_terminator->SetOpcode(SpvOpReturnValue);
           merge_terminator->SetInOperands({{SPV_OPERAND_TYPE_ID, {undef_id}}});
           get_def_use_mgr()->AnalyzeInstUse(merge_terminator);
         }
@@ -369,11 +369,11 @@ void AggressiveDCEPass::AddDecorationsToWorkList(const Instruction* inst) {
     // We only care about OpDecorateId instructions because the are the only
     // decorations that will reference an id that will have to be kept live
     // because of that use.
-    if (dec->opcode() != spv::Op::OpDecorateId) {
+    if (dec->opcode() != SpvOpDecorateId) {
       continue;
     }
-    if (spv::Decoration(dec->GetSingleWordInOperand(1)) ==
-        spv::Decoration::HlslCounterBufferGOOGLE) {
+    if (dec->GetSingleWordInOperand(1) ==
+        SpvDecorationHlslCounterBufferGOOGLE) {
       // These decorations should not force the use id to be live.  It will be
       // removed if either the target or the in operand are dead.
       continue;
@@ -391,7 +391,7 @@ void AggressiveDCEPass::MarkLoadedVariablesAsLive(Function* func,
 }
 
 std::vector<uint32_t> AggressiveDCEPass::GetLoadedVariables(Instruction* inst) {
-  if (inst->opcode() == spv::Op::OpFunctionCall) {
+  if (inst->opcode() == SpvOpFunctionCall) {
     return GetLoadedVariablesFromFunctionCall(inst);
   }
   uint32_t var_id = GetLoadedVariableFromNonFunctionCalls(inst);
@@ -409,11 +409,11 @@ uint32_t AggressiveDCEPass::GetLoadedVariableFromNonFunctionCalls(
   }
 
   switch (inst->opcode()) {
-    case spv::Op::OpLoad:
-    case spv::Op::OpImageTexelPointer:
+    case SpvOpLoad:
+    case SpvOpImageTexelPointer:
       return GetVariableId(inst->GetSingleWordInOperand(kLoadSourceAddrInIdx));
-    case spv::Op::OpCopyMemory:
-    case spv::Op::OpCopyMemorySized:
+    case SpvOpCopyMemory:
+    case SpvOpCopyMemorySized:
       return GetVariableId(
           inst->GetSingleWordInOperand(kCopyMemorySourceAddrInIdx));
     default:
@@ -436,11 +436,8 @@ uint32_t AggressiveDCEPass::GetLoadedVariableFromNonFunctionCalls(
 
 std::vector<uint32_t> AggressiveDCEPass::GetLoadedVariablesFromFunctionCall(
     const Instruction* inst) {
-  assert(inst->opcode() == spv::Op::OpFunctionCall);
+  assert(inst->opcode() == SpvOpFunctionCall);
   std::vector<uint32_t> live_variables;
-  // NOTE: we should only be checking function call parameters here, not the
-  // function itself, however, `IsPtr` will trivially return false for
-  // OpFunction
   inst->ForEachInId([this, &live_variables](const uint32_t* operand_id) {
     if (!IsPtr(*operand_id)) return;
     uint32_t var_id = GetVariableId(*operand_id);
@@ -484,7 +481,7 @@ void AggressiveDCEPass::MarkBlockAsLive(Instruction* inst) {
   // the loop, so the loop construct must be live.  We exclude the label because
   // it does not matter how many times it is executed.  This could be extended
   // to more instructions, but we will need it for now.
-  if (inst->opcode() != spv::Op::OpLabel)
+  if (inst->opcode() != SpvOpLabel)
     MarkLoopConstructAsLiveIfLoopHeader(basic_block);
 
   Instruction* next_branch_inst = GetBranchForNextHeader(basic_block);
@@ -494,8 +491,8 @@ void AggressiveDCEPass::MarkBlockAsLive(Instruction* inst) {
     AddToWorklist(mergeInst);
   }
 
-  if (inst->opcode() == spv::Op::OpLoopMerge ||
-      inst->opcode() == spv::Op::OpSelectionMerge) {
+  if (inst->opcode() == SpvOpLoopMerge ||
+      inst->opcode() == SpvOpSelectionMerge) {
     AddBreaksAndContinuesToWorklist(inst);
   }
 }
@@ -532,27 +529,27 @@ void AggressiveDCEPass::InitializeWorkList(
   // cleaned up.
   for (auto& bi : structured_order) {
     for (auto ii = bi->begin(); ii != bi->end(); ++ii) {
-      spv::Op op = ii->opcode();
+      SpvOp op = ii->opcode();
       if (ii->IsBranch()) {
         continue;
       }
       switch (op) {
-        case spv::Op::OpStore: {
+        case SpvOpStore: {
           uint32_t var_id = 0;
           (void)GetPtr(&*ii, &var_id);
           if (!IsLocalVar(var_id, func)) AddToWorklist(&*ii);
         } break;
-        case spv::Op::OpCopyMemory:
-        case spv::Op::OpCopyMemorySized: {
+        case SpvOpCopyMemory:
+        case SpvOpCopyMemorySized: {
           uint32_t var_id = 0;
           uint32_t target_addr_id =
               ii->GetSingleWordInOperand(kCopyMemoryTargetAddrInIdx);
           (void)GetPtr(target_addr_id, &var_id);
           if (!IsLocalVar(var_id, func)) AddToWorklist(&*ii);
         } break;
-        case spv::Op::OpLoopMerge:
-        case spv::Op::OpSelectionMerge:
-        case spv::Op::OpUnreachable:
+        case SpvOpLoopMerge:
+        case SpvOpSelectionMerge:
+        case SpvOpUnreachable:
           break;
         default: {
           // Function calls, atomics, function params, function returns, etc.
@@ -581,10 +578,8 @@ void AggressiveDCEPass::InitializeModuleScopeLiveInstructions() {
         auto* var = get_def_use_mgr()->GetDef(entry.GetSingleWordInOperand(i));
         auto storage_class = var->GetSingleWordInOperand(0u);
         // Vulkan support outputs without an associated input, but not inputs
-        // without an associated output. Don't remove outputs unless explicitly
-        // allowed.
-        if (!remove_outputs_ &&
-            spv::StorageClass(storage_class) == spv::StorageClass::Output) {
+        // without an associated output.
+        if (storage_class == SpvStorageClassOutput) {
           AddToWorklist(var);
         }
       }
@@ -593,29 +588,24 @@ void AggressiveDCEPass::InitializeModuleScopeLiveInstructions() {
     }
   }
   for (auto& anno : get_module()->annotations()) {
-    if (anno.opcode() == spv::Op::OpDecorate) {
+    if (anno.opcode() == SpvOpDecorate) {
       // Keep workgroup size.
-      if (spv::Decoration(anno.GetSingleWordInOperand(1u)) ==
-              spv::Decoration::BuiltIn &&
-          spv::BuiltIn(anno.GetSingleWordInOperand(2u)) ==
-              spv::BuiltIn::WorkgroupSize) {
+      if (anno.GetSingleWordInOperand(1u) == SpvDecorationBuiltIn &&
+          anno.GetSingleWordInOperand(2u) == SpvBuiltInWorkgroupSize) {
         AddToWorklist(&anno);
       }
 
       if (context()->preserve_bindings()) {
         // Keep all bindings.
-        if ((spv::Decoration(anno.GetSingleWordInOperand(1u)) ==
-             spv::Decoration::DescriptorSet) ||
-            (spv::Decoration(anno.GetSingleWordInOperand(1u)) ==
-             spv::Decoration::Binding)) {
+        if ((anno.GetSingleWordInOperand(1u) == SpvDecorationDescriptorSet) ||
+            (anno.GetSingleWordInOperand(1u) == SpvDecorationBinding)) {
           AddToWorklist(&anno);
         }
       }
 
       if (context()->preserve_spec_constants()) {
         // Keep all specialization constant instructions
-        if (spv::Decoration(anno.GetSingleWordInOperand(1u)) ==
-            spv::Decoration::SpecId) {
+        if (anno.GetSingleWordInOperand(1u) == SpvDecorationSpecId) {
           AddToWorklist(&anno);
         }
       }
@@ -634,7 +624,7 @@ void AggressiveDCEPass::InitializeModuleScopeLiveInstructions() {
     debug_global_seen = true;
     dbg.ForEachInId([this](const uint32_t* iid) {
       Instruction* in_inst = get_def_use_mgr()->GetDef(*iid);
-      if (in_inst->opcode() == spv::Op::OpVariable) return;
+      if (in_inst->opcode() == SpvOpVariable) return;
       AddToWorklist(in_inst);
     });
   }
@@ -657,19 +647,19 @@ void AggressiveDCEPass::InitializeModuleScopeLiveInstructions() {
 Pass::Status AggressiveDCEPass::ProcessImpl() {
   // Current functionality assumes shader capability
   // TODO(greg-lunarg): Handle additional capabilities
-  if (!context()->get_feature_mgr()->HasCapability(spv::Capability::Shader))
+  if (!context()->get_feature_mgr()->HasCapability(SpvCapabilityShader))
     return Status::SuccessWithoutChange;
 
   // Current functionality assumes relaxed logical addressing (see
   // instruction.h)
   // TODO(greg-lunarg): Handle non-logical addressing
-  if (context()->get_feature_mgr()->HasCapability(spv::Capability::Addresses))
+  if (context()->get_feature_mgr()->HasCapability(SpvCapabilityAddresses))
     return Status::SuccessWithoutChange;
 
   // The variable pointer extension is no longer needed to use the capability,
   // so we have to look for the capability.
   if (context()->get_feature_mgr()->HasCapability(
-          spv::Capability::VariablePointersStorageBuffer))
+          SpvCapabilityVariablePointersStorageBuffer))
     return Status::SuccessWithoutChange;
 
   // If any extensions in the module are not explicitly supported,
@@ -753,7 +743,7 @@ bool AggressiveDCEPass::ProcessGlobalValues() {
   bool modified = false;
   Instruction* instruction = &*get_module()->debug2_begin();
   while (instruction) {
-    if (instruction->opcode() != spv::Op::OpName) {
+    if (instruction->opcode() != SpvOpName) {
       instruction = instruction->NextNode();
       continue;
     }
@@ -774,22 +764,22 @@ bool AggressiveDCEPass::ProcessGlobalValues() {
   std::sort(annotations.begin(), annotations.end(), DecorationLess());
   for (auto annotation : annotations) {
     switch (annotation->opcode()) {
-      case spv::Op::OpDecorate:
-      case spv::Op::OpMemberDecorate:
-      case spv::Op::OpDecorateStringGOOGLE:
-      case spv::Op::OpMemberDecorateStringGOOGLE:
+      case SpvOpDecorate:
+      case SpvOpMemberDecorate:
+      case SpvOpDecorateStringGOOGLE:
+      case SpvOpMemberDecorateStringGOOGLE:
         if (IsTargetDead(annotation)) {
           context()->KillInst(annotation);
           modified = true;
         }
         break;
-      case spv::Op::OpDecorateId:
+      case SpvOpDecorateId:
         if (IsTargetDead(annotation)) {
           context()->KillInst(annotation);
           modified = true;
         } else {
-          if (spv::Decoration(annotation->GetSingleWordInOperand(1)) ==
-              spv::Decoration::HlslCounterBufferGOOGLE) {
+          if (annotation->GetSingleWordInOperand(1) ==
+              SpvDecorationHlslCounterBufferGOOGLE) {
             // HlslCounterBuffer will reference an id other than the target.
             // If that id is dead, then the decoration can be removed as well.
             uint32_t counter_buffer_id = annotation->GetSingleWordInOperand(2);
@@ -802,7 +792,7 @@ bool AggressiveDCEPass::ProcessGlobalValues() {
           }
         }
         break;
-      case spv::Op::OpGroupDecorate: {
+      case SpvOpGroupDecorate: {
         // Go through the targets of this group decorate. Remove each dead
         // target. If all targets are dead, remove this decoration.
         bool dead = true;
@@ -828,7 +818,7 @@ bool AggressiveDCEPass::ProcessGlobalValues() {
         }
         break;
       }
-      case spv::Op::OpGroupMemberDecorate: {
+      case SpvOpGroupMemberDecorate: {
         // Go through the targets of this group member decorate. Remove each
         // dead target (and member index). If all targets are dead, remove this
         // decoration.
@@ -856,7 +846,7 @@ bool AggressiveDCEPass::ProcessGlobalValues() {
         }
         break;
       }
-      case spv::Op::OpDecorationGroup:
+      case SpvOpDecorationGroup:
         // By the time we hit decoration groups we've checked everything that
         // can target them. So if they have no uses they must be dead.
         if (get_def_use_mgr()->NumUsers(annotation) == 0) {
@@ -897,7 +887,7 @@ bool AggressiveDCEPass::ProcessGlobalValues() {
       // this live as it does not have a result id. This is a little too
       // conservative since it is not known if the structure type that needed
       // it is still live. TODO(greg-lunarg): Only save if needed.
-      if (val.opcode() == spv::Op::OpTypeForwardPointer) {
+      if (val.opcode() == SpvOpTypeForwardPointer) {
         uint32_t ptr_ty_id = val.GetSingleWordInOperand(0);
         Instruction* ptr_ty_inst = get_def_use_mgr()->GetDef(ptr_ty_id);
         if (IsLive(ptr_ty_inst)) continue;
@@ -997,8 +987,6 @@ void AggressiveDCEPass::InitExtensions() {
       "SPV_KHR_non_semantic_info",
       "SPV_KHR_uniform_group_instructions",
       "SPV_KHR_fragment_shader_barycentric",
-      "SPV_NV_bindless_texture",
-      "SPV_EXT_shader_atomic_float_add",
   });
 }
 
@@ -1095,9 +1083,8 @@ bool AggressiveDCEPass::IsEntryPoint(Function* func) {
 }
 
 bool AggressiveDCEPass::HasCall(Function* func) {
-  return !func->WhileEachInst([](Instruction* inst) {
-    return inst->opcode() != spv::Op::OpFunctionCall;
-  });
+  return !func->WhileEachInst(
+      [](Instruction* inst) { return inst->opcode() != SpvOpFunctionCall; });
 }
 
 void AggressiveDCEPass::MarkFirstBlockAsLive(Function* func) {

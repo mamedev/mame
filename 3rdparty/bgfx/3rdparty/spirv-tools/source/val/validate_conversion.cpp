@@ -14,6 +14,7 @@
 
 // Validates correctness of conversion instructions.
 
+#include "source/diagnostic.h"
 #include "source/opcode.h"
 #include "source/spirv_constant.h"
 #include "source/spirv_target_env.h"
@@ -26,11 +27,11 @@ namespace val {
 
 // Validates correctness of conversion instructions.
 spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
-  const spv::Op opcode = inst->opcode();
+  const SpvOp opcode = inst->opcode();
   const uint32_t result_type = inst->type_id();
 
   switch (opcode) {
-    case spv::Op::OpConvertFToU: {
+    case SpvOpConvertFToU: {
       if (!_.IsUnsignedIntScalarType(result_type) &&
           !_.IsUnsignedIntVectorType(result_type) &&
           !_.IsUnsignedIntCooperativeMatrixType(result_type))
@@ -61,7 +62,7 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpConvertFToS: {
+    case SpvOpConvertFToS: {
       if (!_.IsIntScalarType(result_type) && !_.IsIntVectorType(result_type) &&
           !_.IsIntCooperativeMatrixType(result_type))
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
@@ -91,8 +92,8 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpConvertSToF:
-    case spv::Op::OpConvertUToF: {
+    case SpvOpConvertSToF:
+    case SpvOpConvertUToF: {
       if (!_.IsFloatScalarType(result_type) &&
           !_.IsFloatVectorType(result_type) &&
           !_.IsFloatCooperativeMatrixType(result_type))
@@ -123,7 +124,7 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpUConvert: {
+    case SpvOpUConvert: {
       if (!_.IsUnsignedIntScalarType(result_type) &&
           !_.IsUnsignedIntVectorType(result_type) &&
           !_.IsUnsignedIntCooperativeMatrixType(result_type))
@@ -159,7 +160,7 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpSConvert: {
+    case SpvOpSConvert: {
       if (!_.IsIntScalarType(result_type) && !_.IsIntVectorType(result_type) &&
           !_.IsIntCooperativeMatrixType(result_type))
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
@@ -194,7 +195,7 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpFConvert: {
+    case SpvOpFConvert: {
       if (!_.IsFloatScalarType(result_type) &&
           !_.IsFloatVectorType(result_type) &&
           !_.IsFloatCooperativeMatrixType(result_type))
@@ -230,7 +231,7 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpQuantizeToF16: {
+    case SpvOpQuantizeToF16: {
       if ((!_.IsFloatScalarType(result_type) &&
            !_.IsFloatVectorType(result_type)) ||
           _.GetBitWidth(result_type) != 32)
@@ -246,7 +247,7 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpConvertPtrToU: {
+    case SpvOpConvertPtrToU: {
       if (!_.IsUnsignedIntScalarType(result_type))
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected unsigned int scalar type as Result Type: "
@@ -257,18 +258,17 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected input to be a pointer: " << spvOpcodeString(opcode);
 
-      if (_.addressing_model() == spv::AddressingModel::Logical)
+      if (_.addressing_model() == SpvAddressingModelLogical)
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Logical addressing not supported: "
                << spvOpcodeString(opcode);
 
-      if (_.addressing_model() ==
-          spv::AddressingModel::PhysicalStorageBuffer64) {
-        spv::StorageClass input_storage_class;
+      if (_.addressing_model() == SpvAddressingModelPhysicalStorageBuffer64) {
+        uint32_t input_storage_class = 0;
         uint32_t input_data_type = 0;
         _.GetPointerTypeInfo(input_type, &input_data_type,
                              &input_storage_class);
-        if (input_storage_class != spv::StorageClass::PhysicalStorageBuffer)
+        if (input_storage_class != SpvStorageClassPhysicalStorageBuffer)
           return _.diag(SPV_ERROR_INVALID_DATA, inst)
                  << "Pointer storage class must be PhysicalStorageBuffer: "
                  << spvOpcodeString(opcode);
@@ -286,8 +286,8 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpSatConvertSToU:
-    case spv::Op::OpSatConvertUToS: {
+    case SpvOpSatConvertSToU:
+    case SpvOpSatConvertUToS: {
       if (!_.IsIntScalarType(result_type) && !_.IsIntVectorType(result_type))
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected int scalar or vector type as Result Type: "
@@ -307,7 +307,7 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpConvertUToPtr: {
+    case SpvOpConvertUToPtr: {
       if (!_.IsPointerType(result_type))
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected Result Type to be a pointer: "
@@ -318,18 +318,17 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected int scalar as input: " << spvOpcodeString(opcode);
 
-      if (_.addressing_model() == spv::AddressingModel::Logical)
+      if (_.addressing_model() == SpvAddressingModelLogical)
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Logical addressing not supported: "
                << spvOpcodeString(opcode);
 
-      if (_.addressing_model() ==
-          spv::AddressingModel::PhysicalStorageBuffer64) {
-        spv::StorageClass result_storage_class;
+      if (_.addressing_model() == SpvAddressingModelPhysicalStorageBuffer64) {
+        uint32_t result_storage_class = 0;
         uint32_t result_data_type = 0;
         _.GetPointerTypeInfo(result_type, &result_data_type,
                              &result_storage_class);
-        if (result_storage_class != spv::StorageClass::PhysicalStorageBuffer)
+        if (result_storage_class != SpvStorageClassPhysicalStorageBuffer)
           return _.diag(SPV_ERROR_INVALID_DATA, inst)
                  << "Pointer storage class must be PhysicalStorageBuffer: "
                  << spvOpcodeString(opcode);
@@ -347,8 +346,8 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpPtrCastToGeneric: {
-      spv::StorageClass result_storage_class;
+    case SpvOpPtrCastToGeneric: {
+      uint32_t result_storage_class = 0;
       uint32_t result_data_type = 0;
       if (!_.GetPointerTypeInfo(result_type, &result_data_type,
                                 &result_storage_class))
@@ -356,22 +355,22 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
                << "Expected Result Type to be a pointer: "
                << spvOpcodeString(opcode);
 
-      if (result_storage_class != spv::StorageClass::Generic)
+      if (result_storage_class != SpvStorageClassGeneric)
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected Result Type to have storage class Generic: "
                << spvOpcodeString(opcode);
 
       const uint32_t input_type = _.GetOperandTypeId(inst, 2);
-      spv::StorageClass input_storage_class;
+      uint32_t input_storage_class = 0;
       uint32_t input_data_type = 0;
       if (!_.GetPointerTypeInfo(input_type, &input_data_type,
                                 &input_storage_class))
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected input to be a pointer: " << spvOpcodeString(opcode);
 
-      if (input_storage_class != spv::StorageClass::Workgroup &&
-          input_storage_class != spv::StorageClass::CrossWorkgroup &&
-          input_storage_class != spv::StorageClass::Function)
+      if (input_storage_class != SpvStorageClassWorkgroup &&
+          input_storage_class != SpvStorageClassCrossWorkgroup &&
+          input_storage_class != SpvStorageClassFunction)
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected input to have storage class Workgroup, "
                << "CrossWorkgroup or Function: " << spvOpcodeString(opcode);
@@ -383,8 +382,8 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpGenericCastToPtr: {
-      spv::StorageClass result_storage_class;
+    case SpvOpGenericCastToPtr: {
+      uint32_t result_storage_class = 0;
       uint32_t result_data_type = 0;
       if (!_.GetPointerTypeInfo(result_type, &result_data_type,
                                 &result_storage_class))
@@ -392,22 +391,22 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
                << "Expected Result Type to be a pointer: "
                << spvOpcodeString(opcode);
 
-      if (result_storage_class != spv::StorageClass::Workgroup &&
-          result_storage_class != spv::StorageClass::CrossWorkgroup &&
-          result_storage_class != spv::StorageClass::Function)
+      if (result_storage_class != SpvStorageClassWorkgroup &&
+          result_storage_class != SpvStorageClassCrossWorkgroup &&
+          result_storage_class != SpvStorageClassFunction)
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected Result Type to have storage class Workgroup, "
                << "CrossWorkgroup or Function: " << spvOpcodeString(opcode);
 
       const uint32_t input_type = _.GetOperandTypeId(inst, 2);
-      spv::StorageClass input_storage_class;
+      uint32_t input_storage_class = 0;
       uint32_t input_data_type = 0;
       if (!_.GetPointerTypeInfo(input_type, &input_data_type,
                                 &input_storage_class))
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected input to be a pointer: " << spvOpcodeString(opcode);
 
-      if (input_storage_class != spv::StorageClass::Generic)
+      if (input_storage_class != SpvStorageClassGeneric)
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected input to have storage class Generic: "
                << spvOpcodeString(opcode);
@@ -419,8 +418,8 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpGenericCastToPtrExplicit: {
-      spv::StorageClass result_storage_class;
+    case SpvOpGenericCastToPtrExplicit: {
+      uint32_t result_storage_class = 0;
       uint32_t result_data_type = 0;
       if (!_.GetPointerTypeInfo(result_type, &result_data_type,
                                 &result_storage_class))
@@ -428,22 +427,21 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
                << "Expected Result Type to be a pointer: "
                << spvOpcodeString(opcode);
 
-      const auto target_storage_class =
-          inst->GetOperandAs<spv::StorageClass>(3);
+      const uint32_t target_storage_class = inst->word(4);
       if (result_storage_class != target_storage_class)
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected Result Type to be of target storage class: "
                << spvOpcodeString(opcode);
 
       const uint32_t input_type = _.GetOperandTypeId(inst, 2);
-      spv::StorageClass input_storage_class;
+      uint32_t input_storage_class = 0;
       uint32_t input_data_type = 0;
       if (!_.GetPointerTypeInfo(input_type, &input_data_type,
                                 &input_storage_class))
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected input to be a pointer: " << spvOpcodeString(opcode);
 
-      if (input_storage_class != spv::StorageClass::Generic)
+      if (input_storage_class != SpvStorageClassGeneric)
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected input to have storage class Generic: "
                << spvOpcodeString(opcode);
@@ -453,16 +451,16 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
                << "Expected input and Result Type to point to the same type: "
                << spvOpcodeString(opcode);
 
-      if (target_storage_class != spv::StorageClass::Workgroup &&
-          target_storage_class != spv::StorageClass::CrossWorkgroup &&
-          target_storage_class != spv::StorageClass::Function)
+      if (target_storage_class != SpvStorageClassWorkgroup &&
+          target_storage_class != SpvStorageClassCrossWorkgroup &&
+          target_storage_class != SpvStorageClassFunction)
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected target storage class to be Workgroup, "
                << "CrossWorkgroup or Function: " << spvOpcodeString(opcode);
       break;
     }
 
-    case spv::Op::OpBitcast: {
+    case SpvOpBitcast: {
       const uint32_t input_type = _.GetOperandTypeId(inst, 2);
       if (!input_type)
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
@@ -473,10 +471,7 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
       const bool input_is_pointer = _.IsPointerType(input_type);
       const bool input_is_int_scalar = _.IsIntScalarType(input_type);
 
-      const bool result_is_coopmat = _.IsCooperativeMatrixType(result_type);
-      const bool input_is_coopmat = _.IsCooperativeMatrixType(input_type);
-
-      if (!result_is_pointer && !result_is_int_scalar && !result_is_coopmat &&
+      if (!result_is_pointer && !result_is_int_scalar &&
           !_.IsIntVectorType(result_type) &&
           !_.IsFloatScalarType(result_type) &&
           !_.IsFloatVectorType(result_type))
@@ -484,32 +479,21 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
                << "Expected Result Type to be a pointer or int or float vector "
                << "or scalar type: " << spvOpcodeString(opcode);
 
-      if (!input_is_pointer && !input_is_int_scalar && !input_is_coopmat &&
+      if (!input_is_pointer && !input_is_int_scalar &&
           !_.IsIntVectorType(input_type) && !_.IsFloatScalarType(input_type) &&
           !_.IsFloatVectorType(input_type))
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected input to be a pointer or int or float vector "
                << "or scalar: " << spvOpcodeString(opcode);
 
-      if (result_is_coopmat != input_is_coopmat)
-        return _.diag(SPV_ERROR_INVALID_DATA, inst)
-               << "Cooperative matrix can only be cast to another cooperative "
-               << "matrix: " << spvOpcodeString(opcode);
-
-      if (result_is_coopmat) {
-        spv_result_t ret =
-            _.CooperativeMatrixShapesMatch(inst, result_type, input_type);
-        if (ret != SPV_SUCCESS) return ret;
-      }
-
       if (_.version() >= SPV_SPIRV_VERSION_WORD(1, 5) ||
           _.HasExtension(kSPV_KHR_physical_storage_buffer)) {
         const bool result_is_int_vector = _.IsIntVectorType(result_type);
         const bool result_has_int32 =
-            _.ContainsSizedIntOrFloatType(result_type, spv::Op::OpTypeInt, 32);
+            _.ContainsSizedIntOrFloatType(result_type, SpvOpTypeInt, 32);
         const bool input_is_int_vector = _.IsIntVectorType(input_type);
         const bool input_has_int32 =
-            _.ContainsSizedIntOrFloatType(input_type, spv::Op::OpTypeInt, 32);
+            _.ContainsSizedIntOrFloatType(input_type, SpvOpTypeInt, 32);
         if (result_is_pointer && !input_is_pointer && !input_is_int_scalar &&
             !(input_is_int_vector && input_has_int32))
           return _.diag(SPV_ERROR_INVALID_DATA, inst)
@@ -550,7 +534,7 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
       break;
     }
 
-    case spv::Op::OpConvertUToAccelerationStructureKHR: {
+    case SpvOpConvertUToAccelerationStructureKHR: {
       if (!_.IsAccelerationStructureType(result_type)) {
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected Result Type to be a Acceleration Structure: "
@@ -572,13 +556,13 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
       break;
   }
 
-  if (_.HasCapability(spv::Capability::Shader)) {
+  if (_.HasCapability(SpvCapabilityShader)) {
     switch (inst->opcode()) {
-      case spv::Op::OpConvertFToU:
-      case spv::Op::OpConvertFToS:
-      case spv::Op::OpConvertSToF:
-      case spv::Op::OpConvertUToF:
-      case spv::Op::OpBitcast:
+      case SpvOpConvertFToU:
+      case SpvOpConvertFToS:
+      case SpvOpConvertSToF:
+      case SpvOpConvertUToF:
+      case SpvOpBitcast:
         if (_.ContainsLimitedUseIntOrFloatType(inst->type_id()) ||
             _.ContainsLimitedUseIntOrFloatType(_.GetOperandTypeId(inst, 2u))) {
           return _.diag(SPV_ERROR_INVALID_DATA, inst)

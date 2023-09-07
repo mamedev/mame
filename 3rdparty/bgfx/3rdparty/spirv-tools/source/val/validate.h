@@ -31,6 +31,11 @@ class ValidationState_t;
 class BasicBlock;
 class Instruction;
 
+/// A function that returns a vector of BasicBlocks given a BasicBlock. Used to
+/// get the successor and predecessor nodes of a CFG block
+using get_blocks_func =
+    std::function<const std::vector<BasicBlock*>*(const BasicBlock*)>;
+
 /// @brief Performs the Control Flow Graph checks
 ///
 /// @param[in] _ the validation state of the module
@@ -64,8 +69,8 @@ spv_result_t CheckIdDefinitionDominateUse(ValidationState_t& _);
 /// instructions.
 ///
 /// This function will iterate over all instructions and check for any required
-/// predecessor and/or successor instructions. e.g. spv::Op::OpPhi must only be
-/// preceded by spv::Op::OpLabel, spv::Op::OpPhi, or spv::Op::OpLine.
+/// predecessor and/or successor instructions. e.g. SpvOpPhi must only be
+/// preceded by SpvOpLabel, SpvOpPhi, or SpvOpLine.
 ///
 /// @param[in] _ the validation state of the module
 ///
@@ -197,9 +202,6 @@ spv_result_t RayQueryPass(ValidationState_t& _, const Instruction* inst);
 
 /// Validates correctness of ray tracing instructions.
 spv_result_t RayTracingPass(ValidationState_t& _, const Instruction* inst);
-
-/// Validates correctness of shader execution reorder instructions.
-spv_result_t RayReorderNVPass(ValidationState_t& _, const Instruction* inst);
 
 /// Validates correctness of mesh shading instructions.
 spv_result_t MeshShadingPass(ValidationState_t& _, const Instruction* inst);

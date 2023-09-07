@@ -37,6 +37,8 @@
 // propagate the 'noContraction' qualifier.
 //
 
+#ifndef GLSLANG_WEB
+
 #include "propagateNoContraction.h"
 
 #include <cstdlib>
@@ -421,7 +423,7 @@ getSymbolToDefinitionMappingAndPreciseSymbolIDs(const glslang::TIntermediate& in
                                         ReturnBranchNodeSet());
 
     TIntermNode* root = intermediate.getTreeRoot();
-    if (root == nullptr)
+    if (root == 0)
         return result_tuple;
 
     NodeMapping& symbol_definition_mapping = std::get<0>(result_tuple);
@@ -863,4 +865,6 @@ void PropagateNoContraction(const glslang::TIntermediate& intermediate)
         precise_object_accesschains.erase(precise_object_accesschain);
     }
 }
-}
+};
+
+#endif // GLSLANG_WEB
