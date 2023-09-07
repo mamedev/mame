@@ -176,7 +176,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="teachysb">
-		<description>TEACH YOURSELF BASIC (United Kingdom)</description>
+		<description>Teach Yourself BASIC (United Kingdom)</description>
 		<year>1985</year>
 		<publisher>Toshiba</publisher>
 		<notes>Bundled with Toshiba HX-10.</notes>
@@ -16768,7 +16768,7 @@ Side B
 		<description>W Series 1 - Biotech / Killer Station (Japan)</description>
 		<year>1983</year>
 		<publisher>Hudson Soft</publisher>
-		<info name="alt_title" value="Wシリーズ1"/>
+		<info name="alt_title" value="Wシリーズ1　バイオテック・キラーステーション"/>
 		<info name="serial" value="MX-1003"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
 		<part name="cass1a" interface="msx_cass">
@@ -16786,10 +16786,10 @@ Side B
 	</software>
 
 	<software name="wseries3">
-		<description>W Series 3 - Akarui Nouen / Fire Ball (Japan)</description>
+		<description>W Series 3 - Fire Ball / Akarui Nouen (Japan)</description>
 		<year>1983</year>
 		<publisher>Hudson Soft</publisher>
-		<info name="alt_title" value="Wシリーズ3"/>
+		<info name="alt_title" value="Wシリーズ3　ファイアボール・明るい農園"/>
 		<info name="serial" value="MX-1005"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
 		<part name="cass1a" interface="msx_cass">
@@ -16807,10 +16807,10 @@ Side B
 	</software>
 
 	<software name="wseries4">
-		<description>W Series 4 - Super Doors / Busy Rainy Day (Japan)</description>
+		<description>W Series 4 - Ame no Hi wa Ōisogashi / Super Doors (Japan)</description>
 		<year>1983</year>
 		<publisher>Hudson Soft</publisher>
-		<info name="alt_title" value="Wシリーズ4"/>
+		<info name="alt_title" value="Wシリーズ4　雨の日は大忙し・スーパードアーズ"/>
 		<info name="serial" value="MX-1006"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
 		<part name="cass1a" interface="msx_cass">
@@ -17352,7 +17352,7 @@ Side B
 	</software>
 
 	<software name="wldmscpp">
-		<description>Color Plotter/Printer-you yō Sekai Chizu Soft (Japan)</description>
+		<description>Color Plotter/Printer-yō Sekai Chizu Soft (Japan)</description>
 		<year>1984</year>
 		<publisher>National</publisher>
 		<info name="alt_title" value="カラープロッタプリンタ用世界地図ソフト"/>
