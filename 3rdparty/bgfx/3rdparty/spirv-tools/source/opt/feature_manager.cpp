@@ -14,8 +14,6 @@
 
 #include "source/opt/feature_manager.h"
 
-#include <queue>
-#include <stack>
 #include <string>
 
 #include "source/enum_string_mapping.h"
@@ -36,42 +34,44 @@ void FeatureManager::AddExtensions(Module* module) {
 }
 
 void FeatureManager::AddExtension(Instruction* ext) {
-  assert(ext->opcode() == SpvOpExtension &&
+  assert(ext->opcode() == spv::Op::OpExtension &&
          "Expecting an extension instruction.");
 
   const std::string name = ext->GetInOperand(0u).AsString();
   Extension extension;
   if (GetExtensionFromString(name.c_str(), &extension)) {
-    extensions_.Add(extension);
+    extensions_.insert(extension);
   }
 }
 
 void FeatureManager::RemoveExtension(Extension ext) {
-  if (!extensions_.Contains(ext)) return;
-  extensions_.Remove(ext);
+  if (!extensions_.contains(ext)) return;
+  extensions_.erase(ext);
 }
 
-void FeatureManager::AddCapability(SpvCapability cap) {
-  if (capabilities_.Contains(cap)) return;
+void FeatureManager::AddCapability(spv::Capability cap) {
+  if (capabilities_.contains(cap)) return;
 
-  capabilities_.Add(cap);
+  capabilities_.insert(cap);
 
   spv_operand_desc desc = {};
-  if (SPV_SUCCESS ==
-      grammar_.lookupOperand(SPV_OPERAND_TYPE_CAPABILITY, cap, &desc)) {
-    CapabilitySet(desc->numCapabilities, desc->capabilities)
-        .ForEach([this](SpvCapability c) { AddCapability(c); });
+  if (SPV_SUCCESS == grammar_.lookupOperand(SPV_OPERAND_TYPE_CAPABILITY,
+                                            uint32_t(cap), &desc)) {
+    for (auto capability :
+         CapabilitySet(desc->numCapabilities, desc->capabilities)) {
+      AddCapability(capability);
+    }
   }
 }
 
-void FeatureManager::RemoveCapability(SpvCapability cap) {
-  if (!capabilities_.Contains(cap)) return;
-  capabilities_.Remove(cap);
+void FeatureManager::RemoveCapability(spv::Capability cap) {
+  if (!capabilities_.contains(cap)) return;
+  capabilities_.erase(cap);
 }
 
 void FeatureManager::AddCapabilities(Module* module) {
   for (Instruction& inst : module->capabilities()) {
-    AddCapability(static_cast<SpvCapability>(inst.GetSingleWordInOperand(0)));
+    AddCapability(static_cast<spv::Capability>(inst.GetSingleWordInOperand(0)));
   }
 }
 

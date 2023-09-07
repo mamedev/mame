@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2023 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
 --
 
@@ -79,8 +79,8 @@ newaction {
 			csgen.write(csgen.gen_dllname(), "../bindings/cs/bgfx_dllname.cs")
 
 			local dgen = require "bindings-d"
-			dgen.write(dgen.gen_types(), "../bindings/d/types.d")
-			dgen.write(dgen.gen_funcs(), "../bindings/d/funcs.d")
+			dgen.write(dgen.gen(), "../bindings/d/package.d")
+			dgen.write(dgen.fakeEnumFile, "../bindings/d/fakeenum.d")
 
 			local csgen = require "bindings-bf"
 			csgen.write(csgen.gen(), "../bindings/bf/bgfx.bf")
@@ -111,7 +111,7 @@ newaction {
 		f:close()
 		io.output(path.join(MODULE_DIR, "src/version.h"))
 		io.write("/*\n")
-		io.write(" * Copyright 2011-2022 Branimir Karadzic. All rights reserved.\n")
+		io.write(" * Copyright 2011-2023 Branimir Karadzic. All rights reserved.\n")
 		io.write(" * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE\n")
 		io.write(" */\n")
 		io.write("\n")

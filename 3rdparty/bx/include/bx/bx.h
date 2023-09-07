@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2023 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -36,8 +36,83 @@
 ///
 #define BX_ENABLED(_x) BX_IGNORE_C4127(bx::isEnabled<!!(_x)>::value)
 
+///
+#define BX_DECLARE_TAG(_name)  \
+	struct    _name ## Tag {}; \
+	constexpr _name ## Tag _name
+
 namespace bx
 {
+	/// Placement new tag.
+	BX_DECLARE_TAG(PlacementNew);
+
+	/// Fields are left uninitialized.
+	BX_DECLARE_TAG(InitNone);
+
+	/// Fields are initialized to zero.
+	BX_DECLARE_TAG(InitZero);
+
+	/// Fields are initialized to identity value.
+	BX_DECLARE_TAG(InitIdentity);
+
+	/// Source location with file path, and file line.
+	///
+	struct Location
+	{
+		/// Default constructor.
+		///
+		constexpr Location()
+			: filePath(""), line(0) {}
+
+		/// Constructor with specific file name, and line number.
+		///
+		constexpr Location(const char* _filePath, uint32_t _line)
+			: filePath(_filePath), line(_line) {}
+
+		/// Current source location.
+		///
+		static Location current(
+			  const char* _filePath = __builtin_FILE()
+			, uint32_t _line = __builtin_LINE()
+			);
+
+		const char* filePath; //!< File path.
+		uint32_t    line;     //!< File line.
+	};
+
+	/// Unknown source code location.
+	static constexpr Location kUnknownLocation("Unknown?", 0);
+
+	/// Source location with file path, file line, and function name.
+	///
+	struct LocationFull
+	{
+		/// Default constructor.
+		///
+		constexpr LocationFull()
+			: function(""), filePath(""), line(0) {}
+
+		/// Constructor with specific function name, file name, and line number.
+		///
+		constexpr LocationFull(const char* _function, const char* _filePath, uint32_t _line)
+			: function(_function), filePath(_filePath), line(_line) {}
+
+		/// Current source location.
+		///
+		static LocationFull current(
+			  const char* _function = __builtin_FUNCTION()
+			, const char* _filePath = __builtin_FILE()
+			, uint32_t _line = __builtin_LINE()
+			);
+
+		const char* function; //!< Function name.
+		const char* filePath; //!< File path.
+		uint32_t    line;     //!< File line.
+	};
+
+	/// Unknown source code location.
+	static constexpr LocationFull kUnknownLocationFull("Unknown?", "Unknown?", 0);
+
 	/// Arithmetic type `Ty` limits.
 	template<typename Ty, bool SignT = isSigned<Ty>()>
 	struct LimitsT;

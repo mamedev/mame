@@ -94,6 +94,7 @@ private:
 	u8 counters_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(refresh_timer) { refresh(); }
+	void clear_board(int state);
 	void refresh();
 	void update_counters();
 	void update_limits();
@@ -110,6 +111,12 @@ private:
 	attotime m_pwm_accum[4];
 	attotime m_pwm_last;
 };
+
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
 
 void robotadv_state::machine_start()
 {
@@ -132,8 +139,13 @@ void robotadv_state::machine_start()
 
 void robotadv_state::machine_reset()
 {
-	m_piece_hand = 0;
 	refresh();
+}
+
+void robotadv_state::clear_board(int state)
+{
+	m_piece_hand = 0;
+	m_board->clear_board();
 }
 
 
@@ -502,6 +514,7 @@ void robotadv_state::robotadv(machine_config &config)
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->set_size(8+4, 8);
+	m_board->clear_cb().set(FUNC(robotadv_state::clear_board));
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 	m_board->set_nvram_enable(true);

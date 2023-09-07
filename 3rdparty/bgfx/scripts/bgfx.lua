@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2023 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
 --
 
@@ -244,7 +244,6 @@ function bgfxProjectBase(_kind, _defines)
 			}
 
 			excludes {
-				path.join(BGFX_DIR, "src/glcontext_**.mm"),
 				path.join(BGFX_DIR, "src/renderer_**.mm"),
 				path.join(BGFX_DIR, "src/amalgamated.cpp"),
 			}
@@ -259,7 +258,6 @@ function bgfxProjectBase(_kind, _defines)
 	else
 		configuration { "xcode* or osx* or ios*" }
 			files {
-				path.join(BGFX_DIR, "src/glcontext_**.mm"),
 				path.join(BGFX_DIR, "src/renderer_**.mm"),
 			}
 

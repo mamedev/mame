@@ -832,7 +832,8 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	std::vector<uint8_t> imagebuf(max_size);
 	uint8_t header[12];
 
-	io.read_at(0, header, 12, actual);
+	if(io.read_at(0, header, 12, actual) || actual != 12)
+		return false;
 	head_count = header[9];
 
 	if(header[0] == 't')
@@ -841,16 +842,18 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 		disk_decode.init_Decode();
 		disk_decode.set_floppy_file_offset(12);
-		disk_decode.Decode(&imagebuf[0], max_size);
+		actual = disk_decode.Decode(&imagebuf[0], max_size);
 	}
 	else
 	{
 		uint64_t image_size;
 		if(io.length(image_size))
 			return false;
-		io.read_at(12, &imagebuf[0], image_size, actual);
+		if(io.read_at(12, &imagebuf[0], image_size - 12, actual) || actual != image_size - 12)
+			return false;
 	}
 
+	// skip optional comment section
 	if(header[7] & 0x80)
 		offset = 10 + imagebuf[2] + (imagebuf[3] << 8);
 
@@ -918,6 +921,9 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 	while(track_spt != 255)
 	{
+		if(actual < offset + 4)
+			return false;
+
 		desc_pc_sector sects[256];
 		uint8_t sect_data[65536];
 		int sdatapos = 0;
@@ -927,6 +933,9 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		offset += 4;
 		for(int i = 0; i < track_spt; i++)
 		{
+			if(actual < offset + 6)
+				return false;
+
 			uint8_t *hs = &imagebuf[offset];
 			uint16_t size;
 			offset += 6;
@@ -943,6 +952,8 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			else
 			{
 				offset += 3;
+				if(actual < offset)
+					return false;
 				size = 128 << hs[3];
 				int j, k;
 				switch(hs[8])
@@ -950,11 +961,15 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					default:
 						return false;
 					case 0:
+						if(actual < offset + size)
+							return false;
 						memcpy(&sect_data[sdatapos], &imagebuf[offset], size);
 						offset += size;
 						break;
 					case 1:
 						offset += 4;
+						if(actual < offset)
+							return false;
 						k = (hs[9] + (hs[10] << 8)) * 2;
 						k = (k <= size) ? k : size;
 						for(j = 0; j < k; j += 2)
@@ -969,11 +984,15 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 						k = 0;
 						while(k < size)
 						{
+							if(actual < offset + 2)
+								return false;
 							uint16_t len = imagebuf[offset];
 							uint16_t rep = imagebuf[offset + 1];
 							offset += 2;
 							if(!len)
 							{
+								if(actual < offset + rep)
+									return false;
 								memcpy(&sect_data[sdatapos + k], &imagebuf[offset], rep);
 								offset += rep;
 								k += rep;
@@ -981,6 +1000,8 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 							else
 							{
 								len = (1 << len);
+								if(actual < offset + len)
+									return false;
 								rep = len * rep;
 								rep = ((rep + k) <= size) ? rep : (size - k);
 								for(j = 0; j < rep; j += len)
@@ -1010,7 +1031,7 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		else
 			build_pc_track_mfm(track, head, image, base_cell_count*2, track_spt, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
 
-		track_spt = imagebuf[offset];
+		track_spt = offset < actual ? imagebuf[offset] : 255;
 	}
 	if((track_count > 50) && (form_factor == floppy_image::FF_525)) // ?
 	{

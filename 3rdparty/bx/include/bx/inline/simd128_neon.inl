@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2023 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -536,7 +536,13 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_rcp(simd128_neon_t _a)
 	{
-		return simd_rcp_ni(_a);
+		const simd128_neon_t tmp0   = simd_rcp_est(_a);
+		const simd128_neon_t tmp1   = vrecpsq_f32(_a, tmp0);
+		const simd128_neon_t tmp2   = simd_mul(tmp0, tmp1);
+		const simd128_neon_t tmp3   = vrecpsq_f32(_a, tmp2);
+		const simd128_neon_t result = simd_mul(tmp2, tmp3);
+
+		return result;
 	}
 
 	template<>
@@ -620,13 +626,21 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_rsqrt(simd128_neon_t _a)
 	{
-		return simd_rsqrt_ni(_a);
+		const simd128_neon_t tmp0   = simd_rsqrt_est(_a);
+		const simd128_neon_t tmp1   = simd_mul(_a, tmp0);
+		const simd128_neon_t tmp2   = vrsqrtsq_f32(tmp1, tmp0);
+		const simd128_neon_t tmp3   = simd_mul(tmp0, tmp2);
+		const simd128_neon_t tmp4   = simd_mul(_a, tmp3);
+		const simd128_neon_t tmp5   = vrsqrtsq_f32(tmp4, tmp3);
+		const simd128_neon_t result = simd_mul(tmp3, tmp5);
+
+		return result;
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_rsqrt_nr(simd128_neon_t _a)
 	{
-		return simd_rsqrt_nr_ni(_a);
+		return simd_rsqrt(_a);
 	}
 
 	template<>
@@ -636,15 +650,18 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	}
 
 	template<>
-	BX_SIMD_FORCE_INLINE simd128_neon_t simd_sqrt_nr(simd128_neon_t _a)
+	BX_SIMD_FORCE_INLINE simd128_neon_t simd_sqrt(simd128_neon_t _a)
 	{
-		return simd_sqrt_nr_ni(_a);
+		const simd128_neon_t rsqrt  = simd_rsqrt(_a);
+		const simd128_neon_t result = simd_mul(_a, rsqrt);
+
+		return result;
 	}
 
 	template<>
-	BX_SIMD_FORCE_INLINE simd128_neon_t simd_sqrt(simd128_neon_t _a)
+	BX_SIMD_FORCE_INLINE simd128_neon_t simd_sqrt_nr(simd128_neon_t _a)
 	{
-		return simd_sqrt_nr_ni(_a);
+		return simd_sqrt(_a);
 	}
 
 	template<>

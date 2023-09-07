@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // ----------------------------------------------------------------------------
-// Copyright 2011-2021 Arm Limited
+// Copyright 2011-2023 Arm Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License. You may obtain a copy
@@ -22,6 +22,50 @@
 #include "astcenc_internal.h"
 
 #include <cassert>
+
+/**
+ * @brief Reverse bits in a byte.
+ *
+ * @param p   The value to reverse.
+  *
+ * @return The reversed result.
+ */
+static inline int bitrev8(int p)
+{
+	p = ((p & 0x0F) << 4) | ((p >> 4) & 0x0F);
+	p = ((p & 0x33) << 2) | ((p >> 2) & 0x33);
+	p = ((p & 0x55) << 1) | ((p >> 1) & 0x55);
+	return p;
+}
+
+
+/**
+ * @brief Read up to 8 bits at an arbitrary bit offset.
+ *
+ * The stored value is at most 8 bits, but can be stored at an offset of between 0 and 7 bits so may
+ * span two separate bytes in memory.
+ *
+ * @param         bitcount    The number of bits to read.
+ * @param         bitoffset   The bit offset to read from, between 0 and 7.
+ * @param[in,out] ptr         The data pointer to read from.
+ *
+ * @return The read value.
+ */
+static inline int read_bits(
+	int bitcount,
+	int bitoffset,
+	const uint8_t* ptr
+) {
+	int mask = (1 << bitcount) - 1;
+	ptr += bitoffset >> 3;
+	bitoffset &= 7;
+	int value = ptr[0] | (ptr[1] << 8);
+	value >>= bitoffset;
+	value &= mask;
+	return value;
+}
+
+#if !defined(ASTCENC_DECOMPRESS_ONLY)
 
 /**
  * @brief Write up to 8 bits at an arbitrary bit offset.
@@ -52,47 +96,6 @@ static inline void write_bits(
 	ptr[0] |= value;
 	ptr[1] &= mask >> 8;
 	ptr[1] |= value >> 8;
-}
-
-/**
- * @brief Read up to 8 bits at an arbitrary bit offset.
- *
- * The stored value is at most 8 bits, but can be stored at an offset of between 0 and 7 bits so may
- * span two separate bytes in memory.
- *
- * @param         bitcount    The number of bits to read.
- * @param         bitoffset   The bit offset to read from, between 0 and 7.
- * @param[in,out] ptr         The data pointer to read from.
- *
- * @return The read value.
- */
-static inline int read_bits(
-	int bitcount,
-	int bitoffset,
-	const uint8_t* ptr
-) {
-	int mask = (1 << bitcount) - 1;
-	ptr += bitoffset >> 3;
-	bitoffset &= 7;
-	int value = ptr[0] | (ptr[1] << 8);
-	value >>= bitoffset;
-	value &= mask;
-	return value;
-}
-
-/**
- * @brief Reverse bits in a byte.
- *
- * @param p   The value to reverse.
-  *
- * @return The reversed result.
- */
-static inline int bitrev8(int p)
-{
-	p = ((p & 0x0F) << 4) | ((p >> 4) & 0x0F);
-	p = ((p & 0x33) << 2) | ((p >> 2) & 0x33);
-	p = ((p & 0x55) << 1) | ((p >> 1) & 0x55);
-	return p;
 }
 
 /* See header for documentation. */
@@ -282,6 +285,8 @@ void symbolic_to_physical(
 	           scb.partition_count == 1 ? 17 : 19 + PARTITION_INDEX_BITS);
 }
 
+#endif
+
 /* See header for documentation. */
 void physical_to_symbolic(
 	const block_size_descriptor& bsd,
@@ -371,12 +376,15 @@ void physical_to_symbolic(
 	const auto& di = bsd.get_decimation_info(bm.decimation_mode);
 
 	int weight_count = di.weight_count;
+	promise(weight_count > 0);
+
 	quant_method weight_quant_method = static_cast<quant_method>(bm.quant_mode);
 	int is_dual_plane = bm.is_dual_plane;
 
 	int real_weight_count = is_dual_plane ? 2 * weight_count : weight_count;
 
 	int partition_count = read_bits(2, 11, pcb.data) + 1;
+	promise(partition_count > 0);
 
 	scb.block_mode = static_cast<uint16_t>(block_mode);
 	scb.partition_count = static_cast<uint8_t>(partition_count);
@@ -523,6 +531,7 @@ void physical_to_symbolic(
 	}
 
 	// Fetch component for second-plane in the case of dual plane of weights.
+	scb.plane2_component = -1;
 	if (is_dual_plane)
 	{
 		scb.plane2_component = static_cast<int8_t>(read_bits(2, below_weights_pos - 2, pcb.data));

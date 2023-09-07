@@ -986,6 +986,8 @@ if (BUSES["C64"]~=null) then
 		MAME_DIR .. "src/devices/bus/c64/swiftlink.h",
 		MAME_DIR .. "src/devices/bus/c64/system3.cpp",
 		MAME_DIR .. "src/devices/bus/c64/system3.h",
+		MAME_DIR .. "src/devices/bus/c64/tibdd001.cpp",
+		MAME_DIR .. "src/devices/bus/c64/tibdd001.h",
 		MAME_DIR .. "src/devices/bus/c64/tdos.cpp",
 		MAME_DIR .. "src/devices/bus/c64/tdos.h",
 		MAME_DIR .. "src/devices/bus/c64/turbo232.cpp",

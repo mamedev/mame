@@ -16,7 +16,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <climits>
 #include <cstdint>
 #include <sstream>
 #include <string>
@@ -24,7 +23,6 @@
 
 #include "source/util/hash_combine.h"
 #include "source/util/make_unique.h"
-#include "spirv/unified1/spirv.h"
 
 namespace spvtools {
 namespace opt {
@@ -65,7 +63,7 @@ bool CompareTwoVectors(const U32VecVec a, const U32VecVec b) {
   return true;
 }
 
-}  // anonymous namespace
+}  // namespace
 
 std::string Type::GetDecorationStr() const {
   std::ostringstream oss;
@@ -86,10 +84,9 @@ bool Type::HasSameDecorations(const Type* that) const {
   return CompareTwoVectors(decorations_, that->decorations_);
 }
 
-bool Type::IsUniqueType(bool allowVariablePointers) const {
+bool Type::IsUniqueType() const {
   switch (kind_) {
     case kPointer:
-      return !allowVariablePointers;
     case kStruct:
     case kArray:
     case kRuntimeArray:
@@ -131,7 +128,9 @@ std::unique_ptr<Type> Type::Clone() const {
     DeclareKindCase(NamedBarrier);
     DeclareKindCase(AccelerationStructureNV);
     DeclareKindCase(CooperativeMatrixNV);
+    DeclareKindCase(CooperativeMatrixKHR);
     DeclareKindCase(RayQueryKHR);
+    DeclareKindCase(HitObjectNV);
 #undef DeclareKindCase
     default:
       assert(false && "Unhandled type");
@@ -177,7 +176,9 @@ bool Type::operator==(const Type& other) const {
     DeclareKindCase(NamedBarrier);
     DeclareKindCase(AccelerationStructureNV);
     DeclareKindCase(CooperativeMatrixNV);
+    DeclareKindCase(CooperativeMatrixKHR);
     DeclareKindCase(RayQueryKHR);
+    DeclareKindCase(HitObjectNV);
 #undef DeclareKindCase
     default:
       assert(false && "Unhandled type");
@@ -231,7 +232,9 @@ size_t Type::ComputeHashValue(size_t hash, SeenTypes* seen) const {
     DeclareKindCase(NamedBarrier);
     DeclareKindCase(AccelerationStructureNV);
     DeclareKindCase(CooperativeMatrixNV);
+    DeclareKindCase(CooperativeMatrixKHR);
     DeclareKindCase(RayQueryKHR);
+    DeclareKindCase(HitObjectNV);
 #undef DeclareKindCase
     default:
       assert(false && "Unhandled type");
@@ -357,8 +360,9 @@ size_t Matrix::ComputeExtraStateHash(size_t hash, SeenTypes* seen) const {
   return element_type_->ComputeHashValue(hash, seen);
 }
 
-Image::Image(Type* type, SpvDim dimen, uint32_t d, bool array, bool multisample,
-             uint32_t sampling, SpvImageFormat f, SpvAccessQualifier qualifier)
+Image::Image(Type* type, spv::Dim dimen, uint32_t d, bool array,
+             bool multisample, uint32_t sampling, spv::ImageFormat f,
+             spv::AccessQualifier qualifier)
     : Type(kImage),
       sampled_type_(type),
       dim_(dimen),
@@ -383,9 +387,9 @@ bool Image::IsSameImpl(const Type* that, IsSameCache* seen) const {
 
 std::string Image::str() const {
   std::ostringstream oss;
-  oss << "image(" << sampled_type_->str() << ", " << dim_ << ", " << depth_
-      << ", " << arrayed_ << ", " << ms_ << ", " << sampled_ << ", " << format_
-      << ", " << access_qualifier_ << ")";
+  oss << "image(" << sampled_type_->str() << ", " << uint32_t(dim_) << ", "
+      << depth_ << ", " << arrayed_ << ", " << ms_ << ", " << sampled_ << ", "
+      << uint32_t(format_) << ", " << uint32_t(access_qualifier_) << ")";
   return oss.str();
 }
 
@@ -557,7 +561,7 @@ size_t Opaque::ComputeExtraStateHash(size_t hash, SeenTypes*) const {
   return hash_combine(hash, name_);
 }
 
-Pointer::Pointer(const Type* type, SpvStorageClass sc)
+Pointer::Pointer(const Type* type, spv::StorageClass sc)
     : Type(kPointer), pointee_type_(type), storage_class_(sc) {}
 
 bool Pointer::IsSameImpl(const Type* that, IsSameCache* seen) const {
@@ -636,7 +640,7 @@ bool Pipe::IsSameImpl(const Type* that, IsSameCache*) const {
 
 std::string Pipe::str() const {
   std::ostringstream oss;
-  oss << "pipe(" << access_qualifier_ << ")";
+  oss << "pipe(" << uint32_t(access_qualifier_) << ")";
   return oss.str();
 }
 
@@ -701,6 +705,45 @@ size_t CooperativeMatrixNV::ComputeExtraStateHash(size_t hash,
 bool CooperativeMatrixNV::IsSameImpl(const Type* that,
                                      IsSameCache* seen) const {
   const CooperativeMatrixNV* mt = that->AsCooperativeMatrixNV();
+  if (!mt) return false;
+  return component_type_->IsSameImpl(mt->component_type_, seen) &&
+         scope_id_ == mt->scope_id_ && rows_id_ == mt->rows_id_ &&
+         columns_id_ == mt->columns_id_ && HasSameDecorations(that);
+}
+
+CooperativeMatrixKHR::CooperativeMatrixKHR(const Type* type,
+                                           const uint32_t scope,
+                                           const uint32_t rows,
+                                           const uint32_t columns,
+                                           const uint32_t use)
+    : Type(kCooperativeMatrixKHR),
+      component_type_(type),
+      scope_id_(scope),
+      rows_id_(rows),
+      columns_id_(columns),
+      use_id_(use) {
+  assert(type != nullptr);
+  assert(scope != 0);
+  assert(rows != 0);
+  assert(columns != 0);
+}
+
+std::string CooperativeMatrixKHR::str() const {
+  std::ostringstream oss;
+  oss << "<" << component_type_->str() << ", " << scope_id_ << ", " << rows_id_
+      << ", " << columns_id_ << ", " << use_id_ << ">";
+  return oss.str();
+}
+
+size_t CooperativeMatrixKHR::ComputeExtraStateHash(size_t hash,
+                                                   SeenTypes* seen) const {
+  hash = hash_combine(hash, scope_id_, rows_id_, columns_id_, use_id_);
+  return component_type_->ComputeHashValue(hash, seen);
+}
+
+bool CooperativeMatrixKHR::IsSameImpl(const Type* that,
+                                      IsSameCache* seen) const {
+  const CooperativeMatrixKHR* mt = that->AsCooperativeMatrixKHR();
   if (!mt) return false;
   return component_type_->IsSameImpl(mt->component_type_, seen) &&
          scope_id_ == mt->scope_id_ && rows_id_ == mt->rows_id_ &&
