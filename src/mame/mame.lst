@@ -35543,6 +35543,7 @@ streetgr3                       // (c) 1993
 
 @source:pc/pcipc.cpp
 pciagp                          //
+pcimga                          //
 pcinv3                          //
 pcipc                           //
 pcipctx                         //
