@@ -34,7 +34,6 @@ jobs:
     - name: Build
       env:
         MINGW64: "/mingw64"
-        CXXFLAGS: "-std=c++17"
       run: make shaders
     - uses: actions/upload-artifact@master
       with:
