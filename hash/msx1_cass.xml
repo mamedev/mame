@@ -143,6 +143,56 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="svi728nl">
+		<description>Inleiding tot de SpectraVideo SV 728 (Netherlands)</description>
+		<year>1985</year>
+		<publisher>Spectravideo</publisher>
+		<notes>Bundled with Spectravideo SVI-728.</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="44429">
+				<rom name="inleiding tot de spectravideo sv 728 - spectravideo.cas" size="44429" crc="e0d87d84" sha1="f79b1007210a2fad41e56bbb4251af7a4dfa3834"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Needs a working light pen interface -->
+	<software name="lpengrph" supported="partial">
+		<description>Light Pen Graphic v1.0 (Japan)</description>
+		<year>1984</year>
+		<publisher>Sanyo</publisher>
+		<notes>Bundled with Sanyo MPC-10.</notes>
+		<info name="usage" value="Side A: Load with BLOAD&quot;CAS:&quot;,R. Side B: Load with CLOAD + RUN. Requires a Japanese system."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="26187">
+				<rom name="light pen graphic v1.0 - sanyo (side a).cas" size="26187" crc="cf7c9de7" sha1="4ff9e8bf6a5224819578142a4ba28fa18307a990"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="16800">
+				<rom name="light pen graphic v1.0 - sanyo (side b).cas" size="16800" crc="f8aad1f1" sha1="45a254be32167d2722a50355b673ea39cde74892"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teachysb">
+		<description>Teach Yourself BASIC (United Kingdom)</description>
+		<year>1985</year>
+		<publisher>Toshiba</publisher>
+		<notes>Bundled with Toshiba HX-10.</notes>
+		<info name="usage" value="Load with CLOAD + RUN."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="37714">
+				<rom name="teach yourself basic - toshiba (side a).cas" size="37714" crc="4414f500" sha1="83d1a4ed31380b5aa071876e89f33044df2f88eb"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="34456">
+				<rom name="teach yourself basic - toshiba (side a).cas" size="34456" crc="33e11c22" sha1="e5b0b2b89522b29ba630102ba940e4f94c97100e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Games -->
 
 	<software name="genius">
@@ -1047,6 +1097,33 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="archers">
+		<description>The Archers (Europe)</description>
+		<year>1986</year>
+		<publisher>Mosaic Publishing</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a1" interface="msx_cass">
+			<dataarea name="cass" size="60880">
+				<rom name="the archers - mosaic publishing (part 1).cas" size="60880" crc="08cc776f" sha1="61294e750b5fe4ddf93a4d2e499b33ea0a1f38e0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="cass1a2" interface="msx_cass">
+			<dataarea name="cass" size="57447">
+				<rom name="the archers - mosaic publishing (part 2).cas" size="57447" crc="97bc351c" sha1="a744b0fcfd93516479ada9a277063e7550b75a15" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="cass1b1" interface="msx_cass">
+			<dataarea name="cass" size="57448">
+				<rom name="the archers - mosaic publishing (part 3).cas" size="57448" crc="d7477bcd" sha1="d7d80cb7fad8c8054010d7db5adf6b1c00f6510e" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="cass1b2" interface="msx_cass">
+			<dataarea name="cass" size="57447">
+				<rom name="the archers - mosaic publishing (part 4).cas" size="57447" crc="b85dec9e" sha1="f181dd74e9eb7083df25cfac6744e2cfe62b3185" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="arctfox">
 		<description>ArcticFox (Spain)</description>
 		<year>1989</year>
@@ -1544,6 +1621,19 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="bangbang">
+		<description>Bang! Bang! (Japan)</description>
+		<year>1985</year>
+		<publisher>Mel Software</publisher>
+		<info name="serial" value="58L-804"/>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="17615458">
+				<rom name="bang bang - mel software.wav" size="17615458" crc="ccc0bb18" sha1="5d07f7b6d28f5bf48e2cda4c836210edae202e26"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="barb">
 		<description>Barbarian (Spain)</description>
 		<year>1989</year>
@@ -1796,7 +1886,7 @@ license:CC0-1.0
 		<description>The Black Bass (Japan)</description>
 		<year>1986</year>
 		<publisher>Hot-B</publisher>
-		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R. Required a Japanese system."/>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R. Requires a Japanese system."/>
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="28196">
@@ -2022,8 +2112,8 @@ license:CC0-1.0
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
-			<dataarea name="cass" size="22504">
-				<rom name="booty (1988)(eurosoft)(nl)[run'cas-'].cas" size="22504" crc="c20898f4" sha1="227d0b7d2b3479e8f6e88777068181afddee66ed"/>
+			<dataarea name="cass" size="28140736">
+				<rom name="booty - eurosoft.wav" size="28140736" crc="27b152e5" sha1="fb7294b1b0d6ec714f1392fd521441e3628f28e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6494,6 +6584,26 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="growpain">
+		<description>The Growing Pains of Adrian Mole (United Kingdom)</description>
+		<year>1987</year>
+		<publisher>Virgin Games</publisher>
+		<info name="serial" value="VGE 4002"/>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<feature name="part_id" value="Side A - Parts 1 &amp; 2"/>
+			<dataarea name="cass" size="115999">
+				<rom name="the growing pains of adrian mole - virgin games (side a).cas" size="115999" crc="2defd873" sha1="b3c6c46a024badcbdbedbac062dd5684fbffdae3"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<feature name="part_id" value="Side B - Parts 3 &amp; 4"/>
+			<dataarea name="cass" size="115999">
+				<rom name="the growing pains of adrian mole - virgin games (side b).cas" size="115999" crc="bec874ec" sha1="b86386ef4e04a2d375b7fbbf1f9f08fbd18c96cc"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Gunstick is not supported yet. -->
 	<software name="gtell" supported="no">
 		<description>Guillermo Tell (Spain)</description>
@@ -10394,6 +10504,21 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="munsters">
+		<description>The Munsters (Europe)</description>
+		<year>1988</year>
+		<publisher>Alternative Software</publisher>
+		<info name="serial" value="AS774"/>
+		<info name="barcode" value="5015103779161"/>
+		<!-- The instructions say to use LOAD"CAS:",R. Error in instructions or incomplete dump? -->
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="72561">
+				<rom name="the munsters - alternative software.cas" size="72561" crc="1818da64" sha1="5d47179ab4d9eb793d686ef4823d9a48a31d92ab"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="musjueg1">
 		<description>Música en Juego I - Notas (Spain)</description>
 		<year>1986</year>
@@ -10797,8 +10922,8 @@ license:CC0-1.0
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
-			<dataarea name="cass" size="62720">
-				<rom name="north sea helicopter (1987)(aackosoft)(nl)[run'cas-'].cas" size="62720" crc="5733cc5c" sha1="d062be70d6a4179577414a5e3cf20be61c664053"/>
+			<dataarea name="cass" size="99311660">
+				<rom name="north sea helicopter - aackosoft.wav" size="99311660" crc="732cbaaf" sha1="dd5967d8d6dde89a87b9e6be787ad5be74d98837"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11567,7 +11692,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="phantom2">
+	<software name="phantom2" cloneof="vampirec">
 		<description>Phantomas 2 (Spain)</description>
 		<year>1987</year>
 		<publisher>Dinamic Software</publisher>
@@ -12585,6 +12710,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="riverchs">
+		<description>River Chase (Japan)</description>
+		<year>1985</year>
+		<publisher>Soft Pro International</publisher>
+		<info name="usage" value="Load with CLOAD + RUN."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="18873698">
+				<rom name="river chase - soft pro international.wav" size="18873698" crc="dae33bc4" sha1="95178bf0bdebbef0644b9d8fcd35a6e6f4d8f4a2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="riveraid">
 		<description>River Raid (Europe)</description>
 		<year>1984</year>
@@ -12989,6 +13126,28 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="scpghost">
+		<description>Scapeghost (Europe)</description>
+		<year>1989</year>
+		<publisher>Level 9 Computing</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="60407">
+				<rom name="scapeghost - level 9 computing (part 1).cas" size="60407" crc="44ec0374" sha1="fd4b912f341d2b9a079e61be4f81ade4e229ac57"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="msx_cass">
+			<dataarea name="cass" size="60407">
+				<rom name="scapeghost - level 9 computing (part 2).cas" size="60407" crc="24375acf" sha1="90d08b32b264bd6fcf81794d973d4dbfe0a8f2c5"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="msx_cass">
+			<dataarea name="cass" size="60407">
+				<rom name="scapeghost - level 9 computing (part 3).cas" size="60407" crc="f6fdb73d" sha1="58d8c07b8f90c7456ea52610f801e5228830b049"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="scentped">
 		<description>Scentipede (Europe)</description>
 		<year>1986</year>
@@ -13073,6 +13232,19 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="seahuntr">
+		<description>Sea Hunter (Europe)</description>
+		<year>1985</year>
+		<publisher>Spectravideo</publisher>
+		<info name="serial" value="001"/>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="8230">
+				<rom name="sea hunter - spectravideo.cas" size="8230" crc="ac172cd3" sha1="15bb84661955216d7554d207bbae0d6f1d4f7410"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="seaking">
 		<description>Sea King (Europe)</description>
 		<year>1986</year>
@@ -13083,6 +13255,38 @@ license:CC0-1.0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="33535">
 				<rom name="sea king (1986)(players software)(gb)[run'cas-'].cas" size="33535" crc="b29571ed" sha1="af8b0e5b89d6c6a7123d84965ab9863da8c45981"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="secamole">
+		<description>The Secret Diary of Adrian Mole Aged 13¾ (Europe)</description>
+		<year>1985</year>
+		<publisher>Mosaic Publishing</publisher>
+		<info name="barcode" value="9780946855490"/>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a1" interface="msx_cass">
+			<feature name="part_id" value="Side A - Part 1"/>
+			<dataarea name="cass" size="61848">
+				<rom name="the secret diary of adrian mole - mosaic publishing (part 1).cas" size="61848" crc="9c9ea025" sha1="726daa2e95d744c3acb1f9360b06eac2719bac63" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="cass1a2" interface="msx_cass">
+			<feature name="part_id" value="Side A - Part 2"/>
+			<dataarea name="cass" size="61848">
+				<rom name="the secret diary of adrian mole - mosaic publishing (part 2).cas" size="61848" crc="5eefcfdc" sha1="d2247d31cdc8f676cc6ada9fa86c23e47c765248" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="cass1b1" interface="msx_cass">
+			<feature name="part_id" value="Side B - Part 3"/>
+			<dataarea name="cass" size="61848">
+				<rom name="the secret diary of adrian mole - mosaic publishing (part 3).cas" size="61848" crc="ce84cac7" sha1="472ad0f818095023b7c1e7927964563cf0041724" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="cass1b2" interface="msx_cass">
+			<feature name="part_id" value="Side B - Part 4"/>
+			<dataarea name="cass" size="61848">
+				<rom name="the secret diary of adrian mole - mosaic publishing (part 4).cas" size="61848" crc="5c465ccc" sha1="c827d2417389f8d0a20404f3c5f5f84163799962" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13226,6 +13430,42 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="sildrm1">
+		<description>Silicon Dreams I - Snowball (United Kingdom)</description>
+		<year>1984</year>
+		<publisher>Level 9 Computing</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="30081">
+				<rom name="snowball - level 9 computing.cas" size="30081" crc="b999e3ed" sha1="061750c422fb7021a8ff02a791d1eafe9e94b732"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sildrm2">
+		<description>Silicon Dreams II - Return to Eden (United Kingdom)</description>
+		<year>1984</year>
+		<publisher>Level 9 Computing</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="44001">
+				<rom name="return to eden - level 9 computing.cas" size="44001" crc="e8673e3f" sha1="8abd2f1a3c26b4cd2d250647e35bda5a1b23b544"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sildrm3">
+		<description>Silicon Dreams III - The Worm in Paradise (United Kingdom)</description>
+		<year>1985</year>
+		<publisher>Level 9 Computing</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="57501">
+				<rom name="the worm in paradise - level 9 computing.cas" size="57501" crc="c620ef67" sha1="e5e20c0a9cc8c1dfa5dc7c63ba12862c4ff59e1a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sildream">
 		<description>Silicon Dreams (Europe)</description>
 		<year>1986</year>
@@ -13233,21 +13473,21 @@ license:CC0-1.0
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
-			<feature name="part_id" value="Tape I - Snowball v2"/>
+			<feature name="part_id" value="Tape I - Snowball"/>
 			<dataarea name="cass" size="57975">
-				<rom name="silicon dreams i - snowball v2 (1986)(level 9 computing)(gb)[run'cas-'].cas" size="57975" crc="7f9ce25f" sha1="0c97c0045ce6f0a4e6c885063c84fe69dd2471c7"/>
+				<rom name="silicon dreams i - snowball (1986)(level 9 computing)(gb)[run'cas-'].cas" size="57975" crc="7f9ce25f" sha1="0c97c0045ce6f0a4e6c885063c84fe69dd2471c7"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="msx_cass">
-			<feature name="part_id" value="Tape II - Return to Eden v2"/>
+			<feature name="part_id" value="Tape II - Return to Eden"/>
 			<dataarea name="cass" size="57975">
-				<rom name="silicon dreams ii - return to eden v2 (1986)(level 9 computing)(gb)[run'cas-'].cas" size="57975" crc="515d72d2" sha1="1ba2348abc96f2156a2da4381f3bf87bf34c73c2"/>
+				<rom name="silicon dreams ii - return to eden (1986)(level 9 computing)(gb)[run'cas-'].cas" size="57975" crc="515d72d2" sha1="1ba2348abc96f2156a2da4381f3bf87bf34c73c2"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="msx_cass">
-			<feature name="part_id" value="Tape III - The Worm in Paradise v2"/>
+			<feature name="part_id" value="Tape III - The Worm in Paradise"/>
 			<dataarea name="cass" size="57975">
-				<rom name="silicon dreams iii - the worm in paradise v2 (1986)(level 9 computing)(gb)[run'cas-'].cas" size="57975" crc="eb408655" sha1="762f49897cf54c84159a5a19b1010eefebb3f4c6"/>
+				<rom name="silicon dreams iii - the worm in paradise (1986)(level 9 computing)(gb)[run'cas-'].cas" size="57975" crc="eb408655" sha1="762f49897cf54c84159a5a19b1010eefebb3f4c6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13259,73 +13499,21 @@ license:CC0-1.0
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
-			<feature name="part_id" value="Tape I - Snowball v2"/>
+			<feature name="part_id" value="Tape I - Snowball"/>
 			<dataarea name="cass" size="57975">
-				<rom name="silicon dreams i - snowball v2 (1986)(level 9 computing)(gb)[a][run'cas-'].cas" size="57975" crc="08a45bf6" sha1="4c9abff41b3b961e4a0d9b06e46d13fc404af899"/>
+				<rom name="silicon dreams i - snowball (1986)(level 9 computing)(gb)[a][run'cas-'].cas" size="57975" crc="08a45bf6" sha1="4c9abff41b3b961e4a0d9b06e46d13fc404af899"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="msx_cass">
-			<feature name="part_id" value="Tape II - Return to Eden v2"/>
+			<feature name="part_id" value="Tape II - Return to Eden"/>
 			<dataarea name="cass" size="57975">
-				<rom name="silicon dreams ii - return to eden v2 (1986)(level 9 computing)(gb)[a][run'cas-'].cas" size="57975" crc="4845f865" sha1="2114b015e3abfd737b5b9d0198d095edbd51d628"/>
+				<rom name="silicon dreams ii - return to eden (1986)(level 9 computing)(gb)[a][run'cas-'].cas" size="57975" crc="4845f865" sha1="2114b015e3abfd737b5b9d0198d095edbd51d628"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="msx_cass">
-			<feature name="part_id" value="Tape III - The Worm in Paradise v2"/>
+			<feature name="part_id" value="Tape III - The Worm in Paradise"/>
 			<dataarea name="cass" size="57975">
-				<rom name="silicon dreams iii - the worm in paradise v2 (1986)(level 9 computing)(gb)[a][run'cas-'].cas" size="57975" crc="dde95b90" sha1="96cefba8183edafba61855e6bebc2a05d81c17dc"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sildreamb" cloneof="sildream">
-		<description>Silicon Dreams (Europe, alt 2)</description>
-		<year>1984?</year>
-		<publisher>Level 9 Computing</publisher>
-		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
-
-		<part name="cass1" interface="msx_cass">
-			<feature name="part_id" value="Tape I - Snowball v2"/>
-			<dataarea name="cass" size="57975">
-				<rom name="silicon dreams i - snowball v2 (1986)(level 9 computing)(gb)[run'cas-'].cas" size="57975" crc="7f9ce25f" sha1="0c97c0045ce6f0a4e6c885063c84fe69dd2471c7"/>
-			</dataarea>
-		</part>
-		<part name="cass2" interface="msx_cass">
-			<feature name="part_id" value="Tape II - Return to Eden v1"/>
-			<dataarea name="cass" size="42417">
-				<rom name="silicon dreams ii - return to eden (1984)(level 9 computing)(gb)[bload'cas-',r].cas" size="42417" crc="44b7c336" sha1="c6a0ce19d24948d93f8468ad052878ae58022f9f"/>
-			</dataarea>
-		</part>
-		<part name="cass3" interface="msx_cass">
-			<feature name="part_id" value="Tape III - The Worm in Paradise v2"/>
-			<dataarea name="cass" size="57975">
-				<rom name="silicon dreams iii - the worm in paradise v2 (1986)(level 9 computing)(gb)[run'cas-'].cas" size="57975" crc="eb408655" sha1="762f49897cf54c84159a5a19b1010eefebb3f4c6"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sildreamc" cloneof="sildream">
-		<description>Silicon Dreams (Europe, alt 3)</description>
-		<year>1984?</year>
-		<publisher>Level 9 Computing</publisher>
-		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
-
-		<part name="cass1" interface="msx_cass">
-			<feature name="part_id" value="Tape I - Snowball v2"/>
-			<dataarea name="cass" size="57975">
-				<rom name="silicon dreams i - snowball v2 (1986)(level 9 computing)(gb)[run'cas-'].cas" size="57975" crc="7f9ce25f" sha1="0c97c0045ce6f0a4e6c885063c84fe69dd2471c7"/>
-			</dataarea>
-		</part>
-		<part name="cass2" interface="msx_cass">
-			<feature name="part_id" value="Tape II - Return to Eden v1, Alt Loader?"/>
-			<dataarea name="cass" size="44001">
-				<rom name="silicon dreams ii - return to eden (1984)(level 9 computing)(gb)[run'cas-'].cas" size="44001" crc="e8673e3f" sha1="8abd2f1a3c26b4cd2d250647e35bda5a1b23b544"/>
-			</dataarea>
-		</part>
-		<part name="cass3" interface="msx_cass">
-			<feature name="part_id" value="Tape III - The Worm in Paradise v2"/>
-			<dataarea name="cass" size="57975">
-				<rom name="silicon dreams iii - the worm in paradise v2 (1986)(level 9 computing)(gb)[run'cas-'].cas" size="57975" crc="eb408655" sha1="762f49897cf54c84159a5a19b1010eefebb3f4c6"/>
+				<rom name="silicon dreams iii - the worm in paradise (1986)(level 9 computing)(gb)[a][run'cas-'].cas" size="57975" crc="dde95b90" sha1="96cefba8183edafba61855e6bebc2a05d81c17dc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13514,12 +13702,24 @@ license:CC0-1.0
 	<software name="skydiver">
 		<description>Sky Diver (Japan)</description>
 		<year>1984</year>
-		<publisher>SoftBank</publisher>
+		<publisher>Hudson Soft</publisher>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="11734">
 				<rom name="sky diver (1984)(hudson soft - japanese softbank)(jp)(en)[bload'cas-',r][martos].cas" size="11734" crc="93a40a2c" sha1="fff14d423ab59c2d5b8fc88a0f642de470470b0c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skydivera" cloneof="skydiver">
+		<description>Sky Diver (Japan, alt)</description>
+		<year>1984</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="11732">
+				<rom name="sky diver - hudson soft (alt).cas" size="11732" crc="30522dd2" sha1="96873d866b7989d76964db1aaedeec13a6c9568b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13889,7 +14089,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="soviet">
-		<description>Soviet (Europe?)</description>
+		<description>Soviet (Spain)</description>
 		<year>1990</year>
 		<publisher>Opera Soft</publisher>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
@@ -13904,6 +14104,25 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="119128">
 				<rom name="soviet (1990)(opera soft)(side b)[bload'cas-',r].cas" size="119128" crc="183dcfb4" sha1="0a92dfdded56b8ba4d67c72ae52713b2289faa73"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sovieta" cloneof="soviet">
+		<description>Soviet (Spain, alt)</description>
+		<year>1990</year>
+		<publisher>Opera Soft</publisher>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1a" interface="msx_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="102992">
+				<rom name="soviet - opera soft (side a, alt).cas" size="102992" crc="e6cda8d1" sha1="69758b868f5b7855c999ed042fe44ada313bd1cb"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="119128">
+				<rom name="soviet - opera soft (side b, alt).cas" size="119128" crc="54d88b83" sha1="66f045ef0c1a7b164bbd2da6e7376bc767effc15"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13932,6 +14151,24 @@ license:CC0-1.0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="8776">
 				<rom name="space busters (1985)(aackosoft)(nl)[run'cas-'].cas" size="8776" crc="4a8a958c" sha1="7449e0805e08b1deb879967f012353ac4028eba4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sharr2">
+		<description>Space Harrier II (Europe)</description>
+		<year>1990</year>
+		<publisher>Grandslam Entertainments</publisher>
+		<info name="barcode" value="5013248004025"/>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="72561">
+				<rom name="space harrier ii - grandslam entertainments (side a).cas" size="72561" crc="d2c63ef5" sha1="e10ffdeba1cdeb7a9dfe61099eb3b240083384c3"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="93398">
+				<rom name="space harrier ii - grandslam entertainments (side b).cas" size="93398" crc="03129b5f" sha1="ec7506b183005a6fedaa7cb7688ef406574afc2a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14335,6 +14572,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="starbust">
+		<description>Starbuster (Europe)</description>
+		<year>1987</year>
+		<publisher>Methodic Solutions</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="38265">
+				<rom name="starbuster - methodic solutions.cas" size="38265" crc="b91736b6" sha1="0419e8de859558c5c42907d138dc348be1e8a715"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="starbyte">
 		<description>Starbyte (Spain)</description>
 		<year>1987</year>
@@ -14667,6 +14916,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="supermaze">
+		<description>Supermaze (United Kingdom)</description>
+		<year>1984</year>
+		<publisher>Morwood Software</publisher>
+		<info name="usage" value="Load with CLOAD + RUN."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="20212">
+				<rom name="supermaze - morwood software.cas" size="20212" crc="c2520b1b" sha1="d2926b735d7adee49c4f254b67aab3cf876c89ef"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="survivor">
 		<description>Survivor (Spain)</description>
 		<year>1987</year>
@@ -14757,6 +15018,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="tank">
+		<description>Tank (Finland)</description>
+		<year>1986</year>
+		<publisher>Boss Company</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="21713">
+				<rom name="tank - boss company.cas" size="21713" crc="f3b284a8" sha1="603fc3c2841a1f3358625372b27b899e4d924693"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tankbatt">
 		<description>Tank Battalion (Europe)</description>
 		<year>1984</year>
@@ -14768,6 +15041,40 @@ license:CC0-1.0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="25249">
 				<rom name="tank battalion (1984)(bug-byte software)(gb)[bload'cas-',r].cas" size="25249" crc="2d203129" sha1="9a2fb1881140c41d3e52d389f38e7cbd5df3166c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tlgngame">
+		<description>Tape Login MSX Game Book (Japan)</description>
+		<year>1985</year>
+		<publisher>ASCII</publisher>
+		<notes><![CDATA[Instructions:
+Side A
+1. ラビリンス - Labylinth: CLEAR 100,&HE6FF + BLOAD"CAS:lm" + CLOAD"lb" + RUN
+2. ザルバー２７８４ - Zalbar 2784: BLOAD"CAS:ZALBAR",R
+3. フィールドマスター - Field Master: CLOAD"FIELD" + BLOAD"CAS:FIELD" + RUN
+4. ハンググライディングゲーム - Hang Gliding Game: CLOAD"HANG" + RUN
+5. マイクロ・イリーガス - Micro Illegus: CLOAD"login" + BLOAD"CAS:MC" + RUN
+6. 特別編超難解版テセウス - Theseus - Special Super Hard Edition: BLOAD"CAS:the",R
+Side B
+7. モッキー - Mockey: CLOAD"MOC-B" + BLOAD"CAS:MOC-O" + RUN
+8. フッパー - Fupper: CLOAD"BASIC" + BLOAD"CAS:MAC" + RUN
+9. ７ならべ - Sevens: CLOAD"SEVEN" + RUN
+10. デマンド - Demand: BLOAD"CAS:MC",R
+11. スーパーレーサー - Super Racer: BLOAD"CAS:race",R
+12. ルートファインディング - Route Finding: CLOAD"login" + RUN
+]]></notes>
+		<info name="alt_title" value="別冊テープログインMSX GAME BOOK"/>
+		<info name="usage" value="Requires a Japanese system. See notes for loading instructions."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="134943788">
+				<rom name="tape login msx game book - ascii (side a).wav" size="134943788" crc="ba60a6f9" sha1="57097787af0b948798e7ee9abeff933c4a142b24"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="135447596">
+				<rom name="tape login msx game book - ascii (side b).wav" size="135447596" crc="51597faa" sha1="561f00c142c561dd6e9437e298f8c768e560d2cd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14839,6 +15146,20 @@ license:CC0-1.0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="63390">
 				<rom name="teenage mutant hero turtles (1990)(mcm software)[passworded][run'cas-'].cas" size="63390" crc="45e1d213" sha1="8ac173faad6e9ce19613faf8f81fd6e57e27572c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="temptawf">
+		<description>The Temptation of the Apartment Wife (Japan)</description>
+		<year>1985</year>
+		<publisher>KOEI</publisher>
+		<info name="alt_title" value="団地妻の誘惑"/>
+		<info name="serial" value="MXKN11006"/>
+		<info name="usage" value="Load with CLOAD + RUN. Requires a Japanese system."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="31456">
+				<rom name="the temptation of the apartment wife - koei.cas" size="31456" crc="22acc51a" sha1="038e9a56baa747530fb0c44e23838973fc6c4703"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15106,6 +15427,93 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="timemag3">
+		<description>Time and Magik III - The Price of Magik (Europe)</description>
+		<year>1986</year>
+		<publisher>Level 9 Computing</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="57447">
+				<rom name="time and magik iii - the price of magik - level 9 computing.cas" size="57447" crc="b4dc0db2" sha1="11640e50abfefc0d308ba391285ab589b404b562"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timemagk">
+		<description>Time and Magik (United Kingdom)</description>
+		<year>1988</year>
+		<publisher>Mandarin Software</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="60407">
+				<rom name="time and magik - mandarin software (tape 1).cas" size="60407" crc="74cdc020" sha1="a1439a1c8bf10d2416ab55acf5a95430f37dae7e"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="msx_cass">
+			<feature name="part_id" value="Tape 2"/>
+			<dataarea name="cass" size="60407">
+				<rom name="time and magik - mandarin software (tape 2).cas" size="60407" crc="c282d262" sha1="09bc993fc39b6544ef7e63021729fbaea72eb55c"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="msx_cass">
+			<feature name="part_id" value="Tape 3"/>
+			<dataarea name="cass" size="60407">
+				<rom name="time and magik - mandarin software (tape 3).cas" size="60407" crc="3f027b9c" sha1="a37a4217ea7271c320482f6756a2fb7fb3ba0ffa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timemagkc" cloneof="timemagk">
+		<description>Time and Magik (United Kingdom, cracked)</description>
+		<year>1988</year>
+		<publisher>Mandarin Software</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="60407">
+				<rom name="time and magik - mandarin software (tape 1, cracked).cas" size="60407" crc="496c426b" sha1="8f073c8629af3247e67fef1ad7e64ae70d57c08a"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="msx_cass">
+			<feature name="part_id" value="Tape 2"/>
+			<dataarea name="cass" size="60407">
+				<rom name="time and magik - mandarin software (tape 2, cracked).cas" size="60407" crc="3386af88" sha1="2000170b1dbe35dab03095d727e2b65b2fa9cc35"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="msx_cass">
+			<feature name="part_id" value="Tape 3"/>
+			<dataarea name="cass" size="60407">
+				<rom name="time and magik - mandarin software (tape 3, cracked).cas" size="60407" crc="e628082f" sha1="c2afd378bd9ca05da45cc31cb6ca8a62db2cb4d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timemagka" cloneof="timemagk">
+		<description>Time and Magik (United Kingdom, alt)</description>
+		<year>1988</year>
+		<publisher>Mandarin Software</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="60407">
+				<rom name="time and magik - mandarin software (tape 1, alt).cas" size="60407" crc="0c0f8249" sha1="e1acf101a15f428310539f7db27611625e899121"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="msx_cass">
+			<feature name="part_id" value="Tape 2"/>
+			<dataarea name="cass" size="60407">
+				<rom name="time and magik - mandarin software (tape 2, alt).cas" size="60407" crc="b983375f" sha1="73ad19cf74003fb9ea84a7a358319740da333f3f"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="msx_cass">
+			<feature name="part_id" value="Tape 3"/>
+			<dataarea name="cass" size="60407">
+				<rom name="time and magik - mandarin software (tape 3, alt).cas" size="60407" crc="d921d6a5" sha1="d8c21b547d8aaf1236a3d24b780bff3ec2b13add"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="timeband">
 		<description>Time Bandits (Europe)</description>
 		<year>1984</year>
@@ -15369,6 +15777,39 @@ license:CC0-1.0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="92113">
 				<rom name="tom &amp; jerry (1989)(erbe software)(es)[run'cas-'].cas" size="92113" crc="4e440e8d" sha1="fd23db3577a27b638d23100403b176e42482bd00"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmtprncs">
+		<description>The Tomato Princess from Salad Land (Japan)</description>
+		<year>1985</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="alt_tilte" value="サラダの国のトマト姫"/>
+		<info name="serial" value="XT-1004"/>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R. Requires a Japanese system."/>
+		<part name="cass1a" interface="msx_cass">
+			<feature name="part_id" value="Tape 1 Side A - ADV-1"/>
+			<dataarea name="cass" size="26919">
+				<rom name="the tomato princess from salad land - hudson soft (1a).cas" size="26919" crc="f2d174da" sha1="d8c0c1783a14993edb117f6da1429556b8978129"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<feature name="part_id" value="Tape 1 Side B - ADV-2"/>
+			<dataarea name="cass" size="24614">
+				<rom name="the tomato princess from salad land - hudson soft (1b).cas" size="24614" crc="999c1a4f" sha1="eb935b0f7ec3f990f419a4f331343a8030344cb1"/>
+			</dataarea>
+		</part>
+		<part name="cass2a" interface="msx_cass">
+			<feature name="part_id" value="Tape 2 Side A - ADV-3"/>
+			<dataarea name="cass" size="28711">
+				<rom name="the tomato princess from salad land - hudson soft (2a).cas" size="28711" crc="363b615e" sha1="ce7bbc921213ca33739df1c7ce60d0caf4e353c1"/>
+			</dataarea>
+		</part>
+		<part name="cass2b" interface="msx_cass">
+			<feature name="part_id" value="Tape 2 Side B - ADV-4"/>
+			<dataarea name="cass" size="26406">
+				<rom name="the tomato princess from salad land - hudson soft (2b).cas" size="26406" crc="11edfd00" sha1="f59e52708358e9405a3e85e01657bc3c945cf806"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15977,6 +16418,31 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="vampirec">
+		<description>Vampire (Europe)</description>
+		<year>1986</year>
+		<publisher>Codemasters</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="45536">
+				<rom name="vampire - codemasters.cas" size="45536" crc="ddfaa430" sha1="9e75047936399e04f1d6bb519674e593996243b9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Missing initial loading screen displaying VAMPIRE (C) 1986 CODE MASTERS -->
+	<software name="vampireca" cloneof="vampirec">
+		<description>Vampire (Europe, alt)</description>
+		<year>1986</year>
+		<publisher>Codemasters</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="45255">
+				<rom name="vampire - codemasters (alt).cas" size="45255" crc="40df16fb" sha1="8edb768a259d9493b51a549b8fa3610fbabc67e8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vampemp">
 		<description>Vampire's Empire (Spain)</description>
 		<year>1988</year>
@@ -16186,6 +16652,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="vidpokrb">
+		<description>Video Poker (Brazil, Disprosoft)</description>
+		<year>1986</year>
+		<publisher>Disprosoft</publisher>
+		<info name="usage" value="Load with CLOAD + RUN."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="25667">
+				<rom name="video poker - disprosoft.cas" size="25667" crc="d40bfeec" sha1="5b36d4e765bd782d7fc688f0497c235498b22717"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="avtak">
 		<description>A View to a Kill (Europe)</description>
 		<year>1986</year>
@@ -16282,6 +16760,67 @@ license:CC0-1.0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="58744">
 				<rom name="vortex raider (1988)(eurosoft)(nl)[a][run'cas-'].cas" size="58744" crc="488c3fae" sha1="ab99b0fd47c8be8bb08c8e958b9d9373ddebaa0c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wseries1">
+		<description>W Series 1 - Biotech / Killer Station (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="alt_title" value="Wシリーズ1　バイオテック・キラーステーション"/>
+		<info name="serial" value="MX-1003"/>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1a" interface="msx_cass">
+			<feature name="part_id" value="Side A - Biotech, Killer Station"/>
+			<dataarea name="cass" size="26327">
+				<rom name="w series 1 - hudson soft (side a).cas" size="17088" crc="dead2462" sha1="eb28b4de3b276b20d16160f354c98be21b99572c"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<feature name="part_id" value="Side B - Killer Station, Biotech"/>
+			<dataarea name="cass" size="26327">
+				<rom name="w series 1 - hudson soft (side b).cas" size="17088" crc="3cb0c6db" sha1="614b87a4a2abf8a452d7747e876bbaa23708ed1a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wseries3">
+		<description>W Series 3 - Fire Ball / Akarui Nouen (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="alt_title" value="Wシリーズ3　ファイアボール・明るい農園"/>
+		<info name="serial" value="MX-1005"/>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1a" interface="msx_cass">
+			<feature name="part_id" value="Side A - Fire Ball, Akarui Nouen"/>
+			<dataarea name="cass" size="26327">
+				<rom name="w series 3 - hudson soft (side a).cas" size="17088" crc="6ec14ccf" sha1="08b24777748e02933c0eab80f1e36942b9f28a82"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<feature name="part_id" value="Side B - Akarui Nouen, Fire Ball"/>
+			<dataarea name="cass" size="26327">
+				<rom name="w series 3 - hudson soft (side b).cas" size="17088" crc="163bd5fa" sha1="6b1802e61a1a1347a2c9c64983ec9286715d285a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wseries4">
+		<description>W Series 4 - Ame no Hi wa Ōisogashi / Super Doors (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="alt_title" value="Wシリーズ4　雨の日は大忙し・スーパードアーズ"/>
+		<info name="serial" value="MX-1006"/>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="10353">
+				<rom name="w series 4 - super doors - hudson soft.cas" size="10353" crc="5300654e" sha1="beb6ca52d6241ae11944b5af667629301dacc517" />
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="8735">
+				<rom name="w series 4 - busy rainy day - hudson soft.cas" size="8735" crc="2f04a9d4" sha1="e7e41116c75165370498e4124862d20c7cd5e897"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16524,6 +17063,32 @@ license:CC0-1.0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="36675">
 				<rom name="whopper chase (1987)(erbe software)(es)[run'cas-'][martos].cas" size="36675" crc="7c28051b" sha1="0e447fc9b4f4b4e7bf37fa19b45637db8fe957db"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wilco">
+		<description>Wilco (Spain)</description>
+		<year>19??</year>
+		<publisher>MSX Club</publisher>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="39891">
+				<rom name="wilco - msx club.cas" size="39891" crc="5e7bc485" sha1="1e2286cc6f7d704e0454660f89cf8f1d0ab2028c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wildcat">
+		<description>Wild Cat (Japan)</description>
+		<year>1984</year>
+		<publisher>Colpax</publisher>
+		<info name="alt_title" value="ワイルドキャット"/>
+		<info name="serial" value="32C99-15"/>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="12425">
+				<rom name="wild cat - colpax.cas" size="12425" crc="41728598" sha1="889617554cf78967dbb997a9d6ac063ba5415eec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16786,7 +17351,53 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="wldmscpp">
+		<description>Color Plotter/Printer-yō Sekai Chizu Soft (Japan)</description>
+		<year>1984</year>
+		<publisher>National</publisher>
+		<info name="alt_title" value="カラープロッタプリンタ用世界地図ソフト"/>
+		<info name="serial" value="CF-SN002"/>
+		<info name="usage" value="Load with CLOAD + RUN. Requires a Japanese system."/>
+		<part name="cass1a" interface="msx_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="26617">
+				<rom name="world map software for color plotter printer - national (side a).cas" size="26617" crc="962fc4ac" sha1="2512ba0ccdcc4d6c581f2a21502750293a7da2f6"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="26608">
+				<rom name="world map software for color plotter printer - national (side b).cas" size="26608" crc="9562d4b8" sha1="c4b43c3b38978fbd0988369e9479728f8cbf5217"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wreck">
+		<description>The Wreck (United Kingdom)</description>
+		<year>1984</year>
+		<publisher>Electric Software</publisher>
+		<info name="serial" value="5006/1"/>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="32931">
+				<rom name="the wreck - electric software.cas" size="32931" crc="d5fc75bd" sha1="9ecd023430f6856873f2acf372cbd19659740862"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="xenon">
+		<description>Xenon (United Kingdom)</description>
+		<year>1988</year>
+		<publisher>Melbourne House</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="75103">
+				<rom name="xenon - melbourne house.cas" size="75103" crc="9aac6222" sha1="958cbc322bc3e3be385273a106a789c4c964f0e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xenons" cloneof="xenon">
 		<description>Xenon (Spain)</description>
 		<year>1988</year>
 		<publisher>Dro Soft</publisher>
@@ -16931,6 +17542,20 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="zerofght">
+		<description>Zero Fighter (Japan)</description>
+		<year>1984</year>
+		<publisher>Honeybee Soft</publisher>
+		<info name="alt_title" value="ゼロファイター"/>
+		<info name="serial" value="MXHI 110010"/>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="7055">
+				<rom name="zero fighter - honeybee soft.cas" size="7055" crc="0c8ebf72" sha1="1a92558603614b4a0f4493374cdbba8b28b711a8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zexas">
 		<description>Zexas (Japan)</description>
 		<year>1984</year>
@@ -17026,6 +17651,19 @@ license:CC0-1.0
 
 <!-- Doujin -->
 
+	<software name="chiteidb">
+		<description>Chitei Daibouken (Japan)</description>
+		<year>1987</year>
+		<publisher>Yasunori Takahara</publisher>
+		<info name="alt_title" value="地底大冒険"/>
+		<info name="usage" value="Load with CLOAD + RUN"/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="30048">
+				<rom name="ugadventure.cas" size="30048" crc="294e3342" sha1="3f33068710feb943738190a8a2ad1e8ad11f420b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mtype">
 		<description>M-TYPE (Japan)</description>
 		<year>1989</year>
@@ -17035,6 +17673,32 @@ license:CC0-1.0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="17346">
 				<rom name="mtype.cas" size="17346" crc="2d537c7d" sha1="698509696c533bf2f52a557384ab6e687a738415"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Only part 1 can be loaded -->
+	<software name="queensfs" supported="partial">
+		<description>The Queen's Footsteps (English)</description>
+		<year>2020</year>
+		<publisher>Davide Bucci</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="76562">
+				<rom name="the queens footsteps - davide bucci (english).cas" size="76562" crc="f1ca8aad" sha1="69e5d55652b5cd87acbc4ecba9529f3525846765"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Motor does not stop after loading of a part finishes -->
+	<software name="queensfsi" cloneof="queensfs">
+		<description>The Queen's Footsteps (Italian)</description>
+		<year>2022</year>
+		<publisher>Davide Bucci</publisher>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="334932">
+				<rom name="the queens footsteps - davide bucci (italian).cas" size="334932" crc="01657fd6" sha1="f5a949777a689b6ffd72994cfe8550caed03b1b2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17052,15 +17716,33 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="chiteidb">
-		<description>Chitei Daibouken (Japan)</description>
-		<year>1987</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Yasunori Takahara"/>
+	<software name="silvestro">
+		<description>Silvestro (Italy)</description>
+		<year>1986</year>
+		<publisher>Gianluca Barfi</publisher>
 		<info name="usage" value="Load with CLOAD + RUN"/>
 		<part name="cass1" interface="msx_cass">
-			<dataarea name="cass" size="30048">
-				<rom name="ugadventure.cas" size="30048" crc="294e3342" sha1="3f33068710feb943738190a8a2ad1e8ad11f420b"/>
+			<dataarea name="cass" size="13688">
+				<rom name="silvestro - gianluca barfi.cas" size="13688" crc="abaaaa69" sha1="6ec6178f8ff1daa190ee35c1ba294582f077a01b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="torreosc">
+		<description>Torreoscura (Spanish)</description>
+		<year>2020</year>
+		<publisher>Bieno Marti &amp; Pedro Fernández</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<feature name="part_id" value="Part 1"/>
+			<dataarea name="cass" size="45600">
+				<rom name="torreoscura - bieno marti (part 1, spanish).cas" size="45600" crc="42987fcf" sha1="26603cc2778cc44d54eb3a3beec4e232b02cc4e8"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="msx_cass">
+			<feature name="part_id" value="Part 2"/>
+			<dataarea name="cass" size="38188">
+				<rom name="torreoscura - bieno marti (part 2, spanish).cas" size="38188" crc="4330960d" sha1="441307984bb3ba6ac3c9460af37482b8db44c680"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17784,5 +18466,482 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="sprmsx01">
+		<description>Super MSX N.1 (1987-05) (Italy)</description>
+		<year>1987</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Attila (RUN"CAS:ATTILA"), Robovo (RUN"CAS:ROBOVO"), Difensore (RUN"CAS:DIFENS"). Side B: Mad Driver (RUN"CAS:MAD"), Miner (RUN"CAS:MINER"), Magus (RUN"CAS:MAGUS"), Explorer (RUN"CAS:EXPLOR").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<!-- Both sides merged into a single dump. -->
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="206221">
+				<rom name="super msx n.1.cas" size="206221" crc="e15bebdd" sha1="33622e2e498ac0052ae70200435d222927b14ec0" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx02">
+		<description>Super MSX N.2 (1987-06) (Italy)</description>
+		<year>1987</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Magic Bell (RUN"CAS:MAGIC"), Pierino (RUN"CAS:PIERIN"), Orda Letale (RUN"CAS:ORDA"). Side B: Bobby (RUN"CAS:BOBBY"), Destroyer (RUN"CAS:DESTRO"), Racer (RUN"CAS:RACER"), The Hero (RUN"CAS:HERO").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="65632">
+				<rom name="super msx n.2 (side a).cas" size="65632" crc="82b6063f" sha1="a9ad5a5676b7e80ceeac6add5fe25ca4075f588e"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="90499">
+				<rom name="super msx n.2 (side b).cas" size="90499" crc="d9dfb0f8" sha1="72cae43e00d4757098981d2153a6cc17a9e522f3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx03">
+		<description>Super MSX N.3 (1987-07/08) (Italy)</description>
+		<year>1987</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Olimpigames (RUN"CAS:OLIMPI"), Crazy Eater (RUN"CAS:CRAZY"), Asso (RUN"CAS:ASSO"). Side B: Chen (RUN"CAS:CHEN"), Dada Umpa (RUN"CAS:DADA"), Natalino Folle (RUN"CAS:NATA"), Alexis (RUN"CAS:ALEX").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<!-- Both sides merged into a single dump. -->
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="168203">
+				<rom name="super msx n.3.cas" size="168203" crc="e1b5e6a1" sha1="dcc09cf7d6e985053ac6cb96157c91847ebf7e40" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx04">
+		<description>Super MSX N.4 (1987-09) (Italy)</description>
+		<year>1987</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Apple Buster (RUN"CAS:APPLE"), Ugo (RUN"CAS:UGO"), Roller (RUN"CAS:ROLLER"). Side B: Air Pillow (RUN"CAS:AIR"), Jetty (RUN"CAS:JETTY"), Igloo (RUN"CAS:IGLOO"), Iron Man (RUN"CAS:IRON").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="81213">
+				<rom name="super msx n.4 (side a).cas" size="81213" crc="22a29556" sha1="3719c9ec1ab2ea69d2d6bd060eed73150f3e5523"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="121957">
+				<rom name="super msx n.4 (side b).cas" size="121957" crc="51776e90" sha1="b5e649d6018ade5789adb50be525e2713c314c6c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx05">
+		<description>Super MSX N.5 (1987-10) (Italy)</description>
+		<year>1987</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Gino e Pino (RUN"CAS:GI&amp;PI"), Bowling (RUN"CAS:BOWLIN"), Shutter (RUN"CAS:SHUTTE"). Side B: Poldo, Climber, Wroom, Conquest.</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="101329">
+				<rom name="super msx n.5 (side a).cas" size="101329" crc="57b197b6" sha1="25f7d994142c3cfc1bef67cd8201324eb872f916"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="97618">
+				<rom name="super msx n.5 (side b).cas" size="0" status="nodump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx06">
+		<description>Super MSX N.6 (1987-11) (Italy)</description>
+		<year>1987</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Pharaoh (RUN"CAS:PHARAO"), Granador (RUN"CAS:GRANAD"), Chopter (RUN"CAS:CHOPTE"). Side B: Duello Aereo (RUN"CAS:DUELLO"), Bang Bang (RUN"CAS:BANG"), Bruce Lee (RUN"CAS:BRUCE"), Marcus (RUN"CAS:MARCUS").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="107773">
+				<rom name="super msx n.6 (side a).cas" size="107773" crc="b510767a" sha1="746a9e4da001d9c7b66abff263f5e0ec1c2facab"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="147555">
+				<rom name="super msx n.6 (side b).cas" size="147555" crc="2a261865" sha1="ccdfd8acc6e86637f84610cca4425e01f070615b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx07">
+		<description>Super MSX N.7 (1987-12) (Italy)</description>
+		<year>1987</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: The Wall (RUN"CAS:WALL"), Crazy Shoe (RUN"CAS:CRAZY"), Raider (RUN"CAS:RAIDER"). Side B: Terror (RUN"CAS:TERROR"), Athor (RUN"CAS:ATHOR"), Derex (RUN"CAS:DEREX"), Robotron (RUN"CAS:ROBOT").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="96667">
+				<rom name="super msx n.7 (side a).cas" size="96667" crc="1ff71102" sha1="4be314d12e3a0ddb3c83eec316d8a186a0e61db6"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="105168">
+				<rom name="super msx n.7 (side b).cas" size="105168" crc="b21dfdfa" sha1="828bcf439941fa38260d7c7bd14b089f046d550d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx08">
+		<description>Super MSX N.8 (1988-01) (Italy)</description>
+		<year>1988</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Fantaparco (RUN"CAS:FANTA"), Cadet (RUN"CAS:CADET"), Space Hawk (RUN"CAS:SPACE"). Side B: Saturn (RUN"CAS:SATURN"), Attack (RUN"CAS:ATTACK"), Pallacanestro (RUN"CAS:PALLA"), Bad Boy (RUN"CAS:BAD").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="71254">
+				<rom name="super msx n.8 (side a).cas" size="71254" crc="574fd6a7" sha1="809a3afbaf5b3c158dd4a3ff6cba812163ac1d11"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="166880">
+				<rom name="super msx n.8 (side b).cas" size="166880" crc="90858f92" sha1="d2959e683fea39cde0e8ce38a424fd83291305ea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx09">
+		<description>Super MSX N.9 (1988-02) (Italy)</description>
+		<year>1988</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Calcio (RUN"CAS:CALCIO"), Aliens (RUN"CAS:ALIENS"), Zapper (RUN"CAS:ZAPPER"). Side B: Elicopter (RUN"CAS:ELICOP"), Love Game ("RUN"CAS:LOVE"), Pinguin (RUN"CAS:PINGUI"), Karateka (RUN"CAS:KARATE").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="109018">
+				<rom name="super msx n.9 (side a).cas" size="109018" crc="03a0b7a8" sha1="b0a1e73ee6fa9a5fd4691ef8a6b74c14278433e9"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="118773">
+				<rom name="super msx n.9 (side b).cas" size="118773" crc="a8964034" sha1="09f3b40ac2697ec3eddc984ef6188b3a7ae6d034"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx10">
+		<description>Super MSX N.10 (1988-03) (Italy)</description>
+		<year>1988</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Make a Pizza (RUN"CAS:MAKE"), Air Raid (RUN"CAS:AIR"), Frog (RUN"CAS:FROG"). Side B: Wow Cocco (RUN"CAS:WOW"), Kriox (RUN"CAS:KRIOX"), Black Death (RUN"CAS:BLACK"), Ninja (RUN"CAS:NINJA").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="88760">
+				<rom name="super msx n.10 (side a).cas" size="88760" crc="730767da" sha1="abcfa7ab5dac0acf72619ac042d27626666d6a1e"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="113652">
+				<rom name="super msx n.10 (side b).cas" size="113652" crc="d17e6118" sha1="0114f184a57f9723903b467fa4ce9aa446c82b41"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx11">
+		<description>Super MSX N.11 (1988-04) (Italy)</description>
+		<year>1988</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Il Ladro (RUN"CAS:LADRO"), Dragon, Casinò (RUN"CAS:CASINO"), Shuriken (RUN"CAS:SHURI"). Side B: Shuriken (RUN"CAS:SHURI"), Worm (RUN"CAS:WORM"), Il Circo (RUN"CAS:CIRCO"), Bici Cross (RUN"CAS:BICI").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<!-- Dragon is missing from Side A. -->
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="112033">
+				<rom name="super msx n.11 (side a).cas" size="112033" crc="8f9cf203" sha1="1bc62c959aa72ceccef7fcf2bd583ab62807e453" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="139568">
+				<rom name="super msx n.11 (side b).cas" size="139568" crc="f7895b66" sha1="8b716cf807acf587e35cd539ef54b74d1dcde86c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx12">
+		<description>Super MSX N.12 (1988-05) (Italy)</description>
+		<year>1988</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Fat John, Far West (RUN"CAS:FARWES"), Painter (RUN"PAINTE"). Side B: Infiltrator (RUN"CAS:INFILT"), Susy (RUN"CAS:SUSY"), Fuga da Alcratraz, Boat (RUN"CAS:BOAT").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<!-- Fat John is missing from Side A. -->
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="53593">
+				<rom name="super msx n.12 (side a).cas" size="53593" crc="ef9ea0a4" sha1="f48fe66defe60f6182c6b8a3e4df6942d2e3bb6c" status="baddump"/>
+			</dataarea>
+		</part>
+		<!-- Fuga da Alcratraz is missing from Side B. -->
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="54437">
+				<rom name="super msx n.12 (side b).cas" size="54437" crc="b20ed017" sha1="bc160bcf95ac8d12cdea49f7a74972e3788181e7" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx13">
+		<description>Super MSX N.13 (1988-06) (Italy)</description>
+		<year>1988</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Il Giustiziere (RUN"CAS:GIUST"), Robotix (RUN"CAS:ROBO"), Rock (RUN"CAS:ROCK"). Side B: Unprimer (RUN"CAS:UNPRIM"), Trapper (RUN"CAS:TRAPPE"), Il Topo (RUN"CAS:TOPO"), Hal (RUN"CAS:HAL").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="113244">
+				<rom name="super msx n.13 (side a).cas" size="113244" crc="151a3ca8" sha1="1092075064f631b49b8c2ed103209bde0a49b689"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="100294">
+				<rom name="super msx n.13 (side b).cas" size="100294" crc="0475d20a" sha1="e2f769825064c39cfb9ef760fb22c3efe85a350e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx14">
+		<description>Super MSX N.14 (1988-09) (Italy)</description>
+		<year>1988</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Rroarr, Rabbit (RUN"CAS:RABBIT"), Porte Aperte (RUN"CAS:PORTE"). Side B: Flipper (RUN"CAS:FLIPPE"), Spitfire (RUN"CAS:SPITFI"), I Funghi (RUN"CAS:FUNGHI"), La Molla (RUN"CAS:MOLLA").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<!-- Rroarr is missing from Side A. -->
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="57420">
+				<rom name="super msx n.14 (side a).cas" size="57420" crc="ed7a653a" sha1="96dabf8c8d2e0200f4b36f322b65ac0c7df4c4fb" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="128416">
+				<rom name="super msx n.14 (side b).cas" size="128416" crc="8272099f" sha1="bc9fd14df07b44fe5a05c0043cb8d84f75c7b21a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx15">
+		<description>Super MSX N.15 (1988-10) (Italy)</description>
+		<year>1988</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Belle Cicce (RUN"CAS:BELLE"), Cita (RUN"CAS:CITA"), Galassia (RUN"CAS:GALASS"). Side B: Stop Leak (RUN"CAS:STOPLE"), Pam (RUN"CAS:PAM"), Seeker (RUN"CAS:SEEKER"), Sky Ace (RUN"CAS:SKYACE").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="57206">
+				<rom name="super msx n.15 (side a).cas" size="57206" crc="71def62e" sha1="70ce5af6c69b3d4e8e4df16aa02c41342aaf2c29"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="97618">
+				<rom name="super msx n.15 (side b).cas" size="97618" crc="e3730cba" sha1="8404927cfc2d5b429d660858ef1921240054f7c3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx16">
+		<description>Super MSX N.16 (1988-11) (Italy)</description>
+		<year>1988</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Pig Bomber (RUN"CAS:PIG"), Sky Wing (RUN"CAS:SKY"), Sword (RUN"CAS:SWORD"). Side B: Blocks (RUN"CAS:BLOCKS"), Hockey (RUN"CAS:HOCKEY"), Star (RUN"CAS:STAR"), Super Calcio (RUN"CAS:SUPER").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="123915">
+				<rom name="super msx n.16 (side a).cas" size="123915" crc="70d97e74" sha1="a2cc5ece6463700eae479396cd84adcf050bb6bd"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="128303">
+				<rom name="super msx n.16 (side b).cas" size="128303" crc="923d55e8" sha1="c7a5fb199e82e0f7380b23de2a2d61138736f99c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx17">
+		<description>Super MSX N.17 (1988-12) (Italy)</description>
+		<year>1988</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Far West (RUN"CAS:FARWES"), Buggy (RUN"CAS:BUGGY"), Flame Thrower (RUN"CAS:FLAME"). Side B: Space Beater (RUN"CAS:SPACEB"), Zexas Kid (RUN"CAS:ZEXASK"), Goblin Maze (RUN"CAS:GOBLIN"), Good &amp; Evil (RUN"CAS:GOOD&amp;E").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="115460">
+				<rom name="super msx n.17 (side a).cas" size="115460" crc="c8d91341" sha1="e65001db45e6778386a88d7f95ba3e1e8620aebf"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="162694">
+				<rom name="super msx n.17 (side b).cas" size="162694" crc="bfde78d4" sha1="fa20084b1c0c70b4b144c7f9b0f54ebe21409bfb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx18">
+		<description>Super MSX N.18 (1989-01) (Italy)</description>
+		<year>1989</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Tiddler (RUN"CAS:TIDDLE"), Pippo (RUN"CAS:PIPPO"), Raider (RUN"CAS:RAIDER"). Side B: Snowrun (RUN"CAS:SNOWRU"), Tristar (RUN"CAS:TRISTA"), Guardic (RUN"CAS:GUARDI"), Planetoid (RUN"CAS:PLANET").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="85614">
+				<rom name="super msx n.18 (side a).cas" size="85614" crc="15f2b8af" sha1="be004a131f85a077205a70e00285a527746ea353"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="144631">
+				<rom name="super msx n.18 (side b).cas" size="144631" crc="10fe8ce9" sha1="9fa55b37487e2545e40cc56183f5082a65487538"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx19">
+		<description>Super MSX N.19 (1989-02) (Italy)</description>
+		<year>1989</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Bang Them (RUN"CAS:BANGTH"), Toruk (RUN"CAS:TORUK"), Tetratlon (RUN"CAS:TETRA"). Side B: Horse (RUN"CAS:HORSE"), Push It (RUN"CAS:PUSHIT"), Baller (RUN"CAS:BALLER"), Naked Alì (RUN"CAS:NAKALI").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="89682">
+				<rom name="super msx n.19 (side a).cas" size="89682" crc="1eb4da2b" sha1="73b877417e260dab4595e3c05db4c72102e98601"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="107130">
+				<rom name="super msx n.19 (side b).cas" size="107130" crc="43aa0480" sha1="f2627777fcf65ba6e4a781f22eb9f9477d5c969d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx20">
+		<description>Super MSX N.20 (1989-04) (Italy)</description>
+		<year>1989</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Ghosts e Skeletons (RUN"CAS:GHOSTS"), Love Affairs (RUN"CAS:LOVE"), Godzy (RUN"CAS:GODZY"). Side B: Digy Dung (RUN"CAS:DIGY"), Ranatrac (RUN"CAS:RANATR"), Japan (RUN"CAS:JAPAN"), Bimbolandia (RUN"CAS:BIMBO").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="108879">
+				<rom name="super msx n.20 (side a).cas" size="108879" crc="9b9f09e0" sha1="0f0b306b3d6aa6861ca56c3d8388e844511e450f"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="96623">
+				<rom name="super msx n.20 (side b).cas" size="96623" crc="1201afb9" sha1="42c1e6026fdcb866c0215eb0cab2661b5b807b9b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx21">
+		<description>Super MSX N.21 (1989-05) (Italy)</description>
+		<year>1989</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Pirata (RUN"CAS:PIRATA"), Scacchi (RUN"CAS:SCACCH"), Castle Lady (RUN"CAS:CASTLE"), Maiden Rescue (RUN"CAS:MAIDEN"), Mister Micky (RUN"CAS:MISTER"). Side B: Berretti Verdi (RUN"CAS:BVERDI").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="136475">
+				<rom name="super msx n.21 (side a).cas" size="136475" crc="363a7dad" sha1="991bbcd2ccec644d3c1d1095965ee48f7d923d18"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="161104">
+				<rom name="super msx n.21 (side b).cas" size="161104" crc="a4b67a22" sha1="cd9b8f5a31c18e9ee35ba3a9e6e6dcc10c2e693e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx22">
+		<description>Super MSX N.22 (1989-06) (Italy)</description>
+		<year>1989</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Spqr (RUN"CAS:SPQR"), Testarossa (RUN"CAS:TESTA"), Aliantantor (RUN"CAS:ALIAN"). Side B: Fanta Bally (RUN"CAS:FANT"), Ninja Girl (RUN"CAS:NINJA"), Centaur (RUN"CAS:CENTAU"), G.P. Endurance (RUN"CAS:ENDURA").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="108439">
+				<rom name="super msx n.22 (side a).cas" size="108439" crc="301abf6a" sha1="21afbc99cd5798845b536d2c25e0efe6917832a5"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="149927">
+				<rom name="super msx n.22 (side b).cas" size="149927" crc="00b278eb" sha1="87a47d93548a00c741d6ae3eab5af8d06959b618"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx23">
+		<description>Super MSX N.23 (1989-09) (Italy)</description>
+		<year>1989</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Nick Flame (RUN"CAS:NICKFL"), The Karate Kid (RUN"CAS:KARATE"), Rombo (RUN"CAS:ROMBO"), Choplift (RUN"CAS:CHOPLI"), Vartox (RUN"CAS:VARTOS"). Side B: Crossair (BLOAD"CAS:CROSS1",R), Goalgame (RUN"CAS:GOALGA"), Old Friends (RUN"CAS:OLDFRI"), Africa Film (RUN"CAS:AFRICA"), Footballers League (RUN"CAS:FOOTBA").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="103823">
+				<rom name="super msx n.23 (side a).cas" size="103823" crc="d9f60579" sha1="6d00125ee270d5d95729917c7eb24b5751cf7be7"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="153648">
+				<rom name="super msx n.23 (side b).cas" size="153648" crc="a92259eb" sha1="cca9e481111050c59842beac90e47d91fd6c0219"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx24">
+		<description>Super MSX N.24 (1989-10) (Italy)</description>
+		<year>1989</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes>Side A: Golf (RUN"CAS:GOLF"), Vertigo (RUN"CAS:VERTIG"), Shooting Flipper (RUN"CAS:SHOOTF"), Gunship (RUN"CAS:GUNSHI"), Kamikaze (RUN"CAS:KAMIKA"). Side B: Container (RUN"CAS:CONTAI"), Rail Station (RUN"CAS:RAILST"), La Pulce (RUN"CAS:PULCE"), American Football (RUN"CAS:AMERIC"), Gangster (RUN"CAS:GANGST").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="167359">
+				<rom name="super msx n.24 (side a).cas" size="167359" crc="b20ff169" sha1="770bfcfa7ee1722263f99a832d1348c89b8a950d"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="117439">
+				<rom name="super msx n.24 (side b).cas" size="117439" crc="67a70ede" sha1="f747f0115d96e2a290de21c99dd891ec3bd1f4e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx25">
+		<description>Super MSX N.25 (1989-12) (Italy)</description>
+		<year>1989</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Boxing Trophy (RUN"CAS:BOXING"), Service Ace (RUN"CAS:SERVIC"), Defensor (RUN"CAS:DEFENS"), Taurus (RUN"CAS:TAURUS"), Sea-Hunt (RUN"CAS:SEA_HU"). Side B: La Grande Fuga (RUN"CAS:FUGA"), Lilius (RUN"CAS:LILIUS"), Bandits (RUN"CAS:BANDIT"), Prisoner (RUN"CAS:PRISON"), Misty Case (RUN"CAS:MISTY").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="169039">
+				<rom name="super msx n.25 (side a).cas" size="169039" crc="6f6a4f3d" sha1="4f865e9054f5c7a9deb21d412d86229daed56bd4"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="199836">
+				<rom name="super msx n.25 (side b).cas" size="199836" crc="6c675fe5" sha1="1de8848f0d4de7aaa2b7969754512524017eaca3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx26">
+		<description>Super MSX N.26 (1990-01) (Italy)</description>
+		<year>1990</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Marble (RUN"CAS:MARBLE"), Rocks (RUN"CAS:ROCKS"), Andromeda 2 (RUN"CAS:ANDR_I"), Slope Race (RUN"CAS:SLOPE"), Invade (RUN"CAS:INVADE"). Side B: Karate Will (RUN"CAS:KARATE"), Exterminus (RUN"CAS:EXTERM"), Bombcopter (RUN"CAS:BOMBCO"), Pub's Dart (RUN"CAS:DARTS"), Rimpallino (RUN"CAS:RIMPAL").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1a" interface="msx_cass">
+			<dataarea name="cass" size="191048">
+				<rom name="super msx n.26 (side a).cas" size="191048" crc="6058edc1" sha1="95adf13d699bdae1e66e4610a378810858780737"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<dataarea name="cass" size="160220">
+				<rom name="super msx n.26 (side b).cas" size="160220" crc="a6649ce6" sha1="e128c4496e9f32b244f2db5b2db3a9bbb84c4dff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprmsx27">
+		<description>Super MSX N.27 (1990-02) (Italy)</description>
+		<year>1990</year>
+		<publisher>Edizione E.P.I.</publisher>
+		<notes>Side A: Bomb Hazard (RUN"CAS:BOMBHA"), Xerider (RUN"CAS:XERIDE"), Puzzle (RUN"CAS:PUZZLE"), Zapper (RUN"CAS:ZAPPER"), Reversi (RUN"CAS:REVERS"). Side B: Double &amp; Couple (RUN"CAS:DOUBLE"), Jino Ninja (RUN"CAS:JINONI"), Adventor (RUN"CAS:ADVENT"), Odino II (RUN"CAS:ODINOI"), Pole Fight (RUN"CAS:POLEFI").</notes>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<!-- Both sides merged into a single dump. -->
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="324399">
+				<rom name="super msx n.27.cas" size="324399" crc="7d508bac" sha1="0dfacc50927cc042385de204ea208888d2b35dd8" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>
