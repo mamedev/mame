@@ -138,7 +138,7 @@ void x68k_state::spritereg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_video.bg_hstart = (data - 4) * 8 + 1;
 		break;
 	case 0x407:  // BG V-DISP (like CRTC reg 6)
-		m_video.bg_vstart = data;
+		m_video.bg_vstart = data - 1;
 		break;
 	case 0x408:  // BG H/V-Res
 		m_video.bg_hvres = data & 0x1f;
@@ -734,7 +734,7 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	if(/*(m_spritereg[0x404] & 0x0200) &&*/ (m_video.reg[2] & 0x0040))
 	{
 		rectangle pcgrect = rect;
-		if((!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan()) || ((m_video.bg_hvres & 0x1c) == 0x10 && m_crtc->vfactor() == 1))
+		if((!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan()) || ((m_video.bg_hvres & 0x1c) == 0x10 && m_crtc->vfactor() == 1) || (m_video.bg_hvres == 1))
 		{
 			pcgrect.max_y >>= 1;
 			pcgrect.min_y >>= 1;
