@@ -176,7 +176,7 @@ void x68k_crtc_device::refresh_mode()
 
 //  LOG("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i\n", m_reg[0], m_reg[1], m_reg[2], m_reg[3],
 //      m_reg[4], m_reg[5], m_reg[6], m_reg[7], m_reg[8], m_reg[9]);
-	int div;
+	double div;
 	switch (m_reg[20] & 0x1f)
 	{
 		case 0:
@@ -197,6 +197,9 @@ void x68k_crtc_device::refresh_mode()
 			break;
 		case 0x15:
 			div = 3;
+			break;
+		case 0x19:
+			div = 1.5;
 			break;
 	}
 	attotime refresh = attotime::from_hz((BIT(m_reg[20], 4) ? clock_69m() : clock_39m()) / div) * (scr.max_x * scr.max_y);
