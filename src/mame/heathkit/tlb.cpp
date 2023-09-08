@@ -17,12 +17,6 @@
   TODO:
     - INS8250 needs to implement "Set Break" (LCR, bit 6) before Break key
       will function as expected.
-    - 49/50 row mode does not work when DOT clocks are programmed as documented
-      in the manual. It does work when DOT clock is fixed at the 20.282 MHz
-      rate.
-    - In 49/50 row mode, character descenders are cut off.
-    - fix GP-19 graphics mode only showing the top half of the image (on the
-      visible screen).
 
 ****************************************************************************/
 /***************************************************************************
@@ -1272,7 +1266,7 @@ void heath_gp19_tlb_device::mem_map(address_map &map)
 	// ROMs 1, 2, 3
 	map(0x0000, 0x02fff).rom();
 
-	// Optional external board - Program ROM 4, external I/O
+	// Optional external board - Program ROM 4(not aware if any ever existed), external I/O
 	// map(0x3000, 0x03fff).rom();
 
 	map(0x4000, 0x40ff).mirror(0x3f00).ram();
@@ -1291,7 +1285,7 @@ void heath_gp19_tlb_device::io_map(address_map &map)
 	// Switch on GP-19 board
 	map(0x70, 0x70).mirror(0x07).portr("SW1");
 
-	// Optional Auxiliary I/O connector
+	// Optional Auxiliary I/O connector(not aware if any ever existed)
 	// map(0x78, 0x78).mirror(0x07);
 }
 
@@ -1341,7 +1335,7 @@ MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 		{
 			for (int x = 0; x < x_count; x++)
 			{
-				uint8_t const gfx = m_p_videoram[(ma + x) & 0x3fff] ^ screen_inv;
+				uint8_t const gfx = m_p_videoram[((ma << 1) + ( ra * x_count ) + x) & 0x3fff] ^ screen_inv;
 
 				for (int b = 0; 8 > b; ++b)
 				{
@@ -1351,6 +1345,8 @@ MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 		}
 		else
 		{
+			uint16_t base = m_char_gen_a11 ? 0x800 : 0x0;
+
 			for (int x = 0; x < x_count; x++)
 			{
 				uint8_t inv = (x == cursor_x) ? 0xff : 0;
@@ -1365,7 +1361,6 @@ MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 				inv ^= screen_inv;
 
 				// select proper character set
-				uint16_t base = m_char_gen_a11 ? 0x800 : 0x0;
 				uint8_t const gfx = m_p_chargen[base | (chr << 4) | ra] ^ inv;
 
 				// Display a scanline of a character (8 pixels)
