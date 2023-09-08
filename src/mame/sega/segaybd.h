@@ -71,7 +71,7 @@ public:
 
 protected:
 	// device overrides
-	virtual void machine_start() override;
+	virtual void device_resolve_objects() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 

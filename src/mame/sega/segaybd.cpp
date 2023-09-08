@@ -293,7 +293,7 @@ void segaybd_state::output2_w(uint8_t data)
 //  DRIVER OVERRIDES
 //**************************************************************************
 
-void segaybd_state::machine_start()
+void segaybd_state::device_resolve_objects()
 {
 	m_start_lamp.resolve();
 	m_right_motor_position.resolve();
