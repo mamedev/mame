@@ -57,6 +57,7 @@ void midvunit_state::machine_start()
 	save_item(NAME(m_comm_data));
 
 	m_optional_drivers.resolve();
+	m_wheel_motor.resolve();
 }
 
 
@@ -433,7 +434,7 @@ void midvunit_state::midvunit_wheel_board_w(uint32_t data)
 					logerror("Wheel board (ATODRDZ) = %02X\n", arg);
 					break;
 				case 4: // WHLCTLZ
-					output().set_value("wheel", arg);
+					m_wheel_motor = arg;
 					//logerror("Wheel board (U4 74HC574; Motor) = %02X\n", arg);
 					break;
 				case 5: // DRVCTLZ

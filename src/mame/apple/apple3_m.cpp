@@ -63,8 +63,14 @@
 #define ENV_ROMENABLE   (0x01)
 
 // 14M / 14, but with every 65th cycle stretched which we cannot reasonably emulate
-// 2 MHz mode probably has every 33rd cycle stretched but this is currently unproven.
 static constexpr XTAL APPLE2_CLOCK(1'021'800);
+
+// 2 MHz mode has every ~130th cycle stretched, and there are also dram refresh cycles
+// happening which slows the clock back to 1MHz for some periods.
+// There is mentioned in Apple documentation the result is ~1.8MHz
+// PH0 Measured on a logic analyser when running a loop in ram with the screen off 
+// averaged over a long capture is 1.905MHz.
+static constexpr XTAL A3_2MHZ_CLOCK(1'905'000);
 
 uint8_t apple3_state::apple3_c0xx_r(offs_t offset)
 {
@@ -532,7 +538,7 @@ void apple3_state::apple3_update_memory()
 
 	LOGMASKED(LOG_MEMORY, "apple3_update_memory(): via_0_b=0x%02x via_1_a=0x0x%02x\n", m_via_0_b, m_via_1_a);
 
-	m_maincpu->set_unscaled_clock(((m_via_0_a & ENV_SLOWSPEED) ? APPLE2_CLOCK : (14.318181_MHz_XTAL / 7)), true);
+	m_maincpu->set_unscaled_clock(((m_via_0_a & ENV_SLOWSPEED) ? APPLE2_CLOCK : A3_2MHZ_CLOCK), true);
 
 	/* bank 2 (0100-01FF) */
 	if (!(m_via_0_a & ENV_STACK1XX))
@@ -1109,11 +1115,17 @@ TIMER_CALLBACK_MEMBER(apple3_state::scanstart_cb)
 	int scanline;
 
 	scanline = m_screen->vpos();
-	//m_screen->update_partial(m_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 
 	m_via[1]->write_pb6(0);
 
 	m_scanend->adjust(m_screen->time_until_pos(scanline, 559));
+
+	// Drop back to 1Mhz for video memory access
+	if (!(m_via_0_a & ENV_SLOWSPEED) && (m_via_0_a & ENV_VIDENABLE))
+	{
+		m_maincpu->set_unscaled_clock(APPLE2_CLOCK, true);
+	}
 }
 
 TIMER_CALLBACK_MEMBER(apple3_state::scanend_cb)
@@ -1122,7 +1134,13 @@ TIMER_CALLBACK_MEMBER(apple3_state::scanend_cb)
 
 	m_via[1]->write_pb6(1);
 
-	m_scanstart->adjust(m_screen->time_until_pos((scanline+1) % 224, 0));
+	m_scanstart->adjust(m_screen->time_until_pos((scanline+1) % 192, 0));
+
+	// And back to 2MHz during blanking
+	if (!(m_via_0_a & ENV_SLOWSPEED) && (m_via_0_a & ENV_VIDENABLE))
+	{
+		m_maincpu->set_unscaled_clock(A3_2MHZ_CLOCK, true);
+	}
 }
 
 INPUT_CHANGED_MEMBER(apple3_state::keyb_special_changed)
@@ -1143,7 +1161,7 @@ INPUT_CHANGED_MEMBER(apple3_state::keyb_special_changed)
 		{
 			m_nmi_latch = true;
 			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		}		
+		}
 	}
 	else
 	{
@@ -1354,7 +1372,7 @@ void apple3_state::pdl_handler(int offset)
 		case 0x5c:
 			m_ramp_active = false;
 			m_pdl_charge = 0;
-			m_pdltimer->adjust(attotime::from_hz(1000000.0));
+			m_pdltimer->adjust(attotime::from_hz(950000.0));
 			break;
 
 		case 0x5d:
@@ -1387,7 +1405,7 @@ void apple3_state::pdl_handler(int offset)
 				m_pdl_charge += (pdlread*7);
 				m_pdl_charge -= 100;
 			}
-			m_pdltimer->adjust(attotime::from_hz(1000000.0));
+			m_pdltimer->adjust(attotime::from_hz(950000.0));
 			m_ramp_active = true;
 			break;
 
@@ -1409,7 +1427,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::paddle_timer)
 
 		if (m_pdl_charge > 0)
 		{
-			m_pdltimer->adjust(attotime::from_hz(1000000.0));
+			m_pdltimer->adjust(attotime::from_hz(950000.0));
 		}
 		else
 		{
@@ -1420,7 +1438,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::paddle_timer)
 	else
 	{
 		m_pdl_charge++;
-		m_pdltimer->adjust(attotime::from_hz(1000000.0));
+		m_pdltimer->adjust(attotime::from_hz(950000.0));
 	}
 }
 

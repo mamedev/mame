@@ -226,7 +226,9 @@ public:
 		m_sw1_1(*this, "maincpu:sw1_1"),
 		m_sw1_2(*this, "maincpu:sw1_2"),
 		m_sw1_3(*this, "maincpu:sw1_3"),
-		m_sw1_4(*this, "maincpu:sw1_4")
+		m_sw1_4(*this, "maincpu:sw1_4"),
+		m_serve_led_output(*this, "serve_led"),
+		m_lamp_credit_output(*this, "lamp_credit%u", 1U)
 	{
 	}
 	required_device<netlist_mame_analog_output_device> m_led_serve;
@@ -241,17 +243,12 @@ public:
 
 	NETDEV_ANALOG_CALLBACK_MEMBER(serve_cb)
 	{
-		output().set_value("serve_led", (data < 3.5) ? 1 : 0);
+		m_serve_led_output = (data < 3.5) ? 1 : 0;
 	}
 
-	NETDEV_ANALOG_CALLBACK_MEMBER(credit1_cb)
+	template <uint8_t Which> NETDEV_ANALOG_CALLBACK_MEMBER(credit_cb)
 	{
-		output().set_value("lamp_credit1", (data < 2.0) ? 0 : 1);
-	}
-
-	NETDEV_ANALOG_CALLBACK_MEMBER(credit2_cb)
-	{
-		output().set_value("lamp_credit2", (data < 2.0) ? 0 : 1);
+		m_lamp_credit_output[Which] = (data < 2.0) ? 0 : 1;
 	}
 
 	NETDEV_ANALOG_CALLBACK_MEMBER(coin_counter_cb)
@@ -271,12 +268,13 @@ public:
 protected:
 
 	// driver_device overrides
-	virtual void machine_start() override { };
+	virtual void machine_start() override { m_serve_led_output.resolve(); m_lamp_credit_output.resolve(); };
 	virtual void machine_reset() override { };
 	virtual void video_start() override  { };
 
 private:
-
+	output_finder<> m_serve_led_output;
+	output_finder<2> m_lamp_credit_output;
 };
 
 class rebound_state : public ttl_mono_state
@@ -286,6 +284,7 @@ public:
 		: ttl_mono_state(mconfig, type, tag)
 		, m_sw1a(*this, "maincpu:dsw1a")
 		, m_sw1b(*this, "maincpu:dsw1b")
+		, m_credit_led(*this, "credit_led")
 	{
 	}
 
@@ -297,7 +296,7 @@ public:
 
 	NETDEV_ANALOG_CALLBACK_MEMBER(led_credit_cb)
 	{
-		output().set_value("credit_led", (data < 3.5) ? 1 : 0);
+		m_credit_led = (data < 3.5) ? 1 : 0;
 	}
 
 	NETDEV_ANALOG_CALLBACK_MEMBER(coin_counter_cb)
@@ -310,12 +309,12 @@ public:
 protected:
 
 	// driver_device overrides
-	virtual void machine_start() override { };
+	virtual void machine_start() override { m_credit_led.resolve(); };
 	virtual void machine_reset() override { };
 	virtual void video_start() override  { };
 
 private:
-
+	output_finder<> m_credit_led;
 };
 
 
@@ -527,8 +526,8 @@ void breakout_state::breakout(machine_config &config)
 	// Leds and lamps
 
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:led_serve", 0).set_params("CON_P", FUNC(breakout_state::serve_cb));
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:lamp_credit1", 0).set_params("CON_CREDIT1", FUNC(breakout_state::credit1_cb));
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:lamp_credit2", 0).set_params("CON_CREDIT2", FUNC(breakout_state::credit2_cb));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:lamp_credit1", 0).set_params("CON_CREDIT1", FUNC(breakout_state::credit_cb<0>));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:lamp_credit2", 0).set_params("CON_CREDIT2", FUNC(breakout_state::credit_cb<1>));
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:coin_counter", 0).set_params("CON_T", FUNC(breakout_state::coin_counter_cb));
 
 	/* video hardware */

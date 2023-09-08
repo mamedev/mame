@@ -35,6 +35,7 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+#include "dodgem.lh"
 #include "tinv2650.lh"
 
 
@@ -51,12 +52,13 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
-		m_s2636_0_ram(*this, "s2636_0_ram"),
-		m_1e80(*this, "1E80")
+		m_s2636_0_ram(*this, "s2636_0_ram")
 	{ }
 
 	void tinvader(machine_config &config);
 	void dodgem(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(bg_collision_r) { return m_collision_background; }
 
 protected:
 	virtual void video_start() override;
@@ -73,8 +75,6 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_s2636_0_ram;
 
-	required_ioport m_1e80;
-
 	bitmap_ind16 m_bitmap;
 	bitmap_ind16 m_spritebitmap;
 	uint8_t m_collision_background = 0;
@@ -85,7 +85,6 @@ private:
 	void videoram_w(offs_t offset, uint8_t data);
 	uint8_t s2636_r(offs_t offset);
 	void s2636_w(offs_t offset, uint8_t data);
-	uint8_t port_0_r();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -96,106 +95,34 @@ private:
 };
 
 
-// video
+/*******************************************************************************
+    Video
+*******************************************************************************/
 
-void zac1b1120_state::videoram_w(offs_t offset, uint8_t data)
+/*
+
+Video is slightly odd on these zac boards
+
+background is 256 x 240 pixels, but the sprite chips run at a different frequency, which means
+that the output of 196x240 is stretched to fill the same screen space.
+
+to 'properly' accomplish this, we set the screen up as 768x720 and do the background at 3 times
+the size, and the sprites as 4 times the size - everything then matches up correctly.
+
+*/
+
+void zac1b1120_state::palette(palette_device &palette) const
 {
-	m_videoram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-uint8_t zac1b1120_state::s2636_r(offs_t offset)
-{
-	if (offset != 0xcb) return m_s2636_0_ram[offset];
-	else return m_collision_sprite;
-}
-
-void zac1b1120_state::s2636_w(offs_t offset, uint8_t data)
-{
-	m_s2636_0_ram[offset] = data;
-	m_gfxdecode->gfx(1)->mark_dirty(offset / 8);
-	m_gfxdecode->gfx(2)->mark_dirty(offset / 8);
-	if (offset == 0xc7)
-	{
-		m_s2636->write_data(offset, data);
-	}
-}
-
-uint8_t zac1b1120_state::port_0_r()
-{
-	return m_1e80->read() - m_collision_background;
-}
-
-/*****************************************/
-/* Check for collision between 2 sprites */
-/*****************************************/
-
-int zac1b1120_state::sprite_collision(int first, int second)
-{
-	int checksum = 0;
-	const rectangle &visarea = m_screen->visible_area();
-
-	if ((m_s2636_0_ram[first * 0x10 + 10] < 0xf0) && (m_s2636_0_ram[second * 0x10 + 10] < 0xf0))
-	{
-		int const fx = (m_s2636_0_ram[first * 0x10 + 10] * 4 )- 22;
-		int const fy = m_s2636_0_ram[first * 0x10 + 12] + 1;
-		int const expand = (first == 1) ? 2 : 1;
-
-		// Draw first sprite
-
-		m_gfxdecode->gfx(expand)->opaque(m_spritebitmap, m_spritebitmap.cliprect(),
-				first * 2,
-				0,
-				0, 0,
-				fx, fy);
-
-		// Get fingerprint
-
-		for (int x = fx; x < fx + m_gfxdecode->gfx(expand)->width(); x++)
-		{
-			for (int y = fy; y < fy + m_gfxdecode->gfx(expand)->height(); y++)
-			{
-				if (visarea.contains(x, y))
-					checksum += m_spritebitmap.pix(y, x);
-			}
-		}
-
-		// Blackout second sprite
-
-		m_gfxdecode->gfx(1)->transpen(m_spritebitmap, m_spritebitmap.cliprect(),
-				second * 2,
-				1,
-				0, 0,
-				(m_s2636_0_ram[second * 0x10 + 10] * 4) - 22, m_s2636_0_ram[second * 0x10 + 12] + 1, 0);
-
-		// Remove fingerprint
-
-		for (int x = fx; x < fx + m_gfxdecode->gfx(expand)->width(); x++)
-		{
-			for (int y = fy; y < fy + m_gfxdecode->gfx(expand)->height(); y++)
-			{
-				if (visarea.contains(x, y))
-					checksum -= m_spritebitmap.pix(y, x);
-			}
-		}
-
-		// Zero bitmap
-
-		m_gfxdecode->gfx(expand)->opaque(m_spritebitmap, m_spritebitmap.cliprect(),
-				first * 2,
-				1,
-				0, 0,
-				fx, fy);
-	}
-
-	return checksum;
+	// FIXME: this PCB actually outputs RGB signals, not monochrome video!
+	palette.set_pen_color(0, rgb_t::black());
+	palette.set_pen_color(1, rgb_t::white());
+	palette.set_pen_color(2, rgb_t::black());
+	palette.set_pen_color(3, rgb_t::black());
 }
 
 TILE_GET_INFO_MEMBER(zac1b1120_state::get_bg_tile_info)
 {
-	int const code = m_videoram[tile_index];
-
-	tileinfo.set(0, code, 0, 0);
+	tileinfo.set(0, m_videoram[tile_index], 0, 0);
 }
 
 void zac1b1120_state::video_start()
@@ -208,10 +135,88 @@ void zac1b1120_state::video_start()
 	m_gfxdecode->gfx(1)->set_source(m_s2636_0_ram);
 	m_gfxdecode->gfx(2)->set_source(m_s2636_0_ram);
 
-	save_item(NAME(m_bitmap));
-	save_item(NAME(m_spritebitmap));
 	save_item(NAME(m_collision_background));
 	save_item(NAME(m_collision_sprite));
+}
+
+void zac1b1120_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+uint8_t zac1b1120_state::s2636_r(offs_t offset)
+{
+	if (offset != 0xcb)
+		return m_s2636_0_ram[offset];
+	else
+		return m_collision_sprite;
+}
+
+void zac1b1120_state::s2636_w(offs_t offset, uint8_t data)
+{
+	m_s2636_0_ram[offset] = data;
+	m_gfxdecode->gfx(1)->mark_dirty(offset / 8);
+	m_gfxdecode->gfx(2)->mark_dirty(offset / 8);
+
+	if (offset == 0xc7)
+		m_s2636->write_data(offset, data);
+}
+
+int zac1b1120_state::sprite_collision(int first, int second)
+{
+	int checksum = 0;
+	const rectangle &visarea = m_screen->visible_area();
+
+	if ((m_s2636_0_ram[first * 0x10 + 10] < 0xf0) && (m_s2636_0_ram[second * 0x10 + 10] < 0xf0))
+	{
+		int const fx = (m_s2636_0_ram[first * 0x10 + 10] * 4) - 22;
+		int const fy = m_s2636_0_ram[first * 0x10 + 12] + 1;
+		int const expand = (first == 1) ? 2 : 1;
+
+		// Draw first sprite
+		m_gfxdecode->gfx(expand)->opaque(m_spritebitmap, m_spritebitmap.cliprect(),
+				first * 2,
+				0,
+				0, 0,
+				fx, fy);
+
+		// Get fingerprint
+		for (int x = fx; x < fx + m_gfxdecode->gfx(expand)->width(); x++)
+		{
+			for (int y = fy; y < fy + m_gfxdecode->gfx(expand)->height(); y++)
+			{
+				if (visarea.contains(x, y))
+					checksum += m_spritebitmap.pix(y, x);
+			}
+		}
+
+		// Blackout second sprite
+		m_gfxdecode->gfx(1)->transpen(m_spritebitmap, m_spritebitmap.cliprect(),
+				second * 2,
+				1,
+				0, 0,
+				(m_s2636_0_ram[second * 0x10 + 10] * 4) - 22, m_s2636_0_ram[second * 0x10 + 12] + 1, 0);
+
+		// Remove fingerprint
+		for (int x = fx; x < fx + m_gfxdecode->gfx(expand)->width(); x++)
+		{
+			for (int y = fy; y < fy + m_gfxdecode->gfx(expand)->height(); y++)
+			{
+				if (visarea.contains(x, y))
+					checksum -= m_spritebitmap.pix(y, x);
+			}
+		}
+
+		// Zero bitmap
+		m_gfxdecode->gfx(expand)->opaque(m_spritebitmap, m_spritebitmap.cliprect(),
+				first * 2,
+				1,
+				0, 0,
+				fx, fy);
+	}
+
+	return checksum;
 }
 
 void zac1b1120_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -229,17 +234,19 @@ void zac1b1120_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipre
 	/* does not seem to be a fault of the emulation!                  */
 	/* -------------------------------------------------------------- */
 
-	m_collision_background = 0;   // Read from 0x1e80 bit 7
+	m_collision_background = 0; // Read from 0x1e80 bit 7
 
 	// for collision detection checking
 	copybitmap(m_bitmap, bitmap, 0, 0, 0, 0, visarea);
 
-	for (int offs = 0; offs < 0x50; offs += 0x10)
+	for (int i = 0; i < 4; i++)
 	{
-		if ((m_s2636_0_ram[offs + 10] < 0xf0) && (offs != 0x30))
+		int const spriteno = (i == 0) ? 0 : (1 << i); // 0, 2, 4, 8
+		int const offs = spriteno << 3; // 0, 0x10, 0x20, 0x40
+
+		if (m_s2636_0_ram[offs + 10] < 0xf0)
 		{
-			int const spriteno = (offs / 8);
-			int const expand = ((m_s2636_0_ram[0xc0] & (spriteno * 2)) != 0) ? 2 : 1;
+			int const expand = (m_s2636_0_ram[0xc0] & (1 << (i * 2))) ? 2 : 1;
 			int const bx = (m_s2636_0_ram[offs + 10] * 4) - 22;
 			int const by = m_s2636_0_ram[offs + 12] + 1;
 
@@ -257,7 +264,7 @@ void zac1b1120_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipre
 					if (visarea.contains(x, y))
 						if (bitmap.pix(y, x) != m_bitmap.pix(y, x))
 						{
-							m_collision_background = 0x80;
+							m_collision_background = 1;
 							break;
 						}
 				}
@@ -273,12 +280,12 @@ void zac1b1120_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipre
 
 	// Sprite->Sprite collision detection
 	m_collision_sprite = 0;
-//  if(sprite_collision(0, 1)) m_collision_sprite |= 0x20;   // Not used
+//  if(sprite_collision(0, 1)) m_collision_sprite |= 0x20; // Not used
 	if(sprite_collision(0, 2)) m_collision_sprite |= 0x10;
 	if(sprite_collision(0, 4)) m_collision_sprite |= 0x08;
 	if(sprite_collision(1, 2)) m_collision_sprite |= 0x04;
 	if(sprite_collision(1, 4)) m_collision_sprite |= 0x02;
-//  if(sprite_collision(2, 4)) m_collision_sprite |= 0x01;   // Not used
+//  if(sprite_collision(2, 4)) m_collision_sprite |= 0x01; // Not used
 }
 
 uint32_t zac1b1120_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -289,9 +296,27 @@ uint32_t zac1b1120_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-// machine
+/*******************************************************************************
+    Sound
+*******************************************************************************/
 
-/***********************************************************************************************/
+void zac1b1120_state::sound_w(uint8_t data)
+{
+	// sounds are NOT the same as space invaders
+	logerror("Register %x = Data %d\n", data & 0xfe, data & 0x01);
+
+	// 08 = hit invader
+	// 20 = bonus (extra base)
+	// 40 = saucer
+	// 84 = fire
+	// 90 = die
+	// c4 = hit saucer
+}
+
+
+/*******************************************************************************
+    Address Maps
+*******************************************************************************/
 
 void zac1b1120_state::main_map(address_map &map)
 {
@@ -299,13 +324,18 @@ void zac1b1120_state::main_map(address_map &map)
 	map(0x1800, 0x1bff).ram().w(FUNC(zac1b1120_state::videoram_w)).share(m_videoram);
 	map(0x1c00, 0x1cff).ram();
 	map(0x1d00, 0x1dff).ram();
-	map(0x1e80, 0x1e80).r(FUNC(zac1b1120_state::port_0_r)).w(FUNC(zac1b1120_state::sound_w));
+	map(0x1e80, 0x1e80).portr("1E80").w(FUNC(zac1b1120_state::sound_w));
 	map(0x1e81, 0x1e81).portr("1E81");
 	map(0x1e82, 0x1e82).portr("1E82");
 	map(0x1e85, 0x1e85).portr("1E85"); // Dodgem only
 	map(0x1e86, 0x1e86).portr("1E86").nopw(); // Dodgem only
 	map(0x1f00, 0x1fff).rw(FUNC(zac1b1120_state::s2636_r), FUNC(zac1b1120_state::s2636_w)).share(m_s2636_0_ram);
 }
+
+
+/*******************************************************************************
+    Input Ports
+*******************************************************************************/
 
 static INPUT_PORTS_START( tinvader )
 	PORT_START("1E80")
@@ -316,7 +346,7 @@ static INPUT_PORTS_START( tinvader )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Missile-background collision
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(zac1b1120_state, bg_collision_r)
 
 	PORT_START("1E81")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )
@@ -378,7 +408,7 @@ static INPUT_PORTS_START( dodgem )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Missile-background collision
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(zac1b1120_state, bg_collision_r)
 
 	PORT_START("1E81")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )
@@ -448,27 +478,9 @@ static INPUT_PORTS_START( dodgem )
 INPUT_PORTS_END
 
 
-void zac1b1120_state::palette(palette_device &palette) const
-{
-	// FIXME: this PCB actually outputs RGB signals, not monochrome video!
-	palette.set_pen_color(0, rgb_t::black());
-	palette.set_pen_color(1, rgb_t::white());
-	palette.set_pen_color(2, rgb_t::black());
-	palette.set_pen_color(3, rgb_t::black());
-}
-
-/************************************************************************************************
-
- Video is slightly odd on these zac boards
-
- background is 256 x 240 pixels, but the sprite chips run at a different frequency, which means
- that the output of 196x240 is stretched to fill the same screen space.
-
- to 'properly' accomplish this, we set the screen up as 768x720 and do the background at 3 times
- the size, and the sprites as 4 times the size - everything then matches up correctly.
-
-************************************************************************************************/
-
+/*******************************************************************************
+    GFX Layouts
+*******************************************************************************/
 
 static const gfx_layout s2636_character =
 {
@@ -483,9 +495,14 @@ static const gfx_layout s2636_character =
 
 static GFXDECODE_START( gfx_tinvader )
 	GFXDECODE_SCALE( "gfx1", 0, gfx_8x8x1, 0, 2, 3, 1 )
-	GFXDECODE_SCALE( nullptr, 0x1f00, s2636_character, 0, 2, 4, 1 )  // dynamic
-	GFXDECODE_SCALE( nullptr, 0x1f00, s2636_character, 0, 2, 8, 2 )  // dynamic
+	GFXDECODE_SCALE( nullptr, 0x1f00, s2636_character, 0, 2, 4, 1 ) // dynamic
+	GFXDECODE_SCALE( nullptr, 0x1f00, s2636_character, 0, 2, 8, 2 ) // dynamic
 GFXDECODE_END
+
+
+/*******************************************************************************
+    Machine Configs
+*******************************************************************************/
 
 void zac1b1120_state::tinvader(machine_config &config)
 {
@@ -496,6 +513,7 @@ void zac1b1120_state::tinvader(machine_config &config)
 
 	// video hardware (timings generated by an (overclocked) Signetics 2621 PAL Universal Sync Generator; screen refresh measured at 55Hz)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); // for collision detection
 	m_screen->set_raw(15.625_MHz_XTAL, 227 * 4, 0, 180 * 4, 312, 0, 256);
 	m_screen->set_screen_update(FUNC(zac1b1120_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -505,7 +523,6 @@ void zac1b1120_state::tinvader(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-
 	S2636(config, m_s2636, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -520,19 +537,10 @@ void zac1b1120_state::dodgem(machine_config &config)
 	// TODO: sound board (different from The Invaders)
 }
 
-void zac1b1120_state::sound_w(uint8_t data)
-{
-	// sounds are NOT the same as space invaders
 
-	logerror("Register %x = Data %d\n", data & 0xfe, data & 0x01);
-
-	// 08 = hit invader
-	// 20 = bonus (extra base)
-	// 40 = saucer
-	// 84 = fire
-	// 90 = die
-	// c4 = hit saucer
-}
+/*******************************************************************************
+    ROM Definitions
+*******************************************************************************/
 
 ROM_START( sia2650 )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -576,6 +584,10 @@ ROM_END
 } // anonymous namespace
 
 
+/*******************************************************************************
+    Game Drivers
+*******************************************************************************/
+
 GAMEL( 1979?, tinv2650, 0,        tinvader, tinvader, zac1b1120_state, empty_init, ROT270, "Zaccaria / Zelco", "The Invaders",                                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_tinv2650 )
 GAME(  1979?, sia2650,  tinv2650, tinvader, sinvader, zac1b1120_state, empty_init, ROT270, "bootleg (Sidam)",  "Super Invader Attack (bootleg of The Invaders)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 1980?
-GAME(  1979,  dodgem,   0,        dodgem,   dodgem,   zac1b1120_state, empty_init, ROT0,   "Zaccaria",         "Dodgem",                                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1979,  dodgem,   0,        dodgem,   dodgem,   zac1b1120_state, empty_init, ROT0,   "Zaccaria",         "Dodgem",                                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_dodgem )

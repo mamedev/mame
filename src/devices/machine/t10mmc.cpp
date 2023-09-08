@@ -1269,62 +1269,70 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 	case T10SPC_CMD_MODE_SENSE_6:
 	case T10SPC_CMD_MODE_SENSE_10:
 		//      m_device->logerror("T10MMC: MODE SENSE page code = %x, PC = %x\n", command[2] & 0x3f, (command[2]&0xc0)>>6);
-
-		memset(data, 0, SCSILengthFromUINT16( &command[ 7 ] ));
-
-		switch (command[2] & 0x3f)
 		{
-			case 0xe:   // CD Audio control page
-				data[1] = 0x0e;
-				data[0] = 0x8e; // page E, parameter is savable
-				data[1] = 0x0e; // page length
-				data[2] = (1 << 2) | (m_sotc << 1); // IMMED = 1
-				data[3] = data[4] = data[5] = data[6] = data[7] = 0; // reserved
+			memset(data, 0, SCSILengthFromUINT16( &command[ 7 ] ));
 
-				// connect each audio channel to 1 output port
-				data[8] = 1;
-				data[10] = 2;
-				data[12] = 4;
-				data[14] = 8;
+			const uint8_t page = command[2] & 0x3f;
+			int ptr = 0;
 
-				// indicate max volume
-				data[9] = data[11] = data[13] = data[15] = 0xff;
-				break;
-			case 0x2a:  // Page capabilities
-				data[1] = 0x14;
-				data[0] = 0x2a;
-				data[1] = 0x14; // page length
-				data[2] = 0x00; data[3] = 0x00; // CD-R only
-				data[4] = 0x01; // can play audio
-				data[5] = 0;
-				data[6] = 0;
-				data[7] = 0;
-				data[8] = 0x02; data[9] = 0xc0; // 4x speed
-				data[10] = 0x01; data[11] = 0x00; // 256 volume levels supported
-				data[12] = 0x00; data[13] = 0x00; // buffer
-				data[14] = 0x02; data[15] = 0xc0; // 4x read speed
-				data[16] = 0;
-				data[17] = 0;
-				data[18] = 0;
-				data[19] = 0;
-				data[20] = 0;
-				data[21] = 0;
-				break;
+			if ((page == 0xe) || (page == 0x3f))
+			{ // CD Audio control page
+					data[ptr++] = 0x8e; // page E, parameter is savable
+					data[ptr++] = 0x0e; // page length
+					data[ptr++] = (1 << 2) | (m_sotc << 1); // IMMED = 1
+					ptr += 6;   // skip reserved bytes
+					// connect each audio channel to 1 output port
+					data[ptr++] = 1;
+					data[ptr++] = 2;
+					data[ptr++] = 4;
+					data[ptr++] = 8;
+					// indicate max volume
+					data[ptr++] = 0xff;
+					ptr++;
+					data[ptr++] = 0xff;
+					ptr++;
+					data[ptr++] = 0xff;
+					ptr++;
+					data[ptr++] = 0xff;
+			}
 
-			case 0x0d: // CD page
-				data[1] = 0x06;
-				data[0] = 0x0d;
-				data[2] = 0;
-				data[3] = 0;
-				data[4] = 0;
-				data[5] = 60;
-				data[6] = 0;
-				data[7] = 75;
-				break;
+			if ((page == 0x0d) || (page == 0x3f))
+			{ // CD page
+					data[ptr++] = 0x0d;
+					data[ptr++] = 6;    // page length
+					data[ptr++] = 0;
+					data[ptr++] = 0;
+					data[ptr++] = 0;
+					data[ptr++] = 60;
+					data[ptr++] = 0;
+					data[ptr++] = 75;
+			}
 
-			default:
-				m_device->logerror("T10MMC: MODE SENSE unknown page %x\n", command[2] & 0x3f);
-				break;
+			if ((page == 0x2a) || (page == 0x3f))
+			{ // Page capabilities
+					data[ptr++] = 0x2a;
+					data[ptr++] = 0x14; // page length
+					data[ptr++] = 0x00;
+					data[ptr++] = 0x00; // CD-R only
+					data[ptr++] = 0x01; // can play audio
+					data[ptr++] = 0;
+					data[ptr++] = 0;
+					data[ptr++] = 0;
+					data[ptr++] = 0x02;
+					data[ptr++] = 0xc0; // 4x speed
+					data[ptr++] = 0x01;
+					data[ptr++] = 0x00; // 256 volume levels supported
+					data[ptr++] = 0x00;
+					data[ptr++] = 0x00; // buffer
+					data[ptr++] = 0x02;
+					data[ptr++] = 0xc0; // 4x read speed
+					data[ptr++] = 0;
+					data[ptr++] = 0;
+					data[ptr++] = 0;
+					data[ptr++] = 0;
+					data[ptr++] = 0;
+					data[ptr++] = 0;
+			}
 		}
 		break;
 

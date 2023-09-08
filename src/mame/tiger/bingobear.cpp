@@ -25,11 +25,8 @@ Monkgomery Monkey (trademarked by Hasbro) has the same MCU. The voice box label
 is 7~150 instead of 7~130.
 
 The external modules also came with a new outfit for the plushie to wear.
-It looks like the Bingo Bear modules work fine with Monkgomery Monkey, though
-obviously his voice will change.
-
-TODO:
-- dump/add Doctor Bingo Bear module
+It looks like the Bingo Bear modules mostly work fine with Monkgomery Monkey,
+though obviously his voice will change.
 
 *******************************************************************************/
 

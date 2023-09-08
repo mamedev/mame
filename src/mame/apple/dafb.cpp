@@ -1240,7 +1240,7 @@ void dafb_memcjr_device::clockgen_w(offs_t offset, u8 data)
 	}
 }
 
-// This is an Anrelope which is a further revised AC842a
+// This is an Antelope which is a further revised AC842a
 u32 dafb_memcjr_device::ramdac_r(offs_t offset)
 {
 	switch (offset << 2)
@@ -1268,7 +1268,7 @@ void dafb_memcjr_device::ramdac_w(offs_t offset, u32 data)
 			if ((m_pal_address == 1) && ((m_ac842_pbctrl & 0x06) == 0x06))
 			{
 				LOGMASKED(LOG_RAMDAC, "%02x to Antelope PCBR1\n", data);
-				m_pcbr1 = (data & 0xf0) | 0x02;	// Antelope version ID
+				m_pcbr1 = (data & 0xf0) | 0x02; // Antelope version ID
 			}
 			else
 			{

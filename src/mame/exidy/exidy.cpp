@@ -188,6 +188,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_dsw(*this, "DSW"),
 		m_in0(*this, "IN0"),
+		m_led(*this, "led%u", 0U),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -217,6 +218,7 @@ protected:
 
 	required_ioport m_dsw;
 	required_ioport m_in0;
+	output_finder<2> m_led;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -472,8 +474,8 @@ void exidy_state::mtrap_ocl_w(uint8_t data) // Mouse Trap (possibly others) set 
 {
 	*m_sprite_enable = data;
 
-	output().set_value("led0", !BIT(data, 2));
-	output().set_value("led1", !BIT(data, 4));
+	m_led[0] = !BIT(data, 2);
+	m_led[1] = !BIT(data, 4);
 }
 
 
@@ -1457,6 +1459,8 @@ uint32_t exidy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 void exidy_state::machine_start()
 {
+	m_led.resolve();
+
 	for (int i = 0; i < 128; i++)
 		m_collision_timer[i] = timer_alloc(FUNC(exidy_state::latch_collision), this);
 }

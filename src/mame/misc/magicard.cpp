@@ -2161,7 +2161,7 @@ ROM_END
   2 bytes of difference.
 
   Early board.
-  
+
 */
 ROM_START( lucky7x )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
@@ -2180,7 +2180,7 @@ ROM_END
   Ver 11/90b
 
   Early board.
-  
+
 */
 ROM_START( jjokeri )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX

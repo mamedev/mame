@@ -123,7 +123,7 @@ void namcoc65_device::namcos2_mcu_analog_ctrl_w(uint8_t data)
 			m_mcu_analog_data = m_port_analog_in_cb[7]();
 			break;
 		default:
-			//output().set_value("anunk",data);
+			//logerror("anunk: %02x\n", data);
 			break;
 		}
 

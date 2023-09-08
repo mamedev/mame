@@ -583,7 +583,7 @@ void mcr_state::dotron_op4_w(uint8_t data)
 	*/
 	/* bit 7 = FL1 (J1-3) on flasher control board */
 	/* bit 6 = FL0 (J1-4) on flasher control board */
-	output().set_value("backlight", (data >> 6) & 1);
+	m_backlight = BIT(data, 6);
 
 	/*
 	    Lamp Sequencer:

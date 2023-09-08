@@ -51,6 +51,10 @@
 
 #include "emu.h"
 
+#include "ctl1.h"
+#include "kbd.h"
+#include "sgi_gr1.h"
+
 // cpu and memory
 #include "cpu/mips/mips1.h"
 #include "cpu/dsp56000/dsp56000.h"
@@ -71,16 +75,12 @@
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/hlemouse.h"
 
-#include "ctl1.h"
-#include "kbd.h"
-#include "sgi_gr1.h"
+#include "softlist.h"
 
 #include "4dpi.lh"
 
 #define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
-
-#include "softlist.h"
 
 namespace {
 

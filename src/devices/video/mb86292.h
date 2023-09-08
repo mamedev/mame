@@ -39,8 +39,10 @@ protected:
 	devcb_write_line m_xint_cb;
 
 	void reconfigure_screen();
-	void process_display_list();
+	void process_display_opcode(u32 opcode);
 private:
+	void process_display_list();
+
 	u16 m_dce = 0;
 	struct {
 		u32 lsa = 0, lco = 0;
@@ -72,9 +74,29 @@ private:
 		u32 base = 0;
 	} m_fb;
 
+	enum drawing_state_t {
+		DRAW_IDLE,
+		DRAW_COMMAND,
+		DRAW_DATA
+	};
+
 	struct {
 		u16 fc = 0, bc = 0;
+		util::fifo <u32, 32> fifo;
+		drawing_state_t state;
+		u32 current_command = 0;
+		u8 command_count = 0;
+		u32 data_count = 0;
+
+		// DrawBitmapP needs these intermediary values
+		u16 rx = 0, ry = 0, rxi = 0, ryi = 0, rsizex = 0, rsizey = 0;
 	} m_draw;
+
+	void reset_drawing_engine();
+	u32 ctr_r(offs_t offset);
+
+	// geometry engine
+	u32 gctr_r(offs_t offset);
 
 	struct {
 		u32 cm = 0;
@@ -82,7 +104,27 @@ private:
 		u16 cw = 0;
 		bool cc = false;
 		u32 cda = 0;
-	} m_clayer;
+		u16 tc = 0;
+		u16 transpen = 0;
+	} m_c_layer;
+
+	struct {
+		u32 blda[2]{};
+		u32 blm = 0;
+		u16 blh = 0;
+		u16 blw = 0;
+		u8 blflp = 0;
+		bool blc = false;
+	} m_bl_layer;
+
+	struct {
+		u32 mlda[2]{};
+	} m_ml_layer;
+
+	template <unsigned N> u32 blda_r(offs_t offset);
+	template <unsigned N> void blda_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	template <unsigned N> u32 mlda_r(offs_t offset);
+	template <unsigned N> void mlda_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	emu_timer* m_vsync_timer;
 

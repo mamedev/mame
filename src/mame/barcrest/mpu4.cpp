@@ -390,7 +390,7 @@ void mpu4_state::update_meters()
 		break;
 
 	case FLUTTERBOX: //The backbox fan assembly fits in a reel unit sized box, wired to the remote meter pin, so we can handle it here
-		output().set_value("flutterbox", data & 0x80);
+		m_flutterbox = BIT(data, 7);
 		data &= ~0x80; //Strip flutterbox data from meter drives
 		break;
 	}
@@ -1880,6 +1880,7 @@ void mpu4_state::mpu4_config_common()
 	m_mpu4leds.resolve();
 	m_digits.resolve();
 	m_triacs.resolve();
+	m_flutterbox.resolve();
 
 	m_ic24_timer = timer_alloc(FUNC(mpu4_state::update_ic24), this);
 

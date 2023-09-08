@@ -1282,6 +1282,7 @@ void x68k_state::x68000_base(machine_config &config)
 
 	RP5C15(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->alarm().set(m_mfpdev, FUNC(mc68901_device::i0_w));
+	m_rtc->set_year_offset(20);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

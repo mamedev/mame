@@ -46,7 +46,7 @@ namespace {
 class cobrasd_state : public driver_device
 {
 public:
-	cobrasd_state(const machine_config &mconfig, device_type type, const char *tag)	:
+	cobrasd_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu")
 	{ }

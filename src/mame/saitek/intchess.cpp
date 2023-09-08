@@ -5,8 +5,7 @@
 
 SciSys Intelligent Chess
 
-The UK version wasn't widely released, perhaps it wasn't sold at all (can't find
-photos, just brochures and some magazine reviews). The German version was common.
+The UK version wasn't widely released, the German version was more common.
 Development by Intelligent Games, the same group of people that worked on the
 Super System III and Mark V. The visual interface is an evolution of "Tolinka".
 
@@ -124,9 +123,9 @@ INPUT_CHANGED_MEMBER(intchess_state::reset_button)
 
 void intchess_state::init_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, 0xa0, 0xb0, 0xff);
+	palette.set_pen_color(0, 0xb0, 0xd0, 0xff);
 	palette.set_pen_color(1, 0x00, 0x00, 0x00);
-	palette.set_pen_color(2, 0x50, 0x80, 0x20);
+	palette.set_pen_color(2, 0x88, 0xa8, 0x50);
 	palette.set_pen_color(3, 0xff, 0xff, 0xff);
 }
 

@@ -13,7 +13,6 @@
 #include "cpu/h6280/h6280.h"
 #include "cpu/m6502/rp2a03.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/sh/sh2.h"
 #include "sound/ay8910.h"
 #include "sound/c140.h"
 #include "sound/c352.h"

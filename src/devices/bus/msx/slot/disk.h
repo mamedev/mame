@@ -53,9 +53,6 @@ DECLARE_DEVICE_TYPE(MSX_SLOT_DISK11_WD2793, msx_slot_disk11_wd2793_device)
 
 class msx_slot_disk_device : public msx_slot_rom_device
 {
-public:
-	int get_nr_drives() const { return m_nr_drives; }
-
 protected:
 	static constexpr int NO_DRIVES = 0;
 	static constexpr int DRIVES_1 = 1;

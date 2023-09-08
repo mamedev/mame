@@ -109,6 +109,14 @@ enum
 DEFINE_DEVICE_TYPE(RP5C15, rp5c15_device, "rp5c15", "Ricoh RP5C15 RTC")
 
 
+// x68k wants an epoch base (1980-2079) on init, mz2500 do not ("print date$" under basicv2)
+// megast_* tbd
+void rp5c15_device::set_current_time(const system_time &systime)
+{
+	const system_time::full_time &time = m_use_utc ? systime.utc_time : systime.local_time;
+	set_time(true, time.year + m_year_offset, time.month + 1, time.mday, time.weekday + 1,
+		time.hour, time.minute, time.second);
+}
 
 //**************************************************************************
 //  INLINE HELPERS

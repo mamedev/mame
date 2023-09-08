@@ -2,6 +2,8 @@
 // copyright-holders:R. Belmont
 /*
     Konami PowerPC medal hardware
+
+    G1 Turf Wild 3 (c) 2005  GSF51
 */
 
 #include "emu.h"
@@ -54,23 +56,41 @@ uint32_t konmedalppc_state::screen_update(screen_device &screen, bitmap_ind16 &b
 	return m_gcu->draw(screen, bitmap, cliprect);
 }
 
-// The code wants to read the ATA STATUS port (1F7 on a PC) at an offset of 6 (0x721001F6).
-// so convert our offset back to the address and XOR to flip the endianness.
-// This isn't exactly right, but it does pass the initial check.
+/*
+   Offset 0 is the full 16 bits of ATA register 0 (1F0h on PC)
+   Offset 1 is ATA registers 2 & 3 (3322)
+   Offset 2 is ATA registers 4 & 5 (5544)
+   Offset 3 is ATA registers 6 & 7 (7766)
+*/
 u16 konmedalppc_state::ata_r(offs_t offset, u16 mem_mask)
 {
-	offset <<= 1;
-	offset ^= 1;
+	if (offset == 0)
+	{
+		return m_ata->cs0_swap_r(offset, mem_mask);
+	}
 
-	return m_ata->cs0_swap_r(offset, mem_mask);
+	u16 result = m_ata->cs0_r((offset<<1) + 1, 0x00ff)<<8;
+	result |= m_ata->cs0_r(offset<<1, 0xff);
+	return result;
 }
 
 void konmedalppc_state::ata_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	offset <<= 1;
-	offset ^= 1;
+	if (offset == 0)
+	{
+		m_ata->cs0_swap_w(offset, data, mem_mask);
+		return;
+	}
 
-	m_ata->cs0_swap_w(offset, data, mem_mask);
+	if (ACCESSING_BITS_0_7)
+	{
+		m_ata->cs0_w(offset << 1, data & 0xff, 0xff);
+	}
+
+	if (ACCESSING_BITS_8_15)
+	{
+		m_ata->cs0_w((offset<<1) + 1, data>>8, 0xff);
+	}
 }
 
 void konmedalppc_state::main_map(address_map &map)
@@ -137,7 +157,7 @@ void konmedalppc_state::konmedalppc(machine_config &config)
 	ymz.add_route(0, "rspeaker", 1.0);
 }
 
-ROM_START( konmdlunk )
+ROM_START( turfwld3 )
 	ROM_REGION32_BE(0x80000, "program", 0) // PowerPC program ROMs
 	ROM_LOAD16_WORD_SWAP("a89-pce-b01.u2", 0x000000, 0x080000, CRC(3c5d44d4) SHA1(5ba46e3405b3c2ed5b4880abbbe557064b3492e9))
 
@@ -145,9 +165,10 @@ ROM_START( konmdlunk )
 	ROM_LOAD("29f016.u130", 0x000000, 0x200000, CRC(4aed68b5) SHA1(40e019d389a252f6f210b2a6ebadd2a92d5b692a))
 
 	DISK_REGION("ata:0:cfcard")
-	DISK_IMAGE("f51-pce-a02", 0, SHA1(a2971e1c10071c6ae8d9e74c632d0d0b175f69f4))
+	// Sector 0 appears to have been overwritten by Windows, the information needed to chain the boot is now "Replace the disk and press any key"
+	DISK_IMAGE("f51-pce-a02", 0, BAD_DUMP SHA1(a2971e1c10071c6ae8d9e74c632d0d0b175f69f4))
 ROM_END
 
 } // Anonymous namespace
 
-GAME(199?, konmdlunk, 0, konmedalppc, konmedalppc, konmedalppc_state, empty_init, ROT0, "Konami", "Unknown PowerPC Medal Game", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(2005, turfwld3, 0, konmedalppc, konmedalppc, konmedalppc_state, empty_init, ROT0, "Konami", "G1 Turf Wild 3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

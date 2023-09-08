@@ -49,7 +49,8 @@ public:
 		m_squawk_n_talk(*this, "snt"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_backlight(*this, "backlight")
 	{ }
 
 	void mcr_control_port_w(uint8_t data);
@@ -140,6 +141,7 @@ protected:
 	required_device<palette_device> m_palette;
 
 private:
+	output_finder<> m_backlight;
 	uint32_t m_mcr_cpu_board = 0;
 	uint32_t m_mcr_sprite_board = 0;
 

@@ -137,4 +137,4 @@ void smuc_device::device_reset()
 
 } // namespace bus::spectrum::zxbus
 
-DEFINE_DEVICE_TYPE_PRIVATE(ZXBUS_SMUC, device_zxbus_card_interface, bus::spectrum::zxbus::smuc_device, "smuc", "SMUC")
+DEFINE_DEVICE_TYPE_PRIVATE(ZXBUS_SMUC, device_zxbus_card_interface, bus::spectrum::zxbus::smuc_device, "zxbus_smuc", "SMUC")

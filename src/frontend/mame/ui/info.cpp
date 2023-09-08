@@ -84,7 +84,7 @@ void get_general_warnings(std::ostream &buf, running_machine &machine, machine_f
 	{
 		if (bad_roms)
 			buf << '\n';
-		buf << _("There are known problems with this system\n\n");
+		buf << _("There are known problems with this system:\n\n");
 	}
 
 	// add a warning if any ROMs are flagged BAD_DUMP/NO_DUMP
@@ -139,10 +139,20 @@ void get_system_warnings(std::ostream &buf, running_machine &machine, machine_fl
 		buf << _("Screen flipping in cocktail mode is not supported.\n");
 	if (flags & ::machine_flags::REQUIRES_ARTWORK)
 		buf << _("This system requires external artwork files.\n");
+
+	// add the 'BTANB' warnings
 	if (flags & ::machine_flags::IS_INCOMPLETE)
+	{
+		if (buf.tellp() > start_position)
+			buf << '\n';
 		buf << _("This system was never completed. It may exhibit strange behavior or missing elements that are not bugs in the emulation.\n");
+	}
 	if (flags & ::machine_flags::NO_SOUND_HW)
-		buf << _("This system has no sound hardware, MAME will produce no sounds, this is expected behaviour.\n");
+	{
+		if (buf.tellp() > start_position)
+			buf << '\n';
+		buf << _("This system has no sound hardware, MAME will produce no sounds, this is expected behavior.\n");
+	}
 
 	// these are more severe warnings
 	if (flags & ::machine_flags::MECHANICAL)
