@@ -17808,6 +17808,7 @@ fex68km3                        //
 fex68km3a                       //
 fex68km3b                       //
 fex68km4                        //
+premiere                        //
 
 @source:fidelity/eldorado.cpp
 feldo
@@ -18917,11 +18918,13 @@ kosmicmt                        // Elektronika
 kosmicpt                        // Elektronika
 krybolov                        // Elektronika
 kskatedie                       // Konami
+kst25                           // Konami
 ktmnt                           // Konami
 ktmnt2                          // Konami
 ktmnt3                          // Konami
 ktmntbb                         // Konami
 ktopgun                         // Konami
+ktopgun2                        // Konami
 kvakazad                        // Elektronika
 morataka                        // Elektronika
 nochnyev                        // Elektronika
