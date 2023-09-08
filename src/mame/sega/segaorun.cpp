@@ -770,7 +770,7 @@ void segaorun_state::shangon_custom_io_w(offs_t offset, uint16_t data, uint16_t 
 				//  D3: Vibration motor
 				//  D2: Start lamp
 				//  other bits: ?
-				m_adc_select = BIT(data, 7, 6);
+				m_adc_select = data >> 6 & 3;
 				m_segaic16vid->set_display_enable(BIT(data, 5));
 				m_vibration_motor = BIT(data, 3);
 				m_start_lamp = BIT(data, 2);
