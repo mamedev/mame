@@ -93,8 +93,9 @@ DEFINE_DEVICE_TYPE(HEATH_TLB_CONNECTOR, heath_tlb_connector, "heath_tlb_connecto
 
 DEFINE_DEVICE_TYPE(HEATH_TLB, heath_tlb_device, "heath_tlb", "Heath Terminal Logic Board");
 DEFINE_DEVICE_TYPE(HEATH_SUPER19, heath_super19_tlb_device, "heath_super19_tlb", "Heath Terminal Logic Board w/Super19 ROM");
-DEFINE_DEVICE_TYPE(HEATH_WATZ, heath_watz_tlb_device, "heath_watz_tlb", "Heath Terminal Logic Board w/Watzman ROM");
+DEFINE_DEVICE_TYPE(HEATH_SUPERSET, heath_superset_tlb_device, "heath_superset_tlb", "Heath Terminal Logic Board w/Superset ROM");
 DEFINE_DEVICE_TYPE(HEATH_ULTRA, heath_ultra_tlb_device, "heath_ultra_tlb", "Heath Terminal Logic Board w/Ultra ROM");
+DEFINE_DEVICE_TYPE(HEATH_WATZ, heath_watz_tlb_device, "heath_watz_tlb", "Heath Terminal Logic Board w/Watzman ROM");
 DEFINE_DEVICE_TYPE(HEATH_GP19, heath_gp19_tlb_device, "heath_gp19_tlb", "Heath Terminal Logic Board plus Northwest Digital Systems GP-19")
 
 
@@ -699,6 +700,42 @@ static INPUT_PORTS_START( super19 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( superset )
+	PORT_INCLUDE( tlb )
+
+	PORT_MODIFY("SW401")
+	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")           PORT_DIPLOCATION("SW401:1,2,3,4")
+	PORT_DIPSETTING(    0x00, "75")
+	PORT_DIPSETTING(    0x01, "110")
+	PORT_DIPSETTING(    0x02, "150")
+	PORT_DIPSETTING(    0x03, "300")
+	PORT_DIPSETTING(    0x04, "600")
+	PORT_DIPSETTING(    0x05, "1200")
+	PORT_DIPSETTING(    0x06, "1800")
+	PORT_DIPSETTING(    0x07, "2000")
+	PORT_DIPSETTING(    0x08, "2400")
+	PORT_DIPSETTING(    0x09, "3600")
+	PORT_DIPSETTING(    0x0a, "4800")
+	PORT_DIPSETTING(    0x0b, "7200")
+	PORT_DIPSETTING(    0x0c, "9600")
+	PORT_DIPSETTING(    0x0d, "19200")
+	PORT_DIPSETTING(    0x0e, "38400")
+	PORT_DIPSETTING(    0x0f, "134.5")
+	PORT_DIPNAME( 0x10, 0x10, "Duplex")              PORT_DIPLOCATION("SW401:5")
+	PORT_DIPSETTING(    0x00, "Half")
+	PORT_DIPSETTING(    0x80, "Full")
+	PORT_DIPNAME( 0x20, 0x00, "Word Length")         PORT_DIPLOCATION("SW401:6")
+	PORT_DIPSETTING(    0x00, "8-bit" )
+	PORT_DIPSETTING(    0x20, "7-bit" )
+	PORT_DIPNAME( 0x40, 0x00, "Parity Type")         PORT_DIPLOCATION("SW401:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( None )  )
+	PORT_DIPSETTING(    0x40, "Even")
+	PORT_DIPNAME( 0x80, 0x80, "Parity")              PORT_DIPLOCATION("SW401:8")
+	PORT_DIPSETTING(    0x00, "Disabled")
+	PORT_DIPSETTING(    0x80, "Enabled")
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( ultra19 )
 	PORT_INCLUDE( tlb )
 
@@ -837,6 +874,24 @@ ROM_START( super19 )
 	// Original keyboard
 	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD( "2716_444-37_h19keyb.u445", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
+ROM_END
+
+ROM_START( superset )
+	// SuperSet ROM
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "27256_101-402_superset_code.u437", 0x0000, 0x2000, CRC(a6896076) SHA1(a4e2d25028dc75a665c3f5a830a4e8cdecbd481c))
+	// 1st 8k is unused, so overwrite it, with the next 16k (but only first 8k is valid)
+	ROM_CONTINUE(0x0000, 0x4000)
+	// overwrite at 8k starting address with the last 8k of the chip.
+	ROM_CONTINUE(0x2000, 0x2000)
+
+	// Superset SUPERFONT
+	ROM_REGION( 0x8000, "chargen", 0 )
+	ROM_LOAD( "27256_101-431_superset_font.u420", 0x0000, 0x8000, CRC(4c0688f6) SHA1(be6059913420ad66f5c839d619fdcb164ffae85a))
+
+	// Superset Keyboard
+	ROM_REGION( 0x0800, "keyboard", 0 )
+	ROM_LOAD( "2716_101-422_superset_kbd.u445", 0x0000, 0x0800, CRC(549d15b3) SHA1(981962e5e05bbdc5a66b0e86870853ce5596e877))
 ROM_END
 
 ROM_START( watz19 )
@@ -1013,6 +1068,110 @@ ioport_constructor heath_super19_tlb_device::device_input_ports() const
 	return INPUT_PORTS_NAME(super19);
 }
 
+/**
+ * Superset ROM
+ *
+ * Developed by TMSI
+ */
+heath_superset_tlb_device::heath_superset_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	heath_tlb_device(mconfig, HEATH_SUPERSET, tag, owner, clock)
+{
+}
+
+void heath_superset_tlb_device::device_add_mconfig(machine_config &config)
+{
+	heath_tlb_device::device_add_mconfig(config);
+
+	// part of the Superset upgrade was to upgrade the CPU to 3 MHz.
+	m_maincpu->set_clock(H19_3MHZ);
+	m_maincpu->set_addrmap(AS_PROGRAM, &heath_superset_tlb_device::mem_map);
+
+	m_crtc->set_update_row_callback(FUNC(heath_superset_tlb_device::crtc_update_row));
+
+	// link up the serial port outputs to font chip.
+	m_ace->out_dtr_callback().set(FUNC(heath_superset_tlb_device::dtr_internal));
+	m_ace->out_out1_callback().set(FUNC(heath_superset_tlb_device::out1_internal));
+	m_ace->out_out2_callback().set(FUNC(heath_superset_tlb_device::out2_internal));
+}
+
+void heath_superset_tlb_device::device_start()
+{
+	heath_tlb_device::device_start();
+
+	save_item(NAME(m_selected_char_set));
+
+	m_selected_char_set = 0;
+}
+
+void heath_superset_tlb_device::mem_map(address_map &map)
+{
+	heath_tlb_device::mem_map(map);
+
+	// update rom space for the 16k ROM.
+	map(0x0000, 0x3fff).rom();
+
+	// page 2 memory
+	map(0x8000, 0x87ff).ram();
+}
+
+const tiny_rom_entry *heath_superset_tlb_device::device_rom_region() const
+{
+	return ROM_NAME(superset);
+}
+
+ioport_constructor heath_superset_tlb_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(superset);
+}
+
+MC6845_UPDATE_ROW(heath_superset_tlb_device::crtc_update_row)
+{
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
+
+	if (de)
+	{
+		for (int x = 0; x < x_count; x++)
+		{
+			uint8_t inv = (x == cursor_x) ? 0xff : 0;
+			uint8_t chr = m_p_videoram[(ma + x) & 0x7ff];
+
+			if (chr & 0x80)
+			{
+				inv ^= 0xff;
+				chr &= 0x7f;
+			}
+
+			// get pattern of pixels for that character scanline
+			uint8_t const gfx = m_p_chargen[(m_selected_char_set << 12) | (chr << 4) | ra] ^ inv;
+
+			// Display a scanline of a character (8 pixels)
+			for (int b = 0; 8 > b; ++b)
+			{
+				*p++ = palette[BIT(gfx, 7 - b)];
+			}
+		}
+	}
+	else
+	{
+		std::fill_n(p, x_count * 8, palette[0]);
+	}
+}
+
+void heath_superset_tlb_device::dtr_internal(int data)
+{
+	m_selected_char_set = (m_selected_char_set & 0x03) | ((data & 0x01) << 2);
+}
+
+void heath_superset_tlb_device::out1_internal(int data)
+{
+	m_selected_char_set = (m_selected_char_set & 0x05) | ((data & 0x01) << 1);
+}
+
+void heath_superset_tlb_device::out2_internal(int data)
+{
+	m_selected_char_set = (m_selected_char_set & 0x06) | (data & 0x01);
+}
 
 /**
  * Watzman ROM
@@ -1033,7 +1192,6 @@ ioport_constructor heath_watz_tlb_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(watz19);
 }
-
 
 /**
  * UltraROM
