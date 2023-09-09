@@ -695,7 +695,6 @@ private:
 	void gigaman2_gfx_reorder();
 	void cps2_eeprom_port_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t cps2_qsound_volume_r();
-	uint16_t kludge_r();
 	uint16_t joy_or_paddle_r();
 	uint16_t joy_or_paddle_ecofghtr_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);
@@ -1314,11 +1313,6 @@ uint16_t cps2_state::cps2_qsound_volume_r()
  *
  *************************************/
 
-uint16_t cps2_state::kludge_r()
-{
-	return 0xffff;
-}
-
 uint16_t cps2_state::joy_or_paddle_r()
 {
 	if (m_readpaddle != 0)
@@ -1417,7 +1411,8 @@ void cps2_state::cps2_map(address_map &map)
 	map(0x804030, 0x804031).r(FUNC(cps2_state::cps2_qsound_volume_r));                                                                // Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present.
 	map(0x804040, 0x804041).w(FUNC(cps2_state::cps2_eeprom_port_w));                                                                  // EEPROM
 	map(0x8040a0, 0x8040a1).nopw();                                                                                                   // Unknown (reset once on startup)
-	map(0x8040b0, 0x8040b3).r(FUNC(cps2_state::kludge_r));                                                                            // Unknown (xmcotaj hangs if this is 0)
+	map(0x8040b0, 0x8040b1).portr("DSW1");
+	map(0x8040b2, 0x8040b3).portr("DSW2");
 	map(0x8040e0, 0x8040e1).w(FUNC(cps2_state::cps2_objram_bank_w));                                                                  // bit 0 = Object ram bank swap
 	map(0x804100, 0x80413f).w(FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                                                    // CPS-A custom
 	map(0x804140, 0x80417f).rw(FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w));                                       // CPS-B custom
@@ -1456,7 +1451,8 @@ void cps2_state::dead_cps2_map(address_map &map)
 	map(0x804030, 0x804031).r(FUNC(cps2_state::cps2_qsound_volume_r));                                                                // Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present.
 	map(0x804040, 0x804041).w(FUNC(cps2_state::cps2_eeprom_port_w));                                                                  // EEPROM
 	map(0x8040a0, 0x8040a1).nopw();                                                                                                   // Unknown (reset once on startup)
-	map(0x8040b0, 0x8040b3).r(FUNC(cps2_state::kludge_r));                                                                            // Unknown (xmcotaj hangs if this is 0)
+	map(0x8040b0, 0x8040b3).portr("DSW1");
+	map(0x8040b2, 0x8040b3).portr("DSW2");
 	map(0x8040e0, 0x8040e1).w(FUNC(cps2_state::cps2_objram_bank_w));                                                                  // bit 0 = Object ram bank swap
 	map(0x804100, 0x80413f).w(FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                                                    // CPS-A custom
 	map(0x804140, 0x80417f).rw(FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w));                                       // CPS-B custom
@@ -1543,6 +1539,90 @@ static INPUT_PORTS_START( cps2_4p4b )
 	PORT_START( "DIGITALVOL" )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_VOLUME_UP )
+
+	PORT_START("DEV_HW")
+	PORT_CONFNAME(0x01,0x00,"Dev hardware")
+	PORT_CONFSETTING(0x00, "Default Hardware")
+	PORT_CONFSETTING(0x01, "Debug DIP switches enable")
+
+// PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_START("DSW1") 
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+
+	PORT_START("DSW2") 
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:1") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:2") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:3") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:4") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:5") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:6") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:7") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:8") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) ) PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+
 INPUT_PORTS_END
 
 // 4 players and 3 buttons
