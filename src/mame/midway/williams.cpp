@@ -3160,12 +3160,13 @@ There is known to be a "perfect" version of Sinistar, that being the original ve
 
 Sinistar's cockpit cabinet features two sound boards, one for the front speakers and another for the rear.  The rear
   sound board uses a different ROM, Video Sound ROM 10.  It adds a slight delay to some of the sound effects,
-  producing a reverberation effect, and ignores the extra ship and bounce effects.  It has no speech ROMs.
+  and ignores the extra ship and bounce effects.  It has no speech ROMs.
 
 If you disconnect the speech ROMs from the upright sound board, Video Sound ROM 9 will play two replacement sound
   effects for the Sinistar's missing audio.  Any line of dialogue will be replaced by a generic alarm noise,
   while the Sinistar roar is replaced by a loud square wave synth noise that attempts to emulate the "sini-scream".
   Video Sound Rom 10 disables this functionality so that it doesn't play placeholder sounds in place of speech.
+
 */
 ROM_START( sinistar ) // rev. 3
 	ROM_REGION( 0x19000, "maincpu", 0 ) // solid RED labels with final production part numbers
