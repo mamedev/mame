@@ -1707,10 +1707,6 @@ void sinistar_state::cockpit(machine_config &config)
 	SPEAKER(config, "rspeaker").rear_center();
 	MC1408(config, "rdac").add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
 
-	// uncomment this to route front/rear to left/right
-	//subdevice<speaker_device>("speaker")->front_left();
-	//subdevice<speaker_device>("rspeaker")->front_right();
-
 	// pia
 	INPUT_MERGER_ANY_HIGH(config, "soundirq_b").output_handler().set_inputline("soundcpu_b", M6808_IRQ_LINE);
 
