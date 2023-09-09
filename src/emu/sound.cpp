@@ -33,19 +33,11 @@
 #define LOG_OUTPUT_WAV  (0)
 
 
-
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
 const attotime sound_manager::STREAMS_UPDATE_ATTOTIME = attotime::from_hz(STREAMS_UPDATE_FREQUENCY);
-
 
 
 //**************************************************************************
@@ -1390,10 +1382,19 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 		mixer_input info;
 		if (indexed_mixer_input(node->get_attribute_int("index", -1), info))
 		{
-			float defvol = node->get_attribute_float("defvol", 1.0f);
-			float newvol = node->get_attribute_float("newvol", -1000.0f);
-			if (newvol != -1000.0f)
-				info.stream->input(info.inputnum).set_user_gain(newvol / defvol);
+			float value = node->get_attribute_float("value", std::nanf(""));
+
+			if (std::isnan(value))
+			{
+				// TODO: remove defvol and newvol in 2024
+				float defvol = node->get_attribute_float("defvol", 1.0f);
+				float newvol = node->get_attribute_float("newvol", -1000.0f);
+				if (newvol != -1000.0f && defvol != 0.0f)
+					value = newvol / defvol;
+			}
+
+			if (!std::isnan(value))
+				info.stream->input(info.inputnum).set_user_gain(value);
 		}
 	}
 
@@ -1442,14 +1443,14 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 		if (!indexed_mixer_input(mixernum, info))
 			break;
 
-		float const newvol = info.stream->input(info.inputnum).user_gain();
-		if (newvol != 1.0f)
+		float const value = info.stream->input(info.inputnum).user_gain();
+		if (value != 1.0f)
 		{
 			util::xml::data_node *const node = parentnode->add_child("channel", nullptr);
 			if (node)
 			{
 				node->set_attribute_int("index", mixernum);
-				node->set_attribute_float("newvol", newvol);
+				node->set_attribute_float("value", value);
 			}
 		}
 	}
@@ -1457,7 +1458,7 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 	// iterate over speakers for panning
 	for (speaker_device &speaker : speaker_device_enumerator(machine().root_device()))
 	{
-		float value = speaker.pan();
+		float const value = speaker.pan();
 		if (value != speaker.defpan())
 		{
 			util::xml::data_node *const node = parentnode->add_child("panning", nullptr);
