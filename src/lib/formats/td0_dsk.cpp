@@ -90,7 +90,7 @@ private:
 	uint8_t getlen;
 
 	int data_read(uint8_t *buf, uint16_t size);
-	int next_word();
+	int next_word(int needed);
 	int GetBit();
 	int GetByte();
 	void StartHuff();
@@ -412,16 +412,15 @@ static const uint8_t d_len[256] = {
 	0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08,
 };
 
-int td0dsk_t::next_word()
+int td0dsk_t::next_word(int needed)
 {
-	if(tdctl.ibufndx >= tdctl.ibufcnt)
-	{
-		tdctl.ibufndx = 0;
-		tdctl.ibufcnt = data_read(tdctl.inbuf,BUFSZ);
-		if(tdctl.ibufcnt <= 0)
-			return(-1);
-	}
 	while (getlen <= 8) { // typically reads a word at a time
+		if(tdctl.ibufndx >= tdctl.ibufcnt) {
+			tdctl.ibufndx = 0;
+			tdctl.ibufcnt = data_read(tdctl.inbuf,BUFSZ);
+			if(tdctl.ibufcnt <= 0)
+				return(getlen >= needed ? 0 : -1);
+		}
 		getbuf |= tdctl.inbuf[tdctl.ibufndx++] << (8 - getlen);
 		getlen += 8;
 	}
@@ -432,7 +431,7 @@ int td0dsk_t::next_word()
 int td0dsk_t::GetBit()    /* get one bit */
 {
 	int16_t i;
-	if(next_word() < 0)
+	if(next_word(1) < 0)
 		return(-1);
 	i = getbuf;
 	getbuf <<= 1;
@@ -446,7 +445,7 @@ int td0dsk_t::GetBit()    /* get one bit */
 int td0dsk_t::GetByte()    /* get a byte */
 {
 	uint16_t i;
-	if(next_word() != 0)
+	if(next_word(8) != 0)
 		return(-1);
 	i = getbuf;
 	getbuf <<= 8;
@@ -643,7 +642,7 @@ int td0dsk_t::Decode(uint8_t *buf, int len)  /* Decoding/Uncompressing */
 				}
 				else {
 					if((pos = DecodePosition()) < 0)
-							return(count); // fatal error
+						return(count); // fatal error
 					tdctl.bufpos = (tdctl.r - pos - 1) & (N - 1);
 					tdctl.bufcnt = c - 255 + THRESHOLD;
 					tdctl.bufndx = 0;
@@ -1031,7 +1030,9 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		else
 			build_pc_track_mfm(track, head, image, base_cell_count*2, track_spt, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
 
-		track_spt = offset < actual ? imagebuf[offset] : 255;
+		if(actual <= offset)
+			return false;
+		track_spt = imagebuf[offset];
 	}
 	if((track_count > 50) && (form_factor == floppy_image::FF_525)) // ?
 	{
