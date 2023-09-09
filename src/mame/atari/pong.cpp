@@ -150,10 +150,10 @@ class ttl_mono_state : public driver_device
 {
 public:
 	ttl_mono_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_video(*this, "fixfreq"),
-			m_dac(*this, "dac")                /* just to have a sound device */
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_video(*this, "fixfreq")
+		, m_dac(*this, "dac")                /* just to have a sound device */
 	{
 	}
 
@@ -172,14 +172,6 @@ public:
 		m_dac->write(16384 * data);
 	}
 
-protected:
-
-	// driver_device overrides
-	virtual void machine_start() override { };
-	virtual void machine_reset() override { };
-
-	virtual void video_start() override { };
-
 private:
 
 };
@@ -188,9 +180,9 @@ class pong_state : public ttl_mono_state
 {
 public:
 	pong_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ttl_mono_state(mconfig, type, tag),
-			m_sw1a(*this, "maincpu:sw1a"),
-			m_sw1b(*this, "maincpu:sw1b")
+		: ttl_mono_state(mconfig, type, tag)
+		, m_sw1a(*this, "maincpu:sw1a")
+		, m_sw1b(*this, "maincpu:sw1b")
 	{
 	}
 
@@ -203,13 +195,6 @@ public:
 	void pongd(machine_config &config);
 	void pong(machine_config &config);
 
-protected:
-
-	// driver_device overrides
-	virtual void machine_start() override { };
-	virtual void machine_reset() override { };
-	virtual void video_start() override  { };
-
 private:
 
 };
@@ -218,17 +203,17 @@ class breakout_state : public ttl_mono_state
 {
 public:
 	breakout_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ttl_mono_state(mconfig, type, tag),
-		m_led_serve(*this, "maincpu:led_serve"),
-		m_lamp_credit1(*this, "maincpu:lamp_credit1"),
-		m_lamp_credit2(*this, "maincpu:lamp_credit2"),
-		m_coin_counter(*this, "maincpu:coin_counter"),
-		m_sw1_1(*this, "maincpu:sw1_1"),
-		m_sw1_2(*this, "maincpu:sw1_2"),
-		m_sw1_3(*this, "maincpu:sw1_3"),
-		m_sw1_4(*this, "maincpu:sw1_4"),
-		m_serve_led_output(*this, "serve_led"),
-		m_lamp_credit_output(*this, "lamp_credit%u", 1U)
+		: ttl_mono_state(mconfig, type, tag)
+		, m_led_serve(*this, "maincpu:led_serve")
+		, m_lamp_credit1(*this, "maincpu:lamp_credit1")
+		, m_lamp_credit2(*this, "maincpu:lamp_credit2")
+		, m_coin_counter(*this, "maincpu:coin_counter")
+		, m_sw1_1(*this, "maincpu:sw1_1")
+		, m_sw1_2(*this, "maincpu:sw1_2")
+		, m_sw1_3(*this, "maincpu:sw1_3")
+		, m_sw1_4(*this, "maincpu:sw1_4")
+		, m_serve_led_output(*this, "serve_led")
+		, m_lamp_credit_output(*this, "lamp_credit%u", 1U)
 	{
 	}
 	required_device<netlist_mame_analog_output_device> m_led_serve;
@@ -268,9 +253,7 @@ public:
 protected:
 
 	// driver_device overrides
-	virtual void machine_start() override { m_serve_led_output.resolve(); m_lamp_credit_output.resolve(); };
-	virtual void machine_reset() override { };
-	virtual void video_start() override  { };
+	virtual void machine_start() override { m_serve_led_output.resolve(); m_lamp_credit_output.resolve(); }
 
 private:
 	output_finder<> m_serve_led_output;
@@ -309,9 +292,7 @@ public:
 protected:
 
 	// driver_device overrides
-	virtual void machine_start() override { m_credit_led.resolve(); };
-	virtual void machine_reset() override { };
-	virtual void video_start() override  { };
+	virtual void machine_start() override { m_credit_led.resolve(); }
 
 private:
 	output_finder<> m_credit_led;

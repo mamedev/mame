@@ -1335,7 +1335,7 @@ MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 		{
 			for (int x = 0; x < x_count; x++)
 			{
-				uint8_t const gfx = m_p_videoram[((ma << 1) + ( ra * x_count ) + x) & 0x3fff] ^ screen_inv;
+				uint8_t const gfx = m_p_videoram[((ma << 1) + (ra * x_count) + x) & 0x3fff] ^ screen_inv;
 
 				for (int b = 0; 8 > b; ++b)
 				{
@@ -1345,7 +1345,7 @@ MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 		}
 		else
 		{
-			uint16_t base = m_char_gen_a11 ? 0x800 : 0x0;
+			uint16_t const base = m_char_gen_a11 ? 0x800 : 0x0;
 
 			for (int x = 0; x < x_count; x++)
 			{

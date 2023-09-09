@@ -157,7 +157,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Needs a working light pen interface -->
-	<software name="lpengrph" supported="partial">
+	<software name="lpengrph" supported="no">
 		<description>Light Pen Graphic v1.0 (Japan)</description>
 		<year>1984</year>
 		<publisher>Sanyo</publisher>
@@ -17678,7 +17678,7 @@ Side B
 	</software>
 
 	<!-- Only part 1 can be loaded -->
-	<software name="queensfs" supported="partial">
+	<software name="queensfs" supported="no">
 		<description>The Queen's Footsteps (English)</description>
 		<year>2020</year>
 		<publisher>Davide Bucci</publisher>
