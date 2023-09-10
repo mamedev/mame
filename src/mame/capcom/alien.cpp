@@ -184,7 +184,7 @@ void alien_state::alien_map(address_map &map)
 	map(0x08000000, 0x08000007).portr("DSW");
 	// wontame at least
 	map(0x08800000, 0x08800001).lr16(
-		NAME([this] (offs_t offset, u32 mem_mask) {
+		NAME([this] (offs_t offset, u16 mem_mask) {
 			return m_io_in1->read();
 		})
 	);
