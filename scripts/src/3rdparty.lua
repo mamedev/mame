@@ -1484,7 +1484,6 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/debug_renderdoc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/dxgi.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_egl.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/glcontext_glx.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_html5.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_wgl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/nvapi.cpp",
