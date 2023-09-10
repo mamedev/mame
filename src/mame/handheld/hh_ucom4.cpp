@@ -3189,10 +3189,10 @@ ROM_END
   Tomy Alien Chase (manufactured in Japan)
   * PCB label: TN-16 2E121B01
   * NEC uCOM-43 MCU, label D553C 258
-  * red/green VFD NEC FIP9AM24T, 2-sided*
+  * red/green VFD NEC FIP9AM24T, 2-sided
   * color overlay: top row: green, bottom: blue, middle: pink, other: yellow
 
-  *Player one views the VFD from the front (grid+filament side) while the
+  Player one views the VFD from the front (grid+filament side), while the
   opposite player views it from the back side (through the conductive traces),
   basically a mirror-image.
 
@@ -3273,10 +3273,10 @@ static INPUT_PORTS_START( alnchase )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 
 	PORT_START("IN.1") // D0 port A
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) // on non-mirrored view, swap P2 left/right
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2) // "
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL // on non-mirrored view, swap P2 left/right
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL // "
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
 
 	PORT_START("IN.2") // port B
 	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Players ) )

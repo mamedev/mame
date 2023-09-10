@@ -193,7 +193,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
  *MP6262A  TMS1170   1981, Bearcat BC-210XL
  @MP6354   TMS1475   1982, Tsukuda The Dracula
- *MP6358   TMS1475   1982, Bandai U-Boat
+ @MP6358   TMS1475   1982, Bandai U-Boat
  *MP6361   TMS1475   1983, <unknown> Defender Strikes
  @MP7302   TMS1400   1980, Tiger Deluxe Football with Instant Replay
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
@@ -352,6 +352,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "tisr16.lh"
 #include "tithermos.lh"
 #include "tmvolleyb.lh"
+#include "uboat.lh"
 #include "vclock3.lh"
 #include "wizatron.lh"
 #include "xl25.lh"
@@ -1325,6 +1326,164 @@ ROM_START( tc7atc )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_tc7atc_output.pla", 0, 365, CRC(0e6e3096) SHA1(375beb43657af0cc3070e581b42e501878c0eaaa) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Bandai U-Boat (model 16300)
+  * TMS1475 MP6358 (die label: TMS1175 /TMS1475, MP6358, 40H-PASS-0900-R300-0)
+  * cyan/red VFD NEC FIP10DM24AT no. 2-8 21, 2-sided
+  * color overlay: red/yellow/blue, and black
+  * 1-bit sound
+
+  The VFD is 2-sided, the destroyer side views it from the back and basically
+  sees a mirror image. Each side has its own color overlay, and a black panel
+  that obscures part of the screen.
+
+*******************************************************************************/
+
+class uboat_state : public hh_tms1k_state
+{
+public:
+	uboat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void uboat(machine_config &config);
+
+private:
+	void update_display();
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void uboat_state::update_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
+
+void uboat_state::write_r(u32 data)
+{
+	// R14: speaker out
+	m_speaker->level_w(BIT(data, 14));
+
+	// R15,R19-R21: input mux
+	m_inp_mux = (data >> 15 & 1) | (data >> 18 & 0xe);
+
+	// R0-R9: VFD grid
+	// R10-R13, R16-R18: VFD plate
+	m_grid = data & 0x3ff;
+	m_plate = (m_plate & 0xff) | (data >> 2 & 0xf00) | (data >> 4 & 0x7000);
+	update_display();
+}
+
+void uboat_state::write_o(u16 data)
+{
+	// O0-O7: VFD plate
+	m_plate = (m_plate & ~0xff) | data;
+	update_display();
+}
+
+u8 uboat_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(4);
+}
+
+// inputs
+
+/* physical button layout and labels are like this:
+
+    player 1 side:                                     player 2 side (opposite):
+
+    OFF ON  OFF ON     ---- SELECT ----           s
+    [---o]  [---o]  [    ]  [    ]  [    ]        c
+    POWER   SOUND   COMvsD  MANUAL  COMvsS        r
+                                                  e                SUBMARINE SIDE
+     [  ]                                         e      \     |     /
+     FIRE  DISTROYER SIDE (sic)     [joystick]    n    [  ]  [  ]  [  ]    [joystick]
+     [  ]                             ACTION             --- FIRE ---        ACTION
+*/
+
+static INPUT_PORTS_START( uboat )
+	PORT_START("IN.0") // R15
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+
+	PORT_START("IN.1") // R19
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START3 ) PORT_NAME("1 Player Start (Submarine)")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+
+	PORT_START("IN.2") // R20
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("1 Player Start (Destroyer)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+
+	PORT_START("IN.3") // R21
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+INPUT_PORTS_END
+
+// config
+
+void uboat_state::uboat(machine_config &config)
+{
+	// basic machine hardware
+	TMS1475(config, m_maincpu, 425000); // approximation - RC osc. R=43K, C=47pF
+	m_maincpu->read_k().set(FUNC(uboat_state::read_k));
+	m_maincpu->write_r().set(FUNC(uboat_state::write_r));
+	m_maincpu->write_o().set(FUNC(uboat_state::write_o));
+
+	// video hardware
+	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_SVG));
+	screen1.set_refresh_hz(60);
+	screen1.set_size(372, 1080);
+	screen1.set_visarea_full();
+
+	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_SVG));
+	screen2.set_refresh_hz(60);
+	screen2.set_size(372, 1080);
+	screen2.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(10, 15);
+	config.set_default_layout(layout_uboat);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( uboat )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp6358", 0x0000, 0x1000, CRC(2e238df8) SHA1(e60f061b1f449946e1a68fb8789a381961b088ad) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_uboat_output.pla", 0, 557, CRC(fdb07ac9) SHA1(beb2d8f8de39b795cb95aef2b0f02abc5e4d79dc) )
+
+	ROM_REGION( 305576, "screen1", 0) // destroyer side
+	ROM_LOAD( "uboat1.svg", 0, 305576, CRC(5d51fa01) SHA1(a42ccbc821050f5719232130f115eeb4888ed452) )
+
+	ROM_REGION( 310743, "screen2", 0) // submarine side
+	ROM_LOAD( "uboat2.svg", 0, 310743, CRC(72c44272) SHA1(a43a57b8038b00f9d63c6e5d1a43c4a45a6c6075) )
 ROM_END
 
 
@@ -17157,6 +17316,7 @@ SYST( 1980, mathmagi,   0,         0,      mathmagi,  mathmagi,  mathmagi_state,
 SYST( 1979, bcheetah,   0,         0,      bcheetah,  bcheetah,  bcheetah_state,  empty_init, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL ) // ***
 SYST( 1980, racetime,   0,         0,      racetime,  racetime,  racetime_state,  empty_init, "Bandai", "Race Time", MACHINE_SUPPORTS_SAVE )
 SYST( 1981, tc7atc,     0,         0,      tc7atc,    tc7atc,    tc7atc_state,    empty_init, "Bandai", "TC7: Air Traffic Control", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, uboat,      0,         0,      uboat,     uboat,     uboat_state,     empty_init, "Bandai", "U-Boat", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1977, palmf31,    0,         0,      palmf31,   palmf31,   palmf31_state,   empty_init, "Canon", "Palmtronic F-31", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1977, palmmd8,    0,         0,      palmmd8,   palmmd8,   palmmd8_state,   empty_init, "Canon", "Palmtronic MD-8 (Multi 8)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
