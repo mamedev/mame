@@ -51,14 +51,24 @@ public:
 		, m_ay(*this, "aysnd")
 		, m_eeprom(*this, "eeprom")
 		, m_digits(*this, "digit%u", 0U)
+		, m_hopper(*this, "Hopper", 1U)
+		, m_gameover(*this, "GameOver")
+		, m_title(*this, "Title")
+		, m_credit(*this, "Credit")
+		, m_ss(*this, "SS")
+		, m_c_lock(*this, "C_LOCK")
+		, m_sv(*this, "SV")
+		, m_fbv(*this, "FBV")
+		, m_rv(*this, "RV")
 	{ }
 
 	void fireball(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+private:
 	void fireball_map(address_map &map);
 	void fireball_io_map(address_map &map);
 
@@ -88,6 +98,15 @@ private:
 	required_device<ay8912_device> m_ay;
 	required_device<eeprom_serial_x24c44_device> m_eeprom;
 	output_finder<8> m_digits;
+	output_finder<3> m_hopper;
+	output_finder<> m_gameover;
+	output_finder<> m_title;
+	output_finder<> m_credit;
+	output_finder<> m_ss;
+	output_finder<> m_c_lock;
+	output_finder<> m_sv;
+	output_finder<> m_fbv;
+	output_finder<> m_rv;
 };
 
 
@@ -126,9 +145,9 @@ void fireball_state::io_00_w(uint8_t data)
 
 	LOGMASKED(LOG_OUTPUT, "write to 0x00 IO (X11-X11A) %02X\n", data & 0xf0);
 
-	output().set_value("Hopper1", BIT(data, 4));
-	output().set_value("Hopper2", BIT(data, 5));
-	output().set_value("Hopper3", BIT(data, 6));
+	m_hopper[0] = BIT(data, 4);
+	m_hopper[1] = BIT(data, 5);
+	m_hopper[2] = BIT(data, 6);
 }
 
 
@@ -143,14 +162,14 @@ void fireball_state::io_02_w(uint8_t data)
 {
 	LOGMASKED(LOG_OUTPUT, "write to 0x00 IO (X7-X9) %02X\n", data);
 
-	output().set_value("GameOver", BIT(data, 0));
-	output().set_value("Title", BIT(data, 1));
-	output().set_value("Credit", BIT(data, 2));
-	output().set_value("SS", BIT(data, 3));
-	output().set_value("C_LOCK", BIT(~data, 4));
-	output().set_value("SV", BIT(data, 5));
-	output().set_value("FBV", BIT(data, 6));
-	output().set_value("RV", BIT(data, 7));
+	m_gameover = BIT(data, 0);
+	m_title = BIT(data, 1);
+	m_credit = BIT(data, 2);
+	m_ss = BIT(data, 3);
+	m_c_lock = BIT(~data, 4);
+	m_sv = BIT(data, 5);
+	m_fbv = BIT(data, 6);
+	m_rv = BIT(data, 7);
 }
 
 
@@ -425,6 +444,15 @@ INPUT_PORTS_END
 void fireball_state::machine_start()
 {
 	m_digits.resolve();
+	m_hopper.resolve();
+	m_gameover.resolve();
+	m_title.resolve();
+	m_credit.resolve();
+	m_ss.resolve();
+	m_c_lock.resolve();
+	m_sv.resolve();
+	m_fbv.resolve();
+	m_rv.resolve();
 }
 
 void fireball_state::machine_reset()
@@ -433,18 +461,18 @@ void fireball_state::machine_reset()
 	m_digits[5] = 0x3f;
 	m_digits[6] = 0x3f;
 
-	output().set_value("Hopper1", 0);
-	output().set_value("Hopper2", 0);
-	output().set_value("Hopper3", 0);
+	m_hopper[0] = 0;
+	m_hopper[1] = 0;
+	m_hopper[2] = 0;
 
-	output().set_value("GameOver", 0);
-	output().set_value("Title", 0);
-	output().set_value("Credit", 0);
-	output().set_value("SS", 0);
-	output().set_value("C_LOCK", 0);
-	output().set_value("SV", 0);
-	output().set_value("FBV", 0);
-	output().set_value("RV", 0);
+	m_gameover = 0;
+	m_title = 0;
+	m_credit = 0;
+	m_ss = 0;
+	m_c_lock = 0;
+	m_sv = 0;
+	m_fbv = 0;
+	m_rv = 0;
 }
 
 

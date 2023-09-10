@@ -1934,6 +1934,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/tibdd001_dsk.h,FORMATS["TIBDD001_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "TIBDD001_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/tibdd001_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/tibdd001_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/tiki100_dsk.h,FORMATS["TIKI100_DSK"] = true
 --------------------------------------------------
 

@@ -256,17 +256,17 @@ protected:
 	inline uint32_t data_read_dag2(uint32_t op);
 	inline void pgm_write_dag2(uint32_t op, int32_t val);
 	inline uint32_t pgm_read_dag2(uint32_t op);
-	void alu_op_ar(int op);
-	void alu_op_ar_const(int op);
-	void alu_op_af(int op);
-	void alu_op_af_const(int op);
-	void alu_op_none(int op);
-	void mac_op_mr(int op);
-	void mac_op_mr_xop(int op);
-	void mac_op_mf(int op);
-	void mac_op_mf_xop(int op);
-	void shift_op(int op);
-	void shift_op_imm(int op);
+	void alu_op_ar(uint32_t op);
+	void alu_op_ar_const(uint32_t op);
+	void alu_op_af(uint32_t op);
+	void alu_op_af_const(uint32_t op);
+	void alu_op_none(uint32_t op);
+	void mac_op_mr(uint32_t op);
+	void mac_op_mr_xop(uint32_t op);
+	void mac_op_mf(uint32_t op);
+	void mac_op_mf_xop(uint32_t op);
+	void shift_op(uint32_t op);
+	void shift_op_imm(uint32_t op);
 
 	// memory access
 	inline uint16_t data_read(uint32_t addr);

@@ -4330,7 +4330,7 @@ ROM_END
 
 /***************************************************************************
 
-Chuugokuryuu (china dragon jpn ver.)
+中國龍/Chuugokuryuu (china dragon jpn ver.)
 (c)IGS
 Distributed by ALTA
 
@@ -4655,7 +4655,7 @@ ROM_END
 
 /***************************************************************************
 
-Mahjong Ryukobou
+龍虎榜/Mahjong Ryukobou
 Alta, 1995
 
 PCB Layout
@@ -4925,8 +4925,8 @@ GAME( 1997, drgnwrld,      0,        drgnwrld,        drgnwrld,  igs011_state, i
 GAME( 1995, drgnwrldv40k,  drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dragon World (Korea, V040K)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1995, drgnwrldv30,   drgnwrld, drgnwrld,        drgnwrld,  igs011_state, init_drgnwrldv30,  ROT0, "IGS",                     "Dragon World (World, V030O)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1995, drgnwrldv21,   drgnwrld, drgnwrld_igs012, drgnwrld,  igs011_state, init_drgnwrldv21,  ROT0, "IGS",                     "Dragon World (World, V021O)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv21j,  drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv21j, ROT0, "IGS / Alta",              "Zhongguo Long (Japan, V021J)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv20j,  drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv20j, ROT0, "IGS / Alta",              "Zhongguo Long (Japan, V020J)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv21j,  drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv21j, ROT0, "IGS / Alta",              "Chuugokuryuu (Japan, V021J)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv20j,  drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv20j, ROT0, "IGS / Alta",              "Chuugokuryuu (Japan, V020J)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1995, drgnwrldv11h,  drgnwrld, drgnwrld,        drgnwrldc, igs011_state, init_drgnwrldv11h, ROT0, "IGS",                     "Dung Fong Zi Zyu (Hong Kong, V011H, set 1)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1995, drgnwrldv11ha, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dung Fong Zi Zyu (Hong Kong, V011H, set 2)",  MACHINE_SUPPORTS_SAVE ) // different encryption and with IGS012
 GAME( 1995, drgnwrldv10c,  drgnwrld, drgnwrld,        drgnwrldc, igs011_state, init_drgnwrldv10c, ROT0, "IGS",                     "Zhongguo Long (China, V010C)",                MACHINE_SUPPORTS_SAVE )

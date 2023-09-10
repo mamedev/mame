@@ -15,6 +15,8 @@ class intelfsh_device : public device_t,
 public:
 	uint8_t *base() { return &m_data[0]; }
 
+	bool is_ready();
+
 protected:
 	// construction/destruction
 	intelfsh_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t bits, uint32_t size, uint8_t maker_id, uint16_t device_id);

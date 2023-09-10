@@ -9,10 +9,7 @@ TMS1400 follows the TMS1100, it doubles the ROM size again (4 chapters of 16 pag
 - the opla size is increased from 20 to 32 terms
 
 TMS1475 adds more R pins (indexed from X MSB)
-- opla OR order appears to be flipped: O7-O0
-
 TMS1600 adds more I/O to the TMS1400, input pins are doubled with added L1,2,4,8
-- mpla and opla are the same as TMS1400
 
 TODO:
 - emulate TMS1600 L-pins

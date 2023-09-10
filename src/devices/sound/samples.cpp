@@ -54,9 +54,9 @@ samples_device::samples_device(const machine_config &mconfig, const char *tag, d
 samples_device::samples_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, m_samples_start_cb(*this)
 	, m_channels(0)
 	, m_names(nullptr)
-	, m_samples_start_cb(*this)
 {
 }
 

@@ -1180,7 +1180,6 @@ void swim1_device::ism_sync()
 									val |= M_CRC0;
 								if(ism_fifo_push(val) && !m_ism_error)
 									m_ism_error |= 0x01;
-								machine().debug_break();
 								m_ism_tsm_bits = 0;
 							}
 						}

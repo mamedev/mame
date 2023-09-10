@@ -6,7 +6,7 @@ Novag Chess Robot Adversary, chess computer with robotic arm. The chess engine
 is MyChess by David Kittinger, just like the one in Novag Savant.
 
 Hardware notes:
-- PCB label: PACIFIC MICROELECTRONICS GROUP, ROM PCB: 743-279A/280A/281A
+- PCB label: GOODNIGHT DESIGN, PACIFIC MICROELECTRONICS GROUP, 743-279A/280A/281A
 - Zilog Z8400B PS, 6 MHz XTAL
 - 40KB ROM (4*2764 or equivalent, 4*MSM2716AS) + 1 socket for expansion
 - 5KB RAM (8*TMM314APL-1, 2*TC5514AP-8 battery-backed)
@@ -64,8 +64,7 @@ public:
 		m_inputs(*this, "IN.%u", 0),
 		m_piece_hand(*this, "cpu_hand"),
 		m_out_motor(*this, "motor%u", 0U),
-		m_out_clawx(*this, "clawx"),
-		m_out_clawy(*this, "clawy")
+		m_out_pos(*this, "pos_%c", unsigned('x'))
 	{ }
 
 	void robotadv(machine_config &config);
@@ -82,8 +81,7 @@ private:
 	required_ioport_array<3> m_inputs;
 	output_finder<> m_piece_hand;
 	output_finder<6> m_out_motor;
-	output_finder<> m_out_clawx;
-	output_finder<> m_out_clawy;
+	output_finder<2> m_out_pos;
 
 	void main_map(address_map &map);
 	void io_map(address_map &map);
@@ -96,6 +94,7 @@ private:
 	u8 counters_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(refresh_timer) { refresh(); }
+	void clear_board(int state);
 	void refresh();
 	void update_counters();
 	void update_limits();
@@ -113,13 +112,18 @@ private:
 	attotime m_pwm_last;
 };
 
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
+
 void robotadv_state::machine_start()
 {
 	// resolve outputs
 	m_piece_hand.resolve();
 	m_out_motor.resolve();
-	m_out_clawx.resolve();
-	m_out_clawy.resolve();
+	m_out_pos.resolve();
 
 	// register for savestates
 	save_item(NAME(m_control1));
@@ -135,8 +139,13 @@ void robotadv_state::machine_start()
 
 void robotadv_state::machine_reset()
 {
-	m_piece_hand = 0;
 	refresh();
+}
+
+void robotadv_state::clear_board(int state)
+{
+	m_piece_hand = 0;
+	m_board->clear_board();
 }
 
 
@@ -281,14 +290,16 @@ void robotadv_state::update_piece(double x, double y)
 			return;
 
 		// pick up piece, unless it was picked up by the user
-		int pos = (by << 4 & 0xf0) | (bx & 0x0f);
+		const int pos = (by << 4 & 0xf0) | (bx & 0x0f);
 		if (pos != m_board->get_handpos())
+		{
 			m_piece_hand = m_board->read_piece(bx, by);
 
-		if (m_piece_hand != 0)
-		{
-			m_board->write_piece(bx, by, 0);
-			m_board->refresh();
+			if (m_piece_hand != 0)
+			{
+				m_board->write_piece(bx, by, 0);
+				m_board->refresh();
+			}
 		}
 	}
 }
@@ -312,8 +323,8 @@ void robotadv_state::refresh()
 
 	// output claw position
 	const int open = (m_limits & 1) ? 0x800 : 0; // put open state on x bit 11
-	m_out_clawx = int((x + 15.0) * 50.0) | open;
-	m_out_clawy = int((y + 15.0) * 50.0);
+	m_out_pos[0] = int((x + 15.0) * 50.0 + 0.5) | open;
+	m_out_pos[1] = int((y + 15.0) * 50.0 + 0.5);
 }
 
 
@@ -503,6 +514,7 @@ void robotadv_state::robotadv(machine_config &config)
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->set_size(8+4, 8);
+	m_board->clear_cb().set(FUNC(robotadv_state::clear_board));
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 	m_board->set_nvram_enable(true);

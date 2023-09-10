@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="mac_flop_orig" description="Macintosh 400K/800K Original disk images">
+<softwarelist name="mac_flop_orig" description="Apple Macintosh 400K/800K original disk images">
 
 	<software name="lodrun10">
 		<description>Lode Runner (version 1.0)</description>

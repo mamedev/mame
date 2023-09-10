@@ -17808,6 +17808,7 @@ fex68km3                        //
 fex68km3a                       //
 fex68km3b                       //
 fex68km4                        //
+premiere                        //
 
 @source:fidelity/eldorado.cpp
 feldo
@@ -18917,11 +18918,13 @@ kosmicmt                        // Elektronika
 kosmicpt                        // Elektronika
 krybolov                        // Elektronika
 kskatedie                       // Konami
+kst25                           // Konami
 ktmnt                           // Konami
 ktmnt2                          // Konami
 ktmnt3                          // Konami
 ktmntbb                         // Konami
 ktopgun                         // Konami
+ktopgun2                        // Konami
 kvakazad                        // Elektronika
 morataka                        // Elektronika
 nochnyev                        // Elektronika
@@ -19120,6 +19123,7 @@ tisr16                          // Texas Instruments
 tisr16ii                        // Texas Instruments
 tithermos                       // Texas Instruments
 tmvolleyb                       // Tomy
+uboat                           // Bandai
 vclock3                         // Tandy Corporation
 wizatron                        // Texas Instruments
 wtalker                         // Technasonic
@@ -20150,6 +20154,7 @@ drw80pk2                        // (c) 1983 IGT
 drw80pkr                        // (c) 1982 IGT
 
 @source:igt/gkigt.cpp
+bmoonii                         //
 gkigt4                          //
 gkigt43                         //
 gkigt43n                        //
@@ -23745,6 +23750,7 @@ kbadlandsh                      // GX455 (c) 1984
 @source:konami/konendev.cpp
 konendev                        // Konami Endeavour BIOS
 aadvent                         // African Adventure
+amazonsp                        // Amazon Spirit
 blkrose                         // Black Rose Rapid Fire Grand Prix
 dragnfly                        // Dragonfly
 enchlamp                        // Enchanted Lamp
@@ -23756,7 +23762,8 @@ luckfoun                        // Lucky Fountain
 mohicans                        // Mohican Sun
 monshow                         // Mon Show
 romanl                          // Roman L
-safemon                         // Safe Money
+safemon                         // Safe Money (Russia)
+safemonn                        // Safe Money (NSW)
 showqn                          // Show Queen
 spiceup                         // Spice It Up
 sultanw                         // Sultan W
@@ -29581,7 +29588,8 @@ ez2d2m                          // 2001 Amuse World
 @source:misc/falgas_m89.cpp
 cbully                          // (c) 1991 Falgas
 fantcar                         // (c) 19?? Falgas
-fantcar87                       // (c) 1987 Falgas
+fantcar87                       // (c) 1988 Falgas
+fantcar87a                      // (c) 1987 Falgas
 rmontecarlo                     // (c) 1991 Falgas
 
 @source:misc/fastinvaders.cpp
@@ -29874,6 +29882,7 @@ gtsers1                         // (c) 1984 Greyhound Electronics
 gtsers10                        // (c) 1984 Greyhound Electronics
 gtsers11                        // (c) 1984 Greyhound Electronics
 gtsers11a                       // (c) 1984 Greyhound Electronics
+gtsers11b                       // (c) 1984 Greyhound Electronics
 gtsers12                        // (c) 1984 Greyhound Electronics
 gtsers12a                       // (c) 1984 Greyhound Electronics
 gtsers14                        // (c) 1986 Greyhound Electronics
@@ -29898,6 +29907,7 @@ quiz                            // (c) 1986 Elettronolo
 quiz211                         // (c) 1986 Elettronolo
 quizvid                         // (c) 1986 Italian bootleg
 reelfun                         // (c) 1986 Grayhound Electronics
+reelfun0                        // (c) 1986 Grayhound Electronics
 reelfun1                        // (c) 1986 Grayhound Electronics
 sexappl                         // (c) 1992 Grayhound Electronics
 sextriv1                        // (c) 1985 Kinky Kit and Game Co.
@@ -31240,6 +31250,8 @@ fnf                             // (c) 2004 Raw Thrills
 guitarheroac                    // (c) 2008 Raw Thrills / Activision / Konami
 
 @source:misc/rbmk.cpp
+ballch                          // (c) 2002 TVE
+cots                            // (c) 2005 ECM
 magslot                         // (c) 2003 GMS
 rbmk                            // (c) 1998 GMS
 rbspm                           // (c) 1998 GMS
@@ -32789,7 +32801,8 @@ ghlpanic                        // 1999.?? Ghoul Panic (World, OB2/VER.A)
 golgo13                         // 2000.03 Golgo 13 (Japan, GLG1/VER.A)
 gunbarl                         // 1999.?? Gunbarl (Japan, GNB4/VER.A)
 kaiunqz                         // 1999.12 Kaiun Quiz (Japan, KW1/VER.A)
-kartduel                        // 2000.07 Kart Duel (Japan, KTD1/VER.A)
+kartduel                        // 2000.07 Kart Duel (World, KTD2/VER.A)
+kartduelj                       // 2000.07 Kart Duel (Japan, KTD1/VER.A)
 lbgrande                        // 1997.?? Libero Grande (World, LG2/VER.A)
 mdhorse                         // 1998.11 Derby Quiz My Dream Horse (Japan, MDH1/VER.A2)
 mrdrillr                        // 1999.11 Mr Driller (US, DRI3/VER.A2)
@@ -34739,6 +34752,8 @@ akazukin                        // (c) 1984 Sigma
 
 @source:orca/espial.cpp
 espial                          // (c) 1983 Thunderbolt, Orca logo is hidden in title screen
+espialj                         // (c) 1983 Thunderbolt, Orca logo is hidden in title screen
+espialn                         // (c) 1983 Nova Apparate (+ Hamburg) license
 espialu                         // (c) 1983 Thunderbolt, Orca logo is hidden in title screen
 netwars                         // (c) 1983 Orca + Esco Trading Co license
 
@@ -35535,6 +35550,7 @@ streetgr3                       // (c) 1993
 
 @source:pc/pcipc.cpp
 pciagp                          //
+pcimga                          //
 pcinv3                          //
 pcipc                           //
 pcipctx                         //
@@ -39470,6 +39486,7 @@ cottonjad                       //
 cottonjd                        //
 cottonu                         // (c) 1990 (FD1094)
 cottonud                        //
+dddoor                          // (c) 1993
 ddux                            // (c) 1989 (FD1094)
 ddux1                           // (c) 1989 (8751)
 dduxd                           //
@@ -40018,6 +40035,7 @@ flickyo                         // (c) 1984 (S1)
 flickys1                        // (c) 1984 (S1)
 flickys2                        // (c) 1984 (S1)
 flickyup                        // (c) 1984 (Converted from Up'n Down)
+flickyupa                       // (c) 1984 (Converted from Up'n Down)
 gardia                          // 834-6119 (S2?)
 gardiab                         // bootleg
 gardiaj                         //
@@ -43625,6 +43643,7 @@ solrwarr                        // TA-0019 (c) 1986 + Taito / Memetron license
 xsleena                         // TA-0019 (c) 1986 + Taito license
 xsleenab                        // bootleg
 xsleenaba                       // bootleg
+xsleenabb                       // bootleg
 xsleenaj                        // TA-0019 (c) 1986
 
 @source:tecmo/bombjack.cpp

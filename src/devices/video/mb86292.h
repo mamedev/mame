@@ -82,7 +82,7 @@ private:
 
 	struct {
 		u16 fc = 0, bc = 0;
-		util::fifo <u32, 16> fifo;
+		util::fifo <u32, 32> fifo;
 		drawing_state_t state;
 		u32 current_command = 0;
 		u8 command_count = 0;
@@ -93,6 +93,9 @@ private:
 	} m_draw;
 
 	void reset_drawing_engine();
+	u32 ctr_r(offs_t offset);
+
+	// geometry engine
 	u32 gctr_r(offs_t offset);
 
 	struct {

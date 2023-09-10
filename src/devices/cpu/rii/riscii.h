@@ -187,6 +187,12 @@ protected:
 	void timer0_reload();
 	TIMER_CALLBACK_MEMBER(timer0);
 	u16 timer0_count() const;
+	void timer1_reload();
+	TIMER_CALLBACK_MEMBER(timer1);
+	u8 timer1_count() const;
+	void timer2_reload();
+	TIMER_CALLBACK_MEMBER(timer2);
+	u8 timer2_count() const;
 	u8 trl0l_r();
 	void trl0l_w(u8 data);
 	u8 trl0h_r();
@@ -361,7 +367,7 @@ private:
 	u8 m_tr01con;
 	u8 m_tr2con;
 	u8 m_trlir;
-	emu_timer *m_timer0;
+	emu_timer *m_timer[3];
 
 	// synthesizer state
 	u8 m_sfcr;

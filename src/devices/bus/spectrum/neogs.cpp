@@ -426,9 +426,9 @@ const tiny_rom_entry *neogs_device::device_rom_region() const
 
 void neogs_device::neogsmap(address_map &map)
 {
-	map(0x00bb, 0x00bb).mirror(0xff00).rw(FUNC(neogs_device::neogs_status_r), FUNC(neogs_device::neogs_command_w));
-	map(0x00b3, 0x00b3).mirror(0xff00).rw(FUNC(neogs_device::neogs_data_r), FUNC(neogs_device::neogs_data_w));
-	map(0x0033, 0x0033).mirror(0xff00).w(FUNC(neogs_device::neogs_ctrl_w));
+	map(0x000bb, 0x000bb).mirror(0xff00).rw(FUNC(neogs_device::neogs_status_r), FUNC(neogs_device::neogs_command_w));
+	map(0x000b3, 0x000b3).mirror(0xff00).rw(FUNC(neogs_device::neogs_data_r), FUNC(neogs_device::neogs_data_w));
+	map(0x00033, 0x00033).mirror(0xff00).w(FUNC(neogs_device::neogs_ctrl_w));
 }
 
 void neogs_device::device_start()
@@ -480,4 +480,4 @@ void neogs_device::device_reset()
 } // namespace bus::spectrum::zxbus
 
 
-DEFINE_DEVICE_TYPE_PRIVATE(ZXBUS_NEOGS, device_zxbus_card_interface, bus::spectrum::zxbus::neogs_device, "neogs", "NeoGS / General Sound")
+DEFINE_DEVICE_TYPE_PRIVATE(ZXBUS_NEOGS, device_zxbus_card_interface, bus::spectrum::zxbus::neogs_device, "zxbus_neogs", "NeoGS / General Sound")

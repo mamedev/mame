@@ -841,6 +841,19 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="tibdd001">
+		<description>Games and Utility Disc (v1.1)</description>
+		<year>1991</year>
+		<publisher>TIB</publisher>
+		<sharedfeat name="requirement" value="c64_cart:tibdd001"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dd001boot.img" size="737280" crc="a91cabd1" sha1="6a430a246978f9af418e5c6db618e5cb85affd4e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Demos -->
 
 	<software name="2ndreal">

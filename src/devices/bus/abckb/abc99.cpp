@@ -551,8 +551,6 @@ void abc99_device::led_w(uint8_t data)
 {
 	if (m_led_en) return;
 
-	machine().output().set_value("led0", !BIT(data, 2));
-
 	m_leds[LED_1] = BIT(data, 0);
 	m_leds[LED_2] = BIT(data, 1);
 	m_leds[LED_3] = BIT(data, 2);

@@ -20,6 +20,8 @@ noticeable on the 2nd level.
 
 --------------------------------------------------------------------------------
 
+PCB notes:
+
 Bottom board:
 What appeared to be a cpu socket was a passthru to the top board.
 4 other smaller chip sockets also passed thru to the top.

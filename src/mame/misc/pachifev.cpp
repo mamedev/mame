@@ -17,7 +17,7 @@ Driver by Tomasz Slanina
 - VDP has also custom label ( "RY 050012    DDU 30600" ) plus TI logo
   Seems to be TMS9928A
   XTAL:10.738MHZ
-- 2xY2404 ( SN76489A comaptible? ) for music and sfx
+- 2xY2404 ( SN76489A compatible? ) for music and sfx
 - MSM5205 - sample player (see below)
 
 - TODO:

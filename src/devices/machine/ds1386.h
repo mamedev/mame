@@ -166,8 +166,6 @@ protected:
 	void safe_intb_cb(int state);
 	void safe_sqw_cb(int state);
 
-	void set_current_time();
-
 	void check_tod_alarm();
 	void time_of_day_alarm();
 	void watchdog_alarm();

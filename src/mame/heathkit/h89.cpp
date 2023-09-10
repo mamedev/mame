@@ -71,7 +71,8 @@ public:
 		m_console(*this, "console"),
 		m_serial1(*this, "serial1"),
 		m_serial2(*this, "serial2"),
-		m_serial3(*this, "serial3")
+		m_serial3(*this, "serial3"),
+		m_config(*this, "CONFIG")
 	{
 	}
 
@@ -92,6 +93,7 @@ private:
 	required_device<ins8250_device> m_serial1;
 	required_device<ins8250_device> m_serial2;
 	required_device<ins8250_device> m_serial3;
+	required_ioport m_config;
 
 	// General Purpose Port (GPP)
 	uint8_t m_gpp;
@@ -100,12 +102,15 @@ private:
 	bool m_timer_intr_enabled;
 	bool m_floppy_ram_wp;
 
+	uint32_t m_cpu_speed_multiplier;
+
 	// Clocks
 	static constexpr XTAL H89_CLOCK = XTAL(12'288'000) / 6;
 	static constexpr XTAL INS8250_CLOCK = XTAL(1'843'200);
 
 	static constexpr uint8_t GPP_SINGLE_STEP_BIT = 0;
 	static constexpr uint8_t GPP_ENABLE_TIMER_INTERRUPT_BIT = 1;
+	static constexpr uint8_t GPP_SPEED_SELECT_BIT = 4;
 	static constexpr uint8_t GPP_DISABLE_ROM_BIT = 5;
 	static constexpr uint8_t GPP_H17_SIDE_SELECT_BIT = 6;
 
@@ -329,6 +334,12 @@ static INPUT_PORTS_START( h89 )
     PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
     PORT_DIPSETTING( 0x80, "Auto" )
 */
+
+	PORT_START("CONFIG")
+	PORT_CONFNAME(0x03, 0x00, "CPU Clock Speed Upgrade")
+	PORT_CONFSETTING(0x00, DEF_STR( None ) )
+	PORT_CONFSETTING(0x01, "2 / 4 MHz")
+	PORT_CONFSETTING(0x02, "2 / 6 MHz")
 INPUT_PORTS_END
 
 
@@ -338,6 +349,7 @@ void h89_state::machine_start()
 	save_item(NAME(m_rom_enabled));
 	save_item(NAME(m_timer_intr_enabled));
 	save_item(NAME(m_floppy_ram_wp));
+	save_item(NAME(m_cpu_speed_multiplier));
 
 	// update RAM mappings based on RAM size
 	uint8_t *m_ram_ptr = m_ram->pointer();
@@ -386,6 +398,29 @@ void h89_state::machine_reset()
 	m_timer_intr_enabled = true;
 	m_floppy_ram_wp = false;
 
+	ioport_value const cfg(m_config->read());
+
+	// CPU clock speed
+	const uint8_t selected_clock_upgrade = cfg & 0x3;
+
+	switch (selected_clock_upgrade)
+	{
+	case 0x01:
+		// 4 MHz was offered by several companies including Kres, ANAPRO, and an article
+		// in REMark magazine.
+		m_cpu_speed_multiplier = 2;
+		break;
+	case 0x02:
+		// 6 MHz was offered by at least ANAPRO, and a how to article in CHUG newsletter
+		m_cpu_speed_multiplier = 3;
+		break;
+	case 0x00:
+	default:
+		// No speed upgrade installed - Standard Clock
+		m_cpu_speed_multiplier = 1;
+		break;
+	}
+
 	update_gpp(0);
 	update_mem_view();
 }
@@ -429,20 +464,39 @@ void h89_state::update_mem_view()
 	m_mem_view.select(m_rom_enabled ? (m_floppy_ram_wp ? 0 : 1) : 2);
 }
 
+// General Purpose Port
+//
+// Bit     OUTPUT
+// ---------------------
+//  0    Single-step enable
+//  1    2 mSec interrupt enable
+//  2    Latched bit MEM 1 H on memory exp connector
+//  3    Not used
+//  4    Latched bit MEM 0 H on memory expansion connector (Commonly used for Speed upgrades)
+//  5    ORG-0 (CP/M map)
+//  6    Latched bit I/O 0 on I/O exp connector
+//  7    Latched bit I/O 1 on I/O exp connector
+//
 void h89_state::update_gpp(uint8_t gpp)
 {
+	uint8_t changed_gpp = gpp ^ m_gpp;
+
 	m_gpp = gpp;
 
-	bool new_rom_enabled = BIT(m_gpp, GPP_DISABLE_ROM_BIT) == 0;
+	m_timer_intr_enabled = bool(BIT(m_gpp, GPP_ENABLE_TIMER_INTERRUPT_BIT));
 
-	if (m_rom_enabled != new_rom_enabled)
+	if (BIT(changed_gpp, GPP_DISABLE_ROM_BIT))
 	{
-		m_rom_enabled = new_rom_enabled;
+		m_rom_enabled = BIT(m_gpp, GPP_DISABLE_ROM_BIT) == 0;
 
 		update_mem_view();
 	}
 
-	m_timer_intr_enabled = bool(BIT(m_gpp, GPP_ENABLE_TIMER_INTERRUPT_BIT));
+	if (BIT(changed_gpp, GPP_SPEED_SELECT_BIT))
+	{
+		m_maincpu->set_clock(BIT(m_gpp, GPP_SPEED_SELECT_BIT) ?
+			H89_CLOCK * m_cpu_speed_multiplier : H89_CLOCK);
+	}
 }
 
 // General Purpose Port
@@ -458,6 +512,7 @@ static void tlb_options(device_slot_interface &device)
 	device.option_add("heath", HEATH_TLB);
 	device.option_add("gp19", HEATH_GP19);
 	device.option_add("super19", HEATH_SUPER19);
+	device.option_add("superset", HEATH_SUPERSET);
 	device.option_add("ultrarom", HEATH_ULTRA);
 	device.option_add("watzman", HEATH_WATZ);
 }
@@ -476,7 +531,7 @@ void h89_state::h89(machine_config & config)
 	m_maincpu->set_addrmap(AS_IO, &h89_state::h89_io);
 	m_maincpu->set_irq_acknowledge_callback("intr_socket", FUNC(heath_intr_socket::irq_callback));
 
-	HEATH_INTR_SOCKET(config, m_intr_socket, intr_ctrl_options, "h37");
+	HEATH_INTR_SOCKET(config, m_intr_socket, intr_ctrl_options, "h37", true);
 	m_intr_socket->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("16K,32K,48K").set_default_value(0x00);

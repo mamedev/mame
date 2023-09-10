@@ -288,7 +288,7 @@ protected:
 	bool get_text_pixel(int line, int pixel, uint16_t *pix);
 	bool draw_gfx_scanline(bitmap_ind16 &bitmap, rectangle cliprect, uint8_t priority);
 	bool draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, screen_device &screen, rectangle cliprect);
 	void draw_bg(bitmap_ind16 &bitmap, screen_device &screen, int layer, bool opaque, rectangle rect);
 	template <bool Blend> rgb_t get_gfx_pixel(int scanline, int pixel, bool gfxblend, rgb_t blendpix);
 

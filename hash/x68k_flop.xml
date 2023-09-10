@@ -6,6 +6,7 @@ license:CC0-1.0
 TODO compatibility notes:
 - identify/translate all "loading Abort" causes;
 - verify doujinshi bugs that are really bugs and not bad coding or even bad dumps;
+- fill in year dates for doujinshi games (best guess: dir the contents and pickup latest date, always mark it with a question mark)
 
 Image formats:
 
@@ -1540,11 +1541,14 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!-- boot OK, has huge layer alignment issues in-game -->
-	<software name="atomrobo" supported="no">
+	<software name="atomrobo" supported="yes">
 		<description>Atomic Robo-Kid</description>
 		<year>1990</year>
 		<publisher>システムサコム (System Sacom)</publisher>
+		<notes><![CDATA[
+Stage 3 1st boss has a corrupted layer on top of it (fixed)
+Weapon bar goes under some playfield elements during gameplay, on stage 1 pick a weapon then go all the way down (fixed, sprite orthogonality)
+]]></notes>
 		<info name="alt_title" value="アトミックロボキッド" />
 		<info name="release" value="19901220" />
 		<part name="flop1" interface="floppy_5_25">
@@ -1683,7 +1687,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="bgelmntt">
+	<software name="bgelmntt" supported="yes">
 		<description>Blade of The Great Elements (Test Version)</description>
 		<year>1990</year>
 		<publisher>アミューズメント (Amusement)</publisher>
@@ -1695,7 +1699,6 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!-- boot OK -->
 	<software name="btlchess" supported="yes">
 		<description>Battle Chess</description>
 		<year>1989</year>
@@ -2906,13 +2909,17 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!-- boot OK, Title screen has wrong scroll effect, no "get ready" ADPCM at first life/first stage? -->
-	<software name="codezero" supported="partial">
+	<software name="codezero" supported="yes">
 		<description>Code-Zero</description>
 		<year>1991</year>
 		<publisher>エニックス (Enix)</publisher>
+		<notes><![CDATA[
+Enix logo and title screen is a test case for [CRTC] abuse (fixed)
+No "get ready" [ADPCM] sample on first life/first stage? (btanb)
+]]></notes>
 		<info name="alt_title" value="コードゼロ" />
 		<info name="release" value="19911129" />
+		<info name="developer" value="Random House" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
@@ -3128,10 +3135,13 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="cybrbloc">
+	<software name="cybrbloc" supported="partial">
 		<description>Cyberblock Metal Orange EX</description>
 		<year>1993</year>
 		<publisher>サイバーテックカスタム (Cybertech Custom)</publisher>
+		<notes><![CDATA[
+Corrupt screen drawing (text pitch) on transitions, [CRTC] disabled?
+]]></notes>
 		<info name="alt_title" value="メタルオレンジEX" />
 		<info name="release" value="199301xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3265,11 +3275,14 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!-- boot OK, setting mode 2 causes no sprites (offset?), stage 3-2 has slight priority issue with moving platforms -->
 	<software name="daimakai" supported="partial">
 		<description>Dai Makaimura</description>
 		<year>1994</year>
 		<publisher>カプコン (Capcom)</publisher>
+		<notes><![CDATA[
+Sets up 121 Hz refresh screen if video mode is set to 2
+Stage 3-2 has sprite priority masking bug with stone faces and moving platforms and tongues (btanb)
+]]></notes>
 		<info name="alt_title" value="大魔界村" />
 		<info name="release" value="19940422" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3515,7 +3528,6 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!-- boot OK -->
 	<software name="dashyar" supported="yes">
 		<description>Dash Yarou</description>
 		<year>1991</year>
@@ -5132,10 +5144,13 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="exterlin">
+	<software name="exterlin" supported="partial">
 		<description>Exterlien</description>
 		<year>1990</year>
 		<publisher>ディー・オー (D.O.)</publisher>
+		<notes><![CDATA[
+D.O. blue logo drawing is cutoff on right edge
+]]></notes>
 		<info name="alt_title" value="エクスタリアン" />
 		<info name="release" value="19901207" />
 		<part name="flop1" interface="floppy_5_25">
@@ -5304,10 +5319,14 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="flappy2">
+	<software name="flappy2" supported="partial">
+		<!-- lowercase "resurrection" is actually from title screen -->
 		<description>Flappy 2 - The resurrection of Blue Star</description>
 		<year>1989</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
+		<notes><![CDATA[
+Has sprite masking issue with elevators and blocks in stage 1-04
+]]></notes>
 		<info name="alt_title" value="フラッピー2 ブルースター復活の日" />
 		<info name="release" value="19891201" />
 		<part name="flop1" interface="floppy_5_25">
@@ -6348,12 +6367,16 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="groupx">
+	<software name="groupx" supported="partial">
 		<description>Group X</description>
 		<year>1991</year>
 		<publisher>コムパック (Compac)</publisher>
+		<notes><![CDATA[
+Sometimes turning doesn't work (verify)
+]]></notes>
 		<info name="alt_title" value="グループX" />
 		<info name="release" value="199107xx" />
+		<info name="usage" value="HELP key to start engine, SPACE key to accelerate, other buttons are mappable from control and switch submenus (defaults to mouse + button press to turn)" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
@@ -9727,7 +9750,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="gundamco">
+	<software name="gundamco" supported="yes">
 		<description>Mobile Suit Gundam Classic Operation</description>
 		<year>1991</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
@@ -13383,11 +13406,14 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!-- boot OK, throws "cannot read file" error when asked to disc swap on end of stage 4 -->
 	<software name="strider" supported="no">
 		<description>Strider Hiryuu</description>
 		<year>1992</year>
 		<publisher>カプコン (Capcom)</publisher>
+		<notes><![CDATA[
+Throws "cannot read file, press space bar" when asked to [FDC] disk swap with System Disk at end of stage 4
+Stage 3 background color in up climb section is black rather than cyan like Arcade version (verify)
+]]></notes>
 		<info name="alt_title" value="ストライダー飛竜" />
 		<info name="release" value="19921127" />
 		<part name="flop1" interface="floppy_5_25">
@@ -13524,10 +13550,15 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="shangon">
+	<software name="shangon" supported="partial">
 		<description>Super Hang-On</description>
 		<year>1989</year>
 		<publisher>Sharp</publisher>
+		<notes><![CDATA[
+Countdown text tileset during loading has extra black dots (baddump?)
+omake: has a minigame under the "^_^" folder
+omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort Retry Fail even if MIDI is attached, needs config?)
+]]></notes>
 		<info name="alt_title" value="スーパーハングオン" />
 		<info name="release" value="19891225" />
 		<info name="usage" value="Supports analog joystick." />
@@ -24221,10 +24252,14 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="cylips">
+	<software name="cylips" supported="partial">
 		<description>Cy-Lips</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Uses raster effect for background in stage 1, flickers
+Corrupt screen drawing on transitions, [CRTC] disabled?
+]]></notes>
 		<info name="developer" value="Twinkle Soft" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
@@ -24745,10 +24780,14 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="disk7fmv">
+	<software name="disk7fmv" supported="partial">
 		<description>Disk7 FMV - Choujikuu Yousai Macross</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Looks ugly, [screen] post-processing artifact?
+[ADPCM] has tons of aliasing
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="disk7_fmv.xdf" size="1261568" crc="452ee5cb" sha1="991cef991283547269253a8a22b05f7642d6fab9" />
@@ -24756,10 +24795,16 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="disk8fmv">
+	<software name="disk8fmv" supported="partial">
 		<description>Disk8 FMV - Fushigi no Umi no Nadia</description>
-		<year>19??</year>
+		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Looks ugly, [screen] post-processing artifact?
+[ADPCM] has tons of aliasing
+Disk auto-ejects after loading
+Disk contains one "NADIA" (fullwidth, cannot be read thru "type") binary file
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="disk8_fmv.xdf" size="1261568" crc="e6fd2663" sha1="07ef61a78cf4dcd40af4cfa3853f8a330225a8ee" />
@@ -24767,11 +24812,15 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- boot OK (very poor audiovideo "codec") -->
-	<software name="disk9fmv" supported="yes">
+	<software name="disk9fmv" supported="partial">
 		<description>Disk9 FMV - Honou no Tenkousei</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Looks ugly, [screen] post-processing artifact?
+[ADPCM] has tons of aliasing
+Disk auto-ejects after loading
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="disk9_fmv.xdf" size="1261568" crc="cc920255" sha1="107ca885217a94df6261d26b55de159334794582" />
@@ -24938,11 +24987,13 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- boot OK, no sound (btanb?) -->
 	<software name="dslayer" supported="partial">
 		<description>Dragon Slayer (L1.1)</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+No sound (verify)
+]]></notes>
 		<info name="developer" value="Beauty Planets" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
@@ -26180,7 +26231,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="hnkyo68k">
+	<software name="hnkyo68k" supported="yes">
 		<description>Heiankyo Alien 68k</description>
 		<year>1988</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -28645,9 +28696,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="ohhajiki">
+	<software name="ohhajiki" supported="yes">
 		<description>Oh! Hajiki!</description>
-		<year>19??</year>
+		<year>1995?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Maru" />
 		<part name="flop1" interface="floppy_5_25">
@@ -29101,10 +29152,13 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="pole2win">
+	<software name="pole2win" supported="no">
 		<description>Pole To Win</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Expects to read track data from [FDC] drive 1, works if same disk loaded.
+]]></notes>
 		<info name="developer" value="MIX" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
@@ -31869,11 +31923,13 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- boot OK, busted gameplay timings (slightly advances if you keep a keyboard button pressed?) -->
-	<software name="terradrv" supported="no">
+	<software name="terradrv" supported="partial">
 		<description>Terra Drive</description>
 		<year>1989</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Corrupt orange billboard GFXs, baddump?
+]]></notes>
 		<info name="developer" value="Unique's" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
@@ -32273,10 +32329,14 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="toypop">
+	<software name="toypop" supported="no">
 		<description>Toy Pop</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Very slow refresh rate setup (21 Hz)
+Has no title screen/intro GFXs
+]]></notes>
 		<info name="developer" value="R.G.B." />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
@@ -33032,17 +33092,18 @@ a DIM dump with DIFC, these are at least confirmed as coming from real disk (by 
 		</part>
 	</software>
 
-	<!-- doesn't autoboot, input doesn't work, wrong colors -->
 	<software name="smba" cloneof="smb" supported="no">
 		<description>Famicom - Super Mario Bros.</description>
 		<year>1985</year>
-		<!-- doujin like parent? -->
-		<publisher>Nintendo</publisher>
+		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+doesn't autoboot, input doesn't work, wrong colors, likely baddump
+]]></notes>
 		<!-- This must be loaded in DF1 with Human68k OS in DF0 (correct?) -->
 		<info name="usage" value="Mount Human68k in DF0 and this in DF1, type S_MARIO.X at prompt" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="famicom - super mario bros (1985) (nintendo) [xdf].xdf" size="1261568" crc="2c6d35b3" sha1="c1dfd26c4d7fde821400b37d0c4de60e757dd440" />
+				<rom name="famicom - super mario bros (1985) (nintendo) [xdf].xdf" size="1261568" crc="2c6d35b3" sha1="c1dfd26c4d7fde821400b37d0c4de60e757dd440" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

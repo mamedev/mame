@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="mac_hdd" description="Mac Harddisks">
+<softwarelist name="mac_hdd" description="Apple Macintosh hard disk images">
 	<software name="mac608">
 		<description>System Software 6.0.8</description>
 		<year>1988</year>

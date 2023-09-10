@@ -51,7 +51,7 @@ license:CC0-1.0
 		<rect state="1"><color red="1.0" green="0.1" blue="0.15" /></rect>
 	</element>
 
-	<element name="clawpos" defstate="0">
+	<element name="mpos" defstate="0">
 		<rect>
 			<bounds x="0" y="0" width="4096" height="6.25" />
 			<color alpha="0" />
@@ -723,20 +723,21 @@ license:CC0-1.0
 
 		<!-- optional claw position overlay -->
 		<collection name="Claw Position">
-			<element name="clawx" ref="clawpos">
-				<animate name="clawy" />
+			<element name="pos_x" ref="mpos">
+				<animate name="pos_y" />
 				<bounds state="0" x="-106.625" y="-168.625" width="819.2" height="1.25" />
 				<bounds state="1500" x="-106.625" y="131.375" width="819.2" height="1.25" />
 				<color alpha="0.4" />
 			</element>
-			<element name="clawx" ref="clawpos">
-				<animate name="clawy" />
+			<element name="pos_x" ref="mpos">
+				<animate name="pos_y" />
 				<bounds state="0" x="-516.225" y="-168.625" width="819.2" height="1.25" />
 				<bounds state="1500" x="-516.225" y="131.375" width="819.2" height="1.25" />
 				<color alpha="0.9" />
 			</element>
 
 			<element ref="blackb"><bounds x="-516.225" y="-200" width="409.6" height="400" /></element>
+			<element ref="blackb"><bounds x="302.975" y="-200" width="409.6" height="400" /></element>
 		</collection>
 
 	</view>

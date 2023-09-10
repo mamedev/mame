@@ -630,11 +630,11 @@ void lordgun_state::machine_start()
 
 void lordgun_state::lordgun(machine_config &config)
 {
-	M68000(config, m_maincpu, XTAL(20'000'000) / 2);
+	M68000(config, m_maincpu, 20_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lordgun_state::lordgun_map);
 	m_maincpu->set_vblank_int("screen", FUNC(lordgun_state::irq4_line_hold));
 
-	Z80(config, m_soundcpu, XTAL(20'000'000) / 4);
+	Z80(config, m_soundcpu, 20_MHz_XTAL / 4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &lordgun_state::soundmem_map);
 	m_soundcpu->set_addrmap(AS_IO, &lordgun_state::lordgun_soundio_map);
 
@@ -674,21 +674,21 @@ void lordgun_state::lordgun(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(3'579'545)));
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 3.579545_MHz_XTAL));
 	ymsnd.irq_handler().set_inputline("soundcpu", 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, m_oki, XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH);   // ? 5MHz can't be right!
+	OKIM6295(config, m_oki, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void lordgun_state::aliencha(machine_config &config)
 {
-	M68000(config, m_maincpu, XTAL(20'000'000) / 2);
+	M68000(config, m_maincpu, 20_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lordgun_state::aliencha_map);
 	m_maincpu->set_vblank_int("screen", FUNC(lordgun_state::irq4_line_hold));
 
-	Z80(config, m_soundcpu, XTAL(20'000'000) / 4);
+	Z80(config, m_soundcpu, 20_MHz_XTAL / 4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &lordgun_state::soundmem_map);
 	m_soundcpu->set_addrmap(AS_IO, &lordgun_state::aliencha_soundio_map);
 
@@ -728,15 +728,15 @@ void lordgun_state::aliencha(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	ymf278b_device &ymf(YMF278B(config, "ymf", XTAL(33'868'800))); // ? 33.8688MHz matches video (decrease for faster music tempo)
+	ymf278b_device &ymf(YMF278B(config, "ymf", 33.8688_MHz_XTAL));
 	ymf.set_addrmap(0, &lordgun_state::ymf278_map);
 	ymf.irq_handler().set_inputline("soundcpu", 0);
 	ymf.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	OKIM6295(config, m_oki, XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH); // ? 5MHz can't be right
+	OKIM6295(config, m_oki, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	OKIM6295(config, "oki2", XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // ? 5MHz can't be right
+	OKIM6295(config, "oki2", 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -1002,41 +1002,72 @@ ROM_END
   (C) 1994 IGS
   12/13/94 13:55:47 in test mode
 
+MADE IN TAIWAN IGS PCB NO-0085
++--------------------------------------------------------+
+|              M6295 ALIEN.U66 +------++------+ IGST0103 |
+|   YMF278B-F  M6295 ALIEN.U65 |  IGS ||  IGS | IGST0102 |
+|     33.8688MHz 6116 6116     |  008 ||  006 | IGST0101 |
+|  YRW801-M ALIEN.u68 6116     +------++------+ IGSB0101 |
+|          Z840006PSC                           IGSB0102 |
+|                                        PAL    IGSB0103 |
+|                                   63C256   61C64 61C64 |
+|J                                  63C256   61C64 61C64 |
+|A 63C256                           63C256               |
+|M 63C256              +------+     63C256 20.000MHz PAL |
+|M  PAL  IGSC0101.U81  |  IGS |     63C256 PAL  +------+ |
+|A                U80  |  005 |                 |  IGS | |
+|      MC86000P10 U79  +------+                 |  007 | |
+|                                               +------+ |
+|                PAL        6116                         |
+|          D8255 PAL       61C64                IGSA0101 |
+|    93C46 D8255 PAL        6116                IGSA0102 |
+| JP9       SW3 SW2 SW1     6116                IGSA0103 |
++--------------------------------------------------------+
+
+HW Notes:
+ MC68000P10 clock: 10.000MHz (20.000MHz/2)
+ Z840006PSC clock: 5.000MHz (20.000MHz/4)
+  YMF278B-F clock: 33.8688MHz
+   OKI 6295 clock: 1.000MHz (20.000MHz/20)
+    OKI 6295 pin7: High
+
+Standard JAMMA edge connector
+JP9 - 10 pin header
+
 ***************************************************************************/
 
 ROM_START( alienchac )
-	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000
-	// load the world version code in the top half, or it does not work. Are these program roms half size?
-	ROM_LOAD( "igsc0102.u81",     0x00000, 0x200000, BAD_DUMP CRC(e3432be3) SHA1(d3597c885571d4a996afaaf29c78da123798371e) )
-	ROM_LOAD16_BYTE( "hfh_p.u80", 0x00000, 0x080000, BAD_DUMP CRC(5175ebdc) SHA1(4a0bdda0f8291f895f888bfd45328b2b124b9051) )
-	ROM_LOAD16_BYTE( "hfh_p.u79", 0x00001, 0x080000, BAD_DUMP CRC(42ad978c) SHA1(eccb96e7170902b37989c8f207e1a821f29b2475) )
+	ROM_REGION( 0x300000, "maincpu", 0 ) // 68000
+	ROM_LOAD16_BYTE( "hfh_p.u80", 0x000000, 0x080000, CRC(5175ebdc) SHA1(4a0bdda0f8291f895f888bfd45328b2b124b9051) )
+	ROM_LOAD16_BYTE( "hfh_p.u79", 0x000001, 0x080000, CRC(42ad978c) SHA1(eccb96e7170902b37989c8f207e1a821f29b2475) )
+	ROM_LOAD( "igsc0101.u81",     0x100000, 0x200000, CRC(704c48cf) SHA1(908017b206622680ab766251294806c8c8c9388b) ) // bytes 0x000000-0x0fffff == 0x100000-0x1fffff of IGSC0102
 
 	ROM_REGION( 0x010000, "soundcpu", 0 ) // Z80
-	ROM_LOAD( "hfh_s.u86", 0x00000, 0x10000, CRC(5728a9ed) SHA1(e5a9e4a1a2cc6c848b08608bc8727bc739270873) )
+	ROM_LOAD( "alien_u-86.u86", 0x00000, 0x10000, CRC(5728a9ed) SHA1(e5a9e4a1a2cc6c848b08608bc8727bc739270873) ) // labeled as  ALIEN  U-86, == hfh_s.u86
 
 	ROM_REGION( 0x300000, "tiles0", 0 ) // Tilemaps 0 & 3
-	ROM_LOAD( "igst0101.u9",  0x000000, 0x100000, BAD_DUMP CRC(2ce12d7b) SHA1(aa93a82e5f4015c46bb705efb2051b62cd5d7e04) ) /* Graphics ROMs not confirmed to be the same */
-	ROM_LOAD( "igst0102.u10", 0x100000, 0x100000, BAD_DUMP CRC(542a76a0) SHA1(6947b50a024d0053c1eaf9da8c90652bab875142) ) /* Use these until roms are dumped / verified */
-	ROM_LOAD( "igst0103.u11", 0x200000, 0x100000, BAD_DUMP CRC(adf5698a) SHA1(4b798f8acc5d7581c7e0989260863ae0ca654acd) )
+	ROM_LOAD( "igst0101.u9",  0x000000, 0x100000, CRC(2ce12d7b) SHA1(aa93a82e5f4015c46bb705efb2051b62cd5d7e04) )
+	ROM_LOAD( "igst0102.u10", 0x100000, 0x100000, CRC(542a76a0) SHA1(6947b50a024d0053c1eaf9da8c90652bab875142) )
+	ROM_LOAD( "igst0103.u11", 0x200000, 0x100000, CRC(adf5698a) SHA1(4b798f8acc5d7581c7e0989260863ae0ca654acd) )
 
 	ROM_REGION( 0x600000, "tiles1", 0 ) // Tilemaps 1 & 2
-	ROM_LOAD( "igsb0101.u8", 0x000000, 0x200000, BAD_DUMP CRC(5c995f7e) SHA1(4f08cf13e313c6802c924b914c73cab4b450da61) ) /* Graphics ROMs not confirmed to be the same */
-	ROM_LOAD( "igsb0102.u7", 0x200000, 0x200000, BAD_DUMP CRC(a2ae9baf) SHA1(338ee260c33448568f138ca00e1d4edda4da018f) ) /* Use these until roms are dumped / verified */
-	ROM_LOAD( "igsb0103.u6", 0x400000, 0x200000, BAD_DUMP CRC(11b927af) SHA1(2f15e5cea1b86cde3b679bdd0f3d79672d0ddd3e) )
+	ROM_LOAD( "igsb0101.u8",  0x000000, 0x200000, CRC(5c995f7e) SHA1(4f08cf13e313c6802c924b914c73cab4b450da61) )
+	ROM_LOAD( "igsb0102.u7",  0x200000, 0x200000, CRC(a2ae9baf) SHA1(338ee260c33448568f138ca00e1d4edda4da018f) )
+	ROM_LOAD( "igsb0103.u6",  0x400000, 0x200000, CRC(11b927af) SHA1(2f15e5cea1b86cde3b679bdd0f3d79672d0ddd3e) )
 
 	ROM_REGION( 0xc00000, "sprites", 0 ) // Sprites
-	ROM_LOAD( "igsa0101.u3", 0x000000, 0x400000, BAD_DUMP CRC(374d07c4) SHA1(87e9bfe32cbfe9964ba7253847fbd14aa3c8ed20) ) /* Graphics ROMs not confirmed to be the same */
-	ROM_LOAD( "igsa0102.u2", 0x400000, 0x400000, BAD_DUMP CRC(dbeee7ac) SHA1(e0eb0d73d9230aa6f69f5ac25d44fa19affebe88) ) /* Use these until roms are dumped / verified */
-	ROM_LOAD( "igsa0103.u1", 0x800000, 0x400000, BAD_DUMP CRC(e5f19041) SHA1(c92a29bbbcb9a1f63364c665e3e0f9679add4389) )
+	ROM_LOAD( "igsa0101.u3",  0x000000, 0x400000, CRC(374d07c4) SHA1(87e9bfe32cbfe9964ba7253847fbd14aa3c8ed20) )
+	ROM_LOAD( "igsa0102.u2",  0x400000, 0x400000, CRC(dbeee7ac) SHA1(e0eb0d73d9230aa6f69f5ac25d44fa19affebe88) )
+	ROM_LOAD( "igsa0103.u1",  0x800000, 0x400000, CRC(e5f19041) SHA1(c92a29bbbcb9a1f63364c665e3e0f9679add4389) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) // Samples
-	ROM_LOAD( "hfh_g.u65", 0x00000, 0x40000, CRC(ec469b57) SHA1(ba1668078987ad51f47bcd3e61c51a0cf2545350) )
+	ROM_LOAD( "alien_u65.u65", 0x00000, 0x40000, CRC(ec469b57) SHA1(ba1668078987ad51f47bcd3e61c51a0cf2545350) ) // labeled as  ALIEN  U65, == hfh_g.u65
 
 	ROM_REGION( 0x40000, "oki2", 0 ) // Samples
-	ROM_LOAD( "hfh_g.u66", 0x00000, 0x40000, CRC(7cfcd98e) SHA1(3b03123160adfd3404a9e0c4c68420930e80ae48) )
+	ROM_LOAD( "alien_u66.u66", 0x00000, 0x40000, CRC(7cfcd98e) SHA1(3b03123160adfd3404a9e0c4c68420930e80ae48) ) // labeled as  ALIEN  U66, == hfh_g.u66
 
 	ROM_REGION( 0x200000, "ymf", 0 ) // Samples (Standard Yamaha YRW801 2MB samples ROM)
-	ROM_LOAD( "yrw801-m", 0x000000, 0x200000, CRC(2a9d8d43) SHA1(32760893ce06dbe3930627755ba065cc3d8ec6ca) ) /* Not dumped from PCB, but is a standard samples rom */
+	ROM_LOAD( "yrw801-m", 0x000000, 0x200000, CRC(2a9d8d43) SHA1(32760893ce06dbe3930627755ba065cc3d8ec6ca) ) // Not dumped from PCB, but is a standard samples rom
 ROM_END
 
 

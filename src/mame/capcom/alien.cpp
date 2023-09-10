@@ -10,10 +10,18 @@ TODO:
   end user to care).
   The BAD_DUMP also denotes that we are missing the 256 bytes "secured silicon sector" data for
   those.
-- pingu/wontame/dokudemo sets up GPU with a comparison between DrawTrap output with DrawBitmap,
-  failing in the process;
+- Several games sets up GPU with a comparison between DrawTrap output with DrawBitmap,
+  failing in the process:
+  dokodemo (-nodrc only): bp c7aa342,1,{r1=r0;g}
+  pingu: bp ccaea4ee,1,{r9=r1;g}
+  wontame: bp cc05422c,1,{r4=r2;g}
+  masmarios: bp cc98790e,1,{r9=r1;g}
+  masmario2: bp cc8f41d8,1,{r9=r1;g}
+  dkbanans (-nodrc only): bp c48c05e,1,{r1=r0;g}
 - YMZ770B for anything but wontame;
 - Proper SIO handling, particularly IRQ source;
+- Identify and handle LCDC at $89xxxxx/$8axxxxx;
+- Understand enough of I/O system so they don't throw error codes;
 
 ===================================================================================================
 
@@ -117,6 +125,7 @@ public:
 		, m_ymz(*this, "ymz770")
 		, m_ymz_flash(*this, "ymz770_flash%d", 1U)
 		, m_io_in0(*this, "IN0")
+		, m_io_in1(*this, "IN1")
 	{ }
 
 	void alien(machine_config &config);
@@ -142,6 +151,7 @@ private:
 	required_device<ymz770_device> m_ymz;
 	optional_device_array<spansion_s29gl064s_device, 2> m_ymz_flash;
 	required_ioport m_io_in0;
+	required_ioport m_io_in1;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -167,11 +177,20 @@ u8 alien_state::fpga_r()
 void alien_state::alien_map(address_map &map)
 {
 	map(0x00000000, 0x00ffffff).rom();
-//	map(0x02000000, ...) accessed by dkbanana
+//  map(0x02000000, ...) accessed by dkbanana
 	map(0x04000000, 0x04007fff).rw("m48t35", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
 	map(0x04800000, 0x04800000).r(FUNC(alien_state::fpga_r));
 	map(0x04a00000, 0x04a00007).nopw(); // FPGA config
 	map(0x08000000, 0x08000007).portr("DSW");
+	// wontame at least
+	map(0x08800000, 0x08800001).lr16(
+		NAME([this] (offs_t offset, u32 mem_mask) {
+			return m_io_in1->read();
+		})
+	);
+//  map(0x08900000, 0x08900001) VFD - pingu & wontame at least, protocol for a LCDC (also referenced in lamp test)
+//  map(0x08a00000, 0x08a00001) DOT /
+
 	map(0x0c000000, 0x0cffffff).ram().share("workram"); // main RAM
 
 	map(0x10000000, 0x107fffff).rw(m_vram, FUNC(ram_device::read), FUNC(ram_device::write)); // GPU 1 VRAM
@@ -187,7 +206,7 @@ void alien_state::alien_map(address_map &map)
 				case 1:
 					return m_io_in0->read();
 				case 2:
-					// must be zero otherwise inputs stops working
+					// must be zero otherwise inputs stops working in mariojjl (tbd)
 					return (u32)0;
 			}
 			return 0xffffffff;
@@ -196,8 +215,8 @@ void alien_state::alien_map(address_map &map)
 			// writing to 0x14000000: data out
 		})
 	);
-//	map(0x14100010, 0x14100070) masmario2/dkbanans satellite terminal comms?
-//	map(0x18000000, 0x1800000f).r(FUNC(alien_state::test_r)).nopw(); // Alien CF ATA, other games have it other way
+//  map(0x14100010, 0x14100070) masmario2/dkbanans satellite terminal comms?
+//  map(0x18000000, 0x1800000f).r(FUNC(alien_state::test_r)).nopw(); // Alien CF ATA, other games have it other way
 
 	// pingu ATA i/f, similar to konami/konamigs.cpp
 	map(0x18800000, 0x18800007).lrw16(
@@ -242,8 +261,8 @@ static INPUT_PORTS_START( alien )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // Coin SW "R-Err"
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Push SW L")
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Push SW R")
-	PORT_BIT( 0x000000c0, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x000000c0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_SERVICE1 ) // Test SW
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Enter SW")
 	PORT_CONFNAME( 0x00001800, 0x00001800, "Mini JP SW" )
@@ -251,11 +270,14 @@ static INPUT_PORTS_START( alien )
 	PORT_CONFSETTING( 0x00001000, "0/1" )
 	PORT_CONFSETTING( 0x00000800, "1/0" )
 	PORT_CONFSETTING( 0x00001800, "1/1" )
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x7fff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_START1 ) // "Star SW" (sic)
+
+	PORT_START("IN1")
+	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
 	// "DIP 8"
@@ -272,12 +294,57 @@ static INPUT_PORTS_START( alien )
 	// "DIP 9"
 	PORT_DIPUNKNOWN_DIPLOC( 0x01000000, 0x01000000, "SW2:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02000000, 0x02000000, "SW2:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04000000, 0x04000000, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04000000, 0x04000000, "SW2:3" ) // additional test mode in wontame (needs both this and SW1:7 to be enabled)
 	PORT_DIPUNKNOWN_DIPLOC( 0x08000000, 0x08000000, "SW2:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10000000, 0x10000000, "SW2:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20000000, 0x20000000, "SW2:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40000000, 0x40000000, "SW2:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80000000, 0x80000000, "SW2:8" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( wontame )
+	PORT_INCLUDE( alien )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN ) // Coin SW "L-Err"
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN1 ) // Coin SW "L"
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN ) // Coin SW "R-Err"
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN2 ) // Coin SW "R"
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Push SW L")
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Action SW L")
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Push SW R")
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Action SW R")
+	// related to solenoid test?
+	PORT_CONFNAME( 0x00000300, 0x00000300, "Mini JP SW" )
+	PORT_CONFSETTING( 0x00000000, "0/0" )
+	PORT_CONFSETTING( 0x00000100, "1/0" )
+	PORT_CONFSETTING( 0x00000200, "0/1" )
+	PORT_CONFSETTING( 0x00000300, "1/1" )
+//  PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Enter SW")
+	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "pusher"
+	PORT_BIT( 0x0000f000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "kurukuru" (4 SW)
+	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "chacker sw left-top"
+	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "chacker sw right-top"
+	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "chacker sw center-bottom"
+	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "chacker sw left-bottom"
+	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "chacker sw right-bottom"
+	PORT_BIT( 0x00200000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "v chacker 1"
+	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "v chacker 2"
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "v chacker 3"
+	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "v chacker 4"
+	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "v chacker 5"
+	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "v chacker 6"
+	PORT_BIT( 0x08000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "v chacker 7"
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "v chacker 8"
+	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "left hopper"
+	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "center hopper"
+	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "right hopper"
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_SERVICE1 ) // Test SW
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Enter SW")
+	PORT_BIT( 0xfffffffc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 template <unsigned N> void alien_state::gpu_irq_w(int state)
@@ -318,7 +385,7 @@ void alien_state::alien(machine_config &config)
 	SH4LE(config, m_maincpu, MASTER_CLOCK);    /* 200MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &alien_state::alien_map);
 	m_maincpu->set_periodic_int(FUNC(alien_state::sio_irq_w), attotime::from_hz(60));
-//	m_maincpu->set_force_no_drc(true);
+//  m_maincpu->set_force_no_drc(true);
 
 	// Configured as FCRAM 16MBit with 8MB / 64-bit data bus thru MMR register
 	RAM(config, m_vram);
@@ -571,17 +638,17 @@ ROM_END
 
 
 // Custom
-GAME( 2005, alien,     0,        alien,     alien, alien_state, empty_init,    ROT0, "Capcom",               "Alien: The Arcade Medal Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2007, dkbanana,  0,        alien,     alien, alien_state, empty_init,    ROT0, "Capcom",               "Donkey Kong Banana Kingdom (host)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2007, dkbanans,  dkbanana, masmario2, alien, alien_state, init_dkbanans, ROT0, "Capcom",               "Donkey Kong Banana Kingdom (satellite)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2004, masmario,  0,        alien,     alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party (center)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2004, masmarios, 0,        alien,     alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party (satellite)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2005, masmario2, 0,        masmario2, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, alien,     0,        alien,     alien,   alien_state, empty_init,    ROT0, "Capcom",               "Alien: The Arcade Medal Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, dkbanana,  0,        alien,     alien,   alien_state, empty_init,    ROT0, "Capcom",               "Donkey Kong Banana Kingdom (host)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, dkbanans,  dkbanana, masmario2, alien,   alien_state, init_dkbanans, ROT0, "Capcom",               "Donkey Kong Banana Kingdom (satellite)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004, masmario,  0,        alien,     alien,   alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party (center)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004, masmarios, 0,        alien,     alien,   alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party (satellite)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, masmario2, 0,        masmario2, alien,   alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // Medalusion 1
-GAME( 2006, mariojjl,  0,        alien,     alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no JanJanLand (Ver.1.00C, 06/08/29)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2005, mmaruchan, 0,        alien,     alien, alien_state, empty_init,    ROT0, "Capcom",               "Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki (Ver.1.00B, 05/06/22)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ちびまる子ちゃん「みんなですごろく遊び」の巻
-GAME( 2004, mmaruchana,mmaruchan,alien,     alien, alien_state, empty_init,    ROT0, "Capcom",               "Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki (Ver.1.00A, 04/04/20)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ちびまる子ちゃん「みんなですごろく遊び」の巻
+GAME( 2006, mariojjl,  0,        alien,     alien,   alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no JanJanLand (Ver.1.00C, 2006/08/29)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, mmaruchan, 0,        alien,     alien,   alien_state, empty_init,    ROT0, "Capcom",               "Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki (Ver.1.00B, 2005/06/22)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ちびまる子ちゃん「みんなですごろく遊び」の巻
+GAME( 2004, mmaruchana,mmaruchan,alien,     alien,   alien_state, empty_init,    ROT0, "Capcom",               "Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki (Ver.1.00A, 2004/04/20)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ちびまる子ちゃん「みんなですごろく遊び」の巻
 // Medalusion 2
-GAME( 2006, dokodemo,  0,        alien,     alien, alien_state, empty_init,    ROT0, "Sony / Capcom",        "Doko Demo Issho: Toro's Fishing", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2006, pingu,     0,        alien,     alien, alien_state, empty_init,    ROT0, "Pygos Group / Capcom", "Pingu's Ice Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2008, wontame,   0,        alien,     alien, alien_state, empty_init,    ROT0, "Capcom / Tomy",        "Won! Tertainment Happy Channel (Ver E)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, dokodemo,  0,        alien,     alien,   alien_state, empty_init,    ROT0, "Sony / Capcom",        "Doko Demo Issho: Toro's Fishing (Ver.1.00, 2006/06/07)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, pingu,     0,        alien,     alien,   alien_state, empty_init,    ROT0, "Pygos Group / Capcom", "Pingu's Ice Block (Ver.1.00 2006/01/27)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2008, wontame,   0,        alien,     wontame, alien_state, empty_init,    ROT0, "Capcom / Tomy",        "Won! Tertainment Happy Channel (Ver.1.00E 2008/02/21)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

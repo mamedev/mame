@@ -1177,7 +1177,7 @@ static INPUT_PORTS_START( thrilld_gk )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( thrilld_gn )
-	PORT_INCLUDE( thrilld )
+	PORT_INCLUDE( thrilld_gk )
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Gear Shift Up")

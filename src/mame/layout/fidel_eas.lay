@@ -415,10 +415,37 @@ license:CC0-1.0
 	</group>
 
 
+<!-- 7seg panel -->
+
+	<group name="digits">
+		<bounds x="0" y="0" width="25.5" height="8.5" />
+
+		<element name="digit1" ref="digit">
+			<bounds x="0" y="0" width="5.66" height="8.5" />
+		</element>
+		<element name="digit0" ref="digit">
+			<bounds x="5.66" y="0" width="5.66" height="8.5" />
+		</element>
+		<element name="digit2" ref="digit">
+			<bounds x="14.16" y="0" width="5.66" height="8.5" />
+		</element>
+		<element name="digit3" ref="digit">
+			<bounds x="19.82" y="0" width="5.66" height="8.5" />
+		</element>
+
+		<element name="0.7" ref="led">
+			<bounds x="12.58" y="1.5" width="0.85" height="0.85" />
+		</element>
+		<element name="1.7" ref="led">
+			<bounds x="12.13" y="6.15" width="0.85" height="0.85" />
+		</element>
+	</group>
+
+
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-13.5" right="87.5" top="-1" bottom="100.5" />
+		<bounds left="-13.5" right="87.5" top="-1" bottom="100" />
 
 		<element ref="cblack"><bounds x="-1.5" y="-1" width="89" height="89" /></element>
 		<element ref="cwhite"><bounds x="2.5" y="3" width="81" height="81" /></element>
@@ -426,8 +453,7 @@ license:CC0-1.0
 
 		<group ref="sb_ui"><bounds x="-12.5" y="3" width="10" height="80" /></group>
 
-	<!-- chessboard coords -->
-
+		<!-- chessboard coords -->
 		<element ref="text_8"><bounds x="-0.3" y="7.5" width="2" height="2" /></element>
 		<element ref="text_7"><bounds x="-0.3" y="17.5" width="2" height="2" /></element>
 		<element ref="text_6"><bounds x="-0.3" y="27.5" width="2" height="2" /></element>
@@ -446,7 +472,8 @@ license:CC0-1.0
 		<element ref="text_g"><bounds x="67" y="85" width="2" height="2" /></element>
 		<element ref="text_h"><bounds x="77" y="85" width="2" height="2" /></element>
 
-	<!-- bottom side -->
+		<!-- bottom side -->
+		<group ref="digits"><bounds x="7.5" y="90" width="20" height="6.66" /></group>
 
 		<element name="8.8" ref="led2"><bounds x="42" y="90" width="1.5" height="1.5" /></element>
 		<element name="8.9" ref="led2"><bounds x="45" y="90" width="1.5" height="1.5" /></element>
@@ -496,28 +523,6 @@ license:CC0-1.0
 		<element ref="text_r1"><bounds x="70" y="89.25" width="6" height="1.5" /></element>
 		<element ref="text_r2"><bounds x="70" y="90.75" width="6" height="1.5" /></element>
 		<element ref="text_r3"><bounds x="70" y="94" width="6" height="1.5" /></element>
-
-	<!-- panel 7seg leds -->
-
-		<element name="digit1" ref="digit">
-			<bounds x="3" y="90" width="5.66" height="8.5" />
-		</element>
-		<element name="digit0" ref="digit">
-			<bounds x="8.66" y="90" width="5.66" height="8.5" />
-		</element>
-		<element name="digit2" ref="digit">
-			<bounds x="17.16" y="90" width="5.66" height="8.5" />
-		</element>
-		<element name="digit3" ref="digit">
-			<bounds x="22.82" y="90" width="5.66" height="8.5" />
-		</element>
-
-		<element name="0.7" ref="led">
-			<bounds x="15.58" y="91.5" width="0.85" height="0.85" />
-		</element>
-		<element name="1.7" ref="led">
-			<bounds x="15.13" y="96.15" width="0.85" height="0.85" />
-		</element>
 
 	</view>
 </mamelayout>
