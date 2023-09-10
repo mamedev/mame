@@ -71,8 +71,8 @@ public:
 	// internally for use by the sound system
 	void mix(stream_buffer::sample_t *leftmix, stream_buffer::sample_t *rightmix, attotime start, attotime end, int expected_samples, bool suppress);
 
-	// panning
-	void set_pan(double pan) { m_pan = std::clamp(pan, 0.0, 2.0); }
+	// user panning configuration
+	void set_pan(float pan) { m_pan = std::clamp(pan, -1.0f, 1.0f); }
 	float pan() { return m_pan; }
 	float defpan() { return m_defpan; }
 

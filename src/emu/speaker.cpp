@@ -37,8 +37,8 @@ speaker_device::speaker_device(const machine_config &mconfig, const char *tag, d
 	, m_x(0.0)
 	, m_y(0.0)
 	, m_z(0.0)
-	, m_pan(1.0)
-	, m_defpan(1.0)
+	, m_pan(0.0)
+	, m_defpan(0.0)
 	, m_current_max(0)
 	, m_samples_this_bucket(0)
 {
@@ -67,18 +67,17 @@ speaker_device &speaker_device::set_position(double x, double y, double z)
 
 	// hard pan to left
 	if (m_x < 0.0)
-		set_pan(0.0f);
+		set_pan(-1.0f);
 
 	// hard pan to right
 	else if (m_x > 0.0)
-		set_pan(2.0f);
+		set_pan(1.0f);
 
 	// center (mono)
 	else
-		set_pan(1.0f);
+		set_pan(0.0f);
 
 	m_defpan = m_pan;
-
 	return *this;
 }
 
@@ -121,20 +120,20 @@ void speaker_device::mix(stream_buffer::sample_t *leftmix, stream_buffer::sample
 	if (!suppress)
 	{
 		// if the speaker is hard panned to the left, send only to the left
-		if (m_pan == 0.0f)
+		if (m_pan == -1.0f)
 			for (int sample = 0; sample < expected_samples; sample++)
 				leftmix[sample] += view.get(sample);
 
 		// if the speaker is hard panned to the right, send only to the right
-		else if (m_pan == 2.0f)
+		else if (m_pan == 1.0f)
 			for (int sample = 0; sample < expected_samples; sample++)
 				rightmix[sample] += view.get(sample);
 
 		// otherwise, send to both
 		else
 		{
-			const float leftpan = (m_pan <= 1.0f) ? 1.0f : 2.0f - m_pan;
-			const float rightpan = (m_pan >= 1.0f) ? 1.0f : m_pan;
+			const float leftpan = (m_pan <= 0.0f) ? 1.0f : 1.0f - m_pan;
+			const float rightpan = (m_pan >= 0.0f) ? 1.0f : 1.0f + m_pan;
 
 			for (int sample = 0; sample < expected_samples; sample++)
 			{

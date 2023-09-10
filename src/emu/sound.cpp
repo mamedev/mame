@@ -1382,6 +1382,7 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 		mixer_input info;
 		if (indexed_mixer_input(node->get_attribute_int("index", -1), info))
 		{
+			// note that this doesn't disallow out-of-range values
 			float value = node->get_attribute_float("value", std::nanf(""));
 
 			if (std::isnan(value))
