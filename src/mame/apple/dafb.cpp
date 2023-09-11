@@ -208,6 +208,7 @@ static INPUT_PORTS_START(monitor_config_noconv)
 	PORT_CONFSETTING(0x06, u8"Mac Hi-Res Display (12-14\" 640\u00d7480)")       // "High Res"
 	PORT_CONFSETTING(ext(1, 1, 3), "640x480 VGA")
 	PORT_CONFSETTING(ext(2, 3, 1), "832x624 16\" RGB")                          // "Goldfish" or "16 inch RGB"
+	PORT_CONFSETTING(ext(3, 2, 2), "1024\u00d7768 19\" RGB");
 INPUT_PORTS_END
 
 ioport_constructor dafb_base::device_input_ports() const
@@ -819,8 +820,13 @@ void dafb_base::recalc_mode()
 		}
 		else
 		{
-			m_hres *= clockdiv;
-			m_htotal *= clockdiv;
+			// FIXME: Quadra 800 family machines in 832x624 program an unnecessary 2x clock divider in 24bpp mode only.
+			// Need to determine if this is deliberate and we're just missing something.
+			if ((m_hres != 832) || (clockdiv != 2))
+			{
+				m_hres *= clockdiv;
+				m_htotal *= clockdiv;
+			}
 		}
 
 		// if we're interlaced, bump the vertical back to double
