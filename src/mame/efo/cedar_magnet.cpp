@@ -21,7 +21,6 @@
     * there are no per-game protection devices, so it's something to do with the base hardware
     * there seem to be 2 checks, one based on a weird sector on the discs, the other based on
       a port read
-  - Add additional hardware notes from ArcadeHacker
   - Layer enables on War Mission? (transitions from title screen etc.)
 
  notes:
@@ -170,6 +169,8 @@ MASTER BOARD
 |__     CONN                                                                |
    |________________________________________________________________________|
 
+Xtal 1 = 16.000 MHz
+Xtal 2 = 20.000 MHz
 
  PLANES BOARD
    ___________________________________________________________________________
@@ -264,6 +265,440 @@ MASTER BOARD
    |                                                         __________     |
    |                                                        |MC74HC157|     |
    |________________________________________________________________________|
+*/
+
+/*
+Additional hardware notes from ArcadeHacker:
+
+
+Z80 main @ 3.9986 Mhz
+---------------------
+
+Memory map
+‘Bank bits’ are these from IC 48 PIO  (0x20)
+A5 -> 4 74HC10 3NAND IC19  // Main CPU Memory bank switch
+A6 -> 2 74HC10 3NAND IC19  // Main CPU Memory bank switch
+
+Initial state  (bank bits 11?)
+0000-1FFF eprom
+2000-3FFF eprom mirror
+4000-5FFF eprom mirror
+6000-7FFF eprom mirror
+8000-9FFF eprom mirror
+A000-BFFF eprom mirror
+C000-DFFF eprom mirror
+E000-FFFF eprom mirror
+
+Upload to other CPUs state (Bank bits 10 )
+
+This is complex and not 100% understood.
+
+ 0000 - BFFF   - RAM?  (same as in state 01 / 00)
+ C000  FFFF   - a 0x4000 sized window into the RAM for the other CPUs, uploads programs**
+
+**see 0x43 IC 49 PIO
+B2 -> 36 J7
+B3 -> 35 J7
+and MAYBE  B1 -> 3 74HC04 IC21
+2 bank bits gives a full 0x10000 (64kb view) but could be more?
+
+WHICH cpu we get a window into accessible seems to be determined by the busreq bits (main CPU must have bus?)
+IC48 A1 -> 47 J6 - output (DH: busreq plane board a?)
+IC48 B1 -> 48 J6 - output (DH: busreq plane board b?)
+IC48 B5 -> 43 J6 - output (DH: busreq sprite board?)
+IC49 B5 -> 8 J3  - output (DH: sound CPU busreq)
+
+Is it possible to upload to multiple CPUs at once this way??
+
+
+Simple Ram/ROM state (Banks bits 01)
+     0000 - DFFF   - RAM?    (same as in state 10 / 00)
+     E000-FFFF eprom 
+
+ALL RAM (Banks bits 00)
+     0000 - DFFF   - RAM?    (same as in state 10 / 01)
+     E000-FFFF - more ram, only accessible in this state?
+
+
+I/O map
+
+0x18 <-> 0001 1000 ?
+0x19 <-> 0001 1001 ?
+0x1A ->  0001 1010 ?
+0x1B <-  0001 1011 ?
+
+Loop checking bit 2 on port 19
+// 9496 in a,($19)
+// 9498 bit 2,a
+Writes a stream of data from rom to the other ports (garbage??)
+
+IC 48 PIO 
+0x20 0010 0000 IC48 Data port A    // Bits 5&6 manage banked mem
+0x21 0010 0001 IC48 Command port A
+
+A0 -> 49 J6 - input from plane board a (main CPU checks before accessing)
+A1 -> 47 J6 - output (DH: busreq plane board a?)
+A2 -> 45 J6 - output (DH: reset plane board a CPU?)
+A3 <- 4 74HC14P (inverter) IC4 <- EDGE 21 COIN1
+A4 <- 9 74HC74 IC20 <- input from 18 74LS244 IC61   - Interrupt source related? (DH - gets checked in IRQ code)
+A5 -> 4 74HC10 3NAND IC19  // Main CPU Memory bank switch
+A6 -> 2 74HC10 3NAND IC19  // Main CPU Memory bank switch
+A7 -> 12 J4 unpopulated
+
+0x22 0010 0010 IC48 Data port B 
+0x23 0010 0011 IC48 Command port B
+
+B0 -> 50 J6 - input from plane board b (main CPU checks before accessing)
+B1 -> 48 J6 - output (DH: busreq plane board b?)
+B2 -> 46 J6 - output (DH: reset plane board b CPU?)
+B3 -> Q8 transistor (DH: unknown purpose)
+B4 -> 44 J6 - input from sprite board (main CPU checks before accessing)
+B5 -> 43 J6 - output (DH: busreq sprite board?)
+B6 -> 41 J6 - output (DH: reset sprite board CPU?)
+B7 <- 2 74HC14P (inverter) IC4 <- EDGE 22 COIN2
+
+IC 49 PIO
+0x40 NOT USED IC49 Data port A
+0x41 0100 0001   IC49 Command port A
+A0 -> 8 IC36 unpopulated
+A1 -> 7 IC36 unpopulated
+A2 -> 6 IC36 unpopulated
+A3 -> 5 IC36 unpopulated
+A4 -> 4 IC36 unpopulated
+A5 -> 3 IC36 unpopulated
+A6 -> 2 IC36 unpopulated
+A7 -> 1 IC36 unpopulated
+
+0x42 0100 0010 IC49 Data port B 
+0x43 0100 0011 IC49 Command port B
+	
+B0 -> LED LD1  (DH: only? Or does it go somewhere else too?)
+B1 -> 3 74HC04 IC21   (DH: some kind of bank/writeprotect? Gets set during weird sprite CPU comms important??)
+B2 -> 36 J7  (DH: bank bits for main CPU window into Sprite RAM)
+B3 -> 35 J7  (DH: bank bits for main CPU window into Sprite RAM)
+B4 -> 7 J3  (from sound CPU)
+B5 -> 8 J3  (sound CPU busreq)
+B6 -> 9 J3  (sound CPU - Z80CTC reset?)
+B7 -> Q9 transistor  (unknown purpose)
+
+Disk controller
+0x60 0110 0000 // Status (read) / Command (write)
+0x61 0110 0001 // Current Track # (read)
+0x62 0110 0010 // Requested sector (write)
+0x63 0110 0011 // Data (read) / Parameter for Command (write)
+
+Player controls
+0x64 1 74LS244 IC3 /OE edge  Player 1 inputs
+D0 P1 up - D1 P1 right - D2 P1 down - D3 P1 left - D4 Action1 - D5 P1 Action2 - D6 P1 Action3 - D7 P1 Start
+0x68 1 74LS244 IC2 /OE edge  Player 2 inputs
+D0 P2 up - D1 P2 right - D2 P2 down - D3 P2 left - D4 P2 Action 1 - D5  Action2 - D6 P2 Action3 - D7 P2 Start
+0x6C 1 74LS244 IC1 /OE edge  16-19 not used
+
+0x70 0111 0000 IC42 1  Memory daughter board 74LS273 10 Clock input
+0x74 0111 0100 IC42 2  Memory daughter board 74LS00 1A
+0x78 0111 1000 IC42 3 ← Watchdog (disable watchdog IC5 3 to ground after initial cpu reset) Memory daughter board 74LS374 11 Clock input
+
+0x70/0x74/0x78 are used for data upload, presumably to the 3x MOTOROLA MM2114N SRAM chips on the memory sub-board, palette?
+
+0x70 also seems to be used for banking of other RAM (writes of 1c/1d/1e/1f, and maybe 00) 
+CONFIRMED
+Lower 2 bits are used to select 64kb main CPU ram banks
+Upper 6 bits are used to select where palette writes go
+
+
+0x7C 0111 1100 ?
+
+7c is read at the end of an interrupt routine
+There’s also an odd loop waiting for the low 7 bits to be non-zero while accessing 0xFFFF
+Does 0xFFFF do something more than just act as ram? 
+
+088E: 00        	nop
+088F: F3        	di
+0890: 3E 54     	ld   a,$54
+0892: F6 28     	or   $28
+0894: 4F        	ld   c,a
+0895: 21 FF FF  	ld   hl,$FFFF
+0898: 46        	ld   b,(hl)
+0899: 70        	ld   (hl),b
+089A: 70        	ld   (hl),b
+089B: 70        	ld   (hl),b
+089C: ED 50     	in   d,(c)   << port 7c
+089E: 70        	ld   (hl),b
+089F: ED 58     	in   e,(c)  << port 7c
+08A1: 7B        	ld   a,e
+08A2: E6 7F     	and  $7F
+08A4: 20 08     	jr   nz,$08AE
+08A6: 2E 1A     	ld   l,$1A
+08A8: 26 FF     	ld   h,$FF
+08AA: 46        	ld   b,(hl)
+08AB: 70        	ld   (hl),b
+08AC: 18 E7     	jr   $0895
+
+08AE: 7A        	ld   a,d
+08AF: 07        	rlca
+08B0: 07        	rlca
+08B1: 07        	rlca
+08B2: 07        	rlca
+08B3: AA        	xor  d
+08B4: 07        	rlca
+08B5: 07        	rlca
+08B6: 7A        	ld   a,d
+08B7: 17        	rla
+08B8: AB        	xor  e
+08B9: E6 7F     	and  $7F
+08BB: C8        	ret  z
+08BC: 3E FF     	ld   a,$FF
+08BE: 32 8C 08  	ld   ($088C),a
+08C1: C9        	ret
+
+
+0xFF - out, sound latch? Coin counter? Written after reading coins at least.
+
+
+
+Z80 sound @ 3.9986 Mhz
+----------------------
+
+Memory map
+0000-FFFF Ram (full 64kb or mirrored? check mem chip count on pcb)
+
+J2 sound board connector (labeled as J3 on main board)
+
+1 EDGE25 PARTS SPEAKER +
+2 EDGE25 SOLDER SPEAKER -
+3 GND
+4 GND
+5 +5v
+6 +12v
+7 Ic28 74244 1 19 /ENA   ic29  74244 1 19 /ENA   ic32 74241 1 19 ENA   ic33 7432 3 12
+8 ic34 74HC14  9 -> IC35 74HC00 5 -> IC19 Z80 CPU 25 /Busreq
+9 ic34 74HC14 11 -> IC22 IC23 Z80CTC 17 /Reset
+
+
+Z80 sound port map
+
+0x00 - 0x03 AM_DEVREADWRITE("ctc0", z80ctc_device, read, write)
+0x04 -0x07 AM_DEVREADWRITE("ctc1", z80ctc_device, read, write)
+
+0x0c - 0x0d AM AY8910 #1
+0x10 - 0x11 AM_AY8910 #2
+    
+0x14 input from main cpu? (maybe read what was written to 0xff?)
+
+There’s also an M5205 ADPCM playback chip, not seen writes for it.
+
+
+Sound board CPU iorq's
+
+Z80 IORQ goes into IC11 (74138) /ENA1 control together with ENA3 (the output of IC35 (7400) watching over the z80 RD/WR signals), /ENA2 is gnd.
+Z80 A0 -> 28 IC20/21 AY-3-8910A BC2 (BC1 is grounded)
+Z80 A0 A1 -> 18/19 IC22/23 Z80 CTC CS0 CS1 Selects
+Z80 A2 A3 A4 -> IC11 decoder  inputs A0 A1 A2
+
+Decoder IC11 outputs as follows:
+
+15 /Y0 -> 16 IC22 Z80CTC /CE
+14 /Y1 -> 16 IC23 Z80CTC /CE
+13 /Y2 -> 3 IC8 (7404 inverter) -> 3 IC13 HCF40105BE (FIFO) SI (Shift in)
+12 /Y3 -> 1 IC8 (7404 inverter) -> 27 IC20 AY-3-8910A BDIR
+11 /Y4 -> 5 IC8 (7404 inverter) -> 27 IC21 AY-3-8910A BDIR
+10 /Y5 -> 13 IC12 (7474 FF) CLEAR & 1 IC31 (74HC374 FF) /OE
+9 /Y6 -> N.C.
+7 /Y7 -> N.C.
+
+
+
+Z80 sprite notes
+----------------
+
+Port maps
+
+  0xc0 - 0xc3 AM_DEVREADWRITE("z80pio0", z80pio_device, read_alt, write_alt)
+  0xc4 - 0xc7 AM_DEVREADWRITE("z80pio1", z80pio_device, read_alt, write_alt)
+  0xc8 - 0xcb AM_DEVREADWRITE("z80pio2", z80pio_device, read_alt, write_alt)
+
+   0x88  write, upper 8 bits of address for port-based data upload
+   0x8c  data for port upload
+   (0x9c -0x9c) unknown
+
+Z80pio2
+Addr 0xc8 (data port A) - write, lower 8 bits of address fo port-based data upload
+
+Can upload 64kb of data (to sprite ram sub-board?) using address provided in ports 0x88 and 0xc8, then data write at 0x8c
+
+Z80pio0
+Address 0xc0 (data port A) - write mask 0x20 seems important, deasserted after some startup code is executed 3 times.  Where does it go?
+
+
+
+Z80 plane board notes
+---------------------
+
+Each board has jumpers set differently (only difference? Probably controls addressing / mixing?)
+
+Port maps
+
+0xc0 - 0xc3 AM_DEVREADWRITE("z80pio0", z80pio_device, read_alt, write_alt)
+0xc4 - 0xc7 AM_DEVREADWRITE("z80pio1", z80pio_device, read_alt, write_alt)
+
+0xcc unknown
+0xcd unknown
+0xce unknown
+0xcf unknown
+
+
+
+Main memory daughter board
+--------------------------
+1.5kbytes 3x MOTOROLA MM2114N SRAM 4096 bit (4x1024bit) http://data.datasheetlib.com/pdf1/73/22/732266/mm2114n_5dc843bb0d.pdf
+
+256kbytes 8x SIEMENS HYB 41256-15 AA - 262,144 bit DRAM (32kbytes)
+http://matthieu.benoit.free.fr/cross/data_sheets/HYB41256.pdf
+
+
+
+Disk controller
+---------------
+SAB 2797B (FM - MFM type) @ 1.25mhz (oscillates 1.250~1.251)
+http://cygnus.speccy.cz/download/datasheety/sab2793.pdf
+
+
+Format description
+------------------
+
+Disks are written at 240RPM which increases the capacity by 25% compared to a standard disk. A normal track written with a 300 RPM drive would be 12500 bytes, a 240 RPM drive would fill 15625 bytes.
+
+Each track has 6 sectors, and each sector is 1024 bytes long.
+The sector headers are marked as if the sector length was 512 bytes, this effectively prevents copying the second half of the data in each sector unless you know the real sector size. (plus have a drive running at 240 RPM...)
+
+Sectors are numbered from 200...205, instead of 0...5.
+e.g. 
+track 0, side 0, sector 200...205 (instead of sector 0...5)
+track 0, side 1, sector 200...205
+track 1, side 0, sector 200...205
+track 1, side 1, sector 200...205
+
+
+
+Z80 main -  partial schem
+-------------------------
+
+A0 - A0 eprom IC31 & i9 pal16r8pc ic32 & 5 PIO IC48 CONTROL/DATA SEL 
+A1 - A1 eprom IC31 & i8 pal16r8pc ic32 & 6 PIO IC48 PORT B/A SEL 
+A2 - A2 eprom IC31 & i7 pal16r8pc ic32
+A3 - A3 eprom IC31 & i6 pal16r8pc ic32
+A4 - A4 eprom IC31 & i5 pal16r8pc ic32
+A5 - A5 eprom IC31 & i4 pal16r8pc ic32 & 2 74LS139 IC33
+A6 - A6 eprom IC31 & i3 pal16r8pc ic32 & 3 74LS139 IC33
+A7 - A7 eprom IC31 & i2 pal16r8pc ic32 & 1 74LS139 IC33
+A8 - A8 eprom IC31 
+…
+A11 - A11 eprom IC31 
+A12 - A12 eprom IC31 & 14 74HC157 IC45
+A13 - 11 74HC157 IC45
+A14 -   5 74HC157 IC45
+A15 -   2 74HC157 IC45 
+
+D0 - D0 eprom ic31 & o12 pal16r8pc ic32 & memory adhoc board & PIO
+D1 - D1 eprom ic31 & o13 pal16r8pc ic32 & memory adhoc board 3 IC43 Socket -> 11 Clock 74HC374 daughter board & PIO
+D2 - D2 eprom ic31 & o14 pal16r8pc ic32 & memory adhoc board & PIO
+D3 - D3 eprom ic31 & o15 pal16r8pc ic32 & memory adhoc board & PIO
+D4 - D4 eprom ic31 & o16 pal16r8pc ic32 & memory adhoc board & PIO
+D5 - D5 eprom ic31 & o17 pal16r8pc ic32 & memory adhoc board & PIO
+D6 - D6 eprom ic31 & o18 pal16r8pc ic32 & memory adhoc board & PIO
+D7 - D7 eprom ic31 & o19 pal16r8pc ic32 & memory adhoc board & PIO
+
+MREQ 19 -> 15 74LS244 IC61
+IORQ 20 -> 36 IORQ PIO IC48/49 & J7 19 & 5 (/E2) 74HC138 IC34
+RD 21 -> 22 /OE EPROM & 35 RD PIO 48/49 & J7 23 & 5 74HC04 IC21 & 5 74HC00 IC35 & 5 74HC32 IC8
+WR 22 -> J7 21
+
+3 74HC157 IC45 -> 4 74HC157 IC51
+
+
+
+IC33 74LS139
+------------
+
+A7 Z80 -> /ENA 1 74LS139 IC33 
+A5 Z80 -> A0A 2 74LS139 IC33 (H = enable pio 48)
+A6 Z80 -> A1A 3 74LS139 IC33 (H = enable pio 49)
+/O0A 4 ?
+/O1A 5 74LS139 IC33 -> /ENA PIO IC48
+/O2A 6 74LS139 IC33 -> /ENA PIO IC49
+/O3A 7 74LS139 IC33 -> 4 (/E1) 74LS138 IC34
+
+
+
+IC34 74LS138 (0x60 & 0x70 IO)
+-----------------------------
+
+1 (A0) <- A2
+2 (A1) <- A3
+3 (A2) <- A4
+4 (/E1) <- 7 74LS139 IC33
+5 (/E2) <- IORQ 20 Z80
+6 (E3) <- 6 74HC00 IC35
+
+15 (O0) -> 4 74HC32 IC8                           (0x60)
+14 (O1) -> 1&19 74LS244 IC3 OE edge               (0x64) IC3 Player 1
+13 (O2) -> 1&19 74LS244 IC2 OE edge               (0x68) IC2 Player 2
+12 (O3) -> 1&19 74LS244 IC1 OE edge               (0x6C) IC1 Not used
+11 (O4) -> 1 MB IC42 & 13 J8 unpopulated          
+10 (O5) -> 2 MB IC42 & 12 J8 unpopulated	       
+9   (O6) -> 3 MB IC42 & 11 J8 unpopulated         
+7   (O7) -> 11 /OE PAL16R8PC IC32 & 4 (SET1) 74HC74 IC20  (0x7C?)
+
+
+
+IC32 PAL16R8PC
+--------------
+
+11 <- 7 O7 IC34
+
+
+
+IC 31 Eprom
+-----------
+
+20 /CE & 5 74HC08 IC18 <- 6 74HC10 IC19
+22 /OE <- Z80 RD
+
+
+
+IC18 74HC08 2AND
+----------------
+
+4 <- 12 74HC10 IC19
+5 <- ? (/20 CE EPROM IC 31)
+6 -> 9 IC26 74HC08 
+
+12 <- RFSH Z80 
+13 <- 11 74HC00 IC35
+11 -> 12 74HC32 IC8
+
+
+IC19 74HC10 3NAND
+-----------------
+
+1 <- 8 74HC04 IC21 
+2 <- A6 IC48 PIO 
+13 <- 8 74HC00 IC35
+12 -> 4 74HC08 IC18
+
+3 <- 8 74HC04 IC21
+4 <- A5 IC48 PIO
+5 <- 8 74HC00 IC35
+6 -> 20 /CE IC31 EPROM & 5 74HC08 IC18
+
+
+
+IC26 74HC08
+-----------
+
+9 <- IC18 74HC08 6
+10 <- RFSH Z80 
+8 -> 4  74HC74 IC17
 
 */
 
