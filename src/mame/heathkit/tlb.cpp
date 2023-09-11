@@ -1068,7 +1068,8 @@ ioport_constructor heath_super19_tlb_device::device_input_ports() const
  * Developed by TMSI
  */
 heath_superset_tlb_device::heath_superset_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	heath_tlb_device(mconfig, HEATH_SUPERSET, tag, owner, clock)
+	heath_tlb_device(mconfig, HEATH_SUPERSET, tag, owner, clock),
+	m_selected_char_set(0)
 {
 }
 
