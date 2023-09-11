@@ -57,7 +57,7 @@
   - War Mission ** *
 
   Ports / Conversions
-  - Boody Kids *
+  - Booby Kids *
   - Cocomania (Pacmania)
   - Dodge Ball
   - Double Dragon
