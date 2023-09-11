@@ -1314,8 +1314,8 @@ uint16_t cps2_state::cps2_qsound_volume_r()
  *  Read handlers
  *
  *************************************/
-uint16_t cps2_state::joy_or_paddle_r()
 
+uint16_t cps2_state::joy_or_paddle_r()
 {
 	if (m_readpaddle != 0)
 	{
