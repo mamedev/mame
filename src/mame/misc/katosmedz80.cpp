@@ -83,6 +83,7 @@ void katosmedz80_state::program_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
+	map(0x8000, 0x8000).portr("IN2");
 }
 
 void katosmedz80_state::io_map(address_map &map)
@@ -194,6 +195,11 @@ static INPUT_PORTS_START( dnbanban )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Coin")      // Service COIN (related error E6)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR ) PORT_NAME("Door Switch")  // DOOR (related error E7)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")  // to figure out...
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )		// Doraneko (ドラネコ) Start
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )		// Koneko (コネコ) Start
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )     // not accessed in game code
 
 INPUT_PORTS_END
 
