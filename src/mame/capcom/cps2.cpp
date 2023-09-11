@@ -668,6 +668,7 @@ public:
 		, m_output(*this, "output")
 		, m_io_in0(*this, "IN0")
 		, m_io_in1(*this, "IN1")
+		, m_dsw{ { *this, "DSWA" }, { *this, "DSWB" }, { *this, "DSWC" } }
 		, m_cps2_dial_type(0)
 		, m_ecofghtr_dial_direction0(0)
 		, m_ecofghtr_dial_direction1(0)
@@ -728,8 +729,6 @@ private:
 	void init_cps2_video();
 	void init_cps2crypt();
 
-	uint8_t cps2_dsw_r(offs_t offset);
-
 	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
 	optional_memory_region m_region_key;
 
@@ -742,6 +741,7 @@ private:
 
 	optional_ioport m_io_in0;
 	optional_ioport m_io_in1;
+	optional_ioport m_dsw[3];
 
 	std::unique_ptr<uint16_t[]> m_cps2_buffered_obj;
 	std::unique_ptr<uint16_t[]> m_gigaman2_dummyqsound_ram;
@@ -1391,20 +1391,6 @@ uint16_t cps2_state::joy_or_paddle_ecofghtr_r()
 
 /*************************************
  *
- *  DIP switches
- *
- *************************************/
-uint8_t cps2_state::cps2_dsw_r(offs_t offset)
-{
-	static const char *const dswname[] = { "DSWA", "DSWB", "DSWC" };
-	
-	int in = ioport(dswname[offset])->read();
-	// printf("dip offset %x, value %x\n", offset, in);
-	return in;
-}
-
-/*************************************
- *
  *  Memory map
  *
  *************************************/
@@ -1426,7 +1412,13 @@ void cps2_state::cps2_map(address_map &map)
 	map(0x804030, 0x804031).r(FUNC(cps2_state::cps2_qsound_volume_r));                                                                // Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present.
 	map(0x804040, 0x804041).w(FUNC(cps2_state::cps2_eeprom_port_w));                                                                  // EEPROM
 	map(0x8040a0, 0x8040a1).nopw();                                                                                                   // Unknown (reset once on startup)
-	// 0x8040b0 to 0x8040b2 are the debug DIPs present on development hardware, implemented as read handler cps2_dsw_r
+	map(0x8040b0, 0x8040b2).lr8(                                                                                                      // DIP switches (only present on development hardware)
+		NAME([this] (offs_t offset) {
+			return this->ioport("HW_TYPE")->read() == 0
+				? (unsigned) 0xff
+				: m_dsw[offset]->read();
+		})
+	);
 	map(0x8040e0, 0x8040e1).w(FUNC(cps2_state::cps2_objram_bank_w));                                                                  // bit 0 = Object ram bank swap
 	map(0x804100, 0x80413f).w(FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                                                    // CPS-A custom
 	map(0x804140, 0x80417f).rw(FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w));                                       // CPS-B custom
@@ -1465,7 +1457,13 @@ void cps2_state::dead_cps2_map(address_map &map)
 	map(0x804030, 0x804031).r(FUNC(cps2_state::cps2_qsound_volume_r));                                                                // Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present.
 	map(0x804040, 0x804041).w(FUNC(cps2_state::cps2_eeprom_port_w));                                                                  // EEPROM
 	map(0x8040a0, 0x8040a1).nopw();                                                                                                   // Unknown (reset once on startup)
-	// 0x8040b0 to 0x8040b2 are the debug DIPs present on development hardware, implemented as read handler cps2_dsw_r
+	map(0x8040b0, 0x8040b2).lr8(                                                                                                      // DIP switches (only present on development hardware)
+		NAME([this] (offs_t offset) {
+			return this->ioport("HW_TYPE")->read() == 0
+				? (unsigned) 0xff
+				: m_dsw[offset]->read();
+		})
+	);
 	map(0x8040e0, 0x8040e1).w(FUNC(cps2_state::cps2_objram_bank_w));                                                                  // bit 0 = Object ram bank swap
 	map(0x804100, 0x80413f).w(FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                                                    // CPS-A custom
 	map(0x804140, 0x80417f).rw(FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w));                                       // CPS-B custom
@@ -1554,86 +1552,86 @@ static INPUT_PORTS_START( cps2_4p4b )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_VOLUME_UP )
 
 	// Machine configuration for dev hardware with DIPs
-	PORT_START("DEV_HW")
+	PORT_START("HW_TYPE")
 	PORT_CONFNAME(0x01,0x00,"Hardware")
 	PORT_CONFSETTING(0x00, "Production")
 	PORT_CONFSETTING(0x01, "Development (Enable Debug DIPs)")
 
 	PORT_START("DSWA") 
-	PORT_DIPNAME( 0x01, 0x01, "1-1" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x01, 0x01, "1-1" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x02, 0x02, "1-2" ) PORT_DIPLOCATION("SW1:2") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x02, 0x02, "1-2" ) PORT_DIPLOCATION("SW1:2") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x04, 0x04, "1-3" ) PORT_DIPLOCATION("SW1:3") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x04, 0x04, "1-3" ) PORT_DIPLOCATION("SW1:3") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x08, 0x08, "1-4" ) PORT_DIPLOCATION("SW1:4") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x08, 0x08, "1-4" ) PORT_DIPLOCATION("SW1:4") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x10, 0x10, "1-5" ) PORT_DIPLOCATION("SW1:5") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x10, 0x10, "1-5" ) PORT_DIPLOCATION("SW1:5") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x20, 0x20, "1-6" ) PORT_DIPLOCATION("SW1:6") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x20, 0x20, "1-6" ) PORT_DIPLOCATION("SW1:6") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x40, 0x40, "1-7" ) PORT_DIPLOCATION("SW1:7") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x40, 0x40, "1-7" ) PORT_DIPLOCATION("SW1:7") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x80, 0x80, "1-8" ) PORT_DIPLOCATION("SW1:8") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x80, 0x80, "1-8" ) PORT_DIPLOCATION("SW1:8") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x01, 0x01, "2-1" ) PORT_DIPLOCATION("SW2:1") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x01, 0x01, "2-1" ) PORT_DIPLOCATION("SW2:1") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x02, 0x02, "2-2" ) PORT_DIPLOCATION("SW2:2") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x02, 0x02, "2-2" ) PORT_DIPLOCATION("SW2:2") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x04, 0x04, "2-3" ) PORT_DIPLOCATION("SW2:3") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x04, 0x04, "2-3" ) PORT_DIPLOCATION("SW2:3") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x08, 0x08, "2-4" ) PORT_DIPLOCATION("SW2:4") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x08, 0x08, "2-4" ) PORT_DIPLOCATION("SW2:4") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x10, 0x10, "2-5" ) PORT_DIPLOCATION("SW2:5") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x10, 0x10, "2-5" ) PORT_DIPLOCATION("SW2:5") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x20, 0x20, "2-6" ) PORT_DIPLOCATION("SW2:6") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x20, 0x20, "2-6" ) PORT_DIPLOCATION("SW2:6") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x40, 0x40, "2-7" ) PORT_DIPLOCATION("SW2:7") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x40, 0x40, "2-7" ) PORT_DIPLOCATION("SW2:7") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x80, 0x80, "2-8" ) PORT_DIPLOCATION("SW2:8") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x80, 0x80, "2-8" ) PORT_DIPLOCATION("SW2:8") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 
 	PORT_START("DSWC") 
-	PORT_DIPNAME( 0x01, 0x01, "3-1" ) PORT_DIPLOCATION("SW3:1") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x01, 0x01, "3-1" ) PORT_DIPLOCATION("SW3:1") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x02, 0x02, "3-2" ) PORT_DIPLOCATION("SW3:2") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x02, 0x02, "3-2" ) PORT_DIPLOCATION("SW3:2") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x04, 0x04, "3-3" ) PORT_DIPLOCATION("SW3:3") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x04, 0x04, "3-3" ) PORT_DIPLOCATION("SW3:3") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x08, 0x08, "3-4" ) PORT_DIPLOCATION("SW3:4") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x08, 0x08, "3-4" ) PORT_DIPLOCATION("SW3:4") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x10, 0x10, "3-5" ) PORT_DIPLOCATION("SW3:5") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x10, 0x10, "3-5" ) PORT_DIPLOCATION("SW3:5") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x20, 0x20, "3-6" ) PORT_DIPLOCATION("SW3:6") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x20, 0x20, "3-6" ) PORT_DIPLOCATION("SW3:6") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x40, 0x40, "3-7" ) PORT_DIPLOCATION("SW3:7") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x40, 0x40, "3-7" ) PORT_DIPLOCATION("SW3:7") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x80, 0x80, "3-8" ) PORT_DIPLOCATION("SW3:8") PORT_CONDITION("DEV_HW", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x80, 0x80, "3-8" ) PORT_DIPLOCATION("SW3:8") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 
@@ -10915,8 +10913,6 @@ void cps2_state::init_cps2()
 	// Decrypt the game - see machine/cps2crypt.cpp
 	init_cps2crypt();
 	init_cps2nc();
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x8040b0, 0x8040b2, read8sm_delegate(*this, FUNC(cps2_state::cps2_dsw_r)));
 }
 
 void cps2_state::init_cps2nc()
@@ -10937,6 +10933,7 @@ void cps2_state::init_pzloop2()
 	m_cps2_dial_type = 1;
 
 	save_item(NAME(m_readpaddle));
+
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x804000, 0x804001, read16smo_delegate(*this, FUNC(cps2_state::joy_or_paddle_r)));
 }
 
