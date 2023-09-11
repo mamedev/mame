@@ -668,7 +668,7 @@ public:
 		, m_output(*this, "output")
 		, m_io_in0(*this, "IN0")
 		, m_io_in1(*this, "IN1")
-		, m_dsw{ { *this, "DSWA" }, { *this, "DSWB" }, { *this, "DSWC" } }
+		, m_dsw(*this, "DSW%c", 'A')
 		, m_cps2_dial_type(0)
 		, m_ecofghtr_dial_direction0(0)
 		, m_ecofghtr_dial_direction1(0)
@@ -741,7 +741,7 @@ private:
 
 	optional_ioport m_io_in0;
 	optional_ioport m_io_in1;
-	optional_ioport m_dsw[3];
+	optional_ioport_array<3> m_dsw;
 
 	std::unique_ptr<uint16_t[]> m_cps2_buffered_obj;
 	std::unique_ptr<uint16_t[]> m_gigaman2_dummyqsound_ram;
