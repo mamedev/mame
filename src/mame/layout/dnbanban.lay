@@ -1,0 +1,165 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.1" blue="0.1" />
+		</led7seg>
+	</element>
+	<element name="led" defstate="0">
+		<disk state="1">
+			<color red="1.0" green="0.1" blue="0.1" />
+		</disk>
+		<disk state="0">
+			<color red="0.1" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<view name="Internal Layout">
+		<bounds left="0" top="0" right="246" bottom="246" />
+
+		<element name="digit3" ref="digit">
+			<bounds x="20" y="25" width="20" height="30" />
+		</element>
+		<element name="digit2" ref="digit">
+			<bounds x="40" y="25" width="20" height="30" />
+		</element>
+		<element name="digit1" ref="digit">
+			<bounds x="186" y="25" width="20" height="30" />
+		</element>
+		<element name="digit0" ref="digit">
+			<bounds x="206" y="25" width="20" height="30" />
+		</element>
+
+		<element name="p2led7" ref="led">
+			<bounds x="5" y="160" width="9" height="9" />
+		</element>
+		<element name="p2led6" ref="led">
+			<bounds x="15" y="160" width="9" height="9" />
+		</element>
+		<element name="p2led5" ref="led">
+			<bounds x="25" y="160" width="9" height="9" />
+		</element>
+		<element name="p2led4" ref="led">
+			<bounds x="35" y="160" width="9" height="9" />
+		</element>
+		<element name="p2led3" ref="led">
+			<bounds x="45" y="160" width="9" height="9" />
+		</element>
+		<element name="p2led2" ref="led">
+			<bounds x="55" y="160" width="9" height="9" />
+		</element>
+		<element name="p2led1" ref="led">
+			<bounds x="65" y="160" width="9" height="9" />
+		</element>
+		<element name="p2led0" ref="led">
+			<bounds x="75" y="160" width="9" height="9" />
+		</element>
+
+		<element name="p3led7" ref="led">
+			<bounds x="100" y="160" width="9" height="9" />
+		</element>
+		<element name="p3led6" ref="led">
+			<bounds x="110" y="160" width="9" height="9" />
+		</element>
+		<element name="p3led5" ref="led">
+			<bounds x="120" y="160" width="9" height="9" />
+		</element>
+		<element name="p3led4" ref="led">
+			<bounds x="130" y="160" width="9" height="9" />
+		</element>
+		<element name="p3led3" ref="led">
+			<bounds x="140" y="160" width="9" height="9" />
+		</element>
+		<element name="p3led2" ref="led">
+			<bounds x="150" y="160" width="9" height="9" />
+		</element>
+		<element name="p3led1" ref="led">
+			<bounds x="160" y="160" width="9" height="9" />
+		</element>
+		<element name="p3led0" ref="led">
+			<bounds x="170" y="160" width="9" height="9" />
+		</element>
+
+		<element name="p5led7" ref="led">
+			<bounds x="5" y="180" width="9" height="9" />
+		</element>
+		<element name="p5led6" ref="led">
+			<bounds x="15" y="180" width="9" height="9" />
+		</element>
+		<element name="p5led5" ref="led">
+			<bounds x="25" y="180" width="9" height="9" />
+		</element>
+		<element name="p5led4" ref="led">
+			<bounds x="35" y="180" width="9" height="9" />
+		</element>
+		<element name="p5led3" ref="led">
+			<bounds x="45" y="180" width="9" height="9" />
+		</element>
+		<element name="p5led2" ref="led">
+			<bounds x="55" y="180" width="9" height="9" />
+		</element>
+		<element name="p5led1" ref="led">
+			<bounds x="65" y="180" width="9" height="9" />
+		</element>
+		<element name="p5led0" ref="led">
+			<bounds x="75" y="180" width="9" height="9" />
+		</element>
+
+		<element name="p6led7" ref="led">
+			<bounds x="100" y="180" width="9" height="9" />
+		</element>
+		<element name="p6led6" ref="led">
+			<bounds x="110" y="180" width="9" height="9" />
+		</element>
+		<element name="p6led5" ref="led">
+			<bounds x="120" y="180" width="9" height="9" />
+		</element>
+		<element name="p6led4" ref="led">
+			<bounds x="130" y="180" width="9" height="9" />
+		</element>
+		<element name="p6led3" ref="led">
+			<bounds x="140" y="180" width="9" height="9" />
+		</element>
+		<element name="p6led2" ref="led">
+			<bounds x="150" y="180" width="9" height="9" />
+		</element>
+		<element name="p6led1" ref="led">
+			<bounds x="160" y="180" width="9" height="9" />
+		</element>
+		<element name="p6led0" ref="led">
+			<bounds x="170" y="180" width="9" height="9" />
+		</element>
+
+		<element name="p8led7" ref="led">
+			<bounds x="5" y="200" width="9" height="9" />
+		</element>
+		<element name="p8led6" ref="led">
+			<bounds x="15" y="200" width="9" height="9" />
+		</element>
+		<element name="p8led5" ref="led">
+			<bounds x="25" y="200" width="9" height="9" />
+		</element>
+		<element name="p8led4" ref="led">
+			<bounds x="35" y="200" width="9" height="9" />
+		</element>
+		<element name="p8led3" ref="led">
+			<bounds x="45" y="200" width="9" height="9" />
+		</element>
+		<element name="p8led2" ref="led">
+			<bounds x="55" y="200" width="9" height="9" />
+		</element>
+		<element name="p8led1" ref="led">
+			<bounds x="65" y="200" width="9" height="9" />
+		</element>
+		<element name="p8led0" ref="led">
+			<bounds x="75" y="200" width="9" height="9" />
+		</element>
+
+	</view>
+</mamelayout>
