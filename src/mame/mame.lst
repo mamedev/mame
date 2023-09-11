@@ -15901,6 +15901,10 @@ mz1                             // 1986 Casio (unreleased)
 @source:casio/cz101.cpp
 cz101                           // 1984 Casio
 
+@source:casio/cz230s.cpp
+cz230s                          // 1986 Casio
+sz1                             // 1985 Casio
+
 @source:casio/fp200.cpp
 fp200                           //
 

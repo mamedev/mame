@@ -847,6 +847,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/mn1252.h,VIDEOS["MN1252"] = true
+--------------------------------------------------
+
+if (VIDEOS["MN1252"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/mn1252.cpp",
+		MAME_DIR .. "src/devices/video/mn1252.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pc_vga.h,VIDEOS["PC_VGA"] = true
 --------------------------------------------------
 

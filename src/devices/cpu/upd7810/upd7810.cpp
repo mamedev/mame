@@ -389,7 +389,8 @@ void upd7810_device::upd_internal_128_ram_map(address_map &map)
 
 void upd7810_device::upd_internal_256_ram_map(address_map &map)
 {
-	map(0xff00, 0xffff).ram();
+	map(0xff00, 0xffff).view(m_ram_view);
+	m_ram_view[0](0xff00, 0xffff).ram();
 }
 
 void upd7810_device::upd_internal_4096_rom_128_ram_map(address_map &map)
@@ -401,7 +402,8 @@ void upd7810_device::upd_internal_4096_rom_128_ram_map(address_map &map)
 void upd7810_device::upd_internal_4096_rom_256_ram_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
-	map(0xff00, 0xffff).ram();
+	map(0xff00, 0xffff).view(m_ram_view);
+	m_ram_view[0](0xff00, 0xffff).ram();
 }
 
 upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map)
@@ -424,6 +426,7 @@ upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, 
 	, m_pf_out_cb(*this)
 	, m_pt_in_cb(*this, 0) // TODO: uPD7807 only
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, internal_map)
+	, m_ram_view(*this, "ram_view")
 	, m_pa_pullups(0xff)
 	, m_pb_pullups(0xff)
 	, m_pc_pullups(0xff)
