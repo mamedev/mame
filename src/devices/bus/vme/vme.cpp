@@ -263,6 +263,7 @@ device_vme_card_interface::device_vme_card_interface(machine_config const &mconf
 void device_vme_card_interface::interface_config_complete()
 {
 	// route bus errors to the card when it is the bus master
+	if (m_slot) // HACK: avoid breaking listxml until proper fix can be identified
 	m_slot->berr().append(
 		[this](int state)
 		{

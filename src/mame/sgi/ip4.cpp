@@ -283,6 +283,8 @@ void sgi_ip4_device::device_add_mconfig(machine_config &config)
 
 void sgi_ip4_device::device_config_complete()
 {
+	if (owner() && owner()->owner())
+	{
 	// TODO: ACFAIL -> vme_irq<0>
 	device_vme_card_interface::vme_irq<1>().append(*this, FUNC(sgi_ip4_device::vme_irq<1>));
 	device_vme_card_interface::vme_irq<2>().append(*this, FUNC(sgi_ip4_device::vme_irq<2>));
@@ -293,6 +295,7 @@ void sgi_ip4_device::device_config_complete()
 	device_vme_card_interface::vme_irq<7>().append(*this, FUNC(sgi_ip4_device::vme_irq<7>));
 
 	vme_berr().set_inputline(m_cpu, INPUT_LINE_IRQ5).invert();
+	}
 }
 
 void sgi_ip4_device::device_start()
