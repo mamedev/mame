@@ -161,7 +161,7 @@ void vme_sys68k_cpu1_card_device::force68k_mem(address_map &map)
 	map(0x000000, 0x01ffff).ram().share("ram"); /* DRAM CPU-1B */
 //  map(0x020000, 0x07ffff).ram(); /* Additional DRAM CPU-1D */
 	map(0x080000, 0x09ffff).rom().region("eprom", 0); /* System EPROM Area 128Kb DEBUGGER supplied as default on CPU-1B/D     */
-	map(0x0a0000, 0x0bffff).rom().region("user", 0); /* User EPROM/SRAM Area, max 128Kb mapped by a cartslot  */
+	//map(0x0a0000, 0x0bffff).rom().region("user", 0); /* User EPROM/SRAM Area, max 128Kb mapped by a cartslot  */
 	map(0x0c0040, 0x0c0043).rw(m_aciahost, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 	map(0x0c0080, 0x0c0083).rw(m_aciaterm, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
 	map(0x0c0100, 0x0c0103).rw(m_aciaremt, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
