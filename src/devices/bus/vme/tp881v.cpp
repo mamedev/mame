@@ -27,10 +27,10 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(TP881V, tp881v_device, "tp881v", "Tadpole Technology TP881V")
+DEFINE_DEVICE_TYPE(VME_TP881V, vme_tp881v_card_device, "tp881v", "Tadpole Technology TP881V")
 
-tp881v_device::tp881v_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, TP881V, tag, owner, clock)
+vme_tp881v_card_device::vme_tp881v_card_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, VME_TP881V, tag, owner, clock)
 	, device_vme_card_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")
 	, m_mmu(*this, "mmu%u", 0U)
@@ -57,21 +57,21 @@ ROM_END
 static INPUT_PORTS_START(tp881v)
 INPUT_PORTS_END
 
-const tiny_rom_entry *tp881v_device::device_rom_region() const
+const tiny_rom_entry *vme_tp881v_card_device::device_rom_region() const
 {
 	return ROM_NAME(tp881v);
 }
 
-ioport_constructor tp881v_device::device_input_ports() const
+ioport_constructor vme_tp881v_card_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(tp881v);
 }
 
-void tp881v_device::device_start()
+void vme_tp881v_card_device::device_start()
 {
 }
 
-void tp881v_device::device_reset()
+void vme_tp881v_card_device::device_reset()
 {
 }
 
@@ -82,10 +82,10 @@ static void scsi_devices(device_slot_interface &device)
 	device.option_add("ncr53c90a", NCR53C90A);
 }
 
-void tp881v_device::device_add_mconfig(machine_config &config)
+void vme_tp881v_card_device::device_add_mconfig(machine_config &config)
 {
 	MC88100(config, m_cpu, 40_MHz_XTAL / 2);
-	m_cpu->set_addrmap(AS_PROGRAM, &tp881v_device::cpu_mem);
+	m_cpu->set_addrmap(AS_PROGRAM, &vme_tp881v_card_device::cpu_mem);
 
 	MC88200(config, m_mmu[0], 40_MHz_XTAL / 2, 0x00);
 	m_mmu[0]->set_mbus(m_cpu, AS_PROGRAM);
@@ -178,7 +178,7 @@ void tp881v_device::device_add_mconfig(machine_config &config)
 
 	I82596_BE32(config, m_net, 20'000'000); // A82596DX-25
 	m_net->out_irq_cb().set(m_cio[0], FUNC(z8036_device::pa1_w));
-	m_net->set_addrmap(0, &tp881v_device::net_mem);
+	m_net->set_addrmap(0, &vme_tp881v_card_device::net_mem);
 
 	input_merger_any_high_device &scc_irq(INPUT_MERGER_ANY_HIGH(config, "scc_irq"));
 	scc_irq.output_handler().set(m_cio[0], FUNC(z8036_device::pa5_w));
@@ -310,12 +310,13 @@ void tp881v_device::device_add_mconfig(machine_config &config)
 	NMC9306(config, m_eeprom, 0);
 }
 
-void tp881v_device::cpu_mem(address_map &map)
+void vme_tp881v_card_device::cpu_mem(address_map &map)
 {
 	map(0x0000'0000, 0x0003'ffff).rom().region("eprom", 0);
 	//map(0x2000'0000, 0x20ff'ffff); // vme short space (a24 d32)
+
 	map(0x4000'0000, 0x41ff'ffff).ram().share("ram");
-	//map(0x8000'0000, 0x80ff'ffff); // vme extended space (a32 d32)
+	//map(0x8000'0000, 0xbfff'ffff); // vme extended space (a32 d32)
 	//map(0xc000'0000, 0xc0ff'ffff); // vsb space
 
 	map(0xfff3'0000, 0xfff3'003f).m(m_scsi[0], FUNC(ncr53c90a_device::map)).umask32(0x000000ff);
@@ -342,7 +343,7 @@ void tp881v_device::cpu_mem(address_map &map)
 	map(0xfff9'0c00, 0xfff9'0cbf).rw(m_cio[7], FUNC(z8036_device::read), FUNC(z8036_device::write)).umask32(0x000000ff);
 }
 
-void tp881v_device::net_mem(address_map &map)
+void vme_tp881v_card_device::net_mem(address_map &map)
 {
 	map(0x4000'0000, 0x41ff'ffff).ram().share("ram");
 }

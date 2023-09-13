@@ -1,28 +1,25 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_BUS_VME_MVME187_H
-#define MAME_BUS_VME_MVME187_H
+#ifndef MAME_BUS_VME_MVME181_H
+#define MAME_BUS_VME_MVME181_H
 
 #pragma once
 
 #include "cpu/m88000/m88000.h"
-
-#include "machine/53c7xx.h"
-//#include "machine/cd2400.h"
-#include "machine/i82586.h"
+#include "machine/ds1315.h"
+#include "machine/mc68681.h"
 #include "machine/mc88200.h"
-#include "machine/timekpr.h"
 
 #include "bus/vme/vme.h"
 #include "bus/rs232/rs232.h"
 
-class vme_mvme187_card_device
+class vme_mvme181_card_device
 	: public device_t
 	, public device_vme_card_interface
 {
 public:
-	vme_mvme187_card_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	vme_mvme181_card_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -34,18 +31,22 @@ protected:
 private:
 	void cpu_mem(address_map &map);
 
+	template <unsigned N> void irq_w(int state);
+	void interrupt();
+
 	required_device<mc88100_device> m_cpu;
 	required_device_array<mc88200_device, 2> m_mmu;
 
-	required_device<ds1643_device> m_rtc;
-	//required_device_array<cd2401, 2> m_uart;
-	required_device_array<rs232_port_device, 6> m_serial;
-	//required_device<ncr53c7xx_device> m_scsi;
-	required_device<i82596_device> m_lan;
+	required_device<ds1315_device> m_rtc;
+	required_device<scn2681_device> m_duart;
+	required_device_array<rs232_port_device, 2> m_serial;
 
 	memory_view m_boot;
+
+	u8 m_isr; // interrupt status register
+	u8 m_imr; // interrupt mask register
 };
 
-DECLARE_DEVICE_TYPE(VME_MVME187, vme_mvme187_card_device)
+DECLARE_DEVICE_TYPE(VME_MVME181, vme_mvme181_card_device)
 
-#endif // MAME_BUS_VME_MVME187_H
+#endif // MAME_BUS_VME_MVME181_H

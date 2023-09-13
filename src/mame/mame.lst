@@ -17872,32 +17872,6 @@ vcc                             //
 @source:fidelity/vsc.cpp
 vsc                             //
 
-@source:force/fccpu20.cpp
-fccpu20sbc
-fccpu21ssbc
-fccpu21sbc
-fccpu21asbc
-fccpu21yasbc
-fccpu21bsbc
-fccpu21ybsbc
-
-@source:force/fccpu30.cpp
-fccpu30
-fccpu30x
-fccpu30xa
-fccpu30za
-fccpu30zbe
-fccpu30be8
-fccpu30be16
-fccpu30lite4
-fccpu30lite8
-fccpu30senr
-fccpu30senr501
-fccpu33
-
-@source:force/force68k.cpp
-fccpu1                          //
-
 @source:force/miniforce.cpp
 miniforce                       // D26 cabinet test board
 
@@ -19345,9 +19319,6 @@ smondial                        // 1986 Mephisto Super Mondial (Ver A)
 smondialab                      // 1986 Mephisto Super Mondial (Ver AB)
 smondialb                       // 1986 Mephisto Super Mondial (Ver B)
 smondial2                       // 1989 Mephisto Super Mondial II
-
-@source:heurikon/hk68v10.cpp
-hk68v10                         //
 
 @source:hitachi/b16.cpp
 b16                             //
@@ -31978,9 +31949,6 @@ multi16                         //
 @source:mitsubishi/trium.cpp
 triumec                         //
 
-@source:mizar/mzr8105.cpp
-mzr8105                         //
-
 @source:morrow/microdec.cpp
 md2                             //
 md3                             //
@@ -32026,9 +31994,6 @@ mekd4                           // 1980 Motorola Evaluation Kit
 
 @source:motorola/mekd5.cpp
 mekd5                           // 1980 Motorola Evaluation Kit
-
-@source:motorola/mvme147.cpp
-mvme147                         // (c) 1989 Motorola
 
 @source:motorola/mvme162.cpp
 mvme162                         // (c) 1993 Motorola
@@ -40825,9 +40790,6 @@ indy_4613                       // IP22: Indy, R4600, 133MHz
 indy_5015                       // IP22: Indy, R5000, 150MHz
 indigo2_4415                    // IP24: Indigo 2, R4400, 150MHz
 
-@source:sgi/ip4.cpp
-pi4d50                          // Professional IRIS 4D/50 (R2000 @ 8MHz)
-
 @source:sgi/ip6.cpp
 pi4d20                          // Personal IRIS 4D/20 (R2000 @ 12.5MHz)
 pi4d25                          // Personal IRIS 4D/25 (R3000 @ 20MHz)
@@ -40852,6 +40814,10 @@ o2                              // (c) 1996 SGI
 
 @source:sgi/octane.cpp
 octane                          // (c) 1997 SGI
+
+@source:sgi/tt.cpp
+pi4d50                          // Professional IRIS 4D/50 (R2000 @ 8MHz)
+pi4d70                          // Professional IRIS 4D/70 (R2000 @ 12.5MHz)
 
 @source:sharp/fontwriter.cpp
 fw600                           // (c) Sharp
