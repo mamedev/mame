@@ -1427,6 +1427,7 @@ atarifb1                        // 033xxx           1978/10 [6502]
 atarifb2                        // 035330-035350    ???     [6502]
 atarifb4                        // 034754           1979/04 [6502]
 soccer                          // 035222-035260    1980/04 [6502]
+amerug                          // 1980 Shoei
 
 @source:atari/atarig1.cpp
 hydra                           // 136079           (c) 1990
@@ -15752,6 +15753,7 @@ trojan                          // 4/1986 (c) 1986 (US)
 trojana                         // 4/1986 (c) 1986 (US)
 trojanb                         // bootleg
 trojanj                         // 4/1986 (c) 1986 (Japan)
+trojanjo                        // 4/1986 (c) 1986 (Japan)
 trojanlt                        // location test
 trojanr                         // 4/1986 (c) 1986 + Romstar
 
