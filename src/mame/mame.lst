@@ -1422,12 +1422,12 @@ xegs                            // 1987 Atari XE Game System
 @source:atari/atarifb.cpp
 abaseb                          // 034711-034738    1979/06 [6502]
 abaseb2                         // 034711-034738    1979/06 [6502]
+amerug                          // 1980 Shoei
 atarifb                         // 033xxx           1978/10 [6502]
 atarifb1                        // 033xxx           1978/10 [6502]
 atarifb2                        // 035330-035350    ???     [6502]
 atarifb4                        // 034754           1979/04 [6502]
 soccer                          // 035222-035260    1980/04 [6502]
-amerug                          // 1980 Shoei
 
 @source:atari/atarig1.cpp
 hydra                           // 136079           (c) 1990
