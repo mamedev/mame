@@ -55,6 +55,9 @@
   50-89 |  med  |    Yes
   90-99 |  high |    Yes
 
+  You can see the high score for Doraneko or Koneko, pressing the corresponding start button
+  whilst game is over.
+
 
   The game has a DIP switch that trigger the Test Mode. This Mode start to handle the stepper motors
   of all arms, and test a sequence of lamps while triggers all the game sounds.
