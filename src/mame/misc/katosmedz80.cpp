@@ -1,20 +1,89 @@
 // license:BSD-3-Clause
 // copyright-holders: Roberto Fresca, Grull Osgo
 
-/*
-ドラネコバンバン - Dora Neco BanBan (as transliterated on the cab)
-Medal game by Kato's, whack-a-mole style
+/**************************************************************************************************
 
-PCB is unmarked
+  ドラネコバンバン - Dora Neco BanBan
+  (as transliterated on the cab)
 
-Main components:
-Sharp LH0080B Z80B-CPU
-12.000 MHz XTAL
-HM6116LP-3 Static RAM
-2x NEC D71055C
-OKI M6295GS
-4-DIP bank
-*/
+  Medal game by Kato Seisakusho
+  whack-a-mole style
+
+  Driver by Roberto Fresca & Grull Osgo.
+
+
+***************************************************************************************************
+
+  PCB is unmarked
+
+  Main components:
+  Sharp LH0080B Z80B-CPU
+  12.000 MHz XTAL
+  HM6116LP-3 Static RAM
+  2x NEC D71055C
+  OKI M6295GS
+  4-DIP bank
+
+  
+***************************************************************************************************
+
+  Some videos about the machine...
+
+  https://www.youtube.com/watch?v=NwB9iffssts
+  https://www.youtube.com/watch?v=zRxTYqj9On4
+  https://www.youtube.com/watch?v=dGlkhfn2Nbw
+  https://www.youtube.com/watch?v=zRxTYqj9On4
+  https://www.youtube.com/watch?v=tj4V5Iaom6I
+
+
+***************************************************************************************************
+
+  We have two characters...
+
+  Doraneko (ドラネコ) (means Stray Cat) 
+  Koneko (コネコ) (means Kitten)
+
+  The game is basically similar to other gator/alligator games, where you must hit 4 mechanical
+  cat arms that make attempts to steal the food through a fence.
+
+  There is a rank system based on the number of hits you can get in the game. After time out,
+  if you have at least 50 hits, you can get extended time. 
+
+   Hits   Level   Extended Game
+  ------+-------+--------------
+  00-49 |  low  |    No
+  50-89 |  med  |    Yes
+  90-99 |  high |    Yes
+
+
+  The game has a DIP switch that trigger the Test Mode. This Mode start to handle the stepper motors
+  of all arms, and test a sequence of lamps while triggers all the game sounds.
+  
+  Test mode: Press START 1 to test the stepper motors / arms.
+
+
+***************************************************************************************************
+
+  Error codes:
+  
+  E1 = Arm 1 sensor error.
+  E2 = Arm 2 sensor error.
+  E3 = Arm 3 sensor error.
+  E4 = Arm 4 sensor error.
+  E5 = Coin error.
+  E6 = Service Coin error.
+  E7 = Door Open error.
+
+
+***************************************************************************************************
+
+  This driver was made reverse-engineering the game code with some educated guesses, as the clocks
+  for all devices. The only element we had, was a PCB picture. All the rest was figured out, as the
+  multiple output lines connections to stepper motors, lamps, 7seg LEDs, etc...
+
+
+**************************************************************************************************/
+
 
 #include "emu.h"
 
@@ -34,19 +103,22 @@ class katosmedz80_state : public driver_device
 public:
 	katosmedz80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu (*this, "maincpu"),
+		m_maincpu(*this, "maincpu"),
 		m_digits(*this, "digit%u", 0U),
 		m_ledsp2(*this, "p2led%u", 0U),
 		m_ledsp3(*this, "p3led%u", 0U),
 		m_ledsp5(*this, "p5led%u", 0U),
 		m_ledsp6(*this, "p6led%u", 0U),
-		m_ledsp8(*this, "p8led%u", 0U)
-	{ }
+		m_ledsp8(*this, "p8led%u", 0U),
+		m_pos(*this, "mpos%u", 0U)
+	{}
 
+	DECLARE_CUSTOM_INPUT_MEMBER(arm_sensors_r);
 	void dnbanban(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -56,18 +128,27 @@ private:
 	output_finder<8> m_ledsp5;
 	output_finder<8> m_ledsp6;
 	output_finder<8> m_ledsp8;
+	output_finder<4> m_pos;
+
 
 	void program_map(address_map &map);
 	void io_map(address_map &map);
 
 	void port8_w(uint8_t data);
-	void output_digit(int i, u8 data);
 
 	void ppi0_b_w(uint8_t data);
 	void ppi0_c_w(uint8_t data);
 	void ppi1_b_w(uint8_t data);
 	void ppi1_c_w(uint8_t data);
+
+	u16 m_var[4];
+	u8 dn, m_sensors, m_pre[4];
 };
+
+
+/******************************************
+*          Machine Start & Reset          *
+******************************************/
 
 void katosmedz80_state::machine_start()
 {
@@ -77,7 +158,28 @@ void katosmedz80_state::machine_start()
 	m_ledsp5.resolve();
 	m_ledsp6.resolve();
 	m_ledsp8.resolve();
+	m_pos.resolve();
+	save_item(NAME(m_var));
+
+
 }
+
+void katosmedz80_state::machine_reset()
+{
+	for(u8 i = 0; i < 4; i++)
+	{
+		m_var[i] = 0;
+		m_pre[i] = 0;
+		m_pos[i] = 0;
+	}
+
+	m_sensors = 0xff;
+}
+
+
+/*********************************************
+*           Memory Map Information           *
+*********************************************/
 
 void katosmedz80_state::program_map(address_map &map)
 {
@@ -95,23 +197,10 @@ void katosmedz80_state::io_map(address_map &map)
 	map(0x0c, 0x0c).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
-void katosmedz80_state::port8_w(u8 data)
-{
-	// show layout (debug)
-	for (u8 i = 0; i < 8; i++)
-		m_ledsp8[i] = (data >> i) & 0x01;
-}
 
-void katosmedz80_state::output_digit(int i, u8 data)
-{
-	// assuming it's using a 7448
-	static const u8 led_map[16] =
-		//{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
-		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x5f,0x7c,0x58,0x5e,0x7b,0x71 }; // hex format
-
-	m_digits[i] = led_map[data & 0xf];
-}
-
+/***********************************************
+*        PPI's and other Ports Handling        *
+***********************************************/
 /*
   .-----.-----------.---------.---------.---------.-------.-------.-------.
   | PPI | Map Range | control | PA mode | PB mode | PortA | PortB | PortC |
@@ -121,53 +210,165 @@ void katosmedz80_state::output_digit(int i, u8 data)
 
 */
 
+CUSTOM_INPUT_MEMBER(katosmedz80_state::arm_sensors_r)
+{
+	return m_sensors;
+}
+
+
 void katosmedz80_state::ppi0_b_w(uint8_t data)
 {
+/*
+    ---- --xx    Stepper Motor 1
+    ---- xx--    Stepper Motor 2
+    --xx ----    Stepper Motor 3
+    xx-- ----    Stepper Motor 4
+
+*/
+
+	u8 m[4], m_bit = 1;
+	for(u8 i = 0; i < 4; i++)
+	{
+		m[i] = (data >> (i * 2)) & 0x03;
+
+		if (m[i] == ((m_pre[i] + 1) % 4))
+			m_var[i]++;  					// arm goes forward
+
+		if (m[i] == ((m_pre[i] - 1) & 3))
+			m_var[i]--;  					// arm goes back
+
+		if (m[i] == m_pre[i])
+			logerror("Motor_%i Stopped\n", i + 1);  // delete after debug
+
+		if (m[i] != m_pre[i])
+		{
+			if (m_var[i] >= 0x20)
+				m_sensors &= 0xff - m_bit;  // sensor on
+
+			if (m_var[i] < 0x08)
+				m_sensors |= m_bit;			// sensor off
+
+			logerror("Motor_%i: %02X   -  m_sensors:%02X\n", i + 1, m_var[i], m_sensors);
+			m_pre[i] = m[i];
+		}
+
+		m_bit = m_bit << 2;
+		m_pos[i] = m_var[i];
+	}
+
+	// show layout (debug)
 	for(u8 i = 0; i < 8; i++)
 		m_ledsp2[i] = (data >> i) & 0x01;
 
-	logerror("PPI0 Port B OUT: %02X\n", data);
 }
 
 void katosmedz80_state::ppi0_c_w(uint8_t data)
 {
+/*
+    ---- ---x    Lamp 1: Doraneko (ドラネコ) Start / Game
+    ---- --x-    Lamp 2: Koneko (コネコ) Start / Game
+    ---- -x--    * On Game: Blinks | Off Game and Test Mode: Turns ON when unknown key "I" is active
+    ---- x---    * High when hits give points. It could be the "Eyes" effect actuator. Related to RAM 4047-4048  
+    ---x ----    Low: Arm 1 Action. Low when food Lamp 1 is On
+    --x- ----    Low: Arm 2 Action. Low when food Lamp 2 is On
+    -x-- ----    Low: Arm 3 Action. Low when food Lamp 3 is On
+    x--- ----    Low: Arm 4 Action. Low when food Lamp 4 is On
+
+*/
+
+	// show layout (debug)
 	for(u8 i = 0; i < 8; i++)
 		m_ledsp3[i] = (data >> i) & 0x01;
-
-	//logerror("PPI0 Port C OUT: %02X\n", data);
 }
 
 void katosmedz80_state::ppi1_b_w(uint8_t data)
 {
+/*
+    ---- ---x    Segment a
+    ---- --x-    Segment b
+    ---- -x--    Segment c
+    ---- x---    Segment d
+    ---x ----    Segment e
+    --x- ----    Segment f
+    -x-- ----    Segment g
+    x--- ----    Coin Lock / Inhibit
+
+*/
+
+	// show layout (game score - max score)
+	m_digits[dn] = data & 0x7f;
+
+	// show layout (debug)
 	for(u8 i = 0; i < 8; i++)
 		m_ledsp5[i] = (data >> i) & 0x01;
 
-	//logerror("PPI1 Port B OUT: %02X\n", data);
 }
 
 void katosmedz80_state::ppi1_c_w(uint8_t data)
 {
-	u8 dn = 0;
-	u8 dig = data & 0x0f;
-	if (dig == 1) dn = 0;
-	if (dig == 2) dn = 1;
-	if (dig == 4) dn = 2;
-	if (dig == 8) dn = 3;
+/*
+    ---- ---x    Digit 0
+    ---- --x-    Digit 1
+    ---- -x--    Digit 2
+    ---- x---    Digit 3
+    ---x ----    Coin Counter
+    --x- ----    * XOR between digit selection
+    -x-- ----    * Off while playing Sounds (RDY / BUSY / Digital Mute signal?
+    x--- ----    * On = funcional; Off = error
 
-	output_digit(dn, (data >> 4) & 0x0f);
+*/
 
+	// Digit Selector for multiplexed 7Seg display
+	for(u8 i = 0; i < 4; i++) 
+		if(((data >> i) & 1) == 1)
+			dn = i;
+
+	// show layout (debug)
 	for(u8 i = 0; i < 8; i++)
 		m_ledsp6[i] = (data >> i) & 0x01;
 
-	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));  // coin counter
-
-	//logerror("PPI1 Port C OUT: %02X\n", data);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
 }
 
 
+void katosmedz80_state::port8_w(u8 data)
+{
+/*
+    ---- ---x    Lamp 1: Text Line 3 - Low Level (00-49 hits)
+    ---- --x-    Lamp 2: Text Line 2 - Medium Level (50-89 hits)
+    ---- -x--    Lamp 3: Text Line 1 - High Level (90-99 hits)
+    ---- x---    Lamp 4: Game Over
+    ---x ----    Lamp 5: Arm 1 food
+    --x- ----    Lamp 6: Arm 2 food
+    -x-- ----    Lamp 7: Arm 3 food
+    x--- ----    Lamp 8: Arm 4 food
+
+*/
+
+	// show layout (debug)
+	for (u8 i = 0; i < 8; i++)
+		m_ledsp8[i] = (data >> i) & 0x01;
+}
+
+
+/*********************************************
+*                Input Ports                 *
+*********************************************/
+
 static INPUT_PORTS_START( dnbanban )
 	PORT_START("IN0")
-	PORT_BIT( 0x55, IP_ACTIVE_HIGH, IPT_UNKNOWN )  // seems the arms sensors...
+/*
+    ---- ---x    Arm 1 Sensor
+    ---- --x-    Arm 1 Hit microswitch
+    ---- -x--    Arm 2 Sensor
+    ---- x---    Arm 2 Hit microswitch
+    ---x ----    Arm 3 Sensor
+    --x- ----    Arm 3 Hit microswitch
+    -x-- ----    Arm 4 Sensor
+    x--- ----    Arm 4 Hit microswitch
+
+*/
+	PORT_BIT( 0x55, IP_ACTIVE_HIGH, IPT_CUSTOM )PORT_CUSTOM_MEMBER(katosmedz80_state, arm_sensors_r) 
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1) PORT_NAME("Hit Arm 1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD2) PORT_NAME("Hit Arm 2")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3) PORT_NAME("Hit Arm 3")
@@ -197,49 +398,66 @@ static INPUT_PORTS_START( dnbanban )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")  // to figure out...
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )		// Doraneko (ドラネコ) Start
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )		// Koneko (コネコ) Start
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )     // not accessed in game code
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )	 // Doraneko (ドラネコ) Start
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )	 // Koneko (コネコ) Start
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )  // not accessed in game code
 
 INPUT_PORTS_END
 
 
+/*********************************************
+*              Machine Drivers               *
+*********************************************/
+
 void katosmedz80_state::dnbanban(machine_config &config)
 {
-	Z80(config, m_maincpu, 12_MHz_XTAL / 4); // divider unknown
+	// basic machine hardware
+	Z80(config, m_maincpu, 12_MHz_XTAL / 2);  // guess
 	m_maincpu->set_addrmap(AS_PROGRAM, &katosmedz80_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &katosmedz80_state::io_map);
-	m_maincpu->set_periodic_int(FUNC(katosmedz80_state::irq0_line_hold), attotime::from_hz(4*60));  // wrong
+	m_maincpu->set_periodic_int(FUNC(katosmedz80_state::irq0_line_hold), attotime::from_hz(720));  // wrong
 
-	i8255_device &ppi0(I8255(config, "ppi0"));  // D71055C
+	i8255_device &ppi0(I8255(config, "ppi0"));  // D71055C IC10
 	// (00-03) Mode 0 - Ports A set as input, Ports B, high C & low C as output.
 	ppi0.in_pa_callback().set_ioport("IN0");
 	ppi0.out_pb_callback().set(FUNC(katosmedz80_state::ppi0_b_w));
 	ppi0.out_pc_callback().set(FUNC(katosmedz80_state::ppi0_c_w));
 
-	i8255_device &ppi1(I8255(config, "ppi1"));  // D71055C
+	i8255_device &ppi1(I8255(config, "ppi1"));  // D71055C IC5
 	// (04-07) Mode 0 - Ports A set as input, Ports B, high C & low C as output.
 	ppi1.in_pa_callback().set_ioport("IN1");
 	ppi1.out_pb_callback().set(FUNC(katosmedz80_state::ppi1_b_w));
 	ppi1.out_pc_callback().set(FUNC(katosmedz80_state::ppi1_c_w));
 
-	// 2x LEDs
+	// video
+	config.set_default_layout(layout_dnbanban);
 
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-
 	OKIM6295(config, "oki", 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.65);
 }
 
 
-ROM_START( dnbanban )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "g25_a.ic17", 0x0000, 0x8000, CRC(ef441127) SHA1(69fea4992abb2c4905d3831b6f18e464088f0ec7) ) // MBM27C256A, 1xxxxxxxxxxxxxx = 0xFF
+/*********************************************
+*                  Rom Load                  *
+*********************************************/
 
-	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
-	ROM_LOAD( "g25_v.ic7", 0x00000, 0x20000, CRC(87c7d45d) SHA1(3f035d5e62fe62111cee978ed1708e902c98526a) ) // MBM27C1000
+ROM_START( dnbanban )
+    ROM_REGION( 0x8000, "maincpu", 0 )
+    ROM_LOAD( "g25_a.ic17", 0x0000, 0x8000, CRC(ef441127) SHA1(69fea4992abb2c4905d3831b6f18e464088f0ec7) )  // MBM27C256A, 1xxxxxxxxxxxxxx = 0xFF
+
+    ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
+    ROM_LOAD( "g25_v.ic7", 0x00000, 0x20000, CRC(87c7d45d) SHA1(3f035d5e62fe62111cee978ed1708e902c98526a) )  // MBM27C1000
 ROM_END
 
-} // anonymous namespace
+}
+
+// anonymous namespace
 
 
-GAMEL( 1993, dnbanban, 0, dnbanban, dnbanban, katosmedz80_state, empty_init, ROT0, "Kato's", "Dora Neco BanBan", MACHINE_IS_SKELETON_MECHANICAL, layout_dnbanban )
+/*********************************************
+*                Game Drivers                *
+*********************************************/
+
+//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE              INIT        ROT    COMPANY            FULLNAME           FLAGS
+GAME( 1993, dnbanban, 0,       dnbanban, dnbanban, katosmedz80_state, empty_init, ROT0, "Kato Seisakusho", "Dora Neco BanBan", MACHINE_MECHANICAL )
