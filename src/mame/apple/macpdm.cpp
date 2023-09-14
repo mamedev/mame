@@ -496,7 +496,7 @@ uint8_t macpdm_state::via2_ifr_r()
 
 uint8_t macpdm_state::via2_sier_r()
 {
-	return m_via2_ier;
+	return m_via2_sier;
 }
 
 void macpdm_state::via2_sier_w(uint8_t data)
