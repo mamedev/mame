@@ -40259,6 +40259,7 @@ failgate                        // (c) 1991 Seibu Kaihatsu
 @source:seibu/banprestoms.cpp
 marioun                         //
 tvdenwad                        //
+tvdenwam                        //
 
 @source:seibu/bloodbro.cpp
 bloodbro                        // (c) 1990 Tad
@@ -42819,8 +42820,8 @@ rollace                         // (c) 1983 Williams
 rollace2                        // (c) 1983 Williams
 
 @source:taito/sbmjb.cpp
-honooinv                        // E41 (c) 1997 Taito
 bubbroul                        // E48 (c) 1997 Taito
+honooinv                        // E41 (c) 1997 Taito
 sbmjb                           // ??? (c) 1998 Taito
 
 @source:taito/sbowling.cpp
