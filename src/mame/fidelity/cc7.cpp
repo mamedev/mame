@@ -12,6 +12,9 @@ Zilog Z80A, 3.579MHz from XTAL
 Z80 IRQ/NMI unused, no timer IC.
 This is a cost-reduced design from CC10, no special I/O chips.
 
+Known ROM labels (long production run, so there are several revisions):
+CN19064N BCC, CN19103N BCC-REVB, 101-32016, 101-1005C01
+
 Backgammon Challenger (BKC) is the same PCB, with the speaker connection going
 to the display panel instead.
 
@@ -22,7 +25,7 @@ RE information from netlist by Berger (1st version PCB)
 
 Memory map:
 -----------
-0000-0FFF: 4K 2332 ROM CN19103N BCC-REVB (or CN19064N BCC)
+0000-0FFF: 4K 2332 ROM
 2000-2FFF: ROM/RAM bus conflict!
 3000-3FFF: 256 bytes RAM (2111 SRAM x2)
 4000-FFFF: Z80 A14/A15 not connected
