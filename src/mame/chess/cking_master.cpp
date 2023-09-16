@@ -4,7 +4,10 @@
 /*******************************************************************************
 
 Chess King Master (yes, it's plainly named "Master")
-According to the manual, the chess engine is Cyrus (by Richard Lang).
+
+Chess King was a UK business formed by Intelligent Software, so logically,
+all the programs were by them. According to the manual, the chess engine is
+Cyrus (by Richard Lang).
 
 Hardware notes:
 - Z80 CPU(NEC D780C-1) @ 4MHz(8MHz XTAL), IRQ from 555 timer
@@ -256,5 +259,5 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY       FULLNAME               FLAGS
-SYST( 1984, ckmaster, 0,      0,      master,  master, master_state, init_master, "Chess King", "Master (Chess King)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY, FULLNAME, FLAGS
+SYST( 1984, ckmaster, 0,      0,      master,  master, master_state, init_master, "Chess King / Intelligent Software", "Master (Chess King)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
