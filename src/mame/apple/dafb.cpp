@@ -397,7 +397,7 @@ u32 dafb_base::dafb_r(offs_t offset)
 			return m_scsi_ctrl[1] | (m_drq[1] << 9);
 
 		case 0x2c: // test / version (0 = original, 1 = NTSC and PAL fix, 2 = discrete DAFB II, 3 = MEMC/MEMCjr integrated DAFB cell)
-			return (m_test & 0x1ff) | (2<<9);
+			return (m_test & 0x1ff) | (m_dafb_version<<9);
 	}
 
 	return 0;
@@ -582,6 +582,13 @@ u32 dafb_base::swatch_r(offs_t offset)
 
 		case 0x20: // unused register, used by the driver to stash data
 			return m_swatch_test;
+
+		case 0x24: case 0x28: case 0x2c: case 0x30: case 0x34: case 0x38: case 0x3c:
+		case 0x40: case 0x44: case 0x48:
+			return m_horizontal_params[offset - (0x24 / 4)];
+
+		case 0x4c: case 0x50: case 0x54: case 0x58: case 0x5c: case 0x60: case 0x64:
+			return m_vertical_params[offset - (0x4c / 4)];
 	}
 	return 0;
 }
@@ -707,7 +714,8 @@ u32 dafb_base::ramdac_r(offs_t offset)
 			break;
 
 		case 0x20:
-			return m_ac842_pbctrl;
+				LOGMASKED(LOG_RAMDAC, "Read %02x from PCBR(0)\n", m_ac842_pbctrl);
+				return m_ac842_pbctrl;
 	}
 	return 0;
 }
@@ -820,13 +828,8 @@ void dafb_base::recalc_mode()
 		}
 		else
 		{
-			// FIXME: Quadra 800 family machines in 832x624 program an unnecessary 2x clock divider in 24bpp mode only.
-			// Need to determine if this is deliberate and we're just missing something.
-			if ((m_hres != 832) || (clockdiv != 2))
-			{
-				m_hres *= clockdiv;
-				m_htotal *= clockdiv;
-			}
+			m_hres *= clockdiv;
+			m_htotal *= clockdiv;
 		}
 
 		// if we're interlaced, bump the vertical back to double
@@ -884,12 +887,22 @@ void dafb_base::clockgen_w(offs_t offset, u8 data)
 
 u32 dafb_base::vram_r(offs_t offset)
 {
-	return m_vram[offset & (m_vram_size - 1)];
+	if (offset >= (m_vram_size>>2))
+	{
+		return 0;
+	}
+
+	return m_vram[offset];
 }
 
 void dafb_base::vram_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	COMBINE_DATA(&m_vram[offset & (m_vram_size - 1)]);
+	if (offset >= (m_vram_size >> 2))
+	{
+		return;
+	}
+
+	COMBINE_DATA(&m_vram[offset]);
 }
 
 void dafb_base::recalc_ints()
@@ -1104,7 +1117,7 @@ void dafb_memc_device::clockgen_w(offs_t offset, u8 data)
 	}
 }
 
-// This is an AC842a, which has x555 16bpp mode
+// This is an Antelope, which has x555 16bpp mode
 u32 dafb_memc_device::ramdac_r(offs_t offset)
 {
 	switch (offset << 2)
@@ -1112,6 +1125,7 @@ u32 dafb_memc_device::ramdac_r(offs_t offset)
 		case 0x20:
 			if ((m_pal_address == 1) && ((m_ac842_pbctrl & 0x06) == 0x06))
 			{
+				LOGMASKED(LOG_RAMDAC, "Read %02x from PCBR1\n", m_pcbr1);
 				return m_pcbr1;
 			}
 			else
@@ -1132,7 +1146,7 @@ void dafb_memc_device::ramdac_w(offs_t offset, u32 data)
 			if ((m_pal_address == 1) && ((m_ac842_pbctrl & 0x06) == 0x06))
 			{
 				LOGMASKED(LOG_RAMDAC, "%02x to AC842a PCBR1\n", data);
-				m_pcbr1 = data & 0xf0;
+				m_pcbr1 = (data & 0xf0) | 0x02; // Antelope version ID
 			}
 			else
 			{
