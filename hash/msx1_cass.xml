@@ -188,7 +188,7 @@ license:CC0-1.0
 		</part>
 		<part name="cass1b" interface="msx_cass">
 			<dataarea name="cass" size="34456">
-				<rom name="teach yourself basic - toshiba (side a).cas" size="34456" crc="33e11c22" sha1="e5b0b2b89522b29ba630102ba940e4f94c97100e"/>
+				<rom name="teach yourself basic - toshiba (side b).cas" size="34456" crc="33e11c22" sha1="e5b0b2b89522b29ba630102ba940e4f94c97100e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3023,6 +3023,20 @@ license:CC0-1.0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="26667">
 				<rom name="chiller (1985)(mastertronic)(gb)[a5][run'cas-'].cas" size="26667" crc="ca145912" sha1="4743f27195249b380de6a3e2cb4f52b3052f7912"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chojinrk">
+		<description>Chōjin Rokku Majo No Millenium (Japan)</description>
+		<year>1984</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="alt_title" value="超人ロック魔女のミレニアム"/>
+		<info name="serial" value="K28X5062"/>
+		<info name="usage" value="Load with CLOAD + RUN"/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="10700">
+				<rom name="chojin rokku majo no millenium - pony canyon.cas" size="10700" crc="1ffabb5c" sha1="a09061cd0bba0e95517b0bc71f8954e9881828a5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8785,6 +8799,32 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="lancelot">
+		<description>Lancelot (United Kingdom)</description>
+		<year>1988</year>
+		<publisher>Mandarin Software</publisher>
+		<info name="barcode" value="9780948103213"/>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="60407">
+				<rom name="lancelot - mandarin software (tape 1).cas" size="60407" crc="f7103404" sha1="31703294d8c14a2c1564b9789cddd4b214db119a"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="msx_cass">
+			<feature name="part_id" value="Tape 2"/>
+			<dataarea name="cass" size="60407">
+				<rom name="lancelot - mandarin software (tape 2).cas" size="60407" crc="103492d3" sha1="df1c1334dcad4a80fbfc6c581820989ce54f4c86"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="msx_cass">
+			<feature name="part_id" value="Tape 3"/>
+			<dataarea name="cass" size="60407">
+				<rom name="lancelot - mandarin software (tape 3).cas" size="60407" crc="fb88e29f" sha1="1a7f81a907dfdc7c15ef4994a197a6fbe6693163"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lastdung">
 		<description>Last Dungeon (Spain)</description>
 		<year>198?</year>
@@ -9013,6 +9053,28 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="letscomp">
+		<description>Let's Computer (Japan)</description>
+		<year>1984</year>
+		<publisher>Mel Software</publisher>
+		<notes>Side A: 2400 baud. Side B: 1200 baud.</notes>
+		<info name="alt_title" value="レッツ・コンピュータ"/>
+		<info name="serial" value="58L-806"/>
+		<info name="usage" value="Load with CLOAD + RUN. Requires a Japanese system."/>
+		<part name="cass1a" interface="msx_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="52303">
+				<rom name="lets computer - mel software (side a).cas" size="52303" crc="d57411fb" sha1="a177cadb45915c49b32695768619a00f2580f896"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="1">
+				<rom name="lets computer - mel software (side b).cas" size="0" status="nodump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="licantro" cloneof="knightlr">
 		<description>Licantropo (Spain)</description>
 		<year>1986</year>
@@ -9165,6 +9227,18 @@ license:CC0-1.0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="45270">
 				<rom name="lizard (1985)(micro cabin)(jp)[cload + run].cas" size="45270" crc="0cba2cd9" sha1="ebc167e54bcd604fc54763346d0d165599bda33c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lordwats">
+		<description>Lord Watson (Spain)</description>
+		<year>198?</year>
+		<publisher>MSX Club</publisher>
+		<info name="usage" value="Load with LOAD&quot;CAS:&quot;,R or RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="54608">
+				<rom name="lord watson - msx club.cas" size="54608" crc="90b9203f" sha1="62dab36d97caeeb59e88c25887a764bffe0b631b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9448,7 +9522,38 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mandragr">
+	<software name="mandragore">
+		<description>Mandragore (United Kingdom)</description>
+		<year>1986</year>
+		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1a" interface="msx_cass">
+			<feature name="part_id" value="Tape 1 Side A"/>
+			<dataarea name="cass" size="56793">
+				<rom name="mandragore - infogrames (tape 1 side a).cas" size="56793" crc="3b7fb035" sha1="eea5891c531814042b814734b7b8c8e23f817a3e"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="msx_cass">
+			<feature name="part_id" value="Tape 1 Side B"/>
+			<dataarea name="cass" size="56793">
+				<rom name="mandragore - infogrames (tape 1 side b).cas" size="56793" crc="3b7fb035" sha1="eea5891c531814042b814734b7b8c8e23f817a3e"/>
+			</dataarea>
+		</part>
+		<part name="cass2a" interface="msx_cass">
+			<feature name="part_id" value="Tape 2 Side A"/>
+			<dataarea name="cass" size="49991">
+				<rom name="mandragore - infogrames (tape 2 side a).cas" size="49991" crc="113dfe20" sha1="bf93abdf3b1ab251dc157d03a34a0ece5266aa9e"/>
+			</dataarea>
+		</part>
+		<part name="cass2b" interface="msx_cass">
+			<feature name="part_id" value="Tape 2 Side B"/>
+			<dataarea name="cass" size="44359">
+				<rom name="mandragore - infogrames (tape 2 side b).cas" size="44359" crc="f6548b0b" sha1="20a9da08c5053cd77a57752c17a91fa1b7165123"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mandragrf" cloneof="mandragore">
 		<description>Mandragore (France)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
@@ -9475,7 +9580,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mandragra" cloneof="mandragr">
+	<software name="mandragrfa" cloneof="mandragore">
 		<description>Mandragore (France, alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
@@ -9592,6 +9697,20 @@ license:CC0-1.0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="39088">
 				<rom name="martianoids (1987)(ultimate play the game)(gb)[bload'cas-',r].cas" size="39088" crc="900958f3" sha1="58df58ad1615a7a6bd2454f4648e317aa96d8e94"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marsongo">
+		<description>Marude Son Goku (Japan)</description>
+		<year>1984</year>
+		<publisher>Mel Software</publisher>
+		<info name="alt_title" value="まるで孫悟空"/>
+		<info name="serial" value="58L-801"/>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;.R."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="26919">
+				<rom name="marude son goku - mel software.cas" size="26919" crc="1d2243b3" sha1="43c873011513080ae53020be383454b40252ec5a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10063,6 +10182,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="minder">
+		<description>Minder (United Kingdom)</description>
+		<year>1985</year>
+		<publisher>DK'Tronics</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="58119">
+				<rom name="minder - dk-tronics.cas" size="58119" crc="54ca0e54" sha1="bfd7a60e49af6b93bf663ae1264f1b40c639e830"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Generation-msx only lists a floppy release by Eaglesoft with serial 1914. That range is normally used for cassette releases. -->
 	<software name="minemach">
 		<description>Miner Machine (Europe)</description>
@@ -10142,6 +10273,19 @@ license:CC0-1.0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="26990">
 				<rom name="mision rescate (1986)(anaya multimedia)(es)[run'cas-'].cas" size="26990" crc="8c8acdf0" sha1="b057046c1ad2c36a87f6b334d986e570c318b712"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrjaws">
+		<description>Mister Jaws (Netherlands)</description>
+		<year>1987</year>
+		<publisher>Eaglesoft</publisher>
+		<info name="serial" value="1552"/>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="28136">
+				<rom name="mister jaws - eaglesoft.cas" size="28136" crc="f142d19d" sha1="194ee63a5745db10761a2bcad3cc8944bc7f5236"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10426,6 +10570,18 @@ license:CC0-1.0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="13647">
 				<rom name="mr. wong's loopy laundry (1984)(artic computing)(gb)[a][bload'cas-',r].cas" size="13647" crc="8f682a32" sha1="b930e313b709ff123fb04ee632e3ba1da50d3df6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mstcalc">
+		<description>MST-CALC (Europe)</description>
+		<year>1985</year>
+		<publisher>MST Consultants</publisher>
+		<info name="usage" value="Load with CLOAD + RUN."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="9256">
+				<rom name="mst-calc - mst consultants.cas" size="9256" crc="2b58585b" sha1="62fceb223588fe6721c59ba3ee235eba2b82deca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10826,6 +10982,34 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Ninjya Kage -->
+	<software name="ninjaaks">
+		<description>Ninja (Netherlands, Aackosoft)</description>
+		<year>1984</year>
+		<publisher>Aackosoft</publisher>
+		<info name="serial" value="1052"/>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="17108">
+				<rom name="ninja - aackosoft.cas" size="17108" crc="c336e956" sha1="b0c7e9baf65081e34e6dbbb4ee7f98a78037f4c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Ninja-kun - Magic Castle Adventure -->
+	<software name="ninjaeag">
+		<description>Ninja (Netherlands, Eaglesoft)</description>
+		<year>1986</year>
+		<publisher>Eaglesoft</publisher>
+		<info name="serial" value="1337"/>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="34616">
+				<rom name="ninja - eaglesoft.cas" size="34616" crc="b07d9c23" sha1="3352ed6e455fa3fd7f73de21e9f6a8e90a1cb8c3"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nonamed">
 		<description>Nonamed (Spain)</description>
 		<year>1986</year>
@@ -11040,6 +11224,32 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="octopuss">
+		<description>Octopuss (France)</description>
+		<year>1986</year>
+		<publisher>Vifi International</publisher>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="22055">
+				<rom name="octopuss - vifi international.cas" size="22055" crc="1a333b71" sha1="dafb7fe251eeb87890f4e09e9b289b7190e1fa59"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="offering">
+		<description>Offering (Japan)</description>
+		<year>1984</year>
+		<publisher>Toshiba-EMI</publisher>
+		<info name="alt_title" value="オファリング"/>
+		<info name="serial" value="PS-1004G"/>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;. Requires a Japanese system."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="23604">
+				<rom name="offering - toshiba-emi.cas" size="23604" crc="2c7f3e13" sha1="385016a79d139e867bc78bd5d25167440e65c63c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ohmummy">
 		<description>Oh Mummy!! (Europe)</description>
 		<year>1984</year>
@@ -11078,6 +11288,18 @@ license:CC0-1.0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="32784">
 				<rom name="oh shit (1986)(aackosoft)(nl)[a][run'cas-'].cas" size="32784" crc="5fc9b6a2" sha1="7db51c6c9792b472cb41521233f105aa6c89c48e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ohnob" cloneof="ohshit">
+		<description>Oh No! (Brazil)</description>
+		<year>1986</year>
+		<publisher>Disprosoft</publisher>
+		<info name="usage" value="Load with CLOAD + RUN."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="30323">
+				<rom name="oh no - disprosoft.cas" size="30323" crc="2a48ee99" sha1="c34a96d25be4a3ae616659a24bd8c4a51f5ff222"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11705,6 +11927,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="phantom2a" cloneof="vampirec">
+		<description>Phantomas 2 (Spain, alt)</description>
+		<year>1987</year>
+		<publisher>Dinamic Software</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="45248">
+				<rom name="phantomas 2 - dinamic software (alt).cas" size="45248" crc="d302f7df" sha1="d24bf89e56ed332a557786a439aa486f0b4be178"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pharaoh">
 		<description>Pharaoh's Revenge (Europe)</description>
 		<year>1988</year>
@@ -11755,6 +11989,18 @@ license:CC0-1.0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="14331">
 				<rom name="phfile (19xx)(philips)(es)[bload'cas-',r].cas" size="14331" crc="242f09af" sha1="0541e72cf0ef50516dd01921bca5a92b233b0706"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="photomem">
+		<description>Photographic Memory (Netherlands)</description>
+		<year>1984</year>
+		<publisher>C.D. Systems</publisher>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="20000">
+				<rom name="photographic memory - c.d. systems.cas" size="20000" crc="c1a1f09b" sha1="488f49052c83eac8adb499f993a725fb9feb21d2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11824,6 +12070,20 @@ license:CC0-1.0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="67318">
 				<rom name="pink panther (1988)(dro soft)(es)[run'cas-'].cas" size="67318" crc="1c4f3581" sha1="7dfbc7ca8a3ad970d40923ba10595ad5dfbe070a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pirates">
+		<description>Pirates (Spain)</description>
+		<year>1988</year>
+		<publisher>Halley Software</publisher>
+		<info name="alt_title" value="Piratas"/>
+		<info name="serial" value="HAL 004"/>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="43900">
+				<rom name="pirates - halley software.cas" size="43900" crc="7ba4f705" sha1="bcdddce906a75d7715c44a61cc743726624338fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11973,6 +12233,20 @@ license:CC0-1.0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="66368">
 				<rom name="poogaboo (1991)(opera soft)(es)[a][passworded][bload'cas-',r].cas" size="66368" crc="2f3350f7" sha1="3822f4b5cb4da4a14ad05fa005ac1316e56fdcff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="portopia">
+		<description>Portopia Renzoku Satsujin Jiken (Japan)</description>
+		<year>1985</year>
+		<publisher>ENIX</publisher>
+		<info name="alt_title" value="ポートピア連続殺人事件"/>
+		<info name="serial" value="E-M002"/>
+		<info name="usage" value="Load with CLOAD + RUN. Requires a Japanese system."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="33280">
+				<rom name="portopia renzoku satsujin jiken - enix.cas" size="33280" crc="734da876" sha1="737de4aa277d7e970705650730d26e59c9c39945"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12180,7 +12454,21 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="punchy">
+	<software name="punchyjd">
+		<description>Punchy &amp; Judy (United Kingdom)</description>
+		<year>1989</year>
+		<publisher>Alternative Software</publisher>
+		<info name="serial" value="AS 737"/>
+		<info name="barcode" value="5015103778560"/>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="51513">
+				<rom name="punchy and judy - alternative software.cas" size="51513" crc="81f85c69" sha1="484e5bef413c6b7d58f6b1be1e877d93bbf007c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="punchy" cloneof="punchyjd">
 		<description>Punchy (Spain)</description>
 		<year>1984</year>
 		<publisher>Philips Spain</publisher>
@@ -12194,7 +12482,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="punchya" cloneof="punchy">
+	<software name="punchya" cloneof="punchyjd">
 		<description>Punchy (Europe)</description>
 		<year>1984</year>
 		<publisher>Mr. Micro</publisher>
@@ -12323,6 +12611,18 @@ license:CC0-1.0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="65880">
 				<rom name="r.a.m. (1990)(topo soft)(es)[run'cas-'].cas" size="65880" crc="497462cc" sha1="e8505264d428cd4255835a422fc0b827e61f6994"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rabbian">
+		<description>Rabbian (Japan)</description>
+		<year>1984</year>
+		<publisher>Soft Pro International</publisher>
+		<info name="usage" value="Load with CLOAD + RUN."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="17060">
+				<rom name="rabbian - soft pro international.cas" size="17060" crc="c24b8576" sha1="7cfc6290b92e6f0df0a70eb8a978d973c4f1373a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12876,6 +13176,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="roller">
+		<description>Roller (Finland)</description>
+		<year>1987</year>
+		<publisher>Triosoft</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="34110">
+				<rom name="roller - triosoft.cas" size="34110" crc="d1edbf43" sha1="e6eb065a8f381eab4fa1a41103db971daca9c282"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="roma">
 		<description>Roma - La Conquista del Imperio (Spain)</description>
 		<year>1986</year>
@@ -13371,6 +13683,44 @@ license:CC0-1.0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="23414">
 				<rom name="ship (1989)(eurosoft)(nl)(es)[bload'cas-',r].cas" size="23414" crc="8c104698" sha1="df838093393c895b9d2b204494cc7fafd75fcf5f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shirokur">
+		<description>Shiro to Kuro no Densetsu (Japan)</description>
+		<year>1986</year>
+		<publisher>Soft Studio Wing</publisher>
+		<info name="usage" value="Load with CLOAD + RUN. Requires a Japanese system."/>
+		<part name="cass1" interface="msx_cass">
+			<feature name="part_id" value="Tape A - Music"/>
+			<dataarea name="cass" size="27696">
+				<!-- This is supposed to also have music and sounds recorded. -->
+				<rom name="shiro to kuro no densetsu - soft studio wing (tape a).cas" size="27696" crc="06f644c5" sha1="cef1b108e98b80d7bef34d1abe7c9800ed0f7f3f" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="cass2a" interface="msx_cass">
+			<feature name="part_id" value="Tape A Side 1"/>
+			<dataarea name="cass" size="28032">
+				<rom name="shiro to kuro no densetsu - soft studio wing (tape a)(side 1).cas" size="28032" crc="cc5118ad" sha1="08d07748fd00ffe7465e9cc0acf903d311240a83"/>
+			</dataarea>
+		</part>
+		<part name="cass2b" interface="msx_cass">
+			<feature name="part_id" value="Tape A Side 2"/>
+			<dataarea name="cass" size="27904">
+				<rom name="shiro to kuro no densetsu - soft studio wing (tape a)(side 2).cas" size="27904" crc="082ebd2e" sha1="ce5e923758af35bb89c25fa0c81b3b8d73e3f517"/>
+			</dataarea>
+		</part>
+		<part name="cass3a" interface="msx_cass">
+			<feature name="part_id" value="Tape B Side 1"/>
+			<dataarea name="cass" size="30976">
+				<rom name="shiro to kuro no densetsu - soft studio wing (tape b)(side 1).cas" size="30976" crc="3f5a969e" sha1="0836de8340fcb157666bdb01d77b5778b909b0c8"/>
+			</dataarea>
+		</part>
+		<part name="cass3b" interface="msx_cass">
+			<feature name="part_id" value="Tape B Side 2"/>
+			<dataarea name="cass" size="27904">
+				<rom name="shiro to kuro no densetsu - soft studio wing (tape b)(side 2).cas" size="27904" crc="61424589" sha1="f500e18f28db244f11182141be0df4d6e3e57720"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15410,6 +15760,18 @@ Side B
 			<feature name="part_id" value="Tape 2 Side B"/>
 			<dataarea name="cass" size="72561">
 				<rom name="thunderbirds (1989)(grandslam entertainments)(gb)(tape 2 of 2 side b)[bload'cas-',r][martos].cas" size="72561" crc="1bcb9d6f" sha1="965558f541f6154f42866b8fdd683dcee5ba62b3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timemag1">
+		<description>Time and Magik I - Lords of Time (Europe)</description>
+		<year>1984</year>
+		<publisher>Level 9 Computing</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="30081">
+				<rom name="time and magik i - lords of time - level 9 computing.cas" size="30081" crc="96ba62cd" sha1="08edf9ee78f3ae63219efc59b759fda4f31aecf8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17651,6 +18013,25 @@ Side B
 
 <!-- Doujin -->
 
+	<software name="aventrur">
+		<description>Las Aventuras de Rudolphine Rur</description>
+		<year>2020</year>
+		<publisher>Dwalin</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;."/>
+		<part name="cass1" interface="msx_cass">
+			<feature name="part_id" value="Part 1"/>
+			<dataarea name="cass" size="47601">
+				<rom name="las aventures de rudolphine rur - dwalin (part 1).cas" size="47601" crc="db717a81" sha1="9cecdc69013039b187e3b456e467df7dffc0ec19"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="msx_cass">
+			<feature name="part_id" value="Part 2"/>
+			<dataarea name="cass" size="47415">
+				<rom name="las aventures de rudolphine rur - dwalin (part 2).cas" size="47415" crc="518cd8bd" sha1="7721e427072d9aa5f9545067784ac61def1f72c7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chiteidb">
 		<description>Chitei Daibouken (Japan)</description>
 		<year>1987</year>
@@ -17664,6 +18045,18 @@ Side B
 		</part>
 	</software>
 
+	<software name="lift">
+		<description>Lift</description>
+		<year>2021</year>
+		<publisher>Inufuto</publisher>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="3719420">
+				<rom name="lift - inufuto.wav" size="3719420" crc="59dc528e" sha1="9b86cc2fea4ba3cf53a18f8766ff5f197f980df9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mtype">
 		<description>M-TYPE (Japan)</description>
 		<year>1989</year>
@@ -17673,6 +18066,31 @@ Side B
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="17346">
 				<rom name="mtype.cas" size="17346" crc="2d537c7d" sha1="698509696c533bf2f52a557384ab6e687a738415"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neuras">
+		<description>Neuras</description>
+		<year>2021</year>
+		<publisher>Inufuto</publisher>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="16209196">
+				<rom name="neuras - inufuto.wav" size="16209196" crc="600551a4" sha1="1ec9b1dad1fa75bdc25f124b96d4fcf4dbcedc96"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pereztm">
+		<description>Perez the Mouse</description>
+		<year>2011</year>
+		<publisher>MSX-BASIC Contest 2011</publisher>
+		<info name="developer" value="theNestruo"/>
+		<info name="usage" value="Load with CLOAD + RUN + RUN."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="22915">
+				<rom name="perez the mouse - thenestruo.cas" size="22915" crc="cc8d9d62" sha1="9730c5b7b2e7949a851c8dc69fb862f84aa3b84a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17712,6 +18130,30 @@ Side B
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="78080">
 				<rom name="resurection (dakar soft, 2013).cas" size="78080" crc="11e1389f" sha1="e41e25346add0eece843b8878fbf97e67df400f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rodmand">
+		<description>Rodman (demo)</description>
+		<year>2018</year>
+		<publisher>Misfit</publisher>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="16411">
+				<rom name="rodman (demo) - misfit.cas" size="16411" crc="b881d8ee" sha1="76eebf73fbe4b0492388062553598411778e4dbb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ruptus">
+		<description>Ruptus</description>
+		<year>2021</year>
+		<publisher>Inufuto</publisher>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="5516864">
+				<rom name="ruptus - inufuto.wav" size="5516864" crc="a011c6db" sha1="c63c23cf4cdcaa6506d49b67a61ad28f0bee9fdb"/>
 			</dataarea>
 		</part>
 	</software>
