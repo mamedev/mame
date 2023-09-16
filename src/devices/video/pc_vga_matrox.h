@@ -45,6 +45,7 @@ protected:
 	virtual uint16_t offset() override;
 	virtual uint32_t start_addr() override;
 	virtual void recompute_params() override;
+	virtual void palette_update() override;
 
 	void crtcext_map(address_map &map);
 	void ramdac_indexed_map(address_map &map);
@@ -100,6 +101,8 @@ private:
 
 	u8 m_multiplex_ctrl = 0;
 	u8 m_truecolor_ctrl = 0;
+
+	u8 m_msc = 0;
 };
 
 DECLARE_DEVICE_TYPE(MATROX_VGA, matrox_vga_device)
