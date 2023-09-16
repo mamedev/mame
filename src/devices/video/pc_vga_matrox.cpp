@@ -38,6 +38,10 @@ void matrox_vga_device::device_start()
 	save_item(NAME(m_cursor_dcc));
 	save_pointer(NAME(m_cursor_color), 12);
 	save_pointer(NAME(m_cursor_ram), 0x400);
+
+	save_item(NAME(m_msc));
+	save_item(NAME(m_truecolor_ctrl));
+	save_item(NAME(m_multiplex_ctrl));
 }
 
 void matrox_vga_device::device_reset()
@@ -57,6 +61,7 @@ void matrox_vga_device::device_reset()
 	m_cursor_x = 0;
 	m_cursor_y = 0;
 
+	m_msc = 0;
 	m_truecolor_ctrl = 0x80;
 	m_multiplex_ctrl = 0x98;
 }
@@ -377,8 +382,19 @@ void matrox_vga_device::ramdac_indexed_map(address_map &map)
 //  map(0x1a, 0x1a) CSR clock selection
 //  map(0x1c, 0x1c) palette page
 //  map(0x1d, 0x1d) GCR general control
-//  map(0x1e, 0x1e) MSC misc control
-
+	// MSC misc control
+	map(0x1e, 0x1e).lrw8(
+		NAME([this] (offs_t offset) {
+			logerror("$1e MSC R\n");
+			return m_msc;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			logerror("$1e MSC W %02x\n", data);
+			if ((m_msc & 0xc) != (data & 0xc))
+				vga.dac.dirty = 1;
+			m_msc = data;
+		})
+	);
 //  map(0x2a, 0x2a) IOC GPIO control (bits 4-0, 1 = data bit as output, 0 = data bit as input)
 //  map(0x2b, 0x2b) GPIO data (bits 4-0)
 //  map(0x2d, 0x2d) pixel clock PLL
@@ -513,6 +529,26 @@ void matrox_vga_device::flush_true_color_mode()
 	}
 
 	recompute_params();
+}
+
+void matrox_vga_device::palette_update()
+{
+	// TODO: terminal pin handling
+	if ((m_msc & 0xc) != 0xc)
+		vga_device::palette_update();
+	else
+	{
+		for (int i = 0; i < 256; i++)
+		{
+			set_pen_color(
+				i,
+				vga.dac.color[3*(i & vga.dac.mask) + 0],
+				vga.dac.color[3*(i & vga.dac.mask) + 1],
+				vga.dac.color[3*(i & vga.dac.mask) + 2]
+			);
+		}
+	}
+
 }
 
 uint8_t matrox_vga_device::mem_r(offs_t offset)
