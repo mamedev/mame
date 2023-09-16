@@ -414,15 +414,15 @@ INPUT_PORTS_END
 
 static const gfx_layout spritelayout =
 {
-	16,16,  /* 16*16 sprites */
-	768,    /* 768 sprites */
-	3,      /* 3 bits per pixel */
-	{ 2*768*16*16, 768*16*16, 0 },  /* the bitplanes are separated */
+	16,16,  // 16*16 sprites
+	768,    // 768 sprites
+	3,      // 3 bits per pixel
+	{ 2*768*16*16, 768*16*16, 0 },  // the bitplanes are separated
 	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
 			0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8    /* every sprite takes 32 consecutive bytes */
+	32*8    // every sprite takes 32 consecutive bytes
 };
 
 static GFXDECODE_START( gfx_tagteam )
@@ -504,6 +504,43 @@ ROM_START( bigprowr )
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "fko.8",        0x0000, 0x0020, CRC(b6ee1483) SHA1(b2ea7be533e29da6cd7302532da2eb0410490e6a) ) // palette
 	ROM_LOAD( "fjo.25",       0x0020, 0x0020, CRC(24da2b63) SHA1(4db7e1ff1b9fd5ae4098cd7ca66cf1fa2574501a) ) // hcount related, not implemented yet
+
+	ROM_REGION( 0x0104, "plds", 0 )
+	ROM_LOAD( "pal16r4.ic57", 0x0000, 0x0104, NO_DUMP )
+ROM_END
+
+ROM_START( bigprowra ) // TA-007-P1-1 + TA-007-P1-2 PCBs. Dumper thinks it may be a field test PCB but it has a high serial number
+	ROM_REGION( 0x10000, "maincpu", 0 ) // handwritten labels
+	ROM_LOAD( "xa-0.ic20", 0x08000, 0x2000, CRC(4f711b0a) SHA1(890655279311925a054181453f90050b7084d623) )
+	ROM_LOAD( "xa-1.ic33", 0x0a000, 0x2000, CRC(5471efc3) SHA1(9b5246f60ba73521b1e98aeb4503665579315153) )
+	ROM_LOAD( "xa-2.ic34", 0x0c000, 0x2000, CRC(353ed84f) SHA1(73c09f35aa5ec1a881a4f47239c032927f042fb4) )
+	ROM_LOAD( "xa-3.ic46", 0x0e000, 0x2000, CRC(4f1b7203) SHA1(154886bc65b6820555cd3d072135514254d0eaa0) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "bf04-.ic8", 0x04000, 0x2000, CRC(0558e1d8) SHA1(317011c0e3a9d5f73c67d044c1fab315ff8049fb) )
+	ROM_LOAD( "bf05-.ic7", 0x06000, 0x2000, CRC(c1073f24) SHA1(0337c259c10fae3067e5e0e0acf54e6d0891b29f) )
+	ROM_LOAD( "bf06-.ic6", 0x08000, 0x2000, CRC(208cd081) SHA1(e5f6379e7f7bc80cdea12de7e0a2bb232bb16b5a) )
+	ROM_LOAD( "bf07-.ic3", 0x0a000, 0x2000, CRC(34a033dc) SHA1(01e4c331233a2337c7c53edd221bb87859278b04) )
+	ROM_LOAD( "bf08-.ic2", 0x0c000, 0x2000, CRC(eafe8056) SHA1(4a2d1c903e4acee962aeb0f0f18333252790f686) ) // this ROM wouldn't give consistent reads, however since all other audio CPU ROMs match the other sets..
+	ROM_LOAD( "bf09-.ic1", 0x0e000, 0x2000, CRC(d589ce1b) SHA1(c2aca1cc6867d4d6d6e02ac29a4c53c667bf6d89) )
+
+	ROM_REGION( 0x12000, "gfx", 0 ) // labels with x are handwritten
+	ROM_LOAD( "x-1.ic89",    0x00000, 0x2000, CRC(48165902) SHA1(3145fc83f17712b460a08b882677cfcac08fc272) )
+	ROM_LOAD( "bf11-.ic94",  0x02000, 0x2000, CRC(c3fe99c1) SHA1(beb3056b37f26a52f3c0907868054b3cc3c4e3ea) )
+	ROM_LOAD( "bf12-.ic103", 0x04000, 0x2000, CRC(c8717a46) SHA1(6de0238071aacb443234d9a7ef250ddfaa9dd1a8) )
+	ROM_LOAD( "x-2.ic91",    0x06000, 0x2000, CRC(ecfa581d) SHA1(1352c6a5f8e6f2d3fbe9f9e74c542ea2467f1438) )
+	ROM_LOAD( "bf14-.ic95",  0x08000, 0x2000, CRC(a6721142) SHA1(200058d7b688dccda0ab0f568ab6c6c215a23e0a) )
+	ROM_LOAD( "bf15-.ic105", 0x0a000, 0x2000, CRC(60ae1078) SHA1(f9c162ff0830aff26d121f04c107dadb060d4bd5) )
+	ROM_LOAD( "x-3.ic93",    0x0c000, 0x2000, CRC(75ee5705) SHA1(95fdea3768f2d5b81ba5dafd3b13a061cd96689a) )
+	ROM_LOAD( "bf17-.ic96",  0x0e000, 0x2000, CRC(ccf42380) SHA1(6a8958201125c1b13b1354c98adc573dbea64d56) )
+	ROM_LOAD( "bf18-.ic107", 0x10000, 0x2000, CRC(fd6f006d) SHA1(ad100ac8c0fed24f922a2cc908c88b4fced07eb0) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "fko.ic8",  0x0000, 0x0020, CRC(b6ee1483) SHA1(b2ea7be533e29da6cd7302532da2eb0410490e6a) ) // n82s123n, palette
+	ROM_LOAD( "fjo.ic25", 0x0020, 0x0020, CRC(24da2b63) SHA1(4db7e1ff1b9fd5ae4098cd7ca66cf1fa2574501a) ) // n82s123n, hcount related, not implemented yet
+
+	ROM_REGION( 0x0104, "plds", 0 )
+	ROM_LOAD( "pal16r4.ic57", 0x0000, 0x0104, NO_DUMP )
 ROM_END
 
 ROM_START( tagteam )
@@ -535,10 +572,14 @@ ROM_START( tagteam )
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "fko.8",        0x0000, 0x0020, CRC(b6ee1483) SHA1(b2ea7be533e29da6cd7302532da2eb0410490e6a) ) // palette
 	ROM_LOAD( "fjo.25",       0x0020, 0x0020, CRC(24da2b63) SHA1(4db7e1ff1b9fd5ae4098cd7ca66cf1fa2574501a) ) // hcount related, not implemented yet
+
+	ROM_REGION( 0x0104, "plds", 0 )
+	ROM_LOAD( "pal16r4.ic57", 0x0000, 0x0104, NO_DUMP )
 ROM_END
 
 } // anonymous namespace
 
 
-GAME( 1983, bigprowr, 0,        tagteam, bigprowr, tagteam_state, empty_init, ROT270, "Technos Japan",                     "The Big Pro Wrestling!", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tagteam,  bigprowr, tagteam, tagteam,  tagteam_state, empty_init, ROT270, "Technos Japan (Data East license)", "Tag Team Wrestling",     MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bigprowr,  0,        tagteam, bigprowr, tagteam_state, empty_init, ROT270, "Technos Japan",                     "The Big Pro Wrestling! (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bigprowra, bigprowr, tagteam, bigprowr, tagteam_state, empty_init, ROT270, "Technos Japan",                     "The Big Pro Wrestling! (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tagteam,   bigprowr, tagteam, tagteam,  tagteam_state, empty_init, ROT270, "Technos Japan (Data East license)", "Tag Team Wrestling",             MACHINE_SUPPORTS_SAVE )
