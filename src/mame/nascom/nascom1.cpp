@@ -319,9 +319,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( nascom2_state::nascom2_kansas_r )
 template<int Dest>
 SNAPSHOT_LOAD_MEMBER(nascom_state::snapshot_cb)
 {
+	util::core_file &file = image.image_core_file();
 	uint8_t line[29];
 
-	while (image.fread(&line, sizeof(line)) == sizeof(line))
+	std::error_condition err;
+	size_t actual;
+	while (!(err = file.read(&line, sizeof(line), actual)) && actual == sizeof(line))
 	{
 		unsigned int addr, b[8], dummy;
 
@@ -346,13 +349,15 @@ SNAPSHOT_LOAD_MEMBER(nascom_state::snapshot_cb)
 			return std::make_pair(image_error::INVALIDIMAGE, "Unsupported file format");
 		}
 		dummy = 0x00;
-		while (!image.image_feof() && dummy != 0x0a && dummy != 0x1f)
+		while (dummy != 0x0a && dummy != 0x1f)
 		{
-			image.fread(&dummy, 1);
+			err = file.read(&dummy, 1, actual);
+			if (err || actual != 1)
+				return std::make_pair(err, std::string());
 		}
 	}
 
-	return std::make_pair(std::error_condition(), std::string());
+	return std::make_pair(err, std::string());
 }
 
 
@@ -372,7 +377,11 @@ std::pair<std::error_condition, std::string> nascom2_state::load_cart(
 			return std::make_pair(image_error::INVALIDLENGTH, "Unsupported image file size (must be no more than 4K)");
 
 		slot->rom_alloc(slot->length(), GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-		slot->fread(slot->get_rom_base(), slot->length());
+
+		size_t actual;
+		std::error_condition const err = slot->image_core_file().read(slot->get_rom_base(), slot->length(), actual);
+		if (err || actual != slot->length())
+			return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 		// we just assume that socket1 should be loaded to 0xc000 and socket2 to 0xd000
 		switch (slot_id)
