@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Tomasz Slanina, David Haywood
+// copyright-holders: Tomasz Slanina, David Haywood
+
 /*
 实战麻将王 (Shízhàn Májiàng Wáng) by 'Game Men System Co. Ltd.'
 
@@ -64,6 +65,7 @@ Keep pressed 9 and press reset to enter service mode.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 namespace {
@@ -114,6 +116,7 @@ private:
 	uint8_t m_mux_data = 0;
 	uint16_t m_dip_mux = 0;
 	//uint16_t m_prot_data = 0;
+	tilemap_t *m_tilemap[3]{};
 
 	void mcu_io(address_map &map);
 	void mcu_mem(address_map &map);
@@ -132,6 +135,10 @@ private:
 	void mcu_io_mux_w(uint8_t data);
 	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
+	template <uint8_t Which> void vram_w(offs_t offset, u16 data, u16 mem_mask);
+	TILE_GET_INFO_MEMBER(get_tile0_info);
+	TILE_GET_INFO_MEMBER(get_tile1_info);
+	[[maybe_unused]] TILE_GET_INFO_MEMBER(get_tile2_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -162,6 +169,13 @@ void rbmk_state::tilebank_w(uint16_t data)
 	m_tilebank = data;
 }
 
+template <uint8_t Which>
+void rbmk_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_vidram[Which][offset]);
+	m_tilemap[Which]->mark_tile_dirty(offset);
+}
+
 void rbmk_state::dip_mux_w(uint16_t data)
 {
 	m_dip_mux = data;
@@ -169,13 +183,13 @@ void rbmk_state::dip_mux_w(uint16_t data)
 
 void rbmk_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	//bad ?
-	if( ACCESSING_BITS_0_7 )
+	// bad ?
+	if (ACCESSING_BITS_0_7)
 	{
 		m_eeprom->di_write((data & 0x04) >> 2);
-		m_eeprom->cs_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->cs_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 
-		m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -185,10 +199,11 @@ void rbmk_state::rbmk_mem(address_map &map)
 	map(0x000000, 0x07ffff).rom().nopw();
 	map(0x100000, 0x10ffff).ram();
 	map(0x500000, 0x50ffff).ram();
-	map(0x940000, 0x940fff).ram().share(m_vidram[1]);
+	map(0x940000, 0x940bff).ram();
+	map(0x940c00, 0x940fff).ram().w(FUNC(rbmk_state::vram_w<0>)).share(m_vidram[0]);
 	map(0x980300, 0x983fff).ram(); // 0x2048  words ???, byte access
 	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x9c0000, 0x9c0fff).ram().share(m_vidram[0]);
+	map(0x9c0000, 0x9c0fff).ram().w(FUNC(rbmk_state::vram_w<1>)).share(m_vidram[1]);
 	map(0xb00000, 0xb00001).w(FUNC(rbmk_state::eeprom_w));
 	map(0xc00000, 0xc00001).rw(FUNC(rbmk_state::dip_mux_r), FUNC(rbmk_state::dip_mux_w));
 	map(0xc08000, 0xc08001).portr("IN1").w(FUNC(rbmk_state::tilebank_w));
@@ -212,9 +227,10 @@ void rbmk_state::rbspm_mem(address_map &map)
 	map(0x340002, 0x340003).nopw();
 	map(0x500000, 0x50ffff).ram();
 	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // if removed fails gfx test?
-	map(0x940000, 0x940fff).ram().share(m_vidram[1]); // if removed fails palette test?
+	map(0x940000, 0x940bff).ram();
+	map(0x940c00, 0x940fff).ram().w(FUNC(rbmk_state::vram_w<0>)).share(m_vidram[0]); // if removed fails palette test?
 	map(0x980300, 0x983fff).ram(); // 0x2048  words ???, byte access, u25 and u26 according to test mode
-	map(0x9c0000, 0x9c0fff).ram().share(m_vidram[0]);
+	map(0x9c0000, 0x9c0fff).ram().w(FUNC(rbmk_state::vram_w<1>)).share(m_vidram[1]);
 }
 
 void rbmk_state::super555_mem(address_map &map)
@@ -229,9 +245,10 @@ void rbmk_state::super555_mem(address_map &map)
 	// map(0x620080, 0x620081).lw16(NAME([this] (uint16_t data) { m_prot_data = data; })); // writes something here that expects to read above
 	map(0x628000, 0x628000).w("oki", FUNC(okim6295_device::write));
 	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x940000, 0x940fff).ram().share(m_vidram[1]);
+	map(0x940000, 0x940bff).ram();
+	map(0x940c00, 0x940fff).ram().w(FUNC(rbmk_state::vram_w<0>)).share(m_vidram[0]);
 	map(0x980000, 0x983fff).ram();
-	map(0x9c0000, 0x9c0fff).ram().share(m_vidram[0]);
+	map(0x9c0000, 0x9c0fff).ram().w(FUNC(rbmk_state::vram_w<1>)).share(m_vidram[1]);
 	//map(0xf00000, 0xf00001).w(FUNC(rbmk_state::eeprom_w)); // wrong?
 }
 
@@ -255,7 +272,7 @@ uint8_t rbmk_state::mcu_io_r(offs_t offset)
 	}
 	else if (m_mux_data & 4)
 	{
-		//printf("%02x R\n",offset);
+		// printf("%02x R\n",offset);
 		// ...
 		return 0xff;
 	}
@@ -1117,9 +1134,9 @@ static const gfx_layout magslot16_layout = // TODO: not correct
 	8,
 	{8, 9,10, 11, 0, 1, 2, 3  },
 	{ 0, 4, 16, 20, 32, 36, 48, 52,
-	512+0,512+4,512+16,512+20,512+32,512+36,512+48,512+52},
+	64+0,64+4,64+16,64+20,64+32,64+36,64+48,64+52},
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-	1024+0*16,1024+1*64,1024+2*64,1024+3*64,1024+4*64,1024+5*64,1024+6*64,1024+7*64},
+	512+0*16,512+1*64,512+2*64,512+3*64,512+4*64,512+5*64,512+6*64,512+7*64},
 	32*64
 };
 
@@ -1137,38 +1154,36 @@ GFXDECODE_END
 
 void rbmk_state::video_start()
 {
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rbmk_state::get_tile0_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rbmk_state::get_tile1_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
+	m_tilemap[1]->set_transparent_pen(0);
+
+	// m_tilemap[2] // TODO: for magslot and sc2in1
+
 	save_item(NAME(m_tilebank));
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_dip_mux));
 }
 
+TILE_GET_INFO_MEMBER(rbmk_state::get_tile0_info)
+{
+	const int tile = m_vidram[0][tile_index];
+	tileinfo.set(0, (tile & 0x0fff) + ((m_tilebank & 0x10) >> 4) * 0x1000, tile >> 12, 0);
+}
+
+TILE_GET_INFO_MEMBER(rbmk_state::get_tile1_info)
+{
+	const int tile = m_vidram[1][tile_index];
+	tileinfo.set(1, (tile & 0x0fff) + ((m_tilebank >> 1) & 3) * 0x1000, tile >> 12, 0);
+}
 
 // TODO:  ballch's and cots' title screens highlight a priority bug: the title and copyright are drawn behind the background
 uint32_t rbmk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int count = 0;
+	m_tilemap[0]->draw(screen, bitmap, cliprect);
+	m_tilemap[1]->draw(screen, bitmap, cliprect);
 
-	for (int y = 0; y < 8; y++)
-	{
-		for (int x = 0; x < 64; x++)
-		{
-			int tile = m_vidram[1][count + 0x600];
-			m_gfxdecode->gfx(0)->opaque(bitmap, cliprect, (tile & 0xfff) + ((m_tilebank & 0x10) >> 4) * 0x1000, tile >> 12, 0, 0, x * 8, y * 32);
-			count++;
-		}
-	}
-
-	count=0;
-
-	for (int y = 0; y < 32; y++)
-	{
-		for (int x = 0; x < 64; x++)
-		{
-			int tile = m_vidram[0][count];
-			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, (tile & 0xfff) + ((m_tilebank >> 1) & 3) * 0x1000, tile >> 12, 0, 0, x * 8, y * 8, 0);
-			count++;
-		}
-	}
 	return 0;
 }
 
@@ -1502,15 +1517,15 @@ void rbmk_state::init_cots()
 
 // mahjong
 GAME( 1998, rbmk,     0, rbmk,     rbmk,     rbmk_state, empty_init,    ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // misses YM2151 hookup, Oki hookup may be imperfect
-GAME( 1998, rbspm,    0, rbspm,    rbspm,    rbmk_state, init_rbspm,    ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)",    MACHINE_NOT_WORKING ) // stops during boot, patched for now
+GAME( 1998, rbspm,    0, rbspm,    rbspm,    rbmk_state, init_rbspm,    ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
 
 // card games
 GAME( 1999, super555, 0, super555, super555, rbmk_state, init_super555, ROT0,  "GMS", "Super 555 (English version V1.5)",          MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
-GAME( 2001, sc2in1,   0, magslot,  sc2in1,   rbmk_state, init_sc2in1,   ROT0,  "GMS", "Super Card 2 in 1 (English version 03.23)", MACHINE_NOT_WORKING ) // stops during boot, patched for now
+GAME( 2001, sc2in1,   0, magslot,  sc2in1,   rbmk_state, init_sc2in1,   ROT0,  "GMS", "Super Card 2 in 1 (English version 03.23)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
 
 // slot, on slightly different PCB
-GAME( 2003, magslot,  0, magslot,  magslot,  rbmk_state, empty_init,    ROT0,  "GMS", "Magic Slot (normal 1.0C)",                  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // needs implementing of 3rd GFX layer, correct GFX decode for 1st layer, inputs
+GAME( 2003, magslot,  0, magslot,  magslot,  rbmk_state, empty_init,    ROT0,  "GMS", "Magic Slot (normal 1.0C)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // needs implementing of 3rd GFX layer, correct GFX decode for 1st layer, inputs
 
 // train games
-GAME( 2002, ballch,   0, super555, ballch,   rbmk_state, init_ballch,   ROT0,  "TVE", "Ball Challenge (20020607 1.0 OVERSEA)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
+GAME( 2002, ballch,   0, super555, ballch,   rbmk_state, init_ballch,   ROT0,  "TVE", "Ball Challenge (20020607 1.0 OVERSEA)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
 GAME( 2005, cots,     0, super555, cots,     rbmk_state, init_cots,     ROT0,  "ECM", "Creatures of the Sea (20050328 USA 6.3)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
