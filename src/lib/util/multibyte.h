@@ -43,6 +43,16 @@ inline constexpr u32 get_u32be(const u8 *const buf) noexcept
 	     | ((const u32)buf[3] << 0);
 }
 
+inline constexpr u64 get_u48be(const u8 *const buf) noexcept
+{
+	return ((const u64)buf[0] << 40)
+	     | ((const u64)buf[1] << 36)
+	     | ((const u64)buf[2] << 24)
+	     | ((const u64)buf[3] << 16)
+	     | ((const u64)buf[4] << 8)
+	     | ((const u64)buf[5] << 0);
+}
+
 inline constexpr u64 get_u64be(const u8 *const buf) noexcept
 {
 	return ((const u64)buf[0] << 56)
@@ -76,6 +86,16 @@ inline void put_u32be(u8 *buf, const u32 data) noexcept
 	buf[3] = data >> 0;
 }
 
+inline void put_u48be(u8 *buf, const u64 data) noexcept
+{
+	buf[0] = data >> 40;
+	buf[1] = data >> 36;
+	buf[2] = data >> 24;
+	buf[3] = data >> 16;
+	buf[4] = data >> 8;
+	buf[5] = data >> 0;
+}
+
 inline void put_u64be(u8 *buf, const u64 data) noexcept
 {
 	buf[0] = data >> 56;
@@ -107,6 +127,11 @@ inline constexpr s32 get_s32be(const u8 *const buf) noexcept
 	return get_u32be(buf);
 }
 
+inline constexpr s64 get_s48be(const u8 *const buf) noexcept
+{
+	return util::sext(get_u48be(buf), 48);
+}
+
 inline constexpr s64 get_s64be(const u8 *const buf) noexcept
 {
 	return get_u64be(buf);
@@ -125,6 +150,11 @@ inline void put_s24be(u8 *buf, const s32 data) noexcept
 inline void put_s32be(u8 *buf, const s32 data) noexcept
 {
 	put_u32be(buf, data);
+}
+
+inline void put_s48be(u8 *buf, const s64 data) noexcept
+{
+	put_u48be(buf, data);
 }
 
 inline void put_s64be(u8 *buf, const s64 data) noexcept
@@ -155,6 +185,16 @@ inline constexpr u32 get_u32le(const u8 *const buf) noexcept
 	     | ((const u32)buf[1] << 8)
 	     | ((const u32)buf[2] << 16)
 	     | ((const u32)buf[3] << 24);
+}
+
+inline constexpr u64 get_u48le(const u8 *const buf) noexcept
+{
+	return ((const u64)buf[0] << 0)
+	     | ((const u64)buf[1] << 8)
+	     | ((const u64)buf[2] << 16)
+	     | ((const u64)buf[3] << 24)
+	     | ((const u64)buf[4] << 32)
+	     | ((const u64)buf[5] << 40);
 }
 
 inline constexpr u64 get_u64le(const u8 *const buf) noexcept
@@ -190,6 +230,16 @@ inline void put_u32le(u8 *buf, const u32 data) noexcept
 	buf[3] = data >> 24;
 }
 
+inline void put_u48le(u8 *buf, const u64 data) noexcept
+{
+	buf[0] = data >> 0;
+	buf[1] = data >> 8;
+	buf[2] = data >> 16;
+	buf[3] = data >> 24;
+	buf[4] = data >> 32;
+	buf[5] = data >> 40;
+}
+
 inline void put_u64le(u8 *buf, const u64 data) noexcept
 {
 	buf[0] = data >> 0;
@@ -221,6 +271,11 @@ inline constexpr s32 get_s32le(const u8 *const buf) noexcept
 	return get_u32le(buf);
 }
 
+inline constexpr s64 get_s48le(const u8 *const buf) noexcept
+{
+	return util::sext(get_u48le(buf), 48);
+}
+
 inline constexpr s64 get_s64le(const u8 *const buf) noexcept
 {
 	return get_u64le(buf);
@@ -239,6 +294,11 @@ inline void put_s24le(u8 *buf, const s32 data) noexcept
 inline void put_s32le(u8 *buf, const s32 data) noexcept
 {
 	put_u32le(buf, data);
+}
+
+inline void put_s48le(u8 *buf, const s64 data) noexcept
+{
+	put_u48le(buf, data);
 }
 
 inline void put_s64le(u8 *buf, const s64 data) noexcept
