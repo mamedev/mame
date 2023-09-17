@@ -82,7 +82,7 @@ uint16_t sh7014_port_device::padrl_r()
 	return r;
 }
 
-void sh7014_port_device::padrl_w(offs_t offset, uint16_t data)
+void sh7014_port_device::padrl_w(uint16_t data)
 {
 	m_padr = data & 0x83ff;
 	LOGMASKED(LOG_WRITE, "padrl_w %04x\n", m_padr);
@@ -97,7 +97,7 @@ uint16_t sh7014_port_device::paiorl_r()
 	return m_paior;
 }
 
-void sh7014_port_device::paiorl_w(offs_t offset, uint16_t data)
+void sh7014_port_device::paiorl_w(uint16_t data)
 {
 	m_paior = data & 0x83ff;
 	LOGMASKED(LOG_WRITE, "paiorl_w %04x\n", m_paior);
@@ -109,7 +109,7 @@ uint16_t sh7014_port_device::pacrl1_r()
 	return m_pacr1;
 }
 
-void sh7014_port_device::pacrl1_w(offs_t offset, uint16_t data)
+void sh7014_port_device::pacrl1_w(uint16_t data)
 {
 	m_pacr1 = data & 0x400f;
 	LOGMASKED(LOG_WRITE, "pacrl1_w %04x\n", m_pacr1);
@@ -121,7 +121,7 @@ uint16_t sh7014_port_device::pacrl2_r()
 	return m_pacr2;
 }
 
-void sh7014_port_device::pacrl2_w(offs_t offset, uint16_t data)
+void sh7014_port_device::pacrl2_w(uint16_t data)
 {
 	m_pacr2 = data & 0xfd75;
 	LOGMASKED(LOG_WRITE, "pacrl2_w %04x\n", m_pacr2);
@@ -135,7 +135,7 @@ uint16_t sh7014_port_device::pbdr_r()
 	return r;
 }
 
-void sh7014_port_device::pbdr_w(offs_t offset, uint16_t data)
+void sh7014_port_device::pbdr_w(uint16_t data)
 {
 	m_pbdr = data;
 	LOGMASKED(LOG_WRITE, "pbdr_w %04x\n", m_pbdr);
@@ -150,7 +150,7 @@ uint16_t sh7014_port_device::pbior_r()
 	return m_pbior;
 }
 
-void sh7014_port_device::pbior_w(offs_t offset, uint16_t data)
+void sh7014_port_device::pbior_w(uint16_t data)
 {
 	// For SH7014 specifically, bits 0 and 1 are read only
 	m_pbior = data & 0x3fc;
@@ -163,7 +163,7 @@ uint16_t sh7014_port_device::pbcr1_r()
 	return m_pbcr1;
 }
 
-void sh7014_port_device::pbcr1_w(offs_t offset, uint16_t data)
+void sh7014_port_device::pbcr1_w(uint16_t data)
 {
 	m_pbcr1 = data & 0xf;
 	LOGMASKED(LOG_WRITE, "pbcr1_w %04x\n", m_pbcr1);
@@ -175,7 +175,7 @@ uint16_t sh7014_port_device::pbcr2_r()
 	return m_pbcr2;
 }
 
-void sh7014_port_device::pbcr2_w(offs_t offset, uint16_t data)
+void sh7014_port_device::pbcr2_w(uint16_t data)
 {
 	m_pbcr2 = data & 0xfff5;
 	LOGMASKED(LOG_WRITE, "pbcr2_w %04x\n", m_pbcr2);
@@ -189,7 +189,7 @@ uint16_t sh7014_port_device::pedr_r()
 	return r;
 }
 
-void sh7014_port_device::pedr_w(offs_t offset, uint16_t data)
+void sh7014_port_device::pedr_w(uint16_t data)
 {
 	m_pedr = data;
 	LOGMASKED(LOG_WRITE, "pedr_w %04x\n", m_pedr);
@@ -204,7 +204,7 @@ uint16_t sh7014_port_device::peior_r()
 	return m_peior;
 }
 
-void sh7014_port_device::peior_w(offs_t offset, uint16_t data)
+void sh7014_port_device::peior_w(uint16_t data)
 {
 	m_peior = data;
 	LOGMASKED(LOG_WRITE, "peior_w %04x\n", m_peior);
@@ -216,7 +216,7 @@ uint16_t sh7014_port_device::pecr1_r()
 	return m_pecr1;
 }
 
-void sh7014_port_device::pecr1_w(offs_t offset, uint16_t data)
+void sh7014_port_device::pecr1_w(uint16_t data)
 {
 	m_pecr1 = data & 0xf000;
 	LOGMASKED(LOG_WRITE, "pecr1_w %04x\n", m_pecr1);
@@ -228,7 +228,7 @@ uint16_t sh7014_port_device::pecr2_r()
 	return m_pecr2;
 }
 
-void sh7014_port_device::pecr2_w(offs_t offset, uint16_t data)
+void sh7014_port_device::pecr2_w(uint16_t data)
 {
 	m_pecr2 = data & 0x55ff;
 	LOGMASKED(LOG_WRITE, "pecr2_w %04x\n", m_pecr2);

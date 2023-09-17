@@ -15,17 +15,13 @@ DEFINE_DEVICE_TYPE(SH2_SH7014, sh2_sh7014_device,  "sh2_sh7014",  "Hitachi SH-2 
 
 sh2_sh7014_device::sh2_sh7014_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sh2_device(mconfig, SH2_SH7014, tag, owner, clock, CPU_TYPE_SH2, address_map_constructor(FUNC(sh2_sh7014_device::sh7014_map), this), 32, 0xffffffff)
-	, m_sci(*this, "sh7014_sci%u", 0u)
-	, m_bsc(*this, "sh7014_bsc")
-	, m_dmac(*this, "sh7014_dmac")
-	, m_dmac_chan(*this, "sh7014_dmac:ch%u", 0u)
-	, m_intc(*this, "sh7014_intc")
-	, m_mtu(*this, "sh7014_mtu")
-	, m_mtu_chan(*this, "sh7014_mtu:ch%u", 0u)
-	, m_port(*this, "sh7014_io_port")
+	, m_sci(*this, "sci%u", 0u)
+	, m_bsc(*this, "bsc")
+	, m_dmac(*this, "dmac")
+	, m_intc(*this, "intc")
+	, m_mtu(*this, "mtu")
+	, m_port(*this, "io_port")
 	, m_sci_tx_cb(*this)
-	, m_port_read(*this, 0)
-	, m_port_write(*this)
 {
 }
 
@@ -46,84 +42,33 @@ void sh2_sh7014_device::device_reset()
 
 void sh2_sh7014_device::device_add_mconfig(machine_config &config)
 {
-	SH7014_SCI(config, m_sci[0], *this, m_intc,
+	SH7014_SCI(config, m_sci[0], DERIVED_CLOCK(1, 1), m_intc,
 		0, // id
 		sh7014_intc_device::INT_VECTOR_SCI_ERI0,
 		sh7014_intc_device::INT_VECTOR_SCI_RXI0,
 		sh7014_intc_device::INT_VECTOR_SCI_TXI0,
 		sh7014_intc_device::INT_VECTOR_SCI_TEI0
 	);
-	m_sci[0]->write_sci_tx().set([this] (int state) { m_sci_tx_cb[0](state); });
 
-	SH7014_SCI(config, m_sci[1], *this, m_intc,
+	SH7014_SCI(config, m_sci[1], DERIVED_CLOCK(1, 1), m_intc,
 		1, // id
 		sh7014_intc_device::INT_VECTOR_SCI_ERI1,
 		sh7014_intc_device::INT_VECTOR_SCI_RXI1,
 		sh7014_intc_device::INT_VECTOR_SCI_TXI1,
 		sh7014_intc_device::INT_VECTOR_SCI_TEI1
 	);
-	m_sci[1]->write_sci_tx().set([this] (int state) { m_sci_tx_cb[1](state); });
 
 	SH7014_BSC(config, m_bsc);
 
-	SH7014_DMAC(config, m_dmac);
-	SH7014_DMAC_CHANNEL(config, m_dmac_chan[0], *this, m_dmac, m_intc,
-		0, // channel
-		sh7014_intc_device::INT_VECTOR_DMA_CH0
-	);
-	m_dmac_chan[0]->notify_dma_source().set(FUNC(sh2_sh7014_device::notify_dma_source));
-
-	SH7014_DMAC_CHANNEL(config, m_dmac_chan[1], *this, m_dmac, m_intc,
-		1, // channel
-		sh7014_intc_device::INT_VECTOR_DMA_CH1
-	);
-	m_dmac_chan[1]->notify_dma_source().set(FUNC(sh2_sh7014_device::notify_dma_source));
+	SH7014_DMAC(config, m_dmac, DERIVED_CLOCK(1, 1), *this, m_intc);
+	m_dmac->notify_dma_source_callback().set(FUNC(sh2_sh7014_device::notify_dma_source));
 
 	SH7014_INTC(config, m_intc);
 	m_intc->set_irq_callback(FUNC(sh2_sh7014_device::set_irq));
 
-	SH7014_MTU(config, m_mtu, 0);
-	SH7014_MTU_CHANNEL(config, m_mtu_chan[0], 0, *this, m_intc,
-		0, // channel
-		sh7014_intc_device::INT_VECTOR_MTU_TGI0A,
-		sh7014_intc_device::INT_VECTOR_MTU_TGI0B,
-		sh7014_intc_device::INT_VECTOR_MTU_TGI0C,
-		sh7014_intc_device::INT_VECTOR_MTU_TGI0D,
-		sh7014_intc_device::INT_VECTOR_MTU_TGI0V,
-		-1
-	);
-
-	SH7014_MTU_CHANNEL(config, m_mtu_chan[1], 0, *this, m_intc,
-		1, // channel
-		sh7014_intc_device::INT_VECTOR_MTU_TGI1A,
-		sh7014_intc_device::INT_VECTOR_MTU_TGI1B,
-		-1,
-		-1,
-		sh7014_intc_device::INT_VECTOR_MTU_TGI1V,
-		sh7014_intc_device::INT_VECTOR_MTU_TGI1U
-	);
-
-	SH7014_MTU_CHANNEL(config, m_mtu_chan[2], 0, *this, m_intc,
-		2, // channel
-		sh7014_intc_device::INT_VECTOR_MTU_TGI2A,
-		sh7014_intc_device::INT_VECTOR_MTU_TGI2B,
-		-1,
-		-1,
-		sh7014_intc_device::INT_VECTOR_MTU_TGI2V,
-		sh7014_intc_device::INT_VECTOR_MTU_TGI2U
-	);
+	SH7014_MTU(config, m_mtu, DERIVED_CLOCK(1, 1), m_intc);
 
 	SH7014_PORT(config, m_port);
-	m_port->port_a_read_callback().set([this] () { return m_port_read[PORT_A](); });
-	m_port->port_a_write_callback().set([this] (uint16_t data) { m_port_write[PORT_A](data); });
-
-	m_port->port_b_read_callback().set([this] () { return m_port_read[PORT_B](); });
-	m_port->port_b_write_callback().set([this] (uint16_t data) { m_port_write[PORT_B](data); });
-
-	m_port->port_e_read_callback().set([this] () { return m_port_read[PORT_E](); });
-	m_port->port_e_write_callback().set([this] (uint16_t data) { m_port_write[PORT_E](data); });
-
-	m_port->port_f_read_callback().set([this] () { return m_port_read[PORT_F](); });
 }
 
 void sh2_sh7014_device::sh7014_map(address_map &map)

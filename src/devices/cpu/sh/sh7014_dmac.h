@@ -25,7 +25,16 @@ class sh7014_dmac_device : public device_t
 	friend sh7014_dmac_channel_device;
 
 public:
-	sh7014_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sh7014_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template<typename T, typename U> sh7014_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu, U &&intc)
+		: sh7014_dmac_device(mconfig, tag, owner, clock)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu));
+		m_intc.set_tag(std::forward<U>(intc));
+	}
+
+	auto notify_dma_source_callback() { return m_notify_dma_source_cb.bind(); }
 
 	void map(address_map &map);
 
@@ -34,6 +43,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	enum {
@@ -42,12 +52,18 @@ private:
 		DMAOR_AE = 1 << 2,
 	};
 
-	required_device_array<sh7014_dmac_channel_device, 2> m_chan;
-
 	bool is_transfer_allowed();
+
+	void notify_dma_source(int32_t source);
 
 	void dmaor_w(uint16_t data);
 	uint16_t dmaor_r();
+
+	required_device<sh2_device> m_cpu;
+	required_device<sh7014_intc_device> m_intc;
+	required_device_array<sh7014_dmac_channel_device, 2> m_chan;
+
+	devcb_write32 m_notify_dma_source_cb;
 
 	uint16_t m_dmaor;
 };
@@ -71,19 +87,15 @@ public:
 		RS_SCI_RXI1 = 15,
 	};
 
-	sh7014_dmac_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sh7014_dmac_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<typename T, typename U, typename V> sh7014_dmac_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&dmac, V &&intc, int chan_id, int vector)
-		: sh7014_dmac_channel_device(mconfig, tag, owner)
+	template<typename T> sh7014_dmac_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&dmac, int chan_id, int vector)
+		: sh7014_dmac_channel_device(mconfig, tag, owner, clock)
 	{
-		m_cpu.set_tag(std::forward<T>(cpu));
-		m_dmac.set_tag(std::forward<U>(dmac));
-		m_intc.set_tag(std::forward<V>(intc));
+		m_dmac.set_tag(std::forward<T>(dmac));
 		m_channel_id = chan_id;
 		m_vector = vector;
 	}
-
-	auto notify_dma_source() { return m_notify_dma_source_cb.bind(); }
 
 	void map(address_map &map);
 
@@ -134,13 +146,9 @@ private:
 
 	TIMER_CALLBACK_MEMBER( dma_timer_callback );
 
-	required_device<sh2_device> m_cpu;
 	required_device<sh7014_dmac_device> m_dmac;
-	required_device<sh7014_intc_device> m_intc;
 
 	emu_timer *m_dma_current_active_timer;
-
-	devcb_write32 m_notify_dma_source_cb;
 
 	uint32_t m_channel_id;
 	uint32_t m_vector;

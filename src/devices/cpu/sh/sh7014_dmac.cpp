@@ -27,7 +27,10 @@ DEFINE_DEVICE_TYPE(SH7014_DMAC_CHANNEL, sh7014_dmac_channel_device, "sh7014dmacc
 
 sh7014_dmac_device::sh7014_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SH7014_DMAC, tag, owner, clock)
+	, m_cpu(*this, finder_base::DUMMY_TAG)
+	, m_intc(*this, finder_base::DUMMY_TAG)
 	, m_chan(*this, "ch%u", 0u)
+	, m_notify_dma_source_cb(*this)
 {
 }
 
@@ -39,6 +42,19 @@ void sh7014_dmac_device::device_start()
 void sh7014_dmac_device::device_reset()
 {
 	m_dmaor = 0;
+}
+
+void sh7014_dmac_device::device_add_mconfig(machine_config &config)
+{
+	SH7014_DMAC_CHANNEL(config, m_chan[0], DERIVED_CLOCK(1, 1), *this,
+		0, // channel
+		sh7014_intc_device::INT_VECTOR_DMA_CH0
+	);
+
+	SH7014_DMAC_CHANNEL(config, m_chan[1], DERIVED_CLOCK(1, 1), *this,
+		1, // channel
+		sh7014_intc_device::INT_VECTOR_DMA_CH1
+	);
 }
 
 void sh7014_dmac_device::map(address_map &map)
@@ -85,6 +101,11 @@ int sh7014_dmac_device::is_dma_activated(int vector)
 	return activated;
 }
 
+void sh7014_dmac_device::notify_dma_source(int32_t source)
+{
+	m_notify_dma_source_cb(source);
+}
+
 
 //////////////////
 
@@ -99,10 +120,7 @@ void sh7014_dmac_channel_device::map(address_map &map)
 
 sh7014_dmac_channel_device::sh7014_dmac_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SH7014_DMAC_CHANNEL, tag, owner, clock)
-	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_dmac(*this, finder_base::DUMMY_TAG)
-	, m_intc(*this, finder_base::DUMMY_TAG)
-	, m_notify_dma_source_cb(*this)
 {
 }
 
@@ -261,7 +279,7 @@ bool sh7014_dmac_channel_device::is_dma_activated(int vector)
 	if (!m_dma_timer_active)
 		return false;
 
-	m_dma_current_active_timer->adjust(m_cpu->cycles_to_attotime(2));
+	m_dma_current_active_timer->adjust(attotime::from_ticks(2, clock()));
 
 	return true;
 }
@@ -286,25 +304,25 @@ TIMER_CALLBACK_MEMBER( sh7014_dmac_channel_device::dma_timer_callback )
 		m_dar -= m_active_dma_unit_size;
 
 	if (m_request_source_type == RS_TYPE_INTERNAL)
-		m_notify_dma_source_cb(m_selected_resource);
+		m_dmac->notify_dma_source(m_selected_resource);
 
 	switch (m_active_dma_unit_size) {
 		case 1:
-			m_cpu->m_program->write_byte(
+			m_dmac->m_cpu->m_program->write_byte(
 				m_dar,
-				m_cpu->m_program->read_byte(m_sar)
+				m_dmac->m_cpu->m_program->read_byte(m_sar)
 			);
 			break;
 		case 2:
-			m_cpu->m_program->write_word(
+			m_dmac->m_cpu->m_program->write_word(
 				m_dar,
-				m_cpu->m_program->read_word(m_sar)
+				m_dmac->m_cpu->m_program->read_word(m_sar)
 			);
 			break;
 		case 4:
-			m_cpu->m_program->write_dword(
+			m_dmac->m_cpu->m_program->write_dword(
 				m_dar,
-				m_cpu->m_program->read_dword(m_sar)
+				m_dmac->m_cpu->m_program->read_dword(m_sar)
 			);
 			break;
 	}
@@ -325,17 +343,17 @@ TIMER_CALLBACK_MEMBER( sh7014_dmac_channel_device::dma_timer_callback )
 		m_dma_timer_active = false;
 
 		if (m_active_dma_is_burst)
-			m_cpu->resume(SUSPEND_REASON_HALT);
+			m_dmac->m_cpu->resume(SUSPEND_REASON_HALT);
 
 		const auto interrupt_enable = (m_chcr & CHCR_IE) != 0;
 		if (interrupt_enable)
-			m_intc->set_interrupt(m_vector, ASSERT_LINE);
+			m_dmac->m_intc->set_interrupt(m_vector, ASSERT_LINE);
 	} else {
 		// schedule next DMA callback
 		// Internal source transfers in burst mode end on last transfer, otherwise should end after the first transfer when burst mode is off
 		// TODO: DREQ and DACK are needed for external sources instead of being handled like an auto requests
 		if (m_request_source_type != RS_TYPE_INTERNAL || (m_request_source_type == RS_TYPE_INTERNAL && m_active_dma_is_burst))
-			m_dma_current_active_timer->adjust(m_cpu->cycles_to_attotime(2));
+			m_dma_current_active_timer->adjust(attotime::from_ticks(2, clock()));
 	}
 }
 
@@ -378,8 +396,8 @@ void sh7014_dmac_channel_device::dma_check()
 	}
 
 	if (m_active_dma_is_burst)
-		m_cpu->suspend(SUSPEND_REASON_HALT, 1);
+		m_dmac->m_cpu->suspend(SUSPEND_REASON_HALT, 1);
 
 	if (m_request_source_type != RS_TYPE_INTERNAL || (m_request_source_type == RS_TYPE_INTERNAL && m_active_dma_is_burst))
-		m_dma_current_active_timer->adjust(m_cpu->cycles_to_attotime(2));
+		m_dma_current_active_timer->adjust(attotime::from_ticks(2, clock()));
 }

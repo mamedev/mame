@@ -30,42 +30,42 @@ public:
 
 	// port A
 	uint16_t padrl_r();
-	void padrl_w(offs_t offset, uint16_t data);
+	void padrl_w(uint16_t data);
 
 	uint16_t paiorl_r();
-	void paiorl_w(offs_t offset, uint16_t data);
+	void paiorl_w(uint16_t data);
 
 	uint16_t pacrl1_r();
-	void pacrl1_w(offs_t offset, uint16_t data);
+	void pacrl1_w(uint16_t data);
 
 	uint16_t pacrl2_r();
-	void pacrl2_w(offs_t offset, uint16_t data);
+	void pacrl2_w(uint16_t data);
 
 	// port b
 	uint16_t pbdr_r();
-	void pbdr_w(offs_t offset, uint16_t data);
+	void pbdr_w(uint16_t data);
 
 	uint16_t pbior_r();
-	void pbior_w(offs_t offset, uint16_t data);
+	void pbior_w(uint16_t data);
 
 	uint16_t pbcr1_r();
-	void pbcr1_w(offs_t offset, uint16_t data);
+	void pbcr1_w(uint16_t data);
 
 	uint16_t pbcr2_r();
-	void pbcr2_w(offs_t offset, uint16_t data);
+	void pbcr2_w(uint16_t data);
 
 	// port e
 	uint16_t pedr_r();
-	void pedr_w(offs_t offset, uint16_t data);
+	void pedr_w(uint16_t data);
 
 	uint16_t peior_r();
-	void peior_w(offs_t offset, uint16_t data);
+	void peior_w(uint16_t data);
 
 	uint16_t pecr1_r();
-	void pecr1_w(offs_t offset, uint16_t data);
+	void pecr1_w(uint16_t data);
 
 	uint16_t pecr2_r();
-	void pecr2_w(offs_t offset, uint16_t data);
+	void pecr2_w(uint16_t data);
 
 	// port f
 	uint8_t pfdr_r();

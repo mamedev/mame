@@ -26,6 +26,7 @@ DEFINE_DEVICE_TYPE(SH7014_MTU_CHANNEL, sh7014_mtu_channel_device, "sh7014mtuchan
 
 sh7014_mtu_device::sh7014_mtu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SH7014_MTU, tag, owner, clock)
+	, m_intc(*this, finder_base::DUMMY_TAG)
 	, m_chan(*this, "ch%u", 0u)
 {
 }
@@ -38,6 +39,39 @@ void sh7014_mtu_device::device_start()
 void sh7014_mtu_device::device_reset()
 {
 	m_tsyr = 0;
+}
+
+void sh7014_mtu_device::device_add_mconfig(machine_config &config)
+{
+	SH7014_MTU_CHANNEL(config, m_chan[0], DERIVED_CLOCK(1, 1), m_intc,
+		0, // channel
+		sh7014_intc_device::INT_VECTOR_MTU_TGI0A,
+		sh7014_intc_device::INT_VECTOR_MTU_TGI0B,
+		sh7014_intc_device::INT_VECTOR_MTU_TGI0C,
+		sh7014_intc_device::INT_VECTOR_MTU_TGI0D,
+		sh7014_intc_device::INT_VECTOR_MTU_TGI0V,
+		-1
+	);
+
+	SH7014_MTU_CHANNEL(config, m_chan[1], DERIVED_CLOCK(1, 1), m_intc,
+		1, // channel
+		sh7014_intc_device::INT_VECTOR_MTU_TGI1A,
+		sh7014_intc_device::INT_VECTOR_MTU_TGI1B,
+		-1,
+		-1,
+		sh7014_intc_device::INT_VECTOR_MTU_TGI1V,
+		sh7014_intc_device::INT_VECTOR_MTU_TGI1U
+	);
+
+	SH7014_MTU_CHANNEL(config, m_chan[2], DERIVED_CLOCK(1, 1), m_intc,
+		2, // channel
+		sh7014_intc_device::INT_VECTOR_MTU_TGI2A,
+		sh7014_intc_device::INT_VECTOR_MTU_TGI2B,
+		-1,
+		-1,
+		sh7014_intc_device::INT_VECTOR_MTU_TGI2V,
+		sh7014_intc_device::INT_VECTOR_MTU_TGI2U
+	);
 }
 
 void sh7014_mtu_device::map(address_map &map)
@@ -59,7 +93,7 @@ uint8_t sh7014_mtu_device::tstr_r()
 	 | (m_chan[2]->is_enabled() << 2);
 }
 
-void sh7014_mtu_device::tstr_w(offs_t offset, uint8_t data)
+void sh7014_mtu_device::tstr_w(uint8_t data)
 {
 	LOG("%s: tstr_w %02x\n", machine().describe_context().c_str(), data);
 
@@ -73,7 +107,7 @@ uint8_t sh7014_mtu_device::tsyr_r()
 	return m_tsyr & (TSYR_SYNC0 | TSYR_SYNC1 | TSYR_SYNC2);
 }
 
-void sh7014_mtu_device::tsyr_w(offs_t offset, uint8_t data)
+void sh7014_mtu_device::tsyr_w(uint8_t data)
 {
 	LOG("%s: tsyr_w %02x\n", machine().describe_context().c_str(), data);
 
@@ -85,7 +119,6 @@ void sh7014_mtu_device::tsyr_w(offs_t offset, uint8_t data)
 
 sh7014_mtu_channel_device::sh7014_mtu_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SH7014_MTU_CHANNEL, tag, owner, clock)
-	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_intc(*this, finder_base::DUMMY_TAG)
 	, m_timer(nullptr)
 {
@@ -187,7 +220,7 @@ uint8_t sh7014_mtu_channel_device::tcr_r()
 	return r;
 }
 
-void sh7014_mtu_channel_device::tcr_w(offs_t offset, uint8_t data)
+void sh7014_mtu_channel_device::tcr_w(uint8_t data)
 {
 	LOG("%s: tcr_w<%d> %02x\n", machine().describe_context().c_str(), m_channel_id, data);
 
@@ -259,7 +292,7 @@ uint8_t sh7014_mtu_channel_device::tmdr_r()
 	return r | 0xc0;
 }
 
-void sh7014_mtu_channel_device::tmdr_w(offs_t offset, uint8_t data)
+void sh7014_mtu_channel_device::tmdr_w(uint8_t data)
 {
 	LOG("%s: tmdr_w<%d> %02x\n", machine().describe_context().c_str(), m_channel_id, data);
 
@@ -271,7 +304,7 @@ uint8_t sh7014_mtu_channel_device::tiorh_r()
 	return m_tiorh;
 }
 
-void sh7014_mtu_channel_device::tiorh_w(offs_t offset, uint8_t data)
+void sh7014_mtu_channel_device::tiorh_w(uint8_t data)
 {
 	LOG("%s: tiorh_w<%d> %02x\n", machine().describe_context().c_str(), m_channel_id, data);
 
@@ -310,7 +343,7 @@ uint8_t sh7014_mtu_channel_device::tiorl_r()
 	return m_tiorl;
 }
 
-void sh7014_mtu_channel_device::tiorl_w(offs_t offset, uint8_t data)
+void sh7014_mtu_channel_device::tiorl_w(uint8_t data)
 {
 	LOG("%s: tiorl_w<%d> %02x\n", machine().describe_context().c_str(), m_channel_id, data);
 
@@ -349,7 +382,7 @@ uint8_t sh7014_mtu_channel_device::tier_r()
 	return m_tier | 0x40;
 }
 
-void sh7014_mtu_channel_device::tier_w(offs_t offset, uint8_t data)
+void sh7014_mtu_channel_device::tier_w(uint8_t data)
 {
 	LOG("%s: tier_w<%d> %02x\n", machine().describe_context().c_str(), m_channel_id, data);
 
@@ -368,7 +401,7 @@ uint8_t sh7014_mtu_channel_device::tsr_r()
 	return r | (1 << 6);
 }
 
-void sh7014_mtu_channel_device::tsr_w(offs_t offset, uint8_t data)
+void sh7014_mtu_channel_device::tsr_w(uint8_t data)
 {
 	LOG("%s: tsr_w<%d> %02x\n", machine().describe_context().c_str(), m_channel_id, data);
 
@@ -387,7 +420,7 @@ uint16_t sh7014_mtu_channel_device::tcnt_r()
 	return m_tcnt;
 }
 
-void sh7014_mtu_channel_device::tcnt_w(offs_t offset, uint16_t data)
+void sh7014_mtu_channel_device::tcnt_w(uint16_t data)
 {
 	LOG("%s: tcnt_w<%d> %04x -> %04x\n", machine().describe_context().c_str(), m_channel_id, m_tcnt, data);
 
@@ -399,7 +432,7 @@ uint16_t sh7014_mtu_channel_device::tgra_r()
 	return m_tgr[0];
 }
 
-void sh7014_mtu_channel_device::tgra_w(offs_t offset, uint16_t data)
+void sh7014_mtu_channel_device::tgra_w(uint16_t data)
 {
 	LOG("%s: tgra_w<%d> %04x -> %04x\n", machine().describe_context().c_str(), m_channel_id, m_tgr[0], data);
 
@@ -411,7 +444,7 @@ uint16_t sh7014_mtu_channel_device::tgrb_r()
 	return m_tgr[1];
 }
 
-void sh7014_mtu_channel_device::tgrb_w(offs_t offset, uint16_t data)
+void sh7014_mtu_channel_device::tgrb_w(uint16_t data)
 {
 	LOG("%s: tgrb_w<%d> %04x -> %04x\n", machine().describe_context().c_str(), m_channel_id, m_tgr[1], data);
 
@@ -423,7 +456,7 @@ uint16_t sh7014_mtu_channel_device::tgrc_r()
 	return m_tgr[2];
 }
 
-void sh7014_mtu_channel_device::tgrc_w(offs_t offset, uint16_t data)
+void sh7014_mtu_channel_device::tgrc_w(uint16_t data)
 {
 	LOG("%s: tgrc_w<%d> %04x -> %04x\n", machine().describe_context().c_str(), m_channel_id, m_tgr[2], data);
 
@@ -435,7 +468,7 @@ uint16_t sh7014_mtu_channel_device::tgrd_r()
 	return m_tgr[3];
 }
 
-void sh7014_mtu_channel_device::tgrd_w(offs_t offset, uint16_t data)
+void sh7014_mtu_channel_device::tgrd_w(uint16_t data)
 {
 	LOG("%s: tgrd_w<%d> %04x -> %04x\n", machine().describe_context().c_str(), m_channel_id, m_tgr[3], data);
 
@@ -447,7 +480,7 @@ void sh7014_mtu_channel_device::update_counter()
 	if (m_clock_type != INPUT_INTERNAL)
 		return;
 
-	uint64_t cur_time = m_cpu->total_cycles();
+	uint64_t cur_time = machine().time().as_ticks(clock());
 
 	if (!m_channel_active) {
 		m_last_clock_update = cur_time;
@@ -531,6 +564,7 @@ void sh7014_mtu_channel_device::schedule_next_event()
 
 	if (event_delay != 0xffffffff) {
 		const uint32_t next_event = (((((1ULL << m_clock_divider) - m_phase) >> m_clock_divider) + event_delay - 1) << m_clock_divider) + m_phase;
-		m_timer->adjust(m_cpu->cycles_to_attotime(next_event));
+		m_timer->adjust(attotime::from_ticks(next_event, clock()));
+
 	}
 }

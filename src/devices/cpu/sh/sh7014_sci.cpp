@@ -26,7 +26,6 @@ DEFINE_DEVICE_TYPE(SH7014_SCI, sh7014_sci_device, "sh7014sci", "SH7014 SCI Contr
 sh7014_sci_device::sh7014_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SH7014_SCI, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
-	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_intc(*this, finder_base::DUMMY_TAG)
 	, m_sci_tx_cb(*this)
 	, m_hack_set_full_data_transmit_on_sync(false)
@@ -356,7 +355,7 @@ void sh7014_sci_device::update_clock()
 		case INTERNAL_SYNC_OUT:
 		{
 			int divider = (1 << (2 * (m_smr & SMR_CKS))) * (m_brr + 1);
-			clock_speed = attotime::from_hz(m_cpu->clock() / divider);
+			clock_speed = attotime::from_ticks(divider, clock());
 		}
 		break;
 

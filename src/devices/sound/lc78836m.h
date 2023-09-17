@@ -15,7 +15,7 @@
 class lc78836m_device : public device_t, public device_sound_interface
 {
 public:
-	lc78836m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	lc78836m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void mute_w(int state);
 
@@ -58,7 +58,6 @@ private:
 
 	stream_buffer::sample_t m_sample_ch1, m_sample_ch2;
 	double m_att;
-	attotime m_mute_end_time;
 };
 
 

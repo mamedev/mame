@@ -20,11 +20,10 @@ class sh7014_sci_device : public device_t, public device_serial_interface
 public:
 	sh7014_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<typename T, typename U> sh7014_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int channel_id, int eri, int rxi, int txi, int tei)
-		: sh7014_sci_device(mconfig, tag, owner, 0)
+	template<typename T> sh7014_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&intc, int channel_id, int eri, int rxi, int txi, int tei)
+		: sh7014_sci_device(mconfig, tag, owner, clock)
 	{
-		m_cpu.set_tag(std::forward<T>(cpu));
-		m_intc.set_tag(std::forward<U>(intc));
+		m_intc.set_tag(std::forward<T>(intc));
 		m_channel_id = channel_id;
 		m_eri_int = eri;
 		m_rxi_int = rxi;
@@ -112,7 +111,6 @@ private:
 	void update_clock();
 	void update_data_format();
 
-	required_device<sh2_device> m_cpu;
 	required_device<sh7014_intc_device> m_intc;
 
 	devcb_write_line m_sci_tx_cb;

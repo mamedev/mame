@@ -65,7 +65,6 @@ void lc78836m_device::device_start()
 	save_item(NAME(m_sample_ch1));
 	save_item(NAME(m_sample_ch2));
 	save_item(NAME(m_att));
-	save_item(NAME(m_mute_end_time));
 
 	m_stream = stream_alloc(2, 2, m_clock);
 }
@@ -78,8 +77,7 @@ void lc78836m_device::device_reset()
 	m_bclk = 0;
 	m_sample = 0;
 	m_sample_bit = 0;
-	m_att = 1.0;
-	m_mute_end_time = attotime::never;
+	m_att = 1024;
 	m_sample_ch1 = m_sample_ch2 = 0;
 
 	update_clock();
@@ -93,37 +91,23 @@ void lc78836m_device::device_clock_changed()
 void lc78836m_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	outputs[0].fill(0);
-	outputs[0].put(0, m_sample_ch1 * m_att);
+	outputs[0].put(0, m_sample_ch1 * m_att / 1024.0);
 	m_sample_ch1 = 0;
 
 	outputs[1].fill(0);
-	outputs[1].put(0, m_sample_ch2 * m_att);
+	outputs[1].put(0, m_sample_ch2 * m_att / 1024.0);
 	m_sample_ch2 = 0;
 
-	// Soft mute fades in/out over a period of 1024/fs
-	if (!m_mute_end_time.is_never() && ((m_mute && m_att != 0.0) || (!m_mute && m_att != 1.0))) {
-		const attotime curtime = machine().time();
-		const double step = attotime::from_double(1024.0 / m_clock_fs).as_double() / 64.0;
-		const double att = (m_mute_end_time - curtime).as_double() / step / 64.0;
+	if (m_mute && m_att > 0)
+		m_att--;
+	else if (!m_mute && m_att < 1024)
+		m_att++;
 
-		if (m_mute)
-			m_att = att; // fading out, ATT is stepping 64 -> 0
-		else
-			m_att = 1.0 - att; // fading in, ATT is stepping 0 -> 64
-
-		if (curtime >= m_mute_end_time || (m_mute && m_att <= 0.0) || (!m_mute && m_att >= 1.0)) {
-			m_att = m_mute ? 0.0 : 1.0;
-			m_mute_end_time = attotime::never;
-		}
-	}
 }
 
 void lc78836m_device::mute_w(int state)
 {
 	// Soft mute
-	if (state != m_mute)
-		m_mute_end_time = machine().time() + attotime::from_double(1024.0 / m_clock_fs);
-
 	m_mute = state;
 }
 

@@ -63,6 +63,12 @@ void namcos12_cdxa_device::device_start()
 	save_item(NAME(m_audio_cur_bit));
 	save_item(NAME(m_volume_write_counter));
 	save_item(NAME(m_audio_lrck));
+
+	m_lc78836m->cksl1_w(1); // configure for 448 fs for 37800hz. setting to 0 gives 384 fs to make 44100hz
+	m_lc78836m->cksl2_w(0); // these are all grounded
+	m_lc78836m->fs1_w(0);
+	m_lc78836m->fs2_w(0);
+	m_lc78836m->emp_w(0);
 }
 
 void namcos12_cdxa_device::device_reset()
@@ -84,12 +90,7 @@ void namcos12_cdxa_device::device_add_mconfig(machine_config &config)
 
 	ATA_INTERFACE(config, m_ata).options([] (device_slot_interface &device) { device.option_add("cdrom", TOSHIBA_XM6402B_CDROM); }, "cdrom", nullptr, true);
 
-	LC78836M(config, m_lc78836m, 0);
-	m_lc78836m->cksl1_w(1); // configure for 448 fs for 37800hz. setting to 0 gives 384 fs to make 44100hz
-	m_lc78836m->cksl2_w(0); // these are all grounded
-	m_lc78836m->fs1_w(0);
-	m_lc78836m->fs2_w(0);
-	m_lc78836m->emp_w(0);
+	LC78836M(config, m_lc78836m, XTAL(16'934'400));
 
 	MB87078(config, m_mb87078);
 	m_mb87078->gain_changed().set(FUNC(namcos12_cdxa_device::mb87078_gain_changed));
@@ -126,22 +127,20 @@ void namcos12_cdxa_device::sh7014_map(address_map &map)
 
 void namcos12_cdxa_device::reset_sh2_w(uint16_t data)
 {
-	if (data == 1) {
-		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-	}
+	if (data == 1)
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 uint32_t namcos12_cdxa_device::sh2_ram_r(offs_t offset)
 {
 	auto r = m_sram_enabled ? m_sram : m_cram;
-	return BIT(r[offset], 16, 16) | (BIT(r[offset], 0, 16) << 16);
+	return rotl_32(r[offset], 16);
 }
 
 void namcos12_cdxa_device::sh2_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	mem_mask = BIT(mem_mask, 16, 16) | (BIT(mem_mask, 0, 16) << 16);
-	data = BIT(data, 16, 16) | (BIT(data, 0, 16) << 16);
+	mem_mask = rotl_32(mem_mask, 16);
+	data = rotl_32(data, 16);
 
 	if (!m_sram_enabled)
 		COMBINE_DATA(&m_cram[offset]);

@@ -78,7 +78,6 @@ public:
 	void set_interrupt(int vector, int state);
 
 protected:
-	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

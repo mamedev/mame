@@ -24,7 +24,9 @@ class sh2_sh7014_device : public sh2_device
 public:
 	sh2_sh7014_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<int Sci> auto sci_tx_w() { return m_sci_tx_cb[Sci].bind(); }
+	template<int Sci> auto sci_tx_w() {
+		return m_sci[Sci].lookup()->write_sci_tx();
+	}
 
 	template<int Sci> void sci_set_external_clock_period(const attotime &period) {
 		m_sci[Sci].lookup()->set_external_clock_period(period);
@@ -34,29 +36,18 @@ public:
 		m_sci[Sci].lookup()->set_send_full_data_transmit_on_sync_hack(enabled);
 	}
 
-	auto read_porta()  { return m_port_read[PORT_A].bind(); }
-	auto write_porta() { return m_port_write[PORT_A].bind(); }
+	auto read_porta()  { return m_port.lookup()->port_a_read_callback(); }
+	auto write_porta() { return m_port.lookup()->port_a_write_callback(); }
 
-	auto read_portb()  { return m_port_read[PORT_B].bind(); }
-	auto write_portb() { return m_port_write[PORT_B].bind(); }
+	auto read_portb()  { return m_port.lookup()->port_b_read_callback(); }
+	auto write_portb() { return m_port.lookup()->port_b_write_callback(); }
 
-	auto read_porte()  { return m_port_read[PORT_E].bind(); }
-	auto write_porte() { return m_port_write[PORT_E].bind(); }
+	auto read_porte()  { return m_port.lookup()->port_e_read_callback(); }
+	auto write_porte() { return m_port.lookup()->port_e_write_callback(); }
 
-	auto read_portf()  { return m_port_read[PORT_F].bind(); }
-
-	void sh7014_map(address_map &map);
+	auto read_portf()  { return m_port.lookup()->port_f_read_callback(); }
 
 protected:
-	enum {
-		PORT_A,
-		PORT_B,
-		PORT_E,
-		PORT_F,
-		PORT_COUNT
-	};
-
-	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -66,27 +57,23 @@ protected:
 	virtual void sh2_exception_internal(const char *message, int irqline, int vector) override;
 
 private:
+	void sh7014_map(address_map &map);
+
 	void set_irq(int vector, int level, bool is_internal);
 
 	void notify_dma_source(uint32_t source);
 
+	uint16_t ccr_r();
+	void ccr_w(offs_t offset, uint16_t dat, uint16_t mem_mask = ~0);
+
 	required_device_array<sh7014_sci_device, 2> m_sci;
 	required_device<sh7014_bsc_device> m_bsc;
 	required_device<sh7014_dmac_device> m_dmac;
-	required_device_array<sh7014_dmac_channel_device, 2> m_dmac_chan;
 	required_device<sh7014_intc_device> m_intc;
 	required_device<sh7014_mtu_device> m_mtu;
-	required_device_array<sh7014_mtu_channel_device, 3> m_mtu_chan;
 	required_device<sh7014_port_device> m_port;
 
 	devcb_write_line::array<2> m_sci_tx_cb;
-
-	devcb_read16::array<PORT_COUNT> m_port_read;
-	devcb_write16::array<PORT_COUNT> m_port_write;
-
-	// CAC
-	uint16_t ccr_r();
-	void ccr_w(offs_t offset, uint16_t dat, uint16_t mem_mask = ~0);
 
 	uint16_t m_ccr;
 };

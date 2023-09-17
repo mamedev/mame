@@ -22,11 +22,18 @@ class sh7014_mtu_device : public device_t
 public:
 	sh7014_mtu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template<typename T> sh7014_mtu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&intc)
+		: sh7014_mtu_device(mconfig, tag, owner, clock)
+	{
+		m_intc.set_tag(std::forward<T>(intc));
+	}
+
 	void map(address_map &map);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	enum {
@@ -40,11 +47,12 @@ private:
 	};
 
 	uint8_t tstr_r();
-	void tstr_w(offs_t offset, uint8_t data);
+	void tstr_w(uint8_t data);
 
 	uint8_t tsyr_r();
-	void tsyr_w(offs_t offset, uint8_t data);
+	void tsyr_w(uint8_t data);
 
+	required_device<sh7014_intc_device> m_intc;
 	required_device_array<sh7014_mtu_channel_device, 3> m_chan;
 
 	uint8_t m_tsyr;
@@ -56,11 +64,10 @@ class sh7014_mtu_channel_device : public device_t
 public:
 	sh7014_mtu_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<typename T, typename U> sh7014_mtu_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu, U &&intc, int chan_id, int32_t vector_tgia, int32_t vector_tgib, int32_t vector_tgic, int32_t vector_tgid, int32_t vector_tgiv, int32_t vector_tgiu)
+	template<typename T> sh7014_mtu_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&intc, int chan_id, int32_t vector_tgia, int32_t vector_tgib, int32_t vector_tgic, int32_t vector_tgid, int32_t vector_tgiv, int32_t vector_tgiu)
 		: sh7014_mtu_channel_device(mconfig, tag, owner, clock)
 	{
-		m_cpu.set_tag(std::forward<T>(cpu));
-		m_intc.set_tag(std::forward<U>(intc));
+		m_intc.set_tag(std::forward<T>(intc));
 		m_channel_id = chan_id;
 		m_vectors[VECTOR_TGIA] = vector_tgia;
 		m_vectors[VECTOR_TGIB] = vector_tgib;
@@ -139,44 +146,43 @@ private:
 	};
 
 	uint8_t tcr_r();
-	void tcr_w(offs_t offset, uint8_t data);
+	void tcr_w(uint8_t data);
 
 	uint8_t tmdr_r();
-	void tmdr_w(offs_t offset, uint8_t data);
+	void tmdr_w(uint8_t data);
 
 	uint8_t tiorh_r();
-	void tiorh_w(offs_t offset, uint8_t data);
+	void tiorh_w(uint8_t data);
 
 	uint8_t tiorl_r();
-	void tiorl_w(offs_t offset, uint8_t data);
+	void tiorl_w(uint8_t data);
 
 	uint8_t tier_r();
-	void tier_w(offs_t offset, uint8_t data);
+	void tier_w(uint8_t data);
 
 	uint8_t tsr_r();
-	void tsr_w(offs_t offset, uint8_t data);
+	void tsr_w(uint8_t data);
 
 	uint16_t tcnt_r();
-	void tcnt_w(offs_t offset, uint16_t data);
+	void tcnt_w(uint16_t data);
 
 	uint16_t tgra_r();
-	void tgra_w(offs_t offset, uint16_t data);
+	void tgra_w(uint16_t data);
 
 	uint16_t tgrb_r();
-	void tgrb_w(offs_t offset, uint16_t data);
+	void tgrb_w(uint16_t data);
 
 	uint16_t tgrc_r();
-	void tgrc_w(offs_t offset, uint16_t data);
+	void tgrc_w(uint16_t data);
 
 	uint16_t tgrd_r();
-	void tgrd_w(offs_t offset, uint16_t data);
+	void tgrd_w(uint16_t data);
 
 	void update_counter();
 	void schedule_next_event();
 
 	TIMER_CALLBACK_MEMBER( timer_callback );
 
-	required_device<cpu_device> m_cpu;
 	required_device<sh7014_intc_device> m_intc;
 
 	emu_timer *m_timer;
