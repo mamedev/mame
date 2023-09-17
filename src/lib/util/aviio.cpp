@@ -16,6 +16,7 @@
 #include "osdcomm.h"
 #include "osdfile.h"
 
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cstdlib>
@@ -1282,9 +1283,9 @@ avi_file::error avi_stream::uncompressed_yuv420p_to_argb32(const std::uint8_t *d
 			int g = luma - (0.698001f * (v - 0x80)) - (0.337633f * (u - 0x80));
 			int b = luma + (1.732446f * (u - 0x80));
 
-			r = (r < 0) ? 0 : ((r > 255) ? 255 : r);
-			g = (g < 0) ? 0 : ((g > 255) ? 255 : g);
-			b = (b < 0) ? 0 : ((b > 255) ? 255 : b);
+			r = std::clamp(r, 0, 255);
+			g = std::clamp(g, 0, 255);
+			b = std::clamp(b, 0, 255);
 
 			*dest++ = 0xff << 24 | r << 16 | g << 8 | b;
 		}
