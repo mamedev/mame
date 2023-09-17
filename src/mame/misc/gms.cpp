@@ -61,6 +61,7 @@ TODO:
 - hookup MCU and YM2151 sound for the mahjong games
 - hookup PIC16F84 for rbspm once a CPU core is available
 - emulate protection devices correctly instead of patching
+- hookup lamps and do layouts
 */
 
 #include "emu.h"
@@ -181,7 +182,7 @@ uint16_t gms_2layers_state::dip_mux_r()
 	uint16_t res = 0xffff;
 
 	// TODO: & 0x00ff are the inputs for keyboard mode in rbmk
-	switch (m_dip_mux & 0x7000)
+	switch (m_dip_mux & 0xf000)
 	{
 		case 0x1000: res = m_dsw[0]->read(); break;
 		case 0x2000: if (m_dsw[1]) res = m_dsw[1]->read(); break;
@@ -227,10 +228,10 @@ void gms_2layers_state::rbmk_mem(address_map &map)
 	map(0x000000, 0x07ffff).rom().nopw();
 	map(0x100000, 0x10ffff).ram();
 	map(0x500000, 0x50ffff).ram();
+	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x940000, 0x940bff).ram();
 	map(0x940c00, 0x940fff).ram().w(FUNC(gms_2layers_state::vram_w<0>)).share(m_vidram[0]);
 	map(0x980300, 0x983fff).ram(); // 0x2048  words ???, byte access
-	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x9c0000, 0x9c0fff).ram().w(FUNC(gms_2layers_state::vram_w<1>)).share(m_vidram[1]);
 	map(0xb00000, 0xb00001).w(FUNC(gms_2layers_state::eeprom_w));
 	map(0xc00000, 0xc00001).rw(FUNC(gms_2layers_state::dip_mux_r), FUNC(gms_2layers_state::dip_mux_w));
@@ -272,6 +273,7 @@ void gms_2layers_state::super555_mem(address_map &map)
 	map(0x620000, 0x620000).r("oki", FUNC(okim6295_device::read)); // TODO: Oki controlled through a GAL at 18C, should be banked, too
 	// map(0x620080, 0x620081).lw16(NAME([this] (uint16_t data) { m_prot_data = data; })); // writes something here that expects to read above
 	map(0x628000, 0x628000).w("oki", FUNC(okim6295_device::write));
+	map(0x638000, 0x638001).nopw(); // lamps / outputs?
 	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x940000, 0x940bff).ram();
 	map(0x940c00, 0x940fff).ram().w(FUNC(gms_2layers_state::vram_w<0>)).share(m_vidram[0]);
