@@ -70,10 +70,10 @@ Keep pressed 9 and press reset to enter service mode.
 
 namespace {
 
-class rbmk_state : public driver_device
+class gms_2layers_state : public driver_device
 {
 public:
-	rbmk_state(const machine_config &mconfig, device_type type, const char *tag)
+	gms_2layers_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_vidram(*this, "vidram%u", 1U)
 		, m_maincpu(*this, "maincpu")
@@ -89,19 +89,16 @@ public:
 	void rbmk(machine_config &config);
 	void rbspm(machine_config &config);
 
-	void magslot(machine_config &config);
 	void super555(machine_config &config);
 
 	void init_ballch();
 	void init_cots();
 	void init_rbspm();
-	void init_sc2in1();
 	void init_super555();
 
 protected:
 	virtual void video_start() override;
 
-private:
 	optional_shared_ptr_array<uint16_t, 3> m_vidram;
 
 	required_device<cpu_device> m_maincpu;
@@ -113,18 +110,21 @@ private:
 	optional_ioport_array<4> m_dsw;
 
 	uint16_t m_tilebank = 0;
+	tilemap_t *m_tilemap[3]{};
+
+	void super555_mem(address_map &map);
+
+	template <uint8_t Which> void vram_w(offs_t offset, u16 data, u16 mem_mask);
+
+private:
 	uint8_t m_mux_data = 0;
 	uint16_t m_dip_mux = 0;
 	//uint16_t m_prot_data = 0;
-	tilemap_t *m_tilemap[3]{};
 
 	void mcu_io(address_map &map);
 	void mcu_mem(address_map &map);
 	void rbmk_mem(address_map &map);
 	void rbspm_mem(address_map &map);
-
-	void magslot_mem(address_map &map);
-	void super555_mem(address_map &map);
 
 	uint16_t unk_r();
 	uint16_t dip_mux_r();
@@ -135,20 +135,39 @@ private:
 	void mcu_io_mux_w(uint8_t data);
 	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	template <uint8_t Which> void vram_w(offs_t offset, u16 data, u16 mem_mask);
 	TILE_GET_INFO_MEMBER(get_tile0_info);
 	TILE_GET_INFO_MEMBER(get_tile1_info);
-	[[maybe_unused]] TILE_GET_INFO_MEMBER(get_tile2_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
+class gms_3layers_state : public gms_2layers_state
+{
+public:
+	gms_3layers_state(const machine_config &mconfig, device_type type, const char *tag)
+		: gms_2layers_state(mconfig, type, tag)
+	{
+	}
 
-uint16_t rbmk_state::unk_r()
+	void init_sc2in1();
+
+	void magslot(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	void magslot_mem(address_map &map);
+
+	TILE_GET_INFO_MEMBER(get_tile2_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+};
+
+uint16_t gms_2layers_state::unk_r()
 {
 	return machine().rand();
 }
 
-uint16_t rbmk_state::dip_mux_r()
+uint16_t gms_2layers_state::dip_mux_r()
 {
 	uint16_t res = 0xffff;
 
@@ -164,24 +183,24 @@ uint16_t rbmk_state::dip_mux_r()
 	return res;
 }
 
-void rbmk_state::tilebank_w(uint16_t data)
+void gms_2layers_state::tilebank_w(uint16_t data)
 {
 	m_tilebank = data;
 }
 
 template <uint8_t Which>
-void rbmk_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
+void gms_2layers_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vidram[Which][offset]);
 	m_tilemap[Which]->mark_tile_dirty(offset);
 }
 
-void rbmk_state::dip_mux_w(uint16_t data)
+void gms_2layers_state::dip_mux_w(uint16_t data)
 {
 	m_dip_mux = data;
 }
 
-void rbmk_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void gms_2layers_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// bad ?
 	if (ACCESSING_BITS_0_7)
@@ -194,51 +213,51 @@ void rbmk_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 }
 
 
-void rbmk_state::rbmk_mem(address_map &map)
+void gms_2layers_state::rbmk_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().nopw();
 	map(0x100000, 0x10ffff).ram();
 	map(0x500000, 0x50ffff).ram();
 	map(0x940000, 0x940bff).ram();
-	map(0x940c00, 0x940fff).ram().w(FUNC(rbmk_state::vram_w<0>)).share(m_vidram[0]);
+	map(0x940c00, 0x940fff).ram().w(FUNC(gms_2layers_state::vram_w<0>)).share(m_vidram[0]);
 	map(0x980300, 0x983fff).ram(); // 0x2048  words ???, byte access
 	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x9c0000, 0x9c0fff).ram().w(FUNC(rbmk_state::vram_w<1>)).share(m_vidram[1]);
-	map(0xb00000, 0xb00001).w(FUNC(rbmk_state::eeprom_w));
-	map(0xc00000, 0xc00001).rw(FUNC(rbmk_state::dip_mux_r), FUNC(rbmk_state::dip_mux_w));
-	map(0xc08000, 0xc08001).portr("IN1").w(FUNC(rbmk_state::tilebank_w));
+	map(0x9c0000, 0x9c0fff).ram().w(FUNC(gms_2layers_state::vram_w<1>)).share(m_vidram[1]);
+	map(0xb00000, 0xb00001).w(FUNC(gms_2layers_state::eeprom_w));
+	map(0xc00000, 0xc00001).rw(FUNC(gms_2layers_state::dip_mux_r), FUNC(gms_2layers_state::dip_mux_w));
+	map(0xc08000, 0xc08001).portr("IN1").w(FUNC(gms_2layers_state::tilebank_w));
 	map(0xc10000, 0xc10001).portr("IN2");
-	map(0xc18080, 0xc18081).r(FUNC(rbmk_state::unk_r));  // TODO: from MCU?
+	map(0xc18080, 0xc18081).r(FUNC(gms_2layers_state::unk_r));  // TODO: from MCU?
 	map(0xc20000, 0xc20000).r("oki", FUNC(okim6295_device::read));
 	//map(0xc20080, 0xc20081) // TODO: to MCU?
 	map(0xc28000, 0xc28000).w("oki", FUNC(okim6295_device::write));
 }
 
-void rbmk_state::rbspm_mem(address_map &map)
+void gms_2layers_state::rbspm_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x200000, 0x200001).w(FUNC(rbmk_state::eeprom_w)); // wrong
-	map(0x300000, 0x300001).rw(FUNC(rbmk_state::dip_mux_r), FUNC(rbmk_state::dip_mux_w));
-	map(0x308000, 0x308001).portr("IN1").w(FUNC(rbmk_state::tilebank_w)); // ok
+	map(0x200000, 0x200001).w(FUNC(gms_2layers_state::eeprom_w)); // wrong
+	map(0x300000, 0x300001).rw(FUNC(gms_2layers_state::dip_mux_r), FUNC(gms_2layers_state::dip_mux_w));
+	map(0x308000, 0x308001).portr("IN1").w(FUNC(gms_2layers_state::tilebank_w)); // ok
 	map(0x310000, 0x310001).portr("IN2");
-	map(0x318080, 0x318081).r(FUNC(rbmk_state::unk_r));
+	map(0x318080, 0x318081).r(FUNC(gms_2layers_state::unk_r));
 	map(0x320000, 0x320000).r("oki", FUNC(okim6295_device::read));
 	map(0x328000, 0x328000).w("oki", FUNC(okim6295_device::write));
 	map(0x340002, 0x340003).nopw();
 	map(0x500000, 0x50ffff).ram();
 	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // if removed fails gfx test?
 	map(0x940000, 0x940bff).ram();
-	map(0x940c00, 0x940fff).ram().w(FUNC(rbmk_state::vram_w<0>)).share(m_vidram[0]); // if removed fails palette test?
+	map(0x940c00, 0x940fff).ram().w(FUNC(gms_2layers_state::vram_w<0>)).share(m_vidram[0]); // if removed fails palette test?
 	map(0x980300, 0x983fff).ram(); // 0x2048  words ???, byte access, u25 and u26 according to test mode
-	map(0x9c0000, 0x9c0fff).ram().w(FUNC(rbmk_state::vram_w<1>)).share(m_vidram[1]);
+	map(0x9c0000, 0x9c0fff).ram().w(FUNC(gms_2layers_state::vram_w<1>)).share(m_vidram[1]);
 }
 
-void rbmk_state::super555_mem(address_map &map)
+void gms_2layers_state::super555_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x10ffff).ram();
-	map(0x600000, 0x600001).rw(FUNC(rbmk_state::dip_mux_r), FUNC(rbmk_state::dip_mux_w));
-	map(0x608000, 0x608001).portr("IN1").w(FUNC(rbmk_state::tilebank_w)); // ok
+	map(0x600000, 0x600001).rw(FUNC(gms_2layers_state::dip_mux_r), FUNC(gms_2layers_state::dip_mux_w));
+	map(0x608000, 0x608001).portr("IN1").w(FUNC(gms_2layers_state::tilebank_w)); // ok
 	map(0x610000, 0x610001).portr("IN2");
 	map(0x618080, 0x618081).nopr();//.lr16(NAME([this] () -> uint16_t { return m_prot_data; })); // reads something here from below, if these are hooked up booting stops with '0x09 U64 ERROR', like it's failing some checksum test
 	map(0x620000, 0x620000).r("oki", FUNC(okim6295_device::read)); // TODO: Oki controlled through a GAL at 18C, should be banked, too
@@ -246,25 +265,25 @@ void rbmk_state::super555_mem(address_map &map)
 	map(0x628000, 0x628000).w("oki", FUNC(okim6295_device::write));
 	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x940000, 0x940bff).ram();
-	map(0x940c00, 0x940fff).ram().w(FUNC(rbmk_state::vram_w<0>)).share(m_vidram[0]);
+	map(0x940c00, 0x940fff).ram().w(FUNC(gms_2layers_state::vram_w<0>)).share(m_vidram[0]);
 	map(0x980000, 0x983fff).ram();
-	map(0x9c0000, 0x9c0fff).ram().w(FUNC(rbmk_state::vram_w<1>)).share(m_vidram[1]);
-	//map(0xf00000, 0xf00001).w(FUNC(rbmk_state::eeprom_w)); // wrong?
+	map(0x9c0000, 0x9c0fff).ram().w(FUNC(gms_2layers_state::vram_w<1>)).share(m_vidram[1]);
+	//map(0xf00000, 0xf00001).w(FUNC(gms_2layers_state::eeprom_w)); // wrong?
 }
 
-void rbmk_state::magslot_mem(address_map &map)
+void gms_3layers_state::magslot_mem(address_map &map)
 {
 	super555_mem(map);
 
-	map(0x9e0000, 0x9e0fff).ram().share(m_vidram[2]);
+	map(0x9e0000, 0x9e0fff).ram().w(FUNC(gms_3layers_state::vram_w<2>)).share(m_vidram[2]);
 }
 
-void rbmk_state::mcu_mem(address_map &map)
+void gms_2layers_state::mcu_mem(address_map &map)
 {
 //  map(0x0000, 0x0fff).rom();
 }
 
-uint8_t rbmk_state::mcu_io_r(offs_t offset)
+uint8_t gms_2layers_state::mcu_io_r(offs_t offset)
 {
 	if (m_mux_data & 8)
 	{
@@ -282,7 +301,7 @@ uint8_t rbmk_state::mcu_io_r(offs_t offset)
 	return 0xff;
 }
 
-void rbmk_state::mcu_io_w(offs_t offset, uint8_t data)
+void gms_2layers_state::mcu_io_w(offs_t offset, uint8_t data)
 {
 	if (m_mux_data & 8) { m_ymsnd->write(offset & 1, data); }
 	else if (m_mux_data & 4)
@@ -294,14 +313,14 @@ void rbmk_state::mcu_io_w(offs_t offset, uint8_t data)
 		printf("Warning: mux data W = %02x", m_mux_data);
 }
 
-void rbmk_state::mcu_io_mux_w(uint8_t data)
+void gms_2layers_state::mcu_io_mux_w(uint8_t data)
 {
 	m_mux_data = ~data;
 }
 
-void rbmk_state::mcu_io(address_map &map)
+void gms_2layers_state::mcu_io(address_map &map)
 {
-	map(0x0ff00, 0x0ffff).rw(FUNC(rbmk_state::mcu_io_r), FUNC(rbmk_state::mcu_io_w));
+	map(0x0ff00, 0x0ffff).rw(FUNC(gms_2layers_state::mcu_io_r), FUNC(gms_2layers_state::mcu_io_w));
 }
 
 static INPUT_PORTS_START( rbmk )
@@ -852,30 +871,20 @@ static INPUT_PORTS_START( sc2in1 )
 
 	// Only 1 8-DIP bank on PCB
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0000, "SW1:1")
+	PORT_DIPUNUSED_DIPLOC( 0x0002, 0x0000, "SW1:2")
+	PORT_DIPUNUSED_DIPLOC( 0x0004, 0x0000, "SW1:3")
+	PORT_DIPUNUSED_DIPLOC( 0x0008, 0x0000, "SW1:4")
+	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0000, "SW1:5")
+	PORT_DIPNAME(          0x0020, 0x0000, "Game Setup" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(       0x0000, DEF_STR( Normal ) )
+	PORT_DIPSETTING(       0x0020, "Power On" )
+	PORT_DIPNAME(          0x0040, 0x0000, "Game Password" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(       0x0000, DEF_STR( Normal ) )
+	PORT_DIPSETTING(       0x0040, "Power On" )
+	PORT_DIPNAME(          0x0080, 0x0000, "Connector" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(       0x0000, "Joystick" ) // hardcoded
+	PORT_DIPSETTING(       0x0080, "Joystick" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ballch )
@@ -1152,10 +1161,10 @@ static GFXDECODE_START( gfx_magslot )
 	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_packed_lsb,     0x100, 16  ) // wrong colors
 GFXDECODE_END
 
-void rbmk_state::video_start()
+void gms_2layers_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rbmk_state::get_tile0_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rbmk_state::get_tile1_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gms_2layers_state::get_tile0_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gms_2layers_state::get_tile1_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_tilemap[1]->set_transparent_pen(0);
 
@@ -1166,20 +1175,35 @@ void rbmk_state::video_start()
 	save_item(NAME(m_dip_mux));
 }
 
-TILE_GET_INFO_MEMBER(rbmk_state::get_tile0_info)
+void gms_3layers_state::video_start()
+{
+	gms_2layers_state::video_start();
+
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gms_3layers_state::get_tile2_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
+	m_tilemap[2]->set_transparent_pen(0);
+}
+
+TILE_GET_INFO_MEMBER(gms_2layers_state::get_tile0_info)
 {
 	const int tile = m_vidram[0][tile_index];
 	tileinfo.set(0, (tile & 0x0fff) + ((m_tilebank & 0x10) >> 4) * 0x1000, tile >> 12, 0);
 }
 
-TILE_GET_INFO_MEMBER(rbmk_state::get_tile1_info)
+TILE_GET_INFO_MEMBER(gms_2layers_state::get_tile1_info)
 {
 	const int tile = m_vidram[1][tile_index];
 	tileinfo.set(1, (tile & 0x0fff) + ((m_tilebank >> 1) & 3) * 0x1000, tile >> 12, 0);
 }
 
+TILE_GET_INFO_MEMBER(gms_3layers_state::get_tile2_info)
+{
+	const int tile = m_vidram[2][tile_index];
+	tileinfo.set(2, (tile & 0x0fff) + ((m_tilebank >> 9) & 3) * 0x1000, tile >> 12, 0); // TODO: identify tilebank bits
+}
+
 // TODO:  ballch's and cots' title screens highlight a priority bug: the title and copyright are drawn behind the background
-uint32_t rbmk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gms_2layers_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap[0]->draw(screen, bitmap, cliprect);
 	m_tilemap[1]->draw(screen, bitmap, cliprect);
@@ -1187,16 +1211,26 @@ uint32_t rbmk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-void rbmk_state::rbmk(machine_config &config)
+uint32_t gms_3layers_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_tilemap[0]->draw(screen, bitmap, cliprect);
+	m_tilemap[1]->draw(screen, bitmap, cliprect);
+	m_tilemap[2]->draw(screen, bitmap, cliprect);
+
+	return 0;
+}
+
+
+void gms_2layers_state::rbmk(machine_config &config)
 {
 	M68000(config, m_maincpu, 22_MHz_XTAL / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &rbmk_state::rbmk_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(rbmk_state::irq1_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &gms_2layers_state::rbmk_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(gms_2layers_state::irq1_line_hold));
 
 	AT89C4051(config, m_mcu, 22_MHz_XTAL / 4); // frequency isn't right
-	m_mcu->set_addrmap(AS_PROGRAM, &rbmk_state::mcu_mem);
-	m_mcu->set_addrmap(AS_IO, &rbmk_state::mcu_io);
-	m_mcu->port_out_cb<3>().set(FUNC(rbmk_state::mcu_io_mux_w));
+	m_mcu->set_addrmap(AS_PROGRAM, &gms_2layers_state::mcu_mem);
+	m_mcu->set_addrmap(AS_IO, &gms_2layers_state::mcu_io);
+	m_mcu->port_out_cb<3>().set(FUNC(gms_2layers_state::mcu_io_mux_w));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rbmk);
 
@@ -1205,7 +1239,7 @@ void rbmk_state::rbmk(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
-	screen.set_screen_update(FUNC(rbmk_state::screen_update));
+	screen.set_screen_update(FUNC(gms_2layers_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
@@ -1224,27 +1258,29 @@ void rbmk_state::rbmk(machine_config &config)
 	m_ymsnd->add_route(1, "rspeaker", 0.60);
 }
 
-void rbmk_state::rbspm(machine_config &config)
+void gms_2layers_state::rbspm(machine_config &config)
 {
 	rbmk(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &rbmk_state::rbspm_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gms_2layers_state::rbspm_mem);
 
 	// PIC16F84 but no CPU core available
 }
 
-void rbmk_state::super555(machine_config &config)
+void gms_2layers_state::super555(machine_config &config)
 {
 	rbmk(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &rbmk_state::super555_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gms_2layers_state::super555_mem);
 
 	config.device_remove("mcu");
 	config.device_remove("ymsnd");
 }
 
-void rbmk_state::magslot(machine_config &config)
+void gms_3layers_state::magslot(machine_config &config)
 {
 	super555(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &rbmk_state::magslot_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gms_3layers_state::magslot_mem);
+
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(gms_3layers_state::screen_update));
 
 	m_gfxdecode->set_info(gfx_magslot);
 }
@@ -1467,7 +1503,7 @@ ROM_END
 	// the following inits patch out protection (?) checks to allow for testing
 	// unfortunately the various U errors shown don't correspond to correct PCB locations
 
-void rbmk_state::init_rbspm()
+void gms_2layers_state::init_rbspm()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
@@ -1477,14 +1513,14 @@ void rbmk_state::init_rbspm()
 	rom[0x1f1fc / 2] = 0x6000;
 }
 
-void rbmk_state::init_sc2in1()
+void gms_3layers_state::init_sc2in1()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	rom[0x45f48 / 2] = 0xff84;
 }
 
-void rbmk_state::init_super555()
+void gms_2layers_state::init_super555()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
@@ -1493,7 +1529,7 @@ void rbmk_state::init_super555()
 	rom[0x4782e / 2] = 0x6000; // 0x0A U135 ERROR
 }
 
-void rbmk_state::init_ballch()
+void gms_2layers_state::init_ballch()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
@@ -1501,7 +1537,7 @@ void rbmk_state::init_ballch()
 	rom[0x13212 / 2] = 0x4e71; // U64 U136 ERROR
 }
 
-void rbmk_state::init_cots()
+void gms_2layers_state::init_cots()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
@@ -1516,16 +1552,16 @@ void rbmk_state::init_cots()
 
 
 // mahjong
-GAME( 1998, rbmk,     0, rbmk,     rbmk,     rbmk_state, empty_init,    ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // misses YM2151 hookup, Oki hookup may be imperfect
-GAME( 1998, rbspm,    0, rbspm,    rbspm,    rbmk_state, init_rbspm,    ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
+GAME( 1998, rbmk,     0, rbmk,     rbmk,     gms_2layers_state, empty_init,    ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // misses YM2151 hookup, Oki hookup may be imperfect
+GAME( 1998, rbspm,    0, rbspm,    rbspm,    gms_2layers_state, init_rbspm,    ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
 
 // card games
-GAME( 1999, super555, 0, super555, super555, rbmk_state, init_super555, ROT0,  "GMS", "Super 555 (English version V1.5)",          MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
-GAME( 2001, sc2in1,   0, magslot,  sc2in1,   rbmk_state, init_sc2in1,   ROT0,  "GMS", "Super Card 2 in 1 (English version 03.23)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
+GAME( 1999, super555, 0, super555, super555, gms_2layers_state, init_super555, ROT0,  "GMS", "Super 555 (English version V1.5)",          MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
+GAME( 2001, sc2in1,   0, magslot,  sc2in1,   gms_3layers_state, init_sc2in1,   ROT0,  "GMS", "Super Card 2 in 1 (English version 03.23)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
 
 // slot, on slightly different PCB
-GAME( 2003, magslot,  0, magslot,  magslot,  rbmk_state, empty_init,    ROT0,  "GMS", "Magic Slot (normal 1.0C)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // needs implementing of 3rd GFX layer, correct GFX decode for 1st layer, inputs
+GAME( 2003, magslot,  0, magslot,  magslot,  gms_3layers_state, empty_init,    ROT0,  "GMS", "Magic Slot (normal 1.0C)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // needs implementing of 3rd GFX layer, correct GFX decode for 1st layer, inputs
 
 // train games
-GAME( 2002, ballch,   0, super555, ballch,   rbmk_state, init_ballch,   ROT0,  "TVE", "Ball Challenge (20020607 1.0 OVERSEA)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
-GAME( 2005, cots,     0, super555, cots,     rbmk_state, init_cots,     ROT0,  "ECM", "Creatures of the Sea (20050328 USA 6.3)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
+GAME( 2002, ballch,   0, super555, ballch,   gms_2layers_state, init_ballch,   ROT0,  "TVE", "Ball Challenge (20020607 1.0 OVERSEA)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
+GAME( 2005, cots,     0, super555, cots,     gms_2layers_state, init_cots,     ROT0,  "ECM", "Creatures of the Sea (20050328 USA 6.3)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
