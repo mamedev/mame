@@ -6,7 +6,6 @@
 #include "fs_vtech.h"
 #include "vt_dsk.h"
 
-#include "corestr.h"
 #include "multibyte.h"
 
 #include <stdexcept>
@@ -142,7 +141,7 @@ meta_data vtech_impl::file_metadata(const u8 *entry)
 {
 	meta_data res;
 
-	res.set(meta_name::name, strtrimrightspace(rstr(entry+2, 8)));
+	res.set(meta_name::name, trim_end_spaces(rstr(entry+2, 8)));
 	res.set(meta_name::basic, entry[0] == 'T');
 	res.set(meta_name::loading_address, get_u16le(entry + 0xc));
 	res.set(meta_name::length, ((get_u16le(entry + 0xe) - get_u16le(entry + 0xc) + 1) & 0xffff));
@@ -161,7 +160,7 @@ std::tuple<fsblk_t::block_t, u32> vtech_impl::file_find(std::string_view name)
 				continue;
 			if(bdir.r8(off+1) != ':')
 				continue;
-			if(strtrimrightspace(bdir.rstr(off+2, 8)) == name) {
+			if(trim_end_spaces(bdir.rstr(off+2, 8)) == name) {
 				return std::make_tuple(bdir, i);
 			}
 		}

@@ -257,6 +257,8 @@ public:
 
 	static std::string_view rstr(const u8 *p, u32 size);
 
+	static std::string_view trim_end_spaces(std::string_view str);
+
 protected:
 	filesystem_t(fsblk_t &blockdev, u32 size) : m_blockdev(blockdev) {
 		m_blockdev.set_block_size(size);

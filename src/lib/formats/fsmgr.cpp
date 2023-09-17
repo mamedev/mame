@@ -231,6 +231,12 @@ std::string_view filesystem_t::rstr(const u8 *p, u32 size)
 	return std::string_view(reinterpret_cast<const char *>(p), size);
 }
 
+std::string_view filesystem_t::trim_end_spaces(std::string_view str)
+{
+	const auto i = str.find_last_not_of(' ');
+	return str.substr(0, (std::string::npos != i) ? (i + 1) : 0);
+}
+
 meta_data filesystem_t::volume_metadata()
 {
 	return meta_data();
