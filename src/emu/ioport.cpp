@@ -1500,12 +1500,16 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 			name.append(string_format("%-*s ", std::max(SPACE_COUNT - 1, 0), field.key_name(which)));
 		}
 
-		// trim extra spaces
-		name = strtrimspace(name);
-
 		// special case
 		if (name.empty())
 			name.assign("Unnamed Key");
+		else
+		{
+			// trim extra spaces
+			auto pos = name.find_last_not_of(' ');
+			assert(pos < name.size());
+			name.erase(pos + 1);
+		}
 	}
 }
 
