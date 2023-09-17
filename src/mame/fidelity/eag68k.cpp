@@ -10,7 +10,6 @@ Excel 68000 I/O is very similar to EAG, so it's handled in this driver as well
 
 TODO:
 - unemulated waitstates with DTACK
-- EAG USART doesn't work right? it should be able to connect to a serial printer
 - V10 CPU emulation is too slow, MAME 68040 opcode timing is same as 68030 but in
   reality it is much faster, same goes for V11 of course (see note below)
 - V11 CPU should be M68EC060, not yet emulated. Now using M68EC040 in its place
@@ -81,9 +80,12 @@ The module slot pinout is different from SCC series. The data on those appears
 to be compatible with EAG though and will load fine with an adapter.
 
 The USART allows for a serial connection between the chess computer and another
-device, for example a PC. Fidelity released a DOS tool called EAGLINK which
-featured PC printer support, complete I/O control, detailed information while
-the program is 'thinking', etc. It can be enabled with POP3 H3.
+device, for example the Fidelity Challenger Printer, or a PC. It expects a baud
+rate of 600.
+
+Fidelity released a DOS tool called EAGLINK which featured PC printer support,
+complete I/O control, detailed information while the program is 'thinking', etc.
+It can be enabled with POP3 H3.
 
 Memory map: (of what is known)
 -----------
@@ -118,10 +120,9 @@ supposedly has the same program as V10.
 
 V7 Hardware info:
 -----------------
-- MC68020RC25E CPU, 25MHz XTAL - this PCB was overclocked, original was 20MHz so let's use that
-- 4*AS7C164-20PC 8KB SRAM, 2*KM684000ALG-7L 512KB CMOS SRAM
-- 2*27C512? 64KB EPROM, 2*HM6264LP-15 8KB SRAM, 2*AT28C64B 8KB EEPROM, 2*GAL16V8C
-- same as 6114: M82C51A, NE555, SN74HC4060, module slot, chessboard, ..
+- 510.1139A01 daughterboard with MC68020RC20E or MC68020RC25E @ 20MHz,
+  and 32KB RAM (4*MCM6264P35)
+- rest is same as 6114
 
 V7 Memory map:
 --------------
@@ -735,11 +736,13 @@ void eag_state::eag_base(machine_config &config)
 
 	I8251(config, m_usart, 4.9152_MHz_XTAL);
 	m_usart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_usart->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
-	m_usart->rxrdy_handler().set_inputline(m_maincpu, M68K_IRQ_IPL2);
+
+	auto &usart_clock(CLOCK(config, "usart_clock", 4.9152_MHz_XTAL / 128)); // 4060 Q7, 38.4kHz
+	usart_clock.signal_handler().set(m_usart, FUNC(i8251_device::write_txc));
 
 	auto &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_usart, FUNC(i8251_device::write_rxd));
+	rs232.cts_handler().set(m_usart, FUNC(i8251_device::write_cts));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));

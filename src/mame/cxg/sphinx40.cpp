@@ -3,7 +3,7 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-CXG Sphinx 40 / 50
+CXG "Adversary" Sphinx 40 / 50
 
 This is a modular chesscomputer, similar to Mephisto's 3-drawers one.
 Chesscomputer on the right, LCD in the middle, and future expansion on the left.
