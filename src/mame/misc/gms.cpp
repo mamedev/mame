@@ -52,6 +52,15 @@ Notes:
             S1 - Macronix MX27C2000 (OKI samples)
 
 Keep pressed 9 and press reset to enter service mode.
+
+TODO:
+- correct decode for 1st layer in sc2in1 and magslot
+- tilemap priorities for cots and ballch
+- correct EEPROM hookup for all games
+- oki banking
+- hookup MCU and YM2151 sound for the mahjong games
+- hookup PIC16F84 for rbspm once a CPU core is available
+- emulate protection devices correctly instead of patching
 */
 
 #include "emu.h"
@@ -1199,7 +1208,7 @@ TILE_GET_INFO_MEMBER(gms_2layers_state::get_tile1_info)
 TILE_GET_INFO_MEMBER(gms_3layers_state::get_tile2_info)
 {
 	const int tile = m_vidram[2][tile_index];
-	tileinfo.set(2, (tile & 0x0fff) + ((m_tilebank >> 9) & 3) * 0x1000, tile >> 12, 0); // TODO: identify tilebank bits
+	tileinfo.set(2, (tile & 0x0fff) + ((m_tilebank >> 9) & 3) * 0x1000, tile >> 12, 0);
 }
 
 // TODO:  ballch's and cots' title screens highlight a priority bug: the title and copyright are drawn behind the background
