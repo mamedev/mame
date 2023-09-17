@@ -13,6 +13,7 @@
 #include "imageutl.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include "osdcore.h" // osd_printf_*
 
@@ -251,7 +252,7 @@ FLOPPY_CONSTRUCT( dsk_dsk_construct )
 		for (i=0; i<tag->tracks * tag->heads; i++)
 		{
 			tag->track_offsets[cnt] = tmp;
-			tmp += pick_integer_le(header, 0x32, 2);
+			tmp += get_u16le(&header[0x32]);
 			cnt += skip;
 		}
 	} else  {
@@ -403,7 +404,7 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		for (int i=0; i<tracks * heads; i++)
 		{
 			track_offsets[cnt] = tmp;
-			tmp += pick_integer_le(header, 0x32, 2);
+			tmp += get_u16le(&header[0x32]);
 			cnt += skip;
 		}
 	} else  {

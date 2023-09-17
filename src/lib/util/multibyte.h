@@ -22,20 +22,20 @@ using osd::s64;
 
 // unsigned big-endian
 
-inline const u16 get_u16be(const u8 *const buf)
+inline constexpr u16 get_u16be(const u8 *const buf) noexcept
 {
 	return ((const u16)buf[0] << 8)
 	     | ((const u16)buf[1] << 0);
 }
 
-inline const u32 get_u24be(const u8 *const buf)
+inline constexpr u32 get_u24be(const u8 *const buf) noexcept
 {
 	return ((const u32)buf[0] << 16)
 	     | ((const u32)buf[1] << 8)
 	     | ((const u32)buf[2] << 0);
 }
 
-inline const u32 get_u32be(const u8 *const buf)
+inline constexpr u32 get_u32be(const u8 *const buf) noexcept
 {
 	return ((const u32)buf[0] << 24)
 	     | ((const u32)buf[1] << 16)
@@ -43,7 +43,7 @@ inline const u32 get_u32be(const u8 *const buf)
 	     | ((const u32)buf[3] << 0);
 }
 
-inline const u64 get_u64be(const u8 *const buf)
+inline constexpr u64 get_u64be(const u8 *const buf) noexcept
 {
 	return ((const u64)buf[0] << 56)
 	     | ((const u64)buf[1] << 48)
@@ -55,20 +55,20 @@ inline const u64 get_u64be(const u8 *const buf)
 	     | ((const u64)buf[7] << 0);
 }
 
-inline void put_u16be(u8 *buf, const u16 data)
+inline void put_u16be(u8 *buf, const u16 data) noexcept
 {
 	buf[0] = data >> 8;
 	buf[1] = data >> 0;
 }
 
-inline void put_u24be(u8 *buf, const u32 data)
+inline void put_u24be(u8 *buf, const u32 data) noexcept
 {
 	buf[0] = data >> 16;
 	buf[1] = data >> 8;
 	buf[2] = data >> 0;
 }
 
-inline void put_u32be(u8 *buf, const u32 data)
+inline void put_u32be(u8 *buf, const u32 data) noexcept
 {
 	buf[0] = data >> 24;
 	buf[1] = data >> 16;
@@ -76,7 +76,7 @@ inline void put_u32be(u8 *buf, const u32 data)
 	buf[3] = data >> 0;
 }
 
-inline void put_u64be(u8 *buf, const u64 data)
+inline void put_u64be(u8 *buf, const u64 data) noexcept
 {
 	buf[0] = data >> 56;
 	buf[1] = data >> 48;
@@ -92,42 +92,42 @@ inline void put_u64be(u8 *buf, const u64 data)
 
 // signed big-endian
 
-inline const s16 get_s16be(const u8 *const buf)
+inline constexpr s16 get_s16be(const u8 *const buf) noexcept
 {
 	return get_u16be(buf);
 }
 
-inline const s32 get_s24be(const u8 *const buf)
+inline constexpr s32 get_s24be(const u8 *const buf) noexcept
 {
 	return util::sext(get_u24be(buf), 24);
 }
 
-inline const s32 get_s32be(const u8 *const buf)
+inline constexpr s32 get_s32be(const u8 *const buf) noexcept
 {
 	return get_u32be(buf);
 }
 
-inline const s64 get_s64be(const u8 *const buf)
+inline constexpr s64 get_s64be(const u8 *const buf) noexcept
 {
 	return get_u64be(buf);
 }
 
-inline void put_s16be(u8 *buf, const s16 data)
+inline void put_s16be(u8 *buf, const s16 data) noexcept
 {
 	put_u16be(buf, data);
 }
 
-inline void put_s24be(u8 *buf, const s32 data)
+inline void put_s24be(u8 *buf, const s32 data) noexcept
 {
 	put_u24be(buf, data);
 }
 
-inline void put_s32be(u8 *buf, const s32 data)
+inline void put_s32be(u8 *buf, const s32 data) noexcept
 {
 	put_u32be(buf, data);
 }
 
-inline void put_s64be(u8 *buf, const s64 data)
+inline void put_s64be(u8 *buf, const s64 data) noexcept
 {
 	put_u64be(buf, data);
 }
@@ -136,20 +136,20 @@ inline void put_s64be(u8 *buf, const s64 data)
 
 // unsigned little-endian
 
-inline const u16 get_u16le(const u8 *const buf)
+inline constexpr u16 get_u16le(const u8 *const buf) noexcept
 {
 	return ((const u16)buf[0] << 0)
 	     | ((const u16)buf[1] << 8);
 }
 
-inline const u32 get_u24le(const u8 *const buf)
+inline constexpr u32 get_u24le(const u8 *const buf) noexcept
 {
 	return ((const u32)buf[0] << 0)
 	     | ((const u32)buf[1] << 8)
 	     | ((const u32)buf[2] << 16);
 }
 
-inline const u32 get_u32le(const u8 *const buf)
+inline constexpr u32 get_u32le(const u8 *const buf) noexcept
 {
 	return ((const u32)buf[0] << 0)
 	     | ((const u32)buf[1] << 8)
@@ -157,7 +157,7 @@ inline const u32 get_u32le(const u8 *const buf)
 	     | ((const u32)buf[3] << 24);
 }
 
-inline const u64 get_u64le(const u8 *const buf)
+inline constexpr u64 get_u64le(const u8 *const buf) noexcept
 {
 	return ((const u64)buf[0] << 0)
 	     | ((const u64)buf[1] << 8)
@@ -169,20 +169,20 @@ inline const u64 get_u64le(const u8 *const buf)
 	     | ((const u64)buf[7] << 56);
 }
 
-inline void put_u16le(u8 *buf, const u16 data)
+inline void put_u16le(u8 *buf, const u16 data) noexcept
 {
 	buf[0] = data >> 0;
 	buf[1] = data >> 8;
 }
 
-inline void put_u24le(u8 *buf, const u32 data)
+inline void put_u24le(u8 *buf, const u32 data) noexcept
 {
 	buf[0] = data >> 0;
 	buf[1] = data >> 8;
 	buf[2] = data >> 16;
 }
 
-inline void put_u32le(u8 *buf, const u32 data)
+inline void put_u32le(u8 *buf, const u32 data) noexcept
 {
 	buf[0] = data >> 0;
 	buf[1] = data >> 8;
@@ -190,7 +190,7 @@ inline void put_u32le(u8 *buf, const u32 data)
 	buf[3] = data >> 24;
 }
 
-inline void put_u64le(u8 *buf, const u64 data)
+inline void put_u64le(u8 *buf, const u64 data) noexcept
 {
 	buf[0] = data >> 0;
 	buf[1] = data >> 8;
@@ -206,42 +206,42 @@ inline void put_u64le(u8 *buf, const u64 data)
 
 // signed little-endian
 
-inline const s16 get_s16le(const u8 *const buf)
+inline constexpr s16 get_s16le(const u8 *const buf) noexcept
 {
 	return get_u16le(buf);
 }
 
-inline const s32 get_s24le(const u8 *const buf)
+inline constexpr s32 get_s24le(const u8 *const buf) noexcept
 {
 	return util::sext(get_u24le(buf), 24);
 }
 
-inline const s32 get_s32le(const u8 *const buf)
+inline constexpr s32 get_s32le(const u8 *const buf) noexcept
 {
 	return get_u32le(buf);
 }
 
-inline const s64 get_s64le(const u8 *const buf)
+inline constexpr s64 get_s64le(const u8 *const buf) noexcept
 {
 	return get_u64le(buf);
 }
 
-inline void put_s16le(u8 *buf, const s16 data)
+inline void put_s16le(u8 *buf, const s16 data) noexcept
 {
 	put_u16le(buf, data);
 }
 
-inline void put_s24le(u8 *buf, const s32 data)
+inline void put_s24le(u8 *buf, const s32 data) noexcept
 {
 	put_u24le(buf, data);
 }
 
-inline void put_s32le(u8 *buf, const s32 data)
+inline void put_s32le(u8 *buf, const s32 data) noexcept
 {
 	put_u32le(buf, data);
 }
 
-inline void put_s64le(u8 *buf, const s64 data)
+inline void put_s64le(u8 *buf, const s64 data) noexcept
 {
 	put_u64le(buf, data);
 }
