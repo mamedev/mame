@@ -48,11 +48,12 @@
   There is a rank system based on the number of hits you can get in the game. After time out,
   if you have at least 50 hits, you can get extended time. 
 
-   Hits   Level   Extended Game
-  ------+-------+--------------
-  00-49 |  low  |    No
-  50-89 |  med  |    Yes
-  90-99 |  high |    Yes
+   Hits   Level      Japanese              Translation           Extended Game
+  ------+-------+------------------+---------------------------+---------------
+  90-99 |  High | にゃんともてごわいやつ!! | How tough you are nyaa!!  |      Yes
+  50-89 |  Med  | なかなかやるにゃん     | Not bad nyaa              |      Yes
+  00-49 |  Low  | まだまだあまいにゃ～    | It's not there yet. nyaa~ |      No
+
 
   You can see the high score for Doraneko or Koneko, pressing the corresponding start button
   whilst game is over.
@@ -62,6 +63,16 @@
   of all arms, and test a sequence of lamps while triggers all the game sounds.
   
   Test mode: Press START 1 to test the stepper motors / arms.
+
+
+  Some cat's speeches:
+  
+  "Umasouda nyaa" ----> "Looks delicious nyaa" (at start of a game)
+  "Gochisousama" -----> "Thank you for the food" (at end of the game)
+
+  "maitta, kousan" ---> "We lost, give up"
+  "nakanaka yarunya" -> "Not bad nyaa"
+  "mou yurusan!" -----> "We won't forgive you!"
 
 
 ***************************************************************************************************
