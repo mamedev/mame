@@ -19,20 +19,13 @@
 
 
 /***************************************************************************
-    MACROS
+    INLINE FUNCTIONS
 ***************************************************************************/
 
-#define AVI_FOURCC(a,b,c,d)     ((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
-
-#define FORMAT_UYVY             AVI_FOURCC('U','Y','V','Y')
-#define FORMAT_VYUY             AVI_FOURCC('V','Y','U','Y')
-#define FORMAT_YUY2             AVI_FOURCC('Y','U','Y','2')
-#define FORMAT_HFYU             AVI_FOURCC('H','F','Y','U')
-#define FORMAT_I420             AVI_FOURCC('I','4','2','0')
-#define FORMAT_DIB              AVI_FOURCC('D','I','B',' ')
-#define FORMAT_RGB              AVI_FOURCC('R','G','B',' ')
-#define FORMAT_RAW              AVI_FOURCC('R','A','W',' ')
-#define FORMAT_UNCOMPRESSED     0x00000000
+inline constexpr std::uint32_t AVI_FOURCC(char a, char b, char c, char d)
+{
+	return std::uint32_t(a) | (std::uint32_t(b) << 8) | (std::uint32_t(c) << 16) | (std::uint32_t(d) << 24);
+}
 
 
 class avi_file
@@ -42,6 +35,19 @@ public:
 	/***********************************************************************
 	    CONSTANTS
 	***********************************************************************/
+
+	enum : std::uint32_t
+	{
+		FORMAT_UYVY         = AVI_FOURCC('U','Y','V','Y'),
+		FORMAT_VYUY         = AVI_FOURCC('V','Y','U','Y'),
+		FORMAT_YUY2         = AVI_FOURCC('Y','U','Y','2'),
+		FORMAT_HFYU         = AVI_FOURCC('H','F','Y','U'),
+		FORMAT_I420         = AVI_FOURCC('I','4','2','0'),
+		FORMAT_DIB          = AVI_FOURCC('D','I','B',' '),
+		FORMAT_RGB          = AVI_FOURCC('R','G','B',' '),
+		FORMAT_RAW          = AVI_FOURCC('R','A','W',' '),
+		FORMAT_UNCOMPRESSED = 0x00000000
+	};
 
 	enum class error
 	{
