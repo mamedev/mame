@@ -29936,6 +29936,15 @@ nfsug                           // Need For Speed: Underground Install (2 Discs)
 @source:misc/gluck2.cpp
 gluck2                          // 1992 Yung Yu / CYE
 
+@source:misc/gms.cpp
+ballch                          // (c) 2002 TVE
+cots                            // (c) 2005 ECM
+magslot                         // (c) 2003 GMS
+rbmk                            // (c) 1998 GMS
+rbspm                           // (c) 1998 GMS
+sc2in1                          // (c) 2001 GMS
+super555                        // (c) 1999 GMS
+
 @source:misc/goldngam.cpp
 moviecrd                        // (c) 1998 Golden Games
 swisspkr                        // (c) 1990 Golden Games
@@ -31223,15 +31232,6 @@ radikaldrt                      // (c) 2011? Gaelco Darts
 doodlejmp                       // (c) 2013 ICE / Raw Thrills / Lima Sky
 fnf                             // (c) 2004 Raw Thrills
 guitarheroac                    // (c) 2008 Raw Thrills / Activision / Konami
-
-@source:misc/rbmk.cpp
-ballch                          // (c) 2002 TVE
-cots                            // (c) 2005 ECM
-magslot                         // (c) 2003 GMS
-rbmk                            // (c) 1998 GMS
-rbspm                           // (c) 1998 GMS
-sc2in1                          // (c) 2001 GMS
-super555                        // (c) 1999 GMS
 
 @source:misc/rcorsair.cpp
 rcorsair                        // (c) 1984 Nakasawa
