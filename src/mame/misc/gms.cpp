@@ -128,7 +128,7 @@ protected:
 
 private:
 	uint8_t m_mux_data = 0;
-	uint16_t m_dip_mux = 0;
+	uint16_t m_input_matrix = 0;
 	//uint16_t m_prot_data = 0;
 
 	void mcu_io(address_map &map);
@@ -137,8 +137,8 @@ private:
 	void rbspm_mem(address_map &map);
 
 	uint16_t unk_r();
-	uint16_t dip_mux_r();
-	void dip_mux_w(uint16_t data);
+	uint16_t input_matrix_r();
+	void input_matrix_w(uint16_t data);
 	void tilebank_w(uint16_t data);
 	uint8_t mcu_io_r(offs_t offset);
 	void mcu_io_w(offs_t offset, uint8_t data);
@@ -177,17 +177,17 @@ uint16_t gms_2layers_state::unk_r()
 	return machine().rand();
 }
 
-uint16_t gms_2layers_state::dip_mux_r()
+uint16_t gms_2layers_state::input_matrix_r()
 {
 	uint16_t res = 0xffff;
 
 	// TODO: & 0x00ff are the inputs for keyboard mode in rbmk
-	switch (m_dip_mux & 0xf000)
+	switch (m_input_matrix & 0xf000)
 	{
 		case 0x1000: res = m_dsw[0]->read(); break;
-		case 0x2000: if (m_dsw[1]) res = m_dsw[1]->read(); break;
-		case 0x4000: if (m_dsw[2]) res = m_dsw[2]->read(); break;
-		case 0x8000: if (m_dsw[3]) res = m_dsw[3]->read(); break;
+		case 0x2000: res = m_dsw[1].read_safe(0xffff); break;
+		case 0x4000: res = m_dsw[2].read_safe(0xffff); break;
+		case 0x8000: res = m_dsw[3].read_safe(0xffff); break;
 	}
 
 	return res;
@@ -205,9 +205,9 @@ void gms_2layers_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 	m_tilemap[Which]->mark_tile_dirty(offset);
 }
 
-void gms_2layers_state::dip_mux_w(uint16_t data)
+void gms_2layers_state::input_matrix_w(uint16_t data)
 {
-	m_dip_mux = data;
+	m_input_matrix = data;
 }
 
 void gms_2layers_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -234,7 +234,7 @@ void gms_2layers_state::rbmk_mem(address_map &map)
 	map(0x980300, 0x983fff).ram(); // 0x2048  words ???, byte access
 	map(0x9c0000, 0x9c0fff).ram().w(FUNC(gms_2layers_state::vram_w<1>)).share(m_vidram[1]);
 	map(0xb00000, 0xb00001).w(FUNC(gms_2layers_state::eeprom_w));
-	map(0xc00000, 0xc00001).rw(FUNC(gms_2layers_state::dip_mux_r), FUNC(gms_2layers_state::dip_mux_w));
+	map(0xc00000, 0xc00001).rw(FUNC(gms_2layers_state::input_matrix_r), FUNC(gms_2layers_state::input_matrix_w));
 	map(0xc08000, 0xc08001).portr("IN1").w(FUNC(gms_2layers_state::tilebank_w));
 	map(0xc10000, 0xc10001).portr("IN2");
 	map(0xc18080, 0xc18081).r(FUNC(gms_2layers_state::unk_r));  // TODO: from MCU?
@@ -247,7 +247,7 @@ void gms_2layers_state::rbspm_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x200001).w(FUNC(gms_2layers_state::eeprom_w)); // wrong
-	map(0x300000, 0x300001).rw(FUNC(gms_2layers_state::dip_mux_r), FUNC(gms_2layers_state::dip_mux_w));
+	map(0x300000, 0x300001).rw(FUNC(gms_2layers_state::input_matrix_r), FUNC(gms_2layers_state::input_matrix_w));
 	map(0x308000, 0x308001).portr("IN1").w(FUNC(gms_2layers_state::tilebank_w)); // ok
 	map(0x310000, 0x310001).portr("IN2");
 	map(0x318080, 0x318081).r(FUNC(gms_2layers_state::unk_r));
@@ -266,7 +266,7 @@ void gms_2layers_state::super555_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x10ffff).ram();
-	map(0x600000, 0x600001).rw(FUNC(gms_2layers_state::dip_mux_r), FUNC(gms_2layers_state::dip_mux_w));
+	map(0x600000, 0x600001).rw(FUNC(gms_2layers_state::input_matrix_r), FUNC(gms_2layers_state::input_matrix_w));
 	map(0x608000, 0x608001).portr("IN1").w(FUNC(gms_2layers_state::tilebank_w)); // ok
 	map(0x610000, 0x610001).portr("IN2");
 	map(0x618080, 0x618081).nopr();//.lr16(NAME([this] () -> uint16_t { return m_prot_data; })); // reads something here from below, if these are hooked up booting stops with '0x09 U64 ERROR', like it's failing some checksum test
@@ -572,7 +572,7 @@ static INPUT_PORTS_START( magslot )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // but recognized for password entering
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // TODO: verify
 
-
+	// 3 8-dip banks on PCB
 	PORT_START("DSW1") // Game setup is password protected, needs reverse engineering of the password
 	PORT_DIPNAME( 0x0001, 0x0001, "DSW1" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -839,6 +839,16 @@ static INPUT_PORTS_START( super555 )
 	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:8") // not shown in test mode
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("DSW4")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "SW4:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "SW4:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW4:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW4:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW4:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW4:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW4:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW4:8" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc2in1 )
@@ -1179,11 +1189,9 @@ void gms_2layers_state::video_start()
 
 	m_tilemap[1]->set_transparent_pen(0);
 
-	// m_tilemap[2] // TODO: for magslot and sc2in1
-
 	save_item(NAME(m_tilebank));
 	save_item(NAME(m_mux_data));
-	save_item(NAME(m_dip_mux));
+	save_item(NAME(m_input_matrix));
 }
 
 void gms_3layers_state::video_start()
