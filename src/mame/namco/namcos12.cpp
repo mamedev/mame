@@ -1260,10 +1260,11 @@ public:
 	{
 	}
 
+	void cdxa_pcb(machine_config &config);
+
 	void truckk(machine_config &config);
 
 private:
-	void cdxa_pcb(machine_config &config);
 	void cdxa_psx_map(address_map &map);
 
 	required_device<namcos12_cdxa_device> m_cdxa_pcb;
@@ -1978,8 +1979,10 @@ void namcos12_boothack_state::aplarail(machine_config &config)
 
 void namcos12_cdxa_state::cdxa_pcb(machine_config &config)
 {
+	coh700(config);
+
 	NAMCOS12_CDXA(config, m_cdxa_pcb, XTAL(14'745'600));
-	m_cdxa_pcb->add_route(0, "lspeaker", 0.30); // roughtly matched the volume of speaking lines between the CDXA audio vs non-CDXA audio
+	m_cdxa_pcb->add_route(0, "lspeaker", 0.30); // roughly matched the volume of speaking lines between the CDXA audio vs non-CDXA audio
 	m_cdxa_pcb->add_route(1, "rspeaker", 0.30);
 	m_cdxa_pcb->psx_int10_callback().set("maincpu:irq", FUNC(psxirq_device::intin10));
 
@@ -2016,7 +2019,6 @@ void namcos12_cdxa_state::cdxa_psx_map(address_map &map)
 
 void namcos12_cdxa_state::truckk(machine_config &config)
 {
-	coh700(config);
 	cdxa_pcb(config);
 
 	m_sub->read_adc<0>().set_ioport("STEER");
@@ -2034,7 +2036,6 @@ void namcos12_cdxa_state::truckk(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(2*115200));
 }
-
 
 static INPUT_PORTS_START( namcos12 )
 	PORT_START("DSW")
@@ -2284,6 +2285,36 @@ static INPUT_PORTS_START( truckk )
 
 	PORT_START("STEER")
 	PORT_BIT( 0x3ff, 0x0200, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Steering Wheel")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ujlnow )
+	PORT_START("DSW")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 Chin Switch (C)")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("P1 Joe Switch (J)")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Select Down")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Select Up")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Circle / Enter") // The cabinet enter switch is linked to the P1 circle input as per the manual (bottom of pg 33)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Cross")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Triangle")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Chin Switch (C)")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("P2 Joe Switch (J)")
+	PORT_BIT( 0x0c00, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Must be high to get rid of I/O errors
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Circle")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Cross")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Triangle")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x13ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Square")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Square")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_SERVICE( 0x4000, IP_ACTIVE_LOW )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 INPUT_PORTS_END
 
 ROM_START( aquarush )
@@ -3496,6 +3527,31 @@ ROM_START( aplarail )
 	ROM_LOAD( "at28c16",      0x000000, 0x000800, CRC(db1b63c5) SHA1(01fc3386a2d1cb1bed1b7fd9bd2fd59e503832d3) )
 ROM_END
 
+ROM_START( ujlnow )
+	ROM_REGION32_LE( 0x00400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "ul1vera.2l",  0x000000, 0x200000, CRC(40251bc3) SHA1(377a156d738b29d8f19d9696a261cc6e3470ee3e) )
+	ROM_LOAD16_BYTE( "ul1vera.2p",  0x000001, 0x200000, CRC(98181955) SHA1(febd73361d0de10282a850611b5f966a99eecdec) )
+
+	ROM_REGION32_LE( 0x2000000, "bankedroms", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "ul1rom0l.ic12", 0x0000000, 0x800000, CRC(7a77cffd) SHA1(6bd18837f475615061be73ee6d1bc09726e96fb5) )
+	ROM_LOAD16_BYTE( "ul1rom0u.ic11", 0x0000001, 0x800000, CRC(1fdb34b3) SHA1(3773b3fb1574a0b4acebfaf510c75fa117394ae4) )
+	ROM_LOAD16_BYTE( "ul1rom1l.ic10", 0x1000000, 0x800000, CRC(2d300d8c) SHA1(eabd0b4525530e5b33a6d85fa4d959e88c6fbd42) )
+	ROM_LOAD16_BYTE( "ul1rom1u.ic9",  0x1000001, 0x800000, CRC(a4762002) SHA1(0faadc04bcc32e4f805069af8e635765a0b77ca9) )
+
+	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
+	ROM_LOAD16_WORD_SWAP( "ul1vera.11s", 0x000000, 0x080000, CRC(2f466df3) SHA1(6468089c6cf3e056a30fa04274056ff2c9a01d5b) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "ul1wave0.ic2", 0x0000000, 0x800000, CRC(4efbff5d) SHA1(add4caf9aa9443707bcb6cf9ebad0a5a59900ca9) )
+	ROM_LOAD( "ul1wave1.ic1", 0x0800000, 0x800000, CRC(ad512f4c) SHA1(cfbecaad13a2239be0e697f3f9856401f11a1bc5) )
+
+	ROM_REGION( 0x80000, "m148", 0) /* M148 EMI DRIVE PCB */
+	ROM_LOAD( "ul1spro.10c", 0x000000, 0x080000, CRC(1bd0e763) SHA1(07e9ad77bb983fcb4e4e6f66fbe55808b5a27d2e) )
+
+	DISK_REGION( "cdxa_pcb:ata:0:cdrom" )
+	DISK_IMAGE_READONLY( "ul1-a", 0, SHA1(676f2c530f8d422ab9895ea04a43b2e9272fb8f8) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -3546,6 +3602,7 @@ GAME( 1999, ohbakyuun, ghlpanic, ptblank2, ghlpanic,  namcos12_boothack_state, i
 GAME( 1999, pacapp2,   0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Produce / Namco", "Paca Paca Passion 2 (Japan, PKS1/VER.A)", 0 ) /* KC046 */
 GAME( 1999, mrdrillr,  0,        coh700,   namcos124w,namcos12_boothack_state, init_namcos12, ROT0, "Namco",           "Mr. Driller (US, DRI3/VER.A2)", 0 ) /* KC048 */
 GAME( 1999, mrdrillrj, mrdrillr, coh700,   namcos124w,namcos12_boothack_state, init_namcos12, ROT0, "Namco",           "Mr. Driller (Japan, DRI1/VER.A2)", 0 ) /* KC048 */
+GAME( 1999, ujlnow,    0,        cdxa_pcb, ujlnow,    namcos12_cdxa_state,     init_alt_bank1,ROT0, "Namco",           "Um Jammer Lammy NOW! (Japan, UL1/VER.A)", 0 ) /* KC049 */
 GAME( 1999, kaiunqz,   0,        coh700,   namcos12,  namcos12_state,          init_alt_bank1,ROT0, "Namco",           "Kaiun Quiz (Japan, KW1/VER.A)", 0 ) /* KC050 */
 GAME( 1999, pacappsp,  0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Produce / Namco", "Paca Paca Passion Special (Japan, PSP1/VER.A)", 0 ) /* KC052 */
 GAME( 1999, aquarush,  0,        coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Aqua Rush (Japan, AQ1/VER.A1)", 0 ) /* KC053 */
