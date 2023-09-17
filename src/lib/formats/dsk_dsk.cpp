@@ -104,10 +104,10 @@ static floperr_t get_offset(floppy_image_legacy *floppy, int head, int track, in
 		get_tag(floppy)->sector_size = (1<<(track_info[0x014]+7));
 		offs = track_offset + 0x100 +sector * get_tag(floppy)->sector_size;
 	} else {
-		get_tag(floppy)->sector_size = track_info[0x18 + (sector<<3) + 6] + (track_info[0x18+(sector<<3) + 7]<<8);
+		get_tag(floppy)->sector_size = get_u16le(&track_info[0x18 + (sector<<3) + 6]);
 		offs = track_offset + 0x100;
 		for (i=0;i<sector;i++) {
-			offs += track_info[0x18 + (i<<3) + 6] + (track_info[0x18+(i<<3) + 7]<<8);
+			offs += get_u16le(&track_info[0x18 + (i<<3) + 6]);
 		}
 	}
 

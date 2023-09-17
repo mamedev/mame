@@ -11,6 +11,7 @@
 #include "formats/st_dsk.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include <cstring>
 
@@ -153,11 +154,11 @@ void msa_format::read_header(util::random_read &io, uint16_t &sign, uint16_t &se
 	uint8_t h[10];
 	size_t actual;
 	io.read_at(0, h, 10, actual);
-	sign = (h[0] << 8) | h[1];
-	sect = (h[2] << 8) | h[3];
-	head = (h[4] << 8) | h[5];
-	strack = (h[6] << 8) | h[7];
-	etrack = (h[8] << 8) | h[9];
+	sign = get_u16be(&h[0]);
+	sect = get_u16be(&h[2]);
+	head = get_u16be(&h[4]);
+	strack = get_u16be(&h[6]);
+	etrack = get_u16be(&h[8]);
 }
 
 bool msa_format::uncompress(uint8_t *buffer, int csize, int usize)
@@ -170,7 +171,7 @@ bool msa_format::uncompress(uint8_t *buffer, int csize, int usize)
 			if(csize-src < 3)
 				return false;
 			c = buffer[src++];
-			int count = (buffer[src] << 8) | buffer[src+1];
+			int count = get_u16be(&buffer[src]);
 			src += 2;
 			if(usize-dst < count)
 				return false;
@@ -201,8 +202,8 @@ bool msa_format::compress(const uint8_t *buffer, int usize, uint8_t *dest, int &
 				return false;
 			dest[dst++] = 0xe5;
 			dest[dst++] = c;
-			dest[dst++] = ncopy >> 8;
-			dest[dst++] = ncopy;
+			put_u16be(&dest[dst], ncopy);
+			dst += 2;
 		} else {
 			src -= ncopy-1;
 			dest[dst++] = c;
@@ -250,7 +251,7 @@ bool msa_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			uint8_t th[2];
 			io.read_at(pos, th, 2, actual);
 			pos += 2;
-			int tsize = (th[0] << 8) | th[1];
+			int tsize = get_u16be(th);
 			io.read_at(pos, sectdata, tsize, actual);
 			pos += tsize;
 			if(tsize < track_size) {
@@ -313,14 +314,12 @@ bool msa_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 			int csize;
 			if(compress(sectdata, track_size, compdata, csize)) {
 				uint8_t th[2];
-				th[0] = csize >> 8;
-				th[1] = csize;
+				put_u16be(th, csize);
 				io.write(th, 2, actual);
 				io.write(compdata, csize, actual);
 			} else {
 				uint8_t th[2];
-				th[0] = track_size >> 8;
-				th[1] = track_size;
+				put_u16be(th, track_size);
 				io.write(th, 2, actual);
 				io.write(sectdata, track_size, actual);
 			}

@@ -11,6 +11,7 @@
 #include "oric_dsk.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include <cstring>
 
@@ -44,9 +45,9 @@ int oric_dsk_format::identify(util::random_read &io, uint32_t form_factor, const
 	if(memcmp(h, "MFM_DISK", 8))
 		return 0;
 
-	int sides  = (h[11] << 24) | (h[10] << 16) | (h[ 9] << 8) | h[ 8];
-	int tracks = (h[15] << 24) | (h[14] << 16) | (h[13] << 8) | h[12];
-	int geom   = (h[19] << 24) | (h[18] << 16) | (h[17] << 8) | h[16];
+	int sides  = get_u32le(&h[ 8]);
+	int tracks = get_u32le(&h[12]);
+	int geom   = get_u32le(&h[16]);
 
 	uint64_t size;
 	if(io.length(size))
@@ -66,8 +67,8 @@ bool oric_dsk_format::load(util::random_read &io, uint32_t form_factor, const st
 	t[6250] = t[6251] = t[6252] = 0;
 	io.read_at(0, h, 256, actual);
 
-	int sides  = (h[11] << 24) | (h[10] << 16) | (h[ 9] << 8) | h[ 8];
-	int tracks = (h[15] << 24) | (h[14] << 16) | (h[13] << 8) | h[12];
+	int sides  = get_u32le(&h[ 8]);
+	int tracks = get_u32le(&h[12]);
 
 	for(int side=0; side<sides; side++)
 		for(int track=0; track<tracks; track++) {

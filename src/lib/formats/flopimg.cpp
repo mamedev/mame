@@ -11,6 +11,7 @@
 #include "flopimg.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 #include "strformat.h"
 
 #include <cstdio>
@@ -2102,7 +2103,7 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_tr
 
 	std::vector<uint32_t> hpos;
 
-	uint32_t hstate = (nib[nib.size() - 2] << 8) | nib[nib.size() - 1];
+	uint32_t hstate = get_u16be(&nib[nib.size() - 2]);
 	for(uint32_t pos = 0; pos != nib.size(); pos++) {
 		hstate = ((hstate << 8) | nib[pos]) & 0xffffff;
 		if(hstate == 0xd5aa96)

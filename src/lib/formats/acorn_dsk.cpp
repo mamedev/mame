@@ -12,6 +12,7 @@
 #include "imageutl.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include <cstring>
 
@@ -77,7 +78,7 @@ int acorn_ssd_format::find_size(util::random_read &io, uint32_t form_factor, con
 
 		// read sector count from side 0 catalogue
 		io.read_at(0x100, cat, 8, actual);
-		sectors0 = ((cat[6] & 3) << 8) + cat[7];
+		sectors0 = get_u16be(&cat[6]) & 0x3ff;
 		LOG_FORMATS("ssd: sector count 0: %d %s\n", sectors0, sectors0 % 10 != 0 ? "invalid" : "");
 
 		if ((size <= (uint64_t)compute_track_size(f) * f.track_count * f.head_count) && (sectors0 <= f.track_count * f.sector_count))
@@ -86,12 +87,12 @@ int acorn_ssd_format::find_size(util::random_read &io, uint32_t form_factor, con
 			{
 				// read sector count from side 2 catalogue
 				io.read_at((uint64_t)compute_track_size(f) * f.track_count + 0x100, cat, 8, actual); // sequential
-				sectors2 = ((cat[6] & 3) << 8) + cat[7];
+				sectors2 = get_u16be(&cat[6]) & 0x3ff;
 
 				// exception case for Acorn CP/M System Disc 1
 				io.read_at(0x367ec, cat, 8, actual);
 				if (memcmp(cat, "/M  ", 4) == 0)
-					sectors2 = ((cat[6] & 3) << 8) + cat[7];
+					sectors2 = get_u16be(&cat[6]) & 0x3ff;
 
 				LOG_FORMATS("ssd: sector count 2: %d %s\n", sectors2, sectors2 % 10 != 0 ? "invalid" : "");
 			}
@@ -222,19 +223,19 @@ int acorn_dsd_format::find_size(util::random_read &io, uint32_t form_factor, con
 
 		// read sector count from side 0 catalogue
 		io.read_at(0x100, cat, 8, actual);
-		sectors0 = ((cat[6] & 3) << 8) + cat[7];
+		sectors0 = get_u16be(&cat[6]) & 0x3ff;
 		LOG_FORMATS("dsd: sector count 0: %d %s\n", sectors0, sectors0 % 10 != 0 ? "invalid" : "");
 
 		if ((size <= (uint64_t)compute_track_size(f) * f.track_count * f.head_count) && (sectors0 <= f.track_count * f.sector_count))
 		{
 			// read sector count from side 2 catalogue
 			io.read_at(0xb00, cat, 8, actual); // interleaved
-			sectors2 = ((cat[6] & 3) << 8) + cat[7];
+			sectors2 = get_u16be(&cat[6]) & 0x3ff;
 
 			// exception case for Acorn CP/M System Disc 1
 			io.read_at(0x97ec, cat, 8, actual);
 			if (memcmp(cat, "/M  ", 4) == 0)
-				sectors2 = ((cat[6] & 3) << 8) + cat[7];
+				sectors2 = get_u16be(&cat[6]) & 0x3ff;
 
 			LOG_FORMATS("dsd: sector count 2: %d %s\n", sectors2, sectors2 % 10 != 0 ? "invalid" : "");
 
@@ -313,7 +314,7 @@ int opus_ddos_format::find_size(util::random_read &io, uint32_t form_factor, con
 
 	// read sector count from side 0 catalogue
 	io.read_at(0x1000, cat, 8, actual);
-	sectors0 = (cat[1] << 8) + cat[2];
+	sectors0 = get_u16be(&cat[1]);
 	LOG_FORMATS("ddos: sector count 0: %d %s\n", sectors0, sectors0 % 18 != 0 ? "invalid" : "");
 
 	uint64_t size;
@@ -335,7 +336,7 @@ int opus_ddos_format::find_size(util::random_read &io, uint32_t form_factor, con
 			{
 				// read sector count from side 2 catalogue
 				io.read_at((uint64_t)compute_track_size(f) * f.track_count + 0x1000, cat, 8, actual); // sequential
-				sectors2 = (cat[1] << 8) + cat[2];
+				sectors2 = get_u16be(&cat[1]);
 				LOG_FORMATS("ddos: sector count 2: %d %s\n", sectors2, sectors2 % 18 != 0 ? "invalid" : "");
 			}
 			else
@@ -419,7 +420,7 @@ int acorn_adfs_old_format::find_size(util::random_read &io, uint32_t form_factor
 
 	// read sector count from free space map
 	io.read_at(0xfc, map, 3, actual);
-	sectors = map[0] + (map[1] << 8) + (map[2] << 16);
+	sectors = get_u24le(map);
 	LOG_FORMATS("adfs_o: sector count %d %s\n", sectors, sectors % 16 != 0 ? "invalid" : "");
 
 	// read map identifier
