@@ -14,15 +14,14 @@
 
 ***************************************************************************************************
 
-  PCB is unmarked
-
   Main components:
+
   Sharp LH0080B Z80B-CPU
   12.000 MHz XTAL
   HM6116LP-3 Static RAM
   2x NEC D71055C
   OKI M6295GS
-  4-DIP bank
+  4-DIP switches bank
 
   
 ***************************************************************************************************
@@ -80,9 +79,11 @@
 
 ***************************************************************************************************
 
-  This driver was made reverse-engineering the game code with some educated guesses, as the clocks
-  for all devices. The only element we had, was a PCB picture. All the rest was figured out, as the
+  This driver was made reverse-engineering the game code with some educated guesses.
+  The only element we had, was a PCB picture. All the rest was figured out, as the
   multiple output lines connections to stepper motors, lamps, 7seg LEDs, etc...
+
+  Will check lot of things with the hardware once available.
 
 
 ***************************************************************************************************
@@ -143,6 +144,88 @@
 
   PCB Silkscreened: AKG3I/G25800IM or AKG31/G258001M
   (can't see if are I's or 1's...)
+
+
+***************************************************************************************************
+
+  Measurements...
+   (partial)
+
+                   .------v------.
+           --(PA3)-|01         40|-(PA4)-- 
+           --(PA2)-|02  IC10   39|-(PA5)-- 
+           --(PA1)-|03         38|-(PA6)-- 
+           --(PA0)-|04  PPI#0  37|-(PA7)-- 
+           --(/RD)-|05         36|-(/WR)-- 
+           --(/CS)-|06         35|-(RES)-- 
+           --(GND)-|07         34|-(D0)-- 
+           ---(A1)-|08         33|-(D1)-- 
+           ---(A0)-|09   NEC   32|-(D2)-- 
+           --(PC7)-|10         31|-(D3)-- 
+           --(PC6)-|11 D71055C 30|-(D4)-- 
+           --(PC5)-|12         29|-(D5)-- 
+           --(PC4)-|13         28|-(D6)-- 
+           --(PC0)-|14         27|-(D7)-- 
+           --(PC1)-|15         26|-(Vcc)-- 
+           --(PC2)-|16         25|-(PB7)-- 
+           --(PC3)-|17         24|-(PB6)-- 
+           --(PB0)-|18         23|-(PB5)-- 
+           --(PB1)-|19         22|-(PB4)-- 
+           --(PB2)-|20         21|-(PB3)-- 
+                   '-------------'
+
+
+                   .------v------.
+     DSW#4 --(PA3)-|01         40|-(PA4)-- 
+     DSW#3 --(PA2)-|02   IC5   39|-(PA5)-- 
+     DSW#2 --(PA1)-|03         38|-(PA6)-- 
+     DSW#1 --(PA0)-|04  PPI#1  37|-(PA7)-- 
+           --(/RD)-|05         36|-(/WR)-- 
+           --(/CS)-|06         35|-(RES)-- 
+           --(GND)-|07         34|-(D0)-- 
+           ---(A1)-|08         33|-(D1)-- 
+           ---(A0)-|09   NEC   32|-(D2)-- 
+           --(PC7)-|10         31|-(D3)-- 
+           --(PC6)-|11 D71055C 30|-(D4)-- 
+           --(PC5)-|12         29|-(D5)-- 
+           --(PC4)-|13         28|-(D6)-- 
+           --(PC0)-|14         27|-(D7)-- 
+           --(PC1)-|15         26|-(Vcc)-- 
+           --(PC2)-|16         25|-(PB7)-- 
+           --(PC3)-|17         24|-(PB6)-- 
+           --(PB0)-|18         23|-(PB5)-- 
+           --(PB1)-|19         22|-(PB4)-- 
+           --(PB2)-|20         21|-(PB3)-- 
+                   '-------------'
+
+
+
+  CPU Clock...
+  Binary divisor 12 --> 6 MHz.
+
+                           .-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-.
+      .-------.            |                                         |
+      | Xtal  |            |          CLK      LH0080B Z80B          |
+      | 12MHz |            |           6                             |
+      '--+-+--'            '-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-'
+         | |                           |
+         + +-. .---------------------. |
+         | | | |                     | |
+     .-+-+-+-+-+-+-+-. .-+-+-+-+-+-+-+-+-.
+     |   1 1 1 1     | |             1 0 |
+     |   3 2 1 0     | |             0 9 |
+     |               | |                 |
+     '-+-+-+-+-+-+-+-' '-+-+-+-+-+-+-+-+-'
+          74HC04            74HC4040
+         
+
+***************************************************************************************************
+
+  TODO:
+
+  - Hook the cats eye effect when the arms are hit.
+  - Figure out the IN1: 0x80 currently mapped in the key "I".
+  - Find if there is some type of reward... tickets, medals, etc. (doesn't seems to be one)
 
 
 **************************************************************************************************/
