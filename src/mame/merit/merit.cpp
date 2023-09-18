@@ -109,7 +109,7 @@ public:
 	void phrcraze(machine_config &config);
 	void dtrvwz5(machine_config &config);
 	void casino5(machine_config &config);
-	void dodge(machine_config &config);
+	void riviera(machine_config &config);
 	void mosdraw(machine_config &config);
 	void tictac(machine_config &config);
 	void trvwhiz(machine_config &config);
@@ -118,6 +118,7 @@ public:
 	void pitboss(machine_config &config);
 
 	void init_couple();
+	void init_dodge();
 	void init_key_5();
 	void init_key_4();
 	void init_key_7();
@@ -128,7 +129,6 @@ public:
 	int rndbit_r();
 
 private:
-	void dodge_nvram_init(nvram_device &nvram, void *base, size_t size);
 	uint8_t questions_r();
 	void low_offset_w(offs_t offset, uint8_t data);
 	void med_offset_w(offs_t offset, uint8_t data);
@@ -148,7 +148,7 @@ private:
 	void bigappg_map(address_map &map);
 	void casino5_map(address_map &map);
 	void couple_map(address_map &map);
-	void dodge_map(address_map &map);
+	void riviera_map(address_map &map);
 	void dtrvwz5_map(address_map &map);
 	void misdraw_map(address_map &map);
 	void phrcraze_io_map(address_map &map);
@@ -469,7 +469,7 @@ void merit_state::misdraw_map(address_map &map)
 	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
 }
 
-void merit_state::dodge_map(address_map &map)
+void merit_state::riviera_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xa000, 0xbfff).ram().share("nvram");
@@ -1433,12 +1433,6 @@ static INPUT_PORTS_START( couplep )
 INPUT_PORTS_END
 
 
-void merit_state::dodge_nvram_init(nvram_device &nvram, void *base, size_t size)
-{
-	memset(base, 0x00, size);
-	reinterpret_cast<uint8_t *>(base)[0x1040] = 0xc9; /* ret */
-}
-
 MACHINE_START_MEMBER(merit_state,casino5)
 {
 	merit_state::machine_start();
@@ -1516,19 +1510,19 @@ void merit_state::misdraw(machine_config &config)
 	NVRAM(config, "cpunvram", nvram_device::DEFAULT_ALL_0);
 }
 
-void merit_state::dodge(machine_config &config)
+void merit_state::riviera(machine_config &config)
 {
 	pitboss(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &merit_state::dodge_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &merit_state::riviera_map);
 	m_maincpu->set_addrmap(AS_IO, &merit_state::tictac_io_map);
 
-	NVRAM(config, "nvram").set_custom_handler(FUNC(merit_state::dodge_nvram_init));
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 
 void merit_state::mosdraw(machine_config &config)
 {
-	dodge(config);
+	riviera(config);
 
 	// TODO: hook up RTC and printer
 	MM58274C(config, "rtc", 0);  // actually an MM58174AN, but should be compatible according to other drivers
@@ -1955,9 +1949,8 @@ ROM_START( dodgectya )
 	ROM_REGION( 0x8000, "gfx2", ROMREGION_ERASEFF )
 	/* No U40 char rom - Verified on 4 PCBs */
 
-	ROM_REGION( 0x0800, "crt209", ROMREGION_ERASEFF ) // two dumps from two PCBs, probably the second one is the good one but loading both until it can be determined for sure
-	ROM_LOAD( "crt-209_2131-82",     0x0000, 0x0800, CRC(f73402df) SHA1(342c3516b4ba09c3f0fa6737ff4b1970662efcb9) )
-	ROM_LOAD( "crt-209_2131-82_alt", 0x0000, 0x0800, CRC(ec540d8a) SHA1(fbc64d4cc56f418bc090b47bb6798e3a90282f56) )
+	ROM_REGION( 0x0800, "cpunvram", ROMREGION_ERASEFF )
+	ROM_LOAD( "crt-209_2131-82", 0x0000, 0x0800, CRC(ec540d8a) SHA1(fbc64d4cc56f418bc090b47bb6798e3a90282f56) )
 ROM_END
 
 ROM_START( dodgectyb )
@@ -1972,9 +1965,8 @@ ROM_START( dodgectyb )
 	ROM_REGION( 0x8000, "gfx2", ROMREGION_ERASEFF )
 	/* No U40 char rom - Verified on 4 PCBs */
 
-	ROM_REGION( 0x0800, "crt209", ROMREGION_ERASEFF ) // two dumps from two PCBs, probably the second one is the good one but loading both until it can be determined for sure
-	ROM_LOAD( "crt-209_2131-82",     0x0000, 0x0800, CRC(f73402df) SHA1(342c3516b4ba09c3f0fa6737ff4b1970662efcb9) )
-	ROM_LOAD( "crt-209_2131-82_alt", 0x0000, 0x0800, CRC(ec540d8a) SHA1(fbc64d4cc56f418bc090b47bb6798e3a90282f56) )
+	ROM_REGION( 0x0800, "cpunvram", ROMREGION_ERASEFF )
+	ROM_LOAD( "crt-209_2131-82", 0x0000, 0x0800, CRC(ec540d8a) SHA1(fbc64d4cc56f418bc090b47bb6798e3a90282f56) )
 ROM_END
 
 ROM_START( dodgectyc )
@@ -1989,9 +1981,38 @@ ROM_START( dodgectyc )
 	ROM_REGION( 0x8000, "gfx2", ROMREGION_ERASEFF )
 	/* No U40 char rom - Verified on 4 PCBs */
 
-	ROM_REGION( 0x0800, "crt209", ROMREGION_ERASEFF ) // two dumps from two PCBs, probably the second one is the good one but loading both until it can be determined for sure
-	ROM_LOAD( "crt-209_2131-82",     0x0000, 0x0800, CRC(f73402df) SHA1(342c3516b4ba09c3f0fa6737ff4b1970662efcb9) )
-	ROM_LOAD( "crt-209_2131-82_alt", 0x0000, 0x0800, CRC(ec540d8a) SHA1(fbc64d4cc56f418bc090b47bb6798e3a90282f56) )
+	ROM_REGION( 0x0800, "cpunvram", ROMREGION_ERASEFF )
+	ROM_LOAD( "crt-209_2131-82", 0x0000, 0x0800, CRC(ec540d8a) SHA1(fbc64d4cc56f418bc090b47bb6798e3a90282f56) )
+ROM_END
+
+ROM_START( unkmerit )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "4435-81_u5-1.u5", 0x0000, 0x8000, CRC(38ed804a) SHA1(fc500db9d5e5eac7d9a88756f7d0176a887f1fd1) ) /* 4435-81 U5-1 984140  4435811 */
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "u39", 0x00000, 0x8000, CRC(aba5aa05) SHA1(7929c5508e4eefc3905b40d7d51e5d80a1550f77) )
+	ROM_LOAD( "u38", 0x08000, 0x8000, CRC(50032b4f) SHA1(e39b4068ee6863aa4ba22232928b450e7ab47e63) )
+	ROM_LOAD( "u37", 0x10000, 0x8000, CRC(fe9c41fa) SHA1(4da945fd5c8e797ccb72ac931a01e322aabbe8ee) )
+
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_ERASEFF )
+	/* No U40 char rom */
+
+	ROM_REGION( 0x0800, "cpunvram", ROMREGION_ERASE00 )
+	ROM_LOAD( "crt-209_4435-81.cpu", 0x0000, 0x0800, NO_DUMP ) /* 2816 EEPROM in Z80 epoxy CPU module */
+	// 7A A4 47 7B A5 4F 7A B4 57 7B B5 5F C9
+	ROM_FILL( 0x40, 0x01, 0x7a )
+	ROM_FILL( 0x41, 0x01, 0xa4 )
+	ROM_FILL( 0x42, 0x01, 0x47 )
+	ROM_FILL( 0x43, 0x01, 0x7b )
+	ROM_FILL( 0x44, 0x01, 0xa5 )
+	ROM_FILL( 0x45, 0x01, 0x4f )
+	ROM_FILL( 0x46, 0x01, 0x7a )
+	ROM_FILL( 0x47, 0x01, 0xb4 )
+	ROM_FILL( 0x48, 0x01, 0x57 )
+	ROM_FILL( 0x49, 0x01, 0x7b )
+	ROM_FILL( 0x4a, 0x01, 0xb5 )
+	ROM_FILL( 0x4b, 0x01, 0x5f )
+	ROM_FILL( 0x4c, 0x01, 0xc9 )
 ROM_END
 
 ROM_START( trvwzh )
@@ -2651,6 +2672,21 @@ void merit_state::init_dtrvwz5()
 	m_decryption_key = 6;
 }
 
+void merit_state::init_dodge()
+{
+	uint8_t *rom = memregion("cpunvram")->base();
+	std::vector<uint8_t> buffer(0x800);
+
+	memcpy(&buffer[0], rom, 0x800);
+
+	// these give the same results as the above subroutine in init_dtrvwz5 at the address the game jumps to (0xb040), so should be right? But then again it doesn't solve the missing GFX issue.
+	for (int i = 0; i < 0x800; i++)
+	{
+		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 1, 0, 2, 3, 4, 5, 6, 7)];
+		rom[i] = bitswap<8>(rom[i], 2, 6, 5, 3, 4, 7, 0, 1);
+	}
+}
+
 } // anonymous namespace
 
 
@@ -2677,18 +2713,20 @@ GAME( 1984, mroundup,   0,        pitboss, mroundup,  merit_state, empty_init, R
 GAME( 1984, chkndraw,   0,        pitboss, chkndraw,  merit_state, empty_init, ROT0,  "Merit", "Chicken Draw (2131-04, U5-1)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1984, chkndrawa,  chkndraw, pitboss, chkndraw,  merit_state, empty_init, ROT0,  "Merit", "Chicken Draw (2131-04, U5-0)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1987, riviera,    0,        dodge,   riviera,   merit_state, empty_init, ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4A)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1986, rivieraa,   riviera,  dodge,   riviera,   merit_state, empty_init, ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1986, rivierab,   riviera,  dodge,   rivierab,  merit_state, empty_init, ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-2D)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, riviera,    0,        riviera, riviera,   merit_state, empty_init, ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4A)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, rivieraa,   riviera,  riviera, riviera,   merit_state, empty_init, ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, rivierab,   riviera,  riviera, rivierab,  merit_state, empty_init, ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-2D)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1990, mosdraw,    0,        mosdraw, mosdraw,   merit_state, empty_init, ROT0,  "Merit", "Montana Super Draw (4436-05, U5-0)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // needs printer and RTC hook up
 
 GAME( 1986, bigappg,    0,        bigappg, bigappg,   merit_state, empty_init, ROT0,  "Big Apple Games / Merit", "The Big Apple (2131-13, U5-0)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1986, misdraw,    0,        misdraw, bigappg,   merit_state, empty_init, ROT0,  "Big Apple Games / Merit", "Michigan Super Draw (2131-16, U5-2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1990, iowapp,     0,        dodge,   iowapp,    merit_state, empty_init, ROT0,  "Merit",                   "Iowa Premium Player (2131-21, U5-1)",   MACHINE_SUPPORTS_SAVE ) /* Copyright year based on rom label */
+GAME( 1990, iowapp,     0,        riviera, iowapp,    merit_state, empty_init, ROT0,  "Merit",                   "Iowa Premium Player (2131-21, U5-1)",   MACHINE_SUPPORTS_SAVE ) /* Copyright year based on rom label */
 
-GAME( 1986, dodgectya,  dodgecty, dodge,   dodge,     merit_state, empty_init, ROT0,  "Merit", "Dodge City (2131-82, U5-0D)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1986, dodgectyb,  dodgecty, dodge,   dodge,     merit_state, empty_init, ROT0,  "Merit", "Dodge City (2131-82, U5-50)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1986, dodgectyc,  dodgecty, dodge,   dodge,     merit_state, empty_init, ROT0,  "Merit", "Dodge City (2131-82, U5-0 GT)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1986, dodgectya,  dodgecty, misdraw, dodge,     merit_state, init_dodge, ROT0,  "Merit", "Dodge City (2131-82, U5-0D)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no text shown, while cards are
+GAME( 1986, dodgectyb,  dodgecty, misdraw, dodge,     merit_state, init_dodge, ROT0,  "Merit", "Dodge City (2131-82, U5-50)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no text shown, while cards are
+GAME( 1986, dodgectyc,  dodgecty, misdraw, dodge,     merit_state, init_dodge, ROT0,  "Merit", "Dodge City (2131-82, U5-0 GT)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no text shown, while cards are
+
+GAME( 1989, unkmerit,   0,        misdraw, bigappg,   merit_state, empty_init, ROT0,  "Merit", "unknown Merit game (4435-81, U5-1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // no text shown, while cards are
 
 /* Trivia and Word games */
 
