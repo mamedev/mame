@@ -105,7 +105,7 @@ void roma2_state::strobe_w(u8 data)
 
 void roma2_state::dac_w(offs_t offset, u8 data)
 {
-	// a0,d0: dac data
+	// a1,d0: dac data
 	u8 mask = 1 << offset;
 	m_dac_data = (m_dac_data & ~mask) | ((data & 1) ? mask : 0);
 	m_dac->write(m_dac_data);
@@ -113,7 +113,7 @@ void roma2_state::dac_w(offs_t offset, u8 data)
 
 void roma2_state::input_w(offs_t offset, u8 data)
 {
-	// a0-a3,d0: input mux
+	// a1-a4,d0: input mux
 	u8 mask = 1 << offset;
 	m_inp_mux = (m_inp_mux & ~mask) | ((data & 1) ? mask : 0);
 }
