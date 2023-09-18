@@ -75,12 +75,13 @@ BTANB:
 
 #include "emu.h"
 
+#include "mmdisplay1.h"
+
 #include "cpu/cosmac/cosmac.h"
 #include "machine/cdp1852.h"
 #include "machine/sensorboard.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "mmdisplay1.h"
 #include "video/pwm.h"
 
 #include "speaker.h"

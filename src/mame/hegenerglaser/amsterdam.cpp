@@ -14,11 +14,12 @@ TODO:
 
 #include "emu.h"
 
+#include "mmboard.h"
+#include "mmdisplay1.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/m68000/m68020.h"
-#include "mmboard.h"
 #include "sound/dac.h"
-#include "mmdisplay1.h"
 
 #include "speaker.h"
 
@@ -47,7 +48,6 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -71,18 +71,13 @@ void amsterdam_state::machine_start()
 	save_item(NAME(m_kp_select));
 }
 
-void amsterdam_state::machine_reset()
-{
-	m_display->reset();
-}
-
 INPUT_CHANGED_MEMBER(amsterdam_state::reset_button)
 {
 	// RES buttons in serial tied to CPU RESET
 	if (ioport("RESET")->read() == 3)
 	{
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-		machine_reset();
+		m_display->reset();
 	}
 }
 

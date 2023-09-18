@@ -19316,6 +19316,10 @@ polgar101                       // 1990 Mephisto Polgar 10MHz
 mrisc                           // 1992 Mephisto RISC 1MB
 mrisc2                          // 1994 Mephisto RISC II
 
+@source:hegenerglaser/roma2.cpp
+montreal                        // Montreal 68000
+roma2                           // Roma II
+
 @source:hegenerglaser/smondial.cpp
 mega4                           // 1989 Mephisto Mega IV
 mega4a                          // 1989 Mephisto Mega IV

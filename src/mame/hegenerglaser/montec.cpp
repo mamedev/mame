@@ -21,11 +21,12 @@ Hardware notes:
 
 #include "emu.h"
 
+#include "mmboard.h"
+
 #include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
-#include "mmboard.h"
 #include "sound/dac.h"
 #include "video/pcf2100.h"
 #include "video/pwm.h"

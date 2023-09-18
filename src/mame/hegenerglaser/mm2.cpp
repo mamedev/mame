@@ -98,13 +98,14 @@ $8000-$FFFF ROM
 
 #include "emu.h"
 
+#include "mmboard.h"
+#include "mmdisplay1.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/74259.h"
-#include "mmboard.h"
 #include "sound/dac.h"
-#include "mmdisplay1.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"
