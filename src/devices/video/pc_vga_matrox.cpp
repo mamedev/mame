@@ -534,6 +534,7 @@ void matrox_vga_device::flush_true_color_mode()
 void matrox_vga_device::palette_update()
 {
 	// TODO: terminal pin handling
+	// (which does the same thing but externally controlled)
 	if ((m_msc & 0xc) != 0xc)
 		vga_device::palette_update();
 	else
