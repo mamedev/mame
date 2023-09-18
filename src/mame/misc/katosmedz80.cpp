@@ -399,7 +399,7 @@ void katosmedz80_state::ppi0_b_w(uint8_t data)
 			if (m_var[i] >= 0x20)
 				m_sensors &= 0xff - m_bit;  // sensor on
 
-			if (m_var[i] < 0x08)
+			if (m_var[i] < 0x07)
 				m_sensors |= m_bit;			// sensor off
 
 			logerror("Motor_%i: %02X   -  m_sensors:%02X\n", i + 1, m_var[i], m_sensors);
