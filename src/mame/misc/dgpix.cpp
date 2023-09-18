@@ -10,6 +10,9 @@
  - Jump Jump                           (c) 1999 dgPIX Entertainment Inc.
  - The X-Files (2 sets)                (c) 1999 dgPIX Entertainment Inc.
  - King of Dynast Gear (version 1.8)   (c) 1999 EZ Graphics [*]
+ - Let's Dance                         (c) 1999 dgPIX Entertainment Inc.
+ - Beat Player 2000                    (c) 2000 dgPIX Entertainment Inc.
+ - Fishing Maniac 2+                   (c) 2000 Saero Entertainment
  - Fishing Maniac 3                    (c) 2002 Saero Entertainment
 
  [*] the version number is written in the flash roms at the beginning of the game settings
@@ -17,8 +20,6 @@
 Note: There is known to exist an alternate version of The X-Files titled The Sex Files which is undumped
 The following additional games are also known to be undumped
 
-- Beat Player 2000, using the VRender0 Minus Rev5 PCB, with an undocumented BMkey Flash Rev2 dgPIX Entertainment 1999 subboard.
-- Let's Dance, using the VRender0 Minus Rev5 PCB, with an undocumented BMkey Flash Rev2 dgPIX Entertainment 1999 subboard.
 - Fishing Maniac, using the VRender0 Minus Rev5 PCB, with a Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999 subboard.
 - Fishing Maniac 2, using the VRender0 Minus Rev5 PCB, with a Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999 subboard.
 
@@ -152,7 +153,7 @@ Notes:
       FLASH        - Intel DA28F320J5 32M x8 StrataFlash surface-mounted FlashROM (SSOP56)
       CONN1,CONN2,
       CONN3        - Connectors for joining small sub-board to main board
-      U100         - A custom programmed PIC (Programmable Interrupt Controller), rebadged as 'dgPIX-PR1' (DIP18)
+      U100         - A custom programmed PIC microcontroller, rebadged as 'dgPIX-PR1' (DIP18)
 
 
 *********************************************************************/
@@ -186,6 +187,9 @@ public:
 	void init_xfiles();
 	void init_xfilesk();
 	void init_kdynastg();
+	void init_letsdnce();
+	void init_btplay2k();
+	void init_fmaniac2p();
 	void init_fmaniac3();
 
 protected:
@@ -485,6 +489,7 @@ void dgpix_state::dgpix(machine_config &config)
 
 
 /*
+ 
 Elfin
 dgPIX Entertainment Inc. 1999
 
@@ -499,7 +504,7 @@ ROM_START( elfin )
 	ROM_LOAD16_WORD_SWAP( "flash.u8", 0x1800000, 0x400000, CRC(eb56d7ca) SHA1(7c1cfcc68579cf3bdd9707da7d745a410223b8d9) )
 	ROM_LOAD16_WORD_SWAP( "flash.u9", 0x1c00000, 0x400000, CRC(cbf64ef4) SHA1(1a231872ee14e6d718c3f8888185ede7483e79dd) ) /* game settings & highscores are saved in here */
 
-	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound ROM */
 	ROM_LOAD16_WORD_SWAP( "flash.u10", 0x000000, 0x400000, CRC(d378fe55) SHA1(5cc7bc5ae258cd48816857793a262e7c6c330795) )
 
 	ROM_REGION( 0x1000, "cpu2", ROMREGION_ERASEFF ) /* PIC */
@@ -507,6 +512,7 @@ ROM_START( elfin )
 ROM_END
 
 /*
+ 
 Jump Jump
 dgPIX Entertainment Inc. 1999
 
@@ -521,7 +527,7 @@ ROM_START( jumpjump )
 	ROM_LOAD16_WORD_SWAP( "jumpjump.u8", 0x1800000, 0x400000, CRC(210dfd8b) SHA1(a1aee4ec8c01832e77d2e4e334a62c246d7e3635) )
 	ROM_LOAD16_WORD_SWAP( "jumpjump.u9", 0x1c00000, 0x400000, CRC(16d1e352) SHA1(3c43974fb8d90b0c84472dd9f2167eb983142095) )
 
-	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound ROM */
 	ROM_LOAD16_WORD_SWAP( "jumpjump.u10", 0x000000, 0x400000, CRC(2152ecce) SHA1(522d389952a07fa0830ca8aaa6de3aacf834e32e) )
 
 	ROM_REGION( 0x1000, "cpu2", ROMREGION_ERASEFF ) /* PIC */
@@ -546,7 +552,7 @@ ROM_START( xfiles )
 	ROM_LOAD16_WORD_SWAP( "flash.u8",  0x1800000, 0x400000, CRC(231ad82a) SHA1(a1cc5c4122605e564d51137f1dca2afa82616202) )
 	ROM_LOAD16_WORD_SWAP( "flash.u9",  0x1c00000, 0x400000, CRC(d68994b7) SHA1(c1752d6795f7aaa6beef73643327205a1c32f0f5) )
 
-	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound ROM */
 	ROM_LOAD16_WORD_SWAP( "flash.u10", 0x0000000, 0x400000, CRC(1af33cda) SHA1(9bbcfb07a4a5bcff3efc1c7bcc51bc16c47ca9e6) )
 
 	ROM_REGION( 0x1000, "cpu2", 0 ) /* PIC */
@@ -579,7 +585,7 @@ ROM_START( xfilesk )
 	ROM_LOAD16_WORD_SWAP( "u8.bin",  0x1800000, 0x400000, CRC(3b2c2bc1) SHA1(1c07fb5bd8a8c9b5fb169e6400fef845f3aee7aa) )
 	ROM_LOAD16_WORD_SWAP( "u9.bin",  0x1c00000, 0x400000, CRC(6ecdd1eb) SHA1(e26c9711e589865cc75ec693d382758fa52528b8) )
 
-	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound ROM */
 	ROM_LOAD16_WORD_SWAP( "u10.bin", 0x0000000, 0x400000, CRC(f2ef1eb9) SHA1(d033d140fce6716d7d78509aa5387829f0a1404c) )
 
 	ROM_REGION( 0x1000, "cpu2", 0 ) /* PIC */
@@ -587,6 +593,7 @@ ROM_START( xfilesk )
 ROM_END
 
 /*
+
 King of Dynast Gear
 EZ Graphics, 1999
 
@@ -603,7 +610,7 @@ ROM_START( kdynastg )
 	ROM_LOAD16_WORD_SWAP( "flash.u8",  0x1800000, 0x400000, CRC(1016b61c) SHA1(eab4934e1f41cc26259e5187a94ceebd45888a94) )
 	ROM_LOAD16_WORD_SWAP( "flash.u9",  0x1c00000, 0x400000, CRC(093d9243) SHA1(2a643acc7144193aaa3606a84b0c67aadb4c543b) )
 
-	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound ROM */
 	ROM_LOAD16_WORD_SWAP( "flash.u10", 0x0000000, 0x400000, CRC(3f103cb1) SHA1(2ff9bd73f3005f09d872018b81c915b01d6703f5) )
 
 	ROM_REGION( 0x1000, "cpu2", 0 ) /* PIC */
@@ -611,6 +618,97 @@ ROM_START( kdynastg )
 ROM_END
 
 /*
+
+Let's Dance
+dgPIX Entertainment Inc. 1999
+
+PCB combo:
+VRender0 Minus Rev5 dgPIX Entertainment Inc. 1999
+BMkey Flash Rev2 dgPIX Entertainment 1999
+
+*/
+ROM_START( letsdnce )
+	ROM_REGION32_BE( 0x2000000, "flash", ROMREGION_ERASE00 ) /* Hyperstone CPU Code & Data */
+	/* 0 - 0x17fffff empty space */
+	ROM_LOAD16_WORD_SWAP( "flash.u9",  0x1800000, 0x400000, CRC(90e181d6) SHA1(c698b842c045f95a5f3a5483b5e5d12ca06c8f08) )
+	ROM_LOAD16_WORD_SWAP( "flash.u10", 0x1c00000, 0x400000, CRC(1416acb3) SHA1(097b89d5cebeaa29742abec8ed84b50313f0b387) )
+
+	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound ROMs - TODO: banking */
+	ROM_LOAD16_WORD_SWAP( "flash.u20", 0x0000000, 0x400000, CRC(e88ccc12) SHA1(6d988fe337a166f6e77ed67e83de7a64688958d1) )
+	ROM_LOAD16_WORD_SWAP( "flash.u21", 0x0000000, 0x400000, CRC(ffbbde83) SHA1(a6307d782024cd1b6c9fd83ffeef64c31c6bd22d) )
+	ROM_LOAD16_WORD_SWAP( "flash.u22", 0x0000000, 0x400000, CRC(068c376a) SHA1(622db2b76d84d53bc235fd77aea85cdb2d8c286c) )
+	ROM_LOAD16_WORD_SWAP( "flash.u23", 0x0000000, 0x400000, CRC(ab033dc7) SHA1(e46c0902bc5cc2608011bbb27fb136d9ccae1789) )
+	ROM_LOAD16_WORD_SWAP( "flash.u24", 0x0000000, 0x400000, CRC(23a556d8) SHA1(8ed58febbb1c51f4315494859afa04c916155471) )
+	ROM_LOAD16_WORD_SWAP( "flash.u25", 0x0000000, 0x400000, CRC(2a0f0e06) SHA1(9b1d6978a72c354aa1ef97ca4aa5902985f0aaed) )
+	ROM_LOAD16_WORD_SWAP( "flash.u26", 0x0000000, 0x400000, CRC(2a0c396b) SHA1(a8eead3de11c85997c930f000ed48c783bcee07c) )
+
+	ROM_REGION( 0x1000, "cpu2", ROMREGION_ERASEFF ) /* PIC */
+	ROM_LOAD( "letsdnce_pic",  0x0000, 0x1000, NO_DUMP ) // protected - labeled S831D dgPIX-PR1
+
+	ROM_REGION( 0x117, "pals", 0 )
+	ROM_LOAD( "palce16v8h.u11",  0x0000, 0x117, CRC(47e474c9) SHA1(f13ef4050072ab000a45140c180a3b97dacd8675) )
+ROM_END
+
+/*
+
+Beat Player 2000
+dgPIX Entertainment Inc. 2000
+
+PCB combo:
+VRender0 Minus Rev5 dgPIX Entertainment Inc. 1999
+BMkey Flash Rev2 dgPIX Entertainment 1999
+
+*/
+ROM_START( btplay2k )
+	ROM_REGION32_BE( 0x2000000, "flash", ROMREGION_ERASE00 ) /* Hyperstone CPU Code & Data */
+	/* 0 - 0x17fffff empty space */
+	ROM_LOAD16_WORD_SWAP( "flash.u9",  0x1800000, 0x400000, CRC(28d5a2cb) SHA1(69082810849031379018babe6d87c5528e97cfba) )
+	ROM_LOAD16_WORD_SWAP( "flash.u10", 0x1c00000, 0x400000, CRC(4f6c963b) SHA1(775df9c33ff73a85bf478e695f09577d3a07c997) )
+
+	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound ROMs - TODO: banking */
+	ROM_LOAD16_WORD_SWAP( "flash.u20", 0x0000000, 0x400000, CRC(cbbb5c11) SHA1(dfc9eeadb077efb86277ff73fbd0e51608c2a2eb) )
+	ROM_LOAD16_WORD_SWAP( "flash.u21", 0x0000000, 0x400000, CRC(f1dc0d33) SHA1(6e1e4f8da2a8ea59703e8684613c05a05c60d0ac) )
+	ROM_LOAD16_WORD_SWAP( "flash.u22", 0x0000000, 0x400000, CRC(b783feb6) SHA1(86ca43262a4ccd64f4bd079ad8eaa0a3c113db1f) )
+	ROM_LOAD16_WORD_SWAP( "flash.u23", 0x0000000, 0x400000, CRC(fa298e11) SHA1(9c54d4f37fd2ed367b6f9fdb01c361b25b6f2048) )
+	ROM_LOAD16_WORD_SWAP( "flash.u24", 0x0000000, 0x400000, CRC(29827f0c) SHA1(050e6ed33cf38d5ed45b7d05d039e618f06b5c5b) )
+	ROM_LOAD16_WORD_SWAP( "flash.u25", 0x0000000, 0x400000, CRC(81b974fa) SHA1(30c11fa926437f144fa6929df2eb85751777bcac) )
+	ROM_LOAD16_WORD_SWAP( "flash.u26", 0x0000000, 0x400000, CRC(6ff2f3ec) SHA1(8193851b5fdf5248d328f14c0edc2501d12233f3) )
+
+	ROM_REGION( 0x1000, "cpu2", ROMREGION_ERASEFF ) /* PIC */
+	ROM_LOAD( "btplay2k_pic",  0x0000, 0x1000, NO_DUMP ) // protected - labeled S831D dgPIX-PR1
+
+	ROM_REGION( 0x117, "pals", 0 )
+	ROM_LOAD( "palce16v8h.u11",  0x0000, 0x117, CRC(47e474c9) SHA1(f13ef4050072ab000a45140c180a3b97dacd8675) )
+ROM_END
+
+
+/*
+
+Fishing Maniac 2+
+Saero Entertainment, 2000
+
+PCB combo:
+VRender0 Minus Rev4 dgPIX Entertainment Inc. 1999
+Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
+
+U100 18 pin socket for the PIC chip is unused
+
+*/
+ROM_START( fmaniac2p )
+	ROM_REGION32_BE( 0x2000000, "flash", ROMREGION_ERASE00 ) /* Hyperstone CPU Code & Data */
+	/* 0 - 0x17fffff empty space */
+	ROM_LOAD16_WORD_SWAP( "flash.u8", 0x1800000, 0x400000, CRC(acc7da30) SHA1(8c4ffbf646777104a0e108c9d1b49446c12adddc) )
+	ROM_LOAD16_WORD_SWAP( "flash.u9", 0x1c00000, 0x400000, CRC(b7f7079d) SHA1(2c97d106a8a28e6fa2a18fb324412533e24f46cc) )
+
+	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound ROM */
+	ROM_LOAD16_WORD_SWAP( "flash.u10", 0x000000, 0x400000, CRC(9a4b15fa) SHA1(64a7c6eff049b15a005a9f2d87b340c81c2ee69c) )
+
+	ROM_REGION( 0x1000, "cpu2", ROMREGION_ERASEFF ) /* PIC */
+	// not present
+ROM_END
+
+/*
+
 Fishing Maniac 3
 Saero Entertainment, 2002
 
@@ -618,7 +716,7 @@ PCB combo:
 VRender0 Minus Rev4 dgPIX Entertainment Inc. 1999
 Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
 
- U100 18 pin socket for the PIC chip is unused
+U100 18 pin socket for the PIC chip is unused
 
 */
 ROM_START( fmaniac3 )
@@ -627,7 +725,7 @@ ROM_START( fmaniac3 )
 	ROM_LOAD16_WORD_SWAP( "flash.u8", 0x1800000, 0x400000, CRC(dc08a224) SHA1(4d14145eb84ad13674296f81e90b9d60403fa0de) )
 	ROM_LOAD16_WORD_SWAP( "flash.u9", 0x1c00000, 0x400000, CRC(c1fee95f) SHA1(0ed5ed9fa18e7da9242a6df2c210c46de25a2281) )
 
-	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound ROM */
 	ROM_LOAD16_WORD_SWAP( "flash.u10", 0x000000, 0x400000, CRC(dfeb91a0) SHA1(a4a79073c3f6135957ea8a4a66a9c71a3a39893c) )
 
 	ROM_REGION( 0x1000, "cpu2", ROMREGION_ERASEFF ) /* PIC */
@@ -715,6 +813,39 @@ void dgpix_state::init_kdynastg()
 	m_flash_roms = 4;
 }
 
+void dgpix_state::init_letsdnce()
+{
+	u8 *rom = memregion("flash")->base() + 0x1c00000;
+
+	rom[BYTE4_XOR_BE(0x3a9eb2)] = 3;
+	rom[BYTE4_XOR_BE(0x3a9eb3)] = 0;
+	rom[BYTE4_XOR_BE(0x3a9eb4)] = 3;
+	rom[BYTE4_XOR_BE(0x3a9eb5)] = 0;
+	rom[BYTE4_XOR_BE(0x3a9eb6)] = 3;
+	rom[BYTE4_XOR_BE(0x3a9eb7)] = 0;
+
+	m_flash_roms = 2;
+}
+
+void dgpix_state::init_btplay2k()
+{
+	u8 *rom = memregion("flash")->base() + 0x1c00000;
+	
+	rom[BYTE4_XOR_BE(0x3a7914)] = 3;
+	rom[BYTE4_XOR_BE(0x3a7915)] = 0;
+	rom[BYTE4_XOR_BE(0x3a7916)] = 3;
+	rom[BYTE4_XOR_BE(0x3a7917)] = 0;
+	rom[BYTE4_XOR_BE(0x3a7918)] = 3;
+	rom[BYTE4_XOR_BE(0x3a7919)] = 0;
+
+	m_flash_roms = 2;
+}
+
+void dgpix_state::init_fmaniac2p()
+{
+	m_flash_roms = 2;
+}
+
 void dgpix_state::init_fmaniac3()
 {
 	m_flash_roms = 2;
@@ -723,9 +854,12 @@ void dgpix_state::init_fmaniac3()
 } // anonymous namespace
 
 
-GAME( 1999, elfin,    0,      dgpix, dgpix, dgpix_state, init_elfin,    ROT0, "dgPIX Entertainment Inc.", "Elfin",                             MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, jumpjump, 0,      dgpix, dgpix, dgpix_state, init_jumpjump, ROT0, "dgPIX Entertainment Inc.", "Jump Jump",                         MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, xfiles,   0,      dgpix, dgpix, dgpix_state, init_xfiles,   ROT0, "dgPIX Entertainment Inc.", "The X-Files",                       MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, xfilesk,  xfiles, dgpix, dgpix, dgpix_state, init_xfilesk,  ROT0, "dgPIX Entertainment Inc.", "The X-Files (Censored, Korea)",     MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, kdynastg, 0,      dgpix, dgpix, dgpix_state, init_kdynastg, ROT0, "EZ Graphics",              "King of Dynast Gear (version 1.8)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, fmaniac3, 0,      dgpix, dgpix, dgpix_state, init_fmaniac3, ROT0, "Saero Entertainment",      "Fishing Maniac 3",                  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, elfin,     0,      dgpix, dgpix, dgpix_state, init_elfin,     ROT0, "dgPIX Entertainment Inc.", "Elfin",                             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jumpjump,  0,      dgpix, dgpix, dgpix_state, init_jumpjump,  ROT0, "dgPIX Entertainment Inc.", "Jump Jump",                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, xfiles,    0,      dgpix, dgpix, dgpix_state, init_xfiles,    ROT0, "dgPIX Entertainment Inc.", "The X-Files",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, xfilesk,   xfiles, dgpix, dgpix, dgpix_state, init_xfilesk,   ROT0, "dgPIX Entertainment Inc.", "The X-Files (Censored, Korea)",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, kdynastg,  0,      dgpix, dgpix, dgpix_state, init_kdynastg,  ROT0, "EZ Graphics",              "King of Dynast Gear (version 1.8)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, letsdnce,  0,      dgpix, dgpix, dgpix_state, init_letsdnce,  ROT0, "dgPIX Entertainment Inc.", "Let's Dance",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, btplay2k,  0,      dgpix, dgpix, dgpix_state, init_btplay2k,  ROT0, "dgPIX Entertainment Inc.", "Beat Player 2000",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, fmaniac2p, 0,      dgpix, dgpix, dgpix_state, init_fmaniac2p, ROT0, "Saero Entertainment",      "Fishing Maniac 2+",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, fmaniac3,  0,      dgpix, dgpix, dgpix_state, init_fmaniac3,  ROT0, "Saero Entertainment",      "Fishing Maniac 3",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
