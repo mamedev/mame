@@ -61,7 +61,7 @@ void sh2_sh7014_device::device_add_mconfig(machine_config &config)
 	SH7014_BSC(config, m_bsc);
 
 	SH7014_DMAC(config, m_dmac, DERIVED_CLOCK(1, 1), *this, m_intc);
-	m_dmac->notify_dma_source_callback().set(FUNC(sh2_sh7014_device::notify_dma_source));
+	m_dmac->set_notify_dma_source_callback(FUNC(sh2_sh7014_device::notify_dma_source));
 
 	SH7014_INTC(config, m_intc);
 	m_intc->set_irq_callback(FUNC(sh2_sh7014_device::set_irq));

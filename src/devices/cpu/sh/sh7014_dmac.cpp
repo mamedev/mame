@@ -30,7 +30,6 @@ sh7014_dmac_device::sh7014_dmac_device(const machine_config &mconfig, const char
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_intc(*this, finder_base::DUMMY_TAG)
 	, m_chan(*this, "ch%u", 0u)
-	, m_notify_dma_source_cb(*this)
 {
 }
 
@@ -46,12 +45,12 @@ void sh7014_dmac_device::device_reset()
 
 void sh7014_dmac_device::device_add_mconfig(machine_config &config)
 {
-	SH7014_DMAC_CHANNEL(config, m_chan[0], DERIVED_CLOCK(1, 1), *this,
+	SH7014_DMAC_CHANNEL(config, m_chan[0], DERIVED_CLOCK(1, 1), *this, m_cpu, m_intc,
 		0, // channel
 		sh7014_intc_device::INT_VECTOR_DMA_CH0
 	);
 
-	SH7014_DMAC_CHANNEL(config, m_chan[1], DERIVED_CLOCK(1, 1), *this,
+	SH7014_DMAC_CHANNEL(config, m_chan[1], DERIVED_CLOCK(1, 1), *this, m_cpu, m_intc,
 		1, // channel
 		sh7014_intc_device::INT_VECTOR_DMA_CH1
 	);
@@ -101,11 +100,6 @@ int sh7014_dmac_device::is_dma_activated(int vector)
 	return activated;
 }
 
-void sh7014_dmac_device::notify_dma_source(int32_t source)
-{
-	m_notify_dma_source_cb(source);
-}
-
 
 //////////////////
 
@@ -121,6 +115,9 @@ void sh7014_dmac_channel_device::map(address_map &map)
 sh7014_dmac_channel_device::sh7014_dmac_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SH7014_DMAC_CHANNEL, tag, owner, clock)
 	, m_dmac(*this, finder_base::DUMMY_TAG)
+	, m_cpu(*this, finder_base::DUMMY_TAG)
+	, m_intc(*this, finder_base::DUMMY_TAG)
+	, m_notify_dma_source_cb(*this)
 {
 }
 
@@ -304,25 +301,25 @@ TIMER_CALLBACK_MEMBER( sh7014_dmac_channel_device::dma_timer_callback )
 		m_dar -= m_active_dma_unit_size;
 
 	if (m_request_source_type == RS_TYPE_INTERNAL)
-		m_dmac->notify_dma_source(m_selected_resource);
+		m_notify_dma_source_cb(m_selected_resource);
 
 	switch (m_active_dma_unit_size) {
 		case 1:
-			m_dmac->m_cpu->m_program->write_byte(
+			m_cpu->m_program->write_byte(
 				m_dar,
-				m_dmac->m_cpu->m_program->read_byte(m_sar)
+				m_cpu->m_program->read_byte(m_sar)
 			);
 			break;
 		case 2:
-			m_dmac->m_cpu->m_program->write_word(
+			m_cpu->m_program->write_word(
 				m_dar,
-				m_dmac->m_cpu->m_program->read_word(m_sar)
+				m_cpu->m_program->read_word(m_sar)
 			);
 			break;
 		case 4:
-			m_dmac->m_cpu->m_program->write_dword(
+			m_cpu->m_program->write_dword(
 				m_dar,
-				m_dmac->m_cpu->m_program->read_dword(m_sar)
+				m_cpu->m_program->read_dword(m_sar)
 			);
 			break;
 	}
@@ -343,11 +340,11 @@ TIMER_CALLBACK_MEMBER( sh7014_dmac_channel_device::dma_timer_callback )
 		m_dma_timer_active = false;
 
 		if (m_active_dma_is_burst)
-			m_dmac->m_cpu->resume(SUSPEND_REASON_HALT);
+			m_cpu->resume(SUSPEND_REASON_HALT);
 
 		const auto interrupt_enable = (m_chcr & CHCR_IE) != 0;
 		if (interrupt_enable)
-			m_dmac->m_intc->set_interrupt(m_vector, ASSERT_LINE);
+			m_intc->set_interrupt(m_vector, ASSERT_LINE);
 	} else {
 		// schedule next DMA callback
 		// Internal source transfers in burst mode end on last transfer, otherwise should end after the first transfer when burst mode is off
@@ -396,7 +393,7 @@ void sh7014_dmac_channel_device::dma_check()
 	}
 
 	if (m_active_dma_is_burst)
-		m_dmac->m_cpu->suspend(SUSPEND_REASON_HALT, 1);
+		m_cpu->suspend(SUSPEND_REASON_HALT, 1);
 
 	if (m_request_source_type != RS_TYPE_INTERNAL || (m_request_source_type == RS_TYPE_INTERNAL && m_active_dma_is_burst))
 		m_dma_current_active_timer->adjust(attotime::from_ticks(2, clock()));

@@ -1133,12 +1133,10 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, "maincpu:ram")
 		, m_sub(*this, "sub")
-		, m_cdxa_pcb(*this, "cdxa_pcb")
 		, m_adc(*this, "sub:adc")
 		, m_rtc(*this, "rtc")
 		, m_settings(*this, "namco_settings")
 		, m_sharedram(*this, "sharedram")
-		, m_cdxa_ata(*this, "cdxa_pcb:ata")
 		, m_mainrom(*this, "maincpu:rom")
 		, m_bankedroms(*this, "bankedroms")
 		, m_mainbank(*this, "mainbank")
@@ -1152,7 +1150,6 @@ public:
 	void coh700(machine_config &config);
 	void coh716(machine_config &config);
 	void namcos12_mobo(machine_config &config);
-	void cdxa_pcb(machine_config &config);
 
 	void init_namcos12();
 	void init_ptblank2();
@@ -1171,7 +1168,6 @@ protected:
 	void s12h8rwmap(address_map &map);
 	void tdjvsmap(address_map &map);
 	void tektagt_map(address_map &map);
-	void cdxa_psx_map(address_map &map);
 
 	uint16_t s12_mcu_gun_h_r();
 	uint16_t s12_mcu_gun_v_r();
@@ -1190,15 +1186,11 @@ protected:
 	required_device<ram_device> m_ram;
 	required_device<h83002_device> m_sub;
 
-	optional_device<namcos12_cdxa_device> m_cdxa_pcb;
-
 private:
 	required_device<h8_adc_device> m_adc;
 	required_device<rtc4543_device> m_rtc;
 	required_device<namco_settings_device> m_settings;
 	required_shared_ptr<uint16_t> m_sharedram;
-
-	optional_device<ata_interface_device> m_cdxa_ata;
 
 	required_memory_region m_mainrom;
 	optional_memory_region m_bankedroms;
@@ -1250,13 +1242,31 @@ public:
 	void technodr(machine_config &config);
 	void golgo13(machine_config &config);
 	void aplarail(machine_config &config);
-	void truckk(machine_config &config);
 	void tektagt(machine_config &config);
 	void ptblank2(machine_config &config);
 	void kartduel(machine_config &config);
 
 private:
 	virtual void machine_reset() override;
+};
+
+
+class namcos12_cdxa_state : public namcos12_boothack_state
+{
+public:
+	namcos12_cdxa_state(const machine_config &mconfig, device_type type, const char *tag)
+		: namcos12_boothack_state(mconfig, type, tag)
+		, m_cdxa_pcb(*this, "cdxa_pcb")
+	{
+	}
+
+	void truckk(machine_config &config);
+
+private:
+	void cdxa_pcb(machine_config &config);
+	void cdxa_psx_map(address_map &map);
+
+	required_device<namcos12_cdxa_device> m_cdxa_pcb;
 };
 
 
@@ -1453,34 +1463,6 @@ void namcos12_state::tektagt_map(address_map &map)
 	map(0x1fb00000, 0x1fb00003).rw(FUNC(namcos12_state::tektagt_protection_1_r), FUNC(namcos12_state::tektagt_protection_1_w));
 	map(0x1fb80000, 0x1fb80003).rw(FUNC(namcos12_state::tektagt_protection_2_r), FUNC(namcos12_state::tektagt_protection_2_w));
 	map(0x1f700000, 0x1f700003).r(FUNC(namcos12_state::tektagt_protection_3_r));
-}
-
-void namcos12_state::cdxa_psx_map(address_map &map)
-{
-	namcos12_map(map);
-
-	map(0x1f7c0000, 0x1f7cffff).rw(m_cdxa_pcb, FUNC(namcos12_cdxa_device::sh2_ram_r), FUNC(namcos12_cdxa_device::sh2_ram_w));
-
-	map(0x1f7d6002, 0x1f7d6003).w(m_cdxa_pcb, FUNC(namcos12_cdxa_device::reset_sh2_w));
-	map(0x1f7d6004, 0x1f7d600b).w(m_cdxa_pcb, FUNC(namcos12_cdxa_device::clockgen_w));
-	map(0x1f7d6010, 0x1f7d6011).w(m_cdxa_pcb, FUNC(namcos12_cdxa_device::ide_sh2_enabled_w));
-	map(0x1f7d6012, 0x1f7d6013).w(m_cdxa_pcb, FUNC(namcos12_cdxa_device::ide_ps1_enabled_w));
-	// 1f7d6018 unknown, only set once to 1 between the "SH2 Reset" and "SH2 Pll Clock Set" steps during boot
-	map(0x1f7d601a, 0x1f7d601b).w(m_cdxa_pcb, FUNC(namcos12_cdxa_device::sram_enabled_w));
-	map(0x1f7d601e, 0x1f7d601f).w(m_cdxa_pcb, FUNC(namcos12_cdxa_device::ps1_int10_finished_w));
-
-	map(0x1f7d800a, 0x1f7d800b).lr16(NAME([] () {
-		// Might be for the M148 PCB instead of CDXA PCB
-		// Code loops until this returns 0x20 before it starts writing to 0x1f7d8000
-		// Writes "55 x y z" to 0x1f7d8000 where x, y, z are related to the current I/O state
-		// Maybe used for lights?
-		return 0x20;
-	}));
-
-	map(0x1f7e0000, 0x1f7e000f).rw(m_cdxa_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w));
-	// map(0x1f7e8000, 0x1f7e800f).rw(m_cdxa_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w));
-	// 1f7d7000 volume enabled/set? gets set to 6 between the "SH2 Volume Set" and "SH2 Trf Program" steps, after setting 4 volumes registers to 0x7e
-	map(0x1f7f8000, 0x1f7f80ff).w(m_cdxa_pcb, FUNC(namcos12_cdxa_device::volume_w));
 }
 
 void namcos12_state::system11gun_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -1850,16 +1832,6 @@ void namcos12_state::coh716(machine_config &config)
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER).screen_vblank().set(FUNC(namcos12_state::namcos12_sub_irq));
 }
 
-void namcos12_state::cdxa_pcb(machine_config &config)
-{
-	NAMCOS12_CDXA(config, m_cdxa_pcb, XTAL(14'745'600));
-	m_cdxa_pcb->add_route(0, "lspeaker", 0.30); // roughtly matched the volume of speaking lines between the CDXA audio vs non-CDXA audio
-	m_cdxa_pcb->add_route(1, "rspeaker", 0.30);
-	m_cdxa_pcb->psx_int10_callback().set("maincpu:irq", FUNC(psxirq_device::intin10));
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcos12_state::cdxa_psx_map);
-}
-
 void namcos12_boothack_state::ptblank2(machine_config &config)
 {
 	coh700(config);
@@ -1900,27 +1872,6 @@ void namcos12_state::jvsmap(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("iocpu", 0);
 	map(0xc000, 0xfb7f).ram();
-}
-
-void namcos12_boothack_state::truckk(machine_config &config)
-{
-	coh700(config);
-	cdxa_pcb(config);
-
-	m_sub->read_adc<0>().set_ioport("STEER");
-	m_sub->read_adc<1>().set_ioport("BRAKE");
-	m_sub->read_adc<2>().set_ioport("GAS");
-
-	// Timer at 115200*16 for the jvs serial clock
-	m_sub->sci_set_external_clock_period(0, attotime::from_hz(JVSCLOCK/8));
-
-	h83334_device &iocpu(H83334(config, "iocpu", JVSCLOCK));
-	iocpu.set_addrmap(AS_PROGRAM, &namcos12_boothack_state::jvsmap);
-
-	iocpu.write_sci_tx<0>().set(m_sub, FUNC(h8_device::sci_rx_w<0>));
-	m_sub->write_sci_tx<0>().set(iocpu, FUNC(h8_device::sci_rx_w<0>));
-
-	config.set_maximum_quantum(attotime::from_hz(2*115200));
 }
 
 uint16_t namcos12_state::iob_p4_r()
@@ -2022,6 +1973,68 @@ void namcos12_boothack_state::aplarail(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(2*115200));
 }
+
+///
+
+void namcos12_cdxa_state::cdxa_pcb(machine_config &config)
+{
+	NAMCOS12_CDXA(config, m_cdxa_pcb, XTAL(14'745'600));
+	m_cdxa_pcb->add_route(0, "lspeaker", 0.30); // roughtly matched the volume of speaking lines between the CDXA audio vs non-CDXA audio
+	m_cdxa_pcb->add_route(1, "rspeaker", 0.30);
+	m_cdxa_pcb->psx_int10_callback().set("maincpu:irq", FUNC(psxirq_device::intin10));
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos12_cdxa_state::cdxa_psx_map);
+}
+
+void namcos12_cdxa_state::cdxa_psx_map(address_map &map)
+{
+	namcos12_map(map);
+
+	map(0x1f7c0000, 0x1f7cffff).rw(m_cdxa_pcb, FUNC(namcos12_cdxa_device::sh2_ram_r), FUNC(namcos12_cdxa_device::sh2_ram_w));
+
+	map(0x1f7d6002, 0x1f7d6003).w(m_cdxa_pcb, FUNC(namcos12_cdxa_device::reset_sh2_w));
+	map(0x1f7d6004, 0x1f7d600b).w(m_cdxa_pcb, FUNC(namcos12_cdxa_device::clockgen_w));
+	map(0x1f7d6010, 0x1f7d6011).w(m_cdxa_pcb, FUNC(namcos12_cdxa_device::ide_sh2_enabled_w));
+	map(0x1f7d6012, 0x1f7d6013).w(m_cdxa_pcb, FUNC(namcos12_cdxa_device::ide_ps1_enabled_w));
+	// 1f7d6018 unknown, only set once to 1 between the "SH2 Reset" and "SH2 Pll Clock Set" steps during boot
+	map(0x1f7d601a, 0x1f7d601b).w(m_cdxa_pcb, FUNC(namcos12_cdxa_device::sram_enabled_w));
+	map(0x1f7d601e, 0x1f7d601f).w(m_cdxa_pcb, FUNC(namcos12_cdxa_device::ps1_int10_finished_w));
+
+	map(0x1f7d800a, 0x1f7d800b).lr16(NAME([] () {
+		// Might be for the M148 PCB instead of CDXA PCB
+		// Code loops until this returns 0x20 before it starts writing to 0x1f7d8000
+		// Writes "55 x y z" to 0x1f7d8000 where x, y, z are related to the current I/O state
+		// Maybe used for lights?
+		return 0x20;
+	}));
+
+	map(0x1f7e0000, 0x1f7e000f).rw(m_cdxa_pcb, FUNC(namcos12_cdxa_device::cdrom_cs0_r), FUNC(namcos12_cdxa_device::cdrom_cs0_w));
+	// map(0x1f7e8000, 0x1f7e800f).rw(m_cdxa_pcb, FUNC(namcos12_cdxa_device::cdrom_cs1_r), FUNC(namcos12_cdxa_device::cdrom_cs1_w));
+	// 1f7d7000 volume enabled/set? gets set to 6 between the "SH2 Volume Set" and "SH2 Trf Program" steps, after setting 4 volumes registers to 0x7e
+	map(0x1f7f8000, 0x1f7f80ff).w(m_cdxa_pcb, FUNC(namcos12_cdxa_device::volume_w));
+}
+
+void namcos12_cdxa_state::truckk(machine_config &config)
+{
+	coh700(config);
+	cdxa_pcb(config);
+
+	m_sub->read_adc<0>().set_ioport("STEER");
+	m_sub->read_adc<1>().set_ioport("BRAKE");
+	m_sub->read_adc<2>().set_ioport("GAS");
+
+	// Timer at 115200*16 for the jvs serial clock
+	m_sub->sci_set_external_clock_period(0, attotime::from_hz(JVSCLOCK/8));
+
+	h83334_device &iocpu(H83334(config, "iocpu", JVSCLOCK));
+	iocpu.set_addrmap(AS_PROGRAM, &namcos12_cdxa_state::jvsmap);
+
+	iocpu.write_sci_tx<0>().set(m_sub, FUNC(h8_device::sci_rx_w<0>));
+	m_sub->write_sci_tx<0>().set(iocpu, FUNC(h8_device::sci_rx_w<0>));
+
+	config.set_maximum_quantum(attotime::from_hz(2*115200));
+}
+
 
 static INPUT_PORTS_START( namcos12 )
 	PORT_START("DSW")
@@ -3539,7 +3552,7 @@ GAME( 1999, aquarush,  0,        coh700,   namcos12,  namcos12_state,          i
 GAME( 1999, golgo13,   0,        golgo13,  golgo13,   namcos12_boothack_state, init_alt_bank1,ROT0, "Eighting / Raizing / Namco", "Golgo 13 (Japan, GLG1/VER.A)", 0 ) /* KC054 */
 GAME( 2000, g13knd,    0,        golgo13,  golgo13,   namcos12_boothack_state, init_alt_bank1,ROT0, "Eighting / Raizing / Namco", "Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)", 0 ) /* KC059 */
 GAME( 2000, sws2000,   0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Namco",           "Super World Stadium 2000 (Japan, SS01/VER.A)", MACHINE_NOT_WORKING ) /* KC055 */
-GAME( 2000, truckk,    0,        truckk,   truckk,    namcos12_boothack_state, init_alt_bank1,ROT0, "Metro / Namco",   "Truck Kyosokyoku (Japan, TKK2/VER.A)", MACHINE_IMPERFECT_SOUND ) /* KC056 */
+GAME( 2000, truckk,    0,        truckk,   truckk,    namcos12_cdxa_state,     init_alt_bank1,ROT0, "Metro / Namco",   "Truck Kyosokyoku (Japan, TKK2/VER.A)", MACHINE_IMPERFECT_SOUND ) /* KC056 */
 GAME( 2000, kartduel,  0,        kartduel, kartduel,  namcos12_boothack_state, init_namcos12, ROT0, "Gaps / Namco",    "Kart Duel (World, KTD2/VER.A)", MACHINE_NOT_WORKING ) /* KC057 */
 GAME( 2000, kartduelj, kartduel, kartduel, kartduel,  namcos12_boothack_state, init_namcos12, ROT0, "Gaps / Namco",    "Kart Duel (Japan, KTD1/VER.A)", MACHINE_NOT_WORKING ) /* KC057 */
 GAME( 2001, sws2001,   sws2000,  coh716,   namcos12,  namcos12_boothack_state, init_alt_bank1,ROT0, "Namco",           "Super World Stadium 2001 (Japan, SS11/VER.A)", MACHINE_NOT_WORKING ) /* KC061 */
