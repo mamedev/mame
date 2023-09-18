@@ -182,13 +182,10 @@ uint16_t gms_2layers_state::input_matrix_r()
 	uint16_t res = 0xffff;
 
 	// TODO: & 0x00ff are the inputs for keyboard mode in rbmk
-	switch (m_input_matrix & 0xf000)
-	{
-		case 0x1000: res = m_dsw[0]->read(); break;
-		case 0x2000: res = m_dsw[1].read_safe(0xffff); break;
-		case 0x4000: res = m_dsw[2].read_safe(0xffff); break;
-		case 0x8000: res = m_dsw[3].read_safe(0xffff); break;
-	}
+	if (m_input_matrix & 0x1000) res &= m_dsw[0]->read();
+	if (m_input_matrix & 0x2000) res &= m_dsw[1].read_safe(0xffff);
+	if (m_input_matrix & 0x4000) res &= m_dsw[2].read_safe(0xffff);
+	if (m_input_matrix & 0x8000) res &= m_dsw[3].read_safe(0xffff);
 
 	return res;
 }
