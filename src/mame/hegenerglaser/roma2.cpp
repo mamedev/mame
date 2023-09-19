@@ -13,7 +13,7 @@ Mephisto Montreal 68000 from 1993 is on similar hardware, but it is a standalone
 chess computer (Roma II is a module). The chess engine is still the old 1987 Roma.
 
 TODO:
-- verify XTAL (currently guessed from beeper pitch on videos)
+- verify montreal XTAL (currently guessed from beeper pitch on video)
 - verify irq source and level
 - does it have DTACK waitstates?
 
@@ -89,11 +89,10 @@ INPUT_CHANGED_MEMBER(roma2_state::reset_button)
 u8 roma2_state::input_r()
 {
 	u8 data = 0;
-	u8 inp_mux = m_outlatch->output_state() & 0xf;
 
 	// read keypad
 	for (int i = 0; i < 4; i++)
-		if (!BIT(inp_mux, i))
+		if (!BIT(m_outlatch->output_state(), i))
 			data |= m_inputs[i]->read();
 
 	return data;
@@ -108,13 +107,13 @@ u8 roma2_state::input_r()
 void roma2_state::main_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
+	map(0x800000, 0x803fff).ram();
 	map(0x900000, 0x90000f).w(m_outlatch, FUNC(hc259_device::write_d0)).umask16(0xff00);
-	map(0xc00000, 0xc00000).w(m_board, FUNC(mephisto_board_device::mux_w));
 	map(0xb00000, 0xb00000).w(m_board, FUNC(mephisto_board_device::led_w));
+	map(0xc00000, 0xc00000).w(m_board, FUNC(mephisto_board_device::mux_w));
 	map(0xd00000, 0xd00000).r(m_board, FUNC(mephisto_board_device::input_r));
 	map(0xd00001, 0xd00001).r(FUNC(roma2_state::input_r));
 	map(0xe00000, 0xe00000).w(m_display, FUNC(mephisto_display1_device::data_w));
-	map(0x800000, 0x803fff).ram();
 
 	map(0x900000, 0x900009).nopr(); // st
 	map(0xc00000, 0xc00001).nopr(); // st
@@ -220,8 +219,8 @@ void roma2_state::montreal(machine_config &config)
 
 ROM_START( roma2 )
 	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("roma2_u_v4.02", 0x00000, 0x08000, CRC(89e95f5f) SHA1(6c3992f35fba2c1cc08a93f50aa991d5ffda5bc3) )
-	ROM_LOAD16_BYTE("roma2_l_v4.02", 0x00001, 0x08000, CRC(74b03889) SHA1(9d2a09b93f3b2dc483b4f30db134f83deb3aa951) )
+	ROM_LOAD16_BYTE("roma_ii_u_ver.4.02", 0x00000, 0x08000, CRC(89e95f5f) SHA1(6c3992f35fba2c1cc08a93f50aa991d5ffda5bc3) )
+	ROM_LOAD16_BYTE("roma_ii_l_ver.4.02", 0x00001, 0x08000, CRC(74b03889) SHA1(9d2a09b93f3b2dc483b4f30db134f83deb3aa951) )
 ROM_END
 
 ROM_START( montreal )

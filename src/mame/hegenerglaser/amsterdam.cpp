@@ -32,13 +32,14 @@ namespace {
 class amsterdam_state : public driver_device
 {
 public:
-	amsterdam_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_board(*this, "board")
-		, m_display(*this, "display")
-		, m_dac(*this, "dac")
-		, m_keys(*this, "KEY.%u", 0)
+	amsterdam_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_display(*this, "display"),
+		m_dac(*this, "dac"),
+		m_keys(*this, "KEY.%u", 0),
+		m_reset(*this, "RESET")
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
@@ -46,15 +47,13 @@ public:
 	void amsterdam(machine_config &config);
 	void dallas32(machine_config &config);
 
-protected:
-	virtual void machine_start() override;
-
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mephisto_board_device> m_board;
 	required_device<mephisto_display1_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_keys;
+	required_ioport m_reset;
 
 	void amsterd_mem(address_map &map);
 	void dallas32_mem(address_map &map);
@@ -62,19 +61,12 @@ private:
 	void led_w(offs_t offset, u8 data);
 	void dac_w(u8 data);
 	u8 keys_r();
-
-	u8 m_kp_select = 0;
 };
-
-void amsterdam_state::machine_start()
-{
-	save_item(NAME(m_kp_select));
-}
 
 INPUT_CHANGED_MEMBER(amsterdam_state::reset_button)
 {
 	// RES buttons in serial tied to CPU RESET
-	if (ioport("RESET")->read() == 3)
+	if (m_reset->read() == 3)
 	{
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_display->reset();
@@ -89,11 +81,11 @@ INPUT_CHANGED_MEMBER(amsterdam_state::reset_button)
 
 void amsterdam_state::led_w(offs_t offset, u8 data)
 {
+	// d0-d7: board leds
 	m_board->led_w(data);
 
-	// lcd strobe is shared with keypad select
-	m_kp_select = offset >> 7;
-	m_display->strobe_w(m_kp_select);
+	// a8: lcd strobe
+	m_display->strobe_w(BIT(offset, 7));
 }
 
 void amsterdam_state::dac_w(u8 data)
@@ -104,7 +96,8 @@ void amsterdam_state::dac_w(u8 data)
 
 u8 amsterdam_state::keys_r()
 {
-	return m_keys[m_kp_select & 1]->read();
+	// lcd strobe is shared with keypad select
+	return m_keys[m_display->strobe_r()]->read();
 }
 
 
