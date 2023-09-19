@@ -24,8 +24,8 @@ Hardware notes:
 
 #include "cpu/m6502/m65sc02.h"
 #include "machine/74259.h"
-#include "machine/nvram.h"
 #include "machine/chessmachine.h"
+#include "machine/nvram.h"
 
 // internal artwork
 #include "mephisto_risc.lh"
