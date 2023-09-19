@@ -121,12 +121,13 @@ namespace {
 class mm2_state : public driver_device
 {
 public:
-	mm2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_outlatch(*this, "outlatch")
-		, m_display(*this, "display")
-		, m_keys(*this, "KEY.%u", 0)
+	mm2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_outlatch(*this, "outlatch"),
+		m_display(*this, "display"),
+		m_keys(*this, "KEY.%u", 0),
+		m_reset(*this, "RESET")
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
@@ -147,6 +148,7 @@ private:
 	required_device<hc259_device> m_outlatch;
 	required_device<mephisto_display1_device> m_display;
 	required_ioport_array<2> m_keys;
+	required_ioport m_reset;
 
 	void bup_mem(address_map &map);
 	void mm2_mem(address_map &map);
@@ -160,17 +162,16 @@ private:
 
 void mm2_state::machine_reset()
 {
-	m_display->reset();
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 INPUT_CHANGED_MEMBER(mm2_state::reset_button)
 {
 	// RES buttons in serial tied to CPU RESET
-	if (ioport("RESET")->read() == 3)
+	if (m_reset->read() == 3)
 	{
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-		machine_reset();
+		m_display->reset();
 	}
 }
 

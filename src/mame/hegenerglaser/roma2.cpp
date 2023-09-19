@@ -5,7 +5,7 @@
 Mephisto Roma II
 
 Hardware notes:
-- MC68HC000FN10 @ ~10MHz
+- MC68HC000FN10 @ 9.83MHz
 - 64KB ROM (2*27C256), 16KB RAM (2*HY6264LP-10), piezo
 - compatible with magnets chessboard or Mephisto Mobil, and 7seg LCD module
 

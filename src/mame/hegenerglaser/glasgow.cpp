@@ -9,7 +9,7 @@ sp_rinter@gmx.de
 
 TODO:
 - add waitstates, CPU is 12MHz but with DTACK waitstates for slow EPROMs,
-  effective speed is less than 10MHz
+  effective speed is around 7.2MHz
 
 ================================================================================
 
