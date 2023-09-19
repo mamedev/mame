@@ -163,6 +163,7 @@ private:
 void mm2_state::machine_reset()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_display->reset();
 }
 
 INPUT_CHANGED_MEMBER(mm2_state::reset_button)
@@ -171,7 +172,7 @@ INPUT_CHANGED_MEMBER(mm2_state::reset_button)
 	if (m_reset->read() == 3)
 	{
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-		m_display->reset();
+		machine_reset();
 	}
 }
 
