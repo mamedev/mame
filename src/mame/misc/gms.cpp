@@ -855,11 +855,11 @@ static INPUT_PORTS_START( sc2in1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME( "Start / Take" )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME( "Hold 2 / Double Up" )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Paytable" )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME( "Hold 1 / Double Up / Big" )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME( "Hold 3 / Double Up / Small" )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1533,7 +1533,17 @@ void gms_3layers_state::init_sc2in1()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
-	rom[0x45f48 / 2] = 0xff84;
+	rom[0x45f46 / 2] = 0x4e71;
+	rom[0x45f48 / 2] = 0x4e71;
+	rom[0x45f60 / 2] = 0x6000;
+	rom[0x45f70 / 2] = 0x4e71;
+	rom[0x45f72 / 2] = 0x4e71;
+	rom[0x45f9e / 2] = 0x6000;
+	rom[0x46818 / 2] = 0x4e71;
+	rom[0x4681a / 2] = 0x4e71;
+	rom[0x46842 / 2] = 0x4e71;
+	rom[0x46844 / 2] = 0x4e71;
+	//45f46 = 4e71 4e71 45f60 = 6000 45f70 = 4e71 4e71 45f9e = 6000 46818 = 4e71 4e71 46842 = 4e71 4e71
 }
 
 void gms_2layers_state::init_super555()
