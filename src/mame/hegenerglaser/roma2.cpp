@@ -25,6 +25,7 @@ TODO:
 #include "mmdisplay1.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/74259.h"
 #include "sound/dac.h"
 
 #include "speaker.h"
@@ -42,10 +43,12 @@ public:
 	roma2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_outlatch(*this, "outlatch"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
-		m_inputs(*this, "IN.%u", 0)
+		m_inputs(*this, "IN.%u", 0),
+		m_reset(*this, "RESET")
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
@@ -53,38 +56,24 @@ public:
 	void roma2(machine_config &config);
 	void montreal(machine_config &config);
 
-protected:
-	virtual void machine_start() override;
-
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<hc259_device> m_outlatch;
 	required_device<mephisto_board_device> m_board;
 	required_device<mephisto_display1_device> m_display;
 	required_device<dac_byte_interface> m_dac;
 	required_ioport_array<4> m_inputs;
+	optional_ioport m_reset;
 
 	void main_map(address_map &map);
 
-	void strobe_w(u8 data);
-	void dac_w(offs_t offset, u8 data);
-	void input_w(offs_t offset, u8 data);
 	u8 input_r();
-
-	u8 m_dac_data = 0;
-	u8 m_inp_mux = 0xf;
 };
-
-void roma2_state::machine_start()
-{
-	// register for savestates
-	save_item(NAME(m_dac_data));
-	save_item(NAME(m_inp_mux));
-}
 
 INPUT_CHANGED_MEMBER(roma2_state::reset_button)
 {
 	// RES buttons in serial tied to CPU RESET
-	if (ioport("RESET")->read() == 3)
+	if (m_reset->read() == 3)
 	{
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_display->reset();
@@ -97,34 +86,14 @@ INPUT_CHANGED_MEMBER(roma2_state::reset_button)
     I/O
 *******************************************************************************/
 
-void roma2_state::strobe_w(u8 data)
-{
-	// d0: lcd strobe
-	m_display->strobe_w(data & 1);
-}
-
-void roma2_state::dac_w(offs_t offset, u8 data)
-{
-	// a1,d0: dac data
-	u8 mask = 1 << offset;
-	m_dac_data = (m_dac_data & ~mask) | ((data & 1) ? mask : 0);
-	m_dac->write(m_dac_data);
-}
-
-void roma2_state::input_w(offs_t offset, u8 data)
-{
-	// a1-a4,d0: input mux
-	u8 mask = 1 << offset;
-	m_inp_mux = (m_inp_mux & ~mask) | ((data & 1) ? mask : 0);
-}
-
 u8 roma2_state::input_r()
 {
 	u8 data = 0;
+	u8 inp_mux = m_outlatch->output_state() & 0xf;
 
 	// read keypad
 	for (int i = 0; i < 4; i++)
-		if (!BIT(m_inp_mux, i))
+		if (!BIT(inp_mux, i))
 			data |= m_inputs[i]->read();
 
 	return data;
@@ -139,9 +108,7 @@ u8 roma2_state::input_r()
 void roma2_state::main_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
-	map(0x900000, 0x900007).w(FUNC(roma2_state::input_w)).umask16(0xff00);
-	map(0x900008, 0x900008).w(FUNC(roma2_state::strobe_w));
-	map(0x90000c, 0x90000f).w(FUNC(roma2_state::dac_w)).umask16(0xff00);
+	map(0x900000, 0x90000f).w(m_outlatch, FUNC(hc259_device::write_d0)).umask16(0xff00);
 	map(0xc00000, 0xc00000).w(m_board, FUNC(mephisto_board_device::mux_w));
 	map(0xb00000, 0xb00000).w(m_board, FUNC(mephisto_board_device::led_w));
 	map(0xd00000, 0xd00000).r(m_board, FUNC(mephisto_board_device::input_r));
@@ -212,6 +179,11 @@ void roma2_state::roma2(machine_config &config)
 	M68000(config, m_maincpu, 9.8304_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &roma2_state::main_map);
 
+	HC259(config, m_outlatch);
+	// Q0-Q3: input mux; Q4: strobe; Q6-Q7: DAC
+	m_outlatch->q_out_cb<4>().set(m_display, FUNC(mephisto_display1_device::strobe_w));
+	m_outlatch->parallel_out_cb().set(m_dac, FUNC(dac_byte_interface::write)).rshift(6).mask(3);
+
 	const attotime irq_period = attotime::from_hz(9.8304_MHz_XTAL / 0x14000); // 120Hz
 	m_maincpu->set_periodic_int(FUNC(roma2_state::irq5_line_hold), irq_period);
 
@@ -224,7 +196,7 @@ void roma2_state::roma2(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	DAC_2BIT_ONES_COMPLEMENT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.125);
+	DAC_2BIT_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.125);
 }
 
 void roma2_state::montreal(machine_config &config)
