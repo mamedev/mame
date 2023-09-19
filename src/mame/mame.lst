@@ -43136,7 +43136,8 @@ raimaisjo                       // B36 (c) 1988 Taito Corporation
 tubeit                          // ??? no copyright message
 
 @source:taito/taito_o.cpp
-parentj                         // C42 (c) 199? Taito
+eibise                          // C88 (c) 1990 Taito
+parentj                         // C42 (c) 1989 Taito
 
 @source:taito/taito_x.cpp
 ballbros                        // no copyright notice
