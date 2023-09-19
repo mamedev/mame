@@ -694,7 +694,7 @@ void am7990_device_base::initialize()
 	put_u16le(&m_physical_addr[0], init_block[1]);
 	put_u16le(&m_physical_addr[2], init_block[2]);
 	put_u16le(&m_physical_addr[4], init_block[3]);
-	set_mac((char *)m_physical_addr);
+	set_mac(m_physical_addr);
 
 	m_logical_addr_filter = (u64(init_block[7]) << 48) | (u64(init_block[6]) << 32) | (u32(init_block[5]) << 16) | init_block[4];
 
