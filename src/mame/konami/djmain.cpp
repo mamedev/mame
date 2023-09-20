@@ -1926,7 +1926,7 @@ ROM_START( bmcmxaac )
 ROM_END
 
 ROM_START( bscompmx )
-	ROM_REGION( 0x100000, "maincpu", 0 )        /* MC68EC020FG25 MPU */
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* MC68EC020FG25 MPU */
 	ROM_LOAD16_BYTE( "858kab01.6a", 0x000000, 0x80000, CRC(47c19dcc) SHA1(3698c9d5ccaa24626d5a04b20750dc3faf423f68) )
 	ROM_LOAD16_BYTE( "858kab02.8a", 0x000001, 0x80000, CRC(cc848aaa) SHA1(1ebe4f8d3936dbcd0a83dadc3547951fcab39786) )
 
@@ -1936,13 +1936,13 @@ ROM_START( bscompmx )
 	ROM_LOAD16_BYTE( "858kab05.22a", 0x100000, 0x80000, CRC(f59c8e83) SHA1(fe4fee34ce12afc02e709190ec3a756a0cf77e08) )
 	ROM_LOAD16_BYTE( "858kab06.24a", 0x100001, 0x80000, CRC(8de99a50) SHA1(bde3fae982bd0a3492135b20542d87a87dd772ce) )
 
-	ROM_REGION( 0x200000, "k056832", 0 )       /* TILEMAP */
+	ROM_REGION( 0x200000, "k056832", 0 )    /* TILEMAP */
 	ROM_LOAD16_BYTE( "858kab07.22d", 0x000000, 0x80000, CRC(3bd6d429) SHA1(bc63eb4931d528aad6199fa4374f8a7d3cc50094) )
 	ROM_LOAD16_BYTE( "858kab08.23d", 0x000001, 0x80000, CRC(3a16c0bb) SHA1(77c417cab5b71dcfce4225471eb73e26e1adb1bb) )
 	ROM_LOAD16_BYTE( "858kab09.25d", 0x100000, 0x80000, CRC(f4a2fab7) SHA1(b7814a2bb04cb11969295dba97b2755daddbaab6) )
 	ROM_LOAD16_BYTE( "858kab10.27d", 0x100001, 0x80000, CRC(177777fb) SHA1(9d556d7d65a588bad300dbd282c6b5a31629bd6d) )
 
-	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )              /* IDE HARD DRIVE */
 	DISK_IMAGE( "858kab11", 0, SHA1(951376b895782ac57844b25d13a4984d37cc9fc8) ) /* ver 1.00 KA */
 ROM_END
 
@@ -2407,10 +2407,10 @@ void djmain_state::init_bscompmx()
 		0x6b, 0x09, 0x02, 0x0f, 0x05, 0x00, 0x7d, 0x1b
 	};
 
-		init_beatmania();
+	init_beatmania();
 
-		m_ata_master_password = beatmania_master_password;
-		m_ata_user_password = bscompmx_user_password;
+	m_ata_master_password = beatmania_master_password;
+	m_ata_user_password = bscompmx_user_password;
 }
 
 void djmain_state::init_bm4thmix()
