@@ -6071,6 +6071,9 @@ ROM_START( tharrier )
 	ROM_LOAD16_BYTE( "2.18b", 0x00000, 0x20000, CRC(f3887a44) SHA1(4e5b660d33ba1d1e00263030efa67e2db376a234) )
 	ROM_LOAD16_BYTE( "3.21b", 0x00001, 0x20000, CRC(65c247f6) SHA1(9f35f2b6f54814b4c4d23e2d78db8043e678fef2) )
 
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "upl.13m", 0x0000, 0x2000, NO_DUMP ) // 64-pin SDIP covered by sticker, probably M50747 (as in jalmah.cpp) or similar
+
 	ROM_REGION( 0x010000, "audiocpu", 0 )
 	ROM_LOAD( "12.4l", 0x00000, 0x10000, CRC(b959f837) SHA1(073b14935e7d5b0cad19a3471fd26e9e3a363827) )
 
@@ -6103,6 +6106,9 @@ ROM_START( tharrieru )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "u_2.18b", 0x00000, 0x20000, CRC(78923aaa) SHA1(28338f49581180604403e1bd200f524fc4cb8b9f) ) // "U" stamped on label
 	ROM_LOAD16_BYTE( "u_3.21b", 0x00001, 0x20000, CRC(99cea259) SHA1(75abfb08b2358dd13809ade5a2dfffeb8b8df82c) ) // "U" stamped on label
+
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "upl.13m", 0x0000, 0x2000, NO_DUMP ) // 64-pin SDIP covered by sticker, probably M50747 (as in jalmah.cpp) or similar
 
 	ROM_REGION( 0x010000, "audiocpu", 0 )
 	ROM_LOAD( "12.4l", 0x00000, 0x10000, CRC(b959f837) SHA1(073b14935e7d5b0cad19a3471fd26e9e3a363827) )
