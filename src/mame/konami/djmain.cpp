@@ -1943,7 +1943,7 @@ ROM_START( bscompmx )
 	ROM_LOAD16_BYTE( "858kab10.27d", 0x100001, 0x80000, CRC(177777fb) SHA1(9d556d7d65a588bad300dbd282c6b5a31629bd6d) )
 
 	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
-	DISK_IMAGE( "858kab11", 0, SHA1(6980fe76d520639dfb8be4253332edc25251ac23) ) /* ver 1.00 KA */
+	DISK_IMAGE( "858kab11", 0, SHA1(d7739bda95c2891b9bdc936bac16f66eed7e82a1) ) /* ver 1.00 KA */
 ROM_END
 
 ROM_START( bm4thmix )
