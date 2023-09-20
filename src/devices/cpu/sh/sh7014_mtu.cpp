@@ -144,7 +144,6 @@ void sh7014_mtu_channel_device::device_start()
 	save_item(NAME(m_tgr_clearing));
 
 	m_timer = timer_alloc(FUNC(sh7014_mtu_channel_device::timer_callback), this);
-	m_timer->adjust(attotime::never);
 }
 
 void sh7014_mtu_channel_device::device_reset()
@@ -164,6 +163,8 @@ void sh7014_mtu_channel_device::device_reset()
 	m_phase = 0;
 	m_counter_cycle = 0x10000;
 	m_tgr_clearing = TGR_CLEAR_NONE;
+
+	m_timer->adjust(attotime::never);
 }
 
 void sh7014_mtu_channel_device::map_chan0(address_map &map)
