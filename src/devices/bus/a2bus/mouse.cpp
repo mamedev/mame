@@ -54,7 +54,9 @@
         68705 PB4 and 5 are N/C
         68705 PB6 is IRQ for the slot
         68705 PB7 is the mouse button
+
         68705 is clocked at 2M
+        PIA is clocked at 1M
 
     See the schematic at:
     http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Interface%20Cards/Digitizers/Apple%20Mouse%20Interface%20Card/Schematics/
@@ -188,7 +190,7 @@ void a2bus_mouse_device::device_add_mconfig(machine_config &config)
 	m_mcu->portb_w().set(FUNC(a2bus_mouse_device::mcu_port_b_w));
 	m_mcu->portc_w().set(FUNC(a2bus_mouse_device::mcu_port_c_w));
 
-	PIA6821(config, m_pia);
+	PIA6821(config, m_pia, 1021800);
 	m_pia->writepa_handler().set(FUNC(a2bus_mouse_device::pia_out_a));
 	m_pia->writepb_handler().set(FUNC(a2bus_mouse_device::pia_out_b));
 	m_pia->tspb_handler().set_constant(0x00);

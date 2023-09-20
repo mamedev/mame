@@ -46,7 +46,7 @@ const tiny_rom_entry *bbc_mertec_device::device_rom_region() const
 
 void bbc_mertec_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia);
+	PIA6821(config, m_pia, DERIVED_CLOCK(1, 8));
 	//m_pia->readpb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_r));
 	//m_pia->writepb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_w));
 	//m_pia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));

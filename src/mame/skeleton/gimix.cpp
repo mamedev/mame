@@ -702,13 +702,13 @@ void gimix_state::gimix(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:3", gimix_floppies, "525hd", gimix_state::floppy_formats).enable_sound(true);
 
 	/* parallel ports */
-	pia6821_device &pia1(PIA6821(config, "pia1"));
+	pia6821_device &pia1(PIA6821(config, "pia1", 2'000'000));
 	pia1.writepa_handler().set(FUNC(gimix_state::pia_pa_w));
 	pia1.writepb_handler().set(FUNC(gimix_state::pia_pb_w));
 	pia1.readpa_handler().set(FUNC(gimix_state::pia_pa_r));
 	pia1.readpb_handler().set(FUNC(gimix_state::pia_pb_r));
 
-	PIA6821(config, "pia2");
+	PIA6821(config, "pia2", 2'000'000);
 
 	/* serial ports */
 	ACIA6850(config, m_acia1, 2'000'000);
