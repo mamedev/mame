@@ -1264,6 +1264,8 @@ public:
 
 	void truckk(machine_config &config);
 
+	void init_truckk();
+
 private:
 	void cdxa_psx_map(address_map &map);
 
@@ -2035,6 +2037,20 @@ void namcos12_cdxa_state::truckk(machine_config &config)
 	m_sub->write_sci_tx<0>().set(iocpu, FUNC(h8_device::sci_rx_w<0>));
 
 	config.set_maximum_quantum(attotime::from_hz(2*115200));
+}
+
+void namcos12_cdxa_state::init_truckk()
+{
+	init_alt_bank1();
+
+	/*
+	HACK: Change order of code so that the status flags are set before DMA 5 is started
+	Can be checked at 0x8001f6e4
+	*/
+	uint8_t temp[5 * 4];
+	memcpy(temp, memregion( "maincpu:rom" )->base() + 0x376ec, sizeof(temp)); // copy the 5 instructions that initialize statuses before DMA 5 finishes
+	memcpy(memregion( "maincpu:rom" )->base() + 0x376e4 + sizeof(temp), memregion( "maincpu:rom" )->base() + 0x376e4, 2 * 4); // move the 2 DMA start call instructions below where the initialization code will go
+	memcpy(memregion( "maincpu:rom" )->base() + 0x376e4, temp, sizeof(temp)); // write initialization code in new spot
 }
 
 static INPUT_PORTS_START( namcos12 )
@@ -3609,7 +3625,7 @@ GAME( 1999, aquarush,  0,        coh700,   namcos12,  namcos12_state,          i
 GAME( 1999, golgo13,   0,        golgo13,  golgo13,   namcos12_boothack_state, init_alt_bank1,ROT0, "Eighting / Raizing / Namco", "Golgo 13 (Japan, GLG1/VER.A)", 0 ) /* KC054 */
 GAME( 2000, g13knd,    0,        golgo13,  golgo13,   namcos12_boothack_state, init_alt_bank1,ROT0, "Eighting / Raizing / Namco", "Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)", 0 ) /* KC059 */
 GAME( 2000, sws2000,   0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Namco",           "Super World Stadium 2000 (Japan, SS01/VER.A)", MACHINE_NOT_WORKING ) /* KC055 */
-GAME( 2000, truckk,    0,        truckk,   truckk,    namcos12_cdxa_state,     init_alt_bank1,ROT0, "Metro / Namco",   "Truck Kyosokyoku (Japan, TKK2/VER.A)", MACHINE_IMPERFECT_SOUND ) /* KC056 */
+GAME( 2000, truckk,    0,        truckk,   truckk,    namcos12_cdxa_state,     init_truckk,   ROT0, "Metro / Namco",   "Truck Kyosokyoku (Japan, TKK2/VER.A)", MACHINE_IMPERFECT_SOUND ) /* KC056 */
 GAME( 2000, kartduel,  0,        kartduel, kartduel,  namcos12_boothack_state, init_namcos12, ROT0, "Gaps / Namco",    "Kart Duel (World, KTD2/VER.A)", MACHINE_NOT_WORKING ) /* KC057 */
 GAME( 2000, kartduelj, kartduel, kartduel, kartduel,  namcos12_boothack_state, init_namcos12, ROT0, "Gaps / Namco",    "Kart Duel (Japan, KTD1/VER.A)", MACHINE_NOT_WORKING ) /* KC057 */
 GAME( 2001, sws2001,   sws2000,  coh716,   namcos12,  namcos12_boothack_state, init_alt_bank1,ROT0, "Namco",           "Super World Stadium 2001 (Japan, SS11/VER.A)", MACHINE_NOT_WORKING ) /* KC061 */
