@@ -163,6 +163,12 @@ private:
 	u8 m_esb_select = 0;
 };
 
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
+
 void brikett_state::machine_start()
 {
 	// register for savestates
@@ -197,6 +203,8 @@ void brikett_state::set_cpu_freq()
 /*******************************************************************************
     I/O
 *******************************************************************************/
+
+// base hardware
 
 INTERRUPT_GEN_MEMBER(brikett_state::interrupt)
 {
@@ -234,6 +242,9 @@ u8 brikett_state::input_r(offs_t offset)
 
 	return data;
 }
+
+
+// ESB 6000
 
 void brikett_state::esb_w(u8 data)
 {

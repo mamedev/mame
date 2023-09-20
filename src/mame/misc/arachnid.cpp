@@ -502,7 +502,7 @@ void arachnid_state::arachnid(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MK48Z02 (or DS1220Y)
 
 	// devices
-	PIA6821(config, m_pia_u4, 0);
+	PIA6821(config, m_pia_u4);
 	m_pia_u4->readpa_handler().set(FUNC(arachnid_state::pia_u4_pa_r));
 	m_pia_u4->readpb_handler().set(FUNC(arachnid_state::pia_u4_pb_r));
 	m_pia_u4->readca1_handler().set(FUNC(arachnid_state::pia_u4_pca_r));
@@ -512,7 +512,7 @@ void arachnid_state::arachnid(machine_config &config)
 	m_pia_u4->ca2_handler().set(FUNC(arachnid_state::pia_u4_pca_w));
 	m_pia_u4->cb2_handler().set(FUNC(arachnid_state::pia_u4_pcb_w));
 
-	PIA6821(config, m_pia_u17, 0);
+	PIA6821(config, m_pia_u17);
 	m_pia_u17->readpa_handler().set(FUNC(arachnid_state::pia_u17_pa_r));
 	m_pia_u17->ca1_w(1); // CA1 - 1000 HZ Input
 	m_pia_u17->writepb_handler().set(FUNC(arachnid_state::pia_u17_pb_w));

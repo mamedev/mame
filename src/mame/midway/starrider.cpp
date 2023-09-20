@@ -394,7 +394,7 @@ void sr_state::starrider(machine_config &config)
 	MC6809E(config, m_main_cpu, 24_MHz_XTAL / 2 / 12); // 6809E - clock patterns generated using 82S123 and 74F374 at VGG U114 and U101
 	m_main_cpu->set_addrmap(AS_PROGRAM, &sr_state::main_memory);
 
-	PIA6821(config, m_main_pia1, 24_MHz_XTAL / 2 / 12); // 6820/21
+	PIA6821(config, m_main_pia1); // 6820/21
 	m_main_pia1->readpa_handler().set_ioport("IN2");
 	// CA1 is the /END SCREEN signal
 	// CA2 is the 4MS signal
@@ -403,7 +403,7 @@ void sr_state::starrider(machine_config &config)
 	m_main_pia1->irqa_handler().set("main.irq", FUNC(input_merger_device::in_w<0>));
 	m_main_pia1->irqb_handler().set("main.irq", FUNC(input_merger_device::in_w<1>));
 
-	PIA6821(config, m_main_pia2, 24_MHz_XTAL / 2 / 12); // 6820/21
+	PIA6821(config, m_main_pia2); // 6820/21
 	m_main_pia2->readpa_handler().set_ioport("IN0");
 	m_main_pia2->ca1_w(0); // grounded
 	m_main_pia2->ca2_handler().set(FUNC(sr_state::cpu_pia2_ca2_w));
@@ -414,7 +414,7 @@ void sr_state::starrider(machine_config &config)
 
 	NVRAM(config, "cpu.u9", nvram_device::DEFAULT_ALL_0);
 
-	ADDRESS_MAP_BANK(config, m_main_banks, 24_MHz_XTAL / 2 / 12);
+	ADDRESS_MAP_BANK(config, m_main_banks);
 	m_main_banks->set_map(&sr_state::main_banks);
 	m_main_banks->set_data_width(8);
 	m_main_banks->set_addr_width(20);
@@ -423,7 +423,7 @@ void sr_state::starrider(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, "main.irq").output_handler().set_inputline(m_main_cpu, M6809_IRQ_LINE);
 
 	// VGG
-	PIA6821(config, m_vgg_pia, 24_MHz_XTAL / 2 / 12); // 6821
+	PIA6821(config, m_vgg_pia); // 6821
 	// PA0-8 and CA2 are outputs to the expander board
 	// CA1 is the /HALT signal
 	// PB0-7 and CB1-2 are the interface to the PIF board (bidirectional)
@@ -436,7 +436,7 @@ void sr_state::starrider(machine_config &config)
 	MC6809E(config, m_pif_cpu, 4_MHz_XTAL / 4); // 6809E
 	m_pif_cpu->set_addrmap(AS_PROGRAM, &sr_state::pif_memory);
 
-	PIA6821(config, m_pif_pia, 4_MHz_XTAL / 4); // 6821
+	PIA6821(config, m_pif_pia); // 6821
 	m_pif_pia->irqa_handler().set_inputline(m_pif_cpu, M6809_FIRQ_LINE);
 	m_pif_pia->irqb_handler().set_inputline(m_pif_cpu, INPUT_LINE_NMI);
 
@@ -452,14 +452,14 @@ void sr_state::starrider(machine_config &config)
 	m_sound_ptm->o3_callback().set(m_sound_ptm, FUNC(ptm6840_device::set_c3));
 	m_sound_ptm->irq_callback().set("sound.irq", FUNC(input_merger_device::in_w<0>));
 
-	PIA6821(config, m_sound_pia1, 8_MHz_XTAL / 4); // 68B21
+	PIA6821(config, m_sound_pia1); // 68B21
 	m_sound_pia1->ca2_handler().set(m_main_pia1, FUNC(pia6821_device::cb1_w));
 	// PB0-7 are for unpopulated 5220 at U55
 	// CB1-2 are unused
 	m_sound_pia1->irqa_handler().set_inputline(m_sound_cpu, M6809_FIRQ_LINE);
 	m_sound_pia1->irqb_handler().set("sound.irq", FUNC(input_merger_device::in_w<1>));
 
-	PIA6821(config, m_sound_pia2, 8_MHz_XTAL / 4); // 68B21
+	PIA6821(config, m_sound_pia2); // 68B21
 	m_sound_pia2->writepa_handler().set(FUNC(sr_state::sound_pia2_pa));
 	// PA3 is the IR output from the unpopulated third FIFO (active low)
 	// PA7 is the RDY output from the unpopulated 5220 (active low)

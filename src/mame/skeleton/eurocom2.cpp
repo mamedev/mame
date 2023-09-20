@@ -426,7 +426,7 @@ void eurocom2_state::eurocom2(machine_config &config)
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(eurocom2_state::kbd_put));
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->ca2_w(m_sst_state); // SST output Q14
 	m_pia1->cb1_w(m_sst_state); // SST output Q6
 	m_pia1->cb2_handler().set(FUNC(eurocom2_state::pia1_cb2_w)); // SST reset input
@@ -435,7 +435,7 @@ void eurocom2_state::eurocom2(machine_config &config)
 //  m_pia1->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 //  m_pia1->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	PIA6821(config, m_pia2, 0);
+	PIA6821(config, m_pia2);
 //  m_pia2->irqa_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
 //  m_pia2->irqb_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
 
@@ -463,7 +463,7 @@ void waveterm_state::waveterm(machine_config &config)
 
 	// ports A(in/out), B(out), CA1(in), CA2(in), and CB2(out) = interface to PPG bus via DIL socket on WTI board
 	// CB1 -- front panel "End" button
-	PIA6821(config, m_pia3, 0);
+	PIA6821(config, m_pia3);
 //  m_pia3->readpa_handler().set(FUNC(waveterm_state::pia3_pa_r));
 //  m_pia3->writepa_handler().set(FUNC(waveterm_state::pia3_pa_w));
 	m_pia3->writepb_handler().set(FUNC(waveterm_state::pia3_pb_w));

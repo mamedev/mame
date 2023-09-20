@@ -96,7 +96,7 @@ void bbc_cumana68k_device::device_add_mconfig(machine_config &config)
 			downcast<nscsi_callback_device&>(*device).req_callback().append(m_pia_sasi, FUNC(pia6821_device::ca1_w));
 		});
 
-	PIA6821(config, m_pia_sasi, 0);
+	PIA6821(config, m_pia_sasi);
 	m_pia_sasi->readpa_handler().set(m_sasi, FUNC(nscsi_callback_device::read));
 	m_pia_sasi->writepa_handler().set(m_sasi, FUNC(nscsi_callback_device::write));
 	m_pia_sasi->writepb_handler().set(FUNC(bbc_cumana68k_device::pia_sasi_pb_w));
@@ -106,7 +106,7 @@ void bbc_cumana68k_device::device_add_mconfig(machine_config &config)
 	m_pia_sasi->irqa_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 	m_pia_sasi->irqb_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
-	PIA6821(config, m_pia_rtc, 0);
+	PIA6821(config, m_pia_rtc);
 	m_pia_rtc->readpa_handler().set([this]() { return m_mc146818_data; });
 	m_pia_rtc->writepa_handler().set([this](uint8_t data) { m_mc146818_data = data; });
 	m_pia_rtc->writepb_handler().set(FUNC(bbc_cumana68k_device::pia_rtc_pb_w));

@@ -4,6 +4,8 @@
 
 Mephisto Roma II
 
+It's a cost-reduced version of Roma 68000, not really a 'sequel'.
+
 Hardware notes:
 - MC68HC000FN10 @ 9.83MHz
 - 64KB ROM (2*27C256), 16KB RAM (2*HY6264LP-10), piezo

@@ -517,7 +517,7 @@ void bitgraph_state::bg_motherboard(machine_config &config)
 	m_dbrgb->fr_handler().set(FUNC(bitgraph_state::com8116_b_fr_w));
 	m_dbrgb->ft_handler().set(FUNC(bitgraph_state::com8116_b_ft_w));
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readca1_handler().set(FUNC(bitgraph_state::pia_ca1_r));
 	m_pia->cb2_handler().set(FUNC(bitgraph_state::pia_cb2_w));
 	m_pia->readpa_handler().set(FUNC(bitgraph_state::pia_pa_r));

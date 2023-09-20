@@ -829,7 +829,7 @@ bool m68sfdc_device::pll_write_next_bit(bool bit, attotime &tm, floppy_image_dev
 
 void m68sfdc_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(m68sfdc_device::pia_pa_r));
 	m_pia->writepa_handler().set(FUNC(m68sfdc_device::pia_pa_w));
 	m_pia->ca1_w(0);

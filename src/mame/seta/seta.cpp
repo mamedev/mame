@@ -9222,8 +9222,8 @@ void jockeyc_state::inttoote(machine_config &config)
 	m_layers[0]->set_xoffsets(0, -2);
 
 	// I/O board (not hooked up yet)
-	PIA6821(config, "pia0", 0);
-	PIA6821(config, "pia1", 0);
+	PIA6821(config, "pia0");
+	PIA6821(config, "pia1");
 
 	ACIA6850(config, "acia1", 0);
 	ACIA6850(config, "acia2", 0);

@@ -261,7 +261,7 @@ void eacc_state::eacc(machine_config &config)
 
 	config.set_default_layout(layout_eacc);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpb_handler().set(FUNC(eacc_state::keyboard_r));
 	m_pia->writepa_handler().set(FUNC(eacc_state::segment_w));
 	m_pia->writepb_handler().set(FUNC(eacc_state::digit_w));

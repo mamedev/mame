@@ -324,14 +324,14 @@ void v6809_state::v6809(machine_config &config)
 	keyboard.set_keyboard_callback(FUNC(v6809_state::kbd_put));
 
 	// port A = drive select and 2 control lines ; port B = keyboard
-	PIA6821(config, m_pia0, 0);
+	PIA6821(config, m_pia0);
 	m_pia0->readpb_handler().set(FUNC(v6809_state::pb_r));
 	m_pia0->writepa_handler().set(FUNC(v6809_state::pa_w));
 	m_pia0->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	m_pia0->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
 	// no idea what this does
-	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia6821_device &pia1(PIA6821(config, "pia1"));
 	pia1.irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	pia1.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 

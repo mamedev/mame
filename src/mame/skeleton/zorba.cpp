@@ -185,13 +185,13 @@ void zorba_state::zorba(machine_config &config)
 
 	// port A - disk select etc, beeper
 	// port B - parallel interface
-	PIA6821(config, m_pia0, 0);
+	PIA6821(config, m_pia0);
 	m_pia0->writepa_handler().set(FUNC(zorba_state::pia0_porta_w));
 	m_pia0->writepb_handler().set("parprndata", FUNC(output_latch_device::write));
 	m_pia0->cb2_handler().set("parprn", FUNC(centronics_device::write_strobe));
 
 	// IEEE488 interface
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpa_handler().set(m_ieee, FUNC(ieee488_device::dio_r)); // TODO: gated with PB1
 	m_pia1->writepa_handler().set(m_ieee, FUNC(ieee488_device::host_dio_w)); // TODO: gated with PB1
 	m_pia1->readpb_handler().set(FUNC(zorba_state::pia1_portb_r));

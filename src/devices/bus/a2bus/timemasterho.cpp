@@ -138,7 +138,7 @@ ioport_constructor a2bus_timemasterho_device::device_input_ports() const
 
 void a2bus_timemasterho_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia, 1021800);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(a2bus_timemasterho_device::pia_out_a));
 	m_pia->writepb_handler().set(FUNC(a2bus_timemasterho_device::pia_out_b));
 	m_pia->irqa_handler().set(FUNC(a2bus_timemasterho_device::pia_irqa_w));

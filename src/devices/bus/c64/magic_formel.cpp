@@ -98,7 +98,7 @@ void c64_magic_formel_cartridge_device::pia_cb2_w(int state)
 
 void c64_magic_formel_cartridge_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(c64_magic_formel_cartridge_device::pia_pa_w));
 	m_pia->writepb_handler().set(FUNC(c64_magic_formel_cartridge_device::pia_pb_w));
 	m_pia->cb2_handler().set(FUNC(c64_magic_formel_cartridge_device::pia_cb2_w));

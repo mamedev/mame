@@ -279,7 +279,7 @@ void sphinx40_state::sphinx40(machine_config &config)
 	const attotime irq_period = attotime::from_hz(8000000 / 0x1000);
 	m_maincpu->set_periodic_int(FUNC(sphinx40_state::irq4_line_hold), irq_period);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(sphinx40_state::cb_mux_w));
 	m_pia->writepb_handler().set(FUNC(sphinx40_state::cb_leds_w));
 	m_pia->cb2_handler().set("dac", FUNC(dac_bit_interface::write));
