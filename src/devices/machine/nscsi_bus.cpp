@@ -642,7 +642,9 @@ void nscsi_full_device::set_sense_data(const u8 sense_key, const u16 sense_key_c
 
 void nscsi_full_device::sense(bool deferred, uint8_t key, uint8_t asc, uint8_t ascq)
 {
-	set_sense_data(key, (asc << 8) | ascq, { .deferred = deferred });
+	sense_data s;
+	s.deferred = deferred;
+	set_sense_data(key, (asc << 8) | ascq, s);
 }
 
 void nscsi_full_device::report_condition(const u8 sense_key, const u16 sense_key_code, const sense_data data)
@@ -666,37 +668,57 @@ void nscsi_full_device::report_bad_cmd(const u8 cmd)
 void nscsi_full_device::report_filemark(const s32 info, const bool eom)
 {
 	LOG("    *** FILEMARK info=%d\n", info);
-	report_condition(SK_NO_SENSE, SKC_FILEMARK_DETECTED, { .filemark = true, .eom = eom, .info = info });
+	sense_data s;
+	s.filemark = true;
+	s.eom = eom;
+	s.info = info;
+	report_condition(SK_NO_SENSE, SKC_FILEMARK_DETECTED, s);
 }
 
 void nscsi_full_device::report_bom(const s32 info)
 {
 	LOG("    *** BOM info=%d\n", info);
-	report_condition(SK_NO_SENSE, SKC_BEGINNING_OF_PARTITION_MEDIUM_DETECTED, { .eom = true, .info = info });
+	sense_data s;
+	s.eom = true;
+	s.info = info;
+	report_condition(SK_NO_SENSE, SKC_BEGINNING_OF_PARTITION_MEDIUM_DETECTED, s);
 }
 
 void nscsi_full_device::report_ew(const s32 info)
 {
 	LOG("    EW info=%d\n", info);
-	report_condition(SK_NO_SENSE, SKC_END_OF_PARTITION_MEDIUM_DETECTED, { .eom = true, .info = info });
+	sense_data s;
+	s.eom = true;
+	s.info = info;
+	report_condition(SK_NO_SENSE, SKC_END_OF_PARTITION_MEDIUM_DETECTED, s);
 }
 
 void nscsi_full_device::report_eod(const s32 info, const bool eom)
 {
 	LOG("    *** EOD info=%d\n", info);
-	report_condition(SK_BLANK_CHECK, SKC_END_OF_DATA_DETECTED, { .eom = eom, .info = info });
+	sense_data s;
+	s.eom = eom;
+	s.info = info;
+	report_condition(SK_BLANK_CHECK, SKC_END_OF_DATA_DETECTED, s);
 }
 
 void nscsi_full_device::report_eom(const bool write, const s32 info, const bool invalid)
 {
 	LOG("    *** EOM info=%d invalid=%d\n", info, invalid);
-	report_condition(write ? SK_VOLUME_OVERFLOW : SK_MEDIUM_ERROR, SKC_END_OF_PARTITION_MEDIUM_DETECTED, { .invalid = invalid, .eom = true, .info = info });
+	sense_data s;
+	s.invalid = invalid;
+	s.eom = true;
+	s.info = info;
+	report_condition(write ? SK_VOLUME_OVERFLOW : SK_MEDIUM_ERROR, SKC_END_OF_PARTITION_MEDIUM_DETECTED, s);
 }
 
 void nscsi_full_device::report_bad_len(const bool over, const s32 info)
 {
 	LOG("    *** %sLENGTH BLOCK info=%d\n", over ? "OVER" : "UNDER", info);
-	report_condition(SK_ILLEGAL_REQUEST, SKC_NO_ADDITIONAL_SENSE_INFORMATION, { .bad_len = true, .info = info });
+	sense_data s;
+	s.bad_len = true;
+	s.info = info;
+	report_condition(SK_ILLEGAL_REQUEST, SKC_NO_ADDITIONAL_SENSE_INFORMATION, s);
 }
 
 void nscsi_full_device::report_bad_cdb_field()
