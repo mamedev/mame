@@ -960,12 +960,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 						buffer_offset = 0;
 						data_len = 2352;
 					}
-					else if (track_type == cdrom_file::CD_TRACK_MODE1)
-					{
-						buffer_offset = 0;
-						data_len = 2048;
-					}
-					else if (track_type == cdrom_file::CD_TRACK_MODE1_RAW)
+					else if (track_type == cdrom_file::CD_TRACK_MODE1 || track_type == cdrom_file::CD_TRACK_MODE1_RAW)
 					{
 						buffer_offset = 16;
 						data_len = 2048;
