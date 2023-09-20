@@ -5849,10 +5849,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="fiveholy">
-		<description>Five Holy Girls (Japan)</description>
+		<description>Seijo Densetsu: Five Holy Girls (Japan)</description>
 		<year>1987</year>
 		<publisher>Cosmos Computer</publisher>
-		<info name="alt_title" value="聖女伝説"/>
+		<info name="alt_title" value="聖女伝説 Five Holy Girls"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R. Requires a Japanese system."/>
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="93926">
@@ -6866,7 +6866,7 @@ license:CC0-1.0
 		<description>Golden Grave II (Japan)</description>
 		<year>1985</year>
 		<publisher>Magical Zoo</publisher>
-		<info name="alt_title" value="続黄金の墓"/>
+		<info name="alt_title" value="続・黄金の墓 スフィンクスの謎"/>
 		<info name="serial" value="MXMH21037"/>
 		<info name="usage" value="Load with CLOAD + RUN. Requires a Japanese system"/>
 		<part name="cass1" interface="msx_cass">
