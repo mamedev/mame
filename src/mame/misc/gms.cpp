@@ -55,13 +55,14 @@ Keep pressed 9 and press reset to enter service mode.
 
 TODO:
 - correct decode for 1st layer in sc2in1 and magslot
-- tilemap priorities for cots and ballch
+- fix 1st tilemap transparency enable
 - correct EEPROM hookup for all games
 - oki banking
 - hookup MCU and YM2151 sound for the mahjong games
 - hookup PIC16F84 for rbspm once a CPU core is available
 - emulate protection devices correctly instead of patching
 - hookup lamps and do layouts
+- keyboard inputs for mahjong games
 */
 
 #include "emu.h"
@@ -76,6 +77,16 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+
+
+// configurable logging
+#define LOG_TILEATTR (1U << 1)
+
+#define VERBOSE (LOG_GENERAL | LOG_TILEATTR)
+
+#include "logmacro.h"
+
+#define LOGTILEATTR(...) LOGMASKED(LOG_TILEATTR, __VA_ARGS__)
 
 
 namespace {
@@ -100,6 +111,7 @@ public:
 	void rbspm(machine_config &config);
 
 	void super555(machine_config &config);
+	void train(machine_config &config);
 
 	void init_ballch();
 	void init_cots();
@@ -145,6 +157,7 @@ private:
 	void mcu_io_mux_w(uint8_t data);
 	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
+	DECLARE_VIDEO_START(train) { video_start(); m_tilemap[0]->set_transparent_pen(0); } // TODO: this shouldn't be needed
 	TILE_GET_INFO_MEMBER(get_tile0_info);
 	TILE_GET_INFO_MEMBER(get_tile1_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -193,6 +206,22 @@ uint16_t gms_2layers_state::input_matrix_r()
 void gms_2layers_state::tilebank_w(uint16_t data)
 {
 	m_tilebank = data;
+
+	// fedcba98 76543210
+	// xxxx              // unknown (never seen set, possibly a 4th tilemap not used by the dumped games?)
+	//     x             // 3rd tilemap enable (probably)
+	//      xx           // bank 3rd tilemap
+	//        x          // unknown (never seen set)
+	//          x        // unknown (never seen set)
+	//           x       // unknown (set during most screens in the mahjong games and in sc2in1')
+	//            x      // priority between 1st and 2nd tilemaps
+	//             x     // bank 1st tilemap
+	//              x    // 1st tilemap enable (probably)
+	//               xx  // bank 2nd tilemap
+	//                 x // 2nd tilemap enable (probably)
+
+	if (m_tilebank & 0xf1c0)
+		LOGTILEATTR("%04x\n", m_tilebank);
 }
 
 template <uint8_t Which>
@@ -1176,7 +1205,7 @@ GFXDECODE_END
 static GFXDECODE_START( gfx_magslot )
 	GFXDECODE_ENTRY( "gfx1", 0, magslot16_layout,         0x000, 16  )
 	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_lsb,     0x100, 16  )
-	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_packed_lsb,     0x100, 16  ) // wrong colors
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_packed_lsb,     0x400, 16  )
 GFXDECODE_END
 
 void gms_2layers_state::video_start()
@@ -1184,6 +1213,7 @@ void gms_2layers_state::video_start()
 	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gms_2layers_state::get_tile0_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gms_2layers_state::get_tile1_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
+	//m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);
 
 	save_item(NAME(m_tilebank));
@@ -1218,20 +1248,34 @@ TILE_GET_INFO_MEMBER(gms_3layers_state::get_tile2_info)
 	tileinfo.set(2, (tile & 0x0fff) + ((m_tilebank >> 9) & 3) * 0x1000, tile >> 12, 0);
 }
 
-// TODO:  ballch's and cots' title screens highlight a priority bug: the title and copyright are drawn behind the background
+
 uint32_t gms_2layers_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tilemap[0]->draw(screen, bitmap, cliprect);
-	m_tilemap[1]->draw(screen, bitmap, cliprect);
+	if (BIT(m_tilebank, 3) && BIT(m_tilebank, 5))
+		m_tilemap[0]->draw(screen, bitmap, cliprect);
+
+	if (BIT(m_tilebank, 0))
+		m_tilemap[1]->draw(screen, bitmap, cliprect);
+
+	if (BIT(m_tilebank, 3) && !BIT(m_tilebank, 5))
+		m_tilemap[0]->draw(screen, bitmap, cliprect);
 
 	return 0;
 }
 
 uint32_t gms_3layers_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tilemap[0]->draw(screen, bitmap, cliprect);
-	m_tilemap[1]->draw(screen, bitmap, cliprect);
-	m_tilemap[2]->draw(screen, bitmap, cliprect);
+	if (BIT(m_tilebank, 3) && BIT(m_tilebank, 5))
+		m_tilemap[0]->draw(screen, bitmap, cliprect);
+
+	if (BIT(m_tilebank, 0))
+		m_tilemap[1]->draw(screen, bitmap, cliprect);
+
+	if (BIT(m_tilebank, 3) && !BIT(m_tilebank, 5))
+		m_tilemap[0]->draw(screen, bitmap, cliprect);
+
+	if (BIT(m_tilebank, 11))
+		m_tilemap[2]->draw(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -1291,6 +1335,13 @@ void gms_2layers_state::super555(machine_config &config)
 	config.device_remove("ymsnd");
 }
 
+void gms_2layers_state::train(machine_config &config)
+{
+	super555(config);
+
+	MCFG_VIDEO_START_OVERRIDE(gms_2layers_state, train)
+}
+
 void gms_3layers_state::magslot(machine_config &config)
 {
 	super555(config);
@@ -1333,7 +1384,7 @@ http://youtu.be/pPk-6N1wXoE
 http://youtu.be/VGbrR7GfDck
 */
 
-ROM_START( rbspm )
+ROM_START( rbspm ) // PCB NO.6899-B
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD( "mj-dfmj-p1.bin", 0x00000, 0x80000, CRC(8f81f154) SHA1(50a9a373dec96b0265907f053d068d636bdabd61) )
 
@@ -1361,7 +1412,7 @@ ROM_START( rbspm )
 ROM_END
 
 
-ROM_START( super555 )
+ROM_START( super555 ) // GMS branded chips: A66, A68, M06
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD( "super555-v1.5e-0d9b.u64", 0x00000, 0x80000, CRC(9a9c16cc) SHA1(95609dbd45feb591190a2b62dee8846cdcec3462) )
 
@@ -1379,7 +1430,9 @@ ROM_START( super555 )
 ROM_END
 
 
-ROM_START( sc2in1 ) // Basically same PCB as magslot, but with only 1 dip bank. Most labels have been covered with other labels with 'TETRIS' hand-written
+// Basically same PCB as magslot, but with only 1 dip bank. Most labels have been covered with other labels with 'TETRIS' hand-written
+// GMS-branded chips: A66, A89, A201, A202. Not populated: M88
+ROM_START( sc2in1 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD( "u64", 0x00000, 0x80000, CRC(c0ad5df0) SHA1(a51f30e76493ea9fb5313c0064dac9a2a4f70cc3) )
 
@@ -1401,6 +1454,7 @@ ROM_END
 
 
 // the PCB is slightly different from the others, both layout-wise and component-wise, but it's mostly compatible. It seems to use one more GFX layer and not to have the 89C51.
+// GMS-branded chips: A66, A89, A201, A202. Not populated: M88
 ROM_START( magslot ) // All labels have SLOT canceled with a black pen. No sum matches the one on label.
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD( "magic 1.0c _ _ _ _.u64", 0x00000, 0x80000, CRC(84544dd7) SHA1(cf10ad3373c2f35f5fa7986be0865f760a454c28) ) // no sum on label, 1xxxxxxxxxxxxxxxxxx = 0x00
@@ -1432,7 +1486,7 @@ Major components:
   CPU: MC68HC00F16
 Sound: OKI 6295
   OSC: 22.00MHz
-EEPOM: ISSI 93C46
+EEPROM: ISSI 93C46
   DSW: 3 x 8-position switches
   BAT: 3.6v Varta battery
 
@@ -1471,7 +1525,7 @@ Major components:
   CPU: MC68HC00F16
 Sound: OKI 6295
   OSC: 22.00MHz
-EEPOM: ISSI 93C46
+EEPROM: ISSI 93C46
   DSW: 3 x 8-position switches
   BAT: 3.6v Varta battery
 
@@ -1543,7 +1597,6 @@ void gms_3layers_state::init_sc2in1()
 	rom[0x4681a / 2] = 0x4e71;
 	rom[0x46842 / 2] = 0x4e71;
 	rom[0x46844 / 2] = 0x4e71;
-	//45f46 = 4e71 4e71 45f60 = 6000 45f70 = 4e71 4e71 45f9e = 6000 46818 = 4e71 4e71 46842 = 4e71 4e71
 }
 
 void gms_2layers_state::init_super555()
@@ -1589,5 +1642,5 @@ GAME( 2001, sc2in1,   0, magslot,  sc2in1,   gms_3layers_state, init_sc2in1,   R
 GAME( 2003, magslot,  0, magslot,  magslot,  gms_3layers_state, empty_init,    ROT0,  "GMS", "Magic Slot (normal 1.0C)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // needs implementing of 3rd GFX layer, correct GFX decode for 1st layer, inputs
 
 // train games
-GAME( 2002, ballch,   0, super555, ballch,   gms_2layers_state, init_ballch,   ROT0,  "TVE", "Ball Challenge (20020607 1.0 OVERSEA)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
-GAME( 2005, cots,     0, super555, cots,     gms_2layers_state, init_cots,     ROT0,  "ECM", "Creatures of the Sea (20050328 USA 6.3)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
+GAME( 2002, ballch,   0, train,    ballch,   gms_2layers_state, init_ballch,   ROT0,  "TVE", "Ball Challenge (20020607 1.0 OVERSEA)",     MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
+GAME( 2005, cots,     0, train,    cots,     gms_2layers_state, init_cots,     ROT0,  "ECM", "Creatures of the Sea (20050328 USA 6.3)",   MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now

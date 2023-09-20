@@ -720,7 +720,7 @@ license:CC0-1.0
 		<publisher>unknown</publisher>
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="0x10000">
-				<rom name="sonnyxpr.bin" size="0x10000" crc="cb67bcd8" sha1="578cdce33420facf19d2b7227b41693adde5b60e"/>
+				<rom name="sonnyxpra.bin" size="0x10000" crc="cb67bcd8" sha1="578cdce33420facf19d2b7227b41693adde5b60e"/>
 			</dataarea>
 		</part>
 	</software>

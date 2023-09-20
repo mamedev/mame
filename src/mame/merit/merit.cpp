@@ -424,6 +424,7 @@ void merit_state::misc_w(uint8_t data)
 	m_lscnblk = (data >> 3) & 1;
 
 	// other bits unknown
+	// TODO: bit 0 gets set by couple and clones in the levels where the tiles' GFX are wrong. Another video bank bit?
 }
 
 void merit_banked_state::bank_w(uint8_t data)
@@ -804,7 +805,7 @@ static INPUT_PORTS_START( iowapp )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 
-//  PORT_MODIFY("IN1") /* Pins #57 through #51 of J3 in descending order */
+//  PORT_MODIFY("IN1") // Pins #57 through #51 of J3 in descending order
 //  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // If HIGH triggers a "TOKEN LOW" error - Hopper related
 
 	PORT_MODIFY("DSW")
@@ -840,7 +841,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( pitboss ) // PCB pinout maps 12 lamp outputs - Where are they mapped?
 
-	PORT_START("IN0") /* Pins #65 through #58 of J3 in descending order */
+	PORT_START("IN0") // Pins #65 through #58 of J3 in descending order
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("P1/P2 Button 1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("P1/P2 Button 2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("P1/P2 Button 3")
@@ -848,7 +849,7 @@ static INPUT_PORTS_START( pitboss ) // PCB pinout maps 12 lamp outputs - Where a
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) PORT_NAME("P1/P2 Button 5")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1/P2 Play")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_Q) PORT_NAME("P1/P2 Cancel")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // pulling this LOW causes "unathorized conversion" msg.
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // pulling this LOW causes "unauthorized conversion" msg.
 
 	PORT_START("IN1") // Pins #57 through #51 of J3 in descending order
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -932,7 +933,7 @@ static INPUT_PORTS_START( mroundup ) // TODO: Find were Player 2 "Play" is mappe
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL PORT_CODE(KEYCODE_D) PORT_NAME("P2 Button 3")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL PORT_CODE(KEYCODE_F) PORT_NAME("P2 Button 4")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_COCKTAIL PORT_CODE(KEYCODE_G) PORT_NAME("P2 Button 5")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // pulling this LOW causes "unathorized conversion" msg.
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // pulling this LOW causes "unauthorized conversion" msg.
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(merit_state, rndbit_r)
 
@@ -1052,7 +1053,7 @@ static INPUT_PORTS_START( mpchoicea ) // pitbossc games but dips like The Round 
 	PORT_MODIFY("IN1") // Pins #57 through #51 of J3 in descending order
 	PORT_DIPNAME( 0xc0, 0xc0, "Percentage Out" )    PORT_DIPLOCATION("Special:1,2") // Pins #52 & #51?? Listed as "Switch Common Ground"
 	PORT_DIPSETTING(    0x80, "80%" )
-	PORT_DIPSETTING(    0x00, "85%" ) /* Duplicate */
+	PORT_DIPSETTING(    0x00, "85%" ) // Duplicate
 	PORT_DIPSETTING(    0xc0, "85%" )
 	PORT_DIPSETTING(    0x40, "90%" )
 
@@ -1358,15 +1359,15 @@ static INPUT_PORTS_START( dtrvwh5 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( couple )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_START("IN0") // both players use the same controls. Start a 1 player game with button 1 or a 2 player game with button 2.
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "Number of Attempts" )    PORT_DIPLOCATION("SW1:1")
@@ -1395,10 +1396,8 @@ static INPUT_PORTS_START( couple )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
@@ -1450,6 +1449,24 @@ static INPUT_PORTS_START( couplep )
 	PORT_DIPSETTING(    0x40, "at 150.000" )
 	PORT_DIPSETTING(    0x00, "at 200.000" )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( matchemg )
+	PORT_INCLUDE( couple )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:3") // it always gives 6 credits, but it only shows the possibility when off, maybe it locks out the second coin instead?
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) ) // 6 games for 5 DM
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) ) // 5 games for 5 DM
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1736,7 +1753,7 @@ ROM_END
 
 ROM_START( mpchoicea ) // Like the M4C1 set above, but only 3 games here
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "m3c1_u5b.u5",  0x0000, 0x2000, CRC(685eb48a) SHA1(31f41527f7a29379bf783f48ea50c3b74523d304) ) /* Internal designation: M3CG */
+	ROM_LOAD( "m3c1_u5b.u5",  0x0000, 0x2000, CRC(685eb48a) SHA1(31f41527f7a29379bf783f48ea50c3b74523d304) ) // Internal designation: M3CG
 	ROM_LOAD( "m3c1_u6b.u6",  0x2000, 0x2000, CRC(4cf91cca) SHA1(aaf685e66e153fa2c47b90c17af9f70751008e9a) ) // Games included in this set are:
 	ROM_LOAD( "m3c1_u7.u7",   0x4000, 0x2000, CRC(5a2aca08) SHA1(0fb4600f61ff1aef2d79ce7a63ee3fd9e79f7f3f) ) // Draw Poker, Blackjack & Acey Deucey
 
@@ -2343,7 +2360,7 @@ ROM_START( dtrvwz5 )
 	ROM_LOAD( "tw5-06_sx5-2.10", 0x98000, 0x8000, CRC(790184fc) SHA1(9c8b56852b31d3312f26a5901487f6b31d9e9b4f) )
 
 	ROM_REGION( 0x0800, "crt209", ROMREGION_ERASE00 )
-	ROM_LOAD( "crt-209.cpu", 0x0000, 0x0800, NO_DUMP ) // 2816 EEPROM in Z80 epoxy CPU module
+	ROM_LOAD( "crt-209_6221-70.cpu", 0x0000, 0x0800, NO_DUMP ) // 2816 EEPROM in Z80 epoxy CPU module
 
 	ROM_FILL( 0x000, 0x800, 0xc9 ) // ret
 
@@ -2553,7 +2570,7 @@ ROM_START( phrcrazev )
 	ROM_LOAD( "phrz1-07_sex-1a", 0x90000, 0x8000, CRC(ed7604b8) SHA1(b1e841b50b8ef6ae95fafac1c34b6d0337a05d18) )
 ROM_END
 
-ROM_START( couple )
+ROM_START( couple ) // bootleg of Match'em Up (6221-51 U5-0)
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "1.1d",  0x00000, 0x8000, CRC(bc70337a) SHA1(ffc484bc3965f0780d3fa5d8801af27a7164a417) )
 	ROM_LOAD( "2.1e",  0x10000, 0x8000, CRC(17372a93) SHA1(e0f0980003473555c2543d98d1494f82afa49f1a) )
@@ -2572,8 +2589,9 @@ ROM_END
 
 /*f205v's dump, same except for the first z80 ROM, first noticeable differences are that
 it doesn't jump to the backup RAM area and it gives an extra play if you reach a certain
-amount of points (there is a dip switch to select the trigger: 150.000 or 200.000*/
-ROM_START( couplep )
+amount of points (there is a dip switch to select the trigger: 150.000 or 200.000)
+PCB is marked: "230188" and "LC" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")*/
+ROM_START( couplep ) // bootleg of Match'em Up (6221-51 U5-0)
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "p_1.1d", 0x00000, 0x8000, CRC(4601ace6) SHA1(a824ceebf8b9ce77ef2c8e92636e4261f2ae0420) )
 	ROM_LOAD( "2.1e",  0x10000, 0x8000, CRC(17372a93) SHA1(e0f0980003473555c2543d98d1494f82afa49f1a) )
@@ -2591,8 +2609,9 @@ ROM_START( couplep )
 ROM_END
 
 /*f205v's dump, this one looks like an intermediate release between set1 and set2;
-it has same dips as set1, but remaining machine code is the same as set2*/
-ROM_START( couplei )
+it has same dips as set1, but remaining machine code is the same as set2
+PCB is marked: "230188" and "LC" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")*/
+ROM_START( couplei ) // bootleg of Match'em Up (6221-51 U5-0)
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "i_1.1d", 0x00000, 0x8000, CRC(760fa29e) SHA1(a37a1562028d9615adff3d2ef88e0156354c720a) )
 	ROM_LOAD( "2.1e",  0x10000, 0x8000, CRC(17372a93) SHA1(e0f0980003473555c2543d98d1494f82afa49f1a) )
@@ -2640,7 +2659,6 @@ void merit_state::init_crt209()
 
 	memcpy(&buffer[0], rom, 0x800);
 
-	// these give the same results as the above subroutine in init_dtrvwz5 at the address the game jumps to (0xb040), so should be right? But then again it doesn't solve the missing GFX issue.
 	for (int i = 0; i < 0x800; i++)
 	{
 		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 1, 0, 2, 3, 4, 5, 6, 7)];
@@ -2653,15 +2671,15 @@ void merit_state::init_crt209()
 
 // Gambling type games
 
-GAME( 1983, pitboss,    0,        pitboss, pitbossa,  merit_state,        empty_init,  ROT0,  "Merit", "The Pit Boss (2214-07, U5-0A)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* "7" hand written over a 5 */
+GAME( 1983, pitboss,    0,        pitboss, pitbossa,  merit_state,        empty_init,  ROT0,  "Merit", "The Pit Boss (2214-07, U5-0A)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // "7" hand written over a 5
 GAME( 1983, pitboss04,  pitboss,  casino5, pitboss,   merit_banked_state, empty_init,  ROT0,  "Merit", "The Pit Boss (2214-04)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, pitboss03,  pitboss,  pitboss, pitbossa,  merit_state,        empty_init,  ROT0,  "Merit", "The Pit Boss (2214-03, U5-0C)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* Also M4A4 */
-GAME( 1983, pitboss03a, pitboss,  pitboss, pitbossa1, merit_state,        empty_init,  ROT0,  "Merit", "The Pit Boss (2214-03, U5-1C)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* Also M4A4 */
-GAME( 1983, pitboss03b, pitboss,  pitboss, pitbossa,  merit_state,        empty_init,  ROT0,  "Merit", "The Pit Boss (M4A4)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* No labels, so use internal designation */
+GAME( 1983, pitboss03,  pitboss,  pitboss, pitbossa,  merit_state,        empty_init,  ROT0,  "Merit", "The Pit Boss (2214-03, U5-0C)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // Also M4A4
+GAME( 1983, pitboss03a, pitboss,  pitboss, pitbossa1, merit_state,        empty_init,  ROT0,  "Merit", "The Pit Boss (2214-03, U5-1C)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // Also M4A4
+GAME( 1983, pitboss03b, pitboss,  pitboss, pitbossa,  merit_state,        empty_init,  ROT0,  "Merit", "The Pit Boss (M4A4)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // No labels, so use internal designation
 GAME( 1983, pitbossm4,  pitboss,  pitboss, pitbossb,  merit_state,        empty_init,  ROT0,  "Merit", "The Pit Boss (M4A1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1983, pitbossps,  pitboss,  pitboss, pitbossa,  merit_state,        empty_init,  ROT0,  "Merit", "The Pit Boss (PSB1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1983, housecard,  pitboss,  pitboss, pitbossa,  merit_state,        empty_init,  ROT0,  "Merit", "House of Cards (HSC1)",           MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, mdchoice,   pitboss,  pitboss, mdchoice,  merit_state,        empty_init,  ROT0,  "Merit", "Dealer's Choice (E4A1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* Copyright year based on other Pit Boss sets */
+GAME( 1983, mdchoice,   pitboss,  pitboss, mdchoice,  merit_state,        empty_init,  ROT0,  "Merit", "Dealer's Choice (E4A1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // Copyright year based on other Pit Boss sets
 GAME( 1983, mpchoice,   pitboss,  pitboss, mpchoice,  merit_state,        empty_init,  ROT0,  "Merit", "Player's Choice (M4C1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1982, mpchoicea,  pitboss,  pitboss, mpchoicea, merit_state,        empty_init,  ROT0,  "Merit", "Player's Choice (M3C1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 
@@ -2681,12 +2699,13 @@ GAME( 1990, mosdraw,    0,        mosdraw, mosdraw,   merit_state,        empty_
 
 GAME( 1986, bigappg,    0,        bigappg, bigappg,   merit_state,        empty_init,  ROT0,  "Big Apple Games / Merit", "The Big Apple (2131-13, U5-0)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1986, misdraw,    0,        misdraw, bigappg,   merit_state,        empty_init,  ROT0,  "Big Apple Games / Merit", "Michigan Super Draw (2131-16, U5-2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1990, iowapp,     0,        riviera, iowapp,    merit_state,        empty_init,  ROT0,  "Merit",                   "Iowa Premium Player (2131-21, U5-1)",   MACHINE_SUPPORTS_SAVE ) /* Copyright year based on rom label */
+GAME( 1990, iowapp,     0,        riviera, iowapp,    merit_state,        empty_init,  ROT0,  "Merit",                   "Iowa Premium Player (2131-21, U5-1)",   MACHINE_SUPPORTS_SAVE ) // Copyright year based on ROM label
 
 GAME( 1986, dodgectya,  dodgecty, misdraw, dodge,     merit_state,        init_crt209, ROT0,  "Merit", "Dodge City (2131-82, U5-0D)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no text shown, while cards are
 GAME( 1986, dodgectyb,  dodgecty, misdraw, dodge,     merit_state,        init_crt209, ROT0,  "Merit", "Dodge City (2131-82, U5-50)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no text shown, while cards are
 GAME( 1986, dodgectyc,  dodgecty, misdraw, dodge,     merit_state,        init_crt209, ROT0,  "Merit", "Dodge City (2131-82, U5-0 GT)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no text shown, while cards are
 
+// Superstar is part of the title
 GAME( 1989, unkmerit,   0,        misdraw, bigappg,   merit_state,        empty_init,  ROT0,  "Merit", "unknown Merit game (4435-81, U5-1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // no text shown, while cards are
 
 // Trivia and Word games
@@ -2717,7 +2736,7 @@ GAME( 1986, phrcrazev,  phrcraze, phrcraze, phrcrazs, merit_quiz_state,   init_k
 
 GAME( 1987, dtrvwz5,   0,         dtrvwz5,  dtrvwh5,  merit_quiz_state,   init_key<6>, ROT0,  "Merit", "Deluxe Trivia ? Whiz (6221-70, U5-0A Edition 5)",         MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, couple,    0,         couple,   couple,   merit_state,        init_crt209, ROT0,  "Merit", "The Couples (set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, couplep,   couple,    couple,   couplep,  merit_state,        init_crt209, ROT0,  "Merit", "The Couples (set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, couplei,   couple,    couple,   couple,   merit_state,        init_crt209, ROT0,  "Merit", "The Couples (set 3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1986, matchemg,  couple,    couple,   couple,   merit_state,        init_crt209, ROT0,  "Merit", "Match'em Up (German)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, couple,    0,         couple,   couple,   merit_state,        init_crt209, ROT0,  "bootleg", "The Couples (set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // in some levels the tiles' GFX are jumbled
+GAME( 1988, couplep,   couple,    couple,   couplep,  merit_state,        init_crt209, ROT0,  "bootleg", "The Couples (set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
+GAME( 1988, couplei,   couple,    couple,   couple,   merit_state,        init_crt209, ROT0,  "bootleg", "The Couples (set 3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
+GAME( 1986, matchemg,  couple,    couple,   matchemg, merit_state,        init_crt209, ROT0,  "Merit",   "Match'em Up (German)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
