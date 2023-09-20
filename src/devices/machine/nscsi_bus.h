@@ -661,6 +661,18 @@ protected:
 	void scsi_data_out(int buf, int size);
 
 	struct sense_data {
+		sense_data()
+		{
+			invalid = false;
+			deferred = false;
+			filemark = false;
+			eom = false;
+			bad_len = false;
+			sense_key = 0;
+			info = 0;
+			sense_key_code = 0;
+		}
+
 		bool invalid;
 		bool deferred;
 		bool filemark;
@@ -679,7 +691,7 @@ protected:
 	void report_bom(const s32 info = 0);
 	void report_ew(const s32 info = 0);
 	void report_eod(const s32 info = 0, const bool eom = false);
-	void report_eom(const bool write, const s32 info = 0, const bool invalid = 0);
+	void report_eom(const bool write, const s32 info = 0, const bool invalid = false);
 	void report_bad_len(const bool over, const s32 info = 0);
 	void report_bad_cdb_field();
 	void report_bad_pl_field();
