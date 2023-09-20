@@ -33054,6 +33054,9 @@ nascom1                         // 1978 Nascom 1
 nascom2                         // 1979 Nascom 2
 nascom2c                        // 1980 Nascom 2 (CP/M)
 
+@source:natsemi/icm3216.cpp
+icm3216                         // National Semiconductor ICM-3216
+
 @source:natsemi/ns32kdb.cpp
 db32016                         // National Semiconductor DB32016
 
