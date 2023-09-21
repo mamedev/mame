@@ -40,6 +40,43 @@ clayshoo:
 @:maincpu,program,2140,8,be,00
 
 
+;@s:alliedleisure/killcom.cpp
+
+;(megatack) (by GeoMan)
+megatack:
+megatacka:
+@:maincpu,program,00c4,f,00,1a
+
+
+;*******pirate treasure
+piratetr:
+@:maincpu,program,2dc,4f,55,44
+
+
+;(kaos) (by GeoMan)
+kaos:
+@:maincpu,program,03c8,30,84,44
+
+
+;(leprechaun) and clones (by GeoMan) 
+;** let game display hiscore table a few times in attract mode before **
+;** starting a game **
+leprechn:
+leprecha:
+potogold:
+@:maincpu,program,02ca,50,55,00
+
+
+;(killer comet)
+killcom:
+@:maincpu,program,88,2,47,00
+
+
+;(challenger)
+challeng:
+@:maincpu,program,cc,f,00,1f
+
+
 ;@s:alpha/alpha68k.cpp
 
 ;(time soldiers (us rev 3))
@@ -2848,7 +2885,7 @@ breywood:
 ;meikyuha:******Meikyuu Hunter G (Japan, set 2)
 ;meikyuh:******Meikyuu Hunter G (Japan, set 1)
 meikyuh:
-meikyuha:
+meikyuhbl:
 @:maincpu,program,190,50,01,20
 
 
@@ -5027,53 +5064,6 @@ mrkougb2:
 ad2083:
 @:maincpu,program,4600,64,0a,04
 @:maincpu,program,40a8,3,00,06
-
-
-;@s:gameplan/enigma2.cpp
-
-;*******enigma 2
-enigma2:
-enigma2a:
-enigma2b:
-@:maincpu,program,20af,3,00,00
-@:maincpu,program,20c1,3,24,24
-
-
-;@s:gameplan/gameplan.cpp
-
-;(megatack) (by GeoMan)
-megatack:
-megatacka:
-@:maincpu,program,00c4,f,00,1a
-
-
-;*******pirate treasure
-piratetr:
-@:maincpu,program,2dc,4f,55,44
-
-
-;(kaos) (by GeoMan)
-kaos:
-@:maincpu,program,03c8,30,84,44
-
-
-;(leprechaun) and clones (by GeoMan) 
-;** let game display hiscore table a few times in attract mode before **
-;** starting a game **
-leprechn:
-leprechp:
-potogold:
-@:maincpu,program,02ca,50,55,00
-
-
-;(killer comet)
-killcom:
-@:maincpu,program,88,2,47,00
-
-
-;(challenger)
-challeng:
-@:maincpu,program,cc,f,00,1f
 
 
 ;@s:gametron/gotya.cpp
@@ -7318,6 +7308,8 @@ tmntucbl:
 @:maincpu,program,63500,f3,03,41
 
 
+;@s:konami/tmnt2.cpp
+
 ;********(golfing greats)
 glfgreat:
 glfgreatj:
@@ -8665,6 +8657,16 @@ efdt:
 
 foolrace:
 @:maincpu,program,ff06,4,00,00
+
+
+;@s:misc/enigma2.cpp
+
+;*******enigma 2
+enigma2:
+enigma2a:
+enigma2b:
+@:maincpu,program,20af,3,00,00
+@:maincpu,program,20c1,3,24,24
 
 
 ;@s:misc/epos.cpp
@@ -12293,9 +12295,10 @@ logicpr2:
 ;@s:sega/mdconsole.cpp
 
 genesis,sspinu:
-megadriv,sspin:
 megadrij,sspinj:
+megadriv,sspin:
 @:maincpu,program,fff8da,1e,ff,c8
+
 
 genesis,tf3:
 @:maincpu,program,fff2ac,4,00,90
@@ -15740,7 +15743,7 @@ lkageb2:
 lkageb3:
 lkageb4:
 lkageo:
-lkageoo:
+lkageo2:
 @:maincpu,program,e25f,85,00,52
 @:maincpu,program,e188,3,00,00
 
@@ -18829,7 +18832,7 @@ seabattl:
 @:maincpu,program,1c0b,15,00,0a
 
 
-;@s:zaccaria/zac2650.cpp
+;@s:zaccaria/zac1b1120.cpp
 
 ;(super invader attack) (by GeoMan)
 sia2650:
