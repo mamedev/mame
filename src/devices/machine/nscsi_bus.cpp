@@ -624,18 +624,22 @@ void nscsi_full_device::scsi_data_out(int buf, int size)
 
 //////////////////////////////////////////////////////////////////////////////
 
-void nscsi_full_device::set_sense_data(const u8 sense_key, const u16 sense_key_code, const sense_data data)
+void nscsi_full_device::set_sense_data(const u8 sense_key, const u16 sense_key_code, const sense_data *data)
 {
 	assert(sizeof(scsi_sense_buffer) >= 18);
 	assert(sense_key <= 0x0f);
 	memset(scsi_sense_buffer, 0, 18);
-	scsi_sense_buffer[0] = (data.invalid ? 0 : 0x80) // even though SCSI-2 section 8.2.14 implies valid bit should always be set, other sections such as 10.2.12 disagree!
-	                     | (data.deferred ? 0x71 : 0x70);
-	scsi_sense_buffer[2] = (data.filemark ? 0x80 : 0)
-	                     | (data.eom ? 0x40 : 0)
-	                     | (data.bad_len ? 0x20 : 0) // "incorrect length indicator"
-	                     | sense_key;
-	put_s32be(&scsi_sense_buffer[3], data.info);
+	if (data) {
+		scsi_sense_buffer[0] = (data->invalid ? 0 : 0x80) // even though SCSI-2 section 8.2.14 implies valid bit should always be set, other sections such as 10.2.12 disagree!
+		                     | (data->deferred ? 0x71 : 0x70);
+		scsi_sense_buffer[2] = (data->filemark ? 0x80 : 0)
+		                     | (data->eom ? 0x40 : 0)
+		                     | (data->bad_len ? 0x20 : 0); // "incorrect length indicator"
+		put_s32be(&scsi_sense_buffer[3], data->info);
+	}
+	else
+		scsi_sense_buffer[0] = 0xf0;
+	scsi_sense_buffer[2] |= sense_key;
 	scsi_sense_buffer[7] = 10; // additional sense length
 	put_u16be(&scsi_sense_buffer[12], sense_key_code);
 }
@@ -644,10 +648,10 @@ void nscsi_full_device::sense(bool deferred, uint8_t key, uint8_t asc, uint8_t a
 {
 	sense_data s;
 	s.deferred = deferred;
-	set_sense_data(key, (asc << 8) | ascq, s);
+	set_sense_data(key, (asc << 8) | ascq, &s);
 }
 
-void nscsi_full_device::report_condition(const u8 sense_key, const u16 sense_key_code, const sense_data data)
+void nscsi_full_device::report_condition(const u8 sense_key, const u16 sense_key_code, const sense_data *data)
 {
 	set_sense_data(sense_key, sense_key_code, data);
 	scsi_status_complete(SS_CHECK_CONDITION);
@@ -672,7 +676,7 @@ void nscsi_full_device::report_filemark(const s32 info, const bool eom)
 	s.filemark = true;
 	s.eom = eom;
 	s.info = info;
-	report_condition(SK_NO_SENSE, SKC_FILEMARK_DETECTED, s);
+	report_condition(SK_NO_SENSE, SKC_FILEMARK_DETECTED, &s);
 }
 
 void nscsi_full_device::report_bom(const s32 info)
@@ -681,7 +685,7 @@ void nscsi_full_device::report_bom(const s32 info)
 	sense_data s;
 	s.eom = true;
 	s.info = info;
-	report_condition(SK_NO_SENSE, SKC_BEGINNING_OF_PARTITION_MEDIUM_DETECTED, s);
+	report_condition(SK_NO_SENSE, SKC_BEGINNING_OF_PARTITION_MEDIUM_DETECTED, &s);
 }
 
 void nscsi_full_device::report_ew(const s32 info)
@@ -690,7 +694,7 @@ void nscsi_full_device::report_ew(const s32 info)
 	sense_data s;
 	s.eom = true;
 	s.info = info;
-	report_condition(SK_NO_SENSE, SKC_END_OF_PARTITION_MEDIUM_DETECTED, s);
+	report_condition(SK_NO_SENSE, SKC_END_OF_PARTITION_MEDIUM_DETECTED, &s);
 }
 
 void nscsi_full_device::report_eod(const s32 info, const bool eom)
@@ -699,7 +703,7 @@ void nscsi_full_device::report_eod(const s32 info, const bool eom)
 	sense_data s;
 	s.eom = eom;
 	s.info = info;
-	report_condition(SK_BLANK_CHECK, SKC_END_OF_DATA_DETECTED, s);
+	report_condition(SK_BLANK_CHECK, SKC_END_OF_DATA_DETECTED, &s);
 }
 
 void nscsi_full_device::report_eom(const bool write, const s32 info, const bool invalid)
@@ -709,7 +713,7 @@ void nscsi_full_device::report_eom(const bool write, const s32 info, const bool 
 	s.invalid = invalid;
 	s.eom = true;
 	s.info = info;
-	report_condition(write ? SK_VOLUME_OVERFLOW : SK_MEDIUM_ERROR, SKC_END_OF_PARTITION_MEDIUM_DETECTED, s);
+	report_condition(write ? SK_VOLUME_OVERFLOW : SK_MEDIUM_ERROR, SKC_END_OF_PARTITION_MEDIUM_DETECTED, &s);
 }
 
 void nscsi_full_device::report_bad_len(const bool over, const s32 info)
@@ -718,7 +722,7 @@ void nscsi_full_device::report_bad_len(const bool over, const s32 info)
 	sense_data s;
 	s.bad_len = true;
 	s.info = info;
-	report_condition(SK_ILLEGAL_REQUEST, SKC_NO_ADDITIONAL_SENSE_INFORMATION, s);
+	report_condition(SK_ILLEGAL_REQUEST, SKC_NO_ADDITIONAL_SENSE_INFORMATION, &s);
 }
 
 void nscsi_full_device::report_bad_cdb_field()
