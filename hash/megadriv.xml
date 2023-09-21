@@ -25262,18 +25262,23 @@ https://bootleggames.fandom.com/wiki/San_Guo_Zhi_V
 		</part>
 	</software>
 
-	<software name="sansan" supported="no">
+	<software name="sansan" supported="partial">
 		<description>San San (Japan)</description>
 		<year>1994</year>
 		<publisher>San San Co.</publisher>
 		<notes><![CDATA[
-Unsupported [Sega Mega Modem] features
+Unsupported [Sega Mega Modem] features, local multiplayer supported only.
 ]]></notes>
 		<info name="serial" value="T-147013"/>
 		<info name="alt_title" value="サンサン"/>
+		<info name="usage" value="Initialize SRAM thru option 4 -> 2, accept. Option 2 -> 4 for local multiplayer"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="san san (japan).bin" size="1048576" crc="5b85deed" sha1="e882c3af57884862bafc764226c88c287752e9d6"/>
+			</dataarea>
+			<!-- Guessed, SRAM size=16384 causes heavy glitches in menuing -->
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
