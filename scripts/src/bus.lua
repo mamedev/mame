@@ -2115,6 +2115,8 @@ if (BUSES["PC_JOY"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/pc_joy/pc_joy.cpp",
 		MAME_DIR .. "src/devices/bus/pc_joy/pc_joy.h",
+		MAME_DIR .. "src/devices/bus/pc_joy/pc_joy_magnum6.cpp",
+		MAME_DIR .. "src/devices/bus/pc_joy/pc_joy_magnum6.h",
 		MAME_DIR .. "src/devices/bus/pc_joy/pc_joy_sw.cpp",
 		MAME_DIR .. "src/devices/bus/pc_joy/pc_joy_sw.h",
 	}
