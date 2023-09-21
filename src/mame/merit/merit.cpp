@@ -522,7 +522,7 @@ void merit_state::misdraw_map(address_map &map)
 {
 	riviera_map(map);
 
-	map(0xb000, 0xb7ff).ram().share("crt209"); // overlays other NVRAM? or is it banked?
+	map(0xb000, 0xb7ff).ram().share("crt209"); // 2816 EEPROM data in Z80 epoxy CPU module
 }
 
 void merit_state::couple_map(address_map &map)
@@ -580,23 +580,7 @@ void merit_quiz_state::phrcraze_io_map(address_map &map)
 void merit_quiz_state::tictac_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).ram();
-	map(0xc004, 0xc007).mirror(0x1df0).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xc008, 0xc00b).mirror(0x1df0).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xce00, 0xceff).rw(FUNC(merit_quiz_state::questions_r), FUNC(merit_quiz_state::high_offset_w));
-	map(0xd600, 0xd6ff).w(FUNC(merit_quiz_state::low_offset_w));
-	map(0xda00, 0xdaff).w(FUNC(merit_quiz_state::med_offset_w));
-	map(0xe000, 0xe000).mirror(0x05f0).w("crtc", FUNC(mc6845_device::address_w));
-	map(0xe001, 0xe001).mirror(0x05f0).w("crtc", FUNC(mc6845_device::register_w));
-	map(0xe800, 0xefff).ram().share(m_ram_attr);
-	map(0xf000, 0xf7ff).ram().share(m_ram_video);
-	map(0xf800, 0xfbff).rw(FUNC(merit_quiz_state::palette_r), FUNC(merit_quiz_state::palette_w));
-}
-
-void merit_quiz_state::trvwhziv_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();
-	map(0xa000, 0xbfff).ram();
+	map(0x8000, 0x9fff).ram().share("nvram");
 	map(0xc004, 0xc007).mirror(0x1df0).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xc008, 0xc00b).mirror(0x1df0).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xce00, 0xceff).rw(FUNC(merit_quiz_state::questions_r), FUNC(merit_quiz_state::high_offset_w));
@@ -611,9 +595,15 @@ void merit_quiz_state::trvwhziv_map(address_map &map)
 
 void merit_quiz_state::dtrvwz5_map(address_map &map)
 {
+	tictac_map(map);
+
+	map(0xb000, 0xb7ff).ram().share("crt209"); // 2816 EEPROM data in Z80 epoxy CPU module
+}
+
+void merit_quiz_state::trvwhziv_map(address_map &map)
+{
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).ram().share("nvram");
-	map(0xb000, 0xb7ff).ram().share("crt209");
+	map(0xa000, 0xbfff).ram();
 	map(0xc004, 0xc007).mirror(0x1df0).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xc008, 0xc00b).mirror(0x1df0).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xce00, 0xceff).rw(FUNC(merit_quiz_state::questions_r), FUNC(merit_quiz_state::high_offset_w));
@@ -1566,6 +1556,8 @@ void merit_quiz_state::tictac(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &merit_quiz_state::tictac_map);
 	m_maincpu->set_addrmap(AS_IO, &merit_quiz_state::bigappg_io_map);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 
 void merit_quiz_state::trvwhiz(machine_config &config)
@@ -2018,7 +2010,7 @@ ROM_START( unkmerit )
 	ROM_LOAD( "4435-81_u5-1.u5", 0x0000, 0x8000, CRC(38ed804a) SHA1(fc500db9d5e5eac7d9a88756f7d0176a887f1fd1) ) // 4435-81 U5-1 984140  4435811
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "u39", 0x00000, 0x8000, CRC(aba5aa05) SHA1(7929c5508e4eefc3905b40d7d51e5d80a1550f77) )
+	ROM_LOAD( "u39", 0x00000, 0x8000, CRC(aba5aa05) SHA1(7929c5508e4eefc3905b40d7d51e5d80a1550f77) ) // These 3 ROMs: 1st & 2nd half identical - Verified correct
 	ROM_LOAD( "u38", 0x08000, 0x8000, CRC(50032b4f) SHA1(e39b4068ee6863aa4ba22232928b450e7ab47e63) )
 	ROM_LOAD( "u37", 0x10000, 0x8000, CRC(fe9c41fa) SHA1(4da945fd5c8e797ccb72ac931a01e322aabbe8ee) )
 
@@ -2408,12 +2400,12 @@ ROM_START( tictac )
 	ROM_LOAD( "6221-23_u5-0c.u5", 0x00000, 0x8000, CRC(f0dd73f5) SHA1(f2988b84255ce5f7ea6d25150cdbae88b98e1be3) ) // 6221-23 U5-0C 02/11/86
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "merit.u39", 0x00000, 0x2000, CRC(dd79e824) SHA1(d65ee1c758293ddf8a5f4913878a2867ba526e68) )
-	ROM_LOAD( "merit.u38", 0x02000, 0x2000, CRC(e1bf0fab) SHA1(291261ea817c42d6e8a19c17a2d3706fed7d78c4) )
-	ROM_LOAD( "merit.u37", 0x04000, 0x2000, CRC(94f9c7f8) SHA1(494389983fb62fe2d772c276e659b6b20c531933) )
+	ROM_LOAD( "ttt1_u39.u39", 0x00000, 0x2000, CRC(dd79e824) SHA1(d65ee1c758293ddf8a5f4913878a2867ba526e68) )
+	ROM_LOAD( "ttt1_u38.u38", 0x02000, 0x2000, CRC(e1bf0fab) SHA1(291261ea817c42d6e8a19c17a2d3706fed7d78c4) )
+	ROM_LOAD( "ttt1_u37.u37", 0x04000, 0x2000, CRC(94f9c7f8) SHA1(494389983fb62fe2d772c276e659b6b20c531933) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "merit.u40",    0x00000, 0x2000, CRC(ab0088eb) SHA1(23a05a4dc11a8497f4fc7e4a76085af15ff89cea) )
+	ROM_LOAD( "ttt1_u40.u40",    0x00000, 0x2000, CRC(ab0088eb) SHA1(23a05a4dc11a8497f4fc7e4a76085af15ff89cea) )
 
 	ROM_REGION( 0xa0000, "questions", ROMREGION_ERASEFF )
 	ROM_LOAD( "spo-004_01a.1", 0x08000, 0x8000, CRC(71b398a9) SHA1(5ea07c409afd52c7d08592b30ff0ff3b72c3f8c3) ) // Trivia categories are:
@@ -2570,7 +2562,24 @@ ROM_START( phrcrazev )
 	ROM_LOAD( "phrz1-07_sex-1a", 0x90000, 0x8000, CRC(ed7604b8) SHA1(b1e841b50b8ef6ae95fafac1c34b6d0337a05d18) )
 ROM_END
 
-ROM_START( couple ) // bootleg of Match'em Up (6221-51 U5-0)
+ROM_START( matchemg )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "6221-55_u5-1.u5", 0x00000, 0x8000, CRC(152ad9f6) SHA1(fdd90ea7e5bbcd7dc8f7d6f10ac9efc08515b112) )
+	ROM_LOAD( "6221-55_u6-1.u6", 0x14000, 0x2000, CRC(0678d986) SHA1(c881aee9e977384a188f0f7b9e563b699da5fc0a) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "gex_1_u39.u39", 0x00000, 0x8000, CRC(da94fbc6) SHA1(af008eceba2e4ef35d0815d5cb1a5a50f1a9817f) ) // labeled  GEX 1   U39  C1987 MII - U38 & U39 had a space between GEX and 1
+	ROM_LOAD( "gex_1_u38.u38", 0x08000, 0x8000, CRC(211b75cc) SHA1(52497743457afbcf2969a967d5982d8934a29864) ) // labeled  GEX 1   U38  C1987 MII
+	ROM_LOAD( "gex1_u37.u37",  0x10000, 0x8000, CRC(dfc73155) SHA1(a922953ba238c3ca2f2f0a046109186d1057d76d) ) // labeled  GEX1   U37  C1987 MII - U37 & U40 had no space between GEX and 1
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "gex1_u40.u40", 0x00000, 0x8000, CRC(a6a9a73d) SHA1(f3cb1d434d730f6e00f48079eaf8b88f57779fa0) ) // labeled  GEX1   U40  C1987 MII
+
+	ROM_REGION( 0x0800, "crt209", 0 )
+	ROM_LOAD( "crt-209_6221-55.cpu",  0x00000, 0x0800, CRC(2c22b3a8) SHA1(663e3b687d4f2adc34e421e23773f234ca35c629) )
+ROM_END
+
+ROM_START( couple ) // PCB is marked: "230188", bootleg of Match'em Up (6221-51 U5-0)
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "1.1d",  0x00000, 0x8000, CRC(bc70337a) SHA1(ffc484bc3965f0780d3fa5d8801af27a7164a417) )
 	ROM_LOAD( "2.1e",  0x10000, 0x8000, CRC(17372a93) SHA1(e0f0980003473555c2543d98d1494f82afa49f1a) )
@@ -2587,14 +2596,10 @@ ROM_START( couple ) // bootleg of Match'em Up (6221-51 U5-0)
 	ROM_LOAD( "7.7a",  0x00000, 0x0800, CRC(6c36361e) SHA1(7a018eecf3d8b7cf8845dcfcf8067feb292933b2) )
 ROM_END
 
-/*f205v's dump, same except for the first z80 ROM, first noticeable differences are that
-it doesn't jump to the backup RAM area and it gives an extra play if you reach a certain
-amount of points (there is a dip switch to select the trigger: 150.000 or 200.000)
-PCB is marked: "230188" and "LC" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")*/
-ROM_START( couplep ) // bootleg of Match'em Up (6221-51 U5-0)
+ROM_START( couplep ) // PCB is marked: "230188", bootleg of Match'em Up (6221-51 U5-0)
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "p_1.1d", 0x00000, 0x8000, CRC(4601ace6) SHA1(a824ceebf8b9ce77ef2c8e92636e4261f2ae0420) )
-	ROM_LOAD( "2.1e",  0x10000, 0x8000, CRC(17372a93) SHA1(e0f0980003473555c2543d98d1494f82afa49f1a) )
+	ROM_LOAD( "p_1.1d", 0x00000, 0x8000, CRC(4601ace6) SHA1(a824ceebf8b9ce77ef2c8e92636e4261f2ae0420) ) // doesn't jump to the backup RAM area
+	ROM_LOAD( "2.1e",   0x10000, 0x8000, CRC(17372a93) SHA1(e0f0980003473555c2543d98d1494f82afa49f1a) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "3.9c",  0x00000, 0x8000, CRC(f017399a) SHA1(baf4c1bea6a12b1d4c8838552503fbdb81378411) )
@@ -2608,13 +2613,10 @@ ROM_START( couplep ) // bootleg of Match'em Up (6221-51 U5-0)
 	ROM_LOAD( "7.7a",  0x00000, 0x0800, CRC(6c36361e) SHA1(7a018eecf3d8b7cf8845dcfcf8067feb292933b2) )
 ROM_END
 
-/*f205v's dump, this one looks like an intermediate release between set1 and set2;
-it has same dips as set1, but remaining machine code is the same as set2
-PCB is marked: "230188" and "LC" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")*/
-ROM_START( couplei ) // bootleg of Match'em Up (6221-51 U5-0)
+ROM_START( couplei ) // PCB is marked: "230188", bootleg of Match'em Up (6221-51 U5-0)
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "i_1.1d", 0x00000, 0x8000, CRC(760fa29e) SHA1(a37a1562028d9615adff3d2ef88e0156354c720a) )
-	ROM_LOAD( "2.1e",  0x10000, 0x8000, CRC(17372a93) SHA1(e0f0980003473555c2543d98d1494f82afa49f1a) )
+	ROM_LOAD( "i_1.1d", 0x00000, 0x8000, CRC(760fa29e) SHA1(a37a1562028d9615adff3d2ef88e0156354c720a) ) // looks like an intermediate release between set1 and set2
+	ROM_LOAD( "2.1e",   0x10000, 0x8000, CRC(17372a93) SHA1(e0f0980003473555c2543d98d1494f82afa49f1a) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "3.9c",  0x00000, 0x8000, CRC(f017399a) SHA1(baf4c1bea6a12b1d4c8838552503fbdb81378411) )
@@ -2626,24 +2628,6 @@ ROM_START( couplei ) // bootleg of Match'em Up (6221-51 U5-0)
 
 	ROM_REGION( 0x0800, "crt209", 0 ) // same use as the CRT-209 modules, just a standard 2716 EPROM
 	ROM_LOAD( "7.7a",  0x00000, 0x0800, CRC(6c36361e) SHA1(7a018eecf3d8b7cf8845dcfcf8067feb292933b2) )
-ROM_END
-
-ROM_START( matchemg )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "6221-55_u5-1.u5", 0x00000, 0x8000, CRC(152ad9f6) SHA1(fdd90ea7e5bbcd7dc8f7d6f10ac9efc08515b112) )
-	ROM_LOAD( "6221-55_u6-1.u6", 0x14000, 0x2000, CRC(0678d986) SHA1(c881aee9e977384a188f0f7b9e563b699da5fc0a) )
-	ROM_RELOAD(                  0x16000, 0x2000)
-
-	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "gex_1_u39.u39", 0x00000, 0x8000, CRC(da94fbc6) SHA1(af008eceba2e4ef35d0815d5cb1a5a50f1a9817f) ) // labeled  GEX 1   U39  C1987 MII - U38 & U39 had a space between GEX and 1
-	ROM_LOAD( "gex_1_u38.u38", 0x08000, 0x8000, CRC(211b75cc) SHA1(52497743457afbcf2969a967d5982d8934a29864) ) // labeled  GEX 1   U38  C1987 MII
-	ROM_LOAD( "gex1_u37.u37",  0x10000, 0x8000, CRC(dfc73155) SHA1(a922953ba238c3ca2f2f0a046109186d1057d76d) ) // labeled  GEX1   U37  C1987 MII - U37 & U40 had no space between GEX and 1
-
-	ROM_REGION( 0x08000, "gfx2", 0 )
-	ROM_LOAD( "gex1_u40.u40", 0x00000, 0x8000, CRC(a6a9a73d) SHA1(f3cb1d434d730f6e00f48079eaf8b88f57779fa0) ) // labeled  GEX1   U40  C1987 MII
-
-	ROM_REGION( 0x0800, "crt209", 0 )
-	ROM_LOAD( "crt-209_6221-55.cpu",  0x00000, 0x0800, CRC(2c22b3a8) SHA1(663e3b687d4f2adc34e421e23773f234ca35c629) )
 ROM_END
 
 template <uint8_t Key>
@@ -2697,7 +2681,7 @@ GAME( 1986, rivieraa,   riviera,  riviera, riviera,   merit_state,        empty_
 GAME( 1986, rivierab,   riviera,  riviera, rivierab,  merit_state,        empty_init,  ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-2D)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1990, mosdraw,    0,        mosdraw, mosdraw,   merit_state,        empty_init,  ROT0,  "Merit", "Montana Super Draw (4436-05, U5-0)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // needs printer and RTC hook up
 
-GAME( 1986, bigappg,    0,        bigappg, bigappg,   merit_state,        empty_init,  ROT0,  "Big Apple Games / Merit", "The Big Apple (2131-13, U5-0)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bigappg,    0,        bigappg, bigappg,   merit_state,        empty_init,  ROT0,  "Big Apple Games / Merit", "The Big Apple (2131-13, U5-0)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1986, misdraw,    0,        misdraw, bigappg,   merit_state,        empty_init,  ROT0,  "Big Apple Games / Merit", "Michigan Super Draw (2131-16, U5-2)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1990, iowapp,     0,        riviera, iowapp,    merit_state,        empty_init,  ROT0,  "Merit",                   "Iowa Premium Player (2131-21, U5-1)",   MACHINE_SUPPORTS_SAVE ) // Copyright year based on ROM label
 
@@ -2736,7 +2720,7 @@ GAME( 1986, phrcrazev,  phrcraze, phrcraze, phrcrazs, merit_quiz_state,   init_k
 
 GAME( 1987, dtrvwz5,   0,         dtrvwz5,  dtrvwh5,  merit_quiz_state,   init_key<6>, ROT0,  "Merit", "Deluxe Trivia ? Whiz (6221-70, U5-0A Edition 5)",         MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, couple,    0,         couple,   couple,   merit_state,        init_crt209, ROT0,  "bootleg", "The Couples (set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // in some levels the tiles' GFX are jumbled
-GAME( 1988, couplep,   couple,    couple,   couplep,  merit_state,        init_crt209, ROT0,  "bootleg", "The Couples (set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
-GAME( 1988, couplei,   couple,    couple,   couple,   merit_state,        init_crt209, ROT0,  "bootleg", "The Couples (set 3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
-GAME( 1986, matchemg,  couple,    couple,   matchemg, merit_state,        init_crt209, ROT0,  "Merit",   "Match'em Up (German)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
+GAME( 1986, matchemg,  0,         couple,   matchemg, merit_state,        init_crt209, ROT0,  "Merit",   "Match'em Up (German)",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // in some levels the tiles' GFX are jumbled
+GAME( 1988, couple,    matchemg,  couple,   couple,   merit_state,        init_crt209, ROT0,  "bootleg", "The Couples (set 1)",                                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
+GAME( 1988, couplep,   matchemg,  couple,   couplep,  merit_state,        init_crt209, ROT0,  "bootleg", "The Couples (set 2)",                                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
+GAME( 1988, couplei,   matchemg,  couple,   couple,   merit_state,        init_crt209, ROT0,  "bootleg", "The Couples (set 3)",                                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "

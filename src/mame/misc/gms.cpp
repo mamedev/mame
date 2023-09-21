@@ -63,6 +63,11 @@ TODO:
 - emulate protection devices correctly instead of patching
 - hookup lamps and do layouts
 - keyboard inputs for mahjong games
+
+Video references:
+rbspm: https://www.youtube.com/watch?v=pPk-6N1wXoE
+sc2in1: https://www.youtube.com/watch?v=RNwW1IhKHXw
+super555: https://www.youtube.com/watch?v=CCUKdbQ5O-U
 */
 
 #include "emu.h"
@@ -97,6 +102,7 @@ public:
 	gms_2layers_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_vidram(*this, "vidram%u", 1U)
+		, m_scrolly(*this, "scrolly")
 		, m_maincpu(*this, "maincpu")
 		, m_mcu(*this, "mcu")
 		, m_eeprom(*this, "eeprom")
@@ -122,6 +128,7 @@ protected:
 	virtual void video_start() override;
 
 	optional_shared_ptr_array<uint16_t, 3> m_vidram;
+	optional_shared_ptr<uint16_t> m_scrolly;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<at89c4051_device> m_mcu;
@@ -258,6 +265,7 @@ void gms_2layers_state::rbmk_mem(address_map &map)
 	map(0x940000, 0x940bff).ram();
 	map(0x940c00, 0x940fff).ram().w(FUNC(gms_2layers_state::vram_w<0>)).share(m_vidram[0]);
 	map(0x980300, 0x983fff).ram(); // 0x2048  words ???, byte access
+	map(0x980380, 0x9803ff).ram().share(m_scrolly);
 	map(0x9c0000, 0x9c0fff).ram().w(FUNC(gms_2layers_state::vram_w<1>)).share(m_vidram[1]);
 	map(0xb00000, 0xb00001).w(FUNC(gms_2layers_state::eeprom_w));
 	map(0xc00000, 0xc00001).rw(FUNC(gms_2layers_state::input_matrix_r), FUNC(gms_2layers_state::input_matrix_w));
@@ -285,6 +293,7 @@ void gms_2layers_state::rbspm_mem(address_map &map)
 	map(0x940000, 0x940bff).ram();
 	map(0x940c00, 0x940fff).ram().w(FUNC(gms_2layers_state::vram_w<0>)).share(m_vidram[0]); // if removed fails palette test?
 	map(0x980300, 0x983fff).ram(); // 0x2048  words ???, byte access, u25 and u26 according to test mode
+	map(0x980380, 0x9803ff).ram().share(m_scrolly);
 	map(0x9c0000, 0x9c0fff).ram().w(FUNC(gms_2layers_state::vram_w<1>)).share(m_vidram[1]);
 }
 
@@ -304,6 +313,7 @@ void gms_2layers_state::super555_mem(address_map &map)
 	map(0x940000, 0x940bff).ram();
 	map(0x940c00, 0x940fff).ram().w(FUNC(gms_2layers_state::vram_w<0>)).share(m_vidram[0]);
 	map(0x980000, 0x983fff).ram();
+	map(0x980380, 0x9803ff).ram().share(m_scrolly);
 	map(0x9c0000, 0x9c0fff).ram().w(FUNC(gms_2layers_state::vram_w<1>)).share(m_vidram[1]);
 	//map(0xf00000, 0xf00001).w(FUNC(gms_2layers_state::eeprom_w)); // wrong?
 }
@@ -1185,14 +1195,13 @@ static const gfx_layout rbmk32_layout =
 
 static const gfx_layout magslot16_layout = // TODO: not correct
 {
-	16,16,
+	8,32,
 	RGN_FRAC(1,1),
 	8,
-	{8, 9,10, 11, 0, 1, 2, 3  },
+	{ 8, 9, 10, 11, 0, 1, 2, 3 },
 	{ 0, 4, 16, 20, 32, 36, 48, 52,
-	64+0,64+4,64+16,64+20,64+32,64+36,64+48,64+52},
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-	512+0*16,512+1*64,512+2*64,512+3*64,512+4*64,512+5*64,512+6*64,512+7*64},
+	64+0, 64+4, 64+16, 64+20, 64+32, 64+36, 64+48, 64+52},
+	{ STEP32(0,8*8) },
 	32*64
 };
 
@@ -1251,6 +1260,10 @@ TILE_GET_INFO_MEMBER(gms_3layers_state::get_tile2_info)
 
 uint32_t gms_2layers_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+
+	for (int i = 0; i < 64; i++)
+		m_tilemap[0]->set_scrolly(i, m_scrolly[i]);
+
 	if (BIT(m_tilebank, 3) && BIT(m_tilebank, 5))
 		m_tilemap[0]->draw(screen, bitmap, cliprect);
 
@@ -1265,6 +1278,9 @@ uint32_t gms_2layers_state::screen_update(screen_device &screen, bitmap_ind16 &b
 
 uint32_t gms_3layers_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	for (int i = 0; i < 64; i++)
+		m_tilemap[0]->set_scrolly(i, m_scrolly[i]);
+
 	if (BIT(m_tilebank, 3) && BIT(m_tilebank, 5))
 		m_tilemap[0]->draw(screen, bitmap, cliprect);
 
