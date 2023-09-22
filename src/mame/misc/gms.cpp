@@ -54,7 +54,7 @@ Notes:
 Keep pressed 9 and press reset to enter service mode.
 
 TODO:
-- correct decode for 1st layer in sc2in1 and magslot
+- correct decode for 1st layer in sc2in1 and magslot (magslot also uses more videoram for tilemap 1)
 - fix 1st tilemap transparency enable
 - correct EEPROM hookup for all games
 - oki banking
@@ -87,7 +87,7 @@ super555: https://www.youtube.com/watch?v=CCUKdbQ5O-U
 // configurable logging
 #define LOG_TILEATTR (1U << 1)
 
-#define VERBOSE (LOG_GENERAL | LOG_TILEATTR)
+//#define VERBOSE (LOG_GENERAL | LOG_TILEATTR)
 
 #include "logmacro.h"
 
@@ -228,7 +228,7 @@ void gms_2layers_state::tilebank_w(uint16_t data)
 	//                 x // 2nd tilemap enable (probably)
 
 	if (m_tilebank & 0xf1c0)
-		LOGTILEATTR("%04x\n", m_tilebank);
+		LOGTILEATTR("unknown tilemap attribute: %04x\n", m_tilebank & 0xf1c0);
 }
 
 template <uint8_t Which>
@@ -1193,14 +1193,14 @@ static const gfx_layout rbmk32_layout =
 	32*32
 };
 
-static const gfx_layout magslot16_layout = // TODO: not correct
+static const gfx_layout magslot32_layout = // TODO: probably not 100% correct
 {
 	8,32,
 	RGN_FRAC(1,1),
 	8,
 	{ 8, 9, 10, 11, 0, 1, 2, 3 },
-	{ 0, 4, 16, 20, 32, 36, 48, 52,
-	64+0, 64+4, 64+16, 64+20, 64+32, 64+36, 64+48, 64+52},
+	{ 4, 0, 20, 16, 36, 32, 52, 48,
+	64+4, 64+0, 64+20, 64+16, 64+36, 64+32, 64+52, 64+48},
 	{ STEP32(0,8*8) },
 	32*64
 };
@@ -1212,7 +1212,7 @@ static GFXDECODE_START( gfx_rbmk )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_magslot )
-	GFXDECODE_ENTRY( "gfx1", 0, magslot16_layout,         0x000, 16  )
+	GFXDECODE_ENTRY( "gfx1", 0, magslot32_layout,         0x000, 16  )
 	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_lsb,     0x100, 16  )
 	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_packed_lsb,     0x400, 16  )
 GFXDECODE_END
