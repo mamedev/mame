@@ -17746,6 +17746,9 @@ felega1
 felega2
 felega3
 
+@source:fidelity/bridgeb.cpp
+bridgeb
+
 @source:fidelity/card.cpp
 bridgec
 bridgec3

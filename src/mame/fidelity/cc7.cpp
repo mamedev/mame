@@ -109,8 +109,6 @@ void bcc_state::machine_start()
     I/O
 *******************************************************************************/
 
-// TTL
-
 void bcc_state::control_w(offs_t offset, u8 data)
 {
 	// a0-a2,d7: digit segment data via NE591
