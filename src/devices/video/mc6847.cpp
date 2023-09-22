@@ -95,7 +95,7 @@
 #define LOG_FSYNC    (1U << 3)
 #define LOG_FLUSH    (1U << 4)
 #define LOG_INPUT    (1U << 5)
-#define VERBOSE (0)
+#define VERBOSE (LOG_FSYNC)
 #include "logmacro.h"
 
 
@@ -406,6 +406,9 @@ inline void mc6847_friend_device::next_scanline()
 		m_logical_scanline_zone = SCANLINE_ZONE_BOTTOM_BORDER;
 		enter_bottom_border();
 	}
+
+	// Temporary debugging aid
+	LOGMASKED(LOG_FSYNC, "mc6847_friend_device::next_scanline(): vpos='%d', m_physical_scanline='%d', m_logical_scanline_zone='%s', m_logical_scanline='%d'\n", (screen().vpos()), m_physical_scanline, (scanline_zone_string((scanline_zone)m_logical_scanline_zone)), m_logical_scanline);
 }
 
 
@@ -559,11 +562,16 @@ void mc6847_base_device::device_config_complete()
 
 	if (!screen().refresh_attoseconds())
 	{
-		// FIXME: use correct raw parameters rather than this nonsense
-		screen().set_refresh_hz(m_tpfs > 310.0 ? 50 : 60);
-		screen().set_size(320, 243);
-		screen().set_visarea(0, 320-1, 1, 241-1);
-		screen().set_vblank_time(0);
+		// This example fix for the synchronization problem betwen screen & mc6847
+		// slows the drift between screen's vpos and mc6847's m_physical_scanline
+		// a little bit not completely.  Still some roundoff error.
+		// Multiplying the clock by 1.72043 allows us to retain 320 visible whole
+		// pixels for each for horizontal line, but I doubt this is what the
+		// code should look like.
+		screen().set_raw(
+			(u32) (m_clock * 1.72043),
+			392 /* htotal */, 0 /* hbend */, 320 /* hbstart */,
+			m_tpfs /* vtotal */, 0 /* vbend */, 242 /*vbstart*/);
 	}
 
 	if (!screen().has_screen_update())
