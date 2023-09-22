@@ -3,7 +3,7 @@
 /*
     Konami PowerPC medal hardware
 
-    G1 Turf Wild 3 (c) 2005  GSF51
+    GI Turf Wild 3 (c) 2005  GSF51
 */
 
 #include "emu.h"
@@ -171,4 +171,4 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(2005, turfwld3, 0, konmedalppc, konmedalppc, konmedalppc_state, empty_init, ROT0, "Konami", "G1 Turf Wild 3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(2005, turfwld3, 0, konmedalppc, konmedalppc, konmedalppc_state, empty_init, ROT0, "Konami", "GI Turf Wild 3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
