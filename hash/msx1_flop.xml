@@ -3498,18 +3498,6 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="bswriter">
-		<description>Bank Street Writer (Japan, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;cart2disk hack&gt;</publisher>
-		<info name="usage" value="Hold CTRL at boot until the beep." />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="bank street writer (1983)(toshiba-emi)(jp).dsk" size="737280" crc="752adfdf" sha1="fbbb44360685b342848b800e3578f6cb3764c55a" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="barnabas">
 		<description>Barnabasket (Spain, disk conversion)</description>
 		<year>19??</year>
@@ -3649,17 +3637,6 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="castillo de godless, el (1985)(idealogic)(es).dsk" size="737280" crc="4dadef92" sha1="15d435ee6209562cc705876c411809545e0dfaf0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chubbygr">
-		<description>Chubby Gristle (United Kingdom, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;tape2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="chubby gristle (1988)(grandslam entertainments)(gb).dsk" size="737280" crc="1257ca62" sha1="e09d5ef43bdc4bc9ebbe6613dff1f17422f1993b" />
 			</dataarea>
 		</part>
 	</software>
@@ -3911,28 +3888,6 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="donpan">
-		<description>DonPan (Japan, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;tape2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="donpan (1983)(nippon columbia - colpax - universal).dsk" size="737280" crc="57052d7c" sha1="a593850e3ff451dc5f52be5f9faa54eb5d2f78af" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="eagle">
-		<description>Eagle (Spain, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;tape2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="eagle (1987)(dro soft)(es).dsk" size="737280" crc="13321097" sha1="522b17192c410d8c23ba293cb37166de714d59d1" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="eatit">
 		<description>Eat It (Netherlands, disk conversion)</description>
 		<year>19??</year>
@@ -3952,17 +3907,6 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="eggy (1985)(bothtec)(jp).dsk" size="737280" crc="ee86dc5c" sha1="db14fe498da9b19218e71e3c529248c983d6b66a" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="emerisle">
-		<description>Emerald Isle (United Kingdom, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;tape2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="emerald isle (1985)(level 9 computing)(gb).dsk" size="737280" crc="392fe667" sha1="cd083fba7218c8b85d3aada559bd8ac5bb450c0a" />
 			</dataarea>
 		</part>
 	</software>
@@ -4110,17 +4054,6 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="fbmanger">
-		<description>Football Manager (Europe, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;tape2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="football manager (1987)(addictive games)(es-gb).dsk" size="737280" crc="bc7d6d2d" sha1="b3ad3cef2f486bdc9d952c00630e8d98e272e5e1" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="forajido">
 		<description>Forajidos (Spain, disk conversion)</description>
 		<year>19??</year>
@@ -4241,17 +4174,6 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="globiblood (1986)(proeco)(es).dsk" size="737280" crc="b5fe4117" sha1="9e04ec43de8004eefb4fc87ffb3d65fc9459d10b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gfxartst">
-		<description>Graphic Artist (Japan, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;cart2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="graphic artist (1985)(yamaha)(jp)[mouse].dsk" size="737280" crc="6d3e5213" sha1="74ecb5eac26367bde2318441955c0a99a19b37f8" />
 			</dataarea>
 		</part>
 	</software>
@@ -4435,17 +4357,6 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="jumpjet">
-		<description>Jump Jet (Brazil, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;tape2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="jump jet (1985)(anirog software)(gb)[tr pt plansoft].dsk" size="737280" crc="da65e4bb" sha1="8d04b8be76656d131ee50ecc6d1133040f7a81d9" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="kaerusht">
 		<description>Kaeru Shooter (Japan, disk conversion)</description>
 		<year>19??</year>
@@ -4615,17 +4526,6 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="minder">
-		<description>Minder (United Kingdom, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;tape2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="minder (1985)(dk'tronics)(gb).dsk" size="737280" crc="75937147" sha1="3915914a69c9dacb52665349f23ba3b0d31823a7" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="motormad">
 		<description>Motorbike Madness (United Kingdom, disk conversion)</description>
 		<year>19??</year>
@@ -4645,28 +4545,6 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="multipuzzle (1985)(anaya multimedia)(es).dsk" size="737280" crc="5e1acf5e" sha1="90e3a685a5a4c1d1044bc972eb27bbf1f1828bfe" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="munsters">
-		<description>The Munsters (United Kingdom, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;tape2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="munsters, the (1989)(alternative software).dsk" size="737280" crc="3a17c8ef" sha1="83cc5884240a12426fe34bacdf8806bb6f98c34c" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="munstersa" cloneof="munsters">
-		<description>The Munsters (United Kingdom, disk conversion, alt)</description>
-		<year>19??</year>
-		<publisher>&lt;tape2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="munsters, the (1989)(alternative software)[a].dsk" size="737280" crc="8d9cb5e1" sha1="fb6218bd157f5fb0cb6f5dfee33f079c6b868d26" />
 			</dataarea>
 		</part>
 	</software>
@@ -4860,17 +4738,6 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="puddles - exercices avec formes (1984)(morwood software)(gb)(fr).dsk" size="737280" crc="2122a878" sha1="9287b20ed4a3665bd72ef571da872080541c0474" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="punchjud">
-		<description>Punch &amp; Judy (United Kingdom, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;tape2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="punch &amp; judy (1986)(alternative software).dsk" size="737280" crc="06631e91" sha1="2f90a2d5f006df05f1b585c6fb2753f74878af01" />
 			</dataarea>
 		</part>
 	</software>
@@ -5101,17 +4968,6 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="startrek">
-		<description>Star Trek - Strategic Operations Simulator (Japan, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;cart2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="star trek - strategic operations simulator (1986)(sega)(jp).dsk" size="737280" crc="3ee873d9" sha1="64da50bb491074aa43b681dfb0d774603ea38f48" />
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- Software does not autoboot -->
 	<software name="subshoot">
 		<description>Submarine Shooter (Japan, disk conversion)</description>
@@ -5154,40 +5010,6 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="tarot (1986)(nice ideas)(fr).dsk" size="737280" crc="7474b2a1" sha1="428536b49be7052b8c316de1e9910b62f18c4cd6" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="timemag1">
-		<description>Time and Magik I - Lords of Time (United Kingdom, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;tape2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="time and magik i - lords of time (1983)(level 9 computing)(gb).dsk" size="737280" crc="60fca1f5" sha1="7a9be16ff11509450db2a2c1d28aa67ec742f33a" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="timemag2">
-		<description>Time and Magik II - Red Moon (United Kingdom, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;tape2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="time and magik ii - red moon (1985)(level 9 computing)(gb).dsk" size="737280" crc="d2c818cf" sha1="619ca419086d0b09c46a5f54bf8745a0f2c83779" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="timemag3">
-		<description>Time and Magik III - The Price of Magik (United Kingdom, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;tape2disk hack&gt;</publisher>
-		<info name="usage" value="Hold CTRL at boot until the beep." />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="time and magik iii - the price of magik (1986)(level 9 computing)(gb).dsk" size="737280" crc="56609344" sha1="78a9dc8a9c1b633bed0178bd113053ac581e4eec" />
 			</dataarea>
 		</part>
 	</software>
@@ -5572,17 +5394,6 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="cannonfg">
-		<description>Cannon Fighter (Japan, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;tape2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="cannon fighter (1984)(policy)(jp).dsk" size="737280" crc="8091560e" sha1="09cd7dd65d4f597fa486fd390be6429b33e5531f" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="champion">
 		<description>Champions (Japan, disk conversion)</description>
 		<year>19??</year>
@@ -5682,50 +5493,6 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="dipdip">
-		<description>Dip Dip (Spain, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;cart2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="dip dip (1985)(indescomp)(es).dsk" size="737280" crc="b5325fbf" sha1="d4a3650642ded7a784d2de126b4f32d43eb4d352" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dizzybal">
-		<description>Dizzy Ball (Japan, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;tape2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="dizzy ball (1983)(pony canyon)(jp).dsk" size="737280" crc="5c4decca" sha1="118ce1269b81d14e1533f453c3e72ab258baada0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="driltank">
-		<description>Driller Tanks (Japan, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;tape2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="driller tanks (1984)(hudson soft)(jp).dsk" size="737280" crc="62321800" sha1="42e83d5a92d19e4bd1913d49da32d3f3b8fa5e89" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="driltanka" cloneof="driltank">
-		<description>Driller Tanks (Japan, disk conversion, alt)</description>
-		<year>19??</year>
-		<publisher>&lt;tape2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="driller tanks (1984)(hudson soft)(jp)[a].dsk" size="737280" crc="24f02f3e" sha1="ff41af502a2696389ffdd553030fc7e46bc37e45" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="eddy2">
 		<description>Eddy II (Japan, disk conversion)</description>
 		<year>19??</year>
@@ -5733,18 +5500,6 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="eddy ii (1984)(hal laboratory)(jp).dsk" size="737280" crc="f1c0d444" sha1="42dcbd088482e6f02d41377f4b39208d1bd20714" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Does not have 'BOMBERMAN 1983 HUDSONSOFT' at the bottom of the game screen like the cartridge version. -->
-	<software name="ericflo">
-		<description>Eric and the Floaters (Europe, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;cart2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="bomber man. eric and the floaters (1985)(kuma computers)(gb).dsk" size="737280" crc="747ba62d" sha1="1eb6e46d62ff2def66b2d3a6caef02c58409b336" />
 			</dataarea>
 		</part>
 	</software>
@@ -5842,17 +5597,6 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="jumping rabbit (1984)(mia)(jp).dsk" size="737280" crc="ee81386a" sha1="602601f88b2d9556ceef51bd4bb149ad23df47dc" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="keykaper">
-		<description>Keystone Kapers (United Kingdom, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;cart2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="keystone kapers (1984)(activision)(us).dsk" size="737280" crc="6fbe060d" sha1="655cd37b9a6a847532f9fe24b4834dc9ff192844" />
 			</dataarea>
 		</part>
 	</software>
@@ -6040,17 +5784,6 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="sdadrian">
-		<description>The Secret Diary of Adrian Mole (United Kingdom, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;tape2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="secret diary of adrian mole, the (1985)(mosaic publishing).dsk" size="737280" crc="231cfd6a" sha1="e879ae279c0ca45a849aa825a461e58e3e06ec27" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="protenn">
 		<description>Profesional Tennis Simulator (Spain)</description>
 		<year>1990</year>
@@ -6118,30 +5851,6 @@ The following floppies came with the machines.
 			<dataarea name="flop" size="737280">
 				<!-- According to generation-msx this was released on a single sided floppy. -->
 				<rom name="time rider (1988)(eurosoft)(nl).dsk" size="737280" crc="301256e9" sha1="948cb883716b415e9d28f05bfc9810f046cc5894" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Only the Manhattan Transfer cassette version has been dumped. -->
-	<software name="vampire">
-		<description>Vampire (Europe, disk conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;tape2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="vampire (1986)(codemasters)(gb)[aka phantomas 2].dsk" size="737280" crc="990b21e0" sha1="bccc3cf3a5fcb52079c37ee6c92eab6dbbe6eb6e" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Only the Manhattan Transfer cassette version has been dumped. -->
-	<software name="vampirea" cloneof="vampire">
-		<description>Vampire (Europe, disk conversion, alt)</description>
-		<year>19??</year>
-		<publisher>&lt;tape2disk hack&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="vampire (1986)(codemasters)(gb)[a][aka phantomas 2].dsk" size="737280" crc="9d5feac8" sha1="26cd1c329912fd45e6d9f57937926b383531b30b" />
 			</dataarea>
 		</part>
 	</software>
