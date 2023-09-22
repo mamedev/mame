@@ -17068,11 +17068,6 @@ dct11em                         //
 decmate2                        //
 decmate3                        //
 
-@source:dec/decstation.cpp
-ds2100                          // 1989 Digital Equipment Corporation (DECstation 2100)
-ds3100                          // 1989 Digital Equipment Corporation (DECstation 3100)
-ds5k133                         // 1993 Digital Equipment Corporation (DECstation 5000/133)
-
 @source:dec/dectalk.cpp
 dectalk                         // 1983 Digital Equipment Corporation
 
@@ -17086,6 +17081,13 @@ dtc03                           // 1985 Digital Equipment Corporation
 d2k300axp                       // DEC 2000 Model 300 AXP
 d2k500axp                       // DEC 2000 Model 500 AXP
 dpcaxp150                       // DECpc AXP 150
+
+@source:dec/kn01.cpp
+ds2100                          // 1989 Digital Equipment Corporation (DECstation 2100)
+ds3100                          // 1989 Digital Equipment Corporation (DECstation 3100)
+
+@source:dec/kn02.cpp
+ds5k133                         // 1993 Digital Equipment Corporation (DECstation 5000/133)
 
 @source:dec/pdp1.cpp
 pdp1                            // 1961 DEC PDP1
