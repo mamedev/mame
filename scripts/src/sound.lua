@@ -1442,6 +1442,18 @@ if (SOUNDS["LC7535"]~=null) then
 end
 
 ---------------------------------------------------
+-- Sanyo LC78836M
+--@src/devices/sound/lc78836m.h,SOUNDS["LC78836M"] = true
+---------------------------------------------------
+
+if (SOUNDS["LC78836M"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/lc78836m.cpp",
+		MAME_DIR .. "src/devices/sound/lc78836m.h",
+	}
+end
+
+---------------------------------------------------
 -- Sanyo LC82310
 --@src/devices/sound/lc82310.h,SOUNDS["LC82310"] = true
 ---------------------------------------------------
