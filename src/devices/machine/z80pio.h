@@ -58,6 +58,7 @@ public:
 	// construction/destruction
 	z80pio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// configuration helpers
 	auto out_int_callback() { return m_out_int_cb.bind(); }
 	auto in_pa_callback() { return m_in_pa_cb.bind(); }
 	auto out_pa_callback() { return m_out_pa_cb.bind(); }
@@ -65,7 +66,6 @@ public:
 	auto in_pb_callback() { return m_in_pb_cb.bind(); }
 	auto out_pb_callback() { return m_out_pb_cb.bind(); }
 	auto out_brdy_callback() { return m_out_brdy_cb.bind(); }
-
 
 	// I/O line access
 	int rdy(int which) { return m_port[which].rdy(); }
@@ -196,9 +196,9 @@ private:
 
 		int m_mode;                 // mode register
 		int m_next_control_word;    // next control word
-		uint8_t m_input;              // input latch
-		uint8_t m_output;             // output latch
-		uint8_t m_ior;                // input/output register
+		uint8_t m_input;            // input latch
+		uint8_t m_output;           // output latch
+		uint8_t m_ior;              // input/output register
 		bool m_rdy;                 // ready
 		bool m_stb;                 // strobe
 
@@ -206,14 +206,14 @@ private:
 		bool m_ie;                  // interrupt enabled
 		bool m_ip;                  // interrupt pending
 		bool m_ius;                 // interrupt under service
-		uint8_t m_icw;                // interrupt control word
-		uint8_t m_vector;             // interrupt vector
-		uint8_t m_mask;               // interrupt mask
+		uint8_t m_icw;              // interrupt control word
+		uint8_t m_vector;           // interrupt vector
+		uint8_t m_mask;             // interrupt mask
 		bool m_match;               // logic equation match
 	};
 
 	// internal state
-	pio_port             m_port[2];
+	pio_port            m_port[2];
 	devcb_write_line    m_out_int_cb;
 
 	devcb_read8         m_in_pa_cb;
