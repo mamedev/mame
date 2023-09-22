@@ -65,18 +65,19 @@
 #include "machine/mc146818.h"
 #include "machine/z80scc.h"
 #include "machine/ncr53c90.h"
-//#include "machine/dc7061.h"
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
-#include "dec_lk201.h"
 #include "machine/am79c90.h"
-#include "machine/dc7085.h"
 #include "bus/rs232/rs232.h"
 #include "screen.h"
 #include "video/bt47x.h"
 #include "video/bt459.h"
-#include "video/decsfb.h"
+
+//#include "dc7061.h"
+#include "dc7085.h"
+#include "lk201.h"
+#include "sfb.h"
 
 #include "kn01.lh"
 

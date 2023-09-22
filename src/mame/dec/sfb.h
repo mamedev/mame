@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
 
-#ifndef MAME_VIDEO_DECSFB_H
-#define MAME_VIDEO_DECSFB_H
+#ifndef MAME_DEC_SFB_H
+#define MAME_DEC_SFB_H
 
 #pragma once
 
@@ -35,4 +35,4 @@ private:
 
 DECLARE_DEVICE_TYPE(DECSFB, decsfb_device)
 
-#endif // MAME_VIDEO_DECSFB_H
+#endif // MAME_DEC_SFB_H

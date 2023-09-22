@@ -4841,18 +4841,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/dc7085.h,MACHINES["DC7085"] = true
----------------------------------------------------
-
-if (MACHINES["DC7085"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/dc7085.cpp",
-		MAME_DIR .. "src/devices/machine/dc7085.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/i82357.h,MACHINES["I82357"] = true
 ---------------------------------------------------
 
