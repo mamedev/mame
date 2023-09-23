@@ -14,7 +14,7 @@ Hardware notes:
 - PCB label: main PCB: 510-1012, display PCB: 510-1013
 - Zilog Z80-CPU-PS @ ~1MHz (R/C clock, no XTAL)
 - Zilog Z80 PIO (custom label)
-- 16KB ROM (2* NEC 2364C), 1KB RAM (2*TC5514P)
+- 16KB ROM (2*NEC 2364C), 1KB RAM (2*TC5514P)
 - 3*Litronix DL1414, 4 more leds, piezo
 
 *******************************************************************************/

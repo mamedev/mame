@@ -47,9 +47,11 @@ D0-D3: keypad row
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork

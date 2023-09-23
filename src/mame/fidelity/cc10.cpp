@@ -115,8 +115,6 @@ void ccx_state::machine_start()
     I/O
 *******************************************************************************/
 
-// I8255 PPI
-
 void ccx_state::update_display()
 {
 	// 4 7segs + 2 leds

@@ -171,6 +171,7 @@ Two card decks exist (red and blue), each has the same set of barcodes.
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8243.h"
@@ -178,6 +179,7 @@ Two card decks exist (red and blue), each has the same set of barcodes.
 #include "sound/dac.h"
 #include "sound/s14001a.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
