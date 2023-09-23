@@ -5367,14 +5367,14 @@ public:
 
 static INPUT_PORTS_START( knascar )
 	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
 
 	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
 
@@ -5480,8 +5480,8 @@ ROM_END
   Konami Teenage Mutant Ninja Turtles II: Splinter Speaks (model 13012)
   * PCB label: BH012
   * Sharp SM511 under epoxy (die label KMS73B, 785)
-  * lcd screen with custom segments, 1-bit sound
-  * OKI MSM6373 ADPCM under epoxy
+  * OKI MSM6373 ADPCM under epoxy + 1-bit sound
+  * lcd screen with custom segments
 
 *******************************************************************************/
 
@@ -5495,7 +5495,7 @@ public:
 
 	void ktmnt2(machine_config &config);
 
-private:
+protected:
 	required_device<samples_device> m_samples;
 
 	void sound_w(u8 data);
@@ -5522,8 +5522,12 @@ void ktmnt2_state::sound_w(u8 data)
 			if (sample == 0)
 				m_samples->stop(0);
 		}
-		else if (sample < m_samples->samples() + 1)
-			m_samples->start(0, sample - 1);
+		else
+		{
+			sample--;
+			if (sample < m_samples->samples() && strncmp(m_samples->names()[sample + 1], "none", 4))
+				m_samples->start(0, sample);
+		}
 	}
 
 	// other: input mux
@@ -5677,6 +5681,192 @@ ROM_START( knfl )
 
 	ROM_REGION( 571173, "screen", 0)
 	ROM_LOAD( "knfl.svg", 0, 571173, CRC(406c5bed) SHA1(1f3a704f091b78c89c06108ba11310f4072cc178) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Konami Star Trek: 25th Anniversary (model 13015)
+  * PCB label: BH015
+  * Sharp SM511 under epoxy (die label KMS73B, 787)
+  * OKI MSM6373 ADPCM under epoxy + 1-bit sound
+  * lcd screen with custom segments
+
+*******************************************************************************/
+
+class kst25_state : public ktmnt2_state
+{
+public:
+	kst25_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ktmnt2_state(mconfig, type, tag)
+	{
+		// increase lcd decay: bullets flicker
+		m_decay_len = 30;
+	}
+
+	void kst25(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( kst25 )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, 0x02, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // Up/Down
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("FAKE") // Up/Down are electronically the same button
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+INPUT_PORTS_END
+
+// config
+
+static const char *const kst25_sample_names[] =
+{
+	"*kst25",
+	"beammeupscotty",
+	"warpspeed",
+	"thatsnotlogical",
+	"shieldsup",
+	"firethephotontorpedos",
+	"orbittheplanet",
+	"engage",
+	"boom",
+	"teleporter",
+	"klaxon",
+	"photontorpedo",
+	"hum",
+	nullptr
+};
+
+void kst25_state::kst25(machine_config &config)
+{
+	ktmnt2(config);
+
+	config.device_remove("screen");
+	mcfg_svg_screen(config, 1464, 1080);
+	m_samples->set_samples_names(kst25_sample_names);
+}
+
+// roms
+
+ROM_START( kst25 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "787.program", 0x0000, 0x1000, CRC(05abdeec) SHA1(b947fcf4c6c9696b606eabdc74594076013ff73c) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "787.melody", 0x000, 0x100, CRC(3f1c63d4) SHA1(efdfa49c4fd89f2ca5d5cfc6bf9fa741ac227338) )
+
+	ROM_REGION( 570121, "screen", 0)
+	ROM_LOAD( "kst25.svg", 0, 570121, CRC(6529d2de) SHA1(993c84ae46277d0d8e0af66473f6ce324b697638) )
+
+	ROM_REGION( 0x8000, "adpcm", 0)
+	ROM_LOAD( "msm6373", 0, 0x8000, NO_DUMP )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Konami Top Gun: Second Mission
+  * PCB label: BH017
+  * Sharp SM511 under epoxy (die label KMS73B, 792)
+  * OKI MSM6373 ADPCM under epoxy + 1-bit sound
+  * lcd screen with custom segments
+
+*******************************************************************************/
+
+class ktopgun2_state : public ktmnt2_state
+{
+public:
+	ktopgun2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ktmnt2_state(mconfig, type, tag)
+	{ }
+
+	void ktopgun2(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( ktopgun2 )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+// config
+
+static const char *const ktopgun2_sample_names[] =
+{
+	"*ktopgun2",
+	"explosion",
+	"crash",
+	"none",
+	"machinegun",
+	"boom",
+	"lockon",
+	"none",
+	"danger",
+	"missioncomplete",
+	"targetinrange",
+	"none",
+	"bailout",
+	"none",
+	"gameover",
+	nullptr
+};
+
+void ktopgun2_state::ktopgun2(machine_config &config)
+{
+	ktmnt2(config);
+
+	config.device_remove("screen");
+	mcfg_svg_screen(config, 1496, 1080);
+	m_samples->set_samples_names(ktopgun2_sample_names);
+}
+
+// roms
+
+ROM_START( ktopgun2 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "792.program", 0x0000, 0x1000, CRC(bb6eeeb6) SHA1(7bb21d1736ef7fdfc58ffc0e9dc633ec3c491117) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "792.melody", 0x000, 0x100, CRC(dce276ae) SHA1(27ce9c02e69c38120fd3608577176cdce29f6f06) )
+
+	ROM_REGION( 756991, "screen", 0)
+	ROM_LOAD( "ktopgun2.svg", 0, 756991, CRC(d65dbf75) SHA1(f2b55bfba784919f6601a7adaeeb7e5951a03367) )
+
+	ROM_REGION( 0x8000, "adpcm", 0)
+	ROM_LOAD( "msm6373", 0, 0x8000, NO_DUMP )
 ROM_END
 
 
@@ -11277,8 +11467,10 @@ SYST( 1990, kbottom9,     0,           0,      kbottom9,     kbottom9,     kbott
 SYST( 1990, kloneran,     0,           0,      kloneran,     kloneran,     kloneran_state,     empty_init, "Konami", "The Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, knascar,      0,           0,      knascar,      knascar,      knascar_state,      empty_init, "Konami", "Bill Elliott's NASCAR Racing (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, kblades,      0,           0,      kblades,      kblades,      kblades_state,      empty_init, "Konami", "Blades of Steel (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1990, ktmnt2,       0,           0,      ktmnt2,       ktmnt2,       ktmnt2_state,       empty_init, "Konami", "Teenage Mutant Ninja Turtles II: Splinter Speaks (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, ktmnt2,       0,           0,      ktmnt2,       ktmnt2,       ktmnt2_state,       empty_init, "Konami", "Teenage Mutant Ninja Turtles II: Splinter Speaks (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
 SYST( 1990, knfl,         0,           0,      knfl,         knfl,         knfl_state,         empty_init, "Konami", "NFL Football (Konami, handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, kst25,        0,           0,      kst25,        kst25,        kst25_state,        empty_init, "Konami", "Star Trek: 25th Anniversary (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
+SYST( 1991, ktopgun2,     0,           0,      ktopgun2,     ktopgun2,     ktopgun2_state,     empty_init, "Konami", "Top Gun: Second Mission (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
 SYST( 1991, ktmnt3,       0,           0,      ktmnt3,       ktmnt3,       ktmnt3_state,       empty_init, "Konami", "Teenage Mutant Ninja Turtles 3: Shredder's Last Stand (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, ktmntbb,      0,           0,      ktmntbb,      ktmntbb,      ktmntbb_state,      empty_init, "Konami", "Teenage Mutant Ninja Turtles: Basketball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, kbucky,       0,           0,      kbucky,       kbucky,       kbucky_state,       empty_init, "Konami", "Bucky O'Hare (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

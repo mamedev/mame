@@ -4,18 +4,16 @@
 /*******************************************************************************
 
 Chess King Master (yes, it's plainly named "Master")
-According to the manual, the chess engine is Cyrus (by Richard Lang).
+
+Chess King was a UK business formed by Intelligent Software, so logically,
+all the programs were by them. According to the manual, the chess engine is
+Cyrus (by Richard Lang).
 
 Hardware notes:
 - Z80 CPU(NEC D780C-1) @ 4MHz(8MHz XTAL), IRQ from 555 timer
 - 8KB ROM(NEC D2764C-3), 2KB RAM(NEC D4016C), ROM is scrambled for easy PCB placement
 - simple I/O via 2*74373 and a 74145
 - 8*8 chessboard buttons, 32+1 border leds, piezo
-
-TODO:
-- 1 WAIT CLK per M1, workaround with z80_set_cycle_tables is possible
-  (wait state is similar to MSX) but I can't be bothered, better solution
-  is to add M1 pin to the z80 core. Until then, it'll run ~20% too fast.
 
 *******************************************************************************/
 
@@ -59,7 +57,7 @@ protected:
 
 private:
 	// devices/pointers
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
 	required_device<sensorboard_device> m_board;
 	required_device<dac_2bit_ones_complement_device> m_dac;
@@ -78,6 +76,28 @@ private:
 
 	u16 m_inp_mux = 0;
 };
+
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
+
+void master_state::init_master()
+{
+	u8 *rom = memregion("maincpu")->base();
+	const u32 len = memregion("maincpu")->bytes();
+
+	// descramble data lines
+	for (int i = 0; i < len; i++)
+		rom[i] = bitswap<8>(rom[i], 4,5,0,7,6,1,3,2);
+
+	// descramble address lines
+	std::vector<u8> buf(len);
+	memcpy(&buf[0], rom, len);
+	for (int i = 0; i < len; i++)
+		rom[i] = buf[bitswap<16>(i, 15,14,13,12,11,3,7,9, 10,8,6,5,4,2,1,0)];
+}
 
 void master_state::machine_start()
 {
@@ -119,22 +139,6 @@ u8 master_state::input_r()
 		data = m_inputs[m_inp_mux - 8]->read();
 
 	return ~data;
-}
-
-void master_state::init_master()
-{
-	u8 *rom = memregion("maincpu")->base();
-	const u32 len = memregion("maincpu")->bytes();
-
-	// descramble data lines
-	for (int i = 0; i < len; i++)
-		rom[i] = bitswap<8>(rom[i], 4,5,0,7,6,1,3,2);
-
-	// descramble address lines
-	std::vector<u8> buf(len);
-	memcpy(&buf[0], rom, len);
-	for (int i = 0; i < len; i++)
-		rom[i] = buf[bitswap<16>(i, 15,14,13,12,11,3,7,9, 10,8,6,5,4,2,1,0)];
 }
 
 
@@ -215,6 +219,7 @@ void master_state::master(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, 8_MHz_XTAL/2);
+	m_maincpu->z80_set_m1_cycles(5); // 1 WAIT CLK per M1
 	m_maincpu->set_addrmap(AS_PROGRAM, &master_state::main_trampoline);
 	ADDRESS_MAP_BANK(config, "mainmap").set_map(&master_state::main_map).set_options(ENDIANNESS_LITTLE, 8, 16);
 
@@ -254,5 +259,5 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY       FULLNAME               FLAGS
-SYST( 1984, ckmaster, 0,      0,      master,  master, master_state, init_master, "Chess King", "Master (Chess King)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY, FULLNAME, FLAGS
+SYST( 1984, ckmaster, 0,      0,      master,  master, master_state, init_master, "Chess King / Intelligent Software", "Master (Chess King)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

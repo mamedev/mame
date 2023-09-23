@@ -5033,7 +5033,25 @@ AMD MACH110-20 (CPLD)
 
 ***************************************************************************/
 
-ROM_START( pururun )
+ROM_START( pururun ) // These labels follow standard production format, IE: Game code, region/revision - PU JA
+	ROM_REGION( 0x80000, "maincpu", 0 )        // 68000 Code
+	ROM_LOAD16_BYTE( "pu_ja-5.20e", 0x000000, 0x020000, CRC(c15ae3db) SHA1(7056ef5d96b7bdd30e85c2e7f0482cf04e2300c7) )
+	ROM_LOAD16_BYTE( "pu_ja-6.20c", 0x000001, 0x020000, CRC(2e21328a) SHA1(6aad7fb728042eef2edce73acd73cd9a29cb1082) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )       // NEC78C10 Code
+	ROM_LOAD( "pu_ja-8.3i", 0x000000, 0x020000, CRC(edc3830b) SHA1(13ee759d10711218465f6d7155e9c443a82b323c) )
+
+	ROM_REGION( 0x200000, "vdp2", 0 )   // Gfx + Data (Addressable by CPU & Blitter)
+	ROM_LOAD64_WORD( "pu_ja-2.14i", 0x000000, 0x080000, CRC(93a9dbed) SHA1(76d11a14e655d3d6de95847dd69f425467d1a1d9) )
+	ROM_LOAD64_WORD( "pu_ja-4.18i", 0x000002, 0x080000, CRC(47d82187) SHA1(a588f053781773d54a2333bf70965ff357da0253) )
+	ROM_LOAD64_WORD( "pu_ja-1.12i", 0x000004, 0x080000, CRC(436096c6) SHA1(35575defa25f0e3a7db3fb7a0e22e003e05d9c67) )
+	ROM_LOAD64_WORD( "pu_ja-3.16i", 0x000006, 0x080000, CRC(80619e1a) SHA1(625d3fc829e3b7f24de9b0b932b2cef2cd8509ef) )
+
+	ROM_REGION( 0x040000, "oki", 0 )    // Samples
+	ROM_LOAD( "pu_ja-7.3g", 0x000000, 0x040000, CRC(51ae4926) SHA1(1a69a00e960bda399aaf051b3dcc9e0a108c8047) )
+ROM_END
+
+ROM_START( pururuna ) // dev or proto version?, PU9 & 19 don't follow normal Game code, region/revision format
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "pu9-19-5.20e", 0x000000, 0x020000, CRC(5a466a1b) SHA1(032eeaf66ce1b601385a8e76d2efd9ea6fd34680) )
 	ROM_LOAD16_BYTE( "pu9-19-6.20c", 0x000001, 0x020000, CRC(d155a53c) SHA1(6916a1bad82c624b8757f5124416dac50a8dd7f5) )
@@ -5460,7 +5478,8 @@ GAME( 1994, toride2gk, toride2g, toride2g,  toride2g,   metro_state, init_metro,
 GAME( 1994, toride2j,  toride2g, toride2g,  toride2g,   metro_state, init_metro,    ROT0,   "Metro",                                           "Toride II (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, gunmast,   0,        pururun,   gunmast,    metro_state, init_metro,    ROT0,   "Metro",                                           "Gun Master", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, daitorid,  0,        daitorid,  daitorid,   metro_state, init_metro,    ROT0,   "Metro",                                           "Daitoride", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, pururun,   0,        pururun,   pururun,    metro_state, init_metro,    ROT0,   "Metro / Banpresto",                               "Pururun", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, pururun,   0,        pururun,   pururun,    metro_state, init_metro,    ROT0,   "Metro / Banpresto",                               "Pururun (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, pururuna,  pururun,  pururun,   pururun,    metro_state, init_metro,    ROT0,   "Metro / Banpresto",                               "Pururun (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, puzzli,    0,        puzzli,    puzzli,     metro_state, init_metro,    ROT0,   "Metro / Banpresto",                               "Puzzli (revision B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, puzzlia,   puzzli,   puzzlia,   puzzli,     metro_state, init_metro,    ROT0,   "Metro / Banpresto",                               "Puzzli (revision A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, 3kokushi,  0,        sankokushi,sankokushi, metro_state, init_karatour, ROT0,   "Mitchell",                                        "Sankokushi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -978,7 +978,6 @@ template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_so
 
 			case 0x1e: // Reserved
 				throw emu_fatalerror("DSP16: reserved op %u (PC = %04X)\n", op >> 11, m_st_pcbase);
-				break;
 
 			case 0x1f: // F1 ; y = Y ; x = *pt++[i]
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);

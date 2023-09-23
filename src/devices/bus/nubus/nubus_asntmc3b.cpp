@@ -15,6 +15,8 @@
 #include "emu.h"
 #include "nubus_asntmc3b.h"
 
+#include "multibyte.h"
+
 #define MAC8390_ROM_REGION  "asntm3b_rom"
 #define MAC8390_839X  "dp83902"
 
@@ -95,10 +97,11 @@ nubus_appleenet_device::nubus_appleenet_device(const machine_config &mconfig, co
 void nubus_mac8390_device::device_start()
 {
 	uint32_t slotspace;
-	char mac[7];
+	uint8_t mac[6];
 	uint32_t num = machine().rand();
 	memset(m_prom, 0x57, 16);
-	sprintf(mac+2, "\x1b%c%c%c", (num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff);
+	mac[2] = 0x1b;
+	put_u24be(mac+3, num);
 	mac[0] = mac[1] = 0;  // avoid gcc warning
 	memcpy(m_prom, mac, 6);
 	m_dp83902->set_mac(mac);

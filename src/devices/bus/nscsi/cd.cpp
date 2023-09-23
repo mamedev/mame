@@ -952,9 +952,9 @@ void nscsi_cdrom_apple_device::scsi_command()
 				scsi_cmdbuf[2] = 0x01;
 				scsi_cmdbuf[3] = 0x01;
 				scsi_cmdbuf[4] = 0x31;       // additional length
-				strncpy((char *)&scsi_cmdbuf[8],  "SONY    ", 8);
-				strncpy((char *)&scsi_cmdbuf[16], "CD-ROM CDU-8002 ", 16);
-				strncpy((char *)&scsi_cmdbuf[32], "1.8g", 4);
+				memcpy((char *)&scsi_cmdbuf[8],  "SONY    ", 8);
+				memcpy((char *)&scsi_cmdbuf[16], "CD-ROM CDU-8002 ", 16);
+				memcpy((char *)&scsi_cmdbuf[32], "1.8g", 4);
 				scsi_cmdbuf[39] = 0xd0;
 				scsi_cmdbuf[40] = 0x90;
 				scsi_cmdbuf[41] = 0x27;
@@ -996,13 +996,28 @@ void nscsi_cdrom_apple_device::scsi_command()
 
 				for (int trk = 0; trk < num_trks; trk++)
 				{
-					const uint32_t start_lba = image->get_track_start(trk + start_track);
-					const uint32_t start_frame = to_msf(start_lba);
+					// Coverity: The emulated program could conceivably request a buffer size for
+					// more tracks than exist, but we must still return the requested amount of data.
+					if ((trk + start_track) < image->get_last_track())
+					{
+						const uint32_t start_lba = image->get_track_start(trk + start_track);
+						const uint32_t start_frame = to_msf(start_lba);
 
-					scsi_cmdbuf[pos++] = image->get_adr_control(trk + start_track);
-					scsi_cmdbuf[pos++] = dec_2_bcd(BIT(start_frame, 16, 8)); // minutes
-					scsi_cmdbuf[pos++] = dec_2_bcd(BIT(start_frame, 8, 8));  // seconds
-					scsi_cmdbuf[pos++] = dec_2_bcd(BIT(start_frame, 0, 8));  // frames
+						scsi_cmdbuf[pos++] = image->get_adr_control(trk + start_track);
+						scsi_cmdbuf[pos++] = dec_2_bcd(BIT(start_frame, 16, 8)); // minutes
+						scsi_cmdbuf[pos++] = dec_2_bcd(BIT(start_frame, 8, 8));  // seconds
+						scsi_cmdbuf[pos++] = dec_2_bcd(BIT(start_frame, 0, 8));  // frames
+					}
+					else    // keep returning the last track if necessary
+					{
+						const uint32_t start_lba = image->get_track_start(image->get_last_track());
+						const uint32_t start_frame = to_msf(start_lba);
+
+						scsi_cmdbuf[pos++] = image->get_adr_control(image->get_last_track());
+						scsi_cmdbuf[pos++] = dec_2_bcd(BIT(start_frame, 16, 8)); // minutes
+						scsi_cmdbuf[pos++] = dec_2_bcd(BIT(start_frame, 8, 8));  // seconds
+						scsi_cmdbuf[pos++] = dec_2_bcd(BIT(start_frame, 0, 8));  // frames
+					}
 				}
 
 				scsi_data_in(SBUF_MAIN, pos);

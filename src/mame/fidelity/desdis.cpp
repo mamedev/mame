@@ -159,8 +159,6 @@ void desmas_state::init_fdes2265()
     I/O
 *******************************************************************************/
 
-// TTL/generic
-
 void desdis_state::update_lcd()
 {
 	u8 mask = (m_select & 8) ? 0 : 0xff;

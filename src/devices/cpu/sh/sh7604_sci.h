@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_CPU_SH2_SH7604_SCI_H
-#define MAME_CPU_SH2_SH7604_SCI_H
+#ifndef MAME_CPU_SH_SH7604_SCI_H
+#define MAME_CPU_SH_SH7604_SCI_H
 
 #pragma once
 
@@ -73,4 +73,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SH7604_SCI, sh7604_sci_device)
 
-#endif // MAME_CPU_SH2_SH7604_SCI_H
+#endif // MAME_CPU_SH_SH7604_SCI_H

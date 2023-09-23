@@ -7,6 +7,7 @@
 
 #include "emu.h"
 
+#include "bus/vme/vme.h"
 #include "bus/vme/mvme187.h"
 
 namespace {
@@ -24,11 +25,9 @@ public:
 
 void m8120_state::m8120(machine_config &config)
 {
-	VME(config, "vme", 0);
+	VME(config, "vme");
 
-	vme_slot_device &slot(VME_SLOT(config, "vme:0", 0));
-	slot.set_vme_slot("vme", 0);
-	slot.option_set("mvme187", MVME187);
+	VME_SLOT(config, "vme:slot1").option_set("mvme187", VME_MVME187);
 }
 
 ROM_START(m8120)

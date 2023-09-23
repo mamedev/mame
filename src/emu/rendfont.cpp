@@ -16,6 +16,7 @@
 
 #include "corestr.h"
 #include "coreutil.h"
+#include "multibyte.h"
 #include "path.h"
 
 #include "osdepend.h"
@@ -150,51 +151,27 @@ public:
 	}
 	u64 get_original_length() const
 	{
-		return
-				(u64(m_data[OFFS_ORIGLENGTH + 0]) << (7 * 8)) |
-				(u64(m_data[OFFS_ORIGLENGTH + 1]) << (6 * 8)) |
-				(u64(m_data[OFFS_ORIGLENGTH + 2]) << (5 * 8)) |
-				(u64(m_data[OFFS_ORIGLENGTH + 3]) << (4 * 8)) |
-				(u64(m_data[OFFS_ORIGLENGTH + 4]) << (3 * 8)) |
-				(u64(m_data[OFFS_ORIGLENGTH + 5]) << (2 * 8)) |
-				(u64(m_data[OFFS_ORIGLENGTH + 6]) << (1 * 8)) |
-				(u64(m_data[OFFS_ORIGLENGTH + 7]) << (0 * 8));
+		return get_u64be(m_data + OFFS_ORIGLENGTH);
 	}
 	u32 get_original_hash() const
 	{
-		return
-				(u32(m_data[OFFS_ORIGHASH + 0]) << (3 * 8)) |
-				(u32(m_data[OFFS_ORIGHASH + 1]) << (2 * 8)) |
-				(u32(m_data[OFFS_ORIGHASH + 2]) << (1 * 8)) |
-				(u32(m_data[OFFS_ORIGHASH + 3]) << (0 * 8));
+		return get_u32be(m_data + OFFS_ORIGHASH);
 	}
 	u32 get_glyph_count() const
 	{
-		return
-				(u32(m_data[OFFS_GLYPHCOUNT + 0]) << (3 * 8)) |
-				(u32(m_data[OFFS_GLYPHCOUNT + 1]) << (2 * 8)) |
-				(u32(m_data[OFFS_GLYPHCOUNT + 2]) << (1 * 8)) |
-				(u32(m_data[OFFS_GLYPHCOUNT + 3]) << (0 * 8));
+		return get_u32be(m_data + OFFS_GLYPHCOUNT);
 	}
 	u16 get_height() const
 	{
-		return
-				(u16(m_data[OFFS_HEIGHT + 0]) << (1 * 8)) |
-				(u16(m_data[OFFS_HEIGHT + 1]) << (0 * 8));
+		return get_u16be(m_data + OFFS_HEIGHT);
 	}
 	s16 get_y_offset() const
 	{
-		return
-				(u16(m_data[OFFS_YOFFSET + 0]) << (1 * 8)) |
-				(u16(m_data[OFFS_YOFFSET + 1]) << (0 * 8));
+		return get_u16be(m_data + OFFS_YOFFSET);
 	}
 	s32 get_default_character() const
 	{
-		return
-				(u32(m_data[OFFS_DEFCHAR + 0]) << (3 * 8)) |
-				(u32(m_data[OFFS_DEFCHAR + 1]) << (2 * 8)) |
-				(u32(m_data[OFFS_DEFCHAR + 2]) << (1 * 8)) |
-				(u32(m_data[OFFS_DEFCHAR + 3]) << (0 * 8));
+		return get_u32be(m_data + OFFS_DEFCHAR);
 	}
 
 	void set_magic()
@@ -208,45 +185,27 @@ public:
 	}
 	void set_original_length(u64 value)
 	{
-		m_data[OFFS_ORIGLENGTH + 0] = u8((value >> (7 * 8)) & 0x00ff);
-		m_data[OFFS_ORIGLENGTH + 1] = u8((value >> (6 * 8)) & 0x00ff);
-		m_data[OFFS_ORIGLENGTH + 2] = u8((value >> (5 * 8)) & 0x00ff);
-		m_data[OFFS_ORIGLENGTH + 3] = u8((value >> (4 * 8)) & 0x00ff);
-		m_data[OFFS_ORIGLENGTH + 4] = u8((value >> (3 * 8)) & 0x00ff);
-		m_data[OFFS_ORIGLENGTH + 5] = u8((value >> (2 * 8)) & 0x00ff);
-		m_data[OFFS_ORIGLENGTH + 6] = u8((value >> (1 * 8)) & 0x00ff);
-		m_data[OFFS_ORIGLENGTH + 7] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u64be(m_data + OFFS_ORIGLENGTH, value);
 	}
 	void set_original_hash(u32 value)
 	{
-		m_data[OFFS_ORIGHASH + 0] = u8((value >> (3 * 8)) & 0x00ff);
-		m_data[OFFS_ORIGHASH + 1] = u8((value >> (2 * 8)) & 0x00ff);
-		m_data[OFFS_ORIGHASH + 2] = u8((value >> (1 * 8)) & 0x00ff);
-		m_data[OFFS_ORIGHASH + 3] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u32be(m_data + OFFS_ORIGHASH, value);
 	}
 	void set_glyph_count(u32 value)
 	{
-		m_data[OFFS_GLYPHCOUNT + 0] = u8((value >> (3 * 8)) & 0x00ff);
-		m_data[OFFS_GLYPHCOUNT + 1] = u8((value >> (2 * 8)) & 0x00ff);
-		m_data[OFFS_GLYPHCOUNT + 2] = u8((value >> (1 * 8)) & 0x00ff);
-		m_data[OFFS_GLYPHCOUNT + 3] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u32be(m_data + OFFS_GLYPHCOUNT, value);
 	}
 	void set_height(u16 value)
 	{
-		m_data[OFFS_HEIGHT + 0] = u8((value >> (1 * 8)) & 0x00ff);
-		m_data[OFFS_HEIGHT + 1] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u16be(m_data + OFFS_HEIGHT, value);
 	}
 	void set_y_offset(s16 value)
 	{
-		m_data[OFFS_YOFFSET + 0] = u8((value >> (1 * 8)) & 0x00ff);
-		m_data[OFFS_YOFFSET + 1] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u16be(m_data + OFFS_YOFFSET, value);
 	}
 	void set_default_character(s32 value)
 	{
-		m_data[OFFS_DEFCHAR + 0] = u8((value >> (3 * 8)) & 0x00ff);
-		m_data[OFFS_DEFCHAR + 1] = u8((value >> (2 * 8)) & 0x00ff);
-		m_data[OFFS_DEFCHAR + 2] = u8((value >> (1 * 8)) & 0x00ff);
-		m_data[OFFS_DEFCHAR + 3] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u32be(m_data + OFFS_DEFCHAR, value);
 	}
 
 private:
@@ -286,74 +245,52 @@ public:
 
 	u32 get_encoding() const
 	{
-		return
-				(u32(m_ptr[OFFS_ENCODING + 0]) << (3 * 8)) |
-				(u32(m_ptr[OFFS_ENCODING + 1]) << (2 * 8)) |
-				(u32(m_ptr[OFFS_ENCODING + 2]) << (1 * 8)) |
-				(u32(m_ptr[OFFS_ENCODING + 3]) << (0 * 8));
+		return get_u32be(m_ptr + OFFS_ENCODING);
 	}
 	u16 get_x_advance() const
 	{
-		return
-				(u16(m_ptr[OFFS_XADVANCE + 0]) << (1 * 8)) |
-				(u16(m_ptr[OFFS_XADVANCE + 1]) << (0 * 8));
+		return get_u16be(m_ptr + OFFS_XADVANCE);
 	}
 	s16 get_bb_x_offset() const
 	{
-		return
-				(u16(m_ptr[OFFS_BBXOFFSET + 0]) << (1 * 8)) |
-				(u16(m_ptr[OFFS_BBXOFFSET + 1]) << (0 * 8));
+		return get_u16be(m_ptr + OFFS_BBXOFFSET);
 	}
 	s16 get_bb_y_offset() const
 	{
-		return
-				(u16(m_ptr[OFFS_BBYOFFSET + 0]) << (1 * 8)) |
-				(u16(m_ptr[OFFS_BBYOFFSET + 1]) << (0 * 8));
+		return get_u16be(m_ptr + OFFS_BBYOFFSET);
 	}
 	u16 get_bb_width() const
 	{
-		return
-				(u16(m_ptr[OFFS_BBWIDTH + 0]) << (1 * 8)) |
-				(u16(m_ptr[OFFS_BBWIDTH + 1]) << (0 * 8));
+		return get_u16be(m_ptr + OFFS_BBWIDTH);
 	}
 	u16 get_bb_height() const
 	{
-		return
-				(u16(m_ptr[OFFS_BBHEIGHT + 0]) << (1 * 8)) |
-				(u16(m_ptr[OFFS_BBHEIGHT + 1]) << (0 * 8));
+		return get_u16be(m_ptr + OFFS_BBHEIGHT);
 	}
 
 	void set_encoding(u32 value)
 	{
-		m_ptr[OFFS_ENCODING + 0] = u8((value >> (3 * 8)) & 0x00ff);
-		m_ptr[OFFS_ENCODING + 1] = u8((value >> (2 * 8)) & 0x00ff);
-		m_ptr[OFFS_ENCODING + 2] = u8((value >> (1 * 8)) & 0x00ff);
-		m_ptr[OFFS_ENCODING + 3] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u32be(m_ptr + OFFS_ENCODING, value);
 	}
 	void set_x_advance(u16 value)
 	{
-		m_ptr[OFFS_XADVANCE + 0] = u8((value >> (1 * 8)) & 0x00ff);
-		m_ptr[OFFS_XADVANCE + 1] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u16be(m_ptr + OFFS_XADVANCE, value);
 	}
 	void set_bb_x_offset(s16 value)
 	{
-		m_ptr[OFFS_BBXOFFSET + 0] = u8((value >> (1 * 8)) & 0x00ff);
-		m_ptr[OFFS_BBXOFFSET + 1] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u16be(m_ptr + OFFS_BBXOFFSET, value);
 	}
 	void set_bb_y_offset(s16 value)
 	{
-		m_ptr[OFFS_BBYOFFSET + 0] = u8((value >> (1 * 8)) & 0x00ff);
-		m_ptr[OFFS_BBYOFFSET + 1] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u16be(m_ptr + OFFS_BBYOFFSET, value);
 	}
 	void set_bb_width(u16 value)
 	{
-		m_ptr[OFFS_BBWIDTH + 0] = u8((value >> (1 * 8)) & 0x00ff);
-		m_ptr[OFFS_BBWIDTH + 1] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u16be(m_ptr + OFFS_BBWIDTH, value);
 	}
 	void set_bb_height(u16 value)
 	{
-		m_ptr[OFFS_BBHEIGHT + 0] = u8((value >> (1 * 8)) & 0x00ff);
-		m_ptr[OFFS_BBHEIGHT + 1] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u16be(m_ptr + OFFS_BBHEIGHT, value);
 	}
 
 	bdc_table_entry &operator=(bdc_table_entry const &that) = default;
@@ -673,7 +610,7 @@ void render_font::char_expand(char32_t chnum, glyph &gl)
 					if (accumbit == 7)
 						accum = *ptr++;
 					if (dest != nullptr)
-						*dest++ = (accum & (1 << accumbit)) ? fgcol : bgcol;
+						*dest++ = BIT(accum, accumbit) ? fgcol : bgcol;
 					accumbit = (accumbit - 1) & 7;
 				}
 			}
@@ -769,7 +706,7 @@ void render_font::char_expand(char32_t chnum, glyph &gl)
 					if (accumbit == 7)
 						accum = *ptr++;
 					if (dest != nullptr)
-						*dest++ = (accum & (1 << accumbit)) ? fgcol : bgcol;
+						*dest++ = BIT(accum, accumbit) ? fgcol : bgcol;
 					accumbit = (accumbit - 1) & 7;
 				}
 			}

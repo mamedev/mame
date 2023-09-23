@@ -1816,7 +1816,7 @@ void taitosj_state::nomcu(machine_config &config)
 	AY8910(config, m_ay[3], 12_MHz_XTAL / 8); // on GAME board, AY-3-8910 @ IC50
 	// TODO: Implement ay4 Port A bits 0 and 1 which connect to a 7416 open collector inverter, to selectively
 	// tie none, either or both of two capacitors between the ay4 audio output signal and ground,
-    // or between audio output signal and high-z (i.e. do nothing). Bio Attack uses this?
+	// or between audio output signal and high-z (i.e. do nothing). Bio Attack uses this?
 	m_ay[3]->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay[3]->port_b_write_callback().set(FUNC(taitosj_state::sndnmi_msk_w));
 	m_ay[3]->add_route(ALL_OUTPUTS, "speaker", 1.0);

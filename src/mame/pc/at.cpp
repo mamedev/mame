@@ -2751,7 +2751,7 @@ ROM_START( n8810m55 )
 ROM_END
 
 // Olivetti M250E aka DECStation 220 - PVGA1A on board with the ROM included in the main ROM - Board: BA241 - Chips: 16C451, 8742, WD37C65, GA99, GA80
-// CPU: 12MHz 80286 - FPU: 80287-2 socket provided - RAM: 1MB, 2MB, 4MB in SIMM modules - ROM: 64KB BIOS 1.07-1.09 - Mass storage: 2x 3.5" FDD HD, 
+// CPU: 12MHz 80286 - FPU: 80287-2 socket provided - RAM: 1MB, 2MB, 4MB in SIMM modules - ROM: 64KB BIOS 1.07-1.09 - Mass storage: 2x 3.5" FDD HD,
 // on board: AT/RLL controller - Shadow memory: E0000-FFFFF - Bus: 3xISA8/18 on riser board - Video: PVGA1A on board, 256KB RAM - Connectors: VGA, ser, par, PS/2 keyboard, PS/2 mouse
 ROM_START( m250e )
 	ROM_REGION16_LE(0x20000, "bios", 0 )

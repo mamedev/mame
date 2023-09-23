@@ -574,7 +574,7 @@ void s8_state::psound(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	PIA6821(config, m_pias, 0);
+	PIA6821(config, m_pias);
 	m_pias->readpa_handler().set(FUNC(s8_state::sound_r));
 	m_pias->set_port_a_input_overrides_output_mask(0xff);
 	m_pias->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
@@ -593,7 +593,7 @@ void s8_state::s8(machine_config &config)
 	genpin_audio(config);
 
 	/* Devices */
-	PIA6821(config, m_pia21, 0);
+	PIA6821(config, m_pia21);
 	m_pia21->readpa_handler().set(FUNC(s8_state::sound_r));
 	m_pia21->set_port_a_input_overrides_output_mask(0xff);
 	m_pia21->ca1_w(1); // sound busy
@@ -604,14 +604,14 @@ void s8_state::s8(machine_config &config)
 	m_pia21->irqa_handler().set(FUNC(s8_state::pia_irq));
 	m_pia21->irqb_handler().set(FUNC(s8_state::pia_irq));
 
-	PIA6821(config, m_pia24, 0);
+	PIA6821(config, m_pia24);
 	m_pia24->writepa_handler().set(FUNC(s8_state::lamp0_w));
 	m_pia24->writepb_handler().set(FUNC(s8_state::lamp1_w));
 	m_pia24->cb2_handler().set(FUNC(s8_state::pia24_cb2_w));
 	m_pia24->irqa_handler().set(FUNC(s8_state::pia_irq));
 	m_pia24->irqb_handler().set(FUNC(s8_state::pia_irq));
 
-	PIA6821(config, m_pia28, 0);
+	PIA6821(config, m_pia28);
 	m_pia28->writepa_handler().set(FUNC(s8_state::dig0_w));
 	m_pia28->writepb_handler().set(FUNC(s8_state::dig1_w));
 	m_pia28->ca2_handler().set(FUNC(s8_state::pia28_ca2_w));
@@ -619,7 +619,7 @@ void s8_state::s8(machine_config &config)
 	m_pia28->irqa_handler().set(FUNC(s8_state::pia_irq));
 	m_pia28->irqb_handler().set(FUNC(s8_state::pia_irq));
 
-	PIA6821(config, m_pia30, 0);
+	PIA6821(config, m_pia30);
 	m_pia30->readpa_handler().set(FUNC(s8_state::switch_r));
 	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s8_state::switch_w));

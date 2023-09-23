@@ -576,20 +576,20 @@ license:CC0-1.0
 		<group ref="sb_board"><bounds x="3.5" y="3" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-12.5" y="3" width="10" height="80" /></group>
 
-		<element ref="text_tb1"><bounds x="32.0" y="90.7" width="7.2" height="1.8" /></element>
-		<element ref="text_tb2a"><bounds x="38.5" y="89.0" width="5.2" height="1.8" /></element>
-		<element ref="text_tb2b"><bounds x="38.5" y="90.7" width="5.2" height="1.8" /></element>
-		<element ref="text_tb3"><bounds x="44.0" y="90.7" width="5.2" height="1.8" /></element>
-		<element ref="text_tb4a"><bounds x="49.5" y="89.0" width="5.2" height="1.8" /></element>
-		<element ref="text_tb4b"><bounds x="49.5" y="90.7" width="5.2" height="1.8" /></element>
-		<element ref="text_tb5a"><bounds x="55.0" y="89.0" width="5.2" height="1.8" /></element>
-		<element ref="text_tb5b"><bounds x="55.0" y="90.7" width="5.2" height="1.8" /></element>
-		<element ref="text_tb6a"><bounds x="60.5" y="89.0" width="5.2" height="1.8" /></element>
-		<element ref="text_tb6b"><bounds x="60.5" y="90.7" width="5.2" height="1.8" /></element>
-		<element ref="text_tb7"><bounds x="66.0" y="90.7" width="5.2" height="1.8" /></element>
-		<element ref="text_tb8a"><bounds x="71.5" y="89.0" width="5.2" height="1.8" /></element>
-		<element ref="text_tb8b"><bounds x="71.5" y="90.7" width="5.2" height="1.8" /></element>
-		<element ref="text_tb9"><bounds x="78.8" y="90.7" width="5.2" height="1.8" /></element>
+		<element ref="text_tb1"><bounds x="32.0" y="90.7" width="7.2" height="1.75" /></element>
+		<element ref="text_tb2a"><bounds x="38.5" y="89.0" width="5.2" height="1.75" /></element>
+		<element ref="text_tb2b"><bounds x="38.9" y="90.7" width="4.6" height="1.75" /></element>
+		<element ref="text_tb3"><bounds x="44.0" y="90.7" width="5.2" height="1.75" /></element>
+		<element ref="text_tb4a"><bounds x="49.5" y="89.0" width="5.2" height="1.75" /></element>
+		<element ref="text_tb4b"><bounds x="49.5" y="90.7" width="5.2" height="1.75" /></element>
+		<element ref="text_tb5a"><bounds x="55.0" y="89.0" width="5.2" height="1.75" /></element>
+		<element ref="text_tb5b"><bounds x="55.0" y="90.7" width="5.2" height="1.75" /></element>
+		<element ref="text_tb6a"><bounds x="60.5" y="89.0" width="5.2" height="1.75" /></element>
+		<element ref="text_tb6b"><bounds x="60.5" y="90.7" width="5.2" height="1.75" /></element>
+		<element ref="text_tb7"><bounds x="66.0" y="90.7" width="5.2" height="1.75" /></element>
+		<element ref="text_tb8a"><bounds x="71.5" y="89.0" width="5.2" height="1.75" /></element>
+		<element ref="text_tb8b"><bounds x="71.5" y="90.7" width="5.2" height="1.75" /></element>
+		<element ref="text_tb9"><bounds x="78.8" y="90.7" width="5.2" height="1.75" /></element>
 
 		<group ref="shared"><bounds x="-0.5" y="6.5" width="83" height="94.9" /></group>
 	</view>

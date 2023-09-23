@@ -821,13 +821,13 @@ void mpu3_state::mpu3base(machine_config &config)
 	m_ptm2->o3_callback().set(FUNC(mpu3_state::ic2_o3_callback));
 	m_ptm2->irq_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
-	PIA6821(config, m_pia3, 0);
+	PIA6821(config, m_pia3);
 	m_pia3->readpa_handler().set(FUNC(mpu3_state::pia_ic3_porta_r));
 	m_pia3->writepb_handler().set(FUNC(mpu3_state::pia_ic3_portb_w));
 	m_pia3->ca2_handler().set(FUNC(mpu3_state::pia_ic3_ca2_w));
 	m_pia3->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	PIA6821(config, m_pia4, 0);
+	PIA6821(config, m_pia4);
 	m_pia4->readpa_handler().set(FUNC(mpu3_state::pia_ic4_porta_r));
 	m_pia4->writepa_handler().set(FUNC(mpu3_state::pia_ic4_porta_w));
 	m_pia4->writepb_handler().set(FUNC(mpu3_state::pia_ic4_portb_w));
@@ -835,14 +835,14 @@ void mpu3_state::mpu3base(machine_config &config)
 	m_pia4->cb2_handler().set(FUNC(mpu3_state::pia_ic4_cb2_w));
 	m_pia4->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	PIA6821(config, m_pia5, 0);
+	PIA6821(config, m_pia5);
 	m_pia5->readpb_handler().set(FUNC(mpu3_state::pia_ic5_portb_r));
 	m_pia5->writepa_handler().set(FUNC(mpu3_state::pia_ic5_porta_w));
 	m_pia5->writepb_handler().set(FUNC(mpu3_state::pia_ic5_portb_w));
 	m_pia5->ca2_handler().set(FUNC(mpu3_state::pia_ic5_ca2_w));
 	m_pia5->cb2_handler().set(FUNC(mpu3_state::pia_ic5_cb2_w));
 
-	PIA6821(config, m_pia6, 0);
+	PIA6821(config, m_pia6);
 	m_pia6->readpa_handler().set(FUNC(mpu3_state::pia_ic6_porta_r));
 	m_pia6->readpb_handler().set(FUNC(mpu3_state::pia_ic6_portb_r));
 	m_pia6->writepa_handler().set(FUNC(mpu3_state::pia_ic6_porta_w));

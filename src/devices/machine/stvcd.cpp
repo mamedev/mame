@@ -44,6 +44,7 @@ DASM notes:
 #include "machine/stvcd.h"
 
 #include "coreutil.h"
+#include "multibyte.h"
 
 #define LOG_WARN           (1U << 1)
 #define LOG_CMD            (1U << 2)
@@ -199,10 +200,7 @@ inline u32 stvcd_device::dataxfer_long_r()
 			if (xfersect < xfersectnum)
 			{
 				// get next longword
-				rv = (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 0]<<24) |
-						(transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 1]<<16) |
-						(transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 2]<<8)  |
-						(transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 3]<<0);
+				rv = get_u32be(&transpart->blocks[xfersectpos+xfersect]->data[xferoffs]);
 
 				xferdnum += 4;
 				xferoffs += 4;
@@ -262,10 +260,7 @@ inline void stvcd_device::dataxfer_long_w(u32 data)
 			if (xfersect < xfersectnum)
 			{
 				// get next longword
-				transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 0] = (data >> 24) & 0xff;
-				transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 1] = (data >> 16) & 0xff;
-				transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 2] = (data >> 8) & 0xff;
-				transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 3] = (data >> 0) & 0xff;
+				put_u32be(&transpart->blocks[xfersectpos+xfersect]->data[xferoffs], data);
 
 				xferdnum += 4;
 				xferoffs += 4;
@@ -300,7 +295,7 @@ inline u16 stvcd_device::dataxfer_word_r()
 	switch (xfertype)
 	{
 		case XFERTYPE_TOC:
-			rv = tocbuf[xfercount]<<8 | tocbuf[xfercount+1];
+			rv = get_u16be(&tocbuf[xfercount]);
 
 			xfercount += 2;
 			xferdnum += 2;
@@ -313,7 +308,7 @@ inline u16 stvcd_device::dataxfer_word_r()
 			break;
 
 		case XFERTYPE_FILEINFO_1:
-			rv = finfbuf[xfercount]<<8 | finfbuf[xfercount+1];
+			rv = get_u16be(&finfbuf[xfercount]);
 			xfercount += 2;
 			xferdnum += 2;
 
@@ -330,22 +325,16 @@ inline u16 stvcd_device::dataxfer_word_r()
 				uint32_t temp = 2 + (xfercount / (0x6 * 2));
 
 				// first 4 bytes = FAD
-				finfbuf[0] = (curdir[temp].firstfad>>24)&0xff;
-				finfbuf[1] = (curdir[temp].firstfad>>16)&0xff;
-				finfbuf[2] = (curdir[temp].firstfad>>8)&0xff;
-				finfbuf[3] = (curdir[temp].firstfad&0xff);
+				put_u32be(&finfbuf[0], curdir[temp].firstfad);
 				// second 4 bytes = length of file
-				finfbuf[4] = (curdir[temp].length>>24)&0xff;
-				finfbuf[5] = (curdir[temp].length>>16)&0xff;
-				finfbuf[6] = (curdir[temp].length>>8)&0xff;
-				finfbuf[7] = (curdir[temp].length&0xff);
+				put_u32be(&finfbuf[4], curdir[temp].length);
 				finfbuf[8] = curdir[temp].interleave_gap_size;
 				finfbuf[9] = curdir[temp].file_unit_size;
 				finfbuf[10] = temp;
 				finfbuf[11] = curdir[temp].flags;
 			}
 
-			rv = finfbuf[xfercount % (6 * 2)]<<8 | finfbuf[(xfercount % (6 * 2)) +1];
+			rv = get_u16be(&finfbuf[xfercount % (6 * 2)]);
 
 			xfercount += 2;
 			xferdnum += 2;
@@ -358,7 +347,7 @@ inline u16 stvcd_device::dataxfer_word_r()
 			break;
 
 		case XFERTYPE_SUBQ:
-			rv = subqbuf[xfercount]<<8 | subqbuf[xfercount+1];
+			rv = get_u16be(&subqbuf[xfercount]);
 
 			xfercount += 2;
 			xferdnum += 2;
@@ -372,7 +361,7 @@ inline u16 stvcd_device::dataxfer_word_r()
 
 
 		case XFERTYPE_SUBRW:
-			rv = subrwbuf[xfercount]<<8 | subrwbuf[xfercount+1];
+			rv = get_u16be(&subrwbuf[xfercount]);
 
 			xfercount += 2;
 			xferdnum += 2;
@@ -608,7 +597,7 @@ void stvcd_device::cmd_get_session_info()
 			cr1 = cd_stat;
 			cr2 = 0;
 			cr3 = 0x0100 | tocbuf[(101*4)+1];
-			cr4 = tocbuf[(101*4)+2]<<8 | tocbuf[(101*4)+3];
+			cr4 = get_u16be(&tocbuf[(101*4)+2]);
 			break;
 
 		case 1: // get total session info / disc start
@@ -1754,15 +1743,9 @@ void stvcd_device::cmd_get_target_file_info()
 			throw emu_fatalerror("File ID not found in XFERTYPE_FILEINFO_1");
 //      LOGWARN("%08x %08x\n",curdir[temp].firstfad,curdir[temp].length);
 		// first 4 bytes = FAD
-		finfbuf[0] = (curdir[temp].firstfad>>24)&0xff;
-		finfbuf[1] = (curdir[temp].firstfad>>16)&0xff;
-		finfbuf[2] = (curdir[temp].firstfad>>8)&0xff;
-		finfbuf[3] = (curdir[temp].firstfad&0xff);
+		put_u32be(&finfbuf[0], curdir[temp].firstfad);
 		// second 4 bytes = length of file
-		finfbuf[4] = (curdir[temp].length>>24)&0xff;
-		finfbuf[5] = (curdir[temp].length>>16)&0xff;
-		finfbuf[6] = (curdir[temp].length>>8)&0xff;
-		finfbuf[7] = (curdir[temp].length&0xff);
+		put_u32be(&finfbuf[4], curdir[temp].length);
 		finfbuf[8] = curdir[temp].interleave_gap_size;
 		finfbuf[9] = curdir[temp].file_unit_size;
 		finfbuf[10] = temp;
@@ -2258,13 +2241,13 @@ void stvcd_device::read_new_dir(uint32_t fileno)
 		// got primary vol. desc.
 		if (foundpd)
 		{
-			//dirfad = sect[140] | (sect[141]<<8) | (sect[142]<<16) | (sect[143]<<24);
+			//dirfad = get_u32le(&sect[140]);
 			//dirfad += 150;
 
 			// parse root entry
-			curroot.firstfad = sect[158] | (sect[159]<<8) | (sect[160]<<16) | (sect[161]<<24);
+			curroot.firstfad = get_u32le(&sect[158]);
 			curroot.firstfad += 150;
-			curroot.length = sect[166] | (sect[167]<<8) | (sect[168]<<16) | (sect[169]<<24);
+			curroot.length = get_u32le(&sect[166]);
 			curroot.flags = sect[181];
 			for (i = 0; i < sect[188]; i++)
 			{
@@ -2354,9 +2337,9 @@ void stvcd_device::make_dir_current(uint32_t fad)
 
 		curentry->record_size = sect[nextent+0];
 		curentry->xa_record_size = sect[nextent+1];
-		curentry->firstfad = sect[nextent+2] | (sect[nextent+3]<<8) | (sect[nextent+4]<<16) | (sect[nextent+5]<<24);
+		curentry->firstfad = get_u32le(&sect[nextent+2]);
 		curentry->firstfad += 150;
-		curentry->length = sect[nextent+10] | (sect[nextent+11]<<8) | (sect[nextent+12]<<16) | (sect[nextent+13]<<24);
+		curentry->length = get_u32le(&sect[nextent+10]);
 		curentry->year = sect[nextent+18];
 		curentry->month = sect[nextent+19];
 		curentry->day = sect[nextent+20];
@@ -2367,7 +2350,7 @@ void stvcd_device::make_dir_current(uint32_t fad)
 		curentry->flags = sect[nextent+25];
 		curentry->file_unit_size = sect[nextent+26];
 		curentry->interleave_gap_size = sect[nextent+27];
-		curentry->volume_sequencer_number = sect[nextent+28] | (sect[nextent+29] << 8);
+		curentry->volume_sequencer_number = get_u16le(&sect[nextent+28]);
 
 		for (i = 0; i < sect[nextent+32]; i++)
 		{
@@ -2441,9 +2424,7 @@ void stvcd_device::cd_readTOC(void)
 		{
 			fad = m_cdrom_image->get_track_start(i) + 150;
 
-			tocbuf[tocptr+1] = (fad>>16)&0xff;
-			tocbuf[tocptr+2] = (fad>>8)&0xff;
-			tocbuf[tocptr+3] = fad&0xff;
+			put_u24be(&tocbuf[tocptr+1], fad);
 		}
 		else
 		{
@@ -2483,9 +2464,7 @@ void stvcd_device::cd_readTOC(void)
 	fad = m_cdrom_image->get_track_start(0xaa) + 150;
 
 	tocbuf[tocptr+8] = tocbuf[0];
-	tocbuf[tocptr+9]  = (fad>>16)&0xff;
-	tocbuf[tocptr+10] = (fad>>8)&0xff;
-	tocbuf[tocptr+11] = fad&0xff;
+	put_u24be(&tocbuf[tocptr+9], fad);
 }
 
 stvcd_device::partitionT *stvcd_device::cd_filterdata(filterT *flt, int trktype, uint8_t *p_ok)

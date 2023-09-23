@@ -179,6 +179,304 @@ protected:
 		SK_COMPLETED                     = 0x0f
 	};
 
+	// SCSI SPACE type codes; SCSI-2 table 189
+	enum {
+		STC_BLOCKS                          = 0x00,
+		STC_FILEMARKS                       = 0x01,
+		STC_SEQUENTIAL_FILEMARKS            = 0x02,
+		STC_END_OF_DATA                     = 0x03,
+		STC_SETMARKS                        = 0x04,
+		STC_SEQUENTIAL_SETMARKS             = 0x05
+	};
+
+	// SCSI MODE SENSE page controls; SCSI-2 table 55
+	enum {
+		SPC_CURRENT_VALUES                  = 0x00,
+		SPC_CHANGEABLE_VALUES               = 0x01,
+		SPC_DEFAULT_VALUES                  = 0x02,
+		SPC_SAVED_VALUES                    = 0x03
+	};
+
+	// SCSI MODE SELECT/SENSE page codes; SCSI-2 tables 95, 155, 199, 216, 267, 296, 324, 350, 363; extra SCSI-3 codes from "The SCSI Bench Reference"
+	enum {
+		SPC_VENDOR_SPECIFIC                             = 0x00,
+		SPC_READ_WRITE_ERROR_RECOVERY_PAGE              = 0x01,
+		SPC_READ_ERROR_RECOVERY_PAGE                    = 0x01,
+		SPC_DISCONNECT_RECONNECT_PAGE                   = 0x02,
+		SPC_FORMAT_DEVICE_PAGE                          = 0x03,
+		SPC_PARALLEL_PRINTER_INTERFACE_PAGE             = 0x03,
+		SPC_MEASUREMENT_UNITS_PAGE                      = 0x03,
+		SPC_RIGID_DISK_GEOMETRY_PAGE                    = 0x04,
+		SPC_SERIAL_PRINTER_INTERFACE_PAGE               = 0x04,
+		SPC_FLEXIBLE_DISK_PAGE                          = 0x05,
+		SPC_PRINTER_OPTIONS_PAGE                        = 0x05,
+		SPC_OPTICAL_MEMORY_PAGE                         = 0x06,
+		SPC_VERIFY_ERROR_RECOVERY_PAGE                  = 0x07,
+		SPC_CACHING_PAGE                                = 0x08,
+		SPC_PERIPHERAL_DEVICE_PAGE                      = 0x09,
+		SPC_CONTROL_MODE_PAGE                           = 0x0a,
+		SPC_MEDIUM_TYPES_SUPPORTED_PAGE                 = 0x0b,
+		SPC_NOTCH_AND_PARTITION_PAGE                    = 0x0c,
+		SPC_DIRECT_ACCESS_POWER_CONDITION_PAGE          = 0x0d, // direct access device only
+		SPC_CD_ROM_PAGE                                 = 0x0d,
+		SPC_CD_ROM_AUDIO_CONTROL_PAGE                   = 0x0e,
+		SPC_DATA_COMPRESSION_PAGE                       = 0x0f,
+		SPC_XOR_CONTROL_MODE_PAGE                       = 0x10,
+		SPC_DEVICE_CONFIGURATION_PAGE                   = 0x10,
+		SPC_MEDIUM_PARTITION_PAGE_1                     = 0x11,
+		SPC_MEDIUM_PARTITION_PAGE_2                     = 0x12,
+		SPC_MEDIUM_PARTITION_PAGE_3                     = 0x13,
+		SPC_MEDIUM_PARTITION_PAGE_4                     = 0x14,
+		SPC_POWER_CONDITION_PAGE                        = 0x1a, // all other device types
+		SPC_INFORMATIONAL_EXCEPTIONS_CONTROL_PAGE       = 0x1c,
+		SPC_ELEMENT_ADDRESS_ASSIGNMENT_PAGE             = 0x1d,
+		SPC_TRANSPORT_GEOMETRY_PARAMETERS_PAGE          = 0x1e,
+		SPC_DEVICE_CAPABILITIES_PAGE                    = 0x1f,
+		SPC_RETURN_ALL_MODE_PAGES                       = 0x3f
+	};
+
+	// SCSI additional sense codes and additional sense code qualifiers, packaged together as additional qualified sense key codes; SCSI-2 table 71; extra SCSI-3 codes from "The SCSI Bench Reference"
+	enum {
+		SKC_NO_ADDITIONAL_SENSE_INFORMATION                         = 0x0000,
+		SKC_FILEMARK_DETECTED                                       = 0x0001,
+		SKC_END_OF_PARTITION_MEDIUM_DETECTED                        = 0x0002,
+		SKC_SETMARK_DETECTED                                        = 0x0003,
+		SKC_BEGINNING_OF_PARTITION_MEDIUM_DETECTED                  = 0x0004,
+		SKC_END_OF_DATA_DETECTED                                    = 0x0005,
+		SKC_IO_PROCESS_TERMINATED                                   = 0x0006,
+		SKC_AUDIO_PLAY_OPERATION_IN_PROGRESS                        = 0x0011,
+		SKC_AUDIO_PLAY_OPERATION_PAUSED                             = 0x0012,
+		SKC_AUDIO_PLAY_OPERATION_SUCCESSFULLY_COMPLETED             = 0x0013,
+		SKC_AUDIO_PLAY_OPERATION_STOPPED_DUE_TO_ERROR               = 0x0014,
+		SKC_NO_CURRENT_AUDIO_STATUS_TO_RETURN                       = 0x0015,
+		SKC_OPERATION_IN_PROGRESS                                   = 0x0016,
+		SKC_CLEANING_REQUESTED                                      = 0x0017,
+		SKC_NO_INDEX_SECTOR_SIGNAL                                  = 0x0100,
+		SKC_NO_SEEK_COMPLETE                                        = 0x0200,
+		SKC_PERIPHERAL_DEVICE_WRITE_FAULT                           = 0x0300,
+		SKC_NO_WRITE_CURRENT                                        = 0x0301,
+		SKC_EXCESSIVE_WRITE_ERRORS                                  = 0x0302,
+		SKC_LOGICAL_UNIT_NOT_READY_CAUSE_NOT_REPORTABLE             = 0x0400,
+		SKC_LOGICAL_UNIT_IS_IN_PROCESS_OF_BECOMING_READY            = 0x0401,
+		SKC_LOGICAL_UNIT_NOT_READY_INITIALIZING_COMMAND_REQUIRED    = 0x0402,
+		SKC_LOGICAL_UNIT_NOT_READY_MANUAL_INTERVENTION_REQUIRED     = 0x0403,
+		SKC_LOGICAL_UNIT_NOT_READY_FORMAT_IN_PROGRESS               = 0x0404,
+		SKC_LOGICAL_UNIT_NOT_READY_OPERATION_IN_PROGRESS            = 0x0407,
+		SKC_LOGICAL_UNIT_DOES_NOT_RESPOND_TO_SELECTION              = 0x0500,
+		SKC_NO_REFERENCE_POSITION_FOUND                             = 0x0600,
+		SKC_MULTIPLE_PERIPHERAL_DEVICES_SELECTED                    = 0x0700,
+		SKC_LOGICAL_UNIT_COMMUNICATION_FAILURE                      = 0x0800,
+		SKC_LOGICAL_UNIT_COMMUNICATION_TIME_OUT                     = 0x0801,
+		SKC_LOGICAL_UNIT_COMMUNICATION_PARITY_ERROR                 = 0x0802,
+		SKC_TRACK_FOLLOWING_ERROR                                   = 0x0900,
+		SKC_TRACKING_SERVO_FAILURE                                  = 0x0901,
+		SKC_FOCUS_SERVO_FAILURE                                     = 0x0902,
+		SKC_SPINDLE_SERVO_FAILURE                                   = 0x0903,
+		SKC_HEAD_SELECT_FAULT                                       = 0x0904,
+		SKC_ERROR_LOG_OVERFLOW                                      = 0x0a00,
+		SKC_WARNING                                                 = 0x0b00,
+		SKC_WARNING_SPECIFIC_TEMPERATURE_EXCEEDED                   = 0x0b01,
+		SKC_WRITE_ERROR                                             = 0x0c00,
+		SKC_WRITE_ERROR_RECOVERED_WITH_AUTO_REALLOCATION            = 0x0c01,
+		SKC_WRITE_ERROR_AUTO_REALLOCATION_FAILED                    = 0x0c02,
+		SKC_WRITE_ERROR_RECOMMEND_REASSIGNMENT                      = 0x0c03,
+		SKC_COMPRESSION_CHECK_MISCOMPARE_ERROR                      = 0x0c04,
+		SKC_DATA_EXPANSION_OCCURRED_DURING_COMPRESSION              = 0x0c05,
+		SKC_BLOCK_NOT_COMPRESSABLE                                  = 0x0c06,
+		SKC_ID_CRC_OR_ECC_ERROR                                     = 0x1000,
+		SKC_UNRECOVERED_READ_ERROR                                  = 0x1100,
+		SKC_READ_RETRIES_EXHAUSTED                                  = 0x1101,
+		SKC_ERROR_TOO_LONG_TO_CORRECT                               = 0x1102,
+		SKC_MULTIPLE_READ_ERRORS                                    = 0x1103,
+		SKC_UNRECOVERED_READ_ERROR_AUTO_REALLOCATE_FAILED           = 0x1104,
+		SKC_L_EC_UNCORRECTABLE_ERROR                                = 0x1105,
+		SKC_CIRC_UNRECOVERED_ERROR                                  = 0x1106,
+		SKC_DATA_RESYNCHRONIZATION_ERROR                            = 0x1107,
+		SKC_INCOMPLETE_BLOCK_READ                                   = 0x1108,
+		SKC_NO_GAP_FOUND                                            = 0x1109,
+		SKC_MISCORRECTED_ERROR                                      = 0x110a,
+		SKC_UNRECOVERED_READ_ERROR_RECOMMEND_REASSIGNMENT           = 0x110b,
+		SKC_UNRECOVERED_READ_ERROR_RECOMMEND_REWRITE                = 0x110c,
+		SKC_DECOMPRESSION_CRC_ERROR                                 = 0x110d,
+		SKC_CANNOT_DECOMPRESS_USING_DECLARED_ALGORITHM              = 0x100e,
+		SKC_ADDRESS_MARK_NOT_FOUND_FOR_ID_FIELD                     = 0x1200,
+		SKC_ADDRESS_MARK_NOT_FOUND_FOR_DATA_FIELD                   = 0x1300,
+		SKC_RECORDED_ENTITY_NOT_FOUND                               = 0x1400,
+		SKC_RECORD_NOT_FOUND                                        = 0x1401,
+		SKC_FILEMARK_OR_SETMARK_NOT_FOUND                           = 0x1402,
+		SKC_END_OF_DATA_NOT_FOUND                                   = 0x1403,
+		SKC_BLOCK_SEQUENCE_ERROR                                    = 0x1404,
+		SKC_RECORD_NOT_FOUND_RECOMMEND_REASSIGNMENT                 = 0x1405,
+		SKC_RECORD_NOT_FOUND_DATA_AUTO_REALLOCATED                  = 0x1406,
+		SKC_RANDOM_POSITIONING_ERROR                                = 0x1500,
+		SKC_MECHANICAL_POSITIONING_ERROR                            = 0x1501,
+		SKC_POSITIONING_ERROR_DETECTED_BY_READ_OF_MEDIUM            = 0x1502,
+		SKC_DATA_SYNCHRONIZATION_MARK_ERROR                         = 0x1600,
+		SKC_DATA_SYNCHRONIZATION_ERROR_DATA_REWRITTEN               = 0x1601,
+		SKC_DATA_SYNCHRONIZATION_ERROR_RECOMMEND_REWRITE            = 0x1602,
+		SKC_DATA_SYNCHRONIZATION_ERROR_DATA_AUTO_REALLOCATED        = 0x1603,
+		SKC_DATA_SYNCHRONIZATION_ERROR_RECOMMEND_REASSIGNMENT       = 0x1604,
+		SKC_RECOVERED_DATA_WITH_NO_ERROR_CORRECTION_APPLIED         = 0x1700,
+		SKC_RECOVERED_DATA_WITH_RETRIES                             = 0x1701,
+		SKC_RECOVERED_DATA_WITH_POSITIVE_HEAD_OFFSET                = 0x1702,
+		SKC_RECOVERED_DATA_WITH_NEGATIVE_HEAD_OFFSET                = 0x1703,
+		SKC_RECOVERED_DATA_WITH_RETRIES_AND_OR_CIRC_APPLIED         = 0x1704,
+		SKC_RECOVERED_DATA_USING_PREVIOUS_SECTOR_ID                 = 0x1705,
+		SKC_RECOVERED_DATA_WITHOUT_ECC_DATA_AUTO_REALLOCATED        = 0x1706,
+		SKC_RECOVERED_DATA_WITHOUT_ECC_RECOMMEND_REASSIGNMENT       = 0x1707,
+		SKC_RECOVERED_DATA_WITHOUT_ECC_RECOMMEND_REWRITE            = 0x1708,
+		SKC_RECOVERED_DATA_WITHOUT_ECC_DATA_REWRITTEN               = 0x1809,
+		SKC_RECOVERED_DATA_WITH_ERROR_CORRECTION_APPLIED            = 0x1800,
+		SKC_RECOVERED_DATA_WITH_ERROR_CORRECTION_RETRIES_APPLIED    = 0x1801,
+		SKC_RECOVERED_DATA_DATA_AUTO_REALLOCATED                    = 0x1802,
+		SKC_RECOVERED_DATA_WITH_CIRC                                = 0x1803,
+		SKC_RECOVERED_DATA_WITH_L_EC                                = 0x1804,
+		SKC_RECOVERED_DATA_RECOMMEND_REASSIGNMENT                   = 0x1805,
+		SKC_RECOVERED_DATA_RECOMMEND_REWRITE                        = 0x1806,
+		SKC_RECOVERED_DATA_WITH_ECC_DATA_REWRITTEN                  = 0x1807,
+		SKC_DEFECT_LIST_ERROR                                       = 0x1900,
+		SKC_DEFECT_LIST_NOT_AVAILABLE                               = 0x1901,
+		SKC_DEFECT_LIST_ERROR_IN_PRIMARY_LIST                       = 0x1902,
+		SKC_DEFECT_LIST_ERROR_IN_GROWN_LIST                         = 0x1903,
+		SKC_PARAMETER_LIST_LENGTH_ERROR                             = 0x1a00,
+		SKC_SYNCHRONOUS_DATA_TRANSFER_ERROR                         = 0x1b00,
+		SKC_DEFECT_LIST_NOT_FOUND                                   = 0x1c00,
+		SKC_PRIMARY_DEFECT_LIST_NOT_FOUND                           = 0x1c01,
+		SKC_GROWN_DEFECT_LIST_NOT_FOUND                             = 0x1c02,
+		SKC_MISCOMPARE_DURING_VERIFY_OPERATION                      = 0x1d00,
+		SKC_RECOVERED_ID_WITH_ECC_CORRECTION                        = 0x1e00,
+		SKC_PARTIAL_DEFECT_LIST_TRANSFER                            = 0x1f00,
+		SKC_INVALID_COMMAND_OPERATION_CODE                          = 0x2000,
+		SKC_LOGICAL_BLOCK_ADDRESS_OUT_OF_RANGE                      = 0x2100,
+		SKC_INVALID_ELEMENT_ADDRESS                                 = 0x2101,
+		SKC_ILLEGAL_FUNCTION                                        = 0x2200, // "should use 0x2000, 0x2400, or 0x2600"
+		SKC_INVALID_FIELD_IN_CDB                                    = 0x2400,
+		SKC_LOGICAL_UNIT_NOT_SUPPORTED                              = 0x2500,
+		SKC_INVALID_FIELD_IN_PARAMETER_LIST                         = 0x2600,
+		SKC_PARAMETER_NOT_SUPPORTED                                 = 0x2601,
+		SKC_PARAMETER_VALUE_INVALID                                 = 0x2602,
+		SKC_THRESHOLD_PARAMETERS_NOT_SUPPORTED                      = 0x2603,
+		SKC_INVALID_RELEASE_OF_ACTIVE_PERSISTENT_RESERVATION        = 0x2604,
+		SKC_WRITE_PROTECTED                                         = 0x2700,
+		SKC_NOT_READY_TO_READY_TRANSITION_MEDIUM_MAY_HAVE_CHANGED   = 0x2800,
+		SKC_IMPORT_OR_EXPORT_ELEMENT_ACCESSED                       = 0x2801,
+		SKC_POWER_ON_RESET_OR_BUS_DEVICE_RESET_OCCURRED             = 0x2900,
+		SKC_POWER_ON_OCCURRED                                       = 0x2901,
+		SKC_SCSI_BUS_RESET_OCCURRED                                 = 0x2902,
+		SKC_SCSI_BUS_DEVICE_RESET_FUNCTION_OCCURRED                 = 0x2903,
+		SKC_PARAMETERS_CHANGED                                      = 0x2a00,
+		SKC_MODE_PARAMETERS_CHANGED                                 = 0x2a01,
+		SKC_LOG_PARAMETERS_CHANGED                                  = 0x2a02,
+		SKC_RESERVATIONS_PREEMPTED                                  = 0x2a03,
+		SKC_COPY_CANNOT_EXECUTE_SINCE_HOST_CANNOT_DISCONNECT        = 0x2b00,
+		SKC_COMMAND_SEQUENCE_ERROR                                  = 0x2c00,
+		SKC_TOO_MANY_WINDOWS_SPECIFIED                              = 0x2c01,
+		SKC_INVALID_COMBINATION_OF_WINDOWS_SPECIFIED                = 0x2c02,
+		SKC_OVERWRITE_ERROR_ON_UPDATE_IN_PLACE                      = 0x2d00,
+		SKC_COMMANDS_CLEARED_BY_ANOTHER_INITIATOR                   = 0x2f00,
+		SKC_INCOMPATIBLE_MEDIUM_INSTALLED                           = 0x3000,
+		SKC_CANNOT_READ_MEDIUM_UNKNOWN_FORMAT                       = 0x3001,
+		SKC_CANNOT_READ_MEDIUM_INCOMPATIBLE_FORMAT                  = 0x3002,
+		SKC_CLEANING_CARTRIDGE_INSTALLED                            = 0x3003,
+		SKC_CANNOT_WRITE_MEDIUM_UNKNOWN_FORMAT                      = 0x3004,
+		SKC_CANNOT_WRITE_MEDIUM_INCOMPATIBLE_FORMAT                 = 0x3005,
+		SKC_CANNOT_FORMAT_MEDIUM_INCOMPATIBLE_MEDIUM                = 0x3006,
+		SKC_CLEANING_FAILURE                                        = 0x3007,
+		SKC_MEDIUM_FORMAT_CORRUPTED                                 = 0x3100,
+		SKC_FORMAT_COMMAND_FAILED                                   = 0x3101,
+		SKC_NO_DEFECT_SPARE_LOCATION_AVAILABLE                      = 0x3200,
+		SKC_DEFECT_LIST_UPDATE_FAILURE                              = 0x3201,
+		SKC_TAPE_LENGTH_ERROR                                       = 0x3300,
+		SKC_RIBBON_INK_OR_TONER_FAILURE                             = 0x3600,
+		SKC_ROUNDED_PARAMETER                                       = 0x3700,
+		SKC_SAVING_PARAMETERS_NOT_SUPPORTED                         = 0x3900,
+		SKC_MEDIUM_NOT_PRESENT                                      = 0x3a00,
+		SKC_SEQUENTIAL_POSITIONING_ERROR                            = 0x3b00,
+		SKC_TAPE_POSITION_ERROR_AT_BEGINNING_OF_MEDIUM              = 0x3b01,
+		SKC_TAPE_POSITION_ERROR_AT_END_OF_MEDIUM                    = 0x3b02,
+		SKC_TAPE_OR_ELECTRONIC_VERTICAL_FORMS_UNIT_NOT_READY        = 0x3b03,
+		SKC_SLEW_FAILURE                                            = 0x3b04,
+		SKC_PAPER_JAM                                               = 0x3b05,
+		SKC_FAILED_TO_SENSE_TOP_OF_FORM                             = 0x3b06,
+		SKC_FAILED_TO_SENSE_BOTTOM_OF_FORM                          = 0x3b07,
+		SKC_REPOSITION_ERROR                                        = 0x3b08,
+		SKC_READ_PAST_END_OF_MEDIUM                                 = 0x3b09,
+		SKC_READ_PAST_BEGINNING_OF_MEDIUM                           = 0x3b0a,
+		SKC_POSITION_PAST_END_OF_MEDIUM                             = 0x3b0b,
+		SKC_POSITION_PAST_BEGINNING_OF_MEDIUM                       = 0x3b0c,
+		SKC_MEDIUM_DESTINATION_ELEMENT_FULL                         = 0x3b0d,
+		SKC_MEDIUM_SOURCE_ELEMENT_EMPTY                             = 0x3b0e,
+		SKC_MEDIUM_MAGAZINE_NOT_ACCESSIBLE                          = 0x3b11,
+		SKC_MEDIUM_MAGAZINE_REMOVED                                 = 0x3b12,
+		SKC_MEDIUM_MAGAZINE_INSERTED                                = 0x3b13,
+		SKC_MEDIUM_MAGAZINE_LOCKED                                  = 0x3b14,
+		SKC_MEDIUM_MAGAZINE_UNLOCKED                                = 0x3b15,
+		SKC_INVALID_BITS_IN_IDENTIFY_MESSAGE                        = 0x3d00,
+		SKC_LOGICAL_UNIT_HAS_NOT_SELF_CONFIGURED_YET                = 0x3e00,
+		SKC_TARGET_OPERATING_CONDITIONS_HAVE_CHANGED                = 0x3f00,
+		SKC_MICROCODE_HAS_BEEN_CHANGED                              = 0x3f01,
+		SKC_CHANGED_OPERATING_DEFINITION                            = 0x3f02,
+		SKC_INQUIRY_DATA_HAS_CHANGED                                = 0x3f03,
+		SKC_RAM_FAILURE                                             = 0x4000, // "should use 0x40nn"
+		SKC_DIAGNOSTIC_FAILURE_ON_COMPONENT_NN                      = 0x4000, // LSB is nn (0x80-0xff)
+		SKC_DATA_PATH_FAILURE                                       = 0x4100, // "should use 0x40nn"
+		SKC_POWER_ON_OR_SELF_TEST_FAILURE                           = 0x4200, // "should use 0x40nn"
+		SKC_MESSAGE_ERROR                                           = 0x4300,
+		SKC_INTERNAL_TARGET_FAILURE                                 = 0x4400,
+		SKC_SELECT_OR_RESELECT_FAILURE                              = 0x4500,
+		SKC_UNSUCCESSFUL_SOFT_RESET                                 = 0x4600,
+		SKC_SCSI_PARITY_ERROR                                       = 0x4700,
+		SKC_INITIATOR_DETECTED_ERROR_MESSAGE_RECEIVED               = 0x4800,
+		SKC_INVALID_MESSAGE_ERROR                                   = 0x4900,
+		SKC_COMMAND_PHASE_ERROR                                     = 0x4a00,
+		SKC_DATA_PHASE_ERROR                                        = 0x4b00,
+		SKC_LOGICAL_UNIT_FAILED_SELF_CONFIGURATION                  = 0x4c00,
+		SKC_TAGGED_OVERLAPPED_COMMANDS_NN                           = 0x4d00, // "queue tag"; LSB is nn
+		SKC_OVERLAPPED_COMMANDS_ATTEMPTED                           = 0x4e00,
+		SKC_WRITE_APPEND_ERROR                                      = 0x5000,
+		SKC_WRITE_APPEND_POSITION_ERROR                             = 0x5001,
+		SKC_POSITION_ERROR_RELATED_TO_TIMING                        = 0x5002,
+		SKC_ERASE_FAILURE                                           = 0x5100,
+		SKC_CARTRIDGE_FAULT                                         = 0x5200,
+		SKC_MEDIA_LOAD_OR_EJECT_FAILED                              = 0x5300,
+		SKC_UNLOAD_TAPE_FAILURE                                     = 0x5301,
+		SKC_MEDIUM_REMOVAL_PREVENTED                                = 0x5302,
+		SKC_SCSI_TO_HOST_SYSTEM_INTERFACE_FAILURE                   = 0x5400,
+		SKC_SYSTEM_RESOURCE_FAILURE                                 = 0x5500,
+		SKC_SYSTEM_BUFFER_FULL                                      = 0x5501,
+		SKC_UNABLE_TO_RECOVER_TABLE_OF_CONTENTS                     = 0x5700,
+		SKC_GENERATION_DOES_NOT_EXIST                               = 0x5800,
+		SKC_UPDATED_BLOCK_READ                                      = 0x5900,
+		SKC_OPERATOR_REQUEST_OR_STATE_CHANGE_INPUT                  = 0x5a00, // "unspecified"
+		SKC_OPERATOR_MEDIUM_REMOVAL_REQUEST                         = 0x5a01,
+		SKC_OPERATOR_SELECTED_WRITE_PROTECT                         = 0x5a02,
+		SKC_OPERATOR_SELECTED_WRITE_PERMIT                          = 0x5a03,
+		SKC_LOG_EXCEPTION                                           = 0x5b00,
+		SKC_THRESHOLD_CONDITION_MET                                 = 0x5b01,
+		SKC_LOG_COUNTER_AT_MAXIMUM                                  = 0x5b02,
+		SKC_LOG_LIST_CODES_EXHAUSTED                                = 0x5b03,
+		SKC_RPL_STATUS_CHANGE                                       = 0x5c00,
+		SKC_SPINDLES_SYNCHRONIZED                                   = 0x5c01,
+		SKC_SPINDLES_NOT_SYNCHRONIZED                               = 0x5c02,
+		SKC_FAILURE_PREDICTION_THRESHOLD_EXCEEDED                   = 0x5d00,
+		SKC_FAILURE_PREDICTION_THRESHOLD_EXCEEDED_FALSE             = 0x5dff, // what?!
+		SKC_LOW_POWER_CONDITION_ON                                  = 0x5e00,
+		SKC_IDLE_CONDITION_ACTIVATED_BY_TIMER                       = 0x5e01,
+		SKC_STANDBY_CONDITION_ACTIVATED_BY_TIMER                    = 0x5e02,
+		SKC_IDLE_CONDITION_ACTIVATED_BY_COMMAND                     = 0x5e03,
+		SKC_STANDBY_CONDITION_ACTIVATED_BY_COMMAND                  = 0x5e04,
+		SKC_LAMP_FAILURE                                            = 0x6000,
+		SKC_VIDEO_ACQUISITION_ERROR                                 = 0x6100,
+		SKC_UNABLE_TO_ACQUIRE_VIDEO                                 = 0x6101,
+		SKC_OUT_OF_FOCUS                                            = 0x6102,
+		SKC_SCAN_HEAD_POSITIONING_ERROR                             = 0x6200,
+		SKC_END_OF_USER_AREA_ENCOUNTERED_ON_THIS_TRACK              = 0x6300,
+		SKC_ILLEGAL_MODE_FOR_THIS_TRACK                             = 0x6400,
+		SKC_VOLTAGE_FAULT                                           = 0x6500,
+		SKC_DECOMPRESSION_EXCEPTION_SHORT_ALGORITHM_ID_OF_NN        = 0x7000, // LSB is nn
+		SKC_DECOMPRESSION_EXCEPTION_LONG_ALGORITHM_ID               = 0x7100
+	};
+
 	// SCSI addtional sense code qualifiers
 	enum {
 		SK_ASC_INVALID_FIELD_IN_CDB       = 0x24,
@@ -356,12 +654,56 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(update_tick);
 
+	void handle_request_sense(const u8 lun);
 	void scsi_unknown_command();
 	void scsi_status_complete(uint8_t st);
 	void scsi_data_in(int buf, int size);
 	void scsi_data_out(int buf, int size);
 
+	struct sense_data {
+		sense_data()
+		{
+			invalid = false;
+			deferred = false;
+			filemark = false;
+			eom = false;
+			bad_len = false;
+			sense_key = 0;
+			info = 0;
+			sense_key_code = 0;
+		}
+
+		bool invalid;
+		bool deferred;
+		bool filemark;
+		bool eom;
+		bool bad_len;
+		u8 sense_key;
+		s32 info;
+		u16 sense_key_code;
+	};
+	void set_sense_data(const u8 sense_key, const u16 sense_key_code, const sense_data *data = nullptr);
 	void sense(bool deferred, uint8_t key, uint8_t asc = 0, uint8_t ascq = 0);
+	void report_condition(const u8 sense_key, const u16 sense_key_code, const sense_data *data = nullptr);
+	void report_bad_lun(const u8 cmd, const u8 lun);
+	void report_bad_cmd(const u8 cmd);
+	void report_filemark(const s32 info = 0, const bool eom = false);
+	void report_bom(const s32 info = 0);
+	void report_ew(const s32 info = 0);
+	void report_eod(const s32 info = 0, const bool eom = false);
+	void report_eom(const bool write, const s32 info = 0, const bool invalid = false);
+	void report_bad_len(const bool over, const s32 info = 0);
+	void report_bad_cdb_field();
+	void report_bad_pl_field();
+	void report_bad_pl_len();
+	void report_no_saving_params();
+	void report_no_medium();
+	void report_medium_changed();
+	void report_read_only();
+	void report_read_failure();
+	void report_write_failure();
+	void report_erase_failure();
+
 	int get_lun(int def = 0);
 	void bad_lun();
 
@@ -436,7 +778,8 @@ protected:
 	// Command delay (immediate)
 	virtual attotime scsi_data_command_delay();
 
-	uint8_t scsi_cmdbuf[4096], scsi_sense_buffer[18];
+	uint8_t scsi_cmdbuf[4096];
+	uint8_t scsi_sense_buffer[18];
 	int scsi_cmdsize;
 	uint8_t scsi_identify;
 

@@ -17,12 +17,12 @@
 #include "bus/vme/vme.h"
 #include "bus/rs232/rs232.h"
 
-class mvme187_device
+class vme_mvme187_card_device
 	: public device_t
 	, public device_vme_card_interface
 {
 public:
-	mvme187_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	vme_mvme187_card_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -46,6 +46,6 @@ private:
 	memory_view m_boot;
 };
 
-DECLARE_DEVICE_TYPE(MVME187, mvme187_device)
+DECLARE_DEVICE_TYPE(VME_MVME187, vme_mvme187_card_device)
 
 #endif // MAME_BUS_VME_MVME187_H

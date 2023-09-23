@@ -493,7 +493,7 @@ void ssystem3_state::ssystem3(machine_config &config)
 
 	config.set_perfect_quantum(m_maincpu);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->irqa_handler().set_inputline(m_subcpu, INPUT_LINE_NMI);
 	m_pia->writepa_handler().set(FUNC(ssystem3_state::cu_pia_a_w));
 	m_pia->readpa_handler().set(FUNC(ssystem3_state::cu_pia_a_r));

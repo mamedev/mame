@@ -504,7 +504,7 @@ void by6803_state::by6803(machine_config &config)
 	genpin_audio(config);
 
 	/* Devices */
-	PIA6821(config, m_pia0, 0);
+	PIA6821(config, m_pia0);
 	m_pia0->readpa_handler().set(FUNC(by6803_state::pia0a_r));
 	m_pia0->writepa_handler().set(FUNC(by6803_state::pia0a_w));
 	m_pia0->readpb_handler().set(FUNC(by6803_state::pia0b_r));
@@ -515,7 +515,7 @@ void by6803_state::by6803(machine_config &config)
 	m_pia0->irqb_handler().set_inputline("maincpu", M6803_IRQ_LINE);
 	TIMER(config, "timer_z").configure_periodic(FUNC(by6803_state::pia0_timer), attotime::from_hz(120)); // mains freq*2
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpa_handler().set(FUNC(by6803_state::pia1a_r));
 	m_pia1->writepa_handler().set(FUNC(by6803_state::pia1a_w));
 	m_pia1->writepb_handler().set(FUNC(by6803_state::pia1b_w));

@@ -174,7 +174,7 @@ public:
 		void copy(u32 offset, const u8 *src, u32 size);
 		void fill(            u8 data);
 		void fill(u32 offset, u8 data, u32 size);
-		void wstr(u32 offset, const std::string &str);
+		void wstr(u32 offset, std::string_view str);
 		void w8(  u32 offset, u8 data);
 		void w16b(u32 offset, u16 data);
 		void w24b(u32 offset, u32 data);
@@ -183,7 +183,7 @@ public:
 		void w24l(u32 offset, u32 data);
 		void w32l(u32 offset, u32 data);
 
-		std::string rstr(u32 offset, u32 size) const;
+		std::string_view rstr(u32 offset, u32 size) const;
 		u8  r8(  u32 offset) const;
 		u16 r16b(u32 offset) const;
 		u32 r24b(u32 offset) const;
@@ -253,32 +253,16 @@ public:
 	// Format an image, provide the volume metadata
 	virtual err_t format(const meta_data &meta);
 
-	static void copy(u8 *p, const u8 *src, u32 size);
-	static void fill(u8 *p, u8 data, u32 size);
-	static void wstr(u8 *p, const std::string &str);
-	static void w8(  u8 *p, u8 data);
-	static void w16b(u8 *p, u16 data);
-	static void w24b(u8 *p, u32 data);
-	static void w32b(u8 *p, u32 data);
-	static void w16l(u8 *p, u16 data);
-	static void w24l(u8 *p, u32 data);
-	static void w32l(u8 *p, u32 data);
+	static void wstr(u8 *p, std::string_view str);
 
-	static std::string rstr(const u8 *p, u32 size);
-	static u8  r8(  const u8 *p);
-	static u16 r16b(const u8 *p);
-	static u32 r24b(const u8 *p);
-	static u32 r32b(const u8 *p);
-	static u16 r16l(const u8 *p);
-	static u32 r24l(const u8 *p);
-	static u32 r32l(const u8 *p);
+	static std::string_view rstr(const u8 *p, u32 size);
+
+	static std::string_view trim_end_spaces(std::string_view str);
 
 protected:
 	filesystem_t(fsblk_t &blockdev, u32 size) : m_blockdev(blockdev) {
 		m_blockdev.set_block_size(size);
 	}
-
-	static std::string trim_end_spaces(const std::string &str);
 
 	fsblk_t &m_blockdev;
 };

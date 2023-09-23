@@ -13,7 +13,7 @@ enum
 	NSC800_RSTB,
 	NSC800_RSTC,
 	Z80_INPUT_LINE_WAIT,
-	Z80_INPUT_LINE_BOGUSWAIT, /* WAIT pin implementation used to be nonexistent, please remove this when all drivers are updated with Z80_INPUT_LINE_WAIT */
+	Z80_INPUT_LINE_BOGUSWAIT, // WAIT pin implementation used to be nonexistent, please remove this when all drivers are updated with Z80_INPUT_LINE_WAIT
 	Z80_INPUT_LINE_BUSRQ
 };
 
@@ -30,10 +30,12 @@ enum
 class z80_device : public cpu_device, public z80_daisy_chain_interface
 {
 public:
-	z80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z80_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, const uint8_t *ed, const uint8_t *xy, const uint8_t *xycb, const uint8_t *ex);
-	void set_mtm_cycles(uint8_t mtm_cycles);
+	void z80_set_m1_cycles(u8 m1_cycles) { m_m1_cycles = m1_cycles; }
+	void z80_set_memrq_cycles(u8 memrq_cycles) { m_memrq_cycles = memrq_cycles; }
+	void z80_set_iorq_cycles(u8 iorq_cycles) { m_iorq_cycles = iorq_cycles; }
+
 	template <typename... T> void set_memory_map(T &&... args) { set_addrmap(AS_PROGRAM, std::forward<T>(args)...); }
 	template <typename... T> void set_m1_map(T &&... args) { set_addrmap(AS_OPCODES, std::forward<T>(args)...); }
 	template <typename... T> void set_io_map(T &&... args) { set_addrmap(AS_IO, std::forward<T>(args)...); }
@@ -43,31 +45,32 @@ public:
 	auto halt_cb() { return m_halt_cb.bind(); }
 
 protected:
-	z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
+	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const noexcept override { return 2; }
-	virtual uint32_t execute_max_cycles() const noexcept override { return 16; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 4; }
-	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0xff; }
+	// device_execute_interface implementation
+	virtual u32 execute_min_cycles() const noexcept override { return 2; }
+	virtual u32 execute_max_cycles() const noexcept override { return 16; }
+	virtual u32 execute_input_lines() const noexcept override { return 4; }
+	virtual u32 execute_default_irq_vector(int inputnum) const noexcept override { return 0xff; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 	virtual u32 translate_memory_address(u16 address) { return address; }
 
-	// device_state_interface overrides
+	// device_state_interface implementation
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 #undef PROTOTYPES
@@ -137,9 +140,6 @@ protected:
 	void prefix##_f8(); void prefix##_f9(); void prefix##_fa(); void prefix##_fb(); \
 	void prefix##_fc(); void prefix##_fd(); void prefix##_fe(); void prefix##_ff();
 
-	void illegal_1();
-	void illegal_2();
-
 	PROTOTYPES(op)
 	PROTOTYPES(cb)
 	PROTOTYPES(dd)
@@ -147,19 +147,22 @@ protected:
 	PROTOTYPES(fd)
 	PROTOTYPES(xycb)
 
+	void illegal_1();
+	void illegal_2();
+
 	void halt();
 	void leave_halt();
-	uint8_t in(uint16_t port);
-	void out(uint16_t port, uint8_t value);
-	virtual uint8_t rm(uint16_t addr);
-	uint8_t rm_reg(uint16_t addr);
-	void rm16(uint16_t addr, PAIR &r);
-	virtual void wm(uint16_t addr, uint8_t value);
-	void wm16(uint16_t addr, PAIR &r);
+	u8 in(u16 port);
+	void out(u16 port, u8 value);
+	u8 rm(u16 addr);
+	u8 rm_reg(u16 addr);
+	void rm16(u16 addr, PAIR &r);
+	void wm(u16 addr, u8 value);
+	void wm16(u16 addr, PAIR &r);
 	void wm16_sp(PAIR &r);
-	virtual uint8_t rop();
-	virtual uint8_t arg();
-	virtual uint16_t arg16();
+	u8 rop();
+	u8 arg();
+	u16 arg16();
 	void eax();
 	void eay();
 	void pop(PAIR &r);
@@ -167,63 +170,61 @@ protected:
 	void jp(void);
 	void jp_cond(bool cond);
 	void jr();
-	void jr_cond(bool cond, uint8_t opcode);
+	void jr_cond(bool cond, u8 opcode);
 	void call();
-	void call_cond(bool cond, uint8_t opcode);
-	void ret_cond(bool cond, uint8_t opcode);
+	void call_cond(bool cond, u8 opcode);
+	void ret_cond(bool cond, u8 opcode);
 	void retn();
 	void reti();
 	void ld_r_a();
 	void ld_a_r();
 	void ld_i_a();
 	void ld_a_i();
-	void rst(uint16_t addr);
-	uint8_t inc(uint8_t value);
-	uint8_t dec(uint8_t value);
+	void rst(u16 addr);
+	u8 inc(u8 value);
+	u8 dec(u8 value);
 	void rlca();
 	void rrca();
 	void rla();
 	void rra();
 	void rrd();
 	void rld();
-	void add_a(uint8_t value);
-	void adc_a(uint8_t value);
-	void sub(uint8_t value);
-	void sbc_a(uint8_t value);
+	void add_a(u8 value);
+	void adc_a(u8 value);
+	void sub(u8 value);
+	void sbc_a(u8 value);
 	void neg();
 	void daa();
-	void and_a(uint8_t value);
-	void or_a(uint8_t value);
-	void xor_a(uint8_t value);
-	void cp(uint8_t value);
-	void ex_af();
-	void ex_de_hl();
+	void and_a(u8 value);
+	void or_a(u8 value);
+	void xor_a(u8 value);
+	void cp(u8 value);
 	void exx();
 	void ex_sp(PAIR &r);
 	void add16(PAIR &dr, PAIR &sr);
 	void adc_hl(PAIR &r);
 	void sbc_hl(PAIR &r);
-	uint8_t rlc(uint8_t value);
-	uint8_t rrc(uint8_t value);
-	uint8_t rl(uint8_t value);
-	uint8_t rr(uint8_t value);
-	uint8_t sla(uint8_t value);
-	uint8_t sra(uint8_t value);
-	uint8_t sll(uint8_t value);
-	uint8_t srl(uint8_t value);
-	void bit(int bit, uint8_t value);
-	void bit_hl(int bit, uint8_t value);
-	void bit_xy(int bit, uint8_t value);
-	uint8_t res(int bit, uint8_t value);
-	uint8_t set(int bit, uint8_t value);
+	u8 rlc(u8 value);
+	u8 rrc(u8 value);
+	u8 rl(u8 value);
+	u8 rr(u8 value);
+	u8 sla(u8 value);
+	u8 sra(u8 value);
+	u8 sll(u8 value);
+	u8 srl(u8 value);
+	void bit(int bit, u8 value);
+	void bit_hl(int bit, u8 value);
+	void bit_xy(int bit, u8 value);
+	u8 res(int bit, u8 value);
+	u8 set(int bit, u8 value);
 	void ldi();
 	void cpi();
-	void ini();
-	void outi();
+	u8 ini();
+	u8 outi();
 	void ldd();
 	void cpd();
-	void ind();
-	void outd();
+	u8 ind();
+	u8 outd();
 	void ldir();
 	void cpir();
 	void inir();
@@ -233,12 +234,20 @@ protected:
 	void indr();
 	void otdr();
 	void ei();
+	void set_f(u8 f);
+	void block_io_interrupted_flags(u8 data);
 
+	void execute_cycles(u8 icount);
 	virtual void check_interrupts();
 	void take_interrupt();
 	void take_nmi();
 	void nomreq_ir(s8 cycles);
 	void nomreq_addr(u16 addr, s8 cycles);
+
+	virtual u8 data_read(u16 addr);
+	virtual void data_write(u16 addr, u8 value);
+	virtual u8 opcode_read();
+	virtual u8 arg_read();
 
 	// address spaces
 	const address_space_config m_program_config;
@@ -254,46 +263,44 @@ protected:
 	devcb_write8 m_nomreq_cb;
 	devcb_write_line m_halt_cb;
 
-	PAIR              m_prvpc;
-	PAIR              m_pc;
-	PAIR              m_sp;
-	PAIR              m_af;
-	PAIR              m_bc;
-	PAIR              m_de;
-	PAIR              m_hl;
-	PAIR              m_ix;
-	PAIR              m_iy;
-	PAIR              m_wz;
-	PAIR              m_af2;
-	PAIR              m_bc2;
-	PAIR              m_de2;
-	PAIR              m_hl2;
-	uint8_t           m_r;
-	uint8_t           m_r2;
-	uint8_t           m_iff1;
-	uint8_t           m_iff2;
-	uint8_t           m_halt;
-	uint8_t           m_im;
-	uint8_t           m_i;
-	uint8_t           m_nmi_state;          /* nmi line state */
-	uint8_t           m_nmi_pending;        /* nmi pending */
-	uint8_t           m_irq_state;          /* irq line state */
-	int               m_wait_state;         // wait line state
-	int               m_busrq_state;        // bus request line state
-	uint8_t           m_after_ei;           /* are we in the EI shadow? */
-	uint8_t           m_after_ldair;        /* same, but for LD A,I or LD A,R */
-	uint32_t          m_ea;
+	PAIR         m_prvpc;
+	PAIR         m_pc;
+	PAIR         m_sp;
+	PAIR         m_af;
+	PAIR         m_bc;
+	PAIR         m_de;
+	PAIR         m_hl;
+	PAIR         m_ix;
+	PAIR         m_iy;
+	PAIR         m_wz;
+	PAIR         m_af2;
+	PAIR         m_bc2;
+	PAIR         m_de2;
+	PAIR         m_hl2;
+	u8           m_qtemp;
+	u8           m_q;
+	u8           m_r;
+	u8           m_r2;
+	u8           m_iff1;
+	u8           m_iff2;
+	u8           m_halt;
+	u8           m_im;
+	u8           m_i;
+	u8           m_nmi_state;          // nmi line state
+	u8           m_nmi_pending;        // nmi pending
+	u8           m_irq_state;          // irq line state
+	int          m_wait_state;         // wait line state
+	int          m_busrq_state;        // bus request line state
+	u8           m_after_ei;           // are we in the EI shadow?
+	u8           m_after_ldair;        // same, but for LD A,I or LD A,R
+	u32          m_ea;
 
-	int               m_icount;
-	int               m_icount_executing;
-	uint8_t           m_rtemp;
-	const uint8_t *   m_cc_op;
-	const uint8_t *   m_cc_cb;
-	const uint8_t *   m_cc_ed;
-	const uint8_t *   m_cc_xy;
-	const uint8_t *   m_cc_xycb;
-	const uint8_t *   m_cc_ex;
-	uint8_t           m_mtm_cycles;
+	int          m_icount;
+	u8           m_rtemp;
+
+	u8 m_m1_cycles;
+	u8 m_memrq_cycles;
+	u8 m_iorq_cycles;
 };
 
 DECLARE_DEVICE_TYPE(Z80, z80_device)
@@ -301,20 +308,20 @@ DECLARE_DEVICE_TYPE(Z80, z80_device)
 class nsc800_device : public z80_device
 {
 public:
-	nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
-	virtual uint32_t execute_input_lines() const noexcept override { return 7; }
+	// device_execute_interface implementation
+	virtual u32 execute_input_lines() const noexcept override { return 7; }
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	virtual void check_interrupts() override;
 	void take_interrupt_nsc800();
-	uint8_t m_nsc800_irq_state[4]; /* state of NSC800 restart interrupts A, B, C */
+	u8 m_nsc800_irq_state[4]; // state of NSC800 restart interrupts A, B, C
 };
 
 DECLARE_DEVICE_TYPE(NSC800, nsc800_device)

@@ -477,7 +477,7 @@ void dragon_state::dragon_base(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	INPUT_MERGER_ANY_HIGH(config, m_firqs).output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
-	pia6821_device &pia0(PIA6821(config, PIA0_TAG, 0));
+	pia6821_device &pia0(PIA6821(config, PIA0_TAG));
 	pia0.writepa_handler().set(FUNC(coco_state::pia0_pa_w));
 	pia0.writepb_handler().set(FUNC(coco_state::pia0_pb_w));
 	pia0.tspb_handler().set_constant(0xff);
@@ -486,7 +486,7 @@ void dragon_state::dragon_base(machine_config &config)
 	pia0.irqa_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 	pia0.irqb_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
-	pia6821_device &pia1(PIA6821(config, PIA1_TAG, 0));
+	pia6821_device &pia1(PIA6821(config, PIA1_TAG));
 	pia1.readpa_handler().set(FUNC(coco_state::pia1_pa_r));
 	pia1.readpb_handler().set(FUNC(coco_state::pia1_pb_r));
 	pia1.writepa_handler().set(FUNC(coco_state::pia1_pa_w));

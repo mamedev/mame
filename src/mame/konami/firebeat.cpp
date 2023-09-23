@@ -136,6 +136,13 @@
         at any point during the frame. It's mainly used to call display lists, which is where
         the display list addresses come from. Some games use it to send other commands, so
         it appears to be a 4-dword FIFO or something along those lines.
+
+        // IRQs
+        // IRQ 0: VBlank
+        // IRQ 1: Extend board IRQ
+        // IRQ 2: Main board UART
+        // IRQ 3: SPU mailbox interrupt
+        // IRQ 4: ATA
 */
 
 #include "emu.h"
@@ -426,7 +433,6 @@ protected:
 	void lamp_output2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void lamp_output3_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	INTERRUPT_GEN_MEMBER(firebeat_interrupt);
 	void ata_interrupt(int state);
 	void gcu_interrupt(int state);
 	void sound_irq_callback(int state);
@@ -732,7 +738,6 @@ void firebeat_state::firebeat(machine_config &config)
 	/* basic machine hardware */
 	PPC403GCX(config, m_maincpu, XTAL(66'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_state::firebeat_map);
-	m_maincpu->set_vblank_int("screen", FUNC(firebeat_state::firebeat_interrupt));
 
 	RTC65271(config, "rtc", 0);
 
@@ -751,6 +756,7 @@ void firebeat_state::firebeat(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480);
 	screen.set_screen_update(FUNC(firebeat_state::screen_update_firebeat_0));
 	screen.set_palette("palette");
+	screen.screen_vblank().set(m_gcu, FUNC(k057714_device::vblank_w));
 
 	K057714(config, m_gcu, 0).set_screen("screen");
 	m_gcu->irq_callback().set(FUNC(firebeat_state::gcu_interrupt));
@@ -1151,18 +1157,6 @@ void firebeat_state::lamp_output3_w(offs_t offset, uint32_t data, uint32_t mem_m
 }
 
 /*****************************************************************************/
-
-INTERRUPT_GEN_MEMBER(firebeat_state::firebeat_interrupt)
-{
-	// IRQs
-	// IRQ 0: VBlank
-	// IRQ 1: Extend board IRQ
-	// IRQ 2: Main board UART
-	// IRQ 3: SPU mailbox interrupt
-	// IRQ 4: ATA
-
-	device.execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-}
 
 void firebeat_state::ata_interrupt(int state)
 {
@@ -1790,7 +1784,6 @@ void firebeat_kbm_state::firebeat_kbm(machine_config &config)
 	/* basic machine hardware */
 	PPC403GCX(config, m_maincpu, XTAL(66'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_kbm_state::firebeat_kbm_map);
-	m_maincpu->set_vblank_int("lscreen", FUNC(firebeat_kbm_state::firebeat_interrupt));
 
 	RTC65271(config, "rtc", 0);
 
@@ -1810,6 +1803,7 @@ void firebeat_kbm_state::firebeat_kbm(machine_config &config)
 	lscreen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480);
 	lscreen.set_screen_update(FUNC(firebeat_kbm_state::screen_update_firebeat_0));
 	lscreen.set_palette("palette");
+	lscreen.screen_vblank().set(m_gcu, FUNC(k057714_device::vblank_w));
 
 	K057714(config, m_gcu, 0).set_screen("lscreen");
 	m_gcu->irq_callback().set(FUNC(firebeat_kbm_state::gcu_interrupt));

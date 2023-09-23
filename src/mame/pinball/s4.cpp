@@ -438,7 +438,7 @@ void s4_state::s4(machine_config &config)
 	genpin_audio(config);
 
 	// Devices
-	PIA6821(config, m_pia22, 0);
+	PIA6821(config, m_pia22);
 	m_pia22->writepa_handler().set(FUNC(s4_state::sol0_w));
 	m_pia22->writepb_handler().set(FUNC(s4_state::sol1_w));
 	m_pia22->ca2_handler().set(FUNC(s4_state::pia22_ca2_w));
@@ -446,7 +446,7 @@ void s4_state::s4(machine_config &config)
 	m_pia22->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<1>));
 	m_pia22->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<2>));
 
-	PIA6821(config, m_pia24, 0);
+	PIA6821(config, m_pia24);
 	m_pia24->writepa_handler().set(FUNC(s4_state::lamp0_w));
 	m_pia24->writepb_handler().set(FUNC(s4_state::lamp1_w));
 	m_pia24->ca2_handler().set(FUNC(s4_state::pia24_ca2_w));
@@ -454,7 +454,7 @@ void s4_state::s4(machine_config &config)
 	m_pia24->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<3>));
 	m_pia24->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<4>));
 
-	PIA6821(config, m_pia28, 0);
+	PIA6821(config, m_pia28);
 	m_pia28->readpa_handler().set(FUNC(s4_state::dips_r));
 	m_pia28->set_port_a_input_overrides_output_mask(0xff);
 	m_pia28->readca1_handler().set_ioport("DIAGS").bit(2); // advance button
@@ -466,7 +466,7 @@ void s4_state::s4(machine_config &config)
 	m_pia28->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<5>));
 	m_pia28->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<6>));
 
-	PIA6821(config, m_pia30, 0);
+	PIA6821(config, m_pia30);
 	m_pia30->readpa_handler().set(FUNC(s4_state::switch_r));
 	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s4_state::switch_w));

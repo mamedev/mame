@@ -98,8 +98,6 @@ void msc_state::machine_start()
     I/O
 *******************************************************************************/
 
-// MCU ports/generic
-
 void msc_state::update_display()
 {
 	m_display->matrix(m_led_select, m_inp_mux);

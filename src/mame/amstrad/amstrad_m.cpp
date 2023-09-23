@@ -31,8 +31,14 @@ the name I give to the time taken for one NOP command to execute.
 
 This happens to be 1us.
 
-From measurement, there are 64 NOPs per line, with 312 lines per screen.
-This gives a total of 19968 NOPs per frame.
+
+Timings:
+  From measurement, there are 64 NOPs per line, with 312 lines per screen. This
+gives a total of 19968 NOPs per frame.
+
+  The Amstrad hardware issues a HALT for each memory fetch. This has the effect
+of stretching the timing for Z80 opcodes, so that they are all multiple of 4 T
+states long. All opcode timings are a multiple of 1us in length.
 
 ***************************************************************************/
 
@@ -97,14 +103,14 @@ static const uint8_t asic_unlock_seq[15] =
    The following tables show the possible ram configurations :*/
 static const int RamConfigurations[8 * 4] =
 {
-	0, 1, 2, 3,                        /* config 0 */
-	0, 1, 2, 7,                        /* config 1 */
-	4, 5, 6, 7,                        /* config 2 */
-	0, 3, 2, 7,                        /* config 3 */
-	0, 4, 2, 3,                        /* config 4 */
-	0, 5, 2, 3,                        /* config 5 */
-	0, 6, 2, 3,                        /* config 6 */
-	0, 7, 2, 3                       /* config 7 */
+	0, 1, 2, 3,              // config 0
+	0, 1, 2, 7,              // config 1
+	4, 5, 6, 7,              // config 2
+	0, 3, 2, 7,              // config 3
+	0, 4, 2, 3,              // config 4
+	0, 5, 2, 3,              // config 5
+	0, 6, 2, 3,              // config 6
+	0, 7, 2, 3               // config 7
 };
 
 
@@ -161,38 +167,38 @@ static const rgb_t amstrad_palette[32] =
 /* the green brightness is equal to the firmware colour index */
 static const rgb_t amstrad_green_palette[32] =
 {
-	rgb_t(0x000, 0x07F, 0x000),        /*13*/
-	rgb_t(0x000, 0x07F, 0x000),        /*13*/
-	rgb_t(0x000, 0x0BA, 0x000),        /*19*/
-	rgb_t(0x000, 0x0F5, 0x000),        /*25*/
-	rgb_t(0x000, 0x009, 0x000),        /*1*/
-	rgb_t(0x000, 0x044, 0x000),        /*7*/
-	rgb_t(0x000, 0x062, 0x000),        /*10*/
-	rgb_t(0x000, 0x09C, 0x000),        /*16*/
-	rgb_t(0x000, 0x044, 0x000),        /*7*/
-	rgb_t(0x000, 0x0F5, 0x000),        /*25*/
-	rgb_t(0x000, 0x0EB, 0x000),        /*24*/
-	rgb_t(0x000, 0x0FF, 0x000),        /*26*/
-	rgb_t(0x000, 0x03A, 0x000),        /*6*/
-	rgb_t(0x000, 0x04E, 0x000),        /*8*/
-	rgb_t(0x000, 0x093, 0x000),        /*15*/
-	rgb_t(0x000, 0x0A6, 0x000),        /*17*/
-	rgb_t(0x000, 0x009, 0x000),        /*1*/
-	rgb_t(0x000, 0x0BA, 0x000),        /*19*/
-	rgb_t(0x000, 0x0B0, 0x000),        /*18*/
-	rgb_t(0x000, 0x0C4, 0x000),        /*20*/
-	rgb_t(0x000, 0x000, 0x000),        /*0*/
-	rgb_t(0x000, 0x013, 0x000),        /*2*/
-	rgb_t(0x000, 0x058, 0x000),        /*9*/
-	rgb_t(0x000, 0x06B, 0x000),        /*11*/
-	rgb_t(0x000, 0x027, 0x000),        /*4*/
-	rgb_t(0x000, 0x0D7, 0x000),        /*22*/
-	rgb_t(0x000, 0x0CD, 0x000),        /*21*/
-	rgb_t(0x000, 0x0E1, 0x000),        /*23*/
-	rgb_t(0x000, 0x01D, 0x000),        /*3*/
-	rgb_t(0x000, 0x031, 0x000),        /*5*/
-	rgb_t(0x000, 0x075, 0x000),        /*12*/
-	rgb_t(0x000, 0x089, 0x000)         /*14*/
+	rgb_t(0x000, 0x07F, 0x000),        // 13
+	rgb_t(0x000, 0x07F, 0x000),        // 13
+	rgb_t(0x000, 0x0BA, 0x000),        // 19
+	rgb_t(0x000, 0x0F5, 0x000),        // 25
+	rgb_t(0x000, 0x009, 0x000),        //  1
+	rgb_t(0x000, 0x044, 0x000),        //  7
+	rgb_t(0x000, 0x062, 0x000),        // 10
+	rgb_t(0x000, 0x09C, 0x000),        // 16
+	rgb_t(0x000, 0x044, 0x000),        //  7
+	rgb_t(0x000, 0x0F5, 0x000),        // 25
+	rgb_t(0x000, 0x0EB, 0x000),        // 24
+	rgb_t(0x000, 0x0FF, 0x000),        // 26
+	rgb_t(0x000, 0x03A, 0x000),        //  6
+	rgb_t(0x000, 0x04E, 0x000),        //  8
+	rgb_t(0x000, 0x093, 0x000),        // 15
+	rgb_t(0x000, 0x0A6, 0x000),        // 17
+	rgb_t(0x000, 0x009, 0x000),        //  1
+	rgb_t(0x000, 0x0BA, 0x000),        // 19
+	rgb_t(0x000, 0x0B0, 0x000),        // 18
+	rgb_t(0x000, 0x0C4, 0x000),        // 20
+	rgb_t(0x000, 0x000, 0x000),        //  0
+	rgb_t(0x000, 0x013, 0x000),        //  2
+	rgb_t(0x000, 0x058, 0x000),        //  9
+	rgb_t(0x000, 0x06B, 0x000),        // 11
+	rgb_t(0x000, 0x027, 0x000),        //  4
+	rgb_t(0x000, 0x0D7, 0x000),        // 22
+	rgb_t(0x000, 0x0CD, 0x000),        // 21
+	rgb_t(0x000, 0x0E1, 0x000),        // 23
+	rgb_t(0x000, 0x01D, 0x000),        //  3
+	rgb_t(0x000, 0x031, 0x000),        //  5
+	rgb_t(0x000, 0x075, 0x000),        // 12
+	rgb_t(0x000, 0x089, 0x000)         // 14
 };
 
 
@@ -2174,6 +2180,18 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 	}
 }
 
+uint8_t amstrad_state::amstrad_cpc_mem_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-((4 - m_maincpu->total_cycles() % 4) % 4));
+	return ((uint8_t*)m_banks[(offset >> 13)]->base())[offset & 0x1fff];
+}
+
+void amstrad_state::amstrad_cpc_mem_w(offs_t offset, uint8_t data)
+{
+	m_maincpu->adjust_icount(-((4 - m_maincpu->total_cycles() % 4) % 4));
+	((uint8_t*)m_banks[(offset >> 13) + 8]->base())[offset & 0x1fff] = data;
+}
 
 /* load CPCEMU style snapshots */
 void amstrad_state::amstrad_handle_snapshot(unsigned char *pSnapshot)
@@ -2766,125 +2784,6 @@ IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 }
 
 
-/* the following timings have been measured! */
-static const uint8_t amstrad_cycle_table_op[256] = {
-	 4, 12,  8,  8,  4,  4,  8,  4,  4, 12,  8,  8,  4,  4,  8,  4,
-	12, 12,  8,  8,  4,  4,  8,  4, 12, 12,  8,  8,  4,  4,  8,  4,
-	 8, 12, 20,  8,  4,  4,  8,  4,  8, 12, 20,  8,  4,  4,  8,  4,
-	 8, 12, 16,  8, 12, 12, 12,  4,  8, 12, 16,  8,  4,  4,  8,  4,
-	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	 8,  8,  8,  8,  8,  8,  4,  8,  4,  4,  4,  4,  4,  4,  8,  4,
-	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	 8, 12, 12, 12, 12, 16,  8, 16,  8, 12, 12,  4, 12, 20,  8, 16,
-	 8, 12, 12, 12, 12, 16,  8, 16,  8,  4, 12, 12, 12,  4,  8, 16,
-	 8, 12, 12, 24, 12, 16,  8, 16,  8,  4, 12,  4, 12,  4,  8, 16,
-	 8, 12, 12,  4, 12, 16,  8, 16,  8,  8, 12,  4, 12,  4,  8, 16
-};
-
-static const uint8_t amstrad_cycle_table_cb[256]=
-{
-	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4
-};
-
-static const uint8_t amstrad_cycle_table_ed[256]=
-{
-	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-	12, 12, 12, 20,  4, 12,  4,  8, 12, 12, 12, 20,  4, 12,  4,  8,
-	12, 12, 12, 20,  4, 12,  4,  8, 12, 12, 12, 20,  4, 12,  4,  8,
-	12, 12, 12, 20,  4, 12,  4, 16, 12, 12, 12, 20,  4, 12,  4, 16,
-	12, 12, 12, 20,  4, 12,  4,  4, 12, 12, 12, 20,  4, 12,  4,  4,
-	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-	16, 12, 16, 16,  4,  4,  4,  4, 16, 12, 16, 16,  4,  4,  4,  4,
-	16, 12, 16, 16,  4,  4,  4,  4, 16, 12, 16, 16,  4,  4,  4,  4,
-	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4
-};
-
-static const uint8_t amstrad_cycle_table_xy[256]=
-{
-	 4, 12,  8,  8,  4,  4,  8,  4,  4, 12,  8,  8,  4,  4,  8,  4,
-	12, 12,  8,  8,  4,  4,  8,  4, 12, 12,  8,  8,  4,  4,  8,  4,
-	 8, 12, 20,  8,  4,  4,  8,  4,  8, 12, 20,  8,  4,  4,  8,  4,
-	 8, 12, 16,  8, 20, 20, 20,  4,  8, 12, 16,  8,  4,  4,  8,  4,
-	 4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
-	 4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
-	 4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
-	16, 16, 16, 16, 16, 16,  4, 16,  4,  4,  4,  4,  4,  4, 16,  4,
-	 4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
-	 4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
-	 4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
-	 4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
-	 8, 12, 12, 12, 12, 16,  8, 16,  8, 12, 12,  8, 12, 20,  8, 16,
-	 8, 12, 12, 12, 12, 16,  8, 16,  8,  4, 12, 12, 12,  4,  8, 16,
-	 8, 12, 12, 24, 12, 16,  8, 16,  8,  4, 12,  4, 12,  4,  8, 16,
-	 8, 12, 12,  4, 12, 16,  8, 16,  8,  8, 12,  4, 12,  4,  8, 16
-};
-
-static const uint8_t amstrad_cycle_table_xycb[0x100] = {
-	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
-	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
-	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
-	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
-	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
-	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
-	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
-	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
-	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
-	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
-	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16
-};
-
-static const uint8_t amstrad_cycle_table_ex[256]=
-{
-	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	4,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	4,  0,  0,  0,  0,  0,  0,  0,  4,  0,  0,  0,  0,  0,  0,  0,
-	4,  0,  0,  0,  0,  0,  0,  0,  4,  0,  0,  0,  0,  0,  0,  0,
-	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	4,  8,  4,  4,  0,  0,  0,  0,  4,  8,  4,  4,  0,  0,  0,  0,
-	8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,
-	8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,
-	8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,
-	8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0
-};
-
 #define NEXT_ROM_SLOT   m_rom_count++; \
 						if(slot3 && m_rom_count == 3) m_rom_count++; \
 						if(slot7 && m_rom_count == 7) m_rom_count++;
@@ -3036,26 +2935,7 @@ void amstrad_state::amstrad_common_init()
 		m_maincpu->set_input_line_vector(0, 0xff); // Z80
 	else
 		m_maincpu->set_input_line_vector(0, 0x00); // Z80
-
-	/* The opcode timing in the Amstrad is different to the opcode
-	timing in the core for the Z80 CPU.
-
-	The Amstrad hardware issues a HALT for each memory fetch.
-	This has the effect of stretching the timing for Z80 opcodes,
-	so that they are all multiple of 4 T states long. All opcode
-	timings are a multiple of 1us in length. */
-
-	/* Using the cool code Juergen has provided, I will override
-	the timing tables with the values for the amstrad */
-	m_maincpu->z80_set_cycle_tables(
-		(const uint8_t*)amstrad_cycle_table_op,
-		(const uint8_t*)amstrad_cycle_table_cb,
-		(const uint8_t*)amstrad_cycle_table_ed,
-		(const uint8_t*)amstrad_cycle_table_xy,
-		(const uint8_t*)amstrad_cycle_table_xycb,
-		(const uint8_t*)amstrad_cycle_table_ex);
-
-	/* Juergen is a cool dude! */
+	m_maincpu->z80_set_iorq_cycles(5);
 }
 
 TIMER_CALLBACK_MEMBER(amstrad_state::cb_set_resolution)

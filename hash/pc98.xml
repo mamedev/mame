@@ -66650,11 +66650,14 @@ doujin?!?
 		</part>
 	</software>
 
-	<!-- Black screen -->
 	<software name="5galscon" supported="no">
 		<description>Five Gals Connection</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>   <!-- is this really a doujin soft? -->
+		<notes><![CDATA[
+Black screen [FDC] 2DD disk
+Has XA and LT support according to spine card
+]]></notes>
 		<info name="author" value="Fancy Soft" />
 		<info name="alt_title" value="ファイブギャルズコネクション" />
 		<part name="flop1" interface="floppy_5_25">

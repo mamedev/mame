@@ -1022,7 +1022,7 @@ void c1541_prologic_dos_classic_device::device_add_mconfig(machine_config &confi
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &c1541_prologic_dos_classic_device::c1541pdc_mem);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpb_handler().set(FUNC(c1541_prologic_dos_classic_device::pia_pb_r));
 	m_pia->writepa_handler().set(FUNC(c1541_prologic_dos_classic_device::pia_pa_w));
 	m_pia->writepb_handler().set(FUNC(c1541_prologic_dos_classic_device::pia_pb_w));

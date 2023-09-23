@@ -43,8 +43,8 @@ Todo:
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#include "formats/imageutl.h"
 #include "formats/vt_cas.h"
+#include "multibyte.h"
 
 #define LOG_VTECH1_LATCH (1U << 1)
 
@@ -176,7 +176,7 @@ SNAPSHOT_LOAD_MEMBER(vtech1_base_state::snapshot_cb)
 	pgmname[16] = '\0';
 
 	// get start and end addresses
-	uint16_t const start = pick_integer_le(header, 22, 2);
+	uint16_t const start = get_u16le(&header[22]);
 	uint16_t const end = start + image.length() - sizeof(header);
 	uint16_t const size = end - start;
 

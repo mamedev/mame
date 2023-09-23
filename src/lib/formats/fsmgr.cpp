@@ -7,6 +7,7 @@
 
 #include "fsmgr.h"
 
+#include "multibyte.h"
 #include "strformat.h"
 
 #include <stdexcept>
@@ -124,235 +125,113 @@ const u8 *fsblk_t::iblock_t::rooffset(const char *function, u32 off, u32 size)
 
 void fsblk_t::block_t::copy(u32 offset, const u8 *src, u32 size)
 {
-	u8 *blk = m_object->offset("copy", offset, size);
-	memcpy(blk, src, size);
+	memcpy(m_object->offset("copy", offset, size), src, size);
 }
 
 void fsblk_t::block_t::fill(u32 offset, u8 data, u32 size)
 {
-	u8 *blk = m_object->offset("fill", offset, size);
-	memset(blk, data, size);
+	memset(m_object->offset("fill", offset, size), data, size);
 }
 
 void fsblk_t::block_t::fill(u8 data)
 {
-	u8 *blk = m_object->data();
-	memset(blk, data, m_object->size());
+	memset(m_object->data(), data, m_object->size());
 }
 
-void fsblk_t::block_t::wstr(u32 offset, const std::string &str)
+void fsblk_t::block_t::wstr(u32 offset, std::string_view str)
 {
-	u8 *blk = m_object->offset("wstr", offset, str.size());
-	memcpy(blk, str.data(), str.size());
+	memcpy(m_object->offset("wstr", offset, str.size()), str.data(), str.size());
 }
 
 void fsblk_t::block_t::w8(u32 offset, u8 data)
 {
-	u8 *blk = m_object->offset("w8", offset, 1);
-	blk[0] = data;
+	m_object->offset("w8", offset, 1)[0] = data;
 }
 
 void fsblk_t::block_t::w16b(u32 offset, u16 data)
 {
-	u8 *blk = m_object->offset("w16b", offset, 2);
-	blk[0] = data >> 8;
-	blk[1] = data;
+	put_u16be(m_object->offset("w16b", offset, 2), data);
 }
 
 void fsblk_t::block_t::w24b(u32 offset, u32 data)
 {
-	u8 *blk = m_object->offset("w24b", offset, 3);
-	blk[0] = data >> 16;
-	blk[1] = data >> 8;
-	blk[2] = data;
+	put_u24be(m_object->offset("w24b", offset, 3), data);
 }
 
 void fsblk_t::block_t::w32b(u32 offset, u32 data)
 {
-	u8 *blk = m_object->offset("w32b", offset, 4);
-	blk[0] = data >> 24;
-	blk[1] = data >> 16;
-	blk[2] = data >> 8;
-	blk[3] = data;
+	put_u32be(m_object->offset("w32b", offset, 4), data);
 }
 
 void fsblk_t::block_t::w16l(u32 offset, u16 data)
 {
-	u8 *blk = m_object->offset("w16l", offset, 2);
-	blk[0] = data;
-	blk[1] = data >> 8;
+	put_u16le(m_object->offset("w16l", offset, 2), data);
 }
 
 void fsblk_t::block_t::w24l(u32 offset, u32 data)
 {
-	u8 *blk = m_object->offset("w24l", offset, 3);
-	blk[0] = data;
-	blk[1] = data >> 8;
-	blk[2] = data >> 16;
+	put_u24le(m_object->offset("w24l", offset, 3), data);
 }
 
 void fsblk_t::block_t::w32l(u32 offset, u32 data)
 {
-	u8 *blk = m_object->offset("w32l", offset, 4);
-	blk[0] = data;
-	blk[1] = data >> 8;
-	blk[2] = data >> 16;
-	blk[3] = data >> 24;
+	put_u32le(m_object->offset("w32l", offset, 4), data);
 }
 
-std::string fsblk_t::block_t::rstr(u32 offset, u32 size) const
+std::string_view fsblk_t::block_t::rstr(u32 offset, u32 size) const
 {
 	const u8 *d = m_object->rooffset("rstr", offset, size);
-	return std::string(d, d + size);
+	return std::string_view(reinterpret_cast<const char *>(d), size);
 }
 
 u8 fsblk_t::block_t::r8(u32 offset) const
 {
-	const u8 *blk = m_object->offset("r8", offset, 1);
-	return blk[0];
+	return m_object->offset("r8", offset, 1)[0];
 }
 
 u16 fsblk_t::block_t::r16b(u32 offset) const
 {
-	const u8 *blk = m_object->offset("r16b", offset, 2);
-	return (blk[0] << 8) | blk[1];
+	return get_u16be(m_object->offset("r16b", offset, 2));
 }
 
 u32 fsblk_t::block_t::r24b(u32 offset) const
 {
-	const u8 *blk = m_object->offset("r24b", offset, 3);
-	return (blk[0] << 16) | (blk[1] << 8) | blk[2];
+	return get_u24be(m_object->offset("r24b", offset, 3));
 }
 
 u32 fsblk_t::block_t::r32b(u32 offset) const
 {
-	const u8 *blk = m_object->offset("r32b", offset, 4);
-	return (blk[0] << 24) | (blk[1] << 16) | (blk[2] << 8) | blk[3];
+	return get_u32be(m_object->offset("r32b", offset, 4));
 }
 
 u16 fsblk_t::block_t::r16l(u32 offset) const
 {
-	const u8 *blk = m_object->offset("r16l", offset, 2);
-	return blk[0] | (blk[1] << 8);
+	return get_u16le(m_object->offset("r16l", offset, 2));
 }
 
 u32 fsblk_t::block_t::r24l(u32 offset) const
 {
-	const u8 *blk = m_object->offset("r24l", offset, 3);
-	return blk[0] | (blk[1] << 8) | (blk[2] << 16);
+	return get_u24le(m_object->offset("r24l", offset, 3));
 }
 
 u32 fsblk_t::block_t::r32l(u32 offset) const
 {
-	const u8 *blk = m_object->offset("r32l", offset, 4);
-	return blk[0] | (blk[1] << 8) | (blk[2] << 16) | (blk[3] << 24);
+	return get_u32le(m_object->offset("r32l", offset, 4));
 }
 
 
 
-void filesystem_t::copy(u8 *p, const u8 *src, u32 size)
-{
-	memcpy(p, src, size);
-}
-
-void filesystem_t::fill(u8 *p, u8 data, u32 size)
-{
-	memset(p, data, size);
-}
-
-void filesystem_t::wstr(u8 *p, const std::string &str)
+void filesystem_t::wstr(u8 *p, std::string_view str)
 {
 	memcpy(p, str.data(), str.size());
 }
 
-void filesystem_t::w8(u8 *p, u8 data)
+std::string_view filesystem_t::rstr(const u8 *p, u32 size)
 {
-	p[0] = data;
+	return std::string_view(reinterpret_cast<const char *>(p), size);
 }
 
-void filesystem_t::w16b(u8 *p, u16 data)
-{
-	p[0] = data >> 8;
-	p[1] = data;
-}
-
-void filesystem_t::w24b(u8 *p, u32 data)
-{
-	p[0] = data >> 16;
-	p[1] = data >> 8;
-	p[2] = data;
-}
-
-void filesystem_t::w32b(u8 *p, u32 data)
-{
-	p[0] = data >> 24;
-	p[1] = data >> 16;
-	p[2] = data >> 8;
-	p[3] = data;
-}
-
-void filesystem_t::w16l(u8 *p, u16 data)
-{
-	p[0] = data;
-	p[1] = data >> 8;
-}
-
-void filesystem_t::w24l(u8 *p, u32 data)
-{
-	p[0] = data;
-	p[1] = data >> 8;
-	p[2] = data >> 16;
-}
-
-void filesystem_t::w32l(u8 *p, u32 data)
-{
-	p[0] = data;
-	p[1] = data >> 8;
-	p[2] = data >> 16;
-	p[3] = data >> 24;
-}
-
-std::string filesystem_t::rstr(const u8 *p, u32 size)
-{
-	return std::string(p, p + size);
-}
-
-u8 filesystem_t::r8(const u8 *p)
-{
-	return p[0];
-}
-
-u16 filesystem_t::r16b(const u8 *p)
-{
-	return (p[0] << 8) | p[1];
-}
-
-u32 filesystem_t::r24b(const u8 *p)
-{
-	return (p[0] << 16) | (p[1] << 8) | p[2];
-}
-
-u32 filesystem_t::r32b(const u8 *p)
-{
-	return (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
-}
-
-u16 filesystem_t::r16l(const u8 *p)
-{
-	return p[0] | (p[1] << 8);
-}
-
-u32 filesystem_t::r24l(const u8 *p)
-{
-	return p[0] | (p[1] << 8) | (p[2] << 16);
-}
-
-u32 filesystem_t::r32l(const u8 *p)
-{
-	return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
-}
-
-std::string filesystem_t::trim_end_spaces(const std::string &str)
+std::string_view filesystem_t::trim_end_spaces(std::string_view str)
 {
 	const auto i = str.find_last_not_of(' ');
 	return str.substr(0, (std::string::npos != i) ? (i + 1) : 0);

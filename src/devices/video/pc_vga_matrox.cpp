@@ -4,6 +4,8 @@
 #include "emu.h"
 #include "pc_vga_matrox.h"
 
+#define DEBUG_VRAM_VIEWER 0
+
 DEFINE_DEVICE_TYPE(MATROX_VGA,  matrox_vga_device,  "matrox_vga",  "Matrox MGA2064W VGA")
 
 matrox_vga_device::matrox_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -32,7 +34,14 @@ void matrox_vga_device::device_start()
 	save_item(NAME(m_cursor_read_index));
 	save_item(NAME(m_cursor_write_index));
 	save_item(NAME(m_cursor_index_state));
+	save_item(NAME(m_cursor_ccr));
+	save_item(NAME(m_cursor_dcc));
 	save_pointer(NAME(m_cursor_color), 12);
+	save_pointer(NAME(m_cursor_ram), 0x400);
+
+	save_item(NAME(m_msc));
+	save_item(NAME(m_truecolor_ctrl));
+	save_item(NAME(m_multiplex_ctrl));
 }
 
 void matrox_vga_device::device_reset()
@@ -48,6 +57,11 @@ void matrox_vga_device::device_reset()
 	m_interlace_mode = false;
 
 	m_cursor_read_index = m_cursor_write_index = m_cursor_index_state = 0;
+	m_cursor_ccr = 0;
+	m_cursor_x = 0;
+	m_cursor_y = 0;
+
+	m_msc = 0;
 	m_truecolor_ctrl = 0x80;
 	m_multiplex_ctrl = 0x98;
 }
@@ -224,23 +238,68 @@ void matrox_vga_device::ramdac_ext_map(address_map &map)
 	map(0x04, 0x04).rw(FUNC(matrox_vga_device::cursor_write_index_r), FUNC(matrox_vga_device::cursor_write_index_w));
 	map(0x05, 0x05).rw(FUNC(matrox_vga_device::cursor_data_r), FUNC(matrox_vga_device::cursor_data_w));
 	map(0x07, 0x07).rw(FUNC(matrox_vga_device::cursor_read_index_r), FUNC(matrox_vga_device::cursor_read_index_w));
-//  map(0x09, 0x09) Direct Cursor control
+	// DDC Direct Cursor control
+	map(0x09, 0x09).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_cursor_dcc & 3;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			// compatible alias to setup cursor mode
+			m_cursor_dcc = (data & 3);
+		})
+	);
 	map(0x0a, 0x0a).rw(FUNC(matrox_vga_device::ramdac_ext_indexed_r), FUNC(matrox_vga_device::ramdac_ext_indexed_w));
 //  map(0x0b, 0x0b) Cursor RAM data
-//  map(0x0c, 0x0f) Cursor X/Y positions
+	map(0x0b, 0x0b).lrw8(
+		NAME([this] (offs_t offset) {
+			u16 cursor_address = vga.dac.read_index | ((m_cursor_ccr & 0xc) >> 2) << 8;
+			u8 res = m_cursor_ram[cursor_address++];
+			cursor_address &= 0x3ff;
+			vga.dac.read_index = cursor_address & 0xff;
+			m_cursor_ccr = (((cursor_address & 0x300) >> 8) << 2) | (m_cursor_ccr & 0xf3);
+			return res;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			u16 cursor_address = vga.dac.write_index | ((m_cursor_ccr & 0xc) >> 2) << 8;
+			m_cursor_ram[cursor_address++] = data;
+			cursor_address &= 0x3ff;
+			vga.dac.write_index = cursor_address & 0xff;
+			m_cursor_ccr = (((cursor_address & 0x300) >> 8) << 2) | (m_cursor_ccr & 0xf3);
+		})
+	);
+	map(0x0c, 0x0d).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_cursor_x >> (offset * 8);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			const u8 shift_mask = 0xff00 >> (offset * 8);
+			m_cursor_x = (data << (offset * 8)) | (m_cursor_x & shift_mask);
+			m_cursor_x &= 0xfff;
+		})
+	);
+	map(0x0e, 0x0f).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_cursor_y >> (offset * 8);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			const u8 shift_mask = 0xff00 >> (offset * 8);
+			m_cursor_y = (data << (offset * 8)) | (m_cursor_y & shift_mask);
+			m_cursor_y &= 0xfff;
+		})
+	);
 //  map(0x10, 0x1f) <reserved>
 }
 
 u8 matrox_vga_device::ramdac_ext_indexed_r()
 {
 	// Unclear from the docs, according to usage seems to be the write index with no autoincrement
-//	logerror("RAMDAC ext read [%02x]\n", vga.dac.write_index);
+//  logerror("RAMDAC ext read [%02x]\n", vga.dac.write_index);
 	return space(EXT_REG + 1).read_byte(vga.dac.write_index);
 }
 
 void matrox_vga_device::ramdac_ext_indexed_w(offs_t offset, u8 data)
 {
-//	logerror("RAMDAC ext [%02x] %02x\n", vga.dac.write_index, data);
+//  logerror("RAMDAC ext [%02x] %02x\n", vga.dac.write_index, data);
 	space(EXT_REG + 1).write_byte(vga.dac.write_index, data);
 }
 
@@ -254,7 +313,7 @@ void matrox_vga_device::cursor_write_index_w(offs_t offset, u8 data)
 	m_cursor_write_index = data & 3;
 	m_cursor_index_state = 0;
 	if (data & 0xfc)
-		logerror("RAMDAC cursor write index > 3");
+		logerror("RAMDAC cursor_write_index_w > 3 -> %02x\n", data);
 }
 
 u8 matrox_vga_device::cursor_read_index_r()
@@ -267,7 +326,7 @@ void matrox_vga_device::cursor_read_index_w(offs_t offset, u8 data)
 	m_cursor_read_index = data & 3;
 	m_cursor_index_state = 0;
 	if (data & 0xfc)
-		logerror("RAMDAC cursor read index > 3");
+		logerror("RAMDAC cursor_read_index_w > 3 -> %02x\n", data);
 }
 
 u8 matrox_vga_device::cursor_data_r()
@@ -292,7 +351,7 @@ void matrox_vga_device::cursor_data_w(offs_t offset, u8 data)
 	if (!machine().side_effects_disabled())
 	{
 		m_cursor_index_state ++;
-		if (m_cursor_write_index > 2)
+		if (m_cursor_index_state > 2)
 		{
 			m_cursor_index_state = 0;
 			m_cursor_write_index ++;
@@ -307,7 +366,15 @@ void matrox_vga_device::ramdac_indexed_map(address_map &map)
 	map(0x01, 0x01).lr8(
 		NAME([] (offs_t offset) { return 0x00; })
 	);
-//  map(0x06, 0x06) CCR indirect cursor control
+	// CCR indirect cursor control
+	map(0x06, 0x06).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_cursor_ccr;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_cursor_ccr = data;
+		})
+	);
 //  map(0x0f, 0x0f) LCR latch control
 
 	map(0x18, 0x18).rw(FUNC(matrox_vga_device::truecolor_ctrl_r), FUNC(matrox_vga_device::truecolor_ctrl_w));
@@ -315,8 +382,19 @@ void matrox_vga_device::ramdac_indexed_map(address_map &map)
 //  map(0x1a, 0x1a) CSR clock selection
 //  map(0x1c, 0x1c) palette page
 //  map(0x1d, 0x1d) GCR general control
-//  map(0x1e, 0x1e) MSC misc control
-
+	// MSC misc control
+	map(0x1e, 0x1e).lrw8(
+		NAME([this] (offs_t offset) {
+			logerror("$1e MSC R\n");
+			return m_msc;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			logerror("$1e MSC W %02x\n", data);
+			if ((m_msc & 0xc) != (data & 0xc))
+				vga.dac.dirty = 1;
+			m_msc = data;
+		})
+	);
 //  map(0x2a, 0x2a) IOC GPIO control (bits 4-0, 1 = data bit as output, 0 = data bit as input)
 //  map(0x2b, 0x2b) GPIO data (bits 4-0)
 //  map(0x2d, 0x2d) pixel clock PLL
@@ -382,7 +460,8 @@ void matrox_vga_device::flush_true_color_mode()
 			{
 				// [0x41, 0x42, 0x43, 0x44] for normal
 				// [0x61, 0x62, 0x63, 0x64] for nibble swapped
-				popmessage("TVP3026: Unemulated 4-bit %s with multiplex: %02x"
+				// Used a lot on intermediate states between VGA and Power Modes ...
+				logerror("TVP3026: Unemulated 4-bit %s with multiplex: %02x\n"
 					, m_multiplex_ctrl & 0x20 ? "normal" : "nibble swapped"
 					, m_multiplex_ctrl
 				);
@@ -452,6 +531,27 @@ void matrox_vga_device::flush_true_color_mode()
 	recompute_params();
 }
 
+void matrox_vga_device::palette_update()
+{
+	// TODO: terminal pin handling
+	// (which does the same thing but externally controlled)
+	if ((m_msc & 0xc) != 0xc)
+		vga_device::palette_update();
+	else
+	{
+		for (int i = 0; i < 256; i++)
+		{
+			set_pen_color(
+				i,
+				vga.dac.color[3*(i & vga.dac.mask) + 0],
+				vga.dac.color[3*(i & vga.dac.mask) + 1],
+				vga.dac.color[3*(i & vga.dac.mask) + 2]
+			);
+		}
+	}
+
+}
+
 uint8_t matrox_vga_device::mem_r(offs_t offset)
 {
 	if (m_mgamode)
@@ -510,4 +610,99 @@ uint32_t matrox_vga_device::start_addr()
 u16 matrox_vga_device::line_compare_mask()
 {
 	return m_mgamode ? 0x7ff : 0x3ff;
+}
+
+uint32_t matrox_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	svga_device::screen_update(screen, bitmap, cliprect);
+	// HW cursor
+	const u8 cursor_mode = (BIT(m_cursor_ccr, 7) ? m_cursor_dcc : m_cursor_ccr) & 3;
+
+	if (cursor_mode)
+	{
+		// partial XGA mode only for now (Win 3.1), others TBD
+		// mode 1: 3 color mode -> transparent/color 0-1-2
+		// mode 2: xga mode -> color 0-1/transparent/complement
+		// mode 3: x-window mode -> transparent/transparent/color 0-1
+		const u8 transparent_pen = 2;
+		for (int y = 0; y < 64; y ++)
+		{
+			int res_y = y + m_cursor_y - 64;
+			for (int x = 0; x < 64; x++)
+			{
+				int res_x = x + m_cursor_x - 64;
+				if (!cliprect.contains(res_x, res_y))
+					continue;
+				const u16 cursor_address = (x >> 3) + y * 8;
+				const int xi = 7 - (x & 7);
+				u8 cursor_gfx = (m_cursor_ram[cursor_address] >> (xi) & 1) | ((m_cursor_ram[cursor_address + 0x200] >> (xi)) & 1) << 1;
+				if (cursor_gfx == transparent_pen)
+					continue;
+				// FIXME: Win 3.1 writes to clut 2 for white, may be wrong
+				cursor_gfx ++;
+				cursor_gfx &= 3;
+				const u8 r = m_cursor_color[3 * cursor_gfx + 0];
+				const u8 g = m_cursor_color[3 * cursor_gfx + 1];
+				const u8 b = m_cursor_color[3 * cursor_gfx + 2];
+
+				bitmap.pix(res_y, res_x) = r << 16 | g << 8 | b;
+			}
+		}
+	}
+
+#if DEBUG_VRAM_VIEWER
+	static int m_test_x = 640, m_start_offs;
+	static int m_test_trigger = 1;
+	const int m_test_y = cliprect.max_y;
+
+	if(machine().input().code_pressed(JOYCODE_X_RIGHT_SWITCH))
+		m_test_x += 1 << (machine().input().code_pressed(JOYCODE_BUTTON2) ? 4 : 0);;
+
+	if(machine().input().code_pressed(JOYCODE_X_LEFT_SWITCH))
+		m_test_x -= 1 << (machine().input().code_pressed(JOYCODE_BUTTON2) ? 4 : 0);;
+
+	//if(machine().input().code_pressed(JOYCODE_Y_DOWN_SWITCH))
+	//	m_test_y++;
+
+	//if(machine().input().code_pressed(JOYCODE_Y_UP_SWITCH))
+	//	m_test_y--;
+
+	if(machine().input().code_pressed(JOYCODE_Y_DOWN_SWITCH))
+		m_start_offs+= 0x100 << (machine().input().code_pressed(JOYCODE_BUTTON2) ? 8 : 0);
+
+	if(machine().input().code_pressed(JOYCODE_Y_UP_SWITCH))
+		m_start_offs-= 0x100 << (machine().input().code_pressed(JOYCODE_BUTTON2) ? 8 : 0);
+
+	m_start_offs %= vga.svga_intf.vram_size;
+
+	if(machine().input().code_pressed_once(JOYCODE_BUTTON1))
+		m_test_trigger ^= 1;
+
+	if (!m_test_trigger)
+		return 0;
+
+	popmessage("%d %d %04x", m_test_x, m_test_y, m_start_offs);
+
+	bitmap.fill(0, cliprect);
+
+	int count = m_start_offs;
+
+	for(int y = 0; y < m_test_y; y++)
+	{
+		for(int x = 0; x < m_test_x; x ++)
+		{
+			u8 color = vga.memory[count % vga.svga_intf.vram_size];
+
+			if(cliprect.contains(x, y))
+			{
+				//bitmap.pix(y, x) = pal565(color, 11, 5, 0);
+				bitmap.pix(y, x) = pen(color);
+			}
+
+			count ++;
+			// count += 2;
+		}
+	}
+#endif
+	return 0;
 }

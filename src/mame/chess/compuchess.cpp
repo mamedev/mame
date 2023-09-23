@@ -180,6 +180,12 @@ private:
 	bool m_blink = false;
 };
 
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
+
 void cmpchess_state::machine_start()
 {
 	// register for savestates

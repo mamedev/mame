@@ -324,7 +324,7 @@ void fortyl_state::undoukai_map(address_map &map)
 	map(0xa804, 0xa804).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
 	map(0xa804, 0xa804).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xa805, 0xa805).r(FUNC(fortyl_state::snd_flag_r)).nopw(); /*sound_reset*/    //????
-	map(0xa807, 0xa807).nopr().nopw(); /* unknown */
+	map(0xa807, 0xa807).noprw(); /* unknown */
 	map(0xa808, 0xa808).portr("DSW3");
 	map(0xa809, 0xa809).portr("P1");
 	map(0xa80a, 0xa80a).portr("SYSTEM");

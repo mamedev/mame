@@ -5,8 +5,9 @@
 Banpresto medal games with Seibu customs
 
 Confirmed games (but there are probably several more):
-Mario Undoukai
 Terebi Denwa Doraemon
+Terebi Denwa Super Mario World
+Mario Undoukai
 
 The following is from Mario Undoukai PCB pics:
 
@@ -509,6 +510,40 @@ ROM_START( tvdenwad )
 	ROM_LOAD( "sc006.u248", 0x800, 0x117, NO_DUMP ) // gal16v8a
 ROM_END
 
+ROM_START( tvdenwam )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "s40_b02.u15",  0x00000, 0x20000, CRC(9d633126) SHA1(5879d84ace23927fd85f6d32c7d94f0ff8d52927) )
+	ROM_LOAD16_BYTE( "s40_b01.u14",  0x00001, 0x20000, CRC(72973fba) SHA1(584a7fd7e82a1797c134ffbb81cf256f79f6f915) )
+
+	ROM_REGION( 0x80000, "spr_gfx", 0 )
+	ROM_LOAD( "s40_a05.u119", 0x00000, 0x80000, CRC(bec55644) SHA1(e3a7ad626845d709bc6cd6a70bda6686b07c0c5f) )
+
+	ROM_REGION( 0x80000, "gfx_tiles", 0 )
+	ROM_LOAD( "s40_a04.u18", 0x00000, 0x80000, CRC(49d21bb1) SHA1(42080305ed2125207427e37e260c655b79d7d170) )
+
+	ROM_REGION( 0x80000, "bg_gfx", 0 )
+	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x80000, "md_gfx", 0 )
+	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x80000, "fg_gfx", 0 )
+	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x80000, "tx_gfx", 0 )
+	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "s40_a03.u17", 0x000000, 0x100000, CRC(55591e28) SHA1(b7edc7ff9f009805c16ca0d10f938540b30907e7) )
+
+	ROM_REGION( 0xa00, "plds", 0 )
+	ROM_LOAD( "sc001.u110", 0x000, 0x104, NO_DUMP ) // tibpal16l8-25cn
+	ROM_LOAD( "sc002.u235", 0x200, 0x104, NO_DUMP ) // tibpal16l8-25cn
+	ROM_LOAD( "sc003.u36",  0x400, 0x155, NO_DUMP ) // 18cv8pc-25
+	ROM_LOAD( "sc004c.u68", 0x600, 0x117, NO_DUMP ) // gal16v8a
+	ROM_LOAD( "sc006.u248", 0x800, 0x117, NO_DUMP ) // gal16v8a
+ROM_END
+
 ROM_START( marioun )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "s98_b02.u15",  0x00000, 0x20000, CRC(d88eecfc) SHA1(5a15a1f925ae10e439e5aee8f3ef5a2fa956b80f) )
@@ -577,5 +612,6 @@ void banprestoms_state::init_oki() // The Oki mask ROM is in an unusual format, 
 } // Anonymous namespace
 
 
-GAME( 1991, tvdenwad, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Doraemon", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, marioun,  0, banprestoms, marioun,  banprestoms_state, init_oki, ROT0, "Banpresto", "Super Mario World - Mario Undoukai",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tvdenwad, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Doraemon",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, tvdenwam, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Super Mario World",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, marioun,  0, banprestoms, marioun,  banprestoms_state, init_oki, ROT0, "Banpresto", "Super Mario World - Mario Undoukai", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

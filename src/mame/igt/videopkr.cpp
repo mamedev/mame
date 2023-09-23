@@ -427,8 +427,6 @@ private:
 };
 
 
-#define DATA_NVRAM_SIZE     0x100
-
 /*************************
 *     Video Hardware     *
 *************************/
@@ -1240,8 +1238,6 @@ void videopkr_state::machine_start()
 	m_count3 = 0;
 	m_count4 = 0;
 	m_ant_jckp = 0;
-
-	subdevice<nvram_device>("nvram")->set_base(m_data_ram, sizeof(m_data_ram));
 }
 
 void babypkr_state::machine_start()
@@ -1276,7 +1272,7 @@ void videopkr_state::videopkr(machine_config &config)
 	soundcpu.p2_in_cb().set(FUNC(videopkr_state::sound_p2_r));
 	soundcpu.p2_out_cb().set(FUNC(videopkr_state::sound_p2_w));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "data_ram", nvram_device::DEFAULT_ALL_0);
 
 	TIMER(config, "t1_timer").configure_periodic(FUNC(videopkr_state::sound_t1_callback), attotime::from_hz(50));
 

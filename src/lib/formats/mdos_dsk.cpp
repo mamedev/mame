@@ -53,6 +53,7 @@
 #include "imageutl.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 
 mdos_format::mdos_format() : wd177x_format(formats)
@@ -158,9 +159,7 @@ int mdos_format::find_size(util::random_read &io, uint32_t form_factor, const st
 	// 10 words. The area beyond the zero word is not always zero filled,
 	// and is ignored here. Check that it is consistent with this.
 	for (int i = 0; i < 10; i++) {
-		uint8_t high = info.rib_addr[i * 2];
-		uint8_t low = info.rib_addr[i * 2 + 1];
-		uint16_t cluster = (high << 8) | low;
+		uint16_t cluster = get_u16be(&info.rib_addr[i * 2]);
 
 		if (cluster == 0)
 			break;

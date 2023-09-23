@@ -180,13 +180,12 @@ void mpu4_oki_sampled_sound::device_add_mconfig(machine_config &config)
 	m_ptm_ic3ss->o2_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_c1));
 	m_ptm_ic3ss->o3_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_g1));
 
-	PIA6821(config, m_pia_ic4ss, 0);
+	PIA6821(config, m_pia_ic4ss);
 	m_pia_ic4ss->readpb_handler().set(FUNC(mpu4_oki_sampled_sound::pia_gb_portb_r));
 	m_pia_ic4ss->writepa_handler().set(FUNC(mpu4_oki_sampled_sound::pia_gb_porta_w));
 	m_pia_ic4ss->writepb_handler().set(FUNC(mpu4_oki_sampled_sound::pia_gb_portb_w));
 	m_pia_ic4ss->ca2_handler().set(FUNC(mpu4_oki_sampled_sound::pia_gb_ca2_w));
 	m_pia_ic4ss->cb2_handler().set(FUNC(mpu4_oki_sampled_sound::pia_gb_cb2_w));
-
 
 	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(0, *this, 1.0);

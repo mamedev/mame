@@ -82,7 +82,7 @@ private:
 
 	struct {
 		u16 fc = 0, bc = 0;
-		util::fifo <u32, 16> fifo;
+		util::fifo <u32, 32> fifo;
 		drawing_state_t state;
 		u32 current_command = 0;
 		u8 command_count = 0;
@@ -91,6 +91,12 @@ private:
 		// DrawBitmapP needs these intermediary values
 		u16 rx = 0, ry = 0, rxi = 0, ryi = 0, rsizex = 0, rsizey = 0;
 	} m_draw;
+
+	void reset_drawing_engine();
+	u32 ctr_r(offs_t offset);
+
+	// geometry engine
+	u32 gctr_r(offs_t offset);
 
 	struct {
 		u32 cm = 0;
@@ -103,9 +109,20 @@ private:
 	} m_c_layer;
 
 	struct {
+		u32 blda[2]{};
+		u32 blm = 0;
+		u16 blh = 0;
+		u16 blw = 0;
+		u8 blflp = 0;
+		bool blc = false;
+	} m_bl_layer;
+
+	struct {
 		u32 mlda[2]{};
 	} m_ml_layer;
 
+	template <unsigned N> u32 blda_r(offs_t offset);
+	template <unsigned N> void blda_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	template <unsigned N> u32 mlda_r(offs_t offset);
 	template <unsigned N> void mlda_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 

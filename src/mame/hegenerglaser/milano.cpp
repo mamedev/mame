@@ -17,11 +17,12 @@ Nigel Short is basically a Milano 2.00
 
 #include "emu.h"
 
+#include "mmdisplay2.h"
+
 #include "cpu/m6502/r65c02.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
-#include "mmdisplay2.h"
 #include "video/pwm.h"
 
 // internal artwork

@@ -1572,17 +1572,17 @@ void williams_state::williams_base(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_soundcpu, M6808_IRQ_LINE);
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set_ioport("IN0");
 	m_pia[0]->readpb_handler().set_ioport("IN1");
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set_ioport("IN2");
 	m_pia[1]->writepb_handler().set(FUNC(williams_state::snd_cmd_w));
 	m_pia[1]->irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
 
-	PIA6821(config, m_pia[2], 0);
+	PIA6821(config, m_pia[2]);
 	m_pia[2]->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pia[2]->irqa_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[2]->irqb_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
@@ -1664,7 +1664,7 @@ void spdball_state::spdball(machine_config &config)
 	williams_b1(config);
 
 	// pia
-	PIA6821(config, m_pia[3], 0);
+	PIA6821(config, m_pia[3]);
 	m_pia[3]->readpa_handler().set_ioport("IN3");
 	m_pia[3]->readpb_handler().set_ioport("IN4");
 }
@@ -1707,16 +1707,12 @@ void sinistar_state::cockpit(machine_config &config)
 	SPEAKER(config, "rspeaker").rear_center();
 	MC1408(config, "rdac").add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
 
-	// uncomment this to route front/rear to left/right
-	//subdevice<speaker_device>("speaker")->front_left();
-	//subdevice<speaker_device>("rspeaker")->front_right();
-
 	// pia
 	INPUT_MERGER_ANY_HIGH(config, "soundirq_b").output_handler().set_inputline("soundcpu_b", M6808_IRQ_LINE);
 
 	m_pia[1]->writepb_handler().set(FUNC(sinistar_state::cockpit_snd_cmd_w));
 
-	PIA6821(config, m_pia[3], 0);
+	PIA6821(config, m_pia[3]);
 	m_pia[3]->writepa_handler().set("rdac", FUNC(dac_byte_interface::data_w));
 	m_pia[3]->irqa_handler().set("soundirq_b", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[3]->irqb_handler().set("soundirq_b", FUNC(input_merger_any_high_device::in_w<1>));
@@ -1783,7 +1779,7 @@ void blaster_state::blaster(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(blaster_state::blaster_snd_cmd_w));
 	m_pia[2]->writepa_handler().set("ldac", FUNC(dac_byte_interface::data_w));
 
-	PIA6821(config, m_pia[3], 0);
+	PIA6821(config, m_pia[3]);
 	m_pia[3]->writepa_handler().set("rdac", FUNC(dac_byte_interface::data_w));
 	m_pia[3]->irqa_handler().set("soundirq_b", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[3]->irqb_handler().set("soundirq_b", FUNC(input_merger_any_high_device::in_w<1>));
@@ -1836,18 +1832,18 @@ void williams2_state::williams2_base(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_soundcpu, M6808_IRQ_LINE);
 
 	// pia
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set_ioport("IN0");
 	m_pia[0]->readpb_handler().set_ioport("IN1");
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set_ioport("IN2");
 	m_pia[1]->writepb_handler().set(FUNC(williams2_state::snd_cmd_w));
 	m_pia[1]->cb2_handler().set(m_pia[2], FUNC(pia6821_device::ca1_w));
 	m_pia[1]->irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
 
-	PIA6821(config, m_pia[2], 0);
+	PIA6821(config, m_pia[2]);
 	m_pia[2]->writepa_handler().set(m_pia[1], FUNC(pia6821_device::portb_w));
 	m_pia[2]->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pia[2]->ca2_handler().set(m_pia[1], FUNC(pia6821_device::cb1_w));
@@ -3160,12 +3156,13 @@ There is known to be a "perfect" version of Sinistar, that being the original ve
 
 Sinistar's cockpit cabinet features two sound boards, one for the front speakers and another for the rear.  The rear
   sound board uses a different ROM, Video Sound ROM 10.  It adds a slight delay to some of the sound effects,
-  producing a reverberation effect, and ignores the extra ship and bounce effects.  It has no speech ROMs.
+  and ignores the extra ship and bounce effects.  It has no speech ROMs.
 
 If you disconnect the speech ROMs from the upright sound board, Video Sound ROM 9 will play two replacement sound
   effects for the Sinistar's missing audio.  Any line of dialogue will be replaced by a generic alarm noise,
   while the Sinistar roar is replaced by a loud square wave synth noise that attempts to emulate the "sini-scream".
   Video Sound Rom 10 disables this functionality so that it doesn't play placeholder sounds in place of speech.
+
 */
 ROM_START( sinistar ) // rev. 3
 	ROM_REGION( 0x19000, "maincpu", 0 ) // solid RED labels with final production part numbers

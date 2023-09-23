@@ -659,6 +659,20 @@ ROM_START( atarifb2 ) // built from original Atari source code
 	ROM_LOAD_NIB_HIGH( "033031.d5", 0x0000, 0x0200, CRC(89d619b8) SHA1(0af5d1f4e6f9a377dc2d49a8039866b1857af01f) )
 ROM_END
 
+ROM_START( amerug )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "28.lm1", 0x6800, 0x0800, CRC(f8ce7ed8) SHA1(54520d7d31c6c8f9028b7253a33aba3b2c35ae7c) )
+	ROM_LOAD( "26.p1",  0x7000, 0x0800, CRC(a79c79ca) SHA1(7791b431e9aadb09fd286ae56699c4beda54830a) )
+	ROM_LOAD( "27.n1",  0x7800, 0x0800, CRC(7740be51) SHA1(3f610061f081eb5589b00a496877bc58f6e0f09f) )
+
+	ROM_REGION( 0x0400, "gfx1", 0 )
+	ROM_LOAD_NIB_LOW ( "am27s33dc.n7", 0x0000, 0x0400, CRC(12f43dca) SHA1(a463f5068d5522ddf74052429aa6da23e5475844) )
+
+	ROM_REGION( 0x0200, "gfx2", 0 )
+	ROM_LOAD_NIB_LOW ( "30.c5", 0x0000, 0x0200, CRC(00b6d316) SHA1(cbe094075e682b68bc79cdd3a0b3e88c6ef9f521) )
+	ROM_LOAD_NIB_HIGH( "31.d5", 0x0000, 0x0200, CRC(e5ea13e4) SHA1(95e7f71765abf4063904705964042e05705774db) )
+ROM_END
+
 ROM_START( atarifb4 )
 	ROM_REGION( 0x8000, "maincpu", 0 ) /* 64k for code, the ROMs are nibble-wide */
 	ROM_LOAD_NIB_LOW ( "34889.m1", 0x6000, 0x0400, CRC(5c63974a) SHA1(e91f318be80d985a09ff92f4db5792290a06dc0f) )
@@ -782,6 +796,7 @@ ROM_END
 GAMEL( 1978, atarifb,  0,       atarifb,  atarifb,  atarifb_state, empty_init, ROT0, "Atari", "Atari Football (revision 2)", MACHINE_SUPPORTS_SAVE, layout_atarifb )
 GAMEL( 1978, atarifb1, atarifb, atarifb,  atarifb,  atarifb_state, empty_init, ROT0, "Atari", "Atari Football (revision 1)", MACHINE_SUPPORTS_SAVE, layout_atarifb )
 GAMEL( 1978, atarifb2, atarifb, atarifb,  atarifb,  atarifb_state, empty_init, ROT0, "Atari", "Atari Football II", MACHINE_SUPPORTS_SAVE, layout_atarifb )
+GAMEL( 1980, amerug,   atarifb, atarifb,  atarifb,  atarifb_state, empty_init, ROT0, "Shoei", "Amerug (Shoei bootleg of Atari Football)", MACHINE_SUPPORTS_SAVE, layout_atarifb )
 GAMEL( 1979, atarifb4, atarifb, atarifb4, atarifb4, atarifb_state, empty_init, ROT0, "Atari", "Atari 4 Player Football", MACHINE_SUPPORTS_SAVE, layout_atarifb4 )
 GAMEL( 1979, abaseb,   0,       abaseb,   abaseb,   atarifb_state, empty_init, ROT0, "Atari", "Atari Baseball (set 1)", MACHINE_SUPPORTS_SAVE, layout_abaseb )
 GAMEL( 1979, abaseb2,  abaseb,  abaseb,   abaseb,   atarifb_state, empty_init, ROT0, "Atari", "Atari Baseball (set 2)", MACHINE_SUPPORTS_SAVE, layout_abaseb )

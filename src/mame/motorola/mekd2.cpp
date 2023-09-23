@@ -376,7 +376,7 @@ void mekd2_state::mekd2(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
-	PIA6821(config, m_pia_s, 0);
+	PIA6821(config, m_pia_s);
 	m_pia_s->readpa_handler().set(FUNC(mekd2_state::key_r));
 	m_pia_s->readcb1_handler().set(FUNC(mekd2_state::key40_r));
 	m_pia_s->writepa_handler().set(FUNC(mekd2_state::segment_w));
@@ -385,7 +385,7 @@ void mekd2_state::mekd2(machine_config &config)
 	m_pia_s->irqa_handler().set_inputline("maincpu", INPUT_LINE_NMI);
 	m_pia_s->irqb_handler().set_inputline("maincpu", INPUT_LINE_NMI);
 
-	PIA6821(config, m_pia_u, 0);
+	PIA6821(config, m_pia_u);
 	m_pia_u->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia_u->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 

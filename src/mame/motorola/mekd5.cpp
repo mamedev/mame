@@ -468,7 +468,7 @@ void mekd5_state::mekd5(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// Keypad and display PIA (U23). IRQA is NC. CB2 is trace timer input.
-	PIA6821(config, m_kpd_pia, 0);
+	PIA6821(config, m_kpd_pia);
 	m_kpd_pia->readpa_handler().set(FUNC(mekd5_state::keypad_key_r));
 	m_kpd_pia->writepa_handler().set(FUNC(mekd5_state::led_segment_w));
 	m_kpd_pia->writepb_handler().set(FUNC(mekd5_state::led_digit_w));
@@ -480,7 +480,7 @@ void mekd5_state::mekd5(machine_config &config)
 	// User PIA (U9).
 	// IRQA and IRQB can be independently jumpered to IRQ or NMI via J1.
 	// All the I/O lines are available at the User I/O connector.
-	PIA6821(config, m_user_pia, 0);
+	PIA6821(config, m_user_pia);
 
 	// IRQ is NC. RX and TX clk are wired together. RTS is available.
 	// /DCD and /CTS and wired low.

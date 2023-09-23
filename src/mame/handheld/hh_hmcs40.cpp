@@ -267,7 +267,7 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
 /*******************************************************************************
 
   Actronics / Hanzawa Wanted G-Man
-  * Hitachi HD38800B24 MCU
+  * Hitachi HD38800B24 MCU, 1-bit sound
   * cyan/red VFD
 
   known releases:
@@ -389,7 +389,7 @@ ROM_END
 
   Bambino Dribble Away Basketball (manufactured in Japan)
   * PCB label: Emix Corp. ET-05
-  * Hitachi HD38750A08 MCU
+  * Hitachi HD38750A08 MCU, 1-bit sound
   * cyan VFD Emix-106, with bezel overlay
   * color overlay: green (optional)
 
@@ -517,7 +517,7 @@ ROM_END
 
   Bambino Knock-Em Out Boxing
   * PCB label: Emix Corp. ET-06B
-  * Hitachi HD38750A07 MCU
+  * Hitachi HD38750A07 MCU, 1-bit sound
   * cyan VFD Emix-103, with blue or transparent window
 
 *******************************************************************************/
@@ -667,7 +667,7 @@ ROM_END
 
   Bandai Frisky Tom (manufactured in Japan)
   * PCB label: Kaken Corp., PT-327A
-  * Hitachi HD38800A77 MCU
+  * Hitachi HD38800A77 MCU, 1-bit sound
   * cyan/red/green VFD Futaba DM-43ZK 2E
 
 *******************************************************************************/
@@ -798,7 +798,7 @@ ROM_END
 
   Bandai Packri Monster (manufactured in Japan)
   * PCB label: DM-21ZA2
-  * Hitachi HD38800A27 MCU
+  * Hitachi HD38800A27 MCU, 1-bit sound
   * cyan/red/green VFD Futaba DM-21ZK 2B, with bezel overlay
 
   known releases:
@@ -922,7 +922,7 @@ ROM_END
 
   Bandai Zaxxon (manufactured in Japan, licensed from Sega)
   * PCB label: FL Zaxxon
-  * Hitachi HD38800B19 MCU
+  * Hitachi HD38800B19 MCU, 1-bit sound
   * cyan/red/blue VFD NEC FIP11BM24T no. 4-8, half of it reflected with a
     one-way mirror to give the illusion of a 3D display
 
@@ -1050,7 +1050,7 @@ ROM_END
 /*******************************************************************************
 
   Bandai Zackman (manufactured in Japan)
-  * Hitachi QFP HD38820A49 MCU
+  * Hitachi QFP HD38820A49 MCU, 1-bit sound
   * cyan/red/yellow VFD Futaba DM-53Z 3E
   * color overlay: score/lives: blue, game row 3,4: pink1, row 5,6: pink2
 
@@ -1183,7 +1183,7 @@ ROM_END
 
   Bandai Pengo (manufactured in Japan, licensed from Sega)
   * PCB label: FL Pengo(in katakana)
-  * Hitachi QFP HD38820A63 MCU
+  * Hitachi QFP HD38820A63 MCU, 1-bit sound
   * cyan/red/blue VFD Futaba DM-68ZK 3D DM-63
 
 *******************************************************************************/
@@ -1318,7 +1318,7 @@ ROM_END
 
   Bandai Burger Time (manufactured in Japan, licensed from Data East)
   * PCB label: Kaken Corp. PT-389 Burger Time
-  * Hitachi QFP HD38820A65 MCU
+  * Hitachi QFP HD38820A65 MCU, 1-bit sound
   * cyan/red/green VFD NEC FIP6AM25T no. 21-21
 
 *******************************************************************************/
@@ -1448,7 +1448,7 @@ ROM_END
 /*******************************************************************************
 
   Bandai Kiteyo Parman
-  * Hitachi HD38800B42 MCU
+  * Hitachi HD38800B42 MCU, 1-bit sound
   * cyan/red/blue VFD
 
 *******************************************************************************/
@@ -1545,7 +1545,7 @@ ROM_END
 
   Bandai Dokodemo Dorayaki Doraemon (FL LSI Game Push Up) (manufactured in Japan)
   * PCB label: Kaken Corp PT-412 FL-Doreamon(in katakana)
-  * Hitachi HD38800B43 MCU
+  * Hitachi HD38800B43 MCU, 1-bit sound
   * cyan/red/blue VFD Futaba DM-71
 
 *******************************************************************************/
@@ -1655,7 +1655,7 @@ ROM_END
 /*******************************************************************************
 
   Bandai Toukon Juohmaru
-  * Hitachi HD38800B48 MCU
+  * Hitachi HD38800B48 MCU, 1-bit sound
   * cyan/red/blue VFD
 
 *******************************************************************************/
@@ -1771,7 +1771,7 @@ ROM_END
 
   Bandai Ultraman Monster Battle (FL LSI Game Push Up) (manufactured in Japan)
   * PCB label: Kaken Corp. PT-424 FL Ultra Man
-  * Hitachi HD38800B52 MCU
+  * Hitachi HD38800B52 MCU, 1-bit sound
   * cyan/red/blue VFD NEC FIP8BM25T no. 21-8 2
 
 *******************************************************************************/
@@ -1873,7 +1873,7 @@ ROM_END
 /*******************************************************************************
 
   Bandai Go Go Dynaman
-  * Hitachi HD38820A75 MCU
+  * Hitachi HD38820A75 MCU, 1-bit sound
   * cyan/red/blue VFD
 
   known releases:
@@ -2000,7 +2000,7 @@ ROM_END
 
   Bandai Machine Man (FL Flat Type) (manufactured in Japan)
   * PCB label: Kaken PT-438
-  * Hitachi QFP HD38820A85 MCU
+  * Hitachi QFP HD38820A85 MCU, 1-bit sound
   * cyan/red/green VFD NEC FIP5CM33T no. 4 21
 
 *******************************************************************************/
@@ -2103,7 +2103,7 @@ ROM_END
 
   Bandai Pair Match (manufactured in Japan)
   * PCB label: Kaken Corp. PT-460
-  * Hitachi QFP HD38820A88 MCU(main), HD38820A89(audio)
+  * Hitachi QFP HD38820A88 MCU(main), HD38820A89(audio), 1-bit sound
   * cyan/red VFD
 
   This is a memory game, the difference is instead of pictures, the player
@@ -2282,7 +2282,7 @@ ROM_END
 /*******************************************************************************
 
   Coleco Alien Attack (manufactured in Taiwan)
-  * Hitachi HD38800A25 MCU
+  * Hitachi HD38800A25 MCU, 1-bit sound
   * cyan/red VFD Futaba DM-19Z 1J
 
   It looks like Coleco took Gakken's Heiankyo Alien and turned it into a more
@@ -2411,7 +2411,7 @@ ROM_END
   Coleco Donkey Kong (manufactured in Taiwan, licensed from Nintendo)
   * PCB label: Coleco Rev C 75790 DK
   * Hitachi QFP HD38820A45 MCU
-  * RC circuit for speaker volume decay
+  * 1-bit sound with RC circuit for speaker volume decay
   * cyan/red VFD Futaba DM-47ZK 2K
   * color overlay: playfield: red1, donkey kong/princess: red2
 
@@ -2558,7 +2558,7 @@ ROM_END
   Coleco Galaxian (manufactured in Taiwan)
   * PCB label: Coleco Rev A 75718
   * Hitachi HD38800A70 MCU
-  * discrete sound (when alien attacks)
+  * 1-bit sound + discrete sound (when alien attacks)
   * cyan/red VFD Futaba DM-36Z 2H
   * color overlay: gameover+top row: orange, aliens: pink
 
@@ -2698,7 +2698,7 @@ ROM_END
 
   Coleco Pac-Man (manufactured in Taiwan, licensed from Midway)
   * PCB label: Coleco 75690
-  * Hitachi QFP HD38820A28/29 MCU
+  * Hitachi QFP HD38820A28/29 MCU, 1-bit sound
   * cyan/red VFD Futaba DM-34Z 2A
   * color overlay: playfield: orange, lives/status: pink
 
@@ -2842,7 +2842,7 @@ ROM_END
 
   Coleco Ms. Pac-Man (manufactured in Taiwan, licensed from Midway)
   * PCB label: Coleco 911171
-  * Hitachi QFP HD38820A61 MCU
+  * Hitachi QFP HD38820A61 MCU, 1-bit sound
   * cyan/red VFD Futaba DM-60Z 3I
   * color overlay: lives/playfield: orange, best: pink, fruit: yellow
 
@@ -2972,7 +2972,7 @@ ROM_END
 
   Entex Galaxian 2 (manufactured in Japan)
   * PCB labels: ENTEX GALAXIAN PB-118/116/097 80-210137/135/114
-  * Hitachi QFP HD38820A13 MCU
+  * Hitachi QFP HD38820A13 MCU, 1-bit sound
   * cyan/red/green VFD Futaba DM-20
 
   known releases:
@@ -3110,7 +3110,7 @@ ROM_END
 
   Entex Pac Man 2 (manufactured in Japan)
   * PCB labels: ENTEX PAC-MAN PB-093/094 80-210149/50/51
-  * Hitachi QFP HD38820A23 MCU
+  * Hitachi QFP HD38820A23 MCU, 1-bit sound
   * cyan/red VFD Futaba DM-28Z 1G(cyan Pac-Man) or DM-28 1K(orange Pac-Man)
 
   2 VFD revisions are known, the difference is Pac-Man's color: cyan or red.
@@ -3200,7 +3200,7 @@ ROM_END
 /*******************************************************************************
 
   Entex Super Space Invader 2 (black version)
-  * Hitachi HD38800A31 MCU
+  * Hitachi HD38800A31 MCU, 1-bit sound
   * cyan/red VFD
 
   This version has the same MCU as the Select-A-Game cartridge. Maybe from
@@ -3331,7 +3331,7 @@ ROM_END
   Entex Turtles (manufactured in Japan)
   * PCB label: 560359
   * Hitachi QFP HD38820A43 MCU, speed adjustable by knob
-  * COP411L sub MCU for sound, label COP411L-KED/N
+  * COP411L sub MCU for sound, label COP411L-KED/N, 1-bit sound
   * cyan/red/green VFD NEC FIP15BM32T
 
 *******************************************************************************/
@@ -3553,7 +3553,8 @@ ROM_END
   Entex Stargate (manufactured in Japan)
   * PCB label: 5603521/31
   * Hitachi QFP HD38820A42 MCU, speed adjustable by knob
-  * COP411L sub MCU for sound, label ~/B8236 COP411L-KEC/N, volume control
+  * COP411L sub MCU for sound, label ~/B8236 COP411L-KEC/N
+  * 1-bit sound with volume control
   * cyan/red/green VFD NEC FIP15AM32T (EL628-003) no. 2-421
   * color overlay: bottom row: red
 
@@ -3692,7 +3693,7 @@ ROM_END
 /*******************************************************************************
 
   Gakken Heiankyo Alien (manufactured in Japan)
-  * Hitachi HD38800A04 MCU
+  * Hitachi HD38800A04 MCU, 1-bit sound
   * cyan/red VFD Futaba DM-11Z 1H
 
   known releases:
@@ -3821,7 +3822,7 @@ ROM_END
 
   Gakken Crazy Kong (manufactured in Japan)
   * PCB label: ZENY 5603601
-  * Hitachi HD38800B01 MCU
+  * Hitachi HD38800B01 MCU, 1-bit sound
   * cyan/red/blue VFD Futaba DM-54Z 2H, with bezel overlay
 
   known releases:
@@ -3956,7 +3957,7 @@ ROM_END
 
   Gakken Super Cobra
   * PCB label: SUPER COBRA 3000N
-  * Hitachi QFP HD38820A32 MCU
+  * Hitachi QFP HD38820A32 MCU, 1-bit sound
   * cyan/red/green VFD
 
   known releases:
@@ -4093,7 +4094,7 @@ ROM_END
 /*******************************************************************************
 
   Gakken Defender
-  * Hitachi HD38820L53 MCU (SDIP)
+  * Hitachi HD38820L53 MCU (SDIP), 1-bit sound
   * cyan/red/green VFD
 
   Entex Defender is possibly the same game, but with a cyan/red VFD.
@@ -4228,7 +4229,7 @@ ROM_END
 
   Gakken Dig Dug (manufactured in Japan)
   * PCB label: Gakken DIG-DAG KS-004283(A/B)
-  * Hitachi QFP HD38820A69 MCU
+  * Hitachi QFP HD38820A69 MCU, 1-bit sound
   * cyan/red/yellow VFD Futaba DM-69Z 3F
   * color overlay: game row 1,2: orange1: row 3,4: o2, row 5,6: o3, row 7: o4
 
@@ -4358,7 +4359,7 @@ ROM_END
 
   Mattel World Championship Baseball (model 3201)
   * PCB label: MEL-001 Baseball Rev. B
-  * Hitachi QFP HD38820A09 MCU
+  * Hitachi QFP HD38820A09 MCU, 3-bit sound
   * cyan/red/green VFD Futaba DM-24ZK 1G, with etched overlay
 
   It was patented under US4372557. To start the game in 2-player mode, simply
@@ -4535,7 +4536,7 @@ ROM_END
 
   Mattel Star Hawk (manufactured in Japan)
   * PCB label: Kaken, PT-317B
-  * Hitachi HD38800A73 MCU
+  * Hitachi HD38800A73 MCU, 1-bit sound
   * cyan/red VFD Futaba DM-41ZK, with cross hatch on bezel
   * color overlay: score panel: red
 
@@ -4676,7 +4677,7 @@ ROM_END
 
   Parker Brothers Q*Bert
   * PCB label: 13662 REV-4
-  * Hitachi QFP HD38820A70 MCU
+  * Hitachi QFP HD38820A70 MCU, 1-bit sound
   * cyan/red/green/darkgreen VFD Itron CP5137
 
 *******************************************************************************/
@@ -4777,7 +4778,7 @@ ROM_END
 /*******************************************************************************
 
   Romtec Pucki & Monsters
-  * Hitachi HD38750A67 MCU
+  * Hitachi HD38750A67 MCU, 1-bit sound
   * cyan/red/green VFD
 
 *******************************************************************************/
@@ -4877,7 +4878,7 @@ ROM_END
 
   Tomy Tron (manufactured in Japan)
   * PCB label: THN-02 2E114E07
-  * Hitachi HD38800A88 MCU
+  * Hitachi HD38800A88 MCU, 1-bit sound
   * cyan/red/green VFD NEC FIP10AM24T no. 2-8 1
 
 *******************************************************************************/
@@ -5005,7 +5006,7 @@ ROM_END
 
   Tomy Kingman (manufactured in Japan)
   * PCB label: THF-01II 2E138E01/2E128E02
-  * Hitachi HD38800B23 MCU
+  * Hitachi HD38800B23 MCU, 1-bit sound
   * cyan/red/blue VFD Futaba DM-65ZK 3A
 
   known releases:
@@ -5136,7 +5137,7 @@ ROM_END
 /*******************************************************************************
 
   Tomy Bombman (Portable 6000 series)
-  * Hitachi HD38800B29 MCU
+  * Hitachi HD38800B29 MCU, 1-bit sound
   * cyan/red/blue VFD
 
 *******************************************************************************/
@@ -5259,7 +5260,7 @@ ROM_END
 /*******************************************************************************
 
   VTech Invaders (manufactured in Taiwan)
-  * Hitachi HD38750A45 MCU
+  * Hitachi HD38750A45 MCU, 1-bit sound
   * cyan/red VFD Futaba DM-26Z 1G
   * color overlay: alien row 2,4: yellow, row 2,5: red
 

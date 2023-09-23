@@ -120,7 +120,7 @@ const int MODE_GDI = 2;
 
 typedef std::unordered_map<std::string, std::string *> parameters_map;
 
-template <typename Format, typename... Params> static void report_error(int error, Format &&fmt, Params &&...args);
+template <typename Format, typename... Params> [[noreturn]] static void report_error(int error, Format &&fmt, Params &&...args);
 static void do_info(parameters_map &params);
 static void do_verify(parameters_map &params);
 static void do_create_raw(parameters_map &params);
@@ -2869,7 +2869,7 @@ static void do_extract_ld(parameters_map &params)
 
 	// build up the movie info
 	avi_file::movie_info info;
-	info.video_format = FORMAT_YUY2;
+	info.video_format = avi_file::FORMAT_YUY2;
 	info.video_timescale = fps_times_1million / interlace_factor;
 	info.video_sampletime = 1000000;
 	info.video_width = width;

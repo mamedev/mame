@@ -3,6 +3,8 @@
 #include "emu.h"
 #include "t10mmc.h"
 
+#include "multibyte.h"
+
 static int to_msf(int frame)
 {
 	int m = frame / (75 * 60);
@@ -167,7 +169,7 @@ void t10mmc::ExecCommand()
 	case T10MMC_CMD_READ_DISC_STRUCTURE:
 		m_phase = SCSI_PHASE_DATAIN;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
-		m_transfer_length = (command[8] << 8) | command[9];
+		m_transfer_length = get_u16be(&command[8]);
 		break;
 
 	case T10SBC_CMD_READ_10:
@@ -179,7 +181,7 @@ void t10mmc::ExecCommand()
 			break;
 		}
 
-		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
+		m_lba = get_u32be(&command[2]);
 		m_blocks = SCSILengthFromUINT16( &command[7] );
 
 		//m_device->logerror("T10MMC: READ(10) at LBA %x for %d blocks (%d bytes)\n", m_lba, m_blocks, m_blocks * m_sector_bytes);
@@ -267,7 +269,7 @@ void t10mmc::ExecCommand()
 			break;
 		}
 
-		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
+		m_lba = get_u32be(&command[2]);
 		m_blocks = SCSILengthFromUINT16( &command[7] );
 
 		if (m_lba == 0)
@@ -437,7 +439,7 @@ void t10mmc::ExecCommand()
 		break;
 
 	case T10SPC_CMD_MODE_SELECT_10:
-		//m_device->logerror("T10MMC: MODE SELECT length %x control %x\n", command[7]<<8 | command[8], command[1]);
+		//m_device->logerror("T10MMC: MODE SELECT length %x control %x\n", get_u16be(&command[7]), command[1]);
 		m_phase = SCSI_PHASE_DATAOUT;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = SCSILengthFromUINT16( &command[ 7 ] );
@@ -458,8 +460,8 @@ void t10mmc::ExecCommand()
 			break;
 		}
 
-		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
-		m_blocks = command[6]<<24 | command[7]<<16 | command[8]<<8 | command[9];
+		m_lba = get_u32be(&command[2]);
+		m_blocks = get_u32be(&command[6]);
 
 		if (m_lba == 0)
 		{
@@ -502,8 +504,8 @@ void t10mmc::ExecCommand()
 			break;
 		}
 
-		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
-		m_blocks = command[7]<<16 | command[8]<<8 | command[9];
+		m_lba = get_u32be(&command[2]);
+		m_blocks = get_u24be(&command[7]);
 
 		//m_device->logerror("T10MMC: READ(12) at LBA %x for %x blocks (%x bytes)\n", m_lba, m_blocks, m_blocks * m_sector_bytes);
 
@@ -525,7 +527,7 @@ void t10mmc::ExecCommand()
 		break;
 
 	case T10MMC_CMD_SET_CD_SPEED:
-		m_device->logerror("T10MMC: SET CD SPEED to %d kbytes/sec.\n", command[2]<<8 | command[3]);
+		m_device->logerror("T10MMC: SET CD SPEED to %d kbytes/sec.\n", get_u16be(&command[2]));
 		m_phase = SCSI_PHASE_STATUS;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = 0;
@@ -541,8 +543,8 @@ void t10mmc::ExecCommand()
 			break;
 		}
 
-		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
-		m_blocks = command[6]<<16 | command[7]<<8 | command[8];
+		m_lba = get_u32be(&command[2]);
+		m_blocks = get_u24be(&command[6]);
 		m_read_cd_flags = command[9];
 		m_transfer_length = 0;
 
@@ -758,6 +760,16 @@ void t10mmc::ExecCommand()
 		break;
 	}
 
+	case T10SBC_CMD_SEEK_10:
+		m_lba = get_u32be(&command[2]);
+
+		m_device->logerror("T10SBC: SEEK EXTENDED to LBA %x\n", m_lba);
+
+		m_phase = SCSI_PHASE_STATUS;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
+		m_transfer_length = 0;
+		break;
+
 	default:
 		t10spc::ExecCommand();
 	}
@@ -792,14 +804,10 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 		temp = m_image->get_track_start(0xaa);
 		temp--; // return the last used block on the disc
 
-		data[0] = (temp>>24) & 0xff;
-		data[1] = (temp>>16) & 0xff;
-		data[2] = (temp>>8) & 0xff;
-		data[3] = (temp & 0xff);
+		put_u32be(&data[0], temp);
 		data[4] = 0;
 		data[5] = 0;
-		data[6] = (m_sector_bytes>>8)&0xff;
-		data[7] = (m_sector_bytes & 0xff);
+		put_u16be(&data[6], m_sector_bytes);
 		break;
 
 	case T10SBC_CMD_READ_10:
@@ -962,12 +970,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 						buffer_offset = 0;
 						data_len = 2352;
 					}
-					else if (track_type == cdrom_file::CD_TRACK_MODE1)
-					{
-						buffer_offset = 0;
-						data_len = 2048;
-					}
-					else if (track_type == cdrom_file::CD_TRACK_MODE1_RAW)
+					else if (track_type == cdrom_file::CD_TRACK_MODE1 || track_type == cdrom_file::CD_TRACK_MODE1_RAW)
 					{
 						buffer_offset = 16;
 						data_len = 2048;
@@ -1134,10 +1137,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 						frame = to_msf(frame);
 					}
 
-					data[8] = (frame>>24)&0xff;
-					data[9] = (frame>>16)&0xff;
-					data[10] = (frame>>8)&0xff;
-					data[11] = frame&0xff;
+					put_u32be(&data[8], frame);
 
 					frame = m_last_lba - m_image->get_track_start(data[6] - 1);
 
@@ -1146,10 +1146,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 						frame = to_msf(frame);
 					}
 
-					data[12] = (frame>>24)&0xff;
-					data[13] = (frame>>16)&0xff;
-					data[14] = (frame>>8)&0xff;
-					data[15] = frame&0xff;
+					put_u32be(&data[12], frame);
 				}
 				else
 				{
@@ -1184,8 +1181,8 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 					// the returned TOC DATA LENGTH must be the full amount,
 					// regardless of how much we're able to pass back due to in_len
 					int dptr = 0;
-					data[dptr++] = (len>>8) & 0xff;
-					data[dptr++] = (len & 0xff);
+					put_u16be(&data[dptr], len);
+					dptr += 2;
 					data[dptr++] = 1;
 					data[dptr++] = m_image->get_last_track();
 
@@ -1222,10 +1219,8 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 							tstart = to_msf(tstart+150);
 						}
 
-						data[dptr++] = (tstart>>24) & 0xff;
-						data[dptr++] = (tstart>>16) & 0xff;
-						data[dptr++] = (tstart>>8) & 0xff;
-						data[dptr++] = (tstart & 0xff);
+						put_u32be(&data[dptr], tstart);
+						dptr += 4;
 					}
 				}
 				break;
@@ -1235,8 +1230,8 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 					int len = 2 + (8 * 1);
 
 					int dptr = 0;
-					data[dptr++] = (len>>8) & 0xff;
-					data[dptr++] = (len & 0xff);
+					put_u16be(&data[dptr], len);
+					dptr += 2;
 					data[dptr++] = 1;
 					data[dptr++] = 1;
 
@@ -1252,10 +1247,8 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 						tstart = to_msf(tstart+150);
 					}
 
-					data[dptr++] = (tstart>>24) & 0xff;
-					data[dptr++] = (tstart>>16) & 0xff;
-					data[dptr++] = (tstart>>8) & 0xff;
-					data[dptr++] = (tstart & 0xff);
+					put_u32be(&data[dptr], tstart);
+					dptr += 4;
 				}
 				break;
 
@@ -1269,62 +1262,70 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 	case T10SPC_CMD_MODE_SENSE_6:
 	case T10SPC_CMD_MODE_SENSE_10:
 		//      m_device->logerror("T10MMC: MODE SENSE page code = %x, PC = %x\n", command[2] & 0x3f, (command[2]&0xc0)>>6);
-
-		memset(data, 0, SCSILengthFromUINT16( &command[ 7 ] ));
-
-		switch (command[2] & 0x3f)
 		{
-			case 0xe:   // CD Audio control page
-				data[1] = 0x0e;
-				data[0] = 0x8e; // page E, parameter is savable
-				data[1] = 0x0e; // page length
-				data[2] = (1 << 2) | (m_sotc << 1); // IMMED = 1
-				data[3] = data[4] = data[5] = data[6] = data[7] = 0; // reserved
+			memset(data, 0, SCSILengthFromUINT16( &command[ 7 ] ));
 
-				// connect each audio channel to 1 output port
-				data[8] = 1;
-				data[10] = 2;
-				data[12] = 4;
-				data[14] = 8;
+			const uint8_t page = command[2] & 0x3f;
+			int ptr = 0;
 
-				// indicate max volume
-				data[9] = data[11] = data[13] = data[15] = 0xff;
-				break;
-			case 0x2a:  // Page capabilities
-				data[1] = 0x14;
-				data[0] = 0x2a;
-				data[1] = 0x14; // page length
-				data[2] = 0x00; data[3] = 0x00; // CD-R only
-				data[4] = 0x01; // can play audio
-				data[5] = 0;
-				data[6] = 0;
-				data[7] = 0;
-				data[8] = 0x02; data[9] = 0xc0; // 4x speed
-				data[10] = 0x01; data[11] = 0x00; // 256 volume levels supported
-				data[12] = 0x00; data[13] = 0x00; // buffer
-				data[14] = 0x02; data[15] = 0xc0; // 4x read speed
-				data[16] = 0;
-				data[17] = 0;
-				data[18] = 0;
-				data[19] = 0;
-				data[20] = 0;
-				data[21] = 0;
-				break;
+			if ((page == 0xe) || (page == 0x3f))
+			{ // CD Audio control page
+					data[ptr++] = 0x8e; // page E, parameter is savable
+					data[ptr++] = 0x0e; // page length
+					data[ptr++] = (1 << 2) | (m_sotc << 1); // IMMED = 1
+					ptr += 6;   // skip reserved bytes
+					// connect each audio channel to 1 output port
+					data[ptr++] = 1;
+					data[ptr++] = 2;
+					data[ptr++] = 4;
+					data[ptr++] = 8;
+					// indicate max volume
+					data[ptr++] = 0xff;
+					ptr++;
+					data[ptr++] = 0xff;
+					ptr++;
+					data[ptr++] = 0xff;
+					ptr++;
+					data[ptr++] = 0xff;
+			}
 
-			case 0x0d: // CD page
-				data[1] = 0x06;
-				data[0] = 0x0d;
-				data[2] = 0;
-				data[3] = 0;
-				data[4] = 0;
-				data[5] = 60;
-				data[6] = 0;
-				data[7] = 75;
-				break;
+			if ((page == 0x0d) || (page == 0x3f))
+			{ // CD page
+					data[ptr++] = 0x0d;
+					data[ptr++] = 6;    // page length
+					data[ptr++] = 0;
+					data[ptr++] = 0;
+					data[ptr++] = 0;
+					data[ptr++] = 60;
+					data[ptr++] = 0;
+					data[ptr++] = 75;
+			}
 
-			default:
-				m_device->logerror("T10MMC: MODE SENSE unknown page %x\n", command[2] & 0x3f);
-				break;
+			if ((page == 0x2a) || (page == 0x3f))
+			{ // Page capabilities
+					data[ptr++] = 0x2a;
+					data[ptr++] = 0x14; // page length
+					data[ptr++] = 0x00;
+					data[ptr++] = 0x00; // CD-R only
+					data[ptr++] = 0x01; // can play audio
+					data[ptr++] = 0;
+					data[ptr++] = 0;
+					data[ptr++] = 0;
+					data[ptr++] = 0x02;
+					data[ptr++] = 0xc0; // 4x speed
+					data[ptr++] = 0x01;
+					data[ptr++] = 0x00; // 256 volume levels supported
+					data[ptr++] = 0x00;
+					data[ptr++] = 0x00; // buffer
+					data[ptr++] = 0x02;
+					data[ptr++] = 0xc0; // 4x read speed
+					data[ptr++] = 0;
+					data[ptr++] = 0;
+					data[ptr++] = 0;
+					data[ptr++] = 0;
+					data[ptr++] = 0;
+					data[ptr++] = 0;
+			}
 		}
 		break;
 

@@ -12,6 +12,7 @@
 #include "basicdsk.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include <cassert>
 #include <cstdlib>
@@ -347,7 +348,7 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 								uint8_t se = gcr4_decode(h[4],h[5]);
 								uint8_t chk = gcr4_decode(h[6],h[7]);
 								#ifdef VERBOSE_SAVE
-								uint32_t post = (h[8]<<16)|(h[9]<<8)|h[10];
+								uint32_t post = get_u24be(&h[8]);
 								printf("Address Mark:\tVolume %d, Track %d, Sector %2d, Checksum %02X: %s, Postamble %03X: %s\n", vl, tr, se, chk, (chk ^ vl ^ tr ^ se)==0?"OK":"BAD", post, (post&0xFFFF00)==0xDEAA00?"OK":"BAD");
 								#endif
 								// sanity check
@@ -674,7 +675,7 @@ bool a2_rwts18_format::save(util::random_read_write &io, const std::vector<uint3
 						uint8_t tr = gcr4_decode(h[2],h[3]);
 						uint8_t se = gcr4_decode(h[4],h[5]);
 						uint8_t chk = gcr4_decode(h[6],h[7]);
-						uint32_t post = (h[8]<<16)|(h[9]<<8)|h[10];
+						uint32_t post = get_u24be(&h[8]);
 						printf("Address Mark:\tVolume %d, Track %d, Sector %2d, Checksum %02X: %s, Postamble %03X: %s\n", vl, tr, se, chk, (chk ^ vl ^ tr ^ se)==0?"OK":"BAD", post, (post&0xFFFF00)==0xDEAA00?"OK":"BAD");
 						// sanity check
 						if (tr == 0 && se < nsect) {
@@ -834,7 +835,7 @@ bool a2_rwts18_format::save(util::random_read_write &io, const std::vector<uint3
 								uint8_t tr = gcr6bw_tb[h[0]];
 								uint8_t se = gcr6bw_tb[h[1]];
 								uint8_t chk = gcr6bw_tb[h[2]];
-								uint32_t post = (h[3]<<16)|(h[4]<<8)|h[5];
+								uint32_t post = get_u24be(&h[3]);
 								uint8_t bbundid = h[6];
 								printf("RWTS18 AM:\t Track %d, Sector %2d, Checksum %02X: %s, Postamble %03X: %s, BBUNDID %02x\n", tr, se, chk, (chk ^ tr ^ se)==0?"OK":"BAD", post, post==0xAAFFFF?"OK":"BAD", bbundid);
 								// sanity check
@@ -1040,7 +1041,7 @@ int a2_edd_format::identify(util::random_read &io, uint32_t form_factor, const s
 
 uint8_t a2_edd_format::pick(const uint8_t *data, int pos)
 {
-	return ((data[pos>>3] << 8) | data[(pos>>3)+1]) >> (8-(pos & 7));
+	return get_u16be(&data[pos>>3]) >> (8-(pos & 7));
 }
 
 bool a2_edd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const

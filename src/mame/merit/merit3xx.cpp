@@ -100,8 +100,6 @@ Copyright is 1989
 
 The CRT-350 is an extension of CRT-300 that allows for memory (ROM) expansion.
 
-Merit MULTI-ACTION 7551-21-R2P - Touchscreen game
-
 MERIT CRT-350 REV C (and REV B):
 +------------------------------------------------------------+
 |       U45*                HY6264ALP-10      10.000000MHz   |
@@ -204,7 +202,70 @@ J6 17-pin single row connector for unknown (some kind of jumper block)
 J7 6-pin single row connector for hopper
 JPR3 is a 3 pin jumper: Pins 1&2 = Printer, pins 2&3= Hopper
 
+******************************************************************************
 
+7551-20-R3T
+
+MERIT CRT-350 REV C + MEMORY EXPANSION BOARD CRT-352 rev A
+
+Main PCB graphics roms (on main board):
+
+U46
+DMA6
+9c9a
+
+U47
+DMA6
+ed62
+
+U48
+DMA6
+a382
+
+
+Program ROMs on Expansion board:
+
+U11 *Empty       U15
+                 7551-20-R3T
+                 0ff2
+
+U10              U14
+7551-20-R3T      7551-20-R3T
+a43c             a786
+
+U9               U13
+7551-20-R3T      7551-20-R3T
+8f39             5443
+
+U8               U12
+7551-20-R3T      7551-20-R3T
+1d98             4f74
+
+
+According to U14:
+ INVALID DIPSWITCH SETTING
+ ENABLE AT LEAST TWO GAMES
+  CS1-1 ON =JOKER POKER
+  CS1-2 ON =DEUCES
+  CS1-3 ON =FEVER POKER
+  CS1-4 ON =JACKS POKER
+  CS1-5 ON =BLACKJACK
+  CS1-6 ON =KENO WILD
+  CS1-7 ON =TBALL KENO
+  CS1-8 ON =BINGO
+ CSW1-1 ON =DOLR JACKS
+ CSW1-2 ON =DOLR DEUCE
+ CSW1-3 ON =5# KENO
+ CSW1-4 ON =ADDEM
+
+Dipswitch on CRT-350 main is labeled S1
+Dipswitch on CRT-352 MEM is labeled SW1
+
+******************************************************************************
+
+Merit MULTI-ACTION 7551-21-R2P
+
+MERIT CRT-350 REV C + MEMORY EXPANSION BOARD CRT-352 rev A
 
 Main PCB graphics roms (on main board):
 
@@ -216,7 +277,6 @@ NC $
 
 U48
 NC $
-
 
 
 Program ROMs on Expansion board:
@@ -253,115 +313,11 @@ According to U14:
 Dipswitch on CRT-350 main is labeled S1
 Dipswitch on CRT-352 MEM is labeled SW1
 
--------------------------------------------------------------
+******************************************************************************
 
-Merit MULTI-ACTION 7556-00-R2 - Touchscreen game
+Merit MULTI-ACTION 7556-00-R2
 
-MERIT CRT-350 REV C (and REV B):
-+------------------------------------------------------------+
-|       U45*                HY6264ALP-10      10.000000MHz   |
-|                                                            |
-|       U46                 HY6264ALP-10                     |
-|                                                            |
-|       U47                                   HD46505SP-2  +-|
-|                                                          | |
-|       U48                                   IMSG176P-40  | |
-|                                                          | |
-|U7*    PAL16l8ACN.U14                                     |J|
-|                                                          |2|
-|U6*    PAL20L10NC.U8                                      | |
-|                                                          | |
-|U5*    PAL20L10NC.U4A      PC16550DN                      | |
-|                                                          | |
-||===========J14==========| DSW  1.84MHz                   +-|
-|                                                          +-|
-|                           YM2149F                        | |
-|                                                          | |
-|       Z0840006PSC-Z80B    D8255AC-2                      | |
-|                                                          |J|
-|10.000MHz       DS1231-50  D8255AC-2                      |1|
-|                                                          | |
-|                                                          | |
-|                                                          | |
-|VOLUME   LM383T                                           | |
-+----------------------------------------------------------+-+
-
-  CPU: Z80B 6MHz part Clocked @ 5MHz (10MHz/2)
-Video: HD46505SP-2 CRT controller (enhanced) 2MHz AKA HD68B45SP compatible with MC68B45P
-       inmos IMS G176 High performance CMOS color look-up table compatible to
-         ADV476KN35 CMOS Monolithic 256x18 Color Palette RAM-DAC
-Sound: Yamaha YM2149F or AY-3-8910A
-       LM383T 7-Watt Audio High Power Amplifier (rev C PCB only)
-       MB3731 18-Watt BTL Power Amplifier (rev B PCB only)
-  RAM: 6264 8K High Speed CMOS Static RAM x 2
-  OSC: 10.00MHz x 2, 1.85MHz
-  DSW: 8 switch dipswitch block labeled S1
-Other: PC16550DN UART with FIFO clocked @ 1.84MHz
-       D8255AC Programmable Peripheral Interface chip x 2
-       DS1231 Power Monitor Chip
-
-Connectors:
-  J1 80-pin connector to CRT-351 backplane & wire harness
-  J2 80-pin connector to CRT-351 backplane & wire harness
-  J14 64-pin connector for CRT-352 Expansion board (96 pins, but middle row pins removed)
-
-* Denotes unpopulated
-
-
-MEMORY EXPANSION BOARD CRT-352 rev A
-+--------------------------+
-|     U11*         U15     |
-|                          |
-|     U10          U14     |
-|                          |
-|     U9           U13     |
-|                          |
-|     U8           U12     |
-|                          |
-| 74HC245      INS8250N    |
-|                          |
-| DS1225Y.U7   PAL 1.84MHz |
-|                          |
-| DS1216.U18   GAL20XV10B  |
-|                          |
-| DS1230Y.U17              |
-|                          |
-||===========J1===========||
-|                          |
-|       74HC541N    DSW    |
-+--------------------------+
-
-Other: DS1225Y-200 Dallas 8Kx8 NVRAM
-       DS1230Y-200 Dallas 32Kx8 NVRAM
-       DS1216 Dallas 2Kx8 SmartWatch RTC
-       PC16550DN UART with FIFO clocked @ 1.84MHz
-       8 switch dipswitch block labeled SW1 (enable/disable games)
- NOTE: on this PCB pin28 on the DS1225Y was bent up so data was not correctly saved from PCB
-       on this PCB pin28 on the DS1130Y was broken so data was not correctly saved from PCB
-
-Connectors:
-  J1 96-pin female receiver to connect to CRT-350 main board  (64 pins used, middle row pins not connected)
-
-* Denotes unpopulated
-
-
-CRT-351
-+----------------------------------------------------------------------------+
-|      |=J5==| |---------------------------J3-------------------------------||
-| |===J6===|                                                   |=====J4=====||
-|                                                    JPR3              |-J7-||
-|              |=============J2=============||=============J1===============||
-+----------------------------------------------------------------------------+
-
-J1 80-pin connector to J1 connector on the CRT-350 mainboard
-J2 80-pin connector to J2 connector on the CRT-350 mainboard
-J3 65-pin single row connector for wire harness
-J4 40-pin dual row connector for printer
-J5 16-pin dual row connector for unknown
-J6 17-pin single row connector for unknown (some kind of jumper block)
-J7 6-pin single row connector for hopper
-JPR3 is a 3 pin jumper: Pins 1&2 = Printer, pins 2&3= Hopper
-
+MERIT CRT-350 REV C + MEMORY EXPANSION BOARD CRT-352 rev A
 
 Main PCB graphics roms (on main board):
 
@@ -418,9 +374,12 @@ According to U14:
 Dipswitch on CRT-350 main is labeled S1
 Dipswitch on CRT-352 MEM is labeled SW1
 
--------------------------------------------------------------
+NOTE: on this PCB pin28 on the DS1225Y was bent up so data was not correctly saved from PCB
+      on this PCB pin28 on the DS1130Y was broken so data was not correctly saved from PCB
 
-Merit MULTI-ACTION 7558-01-R0 DS - Touchscreen game
+******************************************************************************
+
+Merit MULTI-ACTION 7558-01-R0 DS
 
 MERIT CRT-350 REV B + MEMORY EXPANSION BOARD CRT-352 rev A
 
@@ -437,7 +396,6 @@ U47
 Multi-Action
 7556-WV
 U48
-
 
 
 Program ROMs on Expansion board:
@@ -638,7 +596,29 @@ ROM_START( ma6710 )
 ROM_END
 
 
-ROM_START( ma7551 )
+ROM_START( ma7551t ) // all ROMs reads matched printed checksum
+	ROM_REGION(0x40000, "maincpu", 0)
+	ROM_LOAD( "u8_7551-20-r3t_1d98.u8",   0x00000, 0x08000, CRC(a130ec60) SHA1(7d09faf1c6a5df63890eb22317bb4a5ad55d8b8f) )
+	ROM_LOAD( "u9_7551-20-r3t_8f39.u9",   0x08000, 0x08000, CRC(6758e2f9) SHA1(f114bd78e1d940190bc2771d90642dba566d47ed) )
+	ROM_LOAD( "u10_7551-20-r3t_a43c.u10", 0x10000, 0x08000, CRC(3efb3bb4) SHA1(6b39acecd577eb2f4b44c8421390f4035e5d5d84) )
+	// u11 not populated
+	ROM_LOAD( "u15_7551-20-r3t_0ff2.u15", 0x20000, 0x08000, CRC(39203dd0) SHA1(885424a7c0bdb85891188ca575c0c3ca3ecca04a) )
+	ROM_LOAD( "u14_7551-20-r3t_a786.u14", 0x28000, 0x08000, CRC(63baf2a5) SHA1(402f8bac78cdbe6d6df90db3e77bd9e97615ae21) )
+	ROM_LOAD( "u13_7551-20-r3t_5443.u13", 0x30000, 0x08000, CRC(88f89dd9) SHA1(0ce29f56f5a3643a2fb204ce2b919bea6f5dd3b5) )
+	ROM_LOAD( "u12_7551-20-r3t_4f74.u12", 0x38000, 0x08000, CRC(9b818bb4) SHA1(5f1228f500618d5de93c82dbc9c710651bdb22f6) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "u46_dma6_9c9a.u46", 0x00000, 0x10000, CRC(138d1cc7) SHA1(2043fcc580269966031d86dc445e03bddf83a412) )
+	ROM_LOAD( "u47_dma6_ed62.u47", 0x10000, 0x10000, CRC(4312f851) SHA1(281f0fdf5ec0519c5fbdf73f2d8d567da626b13e) )
+	ROM_LOAD( "u48_dma6_a382.u48", 0x20000, 0x10000, CRC(fd256128) SHA1(e32da5242a8f0c68074326336938c60991d98fdc) )
+
+	ROM_REGION( 0xa000, "nvram", 0 )
+	ROM_LOAD( "dallas_ds1225y-150.u7",  0x0000, 0x2000, CRC(d7d46736) SHA1(98c7d6905f30e351583c90103aae0ca742ba070f) )
+	ROM_LOAD( "dallas_ds1230y-120.u17", 0x2000, 0x8000, CRC(6fcc7313) SHA1(6ee2dd8898e4b567a27ee5b8ed54e0cdc56f9553) )
+ROM_END
+
+
+ROM_START( ma7551p )
 	ROM_REGION(0x40000, "maincpu", 0)
 	ROM_LOAD( "u8_7551-21-r2p.u8",   0x00000, 0x08000, CRC(a2ae7a03) SHA1(2d923cf068fd1b9bd5f48a110f5155b876b9ba37) )
 	ROM_LOAD( "u9_7551-21-r2p.u9",   0x08000, 0x08000, CRC(2e669bc9) SHA1(376e808a62e92169a5ae34b9ef808fe4eda6c13c) )
@@ -655,12 +635,12 @@ ROM_START( ma7551 )
 	ROM_LOAD( "u48_nc+.u48", 0x20000, 0x10000, CRC(1ef22a70) SHA1(f33db37dc6e2ded3a39907eb5f5ea6306fd6f8b0) )
 
 	ROM_REGION( 0xa000, "nvram", 0 )
-	ROM_LOAD( "dallas_ds1225y-150.u7", 0x0000, 0x2000, CRC(2526c25c) SHA1(fe7d54e65dc7bd93576f496160f63b3c8e8c128b) )
-	ROM_LOAD( "dallas_ds1230y-120.u7", 0x2000, 0x8000, CRC(54099035) SHA1(2a8854a862bc24ff72470660e60e9e4228158b42) )
+	ROM_LOAD( "dallas_ds1225y-150.u7",  0x0000, 0x2000, CRC(2526c25c) SHA1(fe7d54e65dc7bd93576f496160f63b3c8e8c128b) )
+	ROM_LOAD( "dallas_ds1230y-120.u17", 0x2000, 0x8000, CRC(54099035) SHA1(2a8854a862bc24ff72470660e60e9e4228158b42) )
 ROM_END
 
 
-ROM_START( ma7556 )
+ROM_START( ma7556 ) // all ROMs reads matched printed checksum
 	ROM_REGION(0x40000, "maincpu", 0)
 	ROM_LOAD( "u8_7556-01-r0_23c6.u8",   0x00000, 0x08000, CRC(4dfca3d2) SHA1(2d8cc59edad12368dbc267b763af46e095599bc0) )
 	ROM_LOAD( "u9_7556-01-r0_ef1e.u9",   0x08000, 0x08000, CRC(142370d6) SHA1(cb32f204b7bf78874990ef438fd5115cc3ed140e) )
@@ -669,7 +649,7 @@ ROM_START( ma7556 )
 	ROM_LOAD( "u15_7556-01-r0_add3.u15", 0x20000, 0x08000, CRC(83e5f4cd) SHA1(15b999169b28fb267ec8a265c915c1d366e57655) )
 	ROM_LOAD( "u14_7556-01-r0_dff2.u14", 0x28000, 0x08000, CRC(9e5518c1) SHA1(37ed33118d87f0699845f84c820569666ac8c533) )
 	ROM_LOAD( "u13_7556-01-r0_7c21.u13", 0x30000, 0x08000, CRC(5288eecc) SHA1(efd569beb22b8a9354520e7755bd797724593a0a) )
-	ROM_LOAD( "u12_7556-00-r2.u12",      0x38000, 0x08000, CRC(34357c5d) SHA1(f71db3cd5ced70a709ecb8de1328c12666abc047) )
+	ROM_LOAD( "u12_7556-00-r2.u12",      0x38000, 0x08000, CRC(34357c5d) SHA1(f71db3cd5ced70a709ecb8de1328c12666abc047) ) // rev 2, other program ROMs are rev 0
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD( "multi-action_7556-wv_u46.u46", 0x00000, 0x10000, CRC(32c11634) SHA1(26f3c5c220b45e8eedad940ff94dc5ef6f89e3fa) ) // also known to be labeled: U46  MLT8  cs:8bbe
@@ -682,7 +662,7 @@ ROM_START( ma7556 )
 ROM_END
 
 
-ROM_START( ma7558 )
+ROM_START( ma7558 ) // all ROMs reads matched printed checksum
 	ROM_REGION(0x40000, "maincpu", 0)
 	ROM_LOAD( "u8_7558-01-r0_ds_d27a.u8",   0x00000, 0x08000, CRC(ff59d929) SHA1(902ba35967a49b73a6b7c1990c736ac922e25672) )
 	ROM_LOAD( "u9_7558-01-r0_ds_e651.u9",   0x08000, 0x08000, CRC(e02f8c98) SHA1(d04351535f86907129b97811a02a590f96f108b9) )
@@ -709,6 +689,7 @@ ROM_END
 GAME( 1989, ma6710, 0, merit300, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6710-13", MACHINE_IS_SKELETON )
 
 // CRT-350 games
-GAME( 199?, ma7551, 0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551", MACHINE_IS_SKELETON )
-GAME( 199?, ma7556, 0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7556", MACHINE_IS_SKELETON )
-GAME( 199?, ma7558, 0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7558", MACHINE_IS_SKELETON )
+GAME( 199?, ma7551t, 0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551-20-R3T", MACHINE_IS_SKELETON )
+GAME( 199?, ma7551p, 0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551-21-R2P", MACHINE_IS_SKELETON )
+GAME( 199?, ma7556,  0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7556-00-R2",  MACHINE_IS_SKELETON )
+GAME( 199?, ma7558,  0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7558-01-R0",  MACHINE_IS_SKELETON )

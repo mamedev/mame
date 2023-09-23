@@ -11,6 +11,7 @@
 #include "flopimg.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 #include "strformat.h"
 
 #include <cstdio>
@@ -33,6 +34,39 @@ floppy_image::floppy_image(int _tracks, int _heads, uint32_t _form_factor)
 
 floppy_image::~floppy_image()
 {
+}
+
+void floppy_image::set_variant(uint32_t _variant)
+{
+	variant = _variant;
+
+	// Initialize hard sectors
+	index_array.clear();
+
+	uint32_t sectors;
+	switch(variant) {
+	case SSDD16:
+	case SSQD16:
+	case DSDD16:
+	case DSQD16:
+		sectors = 16;
+		break;
+	default:
+		sectors = 0;
+	}
+	if(sectors) {
+		uint32_t sector_angle = 200000000/sectors;
+		for(int i = 1; i < sectors; i++)
+			index_array.push_back(i*sector_angle);
+		index_array.push_back((sectors-1)*sector_angle + sector_angle/2);
+	}
+}
+
+void floppy_image::find_index_hole(uint32_t pos, uint32_t &last, uint32_t &next)
+{
+	auto nexti = std::lower_bound(index_array.begin(), index_array.end(), pos+1);
+	next = nexti == index_array.end() ? 200000000 : *nexti;
+	last = nexti == index_array.begin() ? 0 : *--nexti;
 }
 
 void floppy_image::get_maximal_geometry(int &_tracks, int &_heads) const
@@ -100,13 +134,17 @@ bool floppy_image::track_is_formatted(int track, int head, int subtrack)
 const char *floppy_image::get_variant_name(uint32_t form_factor, uint32_t variant)
 {
 	switch(variant) {
-	case SSSD: return "Single side, single density";
-	case SSDD: return "Single side, double density";
-	case SSQD: return "Single side, quad density";
-	case DSDD: return "Double side, double density";
-	case DSQD: return "Double side, quad density";
-	case DSHD: return "Double side, high density";
-	case DSED: return "Double side, extended density";
+	case SSSD:   return "Single side, single density";
+	case SSDD:   return "Single side, double density";
+	case SSDD16: return "Single side, double density, 16 hard sector";
+	case SSQD:   return "Single side, quad density";
+	case SSQD16: return "Single side, quad density, 16 hard sector";
+	case DSDD:   return "Double side, double density";
+	case DSDD16: return "Double side, double density, 16 hard sector";
+	case DSQD:   return "Double side, quad density";
+	case DSQD16: return "Double side, quad density, 16 hard sector";
+	case DSHD:   return "Double side, high density";
+	case DSED:   return "Double side, extended density";
 	}
 	return "Unknown";
 }
@@ -2065,7 +2103,7 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_tr
 
 	std::vector<uint32_t> hpos;
 
-	uint32_t hstate = (nib[nib.size() - 2] << 8) | nib[nib.size() - 1];
+	uint32_t hstate = get_u16be(&nib[nib.size() - 2]);
 	for(uint32_t pos = 0; pos != nib.size(); pos++) {
 		hstate = ((hstate << 8) | nib[pos]) & 0xffffff;
 		if(hstate == 0xd5aa96)

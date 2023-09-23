@@ -8,8 +8,6 @@
  *  - Ethernet Node Processor ENP-30 Reference Guide (6213000-05B), Communication Machinery Corporation, November 15, 1988
  *
  * TODO:
- *  - vme interface
- *  - address/interrupt configuration
  *  - verify registers
  *  - uart?
  */
@@ -31,14 +29,15 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(CMC_ENP10, cmc_enp10_device, "cmc_enp10", "CMC ENP-10")
+DEFINE_DEVICE_TYPE(VME_ENP10, vme_enp10_card_device, "enp10", "CMC ENP-10")
 
-cmc_enp10_device::cmc_enp10_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, CMC_ENP10, tag, owner, clock)
+vme_enp10_card_device::vme_enp10_card_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, VME_ENP10, tag, owner, clock)
 	, device_vme_card_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")
 	, m_net(*this, "net")
 	, m_led(*this, "led%u", 0U)
+	, m_base(*this, "BASE")
 	, m_boot(*this, "boot")
 {
 }
@@ -60,58 +59,75 @@ ROM_START(enp10)
 ROM_END
 
 static INPUT_PORTS_START(enp10)
+	PORT_START("BASE")
+	PORT_CONFNAME(0xff, 0xde, "Base Address")
+	PORT_CONFSETTING(0xd8, "0xd80000")
+	PORT_CONFSETTING(0xda, "0xda0000")
+	PORT_CONFSETTING(0xdc, "0xdc0000")
+	PORT_CONFSETTING(0xde, "0xde0000")
 INPUT_PORTS_END
 
-const tiny_rom_entry *cmc_enp10_device::device_rom_region() const
+const tiny_rom_entry *vme_enp10_card_device::device_rom_region() const
 {
 	return ROM_NAME(enp10);
 }
 
-ioport_constructor cmc_enp10_device::device_input_ports() const
+ioport_constructor vme_enp10_card_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(enp10);
 }
 
-void cmc_enp10_device::device_start()
+void vme_enp10_card_device::device_start()
 {
 	m_led.resolve();
 
+	save_item(NAME(m_ivr));
+	save_item(NAME(m_csr));
 	save_item(NAME(m_ier));
 	save_item(NAME(m_tir));
 	save_item(NAME(m_rir));
 	save_item(NAME(m_uir));
-	save_item(NAME(m_exr));
-	save_item(NAME(m_csr));
 	save_item(NAME(m_rer));
+	save_item(NAME(m_exr));
 	save_item(NAME(m_hir));
 }
 
-void cmc_enp10_device::device_reset()
+void vme_enp10_card_device::device_reset()
 {
 	m_boot.select(0);
 
+	m_ivr = 0;
+	m_csr = 0;
 	m_ier = 0;
 	m_tir = 0;
 	m_rir = 0;
 	m_uir = 0;
-	m_exr = 0;
-	m_csr = 0;
 	m_rer = 0;
+	m_exr = 0;
 	m_hir = 0;
+
+	u32 const base = m_base->read() << 16;
+
+	vme_space(vme::AM_39).install_device(base, base | 0x1'ffff, *this, &vme_enp10_card_device::vme_map);
+	vme_space(vme::AM_3d).install_device(base, base | 0x1'ffff, *this, &vme_enp10_card_device::vme_map);
+
+	vme_irq_w<4>(1);
 }
 
-void cmc_enp10_device::device_add_mconfig(machine_config &config)
+void vme_enp10_card_device::device_add_mconfig(machine_config &config)
 {
 	M68000(config, m_cpu, 20_MHz_XTAL / 2);
-	m_cpu->set_addrmap(AS_PROGRAM, &cmc_enp10_device::cpu_mem);
+	m_cpu->set_addrmap(AS_PROGRAM, &vme_enp10_card_device::cpu_map);
 
 	AM7990(config, m_net, 20_MHz_XTAL / 2);
 	m_net->intr_out().set_inputline(m_cpu, INPUT_LINE_IRQ6).invert();
 	m_net->dma_in().set([this](offs_t offset) { return m_cpu->space(0).read_word(offset); });
 	m_net->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) { m_cpu->space(0).write_word(offset, data, mem_mask); });
+
+	vme_iack().set(FUNC(vme_enp10_card_device::iack_r));
 }
 
-void cmc_enp10_device::cpu_mem(address_map &map)
+void vme_enp10_card_device::cpu_map(address_map &map)
 {
 	map(0xf0'0000, 0xf1'ffff).ram().share("ram");
 	map(0xf8'0000, 0xf8'3fff).rom().region("eprom", 0).mirror(0x02'0000);
@@ -128,7 +144,7 @@ void cmc_enp10_device::cpu_mem(address_map &map)
 	// uart: 16 byte registers 10-2f?
 	map(0xef'8010, 0xef'802f).noprw();
 
-	// fe'0080 vector?  w:host vectored interrupt, r:slave address msb
+	map(0xfe'0080, 0xfe'0081).umask16(0x00ff).rw(FUNC(vme_enp10_card_device::addr_r), FUNC(vme_enp10_card_device::irq_w));
 
 	map(0xfe'00a0, 0xfe'00a1).umask16(0x00ff).lrw8(
 		[this]() { return m_csr; }, "csr_r",
@@ -156,10 +172,45 @@ void cmc_enp10_device::cpu_mem(address_map &map)
 
 	// TODO: verify the next two registers
 	map(0xfe'0e00, 0xfe'0e01).umask16(0x00ff).lrw8(NAME([this]() { return m_hir; }), NAME([this](u8 data) { m_hir = data; interrupt(); }));
-	map(0xfe'0f00, 0xfe'0f01).umask16(0x00ff).lrw8(NAME([this]() { reset(); return 0; }), NAME([this](u8 data) { reset(); }));
+	map(0xfe'0f00, 0xfe'0fff).umask16(0x00ff).lrw8(NAME([this]() { reset(); return 0; }), NAME([this](u8 data) { reset(); }));
 }
 
-void cmc_enp10_device::interrupt()
+void vme_enp10_card_device::vme_map(address_map &map)
+{
+	map(0x0'0000, 0x1'efff).lrw16(
+		[this](offs_t offset, u16 mem_mask) { return m_cpu->space(0).read_word(0xf0'0000 | (offset << 1), mem_mask); }, "mem_r",
+		[this](offs_t offset, u16 data, u16 mem_mask) { m_cpu->space(0).write_word(0xf0'0000 | (offset << 1), data, mem_mask); }, "mem_w");
+
+	map(0x1'f000, 0x1'ffff).lrw16(
+		[this](offs_t offset, u16 mem_mask) { return m_cpu->space(0).read_word(0xfe'0000 | (offset << 1), mem_mask); }, "reg_r",
+		[this](offs_t offset, u16 data, u16 mem_mask) { m_cpu->space(0).write_word(0xfe'0000 | (offset << 1), mem_mask); }, "reg_w");
+}
+
+u8 vme_enp10_card_device::addr_r()
+{
+	LOG("addr_r (%s)\n", machine().describe_context());
+
+	// TODO: what is returned here?
+	return m_base->read();
+}
+
+void vme_enp10_card_device::irq_w(u8 data)
+{
+	LOG("irq 0x%02x (%s)\n", data, machine().describe_context());
+
+	m_ivr = data;
+
+	vme_irq_w<4>(0);
+}
+
+u8 vme_enp10_card_device::iack_r()
+{
+	vme_irq_w<4>(1);
+
+	return m_ivr;
+}
+
+void vme_enp10_card_device::interrupt()
 {
 	bool const enable = BIT(m_ier, 7);
 
