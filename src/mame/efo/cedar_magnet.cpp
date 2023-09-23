@@ -1112,9 +1112,9 @@ ROM_START( mag_exzi )
 ROM_END
 
 /*
-	Track 79 side 1 (file offset 0x0ee800) would not read, but it appears to be outside of the used data
-	this also has many scores stored on the disk at offset 0x01cc00, invalidating these does reset the
-	score table to 'EFO 100000' scores, but then it never writes new scores?
+    Track 79 side 1 (file offset 0x0ee800) would not read, but it appears to be outside of the used data
+    this also has many scores stored on the disk at offset 0x01cc00, invalidating these does reset the
+    score table to 'EFO 100000' scores, but then it never writes new scores?
 */
 ROM_START( mag_pdak )
 	BIOS_ROM

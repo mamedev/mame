@@ -23,7 +23,7 @@
   OKI M6295GS
   4-DIP switches bank
 
-  
+
 ***************************************************************************************************
 
   Some videos about the machine...
@@ -39,14 +39,14 @@
 
   We have two characters...
 
-  Doraneko (ドラネコ) (means Stray Cat) 
+  Doraneko (ドラネコ) (means Stray Cat)
   Koneko (コネコ) (means Kitten)
 
   The game is basically similar to other gator/alligator games, where you must hit 4 mechanical
   cat arms that make attempts to steal the food through a fence.
 
   There is a rank system based on the number of hits you can get in the game. After time out,
-  if you have at least 50 hits, you can get extended time. 
+  if you have at least 50 hits, you can get extended time.
 
    Hits   Level      Japanese              Translation           Extended Game
   ------+-------+------------------+---------------------------+---------------
@@ -61,12 +61,12 @@
 
   The game has a DIP switch that trigger the Test Mode. This Mode start to handle the stepper motors
   of all arms, and test a sequence of lamps while triggers all the game sounds.
-  
+
   Test mode: Press START 1 to test the stepper motors / arms.
 
 
   Some cat's speeches:
-  
+
   "Umasouda nyaa" ----> "Looks delicious nyaa" (at start of a game)
   "Gochisousama" -----> "Thank you for the food" (at end of the game)
 
@@ -78,7 +78,7 @@
 ***************************************************************************************************
 
   Error codes:
-  
+
   E1 = Arm 1 sensor error.
   E2 = Arm 2 sensor error.
   E3 = Arm 3 sensor error.
@@ -163,50 +163,50 @@
    (partial)
 
                    .------v------.
-           --(PA3)-|01         40|-(PA4)-- 
-           --(PA2)-|02  IC10   39|-(PA5)-- 
-           --(PA1)-|03         38|-(PA6)-- 
-           --(PA0)-|04  PPI#0  37|-(PA7)-- 
-           --(/RD)-|05         36|-(/WR)-- 
-           --(/CS)-|06         35|-(RES)-- 
-           --(GND)-|07         34|-(D0)-- 
-           ---(A1)-|08         33|-(D1)-- 
-           ---(A0)-|09   NEC   32|-(D2)-- 
-           --(PC7)-|10         31|-(D3)-- 
-           --(PC6)-|11 D71055C 30|-(D4)-- 
-           --(PC5)-|12         29|-(D5)-- 
-           --(PC4)-|13         28|-(D6)-- 
-           --(PC0)-|14         27|-(D7)-- 
-           --(PC1)-|15         26|-(Vcc)-- 
-           --(PC2)-|16         25|-(PB7)-- 
-           --(PC3)-|17         24|-(PB6)-- 
-           --(PB0)-|18         23|-(PB5)-- 
-           --(PB1)-|19         22|-(PB4)-- 
-           --(PB2)-|20         21|-(PB3)-- 
+           --(PA3)-|01         40|-(PA4)--
+           --(PA2)-|02  IC10   39|-(PA5)--
+           --(PA1)-|03         38|-(PA6)--
+           --(PA0)-|04  PPI#0  37|-(PA7)--
+           --(/RD)-|05         36|-(/WR)--
+           --(/CS)-|06         35|-(RES)--
+           --(GND)-|07         34|-(D0)--
+           ---(A1)-|08         33|-(D1)--
+           ---(A0)-|09   NEC   32|-(D2)--
+           --(PC7)-|10         31|-(D3)--
+           --(PC6)-|11 D71055C 30|-(D4)--
+           --(PC5)-|12         29|-(D5)--
+           --(PC4)-|13         28|-(D6)--
+           --(PC0)-|14         27|-(D7)--
+           --(PC1)-|15         26|-(Vcc)--
+           --(PC2)-|16         25|-(PB7)--
+           --(PC3)-|17         24|-(PB6)--
+           --(PB0)-|18         23|-(PB5)--
+           --(PB1)-|19         22|-(PB4)--
+           --(PB2)-|20         21|-(PB3)--
                    '-------------'
 
 
                    .------v------.
-     DSW#4 --(PA3)-|01         40|-(PA4)-- 
-     DSW#3 --(PA2)-|02   IC5   39|-(PA5)-- 
-     DSW#2 --(PA1)-|03         38|-(PA6)-- 
-     DSW#1 --(PA0)-|04  PPI#1  37|-(PA7)-- 
-           --(/RD)-|05         36|-(/WR)-- 
-           --(/CS)-|06         35|-(RES)-- 
-           --(GND)-|07         34|-(D0)-- 
-           ---(A1)-|08         33|-(D1)-- 
-           ---(A0)-|09   NEC   32|-(D2)-- 
-           --(PC7)-|10         31|-(D3)-- 
-           --(PC6)-|11 D71055C 30|-(D4)-- 
-           --(PC5)-|12         29|-(D5)-- 
-           --(PC4)-|13         28|-(D6)-- 
-           --(PC0)-|14         27|-(D7)-- 
-           --(PC1)-|15         26|-(Vcc)-- 
-           --(PC2)-|16         25|-(PB7)-- 
-           --(PC3)-|17         24|-(PB6)-- 
-           --(PB0)-|18         23|-(PB5)-- 
-           --(PB1)-|19         22|-(PB4)-- 
-           --(PB2)-|20         21|-(PB3)-- 
+     DSW#4 --(PA3)-|01         40|-(PA4)--
+     DSW#3 --(PA2)-|02   IC5   39|-(PA5)--
+     DSW#2 --(PA1)-|03         38|-(PA6)--
+     DSW#1 --(PA0)-|04  PPI#1  37|-(PA7)--
+           --(/RD)-|05         36|-(/WR)--
+           --(/CS)-|06         35|-(RES)--
+           --(GND)-|07         34|-(D0)--
+           ---(A1)-|08         33|-(D1)--
+           ---(A0)-|09   NEC   32|-(D2)--
+           --(PC7)-|10         31|-(D3)--
+           --(PC6)-|11 D71055C 30|-(D4)--
+           --(PC5)-|12         29|-(D5)--
+           --(PC4)-|13         28|-(D6)--
+           --(PC0)-|14         27|-(D7)--
+           --(PC1)-|15         26|-(Vcc)--
+           --(PC2)-|16         25|-(PB7)--
+           --(PC3)-|17         24|-(PB6)--
+           --(PB0)-|18         23|-(PB5)--
+           --(PB1)-|19         22|-(PB4)--
+           --(PB2)-|20         21|-(PB3)--
                    '-------------'
 
 
@@ -228,7 +228,7 @@
      |               | |                 |
      '-+-+-+-+-+-+-+-' '-+-+-+-+-+-+-+-+-'
           74HC04            74HC4040
-         
+
 
 ***************************************************************************************************
 
@@ -386,10 +386,10 @@ void katosmedz80_state::ppi0_b_w(uint8_t data)
 		m[i] = (data >> (i * 2)) & 0x03;
 
 		if (m[i] == ((m_pre[i] + 1) % 4))
-			m_var[i]++;  					// arm goes forward
+			m_var[i]++;                     // arm goes forward
 
 		if (m[i] == ((m_pre[i] - 1) & 3))
-			m_var[i]--;  					// arm goes back
+			m_var[i]--;                     // arm goes back
 
 		if (m[i] == m_pre[i])
 			logerror("Motor_%i Stopped\n", i + 1);  // delete after debug
@@ -400,7 +400,7 @@ void katosmedz80_state::ppi0_b_w(uint8_t data)
 				m_sensors &= 0xff - m_bit;  // sensor on
 
 			if (m_var[i] < 0x07)
-				m_sensors |= m_bit;			// sensor off
+				m_sensors |= m_bit;         // sensor off
 
 			logerror("Motor_%i: %02X   -  m_sensors:%02X\n", i + 1, m_var[i], m_sensors);
 			m_pre[i] = m[i];
@@ -422,7 +422,7 @@ void katosmedz80_state::ppi0_c_w(uint8_t data)
     ---- ---x    Lamp 1: Doraneko (ドラネコ) Start / Game
     ---- --x-    Lamp 2: Koneko (コネコ) Start / Game
     ---- -x--    * On Game: Blinks | Off Game and Test Mode: Turns ON when unknown key "I" is active
-    ---- x---    * High when hits give points. It could be the "Eyes" effect actuator. Related to RAM 4047-4048  
+    ---- x---    * High when hits give points. It could be the "Eyes" effect actuator. Related to RAM 4047-4048
     ---x ----    Low: Arm 1 Action. Low when food Lamp 1 is On
     --x- ----    Low: Arm 2 Action. Low when food Lamp 2 is On
     -x-- ----    Low: Arm 3 Action. Low when food Lamp 3 is On
@@ -473,7 +473,7 @@ void katosmedz80_state::ppi1_c_w(uint8_t data)
 */
 
 	// Digit Selector for multiplexed 7Seg display
-	for(u8 i = 0; i < 4; i++) 
+	for(u8 i = 0; i < 4; i++)
 		if(((data >> i) & 1) == 1)
 			dn = i;
 
@@ -522,7 +522,7 @@ static INPUT_PORTS_START( dnbanban )
     x--- ----    Arm 4 Hit microswitch
 
 */
-	PORT_BIT( 0x55, IP_ACTIVE_HIGH, IPT_CUSTOM )PORT_CUSTOM_MEMBER(katosmedz80_state, arm_sensors_r) 
+	PORT_BIT( 0x55, IP_ACTIVE_HIGH, IPT_CUSTOM )PORT_CUSTOM_MEMBER(katosmedz80_state, arm_sensors_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1) PORT_NAME("Hit Arm 1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD2) PORT_NAME("Hit Arm 2")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3) PORT_NAME("Hit Arm 3")
@@ -552,8 +552,8 @@ static INPUT_PORTS_START( dnbanban )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")  // to figure out...
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )	 // Doraneko (ドラネコ) Start
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )	 // Koneko (コネコ) Start
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )  // Doraneko (ドラネコ) Start
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )  // Koneko (コネコ) Start
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )  // not accessed in game code
 
 INPUT_PORTS_END
@@ -597,11 +597,11 @@ void katosmedz80_state::dnbanban(machine_config &config)
 *********************************************/
 
 ROM_START( dnbanban )
-    ROM_REGION( 0x8000, "maincpu", 0 )
-    ROM_LOAD( "g25_a.ic17", 0x0000, 0x8000, CRC(ef441127) SHA1(69fea4992abb2c4905d3831b6f18e464088f0ec7) )  // MBM27C256A, 1xxxxxxxxxxxxxx = 0xFF
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "g25_a.ic17", 0x0000, 0x8000, CRC(ef441127) SHA1(69fea4992abb2c4905d3831b6f18e464088f0ec7) )  // MBM27C256A, 1xxxxxxxxxxxxxx = 0xFF
 
-    ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
-    ROM_LOAD( "g25_v.ic7", 0x00000, 0x20000, CRC(87c7d45d) SHA1(3f035d5e62fe62111cee978ed1708e902c98526a) )  // MBM27C1000
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
+	ROM_LOAD( "g25_v.ic7", 0x00000, 0x20000, CRC(87c7d45d) SHA1(3f035d5e62fe62111cee978ed1708e902c98526a) )  // MBM27C1000
 ROM_END
 
 }

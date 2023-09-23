@@ -122,7 +122,7 @@ QUICKLOAD_LOAD_MEMBER(trs80_quickload_device::quickload_cb)
 			LOG("/CMD load module header '%s'\n", data);
 			break;
 
-		case CMD_TYPE_COPYRIGHT_BLOCK: // 1F - copyright info			err = file.read(&data, length, actual);
+		case CMD_TYPE_COPYRIGHT_BLOCK: // 1F - copyright info           err = file.read(&data, length, actual);
 			if (actual != length)
 			{
 				logerror("/CMD error reading block type %02x\n", type);

@@ -68,7 +68,7 @@ static constexpr XTAL APPLE2_CLOCK(1'021'800);
 // 2 MHz mode has every ~130th cycle stretched, and there are also dram refresh cycles
 // happening which slows the clock back to 1MHz for some periods.
 // There is mentioned in Apple documentation the result is ~1.8MHz
-// PH0 Measured on a logic analyser when running a loop in ram with the screen off 
+// PH0 Measured on a logic analyser when running a loop in ram with the screen off
 // averaged over a long capture is 1.905MHz.
 static constexpr XTAL A3_2MHZ_CLOCK(1'905'000);
 

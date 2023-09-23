@@ -42,16 +42,16 @@ inline const bool is_simh_marker_eod_forward(const simh_marker marker)
 {
 	// this function is used when we're reading normally (from BOM to EOM); returns true for markers that we consider EOD
 	return marker == simh_marker::ERASE_GAP
-	    || is_simh_marker_half_gap_forward(marker)
-	    || marker == simh_marker::EOM; // logical EOM
+		|| is_simh_marker_half_gap_forward(marker)
+		|| marker == simh_marker::EOM; // logical EOM
 }
 
 inline const bool is_simh_marker_eod_reverse(const simh_marker marker)
 {
 	// this function is used when we're reading in reverse (from EOM to BOM); returns true for markers that we consider EOD
 	return marker == simh_marker::ERASE_GAP
-	    || is_simh_marker_half_gap_reverse(marker)
-	    || marker == simh_marker::EOM; // logical EOM
+		|| is_simh_marker_half_gap_reverse(marker)
+		|| marker == simh_marker::EOM; // logical EOM
 }
 
 enum class simh_marker_class : u8 {
