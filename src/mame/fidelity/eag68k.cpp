@@ -245,7 +245,6 @@ public:
 
 	// machine configs
 	void eagv4(machine_config &config);
-	void eagv3(machine_config &config);
 	void eagv5(machine_config &config);
 	void eagv7(machine_config &config);
 	void eagv9(machine_config &config);
