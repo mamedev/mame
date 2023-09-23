@@ -175,7 +175,7 @@ ROM_START( qncrash )
 	ROM_LOAD( "qc1-sound00.ic12", 0x000000, 0x400000, CRC(d72713d2) SHA1(556a0be2bb08fc9b4a2476b0ce8a23aa66858809) )
 	ROM_LOAD( "qc1-sound01.ic13", 0x400000, 0x400000, CRC(70e472a1) SHA1(df06270cede1d00e2ec231276e5e5466ab549794) ) // 1xxxxxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
 	ROM_LOAD( "93c66n.ic5", 0x000, 0x200, CRC(1ba66a58) SHA1(adb7f1685cf81585ed30613adc39e9091e63af84) )
 
 	ROM_REGION( 0x600, "dot_plds", ROMREGION_ERASE00 ) // all 18CV8P
