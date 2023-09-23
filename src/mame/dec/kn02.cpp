@@ -48,6 +48,10 @@
 
 #include "emu.h"
 
+#include "decioga.h"
+#include "lk201.h"
+#include "sfb.h"
+
 #include "cpu/mips/mips1.h"
 
 #include "machine/am79c90.h"
@@ -57,10 +61,6 @@
 #include "machine/ram.h"
 #include "machine/z80scc.h"
 #include "video/bt459.h"
-
-#include "decioga.h"
-#include "lk201.h"
-#include "sfb.h"
 
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
@@ -89,12 +89,13 @@ public:
 	{
 	}
 
-	void kn02ba(machine_config &config, u32 clock);
 	void m120(machine_config &config) { kn02ba(config, 20'000'000); }
 	void m125(machine_config &config) { kn02ba(config, 25'000'000); }
 	void m133(machine_config &config) { kn02ba(config, 33'300'000); }
 
 protected:
+	void kn02ba(machine_config &config, u32 clock);
+
 	uint32_t cfb_r(offs_t offset);
 	void cfb_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
@@ -133,7 +134,7 @@ uint32_t kn02ba_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 uint32_t kn02ba_state::cfb_r(offs_t offset)
 {
-	uint32_t addr = offset << 2;
+	uint32_t const addr = offset << 2;
 
 	//logerror("cfb_r: reading at %x\n", addr);
 
@@ -155,7 +156,7 @@ uint32_t kn02ba_state::cfb_r(offs_t offset)
 
 void kn02ba_state::cfb_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	uint32_t addr = offset << 2;
+	uint32_t const addr = offset << 2;
 
 	if ((addr >= 0x100000) && (addr < 0x100200))
 	{

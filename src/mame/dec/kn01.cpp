@@ -38,6 +38,10 @@
 
 #include "emu.h"
 
+#include "dc7061.h"
+#include "dc7085.h"
+#include "lk201.h"
+
 #include "cpu/mips/mips1.h"
 
 #include "machine/am79c90.h"
@@ -47,15 +51,13 @@
 #include "machine/timer.h"
 #include "video/bt47x.h"
 
-#include "dc7061.h"
-#include "dc7085.h"
-#include "lk201.h"
-
 #include "bus/rs232/rs232.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
 
 #include "screen.h"
+
+#include "endianness.h"
 
 #include "kn01.lh"
 
@@ -89,11 +91,12 @@ public:
 
 	void pmax(machine_config &config) { kn01(config, 33.33_MHz_XTAL / 2); }
 	void pmin(machine_config &config) { kn01(config, 25_MHz_XTAL / 2); }
-	void kn01(machine_config &config, XTAL clock);
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	void kn01(machine_config &config, XTAL clock);
 
 	void map(address_map &map);
 
@@ -113,6 +116,43 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
 private:
+	enum sys_csr_mask : u16
+	{
+		VRGTRB  = 0x0001, // video dac voltage red > blue
+		VRGTRG  = 0x0002, // video dac voltage red > green
+		VBGTRG  = 0x0004, // video dac voltage blue > green
+		TXDIS   = 0x0100, // disable serial transmit drivers
+		VINT    = 0x0200, // pcc programmable area detect 2
+		MEMERR  = 0x0400, // bus timeout on write
+		MONO    = 0x0800, // monochrome framebuffer installed
+		CRSRTST = 0x1000, // pcc test output
+		PARDIS  = 0x2000, // memory parity disable
+		STATUS  = 0x4000, // self-test completed successfully
+		MNFMOD  = 0x8000, // manufacturing self test jumper installed
+	};
+
+	enum pcc_regnum : unsigned
+	{
+		PCC_CMDR   =  0,
+		PCC_XPOS   =  1,
+		PCC_YPOS   =  2,
+		PCC_XMIN1  =  3,
+		PCC_XMAX1  =  4,
+		PCC_YMIN1  =  5,
+		PCC_YMAX1  =  6,
+		PCC_XMIN2  = 11,
+		PCC_XMAX2  = 12,
+		PCC_YMIN2  = 13,
+		PCC_YMAX2  = 14,
+		PCC_MEMORY = 15,
+	};
+
+	enum msr_mask : u16
+	{
+		MSR_DSR3 = 0x0001,
+		MSR_DSR2 = 0x0200,
+	};
+
 	required_device<mips1_device_base> m_cpu;
 	required_device<ram_device> m_mram;
 	required_region_ptr<u8> m_esar;
@@ -132,56 +172,22 @@ private:
 	required_ioport m_config;
 	output_finder<8> m_leds;
 
-	enum sys_csr_mask : u16
-	{
-		VRGTRB  = 0x0001, // video dac voltage red > blue
-		VRGTRG  = 0x0002, // video dac voltage red > green
-		VBGTRG  = 0x0004, // video dac voltage blue > green
-		TXDIS   = 0x0100, // disable serial transmit drivers
-		VINT    = 0x0200, // pcc programmable area detect 2
-		MEMERR  = 0x0400, // bus timeout on write
-		MONO    = 0x0800, // monochrome framebuffer installed
-		CRSRTST = 0x1000, // pcc test output
-		PARDIS  = 0x2000, // memory parity disable
-		STATUS  = 0x4000, // self-test completed successfully
-		MNFMOD  = 0x8000, // manufacturing self test jumper installed
-	};
 	u16 m_status;
 
 	u32 m_plane_mask;
 
-	enum pcc_regnum : unsigned
-	{
-		PCC_CMDR   =  0,
-		PCC_XPOS   =  1,
-		PCC_YPOS   =  2,
-		PCC_XMIN1  =  3,
-		PCC_XMAX1  =  4,
-		PCC_YMIN1  =  5,
-		PCC_YMAX1  =  6,
-		PCC_XMIN2  = 11,
-		PCC_XMAX2  = 12,
-		PCC_YMIN2  = 13,
-		PCC_YMAX2  = 14,
-		PCC_MEMORY = 15,
-	};
 	u16 m_pcc_regs[16];
 
 	std::unique_ptr<u16[]> m_dram; // disk ram
 	std::unique_ptr<u16[]> m_nram; // network ram
 
-	enum msr_mask : u16
-	{
-		MSR_DSR3 = 0x0001,
-		MSR_DSR2 = 0x0200,
-	};
 	u16 m_msr;
 	u32 m_weaddr; // write error address
 };
 
 uint32_t kn01_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
 {
-	u32 *pixel_pointer = m_vram;
+	u32 const *pixel_pointer = m_vram;
 
 	if (m_status & MONO)
 	{
@@ -244,11 +250,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(kn01_state::scanline_timer)
 
 	if ((scanline == m_pcc_regs[PCC_YMIN1]) && (m_pcc_regs[PCC_CMDR] & 0x0100))
 	{
-		int x, y;
-		u8 *vram = (u8 *)m_vram.target();
+		auto const vram = util::little_endian_cast<u8 const>(m_vram.target());
 
-		x = m_pcc_regs[PCC_XMIN1] - 212;
-		y = m_pcc_regs[PCC_YMIN1] - 34;
+		int const x = m_pcc_regs[PCC_XMIN1] - 212;
+		int const y = m_pcc_regs[PCC_YMIN1] - 34;
 		//printf("sampling for VRGTRB and friends at X=%d Y=%d\n", x, y);
 		m_status &= ~(VBGTRG | VRGTRG | VRGTRB);
 		if ((x >= 0) && (x <= 1023) && (y >= 0) && (y <= 863))
@@ -344,7 +349,7 @@ u16 kn01_state::status_r()
 
 void kn01_state::control_w(u16 data)
 {
-	// update leds
+	// update LEDs
 	for (unsigned i = 0; i < 8; i++)
 		m_leds[i] = BIT(data, i);
 
