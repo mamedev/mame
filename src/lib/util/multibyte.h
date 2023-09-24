@@ -46,7 +46,7 @@ inline constexpr u32 get_u32be(const u8 *const buf) noexcept
 inline constexpr u64 get_u48be(const u8 *const buf) noexcept
 {
 	return ((const u64)buf[0] << 40)
-		 | ((const u64)buf[1] << 36)
+		 | ((const u64)buf[1] << 32)
 		 | ((const u64)buf[2] << 24)
 		 | ((const u64)buf[3] << 16)
 		 | ((const u64)buf[4] << 8)
@@ -58,7 +58,7 @@ inline constexpr u64 get_u64be(const u8 *const buf) noexcept
 	return ((const u64)buf[0] << 56)
 		 | ((const u64)buf[1] << 48)
 		 | ((const u64)buf[2] << 40)
-		 | ((const u64)buf[3] << 36)
+		 | ((const u64)buf[3] << 32)
 		 | ((const u64)buf[4] << 24)
 		 | ((const u64)buf[5] << 16)
 		 | ((const u64)buf[6] << 8)
@@ -89,7 +89,7 @@ inline void put_u32be(u8 *buf, const u32 data) noexcept
 inline void put_u48be(u8 *buf, const u64 data) noexcept
 {
 	buf[0] = data >> 40;
-	buf[1] = data >> 36;
+	buf[1] = data >> 32;
 	buf[2] = data >> 24;
 	buf[3] = data >> 16;
 	buf[4] = data >> 8;
@@ -101,7 +101,7 @@ inline void put_u64be(u8 *buf, const u64 data) noexcept
 	buf[0] = data >> 56;
 	buf[1] = data >> 48;
 	buf[2] = data >> 40;
-	buf[3] = data >> 36;
+	buf[3] = data >> 32;
 	buf[4] = data >> 24;
 	buf[5] = data >> 16;
 	buf[6] = data >> 8;
