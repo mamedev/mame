@@ -61,6 +61,8 @@
 #include "softlist.h"
 #include "speaker.h"
 
+#include "formats/flopimg.h"
+
 
 /* Read/Write Handlers */
 

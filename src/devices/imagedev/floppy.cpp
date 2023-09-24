@@ -311,6 +311,17 @@ void floppy_image_device::setup_led_cb(led_cb cb)
 	cur_led_cb = cb;
 }
 
+struct floppy_image_device::fs_enum : public fs::manager_t::floppy_enumerator {
+	floppy_image_device *m_fid;
+	const fs::manager_t *m_manager;
+
+	fs_enum(floppy_image_device *fid);
+
+	virtual void add_raw(const char *name, u32 key, const char *description) override;
+protected:
+	virtual void add_format(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description) override;
+};
+
 floppy_image_device::fs_enum::fs_enum(floppy_image_device *fid)
 	: fs::manager_t::floppy_enumerator(fid->form_factor, fid->variants)
 	, m_fid(fid)
@@ -1415,6 +1426,11 @@ uint32_t floppy_image_device::get_form_factor() const
 uint32_t floppy_image_device::get_variant() const
 {
 	return image ? image->get_variant() : 0;
+}
+
+std::vector<uint32_t> &floppy_image_device::get_buffer()
+{
+	return image->get_buffer(cyl, ss, subcyl);
 }
 
 //===================================================================
