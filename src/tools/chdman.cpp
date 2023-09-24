@@ -16,6 +16,7 @@
 #include "coretmpl.h"
 #include "hashing.h"
 #include "md5.h"
+#include "multibyte.h"
 #include "path.h"
 #include "strformat.h"
 #include "vbiparse.h"
@@ -1881,9 +1882,9 @@ static void do_create_hd(parameters_map &params)
 		// must be at least 14 bytes; extract CHS data from there
 		if (identdata.size() < 14)
 			report_error(1, "Ident file '%s' is invalid (too short)", *ident_str->second);
-		cylinders = (identdata[3] << 8) | identdata[2];
-		heads = (identdata[7] << 8) | identdata[6];
-		sectors = (identdata[13] << 8) | identdata[12];
+		cylinders = get_u16le(&identdata[2]);
+		heads = get_u16le(&identdata[6]);
+		sectors = get_u16le(&identdata[12]);
 
 		// ignore CHS for > 8GB drives
 		if (cylinders * heads * sectors >= 16514064)

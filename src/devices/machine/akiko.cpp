@@ -24,8 +24,6 @@
 #include "emu.h"
 #include "akiko.h"
 
-#include "romload.h"
-
 #include "coreutil.h"
 #include "multibyte.h"
 

@@ -25,7 +25,6 @@ TODO:
 #include "cdicdic.h"
 
 #include "cdrom.h"
-#include "romload.h"
 #include "sound/cdda.h"
 
 #define LOG_DECODES     (1U << 1)
