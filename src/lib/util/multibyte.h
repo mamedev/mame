@@ -25,44 +25,44 @@ using osd::s64;
 inline constexpr u16 get_u16be(const u8 *const buf) noexcept
 {
 	return ((const u16)buf[0] << 8)
-	     | ((const u16)buf[1] << 0);
+		 | ((const u16)buf[1] << 0);
 }
 
 inline constexpr u32 get_u24be(const u8 *const buf) noexcept
 {
 	return ((const u32)buf[0] << 16)
-	     | ((const u32)buf[1] << 8)
-	     | ((const u32)buf[2] << 0);
+		 | ((const u32)buf[1] << 8)
+		 | ((const u32)buf[2] << 0);
 }
 
 inline constexpr u32 get_u32be(const u8 *const buf) noexcept
 {
 	return ((const u32)buf[0] << 24)
-	     | ((const u32)buf[1] << 16)
-	     | ((const u32)buf[2] << 8)
-	     | ((const u32)buf[3] << 0);
+		 | ((const u32)buf[1] << 16)
+		 | ((const u32)buf[2] << 8)
+		 | ((const u32)buf[3] << 0);
 }
 
 inline constexpr u64 get_u48be(const u8 *const buf) noexcept
 {
 	return ((const u64)buf[0] << 40)
-	     | ((const u64)buf[1] << 36)
-	     | ((const u64)buf[2] << 24)
-	     | ((const u64)buf[3] << 16)
-	     | ((const u64)buf[4] << 8)
-	     | ((const u64)buf[5] << 0);
+		 | ((const u64)buf[1] << 36)
+		 | ((const u64)buf[2] << 24)
+		 | ((const u64)buf[3] << 16)
+		 | ((const u64)buf[4] << 8)
+		 | ((const u64)buf[5] << 0);
 }
 
 inline constexpr u64 get_u64be(const u8 *const buf) noexcept
 {
 	return ((const u64)buf[0] << 56)
-	     | ((const u64)buf[1] << 48)
-	     | ((const u64)buf[2] << 40)
-	     | ((const u64)buf[3] << 36)
-	     | ((const u64)buf[4] << 24)
-	     | ((const u64)buf[5] << 16)
-	     | ((const u64)buf[6] << 8)
-	     | ((const u64)buf[7] << 0);
+		 | ((const u64)buf[1] << 48)
+		 | ((const u64)buf[2] << 40)
+		 | ((const u64)buf[3] << 36)
+		 | ((const u64)buf[4] << 24)
+		 | ((const u64)buf[5] << 16)
+		 | ((const u64)buf[6] << 8)
+		 | ((const u64)buf[7] << 0);
 }
 
 inline void put_u16be(u8 *buf, const u16 data) noexcept
@@ -169,44 +169,44 @@ inline void put_s64be(u8 *buf, const s64 data) noexcept
 inline constexpr u16 get_u16le(const u8 *const buf) noexcept
 {
 	return ((const u16)buf[0] << 0)
-	     | ((const u16)buf[1] << 8);
+		 | ((const u16)buf[1] << 8);
 }
 
 inline constexpr u32 get_u24le(const u8 *const buf) noexcept
 {
 	return ((const u32)buf[0] << 0)
-	     | ((const u32)buf[1] << 8)
-	     | ((const u32)buf[2] << 16);
+		 | ((const u32)buf[1] << 8)
+		 | ((const u32)buf[2] << 16);
 }
 
 inline constexpr u32 get_u32le(const u8 *const buf) noexcept
 {
 	return ((const u32)buf[0] << 0)
-	     | ((const u32)buf[1] << 8)
-	     | ((const u32)buf[2] << 16)
-	     | ((const u32)buf[3] << 24);
+		 | ((const u32)buf[1] << 8)
+		 | ((const u32)buf[2] << 16)
+		 | ((const u32)buf[3] << 24);
 }
 
 inline constexpr u64 get_u48le(const u8 *const buf) noexcept
 {
 	return ((const u64)buf[0] << 0)
-	     | ((const u64)buf[1] << 8)
-	     | ((const u64)buf[2] << 16)
-	     | ((const u64)buf[3] << 24)
-	     | ((const u64)buf[4] << 32)
-	     | ((const u64)buf[5] << 40);
+		 | ((const u64)buf[1] << 8)
+		 | ((const u64)buf[2] << 16)
+		 | ((const u64)buf[3] << 24)
+		 | ((const u64)buf[4] << 32)
+		 | ((const u64)buf[5] << 40);
 }
 
 inline constexpr u64 get_u64le(const u8 *const buf) noexcept
 {
 	return ((const u64)buf[0] << 0)
-	     | ((const u64)buf[1] << 8)
-	     | ((const u64)buf[2] << 16)
-	     | ((const u64)buf[3] << 24)
-	     | ((const u64)buf[4] << 32)
-	     | ((const u64)buf[5] << 40)
-	     | ((const u64)buf[6] << 48)
-	     | ((const u64)buf[7] << 56);
+		 | ((const u64)buf[1] << 8)
+		 | ((const u64)buf[2] << 16)
+		 | ((const u64)buf[3] << 24)
+		 | ((const u64)buf[4] << 32)
+		 | ((const u64)buf[5] << 40)
+		 | ((const u64)buf[6] << 48)
+		 | ((const u64)buf[7] << 56);
 }
 
 inline void put_u16le(u8 *buf, const u16 data) noexcept

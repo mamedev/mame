@@ -38,7 +38,7 @@ private:
 
 u8 nemoide_device::ata_r(offs_t offset)
 {
-    const u16 data = m_ata->cs0_r((offset >> 5) & 7);
+	const u16 data = m_ata->cs0_r((offset >> 5) & 7);
 	if (!machine().side_effects_disabled())
 		m_ata_data_latch = data >> 8;
 
@@ -48,7 +48,7 @@ u8 nemoide_device::ata_r(offs_t offset)
 void nemoide_device::ata_w(offs_t offset, u8 data)
 {
 	const u16 ata_data = (m_ata_data_latch << 8) | data;
-    m_ata->cs0_w((offset >> 5) & 7, ata_data);
+	m_ata->cs0_w((offset >> 5) & 7, ata_data);
 }
 
 void nemoide_device::map_io(address_map &map)

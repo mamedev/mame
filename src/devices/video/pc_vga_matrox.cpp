@@ -662,10 +662,10 @@ uint32_t matrox_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &b
 		m_test_x -= 1 << (machine().input().code_pressed(JOYCODE_BUTTON2) ? 4 : 0);;
 
 	//if(machine().input().code_pressed(JOYCODE_Y_DOWN_SWITCH))
-	//	m_test_y++;
+	//  m_test_y++;
 
 	//if(machine().input().code_pressed(JOYCODE_Y_UP_SWITCH))
-	//	m_test_y--;
+	//  m_test_y--;
 
 	if(machine().input().code_pressed(JOYCODE_Y_DOWN_SWITCH))
 		m_start_offs+= 0x100 << (machine().input().code_pressed(JOYCODE_BUTTON2) ? 8 : 0);

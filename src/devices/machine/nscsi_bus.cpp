@@ -631,10 +631,10 @@ void nscsi_full_device::set_sense_data(const u8 sense_key, const u16 sense_key_c
 	memset(scsi_sense_buffer, 0, 18);
 	if (data) {
 		scsi_sense_buffer[0] = (data->invalid ? 0 : 0x80) // even though SCSI-2 section 8.2.14 implies valid bit should always be set, other sections such as 10.2.12 disagree!
-		                     | (data->deferred ? 0x71 : 0x70);
+							 | (data->deferred ? 0x71 : 0x70);
 		scsi_sense_buffer[2] = (data->filemark ? 0x80 : 0)
-		                     | (data->eom ? 0x40 : 0)
-		                     | (data->bad_len ? 0x20 : 0); // "incorrect length indicator"
+							 | (data->eom ? 0x40 : 0)
+							 | (data->bad_len ? 0x20 : 0); // "incorrect length indicator"
 		put_s32be(&scsi_sense_buffer[3], data->info);
 	}
 	else

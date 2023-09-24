@@ -489,7 +489,7 @@ void dgpix_state::dgpix(machine_config &config)
 
 
 /*
- 
+
 Elfin
 dgPIX Entertainment Inc. 1999
 
@@ -512,7 +512,7 @@ ROM_START( elfin )
 ROM_END
 
 /*
- 
+
 Jump Jump
 dgPIX Entertainment Inc. 1999
 
@@ -830,7 +830,7 @@ void dgpix_state::init_letsdnce()
 void dgpix_state::init_btplay2k()
 {
 	u8 *rom = memregion("flash")->base() + 0x1c00000;
-	
+
 	rom[BYTE4_XOR_BE(0x3a7914)] = 3;
 	rom[BYTE4_XOR_BE(0x3a7915)] = 0;
 	rom[BYTE4_XOR_BE(0x3a7916)] = 3;

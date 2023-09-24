@@ -1849,7 +1849,7 @@ ROM_START( trojanj )
 	ROM_REGION( 0x10000, "gfx4", 0 )
 	ROM_LOAD( "tb_25.15n", 0x00000, 0x8000, CRC(6e38c6fa) SHA1(c51228d5d063dcf4361c76fa49dbe18db80c50a0) )     /* Bk Tiles */
 	ROM_LOAD( "tb_24.13n", 0x08000, 0x8000, CRC(14fc6cf2) SHA1(080a2d845cb36c637f76d8e062725bd13dd1aed0) )
-               
+
 	ROM_REGION( 0x08000, "gfx5", 0 )
 	ROM_LOAD( "tb_23.9n",  0x00000, 0x08000, CRC(eda13c0e) SHA1(806f0819af8b25c2b46de3d1fd95bc9c0e883bd9) )   /* Tile Map */
 

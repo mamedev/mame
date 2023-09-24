@@ -659,16 +659,16 @@ void nscsi_tape_device::handle_read_position() // optional; SCSI-2 section 10.2.
 		}
 		const bool bom = status == tape_status::BOM;
 		const bool eom = status == tape_status::EW
-		              || status == tape_status::UNKNOWN_EW
-		              || status == tape_status::EOM;
+					  || status == tape_status::UNKNOWN_EW
+					  || status == tape_status::EOM;
 		const bool bpu = status == tape_status::UNKNOWN
-		              || status == tape_status::UNKNOWN_EW
-		              || status == tape_status::EOM;
+					  || status == tape_status::UNKNOWN_EW
+					  || status == tape_status::EOM;
 		assert(sizeof(scsi_cmdbuf) >= 20);
 		memset(scsi_cmdbuf, 0, 20);
 		scsi_cmdbuf[0] = (bom ? 0x80 : 0) // is position at BOM
-		               | (eom ? 0x40 : 0) // is position between EW and EOM
-		               | (bpu ? 0x04 : 0); // is next block address invalid; "block position unknown"
+					   | (eom ? 0x40 : 0) // is position between EW and EOM
+					   | (bpu ? 0x04 : 0); // is next block address invalid; "block position unknown"
 		put_u32be(&scsi_cmdbuf[4], block_addr); // address of next block to be read/written; "first block location"
 		put_u32be(&scsi_cmdbuf[8], block_addr); // address of last buffered block; we don't support buffering, so we set it to next block address; "last block location"
 		scsi_data_in(SBUF_MAIN, 20);
@@ -753,9 +753,9 @@ void nscsi_tape_device::handle_space() // mandatory; SCSI-2 section 10.2.12
 		const bool reverse = req_dir_items_num < 0;
 		const u32 req_items_num = reverse ? -req_dir_items_num : req_dir_items_num;
 		const auto result = marks ? (reverse ? m_image->get_file()->space_filemarks_reverse(req_items_num)
-		                                     : m_image->get_file()->space_filemarks(req_items_num))
-		                          : (reverse ? m_image->get_file()->space_blocks_reverse(req_items_num)
-		                                     : m_image->get_file()->space_blocks(req_items_num));
+											 : m_image->get_file()->space_filemarks(req_items_num))
+								  : (reverse ? m_image->get_file()->space_blocks_reverse(req_items_num)
+											 : m_image->get_file()->space_blocks(req_items_num));
 		const auto status = result.first;
 		const u32 items_num = result.second;
 		switch (status) {
