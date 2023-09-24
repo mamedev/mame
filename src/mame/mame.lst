@@ -30225,9 +30225,10 @@ imolagp                         // (c) 198? RB Bologna
 imolagpo                        // (c) 198? RB Bologna
 
 @source:misc/interflip8035.cpp
-cbrava                          //
-sevilla                         //
-toledo                          //
+cbrava                          // (c) 1982 InterFlip
+sevilla                         // (c) 1982 InterFlip
+toledo                          // (c) 1982 InterFlip
+jackuse                         // (c) 1982 InterFlip
 
 @source:misc/intrscti.cpp
 intrscti                        // ????
