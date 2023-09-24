@@ -13,5 +13,6 @@
 
 void mac_nubus_cards(device_slot_interface &device) ATTR_COLD;
 void mac_pds030_cards(device_slot_interface &device) ATTR_COLD;
+void mac_iisi_cards(device_slot_interface &device) ATTR_COLD;
 
 #endif // MAME_BUS_NUBUS_CARDS_H

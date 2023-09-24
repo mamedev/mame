@@ -268,9 +268,9 @@ device_nubus_card_interface::~device_nubus_card_interface()
 
 void device_nubus_card_interface::interface_pre_start()
 {
-	if (!strncmp(m_nubus_slottag, "pds030", 6))
+	if ((!strncmp(m_nubus_slottag, "pds030", 6)) || (!strcmp(m_nubus_slottag, "siexp")))
 	{
-		m_slot = 0x9;   // '030 PDS slots phantom slot as NuBus slots $9, $A, and $B
+		m_slot = 0x9;   // '030 PDS slots phantom slot as whatever they want but default to 9
 	}
 	else if (!strncmp(m_nubus_slottag, "lcpds", 6))
 	{

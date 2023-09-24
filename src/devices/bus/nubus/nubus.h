@@ -45,6 +45,8 @@ public:
 	void raise_slot_irq();
 	void lower_slot_irq();
 
+	void set_pds_slot(int slot) { m_slot = slot; }
+
 	// inline configuration
 	void set_nubus_tag(nubus_device *nubus, const char *slottag) { m_nubus = nubus; m_nubus_slottag = slottag; }
 
