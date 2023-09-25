@@ -5884,19 +5884,45 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<info name="alt_title" value="ガウディ バルセロナの風" />
 		<info name="release" value="19890831" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Disk I" />
+			<dataarea name="flop" size="3402035">
+				<rom name="gaudi_disk_i.mfm" size="3402035" crc="d4c74e01" sha1="741b8e468059c55869214b3bb5829765c8b81db9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk II" />
+			<dataarea name="flop" size="3408814">
+				<rom name="gaudi_disk_ii.mfm" size="3408814" crc="db3a03e6" sha1="bc28bd8bc99751fbc848f7b8f0b2f86fb31a17b7" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk III" />
+			<dataarea name="flop" size="3423830">
+				<rom name="gaudi_disk_iii.mfm" size="3423830" crc="cf04cca2" sha1="4f80b480791d48bd0e51bb1d6ced22fc1de4dc95" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gaudic" cloneof="gaudi">
+		<description>Gaudi - Barcelona no Kaze (cracked)</description>
+		<year>1989</year>
+		<publisher>ウルフチーム (Wolf Team)</publisher>
+		<info name="alt_title" value="ガウディ バルセロナの風" />
+		<info name="release" value="19890831" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk I" />
 			<dataarea name="flop" size="1261824">
 				<rom name="gaudi barcelona no kaze (19xx)(wolf team)(disk 1 of 3).dim" size="1261824" crc="4189f78b" sha1="15c54cc35f2d1d0939ca43980a40b260988a4a74" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Disk II" />
 			<dataarea name="flop" size="1261824">
 				<rom name="gaudi barcelona no kaze (19xx)(wolf team)(disk 2 of 3).dim" size="1261824" crc="2f345803" sha1="bf548444c9015b553aa5a26b91749f8811c42784" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3" />
+			<feature name="part_id" value="Disk III" />
 			<dataarea name="flop" size="1261824">
 				<rom name="gaudi barcelona no kaze (19xx)(wolf team)(disk 3 of 3).dim" size="1261824" crc="963650da" sha1="bb929c0edf275e60f5e6ed7aa3116fd6c7df0367" />
 			</dataarea>
@@ -6604,6 +6630,26 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 
 	<software name="hanahour">
 		<description>Hanafuda Hourouki</description>
+		<year>1988</year>
+		<publisher>ドット企画 (Dot Kikaku)</publisher>
+		<info name="alt_title" value="花札放浪記" />
+		<info name="release" value="198808xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="3436002">
+				<rom name="hanafuda_hourouki_disk_a.mfm" size="3436002" crc="6c712a07" sha1="765df403f8bd43c7de460dbb85852b4b24ca13cd" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="3420468">
+				<rom name="hanafuda_hourouki_disk_b.mfm" size="3420468" crc="4e9faa7d" sha1="e4fcbea1516f9886dcbcb4bea1f0883131b7b43b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hanahourc" cloneof="hanahour">
+		<description>Hanafuda Hourouki (cracked)</description>
 		<year>1988</year>
 		<publisher>ドット企画 (Dot Kikaku)</publisher>
 		<info name="alt_title" value="花札放浪記" />
@@ -11468,20 +11514,20 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<info name="release" value="199104xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1261824">
-				<rom name="pretty doll (1991)(system house oh)(disk 1 of 3).dim" size="1261824" crc="65d34713" sha1="c6e78274231f19225632a1e6657eee8cd4120542" />
+			<dataarea name="flop" size="3444672">
+				<rom name="pretty_doll_disk_1.mfm" size="3444672" crc="8f5ebae5" sha1="08df833d3725a23f2db7d45aa89cf8aee33dfa01" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1261824">
-				<rom name="pretty doll (1991)(system house oh)(disk 2 of 3).dim" size="1261824" crc="0624a794" sha1="2d08d95804530874798aeafc0698353fd78a388f" />
+			<dataarea name="flop" size="3420184">
+				<rom name="pretty_doll_disk_2.mfm" size="3420184" crc="11beb534" sha1="0f5d4964ab4eb4a911e2e788a0851c21f8573c35" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3" />
-			<dataarea name="flop" size="1261824">
-				<rom name="pretty doll (1991)(system house oh)(disk 3 of 3).dim" size="1261824" crc="f53d16f2" sha1="124fe85889282d5a663b6fde9bd332e930eae9ff" />
+			<dataarea name="flop" size="3425951">
+				<rom name="pretty_doll_disk_3.mfm" size="3425951" crc="dca805c2" sha1="f0926194633233327e2886aab3b02d2f9fb27abb" />
 			</dataarea>
 		</part>
 	</software>
