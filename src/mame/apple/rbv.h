@@ -29,9 +29,7 @@ public:
 	auto via6015_callback() { return write_6015.bind(); }
 	auto irq_callback() { return write_irq.bind(); }
 
-	void slot0_irq_w(int state);
-	void slot1_irq_w(int state);
-	void slot2_irq_w(int state);
+	template <u8 mask> void slot_irq_w(int state);
 	void asc_irq_w(int state);
 
 protected:
@@ -59,7 +57,6 @@ private:
 	void pseudovia_recalc_irqs();
 
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
-	void vbl_w(int state);
 
 	u8 dac_r(offs_t offset);
 	void dac_w(offs_t offset, u8 data);

@@ -1729,7 +1729,7 @@ void adsp21xx_device::execute_run()
 				break;
 			case 0x9c: case 0x9d: case 0x9e: case 0x9f:
 				// 1001xxxx xxxxxxxx xxxxxxxx  write data memory (immediate addr) from reg group 3
-				data_write(BIT(op, 4, 4), read_reg3(BIT(op, 0, 4)));
+				data_write(BIT(op, 4, 14), read_reg3(BIT(op, 0, 4)));
 				break;
 			case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
 			case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:

@@ -387,7 +387,7 @@ offs_t adsp21xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		case 0x0d:
 			// 00001101 0000xxxx xxxxxxxx  internal data move
 			if (BIT(op, 12, 4) == 0)
-				util::stream_format(stream, "%s = %s", reg_grp[BIT(op, 10, 2)][BIT(op, 4, 4)], reg_grp[BIT(op, 8, 3)][BIT(op, 0, 4)]);
+				util::stream_format(stream, "%s = %s", reg_grp[BIT(op, 10, 2)][BIT(op, 4, 4)], reg_grp[BIT(op, 8, 2)][BIT(op, 0, 4)]);
 			else
 				util::stream_format(stream, "??? (%06X)", op);
 			break;
@@ -487,7 +487,7 @@ offs_t adsp21xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47:
 		case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
 			// 0100xxxx xxxxxxxx xxxxxxxx  load data register immediate
-			util::stream_format(stream, "%s = $%04X", reg_grp[0][BIT(op, 0, 4)], BIT(op, 4, 14));
+			util::stream_format(stream, "%s = $%04X", reg_grp[0][BIT(op, 0, 4)], BIT(op, 4, 16));
 			break;
 		case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57:
 		case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:

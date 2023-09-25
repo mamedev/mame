@@ -103,7 +103,7 @@
 
 # QT_HOME = /usr/lib64/qt48/
 
-# SOURCES = src/mame/atari/asteroid.cpp,src/mame/cinemat/cchasm.cpp
+# SOURCES = src/mame/atari/asteroid.cpp,src/mame/cinematronics/cchasm.cpp
 
 # SOURCEFILTER = mydrivers.flt
 
@@ -236,7 +236,7 @@ endif
 
 #-------------------------------------------------
 # specify core target: mame, ldplayer
-# specify subtarget: mame, arcade, mess, tiny, etc.
+# specify subtarget: mame, tiny, etc.
 # build scripts will be run from
 # scripts/target/$(TARGET)/$(SUBTARGET).lua
 #-------------------------------------------------
@@ -982,8 +982,6 @@ SRC = src
 # all 3rd party sources are under the 3rdparty/ directory
 3RDPARTY = 3rdparty
 ifeq ($(SUBTARGET_FULL),mame)
-PROJECT_NAME := $(SUBTARGET_FULL)
-else ifeq ($(SUBTARGET_FULL),mess)
 PROJECT_NAME := $(SUBTARGET_FULL)
 else
 PROJECT_NAME := $(TARGET)$(SUBTARGET_FULL)
