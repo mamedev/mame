@@ -399,8 +399,8 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1988, korgm1,    0,      0, korgm1,  korgm1, korgm1_state, empty_init, "Korg",                 "M1 Music Workstation (Rev 19)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-SYST(1988, korgm1ex,  korgm1, 0, korgm1,  korgm1, korgm1_state, empty_init, "Korg",                 "M1 EX Music Workstation (v1.29)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-SYST(1988, korgm1r,   korgm1, 0, korgm1r, korgm1, korgm1_state, empty_init, "Korg",                 "M1R Music Workstation (v1.06)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-SYST(1988, korgm1rex, korgm1, 0, korgm1r, korgm1, korgm1_state, empty_init, "Korg",                 "M1R EX Music Workstation (v1.12)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-SYST(1993, korgm1p1,  korgm1, 0, korgm1,  korgm1, korgm1_state, empty_init, "InVision Interactive", "M1 Plus+1 Music Workstation",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST(1988, korgm1,    0,      0, korgm1, korgm1,  korgm1_state, empty_init, "Korg",                 "M1 Music Workstation (Rev 19)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST(1988, korgm1ex,  korgm1, 0, korgm1, korgm1,  korgm1_state, empty_init, "Korg",                 "M1 EX Music Workstation (v1.29)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST(1988, korgm1r,   korgm1, 0, korgm1, korgm1r, korgm1_state, empty_init, "Korg",                 "M1R Music Workstation (v1.06)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST(1988, korgm1rex, korgm1, 0, korgm1, korgm1r, korgm1_state, empty_init, "Korg",                 "M1R EX Music Workstation (v1.12)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST(1993, korgm1p1,  korgm1, 0, korgm1, korgm1,  korgm1_state, empty_init, "InVision Interactive", "M1 Plus+1 Music Workstation",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
