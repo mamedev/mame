@@ -129,6 +129,7 @@ public:
 	void install_bank(offs_t start, offs_t end, void *data);
 	void install_view(offs_t start, offs_t end, memory_view &view);
 	void set_irq_line(int slot, int state);
+	void set_address_mask(uint32_t mask) { m_addr_mask = mask; }
 
 	void irq9_w(int state);
 	void irqa_w(int state);
@@ -154,6 +155,8 @@ protected:
 	devcb_write_line    m_out_irqe_cb;
 
 	std::vector<std::reference_wrapper<device_nubus_card_interface> > m_device_list;
+
+	uint32_t m_addr_mask;
 };
 
 inline void device_nubus_card_interface::raise_slot_irq()

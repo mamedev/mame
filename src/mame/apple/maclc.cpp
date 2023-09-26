@@ -22,6 +22,8 @@
 
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
+#include "bus/nubus/cards.h"
+#include "bus/nubus/nubus.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68020.h"
 #include "cpu/m68000/m68030.h"
@@ -358,6 +360,14 @@ void maclc_state::maclc_base(machine_config &config)
 	m_v8->hdsel_callback().set(FUNC(maclc_state::hdsel_w));
 	m_v8->hmmu_enable_callback().set(FUNC(maclc_state::set_hmmu));
 
+	nubus_device &nubus(NUBUS(config, "pds", 0));
+	nubus.set_space(m_maincpu, AS_PROGRAM);
+	nubus.set_address_mask(0x80ffffff);
+	// V8 supports interrupts for slots $C, $D, and $E, but the LC, LC II, and Color Classic
+	// only hook the slot $E IRQ up to the PDS slot.
+	nubus.out_irqe_callback().set(m_v8, FUNC(v8_device::slot_irq_w<0x20>));
+	NUBUS_SLOT(config, "lcpds", "pds", mac_pdslc_cards, nullptr);
+
 	MACADB(config, m_macadb, C15M);
 
 	EGRET(config, m_egret, XTAL(32'768));
@@ -458,6 +468,10 @@ void maclc_state::macclas2(machine_config &config)
 	m_v8->pb4_callback().set(m_egret, FUNC(egret_device::set_via_full));
 	m_v8->pb5_callback().set(m_egret, FUNC(egret_device::set_sys_session));
 	m_v8->cb2_callback().set(m_egret, FUNC(egret_device::set_via_data));
+
+	// Classic II doesn't have an LC PDS slot (and its ROM has the Slot Manager disabled)
+	config.device_remove("lcpds");
+	config.device_remove("pds");
 
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("6M,8M,10M");

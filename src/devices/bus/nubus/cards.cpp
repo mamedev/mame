@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-    NuBus and SE/30 PDS slot cards
+    NuBus, SE/30 PDS, and LC PDS slot cards
 
 ***************************************************************************/
 
@@ -58,6 +58,11 @@ void mac_pds030_cards(device_slot_interface &device)
 	device.option_add("30hr",  PDS030_XCEED30HR);   // Micron/XCEED Technology Color 30HR
 	device.option_add("mc30",  PDS030_XCEEDMC30);   // Micron/XCEED Technology MacroColor 30
 	device.option_add("ethermac30", PDS030_ETHERMAC30I);    // Farallon EtherMac 30i Ethernet card
+}
+
+void mac_pdslc_cards(device_slot_interface &device)
+{
+	device.option_add("macconilc", PDSLC_MACCONILC);    // Asante MacCON i LC Ethernet card
 }
 
 // IIsi can take either one SE/30 PDS or one NuBus card
