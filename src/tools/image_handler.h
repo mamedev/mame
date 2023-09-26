@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "formats/flopimg.h"
 #include "formats/fsmgr.h"
 #include "harddisk.h"
 

@@ -141,9 +141,12 @@
 ****************************************************************************/
 
 #include "fs_fat.h"
+#include "fsblk.h"
 #include "pc_dsk.h"
 
 #include "strformat.h"
+
+#include <optional>
 
 using namespace fs;
 

@@ -5,6 +5,7 @@
 
 #include "fs_prodos.h"
 #include "ap_dsk35.h"
+#include "fsblk.h"
 
 #include "multibyte.h"
 #include "strformat.h"
