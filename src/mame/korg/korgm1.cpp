@@ -5,13 +5,16 @@
 Korg M1 (c) 1988
 
 Notes:
-- Memory cards are branded Korg MCR, one row of 32-pins plus write protect dip
-  and a CR2016 battery slot, awfully similar to MSX/PC-9801 Bee Card/PC Engine HuCard.
-  Four known options:
+- Memory cards are MSX/PC-9801 Bee Card re-branded Korg MCR-*, one row of 32-pins plus
+  write protect dip and a CR2016 battery slot.
+  Four known RAM options:
   - MCR-02, 128 kB
   - MCR-03, 256 kB
   - MCR-04, 1024 kB x 4 banks
   - Radiusz Bee-Card, custom made multibank card with rotary knob, 16 x 32 kB/8 x 64 kB/4 x 128 kB
+- "Ext. Cards" are coupled with MPC-** (Bee Card) & MSC-** (PCM data) cards, latter is a 19x2-pins
+   that fits in the back of the synth.
+   Numbered official releases goes from 00P (factory preset) to 16 + some third party options.
 
 **************************************************************************************************/
 
@@ -102,9 +105,9 @@ void korgm1_state::panel_leds_w(u8 data)
 void korgm1_state::korgm1_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).ram().share("nvram"); // 64 KB
-//	map(0x50000, 0x5ffff).lr8(NAME([this] (offs_t offset) {
-//		return m_beecard[offset];
-//	})).umask16(0x00ff); //  memory card 32 KB
+//  map(0x50000, 0x5ffff).lr8(NAME([this] (offs_t offset) {
+//      return m_beecard[offset];
+//  })).umask16(0x00ff); //  memory card 32 KB
 	map(0xe0000, 0xfffff).rom().region("ipl", 0);
 }
 
@@ -129,8 +132,8 @@ void korgm1_state::korgm1_io(address_map &map)
 static INPUT_PORTS_START( korgm1 )
 	PORT_START("Y0")
 	PORT_BIT(0x03, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW1")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW5")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("INT Mode (SW1)")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("CARD Mode (SW5)")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("COMBI Mode (SW2)")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("EDIT COMBI Mode (SW6)")
 
@@ -188,6 +191,10 @@ static INPUT_PORTS_START( korgm1 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( korgm1r )
+	PORT_INCLUDE( korgm1 )
+	// TODO: slightly different
+INPUT_PORTS_END
 
 void korgm1_state::machine_start()
 {
@@ -221,15 +228,15 @@ void korgm1_state::korgm1(machine_config &config)
 	pio.out_portc_cb().set(FUNC(korgm1_state::panel_leds_w));
 	pio.in_portd_cb().set(m_lcdc, FUNC(hd44780_device::db_r));
 	pio.out_portd_cb().set(m_lcdc, FUNC(hd44780_device::db_w));
-	// TODO: porte input (PE3 connected to Ext. Card status (?), PE0-PE2 to "LCD Unit")
+	// TODO: porte input (PE3 connected to Ext. Card status (0=inserted?), PE0-PE2 to "LCD Unit")
 	pio.out_porte_cb().set(m_lcdc, FUNC(hd44780_device::rs_w)).bit(0);
 	pio.out_porte_cb().append(m_lcdc, FUNC(hd44780_device::rw_w)).bit(1);
 	pio.out_porte_cb().append(m_lcdc, FUNC(hd44780_device::e_w)).bit(2);
 
 	M58990(config, m_adc, 32_MHz_XTAL / 32); // M58990P-1 (µPD65013G-402 divides V50 CLKOUT by 8)
 	// Joystick, "value" and After Touch routes here
-//	m_adc->in_callback<0>().set_ioport("AN0"); // pitch joystick
-//	m_adc->in_callback<1>().set_ioport("AN1"); // mg. int joystick
+//  m_adc->in_callback<0>().set_ioport("AN0"); // pitch joystick
+//  m_adc->in_callback<1>().set_ioport("AN1"); // mg. int joystick
 	m_adc->in_callback<6>().set_ioport("AN6"); // to internal battery
 
 	/* video hardware */
@@ -392,8 +399,8 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1988, korgm1,    0,      0, korgm1, korgm1, korgm1_state, empty_init, "Korg",                 "M1 Music Workstation (Rev 19)",    MACHINE_IS_SKELETON)
-SYST(1988, korgm1ex,  korgm1, 0, korgm1, korgm1, korgm1_state, empty_init, "Korg",                 "M1 EX Music Workstation (v1.29)",  MACHINE_IS_SKELETON)
-SYST(1988, korgm1r,   korgm1, 0, korgm1, korgm1, korgm1_state, empty_init, "Korg",                 "M1R Music Workstation (v1.06)",    MACHINE_IS_SKELETON)
-SYST(1988, korgm1rex, korgm1, 0, korgm1, korgm1, korgm1_state, empty_init, "Korg",                 "M1R EX Music Workstation (v1.12)", MACHINE_IS_SKELETON)
-SYST(1993, korgm1p1,  korgm1, 0, korgm1, korgm1, korgm1_state, empty_init, "InVision Interactive", "M1 Plus+1 Music Workstation",      MACHINE_IS_SKELETON)
+SYST(1988, korgm1,    0,      0, korgm1,  korgm1, korgm1_state, empty_init, "Korg",                 "M1 Music Workstation (Rev 19)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST(1988, korgm1ex,  korgm1, 0, korgm1,  korgm1, korgm1_state, empty_init, "Korg",                 "M1 EX Music Workstation (v1.29)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST(1988, korgm1r,   korgm1, 0, korgm1r, korgm1, korgm1_state, empty_init, "Korg",                 "M1R Music Workstation (v1.06)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST(1988, korgm1rex, korgm1, 0, korgm1r, korgm1, korgm1_state, empty_init, "Korg",                 "M1R EX Music Workstation (v1.12)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST(1993, korgm1p1,  korgm1, 0, korgm1,  korgm1, korgm1_state, empty_init, "InVision Interactive", "M1 Plus+1 Music Workstation",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
