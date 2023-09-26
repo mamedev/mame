@@ -2,9 +2,16 @@
 // copyright-holders:Angelo Salese, AJR
 /***************************************************************************
 
-    Korg M1 (c) 1988
+Korg M1 (c) 1988
 
-    skeleton driver
+Notes:
+- Memory cards are branded Korg MCR, one row of 32-pins plus write protect dip
+  and a CR2016 battery slot, awfully similar to MSX/PC-9801 Bee Card/PC Engine HuCard.
+  Four known options:
+  - MCR-02, 128 kB
+  - MCR-03, 256 kB
+  - MCR-04, 1024 kB x 4 banks
+  - Radiusz Bee-Card, custom made multibank card with rotary knob, 16 x 32 kB/8 x 64 kB/4 x 128 kB
 
 ***************************************************************************/
 
