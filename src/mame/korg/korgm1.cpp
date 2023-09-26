@@ -102,7 +102,9 @@ void korgm1_state::panel_leds_w(u8 data)
 void korgm1_state::korgm1_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).ram().share("nvram"); // 64 KB
-//  map(0x50000, 0x57fff).ram(); // memory card 32 KB
+//	map(0x50000, 0x5ffff).lr8(NAME([this] (offs_t offset) {
+//		return m_beecard[offset];
+//	})).umask16(0x00ff); //  memory card 32 KB
 	map(0xe0000, 0xfffff).rom().region("ipl", 0);
 }
 
@@ -129,15 +131,15 @@ static INPUT_PORTS_START( korgm1 )
 	PORT_BIT(0x03, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW1")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW5")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW2")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("COMBI Mode key (SW6)")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("COMBI Mode (SW2)")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("EDIT COMBI Mode (SW6)")
 
 	PORT_START("Y1")
 	PORT_BIT(0x03, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW3")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW7")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW4") // tight loops waiting for an irq, if bypassed goes in "New Song" mode
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("GLOBAL Mode key (SW8)")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PROG Mode? (SW3)")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("EDIT PROG Mode (SW7)")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SEQ Mode? (SW4)") // tight loops waiting for an irq, if bypassed goes in "New Song" mode
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("GLOBAL Mode (SW8)")
 
 	PORT_START("Y2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Key Up (SW9)") PORT_CODE(KEYCODE_UP)
@@ -177,7 +179,13 @@ static INPUT_PORTS_START( korgm1 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Cursor F (SW32)") PORT_CODE(KEYCODE_6)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Cursor G (SW33)") PORT_CODE(KEYCODE_7)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Cursor H (SW34)") PORT_CODE(KEYCODE_8)
-	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Page -") PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Page +") PORT_CODE(KEYCODE_RIGHT)
+
+	PORT_START("AN6")
+	// enough to fix battery low level
+	PORT_BIT(0x7f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -213,12 +221,16 @@ void korgm1_state::korgm1(machine_config &config)
 	pio.out_portc_cb().set(FUNC(korgm1_state::panel_leds_w));
 	pio.in_portd_cb().set(m_lcdc, FUNC(hd44780_device::db_r));
 	pio.out_portd_cb().set(m_lcdc, FUNC(hd44780_device::db_w));
+	// TODO: porte input (PE3 connected to Ext. Card status (?), PE0-PE2 to "LCD Unit")
 	pio.out_porte_cb().set(m_lcdc, FUNC(hd44780_device::rs_w)).bit(0);
 	pio.out_porte_cb().append(m_lcdc, FUNC(hd44780_device::rw_w)).bit(1);
 	pio.out_porte_cb().append(m_lcdc, FUNC(hd44780_device::e_w)).bit(2);
 
 	M58990(config, m_adc, 32_MHz_XTAL / 32); // M58990P-1 (µPD65013G-402 divides V50 CLKOUT by 8)
 	// Joystick, "value" and After Touch routes here
+//	m_adc->in_callback<0>().set_ioport("AN0"); // pitch joystick
+//	m_adc->in_callback<1>().set_ioport("AN1"); // mg. int joystick
+	m_adc->in_callback<6>().set_ioport("AN6"); // to internal battery
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -366,7 +378,8 @@ ROM_START( korgm1p1 )
 	ROM_LOAD16_BYTE( "ic39.bin", 0x300000, 0x080000, CRC(ef8324c4) SHA1(6cbbd8421f777f3d39644474daac2b15f9636810) )
 	ROM_LOAD16_BYTE( "ic43.bin", 0x300001, 0x080000, CRC(77c39278) SHA1(bf87f16fa6af1a3076c19c12901b02cbefac3fce) )
 
-	ROM_REGION( 0x8000, "progcard", 0 )
+	// TODO: move to SW list
+	ROM_REGION( 0x8000, "beecard", 0 )
 	ROM_LOAD( "plus-1_prog_card.bin", 0x0000, 0x8000, CRC(c31b3bce) SHA1(ef341868800bc98c9677f6f9227e8a2342504391) )
 
 	ROM_REGION( 0x400000, "multisound", 0 )
