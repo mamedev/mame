@@ -103,7 +103,7 @@
 
 # QT_HOME = /usr/lib64/qt48/
 
-# SOURCES = src/mame/atari/asteroid.cpp,src/mame/cinemat/cchasm.cpp
+# SOURCES = src/mame/atari/asteroid.cpp,src/mame/cinematronics/cchasm.cpp
 
 # SOURCEFILTER = mydrivers.flt
 
@@ -236,7 +236,7 @@ endif
 
 #-------------------------------------------------
 # specify core target: mame, ldplayer
-# specify subtarget: mame, arcade, mess, tiny, etc.
+# specify subtarget: mame, tiny, etc.
 # build scripts will be run from
 # scripts/target/$(TARGET)/$(SUBTARGET).lua
 #-------------------------------------------------
@@ -983,8 +983,6 @@ SRC = src
 3RDPARTY = 3rdparty
 ifeq ($(SUBTARGET_FULL),mame)
 PROJECT_NAME := $(SUBTARGET_FULL)
-else ifeq ($(SUBTARGET_FULL),mess)
-PROJECT_NAME := $(SUBTARGET_FULL)
 else
 PROJECT_NAME := $(TARGET)$(SUBTARGET_FULL)
 endif
@@ -1561,7 +1559,7 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.257"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.258"' > $@
 	@echo '#define BARE_VCS_REVISION "$(NEW_GIT_VERSION)"' >> $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char bare_vcs_revision[];' >> $@
@@ -1571,7 +1569,7 @@ $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " (" BARE_VCS_REVISION ")";' >> $@
 else
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo #define BARE_BUILD_VERSION "0.257" > $@
+	@echo #define BARE_BUILD_VERSION "0.258" > $@
 	@echo #define BARE_VCS_REVISION "$(NEW_GIT_VERSION)" >> $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char bare_vcs_revision[]; >> $@

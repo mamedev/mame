@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Graves
 // thanks-to:Richard Bush
-/***************************************************************************
+/*******************************************************************************
 
 Taito Triple Screen Games
 =========================
@@ -312,20 +312,278 @@ Darius 2
 (When you lose a life or big enemies appear it's meant to create
 rumbling on a subwoofer in the cabinet.)
 
-
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
-#include "ninjaw.h"
+
+#include "taitoio.h"
 #include "taitoipt.h"
+#include "taitosnd.h"
+
+#include "tc0100scn.h"
+#include "tc0110pcr.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "sound/flt_vol.h"
 #include "sound/ymopn.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 #include "ninjaw.lh"
+
+
+namespace {
+
+class ninjaw_state : public driver_device
+{
+public:
+	ninjaw_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub"),
+		m_tc0140syt(*this, "tc0140syt"),
+		m_tc0100scn(*this, "tc0100scn_%u", 1),
+		m_tc0110pcr(*this, "tc0110pcr_%u", 1),
+		m_2610_l(*this, "2610.%u.l", 1),
+		m_2610_r(*this, "2610.%u.r", 1),
+		m_gfxdecode(*this, "gfxdecode_%u", 1),
+		m_spriteram(*this, "spriteram"),
+		m_z80bank(*this, "z80bank")
+	{ }
+
+	void darius2(machine_config &config);
+	void ninjaw(machine_config &config);
+
+protected:
+	virtual void device_post_load() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<tc0140syt_device> m_tc0140syt;
+	required_device_array<tc0100scn_device, 3> m_tc0100scn;
+	required_device_array<tc0110pcr_device, 3> m_tc0110pcr;
+	required_device_array<filter_volume_device, 2> m_2610_l;
+	required_device_array<filter_volume_device, 2> m_2610_r;
+	required_device_array<gfxdecode_device, 3> m_gfxdecode;
+
+	/* memory pointers */
+	required_shared_ptr<u16> m_spriteram;
+
+	/* memory regions */
+	required_memory_bank m_z80bank;
+
+	/* misc */
+	u16 m_cpua_ctrl = 0;
+	int m_pandata[4]{};
+
+	void coin_control_w(u8 data);
+	void cpua_ctrl_w(u16 data);
+	void sound_bankswitch_w(u8 data);
+	void pancontrol_w(offs_t offset, u8 data);
+	void tc0100scn_triple_screen_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	u32 screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return update_screen(screen, bitmap, cliprect, 36 * 8, 0); }
+	u32 screen_update_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return update_screen(screen, bitmap, cliprect, 36 * 8, 1); }
+	u32 screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return update_screen(screen, bitmap, cliprect, 36 * 8, 2); }
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int x_offs, int y_offs, int chip);
+	void parse_control();
+	u32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, int chip);
+	void darius2_master_map(address_map &map);
+	void darius2_slave_map(address_map &map);
+	void ninjaw_master_map(address_map &map);
+	void ninjaw_slave_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+
+/*******************************************************************************
+        SUBWOOFER (SOUND)
+*******************************************************************************/
+#if 0
+
+class subwoofer_device : public device_t, public device_sound_interface
+{
+public:
+	subwoofer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	~subwoofer_device() {}
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+};
+
+extern const device_type SUBWOOFER;
+
+const device_type SUBWOOFER = device_creator<subwoofer_device>;
+
+subwoofer_device::subwoofer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, SUBWOOFER, "Subwoofer", tag, owner, clock),
+	device_sound_interface(mconfig, *this)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void subwoofer_device::device_start()
+{
+	/* Adjust the lowpass filter of the first three YM2610 channels */
+
+	/* The 150 Hz is a common top frequency played by a generic */
+	/* subwoofer, the real Arcade Machine may differ */
+
+	mixer_set_lowpass_frequency(0, 20);
+	mixer_set_lowpass_frequency(1, 20);
+	mixer_set_lowpass_frequency(2, 20);
+
+	return 0;
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void subwoofer_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+{
+	outputs[0].fill(0);
+}
+
+#endif
+
+
+/*******************************************************************************
+        SPRITE DRAW ROUTINE
+*******************************************************************************/
+
+void ninjaw_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int x_offs, int y_offs, int chip)
+{
+#ifdef MAME_DEBUG
+	int unknown = 0;
+#endif
+
+	static const u32 primask[2] =
+	{
+		GFX_PMASK_4, // draw sprites with priority 0 which are over the mid layer
+		(GFX_PMASK_4 | GFX_PMASK_2) // draw sprites with priority 1 which are under the mid layer
+	};
+
+	for (int offs = 0; offs < (m_spriteram.bytes() / 2); offs += 4)
+	{
+		int data = m_spriteram[offs + 2];
+		const u32 tilenum = data & 0x7fff;
+
+		if (!tilenum)
+			continue;
+
+		data = m_spriteram[offs + 0];
+		int x = (data - 32) & 0x3ff;    /* aligns sprites on rock outcrops and sewer hole */
+
+		data = m_spriteram[offs + 1];
+		int y = (data - 0) & 0x1ff;
+
+		/*
+		    The purpose of the bit at data&0x8 (below) is unknown, but it is set
+		    on Darius explosions, some enemy missiles and at least 1 boss.
+		    It is most likely another priority bit but as there are no obvious
+		    visual problems it will need checked against the original pcb.
+
+		    There is a report this bit is set when the player intersects
+		    the tank sprite in Ninja Warriors however I was unable to repro
+		    this or find any use of this bit in that game.
+
+		    Bit&0x8000 is set on some sprites in later levels of Darius
+		    but is again unknown, and there is no obvious visual problem.
+		*/
+		data = m_spriteram[offs + 3];
+		const bool flipx = (data & 0x1);
+		const bool flipy = (data & 0x2) >> 1;
+		const int priority = (data & 0x4) >> 2; // 1 = low
+		/* data&0x8 - unknown */
+		const u32 color = (data & 0x7f00) >> 8;
+		/* data&0x8000 - unknown */
+
+#ifdef MAME_DEBUG
+		if (data & 0x80f0) unknown |= (data &0x80f0);
+#endif
+
+		x -= x_offs;
+		y += y_offs;
+
+		/* sprite wrap: coords become negative at high values */
+		if (x > 0x3c0) x -= 0x400;
+		if (y > 0x180) y -= 0x200;
+
+		const int curx = x;
+		const int cury = y;
+		const u32 code = tilenum;
+
+		m_gfxdecode[chip]->gfx(0)->prio_transpen(bitmap,cliprect,
+				code, color,
+				flipx, flipy,
+				curx, cury,
+				screen.priority(), primask[priority],
+				0);
+	}
+
+#ifdef MAME_DEBUG
+	if (unknown)
+		popmessage("unknown sprite bits: %04x",unknown);
+#endif
+}
+
+
+/*******************************************************************************
+        SCREEN REFRESH
+*******************************************************************************/
+
+u32 ninjaw_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, int chip)
+{
+	tc0100scn_device *tc0100scn = m_tc0100scn[chip];
+	xoffs *= chip;
+	u8 layer[3];
+
+	tc0100scn->tilemap_update();
+
+	layer[0] = m_tc0100scn[0]->bottomlayer();
+	layer[1] = layer[0] ^ 1;
+	layer[2] = 2;
+
+	screen.priority().fill(0, cliprect);
+	/* chip 0 does tilemaps on the left, chip 1 center, chip 2 the right */
+	// draw bottom layer
+	u8 nodraw = tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);    /* left */
+
+	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
+	if (nodraw)
+		bitmap.fill(m_tc0110pcr[chip]->black_pen(), cliprect);
+
+	// draw middle layer
+	tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
+
+	// draw top(text) layer
+	tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
+
+	/* Sprites can be under/over the layer below text layer */
+	draw_sprites(screen, bitmap, cliprect, xoffs, 8, chip);
+
+	return 0;
+}
+
+
+/*******************************************************************************
+        MISC. CONTROL
+*******************************************************************************/
 
 void ninjaw_state::parse_control()   /* assumes Z80 sandwiched between 68Ks */
 {
@@ -357,15 +615,14 @@ void ninjaw_state::coin_control_w(u8 data)
 }
 
 
-/*****************************************
-            SOUND
-*****************************************/
+/*******************************************************************************
+        SOUND
+*******************************************************************************/
 
 void ninjaw_state::sound_bankswitch_w(u8 data)
 {
 	m_z80bank->set_entry(data & 7);
 }
-
 
 /**** sound pan control ****/
 
@@ -396,9 +653,10 @@ void ninjaw_state::tc0100scn_triple_screen_w(offs_t offset, u16 data, u16 mem_ma
 	m_tc0100scn[2]->ram_w(offset, data, mem_mask);
 }
 
-/***********************************************************
-             MEMORY STRUCTURES
-***********************************************************/
+
+/*******************************************************************************
+        MEMORY STRUCTURES
+*******************************************************************************/
 
 void ninjaw_state::ninjaw_master_map(address_map &map)
 {
@@ -469,7 +727,7 @@ void ninjaw_state::darius2_slave_map(address_map &map)
 }
 
 
-/***************************************************************************/
+/******************************************************************************/
 
 void ninjaw_state::sound_map(address_map &map)
 {
@@ -487,9 +745,9 @@ void ninjaw_state::sound_map(address_map &map)
 }
 
 
-/***********************************************************
-             INPUT PORTS, DIPs
-***********************************************************/
+/*******************************************************************************
+        INPUT PORTS, DIPs
+*******************************************************************************/
 
 static INPUT_PORTS_START( ninjaw )
 	/* 0x200000 (port 0) -> 0x0c2291.b and 0x24122c (shared RAM) */
@@ -580,11 +838,9 @@ static INPUT_PORTS_START( darius2 )
 INPUT_PORTS_END
 
 
-/***********************************************************
-                GFX DECODING
-
-    (Thanks to Raine for the obj decoding)
-***********************************************************/
+/*******************************************************************************
+        GFX DECODING (Thanks to Raine for the obj decoding)
+*******************************************************************************/
 
 static const gfx_layout tilelayout =
 {
@@ -602,80 +858,15 @@ static GFXDECODE_START( gfx_ninjaw )
 GFXDECODE_END
 
 
-/**************************************************************
-                 SUBWOOFER (SOUND)
-**************************************************************/
-#if 0
-
-class subwoofer_device : public device_t,
-									public device_sound_interface
-{
-public:
-	subwoofer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	~subwoofer_device() {}
-
-protected:
-	// device-level overrides
-	virtual void device_start();
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
-
-private:
-	// internal state
-
-};
-
-extern const device_type SUBWOOFER;
-
-const device_type SUBWOOFER = device_creator<subwoofer_device>;
-
-subwoofer_device::subwoofer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, SUBWOOFER, "Subwoofer", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void subwoofer_device::device_start()
-{
-	/* Adjust the lowpass filter of the first three YM2610 channels */
-
-	/* The 150 Hz is a common top frequency played by a generic */
-	/* subwoofer, the real Arcade Machine may differs */
-
-	mixer_set_lowpass_frequency(0, 20);
-	mixer_set_lowpass_frequency(1, 20);
-	mixer_set_lowpass_frequency(2, 20);
-
-	return 0;
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void subwoofer_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
-{
-	outputs[0].fill(0);
-}
-
-
-#endif
-
-
-/*************************************************************
-                 MACHINE DRIVERS
-
+/*******************************************************************************
+        MACHINE DRIVERS
+--------------------------------------------------------------------------------
 Ninjaw: high interleaving of 100, but doesn't stop enemies
 "sliding" when they should be standing still relative
 to the scrolling background.
 
 Darius2: arbitrary interleaving of 10 to keep cpus synced.
-*************************************************************/
+*******************************************************************************/
 
 void ninjaw_state::device_post_load()
 {
@@ -914,9 +1105,9 @@ void ninjaw_state::darius2(machine_config &config)
 }
 
 
-/***************************************************************************
-                    DRIVERS
-***************************************************************************/
+/*******************************************************************************
+        ROM DEFINITIONS
+*******************************************************************************/
 
 ROM_START( ninjaw )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 256K for 68000 CPUA code */
@@ -1180,12 +1371,16 @@ ROM_START( darius2 )
 	ROM_LOAD( "c07-12.107", 0x00000, 0x80000, CRC(e0b71258) SHA1(0258e308b643d723475824752ebffc4ea29d1ac4) )
 ROM_END
 
+} // anonymous namespace
 
-/* Working Games */
 
-//    YEAR, NAME,     PARENT, MACHINE, INPUT,   STATE         INIT,MONITOR,COMPANY,                     FULLNAME,FLAGS
-GAME( 1987, ninjaw,   0,      ninjaw,  ninjaw,  ninjaw_state, empty_init, ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World, later version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, ninjaw1,  ninjaw, ninjaw,  ninjaw,  ninjaw_state, empty_init, ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World, earlier version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, ninjawj,  ninjaw, ninjaw,  ninjawj, ninjaw_state, empty_init, ROT0,   "Taito Corporation",         "The Ninja Warriors (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, ninjawu,  ninjaw, ninjaw,  ninjawj, ninjaw_state, empty_init, ROT0,   "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US, Romstar license)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) /* Uses same coinage as World, see notes */
-GAME( 1989, darius2,  0,      darius2, darius2, ninjaw_state, empty_init, ROT0,   "Taito Corporation",         "Darius II (triple screen) (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+/*******************************************************************************
+        DRIVERS
+*******************************************************************************/
+
+//    YEAR, NAME,     PARENT, MACHINE, INPUT,   CLASS,        INIT,       MONITOR, COMPANY,                     FULLNAME, FLAGS
+GAME( 1987, ninjaw,   0,      ninjaw,  ninjaw,  ninjaw_state, empty_init, ROT0,    "Taito Corporation Japan",   "The Ninja Warriors (World, later version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, ninjaw1,  ninjaw, ninjaw,  ninjaw,  ninjaw_state, empty_init, ROT0,    "Taito Corporation Japan",   "The Ninja Warriors (World, earlier version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, ninjawj,  ninjaw, ninjaw,  ninjawj, ninjaw_state, empty_init, ROT0,    "Taito Corporation",         "The Ninja Warriors (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, ninjawu,  ninjaw, ninjaw,  ninjawj, ninjaw_state, empty_init, ROT0,    "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US, Romstar license)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) /* Uses same coinage as World, see notes */
+GAME( 1989, darius2,  0,      darius2, darius2, ninjaw_state, empty_init, ROT0,    "Taito Corporation",         "Darius II (triple screen) (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

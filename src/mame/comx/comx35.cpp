@@ -18,9 +18,10 @@
 
 #include "emu.h"
 #include "comx35.h"
-#include "formats/imageutl.h"
 #include "screen.h"
 #include "softlist_dev.h"
+
+#include "multibyte.h"
 #include "utf8.h"
 
 /***************************************************************************
@@ -93,9 +94,9 @@ QUICKLOAD_LOAD_MEMBER(comx35_state::quickload_cb)
 
 			image.fread(header, 6);
 
-			start_address = pick_integer_be(header, 0, 2);
-			end_address = pick_integer_be(header, 2, 2);
-			run_address = pick_integer_be(header, 4, 2);
+			start_address = get_u16be(&header[0]);
+			end_address = get_u16be(&header[2]);
+			run_address = get_u16be(&header[4]);
 
 			image_fread_memory(image, start_address, end_address - start_address);
 
@@ -179,7 +180,7 @@ QUICKLOAD_LOAD_MEMBER(comx35_state::quickload_cb)
 
 			image.fread(header, 2);
 
-			array_length = pick_integer_be(header, 0, 2);
+			array_length = get_u16be(&header[0]);
 			start_array = (program.read_byte(0x4295) << 8) | program.read_byte(0x4296);
 			end_array = start_array + (size - 7);
 

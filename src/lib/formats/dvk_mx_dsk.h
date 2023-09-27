@@ -11,7 +11,6 @@
 #pragma once
 
 #include "flopimg.h"
-#include "imageutl.h"
 
 class dvk_mx_format : public floppy_image_format_t
 {

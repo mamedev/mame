@@ -11,10 +11,16 @@
 
 #pragma once
 
-#include "formats/flopimg.h"
-#include "formats/fsmgr.h"
 #include "sound/samples.h"
 #include "screen.h"
+
+class floppy_image;
+class floppy_image_format_t;
+
+namespace fs {
+	class manager_t;
+	class meta_data;
+};
 
 class floppy_sound_device;
 
@@ -109,7 +115,7 @@ public:
 	void setup_wpt_cb(wpt_cb cb);
 	void setup_led_cb(led_cb cb);
 
-	std::vector<uint32_t> &get_buffer() { return image->get_buffer(cyl, ss, subcyl); }
+	std::vector<uint32_t> &get_buffer();
 	int get_cyl() const { return cyl; }
 	bool on_track() const { return !subcyl; }
 
@@ -153,16 +159,7 @@ public:
 	void    enable_sound(bool doit) { m_make_sound = doit; }
 
 protected:
-	struct fs_enum : public fs::manager_t::floppy_enumerator {
-		floppy_image_device *m_fid;
-		const fs::manager_t *m_manager;
-
-		fs_enum(floppy_image_device *fid);
-
-		virtual void add_raw(const char *name, u32 key, const char *description) override;
-	protected:
-		virtual void add_format(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description) override;
-	};
+	struct fs_enum;
 
 	floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -332,6 +329,7 @@ DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSDD,     floppy_525_ssdd,     "floppy_5_
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_DD,       floppy_525_dd,       "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSQD,     floppy_525_ssqd,     "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_QD,       floppy_525_qd,       "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_QD16,     floppy_525_qd16,     "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_HD,       floppy_525_hd,       "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_8_SSSD,       floppy_8_sssd,       "floppy_8")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_8_DSSD,       floppy_8_dssd,       "floppy_8")

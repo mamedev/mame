@@ -15,7 +15,7 @@ It was not manufactured by Elektor, only described as a homebrew project.
 FN 1 = new game, FN 2 = set level, FN 3 = principle variation.
 Moves are confirmed by pressing GO twice.
 
-The program is the same for all versions, only the display differs.
+The chess program is the same for all versions, only the display differs.
 
 Hardware notes:
 
@@ -52,8 +52,8 @@ TODO:
 #include "screen.h"
 
 // internal artwork
-#include "avrmax.lh" // clickable
-#include "atm18mcc.lh" // clickable
+#include "avrmax.lh"
+#include "atm18mcc.lh"
 
 
 namespace {

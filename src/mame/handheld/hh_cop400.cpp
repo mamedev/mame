@@ -7,6 +7,9 @@ National Semiconductor COPS(COP400 MCU series) handhelds or other simple
 devices, mostly LED electronic games/toys.
 
 TODO:
+- minspace: Add graphics overlay mask? There's a commercial with B&W footage
+  of what's probably an older prototype, and there's an advertisement with a
+  mock-up picture for the display.
 - vidchal: Add screen and gun cursor with brightness detection callback,
   and softwarelist for the video tapes. We'd also need a VHS player device.
   The emulated lightgun itself appears to be working fine(eg. add a 30hz
@@ -29,19 +32,19 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "bshipg.lh" // clickable
-#include "comparca.lh" // clickable
-#include "ctstein.lh" // clickable
+#include "bshipg.lh"
+#include "comparca.lh"
+#include "ctstein.lh"
 #include "einvaderc.lh"
-#include "funjacks.lh" // clickable
-#include "funrlgl.lh" // clickable
-#include "funtag.lh" // clickable
+#include "funjacks.lh"
+#include "funrlgl.lh"
+#include "funtag.lh"
 #include "h2hbaskbc.lh"
 #include "h2hhockeyc.lh"
 #include "h2hsoccerc.lh"
 #include "lafootb.lh"
-#include "lchicken.lh" // clickable
-#include "lightfgt.lh" // clickable
+#include "lchicken.lh"
+#include "lightfgt.lh"
 #include "lilcomp.lh"
 #include "mbaskb2.lh"
 #include "mdallas.lh"
@@ -1553,7 +1556,7 @@ ROM_END
 
   Mego Invasion From Space (unreleased)
   * COP421 (likely a development chip)
-  * 36+9 LEDs with overlay mask, 1-bit sound
+  * 36+9 LEDs with overlay mask (for enemies and player ship), 1-bit sound
 
   This game is presumedly unreleased. The design is very complex. Player ship
   and bullets are on a moving "wand", a 2-way mirror makes it appear on the same
@@ -1615,7 +1618,7 @@ u8 minspace_state::read_l()
 
 	// L0-L5+G2: positional odd
 	// L0-L5+G3: positional even
-	u8 pos = m_inputs[1]->read();
+	u8 pos = m_inputs[1]->read() >> 8;
 	if (m_g & 4 && pos & 1)
 		ret ^= (1 << (pos >> 1));
 	if (m_g & 8 && ~pos & 1)
@@ -1635,7 +1638,7 @@ static INPUT_PORTS_START( minspace )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 
 	PORT_START("IN.1")
-	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0)
+	PORT_BIT( 0xfff, 0x600, IPT_PADDLE ) PORT_MINMAX(0x040, 0xbc0) PORT_SENSITIVITY(25) PORT_KEYDELTA(100) PORT_CENTERDELTA(0)
 INPUT_PORTS_END
 
 // config
@@ -2820,7 +2823,7 @@ SYST( 1979, msoccer2,   0,         0,      msoccer2,   msoccer2,   mbaskb2_state
 SYST( 1980, lafootb,    0,         0,      lafootb,    lafootb,    lafootb_state,   empty_init, "Mattel Electronics", "Look Alive! Football", MACHINE_SUPPORTS_SAVE )
 SYST( 1981, mdallas,    0,         0,      mdallas,    mdallas,    mdallas_state,   empty_init, "Mattel Electronics", "Dalla$ (J.R. handheld)", MACHINE_SUPPORTS_SAVE ) // ***
 
-SYST( 1980, minspace,   0,         0,      minspace,   minspace,   minspace_state,  empty_init, "Mego", "Invasion From Space (patent)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, minspace,   0,         0,      minspace,   minspace,   minspace_state,  empty_init, "Mego", "Invasion From Space (patent)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 SYST( 1980, plus1,      0,         0,      plus1,      plus1,      plus1_state,     empty_init, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS ) // ***
 SYST( 1981, lightfgt,   0,         0,      lightfgt,   lightfgt,   lightfgt_state,  empty_init, "Milton Bradley", "Electronic Lightfight: The Games of Dueling Lights", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

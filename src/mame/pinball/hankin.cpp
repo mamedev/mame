@@ -537,7 +537,7 @@ void hankin_state::hankin(machine_config &config)
 	DAC_4BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 
 	/* Devices */
-	PIA6821(config, m_ic10, 0);
+	PIA6821(config, m_ic10);
 	//m_ic10->readpa_handler().set(FUNC(hankin_state::ic10_a_r));
 	m_ic10->writepa_handler().set(FUNC(hankin_state::ic10_a_w));
 	//m_ic10->readpb_handler().set(FUNC(hankin_state::ic10_b_r));
@@ -547,7 +547,7 @@ void hankin_state::hankin(machine_config &config)
 	m_ic10->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	m_ic10->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	PIA6821(config, m_ic11, 0);
+	PIA6821(config, m_ic11);
 	//m_ic11->readpa_handler().set(FUNC(hankin_state::ic11_a_r));
 	m_ic11->writepa_handler().set(FUNC(hankin_state::ic11_a_w));
 	m_ic11->readpb_handler().set(FUNC(hankin_state::ic11_b_r));
@@ -557,7 +557,7 @@ void hankin_state::hankin(machine_config &config)
 	m_ic11->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 	m_ic11->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<3>));
 
-	PIA6821(config, m_ic2, 0);
+	PIA6821(config, m_ic2);
 	m_ic2->readpa_handler().set(FUNC(hankin_state::ic2_a_r));
 	m_ic2->writepa_handler().set(FUNC(hankin_state::ic2_a_w));
 	//m_ic2->readpb_handler().set(FUNC(hankin_state::ic2_b_r));

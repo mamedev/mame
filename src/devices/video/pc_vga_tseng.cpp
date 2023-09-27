@@ -116,10 +116,10 @@ u8 tseng_vga_device::ramdac_hidden_windex_r(offs_t offset)
 void tseng_vga_device::crtc_map(address_map &map)
 {
 	svga_device::crtc_map(map);
-//	map(0x30, 0x30) System Segment Map Comparator
-//	map(0x31, 0x31) General Purpose (& Clock Select 3/4)
-//	map(0x32, 0x32) RAS/CAS Configuration (RCCONF)
-//	map(0x33, 0x33) Extended Start Address
+//  map(0x30, 0x30) System Segment Map Comparator
+//  map(0x31, 0x31) General Purpose (& Clock Select 3/4)
+//  map(0x32, 0x32) RAS/CAS Configuration (RCCONF)
+//  map(0x33, 0x33) Extended Start Address
 	// Auxiliary Control
 	map(0x34, 0x34).lrw8(
 		NAME([this] (offs_t offset) {
@@ -130,8 +130,8 @@ void tseng_vga_device::crtc_map(address_map &map)
 			recompute_params();
 		})
 	);
-//	map(0x35, 0x35) Overflow High
-//	map(0x36, 0x36) Video System Configuration 1 (VSCONF1)
+//  map(0x35, 0x35) Overflow High
+//  map(0x36, 0x36) Video System Configuration 1 (VSCONF1)
 	// Video System Configuration 2 (VSCONF2)
 	// NOTE: reads memory installed from here
 	map(0x37, 0x37).ram();
@@ -153,8 +153,8 @@ void tseng_vga_device::sequencer_map(address_map &map)
 	svga_device::sequencer_map(map);
 	// TODO: preseve legacy hookup, to be investigated
 	map(0x05, 0xff).unmaprw();
-//	map(0x06, 0x06) TS State Control
-//	map(0x07, 0x07) TS Auxiliary Mode
+//  map(0x06, 0x06) TS State Control
+//  map(0x07, 0x07) TS Auxiliary Mode
 }
 
 void tseng_vga_device::attribute_map(address_map &map)

@@ -32,7 +32,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "novag_cforte.lh" // clickable
+#include "novag_cforte.lh"
 
 
 namespace {

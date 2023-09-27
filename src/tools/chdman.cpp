@@ -16,6 +16,7 @@
 #include "coretmpl.h"
 #include "hashing.h"
 #include "md5.h"
+#include "multibyte.h"
 #include "path.h"
 #include "strformat.h"
 #include "vbiparse.h"
@@ -120,7 +121,7 @@ const int MODE_GDI = 2;
 
 typedef std::unordered_map<std::string, std::string *> parameters_map;
 
-template <typename Format, typename... Params> static void report_error(int error, Format &&fmt, Params &&...args);
+template <typename Format, typename... Params> [[noreturn]] static void report_error(int error, Format &&fmt, Params &&...args);
 static void do_info(parameters_map &params);
 static void do_verify(parameters_map &params);
 static void do_create_raw(parameters_map &params);
@@ -1881,9 +1882,9 @@ static void do_create_hd(parameters_map &params)
 		// must be at least 14 bytes; extract CHS data from there
 		if (identdata.size() < 14)
 			report_error(1, "Ident file '%s' is invalid (too short)", *ident_str->second);
-		cylinders = (identdata[3] << 8) | identdata[2];
-		heads = (identdata[7] << 8) | identdata[6];
-		sectors = (identdata[13] << 8) | identdata[12];
+		cylinders = get_u16le(&identdata[2]);
+		heads = get_u16le(&identdata[6]);
+		sectors = get_u16le(&identdata[12]);
 
 		// ignore CHS for > 8GB drives
 		if (cylinders * heads * sectors >= 16514064)
@@ -2869,7 +2870,7 @@ static void do_extract_ld(parameters_map &params)
 
 	// build up the movie info
 	avi_file::movie_info info;
-	info.video_format = FORMAT_YUY2;
+	info.video_format = avi_file::FORMAT_YUY2;
 	info.video_timescale = fps_times_1million / interlace_factor;
 	info.video_sampletime = 1000000;
 	info.video_width = width;

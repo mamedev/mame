@@ -38,8 +38,8 @@ advertisements, but box and manual still simply name it Checker Challenger.
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_acr.lh" // clickable
-#include "fidel_cc10.lh" // clickable
+#include "fidel_acr.lh"
+#include "fidel_cc10.lh"
 
 
 namespace {
@@ -114,8 +114,6 @@ void ccx_state::machine_start()
 /*******************************************************************************
     I/O
 *******************************************************************************/
-
-// I8255 PPI
 
 void ccx_state::update_display()
 {

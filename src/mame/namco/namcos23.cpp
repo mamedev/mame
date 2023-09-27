@@ -120,7 +120,7 @@ c8000000:
         motoxgo(all)        Inputs don't respond at all. Hardlocks shortly in atract mode.
         downhill            Freeze with black screen after POST.
         downhillu           Heavy gfx glitches. Missing rotary inputs. Random freezes.
-        timecrs2(all)       Playable with some gfx glitches up until stage 1-2 (see sub_comm_r).
+        timecrs2(all)       Playable with some gfx glitches
         panicprk,j,j2       Freezes during 'SUB-READY WAIT' after POST (see sub_comm_r).
         gunwars,a           Hardlocks after POST (gmen related?).
         raceon              Hardlocks after POST (gmen related?).
@@ -1451,7 +1451,7 @@ It can also be used with Final Furlong when wired correctly.
 #include "cpu/h8/h83002.h"
 #include "cpu/h8/h83337.h"
 #include "cpu/mips/mips3.h"
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh7604.h"
 #include "namco_settings.h"
 #include "machine/nvram.h"
 #include "machine/rtc4543.h"
@@ -1764,7 +1764,7 @@ private:
 	required_shared_ptr<uint32_t> m_charram;
 	required_shared_ptr<uint32_t> m_textram;
 	optional_shared_ptr<uint32_t> m_czattr;
-	optional_device<cpu_device> m_gmen_sh2;
+	optional_device<sh2_sh7604_device> m_gmen_sh2;
 	optional_shared_ptr<uint32_t> m_gmen_sh2_shared;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_ioport m_lightx;
@@ -3073,7 +3073,7 @@ void namcos23_state::mcuen_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	default:
 		// For some reason, the main program write the high 16bits of the
 		// 32 bits words of itself there...
-		//      logerror("mcuen_w: mask %04x, data %04x @ %x\n", mem_mask, data, offset);
+		//logerror("mcuen_w: mask %04x, data %04x @ %x\n", mem_mask, data, offset);
 		break;
 	}
 }
@@ -3082,7 +3082,6 @@ void namcos23_state::mcuen_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 // C?? (unknown comms)
 
 // while getting the subcpu to be ready, panicprk sits in a tight loop waiting for this AND 0002 to be non-zero (at PC=BFC02F00)
-// timecrs2 locks up in a similar way as panicprk, at the beginning of the 2nd level, by reading/writing to this register a couple of times
 uint16_t namcos23_state::sub_comm_r(offs_t offset)
 {
 	// status register
@@ -3314,7 +3313,7 @@ void namcos23_state::s23h8rwmap(address_map &map)
 	map(0x300000, 0x300003).noprw(); // seems to be more inputs, maybe false leftover code from System 12?
 	map(0x300010, 0x300011).noprw();
 	map(0x300020, 0x300021).w(FUNC(namcos23_state::sub_interrupt_main_w));
-	map(0x300030, 0x300031).nopw();    // timecrs2 writes this when writing to the sync shared ram location, motoxgo doesn't
+	map(0x300030, 0x300031).nopw(); // timecrs2 writes this when writing to the sync shared ram location, motoxgo doesn't
 }
 
 
@@ -3547,7 +3546,7 @@ static INPUT_PORTS_START( finfurl )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Whip Button R")
 
 	PORT_MODIFY("ADC0")
-	PORT_BIT( 0x3ff, 0x0200, IPT_AD_STICK_Y )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Swing")
+	PORT_BIT( 0x3ff, 0x0200, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Swing")
 
 	PORT_MODIFY("ADC1")
 	PORT_BIT( 0x3ff, 0x0200, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Handle") PORT_REVERSE
@@ -3982,7 +3981,7 @@ void namcos23_state::gmen(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos23_state::gmen_mips_map);
 
-	SH2(config, m_gmen_sh2, XTAL(28'700'000));
+	SH2_SH7604(config, m_gmen_sh2, XTAL(28'700'000));
 	m_gmen_sh2->set_addrmap(AS_PROGRAM, &namcos23_state::gmen_sh2_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(namcos23_state,gmen)

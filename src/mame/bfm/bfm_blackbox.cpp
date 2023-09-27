@@ -1485,7 +1485,7 @@ static INPUT_PORTS_START( bb_upndn )
 
 	PORT_MODIFY("PERCENTAGE")
 	PORT_DIPNAME( 0x03, 0x01, "Nudge chance" )
-	PORT_DIPSETTING(    0x00, "Low (4.69%)" )
+	PORT_DIPSETTING(    0x00, "Low (6.25%)" )
 	PORT_DIPSETTING(    0x01, "High (7.81%)" )
 INPUT_PORTS_END
 
@@ -1666,7 +1666,7 @@ void blackbox_base_state::blackbox_base(machine_config &config)
 	m_irq_timer->set_start_delay(attotime::from_msec(1));
 	TIMER(config, m_chute_timer).configure_generic(FUNC(blackbox_base_state::toggle_50p_chute));
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(blackbox_base_state::pia_porta_w));
 	m_pia->readpb_handler().set(FUNC(blackbox_base_state::pia_portb_r));
 	m_pia->writepb_handler().set(FUNC(blackbox_base_state::pia_portb_w));
@@ -1914,4 +1914,4 @@ GAMEL(1981,  bb_cjack,  bb_firec,  blackbox_em_opto_aux,    bb_cjack,  blackbox_
 GAMEL(1981?, bb_fiest,  bb_firec,  blackbox_em_opto_aux,    bb_fiest,  blackbox_em_opto_aux_state, empty_init, ROT0, "Associated Leisure", u8"Fiesta (Associated Leisure) (Black Box) (2p Stake, £1/£2 Jackpot)", GAME_FLAGS|MACHINE_IMPERFECT_SOUND, layout_bb_fiest ) // £1/2p rebuild of Fire Cracker
 GAMEL(1981,  bb_oal,    0,         blackbox_em_opto_music,  bb_oal,    blackbox_em_opto_music_state, empty_init, ROT0, "BFM", u8"Oranges And Lemons (Bellfruit) (Black Box) (10p Stake, £2 Jackpot)", GAME_FLAGS, layout_bb_oal )
 // Club
-GAMEL(1984,  bb_gspin,  0,         blackbox_em_opto_club,   bb_gspin,  blackbox_em_opto_club_state, empty_init, ROT0, "BWB", u8"Golden Spin (BWB) (Black Box) (MK1.5, 5p Stake, £50 Jackpot)", GAME_FLAGS|MACHINE_IMPERFECT_SOUND, layout_bb_gspin ) // Rebuild of Valentine
+GAMEL(1984,  bb_gspin,  0,         blackbox_em_opto_club,   bb_gspin,  blackbox_em_opto_club_state, empty_init, ROT0, "BWB", u8"Golden Spin (BWB) (Black Box) (MK1.5, 5p Stake, £50 Jackpot)", GAME_FLAGS|MACHINE_IMPERFECT_SOUND, layout_bb_gspin ) // Conversion of Valentine

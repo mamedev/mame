@@ -72,6 +72,7 @@ To summarize, known MCU chip ROM serials+year:
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mcs48/mcs48.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
@@ -83,9 +84,9 @@ To summarize, known MCU chip ROM serials+year:
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_gambit.lh" // clickable
-#include "fidel_msc_v2.lh" // clickable
-#include "fidel_sc6.lh" // clickable
+#include "fidel_gambit.lh"
+#include "fidel_msc_v2.lh"
+#include "fidel_sc6.lh"
 
 
 namespace {
@@ -153,8 +154,6 @@ void sc6_state::machine_start()
 /*******************************************************************************
     I/O
 *******************************************************************************/
-
-// MCU ports/generic
 
 void sc6_state::update_display()
 {

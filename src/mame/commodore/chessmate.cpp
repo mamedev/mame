@@ -51,9 +51,9 @@ MOS MPS 6332 005 2179
 #include "speaker.h"
 
 // internal artwork
-#include "chessmate.lh" // clickable
-#include "novag_mk2.lh" // clickable
-#include "novag_mk2a.lh" // clickable
+#include "chessmate.lh"
+#include "novag_mk2.lh"
+#include "novag_mk2a.lh"
 
 
 namespace {

@@ -320,7 +320,7 @@ protected:
 		, m_control(0)
 	{ }
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_post_load() override;
 
@@ -597,7 +597,7 @@ protected:
 		, m_control(0)
 	{ }
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_post_load() override;
 
@@ -731,7 +731,7 @@ protected:
 		, m_control(0)
 	{ }
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_post_load() override;
 
@@ -849,7 +849,7 @@ public:
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override { }
 	virtual void device_add_mconfig(machine_config &config) override
 	{
@@ -892,7 +892,7 @@ public:
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_post_load() override;
@@ -1043,7 +1043,7 @@ public:
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_post_load() override;
@@ -1196,7 +1196,7 @@ public:
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_post_load() override;
@@ -1299,7 +1299,7 @@ public:
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_post_load() override;

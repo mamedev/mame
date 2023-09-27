@@ -364,10 +364,11 @@ std::error_condition rom_load_manager::set_disk_handle(std::string_view region, 
     from SYSTEM_BIOS structure and OPTION_BIOS
 -------------------------------------------------*/
 
-void rom_load_manager::determine_bios_rom(device_t &device, const char *specbios)
+void rom_load_manager::determine_bios_rom(device_t &device, std::string_view specbios)
 {
 	// default is applied by the device at config complete time
-	if (specbios && *specbios && core_stricmp(specbios, "default"))
+	using namespace std::literals;
+	if (!specbios.empty() && !util::streqlower(specbios, "default"sv))
 	{
 		bool found(false);
 		for (const rom_entry &rom : device.rom_region_vector())
@@ -376,11 +377,9 @@ void rom_load_manager::determine_bios_rom(device_t &device, const char *specbios
 			{
 				char const *const biosname = ROM_GETNAME(&rom);
 				int const bios_flags = ROM_GETBIOSFLAGS(&rom);
-				char bios_number[20];
 
 				// Allow '-bios n' to still be used
-				sprintf(bios_number, "%d", bios_flags - 1);
-				if (!core_stricmp(bios_number, specbios) || !core_stricmp(biosname, specbios))
+				if (specbios == std::to_string(bios_flags - 1) || util::streqlower(specbios, biosname))
 				{
 					found = true;
 					device.set_system_bios(bios_flags);
@@ -1470,7 +1469,7 @@ rom_load_manager::rom_load_manager(running_machine &machine)
 					card_bios.erase(found);
 				}
 			}
-			determine_bios_rom(device, specbios.c_str());
+			determine_bios_rom(device, specbios);
 		}
 	}
 

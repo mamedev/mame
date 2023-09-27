@@ -28,12 +28,12 @@ license:CC0-1.0
 <!-- define elements -->
 
 	<element name="led" defstate="0">
-		<disk state="0">
-			<color red="0.20" green="0.0" blue="0.0" />
-		</disk>
-		<disk state="1">
-			<color red="1" green="0.1" blue="0.1" />
-		</disk>
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
+	</element>
+	<element name="led2" defstate="0">
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="0.17" green="0.015" blue="0.02" /></disk>
 	</element>
 	<element name="hlb" defstate="0">
 		<rect state="0">
@@ -66,15 +66,15 @@ license:CC0-1.0
 	<element name="text_f"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect>    <text string="F"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
 	<element name="text_g"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect>    <text string="G"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
 	<element name="text_h"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect>    <text string="H"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_trn">       <rect><color red="0" green="0" blue="0" /></rect>             <text string="TRN">                  <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_info">      <rect><color red="0" green="0" blue="0" /></rect>             <text string="INFO">                 <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_mem">       <rect><color red="0" green="0" blue="0" /></rect>             <text string="MEM">                  <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_pos">       <rect><color red="0" green="0" blue="0" /></rect>             <text string="POS">                  <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_lev">       <rect><color red="0" green="0" blue="0" /></rect>             <text string="LEV">                  <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_fct">       <rect><color red="0" green="0" blue="0" /></rect>             <text string="FCT">                  <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_ent">       <rect><color red="0" green="0" blue="0" /></rect>             <text string="ENT">                  <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_cl">        <rect><color red="0" green="0" blue="0" /></rect>             <text string="CL">                   <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_lcd">       <rect><color red="0" green="0" blue="0" /></rect>             <text string="GRAPHIC DISPLAY MODUL"><color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_trn">  <text string="TRN">                <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_info"> <text string="INFO">               <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_mem">  <text string="MEM">                <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_pos">  <text string="POS">                <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_lev">  <text string="LEV">                <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_fct">  <text string="FCT">                <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_ent">  <text string="ENT">                <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_cl">   <text string="CL">                 <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_lcd">  <text string="8 BIT DISPLAY MODUL"><color red="0.76" green="0.74" blue="0.41" /></text> </element>
 
 	<element name="static_lcd"><rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect></element>
 	<element name="yellow_mask"><rect><color red="0.76" green="0.74" blue="0.41" /></rect></element>
@@ -412,14 +412,14 @@ license:CC0-1.0
 		<element ref="text_p1">           <bounds x="55.25" y="5.55" width="2" height="2" /></element>
 		<element ref="yellow_mask" blend="multiply"><bounds x="30" y="5.51" width="28" height="2.2" /></element>
 
-		<element ref="text_lcd"><bounds x="1" y="0.5" width="24.5" height="1.5" /></element>
+		<element ref="text_lcd"><bounds x="1" y="1" width="24.5" height="1.2" /></element>
 
-		<element name="led100" ref="led">     <bounds x="29.1" y="1" width="1.3" height="1.3" />    </element>
-		<element name="led101" ref="led">     <bounds x="34.1" y="1" width="1.3" height="1.3" />    </element>
-		<element name="led102" ref="led">     <bounds x="39.1" y="1" width="1.3" height="1.3" />    </element>
-		<element name="led103" ref="led">     <bounds x="44.1" y="1" width="1.3" height="1.3" />    </element>
-		<element name="led104" ref="led">     <bounds x="49.1" y="1" width="1.3" height="1.3" />    </element>
-		<element name="led105" ref="led">     <bounds x="54.1" y="1" width="1.3" height="1.3" />    </element>
+		<element name="led100" ref="led2">     <bounds x="29.1" y="1" width="1.3" height="1.3" />    </element>
+		<element name="led101" ref="led2">     <bounds x="34.1" y="1" width="1.3" height="1.3" />    </element>
+		<element name="led102" ref="led2">     <bounds x="39.1" y="1" width="1.3" height="1.3" />    </element>
+		<element name="led103" ref="led2">     <bounds x="44.1" y="1" width="1.3" height="1.3" />    </element>
+		<element name="led104" ref="led2">     <bounds x="49.1" y="1" width="1.3" height="1.3" />    </element>
+		<element name="led105" ref="led2">     <bounds x="54.1" y="1" width="1.3" height="1.3" />    </element>
 
 		<element ref="text_trn">          <bounds x="30.5" y="1" width="2.5" height="1.2" />  </element>
 		<element ref="text_info">         <bounds x="35.5" y="1" width="2.5" height="1.2" />  </element>

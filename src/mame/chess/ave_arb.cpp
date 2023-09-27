@@ -56,7 +56,7 @@ TODO:
 #include "softlist_dev.h"
 
 // internal artwork
-#include "ave_arb.lh" // clickable
+#include "ave_arb.lh"
 
 
 namespace {
@@ -150,13 +150,15 @@ void arb_state::init_board(int state)
 {
 	// different board setup for checkers
 	if (m_altboard)
+	{
 		for (int i = 0; i < 12; i++)
 		{
 			m_board->write_piece((i % 4) * 2 + ((i / 4) & 1), i / 4, 13); // white
 			m_board->write_piece((i % 4) * 2 + (~(i / 4) & 1), i / 4 + 5, 14); // black
 		}
+	}
 	else
-		m_board->preset_chess(state);
+		m_board->preset_chess();
 }
 
 

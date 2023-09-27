@@ -44,7 +44,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_simultano.lh" // clickable
+#include "saitek_simultano.lh"
 
 
 namespace {

@@ -215,7 +215,7 @@ DEFINE_DEVICE_TYPE(SONYPS2_IOP, iop_device,       "sonyiop", "Sony Playstation 2
 
 ALLOW_SAVE_TYPE(mips1core_device_base::branch_state);
 
-mips1core_device_base::mips1core_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size)
+mips1core_device_base::mips1core_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size, bool cache_pws)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config_be("program", ENDIANNESS_BIG, 32, 32)
 	, m_program_config_le("program", ENDIANNESS_LITTLE, 32, 32)
@@ -225,69 +225,70 @@ mips1core_device_base::mips1core_device_base(machine_config const &mconfig, devi
 	, m_icache(icache_size)
 	, m_dcache(dcache_size)
 	, m_cache((icache_size && dcache_size) ? CACHED : UNCACHED)
+	, m_cache_pws(cache_pws)
 	, m_in_brcond(*this, 0)
 {
 }
 
-mips1_device_base::mips1_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size)
-	: mips1core_device_base(mconfig, type, tag, owner, clock, cpurev, icache_size, dcache_size)
+mips1_device_base::mips1_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size, bool cache_pws)
+	: mips1core_device_base(mconfig, type, tag, owner, clock, cpurev, icache_size, dcache_size, cache_pws)
 	, m_fcr0(0)
 {
 }
 
 r2000_device::r2000_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, size_t icache_size, size_t dcache_size)
-	: mips1_device_base(mconfig, R2000, tag, owner, clock, 0x0100, icache_size, dcache_size)
+	: mips1_device_base(mconfig, R2000, tag, owner, clock, 0x0100, icache_size, dcache_size, false)
 {
 }
 
 r2000a_device::r2000a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, size_t icache_size, size_t dcache_size)
-	: mips1_device_base(mconfig, R2000A, tag, owner, clock, 0x0210, icache_size, dcache_size)
+	: mips1_device_base(mconfig, R2000A, tag, owner, clock, 0x0210, icache_size, dcache_size, false)
 {
 }
 
 r3000_device::r3000_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, size_t icache_size, size_t dcache_size)
-	: mips1_device_base(mconfig, R3000, tag, owner, clock, 0x0220, icache_size, dcache_size)
+	: mips1_device_base(mconfig, R3000, tag, owner, clock, 0x0220, icache_size, dcache_size, false)
 {
 }
 
 r3000a_device::r3000a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, size_t icache_size, size_t dcache_size)
-	: mips1_device_base(mconfig, R3000A, tag, owner, clock, 0x0230, icache_size, dcache_size)
+	: mips1_device_base(mconfig, R3000A, tag, owner, clock, 0x0230, icache_size, dcache_size, false)
 {
 }
 
 r3041_device::r3041_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: mips1core_device_base(mconfig, R3041, tag, owner, clock, 0x0700, 2048, 512)
+	: mips1core_device_base(mconfig, R3041, tag, owner, clock, 0x0700, 2048, 512, true)
 {
 }
 
 r3051_device::r3051_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: mips1core_device_base(mconfig, R3051, tag, owner, clock, 0x0200, 4096, 2048)
+	: mips1core_device_base(mconfig, R3051, tag, owner, clock, 0x0200, 4096, 2048, true)
 {
 }
 
 r3052_device::r3052_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: mips1core_device_base(mconfig, R3052, tag, owner, clock, 0x0200, 8192, 2048)
+	: mips1core_device_base(mconfig, R3052, tag, owner, clock, 0x0200, 8192, 2048, true)
 {
 }
 
 r3052e_device::r3052e_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: mips1_device_base(mconfig, R3052E, tag, owner, clock, 0x0200, 8192, 2048)
+	: mips1_device_base(mconfig, R3052E, tag, owner, clock, 0x0200, 8192, 2048, true)
 {
 }
 
 r3071_device::r3071_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, size_t icache_size, size_t dcache_size)
-	: mips1_device_base(mconfig, R3071, tag, owner, clock, 0x0200, icache_size, dcache_size)
+	: mips1_device_base(mconfig, R3071, tag, owner, clock, 0x0200, icache_size, dcache_size, true)
 {
 }
 
 r3081_device::r3081_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, size_t icache_size, size_t dcache_size)
-	: mips1_device_base(mconfig, R3081, tag, owner, clock, 0x0200, icache_size, dcache_size)
+	: mips1_device_base(mconfig, R3081, tag, owner, clock, 0x0200, icache_size, dcache_size, true)
 {
 	set_fpu(0x0300);
 }
 
 iop_device::iop_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: mips1core_device_base(mconfig, SONYPS2_IOP, tag, owner, clock, 0x001f, 4096, 1024)
+	: mips1core_device_base(mconfig, SONYPS2_IOP, tag, owner, clock, 0x001f, 4096, 1024, false)
 {
 	m_endianness = ENDIANNESS_LITTLE;
 }
@@ -1268,6 +1269,9 @@ std::tuple<struct mips1core_device_base::cache::line &, bool> mips1core_device_b
 	// select line within cache based on low address bits
 	struct cache::line &l = c.line[(address & (c.size - 1)) >> 2];
 
+	// clear cache parity error
+	SR &= ~SR_PE;
+
 	// compare cache line tag against upper address bits and line valid bit
 	bool const miss = (l.tag ^ address) & (-c.size | cache::line::INV);
 
@@ -1354,7 +1358,7 @@ template <typename T, bool Aligned, typename U> std::enable_if_t<std::is_convert
 	{
 		// when isolated, loads always hit the cache and the status register
 		// CM flag reflects the actual hit/miss state
-		auto [l, miss] = cache_lookup(address, false);
+		auto [l, miss] = cache_lookup(address & ~0xe000'0000, false);
 
 		if (miss)
 			SR |= SR_CM;
@@ -1390,15 +1394,30 @@ template <typename T, bool Aligned> void mips1core_device_base::store(u32 addres
 		{
 			auto [l, miss] = cache_lookup(address, sizeof(T) == 4);
 
-			if (!miss)
+			// cached full word stores always update the cache
+			if constexpr (Aligned && sizeof(T) == 4)
+				l.update(data);
+			else if (!miss)
 			{
-				unsigned const shift = shift_factor<T>(address);
+				if (!m_cache_pws)
+				{
+					// reload the cache line from memory
+					u32 const data = space(AS_PROGRAM).read_dword(address);
+					if (m_bus_error)
+					{
+						m_bus_error = false;
+						generate_exception(EXCEPTION_BUSDATA);
 
+						return;
+					}
+
+					l.update(data);
+				}
+
+				// merge data into the cache
+				unsigned const shift = shift_factor<T>(address);
 				l.update(u32(data) << shift, u32(mem_mask) << shift);
 			}
-			else if constexpr (Aligned && sizeof(T) == 4)
-				// only full word stores update the cache after a miss
-				l.update(data, mem_mask);
 		}
 
 		// uncached or write-through store
@@ -1413,7 +1432,7 @@ template <typename T, bool Aligned> void mips1core_device_base::store(u32 addres
 	{
 		// when isolated, full word stores update the cache, while partial word
 		// stores invalidate the cache line
-		auto [l, miss] = cache_lookup(address, true);
+		auto [l, miss] = cache_lookup(address & ~0xe000'0000, true);
 
 		if constexpr (Aligned && sizeof(T) == 4)
 			l.update(data, mem_mask);
@@ -1828,7 +1847,15 @@ void mips1_device_base::handle_cop1(u32 const op)
 				set_cop1_reg(FDREG >> 1, f32_to_f64(float32_t{ u32(m_f[FSREG >> 1]) }).v);
 				break;
 			case 0x24: // CVT.W.S
-				set_cop1_reg(FDREG >> 1, f32_to_i32(float32_t{ u32(m_f[FSREG >> 1]) }, softfloat_roundingMode, true));
+				if (BIT(m_f[FSREG >> 1], 23, 8) == 0xff)
+				{
+					// +/- infinity or NaN
+					m_fcr31 &= ~FCR31_CM;
+					m_fcr31 |= FCR31_CE;
+					execute_set_input(m_fpu_irq, ASSERT_LINE);
+				}
+				else
+					set_cop1_reg(FDREG >> 1, f32_to_i32(float32_t{ u32(m_f[FSREG >> 1]) }, softfloat_roundingMode, true));
 				break;
 
 			case 0x30: // C.F.S (false)
@@ -2012,7 +2039,15 @@ void mips1_device_base::handle_cop1(u32 const op)
 				set_cop1_reg(FDREG >> 1, f64_to_f32(float64_t{ m_f[FSREG >> 1] }).v);
 				break;
 			case 0x24: // CVT.W.D
-				set_cop1_reg(FDREG >> 1, f64_to_i32(float64_t{ m_f[FSREG >> 1] }, softfloat_roundingMode, true));
+				if (BIT(m_f[FSREG >> 1], 52, 11) == 0x7ff)
+				{
+					// +/- infinity or NaN
+					m_fcr31 &= ~FCR31_CM;
+					m_fcr31 |= FCR31_CE;
+					execute_set_input(m_fpu_irq, ASSERT_LINE);
+				}
+				else
+					set_cop1_reg(FDREG >> 1, f64_to_i32(float64_t{ m_f[FSREG >> 1] }, softfloat_roundingMode, true));
 				break;
 
 			case 0x30: // C.F.D (false)

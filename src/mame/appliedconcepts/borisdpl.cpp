@@ -23,7 +23,7 @@ is the same as SL90259.
 #include "video/pwm.h"
 
 // internal artwork
-#include "aci_borisdpl.lh" // clickable
+#include "aci_borisdpl.lh"
 
 
 namespace {

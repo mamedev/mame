@@ -21,7 +21,7 @@ assumed to be an unlicensed clone.
 #include "screen.h"
 
 // internal artwork
-#include "mchess.lh" // clickable
+#include "mchess.lh"
 
 
 namespace {

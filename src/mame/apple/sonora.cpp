@@ -10,15 +10,19 @@
     - A full VIA (VIA1) and a "pseudo-VIA", which is basically a combination GPIO and
       interrupt controller that looks somewhat like a VIA with no timers and no shift register.
     - A SWIM2 floppy controller
-    - An ASC-like 4-channel audio controller
-    - 16/25 MHz CPU clock generator
+    - An EASC-like 4-channel audio controller
+    - A 16/25/33 MHz CPU clock generator
     - Support logic for various external subsystems (ADB, PDS, SCC, SCSI, SONIC)
 
-    The "Ardbeg" ASIC (LC 520) appears to be a modest update of Sonora, adding support for
-    pushbuttons controlling display brightness and sound volume, plus monitor power saver mode.
-    "Prime Time" (LC 475/575 and Quadra 605) adapts the peripheral section of Sonora to the
-    68040 bus, but omits the DRAM and video controllers.  "Prime Time II" is similar but adds
-    an ATA controller.
+    The "Ardbeg" ASIC (LC 520) is a modest update of Sonora, adding support for pushbuttons
+    controlling display brightness and sound volume, plus monitor power saver mode and PWM
+    outputs for software control of the display brightness and contrast.
+
+    Macintosh TV has a Sonora/Ardbeg derivative called "Tinker Bell" which adds video
+    overlay support.
+
+    Sonora was succeeded for 68040 machines by IOSB, PrimeTime, and PrimeTime II, with similar
+    functionality but became pure I/O hubs with no memory controller or video.
 
     Sonora's video controller is in some of the PowerMac chipsets as well.
 */
@@ -63,7 +67,7 @@ void sonora_device::map(address_map &map)
 void sonora_device::device_add_mconfig(machine_config &config)
 {
 	MAC_VIDEO_SONORA(config, m_video);
-	m_video->screen_vblank().set(FUNC(sonora_device::vbl_w));
+	m_video->screen_vblank().set(FUNC(sonora_device::slot_irq_w<0x40>));
 
 	R65NC22(config, m_via1, C7M / 10);
 	m_via1->readpa_handler().set(FUNC(sonora_device::via_in_a));
@@ -175,7 +179,7 @@ void sonora_device::device_reset()
 u32 sonora_device::rom_switch_r(offs_t offset)
 {
 	// disable the overlay
-	if (m_overlay)
+	if (m_overlay && !machine().side_effects_disabled())
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 		const u32 memory_end = m_ram_size - 1;
@@ -283,20 +287,28 @@ void sonora_device::scc_irq_w(int state)
 	field_interrupts();
 }
 
-void sonora_device::vbl_w(int state)
+template <u8 mask>
+void sonora_device::slot_irq_w(int state)
 {
-	if (!state)
+	if (state)
 	{
-		return;
+		m_pseudovia_regs[2] &= ~mask;
+	}
+	else
+	{
+		m_pseudovia_regs[2] |= mask;
 	}
 
-	m_pseudovia_regs[2] &= ~0x40; // set vblank signal
-
-	if (m_pseudovia_regs[0x12] & 0x40)
-	{
-		pseudovia_recalc_irqs();
-	}
+	pseudovia_recalc_irqs();
 }
+
+template void sonora_device::slot_irq_w<0x40>(int state);
+template void sonora_device::slot_irq_w<0x20>(int state);
+template void sonora_device::slot_irq_w<0x10>(int state);
+template void sonora_device::slot_irq_w<0x08>(int state);
+template void sonora_device::slot_irq_w<0x04>(int state);
+template void sonora_device::slot_irq_w<0x02>(int state);
+template void sonora_device::slot_irq_w<0x01>(int state);
 
 void sonora_device::asc_irq(int state)
 {

@@ -9,24 +9,55 @@ with: PAC2 BACKUP DATA. We only store the raw sram contents.
 
 #include "emu.h"
 #include "fmpac.h"
+
+#include "sound/ymopl.h"
+
 #include "speaker.h"
 
-DEFINE_DEVICE_TYPE(MSX_CART_FMPAC, msx_cart_fmpac_device, "msx_cart_fmpac", "MSX Cartridge - FM-PAC")
 
+namespace {
 
-msx_cart_fmpac_device::msx_cart_fmpac_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_FMPAC, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_ym2413(*this, "ym2413")
-	, m_rombank(*this, "rombank")
-	, m_view(*this, "view")
-	, m_sram_active(false)
-	, m_opll_active(false)
-	, m_sram_unlock{0, 0}
-	, m_control(0)
+class msx_cart_fmpac_device : public device_t, public msx_cart_interface
 {
-}
+public:
+	msx_cart_fmpac_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_FMPAC, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_ym2413(*this, "ym2413")
+		, m_rombank(*this, "rombank")
+		, m_view(*this, "view")
+		, m_sram_active(false)
+		, m_opll_active(false)
+		, m_sram_unlock{0, 0}
+		, m_control(0)
+	{ }
 
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	void write_ym2413(offs_t offset, u8 data);
+	void sram_unlock(offs_t offset, u8 data);
+	u8 control_r();
+	void control_w(u8 data);
+	u8 bank_r();
+	void bank_w(u8 data);
+
+	required_device<ym2413_device> m_ym2413;
+	memory_bank_creator m_rombank;
+	memory_view m_view;
+
+	bool m_sram_active;
+	bool m_opll_active;
+	u8 m_sram_unlock[2];
+	u8 m_control;
+};
 
 void msx_cart_fmpac_device::device_add_mconfig(machine_config &config)
 {
@@ -34,7 +65,6 @@ void msx_cart_fmpac_device::device_add_mconfig(machine_config &config)
 	if (parent_slot())
 		m_ym2413->add_route(ALL_OUTPUTS, soundin(), 0.8);
 }
-
 
 void msx_cart_fmpac_device::device_start()
 {
@@ -142,3 +172,7 @@ void msx_cart_fmpac_device::write_ym2413(offs_t offset, u8 data)
 		m_ym2413->write(offset & 1, data);
 	}
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_FMPAC, msx_cart_interface, msx_cart_fmpac_device, "msx_cart_fmpac", "MSX Cartridge - FM-PAC")

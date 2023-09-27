@@ -36,22 +36,18 @@ license:CC0-1.0
 		</led16segsc>
 	</element>
 	<element name="led" defstate="0">
-		<disk state="0">
-			<color red="0.20" green="0.0" blue="0.0" />
-		</disk>
-		<disk state="1">
-			<color red="1.0" green="0.0" blue="0.0" />
-		</disk>
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
 	</element>
 
 	<element name="hlb" defstate="0">
 		<disk state="0">
 			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
-			<color red="0.1" green="0.07" blue="0.05" />
+			<color red="0.3" green="0.2" blue="0.1" />
 		</disk>
 		<disk state="1">
 			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
-			<color red="0.37" green="0.33" blue="0.3" />
+			<color red="0.45" green="0.3" blue="0.15" />
 		</disk>
 	</element>
 

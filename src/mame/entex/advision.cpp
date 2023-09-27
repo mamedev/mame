@@ -15,9 +15,9 @@ Hardware notes:
   right button panels are electronically the same)
 - expansion port (unused)
 
-A game cartridge is basically an EPROM chip wearing a jacket, there is no
-dedicated cartridge slot as is common on other consoles. Only 4 games were
-released in total.
+The cartridge slot is different from what is common on other consoles. A game
+cartridge is basically an EPROM chip wearing a jacket. Only 4 games were released
+in total.
 
 The mirror rotates at around 7Hz, the motor speed is not controlled by software,
 and it differs a bit per console. This can be adjusted after enabling -cheat.
@@ -28,9 +28,6 @@ The display is faked in MAME. On the real thing, the picture is not as stable. T
 width of 150 is specified by the BIOS, but it's possible to update the leds at a
 different rate, hence MAME configures a larger screen. In fact, the homebrew demo
 Code Red doesn't use the BIOS for it, and runs at 50*40 to save some RAM.
-
-It's recommended to leave bilinear filtering on (it's the default for most of
-MAME's video backends).
 
 TODO:
 - EA banking is ugly, it can be turd-polished but the real issue is in mcs48
@@ -63,23 +60,25 @@ namespace {
 class advision_state : public driver_device
 {
 public:
-	advision_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_soundcpu(*this, "soundcpu")
-		, m_dac(*this, "dac")
-		, m_volume(*this, "volume")
-		, m_screen(*this, "screen")
-		, m_mirror_sync(*this, "mirror_sync")
-		, m_led_update(*this, "led_update")
-		, m_led_off(*this, "led_off")
-		, m_cart(*this, "cartslot")
-		, m_ea_bank(*this, "ea_bank")
-		, m_joy(*this, "JOY")
-		, m_conf(*this, "CONF")
+	advision_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"),
+		m_dac(*this, "dac"),
+		m_volume(*this, "volume"),
+		m_screen(*this, "screen"),
+		m_mirror_sync(*this, "mirror_sync"),
+		m_led_update(*this, "led_update"),
+		m_led_off(*this, "led_off"),
+		m_cart(*this, "cartslot"),
+		m_ea_bank(*this, "ea_bank"),
+		m_joy(*this, "JOY"),
+		m_conf(*this, "CONF")
 	{ }
 
 	void advision(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(set_screensize);
 
 protected:
 	virtual void machine_start() override;
@@ -127,7 +126,7 @@ private:
 	u32 m_video_hpos = 0;
 	u8 m_led_output[5] = { };
 	u8 m_led_latch[5] = { };
-	std::unique_ptr<u8 []> m_display;
+	std::unique_ptr<u8[]> m_display;
 
 	memory_region *m_cart_rom = nullptr;
 	std::vector<u8> m_ext_ram;
@@ -141,31 +140,36 @@ private:
     Video
 *******************************************************************************/
 
+INPUT_CHANGED_MEMBER(advision_state::set_screensize)
+{
+	// reconfigure screen size when settings changed
+	const int width = 9600 / (m_conf->read() & 0x3f);
+	const int height = 40 * 4 + 3 - (m_conf->read() >> 6 & 3);
+	m_screen->set_visible_area(0, width - 1, 0, height - 1);
+}
+
 u32 advision_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const bool hint_enable = bool(m_conf->read() & 1);
+	u8 led_height = (m_conf->read() >> 6 & 3) + 1;
+
+	bitmap.fill(0, cliprect);
 
 	for (int y = 0; y < 40; y++)
 	{
 		u8 *src = &m_display[y * DISPLAY_WIDTH];
 
-		for (int x = 0; x < DISPLAY_WIDTH; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			int dx = x;
-			int dy = y * 2 + 1;
+			u8 red = src[x] ? 0xff : 0;
+			u8 green = red / 16;
+			u8 blue = red / 12;
 
-			if (cliprect.contains(dx, dy))
+			int dy = y * 4 + (4 - led_height);
+
+			for (int i = 0; i < led_height; i++)
 			{
-				u8 red = src[x] ? 0xff : 0;
-
-				// do some horizontal interpolation
-				if (hint_enable && red == 0 && dx > 0)
-					red = (bitmap.pix(dy, dx - 1) >> 16 & 0xff) * 0.75;
-
-				u8 green = red / 16;
-				u8 blue = red / 12;
-
-				bitmap.pix(dy, dx) = red << 16 | green << 8 | blue;
+				if (cliprect.contains(x, dy))
+					bitmap.pix(dy + i, x) = red << 16 | green << 8 | blue;
 			}
 		}
 	}
@@ -198,7 +202,7 @@ void advision_state::av_control_w(u8 data)
 
 void advision_state::vblank(int state)
 {
-	if (!state && (m_screen->frame_number() & 3) == 0)
+	if (state && (m_screen->frame_number() & 3) == 0)
 	{
 		// starting a new frame
 		std::fill_n(m_display.get(), DISPLAY_WIDTH * 40, 0);
@@ -226,7 +230,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(advision_state::led_update)
 	{
 		// for official games, 1 'pixel' is 60us, but there are two spots that have
 		// a longer duration: at x=50 and x=100 (see BTANB note about seams)
-		m_led_update->adjust(attotime::from_usec(10));
+		m_led_update->adjust(attotime::from_usec(m_conf->read() & 0x3f));
 		m_video_hpos++;
 	}
 }
@@ -353,9 +357,18 @@ static INPUT_PORTS_START( advision )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 
 	PORT_START("CONF")
-	PORT_CONFNAME( 0x01, 0x01, "H Interpolation" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_CONFNAME( 0x3f, 20, "Screen Width" ) PORT_CHANGED_MEMBER(DEVICE_SELF, advision_state, set_screensize, 0) // factors of 60
+	PORT_CONFSETTING(    60, "160" )
+	PORT_CONFSETTING(    30, "320" )
+	PORT_CONFSETTING(    20, "480" )
+	PORT_CONFSETTING(    15, "640" )
+	PORT_CONFSETTING(    12, "800" )
+	PORT_CONFSETTING(    10, "960" )
+	PORT_CONFNAME( 0xc0, 0x80, "LED Height" ) PORT_CHANGED_MEMBER(DEVICE_SELF, advision_state, set_screensize, 0)
+	PORT_CONFSETTING(    0x00, "25%" )
+	PORT_CONFSETTING(    0x40, "50%" )
+	PORT_CONFSETTING(    0x80, "75%" )
+	PORT_CONFSETTING(    0xc0, "100%" )
 INPUT_PORTS_END
 
 
@@ -414,7 +427,7 @@ void advision_state::machine_reset()
 void advision_state::advision(machine_config &config)
 {
 	// basic machine hardware
-	I8048(config, m_maincpu, XTAL(11'000'000));
+	I8048(config, m_maincpu, 11_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &advision_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &advision_state::io_map);
 	m_maincpu->p1_in_cb().set(FUNC(advision_state::controller_r));
@@ -430,10 +443,10 @@ void advision_state::advision(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(4*14); // see notes
+	m_screen->set_refresh_hz(4 * 14); // see notes
 	m_screen->set_vblank_time(0);
-	m_screen->set_size(960, 40 * 2 + 1);
-	m_screen->set_visarea_full();
+	m_screen->set_size(960, 40 * 4 + 4);
+	m_screen->set_visarea(0, 480 - 1, 0, 40 * 4 - 0); // default setting
 	m_screen->set_screen_update(FUNC(advision_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(advision_state::vblank));
 
@@ -459,13 +472,13 @@ void advision_state::advision(machine_config &config)
 
 ROM_START( advision )
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "b225__ins8048-11kdp_n.u5", 0x000, 0x400, CRC(279e33d1) SHA1(bf7b0663e9125c9bfb950232eab627d9dbda8460) ) // "<natsemi logo> /B225 \\ INS8048-11KDP/N"
+	ROM_LOAD( "ins8048-11kdp_n.u5", 0x000, 0x400, CRC(279e33d1) SHA1(bf7b0663e9125c9bfb950232eab627d9dbda8460) ) // "<natsemi logo> /B8225 \\ INS8048-11KDP/N"
 
 	ROM_REGION( 0x200, "soundcpu", 0 )
-	ROM_LOAD( "b8223__cop411l-kcn_n.u8", 0x000, 0x200, CRC(81e95975) SHA1(8b6f8c30dd3e9d8e43f1ea20fba2361b383790eb) ) // "<natsemi logo> /B8223 \\ COP411L-KCN/N"
+	ROM_LOAD( "cop411l-kcn_n.u8", 0x000, 0x200, CRC(81e95975) SHA1(8b6f8c30dd3e9d8e43f1ea20fba2361b383790eb) ) // "<natsemi logo> /B8223 \\ COP411L-KCN/N"
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 

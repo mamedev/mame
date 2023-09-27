@@ -97,7 +97,7 @@ void v8_device::device_add_mconfig(machine_config &config)
 	m_screen->set_size(1024, 768);
 	m_screen->set_visarea(0, 640 - 1, 0, 480 - 1);
 	m_screen->set_screen_update(FUNC(v8_device::screen_update));
-	m_screen->screen_vblank().set(FUNC(v8_device::vbl_w));
+	m_screen->screen_vblank().set(FUNC(v8_device::slot_irq_w<0x40>));
 	config.set_default_layout(layout_monitors);
 
 	PALETTE(config, m_palette).set_entries(256);
@@ -213,7 +213,7 @@ void v8_device::device_reset()
 u32 v8_device::rom_switch_r(offs_t offset)
 {
 	// disable the overlay
-	if (m_overlay)
+	if (m_overlay && !machine().side_effects_disabled())
 	{
 		ram_size(0xc0); // full SIMM, full 4MB onboard
 		m_overlay = false;
@@ -308,20 +308,28 @@ void v8_device::scc_irq_w(int state)
 	field_interrupts();
 }
 
-void v8_device::vbl_w(int state)
+template <u8 mask>
+void v8_device::slot_irq_w(int state)
 {
-	if (!state)
+	if (state)
 	{
-		return;
+		m_pseudovia_regs[2] &= ~mask;
+	}
+	else
+	{
+		m_pseudovia_regs[2] |= mask;
 	}
 
-	m_pseudovia_regs[2] &= ~0x40; // set vblank signal
-
-	if (m_pseudovia_regs[0x12] & 0x40)
-	{
-		pseudovia_recalc_irqs();
-	}
+	pseudovia_recalc_irqs();
 }
+
+template void v8_device::slot_irq_w<0x40>(int state);
+template void v8_device::slot_irq_w<0x20>(int state);
+template void v8_device::slot_irq_w<0x10>(int state);
+template void v8_device::slot_irq_w<0x08>(int state);
+template void v8_device::slot_irq_w<0x04>(int state);
+template void v8_device::slot_irq_w<0x02>(int state);
+template void v8_device::slot_irq_w<0x01>(int state);
 
 void v8_device::asc_irq(int state)
 {
@@ -926,6 +934,7 @@ void spice_device::map(address_map &map)
 	v8_device::map(map);
 
 	map(0x516000, 0x517fff).rw(FUNC(spice_device::swim_r), FUNC(spice_device::swim_w));
+	map(0x518000, 0x518001).w(FUNC(spice_device::bright_contrast_w));
 }
 
 static INPUT_PORTS_START(spice)
@@ -1150,3 +1159,10 @@ void spice_device::via_out_a(u8 data)
 	}
 	m_hdsel = hdsel;
 }
+
+void spice_device::bright_contrast_w(offs_t offset, u8 data)
+{
+	// offset 0 = brightness (0-255)
+	// offset 1 = contrast (0-255)
+}
+

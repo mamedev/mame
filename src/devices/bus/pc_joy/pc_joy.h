@@ -65,10 +65,13 @@ public:
 	virtual uint8_t btn() override { return m_btn->read(); }
 
 protected:
+	pc_basic_joy_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+
 	virtual void device_start() override { }
 
-private:
 	required_ioport m_btn;
+
+private:
 	required_ioport m_x1;
 	required_ioport m_y1;
 	required_ioport m_x2;

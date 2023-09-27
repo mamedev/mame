@@ -93,12 +93,12 @@ Some bugs left :
 #include "amstrad.h"
 
 /* Components */
-#include "machine/i8255.h"  /* for 8255 ppi */
-#include "cpu/z80/z80.h"        /* for cycle tables */
-#include "video/mc6845.h"       /* CRTC */
-#include "machine/upd765.h" /* for floppy disc controller */
+#include "machine/i8255.h"     // for 8255 ppi
+#include "cpu/z80/z80.h"       // for cycle tables
+#include "video/mc6845.h"      // CRTC
+#include "machine/upd765.h"    // for floppy disc controller
 #include "sound/ay8910.h"
-#include "machine/mc146818.h"  /* Aleste RTC */
+#include "machine/mc146818.h"  // Aleste RTC
 #include "bus/centronics/ctronics.h"
 
 /* Devices */
@@ -121,19 +121,11 @@ Some bugs left :
 #define SYSTEM_GX4000 2
 
 
-/* Memory is banked in 16k blocks. However, the multiface
-pages the memory in 8k blocks! The ROM can
-be paged into bank 0 and bank 3. */
+/* Memory is banked in 16k blocks. However, the multiface pages the memory in 8k blocks!
+   The ROM can be paged into bank 0 and bank 3. */
 void amstrad_state::amstrad_mem(address_map &map)
 {
-	map(0x00000, 0x01fff).bankr("bank1").bankw("bank9");
-	map(0x02000, 0x03fff).bankr("bank2").bankw("bank10");
-	map(0x04000, 0x05fff).bankr("bank3").bankw("bank11");
-	map(0x06000, 0x07fff).bankr("bank4").bankw("bank12");
-	map(0x08000, 0x09fff).bankr("bank5").bankw("bank13");
-	map(0x0a000, 0x0bfff).bankr("bank6").bankw("bank14");
-	map(0x0c000, 0x0dfff).bankr("bank7").bankw("bank15");
-	map(0x0e000, 0x0ffff).bankr("bank8").bankw("bank16");
+	map(0x0000, 0xffff).rw(FUNC(amstrad_state::amstrad_cpc_mem_r), FUNC(amstrad_state::amstrad_cpc_mem_w));
 }
 
 /* I've handled the I/O ports in this way, because the ports
@@ -153,9 +145,9 @@ void amstrad_state::amstrad_io(address_map &map)
 
 static INPUT_PORTS_START( amstrad_keyboard )
 	PORT_START("kbrow.0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_UP)          PORT_CODE(KEYCODE_UP)         PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)          PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN)          PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_UP)                 PORT_CODE(KEYCODE_UP)         PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)              PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN)               PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 9")              PORT_CODE(KEYCODE_9_PAD)      PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 6")              PORT_CODE(KEYCODE_6_PAD)      PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 3")              PORT_CODE(KEYCODE_3_PAD)      PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
@@ -163,7 +155,7 @@ static INPUT_PORTS_START( amstrad_keyboard )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad .")              PORT_CODE(KEYCODE_DEL_PAD)    PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
 
 	PORT_START("kbrow.1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)          PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)               PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Copy")                  PORT_CODE(KEYCODE_END)        PORT_CHAR(UCHAR_MAMEKEY(END))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 7")              PORT_CODE(KEYCODE_7_PAD)      PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 8")              PORT_CODE(KEYCODE_8_PAD)      PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
@@ -343,8 +335,8 @@ static INPUT_PORTS_START( amx_mouse )
 	PORT_BIT(0xff , 0, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) PORT_CONDITION("controller_type", 0x02, EQUALS, 0x02)
 
 	PORT_START("mouse_input3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CONDITION("controller_type", 0x02, EQUALS, 0x02)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CONDITION("controller_type", 0x02, EQUALS, 0x02)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Left mouse button")   PORT_CODE(MOUSECODE_BUTTON1) PORT_CONDITION("controller_type", 0x02, EQUALS, 0x02)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Right mouse button")  PORT_CODE(MOUSECODE_BUTTON2) PORT_CONDITION("controller_type", 0x02, EQUALS, 0x02)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3) PORT_CONDITION("controller_type", 0x02, EQUALS, 0x02)
 
 	PORT_START("controller_type")
@@ -1197,13 +1189,12 @@ void amstrad_state::aleste(machine_config &config)
  *
  *************************************/
 
-/* cpc6128.rom contains OS in first 16k, BASIC in second 16k */
-/* cpcados.rom contains Amstrad DOS */
+// cpc6128.rom contains OS in first 16k, BASIC in second 16k
+// cpcados.rom contains Amstrad DOS
 
-/* I am loading the roms outside of the Z80 memory area, because they
-are banked. */
+// I am loading the roms outside of the Z80 memory area, because they are banked.
 ROM_START( cpc6128 )
-	/* this defines the total memory size - 64k ram, 16k OS, 16k BASIC, 16k DOS */
+	// this defines the total memory size - 64k ram, 16k OS, 16k BASIC, 16k DOS
 	ROM_REGION(0x020000, "maincpu", 0)
 	/* load the os to offset 0x01000 from memory base */
 	ROM_LOAD("cpc6128.rom", 0x10000, 0x8000, CRC(9e827fe1) SHA1(5977adbad3f7c1e0e082cd02fe76a700d9860c30))
@@ -1212,17 +1203,17 @@ ROM_END
 
 
 ROM_START( cpc6128f )
-	/* this defines the total memory size (128kb))- 64k ram, 16k OS, 16k BASIC, 16k DOS +16k*/
+	// this defines the total memory size (128kb))- 64k ram, 16k OS, 16k BASIC, 16k DOS +16k
 	ROM_REGION(0x020000, "maincpu", 0)
 
-	/* load the os to offset 0x01000 from memory base */
+	// load the os to offset 0x01000 from memory base
 	ROM_LOAD("cpc6128f.rom", 0x10000, 0x8000, CRC(1574923b) SHA1(200d59076dfef36db061d6d7d21d80021cab1237))
 	ROM_LOAD("cpcados.rom",  0x18000, 0x4000, CRC(1fe22ecd) SHA1(39102c8e9cb55fcc0b9b62098780ed4a3cb6a4bb))
 ROM_END
 
 
 ROM_START( cpc6128s )
-	/* this defines the total memory size (128kb))- 64k ram, 16k OS, 16k BASIC, 16k DOS +16k*/
+	// this defines the total memory size (128kb))- 64k ram, 16k OS, 16k BASIC, 16k DOS +16k
 	ROM_REGION(0x020000, "maincpu", 0)
 
 	/* load the os to offset 0x01000 from memory base */
@@ -1231,7 +1222,7 @@ ROM_START( cpc6128s )
 ROM_END
 
 ROM_START( cpc6128sp )
-	/* this defines the total memory size (128kb))- 64k ram, 16k OS, 16k BASIC, 16k DOS +16k*/
+	// this defines the total memory size (128kb))- 64k ram, 16k OS, 16k BASIC, 16k DOS +16k
 	ROM_REGION(0x020000, "maincpu", 0)
 
 	/* load the os to offset 0x01000 from memory base */
@@ -1309,15 +1300,16 @@ ROM_END
  *
  *************************************/
 
-/*    YEAR  NAME       PARENT  COMPAT  MACHINE  INPUT      CLASS          INIT        COMPANY                FULLNAME                                     FLAGS */
-COMP( 1984, cpc464,    0,      0,      cpc464,  cpc464,    amstrad_state, empty_init, "Amstrad plc",         "Amstrad CPC464",                            0 )
-COMP( 1985, cpc664,    cpc464, 0,      cpc664,  cpc664,    amstrad_state, empty_init, "Amstrad plc",         "Amstrad CPC664",                            0 )
-COMP( 1985, cpc6128,   cpc464, 0,      cpc6128, cpc6128,   amstrad_state, empty_init, "Amstrad plc",         "Amstrad CPC6128",                           0 )
-COMP( 1985, cpc6128f,  cpc464, 0,      cpc6128, cpc6128f,  amstrad_state, empty_init, "Amstrad plc",         "Amstrad CPC6128 (France, AZERTY Keyboard)", 0 )
-COMP( 1985, cpc6128s,  cpc464, 0,      cpc6128, cpc6128s,  amstrad_state, empty_init, "Amstrad plc",         "Amstrad CPC6128 (Sweden/Finland)",          0 )
-COMP( 1985, cpc6128sp, cpc464, 0,      cpc6128, cpc6128sp, amstrad_state, empty_init, "Amstrad plc",         "Amstrad CPC6128 (Spain)",                   0 )
-COMP( 1990, cpc464p,   0,      0,      cpcplus, plus,      amstrad_state, empty_init, "Amstrad plc",         "Amstrad CPC464+",                           0 )
-COMP( 1990, cpc6128p,  0,      0,      cpcplus, plus,      amstrad_state, empty_init, "Amstrad plc",         "Amstrad CPC6128+",                          0 )
-CONS( 1990, gx4000,    0,      0,      gx4000,  gx4000,    amstrad_state, empty_init, "Amstrad plc",         "Amstrad GX4000",                            0 )
-COMP( 1989, kccomp,    cpc464, 0,      kccomp,  kccomp,    amstrad_state, empty_init, u8"VEB Mikroelektronik \"Wilhelm Pieck\" Mühlhausen", "KC Compact", 0 )
-COMP( 1993, al520ex,   cpc464, 0,      aleste,  aleste,    amstrad_state, empty_init, "Patisonic",           "Aleste 520EX",                              MACHINE_IMPERFECT_SOUND )
+/*    YEAR  NAME       PARENT  COMPAT MACHINE  INPUT      CLASS          INIT        COMPANY        FULLNAME                                     FLAGS */
+COMP( 1984, cpc464,    0,      0,     cpc464,  cpc464,    amstrad_state, empty_init, "Amstrad plc", "Amstrad CPC464",                            0 )
+COMP( 1985, cpc664,    cpc464, 0,     cpc664,  cpc664,    amstrad_state, empty_init, "Amstrad plc", "Amstrad CPC664",                            0 )
+COMP( 1985, cpc6128,   cpc464, 0,     cpc6128, cpc6128,   amstrad_state, empty_init, "Amstrad plc", "Amstrad CPC6128",                           0 )
+COMP( 1985, cpc6128f,  cpc464, 0,     cpc6128, cpc6128f,  amstrad_state, empty_init, "Amstrad plc", "Amstrad CPC6128 (France, AZERTY Keyboard)", 0 )
+COMP( 1985, cpc6128s,  cpc464, 0,     cpc6128, cpc6128s,  amstrad_state, empty_init, "Amstrad plc", "Amstrad CPC6128 (Sweden/Finland)",          0 )
+COMP( 1985, cpc6128sp, cpc464, 0,     cpc6128, cpc6128sp, amstrad_state, empty_init, "Amstrad plc", "Amstrad CPC6128 (Spain)",                   0 )
+COMP( 1990, cpc464p,   0,      0,     cpcplus, plus,      amstrad_state, empty_init, "Amstrad plc", "Amstrad CPC464+",                           0 )
+COMP( 1990, cpc6128p,  0,      0,     cpcplus, plus,      amstrad_state, empty_init, "Amstrad plc", "Amstrad CPC6128+",                          0 )
+CONS( 1990, gx4000,    0,      0,     gx4000,  gx4000,    amstrad_state, empty_init, "Amstrad plc", "Amstrad GX4000",                            0 )
+COMP( 1989, kccomp,    cpc464, 0,     kccomp,  kccomp,    amstrad_state, empty_init, u8"VEB Mikroelektronik \"Wilhelm Pieck\" M?hlhausen",
+																									"KC Compact",                                0 )
+COMP( 1993, al520ex,   cpc464, 0,     aleste,  aleste,    amstrad_state, empty_init, "Patisonic",   "Aleste 520EX",                              MACHINE_IMPERFECT_SOUND )

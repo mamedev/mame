@@ -6386,7 +6386,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="iozipd51">
+	<software name="iozipd51" supported="no">
 		<description>Iomega Zip-drive Tools (Version 5.1)</description>
 		<year>1996</year>
 		<publisher>Iomega</publisher>
@@ -6409,6 +6409,20 @@ license:CC0-1.0
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="knowledge dynamics corp, cirrus logic supervga driver pt-521 (version 1.30) (disk 2).img" size="1474560" crc="f7350f94" sha1="0ebe33544679b90aa0497bc03abc576cf24d08a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magnum6">
+		<description>Interact Magnum 6 Game Controller Driver for Windows 95</description>
+		<year>1996</year>
+		<publisher>Interact Multimedia Products</publisher>
+		<notes><![CDATA[
+Driver for [pc_joy:magnum6_pad]
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="interact multimedia products windows 95 driver.img" size="1474560" crc="f5521075" sha1="f9f7ef6292aa431d1c6b34cad0bbd43c57f739f4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8595,11 +8609,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="moneynet">
+	<!-- Windows (3.1?) -->
+	<software name="moneynet" supported="no">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
 		<description>Reuters Money Network</description>
 		<year>1994</year>
 		<publisher>Reuters</publisher>
+		<notes><![CDATA[
+win95/win98: Punts with a "Severe" error message at start of install operation (broken version check)
+Missing [modem] features, assume requiring a connection to a Reuters device such as sk101bl
+]]></notes>
 		<info name="version" value="2.0R3" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -22746,14 +22765,17 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 	<!-- Riki (Slovakia) -->
 
 	<!-- Riki 8 undumped
-	    <info name="Contents" value="The Mask" />
+	    <info name="contents" value="The Mask" />
 	-->
 
-	<software name="riki10">
+	<software name="riki10" supported="no">
 		<description>Riki Coverdisk (June 1995) (Slovak)</description>
 		<year>1995</year>
 		<publisher>Riki</publisher>
-		<info name="Contents" value="Pyrotechnika" />
+		<notes><![CDATA[
+Locks up with gibberish filename during install of a samples file
+]]></notes>
+		<info name="contents" value="Pyrotechnika" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki0695-10.ima" size="1474560" crc="632e1b1b" sha1="c61bc9516d7c39cf785ab5e9d496907f9b5f6e45" status="baddump" />
@@ -22761,11 +22783,14 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="riki11">
+	<software name="riki11" supported="no">
 		<description>Riki Coverdisk (July 1995) (Slovak)</description>
 		<year>1995</year>
 		<publisher>Riki</publisher>
-		<info name="Contents" value="Super Stardust" />
+		<notes><![CDATA[
+Aborts install with "Bad file data"
+]]></notes>
+		<info name="contents" value="Super Stardust" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki0795-11.ima" size="1474560" crc="8cb11858" sha1="492d5c9df9ff4e6a85797295d4d8e5b12ed24b04" status="baddump" />
@@ -22778,6 +22803,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		<year>1995</year>
 		<publisher>Riki</publisher>
 		<info name="contents" value="3D Lemmings" />
+		<info name="usage" value="Requires an EMS manager" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki0995-12.img" size="1474560" crc="08ba4452" sha1="5bafab8f03ee9193bdaaf486abf0a34afc1020bd" status="baddump" />
@@ -22785,10 +22811,14 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="riki13">
+	<software name="riki13" supported="partial">
 		<description>Riki Coverdisk (October 1995) (Slovak)</description>
 		<year>1995</year>
 		<publisher>Riki</publisher>
+		<!-- TODO: Darker not extensively tested -->
+		<notes><![CDATA[
+slanina.exe diskmag boots in pcipc only, uses [speaker] for BGM among other cards cfr. -h CLI arg
+]]></notes>
 		<info name="contents" value="Darker" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -22797,11 +22827,17 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="riki14">
+	<software name="riki14" supported="no">
 		<description>Riki Coverdisk (November 1995) (Slovak)</description>
 		<year>1995</year>
 		<publisher>Riki</publisher>
-		<info name="Contents" value="Bleifuss" />
+		<notes><![CDATA[
+bleifuss.exe hangs on initial loading
+setup.exe gives some system diagnostics, asserts a [network] that doesn't exist among other things
+setup.exe black screen in pcipc
+]]></notes>
+		<!-- Slovak version of Screamer -->
+		<info name="contents" value="Bleifuss" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki1195-14.ima" size="1474560" crc="bad9bdca" sha1="4425c59acb4c47fdb9f3f9b3322ef9cd5984ec5b" status="baddump" />
@@ -22809,11 +22845,15 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="riki15">
+	<software name="riki15" supported="partial">
 		<description>Riki Coverdisk (December 1995) (Slovak)</description>
 		<year>1995</year>
 		<publisher>Riki</publisher>
-		<info name="contents" value="Quadrax" /> <!-- Seems to be a game made especially for Riki by Cauldron and is in Slovakian -->
+		<notes><![CDATA[
+Refuses to start if [sb16] is selected (use regular sb as workaround), moans about not enough memory free, black screen if conventional memory is 600K+
+]]></notes>
+		<!-- Seems to be a game made especially for Riki by Cauldron and is in Slovakian -->
+		<info name="contents" value="Quadrax" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki1295-15.img" size="1474560" crc="8e22c825" sha1="72a1b27790d4fcab18a81cb892d9e3e6dc80e47c" status="baddump" />
@@ -22821,11 +22861,15 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="riki16">
+	<software name="riki16" supported="no">
 		<description>Riki Coverdisk (January 1996) (Slovak)</description>
 		<year>1996</year>
 		<publisher>Riki</publisher>
-		<info name="Contents" value="Jungle Book" />
+		<notes><![CDATA[
+Crashes when player dies during gameplay for missing file
+Attempting to install game with the provided program doesn't work (verify)
+]]></notes>
+		<info name="contents" value="Jungle Book" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki0196-16.ima" size="1474560" crc="2d363851" sha1="5b1d8fc2bd16ecad559f15ada6c477241d5a4848" status="baddump" />
@@ -22833,11 +22877,14 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="riki17">
+	<software name="riki17" supported="no">
 		<description>Riki Coverdisk (February 1996) (Slovak)</description>
 		<year>1996</year>
 		<publisher>Riki</publisher>
-		<info name="Contents" value="Turrican II" />
+		<notes><![CDATA[
+"Error reading from drive A: DOS area: general failure"
+]]></notes>
+		<info name="contents" value="Turrican II" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki0296-17.ima" size="1474560" crc="0397885e" sha1="fbeb23616a222a87d0d3f1e1bb01d9468ea2e2d9" status="baddump" />
@@ -22845,11 +22892,11 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="riki18">
+	<software name="riki18" supported="yes">
 		<description>Riki Coverdisk (March 1996) (Slovak)</description>
 		<year>1996</year>
 		<publisher>Riki</publisher>
-		<info name="Contents" value="Worms" />
+		<info name="contents" value="Worms" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki0396-18.ima" size="1474560" crc="1884a1a5" sha1="3a3d1c942b7bdced7a65b0a3e3f65c583abdf03f" status="baddump" />
@@ -22857,11 +22904,16 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="riki19">
+	<software name="riki19" supported="partial">
 		<description>Riki Coverdisk (April 1996) (Slovak)</description>
 		<year>1996</year>
 		<publisher>Riki</publisher>
-		<info name="Contents" value="Tempest 2000" />
+		<notes><![CDATA[
+No [sb16] SFXs, keeps ringing garbage from DMA, was silent before {PR#11441}
+Gameplay video is slightly X offset on [S3VIRGE]
+]]></notes>
+		<info name="contents" value="Tempest 2000" />
+		<info name="usage" value="Requires an EMS manager" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki0496-19.ima" size="1474560" crc="5df023bd" sha1="684baaaa927db7102dec1872da18bc20ff4c780b" status="baddump" />
@@ -22869,11 +22921,15 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="riki20">
+	<software name="riki20" supported="partial">
 		<description>Riki Coverdisk (May 1996) (Slovak)</description>
 		<year>1996</year>
 		<publisher>Riki</publisher>
-		<info name="Contents" value="Virtual Snooker" />
+		<notes><![CDATA[
+Has unemulated options for VESA 1.2 video and sound cards
+Has untested [MODEM] and [LAN] options
+]]></notes>
+		<info name="contents" value="Virtual Snooker" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki0596-20.ima" size="1474560" crc="5704d5cd" sha1="c283c7dc070fc9cb8b90fec096a980f4c713746c" status="baddump" />
@@ -22881,11 +22937,14 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="riki21">
+	<software name="riki21" supported="partial">
 		<description>Riki Coverdisk (June 1996) (Slovak)</description>
 		<year>1996</year>
 		<publisher>Riki</publisher>
-		<info name="Contents" value="World Rally Fever" />
+		<notes><![CDATA[
+No [sb16] sound even if configured
+]]></notes>
+		<info name="contents" value="World Rally Fever" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki0696-21.ima" size="1474560" crc="e00c21c8" sha1="b05f84ecc7b8e42528395ac5282de8bd36b986b8" status="baddump" />
@@ -22897,7 +22956,9 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		<description>Riki Coverdisk (September 1996) (Slovak)</description>
 		<year>1996</year>
 		<publisher>Riki</publisher>
+		<!-- TODO: untested -->
 		<info name="contents" value="Gearheads" />
+		<info name="usage" value="Requires an ARJ extractor to install" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki0996-22.img" size="1474560" crc="785d713a" sha1="8d4d2108200b36feef6d0f16a2dd243609d90943" status="baddump" />
@@ -22910,6 +22971,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		<year>1996</year>
 		<publisher>Riki</publisher>
 		<info name="contents" value="Mutation of JB" />
+		<info name="usage" value="Requires an EMS manager" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki1196-23.img" size="1474560" crc="d690c997" sha1="38996ed2f099b5c800184ff6b6fbc1f21d87456d" status="baddump" />
@@ -23170,7 +23232,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 
 	<!-- PC Games (Germany) -->
 	<!-- October 1992 undumped
-	    <info name="Contents" value="Soul Magican / Atom Demo" />
+	    <info name="contents" value="Soul Magican / Atom Demo" />
 	-->
 
 	<software name="pcga9211">
@@ -23186,7 +23248,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 	</software>
 
 	<!-- December 1992 undumped
-	    <info name="Contents" value="Ween the Prophecy Demo" />
+	    <info name="contents" value="Ween the Prophecy Demo" />
 	-->
 
 	<software name="pcga9301">
@@ -23214,15 +23276,15 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 	</software>
 
 	<!-- March 1993 undumped
-	    <info name="Contents" value="Ween the Prophecy Demo" />
+	    <info name="contents" value="Ween the Prophecy Demo" />
 	-->
 
 	<!-- April 1993 undumped
-	    <info name="Contents" value="Zool Demo" />
+	    <info name="contents" value="Zool Demo" />
 	-->
 
 	<!-- May 1993 undumped
-	    <info name="Contents" value="Tornado Demo" />
+	    <info name="contents" value="Tornado Demo" />
 	-->
 
 	<software name="pcga9306">
@@ -23262,7 +23324,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 	</software>
 
 	<!-- September 1993 undumped
-	    <info name="Contents" value="Ambush at Sorinor Demo" />
+	    <info name="contents" value="Ambush at Sorinor Demo" />
 	-->
 
 	<software name="pcga9310">
@@ -23278,15 +23340,15 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 	</software>
 
 	<!-- November 1993 undumped
-	    <info name="Contents" value="Energie Manager Demo" />
+	    <info name="contents" value="Energie Manager Demo" />
 	-->
 
 	<!-- December 1993 undumped
-	    <info name="Contents" value="Micro Machines Demo" />
+	    <info name="contents" value="Micro Machines Demo" />
 	-->
 
 	<!-- January 1994 undumped
-	    <info name="Contents" value="Android Demo" />
+	    <info name="contents" value="Android Demo" />
 	-->
 
 	<software name="pcga9402">
@@ -23302,7 +23364,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 	</software>
 
 	<!-- March 1994 undumped
-	    <info name="Contents" value="Pinball Fantasies Demo" />
+	    <info name="contents" value="Pinball Fantasies Demo" />
 	-->
 
 	<software name="pcga9404">
@@ -23342,27 +23404,27 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 	</software>
 
 	<!-- July 1994 undumped
-	    <info name="Contents" value="Tubular Worlds / Empire Soccer Demo" />
+	    <info name="contents" value="Tubular Worlds / Empire Soccer Demo" />
 	-->
 
 	<!-- August 1994 undumped
-	    <info name="Contents" value="Der Clou Demo / 3 New Doom Level" />
+	    <info name="contents" value="Der Clou Demo / 3 New Doom Level" />
 	-->
 
 	<!-- September 1994 undumped
-	    <info name="Contents" value="Tony and Friends in Kellogg's Land Demo" />
+	    <info name="contents" value="Tony and Friends in Kellogg's Land Demo" />
 	-->
 
 	<!-- October 1994 undumped
-	    <info name="Contents" value="Cool Spot / Cheat It Demo" />
+	    <info name="contents" value="Cool Spot / Cheat It Demo" />
 	-->
 
 	<!-- November 1994 undumped
-	    <info name="Contents" value="Bundesliga Manager Hattrick / 3 New Doom Level / Cheat it Demo" />
+	    <info name="contents" value="Bundesliga Manager Hattrick / 3 New Doom Level / Cheat it Demo" />
 	-->
 
 	<!-- December 1994 undumped
-	    <info name="Contents" value="Desert Strike Demo / Bundesliga Manager Hattrick Update" />
+	    <info name="contents" value="Desert Strike Demo / Bundesliga Manager Hattrick Update" />
 	-->
 
 	<software name="pcga9501">

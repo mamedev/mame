@@ -14,6 +14,7 @@
 #include "ui/inifile.h"
 #include "ui/selector.h"
 
+#include "infoxml.h"
 #include "language.h"
 #include "mame.h"
 
@@ -96,6 +97,7 @@ constexpr char const *MACHINE_FILTER_NAMES[machine_filter::COUNT] = {
 		N_p("machine-filter", "Clones"),
 		N_p("machine-filter", "Manufacturer"),
 		N_p("machine-filter", "Year"),
+		N_p("machine-filter", "Source File"),
 		N_p("machine-filter", "Save Supported"),
 		N_p("machine-filter", "Save Unsupported"),
 		N_p("machine-filter", "CHD Required"),
@@ -800,6 +802,18 @@ public:
 };
 
 
+class source_file_machine_filter : public choice_filter_impl_base<machine_filter, machine_filter::SOURCE_FILE>
+{
+public:
+	source_file_machine_filter(machine_filter_data const &data, char const *value, util::core_file *file, unsigned indent)
+		: choice_filter_impl_base<machine_filter, machine_filter::SOURCE_FILE>(data.source_files(), value)
+	{
+	}
+
+	virtual bool apply(ui_system_info const &system) const override { return !have_choices() || (selection_valid() && (selection_text() == info_xml_creator::format_sourcefile(system.driver->type.source()))); }
+};
+
+
 
 //-------------------------------------------------
 //  complementary machine filters
@@ -1227,6 +1241,7 @@ public:
 		case FAVORITE:
 		case MANUFACTURER:
 		case YEAR:
+		case SOURCE_FILE:
 		case CUSTOM:
 		case COUNT:
 			break;
@@ -1236,7 +1251,17 @@ public:
 
 	static bool is_inclusion(type n)
 	{
-		return (CATEGORY == n) || (MANUFACTURER == n) || (YEAR == n);
+		switch (n)
+		{
+		case CATEGORY:
+		case MANUFACTURER:
+		case YEAR:
+		case SOURCE_FILE:
+			return true;
+
+		default:
+			return false;
+		}
 	}
 
 private:
@@ -1602,10 +1627,21 @@ void machine_filter_data::add_year(std::string const &year)
 		m_years.emplace(pos, year);
 }
 
+void machine_filter_data::add_source_file(std::string_view path)
+{
+	std::vector<std::string>::iterator const pos(std::lower_bound(m_source_files.begin(), m_source_files.end(), path));
+	if ((m_source_files.end() == pos) || (*pos != path))
+		m_source_files.emplace(pos, path);
+}
+
 void machine_filter_data::finalise()
 {
+	for (std::string &path : m_source_files)
+		path = info_xml_creator::format_sourcefile(path);
+
 	std::stable_sort(m_manufacturers.begin(), m_manufacturers.end());
 	std::stable_sort(m_years.begin(), m_years.end());
+	std::stable_sort(m_source_files.begin(), m_source_files.end());
 }
 
 std::string machine_filter_data::extract_manufacturer(std::string const &manufacturer)
@@ -1780,6 +1816,8 @@ machine_filter::ptr machine_filter::create(type n, machine_filter_data const &da
 		return std::make_unique<manufacturer_machine_filter>(data, value, file, indent);
 	case YEAR:
 		return std::make_unique<year_machine_filter>(data, value, file, indent);
+	case SOURCE_FILE:
+		return std::make_unique<source_file_machine_filter>(data, value, file, indent);
 	case SAVE:
 		return std::make_unique<save_machine_filter>(data, value, file, indent);
 	case NOSAVE:

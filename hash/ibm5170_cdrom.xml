@@ -1481,6 +1481,52 @@ Some samples have audio crackling [SB16]
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<software name="bestof2" supported="partial">
+		<description>Best of the Best Shareware Volume 2 (Canada)</description>
+		<year>1994</year>
+		<publisher>Explore The World of Software</publisher>
+		<notes><![CDATA[
+1994 Pool:
+1995 Card Games:
+3d Line Wars:
+3d Towers:
+Alien Carnage:
+Alien Doom (level pack for Doom):
+Body Blow:
+Boppin:
+Brudal Baddle:
+Cyberdogs:
+Desert Storm Command
+Digital Downs
+Doom Gathering (level pack for Doom):
+Doom Star Wars (Doom add-on):
+Dr. Riptide:
+Hero's Heart:
+Ladder Man III:
+NHL Hockey:
+One Must Fall:
+Operation Body Count:
+Pool Shark:
+Risky Woods: boot OK
+Shadow Force:
+Silverball Pinball:
+Skunny Karts:
+Skunny Space:
+Skunny Wildwest:
+Tie Fighter:
+Wacky Wheels:
+]]></notes>
+		<info name="usage" value="Run dosroc.exe for a" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="best_of_the_best_vol_2" sha1="4e698516d0a6676c25c3d3fa26b65fe0ce20f52b"/>
+			</diskarea>
+		</part>
+	</software>
+
+
 	<!-- DOS / Windows 3.1 -->
 	<software name="bfchess">
 		<description>Bobby Fischer Teaches Chess</description>
@@ -1573,6 +1619,41 @@ Some samples have audio crackling [SB16]
 		<part name="cdrom4" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="blade runner (1997)(virgin)(disc 4 of 4)" sha1="f4681e82c6cd1d17d449831102f5c9235b6d6659" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Pentium 75 MHz -->
+	<!-- Windows 95 -->
+	<!-- 16 MB RAM, CD-ROM x4, SVGA with 16-bit color depth, SB16 -->
+	<!-- Credits also mentions Mac support, different discs? -->
+	<software name="blindnes" supported="no">
+		<description>Blindness (Italy)</description>
+		<year>1996</year>
+		<!-- capitalized as "MONDADORI newmedia" on back cover -->
+		<publisher>Mondadori New Media</publisher>
+		<notes><![CDATA[
+Offset [SVGA] gfxs during initial credits and gameplay
+No [SVGA] card supports 16-bit color depth (required by gameplay)
+Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
+]]></notes>
+		<info name="developer" value="DedaloMedia Edizioni" />
+
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="blindness_cd1_[pc_ita]" sha1="21804a294e2555c699b32cd0a8c191c430ad1323"/>
+			</diskarea>
+		</part>
+
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="blindness_cd2_[pc_ita]" sha1="d44027d0ab4ba20efe1bdd843576b73dbca9666e"/>
+			</diskarea>
+		</part>
+
+		<part name="cdrom3" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="blindness_cd3_[pc_ita]" sha1="198059bc026de5fb246783f249b756f2969c2a77"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3495,6 +3576,20 @@ Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ggg" sha1="ab7babc13b5ffb4536fc7a553753a9d12ec41103" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- There's also a later Windows version hence the extra "DOS" tag -->
+	<software name="heromm1">
+		<description>Heroes of Might and Magic (USA, DOS, v1.0)</description>
+		<year>1995</year>
+		<publisher>New World Computing</publisher>
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="heroes_of_might_and_magic_(usa)" sha1="e8734799184c2114944e5ee62e3609f64a131b35"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5964,6 +6059,41 @@ Has setup menu glitch with text [8514]
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<software name="div103b" supported="partial">
+		<description>DIV Games Studio (English, v1.03b)</description>
+		<year>1998</year>
+		<publisher>Hammer Technologies</publisher>
+		<notes><![CDATA[
+Games packages all boots in ct486 but frameskips a lot, presumably needs Pentium 1 or 2 class machine
+Has [VESA] video mode options
+CDiv Player doesn't output any [redbook] sound (verify if access to CD is real)
+IDE not extensively tested
+v2 is OSS at https://github.com/DIVGAMES/DIV-Games-Studio
+]]></notes>
+		<info name="usage" value="Requires a VESA driver"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="divgamestudio" sha1="8fe4e601ca118bca1e45e61adcbbc9f49daa371e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="div103b_fr" cloneof="div103b" supported="partial">
+		<description>DIV Games Studio (French, v1.03b)</description>
+		<year>2000</year>
+		<publisher>Hammer Technologies</publisher>
+		<notes><![CDATA[
+French version with extra examples compared to English one
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="div_games_studio_fr" sha1="cc3f10a85ca645ab2bf55f4864383cb78c493c98"/>
+			</diskarea>
+		</part>
+	</software>
+
+
 	<software name="freedos10">
 		<description>FreeDOS 1.0</description>
 		<year>2006</year>
@@ -6120,7 +6250,6 @@ Has setup menu glitch with text [8514]
 		</part>
 	</software>
 
-
 	<software name="freedos13rc4">
 		<description>FreeDOS 1.3 Release Candidate 4</description>
 		<year>2021</year>
@@ -6173,13 +6302,30 @@ Has setup menu glitch with text [8514]
 		</part>
 	</software>
 
+	<software name="mgamil1" supported="no">
+		<description>The Matrox Millennium Multimedia SuperPack (v1.60)</description>
+		<year>1996</year>
+		<publisher>Matrox</publisher>
+		<notes><![CDATA[
+cfr. [mga2064w] emulation
+Anything beyond Windows 3.1 is untested
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="matroxmil1" sha1="f3d826066dafb3e9eb3a0a7f5eaabc97642dd714"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Win 3.1 / 95 -->
 	<!-- Mac OS with System 7.0 -->
-	<!-- includes unknown type scanner driver-->
-	<software name="muscan">
+	<software name="muscan" supported="no">
 		<description>Mustek Power of Scanning</description>
 		<year>1997</year>
 		<publisher>Mustek</publisher>
+		<notes><![CDATA[
+Contains software drivers for a ScanExpress 6000SP Flatbed Scanner, SCSI i/f
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mustek_scanner" sha1="5f708270ed5885c07a49fadc79ab3ffed420af52" />

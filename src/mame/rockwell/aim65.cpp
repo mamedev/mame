@@ -267,7 +267,7 @@ void aim65_state::aim65(machine_config &config)
 	MOS6522(config, m_via1, AIM65_CLOCK);
 	m_via1->irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set([this] (u8 data) { aim65_state::u1_pa_w(data); });
 	m_pia->writepb_handler().set([this] (u8 data) { aim65_state::u1_pb_w(data); });
 

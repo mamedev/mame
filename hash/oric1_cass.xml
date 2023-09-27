@@ -1062,6 +1062,27 @@ Side B: An instruction program is recorded at fast speed
 		</part>
 	</software>
 
+	<software name="cryptshw">
+		<description>Crypt Show</description>
+		<year>1985</year>
+		<publisher>Norsoft</publisher>
+		<info name="developer" value="Guillaume Saviard" />
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass1" interface="oric1_cass">
+			<feature name="part_id" value="A - INTRODUCTION"/>
+			<dataarea name="cass" size="934732">
+				<rom name="cryptsh1.wav" size="934732" crc="8210f7a8" sha1="19c73800b41d914e3cb30e60943f59f926d3b131"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="B - GAME"/>
+			<dataarea name="cass" size="1389236">
+				<rom name="cryptsh2.wav" size="1389236" crc="56f0ed98" sha1="bcc99139db992e982564c2d88f02ca422746a148"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="crypte">
 		<description>La Crypte</description>
 		<year>1983</year>
@@ -1135,6 +1156,20 @@ Side B: An instruction program is recorded at fast speed
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="23571">
 				<rom name="Delta 4 (1983)(Emerald Software)(GB)[48K].tap" size="23571" crc="c50d525a" sha1="18f7603003070f87b6b951fd305e01dfc222499d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dermetro">
+		<description>Dernier Metro</description>
+		<year>1983</year>
+		<publisher>Micro Programmes 5</publisher>
+		<info name="developer" value="Claude Akriche / MP5" />
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="55124">
+				<rom name="dernier.tap" size="55124" crc="e8f55591" sha1="19bddd0cfff094b70a412b087f4434e50365827a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1612,6 +1647,26 @@ Tape 2 Side B - VOYAGES: Which is loaded when you go from one town to another
 		</part>
 	</software>
 
+	<software name="formule1">
+		<description>Formule 1</description>
+		<year>1985</year>
+		<publisher>Cobra Soft</publisher>
+		<info name="language" value="English" />
+		<info name="region" value="France" />
+		<part name="cass1" interface="oric1_cass">
+			<feature name="part_id" value="A - ATMOS" />
+			<dataarea name="cass" size="35684">
+				<rom name="formulea.tap" size="35684" crc="30a9207f" sha1="3729af169e7a1fe8e59cd80ab4a186831ac747c8"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="B - ORIC-1" />
+			<dataarea name="cass" size="35607">
+				<rom name="formuleo.tap" size="35607" crc="c26a6611" sha1="a2c62c062c3253daed55fe984dde54723d5aadf0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="football">
 		<description>Football Manager</description>
 		<year>1984</year>
@@ -1784,6 +1839,20 @@ Tape 2 Side B - VOYAGES: Which is loaded when you go from one town to another
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="13078">
 				<rom name="Green X Toad (1984)(IJK Software)(GB).tap" size="13078" crc="090b3a36" sha1="9e1cce64a7fb1288d62f36b21e77eb6ceff36b6f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gubbie">
+		<description>Gubbie</description>
+		<year>1985</year>
+		<publisher>IJK Software</publisher>
+		<info name="developer" value="Alexander Aghassipour" />
+		<info name="language" value="English" />
+		<info name="region" value="UK" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="34892">
+				<rom name="gubbie.tap" size="34892" crc="1128a00c" sha1="108097afa4269f05be0e033d4afd8fc166e89d54"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2477,6 +2546,20 @@ The cassette stops during the game loading
 		</part>
 	</software>
 
+	<software name="maisonmt">
+		<description>La Maison de la Mort</description>
+		<year>1984</year>
+		<publisher>Micro Programmes 5</publisher>
+		<info name="developer" value="Geoff Phillips" />
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="33678">
+				<rom name="maison.tap" size="33678" crc="d213504d" sha1="6fc0696ed99ccde811b9f07b535157a8ca3ded88"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="manicminer">
 		<description>Manic Miner</description>
 		<year>1985</year>
@@ -2510,6 +2593,18 @@ The cassette stops during the game loading
 		</part>
 	</software>
 
+	<software name="memory">
+		<description>Memory</description>
+		<year>2022</year>
+		<publisher>Raxiss</publisher>
+		<sharedfeat name="compatibility" value="Atmos"/>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="17895">
+				<rom name="memory-v03.tap" size="17895" crc="f398e714" sha1="cd9010d2721449885e5c560a118c70c01ca65ee8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mentor">
 		<description>Mentor</description>
 		<year>1984</year>
@@ -2528,6 +2623,29 @@ The cassette stops during the game loading
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="2659">
 				<rom name="Meteor Run (1983)(The Oric-1 Program Book)(GB)[type-in].tap" size="2659" crc="4a8b6e6d" sha1="c02554e9813a5b3bca5f9b0a914b812c2f044784"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meurtregv">
+		<description>Meurtre a Grande Vitesse</description>
+		<year>1985</year>
+		<publisher>Cobra Soft</publisher>
+		<notes>Side A: Game / Side B: Audio tape</notes>
+		<info name="copy_protection" value="Color codes required" />
+		<info name="developer" value="Bertrand Brocard" />
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass1" interface="oric1_cass">
+			<feature name="part_id" value="Meurtre a Grande Vitesse" />
+			<dataarea name="cass" size="2849891">
+				<rom name="mgv.wav" size="2849891" crc="88b90d3d" sha1="26c2556529747ee82277b90a3c946166a896ef8b"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="Diktaphon" />
+			<dataarea name="cass" size="497789">
+				<rom name="mgv_dikt.mp3" size="497789" crc="417a1194" sha1="ea3ce601990d3e17de0ac2a0ea03c0155cfb7e0c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2561,6 +2679,17 @@ The cassette stops during the game loading
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="11930">
 				<rom name="Mines of Moria, The (1983)(Severn Software)(GB).tap" size="11930" crc="6ae04a6d" sha1="f014b3f30180437ffc2fc2165f9a7b2c35518420"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mineswee">
+		<description>Minesweeper</description>
+		<year>2021</year>
+		<publisher>Raxiss</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="17935">
+				<rom name="minesw-v1.00.tap" size="17935" crc="2f8c18fe" sha1="e694cdeac2582405418b261a2d550713b4383ae8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2615,11 +2744,7 @@ The cassette stops during the game loading
 		<description>Mission Impossible</description>
 		<year>1984</year>
 		<publisher>No Man's Land</publisher>
-		<notes><![CDATA[
-This game is in two parts: Instructtions + Game.
-On side A: Oric 48K version
-On side B: Atmos version
-]]></notes>
+		<notes>This game is in two parts: Instructions + Game.</notes>
 		<info name="language" value="French" />
 		<info name="region" value="France" />
 		<part name="cass1" interface="oric1_cass">

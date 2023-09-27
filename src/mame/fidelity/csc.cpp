@@ -217,9 +217,9 @@ clicking on the game board.
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_csc.lh" // clickable
-#include "fidel_rsc.lh" // clickable
-#include "fidel_su9.lh" // clickable
+#include "fidel_csc.lh"
+#include "fidel_rsc.lh"
+#include "fidel_su9.lh"
 
 
 namespace {
@@ -625,14 +625,14 @@ void csc_state::csc(machine_config &config)
 	irq_clock.set_pulse_width(attotime::from_nsec(42750)); // measured ~42.75us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set(FUNC(csc_state::pia0_pa_r));
 	m_pia[0]->writepa_handler().set(FUNC(csc_state::pia0_pa_w));
 	m_pia[0]->writepb_handler().set(FUNC(csc_state::pia0_pb_w));
 	m_pia[0]->ca2_handler().set(FUNC(csc_state::pia0_ca2_w));
 	m_pia[0]->cb2_handler().set(FUNC(csc_state::pia0_cb2_w));
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpb_handler().set(FUNC(csc_state::pia1_pb_r));
 	m_pia[1]->writepa_handler().set(FUNC(csc_state::pia1_pa_w));
 	m_pia[1]->writepb_handler().set(FUNC(csc_state::pia1_pb_w));
@@ -689,7 +689,7 @@ void csc_state::rsc(machine_config &config)
 	irq_clock.set_pulse_width(attotime::from_usec(38)); // active for 38us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	PIA6821(config, m_pia[0], 0); // MOS 6520
+	PIA6821(config, m_pia[0]); // MOS 6520
 	m_pia[0]->readpa_handler().set(FUNC(csc_state::pia0_pa_r));
 	m_pia[0]->writepa_handler().set(FUNC(csc_state::pia0_pa_w));
 	m_pia[0]->writepb_handler().set(FUNC(csc_state::pia0_pb_w));

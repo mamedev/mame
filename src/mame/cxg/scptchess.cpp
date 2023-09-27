@@ -8,8 +8,12 @@ CXG Portachess, Portachess II, Computachess IV, Sphinx Chess Voyager
 
 Sensor Computachess is White & Allcock's first original chesscomputer. Cassia's
 Chess Mate (aka Computachess) doesn't really count since it was a bootleg of
-Fidelity Chess Challenger 10. The chess engine is by Mark Taylor, it's the same
-one as in Mini Chess released by SciSys earlier that year.
+Fidelity Chess Challenger 10.
+
+It was programmed by Intelligent Software (formerly known as Philidor Software).
+After loosening ties with SciSys, Intelligent Software provided the software for
+various chess computer companies. The chess engine is by Mark Taylor, it's the
+same one as in Mini Chess released by SciSys earlier that year.
 
 Initially, it had a "Sound" button for turning the beeps off. This was later
 changed to the more useful "New Game". With Portachess, they added a "Save"
@@ -57,8 +61,8 @@ HD44801C89 used in:
 #include "speaker.h"
 
 // internal artwork
-#include "cxg_scptchess_v1.lh" // clickable
-#include "cxg_scptchess_v2.lh" // clickable
+#include "cxg_scptchess_v1.lh"
+#include "cxg_scptchess_v2.lh"
 
 
 namespace {
@@ -234,5 +238,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME        PARENT     COMPAT  MACHINE       INPUT         CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, scptchess,  0,         0,      scptchess_v1, scptchess_v1, scptchess_state, empty_init, "CXG Systems / White & Allcock", "Sensor Computachess (1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1985, scptchessa, scptchess, 0,      scptchess_v2, scptchess_v2, scptchess_state, empty_init, "CXG Systems / Newcrest Technology", "Sensor Computachess (1985 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, scptchess,  0,         0,      scptchess_v1, scptchess_v1, scptchess_state, empty_init, "CXG Systems / White & Allcock / Intelligent Software", "Sensor Computachess (1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, scptchessa, scptchess, 0,      scptchess_v2, scptchess_v2, scptchess_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Software", "Sensor Computachess (1985 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

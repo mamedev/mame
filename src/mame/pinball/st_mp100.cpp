@@ -767,7 +767,7 @@ void st_mp100_state::st_mp100(machine_config &config)
 	genpin_audio(config);
 
 	/* Devices */
-	PIA6821(config, m_pia_u10, 0);
+	PIA6821(config, m_pia_u10);
 	m_pia_u10->readpa_handler().set(FUNC(st_mp100_state::u10_a_r));
 	m_pia_u10->writepa_handler().set(FUNC(st_mp100_state::u10_a_w));
 	m_pia_u10->readpb_handler().set(FUNC(st_mp100_state::u10_b_r));
@@ -780,7 +780,7 @@ void st_mp100_state::st_mp100(machine_config &config)
 	clock_device &u10_clock(CLOCK(config, "u10_clock", 120)); // crosspoint detector
 	u10_clock.signal_handler().set(m_pia_u10, FUNC(pia6821_device::cb1_w));
 
-	PIA6821(config, m_pia_u11, 0);
+	PIA6821(config, m_pia_u11);
 	m_pia_u11->readpa_handler().set(FUNC(st_mp100_state::u11_a_r));
 	m_pia_u11->writepa_handler().set(FUNC(st_mp100_state::u11_a_w));
 	m_pia_u11->writepb_handler().set(FUNC(st_mp100_state::u11_b_w));

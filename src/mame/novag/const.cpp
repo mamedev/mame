@@ -44,7 +44,7 @@ Super Sensor IV:
 - 2 ROM sockets for expansion (blue @ u6, white @ u5)
 
 Known Super Sensor IV expansion ROMs:
-- Quartz Chess Clock (came with the clock accessory)
+- Chess Printer (came with the printer accessory)
 
 Super Sensor IV triggers an NMI on power-off (or power-failure). If this isn't
 done, NVRAM fails at next power-on.
@@ -82,10 +82,10 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "novag_const.lh" // clickable
-#include "novag_constq.lh" // clickable
-#include "novag_ssensor4.lh" // clickable
-#include "novag_supercon.lh" // clickable
+#include "novag_const.lh"
+#include "novag_constq.lh"
+#include "novag_ssensor4.lh"
+#include "novag_supercon.lh"
 
 
 namespace {

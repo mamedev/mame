@@ -90,6 +90,8 @@ Scanline 0 is the start of vblank.
 
 #include "bus/mackbd/mackbd.h"
 #include "bus/macpds/hyperdrive.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/devices.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
 #include "machine/iwm.h"
@@ -1137,8 +1139,8 @@ void mac128_state::mac512ke(machine_config &config)
 
 	// software list
 	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
+	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
-	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 }
 
 void mac128_state::mac128k(machine_config &config)
@@ -1170,11 +1172,21 @@ void mac128_state::macplus(machine_config &config)
 	m_mackbd->set_default_option("usp");
 
 	// SCSI bus and devices
+	// These machines were strictly external CD-ROMs so sound didn't route back into them; the AppleCD SC had
+	// RCA jacks for connection to speakers/a stereo.
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
 	NSCSI_BUS(config, m_scsibus);
 	NSCSI_CONNECTOR(config, "scsibus:0", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:2", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:3", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
+		[](device_t *device)
+		{
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
+		});
 	NSCSI_CONNECTOR(config, "scsibus:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", mac_scsi_devices, "harddisk");
@@ -1183,6 +1195,9 @@ void mac128_state::macplus(machine_config &config)
 		adapter.irq_handler().set(*this, FUNC(mac128_state::scsi_irq_w));
 		adapter.drq_handler().set(*this, FUNC(mac128_state::scsi_drq_w));
 	});
+
+	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68000");
 
 	/* internal ram */
 	m_ram->set_default_size("4M");

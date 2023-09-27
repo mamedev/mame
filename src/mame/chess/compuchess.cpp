@@ -111,9 +111,9 @@ Hardware notes:
 #include "speaker.h"
 
 // internal artwork
-#include "cmpchess.lh" // clickable
-#include "novag_mk1.lh" // clickable
-#include "conic_cchess.lh" // clickable
+#include "cmpchess.lh"
+#include "novag_mk1.lh"
+#include "conic_cchess.lh"
 
 
 namespace {
@@ -179,6 +179,12 @@ private:
 	u8 m_digit_data = 0;
 	bool m_blink = false;
 };
+
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
 
 void cmpchess_state::machine_start()
 {

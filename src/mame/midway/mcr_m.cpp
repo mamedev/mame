@@ -79,6 +79,8 @@ const z80_daisy_config mcr_ipu_daisy_chain[] =
 
 void mcr_state::machine_start()
 {
+	m_backlight.resolve();
+
 	save_item(NAME(m_mcr_cocktail_flip));
 }
 

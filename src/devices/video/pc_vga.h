@@ -152,6 +152,7 @@ protected:
 		return res;
 	}
 	virtual bool get_interlace_mode() { return false; }
+	virtual void palette_update();
 
 	struct vga_t
 	{
@@ -321,6 +322,7 @@ protected:
 	void svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual uint8_t pc_vga_choosevideomode() override;
 	virtual void device_start() override;
+	virtual u16 line_compare_mask();
 	struct
 	{
 		uint8_t bank_r, bank_w;

@@ -37,7 +37,8 @@ public:
 		m_leftram(*this, "leftram"),
 		m_rightram(*this, "rightram"),
 		m_centerram(*this, "centerram"),
-		m_digits(*this, "digit%u", 0U)
+		m_digits(*this, "digit%u", 0U),
+		m_led0(*this, "led0")
 	{ }
 
 	void grchamp(machine_config &config);
@@ -130,6 +131,7 @@ private:
 	required_shared_ptr<uint8_t> m_rightram;
 	required_shared_ptr<uint8_t> m_centerram;
 	output_finder<8> m_digits;
+	output_finder<> m_led0;
 };
 
 /* Discrete Sound Input Nodes */

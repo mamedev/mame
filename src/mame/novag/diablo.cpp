@@ -35,8 +35,8 @@ Scorpio 68000 hardware is very similar, but with chessboard buttons and side led
 #include "speaker.h"
 
 // internal artwork
-#include "novag_diablo68k.lh" // clickable
-#include "novag_scorpio68k.lh" // clickable
+#include "novag_diablo68k.lh"
+#include "novag_scorpio68k.lh"
 
 
 namespace {

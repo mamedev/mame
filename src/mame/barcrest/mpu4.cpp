@@ -390,7 +390,7 @@ void mpu4_state::update_meters()
 		break;
 
 	case FLUTTERBOX: //The backbox fan assembly fits in a reel unit sized box, wired to the remote meter pin, so we can handle it here
-		output().set_value("flutterbox", data & 0x80);
+		m_flutterbox = BIT(data, 7);
 		data &= ~0x80; //Strip flutterbox data from meter drives
 		break;
 	}
@@ -1880,6 +1880,7 @@ void mpu4_state::mpu4_config_common()
 	m_mpu4leds.resolve();
 	m_digits.resolve();
 	m_triacs.resolve();
+	m_flutterbox.resolve();
 
 	m_ic24_timer = timer_alloc(FUNC(mpu4_state::update_ic24), this);
 
@@ -2262,7 +2263,7 @@ void mpu4_state::mpu4_common(machine_config &config)
 	m_6840ptm->o3_callback().set(FUNC(mpu4_state::ic2_o3_callback));
 	m_6840ptm->irq_callback().set(FUNC(mpu4_state::cpu0_irq));
 
-	PIA6821(config, m_pia3, 0);
+	PIA6821(config, m_pia3);
 	m_pia3->writepa_handler().set(FUNC(mpu4_state::pia_ic3_porta_w));
 	m_pia3->writepb_handler().set(FUNC(mpu4_state::pia_ic3_portb_w));
 	m_pia3->ca2_handler().set(FUNC(mpu4_state::pia_ic3_ca2_w));
@@ -2270,7 +2271,7 @@ void mpu4_state::mpu4_common(machine_config &config)
 	m_pia3->irqa_handler().set(FUNC(mpu4_state::cpu0_irq));
 	m_pia3->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
 
-	PIA6821(config, m_pia4, 0);
+	PIA6821(config, m_pia4);
 	m_pia4->readpb_handler().set(FUNC(mpu4_state::pia_ic4_portb_r));
 	m_pia4->writepa_handler().set(FUNC(mpu4_state::pia_ic4_porta_w));
 	m_pia4->writepb_handler().set(FUNC(mpu4_state::pia_ic4_portb_w));
@@ -2279,7 +2280,7 @@ void mpu4_state::mpu4_common(machine_config &config)
 	m_pia4->irqa_handler().set(FUNC(mpu4_state::cpu0_irq));
 	m_pia4->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
 
-	PIA6821(config, m_pia5, 0);
+	PIA6821(config, m_pia5);
 	m_pia5->readpa_handler().set(FUNC(mpu4_state::pia_ic5_porta_r));
 	m_pia5->readpb_handler().set(FUNC(mpu4_state::pia_ic5_portb_r));
 	m_pia5->writepa_handler().set(FUNC(mpu4_state::pia_ic5_porta_w));
@@ -2290,7 +2291,7 @@ void mpu4_state::mpu4_common(machine_config &config)
 	m_pia5->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
 	m_pia5->set_port_a_input_overrides_output_mask(0x40); // needed for m4madhse
 
-	PIA6821(config, m_pia6, 0);
+	PIA6821(config, m_pia6);
 	m_pia6->writepa_handler().set(FUNC(mpu4_state::pia_ic6_porta_w));
 	m_pia6->writepb_handler().set(FUNC(mpu4_state::pia_ic6_portb_w));
 	m_pia6->ca2_handler().set(FUNC(mpu4_state::pia_ic6_ca2_w));
@@ -2298,7 +2299,7 @@ void mpu4_state::mpu4_common(machine_config &config)
 	m_pia6->irqa_handler().set(FUNC(mpu4_state::cpu0_irq));
 	m_pia6->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
 
-	PIA6821(config, m_pia7, 0);
+	PIA6821(config, m_pia7);
 	m_pia7->readpb_handler().set(FUNC(mpu4_state::pia_ic7_portb_r));
 	m_pia7->writepa_handler().set(FUNC(mpu4_state::pia_ic7_porta_w));
 	m_pia7->writepb_handler().set(FUNC(mpu4_state::pia_ic7_portb_w));
@@ -2307,7 +2308,7 @@ void mpu4_state::mpu4_common(machine_config &config)
 	m_pia7->irqa_handler().set(FUNC(mpu4_state::cpu0_irq));
 	m_pia7->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
 
-	PIA6821(config, m_pia8, 0);
+	PIA6821(config, m_pia8);
 	m_pia8->readpa_handler().set(FUNC(mpu4_state::pia_ic8_porta_r));
 	m_pia8->writepb_handler().set(FUNC(mpu4_state::pia_ic8_portb_w));
 	m_pia8->ca2_handler().set(FUNC(mpu4_state::pia_ic8_ca2_w));

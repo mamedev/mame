@@ -525,7 +525,7 @@ void m16c_disassembler::dasm_7d(std::ostream &stream, offs_t &pc, offs_t &flags,
 			format_imm16(stream, opcodes.r16(pc + offset));
 		stream << ", ";
 		dasm_ea(stream, pc, opcodes, op2 & 0x0f, true);
-		pc += 2;		
+		pc += 2;
 	}
 	else if ((op2 & 0xf8) == 0x98)
 	{

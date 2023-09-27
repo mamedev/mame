@@ -42,14 +42,15 @@ After boot, it copies ROM to RAM, probably to circumvent waitstates on slow ROM.
 
 #include "emu.h"
 
-#include "cpu/m68000/m68030.h"
-#include "machine/nvram.h"
-#include "machine/timer.h"
 #include "mmboard.h"
 #include "mmdisplay2.h"
 
+#include "cpu/m68000/m68030.h"
+#include "machine/nvram.h"
+#include "machine/timer.h"
+
 // internal artwork
-#include "mephisto_modular_tm.lh" // clickable
+#include "mephisto_modular_tm.lh"
 
 
 namespace {

@@ -10,7 +10,6 @@ Excel 68000 I/O is very similar to EAG, so it's handled in this driver as well
 
 TODO:
 - unemulated waitstates with DTACK
-- EAG USART is not emulated, conflict with input2_r?
 - V10 CPU emulation is too slow, MAME 68040 opcode timing is same as 68030 but in
   reality it is much faster, same goes for V11 of course (see note below)
 - V11 CPU should be M68EC060, not yet emulated. Now using M68EC040 in its place
@@ -19,6 +18,8 @@ TODO:
 - Do the opening book modules work? It detects the rom, but then does nothing
   with it. Maybe support is limited since the basic CB9/CB16 modules have no use
   on newer chesscomputers with a large internal opening library.
+- does premiere only use half of the nvram? 0x600000-0x603fff seems unused
+- premiere unknown reads/writes to 0x500000 with the Vancouver program
 
 Currently(May 2020) when compared to the real chesscomputers, to get closer to the
 actual speed, overclock V10 and V11 to 230%. This can be done by starting MAME
@@ -45,8 +46,8 @@ To start, hold New Game or Clear.
 
 ********************************************************************************
 
-Elite Avant Garde (EAG, model 6114)
------------------------------------
+Elite Avant Garde 2265 (EAG, model 6114)
+----------------------------------------
 
 There are 5 versions of model 6114(V1 to V5):
 
@@ -79,9 +80,12 @@ The module slot pinout is different from SCC series. The data on those appears
 to be compatible with EAG though and will load fine with an adapter.
 
 The USART allows for a serial connection between the chess computer and another
-device, for example a PC. Fidelity released a DOS tool called EAGLINK which
-featured PC printer support, complete I/O control, detailed information while
-the program is 'thinking', etc. It can be enabled with POP3 H3.
+device, for example the Fidelity Challenger Printer, or a PC. It expects a baud
+rate of 600.
+
+Fidelity released a DOS tool called EAGLINK which featured PC printer support,
+complete I/O control, detailed information while the program is 'thinking', etc.
+It can be enabled with POP3 H3.
 
 Memory map: (of what is known)
 -----------
@@ -98,15 +102,15 @@ Memory map: (of what is known)
 
 ********************************************************************************
 
-Elite Avant Garde (EAG, model 6117)
------------------------------------
+Elite Avant Garde 2325 (EAG, model 6117)
+----------------------------------------
 
 There are 6 versions of model 6117(V6 to V11). From a programmer's point of view,
 the hardware is very similar to model 6114.
 
 V6: 68020, 512KB hashtable RAM
 V7: 68020, 1MB h.RAM
-V8: 2*68020, 512KB+128KB h.RAM
+V8: 2*68020, 512KB+128KB h.RAM (unreleased?)
 V9: 68030, 1MB h.RAM
 V10: 68040, 1MB h.RAM
 V11: 68060, high speed, 2MB h.RAM (half unused?)
@@ -116,10 +120,9 @@ supposedly has the same program as V10.
 
 V7 Hardware info:
 -----------------
-- MC68020RC25E CPU, 25MHz XTAL - this PCB was overclocked, original was 20MHz so let's use that
-- 4*AS7C164-20PC 8KB SRAM, 2*KM684000ALG-7L 512KB CMOS SRAM
-- 2*27C512? 64KB EPROM, 2*HM6264LP-15 8KB SRAM, 2*AT28C64B 8KB EEPROM, 2*GAL16V8C
-- same as 6114: M82C51A, NE555, SN74HC4060, module slot, chessboard, ..
+- 510.1139A01 daughterboard with MC68020RC20E or MC68020RC25E @ 20MHz,
+  and 32KB RAM (4*MCM6264P35)
+- rest is same as 6114
 
 V7 Memory map:
 --------------
@@ -154,7 +157,7 @@ V11 Hardware info:
 - MC68EC060RC75 CPU, 36MHz XTAL(36MHz bus, 72MHz CPU), CPU cooler required
 - 4*CXK5863AP-20 8KB SRAM, 4*K6X4008C1F-DF55 512KB CMOS SRAM
 - 4*M27C256B 32KB EPROM, 2*AT28C64 8KB EEPROM, 5*GAL16V8D
-- NEC D71051C USART, assume 8MHz, on quick glance it's same as the OKI USART
+- NEC D71051C USART, on quick glance it's same as the OKI USART
 - same as 6114: NE555, SN74HC4060, module slot, chessboard, ..
 
 This is a custom overclocked V10, manufactured by Wilfried Bucke. PCB is marked:
@@ -168,18 +171,46 @@ V1x Memory map:
 280000-37FFFF: hashtable SRAM
 B0000x-xxxxxx: see V7, -800000
 
+********************************************************************************
+
+Elite Premiere (model 6131)
+---------------------------
+
+This 2-in-1 chesscomputer was manufactured after Fidelity became a H+G subsidiary,
+it's still Fidelity branded. It has a switch where the module slot used to be,
+for selecting between Vancouver (Richard Lang) and 2265 (Spracklen's) programs.
+The 2265 ROM half is almost identical to EAG V2 (the elite_1.6 one), the handful
+of bytes difference is due to the changed hash RAM start address.
+
+The switch is not supposed to be flipped while power is on, hence MAME will only
+check it at reset (otherwise, the CPU will crash and may overwrite NVRAM). Each
+program has its own NVRAM bank, so unfortunately the user can't save the game on
+one program and then analyze or continue on the other.
+
+Hardware info:
+--------------
+- TMP68HC000P-16, 16MHz XTAL
+- 256KB ROM (2*M27C1001), 256KB RAM (2*TC551001PL-10)
+- 64KB battery-backed RAM (2*KM62256AP-10), Dallas DS1210
+- OKI M82C51A-2 USART, 4.9152MHz XTAL
+
+RAM can't be expanded, there are MB1422A and SIMM PCB markings, but unpopulated.
+The I/O remains the same as EAG V2.
+
 *******************************************************************************/
 
 #include "emu.h"
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m68000/m68020.h"
 #include "cpu/m68000/m68030.h"
 #include "cpu/m68000/m68040.h"
 #include "machine/clock.h"
 #include "machine/gen_latch.h"
+#include "machine/i8251.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
@@ -190,8 +221,8 @@ B0000x-xxxxxx: see V7, -800000
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_ex_68k.lh" // clickable
-#include "fidel_eag_68k.lh" // clickable
+#include "fidel_ex_68k.lh"
+#include "fidel_eag_68k.lh"
 
 
 namespace {
@@ -205,6 +236,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "ram"),
+		m_usart(*this, "usart"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -213,7 +245,6 @@ public:
 
 	// machine configs
 	void eagv4(machine_config &config);
-	void eagv3(machine_config &config);
 	void eagv5(machine_config &config);
 	void eagv7(machine_config &config);
 	void eagv9(machine_config &config);
@@ -222,17 +253,22 @@ public:
 
 	void init_eag();
 
+	DECLARE_INPUT_CHANGED_MEMBER(in1_changed) { update_dsr(); }
+
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	void eag_base(machine_config &config);
 
 	// devices/pointers
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<ram_device> m_ram;
+	optional_device<i8251_device> m_usart;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
-	optional_ioport_array<2> m_inputs;
+	optional_ioport_array<3> m_inputs;
 
 	// address maps
 	void eag_map(address_map &map);
@@ -241,9 +277,9 @@ protected:
 
 	// I/O handlers
 	void update_display();
-	virtual void mux_w(offs_t offset, u8 data);
-	u8 input1_r(offs_t offset);
-	u8 input2_r();
+	void update_dsr();
+	void mux_w(offs_t offset, u8 data);
+	u8 input_r(offs_t offset);
 	void leds_w(offs_t offset, u8 data);
 	void digit_w(offs_t offset, u8 data);
 
@@ -259,6 +295,11 @@ void eag_state::machine_start()
 	save_item(NAME(m_select));
 	save_item(NAME(m_7seg_data));
 	save_item(NAME(m_led_data));
+}
+
+void eag_state::machine_reset()
+{
+	update_dsr();
 }
 
 // EAG V5
@@ -291,6 +332,54 @@ private:
 	u8 main_ack_r();
 	u8 sub_ack_r();
 };
+
+// Elite Premiere
+
+class premiere_state : public eag_state
+{
+public:
+	premiere_state(const machine_config &mconfig, device_type type, const char *tag) :
+		eag_state(mconfig, type, tag),
+		m_nvram(*this, "nvram", 0x10000, ENDIANNESS_BIG),
+		m_nvrambank(*this, "nvrambank"),
+		m_rombank(*this, "rombank")
+	{ }
+
+	// machine configs
+	void premiere(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	// devices/pointers
+	memory_share_creator<u16> m_nvram;
+	required_memory_bank m_nvrambank;
+	required_memory_bank m_rombank;
+
+	// address maps
+	void main_map(address_map &map);
+};
+
+void premiere_state::machine_start()
+{
+	eag_state::machine_start();
+
+	// init banks
+	m_rombank->configure_entries(0, 2, memregion("maincpu")->base(), 0x20000);
+	m_nvrambank->configure_entries(0, 2, m_nvram, 0x8000);
+}
+
+void premiere_state::machine_reset()
+{
+	eag_state::machine_reset();
+
+	// program switch directly selects bank
+	const u8 bank = m_inputs[2]->read() & 1;
+	m_rombank->set_entry(bank);
+	m_nvrambank->set_entry(bank);
+}
 
 // Excel 68000
 
@@ -333,6 +422,13 @@ void eag_state::update_display()
 	m_display->matrix(1 << m_select, m_led_data << 8 | seg_data);
 }
 
+void eag_state::update_dsr()
+{
+	// USART DSR: 3 more buttons on EAG
+	if (m_usart != nullptr)
+		m_usart->write_dsr(!BIT(m_inputs[1]->read(), m_select));
+}
+
 void eag_state::mux_w(offs_t offset, u8 data)
 {
 	// a1-a3,d0: 74259
@@ -341,6 +437,7 @@ void eag_state::mux_w(offs_t offset, u8 data)
 
 	// 74259 Q0-Q3: 74145 A-D (Q4-Q7 N/C)
 	m_select &= 0xf;
+	update_dsr();
 
 	// 74145 0-8: input mux, digit/led select
 	// 74145 9: speaker out
@@ -348,7 +445,7 @@ void eag_state::mux_w(offs_t offset, u8 data)
 	update_display();
 }
 
-u8 eag_state::input1_r(offs_t offset)
+u8 eag_state::input_r(offs_t offset)
 {
 	u8 data = 0;
 
@@ -368,12 +465,6 @@ u8 eag_state::input1_r(offs_t offset)
 		data = m_inputs[0]->read();
 
 	return (data >> offset & 1) ? 0 : 0x80;
-}
-
-u8 eag_state::input2_r()
-{
-	// d7: 3 more buttons on EAG
-	return (BIT(m_inputs[1]->read(), m_select)) ? 0x80 : 0;
 }
 
 void eag_state::leds_w(offs_t offset, u8 data)
@@ -425,7 +516,7 @@ void excel68k_state::fex68k_map(address_map &map)
 	map(0x000000, 0x00000f).mirror(0x00fff0).w(FUNC(excel68k_state::leds_w)).umask16(0x00ff);
 	map(0x000000, 0x00000f).mirror(0x00fff0).w(FUNC(excel68k_state::digit_w)).umask16(0xff00);
 	map(0x044000, 0x047fff).ram();
-	map(0x100000, 0x10000f).mirror(0x03fff0).r(FUNC(excel68k_state::input1_r)).umask16(0x00ff);
+	map(0x100000, 0x10000f).mirror(0x03fff0).r(FUNC(excel68k_state::input_r)).umask16(0x00ff);
 	map(0x140000, 0x14000f).mirror(0x03fff0).w(FUNC(excel68k_state::mux_w)).umask16(0x00ff);
 }
 
@@ -447,7 +538,7 @@ void excel68k_state::fex68km4_map(address_map &map)
 	map(0x00000000, 0x0000000f).mirror(0x00fff0).w(FUNC(excel68k_state::leds_w)).umask32(0x00ff00ff);
 	map(0x00000000, 0x0000000f).mirror(0x00fff0).w(FUNC(excel68k_state::digit_w)).umask32(0xff00ff00);
 	map(0x00044000, 0x00047fff).ram(); // unused?
-	map(0x00100000, 0x0010000f).mirror(0x03fff0).r(FUNC(excel68k_state::input1_r)).umask32(0x00ff00ff);
+	map(0x00100000, 0x0010000f).mirror(0x03fff0).r(FUNC(excel68k_state::input_r)).umask32(0x00ff00ff);
 	map(0x00140000, 0x0014000f).mirror(0x03fff0).w(FUNC(excel68k_state::mux_w)).umask32(0x00ff00ff);
 	map(0x00200000, 0x0027ffff).ram();
 	map(0x00400000, 0x00407fff).ram();
@@ -467,11 +558,11 @@ void eag_state::eag_map(address_map &map)
 	map(0x000000, 0x01ffff).rom();
 	map(0x104000, 0x107fff).ram();
 	map(0x300000, 0x30000f).mirror(0x000010).w(FUNC(eag_state::digit_w)).umask16(0xff00).nopr();
-	map(0x300000, 0x30000f).mirror(0x000010).rw(FUNC(eag_state::input1_r), FUNC(eag_state::leds_w)).umask16(0x00ff);
+	map(0x300000, 0x30000f).mirror(0x000010).rw(FUNC(eag_state::input_r), FUNC(eag_state::leds_w)).umask16(0x00ff);
 	map(0x400000, 0x400007).w(FUNC(eag_state::mux_w)).umask16(0x00ff);
 	map(0x400000, 0x407fff).r("cartslot", FUNC(generic_slot_device::read_rom)).umask16(0xff00);
 	map(0x604000, 0x607fff).ram().share("nvram");
-	map(0x700003, 0x700003).r(FUNC(eag_state::input2_r));
+	map(0x700000, 0x700003).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 }
 
 void eagv5_state::main_map(address_map &map)
@@ -495,11 +586,11 @@ void eag_state::eagv7_map(address_map &map)
 	map(0x000000, 0x01ffff).rom();
 	map(0x104000, 0x107fff).ram();
 	map(0x300000, 0x30000f).mirror(0x000010).w(FUNC(eag_state::digit_w)).umask32(0xff00ff00).nopr();
-	map(0x300000, 0x30000f).mirror(0x000010).rw(FUNC(eag_state::input1_r), FUNC(eag_state::leds_w)).umask32(0x00ff00ff);
+	map(0x300000, 0x30000f).mirror(0x000010).rw(FUNC(eag_state::input_r), FUNC(eag_state::leds_w)).umask32(0x00ff00ff);
 	map(0x400000, 0x400007).w(FUNC(eag_state::mux_w)).umask32(0x00ff00ff);
 	map(0x400000, 0x407fff).r("cartslot", FUNC(generic_slot_device::read_rom)).umask32(0xff00ff00);
 	map(0x604000, 0x607fff).ram().share("nvram");
-	map(0x700003, 0x700003).r(FUNC(eag_state::input2_r));
+	map(0x700000, 0x700003).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask32(0x00ff00ff);
 	map(0x800000, 0x807fff).ram();
 }
 
@@ -508,12 +599,23 @@ void eag_state::eagv10_map(address_map &map)
 	map(0x00000000, 0x0001ffff).rom();
 	map(0x00280000, 0x0037ffff).ram();
 	map(0x00b00000, 0x00b0000f).mirror(0x00000010).w(FUNC(eag_state::digit_w)).umask32(0xff00ff00).nopr();
-	map(0x00b00000, 0x00b0000f).mirror(0x00000010).rw(FUNC(eag_state::input1_r), FUNC(eag_state::leds_w)).umask32(0x00ff00ff);
+	map(0x00b00000, 0x00b0000f).mirror(0x00000010).rw(FUNC(eag_state::input_r), FUNC(eag_state::leds_w)).umask32(0x00ff00ff);
 	map(0x00c00000, 0x00c00007).w(FUNC(eag_state::mux_w)).umask32(0x00ff00ff);
 	map(0x00c00000, 0x00c07fff).r("cartslot", FUNC(generic_slot_device::read_rom)).umask32(0xff00ff00);
 	map(0x00e04000, 0x00e07fff).ram().share("nvram");
-	map(0x00f00003, 0x00f00003).r(FUNC(eag_state::input2_r));
-	map(0x01000000, 0x0101ffff).ram();
+	map(0x00f00000, 0x00f00003).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask32(0x00ff00ff);
+	map(0x01018000, 0x0101ffff).ram();
+}
+
+void premiere_state::main_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).bankr(m_rombank);
+	map(0x100000, 0x13ffff).ram();
+	map(0x300000, 0x30000f).mirror(0x000010).w(FUNC(premiere_state::digit_w)).umask16(0xff00).nopr();
+	map(0x300000, 0x30000f).mirror(0x000010).rw(FUNC(premiere_state::input_r), FUNC(premiere_state::leds_w)).umask16(0x00ff);
+	map(0x400000, 0x400007).w(FUNC(premiere_state::mux_w)).umask16(0x00ff);
+	map(0x600000, 0x607fff).mirror(0x008000).bankrw(m_nvrambank);
+	map(0x700000, 0x700003).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 }
 
 
@@ -546,9 +648,18 @@ static INPUT_PORTS_START( eag )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("DM")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL") PORT_CHANGED_MEMBER(DEVICE_SELF, eag_state, in1_changed, 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("DM") PORT_CHANGED_MEMBER(DEVICE_SELF, eag_state, in1_changed, 0)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("New Game") PORT_CHANGED_MEMBER(DEVICE_SELF, eag_state, in1_changed, 0)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( premiere )
+	PORT_INCLUDE( eag )
+
+	PORT_START("IN.2")
+	PORT_CONFNAME( 0x01, 0x00, "Program" )
+	PORT_CONFSETTING(    0x00, "Vancouver" )
+	PORT_CONFSETTING(    0x01, "2265" )
 INPUT_PORTS_END
 
 
@@ -621,6 +732,16 @@ void eag_state::eag_base(machine_config &config)
 	irq_clock.signal_handler().set_inputline(m_maincpu, M68K_IRQ_IPL1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
+	I8251(config, m_usart, 4.9152_MHz_XTAL);
+	m_usart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+
+	auto &usart_clock(CLOCK(config, "usart_clock", 4.9152_MHz_XTAL / 128)); // 4060 Q7, 38.4kHz
+	usart_clock.signal_handler().set(m_usart, FUNC(i8251_device::write_txc));
+
+	auto &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_usart, FUNC(i8251_device::write_rxd));
+	rs232.cts_handler().set(m_usart, FUNC(i8251_device::write_cts));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -702,6 +823,9 @@ void eag_state::eagv10(machine_config &config)
 	M68040(config.replace(), m_maincpu, 25_MHz_XTAL);
 	m_maincpu->set_interrupt_mixer(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv10_map);
+
+	// IRQ pulse should be shorter, guessed here
+	subdevice<clock_device>("irq_clock")->set_pulse_width(attotime::from_nsec(1000));
 }
 
 void eag_state::eagv11(machine_config &config)
@@ -710,10 +834,20 @@ void eag_state::eagv11(machine_config &config)
 
 	// basic machine hardware
 	M68EC040(config.replace(), m_maincpu, 36_MHz_XTAL*2); // wrong! should be M68EC060
+	m_maincpu->set_interrupt_mixer(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv10_map);
+}
 
-	config.device_remove("irq_clock"); // 8.25us is too long
-	m_maincpu->set_periodic_int(FUNC(eag_state::irq2_line_hold), attotime::from_hz(600));
+void premiere_state::premiere(machine_config &config)
+{
+	eag_base(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &premiere_state::main_map);
+
+	// no cartridge
+	config.device_remove("cartslot");
+	config.device_remove("cart_list");
 }
 
 
@@ -839,6 +973,12 @@ ROM_START( feagv11 )
 	ROM_LOAD32_BYTE("19", 0x00003, 0x08000, CRC(a70c5468) SHA1(7f6b4f46577d5cfdaa84d387c7ce35d941e5bbc7) ) // "
 ROM_END
 
+ROM_START( premiere ) // model 6131, PCB label 510.1157A01
+	ROM_REGION16_BE( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("101.1103a01_1meg_even.u22", 0x00000, 0x20000, CRC(0df2d4d8) SHA1(2c6cd8d83768d14aeb9860be76ed2ec0f64f118b) ) // M27C1001
+	ROM_LOAD16_BYTE("101.1104a01_1meg_odd.u19",  0x00001, 0x20000, CRC(afae9d5e) SHA1(7ab5fb8b8a2fa30f2fd444a050eae2432c9236d0) ) // "
+ROM_END
+
 } // anonymous namespace
 
 
@@ -853,17 +993,19 @@ SYST( 1987, fex68ka,   fex68k,  0,      fex68k,   excel68k, excel68k_state, empt
 SYST( 1987, fex68kb,   fex68k,  0,      fex68k,   excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1988, fex68km2,  fex68k,  0,      fex68km2, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach II (rev. C+, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1988, fex68km2a, fex68k,  0,      fex68km2, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach II (rev. C+, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, fex68km3,  fex68k,  0,      fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, fex68km3a, fex68k,  0,      fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, fex68km3b, fex68k,  0,      fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, fex68km3,  fex68k,  0,      fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master 2265 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, fex68km3a, fex68k,  0,      fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master 2265 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, fex68km3b, fex68k,  0,      fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master 2265 (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1989, fex68km4,  fex68k,  0,      fex68km4, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach IV 68020 Master 2325", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-SYST( 1989, feagv4,    0,       0,      eagv4,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-4, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, feagv4a,   feagv4,  0,      eagv4,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-4, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, feagv5,    feagv4,  0,      eagv5,    eag,      eagv5_state,    init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, feagv7,    feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, feagv7a,   feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, feagv7b,   feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, feagv9,    feagv4,  0,      eagv9,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, feagv10,   feagv4,  0,      eagv10,   eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-SYST( 2002, feagv11,   feagv4,  0,      eagv11,   eag,      eag_state,      empty_init, "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+SYST( 1989, feagv4,    0,       0,      eagv4,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde 2265 (model 6114-2/3/4, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, feagv4a,   feagv4,  0,      eagv4,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde 2265 (model 6114-2/3/4, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, feagv5,    feagv4,  0,      eagv5,    eag,      eagv5_state,    init_eag,   "Fidelity Electronics", "Elite Avant Garde 2265 (model 6114-5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, feagv7,    feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde 2325 (model 6117-6/7, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, feagv7a,   feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde 2325 (model 6117-6/7, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, feagv7b,   feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde 2325 (model 6117-6/7, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, feagv9,    feagv4,  0,      eagv9,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde 2325 (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, feagv10,   feagv4,  0,      eagv10,   eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde 2325 (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+SYST( 2001, feagv11,   feagv4,  0,      eagv11,   eag,      eag_state,      empty_init, "hack (Wilfried Bucke)", "Elite Avant Garde 2325 (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+
+SYST( 1992, premiere,  0,       0,      premiere, premiere, premiere_state, empty_init, "Fidelity Electronics", "Elite Premiere", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

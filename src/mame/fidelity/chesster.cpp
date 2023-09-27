@@ -5,7 +5,7 @@
 
 Fidelity Chesster Challenger
 
-These were made after Hegener + Glaser took over Fidelity(design phase started
+These were made after Hegener + Glaser took over Fidelity (design phase started
 before that). Kishon Chesster was released under both Fidelity, and Mephisto brands.
 
 ********************************************************************************
@@ -37,7 +37,7 @@ the S14001A in the 70s), this time a 65C02 software solution.
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_chesster.lh" // clickable
+#include "fidel_chesster.lh"
 
 
 namespace {
@@ -101,8 +101,6 @@ void chesster_state::machine_start()
 /*******************************************************************************
     I/O
 *******************************************************************************/
-
-// TTL/generic
 
 void chesster_state::control_w(offs_t offset, u8 data)
 {

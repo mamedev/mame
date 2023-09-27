@@ -61,7 +61,7 @@ void rbv_device::device_add_mconfig(machine_config &config)
 	m_screen->set_size(1024, 768);
 	m_screen->set_visarea(0, 640 - 1, 0, 480 - 1);
 	m_screen->set_screen_update(FUNC(rbv_device::screen_update));
-	m_screen->screen_vblank().set(FUNC(rbv_device::vbl_w));
+	m_screen->screen_vblank().set(FUNC(rbv_device::slot_irq_w<0x40>));
 	config.set_default_layout(layout_monitors);
 
 	PALETTE(config, m_palette).set_entries(256);
@@ -132,61 +132,28 @@ TIMER_CALLBACK_MEMBER(rbv_device::mac_6015_tick)
 	write_6015(ASSERT_LINE);
 }
 
-void rbv_device::vbl_w(int state)
-{
-	if (!state)
-	{
-		m_pseudovia_regs[2] |= 0x40;
-	}
-	else
-	{
-		m_pseudovia_regs[2] &= ~0x40; // set vblank signal
-	}
-
-	pseudovia_recalc_irqs();
-}
-
-void rbv_device::slot0_irq_w(int state)
+template <u8 mask>
+void rbv_device::slot_irq_w(int state)
 {
 	if (state)
 	{
-		m_pseudovia_regs[2] &= ~0x08;
+		m_pseudovia_regs[2] &= ~mask;
 	}
 	else
 	{
-		m_pseudovia_regs[2] |= 0x08;
+		m_pseudovia_regs[2] |= mask;
 	}
 
 	pseudovia_recalc_irqs();
 }
 
-void rbv_device::slot1_irq_w(int state)
-{
-	if (state)
-	{
-		m_pseudovia_regs[2] &= ~0x10;
-	}
-	else
-	{
-		m_pseudovia_regs[2] |= 0x10;
-	}
-
-	pseudovia_recalc_irqs();
-}
-
-void rbv_device::slot2_irq_w(int state)
-{
-	if (state)
-	{
-		m_pseudovia_regs[2] &= ~0x20;
-	}
-	else
-	{
-		m_pseudovia_regs[2] |= 0x20;
-	}
-
-	pseudovia_recalc_irqs();
-}
+template void rbv_device::slot_irq_w<0x40>(int state);
+template void rbv_device::slot_irq_w<0x20>(int state);
+template void rbv_device::slot_irq_w<0x10>(int state);
+template void rbv_device::slot_irq_w<0x08>(int state);
+template void rbv_device::slot_irq_w<0x04>(int state);
+template void rbv_device::slot_irq_w<0x02>(int state);
+template void rbv_device::slot_irq_w<0x01>(int state);
 
 void rbv_device::asc_irq_w(int state)
 {

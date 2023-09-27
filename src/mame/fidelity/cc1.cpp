@@ -59,15 +59,16 @@ with CCX and CC7.
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
 #include "machine/timer.h"
 #include "video/pwm.h"
 
 // internal artwork
-#include "fidel_cc1.lh" // clickable
-#include "fidel_cc3.lh" // clickable
-#include "fidel_cc10c.lh" // clickable
+#include "fidel_cc1.lh"
+#include "fidel_cc3.lh"
+#include "fidel_cc10c.lh"
 
 
 namespace {
@@ -308,8 +309,8 @@ ROM_END
 
 ROM_START( cc10c )
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("k95069-922_ucc_10", 0x0000, 0x1000, CRC(2232c1c4) SHA1(fd282ba7ce7ac28834c860cec2cca398aec1b3f3) )
-	ROM_CONTINUE(                 0x2000, 0x1000 )
+	ROM_LOAD("ucc_10", 0x0000, 0x1000, CRC(2232c1c4) SHA1(fd282ba7ce7ac28834c860cec2cca398aec1b3f3) )
+	ROM_CONTINUE(      0x2000, 0x1000 )
 ROM_END
 
 } // anonymous namespace

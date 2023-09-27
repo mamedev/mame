@@ -492,12 +492,12 @@ void pent6800_state::pent6800(machine_config &config)
 	BEEP(config, m_beep, 387).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	pia6821_device &pia50(PIA6821(config, "pia50", 0));
+	pia6821_device &pia50(PIA6821(config, "pia50"));
 	pia50.writepa_handler().set(FUNC(pent6800_state::p50a_w));
 	pia50.writepb_handler().set(FUNC(pent6800_state::p50b_w));
 	pia50.ca2_handler().set(FUNC(pent6800_state::p50ca2_w));
 
-	PIA6821(config, m_pia51, 0);
+	PIA6821(config, m_pia51);
 	m_pia51->writepa_handler().set(FUNC(pent6800_state::p51a_w));
 	m_pia51->readpb_handler().set(FUNC(pent6800_state::p51b_r));
 	m_pia51->writepb_handler().set(FUNC(pent6800_state::p51b_w));

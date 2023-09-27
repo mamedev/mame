@@ -17,6 +17,7 @@
 #include "macrtc.h"
 #include "mactoolbox.h"
 
+#include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
 #include "bus/nubus/nubus.h"
@@ -95,6 +96,7 @@ private:
 
 	u32 *m_ram_ptr = nullptr, *m_rom_ptr = nullptr;
 	u32 m_ram_mask = 0, m_ram_size = 0, m_rom_size = 0;
+	u8 m_mac[6];
 
 	emu_timer *m_6015_timer = nullptr;
 
@@ -167,6 +169,8 @@ private:
 		else
 			m_swim->write((offset >> 8) & 0xf, data>>8);
 	}
+
+	u8 ethernet_mac_r(offs_t offset);
 };
 
 void macquadra_state::field_interrupts()
@@ -201,8 +205,20 @@ void macquadra_state::field_interrupts()
 
 void macquadra_state::machine_start()
 {
+	const u8 *MAC = (u8 *)m_sonic->get_mac();
+
 	m_dafb->set_turboscsi1_device(m_ncr1);
 	m_dafb->set_turboscsi2_device(nullptr);
+
+	// MAC PROM is stored with a bit swizzle and must match one of 2
+	// Apple-assigned OUI blocks 00:05:02 or 08:00:07
+	m_mac[0] = bitswap<8>(0x00, 0, 1, 2, 3, 7, 6, 5, 4);
+	m_mac[1] = bitswap<8>(0x05, 0, 1, 2, 3, 7, 6, 5, 4);
+	m_mac[2] = bitswap<8>(0x02, 0, 1, 2, 3, 7, 6, 5, 4);
+	m_mac[3] = bitswap<8>(MAC[3], 0, 1, 2, 3, 7, 6, 5, 4);
+	m_mac[4] = bitswap<8>(MAC[4], 0, 1, 2, 3, 7, 6, 5, 4);
+	m_mac[5] = bitswap<8>(MAC[5], 0, 1, 2, 3, 7, 6, 5, 4);
+	m_sonic->set_mac(&m_mac[0]);
 
 	m_ram_ptr = (u32*)m_ram->pointer();
 	m_ram_size = m_ram->size()>>1;
@@ -411,6 +427,27 @@ u32 macquadra_state::rom_switch_r(offs_t offset)
 	return m_rom_ptr[offset & ((m_rom_size - 1)>>2)];
 }
 
+u8 macquadra_state::ethernet_mac_r(offs_t offset)
+{
+	if (offset < 6)
+	{
+		return m_mac[offset];
+	}
+	else if (offset == 7)
+	{
+		u8 xor_total = 0;
+
+		for (int i = 0; i < 6; i++)
+		{
+			xor_total ^= (u8)m_mac[i];
+		}
+
+		return xor_total ^ 0xff;
+	}
+
+	return 0;
+}
+
 TIMER_CALLBACK_MEMBER(macquadra_state::mac_6015_tick)
 {
 	/* handle ADB keyboard/mouse */
@@ -426,7 +463,7 @@ void macquadra_state::quadra700_map(address_map &map)
 
 	map(0x50000000, 0x50001fff).rw(FUNC(macquadra_state::mac_via_r), FUNC(macquadra_state::mac_via_w)).mirror(0x00fc0000);
 	map(0x50002000, 0x50003fff).rw(FUNC(macquadra_state::mac_via2_r), FUNC(macquadra_state::mac_via2_w)).mirror(0x00fc0000);
-	// 50008000 = Ethernet MAC ID PROM
+	map(0x50008000, 0x50008007).r(FUNC(macquadra_state::ethernet_mac_r)).mirror(0x00fc0000);
 	map(0x5000a000, 0x5000b0ff).m(m_sonic, FUNC(dp83932c_device::map)).umask32(0x0000ffff).mirror(0x00fc0000);
 	// 5000e000 = Orwell controls
 	map(0x5000f000, 0x5000f0ff).rw(m_dafb, FUNC(dafb_device::turboscsi_r<0>), FUNC(dafb_device::turboscsi_w<0>)).mirror(0x00fc0000);
@@ -573,8 +610,13 @@ void macquadra_state::macqd700(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi1:0", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:2", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi1:3", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi1:4", mac_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsi1:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
+		[](device_t *device)
+		{
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
+		});
+	NSCSI_CONNECTOR(config, "scsi1:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:6", mac_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi1:7").option_set("ncr53c96", NCR53C96).clock(50_MHz_XTAL / 2).machine_config(
@@ -589,6 +631,7 @@ void macquadra_state::macqd700(machine_config &config)
 
 	DP83932C(config, m_sonic, 40_MHz_XTAL / 2); // clock is C20M on the schematics
 	m_sonic->set_bus(m_maincpu, 0);
+	m_sonic->out_int_cb().set(m_via2, FUNC(via6522_device::write_pa0)).invert();    // IRQ is active low
 
 	nubus_device &nubus(NUBUS(config, "nubus", 40_MHz_XTAL / 4));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
@@ -639,7 +682,9 @@ void macquadra_state::macqd700(machine_config &config)
 	m_ram->set_extra_options("8M,16M,32M,64M,68M,72M,80M,96M,128M");
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68040");
 	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
+	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 }

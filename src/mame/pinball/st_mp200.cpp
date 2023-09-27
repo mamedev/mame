@@ -644,7 +644,7 @@ void st_mp200_state::st_mp200(machine_config &config)
 	genpin_audio(config);
 
 	/* Devices */
-	PIA6821(config, m_pia_u10, 0);
+	PIA6821(config, m_pia_u10);
 	m_pia_u10->readpa_handler().set(FUNC(st_mp200_state::u10_a_r));
 	m_pia_u10->writepa_handler().set(FUNC(st_mp200_state::u10_a_w));
 	m_pia_u10->readpb_handler().set(FUNC(st_mp200_state::u10_b_r));
@@ -657,7 +657,7 @@ void st_mp200_state::st_mp200(machine_config &config)
 	clock_device &u10_clock(CLOCK(config, "u10_clock", 120)); // crosspoint detector
 	u10_clock.signal_handler().set(m_pia_u10, FUNC(pia6821_device::cb1_w));
 
-	PIA6821(config, m_pia_u11, 0);
+	PIA6821(config, m_pia_u11);
 	m_pia_u11->readpa_handler().set(FUNC(st_mp200_state::u11_a_r));
 	m_pia_u11->writepa_handler().set(FUNC(st_mp200_state::u11_a_w));
 	m_pia_u11->writepb_handler().set(FUNC(st_mp200_state::u11_b_w));
@@ -685,13 +685,13 @@ void st_mp200_state::st_sam4(machine_config &config)
 	st_mp200(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &st_mp200_state::sam4_map);
 	config.device_remove("nvram");
-	PIA6821(config, "sam4_pia0", 0);
-	PIA6821(config, "sam4_pia1", 0);
-	PIA6821(config, "sam4_pia2", 0);
-	pia6821_device &pia3(PIA6821(config, "sam4_pia3", 0));
+	PIA6821(config, "sam4_pia0");
+	PIA6821(config, "sam4_pia1");
+	PIA6821(config, "sam4_pia2");
+	pia6821_device &pia3(PIA6821(config, "sam4_pia3"));
 	pia3.writepa_handler().set_nop();
 	pia3.writepb_handler().set_nop();
-	PIA6821(config, "sam4_pia4", 0);
+	PIA6821(config, "sam4_pia4");
 }
 
 /* ========== ALTERNATE ROMS =======================================================================

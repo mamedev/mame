@@ -37,6 +37,8 @@ protected:
 	virtual void crtc_map(address_map &map) override;
 	virtual void sequencer_map(address_map &map) override;
 
+	virtual u16 line_compare_mask() override;
+
 	// TODO: remove this leaky abstraction
 	struct
 	{

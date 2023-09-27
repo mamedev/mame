@@ -30,12 +30,8 @@ license:CC0-1.0
 	</element>
 
 	<element name="led" defstate="0">
-		<rect state="0">
-			<color red="0.20" green="0.0" blue="0.0" />
-		</rect>
-		<rect state="1">
-			<color red="1" green="0.1" blue="0.1" />
-		</rect>
+		<rect state="1"><color red="1.0" green="0.1" blue="0.15" /></rect>
+		<rect state="0"><color red="0.1" green="0.01" blue="0.015" /></rect>
 	</element>
 	<element name="hlb" defstate="0">
 		<rect state="1">

@@ -123,7 +123,7 @@ void namcoc65_device::namcos2_mcu_analog_ctrl_w(uint8_t data)
 			m_mcu_analog_data = m_port_analog_in_cb[7]();
 			break;
 		default:
-			//output().set_value("anunk",data);
+			//logerror("anunk: %02x\n", data);
 			break;
 		}
 
@@ -155,8 +155,8 @@ void namcoc65_device::mcu_map(address_map &map)
 	map(0x0007, 0x0007).r(FUNC(namcoc65_device::mcuh_r)); /* Usually P1/P2 direction input (R) + Buttons 1,2,3 */
 	map(0x0010, 0x0010).rw(FUNC(namcoc65_device::namcos2_mcu_analog_ctrl_r), FUNC(namcoc65_device::namcos2_mcu_analog_ctrl_w));
 	map(0x0011, 0x0011).rw(FUNC(namcoc65_device::namcos2_mcu_analog_port_r), FUNC(namcoc65_device::namcos2_mcu_analog_port_w));
-	map(0x0040, 0x01bf).ram();
-	map(0x01c0, 0x1fff).rom(); /* internal ROM */
+//  map(0x0040, 0x01bf).ram();
+//  map(0x01c0, 0x1fff).rom(); /* internal ROM */
 	map(0x2000, 0x2000).r(FUNC(namcoc65_device::mcudsw_r)); /* Dipswitch, including service mode */
 	map(0x3000, 0x3000).r(FUNC(namcoc65_device::mcudi0_r));
 	map(0x3001, 0x3001).r(FUNC(namcoc65_device::mcudi1_r));
@@ -170,7 +170,7 @@ void namcoc65_device::mcu_map(address_map &map)
 
 void namcoc65_device::device_add_mconfig(machine_config &config)
 {
-	HD63705(config, m_mcu, DERIVED_CLOCK(1, 1));
+	HD63705Z0(config, m_mcu, DERIVED_CLOCK(1, 1));
 	m_mcu->set_addrmap(AS_PROGRAM, &namcoc65_device::mcu_map);
 }
 

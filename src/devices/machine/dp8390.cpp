@@ -422,7 +422,7 @@ void dp8390_device::cs_write(offs_t offset, uint8_t data) {
 	case 0x45:
 	case 0x46:
 		m_regs.par[(offset & 0x7)-1] = data;
-		set_mac((const char *)m_regs.par);
+		set_mac(m_regs.par);
 		break;
 	case 0x47:
 		m_regs.curr = data;

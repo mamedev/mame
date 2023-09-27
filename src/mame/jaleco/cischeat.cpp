@@ -723,6 +723,14 @@ void armchamp2_state::armchmp2_map(address_map &map)
 #define RIGHT 0
 #define LEFT  1
 
+void captflag_state::machine_start()
+{
+	cischeat_state::machine_start();
+
+	m_motor_left_output.resolve();
+	m_motor_right_output.resolve();
+}
+
 void captflag_state::leds_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_captflag_leds );
@@ -824,7 +832,7 @@ void captflag_state::motor_move(int side, uint16_t data)
 		dev.reset();
 	}
 
-	output().set_value((side == RIGHT) ? "right" : "left", pos);
+	((side == RIGHT) ? m_motor_right_output : m_motor_left_output) = pos;
 }
 
 template <int N>

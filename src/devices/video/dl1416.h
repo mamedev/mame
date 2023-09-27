@@ -66,6 +66,8 @@ protected:
 private:
 	devcb_write16 m_update_cb;
 
+	void do_update(offs_t offset);
+
 	// internal state
 	u8 m_digit_ram[4]; // holds the digit code for each position
 	bool m_cursor_state[4]; // holds the cursor state for each position

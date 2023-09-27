@@ -232,7 +232,7 @@ void ec65_state::ec65(machine_config &config)
 
 	/* devices */
 	ACIA6850(config, "fdc", 0); // used as a FDC on separate card
-	PIA6821(config, "pia", 0);   // assists 6850
+	PIA6821(config, "pia"); // assists 6850
 
 	MOS6522(config, m_via0, XTAL(4'000'000) / 4);
 
@@ -270,13 +270,13 @@ void ec65k_state::ec65k(machine_config &config)
 
 	/* devices */
 	ACIA6850(config, "fdc", 0); // used as a FDC on separate card
-	PIA6821(config, "pia", 0);   // assists 6850
+	PIA6821(config, "pia"); // assists 6850
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	//m_rtc->irq().set(FUNC(micronic_state::mc146818_irq));   Connects to common irq line used by below PIAs and UART
 
-	PIA6821(config, m_pia0, 0);
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia0);
+	PIA6821(config, m_pia1);
 
 	mos6551_device &uart(MOS6551(config, "uart", 0));
 	uart.set_xtal(XTAL(1'843'200));

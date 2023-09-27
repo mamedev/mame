@@ -25,7 +25,7 @@ as seen on the PCB and also confirmed by Ron Nelson.
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_eldorado.lh" // clickable
+#include "fidel_eldorado.lh"
 
 
 namespace {

@@ -301,6 +301,7 @@ void system_list::populate_list(bool copydesc)
 
 			m_filter_data.add_manufacturer(driver.manufacturer);
 			m_filter_data.add_year(driver.year);
+			m_filter_data.add_source_file(driver.type.source());
 		}
 	}
 }

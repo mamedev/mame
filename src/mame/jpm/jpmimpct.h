@@ -76,6 +76,8 @@ public:
 		, m_upd7759(*this, "upd")
 		, m_reel(*this, "reel%u", 0U)
 		, m_lamp_output(*this, "lamp%u", 0U)
+		, m_pwrled(*this, "PWRLED")
+		, m_statled(*this, "STATLED")
 	{ }
 
 	void impact_nonvideo(machine_config &config);
@@ -171,6 +173,8 @@ private:
 	required_device<upd7759_device> m_upd7759;
 	optional_device_array<stepper_device, 6> m_reel;
 	output_finder<256> m_lamp_output;
+	output_finder<> m_pwrled;
+	output_finder<> m_statled;
 };
 
 class jpmimpct_video_state : public jpmimpct_state

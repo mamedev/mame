@@ -6,6 +6,9 @@
 Fidelity Elite A/S series hardware (EAS, EAG, PC)
 see eag68k.cpp for 68000-based EAG hardware
 
+NOTE: To start a new game in EAS/PC, press Game Control (aka Reset), activate
+the D6 square, and then press CL. See below for more info.
+
 TODO:
 - verify fpres/feas irq active time
 
@@ -39,9 +42,17 @@ Though model EWC(improved Budapest) had a 3.57MHz XTAL and EAS-C(Glasgow) had
 a 4MHz XTAL.
 
 A condensator/battery keeps RAM contents alive for a while when powered off.
-Note that EAS doesn't have a "new game" button, it is done through game options:
+
+Note that EAS/PC doesn't have a "new game" button, it is done through game options:
 Press GAME CONTROL, then place/lift a piece on D6 to restart, or D8 to reset
 with default settings, then press CL.
+
+Anecdote from Ron Nelson regarding the new game issue (Sid Samole was the CEO):
+"The next year I designed it into a wooden housing, and Kathy said she wanted to
+design the User Interface. I said ok go for it. When it was finished & masked,
+I was at an internal sales meeting. No one could figure out how to start a new game.
+Sid turned to me with a questioning look. I showed him how to do it (multiple key
+presses as I recall) and explained about Kathy. He said, don't let them do it again."
 
 Prestige Challenger (PC) hardware is very similar. It was released before EAS,
 it doesn't have the 8255 PPI, but has more RAM(7*TMM2016P). Some were released at
@@ -77,9 +88,9 @@ uninteresting to emulate as separate drivers.
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_eag.lh" // clickable
-#include "fidel_eas.lh" // clickable
-#include "fidel_pc.lh" // clickable
+#include "fidel_eag.lh"
+#include "fidel_eas.lh"
+#include "fidel_pc.lh"
 
 
 namespace {

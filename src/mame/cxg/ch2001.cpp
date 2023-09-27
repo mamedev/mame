@@ -31,7 +31,7 @@ Hardware notes:
 #include "speaker.h"
 
 // internal artwork
-#include "cxg_ch2001.lh" // clickable
+#include "cxg_ch2001.lh"
 
 
 namespace {
@@ -217,4 +217,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1984, ch2001, 0,      0,      ch2001,  ch2001, ch2001_state, empty_init, "CXG Systems / Newcrest Technology", "Chess 2001", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, ch2001, 0,      0,      ch2001,  ch2001, ch2001_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Software", "Chess 2001", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

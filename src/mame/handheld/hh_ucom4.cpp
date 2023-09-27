@@ -103,13 +103,13 @@ ROM source notes when dumped from another title, but confident it's the same:
 // internal artwork
 #include "alnchase.lh"
 #include "bmsafari.lh"
-#include "ctntune.lh" // clickable
+#include "ctntune.lh"
 #include "efball.lh"
-#include "grobot9.lh" // clickable
+#include "grobot9.lh"
 #include "mcompgin.lh"
 #include "mvbfree.lh"
 #include "splasfgt.lh"
-#include "tactix.lh" // clickable
+#include "tactix.lh"
 #include "tccombat.lh"
 #include "tmtennis.lh"
 #include "ufombs.lh"
@@ -245,7 +245,7 @@ INPUT_CHANGED_MEMBER(hh_ucom4_state::single_interrupt_line)
 
   Bambino UFO Master-Blaster Station (manufactured in Japan)
   * PCB label: Emix Corp. ET-02
-  * NEC uCOM-44 MCU, label EMIX D552C 017
+  * NEC uCOM-44 MCU, label EMIX D552C 017, 2-bit sound
   * cyan VFD Emix-101, with blue window
 
   This is Bambino's first game, it is not known if ET-01 exists. Emix Corp.
@@ -373,7 +373,7 @@ ROM_END
 
   Bambino Super Star Football (manufactured in Japan)
   * PCB label: Emix Corp. ET-03
-  * NEC uCOM-43 MCU, label D553C 031
+  * NEC uCOM-43 MCU, label D553C 031, 2-bit sound
   * cyan VFD Emix-102
 
   The game was rereleased in 1982 as Football Classic (ET-0351), with an
@@ -536,7 +536,7 @@ ROM_END
 
   Bambino Kick The Goal Soccer
   * PCB label: Emix Corp. ET-10/08 (PCB is for 2 possible games)
-  * NEC uCOM-44 MCU, label D552C 043
+  * NEC uCOM-44 MCU, label D552C 043, 1-bit sound
   * cyan VFD Emix-105, with bezel overlay
 
   Press the Display button twice to start the game. Action won't start until
@@ -676,7 +676,7 @@ ROM_END
 
   Bambino Safari (manufactured in Japan)
   * PCB label: Emix Corp. ET-11
-  * NEC uCOM-44 MCU, label EMIX D552C 049
+  * NEC uCOM-44 MCU, label EMIX D552C 049, 1-bit sound
   * cyan VFD Emix-108
   * color overlay: green (optional)
 
@@ -797,7 +797,7 @@ ROM_END
 
   Bambino Space Laser Fight (manufactured in Japan)
   * PCB label: Emix Corp. ET-12
-  * NEC uCOM-43 MCU, label D553C 055
+  * NEC uCOM-43 MCU, label D553C 055, 2-bit sound
   * cyan VFD Emix-104, with blue or transparent window
 
   This is basically a revamp of their earlier Boxing game (ET-06), case and
@@ -962,7 +962,7 @@ ROM_END
 
   Bandai Gunfighter
   * PCB label: KAKEN CORP., PT-256, PT-256B/PT-258 for the button PCBs
-  * NEC uCOM-43 MCU, label D553C 084
+  * NEC uCOM-43 MCU, label D553C 084, 1-bit sound
   * cyan VFD NEC FIP9BM18T
 
   This is presumedly Bandai's first VFD handheld game. Japanese versions of
@@ -1102,7 +1102,7 @@ ROM_END
 
   Bandai Galaxian
   * PCB label: SM-008
-  * NEC uCOM-43 MCU, label D553C 103
+  * NEC uCOM-43 MCU, label D553C 103, 2-bit sound
   * cyan/red VFD Futaba DM-12Z
   * color overlay: score/bottom rows: yellow, 2nd/3rd rows: pink
 
@@ -1223,7 +1223,7 @@ ROM_END
 
   Bandai Crazy Climber (manufactured in Japan)
   * PCB labels: SM-020/SM-021
-  * NEC uCOM-43 MCU, label D553C 170
+  * NEC uCOM-43 MCU, label D553C 170, 1-bit sound
   * cyan/red/green VFD NEC FIP6AM2-T no. 1-8 2
   * color overlay: score/bird rows: pink
 
@@ -1340,7 +1340,7 @@ ROM_END
 /*******************************************************************************
 
   Castle Toy Tactix
-  * NEC uCOM-43 MCU, label D557LC 512
+  * NEC uCOM-43 MCU, label D557LC 512, 1-bit sound
   * 16 LEDs behind buttons
 
   Tactix is similar to Merlin, for 1 or 2 players. In 2-player mode, simply
@@ -1467,7 +1467,7 @@ ROM_END
 /*******************************************************************************
 
   Castle Toy Name That Tune
-  * NEC uCOM-43 MCU, label D557LC 513
+  * NEC uCOM-43 MCU, label D557LC 513, 1-bit sound
   * 2 lamps, 1 7seg(+2 fake 7segs above a power-on lamp, showing "0")
 
   This is a tabletop multiplayer game. Players are meant to place a bid,
@@ -1613,7 +1613,7 @@ ROM_END
 
   Epoch Invader From Space (manufactured in Japan)
   * PCB labels: 36010(A/B)
-  * NEC uCOM-44 MCU, label D552C 054
+  * NEC uCOM-44 MCU, label D552C 054, 1-bit sound
   * cyan VFD NEC FIP9AM18T tube no. 0D
   * color overlay: alien rows 1,2: blue, 3,4: yellow, 5: red
 
@@ -1728,7 +1728,7 @@ ROM_END
 
   Epoch Electronic Football (manufactured in Japan)
   * PCB labels: 36020(A/B/C)
-  * NEC uCOM-43 MCU, label D553C 080
+  * NEC uCOM-43 MCU, label D553C 080, 1-bit sound
   * cyan VFD NEC FIP10AM15T tube no. 0F, with bezel overlay
 
   known releases:
@@ -1846,9 +1846,9 @@ ROM_END
 
   Epoch Galaxy II (manufactured in Japan)
   * PCB labels: 19096/96062
-  * NEC uCOM-43 MCU, label D553C 153
-  * cyan/red VFD NEC FIP10xM20T. x = multiple VFD revisions exist,
-    with different graphics: rev B no. 1-8, rev. D no. 2-21.
+  * NEC uCOM-43 MCU, label D553C 153, 1-bit sound
+  * cyan/red VFD NEC FIP10xM20T. x = multiple VFD revisions exist, with different
+    graphics: rev B no. 1-8, rev. D no. 2-21.
   * color overlay: score: blue, top/bottom rows: yellow, row 2,3: red
 
   known releases:
@@ -1982,7 +1982,7 @@ ROM_END
 
   Epoch Astro Command (manufactured in Japan)
   * PCB labels: 96111/96112
-  * NEC uCOM-43 MCU, label D553C 202
+  * NEC uCOM-43 MCU, label D553C 202, 1-bit sound
   * cyan/red VFD NEC FIP9AM20T no. 42-42
   * color overlay: right 3 columns: yellow, bottom row 6 columns: pink
 
@@ -2105,7 +2105,7 @@ ROM_END
 
   Epoch Dracula (manufactured in Japan)
   * PCB label: 96121
-  * NEC uCOM-43 MCU, label D553C 206
+  * NEC uCOM-43 MCU, label D553C 206, 1-bit sound
   * cyan/red/green VFD NEC FIP8BM20T no. 2-42
 
   known releases:
@@ -2220,8 +2220,8 @@ ROM_END
 /*******************************************************************************
 
   Mattel Computer Gin
-  * NEC uCOM-43 MCU, label D650C 060 (die label same)
-  * Hughes HLCD0530 LCD driver, 5 by 14 segments LCD panel, no sound
+  * NEC uCOM-43 MCU, label D650C 060 (die label same), no sound
+  * Hughes HLCD0530 LCD driver, 5 by 14 segments LCD panel
 
 *******************************************************************************/
 
@@ -2311,7 +2311,7 @@ ROM_END
 
   Mego Mini-Vid: Break Free (manufactured in Japan)
   * PCB label: Mego 79 rev F
-  * NEC uCOM-43 MCU, label D553C 049
+  * NEC uCOM-43 MCU, label D553C 049, 1-bit sound
   * cyan VFD Futaba DM-4.5 91
 
 *******************************************************************************/
@@ -2424,7 +2424,7 @@ ROM_END
 
   Takatoku Toys(T.T) Game Robot 9 「ゲームロボット九」
   * PCB label: GAME ROBOT 7520
-  * NEC uCOM-43 MCU, label TTGR-512 (die label NEC D557 511)
+  * NEC uCOM-43 MCU, label TTGR-512 (die label NEC D557 511), 1-bit sound
   * 9 lamps behind buttons
 
   known releases:
@@ -2551,7 +2551,7 @@ ROM_END
 
   Tomy Cosmic Combat (manufactured in Japan)
   * PCB label: 2E1019-E01
-  * NEC uCOM-44 MCU, label D552C 042
+  * NEC uCOM-44 MCU, label D552C 042, 1-bit sound
   * cyan VFD NEC FIP32AM18Y tube no. 0E, with blue window
   * color overlay: score/ufo/player: yellow (optional)
 
@@ -2666,7 +2666,7 @@ ROM_END
 
   Tomy Tennis (manufactured in Japan)
   * PCB label: TOMY TN-04 TENNIS
-  * NEC uCOM-44 MCU, label D552C 048
+  * NEC uCOM-44 MCU, label D552C 048, 1-bit sound
   * cyan VFD NEC FIP11AM15T tube no. 0F, with overlay
 
   The initial release of this game was in 1979, known as Pro-Tennis,
@@ -2840,7 +2840,7 @@ ROM_END
 
   Tomy Pac-Man (manufactured in Japan)
   * PCB label: TN-08 2E108E01
-  * NEC uCOM-43 MCU, label D553C 160
+  * NEC uCOM-43 MCU, label D553C 160, 1-bit sound
   * cyan/red/green VFD NEC FIP8AM18T no. 2-21
   * bright yellow round casing
 
@@ -2961,7 +2961,7 @@ ROM_END
 
   Tomy Scramble (manufactured in Japan)
   * PCB label: TN-10 2E114E01
-  * NEC uCOM-43 MCU, label D553C 192
+  * NEC uCOM-43 MCU, label D553C 192, 1-bit sound
   * cyan/red/green VFD NEC FIP10CM20T no. 2-41
 
   known releases:
@@ -3077,7 +3077,7 @@ ROM_END
 
   Tomy Caveman (manufactured in Japan)
   * PCB label: TN-12 2E114E03
-  * NEC uCOM-43 MCU, label D553C 209
+  * NEC uCOM-43 MCU, label D553C 209, 1-bit sound
   * cyan/red/green VFD NEC FIP8AM20T no. 2-42
 
   known releases:
@@ -3188,11 +3188,11 @@ ROM_END
 
   Tomy Alien Chase (manufactured in Japan)
   * PCB label: TN-16 2E121B01
-  * NEC uCOM-43 MCU, label D553C 258
-  * red/green VFD NEC FIP9AM24T, 2-sided*
+  * NEC uCOM-43 MCU, label D553C 258, 1-bit sound
+  * red/green VFD NEC FIP9AM24T (2-sided)
   * color overlay: top row: green, bottom: blue, middle: pink, other: yellow
 
-  *Player one views the VFD from the front (grid+filament side) while the
+  Player one views the VFD from the front (grid+filament side), while the
   opposite player views it from the back side (through the conductive traces),
   basically a mirror-image.
 
@@ -3273,10 +3273,10 @@ static INPUT_PORTS_START( alnchase )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 
 	PORT_START("IN.1") // D0 port A
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) // on non-mirrored view, swap P2 left/right
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2) // "
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL // on non-mirrored view, swap P2 left/right
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL // "
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
 
 	PORT_START("IN.2") // port B
 	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Players ) )

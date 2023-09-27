@@ -647,6 +647,9 @@ ROM_END
 
 /****************************************************** Elektronika MC-1702 ***
 
+This is actually the PC compatibility board for the Soviet MC-0585 computer, a DEC Professional 350 clone.
+An alternative ROM set shares the same corrupted pixels and some other changed locations in comparison with this dump.
+
 ******************************************************************************/
 
 ROM_START( mc1702 )

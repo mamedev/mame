@@ -23,14 +23,17 @@ The daughter card has a big box on it labelled as follows:
 The daughter board is connected to the main board via 40 pin socket.
 
 TODO:
-- decryption is only preliminary (?). The game puts some strings at 0xc000 and at 0xf810. At 0xf810 it puts 'MICRO' and then it expects to read 'DRAGON', if it doesn't it loops endlessly;
-- after decryption is completed, everything else.
+- Decryption may be incomplete, though code flow looks sane both for the main CPU and the audio CPU.
+- The game puts some strings at 0xc000 and at 0xf810. At 0xf810 it puts 'MICRO' in DPRAM and then it expects to read 'DRAGON' (put in DPRAM by the audio CPU),
+  if it doesn't it loops endlessly. For reasons to be investigated the audio CPU puts it at a slightly wrong offset.
+- HD63310 seems to have more features than the DPRAM chips emulated in machine/mb8421.cpp. Maybe reason for the above problem?
 */
 
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/mb8421.h"
 #include "sound/ymopl.h"
 
 #include "emupal.h"
@@ -43,7 +46,8 @@ class cointek_state : public driver_device
 {
 public:
 	cointek_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: driver_device(mconfig, type, tag),
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{
 	}
 
@@ -52,9 +56,12 @@ public:
 	void init_unkct();
 
 private:
+	required_shared_ptr<uint8_t> m_decrypted_opcodes;
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void audio_io_map(address_map &map);
+	void audio_opcodes_map(address_map &map);
 	void audio_prg_map(address_map &map);
 	void io_map(address_map &map);
 	void prg_map(address_map &map);
@@ -69,7 +76,8 @@ void cointek_state::prg_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom(); // banking?
 	map(0xc000, 0xc7ff).ram();
-	map(0xf800, 0xffff).ram();
+	map(0xf800, 0xfbff).rw("dpram", FUNC(idt7130_device::right_r), FUNC(idt7130_device::right_w));
+	map(0xfc00, 0xffff).ram();
 }
 
 void cointek_state::io_map(address_map &map)
@@ -79,10 +87,18 @@ void cointek_state::io_map(address_map &map)
 void cointek_state::audio_prg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+}
+
+void cointek_state::audio_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share(m_decrypted_opcodes);
 }
 
 void cointek_state::audio_io_map(address_map &map)
 {
+	//map(0x0040, 0x0043).rw("ppi3", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	//map(0x8000, 0x80ff).rw("dpram", FUNC(idt7130_device::left_r), FUNC(idt7130_device::left_w)); // TODO: seems to write the required DRAGON string here but in the wrong place. And why only 0x100?
 }
 
 
@@ -146,12 +162,16 @@ void cointek_state::cointek(machine_config &config)
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 12_MHz_XTAL / 3)); // divisor guessed
 	audiocpu.set_addrmap(AS_PROGRAM, &cointek_state::audio_prg_map);
+	audiocpu.set_addrmap(AS_OPCODES, &cointek_state::audio_opcodes_map);
 	audiocpu.set_addrmap(AS_IO, &cointek_state::audio_io_map);
-	audiocpu.set_disable(); // TODO: disabled for now to avoid clogging the error log
 
 	I8255(config, "ppi1");
 	I8255(config, "ppi2");
 	I8255(config, "ppi3");
+
+	IDT7130(config, "dpram"); // actually HD63310P20
+	//dpram.intr_callback().set_inputline("audiocpu", 0);
+	//dpram.intl_callback().set_inputline("maincpu", 0);
 
 	// all wrong
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -224,9 +244,14 @@ void cointek_state::init_unkct()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (int i = 0; i < 0x10000; i++) // TODO: This is only enough to show some strings, but the encryption is conditional, possibly based on addresses. The second ROM is also conditionally scrambled.
+	for (int i = 0; i < 0x10000; i++) // TODO: seems good but needs verifying
 		if (!(i & 0x1000))
 			rom[i] = bitswap<8>(rom[i], 7, 6, 3, 4, 5, 2, 1, 0);
+
+	uint8_t *audiorom = memregion("audiocpu")->base();
+
+	for (int i = 0; i < 0x8000; i++) // TODO: seems good but needs verifying
+		m_decrypted_opcodes[i] = bitswap<8>(audiorom[i], 0, 6, 5, 4, 3, 2, 1, 7);
 }
 
 } // anonymous namespace

@@ -75,21 +75,22 @@ BTANB:
 
 #include "emu.h"
 
+#include "mmdisplay1.h"
+
 #include "cpu/cosmac/cosmac.h"
 #include "machine/cdp1852.h"
 #include "machine/sensorboard.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "mmdisplay1.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
 
 // internal artwork
-#include "mephisto_1.lh" // clickable
-#include "mephisto_esb2.lh" // clickable
-#include "mephisto_3.lh" // clickable
-#include "mephisto_junior.lh" // clickable
+#include "mephisto_1.lh"
+#include "mephisto_esb2.lh"
+#include "mephisto_3.lh"
+#include "mephisto_junior.lh"
 
 
 namespace {
@@ -162,6 +163,12 @@ private:
 	u8 m_esb_select = 0;
 };
 
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
+
 void brikett_state::machine_start()
 {
 	// register for savestates
@@ -196,6 +203,8 @@ void brikett_state::set_cpu_freq()
 /*******************************************************************************
     I/O
 *******************************************************************************/
+
+// base hardware
 
 INTERRUPT_GEN_MEMBER(brikett_state::interrupt)
 {
@@ -233,6 +242,9 @@ u8 brikett_state::input_r(offs_t offset)
 
 	return data;
 }
+
+
+// ESB 6000
 
 void brikett_state::esb_w(u8 data)
 {

@@ -98,13 +98,14 @@ $8000-$FFFF ROM
 
 #include "emu.h"
 
+#include "mmboard.h"
+#include "mmdisplay1.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/74259.h"
-#include "mmboard.h"
 #include "sound/dac.h"
-#include "mmdisplay1.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -120,12 +121,13 @@ namespace {
 class mm2_state : public driver_device
 {
 public:
-	mm2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_outlatch(*this, "outlatch")
-		, m_display(*this, "display")
-		, m_keys(*this, "KEY.%u", 0)
+	mm2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_outlatch(*this, "outlatch"),
+		m_display(*this, "display"),
+		m_keys(*this, "KEY.%u", 0),
+		m_reset(*this, "RESET")
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
@@ -146,6 +148,7 @@ private:
 	required_device<hc259_device> m_outlatch;
 	required_device<mephisto_display1_device> m_display;
 	required_ioport_array<2> m_keys;
+	required_ioport m_reset;
 
 	void bup_mem(address_map &map);
 	void mm2_mem(address_map &map);
@@ -159,14 +162,14 @@ private:
 
 void mm2_state::machine_reset()
 {
-	m_display->reset();
 	m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_display->reset();
 }
 
 INPUT_CHANGED_MEMBER(mm2_state::reset_button)
 {
 	// RES buttons in serial tied to CPU RESET
-	if (ioport("RESET")->read() == 3)
+	if (m_reset->read() == 3)
 	{
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		machine_reset();
@@ -189,6 +192,7 @@ void mm2_state::lcd_irqack_w(u8 data)
 
 u8 mm2_state::keys_r(offs_t offset)
 {
+	// lcd strobe is shared with keypad select
 	return ~(BIT(m_keys[m_outlatch->q7_r()]->read(), offset) << 7);
 }
 
@@ -283,7 +287,9 @@ static INPUT_PORTS_START( mm2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bup )
-	PORT_START("KEY.0")
+	PORT_INCLUDE( mm2 )
+
+	PORT_MODIFY("KEY.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("1 / Pawn") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("2 / Knight") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("3 / Bishop") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD)
@@ -293,7 +299,7 @@ static INPUT_PORTS_START( bup )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("White") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Black") PORT_CODE(KEYCODE_B)
 
-	PORT_START("KEY.1")
+	PORT_MODIFY("KEY.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("ENT") PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("BEST") PORT_CODE(KEYCODE_S)
@@ -302,13 +308,6 @@ static INPUT_PORTS_START( bup )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("POS") PORT_CODE(KEYCODE_O)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LEV") PORT_CODE(KEYCODE_L)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("MEM") PORT_CODE(KEYCODE_M)
-
-	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 1") PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mm2_state, reset_button, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 2") PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mm2_state, reset_button, 0)
-
-	PORT_START("CLICKABLE") // helper for clickable artwork
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)
 INPUT_PORTS_END
 
 

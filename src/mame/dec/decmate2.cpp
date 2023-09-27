@@ -56,7 +56,7 @@
 #include "machine/ay31015.h"
 #include "machine/clock.h"
 #include "machine/com8116.h"
-#include "dec_lk201.h"
+#include "lk201.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80sio.h"
 #include "video/crt9007.h"

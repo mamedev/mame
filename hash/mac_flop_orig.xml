@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="mac_flop_orig" description="Macintosh 400K/800K Original disk images">
+<softwarelist name="mac_flop_orig" description="Apple Macintosh 400K/800K original disk images">
 
 	<software name="lodrun10">
 		<description>Lode Runner (version 1.0)</description>
@@ -74,13 +74,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="temapsht">
-		<description>Temple of Apshai Trilogy</description>
+	<software name="tapt850930">
+		<description>Temple of Apshai Trilogy (version 1985-09-30)</description>
 		<year>1985</year>
 		<publisher>Epyx</publisher>
 		<info name="author" value="Stephen Landrum" />
 		<info name="developer" value="Westwood" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
+		<info name="version" value="1985-09-30" />
 		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
 		<!--Dump released:  2022-09-28-->
 		<!--roleplaying game-->
@@ -246,20 +247,13 @@ license:CC0-1.0
 		<!--Dump released: 2022-09-28-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="649023">
 				<rom name="indiana jones and the revenge of the ancients.moof" size="649023" crc="b5f1554f" sha1="bef7aafc1f397a29a273f8cdf4f6581fdd0f18c8" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk copy" />
-			<dataarea name="flop" size="649023">
-				<rom name="indiana jones and the revenge of the ancients copy.moof" size="649023" crc="b5f1554f" sha1="bef7aafc1f397a29a273f8cdf4f6581fdd0f18c8" />
-			</dataarea>
-		</part>
 	</software>
 
-	<software name="wintgame">
+	<software name="wgam851024">
 		<description>Winter Games (version 1985-10-24)</description>
 		<year>1985</year>
 		<publisher>Epyx</publisher>
@@ -276,7 +270,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wintgamer2">
+	<software name="wgam851031">
 		<description>Winter Games (version 1985-10-31)</description>
 		<year>1985</year>
 		<publisher>Epyx</publisher>
@@ -301,7 +295,7 @@ license:CC0-1.0
 		<info name="developer" value="Beck-Tech" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus" />
 		<!--Dump released: 2022-09-28-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -509,7 +503,7 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
 		<!--Dump released: 2022-10-07-->
 		<!--board game-->
-		<part name="flop2" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="642376">
 				<rom name="the chessmaster 2000 v1.02.moof" size="642376" crc="b7d7d52e" sha1="37a0118ac4d0d791de06121e6abf0f3e8d5df73c" />
 			</dataarea>
@@ -727,12 +721,12 @@ license:CC0-1.0
 	</software>
 
 	<software name="hitchgr47">
-		<description>The Hitchhiker's Guide to the Galaxy (release 47 / 840914)</description>
+		<description>The Hitchhiker's Guide to the Galaxy (release 47 / 840914-C)</description>
 		<year>1984</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Douglas Adams and Steve Meretzky" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<info name="version" value="release 47 / 840914" />
+		<info name="version" value="release 47 / 840914-C" />
 		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
 		<!--Dump released: 2022-12-08-->
 		<!--adventure game-->
@@ -1026,7 +1020,7 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
 		<!--Dump released: 2022-11-02-->
 		<!--simulation game-->
-		<part name="flop2" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="649054">
 				<rom name="flight simulator v1.02.moof" size="649054" crc="58bb2a05" sha1="2f0176d83b303e084295c629cb3ac6826b440a99" />
 			</dataarea>
@@ -1042,7 +1036,7 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="mac128k,mac512k" />
 		<!--Dump released: 2022-11-02-->
 		<!--educational game-->
-		<part name="flop2" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="639290">
 				<rom name="run for the money.moof" size="639290" crc="c5b89cf3" sha1="1bb89e799bd370e51a9f6ea0a015b1b0761da53f" />
 			</dataarea>
@@ -1059,7 +1053,7 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="mac512ke,macplus" />
 		<!--Dump released: 2022-11-02-->
 		<!--sound program-->
-		<part name="flop2" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296183">
 				<rom name="master tracks pro v4.0.moof" size="1296183" crc="655256b4" sha1="0d8f44da1116929b22ee62dbdf32a4e1a9efea5b" />
 			</dataarea>
@@ -1219,7 +1213,7 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
 		<!--Dump released: 2022-11-24-->
 		<!--simulation game-->
-		<part name="flop2" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="649086">
 				<rom name="mac vegas v1.1.moof" size="649086" crc="a03fd1cc" sha1="a16741b6e5767d66c952d60cdc8852b03f92b320" />
 			</dataarea>
@@ -1283,7 +1277,7 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
 		<!--Dump released: 2022-12-04-->
 		<!--educational progam-->
-		<part name="flop2" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="648997">
 				<rom name="the mind prober v1.0.moof" size="648997" crc="90d6f9fc" sha1="112ade8a35891697047ac50cca2cbba2dbf55590" />
 			</dataarea>
@@ -1301,19 +1295,19 @@ license:CC0-1.0
 		<!--Dump released: 2022-12-04-->
 		<!--graphics progam-->
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk master" />
+			<feature name="part_id" value="Disk Master" />
 			<dataarea name="flop" size="649083">
 				<rom name="the toy shop v1.1 - master disk.moof" size="649083" crc="587298c1" sha1="09f5698b104a2fb9693df027059810ec47e1b96b" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Toy Disk 1" />
 			<dataarea name="flop" size="649082">
 				<rom name="the toy shop v1.1 - toy disk 1.moof" size="649082" crc="ac532f1f" sha1="970669331a5c5387e8142069d3499d4125797892" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Toy Disk 2" />
 			<dataarea name="flop" size="649082">
 				<rom name="the toy shop v1.1 - toy disk 2.moof" size="649082" crc="b91c9b65" sha1="436989fec30e1ea974745f5c3713b62e4c243e2b" />
 			</dataarea>
@@ -1423,7 +1417,7 @@ license:CC0-1.0
 	<software name="dolsense13">
 		<description>Dollars and Sense (version 1.3)</description>
 		<year>1984</year>
-		<publisher>Monogram</publisher>
+		<publisher>Monogram Publishing</publisher>
 		<info name="programmer" value="Frank Mullin and Curt Bianchi" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
 		<info name="version" value="1.3" />
@@ -1644,12 +1638,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="fusillade">
-		<description>Fusillade</description>
+	<software name="fusill10">
+		<description>Fusillade (version 1.0)</description>
 		<year>1985</year>
 		<publisher>Miles Computing</publisher>
 		<info name="programmer" value="David Simons and Alvin Wen" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
 		<!--Dump released: 2022-12-22-->
 		<!--action game-->
@@ -1802,11 +1797,12 @@ license:CC0-1.0
 	</software>
 
 	<software name="pinballcs">
-		<description>Pinball Construction Set</description>
+		<description>Pinball Construction Set (version 2.5)</description>
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Bill Budge and Bob Upshaw" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="2.5" />
 		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
 		<!--Dump released: 2023-02-22-->
 		<!--action game-->
@@ -2076,11 +2072,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="murbydoz">
-		<description>Murder by the Dozen</description>
+	<software name="murbydozt">
+		<description>Murder by the Dozen (Thunder Mountain)</description>
 		<year>1984</year>
 		<publisher>Thunder Mountain</publisher>
-		<info name="developer" value="Thunder Mountain" />
+		<info name="developer" value="BrainBank" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
 		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
 		<!--Dump released: 2023-04-06-->

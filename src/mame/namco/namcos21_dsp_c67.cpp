@@ -404,7 +404,7 @@ void namcos21_dsp_c67_device::dspram16_w(offs_t offset, uint16_t data, uint16_t 
 
 int32_t namcos21_dsp_c67_device::read_pointrom_data(unsigned offset)
 {
-	return m_ptrom24[offset];
+	return m_ptrom24[offset & 0xfffff];
 }
 
 

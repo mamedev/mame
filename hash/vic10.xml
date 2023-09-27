@@ -266,6 +266,20 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="slalom">
+		<description>Slalom (World)</description>
+		<year>1983</year>
+		<publisher>Commodore / HAL Laboratory</publisher>
+		<part name="cart" interface="vic10_cart">
+			<dataarea name="lorom" size="0x2000">
+				<rom name="slalom.80" size="0x2000" crc="023e6349" sha1="bfcd2eb18900b92eef713f1636e01fdea1f5bb56" offset="0x0000" />
+			</dataarea>
+			<dataarea name="uprom" size="0x2000">
+				<rom name="slalom.e0" size="0x2000" crc="2d1acb56" sha1="616492972dca95e135b7f1f5a4377c00fb2c2170" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spedmath">
 		<description>Speed Math &amp; Bingo Math (Euro, USA, v.01)</description>
 		<year>1982</year>

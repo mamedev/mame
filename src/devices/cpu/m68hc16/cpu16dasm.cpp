@@ -1294,15 +1294,7 @@ offs_t cpu16_disassembler::disassemble(std::ostream &stream, offs_t pc, const cp
 
 	case mode::XYO:
 		assert(page == 0);
-		util::stream_format(stream, "%-6s", info.m_name);
-		if (BIT(opcode, 7))
-			util::stream_format(stream, "-%d, ", 8 - BIT(opcode, 4, 3));
-		else
-			util::stream_format(stream, "%d, ", BIT(opcode, 4, 3));
-		if (BIT(opcode, 3))
-			util::stream_format(stream, "-%d", 8 - BIT(opcode, 0, 3));
-		else
-			util::stream_format(stream, "%d", BIT(opcode, 0, 3));
+		util::stream_format(stream, "%-6s%d, %d", info.m_name, util::sext(opcode >> 4, 4), util::sext(opcode, 4));
 		return 2 | SUPPORTED | info.m_flags;
 
 	case mode::IND:

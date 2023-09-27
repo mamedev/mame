@@ -16,7 +16,7 @@ There's also an updated revision, identifiable by the startup message "Boris awa
 your move"(same as Boris Master) instead of "Boris plays black".
 
 Boris Master included a battery, RESET was renamed to MEMORY. 2 known versions:
-one with C10617/C10617 ROMs(same as Boris rev. 01), and one with a single 4KB
+one with C10617/C10618 ROMs(same as Boris rev. 01), and one with a single 4KB
 ROM labeled 007-7027-00.
 
 *******************************************************************************/
@@ -27,7 +27,7 @@ ROM labeled 007-7027-00.
 #include "video/pwm.h"
 
 // internal artwork
-#include "aci_boris.lh" // clickable
+#include "aci_boris.lh"
 
 
 namespace {

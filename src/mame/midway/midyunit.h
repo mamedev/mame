@@ -40,6 +40,14 @@ public:
 		, m_gfx_rom(*this, "gfx_rom", 0x800000, ENDIANNESS_BIG)
 		, m_mainram(*this, "mainram")
 		, m_ports(*this, { { "IN0", "IN1", "IN2", "DSW", "UNK0", "UNK1" } })
+		, m_left_flash(*this, "Left_Flash_%u", 1U)
+		, m_right_flash(*this, "Right_Flash_%u", 1U)
+		, m_left_gun_recoil(*this, "Left_Gun_Recoil")
+		, m_right_gun_recoil(*this, "Right_Gun_Recoil")
+		, m_left_gun_green_led(*this, "Left_Gun_Green_Led")
+		, m_left_gun_red_led(*this, "Left_Gun_Red_Led")
+		, m_right_gun_green_led(*this, "Right_Gun_Green_Led")
+		, m_right_gun_red_led(*this, "Right_Gun_Red_Led")
 	{
 	}
 
@@ -73,6 +81,9 @@ public:
 	int narc_talkback_strobe_r();
 	DECLARE_CUSTOM_INPUT_MEMBER(narc_talkback_data_r);
 	int adpcm_irq_state_r();
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	/* protection data types */
@@ -109,6 +120,14 @@ private:
 	memory_share_creator<uint8_t> m_gfx_rom;
 	required_shared_ptr<uint16_t> m_mainram;
 	optional_ioport_array<6> m_ports;
+	output_finder<4> m_left_flash;
+	output_finder<4> m_right_flash;
+	output_finder<> m_left_gun_recoil;
+	output_finder<> m_right_gun_recoil;
+	output_finder<> m_left_gun_green_led;
+	output_finder<> m_left_gun_red_led;
+	output_finder<> m_right_gun_green_led;
+	output_finder<> m_right_gun_red_led;
 
 	std::unique_ptr<uint16_t[]> m_cmos_ram;
 	std::unique_ptr<uint8_t[]> m_hidden_ram;

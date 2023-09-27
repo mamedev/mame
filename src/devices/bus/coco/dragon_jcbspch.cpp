@@ -83,7 +83,7 @@ memory_region *dragon_jcbspch_device::get_cart_memregion()
 
 void dragon_jcbspch_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepb_handler().set(m_nsp, FUNC(sp0256_device::ald_w)).mask(0x3f);
 	m_pia->cb2_handler().set(FUNC(dragon_jcbspch_device::pia_cb2_w));
 	m_pia->irqb_handler().set(FUNC(dragon_jcbspch_device::nmi_w));

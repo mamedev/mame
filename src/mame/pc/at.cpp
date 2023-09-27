@@ -166,7 +166,6 @@ public:
 	void c386sx16(machine_config &config);
 	void atturbo(machine_config &config);
 	void at386(machine_config &config);
-	void m290(machine_config &config);
 	void ncrpc8(machine_config &config);
 	void n8810m15(machine_config &config);
 	void n8810m55(machine_config &config);
@@ -2751,7 +2750,15 @@ ROM_START( n8810m55 )
 	ROM_LOAD16_BYTE( "150-3873_u127_30_4.5.1.bin", 0x10000, 0x8000, CRC(5a7e6643) SHA1(f3890919a772eead7232bd227b2c8677377f6e24))
 ROM_END
 
-// Olivetti M290 - has an Olivetti branded Paradise PVGA1A-JK VGA card - locks up with "Error 2" and a key symbol
+// Olivetti M250E aka DECStation 220 - PVGA1A on board with the ROM included in the main ROM - Board: BA241 - Chips: 16C451, 8742, WD37C65, GA99, GA80
+// CPU: 12MHz 80286 - FPU: 80287-2 socket provided - RAM: 1MB, 2MB, 4MB in SIMM modules - ROM: 64KB BIOS 1.07-1.09 - Mass storage: 2x 3.5" FDD HD,
+// on board: AT/RLL controller - Shadow memory: E0000-FFFFF - Bus: 3xISA8/18 on riser board - Video: PVGA1A on board, 256KB RAM - Connectors: VGA, ser, par, PS/2 keyboard, PS/2 mouse
+ROM_START( m250e )
+	ROM_REGION16_LE(0x20000, "bios", 0 )
+	ROM_LOAD( "biosglas.bin", 0x10000, 0x10000, CRC(83c33ce4) SHA1(0f132072dca06d8c7bb51b0f0d6304a74406cc8c))
+ROM_END
+
+// Olivetti M290 - uses the Olivetti GO481 Paradise PVGA1A-JK VGA card - locks up with "Error 2" and a key symbol
 // Chipset: Olivetti GA099-B/28927F74AT, Olivetti GA098-B 28909F74AS, TI TACT82206FN, Olivetti 8920K5
 // Floppy/IDE card: WD37C65BJM, NS16C450V
 ROM_START( m290 )
@@ -5799,6 +5806,7 @@ COMP( 1985, k286i,     ibm5170, 0,       k286i,     0,     at_state,     init_at
 COMP( 199?, kma202f,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "<unknown>",   "KMA-202F-12R (Winbond chipset)", MACHINE_NOT_WORKING )
 COMP( 19??, kt216wb5,  ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "KT Technology", "KT216WB5-HI Rev.2", MACHINE_NOT_WORKING )
 COMP( 198?, lm103s,    ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "<unknown>",   "LM-103S", MACHINE_NOT_WORKING )
+COMP( 198?, m250e,     ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Olivetti",    "M250E", MACHINE_NOT_WORKING )
 COMP( 1987, m290,      ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Olivetti",    "M290", MACHINE_NOT_WORKING )
 COMP( 198?, magb233,   ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "Magitronic Technology", "Magitronic B233", MACHINE_NOT_WORKING )
 COMP( 198?, magb236,   ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "Magitronic Technology", "Magitronic B236", MACHINE_NOT_WORKING )

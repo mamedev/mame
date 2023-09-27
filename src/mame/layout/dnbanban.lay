@@ -1,0 +1,674 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+copyright-holders: Roberto Fresca, Grull Osgo
+
+************************************************************
+
+  Dora Neco BanBan
+
+  Internal layout artwork by Roberto Fresca & Grull Osgo.
+
+  This internal layout was designed to show all the Output
+  lines activity, besides a working playfield / game.
+
+  Just for educational purposes.
+
+
+  Use our external artwork for a realistic experience.
+
+
+************************************************************
+-->
+<mamelayout version="2">
+
+
+<!-- define elements -->
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.1" blue="0.1" />
+		</led7seg>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="1">
+			<color red="1.0" green="0.1" blue="0.1" />
+		</disk>
+		<disk state="0">
+			<color red="0.1" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="M1">
+		<text string="Motor 1">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+
+	<element name="M2">
+		<text string="Motor 2">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+
+	<element name="M3">
+		<text string="Motor 3">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+
+	<element name="M4">
+		<text string="Motor 4">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+
+	<element name="stat" defstate="0">
+		<text string="off" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="on" state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</text>
+	</element>
+	<element name="statinv" defstate="1">
+		<text string="off" state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="on" state="0">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="hscore">
+		<text string="High Score">
+			<color red="0.7" green="0.7" blue="0.7" />
+		</text>
+	</element>
+
+	<element name="score">
+		<text string="Score">
+			<color red="0.7" green="0.7" blue="0.7" />
+		</text>
+	</element>
+
+	<element name="selg">
+		<text string="-- Selected Game --  " align="2">
+			<color red="0.7" green="0.7" blue="0.7" />
+		</text>
+	</element>
+
+	<element name="sel1">
+		<text string="Doraneko" align="2">
+			<color red="0.7" green="0.7" blue="0.7" />
+		</text>
+	</element>
+
+	<element name="sel2">
+		<text string="Koneko" align="2">
+			<color red="0.7" green="0.7" blue="0.7" />
+		</text>
+	</element>
+
+	<element name="ecoin">
+		<text string="Coin Enable">
+			<color red="0.7" green="0.7" blue="0.7" />
+		</text>
+	</element>
+
+	<element name="ccount">
+		<text string="Coin Counter (Signal)">
+			<color red="0.7" green="0.7" blue="0.7" />
+		</text>
+	</element>
+
+	<element name="mute">
+		<text string="Sound Mute">
+			<color red="0.7" green="0.7" blue="0.7" />
+		</text>
+	</element>
+
+
+<!-- Lamps -->
+
+	<element name="L1" defstate="0">
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</rect>
+		<text string="Level 1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L2" defstate="0">
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</rect>
+		<text string="Level 2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L3" defstate="0">
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</rect>
+		<text string="Level 3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L4" defstate="0">
+		<rect state="0">
+			<color red="0.3" green="0.083" blue="0.026" />
+		</rect>
+		<rect state="1">
+			<color red="0.9" green="0.25" blue="0.08" />
+		</rect>
+		<text string="Game Over">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="F1" defstate="0">
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</rect>
+		<text string="Food 1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="F2" defstate="0">
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</rect>
+		<text string="Food 2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="F3" defstate="0">
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</rect>
+		<text string="Food 3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="F4" defstate="0">
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</rect>
+		<text string="Food 4">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="HT" defstate="0">
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0.8" blue="0.0" />
+		</rect>
+		<text string=" Hit ">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="UKN" defstate="0">
+		<rect state="0">
+			<color red="0.0" green="0.3" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.0" green="0.8" blue="0.0" />
+		</rect>
+		<text string="Unknown I">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="ERR" defstate="1">
+		<rect state="0">
+			<color red="0.8" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string=" Error ">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="debug_stepper_value" defstate="0">
+		<simplecounter maxstate="999" digits="3">
+			<color red="1.0" green="1.0" blue="1.0"/>
+		</simplecounter>
+	</element>
+
+	<element name="blk">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+
+<!-- Fence & Arms -->
+
+	<element name="fence">
+		<rect>
+			<color red="0.2" green="0.5" blue="0.2" />
+		</rect>
+	</element>
+
+	<element name="arm" defstate="0">
+		<rect>
+			<color red="1" green="0" blue="1" />
+			<bounds x="2" y="0"  width="10" height="25" />
+		</rect>
+		<rect>
+			<color red="0" green="0" blue="1" />
+			<bounds x="2" y="3"  width="10" height="3" />
+		</rect>
+		<rect>
+			<color red="0" green="0" blue="1" />
+			<bounds x="2" y="9"  width="10" height="3" />
+		</rect>
+		<rect>
+			<color red="0" green="0" blue="1" />
+			<bounds x="2" y="15"  width="10" height="3" />
+		</rect>
+		<disk>
+			<color red="1" green="0" blue="1" />
+			<bounds x="0.5" y="21"  width="13" height="12" />
+		</disk>
+		<rect>
+			<color red="0.9" green="0" blue="0.8" />
+			<bounds x="2" y="22"  width="10" height="1.5" />
+		</rect>
+	</element>
+
+
+<!-- View Field... -->
+
+	<view name="Internal Layout">
+		<bounds left="0" top="0" right="640" bottom="480" />
+
+
+<!-- Animation Layer   -->
+<!-- Fence & Arms test -->
+
+	<repeat count="4">
+		<param name="x" start="335" increment="65" />
+		<param name="i" start="0" increment="1" />
+			<element ref="arm">
+				<animate name="mpos~i~" />
+				<bounds state="0"   x="~x~" y="180" width="40" height="100" />
+				<bounds state="282" x="~x~" y="280" width="40" height="100" />
+			</element>
+	</repeat>
+
+	<element ref="blk">
+		<bounds x="300" y="180" width="300" height="70" />
+	</element>
+
+	<element ref="fence">
+		<bounds x="300" y="250" width="300" height="30" />
+	</element>
+
+
+<!-- Assorted Game Action -->
+
+	<element ref="hscore">
+		<bounds x="120" y="25" width="80" height="15" />
+	</element>
+
+	<element ref="score">
+		<bounds x="440" y="25" width="80" height="15" />
+	</element>
+
+	<element ref="selg">
+		<bounds x="265" y="25" width="120" height="15" />
+	</element>
+
+	<element ref="sel1">
+		<bounds x="260" y="45" width="60" height="15" />
+	</element>
+
+	<element ref="sel2">
+		<bounds x="320" y="45" width="60" height="15" />
+	</element>
+
+	<element name="p3led0" ref="led">
+		<bounds x="290" y="70" width="20" height="20" />
+	</element>
+
+	<element name="p3led1" ref="led">
+		<bounds x="350" y="70" width="20" height="20" />
+	</element>
+
+	<element ref="ecoin">
+		<bounds x="10" y="120" width="80" height="20" />
+	</element>
+
+	<element name="p5led7" ref="stat">
+		<bounds x="100" y="120" width="20" height="20" />
+	</element>
+
+	<element ref="ccount">
+		<bounds x="140" y="120" width="120" height="20" />
+	</element>
+
+	<element name="p6led4" ref="stat">
+		<bounds x="270" y="120" width="20" height="20" />
+	</element>
+
+	<element ref="mute">
+		<bounds x="320" y="120" width="90" height="20" />
+	</element>
+
+	<element name="p3led3" ref="HT">
+		<bounds x="370" y="200" width="80" height="30" />
+	</element>
+
+	<element name="p3led2" ref="UKN">
+		<bounds x="460" y="200" width="80" height="30" />
+	</element>
+
+	<element name="p6led7" ref="ERR">
+		<bounds x="550" y="200" width="80" height="30" />
+	</element>
+
+	<element name="p6led6" ref="stat">
+		<bounds x="420" y="120" width="20" height="20" />
+	</element>
+
+	<element name="p8led0" ref="L1">
+		<bounds x="10" y="150" width="80" height="30" />
+	</element>
+
+	<element name="p8led1" ref="L2">
+		<bounds x="100" y="150" width="80" height="30" />
+	</element>
+
+	<element name="p8led2" ref="L3">
+		<bounds x="190" y="150" width="80" height="30" />
+	</element>
+
+	<element name="p8led3" ref="L4">
+		<bounds x="280" y="150" width="80" height="30" />
+	</element>
+
+	<element name="p8led4" ref="F1">
+		<bounds x="10" y="200" width="80" height="30" />
+	</element>
+
+	<element name="p8led5" ref="F2">
+		<bounds x="100" y="200" width="80" height="30" />
+	</element>
+
+	<element name="p8led6" ref="F3">
+		<bounds x="190" y="200" width="80" height="30" />
+	</element>
+
+	<element name="p8led7" ref="F4">
+		<bounds x="280" y="200" width="80" height="30" />
+	</element>
+
+
+<!-- Motor action -->
+
+	<element ref="M1">
+		<bounds x="0" y="244" width="80" height="20" />
+	</element>
+
+	<element name="mpos0" ref="debug_stepper_value">
+		<bounds x="80" y="240" width="50" height="30"/>
+	</element>
+
+	<element name="p3led4" ref="statinv">
+		<bounds x="140" y="244" width="20" height="20" />
+	</element>
+
+	<element ref="M2">
+		<bounds x="0" y="284" width="80" height="20" />
+	</element>
+
+	<element name="mpos1" ref="debug_stepper_value">
+		<bounds x="80" y="280" width="50" height="30"/>
+	</element>
+
+	<element name="p3led5" ref="statinv">
+		<bounds x="140" y="284" width="20" height="20" />
+	</element>
+
+	<element ref="M3">
+		<bounds x="0" y="324" width="80" height="20" />
+	</element>
+
+	<element name="mpos2" ref="debug_stepper_value">
+		<bounds x="80" y="320" width="50" height="30"/>
+	</element>
+
+	<element name="p3led6" ref="statinv">
+		<bounds x="140" y="324" width="20" height="20" />
+	</element>
+
+	<element ref="M4">
+		<bounds x="0" y="364" width="80" height="20" />
+	</element>
+
+	<element name="mpos3" ref="debug_stepper_value">
+		<bounds x="80" y="360" width="50" height="30"/>
+	</element>
+
+	<element name="p3led7" ref="statinv">
+		<bounds x="140" y="364" width="20" height="20" />
+	</element>
+
+
+<!-- Seven Segment Displays -->
+
+	<element name="digit3" ref="digit">
+		<bounds x="120" y="50" width="40" height="50" />
+	</element>
+
+	<element name="digit2" ref="digit">
+		<bounds x="160" y="50" width="40" height="50" />
+	</element>
+
+	<element name="digit1" ref="digit">
+		<bounds x="440" y="50" width="40" height="50" />
+	</element>
+
+	<element name="digit0" ref="digit">
+		<bounds x="480" y="50" width="40" height="50" />
+	</element>
+
+
+<!-- Fence & Arms test -->
+
+	<element name="p8led4" ref="F1">
+		<bounds x="335" y="385" width="40" height="20" />
+	</element>
+
+	<element name="p8led5" ref="F2">
+		<bounds x="400" y="385" width="40" height="20" />
+	</element>
+
+	<element name="p8led6" ref="F3">
+		<bounds x="465" y="385" width="40" height="20" />
+	</element>
+
+	<element name="p8led7" ref="F4">
+		<bounds x="530" y="385" width="40" height="20" />
+	</element>
+
+
+<!-- Output Ports Debug -->
+<!-- PPI0-B  | PPI0-C   -->
+<!-- PPI1-B  | PPI1 C   -->
+<!-- Port addresss 0x08 -->
+
+		<element name="p2led7" ref="led">
+			<bounds x="5" y="420" width="9" height="9" />
+		</element>
+		<element name="p2led6" ref="led">
+			<bounds x="15" y="420" width="9" height="9" />
+		</element>
+		<element name="p2led5" ref="led">
+			<bounds x="25" y="420" width="9" height="9" />
+		</element>
+		<element name="p2led4" ref="led">
+			<bounds x="35" y="420" width="9" height="9" />
+		</element>
+		<element name="p2led3" ref="led">
+			<bounds x="45" y="420" width="9" height="9" />
+		</element>
+		<element name="p2led2" ref="led">
+			<bounds x="55" y="420" width="9" height="9" />
+		</element>
+		<element name="p2led1" ref="led">
+			<bounds x="65" y="420" width="9" height="9" />
+		</element>
+		<element name="p2led0" ref="led">
+			<bounds x="75" y="420" width="9" height="9" />
+		</element>
+
+		<element name="p3led7" ref="led">
+			<bounds x="100" y="420" width="9" height="9" />
+		</element>
+		<element name="p3led6" ref="led">
+			<bounds x="110" y="420" width="9" height="9" />
+		</element>
+		<element name="p3led5" ref="led">
+			<bounds x="120" y="420" width="9" height="9" />
+		</element>
+		<element name="p3led4" ref="led">
+			<bounds x="130" y="420" width="9" height="9" />
+		</element>
+		<element name="p3led3" ref="led">
+			<bounds x="140" y="420" width="9" height="9" />
+		</element>
+		<element name="p3led2" ref="led">
+			<bounds x="150" y="420" width="9" height="9" />
+		</element>
+		<element name="p3led1" ref="led">
+			<bounds x="160" y="420" width="9" height="9" />
+		</element>
+		<element name="p3led0" ref="led">
+			<bounds x="170" y="420" width="9" height="9" />
+		</element>
+
+		<element name="p5led7" ref="led">
+			<bounds x="5" y="440" width="9" height="9" />
+		</element>
+		<element name="p5led6" ref="led">
+			<bounds x="15" y="440" width="9" height="9" />
+		</element>
+		<element name="p5led5" ref="led">
+			<bounds x="25" y="440" width="9" height="9" />
+		</element>
+		<element name="p5led4" ref="led">
+			<bounds x="35" y="440" width="9" height="9" />
+		</element>
+		<element name="p5led3" ref="led">
+			<bounds x="45" y="440" width="9" height="9" />
+		</element>
+		<element name="p5led2" ref="led">
+			<bounds x="55" y="440" width="9" height="9" />
+		</element>
+		<element name="p5led1" ref="led">
+			<bounds x="65" y="440" width="9" height="9" />
+		</element>
+		<element name="p5led0" ref="led">
+			<bounds x="75" y="440" width="9" height="9" />
+		</element>
+
+		<element name="p6led7" ref="led">
+			<bounds x="100" y="440" width="9" height="9" />
+		</element>
+		<element name="p6led6" ref="led">
+			<bounds x="110" y="440" width="9" height="9" />
+		</element>
+		<element name="p6led5" ref="led">
+			<bounds x="120" y="440" width="9" height="9" />
+		</element>
+		<element name="p6led4" ref="led">
+			<bounds x="130" y="440" width="9" height="9" />
+		</element>
+		<element name="p6led3" ref="led">
+			<bounds x="140" y="440" width="9" height="9" />
+		</element>
+		<element name="p6led2" ref="led">
+			<bounds x="150" y="440" width="9" height="9" />
+		</element>
+		<element name="p6led1" ref="led">
+			<bounds x="160" y="440" width="9" height="9" />
+		</element>
+		<element name="p6led0" ref="led">
+			<bounds x="170" y="440" width="9" height="9" />
+		</element>
+
+		<element name="p8led7" ref="led">
+			<bounds x="5" y="460" width="9" height="9" />
+		</element>
+		<element name="p8led6" ref="led">
+			<bounds x="15" y="460" width="9" height="9" />
+		</element>
+		<element name="p8led5" ref="led">
+			<bounds x="25" y="460" width="9" height="9" />
+		</element>
+		<element name="p8led4" ref="led">
+			<bounds x="35" y="460" width="9" height="9" />
+		</element>
+		<element name="p8led3" ref="led">
+			<bounds x="45" y="460" width="9" height="9" />
+		</element>
+		<element name="p8led2" ref="led">
+			<bounds x="55" y="460" width="9" height="9" />
+		</element>
+		<element name="p8led1" ref="led">
+			<bounds x="65" y="460" width="9" height="9" />
+		</element>
+		<element name="p8led0" ref="led">
+			<bounds x="75" y="460" width="9" height="9" />
+		</element>
+
+	</view>
+</mamelayout>

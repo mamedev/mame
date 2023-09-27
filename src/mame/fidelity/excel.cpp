@@ -143,11 +143,11 @@ Designer 2100 (model 6103): exactly same, but running at 5MHz
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_des.lh" // clickable
-#include "fidel_ex.lh" // clickable
-#include "fidel_exb.lh" // clickable
-#include "fidel_exd.lh" // clickable
-#include "fidel_exv.lh" // clickable
+#include "fidel_des.lh"
+#include "fidel_ex.lh"
+#include "fidel_exb.lh"
+#include "fidel_exd.lh"
+#include "fidel_exv.lh"
 
 
 namespace {
@@ -222,7 +222,7 @@ void excel_state::machine_start()
     I/O
 *******************************************************************************/
 
-// misc handlers
+// speech
 
 INPUT_CHANGED_MEMBER(excel_state::speech_bankswitch)
 {

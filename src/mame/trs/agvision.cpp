@@ -204,7 +204,7 @@ void agvision_state::agvision(machine_config &config)
 	MC6809E(config, m_maincpu, XTAL(14'318'181) / 16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &agvision_state::mem_map);
 
-	PIA6821(config, m_pia_0, 0);
+	PIA6821(config, m_pia_0);
 	m_pia_0->readpa_handler().set(FUNC(agvision_state::pia0_pa_r));
 	m_pia_0->irqa_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 	m_pia_0->cb2_handler().set(FUNC(agvision_state::pia0_cb2_w));

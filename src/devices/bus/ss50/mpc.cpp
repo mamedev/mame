@@ -101,7 +101,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void ss50_mpc_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia, 0); // actually MC6820
+	PIA6821(config, m_pia); // actually MC6820
 	m_pia->writepa_handler().set("outgate", FUNC(input_merger_device::in_w<0>)).bit(0);
 	m_pia->cb2_handler().set(FUNC(ss50_mpc_device::reader_control_w));
 	m_pia->readpb_handler().set_ioport("STOP").mask(0x01).lshift(6);

@@ -21,6 +21,7 @@ public:
 	auto output_digit() { return m_output_digit.bind(); }
 
 	void strobe_w(int state);
+	int strobe_r() { return m_strobe; }
 	void data_w(u8 data);
 
 protected:

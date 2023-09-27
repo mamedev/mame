@@ -57,10 +57,10 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(MVME187, mvme187_device, "mvme187", "Motorola MVME187")
+DEFINE_DEVICE_TYPE(VME_MVME187, vme_mvme187_card_device, "mvme187", "Motorola MVME187")
 
-mvme187_device::mvme187_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MVME187, tag, owner, clock)
+vme_mvme187_card_device::vme_mvme187_card_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, VME_MVME187, tag, owner, clock)
 	, device_vme_card_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")
 	, m_mmu(*this, "mmu%u", 0U)
@@ -83,29 +83,29 @@ ROM_END
 static INPUT_PORTS_START(mvme187)
 INPUT_PORTS_END
 
-const tiny_rom_entry *mvme187_device::device_rom_region() const
+const tiny_rom_entry *vme_mvme187_card_device::device_rom_region() const
 {
 	return ROM_NAME(mvme187);
 }
 
-ioport_constructor mvme187_device::device_input_ports() const
+ioport_constructor vme_mvme187_card_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(mvme187);
 }
 
-void mvme187_device::device_start()
+void vme_mvme187_card_device::device_start()
 {
 }
 
-void mvme187_device::device_reset()
+void vme_mvme187_card_device::device_reset()
 {
 	m_boot.select(0);
 }
 
-void mvme187_device::device_add_mconfig(machine_config &config)
+void vme_mvme187_card_device::device_add_mconfig(machine_config &config)
 {
 	MC88100(config, m_cpu, 50_MHz_XTAL / 2);
-	m_cpu->set_addrmap(AS_PROGRAM, &mvme187_device::cpu_mem);
+	m_cpu->set_addrmap(AS_PROGRAM, &vme_mvme187_card_device::cpu_mem);
 
 	MC88200(config, m_mmu[0], 50_MHz_XTAL / 2, 0x77);
 	m_mmu[0]->set_mbus(m_cpu, AS_PROGRAM);
@@ -128,7 +128,7 @@ void mvme187_device::device_add_mconfig(machine_config &config)
 	I82596_BE32(config, m_lan, 20'000'000);
 }
 
-void mvme187_device::cpu_mem(address_map &map)
+void vme_mvme187_card_device::cpu_mem(address_map &map)
 {
 	map(0x0000'0000, 0x00ff'ffff).view(m_boot);
 	m_boot[0](0x0000'0000, 0x0007'ffff).rom().region("eprom", 0);

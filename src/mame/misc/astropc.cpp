@@ -13,6 +13,11 @@ Contains video BIOS for Cyrix GX86 (PCI ID: 1078:0104)
 
 Games run on Red Hat Linux 32-bit, Linux kernel 2.4.21-rc6
 
+There is a dongle (internally called "AstroCard") attached to parallel port 1,
+which uses I/O ports 0x300/0x304/0x308 (rw) and 0x378/0x379/0x37a (ro).
+It appears to contain 508 bytes of XOR-encrypted code which is decrypted by
+the game's executable. See the "ProtectCode" function, which writes the
+decrypted "PutJtx" function into the program in memory.
 
 Known games
 
@@ -34,7 +39,6 @@ Notes:
 * Is "Hawaii" the same game as "Treasure Hunting"?
 * The dslayrr sets appear to be pre-setup, have passwords set(?)
 * Game information in the rom entries comes from `AstroGame/data/setup2.txt` or `AstroGame/INF.ini`
-* Functions in MainGame reference an "AstroCard" (InitAstroCard, WriteAstroCard, etc.), possible dongle?
 
 */
 

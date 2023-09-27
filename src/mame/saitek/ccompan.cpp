@@ -29,7 +29,7 @@ Hardware notes:
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_ccompan.lh" // clickable
+#include "saitek_ccompan.lh"
 
 
 namespace {
@@ -192,7 +192,7 @@ void ccompan_state::ccompan(machine_config &config)
 	M6504(config, m_maincpu, 1000000); // approximation, no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &ccompan_state::main_map);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(ccompan_state::input_r));
 	m_pia->writepb_handler().set(FUNC(ccompan_state::control_w));
 	m_pia->ca2_handler().set(FUNC(ccompan_state::sled_w));

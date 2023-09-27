@@ -676,7 +676,7 @@ void exorciser_state::exorciser(machine_config &config)
 	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
 	rs232.set_option_device_input_defaults("exorterm155", DEVICE_INPUT_DEFAULTS_NAME(exorterm));
 
-	PIA6821(config, m_pia_dbg, 0);
+	PIA6821(config, m_pia_dbg);
 	m_pia_dbg->writepa_handler().set(FUNC(exorciser_state::pia_dbg_pa_w));
 	m_pia_dbg->readca1_handler().set(FUNC(exorciser_state::pia_dbg_ca1_r));
 	m_pia_dbg->writepb_handler().set(FUNC(exorciser_state::pia_dbg_pb_w));
@@ -684,7 +684,7 @@ void exorciser_state::exorciser(machine_config &config)
 	m_pia_dbg->cb2_handler().set(FUNC(exorciser_state::pia_dbg_cb2_w));
 
 	// MEX68PI Parallel printer port
-	PIA6821(config, m_pia_lpt, 0);
+	PIA6821(config, m_pia_lpt);
 	m_pia_lpt->writepa_handler().set(FUNC(exorciser_state::pia_lpt_pa_w));
 	m_pia_lpt->ca1_w(0); // External parallel printer busy input.
 	m_pia_lpt->ca2_handler().set(FUNC(exorciser_state::pia_lpt_ca2_w));

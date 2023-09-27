@@ -22,7 +22,7 @@ class iosb_base :  public device_t
 {
 public:
 	// construction/destruction
-	iosb_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	iosb_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// interface routines
 	auto write_adb_st() { return m_adb_st.bind(); } // ADB state
@@ -34,7 +34,7 @@ public:
 	auto read_pa4()  { return m_pa4.bind(); }
 	auto read_pa6()  { return m_pa6.bind(); }
 
-	void map(address_map &map);
+	virtual void map(address_map &map);
 
 	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
 	template <typename... T> void set_scsi_tag(T &&... args) { m_ncr.set_tag(std::forward<T>(args)...); }
@@ -65,6 +65,9 @@ protected:
 	virtual uint8_t via_in_b();
 	virtual void via_out_b(uint8_t data);
 
+	virtual u16 iosb_regs_r(offs_t offset);
+	virtual void iosb_regs_w(offs_t offset, u16 data, u16 mem_mask);
+
 	devcb_write8 m_adb_st;
 	devcb_write_line m_cb1, m_cb2;
 	devcb_read_line m_pa1, m_pa2, m_pa4, m_pa6;
@@ -76,6 +79,10 @@ protected:
 	required_device<applefdintf_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 
+	u16 m_iosb_regs[0x20];
+
+	u8 m_nubus_irqs;
+
 private:
 	emu_timer *m_6015_timer;
 	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
@@ -83,22 +90,16 @@ private:
 	int m_hdsel;
 	int m_adb_interrupt;
 	int m_via2_ca1_hack;
-	u8 m_nubus_irqs;
 
-	int m_drq, m_scsi_irq, m_asc_irq;
-	int m_scsi_read_cycles, m_scsi_write_cycles, m_scsi_dma_read_cycles, m_scsi_dma_write_cycles;
+	s32 m_drq, m_scsi_irq, m_asc_irq;
+	u32 m_scsi_read_cycles, m_scsi_write_cycles, m_scsi_dma_read_cycles, m_scsi_dma_write_cycles;
 	u32 m_scsi_dma_result;
 	bool m_scsi_second_half;
 
-	u16 m_iosb_regs[0x20];
-
-	u16 iosb_regs_r(offs_t offset);
-	void iosb_regs_w(offs_t offset, u16 data, u16 mem_mask);
-
-	uint16_t mac_via_r(offs_t offset);
-	void mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	uint16_t mac_via2_r(offs_t offset);
-	void mac_via2_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	u16 mac_via_r(offs_t offset);
+	void mac_via_w(offs_t offset, u16 data, u16 mem_mask);
+	u16 mac_via2_r(offs_t offset);
+	void mac_via2_w(offs_t offset, u16 data, u16 mem_mask);
 
 	uint8_t via_in_a();
 	uint8_t via2_in_a();
@@ -113,15 +114,19 @@ private:
 
 	void phases_w(uint8_t phases);
 	void devsel_w(uint8_t devsel);
-	uint16_t swim_r(offs_t offset, u16 mem_mask);
+	u16 swim_r(offs_t offset, u16 mem_mask);
 	void swim_w(offs_t offset, u16 data, u16 mem_mask);
 };
 
+/// \brief Device class for Apple IOSB I/O controller ASIC.
+///
+/// IOSB includes 2 VIAs, TurboSCSI logic, a SWIM 2 floppy controller,
+/// and more.
 class iosb_device : public iosb_base
 {
 public:
 	// construction/destruction
-	iosb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	iosb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -138,7 +143,8 @@ class primetime_device : public iosb_base
 {
 public:
 	// construction/destruction
-	primetime_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	primetime_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	primetime_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	auto pb4_callback() { return write_pb4.bind(); }
 	auto pb5_callback() { return write_pb5.bind(); }
@@ -154,8 +160,29 @@ protected:
 private:
 };
 
+class primetimeii_device : public primetime_device
+{
+public:
+	// construction/destruction
+	primetimeii_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void map(address_map &map) override;
+
+	void ata_irq_w(int state);
+
+protected:
+	virtual void device_start() override;
+
+private:
+	u16 ata_regs_r(offs_t offset);
+
+	s32 m_ata_irq;
+	u16 m_primetimeii_regs[0x20];
+};
+
 // device type definition
 DECLARE_DEVICE_TYPE(IOSB, iosb_device)
 DECLARE_DEVICE_TYPE(PRIMETIME, primetime_device)
+DECLARE_DEVICE_TYPE(PRIMETIMEII, primetimeii_device)
 
 #endif // MAME_APPLE_IOSB_H

@@ -37,7 +37,7 @@ BTANB:
 #include "speaker.h"
 
 // internal artwork
-#include "conic_cchess2.lh" // clickable
+#include "conic_cchess2.lh"
 
 
 namespace {
@@ -240,11 +240,11 @@ void cchess2_state::cncchess2(machine_config &config)
 	M6504(config, m_maincpu, 1000000); // approximation, no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &cchess2_state::main_map);
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->writepa_handler().set(FUNC(cchess2_state::pia0_pa_w));
 	m_pia[0]->writepb_handler().set(FUNC(cchess2_state::pia0_pb_w));
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set(FUNC(cchess2_state::pia1_pa_r));
 	m_pia[1]->readpb_handler().set(FUNC(cchess2_state::pia1_pb_r));
 	m_pia[1]->writepb_handler().set(FUNC(cchess2_state::pia1_pb_w));

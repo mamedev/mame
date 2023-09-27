@@ -25,6 +25,7 @@
 #include "macadb.h"
 #include "mactoolbox.h"
 
+#include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
 #include "bus/nubus/nubus.h"
@@ -85,6 +86,8 @@ private:
 	required_device<ncr53c96_device> m_ncr1;
 	required_device<dp83932c_device> m_sonic;
 
+	u8 m_mac[6];
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -95,11 +98,24 @@ private:
 		return (result << 8) | result;
 	}
 	void mac_scc_2_w(offs_t offset, u16 data) { m_iosb->via_sync(); m_scc->dc_ab_w(offset, data >> 8); }
+
+	u8 ethernet_mac_r(offs_t offset);
 };
 
 void quadra800_state::machine_start()
 {
 	m_djmemc->set_ram_info((u32 *) m_ram->pointer(), m_ram->size());
+
+	const u8 *MAC = (u8 *)m_sonic->get_mac();
+	// MAC PROM is stored with a bit swizzle and must match one of 2
+	// Apple-assigned OUI blocks 00:05:02 or 08:00:07
+	m_mac[0] = bitswap<8>(0x08, 0, 1, 2, 3, 7, 6, 5, 4);
+	m_mac[1] = bitswap<8>(0x00, 0, 1, 2, 3, 7, 6, 5, 4);
+	m_mac[2] = bitswap<8>(0x07, 0, 1, 2, 3, 7, 6, 5, 4);
+	m_mac[3] = bitswap<8>(MAC[3], 0, 1, 2, 3, 7, 6, 5, 4);
+	m_mac[4] = bitswap<8>(MAC[4], 0, 1, 2, 3, 7, 6, 5, 4);
+	m_mac[5] = bitswap<8>(MAC[5], 0, 1, 2, 3, 7, 6, 5, 4);
+	m_sonic->set_mac(&m_mac[0]);
 }
 
 void quadra800_state::machine_reset()
@@ -110,6 +126,27 @@ void quadra800_state::init_macqd800()
 {
 }
 
+u8 quadra800_state::ethernet_mac_r(offs_t offset)
+{
+	if (offset < 6)
+	{
+		return m_mac[offset];
+	}
+	else if (offset == 7)
+	{
+		u8 xor_total = 0;
+
+		for (int i = 0; i < 6; i++)
+		{
+			xor_total ^= (u8)m_mac[i];
+		}
+
+		return xor_total ^ 0xff;
+	}
+
+	return 0;
+}
+
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
@@ -118,7 +155,7 @@ void quadra800_state::quadra800_map(address_map &map)
 	map(0x00000000, 0xffffffff).m(m_djmemc, FUNC(djmemc_device::map));
 	map(0x50000000, 0x5fffffff).m(m_iosb, FUNC(iosb_device::map));
 
-	// 50008000 = Ethernet MAC ID PROM
+	map(0x50008000, 0x50008007).r(FUNC(quadra800_state::ethernet_mac_r)).mirror(0x00fc0000);
 	map(0x5000a000, 0x5000b0ff).m(m_sonic, FUNC(dp83932c_device::map)).umask32(0x0000ffff).mirror(0x00fc0000);
 	map(0x5000c000, 0x5000dfff).rw(FUNC(quadra800_state::mac_scc_r), FUNC(quadra800_state::mac_scc_2_w)).mirror(0x00fc0000);
 }
@@ -177,8 +214,13 @@ void quadra800_state::macqd800(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
+		[](device_t *device)
+		{
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^iosb:lspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^iosb:rspeaker", 1.0);
+		});
+	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c96", NCR53C96).clock(40_MHz_XTAL).machine_config(
@@ -221,7 +263,9 @@ void quadra800_state::macqd800(machine_config &config)
 	m_ram->set_extra_options("16M,32M,64M,96M,128M,192M,256M,320M,384M,512M,640M");
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68040");
 	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
+	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 }

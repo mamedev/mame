@@ -802,7 +802,7 @@ void crvision_state::creativision(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &crvision_state::crvision_map);
 
 	// devices
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(crvision_state::pia_pa_r));
 	m_pia->readpb_handler().set(FUNC(crvision_state::pia_pb_r));
 	m_pia->writepa_handler().set(FUNC(crvision_state::pia_pa_w));
@@ -881,7 +881,7 @@ void laser2001_state::lasr2001(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &laser2001_state::lasr2001_map);
 
 	// devices
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(laser2001_state::pia_pa_r));
 	m_pia->readpb_handler().set(FUNC(laser2001_state::pia_pb_r));
 	m_pia->readca1_handler().set(FUNC(laser2001_state::pia_ca1_r));

@@ -4592,7 +4592,7 @@ void calomega_state::sys903(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s903_mux_port_r));
 	m_pia[0]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: some dipsw maybe???
 	m_pia[0]->writepa_handler().set(FUNC(calomega_state::dummy_pia_w));       // Debug: to assign lamps/counters/solenids/hopper????
@@ -4602,7 +4602,7 @@ void calomega_state::sys903(machine_config &config)
 	m_pia[0]->irqa_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 	m_pia[0]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set_ioport("SW1");
 	m_pia[1]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: unknown reads.
 	m_pia[1]->writepa_handler().set(FUNC(calomega_state::lamps_903b_w));
@@ -4665,7 +4665,7 @@ void calomega_state::sys903kb(machine_config &config)
 	m_kstec->t0_in_cb().set("uart", FUNC(i8251_device::txrdy_r));                                    // uart tx handshake
 	m_kstec->t1_in_cb().set([this] () { return calomega_state::m_rxrdy; });                          // uart rx handshake
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s903_mux_port_r));
 	m_pia[0]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: some dipsw maybe???
 	m_pia[0]->writepa_handler().set(FUNC(calomega_state::dummy_pia_w));       // Debug: to assign lamps/counters/solenids/hopper????
@@ -4675,7 +4675,7 @@ void calomega_state::sys903kb(machine_config &config)
 	m_pia[0]->irqa_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 	m_pia[0]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set_ioport("SW1");
 	m_pia[1]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: unknown reads.
 	m_pia[1]->writepa_handler().set(FUNC(calomega_state::lamps_903b_w));
@@ -4759,12 +4759,12 @@ void calomega_state::sys905(machine_config &config)
 
 	screen.screen_vblank().set(FUNC(calomega_state::vblank1_w));
 
-	PIA6821(config.replace(), m_pia[0], 0);
+	PIA6821(config.replace(), m_pia[0]);
 	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s905_mux_port_r));    // Muxed inputs read.
 	m_pia[0]->writepb_handler().set(FUNC(calomega_state::lamps_905_w));       // Full Lamps - OK.
 	m_pia[0]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // V_BLANK Interrupt Event. (PIA -> CPU)
 
-	PIA6821(config.replace(), m_pia[1], 0);
+	PIA6821(config.replace(), m_pia[1]);
 	m_pia[1]->readpa_handler().set_ioport("SW1");                             // Full port.
 	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s905_mux_w));        // Mux. Scan Lines.(Lower Nibble). Hopper & Coin Lockout (Upper nibble).
 	m_pia[1]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.    (PIA -> CPU)
@@ -4795,14 +4795,14 @@ void calomega_state::sys906(machine_config &config)
 	screen.set_screen_update(FUNC(calomega_state::screen_update_calomega));
 
 	screen.screen_vblank().set(FUNC(calomega_state::vblank2_w));
-	PIA6821(config.replace(), m_pia[0], 0);
+	PIA6821(config.replace(), m_pia[0]);
 	m_pia[0]->readpa_handler().set_ioport("SW1");                             // Bit 7 - CGBANK ???? input?-output?
 	m_pia[0]->ca2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // Ignored
 	m_pia[0]->cb2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // Diverter
 	m_pia[0]->writepa_handler().set(FUNC(calomega_state::pia0_aout_w));       // Bit 7 - CGBANK ???? input?-output?
 	m_pia[0]->writepb_handler().set(FUNC(calomega_state::pia0_bout_w));       // Meters ??? (M1-M5), coils, hopper
 
-	PIA6821(config.replace(), m_pia[1], 0);
+	PIA6821(config.replace(), m_pia[1]);
 	m_pia[1]->readpa_handler().set(FUNC(calomega_state::pia1_ain_r));         // Mux. Button read.
 	m_pia[1]->readpb_handler().set(FUNC(calomega_state::pia1_bin_r));
 	m_pia[1]->ca1_w(0);                                                       // Timer Interrupt Ack.      (CPU -> PIA)
@@ -5712,7 +5712,7 @@ ROM_END
 
 
 
-/****************** Unofficial / 3rd part games *****************/
+/****************** Unofficial / 3rd party games *****************/
 
 /*
 
@@ -6154,14 +6154,14 @@ GAMEL( 1985, comg272a, 0,        sys903kb, keno_903, calomega_state, empty_init,
 GAMEL( 1985, comg272b, 0,        sys903kb, keno_903, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, gaming)",             MACHINE_SUPPORTS_SAVE,                         layout_kenokb )
 
 //************ Diagnostic Sets ************
-GAME( 198?, comg903d, 0,        sys903,   stand903, calomega_state, empty_init,    ROT0, "Cal Omega Inc.",                        "Cal Omega - System 903 Diag.PROM",                 MACHINE_SUPPORTS_SAVE )
-GAME( 198?, comg905d, 0,        sys905,   stand905, calomega_state, empty_init,    ROT0, "Cal Omega Inc.",                        "Cal Omega - System 905 Diag.PROM",                 MACHINE_SUPPORTS_SAVE )
+GAME( 198?, comg903d,  0,        sys903,   stand903, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - System 903 Diag.PROM",                 MACHINE_SUPPORTS_SAVE )
+GAME( 198?, comg905d,  0,        sys905,   stand905, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - System 905 Diag.PROM",                 MACHINE_SUPPORTS_SAVE )
 
 //************* 906-III games **************
-GAME( 1988, comg5107, 0,        sys906,   stand906, calomega_state, empty_init,    ROT0, "Casino Electronics Inc.",               "CEI 51.07 (CEI 906-III Poker)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, comg5108, 0,        sys906,   stand906, calomega_state, empty_init,    ROT0, "Casino Electronics Inc.",               "CEI 51.08 (CEI 906-III Poker)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, comg5107,  0,        sys906,   stand906, calomega_state, empty_init,   ROT0, "Casino Electronics Inc.",               "CEI 51.07 (CEI 906-III Poker)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, comg5108,  0,        sys906,   stand906, calomega_state, empty_init,   ROT0, "Casino Electronics Inc.",               "CEI 51.08 (CEI 906-III Poker)",                    MACHINE_SUPPORTS_SAVE )
 
-//****** Unofficial 903/904/905 3rd part games *******
+//****** Unofficial 903/904/905 3rd party games *******
 GAME( 1982, elgrande,  0,        s903mod,  elgrande, calomega_state, empty_init,   ROT0, "Tuni Electro Service",                  "El Grande - 5 Card Draw (New)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1983, jjpoker,   0,        s903mod,  jjpoker,  calomega_state, empty_init,   ROT0, "Enter-Tech, Ltd.",                      "Jackpot Joker Poker (set 1)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1983, jjpokerb,  jjpoker,  s903mod,  jjpoker,  calomega_state, empty_init,   ROT0, "Enter-Tech, Ltd.",                      "Jackpot Joker Poker (set 2)",                      MACHINE_SUPPORTS_SAVE )
@@ -6169,7 +6169,7 @@ GAME( 1988, ssipkr24,  0,        s903mod,  ssipkr,   calomega_state, empty_init,
 GAME( 1988, ssipkr30,  ssipkr24, s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                   "SSI Poker (v3.0)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ssipkr40,  ssipkr24, s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                   "SSI Poker (v4.0)",                                 MACHINE_SUPPORTS_SAVE )
 
-//****** Unofficial 906-III family 3rd part games *******
+//****** Unofficial 906-III family 3rd party games *******
 GAME( 1990, cas21iwc,  0,        sys906,   cas21iwc, calomega_state, empty_init,   ROT0, "UCMC/IWC",                              "Casino 21 UCMC/IWC (ver 30.08)",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1991, pokeriwc,  0,        sys906,   pokeriwc, calomega_state, empty_init,   ROT0, "UCMC/IWC",                              "Poker UCMC/IWC (ver 162.03)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1991, pokiwc162, pokeriwc, sys906,   pokeriwc, calomega_state, empty_init,   ROT0, "UCMC/IWC",                              "Poker UCMC/IWC (ver 162.03 20-6-91)",              MACHINE_SUPPORTS_SAVE )

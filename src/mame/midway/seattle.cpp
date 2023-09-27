@@ -290,6 +290,7 @@ public:
 		m_io_system(*this, "SYSTEM"),
 		m_io_dips(*this, "DIPS"),
 		m_wheel_driver(*this, "wheel"),
+		m_wheel_motor(*this, "wheel_motor"),
 		m_lamps(*this, "lamp%u", 0U),
 		m_leds(*this, "led%u", 0U)
 	{
@@ -357,7 +358,8 @@ private:
 	optional_ioport m_io_gearshift;
 	optional_ioport m_io_system;
 	optional_ioport m_io_dips;
-	output_finder<1> m_wheel_driver;
+	output_finder<> m_wheel_driver;
+	output_finder<> m_wheel_motor;
 	output_finder<16> m_lamps;
 	output_finder<24> m_leds;
 
@@ -484,6 +486,7 @@ void seattle_state::machine_start()
 	save_item(NAME(m_wheel_calibrated));
 
 	m_wheel_driver.resolve();
+	m_wheel_motor.resolve();
 	m_lamps.resolve();
 	m_leds.resolve();
 
@@ -752,7 +755,7 @@ void seattle_state::wheel_board_w(offs_t offset, uint32_t data)
 		}
 		else
 		{
-			m_wheel_driver[0] = arg; // target wheel angle. signed byte.
+			m_wheel_driver = arg; // target wheel angle. signed byte.
 			m_wheel_force = int8_t(arg);
 		}
 	}
@@ -987,7 +990,7 @@ void seattle_state::output_w(uint32_t data)
 				break;
 
 			case 0x04:
-				output().set_value("wheel", arg); // wheel motor delta. signed byte.
+				m_wheel_motor = arg; // wheel motor delta. signed byte.
 				m_wheel_force = int8_t(~arg);
 				//logerror("wheel_board_w: data = %08x op: %02x arg: %02x\n", data, op, arg);
 				break;

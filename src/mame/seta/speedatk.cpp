@@ -87,26 +87,26 @@ Exclusively licensed to ESCO
 
 Model No.834-5206
 
-CA2_1.1c	PRG	0x2000
-CA2_2.1d	PRG	0x2000
-CA2_3.1e	PRG	0x2000
-CA2_4.1h	PRG	0x1000
-CA1_5.7c	CHR	0x2000
-CA1_6.7d	CHR	0x2000
-CA1_7.7e	CHR	0x2000
-tbp24s10.6k	COLOR	0x100
-tbp18s030.7l	CLUT	0x20
+CA2_1.1c    PRG 0x2000
+CA2_2.1d    PRG 0x2000
+CA2_3.1e    PRG 0x2000
+CA2_4.1h    PRG 0x1000
+CA1_5.7c    CHR 0x2000
+CA1_6.7d    CHR 0x2000
+CA1_7.7e    CHR 0x2000
+tbp24s10.6k COLOR   0x100
+tbp18s030.7l    CLUT    0x20
 
-X'tal		12.000MHz
-CPU			D780C(Z80 1.5MHz?)
-SOUND		AY-3-8910(1.5MHz?)
-CRTC		HD46505SP-1 1.5MHz
-WRAM		M58725P(16Kbit SRAM)
-VRAM		M5L2114LP-3(4Kbit SRAM) x4
-CUSTOM		AC001(14pin DIP)
-			AC002(40pin DIP)
-			AC003(40pin DIP)
-DIPSW		8 Elements Switch Array x1
+X'tal       12.000MHz
+CPU         D780C(Z80 1.5MHz?)
+SOUND       AY-3-8910(1.5MHz?)
+CRTC        HD46505SP-1 1.5MHz
+WRAM        M58725P(16Kbit SRAM)
+VRAM        M5L2114LP-3(4Kbit SRAM) x4
+CUSTOM      AC001(14pin DIP)
+            AC002(40pin DIP)
+            AC003(40pin DIP)
+DIPSW       8 Elements Switch Array x1
 
 **************************************************************************************************/
 
@@ -270,19 +270,19 @@ void speedatk_state::daifugo_mem(address_map &map)
 	}));
 	// Protection?
 	map(0x8464, 0x8464).lr8(NAME([] (offs_t offset) {
-		return 0x00;	// this value is never referenced in game
+		return 0x00;    // this value is never referenced in game
 	}));
 	map(0x8465, 0x8465).lr8(NAME([] (offs_t offset) {
-		return 0xb6;	// strange behavior if value other than 0xb6 is set
+		return 0xb6;    // strange behavior if value other than 0xb6 is set
 	}));
 	map(0x8469, 0x8469).lr8(NAME([] (offs_t offset) {
-		return 0x84;	// 1000_0100b(084h) game stops if other value is set
+		return 0x84;    // 1000_0100b(084h) game stops if other value is set
 	}));
 	map(0x8471, 0x8471).lr8(NAME([] (offs_t offset) {
-		return 0x00;	// 0x00 game stops if other value is set
+		return 0x00;    // 0x00 game stops if other value is set
 	}));
 	map(0x8630, 0x8630).lr8(NAME([] (offs_t offset) {
-		return 0x4d;	// 0x4D accept I/O and sound process
+		return 0x4d;    // 0x4D accept I/O and sound process
 	}));
 }
 
@@ -326,40 +326,40 @@ static INPUT_PORTS_START( daifugo )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 
 	PORT_START("PLAYER1")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_HANAFUDA_A )		PORT_PLAYER(1)	// 1
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_HANAFUDA_B )		PORT_PLAYER(1)	// 2
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_HANAFUDA_C )		PORT_PLAYER(1)	// 3
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_HANAFUDA_D )		PORT_PLAYER(1)	// 4
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )			PORT_PLAYER(1)	// 5
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )			PORT_PLAYER(1)	// 6
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_HANAFUDA_E )		PORT_PLAYER(1)	// 7
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_HANAFUDA_H )		PORT_PLAYER(1)	// 8
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_HANAFUDA_F )		PORT_PLAYER(1)	// 9
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_HANAFUDA_G )		PORT_PLAYER(1)	// 10
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED ) 			PORT_PLAYER(1)	// 11
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_START1 )			PORT_PLAYER(1)	// 12
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_START2 )			PORT_PLAYER(1)	// 13
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_HANAFUDA_YES )	PORT_PLAYER(1)	// 14
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_HANAFUDA_NO ) PORT_NAME("P1 Hanafuda No/Pass")	PORT_PLAYER(1)	// 15
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )			PORT_PLAYER(1)	// 16
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_HANAFUDA_A )      PORT_PLAYER(1)  // 1
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_HANAFUDA_B )      PORT_PLAYER(1)  // 2
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_HANAFUDA_C )      PORT_PLAYER(1)  // 3
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_HANAFUDA_D )      PORT_PLAYER(1)  // 4
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(1)  // 5
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(1)  // 6
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_HANAFUDA_E )      PORT_PLAYER(1)  // 7
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_HANAFUDA_H )      PORT_PLAYER(1)  // 8
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_HANAFUDA_F )      PORT_PLAYER(1)  // 9
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_HANAFUDA_G )      PORT_PLAYER(1)  // 10
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(1)  // 11
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_START1 )          PORT_PLAYER(1)  // 12
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_START2 )          PORT_PLAYER(1)  // 13
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_HANAFUDA_YES )    PORT_PLAYER(1)  // 14
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_HANAFUDA_NO ) PORT_NAME("P1 Hanafuda No/Pass")    PORT_PLAYER(1)  // 15
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(1)  // 16
 
 	PORT_START("PLAYER2")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_HANAFUDA_A )		PORT_PLAYER(2)	// 1
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_HANAFUDA_B )		PORT_PLAYER(2)	// 2
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_HANAFUDA_C )		PORT_PLAYER(2)	// 3
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_HANAFUDA_D )		PORT_PLAYER(2)	// 4
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )			PORT_PLAYER(2)	// 5
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )			PORT_PLAYER(2)	// 6
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_HANAFUDA_E )		PORT_PLAYER(2)	// 7
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_HANAFUDA_H )		PORT_PLAYER(2)	// 8
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_HANAFUDA_F )		PORT_PLAYER(2)	// 9
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_HANAFUDA_G )		PORT_PLAYER(2)	// 10
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED ) 			PORT_PLAYER(2)	// 11
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNUSED )			PORT_PLAYER(2)	// 12
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNUSED )			PORT_PLAYER(2)	// 13
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_HANAFUDA_YES )	PORT_PLAYER(2)	// 14
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_HANAFUDA_NO ) PORT_NAME("P2 Hanafuda No/Pass")	PORT_PLAYER(2)	// 15
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )			PORT_PLAYER(2)	// 16
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_HANAFUDA_A )      PORT_PLAYER(2)  // 1
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_HANAFUDA_B )      PORT_PLAYER(2)  // 2
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_HANAFUDA_C )      PORT_PLAYER(2)  // 3
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_HANAFUDA_D )      PORT_PLAYER(2)  // 4
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(2)  // 5
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(2)  // 6
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_HANAFUDA_E )      PORT_PLAYER(2)  // 7
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_HANAFUDA_H )      PORT_PLAYER(2)  // 8
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_HANAFUDA_F )      PORT_PLAYER(2)  // 9
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_HANAFUDA_G )      PORT_PLAYER(2)  // 10
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(2)  // 11
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(2)  // 12
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(2)  // 13
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_HANAFUDA_YES )    PORT_PLAYER(2)  // 14
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_HANAFUDA_NO ) PORT_NAME("P2 Hanafuda No/Pass")    PORT_PLAYER(2)  // 15
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(2)  // 16
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( speedatk )
@@ -456,7 +456,7 @@ void speedatk_state::output_w(uint8_t data)
 
 void speedatk_state::speedatk(machine_config &config)
 {
-	Z80(config, m_maincpu, MASTER_CLOCK/2); //divider is unknown
+	Z80(config, m_maincpu, MASTER_CLOCK/4); //divider is unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &speedatk_state::speedatk_mem);
 	m_maincpu->set_addrmap(AS_IO, &speedatk_state::speedatk_io);
 	m_maincpu->set_vblank_int("screen", FUNC(speedatk_state::irq0_line_hold));
@@ -482,7 +482,7 @@ void speedatk_state::speedatk(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK/4)); //divider is unknown
+	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK/8)); //divider is unknown
 	aysnd.port_b_read_callback().set_ioport("DSW");
 	aysnd.port_a_write_callback().set(FUNC(speedatk_state::output_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.5);

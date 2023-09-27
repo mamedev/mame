@@ -66,11 +66,13 @@ void device_zxbus_card_interface::interface_pre_start()
 }
 
 
+#include "nemoide.h"
 #include "neogs.h"
 #include "smuc.h"
 
 void zxbus_cards(device_slot_interface &device)
 {
+	device.option_add("nemoide", ZXBUS_NEMOIDE);
 	device.option_add("neogs", ZXBUS_NEOGS);
 	device.option_add("smuc", ZXBUS_SMUC);
 }

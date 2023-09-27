@@ -158,6 +158,7 @@ public:
 		, m_mpu4leds(*this, "mpu4led%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
 		, m_triacs(*this, "triac%u", 0U)
+		, m_flutterbox(*this, "flutterbox")
 
 	 { }
 
@@ -458,6 +459,8 @@ protected:
 	output_finder<144> m_digits;
 
 	output_finder<8> m_triacs;
+
+	output_finder<> m_flutterbox;
 
 	uint8_t m_mmtr_data = 0;
 	uint8_t m_ay8913_address = 0;

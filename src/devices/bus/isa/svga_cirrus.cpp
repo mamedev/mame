@@ -155,7 +155,13 @@ ROM_START( clgd510 )
     // Morse KP 800 VGA - 8bit ISA VGA card - Source: EPROM dump - Chips: CL-GD520A-32PC-B, CL-GD510, PAL18L8ACN, Inmos A B171S-35C - ROM: Eagle II VGA BIOS Version 2.12
     // RAM: 256KB - OSC: 28.322000 MHz, 32.514000 MHz, 25.175000MHz - Connectors: DB15, DB9 - DIP: 8-way
     ROM_SYSTEM_BIOS(3, "morse_v212", "Morse KP 800 V2.12")
-    ROMX_LOAD("morse_kp800_vga_cl-gd520a-32pc-b.bin", 0x00000, 0x08000 CRC(9a12e070) SHA1(536046c6c2549d8cc16a546d5ec1739d647486d7), ROM_BIOS(3) )
+    ROMX_LOAD("morse_kp800_vga_cl-gd520a-32pc-b.bin", 0x00000, 0x08000, CRC(9a12e070) SHA1(536046c6c2549d8cc16a546d5ec1739d647486d7), ROM_BIOS(3) )
+    // Videoseven VEGA VGA 8bit ISA graphics card - RAM: 256KB - Chips: Cirrus Logic CL-GD540A-32PC-C, AM81C178-50PC, CL-GD510A-32PC-B -
+    // Connectors: DB9, DB15, 32pin, 6pin - DIP: 6 way
+    ROM_SYSTEM_BIOS(4, "v7vegavga147", "Videoseven VEGA VGA Version 1.47")
+    ROMX_LOAD("v7_vega_vga_62L1989V5_435-0016-47.bin", 0x00000, 0x08000, CRC(79daa514) SHA1(cc3fc6bf54ba2668ae0083f917e91beb78894e30), ROM_BIOS(4) )
+    ROM_SYSTEM_BIOS(5, "v7vegavga178", "Videoseven VEGA VGA Version 1.78")
+    ROMX_LOAD("vegavga.vbi", 0x00000, 0x08000, CRC(438c6790) SHA1(16abdc1bc3cd38f13ce16dc11fa4e99f169b9807), ROM_BIOS(5) )
 ROM_END
 
 */

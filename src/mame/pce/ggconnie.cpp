@@ -40,6 +40,7 @@ public:
 		, m_rtc(*this, "rtc")
 		, m_oki(*this, "oki")
 		, m_okibank(*this, "okibank")
+		, m_lamp(*this, "lamp")
 	{ }
 
 	void ggconnie(machine_config &config);
@@ -58,17 +59,20 @@ private:
 	required_device <msm6242_device> m_rtc;
 	required_device <okim6295_device> m_oki;
 	required_memory_bank m_okibank;
+	output_finder<> m_lamp;
 };
 
 
 void ggconnie_state::machine_start()
 {
+	m_lamp.resolve();
+
 	m_okibank->configure_entries(0, 8, memregion("oki")->base(), 0x10000);
 }
 
 void ggconnie_state::lamp_w(uint8_t data)
 {
-	output().set_value("lamp", !BIT(data,0));
+	m_lamp =!BIT(data, 0);
 }
 
 void ggconnie_state::output_w(uint8_t data)
