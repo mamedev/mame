@@ -48,7 +48,7 @@ bounds:set_xy(left, top, right, bottom)
 
     The arguments must all be floating-point numbers.
 bounds:set_wh(left, top, width, height)
-    Set the rectangle’s position and size in terms of the top top left corner
+    Set the rectangle’s position and size in terms of the top left corner
     position, and the width and height.
 
     The arguments must all be floating-point numbers.
