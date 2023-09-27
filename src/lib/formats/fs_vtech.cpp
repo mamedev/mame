@@ -4,6 +4,7 @@
 // Management of VTech images
 
 #include "fs_vtech.h"
+#include "fsblk.h"
 #include "vt_dsk.h"
 
 #include "multibyte.h"

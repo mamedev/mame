@@ -15,9 +15,12 @@
 
 #include "fs_coco_os9.h"
 #include "coco_rawdsk.h"
+#include "fsblk.h"
 
 #include "multibyte.h"
 #include "strformat.h"
+
+#include <optional>
 
 
 using namespace fs;

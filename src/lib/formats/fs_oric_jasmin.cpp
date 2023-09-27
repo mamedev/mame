@@ -4,6 +4,7 @@
 // Management of Oric Jasmin floppy images
 
 #include "fs_oric_jasmin.h"
+#include "fsblk.h"
 #include "oric_dsk.h"
 
 #include "multibyte.h"

@@ -9,6 +9,7 @@
 *********************************************************************/
 
 #include "fs_isis.h"
+#include "fsblk.h"
 #include "img_dsk.h"
 
 #include "multibyte.h"
