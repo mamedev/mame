@@ -46,12 +46,17 @@ ROM_START( ethermac30i )
 	ROM_LOAD( "5000118-00-01.bin", 0x000000, 0x004000, CRC(49a602ec) SHA1(65a8e87180a793cd54d30930cc030b95723369f1) )
 ROM_END
 
+ROM_START( macconilc )
+	ROM_REGION(0x4000, MAC8390_ROM_REGION, 0)
+	ROM_LOAD( "asante_maccon_lc_mcilc_1.1.bin", 0x000000, 0x004000, CRC(b95940be) SHA1(317255bcb552ef43f43f85109706ed860baaf6dc) )
+ROM_END
+
 class nubus_mac8390_device : public device_t,
 							 public device_nubus_card_interface
 {
 protected:
 	// construction/destruction
-	nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -61,39 +66,49 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	uint8_t asntm3b_ram_r(offs_t offset);
-	void asntm3b_ram_w(offs_t offset, uint8_t data);
-	uint32_t dp_r(offs_t offset, uint32_t mem_mask = ~0);
-	void dp_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	u8 asntm3b_ram_r(offs_t offset);
+	void asntm3b_ram_w(offs_t offset, u8 data);
+	u32 dp_r(offs_t offset, u32 mem_mask = ~0);
+	void dp_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	required_device<dp8390_device> m_dp83902;
 
 private:
 	void dp_irq_w(int state);
-	uint8_t dp_mem_read(offs_t offset);
-	void dp_mem_write(offs_t offset, uint8_t data);
+	u8 dp_mem_read(offs_t offset);
+	void dp_mem_write(offs_t offset, u8 data);
 
 	std::unique_ptr<u8[]> m_ram;
-	uint8_t m_prom[16];
+	u8 m_prom[16];
 };
 
 class nubus_asntmc3nb_device : public nubus_mac8390_device
 {
 public:
-	nubus_asntmc3nb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nubus_asntmc3nb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class nubus_appleenet_device : public nubus_mac8390_device
 {
 public:
-	nubus_appleenet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nubus_appleenet_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class pds030_ethermac30i_device : public nubus_mac8390_device
 {
 public:
-	pds030_ethermac30i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pds030_ethermac30i_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+protected:
+	virtual void device_start() override;
+};
+
+class pdslc_macconilc_device : public nubus_mac8390_device
+{
+public:
+	pdslc_macconilc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
@@ -123,33 +138,43 @@ const tiny_rom_entry *pds030_ethermac30i_device::device_rom_region() const
 	return ROM_NAME( ethermac30i );
 }
 
-nubus_mac8390_device::nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+const tiny_rom_entry *pdslc_macconilc_device::device_rom_region() const
+{
+	return ROM_NAME(macconilc);
+}
+
+nubus_mac8390_device::nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_nubus_card_interface(mconfig, *this),
 	m_dp83902(*this, "dp83902")
 {
 }
 
-nubus_asntmc3nb_device::nubus_asntmc3nb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_asntmc3nb_device::nubus_asntmc3nb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	nubus_mac8390_device(mconfig, NUBUS_ASNTMC3NB, tag, owner, clock)
 {
 }
 
-nubus_appleenet_device::nubus_appleenet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_appleenet_device::nubus_appleenet_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	nubus_mac8390_device(mconfig, NUBUS_APPLEENET, tag, owner, clock)
 {
 }
 
-pds030_ethermac30i_device::pds030_ethermac30i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pds030_ethermac30i_device::pds030_ethermac30i_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	nubus_mac8390_device(mconfig, PDS030_ETHERMAC30I, tag, owner, clock)
+{
+}
+
+pdslc_macconilc_device::pdslc_macconilc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	nubus_mac8390_device(mconfig, PDSLC_MACCONILC, tag, owner, clock)
 {
 }
 
 void nubus_mac8390_device::device_start()
 {
-	uint32_t slotspace;
-	uint8_t mac[6];
-	uint32_t num = machine().rand();
+	const u32 slotspace = get_slotspace();
+	u8 mac[6];
+	u32 num = machine().rand();
 	memset(m_prom, 0x57, 16);
 	mac[2] = 0x1b;
 	put_u24be(mac+3, num);
@@ -160,14 +185,12 @@ void nubus_mac8390_device::device_start()
 	m_ram = std::make_unique<u8[]>(0x10000);
 	save_pointer(NAME(m_ram), 0x10000);
 
-	install_declaration_rom(MAC8390_ROM_REGION, true);
-
-	slotspace = get_slotspace();
+	install_declaration_rom(MAC8390_ROM_REGION);
 
 //  printf("[ASNTMC3NB %p] slotspace = %x\n", this, slotspace);
 
 	// TODO: move 24-bit mirroring down into nubus.cpp
-	uint32_t ofs_24bit = slotno()<<20;
+	u32 ofs_24bit = slotno()<<20;
 	nubus().install_device(slotspace+0xd0000, slotspace+0xdffff, read8sm_delegate(*this, FUNC(nubus_mac8390_device::asntm3b_ram_r)), write8sm_delegate(*this, FUNC(nubus_mac8390_device::asntm3b_ram_w)));
 	nubus().install_device(slotspace+0xe0000, slotspace+0xe003f, read32s_delegate(*this, FUNC(nubus_mac8390_device::dp_r)), write32s_delegate(*this, FUNC(nubus_mac8390_device::dp_w)));
 	nubus().install_device(slotspace+0xd0000+ofs_24bit, slotspace+0xdffff+ofs_24bit, read8sm_delegate(*this, FUNC(nubus_mac8390_device::asntm3b_ram_r)), write8sm_delegate(*this, FUNC(nubus_mac8390_device::asntm3b_ram_w)));
@@ -181,25 +204,32 @@ void pds030_ethermac30i_device::device_start()
 	nubus_mac8390_device::device_start();
 }
 
+void pdslc_macconilc_device::device_start()
+{
+	// this card is hardwired to slot E and the driver looks for it there
+	set_pds_slot(0xe);
+	nubus_mac8390_device::device_start();
+}
+
 void nubus_mac8390_device::device_reset()
 {
 	m_dp83902->dp8390_reset(0);
 	memcpy(m_prom, m_dp83902->get_mac(), 6);
 }
 
-void nubus_mac8390_device::asntm3b_ram_w(offs_t offset, uint8_t data)
+void nubus_mac8390_device::asntm3b_ram_w(offs_t offset, u8 data)
 {
 //    printf("MC3NB: CPU wrote %02x to RAM @ %x\n", data, offset);
 	m_ram[offset] = data;
 }
 
-uint8_t nubus_mac8390_device::asntm3b_ram_r(offs_t offset)
+u8 nubus_mac8390_device::asntm3b_ram_r(offs_t offset)
 {
 //    printf("MC3NB: CPU read %02x @ RAM %x\n", m_ram[offset], offset);
 	return m_ram[offset];
 }
 
-void nubus_mac8390_device::dp_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void nubus_mac8390_device::dp_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (mem_mask == 0xff000000)
 	{
@@ -216,7 +246,7 @@ void nubus_mac8390_device::dp_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	}
 }
 
-uint32_t nubus_mac8390_device::dp_r(offs_t offset, uint32_t mem_mask)
+u32 nubus_mac8390_device::dp_r(offs_t offset, u32 mem_mask)
 {
 	if (mem_mask == 0xff000000)
 	{
@@ -246,13 +276,13 @@ void nubus_mac8390_device::dp_irq_w(int state)
 	}
 }
 
-uint8_t nubus_mac8390_device::dp_mem_read(offs_t offset)
+u8 nubus_mac8390_device::dp_mem_read(offs_t offset)
 {
 //    printf("MC3NB: 8390 read RAM @ %x = %02x\n", offset, m_ram[offset]);
 	return m_ram[offset];
 }
 
-void nubus_mac8390_device::dp_mem_write(offs_t offset, uint8_t data)
+void nubus_mac8390_device::dp_mem_write(offs_t offset, u8 data)
 {
 //    printf("MC3NB: 8390 wrote %02x to RAM @ %x\n", data, offset);
 	m_ram[offset] = data;
@@ -263,3 +293,4 @@ void nubus_mac8390_device::dp_mem_write(offs_t offset, uint8_t data)
 DEFINE_DEVICE_TYPE_PRIVATE(NUBUS_ASNTMC3NB, device_nubus_card_interface, nubus_asntmc3nb_device, "nb_amc3b", "Asante MC3NB Ethernet card")
 DEFINE_DEVICE_TYPE_PRIVATE(NUBUS_APPLEENET, device_nubus_card_interface, nubus_appleenet_device, "nb_aenet", "Apple NuBus Ethernet card")
 DEFINE_DEVICE_TYPE_PRIVATE(PDS030_ETHERMAC30I, device_nubus_card_interface, pds030_ethermac30i_device, "pds30_emac", "Farallon EtherMac 30i-TH Ethernet card")
+DEFINE_DEVICE_TYPE_PRIVATE(PDSLC_MACCONILC, device_nubus_card_interface, pdslc_macconilc_device, "pdslc_macconlc", "Asante MacCON i LC Ethernet card")

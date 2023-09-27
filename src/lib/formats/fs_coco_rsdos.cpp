@@ -10,6 +10,8 @@
 
 #include "fs_coco_rsdos.h"
 #include "coco_rawdsk.h"
+#include "fsblk.h"
+
 #include "util/strformat.h"
 
 #include <bitset>

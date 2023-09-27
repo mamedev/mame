@@ -59,8 +59,11 @@
 *********************************************************************/
 
 #include "fs_hp98x5.h"
+#include "fsblk.h"
 #include "hpi_dsk.h"
+
 #include "strformat.h"
+
 #include <bitset>
 #include <map>
 

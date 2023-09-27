@@ -25,6 +25,8 @@
 
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
+#include "bus/nubus/cards.h"
+#include "bus/nubus/nubus.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68040.h"
 #include "machine/ncr53c90.h"
@@ -218,6 +220,11 @@ void quadra605_state::macqd605(machine_config &config)
 	m_primetime->pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));
 	m_primetime->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
 	m_primetime->write_cb2().set(m_cuda, FUNC(cuda_device::set_via_data));
+
+	nubus_device &nubus(NUBUS(config, "pds", 0));
+	nubus.set_space(m_maincpu, AS_PROGRAM);
+	nubus.out_irqe_callback().set(m_primetime, FUNC(primetime_device::via2_irq_w<0x20>));
+	NUBUS_SLOT(config, "lcpds", "pds", mac_pdslc_cards, nullptr);
 
 	/* internal ram */
 	RAM(config, m_ram);
