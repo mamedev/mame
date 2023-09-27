@@ -414,6 +414,7 @@ protected:
 
 	void ppi_sys_dac_portc_w(uint8_t data);
 	virtual u8 ppi_prn_portb_r() override;
+	uint32_t a20_286(bool state);
 
 	DECLARE_MACHINE_START(pc9801rs);
 	DECLARE_MACHINE_RESET(pc9801rs);
@@ -431,7 +432,6 @@ private:
 //  optional_device<dac_1bit_device> m_dac1bit;
 	required_device<speaker_sound_device> m_dac1bit;
 
-	uint32_t a20_286(bool state);
 
 	uint8_t pc9801rs_knjram_r(offs_t offset);
 	void pc9801rs_knjram_w(offs_t offset, uint8_t data);
