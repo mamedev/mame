@@ -558,8 +558,6 @@ void joystand_state::x180ii_map(address_map &map) // TODO: verify everything
 	//  map(0xe00080, 0xe00081) // write (bit 0 = cart? bit 1 = ? bit 3 = ?)
 	//map(0xe00000, 0xe00001).r(FUNC(joystand_state::e00000_r)); // copy slot
 	//map(0xe00020, 0xe00021).r(FUNC(joystand_state::e00020_r)); // master slot
-
-	//map(0xe80040, 0xe8005f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
 }
 
 
@@ -718,11 +716,10 @@ void joystand_state::x180ii(machine_config &config)
 
 	YM2413(config, "ym2413", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	OKIM6295(config, m_oki, XTAL(16'000'000) / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // pin 7 not verified
+	OKIM6295(config, m_oki, XTAL(16'000'000) / 16, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.50); // clock supplied by pin 15 of the XCT GAL, to be verified
 
 	// devices
 	EEPROM_93C46_16BIT(config, "eeprom");
-	// MSM6242(config, "rtc", XTAL(32'768)); // TODO: is this present on this PCB?
 }
 
 
