@@ -58,7 +58,7 @@ bool hti_format_t::load_tape(util::random_read &io)
 	uint8_t tmp[ 4 ];
 
 	io.read(tmp, 4, actual);
-	auto magic = get_u32le(tmp);
+	auto magic = get_u32be(tmp);
 	if (((m_img_format == HTI_DELTA_MOD_16_BITS || m_img_format == HTI_DELTA_MOD_17_BITS) && magic != FILE_MAGIC_DELTA && magic != OLD_FILE_MAGIC) ||
 		(m_img_format == HTI_MANCHESTER_MOD && magic != FILE_MAGIC_MANCHESTER)) {
 		return false;
