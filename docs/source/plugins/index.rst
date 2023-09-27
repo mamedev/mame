@@ -35,7 +35,7 @@ in an INI file or on the command line).
 Many plugins need to store settings and/or data.  The
 :ref:`homepath option <mame-commandline-homepath>` sets the folder where plugins
 should save data (defaults to the working directory).  You can change this by
-selecting **Configure Options** from the system selection menu, thens selecting
+selecting **Configure Options** from the system selection menu, then selecting
 **Configure Directories**, and then selecting **Plugin Data**.
 
 To turn individual plugins on or off, first make sure plugins are enabled, then
