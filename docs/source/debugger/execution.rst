@@ -301,7 +301,7 @@ specified in milliseconds.
 
 Example:
 
-``gtime #10000```
+``gtime #10000``
     Resume execution for ten seconds of emulated time.
 
 Back to :ref:`debugger-execution-list`
