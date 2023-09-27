@@ -572,7 +572,7 @@ poller:start([seq])
     the positive and negative portions of an axis; for switch inputs, an “or”
     code is appended and the user can add an alternate host input combination.
 poller:poll()
-    Polls for for user input and updates the sequence if appropriate.  Returns a
+    Polls for user input and updates the sequence if appropriate.  Returns a
     Boolean indicating whether sequence input is complete.  If this method
     returns false, you should continue polling.
 
