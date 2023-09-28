@@ -15,8 +15,8 @@ TODO:
 #include "dmk_dsk.h"
 
 #include "coretmpl.h"
-#include "multibyte.h"
 #include "ioprocs.h"
+#include "multibyte.h"
 
 
 namespace {

@@ -12,8 +12,9 @@
 #include "smc91c9x.h"
 
 #include "multibyte.h"
-#include <sstream>
+
 #include <iomanip>
+#include <sstream>
 
 /***************************************************************************
     DEBUGGING

@@ -11,7 +11,7 @@ MAME Documentation
 ==================
 
 .. note::
-    This documentation is a work in progress.  You can track the status of these topics through MAME's `issue tracker <https://github.com/mamedev/mame/issues>`_. Learn how you can `contribute <https://docs.mamedev.org/contributing/>`_.
+    This documentation is a work in progress.  You can track the status of these topics through MAME's `issue tracker <https://github.com/mamedev/mame/issues>`_. Learn how you can :ref:`contribute <contributing>`.
 
 .. toctree::
     :titlesonly:
