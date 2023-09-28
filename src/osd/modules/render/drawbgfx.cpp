@@ -56,6 +56,10 @@ extern void *GetOSWindow(void *wincontroller);
 #endif
 #endif
 
+#if defined(SDLMAME_USE_WAYLAND)
+#include <wayland-egl.h>
+#endif
+
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
 
@@ -383,6 +387,36 @@ bool video_bgfx::init_bgfx_library(osd_window &window)
 
 
 //============================================================
+//  Helper for creating a wayland window
+//============================================================
+
+#if defined(SDLMAME_USE_WAYLAND)
+wl_egl_window *create_wl_egl_window(SDL_Window *window, struct wl_surface *surface)
+{
+	if (!surface)
+	{
+		osd_printf_error("Wayland surface missing, aborting\n");
+		return nullptr;
+	}
+	wl_egl_window *win_impl = (wl_egl_window *)SDL_GetWindowData(window, "wl_egl_window");
+	if (!win_impl)
+	{
+		int width, height;
+		SDL_GetWindowSize(window, &width, &height);
+		win_impl = wl_egl_window_create(surface, width, height);
+		if (!win_impl)
+		{
+			osd_printf_error("Creating wayland window failed\n");
+			return nullptr;
+		}
+		SDL_SetWindowData(window, "wl_egl_window", win_impl);
+	}
+	return win_impl;
+}
+#endif
+
+
+//============================================================
 //  Utility for setting up window handle
 //============================================================
 
@@ -423,10 +457,16 @@ bool video_bgfx::set_platform_data(bgfx::PlatformData &platform_data, osd_window
 		platform_data.nwh = wmi.info.cocoa.window;
 		break;
 #endif
-#if defined(SDL_VIDEO_DRIVER_WAYLAND) && SDL_VERSION_ATLEAST(2, 0, 16)
+#if defined(SDL_VIDEO_DRIVER_WAYLAND) && SDL_VERSION_ATLEAST(2, 0, 16) && defined(SDLMAME_USE_WAYLAND)
 	case SDL_SYSWM_WAYLAND:
 		platform_data.ndt = wmi.info.wl.display;
-		platform_data.nwh = wmi.info.wl.egl_window;
+		platform_data.nwh = create_wl_egl_window(dynamic_cast<sdl_window_info const &>(window).platform_window(), wmi.info.wl.surface);
+		if (!platform_data.nwh)
+		{
+			osd_printf_error("BGFX: Error creating a Wayland window\n");
+			return false;
+		}
+		platform_data.type = bgfx::NativeWindowHandleType::Wayland;
 		break;
 #endif
 #if defined(SDL_VIDEO_DRIVER_ANDROID)
@@ -513,9 +553,9 @@ static void *sdlNativeWindowHandle(SDL_Window *window)
 	case SDL_SYSWM_COCOA:
 		return wmi.info.cocoa.window;
 #endif
-#if defined(SDL_VIDEO_DRIVER_WAYLAND) && SDL_VERSION_ATLEAST(2, 0, 16)
+#if defined(SDL_VIDEO_DRIVER_WAYLAND) && SDL_VERSION_ATLEAST(2, 0, 16) && defined(SDLMAME_USE_WAYLAND)
 	case SDL_SYSWM_WAYLAND:
-		return wmi.info.wl.egl_window;
+		return osd::create_wl_egl_window(window, wmi.info.wl.surface);
 #endif
 #if defined(SDL_VIDEO_DRIVER_ANDROID)
 	case SDL_SYSWM_ANDROID:
