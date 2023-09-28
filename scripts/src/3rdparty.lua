@@ -1469,6 +1469,11 @@ end
 				"BGFX_CONFIG_RENDERER_OPENGL=0",
 			}
 		end
+		if _OPTIONS["USE_WAYLAND"]=="1" then
+			defines {
+				"WL_EGL_PLATFORM=1",
+			}
+		end
 	end
 
 	if _OPTIONS["targetos"]=="macosx" and _OPTIONS["gcc"]~=nil then
@@ -1484,7 +1489,6 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/debug_renderdoc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/dxgi.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_egl.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/glcontext_glx.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_html5.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_wgl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/nvapi.cpp",

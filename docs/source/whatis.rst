@@ -77,7 +77,7 @@ your derivative work.  In general, this means you must request
 permission, which requires that you follow the guidelines above.
 
 The version number of any derivative work should reflect the version
-number of the MAME release from which it was was derived.
+number of the MAME release from which it was derived.
 
 
 V. Official Contact Information

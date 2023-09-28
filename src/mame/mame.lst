@@ -23401,6 +23401,9 @@ contraj1                        // GX633 (c) 1987 (Japan)
 gryzor                          // GX633 (c) 1987
 gryzor1                         // GX633 (c) 1987
 
+@source:konami/cougar.cpp
+spinfev
+
 @source:konami/crimfght.cpp
 crimfght                        // GX821 (c) 1989 (World)
 crimfghtu                       // GX821 (c) 1989 (US)
@@ -44101,6 +44104,7 @@ demonwld1                       // TP-O16 (c) 1989 Toaplan + Taito license
 demonwld2                       // TP-O16 (c) 1989 Toaplan
 demonwld3                       // TP-O16 (c) 1989 Toaplan
 demonwld4                       // TP-O16 (c) 1989 Toaplan
+demonwld5                       // TP-O16 (c) 1989 Toaplan + APM Electronics license
 fireshrk                        // TP-O17 (c) 1990 Toaplan
 fireshrka                       // TP-O17 (c) 1989 Toaplan
 fireshrkd                       // TP-O17 (c) 1990 Toaplan

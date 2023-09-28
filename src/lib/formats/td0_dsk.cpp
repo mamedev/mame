@@ -849,7 +849,7 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		uint64_t image_size;
 		if(io.length(image_size))
 			return false;
-		if(io.read_at(12, &imagebuf[0], image_size - 12, actual) || actual != image_size - 12)
+		if(io.read_at(12, &imagebuf[0], image_size - 12, actual) || actual != (image_size - 12))
 			return false;
 	}
 

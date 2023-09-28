@@ -36,8 +36,8 @@ static imgtoolerr_t fat_image_create(imgtool::image &image, imgtool::stream::ptr
 	memset(buffer, 0, sizeof(buffer));
 	put_u16le(&buffer[24], sectors);
 	put_u16le(&buffer[26], heads);
-	put_u16le(&buffer[19], (uint16_t) (((uint64_t) tracks * heads * sectors) >> 0));
-	put_u32le(&buffer[32], (uint16_t) (((uint64_t) tracks * heads * sectors) >> 16));
+	put_u16le(&buffer[19], uint16_t((uint64_t(tracks) * heads * sectors) >> 0));
+	put_u32le(&buffer[32], uint16_t((uint64_t(tracks) * heads * sectors) >> 16));
 	err = image.write_block(0, buffer);
 	if (err)
 		goto done;
@@ -47,7 +47,7 @@ static imgtoolerr_t fat_image_create(imgtool::image &image, imgtool::stream::ptr
 		imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_CREATE_PARTITION);
 
 	/* actually create the partition */
-	err = fat_partition_create(image, 0, ((uint64_t) tracks) * heads * sectors);
+	err = fat_partition_create(image, 0, uint64_t(tracks) * heads * sectors);
 	if (err)
 		goto done;
 
@@ -68,7 +68,7 @@ static imgtoolerr_t fat_image_get_geometry(imgtool::image &image, uint32_t *trac
 		return err;
 
 	total_sectors = get_u16le(&buffer[19])
-		| (uint64_t)(get_u32le(&buffer[32]) << 16);
+		| uint64_t(get_u32le(&buffer[32]) << 16);
 
 	*sectors = get_u16le(&buffer[24]);
 	*heads = get_u16le(&buffer[26]);

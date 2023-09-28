@@ -4,41 +4,41 @@
 // best read together with SIMH magtape spec (rev 17 Jan 2022)
 // http://simh.trailing-edge.com/docs/simh_magtape.pdf
 
-#include "multibyte.h"
 #include "simh_tape_file.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include <cassert>
+#include <cerrno>
 #include <cstring>
 #include <stdexcept>
 
-#include <errno.h>
 #include <fcntl.h>
 
 //////////////////////////////////////////////////////////////////////////////
 
 // constants and helpers
 
-enum class simh_marker : u32 {
+enum class simh_marker : osd::u32 {
 	TAPE_MARK   = 0x00000000, // filemark; TODO: SIMH doesn't define setmarks
 	ERASE_GAP   = 0xfffffffe,
 	EOM         = 0xffffffff
 };
 
-inline const bool is_simh_marker_half_gap_forward(const simh_marker marker)
+inline bool is_simh_marker_half_gap_forward(const simh_marker marker)
 {
 	// this function is used when we're reading normally (from BOM to EOM); returns true for erase gap markers that have been half overwritten
-	return (const u32)marker == 0xfffeffff;
+	return osd::u32(marker) == 0xfffeffff;
 }
 
-inline const bool is_simh_marker_half_gap_reverse(const simh_marker marker)
+inline bool is_simh_marker_half_gap_reverse(const simh_marker marker)
 {
 	// this function is used when we're reading in reverse (from EOM to BOM); returns true for erase gap markers that have been half overwritten
-	return (const u32)marker >= 0xffff0000 && (const u32)marker <= 0xfffffffd;
+	return osd::u32(marker) >= 0xffff0000 && osd::u32(marker) <= 0xfffffffd;
 }
 
-inline const bool is_simh_marker_eod_forward(const simh_marker marker)
+inline bool is_simh_marker_eod_forward(const simh_marker marker)
 {
 	// this function is used when we're reading normally (from BOM to EOM); returns true for markers that we consider EOD
 	return marker == simh_marker::ERASE_GAP
@@ -46,7 +46,7 @@ inline const bool is_simh_marker_eod_forward(const simh_marker marker)
 		|| marker == simh_marker::EOM; // logical EOM
 }
 
-inline const bool is_simh_marker_eod_reverse(const simh_marker marker)
+inline bool is_simh_marker_eod_reverse(const simh_marker marker)
 {
 	// this function is used when we're reading in reverse (from EOM to BOM); returns true for markers that we consider EOD
 	return marker == simh_marker::ERASE_GAP
@@ -54,7 +54,7 @@ inline const bool is_simh_marker_eod_reverse(const simh_marker marker)
 		|| marker == simh_marker::EOM; // logical EOM
 }
 
-enum class simh_marker_class : u8 {
+enum class simh_marker_class : osd::u8 {
 	GOOD_DATA_RECORD                = 0x0,
 	PRIVATE_DATA_RECORD_1           = 0x1,
 	PRIVATE_DATA_RECORD_2           = 0x2,
@@ -73,21 +73,21 @@ enum class simh_marker_class : u8 {
 	RESERVED_MARKER                 = 0xf
 };
 
-inline const simh_marker_class get_simh_marker_class(const simh_marker marker)
+inline simh_marker_class get_simh_marker_class(const simh_marker marker)
 {
-	return (const simh_marker_class)((const u32)marker >> 28);
+	return simh_marker_class(osd::u32(marker) >> 28);
 }
 
-inline const u32 get_simh_marker_value(const simh_marker marker)
+inline osd::u32 get_simh_marker_value(const simh_marker marker)
 {
-	return (const u32)marker & 0x0fffffff;
+	return osd::u32(marker) & 0x0fffffff;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
 // construction
 
-simh_tape_file::simh_tape_file(util::random_read_write &file, const u64 file_size, const bool read_only, const bool create)
+simh_tape_file::simh_tape_file(util::random_read_write &file, osd::u64 file_size, bool read_only, bool create)
 	: m_file(file)
 	, m_file_size(file_size)
 	, m_read_only(read_only)
@@ -110,14 +110,14 @@ simh_tape_file::~simh_tape_file()
 
 // internal operations
 
-void simh_tape_file::raw_seek(const u64 pos) const
+void simh_tape_file::raw_seek(const osd::u64 pos) const
 {
 	std::error_condition err = m_file.seek(pos, SEEK_SET);
 	if (err) // error: we failed to seek to expected byte offset
 		throw std::runtime_error(std::string("failed seek: ") + err.message());
 }
 
-void simh_tape_file::raw_read(u8 *const buf, const u32 len) const
+void simh_tape_file::raw_read(osd::u8 *const buf, const osd::u32 len) const
 {
 	size_t actual_len;
 	std::error_condition err = m_file.read(buf, len, actual_len);
@@ -125,7 +125,7 @@ void simh_tape_file::raw_read(u8 *const buf, const u32 len) const
 		throw std::runtime_error(std::string("failed read: ") + (err ? err.message() : std::string("unexpected length")));
 }
 
-void simh_tape_file::raw_write(const u8 *const buf, const u32 len) const
+void simh_tape_file::raw_write(const osd::u8 *const buf, const osd::u32 len) const
 {
 	size_t actual_len;
 	std::error_condition err = m_file.write(buf, len, actual_len);
@@ -133,42 +133,42 @@ void simh_tape_file::raw_write(const u8 *const buf, const u32 len) const
 		throw std::runtime_error(std::string("failed write: ") + (err ? err.message() : std::string("unexpected length")));
 }
 
-void simh_tape_file::read_bytes(const u64 pos, u8 *const buf, const u32 len) const
+void simh_tape_file::read_bytes(const osd::u64 pos, osd::u8 *const buf, const osd::u32 len) const
 {
 	raw_seek(pos);
 	raw_read(buf, len);
 }
 
-const u32 simh_tape_file::read_word(const u64 pos) const
+osd::u32 simh_tape_file::read_word(const osd::u64 pos) const
 {
-	const u32 tmp_len = 4;
-	u8 tmp_buf[tmp_len];
+	const osd::u32 tmp_len = 4;
+	osd::u8 tmp_buf[tmp_len];
 	raw_seek(pos);
 	raw_read(tmp_buf, tmp_len);
 	return get_u32le(tmp_buf);
 }
 
-void simh_tape_file::write_bytes(const u64 pos, const u8 *const buf, const u32 len) const
+void simh_tape_file::write_bytes(const osd::u64 pos, const osd::u8 *const buf, const osd::u32 len) const
 {
 	raw_seek(pos);
 	raw_write(buf, len);
 }
 
-void simh_tape_file::write_byte_repeat(const u64 pos, const u8 data, const u32 len) const
+void simh_tape_file::write_byte_repeat(const osd::u64 pos, const osd::u8 data, const osd::u32 len) const
 {
-	const u32 tmp_len = 4096;
-	u8 tmp_buf[tmp_len];
+	const osd::u32 tmp_len = 4096;
+	osd::u8 tmp_buf[tmp_len];
 	memset(tmp_buf, data, std::min(len, tmp_len));
 	raw_seek(pos);
-	for (u32 i = 0; i < len / tmp_len; i++)
+	for (osd::u32 i = 0; i < len / tmp_len; i++)
 		raw_write(tmp_buf, tmp_len);
 	raw_write(tmp_buf, len % tmp_len);
 }
 
-void simh_tape_file::write_word(const u64 pos, const u32 data) const
+void simh_tape_file::write_word(const osd::u64 pos, const osd::u32 data) const
 {
-	const u32 tmp_len = 4;
-	u8 tmp_buf[tmp_len];
+	const osd::u32 tmp_len = 4;
+	osd::u8 tmp_buf[tmp_len];
 	put_u32le(tmp_buf, data);
 	raw_seek(pos);
 	raw_write(tmp_buf, tmp_len);
@@ -178,7 +178,7 @@ void simh_tape_file::write_word(const u64 pos, const u32 data) const
 
 // position-preserving operations
 
-const std::pair<const tape_status, const u32> simh_tape_file::read_position() const
+std::pair<tape_status, osd::u32> simh_tape_file::read_position() const
 {
 	// this module only keeps track of current tape position, therefore this function scans from BOM to find and return current block address, taking linear time; TODO: this module could be rewritten to also keep track of current block address, therefore enabling this function to only take constant time
 	assert(m_pos <= m_file_size);
@@ -190,13 +190,13 @@ const std::pair<const tape_status, const u32> simh_tape_file::read_position() co
 		return std::pair(tape_status::EOM, 0);
 
 	// we need to count how many blocks are between BOM and us
-	u32 blocks_num = 0;
-	u64 tmp_pos = 0;
+	osd::u32 blocks_num = 0;
+	osd::u64 tmp_pos = 0;
 	while (tmp_pos < m_pos) {
 		if (tmp_pos + 4 > m_file_size) // error: truncated marker
 			throw std::runtime_error("truncated marker");
 
-		const simh_marker marker = (const simh_marker)read_word(tmp_pos);
+		const simh_marker marker = simh_marker(read_word(tmp_pos));
 		if (marker == simh_marker::TAPE_MARK) { // we skip filemarks
 			tmp_pos += 4;
 			continue;
@@ -205,9 +205,9 @@ const std::pair<const tape_status, const u32> simh_tape_file::read_position() co
 			return std::pair(is_ew() ? tape_status::UNKNOWN_EW : tape_status::UNKNOWN, 0);
 
 		const simh_marker_class marker_class = get_simh_marker_class(marker);
-		const u32 block_len = get_simh_marker_value(marker);
-		const u32 pad_len = block_len % 2; // pad odd-length blocks with 1 byte
-		const u32 read_len = 4 + block_len + pad_len + 4;
+		const osd::u32 block_len = get_simh_marker_value(marker);
+		const osd::u32 pad_len = block_len % 2; // pad odd-length blocks with 1 byte
+		const osd::u32 read_len = 4 + block_len + pad_len + 4;
 		switch (marker_class) {
 			case simh_marker_class::PRIVATE_MARKER: // we skip other markers
 			case simh_marker_class::RESERVED_MARKER:
@@ -240,24 +240,24 @@ const std::pair<const tape_status, const u32> simh_tape_file::read_position() co
 
 // non-destructive operations
 
-void simh_tape_file::rewind(const bool eom)
+void simh_tape_file::rewind(bool eom)
 {
 	assert(m_pos <= m_file_size);
 	assert(m_pos % 2 == 0);
 	m_pos = eom ? m_file_size : 0;
 }
 
-const tape_status simh_tape_file::locate_block(const u32 req_block_addr)
+tape_status simh_tape_file::locate_block(osd::u32 req_block_addr)
 {
 	assert(m_pos <= m_file_size);
 	assert(m_pos % 2 == 0);
-	u32 blocks_num = 0;
+	osd::u32 blocks_num = 0;
 	m_pos = 0;
 	while (m_pos < m_file_size) {
 		if (m_pos + 4 > m_file_size) // error: truncated marker
 			throw std::runtime_error("truncated marker");
 
-		const simh_marker marker = (const simh_marker)read_word(m_pos);
+		const simh_marker marker = simh_marker(read_word(m_pos));
 		if (marker == simh_marker::TAPE_MARK) { // we skip filemarks
 			m_pos += 4;
 			continue;
@@ -266,9 +266,9 @@ const tape_status simh_tape_file::locate_block(const u32 req_block_addr)
 			return is_ew() ? tape_status::EOD_EW : tape_status::EOD;
 
 		const simh_marker_class marker_class = get_simh_marker_class(marker);
-		const u32 block_len = get_simh_marker_value(marker);
-		const u32 pad_len = block_len % 2; // pad odd-length blocks with 1 byte
-		const u32 read_len = 4 + block_len + pad_len + 4;
+		const osd::u32 block_len = get_simh_marker_value(marker);
+		const osd::u32 pad_len = block_len % 2; // pad odd-length blocks with 1 byte
+		const osd::u32 read_len = 4 + block_len + pad_len + 4;
 		switch (marker_class) {
 			case simh_marker_class::PRIVATE_MARKER: // we skip other markers
 			case simh_marker_class::RESERVED_MARKER:
@@ -296,7 +296,7 @@ const tape_status simh_tape_file::locate_block(const u32 req_block_addr)
 	return tape_status::EOM;
 }
 
-const tape_status simh_tape_file::space_eod()
+tape_status simh_tape_file::space_eod()
 {
 	assert(m_pos <= m_file_size);
 	assert(m_pos % 2 == 0);
@@ -304,7 +304,7 @@ const tape_status simh_tape_file::space_eod()
 		if (m_pos + 4 > m_file_size) // error: truncated marker
 			throw std::runtime_error("truncated marker");
 
-		const simh_marker marker = (const simh_marker)read_word(m_pos);
+		const simh_marker marker = simh_marker(read_word(m_pos));
 		if (marker == simh_marker::TAPE_MARK) { // we skip filemarks
 			m_pos += 4;
 			continue;
@@ -313,9 +313,9 @@ const tape_status simh_tape_file::space_eod()
 			return tape_status::OK;
 
 		const simh_marker_class marker_class = get_simh_marker_class(marker);
-		const u32 block_len = get_simh_marker_value(marker);
-		const u32 pad_len = block_len % 2; // pad odd-length blocks with 1 byte
-		const u32 read_len = 4 + block_len + pad_len + 4;
+		const osd::u32 block_len = get_simh_marker_value(marker);
+		const osd::u32 pad_len = block_len % 2; // pad odd-length blocks with 1 byte
+		const osd::u32 read_len = 4 + block_len + pad_len + 4;
 		switch (marker_class) {
 			case simh_marker_class::PRIVATE_MARKER: // we skip other markers
 			case simh_marker_class::RESERVED_MARKER:
@@ -334,17 +334,17 @@ const tape_status simh_tape_file::space_eod()
 	return tape_status::EOM;
 }
 
-const std::pair<const tape_status, const u32> simh_tape_file::space_blocks(const u32 req_blocks_num)
+std::pair<tape_status, osd::u32> simh_tape_file::space_blocks(osd::u32 req_blocks_num)
 {
 	assert(m_pos <= m_file_size);
 	assert(m_pos % 2 == 0);
 	assert(req_blocks_num > 0);
-	u32 blocks_num = 0;
+	osd::u32 blocks_num = 0;
 	while (m_pos < m_file_size) {
 		if (m_pos + 4 > m_file_size) // error: truncated marker
 			throw std::runtime_error("truncated marker");
 
-		const simh_marker marker = (const simh_marker)read_word(m_pos);
+		const simh_marker marker = simh_marker(read_word(m_pos));
 		if (marker == simh_marker::TAPE_MARK) { // error: we reached filemark
 			m_pos += 4;
 			return std::pair(is_ew() ? tape_status::FILEMARK_EW : tape_status::FILEMARK, blocks_num);
@@ -353,9 +353,9 @@ const std::pair<const tape_status, const u32> simh_tape_file::space_blocks(const
 			return std::pair(is_ew() ? tape_status::EOD_EW : tape_status::EOD, blocks_num);
 
 		const simh_marker_class marker_class = get_simh_marker_class(marker);
-		const u32 block_len = get_simh_marker_value(marker);
-		const u32 pad_len = block_len % 2; // pad odd-length blocks with 1 byte
-		const u32 read_len = 4 + block_len + pad_len + 4;
+		const osd::u32 block_len = get_simh_marker_value(marker);
+		const osd::u32 pad_len = block_len % 2; // pad odd-length blocks with 1 byte
+		const osd::u32 read_len = 4 + block_len + pad_len + 4;
 		switch (marker_class) {
 			case simh_marker_class::PRIVATE_MARKER: // we skip other markers
 			case simh_marker_class::RESERVED_MARKER:
@@ -383,19 +383,19 @@ const std::pair<const tape_status, const u32> simh_tape_file::space_blocks(const
 	return std::pair(tape_status::EOM, blocks_num);
 }
 
-const std::pair<const tape_status, const u32> simh_tape_file::space_filemarks(const u32 req_filemarks_num, const bool setmarks, const bool sequential)
+std::pair<tape_status, osd::u32> simh_tape_file::space_filemarks(osd::u32 req_filemarks_num, bool setmarks, bool sequential)
 {
 	assert(m_pos <= m_file_size);
 	assert(m_pos % 2 == 0);
 	assert(req_filemarks_num > 0);
 	assert(!setmarks); // TODO: SIMH doesn't define setmarks
 	assert(!sequential); // TODO: support spacing over sequential filemarks, once we have good way to test it
-	u32 filemarks_num = 0;
+	osd::u32 filemarks_num = 0;
 	while (m_pos < m_file_size) {
 		if (m_pos + 4 > m_file_size) // error: truncated marker
 			throw std::runtime_error("truncated marker");
 
-		const simh_marker marker = (const simh_marker)read_word(m_pos);
+		const simh_marker marker = simh_marker(read_word(m_pos));
 		if (marker == simh_marker::TAPE_MARK) { // we count filemarks
 			m_pos += 4;
 			filemarks_num++;
@@ -408,9 +408,9 @@ const std::pair<const tape_status, const u32> simh_tape_file::space_filemarks(co
 			return std::pair(is_ew() ? tape_status::EOD_EW : tape_status::EOD, filemarks_num);
 
 		const simh_marker_class marker_class = get_simh_marker_class(marker);
-		const u32 block_len = get_simh_marker_value(marker);
-		const u32 pad_len = block_len % 2; // pad odd-length blocks with 1 byte
-		const u32 read_len = 4 + block_len + pad_len + 4;
+		const osd::u32 block_len = get_simh_marker_value(marker);
+		const osd::u32 pad_len = block_len % 2; // pad odd-length blocks with 1 byte
+		const osd::u32 read_len = 4 + block_len + pad_len + 4;
 		switch (marker_class) {
 			case simh_marker_class::PRIVATE_MARKER: // we skip other markers
 			case simh_marker_class::RESERVED_MARKER:
@@ -429,17 +429,17 @@ const std::pair<const tape_status, const u32> simh_tape_file::space_filemarks(co
 	return std::pair(tape_status::EOM, filemarks_num);
 }
 
-const std::pair<const tape_status, const u32> simh_tape_file::space_blocks_reverse(const u32 req_blocks_num)
+std::pair<tape_status, osd::u32> simh_tape_file::space_blocks_reverse(osd::u32 req_blocks_num)
 {
 	assert(m_pos <= m_file_size);
 	assert(m_pos % 2 == 0);
 	assert(req_blocks_num > 0);
-	u32 blocks_num = 0;
+	osd::u32 blocks_num = 0;
 	while (m_pos > 0) {
 		if (m_pos - 4 < 0) // error: truncated marker
 			throw std::runtime_error("truncated marker");
 
-		const simh_marker marker = (const simh_marker)read_word(m_pos - 4);
+		const simh_marker marker = simh_marker(read_word(m_pos - 4));
 		if (marker == simh_marker::TAPE_MARK) { // error: we reached filemark
 			m_pos -= 4;
 			return std::pair(is_ew() ? tape_status::FILEMARK_EW : tape_status::FILEMARK, blocks_num);
@@ -448,9 +448,9 @@ const std::pair<const tape_status, const u32> simh_tape_file::space_blocks_rever
 			return std::pair(is_ew() ? tape_status::EOD_EW : tape_status::EOD, blocks_num);
 
 		const simh_marker_class marker_class = get_simh_marker_class(marker);
-		const u32 block_len = get_simh_marker_value(marker);
-		const u32 pad_len = block_len % 2; // pad odd-length blocks with 1 byte
-		const u32 read_len = 4 + block_len + pad_len + 4;
+		const osd::u32 block_len = get_simh_marker_value(marker);
+		const osd::u32 pad_len = block_len % 2; // pad odd-length blocks with 1 byte
+		const osd::u32 read_len = 4 + block_len + pad_len + 4;
 		switch (marker_class) {
 			case simh_marker_class::PRIVATE_MARKER: // we skip other markers
 			case simh_marker_class::RESERVED_MARKER:
@@ -478,19 +478,19 @@ const std::pair<const tape_status, const u32> simh_tape_file::space_blocks_rever
 	return std::pair(tape_status::BOM, blocks_num);
 }
 
-const std::pair<const tape_status, const u32> simh_tape_file::space_filemarks_reverse(const u32 req_filemarks_num, const bool setmarks, const bool sequential)
+std::pair<tape_status, osd::u32> simh_tape_file::space_filemarks_reverse(osd::u32 req_filemarks_num, bool setmarks, bool sequential)
 {
 	assert(m_pos <= m_file_size);
 	assert(m_pos % 2 == 0);
 	assert(req_filemarks_num > 0);
 	assert(!setmarks); // TODO: SIMH doesn't define setmarks
 	assert(!sequential); // TODO: support spacing over sequential filemarks, once we have good way to test it
-	u32 filemarks_num = 0;
+	osd::u32 filemarks_num = 0;
 	while (m_pos > 0) {
 		if (m_pos - 4 < 0) // error: truncated marker
 			throw std::runtime_error("truncated marker");
 
-		const simh_marker marker = (const simh_marker)read_word(m_pos - 4);
+		const simh_marker marker = simh_marker(read_word(m_pos - 4));
 		if (marker == simh_marker::TAPE_MARK) { // we count filemarks
 			m_pos -= 4;
 			filemarks_num++;
@@ -503,9 +503,9 @@ const std::pair<const tape_status, const u32> simh_tape_file::space_filemarks_re
 			return std::pair(is_ew() ? tape_status::EOD_EW : tape_status::EOD, filemarks_num);
 
 		const simh_marker_class marker_class = get_simh_marker_class(marker);
-		const u32 block_len = get_simh_marker_value(marker);
-		const u32 pad_len = block_len % 2; // pad odd-length blocks with 1 byte
-		const u32 read_len = 4 + block_len + pad_len + 4;
+		const osd::u32 block_len = get_simh_marker_value(marker);
+		const osd::u32 pad_len = block_len % 2; // pad odd-length blocks with 1 byte
+		const osd::u32 read_len = 4 + block_len + pad_len + 4;
 		switch (marker_class) {
 			case simh_marker_class::PRIVATE_MARKER: // we skip other markers
 			case simh_marker_class::RESERVED_MARKER:
@@ -524,7 +524,7 @@ const std::pair<const tape_status, const u32> simh_tape_file::space_filemarks_re
 	return std::pair(tape_status::BOM, filemarks_num);
 }
 
-const std::pair<const tape_status, const u32> simh_tape_file::read_block(u8 *buf, const u32 buf_size)
+std::pair<tape_status, osd::u32> simh_tape_file::read_block(osd::u8 *buf, osd::u32 buf_size)
 {
 	assert(m_pos <= m_file_size);
 	assert(m_pos % 2 == 0);
@@ -532,7 +532,7 @@ const std::pair<const tape_status, const u32> simh_tape_file::read_block(u8 *buf
 		if (m_pos + 4 > m_file_size) // error: truncated marker
 			throw std::runtime_error("truncated marker");
 
-		const simh_marker marker = (const simh_marker)read_word(m_pos);
+		const simh_marker marker = simh_marker(read_word(m_pos));
 		if (marker == simh_marker::TAPE_MARK) { // error: we reached filemark
 			m_pos += 4;
 			return std::pair(is_ew() ? tape_status::FILEMARK_EW : tape_status::FILEMARK, 0);
@@ -541,9 +541,9 @@ const std::pair<const tape_status, const u32> simh_tape_file::read_block(u8 *buf
 			return std::pair(is_ew() ? tape_status::EOD_EW : tape_status::EOD, 0);
 
 		const simh_marker_class marker_class = get_simh_marker_class(marker);
-		const u32 block_len = get_simh_marker_value(marker);
-		const u32 pad_len = block_len % 2; // pad odd-length blocks with 1 byte
-		const u32 read_len = 4 + block_len + pad_len + 4;
+		const osd::u32 block_len = get_simh_marker_value(marker);
+		const osd::u32 pad_len = block_len % 2; // pad odd-length blocks with 1 byte
+		const osd::u32 read_len = 4 + block_len + pad_len + 4;
 		switch (marker_class) {
 			case simh_marker_class::PRIVATE_MARKER: // we skip other markers
 			case simh_marker_class::RESERVED_MARKER:
@@ -577,23 +577,23 @@ const std::pair<const tape_status, const u32> simh_tape_file::read_block(u8 *buf
 
 // destructive operations
 
-void simh_tape_file::erase(const bool eom)
+void simh_tape_file::erase(bool eom)
 {
 	assert(!m_read_only);
 	assert(m_pos <= m_file_size);
 	assert(m_pos % 2 == 0);
-	const u32 write_len = m_file_size - m_pos; // we always erase entire remainder of tape
+	const osd::u32 write_len = m_file_size - m_pos; // we always erase entire remainder of tape
 	write_byte_repeat(m_pos, 0xff, write_len); // we assume simh_marker::EOM == 0xffffffff
 	m_pos += write_len;
 }
 
-const tape_status simh_tape_file::write_block(const u8 *const buf, const u32 req_block_len)
+tape_status simh_tape_file::write_block(const osd::u8 *buf, osd::u32 req_block_len)
 {
 	assert(!m_read_only);
 	assert(m_pos <= m_file_size);
 	assert(m_pos % 2 == 0);
-	const u32 pad_len = req_block_len % 2; // pad odd-length blocks with 1 byte
-	const u32 write_len = 4 + req_block_len + pad_len + 4;
+	const osd::u32 pad_len = req_block_len % 2; // pad odd-length blocks with 1 byte
+	const osd::u32 write_len = 4 + req_block_len + pad_len + 4;
 	if (m_pos + write_len >= m_file_size) // error: we reached physical EOM
 		return tape_status::EOM;
 
@@ -605,18 +605,18 @@ const tape_status simh_tape_file::write_block(const u8 *const buf, const u32 req
 	return is_ew() ? tape_status::EW : tape_status::OK; // success: we wrote another block
 }
 
-const tape_status simh_tape_file::write_filemarks(const u32 req_filemarks_num, const bool setmarks)
+tape_status simh_tape_file::write_filemarks(osd::u32 req_filemarks_num, bool setmarks)
 {
 	assert(!m_read_only);
 	assert(m_pos <= m_file_size);
 	assert(m_pos % 2 == 0);
 	assert(!setmarks); // TODO: SIMH doesn't define setmarks
-	const u32 write_len = req_filemarks_num * 4;
+	const osd::u32 write_len = req_filemarks_num * 4;
 	if (m_pos + write_len >= m_file_size) // error: we reached physical EOM
 		return tape_status::EOM;
 
-	for (u32 i = 0; i < write_len; i += 4)
-		write_word(m_pos + i, (const u32)simh_marker::TAPE_MARK);
+	for (osd::u32 i = 0; i < write_len; i += 4)
+		write_word(m_pos + i, osd::u32(simh_marker::TAPE_MARK));
 	m_pos += write_len;
 	return is_ew() ? tape_status::EW : tape_status::OK; // success: we wrote all filemarks
 }

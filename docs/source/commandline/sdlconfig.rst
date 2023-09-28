@@ -1,4 +1,4 @@
-SDL-Specific Commandline Options
+SDL-Specific Command-line Options
 ================================
 
 This section contains configuration options that are specific to any build
