@@ -173,7 +173,7 @@ Filters are a means to process data being written into or read out of an image i
 
 **vzsnapshot**
 
-	[todo: VZ Snapshot? Find out what this is....]
+	[todo: VZ Snapshot? Find out what this is...]
 
 **vzbas**
 
