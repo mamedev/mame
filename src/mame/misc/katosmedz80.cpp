@@ -552,8 +552,8 @@ static INPUT_PORTS_START( dnbanban )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1)    PORT_NAME("Coin In")           // COIN IN (related error E5)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Coin")      // Service COIN (related error E6)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1)     PORT_NAME("Coin In")          // COIN IN (related error E5)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Coin")     // Service COIN (related error E6)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR ) PORT_NAME("Door Switch")  // DOOR (related error E7)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")  // to figure out...
 
@@ -572,10 +572,10 @@ INPUT_PORTS_END
 void katosmedz80_state::dnbanban(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 12_MHz_XTAL / 2);  // guess
+	Z80(config, m_maincpu, 12_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &katosmedz80_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &katosmedz80_state::io_map);
-	m_maincpu->set_periodic_int(FUNC(katosmedz80_state::irq0_line_hold), attotime::from_hz(60 * 25));  // to verify
+	m_maincpu->set_periodic_int(FUNC(katosmedz80_state::irq0_line_hold), attotime::from_hz(12_MHz_XTAL / 0x2000));  // to verify
 
 	I8255(config, m_ppi[0]);  // D71055C IC10
 	// (00-03) Mode 0 - Ports A set as input, Ports B, high C & low C as output.
@@ -612,9 +612,7 @@ ROM_START( dnbanban )
 	ROM_LOAD( "g25_v.ic7", 0x00000, 0x20000, CRC(87c7d45d) SHA1(3f035d5e62fe62111cee978ed1708e902c98526a) )  // MBM27C1000
 ROM_END
 
-}
-
-// anonymous namespace
+} // anonymous namespace
 
 
 /*********************************************
