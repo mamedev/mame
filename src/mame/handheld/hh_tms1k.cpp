@@ -957,10 +957,10 @@ ROM_END
   * TMS1000NLL MP0915 (die label: 1000B, MP0915)
   * 2 motors (one for back axis, one for steering), no sound
 
-  It's a programmable buggy, like Big Track but much simpler. To add a command
+  It's a programmable buggy, like Big Trak but much simpler. To add a command
   step in program-mode, press a direction key and one of the time delay number
   keys at the same time. To run the program(max 24 steps), switch to run-mode
-  and press the go-key.
+  and press the go key.
 
   known releases:
   - Japan: System Control Car: Cheetah, published by Bandai
@@ -9650,6 +9650,10 @@ ROM_END
 
   The In command was canceled midst production, it is basically a nop. Newer
   releases and the European version removed the button completely.
+
+  There's also an unofficial Soviet Version: Elektronika IM-11 (УУ-1 MCU and
+  КМ1010КТ1), Lunokhod and later Planetokhod. The software is presumed to be
+  identical to Big Trak, УУ-1 is very likely a TMS1000 clone.
 
 *******************************************************************************/
 
