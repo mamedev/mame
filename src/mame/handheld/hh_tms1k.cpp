@@ -79,6 +79,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP0163   TMS1000   1979, A-One LSI Match Number/LJN Electronic Concentration
  @MP0166   TMS1000   1980, A-One Arrange Ball/LJN Computer Impulse/Tandy Zingo (model 60-2123)
  @MP0168   TMS1000   1979, Conic Multisport/Tandy Sports Arena (model 60-2158)
+ *MP0169   TMS1000   1979, Conic Electronic Baseball
  @MP0170   TMS1000   1979, Conic Football
  *MP0171   TMS1000   1979, Tomy Soccer
  *MP0220   TMS1000   1980, Tomy Teacher
@@ -4146,7 +4147,7 @@ ROM_END
 
   known releases:
   - Hong Kong: Electronic Football II, published by Conic
-  - USA: Electronic Football II, published by Tandy
+  - USA: Electronic Football II (model 60-2169), published by Tandy
 
 *******************************************************************************/
 
