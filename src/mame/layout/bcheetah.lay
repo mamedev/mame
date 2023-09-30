@@ -23,10 +23,157 @@ license:CC0-1.0
 	<element name="text_m2"><text string="motor 2:"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 
 
-<!-- build screen -->
+	<element name="background"><rect><color red="0.4" green="0.5" blue="0.4" /></rect></element>
 
-	<view name="Internal Layout">
-		<bounds left="0" right="6.3" top="0" bottom="2.5" />
+<!-- define keypad elements -->
+
+	<!-- col0 is background -->
+	<param name="col0r" value="1.0"/>
+	<param name="col0g" value="1.0"/>
+	<param name="col0b" value=".9"/>
+
+	<!-- col1 is text color -->
+	<param name="col1r" value="0.4"/>
+	<param name="col1g" value="0.4"/>
+	<param name="col1b" value="0.3"/>
+
+	<!-- col2 is background selected -->
+	<param name="col2r" value="0.4"/>
+	<param name="col2g" value="0.4"/>
+	<param name="col2b" value="0.3"/>
+
+	<!-- col3 is text selected -->
+	<param name="col3r" value="1.0"/>
+	<param name="col3g" value="1.0"/>
+	<param name="col3b" value=".9"/>
+
+	<param name="str0" value="PRO"/>
+	<param name="str1" value="RUN"/>
+	<element name="keyproref">
+		<rect><color red="0.0" blue="0.0" green="0.0"/></rect>
+
+		<rect state="0"><color red="~col0r~" green="~col0g~" blue="~col0b~"/>
+			<bounds left="0.05" right="0.95" top="0.05" bottom="0.95" /></rect>
+
+		<text state="0" string="~str0~"><color red="~col1r~" green="~col1g~" blue="~col1b~"/>
+			<bounds left="0.10" right="0.90" top="0.10" bottom="0.90" /></text>
+
+		<rect state="1"><color red="~col2r~" green="~col2g~" blue="~col2b~"/>
+			<bounds left="0.05" right="0.95" top="0.05" bottom="0.95" /></rect>
+
+		<text state="1" string="~str1~"><color red="~col3r~" green="~col3g~" blue="~col3b~"/>
+			<bounds left="0.10" right="0.90" top="0.10" bottom="0.90" /></text>
+	</element>
+
+	<param name="str0" value="&lt;"/>
+	<element name="keyleftref">
+		<rect><color red="0.0" blue="0.0" green="0.0"/></rect>
+
+		<rect state="0"><color red="~col0r~" green="~col0g~" blue="~col0b~"/>
+			<bounds left="0.05" right="0.95" top="0.05" bottom="0.95" /></rect>
+
+		<text state="0" string="~str0~"><color red="~col1r~" green="~col1g~" blue="~col1b~"/>
+			<bounds left="0.10" right="0.90" top="0.10" bottom="0.90" /></text>
+
+		<rect state="1"><color red="~col2r~" green="~col2g~" blue="~col2b~"/>
+			<bounds left="0.05" right="0.95" top="0.05" bottom="0.95" /></rect>
+
+		<text state="1" string="~str0~"><color red="~col3r~" green="~col3g~" blue="~col3b~"/>
+			<bounds left="0.10" right="0.90" top="0.10" bottom="0.90" /></text>
+	</element>
+
+	<param name="str0" value="^"/>
+	<element name="keyfwdref">
+		<rect><color red="0.0" blue="0.0" green="0.0"/></rect>
+
+		<rect state="0"><color red="~col0r~" green="~col0g~" blue="~col0b~"/>
+			<bounds left="0.05" right="0.95" top="0.05" bottom="0.95" /></rect>
+
+		<text state="0" string="~str0~"><color red="~col1r~" green="~col1g~" blue="~col1b~"/>
+			<bounds left="0.10" right="0.90" top="0.10" bottom="0.90" /></text>
+
+		<rect state="1"><color red="~col2r~" green="~col2g~" blue="~col2b~"/>
+			<bounds left="0.05" right="0.95" top="0.05" bottom="0.95" /></rect>
+
+		<text state="1" string="~str0~"><color red="~col3r~" green="~col3g~" blue="~col3b~"/>
+			<bounds left="0.10" right="0.90" top="0.10" bottom="0.90" /></text>
+	</element>
+
+	<param name="str0" value="&gt;"/>
+	<element name="keyrightref">
+		<rect><color red="0.0" blue="0.0" green="0.0"/></rect>
+
+		<rect state="0"><color red="~col0r~" green="~col0g~" blue="~col0b~"/>
+			<bounds left="0.05" right="0.95" top="0.05" bottom="0.95" /></rect>
+
+		<text state="0" string="~str0~"><color red="~col1r~" green="~col1g~" blue="~col1b~"/>
+			<bounds left="0.10" right="0.90" top="0.10" bottom="0.90" /></text>
+
+		<rect state="1"><color red="~col2r~" green="~col2g~" blue="~col2b~"/>
+			<bounds left="0.05" right="0.95" top="0.05" bottom="0.95" /></rect>
+
+		<text state="1" string="~str0~"><color red="~col3r~" green="~col3g~" blue="~col3b~"/>
+			<bounds left="0.10" right="0.90" top="0.10" bottom="0.90" /></text>
+	</element>
+
+	<param name="str0" value="STOP"/>
+	<element name="keystopref">
+		<rect><color red="0.0" blue="0.0" green="0.0"/></rect>
+
+		<rect state="0"><color red="~col0r~" green="~col0g~" blue="~col0b~"/>
+			<bounds left="0.05" right="0.95" top="0.05" bottom="0.95" /></rect>
+
+		<text state="0" string="~str0~"><color red="~col1r~" green="~col1g~" blue="~col1b~"/>
+			<bounds left="0.10" right="0.90" top="0.10" bottom="0.90" /></text>
+
+		<rect state="1"><color red="~col2r~" green="~col2g~" blue="~col2b~"/>
+			<bounds left="0.05" right="0.95" top="0.05" bottom="0.95" /></rect>
+
+		<text state="1" string="~str0~"><color red="~col3r~" green="~col3g~" blue="~col3b~"/>
+			<bounds left="0.10" right="0.90" top="0.10" bottom="0.90" /></text>
+	</element>
+
+	<param name="str0" value="GO"/>
+	<element name="keygoref">
+		<rect><color red="0.0" blue="0.0" green="0.0"/></rect>
+
+		<rect state="0"><color red="~col0r~" green="~col0g~" blue="~col0b~"/>
+		<bounds left="0.05" right="0.95" top="0.05" bottom="0.95" /></rect>
+
+		<text state="0" string="~str0~"><color red="~col1r~" green="~col1g~" blue="~col1b~"/>
+			<bounds left="0.10" right="0.90" top="0.10" bottom="0.90" /></text>
+
+		<rect state="1"><color red="~col2r~" green="~col2g~" blue="~col2b~"/>
+			<bounds left="0.05" right="0.95" top="0.05" bottom="0.95" /></rect>
+
+		<text state="1" string="~str0~"><color red="~col3r~" green="~col3g~" blue="~col3b~"/>
+			<bounds left="0.10" right="0.90" top="0.10" bottom="0.90" /></text>
+	</element>
+
+	<repeat count="4">
+	<param name="key" start="1" increment="1"/>
+	<param name="str0" value="~key~"/>
+		<element name="key~key~ref">
+		  <rect><color red="0.0" blue="0.0" green="0.0"/></rect>
+
+		  <rect state="0"><color red="~col0r~" green="~col0g~" blue="~col0b~"/>
+			<bounds left="0.05" right="0.95" top="0.05" bottom="0.95" /></rect>
+
+		  <text state="0" string="~str0~"><color red="~col1r~" green="~col1g~" blue="~col1b~"/>
+				<bounds left="0.10" right="0.90" top="0.10" bottom="0.90" /></text>
+
+		  <rect state="1"><color red="~col2r~" green="~col2g~" blue="~col2b~"/>
+			<bounds left="0.05" right="0.95" top="0.05" bottom="0.95" /></rect>
+
+		  <text state="1" string="~str0~"><color red="~col3r~" green="~col3g~" blue="~col3b~"/>
+			<bounds left="0.10" right="0.90" top="0.10" bottom="0.90" /></text>
+		</element>
+	</repeat>
+
+<!-- define groups -->
+
+	<group name="motorgroupref">
+		<bounds left="0" right="10" top="0" bottom="4" />
 
 		<element ref="text_m2"><bounds x="0" y="0" width="4" height="1" /></element>
 		<element name="motor2_left" ref="text_l"><bounds x="4" y="0" width="1" height="1" /></element>
@@ -34,6 +181,65 @@ license:CC0-1.0
 
 		<element ref="text_m1"><bounds x="0" y="1.3" width="4" height="1" /></element>
 		<element name="motor1" ref="text_drv"><bounds x="4" y="1.3" width="2" height="1" /></element>
+	</group>
 
+	<group name="keygroupref">
+		<bounds left="0" right="40" top="0" bottom="40" />
+
+		<element ref="keyproref" inputtag="IN.0" inputmask="0x2">
+			<bounds x="10" y="0" width="8" height="8" />
+		</element>
+
+		<element ref="keygoref" inputtag="IN.1" inputmask="0x8">
+			<bounds x="30" y="0" width="8" height="8" />
+		</element>
+
+		<element ref="keyleftref" inputtag="IN.1" inputmask="0x1">
+			<bounds x="0" y="10" width="8" height="8" />
+		</element>
+
+		<element ref="keyfwdref" inputtag="IN.1" inputmask="0x2">
+			<bounds x="10" y="10" width="8" height="8" />
+		</element>
+
+		<element ref="keyrightref" inputtag="IN.1" inputmask="0x4">
+			<bounds x="20" y="10" width="8" height="8" />
+		</element>
+
+		<element ref="keystopref" inputtag="IN.2" inputmask="0x8">
+			<bounds x="30" y="10" width="8" height="8" />
+		</element>
+
+		<element ref="key1ref" inputtag="IN.3" inputmask="0x2">
+			<bounds x="0" y="20" width="8" height="8" />
+		</element>
+
+		<element ref="key2ref" inputtag="IN.3" inputmask="0x8">
+			<bounds x="10" y="20" width="8" height="8" />
+		</element>
+
+		<element ref="key3ref" inputtag="IN.4" inputmask="0x2">
+			<bounds x="20" y="20" width="8" height="8" />
+		</element>
+
+		<element ref="key4ref" inputtag="IN.4" inputmask="0x8">
+			<bounds x="30" y="20" width="8" height="8" />
+		</element>
+	</group>
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-2" right="50" top="-2" bottom="60"/>
+
+		<element ref="background"><bounds left="-2" right="50" top="-2" bottom="60"/></element>
+
+		<group ref="motorgroupref">
+			<bounds left="0" right="50" top="40" bottom="60"/>
+		</group>
+
+		<group ref="keygroupref">
+			<bounds left="0" right="50" top="0" bottom="50"/>
+		</group>
 	</view>
 </mamelayout>
