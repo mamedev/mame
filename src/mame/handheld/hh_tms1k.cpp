@@ -999,6 +999,8 @@ private:
 void bcheetah_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
+
+	// resolve handlers
 	m_motor1.resolve();
 	m_motor2_left.resolve();
 	m_motor2_right.resolve();
@@ -1009,8 +1011,8 @@ void bcheetah_state::machine_start()
 void bcheetah_state::write_r(u32 data)
 {
 	// R0-R4: input mux
-	// R5,R6: tied to K4??
 	m_inp_mux = data & 0x1f;
+	m_r = data;
 }
 
 void bcheetah_state::write_o(u16 data)
@@ -1019,15 +1021,15 @@ void bcheetah_state::write_o(u16 data)
 	// O0: front motor steer left
 	// O2: front motor steer right
 	// O3: GND, other: N/C
-	m_motor1 = data >> 1 & 1;
-	m_motor2_left = data & 1;
-	m_motor2_right = data >> 2 & 1;
+	m_motor1 = BIT(data, 1);
+	m_motor2_left = BIT(data, 0);
+	m_motor2_right = BIT(data, 2);
 }
 
 u8 bcheetah_state::read_k()
 {
-	// K: multiplexed inputs
-	return read_inputs(5);
+	// K: multiplexed inputs, K4 is also tied to R5+R6
+	return read_inputs(5) | ((m_r & 0x60) ? 4 : 0);
 }
 
 // inputs
@@ -1065,7 +1067,7 @@ INPUT_PORTS_END
 void bcheetah_state::bcheetah(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 100000); // approximation - RC osc. R=47K, C=47pF
+	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set(FUNC(bcheetah_state::read_k));
 	m_maincpu->write_r().set(FUNC(bcheetah_state::write_r));
 	m_maincpu->write_o().set(FUNC(bcheetah_state::write_o));
@@ -9925,6 +9927,7 @@ void mbdtower_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
 
+	// resolve handlers
 	m_motor_pos_out.resolve();
 	m_card_pos_out.resolve();
 	m_motor_on_out.resolve();
@@ -12337,6 +12340,7 @@ void wtalker_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
 
+	// register for savestates
 	save_item(NAME(m_pulse));
 	save_item(NAME(m_dial));
 	save_item(NAME(m_ram_address));
