@@ -20155,7 +20155,7 @@ Needs [megadriv_z80_z80_bank_w] workaround to work (emulator copy protection?)
 	</software>
 
 	<software name="micromacc" cloneof="micromac">
-		<description>Micro Machines (Can)</description>
+		<description>Micro Machines (Canada)</description>
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
