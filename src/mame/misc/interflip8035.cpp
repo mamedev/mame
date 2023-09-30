@@ -376,8 +376,8 @@
 
      Costa Brava plays from 1 to 3 tokens.
      Token 1 bets in the central line.
-     Token 2 bets in the upper line.
-     Token 3 bets in the lower line.
+     Token 2 bets in the lower line.
+     Token 3 bets in the upper line.
 
 
          COSTA BRAVA PAYTABLE       PRIZE
@@ -1077,7 +1077,7 @@ static INPUT_PORTS_START( interflip )
 	PORT_DIPNAME(0x01, 0x00, "General Test")	PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
-	PORT_DIPNAME(0x02, 0x02, "Reels Test")		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME(0x02, 0x00, "Reels Test")		PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x02, DEF_STR(On))
 	PORT_DIPNAME(0x04, 0x00, "Timing Test")		PORT_DIPLOCATION("SW1:7")
