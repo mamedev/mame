@@ -16,7 +16,7 @@ license:CC0-1.0
 				R, Enter
 
 		Notes about the dumps:
-			Due to the way the ZX81 saves data, different recordings of identical code (such as those in both sides of a cassette) might be stored with a few different bytes in them. Additional dumps of the same releases should match those differences.
+			Due to the way the ZX81 saves to tape, different recordings of identical data (such as those in both sides of a cassette) might be stored along with a few different bytes in them. Additional dumps of the same releases should match those differences.
 			TZX files for ZX81 are just the .P dumps with an additional header on top, so they may not be the cleanest format for archival.
 
 		TODO:
