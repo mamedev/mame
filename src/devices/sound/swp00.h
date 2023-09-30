@@ -65,7 +65,6 @@ private:
 	std::array<u8,  0x20>  m_lfo_step;
 	std::array<u8,  0x20>  m_lfo_pmod_depth;
 
-	std::array<u8,  0x20>  m_sample_counter;
 	std::array<u32, 0x20>  m_lfo_phase;
 	std::array<s32, 0x20>  m_sample_pos;
 	std::array<u32, 0x20>  m_sample_increment;
@@ -73,7 +72,13 @@ private:
 	std::array<s32, 0x20>  m_glo_level_cur;
 	std::array<s32, 0x20>  m_pan_l;
 	std::array<s32, 0x20>  m_pan_r;
-	std::array<bool, 0x20> m_active, m_decay, m_decay_done;
+	std::array<s32, 0x20>  m_lpf_feedback;
+	std::array<s32, 0x20>  m_lpf_target_value;
+	std::array<s32, 0x20>  m_lpf_value;
+	std::array<s32, 0x20>  m_lpf_timer;
+	std::array<s32, 0x20>  m_lpf_ha;
+	std::array<s32, 0x20>  m_lpf_hb;	
+	std::array<bool, 0x20> m_active, m_decay, m_decay_done, m_lpf_done;
 
 	u16 m_waverom_val;
 	u8 m_waverom_access;
@@ -160,6 +165,7 @@ private:
 	static s32 fpadd(s32 value, s32 step);
 	static s32 fpsub(s32 value, s32 step);
 	static s16 fpapply(s32 value, s16 sample);
+	static s16 lpffpapply(s32 value, s16 sample);
 };
 
 DECLARE_DEVICE_TYPE(SWP00, swp00_device)
