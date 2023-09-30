@@ -49,7 +49,6 @@ public:
 	{ }
 
 	void vandyke(machine_config &config);
-	void tdragon_prot(machine_config &config);
 	void tdragon2(machine_config &config);
 	void tharrier(machine_config &config);
 	void raphero(machine_config &config);
@@ -86,7 +85,6 @@ public:
 	void init_ssmissin();
 	void init_twinactn();
 	void init_hachamf_prot();
-	void init_tdragon_prot();
 	void init_banked_audiocpu();
 	void init_gunnailb();
 	void init_bjtwin();
@@ -153,7 +151,6 @@ protected:
 	void macross2_sound_reset_w(u16 data);
 	template<unsigned Chip> void tharrier_oki_bankswitch_w(u8 data);
 	void hachamf_mainram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void tdragon_mainram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 vandykeb_r();
 	u16 tdragonb_prot_r();
 	template<unsigned Layer> void bgvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -191,7 +188,6 @@ protected:
 	u32 screen_update_strahl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(dma_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(tdragon_mcu_sim);
 	TIMER_DEVICE_CALLBACK_MEMBER(hachamf_mcu_sim);
 	TIMER_DEVICE_CALLBACK_MEMBER(manybloc_scanline);
 	void video_init();
@@ -246,6 +242,34 @@ protected:
 	void twinactn_map(address_map &map);
 	void vandyke_map(address_map &map);
 	void vandykeb_map(address_map &map);
+};
+
+class tdragon_prot_state : public nmk16_state
+{
+public:
+	tdragon_prot_state(const machine_config &mconfig, device_type type, const char *tag) :
+		nmk16_state(mconfig, type, tag),
+		m_protcpu(*this, "protcpu")
+	{}
+
+	void tdragon_prot(machine_config &config);
+
+protected:
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	optional_device<tlcs90_device> m_protcpu;
+
+	void tdragon_prot_map(address_map &map);
+
+	void mcu_side_shared_w(offs_t offset, u8 data);
+	u8 mcu_side_shared_r(offs_t offset);
+	void mcu_port6_w(u8 data);
+	u8 mcu_port5_r();
+	u8 mcu_port6_r();
+
+	u8 m_bus_status;
 };
 
 class afega_state : public nmk16_state

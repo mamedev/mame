@@ -839,61 +839,6 @@ void nmk16_state::hachamf_map(address_map &map)
 }
 
 
-void nmk16_state::tdragon_mainram_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	COMBINE_DATA(&m_mainram[offset]);
-
-	switch (offset)
-	{
-		case 0xe066/2: PROT_INPUT(0xe066/2,0xe23e,0xe000/2,0x000c0000); break;
-		case 0xe144/2: PROT_INPUT(0xe144/2,0xf54d,0xe004/2,0x000c0002); break;
-		case 0xe60e/2: PROT_INPUT(0xe60e/2,0x067c,0xe008/2,0x000c0008); break;
-		case 0xe714/2: PROT_INPUT(0xe714/2,0x198b,0xe00c/2,0x000c000a); break;
-		case 0xe70e/2: PROT_JSR(0xe70e,0x8007,0x9e22);
-						PROT_JSR(0xe70e,0x8000,0xd518); break;
-		case 0xe71e/2: PROT_JSR(0xe71e,0x8038,0xaa0a);
-						PROT_JSR(0xe71e,0x8031,0x8e7c); break;
-		case 0xe72e/2: PROT_JSR(0xe72e,0x8019,0xac48);
-						PROT_JSR(0xe72e,0x8022,0xd558); break;
-		case 0xe73e/2: PROT_JSR(0xe73e,0x802a,0xb110);
-						PROT_JSR(0xe73e,0x8013,0x96da); break;
-		case 0xe74e/2: PROT_JSR(0xe74e,0x800b,0xb9b2);
-						PROT_JSR(0xe74e,0x8004,0xa062); break;
-		case 0xe75e/2: PROT_JSR(0xe75e,0x803c,0xbb4c);
-						PROT_JSR(0xe75e,0x8035,0xa154); break;
-		case 0xe76e/2: PROT_JSR(0xe76e,0x801d,0xafa6);
-						PROT_JSR(0xe76e,0x8026,0xa57a); break;
-		case 0xe77e/2: PROT_JSR(0xe77e,0x802e,0xc6a4);
-						PROT_JSR(0xe77e,0x8017,0x9e22); break;
-		case 0xe78e/2: PROT_JSR(0xe78e,0x8004,0xaa0a);
-						PROT_JSR(0xe78e,0x8008,0xaa0a); break;
-		case 0xe79e/2: PROT_JSR(0xe79e,0x8030,0xd518);
-						PROT_JSR(0xe79e,0x8039,0xac48); break;
-		case 0xe7ae/2: PROT_JSR(0xe7ae,0x8011,0x8e7c);
-						PROT_JSR(0xe7ae,0x802a,0xb110); break;
-		case 0xe7be/2: PROT_JSR(0xe7be,0x8022,0xd558);
-						PROT_JSR(0xe7be,0x801b,0xb9b2); break;
-		case 0xe7ce/2: PROT_JSR(0xe7ce,0x8003,0x96da);
-						PROT_JSR(0xe7ce,0x800c,0xbb4c); break;
-		case 0xe7de/2: PROT_JSR(0xe7de,0x8034,0xa062);
-						PROT_JSR(0xe7de,0x803d,0xafa6); break;
-		case 0xe7ee/2: PROT_JSR(0xe7ee,0x8015,0xa154);
-						PROT_JSR(0xe7ee,0x802e,0xc6a4); break;
-		case 0xe7fe/2: PROT_JSR(0xe7fe,0x8026,0xa57a);
-						PROT_JSR(0xe7fe,0x8016,0xa57a); break;
-		case 0xef00/2:
-			if (m_mainram[0xef00/2] == 0x60fe)
-			{
-				m_mainram[0xef00/2] = 0x0000; //this is the coin counter
-				m_mainram[0xef02/2] = 0x0000;
-				m_mainram[0xef04/2] = 0x4ef9;
-				m_mainram[0xef06/2] = 0x0000;
-				m_mainram[0xef08/2] = 0x92f4;
-			}
-			break;
-	}
-}
-
 // coin setting MCU simulation
 void nmk16_state::mcu_run(u8 dsw_setting)
 {
@@ -1033,10 +978,6 @@ void nmk16_state::mcu_run(u8 dsw_setting)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::tdragon_mcu_sim)
-{
-	mcu_run(1);
-}
 
 TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::hachamf_mcu_sim)
 {
@@ -1046,22 +987,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::hachamf_mcu_sim)
 void nmk16_state::tdragon_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x044022, 0x044023).nopr();  // No Idea
-//  map(0x0b0000, 0x0b7fff).ram();    // Work RAM
-//  map(0x0b8000, 0x0b8fff).ram().share("spriteram"); // Sprite RAM
-//  map(0x0b9000, 0x0bdfff).ram().share("mcu_work_ram");   // Work RAM
-//  map(0x0be000, 0x0befff).lr(NAME([this] (offs_t offset) { return nmk16_mcu_shared_ram[offset]; })).w(FUNC(nmk16_state::tdragon_mcu_shared_w)).share("mcu_shared_ram");  // Work RAM
-//  map(0x0bf000, 0x0bffff).ram();    // Work RAM
-	map(0x0b0000, 0x0bffff).ram().share("mainram");
-	map(0x0c0000, 0x0c0001).portr("IN0");
-	map(0x0c0002, 0x0c0003).portr("IN1");
-	map(0x0c0008, 0x0c0009).portr("DSW1");
-	map(0x0c000a, 0x0c000b).portr("DSW2");
-	map(0x0c000f, 0x0c000f).r(m_nmk004, FUNC(nmk004_device::read));
-	map(0x0c0015, 0x0c0015).w(FUNC(nmk16_state::flipscreen_w)); // Maybe
-	map(0x0c0016, 0x0c0017).w(FUNC(nmk16_state::nmk004_x0016_w));
-	map(0x0c0019, 0x0c0019).w(FUNC(nmk16_state::tilebank_w)); // Tile Bank?
-	map(0x0c001f, 0x0c001f).w(m_nmk004, FUNC(nmk004_device::write));
+	map(0x044022, 0x044023).nopr();  // No Idea (ROM mirror? - does this even exist on originals?)
+
+	map(0x080000, 0x08ffff).mirror(0x030000).ram().share("mainram");
+
+	map(0x0c0000, 0x0c0001).mirror(0x020000).portr("IN0");
+	map(0x0c0002, 0x0c0003).mirror(0x020000).portr("IN1");
+	map(0x0c0008, 0x0c0009).mirror(0x020000).portr("DSW1");
+	map(0x0c000a, 0x0c000b).mirror(0x020000).portr("DSW2");
+	map(0x0c000f, 0x0c000f).mirror(0x020000).r(m_nmk004, FUNC(nmk004_device::read));
+	map(0x0c0015, 0x0c0015).mirror(0x020000).w(FUNC(nmk16_state::flipscreen_w)); // Maybe
+	map(0x0c0016, 0x0c0017).mirror(0x020000).w(FUNC(nmk16_state::nmk004_x0016_w));
+	map(0x0c0019, 0x0c0019).mirror(0x020000).w(FUNC(nmk16_state::tilebank_w)); // Tile Bank?
+	map(0x0c001f, 0x0c001f).mirror(0x020000).w(m_nmk004, FUNC(nmk004_device::write));
+
 	map(0x0c4000, 0x0c4007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
 	map(0x0c8000, 0x0c87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0cc000, 0x0cffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
@@ -2376,85 +2315,6 @@ static INPUT_PORTS_START( bioship )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( tdragon_prot )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // TEST in service mode
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:7") // The manual states this dip is "Unused"
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:6,5")
-	PORT_DIPSETTING(      0x0004, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x000c, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:4") // The manual states this dip is "Unused"
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:3") // The manual states this dip is "Unused"
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW1:2,1")
-	PORT_DIPSETTING(      0x0000, "1" )
-	PORT_DIPSETTING(      0x0040, "2" )
-	PORT_DIPSETTING(      0x00c0, "3" )
-	PORT_DIPSETTING(      0x0080, "4" )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW2:1,2,3")
-	PORT_DIPSETTING(      0x0004, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW2:4,5,6")
-	PORT_DIPSETTING(      0x0020, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0028, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0030, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0038, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:7") // The MCU (undumped/unemulated) takes care of this
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW2:8") // The manual states this dip is "Unused"
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-INPUT_PORTS_END
 
 static INPUT_PORTS_START( tdragon )
 	PORT_START("IN0")
@@ -2509,7 +2369,7 @@ static INPUT_PORTS_START( tdragon )
 	PORT_DIPSETTING(      0x00c0, "3" )
 	PORT_DIPSETTING(      0x0080, "4" )
 
-	PORT_START("DSW2") // reverse bit order compared to tdragon_prot?
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unused ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( On ) )
@@ -2533,6 +2393,30 @@ static INPUT_PORTS_START( tdragon )
 	PORT_DIPSETTING(      0x0060, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x00a0, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tdragon_prot )
+	PORT_INCLUDE( tdragon )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x001c, 0x001c, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW2:4,5,6")
+	PORT_DIPSETTING(      0x0004, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0014, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x001c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x00e0, 0x00e0, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPSETTING(      0x0020, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x00a0, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0060, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x00e0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
 
@@ -4732,10 +4616,78 @@ void nmk16_state::tdragon(machine_config &config)
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
 
-void nmk16_state::tdragon_prot(machine_config &config)
+void tdragon_prot_state::mcu_port6_w(u8 data)
+{
+	// the actual mechanism is a little more complex, but these are written at the
+	// start and end of the take / release bus function
+	if (data == 0x08)
+	{
+		logerror("%s: mcu_port6_w 68k bus taken, 68k stopped (data %02x)\n", machine().describe_context(), data);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	}
+	else if (data == 0xb)
+	{
+		logerror("%s: mcu_port6_w 68k bus returned, 68k started (data %02x)\n", machine().describe_context(), data);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	}
+	else
+	{
+		logerror("%s: mcu_port6_w 68k bus access (data %02x)\n", machine().describe_context(), data);
+	}
+}
+
+u8 tdragon_prot_state::mcu_port5_r()
+{
+	return m_screen->vpos() >> 2;
+}
+
+u8 tdragon_prot_state::mcu_port6_r()
+{
+	// again this is simplified for now
+	m_bus_status ^= 0x04;
+	return m_bus_status;
+}
+
+void tdragon_prot_state::machine_start()
+{
+	save_item(NAME(m_bus_status));
+}
+
+void tdragon_prot_state::machine_reset()
+{
+	m_bus_status = 0x04;
+}
+
+void tdragon_prot_state::mcu_side_shared_w(offs_t offset, u8 data)
+{
+	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
+}
+
+u8 tdragon_prot_state::mcu_side_shared_r(offs_t offset)
+{
+	u8 retval = m_maincpu->space(AS_PROGRAM).read_byte((offset));
+	return retval;
+}
+
+void tdragon_prot_state::tdragon_prot_map(address_map &map)
+{
+	//  0x000000- 0x003fff is hidden by internal ROM, as are some 0x00fxxx addresses by RAM
+	map(0x000000, 0x0fffff).rw(FUNC(tdragon_prot_state::mcu_side_shared_r), FUNC(tdragon_prot_state::mcu_side_shared_w));
+}
+
+
+
+void tdragon_prot_state::tdragon_prot(machine_config &config)
 {
 	tdragon(config);
-	TIMER(config, "coinsim").configure_periodic(FUNC(nmk16_state::tdragon_mcu_sim), attotime::from_hz(10000));
+
+	TMP91640(config, m_protcpu, 8000000); // Toshiba TMP91640 marked as NMK-110, with 16Kbyte internal ROM, 512bytes internal RAM
+	m_protcpu->set_addrmap(AS_PROGRAM, &tdragon_prot_state::tdragon_prot_map);
+	m_protcpu->port_write<6>().set(FUNC(tdragon_prot_state::mcu_port6_w));
+	m_protcpu->port_read<5>().set(FUNC(tdragon_prot_state::mcu_port5_r));
+	m_protcpu->port_read<6>().set(FUNC(tdragon_prot_state::mcu_port6_r));
+
+	config.set_maximum_quantum(attotime::from_hz(6000));
 }
 
 void nmk16_state::ssmissin(machine_config &config)
@@ -5507,21 +5459,6 @@ void nmk16_state::init_hachamf_prot()
 void nmk16_state::init_tdragonb()
 {
 	decode_tdragonb();
-}
-
-void nmk16_state::init_tdragon_prot()
-{
-	u16 *rom = (u16 *)memregion("maincpu")->base();
-
-	//rom[0x94b0/2] = 0; // Patch out JMP to shared memory (protection)
-	//rom[0x94b2/2] = 0x92f4;
-
-	// kludge the sound communication to let commands go through.
-	rom[0x048a/2] = 0x4e71;
-	rom[0x04aa/2] = 0x4e71;
-
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0b0000, 0x0bffff, write16s_delegate(*this, FUNC(nmk16_state::tdragon_mainram_w)));
-	save_protregs();
 }
 
 void nmk16_state::init_ssmissin()
@@ -6735,7 +6672,7 @@ ROM_START( tdragon )
 	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD16_WORD_SWAP( "91070.4",    0x000000, 0x100000, CRC(3eedc2fe) SHA1(9f48986c231a8fbc07f2b39b2017d1e967b2ed3c) )  // Sprites
 
-	ROM_REGION( 0x010000, "audiocpu", 0 )       // Code for (unknown?) CPU
+	ROM_REGION( 0x010000, "audiocpu", 0 ) // NMK004 sound data
 	ROM_LOAD( "91070.1",      0x00000, 0x10000, CRC(bf493d74) SHA1(6f8f5eff4b71fb6cabda10075cfa88a3f607859e) )
 
 	ROM_REGION( 0x080000, "oki1", 0 )   // OKIM6295 samples
@@ -6754,6 +6691,9 @@ ROM_START( tdragon1 )
 	ROM_LOAD16_BYTE( "thund.8",  0x00000, 0x20000, CRC(edd02831) SHA1(d6bc8d2c37707768a8bf666090f33eea12dda336) )
 	ROM_LOAD16_BYTE( "thund.7",  0x00001, 0x20000, CRC(52192fe5) SHA1(9afef197410e7feb71dc48003e181fbbaf5c99b2) )
 
+	ROM_REGION( 0x04000, "protcpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "nmk-110-tdragon.bin", 0x00000, 0x4000, CRC(cf66a660) SHA1(a1d3346f7688e9bf5513194a2890a9a6aaf28742) ) // 910527 and "SLASH META" for game name string
+
 	ROM_REGION( 0x020000, "fgtile", 0 )
 	ROM_LOAD( "91070.6",        0x000000, 0x20000, CRC(fe365920) SHA1(7581931cb95cd5a8ed40e4f5385b533e3d19af22) )   // 8x8 tiles
 
@@ -6763,7 +6703,7 @@ ROM_START( tdragon1 )
 	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD16_WORD_SWAP( "91070.4",    0x000000, 0x100000, CRC(3eedc2fe) SHA1(9f48986c231a8fbc07f2b39b2017d1e967b2ed3c) )  // Sprites
 
-	ROM_REGION( 0x010000, "audiocpu", 0 )       // Code for (unknown?) CPU
+	ROM_REGION( 0x010000, "audiocpu", 0 ) // NMK004 sound data
 	ROM_LOAD( "91070.1",      0x00000, 0x10000, CRC(bf493d74) SHA1(6f8f5eff4b71fb6cabda10075cfa88a3f607859e) )
 
 	ROM_REGION( 0x080000, "oki1", 0 )   // OKIM6295 samples
@@ -7104,6 +7044,9 @@ ROM_START( hachamf )
 	ROM_LOAD16_BYTE( "7.93",  0x00000, 0x20000, CRC(9d847c31) SHA1(1d370d8db9cadadb9c2cb213e32f681947d81b7f) ) // internally reports as 19th Sep. 1991
 	ROM_LOAD16_BYTE( "6.94",  0x00001, 0x20000, CRC(de6408a0) SHA1(2df77fecd44d2d8b0444abd4545923213ed76b2d) )
 
+	ROM_REGION( 0x04000, "protcpu", 0 )
+	ROM_LOAD("nmk-113.bin", 0x00000, 0x04000, NO_DUMP )
+
 	ROM_REGION( 0x10000, "audiocpu", 0 )        // unknown  - sound CPU ??????
 	ROM_LOAD( "1.70",  0x00000, 0x10000, CRC(9e6f48fc) SHA1(aeb5bfecc025b5478f6de874792fc0f7f54932be) )
 
@@ -7129,6 +7072,9 @@ ROM_START( hachamfa) // reportedly a Korean PCB / version
 	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "7.ic93",  0x00000, 0x20000, CRC(f437e52b) SHA1(061a75a7a9734034d1c499fc0bc2d8a61bb26da4) ) // internally reports as 19th Sep. 1991
 	ROM_LOAD16_BYTE( "6.ic94",  0x00001, 0x20000, CRC(60d340d0) SHA1(3c6f862901b403d6ddf58823af7d6e3f67573788) )
+
+	ROM_REGION( 0x04000, "protcpu", 0 )
+	ROM_LOAD("nmk-113.bin", 0x00000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        // unknown  - sound CPU ??????
 	ROM_LOAD( "1.70",  0x00000, 0x10000, CRC(9e6f48fc) SHA1(aeb5bfecc025b5478f6de874792fc0f7f54932be) )
@@ -9245,7 +9191,7 @@ GAME( 1992, strahlj,    strahl,   strahl,       strahl,       nmk16_state, empty
 GAME( 1992, strahlja,   strahl,   strahl,       strahl,       nmk16_state, empty_init,           ROT0,   "UPL",                          "Koutetsu Yousai Strahl (Japan set 2)", 0 )
 
 GAME( 1991, tdragon,    0,        tdragon,      tdragon,      nmk16_state, empty_init,           ROT270, "NMK (Tecmo license)",          "Thunder Dragon (8th Jan. 1992, unprotected)", 0 )
-GAME( 1991, tdragon1,   tdragon,  tdragon_prot, tdragon_prot, nmk16_state, init_tdragon_prot,    ROT270, "NMK (Tecmo license)",          "Thunder Dragon (4th Jun. 1991, protected)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )
+GAME( 1991, tdragon1,   tdragon,  tdragon_prot, tdragon_prot, tdragon_prot_state, empty_init,    ROT270, "NMK (Tecmo license)",          "Thunder Dragon (4th Jun. 1991, protected)", 0 )
 
 GAME( 1991, hachamf,    0,        hachamf_prot, hachamf_prot, nmk16_state, init_hachamf_prot,    ROT0,   "NMK",                          "Hacha Mecha Fighter (19th Sep. 1991, protected, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND ) // lots of things wrong due to protection
 GAME( 1991, hachamfa,   hachamf,  hachamf_prot, hachamf_prot, nmk16_state, init_hachamf_prot,    ROT0,   "NMK",                          "Hacha Mecha Fighter (19th Sep. 1991, protected, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND ) // lots of things wrong due to protection
