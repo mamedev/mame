@@ -74,6 +74,8 @@ private:
 	u8 m_irqen_76, m_irqen_77;
 	bool m_timer_interrupt;
 
+	util::notifier_subscription m_notif_rom_space;
+
 	void cpu_map(address_map &map);
 
 	u16 vec_r(offs_t offset, u16 mem_mask);

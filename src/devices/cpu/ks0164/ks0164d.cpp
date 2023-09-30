@@ -39,8 +39,8 @@ const ks0164_disassembler::instruction ks0164_disassembler::instructions[] {
 	{ 0x2400, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bgtu %04x",  (pc + 2 + util::sext(opcode, 10)) & 0xffff); return 2 | STEP_COND; } },
 	{ 0x2800, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bleu %04x", (pc + 2 + util::sext(opcode, 10)) & 0xffff); return 2 | STEP_COND; } },
 	{ 0x2c00, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bgts %04x",  (pc + 2 + util::sext(opcode, 10)) & 0xffff); return 2 | STEP_COND; } },
-	{ 0x3000, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bles %04x",  (pc + 2 + util::sext(opcode, 10)) & 0xffff); return 2 | STEP_COND; } },
-	{ 0x3400, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bges %04x",  (pc + 2 + util::sext(opcode, 10)) & 0xffff); return 2 | STEP_COND; } },
+	{ 0x3000, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bges %04x",  (pc + 2 + util::sext(opcode, 10)) & 0xffff); return 2 | STEP_COND; } },
+	{ 0x3400, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bles %04x",  (pc + 2 + util::sext(opcode, 10)) & 0xffff); return 2 | STEP_COND; } },
 	{ 0x3800, 0xfc00, [](P) -> u32 { util::stream_format(stream, "blts %04x",  (pc + 2 + util::sext(opcode, 10)) & 0xffff); return 2 | STEP_COND; } },
 	{ 0x3c00, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bra %04x",  (pc + 2 + util::sext(opcode, 10)) & 0xffff); return 2; } },
 
@@ -177,11 +177,14 @@ const ks0164_disassembler::instruction ks0164_disassembler::instructions[] {
 	{ 0xc008, 0xf88f, [](P) -> u32 { util::stream_format(stream, "(%s)+.w = %s",   regs[(opcode >> 8) & 7], regs[(opcode >> 4) & 7]); return 2; } },
 	{ 0xc00a, 0xf88f, [](P) -> u32 { util::stream_format(stream, "%s = (%s)+.w",   regs[(opcode >> 8) & 7], regs[(opcode >> 4) & 7]); return 2; } },
 
-	{ 0xc00c, 0xf80f, [](P) -> u32 { util::stream_format(stream, "%s <<= %x",   regs[(opcode >> 8) & 7], (opcode >> 4) & 0xf); return 2; } },
-	{ 0xc80c, 0xf80f, [](P) -> u32 { util::stream_format(stream, "%s >>= %x",   regs[(opcode >> 8) & 7], (opcode >> 4) & 0xf); return 2; } },
-	{ 0xc80d, 0xf80f, [](P) -> u32 { util::stream_format(stream, "%s >>s= %x",   regs[(opcode >> 8) & 7], (opcode >> 4) & 0xf); return 2; } },
-	{ 0xc00f, 0xf80f, [](P) -> u32 { util::stream_format(stream, "%s <<c= %x",   regs[(opcode >> 8) & 7], (opcode >> 4) & 0xf); return 2; } },
-	{ 0xc80f, 0xf80f, [](P) -> u32 { util::stream_format(stream, "%s >>c= %x",   regs[(opcode >> 8) & 7], (opcode >> 4) & 0xf); return 2; } },
+	{ 0xc004, 0xf807, [](P) -> u32 { util::stream_format(stream, "%s <<= %x",    regs[(opcode >> 8) & 7], (opcode >> 4) & 0xf); return 2; } }, // are these with bit 3 set really all the same?
+	{ 0xc804, 0xf807, [](P) -> u32 { util::stream_format(stream, "%s >>= %x",    regs[(opcode >> 8) & 7], (opcode >> 4) & 0xf); return 2; } },
+	{ 0xc005, 0xf807, [](P) -> u32 { util::stream_format(stream, "%s >>s= %x",   regs[(opcode >> 8) & 7], (opcode >> 4) & 0xf); return 2; } },
+	{ 0xc805, 0xf807, [](P) -> u32 { util::stream_format(stream, "%s >>s= %x",   regs[(opcode >> 8) & 7], (opcode >> 4) & 0xf); return 2; } },
+	{ 0xc006, 0xf807, [](P) -> u32 { util::stream_format(stream, "%s <<<= %x",   regs[(opcode >> 8) & 7], (opcode >> 4) & 0xf); return 2; } },
+	{ 0xc806, 0xf807, [](P) -> u32 { util::stream_format(stream, "%s >>>= %x",   regs[(opcode >> 8) & 7], (opcode >> 4) & 0xf); return 2; } },
+	{ 0xc007, 0xf807, [](P) -> u32 { util::stream_format(stream, "%s <<c= %x",   regs[(opcode >> 8) & 7], (opcode >> 4) & 0xf); return 2; } },
+	{ 0xc807, 0xf807, [](P) -> u32 { util::stream_format(stream, "%s >>c= %x",   regs[(opcode >> 8) & 7], (opcode >> 4) & 0xf); return 2; } },
 
 	{ 0xd008, 0xf88f, [](P) -> u32 { util::stream_format(stream, "%s = maxu(%s, %04x)", regs[(opcode >> 8) & 7], regs[(opcode >> 4) & 7], opcodes.r16(pc+2)); return 4; } },
 	{ 0xd808, 0xf88f, [](P) -> u32 { util::stream_format(stream, "%s = minu(%s, %04x)", regs[(opcode >> 8) & 7], regs[(opcode >> 4) & 7], opcodes.r16(pc+2)); return 4; } },
