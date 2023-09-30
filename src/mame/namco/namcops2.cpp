@@ -42,8 +42,8 @@ Druaga Online The Story Of Aon (satellite)...... XXXX56X  DOL160-1-ST-DVD0-H   D
    "                                      ...... XXXX56X  DOL110-1-ST-DVD0-C   DVD          NM00028  *?                      Namco 2004                    /
 Fate / Unlimited Codes.......................... X23456X  FUD-HDD0-A           HDD (80GB)   NM00048   FUD1 Ver.A             Capcom/Type-Moon/Cavia/8ing 2008 HDD: Western Digital WD800BB
 Gundam vs Gundam Next........................... XXXX56X  GNX100-1-NA-HDD0-A   HDD (80GB)   NM00052   GNX1001-NA-A           Bandai/Capcom 2009            HDD: Western Digital WD800BB
-THE IDOLM@STER (Station)........................ XXX45-X  IDM1-HA              HDD (40GB)   NM00022   IDMS1 Ver.A            Namco 2004                    Uses the V290 or V300 I/O Boards.
-THE IDOLM@STER (Tower).......................... XXX45-X  IDM1-HA              HDD (40GB)   NM00022   IDMT1 Ver.A            Namco 2004                    Uses the V290 or V300 I/O Boards. Can be a Local server for Station units.
+THE IDOLM@STER (Station)........................ XXX45-X  IDM1-HA              HDD (40GB)   NM00022   IDMS1 Ver.D            Namco 2004                    Uses the V290 or V300 I/O Boards.
+THE IDOLM@STER (Tower).......................... XXX45-X  IDM1-HA              HDD (40GB)   NM00022   IDMT1 Ver.D            Namco 2004                    Uses the V290 or V300 I/O Boards. Can be a Local server for Station units.
 Kinnikuman Muscle Grand Prix.................... XXXX56X  KN1-B                DVD          NM00029   KN1 Ver.A              Banpresto 2006                #
 Kinnikuman Muscle Grand Prix 2.................. XXXX56X  KN2                  DVD          NM00040   KN2 Ver.A              Banpresto 2007                #
 Minna de Kitaeru Zenno Training................. ----56X  ZNT100-1-NA-DVD0-A   DVD          NM00036   ZNT100-1-ST-A          Namco 2006
