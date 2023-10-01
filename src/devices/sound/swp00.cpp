@@ -992,9 +992,9 @@ void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 			s32 mul = m_sample_pos[chan] & 0x7fff;
 			s16 sample = (val1 * mul + val0 * (0x8000 - mul)) >> 15;
 
-			s32 lpf_value = m_lpf_value[chan] + ((lfo_fa_phase * m_lfo_pmod_depth[chan]) << (m_lfo_step[chan] & 0x40 ? 2 : 1));
+			s32 lpf_value = m_lpf_value[chan] + ((lfo_fa_phase * (m_lfo_famod_depth[chan] >> 5)) << (m_lfo_step[chan] & 0x40 ? 2 : 1));
 
-			m_lpf_ha[chan] += lpffpapply(lpf_value, sample - fpapply(m_lpf_feedback[chan], m_lpf_ha[chan]) - m_lpf_hb[chan]);
+			m_lpf_ha[chan] += lpffpapply(lpf_value, sample - 2*fpapply(m_lpf_feedback[chan], m_lpf_ha[chan]) - m_lpf_hb[chan]);
 			m_lpf_hb[chan] += lpffpapply(lpf_value, m_lpf_ha[chan]);
 
 			sample = m_lpf_hb[chan];
