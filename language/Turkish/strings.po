@@ -23,7 +23,7 @@ msgid ""
 "\n"
 "\n"
 "Press any key to continue"
-msgstr ""
+msgstr "Devam etmek için bir tuşa basın"
 
 #: src/frontend/mame/ui/ui.cpp:559
 msgid ""
@@ -35,14 +35,16 @@ msgstr ""
 msgid ""
 "UI controls enabled\n"
 "Use %1$s to toggle"
-msgstr ""
+msgstr "UI kontrolleri açıldı\n"
+"Kapatmak için %1$s 'e basın"
 
 #: src/frontend/mame/ui/ui.cpp:1277
 #, c-format
 msgid ""
 "UI controls disabled\n"
 "Use %1$s to toggle"
-msgstr ""
+msgstr "UI kontrolleri kapatıldı\n"
+"Açmak için %1$s 'e basın"
 
 #: src/frontend/mame/ui/ui.cpp:1486
 msgid "Master Volume"
@@ -125,41 +127,41 @@ msgstr "Lazerdisk '%1$s' Dikey Konum"
 
 #: src/frontend/mame/ui/ui.cpp:1597
 msgid "Vector Flicker"
-msgstr ""
+msgstr "Vektör Titreşimi"
 
 #: src/frontend/mame/ui/ui.cpp:1598
 msgid "Beam Width Minimum"
-msgstr ""
+msgstr "En Düşük Işın Genişliği"
 
 #: src/frontend/mame/ui/ui.cpp:1599
 msgid "Beam Width Maximum"
-msgstr ""
+msgstr "En Yüksek Işın Genişliği"
 
 #: src/frontend/mame/ui/ui.cpp:1600
 msgid "Beam Dot Size"
-msgstr ""
+msgstr "Işın Nokta Boyutu"
 
 #: src/frontend/mame/ui/ui.cpp:1601
 msgid "Beam Intensity Weight"
-msgstr ""
+msgstr "Işın Yoğunluğu Ağırlığı"
 
 #: src/frontend/mame/ui/ui.cpp:1614
 #, c-format
 msgid "Crosshair Scale %1$s"
-msgstr ""
+msgstr "Hedef İşareti Ölçeği"
 
 #: src/frontend/mame/ui/ui.cpp:1614 src/frontend/mame/ui/ui.cpp:1616
 msgid "X"
-msgstr ""
+msgstr "X"
 
 #: src/frontend/mame/ui/ui.cpp:1614 src/frontend/mame/ui/ui.cpp:1616
 msgid "Y"
-msgstr ""
+msgstr "Y"
 
 #: src/frontend/mame/ui/ui.cpp:1616
 #, c-format
 msgid "Crosshair Offset %1$s"
-msgstr ""
+msgstr "Hedef İşareti Yenileme %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1644
 #, c-format
@@ -196,31 +198,31 @@ msgstr ""
 #: src/frontend/mame/ui/ui.cpp:2033
 #, c-format
 msgid "Crosshair Scale X %1$1.3f"
-msgstr ""
+msgstr "Hedef İşareti Ölçeği X %1$1.3f"
 
 #: src/frontend/mame/ui/ui.cpp:2033
 #, c-format
 msgid "Crosshair Scale Y %1$1.3f"
-msgstr ""
+msgstr "Hedef İşareti Ölçeği Y %1$1.3f"
 
 #: src/frontend/mame/ui/ui.cpp:2050
 #, c-format
 msgid "Crosshair Offset X %1$1.3f"
-msgstr ""
+msgstr "Hedef İşareti Yenileme X %1$1.3f"
 
 #: src/frontend/mame/ui/ui.cpp:2050
 #, c-format
 msgid "Crosshair Offset Y %1$1.3f"
-msgstr ""
+msgstr "Hedef İşareti Yenileme Y %1$1.3f"
 
 #: src/frontend/mame/ui/ui.cpp:2137
 msgid "**Error saving ui.ini**"
-msgstr ""
+msgstr "** ui.ini kaydetme hatası**"
 
 #: src/frontend/mame/ui/ui.cpp:2196
 #, c-format
 msgid "**Error saving %s.ini**"
-msgstr ""
+msgstr "**%s.ini kaydetme hatası**"
 
 #: src/frontend/mame/ui/ui.cpp:2200 src/frontend/mame/ui/miscmenu.cpp:773
 msgid ""
@@ -228,6 +230,9 @@ msgid ""
 "    Settings saved    \n"
 "\n"
 msgstr ""
+"\n"
+"   Ayarlar kaydedildi    \n"
+"\n"
 
 #: src/frontend/mame/ui/selsoft.cpp:510 src/frontend/mame/ui/selgame.cpp:318
 #, c-format
@@ -235,6 +240,8 @@ msgid ""
 "%s\n"
 " added to favorites list."
 msgstr ""
+"%s\n"
+" favori listesine eklendi."
 
 #: src/frontend/mame/ui/selsoft.cpp:515 src/frontend/mame/ui/selgame.cpp:323
 #: src/frontend/mame/ui/selgame.cpp:329
@@ -243,29 +250,30 @@ msgid ""
 "%s\n"
 " removed from favorites list."
 msgstr ""
+" favori listesinden kaldırıldı."
 
 #: src/frontend/mame/ui/selsoft.cpp:576
 msgid "[Start empty]"
-msgstr ""
+msgstr "[Boş Başlat]"
 
 #: src/frontend/mame/ui/selsoft.cpp:576
 msgid "[Use file manager]"
-msgstr ""
+msgstr "[Dosya yöneticisini kullan]"
 
 #: src/frontend/mame/ui/selsoft.cpp:756
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
-msgstr ""
+msgstr "%1$s %2$s ( %3$d / %4$d yazılım paketleri )"
 
 #: src/frontend/mame/ui/selsoft.cpp:757
 #, c-format
 msgid "%1$s - select software"
-msgstr ""
+msgstr "%1$s - yazılım seç"
 
 #: src/frontend/mame/ui/selsoft.cpp:762 src/frontend/mame/ui/selgame.cpp:1092
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
-msgstr ""
+msgstr "%1$s: %2$s - Ara: %3$s_"
 
 #: src/frontend/mame/ui/selsoft.cpp:764 src/frontend/mame/ui/selgame.cpp:1094
 #, c-format
@@ -275,11 +283,11 @@ msgstr "Ara: %1$s_"
 #: src/frontend/mame/ui/selsoft.cpp:771
 #, c-format
 msgid "Software list/item: %1$s:%2$s"
-msgstr ""
+msgstr "Yazılım liste/öğe: %1$s:%2$s"
 
 #: src/frontend/mame/ui/optsmenu.cpp:45 src/frontend/mame/ui/selgame.cpp:462
 msgid "General Settings"
-msgstr ""
+msgstr "Genel Ayarlar"
 
 #: src/frontend/mame/ui/optsmenu.cpp:77 src/frontend/mame/ui/sndmenu.cpp:30
 msgid "Sound Options"
@@ -287,23 +295,23 @@ msgstr "Ses Seçenekleri"
 
 #: src/frontend/mame/ui/optsmenu.cpp:80
 msgid "Input Assignments"
-msgstr ""
+msgstr "Giriş Atamaları"
 
 #: src/frontend/mame/ui/optsmenu.cpp:83 src/frontend/mame/ui/miscmenu.cpp:888
 msgid "Plugins"
-msgstr ""
+msgstr "Eklentiler"
 
 #: src/frontend/mame/ui/optsmenu.cpp:85
 msgid "Input Devices"
-msgstr ""
+msgstr "Giriş Aygıtları"
 
 #: src/frontend/mame/ui/optsmenu.cpp:87
 msgid "Save Settings"
-msgstr ""
+msgstr "Ayarlaarı Kaydet"
 
 #: src/frontend/mame/ui/optsmenu.cpp:183 src/frontend/mame/ui/optsmenu.cpp:225
 msgid "System Filter"
-msgstr ""
+msgstr "Sistem Filtresi"
 
 #: src/frontend/mame/ui/optsmenu.cpp:195 src/frontend/mame/ui/custui.cpp:84
 msgid "Customize UI"
@@ -315,7 +323,7 @@ msgstr "Dizinleri yapılandır"
 
 #: src/frontend/mame/ui/pluginopt.cpp:35
 msgid "Plugin Options"
-msgstr ""
+msgstr "Eklenti Seçenekleri"
 
 #: src/frontend/mame/ui/filesel.cpp:234 src/frontend/mame/ui/swlist.cpp:89
 #: src/frontend/mame/ui/slotopt.cpp:231
@@ -333,7 +341,7 @@ msgstr "[yazılım listesi]"
 #: src/frontend/mame/ui/filesel.cpp:298
 #, c-format
 msgid "Error accessing %s"
-msgstr ""
+msgstr "%s'e Erişim Hatası"
 
 #: src/frontend/mame/ui/filesel.cpp:519
 msgid "Select access mode"
@@ -349,11 +357,11 @@ msgstr "Salt-yazılır"
 
 #: src/frontend/mame/ui/filesel.cpp:523
 msgid "Read this image, write to another image"
-msgstr ""
+msgstr "Bu yansıyı oku, başka bir yansıya yaz"
 
 #: src/frontend/mame/ui/filesel.cpp:524
 msgid "Read this image, write to diff"
-msgstr ""
+msgstr "Bu yansıyı oku, fark dosyasına yaz"
 
 #: src/frontend/mame/ui/submenu.cpp:33
 msgid "Miscellaneous Options"
@@ -361,15 +369,15 @@ msgstr "Çeşitli Seçenekler"
 
 #: src/frontend/mame/ui/submenu.cpp:34
 msgid "Skip imperfect emulation warnings"
-msgstr ""
+msgstr "Kusurlu öykünme uyarılarını atla"
 
 #: src/frontend/mame/ui/submenu.cpp:35
 msgid "Re-select last system launched"
-msgstr ""
+msgstr "Son başlatılan sistemi yeniden seç"
 
 #: src/frontend/mame/ui/submenu.cpp:36
 msgid "Enlarge images in the right panel"
-msgstr ""
+msgstr "Sağ paneldeki resimleri büyüt"
 
 #: src/frontend/mame/ui/submenu.cpp:37
 msgid "Cheats"
@@ -381,15 +389,15 @@ msgstr "Fare işaretçisini göster"
 
 #: src/frontend/mame/ui/submenu.cpp:39
 msgid "Confirm quit from emulation"
-msgstr ""
+msgstr "Öykünmeden çıkmayı onayla"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Skip system information screen"
-msgstr ""
+msgstr "Sistem bilgi ekranını atla"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Force 4:3 aspect for snapshot display"
-msgstr ""
+msgstr "Anlık görüntü gösterimi için 4:3 en boy oranını zorla"
 
 #: src/frontend/mame/ui/submenu.cpp:42
 msgid "Use image as background"
@@ -397,19 +405,19 @@ msgstr "Görüntüyü arkaplan olarak kullan"
 
 #: src/frontend/mame/ui/submenu.cpp:43
 msgid "Skip BIOS selection menu"
-msgstr ""
+msgstr "BIOS seçim menüsünü atla"
 
 #: src/frontend/mame/ui/submenu.cpp:44
 msgid "Skip software part selection menu"
-msgstr ""
+msgstr "Yazılım parçası seçim menüsünü atla"
 
 #: src/frontend/mame/ui/submenu.cpp:45
 msgid "Info auto audit"
-msgstr ""
+msgstr "Bilgi otomatik denetimi"
 
 #: src/frontend/mame/ui/submenu.cpp:46
 msgid "Hide romless machine from available list"
-msgstr ""
+msgstr "Romsuz makineyi mevcut listeden gizle"
 
 #: src/frontend/mame/ui/submenu.cpp:52
 msgid "Advanced Options"
@@ -433,7 +441,7 @@ msgstr "Kısma"
 
 #: src/frontend/mame/ui/submenu.cpp:57
 msgid "Mute when unthrottled"
-msgstr ""
+msgstr "Kısıtlama yapılmadığında sessize alın"
 
 #: src/frontend/mame/ui/submenu.cpp:58
 msgid "Sleep"
@@ -445,11 +453,11 @@ msgstr "Hız"
 
 #: src/frontend/mame/ui/submenu.cpp:60
 msgid "Adjust speed to match refresh rate"
-msgstr ""
+msgstr "Hızı yenileme hızına uyacak şekilde ayarlayın"
 
 #: src/frontend/mame/ui/submenu.cpp:61
 msgid "Low latency"
-msgstr ""
+msgstr "Düşük gecikme süresi"
 
 #: src/frontend/mame/ui/submenu.cpp:63
 msgid "Rotation Options"
@@ -469,59 +477,59 @@ msgstr "Sola döndür"
 
 #: src/frontend/mame/ui/submenu.cpp:67
 msgid "Auto rotate right"
-msgstr ""
+msgstr "Otomatik sağa döndür"
 
 #: src/frontend/mame/ui/submenu.cpp:68
 msgid "Auto rotate left"
-msgstr ""
+msgstr "Otomatik sola döndür"
 
 #: src/frontend/mame/ui/submenu.cpp:69
 msgid "Flip X"
-msgstr ""
+msgstr "Döndür X"
 
 #: src/frontend/mame/ui/submenu.cpp:70
 msgid "Flip Y"
-msgstr ""
+msgstr "Döndür Y"
 
 #: src/frontend/mame/ui/submenu.cpp:72
 msgid "Artwork Options"
-msgstr ""
+msgstr "Sanat Eseri Seçenekleri"
 
 #: src/frontend/mame/ui/submenu.cpp:73
 msgid "Zoom to screen area"
-msgstr ""
+msgstr "Ekran alanına yakınlaştır"
 
 #: src/frontend/mame/ui/submenu.cpp:75
 msgid "State/Playback Options"
-msgstr ""
+msgstr "Durum/Oynatma Seçenekleri"
 
 #: src/frontend/mame/ui/submenu.cpp:76
 msgid "Automatic save/restore"
-msgstr ""
+msgstr "Otomatik kaydetme/geri yükleme"
 
 #: src/frontend/mame/ui/submenu.cpp:77
 msgid "Allow rewind"
-msgstr ""
+msgstr "Geri sarmaya izin ver"
 
 #: src/frontend/mame/ui/submenu.cpp:78
 msgid "Rewind capacity"
-msgstr ""
+msgstr "Geri sarma kapasitesi"
 
 #: src/frontend/mame/ui/submenu.cpp:79
 msgid "Bilinear filtering for snapshots"
-msgstr ""
+msgstr "Anlık görüntüler için çift doğrusal filtreleme"
 
 #: src/frontend/mame/ui/submenu.cpp:80
 msgid "Burn-in"
-msgstr ""
+msgstr "Yanma"
 
 #: src/frontend/mame/ui/submenu.cpp:82
 msgid "Input Options"
-msgstr ""
+msgstr "Giriş Seçenekleri"
 
 #: src/frontend/mame/ui/submenu.cpp:83
 msgid "Coin lockout"
-msgstr ""
+msgstr "Jeton kilitleme"
 
 #: src/frontend/mame/ui/submenu.cpp:84
 msgid "Mouse"
@@ -533,7 +541,7 @@ msgstr "Oyun Kolu"
 
 #: src/frontend/mame/ui/submenu.cpp:86
 msgid "Lightgun"
-msgstr ""
+msgstr "Işık Silahı"
 
 #: src/frontend/mame/ui/submenu.cpp:87
 msgid "Multi-keyboard"
@@ -553,19 +561,19 @@ msgstr "Kullanıcı arayüzü aktif"
 
 #: src/frontend/mame/ui/submenu.cpp:91
 msgid "Off-screen reload"
-msgstr ""
+msgstr "Ekran dışı yeniden yükleme"
 
 #: src/frontend/mame/ui/submenu.cpp:92
 msgid "Joystick deadzone"
-msgstr ""
+msgstr "Kumanda kolu ölü bölgesi"
 
 #: src/frontend/mame/ui/submenu.cpp:93
 msgid "Joystick saturation"
-msgstr ""
+msgstr "Kumanda kolu doygunluğu"
 
 #: src/frontend/mame/ui/submenu.cpp:94
 msgid "Joystick threshold"
-msgstr ""
+msgstr "Kumanda kolu eşiği"
 
 #: src/frontend/mame/ui/submenu.cpp:95
 msgid "Natural keyboard"
@@ -573,31 +581,31 @@ msgstr "Doğal Klavye"
 
 #: src/frontend/mame/ui/submenu.cpp:96
 msgid "Allow contradictory joystick inputs"
-msgstr ""
+msgstr "Çelişkili Kumanda kolu girişlerine izin ver"
 
 #: src/frontend/mame/ui/submenu.cpp:97
 msgid "Coin impulse"
-msgstr ""
+msgstr "Jeton etkisi"
 
 #: src/frontend/mame/ui/submenu.cpp:103
 msgid "Input Device Options"
-msgstr ""
+msgstr "Giriş Cihazı Seçenekleri"
 
 #: src/frontend/mame/ui/submenu.cpp:104
 msgid "Lightgun Device Assignment"
-msgstr ""
+msgstr "Işık Silahı Cihaz Ataması"
 
 #: src/frontend/mame/ui/submenu.cpp:105
 msgid "Trackball Device Assignment"
-msgstr ""
+msgstr "Trackball Cihaz Ataması"
 
 #: src/frontend/mame/ui/submenu.cpp:106
 msgid "Pedal Device Assignment"
-msgstr ""
+msgstr "Pedal Cihaz Ataması"
 
 #: src/frontend/mame/ui/submenu.cpp:107
 msgid "AD Stick Device Assignment"
-msgstr ""
+msgstr "AD Stick Cihaz Ataması"
 
 #: src/frontend/mame/ui/submenu.cpp:108
 msgid "Paddle Device Assignment"
@@ -617,19 +625,19 @@ msgstr "Fare Aygıtı Atama"
 
 #: src/frontend/mame/ui/submenu.cpp:113
 msgid "Keyboard Input Provider"
-msgstr ""
+msgstr "Klavye Giriş Sağlayıcısı"
 
 #: src/frontend/mame/ui/submenu.cpp:114
 msgid "Mouse Input Provider"
-msgstr ""
+msgstr "Fare Giriş Sağlayıcısı"
 
 #: src/frontend/mame/ui/submenu.cpp:115
 msgid "Lightgun Input Provider"
-msgstr ""
+msgstr "Işık Silahı Giriş Sağlayıcısı"
 
 #: src/frontend/mame/ui/submenu.cpp:116
 msgid "Joystick Input Provider"
-msgstr ""
+msgstr "Kumanda Kolu Giriş Sağlayıcısı"
 
 #: src/frontend/mame/ui/submenu.cpp:122 src/frontend/mame/ui/videoopt.cpp:42
 msgid "Video Options"
@@ -645,7 +653,7 @@ msgstr "Ekran Sayısı"
 
 #: src/frontend/mame/ui/submenu.cpp:126
 msgid "Triple Buffering"
-msgstr ""
+msgstr "Üçlü tamponlama"
 
 #: src/frontend/mame/ui/submenu.cpp:127
 msgid "HLSL"
@@ -657,7 +665,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:130
 msgid "Bilinear Filtering"
-msgstr ""
+msgstr "Çift Doğrusal Filtreleme"
 
 #: src/frontend/mame/ui/submenu.cpp:131
 msgid "Bitmap Prescaling"
