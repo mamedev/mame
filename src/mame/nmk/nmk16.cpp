@@ -758,63 +758,6 @@ f0 - player bombs (8c36)
 
 */
 
-void nmk16_state::hachamf_mainram_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	COMBINE_DATA(&m_mainram[offset]);
-#define DUMMYA 0x7b9c
-// 7960
-	switch (offset)
-	{
-		case 0xe058/2: PROT_INPUT(0xe058/2,0xc71f,0xe000/2,0x00080000); break;
-		case 0xe182/2: PROT_INPUT(0xe182/2,0x865d,0xe004/2,0x00080002); break;
-		case 0xe51e/2: PROT_INPUT(0xe51e/2,0x0f82,0xe008/2,0x00080008); break;
-		case 0xe6b4/2: PROT_INPUT(0xe6b4/2,0x79be,0xe00c/2,0x0008000a); break;
-		case 0xe10e/2: PROT_JSR(0xe10e,0x8007,0x870a);//870a not 9d66
-						PROT_JSR(0xe10e,0x8000,0xd9c6); break;
-		case 0xe11e/2: PROT_JSR(0xe11e,0x8038,DUMMYA);//972a - (unused)
-						PROT_JSR(0xe11e,0x8031,0x7a54); break;
-		case 0xe12e/2: PROT_JSR(0xe12e,0x8019,0x9642);//OK-9642
-						PROT_JSR(0xe12e,0x8022,0xda06); break;
-		case 0xe13e/2: PROT_JSR(0xe13e,0x802a,0x9d66);//9d66 not 9400 - OK
-						PROT_JSR(0xe13e,0x8013,0x81aa); break;
-		case 0xe14e/2: PROT_JSR(0xe14e,0x800b,0xb3f2);//b3f2 - OK
-						PROT_JSR(0xe14e,0x8004,0x8994); break;
-		case 0xe15e/2: PROT_JSR(0xe15e,0x803c,0xb59e);//b59e - OK
-						PROT_JSR(0xe15e,0x8035,0x8c36); break;
-		case 0xe16e/2: PROT_JSR(0xe16e,0x801d,0x9ac2);//9ac2 - OK
-						PROT_JSR(0xe16e,0x8026,0x8d0c); break;
-		case 0xe17e/2: PROT_JSR(0xe17e,0x802e,0xc366);//c366 - OK
-						PROT_JSR(0xe17e,0x8017,0x870a); break;
-		case 0xe18e/2: PROT_JSR(0xe18e,0x8004,DUMMYA);        //unused
-						PROT_JSR(0xe18e,0x8008,DUMMYA); break; //unused
-		case 0xe19e/2: PROT_JSR(0xe19e,0x8030,0xd9c6);//OK-d9c6
-						PROT_JSR(0xe19e,0x8039,0x9642); break;
-		case 0xe1ae/2: PROT_JSR(0xe1ae,0x8011,0x7a54);//d1f8 not c67e
-						PROT_JSR(0xe1ae,0x802a,0x9d66); break;
-		case 0xe1be/2: PROT_JSR(0xe1be,0x8022,0xda06);//da06
-						PROT_JSR(0xe1be,0x801b,0xb3f2); break;
-		case 0xe1ce/2: PROT_JSR(0xe1ce,0x8003,0x81aa);//81aa
-						PROT_JSR(0xe1ce,0x800c,0xb59e); break;
-		case 0xe1de/2: PROT_JSR(0xe1de,0x8034,0x8994);//8994 - OK
-						PROT_JSR(0xe1de,0x803d,0x9ac2); break;
-		case 0xe1ee/2: PROT_JSR(0xe1ee,0x8015,0x8c36);//8d0c not 82f6
-						PROT_JSR(0xe1ee,0x802e,0xc366); break;
-		case 0xe1fe/2: PROT_JSR(0xe1fe,0x8026,0x8d0c);//8c36
-						PROT_JSR(0xe1fe,0x8016,DUMMYA); break;  //unused
-		case 0xef00/2:
-			if (m_mainram[0xef00/2] == 0x60fe)
-			{
-				m_mainram[0xef00/2] = 0x0000; //this is the coin counter
-				m_mainram[0xef02/2] = 0x0000;
-				m_mainram[0xef04/2] = 0x4ef9;
-				m_mainram[0xef06/2] = 0x0000;
-				m_mainram[0xef08/2] = 0x7dc2;
-			}
-			break;
-	}
-#undef DUMMYA
-}
-
 
 void nmk16_state::hachamf_map(address_map &map)
 {
@@ -829,160 +772,19 @@ void nmk16_state::hachamf_map(address_map &map)
 	map(0x080016, 0x080017).w(FUNC(nmk16_state::nmk004_x0016_w));
 	map(0x080019, 0x080019).w(FUNC(nmk16_state::tilebank_w));
 	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
+
+
 	// Video Region
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08c000, 0x08c007).w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
 	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
 	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
 	// Main RAM, inc sprites, shared with MCU
-	map(0x0f0000, 0x0fffff).ram().share("mainram"); // ram is shared with MCU
+
+    map(0x0f0000, 0x0fffff).ram().share("mainram"); // ram is shared with MCU
 }
 
 
-// coin setting MCU simulation
-void nmk16_state::mcu_run(u8 dsw_setting)
-{
-	u16 coin_input;
-	u8 dsw[2];
-	u8 i;
-
-	// Accept the start button but needs some m68k processing first,otherwise you can't start a play with 1 credit inserted
-	if (m_start_helper & 1 && m_mainram[0x9000/2] & 0x0200) // start 1
-	{
-		m_mainram[0xef00/2]--;
-		m_start_helper = m_start_helper & 2;
-	}
-	if (m_start_helper & 2 && m_mainram[0x9000/2] & 0x0100) // start 2
-	{
-		m_mainram[0xef00/2]--;
-		m_start_helper = m_start_helper & 1;
-	}
-
-	// needed because of the uncompatibility of the dsw settings.
-	if (dsw_setting) // Thunder Dragon
-	{
-		dsw[0] = (m_dsw_io[1]->read() & 0x7);
-		dsw[1] = (m_dsw_io[1]->read() & 0x38) >> 3;
-		for (i = 0; i < 2; i++)
-		{
-			switch (dsw[i] & 7)
-			{
-				case 0: m_mainram[0x9000/2] |= 0x4000; break; //free play
-				case 1: m_coin_count_frac[i] = 1; m_coin_count[i] = 4; break;
-				case 2: m_coin_count_frac[i] = 1; m_coin_count[i] = 3; break;
-				case 3: m_coin_count_frac[i] = 1; m_coin_count[i] = 2; break;
-				case 4: m_coin_count_frac[i] = 4; m_coin_count[i] = 1; break;
-				case 5: m_coin_count_frac[i] = 3; m_coin_count[i] = 1; break;
-				case 6: m_coin_count_frac[i] = 2; m_coin_count[i] = 1; break;
-				case 7: m_coin_count_frac[i] = 1; m_coin_count[i] = 1; break;
-			}
-		}
-	}
-	else // Hacha Mecha Fighter
-	{
-		dsw[0] = (m_dsw_io[0]->read() & 0x0700) >> 8;
-		dsw[1] = (m_dsw_io[0]->read() & 0x3800) >> 11;
-		for (i = 0; i < 2; i++)
-		{
-			switch (dsw[i] & 7)
-			{
-				case 0: m_mainram[0x9000/2] |= 0x4000; break; //free play
-				case 1: m_coin_count_frac[i] = 4; m_coin_count[i] = 1; break;
-				case 2: m_coin_count_frac[i] = 3; m_coin_count[i] = 1; break;
-				case 3: m_coin_count_frac[i] = 2; m_coin_count[i] = 1; break;
-				case 4: m_coin_count_frac[i] = 1; m_coin_count[i] = 4; break;
-				case 5: m_coin_count_frac[i] = 1; m_coin_count[i] = 3; break;
-				case 6: m_coin_count_frac[i] = 1; m_coin_count[i] = 2; break;
-				case 7: m_coin_count_frac[i] = 1; m_coin_count[i] = 1; break;
-			}
-		}
-	}
-
-	// read the coin port
-	coin_input = (~(m_in_io[0]->read()));
-
-	if (coin_input & 0x01)//coin 1
-	{
-		if ((m_input_pressed & 0x01) == 0)
-		{
-			if (m_coin_count_frac[0] != 1)
-			{
-				m_mainram[0xef02/2] += m_coin_count[0];
-				if (m_coin_count_frac[0] == m_mainram[0xef02/2])
-				{
-					m_mainram[0xef00/2] += m_coin_count[0];
-					m_mainram[0xef02/2] = 0;
-				}
-			}
-			else
-				m_mainram[0xef00/2] += m_coin_count[0];
-		}
-		m_input_pressed = (m_input_pressed & 0xfe) | 1;
-	}
-	else
-		m_input_pressed = (m_input_pressed & 0xfe);
-
-	if (coin_input & 0x02)//coin 2
-	{
-		if ((m_input_pressed & 0x02) == 0)
-		{
-			if (m_coin_count_frac[1] != 1)
-			{
-				m_mainram[0xef02/2] += m_coin_count[1];
-				if (m_coin_count_frac[1] == m_mainram[0xef02/2])
-				{
-					m_mainram[0xef00/2] += m_coin_count[1];
-					m_mainram[0xef02/2] = 0;
-				}
-			}
-			else
-				m_mainram[0xef00/2] += m_coin_count[1];
-		}
-		m_input_pressed = (m_input_pressed & 0xfd) | 2;
-	}
-	else
-		m_input_pressed = (m_input_pressed & 0xfd);
-
-	if (coin_input & 0x04)//service 1
-	{
-		if ((m_input_pressed & 0x04) == 0)
-			m_mainram[0xef00/2]++;
-		m_input_pressed = (m_input_pressed & 0xfb) | 4;
-	}
-	else
-		m_input_pressed = (m_input_pressed & 0xfb);
-
-	// The 0x9000 ram address is the status
-	if (m_mainram[0xef00/2] > 0 && m_mainram[0x9000/2] & 0x8000) // enable start button
-	{
-		if (coin_input & 0x08)//start 1
-		{
-			if ((m_input_pressed & 0x08) == 0 && (!(m_mainram[0x9000/2] & 0x0200))) //start 1
-				m_start_helper = 1;
-
-			m_input_pressed = (m_input_pressed & 0xf7) | 8;
-		}
-		else
-			m_input_pressed = (m_input_pressed & 0xf7);
-
-		if (coin_input & 0x10)//start 2
-		{
-			// Decrease two coins to let two players play with one start 2 button and two credits inserted at the insert coin screen.
-			if ((m_input_pressed & 0x10) == 0 && (!(m_mainram[0x9000/2] & 0x0100))) // start 2
-				m_start_helper = (m_mainram[0x9000/2] == 0x8000) ? (3) : (2);
-
-			m_input_pressed = (m_input_pressed & 0xef) | 0x10;
-		}
-		else
-			m_input_pressed = (m_input_pressed & 0xef);
-	}
-}
-
-
-TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::hachamf_mcu_sim)
-{
-	mcu_run(0);
-}
 
 void nmk16_state::tdragon_map(address_map &map)
 {
@@ -990,6 +792,7 @@ void nmk16_state::tdragon_map(address_map &map)
 	map(0x044022, 0x044023).nopr();  // No Idea (ROM mirror? - does this even exist on originals?)
 
 	map(0x080000, 0x08ffff).mirror(0x030000).ram().share("mainram");
+	map(0x0f0000, 0x0fffff).ram().share("mainram");
 
 	map(0x0c0000, 0x0c0001).mirror(0x020000).portr("IN0");
 	map(0x0c0002, 0x0c0003).mirror(0x020000).portr("IN1");
@@ -1857,54 +1660,54 @@ static INPUT_PORTS_START( hachamf_prot )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW2:8,7,6")
-	PORT_DIPSETTING(      0x0100, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0300, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0700, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0600, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0500, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x3800, 0x3800, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW2:5,4,3")
-	PORT_DIPSETTING(      0x0800, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x1800, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x3800, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x3000, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x2800, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Japanese ) )
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:6,5")
-	PORT_DIPSETTING(      0x0004, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x000c, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW1:2,1")
-	PORT_DIPSETTING(      0x0000, "1" )
-	PORT_DIPSETTING(      0x0040, "2" )
-	PORT_DIPSETTING(      0x00c0, "3" )
-	PORT_DIPSETTING(      0x0080, "4" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Japanese ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:6,5")
+	PORT_DIPSETTING(    0x04, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW1:2,1")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0xc0, "3" )
+	PORT_DIPSETTING(    0x80, "4" )
 
 	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW2:4,5,6")
+	PORT_DIPSETTING(    0x10, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x14, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPSETTING(    0x80, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
 
 
@@ -4660,12 +4463,17 @@ void tdragon_prot_state::machine_reset()
 
 void tdragon_prot_state::mcu_side_shared_w(offs_t offset, u8 data)
 {
+	logerror("%s: mcu_side_shared_w offset %08x (data %02x)\n", machine().describe_context(), offset, data);
+
 	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
 u8 tdragon_prot_state::mcu_side_shared_r(offs_t offset)
 {
 	u8 retval = m_maincpu->space(AS_PROGRAM).read_byte((offset));
+
+	logerror("%s: mcu_side_shared_r offset %08x (retdata %02x)\n", machine().describe_context(), offset, retval);
+
 	return retval;
 }
 
@@ -4674,8 +4482,6 @@ void tdragon_prot_state::tdragon_prot_map(address_map &map)
 	//  0x000000- 0x003fff is hidden by internal ROM, as are some 0x00fxxx addresses by RAM
 	map(0x000000, 0x0fffff).rw(FUNC(tdragon_prot_state::mcu_side_shared_r), FUNC(tdragon_prot_state::mcu_side_shared_w));
 }
-
-
 
 void tdragon_prot_state::tdragon_prot(machine_config &config)
 {
@@ -4830,10 +4636,28 @@ void nmk16_state::hachamf(machine_config &config)
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
 
-void nmk16_state::hachamf_prot(machine_config &config)
+u8 tdragon_prot_state::mcu_port7_r()
+{
+	// The NMK-113 code contains multiple different codepaths, which appear to be for different games
+	// a value is read from port 7, and masked with 0xf
+	// This happens in various places in the code, with 5 different possible startup programs, and
+	// a variety of other table data elsewhere in the code
+	// TODO: test NMK113 with other games (jalmah.cpp?) and different reads from port 7 on them
+	return 0x0c;
+}
+
+void tdragon_prot_state::hachamf_prot(machine_config &config)
 {
 	hachamf(config);
-	TIMER(config, "coinsim").configure_periodic(FUNC(nmk16_state::hachamf_mcu_sim), attotime::from_hz(10000));
+
+	TMP91640(config, m_protcpu, 8000000); // Toshiba TMP91640 marked as NMK-113, with 16Kbyte internal ROM, 512bytes internal RAM
+	m_protcpu->set_addrmap(AS_PROGRAM, &tdragon_prot_state::tdragon_prot_map);
+	m_protcpu->port_write<6>().set(FUNC(tdragon_prot_state::mcu_port6_w));
+	m_protcpu->port_read<5>().set(FUNC(tdragon_prot_state::mcu_port5_r));
+	m_protcpu->port_read<6>().set(FUNC(tdragon_prot_state::mcu_port6_r));
+	m_protcpu->port_read<7>().set(FUNC(tdragon_prot_state::mcu_port7_r));
+
+	config.set_maximum_quantum(attotime::from_hz(6000));
 }
 
 
@@ -5416,14 +5240,6 @@ void nmk16_state::decode_ssmissin()
 	}
 }
 
-void nmk16_state::save_protregs()
-{
-	save_item(NAME(m_input_pressed));
-	save_item(NAME(m_start_helper));
-	save_item(NAME(m_coin_count));
-	save_item(NAME(m_coin_count_frac));
-}
-
 void nmk16_state::init_nmk()
 {
 	decode_gfx();
@@ -5440,20 +5256,6 @@ void nmk16_state::init_tharrier()
 	m_okibank[1]->configure_entries(0, 4, memregion("oki2")->base() + 0x20000, 0x20000);
 	save_item(NAME(m_prot_count));
 	m_prot_count = 0;
-}
-
-void nmk16_state::init_hachamf_prot()
-{
-	u16 *rom = (u16 *)memregion("maincpu")->base();
-
-	//rom[0x0006/2] = 0x7dc2;   // replace reset vector with the "real" one
-
-	// kludge the sound communication to let commands go through.
-	rom[0x048a/2] = 0x4e71;
-	rom[0x04aa/2] = 0x4e71;
-
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0f0000, 0x0fffff, write16s_delegate(*this, FUNC(nmk16_state::hachamf_mainram_w)));
-	save_protregs();
 }
 
 void nmk16_state::init_tdragonb()
@@ -7045,9 +6847,10 @@ ROM_START( hachamf )
 	ROM_LOAD16_BYTE( "6.94",  0x00001, 0x20000, CRC(de6408a0) SHA1(2df77fecd44d2d8b0444abd4545923213ed76b2d) )
 
 	ROM_REGION( 0x04000, "protcpu", 0 )
-	ROM_LOAD("nmk-113.bin", 0x00000, 0x04000, NO_DUMP )
+	// has 'WAKAUS' for the game name string, and appears to have programs for multiple games, depending on port 7 reads
+	ROM_LOAD( "nmk-113.bin", 0x00000, 0x04000, CRC(f3072715) SHA1(cee6534de6645c41cbbb1450ad3e5207e44460c7) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // unknown  - sound CPU ??????
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // NMK004 sound data
 	ROM_LOAD( "1.70",  0x00000, 0x10000, CRC(9e6f48fc) SHA1(aeb5bfecc025b5478f6de874792fc0f7f54932be) )
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
@@ -7074,9 +6877,10 @@ ROM_START( hachamfa) // reportedly a Korean PCB / version
 	ROM_LOAD16_BYTE( "6.ic94",  0x00001, 0x20000, CRC(60d340d0) SHA1(3c6f862901b403d6ddf58823af7d6e3f67573788) )
 
 	ROM_REGION( 0x04000, "protcpu", 0 )
-	ROM_LOAD("nmk-113.bin", 0x00000, 0x04000, NO_DUMP )
+	// has 'WAKAUS' for the game name string, and appears to have programs for multiple games, depending on port 7 reads
+	ROM_LOAD( "nmk-113.bin", 0x00000, 0x04000, CRC(f3072715) SHA1(cee6534de6645c41cbbb1450ad3e5207e44460c7) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // unknown  - sound CPU ??????
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // NMK004 sound data
 	ROM_LOAD( "1.70",  0x00000, 0x10000, CRC(9e6f48fc) SHA1(aeb5bfecc025b5478f6de874792fc0f7f54932be) )
 
 	ROM_REGION( 0x020000, "fgtile", 0 ) // Smaller NMK logo plus alternate  Distributed by UPL  Company Limited  starting at tile 0xF80
@@ -7102,7 +6906,7 @@ ROM_START( hachamfb ) // Thunder Dragon conversion - unprotected prototype or bo
 	ROM_LOAD16_BYTE( "8.bin",  0x00000, 0x20000, CRC(14845b65) SHA1(5cafd07a8a6f5ccbb36de7a90571f8b33ecf273e) ) // internally reports as 19th Sep. 1991
 	ROM_LOAD16_BYTE( "7.bin",  0x00001, 0x20000, CRC(069ca579) SHA1(0db4c3c41e17fca613d11de89b388a4af206ec6b) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // unknown  - sound CPU ??????
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // NMK004 sound data
 	ROM_LOAD( "1.70",  0x00000, 0x10000, CRC(9e6f48fc) SHA1(aeb5bfecc025b5478f6de874792fc0f7f54932be) )
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
@@ -7128,7 +6932,7 @@ ROM_START( hachamfp ) // Protoype Location Test Release; Hand-written labels wit
 	ROM_LOAD16_BYTE( "kf-68-pe-b.ic7",  0x00000, 0x20000, CRC(b98a525e) SHA1(161c3b3360068e606e4d4104cc172b9736a52eeb) ) // Label says "KF 9/25 II 68 PE B"
 	ROM_LOAD16_BYTE( "kf-68-po-b.ic6",  0x00001, 0x20000, CRC(b62ad179) SHA1(60a66fb9eb3fc792d172e1f4507a806ac2ad4217) ) // Label says "KF 9/25 II 68 PO B"
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // External NMK004 data
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // NMK004 sound data
 	ROM_LOAD( "kf-snd.ic4",  0x00000, 0x10000, CRC(f7cace47) SHA1(599f6406f5bea69d77f39847d5d5fa361cdb7d00) ) // Label says "KF 9/20 SND"
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
@@ -9193,8 +8997,8 @@ GAME( 1992, strahlja,   strahl,   strahl,       strahl,       nmk16_state, empty
 GAME( 1991, tdragon,    0,        tdragon,      tdragon,      nmk16_state, empty_init,           ROT270, "NMK (Tecmo license)",          "Thunder Dragon (8th Jan. 1992, unprotected)", 0 )
 GAME( 1991, tdragon1,   tdragon,  tdragon_prot, tdragon_prot, tdragon_prot_state, empty_init,    ROT270, "NMK (Tecmo license)",          "Thunder Dragon (4th Jun. 1991, protected)", 0 )
 
-GAME( 1991, hachamf,    0,        hachamf_prot, hachamf_prot, nmk16_state, init_hachamf_prot,    ROT0,   "NMK",                          "Hacha Mecha Fighter (19th Sep. 1991, protected, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND ) // lots of things wrong due to protection
-GAME( 1991, hachamfa,   hachamf,  hachamf_prot, hachamf_prot, nmk16_state, init_hachamf_prot,    ROT0,   "NMK",                          "Hacha Mecha Fighter (19th Sep. 1991, protected, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND ) // lots of things wrong due to protection
+GAME( 1991, hachamf,    0,        hachamf_prot, hachamf_prot, tdragon_prot_state, empty_init,    ROT0,   "NMK",                          "Hacha Mecha Fighter (19th Sep. 1991, protected, set 1)", 0 )
+GAME( 1991, hachamfa,   hachamf,  hachamf_prot, hachamf_prot, tdragon_prot_state, empty_init,    ROT0,   "NMK",                          "Hacha Mecha Fighter (19th Sep. 1991, protected, set 2)", 0 )
 GAME( 1991, hachamfb,   hachamf,  hachamf,      hachamfb,     nmk16_state, empty_init,           ROT0,   "bootleg",                      "Hacha Mecha Fighter (19th Sep. 1991, unprotected, bootleg Thunder Dragon conversion)", 0 ) // appears to be a Thunder Dragon conversion, could be bootleg?
 GAME( 1991, hachamfp,   hachamf,  hachamf,      hachamfp,     nmk16_state, empty_init,           ROT0,   "NMK",                          "Hacha Mecha Fighter (Location Test Prototype, 19th Sep. 1991)", 0 ) // Prototype with hand-written labels showing dates of 9/9, 9/13, 9/24, 9/25. The ROM contains the same 19th Sep. 1991 build string as all the prior releases, so that string was likely never updated in later builds.
 
