@@ -458,11 +458,13 @@ SNAPSHOT_LOAD_MEMBER(microtan_state::snapshot_cb)
 	if (snapshot_len < 4 || snapshot_len >= 66000)
 		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
-	auto snapshot_buff = std::make_unique<uint8_t []>(snapshot_len);
-	if (image.fread(snapshot_buff.get(), snapshot_len) != snapshot_len)
-		return std::make_pair(image_error::UNSPECIFIED, std::string());
+	std::unique_ptr<uint8_t []> snapshot_buff;
+	size_t actual;
+	std::error_condition err = image.image_core_file().alloc_read(snapshot_buff, snapshot_len, actual);
+	if (err || actual != snapshot_len)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
-	std::error_condition err = verify_snapshot(snapshot_buff.get(), snapshot_len);
+	err = verify_snapshot(snapshot_buff.get(), snapshot_len);
 	if (err)
 		return std::make_pair(err, std::string());
 

@@ -162,9 +162,10 @@ bool hpi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	image->set_variant(heads == 2 ? floppy_image::DSDD : floppy_image::SSDD);
 
 	// Suck in the whole image
-	std::vector<uint8_t> image_data(size);
+	std::unique_ptr<uint8_t []> image_data;
 	size_t actual;
-	io.read_at(0, image_data.data(), size, actual);
+	if (io.alloc_read_at(0, image_data, size, actual) || actual != size)
+		return false;
 
 	// Get interleave factor from image
 	unsigned il = (unsigned)image_data[ IL_OFFSET ] * 256 + image_data[ IL_OFFSET + 1 ];

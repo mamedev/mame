@@ -181,11 +181,11 @@ SNAPSHOT_LOAD_MEMBER(vtech1_base_state::snapshot_cb)
 	uint16_t const size = end - start;
 
 	// write it to RAM
-	auto buf = std::make_unique<uint8_t []>(size);
-	if (image.fread(buf.get(), size) != size)
-	{
-		return std::make_pair(image_error::UNSPECIFIED, std::string());
-	}
+	std::unique_ptr<uint8_t []> buf;
+	size_t actual;
+	std::error_condition const err = image.image_core_file().alloc_read(buf, size, actual);
+	if (err || actual != size)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 	uint8_t *ptr = &buf[0];
 
 	// check for supported format before overwriting memory

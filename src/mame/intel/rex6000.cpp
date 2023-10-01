@@ -170,7 +170,7 @@ public:
 	void oz750_banked_map(address_map &map);
 	void oz750_io(address_map &map);
 private:
-	int oz_wzd_extract_tag(const std::vector<uint8_t> &data, const char *tag, char *dest_buf);
+	int oz_wzd_extract_tag(const uint8_t *data, size_t size, const char *tag, char *dest_buf);
 
 	uint16_t m_kb_mask = 0;
 };
@@ -738,8 +738,12 @@ QUICKLOAD_LOAD_MEMBER(rex6000_state::quickload_rex6000)
 	static const char magic[] = "ApplicationName:Addin";
 	uint32_t img_start = 0;
 
-	std::vector<uint8_t> data(image.length());
-	image.fread(&data[0], image.length());
+	const size_t length = image.length();
+	std::unique_ptr<uint8_t []> data;
+	size_t actual;
+	const std::error_condition err = image.image_core_file().alloc_read(data, length, actual);
+	if (err || actual != length)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 	if(strncmp((const char*)&data[0], magic, 21))
 		return std::make_pair(image_error::INVALIDIMAGE, std::string());
@@ -747,21 +751,21 @@ QUICKLOAD_LOAD_MEMBER(rex6000_state::quickload_rex6000)
 	img_start = strlen((const char*)&data[0]) + 5;
 	img_start += 0xa0;  //skip the icon (40x32 pixel)
 
-	for (uint32_t i=0; i<image.length() - img_start ;i++)
+	for (uint32_t i=0; i<length - img_start ;i++)
 		m_flash0b->write_raw(i, data[img_start + i]);
 
 	return std::make_pair(std::error_condition(), std::string());
 }
 
-int oz750_state::oz_wzd_extract_tag(const std::vector<uint8_t> &data, const char *tag, char *dest_buf)
+int oz750_state::oz_wzd_extract_tag(const uint8_t *data, size_t size, const char *tag, char *dest_buf)
 {
 	int tag_len = strlen(tag);
 	uint32_t img_start = 0;
-	for (img_start=0; img_start < data.size() - tag_len; img_start++)
+	for (img_start=0; img_start < size - tag_len; img_start++)
 		if (data[img_start] && !memcmp(&data[img_start], tag, tag_len))
 			break;
 
-	if (img_start >= data.size() - tag_len)
+	if (img_start >= size - tag_len)
 	{
 		if (dest_buf)
 			strcpy(dest_buf, "NONE");
@@ -787,28 +791,33 @@ int oz750_state::oz_wzd_extract_tag(const std::vector<uint8_t> &data, const char
 
 QUICKLOAD_LOAD_MEMBER(oz750_state::quickload_oz750)
 {
-	address_space* flash = &m_flash0a->memory().space(0);
-	std::vector<uint8_t> data(image.length());
-	image.fread(&data[0], image.length());
+	size_t const length = image.length();
+	std::unique_ptr<uint8_t []> data;
+	size_t actual;
+	std::error_condition const err = image.image_core_file().alloc_read(data, length, actual);
+	if (err || length != actual)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 	const char *fs_type = "BSIC";
 	char data_type[0x100];
 	char app_name[0x100];
 	char file_name[0x100];
 
-	oz_wzd_extract_tag(data, "<DATA TYPE>", data_type);
+	oz_wzd_extract_tag(&data[0], length, "<DATA TYPE>", data_type);
 	if (strcmp(data_type, "MY PROGRAMS"))
 		return std::make_pair(image_error::INVALIDIMAGE, std::string());
 
-	oz_wzd_extract_tag(data, "<TITLE>", app_name);
-	oz_wzd_extract_tag(data, "<DATA>", file_name);
+	oz_wzd_extract_tag(&data[0], length, "<TITLE>", app_name);
+	oz_wzd_extract_tag(&data[0], length, "<DATA>", file_name);
 	if (!strncmp(file_name, "PFILE:", 6))
 		memmove(file_name, file_name + 6, strlen(file_name + 6) + 1);
 
-	uint32_t img_start = oz_wzd_extract_tag(data, "<BIN>", nullptr);
+	uint32_t img_start = oz_wzd_extract_tag(&data[0], length, "<BIN>", nullptr);
 
 	if (img_start == 0)
 		return std::make_pair(image_error::INVALIDIMAGE, std::string());
+
+	address_space* flash = &m_flash0a->memory().space(0);
 
 	uint16_t icon_size = data[img_start++];
 
@@ -841,11 +850,11 @@ QUICKLOAD_LOAD_MEMBER(oz750_state::quickload_oz750)
 	for (int i=0, slen = strlen(app_name); i <= slen; i++)
 		flash->write_byte(pos++, app_name[i]);                  // title
 
-	uint16_t size = (uint16_t)image.length() - img_start;
+	uint16_t size = (uint16_t)length - img_start;
 	flash->write_byte(pos++, size);                             // data size LSB
 	flash->write_byte(pos++, size >> 8);                        // data size MSB
 
-	for (int i=img_start; i<image.length(); i++)
+	for (int i=img_start; i<length; i++)
 		flash->write_byte(pos++, data[i]);                      // data
 
 	return std::make_pair(std::error_condition(), std::string());

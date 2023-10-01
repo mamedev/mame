@@ -116,7 +116,11 @@ std::error_condition smartmedia_image_device::smartmedia_format_1()
 		fread(&m_mp_opcode, 1);
 		fread(m_data_uid_ptr.get(), 256 + 16);
 	}
-	fread(m_feeprom_data, m_page_total_size*m_num_pages);
+
+	size_t actual;
+	std::error_condition const err = image_core_file().alloc_read(m_feeprom_data, m_page_total_size*m_num_pages, actual);
+	if (err || actual != m_page_total_size*m_num_pages)
+		return err ? err : std::errc::io_error;
 
 #ifdef SMARTMEDIA_IMAGE_SAVE
 	m_image_format = 1;
@@ -207,7 +211,10 @@ std::error_condition smartmedia_image_device::smartmedia_format_2()
 	}
 	memcpy(m_data_uid_ptr.get() + 256, custom_header.data3, 16);
 
-	fread(m_feeprom_data, m_page_total_size*m_num_pages);
+	size_t actual;
+	std::error_condition const err = image_core_file().alloc_read(m_feeprom_data, m_page_total_size*m_num_pages, actual);
+	if (err || actual != m_page_total_size*m_num_pages)
+		return err ? err : std::errc::io_error;
 
 #ifdef SMARTMEDIA_IMAGE_SAVE
 	m_image_format = 2;

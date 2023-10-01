@@ -317,8 +317,9 @@ bool cqm_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	uint64_t cqm_size;
 	if (io.length(cqm_size))
 		return false;
-	std::vector<uint8_t> cqmbuf(cqm_size);
-	io.read_at(0, &cqmbuf[0], cqm_size, actual);
+	std::unique_ptr<uint8_t []> cqmbuf;
+	if (io.alloc_read_at(0, cqmbuf, cqm_size, actual) || actual != cqm_size)
+		return false;
 
 	// decode the RLE data
 	for (int s = 0, pos = CQM_HEADER_SIZE + comment_size; pos < cqm_size; )

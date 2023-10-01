@@ -98,15 +98,14 @@ std::pair<std::error_condition, std::string> nubus_image_device::messimg_disk_im
 		return std::make_pair(image_error::INVALIDLENGTH, "Image file is too large (must be no more than 256MB)");
 	}
 
-	m_data.reset(new (std::nothrow) uint8_t [m_size]);
-	if (!m_data)
-		return std::make_pair(std::errc::not_enough_memory, "Error allocating memory for volume image");
+	size_t actual;
+	std::error_condition err = image_core_file().alloc_read(m_data, m_size, actual);
+	if (!err && actual != m_size)
+		err = std::errc::io_error;
 
-	fseek(0, SEEK_SET);
-	fread(m_data.get(), m_size);
 	m_ejected = false;
 
-	return std::make_pair(std::error_condition(), std::string());
+	return std::make_pair(err, std::string());
 }
 
 void nubus_image_device::messimg_disk_image_device::call_unload()

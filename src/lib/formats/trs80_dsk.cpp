@@ -146,9 +146,10 @@ int jv3_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	if (image_size < 0x2200)
 		return 0; // too small, silent return
 
-	std::vector<uint8_t> data(image_size);
+	std::unique_ptr<uint8_t []> data;
 	size_t actual;
-	io.read_at(0, data.data(), image_size, actual);
+	if (io.alloc_read_at(0, data, image_size, actual) || actual != image_size)
+		return 0;
 	const uint32_t entries = 2901;
 	const uint32_t header_size = entries *3 +1;
 
@@ -238,9 +239,10 @@ bool jv3_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	uint64_t image_size;
 	if (io.length(image_size))
 		return false;
-	std::vector<uint8_t> data(image_size);
+	std::unique_ptr<uint8_t []> data;
 	size_t actual;
-	io.read_at(0, data.data(), data.size(), actual);
+	if (io.alloc_read_at(0, data, image_size, actual) || actual != image_size)
+		return false;
 	const uint32_t entries = 2901;
 	const uint32_t header_size = entries *3 +1;
 	bool is_dd = false, is_ds = false;
@@ -367,10 +369,9 @@ bool jv3_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 		uint64_t image_size;
 		if (!io.length(image_size))
 		{
-			std::vector<uint8_t> data(image_size);
+			uint8_t writable;
 			size_t actual;
-			io.read_at(0, data.data(), data.size(), actual);
-			if ((data.size() >= 0x2200) && (data[0x21ff] == 0))
+			if (io.read_at(0x21ff, &writable, 1, actual) || actual != 1 || writable == 0)
 				return false;   // disk is readonly
 		}
 	}

@@ -72,9 +72,10 @@ bool img_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	image->set_variant(is_dd ? floppy_image::SSDD : floppy_image::SSSD);
 
 	// Suck in the whole image
-	std::vector<uint8_t> image_data(size);
+	std::unique_ptr<uint8_t []> image_data;
 	size_t actual;
-	io.read_at(0, image_data.data(), size, actual);
+	if (io.alloc_read_at(0, image_data, size, actual) || actual != size)
+		return false;
 
 	for (unsigned cyl = 0; cyl < TRACKS; cyl++) {
 		if (is_dd) {
@@ -134,7 +135,7 @@ bool img_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				sects[ sector ].sector = real_sector;
 				sects[ sector ].bad_crc = false;
 				sects[ sector ].deleted = false;
-				sects[ sector ].data = image_data.data() + offset_in_image;
+				sects[ sector ].data = &image_data[ offset_in_image ];
 			}
 			build_pc_track_fm(cyl, 0, image, 83333, SECTORS_FM, sects, 33, 46, 32, 11);
 		}

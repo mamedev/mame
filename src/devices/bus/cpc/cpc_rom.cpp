@@ -105,18 +105,12 @@ std::pair<std::error_condition, std::string> cpc_rom_image_device::call_load()
 {
 	uint64_t const size = length();
 
-	m_base = std::make_unique<uint8_t[]>(16384);
-	if(size <= 16384)
-	{
-		fread(m_base, size);
-	}
-	else
-	{
-		fseek(size - 16384, SEEK_SET);
-		fread(m_base, 16384);
-	}
+	size_t actual;
+	std::error_condition err = image_core_file().alloc_read_at(size <= 16384 ? 0 : size - 16384, m_base, 16384, actual);
+	if (!err && actual != std::min<size_t>(size, 16384))
+		err = std::errc::io_error;
 
-	return std::make_pair(std::error_condition(), std::string());
+	return std::make_pair(err, std::string());
 }
 
 

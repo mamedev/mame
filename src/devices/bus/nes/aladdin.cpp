@@ -103,13 +103,18 @@ std::pair<std::error_condition, std::string> nes_aladdin_slot_device::call_load(
 		uint32_t size;
 		if (!loaded_through_softlist())
 		{
-			if (length() != 0x20010 && length() != 0x40010)
+			size_t const length = this->length();
+			if (length != 0x20010 && length != 0x40010)
 				return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
-			uint8_t temp[0x40010];
-			size = length() - 0x10;
-			fread(&temp, length());
-			memcpy(ROM, temp + 0x10, size);
+			std::unique_ptr<uint8_t []> temp;
+			size_t actual;
+			std::error_condition const err = image_core_file().alloc_read(temp, length, actual);
+			if (err || actual != length)
+				return std::make_pair(err ? err : std::errc::io_error, std::string());
+
+			size = length - 0x10;
+			memcpy(ROM, &temp[0x10], size);
 
 			// double check that iNES files are really mapper 71 or 232
 			uint8_t mapper = (temp[6] & 0xf0) >> 4;

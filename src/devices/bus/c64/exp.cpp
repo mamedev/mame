@@ -95,6 +95,8 @@ void c64_expansion_slot_device::device_reset()
 
 std::pair<std::error_condition, std::string> c64_expansion_slot_device::call_load()
 {
+	std::error_condition err;
+
 	if (m_card)
 	{
 		m_card->m_roml_size = 0;
@@ -106,11 +108,16 @@ std::pair<std::error_condition, std::string> c64_expansion_slot_device::call_loa
 
 		if (!loaded_through_softlist())
 		{
+			util::core_file &file = image_core_file();
 			size = length();
 
 			if (is_filetype("80"))
 			{
-				fread(m_card->m_roml, size);
+				size_t actual;
+				err = file.alloc_read(m_card->m_roml, size, actual);
+				if (!err && actual != size)
+					err = std::errc::io_error;
+
 				m_card->m_roml_size = size;
 				m_card->m_exrom = 0;
 
@@ -121,7 +128,11 @@ std::pair<std::error_condition, std::string> c64_expansion_slot_device::call_loa
 			}
 			else if (is_filetype("a0"))
 			{
-				fread(m_card->m_romh, 0x2000);
+				size_t actual;
+				err = file.alloc_read(m_card->m_romh, 0x2000, actual);
+				if (!err && actual != 0x2000)
+					err = std::errc::io_error;
+
 				m_card->m_romh_size = 0x2000;
 
 				m_card->m_exrom = 0;
@@ -129,14 +140,18 @@ std::pair<std::error_condition, std::string> c64_expansion_slot_device::call_loa
 			}
 			else if (is_filetype("e0"))
 			{
-				fread(m_card->m_romh, 0x2000);
+				size_t actual;
+				err = file.alloc_read(m_card->m_romh, 0x2000, actual);
+				if (!err && actual != 0x2000)
+					err = std::errc::io_error;
+
 				m_card->m_romh_size = 0x2000;
 
 				m_card->m_game = 0;
 			}
 			else if (is_filetype("crt"))
 			{
-				if (cbm_crt_read_header(image_core_file(), &m_card->m_roml_size, &m_card->m_romh_size, &m_card->m_exrom, &m_card->m_game))
+				if (cbm_crt_read_header(file, &m_card->m_roml_size, &m_card->m_romh_size, &m_card->m_exrom, &m_card->m_game))
 				{
 					uint8_t *roml = nullptr;
 					uint8_t *romh = nullptr;
@@ -147,7 +162,7 @@ std::pair<std::error_condition, std::string> c64_expansion_slot_device::call_loa
 					if (m_card->m_roml_size) roml = m_card->m_roml.get();
 					if (m_card->m_romh_size) romh = m_card->m_romh.get();
 
-					cbm_crt_read_data(image_core_file(), roml, romh);
+					cbm_crt_read_data(file, roml, romh);
 				}
 			}
 		}
@@ -185,7 +200,7 @@ std::pair<std::error_condition, std::string> c64_expansion_slot_device::call_loa
 			return std::make_pair(image_error::INVALIDLENGTH, "ROM size must be power of 2");
 	}
 
-	return std::make_pair(std::error_condition(), std::string());
+	return std::make_pair(err, std::string());
 }
 
 

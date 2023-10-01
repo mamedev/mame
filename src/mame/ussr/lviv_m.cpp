@@ -286,9 +286,12 @@ std::pair<std::error_condition, std::string> lviv_state::verify_snapshot(const u
 
 SNAPSHOT_LOAD_MEMBER(lviv_state::snapshot_cb)
 {
-	std::vector<uint8_t> snapshot_data(LVIV_SNAPSHOT_SIZE);
+	std::unique_ptr<uint8_t []> snapshot_data;
 
-	image.fread(&snapshot_data[0], LVIV_SNAPSHOT_SIZE);
+	size_t actual;
+	std::error_condition const error = image.image_core_file().alloc_read(snapshot_data, LVIV_SNAPSHOT_SIZE, actual);
+	if (error)
+		return std::make_pair(error, std::string());
 
 	auto err = verify_snapshot(&snapshot_data[0], image.length());
 	if (err.first)

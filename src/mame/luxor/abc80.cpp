@@ -667,9 +667,13 @@ QUICKLOAD_LOAD_MEMBER(abc80_state::quickload_cb)
 	offs_t address = space.read_byte(BOFA + 1) << 8 | space.read_byte(BOFA);
 	if (LOG) logerror("BOFA %04x\n",address);
 
-	int quickload_size = image.length();
-	std::vector<u8> data(quickload_size);
-	image.fread(&data[0], quickload_size);
+	const int quickload_size = image.length();
+	std::unique_ptr<u8 []> data;
+	size_t actual;
+	const std::error_condition err = image.image_core_file().alloc_read(data, quickload_size, actual);
+	if (err || actual != quickload_size)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
+
 	for (int i = 1; i < quickload_size; i++)
 		space.write_byte(address++, data[i]);
 

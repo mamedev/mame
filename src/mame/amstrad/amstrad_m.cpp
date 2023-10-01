@@ -3126,17 +3126,21 @@ MACHINE_RESET_MEMBER(amstrad_state,aleste)
 }
 
 
-/* load snapshot */
+// load snapshot
 SNAPSHOT_LOAD_MEMBER(amstrad_state::snapshot_cb)
 {
-	/* get file size */
-	if (image.length() < 8)
+	// get file size
+	size_t const size = image.length();
+	if (size < 8)
 		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
-	std::vector<uint8_t> snapshot(image.length());
+	std::unique_ptr<uint8_t []> snapshot;
 
-	/* read whole file */
-	image.fread(&snapshot[0], image.length());
+	// read whole file
+	size_t actual;
+	std::error_condition const err = image.image_core_file().alloc_read(snapshot, size, actual);
+	if (err || actual != size)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 	if (memcmp(&snapshot[0], "MV - SNA", 8))
 		return std::make_pair(image_error::INVALIDIMAGE, std::string());
@@ -3198,9 +3202,11 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state::amstrad_plus_cartridge)
 
 		uint32_t offset = 0;
 		uint8_t *crt = m_cart->get_rom_base();
-		std::vector<uint8_t> temp_copy;
-		temp_copy.resize(size);
-		image.fread(&temp_copy[0], size);
+		std::unique_ptr<uint8_t []> temp_copy;
+		size_t actual;
+		std::error_condition const err = image.image_core_file().alloc_read(temp_copy, size, actual);
+		if (err || actual != size)
+			return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 		// RIFF chunk bits
 		char chunkid[4];              // chunk ID (4 character code - cb00, cb01, cb02... upto cb31 (max 512kB), other chunks are ignored)

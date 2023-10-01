@@ -116,10 +116,13 @@ void spectrum_state::page_basicrom()
 
 SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 {
-	size_t snapshot_size = image.length();
-	std::vector<uint8_t> snapshot_data(snapshot_size);
+	size_t const snapshot_size = image.length();
+	std::unique_ptr<uint8_t []> snapshot_data;
 
-	image.fread(&snapshot_data[0], snapshot_size);
+	size_t actual;
+	std::error_condition const err = image.image_core_file().alloc_read(snapshot_data, snapshot_size, actual);
+	if (err || actual != snapshot_size)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 	if (image.is_filetype("sna"))
 	{
@@ -2399,10 +2402,13 @@ void spectrum_state::setup_z80(uint8_t *snapdata, uint32_t snapsize)
 
 QUICKLOAD_LOAD_MEMBER(spectrum_state::quickload_cb)
 {
-	size_t quickload_size = image.length();
-	std::vector<uint8_t> quickload_data(quickload_size);
+	size_t const quickload_size = image.length();
+	std::unique_ptr<uint8_t []> quickload_data;
 
-	image.fread(&quickload_data[0], quickload_size);
+	size_t actual;
+	std::error_condition const err = image.image_core_file().alloc_read(quickload_data, quickload_size, actual);
+	if (err || actual != quickload_size)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 	if (image.is_filetype("scr"))
 	{

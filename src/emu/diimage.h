@@ -158,15 +158,6 @@ public:
 		m_file->tell(result);
 		return result;
 	}
-	bool image_feof()
-	{
-		check_for_file();
-		return m_file->eof();
-	}
-
-	// allocate and read into buffers
-	u32 fread(std::unique_ptr<u8 []> &ptr, u32 length) { ptr = std::make_unique<u8 []>(length); return fread(ptr.get(), length); }
-	u32 fread(std::unique_ptr<u8 []> &ptr, u32 length, offs_t offset) { ptr = std::make_unique<u8 []>(length); return fread(ptr.get() + offset, length - offset); }
 
 	// access to software list item information
 	const software_info *software_entry() const noexcept;

@@ -36,13 +36,16 @@ QUICKLOAD_LOAD_MEMBER(kc_state::quickload_cb)
 	uint16_t i;
 
 	/* get file size */
-	uint64_t size = image.length();
+	uint64_t const size = image.length();
 
 	if (size == 0)
 		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
-	std::vector<uint8_t> data(size);
-	image.fread(&data[0], size);
+	std::unique_ptr<uint8_t []> data;
+	size_t actual;
+	std::error_condition const err = image.image_core_file().alloc_read(data, size, actual);
+	if (err || actual != size)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 	header = (struct kcc_header *) &data[0];
 	addr = (header->load_address_l & 0x0ff) | ((header->load_address_h & 0x0ff)<<8);

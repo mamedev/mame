@@ -404,11 +404,15 @@ SNAPSHOT_LOAD_MEMBER(z1013_state::snapshot_cb)
 0020 up   - Program to load
 */
 
-	if (image.length() < 0x20)
+	size_t const size = image.length();
+	if (size < 0x20)
 		return std::make_pair(image_error::INVALIDIMAGE, "File too short to contain Z1013 image header");
 
-	std::vector<uint8_t> data(image.length());
-	image.fread(&data[0], image.length());
+	std::unique_ptr<uint8_t []> data;
+	size_t actual;
+	std::error_condition const err = image.image_core_file().alloc_read(data, size, actual);
+	if (err || actual != size)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 	if ((data[13] != data[14]) || (data[14] != data[15]))
 		return std::make_pair(image_error::INVALIDIMAGE, "Not a Z1013 image");
 
@@ -421,7 +425,7 @@ SNAPSHOT_LOAD_MEMBER(z1013_state::snapshot_cb)
 				image_error::INVALIDIMAGE,
 				util::string_format("End address 0x%04X is less than start address 0x%04X", endaddr, startaddr));
 	}
-	else if ((endaddr - startaddr + 1) > (data.size() - 0x20))
+	else if ((endaddr - startaddr + 1) > (size - 0x20))
 	{
 		return std::make_pair(
 				image_error::INVALIDIMAGE,

@@ -251,8 +251,11 @@ SNAPSHOT_LOAD_MEMBER(poly88_state::snapshot_cb)
 	int i = 0;
 	int theend = 0;
 
-	std::vector<uint8_t> data(snapshot_size);
-	image.fread(&data[0], snapshot_size);
+	std::unique_ptr<uint8_t []> data;
+	size_t actual;
+	const std::error_condition err = image.image_core_file().alloc_read(data, snapshot_size, actual);
+	if (err || actual != snapshot_size)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 	while (pos<snapshot_size) {
 		for(i=0;i<9;i++) {

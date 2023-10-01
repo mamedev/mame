@@ -285,14 +285,15 @@ GFXDECODE_END
 // quickloads can start from various addresses, and the files have no header.
 QUICKLOAD_LOAD_MEMBER(phunsy_state::quickload_cb)
 {
-	int const quick_length = image.length();
+	size_t const quick_length = image.length();
 	if (quick_length > 0x4000)
 		return std::make_pair(image_error::INVALIDLENGTH, "File too long (must be no larger than 16K)");
 
-	std::vector<uint8_t> quick_data;
-	quick_data.resize(quick_length);
-	if (image.fread(&quick_data[0], quick_length) != quick_length)
-		return std::make_pair(image_error::UNSPECIFIED, "Cannot read the file");
+	std::unique_ptr<uint8_t []> quick_data;
+	size_t actual;
+	std::error_condition const err = image.image_core_file().alloc_read(quick_data, quick_length, actual);
+	if (err || actual != quick_length)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 	constexpr uint16_t QUICK_ADDR = 0x1800;
 	constexpr uint16_t EXEC_ADDR = QUICK_ADDR + 2;

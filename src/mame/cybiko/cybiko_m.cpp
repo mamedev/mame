@@ -53,8 +53,12 @@ QUICKLOAD_LOAD_MEMBER(cybiko_state::quickload_cybikoxt)
 	address_space &dest = m_maincpu->space(AS_PROGRAM);
 	uint32_t size = std::min(image.length(), uint64_t(RAMDISK_SIZE));
 
-	std::vector<uint8_t> buffer(size);
-	image.fread(&buffer[0], size);
+	std::unique_ptr<uint8_t []> buffer;
+	size_t actual;
+	std::error_condition const err = image.image_core_file().alloc_read(buffer, size, actual);
+	if (err || actual != size)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
+
 	for (int byte = 0; byte < size; byte++)
 		dest.write_byte(0x400000 + byte, buffer[byte]);
 

@@ -163,9 +163,12 @@ QUICKLOAD_LOAD_MEMBER(lynx_state::quickload_cb)
 	uint16_t const start = header[3] | (header[2]<<8); //! big endian format in file format for little endian cpu
 	uint16_t const length = (header[5] | (header[4]<<8)) - 10;
 
-	std::vector<u8> data;
-	data.resize(length);
-	if (image.fread(&data[0], length) != length)
+	std::unique_ptr<u8 []> data;
+	size_t actual;
+	std::error_condition const error = image.image_core_file().alloc_read(data, length, actual);
+	if (error)
+		return std::make_pair(error, std::string());
+	if (actual != length)
 		return std::make_pair(image_error::INVALIDIMAGE, "Invalid length in file header");
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);

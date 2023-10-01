@@ -208,8 +208,11 @@ SNAPSHOT_LOAD_MEMBER(galaxy_state::snapshot_cb)
 					util::string_format("Unsupported image size (must be %u or %u bytes)", GALAXY_SNAPSHOT_V1_SIZE, GALAXY_SNAPSHOT_V2_SIZE));
 	}
 
-	std::vector<uint8_t> snapshot_data(snapshot_size);
-	image.fread(&snapshot_data[0], snapshot_size);
+	std::unique_ptr<uint8_t []> snapshot_data;
+	size_t actual;
+	std::error_condition const err = image.image_core_file().alloc_read(snapshot_data, snapshot_size, actual);
+	if (err || actual == snapshot_size)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 	setup_snapshot(&snapshot_data[0], snapshot_size);
 

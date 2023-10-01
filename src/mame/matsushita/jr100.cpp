@@ -337,34 +337,34 @@ uint32_t jr100_state::readByLittleEndian(uint8_t *buf,int pos)
 QUICKLOAD_LOAD_MEMBER(jr100_state::quickload_cb)
 {
 	int quick_length;
-	uint8_t buf[0x10000];
-	int read_;
+	std::unique_ptr<uint8_t []> buf;
 	quick_length = image.length();
 	if (quick_length >= 0xffff)
 		return std::make_pair(image_error::INVALIDLENGTH, std::string());
-	read_ = image.fread(buf, quick_length);
-	if (read_ != quick_length)
-		return std::make_pair(image_error::UNSPECIFIED, std::string());
+	size_t actual;
+	std::error_condition const err = image.image_core_file().alloc_read(buf, 0x10000, actual);
+	if (err || actual != quick_length)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 	if (buf[0]!=0x50 || buf[1]!=0x52 || buf[2]!=0x4F || buf[3]!=0x47)
 		// this is not PRG
 		return std::make_pair(image_error::INVALIDIMAGE, std::string());
 
 	int pos = 4;
-	if (readByLittleEndian(buf,pos)!=1)
+	if (readByLittleEndian(buf.get(),pos)!=1)
 		// not version 1 of PRG file
 		return std::make_pair(image_error::INVALIDIMAGE, std::string());
 
 	pos += 4;
-	uint32_t len =readByLittleEndian(buf,pos); pos+= 4;
+	uint32_t len =readByLittleEndian(buf.get(),pos); pos+= 4;
 	pos += len; // skip name
-	uint32_t start_address = readByLittleEndian(buf,pos); pos+= 4;
-	uint32_t code_length   = readByLittleEndian(buf,pos); pos+= 4;
-	uint32_t flag          = readByLittleEndian(buf,pos); pos+= 4;
+	uint32_t start_address = readByLittleEndian(buf.get(),pos); pos+= 4;
+	uint32_t code_length   = readByLittleEndian(buf.get(),pos); pos+= 4;
+	uint32_t flag          = readByLittleEndian(buf.get(),pos); pos+= 4;
 
 	uint32_t end_address = start_address + code_length - 1;
 	// copy code
-	memcpy(m_ram + start_address,buf + pos,code_length);
+	memcpy(m_ram + start_address,buf.get() + pos,code_length);
 	if (flag == 0)
 	{
 		m_ram[end_address + 1] =  0xdf;

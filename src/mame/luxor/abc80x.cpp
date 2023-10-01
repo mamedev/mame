@@ -1969,9 +1969,12 @@ QUICKLOAD_LOAD_MEMBER(abc800_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	size_t quickload_size = image.length();
-	std::vector<uint8_t> data(quickload_size);
-	image.fread(&data[0], quickload_size);
+	const size_t quickload_size = image.length();
+	std::unique_ptr<uint8_t []> data;
+	size_t actual;
+	const std::error_condition err = image.image_core_file().alloc_read(data, quickload_size, actual);
+	if (err || actual != quickload_size)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 	uint8_t prstat = data[2];
 	uint16_t prgsz = (data[5] << 8) | data[4];

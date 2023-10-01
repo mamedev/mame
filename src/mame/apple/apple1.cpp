@@ -189,9 +189,11 @@ SNAPSHOT_LOAD_MEMBER(apple1_state::snapshot_cb)
 	if ((snapsize - 12) > 65535)
 		return std::make_pair(image_error::INVALIDLENGTH, "Snapshot is too long");
 
-	auto data = std::make_unique<uint8_t []>(snapsize);
-	if (image.fread(data.get(), snapsize) != snapsize)
-		return std::make_pair(image_error::UNSPECIFIED, "Internal error loading snapshot");
+	std::unique_ptr<uint8_t []> data;
+	size_t actual;
+	std::error_condition const err = image.image_core_file().alloc_read(data, snapsize, actual);
+	if (err || actual != snapsize)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 	if ((memcmp(hd1, &data[0], 5)) || (memcmp(hd2, &data[7], 5)))
 		return std::make_pair(image_error::INVALIDIMAGE, "Snapshot is invalid");

@@ -96,9 +96,10 @@ bool ccvf_format::load(util::random_read &io, uint32_t form_factor, const std::v
 	if (io.length(size))
 		return false;
 
-	std::vector<uint8_t> img(size);
+	std::unique_ptr<uint8_t []> img;
 	size_t actual;
-	io.read_at(0, &img[0], size, actual);
+	if (io.alloc_read_at(0, img, size, actual) || actual != size)
+		return false;
 
 	std::string ccvf = std::string((const char *)&img[0], size);
 	std::vector<uint8_t> bytes(78720);

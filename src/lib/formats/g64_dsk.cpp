@@ -51,9 +51,10 @@ bool g64_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	if (io.length(size))
 		return false;
 
-	std::vector<uint8_t> img(size);
+	std::unique_ptr<uint8_t []> img;
 	size_t actual;
-	io.read_at(0, &img[0], size, actual);
+	if (io.alloc_read_at(0, img, size, actual) || actual != size)
+		return false;
 
 	if (img[POS_VERSION])
 	{

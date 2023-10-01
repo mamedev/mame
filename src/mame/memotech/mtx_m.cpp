@@ -426,9 +426,11 @@ SNAPSHOT_LOAD_MEMBER(mtx_state::snapshot_cb)
 	if (length >= 0x10000 - 0x4000 + 18)
 		return std::make_pair(image_error::INVALIDLENGTH, "File too long (must be at no more than 48K data)");
 
-	auto data = std::make_unique<uint8_t []>(length);
-	if (image.fread(data.get(), length) != length)
-		return std::make_pair(image_error::UNSPECIFIED, "Error reading file");
+	std::unique_ptr<uint8_t []> data;
+	size_t actual;
+	std::error_condition const err = image.image_core_file().alloc_read(data, length, actual);
+	if (err || actual != length)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 	// verify first byte
 	if (data[0] != 0xff)
@@ -481,9 +483,11 @@ QUICKLOAD_LOAD_MEMBER(mtx_state::quickload_cb)
 	else if (length >= 0x10000 - 0x4000 + 4)
 		return std::make_pair(image_error::INVALIDLENGTH, "File too long (must be at no more than 48K data)");
 
-	auto data = std::make_unique<uint8_t []>(length);
-	if (image.fread(data.get(), length) != length)
-		return std::make_pair(image_error::UNSPECIFIED, "Error reading file");
+	std::unique_ptr<uint8_t []> data;
+	size_t actual;
+	std::error_condition const err = image.image_core_file().alloc_read(data, length, actual);
+	if (err || actual != length)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 	uint16_t const code_base = get_u16le(&data[0]);
 	uint16_t const code_length = get_u16le(&data[2]);

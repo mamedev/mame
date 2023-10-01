@@ -111,9 +111,10 @@ bool fsd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	uint64_t size;
 	if(io.length(size))
 		return false;
-	std::vector<uint8_t> img(size);
+	std::unique_ptr<uint8_t []> img;
 	size_t actual;
-	io.read_at(0, &img[0], size, actual);
+	if(io.alloc_read_at(0, img, size, actual) || actual != size)
+		return false;
 
 	uint64_t pos;
 	std::string title;

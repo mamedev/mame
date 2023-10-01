@@ -283,10 +283,13 @@ void primo_state::setup_pss (uint8_t* snapshot_data, uint32_t snapshot_size)
 
 SNAPSHOT_LOAD_MEMBER(primo_state::snapshot_cb)
 {
-	std::vector<uint8_t> snapshot_data(image.length());
+	size_t const size = image.length();
+	std::unique_ptr<uint8_t []> snapshot_data;
 
-	if (image.fread(&snapshot_data[0], image.length()) != image.length())
-		return std::make_pair(image_error::UNSPECIFIED, std::string());
+	size_t actual;
+	std::error_condition const err = image.image_core_file().alloc_read(snapshot_data, size, actual);
+	if (err || actual != size)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 	if (strncmp((char *)&snapshot_data[0], "PS01", 4))
 		return std::make_pair(image_error::INVALIDIMAGE, std::string());
@@ -319,14 +322,17 @@ void primo_state::setup_pp(uint8_t* quickload_data, uint32_t quickload_size)
 QUICKLOAD_LOAD_MEMBER(primo_state::quickload_cb)
 {
 	size_t const quickload_size = image.length();
-	std::vector<uint8_t> quickload_data(quickload_size);
+	std::unique_ptr<uint8_t []> quickload_data;
 
-	if (image.fread(&quickload_data[0], quickload_size) != quickload_size)
-		return std::make_pair(image_error::UNSPECIFIED, std::string());
+	std::size_t actual;
+	std::error_condition err = image.image_core_file().alloc_read(quickload_data, quickload_size, actual);
+	if (!err && actual != quickload_size)
+		err = std::errc::io_error;
 
-	setup_pp(&quickload_data[0], quickload_size);
+	if (!err)
+		setup_pp(&quickload_data[0], quickload_size);
 
-	return std::make_pair(std::error_condition(), std::string());
+	return std::make_pair(err, std::string());
 }
 
 u32 primo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

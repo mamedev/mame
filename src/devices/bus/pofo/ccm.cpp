@@ -70,15 +70,24 @@ void portfolio_memory_card_slot_device::device_start()
 
 std::pair<std::error_condition, std::string> portfolio_memory_card_slot_device::call_load()
 {
+	std::error_condition err;
+
 	if (m_card)
 	{
 		if (!loaded_through_softlist())
-			fread(m_card->m_rom, length());
+		{
+			size_t const size = length();
+
+			size_t actual;
+			err = image_core_file().alloc_read(m_card->m_rom, size, actual);
+			if (!err && actual != size)
+				err = std::errc::io_error;
+		}
 		else
 			load_software_region("rom", m_card->m_rom);
 	}
 
-	return std::make_pair(std::error_condition(), std::string());
+	return std::make_pair(err, std::string());
 }
 
 

@@ -132,6 +132,7 @@ static const char *o2_get_slot(int type)
 
 std::pair<std::error_condition, std::string> o2_cart_slot_device::call_load()
 {
+	std::error_condition err = image_error::UNSPECIFIED;
 	if (m_cart)
 	{
 		if (loaded_through_softlist())
@@ -153,14 +154,20 @@ std::pair<std::error_condition, std::string> o2_cart_slot_device::call_load()
 		else
 		{
 			u32 const size = length();
-			fread(m_cart->m_rom, size);
 
-			m_cart->m_rom_size = size;
-			m_cart->m_exrom_size = 0;
-			m_cart->m_voice_size = 0;
-			m_b = 0;
+			size_t actual;
+			err = image_core_file().alloc_read(m_cart->m_rom, size, actual);
+			if (!err && actual != size)
+				err = std::errc::io_error;
+			else
+			{
+				m_cart->m_rom_size = size;
+				m_cart->m_exrom_size = 0;
+				m_cart->m_voice_size = 0;
+				m_b = 0;
 
-			m_type = (size == 0x4000) ? O2_RALLY : O2_STD;
+				m_type = (size == 0x4000) ? O2_RALLY : O2_STD;
+			}
 		}
 
 		if (m_cart->get_rom_size() > 0)
@@ -170,7 +177,7 @@ std::pair<std::error_condition, std::string> o2_cart_slot_device::call_load()
 		}
 	}
 
-	return std::make_pair(image_error::UNSPECIFIED, std::string());
+	return std::make_pair(err, std::string());
 }
 
 

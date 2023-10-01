@@ -1199,8 +1199,11 @@ SNAPSHOT_LOAD_MEMBER(ti85_state::snapshot_cb)
 				util::string_format("Incorrect snapshot file length (expected %u bytes)", expected_snapshot_size));
 	}
 
-	std::vector<uint8_t> ti8x_snapshot_data(image.length());
-	image.fread(&ti8x_snapshot_data[0], image.length());
+	std::unique_ptr<uint8_t []> ti8x_snapshot_data;
+	size_t actual;
+	std::error_condition const err = image.image_core_file().alloc_read(ti8x_snapshot_data, expected_snapshot_size, actual);
+	if (err || actual != expected_snapshot_size)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 	if (!strncmp(machine().system().name, "ti85", 4))
 		ti85_setup_snapshot(&ti8x_snapshot_data[0]);

@@ -82,24 +82,34 @@ void vic10_expansion_slot_device::device_start()
 
 std::pair<std::error_condition, std::string> vic10_expansion_slot_device::call_load()
 {
+	std::error_condition err;
 	if (m_card)
 	{
 		if (!loaded_through_softlist())
 		{
+			util::core_file &file = image_core_file();
 			size_t const size = length();
 
 			if (is_filetype("80"))
 			{
-				fread(m_card->m_lorom, 0x2000);
+				size_t actual;
+				err = file.alloc_read(m_card->m_lorom, 0x2000, actual);
+				if (!err && actual != 0x2000)
+					err = std::errc::io_error;
 
-				if (size == 0x4000)
+				if (!err && size == 0x4000)
 				{
-					fread(m_card->m_uprom, 0x2000);
+					err = file.alloc_read(m_card->m_uprom, 0x2000, actual);
+					if (!err && actual != 0x2000)
+						err = std::errc::io_error;
 				}
 			}
 			else if (is_filetype("e0"))
 			{
-				fread(m_card->m_uprom, size);
+				size_t actual;
+				err = file.alloc_read(m_card->m_uprom, size, actual);
+				if (!err && actual != size)
+					err = std::errc::io_error;
 			}
 			else if (is_filetype("crt"))
 			{
@@ -108,7 +118,7 @@ std::pair<std::error_condition, std::string> vic10_expansion_slot_device::call_l
 				int exrom = 1;
 				int game = 1;
 
-				if (cbm_crt_read_header(image_core_file(), &roml_size, &romh_size, &exrom, &game))
+				if (cbm_crt_read_header(file, &roml_size, &romh_size, &exrom, &game))
 				{
 					uint8_t *roml = nullptr;
 					uint8_t *romh = nullptr;
@@ -119,7 +129,7 @@ std::pair<std::error_condition, std::string> vic10_expansion_slot_device::call_l
 					if (roml_size) roml = m_card->m_lorom.get();
 					if (romh_size) romh = m_card->m_lorom.get();
 
-					cbm_crt_read_data(image_core_file(), roml, romh);
+					cbm_crt_read_data(file, roml, romh);
 				}
 			}
 		}
@@ -131,7 +141,7 @@ std::pair<std::error_condition, std::string> vic10_expansion_slot_device::call_l
 		}
 	}
 
-	return std::make_pair(std::error_condition(), std::string());
+	return std::make_pair(err, std::string());
 }
 
 

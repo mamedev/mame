@@ -358,10 +358,11 @@ QUICKLOAD_LOAD_MEMBER(instruct_state::quickload_cb)
 	else if (quick_length > 0x8000)
 		return std::make_pair(image_error::INVALIDLENGTH, "File too long (must be no more than 32K)");
 
-	std::vector<uint8_t> quick_data(quick_length);
-	uint16_t read_ = image.fread(&quick_data[0], quick_length);
-	if (read_ != quick_length)
-		return std::make_pair(image_error::UNSPECIFIED, "Cannot read file");
+	std::unique_ptr<uint8_t []> quick_data;
+	size_t actual;
+	std::error_condition const err = image.image_core_file().alloc_read(quick_data, quick_length, actual);
+	if (err || actual != quick_length)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 	else if (quick_data[0] != 0xc5)
 		return std::make_pair(image_error::INVALIDIMAGE, "Invalid header");
 
@@ -374,7 +375,7 @@ QUICKLOAD_LOAD_MEMBER(instruct_state::quickload_cb)
 	}
 
 	// load to 0000-0FFE (standard ram + extra)
-	read_ = std::min<uint16_t>(quick_length, 0xfff);
+	uint16_t read_ = std::min<uint16_t>(quick_length, 0xfff);
 	m_p_ram[0] = 0x1f;  // add jump for RST key
 	for (uint16_t i = 1; i < read_; i++)
 		m_p_ram[i] = quick_data[i];

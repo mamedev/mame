@@ -655,8 +655,11 @@ std::pair<std::error_condition, std::string> base_sns_cart_slot_device::call_loa
 		if (!loaded_through_softlist())
 		{
 			uint32_t tmplen = length();
-			std::vector<uint8_t> tmpROM(tmplen);
-			fread(&tmpROM[0], tmplen);
+			std::unique_ptr<uint8_t []> tmpROM;
+			size_t actual;
+			std::error_condition const err = image_core_file().alloc_read(tmpROM, tmplen, actual);
+			if (err || actual != tmplen)
+				return std::make_pair(err ? err : std::errc::io_error, std::string());
 			offset = snes_skip_header(&tmpROM[0], tmplen);
 			fseek(offset, SEEK_SET);
 		}

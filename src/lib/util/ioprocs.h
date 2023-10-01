@@ -18,6 +18,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <memory>
+#include <new>
 #include <system_error>
 
 
@@ -57,6 +58,37 @@ public:
 	///   be less than or equal to the requested length.
 	/// \return An error condition if reading stopped due to an error.
 	virtual std::error_condition read(void *buffer, std::size_t length, std::size_t &actual) noexcept = 0;
+
+	/// \brief Allocate and read from the current position in the stream
+	///
+	/// Resets the supplied pointer to the specified number of bytes of
+	/// newly allocated memory and then reads up to that number of bytes
+	/// from the stream into that memory.  May read less than the
+	/// requested number of bytes if the end of the stream is reached or
+	/// an error occurs during either reading or allocation.  If the
+	/// stream supports seeking, reading starts at the current position
+	/// in the stream, and the current position is incremented by the
+	/// number of bytes read.
+	/// \param [out] ptr Reference to pointer to be allocated with the
+	///   requested number of bytes and used as a destination buffer.
+	///   Any previously allocated memory pointed to is destroyed.
+	/// \param [in] length Number of bytes to allocate and maximum
+	///   number of bytes to read.
+	/// \param [out] actual Number of bytes actually read.  Will always
+	///   be less than or equal to the requested length.
+	/// \return An error condition if reading stopped due to an error
+	///   or if memory allocation failed.
+	std::error_condition alloc_read(std::unique_ptr<std::uint8_t []> &ptr, std::size_t length, std::size_t &actual) noexcept
+	{
+		ptr.reset(new (std::nothrow) std::uint8_t [length]);
+		if (ptr)
+			return read(ptr.get(), length, actual);
+		else
+		{
+			actual = 0;
+			return std::errc::not_enough_memory;
+		}
+	}
 };
 
 
@@ -185,6 +217,37 @@ public:
 	/// \return An error condition if seeking failed or reading stopped
 	///   due to an error.
 	virtual std::error_condition read_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept = 0;
+
+	/// \brief Allocate and read from specified position
+	///
+	/// Resets the supplied pointer to the specified number of bytes of
+	/// newly allocated memory and then reads up to the specified number of bytes into the supplied
+	/// buffer.  If seeking is supported, reading starts at the
+	/// specified position and the current position is unaffected.  May
+	/// read less than the requested number of bytes if the end of the
+	/// stream is encountered or an error occurs.
+	/// \param [in] offset The position to start reading from, specified
+	///   as a number of bytes from the beginning of the stream.
+	/// \param [out] ptr Reference to pointer to be allocated with the
+	///   requested number of bytes and used as a destination buffer.
+	///   Any previously allocated memory pointed to is destroyed.
+	/// \param [in] length Number of bytes to allocate and maximum
+	///   number of bytes to read.
+	/// \param [out] actual Number of bytes actually read.  Will always
+	///   be less than or equal to the requested length.
+	/// \return An error condition if seeking failed or reading stopped
+	///   due to an error or if memory allocation failed.
+	std::error_condition alloc_read_at(std::uint64_t offset, std::unique_ptr<std::uint8_t []> &ptr, std::size_t length, std::size_t &actual) noexcept
+	{
+		ptr.reset(new (std::nothrow) std::uint8_t [length]);
+		if (ptr)
+			return read_at(offset, ptr.get(), length, actual);
+		else
+		{
+			actual = 0;
+			return std::errc::not_enough_memory;
+		}
+	}
 };
 
 

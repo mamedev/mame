@@ -477,13 +477,8 @@ private:
 		// read the chunk itself into an allocated memory buffer
 		if (length)
 		{
-			// allocate memory for this chunk
-			data.reset(new (std::nothrow) std::uint8_t [length]);
-			if (!data)
-				return std::errc::not_enough_memory;
-
-			// read the data from the file
-			err = fp.read(data.get(), length, actual);
+			// allocate memory and read the data from the file
+			err = fp.alloc_read(data, length, actual);
 			if (err)
 			{
 				data.reset();

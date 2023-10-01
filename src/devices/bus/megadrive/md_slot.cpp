@@ -458,10 +458,16 @@ std::error_condition base_md_cart_slot_device::load_nonlist()
 	unsigned char *ROM;
 	bool is_smd, is_md;
 	uint32_t tmplen = length(), offset, len;
-	std::vector<uint8_t> tmpROM(tmplen);
+
+	std::unique_ptr<uint8_t []> tmpROM;
 
 	// STEP 1: store a (possibly headered) copy of the file and determine its type (SMD? MD? BIN?)
-	fread(&tmpROM[0], tmplen);
+	size_t actual;
+	std::error_condition const err = image_core_file().alloc_read(tmpROM, tmplen, actual);
+	if (err)
+		return err;
+	else if (actual != tmplen)
+		return std::errc::io_error;
 	is_smd = genesis_is_SMD(&tmpROM[0x200], tmplen - 0x200);
 	is_md = (tmpROM[0x80] == 'E') && (tmpROM[0x81] == 'A') && (tmpROM[0x82] == 'M' || tmpROM[0x82] == 'G');
 

@@ -157,9 +157,10 @@ bool oric_jasmin_format::load(util::random_read &io, uint32_t form_factor, const
 
 	int const heads = size == 41*17*256 ? 1 : 2;
 
-	std::vector<uint8_t> data(size);
+	std::unique_ptr<uint8_t []> data;
 	size_t actual;
-	io.read_at(0, data.data(), size, actual);
+	if(io.alloc_read_at(0, data, size, actual) || actual != size)
+		return false;
 
 	for(int head = 0; head != heads; head++)
 		for(int track = 0; track != 41; track++) {
@@ -171,7 +172,7 @@ bool oric_jasmin_format::load(util::random_read &io, uint32_t form_factor, const
 				sdesc[s].sector = sector + 1;
 				sdesc[s].size = 1;
 				sdesc[s].actual_size = 256;
-				sdesc[s].data = data.data() + 256 * (sector + track*17 + head*17*41);
+				sdesc[s].data = data.get() + 256 * (sector + track*17 + head*17*41);
 				sdesc[s].deleted = false;
 				sdesc[s].bad_crc = false;
 			}

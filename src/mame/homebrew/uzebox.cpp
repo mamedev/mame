@@ -259,8 +259,11 @@ DEVICE_IMAGE_LOAD_MEMBER(uzebox_state::cart_load)
 
 	if (!image.loaded_through_softlist())
 	{
-		std::vector<uint8_t> data(size);
-		image.fread(&data[0], size);
+		std::unique_ptr<uint8_t []> data;
+		size_t actual;
+		std::error_condition const err = image.image_core_file().alloc_read(data, size, actual);
+		if (err || actual != size)
+			return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 		if (image.is_filetype("uze"))
 			memcpy(m_cart->get_rom_base(), &data[0x200], size - 0x200);

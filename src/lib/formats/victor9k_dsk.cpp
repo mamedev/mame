@@ -303,12 +303,10 @@ bool victor9k_format::load(util::random_read &io, uint32_t form_factor, const st
 	if(io.length(size))
 		return false;
 
-	std::vector<uint8_t> img;
-	try { img.resize(size); }
-	catch (...) { return false; }
-
+	std::unique_ptr<uint8_t []> img;
 	size_t actual;
-	io.read_at(0, &img[0], size, actual);
+	if(io.alloc_read_at(0, img, size, actual) || actual != size)
+		return false;
 
 	log_boot_sector(&img[0]);
 

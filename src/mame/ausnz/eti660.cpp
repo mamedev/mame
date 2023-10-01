@@ -317,11 +317,11 @@ void eti660_state::machine_start()
 QUICKLOAD_LOAD_MEMBER(eti660_state::quickload_cb)
 {
 	int const quick_length = image.length();
-	std::vector<u8> quick_data;
-	quick_data.resize(quick_length);
-	int const read_ = image.fread( &quick_data[0], quick_length);
-	if (read_ != quick_length)
-		return std::make_pair(image_error::INVALIDIMAGE, "Cannot read the file");
+	std::unique_ptr<u8 []> quick_data;
+	size_t actual;
+	std::error_condition const err = image.image_core_file().alloc_read(quick_data, quick_length, actual);
+	if (err || actual != quick_length)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 	constexpr int QUICK_ADDR = 0x600;
 	address_space &space = m_maincpu->space(AS_PROGRAM);

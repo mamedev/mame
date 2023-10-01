@@ -398,11 +398,11 @@ void vc4000_state::machine_start()
 QUICKLOAD_LOAD_MEMBER(vc4000_state::quickload_cb)
 {
 	int const quick_length = image.length();
-	std::vector<uint8_t> quick_data;
-	quick_data.resize(quick_length);
-	int read_ = image.fread( &quick_data[0], quick_length);
-	if (read_ != quick_length)
-		return std::make_pair(image_error::UNSPECIFIED, "Cannot read the file");
+	std::unique_ptr<uint8_t []> quick_data;
+	size_t actual;
+	std::error_condition const err = image.image_core_file().alloc_read(quick_data, quick_length, actual);
+	if (err || actual != quick_length)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -454,7 +454,7 @@ QUICKLOAD_LOAD_MEMBER(vc4000_state::quickload_cb)
 		space.write_byte(0x08bf, quick_data[2]);
 
 		// load to 08C0-15FF (standard ram + extra)
-		read_ = 0x1600;
+		int read_ = 0x1600;
 		if (quick_length < 0x1600)
 			read_ = quick_length;
 		for (int i = 0x8c0; i < read_; i++)

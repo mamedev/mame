@@ -392,20 +392,24 @@ void md_cons_state::init_md_jpn()
 DEVICE_IMAGE_LOAD_MEMBER( md_cons_state::_32x_cart )
 {
 	uint32_t length;
-	std::vector<uint8_t> temp_copy;
+	std::unique_ptr<uint8_t []> temp_copy;
 	uint16_t *ROM16;
 	uint32_t *ROM32;
 
 	if (!image.loaded_through_softlist())
 	{
 		length = image.length();
-		temp_copy.resize(length);
-		image.fread(&temp_copy[0], length);
+		size_t actual;
+		std::error_condition const err = image.image_core_file().alloc_read(temp_copy, length, actual);
+		if (err || actual != length)
+			return std::make_pair(err ? err : std::errc::io_error, std::string());
 	}
 	else
 	{
 		length = image.get_software_region_length("rom");
-		temp_copy.resize(length);
+		temp_copy.reset(new (std::nothrow) uint8_t [length]);
+		if (!temp_copy)
+			return std::make_pair(std::errc::not_enough_memory, std::string());
 		memcpy(&temp_copy[0], image.get_software_region("rom"), length);
 	}
 

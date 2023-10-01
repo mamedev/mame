@@ -262,10 +262,11 @@ QUICKLOAD_LOAD_MEMBER(cd2650_state::quickload_cb)
 	else if (quick_length > 0x8000)
 		return std::make_pair(image_error::INVALIDLENGTH, "Image file too long (must be no more than 32K)");
 
-	std::vector<u8> quick_data(quick_length);
-	int read_ = image.fread( &quick_data[0], quick_length);
-	if (read_ != quick_length)
-		return std::make_pair(image_error::UNSPECIFIED, "Cannot read the file");
+	std::unique_ptr<u8 []> quick_data;
+	size_t actual;
+	std::error_condition const err = image.image_core_file().alloc_read(quick_data, quick_length, actual);
+	if (err || actual != quick_length)
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 	else if (quick_data[0] != 0x40)
 		return std::make_pair(image_error::INVALIDIMAGE, "Invalid file header");
 
@@ -278,7 +279,7 @@ QUICKLOAD_LOAD_MEMBER(cd2650_state::quickload_cb)
 	}
 
 	// do not overwite system area (17E0-17FF) otherwise chess3 has problems
-	read_ = std::min<int>(0x17e0, quick_length);
+	int const read_ = std::min<int>(0x17e0, quick_length);
 
 	for (int i = 0x1500; i < read_; i++)
 		m_p_videoram[i-0x1000] = quick_data[i];

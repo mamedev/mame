@@ -1049,12 +1049,10 @@ bool a2_edd_format::load(util::random_read &io, uint32_t form_factor, const std:
 	uint8_t nibble[16384], stream[16384];
 	int npos[16384];
 
-	std::unique_ptr<uint8_t []> img(new (std::nothrow) uint8_t[2244608]);
-	if (!img)
-		return false;
-
+	std::unique_ptr<uint8_t []> img;
 	size_t actual;
-	io.read_at(0, img.get(), 2244608, actual);
+	if (io.alloc_read_at(0, img, 2244608, actual))
+		return false;
 
 	for(int i=0; i<137; i++) {
 		uint8_t const *const trk = &img[16384*i];
