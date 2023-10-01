@@ -794,7 +794,6 @@ void nmk16_state::tdragon_map(address_map &map)
 	map(0x044022, 0x044023).nopr();  // No Idea (ROM mirror? - does this even exist on originals?)
 
 	map(0x080000, 0x08ffff).mirror(0x030000).ram().share("mainram");
-	map(0x0f0000, 0x0fffff).ram().share("mainram");
 
 	map(0x0c0000, 0x0c0001).mirror(0x020000).portr("IN0");
 	map(0x0c0002, 0x0c0003).mirror(0x020000).portr("IN1");
@@ -6513,7 +6512,7 @@ ROM_START( tdragon1 )
 	ROM_LOAD16_BYTE( "thund.7",  0x00001, 0x20000, CRC(52192fe5) SHA1(9afef197410e7feb71dc48003e181fbbaf5c99b2) )
 
 	ROM_REGION( 0x04000, "protcpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "nmk-110-tdragon.bin", 0x00000, 0x4000, CRC(cf66a660) SHA1(a1d3346f7688e9bf5513194a2890a9a6aaf28742) ) // 910527 and "SLASH META" for game name string
+	ROM_LOAD( "nmk-110-tdragon.bin", 0x00000, 0x4000, CRC(cf66a660) SHA1(a1d3346f7688e9bf5513194a2890a9a6aaf28742) ) // 910527 and "SLASH META" for game name string (Slash Metal was an earlier name for the game, tiles still exist in ROM)
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
 	ROM_LOAD( "91070.6",        0x000000, 0x20000, CRC(fe365920) SHA1(7581931cb95cd5a8ed40e4f5385b533e3d19af22) )   // 8x8 tiles
