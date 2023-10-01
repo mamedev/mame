@@ -4643,6 +4643,25 @@ u8 tdragon_prot_state::mcu_port7_r()
 	// This happens in various places in the code, with 5 different possible startup programs, and
 	// a variety of other table data elsewhere in the code
 	// TODO: test NMK113 with other games (jalmah.cpp?) and different reads from port 7 on them
+
+	// Known configurations
+	// 0x00 - unknown
+	// 0x01 - unknown
+	// 0x02 - unknown
+	// 0x03 - unknown
+	// 0x04 - unknown
+	// 0x05 - unknown
+	// 0x06 - unknown
+	// 0x07 - unknown
+	// 0x08 - unknown
+	// 0x09 - unknown
+	// 0x0a - unknown
+	// 0x0b - unknown
+	// 0x0c - Hacha Mecha Fighter
+	// 0x0d - unknown
+	// 0x0e - unknown
+	// 0x0f - Thunder Dragon (but we use the single game 110 found on a Thunder Dragon PCB)
+
 	return 0x0c;
 }
 
