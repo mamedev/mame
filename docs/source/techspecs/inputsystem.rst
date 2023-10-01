@@ -114,13 +114,13 @@ fields:
   and neutral positions.  They are used for analog joystick axes,
   displacement-sensitive pedals, paddle knobs, and other emulated inputs
   with a defined range.
-* **Relative analog fields** have a range with a defined minimum,
-  maximum and starting positions.  On each update, the value
-  accumulates and wraps when it passes either end of the range.
-  Functionally, this is like the output of an up/down counter connected
-  to an incremental encoder.  They are used for mouse/trackball axes,
-  steering wheels without limit stops, and other emulated inputs that
-  have no range limits.
+* **Relative analog fields** have a range with defined minimum, maximum
+  and starting positions.  On each update, the value accumulates and
+  wraps when it passes either end of the range.  Functionally, this is
+  like the output of an up/down counter connected to an incremental
+  encoder.  They are used for mouse/trackball axes, steering wheels
+  without limit stops, and other emulated inputs that have no range
+  limits.
 * DIP switch, configuration and adjuster fields allow the user to set
   the value through MAME’s user interface.
 * Additional special field types are used to produce fixed or
