@@ -17324,7 +17324,7 @@ SYST( 1980, arrball,    0,         0,      arrball,   arrball,   arrball_state, 
 
 SYST( 1980, mathmagi,   0,         0,      mathmagi,  mathmagi,  mathmagi_state,  empty_init, "APF Electronics Inc.", "Mathemagician", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-SYST( 1979, bcheetah,   0,         0,      bcheetah,  bcheetah,  bcheetah_state,  empty_init, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL ) // ***
+SYST( 1979, bcheetah,   0,         0,      bcheetah,  bcheetah,  bcheetah_state,  empty_init, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL | MACHINE_CLICKABLE_ARTWORK ) // ***
 SYST( 1980, racetime,   0,         0,      racetime,  racetime,  racetime_state,  empty_init, "Bandai", "Race Time", MACHINE_SUPPORTS_SAVE )
 SYST( 1981, tc7atc,     0,         0,      tc7atc,    tc7atc,    tc7atc_state,    empty_init, "Bandai", "TC7: Air Traffic Control", MACHINE_SUPPORTS_SAVE )
 SYST( 1982, uboat,      0,         0,      uboat,     uboat,     uboat_state,     empty_init, "Bandai", "U-Boat", MACHINE_SUPPORTS_SAVE )
