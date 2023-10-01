@@ -184,7 +184,7 @@ model name), feel free to use a parameter.  Otherwise derive the
 class.
 
 Dynamic configuration must be done by first defining a nested public
-struct called "config" in the disassembler, with virtual destructor
+struct called ``config`` in the disassembler, with virtual destructor
 and pure virtual methods to pull the required information.  A pointer
 to that struct should be passed to the disassembler constructor.  The
 cpu core should then add a derivation from that config struct and
@@ -195,7 +195,7 @@ the config class to give the information.
 ----------------
 
 There currently is no way for the debugger GUI to add per-core
-configuration.  It is particularly needed for the s2650 and Saturn
+configuration.  In particular, it is needed for the s2650 and Saturn
 cores. It should go through the cpu core class itself, since it's
 pulled from the config struct.
 
