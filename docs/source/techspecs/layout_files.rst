@@ -396,7 +396,7 @@ Elements
 ~~~~~~~~
 
 Elements are one of the basic visual objects that may be arranged, along with
-screens, to make up a view. Elements may be built up by one or more *components*,
+screens, to make up a view. Elements may be built up of one or more *components*,
 but an element is treated as a single surface when building the scene graph
 and rendering.  An element may be used in multiple views, and may be used
 multiple times within a view.
