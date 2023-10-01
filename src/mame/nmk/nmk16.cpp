@@ -58,8 +58,6 @@ TODO:
 
 - Protection is patched in several games.
 
-- Hacha Mecha Fighter: mcu simulation is wrong/incorrect (see notes).
-
 - In Bioship, there's an occasional flicker of one of the sprites composing big
   ships. Increasing CPU speed from 12 to 16 MHz improved it, but it's still not
   100% fixed. (the CPU speed has been verified to be 10Mhz??)
@@ -6479,7 +6477,7 @@ ROM_START( blkheartj )
 ROM_END
 
 ROM_START( tdragon )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code -bitswapped-
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "91070_68k.8",  0x00000, 0x20000, CRC(121c3ae7) SHA1(b88446df3b177d40e0b59a481f8e4de212e3afbc) )
 	ROM_LOAD16_BYTE( "91070_68k.7",  0x00001, 0x20000, CRC(6e154d8e) SHA1(29baea24d670ab63149efe281de25cca15b7b863) )
 
@@ -6507,7 +6505,7 @@ ROM_START( tdragon )
 ROM_END
 
 ROM_START( tdragon1 )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code -bitswapped-
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "thund.8",  0x00000, 0x20000, CRC(edd02831) SHA1(d6bc8d2c37707768a8bf666090f33eea12dda336) )
 	ROM_LOAD16_BYTE( "thund.7",  0x00001, 0x20000, CRC(52192fe5) SHA1(9afef197410e7feb71dc48003e181fbbaf5c99b2) )
 
