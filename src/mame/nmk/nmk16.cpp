@@ -4659,7 +4659,7 @@ u8 tdragon_prot_state::mcu_port7_r()
 	// 0x0b - unknown
 	// 0x0c - Hacha Mecha Fighter
 	// 0x0d - unknown
-	// 0x0e - unknown
+	// 0x0e - Double Dealer (but we use the single game 110 found on a Double Dealer PCB)
 	// 0x0f - Thunder Dragon (but we use the single game 110 found on a Thunder Dragon PCB)
 
 	return 0x0c;
