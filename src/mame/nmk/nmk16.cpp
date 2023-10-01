@@ -213,6 +213,8 @@ Reference of music tempo:
 #include "screen.h"
 #include "speaker.h"
 
+#define VERBOSE     0
+#include "logmacro.h"
 
 void nmk16_state::nmk004_x0016_w(u16 data)
 {
@@ -286,7 +288,7 @@ void nmk16_state::ssmissin_soundbank_w(u8 data)
 
 void nmk16_state::tharrier_mcu_control_w(u16 data)
 {
-//  logerror("%04x: mcu_control_w %02x\n",m_maincpu->pc(),data);
+//  LOG("%04x: mcu_control_w %02x\n",m_maincpu->pc(),data);
 }
 
 u16 nmk16_state::tharrier_mcu_r(offs_t offset, u16 mem_mask)
@@ -4425,17 +4427,17 @@ void tdragon_prot_state::mcu_port6_w(u8 data)
 	// start and end of the take / release bus function
 	if (data == 0x08)
 	{
-		logerror("%s: mcu_port6_w 68k bus taken, 68k stopped (data %02x)\n", machine().describe_context(), data);
+		LOG("%s: mcu_port6_w 68k bus taken, 68k stopped (data %02x)\n", machine().describe_context(), data);
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	else if (data == 0xb)
 	{
-		logerror("%s: mcu_port6_w 68k bus returned, 68k started (data %02x)\n", machine().describe_context(), data);
+		LOG("%s: mcu_port6_w 68k bus returned, 68k started (data %02x)\n", machine().describe_context(), data);
 		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 	else
 	{
-		logerror("%s: mcu_port6_w 68k bus access (data %02x)\n", machine().describe_context(), data);
+		LOG("%s: mcu_port6_w 68k bus access (data %02x)\n", machine().describe_context(), data);
 	}
 }
 
@@ -4447,7 +4449,8 @@ u8 tdragon_prot_state::mcu_port5_r()
 u8 tdragon_prot_state::mcu_port6_r()
 {
 	// again this is simplified for now
-	m_bus_status ^= 0x04;
+	if (!machine().side_effects_disabled())
+		m_bus_status ^= 0x04;
 	return m_bus_status;
 }
 
@@ -4463,17 +4466,14 @@ void tdragon_prot_state::machine_reset()
 
 void tdragon_prot_state::mcu_side_shared_w(offs_t offset, u8 data)
 {
-	logerror("%s: mcu_side_shared_w offset %08x (data %02x)\n", machine().describe_context(), offset, data);
-
+	LOG("%s: mcu_side_shared_w offset %08x (data %02x)\n", machine().describe_context(), offset, data);
 	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
 u8 tdragon_prot_state::mcu_side_shared_r(offs_t offset)
 {
 	u8 retval = m_maincpu->space(AS_PROGRAM).read_byte((offset));
-
-	logerror("%s: mcu_side_shared_r offset %08x (retdata %02x)\n", machine().describe_context(), offset, retval);
-
+	LOG("%s: mcu_side_shared_r offset %08x (retval %02x)\n", machine().describe_context(), offset, retval);
 	return retval;
 }
 
@@ -4487,7 +4487,7 @@ void tdragon_prot_state::tdragon_prot(machine_config &config)
 {
 	tdragon(config);
 
-	TMP91640(config, m_protcpu, 8000000); // Toshiba TMP91640 marked as NMK-110, with 16Kbyte internal ROM, 512bytes internal RAM
+	TMP91640(config, m_protcpu, 4000000); // Toshiba TMP91640 marked as NMK-110, with 16Kbyte internal ROM, 512bytes internal RAM
 	m_protcpu->set_addrmap(AS_PROGRAM, &tdragon_prot_state::tdragon_prot_map);
 	m_protcpu->port_write<6>().set(FUNC(tdragon_prot_state::mcu_port6_w));
 	m_protcpu->port_read<5>().set(FUNC(tdragon_prot_state::mcu_port5_r));
@@ -4650,7 +4650,7 @@ void tdragon_prot_state::hachamf_prot(machine_config &config)
 {
 	hachamf(config);
 
-	TMP91640(config, m_protcpu, 8000000); // Toshiba TMP91640 marked as NMK-113, with 16Kbyte internal ROM, 512bytes internal RAM
+	TMP91640(config, m_protcpu, 4000000); // Toshiba TMP91640 marked as NMK-113, with 16Kbyte internal ROM, 512bytes internal RAM
 	m_protcpu->set_addrmap(AS_PROGRAM, &tdragon_prot_state::tdragon_prot_map);
 	m_protcpu->port_write<6>().set(FUNC(tdragon_prot_state::mcu_port6_w));
 	m_protcpu->port_read<5>().set(FUNC(tdragon_prot_state::mcu_port5_r));

@@ -42,6 +42,8 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+#define VERBOSE     0
+#include "logmacro.h"
 
 namespace {
 
@@ -132,17 +134,17 @@ void ddealer_state::mcu_port6_w(u8 data)
 	// start and end of the take / release bus function
 	if (data == 0x08)
 	{
-		logerror("%s: mcu_port6_w 68k bus taken, 68k stopped (data %02x)\n", machine().describe_context(), data);
+		LOG("%s: mcu_port6_w 68k bus taken, 68k stopped (data %02x)\n", machine().describe_context(), data);
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	else if (data == 0xb)
 	{
-		logerror("%s: mcu_port6_w 68k bus returned, 68k started (data %02x)\n", machine().describe_context(), data);
+		LOG("%s: mcu_port6_w 68k bus returned, 68k started (data %02x)\n", machine().describe_context(), data);
 		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 	else
 	{
-		logerror("%s: mcu_port6_w 68k bus access (data %02x)\n", machine().describe_context(), data);
+		LOG("%s: mcu_port6_w 68k bus access (data %02x)\n", machine().describe_context(), data);
 	}
 }
 
@@ -154,7 +156,8 @@ u8 ddealer_state::mcu_port5_r()
 u8 ddealer_state::mcu_port6_r()
 {
 	// again this is simplified for now
-	m_bus_status ^= 0x04;
+	if (!machine().side_effects_disabled())
+		m_bus_status ^= 0x04;
 	return m_bus_status;
 }
 
@@ -428,7 +431,7 @@ void ddealer_state::ddealer(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(ddealer_state::irq4_line_hold));
 	m_maincpu->set_periodic_int(FUNC(ddealer_state::irq1_line_hold), attotime::from_hz(60)); //guess, controls music tempo, 112 is way too fast, 90 causes 2 player mode to be too slow
 
-	TMP91640(config, m_protcpu, XTAL(16'000'000)/2); // Toshiba TMP91640 marked as NMK-110, with 16Kbyte internal ROM, 512bytes internal RAM
+	TMP91640(config, m_protcpu, XTAL(16'000'000)/4); // Toshiba TMP91640 marked as NMK-110, with 16Kbyte internal ROM, 512bytes internal RAM
 	m_protcpu->set_addrmap(AS_PROGRAM, &ddealer_state::prot_map);
 	m_protcpu->port_write<6>().set(FUNC(ddealer_state::mcu_port6_w));
 	m_protcpu->port_read<5>().set(FUNC(ddealer_state::mcu_port5_r));
