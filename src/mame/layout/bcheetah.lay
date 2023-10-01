@@ -6,34 +6,107 @@ license:CC0-1.0
 
 <!-- define elements -->
 
-	<element name="text_l" defstate="0">
+	<element name="gray" defstate="0"><rect><color red="0.2" green="0.2" blue="0.2" /></rect></element>
+	<element name="nothing" defstate="0"><rect><color alpha="0" /></rect></element>
+
+	<element name="but" defstate="0">
+		<rect state="0"><color red="0.85" green="0.15" blue="0.15" /></rect>
+		<rect state="1"><color red="0.6" green="0.1" blue="0.1" /></rect>
+	</element>
+
+	<element name="switch1" defstate="0">
+		<text state="0x01" string="PRO"><color red="0.75" green="0.75" blue="0.75" /></text>
+		<text state="0x00" string="RUN"><color red="0.75" green="0.75" blue="0.75" /></text>
+	</element>
+
+	<element name="text_l0"><text string="GO"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+	<element name="text_l1"><text string="&lt;"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+	<element name="text_l2"><text string="&lt;"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+	<element name="text_l3"><text string="&gt;"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+	<element name="text_l4"><text string="STOP"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+	<element name="text_l5"><text string="1"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+	<element name="text_l6"><text string="2"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+	<element name="text_l7"><text string="3"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+	<element name="text_l8"><text string="4"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+
+	<element name="text_ml" defstate="0">
 		<text state="0" string="L"><color red="0.2" green="0.2" blue="0.2" /></text>
 		<text state="1" string="L"><color red="1.0" green="1.0" blue="1.0" /></text>
 	</element>
-	<element name="text_r" defstate="0">
+	<element name="text_mr" defstate="0">
 		<text state="0" string="R"><color red="0.2" green="0.2" blue="0.2" /></text>
 		<text state="1" string="R"><color red="1.0" green="1.0" blue="1.0" /></text>
 	</element>
-	<element name="text_drv" defstate="0">
+	<element name="text_mdrv" defstate="0">
 		<text state="0" string="DRV"><color red="0.2" green="0.2" blue="0.2" /></text>
 		<text state="1" string="DRV"><color red="1.0" green="1.0" blue="1.0" /></text>
 	</element>
 
-	<element name="text_m1"><text string="motor 1:"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_m2"><text string="motor 2:"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_m1"><text string="motor 1:" align="1"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+	<element name="text_m2"><text string="motor 2:" align="1"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+
+
+<!-- motor status -->
+
+	<group name="status">
+		<bounds x="0" y="0" width="5.5" height="3" />
+
+		<element ref="text_m2"><bounds x="0" y="0" width="4" height="1" /></element>
+		<element name="motor2_left" ref="text_ml"><bounds x="3.5" y="0" width="1" height="1" /></element>
+		<element name="motor2_right" ref="text_mr"><bounds x="4.5" y="0" width="1" height="1" /></element>
+
+		<element ref="text_m1"><bounds x="0" y="1.15" width="4" height="1" /></element>
+		<element name="motor1" ref="text_mdrv"><bounds x="3.5" y="1.15" width="2" height="1" /></element>
+	</group>
+
+
+<!-- button panel -->
+
+	<group name="buttons">
+		<bounds x="0" y="5" width="15" height="11" />
+
+		<!-- pro/run switch -->
+		<element ref="nothing" inputtag="IN.0" inputmask="0x00" inputraw="yes"><bounds x="2" y="5" width="2.9" height="1.1" /></element> <!-- block clickable input -->
+		<element ref="switch1" inputtag="IN.0" inputmask="0x02" inputraw="yes"><bounds x="2" y="5" width="2.9" height="1.1" /></element>
+		<element ref="gray" inputtag="IN.0" inputmask="0x02" inputraw="yes"><bounds x="2" y="6.2" width="2.9" height="2.2" /></element>
+
+		<!-- buttons -->
+		<element ref="but" inputtag="IN.1" inputmask="0x08"><bounds x="12" y="6.2" width="2.9" height="2.2" /></element>
+
+		<element ref="but" inputtag="IN.1" inputmask="0x01"><bounds x="0" y="10" width="2.9" height="2.2" /></element>
+		<element ref="but" inputtag="IN.1" inputmask="0x02"><bounds x="4" y="10" width="2.9" height="2.2" /></element>
+		<element ref="but" inputtag="IN.1" inputmask="0x04"><bounds x="8" y="10" width="2.9" height="2.2" /></element>
+		<element ref="but" inputtag="IN.2" inputmask="0x08"><bounds x="12" y="10" width="2.9" height="2.2" /></element>
+
+		<element ref="but" inputtag="IN.3" inputmask="0x02"><bounds x="0" y="13.8" width="2.9" height="2.2" /></element>
+		<element ref="but" inputtag="IN.3" inputmask="0x08"><bounds x="4" y="13.8" width="2.9" height="2.2" /></element>
+		<element ref="but" inputtag="IN.4" inputmask="0x02"><bounds x="8" y="13.8" width="2.9" height="2.2" /></element>
+		<element ref="but" inputtag="IN.4" inputmask="0x08"><bounds x="12" y="13.8" width="2.9" height="2.2" /></element>
+
+		<!-- labels -->
+		<element ref="text_l0"><bounds x="12" y="5" width="2.9" height="1.1" /></element>
+
+		<element ref="text_l1"><bounds x="0" y="8.8" width="2.9" height="1.1" /></element>
+		<element ref="text_l2"><bounds x="4.9" y="8.9" width="1.1" height="1.1" /><orientation rotate="90" /></element>
+		<element ref="text_l3"><bounds x="8" y="8.8" width="2.9" height="1.1" /></element>
+		<element ref="text_l4"><bounds x="12" y="8.8" width="2.9" height="1.1" /></element>
+
+		<element ref="text_l5"><bounds x="0" y="12.6" width="2.9" height="1.1" /></element>
+		<element ref="text_l6"><bounds x="4" y="12.6" width="2.9" height="1.1" /></element>
+		<element ref="text_l7"><bounds x="8" y="12.6" width="2.9" height="1.1" /></element>
+		<element ref="text_l8"><bounds x="12" y="12.6" width="2.9" height="1.1" /></element>
+	</group>
 
 
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="0" right="6.3" top="0" bottom="2.5" />
+		<bounds left="-1.1" right="16.1" top="1.5" bottom="22.6" />
 
-		<element ref="text_m2"><bounds x="0" y="0" width="4" height="1" /></element>
-		<element name="motor2_left" ref="text_l"><bounds x="4" y="0" width="1" height="1" /></element>
-		<element name="motor2_right" ref="text_r"><bounds x="5" y="0" width="1" height="1" /></element>
+		<group ref="status"><bounds x="0.1" y="2.6" width="15" height="8.18" /></group>
+		<group ref="buttons"><bounds x="0" y="10" width="15" height="11" /></group>
 
-		<element ref="text_m1"><bounds x="0" y="1.3" width="4" height="1" /></element>
-		<element name="motor1" ref="text_drv"><bounds x="4" y="1.3" width="2" height="1" /></element>
-
+		<element ref="gray"><bounds x="0" y="9.4" width="15" height="0.2" /></element>
 	</view>
+
 </mamelayout>

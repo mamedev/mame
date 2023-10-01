@@ -11,6 +11,7 @@
 #include "acorn_dsk.h"
 #include "imageutl.h"
 
+#include "coretmpl.h"
 #include "ioprocs.h"
 #include "multibyte.h"
 
@@ -42,10 +43,7 @@ int acorn_ssd_format::find_size(util::random_read &io, uint32_t form_factor, con
 	uint32_t sectors0, sectors2;
 	uint64_t size;
 	if (io.length(size))
-	{
-		LOG_FORMATS("ssd: error getting image size\n");
 		return -1;
-	}
 
 	for (int i=0; formats[i].form_factor; i++)
 	{
@@ -105,7 +103,6 @@ int acorn_ssd_format::find_size(util::random_read &io, uint32_t form_factor, con
 				return i;
 		}
 	}
-	LOG_FORMATS("ssd: no match\n");
 	return -1;
 }
 
@@ -121,10 +118,7 @@ int acorn_ssd_format::identify(util::random_read &io, uint32_t form_factor, cons
 
 int acorn_ssd_format::get_image_offset(const format &f, int head, int track) const
 {
-	if (f.sector_base_id == -1)
-		return (track * f.head_count + head) * compute_track_size(f);
-	else
-		return (f.track_count * head + track) * compute_track_size(f);
+	return (f.track_count * head + track) * compute_track_size(f);
 }
 
 const acorn_ssd_format::format acorn_ssd_format::formats[] =
@@ -147,23 +141,23 @@ const acorn_ssd_format::format acorn_ssd_format::formats[] =
 	},
 	{ // 100k 40 track single sided single density
 		floppy_image::FF_35, floppy_image::SSSD, floppy_image::FM,
-		4000, 10, 40, 1, 256,{}, 0,{}, 40, 10, 10
+		4000, 10, 40, 1, 256, {}, 0, {}, 40, 10, 10
 	},
 	{ // 200k 80 track single sided single density
 		floppy_image::FF_35, floppy_image::SSDD, floppy_image::FM,
-		4000, 10, 80, 1, 256,{}, 0,{}, 40, 10, 10
+		4000, 10, 80, 1, 256, {}, 0, {}, 40, 10, 10
 	},
 	{ // 200k 40 track double sided single density
 		floppy_image::FF_35, floppy_image::DSSD, floppy_image::FM,
-		4000, 10, 40, 2, 256,{}, 0,{}, 40, 10, 10
+		4000, 10, 40, 2, 256, {}, 0, {}, 40, 10, 10
 	},
 	{ // 400k 80 track double sided single density
 		floppy_image::FF_35, floppy_image::DSDD, floppy_image::FM,
-		4000, 10, 80, 2, 256,{}, 0,{}, 40, 10, 10
+		4000, 10, 80, 2, 256, {}, 0, {}, 40, 10, 10
 	},
 	{ // 100k 40 track single sided single density
 		floppy_image::FF_3, floppy_image::SSSD, floppy_image::FM,
-		4000, 10, 40, 1, 256,{}, 0,{}, 40, 10, 10
+		4000, 10, 40, 1, 256, {}, 0, {}, 40, 10, 10
 	},
 	{}
 };
@@ -194,10 +188,7 @@ int acorn_dsd_format::find_size(util::random_read &io, uint32_t form_factor, con
 	uint32_t sectors0, sectors2;
 	uint64_t size;
 	if (io.length(size))
-	{
-		LOG_FORMATS("dsd: error getting image size\n");
 		return -1;
-	}
 
 	for (int i = 0; formats[i].form_factor; i++)
 	{
@@ -243,7 +234,6 @@ int acorn_dsd_format::find_size(util::random_read &io, uint32_t form_factor, con
 				return i;
 		}
 	}
-	LOG_FORMATS("dsd: no match\n");
 	return -1;
 }
 
@@ -259,10 +249,7 @@ int acorn_dsd_format::identify(util::random_read &io, uint32_t form_factor, cons
 
 int acorn_dsd_format::get_image_offset(const format &f, int head, int track) const
 {
-	if (f.sector_base_id == -1)
-		return (track * f.head_count + head) * compute_track_size(f);
-	else
-		return (f.track_count * head + track) * compute_track_size(f);
+	return (track * f.head_count + head) * compute_track_size(f);
 }
 
 const acorn_dsd_format::format acorn_dsd_format::formats[] =
@@ -277,11 +264,11 @@ const acorn_dsd_format::format acorn_dsd_format::formats[] =
 	},
 	{ // 400k 80 track double sided single density (interleaved)
 		floppy_image::FF_35, floppy_image::DSDD, floppy_image::FM,
-		4000, 10, 80, 2, 256,{}, -1,{ 0,1,2,3,4,5,6,7,8,9 }, 40, 10, 10
+		4000, 10, 80, 2, 256, {}, -1, { 0,1,2,3,4,5,6,7,8,9 }, 40, 10, 10
 	},
 	{ // 200k 40 track double sided single density (interleaved)
 		floppy_image::FF_35, floppy_image::DSSD, floppy_image::FM,
-		4000, 10, 40, 2, 256,{}, -1,{ 0,1,2,3,4,5,6,7,8,9 }, 40, 10, 10
+		4000, 10, 40, 2, 256, {}, -1, { 0,1,2,3,4,5,6,7,8,9 }, 40, 10, 10
 	},
 	{}
 };
@@ -319,10 +306,7 @@ int opus_ddos_format::find_size(util::random_read &io, uint32_t form_factor, con
 
 	uint64_t size;
 	if (io.length(size))
-	{
-		LOG_FORMATS("ddos: error getting image size\n");
 		return -1;
-	}
 
 	for (int i = 0; formats[i].form_factor; i++)
 	{
@@ -348,7 +332,6 @@ int opus_ddos_format::find_size(util::random_read &io, uint32_t form_factor, con
 				return i;
 		}
 	}
-	LOG_FORMATS("ddos: no match\n");
 	return -1;
 }
 
@@ -364,29 +347,26 @@ int opus_ddos_format::identify(util::random_read &io, uint32_t form_factor, cons
 
 int opus_ddos_format::get_image_offset(const format &f, int head, int track) const
 {
-	if (f.sector_base_id == -1)
-		return (track * f.head_count + head) * compute_track_size(f);
-	else
-		return (f.track_count * head + track) * compute_track_size(f);
+	return (f.track_count * head + track) * compute_track_size(f);
 }
 
 const opus_ddos_format::format opus_ddos_format::formats[] =
 {
 	{ // 180k 40 track single sided double density - gaps unverified
 		floppy_image::FF_525, floppy_image::SSSD, floppy_image::MFM,
-		4000, 18, 40, 1, 256, {}, 0, {}, 36, 22, 27
+		2000, 18, 40, 1, 256, {}, 0, {}, 36, 22, 27
 	},
 	{ // 360k 80 track single sided double density - gaps unverified
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
-		4000, 18, 80, 1, 256, {}, 0, {}, 36, 22, 27
+		2000, 18, 80, 1, 256, {}, 0, {}, 36, 22, 27
 	},
 	{ // 360k 40 track double sided double density - gaps unverified
 		floppy_image::FF_525, floppy_image::DSSD, floppy_image::MFM,
-		4000, 18, 40, 2, 256, {}, 0, {}, 36, 22, 27
+		2000, 18, 40, 2, 256, {}, 0, {}, 36, 22, 27
 	},
 	{ // 720k 80 track double sided double density - gaps unverified
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
-		4000, 18, 80, 2, 256, {}, 0, {}, 36, 22, 27
+		2000, 18, 80, 2, 256, {}, 0, {}, 36, 22, 27
 	},
 	{}
 };
@@ -429,10 +409,7 @@ int acorn_adfs_old_format::find_size(util::random_read &io, uint32_t form_factor
 
 	uint64_t size;
 	if (io.length(size))
-	{
-		LOG_FORMATS("adfs_o: error getting image size\n");
 		return -1;
-	}
 
 	for (int i=0; formats[i].form_factor; i++)
 	{
@@ -445,7 +422,6 @@ int acorn_adfs_old_format::find_size(util::random_read &io, uint32_t form_factor
 			return i;
 		}
 	}
-	LOG_FORMATS("adfs_o: no match\n");
 	return -1;
 }
 
@@ -461,10 +437,7 @@ int acorn_adfs_old_format::identify(util::random_read &io, uint32_t form_factor,
 
 int acorn_adfs_old_format::get_image_offset(const format &f, int head, int track) const
 {
-	if (f.sector_base_id == -1)
-		return (track * f.head_count + head) * compute_track_size(f);
-	else
-		return (f.track_count * head + track) * compute_track_size(f);
+	return (track * f.head_count + head) * compute_track_size(f);
 }
 
 const acorn_adfs_old_format::format acorn_adfs_old_format::formats[] =
@@ -530,10 +503,7 @@ int acorn_adfs_new_format::find_size(util::random_read &io, uint32_t form_factor
 
 	uint64_t size;
 	if (io.length(size))
-	{
-		LOG_FORMATS("adfs_n: error getting image size\n");
 		return -1;
-	}
 
 	for (int i = 0; formats[i].form_factor; i++)
 	{
@@ -549,7 +519,6 @@ int acorn_adfs_new_format::find_size(util::random_read &io, uint32_t form_factor
 		if ((size <= (uint64_t)compute_track_size(f) * f.track_count * f.head_count) && (memcmp(dform, "Hugo", 4) == 0 || memcmp(dform, "Nick", 4) == 0 || memcmp(eform, "Nick", 4) == 0))
 			return i;
 	}
-	LOG_FORMATS("adfs_n: no match\n");
 	return -1;
 }
 
@@ -565,10 +534,7 @@ int acorn_adfs_new_format::identify(util::random_read &io, uint32_t form_factor,
 
 int acorn_adfs_new_format::get_image_offset(const format &f, int head, int track) const
 {
-	if (f.sector_base_id == -1)
-		return (track * f.head_count + head) * compute_track_size(f);
-	else
-		return (f.track_count * head + track) * compute_track_size(f);
+	return (track * f.head_count + head) * compute_track_size(f);
 }
 
 const acorn_adfs_new_format::format acorn_adfs_new_format::formats[] =
@@ -608,10 +574,7 @@ int acorn_dos_format::find_size(util::random_read &io, uint32_t form_factor, con
 {
 	uint64_t size;
 	if (io.length(size))
-	{
-		LOG_FORMATS("dos: error getting image size\n");
 		return -1;
-	}
 
 	for (int i=0; formats[i].form_factor; i++)
 	{
@@ -630,7 +593,6 @@ int acorn_dos_format::find_size(util::random_read &io, uint32_t form_factor, con
 				return i;
 		}
 	}
-	LOG_FORMATS("dos: no match\n");
 	return -1;
 }
 
@@ -646,10 +608,7 @@ int acorn_dos_format::identify(util::random_read &io, uint32_t form_factor, cons
 
 int acorn_dos_format::get_image_offset(const format &f, int head, int track) const
 {
-	if (f.sector_base_id == -1)
-		return (track * f.head_count + head) * compute_track_size(f);
-	else
-		return (f.track_count * head + track) * compute_track_size(f);
+	return (track * f.head_count + head) * compute_track_size(f);
 }
 
 const acorn_dos_format::format acorn_dos_format::formats[] =
@@ -695,32 +654,28 @@ int opus_ddcpm_format::identify(util::random_read &io, uint32_t form_factor, con
 
 	uint64_t size;
 	if (io.length(size))
-	{
-		LOG_FORMATS("ddcpm: error getting image size\n");
 		return -1;
-	}
 
 	if (size == 819200 && memcmp(h, "Slogger ", 8) == 0)
 		return FIFID_SIGN | FIFID_SIZE;
 
-	LOG_FORMATS("ddcpm: no match\n");
 	return 0;
 }
 
 bool opus_ddcpm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
-// Double density discs formatted with DDCPM :
-//
-// Tracks 0 - 2 formatted Single Density
-// Tracks 3 - 159 formatted Double Density
-//
-// Single density tracks are 10 x 256 byte sectors per track
-// Sector skew of 2
-//
-// Double Density tracks are 10 x 512 byte sectors per track
-// Sector skew of 1
-// Sector interleave of 2
-//
+	// Double density discs formatted with DDCPM :
+	//
+	// Tracks 0 - 2 formatted Single Density
+	// Tracks 3 - 159 formatted Double Density
+	//
+	// Single density tracks are 10 x 256 byte sectors per track
+	// Sector skew of 2
+	//
+	// Double Density tracks are 10 x 512 byte sectors per track
+	// Sector skew of 1
+	// Sector interleave of 2
+	//
 	for (int head = 0; head < 2; head++)
 	{
 		for (int track = 0; track < 80; track++)
@@ -762,6 +717,86 @@ bool opus_ddcpm_format::save(util::random_read_write &io, const std::vector<uint
 }
 
 
+cumana_dfs_format::cumana_dfs_format() : wd177x_format(formats)
+{
+}
+
+const char *cumana_dfs_format::name() const
+{
+	return "cdfs";
+}
+
+const char *cumana_dfs_format::description() const
+{
+	return "Cumana DFS disk image";
+}
+
+const char *cumana_dfs_format::extensions() const
+{
+	return "img";
+}
+
+int cumana_dfs_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
+{
+	uint64_t size;
+	if (io.length(size))
+		return -1;
+
+	for (int i=0; formats[i].form_factor; i++)
+	{
+		const format &f = formats[i];
+		if (form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
+			continue;
+
+		if (size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
+		{
+			size_t actual;
+			uint8_t info;
+			io.read_at(14, &info, 1, actual);
+			if (f.head_count == (util::BIT(info, 6) ? 2 : 1) && f.track_count == (util::BIT(info, 7) ? 80 : 40))
+				return i;
+		}
+	}
+	return -1;
+}
+
+int cumana_dfs_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
+{
+	int type = find_size(io, form_factor, variants);
+
+	if (type != -1)
+		return FIFID_STRUCT | FIFID_SIZE;
+
+	return 0;
+}
+
+int cumana_dfs_format::get_image_offset(const format &f, int head, int track) const
+{
+	return (track * f.head_count + head) * compute_track_size(f);
+}
+
+const cumana_dfs_format::format cumana_dfs_format::formats[] =
+{
+	{ // 180K 5 1/4 inch 40 track single sided double density - gaps unverified
+		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
+		2000, 9, 40, 1, 512, {}, -1, { 0,3,6,1,4,7,2,5,8 }, 32, 22, 90
+	},
+	{ // 360K 5 1/4 inch 40 track double sided double density - gaps unverified
+		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
+		2000, 9, 40, 2, 512, {}, -1, { 0,3,6,1,4,7,2,5,8 }, 32, 22, 90
+	},
+	{ // 360K 5 1/4 inch 80 track single sided double density - gaps unverified
+		floppy_image::FF_525, floppy_image::SSQD, floppy_image::MFM,
+		2000, 9, 80, 1, 512, {}, -1, { 0,3,6,1,4,7,2,5,8 }, 32, 22, 90
+	},
+	{ // 720K 5 1/4 inch 80 track single double double density - gaps unverified
+		floppy_image::FF_525, floppy_image::DSQD, floppy_image::MFM,
+		2000, 9, 80, 2, 512, {}, -1, { 0,3,6,1,4,7,2,5,8 }, 32, 22, 90
+	},
+	{}
+};
+
+
 const acorn_ssd_format FLOPPY_ACORN_SSD_FORMAT;
 const acorn_dsd_format FLOPPY_ACORN_DSD_FORMAT;
 const acorn_dos_format FLOPPY_ACORN_DOS_FORMAT;
@@ -769,3 +804,4 @@ const acorn_adfs_old_format FLOPPY_ACORN_ADFS_OLD_FORMAT;
 const acorn_adfs_new_format FLOPPY_ACORN_ADFS_NEW_FORMAT;
 const opus_ddos_format FLOPPY_OPUS_DDOS_FORMAT;
 const opus_ddcpm_format FLOPPY_OPUS_DDCPM_FORMAT;
+const cumana_dfs_format FLOPPY_CUMANA_DFS_FORMAT;

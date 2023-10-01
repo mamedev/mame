@@ -22,6 +22,10 @@
   https://www.recreativas.org/costa-brava-3364-interflip
 
 
+
+  For a realistic experience, use the external artwork and sound samples.
+
+
 *******************************************************************************************************************************************************
 
   Hardware Notes...
@@ -66,7 +70,7 @@
     
     - Lever Microswitch Activation: The Lever microswitch is engaged when the cam reaches the end-of-tour position.
 
-  The game is initiated by processing the combination of these signal events within the system.
+  The game is initiated by processing the combination of these signal events within the system.
 
 
   * Reels System:
@@ -86,12 +90,12 @@
   electronic board housing two optocouplers, meticulously aligned with the corresponding toothed discs. The reference point concerning the optical detector
   is established at the precise moment when the tooth exits the optical obstruction, a transition from the "On" to the "Off" state in terms of detection logic.
 
-  The operational sequence of the machine during gameplay is as follows:
+  The operational sequence of the mechanism during gameplay is as follows:
 
-    1. Initiate the engine.
-    2. Activate all coils to permit the rotation of all reels.
-    3. Read the sensors to determine the final positions and deactivate the coils individually to halt the reels.
-    4. Once all reels have come to a stop, deactivate the engine.
+    1. Turn on the reels motor.
+    2. Activate all unlock coils to permit the rotation of all reels.
+    3. Read the sensors to determine the final positions and deactivate the coils individually to stop the reels.
+    4. Once all reels have come to a stop, turn off the reels motor.
 
 
 *******************************************************************************************************************************************************
@@ -99,6 +103,33 @@
   Games Info
   ==========
 
+  How to play....
+
+  - Insert coin(s) through COIN-IN (key 5).
+
+  - Pull the handle/lever. To do it keep pressed Aux Lever (key 2), and then press Lever (key 1).
+    The reels will start to roll.
+
+  - Prizes below 400 tokens will be payed automatically by hopper.
+  - Prizes exceding the 400 tokens should be payed manually.
+
+
+  Error codes:
+  
+  01: Physical RAM error.
+  02: CPU/MCU error.
+  03: Coin-In error.
+  04: Coin-Out/Hopper error.
+  05: Reels error.
+  06: DATA error.
+  07: Door open error.
+
+  Use the key PAYOUT RESET (key 9) to clean the errors 03, 04 & 05.
+
+  Use the DISPLAY RESET (key 8) to reset the display after pay a jackpot.
+
+
+*******************************************************************************************************************************************************
 
   General Test (DSW5 mode test on):
 
@@ -150,23 +181,10 @@
 
 *******************************************************************************************************************************************************
 
-  Error codes:
-  
-  01: Physical RAM error.
-  02: CPU/MCU error.
-  03: Coin-In error.
-  04: Coin-Out/Hopper error.
-  05: Reels error.
-  06: DATA error.
-  07: Door open error.
-
-
-*******************************************************************************************************************************************************
-
   TODO:
-  
-  - Hopper support.
-  - Trace the main program to find why you can't coin-in without end with an error code.
+
+  - Split subclasses for different games.
+  - Create internal layouts for Sevilla and Costa Brava with their proper reels/symbols.
 
 
 *******************************************************************************************************************************************************
@@ -257,6 +275,11 @@
        PLUM             ORANGE            PLUM             ORANGE
        ORANGE           BELL              ORANGE           CHERRY
        BELL             CHERRY            PLUM             BELL
+
+
+     Toledo plays from 1 to 6 tokens.
+     All coins bet in the central line, but usually
+	 the prize is multiplied by the number of inserted tokens.
 
 
          TOLEDO PAYTABLE                      PRIZE
@@ -353,8 +376,8 @@
 
      Costa Brava plays from 1 to 3 tokens.
      Token 1 bets in the central line.
-     Token 2 bets in the central line.
-     Token 3 bets in the central line.
+     Token 2 bets in the lower line.
+     Token 3 bets in the upper line.
 
 
          COSTA BRAVA PAYTABLE       PRIZE
@@ -383,6 +406,11 @@
 =================================================================================================================
 
   Sevilla...
+
+
+     Sevilla plays from 1 to 3 tokens.
+     All coins bet in the central line, but usually
+	 the prize is multiplied by the number of inserted tokens.
 
 
         SEVILLA PAYTABLE            PRIZE
@@ -442,6 +470,7 @@
 #include "machine/i8243.h"
 #include "machine/i8279.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
 #include "speaker.h"
@@ -462,6 +491,7 @@ public:
 		, m_ioexp(*this, "ioexp%u", 0U)
 		, m_kbdc(*this, "kbdc")
 		, m_reels(*this, "emreel%u", 1U)
+		, m_hopper(*this, "hopper")
 		, m_samples(*this, "samples")
 		, m_outbit(*this, "outbit%u", 0U)
 		, m_outbyte(*this, "outbyte%u", 0U)
@@ -526,6 +556,7 @@ private:
 	required_device_array<i8243_device, 3> m_ioexp;
 	required_device<i8279_device> m_kbdc;
 	required_device_array<em_reel_device, 4> m_reels;
+	required_device<hopper_device> m_hopper;
 	required_device<samples_device> m_samples;	
 
 	// object finders
@@ -597,7 +628,7 @@ u8 interflip8035_state::main_io_r(offs_t offset)
 		case 0x7f:  // gpkd A1 (stat read / cmd write)
 		{
 			ret = m_kbdc->status_r();
-			logerror("KDBC Status Read Offs:%02X - Data:%02X\n", offset, ret);
+			// logerror("KDBC Status Read Offs:%02X - Data:%02X\n", offset, ret);
 			break;
 		}
 		case 0xef:  // NVRAM access
@@ -698,18 +729,17 @@ void interflip8035_state::main_p1_data_w(u8 data)
 */
 
 	m_mp1 = data;
-	m_outbit[0] = data & 0x01;             // Lamp: 1st. Coin
-	m_outbit[1] = ( data >> 1 ) & 0x01;    // Lamp: 2nd. Coin
-	m_outbit[2] = ( data >> 2 ) & 0x01;    // Lamp: 3rd. Coin
-	m_int_flag = ( data >> 3 ) & 0x01;     // Main Interrupt Flag
-	m_ioexp[0]->cs_w((data >> 4) & 0x01);  // Chip Select IO Expander_1 
-	m_ioexp[1]->cs_w((data >> 5) & 0x01);  // Chip Select IO Expander_2
-	m_ioexp[2]->cs_w((data >> 6) & 0x01);  // Chip Select IO Expander_3
-	// m_kbdc->reset((data>>7) & 0x01);    // Reset GPKD (not implemented on device)
-
+	m_outbit[0] = BIT(data, 0);      // Lamp: 1st. Coin
+	m_outbit[1] = BIT(data, 1);      // Lamp: 2nd. Coin
+	m_outbit[2] = BIT(data, 2);      // Lamp: 3rd. Coin
+	m_int_flag = BIT(data, 3);       // Main Interrupt Flag
+	m_outbit[44] = BIT(data, 3);     // Main Interrupt Flag
+	m_ioexp[0]->cs_w(BIT(data, 4));  // Chip Select IO Expander_1 
+	m_ioexp[1]->cs_w(BIT(data, 5));  // Chip Select IO Expander_2
+	m_ioexp[2]->cs_w(BIT(data, 6));  // Chip Select IO Expander_3
+	// m_kbdc->reset(BIT(data, 7));  // Reset GPKD (not implemented on device)
 	// logerror("Main P1 Write: %02X\n", data);
-	// logerror("Main Interrupt Flag: %02X\n", m_int_flag);
-	m_outbit[44] = m_int_flag;
+
 }
 
 
@@ -793,7 +823,7 @@ u8 interflip8035_state::audio_p2_r()
 
 void interflip8035_state::audio_p2_w(u8 data)
 {
-	m_outbit[28] = ( data >> 7 ) & 1;  //	P2.7 Topper Lamp
+	m_outbit[28] = BIT(data, 7);  //	P2.7 Topper Lamp
 
 	if(!m_outbit[28])
 		m_samples->start(0, 0, true);
@@ -815,60 +845,68 @@ void interflip8035_state::audio_p2_w(u8 data)
 void interflip8035_state::exp2_p4_w(u8 data)
 {
 // All active "0" via PNP + NPN open colector transistor driver
-
-	m_outbit[10] = data & 0x01;         // Coil: Lock Reel D (only "Toledo" model)
-	m_outbit[11] = (data >> 1) & 0x01;  // Coil: Lock Reel C
-	m_outbit[12] = (data >> 2) & 0x01;  // Coil: Lock Reel B
-	m_outbit[13] = (data >> 3) & 0x01;  // Coil: Lock Reel A
+	m_outbit[10] = BIT(data, 0);  // Coil: Lock Reel D (only "Toledo" model)
+	m_outbit[11] = BIT(data, 1);  // Coil: Lock Reel C
+	m_outbit[12] = BIT(data, 2);  // Coil: Lock Reel B
+	m_outbit[13] = BIT(data, 3);  // Coil: Lock Reel A
 
 	m_reels[0]->set_state(!m_outbit[10]);
 	m_reels[1]->set_state(!m_outbit[11]);
 	m_reels[2]->set_state(!m_outbit[12]);
 	m_reels[3]->set_state(!m_outbit[13]);
+
 }
 
 void interflip8035_state::exp2_p5_w(u8 data)
 {
 // All active "0" via PNP + NPN open colector transistor driver
-
-	m_outbit[14] = data & 0x01;         // Coil: Coin Lock
-	m_outbit[15] = (data >> 1) & 0x01;  // Coil: Coin Diverter
-	m_outbit[16] = (data >> 2) & 0x01;  // Coil: Unlock Lever
-	m_outbit[17] = (data >> 3) & 0x01;  // Unused
+	m_outbit[14] =  BIT(data, 0);  // Coil: Coin Lock
+	m_outbit[15] =  BIT(data, 1);  // Coil: Coin Diverter
+	m_outbit[16] =  BIT(data, 2);  // Coil: Unlock Lever
+	m_outbit[17] =  BIT(data, 3);  // Unused
 }
 
 void interflip8035_state::exp2_p6_w(u8 data)
 {
 // All active "1" via ULN2803 Darlington array
-
-	m_outbit[20] = data & 0x01;         // EM.Counter: Coin In
-	m_outbit[21] = (data >> 1) & 0x01;  // EM.Counter: Coin Out
-	m_outbit[22] = (data >> 2) & 0x01;  // EM.Counter: Coin Drop
-	m_outbit[23] = (data >> 3) & 0x01;  // EM.Counter: Jackpot Times
+	m_outbit[20] = BIT(data, 0);  // EM.Counter: Coin In
+	m_outbit[21] = BIT(data, 1);  // EM.Counter: Coin Out
+	m_outbit[22] = BIT(data, 2);  // EM.Counter: Coin Drop
+	m_outbit[23] = BIT(data, 3);  // EM.Counter: Jackpot Times
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));  // EM.Counter: Coin In
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));  // EM.Counter: Coin Out
 	machine().bookkeeping().coin_counter_w(2, BIT(data, 2));  // EM.Counter: Coin Drop
 	machine().bookkeeping().coin_counter_w(3, BIT(data, 3));  // EM.Counter: Jackpot Times
+	
+// Coin in sound
+	if(BIT(data, 0))
+		m_samples->start(0, 1, false);
 }
 
 void interflip8035_state::exp2_p7_w(u8 data)
 {
 // All active "1" via ULN2803 Darlington array
 
-	m_outbit[24] = data & 0x01;         // Relay: Hopper Motor
-	m_outbit[25] = (data >> 1) & 0x01;  // Relay: Reels Motor (Motoreductor)
-	m_outbit[26] = (data >> 2) & 0x01;  // Unused
-	m_outbit[27] = (data >> 3) & 0x01;  // Unused
+	m_outbit[24] = BIT(data,0);  // Relay: Hopper Motor
+	m_outbit[25] = BIT(data,1);  // Relay: Reels Motor (Motoreductor)
+	m_outbit[26] = BIT(data,2);  // Unused
+	m_outbit[27] = BIT(data,3);  // Unused
+
+	m_hopper->motor_w(BIT(data, 0));
+
+// Lever rattle sound
+
+	if(BIT(data, 1)) 
+		m_samples->start(1, 2, false);
 }
 
 void interflip8035_state::exp3_p4_w(u8 data)
 {
 // All active "0" via PNP + NPN open colector transistor driver
-
-	m_outbit[3] = data & 0x01;         // Lamp: Accepted Coin
-	m_outbit[4] = (data >> 1) & 0x01;  // Lamp: Insert Coin
-	m_outbit[5] = (data >> 2) & 0x01;  // Lamp: Fault
+	m_outbit[3] = BIT(data, 0);  // Lamp: Accepted Coin
+	m_outbit[4] = BIT(data, 1);  // Lamp: Insert Coin
+	m_outbit[5] = BIT(data, 2);  // Lamp: Fault
 }
 
 void interflip8035_state::exp3_p6_w(u8 data)
@@ -883,7 +921,7 @@ void interflip8035_state::exp3_p6_w(u8 data)
 */
 
 	u8 state;
-	state = data & 0x01;
+	state = BIT(data,0);
 
 	m_audio = bitswap<8>(data, 0, 1, 2, 3, 7, 6, 5, 4);  // IO Expander_3 to Sound Board
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? CLEAR_LINE : ASSERT_LINE);
@@ -905,9 +943,9 @@ void interflip8035_state::kbd_sl_w(u8 data)
 u8 interflip8035_state::kbd_rl_r()
 {
 //  Keyboard read (only scan line 0 is used)
-	if(m_kbd_sl == 0)
+	if((m_kbd_sl & 0x07) == 0)
 	{
-		logerror("I8279: Read Line0: %02X\n", ioport("IN0")->read());
+		// logerror("I8279: Read Line0: %02X\n", ioport("IN0")->read());
 		return ioport("IN0")->read();
 	}
 	return 0xff;
@@ -923,7 +961,7 @@ void interflip8035_state::output_digit(int i, u8 data)
 {
 //  Segment Decode
 	static const u8 led_map[16] =
-		{ 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00 }; 
+		{ 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00 };
 //  show layout 
 	m_outbyte[i] = led_map[data & 0x0f];
 }
@@ -931,9 +969,8 @@ void interflip8035_state::output_digit(int i, u8 data)
 void interflip8035_state::irq_w(int state)
 {
 //  KBD Interrupt ( Enabled by maincpu P1.3 )
-	if(m_int_flag == 1)
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-	//logerror("I8279: irq state: %s  | Int_flag T0:%02x\n", state ? "Assert Line":"Clear Line" , m_int_flag);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (state & m_int_flag) ? ASSERT_LINE : CLEAR_LINE);
+	// logerror("I8279: irq state: %s  | Int_flag T0:%02x\n", (state & m_int_flag) ? "Assert Line":"Clear Line" , m_int_flag);
 }
 
 
@@ -980,6 +1017,8 @@ static const char *const interflip8035_sample_names[] =
 {
 	"*samples",
 	"ringbellm",        // ring bell
+	"coin_in",          // coin in
+	"rattle",           // rattle
 	nullptr
 };
 
@@ -991,16 +1030,16 @@ static const char *const interflip8035_sample_names[] =
 static INPUT_PORTS_START( interflip )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )  PORT_NAME("Auxiliary Lever")                     // auxiliary lever
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )                                              // door
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )                                            // payout
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR )                                             // door
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )  PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)  // payout
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )  PORT_NAME("Lever")                               // lever
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                                                   // unused
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("Display Reset") PORT_CODE(KEYCODE_8)  // display reset
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("Payout Reset")  PORT_CODE(KEYCODE_9)  // payout reset
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )                                                    // coin in
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(5)                                  // coin in
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("IN1-1")  PORT_CODE(KEYCODE_Q)  PORT_TOGGLE  // Hopper Full Sensor
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 )  PORT_NAME("Hopper Full") PORT_TOGGLE           // Hopper Full Sensor
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1038,7 +1077,7 @@ static INPUT_PORTS_START( interflip )
 	PORT_DIPNAME(0x01, 0x00, "General Test")	PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
-	PORT_DIPNAME(0x02, 0x02, "Reels Test")		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME(0x02, 0x00, "Reels Test")		PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x02, DEF_STR(On))
 	PORT_DIPNAME(0x04, 0x00, "Timing Test")		PORT_DIPLOCATION("SW1:7")
@@ -1104,6 +1143,9 @@ void interflip8035_state::interflip(machine_config &config)
 	// electromechanics
 	add_em_reels(config, 20, attotime::from_double(2));
 
+	// Hopper device
+	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	
 	// video layout
 	config.set_default_layout(layout_ifslots);
 
@@ -1113,7 +1155,7 @@ void interflip8035_state::interflip(machine_config &config)
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 2.0);
 
 	SAMPLES(config, m_samples);
-	m_samples->set_channels(1);
+	m_samples->set_channels(2);
 	m_samples->set_samples_names(interflip8035_sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "mono", 2.0);
 
@@ -1165,7 +1207,7 @@ ROM_END
 *********************************************/
 
 //    YEAR  NAME     PARENT  MACHINE    INPUT      STATE                INIT        ROT    COMPANY      FULLNAME      FLAGS
-GAME( 1982, cbrava,  0,      interflip, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Costa Brava", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 1982, sevilla, 0,      interflip, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla",     MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 1982, toledo,  0,      interflip, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo",      MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 1982, jackuse, 0,      interflip, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Jack Use (Jackpot settings for Interflip slots machines)",  MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1982, cbrava,  0,      interflip, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Costa Brava", MACHINE_MECHANICAL )
+GAME( 1982, sevilla, 0,      interflip, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla",     MACHINE_MECHANICAL )
+GAME( 1982, toledo,  0,      interflip, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo",      MACHINE_MECHANICAL )
+GAME( 1982, jackuse, 0,      interflip, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Jack Use (Jackpot settings for Interflip slots machines)",  MACHINE_MECHANICAL )

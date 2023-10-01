@@ -951,7 +951,7 @@ poly_array
 
     poly_array();
 
-The **poly_array** contructor requires no parameters and simply pre-allocates one
+The **poly_array** constructor requires no parameters and simply pre-allocates one
 chunk of objects in preparation for future allocations.
 
 count

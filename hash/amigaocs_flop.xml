@@ -296,7 +296,7 @@ ATK test: C:0 H:U Bad
 
 	<software name="3dwboxin" supported="no">
 		<!-- SPS (CAPS) release 2223 -->
-		<description>3D World Boxing (Euro, Amiga Sports Pack)</description>
+		<description>3D World Boxing (Europe, Amiga Sports Pack)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1992</year>

@@ -96,13 +96,13 @@ static float get_uef_float( const uint8_t *Float)
 		was the first byte read from the UEF, Float[1] the second, etc */
 
 		/* decode mantissa */
-		Mantissa = get_u24be(&Float[0]) | 0x800000;
+		Mantissa = get_u24le(&Float[0]) | 0x800000;
 
 		Result = (float)Mantissa;
 		Result = (float)ldexp(Result, -23);
 
 		/* decode exponent */
-		Exponent = (get_u16be(&Float[2])&0x7f80) >> 7;
+		Exponent = (get_u16le(&Float[2])&0x7f80) >> 7;
 		Exponent -= 127;
 		Result = (float)ldexp(Result, Exponent);
 

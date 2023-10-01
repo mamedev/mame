@@ -22749,7 +22749,7 @@ legacy FM implementations cannot find it.
 		<description>Logic Remastered (32KB RAM)</description>
 		<year>2021</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="Plattysoft"/>
+		<info name="developer" value="Platty Soft"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="0"/>
 			<dataarea name="rom" size="0xc000">
@@ -22762,7 +22762,7 @@ legacy FM implementations cannot find it.
 		<description>Logic Remastered (16KB RAM)</description>
 		<year>2021</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="Plattysoft"/>
+		<info name="developer" value="Platty Soft"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<dataarea name="rom" size="0x40000">

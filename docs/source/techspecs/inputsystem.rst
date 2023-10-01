@@ -114,13 +114,13 @@ fields:
   and neutral positions.  They are used for analog joystick axes,
   displacement-sensitive pedals, paddle knobs, and other emulated inputs
   with a defined range.
-* **Relative analog fields** have a range with with defined
-  minimum, maximum and starting positions.  On each update, the value
-  accumulates and wraps when it passes either end of the range.
-  Functionally, this is like the output of an up/down counter connected
-  to an incremental encoder.  They are used for mouse/trackball axes,
-  steering wheels without limit stops, and other emulated inputs that
-  have no range limits.
+* **Relative analog fields** have a range with defined minimum, maximum
+  and starting positions.  On each update, the value accumulates and
+  wraps when it passes either end of the range.  Functionally, this is
+  like the output of an up/down counter connected to an incremental
+  encoder.  They are used for mouse/trackball axes, steering wheels
+  without limit stops, and other emulated inputs that have no range
+  limits.
 * DIP switch, configuration and adjuster fields allow the user to set
   the value through MAME’s user interface.
 * Additional special field types are used to produce fixed or
@@ -147,7 +147,7 @@ In practice, emulated devices and systems rarely interact with the input
 manager directly.  The most common reason to access the input manager is
 implementing special debug controls, which should be disabled in release
 builds.  Plugins that respond to input need to call the input manager to
-raed inputs.
+read inputs.
 
 I/O port manager
 ~~~~~~~~~~~~~~~~
@@ -408,7 +408,7 @@ to support a variety of control setups:
   device item that produced the current value was an absolute axis, the
   field’s value is set to the current value scaled to the correct range,
   and no further processing is performed.
-* If the current value is non-zero and the input device device item that
+* If the current value is non-zero and the input device item that
   produced the current value was a relative axis, the current value is
   added to the field’s value, scaled by the field’s sensitivity setting.
 * The I/O port manager reads the current value for the field’s assigned
@@ -444,7 +444,7 @@ analog fields:
   produced the current value was an absolute axis, the current value is
   added to the field’s value, scaled by the field’s sensitivity setting,
   and no further processing is performed.
-* If the current value is non-zero and the input device device item that
+* If the current value is non-zero and the input device item that
   produced the current value was a relative axis, the current value is
   added to the field’s value, scaled by the field’s sensitivity setting.
 * The I/O port manager reads the current value for the field’s assigned

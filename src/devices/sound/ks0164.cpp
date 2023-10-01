@@ -54,7 +54,8 @@ ks0164_device::ks0164_device(const machine_config &mconfig, const char *tag, dev
 	  m_midi_tx(*this),
 	  m_mem_region(*this, DEVICE_SELF),
 	  m_cpu(*this, "cpu"),
-	  m_mem_config("mem", ENDIANNESS_BIG, 16, 23)
+	  m_mem_config("mem", ENDIANNESS_BIG, 16, 23),
+	  m_notif_rom_space()
 {
 }
 
@@ -88,6 +89,16 @@ void ks0164_device::device_start()
 		// power-of-two-minus-one, so the xor works
 		space().install_rom(0, rend, ((1 << 23) - 1) ^ rmask, m_mem_region->base());
 	}
+
+	m_notif_rom_space = space().add_change_notifier([this] (read_or_write mode) {
+		// HACK: If something external changes the ROM space after initial load then reset the CPU because the program code also changed (used by BMkey ROM PCBs)
+		for(int voice = 0; voice < 0x20; voice++) {
+			// Disable all voices
+			m_sregs[voice][0] &= ~1;
+		}
+
+		m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	});
 
 	m_stream = stream_alloc(0, 2, clock()/3/2/2/32);
 	space().cache(m_mem_cache);
@@ -308,7 +319,7 @@ void ks0164_device::bank2_select_w(offs_t, u16 data, u16 mem_mask)
 u16 ks0164_device::voice_r(offs_t offset)
 {
 	m_stream->update();
-	logerror("voice read %02x.%02x -> %04x (%04x)\n", m_voice_select & 0x1f, offset, m_sregs[m_voice_select & 0x1f][offset], m_cpu->pc());
+	// logerror("voice read %02x.%02x -> %04x (%04x)\n", m_voice_select & 0x1f, offset, m_sregs[m_voice_select & 0x1f][offset], m_cpu->pc());
 	return m_sregs[m_voice_select & 0x1f][offset];
 }
 
@@ -321,13 +332,14 @@ void ks0164_device::voice_w(offs_t offset, u16 data, u16 mem_mask)
 		if(m_cpu->pc() < 0x5f94 || m_cpu->pc() > 0x5fc0)
 			logerror("voice %02x.%02x = %04x @ %04x (%04x)\n", m_voice_select & 0x1f, offset, m_sregs[m_voice_select & 0x1f][offset], mem_mask, m_cpu->pc());
 	if(offset == 0 && (data & 1) && !(old & 1))
-		logerror("keyon %02x mode=%04x (%s %c %c %c) cur=%02x%04x.%04x loop=%02x%04x.%04x end=%02x%04x.%04x pitch=%02x.%03x 10=%02x/%02x:%02x/%02x 14=%03x/%03x:%03x/%03x 18=%04x/%04x c=%04x   %04x %04x %04x %04x %04x  %04x %04x %04x %04x %04x\n",
+		logerror("keyon %02x mode=%04x (%s %c %c %c %c) cur=%02x%04x.%04x loop=%02x%04x.%04x end=%02x%04x.%04x pitch=%02x.%03x 10=%02x/%02x:%02x/%02x 14=%03x/%03x:%03x/%03x 18=%04x/%04x c=%04x   %04x %04x %04x %04x %04x  %04x %04x %04x %04x %04x\n",
 				 m_voice_select,
 
 				 m_sregs[m_voice_select & 0x1f][0x00],
 
-				 m_sregs[m_voice_select & 0x1f][0x00] & 0x8000 ? " 8" : "16",
-				 m_sregs[m_voice_select & 0x1f][0x00] & 0x0400 ? 'c' : 'l',
+				 m_sregs[m_voice_select & 0x1f][0x00] & 0x8000 ? " 8" : "16", // 8-bit/16-bit samples
+				 m_sregs[m_voice_select & 0x1f][0x00] & 0x0400 ? 'c' : 'l', // compressed/linear samples
+				 m_sregs[m_voice_select & 0x1f][0x00] & 0x0010 ? 'r' : '-', // loop
 				 m_sregs[m_voice_select & 0x1f][0x00] & 0x0008 ? '3' : '-',
 				 m_sregs[m_voice_select & 0x1f][0x00] & 0x0004 ? '2' : '-',
 
@@ -423,7 +435,7 @@ u8 ks0164_device::voice_select_r()
 void ks0164_device::voice_select_w(u8 data)
 {
 	m_voice_select = data;
-	logerror("voice_select = %02x (%04x)\n", m_voice_select, m_cpu->pc());
+	// logerror("voice_select = %02x (%04x)\n", m_voice_select, m_cpu->pc());
 }
 
 void ks0164_device::cpu_map(address_map &map)
@@ -492,9 +504,13 @@ void ks0164_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 				current += step;
 				u64 end = (u64(regs[0xd]) << 32) | (u64(regs[0xe]) << 16) | regs[0xf];
 				if(current >= end) {
-					// Is there a loop enabled flag?
-					u64 loop = (u64(regs[9]) << 32) | (regs[0xa] << 16) | regs[0xb];
-					current = current - end + loop;
+					// guessed, 1d26 in btplay2k flash.u22 seems to check this flag for something similar to looping but no games use it
+					if (regs[0] & 0x10) {
+						u64 loop = (u64(regs[9]) << 32) | (regs[0xa] << 16) | regs[0xb];
+						current = current - end + loop;
+					} else {
+						regs[0] = ~1;
+					}
 				}
 				regs[1] = current >> 32;
 				regs[2] = current >> 16;
