@@ -26761,8 +26761,7 @@ The original release had been altered to include a scene intro and to bypass the
 	</software>
 
 	<software name="sonic2p11" cloneof="sonic2">
-		<!--	Dated 19921102	-->
-		<description>Sonic The Hedgehog 2 (final prototype)</description>
+		<description>Sonic The Hedgehog 2 (final prototype, 19921102)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
