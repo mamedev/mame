@@ -185,6 +185,8 @@ built-in CB9 module
 
 See CSC description above for more information.
 
+Like with EAS, the new game command for SU9 is: RE -> D6 (or D8) -> CL.
+
 ********************************************************************************
 
 Reversi Sensory Challenger (RSC)

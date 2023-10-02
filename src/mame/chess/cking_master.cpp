@@ -9,6 +9,8 @@ Chess King was a UK business formed by Intelligent Software, so logically,
 all the programs were by them. According to the manual, the chess engine is
 Cyrus (by Richard Lang).
 
+To start a new game, press CHANGE POSITION, NEW GAME, and CHANGE POSITION again.
+
 Hardware notes:
 - Z80 CPU(NEC D780C-1) @ 4MHz(8MHz XTAL), IRQ from 555 timer
 - 8KB ROM(NEC D2764C-3), 2KB RAM(NEC D4016C), ROM is scrambled for easy PCB placement
@@ -74,7 +76,7 @@ private:
 	u8 input_r();
 	void control_w(u8 data);
 
-	u16 m_inp_mux = 0;
+	u8 m_inp_mux = 0;
 };
 
 
