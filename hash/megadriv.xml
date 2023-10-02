@@ -7648,10 +7648,13 @@ Unsupported [Menacer] peripheral
 	</software>
 
 	<software name="sonic1jp2" cloneof="sonic">
-		<!--	Mod of rev. A present in Sonic Mega Collection, which changes the spike damage behavior to be like that of later titles.	-->
+		<!--		-->
 		<description>Sonic The Hedgehog (World, JP2, ripped from Sonic Mega Collection)</description>
 		<year>2002</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Mod of rev. A present in Sonic Mega Collection, which changes the spike damage behavior to be like that of later titles.
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="sonic the hedgehog (world) (Sonic mega collection).md" size="524288" crc="6382b2c5" sha1="95b6aac7e11bb2d908aafa06973ffeb45817a992"/>
