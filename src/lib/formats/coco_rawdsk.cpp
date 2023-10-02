@@ -4,29 +4,55 @@
 
     CoCo Raw Disk
 
+	Anonymous format for internal use by CoCo file systems
+
 ***************************************************************************/
 
 #include "coco_rawdsk.h"
 
 
+//-------------------------------------------------
+//  ctor
+//-------------------------------------------------
+
 coco_rawdsk_format::coco_rawdsk_format() : wd177x_format(formats)
 {
 }
 
+
+//-------------------------------------------------
+//  name
+//-------------------------------------------------
+
 const char *coco_rawdsk_format::name() const
 {
-	return "coco_rawdsk";
+	return nullptr;	// "raw" disk is anonymous
 }
+
+
+//-------------------------------------------------
+//  description
+//-------------------------------------------------
 
 const char *coco_rawdsk_format::description() const
 {
-	return "CoCo Raw Disk";
+	return nullptr;	// "raw" disk is anonymous
 }
+
+
+//-------------------------------------------------
+//  extensions
+//-------------------------------------------------
 
 const char *coco_rawdsk_format::extensions() const
 {
-	return "raw";
+	return nullptr;	// "raw" disk is anonymous
 }
+
+
+//-------------------------------------------------
+//  formats
+//-------------------------------------------------
 
 const coco_rawdsk_format::format coco_rawdsk_format::formats[] =
 {
@@ -41,5 +67,9 @@ const coco_rawdsk_format::format coco_rawdsk_format::formats[] =
 	{}
 };
 
+
+//-------------------------------------------------
+//  FLOPPY_COCO_RAWDSK_FORMAT
+//-------------------------------------------------
 
 const coco_rawdsk_format FLOPPY_COCO_RAWDSK_FORMAT;
