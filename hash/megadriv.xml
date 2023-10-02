@@ -26739,7 +26739,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 Earlier than the "Beta 4" prototype. No equivalent build has been found in the Sega QA Archive.
 The original release had been altered to include a scene intro and to bypass the copy protection, this is a modification that removes the intro and restores the ROM back to the way it was meant to be.
 ]]></notes>
-				<info name="release" value="19921109"/>
+		<info name="release" value="19921109"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="sonic the hedgehog 2 (censor prototype).md" size="1048576" crc="5667eced" sha1="9bebfb78049e7556fbef30f4a43d204fbf4c64f0" status="baddump"/>
