@@ -7656,7 +7656,7 @@ Mod of rev. A present in Sonic Mega Collection, which changes the spike damage b
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="sonic the hedgehog (world) (Sonic mega collection).md" size="524288" crc="6382b2c5" sha1="95b6aac7e11bb2d908aafa06973ffeb45817a992"/>
+				<rom name="sonic the hedgehog (world) (sonic mega collection).md" size="524288" crc="6382b2c5" sha1="95b6aac7e11bb2d908aafa06973ffeb45817a992"/>
 			</dataarea>
 		</part>
 	</software>
