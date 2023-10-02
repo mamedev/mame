@@ -7652,7 +7652,7 @@ Unsupported [Menacer] peripheral
 		<year>2002</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Mod of rev. A present in Sonic Mega Collection, which changes the spike damage behavior to be like that of later titles.
+Official modification of rev. A which changes the spike damage behavior to be like that of later titles.
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -26669,6 +26669,9 @@ Originally found in a pirate cartridge, an official prototype with this build ha
 		<description>Sonic The Hedgehog 2 (World, rev. A, ripped from Sonic Mega Collection)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Official modification of rev. A which fixes a bug in the sound test.
+]]></notes>
 		<info name="serial" value="G-4088 (JPN)"/>
 		<info name="release" value="19921121 (JPN)"/>
 		<info name="alt_title" value="ソニック・ザ・ヘッジホッグ2"/>
