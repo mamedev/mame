@@ -99,10 +99,13 @@
 *********************************************************************/
 
 #include "ap_dsk35.h"
-#include "imageutl.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 #include "opresolv.h"
+
+#include "eminline.h"
+#include "osdcore.h" // osd_printf_error
 
 #include <cassert>
 #include <cstdio>
@@ -141,8 +144,8 @@ int dc42_format::identify(util::random_read &io, uint32_t form_factor, const std
 	uint8_t h[0x54];
 	size_t actual;
 	io.read_at(0, h, 0x54, actual);
-	uint32_t dsize = (h[0x40] << 24) | (h[0x41] << 16) | (h[0x42] << 8) | h[0x43];
-	uint32_t tsize = (h[0x44] << 24) | (h[0x45] << 16) | (h[0x46] << 8) | h[0x47];
+	uint32_t dsize = get_u32be(&h[0x40]);
+	uint32_t tsize = get_u32be(&h[0x44]);
 
 	uint8_t encoding = h[0x50];
 	uint8_t format = h[0x51];
@@ -160,8 +163,8 @@ bool dc42_format::load(util::random_read &io, uint32_t form_factor, const std::v
 	size_t actual;
 	uint8_t h[0x54];
 	io.read_at(0, h, 0x54, actual);
-	int dsize = (h[0x40] << 24) | (h[0x41] << 16) | (h[0x42] << 8) | h[0x43];
-	int tsize = (h[0x44] << 24) | (h[0x45] << 16) | (h[0x46] << 8) | h[0x47];
+	int dsize = get_u32be(&h[0x40]);
+	int tsize = get_u32be(&h[0x44]);
 
 	uint8_t encoding = h[0x50];
 	uint8_t format = h[0x51];
@@ -237,8 +240,8 @@ bool dc42_format::load(util::random_read &io, uint32_t form_factor, const std::v
 void dc42_format::update_chk(const uint8_t *data, int size, uint32_t &chk)
 {
 	for(int i=0; i<size; i+=2) {
-		chk += (data[i] << 8) | data[i+1];
-		chk = (chk >> 1) | (chk << 31);
+		chk += get_u16be(&data[i]);
+		chk = rotr_32(chk, 1);
 	}
 }
 
@@ -257,14 +260,8 @@ bool dc42_format::save(util::random_read_write &io, const std::vector<uint32_t> 
 	int nsect = 16*(12+11+10+9+8)*g_heads;
 	uint32_t dsize = nsect*512;
 	uint32_t tsize = nsect*12;
-	h[0x40] = dsize >> 24;
-	h[0x41] = dsize >> 16;
-	h[0x42] = dsize >> 8;
-	h[0x43] = dsize;
-	h[0x44] = tsize >> 24;
-	h[0x45] = tsize >> 16;
-	h[0x46] = tsize >> 8;
-	h[0x47] = tsize;
+	put_u32be(&h[0x40], dsize);
+	put_u32be(&h[0x44], tsize);
 	h[0x50] = g_heads == 2 ? 0x01 : 0x00;
 	h[0x51] = g_heads == 2 ? 0x22 : 0x02;
 	h[0x52] = 0x01;
@@ -469,8 +466,8 @@ bool apple_2mg_format::load(util::random_read &io, uint32_t form_factor, const s
 	desc_gcr_sector sectors[12];
 	uint8_t sdata[512*12], header[64];
 	io.read_at(0, header, 64, actual);
-	uint32_t blocks = header[0x14] | (header[0x15] << 8) | (header[0x16] << 16) | (header[0x17] << 24);
-	uint32_t pos_data = header[0x18] | (header[0x19] << 8) | (header[0x1a] << 16) | (header[0x1b] << 24);
+	uint32_t blocks = get_u32le(&header[0x14]);
+	uint32_t pos_data = get_u32le(&header[0x18]);
 
 	if(blocks != 1600 && blocks != 16390)
 		return false;

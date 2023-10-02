@@ -68,7 +68,7 @@ describing its configuration.  Some examples to look up when needed:
 
 The ``has_configured_map`` method allows to test whether an
 ``address_map`` has been associated with a given space in the
-``memory_space_config`` method .  That allows optional memory spaces to
+``memory_space_config`` method.  That allows optional memory spaces to
 be implemented, such as ``AS_OPCODES`` in certain CPU cores.
 
 

@@ -12,6 +12,7 @@
 
 #include "coretmpl.h"
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include "eminline.h"
 #include "osdcore.h"
@@ -141,20 +142,12 @@ msdib_error dib_read_file_header(read_stream &fp, std::uint32_t &filelen) noexce
 		return msdib_error::BAD_SIGNATURE;
 
 	// do a very basic check on the file length
-	std::uint32_t const file_length(
-			(std::uint32_t(file_header[2]) << 0) |
-			(std::uint32_t(file_header[3]) << 8) |
-			(std::uint32_t(file_header[4]) << 16) |
-			(std::uint32_t(file_header[5]) << 24));
+	std::uint32_t const file_length(get_u32le(&file_header[2]));
 	if ((sizeof(file_header) + sizeof(bitmap_core_header)) > file_length)
 		return msdib_error::FILE_CORRUPT;
 
 	// check that the offset to the pixel data looks half sane
-	std::uint32_t const pixel_offset(
-			(std::uint32_t(file_header[10]) << 0) |
-			(std::uint32_t(file_header[11]) << 8) |
-			(std::uint32_t(file_header[12]) << 16) |
-			(std::uint32_t(file_header[13]) << 24));
+	std::uint32_t const pixel_offset(get_u32le(&file_header[10]));
 	if (((sizeof(file_header) + sizeof(bitmap_core_header)) > pixel_offset) || (file_length < pixel_offset))
 		return msdib_error::FILE_CORRUPT;
 

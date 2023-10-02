@@ -590,7 +590,7 @@ void apple1_state::apple1(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(apple1_state::pia_keyboard_r));
 	m_pia->writepb_handler().set(FUNC(apple1_state::pia_display_w));
 	m_pia->cb2_handler().set(FUNC(apple1_state::pia_display_gate_w));

@@ -67,66 +67,66 @@ copyright-holders: Roberto Fresca, Grull Osgo
 	<element name="stat" defstate="0">
 		<text string="off" state="0">
 			<color red="1.0" green="0.0" blue="0.0" />
-		</text>	
+		</text>
 		<text string="on" state="1">
 			<color red="0.0" green="1.0" blue="0.0" />
-		</text>			
-	</element>	
+		</text>
+	</element>
 	<element name="statinv" defstate="1">
 		<text string="off" state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
-		</text>	
+		</text>
 		<text string="on" state="0">
 			<color red="0.0" green="1.0" blue="0.0" />
-		</text>			
-	</element>	
+		</text>
+	</element>
 
 	<element name="hscore">
 		<text string="High Score">
 			<color red="0.7" green="0.7" blue="0.7" />
-		</text>		
-	</element>	
-	
+		</text>
+	</element>
+
 	<element name="score">
 		<text string="Score">
 			<color red="0.7" green="0.7" blue="0.7" />
-		</text>		
-	</element>	
+		</text>
+	</element>
 
 	<element name="selg">
 		<text string="-- Selected Game --  " align="2">
 			<color red="0.7" green="0.7" blue="0.7" />
-		</text>		
-	</element>	
+		</text>
+	</element>
 
 	<element name="sel1">
 		<text string="Doraneko" align="2">
 			<color red="0.7" green="0.7" blue="0.7" />
-		</text>		
+		</text>
 	</element>
 
 	<element name="sel2">
 		<text string="Koneko" align="2">
 			<color red="0.7" green="0.7" blue="0.7" />
-		</text>		
+		</text>
 	</element>
 
 	<element name="ecoin">
 		<text string="Coin Enable">
 			<color red="0.7" green="0.7" blue="0.7" />
-		</text>		
+		</text>
 	</element>
 
 	<element name="ccount">
 		<text string="Coin Counter (Signal)">
 			<color red="0.7" green="0.7" blue="0.7" />
-		</text>		
+		</text>
 	</element>
 
 	<element name="mute">
 		<text string="Sound Mute">
 			<color red="0.7" green="0.7" blue="0.7" />
-		</text>		
+		</text>
 	</element>
 
 
@@ -279,7 +279,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 		<simplecounter maxstate="999" digits="3">
 			<color red="1.0" green="1.0" blue="1.0"/>
 		</simplecounter>
-	</element>	
+	</element>
 
 	<element name="blk">
 		<rect>
@@ -334,9 +334,9 @@ copyright-holders: Roberto Fresca, Grull Osgo
 <!-- Fence & Arms test -->
 
 	<repeat count="4">
-		<param name="x" start="335" increment="65" /> 
-		<param name="i" start="0" increment="1" /> 
-			<element ref="arm"> 
+		<param name="x" start="335" increment="65" />
+		<param name="i" start="0" increment="1" />
+			<element ref="arm">
 				<animate name="mpos~i~" />
 				<bounds state="0"   x="~x~" y="180" width="40" height="100" />
 				<bounds state="282" x="~x~" y="280" width="40" height="100" />
@@ -346,7 +346,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 	<element ref="blk">
 		<bounds x="300" y="180" width="300" height="70" />
 	</element>
-	
+
 	<element ref="fence">
 		<bounds x="300" y="250" width="300" height="30" />
 	</element>
@@ -668,7 +668,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 		</element>
 		<element name="p8led0" ref="led">
 			<bounds x="75" y="460" width="9" height="9" />
-		</element>		
+		</element>
 
 	</view>
 </mamelayout>

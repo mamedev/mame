@@ -102,6 +102,7 @@
 #include "hxchfe_dsk.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include "osdcore.h" // osd_printf_*
 
@@ -201,7 +202,7 @@ bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		return false;
 	}
 
-	info.m_bit_rate = (header[12] & 0xff) | ((header[13] & 0xff)<<8);
+	info.m_bit_rate = get_u16le(&header[12]);
 
 	if (info.m_bit_rate > 500)
 	{
@@ -211,7 +212,7 @@ bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	int samplelength = 500000 / info.m_bit_rate;
 
 	// Not used in the HxC emulator
-	info.m_floppy_rpm = (header[14] & 0xff) | ((header[15] & 0xff)<<8);
+	info.m_floppy_rpm = get_u16le(&header[14]);
 
 	info.m_interface_mode = (floppymode_t)(header[16] & 0xff);
 	if (info.m_interface_mode > S950_HD_FLOPPYMODE)
@@ -228,14 +229,14 @@ bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	info.m_track0s1_encoding = (encoding_t)(header[25] & 0xff);
 
 	// read track lookup table (multiple of 512)
-	int table_offset = (header[18] & 0xff) | ((header[19] & 0xff)<<8);
+	int table_offset = get_u16le(&header[18]);
 
 	io.read_at(table_offset<<9, track_table, TRACK_TABLE_LENGTH, actual);
 
 	for (int i=0; i < info.m_cylinders; i++)
 	{
-		info.m_cyl_offset[i] = (track_table[4*i] & 0xff) | ((track_table[4*i+1] & 0xff)<<8);
-		info.m_cyl_length[i] = (track_table[4*i+2] & 0xff) | ((track_table[4*i+3] & 0xff)<<8);
+		info.m_cyl_offset[i] = get_u16le(&track_table[4*i]);
+		info.m_cyl_length[i] = get_u16le(&track_table[4*i+2]);
 	}
 
 	// Load the tracks

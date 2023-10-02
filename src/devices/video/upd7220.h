@@ -128,7 +128,7 @@ private:
 	void process_fifo();
 	void continue_command();
 	void update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_graphics_line(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch);
+	void draw_graphics_line(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int mixed);
 	void update_graphics(bitmap_rgb32 &bitmap, const rectangle &cliprect, int force_bitmap);
 
 	void upd7220_vram(address_map &map);

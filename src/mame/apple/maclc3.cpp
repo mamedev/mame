@@ -26,6 +26,8 @@
 
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
+#include "bus/nubus/cards.h"
+#include "bus/nubus/nubus.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68030.h"
 #include "machine/ram.h"
@@ -288,6 +290,14 @@ void macvail_state::maclc3_base(machine_config &config)
 	SONORA(config, m_sonora, C15M);
 	m_sonora->set_maincpu_tag("maincpu");
 	m_sonora->set_rom_tag("bootrom");
+
+	nubus_device &nubus(NUBUS(config, "pds", 0));
+	nubus.set_space(m_maincpu, AS_PROGRAM);
+	// LC III style PDS cards have slot IRQs $C, $D, and $E connected
+	nubus.out_irqc_callback().set(m_sonora, FUNC(sonora_device::slot_irq_w<0x08>));
+	nubus.out_irqd_callback().set(m_sonora, FUNC(sonora_device::slot_irq_w<0x10>));
+	nubus.out_irqe_callback().set(m_sonora, FUNC(sonora_device::slot_irq_w<0x20>));
+	NUBUS_SLOT(config, "lcpds", "pds", mac_pdslc_cards, nullptr);
 
 	MACADB(config, m_macadb, C15M);
 }

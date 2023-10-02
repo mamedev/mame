@@ -938,7 +938,7 @@ void bml3_state::bml3_common(machine_config &config)
 	TIMER(config, "kansas_w").configure_periodic(FUNC(bml3_state::kansas_w), attotime::from_hz(4800));
 	TIMER(config, "kansas_r").configure_periodic(FUNC(bml3_state::kansas_r), attotime::from_hz(40000));
 
-	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia6821_device &pia(PIA6821(config, "pia"));
 	pia.writepa_handler().set(FUNC(bml3_state::piaA_w));
 
 	ACIA6850(config, m_acia, 0);

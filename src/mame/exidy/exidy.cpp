@@ -1616,7 +1616,7 @@ void exidy_state::venture(machine_config &config)
 	exidy_video_config(0x04, 0x04, false);
 
 	// audio hardware
-	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia6821_device &pia(PIA6821(config, "pia"));
 	pia.writepa_handler().set("soundbd", FUNC(venture_sound_device::pb_w));
 	pia.writepb_handler().set("soundbd", FUNC(venture_sound_device::pa_w));
 	pia.ca2_handler().set("soundbd", FUNC(venture_sound_device::cb_w));
@@ -1655,7 +1655,7 @@ void exidy_state::mtrap(machine_config &config)
 	exidy_video_config(0x14, 0x00, false);
 
 	// audio hardware
-	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia6821_device &pia(PIA6821(config, "pia"));
 	pia.writepa_handler().set("soundbd", FUNC(venture_sound_device::pb_w));
 	pia.writepb_handler().set("soundbd", FUNC(venture_sound_device::pa_w));
 	pia.ca2_handler().set("soundbd", FUNC(venture_sound_device::cb_w));

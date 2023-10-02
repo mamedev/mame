@@ -9070,6 +9070,46 @@ ROM_START( timescan )
 	ROM_LOAD( "epr-10563.a8", 0x10000, 0x8000, CRC(9db7eddf) SHA1(8b9a27442a623bee6b9b5b06275226734d132e17) )
 ROM_END
 
+//*************************************************************************************************************************
+//  Time Scanner, Sega System 16B
+//  CPU: FD1089B (317-0024)
+//  ROM Board type: 171-5358
+//  Sega game ID: 833-6207-01 TIME SCANNER
+//    Main board: 837-6224-01
+//     ROM board: 834-6223-01
+//
+ROM_START( timescan3 )
+	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-10559.a4", 0x00000, 0x8000, CRC(7be282cfb) SHA1(e95a3e9edf5a5db10197fa4f8e0cdf8ed2da5071) )
+	ROM_LOAD16_BYTE( "epr-10556.a1", 0x00001, 0x8000, CRC(f8bc7db82) SHA1(efa6ecb9b377e6def2e24c450014db13f00a1297) )
+	ROM_LOAD16_BYTE( "epr-10560.a5", 0x10000, 0x8000, CRC(f4c38aa17) SHA1(d5b35e6343f342de5cf45c0c1569927b68ad5818) )
+	ROM_LOAD16_BYTE( "epr-10557.a2", 0x10001, 0x8000, CRC(cbf8dbeab) SHA1(5caa36be75f3cfedbeb814d1e570ad15157478ec) )
+	ROM_LOAD16_BYTE( "epr-10561.a6", 0x20000, 0x8000, CRC(cb45981f3) SHA1(17e950cf5e108c34d6cdb25d7c182bc0575f770e) )
+	ROM_LOAD16_BYTE( "epr-10558.a3", 0x20001, 0x8000, CRC(d63c8eb7b) SHA1(233b05cf24d675193ed11ef75a26af231dc8c13f) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-10543.b9",  0x00000, 0x8000, CRC(07dccc37) SHA1(544cc6a3b3ef64727ecf5098b84ade2dd5330614) )
+	ROM_LOAD( "epr-10544.b10", 0x08000, 0x8000, CRC(84fb9a3a) SHA1(efde54cc9582f68e58cae05f717a4fc8f620c0fc) )
+	ROM_LOAD( "epr-10545.b11", 0x10000, 0x8000, CRC(c8694bc0) SHA1(e48fc349ef454ded86141937f70b006e64da6b6b) )
+
+	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "epr-10548.b1", 0x00001, 0x8000, CRC(aa150735) SHA1(b6e6ff9229c641e196fc7a0a2cf7aa362f554676) )
+	ROM_LOAD16_BYTE( "epr-10552.b5", 0x00000, 0x8000, CRC(6fcbb9f7) SHA1(0a0fab930477d8b79e500263bbc80d3bf73778f8) )
+	ROM_LOAD16_BYTE( "epr-10549.b2", 0x20001, 0x8000, CRC(2f59f067) SHA1(1fb64cce2f98ddcb5ecb662e63ea636a8da08bcd) )
+	ROM_LOAD16_BYTE( "epr-10553.b6", 0x20000, 0x8000, CRC(8a220a9f) SHA1(c17547d85721fa19e5f445b5be30b3fbf5e8cc6e) )
+	ROM_LOAD16_BYTE( "epr-10550.b3", 0x40001, 0x8000, CRC(f05069ff) SHA1(bd95761036c2fad8ddf4e169d899b173822ee4b0) )
+	ROM_LOAD16_BYTE( "epr-10554.b7", 0x40000, 0x8000, CRC(dc64f809) SHA1(ea85eefa98ec55e9e872940821a959ff4eb1bd1c) )
+	ROM_LOAD16_BYTE( "epr-10551.b4", 0x60001, 0x8000, CRC(435d811f) SHA1(b28eb09620113cd7578387c4d96029f2acb8ec06) )
+	ROM_LOAD16_BYTE( "epr-10555.b8", 0x60000, 0x8000, CRC(2143c471) SHA1(d413aa216349ddf773a39d2826c3a940b4149229) )
+
+	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-10562.a7", 0x00000, 0x8000, CRC(3f5028bf) SHA1(02081569a5f4dc64771e97651a9902a98d54a952) )
+	ROM_LOAD( "epr-10563.a8", 0x10000, 0x8000, CRC(9db7eddf) SHA1(8b9a27442a623bee6b9b5b06275226734d132e17) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
+	ROM_LOAD( "317-0024.key", 0x0000, 0x2000, CRC(dcd41d24) SHA1(2bd96bc7467ad40f4d981d767f9685ec142d6d87) )
+ROM_END
+
 
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -10145,6 +10185,7 @@ GAME( 1988, tetris2,    tetris,   system16b_fd1094,      tetris,   segas16b_stat
 GAME( 1988, tetris1,    tetris,   system16b_fd1094,      tetris,   segas16b_state, init_generic_5358_small, ROT0,   "Sega", "Tetris (set 1, Japan, System 16B) (FD1094 317-0091)", 0 )
 
 GAME( 1987, timescan,   0,        system16b,             timescan, segas16b_state, init_timescan_5358_small,ROT270, "Sega", "Time Scanner (set 2, System 16B)", 0 )
+GAME( 1987, timescan3,  timescan, system16b_fd1089b,     timescan, segas16b_state, init_timescan_5358_small,ROT270, "Sega", "Time Scanner (set 3, Japan, System 16B) (FD1089B 317-0024)", 0 )
 
 GAME( 1994, toryumon,   0,        system16b_5797,        toryumon, segas16b_state, init_generic_5797,       ROT0,   "Sega", "Toryumon", 0 )
 

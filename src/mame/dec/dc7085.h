@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
 
-#ifndef MAME_MACHINE_DC7085_H
-#define MAME_MACHINE_DC7085_H
+#ifndef MAME_DEC_DC7085_H
+#define MAME_DEC_DC7085_H
 
 #pragma once
 
@@ -110,4 +110,4 @@ private:
 DECLARE_DEVICE_TYPE(DC7085, dc7085_device)
 DECLARE_DEVICE_TYPE(DC7085_CHANNEL, dc7085_channel)
 
-#endif // MAME_MACHINE_DC7085_H
+#endif // MAME_DEC_DC7085_H

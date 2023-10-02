@@ -20,6 +20,8 @@ Not nice, but it works...
 #include "uef_cas.h"
 #include "imageutl.h"
 
+#include "multibyte.h"
+
 #include <zlib.h>
 
 #include <cmath>
@@ -64,7 +66,7 @@ static const uint8_t* skip_gz_header( const uint8_t *p ) {
 
 	/* Skip the extra field */
 	if ( ( flags & EXTRA_FIELD ) != 0 ) {
-		int len = ( p[1] << 8 ) | p[0];
+		int len = get_u16le( &p[0] );
 		p += 2 + len;
 	}
 	/* Skip the original file name */
@@ -94,13 +96,13 @@ static float get_uef_float( const uint8_t *Float)
 		was the first byte read from the UEF, Float[1] the second, etc */
 
 		/* decode mantissa */
-		Mantissa = Float[0] | (Float[1] << 8) | ((Float[2]&0x7f)|0x80) << 16;
+		Mantissa = get_u24le(&Float[0]) | 0x800000;
 
 		Result = (float)Mantissa;
 		Result = (float)ldexp(Result, -23);
 
 		/* decode exponent */
-		Exponent = ((Float[2]&0x80) >> 7) | (Float[3]&0x7f) << 1;
+		Exponent = (get_u16le(&Float[2])&0x7f80) >> 7;
 		Exponent -= 127;
 		Result = (float)ldexp(Result, Exponent);
 
@@ -118,7 +120,7 @@ static int uef_cas_to_wav_size( const uint8_t *casdata, int caslen ) {
 	if ( casdata[0] == 0x1f && casdata[1] == 0x8b ) {
 		int err;
 		z_stream d_stream;
-		int inflate_size = ( casdata[ caslen - 1 ] << 24 ) | ( casdata[ caslen - 2 ] << 16 ) | ( casdata[ caslen - 3 ] << 8 ) | casdata[ caslen - 4 ];
+		int inflate_size = get_u32le( &casdata[ caslen - 4 ] );
 		const uint8_t *in_ptr = skip_gz_header( casdata );
 
 		if ( in_ptr == nullptr ) {
@@ -166,8 +168,8 @@ static int uef_cas_to_wav_size( const uint8_t *casdata, int caslen ) {
 	size = 0;
 	pos = sizeof(UEF_HEADER) + 2;
 	while( pos < caslen ) {
-		int chunk_type = ( casdata[pos+1] << 8 ) | casdata[pos];
-		int chunk_length = ( casdata[pos+5] << 24 ) | ( casdata[pos+4] << 16 ) | ( casdata[pos+3] << 8 ) | casdata[pos+2];
+		int chunk_type = get_u16le( &casdata[pos] );
+		int chunk_length = get_u32le( &casdata[pos+2] );
 		int baud_length;
 
 		pos += 6;
@@ -187,14 +189,14 @@ static int uef_cas_to_wav_size( const uint8_t *casdata, int caslen ) {
 			size += ( chunk_length * 10 ) * 4;
 			break;
 		case 0x0110:    /* carrier tone (previously referred to as 'high tone') */
-			baud_length = ( casdata[pos+1] << 8 ) | casdata[pos];
+			baud_length = get_u16le( &casdata[pos] );
 			size += baud_length * 2;
 			break;
 		case 0x0111:
 			LOG_FORMATS( "Unsupported chunk type: %04x\n", chunk_type );
 			break;
 		case 0x0112:    /* integer gap */
-			baud_length = ( casdata[pos+1] << 8 ) | casdata[pos];
+			baud_length = get_u16le( &casdata[pos] );
 			size += baud_length * 2 ;
 			break;
 		case 0x0116:    /* floating point gap */
@@ -259,8 +261,8 @@ static int uef_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 	uint32_t pos = sizeof(UEF_HEADER) + 2;
 	length = length / 2;
 	while( length > 0 ) {
-		int chunk_type = ( bytes[pos+1] << 8 ) | bytes[pos];
-		int chunk_length = ( bytes[pos+5] << 24 ) | ( bytes[pos+4] << 16 ) | ( bytes[pos+3] << 8 ) | bytes[pos+2];
+		int chunk_type = get_u16le( &bytes[pos] );
+		int chunk_length = get_u32le( &bytes[pos+2] );
 
 		uint32_t baud_length, j;
 		uint8_t i, *c;
@@ -295,14 +297,14 @@ static int uef_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 			}
 			break;
 		case 0x0110:    /* carrier tone (previously referred to as 'high tone') */
-			for( baud_length = ( ( bytes[pos+1] << 8 ) | bytes[pos] ) ; baud_length; baud_length-- ) {
+			for( baud_length = get_u16le( &bytes[pos] ) ; baud_length; baud_length-- ) {
 				*p = WAVE_LOW; p++;
 				*p = WAVE_HIGH; p++;
 				length -= 2;
 			}
 			break;
 		case 0x0112:    /* integer gap */
-			for( baud_length = ( ( bytes[pos+1] << 8 ) | bytes[pos] ) ; baud_length; baud_length-- ) {
+			for( baud_length = get_u16le( &bytes[pos] ) ; baud_length; baud_length-- ) {
 				*p = WAVE_NULL; p++;
 				*p = WAVE_NULL; p++;
 				length -= 2;
@@ -315,7 +317,7 @@ static int uef_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 			}
 			break;
 		case 0x0117:    /* change baud rate */
-			baud_length = ( bytes[pos+1] << 8 ) | bytes[pos];
+			baud_length = get_u16le( &bytes[pos] );
 			// These are the only supported numbers
 			if (baud_length == 300)
 				loops = 4;

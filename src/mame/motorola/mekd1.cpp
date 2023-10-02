@@ -419,7 +419,7 @@ void mekd1_state::mekd1(machine_config &config)
 	// PB7 input from the bit rate timer that goes high after the timer period elapses.
 	// CB2 "reader control" output
 	// IRQA and IRQB are NC.
-	PIA6821(config, m_pia0, 0);
+	PIA6821(config, m_pia0);
 	m_pia0->readpa_handler().set(FUNC(mekd1_state::pia0_pa_r));
 	m_pia0->readpb_handler().set(FUNC(mekd1_state::pia0_pb_r));
 	m_pia0->writepa_handler().set(FUNC(mekd1_state::pia0_pa_w));
@@ -427,7 +427,7 @@ void mekd1_state::mekd1(machine_config &config)
 	m_pia0->cb2_handler().set(FUNC(mekd1_state::pia0_cb2_w));
 
 	// User PIA. All the I/O lines are available at P2.
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	m_pia1->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 

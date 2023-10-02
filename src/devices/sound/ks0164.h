@@ -46,6 +46,8 @@ private:
 		MPUS_RX_INT  = 0x80
 	};
 
+	static const u16 sample_dec[0x100];
+
 	devcb_write_line m_midi_tx;
 
 	optional_memory_region m_mem_region;
@@ -71,6 +73,8 @@ private:
 	u8 m_voice_select;
 	u8 m_irqen_76, m_irqen_77;
 	bool m_timer_interrupt;
+
+	util::notifier_subscription m_notif_rom_space;
 
 	void cpu_map(address_map &map);
 
@@ -106,8 +110,6 @@ private:
 	void midi_w(u8 data);
 	u8 midi_status_r();
 	void midi_status_w(u8 data);
-
-	static inline u16 uncomp_8_16(u8 value);
 };
 
 DECLARE_DEVICE_TYPE(KS0164, ks0164_device)

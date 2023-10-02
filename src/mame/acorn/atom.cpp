@@ -118,10 +118,11 @@ Hardware:   PPIA 8255
 #include "emu.h"
 #include "atom.h"
 #include "machine/clock.h"
-#include "formats/imageutl.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include "multibyte.h"
 #include "utf8.h"
 
 /***************************************************************************
@@ -158,9 +159,9 @@ QUICKLOAD_LOAD_MEMBER(atom_state::quickload_cb)
 
 	image.fread(header, 0x16);
 
-	uint16_t start_address = pick_integer_le(header, 0x10, 2);
-	uint16_t run_address = pick_integer_le(header, 0x12, 2);
-	uint16_t size = pick_integer_le(header, 0x14, 2);
+	uint16_t start_address = get_u16le(&header[0x10]);
+	uint16_t run_address = get_u16le(&header[0x12]);
+	uint16_t size = get_u16le(&header[0x14]);
 
 	if (LOG)
 	{

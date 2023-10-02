@@ -25,6 +25,7 @@ Year + Game             PCB ID                    CPU                Video      
 03  Speed Drop          None                      JX-1689HP          ASTRO V05      pLSI1016-60LJ
 04  Zoo                 M1.1                      ASTRO V102PX-005?  ASTRO V06      ASTRO F02 2005-02-18                       Encrypted
 04  Magic Bomb (NB6.1)  J (CS350P001 + CS350P033) ASTRO V102PX-014?  ASTRO V07      ?,                                         Encrypted, select CGA / VGA via jumper
+04  Go & Stop           K2 (CS350P011)            no markings        ASTRO V05      ASTRO F01 2007-06-03                       Encrypted
 05  Dino Dino           T-3802A                   ASTRO V102PX-010?  ASTRO V05      ASTRO F02 2003-03-12                       Encrypted
 05  Stone Age           L1                        ASTRO V102PX-012?  ASTRO V05(x2)  ASTRO F02 2004-09-04                       Encrypted
 05? Hacher (hack)       M1.2                      ?                  ?              ASTRO F02 2005-02-18                       Encrypted
@@ -56,6 +57,7 @@ TODO:
 - magibombd, magibombg, hacher: need a redump of the sprite ROMs.
 - astoneag, dinodino, magibombd, magibombg: exiting from test menu goes haywire (requires a soft-reset with F3).
 - magibombg: needs RE of the CPU code and correct EEPROM.
+- gostopac: stops with 'S4' message during boot. Needs RE of the CPU code and emulation of its peculiarities.
 
 *************************************************************************************************************/
 
@@ -279,12 +281,14 @@ public:
 
 	void hacher(machine_config &config);
 	void dinodino(machine_config &config);
+	void gostop(machine_config &config);
 	void magibombd(machine_config &config);
 	void magibombg(machine_config &config);
 	void winbingo(machine_config &config);
 	void zoo(machine_config &config);
 
 	void init_dinodino();
+	void init_gostop();
 	void init_hacher();
 	void init_magibombd();
 	void init_magibombg();
@@ -321,6 +325,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_1_2_scanline_cb);
 
 	void dinodino_map(address_map &map);
+	void gostop_map(address_map &map);
 	void hacher_map(address_map &map);
 	void magibombd_map(address_map &map);
 	void magibombg_map(address_map &map);
@@ -328,6 +333,7 @@ private:
 	void zoo_map(address_map &map);
 
 	static const decryption_info dinodino_table;
+	static const decryption_info gostop_table;
 	static const decryption_info magibombd_table;
 	static const decryption_info winbingo_table;
 	static const decryption_info zoo_table;
@@ -868,6 +874,23 @@ void zoo_state::zoo_map(address_map &map)
 	map(0xe00000, 0xe00001).portr("CPUCODE_IN");
 }
 
+void zoo_state::gostop_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0xb00001, 0xb00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xb80000, 0xb80001).portr("CPUCODE_IN");
+	map(0xc00000, 0xc00fff).ram().share("spriteram");
+	map(0xc02000, 0xc02001).nopr().w(FUNC(zoo_state::draw_sprites_w));
+	map(0xc04000, 0xc04001).portr("INPUTS");
+	map(0xc08001, 0xc08001).w(FUNC(zoo_state::eeprom_w));
+	map(0xc0a000, 0xc0a001).w(FUNC(zoo_state::magibomb_outputs_w));
+	map(0xc0e000, 0xc0e001).portr("EEPROM_IN");
+	map(0xc80000, 0xc801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xd00000, 0xd03fff).ram().share("nvram"); // battery
+//  map(0xb00001, 0xb00001).w(FUNC(zoo_state::oki_bank_w)); // TODO once it runs
+//  map(0xc00000, 0xc00001).nopr().w(FUNC(zoo_state::screen_enable_w)).umask16(0x00ff); // unknown location
+}
+
 void astoneag_state::astoneag_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
@@ -1279,6 +1302,14 @@ void zoo_state::dinodino(machine_config &config)
 {
 	winbingo(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::dinodino_map);
+
+	TIMER(config.replace(), "scantimer").configure_scanline(FUNC(zoo_state::irq_2_4_scanline_cb), "screen", 0, 1);
+}
+
+void zoo_state::gostop(machine_config &config)
+{
+	zoo(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::gostop_map);
 
 	TIMER(config.replace(), "scantimer").configure_scanline(FUNC(zoo_state::irq_2_4_scanline_cb), "screen", 0, 1);
 }
@@ -2119,6 +2150,40 @@ ROM_START( dinodino )
 	ROM_LOAD( "dinodino_cpucode.key", 0x00, 0x02, CRC(674b2687) SHA1(9c1338a41162fa2ffbd2ea0a579ad87a6c084a0e) )
 ROM_END
 
+/***************************************************************************
+
+Go Stop
+Astro Corp.
+
+***************************************************************************/
+
+ROM_START( gostopac )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "go stop en1.0 1.u20", 0x00000, 0x10000, CRC(288eb9e2) SHA1(cb1181a3ff260374d786fa3b967e3200cdc545c5) )
+	ROM_LOAD16_BYTE( "go stop en1.0 2.u19", 0x00001, 0x10000, CRC(6cee46c2) SHA1(f63914264fbe9c3124f7e6e1fbd6fb1a72314de9) )
+	ROM_FILL(                               0x20000, 0x20000, 0xff )
+
+	ROM_REGION( 0x1000000, "sprites", 0 )
+	ROM_LOAD( "u26", 0x000000, 0x200000, CRC(f8ca0d7b) SHA1(d023521b58f2550a069ae45392f8a7e4959a355b) )
+	ROM_LOAD( "u24", 0x200000, 0x200000, CRC(51892a3f) SHA1(5839a12262a603d4672cc2ab9b4951f7092b5a53) )
+	ROM_RELOAD(      0x400000, 0x200000 )
+	ROM_RELOAD(      0x600000, 0x200000 )
+	ROM_RELOAD(      0x800000, 0x200000 )
+	ROM_RELOAD(      0xa00000, 0x200000 )
+	ROM_RELOAD(      0xc00000, 0x200000 )
+	ROM_RELOAD(      0xe00000, 0x200000 )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "go stop 3.u33", 0x00000, 0x80000, CRC(3d519d59) SHA1(58f0fb42724da75c56eae37ffe47c7e0caf87ee4) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(c5bfafa4) SHA1(b482fad6445487a5c14c4360c7b3b0b02f16944c) ) // TODO: factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "gostopac_cpucode.key", 0x00, 0x02, NO_DUMP )
+ROM_END
+
+
 void astrocorp_state::init_showhand()
 {
 #if 0
@@ -2463,6 +2528,50 @@ void zoo_state::init_dinodino()
 #endif
 }
 
+const zoo_state::decryption_info zoo_state::gostop_table = {
+	{
+		{
+			{ 8, 9, 10 },
+			{
+				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
+				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
+				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
+				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
+				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
+				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
+				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
+				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
+			}
+		},
+		{
+			{ 12, 9, 11 },
+			{
+				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
+				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
+				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
+				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
+				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
+				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
+				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
+				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
+			}
+		}
+	},
+	{ 12, 10, 8, 11, 9, 7, 2, 6, 3, 5, 4 }
+};
+
+void zoo_state::init_gostop()
+{
+	decrypt_rom(gostop_table);
+#if 1
+	// TODO: There's more stuff happening for addresses < 0x400...
+	// override reset vector for now
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	rom[0x00004/2] = 0x0000;
+	rom[0x00006/2] = 0x040e;
+#endif
+}
+
 const astoneag_state::decryption_info astoneag_state::astoneag_table = {
 	{
 		{
@@ -2545,6 +2654,7 @@ GAMEL( 2001?, magibombi, magibomb, magibombb, magibomb,  magibomb_state,  init_m
 
 // Heavier encryption
 GAMEL( 2004,  zoo,       0,        zoo,       magibombd, zoo_state,       init_zoo,       ROT0, "Astro Corp.", "Zoo (Ver. ZO.02.D, Aug 27 2004)",               MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_zoo       ) // 10:53:44 Aug 27 2004
+GAME(  2004,  gostopac,  0,        gostop,    dinodino,  zoo_state,       init_gostop,    ROT0, "Astro Corp.", "Go & Stop",                                     MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAMEL( 2005,  dinodino,  0,        dinodino,  dinodino,  zoo_state,       init_dinodino,  ROT0, "Astro Corp.", "Dino Dino (Ver. A1.1, 01/13/2005)",             MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_dinodino  ) // 13/01.2005 10:59
 GAMEL( 2005,  astoneag,  0,        astoneag,  astoneag,  astoneag_state,  init_astoneag,  ROT0, "Astro Corp.", "Stone Age (Astro, Ver. EN.03.A, 2005/02/21)",   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_astoneag  )
 GAMEL( 2005,  magibombd, magibomb, magibombd, magibombd, zoo_state,       init_magibombd, ROT0, "Astro Corp.", "Magic Bomb (Ver. AA.72.D, 14/11/05)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibombb ) // 15/11/05 09:31. Undumped sprite ROM

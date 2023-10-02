@@ -11,6 +11,7 @@
 #include "formats/vt_dsk.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 #include "osdcomm.h"
 
 
@@ -401,8 +402,8 @@ bool vtech_dsk_format::save(util::random_read_write &io, const std::vector<uint3
 				chk += src[i];
 				bdatax[pos++] = src[i];
 			}
-			bdatax[pos++] = chk;
-			bdatax[pos++] = chk >> 8;
+			put_u16le(&bdatax[pos], chk);
+			pos += 2;
 		}
 	}
 

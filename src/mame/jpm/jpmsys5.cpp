@@ -787,7 +787,7 @@ void jpmsys5_state::jpmsys5_common(machine_config& config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	S16LF01(config, m_vfd);
 
-	pia6821_device &pia(PIA6821(config, "6821pia", 0));
+	pia6821_device &pia(PIA6821(config, "6821pia"));
 	pia.readpa_handler().set(FUNC(jpmsys5_state::u29_porta_r));
 	pia.writepb_handler().set(FUNC(jpmsys5_state::u29_portb_w));
 	pia.ca2_handler().set(FUNC(jpmsys5_state::u29_ca2_w));

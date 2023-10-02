@@ -64,7 +64,7 @@ Imgtool Subcommands
 
 **put**
 
-	**imgtool put <format> <imagename> <filename>... <destname> [--(fileoption)==value] [--filter=filter] [--fork=fork]**
+	**imgtool put <format> <imagename> <filename>... <destname> [--(fileoption)=value] [--filter=filter] [--fork=fork]**
 
 	* <format> is the image format, e.g. coco_jvc_rsdos
 	* <imagename> is the image filename; can specify a ZIP file for image name
@@ -173,7 +173,7 @@ Filters are a means to process data being written into or read out of an image i
 
 **vzsnapshot**
 
-	[todo: VZ Snapshot? Find out what this is....]
+	[todo: VZ Snapshot? Find out what this is...]
 
 **vzbas**
 

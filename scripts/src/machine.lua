@@ -1756,18 +1756,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/icm7170.h,MACHINES["ICM7170"] = true
----------------------------------------------------
-
-if (MACHINES["ICM7170"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/icm7170.cpp",
-		MAME_DIR .. "src/devices/machine/icm7170.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/ibm21s850.h,MACHINES["IBM21S850"] = true
 ---------------------------------------------------
 
@@ -1775,6 +1763,30 @@ if (MACHINES["IBM21S850"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/ibm21s850.cpp",
 		MAME_DIR .. "src/devices/machine/ibm21s850.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/icd2061a.h,MACHINES["ICD2061A"] = true
+---------------------------------------------------
+
+if (MACHINES["ICD2061A"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/icd2061a.cpp",
+		MAME_DIR .. "src/devices/machine/icd2061a.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/icm7170.h,MACHINES["ICM7170"] = true
+---------------------------------------------------
+
+if (MACHINES["ICM7170"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/icm7170.cpp",
+		MAME_DIR .. "src/devices/machine/icm7170.h",
 	}
 end
 
@@ -4824,18 +4836,6 @@ if (MACHINES["AIC6250"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/aic6250.cpp",
 		MAME_DIR .. "src/devices/machine/aic6250.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/dc7085.h,MACHINES["DC7085"] = true
----------------------------------------------------
-
-if (MACHINES["DC7085"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/dc7085.cpp",
-		MAME_DIR .. "src/devices/machine/dc7085.h",
 	}
 end
 

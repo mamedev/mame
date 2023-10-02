@@ -608,13 +608,13 @@ void midway_sounds_good_device::device_add_mconfig(machine_config &config)
 	M68000(config, m_cpu, DERIVED_CLOCK(1, 2));
 	m_cpu->set_addrmap(AS_PROGRAM, &midway_sounds_good_device::soundsgood_map);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(midway_sounds_good_device::porta_w));
 	m_pia->writepb_handler().set(FUNC(midway_sounds_good_device::portb_w));
 	m_pia->irqa_handler().set(FUNC(midway_sounds_good_device::irq_w));
 	m_pia->irqb_handler().set(FUNC(midway_sounds_good_device::irq_w));
 
-	AD7533(config, m_dac, 0); /// ad7533jn.u10
+	AD7533(config, m_dac); /// ad7533jn.u10
 
 	// The DAC filters here are identical to those on the "Turbo Cheap Squeak" and "Cheap Squeak Deluxe" boards.
 	//LM359 @U2.2, 2nd order MFB low-pass (fc = 5404.717733, Q = 0.625210, gain = -1.000000)
@@ -775,13 +775,13 @@ void midway_turbo_cheap_squeak_device::device_add_mconfig(machine_config &config
 	MC6809E(config, m_cpu, DERIVED_CLOCK(1, 4));
 	m_cpu->set_addrmap(AS_PROGRAM, &midway_turbo_cheap_squeak_device::turbocs_map);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(midway_turbo_cheap_squeak_device::porta_w));
 	m_pia->writepb_handler().set(FUNC(midway_turbo_cheap_squeak_device::portb_w));
 	m_pia->irqa_handler().set(FUNC(midway_turbo_cheap_squeak_device::irq_w));
 	m_pia->irqb_handler().set(FUNC(midway_turbo_cheap_squeak_device::irq_w));
 
-	AD7533(config, m_dac, 0); /// ad7533jn.u11
+	AD7533(config, m_dac); /// ad7533jn.u11
 
 	// The DAC filters here are identical to those on the "Sounds Good" and "Cheap Squeak Deluxe" boards.
 	//LM359 @U14.2, 2nd order MFB low-pass (fc = 5404.717733, Q = 0.625210, gain = -1.000000)

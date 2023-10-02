@@ -12,9 +12,9 @@
 #include "fat.h"
 #include "iflopimg.h"
 
-#include "formats/imageutl.h"
 #include "formats/pc_dsk_legacy.h"
 
+#include "multibyte.h"
 #include "opresolv.h"
 
 #define FAT_SECLEN              512
@@ -34,10 +34,10 @@ static imgtoolerr_t fat_image_create(imgtool::image &image, imgtool::stream::ptr
 
 	/* set up just enough of a boot sector to specify geometry */
 	memset(buffer, 0, sizeof(buffer));
-	place_integer_le(buffer, 24, 2, sectors);
-	place_integer_le(buffer, 26, 2, heads);
-	place_integer_le(buffer, 19, 2, (uint16_t) (((uint64_t) tracks * heads * sectors) >> 0));
-	place_integer_le(buffer, 32, 4, (uint16_t) (((uint64_t) tracks * heads * sectors) >> 16));
+	put_u16le(&buffer[24], sectors);
+	put_u16le(&buffer[26], heads);
+	put_u16le(&buffer[19], uint16_t((uint64_t(tracks) * heads * sectors) >> 0));
+	put_u32le(&buffer[32], uint16_t((uint64_t(tracks) * heads * sectors) >> 16));
 	err = image.write_block(0, buffer);
 	if (err)
 		goto done;
@@ -47,7 +47,7 @@ static imgtoolerr_t fat_image_create(imgtool::image &image, imgtool::stream::ptr
 		imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_CREATE_PARTITION);
 
 	/* actually create the partition */
-	err = fat_partition_create(image, 0, ((uint64_t) tracks) * heads * sectors);
+	err = fat_partition_create(image, 0, uint64_t(tracks) * heads * sectors);
 	if (err)
 		goto done;
 
@@ -67,11 +67,11 @@ static imgtoolerr_t fat_image_get_geometry(imgtool::image &image, uint32_t *trac
 	if (err)
 		return err;
 
-	total_sectors = pick_integer_le(buffer, 19, 2)
-		| (pick_integer_le(buffer, 32, 4) << 16);
+	total_sectors = get_u16le(&buffer[19])
+		| uint64_t(get_u32le(&buffer[32]) << 16);
 
-	*sectors = pick_integer_le(buffer, 24, 2);
-	*heads = pick_integer_le(buffer, 26, 2);
+	*sectors = get_u16le(&buffer[24]);
+	*heads = get_u16le(&buffer[26]);
 	*tracks = total_sectors / *heads / *sectors;
 	return IMGTOOLERR_SUCCESS;
 }

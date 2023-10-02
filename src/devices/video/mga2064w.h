@@ -33,6 +33,9 @@ protected:
 
 	void dwgreg_map(address_map &map);
 
+	u32 dmawin_idump_r(offs_t offset, u32 mem_mask = ~0);
+	void dmawin_iload_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+
 	required_device<matrox_vga_device> m_svga;
 	required_memory_region m_vga_rom;
 private:
@@ -52,6 +55,12 @@ private:
 	// DWGREG section
 	void dwgctl_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void maccess_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	enum drawing_state_t {
+		DRAW_IDLE,
+		DRAW_ILOAD,
+		DRAW_IDUMP
+	};
+
 	struct {
 		u32 src[4]{};
 		u32 dr[16]{};
@@ -69,12 +78,16 @@ private:
 		s16 fxleft = 0;
 		s16 fxright = 0;
 		s16 xdst = 0;
-		int32_t ydst = 0;
+		s32 ydst = 0;
 		u32 ydstorg = 0;
 		u32 bcol = 0;
 		u32 fcol = 0;
 		u8 sellin = 0;
+		drawing_state_t state;
+		s32 current_x, current_y;
 	} m_dwgreg;
+
+	void draw_trigger();
 };
 
 DECLARE_DEVICE_TYPE(MGA2064W, mga2064w_device);

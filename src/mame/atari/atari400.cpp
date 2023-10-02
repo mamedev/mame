@@ -2047,7 +2047,7 @@ void a400_state::atari_common(machine_config &config)
 	m_antic->set_gtia_tag(m_gtia);
 
 	/* devices */
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(a400_state::djoy_0_1_r));
 	m_pia->writepa_handler().set(FUNC(a400_state::djoy_0_1_w));
 	m_pia->readpb_handler().set(FUNC(a400_state::djoy_2_3_r));

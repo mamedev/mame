@@ -24,6 +24,18 @@ public:
 	bool vsync_status() { return vga_vblank(); }
 	u32 vcount_r() { return screen().vpos() & 0xfff; }
 
+	u8 read_memory(u32 address)
+	{
+		return vga.memory[address % vga.svga_intf.vram_size];
+	}
+
+	void write_memory(u32 address, u8 data)
+	{
+		vga.memory[address % vga.svga_intf.vram_size] = data;
+	}
+
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+
 protected:
 	virtual void io_3bx_3dx_map(address_map &map) override;
 
@@ -33,6 +45,7 @@ protected:
 	virtual uint16_t offset() override;
 	virtual uint32_t start_addr() override;
 	virtual void recompute_params() override;
+	virtual void palette_update() override;
 
 	void crtcext_map(address_map &map);
 	void ramdac_indexed_map(address_map &map);
@@ -77,6 +90,9 @@ private:
 	u8 m_cursor_read_index = 0;
 	u8 m_cursor_index_state = 0;
 	u8 m_cursor_color[12]{};
+	u8 m_cursor_ram[0x400]{};
+	u8 m_cursor_ccr = 0, m_cursor_dcc = 0;
+	u16 m_cursor_x = 0, m_cursor_y = 0;
 
 	u8 truecolor_ctrl_r();
 	void truecolor_ctrl_w(offs_t offset, u8 data);
@@ -85,6 +101,8 @@ private:
 
 	u8 m_multiplex_ctrl = 0;
 	u8 m_truecolor_ctrl = 0;
+
+	u8 m_msc = 0;
 };
 
 DECLARE_DEVICE_TYPE(MATROX_VGA, matrox_vga_device)

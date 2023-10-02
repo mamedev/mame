@@ -7,8 +7,8 @@ Hegener + Glaser Mephisto Sensors Board, for modular chesscomputers
 - Muenchen
 - Exclusive
 
-This device can also apply to non-modular boards if I/O is similar Bavaria board
-is not emulated here, additional handlers for it are in the driver.
+This device can also apply to non-modular boards if I/O is similar. The Bavaria
+board is not emulated here, additional handlers for it are in the driver.
 
 *******************************************************************************/
 

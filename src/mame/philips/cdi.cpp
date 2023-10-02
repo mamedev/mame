@@ -888,6 +888,17 @@ ROM_START( quizard4_40 ) /* CD-ROM printed 07/97 */
 	ROM_LOAD( "de_142_d3.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) ) // German language
 ROM_END
 
+// only the CD was dumped, MCU not available
+ROM_START( quizardff ) /* CD-ROM printed 01/96 */
+	QUIZARD_BIOS_ROM
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "quizardff", 0, SHA1(ac533040379c1350066e778e3a86d1beb11c6f71) )
+
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "8751.bin", 0x0000, 0x1000, NO_DUMP )
+ROM_END
+
 
 /*************************
 *      Game driver(s)    *
@@ -925,3 +936,5 @@ GAME( 1998, quizard4,    cdibios,  quizard,       quizard,  quizard_state, empty
 GAME( 1998, quizard4cz,  quizard4, quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.2, Czech, i8751 TS142 CZ1)", MACHINE_IMPERFECT_SOUND )
 GAME( 1998, quizard4_41, quizard4, quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.1, German, i8751 DE 142 D3)", MACHINE_IMPERFECT_SOUND )
 GAME( 1997, quizard4_40, quizard4, quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.0, German, i8751 DE 142 D3)", MACHINE_IMPERFECT_SOUND )
+
+GAME( 1996, quizardff,   cdibios,  quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard Fun and Fascination (French Edition V1 - 01/96)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

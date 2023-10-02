@@ -6386,7 +6386,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="iozipd51">
+	<software name="iozipd51" supported="no">
 		<description>Iomega Zip-drive Tools (Version 5.1)</description>
 		<year>1996</year>
 		<publisher>Iomega</publisher>
@@ -6409,6 +6409,20 @@ license:CC0-1.0
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="knowledge dynamics corp, cirrus logic supervga driver pt-521 (version 1.30) (disk 2).img" size="1474560" crc="f7350f94" sha1="0ebe33544679b90aa0497bc03abc576cf24d08a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magnum6">
+		<description>Interact Magnum 6 Game Controller Driver for Windows 95</description>
+		<year>1996</year>
+		<publisher>Interact Multimedia Products</publisher>
+		<notes><![CDATA[
+Driver for [pc_joy:magnum6_pad]
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="interact multimedia products windows 95 driver.img" size="1474560" crc="f5521075" sha1="f9f7ef6292aa431d1c6b34cad0bbd43c57f739f4"/>
 			</dataarea>
 		</part>
 	</software>

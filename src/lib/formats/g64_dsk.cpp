@@ -11,8 +11,10 @@
 *********************************************************************/
 
 #include "formats/g64_dsk.h"
+#include "imageutl.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include "osdcore.h" // osd_printf_*
 
@@ -71,7 +73,7 @@ bool g64_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 		uint32_t tpos = POS_TRACK_OFFSET + (track * 4);
 		uint32_t spos = tpos + (track_count * 4);
-		uint32_t dpos = pick_integer_le(&img[0], tpos, 4);
+		uint32_t dpos = get_u32le(&img[tpos]);
 
 		if (!dpos)
 			continue;
@@ -82,7 +84,7 @@ bool g64_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			return false;
 		}
 
-		uint32_t speed_zone = pick_integer_le(&img[0], spos, 4);
+		uint32_t speed_zone = get_u32le(&img[spos]);
 
 		if (speed_zone > 3)
 		{
@@ -90,7 +92,7 @@ bool g64_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			return false;
 		}
 
-		uint16_t track_bytes = pick_integer_le(&img[0], dpos, 2);
+		uint16_t track_bytes = get_u16le(&img[dpos]);
 		int track_size = track_bytes * 8;
 
 		LOG_FORMATS("head %u track %u offs %u size %u cell %ld\n", head, cylinder, dpos, track_bytes, 200000000L/track_size);
@@ -172,9 +174,9 @@ bool g64_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 			uint8_t speed_offset[4];
 			uint8_t track_length[2];
 
-			place_integer_le(track_offset, 0, 4, dpos);
-			place_integer_le(speed_offset, 0, 4, speed_zone);
-			place_integer_le(track_length, 0, 2, packed.size());
+			put_u32le(track_offset, dpos);
+			put_u32le(speed_offset, speed_zone);
+			put_u16le(track_length, packed.size());
 
 			io.write_at(tpos, track_offset, 4, actual);
 			io.write_at(spos, speed_offset, 4, actual);

@@ -1805,7 +1805,7 @@ void aristmk4_state::aristmk4(machine_config &config)
 	via.irq_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 	// CA1 is connected to +5V, CB1 is not connected.
 
-	pia6821_device &pia(PIA6821(config, "pia6821_0", 0));
+	pia6821_device &pia(PIA6821(config, "pia6821_0"));
 	pia.readpa_handler().set(FUNC(aristmk4_state::mkiv_pia_ina));
 	pia.writepa_handler().set(FUNC(aristmk4_state::mkiv_pia_outa));
 	pia.writepb_handler().set(FUNC(aristmk4_state::mkiv_pia_outb));

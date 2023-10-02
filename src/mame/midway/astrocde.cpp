@@ -947,6 +947,14 @@ static INPUT_PORTS_START( gorf )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( gorfpgm1f )
+	PORT_INCLUDE(gorf)
+
+	PORT_MODIFY("P4HANDLE")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Language ) )     PORT_DIPLOCATION("S1:4") /* Default it to Foreign because this set has the French ROM */
+	PORT_DIPSETTING(    0x08, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x00, "Foreign (French ROM)" )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( gorfpgm1g )
 	PORT_INCLUDE(gorf)
@@ -1613,6 +1621,18 @@ ROM_START( gorfpgm1 )
 	ROM_LOAD( "873h.x8",      0xb000, 0x1000, CRC(56d40c7c) SHA1(c7c9a618d9438a76121972ac029ad7036bcf8c6f) )
 ROM_END
 
+ROM_START( gorfpgm1f )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gorf_a.x1", 0x0000, 0x1000, CRC(97cb4a6a) SHA1(efdae9a437c665fb861665a38c6cb13fd848ad91) )
+	ROM_LOAD( "gorf_b.x2", 0x1000, 0x1000, CRC(257236f8) SHA1(d1e8555fe5e6705ef88535bcd6071d1072b01386) )
+	ROM_LOAD( "gorf_c.x3", 0x2000, 0x1000, CRC(16b0638b) SHA1(65e1e2e4df80140976915e0982ce3219b14beece) )
+	ROM_LOAD( "gorf_d.x4", 0x3000, 0x1000, CRC(b5e821dc) SHA1(152840e353d567cbf5a86206dde70e5b64b27236) )
+	ROM_LOAD( "gorf_e.x5", 0x8000, 0x1000, CRC(8e82804b) SHA1(24250edb30efa63c80514629c86c9372b7ca3020) )
+	ROM_LOAD( "gorf_f.x6", 0x9000, 0x1000, CRC(715fb4d9) SHA1(c9f33162093e6ed7e3cb6bb716419e5bc43c0381) )
+	ROM_LOAD( "gorf_g.x7", 0xa000, 0x1000, CRC(8a066456) SHA1(f64bcdadbc62566b55573039b03baf5358e24a36) )
+	ROM_LOAD( "gorf_h.x8", 0xb000, 0x1000, CRC(56d40c7c) SHA1(c7c9a618d9438a76121972ac029ad7036bcf8c6f) )
+	ROM_LOAD( "french_gorf.x11", 0xc000, 0x1000, CRC(759d7f66) SHA1(339b719fc1ffe3c2be49fbd5cf562d06134abadc) )
+ROM_END
 
 ROM_START( gorfpgm1g )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1840,6 +1860,7 @@ GAME(  1980, wowg,      wow,  wow,      wowg,      astrocde_state, init_wow,    
 /* 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91364 ROM/RAM board */
 GAMEL( 1981, gorf,      0,    gorf,     gorf,      astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway", "Gorf", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf  )
 GAMEL( 1981, gorfpgm1,  gorf, gorf,     gorf,      astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway", "Gorf (program 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
+GAMEL( 1981, gorfpgm1f, gorf, gorf,     gorfpgm1f, astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway", "Gorf (program 1, with French Language ROM)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
 GAMEL( 1981, gorfpgm1g, gorf, gorf,     gorfpgm1g, astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway", "Gorf (program 1, with German Language ROM)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
 
 /* 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91423 memory board */

@@ -3,6 +3,8 @@
 #include "emu.h"
 #include "t10spc.h"
 
+#include "multibyte.h"
+
 void t10spc::t10_start(device_t &device)
 {
 	m_device = &device;
@@ -95,19 +97,14 @@ void t10spc::ReadData( uint8_t *data, int dataLength )
 		if (command[4] == 0)
 		{
 			data[0] = m_sense_asc & 0x7f;
-			data[1] = (m_sense_information >> 16) & 0x1f;
-			data[2] = (m_sense_information >> 8) & 0xff;
-			data[3] = (m_sense_information >> 0) & 0xff;
+			put_u24be(&data[1], m_sense_information);
 		}
 		else
 		{
 			data[0] = 0x70;
 			data[1] = 0;
 			data[2] = m_sense_key & 0xf;
-			data[3] = (m_sense_information >> 24) & 0xff;
-			data[4] = (m_sense_information >> 16) & 0xff;
-			data[5] = (m_sense_information >> 8) & 0xff;
-			data[6] = (m_sense_information >> 0) & 0xff;
+			put_u32be(&data[3], m_sense_information);
 			data[7] = 10;
 			data[8] = 0;
 			data[9] = 0;

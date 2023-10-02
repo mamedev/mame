@@ -38,7 +38,7 @@ cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, dev
 
 void cmi01a_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia[0], 0); // 6821 C6/7/8/9
+	PIA6821(config, m_pia[0]); // 6821 C6/7/8/9
 	m_pia[0]->readcb1_handler().set(FUNC(cmi01a_device::tri_r));
 	m_pia[0]->readpa_handler().set(FUNC(cmi01a_device::ws_dir_r));
 	m_pia[0]->writepa_handler().set(FUNC(cmi01a_device::ws_dir_w));
@@ -49,7 +49,7 @@ void cmi01a_device::device_add_mconfig(machine_config &config)
 	m_pia[0]->irqa_handler().set(m_irq_merger, FUNC(input_merger_device::in_w<0>));
 	m_pia[0]->irqb_handler().set(m_irq_merger, FUNC(input_merger_device::in_w<1>));
 
-	PIA6821(config, m_pia[1], 0); // 6821 D6/7/8/9
+	PIA6821(config, m_pia[1]); // 6821 D6/7/8/9
 	m_pia[1]->readca1_handler().set(FUNC(cmi01a_device::zx_r));
 	m_pia[1]->readcb1_handler().set(FUNC(cmi01a_device::eosi_r));
 	m_pia[1]->readpa_handler().set(FUNC(cmi01a_device::pitch_octave_r));

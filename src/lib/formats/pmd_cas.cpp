@@ -12,6 +12,8 @@
 
 #include "pmd_cas.h"
 
+#include "multibyte.h"
+
 #define WAVEENTRY_LOW  -32768
 #define WAVEENTRY_HIGH  32767
 
@@ -89,7 +91,7 @@ static void pmd85_printf_image_info(const uint8_t *bytes, int sample_count)
 #if 0
 	char track_name[9];
 	uint32_t sec = (uint32_t)(sample_count/PMD85_WAV_FREQUENCY);
-	uint16_t addr = (bytes[0x33]<<8) | bytes[0x32];
+	uint16_t addr = get_u16le(&bytes[0x32]);
 	strncpy(track_name, (char*)&bytes[0x36], 8);
 	track_name[8] = '\0';
 
@@ -135,7 +137,7 @@ static int pmd85_handle_cassette(int16_t *buffer, const uint8_t *bytes)
 		int data_pos = 0;
 		while (data_pos < pmd85_image_size)
 		{
-			uint16_t block_size = (bytes[data_pos + 1]<<8) | bytes[data_pos];
+			uint16_t block_size = get_u16le(&bytes[data_pos]);
 			int pause_len = PMD85_PAUSE_BITS;
 
 			data_pos += 2;

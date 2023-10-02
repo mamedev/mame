@@ -512,6 +512,8 @@ if (BUSES["ATA"]~=null) then
 		MAME_DIR .. "src/devices/bus/ata/gdrom.h",
 		MAME_DIR .. "src/devices/bus/ata/px320a.cpp",
 		MAME_DIR .. "src/devices/bus/ata/px320a.h",
+		MAME_DIR .. "src/devices/bus/ata/zip100.cpp",
+		MAME_DIR .. "src/devices/bus/ata/zip100.h",
 	}
 end
 
@@ -2115,6 +2117,8 @@ if (BUSES["PC_JOY"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/pc_joy/pc_joy.cpp",
 		MAME_DIR .. "src/devices/bus/pc_joy/pc_joy.h",
+		MAME_DIR .. "src/devices/bus/pc_joy/pc_joy_magnum6.cpp",
+		MAME_DIR .. "src/devices/bus/pc_joy/pc_joy_magnum6.h",
 		MAME_DIR .. "src/devices/bus/pc_joy/pc_joy_sw.cpp",
 		MAME_DIR .. "src/devices/bus/pc_joy/pc_joy_sw.h",
 	}

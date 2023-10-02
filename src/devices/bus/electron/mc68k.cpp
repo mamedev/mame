@@ -92,14 +92,14 @@ void electron_mc68k_device::device_add_mconfig(machine_config &config)
 
 	RAM(config, m_ram).set_default_size("256K").set_extra_options("64K,128K,192K");
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->writepb_handler().set(m_pia[1], FUNC(pia6821_device::set_a_input));
 	m_pia[0]->ca2_handler().set(m_pia[1], FUNC(pia6821_device::cb1_w));
 	m_pia[0]->cb2_handler().set(m_pia[1], FUNC(pia6821_device::ca1_w));
 	m_pia[0]->irqa_handler().set("irq_ipl0", FUNC(input_merger_device::in_w<0>));
 	m_pia[0]->irqb_handler().set("irq_ipl0", FUNC(input_merger_device::in_w<1>));
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->writepb_handler().set(m_pia[0], FUNC(pia6821_device::set_a_input));
 	m_pia[1]->ca2_handler().set(m_pia[0], FUNC(pia6821_device::cb1_w));
 	m_pia[1]->cb2_handler().set(m_pia[0], FUNC(pia6821_device::ca1_w));

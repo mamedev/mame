@@ -505,7 +505,7 @@ void pegasus_state::pegasus(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	/* devices */
-	PIA6821(config, m_pia_s, 0);
+	PIA6821(config, m_pia_s);
 	m_pia_s->readpb_handler().set(FUNC(pegasus_state::pegasus_keyboard_r));
 	m_pia_s->readca1_handler().set(FUNC(pegasus_state::pegasus_cassette_r));
 	m_pia_s->writepa_handler().set(FUNC(pegasus_state::pegasus_keyboard_w));
@@ -515,7 +515,7 @@ void pegasus_state::pegasus(machine_config &config)
 	m_pia_s->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	m_pia_s->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	PIA6821(config, m_pia_u, 0);
+	PIA6821(config, m_pia_u);
 	m_pia_u->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	m_pia_u->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 

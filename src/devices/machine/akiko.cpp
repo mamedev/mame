@@ -24,9 +24,8 @@
 #include "emu.h"
 #include "akiko.h"
 
-#include "romload.h"
-
 #include "coreutil.h"
+#include "multibyte.h"
 
 #define LOG_WARN        (1U << 1) // Show warnings
 #define LOG_REGS        (1U << 2) // Show register r/w
@@ -178,9 +177,7 @@ void akiko_device::device_reset()
 		p += 13;
 		p[1] = 0x01;
 		p[3] = 0xa2; /* disc end */
-		p[8] = (discend >> 16 ) & 0xff;
-		p[9] = (discend >> 8 ) & 0xff;
-		p[10] = discend & 0xff;
+		put_u24be(&p[8], discend);
 		p += 13;
 
 		for( i = 0; i < m_cdrom->get_last_track(); i++ )
@@ -192,9 +189,7 @@ void akiko_device::device_reset()
 
 			p[1] = ((addrctrl & 0x0f) << 4) | ((addrctrl & 0xf0) >> 4);
 			p[3] = dec_2_bcd( i+1 );
-			p[8] = (trackpos >> 16 ) & 0xff;
-			p[9] = (trackpos >> 8 ) & 0xff;
-			p[10] = trackpos & 0xff;
+			put_u24be(&p[8], trackpos);
 
 			p += 13;
 		}
@@ -466,9 +461,7 @@ TIMER_CALLBACK_MEMBER(akiko_device::dma_proc)
 		buf[3] = m_cdrom_lba_cur - m_cdrom_lba_start;
 		memset( &buf[4], 0xff, 8 );
 
-		buf[12] = (curmsf >> 16) & 0xff;
-		buf[13] = (curmsf >> 8) & 0xff;
-		buf[14] = curmsf & 0xff;
+		put_u24be(&buf[12], curmsf);
 		buf[15] = 0x01; /* mode1 */
 
 		datasize = 2048;
@@ -732,15 +725,10 @@ void akiko_device::update_cdrom()
 				track_pos = cdrom_file::lba_to_msf(lba - m_cdrom->get_track_start(track));
 
 				/* track position */
-				resp[6] = (track_pos >> 16) & 0xff;
-				resp[7] = (track_pos >> 8) & 0xff;
-				resp[8] = track_pos & 0xff;
+				put_u24be(&resp[6], track_pos);
 
 				/* disk position */
-				resp[9] = (disk_pos >> 24) & 0xff;
-				resp[10] = (disk_pos >> 16) & 0xff;
-				resp[11] = (disk_pos >> 8) & 0xff;
-				resp[12] = disk_pos & 0xff;
+				put_u32be(&resp[9], disk_pos);
 			}
 			else
 			{

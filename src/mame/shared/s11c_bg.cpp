@@ -369,7 +369,7 @@ void s11c_bg_device::s11_bg_base(machine_config &config)
 
 	MC1408(config, m_dac, 0);
 
-	PIA6821(config, m_pia40, 0);
+	PIA6821(config, m_pia40);
 	m_pia40->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pia40->writepb_handler().set(FUNC(s11c_bg_device::pia40_pb_w));
 	// ca2 handler is set in the s11_bg_ym function

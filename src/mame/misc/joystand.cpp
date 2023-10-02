@@ -89,6 +89,7 @@ Notes:
 TODO:
 - Support cartridge slot select function
 - Requires camera, printer, lightpen emulation
+- Identify x180ii and emulate the differences
 
 ***************************************************************************/
 
@@ -96,6 +97,7 @@ TODO:
 #include "cpu/m68000/tmp68301.h"
 #include "machine/bankdev.h"
 #include "machine/eepromser.h"
+#include "machine/i8255.h"
 #include "machine/intelfsh.h"
 #include "machine/msm6242.h"
 #include "sound/okim6295.h"
@@ -136,6 +138,7 @@ public:
 	{ }
 
 	void joystand(machine_config &config);
+	void x180ii(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -145,18 +148,18 @@ private:
 	// devices
 	required_device<tmp68301_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	required_device<palette_device> m_bg15_palette;
+	optional_device<palette_device> m_bg15_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device_array<intelfsh8_device, 12> m_cart_flash;
-	required_device<address_map_bank_device> m_cartflash_bankdev;
+	optional_device_array<intelfsh8_device, 12> m_cart_flash;
+	optional_device<address_map_bank_device> m_cartflash_bankdev;
 	required_device<okim6295_device> m_oki;
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_bg1_ram;
 	required_shared_ptr<uint16_t> m_bg2_ram;
-	required_shared_ptr<uint16_t> m_bg15_0_ram;
-	required_shared_ptr<uint16_t> m_bg15_1_ram;
+	optional_shared_ptr<uint16_t> m_bg15_0_ram;
+	optional_shared_ptr<uint16_t> m_bg15_1_ram;
 	required_shared_ptr<uint16_t> m_scroll;
 	required_shared_ptr<uint16_t> m_enable;
 	required_shared_ptr<uint16_t> m_outputs;
@@ -177,7 +180,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 
 	// r5g5b5 layers
-	bitmap_rgb32 m_bg15_bitmap[2];
+	bitmap_rgb32 m_bg15_bitmap[2]{};
 	void bg15_0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void bg15_1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	static const rgb_t BG15_TRANSPARENT;
@@ -201,10 +204,14 @@ private:
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_x180ii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECLARE_VIDEO_START(x180ii);
 
 	// machine
 	INTERRUPT_GEN_MEMBER(joystand_interrupt);
 	void joystand_map(address_map &map);
+	void x180ii_map(address_map &map);
 	void cart_map(address_map &map);
 };
 
@@ -227,6 +234,7 @@ TILE_GET_INFO_MEMBER(joystand_state::get_bg2_tile_info)
 	uint32_t code = (m_bg2_ram[tile_index * 2 + 0] << 16) | m_bg2_ram[tile_index * 2 + 1];
 	tileinfo.set(0, code & 0x00ffffff, code >> 24, 0);
 }
+
 
 void joystand_state::bg1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
@@ -321,6 +329,15 @@ void joystand_state::video_start()
 	bg15_tiles_dirty = true;
 }
 
+VIDEO_START_MEMBER(joystand_state, x180ii)
+{
+	m_bg1_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(joystand_state::get_bg1_tile_info)), TILEMAP_SCAN_ROWS,  8,  8, 0x40, 0x20);
+	m_bg2_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(joystand_state::get_bg2_tile_info)), TILEMAP_SCAN_ROWS,  8,  8, 0x40, 0x40);
+
+	m_bg1_tmap->set_transparent_pen(0xf);
+	m_bg2_tmap->set_transparent_pen(0xf);
+}
+
 uint32_t joystand_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	int layers_ctrl = -1;
@@ -348,6 +365,36 @@ uint32_t joystand_state::screen_update( screen_device &screen, bitmap_rgb32 &bit
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	if (layers_ctrl & 4)    copybitmap_trans(bitmap, m_bg15_bitmap[0], 0, 0, 1, 0, cliprect, BG15_TRANSPARENT);
 	if (layers_ctrl & 8)    copybitmap_trans(bitmap, m_bg15_bitmap[1], 0, 0, 0, 0, cliprect, BG15_TRANSPARENT);
+	if (layers_ctrl & 1)    m_bg1_tmap->draw(screen, bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 2)    m_bg2_tmap->draw(screen, bitmap, cliprect, 0, 0);
+
+	popmessage("S0: %04X S1: %04X EN: %04X OUT: %04X", m_scroll[0], m_scroll[1], m_enable[0], m_outputs[0]);
+	return 0;
+}
+
+uint32_t joystand_state::screen_update_x180ii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int layers_ctrl = -1;
+
+#ifdef MAME_DEBUG
+	if (machine().input().code_pressed(KEYCODE_Z))
+	{
+		int msk = 0;
+		if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
+		if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
+		if (machine().input().code_pressed(KEYCODE_A))  msk |= 4;
+		if (machine().input().code_pressed(KEYCODE_S))  msk |= 8;
+		if (msk != 0) layers_ctrl &= msk;
+	}
+#endif
+
+	m_bg1_tmap->set_scrollx(0, 0);
+	m_bg1_tmap->set_scrolly(0, 0);
+
+	m_bg2_tmap->set_scrollx(0, m_scroll[0] - 0xa);
+	m_bg2_tmap->set_scrolly(0, m_scroll[1]);
+
+	bitmap.fill(m_palette->black_pen(), cliprect);
 	if (layers_ctrl & 1)    m_bg1_tmap->draw(screen, bitmap, cliprect, 0, 0);
 	if (layers_ctrl & 2)    m_bg2_tmap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -485,6 +532,34 @@ void joystand_state::cart_map(address_map &map)
 	map(0x500000, 0x5fffff).rw(m_cart_flash[1],  FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
 }
 
+void joystand_state::x180ii_map(address_map &map) // TODO: verify everything
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x13ffff).ram();
+	map(0x200000, 0x200003).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
+	map(0x200009, 0x200009).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x200010, 0x200011).portr("IN0"); // r/w
+	map(0x200012, 0x200013).ram().w(FUNC(joystand_state::outputs_w)).share("outputs"); // r/w
+	map(0x200014, 0x200015).rw(FUNC(joystand_state::fpga_r), FUNC(joystand_state::oki_bank_w)); // r/w
+//  map(0x200016, 0x200017) // write $9190 at boot
+
+	map(0x400000, 0x47ffff).ram();
+	map(0x480000, 0x4fffff).ram(); // more rgb layers? (writes at offset 0)
+	map(0x500000, 0x57ffff).ram(); // ""
+	map(0x580000, 0x5fffff).ram(); // ""
+
+	map(0x600000, 0x603fff).ram().w(FUNC(joystand_state::bg2_w)).share("bg2_ram");
+	map(0x604000, 0x605fff).ram().w(FUNC(joystand_state::bg1_w)).share("bg1_ram");
+	map(0x606000, 0x607fff).ram(); // still writes here
+	map(0x608000, 0x609fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x60c000, 0x60c003).ram().share("scroll"); // write
+	map(0x60c00c, 0x60c00d).ram().share("enable"); // write
+
+	//  map(0xe00080, 0xe00081) // write (bit 0 = cart? bit 1 = ? bit 3 = ?)
+	//map(0xe00000, 0xe00001).r(FUNC(joystand_state::e00000_r)); // copy slot
+	//map(0xe00020, 0xe00021).r(FUNC(joystand_state::e00020_r)); // master slot
+}
+
 
 static INPUT_PORTS_START( joystand )
 	// Cart status:
@@ -557,6 +632,11 @@ static GFXDECODE_START( gfx_joystand )
 	GFXDECODE_ENTRY( "cart.u2",  0, layout_16x16x8,       0,  0x10 )
 GFXDECODE_END
 
+static GFXDECODE_START( gfx_x180ii )
+	GFXDECODE_ENTRY( "tiles", 0,        gfx_8x8x4_packed_msb, 0, 0x100 )
+	GFXDECODE_ENTRY( "tiles", 0x200000, layout_16x16x8,       0, 0x10 ) // wrong
+GFXDECODE_END
+
 
 void joystand_state::machine_start()
 {
@@ -604,6 +684,42 @@ void joystand_state::joystand(machine_config &config)
 	// devices
 	EEPROM_93C46_16BIT(config, "eeprom");
 	MSM6242(config, "rtc", XTAL(32'768));
+}
+
+void joystand_state::x180ii(machine_config &config)
+{
+	// basic machine hardware
+	TMP68301(config, m_maincpu, XTAL(16'000'000)); // actually TMP68303F
+	m_maincpu->set_addrmap(AS_PROGRAM, &joystand_state::x180ii_map);
+	m_maincpu->parallel_r_cb().set(FUNC(joystand_state::eeprom_r));
+	m_maincpu->parallel_w_cb().set(FUNC(joystand_state::eeprom_w));
+
+	I8255(config, "ppi0");
+
+	I8255(config, "ppi1");
+
+	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: verify this
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(FUNC(joystand_state::screen_update_x180ii));
+	screen.set_size(0x200, 0x100);
+	screen.set_visarea(0x40, 0x40+0x178-1, 0x10, 0x100-1);
+	screen.screen_vblank().set_inputline(m_maincpu, 1);
+
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_x180ii);
+
+	MCFG_VIDEO_START_OVERRIDE(joystand_state, x180ii)
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+
+	YM2413(config, "ym2413", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 0.80);
+
+	OKIM6295(config, m_oki, XTAL(16'000'000) / 16, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.50); // clock supplied by pin 15 of the XCT GAL, to be verified
+
+	// devices
+	EEPROM_93C46_16BIT(config, "eeprom");
 }
 
 
@@ -660,7 +776,30 @@ ROM_START( joystand )
 	ROM_LOAD( "jsp-xct.ic5",   0x000, 0x117, NO_DUMP )
 ROM_END
 
+ROM_START( x180ii ) // YUVO PCC180C PCB. Similar to the joystand one, even most IC locations match. It has 2x D71055C.
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "x180ii-mpj-e.ver1.00.ic3",  0x00000, 0x80000, CRC(20343837) SHA1(44306e93d3c333f9e418c42d44433fe5654cad40) )
+	ROM_LOAD16_BYTE( "x180ii-mpj-0.ver1.00.ic63", 0x00001, 0x80000, CRC(0d43c32a) SHA1(ab09c2ed61a80704b6d2029f9a2e98e93a5ec5e6) )
+
+	ROM_REGION( 0x600000, "tiles", 0 )
+	ROM_LOAD16_WORD_SWAP( "x180ii-chrm3.ver1.00.ic30", 0x000000, 0x200000, CRC(74b79688) SHA1(d3792aa8aa88a50a3b5530ed2e2077bd03d23aee) )
+	ROM_LOAD16_WORD_SWAP( "x180ii-chrm2.ver1.00.ic32", 0x200000, 0x200000, CRC(6198a681) SHA1(0eae28c72e7b737788cb62767fa7713ed9499206) )
+	ROM_LOAD16_WORD_SWAP( "x180ii-chrm1.ver1.00.ic33", 0x400000, 0x200000, CRC(9b477d6d) SHA1(e6541334298729fe60d158c5e86e84294bcc409c) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "x180-sej1.ver1.00.ic14", 0x00000, 0x80000, CRC(86a0801b) SHA1(a252ed786bf51b963feb6ff253303ea3b67d8fcf) )
+	ROM_LOAD( "x180-sej2.ver1.00.ic13", 0x80000, 0x80000, CRC(92f73edb) SHA1(541a671d0e1648d8ddb42abe0e851ea9c68c718f) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASEFF )
+	ROM_LOAD( "93c46-x16.ic16", 0x00, 0x80, CRC(7ce71435) SHA1(ce9a008f85aae5a8209300f879d8c56af512f44f) )
+
+	ROM_REGION( 0x117, "pld", 0 )
+	ROM_LOAD( "map.ic4", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "xct.ic5", 0x000, 0x117, NO_DUMP )
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1997, joystand, 0, joystand, joystand, joystand_state, empty_init, ROT0, "Yuvo", "Joy Stand Private", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, joystand, 0, joystand, joystand, joystand_state, empty_init, ROT0, "Yuvo", "Joy Stand Private",           MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, x180ii,   0, x180ii,   joystand, joystand_state, empty_init, ROT0, "Yuvo", "unknown Yuvo Joy Stand game", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE ) // has Joy Stand sample in Oki ROMs

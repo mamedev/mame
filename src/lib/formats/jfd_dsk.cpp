@@ -161,6 +161,7 @@
 #include "formats/jfd_dsk.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include "osdcore.h" // osd_printf_*
 
@@ -244,7 +245,7 @@ bool jfd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	int err;
 	std::vector<uint8_t> gz_ptr;
 	z_stream d_stream;
-	int inflate_size = (img[size - 1] << 24) | (img[size - 2] << 16) | (img[size - 3] << 8) | img[size - 4];
+	int inflate_size = get_u32le(&img[size - 4]);
 
 	if (!memcmp(&img[0], GZ_HEADER, sizeof(GZ_HEADER))) {
 		gz_ptr.resize(inflate_size);

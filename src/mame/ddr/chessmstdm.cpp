@@ -283,7 +283,7 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-static const z80_daisy_config chessmstdm_daisy_chain[] =
+static const z80_daisy_config daisy_chain[] =
 {
 	{ "z80pio1" },
 	{ nullptr }
@@ -295,7 +295,7 @@ void chessmstdm_state::chessmstdm(machine_config &config)
 	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &chessmstdm_state::chessmstdm_mem);
 	m_maincpu->set_addrmap(AS_IO, &chessmstdm_state::chessmstdm_io);
-	m_maincpu->set_daisy_config(chessmstdm_daisy_chain);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	auto &strobe(CLOCK(config, "strobe", 500)); // from 555 timer, 50% duty
 	strobe.signal_handler().set(m_pio[1], FUNC(z80pio_device::strobe_b));

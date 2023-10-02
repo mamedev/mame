@@ -102,8 +102,6 @@ void chesster_state::machine_start()
     I/O
 *******************************************************************************/
 
-// TTL/generic
-
 void chesster_state::control_w(offs_t offset, u8 data)
 {
 	// a0-a2,d7: 74259(1)

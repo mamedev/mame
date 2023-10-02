@@ -9,7 +9,7 @@ sp_rinter@gmx.de
 
 TODO:
 - add waitstates, CPU is 12MHz but with DTACK waitstates for slow EPROMs,
-  effective speed is less than 10MHz
+  effective speed is around 7.2MHz
 
 ================================================================================
 
@@ -35,10 +35,11 @@ Hardware notes:
 
 #include "emu.h"
 
-#include "cpu/m68000/m68000.h"
 #include "mmboard.h"
-#include "sound/dac.h"
 #include "mmdisplay1.h"
+
+#include "cpu/m68000/m68000.h"
+#include "sound/dac.h"
 
 #include "speaker.h"
 
@@ -51,13 +52,13 @@ namespace {
 class glasgow_state : public driver_device
 {
 public:
-	glasgow_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_board(*this, "board")
-		, m_display(*this, "display")
-		, m_dac(*this, "dac")
-		, m_keys(*this, "KEY.%u", 0)
+	glasgow_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_display(*this, "display"),
+		m_dac(*this, "dac"),
+		m_keys(*this, "KEY.%u", 0)
 	{ }
 
 	void glasgow(machine_config &config);

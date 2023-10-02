@@ -407,7 +407,7 @@ inline u8 z80_device::opcode_read()
 
 u8 z80_device::rop()
 {
-	u8 res = m_opcodes.read_byte(translate_memory_address(PCD));
+	u8 res = opcode_read();
 	T(m_m1_cycles - 2);
 	m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | (m_r & 0x7f), 0x00, 0xff);
 	T(2);

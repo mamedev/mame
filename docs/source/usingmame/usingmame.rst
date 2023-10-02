@@ -3,7 +3,7 @@ Using MAME
 
 If you want to dive right in and skip the command line, there's a nice graphical
 way to use MAME without the need to download and set up a front end. Simply
-start MAME with no parameters, by doubleclicking the **mame.exe** file or
+start MAME with no parameters, by double-clicking the **mame.exe** file or
 running it directly from the command line. If you're looking to harness the
 full power of MAME, keep reading further.
 
@@ -14,7 +14,7 @@ to missing glyphs.
 If you are a new MAME user, you could find this emulator a bit complex at
 first. Let's take a moment to talk about software lists, as they can simplify
 matters quite a bit. If the content you are trying to play is a documented
-entry on one of the MAME sotware lists, starting the content is as easy as
+entry on one of the MAME software lists, starting the content is as easy as
 
     **mame.exe** *<system>* *<software>*
 
@@ -86,7 +86,7 @@ of this manual.
     **mame.exe -showconfig**
 
 gives you a (quite long) list of available configuration options for MAME.
-These optons can always be modified at command line, or by editing them in
+These options can always be modified at command line, or by editing them in
 mame.ini which is the main configuration file for MAME. You can find a
 description of some configuration options in the
 :ref:`mame-commandline-universal` section of the manual (in most cases, each

@@ -33,6 +33,7 @@
 #include "imageutl.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 
 #define D88_HEADER_LEN 0x2b0
@@ -71,7 +72,7 @@ static int d88_get_sector_id(floppy_image_legacy *floppy, int head, int track, i
 	x=0;
 	while(x<sector_index)
 	{
-		offset += ((sector_hdr[15] << 8) | sector_hdr[14]);
+		offset += get_u16le(&sector_hdr[14]);
 		offset += 16;
 		floppy_image_read(floppy,sector_hdr,offset,16);
 		x++;
@@ -123,10 +124,10 @@ static floperr_t d88_get_sector_length(floppy_image_legacy *floppy, int head, in
 		if(sector == sector_hdr[2])
 		{
 			if(sector_length)
-				*sector_length = (sector_hdr[15] << 8) | sector_hdr[14];
+				*sector_length = get_u16le(&sector_hdr[14]);
 			return FLOPPY_ERROR_SUCCESS;
 		}
-		len = (sector_hdr[15] << 8) | sector_hdr[14];
+		len = get_u16le(&sector_hdr[14]);
 		len += 16;
 		offset += len;
 	}
@@ -164,7 +165,7 @@ static uint32_t d88_get_sector_offset(floppy_image_legacy* floppy, int head, int
 			LOG_FORMATS("d88_get_sector_offset - track %i, side %i, sector %02x, returns %08x\n",track,head,sector,offset+16);
 			return offset + 16;
 		}
-		len = (sector_hdr[15] << 8) | sector_hdr[14];
+		len = get_u16le(&sector_hdr[14]);
 		len += 16;
 		offset += len;
 	}
@@ -194,7 +195,7 @@ static floperr_t d88_get_indexed_sector_info(floppy_image_legacy *floppy, int he
 	x=0;
 	while(x<sector_index)
 	{
-		offset += ((sector_hdr[15] << 8) | sector_hdr[14]);
+		offset += get_u16le(&sector_hdr[14]);
 		offset += 16;
 		floppy_image_read(floppy,sector_hdr,offset,16);
 		x++;
@@ -204,7 +205,7 @@ static floperr_t d88_get_indexed_sector_info(floppy_image_legacy *floppy, int he
 		return FLOPPY_ERROR_SEEKERROR;
 
 	if(sector_length)
-		*sector_length = (sector_hdr[15] << 8) | sector_hdr[14];
+		*sector_length = get_u16le(&sector_hdr[14]);
 	if(cylinder)
 		*cylinder = sector_hdr[0];
 	if(side)
@@ -278,7 +279,6 @@ static floperr_t d88_write_indexed_sector(floppy_image_legacy *floppy, int head,
 static void d88_get_header(floppy_image_legacy* floppy,uint32_t* size, uint8_t* prot, uint8_t* type, uint32_t* offsets)
 {
 	uint8_t header[D88_HEADER_LEN];
-	int x,s;
 
 	floppy_image_read(floppy,header,0,D88_HEADER_LEN);
 
@@ -297,25 +297,11 @@ static void d88_get_header(floppy_image_legacy* floppy,uint32_t* size, uint8_t* 
 	if(type)
 		*type = header[0x1b];
 	if(size)
-	{
-		s = 0;
-		s |= header[0x1f] << 24;
-		s |= header[0x1e] << 16;
-		s |= header[0x1d] << 8;
-		s |= header[0x1c];
-		*size = s;
-	}
+		*size = get_u32le(&header[0x1c]);
 	if(offsets)
 	{
-		for(x=0;x<164;x++)
-		{
-			s = 0;
-			s |= header[0x23 + (x*4)] << 24;
-			s |= header[0x22 + (x*4)] << 16;
-			s |= header[0x21 + (x*4)] << 8;
-			s |= header[0x20 + (x*4)];
-			*(offsets+x) = s;
-		}
+		for(int x=0;x<164;x++)
+			*(offsets+x) = get_u32le(&header[0x20 + (x*4)]);
 	}
 }
 

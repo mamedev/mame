@@ -2,16 +2,21 @@
 // copyright-holders:Tomasz Slanina
 /***************************************************************
 
-Taito  'O System'
--------------------
+Taito 'O System'
+----------------
 
 Taito gambling hardware, very similar to H system.
 
-Board specs (based on poor quality pic):
+Board specs:
 
-68000
-YM2203
-4 custom Taito chips ( TC0080VCO? TC0070RGB? )
+MC68000P12
+YM2203C
+TC0080VCO
+TC0160ROM
+TC0130LNB x 2
+TC0070RGB
+24MHz XTAL
+36MHz XTAL
 Custom (non JAMMA) connector
 Battery
 
@@ -19,6 +24,7 @@ Battery
 Games :
 
 Parent Jack  (C) 1989 Taito
+Eibise       (C) 1990 Taito
 
 TODO:
 
@@ -306,10 +312,34 @@ ROM_START( parentj )
 	ROM_LOAD64_BYTE( "c42-10.16", 0x00007, 0x20000, CRC(e85e536e) SHA1(9ed9e316869333338e39cb0d1293e3380861a3ca) )
 
 	ROM_REGION( 0x2dd, "misc", 0 )
-	ROM_LOAD( "ampal22v10a-0233.c42", 0x000, 0x2dd, CRC(0c030a81) SHA1(0f8198df2cb046683d2db9ac8e609cdff53083ed) )
+	ROM_LOAD( "c42-01.28", 0x000, 0x0cc, CRC(d0e6dcad) SHA1(332da088f13a6dc140f0cd343d708f3e690f8066) ) // PAL20L10ACNS
+	ROM_LOAD( "c42-02.33", 0x000, 0x2dd, CRC(0c030a81) SHA1(0f8198df2cb046683d2db9ac8e609cdff53083ed) ) // PALCE22V10H-2PC/4
+	ROM_LOAD( "c42-03.34", 0x000, 0x0cc, CRC(08a5506e) SHA1(d36de0f8749901cadcd042ed946ff42c95affdfa) ) // PAL20L10ACNS
+ROM_END
+
+ROM_START( eibise )
+	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "c88-10-1.21", 0x00000, 0x10000, CRC(567ea2ec) SHA1(35b44bd058d3def147fa94ac935a8dddbcd02fde) )
+	ROM_LOAD16_BYTE( "c88-09-1.20", 0x00001, 0x10000, CRC(3d408a85) SHA1(7ead8bdcd1379868491991b6387b3f4d319691d7) )
+
+	ROM_REGION( 0x100000, "tc0080vco", 0 )
+	ROM_LOAD64_BYTE( "c88-02.06", 0x00000, 0x20000, CRC(55cbea55) SHA1(96ea2f7bbd995b4125632693b66dc828b550d698) )
+	ROM_LOAD64_BYTE( "c88-01.05", 0x00001, 0x20000, CRC(59d85648) SHA1(249955f8c5669c84ecd5d7363c93b34c94d64f5b) )
+	ROM_LOAD64_BYTE( "c88-06.13", 0x00002, 0x20000, CRC(bc2b606c) SHA1(f8eeba54eb72c4dd7d5a95d426bd3df9eae73005) )
+	ROM_LOAD64_BYTE( "c88-05.12", 0x00003, 0x20000, CRC(9ab5e035) SHA1(84052d04a7ca807e8cbf5e67f31b2d8eefa56190) )
+	ROM_LOAD64_BYTE( "c88-04.10", 0x00004, 0x20000, CRC(a608a0d9) SHA1(2c025a1a747f6f9b33b68120aefc84a66ab13229) )
+	ROM_LOAD64_BYTE( "c88-03.09", 0x00005, 0x20000, CRC(b0fc5f79) SHA1(3519dd75e7f3a67f3736b52c2b74514d5b971b71) )
+	ROM_LOAD64_BYTE( "c88-08.17", 0x00006, 0x20000, CRC(94e794de) SHA1(929f2868ee34e37e2a2a66fe7d7de61f2120d5a7) )
+	ROM_LOAD64_BYTE( "c88-07.16", 0x00007, 0x20000, CRC(fc0eda2e) SHA1(3cb93a5f6a9bb3f752bd6ca5f9d585262d436d00) )
+
+	ROM_REGION( 0x2dd, "misc", 0 )
+	ROM_LOAD( "c42-01.28", 0x000, 0x0cc, CRC(d0e6dcad) SHA1(332da088f13a6dc140f0cd343d708f3e690f8066) ) // PAL20L10ACNS
+	ROM_LOAD( "c42-02.33", 0x000, 0x2dd, CRC(0c030a81) SHA1(0f8198df2cb046683d2db9ac8e609cdff53083ed) ) // PALCE22V10H-2PC/4
+	ROM_LOAD( "c42-03.34", 0x000, 0x0cc, CRC(08a5506e) SHA1(d36de0f8749901cadcd042ed946ff42c95affdfa) ) // PAL20L10ACNS
 ROM_END
 
 } // anonymous namespace
 
 
 GAME( 1989, parentj, 0, parentj,  parentj, taitoo_state, empty_init, ROT0, "Taito", "Parent Jack (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, eibise,  0, parentj,  parentj, taitoo_state, empty_init, ROT0, "Taito", "Eibise (Japan)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

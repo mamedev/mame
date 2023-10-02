@@ -72,6 +72,7 @@ To summarize, known MCU chip ROM serials+year:
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mcs48/mcs48.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
@@ -153,8 +154,6 @@ void sc6_state::machine_start()
 /*******************************************************************************
     I/O
 *******************************************************************************/
-
-// MCU ports/generic
 
 void sc6_state::update_display()
 {

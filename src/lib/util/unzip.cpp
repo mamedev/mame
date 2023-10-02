@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 /***************************************************************************
 
-    unzip.c
+    unzip.cpp
 
     Functions to manipulate data within ZIP files.
 
@@ -13,6 +13,7 @@
 #include "corestr.h"
 #include "hashing.h"
 #include "ioprocs.h"
+#include "multibyte.h"
 #include "timeconv.h"
 
 #include "osdcore.h"
@@ -393,29 +394,15 @@ protected:
 	}
 	std::uint16_t read_word(std::size_t offs) const noexcept
 	{
-		return
-				(std::uint16_t(m_buffer[offs + 1]) << 8) |
-				(std::uint16_t(m_buffer[offs + 0]) << 0);
+		return get_u16le(&m_buffer[offs]);
 	}
 	std::uint32_t read_dword(std::size_t offs) const noexcept
 	{
-		return
-				(std::uint32_t(m_buffer[offs + 3]) << 24) |
-				(std::uint32_t(m_buffer[offs + 2]) << 16) |
-				(std::uint32_t(m_buffer[offs + 1]) << 8) |
-				(std::uint32_t(m_buffer[offs + 0]) << 0);
+		return get_u32le(&m_buffer[offs]);
 	}
 	std::uint64_t read_qword(std::size_t offs) const noexcept
 	{
-		return
-				(std::uint64_t(m_buffer[offs + 7]) << 56) |
-				(std::uint64_t(m_buffer[offs + 6]) << 48) |
-				(std::uint64_t(m_buffer[offs + 5]) << 40) |
-				(std::uint64_t(m_buffer[offs + 4]) << 32) |
-				(std::uint64_t(m_buffer[offs + 3]) << 24) |
-				(std::uint64_t(m_buffer[offs + 2]) << 16) |
-				(std::uint64_t(m_buffer[offs + 1]) << 8) |
-				(std::uint64_t(m_buffer[offs + 0]) << 0);
+		return get_u64le(&m_buffer[offs]);
 	}
 	std::string read_string(std::size_t offs, std::string::size_type len) const
 	{
@@ -1418,7 +1405,7 @@ std::error_condition zip_file_impl::decompress_data_type_14(std::uint64_t offset
 				m_header.file_name, m_filename);
 		return archive_file::error::FILE_TRUNCATED;
 	}
-	std::uint16_t const props_size((std::uint16_t(m_buffer[3]) << 8) | std::uint16_t(m_buffer[2]));
+	std::uint16_t const props_size(get_u16le(&m_buffer[2]));
 	if (props_size > m_buffer.size())
 	{
 		osd_printf_error(

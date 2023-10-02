@@ -1,16 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Mietek Bak
-
-#ifndef MAME_LIB_UTIL_TAPE_FILE_INTERFACE_H
-#define MAME_LIB_UTIL_TAPE_FILE_INTERFACE_H
+#ifndef MAME_UTIL_TAPE_FILE_INTERFACE_H
+#define MAME_UTIL_TAPE_FILE_INTERFACE_H
 
 #pragma once
 
+#include <cstdint>
 #include <utility>
 
 //////////////////////////////////////////////////////////////////////////////
 
-enum class tape_status : u8 {
+enum class tape_status : std::uint8_t {
 	OK, // oll korrekt
 	BOM, // beginning of medium
 	EW, // early warning
@@ -32,27 +32,27 @@ public:
 	virtual ~tape_file_interface() {}
 
 	// position-preserving operations
-	virtual const bool is_read_only() const = 0;
-	virtual const bool is_ew() const = 0;
-	virtual const u8 get_density_code() const = 0;
-	virtual const std::pair<const tape_status, const u32> read_position() const = 0;
+	virtual bool is_read_only() const = 0;
+	virtual bool is_ew() const = 0;
+	virtual std::uint8_t get_density_code() const = 0;
+	virtual std::pair<tape_status, std::uint32_t> read_position() const = 0;
 
 	// non-destructive operations
-	virtual void rewind(const bool eom) = 0;
-	virtual const tape_status locate_block(const u32 req_block_addr) = 0;
-	virtual const tape_status space_eod() = 0;
-	virtual const std::pair<const tape_status, const u32> space_blocks(const u32 req_blocks_num) = 0;
-	virtual const std::pair<const tape_status, const u32> space_filemarks(const u32 req_marks_num, const bool setmarks = false, const bool sequential = false) = 0;
-	virtual const std::pair<const tape_status, const u32> space_blocks_reverse(const u32 req_blocks_num) = 0;
-	virtual const std::pair<const tape_status, const u32> space_filemarks_reverse(const u32 req_marks_num, const bool setmarks = false, const bool sequential = false) = 0;
-	virtual const std::pair<const tape_status, const u32> read_block(u8 *const buf, const u32 buf_size) = 0;
+	virtual void rewind(bool eom) = 0;
+	virtual tape_status locate_block(std::uint32_t req_block_addr) = 0;
+	virtual tape_status space_eod() = 0;
+	virtual std::pair<tape_status, std::uint32_t> space_blocks(std::uint32_t req_blocks_num) = 0;
+	virtual std::pair<tape_status, std::uint32_t> space_filemarks(std::uint32_t req_marks_num, bool setmarks = false, bool sequential = false) = 0;
+	virtual std::pair<tape_status, std::uint32_t> space_blocks_reverse(std::uint32_t req_blocks_num) = 0;
+	virtual std::pair<tape_status, std::uint32_t> space_filemarks_reverse(std::uint32_t req_marks_num, bool setmarks = false, bool sequential = false) = 0;
+	virtual std::pair<tape_status, std::uint32_t> read_block(std::uint8_t *buf, std::uint32_t buf_size) = 0;
 
 	// destructive operations
-	virtual void erase(const bool eom) = 0;
-	virtual const tape_status write_block(const u8 *const buf, const u32 len) = 0;
-	virtual const tape_status write_filemarks(const u32 req_marks_num, const bool setmarks = false) = 0;
+	virtual void erase(bool eom) = 0;
+	virtual tape_status write_block(const std::uint8_t *buf, std::uint32_t len) = 0;
+	virtual tape_status write_filemarks(std::uint32_t req_marks_num, bool setmarks = false) = 0;
 };
 
 //////////////////////////////////////////////////////////////////////////////
 
-#endif // MAME_LIB_UTIL_TAPE_FILE_INTERFACE_H
+#endif // MAME_UTIL_TAPE_FILE_INTERFACE_H

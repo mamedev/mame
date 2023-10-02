@@ -24,7 +24,7 @@ license:CC0-1.0
 
 	<element name="led" defstate="0">
 		<disk state="0">
-			<color red="0.2" green="0" blue="0" />
+			<color red="0.1" green="0.01" blue="0.01" />
 		</disk>
 		<disk state="1">
 			<color red="1" green="0.1" blue="0.1" />

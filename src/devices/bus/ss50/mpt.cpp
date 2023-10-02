@@ -80,7 +80,7 @@ ioport_constructor ss50_mpt_device::device_input_ports() const
 
 void ss50_mpt_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepb_handler().set(FUNC(ss50_mpt_device::pia_b_w));
 	m_pia->cb1_w(0);
 	m_pia->irqa_handler().set(FUNC(ss50_mpt_device::pia_irqa_w));

@@ -4592,7 +4592,7 @@ void calomega_state::sys903(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s903_mux_port_r));
 	m_pia[0]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: some dipsw maybe???
 	m_pia[0]->writepa_handler().set(FUNC(calomega_state::dummy_pia_w));       // Debug: to assign lamps/counters/solenids/hopper????
@@ -4602,7 +4602,7 @@ void calomega_state::sys903(machine_config &config)
 	m_pia[0]->irqa_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 	m_pia[0]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set_ioport("SW1");
 	m_pia[1]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: unknown reads.
 	m_pia[1]->writepa_handler().set(FUNC(calomega_state::lamps_903b_w));
@@ -4665,7 +4665,7 @@ void calomega_state::sys903kb(machine_config &config)
 	m_kstec->t0_in_cb().set("uart", FUNC(i8251_device::txrdy_r));                                    // uart tx handshake
 	m_kstec->t1_in_cb().set([this] () { return calomega_state::m_rxrdy; });                          // uart rx handshake
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s903_mux_port_r));
 	m_pia[0]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: some dipsw maybe???
 	m_pia[0]->writepa_handler().set(FUNC(calomega_state::dummy_pia_w));       // Debug: to assign lamps/counters/solenids/hopper????
@@ -4675,7 +4675,7 @@ void calomega_state::sys903kb(machine_config &config)
 	m_pia[0]->irqa_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 	m_pia[0]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set_ioport("SW1");
 	m_pia[1]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: unknown reads.
 	m_pia[1]->writepa_handler().set(FUNC(calomega_state::lamps_903b_w));
@@ -4759,12 +4759,12 @@ void calomega_state::sys905(machine_config &config)
 
 	screen.screen_vblank().set(FUNC(calomega_state::vblank1_w));
 
-	PIA6821(config.replace(), m_pia[0], 0);
+	PIA6821(config.replace(), m_pia[0]);
 	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s905_mux_port_r));    // Muxed inputs read.
 	m_pia[0]->writepb_handler().set(FUNC(calomega_state::lamps_905_w));       // Full Lamps - OK.
 	m_pia[0]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // V_BLANK Interrupt Event. (PIA -> CPU)
 
-	PIA6821(config.replace(), m_pia[1], 0);
+	PIA6821(config.replace(), m_pia[1]);
 	m_pia[1]->readpa_handler().set_ioport("SW1");                             // Full port.
 	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s905_mux_w));        // Mux. Scan Lines.(Lower Nibble). Hopper & Coin Lockout (Upper nibble).
 	m_pia[1]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.    (PIA -> CPU)
@@ -4795,14 +4795,14 @@ void calomega_state::sys906(machine_config &config)
 	screen.set_screen_update(FUNC(calomega_state::screen_update_calomega));
 
 	screen.screen_vblank().set(FUNC(calomega_state::vblank2_w));
-	PIA6821(config.replace(), m_pia[0], 0);
+	PIA6821(config.replace(), m_pia[0]);
 	m_pia[0]->readpa_handler().set_ioport("SW1");                             // Bit 7 - CGBANK ???? input?-output?
 	m_pia[0]->ca2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // Ignored
 	m_pia[0]->cb2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // Diverter
 	m_pia[0]->writepa_handler().set(FUNC(calomega_state::pia0_aout_w));       // Bit 7 - CGBANK ???? input?-output?
 	m_pia[0]->writepb_handler().set(FUNC(calomega_state::pia0_bout_w));       // Meters ??? (M1-M5), coils, hopper
 
-	PIA6821(config.replace(), m_pia[1], 0);
+	PIA6821(config.replace(), m_pia[1]);
 	m_pia[1]->readpa_handler().set(FUNC(calomega_state::pia1_ain_r));         // Mux. Button read.
 	m_pia[1]->readpb_handler().set(FUNC(calomega_state::pia1_bin_r));
 	m_pia[1]->ca1_w(0);                                                       // Timer Interrupt Ack.      (CPU -> PIA)

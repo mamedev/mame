@@ -150,7 +150,7 @@ namespace
 
 void coco_t4426_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(coco_t4426_device::pia_A_w));
 
 	ACIA6850(config, m_uart, 0);

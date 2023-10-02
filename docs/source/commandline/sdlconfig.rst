@@ -1,5 +1,5 @@
-SDL-Specific Commandline Options
-================================
+SDL-Specific Command-line Options
+=================================
 
 This section contains configuration options that are specific to any build
 supported by SDL (including Windows when built with SDL instead of native).

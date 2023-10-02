@@ -152,6 +152,7 @@ protected:
 		return res;
 	}
 	virtual bool get_interlace_mode() { return false; }
+	virtual void palette_update();
 
 	struct vga_t
 	{

@@ -1666,7 +1666,7 @@ void blackbox_base_state::blackbox_base(machine_config &config)
 	m_irq_timer->set_start_delay(attotime::from_msec(1));
 	TIMER(config, m_chute_timer).configure_generic(FUNC(blackbox_base_state::toggle_50p_chute));
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(blackbox_base_state::pia_porta_w));
 	m_pia->readpb_handler().set(FUNC(blackbox_base_state::pia_portb_r));
 	m_pia->writepb_handler().set(FUNC(blackbox_base_state::pia_portb_w));
