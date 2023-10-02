@@ -26713,7 +26713,7 @@ Contained in four EPROMs, labeled: "SONIC 0", "1", "2", "3".
 	</software>
 
 	<software name="sonic2p9" cloneof="sonic2">
-		<description>Sonic The Hedgehog 2 (Alpha, prototype 19920821)</description>
+		<description>Sonic The Hedgehog 2 (Alpha, 19920821)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
