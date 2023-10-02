@@ -919,14 +919,14 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::index_resync)
 	// if hard-sectored floppy, has extra IDX pulses
 	if(image)
 		image->find_index_hole(position, last_index, next_index);
-	int new_idx = position - last_index < 2000000;
+	bool new_idx = position - last_index < 2000000;
 
 	if(new_idx) {
 		uint32_t index_up = last_index + 2000000;
 		attotime index_up_time = attotime::from_double(index_up/angular_speed);
 		index_timer->adjust(index_up_time - delta);
 	} else {
-		attotime next_index_time = attotime::from_double(next_index/angular_speed);
+		attotime next_index_time = next_index >= 200000000 ? rev_time : attotime::from_double(next_index/angular_speed);
 		index_timer->adjust(next_index_time - delta);
 	}
 
