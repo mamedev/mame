@@ -4899,6 +4899,35 @@ void nmk16_state::bjtwin(machine_config &config)
 	nmk112.set_rom1_tag("oki2");
 }
 
+// the 215 writes minimal data here, probably only enables the decryption logic, rather than supplying the decryption table
+void tdragon_prot_state::mcu_port3_to_214_w(u8 data)
+{
+	// startup only
+	logerror("%s: mcu_port3_to_214_w (data %02x)\n", machine().describe_context(), data);
+}
+
+void tdragon_prot_state::mcu_port7_to_214_w(u8 data)
+{
+	// startup only
+	logerror("%s: mcu_port7_to_214_w (data %02x)\n", machine().describe_context(), data);
+}
+
+void tdragon_prot_state::saboten_prot(machine_config &config)
+{
+	bjtwin(config);
+
+	TMP90840(config, m_protcpu, 4000000); // Toshiba TMP90840 marked as NMK-215, with 8Kbyte internal ROM, 256bytes internal RAM
+	m_protcpu->set_addrmap(AS_PROGRAM, &tdragon_prot_state::tdragon_prot_map);
+	m_protcpu->port_write<6>().set(FUNC(tdragon_prot_state::mcu_port6_w));
+	m_protcpu->port_read<5>().set(FUNC(tdragon_prot_state::mcu_port5_r));
+	m_protcpu->port_read<6>().set(FUNC(tdragon_prot_state::mcu_port6_r));
+
+	// the 215 has these hooked up, going to the 214
+	m_protcpu->port_write<3>().set(FUNC(tdragon_prot_state::mcu_port3_to_214_w));
+	m_protcpu->port_write<7>().set(FUNC(tdragon_prot_state::mcu_port7_to_214_w));
+
+	config.set_maximum_quantum(attotime::from_hz(6000));
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::manybloc_scanline)
 {
@@ -7446,6 +7475,10 @@ ROM_START( sabotenb )
 	ROM_REGION( 0x010000, "fgtile", 0 )
 	ROM_LOAD( "ic35.sb3",       0x000000, 0x010000, CRC(eb7bc99d) SHA1(b3063afd58025a441d4750c22483e9129da402e7) )  // 8x8 tiles
 
+	ROM_REGION( 0x02000, "protcpu", 0 )
+	// has 'SABOTEN' for the game name string, uploads data to '214' for sprite decryption
+	ROM_LOAD( "nmk-215.bin", 0x00000, 0x02000, CRC(d355a06f) SHA1(ebb7b1ff35a97599550f6f3524124246f2d718c5) )
+
 	ROM_REGION( 0x200000, "bgtile", 0 )
 	ROM_LOAD( "ic32.sb4",       0x000000, 0x200000, CRC(24c62205) SHA1(3ab0ca5d7c698328d91421ccf6f7dafc20df3c8d) )  // 8x8 tiles
 
@@ -7467,6 +7500,10 @@ ROM_START( sabotenba )
 	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "sb1.76",  0x00000, 0x40000, CRC(df6f65e2) SHA1(6ad9e9f13539310646895c5e7992c6546e75684b) )
 	ROM_LOAD16_BYTE( "sb2.75",  0x00001, 0x40000, CRC(0d2c1ab8) SHA1(abb43a8c5398195c0ad48d8d772ef47635bf25c2) )
+
+	ROM_REGION( 0x02000, "protcpu", 0 )
+	// has 'SABOTEN' for the game name string, uploads data to '214' for sprite decryption
+	ROM_LOAD( "nmk-215.bin", 0x00000, 0x02000, CRC(d355a06f) SHA1(ebb7b1ff35a97599550f6f3524124246f2d718c5) )
 
 	ROM_REGION( 0x010000, "fgtile", 0 )
 	ROM_LOAD( "ic35.sb3",       0x000000, 0x010000, CRC(eb7bc99d) SHA1(b3063afd58025a441d4750c22483e9129da402e7) )  // 8x8 tiles
@@ -8944,8 +8981,8 @@ GAME( 1994, raphero,    arcadian, raphero,      raphero,      nmk16_state, init_
 GAME( 1994, rapheroa,   arcadian, raphero,      raphero,      nmk16_state, init_banked_audiocpu, ROT270, "NMK (Media Trading license)",  "Rapid Hero (Media Trading)", 0 ) // ^^ - note that all ROM sets have Media Trading(aka Media Shoji) in the tile graphics, but this is the only set that shows it on the titlescreen
 
 // both sets of both these games show a date of 9th Mar 1992 in the test mode, they look like different revisions so I doubt this is accurate
-GAME( 1992, sabotenb,   0,        bjtwin,       sabotenb,     nmk16_state, init_nmk,             ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", MACHINE_NO_COCKTAIL )
-GAME( 1992, sabotenba,  sabotenb, bjtwin,       sabotenb,     nmk16_state, init_nmk,             ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 2)", MACHINE_NO_COCKTAIL )
+GAME( 1992, sabotenb,   0,        saboten_prot, sabotenb,     tdragon_prot_state, init_nmk,      ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", MACHINE_NO_COCKTAIL )
+GAME( 1992, sabotenba,  sabotenb, saboten_prot, sabotenb,     tdragon_prot_state, init_nmk,      ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 2)", MACHINE_NO_COCKTAIL )
 GAME( 1992, cactus,     sabotenb, bjtwin,       sabotenb,     nmk16_state, init_nmk,             ROT0,   "bootleg",                      "Cactus (bootleg of Saboten Bombers)", MACHINE_NO_COCKTAIL ) // PCB marked 'Cactus', no title screen
 
 GAME( 1993, bjtwin,     0,        bjtwin,       bjtwin,       nmk16_state, init_bjtwin,          ROT270, "NMK",                          "Bombjack Twin (set 1)", MACHINE_NO_COCKTAIL )

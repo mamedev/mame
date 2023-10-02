@@ -245,6 +245,7 @@ public:
 
 	void tdragon_prot(machine_config &config);
 	void hachamf_prot(machine_config &config);
+	void saboten_prot(machine_config &config);
 
 protected:
 
@@ -261,6 +262,9 @@ protected:
 	u8 mcu_port5_r();
 	u8 mcu_port6_r();
 	u8 mcu_port7_r(); // NMK-113 uses this
+
+	void mcu_port3_to_214_w(u8 data);
+	void mcu_port7_to_214_w(u8 data);
 
 	u8 m_bus_status;
 };
