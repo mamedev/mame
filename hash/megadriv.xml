@@ -7648,7 +7648,6 @@ Unsupported [Menacer] peripheral
 	</software>
 
 	<software name="sonic1jp2" cloneof="sonic">
-		<!--		-->
 		<description>Sonic The Hedgehog (World, JP2, ripped from Sonic Mega Collection)</description>
 		<year>2002</year>
 		<publisher>Sega</publisher>
