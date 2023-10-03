@@ -76,26 +76,40 @@
 #include "emu.h"
 #include "video/mc6847.h"
 
-
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
-#define TOP_BORDER              25
-#define USE_HORIZONTAL_CLIP     false
+#define LINES_TOP_BORDER		25
+#define LINES_ACTIVE_VIDEO		192
+#define LINES_BOTTOM_BORDER		26
+#define LINES_VERTICAL_RETRACE	6
+#define USE_HORIZONTAL_CLIP		false
 
-#define TIMER_HSYNC_PERIOD      (228)
-#define TIMER_HSYNC_OFF_TIME    (10.0)
-#define TIMER_HSYNC_ON_TIME     (TIMER_HSYNC_OFF_TIME + 16.5)
-#define TIMER_FSYNC_OFF_TIME    (TIMER_HSYNC_PERIOD * TOP_BORDER + TIMER_HSYNC_ON_TIME)
-#define TIMER_FSYNC_ON_TIME     (TIMER_HSYNC_PERIOD * (TOP_BORDER + 192) + TIMER_HSYNC_ON_TIME)
+#define CLOCKS_HSYNC_PERIOD				(228)
+#define	CLOCKS_FRONT_PORCH_DURATION		(7)
+#define CLOCKS_ACTIVE_VIDEO				(128)
+#define CLOCKS_L_OR_R_BORDER			(29)
+#define CLOCKS_ACTIVE_VIDEO_AND_BORDERS	(CLOCKS_ACTIVE_VIDEO + (2*CLOCKS_L_OR_R_BORDER))
+#define TIMER_HSYNC_OFF_TIME			(CLOCKS_ACTIVE_VIDEO_AND_BORDERS + CLOCKS_FRONT_PORCH_DURATION)
+#define TIMER_HSYNC_ON_TIME				(TIMER_HSYNC_OFF_TIME + 16.5)
+
+// FSYNC occurs just after active video, just before right border
+#define TIMER_FSYNC_TIME				(CLOCKS_ACTIVE_VIDEO + CLOCKS_L_OR_R_BORDER)
+
+// These units are the screen device's bitmap pixels.  Multiplied by 2 because
+// the pixel clock is the mc6847's clock * 2
+#define BMP_L_OR_R_BORDER				(CLOCKS_L_OR_R_BORDER * 2)
+#define BMP_ACTIVE_VIDEO				(CLOCKS_ACTIVE_VIDEO * 2)
+
 
 #define LOG_SCANLINE (1U << 1)
 #define LOG_HSYNC    (1U << 2)
 #define LOG_FSYNC    (1U << 3)
 #define LOG_FLUSH    (1U << 4)
 #define LOG_INPUT    (1U << 5)
-#define VERBOSE (LOG_FSYNC)
+#define LOG_NEXTLINE (1U << 6)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 
@@ -161,9 +175,9 @@ void mc6847_friend_device::device_start()
 	m_hsync_off_timer = timer_alloc(FUNC(mc6847_friend_device::change_horizontal_sync), this);
 	m_fsync_timer = timer_alloc(FUNC(mc6847_friend_device::change_field_sync), this);
 
-	m_frame_timer->adjust(clocks_to_attotime(0), 0, clocks_to_attotime(m_tpfs * TIMER_HSYNC_PERIOD * m_divider));
-	m_hsync_on_timer->adjust(clocks_to_attotime(TIMER_HSYNC_ON_TIME * m_divider), 1, clocks_to_attotime(TIMER_HSYNC_PERIOD * m_divider));
-	m_hsync_off_timer->adjust(clocks_to_attotime(TIMER_HSYNC_OFF_TIME * m_divider), 0, clocks_to_attotime(TIMER_HSYNC_PERIOD * m_divider));
+	m_frame_timer->adjust(clocks_to_attotime(0), 0, clocks_to_attotime(m_tpfs * CLOCKS_HSYNC_PERIOD * m_divider));
+	m_hsync_on_timer->adjust(clocks_to_attotime(TIMER_HSYNC_ON_TIME * m_divider), 1, clocks_to_attotime(CLOCKS_HSYNC_PERIOD * m_divider));
+	m_hsync_off_timer->adjust(clocks_to_attotime(TIMER_HSYNC_OFF_TIME * m_divider), 0, clocks_to_attotime(CLOCKS_HSYNC_PERIOD * m_divider));
 
 	m_top_border_scanlines = 0;
 	m_body_scanlines = 0;
@@ -173,7 +187,7 @@ void mc6847_friend_device::device_start()
 	m_logical_scanline_zone = 0;
 	m_field_sync = false;
 	m_horizontal_sync = false;
-	set_geometry(25, 192, false);
+	set_geometry(LINES_TOP_BORDER, LINES_ACTIVE_VIDEO, false);
 
 	/* save states */
 	save_item(NAME(m_physical_scanline));
@@ -184,6 +198,8 @@ void mc6847_friend_device::device_start()
 
 	/* artifacting */
 	m_artifacter.setup_config(this);
+
+	screen().reset_origin(0, 0);
 }
 
 
@@ -214,6 +230,13 @@ void mc6847_friend_device::device_post_load()
 
 //-------------------------------------------------
 //  update_field_sync_timer
+//
+//  Unlike hsync, fsync uses a single timer to handle
+//  both ON (FS high) and OFF (FS low).  When hsync-ON
+//  occurs for a line before we expect FS to change,
+//  this is called to set up an fsync for the next line.
+//  Which line of the field that is determines whether
+//  the fsync will signal an ON or OFF
 //-------------------------------------------------
 
 void mc6847_friend_device::update_field_sync_timer()
@@ -226,7 +249,7 @@ void mc6847_friend_device::update_field_sync_timer()
 	if (expected_field_sync != m_field_sync)
 	{
 		// if so, determine the duration
-		attotime duration = clocks_to_attotime(160 * m_divider);
+		attotime duration = clocks_to_attotime(TIMER_FSYNC_TIME * m_divider);
 
 		// and reset the timer
 		m_fsync_timer->adjust(duration, expected_field_sync ? 1 : 0);
@@ -283,7 +306,7 @@ TIMER_CALLBACK_MEMBER(mc6847_friend_device::change_horizontal_sync)
 	// are we on a rising edge?
 	if (line && !m_horizontal_sync)
 	{
-		LOGMASKED(LOG_SCANLINE, "%s: change_horizontal_sync():  Recording scanline\n", describe_context());
+		LOGMASKED(LOG_SCANLINE, "%s: change_horizontal_sync():  Recording scanline.  line=%d, (vpos,hpos)=(%d,%d), m_physical_scanline=%d\n", describe_context(), line ? 1 : 0, screen().vpos(), screen().hpos(), m_physical_scanline);
 
 		// first store the scanline
 		{
@@ -298,7 +321,7 @@ TIMER_CALLBACK_MEMBER(mc6847_friend_device::change_horizontal_sync)
 				case SCANLINE_ZONE_BODY:
 					m_recording_scanline = true;
 					if (m_partial_scanline_clocks > 0)
-						record_partial_body_scanline(m_physical_scanline, m_logical_scanline, m_partial_scanline_clocks, 228);
+						record_partial_body_scanline(m_physical_scanline, m_logical_scanline, m_partial_scanline_clocks, CLOCKS_HSYNC_PERIOD);
 					else
 						record_body_scanline(m_physical_scanline, m_logical_scanline);
 					m_recording_scanline = false;
@@ -326,7 +349,7 @@ TIMER_CALLBACK_MEMBER(mc6847_friend_device::change_horizontal_sync)
 		m_horizontal_sync = line;
 
 		// log if apprpriate
-		LOGMASKED(LOG_HSYNC, "%s: change_horizontal_sync(): line=%d\n", describe_context(), line ? 1 : 0);
+		LOGMASKED(LOG_HSYNC, "%s: change_horizontal_sync(): line=%d, (vpos,hpos)=(%d,%d), m_physical_scanline=%d\n", describe_context(), line ? 1 : 0, screen().vpos(), screen().hpos(), m_physical_scanline);
 
 		// invoke callback
 		m_write_hsync(line);
@@ -351,7 +374,7 @@ TIMER_CALLBACK_MEMBER(mc6847_friend_device::change_field_sync)
 		m_field_sync = line;
 
 		/* log if apprpriate */
-		LOGMASKED(LOG_FSYNC, "%s: change_field_sync(): line=%d\n", describe_context(), line ? 1 : 0);
+		LOGMASKED(LOG_FSYNC, "%s: change_field_sync(): line=%d, (vpos,hpos)=(%d,%d), m_physical_scanline=%d\n", describe_context(), line ? 1 : 0, screen().vpos(), screen().hpos(), m_physical_scanline);
 
 		/* invoke callback */
 		m_write_fsync(line);
@@ -369,6 +392,9 @@ TIMER_CALLBACK_MEMBER(mc6847_friend_device::change_field_sync)
 
 inline void mc6847_friend_device::next_scanline()
 {
+	const int lines_until_vblank = LINES_TOP_BORDER + LINES_ACTIVE_VIDEO + LINES_BOTTOM_BORDER + LINES_VERTICAL_RETRACE;
+	const int lines_until_retrace = LINES_TOP_BORDER + LINES_ACTIVE_VIDEO + LINES_BOTTOM_BORDER;
+
 	/* advance to next scanline */
 	m_physical_scanline++;
 	m_logical_scanline++;
@@ -381,13 +407,13 @@ inline void mc6847_friend_device::next_scanline()
 		m_logical_scanline = 0;
 		m_logical_scanline_zone = SCANLINE_ZONE_TOP_BORDER;
 	}
-	else if ((m_logical_scanline_zone < SCANLINE_ZONE_VBLANK) && (m_physical_scanline >= 25+192+26+6))
+	else if ((m_logical_scanline_zone < SCANLINE_ZONE_VBLANK) && (m_physical_scanline >= lines_until_vblank))
 	{
 		/* we're now into vblank */
 		m_logical_scanline = 0;
 		m_logical_scanline_zone = SCANLINE_ZONE_VBLANK;
 	}
-	else if ((m_logical_scanline_zone < SCANLINE_ZONE_RETRACE) && (m_physical_scanline >= 25+192+26))
+	else if ((m_logical_scanline_zone < SCANLINE_ZONE_RETRACE) && (m_physical_scanline >= lines_until_retrace))
 	{
 		/* we're now into retrace */
 		m_logical_scanline = 0;
@@ -407,8 +433,8 @@ inline void mc6847_friend_device::next_scanline()
 		enter_bottom_border();
 	}
 
-	// Temporary debugging aid
-	LOGMASKED(LOG_FSYNC, "mc6847_friend_device::next_scanline(): vpos='%d', m_physical_scanline='%d', m_logical_scanline_zone='%s', m_logical_scanline='%d'\n", (screen().vpos()), m_physical_scanline, (scanline_zone_string((scanline_zone)m_logical_scanline_zone)), m_logical_scanline);
+	// This helps to confirm synchronization between the screen device and the 6847
+	LOGMASKED(LOG_NEXTLINE, "mc6847_friend_device::next_scanline(): (vpos,hpos)=(%d,%d), m_physical_scanline='%d', m_logical_scanline_zone='%s', m_logical_scanline='%d'\n", (screen().vpos()), (screen().hpos()), m_physical_scanline, (scanline_zone_string((scanline_zone)m_logical_scanline_zone)), m_logical_scanline);
 }
 
 
@@ -517,7 +543,7 @@ std::string mc6847_friend_device::describe_context() const
 //-------------------------------------------------
 
 mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs) :
-	mc6847_friend_device(mconfig, type, tag, owner, clock, fontdata, (type == MC6847T1_NTSC) || (type == MC6847T1_PAL), tpfs, 25+191, 1, true),
+	mc6847_friend_device(mconfig, type, tag, owner, clock, fontdata, (type == MC6847T1_NTSC) || (type == MC6847T1_PAL), tpfs, LINES_TOP_BORDER + LINES_ACTIVE_VIDEO - 1, 1, true),
 	m_input_cb(*this, 0),
 	m_black_and_white(false),
 	m_fixed_mode(0),
@@ -562,16 +588,19 @@ void mc6847_base_device::device_config_complete()
 
 	if (!screen().refresh_attoseconds())
 	{
-		// This example fix for the synchronization problem betwen screen & mc6847
-		// slows the drift between screen's vpos and mc6847's m_physical_scanline
-		// a little bit not completely.  Still some roundoff error.
-		// Multiplying the clock by 1.72043 allows us to retain 320 visible whole
-		// pixels for each for horizontal line, but I doubt this is what the
-		// code should look like.
+		// It is preferred to initialize the screen device using set_raw.
+		// Setting screen device's raw parameters requires values in terms of pixels.
+		// Multiplying the 6847's clock by 2 produces a pixel clock that allows
+		// 256 pixels of active video area per line, with apparently no roundoff
+		// error or drift.
+		//
+		// Note: This math is valid for NTSC.  If / when PAL is implemented, m_tpfs
+		// can be used to determine if this 6847 is PAL, and a different set_raw
+		// call can be made if helpful.
 		screen().set_raw(
-			(u32) (m_clock * 1.72043),
-			392 /* htotal */, 0 /* hbend */, 320 /* hbstart */,
-			m_tpfs /* vtotal */, 0 /* vbend */, 242 /*vbstart*/);
+			(u32)(clock() * 2),
+			456 /* htotal */, 0 /* hbend */, 372 /* hbstart */,
+			m_tpfs /* vtotal */, 0 /* vbend */, 243 /*vbstart*/);
 	}
 
 	if (!screen().has_screen_update())
@@ -654,7 +683,7 @@ void mc6847_base_device::record_scanline_res(int scanline, int32_t start_pos, in
 	{
 		// set address at beginning of line
 		if (pos == 0)
-			m_video_address = scanline / (192 / yres) * sample_count;
+			m_video_address = scanline / (LINES_ACTIVE_VIDEO / yres) * sample_count;
 
 		// are we sampling this position?
 		if ((pos % sample_modulo) == 0)
@@ -687,7 +716,7 @@ void mc6847_base_device::record_scanline_res(int scanline, int32_t start_pos, in
 inline void mc6847_base_device::record_body_scanline(uint16_t physical_scanline, uint16_t scanline, int32_t start_pos, int32_t end_pos)
 {
 	// sanity checks
-	assert(scanline < 192);
+	assert(scanline < LINES_ACTIVE_VIDEO);
 
 	if (m_mode & MODE_AG)
 	{
@@ -760,11 +789,35 @@ void mc6847_base_device::record_partial_body_scanline(uint16_t physical_scanline
 
 //-------------------------------------------------
 //  scanline_position_from_clock
+//
+//  The hsync ON interrupt marks the end of the
+//  previous line and the beginning of the next
+//  line.  Measuring clocks since hsync ON gives
+//  an offset into the current line.  This converts
+//  the clocks offset into a "position" offset for
+//  use by the record functions as index into
+//  the video_scanline arrays
 //-------------------------------------------------
 
 int32_t mc6847_base_device::scanline_position_from_clock(int32_t clocks_since_hsync)
 {
-	return (clocks_since_hsync - 20) / 4;
+	// This value determined by experimentation with the Dragon Fire game,
+	// which uses precise timing measurements to change video modes
+	// multiple times mid-line.  This value seems to minimize video
+	// garbage, but doesn't eliminate it, so there are likely timing
+	// issues elsewhere.
+	//
+	// Unfortunately, I don't understand why this value isn't
+	// simply 0.  I believe hsync-on appears AFTER the front-porch +
+	// HS pulse + back-porch combo, which should be the entirety of
+	// the horizontal blanking.
+	const int clockOffsetToFirstVisiblePixel = 25;
+
+	// Dividing by 4 converts 128 clocks per horizontal active video
+	// into 32 bytes per horizontal active video.  The borders come
+	// along for the ride.  They are 58 clocks total (for L + R), and
+	// dividing by 4 gives 14.5 bytes
+	return (clocks_since_hsync - clockOffsetToFirstVisiblePixel) / 4;
 }
 
 
@@ -817,12 +870,12 @@ inline mc6847_base_device::pixel_t mc6847_base_device::border_value(uint8_t mode
 
 uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int base_x = 32;
-	int base_y = 25;
+	int base_x = BMP_L_OR_R_BORDER;
+	int base_y = LINES_TOP_BORDER;
 	int x, x2, y, width;
 	bool is_mc6847t1 = (type() == MC6847T1_NTSC) || (type() == MC6847T1_PAL);
 	int min_x = USE_HORIZONTAL_CLIP ? cliprect.min_x : 0;
-	int max_x = USE_HORIZONTAL_CLIP ? cliprect.max_x : (base_x * 2 + 256 - 1);
+	int max_x = USE_HORIZONTAL_CLIP ? cliprect.max_x : (base_x * 2 + BMP_ACTIVE_VIDEO - 1);
 	int min_y = cliprect.min_y;
 	int max_y = cliprect.max_y;
 	const pixel_t *palette = m_palette;
@@ -840,7 +893,7 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 		}
 	}
 
-	for (y = std::max(0, min_y - base_y); y < std::min(192, max_y - base_y); y++)
+	for (y = std::max(0, min_y - base_y); y < std::min(LINES_ACTIVE_VIDEO, max_y - base_y); y++)
 	{
 		/* left border */
 		for (x = min_x; x < base_x; x++)
@@ -875,7 +928,7 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 
 		/* right border */
 		if (width)
-			for (x = base_x + 256; x <= max_x; x++)
+			for (x = base_x + BMP_ACTIVE_VIDEO; x <= max_x; x++)
 				*bitmap_addr(bitmap, y + base_y, x) = border_value(m_data[y].m_mode[width - 1], palette, is_mc6847t1);
 
 		/* artifacting */
@@ -889,13 +942,13 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 
 	}
 
-	width = m_data[191].m_sample_count;
+	width = m_data[LINES_ACTIVE_VIDEO-1].m_sample_count;
 
 	/* bottom border */
 	if (width)
-		for (y = base_y + 192; y <= max_y; y++)
+		for (y = base_y + LINES_ACTIVE_VIDEO - 1; y <= max_y; y++)
 			for (x = min_x; x <= max_x; x++)
-				*bitmap_addr(bitmap, y, x) = border_value(m_data[191].m_mode[width - 1], palette, is_mc6847t1);
+				*bitmap_addr(bitmap, y, x) = border_value(m_data[LINES_ACTIVE_VIDEO - 1].m_mode[width - 1], palette, is_mc6847t1);
 
 	return 0;
 }
