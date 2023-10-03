@@ -6,8 +6,8 @@ Used for coin pushers
 
 Hardware:
 GSDRA PWB(A2) 0000327125 Cougar (with 378 117 11119970 sticker)
-* 6417751A SH-4 BP240 CPU with 20.000 MHz and 32.768 KHz XTALs nearby
-* SiS 315 GFX
+* 6417751A SH-4 BP240 (7751R with PCI controller) CPU SoC with 20.000 MHz and 32.768 KHz XTALs nearby
+* SiS 315 VGA/AGP
 * 2x 48LC8M16A2 128Mb SDRAM (near SH-4)
 * 8x 48LC8M16A2 128Mb SDRAM (near SiS 315)
 * R1LV0416CSB 4M SRAM
@@ -104,8 +104,8 @@ ROM_START( spinfev )
 
 	ROM_REGION( 0x810000, "sndflash3", ROMREGION_ERASE00) // empty on this PCB
 
-	DISK_REGION( "ide:0:hdd" )
-	DISK_IMAGE( "unkcougar", 0, SHA1(a15e8fc9c0cdb97781a9bce223297bc028dc04e7) )
+	DISK_REGION( "ide:0:hdd" ) // dumped from a Seagate Barracuda 7200.10 80 Gbytes (ST380815A8)
+	DISK_IMAGE( "spinfev", 0, SHA1(c1ca74bb05335e66f64bf2198df7f21fda9c4a03) )
 ROM_END
 
 } // anonymous namespace

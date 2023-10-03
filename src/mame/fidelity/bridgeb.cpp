@@ -110,11 +110,8 @@ void bridgeb_state::update_digits(offs_t offset, u16 data)
 
 void bridgeb_state::digit_w(offs_t offset, u8 data)
 {
-	assert(offset >= 0x2000);
-
 	// write to one DL1414 digit
-	offset = (offset >> 11 & 0xf) - 4;
-	m_dl1414[offset >> 2]->bus_w(offset & 3, data);
+	m_dl1414[(offset >> 13) % 3]->bus_w(offset >> 11 & 3, data);
 }
 
 
@@ -165,8 +162,7 @@ void bridgeb_state::main_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x6000, 0x63ff).mirror(0x1c00).ram();
-	map(0x8000, 0xffff).w(FUNC(bridgeb_state::digit_w));
-	map(0x8000, 0x9fff).unmapw();
+	map(0xa000, 0xffff).w(FUNC(bridgeb_state::digit_w));
 }
 
 void bridgeb_state::main_io(address_map &map)

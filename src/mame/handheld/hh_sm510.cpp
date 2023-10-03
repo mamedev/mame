@@ -5522,7 +5522,7 @@ void ktmnt2_state::sound_w(u8 data)
 			if (sample == 0)
 				m_samples->stop(0);
 		}
-		else
+		else if (sample != 0)
 		{
 			sample--;
 			if (sample < m_samples->samples() && strncmp(m_samples->names()[sample + 1], "none", 4))

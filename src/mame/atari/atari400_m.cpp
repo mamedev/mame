@@ -108,8 +108,9 @@ POKEY_KEYBOARD_CB_MEMBER(atari_common_state::a800_keyboard)
         x10  |Pause|  6  |  5  |  4  |
         x11  |Start|  3  |  2  |  1  |
 
-    K0 & K5 are ignored (we send them as 1, see the code below where
-    we pass "(atari_code << 1) | 0x21" )
+    K0 & K5 are ignored. Ignoring K5 doubles the rate at which the
+    matrix is scanned, and ignoring K0 allows the POKEY to register
+    keypresses with "debounce" mode disabled.
 
     To Do: investigate implementation of KR2 to read accurately the
     secondary Fire button (primary read through GTIA).
@@ -138,10 +139,6 @@ POKEY_KEYBOARD_CB_MEMBER(atari_common_state::a5200_keypads)
 	}
 
 	/* decode regular key */
-	/* if kr5 and kr0 not set just return */
-	if ((k543210 & 0x21) != 0x21)
-		return ret;
-
 	k543210 = (k543210 >> 1) & 0x0f;
 
 	/* return on BREAK key now! */
