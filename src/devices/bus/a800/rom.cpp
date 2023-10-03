@@ -195,7 +195,7 @@ void a5200_rom_device::device_start()
  -------------------------------------------------*/
 
 a5200_rom_2chips_device::a5200_rom_2chips_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a800_rom_device(mconfig, A5200_ROM_2CHIPS, tag, owner, clock)
+	: a5200_rom_device(mconfig, A5200_ROM_2CHIPS, tag, owner, clock)
 {
 }
 
