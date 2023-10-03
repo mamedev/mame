@@ -395,9 +395,6 @@ TIMER_CALLBACK_MEMBER(mc6847_friend_device::change_field_sync)
 
 inline void mc6847_friend_device::next_scanline()
 {
-	const int lines_until_vblank = LINES_TOP_BORDER + LINES_ACTIVE_VIDEO + LINES_BOTTOM_BORDER + LINES_VERTICAL_RETRACE;
-	const int lines_until_retrace = LINES_TOP_BORDER + LINES_ACTIVE_VIDEO + LINES_BOTTOM_BORDER;
-
 	/* advance to next scanline */
 	m_physical_scanline++;
 	m_logical_scanline++;
@@ -410,13 +407,13 @@ inline void mc6847_friend_device::next_scanline()
 		m_logical_scanline = 0;
 		m_logical_scanline_zone = SCANLINE_ZONE_TOP_BORDER;
 	}
-	else if ((m_logical_scanline_zone < SCANLINE_ZONE_VBLANK) && (m_physical_scanline >= lines_until_vblank))
+	else if ((m_logical_scanline_zone < SCANLINE_ZONE_VBLANK) && (m_physical_scanline >= LINES_UNTIL_VBLANK))
 	{
 		/* we're now into vblank */
 		m_logical_scanline = 0;
 		m_logical_scanline_zone = SCANLINE_ZONE_VBLANK;
 	}
-	else if ((m_logical_scanline_zone < SCANLINE_ZONE_RETRACE) && (m_physical_scanline >= lines_until_retrace))
+	else if ((m_logical_scanline_zone < SCANLINE_ZONE_RETRACE) && (m_physical_scanline >= LINES_UNTIL_RETRACE))
 	{
 		/* we're now into retrace */
 		m_logical_scanline = 0;
@@ -817,14 +814,15 @@ int32_t mc6847_base_device::scanline_position_from_clock(int32_t clocks_since_hs
 	// Unfortunately, I don't understand why this value isn't
 	// simply 0.  I believe hsync-on appears AFTER the front-porch +
 	// HS pulse + back-porch combo, which should be the entirety of
-	// the horizontal blanking.
-	const int clockOffsetToFirstVisiblePixel = 25;
+	// the horizontal blanking.  But this value makes Dragonfire
+	// significantly better than 0 does.
+	const int CLOCKS_OFFSET_TO_FIRST_VISIBLE_PIXEL = 25;
 
 	// Dividing by 4 converts 128 clocks per horizontal active video
 	// into 32 bytes per horizontal active video.  The borders come
 	// along for the ride.  They are 58 clocks total (for L + R), and
 	// dividing by 4 gives 14.5 bytes
-	return (clocks_since_hsync - clockOffsetToFirstVisiblePixel) / 4;
+	return (clocks_since_hsync - CLOCKS_OFFSET_TO_FIRST_VISIBLE_PIXEL) / 4;
 }
 
 
