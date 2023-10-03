@@ -104,8 +104,8 @@ ROM_START( spinfev )
 
 	ROM_REGION( 0x810000, "sndflash3", ROMREGION_ERASE00) // empty on this PCB
 
-	DISK_REGION( "ide:0:hdd" )
-	DISK_IMAGE( "unkcougar", 0, SHA1(a15e8fc9c0cdb97781a9bce223297bc028dc04e7) )
+	DISK_REGION( "ide:0:hdd" ) // dumped from a Seagate Barracuda 7200.10 80 Gbytes (ST380815A8)
+	DISK_IMAGE( "spinfev", 0, SHA1(c1ca74bb05335e66f64bf2198df7f21fda9c4a03) )
 ROM_END
 
 } // anonymous namespace
