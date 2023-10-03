@@ -9,8 +9,8 @@
    sound is the 315-5641 / D77591, should be compatible with the 7759? but probably wants us to maintain
    an external buffer of at least 0x40 bytes and feed it on a timer in sync with the timer in the chip?
 
-   currently no way to select (or display) the story book area of the games? (will require layout and
-   external artwork)
+   currently no way to display Storyware booklet pages (will require layout improvements and external artwork),
+   although the player can toggle "Pen Target" to switch between interacting with tablet or Storyware.
 
 */
 
@@ -121,16 +121,18 @@ C = MB3514 / 9325 M36
 #include "megadriv.h"
 
 #include "bus/megadrive/rom.h"
+#include "bus/sega_pico/pico_ps2.h"
+#include "bus/sega_pico/pico_doraemon.h"
+#include "bus/sega_pico/pico_kbd.h"
 #include "sound/315-5641.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#define VERBOSE (0)
+#include "logmacro.h"
 
 namespace {
-
-#define PICO_PENX   1
-#define PICO_PENY   2
 
 class pico_base_state : public md_core_state
 {
@@ -139,6 +141,7 @@ public:
 		md_core_state(mconfig, type, tag),
 		m_sega_315_5641_pcm(*this, "315_5641"),
 		m_io_page(*this, "PAGE"),
+		m_io_page_config(*this, "PAGE_CONFIG"),
 		m_io_pad(*this, "PAD"),
 		m_io_penx(*this, "PENX"),
 		m_io_peny(*this, "PENY")
@@ -149,9 +152,23 @@ public:
 	void init_picoj();
 
 protected:
+	static inline constexpr uint8_t PICO_PENX = 1;
+	static inline constexpr uint8_t PICO_PENY = 2;
+
+	virtual void machine_reset() override;
+
+	uint16_t pico_read_penpos(int pen);
+	uint16_t pico_68k_io_read(offs_t offset);
+	void pico_68k_io_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	void sound_cause_irq(int state);
+
+	void pico_mem(address_map &map);
+
 	optional_device<sega_315_5641_pcm_device> m_sega_315_5641_pcm;
 
 	required_ioport m_io_page;
+	required_ioport m_io_page_config;
 	required_ioport m_io_pad;
 	required_ioport m_io_penx;
 	required_ioport m_io_peny;
@@ -159,13 +176,11 @@ protected:
 	int m_version_hi_nibble;
 
 	uint8_t m_page_register;
+	uint8_t m_page_previous_input;
 
-	uint16_t pico_read_penpos(int pen);
-	uint16_t pico_68k_io_read(offs_t offset);
-	void pico_68k_io_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void sound_cause_irq(int state);
-
-	void pico_mem(address_map &map);
+	bool m_is_tablet;
+	uint8_t m_pen_previous_input;
+	uint8_t m_pen_target;
 };
 
 class pico_state : public pico_base_state
@@ -173,7 +188,8 @@ class pico_state : public pico_base_state
 public:
 	pico_state(const machine_config &mconfig, device_type type, const char *tag) :
 		pico_base_state(mconfig, type, tag),
-		m_picocart(*this, "picoslot")
+		m_picocart(*this, "picoslot"),
+		m_picops2(*this, "picops2")
 	{ }
 
 	void pico_ntsc(machine_config &config);
@@ -182,15 +198,35 @@ public:
 protected:
 	virtual void machine_start() override;
 
-private:
 	required_device<pico_cart_slot_device> m_picocart;
+	required_device<pico_ps2_slot_device> m_picops2;
 };
 
 
+void pico_base_state::machine_reset()
+{
+	md_core_state::machine_reset();
+
+	m_is_tablet = true;
+	m_pen_target = 0;
+	m_pen_previous_input = 0;
+}
 
 uint16_t pico_base_state::pico_read_penpos(int pen)
 {
 	uint16_t penpos = 0;
+
+	uint8_t pen_target = (m_io_pad->read() & 0x100) >> 8;
+	if ((m_pen_previous_input ^ pen_target) != 0)
+	{
+		m_pen_previous_input = pen_target;
+		if (pen_target == 1)
+		{
+			m_pen_target ^= 1;
+		}
+		LOG("Pen target: %s\n", m_pen_target == 1 ? "Tablet" : "Storyware");
+	}
+	m_is_tablet = m_pen_target != 0;
 
 	switch (pen)
 	{
@@ -204,7 +240,7 @@ uint16_t pico_base_state::pico_read_penpos(int pen)
 			penpos = m_io_peny->read();
 			penpos |= 0x6;
 			penpos = penpos * 251 / 255;
-			penpos += 0x1fc;
+			penpos += m_is_tablet ? 0x1fc : 0x2f8;
 			break;
 	}
 
@@ -221,7 +257,7 @@ uint16_t pico_base_state::pico_68k_io_read(offs_t offset)
 			retdata = m_version_hi_nibble;
 			break;
 		case 1:
-			retdata = m_io_pad->read();
+			retdata = m_io_pad->read() & 0x00ff;
 			break;
 
 			/*
@@ -248,21 +284,27 @@ uint16_t pico_base_state::pico_68k_io_read(offs_t offset)
 			retdata = pico_read_penpos(PICO_PENY) & 0x00ff;
 			break;
 		case 6:
-		/* Page register :
-		   00 - storyware closed
-		   01, 03, 07, 0f, 1f, 3f - pages 1-6
-		   either page 5 or page 6 is often unused.
-		*/
+			/*
+			   Page register :
+			   00 - storyware closed
+			   01, 03, 07, 0f, 1f, 3f - pages 1-6
+			   either page 5 or page 6 is often unused.
+			*/
 			{
-				uint8_t tmp = m_io_page->read();
-				if (tmp == 2 && m_page_register != 0x3f)
+				if (m_io_page_config->read() != 0)
 				{
-					m_page_register <<= 1;
-					m_page_register |= 1;
+					uint8_t tmp = m_io_page->read();
+					if ((m_page_previous_input ^ tmp) != 0)
+					{
+						m_page_previous_input = tmp;
+						m_page_register = pow(2, tmp) - 1;
+					}
+					retdata = m_page_register;
 				}
-				if (tmp == 1 && m_page_register != 0x00)
-					m_page_register >>= 1;
-				retdata = m_page_register;
+				else
+				{
+					retdata = 0x2a;
+				}
 				break;
 			}
 
@@ -354,7 +396,6 @@ void pico_base_state::pico_mem(address_map &map)
 	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000);
 }
 
-
 static INPUT_PORTS_START( pico )
 	PORT_START("PAD")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -363,10 +404,15 @@ static INPUT_PORTS_START( pico )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Red Button")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Pen Button")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Pen Target")
+
+	PORT_START("PAGE_CONFIG")
+	PORT_CONFNAME( 0x80, 0x80, "Test Mode Pages" )
+	PORT_CONFSETTING( 0x00, DEF_STR( On ) )
+	PORT_CONFSETTING( 0x80, DEF_STR( Off ) )
 
 	PORT_START("PAGE")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Increment Page")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Decrement Page")
+	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(7) PORT_WRAPS PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CODE(JOYCODE_X) PORT_CODE_DEC(KEYCODE_HOME) PORT_CODE_INC(KEYCODE_END) PORT_FULL_TURN_COUNT(7) PORT_NAME("Selected Page")
 
 	PORT_START("PENX")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_NAME("PEN X")
@@ -375,7 +421,6 @@ static INPUT_PORTS_START( pico )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_MINMAX(0,255 ) PORT_PLAYER(1) PORT_NAME("PEN Y")
 INPUT_PORTS_END
 
-
 static void pico_cart(device_slot_interface &device)
 {
 	device.option_add_internal("rom",  MD_STD_ROM);
@@ -383,12 +428,25 @@ static void pico_cart(device_slot_interface &device)
 	device.option_add_internal("rom_sramsafe",  MD_ROM_SRAM);   // not sure these are needed...
 }
 
+static void pico_ps2_devices(device_slot_interface &device)
+{
+	device.option_add("pico_doraemon", PICO_DORAEMON);
+	device.option_add("pico_kbd", PICO_KBD);
+}
+
 void pico_state::machine_start()
 {
-	pico_base_state::machine_start();
+	uint32_t rom_max_addr = 0x7fffff;
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000000, 0x7fffff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x000000, 0x7fffff, write16s_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write)));
+	if (m_picops2->get_card_device())
+	{
+		rom_max_addr = 0x1fffff;
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read8sm_delegate(*m_picops2, FUNC(pico_ps2_slot_device::read)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x200000, 0x200001, write8sm_delegate(*m_picops2, FUNC(pico_ps2_slot_device::write)));
+	}
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000000, rom_max_addr, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x000000, rom_max_addr, write16s_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write)));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a13)), write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a13)));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a15)), write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a15)));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_tmss_bank)));
@@ -405,6 +463,7 @@ void pico_state::pico_ntsc(machine_config &config)
 	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
+	PICO_PS2_SLOT(config, m_picops2, pico_ps2_devices, nullptr, false);
 	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("pico");
 
@@ -426,6 +485,7 @@ void pico_state::pico_pal(machine_config &config)
 	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
+	PICO_PS2_SLOT(config, m_picops2, pico_ps2_devices, nullptr, false);
 	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("pico");
 
@@ -438,23 +498,21 @@ void pico_state::pico_pal(machine_config &config)
 	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "rspeaker", 0.16);
 }
 
-
+#define ROM_PICO \
+	ROM_REGION(MD_CPU_REGION_SIZE, "maincpu", ROMREGION_ERASEFF) \
+	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
 
 ROM_START( pico )
-	ROM_REGION(MD_CPU_REGION_SIZE, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
+	ROM_PICO
 ROM_END
 
 ROM_START( picou )
-	ROM_REGION(MD_CPU_REGION_SIZE, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
+	ROM_PICO
 ROM_END
 
 ROM_START( picoj )
-	ROM_REGION(MD_CPU_REGION_SIZE, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
+	ROM_PICO
 ROM_END
-
 
 void pico_base_state::init_pico()
 {
@@ -598,11 +656,8 @@ private:
 void copera_state::copera_mem(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
-
 	map(0x800000, 0x80001f).rw(FUNC(copera_state::pico_68k_io_read), FUNC(copera_state::pico_68k_io_write));
-
 	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
-
 	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000);
 }
 
@@ -664,8 +719,9 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 1994, pico,  0,    0, pico_pal,  pico, pico_state,   init_pico,  "Sega", "Pico (Europe, PAL)", MACHINE_NOT_WORKING)
-CONS( 1994, picou, pico, 0, pico_ntsc, pico, pico_state,   init_picou, "Sega", "Pico (USA, NTSC)",   MACHINE_NOT_WORKING)
-CONS( 1993, picoj, pico, 0, pico_ntsc, pico, pico_state,   init_picoj, "Sega", "Pico (Japan, NTSC)", MACHINE_NOT_WORKING)
+//    year, name,     parent, compat, machine,       input,    class,               init,       company, fullname,               flags
+CONS( 1994, pico,     0,      0,      pico_pal,      pico,     pico_state,          init_pico,  "Sega",  "Pico (Europe, PAL)",   MACHINE_NOT_WORKING)
+CONS( 1994, picou,    pico,   0,      pico_ntsc,     pico,     pico_state,          init_picou, "Sega",  "Pico (USA, NTSC)",     MACHINE_NOT_WORKING)
+CONS( 1993, picoj,    pico,   0,      pico_ntsc,     pico,     pico_state,          init_picoj, "Sega",  "Pico (Japan, NTSC)",   MACHINE_NOT_WORKING)
 
-CONS( 1993, copera, 0,   0, copera,    pico, copera_state, init_picoj, "Yamaha / Sega", "Yamaha Mixt Book Player Copera", MACHINE_NOT_WORKING)
+CONS( 1993, copera,   0,      0,      copera,        pico,     copera_state,        init_picoj, "Yamaha / Sega", "Yamaha Mixt Book Player Copera", MACHINE_NOT_WORKING)
