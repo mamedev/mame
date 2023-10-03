@@ -80,11 +80,14 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define LINES_TOP_BORDER		25
-#define LINES_ACTIVE_VIDEO		192
-#define LINES_BOTTOM_BORDER		26
-#define LINES_VERTICAL_RETRACE	6
-#define USE_HORIZONTAL_CLIP		false
+#define LINES_TOP_BORDER				(25)
+#define LINES_ACTIVE_VIDEO				(192)
+#define LINES_BOTTOM_BORDER				(26)
+#define LINES_VERTICAL_RETRACE			(6)
+#define LINES_UNTIL_RETRACE				(LINES_TOP_BORDER + LINES_ACTIVE_VIDEO + LINES_BOTTOM_BORDER)
+#define LINES_UNTIL_VBLANK				(LINES_UNTIL_RETRACE + LINES_VERTICAL_RETRACE)
+
+#define USE_HORIZONTAL_CLIP				false
 
 #define CLOCKS_HSYNC_PERIOD				(228)
 #define	CLOCKS_FRONT_PORCH_DURATION		(7)
@@ -599,8 +602,12 @@ void mc6847_base_device::device_config_complete()
 		// call can be made if helpful.
 		screen().set_raw(
 			(u32)(clock() * 2),
-			456 /* htotal */, 0 /* hbend */, 372 /* hbstart */,
-			m_tpfs /* vtotal */, 0 /* vbend */, 243 /*vbstart*/);
+			456,										// htotal
+			0,											// hbend
+			BMP_L_OR_R_BORDER * 2 + BMP_ACTIVE_VIDEO,	// hbstart
+			m_tpfs,										// vtotal
+			0,											// vbend
+			LINES_UNTIL_RETRACE);						// vbstart
 	}
 
 	if (!screen().has_screen_update())
