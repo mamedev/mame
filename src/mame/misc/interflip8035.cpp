@@ -475,7 +475,10 @@
 #include "sound/samples.h"
 #include "speaker.h"
 
+#include "cbrava.lh"
 #include "ifslots.lh"
+#include "sevilla.lh"
+#include "toledo.lh"
 
 
 namespace {
@@ -499,9 +502,13 @@ public:
 
 	enum { STEPS_PER_SYMBOL = 168 };
 
-	void add_em_reels(machine_config &config, int symbols, attotime period);	
+	void add_em_reels(machine_config &config, int symbols, attotime period);
 
 	void interflip(machine_config &config);
+	void cbr_cnf(machine_config &config);
+	void sev_cnf(machine_config &config);
+	void tol_cnf(machine_config &config);
+	void jkp_cnf(machine_config &config);
 
 	template <unsigned Reel> int symbol_opto_r();
 	template <unsigned Reel> int reel_opto_r();
@@ -521,18 +528,21 @@ private:
 	// Main MCU Interface
 	u8 main_io_r(offs_t offset);
 	void main_io_w(offs_t offset, u8 data);
-	void main_p1_data_w(u8 data);
+	void main_p1_enc_data_w(u8 data);  // encoded coin lamps
+	void main_p1_dec_data_w(u8 data);  // decoded coin lamps
 	void main_p2_w(u8 data);
 	u8 main_p2_r();
-	u8 m_mp1, m_mp2;
-	u8 m_int_flag;
+	u8 m_mp1 = 0xff;
+	u8 m_mp2 = 0xff;
+	u8 m_int_flag = 0x00;
 
 	// Audio MCU Interface	
 	u8 audio_io_r(offs_t offset);
-	void audio_io_w(offs_t offset, u8 data);	
+	void audio_io_w(offs_t offset, u8 data);
 	u8 audio_p2_r();
 	void audio_p2_w(u8 data);
-	u8 m_audio;
+	u8 m_audio = 0x00;
+	u8 m_sample_flags = 0x00;
 
 	// I8243 IO Expander x 3
 	void exp2_p4_w(u8 data);
@@ -548,7 +558,7 @@ private:
 	void disp_w(u8 data);
 	void irq_w(int state);
 	void output_digit(int i, u8 data);
-	u8 m_kbd_sl;
+	u8 m_kbd_sl = 0x00;
 
 	// other
 	required_device<i8035_device> m_maincpu;
@@ -557,7 +567,7 @@ private:
 	required_device<i8279_device> m_kbdc;
 	required_device_array<em_reel_device, 4> m_reels;
 	required_device<hopper_device> m_hopper;
-	required_device<samples_device> m_samples;	
+	required_device<samples_device> m_samples;
 
 	// object finders
 	output_finder<50> m_outbit;
@@ -712,7 +722,50 @@ void interflip8035_state::audio_io_w(offs_t offset, u8 data)
 }
 
 
-void interflip8035_state::main_p1_data_w(u8 data)
+void interflip8035_state::main_p1_enc_data_w(u8 data)  // Encoded lamps. (Sevilla & Toledo)
+{
+/*
+	Port P1 Maincpu
+	===============
+
+	P1.0 Coin Lamp Bit 0
+	P1.1 Coin Lamp Bit 1
+	P1.2 Coin Lamp Bit 2
+	P1.3 Interrupt Flag (enable/disable /INT via NAND Gate.)
+	P1.4 /CS PIA 1 - Debug: MPU usually writes 0x67, 0x6f, 0xe7 or 0xef to enable PIA access
+	P1.5 /CS PIA 2 - Debug: MPU usually writes 0x57, 0x5f, 0x57 or 0x5f to enable PIA access
+	P1.6 /CS PIA 3 - Debug: MPU usually writes 0x37, 0x3f, 0x37 or 0x3f to enable PIA access
+	P1.7 /GPKD Reset (Not implemented on device)
+*/
+
+	m_mp1 = data;
+
+/* Lamp decoder: Active "0"
+
+m_outbit[0] -> Lamp: 1st. Coin
+m_outbit[1] -> Lamp: 2nd. Coin
+m_outbit[2] -> Lamp: 3rd. Coin
+m_outbit[3] -> Lamp: 4th. Coin
+m_outbit[4] -> Lamp: 5th. Coin
+m_outbit[5] -> Lamp: 6th. Coin
+*/
+	for(u8 i = 0; i < 6; i++)
+		if((data & 0x07) == i )
+			m_outbit[i] = 0;
+		else
+			m_outbit[i] = 1;
+
+	m_int_flag = BIT(data, 3);       // Main Interrupt Flag
+	m_outbit[44] = BIT(data, 3);     // Main Interrupt Flag
+	m_ioexp[0]->cs_w(BIT(data, 4));  // Chip Select IO Expander_1 
+	m_ioexp[1]->cs_w(BIT(data, 5));  // Chip Select IO Expander_2
+	m_ioexp[2]->cs_w(BIT(data, 6));  // Chip Select IO Expander_3
+	// m_kbdc->reset(BIT(data, 7));  // Reset GPKD (not implemented on device)
+	// logerror("Main P1 Write: %02X\n", data);
+
+}
+
+void interflip8035_state::main_p1_dec_data_w(u8 data)  // Decoded lamps. (Costa Brava)
 {
 /*
 	Port P1 Maincpu
@@ -741,7 +794,6 @@ void interflip8035_state::main_p1_data_w(u8 data)
 	// logerror("Main P1 Write: %02X\n", data);
 
 }
-
 
 void interflip8035_state::main_p2_w(u8 data)
 {
@@ -823,22 +875,40 @@ u8 interflip8035_state::audio_p2_r()
 
 void interflip8035_state::audio_p2_w(u8 data)
 {
+
+// Ring bell is turned on together with tower lamp under error or required handpay conditions
+
+// Added some logic to emulate ringing bell sampled sound effects with fadeout
+
+	u8 change = false;
+	if(m_outbit[28] != BIT(data, 7))
+		change = true;
 	m_outbit[28] = BIT(data, 7);  //	P2.7 Topper Lamp
 
-	if(!m_outbit[28])
+	if(!m_outbit[28] && change)
+	{
 		m_samples->start(0, 0, true);
+		m_sample_flags |= 0x01;
+	}
 	else
+	{
+		if(BIT(m_sample_flags,0) && change)
+		{
+			m_sample_flags &= 0xfe;
+			m_samples->start(1, 3, false);
+		}
 		m_samples->stop(0);
+	}
 }
 
 
 /****************************************************************
 
-             I8243 IO Expander Interface x 3                
+               I8243 IO Expander Interface x 3
 
 	Access:
 	P1 -> Enable PIA Access
-	IORW -> Destination Port (4, 5, 6, 7) 0xf4, 0xf5, 0xf6, 0xf7  
+	IORW -> Destination Port (4, 5, 6, 7) 0xf4, 0xf5, 0xf6, 0xf7
 
 ****************************************************************/
 
@@ -849,12 +919,6 @@ void interflip8035_state::exp2_p4_w(u8 data)
 	m_outbit[11] = BIT(data, 1);  // Coil: Lock Reel C
 	m_outbit[12] = BIT(data, 2);  // Coil: Lock Reel B
 	m_outbit[13] = BIT(data, 3);  // Coil: Lock Reel A
-
-	m_reels[0]->set_state(!m_outbit[10]);
-	m_reels[1]->set_state(!m_outbit[11]);
-	m_reels[2]->set_state(!m_outbit[12]);
-	m_reels[3]->set_state(!m_outbit[13]);
-
 }
 
 void interflip8035_state::exp2_p5_w(u8 data)
@@ -895,18 +959,21 @@ void interflip8035_state::exp2_p7_w(u8 data)
 
 	m_hopper->motor_w(BIT(data, 0));
 
-// Lever rattle sound
+// Lever rattle sampled sound effect
 
-	if(BIT(data, 1)) 
+	if(!m_samples->playing(1) && BIT(data, 1))
+	{
 		m_samples->start(1, 2, false);
+		m_sample_flags |= 0x02;
+	}
 }
 
 void interflip8035_state::exp3_p4_w(u8 data)
 {
 // All active "0" via PNP + NPN open colector transistor driver
-	m_outbit[3] = BIT(data, 0);  // Lamp: Accepted Coin
-	m_outbit[4] = BIT(data, 1);  // Lamp: Insert Coin
-	m_outbit[5] = BIT(data, 2);  // Lamp: Fault
+	m_outbit[6] = BIT(data, 0);  // Lamp: Accepted Coin
+	m_outbit[7] = BIT(data, 1);  // Lamp: Insert Coin
+	m_outbit[8] = BIT(data, 2);  // Lamp: Fault
 }
 
 void interflip8035_state::exp3_p6_w(u8 data)
@@ -953,8 +1020,28 @@ u8 interflip8035_state::kbd_rl_r()
 
 void interflip8035_state::disp_w(u8 data)
 {
+
 //  Display Data
 	output_digit(m_kbd_sl, data >> 4);
+
+// Added some logic to manage rattle forth and back sound effects
+
+	if( m_outbit[25])
+	{
+		if(!m_samples->playing(1))
+		{
+			// reels will start after rattle forth sound has ended
+			m_reels[0]->set_state(!m_outbit[10]);
+			m_reels[1]->set_state(!m_outbit[11]);
+			m_reels[2]->set_state(!m_outbit[12]);
+			m_reels[3]->set_state(!m_outbit[13]);
+			if(BIT(m_sample_flags,1))
+			{
+				m_samples->start(1, 4, false);  // ended rattle forth sound then play rattle back sound
+				m_sample_flags &= 0xfd;
+			}
+		}
+	}
 }
 
 void interflip8035_state::output_digit(int i, u8 data)
@@ -970,7 +1057,7 @@ void interflip8035_state::irq_w(int state)
 {
 //  KBD Interrupt ( Enabled by maincpu P1.3 )
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (state & m_int_flag) ? ASSERT_LINE : CLEAR_LINE);
-	// logerror("I8279: irq state: %s  | Int_flag T0:%02x\n", (state & m_int_flag) ? "Assert Line":"Clear Line" , m_int_flag);
+	// logerror("I8279: irq state: %s  | Int_flag T0:%02x\n", (state & m_int_flag) ? "Assert Line":"Clear Line", m_int_flag);
 }
 
 
@@ -1016,9 +1103,11 @@ int interflip8035_state::reel_opto_r()
 static const char *const interflip8035_sample_names[] =
 {
 	"*samples",
-	"ringbellm",        // ring bell
-	"coin_in",          // coin in
-	"rattle",           // rattle
+	"ringbellm",
+	"coin_in",
+	"rattle_forth",
+	"fade_ring",
+	"rattle_back",
 	nullptr
 };
 
@@ -1039,7 +1128,7 @@ static INPUT_PORTS_START( interflip )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(5)                                  // coin in
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 )  PORT_NAME("Hopper Full") PORT_TOGGLE           // Hopper Full Sensor
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 )  PORT_NAME("Hopper Full") PORT_TOGGLE           // hopper full sensor
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1099,7 +1188,6 @@ void interflip8035_state::interflip(machine_config &config)
 	I8035(config, m_maincpu, MAIN_CLOCK);  // 6 MHz.
 	m_maincpu->set_addrmap(AS_PROGRAM, &interflip8035_state::main_program_map);
 	m_maincpu->set_addrmap(AS_IO , &interflip8035_state::main_io_map);
-	m_maincpu->p1_out_cb().set(FUNC(interflip8035_state::main_p1_data_w));
 	m_maincpu->p2_in_cb().set(FUNC(interflip8035_state::main_p2_r));
 	m_maincpu->p2_out_cb().set(FUNC(interflip8035_state::main_p2_w));
 	m_maincpu->prog_out_cb().set(m_ioexp[0], FUNC(i8243_device::prog_w));
@@ -1130,7 +1218,7 @@ void interflip8035_state::interflip(machine_config &config)
 	m_ioexp[2]->p5_in_cb().set_ioport("IN1");
 	m_ioexp[2]->p6_out_cb().set(FUNC(interflip8035_state::exp3_p6_w));
 
-	I8279(config, m_kbdc, MAIN_CLOCK / 3);  // 2 MHz. (Derived from Main CPU that gives Main Clock / 3  frequency.
+	I8279(config, m_kbdc, MAIN_CLOCK / 3);  // 2 MHz. (Derived from Main CPU T0 line, that gives Main Clock / 3  frequency.
 	m_kbdc->out_sl_callback().set(FUNC(interflip8035_state::kbd_sl_w));  // scan SL lines
 	m_kbdc->out_disp_callback().set(FUNC(interflip8035_state::disp_w));  // display A&B
 	m_kbdc->in_rl_callback().set(FUNC(interflip8035_state::kbd_rl_r));   // kbd RL lines
@@ -1142,13 +1230,10 @@ void interflip8035_state::interflip(machine_config &config)
 
 	// electromechanics
 	add_em_reels(config, 20, attotime::from_double(2));
-
-	// Hopper device
+	
+	// hopper device
 	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 	
-	// video layout
-	config.set_default_layout(layout_ifslots);
-
 	// sound stuff
 	SPEAKER(config, "mono").front_center();
 
@@ -1159,6 +1244,44 @@ void interflip8035_state::interflip(machine_config &config)
 	m_samples->set_samples_names(interflip8035_sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "mono", 2.0);
 
+}
+
+void interflip8035_state::cbr_cnf(machine_config &config)
+{
+	interflip(config);
+
+	m_maincpu->p1_out_cb().set(FUNC(interflip8035_state::main_p1_dec_data_w));  // decoded coin lamps
+
+	// video layout
+	config.set_default_layout(layout_cbrava);
+}
+
+void interflip8035_state::sev_cnf(machine_config &config)
+{
+	interflip(config);
+
+	m_maincpu->p1_out_cb().set(FUNC(interflip8035_state::main_p1_enc_data_w));  // encoded coin lamps 
+
+	// video layout
+	config.set_default_layout(layout_sevilla);
+}
+
+void interflip8035_state::tol_cnf(machine_config &config)
+{
+	interflip(config);
+
+	m_maincpu->p1_out_cb().set(FUNC(interflip8035_state::main_p1_enc_data_w));  // encoded coin lamps
+	
+	// video layout
+	config.set_default_layout(layout_toledo);
+}
+
+void interflip8035_state::jkp_cnf(machine_config &config)
+{
+	interflip(config);
+
+	// video layout
+	config.set_default_layout(layout_ifslots);
 }
 
 
@@ -1199,7 +1322,7 @@ ROM_START( jackuse )  // jackpot settings...
 ROM_END
 
 
-} // anonymous namespace
+}  // anonymous namespace
 
 
 /*********************************************
@@ -1207,7 +1330,7 @@ ROM_END
 *********************************************/
 
 //    YEAR  NAME     PARENT  MACHINE    INPUT      STATE                INIT        ROT    COMPANY      FULLNAME      FLAGS
-GAME( 1982, cbrava,  0,      interflip, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Costa Brava", MACHINE_MECHANICAL )
-GAME( 1982, sevilla, 0,      interflip, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla",     MACHINE_MECHANICAL )
-GAME( 1982, toledo,  0,      interflip, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo",      MACHINE_MECHANICAL )
-GAME( 1982, jackuse, 0,      interflip, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Jack Use (Jackpot settings for Interflip slots machines)",  MACHINE_MECHANICAL )
+GAME( 1982, cbrava,  0,      cbr_cnf  , interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Costa Brava", MACHINE_MECHANICAL )
+GAME( 1982, sevilla, 0,      sev_cnf  , interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla",     MACHINE_MECHANICAL )
+GAME( 1982, toledo,  0,      tol_cnf  , interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo",      MACHINE_MECHANICAL )
+GAME( 1982, jackuse, 0,      jkp_cnf  , interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Jack Use (Jackpot settings for Interflip slots machines)",  MACHINE_MECHANICAL )
