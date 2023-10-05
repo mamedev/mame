@@ -3443,7 +3443,7 @@ msgstr "Zamanlama\tUygulanmadı\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3067
 msgid "Timing\tImperfect\n"
-msgstr "Zamanlama\tKusurlu\n""
+msgstr "Zamanlama\tKusurlu\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3069
 msgid "Mechanical System\tYes\n"
