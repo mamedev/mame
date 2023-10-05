@@ -10111,7 +10111,7 @@ ROM_START( triplfun )
 	ROM_LOAD( "01.bin", 0x000000, 0x40000, CRC(c186a930) SHA1(e17e1a620e380f0737b80c7f160ad643979b2799) )
 ROM_END
 
-/* There is another (Korean set (undumped) with only two noticeable differences: One space on the game title ("숨어있는 덩달이를 찾아 라!"
+/* There is another Korean set (undumped) with only two noticeable differences: One space on the game title ("숨어있는 덩달이를 찾아 라!"
    instead of "숨어있는 덩달이를 찾아라!") and that there's no bootlegger company name on title screen. */
 ROM_START( triplfunk )
 	ROM_REGION( 0x180000, "maincpu", 0 )
