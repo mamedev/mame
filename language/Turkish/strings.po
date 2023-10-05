@@ -254,6 +254,7 @@ msgid ""
 "%s\n"
 " removed from favorites list."
 msgstr ""
+"%s\n"
 " favori listesinden kaldırıldı."
 
 #: src/frontend/mame/ui/selsoft.cpp:576
