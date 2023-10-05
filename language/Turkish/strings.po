@@ -2038,7 +2038,7 @@ msgstr ""
 "kontrol edin.\n"
 "\n"
 "%2$s'yi ilk kez kullanıyorsanız, lütfen %2$s'yi kurma ve kullanma hakkında "
-"bilgi için dokümanlar klasöründeki %2$s.pdf dosyasına bakın."
+"bilgi için docs klasöründeki %2$s.pdf dosyasına bakın."
 
 
 #: src/frontend/mame/ui/simpleselgame.cpp:329
