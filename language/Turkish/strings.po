@@ -3335,7 +3335,7 @@ msgstr "Mikrofon\tKusurlu\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3000
 msgid "Controls\tUnimplemented\n"
-msgstr "Kontroller\tUygulanmadı\"
+msgstr "Kontroller\tUygulanmadı\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3002
 msgid "Controls\tImperfect\n"
