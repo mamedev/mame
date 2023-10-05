@@ -22,6 +22,7 @@
 
 #include "emu.h"
 #include "sblaster_lle.h"
+#include "speaker.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -30,9 +31,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-#define ym3812_StdClock XTAL(3'579'545)
-#define ymf262_StdClock XTAL(14'318'181)
-#define XTAL_DSP        XTAL(12'000'000)    // XTL1
+static constexpr XTAL CLOCK_YM3812  = XTAL(14'318'181/4);   // ISA OSC pin / 4
+static constexpr XTAL XTAL_DSP      = XTAL(12'000'000);     // crystal X1
 
 DEFINE_DEVICE_TYPE(ISA8_SOUND_BLASTER_2_0_LLE, isa8_sblaster_2_0_lle_device, "isa8_sblaster_2_0", "Sound Blaster 2.0 (CT1350, LLE)")
 
@@ -55,14 +55,14 @@ void isa8_sblaster_2_0_lle_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, m_speaker).front_center();
 	MC1408(config, m_dac, 0).add_route(ALL_OUTPUTS, m_speaker, 0.5);
 
-	YM3812(config, m_ym3812, ym3812_StdClock);
+	YM3812(config, m_ym3812, CLOCK_YM3812);
 	m_ym3812->add_route(ALL_OUTPUTS, m_speaker, 1.0);
 	/* no CMS */
 }
 
 static INPUT_PORTS_START( sb_dsw )
 	PORT_START("JP1")
-	PORT_CONFNAME( 0x03, 0x01, "Base Address")
+	PORT_CONFNAME( 0x03, 0x01, "I/O Base Address")
 	PORT_CONFSETTING(    0x01, "220h")
 	PORT_CONFSETTING(    0x02, "240h")
 
@@ -86,43 +86,25 @@ isa8_sblaster_2_0_lle_device::isa8_sblaster_2_0_lle_device(const machine_config 
 	m_joy(*this, "pc_joy"),
 	m_ym3812(*this, "ym3812"),
 	m_dac(*this, "dac"),
-	m_speaker(*this, "speaker")
+	m_speaker(*this, "speaker"),
+	m_jp1(*this, "JP1"),
+	m_jp4(*this, "JP4")
 {
 }
 
 void isa8_sblaster_2_0_lle_device::device_start()
 {
+	m_installed_base_io = 0;
 	set_isa_device();
 }
 
 void isa8_sblaster_2_0_lle_device::device_reset()
 {
-	uint16_t base_port = (ioport("JP1")->read() & 0x02) ? 0x240 : 0x220;
+	install_io();
+	lower_irq();
+	lower_dma();
 
-	m_isa->install_device(0x0200, 0x0207,
-		read8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)),
-		write8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
-
-	m_isa->install_device(base_port + 0x6, base_port + 0x7,
-		read8sm_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_reset_r)),
-		write8sm_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_reset_w)));
-	m_isa->install_device(base_port + 0x8, base_port + 0x9,
-		read8sm_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::ym3812_16_r)),
-		write8sm_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::ym3812_16_w)));
-	m_isa->install_device(base_port + 0xa, base_port + 0xb,
-		read8sm_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_data_r)),
-		write8sm_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_data_w)));
-	m_isa->install_device(base_port + 0xc, base_port + 0xd,
-		read8sm_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_wbuf_status_r)),
-		write8sm_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_cmd_w)));
-	m_isa->install_device(base_port + 0xe, base_port + 0xf,
-		read8sm_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_rbuf_status_r)),
-		write8sm_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_rbuf_status_w)));
-
-	m_isa->install_device(0x0388, 0x0389,
-		read8sm_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::ym3812_16_r)),
-		write8sm_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::ym3812_16_w)));
-
+	// DMA is not configurable.
 	m_isa->set_dma_channel(1, this, false);
 
 	m_irq_in_flag = false;
@@ -131,8 +113,50 @@ void isa8_sblaster_2_0_lle_device::device_reset()
 
 	dsp_reset_w(0, 0);
 
-	m_irq_raised = false;
+	m_irq_raised = 0;
 	m_dma_raised = false;
+}
+
+void isa8_sblaster_2_0_lle_device::install_io()
+{
+	uint16_t base = (m_jp1->read() & 0x02) ? 0x240 : 0x220;
+
+	if(m_installed_base_io != 0)
+	{
+		// Unmap if already mapped.
+		m_isa->unmap_device(m_installed_base_io+0x6, m_installed_base_io+0x7);
+		m_isa->unmap_device(m_installed_base_io+0x8, m_installed_base_io+0x9);
+		m_isa->unmap_device(m_installed_base_io+0xa, m_installed_base_io+0xb);
+		m_isa->unmap_device(m_installed_base_io+0xc, m_installed_base_io+0xd);
+		m_isa->unmap_device(m_installed_base_io+0xe, m_installed_base_io+0xf);
+	}
+
+	m_isa->install_device(base + 0x6, base + 0x7,
+		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_reset_r)),
+		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_reset_w)));
+	m_isa->install_device(base + 0x8, base + 0x9,
+		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::ym3812_16_r)),
+		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::ym3812_16_w)));
+	m_isa->install_device(base + 0xa, base + 0xb,
+		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_data_r)),
+		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_data_w)));
+	m_isa->install_device(base + 0xc, base + 0xd,
+		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_wbuf_status_r)),
+		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_cmd_w)));
+	m_isa->install_device(base + 0xe, base + 0xf,
+		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_rbuf_status_r)),
+		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_rbuf_status_w)));
+
+
+	// The joystick port and AdLib-compatible port are not affected by jumpers.
+	m_isa->install_device(0x200, 0x207,
+		emu::rw_delegate(m_joy, FUNC(pc_joy_device::joy_port_r)),
+		emu::rw_delegate(m_joy, FUNC(pc_joy_device::joy_port_w)));
+	m_isa->install_device(0x388, 0x389,
+		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::ym3812_16_r)),
+		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::ym3812_16_w)));
+
+	m_installed_base_io = base;
 }
 
 // ISA DMA handling
@@ -168,31 +192,28 @@ void isa8_sblaster_2_0_lle_device::raise_irq()
 	if(!m_irq_raised)
 	{
 		LOG("SB raising IRQ %d\n", 5);
-		switch(ioport("JP4")->read())
+		switch(m_jp4->read())
 		{
-			case 1: m_isa->irq7_w(ASSERT_LINE); break;
-			case 2: m_isa->irq5_w(ASSERT_LINE); break;
-			case 4: m_isa->irq3_w(ASSERT_LINE); break;
-			case 8: m_isa->irq2_w(ASSERT_LINE); break;
+			case 1: m_isa->irq7_w(ASSERT_LINE); m_irq_raised = 7; break;
+			case 2: m_isa->irq5_w(ASSERT_LINE); m_irq_raised = 5; break;
+			case 4: m_isa->irq3_w(ASSERT_LINE); m_irq_raised = 3; break;
+			case 8: m_isa->irq2_w(ASSERT_LINE); m_irq_raised = 2; break;
 		}
-		m_irq_raised = true;
 	}
 }
 
 void isa8_sblaster_2_0_lle_device::lower_irq()
 {
-	if(m_irq_raised)
+	LOG("SB lowering IRQ %d\n", 5);
+	switch(m_irq_raised)
 	{
-		LOG("SB lowering IRQ %d\n", 5);
-		switch(ioport("JP4")->read())
-		{
-			case 1: m_isa->irq7_w(CLEAR_LINE); break;
-			case 2: m_isa->irq5_w(CLEAR_LINE); break;
-			case 4: m_isa->irq3_w(CLEAR_LINE); break;
-			case 8: m_isa->irq2_w(CLEAR_LINE); break;
-		}
-		m_irq_raised = false;
+		case 2: m_isa->irq2_w(CLEAR_LINE); break;
+		case 3: m_isa->irq3_w(CLEAR_LINE); break;
+		case 5: m_isa->irq5_w(CLEAR_LINE); break;
+		case 7: m_isa->irq7_w(CLEAR_LINE); break;
+		default: break;
 	}
+	m_irq_raised = 0;
 }
 
 // YM3812
@@ -313,7 +334,11 @@ void isa8_sblaster_2_0_lle_device::dsp_reset_w(offs_t offset, uint8_t data)
 uint8_t isa8_sblaster_2_0_lle_device::dsp_rbuf_status_r(offs_t offset)
 {
 	// 0x22E
-	lower_irq();                        // Reading this bit clears the IRQ.
+	if(!machine().side_effects_disabled())
+	{
+		lower_irq();                    // Reading this bit clears the IRQ.
+	}
+
 	return (m_dav_pc ? 0x80 : 0x00);    // Return the data waiting flag in bit 7.
 }
 
@@ -328,8 +353,12 @@ uint8_t isa8_sblaster_2_0_lle_device::dsp_data_r(offs_t offset)
 {
 	uint8_t data = m_dsp_to_host_latch;     // PC retrieves the latched byte.
 	LOG("PC reading DSP data latch: D:%02X\n", data);
-	m_dav_pc = false;                       // Clear the PC has data flag.
-	m_dsp_to_host_latch = 0;                // Clear the latch.
+
+	if(!machine().side_effects_disabled())
+	{
+		m_dav_pc = false;                       // Clear the PC has data flag.
+		m_dsp_to_host_latch = 0;                // Clear the latch.
+	}
 
 	return data;
 }
@@ -346,9 +375,14 @@ void isa8_sblaster_2_0_lle_device::dsp_cmd_w(offs_t offset, uint8_t data)
 uint8_t isa8_sblaster_2_0_lle_device::dsp_latch_r(offs_t offset)
 {
 	uint8_t data = m_host_to_dsp_latch;                 // DSP retrieves the latched byte.
-	m_host_to_dsp_latch = 0x00;                         // Clear the latch.
-	LOG("DSP reading a byte from PC: D:%02X\n", data);
-	m_dav_dsp = false;                                  // Clear the DSP has data flag.
+
+	if(!machine().side_effects_disabled())
+	{
+		m_host_to_dsp_latch = 0x00;                         // Clear the latch.
+		LOG("DSP reading a byte from PC: D:%02X\n", data);
+		m_dav_dsp = false;                                  // Clear the DSP has data flag.
+	}
+
 	return data;
 }
 
