@@ -10594,4 +10594,17 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="par" supported="no">
+		<description>Pro Action Replay (v1.01)</description>
+		<year>1993</year>
+		<publisher>Datel Electronics</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<feature name="slot" value="mgear" />
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="32768">
+				<rom name="27c256.bin" size="32768" crc="9083e393" sha1="442ad0bdbde2500a4b910382a7141713ab424b3f"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
