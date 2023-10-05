@@ -62,6 +62,7 @@
 #include "mpu401.h"
 #include "pcmidi.h"
 #include "sblaster.h"
+#include "sblaster_lle.h"
 #include "ssi2001.h"
 #include "stereo_fx.h"
 #include "dectalk.h"
@@ -126,6 +127,7 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("gblaster", ISA8_GAME_BLASTER);
 	device.option_add("sblaster1_0", ISA8_SOUND_BLASTER_1_0);
 	device.option_add("sblaster1_5", ISA8_SOUND_BLASTER_1_5);
+	device.option_add("sblaster2_0_lle", ISA8_SOUND_BLASTER_2_0_LLE);
 	device.option_add("stereo_fx", ISA8_STEREO_FX);
 	device.option_add("ssi2001", ISA8_SSI2001);
 	device.option_add("mpu401", ISA8_MPU401);
@@ -176,6 +178,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("gblaster", ISA8_GAME_BLASTER);
 	device.option_add("sblaster1_0", ISA8_SOUND_BLASTER_1_0);
 	device.option_add("sblaster1_5", ISA8_SOUND_BLASTER_1_5);
+	device.option_add("sblaster2_0", ISA8_SOUND_BLASTER_2_0_LLE);
 	device.option_add("stereo_fx", ISA8_STEREO_FX);
 	device.option_add("ssi2001", ISA8_SSI2001);
 	device.option_add("ne1000", NE1000);
