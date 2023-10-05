@@ -125,8 +125,8 @@ NM00053 ?
 NM00054 ?
 NM00055 ?
 
-Note about :
-This is a general guideline flag showing compatibility between the different revisions of  246 hardware.
+Note about System:
+This is a general guideline flag showing compatibility between the different revisions of System 246 hardware.
 1-7: Tested Working
 X  : Tested Not Working
 -  : Not Tested
@@ -625,7 +625,7 @@ Texas Instruments TMS32VC540x DSP, TSOP32 flash ROM and other components.
 V300 FCB PCB
 2606960100 (2582960101)
 
-Notes: V300 FCB PCB is almost identical to the V290 FCB PCB. The main differences are changed internal MCU 
+Notes: V300 FCB PCB is almost identical to the V290 FCB PCB. The main differences are changed internal MCU
 code & PIC code, more output transistors and an traded the RS-232 for a RS-232C IC.
 [to-do]
 
