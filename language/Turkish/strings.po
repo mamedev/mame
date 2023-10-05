@@ -3407,7 +3407,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:3045
 msgid "(EP)ROM\tUnimplemented\n"
-msgstr "(EP)ROM\Uygulanmadı\n"
+msgstr "(EP)ROM\tUygulanmadı\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3047
 msgid "(EP)ROM\tImperfect\n"
