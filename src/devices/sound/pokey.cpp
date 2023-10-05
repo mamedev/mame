@@ -433,9 +433,12 @@ TIMER_CALLBACK_MEMBER(pokey_device::sync_pot)
 
 TIMER_CALLBACK_MEMBER(pokey_device::sync_set_irqst)
 {
-	LOG_IRQ("POKEY TIMR%d IRQ raised\n", param);
-	m_IRQST |=  (param & 0xff);
-	m_irq_w_cb(ASSERT_LINE);
+	if (m_IRQEN & param)
+	{
+		LOG_IRQ("POKEY TIMR%d IRQ raised\n", param);
+		m_IRQST |=  (param & 0xff);
+		m_irq_w_cb(ASSERT_LINE);
+	}
 }
 
 void pokey_device::execute_run()

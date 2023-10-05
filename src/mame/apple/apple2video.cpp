@@ -655,7 +655,6 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	endrow = (std::min)(endrow, cliprect.bottom());
 	int const startcol = (cliprect.left() / 14);
 	int const stopcol = (cliprect.right() / 14) + 1;
-	const bool bIsRGBMonitor = rgb_monitor();
 
 	uint8_t const *const vram = &m_ram_ptr[page];
 	uint8_t const *const vaux = (m_aux_ptr ? m_aux_ptr : vram) + page;
@@ -703,8 +702,9 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				words[col] = (vaux_row[col] & 0x7f) + ((vram_row[col] & 0x7f) << 7);
 			}
 
-			if (monochrome)
+			if (rgbmode < 0 || monochrome)
 			{
+				// Composite or monochrome, use the renderer that supports artifact rendering.
 				render_line(p, words, startcol, stopcol, monochrome, true);
 			}
 			else
@@ -730,7 +730,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				{
 					unsigned const w = words[col] + (words[col+1] << 14);
 
-					unsigned const color_mask = (rgbmode == 3 || !bIsRGBMonitor) ? -1u :
+					unsigned const color_mask = (rgbmode == 3) ? -1u :
 							(vaux_row[col] >> 7) * 0x7f + (vram_row[col] >> 7) * 0x3f80
 							+ (vaux_row[col+1] >> 7) * 0x1fc000 + (vram_row[col+1] >> 7) * 0xfe00000;
 

@@ -372,7 +372,7 @@ void eti660_state::eti660(machine_config &config)
 	m_cti->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(eti660_state::pia_pa_r));
 	m_pia->writepa_handler().set(FUNC(eti660_state::pia_pa_w));
 	m_pia->ca2_handler().set(FUNC(eti660_state::ca2_w));  // not working, bug in pia

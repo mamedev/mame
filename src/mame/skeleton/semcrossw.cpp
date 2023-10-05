@@ -138,9 +138,9 @@ void semcrossw_state::semcrossw(machine_config &config)
 {
 	M6802(config, m_maincpu, XTAL(4'000'000));
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 }
 
 ROM_START(semcrossw)

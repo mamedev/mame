@@ -222,7 +222,7 @@ void excel_state::machine_start()
     I/O
 *******************************************************************************/
 
-// misc handlers
+// speech
 
 INPUT_CHANGED_MEMBER(excel_state::speech_bankswitch)
 {

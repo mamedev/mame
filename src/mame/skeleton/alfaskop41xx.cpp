@@ -373,7 +373,7 @@ void alfaskop4110_state::alfaskop4110(machine_config &config)
 	m_screen->set_raw(19'170'000, 80 * 8, 0, 80 * 8, 400, 0, 400);
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	PIA6821(config, m_mic_pia, 0); // Main board PIA
+	PIA6821(config, m_mic_pia); // Main board PIA
 	m_mic_pia->cb1_w(0);
 	m_mic_pia->cb2_handler().set([this](offs_t offset, uint8_t data) { LOGMIC("->MIC PIA: CB2 write %d\n", data); });
 
@@ -435,7 +435,7 @@ void alfaskop4110_state::alfaskop4110(machine_config &config)
 	m_mic_pia->ca1_w(0);
 	m_mic_pia->ca2_w(0);
 
-	PIA6821(config, m_dia_pia, 0); // Display PIA, controls how the CRTC accesses memory etc
+	PIA6821(config, m_dia_pia); // Display PIA, controls how the CRTC accesses memory etc
 	m_dia_pia->cb1_w(0);
 	m_dia_pia->cb2_handler().set([this](offs_t offset, uint8_t data) { LOGDIA("DIA PIA: CB2_w %d\n", data); });
 	m_dia_pia->writepa_handler().set([this](offs_t offset, uint8_t data) { LOGDIA("DIA PIA: PA_w %02x\n", data); });
@@ -534,8 +534,8 @@ void alfaskop4120_state::alfaskop4120(machine_config &config)
 	M6800(config, m_maincpu, XTAL(19'170'000) / 18); // Verified from service manual
 	m_maincpu->set_addrmap(AS_PROGRAM, &alfaskop4120_state::mem_map);
 
-	PIA6821(config, m_mic_pia, 0); // Main Board PIA
-	PIA6821(config, m_fdapia, 0); // Floppy Disk PIA
+	PIA6821(config, m_mic_pia); // Main Board PIA
+	PIA6821(config, m_fdapia); // Floppy Disk PIA
 }
 
 void alfaskop4101_state::alfaskop4101(machine_config &config)
@@ -544,7 +544,7 @@ void alfaskop4101_state::alfaskop4101(machine_config &config)
 	M6800(config, m_maincpu, XTAL(19'170'000) / 18); // Verified from service manual
 	m_maincpu->set_addrmap(AS_PROGRAM, &alfaskop4101_state::mem_map);
 
-	PIA6821(config, m_mic_pia, 0); // Main board PIA
+	PIA6821(config, m_mic_pia); // Main board PIA
 }
 
 /* ROM definitions */

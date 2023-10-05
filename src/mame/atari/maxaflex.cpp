@@ -342,7 +342,7 @@ void maxaflex_state::maxaflex(machine_config &config)
 	ATARI_ANTIC(config, m_antic, 0);
 	m_antic->set_gtia_tag(m_gtia);
 
-	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia6821_device &pia(PIA6821(config, "pia"));
 	pia.readpa_handler().set(FUNC(maxaflex_state::pia_pa_r));
 	pia.readpb_handler().set(FUNC(maxaflex_state::pia_pb_r));
 	pia.writepb_handler().set(FUNC(maxaflex_state::pia_pb_w));

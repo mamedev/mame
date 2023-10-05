@@ -14,6 +14,7 @@
 #include "sdf_dsk.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 
 sdf_format::sdf_format()
@@ -118,8 +119,8 @@ bool sdf_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			{
 				if (i < sector_count )
 				{
-					idam_location[i] = ((track_data[ 8 * (i+1) + 1] << 8 | track_data[ 8 * (i+1)]) & 0x3FFF) - 4;
-					dam_location[i] = ((track_data[ 8 * (i+1) + 1 + 2] << 8 | track_data[ 8 * (i+1) + 2]) & 0x3FFF) - 4;
+					idam_location[i] = (get_u16le(&track_data[ 8 * (i+1)]) & 0x3FFF) - 4;
+					dam_location[i] = (get_u16le(&track_data[ 8 * (i+1) + 2]) & 0x3FFF) - 4;
 
 					if (idam_location[i] > TOTAL_TRACK_SIZE) return false;
 					if (dam_location[i] > TOTAL_TRACK_SIZE) return false;

@@ -2097,7 +2097,7 @@ void adsp21xx_device::shift_op(uint32_t op)
 			if (xop < 0)
 			{
 				SET_SS;
-				res = count_leading_zeros_32(~xop) - 16 - 1;
+				res = count_leading_ones_32(xop) - 16 - 1;
 			}
 			else
 			{
@@ -2120,7 +2120,7 @@ void adsp21xx_device::shift_op(uint32_t op)
 				if (xop < 0)
 				{
 					SET_SS;
-					res = count_leading_zeros_32(~xop) - 16 - 1;
+					res = count_leading_ones_32(xop) - 16 - 1;
 				}
 				else
 				{

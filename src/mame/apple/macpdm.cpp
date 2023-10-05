@@ -75,7 +75,7 @@ private:
 	uint32_t m_dma_scsi_a_cur_offset = 0, m_dma_scsi_b_cur_offset = 0;
 
 	uint8_t m_dma_scsi_a_ctrl = 0, m_dma_scsi_b_ctrl = 0, m_dma_floppy_ctrl = 0;
-	uint8_t m_dma_scsi_buffer_byte_count = 0;
+	uint8_t m_dma_scsi_buffer_word_count = 0;
 
 	uint8_t m_dma_scc_txa_ctrl = 0, m_dma_scc_rxa_ctrl = 0, m_dma_scc_txb_ctrl = 0, m_dma_scc_rxb_ctrl = 0;
 	uint8_t m_dma_enet_rx_ctrl = 0, m_dma_enet_tx_ctrl = 0;
@@ -260,7 +260,7 @@ void macpdm_state::driver_init()
 	save_item(NAME(m_dma_berr_en));
 	save_item(NAME(m_dma_berr_flag));
 	save_item(NAME(m_dma_scsi_buffer));
-	save_item(NAME(m_dma_scsi_buffer_byte_count));
+	save_item(NAME(m_dma_scsi_buffer_word_count));
 	save_item(NAME(m_dma_scsi_a_in_step));
 	save_item(NAME(m_dma_scsi_a_base_adr));
 	save_item(NAME(m_dma_scsi_b_base_adr));
@@ -317,7 +317,7 @@ void macpdm_state::driver_reset()
 	m_dma_berr_en = 0;
 	m_dma_berr_flag = 0;
 	m_dma_scsi_buffer = 0;
-	m_dma_scsi_buffer_byte_count = 0;
+	m_dma_scsi_buffer_word_count = 0;
 	m_dma_scsi_a_in_step = false;
 	m_dma_scsi_a_base_adr = 0;
 	m_dma_scsi_b_base_adr = 0;
@@ -496,7 +496,7 @@ uint8_t macpdm_state::via2_ifr_r()
 
 uint8_t macpdm_state::via2_sier_r()
 {
-	return m_via2_ier;
+	return m_via2_sier;
 }
 
 void macpdm_state::via2_sier_w(uint8_t data)
@@ -728,22 +728,22 @@ void macpdm_state::dma_scsi_a_step()
 
 	if(m_dma_scsi_a_ctrl & 0x40) {
 		while(m_via2_ifr & 0x01) {
-			if(m_dma_scsi_buffer_byte_count == 0) {
-				m_dma_scsi_buffer_byte_count = 8;
+			if(m_dma_scsi_buffer_word_count == 0) {
+				m_dma_scsi_buffer_word_count = 4;
 				m_dma_scsi_buffer = m_maincpu->space().read_qword(m_dma_scsi_a_base_adr + m_dma_scsi_a_cur_offset);
 				m_dma_scsi_a_cur_offset += 8;
 			}
-			m_dma_scsi_buffer_byte_count --;
-			m_ncr53c94->dma_w(m_dma_scsi_buffer >> (8*m_dma_scsi_buffer_byte_count));
+			m_dma_scsi_buffer_word_count --;
+			m_ncr53c94->dma16_swap_w(m_dma_scsi_buffer >> (16*m_dma_scsi_buffer_word_count));
 		}
 
 	} else {
 		while(m_via2_ifr & 0x01) {
-			uint8_t b = m_ncr53c94->dma_r();
-			m_dma_scsi_buffer = (m_dma_scsi_buffer & ~(u64(0xff) << (56 - 8*m_dma_scsi_buffer_byte_count))) | (u64(b) << (56 - 8*m_dma_scsi_buffer_byte_count));
-			m_dma_scsi_buffer_byte_count ++;
-			if(m_dma_scsi_buffer_byte_count == 8) {
-				m_dma_scsi_buffer_byte_count = 0;
+			uint16_t w = m_ncr53c94->dma16_swap_r();
+			m_dma_scsi_buffer = (m_dma_scsi_buffer & ~(u64(0xffff) << (48 - 16*m_dma_scsi_buffer_word_count))) | (u64(w) << (48 - 16*m_dma_scsi_buffer_word_count));
+			m_dma_scsi_buffer_word_count ++;
+			if(m_dma_scsi_buffer_word_count == 4) {
+				m_dma_scsi_buffer_word_count = 0;
 				m_maincpu->space().write_qword(m_dma_scsi_a_base_adr + m_dma_scsi_a_cur_offset, m_dma_scsi_buffer);
 				m_dma_scsi_a_cur_offset += 8;
 			}
@@ -775,7 +775,7 @@ void macpdm_state::dma_scsi_a_base_adr_w(offs_t, uint32_t data, uint32_t mem_mas
 	COMBINE_DATA(&m_dma_scsi_a_base_adr);
 	m_dma_scsi_a_base_adr &= ~7;
 	m_dma_scsi_a_cur_offset = 0;
-	m_dma_scsi_buffer_byte_count = 0;
+	m_dma_scsi_buffer_word_count = 0;
 	logerror("dma_scsi_a_base_adr_w %08x\n", m_dma_scsi_a_base_adr);
 }
 
@@ -803,22 +803,22 @@ void macpdm_state::dma_scsi_a_ctrl_w(uint8_t data)
 	if(data & 1) {
 		m_dma_scsi_a_ctrl &= 0x40;
 		m_dma_scsi_a_cur_offset = 0;
-		m_dma_scsi_buffer_byte_count = 0;
+		m_dma_scsi_buffer_word_count = 0;
 	}
 	if(data & 0x10) {
 		while(m_via2_ifr & 0x01) {
-			uint8_t b = m_ncr53c94->dma_r();
-			m_dma_scsi_buffer = (m_dma_scsi_buffer & ~(u64(0xff) << (56 - 8*m_dma_scsi_buffer_byte_count))) | (u64(b) << (56 - 8*m_dma_scsi_buffer_byte_count));
-			m_dma_scsi_buffer_byte_count ++;
-			if(m_dma_scsi_buffer_byte_count == 8) {
-				m_dma_scsi_buffer_byte_count = 0;
+			uint16_t w = m_ncr53c94->dma16_swap_r();
+			m_dma_scsi_buffer = (m_dma_scsi_buffer & ~(u64(0xffff) << (48 - 16*m_dma_scsi_buffer_word_count))) | (u64(w) << (48 - 16*m_dma_scsi_buffer_word_count));
+			m_dma_scsi_buffer_word_count ++;
+			if(m_dma_scsi_buffer_word_count == 4) {
+				m_dma_scsi_buffer_word_count = 0;
 				m_maincpu->space().write_qword(m_dma_scsi_a_base_adr + m_dma_scsi_a_cur_offset, m_dma_scsi_buffer);
 				m_dma_scsi_a_cur_offset += 8;
 			}
 		}
-		if(m_dma_scsi_buffer_byte_count) {
+		if(m_dma_scsi_buffer_word_count) {
 			m_maincpu->space().write_qword(m_dma_scsi_a_base_adr + m_dma_scsi_a_cur_offset, m_dma_scsi_buffer);
-			m_dma_scsi_buffer_byte_count = 0;
+			m_dma_scsi_buffer_word_count = 0;
 		}
 	}
 
@@ -1116,6 +1116,7 @@ void macpdm_state::macpdm(machine_config &config)
 		{
 			auto &ctrl = downcast<ncr53c94_device &>(*device);
 			ctrl.set_clock(ENET_CLOCK/2);
+			ctrl.set_busmd(ncr53c94_device::BUSMD_3);
 			ctrl.drq_handler_cb().set(*this, FUNC(macpdm_state::scsi_drq));
 			ctrl.irq_handler_cb().set(*this, FUNC(macpdm_state::scsi_irq));
 		});

@@ -85,8 +85,8 @@ void c64_tib_dd_001_device::device_add_mconfig(machine_config &config)
 c64_tib_dd_001_device::c64_tib_dd_001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, C64_TIB_DD_001, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
-    m_fdc(*this, GM82C765B_TAG),
-    m_floppy(*this, GM82C765B_TAG":0")
+	m_fdc(*this, GM82C765B_TAG),
+	m_floppy(*this, GM82C765B_TAG":0")
 {
 }
 
@@ -117,25 +117,25 @@ uint8_t c64_tib_dd_001_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, 
 {
 	if (!roml)
 	{
-        data = m_roml[offset & 0x1fff];
+		data = m_roml[offset & 0x1fff];
 	}
 
-    if (sphi2 && !io1)
-    {
-        if (BIT(offset, 0))
-        {
-            data = m_fdc->fifo_r();
-        }
-        else
-        {
-            data = m_fdc->msr_r();
-        }
-    }
+	if (sphi2 && !io1)
+	{
+		if (BIT(offset, 0))
+		{
+			data = m_fdc->fifo_r();
+		}
+		else
+		{
+			data = m_fdc->msr_r();
+		}
+	}
 
-    if (sphi2 && !io2)
-    {
-        m_fdc->reset();
-    }
+	if (sphi2 && !io2)
+	{
+		m_fdc->reset();
+	}
 
 	return data;
 }
@@ -147,16 +147,16 @@ uint8_t c64_tib_dd_001_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, 
 
 void c64_tib_dd_001_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-    if (sphi2 && !io1)
-    {
-        if (BIT(offset, 0))
-        {
-            m_fdc->fifo_w(data);
-        }
-    }
+	if (sphi2 && !io1)
+	{
+		if (BIT(offset, 0))
+		{
+			m_fdc->fifo_w(data);
+		}
+	}
 
-    if (sphi2 && !io2)
-    {
-        m_fdc->reset();
-    }
+	if (sphi2 && !io2)
+	{
+		m_fdc->reset();
+	}
 }

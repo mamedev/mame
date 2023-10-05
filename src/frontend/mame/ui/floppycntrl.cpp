@@ -12,6 +12,9 @@
 #include "ui/filecreate.h"
 #include "ui/floppycntrl.h"
 
+#include "formats/flopimg.h"
+#include "formats/fsmgr.h"
+
 #include "zippath.h"
 
 #include <tuple>

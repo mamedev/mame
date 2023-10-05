@@ -563,7 +563,7 @@ void apf_state::apfm1000(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	PIA6821(config, m_pia0, 0);
+	PIA6821(config, m_pia0);
 	m_pia0->readpa_handler().set(FUNC(apf_state::pia0_porta_r));
 	m_pia0->writepb_handler().set(FUNC(apf_state::pia0_portb_w));
 	m_pia0->ca2_handler().set(FUNC(apf_state::pia0_ca2_w));
@@ -585,7 +585,7 @@ void apf_state::apfimag(machine_config &config)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("8K").set_extra_options("16K");
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpa_handler().set(FUNC(apf_state::pia1_porta_r));
 	m_pia1->readpb_handler().set(FUNC(apf_state::pia1_portb_r));
 	m_pia1->writepb_handler().set(FUNC(apf_state::pia1_portb_w));

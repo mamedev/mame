@@ -4336,6 +4336,39 @@ ROM_START( bonkadv )
 ROM_END
 
 
+// Z09AF-003 PCB. No language select (but it has strings in Italian and German?). Also has a much longer list of level titles in ROM (the extra ones don't seem used, though).
+// Handwritten sticker (in Japanese) says: 'Normal board version' 'Sensor sound: English'
+ROM_START( bonkadva )
+	ROM_REGION( 0x100000, "maincpu", 0 )            /* 68000 Code */
+	ROM_LOAD16_BYTE( "1-13.8",        0x000000, 0x080000, CRC(9a02e4ca) SHA1(5e8cbcedd11e8b3bb6c17da8f33951a08977ba1f) ) // handwritten: PC原人 AT 1/13
+	ROM_LOAD16_BYTE( "1-13.7",        0x000001, 0x080000, CRC(6b0afe3d) SHA1(3cb1063c8c2ac93202ed9141caae810a8f6d9907) ) // handwritten: PC原人 AT 1/13
+
+	ROM_REGION( 0x020000, "mcudata", 0 )            /* MCU Code */
+	ROM_LOAD16_WORD_SWAP( "9200.124",             0x000000, 0x020000, CRC(9d4e2724) SHA1(9dd43703265e39f876877020a0ac3875de6faa8d) )
+
+	ROM_REGION( 0x500000, "kan_spr", 0 )   /* Sprites */
+	ROM_LOAD( "pc100101.37",         0x000000, 0x200000, CRC(c96e7c10) SHA1(607cc7745abc3ff820047e8a00060ece61646623) )
+	ROM_LOAD( "pc200102.40",         0x200000, 0x100000, CRC(c2b7a26a) SHA1(1c8783442e0ccf30c5640866c5493f1dc1dd48f8) )
+	ROM_LOAD( "pc300103.38",         0x300000, 0x100000, CRC(51ee162c) SHA1(b33afc7d1e9f55f191e08472e8c51ca931b0389d) )
+	ROM_LOAD16_BYTE( "pc600106.42",  0x400000, 0x080000, CRC(25877026) SHA1(96814d97e9f9284f98c35edfe5e76677ac50dd97) )
+	ROM_LOAD16_BYTE( "pc700107.43",  0x400001, 0x080000, CRC(bfe21c44) SHA1(9900a6fe4182b720a90d64d368bd0fd08bf936a8) )
+
+	ROM_REGION( 0x200000, "view2_0", 0 )   /* Tiles */
+	ROM_LOAD( "pc400104.51",         0x000000, 0x100000, CRC(3b176f84) SHA1(0ad6fd5f03d275165490881173bafcb0a94762eb) )
+
+	ROM_REGION( 0x200000, "view2_1", 0 )   /* Tiles */
+	ROM_LOAD( "pc500105.55",         0x000000, 0x100000, CRC(bebb3edc) SHA1(e0fed4307316deaeb811ec29f5022adeaf577a95) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
+	ROM_LOAD( "pc604109.101",        0x000000, 0x100000, CRC(76025530) SHA1(e0c8192d783057798eea084aa3e87938f6e01cb7) )
+
+	ROM_REGION( 0x380000, "oki2", 0 )   /* Samples */
+	ROM_LOAD( "pc601106.99",         0x000000, 0x100000, CRC(a893651c) SHA1(d221ce89f19a76be497724f6c16fab82c8a52661) )
+	ROM_LOAD( "pc602107.100",        0x100000, 0x100000, CRC(0fbb23aa) SHA1(69b620375c65246317d7105fbc414f3c36e02b2c) )
+	ROM_LOAD( "pc603108.102",        0x200000, 0x100000, CRC(58458985) SHA1(9a846d604ba901eb2a59d2b6cd9c42e3b43adb6a) )
+	ROM_LOAD( "ekt.103",             0x300000, 0x080000, CRC(d0d4014c) SHA1(2928739ce00c766bfd80a8cc279d3c1f86653890) ) // EEPROM instead of MASK ROM. TODO: verify if ROM loading is correct
+ROM_END
+
 
 void kaneko16_shogwarr_state::init_shogwarr()
 {
@@ -4377,6 +4410,7 @@ GAME( 1992, bakubrkr,   explbrkr, bakubrkr, bakubrkr,  kaneko16_state,          
 GAME( 1993, wingforc,   0,        wingforc, wingforc,  kaneko16_state,          init_bakubrkr, ROT270,"A.I (Atlus license)",  "Wing Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, bonkadv,    0,        bonkadv,  bonkadv,   kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bonkadva,   bonkadv,  bonkadv,  bonkadv,   kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Bonk's Adventure (prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // shows an upside down KO! sprite, probably cause of check failing. Playable apart from that
 GAME( 1994, bloodwar,   0,        bloodwar, bloodwar,  kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Blood Warrior", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, oedfight,   bloodwar, bloodwar, bloodwar,  kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan, Bloodshed version)", MACHINE_SUPPORTS_SAVE ) // shows blood effects like Blood Warrior version
 GAME( 1994, oedfighta,  bloodwar, bloodwar, bloodwar,  kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan, Bloodless version)", MACHINE_SUPPORTS_SAVE ) // shows no blood effects

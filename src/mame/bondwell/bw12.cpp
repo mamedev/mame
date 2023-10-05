@@ -550,7 +550,7 @@ void bw12_state::common(machine_config &config)
 	TIMER(config, FLOPPY_TIMER_TAG).configure_generic(FUNC(bw12_state::floppy_motor_off_tick));
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, false, true);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(bw12_state::pia_pa_r));
 	m_pia->writepb_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pia->ca2_handler().set(CENTRONICS_TAG, FUNC(centronics_device::write_strobe));

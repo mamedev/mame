@@ -10,7 +10,8 @@
 
 #include "fs_coco_rsdos.h"
 #include "coco_rawdsk.h"
-#include "util/corestr.h"
+#include "fsblk.h"
+
 #include "util/strformat.h"
 
 #include <bitset>
@@ -415,8 +416,8 @@ meta_data coco_rsdos_impl::get_metadata_from_dirent(const rsdos_dirent &dirent)
 
 std::string coco_rsdos_impl::get_filename_from_dirent(const rsdos_dirent &dirent)
 {
-	std::string_view stem = strtrimrightspace(std::string_view(&dirent.m_filename[0], 8));
-	std::string_view ext = strtrimrightspace(std::string_view(&dirent.m_filename[8], 3));
+	std::string_view stem = trim_end_spaces(std::string_view(&dirent.m_filename[0], 8));
+	std::string_view ext = trim_end_spaces(std::string_view(&dirent.m_filename[8], 3));
 	return util::string_format("%s.%s", stem, ext);
 }
 

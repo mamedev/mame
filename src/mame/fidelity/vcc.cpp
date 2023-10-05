@@ -103,10 +103,12 @@ determination and give you a language option on power up or something.
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/s14001a.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork

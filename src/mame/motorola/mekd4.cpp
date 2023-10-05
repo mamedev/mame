@@ -1001,7 +1001,7 @@ void mekd4_state::mekd4(machine_config &config)
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	// Stop PIA. IRQB is NC.
-	PIA6821(config, m_stop_pia, 0);
+	PIA6821(config, m_stop_pia);
 	m_stop_pia->writepa_handler().set(FUNC(mekd4_state::stop_pia_pa_w));
 	m_stop_pia->writepb_handler().set(FUNC(mekd4_state::stop_pia_pb_w));
 	m_stop_pia->ca2_w(1); // Connected to 'abort' TP2. Can be toggled low to and abort user code.
@@ -1010,7 +1010,7 @@ void mekd4_state::mekd4(machine_config &config)
 	m_stop_pia->irqa_handler().set("mainnmi", FUNC(input_merger_device::in_w<0>));
 
 	// Keypad and display PIA. CA1, CA2, IRQA are NC. CB2 is pulled high.
-	PIA6821(config, m_kpd_pia, 0);
+	PIA6821(config, m_kpd_pia);
 	m_kpd_pia->readpa_handler().set(FUNC(mekd4_state::keypad_key_r));
 	m_kpd_pia->readcb1_handler().set(FUNC(mekd4_state::keypad_cb1_r));
 	m_kpd_pia->writepa_handler().set(FUNC(mekd4_state::led_segment_w));
@@ -1018,7 +1018,7 @@ void mekd4_state::mekd4(machine_config &config)
 	m_kpd_pia->irqb_handler().set("mainnmi", FUNC(input_merger_device::in_w<1>));
 
 	// Keypad and display board User PIA.
-	PIA6821(config, m_user_pia, 0);
+	PIA6821(config, m_user_pia);
 	m_user_pia->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	m_user_pia->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
@@ -1046,7 +1046,7 @@ void mekd4_state::mekd4(machine_config &config)
 	// CA2 light pen input.
 	// PB0 is mode flags and light pen control.
 	// CB1 is VSYNC, and CB2 is HSYNC.
-	PIA6821(config, m_r2_pia, 0);
+	PIA6821(config, m_r2_pia);
 	m_r2_pia->readpa_handler().set(FUNC(mekd4_state::r2_pia_pa_r));
 	m_r2_pia->readpb_handler().set(FUNC(mekd4_state::r2_pia_pb_r));
 	m_r2_pia->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));

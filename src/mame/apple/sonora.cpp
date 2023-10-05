@@ -67,7 +67,7 @@ void sonora_device::map(address_map &map)
 void sonora_device::device_add_mconfig(machine_config &config)
 {
 	MAC_VIDEO_SONORA(config, m_video);
-	m_video->screen_vblank().set(FUNC(sonora_device::vbl_w));
+	m_video->screen_vblank().set(FUNC(sonora_device::slot_irq_w<0x40>));
 
 	R65NC22(config, m_via1, C7M / 10);
 	m_via1->readpa_handler().set(FUNC(sonora_device::via_in_a));
@@ -287,20 +287,28 @@ void sonora_device::scc_irq_w(int state)
 	field_interrupts();
 }
 
-void sonora_device::vbl_w(int state)
+template <u8 mask>
+void sonora_device::slot_irq_w(int state)
 {
-	if (!state)
+	if (state)
 	{
-		return;
+		m_pseudovia_regs[2] &= ~mask;
+	}
+	else
+	{
+		m_pseudovia_regs[2] |= mask;
 	}
 
-	m_pseudovia_regs[2] &= ~0x40; // set vblank signal
-
-	if (m_pseudovia_regs[0x12] & 0x40)
-	{
-		pseudovia_recalc_irqs();
-	}
+	pseudovia_recalc_irqs();
 }
+
+template void sonora_device::slot_irq_w<0x40>(int state);
+template void sonora_device::slot_irq_w<0x20>(int state);
+template void sonora_device::slot_irq_w<0x10>(int state);
+template void sonora_device::slot_irq_w<0x08>(int state);
+template void sonora_device::slot_irq_w<0x04>(int state);
+template void sonora_device::slot_irq_w<0x02>(int state);
+template void sonora_device::slot_irq_w<0x01>(int state);
 
 void sonora_device::asc_irq(int state)
 {

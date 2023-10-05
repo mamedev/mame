@@ -5776,7 +5776,7 @@ TODO:
 		</part>
 	</software>
 
-	<software name="asteka">
+	<software name="asteka" supported="yes">
 		<description>Asteka</description>
 		<year>1985</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
@@ -5789,12 +5789,13 @@ TODO:
 		</part>
 	</software>
 
-	<!-- boot OK -->
-	<!-- Has a DAC1BIT sampling tester on boot, needs +18 [tempo]/low [volume] on RS class to match 3 secs as claimed (confirm via real HW). -->
 	<software name="arquelph" supported="partial">
 		<description>Arquelphos</description>
 		<year>1993</year>
 		<publisher>ディー・オー (D.O.)</publisher>
+		<notes><![CDATA[
+Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS class to match 3 secs as claimed (confirm via real HW).
+]]></notes>
 		<info name="alt_title" value="アルキルフォス" />
 		<info name="release" value="19930715" />
 		<part name="flop1" interface="floppy_5_25">
@@ -10215,11 +10216,13 @@ TODO:
 		</part>
 	</software>
 
-	<!-- boot OK, randomly crashes during gameplay with stuck note -->
 	<software name="fsmoon" supported="no">
 		<description>Chikyuu Bouei Gun II - The Earth Self Defense Force - Far Side Moon</description>
 		<year>1989</year>
 		<publisher>アートディンク (Artdink)</publisher>
+		<notes><![CDATA[
+Randomly crashes during gameplay with stuck note
+]]></notes>
 		<info name="alt_title" value="ファーサイドムーン 地球防衛軍２" />
 		<info name="release" value="198912xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -10629,11 +10632,13 @@ TODO:
 		</part>
 	</software>
 
-	<!-- Seems to work only on 286-based machines (e.g. PC-9801UX) -->
-	<software name="christin">
+	<software name="christin" supported="no">
 		<description>Christine</description>
 		<year>1986</year>
 		<publisher>パソコンショップ高知 (PSK)</publisher>
+		<notes><![CDATA[
+Missing [7220] text selector for choices
+]]></notes>
 		<info name="alt_title" value="クリスチーヌ" />
 		<info name="release" value="198610xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -17664,7 +17669,7 @@ TODO:
 		</part>
 	</software>
 
-	<software name="dungharl">
+	<software name="dungharl" supported="yes">
 		<description>Dungeon Harlem</description>
 		<year>1991</year>
 		<publisher>ハートソフト (Heart Soft)</publisher>
@@ -18470,7 +18475,7 @@ TODO:
 		</part>
 	</software>
 
-	<software name="endanrek">
+	<software name="endanrek" supported="yes">
 		<description>Endan Rekishi Emaki - Nukata no Ookimi</description>
 		<year>1989</year>
 		<publisher>全流通 (Zenryutsu)</publisher>
@@ -18682,7 +18687,7 @@ TODO:
 		</part>
 	</software>
 
-	<software name="eurosens">
+	<software name="eurosens" supported="yes">
 		<description>Europa Sensen</description>
 		<year>1992</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -22664,14 +22669,18 @@ TODO:
 		</part>
 	</software>
 
-	<!-- boot OK with the 1S disk, GFX boxes leaves trails on gameplay -->
-	<!-- TODO: to install to HDD should be "INST1.BAT B: A:<folder>" but it fails recognizing disk 2 -->
 	<software name="grossede" supported="partial">
 		<description>Groß Deutschland</description>
 		<year>1992</year>
 		<publisher>ジェネラル・サポート (General Support)</publisher>
+		<notes><![CDATA[
+Boots without install with the 1S disk
+GFX boxes leaves trails on gameplay
+TODO: to install to HDD should be "INST1.BAT B: A:<folder>" but it fails recognizing disk 2
+]]></notes>
 		<info name="alt_title" value="グロスドイッチュラント" />
 		<info name="release" value="19920522" />
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -23326,7 +23335,7 @@ TODO:
 		</part>
 	</software>
 
-	<software name="harenoos">
+	<software name="harenoos" supported="yes">
 		<description>Hare Nochi Oosawagi!</description>
 		<year>1989</year>
 		<publisher>カクテル・ソフト (Cocktail Soft)</publisher>
@@ -27264,7 +27273,7 @@ TODO:
 		</part>
 	</software>
 
-	<software name="kounais1">
+	<software name="kounais1" supported="yes">
 		<description>Kounai Shasei Vol. 1 - Yo ni mo H na Monogatari</description>
 		<year>1991</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
@@ -29417,7 +29426,7 @@ TODO:
 		</part>
 	</software>
 
-	<software name="mikkokuk">
+	<software name="mikkokuk" supported="yes">
 		<description>Maison Ikkoku Kanketsu Hen - Sayonara Soshite...</description>
 		<year>1988</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
@@ -31770,88 +31779,90 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="monzetsu">
+	<software name="monzetsu" supported="yes">
 		<description>Monzetsu Fighter</description>
 		<year>1995</year>
 		<publisher>トラッシュ (Trush)</publisher>
 		<info name="alt_title" value="悶絶ファイター" />
 		<info name="release" value="19950512" />
+		<!-- disk labels guessed from in-game prompts -->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_1.fdi" size="1265664" crc="f7bdf1f3" sha1="ab1bf26381b8883f6db6a978b94ca0811f7965b1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_2.fdi" size="1265664" crc="72dd2c2f" sha1="18ea80f8bdfd9520c487cb117b361b6986544c8c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_3.fdi" size="1265664" crc="69b5be63" sha1="aff88f5336387f7d5e7ba45ab1f6fee1b5c6bbc0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
+			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_4.fdi" size="1265664" crc="548f5555" sha1="70163480d4ff31e651d095831d0bcf4a75e3efc5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 5"/>
+			<feature name="part_id" value="Disk E"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_5.fdi" size="1265664" crc="923abed9" sha1="5ba30d1715ff12886fd3f2e9701b57ceb6daed3f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 6"/>
+			<feature name="part_id" value="Disk F"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_6.fdi" size="1265664" crc="9f85d17e" sha1="7a479449460e0090a2c414e6f63dca194625cdf0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="monzetsua" cloneof="monzetsu">
-		<description>Monzetsu Fighter (alt Disk 1 &amp; Disk 6)</description>
+	<software name="monzetsua" cloneof="monzetsu" supported="yes">
+		<description>Monzetsu Fighter (alt Disk A &amp; Disk F)</description>
 		<year>1995</year>
 		<publisher>トラッシュ (Trush)</publisher>
 		<info name="alt_title" value="悶絶ファイター" />
 		<info name="release" value="19950512" />
+		<!-- disk labels guessed from in-game prompts -->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="monzetsu_1.fdi" size="1265664" crc="a6b733a0" sha1="67de71a00087b183ebcc1352dc692592ebbad58e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_2.fdi" size="1265664" crc="72dd2c2f" sha1="18ea80f8bdfd9520c487cb117b361b6986544c8c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_3.fdi" size="1265664" crc="69b5be63" sha1="aff88f5336387f7d5e7ba45ab1f6fee1b5c6bbc0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
+			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_4.fdi" size="1265664" crc="548f5555" sha1="70163480d4ff31e651d095831d0bcf4a75e3efc5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 5"/>
+			<feature name="part_id" value="Disk E"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_5.fdi" size="1265664" crc="923abed9" sha1="5ba30d1715ff12886fd3f2e9701b57ceb6daed3f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 6"/>
+			<feature name="part_id" value="Disk F"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="monzetsu_6.fdi" size="1265664" crc="3331ee12" sha1="1127d9091a13f9bdb748a00dd361cb7bcbeee678" offset="0" />
 			</dataarea>
@@ -37172,7 +37183,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="raika">
+	<software name="raika" supported="yes">
 		<description>Raika - Kasenkyuu</description>
 		<year>1994</year>
 		<publisher>リンガーベル (Ringer Bell)</publisher>
@@ -37391,12 +37402,18 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="rance41">
+	<software name="rance41" supported="partial">
 		<description>Rance 4.1 - Okusuri Koujou o Sukue</description>
 		<year>1995</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
+		<notes><![CDATA[
+Draws AliceSoft logo with half height
+Draws "requires 256 colors" error message with cutoff [kanji] LR right side with a RS class machine.
+No [PC9801-86] sound
+]]></notes>
 		<info name="alt_title" value="ランス４．１ ～お薬工場を救え～" />
 		<info name="release" value="19951201" />
+		<info name="usage" value="Requires a PC-9821 with 256 colors. Boot DOS from HDD then run GAME98.BAT from Disk A to install." />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
@@ -42940,11 +42957,13 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<!-- Runs too fast on anything but a PC-9801F, but kanji display doesn't work on that model -->
-	<software name="asteka2" supported="partial">
+	<software name="asteka2" supported="yes">
 		<description>Taiyou no Shinden - Asteka II</description>
 		<year>1986</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<notes><![CDATA[
+Requires a VM class machine, runs too fast on RS and beyond
+]]></notes>
 		<info name="alt_title" value="太陽の神殿 アステカ２" />
 		<info name="release" value="19861120" />
 		<part name="flop1" interface="floppy_5_25">
@@ -43982,10 +44001,14 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="tenshic2">
+	<software name="tenshic2" supported="no">
 		<description>Tenshi-tachi no Gogo Collection 2</description>
 		<year>1995</year>
 		<publisher>ジャスト (Jast)</publisher>
+		<notes><![CDATA[
+Draws main menu [kanji] with LR cutoff right side.
+Eventually hangs with stuck [PC9801-26] sound note
+]]></notes>
 		<info name="alt_title" value="天使たちの午後 コレクション２" />
 		<info name="release" value="19951117" />
 		<part name="flop1" interface="floppy_5_25">
@@ -45049,16 +45072,19 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="troubch1">
+	<software name="troubch1" supported="no">
 		<description>Trouble Chaser Dai-1-wa - Trouble wa Sora kara Mirai kara</description>
 		<year>1994</year>
 		<publisher>日本クリエイト (Nihon Create)</publisher>
+		<notes><![CDATA[
+Throws "Protection check error, please reset" after logos, [FDC] CHRN=(1, 0, -1, 512)
+]]></notes>
 		<info name="alt_title" value="トラぶるＣＨＡＳＥＲ 第１話 トラブルは空から未来から" />
 		<info name="release" value="19941202" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="trchasr_1.fdi" size="1265664" crc="22913064" sha1="928c92fadc451f98733ccfc3288ab5f365eb1b23" offset="0" />
+				<rom name="trchasr_1.fdi" size="1265664" crc="22913064" sha1="928c92fadc451f98733ccfc3288ab5f365eb1b23" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -45069,16 +45095,19 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="troubch2">
+	<software name="troubch2" supported="no">
 		<description>Trouble Chaser Dai-2-wa - Futarime no Chaser</description>
 		<year>1995</year>
 		<publisher>日本クリエイト (Nihon Create)</publisher>
+		<notes><![CDATA[
+Throws "Protection check error, please reset" after logos, [FDC] CHRN=(1, 0, -1, 512)
+]]></notes>
 		<info name="alt_title" value="トラぶるＣＨＡＳＥＲ 第２話 ２人目のチェイサー" />
 		<info name="release" value="19950218" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="trchasr2_1.fdi" size="1265664" crc="d7e76d46" sha1="64576e677191949e8bfa535df48a9ce9e7e9f1c7" offset="0" />
+				<rom name="trchasr2_1.fdi" size="1265664" crc="d7e76d46" sha1="64576e677191949e8bfa535df48a9ce9e7e9f1c7" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -45089,10 +45118,13 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="troubch4">
+	<software name="troubch4" supported="partial">
 		<description>Trouble Chaser Dai-4-wa - Saishuukai</description>
 		<year>1995</year>
 		<publisher>日本クリエイト (Nihon Create)</publisher>
+		<notes><![CDATA[
+Abuses of [7220] pitch on title screen for a TV white noise effect
+]]></notes>
 		<info name="alt_title" value="トラぶるＣＨＡＳＥＲ 第４話 最終回" />
 		<info name="release" value="19951006" />
 		<part name="flop1" interface="floppy_5_25">
@@ -49545,10 +49577,13 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="zan3">
+	<software name="zan3" supported="no">
 		<description>Zan III - Tenun Ware ni Ari</description>
 		<year>1993</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<notes><![CDATA[
+Doesn't recognize [FDC] disk 3 swap after title screen
+]]></notes>
 		<info name="alt_title" value="斬３ 天運我にあり" />
 		<info name="release" value="19931218" />
 		<part name="flop1" interface="floppy_5_25">
@@ -49806,11 +49841,12 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="zest">
+	<software name="zest" supported="yes">
 		<description>Zest to fantasy.</description>
 		<year>1997</year>
 		<publisher>アアル (Aaru)</publisher>
 		<info name="release" value="19970425" />
+		<info name="usage" value="Requires HDD install thru DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
@@ -50017,11 +50053,13 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<!-- Hangs after entering your name -->
 	<software name="adrecon" supported="no">
 		<description>Adrenalin Connection</description>
 		<year>1987</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
+		<notes><![CDATA[
+Hangs after name entry with illegal opcode 0f 0e at PC=FF2C3
+]]></notes>
 		<info name="alt_title" value="アドレナリン・コネクション" />
 		<info name="release" value="19870821" />
 		<part name="flop1" interface="floppy_5_25">
@@ -53832,11 +53870,13 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<!-- unsupported ".fix" format -->
 	<software name="okumanc" supported="no">
 		<description>Okuman Chouja</description>
 		<year>1988</year>
 		<publisher>コスモス・コンピュータ (Cosmos Computer)</publisher>
+		<notes><![CDATA[
+unsupported .fix format
+]]></notes>
 		<info name="alt_title" value="億万長者" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1382414">
@@ -58744,11 +58784,14 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<!-- Doesn't recognize disk changes -->
 	<software name="farland3" supported="no">
 		<description>Farland Story - Tenshi no Namida</description>
 		<year>1994</year>
 		<publisher>テイジイエル (TGL)</publisher>
+		<notes><![CDATA[
+Doesn't recognize [FDC] disk swaps
+Has [GS] and [CD] options, latter requiring a redbook?
+]]></notes>
 		<info name="alt_title" value="ファーランドストーリー 天使の涙" />
 		<info name="release" value="19940715" />
 		<part name="flop1" interface="floppy_5_25">
@@ -63926,8 +63969,12 @@ SPACE EMPIRE
 		<description>Yume no Sei</description>
 		<year>1996</year>
 		<publisher>13cm</publisher>
+		<notes><![CDATA[
+Cutoff [kanji] LR right side
+]]></notes>
 		<info name="alt_title" value="夢の精" />
 		<info name="release" value="19960126" />
+		<info name="usage" value="Run DOS from HDD then swap to disk and INSTALL.BAT B A" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="949244">
@@ -65964,7 +66011,7 @@ SPACE EMPIRE
   The disk images below have been created by users to launch the games in emulators
  -->
 
-	<software name="7narabe">
+	<software name="7narabe" supported="yes">
 		<description>7 Narabe</description>
 		<year>19??</year>
 		<publisher>&lt;unofficial&gt;</publisher>
@@ -66572,10 +66619,14 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="verfalz4">
+	<software name="verfalz4" supported="no">
+		<!-- 1995 presumed from DOS dir (has 2013 autoexec.bat -->
 		<description>Verfalz IV</description>
-		<year>19??</year>
+		<year>1995?</year>
 		<publisher>&lt;unofficial&gt;</publisher>
+		<notes><![CDATA[
+Crashes with a BASIC error when accessing house near starting point, incomplete game? (verify)
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="verfalz_iv.fdi" size="1265664" crc="8856ff03" sha1="cc83d5e86b26b06ce013fc81b27efaf7618e891a" offset="0" />
@@ -66650,11 +66701,14 @@ doujin?!?
 		</part>
 	</software>
 
-	<!-- Black screen -->
 	<software name="5galscon" supported="no">
 		<description>Five Gals Connection</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>   <!-- is this really a doujin soft? -->
+		<notes><![CDATA[ 
+Black screen [FDC] 2DD disk
+Has XA and LT support according to spine card
+]]></notes>
 		<info name="author" value="Fancy Soft" />
 		<info name="alt_title" value="ファイブギャルズコネクション" />
 		<part name="flop1" interface="floppy_5_25">
@@ -68428,7 +68482,7 @@ doujin?!?
 		</part>
 	</software>
 
-	<software name="sailorez">
+	<software name="sailorez" supported="yes">
 		<description>Pretty Soldier Sailor Moon EZ</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -68789,9 +68843,10 @@ doujin?!?
 		</part>
 	</software>
 
-	<software name="studiopl">
+	<software name="studiopl" supported="yes">
+		<!-- year assumed by DOS dir contents -->
 		<description>Studio Pal CG Shuu</description>
-		<year>19??</year>
+		<year>1994?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="alt_title" value="スタジオPAL CG集" />
 		<part name="flop1" interface="floppy_5_25">
@@ -69550,7 +69605,7 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		</part>
 	</software>
 
-<!-- was this extracted from Disc Station Vol. 4? -->
+	<!-- was this extracted from Disc Station Vol. 4? -->
 	<software name="jumphero">
 		<description>Jump Hero</description>
 		<year>19??</year>
@@ -69562,7 +69617,7 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		</part>
 	</software>
 
-	<software name="maborosh">
+	<software name="maborosh" supported="yes">
 		<description>Maboroshi Kaitou Den</description>
 		<year>19??</year>
 		<publisher>コンパイル (Compile)</publisher>

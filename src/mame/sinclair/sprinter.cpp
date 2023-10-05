@@ -1513,9 +1513,15 @@ TIMER_CALLBACK_MEMBER(sprinter_state::irq_off)
 
 TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
 {
-	const u16 left = m_cbl_data[m_cbl_cnt++];
+	u16 left = m_cbl_data[m_cbl_cnt++];
+	u16 right = cbl_stereo() ? m_cbl_data[m_cbl_cnt++] : left;
+	if (cbl_mode16())
+	{
+		using std::swap;
+		swap(left, right);
+	}
 	m_ldac->write(left);
-	m_rdac->write(cbl_stereo() ? m_cbl_data[m_cbl_cnt++] : left);
+	m_rdac->write(right);
 
 	if (cbl_int_ena() && !(m_cbl_cnt & 0x7f))
 	{

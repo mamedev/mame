@@ -21,7 +21,8 @@ magnetic chess board sensors. See sc12.cpp for a more technical description.
 The first RAM chip is low-power, and battery-backed with a capacitor. This is
 also mentioned in the manual. Maybe it does not apply to older PCBs.
 
-Like with EAS, the new game command is: RE -> D8 -> CL.
+Like with EAS, the new game command for AS12 is: RE -> D6 (or D8) -> CL.
+The newer model 6085 does not have this issue.
 
 TODO:
 - is the initial AS12 3MHz version the same ROM as felega1? When it's configured

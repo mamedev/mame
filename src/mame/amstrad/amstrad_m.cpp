@@ -2935,6 +2935,7 @@ void amstrad_state::amstrad_common_init()
 		m_maincpu->set_input_line_vector(0, 0xff); // Z80
 	else
 		m_maincpu->set_input_line_vector(0, 0x00); // Z80
+	m_maincpu->z80_set_iorq_cycles(5);
 }
 
 TIMER_CALLBACK_MEMBER(amstrad_state::cb_set_resolution)

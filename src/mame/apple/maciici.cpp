@@ -600,9 +600,12 @@ void maciici_state::maciici(machine_config &config)
 
 	nubus_device &nubus(NUBUS(config, "nubus", 0));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
-	nubus.out_irqc_callback().set(m_rbv, FUNC(rbv_device::slot0_irq_w));
-	nubus.out_irqd_callback().set(m_rbv, FUNC(rbv_device::slot1_irq_w));
-	nubus.out_irqe_callback().set(m_rbv, FUNC(rbv_device::slot2_irq_w));
+	nubus.out_irq9_callback().set(m_rbv, FUNC(rbv_device::slot_irq_w<0x01>));
+	nubus.out_irqa_callback().set(m_rbv, FUNC(rbv_device::slot_irq_w<0x02>));
+	nubus.out_irqb_callback().set(m_rbv, FUNC(rbv_device::slot_irq_w<0x04>));
+	nubus.out_irqc_callback().set(m_rbv, FUNC(rbv_device::slot_irq_w<0x08>));
+	nubus.out_irqd_callback().set(m_rbv, FUNC(rbv_device::slot_irq_w<0x10>));
+	nubus.out_irqe_callback().set(m_rbv, FUNC(rbv_device::slot_irq_w<0x20>));
 
 	NUBUS_SLOT(config, "nbc", "nubus", mac_nubus_cards, nullptr);
 	NUBUS_SLOT(config, "nbd", "nubus", mac_nubus_cards, nullptr);
@@ -638,6 +641,22 @@ void maciici_state::maciisi(machine_config &config)
 	m_egret->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
 	m_macadb->adb_data_callback().set(m_egret, FUNC(egret_device::set_adb_line));
 	config.set_perfect_quantum(m_maincpu);
+
+	config.device_remove("nbc");
+	config.device_remove("nbd");
+	config.device_remove("nbe");
+	config.device_remove("nubus");
+
+	// TODO: IIsi takes an adapter card that can accept either one SE/30 PDS card or one NuBus card
+	nubus_device &nubus(NUBUS(config, "pds", 0));
+	nubus.set_space(m_maincpu, AS_PROGRAM);
+	nubus.out_irq9_callback().set(m_rbv, FUNC(rbv_device::slot_irq_w<0x01>));
+	nubus.out_irqa_callback().set(m_rbv, FUNC(rbv_device::slot_irq_w<0x02>));
+	nubus.out_irqb_callback().set(m_rbv, FUNC(rbv_device::slot_irq_w<0x04>));
+	nubus.out_irqc_callback().set(m_rbv, FUNC(rbv_device::slot_irq_w<0x08>));
+	nubus.out_irqd_callback().set(m_rbv, FUNC(rbv_device::slot_irq_w<0x10>));
+	nubus.out_irqe_callback().set(m_rbv, FUNC(rbv_device::slot_irq_w<0x20>));
+	NUBUS_SLOT(config, "siexp", "pds", mac_iisi_cards, nullptr);
 }
 
 ROM_START( maciici )

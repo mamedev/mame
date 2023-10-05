@@ -1069,7 +1069,8 @@ ioport_constructor heath_super19_tlb_device::device_input_ports() const
  * Developed by TMSI
  */
 heath_superset_tlb_device::heath_superset_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	heath_tlb_device(mconfig, HEATH_SUPERSET, tag, owner, clock)
+	heath_tlb_device(mconfig, HEATH_SUPERSET, tag, owner, clock),
+	m_selected_char_set(0)
 {
 }
 
@@ -1336,7 +1337,7 @@ MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 		{
 			for (int x = 0; x < x_count; x++)
 			{
-				uint8_t const gfx = m_p_videoram[((ma << 1) + ( ra * x_count ) + x) & 0x3fff] ^ screen_inv;
+				uint8_t const gfx = m_p_videoram[((ma << 1) + (ra * x_count) + x) & 0x3fff] ^ screen_inv;
 
 				for (int b = 0; 8 > b; ++b)
 				{
@@ -1346,7 +1347,7 @@ MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 		}
 		else
 		{
-			uint16_t base = m_char_gen_a11 ? 0x800 : 0x0;
+			uint16_t const base = m_char_gen_a11 ? 0x800 : 0x0;
 
 			for (int x = 0; x < x_count; x++)
 			{

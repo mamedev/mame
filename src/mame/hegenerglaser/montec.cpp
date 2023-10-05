@@ -4,7 +4,7 @@
 
 Mephisto Monte Carlo
 Mephisto Monte Carlo IV
-Mephisto Monte Carlo IV - Limited Edition
+Mephisto Monte Carlo IV: Limited Edition
 
 The chess engine is by Frans Morsch, but for the IV version it's by Ed Schroeder.
 Limited Edition has a twice faster CPU.
@@ -21,11 +21,12 @@ Hardware notes:
 
 #include "emu.h"
 
+#include "mmboard.h"
+
 #include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
-#include "mmboard.h"
 #include "sound/dac.h"
 #include "video/pcf2100.h"
 #include "video/pwm.h"
@@ -270,4 +271,4 @@ SYST( 1987, montec,     0,        0,      montec,    montec,    montec_state, em
 SYST( 1987, monteca,    montec,   0,      montec,    montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo (ver. MC2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 SYST( 1989, montec4,    0,        0,      montec4,   montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, montec4le,  montec4,  0,      montec4le, montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV - Limited Edition", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, montec4le,  montec4,  0,      montec4le, montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV: Limited Edition", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

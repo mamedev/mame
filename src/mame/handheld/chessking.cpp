@@ -8,7 +8,6 @@ Hold down START at boot to enter test mode.
 
 TODO:
 - lots of unknown writes
-- sound emulation is guessed
 - dump/add more cartridges? considering how unknown the handheld is, maybe only a handful were released
 - LCD chip(s) is not emulated, maybe the I/O chip does a DMA from RAM to the LCD?
 - chess game is buggy, assume that's just the way it is, aka BTANB
@@ -367,4 +366,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT        COMPANY             FULLNAME                   FLAGS
-SYST( 1994, chesskng, 0,      0,      chesskng, chesskng, chessking_state, empty_init, "I-Star Co., Ltd.", "Chess King (model ET-6)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // sound not 100% verified against device output
+SYST( 1994, chesskng, 0,      0,      chesskng, chesskng, chessking_state, empty_init, "I-Star Co., Ltd.", "Chess King (model ET-6)", MACHINE_SUPPORTS_SAVE )

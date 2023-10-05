@@ -155,6 +155,8 @@ ht1080z    works
 #include "emu.h"
 #include "trs80.h"
 
+#include "trs80_quik.h"
+
 #include "machine/input_merger.h"
 #include "sound/ay8910.h"
 
@@ -478,9 +480,7 @@ void trs80_state::level2(machine_config &config)      // model I, level II
 	/* devices */
 	m_cassette->set_formats(trs80l2_cassette_formats);
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)));
-	quickload.set_load_callback(FUNC(trs80_state::quickload_cb));
-	quickload.set_interface("trs80_quik");
+	TRS80_QUICKLOAD(config, "quickload", m_maincpu, attotime::from_seconds(1));
 
 	FD1771(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(trs80_state::intrq_w));

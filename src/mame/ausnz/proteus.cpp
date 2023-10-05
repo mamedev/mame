@@ -361,7 +361,7 @@ void proteus_state::proteus(machine_config &config)
 	m_ptm->irq_callback().set("irqs", FUNC(input_merger_device::in_w<1>));
 
 	/* parallel port */
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	//m_pia->readpb_handler().set(FUNC(proteus_state::pia_pb_r));
 	//m_pia->writepa_handler().set(FUNC(proteus_state::pia_pa_w));
 	//m_pia->writepb_handler().set(FUNC(proteus_state::pia_pb_w));

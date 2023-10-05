@@ -7,12 +7,8 @@ license:CC0-1.0
 <!-- define elements -->
 
 	<element name="led" defstate="0">
-		<disk state="0">
-			<color red="0.20" green="0.0" blue="0.0" />
-		</disk>
-		<disk state="1">
-			<color red="1" green="0.1" blue="0.1" />
-		</disk>
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
 	</element>
 
 	<element name="text_1"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect> <text string="1"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
@@ -336,7 +332,7 @@ license:CC0-1.0
 
 <!-- LCD panel -->
 
-	<element name="text_lcd"><text string="GRAPHIC DISPLAY MODUL"><color red="0.64" green="0.59" blue="0.30" /></text></element>
+	<element name="text_lcd"><text string="16/32 BIT DISPLAY MODUL"><color red="0.64" green="0.59" blue="0.30" /></text></element> <!-- actually doesn't have this label, but let's keep it to match the others -->
 	<element name="lcdw"><rect><color red="1" green="1" blue="1" /></rect></element>
 	<element name="lcdm"><rect><color red="0.36" green="0.42" blue="0.42" /></rect></element>
 	<element name="lcda"><rect><color red="0.20" green="0.16" blue="0.17" /></rect></element>
@@ -411,8 +407,8 @@ license:CC0-1.0
 		<element ref="cblack"><bounds x="13" y="-2" width="89" height="89" /></element>
 		<element ref="cwhite"><bounds x="17" y="2" width="81" height="81" /></element>
 
-		<element ref="text_lcd"><bounds x="47.5" y="89" width="24.5" height="2" /></element>
-		<group ref="panel"><bounds x="47.5" y="91.8" width="24.5" height="6.5" /></group>
+		<element ref="text_lcd"><bounds x="43.0" y="89.3" width="24.5" height="1.5" /></element>
+		<group ref="panel"><bounds x="43.0" y="91.8" width="24.5" height="6.5" /></group>
 		<group ref="buttons"><bounds x="77.5" y="88.5" width="13" height="13" /></group>
 
 		<group ref="sb_board"><bounds x="17.5" y="2.5" width="80" height="80" /></group>

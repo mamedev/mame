@@ -14,6 +14,7 @@
 #include "dfi_dsk.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include "osdcore.h" // osd_printf_*
 
@@ -89,10 +90,10 @@ bool dfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	while(pos < size) {
 		uint8_t h[10];
 		io.read_at(pos, h, 10, actual);
-		uint16_t track = (h[0] << 8) | h[1];
-		uint16_t head  = (h[2] << 8) | h[3];
+		uint16_t track = get_u16be(&h[0]);
+		uint16_t head  = get_u16be(&h[2]);
 		// Ignore sector
-		uint32_t tsize = (h[6] << 24) | (h[7] << 16) | (h[8] << 8) | h[9];
+		uint32_t tsize = get_u32be(&h[6]);
 
 		// if the position-so-far-in-file plus 10 (for the header) plus track size
 		// is larger than the size of the file, free buffers and bail out

@@ -729,7 +729,7 @@ void maygay1b_state::maygay_m1(machine_config &config)
 	m_duart68681->irq_cb().set(FUNC(maygay1b_state::duart_irq_handler));
 	m_duart68681->inport_cb().set(FUNC(maygay1b_state::m1_duart_r));
 
-	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia6821_device &pia(PIA6821(config, "pia"));
 	pia.writepa_handler().set(FUNC(maygay1b_state::m1_pia_porta_w));
 	pia.writepb_handler().set(FUNC(maygay1b_state::m1_pia_portb_w));
 

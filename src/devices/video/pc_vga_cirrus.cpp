@@ -118,6 +118,7 @@ void cirrus_gd5428_device::ramdac_hidden_mask_w(offs_t offset, u8 data)
 		// TODO: '5428 reads do not lock the Hidden DAC
 		m_hidden_dac_mode = data;
 		m_hidden_dac_phase = 0;
+		cirrus_define_video_mode();
 		LOGMASKED(LOG_HDAC, "CL: Hidden DAC write %02x\n", data);
 		return;
 	}
@@ -536,6 +537,7 @@ void cirrus_gd5428_device::sequencer_map(address_map &map)
 			gc_locked = (data & 0x17) != 0x12;
 			LOG("Cirrus register extensions %s\n", gc_locked ? "unlocked" : "locked");
 			m_lock_reg = data & 0x17;
+			cirrus_define_video_mode();
 		})
 	);
 	map(0x07, 0x07).lw8(
@@ -788,12 +790,6 @@ void cirrus_gd5428_device::cirrus_define_video_mode()
 	const XTAL xtal = XTAL(14'318'181);
 	uint8_t clocksel = (vga.miscellaneous_output & 0xc) >> 2;
 
-	svga.rgb8_en = 0;
-	svga.rgb15_en = 0;
-	svga.rgb16_en = 0;
-	svga.rgb24_en = 0;
-	svga.rgb32_en = 0;
-
 	if(gc_locked || m_vclk_num[clocksel] == 0 || m_vclk_denom[clocksel] == 0)
 		clock = ((vga.miscellaneous_output & 0xc) ? xtal*2: xtal*1.75).dvalue();
 	else
@@ -804,9 +800,10 @@ void cirrus_gd5428_device::cirrus_define_video_mode()
 		clock = (xtal * numerator / denominator / mul).dvalue();
 	}
 
+	svga.rgb8_en = svga.rgb15_en = svga.rgb16_en = svga.rgb24_en = svga.rgb32_en = 0;
+
 	if (!gc_locked)
 	{
-		svga.rgb8_en = svga.rgb15_en = svga.rgb16_en = svga.rgb24_en = 0;
 		// gambl186 relies on this, don't setup any hidden DAC but only this
 		if (vga.sequencer.data[0x07] & 0x01)
 			svga.rgb8_en = 1;
@@ -867,13 +864,7 @@ uint16_t cirrus_gd5428_device::offset()
 	uint16_t off = vga_device::offset();
 
 	// TODO: check true enable condition
-	if (svga.rgb8_en == 1)
-		off <<= 2;
-	if (svga.rgb16_en == 1)
-		off <<= 2;
-	if (svga.rgb24_en == 1)
-		off <<= 2;
-	if (svga.rgb32_en == 1)
+	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en || svga.rgb32_en)
 		off <<= 2;
 //  popmessage("Offset: %04x  %s %s ** -- actual: %04x",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD",off);
 	return off;

@@ -5480,8 +5480,8 @@ ROM_END
   Konami Teenage Mutant Ninja Turtles II: Splinter Speaks (model 13012)
   * PCB label: BH012
   * Sharp SM511 under epoxy (die label KMS73B, 785)
-  * OKI MSM6373 ADPCM under epoxy
-  * lcd screen with custom segments, 1-bit sound (on top of ADPCM)
+  * OKI MSM6373 ADPCM under epoxy + 1-bit sound
+  * lcd screen with custom segments
 
 *******************************************************************************/
 
@@ -5522,7 +5522,7 @@ void ktmnt2_state::sound_w(u8 data)
 			if (sample == 0)
 				m_samples->stop(0);
 		}
-		else
+		else if (sample != 0)
 		{
 			sample--;
 			if (sample < m_samples->samples() && strncmp(m_samples->names()[sample + 1], "none", 4))
@@ -5692,8 +5692,8 @@ ROM_END
   Konami Star Trek: 25th Anniversary (model 13015)
   * PCB label: BH015
   * Sharp SM511 under epoxy (die label KMS73B, 787)
-  * OKI MSM6373 ADPCM under epoxy
-  * lcd screen with custom segments, 1-bit sound (on top of ADPCM)
+  * OKI MSM6373 ADPCM under epoxy + 1-bit sound
+  * lcd screen with custom segments
 
 *******************************************************************************/
 
@@ -5788,8 +5788,8 @@ ROM_END
   Konami Top Gun: Second Mission
   * PCB label: BH017
   * Sharp SM511 under epoxy (die label KMS73B, 792)
-  * OKI MSM6373 ADPCM under epoxy
-  * lcd screen with custom segments, 1-bit sound (on top of ADPCM)
+  * OKI MSM6373 ADPCM under epoxy + 1-bit sound
+  * lcd screen with custom segments
 
 *******************************************************************************/
 

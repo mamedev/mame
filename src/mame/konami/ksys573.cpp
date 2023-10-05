@@ -415,7 +415,6 @@ Notes: (all ICs shown)
 #include "sound/cdda.h"
 #include "video/psx.h"
 
-#include "romload.h"
 #include "screen.h"
 #include "speaker.h"
 

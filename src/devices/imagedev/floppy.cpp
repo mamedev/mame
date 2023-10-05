@@ -311,6 +311,17 @@ void floppy_image_device::setup_led_cb(led_cb cb)
 	cur_led_cb = cb;
 }
 
+struct floppy_image_device::fs_enum : public fs::manager_t::floppy_enumerator {
+	floppy_image_device *m_fid;
+	const fs::manager_t *m_manager;
+
+	fs_enum(floppy_image_device *fid);
+
+	virtual void add_raw(const char *name, u32 key, const char *description) override;
+protected:
+	virtual void add_format(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description) override;
+};
+
 floppy_image_device::fs_enum::fs_enum(floppy_image_device *fid)
 	: fs::manager_t::floppy_enumerator(fid->form_factor, fid->variants)
 	, m_fid(fid)
@@ -908,14 +919,14 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::index_resync)
 	// if hard-sectored floppy, has extra IDX pulses
 	if(image)
 		image->find_index_hole(position, last_index, next_index);
-	int new_idx = position - last_index < 2000000;
+	bool new_idx = position - last_index < 2000000;
 
 	if(new_idx) {
 		uint32_t index_up = last_index + 2000000;
 		attotime index_up_time = attotime::from_double(index_up/angular_speed);
 		index_timer->adjust(index_up_time - delta);
 	} else {
-		attotime next_index_time = attotime::from_double(next_index/angular_speed);
+		attotime next_index_time = next_index >= 200000000 ? rev_time : attotime::from_double(next_index/angular_speed);
 		index_timer->adjust(next_index_time - delta);
 	}
 
@@ -1415,6 +1426,11 @@ uint32_t floppy_image_device::get_form_factor() const
 uint32_t floppy_image_device::get_variant() const
 {
 	return image ? image->get_variant() : 0;
+}
+
+std::vector<uint32_t> &floppy_image_device::get_buffer()
+{
+	return image->get_buffer(cyl, ss, subcyl);
 }
 
 //===================================================================

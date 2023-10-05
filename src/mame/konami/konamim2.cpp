@@ -228,7 +228,6 @@ Notes:
 
 #include "debug/debugcon.h"
 #include "debugger.h"
-#include "romload.h"
 #include "screen.h"
 #include "speaker.h"
 

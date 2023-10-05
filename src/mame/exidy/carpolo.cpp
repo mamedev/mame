@@ -228,14 +228,14 @@ void carpolo_state::carpolo(machine_config &config)
 	M6502(config, m_maincpu, XTAL(11'289'000)/12); // 940.75 kHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &carpolo_state::main_map);
 
-	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia6821_device &pia0(PIA6821(config, "pia0"));
 	pia0.readpb_handler().set(FUNC(carpolo_state::pia_0_port_b_r));
 	pia0.writepa_handler().set(FUNC(carpolo_state::pia_0_port_a_w));
 	pia0.writepb_handler().set(FUNC(carpolo_state::pia_0_port_b_w));
 	pia0.ca2_handler().set(FUNC(carpolo_state::coin1_interrupt_clear_w));
 	pia0.cb2_handler().set(FUNC(carpolo_state::coin2_interrupt_clear_w));
 
-	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia6821_device &pia1(PIA6821(config, "pia1"));
 	pia1.readpa_handler().set(FUNC(carpolo_state::pia_1_port_a_r));
 	pia1.readpb_handler().set(FUNC(carpolo_state::pia_1_port_b_r));
 	pia1.ca2_handler().set(FUNC(carpolo_state::coin3_interrupt_clear_w));

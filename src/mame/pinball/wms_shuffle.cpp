@@ -467,7 +467,7 @@ void shuffle_state::s4(machine_config &config)
 	genpin_audio(config);
 
 	// Devices
-	PIA6821(config, m_pia22, 0);
+	PIA6821(config, m_pia22);
 	m_pia22->writepa_handler().set(FUNC(shuffle_state::sol0_w));
 	m_pia22->writepb_handler().set(FUNC(shuffle_state::sol1_w));
 	m_pia22->ca2_handler().set(FUNC(shuffle_state::pia22_ca2_w));
@@ -475,7 +475,7 @@ void shuffle_state::s4(machine_config &config)
 	m_pia22->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<1>));
 	m_pia22->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<2>));
 
-	PIA6821(config, m_pia24, 0);
+	PIA6821(config, m_pia24);
 	m_pia24->writepa_handler().set(FUNC(shuffle_state::lamp0_w));
 	m_pia24->writepb_handler().set(FUNC(shuffle_state::lamp1_w));
 	m_pia24->ca2_handler().set(FUNC(shuffle_state::pia24_ca2_w));
@@ -483,7 +483,7 @@ void shuffle_state::s4(machine_config &config)
 	m_pia24->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<3>));
 	m_pia24->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<4>));
 
-	PIA6821(config, m_pia28, 0);
+	PIA6821(config, m_pia28);
 	m_pia28->readpa_handler().set(FUNC(shuffle_state::dips_r));
 	m_pia28->readca1_handler().set_ioport("DIAGS").bit(2); // advance button
 	m_pia28->readcb1_handler().set_ioport("DIAGS").bit(3); // auto/manual switch
@@ -494,7 +494,7 @@ void shuffle_state::s4(machine_config &config)
 	m_pia28->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<5>));
 	m_pia28->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<6>));
 
-	PIA6821(config, m_pia30, 0);
+	PIA6821(config, m_pia30);
 	m_pia30->readpa_handler().set(FUNC(shuffle_state::switch_r));
 	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(shuffle_state::switch_w));
@@ -529,7 +529,7 @@ void shuffle_state::s9(machine_config &config)
 
 	config.set_default_layout(layout_shuffle9);
 
-	PIA6821(config, m_pia21, 0);
+	PIA6821(config, m_pia21);
 	m_pia21->writepa_handler().set("s9sound", FUNC(williams_s9_sound_device::write));
 	m_pia21->writepb_handler().set(FUNC(shuffle_state::sol2_w));
 	m_pia21->ca2_handler().set("s9sound", FUNC(williams_s9_sound_device::strobe));
@@ -551,13 +551,13 @@ void shuffle_state::s11(machine_config &config)
 
 	config.set_default_layout(layout_shuffle11);
 
-	PIA6821(config, m_pia2c, 0);
+	PIA6821(config, m_pia2c);
 	m_pia2c->writepa_handler().set(FUNC(shuffle_state::pia2c_pa_w));
 	m_pia2c->writepb_handler().set(FUNC(shuffle_state::pia2c_pb_w));
 	m_pia2c->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<11>));
 	m_pia2c->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<12>));
 
-	PIA6821(config, m_pia34, 0);
+	PIA6821(config, m_pia34);
 	m_pia34->writepa_handler().set(FUNC(shuffle_state::pia34_pa_w));
 	m_pia34->writepb_handler().set(FUNC(shuffle_state::pia34_pb_w));
 	//m_pia34->cb2_handler().set(FUNC(shuffle_state::pia34_cb2_w));

@@ -456,7 +456,7 @@ void speedatk_state::output_w(uint8_t data)
 
 void speedatk_state::speedatk(machine_config &config)
 {
-	Z80(config, m_maincpu, MASTER_CLOCK/2); //divider is unknown
+	Z80(config, m_maincpu, MASTER_CLOCK/4); //divider is unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &speedatk_state::speedatk_mem);
 	m_maincpu->set_addrmap(AS_IO, &speedatk_state::speedatk_io);
 	m_maincpu->set_vblank_int("screen", FUNC(speedatk_state::irq0_line_hold));
@@ -482,7 +482,7 @@ void speedatk_state::speedatk(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK/4)); //divider is unknown
+	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK/8)); //divider is unknown
 	aysnd.port_b_read_callback().set_ioport("DSW");
 	aysnd.port_a_write_callback().set(FUNC(speedatk_state::output_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.5);

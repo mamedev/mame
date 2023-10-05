@@ -661,7 +661,7 @@ void miniboy7_state::miniboy7(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	pia6821_device &pia(PIA6821(config, "pia0", 0));
+	pia6821_device &pia(PIA6821(config, "pia0"));
 	pia.readpa_handler().set_ioport("INPUT1");
 	pia.readpb_handler().set(FUNC(miniboy7_state::pia_pb_r));
 	pia.ca2_handler().set(FUNC(miniboy7_state::pia_ca2_w));

@@ -23,6 +23,8 @@
 #include "x1_tap.h"
 #include "imageutl.h"
 
+#include "multibyte.h"
+
 #include <cstring>
 
 
@@ -81,7 +83,7 @@ static int x1_cas_to_wav_size (const uint8_t *casdata, int caslen)
 		ret = casdata[0x20] | (casdata[0x21] << 8) | (casdata[0x22] << 16) | (casdata[0x23] << 24);
 		cas_size = ret;
 
-		samplerate = casdata[0x1c] | (casdata[0x1d] << 8) | (casdata[0x1e] << 16) | (casdata[0x1f] << 24);
+		samplerate = get_u32le(&casdata[0x1c]);
 		new_format = 1;
 	}
 	else  // old TAP format
@@ -89,7 +91,7 @@ static int x1_cas_to_wav_size (const uint8_t *casdata, int caslen)
 		ret = (caslen - 4) * 8; // each byte = 8 samples
 		cas_size = ret;
 
-		samplerate = casdata[0x00] | (casdata[0x01] << 8) | (casdata[0x02] << 16) | (casdata[0x03] << 24);
+		samplerate = get_u32le(&casdata[0x00]);
 		new_format = 0;
 	}
 

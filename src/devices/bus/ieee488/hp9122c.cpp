@@ -13,6 +13,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/i8291a.h"
 #include "machine/wd_fdc.h"
+#include "formats/flopimg.h"
 #include "hp9122c.lh"
 
 DEFINE_DEVICE_TYPE(HP9122C, hp9122c_device, "hp9122c", "HP9122C Dual High density disk drive")

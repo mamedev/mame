@@ -21,6 +21,7 @@
 #include "formats/dvk_mx_dsk.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 
 const floppy_image_format_t::desc_e dvk_mx_format::dvk_mx_new_desc[] = {
@@ -125,7 +126,7 @@ int dvk_mx_format::identify(util::random_read &io, uint32_t form_factor, const s
 		size_t actual;
 		io.read_at(512, sectdata, 512, actual);
 		// check value in RT-11 home block.  see src/tools/imgtool/modules/rt11.cpp
-		if (pick_integer_le(sectdata, 0724, 2) == 6)
+		if (get_u16le(&sectdata[0724]) == 6)
 			return FIFID_SIGN|FIFID_SIZE;
 		else
 			return FIFID_SIZE;

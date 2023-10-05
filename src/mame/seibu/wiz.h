@@ -36,6 +36,7 @@ public:
 
 	void wiz(machine_config &config);
 	void kungfut(machine_config &config);
+	void kungfuta(machine_config &config);
 	void scion(machine_config &config);
 	void stinger(machine_config &config);
 
@@ -71,6 +72,7 @@ private:
 	int m_dsc1 = 0;
 
 	uint8_t wiz_protection_r();
+	uint8_t kungfuta_protection_r();
 	void wiz_coin_counter_w(offs_t offset, uint8_t data);
 	void wiz_main_nmi_mask_w(uint8_t data);
 	void wiz_sound_nmi_mask_w(uint8_t data);
@@ -96,6 +98,7 @@ private:
 
 	void decrypted_opcodes_map(address_map &map);
 	void kungfut_main_map(address_map &map);
+	void kungfuta_main_map(address_map &map);
 	void kungfut_sound_map(address_map &map);
 	void stinger_main_map(address_map &map);
 	void stinger_sound_map(address_map &map);

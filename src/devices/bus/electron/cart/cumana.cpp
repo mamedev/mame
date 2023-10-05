@@ -7,8 +7,7 @@
     http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/Cumana_FDsystem.html
 
     TODO:
-    - add floppy format CDFS, and find original utilities disc
-    - confirm whether DRQ and INTRQ are connected
+    - find original utilities disc
     - add spare ROM slot
 
 **********************************************************************/
@@ -32,6 +31,7 @@ DEFINE_DEVICE_TYPE(ELECTRON_CUMANA, electron_cumana_device, "electron_cumana", "
 void electron_cumana_device::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
+	fr.add(FLOPPY_CUMANA_DFS_FORMAT);
 	fr.add(FLOPPY_ACORN_SSD_FORMAT);
 	fr.add(FLOPPY_ACORN_DSD_FORMAT);
 	fr.add(FLOPPY_ACORN_ADFS_OLD_FORMAT);
@@ -49,12 +49,10 @@ void cumana_floppies(device_slot_interface &device)
 
 void electron_cumana_device::device_add_mconfig(machine_config &config)
 {
-	/* fdc */
-	FD1793(config, m_fdc, DERIVED_CLOCK(1, 16)); // TODO: Not known whether DRQ and INTRQ are connected
-	FLOPPY_CONNECTOR(config, m_floppy0, cumana_floppies, "525qd", electron_cumana_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, cumana_floppies, nullptr, electron_cumana_device::floppy_formats).enable_sound(true);
+	FD1793(config, m_fdc, DERIVED_CLOCK(1, 16));
+	FLOPPY_CONNECTOR(config, m_floppy[0], cumana_floppies, "525qd", electron_cumana_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], cumana_floppies, nullptr, electron_cumana_device::floppy_formats).enable_sound(true);
 
-	/* rtc */
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(DEVICE_SELF_OWNER, FUNC(electron_cartslot_device::irq_w));
 }
@@ -71,8 +69,7 @@ electron_cumana_device::electron_cumana_device(const machine_config &mconfig, co
 	: device_t(mconfig, ELECTRON_CUMANA, tag, owner, clock)
 	, device_electron_cart_interface(mconfig, *this)
 	, m_fdc(*this, "fdc")
-	, m_floppy0(*this, "fdc:0")
-	, m_floppy1(*this, "fdc:1")
+	, m_floppy(*this, "fdc:%u", 0)
 	, m_rtc(*this, "rtc")
 {
 }
@@ -84,6 +81,7 @@ electron_cumana_device::electron_cumana_device(const machine_config &mconfig, co
 void electron_cumana_device::device_start()
 {
 }
+
 
 //-------------------------------------------------
 //  read - cartridge data read
@@ -145,7 +143,7 @@ void electron_cumana_device::write(offs_t offset, uint8_t data, int infc, int in
 			m_fdc->write(offset & 0x03, data);
 			break;
 		case 0x94:
-			wd1793_control_w(data);
+			control_w(data);
 			break;
 		case 0x98:
 		case 0x9c:
@@ -167,13 +165,13 @@ void electron_cumana_device::write(offs_t offset, uint8_t data, int infc, int in
 //  IMPLEMENTATION
 //**************************************************************************
 
-void electron_cumana_device::wd1793_control_w(uint8_t data)
+void electron_cumana_device::control_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
 	// bit 1, 2: drive select
-	if (BIT(data, 1)) floppy = m_floppy0->get_device();
-	if (BIT(data, 2)) floppy = m_floppy1->get_device();
+	if (BIT(data, 1)) floppy = m_floppy[0]->get_device();
+	if (BIT(data, 2)) floppy = m_floppy[1]->get_device();
 	m_fdc->set_floppy(floppy);
 
 	// bit 0: side select
@@ -187,5 +185,6 @@ void electron_cumana_device::wd1793_control_w(uint8_t data)
 	if (floppy)
 		floppy->mon_w(!BIT(data, 4));
 
-	// bit 5: head load
+	// bit 5: head load timing
+	m_fdc->hlt_w(BIT(data, 5));
 }

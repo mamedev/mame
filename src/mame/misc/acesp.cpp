@@ -168,7 +168,7 @@ void ace_sp_state::ace_sp(machine_config &config)
 	HD6303Y(config, m_maincpu, 2000000); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &ace_sp_state::ace_sp_map);
 
-	PIA6821(config, "pia0", 0);
+	PIA6821(config, "pia0");
 
 	// unknown frequency
 	TIMER(config, "fixedfreq").configure_periodic(FUNC(ace_sp_state::gen_fixfreq), attotime::from_hz(50));

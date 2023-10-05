@@ -816,10 +816,10 @@ void md6802_state::md6802(machine_config &config)
 	/* Devices */
 	TTL74145(config, m_tb16_74145, 0);
 	/* PIA #1 0xA000-0xA003 - used differently by laborations and loaded software */
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 
 	/* PIA #2 Keyboard & Display 0xC000-0xC003 */
-	PIA6821(config, m_pia2, 0);
+	PIA6821(config, m_pia2);
 	/* --PIA init----------------------- */
 	/* 0xE007 0xC002 (DDR B)     = 0xFF - Port B all outputs and set to 0 (zero) */
 	/* 0xE00B 0xC000 (DDR A)     = 0x70 - Port A three outputs and set to 0 (zero) */

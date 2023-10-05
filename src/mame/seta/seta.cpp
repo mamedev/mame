@@ -1395,10 +1395,8 @@ public:
 	void utoukond(machine_config &config);
 	void rezon(machine_config &config);
 
-	void init_rezon();
 	void init_wiggie();
 	void init_bankx1();
-	void init_eightfrc();
 	void init_madsharkbl();
 
 	void palette_init_RRRRRGGGGGBBBBB_proms(palette_device &palette) const;
@@ -2458,7 +2456,7 @@ void seta_state::zingzip_map(address_map &map)
 
 	map(0x500001, 0x500001).w(FUNC(seta_state::seta_coin_counter_w));       // Coin Counter (no lockout)
 	map(0x500003, 0x500003).w(FUNC(seta_state::seta_vregs_w));              // Video Registers
-	map(0x500004, 0x500005).nopw();
+	map(0x500004, 0x500005).noprw();
 
 	map(0x600000, 0x600003).r(FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x700000, 0x7003ff).ram();                             // (rezon,jjsquawk)
@@ -8635,7 +8633,7 @@ void seta_state::triplfun(machine_config &config)
 void seta_state::rezon(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16_MHz_XTAL);   /* 16 MHz */
+	M68000(config, m_maincpu, 16_MHz_XTAL); // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::rezon_map);
 
 	WATCHDOG_TIMER(config, m_watchdog);
@@ -8649,7 +8647,7 @@ void seta_state::rezon(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(57.42); // approximation from PCB video
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
@@ -8661,12 +8659,12 @@ void seta_state::rezon(machine_config &config)
 	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
 	m_layers[1]->set_screen(m_screen);
-	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
+	PALETTE(config, m_palette).set_entries(512 * 3); // sprites, layer1, layer2
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	X1_010(config, m_x1snd, 16_MHz_XTAL);   /* 16 MHz */
+	X1_010(config, m_x1snd, 16_MHz_XTAL); // 16 MHz
 	m_x1snd->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
@@ -8674,6 +8672,7 @@ void seta_state::rezon(machine_config &config)
 /***************************************************************************
                         Thunder & Lightning / Wit's
 ***************************************************************************/
+
 void thunderl_state::machine_start()
 {
 	seta_state::machine_start();
@@ -8681,7 +8680,7 @@ void thunderl_state::machine_start()
 	save_item(NAME(m_thunderl_protection_reg));
 }
 
-/*  thunderl lev 2 = lev 3 - other levels lead to an error */
+/* thunderl lev 2 = lev 3 - other levels lead to an error */
 
 void thunderl_state::thunderl(machine_config &config)
 {
@@ -9223,8 +9222,8 @@ void jockeyc_state::inttoote(machine_config &config)
 	m_layers[0]->set_xoffsets(0, -2);
 
 	// I/O board (not hooked up yet)
-	PIA6821(config, "pia0", 0);
-	PIA6821(config, "pia1", 0);
+	PIA6821(config, "pia0");
+	PIA6821(config, "pia1");
 
 	ACIA6850(config, "acia1", 0);
 	ACIA6850(config, "acia2", 0);
@@ -10606,7 +10605,6 @@ The "LOGO" above means that the actual Sammy logo was printed there.
 These look like final prototype or test roms before production and combining the data into larger MASK roms.
 */
 
-
 ROM_START( zombraidp ) /* Prototype or test board version.  Data matches released MASK rom version */
 	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "u3_master_usa_prg_e_l_dd28.u3",     0x000000, 0x080000, CRC(0b34b8f7) SHA1(8c6d7d208ece08695169f2e06806e7e55c595eb2) ) /* These 4 roms dated 9/28/95 */
@@ -11241,17 +11239,6 @@ void seta_state::init_madsharkbl()
 	m_oki_bank->configure_entries(0, 4, memregion("oki")->base(), 0x20000);
 }
 
-void seta_state::init_eightfrc()
-{
-	m_maincpu->space(AS_PROGRAM).nop_read(0x500004, 0x500005);   // watchdog??
-	init_bankx1();
-}
-
-void seta_state::init_rezon()
-{
-	m_maincpu->space(AS_PROGRAM).nop_read(0x500006, 0x500007);   // irq ack?
-}
-
 void zombraid_state::init_zombraid()
 {
 	/* bank 1 is never explicitly selected, 0 is used in its place */
@@ -11323,8 +11310,8 @@ GAME( 1993, inttoote2, jockeyc,  jockeyc,   jockeyc,   jockeyc_state,  empty_ini
 GAME( 1998, inttoote,  jockeyc,  inttoote,  inttoote,  jockeyc_state,  init_inttoote,  ROT0,   "bootleg (Coinmaster)",      "International Toote (Germany, P523.V01)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_CLICKABLE_ARTWORK )
 GAME( 1990, gderby,    jockeyc,  jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "hack (CODERE)",             "Gran Derby (Spanish hack of Jockey Club)", MACHINE_CLICKABLE_ARTWORK )
 
-GAME( 1991, rezon,     0,        rezon,     rezon,     seta_state,     init_rezon,     ROT0,   "Allumer",                   "Rezon", 0 )
-GAME( 1992, rezont,    rezon,    rezon,     rezont,    seta_state,     init_rezon,     ROT0,   "Allumer (Taito license)",   "Rezon (Taito)", 0 )
+GAME( 1991, rezon,     0,        rezon,     rezon,     seta_state,     empty_init,     ROT0,   "Allumer",                   "Rezon", 0 )
+GAME( 1992, rezont,    rezon,    rezon,     rezont,    seta_state,     empty_init,     ROT0,   "Allumer (Taito license)",   "Rezon (Taito)", 0 )
 
 GAME( 1991, stg,       0,        stg,       stg,       seta_state,     empty_init,     ROT270, "Athena / Tecmo",            "Strike Gunner S.T.G", 0 )
 
@@ -11379,7 +11366,7 @@ GAME( 1993, utoukond,  0,        utoukond,  utoukond,  seta_state,     empty_ini
 
 GAME( 1993, wrofaero,  0,        wrofaero,  wrofaero,  seta_state,     empty_init,     ROT270, "Yang Cheng",                "War of Aero - Project MEIOU", 0 )
 
-GAME( 1994, eightfrc,  0,        eightfrc,  eightfrc,  seta_state,     init_eightfrc,  ROT90,  "Tecmo",                     "Eight Forces", 0 )
+GAME( 1994, eightfrc,  0,        eightfrc,  eightfrc,  seta_state,     init_bankx1,    ROT90,  "Tecmo",                     "Eight Forces", 0 )
 
 GAME( 1994, krzybowl,  0,        krzybowl,  krzybowl,  seta_state,     empty_init,     ROT270, "American Sammy",            "Krazy Bowl", 0 )
 

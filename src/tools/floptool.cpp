@@ -8,6 +8,8 @@
 
 #include "image_handler.h"
 
+#include "formats/fsblk.h"
+
 #include "corestr.h"
 #include "ioprocs.h"
 #include "path.h"

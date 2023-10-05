@@ -1783,7 +1783,7 @@ void itech8_state::itech8_sound_ym3812(machine_config &config)
 	MC6809(config, m_soundcpu, CLOCK_8MHz);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &itech8_state::sound3812_map);
 
-	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia6821_device &pia(PIA6821(config, "pia"));
 	pia.readpb_handler().set("ticket", FUNC(ticket_dispenser_device::line_r));
 	pia.writepa_handler().set(FUNC(itech8_state::pia_porta_out));
 	pia.writepb_handler().set(FUNC(itech8_state::pia_portb_out));

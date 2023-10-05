@@ -647,7 +647,7 @@ void venture_sound_device::device_add_mconfig(machine_config &config)
 	MOS6532(config, m_riot, SH6532_CLOCK);
 	m_riot->irq_wr_callback().set("audioirq", FUNC(input_merger_device::in_w<0>));
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(venture_sound_device::pia_pa_w));
 	m_pia->writepb_handler().set(FUNC(venture_sound_device::pia_pb_w));
 	m_pia->ca2_handler().set(FUNC(venture_sound_device::pia_ca2_w));
@@ -946,7 +946,7 @@ void victory_sound_device::device_add_mconfig(machine_config &config)
 	m_riot->pb_rd_callback<3>().set(m_tms, FUNC(tms5220_device::intq_r));
 	m_riot->irq_wr_callback().set("audioirq", FUNC(input_merger_device::in_w<0>));
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->ca2_handler().set(FUNC(victory_sound_device::irq_clear_w));
 	m_pia->cb2_handler().set(FUNC(victory_sound_device::main_ack_w));
 	m_pia->irqa_handler().set("audioirq", FUNC(input_merger_device::in_w<1>));

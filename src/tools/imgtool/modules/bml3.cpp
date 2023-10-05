@@ -23,6 +23,7 @@
 #include "iflopimg.h"
 
 #include "corestr.h"
+#include "multibyte.h"
 #include "opresolv.h"
 
 #include <cstdio>
@@ -134,7 +135,7 @@ static floperr_t get_bml3_dirent(imgtool::image &f, int index_loc, struct bml3_d
 		ent->ftype = buf[11];
 		ent->asciiflag = buf[12];
 		ent->first_granule = buf[13];
-		ent->lastsectorbytes = (buf[14] << 8) | buf[15];
+		ent->lastsectorbytes = get_u16be(&buf[14]);
 		break;
 	default:
 		return FLOPPY_ERROR_INVALIDIMAGE;
@@ -167,8 +168,7 @@ static floperr_t put_bml3_dirent(imgtool::image &f, int index_loc, const struct 
 		buf[11] = ent->ftype;
 		buf[12] = ent->asciiflag;
 		buf[13] = ent->first_granule;
-		buf[14] = ent->lastsectorbytes >> 8;
-		buf[15] = ent->lastsectorbytes & 0xff;
+		put_u16be(&buf[14], ent->lastsectorbytes);
 		break;
 	default:
 		return FLOPPY_ERROR_INVALIDIMAGE;

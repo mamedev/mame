@@ -150,7 +150,7 @@ void qix_state::qix_audio(machine_config &config)
 	// SINT is connected to the sound CPU's IRQ line
 	INPUT_MERGER_ANY_HIGH(config, "sint").output_handler().set_inputline(m_audiocpu, M6802_IRQ_LINE);
 
-	PIA6821(config, m_sndpia0, 0);
+	PIA6821(config, m_sndpia0);
 	m_sndpia0->writepa_handler().set(FUNC(qix_state::sync_sndpia1_porta_w));
 	m_sndpia0->writepb_handler().set(FUNC(qix_state::qix_vol_w));
 	m_sndpia0->tspb_handler().set_constant(0xff);
@@ -159,7 +159,7 @@ void qix_state::qix_audio(machine_config &config)
 	m_sndpia0->irqa_handler().set("dint", FUNC(input_merger_device::in_w<0>));
 	m_sndpia0->irqb_handler().set("dint", FUNC(input_merger_device::in_w<1>));
 
-	PIA6821(config, m_sndpia1, 0);
+	PIA6821(config, m_sndpia1);
 	m_sndpia1->writepa_handler().set("sndpia0", FUNC(pia6821_device::porta_w));
 	m_sndpia1->writepb_handler().set(FUNC(qix_state::qix_dac_w));
 	m_sndpia1->tspb_handler().set_constant(0);
@@ -167,7 +167,7 @@ void qix_state::qix_audio(machine_config &config)
 	m_sndpia1->irqa_handler().set("sint", FUNC(input_merger_device::in_w<0>));
 	m_sndpia1->irqb_handler().set("sint", FUNC(input_merger_device::in_w<1>));
 
-	PIA6821(config, m_sndpia2, 0);
+	PIA6821(config, m_sndpia2);
 	m_sndpia2->writepa_handler().set(FUNC(qix_state::sndpia_2_warning_w));
 	m_sndpia2->writepb_handler().set(FUNC(qix_state::sndpia_2_warning_w));
 	m_sndpia2->ca2_handler().set(FUNC(qix_state::sndpia_2_warning_w));
@@ -186,7 +186,7 @@ void slither_state::slither_audio(machine_config &config)
 	// DINT is connected to the data CPU's IRQ line
 	INPUT_MERGER_ANY_HIGH(config, "dint").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	PIA6821(config, m_sndpia0, 0);
+	PIA6821(config, m_sndpia0);
 	m_sndpia0->readpa_handler().set_ioport("P2");
 	m_sndpia0->writepb_handler().set(FUNC(slither_state::slither_coinctl_w));
 	m_sndpia0->tspb_handler().set_constant(0x0f);

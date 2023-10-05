@@ -93,7 +93,7 @@ void ss50_piaide_device::device_start()
 
 void ss50_piaide_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(ss50_piaide_device::pia_a_r));
 	m_pia->readpb_handler().set(FUNC(ss50_piaide_device::pia_b_r));
 	m_pia->writepa_handler().set(FUNC(ss50_piaide_device::pia_a_w));

@@ -367,8 +367,6 @@ private:
 	struct metadata_hash;
 
 	// inline helpers
-	uint64_t be_read(const uint8_t *base, int numbytes) const;
-	void be_write(uint8_t *base, uint64_t value, int numbytes);
 	util::sha1_t be_read_sha1(const uint8_t *base) const;
 	void be_write_sha1(uint8_t *base, util::sha1_t value);
 	void file_read(uint64_t offset, void *dest, uint32_t length) const;

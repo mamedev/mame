@@ -2,198 +2,110 @@
 // copyright-holders:Patrick Mackinlay
 
 /*
- * Silicon Graphics Professional IRIS 4D/50 and 4D/70.
- *
- *   Year  Model  Board  CPU    Clock    I/D Cache    Code Name
- *   1987  4D/50  IP4    R2000  8MHz     64KiB/32KiB  Twin Tower
- *   1987  4D/70  IP4    R2000  12.5MHz  64KiB/32KiB  Twin Tower
- *
- * Sources:
- *   - VME-Eclipse CPU (VIP10) Specification, Silicon Graphics, Inc.
- *
- * TODO:
- *  - configurable ram size
- *  - diagnostics
- *  - VME bus
- *  - graphics
- *
- * WIP:
- *  - can boot to monitor
- *  - failing diagnostics: VME, duarts, lio interrupts, fpu
- */
-
-/*
- * SCN2681AC1N40 x 2
- * SCN2681AC1N24
- * P8254
- * CXK5816PN-15L        2,048x8 SRAM
- * WD33C93-PL
- * DS1216?              SmartWatch RAM
- * SAA1099
- *
- * 16MHz
- * 10MHz
- * 8MHz
- * 3.6864MHz
+ * Silicon Graphics Professional IRIS 4D/50 and 4D/70 CPU board.
  */
 
 #include "emu.h"
+#include "ip4.h"
 
-#include "kbd.h"
-
-// cpu and memory
-#include "cpu/mips/mips1.h"
-
-// other devices
-#include "machine/ds1315.h"
-#include "machine/mc68681.h"
-#include "machine/nvram.h"
-#include "machine/pit8253.h"
-#include "machine/wd33c9x.h"
-#include "sound/saa1099.h"
-
-// buses and connectors
 #include "machine/nscsi_bus.h"
+#include "machine/nvram.h"
+
 #include "bus/nscsi/hd.h"
 #include "bus/nscsi/cd.h"
-#include "bus/rs232/rs232.h"
 #include "bus/rs232/hlemouse.h"
+
+#include "kbd.h"
 
 #include "speaker.h"
 
 #define LOG_PARITY (1U << 1)
+#define LOG_VME    (1U << 2)
 
-//#define VERBOSE (LOG_PARITY)
+#define VERBOSE (0)
 
 #include "logmacro.h"
 
-namespace {
+DEFINE_DEVICE_TYPE(SGI_IP4, sgi_ip4_device, "sgi_ip4", "SGI IP4")
 
-class ip4_state : public driver_device
+sgi_ip4_device::sgi_ip4_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, SGI_IP4, tag, owner, clock)
+	, device_vme_card_interface(mconfig, *this)
+	, m_cpu(*this, "cpu")
+	, m_rtc(*this, "rtc")
+	, m_pit(*this, "pit")
+	, m_scsi(*this, "scsi:0:wd33c93")
+	, m_duart(*this, "duart%u", 0U)
+	, m_serial(*this, "serial%u", 0U)
+	, m_saa(*this, "saa")
+	, m_nvram(*this, "nvram", 0x800, ENDIANNESS_BIG)
+	, m_ram(*this, "ram")
+	, m_leds(*this, "led%u", 0U)
 {
-public:
-	ip4_state(machine_config const &mconfig, device_type type, char const *tag)
-		: driver_device(mconfig, type, tag)
-		, m_cpu(*this, "cpu")
-		, m_rtc(*this, "rtc")
-		, m_pit(*this, "pit")
-		, m_scsi(*this, "scsi:0:wd33c93")
-		, m_duart(*this, "duart%u", 0U)
-		, m_serial(*this, "serial%u", 0U)
-		, m_saa(*this, "saa")
-		, m_nvram(*this, "nvram", 0x800, ENDIANNESS_BIG)
-		, m_leds(*this, "led%u", 0U)
-	{
-	}
+}
 
-	void pi4d50(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	void common(machine_config &config);
-	void map(address_map &map);
-
-	template <unsigned N> void lio_interrupt(int state) { lio_interrupt(N, state); }
-	void lio_interrupt(unsigned number, int state);
-	void scsi_drq(int state);
-
-	u16 cpucfg_r() { return m_cpucfg; }
-	void cpucfg_w(u16 data);
-
-	void parity_r(offs_t offset, u32 &data, u32 mem_mask);
-	void parity_w(offs_t offset, u32 &data, u32 mem_mask);
-
-	enum cpucfg_mask : u16
-	{
-		CPUCFG_LEDS = 0x001f,
-		CPUCFG_S01  = 0x0040, // enable serial ports 0,1
-		CPUCFG_S23  = 0x0080, // enable serial ports 2,3
-		CPUCFG_MAIL = 0x0100, // enable mailbox interrupts
-		CPUCFG_SIN  = 0x0200, // VME sysreset (reset)
-		CPUCFG_RPAR = 0x0400, // enable parity checking
-		CPUCFG_SLA  = 0x0800, // enable slave accesses
-		CPUCFG_ARB  = 0x1000, // enable VME arbiter
-		CPUCFG_BAD  = 0x2000, // write bad parity
-		CPUCFG_DOG  = 0x4000, // enable watchdog timout
-		CPUCFG_AUX2 = 0x8000, // unused
-	};
-
-	enum parerr_mask : u8
-	{
-		PAR_LAN = 0x01,
-		PAR_DMA = 0x02,
-		PAR_CPU = 0x04,
-		PAR_VME = 0x08,
-		PAR_B3  = 0x10, // parity errory byte 3
-		PAR_B2  = 0x20, // parity errory byte 2
-		PAR_B1  = 0x40, // parity errory byte 1
-		PAR_B0  = 0x80, // parity errory byte 0
-		PAR_ALL = 0xf0, // parity errory all bytes
-	};
-
-	enum lio_int_number : unsigned
-	{
-		LIO_D0   = 0, // duart 0
-		LIO_D1   = 1, // duart 1
-		LIO_D2   = 2, // duart 2
-					  // unused
-		LIO_SCSI = 4, // scsi
-					  // unused
-		LIO_MAIL = 6, // VME mailbox
-		LIO_AC   = 7, // VME AC fail
-	};
-
-private:
-	required_device<mips1_device_base> m_cpu;
-
-	required_device<ds1315_device> m_rtc;
-	required_device<pit8254_device> m_pit;
-	required_device<wd33c9x_base_device> m_scsi;
-	required_device_array<scn2681_device, 3> m_duart;
-	required_device_array<rs232_port_device, 4> m_serial;
-	required_device<saa1099_device> m_saa;
-
-	memory_share_creator<u8> m_nvram;
-
-	output_finder<5> m_leds;
-
-	// machine registers
-	u16 m_cpucfg;
-	u16 m_dmalo;
-	u16 m_dmahi;
-	u8 m_lio_isr;
-	u8 m_parerr;
-	u32 m_erradr;
-
-	// other machine state
-	std::unique_ptr<u8[]> m_parity;
-	memory_passthrough_handler m_parity_mph;
-	u32 m_parity_bad;
-	bool m_lio_int;
+enum cpucfg_mask : u16
+{
+	CPUCFG_LEDS = 0x001f,
+	CPUCFG_S01  = 0x0040, // enable serial ports 0,1
+	CPUCFG_S23  = 0x0080, // enable serial ports 2,3
+	CPUCFG_MAIL = 0x0100, // enable mailbox interrupts
+	CPUCFG_SIN  = 0x0200, // VME sysreset (reset)
+	CPUCFG_RPAR = 0x0400, // enable parity checking
+	CPUCFG_SLA  = 0x0800, // enable slave accesses
+	CPUCFG_ARB  = 0x1000, // enable VME arbiter
+	CPUCFG_BAD  = 0x2000, // write bad parity
+	CPUCFG_DOG  = 0x4000, // enable watchdog timout
+	CPUCFG_AUX2 = 0x8000, // unused
 };
 
-void ip4_state::map(address_map &map)
+enum parerr_mask : u8
 {
-	//map(0x1c00'0000, 0x1cff'ffff); // vme a24 modifier 0x3d privileged
-	//map(0x1d00'0000, 0x1d00'ffff); // vme a16 modifier 0x2d privileged
-	//map(0x1d10'0000, 0x1d10'ffff); // vme a16 modifier 0x29 non-privileged
-	//map(0x1df0'0000, 0x1dff'ffff).umask32(0x0000'ff00); // VME_IACK: vme interrupt acknowledge
-	//map(0x1e00'0000, 0x1eff'ffff); // vme a24 modifier 0x39 non-privileged
+	PAR_LAN = 0x01,
+	PAR_DMA = 0x02,
+	PAR_CPU = 0x04,
+	PAR_VME = 0x08,
+	PAR_B3  = 0x10, // parity error byte 3
+	PAR_B2  = 0x20, // parity error byte 2
+	PAR_B1  = 0x40, // parity error byte 1
+	PAR_B0  = 0x80, // parity error byte 0
+	PAR_ALL = 0xf0, // parity error all bytes
+};
 
+enum lio_int_number : unsigned
+{
+	LIO_D0   = 0, // duart 0
+	LIO_D1   = 1, // duart 1
+	LIO_D2   = 2, // duart 2
+				  // unused
+	LIO_SCSI = 4, // scsi
+				  // unused
+	LIO_MAIL = 6, // VME mailbox
+	LIO_AC   = 7, // VME acfail
+};
+
+void sgi_ip4_device::map(address_map &map)
+{
 	// TODO: 4 banks of 4 SIMMs with parity
-	map(0x0000'0000, 0x007f'ffff).ram();
+	map(0x0000'0000, 0x007f'ffff).ram().share("ram");
+
+	map(0x1000'0000, 0x1bff'ffff).rw(&device_vme_card_interface::vme_read32<vme::AM_09,0x1000'0000>, "read", &device_vme_card_interface::vme_write32<vme::AM_09,0x1000'0000>, "write");
+	map(0x1c00'0000, 0x1cff'ffff).rw(FUNC(device_vme_card_interface::vme_read32<vme::AM_3d>), FUNC(device_vme_card_interface::vme_write32<vme::AM_3d>));
+	map(0x1d00'0000, 0x1d00'ffff).rw(FUNC(device_vme_card_interface::vme_read32<vme::AM_2d>), FUNC(device_vme_card_interface::vme_write32<vme::AM_2d>));
+	map(0x1d10'0000, 0x1d10'ffff).rw(FUNC(device_vme_card_interface::vme_read32<vme::AM_29>), FUNC(device_vme_card_interface::vme_write32<vme::AM_29>));
+	map(0x1df0'0000, 0x1df0'000f).lr16(NAME([this](offs_t offset) { return vme_iack_r(offset << 1); })).mirror(0xf'fff0);
+	map(0x1e00'0000, 0x1eff'ffff).rw(FUNC(device_vme_card_interface::vme_read32<vme::AM_39>), FUNC(device_vme_card_interface::vme_write32<vme::AM_39>));
+	map(0x2000'0000, 0x2fff'ffff).rw(FUNC(device_vme_card_interface::vme_read32<vme::AM_09>), FUNC(device_vme_card_interface::vme_write32<vme::AM_09>));
 
 	map(0x1f60'0000, 0x1f60'0003).umask32(0xff00'0000).w(m_saa, FUNC(saa1099_device::data_w));
 	map(0x1f60'0010, 0x1f60'0013).umask32(0xff00'0000).w(m_saa, FUNC(saa1099_device::control_w));
 
-	map(0x1f80'0000, 0x1f80'0003).umask32(0x00ff'0000).lr8(NAME([]() { return 0; })); // system id prom/coprocessor present
+	map(0x1f80'0000, 0x1f80'0003).umask32(0x00ff'0000).lr8(NAME([]() { return 0; })); // TODO: system id prom/coprocessor present
 
-	//map(0x1f840000, 0x1f840003).umask32(0x0000'00ff).lrw8(NAME([this]() { return m_vme_isr; }), NAME([this](u8 data) { m_vme_isr = data; }));
-	//map(0x1f840008, 0x1f84000b).umask32(0x0000'00ff).lrw8(NAME([this]() { return m_vme_imr; }), NAME([this](u8 data) { m_vme_imr = data; }));
+	map(0x1f84'0000, 0x1f84'0003).umask32(0x0000'00ff).lrw8(NAME([this]() { LOG("vme_isr_r 0x%02x\n", m_vme_isr); return m_vme_isr; }), NAME([this](u8 data) { LOG("vme_isr_w 0x%02x\n", data); m_vme_isr = data; }));
+	map(0x1f84'0008, 0x1f84'000b).umask32(0x0000'00ff).lrw8(NAME([this]() { LOG("vme_imr_r 0x%02x\n", m_vme_imr); return m_vme_imr; }), NAME([this](u8 data) { LOG("vme_imr_w 0x%02x\n", data); m_vme_imr = data; }));
 
-	map(0x1f88'0000, 0x1f88'0003).umask32(0x0000'ffff).rw(FUNC(ip4_state::cpucfg_r), FUNC(ip4_state::cpucfg_w));
+	map(0x1f88'0000, 0x1f88'0003).umask32(0x0000'ffff).rw(FUNC(sgi_ip4_device::cpucfg_r), FUNC(sgi_ip4_device::cpucfg_w));
 
 	map(0x1f90'0000, 0x1f90'0003).umask32(0x0000'ffff).lw16(NAME([this](u16 data) { m_dmalo = data; }));
 	map(0x1f92'0000, 0x1f92'0003).umask32(0x0000'ffff).lw16(NAME([this](u16 data) { m_dmahi = data; }));
@@ -201,15 +113,15 @@ void ip4_state::map(address_map &map)
 
 	map(0x1f98'0000, 0x1f98'0003).umask32(0x0000'00ff).lr8(NAME([this]() { return m_lio_isr; }));
 
-	map(0x1f9a'0000, 0x1f9a'0003).nopr(); // switches
+	map(0x1f9a'0000, 0x1f9a'0003).nopr(); // TODO: switches
 
 	map(0x1fa0'0000, 0x1fa0'0003).umask32(0xff00'0000).lr8(NAME([this]() { m_cpu->set_input_line(INPUT_LINE_IRQ4, 0); return 0; }));
 	map(0x1fa2'0000, 0x1fa2'0003).umask32(0xff00'0000).lr8(NAME([this]() { m_cpu->set_input_line(INPUT_LINE_IRQ2, 0); return 0; }));
-	map(0x1fa4'0000, 0x1fa4'0003).lr32([this]() { return m_erradr; }, "sbe");
+	map(0x1fa4'0000, 0x1fa4'0003).lr32(NAME([this]() { m_cpu->set_input_line(INPUT_LINE_IRQ5, 0); return m_erradr; }));
 	map(0x1fa8'0000, 0x1fa8'0003).umask32(0xff00'0000).lr8(NAME([this]() { m_scsi->reset_w(0); return 0; }));
 	map(0x1fa8'0004, 0x1fa8'0007).umask32(0xff00'0000).lr8(NAME([this]() { m_scsi->reset_w(1); return 0; }));
 
-	//map(0x1fa60000, 0x1fa60003).umask32(0xff00'0000); // vme rmw
+	//map(0x1fa60000, 0x1fa60003).umask32(0xff00'0000); // TODO: vme rmw
 	map(0x1faa0000, 0x1faa0003).lrw8(
 		NAME([this](offs_t offset) { m_parerr &= ~(PAR_ALL | (1U << offset)); return 0; }),
 		NAME([this](offs_t offset, u8 data) { m_parerr &= ~(PAR_ALL | (1U << offset)); }));
@@ -246,17 +158,11 @@ static void scsi_devices(device_slot_interface &device)
 	device.option_add("harddisk", NSCSI_HARDDISK);
 }
 
-void ip4_state::pi4d50(machine_config &config)
+void sgi_ip4_device::device_add_mconfig(machine_config &config)
 {
-	R2000(config, m_cpu, 16_MHz_XTAL / 2, 65536, 32768);
+	R2000(config, m_cpu, clock() / 2, 65536, 32768);
 	m_cpu->set_fpu(mips1_device_base::MIPS_R2010);
-
-	common(config);
-}
-
-void ip4_state::common(machine_config &config)
-{
-	m_cpu->set_addrmap(AS_PROGRAM, &ip4_state::map);
+	m_cpu->set_addrmap(AS_PROGRAM, &sgi_ip4_device::map);
 	m_cpu->in_brcond<0>().set([]() { return 1; }); // writeback complete
 
 	DS1315(config, m_rtc, 0); // DS1216?
@@ -277,8 +183,8 @@ void ip4_state::common(machine_config &config)
 			wd33c9x_base_device &wd33c93(downcast<wd33c9x_base_device &>(*device));
 
 			wd33c93.set_clock(10'000'000);
-			wd33c93.irq_cb().set(*this, FUNC(ip4_state::lio_interrupt<LIO_SCSI>)).invert();
-			wd33c93.drq_cb().set(*this, FUNC(ip4_state::scsi_drq));
+			wd33c93.irq_cb().set(*this, FUNC(sgi_ip4_device::lio_irq<LIO_SCSI>)).invert();
+			wd33c93.drq_cb().set(*this, FUNC(sgi_ip4_device::scsi_drq));
 		});
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr, false);
@@ -290,6 +196,7 @@ void ip4_state::common(machine_config &config)
 
 	// duart 0 (keyboard/mouse)
 	SCN2681(config, m_duart[0], 3.6864_MHz_XTAL); // SCN2681AC1N24
+
 	sgi_kbd_port_device &keyboard_port(SGI_KBD_PORT(config, "keyboard_port", default_sgi_kbd_devices, nullptr));
 	rs232_port_device &mouse_port(RS232_PORT(config, "mouse_port",
 		[](device_slot_interface &device)
@@ -299,7 +206,7 @@ void ip4_state::common(machine_config &config)
 		nullptr));
 
 	// duart 0 outputs
-	m_duart[0]->irq_cb().set(FUNC(ip4_state::lio_interrupt<LIO_D0>)).invert();
+	m_duart[0]->irq_cb().set(FUNC(sgi_ip4_device::lio_irq<LIO_D0>)).invert();
 	m_duart[0]->a_tx_cb().set(keyboard_port, FUNC(sgi_kbd_port_device::write_txd));
 	m_duart[0]->b_tx_cb().set(mouse_port, FUNC(rs232_port_device::write_txd));
 
@@ -313,7 +220,7 @@ void ip4_state::common(machine_config &config)
 	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
 
 	// duart 1 outputs
-	m_duart[1]->irq_cb().set(FUNC(ip4_state::lio_interrupt<LIO_D1>)).invert();
+	m_duart[1]->irq_cb().set(FUNC(sgi_ip4_device::lio_irq<LIO_D1>)).invert();
 	m_duart[1]->a_tx_cb().set(m_serial[0], FUNC(rs232_port_device::write_txd));
 	m_duart[1]->b_tx_cb().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 	m_duart[1]->outport_cb().set(
@@ -342,7 +249,7 @@ void ip4_state::common(machine_config &config)
 	RS232_PORT(config, m_serial[3], default_rs232_devices, nullptr);
 
 	// duart 2 outputs
-	m_duart[2]->irq_cb().set(FUNC(ip4_state::lio_interrupt<LIO_D2>)).invert();
+	m_duart[2]->irq_cb().set(FUNC(sgi_ip4_device::lio_irq<LIO_D2>)).invert();
 	m_duart[2]->a_tx_cb().set(m_serial[2], FUNC(rs232_port_device::write_txd));
 	m_duart[2]->b_tx_cb().set(m_serial[3], FUNC(rs232_port_device::write_txd));
 	m_duart[2]->outport_cb().set(
@@ -365,6 +272,7 @@ void ip4_state::common(machine_config &config)
 	m_serial[3]->cts_handler().set(m_duart[2], FUNC(scn2681_device::ip1_w));
 	m_serial[3]->dcd_handler().set(m_duart[2], FUNC(scn2681_device::ip2_w));
 
+	// TODO: move speakers to host
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -373,24 +281,48 @@ void ip4_state::common(machine_config &config)
 	m_saa->add_route(1, "rspeaker", 0.5);
 }
 
-void ip4_state::machine_start()
+void sgi_ip4_device::device_config_complete()
+{
+	if (owner() && owner()->owner())
+	{
+	// TODO: ACFAIL -> vme_irq<0>
+	device_vme_card_interface::vme_irq<1>().append(*this, FUNC(sgi_ip4_device::vme_irq<1>));
+	device_vme_card_interface::vme_irq<2>().append(*this, FUNC(sgi_ip4_device::vme_irq<2>));
+	device_vme_card_interface::vme_irq<3>().append(*this, FUNC(sgi_ip4_device::vme_irq<3>));
+	device_vme_card_interface::vme_irq<4>().append(*this, FUNC(sgi_ip4_device::vme_irq<4>));
+	device_vme_card_interface::vme_irq<5>().append(*this, FUNC(sgi_ip4_device::vme_irq<5>));
+	device_vme_card_interface::vme_irq<6>().append(*this, FUNC(sgi_ip4_device::vme_irq<6>));
+	device_vme_card_interface::vme_irq<7>().append(*this, FUNC(sgi_ip4_device::vme_irq<7>));
+
+	vme_berr().set_inputline(m_cpu, INPUT_LINE_IRQ5).invert();
+	}
+}
+
+void sgi_ip4_device::device_start()
 {
 	m_leds.resolve();
 
 	save_item(NAME(m_cpucfg));
-	save_item(NAME(m_lio_isr));
-	save_item(NAME(m_lio_int));
 	save_item(NAME(m_dmalo));
 	save_item(NAME(m_dmahi));
-	save_item(NAME(m_erradr));
+	save_item(NAME(m_lio_isr));
+	save_item(NAME(m_vme_isr));
+	save_item(NAME(m_vme_imr));
 	save_item(NAME(m_parerr));
+	save_item(NAME(m_erradr));
+
+	save_item(NAME(m_lio_irq));
+	save_item(NAME(m_vme_irq));
 
 	m_cpucfg = 0;
-	m_lio_isr = 0xff;
-	m_lio_int = false;
-
 	m_dmalo = 0;
 	m_dmahi = 0;
+	m_lio_isr = 0xff;
+	m_vme_isr = 0;
+	m_vme_imr = 0;
+
+	m_lio_irq = false;
+	m_vme_irq = false;
 
 	// install phantom rtc with a memory tap
 	m_cpu->space(AS_PROGRAM).install_readwrite_tap(0x1fbc'1ffc, 0x1fbc'1fff, "rtc",
@@ -415,13 +347,13 @@ void ip4_state::machine_start()
 	m_parity_bad = 0;
 }
 
-void ip4_state::machine_reset()
+void sgi_ip4_device::device_reset()
 {
-	m_erradr = 0;
 	m_parerr = 0;
+	m_erradr = 0;
 }
 
-void ip4_state::lio_interrupt(unsigned number, int state)
+void sgi_ip4_device::lio_irq(unsigned number, int state)
 {
 	// record interrupt state
 	if (state)
@@ -430,15 +362,32 @@ void ip4_state::lio_interrupt(unsigned number, int state)
 		m_lio_isr &= ~(1U << number);
 
 	// update interrupt line
-	bool const lio_int = !m_lio_isr;
-	if (m_lio_int ^ lio_int)
+	bool const lio_irq = (m_lio_isr ^ 0xff);
+	if (m_lio_irq ^ lio_irq)
 	{
-		m_lio_int = lio_int;
-		m_cpu->set_input_line(INPUT_LINE_IRQ1, m_lio_int);
+		m_lio_irq = lio_irq;
+		m_cpu->set_input_line(INPUT_LINE_IRQ1, m_lio_irq);
 	}
 }
 
-void ip4_state::scsi_drq(int state)
+void sgi_ip4_device::vme_irq(unsigned number, int state)
+{
+	// record interrupt state
+	if (!state)
+		m_vme_isr |= 1U << number;
+	else
+		m_vme_isr &= ~(1U << number);
+
+	// update interrupt line
+	bool const vme_irq = m_vme_isr;// &m_vme_imr;
+	if (m_vme_irq ^ vme_irq)
+	{
+		m_vme_irq = vme_irq;
+		m_cpu->set_input_line(INPUT_LINE_IRQ0, m_vme_irq);
+	}
+}
+
+void sgi_ip4_device::scsi_drq(int state)
 {
 	if (state)
 	{
@@ -456,7 +405,7 @@ void ip4_state::scsi_drq(int state)
 	}
 }
 
-void ip4_state::cpucfg_w(u16 data)
+void sgi_ip4_device::cpucfg_w(u16 data)
 {
 	LOG("cpucfg_w 0x%04x\n", data);
 
@@ -464,11 +413,30 @@ void ip4_state::cpucfg_w(u16 data)
 	for (unsigned i = 0; i < 5; i++)
 		m_leds[i] = BIT(data, i);
 
+	if ((m_cpucfg & CPUCFG_MAIL) && !BIT(data, 8))
+		lio_irq<LIO_MAIL>(1);
+
 	if (BIT(data, 9))
 		machine().schedule_soft_reset();
 
 	if ((m_cpucfg ^ data) & CPUCFG_RPAR)
 		LOGMASKED(LOG_PARITY, "parity checking %d\n", BIT(data, 10));
+
+	if (!(m_cpucfg & CPUCFG_SLA) && (data & CPUCFG_SLA))
+	{
+		LOGMASKED(LOG_VME, "vme slave access enabled\n");
+		vme_space(vme::AM_29).install_write_handler(0x1000, 0x13ff, emu::rw_delegate(*this, FUNC(sgi_ip4_device::mailbox_w)));
+
+		vme_space(vme::AM_39).install_ram(0x0000'0000, 0x007f'ffff, m_ram.target());
+		vme_space(vme::AM_3a).install_ram(0x0000'0000, 0x007f'ffff, m_ram.target());
+		vme_space(vme::AM_3b).install_ram(0x0000'0000, 0x007f'ffff, m_ram.target());
+		vme_space(vme::AM_3d).install_ram(0x0000'0000, 0x007f'ffff, m_ram.target());
+		vme_space(vme::AM_3e).install_ram(0x0000'0000, 0x007f'ffff, m_ram.target());
+		vme_space(vme::AM_3f).install_ram(0x0000'0000, 0x007f'ffff, m_ram.target());
+
+		vme_space(vme::AM_09).install_ram(0x0000'0000, m_ram.bytes() - 1, m_ram.target());
+		vme_space(vme::AM_0a).install_ram(0x0000'0000, m_ram.bytes() - 1, m_ram.target());
+	}
 
 	if ((m_cpucfg ^ data) & CPUCFG_BAD)
 	{
@@ -482,15 +450,15 @@ void ip4_state::cpucfg_w(u16 data)
 
 			m_parity = std::make_unique<u8[]>(ram_size << (20 - 3));
 			m_parity_mph = m_cpu->space(0).install_readwrite_tap(0, (ram_size << 20) - 1, "parity",
-				std::bind(&ip4_state::parity_r, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3),
-				std::bind(&ip4_state::parity_w, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+				std::bind(&sgi_ip4_device::parity_r, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3),
+				std::bind(&sgi_ip4_device::parity_w, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 		}
 	}
 
 	m_cpucfg = data;
 }
 
-void ip4_state::parity_r(offs_t offset, u32 &data, u32 mem_mask)
+void sgi_ip4_device::parity_r(offs_t offset, u32 &data, u32 mem_mask)
 {
 	if (m_cpucfg & CPUCFG_RPAR)
 	{
@@ -514,7 +482,7 @@ void ip4_state::parity_r(offs_t offset, u32 &data, u32 mem_mask)
 	}
 }
 
-void ip4_state::parity_w(offs_t offset, u32 &data, u32 mem_mask)
+void sgi_ip4_device::parity_w(offs_t offset, u32 &data, u32 mem_mask)
 {
 	if (m_cpucfg & CPUCFG_BAD)
 	{
@@ -552,7 +520,17 @@ void ip4_state::parity_w(offs_t offset, u32 &data, u32 mem_mask)
 	}
 }
 
-ROM_START(pi4d50)
+void sgi_ip4_device::mailbox_w(offs_t offset, u8 data)
+{
+	if (m_cpucfg & CPUCFG_MAIL)
+	{
+		LOGMASKED(LOG_VME, "vme mailbox interrupt (%s)\n", machine().describe_context());
+
+		lio_irq<LIO_MAIL>(0);
+	}
+}
+
+ROM_START(ip4)
 	ROM_REGION32_BE(0x40000, "boot", 0)
 	ROM_SYSTEM_BIOS(0, "4d1v3", "Version 4D1-3.0 PROM IP4 Mon Jan  4 20:29:51 PST 1988 SGI")
 	ROMX_LOAD("070-0093-009.bin", 0x000000, 0x010000, CRC(261b0a4c) SHA1(59f73d0e022a502dc5528289e388700b51b308da), ROM_BIOS(0) | ROM_SKIP(3))
@@ -564,7 +542,15 @@ ROM_START(pi4d50)
 	ROM_LOAD("idprom.bin", 0, 0x20, NO_DUMP)
 ROM_END
 
-} // anonymous namespace
+static INPUT_PORTS_START(ip4)
+INPUT_PORTS_END
 
-//   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY             FULLNAME                   FLAGS
-COMP(1987, pi4d50, 0,      0,      pi4d50,  0,     ip4_state, empty_init, "Silicon Graphics", "Professional IRIS 4D/50", MACHINE_NOT_WORKING)
+tiny_rom_entry const *sgi_ip4_device::device_rom_region() const
+{
+	return ROM_NAME(ip4);
+}
+
+ioport_constructor sgi_ip4_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(ip4);
+}

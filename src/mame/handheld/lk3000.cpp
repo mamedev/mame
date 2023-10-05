@@ -9,7 +9,7 @@ It was also licensed to Nixdorf.
 Hardware notes:
 - 3870 MCU (Motorola brand) @ 4MHz(2MHz internal)
 - optional external ROM or RAM
-- 4*Litronix DL 1414 (16*17segs total)
+- 4*Litronix DL1414 (16*17segs total)
 - 33-button keypad
 
 The CPU and memory is on the cartridge. In theory, any hardware configuration

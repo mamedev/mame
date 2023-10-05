@@ -4,7 +4,9 @@
 /*******************************************************************************
 
 Mephisto Mondial 68000XL
-The chess engine is actually the one from Mephisto Dallas.
+
+It was made for the US market. The chess engine is actually the one from
+Mephisto Dallas.
 
 Hardware notes:
 - TS68000CP12 @ 12MHz

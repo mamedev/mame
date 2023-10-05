@@ -33,19 +33,11 @@
 #define LOG_OUTPUT_WAV  (0)
 
 
-
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
 const attotime sound_manager::STREAMS_UPDATE_ATTOTIME = attotime::from_hz(STREAMS_UPDATE_FREQUENCY);
-
 
 
 //**************************************************************************
@@ -1385,15 +1377,43 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 	}
 
 	// iterate over channel nodes
-	for (util::xml::data_node const *channelnode = parentnode->get_child("channel"); channelnode != nullptr; channelnode = channelnode->get_next_sibling("channel"))
+	for (util::xml::data_node const *node = parentnode->get_child("channel"); node != nullptr; node = node->get_next_sibling("channel"))
 	{
 		mixer_input info;
-		if (indexed_mixer_input(channelnode->get_attribute_int("index", -1), info))
+		if (indexed_mixer_input(node->get_attribute_int("index", -1), info))
 		{
-			float defvol = channelnode->get_attribute_float("defvol", 1.0f);
-			float newvol = channelnode->get_attribute_float("newvol", -1000.0f);
-			if (newvol != -1000.0f)
-				info.stream->input(info.inputnum).set_user_gain(newvol / defvol);
+			// note that this doesn't disallow out-of-range values
+			float value = node->get_attribute_float("value", std::nanf(""));
+
+			if (std::isnan(value))
+			{
+				// TODO: remove defvol and newvol in 2024
+				float defvol = node->get_attribute_float("defvol", 1.0f);
+				float newvol = node->get_attribute_float("newvol", -1000.0f);
+				if (newvol != -1000.0f && defvol != 0.0f)
+					value = newvol / defvol;
+			}
+
+			if (!std::isnan(value))
+				info.stream->input(info.inputnum).set_user_gain(value);
+		}
+	}
+
+	// iterate over speaker panning nodes
+	for (util::xml::data_node const *node = parentnode->get_child("panning"); node != nullptr; node = node->get_next_sibling("panning"))
+	{
+		char const *const tag = node->get_attribute_string("tag", nullptr);
+		if (tag != nullptr)
+		{
+			for (speaker_device &speaker : speaker_device_enumerator(machine().root_device()))
+			{
+				if (!strcmp(tag, speaker.tag()))
+				{
+					float value = node->get_attribute_float("value", speaker.defpan());
+					speaker.set_pan(value);
+					break;
+				}
+			}
 		}
 	}
 }
@@ -1417,21 +1437,36 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 			node->set_attribute_int("value", m_attenuation);
 	}
 
-	// iterate over mixer channels
+	// iterate over mixer channels for per-channel volume
 	for (int mixernum = 0; ; mixernum++)
 	{
 		mixer_input info;
 		if (!indexed_mixer_input(mixernum, info))
 			break;
 
-		float const newvol = info.stream->input(info.inputnum).user_gain();
-		if (newvol != 1.0f)
+		float const value = info.stream->input(info.inputnum).user_gain();
+		if (value != 1.0f)
 		{
-			util::xml::data_node *const channelnode = parentnode->add_child("channel", nullptr);
-			if (channelnode)
+			util::xml::data_node *const node = parentnode->add_child("channel", nullptr);
+			if (node)
 			{
-				channelnode->set_attribute_int("index", mixernum);
-				channelnode->set_attribute_float("newvol", newvol);
+				node->set_attribute_int("index", mixernum);
+				node->set_attribute_float("value", value);
+			}
+		}
+	}
+
+	// iterate over speakers for panning
+	for (speaker_device &speaker : speaker_device_enumerator(machine().root_device()))
+	{
+		float const value = speaker.pan();
+		if (value != speaker.defpan())
+		{
+			util::xml::data_node *const node = parentnode->add_child("panning", nullptr);
+			if (node)
+			{
+				node->set_attribute("tag", speaker.tag());
+				node->set_attribute_float("value", value);
 			}
 		}
 	}

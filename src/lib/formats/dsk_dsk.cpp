@@ -13,6 +13,7 @@
 #include "imageutl.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include "osdcore.h" // osd_printf_*
 
@@ -103,10 +104,10 @@ static floperr_t get_offset(floppy_image_legacy *floppy, int head, int track, in
 		get_tag(floppy)->sector_size = (1<<(track_info[0x014]+7));
 		offs = track_offset + 0x100 +sector * get_tag(floppy)->sector_size;
 	} else {
-		get_tag(floppy)->sector_size = track_info[0x18 + (sector<<3) + 6] + (track_info[0x18+(sector<<3) + 7]<<8);
+		get_tag(floppy)->sector_size = get_u16le(&track_info[0x18 + (sector<<3) + 6]);
 		offs = track_offset + 0x100;
 		for (i=0;i<sector;i++) {
-			offs += track_info[0x18 + (i<<3) + 6] + (track_info[0x18+(i<<3) + 7]<<8);
+			offs += get_u16le(&track_info[0x18 + (i<<3) + 6]);
 		}
 	}
 
@@ -251,7 +252,7 @@ FLOPPY_CONSTRUCT( dsk_dsk_construct )
 		for (i=0; i<tag->tracks * tag->heads; i++)
 		{
 			tag->track_offsets[cnt] = tmp;
-			tmp += pick_integer_le(header, 0x32, 2);
+			tmp += get_u16le(&header[0x32]);
 			cnt += skip;
 		}
 	} else  {
@@ -403,7 +404,7 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		for (int i=0; i<tracks * heads; i++)
 		{
 			track_offsets[cnt] = tmp;
-			tmp += pick_integer_le(header, 0x32, 2);
+			tmp += get_u16le(&header[0x32]);
 			cnt += skip;
 		}
 	} else  {

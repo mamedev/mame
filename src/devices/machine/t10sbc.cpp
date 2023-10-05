@@ -3,6 +3,8 @@
 #include "emu.h"
 #include "t10sbc.h"
 
+#include "multibyte.h"
+
 void t10sbc::t10_start(device_t &device)
 {
 	m_device = &device;
@@ -43,7 +45,7 @@ void t10sbc::ExecCommand()
 		break;
 
 	case T10SBC_CMD_SEEK_6:
-		m_lba = (command[1]&0x1f)<<16 | command[2]<<8 | command[3];
+		m_lba = get_u24be(&command[1])&0x1fffff;
 
 		m_device->logerror("S1410: SEEK to LBA %x\n", m_lba);
 
@@ -52,7 +54,7 @@ void t10sbc::ExecCommand()
 		break;
 
 	case T10SBC_CMD_READ_6:
-		m_lba = (command[1]&0x1f)<<16 | command[2]<<8 | command[3];
+		m_lba = get_u24be(&command[1])&0x1fffff;
 		m_blocks = SCSILengthFromUINT8( &command[4] );
 
 		m_device->logerror("T10SBC: READ at LBA %x for %x blocks\n", m_lba, m_blocks);
@@ -63,7 +65,7 @@ void t10sbc::ExecCommand()
 		break;
 
 	case T10SBC_CMD_WRITE_6:
-		m_lba = (command[1]&0x1f)<<16 | command[2]<<8 | command[3];
+		m_lba = get_u24be(&command[1])&0x1fffff;
 		m_blocks = SCSILengthFromUINT8( &command[4] );
 
 		m_device->logerror("T10SBC: WRITE to LBA %x for %x blocks\n", m_lba, m_blocks);
@@ -99,7 +101,7 @@ void t10sbc::ExecCommand()
 		break;
 
 	case T10SBC_CMD_READ_10:
-		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
+		m_lba = get_u32be(&command[2]);
 		m_blocks = SCSILengthFromUINT16( &command[7] );
 
 		m_device->logerror("T10SBC: READ at LBA %x for %x blocks\n", m_lba, m_blocks);
@@ -110,7 +112,7 @@ void t10sbc::ExecCommand()
 		break;
 
 	case T10SBC_CMD_WRITE_10:
-		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
+		m_lba = get_u32be(&command[2]);
 		m_blocks = SCSILengthFromUINT16( &command[7] );
 
 		m_device->logerror("T10SBC: WRITE to LBA %x for %x blocks\n", m_lba, m_blocks);
@@ -121,8 +123,8 @@ void t10sbc::ExecCommand()
 		break;
 
 	case T10SBC_CMD_READ_12:
-		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
-		m_blocks = command[6]<<24 | command[7]<<16 | command[8]<<8 | command[9];
+		m_lba = get_u32be(&command[2]);
+		m_blocks = get_u32be(&command[6]);
 
 		m_device->logerror("T10SBC: READ at LBA %x for %x blocks\n", m_lba, m_blocks);
 
@@ -372,12 +374,6 @@ void t10sbc::ReadCapacity( uint8_t *data )
 	// get # of sectors
 	uint32_t temp = info.cylinders * info.heads * info.sectors - 1;
 
-	data[0] = (temp>>24) & 0xff;
-	data[1] = (temp>>16) & 0xff;
-	data[2] = (temp>>8) & 0xff;
-	data[3] = (temp & 0xff);
-	data[4] = (info.sectorbytes>>24)&0xff;
-	data[5] = (info.sectorbytes>>16)&0xff;
-	data[6] = (info.sectorbytes>>8)&0xff;
-	data[7] = (info.sectorbytes & 0xff);
+	put_u32be(&data[0], temp);
+	put_u32be(&data[4], info.sectorbytes);
 }

@@ -1,11 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert, Angelo Salese
+
 #include "emu.h"
 #include "mga2064w.h"
 
 #define LOG_WARN      (1U << 1)
 #define LOG_ALIAS     (1U << 2) // log mgabase1 index setups thru the back door
 #define LOG_DRAW      (1U << 3) // log drawing engine accesses
+#define LOG_PIXELXFER (1U << 4) // log drawing pixel writes
 
 #define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_DRAW)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -14,6 +16,7 @@
 #define LOGWARN(...)            LOGMASKED(LOG_WARN, __VA_ARGS__)
 #define LOGALIAS(...)           LOGMASKED(LOG_ALIAS, __VA_ARGS__)
 #define LOGDRAW(...)            LOGMASKED(LOG_DRAW, __VA_ARGS__)
+#define LOGPIXELXFER(...)       LOGMASKED(LOG_PIXELXFER, __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(MGA2064W, mga2064w_device, "mga2064w", "Matrox Millennium \"IS-STORM / MGA-2064W\"")
 
@@ -76,6 +79,7 @@ void mga2064w_device::device_reset()
 	// INTA#
 	intr_pin = 1;
 	m_mgabase1_real_index = 0;
+	m_dwgreg.state = DRAW_IDLE;
 }
 
 device_memory_interface::space_config_vector mga2064w_device::memory_space_config() const
@@ -95,7 +99,7 @@ void mga2064w_device::config_map(address_map &map)
 
 void mga2064w_device::mgabase1_map(address_map &map)
 {
-//  map(0x0000, 0x1bff).rw(FUNC(mga2064w_device::dmawin_idump_r), FUNC(mga2064w_device::dmawin_iload_w));
+	map(0x0000, 0x1bff).rw(FUNC(mga2064w_device::dmawin_idump_r), FUNC(mga2064w_device::dmawin_iload_w));
 	map(0x1c00, 0x1dff).m(FUNC(mga2064w_device::dwgreg_map));
 //  map(0x1e00, 0x1eff) HSTREG Host registers
 	map(0x1e10, 0x1e13).r(FUNC(mga2064w_device::fifo_status_r));
@@ -224,9 +228,9 @@ void mga2064w_device::dwgreg_map(address_map &map)
 		})
 	);
 	// AR0-6
+	// TODO: documentation for each reg
 	map(0x0060, 0x007b).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			// FIXME: signed 18-bit
 			LOGDRAW("dwgreg: AR[%01d] -> %08x & %08x\n", offset, data, mem_mask);
 			COMBINE_DATA(&m_dwgreg.ar[offset]);
 		})
@@ -253,7 +257,7 @@ void mga2064w_device::dwgreg_map(address_map &map)
 				, m_dwgreg.fxleft, m_dwgreg.fxright
 			);
 			if (BIT(offset, 6))
-				LOGDRAW("\tstart trigger\n");
+				draw_trigger();
 		})
 	);
 	// YDSTLEN
@@ -262,13 +266,13 @@ void mga2064w_device::dwgreg_map(address_map &map)
 			// alternative way to access YDST (bits 31-16) and LEN (15-0) with a single dword
 			m_dwgreg.len = data & 0xffff;
 			// TODO: YDST bits 31-16 with signed conversion
-			// ...
+			m_dwgreg.ydst = util::sext(data >> 16, 15);
 			LOGDRAW("dwgreg: YDSTLEN %08x & %08x (YDST %d|LEN %d)\n"
 				, data, mem_mask
 				, data >> 16, m_dwgreg.len
 			);
 			if (BIT(offset, 6))
-				LOGDRAW("\tstart trigger\n");
+				draw_trigger();
 		})
 	);
 	// PITCH
@@ -393,7 +397,7 @@ void mga2064w_device::dwgreg_map(address_map &map)
 void mga2064w_device::dwgctl_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_dwgreg.dwgctl);
-	LOGDRAW("dwgreg: DWGCTRL -> %08x & %08x\n", data, mem_mask);
+	LOGDRAW("dwgreg: DWGCTL -> %08x & %08x\n", data, mem_mask);
 	const char *const opcode_mnemonics[16] = {
 		"LINE_OPEN", "AUTOLINE_OPEN", "LINE_CLOSE", "AUTOLINE_CLOSE",
 		"TRAP",      "TEXTURE_TRAP",  "<reserved>", "<reserved>",
@@ -481,6 +485,175 @@ u32 mga2064w_device::fifo_status_r()
 u32 mga2064w_device::status_r()
 {
 	return m_svga->vsync_status() << 3;
+}
+
+void mga2064w_device::draw_trigger()
+{
+	LOGDRAW("\tstart trigger\n");
+	const u8 opcod = m_dwgreg.dwgctl & 0xf;
+	const u8 bop = (m_dwgreg.dwgctl >> 16) & 0xf;
+	const u8 bltmod = (m_dwgreg.dwgctl >> 25) & 0xf;
+
+	if (bop != 0xc)
+		return;
+
+	const s32 ystart = m_dwgreg.ydst;
+	const s32 yend = ystart + m_dwgreg.len;
+	const s32 xstart = m_dwgreg.fxleft;
+	const s32 xend = m_dwgreg.fxright;
+
+	if (m_dwgreg.state != DRAW_IDLE)
+		LOGWARN("\t(in-flight! %d)\n", m_dwgreg.state);
+
+	m_dwgreg.state = DRAW_IDLE;
+
+	switch(opcod)
+	{
+		// TRAP / RECT
+		case 4:
+		{
+			if (BIT(m_dwgreg.dwgctl, 7))
+			{
+				LOGWARN("\tTRAP in linear mode (unemulated)\n");
+				return;
+			}
+			for (int y = ystart; y < yend; y++)
+			{
+				for (int x = xstart; x < xend; x++)
+				{
+					m_svga->write_memory(x + (y * m_dwgreg.pitch), m_dwgreg.fcol & 0xff);
+				}
+			}
+			break;
+		}
+		// BITBLT
+		case 8:
+		{
+			if (BIT(m_dwgreg.dwgctl, 7))
+			{
+				// BMONOLEF only for now
+				if (bltmod)
+					return;
+
+				const u32 source_base = m_dwgreg.ar[3] & 0xffffff;
+				const s32 source_pitch = util::sext(m_dwgreg.ar[5], 17);
+				int src_x = 0;
+				int src_y = 0;
+				for (int y = ystart; y < yend; y ++, src_y ++)
+				{
+					for (int x = xstart; x < xend; x+=8, src_x ++)
+					{
+						const u32 char_position = (src_x + src_y * source_pitch);
+						const u8 char_data = m_svga->read_memory(source_base + char_position);
+						for (int xi = 0; xi < 8; xi ++)
+						{
+							const u8 pen_dot = (char_data >> (7-xi)) & 1;
+
+							u8 color_pen = (pen_dot ? m_dwgreg.fcol : m_dwgreg.bcol) & 0xff;
+							m_svga->write_memory((x + xi) + m_dwgreg.pitch * y, color_pen);
+						}
+
+					}
+				}
+			}
+			else
+			{
+				const u32 source_base = m_dwgreg.ar[3] & 0xffffff;
+				const s32 source_pitch = util::sext(m_dwgreg.ar[5], 17);
+				int src_x = 0;
+				int src_y = 0;
+				for (int y = ystart; y < yend; y++, src_y++)
+				{
+					for (int x = xstart; x < xend; x++, src_x++)
+					{
+						u8 color_pen = m_svga->read_memory(source_base + (source_pitch * src_y) + src_x);
+						m_svga->write_memory(x + y * m_dwgreg.pitch, color_pen);
+					}
+				}
+			}
+			break;
+		}
+		// ILOAD
+		case 9:
+			m_dwgreg.state = DRAW_ILOAD;
+			m_dwgreg.current_x = 0;
+			m_dwgreg.current_y = 0;
+			break;
+		// IDUMP
+		case 0xa:
+			m_dwgreg.state = DRAW_IDUMP;
+			m_dwgreg.current_x = 0;
+			m_dwgreg.current_y = 0;
+			break;
+	}
+
+	LOGDRAW("\n");
+}
+
+u32 mga2064w_device::dmawin_idump_r(offs_t offset, u32 mem_mask)
+{
+	u32 res = 0;
+	LOGPIXELXFER("dmawin_idump_r [%08x] & %08x %d %d (state %d)\n", offset * 4, mem_mask, m_dwgreg.current_x, m_dwgreg.current_y, m_dwgreg.state);
+	switch(m_dwgreg.state)
+	{
+		case DRAW_IDUMP:
+		{
+			const u32 y_base = m_dwgreg.pitch * (m_dwgreg.current_y + m_dwgreg.ydst);
+			const u32 x_base = m_dwgreg.current_x + m_dwgreg.fxleft;
+
+			for (int xi = 0; xi < 4; xi ++)
+				res |= m_svga->read_memory((y_base) + (x_base + xi)) << (xi * 8);
+			m_dwgreg.current_x += 4;
+			if (m_dwgreg.current_x > m_dwgreg.ar[0])
+			{
+				m_dwgreg.current_x = 0;
+				m_dwgreg.current_y ++;
+				if (m_dwgreg.current_y > m_dwgreg.len)
+					m_dwgreg.state = DRAW_IDLE;
+			}
+
+			return res;
+		}
+		default:
+			LOGWARN("Unemulated IDUMP read state [%08x] mem_mask %08x\n", offset * 4, mem_mask);
+			res = 0xdeadbeef;
+			break;
+	}
+	return res;
+}
+
+void mga2064w_device::dmawin_iload_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// assume dword accesses unless something dull proves otherwise
+	LOGPIXELXFER("dmawin_iload_w [%08x] %08x & %08x %d %d (state %d)\n", offset * 4, data, mem_mask, m_dwgreg.current_x, m_dwgreg.current_y, m_dwgreg.state);
+	switch(m_dwgreg.state)
+	{
+		case DRAW_ILOAD:
+		{
+			const u32 y_base = m_dwgreg.pitch * (m_dwgreg.current_y + m_dwgreg.ydst);
+			const u32 x_base = m_dwgreg.current_x + m_dwgreg.fxleft;
+
+			for (int xi = 0; xi < 4; xi++)
+			{
+				u8 color_pen = (data >> (8 * xi)) & 0xff;
+				m_svga->write_memory((y_base) + (x_base + xi), color_pen);
+			}
+			m_dwgreg.current_x += 4;
+			if (m_dwgreg.current_x > m_dwgreg.ar[0])
+			{
+				m_dwgreg.current_x = 0;
+				m_dwgreg.current_y ++;
+				// Note: this is unnecessary, really changes with OPMODE
+				if (m_dwgreg.current_y > m_dwgreg.len)
+					m_dwgreg.state = DRAW_IDLE;
+			}
+
+			break;
+		}
+		default:
+			LOGWARN("Unemulated ILOAD write state [%08x] %08x & %08x\n", offset * 4, data, mem_mask);
+			break;
+	}
 }
 
 // TODO: this should really be a subclass of VGA

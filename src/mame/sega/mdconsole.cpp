@@ -12,7 +12,7 @@
 
 #include "softlist.h"
 
-#include "formats/imageutl.h"
+#include "multibyte.h"
 
 
 /*************************************
@@ -410,18 +410,18 @@ DEVICE_IMAGE_LOAD_MEMBER( md_cons_state::_32x_cart )
 	}
 
 	// Copy the cart image in the locations the driver expects
-	// Notice that, by using pick_integer, we are sure the code works on both LE and BE machines
+	// Notice that, by using get_uXXbe, we are sure the code works on both LE and BE machines
 	ROM16 = (uint16_t *) memregion("gamecart")->base();
 	for (int i = 0; i < length; i += 2)
-		ROM16[i / 2] = pick_integer_be(&temp_copy[0], i, 2);
+		ROM16[i / 2] = get_u16be(&temp_copy[i]);
 
 	ROM32 = (uint32_t *) memregion("gamecart_sh2")->base();
 	for (int i = 0; i < length; i += 4)
-		ROM32[i / 4] = pick_integer_be(&temp_copy[0], i, 4);
+		ROM32[i / 4] = get_u32be(&temp_copy[i]);
 
 	ROM16 = (uint16_t *) memregion("maincpu")->base();
 	for (int i = 0x00; i < length; i += 2)
-		ROM16[i / 2] = pick_integer_be(&temp_copy[0], i, 2);
+		ROM16[i / 2] = get_u16be(&temp_copy[i]);
 
 	return std::make_pair(std::error_condition(), std::string());
 }

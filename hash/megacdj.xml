@@ -5452,7 +5452,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Silpheed (Japan) (Demo) (Fixed Dump) (Track 1).bin" size="369174624" crc="6b59f551" />
 		<rom name="Silpheed (Japan) (Demo) (Fixed Dump) (Track 2).bin" size="1058400" crc="648c227c" />
 		-->
-		<description>Silpheed Hibaihin (Japan) (Fixed)</description>
+		<description>Silpheed Hibaihin (Japan) (fixed)</description>
 		<year>1993</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="ST-45054"/>
@@ -5633,7 +5633,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 34).bin" size="5738880" crc="92ee9a3c" />
 		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 35).bin" size="3154032" crc="b70def8c" />
 		-->
-		<description>WonderMega Collection - Game Garden (Alt)</description>
+		<description>WonderMega Collection - Game Garden (alt)</description>
 		<year>1992</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="CDS-135"/>

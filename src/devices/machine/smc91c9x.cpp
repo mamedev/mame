@@ -10,8 +10,11 @@
 
 #include "emu.h"
 #include "smc91c9x.h"
-#include <sstream>
+
+#include "multibyte.h"
+
 #include <iomanip>
+#include <sstream>
 
 /***************************************************************************
     DEBUGGING
@@ -972,7 +975,12 @@ void smc91c9x_device::write(offs_t offset, u16 data, u16 mem_mask)
 			if ( ACCESSING_BITS_8_15 )
 			{
 				set_promisc(m_reg[B0_RCR] & PRMS);
-				set_mac((char *)&m_reg[B1_IA0_1]);
+
+				u8 mac[6];
+				put_u16le(&mac[0], m_reg[B1_IA0_1]);
+				put_u16le(&mac[2], m_reg[B1_IA2_3]);
+				put_u16le(&mac[4], m_reg[B1_IA4_5]);
+				set_mac(mac);
 			}
 			break;
 

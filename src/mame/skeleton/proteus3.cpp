@@ -415,7 +415,7 @@ void proteus3_state::proteus3(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Devices */
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(proteus3_state::video_w));
 	m_pia->ca2_handler().set(FUNC(proteus3_state::ca2_w));
 	m_pia->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);

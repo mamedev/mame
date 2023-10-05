@@ -3,6 +3,7 @@
 #include "ipf_dsk.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include <cstring>
 
@@ -54,11 +55,6 @@ bool ipf_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return dec.parse(data, image);
 }
 
-uint32_t ipf_format::ipf_decode::r32(const uint8_t *p)
-{
-	return (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
-}
-
 
 uint32_t ipf_format::ipf_decode::rb(const uint8_t *&p, int count)
 {
@@ -97,24 +93,24 @@ bool ipf_format::ipf_decode::parse(std::vector<uint8_t> &data, floppy_image *ima
 
 bool ipf_format::ipf_decode::parse_info(const uint8_t *info)
 {
-	type = r32(info+12);
+	type = get_u32be(info+12);
 	if(type != 1)
 		return false;
-	encoder_type = r32(info+16); // 1 for CAPS, 2 for SPS
-	encoder_revision = r32(info+20); // 1 always
-	release = r32(info+24);
-	revision = r32(info+28);
-	origin = r32(info+32); // Original source reference
-	min_cylinder = r32(info+36);
-	max_cylinder = r32(info+40);
-	min_head = r32(info+44);
-	max_head = r32(info+48);
-	credit_day = r32(info+52);  // year*1e4 + month*1e2 + day
-	credit_time = r32(info+56); // hour*1e7 + min*1e5 + sec*1e3 + msec
+	encoder_type = get_u32be(info+16); // 1 for CAPS, 2 for SPS
+	encoder_revision = get_u32be(info+20); // 1 always
+	release = get_u32be(info+24);
+	revision = get_u32be(info+28);
+	origin = get_u32be(info+32); // Original source reference
+	min_cylinder = get_u32be(info+36);
+	max_cylinder = get_u32be(info+40);
+	min_head = get_u32be(info+44);
+	max_head = get_u32be(info+48);
+	credit_day = get_u32be(info+52);  // year*1e4 + month*1e2 + day
+	credit_time = get_u32be(info+56); // hour*1e7 + min*1e5 + sec*1e3 + msec
 	for(int i=0; i<4; i++)
-		platform[i] = r32(info+60+4*i);
+		platform[i] = get_u32be(info+60+4*i);
 	for(int i=0; i<5; i++)
-		extra[i] = r32(info+76+4*i);
+		extra[i] = get_u32be(info+76+4*i);
 	return true;
 }
 
@@ -132,50 +128,50 @@ ipf_format::ipf_decode::track_info *ipf_format::ipf_decode::get_index(uint32_t i
 
 bool ipf_format::ipf_decode::parse_imge(const uint8_t *imge)
 {
-	track_info *t = get_index(r32(imge+64));
+	track_info *t = get_index(get_u32be(imge+64));
 	if(!t)
 		return false;
 
 	t->info_set = true;
 
-	t->cylinder = r32(imge+12);
+	t->cylinder = get_u32be(imge+12);
 	if(t->cylinder < min_cylinder || t->cylinder > max_cylinder)
 		return false;
 
-	t->head = r32(imge+16);
+	t->head = get_u32be(imge+16);
 	if(t->head < min_head || t->head > max_head)
 		return false;
 
-	t->type = r32(imge+20);
-	t->sigtype = r32(imge+24); // 1 for 2us cells, no other value valid
-	t->size_bytes = r32(imge+28);
-	t->index_bytes = r32(imge+32);
-	t->index_cells = r32(imge+36);
-	t->datasize_cells = r32(imge+40);
-	t->gapsize_cells = r32(imge+44);
-	t->size_cells = r32(imge+48);
-	t->block_count = r32(imge+52);
-	t->process = r32(imge+56); // encoder process, always 0
-	t->weak_bits = r32(imge+60);
-	t->reserved[0] = r32(imge+68);
-	t->reserved[1] = r32(imge+72);
-	t->reserved[2] = r32(imge+76);
+	t->type = get_u32be(imge+20);
+	t->sigtype = get_u32be(imge+24); // 1 for 2us cells, no other value valid
+	t->size_bytes = get_u32be(imge+28);
+	t->index_bytes = get_u32be(imge+32);
+	t->index_cells = get_u32be(imge+36);
+	t->datasize_cells = get_u32be(imge+40);
+	t->gapsize_cells = get_u32be(imge+44);
+	t->size_cells = get_u32be(imge+48);
+	t->block_count = get_u32be(imge+52);
+	t->process = get_u32be(imge+56); // encoder process, always 0
+	t->weak_bits = get_u32be(imge+60);
+	t->reserved[0] = get_u32be(imge+68);
+	t->reserved[1] = get_u32be(imge+72);
+	t->reserved[2] = get_u32be(imge+76);
 
 	return true;
 }
 
 bool ipf_format::ipf_decode::parse_data(const uint8_t *data, uint32_t &pos, uint32_t max_extra_size)
 {
-	track_info *t = get_index(r32(data+24));
+	track_info *t = get_index(get_u32be(data+24));
 	if(!t)
 		return false;
 
-	t->data_size_bits = r32(data+16);
+	t->data_size_bits = get_u32be(data+16);
 	t->data = data+28;
-	t->data_size = r32(data+12);
+	t->data_size = get_u32be(data+12);
 	if(t->data_size > max_extra_size)
 		return false;
-	if(crc32r(t->data, t->data_size) != r32(data+20))
+	if(crc32r(t->data, t->data_size) != get_u32be(data+20))
 		return false;
 	pos += t->data_size;
 	return true;
@@ -186,10 +182,10 @@ bool ipf_format::ipf_decode::scan_one_tag(std::vector<uint8_t> &data, uint32_t &
 	if(data.size()-pos < 12)
 		return false;
 	tag = &data[pos];
-	tsize = r32(tag+4);
+	tsize = get_u32be(tag+4);
 	if(data.size()-pos < tsize)
 		return false;
-	uint32_t crc = r32(tag+8);
+	uint32_t crc = get_u32be(tag+8);
 	tag[8] = tag[9] = tag[10] = tag[11] = 0;
 	if(crc32r(tag, tsize) != crc)
 		return false;
@@ -208,7 +204,7 @@ bool ipf_format::ipf_decode::scan_all_tags(std::vector<uint8_t> &data)
 		if(!scan_one_tag(data, pos, tag, tsize))
 			return false;
 
-		switch(r32(tag)) {
+		switch(get_u32be(tag)) {
 		case 0x43415053: // CAPS
 			if(tsize != 12)
 				return false;
@@ -361,7 +357,7 @@ bool ipf_format::ipf_decode::generate_timings(track_info *t, std::vector<uint32_
 		break;
 
 	case 9: {
-		uint32_t mask = r32(t->data + 32*t->block_count + 12);
+		uint32_t mask = get_u32be(t->data + 32*t->block_count + 12);
 		for(uint32_t i=1; i<t->block_count; i++)
 			timing_set(track, data_pos[i], gap_pos[i], mask & (1 << (i-1)) ? 1900 : 2100);
 		break;
@@ -666,8 +662,8 @@ bool ipf_format::ipf_decode::generate_block(track_info *t, uint32_t idx, uint32_
 	const uint8_t *data = t->data;
 	const uint8_t *data_end = t->data + t->data_size;
 	const uint8_t *thead = data + 32*idx;
-	uint32_t data_cells = r32(thead);
-	uint32_t gap_cells = r32(thead+4);
+	uint32_t data_cells = get_u32be(thead);
+	uint32_t gap_cells = get_u32be(thead+4);
 
 	if(gap_cells < 8)
 		gap_cells = 0;
@@ -684,9 +680,9 @@ bool ipf_format::ipf_decode::generate_block(track_info *t, uint32_t idx, uint32_
 	pos = gpos + gap_cells;
 	if(pos > t->size_cells)
 		return false;
-	if(!generate_block_data(data + r32(thead+28), data_end, track.begin()+dpos, track.begin()+gpos, context))
+	if(!generate_block_data(data + get_u32be(thead+28), data_end, track.begin()+dpos, track.begin()+gpos, context))
 		return false;
-	if(!generate_block_gap(r32(thead+20), gap_cells, r32(thead+24), spos, ipos > gpos ? ipos-gpos : 0, data + r32(thead+8), data_end, track.begin()+gpos, context))
+	if(!generate_block_gap(get_u32be(thead+20), gap_cells, get_u32be(thead+24), spos, ipos > gpos ? ipos-gpos : 0, data + get_u32be(thead+8), data_end, track.begin()+gpos, context))
 		return false;
 	spos += gpos;
 
@@ -698,8 +694,8 @@ uint32_t ipf_format::ipf_decode::block_compute_real_size(track_info *t)
 	uint32_t size = 0;
 	const uint8_t *thead = t->data;
 	for(unsigned int i=0; i != t->block_count; i++) {
-		uint32_t data_cells = r32(thead);
-		uint32_t gap_cells = r32(thead+4);
+		uint32_t data_cells = get_u32be(thead);
+		uint32_t gap_cells = get_u32be(thead+4);
 		if(gap_cells < 8)
 			gap_cells = 0;
 
