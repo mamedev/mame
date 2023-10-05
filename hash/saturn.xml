@@ -34347,9 +34347,10 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Saturn Power N.1 EUR [610-6576] - Core Demo Disc EUR [790-0002-50]... -->
 	<software name="satpowr1" supported="no">
-		<description>Saturn Power No. 1 (Europe) ~ Core Demo Disc (Europe)</description>
+		<description>Saturn Power No. 1 (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega?</publisher>
+		<info name="alt_title" value="Core Demo Disc"/>
 		<info name="serial" value="610-6576, 790-0002-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
