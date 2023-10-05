@@ -322,7 +322,6 @@ void pic16c5x_device::calc_add_flags(u8 augend)
 		SET(STATUS, DC_FLAG);
 	else
 		CLR(STATUS, DC_FLAG);
-
 }
 
 void pic16c5x_device::calc_sub_flags(u8 minuend)

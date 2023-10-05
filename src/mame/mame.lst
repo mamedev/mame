@@ -19272,6 +19272,7 @@ modenab                         // 1992 Mephisto Modena
 
 @source:hegenerglaser/modular.cpp
 alm16                           // 1988 Mephisto Almeria 16 Bit
+alm16a                          // 1988 Mephisto Almeria 16 Bit
 alm32                           // 1988 Mephisto Almeria 32 Bit
 port16                          // 1989 Mephisto Portorose 16 Bit
 port32                          // 1989 Mephisto Portorose 32 Bit

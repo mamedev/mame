@@ -43,7 +43,7 @@ Undocumented buttons:
 - holding CLEAR on boot will clear the battery backed RAM
 
 TODO:
-- match I/S= diag speed test with real hardware (good test for proper waitstates)
+- match I/S= diag speed test with real hardware (good test for proper waitstates?)
 - gen32 waitstates emulation is preliminary (without it, sound pitch is way too high
   and lcd write speed too fast). Real gen32 sound is a bit lower pitched than MAME.
 
@@ -505,8 +505,14 @@ ROM_END
 
 ROM_START( alm16 ) // U013 65CE 2FCE
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("almeria_16bit_v013_even", 0x00000, 0x10000, CRC(ee5b6ec4) SHA1(30920c1b9e16ffae576da5afa0b56da59ada3dbb) )
-	ROM_LOAD16_BYTE("almeria_16bit_v013_odd",  0x00001, 0x10000, CRC(d0be4ee4) SHA1(d36c074802d2c9099cd44e75f9de3fc7d1fd9908) )
+	ROM_LOAD16_BYTE("almeria_16bit_v0.13_even", 0x00000, 0x10000, CRC(ee5b6ec4) SHA1(30920c1b9e16ffae576da5afa0b56da59ada3dbb) ) // AT26C512
+	ROM_LOAD16_BYTE("almeria_16bit_v0.13_odd",  0x00001, 0x10000, CRC(d0be4ee4) SHA1(d36c074802d2c9099cd44e75f9de3fc7d1fd9908) ) // "
+ROM_END
+
+ROM_START( alm16a ) // U012 737C 2FCE
+	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("almeria_16bit_v0.121_even", 0x00000, 0x10000, CRC(3ab8fd3b) SHA1(0147f2f7aa57a5afab656d05be77bda2d35deb92) ) // TMS27C512-2JL
+	ROM_LOAD16_BYTE("almeria_16bit_v0.121_odd",  0x00001, 0x10000, CRC(436c1d85) SHA1(b141789c2be0a22bab58532d7fb8e57131811547) ) // "
 ROM_END
 
 ROM_START( port32 ) // V104 3F63 1CD7
@@ -547,8 +553,8 @@ ROM_END
 
 ROM_START( lyon16 ) // V207 EC82 5805
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("lyon_16bit_even_v207", 0x00000, 0x10000, CRC(497bd41a) SHA1(3ffefeeac694f49997c10d248ec6a7aa932898a4) )
-	ROM_LOAD16_BYTE("lyon_16bit_odd_v207",  0x00001, 0x10000, CRC(f9de3f54) SHA1(4060e29566d2f40122ccde3c1f84c94a9c1ed54f) )
+	ROM_LOAD16_BYTE("lyon_16bit_even_v_207", 0x00000, 0x10000, CRC(497bd41a) SHA1(3ffefeeac694f49997c10d248ec6a7aa932898a4) )
+	ROM_LOAD16_BYTE("lyon_16bit_odd_v_207",  0x00001, 0x10000, CRC(f9de3f54) SHA1(4060e29566d2f40122ccde3c1f84c94a9c1ed54f) )
 
 	BAVARIA_BOARD_ROM()
 ROM_END
@@ -562,8 +568,8 @@ ROM_END
 
 ROM_START( van16 ) // V309 C8F3 18D3
 	ROM_REGION16_BE( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("vancouver_16_even_v309", 0x00000, 0x20000, CRC(e87602d5) SHA1(90cb2767b4ae9e1b265951eb2569b9956b9f7f44) )
-	ROM_LOAD16_BYTE("vancouver_16_odd_v309",  0x00001, 0x20000, CRC(585f3bdd) SHA1(90bb94a12d3153a91e3760020e1ea2a9eaa7ec0a) )
+	ROM_LOAD16_BYTE("vancouver_16_even_v_309", 0x00000, 0x20000, CRC(e87602d5) SHA1(90cb2767b4ae9e1b265951eb2569b9956b9f7f44) )
+	ROM_LOAD16_BYTE("vancouver_16_odd_v_309",  0x00001, 0x20000, CRC(585f3bdd) SHA1(90bb94a12d3153a91e3760020e1ea2a9eaa7ec0a) )
 
 	BAVARIA_BOARD_ROM()
 ROM_END
@@ -614,7 +620,8 @@ ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE INPUT   CLASS           INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1988, alm32,   0,      0,      alm32,  alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, alm16,   alm32,  0,      alm16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, alm16,   alm32,  0,      alm16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit (v0.13)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, alm16a,  alm32,  0,      alm16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit (v0.121)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 SYST( 1989, port32,  0,      0,      port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.04)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1989, port32a, port32, 0,      port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
