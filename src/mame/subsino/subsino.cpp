@@ -290,6 +290,7 @@ public:
 	void init_victor5();
 	void init_tisuba();
 	void init_tisubb();
+	void init_newhunter();
 	void init_sharkpye();
 	void init_tisub();
 	void init_mtrainnv();
@@ -641,10 +642,10 @@ void subsino_state::out_a_w(uint8_t data)
 	for (int i = 0; i < 8; i++) // Lamps 8 - 15
 		m_lamps[i + 8] = BIT(data, i);
 
-	machine().bookkeeping().coin_counter_w(0, data & 0x01 );    /* coin / keyin */
-	machine().bookkeeping().coin_counter_w(1, data & 0x02 );    /* keyin / coin */
-	machine().bookkeeping().coin_counter_w(2, data & 0x10 );    /* keyout */
-	machine().bookkeeping().coin_counter_w(3, data & 0x20 );    /* payout */
+	machine().bookkeeping().coin_counter_w(0, data & 0x01 );    // coin / keyin
+	machine().bookkeeping().coin_counter_w(1, data & 0x02 );    // keyin / coin
+	machine().bookkeeping().coin_counter_w(2, data & 0x10 );    // keyout
+	machine().bookkeeping().coin_counter_w(3, data & 0x20 );    // payout
 
 	m_hopper->motor_w(BIT(data, 5));   // hopper motor
 
@@ -930,7 +931,7 @@ void subsino_state::victor5_map(address_map &map)
 
 uint8_t subsino_state::hwcheck_r()
 {
-	/* Wants this at POST otherwise an "Hardware Error" occurs. */
+	// Wants this at POST otherwise an "Hardware Error" occurs.
 	return 0x55;
 }
 
@@ -990,7 +991,7 @@ void subsino_state::tisub_map(address_map &map)
 	map(0x09000, 0x09002).r("ppi1", FUNC(i8255_device::read));
 	map(0x09004, 0x09006).r("ppi2", FUNC(i8255_device::read));
 
-	/* 0x09008: is marked as OUTPUT C in the test mode. */
+	// 0x09008: is marked as OUTPUT C in the test mode.
 	map(0x09008, 0x09008).w(FUNC(subsino_state::out_c_w));
 	map(0x09009, 0x09009).w(FUNC(subsino_state::out_b_w));
 	map(0x0900a, 0x0900a).w(FUNC(subsino_state::out_a_w));
@@ -2761,8 +2762,8 @@ GFXDECODE_END
 
 void subsino_state::victor21(machine_config &config)
 {
-	/* basic machine hardware */
-	HD647180X(config, m_maincpu, XTAL(12'000'000));   /* Unknown clock */
+	// basic machine hardware
+	HD647180X(config, m_maincpu, XTAL(12'000'000));   // Unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::victor21_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 
@@ -2775,7 +2776,7 @@ void subsino_state::victor21(machine_config &config)
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -2790,34 +2791,34 @@ void subsino_state::victor21(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, "oki", XTAL(4'433'619) / 4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  /* Clock frequency & pin 7 not verified */
+	OKIM6295(config, "oki", XTAL(4'433'619) / 4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  // Clock frequency & pin 7 not verified
 }
 
-/* same but with an additional protection. */
+// same but with an additional protection.
 void subsino_state::victor5(machine_config &config)
 {
 	victor21(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::victor5_map);
 }
 
 
 void subsino_state::crsbingo(machine_config &config)
 {
-	/* basic machine hardware */
-	HD647180X(config, m_maincpu, XTAL(12'000'000));   /* Unknown CPU and clock */
+	// basic machine hardware
+	HD647180X(config, m_maincpu, XTAL(12'000'000));   // Unknown CPU and clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::crsbingo_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -2832,17 +2833,17 @@ void subsino_state::crsbingo(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);   /* Unknown clock */
+	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);   // Unknown clock
 }
 
 
 void subsino_state::srider(machine_config &config)
 {
-	/* basic machine hardware */
-	HD647180X(config, m_maincpu, XTAL(12'000'000));   /* Unknown clock */
+	// basic machine hardware
+	HD647180X(config, m_maincpu, XTAL(12'000'000));   // Unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::srider_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 
@@ -2858,7 +2859,7 @@ void subsino_state::srider(machine_config &config)
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -2873,19 +2874,19 @@ void subsino_state::srider(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, "oki", XTAL(4'433'619) / 4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  /* Clock frequency & pin 7 not verified */
+	OKIM6295(config, "oki", XTAL(4'433'619) / 4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  // Clock frequency & pin 7 not verified
 }
 
 void subsino_state::sharkpy(machine_config &config)
 {
 	srider(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::sharkpy_map);
 }
 
@@ -2904,8 +2905,8 @@ void subsino_state::dinofmly(machine_config &config)
 
 void subsino_state::tisub(machine_config &config)
 {
-	/* basic machine hardware */
-	HD647180X(config, m_maincpu, XTAL(12'000'000));   /* Unknown CPU and clock */
+	// basic machine hardware
+	HD647180X(config, m_maincpu, XTAL(12'000'000));   // Unknown CPU and clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::tisub_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 
@@ -2921,7 +2922,7 @@ void subsino_state::tisub(machine_config &config)
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -2936,16 +2937,16 @@ void subsino_state::tisub(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state, reels)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);   /* Unknown clock */
+	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);   // Unknown clock
 }
 
 void subsino_state::stbsub(machine_config &config)
 {
-	/* basic machine hardware */
-	HD647180X(config, m_maincpu, XTAL(12'000'000));   /* Unknown clock */
+	// basic machine hardware
+	HD647180X(config, m_maincpu, XTAL(12'000'000));   // Unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::stbsub_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 
@@ -2962,7 +2963,7 @@ void subsino_state::stbsub(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -2981,7 +2982,7 @@ void subsino_state::stbsub(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,stbsub)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -2991,7 +2992,7 @@ void subsino_state::mtrainnv(machine_config &config)
 {
 	stbsub(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::mtrainnv_map);
 }
 
@@ -3216,7 +3217,7 @@ ROM_END
 ROM_START( tisubb )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "ti alpha rom_1 ver3.0n.u6", 0x10000, 0x4000,  CRC(7f0756cc) SHA1(e383b6abea136b79acabbffd9d247cc51c9aaa85) )
-	ROM_CONTINUE(0x0000,0xc000)
+	ROM_CONTINUE(0x0000, 0xc000)
 	ROM_COPY( "maincpu", 0x09000, 0x14000, 0x1000)
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
@@ -3236,6 +3237,49 @@ ROM_START( tisubb )
 	ROM_LOAD( "n82s129n.u40", 0x100, 0x100, BAD_DUMP CRC(b4bd872c) SHA1(c0f9fe68186636d6d6bc6f81415459631cf38edd) )
 	ROM_LOAD( "n82s129n.u41", 0x200, 0x100, BAD_DUMP CRC(db99f6da) SHA1(d281a2fa06f1890ef0b1c4d099e6828827db14fd) )
 ROM_END
+
+ROM_START( newhunter )
+	// The MCU had its surface scratched out, but almost sure it's an HD647180X0CP8L 
+	ROM_REGION( 0x04000, "mcu", 0 )
+	ROM_LOAD( "hd647180.bin", 0x00000, 0x04000, NO_DUMP ) 
+
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "27c512.u18",   0x10000, 0x04000, CRC(d0d863a7) SHA1(0ee5ee04c3da83320bea8130be30f7fe6446b32f) )
+	ROM_CONTINUE(             0x00000, 0x0c000 )
+	ROM_COPY( "maincpu",      0x09000, 0x14000, 0x1000)
+
+	ROM_REGION( 0x40000, "tilemap", 0 )
+	ROM_LOAD( "d27c010a.u16", 0x00000, 0x08000, CRC(c1daa20f) SHA1(c46278a00b6cbbd79c4184db910bf2770d77d92f) )
+	ROM_CONTINUE(             0x10000, 0x08000 )
+	ROM_CONTINUE(             0x08000, 0x08000 )
+	ROM_CONTINUE(             0x18000, 0x08000 )
+	ROM_LOAD( "27c010.u17",   0x20000, 0x08000, CRC(bfd2bfb5) SHA1(4ee11e2a86f36744eff347df4e3801c731406147) )
+	ROM_CONTINUE(             0x30000, 0x08000 )
+	ROM_CONTINUE(             0x28000, 0x08000 )
+	ROM_CONTINUE(             0x38000, 0x08000 )
+
+	ROM_REGION( 0x08000, "reels", 0 )
+	ROM_LOAD( "27c512.u14",   0x00000, 0x04000, CRC(e7632aaa) SHA1(e502554f84130f5a8cd86007f20f958cd303c0eb) )
+	ROM_IGNORE(0xc000)
+	ROM_LOAD( "27c512.u15",   0x04000, 0x04000, CRC(44933beb) SHA1(a19ed785cc3b38c2a2a6a08e9d639361ee118343) )
+	ROM_IGNORE(0xc000)
+
+	ROM_REGION( 0x00300, "proms", 0 )
+	ROM_LOAD( "hu-1.bin",     0x00000, 0x00100, CRC(971843e5) SHA1(4cb5fc1085503dae2f2f02eb49cca051ac84b890) )
+	ROM_LOAD( "hu-2.bin",     0x00100, 0x00100, CRC(b4bd872c) SHA1(c0f9fe68186636d6d6bc6f81415459631cf38edd) )
+	ROM_LOAD( "hu-3.bin",     0x00200, 0x00100, CRC(db99f6da) SHA1(d281a2fa06f1890ef0b1c4d099e6828827db14fd) )
+
+	ROM_REGION( 0x00100, "xtraprom", 0 )
+	ROM_LOAD( "82s129.u34",   0x00000, 0x00100, NO_DUMP ) // There's an (undumped) additional PROM near the MCU
+
+	ROM_REGION( 0x00045c, "plds", 0 )
+	ROM_LOAD( "ht-1.bin",     0x00000, 0x00117, CRC(fdb4cd61) SHA1(f510077b707864b2536942db6157118ca15922de) )
+	ROM_LOAD( "ht-2.bin",     0x00117, 0x00117, CRC(0cf55cec) SHA1(845395ca0587627331b9ac48777f7cb6b54b9401) )
+	ROM_LOAD( "ht-3.bin",     0x0022e, 0x00117, CRC(8272668f) SHA1(9037f0d9c7625d05d2087e6f2d159dece934a945) )
+	ROM_LOAD( "ht-4.bin",     0x00345, 0x00117, CRC(f4f78925) SHA1(738281c05c0f51c0edcf65bacc18ebc87c2408c1) )
+ROM_END
+
+
 
 /***************************************************************************
 
@@ -3962,7 +4006,7 @@ void subsino_state::init_tisub()
 	uint8_t *rom = memregion( "maincpu" )->base();
 	subsino_decrypt(rom, victor5_bitswaps, victor5_xors, 0xc000);
 
-	/* this trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region... */
+	// this trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region...
 	rom[0x64c8] = 0x00;
 	rom[0x64c9] = 0x00;
 	rom[0x64ca] = 0x00;
@@ -3976,7 +4020,7 @@ void subsino_state::init_tisuba()
 	uint8_t *rom = memregion( "maincpu" )->base();
 	subsino_decrypt(rom, victor5_bitswaps, victor5_xors, 0xc000);
 
-	/* this trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region... */
+	// this trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region...
 	rom[0x6491] = 0x00;
 	rom[0x6492] = 0x00;
 	rom[0x6493] = 0x00;
@@ -3990,13 +4034,35 @@ void subsino_state::init_tisubb()
 	uint8_t *rom = memregion( "maincpu" )->base();
 	subsino_decrypt(rom, tisubb_bitswaps, tisubb_xors, 0xc000);
 
-	/* this trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region... */
+	// this trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region...
 	rom[0x60da] = 0x00;
 	rom[0x60db] = 0x00;
 	rom[0x60dc] = 0x00;
 	rom[0x60df] = 0x00;
 	rom[0x60e0] = 0x00;
 	rom[0x60e1] = 0x00;
+
+	m_flash_packet = 0;
+	m_flash_packet_start = 0;
+	m_flash_val = 0;
+
+	save_item(NAME(m_flash_packet));
+	save_item(NAME(m_flash_packet_start));
+	save_item(NAME(m_flash_val));
+}
+
+void subsino_state::init_newhunter()
+{
+	uint8_t *rom = memregion( "maincpu" )->base();
+	subsino_decrypt(rom, tisubb_bitswaps, tisubb_xors, 0xc000);
+
+	// This trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region...
+	rom[0x5fe1] = 0x00;
+	rom[0x5fe2] = 0x00;
+	rom[0x5fe3] = 0x00;
+	rom[0x5fe6] = 0x00;
+	rom[0x5fe7] = 0x00;
+	rom[0x5fe8] = 0x00;
 
 	m_flash_packet = 0;
 	m_flash_packet_start = 0;
@@ -4103,6 +4169,7 @@ GAMEL( 1991, victor5a,    victor5, victor5,  victor5,  subsino_state, init_victo
 GAMEL( 1992, tisub,       0,       tisub,    tisub,    subsino_state, init_tisub,       ROT0, "Subsino",         "Treasure Island (Subsino, set 1)",            0,                   layout_tisub    )
 GAMEL( 1992, tisuba,      tisub,   tisub,    tisub,    subsino_state, init_tisuba,      ROT0, "Subsino",         "Treasure Island (Subsino, set 2)",            0,                   layout_tisub    )
 GAMEL( 1992, tisubb,      tisub,   tisub,    tisubb,   subsino_state, init_tisubb,      ROT0, "American Alpha",  "Treasure Island (American Alpha, v3.0N)",     0,                   layout_tisubb   )
+GAMEL( 1989, newhunter,   tisub,   tisub,    tisub,    subsino_state, init_newhunter,   ROT0, "Karam",           "New HUNTer",                                  0,                   layout_tisubb   )
 
 GAMEL( 1991, crsbingo,    0,       crsbingo, crsbingo, subsino_state, init_crsbingo,    ROT0, "Subsino",         "Poker Carnival",                              0,                   layout_crsbingo )
 
