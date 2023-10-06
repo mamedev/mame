@@ -3239,9 +3239,9 @@ ROM_START( tisubb )
 ROM_END
 
 ROM_START( newhunter )
-	// The MCU had its surface scratched out, so we cannot tell for sure if it has internal ROM or not
-	// ROM_REGION( 0x04000, "mcu", 0 )
-	// ROM_LOAD( "hd647180.bin", 0x00000, 0x04000, NO_DUMP ) 
+	// The MCU had its surface scratched out, but almost sure it's an HD647180X0CP8L 
+	ROM_REGION( 0x04000, "mcu", 0 )
+	ROM_LOAD( "hd647180.bin", 0x00000, 0x04000, NO_DUMP ) 
 
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "27c512.u18",   0x10000, 0x04000, CRC(d0d863a7) SHA1(0ee5ee04c3da83320bea8130be30f7fe6446b32f) )
