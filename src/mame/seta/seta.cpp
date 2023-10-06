@@ -9433,7 +9433,7 @@ ROM_START( wiggie )
 	ROM_LOAD( "wiggie.j21", 0x60000, 0x20000, CRC(22f6fa39) SHA1(d3e86e156434153335c5d2ce71417f35097f5ab7) )
 ROM_END
 
-ROM_START( superbar ) // All roms had a "PROMAT" label with no other information. ROM size was silkscreened on the PCB
+ROM_START( superbar ) // All roms had a "PROMAT" label with no other information.  ROM size was silkscreened on the PCB
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "promat_512-1.e19", 0x00000, 0x10000, CRC(cc7f9e87) SHA1(6c63ee5ac1c145a151a972a2b6bcb29036dad02d) )
 	ROM_LOAD16_BYTE( "promat_512-2.e21", 0x00001, 0x10000, CRC(5e8c7231) SHA1(16efbaa871335143490ca897e0573bbbcf16ff16) )
@@ -10278,7 +10278,7 @@ ROM_START( jjsquawkb )
 	ROM_LOAD( "1", 0x000000, 0x100000, CRC(181a55b8) SHA1(6fa404f85bad93cc15e80feb61d19bed84602b82) ) // fe2001005.u69 + fe2001006.u70 from jjsquawk
 ROM_END
 
-ROM_START( jjsquawkb2 ) // PCB was P0-078A, which was a Blandia board converted to JJ Squawkers. No labels on any of the ROMs. Apparently based on jjsquawko set.
+ROM_START( jjsquawkb2 ) // PCB was P0-078A, which was a Blandia board converted to JJ Squawkers. No labels on any of the ROMs.  Apparently based on jjsquawko set.
 	ROM_REGION( 0x200000, "maincpu", 0 )        // 68000 Code
 	ROM_LOAD16_BYTE( "u3.3a", 0x000000, 0x040000, CRC(f94c913b) SHA1(de6e422c514c787897f8f41d7cd98acb0135c763) ) // 99.999619%
 	ROM_CONTINUE   (                0x100000, 0x040000  )
@@ -10632,7 +10632,7 @@ The "LOGO" above means that the actual Sammy logo was printed there.
 These look like final prototype or test roms before production and combining the data into larger MASK roms.
 */
 
-ROM_START( zombraidp ) // Prototype or test board version. Data matches released MASK ROM version
+ROM_START( zombraidp ) // Prototype or test board version.  Data matches released MASK ROM version
 	ROM_REGION( 0x200000, "maincpu", 0 )        // 68000 Code
 	ROM_LOAD16_BYTE( "u3_master_usa_prg_e_l_dd28.u3",     0x000000, 0x080000, CRC(0b34b8f7) SHA1(8c6d7d208ece08695169f2e06806e7e55c595eb2) ) // These 4 ROMs dated 9/28/95
 	ROM_LOAD16_BYTE( "u4_master_usa_prg_o_l_5e2b.u4",     0x000001, 0x080000, CRC(71bfeb1a) SHA1(75747b0c6e655624a5dc2e4fa8f16a6a51bd8769) )
