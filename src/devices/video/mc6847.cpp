@@ -1,4 +1,4 @@
-// license:BSD-3-Clause 
+// license:BSD-3-Clause
 // copyright-holders:Nathan Woods
 /*********************************************************************
 
@@ -76,44 +76,45 @@
 #include "emu.h"
 #include "video/mc6847.h"
 
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define LINES_TOP_BORDER				(25)
-#define LINES_ACTIVE_VIDEO				(192)
-#define LINES_BOTTOM_BORDER				(26)
-#define LINES_VERTICAL_RETRACE			(6)
-#define LINES_UNTIL_RETRACE				(LINES_TOP_BORDER + LINES_ACTIVE_VIDEO + LINES_BOTTOM_BORDER)
-#define LINES_UNTIL_VBLANK				(LINES_UNTIL_RETRACE + LINES_VERTICAL_RETRACE)
-
-#define USE_HORIZONTAL_CLIP				false
-
-#define CLOCKS_HSYNC_PERIOD				(228)
-#define	CLOCKS_FRONT_PORCH_DURATION		(7)
-#define CLOCKS_ACTIVE_VIDEO				(128)
-#define CLOCKS_L_OR_R_BORDER			(29)
-#define CLOCKS_ACTIVE_VIDEO_AND_BORDERS	(CLOCKS_ACTIVE_VIDEO + (2*CLOCKS_L_OR_R_BORDER))
-#define TIMER_HSYNC_OFF_TIME			(CLOCKS_ACTIVE_VIDEO_AND_BORDERS + CLOCKS_FRONT_PORCH_DURATION)
-#define TIMER_HSYNC_ON_TIME				(TIMER_HSYNC_OFF_TIME + 16.5)
-
-// FSYNC occurs just after active video, just before right border
-#define TIMER_FSYNC_TIME				(CLOCKS_ACTIVE_VIDEO + CLOCKS_L_OR_R_BORDER)
-
-// These units are the screen device's bitmap pixels.  Multiplied by 2 because
-// the pixel clock is the mc6847's clock * 2
-#define BMP_L_OR_R_BORDER				(CLOCKS_L_OR_R_BORDER * 2)
-#define BMP_ACTIVE_VIDEO				(CLOCKS_ACTIVE_VIDEO * 2)
-
-
 #define LOG_SCANLINE (1U << 1)
 #define LOG_HSYNC    (1U << 2)
 #define LOG_FSYNC    (1U << 3)
 #define LOG_FLUSH    (1U << 4)
 #define LOG_INPUT    (1U << 5)
 #define LOG_NEXTLINE (1U << 6)
-#define VERBOSE (0)
+#define VERBOSE      (0)
 #include "logmacro.h"
+
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
+
+namespace {
+constexpr int LINES_TOP_BORDER                  = 25;
+constexpr int LINES_ACTIVE_VIDEO                = 192;
+constexpr int LINES_BOTTOM_BORDER               = 26;
+constexpr int LINES_VERTICAL_RETRACE            = 6;
+constexpr int LINES_UNTIL_RETRACE               = LINES_TOP_BORDER + LINES_ACTIVE_VIDEO + LINES_BOTTOM_BORDER;
+constexpr int LINES_UNTIL_VBLANK                = LINES_UNTIL_RETRACE + LINES_VERTICAL_RETRACE;
+
+constexpr bool USE_HORIZONTAL_CLIP              = false;
+
+constexpr int CLOCKS_HSYNC_PERIOD               = 228;
+constexpr int CLOCKS_FRONT_PORCH_DURATION       = 7;
+constexpr int CLOCKS_ACTIVE_VIDEO               = 128;
+constexpr int CLOCKS_L_OR_R_BORDER              = 29;
+constexpr int CLOCKS_ACTIVE_VIDEO_AND_BORDERS   = CLOCKS_ACTIVE_VIDEO + (2*CLOCKS_L_OR_R_BORDER);
+constexpr int TIMER_HSYNC_OFF_TIME              = CLOCKS_ACTIVE_VIDEO_AND_BORDERS + CLOCKS_FRONT_PORCH_DURATION;
+constexpr int TIMER_HSYNC_ON_TIME               = TIMER_HSYNC_OFF_TIME + 16;
+
+// FSYNC occurs just after active video, just before right border
+constexpr int TIMER_FSYNC_TIME                  = CLOCKS_ACTIVE_VIDEO + CLOCKS_L_OR_R_BORDER;
+
+// These units are the screen device's bitmap pixels.  Multiplied by 2 because
+// the pixel clock is the mc6847's clock * 2
+constexpr int BMP_L_OR_R_BORDER                 = CLOCKS_L_OR_R_BORDER * 2;
+constexpr int BMP_ACTIVE_VIDEO                  = CLOCKS_ACTIVE_VIDEO * 2;
+} // anonymous namespace
 
 
 const uint32_t mc6847_base_device::s_palette[mc6847_base_device::PALETTE_LENGTH] =
@@ -433,8 +434,14 @@ inline void mc6847_friend_device::next_scanline()
 		enter_bottom_border();
 	}
 
-	// This helps to confirm synchronization between the screen device and the 6847
-	LOGMASKED(LOG_NEXTLINE, "mc6847_friend_device::next_scanline(): (vpos,hpos)=(%d,%d), m_physical_scanline='%d', m_logical_scanline_zone='%s', m_logical_scanline='%d'\n", (screen().vpos()), (screen().hpos()), m_physical_scanline, (scanline_zone_string((scanline_zone)m_logical_scanline_zone)), m_logical_scanline);
+	LOGMASKED(\
+		LOG_NEXTLINE, \
+		"mc6847_friend_device::next_scanline(): (vpos,hpos)=(%d,%d), m_physical_scanline='%d', m_logical_scanline_zone='%s', m_logical_scanline='%d'\n", \
+		screen().vpos(), \
+		screen().hpos(), \
+		m_physical_scanline, \
+		scanline_zone_string((scanline_zone)m_logical_scanline_zone), \
+		m_logical_scanline);
 }
 
 
@@ -598,13 +605,13 @@ void mc6847_base_device::device_config_complete()
 		// can be used to determine if this 6847 is PAL, and a different set_raw
 		// call can be made if helpful.
 		screen().set_raw(
-			(u32)(clock() * 2),
-			456,										// htotal
-			0,											// hbend
-			BMP_L_OR_R_BORDER * 2 + BMP_ACTIVE_VIDEO,	// hbstart
-			m_tpfs,										// vtotal
-			0,											// vbend
-			LINES_UNTIL_RETRACE);						// vbstart
+			(uint32_t)(clock() * 2),
+			456,                                        // htotal
+			0,                                          // hbend
+			BMP_L_OR_R_BORDER * 2 + BMP_ACTIVE_VIDEO,   // hbstart
+			m_tpfs,                                     // vtotal
+			0,                                          // vbend
+			LINES_UNTIL_RETRACE);                       // vbstart
 	}
 
 	if (!screen().has_screen_update())
@@ -809,7 +816,7 @@ int32_t mc6847_base_device::scanline_position_from_clock(int32_t clocks_since_hs
 	// which uses precise timing measurements to change video modes
 	// multiple times mid-line.  This value seems to minimize video
 	// garbage, but doesn't eliminate it, so there are likely timing
-	// issues elsewhere.
+	// issues elsewhere.  [Dragon Fire listed in coco_cart.xml as drgnfire.]
 	//
 	// Unfortunately, I don't understand why this value isn't
 	// simply 0.  I believe hsync-on appears AFTER the front-porch +
