@@ -41,9 +41,11 @@ private:
 	static const std::array<u32, 4> lfo_shape_offset_saw;
 	static const std::array<u32, 4> lfo_shape_offset_tri;
 
-	std::array<u16, 0x40> m_intreg;
-	std::array<u16, 0x300> m_fpreg;
+	// MEG registers
+	std::array<u16, 0x40>  m_off;
+	std::array<u16, 0xc0>  m_fp;
 
+	// AWM registers
 	std::array<u16, 0x20>  m_lpf_info;
 	std::array<u8,  0x20>  m_lpf_speed;
 	std::array<u8,  0x20>  m_lfo_famod_depth;
@@ -83,6 +85,7 @@ private:
 	u16 m_waverom_val;
 	u8 m_waverom_access;
 	u8 m_state_adr;
+	u8 m_meg_control;
 
 	// Voice control
 
@@ -127,15 +130,20 @@ private:
 	void lfo_pmod_depth_w(offs_t offset, u8 data);
 	u8 lfo_pmod_depth_r(offs_t offset);
 
+	void slot8_w(offs_t offset, u8 data);
+	void slot9_w(offs_t offset, u8 data);
+
 	// Internal state access
 	u8 state_r();
 	void state_adr_w(u8 data);
 
-	// MEG variables
-	void intreg_w(offs_t offset, u8 data);
-	u8 intreg_r(offs_t offset);
-	void fpreg_w(offs_t offset, u8 data);
-	u8 fpreg_r(offs_t offset);
+	// MEG
+	void off_w(offs_t offset, u8 data);
+	u8 off_r(offs_t offset);
+	void fp_w(offs_t offset, u8 data);
+	u8 fp_r(offs_t offset);
+	void meg_control_w(u8 data);
+	u8 meg_control_r();
 
 	// Control registers
 	void keyon(int chan);
@@ -149,9 +157,8 @@ private:
 	u8 snd_r(offs_t offset);
 	void snd_w(offs_t offset, u8 data);
 
-	inline auto &rany(address_map &map, int chan, int idx) {
-		int slot = (chan << 6) | idx;
-		return map(slot, slot);
+	inline auto &rctrl(address_map &map, int idx) {
+		return map(idx, idx);
 	}
 
 	inline auto &rchan(address_map &map, int idx) {
@@ -164,8 +171,8 @@ private:
 	static bool fpstep(s32 &value, s32 limit, s32 step);
 	static s32 fpadd(s32 value, s32 step);
 	static s32 fpsub(s32 value, s32 step);
-	static s16 fpapply(s32 value, s16 sample);
-	static s16 lpffpapply(s32 value, s16 sample);
+	static s32 fpapply(s32 value, s32 sample);
+	static s32 lpffpapply(s32 value, s32 sample);
 };
 
 DECLARE_DEVICE_TYPE(SWP00, swp00_device)
