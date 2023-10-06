@@ -3247,7 +3247,7 @@ msgstr "Üretici\t%1$s\n"
 #: src/frontend/mame/ui/selmenu.cpp:2944
 #, c-format
 msgid "System is Clone of\t%1$s\n"
-msgstr " Sistem \t%1$s'in klonudur\n"
+msgstr "Sistem \t%1$s'in klonudur\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2949
 msgid "System is Parent\t\n"
@@ -5290,52 +5290,52 @@ msgstr "Işık Silahı Y 10"
 #: src/emu/inpttype.ipp:840
 msgctxt "input-name"
 msgid "Mouse X"
-msgstr "Fare x"
+msgstr "Fare X"
 
 #: src/emu/inpttype.ipp:841
 msgctxt "input-name"
 msgid "Mouse X 2"
-msgstr "Fare x 2"
+msgstr "Fare X 2"
 
 #: src/emu/inpttype.ipp:842
 msgctxt "input-name"
 msgid "Mouse X 3"
-msgstr "Fare x 3"
+msgstr "Fare X 3"
 
 #: src/emu/inpttype.ipp:843
 msgctxt "input-name"
 msgid "Mouse X 4"
-msgstr "Fare x 4"
+msgstr "Fare X 4"
 
 #: src/emu/inpttype.ipp:844
 msgctxt "input-name"
 msgid "Mouse X 5"
-msgstr "Fare x 5"
+msgstr "Fare X 5"
 
 #: src/emu/inpttype.ipp:845
 msgctxt "input-name"
 msgid "Mouse X 6"
-msgstr "Fare x 6"
+msgstr "Fare X 6"
 
 #: src/emu/inpttype.ipp:846
 msgctxt "input-name"
 msgid "Mouse X 7"
-msgstr "Fare x 7"
+msgstr "Fare X 7"
 
 #: src/emu/inpttype.ipp:847
 msgctxt "input-name"
 msgid "Mouse X 8"
-msgstr "Fare x 8"
+msgstr "Fare X 8"
 
 #: src/emu/inpttype.ipp:848
 msgctxt "input-name"
 msgid "Mouse X 9"
-msgstr "Fare x 9"
+msgstr "Fare X 9"
 
 #: src/emu/inpttype.ipp:849
 msgctxt "input-name"
 msgid "Mouse X 10"
-msgstr "Fare x 10"
+msgstr "Fare X 10"
 
 #: src/emu/inpttype.ipp:854
 msgctxt "input-name"
@@ -5915,11 +5915,11 @@ msgstr "Veri Formatı"
 
 #: plugins/cheatfind/init.lua:737
 msgid "Slot 1 Value"
-msgstr "Slot 1 ,değeri"
+msgstr "Yuva 1 ,değeri"
 
 #: plugins/cheatfind/init.lua:737
 msgid "Last Slot Value"
-msgstr "Son Slot Değeri"
+msgstr "Son Yuva Değeri"
 
 #: plugins/cheatfind/init.lua:740
 msgid "Test/Write Poke Value"
@@ -6270,7 +6270,7 @@ msgstr "Uzatmalı adım %d"
 #: plugins/inputmacro/inputmacro_menu.lua:381
 msgctxt "plugin-inputmacro"
 msgid "When held"
-msgstr "basılı tutunca"
+msgstr "Basılı tutunca"
 
 #: plugins/inputmacro/inputmacro_menu.lua:385
 #, lua-format
