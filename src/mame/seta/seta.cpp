@@ -11386,7 +11386,7 @@ GAME( 1993, msgundamb, msgundam, msgundamb, msgundam,  seta_state,     empty_ini
 
 GAME( 1993, oisipuzl,  0,        oisipuzl,  oisipuzl,  seta_state,     empty_init,     ROT0,   "Sunsoft / Atlus",           "Oishii Puzzle Ha Irimasenka", 0 )
 GAME( 1993, triplfun,  oisipuzl, triplfun,  oisipuzl,  seta_state,     empty_init,     ROT0,   "bootleg",                   "Triple Fun", 0 )
-GAME( 1993, triplfunk, oisipuzl, triplfun,  oisipuzl,  seta_state,     empty_init,     ROT0,   "bootleg (Jin Young)",       "Sumeoinneun Deongdarireul Chajara!", 0 ) // 숨어있는 덩달이를 찾아라! (Find the hiding Deongdari!)
+GAME( 1993, triplfunk, oisipuzl, triplfun,  oisipuzl,  seta_state,     empty_init,     ROT0,   "bootleg (Jin Young)",       "Sum-eoitneun Deongdalireul Chat-ara!", 0 ) // 숨어있는 덩달이를 찾아라! (Find the hiding Deongdari!)
 
 GAME( 1993, qzkklgy2,  0,        qzkklgy2,  qzkklgy2,  seta_state,     empty_init,     ROT0,   "Tecmo",                     "Quiz Kokology 2", 0 )
 
