@@ -90,6 +90,7 @@ public:
 	void tandy1000_90key(machine_config &config);
 	void tandy1000_101key(machine_config &config);
 	void t1000tl(machine_config &config);
+	void t1000tl2(machine_config &config);
 	void t1000sx(machine_config &config);
 	void t1000rl(machine_config &config);
 	void t1000sl2(machine_config &config);
@@ -152,6 +153,7 @@ private:
 	void biosbank_map(address_map &map);
 	void tandy1000_16_io(address_map &map);
 	void tandy1000_286_map(address_map &map);
+	void tandy1000_286_bank_map(address_map &map);
 	void tandy1000_bank_io(address_map &map);
 	void tandy1000_bank_map(address_map &map);
 	void tandy1000_io(address_map &map);
@@ -650,6 +652,15 @@ void tandy1000_state::tandy1000_286_map(address_map &map)
 	map(0xe0000, 0xfffff).rom().region("bios", 0);
 }
 
+void tandy1000_state::tandy1000_286_bank_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x000fffff);
+	map(0xb8000, 0xbffff).m("pcvideo_t1000:vram", FUNC(address_map_bank_device::amap8));
+	map(0xe0000, 0xeffff).m(m_biosbank, FUNC(address_map_bank_device::amap16));
+	map(0xf0000, 0xfffff).rom().region("rom", 0x70000);
+}
+
 static const gfx_layout t1000_charlayout =
 {
 	8, 16,
@@ -782,7 +793,7 @@ void tandy1000_state::t1000sl2(machine_config &config)
 	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 }
 
-void tandy1000_state::t1000tl(machine_config &config)
+void tandy1000_state::t1000tl2(machine_config &config)
 {
 	I80286(config, m_maincpu, XTAL(28'636'363) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tandy1000_state::tandy1000_286_map);
@@ -800,9 +811,19 @@ void tandy1000_state::t1000tl(machine_config &config)
 	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 }
 
+void tandy1000_state::t1000tl(machine_config &config)
+{
+	t1000tl2(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &tandy1000_state::tandy1000_286_bank_map);
+	m_maincpu->set_addrmap(AS_IO, &tandy1000_state::tandy1000_bank_io);
+
+	ADDRESS_MAP_BANK(config, "biosbank").set_map(&tandy1000_state::biosbank_map).set_options(ENDIANNESS_LITTLE, 16, 20, 0x10000);
+}
+
 void tandy1000_state::t1000tx(machine_config &config)
 {
-	t1000tl(config);
+	t1000tl2(config);
 	m_maincpu->set_addrmap(AS_IO, &tandy1000_state::tandy1000tx_io);
 
 	config.device_remove("pc_keyboard");
@@ -964,6 +985,17 @@ ROM_START( t1000sl2 )
 ROM_END
 
 
+ROM_START( t1000tl )
+	ROM_REGION16_LE(0x80000, "rom", 0)
+	// v01.04.02 BIOS
+	ROM_LOAD16_BYTE( "8079037.u55", 0x00000, 0x40000, CRC(869dd92e) SHA1(91422085ef541fefede8fcc9a454d0538298d087)) // ┬®TANDY CORP.1988 8079037 LH532370 8849 D.A-EVEN.U55
+	ROM_LOAD16_BYTE( "8079038.u57", 0x00001, 0x40000, CRC(9520db5b) SHA1(9416e85cfcf04b18afc2efb8021a1ed79357ad33)) // ┬®TANDY CORP.1988 8079038 LH532371 8848 D.A-ODD.U57
+
+	ROM_REGION(0x08000,"gfx1", 0)
+	ROM_LOAD("8079027.u24", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450)) // 8079027 NCR 609-2495004 F831628 A8834
+ROM_END
+
+
 ROM_START( t1000tl2 )
 	ROM_REGION16_LE(0x20000, "bios", 0)
 	ROM_LOAD( "t10000tl2.bin", 0x10000, 0x10000, CRC(e288f12c) SHA1(9d54ccf773cd7202c9906323f1b5a68b1b3a3a67))
@@ -979,5 +1011,6 @@ COMP( 1987, t1000hx,  ibm5150, 0,      t1000hx,  t1000, tandy1000_state, empty_i
 COMP( 1987, t1000sx,  ibm5150, 0,      t1000sx,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 SX",   0 )
 COMP( 1987, t1000tx,  ibm5150, 0,      t1000tx,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TX",   0 )
 COMP( 1989, t1000rl,  ibm5150, 0,      t1000rl,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 RL",   0 )
-COMP( 1989, t1000tl2, ibm5150, 0,      t1000tl,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TL/2", 0 )
+COMP( 1988, t1000tl,  ibm5150, 0,      t1000tl,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TL",   0 )
+COMP( 1989, t1000tl2, ibm5150, 0,      t1000tl2, t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TL/2", 0 )
 COMP( 1988, t1000sl2, ibm5150, 0,      t1000sl2, t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 SL/2", 0 )
