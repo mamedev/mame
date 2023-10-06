@@ -19922,7 +19922,6 @@ igs_ncs                         // (c) 198? IGS
 igs_ncs2                        // (c) 2000 IGS
 igstet341                       // (c) 199? IGS
 igstet342                       // (c) 199? IGS
-kungfu                          // (c) 199? IGS
 kungfua                         // (c) 1992 IGS
 number10                        // (c) IGS (Board labeled Playmark Srl)
 numbr10l                        // (c) IGS (Board labeled Playmark Srl)
@@ -19935,6 +19934,7 @@ iqblock                         // (c) 1993
 
 @source:igs/jackie.cpp
 jackie                          // (c) 1993 IGS
+kungfu                          // (c) 1992 IGS
 
 @source:igs/lordgun.cpp
 aliencha                        // (c) 1994
