@@ -67,7 +67,7 @@ are defaulted to 1.
 #define PA_USE_SKELETON 1
 #endif
 
-#if defined(PA_NO_ASIO) || defined(PA_NO_DS) || defined(PA_NO_WMME) || defined(PA_NO_WASAPI) || defined(PA_NO_WDMKS)
+#if defined(PA_NO_PULSEAUDIO) || defined(PA_NO_ASIO) || defined(PA_NO_DS) || defined(PA_NO_WMME) || defined(PA_NO_WASAPI) || defined(PA_NO_WDMKS)
 #error "Portaudio: PA_NO_<APINAME> is no longer supported, please remove definition and use PA_USE_<APINAME> instead"
 #endif
 
@@ -130,6 +130,13 @@ are defaulted to 1.
 #elif (PA_USE_JACK != 0) && (PA_USE_JACK != 1)
 #undef PA_USE_JACK
 #define PA_USE_JACK 1
+#endif
+
+#ifndef PA_USE_PULSEAUDIO
+#define PA_USE_PULSEAUDIO 0
+#elif (PA_USE_PULSEAUDIO != 0) && (PA_USE_PULSEAUDIO != 1)
+#undef PA_USE_PULSEAUDIO
+#define PA_USE_PULSEAUDIO 1
 #endif
 
 #ifndef PA_USE_SGI

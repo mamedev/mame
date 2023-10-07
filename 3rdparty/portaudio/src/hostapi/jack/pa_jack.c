@@ -507,7 +507,7 @@ static PaError BuildDeviceList( PaJackHostApiRepresentation *jackApi )
     // Add 1 for null terminator.
     size_t device_name_regex_escaped_size = jack_client_name_size() * 2 + 1;
     size_t port_regex_size = device_name_regex_escaped_size + strlen(port_regex_suffix);
-    int port_index, client_index, i;
+    unsigned long port_index, client_index, i;
     double globalSampleRate;
     regex_t port_regex;
     unsigned long numClients = 0, numPorts = 0;
