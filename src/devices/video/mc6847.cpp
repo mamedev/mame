@@ -61,7 +61,7 @@
     GM2-0 pins.  This needs to be confirmed.
 
     The MC6847 datasheet states that a scanline is 227.5 clock cycles,
-    but experimentation suggests that it is 228.  The game "Dragon Fire"
+    but experimentation suggests that it is 228.  coco_cart:drgnfire
     has a fine tuned loop that runs in 57 clock cycles by the CPU's
     reckoning (228 actual clock cycles) and would not function correctly
     if skew existed.  SockMaster has confirmed that scanlines are in
@@ -812,16 +812,16 @@ void mc6847_base_device::record_partial_body_scanline(uint16_t physical_scanline
 
 int32_t mc6847_base_device::scanline_position_from_clock(int32_t clocks_since_hsync)
 {
-	// This value determined by experimentation with the Dragon Fire game,
+	// This value determined by experimentation with coco_cart:drgnfire,
 	// which uses precise timing measurements to change video modes
 	// multiple times mid-line.  This value seems to minimize video
 	// garbage, but doesn't eliminate it, so there are likely timing
-	// issues elsewhere.  [Dragon Fire listed in coco_cart.xml as drgnfire.]
+	// issues elsewhere.
 	//
 	// Unfortunately, I don't understand why this value isn't
 	// simply 0.  I believe hsync-on appears AFTER the front-porch +
 	// HS pulse + back-porch combo, which should be the entirety of
-	// the horizontal blanking.  But this value makes Dragonfire
+	// the horizontal blanking.  But this value makes coco_cart:drgnfire
 	// significantly better than 0 does.
 	const int CLOCKS_OFFSET_TO_FIRST_VISIBLE_PIXEL = 25;
 
