@@ -139,6 +139,10 @@
 #   define NV_CPU_ARM 1
 #elif defined POSH_CPU_AARCH64
 #   define NV_CPU_AARCH64 1
+#elif defined POSH_CPU_RISCV64
+#   define NV_CPU_RISCV64 1
+#elif defined POSH_CPU_LOONGARCH64
+#   define NV_CPU_LOONGARCH64 1
 #elif defined POSH_CPU_EMSCRIPTEN
 #   define NV_CPU_EMSCRIPTEN 1
 #else
@@ -164,6 +168,14 @@
 #ifndef NV_CPU_AARCH64
 #	define NV_CPU_AARCH64 0
 #endif // NV_CPU_AARCH64
+
+#ifndef NV_CPU_RISCV64
+#	define NV_CPU_RISCV64 0
+#endif // NV_CPU_RISCV64
+
+#ifndef NV_CPU_LOONGARCH64
+#	define NV_CPU_LOONGARCH64 0
+#endif // NV_CPU_LOONGARCH64
 
 #ifndef NV_CPU_EMSCRIPTEN
 #	define NV_CPU_EMSCRIPTEN 0
