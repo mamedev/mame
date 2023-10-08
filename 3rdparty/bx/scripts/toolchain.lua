@@ -78,6 +78,7 @@ function toolchain(_buildDir, _libDir)
 			{ "linux-arm-gcc",   "Linux (ARM, GCC compiler)"  },
 			{ "linux-ppc64le-gcc",  "Linux (PPC64LE, GCC compiler)"  },
 			{ "linux-ppc64le-clang",  "Linux (PPC64LE, Clang compiler)"  },
+			{ "linux-riscv64-gcc",  "Linux (RISC-V 64, GCC compiler)"  },
 			{ "ios-arm",         "iOS - ARM"                  },
 			{ "ios-arm64",       "iOS - ARM64"                },
 			{ "ios-simulator",   "iOS - Simulator"            },
@@ -312,6 +313,9 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.ar  = "ar"
 			premake.gcc.llvm = true
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-ppc64le-clang"))
+
+		elseif "linux-riscv64-gcc" == _OPTIONS["gcc"] then
+			location (path.join(_buildDir, "projects", _ACTION .. "-linux-riscv64-gcc"))
 
 		elseif "mingw-gcc" == _OPTIONS["gcc"] then
 			if not os.getenv("MINGW") then
@@ -851,6 +855,20 @@ function toolchain(_buildDir, _libDir)
 			"-Wl,--gc-sections",
 		}
 
+	configuration { "linux-riscv64*" }
+		buildoptions {
+			"-Wunused-value",
+			"-Wundef",
+			"-march=rv64g"
+		}
+		links {
+			"rt",
+			"dl",
+		}
+		linkoptions {
+			"-Wl,--gc-sections",
+		}
+
 	configuration { "linux-ppc64le-gcc" }
 		targetdir (path.join(_buildDir, "linux_ppc64le_gcc/bin"))
 		objdir (path.join(_buildDir, "linux_ppc64le_gcc/obj"))
@@ -860,6 +878,11 @@ function toolchain(_buildDir, _libDir)
 		targetdir (path.join(_buildDir, "linux_ppc64le_clang/bin"))
 		objdir (path.join(_buildDir, "linux_ppc64le_clang/obj"))
 		libdirs { path.join(_libDir, "lib/linux_ppc64le_clang") }
+
+	configuration { "linux-riscv64-gcc" }
+		targetdir (path.join(_buildDir, "linux_riscv64_gcc/bin"))
+		objdir (path.join(_buildDir, "linux_riscv64_gcc/obj"))
+		libdirs { path.join(_libDir, "lib/linux_riscv64_gcc") }
 
 	configuration { "wasm2js" }
 		targetdir (path.join(_buildDir, "wasm2js/bin"))
