@@ -38,6 +38,7 @@
 #include "machine/w5100.h"
 #include "machine/w5100_socket.h"
 #include "util/internet_checksum.h"
+#include "multibyte.h"
 
 // #define LOG_GENERAL (1U << 0)
 #define LOG_PACKETS (1U << 1)
@@ -246,25 +247,6 @@ static const uint8_t ETHERNET_MULTICAST[6] = { 0x01, 0x00, 0x5e, 0x00, 0x00, 0x0
 	return buffer;
 }
 
-
-static inline uint32_t be_read(const uint8_t *base, int numbytes)
-{
-	uint32_t result = 0;
-	while (numbytes--)
-		result = (result << 8) | *base++;
-	return result;
-}
-
-static inline void be_write(uint8_t *base, uint32_t value, int numbytes)
-{
-	base += numbytes;
-	while (numbytes--)
-	{
-		*--base = value;
-		value >>= 8;
-	}
-}
-
 static wiznet_eth_info parse_eth(const uint8_t *buffer, int length)
 {
 	wiznet_eth_info info{};
@@ -273,7 +255,7 @@ static wiznet_eth_info parse_eth(const uint8_t *buffer, int length)
 	{
 		memcpy(info.dest_mac, buffer + o_ETHERNET_DEST, 6);
 		memcpy(info.src_mac, buffer + o_ETHERNET_SRC, 6);
-		info.type = be_read(buffer + o_ETHERNET_TYPE, 2);
+		info.type = get_u16be(buffer + o_ETHERNET_TYPE);
 	}
 	return info;
 }
@@ -284,9 +266,9 @@ static wiznet_udp_info parse_udp(const uint8_t *buffer, int length)
 
 	if (length >= 8)
 	{
-		info.udp_length = be_read(buffer + o_UDP_LENGTH, 2);
-		info.src_port = be_read(buffer + o_UDP_SRC_PORT, 2);
-		info.dest_port = be_read(buffer + o_UDP_DEST_PORT, 2);
+		info.udp_length = get_u16be(buffer + o_UDP_LENGTH);
+		info.src_port = get_u16be(buffer + o_UDP_SRC_PORT);
+		info.dest_port = get_u16be(buffer + o_UDP_DEST_PORT);
 	}
 	return info;
 }
@@ -299,12 +281,12 @@ static wiznet_ip_info parse_ip(const uint8_t *buffer, int length)
 	{
 		info.header_length = (buffer[o_IP_IHL] & 0x0f) << 2;
 		info.tos = buffer[o_IP_TOS];
-		info.total_length = be_read(buffer + o_IP_LENGTH, 2);
-		info.fragment = be_read(buffer + o_IP_FLAGS, 2);
+		info.total_length = get_u16be(buffer + o_IP_LENGTH);
+		info.fragment = get_u16be(buffer + o_IP_FLAGS);
 		info.ttl = buffer[o_IP_TTL];
 		info.proto = buffer[o_IP_PROTOCOL];
-		info.src_ip = be_read(buffer + o_IP_SRC_ADDRESS, 4);
-		info.dest_ip = be_read(buffer + o_IP_DEST_ADDRESS, 4);
+		info.src_ip = get_u32be(buffer + o_IP_SRC_ADDRESS);
+		info.dest_ip = get_u32be(buffer + o_IP_DEST_ADDRESS);
 	}
 	return info;
 }
@@ -329,7 +311,7 @@ static void parse_tcp_options(wiznet_tcp_info &info, const uint8_t *buffer, int 
 				ol = buffer[1];
 				if (ol == 4 && length >= 4)
 				{
-					info.option_mss = be_read(buffer + 2, 2);
+					info.option_mss = get_u16be(buffer + 2);
 				}
 				break;
 			default:
@@ -349,11 +331,11 @@ static wiznet_tcp_info parse_tcp(const uint8_t *buffer, int length)
 	{
 		info.header_length = (buffer[o_TCP_DATA_OFFSET] >> 4) << 2;
 		info.flags = buffer[o_TCP_FLAGS];
-		info.sequence_number = be_read(buffer + o_TCP_SEQ_NUMBER, 4);
-		info.ack_number = be_read(buffer + o_TCP_ACK_NUMBER, 4);
-		info.src_port = be_read(buffer + o_TCP_SRC_PORT, 2);
-		info.dest_port = be_read(buffer + o_TCP_DEST_PORT, 2);
-		info.window_size = be_read(buffer + o_TCP_WINDOW_SIZE, 2);
+		info.sequence_number = get_u32be(buffer + o_TCP_SEQ_NUMBER);
+		info.ack_number = get_u32be(buffer + o_TCP_ACK_NUMBER);
+		info.src_port = get_u16be(buffer + o_TCP_SRC_PORT);
+		info.dest_port = get_u16be(buffer + o_TCP_DEST_PORT);
+		info.window_size = get_u16be(buffer + o_TCP_WINDOW_SIZE);
 
 		// check for mss option
 		if (info.header_length > 20 && length >= info.header_length)
@@ -366,7 +348,7 @@ static wiznet_tcp_info parse_tcp(const uint8_t *buffer, int length)
 static bool verify_arp(const uint8_t *arp, int length)
 {
 	if (length < 28) return false;
-	if (be_read(arp + o_ARP_HTYPE, 2) != ARP_HTYPE_ETHERNET) return false;
+	if (get_u16be(arp + o_ARP_HTYPE) != ARP_HTYPE_ETHERNET) return false;
 	if (arp[o_ARP_HLEN] != 6 || arp[o_ARP_PLEN] != 4) return false;
 	return true;
 }
@@ -383,7 +365,7 @@ static bool verify_ip(const uint8_t *ip, int length)
 	int proto = ip[o_IP_PROTOCOL];
 
 	const uint8_t *data = ip + ihl;
-	int ip_length = be_read(ip + o_IP_LENGTH, 2);
+	int ip_length = get_u16be(ip + o_IP_LENGTH);
 
 	if (length < ip_length) return false;
 
@@ -395,16 +377,16 @@ static bool verify_ip(const uint8_t *ip, int length)
 	}
 	else if (proto == IP_PROTOCOL_UDP)
 	{
-		if (length < be_read(data + o_UDP_LENGTH, 2)) return false;
+		if (length < get_u16be(data + o_UDP_LENGTH)) return false;
 
-		uint16_t crc = be_read(data + o_UDP_CHECKSUM, 2);
+		uint16_t crc = get_u16be(data + o_UDP_CHECKSUM);
 		if (crc)
 		{
 			uint8_t pseudo_header[12];
 			memcpy(pseudo_header + 0, ip + o_IP_SRC_ADDRESS, 4);
 			memcpy(pseudo_header + 4, ip + o_IP_DEST_ADDRESS, 4);
-			be_write(pseudo_header + 8, IP_PROTOCOL_UDP, 2);
-			be_write(pseudo_header + 10, length, 2);
+			put_u16be(pseudo_header + 8, IP_PROTOCOL_UDP);
+			put_u16be(pseudo_header + 10, length);
 
 			util::internet_checksum_creator cr;
 			cr.append(pseudo_header, sizeof(pseudo_header));
@@ -423,8 +405,8 @@ static bool verify_ip(const uint8_t *ip, int length)
 		uint8_t pseudo_header[12];
 		memcpy(pseudo_header + 0, ip + o_IP_SRC_ADDRESS, 4);
 		memcpy(pseudo_header + 4, ip + o_IP_DEST_ADDRESS, 4);
-		be_write(pseudo_header + 8, IP_PROTOCOL_TCP, 2);
-		be_write(pseudo_header + 10, length, 2);
+		put_u16be(pseudo_header + 8, IP_PROTOCOL_TCP);
+		put_u16be(pseudo_header + 10, length);
 
 		util::internet_checksum_creator cr;
 		cr.append(pseudo_header, sizeof(pseudo_header));
@@ -443,8 +425,8 @@ static uint16_t udp_tcp_checksum(unsigned proto, const uint8_t *ip_ptr, const ui
 
 	memcpy(pseudo_header + 0, ip_ptr + o_IP_SRC_ADDRESS, 4);
 	memcpy(pseudo_header + 4, ip_ptr + o_IP_DEST_ADDRESS, 4);
-	be_write(pseudo_header + 8, proto, 2);
-	be_write(pseudo_header + 10, length, 2);
+	put_u16be(pseudo_header + 8, proto);
+	put_u16be(pseudo_header + 10, length);
 
 	cc.append(pseudo_header, sizeof(pseudo_header));
 	cc.append(data, length);
@@ -542,7 +524,7 @@ void w5100_device::device_reset()
 	}
 
 
-	set_mac(reinterpret_cast<char *>(m_shar));
+	set_mac(m_shar);
 	set_promisc(false);
 }
 
@@ -756,7 +738,7 @@ void w5100_device::write_register(offs_t offset, uint8_t data)
 		case SHAR4:
 		case SHAR5:
 			m_shar[offset - SHAR0] = data;
-			set_mac(reinterpret_cast<char *>(m_shar));
+			set_mac(m_shar);
 			break;
 		case SIPR0:
 		case SIPR1:
@@ -1052,7 +1034,7 @@ void w5100_device::recv_cb(uint8_t *buffer, int length)
 		if (ip.proto == IP_PROTOCOL_IGMP && data_length >= 8)
 		{
 			unsigned type = data[o_IGMP_TYPE];
-			uint32_t ip = be_read(data + o_IGMP_GROUP_ADDRESS, 4);
+			uint32_t ip = get_u32be(data + o_IGMP_GROUP_ADDRESS);
 
 			if (type == IGMP_TYPE_MEMBERSHIP_QUERY)
 			{
@@ -1068,7 +1050,7 @@ void w5100_device::recv_cb(uint8_t *buffer, int length)
 	{
 		if (verify_arp(data, data_length))
 		{
-			switch(be_read(data + o_ARP_OPCODE, 2))
+			switch(get_u16be(data + o_ARP_OPCODE))
 			{
 				case ARP_OPCODE_REPLY:
 					process_arp_reply(data, data_length);
@@ -1116,21 +1098,21 @@ void w5100_device::send_arp_request(uint32_t ip)
 
 	memcpy(frame + o_ETHERNET_DEST, ETHERNET_BROADCAST, 6);
 	memcpy(frame + o_ETHERNET_SRC, m_shar, 6);
-	be_write(frame + o_ETHERNET_TYPE, ETHERNET_TYPE_ARP, 2);
+	put_u16be(frame + o_ETHERNET_TYPE, ETHERNET_TYPE_ARP);
 
 	uint8_t *ptr = frame + 14;
 
-	be_write(ptr + o_ARP_HTYPE, ARP_HTYPE_ETHERNET, 2);
-	be_write(ptr + o_ARP_PTYPE, ETHERNET_TYPE_IP, 2);
+	put_u16be(ptr + o_ARP_HTYPE, ARP_HTYPE_ETHERNET);
+	put_u16be(ptr + o_ARP_PTYPE, ETHERNET_TYPE_IP);
 	ptr[o_ARP_HLEN] = 6; // hardware size
 	ptr[o_ARP_PLEN] = 4; // protocol size;
-	be_write(ptr + o_ARP_OPCODE, ARP_OPCODE_REQUEST, 2);
+	put_u16be(ptr + o_ARP_OPCODE, ARP_OPCODE_REQUEST);
 
 	std::memcpy(ptr + o_ARP_SHA, m_shar, 6); //sender mac
-	be_write(ptr + o_ARP_SPA, m_ip, 4); // sender ip
+	put_u32be(ptr + o_ARP_SPA, m_ip); // sender ip
 
 	std::memset(ptr + o_ARP_THA, 0, 6); // target mac
-	be_write(ptr + o_ARP_TPA, ip, 4); // sender ip
+	put_u32be(ptr + o_ARP_TPA, ip); // sender ip
 
 	LOGMASKED(LOG_ARP, "Sending ARP request for %s\n", ip_to_string(ip));
 	send_or_queue(frame, FRAME_SIZE);
@@ -1148,7 +1130,7 @@ void w5100_device::process_arp_request(const uint8_t *mac, const uint8_t *arp, i
 	uint8_t frame[FRAME_SIZE];
 	memset(frame, 0, sizeof(frame));
 
-	if (m_ip == be_read(arp + o_ARP_SPA, 4))
+	if (m_ip == get_u32be(arp + o_ARP_SPA))
 	{
 		// "there is ARP request with same IP address as Source IP address."
 		m_ir |= IR_CONFLICT;
@@ -1156,30 +1138,30 @@ void w5100_device::process_arp_request(const uint8_t *mac, const uint8_t *arp, i
 		return;
 	}
 
-	if (m_ip != be_read(arp + o_ARP_TPA, 4))
+	if (m_ip != get_u32be(arp + o_ARP_TPA))
 		return;
 
 	// erratum #2
-	uint32_t dest_ip = arp_ip(be_read(arp + o_ARP_SPA, 4));
+	uint32_t dest_ip = arp_ip(get_u32be(arp + o_ARP_SPA));
 
 
 	std::memcpy(frame + o_ETHERNET_DEST, mac, 6);
 	std::memcpy(frame + o_ETHERNET_SRC, m_shar, 6);
-	be_write(frame + o_ETHERNET_TYPE, ETHERNET_TYPE_ARP, 2);
+	put_u16be(frame + o_ETHERNET_TYPE, ETHERNET_TYPE_ARP);
 
 	uint8_t *ptr = frame + 14;
 
-	be_write(ptr + o_ARP_HTYPE, ARP_HTYPE_ETHERNET, 2);
-	be_write(ptr + o_ARP_PTYPE, ETHERNET_TYPE_IP, 2);
+	put_u16be(ptr + o_ARP_HTYPE, ARP_HTYPE_ETHERNET);
+	put_u16be(ptr + o_ARP_PTYPE, ETHERNET_TYPE_IP);
 	ptr[o_ARP_HLEN] = 6; // hardware size
 	ptr[o_ARP_PLEN] = 4; // protocol size;
-	be_write(ptr + o_ARP_OPCODE, ARP_OPCODE_REPLY, 2);
+	put_u16be(ptr + o_ARP_OPCODE, ARP_OPCODE_REPLY);
 	std::memcpy(ptr + o_ARP_SHA, m_shar, 6); //sender mac
-	be_write(ptr + o_ARP_SPA, m_ip, 4); // sender ip
+	put_u32be(ptr + o_ARP_SPA, m_ip); // sender ip
 	std::memcpy(ptr + o_ARP_THA, mac, 6); // dest mac.
-	be_write(ptr + o_ARP_TPA, dest_ip, 4); // dest ip -- see erratum 3
+	put_u32be(ptr + o_ARP_TPA, dest_ip); // dest ip -- see erratum 3
 
-	LOGMASKED(LOG_ARP, "Replying to ARP request from %s\n", ip_to_string(be_read(arp + o_ARP_SPA, 4)));
+	LOGMASKED(LOG_ARP, "Replying to ARP request from %s\n", ip_to_string(get_u32be(arp + o_ARP_SPA)));
 	send_or_queue(frame, FRAME_SIZE);
 }
 
@@ -1188,7 +1170,7 @@ void w5100_device::process_arp_reply(const uint8_t *arp, int length)
 	if (std::memcmp(m_shar, arp + o_ARP_THA, 6))
 		return;
 
-	uint32_t ip = be_read(arp + o_ARP_SPA, 4);
+	uint32_t ip = get_u32be(arp + o_ARP_SPA);
 	const uint8_t *mac = arp + o_ARP_SHA;
 
 	LOGMASKED(LOG_ARP, "Received ARP response for %s\n", ip_to_string(ip));
@@ -1242,7 +1224,7 @@ void w5100_device::send_icmp_reply(const uint8_t *mac, const wiznet_ip_info &src
 
 	// icmp crc
 	uint16_t crc = util::internet_checksum_creator::simple(icmp, length);
-	be_write(icmp + o_ICMP_CHECKSUM, crc, 2);
+	put_u16be(icmp + o_ICMP_CHECKSUM, crc);
 
 	build_ip_header(frame, mac, ip, length);
 
@@ -1274,7 +1256,7 @@ void w5100_device::send_icmp_unreachable(const uint8_t *mac, const wiznet_ip_inf
 
 	// icmp crc
 	uint16_t crc = util::internet_checksum_creator::simple(icmp, length);
-	be_write(icmp + o_ICMP_CHECKSUM, crc, 2);
+	put_u16be(icmp + o_ICMP_CHECKSUM, crc);
 
 	build_ip_header(frame, mac, ip, length);
 
@@ -1286,7 +1268,7 @@ void w5100_device::build_ip_header(uint8_t *frame, const uint8_t *dest_mac, wizn
 {
 	std::memcpy(frame + o_ETHERNET_DEST, dest_mac, 6);
 	std::memcpy(frame + o_ETHERNET_SRC, m_shar, 6);
-	be_write(frame + o_ETHERNET_TYPE, ETHERNET_TYPE_IP, 2);
+	put_u16be(frame + o_ETHERNET_TYPE, ETHERNET_TYPE_IP);
 
 	uint8_t *ptr = frame + 14;
 
@@ -1296,22 +1278,21 @@ void w5100_device::build_ip_header(uint8_t *frame, const uint8_t *dest_mac, wizn
 
 	ptr[o_IP_IHL] = 0x40 | (ip.header_length >> 2);
 	ptr[o_IP_TOS] = ip.tos;
-	be_write(ptr + o_IP_LENGTH, ip.total_length, 2);
-	be_write(ptr + o_IP_IDENTIFICATION, ++m_identification, 2);
-	be_write(ptr + o_IP_FLAGS, ip.fragment, 2);
+	put_u16be(ptr + o_IP_LENGTH, ip.total_length);
+	put_u16be(ptr + o_IP_IDENTIFICATION, ++m_identification);
+	put_u16be(ptr + o_IP_FLAGS, ip.fragment);
 	ptr[o_IP_TTL] = ip.ttl;
 	ptr[o_IP_PROTOCOL] = ip.proto;
-	be_write(ptr + o_IP_CHECKSUM, 0, 2);
-	be_write(ptr + o_IP_SRC_ADDRESS, ip.src_ip ? ip.src_ip : m_ip, 4);
-	be_write(ptr + o_IP_DEST_ADDRESS, ip.dest_ip, 4);
+	put_u16be(ptr + o_IP_CHECKSUM, 0);
+	put_u32be(ptr + o_IP_SRC_ADDRESS, ip.src_ip ? ip.src_ip : m_ip);
+	put_u32be(ptr + o_IP_DEST_ADDRESS, ip.dest_ip);
 
 	uint16_t crc = util::internet_checksum_creator::simple(ptr, ip.header_length);
-	be_write(ptr + o_IP_CHECKSUM, crc, 2);
+	put_u16be(ptr + o_IP_CHECKSUM, crc);
 }
 
 void w5100_device::build_tcp_header(uint8_t *frame, const uint8_t *dest_mac, wiznet_ip_info &ip, wiznet_tcp_info &tcp, int data_length)
 {
-
 	ip.proto = IP_PROTOCOL_TCP;
 	if (!tcp.header_length) tcp.header_length = tcp.default_header_length;
 
@@ -1319,35 +1300,18 @@ void w5100_device::build_tcp_header(uint8_t *frame, const uint8_t *dest_mac, wiz
 
 	uint8_t *ptr = frame + 14 + ip.header_length;
 
-	be_write(ptr + o_TCP_SRC_PORT, tcp.src_port, 2);
-	be_write(ptr + o_TCP_DEST_PORT, tcp.dest_port, 2);
-	be_write(ptr + o_TCP_SEQ_NUMBER, tcp.sequence_number, 4);
-	be_write(ptr + o_TCP_ACK_NUMBER, tcp.ack_number, 4);
+	put_u16be(ptr + o_TCP_SRC_PORT, tcp.src_port);
+	put_u16be(ptr + o_TCP_DEST_PORT, tcp.dest_port);
+	put_u32be(ptr + o_TCP_SEQ_NUMBER, tcp.sequence_number);
+	put_u32be(ptr + o_TCP_ACK_NUMBER, tcp.ack_number);
 	ptr[o_TCP_DATA_OFFSET] = (tcp.header_length >> 2) << 4;
 	ptr[o_TCP_FLAGS] = tcp.flags;
-	be_write(ptr + o_TCP_WINDOW_SIZE, tcp.window_size, 2);
-	be_write(ptr + o_TCP_CHECKSUM, 0, 2);
-	be_write(ptr + o_TCP_URGENT, 0, 2);
-
-	// grrrr.... how to handle it?
-	#if 0
-	if (header_length > 20)
-	{
-		std::memset(ptr + header_length, 0, header_length - 20);
-		if (tcp.option_mss)
-		{
-			ptr[20] = 2; // mss
-			ptr[21] = 4; // length
-			be_write(ptr + 22, tcp.option_mss, 2);
-		}
-	}
-	#endif
+	put_u16be(ptr + o_TCP_WINDOW_SIZE, tcp.window_size);
+	put_u16be(ptr + o_TCP_CHECKSUM, 0);
+	put_u16be(ptr + o_TCP_URGENT, 0);
 
 	auto crc = udp_tcp_checksum(IP_PROTOCOL_TCP, frame + 14, ptr, data_length + tcp.header_length);
-	be_write(ptr + o_TCP_CHECKSUM, crc, 2);
-
-	// checksum includes data and pseudo header.
-	//uint16_t crc = util::internet_checksum_creator::simple(ptr, header_length);
+	put_u16be(ptr + o_TCP_CHECKSUM, crc);
 }
 
 void w5100_device::build_udp_header(uint8_t *frame, const uint8_t *dest_mac, wiznet_ip_info &ip, wiznet_udp_info &udp, int data_length)
@@ -1359,14 +1323,14 @@ void w5100_device::build_udp_header(uint8_t *frame, const uint8_t *dest_mac, wiz
 	build_ip_header(frame, dest_mac, ip, udp.udp_length);
 	uint8_t *ptr = frame + 14 + ip.header_length;
 
-	be_write(ptr + o_UDP_SRC_PORT, udp.src_port, 2);
-	be_write(ptr + o_UDP_DEST_PORT, udp.dest_port, 2);
-	be_write(ptr + o_UDP_LENGTH, udp.udp_length, 2);
-	be_write(ptr + o_UDP_CHECKSUM, 0, 2);
+	put_u16be(ptr + o_UDP_SRC_PORT, udp.src_port);
+	put_u16be(ptr + o_UDP_DEST_PORT, udp.dest_port);
+	put_u16be(ptr + o_UDP_LENGTH, udp.udp_length);
+	put_u16be(ptr + o_UDP_CHECKSUM, 0);
 
 	auto crc = udp_tcp_checksum(IP_PROTOCOL_UDP, frame + 14, ptr, udp.udp_length);
 	if (crc == 0) crc = 0xffff;
-	be_write(ptr + o_UDP_CHECKSUM, crc, 2);
+	put_u16be(ptr + o_UDP_CHECKSUM, crc);
 }
 
 
@@ -1395,10 +1359,10 @@ void w5100_device::send_igmp_join(const uint8_t *mac, wiznet_ip_info &ip, unsign
 	ptr += 4;
 	// igmp
 	ptr[o_IGMP_TYPE] = version == 1 ? IGMP_TYPE_MEMBERSHIP_REPORT_V1 : IGMP_TYPE_MEMBERSHIP_REPORT_V2;
-	be_write(ptr + o_IGMP_GROUP_ADDRESS, ip.dest_ip, 4);
+	put_u32be(ptr + o_IGMP_GROUP_ADDRESS, ip.dest_ip);
 
 	auto crc = util::internet_checksum_creator::simple(ptr, 8);
-	be_write(ptr + o_IGMP_CHECKSUM, crc, 2);
+	put_u16be(ptr + o_IGMP_CHECKSUM, crc);
 
 
 	LOGMASKED(LOG_IGMP, "Sending IGMP join to %s\n", ip_to_string(ip.dest_ip));
@@ -1434,10 +1398,10 @@ void w5100_device::send_igmp_leave(const uint8_t *mac, wiznet_ip_info &ip, unsig
 	ptr += 4;
 	// igmp
 	ptr[o_IGMP_TYPE] = IGMP_TYPE_LEAVE_GROUP;
-	be_write(ptr + 4, dest_ip, 4);
+	put_u32be(ptr + 4, dest_ip);
 
 	auto crc = util::internet_checksum_creator::simple(ptr, 8);
-	be_write(ptr + o_IGMP_CHECKSUM, crc, 2);
+	put_u16be(ptr + o_IGMP_CHECKSUM, crc);
 
 	LOGMASKED(LOG_IGMP, "Sending IGMP leave to %s\n", ip_to_string(ip.dest_ip));
 	send_or_queue(frame, 60);
