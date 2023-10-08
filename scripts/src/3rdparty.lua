@@ -1550,6 +1550,13 @@ project "portaudio"
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 			"/wd4312", -- warning C4312: 'type cast': conversion from 'UINT' to 'HWAVEIN' of greater size
 		}
+	if _OPTIONS["vs"]=="clangcl" then
+		buildoptions {
+			"-Wno-implicit-const-int-float-conversion",
+			"-Wno-sometimes-uninitialized",
+			"-Wno-unused-but-set-variable",
+		}
+	end
 	if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
 			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
