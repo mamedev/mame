@@ -811,7 +811,7 @@ msgstr "ses"
 #: src/frontend/mame/ui/info.cpp:46
 msgctxt "emulation-feature"
 msgid "capture hardware"
-msgstr ""
+msgstr "yakalama aygıtı"
 
 #: src/frontend/mame/ui/info.cpp:47
 msgctxt "emulation-feature"
@@ -988,7 +988,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Bu sistemin çalışan kopyaları var: %s"
+"Bu sistemin çalışan klonları var: %s"
 
 #: src/frontend/mame/ui/info.cpp:374
 #, c-format
@@ -1548,7 +1548,7 @@ msgstr "Sistem"
 
 #: src/frontend/mame/ui/miscmenu.cpp:82
 msgid "Reset"
-msgstr ""
+msgstr "Yeniden Başlat"
 
 #: src/frontend/mame/ui/miscmenu.cpp:150
 msgid "Network Devices"
@@ -1580,6 +1580,8 @@ msgid ""
 "Tickets dispensed: %1$d\n"
 "\n"
 msgstr ""
+"Dağıtılmış biletler: %1$d\n"
+"\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:259
 msgid "Coin %1$c: NA%3$s\n"
@@ -1906,12 +1908,12 @@ msgstr "[hiçbir giriş cihazı etkin değil]"
 #: src/frontend/mame/ui/inputtoggle.cpp:22
 msgctxt "menu-inputtoggle"
 msgid "Toggle Inputs"
-msgstr ""
+msgstr "Geçiş Girişleri"
 
 #: src/frontend/mame/ui/inputtoggle.cpp:107
 msgctxt "menu-inputtoggle"
 msgid "[no toggle inputs are enabled]"
-msgstr ""
+msgstr "[hiçbir geçiş girişi etkin değil]"
 
 #: src/frontend/mame/ui/tapectrl.cpp:42
 msgid "Tape Control"
@@ -2229,7 +2231,7 @@ msgstr "Kabinler"
 #: src/frontend/mame/ui/dirmenu.cpp:58
 msgctxt "path-option"
 msgid "Marquees"
-msgstr ""
+msgstr "Çerçeveler"
 
 #: src/frontend/mame/ui/dirmenu.cpp:59
 msgctxt "path-option"
@@ -2417,7 +2419,7 @@ msgstr ""
 #, c-format
 msgctxt "gfxview"
 msgid " %1$d×%2$d color %3$X/%4$X"
-msgstr ""
+msgstr " %1$d×%2$d renk %3$X/%4$X"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1306
 #, c-format
@@ -2441,7 +2443,7 @@ msgstr ""
 #, c-format
 msgctxt "gfxview"
 msgid " %1$d×%2$d origin (%3$d %4$d)"
-msgstr ""
+msgstr " %1$d×%2$d köken (%3$d %4$d)"
 
 #: src/frontend/mame/ui/selgame.cpp:463
 msgid "System Settings"
@@ -2537,15 +2539,15 @@ msgstr "Hepsini Gizle"
 
 #: src/frontend/mame/ui/custui.cpp:144
 msgid "UI Language"
-msgstr ""
+msgstr "UI Dili"
 
 #: src/frontend/mame/ui/custui.cpp:169 src/frontend/mame/ui/custui.cpp:222
 msgid "System Names"
-msgstr ""
+msgstr "Sistem İsimleri"
 
 #: src/frontend/mame/ui/custui.cpp:195 src/frontend/mame/ui/custui.cpp:225
 msgid "Show Side Panels"
-msgstr ""
+msgstr "Yan Bölümleri Göster"
 
 #: src/frontend/mame/ui/custui.cpp:215
 msgid "Fonts"
@@ -2561,11 +2563,11 @@ msgstr "Dil"
 
 #: src/frontend/mame/ui/custui.cpp:236 src/frontend/mame/ui/custui.cpp:280
 msgid "[built-in]"
-msgstr ""
+msgstr "[yerleşik]"
 
 #: src/frontend/mame/ui/custui.cpp:337
 msgid "UI Fonts"
-msgstr ""
+msgstr "UI Yazıtipleri"
 
 #: src/frontend/mame/ui/custui.cpp:366
 msgid "default"
@@ -2593,11 +2595,11 @@ msgstr "Bilgiler yazı boyutu"
 
 #: src/frontend/mame/ui/custui.cpp:547
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-msgstr ""
+msgstr "Örnek Yazı - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
 #: src/frontend/mame/ui/custui.cpp:563
 msgid "UI Colors"
-msgstr ""
+msgstr "UI Renkleri"
 
 #: src/frontend/mame/ui/custui.cpp:626
 msgctxt "color-option"
@@ -2622,7 +2624,7 @@ msgstr "Seçilen arkaplan rengi"
 #: src/frontend/mame/ui/custui.cpp:630
 msgctxt "color-option"
 msgid "Subitem color"
-msgstr ""
+msgstr "Alt Öğe rengi"
 
 #: src/frontend/mame/ui/custui.cpp:631
 msgctxt "color-option"
@@ -2642,22 +2644,22 @@ msgstr "Arkaplan"
 #: src/frontend/mame/ui/custui.cpp:634
 msgctxt "color-option"
 msgid "DIP switch"
-msgstr ""
+msgstr "DIP anahtar"
 
 #: src/frontend/mame/ui/custui.cpp:635
 msgctxt "color-option"
 msgid "Unavailable color"
-msgstr ""
+msgstr "Mevcut olmayan renk"
 
 #: src/frontend/mame/ui/custui.cpp:636
 msgctxt "color-option"
 msgid "Slider color"
-msgstr ""
+msgstr "Kaydırıcı rengi"
 
 #: src/frontend/mame/ui/custui.cpp:637
 msgctxt "color-option"
 msgid "Graphics viewer background"
-msgstr ""
+msgstr "Grafik görüntüleyici arkaplanı"
 
 #: src/frontend/mame/ui/custui.cpp:638
 msgctxt "color-option"
@@ -2681,12 +2683,12 @@ msgstr ""
 
 #: src/frontend/mame/ui/custui.cpp:645
 msgid "Restore default colors"
-msgstr ""
+msgstr "Varsayılan renkleri geri yükle"
 
 #: src/frontend/mame/ui/custui.cpp:666
 #, c-format
 msgid "Double-click or press %1$s to change color"
-msgstr ""
+msgstr "Rengi değiştirmek için çift tıkla veya %1$s'e bas"
 
 #: src/frontend/mame/ui/custui.cpp:674
 msgid "Menu Preview"
@@ -2700,7 +2702,7 @@ msgstr "Normal"
 #: src/frontend/mame/ui/custui.cpp:682
 msgctxt "color-sample"
 msgid "Subitem"
-msgstr ""
+msgstr "Alt Öğe"
 
 #: src/frontend/mame/ui/custui.cpp:683
 msgctxt "color-sample"
@@ -2803,7 +2805,7 @@ msgstr "Mor"
 #, c-format
 msgctxt "about-header"
 msgid "%1$s %2$s (%3$s%4$sP%5$s, debug)"
-msgstr ""
+msgstr "%1$s %2$s (%3$s%4$sP%5$s, hata ayıklama)"
 
 #: src/frontend/mame/ui/about.cpp:44
 #, c-format
@@ -2815,7 +2817,7 @@ msgstr ""
 #, c-format
 msgctxt "about-header"
 msgid "Revision: %1$s"
-msgstr ""
+msgstr "Düzeltme: %1$s"
 
 #: src/frontend/mame/ui/analogipt.cpp:27
 #, c-format
@@ -2829,51 +2831,58 @@ msgid ""
 "Next device  \t\t%6$s\n"
 "Return to previous menu  \t\t%7$s"
 msgstr ""
+"Ayarları göster/gizle  \t\t%1$s\n"
+"Değeri düşür  \t\t%2$s\n"
+"Değeri arttır  \t\t%3$s\n"
+"Varsayılan değeri geri yükle  \t\t%4$s\n"
+"Önceki aygıt  \t\t%5$s\n"
+"Sonraki aygıt  \t\t%6$s\n"
+"Önceki menüye dön  \t\t%7$s"
 
 #: src/frontend/mame/ui/analogipt.cpp:82
 msgctxt "menu-analoginput"
 msgid "Analog Input Adjustments"
-msgstr ""
+msgstr "Analog Giriş Ayarları"
 
 #: src/frontend/mame/ui/analogipt.cpp:121
 #, c-format
 msgctxt "menu-analoginput"
 msgid "Press %s to show settings"
-msgstr ""
+msgstr "Ayarları göstermek için %s'e basın"
 
 #: src/frontend/mame/ui/analogipt.cpp:245
 msgctxt "menu-analoginput"
 msgid "Analog Input Adjustments Help"
-msgstr ""
+msgstr "Analog Giriş Ayarları Yardımı"
 
 #: src/frontend/mame/ui/analogipt.cpp:421
 #, c-format
 msgctxt "menu-analoginput"
 msgid "%1$s Increment/Decrement Speed"
-msgstr ""
+msgstr "%1$s Hız Arttırma/Düşürme"
 
 #: src/frontend/mame/ui/analogipt.cpp:426
 #, c-format
 msgctxt "menu-analoginput"
 msgid "%1$s Auto-centering Speed"
-msgstr ""
+msgstr "%1$s Oto-hizalama Hızı"
 
 #: src/frontend/mame/ui/analogipt.cpp:431
 #, c-format
 msgctxt "menu-analoginput"
 msgid "%1$s Reverse"
-msgstr ""
+msgstr "%1$s Ters"
 
 #: src/frontend/mame/ui/analogipt.cpp:436
 #, c-format
 msgctxt "menu-analoginput"
 msgid "%1$s Sensitivity"
-msgstr ""
+msgstr "%1$s Hassaslık"
 
 #: src/frontend/mame/ui/analogipt.cpp:451
 msgctxt "menu-analoginput"
 msgid "[no analog inputs are enabled]"
-msgstr ""
+msgstr "[hiçbir analog giriş etkin değil]"
 
 #: src/frontend/mame/ui/barcode.cpp:40
 msgid "Barcode Reader"
@@ -6682,7 +6691,7 @@ msgstr ""
 
 #~ msgctxt "path-option"
 #~ msgid "GameOver"
-#~ msgstr "OyunBitti"
+#~ msgstr "Oyun Bitti"
 
 #~ msgctxt "selmenu-artwork"
 #~ msgid "Cabinets"
