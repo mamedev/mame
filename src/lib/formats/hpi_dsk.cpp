@@ -141,7 +141,7 @@ bool hpi_format::geometry_from_size(uint64_t image_size , unsigned& heads , unsi
 	}
 }
 
-bool hpi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool hpi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	unsigned heads;
 	unsigned cylinders;
@@ -155,11 +155,11 @@ bool hpi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	}
 	int max_tracks;
 	int max_heads;
-	image->get_maximal_geometry(max_tracks , max_heads);
+	image.get_maximal_geometry(max_tracks , max_heads);
 	if (cylinders > max_tracks || heads > max_heads) {
 		return false;
 	}
-	image->set_variant(heads == 2 ? floppy_image::DSDD : floppy_image::SSDD);
+	image.set_variant(heads == 2 ? floppy_image::DSDD : floppy_image::SSDD);
 
 	// Suck in the whole image
 	std::vector<uint8_t> image_data(size);
@@ -194,11 +194,11 @@ bool hpi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool hpi_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool hpi_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	int tracks;
 	int heads;
-	image->get_actual_geometry(tracks, heads);
+	image.get_actual_geometry(tracks, heads);
 
 	for (int cyl = 0; cyl < tracks; cyl++) {
 		for (int head = 0; head < heads; head++) {
@@ -218,22 +218,22 @@ bool hpi_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	return true;
 }
 
-const char *hpi_format::name() const
+const char *hpi_format::name() const noexcept
 {
 	return "hpi";
 }
 
-const char *hpi_format::description() const
+const char *hpi_format::description() const noexcept
 {
 	return "HP9895A floppy disk image";
 }
 
-const char *hpi_format::extensions() const
+const char *hpi_format::extensions() const noexcept
 {
 	return "hpi";
 }
 
-bool hpi_format::supports_save() const
+bool hpi_format::supports_save() const noexcept
 {
 	return true;
 }

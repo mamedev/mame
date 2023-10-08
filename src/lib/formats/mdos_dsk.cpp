@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders: 68bit
 /*
- * mdos_dsk.c  -  Motorola MDOS compatible disk images
+ * mdos_dsk.cpp  -  Motorola MDOS compatible disk images
  *
  * The format is largely IBM 3740 compatible, with 77 tracks, and 26 sectors
  * per track, and a sector size of 128 bytes. Single sided disks were initially
@@ -60,17 +60,17 @@ mdos_format::mdos_format() : wd177x_format(formats)
 {
 }
 
-const char *mdos_format::name() const
+const char *mdos_format::name() const noexcept
 {
 	return "mdos";
 }
 
-const char *mdos_format::description() const
+const char *mdos_format::description() const noexcept
 {
 	return "Motorola MDOS compatible disk image";
 }
 
-const char *mdos_format::extensions() const
+const char *mdos_format::extensions() const noexcept
 {
 	return "dsk";
 }

@@ -2,7 +2,7 @@
 // copyright-holders:Nigel Barnes
 /*********************************************************************
 
-    formats/jfd_dsk.c
+    formats/jfd_dsk.cpp
 
     JASPP Floppy Disk image format
 
@@ -175,17 +175,17 @@ jfd_format::jfd_format()
 {
 }
 
-const char *jfd_format::name() const
+const char *jfd_format::name() const noexcept
 {
 	return "jfd";
 }
 
-const char *jfd_format::description() const
+const char *jfd_format::description() const noexcept
 {
 	return "JASPP Floppy Disk image";
 }
 
-const char *jfd_format::extensions() const
+const char *jfd_format::extensions() const noexcept
 {
 	return "jfd";
 }
@@ -232,7 +232,7 @@ int jfd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool jfd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool jfd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -367,12 +367,12 @@ bool jfd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				build_wd_track_mfm(track / 2, track % 2, image, den[0] * 50000, spt, sects, 90, 32, 22);
 		}
 	}
-	image->set_variant(floppy_image::DSDD);
+	image.set_variant(floppy_image::DSDD);
 
 	return true;
 }
 
-bool jfd_format::supports_save() const
+bool jfd_format::supports_save() const noexcept
 {
 	return false;
 }

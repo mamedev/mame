@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /*********************************************************************
 
-    formats/abc800_dsk.c
+    formats/abc800_dsk.cpp
 
     Luxor ABC 830/832/834/838 disk image formats
 
@@ -14,17 +14,17 @@ abc800_format::abc800_format() : wd177x_format(formats)
 {
 }
 
-const char *abc800_format::name() const
+const char *abc800_format::name() const noexcept
 {
 	return "abc800";
 }
 
-const char *abc800_format::description() const
+const char *abc800_format::description() const noexcept
 {
 	return "Luxor ABC 830/832/834/838 disk image";
 }
 
-const char *abc800_format::extensions() const
+const char *abc800_format::extensions() const noexcept
 {
 	return "img";
 }

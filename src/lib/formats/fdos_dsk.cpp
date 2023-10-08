@@ -71,17 +71,17 @@ fdos_format::fdos_format() : wd177x_format(fdos_formats::formats)
 {
 }
 
-const char *fdos_format::name() const
+const char *fdos_format::name() const noexcept
 {
 	return "fdos";
 }
 
-const char *fdos_format::description() const
+const char *fdos_format::description() const noexcept
 {
 	return "FDOS compatible disk image";
 }
 
-const char *fdos_format::extensions() const
+const char *fdos_format::extensions() const noexcept
 {
 	return "dsk";
 }

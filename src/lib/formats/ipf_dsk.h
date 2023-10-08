@@ -13,12 +13,12 @@ class ipf_format : public floppy_image_format_t
 {
 public:
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
 
-	virtual const char *name() const override;
-	virtual const char *description() const override;
-	virtual const char *extensions() const override;
-	virtual bool supports_save() const override;
+	virtual const char *name() const noexcept override;
+	virtual const char *description() const noexcept override;
+	virtual const char *extensions() const noexcept override;
+	virtual bool supports_save() const noexcept override;
 
 private:
 	struct ipf_decode {
@@ -73,18 +73,18 @@ private:
 		bool generate_block_gap_3(uint32_t gap_cells, uint32_t &spos, uint32_t ipos, const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator &tpos, bool &context);
 		bool generate_block_gap(uint32_t gap_type, uint32_t gap_cells, uint8_t pattern, uint32_t &spos, uint32_t ipos, const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator tpos, bool &context);
 
-		bool generate_block(track_info *t, uint32_t idx, uint32_t ipos, std::vector<uint32_t> &track, uint32_t &pos, uint32_t &dpos, uint32_t &gpos, uint32_t &spos, bool &context);
-		uint32_t block_compute_real_size(track_info *t);
+		bool generate_block(const track_info &t, uint32_t idx, uint32_t ipos, std::vector<uint32_t> &track, uint32_t &pos, uint32_t &dpos, uint32_t &gpos, uint32_t &spos, bool &context);
+		uint32_t block_compute_real_size(const track_info &t);
 
 		void timing_set(std::vector<uint32_t> &track, uint32_t start, uint32_t end, uint32_t time);
-		bool generate_timings(track_info *t, std::vector<uint32_t> &track, const std::vector<uint32_t> &data_pos, const std::vector<uint32_t> &gap_pos);
+		bool generate_timings(const track_info &t, std::vector<uint32_t> &track, const std::vector<uint32_t> &data_pos, const std::vector<uint32_t> &gap_pos);
 
 		void rotate(std::vector<uint32_t> &track, uint32_t offset, uint32_t size);
 		void mark_track_splice(std::vector<uint32_t> &track, uint32_t offset, uint32_t size);
-		bool generate_track(track_info *t, floppy_image *image);
-		bool generate_tracks(floppy_image *image);
+		bool generate_track(track_info &t, floppy_image &image);
+		bool generate_tracks(floppy_image &image);
 
-		bool parse(std::vector<uint8_t> &data, floppy_image *image);
+		bool parse(std::vector<uint8_t> &data, floppy_image &image);
 	};
 };
 

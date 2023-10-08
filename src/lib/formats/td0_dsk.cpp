@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic
 /*********************************************************************
 
-    formats/td0_dsk.c
+    formats/td0_dsk.cpp
 
     TD0 disk images
 
@@ -781,7 +781,7 @@ FLOPPY_DESTRUCT( td0_dsk_destruct )
 
 /*********************************************************************
 
-    formats/td0_dsk.h
+    formats/td0_dsk.cpp
 
     Teledisk disk images
 
@@ -793,17 +793,17 @@ td0_format::td0_format()
 {
 }
 
-const char *td0_format::name() const
+const char *td0_format::name() const noexcept
 {
 	return "td0";
 }
 
-const char *td0_format::description() const
+const char *td0_format::description() const noexcept
 {
 	return "Teledisk disk image";
 }
 
-const char *td0_format::extensions() const
+const char *td0_format::extensions() const noexcept
 {
 	return "td0";
 }
@@ -821,7 +821,7 @@ int td0_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	size_t actual;
 	int track_count = 0;
@@ -867,7 +867,7 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			if((imagebuf[offset + 2] & 0x7f) == 2) // ?
 			{
 				if(head_count == 2)
-					image->set_variant(floppy_image::DSHD);
+					image.set_variant(floppy_image::DSHD);
 				else
 					return false; // single side hd?
 				break;
@@ -876,36 +876,36 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			[[fallthrough]];
 		case 1:
 			if(head_count == 2)
-				image->set_variant(floppy_image::DSDD);
+				image.set_variant(floppy_image::DSDD);
 			else
-				image->set_variant(floppy_image::SSDD);
+				image.set_variant(floppy_image::SSDD);
 			break;
 		case 4:
 			if((imagebuf[offset + 2] & 0x7f) == 2) // ?
 			{
 				if(head_count == 2)
-					image->set_variant(floppy_image::DSHD);
+					image.set_variant(floppy_image::DSHD);
 				else
 					return false; // single side 3.5?
 				break;
 			} else
-				image->set_variant(floppy_image::SSDD);
+				image.set_variant(floppy_image::SSDD);
 			break; // FIXME: comment below says "no break" but this is a breal
 			/* no break */
 		case 3:
 			if(head_count == 2)
 			{
 				if(form_factor == floppy_image::FF_525)
-					image->set_variant(floppy_image::DSQD);
+					image.set_variant(floppy_image::DSQD);
 				else
-					image->set_variant(floppy_image::DSDD);
+					image.set_variant(floppy_image::DSDD);
 			}
 			else
 			{
 				if(form_factor == floppy_image::FF_525)
-					image->set_variant(floppy_image::SSQD);
+					image.set_variant(floppy_image::SSQD);
 				else
-					image->set_variant(floppy_image::SSDD);
+					image.set_variant(floppy_image::SSDD);
 			}
 			break;
 		case 5:
@@ -1037,16 +1037,16 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	}
 	if((track_count > 50) && (form_factor == floppy_image::FF_525)) // ?
 	{
-		if(image->get_variant() == floppy_image::DSDD)
-			image->set_variant(floppy_image::DSQD);
-		else if(image->get_variant() == floppy_image::SSDD)
-			image->set_variant(floppy_image::SSQD);
+		if(image.get_variant() == floppy_image::DSDD)
+			image.set_variant(floppy_image::DSQD);
+		else if(image.get_variant() == floppy_image::SSDD)
+			image.set_variant(floppy_image::SSQD);
 	}
 	return true;
 }
 
 
-bool td0_format::supports_save() const
+bool td0_format::supports_save() const noexcept
 {
 	return false;
 }

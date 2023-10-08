@@ -2,7 +2,7 @@
 // copyright-holders:Fabio Priuli
 /*********************************************************************
 
-    formats/dcp_dsk.h
+    formats/dcp_dsk.cpp
 
     PC98 DCP & DCU disk images
 
@@ -29,17 +29,17 @@ dcp_format::dcp_format()
 {
 }
 
-const char *dcp_format::name() const
+const char *dcp_format::name() const noexcept
 {
 	return "dcx";
 }
 
-const char *dcp_format::description() const
+const char *dcp_format::description() const noexcept
 {
 	return "DCP/DCU disk image";
 }
 
-const char *dcp_format::extensions() const
+const char *dcp_format::extensions() const noexcept
 {
 	return "dcp,dcu";
 }
@@ -117,7 +117,7 @@ int dcp_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool dcp_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool dcp_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	size_t actual;
 	uint8_t h[0xa2];
@@ -300,7 +300,7 @@ bool dcp_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool dcp_format::supports_save() const
+bool dcp_format::supports_save() const noexcept
 {
 	return false;
 }

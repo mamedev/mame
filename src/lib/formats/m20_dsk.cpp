@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    formats/m20_dsk.c
+    formats/m20_dsk.cpp
 
     Olivetti M20 floppy-disk images
 
@@ -23,22 +23,22 @@ m20_format::m20_format()
 {
 }
 
-const char *m20_format::name() const
+const char *m20_format::name() const noexcept
 {
 	return "m20";
 }
 
-const char *m20_format::description() const
+const char *m20_format::description() const noexcept
 {
 	return "M20 disk image";
 }
 
-const char *m20_format::extensions() const
+const char *m20_format::extensions() const noexcept
 {
 	return "img";
 }
 
-bool m20_format::supports_save() const
+bool m20_format::supports_save() const noexcept
 {
 	return true;
 }
@@ -55,7 +55,7 @@ int m20_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool m20_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool m20_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	for (int track = 0; track < 35; track++)
 		for (int head = 0; head < 2; head ++) {
@@ -85,12 +85,12 @@ bool m20_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool m20_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool m20_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	uint64_t file_offset = 0;
 
 	int track_count, head_count;
-	track_count = 35; head_count = 2;  //FIXME: use image->get_actual_geometry(track_count, head_count) instead
+	track_count = 35; head_count = 2;  //FIXME: use image.get_actual_geometry(track_count, head_count) instead
 
 	// initial fm track
 	auto bitstream = generate_bitstream_from_track(0, 0, 4000, image);
