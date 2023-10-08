@@ -44,6 +44,7 @@
 */
 
 #include <windows.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <process.h>
 #include <assert.h>
@@ -106,10 +107,11 @@
 #include "pa_stream.h"
 #include "pa_cpuload.h"
 #include "pa_process.h"
-#include "pa_win_wasapi.h"
 #include "pa_debugprint.h"
 #include "pa_ringbuffer.h"
+#include "pa_win_version.h"
 #include "pa_win_coinitialize.h"
+#include "pa_win_wasapi.h"
 
 #if !defined(NTDDI_VERSION) || (defined(__GNUC__) && (__GNUC__ <= 6) && !defined(__MINGW64__))
 
@@ -281,9 +283,26 @@ PA_DEFINE_IID(IPart,                AE2DE0E4, 5BCA, 4F2D, aa, 46, 5d, 13, f8, fd
 PA_DEFINE_IID(IKsJackDescription,   4509F757, 2D46, 4637, 8e, 62, ce, 7d, b9, 44, f5, 7b);
 
 // Media formats:
-__DEFINE_GUID(pa_KSDATAFORMAT_SUBTYPE_PCM,        0x00000001, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
-__DEFINE_GUID(pa_KSDATAFORMAT_SUBTYPE_ADPCM,      0x00000002, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
-__DEFINE_GUID(pa_KSDATAFORMAT_SUBTYPE_IEEE_FLOAT, 0x00000003, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
+__DEFINE_GUID(pa_KSDATAFORMAT_SUBTYPE_PCM,                         0x00000001, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
+__DEFINE_GUID(pa_KSDATAFORMAT_SUBTYPE_ADPCM,                       0x00000002, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
+__DEFINE_GUID(pa_KSDATAFORMAT_SUBTYPE_IEEE_FLOAT,                  0x00000003, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
+__DEFINE_GUID(pa_KSDATAFORMAT_SUBTYPE_IEC61937_PCM,                0x00000000, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
+
+#ifndef _WAVEFORMATEXTENSIBLE_IEC61937_
+    #define _WAVEFORMATEXTENSIBLE_IEC61937_
+typedef struct {
+    WAVEFORMATEXTENSIBLE FormatExt;
+    DWORD                dwEncodedSamplesPerSec;
+    DWORD                dwEncodedChannelCount;
+    DWORD                dwAverageBytesPerSec;
+} WAVEFORMATEXTENSIBLE_IEC61937, *PWAVEFORMATEXTENSIBLE_IEC61937;
+#endif // !_WAVEFORMATEXTENSIBLE_IEC61937_
+
+typedef union _WAVEFORMATEXTENSIBLE_UNION
+{
+    WAVEFORMATEXTENSIBLE          ext;
+    WAVEFORMATEXTENSIBLE_IEC61937 iec61937;
+} WAVEFORMATEXTENSIBLE_UNION;
 
 #ifdef __IAudioClient2_INTERFACE_DEFINED__
 typedef enum _pa_AUDCLNT_STREAMOPTIONS {
@@ -534,7 +553,7 @@ typedef struct PaWasapiSubStream
 #endif
     IAudioClient        *clientProc;
 
-    WAVEFORMATEXTENSIBLE wavex;
+    WAVEFORMATEXTENSIBLE_UNION wavexu;
     UINT32               bufferSize;
     REFERENCE_TIME       deviceLatency;
     REFERENCE_TIME       period;
@@ -1164,193 +1183,24 @@ static BOOL IsWow64()
 
 #endif
 }
-
-// ------------------------------------------------------------------------------------------
-typedef enum EWindowsVersion
-{
-    WINDOWS_UNKNOWN = 0,
-    WINDOWS_VISTA_SERVER2008,
-    WINDOWS_7_SERVER2008R2,
-    WINDOWS_8_SERVER2012,
-    WINDOWS_8_1_SERVER2012R2,
-    WINDOWS_10_SERVER2016,
-    WINDOWS_FUTURE
-}
-EWindowsVersion;
-// Alternative way for checking Windows version (allows to check version on Windows 8.1 and up)
-#ifndef PA_WINRT
-static BOOL IsWindowsVersionOrGreater(WORD wMajorVersion, WORD wMinorVersion, WORD wServicePackMajor)
-{
-    typedef ULONGLONG (NTAPI *LPFN_VERSETCONDITIONMASK)(ULONGLONG ConditionMask, DWORD TypeMask, BYTE Condition);
-    typedef BOOL (WINAPI *LPFN_VERIFYVERSIONINFO)(LPOSVERSIONINFOEXA lpVersionInformation, DWORD dwTypeMask, DWORDLONG dwlConditionMask);
-
-    LPFN_VERSETCONDITIONMASK fnVerSetConditionMask;
-    LPFN_VERIFYVERSIONINFO fnVerifyVersionInfo;
-    OSVERSIONINFOEXA osvi = { sizeof(osvi), 0, 0, 0, 0, {0}, 0, 0 };
-    DWORDLONG dwlConditionMask;
-
-    fnVerSetConditionMask = (LPFN_VERSETCONDITIONMASK)GetProcAddress(GetModuleHandleA("kernel32"), "VerSetConditionMask");
-    fnVerifyVersionInfo = (LPFN_VERIFYVERSIONINFO)GetProcAddress(GetModuleHandleA("kernel32"), "VerifyVersionInfoA");
-
-    if ((fnVerSetConditionMask == NULL) || (fnVerifyVersionInfo == NULL))
-        return FALSE;
-
-    dwlConditionMask = fnVerSetConditionMask(
-        fnVerSetConditionMask(
-            fnVerSetConditionMask(
-                0, VER_MAJORVERSION,     VER_GREATER_EQUAL),
-                   VER_MINORVERSION,     VER_GREATER_EQUAL),
-                   VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL);
-
-    osvi.dwMajorVersion    = wMajorVersion;
-    osvi.dwMinorVersion    = wMinorVersion;
-    osvi.wServicePackMajor = wServicePackMajor;
-
-    return (fnVerifyVersionInfo(&osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_SERVICEPACKMAJOR, dwlConditionMask) != FALSE);
-}
-#endif
-// Get Windows version
-// note: We are trying to get Windows version starting from Windows Vista. Earlier OS versions
-//       will fall into WINDOWS_UNKNOWN case.
-static EWindowsVersion GetWindowsVersion()
-{
-#ifndef PA_WINRT
-    static EWindowsVersion version = WINDOWS_UNKNOWN;
-
-    if (version == WINDOWS_UNKNOWN)
-    {
-        DWORD dwMajorVersion = 0xFFFFFFFFU, dwMinorVersion = 0, dwBuild = 0;
-
-        // RTL_OSVERSIONINFOW equals OSVERSIONINFOW but it is missing inb MinGW winnt.h header,
-        // thus use OSVERSIONINFOW for greater portability
-        typedef NTSTATUS (WINAPI *LPFN_RTLGETVERSION)(POSVERSIONINFOW lpVersionInformation);
-        LPFN_RTLGETVERSION fnRtlGetVersion;
-
-        #define NTSTATUS_SUCCESS ((NTSTATUS)0x00000000L)
-
-        // RtlGetVersion must be able to provide true Windows version (Windows 10 may be reported as Windows 8
-        // by GetVersion API)
-        if ((fnRtlGetVersion = (LPFN_RTLGETVERSION)GetProcAddress(GetModuleHandleA("ntdll"), "RtlGetVersion")) != NULL)
-        {
-            OSVERSIONINFOW ver = { sizeof(OSVERSIONINFOW), 0, 0, 0, 0, {0} };
-
-            if (fnRtlGetVersion(&ver) == NTSTATUS_SUCCESS)
-            {
-                dwMajorVersion = ver.dwMajorVersion;
-                dwMinorVersion = ver.dwMinorVersion;
-                dwBuild        = ver.dwBuildNumber;
-            }
-
-            PRINT(("WASAPI: getting Windows version with RtlGetVersion(): major=%d, minor=%d, build=%d\n", dwMajorVersion, dwMinorVersion, dwBuild));
-        }
-
-        #undef NTSTATUS_SUCCESS
-
-        // fallback to GetVersion if RtlGetVersion is missing
-        if (dwMajorVersion == 0xFFFFFFFFU)
-        {
-            typedef DWORD (WINAPI *LPFN_GETVERSION)(VOID);
-            LPFN_GETVERSION fnGetVersion;
-
-            if ((fnGetVersion = (LPFN_GETVERSION)GetProcAddress(GetModuleHandleA("kernel32"), "GetVersion")) != NULL)
-            {
-                DWORD dwVersion = fnGetVersion();
-
-                dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
-                dwMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
-
-                if (dwVersion < 0x80000000)
-                    dwBuild = (DWORD)(HIWORD(dwVersion));
-
-                PRINT(("WASAPI: getting Windows version with GetVersion(): major=%d, minor=%d, build=%d\n", dwMajorVersion, dwMinorVersion, dwBuild));
-            }
-        }
-
-        if (dwMajorVersion != 0xFFFFFFFFU)
-        {
-            switch (dwMajorVersion)
-            {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-                break; // skip lower
-            case 6:
-                switch (dwMinorVersion)
-                {
-                case 0:  version = WINDOWS_VISTA_SERVER2008; break;
-                case 1:  version = WINDOWS_7_SERVER2008R2;   break;
-                case 2:  version = WINDOWS_8_SERVER2012;     break;
-                case 3:  version = WINDOWS_8_1_SERVER2012R2; break;
-                default: version = WINDOWS_FUTURE;           break;
-                }
-                break;
-            case 10:
-                switch (dwMinorVersion)
-                {
-                case 0:  version = WINDOWS_10_SERVER2016;    break;
-                default: version = WINDOWS_FUTURE;           break;
-                }
-                break;
-            default:
-                version = WINDOWS_FUTURE;
-                break;
-            }
-        }
-        // fallback to VerifyVersionInfo if RtlGetVersion and GetVersion are missing
-        else
-        {
-            PRINT(("WASAPI: getting Windows version with VerifyVersionInfo()\n"));
-
-            if (IsWindowsVersionOrGreater(10, 0, 0))
-                version = WINDOWS_10_SERVER2016;
-            else
-            if (IsWindowsVersionOrGreater(6, 3, 0))
-                version = WINDOWS_8_1_SERVER2012R2;
-            else
-            if (IsWindowsVersionOrGreater(6, 2, 0))
-                version = WINDOWS_8_SERVER2012;
-            else
-            if (IsWindowsVersionOrGreater(6, 1, 0))
-                version = WINDOWS_7_SERVER2008R2;
-            else
-            if (IsWindowsVersionOrGreater(6, 0, 0))
-                version = WINDOWS_VISTA_SERVER2008;
-            else
-                version = WINDOWS_FUTURE;
-        }
-
-        PRINT(("WASAPI: Windows version = %d\n", version));
-    }
-
-    return version;
-#else
-    #if (_WIN32_WINNT >= _WIN32_WINNT_WIN10)
-        return WINDOWS_10_SERVER2016;
-    #else
-        return WINDOWS_8_SERVER2012;
-    #endif
-#endif
-}
-
 // ------------------------------------------------------------------------------------------
 static BOOL UseWOW64Workaround()
 {
     // note: WOW64 bug is common to Windows Vista x64, thus we fall back to safe Poll-driven
     //       method. Windows 7 x64 seems has WOW64 bug fixed.
 
-    return (IsWow64() && (GetWindowsVersion() == WINDOWS_VISTA_SERVER2008));
+    return (IsWow64() && (PaWinUtil_GetOsVersion() == paOsVersionWindowsVistaServer2008));
 }
 
 // ------------------------------------------------------------------------------------------
 static UINT32 GetAudioClientVersion()
 {
-    if (GetWindowsVersion() >= WINDOWS_10_SERVER2016)
+    PaOsVersion version = PaWinUtil_GetOsVersion();
+
+    if (version >= paOsVersionWindows10Server2016)
         return 3;
     else
-    if (GetWindowsVersion() >= WINDOWS_8_SERVER2012)
+    if (version >= paOsVersionWindows8Server2012)
         return 2;
 
     return 1;
@@ -1764,11 +1614,11 @@ static HRESULT ActivateAudioInterface(const PaWasapiDeviceInfo *deviceInfo, cons
         switch (streamInfo->streamOption)
         {
         case eStreamOptionRaw:
-            if (GetWindowsVersion() >= WINDOWS_8_1_SERVER2012R2)
+            if (PaWinUtil_GetOsVersion() >= paOsVersionWindows8_1Server2012R2)
                 audioProps.Options = pa_AUDCLNT_STREAMOPTIONS_RAW;
             break;
         case eStreamOptionMatchFormat:
-            if (GetWindowsVersion() >= WINDOWS_10_SERVER2016)
+            if (PaWinUtil_GetOsVersion() >= paOsVersionWindows10Server2016)
                 audioProps.Options = pa_AUDCLNT_STREAMOPTIONS_MATCH_FORMAT;
             break;
         }
@@ -2440,7 +2290,7 @@ PaError PaWasapi_Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApiInd
 
 #ifndef PA_WINRT
     // Fail safely for any Windows version below Windows Vista
-    if (GetWindowsVersion() == WINDOWS_UNKNOWN)
+    if (PaWinUtil_GetOsVersion() < paOsVersionWindowsVistaServer2008)
     {
         PRINT(("WASAPI: Unsupported Windows version!\n"));
         return paNoError;
@@ -2652,7 +2502,7 @@ int PaWasapi_GetDeviceCurrentFormat( PaStream *pStream, void *pFormat, unsigned 
     if (stream == NULL)
         return paBadStreamPtr;
 
-    format = (bOutput == TRUE ? &stream->out.wavex : &stream->in.wavex);
+    format = (bOutput == TRUE ? &stream->out.wavexu.ext : &stream->in.wavexu.ext);
 
     size = min(formatSize, (UINT32)sizeof(*format));
     memcpy(pFormat, format, size);
@@ -2856,9 +2706,7 @@ static void LogWAVEFORMATEXTENSIBLE(const WAVEFORMATEXTENSIBLE *in)
 // ------------------------------------------------------------------------------------------
 PaSampleFormat WaveToPaFormat(const WAVEFORMATEXTENSIBLE *fmtext)
 {
-    const WAVEFORMATEX *fmt = (WAVEFORMATEX *)fmtext;
-
-    switch (fmt->wFormatTag)
+    switch (fmtext->Format.wFormatTag)
     {
     case WAVE_FORMAT_EXTENSIBLE: {
         if (IsEqualGUID(&fmtext->SubFormat, &pa_KSDATAFORMAT_SUBTYPE_IEEE_FLOAT))
@@ -2869,7 +2717,7 @@ PaSampleFormat WaveToPaFormat(const WAVEFORMATEXTENSIBLE *fmtext)
         else
         if (IsEqualGUID(&fmtext->SubFormat, &pa_KSDATAFORMAT_SUBTYPE_PCM))
         {
-            switch (fmt->wBitsPerSample)
+            switch (fmtext->Format.wBitsPerSample)
             {
             case 32: return paInt32;
             case 24: return paInt24;
@@ -2877,13 +2725,25 @@ PaSampleFormat WaveToPaFormat(const WAVEFORMATEXTENSIBLE *fmtext)
             case  8: return paUInt8;
             }
         }
+        else
+        // KSDATAFORMAT_SUBTYPE_IEC61937_PCM is a naked format GUID which has different Data1 and Data2
+        // depending on the passthrough format, for the possible values refer Microsoft documentation
+        // "Representing Formats for IEC 61937 Transmissions". Here we check if Data3 and Data4 match
+        // assuming that if they do match then we have KSDATAFORMAT_SUBTYPE_IEC61937_XXX format.
+        // Currently PA WASAPI is using KSDATAFORMAT_SUBTYPE_IEEE_FLOAT and KSDATAFORMAT_SUBTYPE_PCM
+        // therefore this check is reliable in this way.
+        if (!memcmp(&fmtext->SubFormat.Data3, &pa_KSDATAFORMAT_SUBTYPE_IEC61937_PCM.Data3,
+            (sizeof(GUID) - offsetof(GUID, Data3))))
+        {
+            return paInt16;
+        }
         break; }
 
     case WAVE_FORMAT_IEEE_FLOAT:
         return paFloat32;
 
     case WAVE_FORMAT_PCM: {
-        switch (fmt->wBitsPerSample)
+        switch (fmtext->Format.wBitsPerSample)
         {
         case 32: return paInt32;
         case 24: return paInt24;
@@ -2897,7 +2757,7 @@ PaSampleFormat WaveToPaFormat(const WAVEFORMATEXTENSIBLE *fmtext)
 }
 
 // ------------------------------------------------------------------------------------------
-static PaError MakeWaveFormatFromParams(WAVEFORMATEXTENSIBLE *wavex, const PaStreamParameters *params,
+static PaError MakeWaveFormatFromParams(WAVEFORMATEXTENSIBLE_UNION *wavexu, const PaStreamParameters *params,
     double sampleRate, BOOL packedOnly)
 {
     WORD bitsPerSample;
@@ -2905,6 +2765,8 @@ static PaError MakeWaveFormatFromParams(WAVEFORMATEXTENSIBLE *wavex, const PaStr
     DWORD channelMask = 0;
     BOOL useExtensible = (params->channelCount > 2); // format is always forced for >2 channels format
     PaWasapiStreamInfo *streamInfo = (PaWasapiStreamInfo *)params->hostApiSpecificStreamInfo;
+    WAVEFORMATEXTENSIBLE *wavex = (WAVEFORMATEXTENSIBLE *)wavexu;
+    BOOL passthroughMode = ((streamInfo != NULL) && (streamInfo->flags & paWinWasapiPassthrough));
 
     // Convert PaSampleFormat to valid data bits
     if ((bitsPerSample = PaSampleFormatToBitsPerSample(params->sampleFormat)) == 0)
@@ -2917,9 +2779,9 @@ static PaError MakeWaveFormatFromParams(WAVEFORMATEXTENSIBLE *wavex, const PaStr
         useExtensible = TRUE;
     }
 
-    memset(wavex, 0, sizeof(*wavex));
+    memset(wavexu, 0, sizeof(*wavexu));
 
-    old                    = (WAVEFORMATEX *)wavex;
+    old                 = (WAVEFORMATEX *)wavex;
     old->nChannels      = (WORD)params->channelCount;
     old->nSamplesPerSec = (DWORD)sampleRate;
     old->wBitsPerSample = bitsPerSample;
@@ -2937,18 +2799,35 @@ static PaError MakeWaveFormatFromParams(WAVEFORMATEXTENSIBLE *wavex, const PaStr
     // WAVEFORMATEX
     if (!useExtensible)
     {
-        old->wFormatTag    = WAVE_FORMAT_PCM;
+        old->wFormatTag = WAVE_FORMAT_PCM;
     }
     // WAVEFORMATEXTENSIBLE
     else
     {
         old->wFormatTag = WAVE_FORMAT_EXTENSIBLE;
-        old->cbSize        = sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX);
+        old->cbSize = (passthroughMode ? (sizeof(WAVEFORMATEXTENSIBLE_IEC61937) - sizeof(WAVEFORMATEX))
+            : (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX)));
 
-        if ((params->sampleFormat & ~paNonInterleaved) == paFloat32)
+        if (passthroughMode)
+        {
+            WAVEFORMATEXTENSIBLE_IEC61937 *wavex_61937 = (WAVEFORMATEXTENSIBLE_IEC61937 *)wavexu;
+
+            wavex->SubFormat = pa_KSDATAFORMAT_SUBTYPE_IEC61937_PCM;
+            wavex->SubFormat.Data1 = (streamInfo->passthrough.formatId >> 16);
+            wavex->SubFormat.Data2 = (USHORT)(streamInfo->passthrough.formatId & 0x0000FFFF);
+
+            wavex_61937->dwEncodedSamplesPerSec = streamInfo->passthrough.encodedSamplesPerSec;
+            wavex_61937->dwEncodedChannelCount = streamInfo->passthrough.encodedChannelCount;
+            wavex_61937->dwAverageBytesPerSec = streamInfo->passthrough.averageBytesPerSec;
+        }
+        else if ((params->sampleFormat & ~paNonInterleaved) == paFloat32)
+        {
             wavex->SubFormat = pa_KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
+        }
         else
+        {
             wavex->SubFormat = pa_KSDATAFORMAT_SUBTYPE_PCM;
+        }
 
         wavex->Samples.wValidBitsPerSample = bitsPerSample;
 
@@ -2995,11 +2874,11 @@ static PaError MakeWaveFormatFromParams(WAVEFORMATEXTENSIBLE *wavex, const PaStr
 
 // ------------------------------------------------------------------------------------------
 static HRESULT GetAlternativeSampleFormatExclusive(IAudioClient *client, double sampleRate,
-    const PaStreamParameters *params, WAVEFORMATEXTENSIBLE *outWavex, BOOL packedSampleFormatOnly)
+    const PaStreamParameters *params, WAVEFORMATEXTENSIBLE_UNION *outWavexU, BOOL packedSampleFormatOnly)
 {
     HRESULT hr = !S_OK;
     AUDCLNT_SHAREMODE shareMode = AUDCLNT_SHAREMODE_EXCLUSIVE;
-    WAVEFORMATEXTENSIBLE testFormat;
+    WAVEFORMATEXTENSIBLE_UNION testFormat;
     PaStreamParameters testParams;
     int i;
     static const PaSampleFormat bestToWorst[] = { paInt32, paInt24, paFloat32, paInt16 };
@@ -3012,9 +2891,9 @@ static HRESULT GetAlternativeSampleFormatExclusive(IAudioClient *client, double 
 
         if (MakeWaveFormatFromParams(&testFormat, &testParams, sampleRate, packedSampleFormatOnly) == paNoError)
         {
-            if ((hr = IAudioClient_IsFormatSupported(client, shareMode, &testFormat.Format, NULL)) == S_OK)
+            if ((hr = IAudioClient_IsFormatSupported(client, shareMode, &testFormat.ext.Format, NULL)) == S_OK)
             {
-                (*outWavex) = testFormat;
+                (*outWavexU) = testFormat;
                 return hr;
             }
         }
@@ -3026,9 +2905,9 @@ static HRESULT GetAlternativeSampleFormatExclusive(IAudioClient *client, double 
 
             if (MakeWaveFormatFromParams(&testFormat, &testParams, sampleRate, packedSampleFormatOnly) == paNoError)
             {
-                if ((hr = IAudioClient_IsFormatSupported(client, shareMode, &testFormat.Format, NULL)) == S_OK)
+                if ((hr = IAudioClient_IsFormatSupported(client, shareMode, &testFormat.ext.Format, NULL)) == S_OK)
                 {
-                    (*outWavex) = testFormat;
+                    (*outWavexU) = testFormat;
                     return hr;
                 }
             }
@@ -3043,9 +2922,9 @@ static HRESULT GetAlternativeSampleFormatExclusive(IAudioClient *client, double 
 
         if (MakeWaveFormatFromParams(&testFormat, &testParams, sampleRate, packedSampleFormatOnly) == paNoError)
         {
-            if ((hr = IAudioClient_IsFormatSupported(client, shareMode, &testFormat.Format, NULL)) == S_OK)
+            if ((hr = IAudioClient_IsFormatSupported(client, shareMode, &testFormat.ext.Format, NULL)) == S_OK)
             {
-                (*outWavex) = testFormat;
+                (*outWavexU) = testFormat;
                 return hr;
             }
         }
@@ -3056,13 +2935,14 @@ static HRESULT GetAlternativeSampleFormatExclusive(IAudioClient *client, double 
 
 // ------------------------------------------------------------------------------------------
 static PaError GetClosestFormat(IAudioClient *client, double sampleRate, const PaStreamParameters *_params,
-    AUDCLNT_SHAREMODE shareMode, WAVEFORMATEXTENSIBLE *outWavex, BOOL output)
+    AUDCLNT_SHAREMODE shareMode, WAVEFORMATEXTENSIBLE_UNION *outWavexU, BOOL output)
 {
     PaWasapiStreamInfo *streamInfo   = (PaWasapiStreamInfo *)_params->hostApiSpecificStreamInfo;
     WAVEFORMATEX *sharedClosestMatch = NULL;
     HRESULT hr                       = !S_OK;
     PaStreamParameters params        = (*_params);
     const BOOL explicitFormat        = (streamInfo != NULL) && ((streamInfo->flags & paWinWasapiExplicitSampleFormat) == paWinWasapiExplicitSampleFormat);
+    WAVEFORMATEXTENSIBLE *outWavex   = (WAVEFORMATEXTENSIBLE *)outWavexU;
     (void)output;
 
     /* It was not noticed that 24-bit Input producing no output while device accepts this format.
@@ -3074,10 +2954,10 @@ static PaError GetClosestFormat(IAudioClient *client, double sampleRate, const P
         params.sampleFormat = paFloat32;*/ // <<< The silence was due to missing Int32_To_Int24_Dither implementation
 
     // Try standard approach, e.g. if data is > 16 bits it will be packed into 32-bit containers
-    MakeWaveFormatFromParams(outWavex, &params, sampleRate, FALSE);
+    MakeWaveFormatFromParams(outWavexU, &params, sampleRate, FALSE);
 
     // If built-in PCM converter requested then shared mode format will always succeed
-    if ((GetWindowsVersion() >= WINDOWS_7_SERVER2008R2) &&
+    if ((PaWinUtil_GetOsVersion() >= paOsVersionWindows7Server2008R2) &&
         (shareMode == AUDCLNT_SHAREMODE_SHARED) &&
         ((streamInfo != NULL) && (streamInfo->flags & paWinWasapiAutoConvert)))
         return paFormatIsSupported;
@@ -3088,7 +2968,7 @@ static PaError GetClosestFormat(IAudioClient *client, double sampleRate, const P
     if ((hr != S_OK) && (shareMode == AUDCLNT_SHAREMODE_EXCLUSIVE))
     {
         // Enforce packed only format, e.g. data bits will not be packed into 32-bit containers in any case
-        MakeWaveFormatFromParams(outWavex, &params, sampleRate, TRUE);
+        MakeWaveFormatFromParams(outWavexU, &params, sampleRate, TRUE);
         hr = IAudioClient_IsFormatSupported(client, shareMode, &outWavex->Format, NULL);
     }
 
@@ -3136,11 +3016,11 @@ static PaError GetClosestFormat(IAudioClient *client, double sampleRate, const P
     if ((shareMode == AUDCLNT_SHAREMODE_EXCLUSIVE) && !explicitFormat)
     {
         // Try standard approach, e.g. if data is > 16 bits it will be packed into 32-bit containers
-        if ((hr = GetAlternativeSampleFormatExclusive(client, sampleRate, &params, outWavex, FALSE)) == S_OK)
+        if ((hr = GetAlternativeSampleFormatExclusive(client, sampleRate, &params, outWavexU, FALSE)) == S_OK)
             return paFormatIsSupported;
 
         // Enforce packed only format, e.g. data bits will not be packed into 32-bit containers in any case
-        if ((hr = GetAlternativeSampleFormatExclusive(client, sampleRate, &params, outWavex, TRUE)) == S_OK)
+        if ((hr = GetAlternativeSampleFormatExclusive(client, sampleRate, &params, outWavexU, TRUE)) == S_OK)
             return paFormatIsSupported;
 
         // Log failure
@@ -3250,7 +3130,7 @@ static PaError IsFormatSupported( struct PaUtilHostApiRepresentation *hostApi,
 
     if (inputParameters != NULL)
     {
-        WAVEFORMATEXTENSIBLE wavex;
+        WAVEFORMATEXTENSIBLE_UNION wavex;
         HRESULT hr;
         PaError answer;
         AUDCLNT_SHAREMODE shareMode = AUDCLNT_SHAREMODE_SHARED;
@@ -3276,7 +3156,7 @@ static PaError IsFormatSupported( struct PaUtilHostApiRepresentation *hostApi,
     if (outputParameters != NULL)
     {
         HRESULT hr;
-        WAVEFORMATEXTENSIBLE wavex;
+        WAVEFORMATEXTENSIBLE_UNION wavex;
         PaError answer;
         AUDCLNT_SHAREMODE shareMode = AUDCLNT_SHAREMODE_SHARED;
         outputStreamInfo = (PaWasapiStreamInfo *)outputParameters->hostApiSpecificStreamInfo;
@@ -3353,11 +3233,11 @@ static void _CalculateAlignedPeriod(PaWasapiSubStream *pSub, UINT32 *nFramesPerL
     if (pSub->shareMode == AUDCLNT_SHAREMODE_EXCLUSIVE)
     {
         (*nFramesPerLatency) = AlignFramesPerBuffer((*nFramesPerLatency),
-            pSub->wavex.Format.nBlockAlign, pAlignFunc);
+            pSub->wavexu.ext.Format.nBlockAlign, pAlignFunc);
     }
 
     // Calculate period
-    pSub->period = MakeHnsPeriod((*nFramesPerLatency), pSub->wavex.Format.nSamplesPerSec);
+    pSub->period = MakeHnsPeriod((*nFramesPerLatency), pSub->wavexu.ext.Format.nSamplesPerSec);
 }
 
 // ------------------------------------------------------------------------------------------
@@ -3388,9 +3268,9 @@ static void _CalculatePeriodicity(PaWasapiSubStream *pSub, BOOL output, REFERENC
             // Align frames backwards, so device will likely make buffer read ready when we are ready
             // to read it (our scheduling will wait for amount of millisoconds of frames_per_buffer)
             alignedFrames = AlignFramesPerBuffer(pSub->params.frames_per_buffer,
-                pSub->wavex.Format.nBlockAlign, ALIGN_BWD);
+                pSub->wavexu.ext.Format.nBlockAlign, ALIGN_BWD);
 
-            userPeriodicity = MakeHnsPeriod(alignedFrames, pSub->wavex.Format.nSamplesPerSec);
+            userPeriodicity = MakeHnsPeriod(alignedFrames, pSub->wavexu.ext.Format.nSamplesPerSec);
 
             // Must not be larger than buffer size
             if (userPeriodicity > pSub->period)
@@ -3445,7 +3325,7 @@ static HRESULT CreateAudioClient(PaWasapiStream *pStream, PaWasapiSubStream *pSu
     }
 
     // Get closest format
-    if ((error = GetClosestFormat(audioClient, sampleRate, params, pSub->shareMode, &pSub->wavex, output)) != paFormatIsSupported)
+    if ((error = GetClosestFormat(audioClient, sampleRate, params, pSub->shareMode, &pSub->wavexu, output)) != paFormatIsSupported)
     {
         (*pa_error) = error;
         LogHostError(hr = AUDCLNT_E_UNSUPPORTED_FORMAT);
@@ -3453,10 +3333,10 @@ static HRESULT CreateAudioClient(PaWasapiStream *pStream, PaWasapiSubStream *pSu
     }
 
     // Check for Mono <<>> Stereo workaround
-    if ((params->channelCount == 1) && (pSub->wavex.Format.nChannels == 2))
+    if ((params->channelCount == 1) && (pSub->wavexu.ext.Format.nChannels == 2))
     {
         // select mixer
-        pSub->monoMixer = GetMonoToStereoMixer(&pSub->wavex, (output ? MIX_DIR__1TO2 : MIX_DIR__2TO1_L));
+        pSub->monoMixer = GetMonoToStereoMixer(&pSub->wavexu.ext, (output ? MIX_DIR__1TO2 : MIX_DIR__2TO1_L));
         if (pSub->monoMixer == NULL)
         {
             (*pa_error) = paInvalidChannelCount;
@@ -3470,7 +3350,7 @@ static HRESULT CreateAudioClient(PaWasapiStream *pStream, PaWasapiSubStream *pSu
         (!pSub->streamFlags || ((pSub->streamFlags & AUDCLNT_STREAMFLAGS_EVENTCALLBACK) == 0)))
     {
         framesPerLatency = _CalculateFramesPerHostBuffer(userFramesPerBuffer, params->suggestedLatency,
-            pSub->wavex.Format.nSamplesPerSec);
+            pSub->wavexu.ext.Format.nSamplesPerSec);
     }
     else
     {
@@ -3479,16 +3359,16 @@ static HRESULT CreateAudioClient(PaWasapiStream *pStream, PaWasapiSubStream *pSu
     #endif
 
         // Work 1:1 with user buffer (only polling allows to use >1)
-        framesPerLatency += MakeFramesFromHns(SecondsTonano100(params->suggestedLatency), pSub->wavex.Format.nSamplesPerSec);
+        framesPerLatency += MakeFramesFromHns(SecondsTonano100(params->suggestedLatency), pSub->wavexu.ext.Format.nSamplesPerSec);
 
         // Force Polling if overall latency is >= 21.33ms as it allows to use 100% CPU in a callback,
         // or user specified latency parameter.
     #ifdef PA_WASAPI_FORCE_POLL_IF_LARGE_BUFFER
-        overall = MakeHnsPeriod(framesPerLatency, pSub->wavex.Format.nSamplesPerSec);
+        overall = MakeHnsPeriod(framesPerLatency, pSub->wavexu.ext.Format.nSamplesPerSec);
         if (overall >= (106667 * 2)/*21.33ms*/)
         {
             framesPerLatency = _CalculateFramesPerHostBuffer(userFramesPerBuffer, params->suggestedLatency,
-                pSub->wavex.Format.nSamplesPerSec);
+                pSub->wavexu.Format.nSamplesPerSec);
 
             // Use Polling interface
             pSub->streamFlags &= ~AUDCLNT_STREAMFLAGS_EVENTCALLBACK;
@@ -3503,7 +3383,7 @@ static HRESULT CreateAudioClient(PaWasapiStream *pStream, PaWasapiSubStream *pSu
 
     // Avoid 0 frames
     if (framesPerLatency == 0)
-        framesPerLatency = MakeFramesFromHns(pInfo->DefaultDevicePeriod, pSub->wavex.Format.nSamplesPerSec);
+        framesPerLatency = MakeFramesFromHns(pInfo->DefaultDevicePeriod, pSub->wavexu.ext.Format.nSamplesPerSec);
 
     // Exclusive Input stream renders data in 6 packets, we must set then the size of
     // single packet, total buffer size, e.g. required latency will be PacketSize * 6
@@ -3527,7 +3407,7 @@ static HRESULT CreateAudioClient(PaWasapiStream *pStream, PaWasapiSubStream *pSu
             pSub->period = pInfo->DefaultDevicePeriod;
 
             // Recalculate aligned period
-            framesPerLatency = MakeFramesFromHns(pSub->period, pSub->wavex.Format.nSamplesPerSec);
+            framesPerLatency = MakeFramesFromHns(pSub->period, pSub->wavexu.ext.Format.nSamplesPerSec);
             _CalculateAlignedPeriod(pSub, &framesPerLatency, ALIGN_BWD);
         }
     }
@@ -3538,7 +3418,7 @@ static HRESULT CreateAudioClient(PaWasapiStream *pStream, PaWasapiSubStream *pSu
             pSub->period = pInfo->MinimumDevicePeriod;
 
             // Recalculate aligned period
-            framesPerLatency = MakeFramesFromHns(pSub->period, pSub->wavex.Format.nSamplesPerSec);
+            framesPerLatency = MakeFramesFromHns(pSub->period, pSub->wavexu.ext.Format.nSamplesPerSec);
             _CalculateAlignedPeriod(pSub, &framesPerLatency, ALIGN_FWD);
         }
     }
@@ -3566,7 +3446,7 @@ static HRESULT CreateAudioClient(PaWasapiStream *pStream, PaWasapiSubStream *pSu
                     pSub->period = MAX_BUFFER_EVENT_DURATION;
 
                     // Recalculate aligned period
-                    framesPerLatency = MakeFramesFromHns(pSub->period, pSub->wavex.Format.nSamplesPerSec);
+                    framesPerLatency = MakeFramesFromHns(pSub->period, pSub->wavexu.ext.Format.nSamplesPerSec);
                     _CalculateAlignedPeriod(pSub, &framesPerLatency, ALIGN_BWD);
                 }
             }
@@ -3578,7 +3458,7 @@ static HRESULT CreateAudioClient(PaWasapiStream *pStream, PaWasapiSubStream *pSu
                     pSub->period = MAX_BUFFER_POLL_DURATION;
 
                     // Recalculate aligned period
-                    framesPerLatency = MakeFramesFromHns(pSub->period, pSub->wavex.Format.nSamplesPerSec);
+                    framesPerLatency = MakeFramesFromHns(pSub->period, pSub->wavexu.ext.Format.nSamplesPerSec);
                     _CalculateAlignedPeriod(pSub, &framesPerLatency, ALIGN_BWD);
                 }
             }
@@ -3594,7 +3474,7 @@ static HRESULT CreateAudioClient(PaWasapiStream *pStream, PaWasapiSubStream *pSu
         pSub->streamFlags,
         pSub->period,
         eventPeriodicity,
-        &pSub->wavex.Format,
+        &pSub->wavexu.ext.Format,
         NULL);
 
     // [Output only] Check if buffer size is the one we requested in Exclusive mode, for UAC1 USB DACs WASAPI
@@ -3621,7 +3501,7 @@ static HRESULT CreateAudioClient(PaWasapiStream *pStream, PaWasapiSubStream *pSu
             PRINT(("WASAPI: CreateAudioClient: detected %d times larger buffer than requested, correct to match user latency\n", ratio));
 
             // Get new aligned frames lowered by calculated ratio
-            framesPerLatency = MakeFramesFromHns(pSub->period / ratio, pSub->wavex.Format.nSamplesPerSec);
+            framesPerLatency = MakeFramesFromHns(pSub->period / ratio, pSub->wavexu.ext.Format.nSamplesPerSec);
             _CalculateAlignedPeriod(pSub, &framesPerLatency, ALIGN_BWD);
 
             // Make sure we are not below the minimum period
@@ -3648,7 +3528,7 @@ static HRESULT CreateAudioClient(PaWasapiStream *pStream, PaWasapiSubStream *pSu
                 pSub->streamFlags,
                 pSub->period,
                 eventPeriodicity,
-                &pSub->wavex.Format,
+                &pSub->wavexu.ext.Format,
                 NULL);
         }
     }
@@ -3665,7 +3545,7 @@ static HRESULT CreateAudioClient(PaWasapiStream *pStream, PaWasapiSubStream *pSu
         pSub->period -= (100 * 10000);
 
         // Recalculate aligned period
-        framesPerLatency = MakeFramesFromHns(pSub->period, pSub->wavex.Format.nSamplesPerSec);
+        framesPerLatency = MakeFramesFromHns(pSub->period, pSub->wavexu.ext.Format.nSamplesPerSec);
         _CalculateAlignedPeriod(pSub, &framesPerLatency, ALIGN_BWD);
 
         // Release the previous allocations
@@ -3688,7 +3568,7 @@ static HRESULT CreateAudioClient(PaWasapiStream *pStream, PaWasapiSubStream *pSu
             pSub->streamFlags,
             pSub->period,
             eventPeriodicity,
-            &pSub->wavex.Format,
+            &pSub->wavexu.ext.Format,
             NULL);
     }
 
@@ -3721,7 +3601,7 @@ static HRESULT CreateAudioClient(PaWasapiStream *pStream, PaWasapiSubStream *pSu
             pSub->streamFlags,
             pSub->period,
             eventPeriodicity,
-            &pSub->wavex.Format,
+            &pSub->wavexu.ext.Format,
             NULL);
     }
 
@@ -3738,7 +3618,7 @@ static HRESULT CreateAudioClient(PaWasapiStream *pStream, PaWasapiSubStream *pSu
     IAudioClient_AddRef(pSub->clientParent);
 
     // Recalculate buffers count
-    _RecalculateBuffersCount(pSub, userFramesPerBuffer, MakeFramesFromHns(pSub->period, pSub->wavex.Format.nSamplesPerSec),
+    _RecalculateBuffersCount(pSub, userFramesPerBuffer, MakeFramesFromHns(pSub->period, pSub->wavexu.ext.Format.nSamplesPerSec),
         fullDuplex, output);
 
     // No error, client is successfully created
@@ -3766,7 +3646,7 @@ static PaError ActivateAudioClient(PaWasapiStream *stream, BOOL output)
         LogPaError(result);
         goto error;
     }
-    LogWAVEFORMATEXTENSIBLE(&subStream->wavex);
+    LogWAVEFORMATEXTENSIBLE(&subStream->wavexu.ext);
 
     // Get max possible buffer size to check if it is not less than that we request
     if (FAILED(hr = IAudioClient_GetBufferSize(subStream->clientParent, &maxBufferSize)))
@@ -3799,7 +3679,7 @@ static PaError ActivateAudioClient(PaWasapiStream *stream, BOOL output)
         subStream->framesPerHostCallback : subStream->params.frames_per_buffer);
 
     // Calculate buffer latency
-    bufferLatency = (PaTime)maxBufferSize / subStream->wavex.Format.nSamplesPerSec;
+    bufferLatency = (PaTime)maxBufferSize / subStream->wavexu.ext.Format.nSamplesPerSec;
 
     // Append buffer latency to interface latency in shared mode (see GetStreamLatency notes)
     subStream->latencySeconds = bufferLatency;
@@ -3945,7 +3825,7 @@ static PaError OpenStream( struct PaUtilHostApiRepresentation *hostApi,
             stream->in.streamFlags = 0; // polling interface is implemented for full-duplex mode also
 
         // Use built-in PCM converter (channel count and sample rate) if requested
-        if ((GetWindowsVersion() >= WINDOWS_7_SERVER2008R2) &&
+        if ((PaWinUtil_GetOsVersion() >= paOsVersionWindows7Server2008R2) &&
             (stream->in.shareMode == AUDCLNT_SHAREMODE_SHARED) &&
             ((inputStreamInfo != NULL) && (inputStreamInfo->flags & paWinWasapiAutoConvert)))
             stream->in.streamFlags |= (AUDCLNT_STREAMFLAGS_AUTOCONVERTPCM | AUDCLNT_STREAMFLAGS_SRC_DEFAULT_QUALITY);
@@ -3972,7 +3852,7 @@ static PaError OpenStream( struct PaUtilHostApiRepresentation *hostApi,
         }
 
         // Get closest format
-        hostInputSampleFormat = PaUtil_SelectClosestAvailableFormat(WaveToPaFormat(&stream->in.wavex), inputSampleFormat);
+        hostInputSampleFormat = PaUtil_SelectClosestAvailableFormat(WaveToPaFormat(&stream->in.wavexu.ext), inputSampleFormat);
 
         // Set user-side custom host processor
         if ((inputStreamInfo != NULL) &&
@@ -3995,7 +3875,7 @@ static PaError OpenStream( struct PaUtilHostApiRepresentation *hostApi,
         if (stream->in.params.blocking == TRUE)
         {
             UINT32 bufferFrames = ALIGN_NEXT_POW2((stream->in.framesPerHostCallback / WASAPI_PACKETS_PER_INPUT_BUFFER) * 2);
-            UINT32 frameSize    = stream->in.wavex.Format.nBlockAlign;
+            UINT32 frameSize    = stream->in.wavexu.ext.Format.nBlockAlign;
 
             // buffer
             if ((stream->in.tailBuffer = PaUtil_AllocateZeroInitializedMemory(sizeof(PaUtilRingBuffer))) == NULL)
@@ -4083,7 +3963,7 @@ static PaError OpenStream( struct PaUtilHostApiRepresentation *hostApi,
             stream->out.streamFlags = 0; // polling interface is implemented for full-duplex mode also
 
         // Use built-in PCM converter (channel count and sample rate) if requested
-        if ((GetWindowsVersion() >= WINDOWS_7_SERVER2008R2) &&
+        if ((PaWinUtil_GetOsVersion() >= paOsVersionWindows7Server2008R2) &&
             (stream->out.shareMode == AUDCLNT_SHAREMODE_SHARED) &&
             ((outputStreamInfo != NULL) && (outputStreamInfo->flags & paWinWasapiAutoConvert)))
             stream->out.streamFlags |= (AUDCLNT_STREAMFLAGS_AUTOCONVERTPCM | AUDCLNT_STREAMFLAGS_SRC_DEFAULT_QUALITY);
@@ -4105,7 +3985,7 @@ static PaError OpenStream( struct PaUtilHostApiRepresentation *hostApi,
         }
 
         // Get closest format
-        hostOutputSampleFormat = PaUtil_SelectClosestAvailableFormat(WaveToPaFormat(&stream->out.wavex), outputSampleFormat);
+        hostOutputSampleFormat = PaUtil_SelectClosestAvailableFormat(WaveToPaFormat(&stream->out.wavexu.ext), outputSampleFormat);
 
         // Set user-side custom host processor
         if ((outputStreamInfo != NULL) &&
@@ -4836,7 +4716,7 @@ static PaError ReadStream( PaStream* s, void *_buffer, unsigned long frames )
             {
                 UINT32 sleep_frames = (frames < stream->in.framesPerHostCallback ? frames : stream->in.framesPerHostCallback);
 
-                sleep  = GetFramesSleepTime(sleep_frames, stream->in.wavex.Format.nSamplesPerSec);
+                sleep  = GetFramesSleepTime(sleep_frames, stream->in.wavexu.ext.Format.nSamplesPerSec);
                 sleep /= 4; // wait only for 1/4 of the buffer
 
                 // WASAPI input provides packets, thus expiring packet will result in bad audio
@@ -4886,7 +4766,7 @@ static PaError ReadStream( PaStream* s, void *_buffer, unsigned long frames )
         // Save tail into buffer
         if ((frames == 0) && (available > processed))
         {
-            UINT32 bytes_processed = processed * stream->in.wavex.Format.nBlockAlign;
+            UINT32 bytes_processed = processed * stream->in.wavexu.ext.Format.nBlockAlign;
             UINT32 frames_to_save  = available - processed;
 
             PaUtil_WriteRingBuffer(stream->in.tailBuffer, wasapi_buffer + bytes_processed, frames_to_save);
@@ -4964,7 +4844,7 @@ static PaError WriteStream( PaStream* s, const void *_buffer, unsigned long fram
         {
             UINT32 sleep_frames = (frames < stream->out.framesPerHostCallback ? frames : stream->out.framesPerHostCallback);
 
-            sleep  = GetFramesSleepTime(sleep_frames, stream->out.wavex.Format.nSamplesPerSec);
+            sleep  = GetFramesSleepTime(sleep_frames, stream->out.wavexu.ext.Format.nSamplesPerSec);
             sleep /= 2; // wait only for half of the buffer
 
             // Avoid busy waiting, schedule next 1 millesecond wait
@@ -5102,7 +4982,7 @@ static void WaspiHostProcessingLoop( void *inputBuffer,  long inputFrames,
     {
         PaTime pending_time;
         if ((hr = IAudioClient_GetCurrentPadding(stream->in.clientProc, &pending)) == S_OK)
-            pending_time = (PaTime)pending / (PaTime)stream->in.wavex.Format.nSamplesPerSec;
+            pending_time = (PaTime)pending / (PaTime)stream->in.wavexu.ext.Format.nSamplesPerSec;
         else
             pending_time = (PaTime)stream->in.latencySeconds;
 
@@ -5113,7 +4993,7 @@ static void WaspiHostProcessingLoop( void *inputBuffer,  long inputFrames,
     {
         PaTime pending_time;
         if ((hr = IAudioClient_GetCurrentPadding(stream->out.clientProc, &pending)) == S_OK)
-            pending_time = (PaTime)pending / (PaTime)stream->out.wavex.Format.nSamplesPerSec;
+            pending_time = (PaTime)pending / (PaTime)stream->out.wavexu.ext.Format.nSamplesPerSec;
         else
             pending_time = (PaTime)stream->out.latencySeconds;
 
@@ -5748,7 +5628,7 @@ static HRESULT ProcessOutputBuffer(PaWasapiStream *stream, PaWasapiHostProcessor
     if (stream->out.monoMixer != NULL)
     {
         // Expand buffer
-        UINT32 monoFrames = frames * (stream->out.wavex.Format.wBitsPerSample / 8);
+        UINT32 monoFrames = frames * (stream->out.wavexu.ext.Format.wBitsPerSample / 8);
         if (monoFrames > stream->out.monoBufferSize)
         {
             stream->out.monoBuffer = PaWasapi_ReallocateMemory(stream->out.monoBuffer, (stream->out.monoBufferSize = monoFrames));
@@ -5812,7 +5692,7 @@ static HRESULT ProcessInputBuffer(PaWasapiStream *stream, PaWasapiHostProcessor 
         if (stream->in.monoMixer != NULL)
         {
             // expand buffer
-            UINT32 monoFrames = frames * (stream->in.wavex.Format.wBitsPerSample / 8);
+            UINT32 monoFrames = frames * (stream->in.wavexu.ext.Format.wBitsPerSample / 8);
             if (monoFrames > stream->in.monoBufferSize)
             {
                 stream->in.monoBuffer = PaWasapi_ReallocateMemory(stream->in.monoBuffer, (stream->in.monoBufferSize = monoFrames));
@@ -6152,8 +6032,8 @@ static UINT32 ConfigureLoopSleepTimeAndScheduler(PaWasapiStream *stream, ThreadI
     }
 
     // Calculate timeout for the next polling attempt
-    sleepTimeIn  = GetFramesSleepTime(userFramesIn, stream->in.wavex.Format.nSamplesPerSec);
-    sleepTimeOut = GetFramesSleepTime(userFramesOut, stream->out.wavex.Format.nSamplesPerSec);
+    sleepTimeIn  = GetFramesSleepTime(userFramesIn, stream->in.wavexu.ext.Format.nSamplesPerSec);
+    sleepTimeOut = GetFramesSleepTime(userFramesOut, stream->out.wavexu.ext.Format.nSamplesPerSec);
 
     // WASAPI input packets tend to expire very easily, let's limit sleep time to 2 milliseconds
     // for all cases. Please propose better solution if any
@@ -6165,8 +6045,8 @@ static UINT32 ConfigureLoopSleepTimeAndScheduler(PaWasapiStream *stream, ThreadI
     // Make sure not 0, othervise use ThreadIdleScheduler to bounce between [0, 1] ms to avoid too busy loop
     if (sleepTime == 0)
     {
-        sleepTimeIn  = GetFramesSleepTimeMicroseconds(userFramesIn, stream->in.wavex.Format.nSamplesPerSec);
-        sleepTimeOut = GetFramesSleepTimeMicroseconds(userFramesOut, stream->out.wavex.Format.nSamplesPerSec);
+        sleepTimeIn  = GetFramesSleepTimeMicroseconds(userFramesIn, stream->in.wavexu.ext.Format.nSamplesPerSec);
+        sleepTimeOut = GetFramesSleepTimeMicroseconds(userFramesOut, stream->out.wavexu.ext.Format.nSamplesPerSec);
 
         sleepTime = GetSleepTime(stream, sleepTimeIn, sleepTimeOut, userFramesOut);
 
@@ -6476,7 +6356,7 @@ PA_THREAD_FUNC ProcThreadPoll(void *param)
                         // convert output mono
                         if (stream->out.monoMixer)
                         {
-                            UINT32 mono_frames_size = o_processed * (stream->out.wavex.Format.wBitsPerSample / 8);
+                            UINT32 mono_frames_size = o_processed * (stream->out.wavexu.ext.Format.wBitsPerSample / 8);
                             // expand buffer
                             if (mono_frames_size > stream->out.monoBufferSize)
                             {
@@ -6500,7 +6380,7 @@ PA_THREAD_FUNC ProcThreadPoll(void *param)
                         // convert input mono
                         if (stream->in.monoMixer)
                         {
-                            UINT32 mono_frames_size = i_processed * (stream->in.wavex.Format.wBitsPerSample / 8);
+                            UINT32 mono_frames_size = i_processed * (stream->in.wavexu.ext.Format.wBitsPerSample / 8);
                             // expand buffer
                             if (mono_frames_size > stream->in.monoBufferSize)
                             {

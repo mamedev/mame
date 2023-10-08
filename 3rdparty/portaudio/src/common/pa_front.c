@@ -154,6 +154,7 @@ static PaUtilHostApiRepresentation **hostApis_ = 0;
 static int hostApisCount_ = 0;
 static int defaultHostApiIndex_ = 0;
 static int initializationCount_ = 0;
+static int initializing_ = 0;
 static int deviceCount_ = 0;
 
 PaUtilStreamRepresentation *firstOpenStream_ = NULL;
@@ -360,8 +361,21 @@ PaError Pa_Initialize( void )
         ++initializationCount_;
         result = paNoError;
     }
+    else if( initializing_ )
+    {
+        // a concurrent initialization is already running
+        PA_DEBUG(("Attempting to re-enter Pa_Initialize(), aborting!\n"));
+        result = paCanNotInitializeRecursively;
+    }
     else
     {
+        // set initializing_ here to
+        // let recursive calls execute the if branch above.
+        // This can happen if a driver like FlexAsio itself uses portaudio
+        // and avoids a stack overflow in the user application.
+        // https://github.com/PortAudio/portaudio/issues/766
+        initializing_ = 1;
+
         PA_VALIDATE_TYPE_SIZES;
         PA_VALIDATE_ENDIANNESS;
 
@@ -371,6 +385,8 @@ PaError Pa_Initialize( void )
         result = InitializeHostApis();
         if( result == paNoError )
             ++initializationCount_;
+
+        initializing_ = 0;
     }
 
     PA_LOGAPI_EXIT_PAERROR( "Pa_Initialize", result );
@@ -453,6 +469,7 @@ const char *Pa_GetErrorText( PaError errorCode )
     case paCanNotWriteToAnInputOnlyStream:      result = "Can't write to an input only stream"; break;
     case paIncompatibleStreamHostApi: result = "Incompatible stream host API"; break;
     case paBadBufferPtr:             result = "Bad buffer pointer"; break;
+    case paCanNotInitializeRecursively: result = "PortAudio can not be initialized recursively"; break;
     default:
         if( errorCode > 0 )
             result = "Invalid error code (value greater than zero)";

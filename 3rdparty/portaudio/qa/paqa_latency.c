@@ -61,8 +61,8 @@ typedef struct
     int left_phase;
     int right_phase;
     char message[20];
-    int minFramesPerBuffer;
-    int maxFramesPerBuffer;
+    unsigned long minFramesPerBuffer;
+    unsigned long maxFramesPerBuffer;
     int callbackCount;
     PaTime minDeltaDacTime;
     PaTime maxDeltaDacTime;
@@ -170,8 +170,8 @@ PaError paqaCheckLatency( PaStreamParameters *outputParamsPtr,
     printf("Play for %d seconds.\n", NUM_SECONDS );
     Pa_Sleep( NUM_SECONDS * 1000 );
 
-    printf("  minFramesPerBuffer = %4d\n", dataPtr->minFramesPerBuffer );
-    printf("  maxFramesPerBuffer = %4d\n", dataPtr->maxFramesPerBuffer );
+    printf("  minFramesPerBuffer = %4lu\n", dataPtr->minFramesPerBuffer );
+    printf("  maxFramesPerBuffer = %4lu\n", dataPtr->maxFramesPerBuffer );
     printf("  minDeltaDacTime = %f\n", dataPtr->minDeltaDacTime );
     printf("  maxDeltaDacTime = %f\n", dataPtr->maxDeltaDacTime );
 
