@@ -2443,7 +2443,7 @@ msgstr ""
 #, c-format
 msgctxt "gfxview"
 msgid " %1$d×%2$d origin (%3$d %4$d)"
-msgstr " %1$d×%2$d köken (%3$d %4$d)"
+msgstr " %1$d×%2$d sıfır noktası (%3$d %4$d)"
 
 #: src/frontend/mame/ui/selgame.cpp:463
 msgid "System Settings"
