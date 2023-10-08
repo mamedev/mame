@@ -25,8 +25,6 @@
 #include "sound/spkrdev.h"
 #include "ams40041.h"
 
-#include "formats/pc_dsk.h"
-
 #define I8086_TAG       "ic120"
 #define I8087_TAG       "ic119"
 #define I8048_TAG       "i8048"

@@ -238,11 +238,7 @@
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
-#include "formats/pc_dsk.h"
-
 #include "imagedev/floppy.h"
-
-#include "debugger.h"
 
 #define LOG_MMU     (1U << 1)
 #define LOG_IOCB    (1U << 2)

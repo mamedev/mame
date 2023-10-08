@@ -32,7 +32,6 @@
 #include "bus/rs232/rs232.h"
 #include "imagedev/harddriv.h"
 #include "imagedev/floppy.h"
-#include "formats/imd_dsk.h"
 
 // video
 #include "screen.h"

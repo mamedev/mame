@@ -15,9 +15,6 @@
 #include "machine/pci.h"
 #include "machine/upd765.h"
 
-#include "formats/naslite_dsk.h"
-#include "formats/pc_dsk.h"
-
 
 // NVIDIA Corporation nForce CPU bridge
 

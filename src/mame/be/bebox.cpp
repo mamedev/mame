@@ -26,7 +26,6 @@
 /* Devices */
 #include "bus/scsi/scsicd.h"
 #include "bus/scsi/scsihd.h"
-#include "formats/pc_dsk.h"
 #include "machine/8042kbdc.h"
 
 uint8_t bebox_state::at_dma8237_1_r(offs_t offset) { return m_dma8237[1]->read(offset / 2); }

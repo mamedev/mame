@@ -91,10 +91,7 @@
 #include "bus/pc_kbd/keyboards.h"
 
 #include "imagedev/floppy.h"
-#include "formats/pc_dsk.h"
 #include "softlist.h"
-
-#include "debugger.h"
 
 #include "jazz.lh"
 

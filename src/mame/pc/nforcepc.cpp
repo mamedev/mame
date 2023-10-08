@@ -36,6 +36,8 @@
 #include "bus/isa/isa.h"
 #include "video/virge_pci.h"
 
+#include "formats/naslite_dsk.h"
+
 
 #if 1
 // for now let's use this as the contents of the spd chip in the ddr dimm memory module

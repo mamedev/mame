@@ -330,7 +330,6 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 
 #include "machine/wd_fdc.h"
 #include "formats/rx50_dsk.h"
-#include "formats/pc_dsk.h" // PC Formats
 #include "imagedev/floppy.h"
 
 #include "imagedev/harddriv.h"

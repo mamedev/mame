@@ -18,7 +18,6 @@
 #include "machine/ins8250.h"    /* pc com port */
 #include "sound/beep.h"         /* pcw/pcw16 beeper */
 #include "machine/intelfsh.h"
-#include "formats/pc_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/timer.h"

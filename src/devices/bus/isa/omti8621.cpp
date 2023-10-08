@@ -16,7 +16,6 @@
 #include "omti8621.h"
 #include "image.h"
 #include "imagedev/harddriv.h"
-#include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
 #include "formats/apollo_dsk.h"
 

@@ -62,8 +62,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "formats/pc_dsk.h"
-
 #define LOG_DEBUG   (1U << 1)
 #define LOG_IRQ     (1U << 2)
 

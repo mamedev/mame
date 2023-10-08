@@ -255,7 +255,6 @@
 #include "bus/interpro/keyboard/keyboard.h"
 #include "bus/interpro/mouse/mouse.h"
 
-#include "formats/pc_dsk.h"
 #include "softlist.h"
 
 #include "machine/input_merger.h"

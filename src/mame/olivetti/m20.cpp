@@ -57,7 +57,6 @@ E I1     Vectored interrupt error
 #include "softlist_dev.h"
 
 #include "formats/m20_dsk.h"
-#include "formats/pc_dsk.h"
 
 
 namespace {
