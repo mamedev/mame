@@ -4254,7 +4254,7 @@ void subsino_state::init_mtrainnv()
 *                               Game Drivers                               *
 ***************************************************************************/
 
-//     YEAR  NAME         PARENT   MACHINE   INPUT     CLASS          INIT              ROT   COMPANY            FULLNAME                                       FLAGS                LAYOUT
+//     YEAR  NAME         PARENT   MACHINE     INPUT     CLASS          INIT              ROT   COMPANY            FULLNAME                                       FLAGS                LAYOUT
 GAMEL( 1990, victor21,    0,       victor21,   victor21, subsino_state, init_victor21,    ROT0, "Subsino / Buffy", "Victor 21",                                   0,                   layout_victor21 )
 
 GAMEL( 1991, victor5,     0,       victor5,    victor5,  subsino_state, init_victor5,     ROT0, "Subsino / Buffy", "Victor 5",                                    0,                   layout_victor5  ) // Original PCB and game from Subsino.
