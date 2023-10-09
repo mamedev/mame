@@ -3322,8 +3322,8 @@ ROM_START( newhunter )
 	ROM_LOAD( "ht-4.bin",     0x00345, 0x00117, CRC(f4f78925) SHA1(738281c05c0f51c0edcf65bacc18ebc87c2408c1) )
 ROM_END
 
-/*  The PCB have five 8-dipswitches bank sockets, but four of them were unpopulated (only one was present on the PCB).
-    The socket for the reset switch was also unpopulated on the PCB, and there wasn't memory backed RAM on the PCB
+/*  The PCB had five positions for banks of eight DIP switches, but four of them were unpopulated (only one was present on the PCB).
+    The position for the reset switch was also unpopulated, and there wasn't battery-backed RAM on the PCB
     (present on most games on this hardware). */
 ROM_START( newhunterb )
 	ROM_REGION( 0x04000, "mcu", 0 )
