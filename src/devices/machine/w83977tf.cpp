@@ -103,7 +103,7 @@ void w83977tf_device::remap(int space_id, offs_t start, offs_t end)
 		if (m_activate[8] & 1)
 		{
 			// TODO: from port
-			m_isa->install_device(0x70, 0x7f, read8sm_delegate(*m_rtc, FUNC(ds12885_device::read)), write8sm_delegate(*m_rtc, FUNC(ds12885_device::write)));
+			m_isa->install_device(0x70, 0x7f, read8sm_delegate(*this, FUNC(w83977tf_device::rtc_r)), write8sm_delegate(*this, FUNC(w83977tf_device::rtc_w)));
 		}
 	}
 }
@@ -385,6 +385,22 @@ void w83977tf_device::keyb_io_address_w(offs_t offset, u8 data)
 /*
  * Device #8 (RTC)
  */
+
+u8 w83977tf_device::rtc_r(offs_t offset)
+{
+	if (BIT(offset, 0))
+		return m_rtc->data_r();
+	else
+		return m_rtc->get_address();
+}
+
+void w83977tf_device::rtc_w(offs_t offset, u8 data)
+{
+	if (BIT(offset, 0))
+		m_rtc->data_w(data);
+	else
+		m_rtc->address_w(data);
+}
 
 void w83977tf_device::irq_rtc_w(int state)
 {

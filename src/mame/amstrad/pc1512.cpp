@@ -563,7 +563,7 @@ uint8_t pc1640_state::io_r(offs_t offset)
 	else if (addr >= 0x020 && addr <= 0x021) { data = m_pic->read(offset & 0x01); decoded = true; }
 	else if (addr >= 0x040 && addr <= 0x043) { data = m_pit->read(offset & 0x03); decoded = true; }
 	else if (addr >= 0x060 && addr <= 0x06f) { data = system_r(offset & 0x0f); decoded = true; }
-	else if (addr >= 0x070 && addr <= 0x073) { data = m_rtc->read(offset & 0x01); decoded = true; }
+	else if (addr == 0x071 || addr == 0x073) { data = m_rtc->data_r(); decoded = true; }
 	else if (addr >= 0x078 && addr <= 0x07f) { data = mouse_r(offset & 0x07); decoded = true; }
 	else if (addr >= 0x378 && addr <= 0x37b) { data = printer_r(offset & 0x03); decoded = true; }
 	else if (addr >= 0x3b0 && addr <= 0x3df) { decoded = true; }
@@ -631,7 +631,8 @@ void pc1512_state::pc1512_io(address_map &map)
 	map(0x020, 0x021).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x040, 0x043).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x060, 0x06f).rw(FUNC(pc1512_state::system_r), FUNC(pc1512_state::system_w));
-	map(0x070, 0x071).mirror(0x02).rw(m_rtc, FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+	map(0x070, 0x070).mirror(0x02).w(m_rtc, FUNC(mc146818_device::address_w));
+	map(0x071, 0x071).mirror(0x02).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w));
 	map(0x078, 0x07f).rw(FUNC(pc1512_state::mouse_r), FUNC(pc1512_state::mouse_w));
 	map(0x080, 0x083).w(FUNC(pc1512_state::dma_page_w));
 	map(0x0a1, 0x0a1).w(FUNC(pc1512_state::nmi_mask_w));
@@ -666,7 +667,8 @@ void pc1640_state::pc1640_io(address_map &map)
 	map(0x020, 0x021).w(m_pic, FUNC(pic8259_device::write));
 	map(0x040, 0x043).w(m_pit, FUNC(pit8253_device::write));
 	map(0x060, 0x06f).w(FUNC(pc1640_state::system_w));
-	map(0x070, 0x071).mirror(0x02).w(m_rtc, FUNC(mc146818_device::write));
+	map(0x070, 0x070).mirror(0x02).w(m_rtc, FUNC(mc146818_device::address_w));
+	map(0x071, 0x071).mirror(0x02).w(m_rtc, FUNC(mc146818_device::data_w));
 	map(0x078, 0x07f).w(FUNC(pc1640_state::mouse_w));
 	map(0x080, 0x083).w(FUNC(pc1640_state::dma_page_w));
 	map(0x0a1, 0x0a1).w(FUNC(pc1640_state::nmi_mask_w));

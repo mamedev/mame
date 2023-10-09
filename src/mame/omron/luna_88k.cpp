@@ -338,7 +338,8 @@ void luna88k2_state::cpu_map(address_map &map)
 {
 	luna_88k_state_base::cpu_map(map);
 
-	map(0x4500'0000, 0x4500'0001).rw(m_rtc, FUNC(ds1397_device::read), FUNC(ds1397_device::write));
+	map(0x4500'0000, 0x4500'0000).w(m_rtc, FUNC(ds1397_device::address_w));
+	map(0x4500'0001, 0x4500'0001).rw(m_rtc, FUNC(ds1397_device::data_r), FUNC(ds1397_device::data_w));
 	map(0x4700'0000, 0x4700'003f).rw(m_rtc, FUNC(ds1397_device::xram_r), FUNC(ds1397_device::xram_w));
 
 	// 0x8100'0000 ext board A

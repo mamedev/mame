@@ -47,7 +47,8 @@ void sis85c496_host_device::internal_io_map(address_map &map)
 	map(0x0040, 0x005f).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x0060, 0x0063).rw(FUNC(sis85c496_host_device::at_keybc_r), FUNC(sis85c496_host_device::at_keybc_w));
 	map(0x0064, 0x0067).rw("keybc", FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w));
-	map(0x0070, 0x007f).rw("rtc", FUNC(ds12885_device::read), FUNC(ds12885_device::write));
+	map(0x0070, 0x007f).w(FUNC(sis85c496_host_device::rtc_nmi_w)).umask32(0x00ff00ff);
+	map(0x0070, 0x007f).rw("rtc", FUNC(ds12885_device::data_r), FUNC(ds12885_device::data_w)).umask32(0xff00ff00);
 	map(0x0080, 0x009f).rw(FUNC(sis85c496_host_device::at_page8_r), FUNC(sis85c496_host_device::at_page8_w));
 	map(0x00a0, 0x00bf).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00c0, 0x00df).rw(FUNC(sis85c496_host_device::at_dma8237_2_r), FUNC(sis85c496_host_device::at_dma8237_2_w));
@@ -618,16 +619,11 @@ void sis85c496_host_device::at_keybc_w(offs_t offset, uint8_t data)
 }
 
 
-void sis85c496_host_device::write_rtc(offs_t offset, uint8_t data)
+void sis85c496_host_device::rtc_nmi_w(uint8_t data)
 {
-	if (offset==0) {
-		m_nmi_enabled = BIT(data,7);
-		//m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
-		m_ds12885->write(0,data);
-	}
-	else {
-		m_ds12885->write(offset,data);
-	}
+	m_nmi_enabled = BIT(data,7);
+	//m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
+	m_ds12885->address_w(data);
 }
 
 void sis85c496_host_device::cpu_a20_w(int state)

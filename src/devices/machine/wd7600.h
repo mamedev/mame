@@ -104,7 +104,7 @@ private:
 	uint8_t pic1_slave_ack_r(offs_t offset);
 	void ctc_out1_w(int state);
 	void ctc_out2_w(int state);
-	void rtc_w(offs_t offset, uint8_t data);
+	void rtc_nmi_w(uint8_t data);
 	void keyb_cmd_w(uint8_t data);
 	void keyb_data_w(uint8_t data);
 	uint8_t keyb_data_r();

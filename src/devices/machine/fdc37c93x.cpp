@@ -609,7 +609,8 @@ void fdc37c93x_device::unmap_serial2_addresses()
 
 void fdc37c93x_device::map_rtc(address_map &map)
 {
-	map(0x0, 0xf).rw(ds12885_rtcdev, FUNC(ds12885_device::read), FUNC(ds12885_device::write));
+	map(0x0, 0xf).lr8(NAME([this]() { return ds12885_rtcdev->get_address(); })).w(ds12885_rtcdev, FUNC(ds12885_device::address_w)).umask32(0x00ff00ff); // datasheet implies address might be a R/W register
+	map(0x0, 0xf).rw(ds12885_rtcdev, FUNC(ds12885_device::data_r), FUNC(ds12885_device::data_w)).umask32(0xff00ff00);
 }
 
 void fdc37c93x_device::map_rtc_addresses()

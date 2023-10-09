@@ -131,7 +131,8 @@ void pcat_base_state::pcat32_io_common(address_map &map)
 	map(0x0020, 0x003f).rw(m_pic8259_1, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x005f).rw(m_pit8254, FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x0060, 0x006f).rw(m_kbdc, FUNC(kbdc8042_device::data_r), FUNC(kbdc8042_device::data_w));
-	map(0x0070, 0x007f).rw(m_mc146818, FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+	map(0x0070, 0x007f).w(m_mc146818, FUNC(mc146818_device::address_w)).umask32(0x00ff00ff);
+	map(0x0070, 0x007f).rw(m_mc146818, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask32(0xff00ff00);
 	map(0x0080, 0x009f).rw(FUNC(pcat_base_state::dma_page_select_r), FUNC(pcat_base_state::dma_page_select_w));//TODO
 	map(0x00a0, 0x00bf).rw(m_pic8259_2, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00c0, 0x00df).rw(m_dma8237_2, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0x00ff00ff);

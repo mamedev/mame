@@ -101,7 +101,7 @@ void pc87306_device::remap(int space_id, offs_t start, offs_t end)
 		}
 
 		if (BIT(m_krr, 3))
-			m_isa->install_device(0x70, 0x71, read8sm_delegate(*m_rtc, FUNC(ds12885_device::read)), write8sm_delegate(*m_rtc, FUNC(ds12885_device::write)));
+			m_isa->install_device(0x70, 0x71, read8sm_delegate(*this, FUNC(pc87306_device::rtc_r)), write8sm_delegate(*this, FUNC(pc87306_device::rtc_w)));
 	}
 }
 
@@ -198,6 +198,22 @@ u8 pc87306_device::keybc_status_r(offs_t offset)
 void pc87306_device::keybc_command_w(offs_t offset, u8 data)
 {
 	m_kbdc->data_w(4, data);
+}
+
+u8 pc87306_device::rtc_r(offs_t offset)
+{
+	if (BIT(offset, 0))
+		return m_rtc->data_r(); // TODO: SCF0 bit 0 locks addresses 38 to 3F (FF is returned)
+	else
+		return m_rtc->get_address(); // datasheet doesn't clarify whether or not this is actually readable
+}
+
+void pc87306_device::rtc_w(offs_t offset, u8 data)
+{
+	if (BIT(offset, 0))
+		m_rtc->data_w(data); // TODO: SCF0 bit 0 locks addresses 38 to 3F
+	else
+		m_rtc->address_w(data);
 }
 
 /*

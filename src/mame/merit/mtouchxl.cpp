@@ -134,7 +134,8 @@ void mtxl_state::at32_io(address_map &map)
 	map(0x0040, 0x005f).rw("mb:pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x0060, 0x0067).rw("kbdc", FUNC(kbdc8042_device::data_r), FUNC(kbdc8042_device::data_w));
 	map(0x0061, 0x0061).rw("mb", FUNC(at_mb_device::portb_r), FUNC(at_mb_device::portb_w));
-	map(0x0070, 0x007f).rw("mb:rtc", FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+	map(0x0070, 0x007f).w("mb:rtc", FUNC(mc146818_device::address_w)).umask32(0x00ff00ff);
+	map(0x0070, 0x007f).rw("mb:rtc", FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask32(0xff00ff00);
 	map(0x0080, 0x009f).rw("mb", FUNC(at_mb_device::page8_r), FUNC(at_mb_device::page8_w));
 	map(0x00a0, 0x00bf).rw("mb:pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00c0, 0x00df).rw("mb:dma8237_2", FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0x00ff00ff);

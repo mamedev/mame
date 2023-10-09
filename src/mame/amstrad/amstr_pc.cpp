@@ -299,7 +299,8 @@ void amstrad_pc_state::pc200_io(address_map &map)
 void amstrad_pc_state::ppc512_io(address_map &map)
 {
 	pc200_io(map);
-	map(0x0070, 0x0071).rw("rtc", FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+	map(0x0070, 0x0070).w("rtc", FUNC(mc146818_device::address_w));
+	map(0x0071, 0x0071).rw("rtc", FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w));
 }
 
 void amstrad_pc_state::machine_start()

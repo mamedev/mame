@@ -67,6 +67,8 @@ private:
 
 	u8 keybc_status_r(offs_t offset);
 	void keybc_command_w(offs_t offset, u8 data);
+	u8 rtc_r(offs_t offset);
+	void rtc_w(offs_t offset, u8 data);
 
 	void kbdp21_gp25_gatea20_w(int state);
 	void kbdp20_gp20_reset_w(int state);

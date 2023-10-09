@@ -1136,7 +1136,8 @@ void rastersp_state::io_map(address_map &map)
 	map(0x100c, 0x100f).portr("DSW2");
 	map(0x1010, 0x1013).portr("DSW1");
 	map(0x1014, 0x1017).portr("EXTRA");
-	map(0x4000, 0x4007).rw("rtc", FUNC(mc146818_device::read), FUNC(mc146818_device::write)).umask32(0x000000ff);
+	map(0x4000, 0x4000).w("rtc", FUNC(mc146818_device::address_w));
+	map(0x4004, 0x4004).rw("rtc", FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w));
 	map(0x6000, 0x6000).rw( m_duart, FUNC(z80scc_device::cb_r), FUNC(z80scc_device::cb_w));
 	map(0x6004, 0x6004).rw( m_duart, FUNC(z80scc_device::db_r), FUNC(z80scc_device::db_w));
 	map(0x6008, 0x6008).rw( m_duart, FUNC(z80scc_device::ca_r), FUNC(z80scc_device::ca_w));

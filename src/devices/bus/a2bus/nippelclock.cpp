@@ -88,8 +88,8 @@ uint8_t a2bus_nippelclock_device::read_c0nx(uint8_t offset)
 {
 	switch (offset)
 	{
-	case 6: case 7:
-		return m_rtc->read(offset - 6);
+	case 7:
+		return m_rtc->data_r();
 		break;
 	}
 
@@ -105,8 +105,11 @@ void a2bus_nippelclock_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
-	case 6: case 7:
-		m_rtc->write(offset - 6, data);
+	case 6:
+		m_rtc->address_w(data);
+		break;
+	case 7:
+		m_rtc->data_w(data);
 		break;
 	}
 }
