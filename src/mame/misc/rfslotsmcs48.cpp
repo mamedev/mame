@@ -70,7 +70,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ioexp(*this, "ioexp%u", 0U)
 		, m_kbdc(*this, "kbdc")  // found leftover code for kdbc controller
-		, m_hopper(*this, "hopper")		
+		, m_hopper(*this, "hopper")
 		, m_sndajcpu(*this, "sndajcpu")
 		, m_sndbfcpu(*this, "sndbfcpu")
 		, m_aysnd1(*this, "aysnd1")
@@ -83,9 +83,7 @@ public:
 	void babyfrts(machine_config &config);
 
 protected:
-
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	memory_share_creator<uint8_t> m_data_ram;
 
 	required_device<i8035_device> m_maincpu;
@@ -144,7 +142,7 @@ private:
 	u8 m_kbd_sl = 0x00;
 
 	// other
-	u8 m_hdecode;
+	u8 m_hdecode = 0;
 	void hopper_decode();
 };
 
@@ -153,7 +151,7 @@ private:
 
 
 /******************************************
-*          Machine Start & Reset          *
+*              Machine Start              *
 *                                         *
 ******************************************/
 
@@ -161,9 +159,6 @@ void rfslotsmcs48_state::machine_start()
 {
 	m_outbit.resolve();
 }
-
-void rfslotsmcs48_state::machine_reset()
-{}
 
 
 /*********************************************
@@ -219,15 +214,15 @@ u8 rfslotsmcs48_state::main_io_r(offs_t offset)
 			ret = m_kbdc->status_r();
 			// logerror("KDBC Status Read Offs:%02X - Data:%02X\n", offset, ret);
 			break;
-		}		
+		}
 		case 0xe:  // NVRAM access
 		{
 			ret = m_data_ram[offset];
 			// logerror("Data RAM Read Offs:%02X - Data:%02X\n", offset, ret);
 			break;
 		}
-		default: 
-			ret =  0xff;
+		default:
+			ret = 0xff;
 	}
 	// logerror("%s: Main I/O Read Offs:%02X - ret:%02x\n", machine().describe_context(), offset, ret);
 	return ret;
@@ -262,15 +257,15 @@ void rfslotsmcs48_state::main_io_w(offs_t offset, u8 data)
 
 void rfslotsmcs48_state::main_p1_w(u8 data)
 {
-	m_int_flag = BIT(data, 0); 
+	m_int_flag = BIT(data, 0);
 	m_ioexp[0]->cs_w(BIT(data, 5));  // Chip Select IO Expander_1
 	m_ioexp[1]->cs_w(BIT(data, 4));  // Chip Select IO Expander_2
 	m_ioexp[2]->cs_w(BIT(data, 3));  // Chip Select IO Expander_3
 	m_ioexp[3]->cs_w(BIT(data, 2));  // Chip Select IO Expander_4
 	m_ioexp[4]->cs_w(BIT(data, 1));  // Chip Select IO Expander_5
-	
+
 	hopper_decode();  // update hopper motor state
-	
+
 	// bit 7 unused or unknown
 	// logerror("%s:Main P1 write Data: %02x\n", machine().describe_context(), data);
 }
@@ -376,11 +371,11 @@ u8 rfslotsmcs48_state::sound_io_r(offs_t offset)
 {
 	logerror("%s: Audio I/O Read Offs:%02X\n", machine().describe_context(), offset);
 	m_aysnd1->address_w(offset);
-		if(!BIT(m_sndbfcpu->p1_r(),0))
+	if(!BIT(m_sndbfcpu->p1_r(),0))
 	{
 		m_aysnd1->address_w(offset);
 		return m_aysnd1->data_r();
-	}	
+	}
 	if(!BIT(m_sndbfcpu->p1_r(),1))
 	{
 		m_aysnd2->address_w(offset);
@@ -454,10 +449,9 @@ void rfslotsmcs48_state::proy_3_w(u8 data)  // right projector
 void rfslotsmcs48_state::exp1_p7_w(u8 data)  // sound reset + int
 {
 	if(!BIT(data,0))
-	{
 		logerror("Sent Reset to Sound CPU - Now testing...\n");
-		m_sndbfcpu->reset_w();
-	}
+
+	m_sndbfcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 	m_sndbfcpu->set_input_line(INPUT_LINE_IRQ0, BIT(data, 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -470,7 +464,7 @@ void rfslotsmcs48_state::aj_exp1_p7_w(u8 data)  // sound code
 
 void rfslotsmcs48_state::aj_exp5_p6_w(u8 data)  // sound reset + int
 {
-	if(!BIT(data, 2)) m_sndajcpu->reset_w();
+	m_sndajcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE);
 	m_sndajcpu->set_input_line(INPUT_LINE_IRQ0, BIT(data, 3) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -484,7 +478,7 @@ void rfslotsmcs48_state::exp2_p4_w(u8 data)  // coils and emcounters
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));  // EM counter: Coin In
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 3));  // EM counter: Coin Out
-	
+
 	m_outbit[16] = machine().bookkeeping().coin_counter_get_count(0);
 	m_outbit[17] = machine().bookkeeping().coin_counter_get_count(1);
 }
@@ -553,7 +547,7 @@ void rfslotsmcs48_state::hopper_decode()
    c = p4.3
    d = p1.6
 
-*/ 
+*/
 	u8 res = 0xff;
 	if(!BIT(m_hdecode, 0) & (!BIT(m_hdecode, 1)))  // g1&g2=0
 	{
@@ -563,7 +557,7 @@ void rfslotsmcs48_state::hopper_decode()
 		b = 1;
 		a = BIT(m_hdecode, 2);
 		res = a + (b * 2) + (c * 4) + (d * 8);
-	}	
+	}
 
 	if(res == 0x03)
 	{
@@ -572,7 +566,7 @@ void rfslotsmcs48_state::hopper_decode()
 		logerror("Hopper paying....\n");
 	}
 	else
-	{	
+	{
 		m_hopper->motor_w(0);
 		m_outbit[15] = 0;
 	}
@@ -750,27 +744,27 @@ void rfslotsmcs48_state::babyfrts(machine_config &config)
 	I8243(config.replace(), m_ioexp[0]);  // PIA 1: fruits projectors
 	m_ioexp[0]->p4_out_cb().set(FUNC(rfslotsmcs48_state::proy_1_w));   // left
 	m_ioexp[0]->p5_out_cb().set(FUNC(rfslotsmcs48_state::proy_2_w));   // center
-	m_ioexp[0]->p6_out_cb().set(FUNC(rfslotsmcs48_state::proy_3_w));   // right	
+	m_ioexp[0]->p6_out_cb().set(FUNC(rfslotsmcs48_state::proy_3_w));   // right
 	m_ioexp[0]->p7_out_cb().set(FUNC(rfslotsmcs48_state::exp1_p7_w));  // sound Reset + Int
 
-	I8243(config.replace(), m_ioexp[1]);  // PIA 2 
+	I8243(config.replace(), m_ioexp[1]);  // PIA 2
 	m_ioexp[1]->p4_out_cb().set(FUNC(rfslotsmcs48_state::exp2_p4_w));  // coils and EM counters
 	m_ioexp[1]->p5_out_cb().set(FUNC(rfslotsmcs48_state::exp2_p5_w));  // game lights
 	m_ioexp[1]->p6_out_cb().set(FUNC(rfslotsmcs48_state::exp2_p6_w));  // push buttons lights
 	m_ioexp[1]->p7_out_cb().set(FUNC(rfslotsmcs48_state::exp2_p7_w));  // sound codes
 	m_ioexp[1]->p7_in_cb().set(FUNC(rfslotsmcs48_state::exp2_p7_r));   // sound handshake
 
-	I8243(config.replace(), m_ioexp[3]);  // PIA 4  
+	I8243(config.replace(), m_ioexp[3]);  // PIA 4
 	m_ioexp[3]->p4_in_cb().set_ioport("IN0");
 	m_ioexp[3]->p5_in_cb().set_ioport("IN1");
 	m_ioexp[3]->p6_in_cb().set_ioport("IN4");  // SWA
 	m_ioexp[3]->p7_in_cb().set_ioport("IN2");
 
-	I8243(config.replace(), m_ioexp[4]);  // PIA 5 
+	I8243(config.replace(), m_ioexp[4]);  // PIA 5
 	m_ioexp[4]->p4_out_cb().set(FUNC(rfslotsmcs48_state::exp5_p4_w));  // Selector 1-16
 	m_ioexp[4]->p5_in_cb().set_ioport("IN5");  // SWB
 	m_ioexp[4]->p7_in_cb().set_ioport("IN3");
-	
+
 	// video layout
 	config.set_default_layout(layout_babyfrts);
 
@@ -793,7 +787,7 @@ void rfslotsmcs48_state::ajofrin(machine_config &config)
 	m_ioexp[0]->p4_out_cb().set(FUNC(rfslotsmcs48_state::proy_1_w));  // to verify left projector
 	m_ioexp[0]->p5_out_cb().set(FUNC(rfslotsmcs48_state::proy_2_w));  // to verify center projector
 	m_ioexp[0]->p6_out_cb().set(FUNC(rfslotsmcs48_state::proy_3_w));  // to verify right projector - There is an extra projector. To be found.
-	m_ioexp[0]->p7_out_cb().set(FUNC(rfslotsmcs48_state::aj_exp1_p7_w));  // sound+int to verify 
+	m_ioexp[0]->p7_out_cb().set(FUNC(rfslotsmcs48_state::aj_exp1_p7_w));  // sound+int to verify
 
 	I8243(config.replace(), m_ioexp[1]);       // PIA 2
 	m_ioexp[1]->p4_out_cb().set(FUNC(rfslotsmcs48_state::exp2_p4_w));  // coils and EM counters - idem bfr
@@ -805,7 +799,7 @@ void rfslotsmcs48_state::ajofrin(machine_config &config)
 	I8243(config.replace(), m_ioexp[3]);       // PIA 4
 	m_ioexp[3]->p4_in_cb().set_ioport("IN1");
 	m_ioexp[3]->p5_in_cb().set_ioport("IN2");
-	m_ioexp[3]->p6_in_cb().set_ioport("IN3");  
+	m_ioexp[3]->p6_in_cb().set_ioport("IN3");
 	m_ioexp[3]->p7_in_cb().set_ioport("IN4");
 
 	I8243(config.replace(), m_ioexp[4]);       // PIA 5
