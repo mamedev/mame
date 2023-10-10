@@ -1305,9 +1305,25 @@ ROM_START( sevilla )
 	ROM_LOAD( "sonsev.pal", 0x000, 0x800, CRC(1043a346) SHA1(3d45e3795653a51dca7992848eb4b9ed66492b0c) )
 ROM_END
 
-ROM_START( toledo )
+ROM_START( toledo )  // 2p87
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "told2p87.pal", 0x0000, 0x1000, CRC(9990f5ed) SHA1(b556eb3c9ebec7b974a19ec077e81ef0429ccfe0) )
+
+	ROM_REGION( 0x800, "audiocpu", 0 )
+	ROM_LOAD( "sontol.pal", 0x000, 0x800, CRC(5066dc8c) SHA1(9bb81671525c645a633db2b8f6aed0dfe198fe63) )
+ROM_END
+
+ROM_START( toledoa )  // 2p83
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "tol2p83.pal", 0x0000, 0x1000, CRC(7052a2f3) SHA1(ad56ecc50f0806a03a4451aecf3c6f749fd44480) )
+
+	ROM_REGION( 0x800, "audiocpu", 0 )
+	ROM_LOAD( "sontol.pal", 0x000, 0x800, CRC(5066dc8c) SHA1(9bb81671525c645a633db2b8f6aed0dfe198fe63) )
+ROM_END
+
+ROM_START( toledob )  // 1p79
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "tol1p79.pal", 0x0000, 0x1000, CRC(f1c74d63) SHA1(8ceab68e27ba24ce843245a26696ff3b081adefa) )
 
 	ROM_REGION( 0x800, "audiocpu", 0 )
 	ROM_LOAD( "sontol.pal", 0x000, 0x800, CRC(5066dc8c) SHA1(9bb81671525c645a633db2b8f6aed0dfe198fe63) )
@@ -1329,8 +1345,10 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//    YEAR  NAME     PARENT  MACHINE    INPUT      STATE                INIT        ROT    COMPANY      FULLNAME      FLAGS
-GAME( 1982, cbrava,  0,      cbr_cnf  , interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Costa Brava", MACHINE_MECHANICAL )
-GAME( 1982, sevilla, 0,      sev_cnf  , interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla",     MACHINE_MECHANICAL )
-GAME( 1982, toledo,  0,      tol_cnf  , interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo",      MACHINE_MECHANICAL )
+//    YEAR  NAME     PARENT  MACHINE    INPUT      STATE                INIT        ROT    COMPANY      FULLNAME               FLAGS
+GAME( 1982, cbrava,  0,      cbr_cnf  , interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Costa Brava",          MACHINE_MECHANICAL )
+GAME( 1982, sevilla, 0,      sev_cnf  , interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla",              MACHINE_MECHANICAL )
+GAME( 1982, toledo,  0,      tol_cnf  , interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo (set 1, 2p87)", MACHINE_MECHANICAL )
+GAME( 1982, toledoa, toledo, tol_cnf  , interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo (set 2, 2p83)", MACHINE_MECHANICAL )
+GAME( 1982, toledob, toledo, tol_cnf  , interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo (set 3, 1p79)", MACHINE_MECHANICAL )
 GAME( 1982, jackuse, 0,      jkp_cnf  , interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Jack Use (Jackpot settings for Interflip slots machines)",  MACHINE_MECHANICAL )
