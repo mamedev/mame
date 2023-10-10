@@ -1325,7 +1325,7 @@ ROM_END
 
 ROM_START( cbravad )  // 8p77 - 8 jackpot points by coin, 77%.
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "cbr8p77.pal", 0x0000, 0x1000, CRC(2a0df366) SHA1(29b66bd78c35a5ad284a20102d6f6299d1e2f5a6) )
+	ROM_LOAD( "cbr8p77.pal", 0x0000, 0x1000, CRC(dec13b4d) SHA1(9235480683c93949e14f57a6d60254d0b8380b83) )
 
 	ROM_REGION( 0x800, "audiocpu", 0 ) // same as sevilla
 	ROM_LOAD( "sonsev.pal", 0x000, 0x800, CRC(1043a346) SHA1(3d45e3795653a51dca7992848eb4b9ed66492b0c) )
@@ -1368,7 +1368,7 @@ ROM_END
 
 ROM_START( sevillad )  // 8p77 - 8 jackpot points by coin, 77%.
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "sev8p77.pal", 0x0000, 0x1000, CRC(dec13b4d) SHA1(9235480683c93949e14f57a6d60254d0b8380b83) )
+	ROM_LOAD( "sev8p77.pal", 0x0000, 0x1000, CRC(2a0df366) SHA1(29b66bd78c35a5ad284a20102d6f6299d1e2f5a6) )
 
 	ROM_REGION( 0x800, "audiocpu", 0 ) // same as cbrava
 	ROM_LOAD( "sonsev.pal", 0x000, 0x800, CRC(1043a346) SHA1(3d45e3795653a51dca7992848eb4b9ed66492b0c) )
