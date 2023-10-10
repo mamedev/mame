@@ -117,7 +117,6 @@ private:
 	void sound_io_w(offs_t offset, u8 data);
 	void sound_p1_w(u8 data);
 	u8 sound_p2_r();
-	u8 m_sound_p1 = 0;
 	u8 m_sound_code = 0;
 
 	// I8243 IO Expander x 4
