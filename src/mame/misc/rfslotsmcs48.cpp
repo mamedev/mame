@@ -871,7 +871,7 @@ ROM_END
 // Same PCBs configuration as "babyfrts"
 ROM_START(babyfrts25)
 	ROM_REGION(0x1000, "maincpu", 0)
-	ROM_LOAD("baby_8.3_av_25pts.bin",  0x0000, 0x1000, CRC(af45e046) SHA1(d4896f428a2061ad6bc12eed7d56eca4182d237d))
+	ROM_LOAD("baby_8.3_av_25pts.bin",  0x0000, 0x1000, BAD_DUMP CRC(af45e046) SHA1(d4896f428a2061ad6bc12eed7d56eca4182d237d))  // too many illegal opcodes.
 
 	ROM_REGION(0x1000, "sndbfcpu", 0)
 	ROM_LOAD( "bbs_25pts_sonido.bin",  0x0000, 0x1000, CRC(384dc9b4) SHA1(0a3ab8a7dfba958858b06d23850d1a8a2b9a348f))
