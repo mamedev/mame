@@ -12,9 +12,11 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "machine/w83977tf.h"
+
 #include "bus/isa/isa.h"
 //#include "machine/ds128x.h"
-#include "machine/w83977tf.h"
+#include "machine/pckeybrd.h"
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -84,6 +86,10 @@ void w83977tf_device::device_add_mconfig(machine_config &config)
 	m_kbdc->gate_a20_callback().set(FUNC(w83977tf_device::kbdp21_gp25_gatea20_w));
 	m_kbdc->input_buffer_full_callback().set(FUNC(w83977tf_device::irq_keyboard_w));
 	m_kbdc->input_buffer_full_mouse_callback().set(FUNC(w83977tf_device::irq_mouse_w));
+	m_kbdc->set_keyboard_tag("at_keyboard");
+
+	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));
+	at_keyb.keypress().set(m_kbdc, FUNC(kbdc8042_device::keyboard_w));
 }
 
 

@@ -241,6 +241,10 @@ void bebox_state::bebox_peripherals(machine_config &config)
 	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	kbdc.system_reset_callback().set_inputline(m_ppc[0], INPUT_LINE_RESET);
 	kbdc.input_buffer_full_callback().set(FUNC(bebox_state::bebox_keyboard_interrupt));
+	kbdc.set_keyboard_tag("at_keyboard");
+
+	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));
+	at_keyb.keypress().set("kbdc", FUNC(kbdc8042_device::keyboard_w));
 
 	/* internal ram */
 	RAM(config, m_ram);

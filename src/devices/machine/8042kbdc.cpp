@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(KBDC8042, kbdc8042_device, "kbdc8042", "8042 Keyboard/Mouse C
 
 kbdc8042_device::kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, KBDC8042, tag, owner, clock)
-	, m_keyboard_dev(*this, "at_keyboard")
+	, m_keyboard_dev(*this, finder_base::DUMMY_TAG)
 	, m_mousex_port(*this, "MOUSEX")
 	, m_mousey_port(*this, "MOUSEY")
 	, m_mousebtn_port(*this, "MOUSEBTN")
@@ -48,12 +48,6 @@ kbdc8042_device::kbdc8042_device(const machine_config &mconfig, const char *tag,
 {
 	m_keybtype = KBDC8042_STANDARD;
 	m_interrupttype = KBDC8042_SINGLE;
-}
-
-void kbdc8042_device::device_add_mconfig(machine_config &config)
-{
-	AT_KEYB(config, m_keyboard_dev, pc_keyboard_device::KEYBOARD_TYPE::AT, 1);
-	m_keyboard_dev->keypress().set(FUNC(kbdc8042_device::keyboard_w));
 }
 
 
@@ -144,7 +138,7 @@ void kbdc8042_device::at_8042_receive(uint8_t data, bool mouse)
 
 void kbdc8042_device::at_8042_check_keyboard()
 {
-	if (!m_keyboard.received && !m_mouse.received)
+	if (!m_keyboard.received && !m_mouse.received && m_keyboard_dev.found())
 	{
 		int data = m_keyboard_dev->read();
 		if (data)
@@ -340,7 +334,8 @@ void kbdc8042_device::data_w(offs_t offset, uint8_t data)
 		case 0:
 			m_data = data;
 			m_sending = 1;
-			m_keyboard_dev->write(data);
+			if (m_keyboard_dev.found())
+				m_keyboard_dev->write(data);
 			break;
 
 		case 1:

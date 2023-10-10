@@ -17,6 +17,7 @@
 #include "pcshare.h"
 
 #include "cpu/i86/i286.h"
+#include "machine/pckeybrd.h"
 
 /******************
 DMA8237 Controller
@@ -176,4 +177,8 @@ void pcat_base_state::pcat_common(machine_config &config)
 	m_kbdc->system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
 	m_kbdc->gate_a20_callback().set_inputline(m_maincpu, INPUT_LINE_A20);
 	m_kbdc->input_buffer_full_callback().set(m_pic8259_1, FUNC(pic8259_device::ir1_w));
+	m_kbdc->set_keyboard_tag("at_keyboard");
+
+	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));
+	at_keyb.keypress().set(m_kbdc, FUNC(kbdc8042_device::keyboard_w));
 }

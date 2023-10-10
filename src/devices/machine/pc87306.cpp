@@ -13,6 +13,7 @@ TODO:
 #include "bus/isa/isa.h"
 //#include "machine/ds128x.h"
 #include "machine/pc87306.h"
+#include "machine/pckeybrd.h"
 
 #define LOG_WARN        (1U << 1) // Show warnings
 
@@ -84,6 +85,10 @@ void pc87306_device::device_add_mconfig(machine_config &config)
 	m_kbdc->input_buffer_full_mouse_callback().set(FUNC(pc87306_device::irq_mouse_w));
 	m_kbdc->system_reset_callback().set(FUNC(pc87306_device::kbdp20_gp20_reset_w));
 	m_kbdc->gate_a20_callback().set(FUNC(pc87306_device::kbdp21_gp25_gatea20_w));
+	m_kbdc->set_keyboard_tag("at_keyboard");
+
+	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));
+	at_keyb.keypress().set(m_kbdc, FUNC(kbdc8042_device::keyboard_w));
 }
 
 void pc87306_device::remap(int space_id, offs_t start, offs_t end)
