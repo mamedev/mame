@@ -419,7 +419,9 @@ void mmodular_state::alm16(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, 12.288_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmodular_state::alm16_mem);
-	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq2_line_hold), attotime::from_hz(600));
+
+	const attotime irq_period = attotime::from_hz(12.288_MHz_XTAL / 10 / 0x800); // 600Hz
+	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq2_line_hold), irq_period);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -619,7 +621,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE INPUT   CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1988, alm32,   0,      0,      alm32,  alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, alm32,   0,      0,      alm32,  alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 0.12 or 0.121?
 SYST( 1988, alm16,   alm32,  0,      alm16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit (v0.13)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1988, alm16a,  alm32,  0,      alm16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit (v0.121)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
