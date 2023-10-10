@@ -39,6 +39,9 @@
   - Discover and emulate 100 Pts. coin in action, done by an owner hack in mainboard with a 74ls164.
     This 100 Pts. hack accepts this coin and gives back three 25 Pts. coins as change, then only plays 25 Pts. as bet.
 
+  - Complete Baby Fruits 25 pts. emulation, partially emulated due to a bad dump of the main CPU ROM.
+  - Complete Ajofrin emulation, partially emulated due to a bad dump of of the main CPU ROM.
+
 
 ***************************************************************************/
 
@@ -870,8 +873,8 @@ ROM_END
 
 // Same PCBs configuration as "babyfrts"
 ROM_START(babyfrts25)
-	ROM_REGION(0x1000, "maincpu", 0)
-	ROM_LOAD("baby_8.3_av_25pts.bin",  0x0000, 0x1000, BAD_DUMP CRC(af45e046) SHA1(d4896f428a2061ad6bc12eed7d56eca4182d237d))  // too many illegal opcodes.
+	ROM_REGION(0x1000, "maincpu", 0)  // too many illegal opcodes.
+	ROM_LOAD("baby_8.3_av_25pts.bin",  0x0000, 0x1000, BAD_DUMP CRC(af45e046) SHA1(d4896f428a2061ad6bc12eed7d56eca4182d237d))
 
 	ROM_REGION(0x1000, "sndbfcpu", 0)
 	ROM_LOAD( "bbs_25pts_sonido.bin",  0x0000, 0x1000, CRC(384dc9b4) SHA1(0a3ab8a7dfba958858b06d23850d1a8a2b9a348f))
@@ -880,8 +883,8 @@ ROM_END
 
 // Found just one PCB, may be missing some more boards (extra sound, I/O, etc.)
 ROM_START(ajofrin)
-	ROM_REGION(0x1000, "maincpu", 0)
-	ROM_LOAD("ajofr_90percent_4k.bin", 0x0000, 0x1000, CRC(9e1fd7fe) SHA1(e7a5a2a10d17537edb039ac0f53358ee35465c90))
+	ROM_REGION(0x1000, "maincpu", 0)  // underdumped and duped halves. bad higher address pin
+	ROM_LOAD("ajofr_90percent_4k.bin", 0x0000, 0x1000, BAD_DUMP CRC(9e1fd7fe) SHA1(e7a5a2a10d17537edb039ac0f53358ee35465c90))
 
 	ROM_REGION(0x0400, "sndajcpu", 0)
 	ROM_LOAD( "ajo_d8748.bin",         0x0000, 0x0400, CRC(414dc0e3) SHA1(016ed2aa36b36a637163ac7cba0a944a258c02a4))
