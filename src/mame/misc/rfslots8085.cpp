@@ -194,11 +194,11 @@ Uses also the following Recreativos Franco boards:
 A complete manual with schematics can be downloaded from https://www.recreativas.org/manuales
 */
 ROM_START(bformula2)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("recreativos_franco_m-000031-b_001744_90_pc.ic32", 0x0000, 0x8000, CRC(b593c6bc) SHA1(c01b61b4ea60b9f2bca3200b4b90af1c4027f9df))
+	ROM_REGION(0x8000, "maincpu", 0)  // ROM lines D2 and D5 are stuck to 0. the device needs to be redumped.
+	ROM_LOAD("recreativos_franco_m-000031-b_001744_90_pc.ic32", 0x0000, 0x8000, BAD_DUMP CRC(b593c6bc) SHA1(c01b61b4ea60b9f2bca3200b4b90af1c4027f9df))
 
-	ROM_REGION(0x8000, "audiocpu", 0)
-	ROM_LOAD("recreativos_franco_m-000031-b_001744_90_pa.ic44", 0x0000, 0x8000, CRC(3c4ae129) SHA1(e68e7a403596a9f2d34e6b8d2631d2716010e982))
+	ROM_REGION(0x8000, "audiocpu", 0)  // ROM lines D2 and D5 are stuck to 0. the device needs to be redumped.
+	ROM_LOAD("recreativos_franco_m-000031-b_001744_90_pa.ic44", 0x0000, 0x8000, BAD_DUMP CRC(3c4ae129) SHA1(e68e7a403596a9f2d34e6b8d2631d2716010e982))
 ROM_END
 
 } // anonymous namespace
