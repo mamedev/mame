@@ -476,7 +476,8 @@
 
 #include "cbrava_81.lh"
 #include "cbrava_77.lh"
-#include "sevilla.lh"
+#include "sevilla_81.lh"
+#include "sevilla_77.lh"
 #include "toledo.lh"
 #include "ifslots.lh"
 
@@ -507,7 +508,8 @@ public:
 	void interflip(machine_config &config);
 	void cbr_81_cnf(machine_config &config);
 	void cbr_77_cnf(machine_config &config);
-	void sev_cnf(machine_config &config);
+	void sev_81_cnf(machine_config &config);
+	void sev_77_cnf(machine_config &config);
 	void tol_cnf(machine_config &config);
 	void jkp_cnf(machine_config &config);
 
@@ -1247,6 +1249,7 @@ void interflip8035_state::interflip(machine_config &config)
 
 }
 
+
 void interflip8035_state::cbr_81_cnf(machine_config &config)
 {
 	interflip(config);
@@ -1267,15 +1270,27 @@ void interflip8035_state::cbr_77_cnf(machine_config &config)
 	config.set_default_layout(layout_cbrava_77);
 }
 
-void interflip8035_state::sev_cnf(machine_config &config)
+
+void interflip8035_state::sev_81_cnf(machine_config &config)
 {
 	interflip(config);
 
 	m_maincpu->p1_out_cb().set(FUNC(interflip8035_state::main_p1_enc_data_w));  // encoded coin lamps 
 
 	// video layout
-	config.set_default_layout(layout_sevilla);
+	config.set_default_layout(layout_sevilla_81);
 }
+
+void interflip8035_state::sev_77_cnf(machine_config &config)
+{
+	interflip(config);
+
+	m_maincpu->p1_out_cb().set(FUNC(interflip8035_state::main_p1_enc_data_w));  // encoded coin lamps 
+
+	// video layout
+	config.set_default_layout(layout_sevilla_77);
+}
+
 
 void interflip8035_state::tol_cnf(machine_config &config)
 {
@@ -1286,6 +1301,7 @@ void interflip8035_state::tol_cnf(machine_config &config)
 	// video layout
 	config.set_default_layout(layout_toledo);
 }
+
 
 void interflip8035_state::jkp_cnf(machine_config &config)
 {
@@ -1438,11 +1454,11 @@ GAME( 1982, cbravab,  cbrava,  cbr_77_cnf, interflip, interflip8035_state, empty
 GAME( 1982, cbravac,  cbrava,  cbr_77_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Costa Brava (4 jackpot points, 77%)", MACHINE_MECHANICAL )
 GAME( 1982, cbravad,  cbrava,  cbr_77_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Costa Brava (8 jackpot points, 77%)", MACHINE_MECHANICAL )
 
-GAME( 1982, sevilla,  0,       sev_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla (2 jackpot points, 81%)",     MACHINE_MECHANICAL )
-GAME( 1982, sevillaa, sevilla, sev_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla (1 jackpot point, 77%)",      MACHINE_MECHANICAL )
-GAME( 1982, sevillab, sevilla, sev_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla (2 jackpot points, 77%)",     MACHINE_MECHANICAL )
-GAME( 1982, sevillac, sevilla, sev_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla (4 jackpot points, 77%)",     MACHINE_MECHANICAL )
-GAME( 1982, sevillad, sevilla, sev_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla (8 jackpot points, 77%)",     MACHINE_MECHANICAL )
+GAME( 1982, sevilla,  0,       sev_81_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla (2 jackpot points, 81%)",     MACHINE_MECHANICAL )
+GAME( 1982, sevillaa, sevilla, sev_77_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla (1 jackpot point, 77%)",      MACHINE_MECHANICAL )
+GAME( 1982, sevillab, sevilla, sev_77_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla (2 jackpot points, 77%)",     MACHINE_MECHANICAL )
+GAME( 1982, sevillac, sevilla, sev_77_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla (4 jackpot points, 77%)",     MACHINE_MECHANICAL )
+GAME( 1982, sevillad, sevilla, sev_77_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla (8 jackpot points, 77%)",     MACHINE_MECHANICAL )
 
 GAME( 1982, toledo,   0,       tol_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo (2 jackpot points, 87%)",      MACHINE_MECHANICAL )
 GAME( 1982, toledoa,  toledo,  tol_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo (2 jackpot points, 83%)",      MACHINE_MECHANICAL )
