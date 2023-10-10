@@ -183,7 +183,7 @@
 
   TODO:
 
-  - Create proper layout with reels for Sevilla 77% sets.
+  - Set a common sampleset for all games and clones.
 
 
 *******************************************************************************************************************************************************
@@ -478,7 +478,8 @@
 #include "cbrava_77.lh"
 #include "sevilla_81.lh"
 #include "sevilla_77.lh"
-#include "toledo.lh"
+#include "toledo_87.lh"
+#include "toledo_83.lh"
 #include "ifslots.lh"
 
 
@@ -510,7 +511,8 @@ public:
 	void cbr_77_cnf(machine_config &config);
 	void sev_81_cnf(machine_config &config);
 	void sev_77_cnf(machine_config &config);
-	void tol_cnf(machine_config &config);
+	void tol_87_cnf(machine_config &config);
+	void tol_83_cnf(machine_config &config);
 	void jkp_cnf(machine_config &config);
 
 	template <unsigned Reel> int symbol_opto_r();
@@ -1292,14 +1294,24 @@ void interflip8035_state::sev_77_cnf(machine_config &config)
 }
 
 
-void interflip8035_state::tol_cnf(machine_config &config)
+void interflip8035_state::tol_87_cnf(machine_config &config)
 {
 	interflip(config);
 
 	m_maincpu->p1_out_cb().set(FUNC(interflip8035_state::main_p1_enc_data_w));  // encoded coin lamps
 	
 	// video layout
-	config.set_default_layout(layout_toledo);
+	config.set_default_layout(layout_toledo_87);
+}
+
+void interflip8035_state::tol_83_cnf(machine_config &config)
+{
+	interflip(config);
+
+	m_maincpu->p1_out_cb().set(FUNC(interflip8035_state::main_p1_enc_data_w));  // encoded coin lamps
+	
+	// video layout
+	config.set_default_layout(layout_toledo_83);
 }
 
 
@@ -1460,9 +1472,9 @@ GAME( 1982, sevillab, sevilla, sev_77_cnf, interflip, interflip8035_state, empty
 GAME( 1982, sevillac, sevilla, sev_77_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla (4 jackpot points, 77%)",     MACHINE_MECHANICAL )
 GAME( 1982, sevillad, sevilla, sev_77_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla (8 jackpot points, 77%)",     MACHINE_MECHANICAL )
 
-GAME( 1982, toledo,   0,       tol_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo (2 jackpot points, 87%)",      MACHINE_MECHANICAL )
-GAME( 1982, toledoa,  toledo,  tol_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo (2 jackpot points, 83%)",      MACHINE_MECHANICAL )
-GAME( 1982, toledob,  toledo,  tol_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo (1 jackpot point, 79%)",       MACHINE_MECHANICAL )
+GAME( 1982, toledo,   0,       tol_87_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo (2 jackpot points, 87%)",      MACHINE_MECHANICAL )
+GAME( 1982, toledoa,  toledo,  tol_83_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo (2 jackpot points, 83%)",      MACHINE_MECHANICAL )
+GAME( 1982, toledob,  toledo,  tol_83_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo (1 jackpot point, 79%)",       MACHINE_MECHANICAL )  // same as 83%
 
 // jackpot settings program
 GAME( 1982, jackuse,  0,       jkp_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Jack Use (Jackpot settings for Interflip slots machines)", MACHINE_MECHANICAL )
