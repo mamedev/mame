@@ -1297,7 +1297,7 @@ ROM_START( cbrava )
 	ROM_LOAD( "sonsev.pal", 0x000, 0x800, CRC(1043a346) SHA1(3d45e3795653a51dca7992848eb4b9ed66492b0c) )
 ROM_END
 
-ROM_START( sevilla )
+ROM_START( sevilla )  // 2p81 - 2 jackpot points by coin.
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "sev2p81.pal", 0x0000, 0x1000, CRC(362acdf4) SHA1(82913fe5c646be9c10252c2337ceaac2fc8173df) )
 
@@ -1305,9 +1305,42 @@ ROM_START( sevilla )
 	ROM_LOAD( "sonsev.pal", 0x000, 0x800, CRC(1043a346) SHA1(3d45e3795653a51dca7992848eb4b9ed66492b0c) )
 ROM_END
 
+ROM_START( sevillaa )  // 1p77 - 1 jackpot point by coin.
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "sev1p77.pal", 0x0000, 0x1000, CRC(242d3be6) SHA1(5aa80000bf13321c8f70f72e941123ce417e7b6e) )
+
+	ROM_REGION( 0x800, "audiocpu", 0 ) // same as cbrava
+	ROM_LOAD( "sonsev.pal", 0x000, 0x800, CRC(1043a346) SHA1(3d45e3795653a51dca7992848eb4b9ed66492b0c) )
+ROM_END
+
+ROM_START( sevillab )  // 2p77 - 2 jackpot points by coin.
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "sev2p77.pal", 0x0000, 0x1000, CRC(a7e2ef85) SHA1(c1bc0eb255c26365bb7d5f286fd3aafdf993aeb1) )
+
+	ROM_REGION( 0x800, "audiocpu", 0 ) // same as cbrava
+	ROM_LOAD( "sonsev.pal", 0x000, 0x800, CRC(1043a346) SHA1(3d45e3795653a51dca7992848eb4b9ed66492b0c) )
+ROM_END
+
+ROM_START( sevillac )  // 4p77 - 4 jackpot points by coin.
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "sev4p77.pal", 0x0000, 0x1000, CRC(501a4cb9) SHA1(1f98072d4499da1c8c4f90b99432a00e0bb98e79) )
+
+	ROM_REGION( 0x800, "audiocpu", 0 ) // same as cbrava
+	ROM_LOAD( "sonsev.pal", 0x000, 0x800, CRC(1043a346) SHA1(3d45e3795653a51dca7992848eb4b9ed66492b0c) )
+ROM_END
+
+ROM_START( sevillad )  // 8p77 - 8 jackpot points by coin.
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "sev8p77.pal", 0x0000, 0x1000, CRC(dec13b4d) SHA1(9235480683c93949e14f57a6d60254d0b8380b83) )
+
+	ROM_REGION( 0x800, "audiocpu", 0 ) // same as cbrava
+	ROM_LOAD( "sonsev.pal", 0x000, 0x800, CRC(1043a346) SHA1(3d45e3795653a51dca7992848eb4b9ed66492b0c) )
+ROM_END
+
+
 ROM_START( toledo )  // 2p87 - 2 jackpot points by coin.
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "told2p87.pal", 0x0000, 0x1000, CRC(9990f5ed) SHA1(b556eb3c9ebec7b974a19ec077e81ef0429ccfe0) )
+	ROM_LOAD( "tol2p87.pal", 0x0000, 0x1000, CRC(9990f5ed) SHA1(b556eb3c9ebec7b974a19ec077e81ef0429ccfe0) )
 
 	ROM_REGION( 0x800, "audiocpu", 0 )
 	ROM_LOAD( "sontol.pal", 0x000, 0x800, CRC(5066dc8c) SHA1(9bb81671525c645a633db2b8f6aed0dfe198fe63) )
@@ -1329,6 +1362,7 @@ ROM_START( toledob )  // 1p79 - 1 jackpot point by coin.
 	ROM_LOAD( "sontol.pal", 0x000, 0x800, CRC(5066dc8c) SHA1(9bb81671525c645a633db2b8f6aed0dfe198fe63) )
 ROM_END
 
+
 ROM_START( jackuse )  // jackpot settings...
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "jackuse.pal", 0x0000, 0x1000, CRC(6adc3fcf) SHA1(cb63a0dcf9accf283a9aeddb2e9e120c19483b13) )
@@ -1345,10 +1379,17 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//    YEAR  NAME     PARENT  MACHINE    INPUT      STATE                INIT        ROT    COMPANY      FULLNAME               FLAGS
-GAME( 1982, cbrava,  0,      cbr_cnf  , interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Costa Brava",          MACHINE_MECHANICAL )
-GAME( 1982, sevilla, 0,      sev_cnf  , interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla",              MACHINE_MECHANICAL )
-GAME( 1982, toledo,  0,      tol_cnf  , interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo (set 1, 2p87)", MACHINE_MECHANICAL )
-GAME( 1982, toledoa, toledo, tol_cnf  , interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo (set 2, 2p83)", MACHINE_MECHANICAL )
-GAME( 1982, toledob, toledo, tol_cnf  , interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo (set 3, 1p79)", MACHINE_MECHANICAL )
-GAME( 1982, jackuse, 0,      jkp_cnf  , interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Jack Use (Jackpot settings for Interflip slots machines)",  MACHINE_MECHANICAL )
+//    YEAR  NAME      PARENT   MACHINE  INPUT      STATE                INIT        ROT    COMPANY      FULLNAME                          FLAGS
+GAME( 1982, cbrava,   0,       cbr_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Costa Brava",                     MACHINE_MECHANICAL )
+
+GAME( 1982, sevilla,  0,       sev_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla (2 jackpot points, 81%)", MACHINE_MECHANICAL )
+GAME( 1982, sevillaa, sevilla, sev_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla (1 jackpot point, 77%)",  MACHINE_MECHANICAL )
+GAME( 1982, sevillab, sevilla, sev_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla (2 jackpot points, 77%)", MACHINE_MECHANICAL )
+GAME( 1982, sevillac, sevilla, sev_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla (4 jackpot points, 77%)", MACHINE_MECHANICAL )
+GAME( 1982, sevillad, sevilla, sev_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Sevilla (8 jackpot points, 77%)", MACHINE_MECHANICAL )
+
+GAME( 1982, toledo,   0,       tol_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo (2 jackpot points, 87%)",  MACHINE_MECHANICAL )
+GAME( 1982, toledoa,  toledo,  tol_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo (2 jackpot points, 83%)",  MACHINE_MECHANICAL )
+GAME( 1982, toledob,  toledo,  tol_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Toledo (1 jackpot point, 79%)",   MACHINE_MECHANICAL )
+
+GAME( 1982, jackuse,  0,       jkp_cnf, interflip, interflip8035_state, empty_init, ROT0, "Interflip", "Jack Use (Jackpot settings for Interflip slots machines)", MACHINE_MECHANICAL )
