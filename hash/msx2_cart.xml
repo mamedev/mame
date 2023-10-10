@@ -3647,8 +3647,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<description>The Adventures of Moron van der Slut - Escape from Castro Castro</description>
 		<year>2010</year>
 		<publisher>Passion MSX2 Contest</publisher>
-		<info name="developer" value="The New Image"/>
 		<notes>Graphics glitch on logo screen.</notes>
+		<info name="developer" value="The New Image"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8"/>
 			<dataarea name="rom" size="0x20000">
@@ -3763,8 +3763,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<description>Mr. Balloon</description>
 		<year>2014</year>
 		<publisher>#msxdev Compo</publisher>
-		<info name="developer" value="Mapax"/>
 		<notes>Graphics glitches on title and text screens. It is impossible to control the balloon.</notes>
+		<info name="developer" value="Mapax"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
