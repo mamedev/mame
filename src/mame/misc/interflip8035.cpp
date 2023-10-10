@@ -1305,7 +1305,7 @@ ROM_START( sevilla )
 	ROM_LOAD( "sonsev.pal", 0x000, 0x800, CRC(1043a346) SHA1(3d45e3795653a51dca7992848eb4b9ed66492b0c) )
 ROM_END
 
-ROM_START( toledo )  // 2p87
+ROM_START( toledo )  // 2p87 - 2 jackpot points by coin.
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "told2p87.pal", 0x0000, 0x1000, CRC(9990f5ed) SHA1(b556eb3c9ebec7b974a19ec077e81ef0429ccfe0) )
 
@@ -1313,7 +1313,7 @@ ROM_START( toledo )  // 2p87
 	ROM_LOAD( "sontol.pal", 0x000, 0x800, CRC(5066dc8c) SHA1(9bb81671525c645a633db2b8f6aed0dfe198fe63) )
 ROM_END
 
-ROM_START( toledoa )  // 2p83
+ROM_START( toledoa )  // 2p83 - 2 jackpot points by coin.
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "tol2p83.pal", 0x0000, 0x1000, CRC(7052a2f3) SHA1(ad56ecc50f0806a03a4451aecf3c6f749fd44480) )
 
@@ -1321,7 +1321,7 @@ ROM_START( toledoa )  // 2p83
 	ROM_LOAD( "sontol.pal", 0x000, 0x800, CRC(5066dc8c) SHA1(9bb81671525c645a633db2b8f6aed0dfe198fe63) )
 ROM_END
 
-ROM_START( toledob )  // 1p79
+ROM_START( toledob )  // 1p79 - 1 jackpot point by coin.
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "tol1p79.pal", 0x0000, 0x1000, CRC(f1c74d63) SHA1(8ceab68e27ba24ce843245a26696ff3b081adefa) )
 
