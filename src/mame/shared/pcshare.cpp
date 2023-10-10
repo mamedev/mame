@@ -139,7 +139,7 @@ void pcat_base_state::pcat32_io_common(address_map &map)
 	map(0x00c0, 0x00df).rw(m_dma8237_2, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0x00ff00ff);
 }
 
-void pcat_base_state::pcat_common(machine_config &config)
+void pcat_base_state::pcat_common_nokeyboard(machine_config &config)
 {
 	PIC8259(config, m_pic8259_1, 0);
 	m_pic8259_1->out_int_callback().set_inputline(m_maincpu, 0);
@@ -177,6 +177,11 @@ void pcat_base_state::pcat_common(machine_config &config)
 	m_kbdc->system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
 	m_kbdc->gate_a20_callback().set_inputline(m_maincpu, INPUT_LINE_A20);
 	m_kbdc->input_buffer_full_callback().set(m_pic8259_1, FUNC(pic8259_device::ir1_w));
+}
+
+void pcat_base_state::pcat_common(machine_config &config)
+{
+	pcat_common_nokeyboard(config);
 	m_kbdc->set_keyboard_tag("at_keyboard");
 
 	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));

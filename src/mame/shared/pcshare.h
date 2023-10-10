@@ -42,6 +42,7 @@ public:
 
 protected:
 	void pcat_common(machine_config &config);
+	void pcat_common_nokeyboard(machine_config &config);
 
 	void pcat32_io_common(address_map &map);
 
