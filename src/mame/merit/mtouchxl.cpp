@@ -264,11 +264,6 @@ void mtxl_state::at486(machine_config &config)
 	kbdc.system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
 	kbdc.gate_a20_callback().set_inputline(m_maincpu, INPUT_LINE_A20);
 	kbdc.input_buffer_full_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir1_w));
-	kbdc.set_keyboard_tag("at_keyboard");
-
-	// FIXME: we shouldn't need a keyboard, but the BIOS complains if it doesn't find one
-	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));
-	at_keyb.keypress().set("kbdc", FUNC(kbdc8042_device::keyboard_w));
 
 	ds12885_device &rtc(DS12885(config.replace(), "mb:rtc"));
 	rtc.irq().set("mb:pic8259_slave", FUNC(pic8259_device::ir0_w));
@@ -328,11 +323,6 @@ void mtxl_state::at486hd(machine_config &config)
 	kbdc.system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
 	kbdc.gate_a20_callback().set_inputline(m_maincpu, INPUT_LINE_A20);
 	kbdc.input_buffer_full_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir1_w));
-	kbdc.set_keyboard_tag("at_keyboard");
-
-	// FIXME: we shouldn't need a keyboard, but the BIOS complains if it doesn't find one
-	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));
-	at_keyb.keypress().set("kbdc", FUNC(kbdc8042_device::keyboard_w));
 
 	ds12885_device &rtc(DS12885(config.replace(), "mb:rtc"));
 	rtc.irq().set("mb:pic8259_slave", FUNC(pic8259_device::ir0_w));
@@ -367,7 +357,7 @@ void mtxl_state::at486hd(machine_config &config)
 	ROM_REGION32_LE(0x20000, "bios", 0) \
 	ROM_LOAD("prom.mb", 0x10000, 0x10000, BAD_DUMP CRC(e44bfd3c) SHA1(c07ec94e11efa30e001f39560010112f73cc0016) ) \
 	ROM_REGION(0x80, "mb:rtc", 0) \
-	ROM_LOAD("mb_rtc", 0, 0x80, BAD_DUMP CRC(b724e5d3) SHA1(45a19ec4201d2933d033689b7a01a0260962fb0b))
+	ROM_LOAD("mb_rtc", 0, 0x80, BAD_DUMP CRC(ac77f726) SHA1(e6ae2010d8cebb82d0414c70e41ae9dbcbc460e4))
 #endif
 
 ROM_START( mtouchxl )
