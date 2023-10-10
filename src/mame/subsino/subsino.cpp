@@ -356,6 +356,7 @@ private:
 	void srider_map(address_map &map);
 	void stbsub_map(address_map &map);
 	void subsino_iomap(address_map &map);
+	void tisub_base_map(address_map &map);
 	void tisub_map(address_map &map);
 	void victor21_map(address_map &map);
 	void victor5_map(address_map &map);
@@ -986,72 +987,44 @@ void subsino_state::out_c_w(uint8_t data)
 //  popmessage("data %02x\n",data);
 }
 
-void subsino_state::tisub_map(address_map &map)
+void subsino_state::tisub_base_map(address_map &map)
 {
 	map(0x00000, 0x0bfff).rom(); // overlap unmapped regions
-	map(0x09800, 0x09fff).ram();
-
+	map(0x07800, 0x07fff).ram();
+	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x08800, 0x08fff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
 	map(0x09000, 0x09002).r("ppi1", FUNC(i8255_device::read));
 	map(0x09004, 0x09006).r("ppi2", FUNC(i8255_device::read));
-
-	// 0x09008: is marked as OUTPUT C in the test mode.
 	map(0x09008, 0x09008).w(FUNC(subsino_state::out_c_w));
 	map(0x09009, 0x09009).w(FUNC(subsino_state::out_b_w));
 	map(0x0900a, 0x0900a).w(FUNC(subsino_state::out_a_w));
-
-	map(0x0900c, 0x0900c).portr("INC");
-
-	map(0x09016, 0x09017).w("ymsnd", FUNC(ym3812_device::write));
-
-//  map(0x0900c, 0x0900c).w("oki", FUNC(okim6295_device::write));
-
-	map(0x0901b, 0x0901b).w(FUNC(subsino_state::tiles_offset_w));
-
-	map(0x07800, 0x07fff).ram();
-	map(0x08800, 0x08fff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
-	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
-
+	map(0x09800, 0x09fff).ram();
 	map(0x10000, 0x13fff).rom();
-	map(0x14000, 0x14fff).rom(); // reads the card face data here (see rom copy in rom loading)
-
 	map(0x150c0, 0x150ff).ram().share("reel_scroll.2");
 	map(0x15140, 0x1517f).ram().share("reel_scroll.1");
 	map(0x15180, 0x151bf).ram().share("reel_scroll.0");
-
 	map(0x15800, 0x159ff).ram().w(FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
 	map(0x15a00, 0x15bff).ram().w(FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
 	map(0x15c00, 0x15dff).ram().w(FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
 }
 
+void subsino_state::tisub_map(address_map &map)
+{
+	tisub_base_map(map);
+
+	map(0x0900c, 0x0900c).portr("INC");
+	map(0x09016, 0x09017).w("ymsnd", FUNC(ym3812_device::write));
+	map(0x0901b, 0x0901b).w(FUNC(subsino_state::tiles_offset_w));
+	map(0x14000, 0x14fff).rom(); // reads the card face data here (see rom copy in rom loading)
+}
+
 void subsino_state::newhunterb_map(address_map &map)
 {
-	map(0x00000, 0x077ff).rom();
-	map(0x07800, 0x07fff).ram();
-	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
-	map(0x08800, 0x08fff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
-
-	map(0x09000, 0x09002).r("ppi1", FUNC(i8255_device::read));
-	map(0x09004, 0x09006).r("ppi2", FUNC(i8255_device::read));
-
-	map(0x09008, 0x09008).w(FUNC(subsino_state::out_c_w));
-	map(0x09009, 0x09009).w(FUNC(subsino_state::out_b_w));
-	map(0x0900a, 0x0900a).w(FUNC(subsino_state::out_a_w));
+	tisub_base_map(map);
 
 	map(0x0900c, 0x0900d).w("ymsnd", FUNC(ym3812_device::write));
 	map(0x0900e, 0x0900e).portr("INC");
 	map(0x0900f, 0x0900f).w(FUNC(subsino_state::tiles_offset_w));
-
-	map(0x09800, 0x09fff).ram();
-
-	map(0x10000, 0x13fff).rom();
-
-	map(0x150c0, 0x150ff).ram().share("reel_scroll.2");
-	map(0x15140, 0x1517f).ram().share("reel_scroll.1");
-	map(0x15180, 0x151bf).ram().share("reel_scroll.0");
-
-	map(0x15800, 0x159ff).ram().w(FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
-	map(0x15a00, 0x15bff).ram().w(FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
-	map(0x15c00, 0x15dff).ram().w(FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
 }
 
 void subsino_state::ramdac_map(address_map &map)
@@ -3280,7 +3253,7 @@ ROM_START( tisubb )
 ROM_END
 
 /* This bootleg shows year 1989 on title screen, but it's from 1992 (there are 1992 strings on the ROMs). Probably Karam
-   modified the New HUNTer set from Mecca, which also shows 1989, and was legally registered on Korea on 1989-8-25. */ 
+   modified the New HUNTer set from Mecca, which also shows 1989, and was legally registered on Korea on 1989-8-25. */
 ROM_START( newhunter )
 	// The MCU had its surface scratched out, but almost sure it's an HD647180X0CP8L
 	ROM_REGION( 0x04000, "mcu", 0 )
