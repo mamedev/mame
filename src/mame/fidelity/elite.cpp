@@ -60,7 +60,7 @@ it doesn't have the 8255 PPI, but has more RAM(7*TMM2016P). Some were released a
 included by default, this module is the same as CB16 but at different form factor.
 
 Elite Avant Garde (models 6081,6088,6089) is on similar hardware as EAS. Level B8
-Starts a self-test and displays ROM checksums, press CL to advance.
+starts a self-test and displays ROM checksums, press CL to advance.
 
 Fidelity Elite Private Line were EAS/EAG conversions released by Fidelity Deutschland.
 The "Elite Privat" was probably for the local market and the "Private Line" for export.

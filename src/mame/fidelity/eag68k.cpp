@@ -41,6 +41,9 @@ Mach IV has 2*256KB DRAM, and a daughterboard(510.1123B01) for the 68020 + 32KB 
 
 I/O is via TTL, overall very similar to EAG.
 
+Holding NEW GAME does a quick self-test, on Mach III and Mach IV it will also
+display a ROM checksum.
+
 fex68km4 continuously tests RAM at boot and displays "512", this is normal.
 To start, hold New Game or Clear.
 
