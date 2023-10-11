@@ -10,7 +10,6 @@ Excel 68000 I/O is very similar to EAG, so it's handled in this driver as well
 
 TODO:
 - unemulated waitstates with DTACK
-- EAG USART doesn't work right? it should be able to connect to a serial printer
 - V10 CPU emulation is too slow, MAME 68040 opcode timing is same as 68030 but in
   reality it is much faster, same goes for V11 of course (see note below)
 - V11 CPU should be M68EC060, not yet emulated. Now using M68EC040 in its place
@@ -41,6 +40,9 @@ Mach III has wire mods from U22/U23 to U8/U9(2*8KB + 2*32KB piggybacked).
 Mach IV has 2*256KB DRAM, and a daughterboard(510.1123B01) for the 68020 + 32KB RAM.
 
 I/O is via TTL, overall very similar to EAG.
+
+Holding NEW GAME does a quick self-test, on Mach III and Mach IV it will also
+display a ROM checksum.
 
 fex68km4 continuously tests RAM at boot and displays "512", this is normal.
 To start, hold New Game or Clear.
@@ -81,9 +83,12 @@ The module slot pinout is different from SCC series. The data on those appears
 to be compatible with EAG though and will load fine with an adapter.
 
 The USART allows for a serial connection between the chess computer and another
-device, for example a PC. Fidelity released a DOS tool called EAGLINK which
-featured PC printer support, complete I/O control, detailed information while
-the program is 'thinking', etc. It can be enabled with POP3 H3.
+device, for example the Fidelity Challenger Printer, or a PC. It expects a baud
+rate of 600.
+
+Fidelity released a DOS tool called EAGLINK which featured PC printer support,
+complete I/O control, detailed information while the program is 'thinking', etc.
+It can be enabled with POP3 H3.
 
 Memory map: (of what is known)
 -----------
@@ -118,10 +123,9 @@ supposedly has the same program as V10.
 
 V7 Hardware info:
 -----------------
-- MC68020RC25E CPU, 25MHz XTAL - this PCB was overclocked, original was 20MHz so let's use that
-- 4*AS7C164-20PC 8KB SRAM, 2*KM684000ALG-7L 512KB CMOS SRAM
-- 2*27C512? 64KB EPROM, 2*HM6264LP-15 8KB SRAM, 2*AT28C64B 8KB EEPROM, 2*GAL16V8C
-- same as 6114: M82C51A, NE555, SN74HC4060, module slot, chessboard, ..
+- 510.1139A01 daughterboard with MC68020RC20E or MC68020RC25E @ 20MHz,
+  and 32KB RAM (4*MCM6264P35)
+- rest is same as 6114
 
 V7 Memory map:
 --------------
@@ -143,8 +147,8 @@ The ROM dump came from the V11(see below). Built-in factory test proves
 that this program is a V10. Hold TB button immediately after power-on and
 press it for a sequence of tests:
 1) all LEDs on
-2) F40C: V10 program version
-3) 38b9: V10 ROM checksum
+2) F40C: V10 ROM checksum 1
+3) 38b9: V10 ROM checksum 2
 4) xxxx: external module ROM checksum (0000 if no module present)
 5) xxxx: user settings (stored in EEPROM)
 6) xxxx: "
@@ -244,7 +248,6 @@ public:
 
 	// machine configs
 	void eagv4(machine_config &config);
-	void eagv3(machine_config &config);
 	void eagv5(machine_config &config);
 	void eagv7(machine_config &config);
 	void eagv9(machine_config &config);
@@ -735,11 +738,13 @@ void eag_state::eag_base(machine_config &config)
 
 	I8251(config, m_usart, 4.9152_MHz_XTAL);
 	m_usart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_usart->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
-	m_usart->rxrdy_handler().set_inputline(m_maincpu, M68K_IRQ_IPL2);
+
+	auto &usart_clock(CLOCK(config, "usart_clock", 4.9152_MHz_XTAL / 128)); // 4060 Q7, 38.4kHz
+	usart_clock.signal_handler().set(m_usart, FUNC(i8251_device::write_txc));
 
 	auto &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_usart, FUNC(i8251_device::write_rxd));
+	rs232.cts_handler().set(m_usart, FUNC(i8251_device::write_cts));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -909,20 +914,20 @@ ROM_START( fex68km4 ) // model 6110, PCB label 510.1120B01 - checksum FD96
 ROM_END
 
 
-ROM_START( feagv4 ) // dumped from a V3
+ROM_START( feagv4 ) // dumped from a V3 - checksum F66D 4B3E
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("elite_1.6_e.u22", 0x00000, 0x10000, CRC(c8b89ccc) SHA1(d62e0a72f54b793ab8853468a81255b62f874658) )
 	ROM_LOAD16_BYTE("elite_1.6_o.u19", 0x00001, 0x10000, CRC(904c7061) SHA1(742110576cf673321440bc81a4dae4c949b49e38) )
 ROM_END
 
-ROM_START( feagv4a ) // dumped from a V2
+ROM_START( feagv4a ) // dumped from a V2 - checksum FD5C 49AC
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("6114_e5_yellow.u22", 0x00000, 0x10000, CRC(f9c7bada) SHA1(60e545f829121b9a4f1100d9e85ac83797715e80) ) // 27c512
 	ROM_LOAD16_BYTE("6114_o5_green.u19",  0x00001, 0x10000, CRC(04f97b22) SHA1(8b2845dd115498f7b385e8948eca6a5893c223d1) ) // "
 ROM_END
 
 ROM_START( feagv5 )
-	ROM_REGION16_BE( 0x20000, "maincpu", 0 ) // PCB label 510.1136A01
+	ROM_REGION16_BE( 0x20000, "maincpu", 0 ) // PCB label 510.1136A01 - checksum 0140 9CF2
 	ROM_LOAD16_BYTE("master_e", 0x00000, 0x10000, CRC(e424bddc) SHA1(ff03656addfe5c47f06df2efb4602f43a9e19d96) )
 	ROM_LOAD16_BYTE("master_o", 0x00001, 0x10000, CRC(33a00894) SHA1(849460332b1ac10d452ca3631eb99f5597511b73) )
 
@@ -931,31 +936,31 @@ ROM_START( feagv5 )
 	ROM_LOAD16_BYTE("slave_o", 0x00001, 0x08000, CRC(35fe2fdf) SHA1(731da12ee290bad9bc03cffe281c8cc48e555dfb) )
 ROM_END
 
-ROM_START( feagv7 ) // dumped from a repro pcb
+ROM_START( feagv7 ) // dumped from a repro pcb - checksum FCA0 6969
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("eag-v7b", 0x00000, 0x10000, CRC(f2f68b63) SHA1(621e5073e9c5083ac9a9b467f3ef8aa29beac5ac) )
 	ROM_LOAD16_BYTE("eag-v7a", 0x00001, 0x10000, CRC(506b688f) SHA1(0a091c35d0f01166b57f964b111cde51c5720d58) )
 ROM_END
 
-ROM_START( feagv7a ) // PCB label 510.1136A01, dumped from a V6
+ROM_START( feagv7a ) // PCB label 510.1136A01, dumped from a V6 - checksum 005D 6AB7
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("e1_yellow.u22", 0x00000, 0x10000, CRC(2fa692a9) SHA1(357fd47e97f823462e372c7b4d0730c1fa35c364) )
 	ROM_LOAD16_BYTE("o1_red.u19",    0x00001, 0x10000, CRC(bceb99f0) SHA1(601869be5fb9724fe75f14d4dac58471eed6e0f4) )
 ROM_END
 
-ROM_START( feagv7b )
+ROM_START( feagv7b ) // checksum 00D5 6939
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("e1_yellow.u22", 0x00000, 0x10000, CRC(44baefbf) SHA1(dbc24340d7e3013cc8f111ebb2a59169c5dcb8e8) )
 	ROM_LOAD16_BYTE("o1_red.u19",    0x00001, 0x10000, CRC(951a7857) SHA1(dad21b049fd4f411a79d4faefb922c1277569c0e) )
 ROM_END
 
-ROM_START( feagv9 )
+ROM_START( feagv9 ) // checksum F702 6893
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("eag-v9b", 0x00000, 0x10000, CRC(60523199) SHA1(a308eb6b782732af1ab2fd0ed8b046de7a8dd24b) )
 	ROM_LOAD16_BYTE("eag-v9a", 0x00001, 0x10000, CRC(255c63c0) SHA1(8aa0397bdb3731002f5b066cd04ec62531267e22) )
 ROM_END
 
-ROM_START( feagv10 )
+ROM_START( feagv10 ) // checksum F40C 38B9
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD32_BYTE("16", 0x00000, 0x08000, CRC(8375d61f) SHA1(e042f6f01480c59ee09a458cf34f135664479824) ) // 27c256
 	ROM_LOAD32_BYTE("17", 0x00001, 0x08000, CRC(bfd14916) SHA1(115af6dfd29ddd8ad6d2ce390f8ecc4d60de6fce) ) // "
@@ -963,7 +968,7 @@ ROM_START( feagv10 )
 	ROM_LOAD32_BYTE("19", 0x00003, 0x08000, CRC(a70c5468) SHA1(7f6b4f46577d5cfdaa84d387c7ce35d941e5bbc7) ) // "
 ROM_END
 
-ROM_START( feagv11 )
+ROM_START( feagv11 ) // checksum F40C 38B9
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD32_BYTE("16", 0x00000, 0x08000, CRC(8375d61f) SHA1(e042f6f01480c59ee09a458cf34f135664479824) ) // 27c256
 	ROM_LOAD32_BYTE("17", 0x00001, 0x08000, CRC(bfd14916) SHA1(115af6dfd29ddd8ad6d2ce390f8ecc4d60de6fce) ) // "
@@ -971,7 +976,7 @@ ROM_START( feagv11 )
 	ROM_LOAD32_BYTE("19", 0x00003, 0x08000, CRC(a70c5468) SHA1(7f6b4f46577d5cfdaa84d387c7ce35d941e5bbc7) ) // "
 ROM_END
 
-ROM_START( premiere ) // model 6131, PCB label 510.1157A01
+ROM_START( premiere ) // model 6131, PCB label 510.1157A01 - checksum (2265 only) F667 4B06
 	ROM_REGION16_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("101.1103a01_1meg_even.u22", 0x00000, 0x20000, CRC(0df2d4d8) SHA1(2c6cd8d83768d14aeb9860be76ed2ec0f64f118b) ) // M27C1001
 	ROM_LOAD16_BYTE("101.1104a01_1meg_odd.u19",  0x00001, 0x20000, CRC(afae9d5e) SHA1(7ab5fb8b8a2fa30f2fd444a050eae2432c9236d0) ) // "

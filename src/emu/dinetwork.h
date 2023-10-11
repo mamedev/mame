@@ -16,7 +16,7 @@ public:
 
 	void set_interface(int id);
 	void set_promisc(bool promisc);
-	void set_mac(const char *mac);
+	void set_mac(const u8 *mac);
 	void set_loopback(bool loopback);
 
 	const char *get_mac() const { return m_mac; }

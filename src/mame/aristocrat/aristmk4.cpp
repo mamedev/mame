@@ -676,7 +676,7 @@ uint8_t aristmk4_state::mkiv_pia_ina()
 {
 	/* uncomment this code once RTC is fixed */
 
-	//return m_rtc->read(1);
+	//return m_rtc->data_r();
 	return 0;   // OK for now, the aussie version has no RTC on the MB so this is valid.
 }
 
@@ -685,12 +685,12 @@ void aristmk4_state::mkiv_pia_outa(uint8_t data)
 {
 	if(m_rtc_data_strobe)
 	{
-		m_rtc->write(1,data);
+		m_rtc->data_w(data);
 		//logerror("rtc protocol write data: %02X\n",data);
 	}
 	else
 	{
-		m_rtc->write(0,data);
+		m_rtc->address_w(data);
 		//logerror("rtc protocol write address: %02X\n",data);
 	}
 }
@@ -1805,7 +1805,7 @@ void aristmk4_state::aristmk4(machine_config &config)
 	via.irq_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 	// CA1 is connected to +5V, CB1 is not connected.
 
-	pia6821_device &pia(PIA6821(config, "pia6821_0", 0));
+	pia6821_device &pia(PIA6821(config, "pia6821_0"));
 	pia.readpa_handler().set(FUNC(aristmk4_state::mkiv_pia_ina));
 	pia.writepa_handler().set(FUNC(aristmk4_state::mkiv_pia_outa));
 	pia.writepb_handler().set(FUNC(aristmk4_state::mkiv_pia_outb));

@@ -19,6 +19,7 @@
 #include "cdrom.h"
 
 #include "corestr.h"
+#include "multibyte.h"
 #include "osdfile.h"
 #include "strformat.h"
 
@@ -502,9 +503,7 @@ bool cdrom_file::read_data(uint32_t lbasector, void *buffer, uint32_t datatype, 
 
 			static const uint8_t syncbytes[12] = {0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00};
 			memcpy(bufptr, syncbytes, 12);
-			bufptr[12] = msf>>16;
-			bufptr[13] = msf>>8;
-			bufptr[14] = msf&0xff;
+			put_u24be(&bufptr[12], msf);
 			bufptr[15] = 1; // mode 1
 			LOG(("CDROM: promotion of mode1/form1 sector to mode1 raw is not complete!\n"));
 			return !read_partial_sector(bufptr+16, lbasector, chdsector, tracknum, 0, 2048, phys);
@@ -1778,14 +1777,11 @@ uint32_t cdrom_file::parse_wav_sample(std::string_view filename, uint32_t *datao
 
 uint16_t cdrom_file::read_uint16(FILE *infile)
 {
-	uint16_t res = 0;
 	unsigned char buffer[2];
 
 	fread(buffer, 2, 1, infile);
 
-	res = buffer[1] | buffer[0]<<8;
-
-	return res;
+	return get_u16be(buffer);
 }
 
 /**
@@ -1800,14 +1796,11 @@ uint16_t cdrom_file::read_uint16(FILE *infile)
 
 uint32_t cdrom_file::read_uint32(FILE *infile)
 {
-	uint32_t res = 0;
 	unsigned char buffer[4];
 
 	fread(buffer, 4, 1, infile);
 
-	res = buffer[3] | buffer[2]<<8 | buffer[1]<<16 | buffer[0]<<24;
-
-	return res;
+	return get_u32be(buffer);
 }
 
 /**
@@ -1822,18 +1815,11 @@ uint32_t cdrom_file::read_uint32(FILE *infile)
 
 uint64_t cdrom_file::read_uint64(FILE *infile)
 {
-	uint64_t res0(0), res1(0);
-	uint64_t res;
 	unsigned char buffer[8];
 
 	fread(buffer, 8, 1, infile);
 
-	res0 = buffer[3] | buffer[2]<<8 | buffer[1]<<16 | buffer[0]<<24;
-	res1 = buffer[7] | buffer[6]<<8 | buffer[5]<<16 | buffer[4]<<24;
-
-	res = res0<<32 | res1;
-
-	return res;
+	return get_u64be(buffer);
 }
 
 /*-------------------------------------------------
@@ -1883,7 +1869,7 @@ std::error_condition cdrom_file::parse_nero(std::string_view tocfname, toc &outt
 		return chd_file::error::UNSUPPORTED_FORMAT;
 	}
 
-	chain_offs = buffer[11] | (buffer[10]<<8) | (buffer[9]<<16) | (buffer[8]<<24);
+	chain_offs = get_u32be(&buffer[8]);
 
 	if ((buffer[7] != 0) || (buffer[6] != 0) || (buffer[5] != 0) || (buffer[4] != 0))
 	{
@@ -1899,7 +1885,7 @@ std::error_condition cdrom_file::parse_nero(std::string_view tocfname, toc &outt
 		fseek(infile, chain_offs, SEEK_SET);
 		fread(buffer, 8, 1, infile);
 
-		chunk_size = (buffer[7] | buffer[6]<<8 | buffer[5]<<16 | buffer[4]<<24);
+		chunk_size = get_u32be(&buffer[4]);
 
 //      printf("Chunk type: %c%c%c%c, size %x\n", buffer[0], buffer[1], buffer[2], buffer[3], chunk_size);
 

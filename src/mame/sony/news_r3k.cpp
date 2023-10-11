@@ -48,9 +48,6 @@
 #include "bus/rs232/rs232.h"
 
 #include "imagedev/floppy.h"
-#include "formats/pc_dsk.h"
-
-#include "debugger.h"
 
 #define VERBOSE 0
 #include "logmacro.h"

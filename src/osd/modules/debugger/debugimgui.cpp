@@ -20,6 +20,8 @@
 #include "render.h"
 #include "uiinput.h"
 
+#include "formats/flopimg.h"
+
 #include "config.h"
 #include "modules/lib/osdobj_common.h"
 #include "modules/osdmodule.h"

@@ -103,14 +103,11 @@
 #include "machine/input_merger.h"
 
 #include "imagedev/floppy.h"
-#include "formats/pc_dsk.h"
 
 #define LOG_KLS     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL|LOG_KLS)
 #include "logmacro.h"
-
-#include "debugger.h"
 
 #include "rtpc.lh"
 

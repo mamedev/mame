@@ -11,6 +11,7 @@
 #include "flac.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include <algorithm>
 #include <cassert>
@@ -256,7 +257,7 @@ FLAC__StreamEncoderWriteStatus flac_encoder::write_callback(const FLAC__byte buf
 			// if we haven't hit the end of metadata, process a new piece
 			assert(bytes - offset >= 4);
 			m_found_audio = ((buffer[offset] & 0x80) != 0);
-			m_ignore_bytes = (buffer[offset + 1] << 16) | (buffer[offset + 2] << 8) | buffer[offset + 3];
+			m_ignore_bytes = get_u24be(&buffer[offset + 1]);
 			offset += 4;
 		}
 		else
@@ -415,11 +416,9 @@ bool flac_decoder::reset(uint32_t sample_rate, uint8_t num_channels, uint32_t bl
 														// +2A: start of stream data
 	};
 	memcpy(m_custom_header, s_header_template, sizeof(s_header_template));
-	m_custom_header[0x08] = m_custom_header[0x0a] = block_size >> 8;
-	m_custom_header[0x09] = m_custom_header[0x0b] = block_size & 0xff;
-	m_custom_header[0x12] = sample_rate >> 12;
-	m_custom_header[0x13] = sample_rate >> 4;
-	m_custom_header[0x14] = (sample_rate << 4) | ((num_channels - 1) << 1);
+	put_u16be(&m_custom_header[0x08], block_size);
+	put_u16be(&m_custom_header[0x0a], block_size);
+	put_u24be(&m_custom_header[0x12], (sample_rate << 4) | ((num_channels - 1) << 1));
 
 	// configure the header ahead of the provided buffer
 	m_file = nullptr;

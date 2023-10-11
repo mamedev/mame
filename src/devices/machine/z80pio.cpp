@@ -559,10 +559,24 @@ void z80pio_device::pio_port::write(uint8_t data)
 
 		data &= mask;
 
-		if ((m_icw & 0x60) == 0 && data != mask) match = true;
-		else if ((m_icw & 0x60) == 0x20 && data != 0) match = true;
-		else if ((m_icw & 0x60) == 0x40 && data == 0) match = true;
-		else if ((m_icw & 0x60) == 0x60 && data == mask) match = true;
+		switch (m_icw & 0x60)
+		{
+		case 0x00:
+			match = data != mask;
+			break;
+
+		case 0x20:
+			match = data != 0;
+			break;
+
+		case 0x40:
+			match = data == 0;
+			break;
+
+		case 0x60:
+			match = data == mask;
+			break;
+		}
 
 		if (!m_match && match && !m_ius)
 		{

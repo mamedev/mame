@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert, 68bit
 /*********************************************************************
 
-    formats/wd177x_dsk.h
+    formats/wd177x_dsk.cpp
 
     helper for simple wd177x-formatted disk images
 
@@ -208,7 +208,7 @@ floppy_image_format_t::desc_e* wd177x_format::get_desc_mfm(const format &f, int 
 	return desc;
 }
 
-bool wd177x_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool wd177x_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	int const type = find_size(io, form_factor, variants);
 	if(type == -1)
@@ -216,7 +216,7 @@ bool wd177x_format::load(util::random_read &io, uint32_t form_factor, const std:
 
 	const format &f = formats[type];
 	int max_tracks, max_heads;
-	image->get_maximal_geometry(max_tracks, max_heads);
+	image.get_maximal_geometry(max_tracks, max_heads);
 
 	if(f.track_count > max_tracks) {
 		osd_printf_error("wd177x_format: Number of tracks in image file too high for floppy drive (%d > %d)\n", f.track_count, max_tracks);
@@ -267,17 +267,17 @@ bool wd177x_format::load(util::random_read &io, uint32_t form_factor, const std:
 			generate_track(desc, track, head, sectors, tf.sector_count, total_size, image);
 		}
 
-	image->set_form_variant(f.form_factor, f.variant);
+	image.set_form_variant(f.form_factor, f.variant);
 
 	return true;
 }
 
-bool wd177x_format::supports_save() const
+bool wd177x_format::supports_save() const noexcept
 {
 	return true;
 }
 
-bool wd177x_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool wd177x_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	// Count the number of formats
 	int formats_count;
@@ -297,8 +297,8 @@ bool wd177x_format::save(util::random_read_write &io, const std::vector<uint32_t
 		int cur_cell_size = 0;
 		candidates.clear();
 		for(int i=0; i < formats_count; i++) {
-			if(image->get_form_factor() == floppy_image::FF_UNKNOWN ||
-				image->get_form_factor() == formats[i].form_factor) {
+			if(image.get_form_factor() == floppy_image::FF_UNKNOWN ||
+				image.get_form_factor() == formats[i].form_factor) {
 				if(formats[i].cell_size == cur_cell_size)
 					candidates.push_back(i);
 				else if((!cur_cell_size || formats[i].cell_size < cur_cell_size) &&
@@ -335,7 +335,7 @@ bool wd177x_format::save(util::random_read_write &io, const std::vector<uint32_t
 
 		// Otherwise, find the best
 		int tracks, heads;
-		image->get_actual_geometry(tracks, heads);
+		image.get_actual_geometry(tracks, heads);
 		chosen_candidate = candidates[0];
 		for(unsigned int i=1; i < candidates.size(); i++) {
 			const format &cc = formats[chosen_candidate];
@@ -435,7 +435,7 @@ int wd177x_format::get_track_dam_mfm(const format &f, int head, int track) const
 	return MFM_DAM;
 }
 
-void wd177x_format::check_compatibility(floppy_image *image, std::vector<int> &candidates) const
+void wd177x_format::check_compatibility(const floppy_image &image, std::vector<int> &candidates) const
 {
 	// Check compatibility with every candidate, copy in-place
 	int *ok_cands = &candidates[0];
@@ -443,7 +443,7 @@ void wd177x_format::check_compatibility(floppy_image *image, std::vector<int> &c
 		const format &f = formats[candidates[i]];
 
 		int max_tracks, max_heads;
-		image->get_maximal_geometry(max_tracks, max_heads);
+		image.get_maximal_geometry(max_tracks, max_heads);
 
 		// Fail if floppy drive can't handle track or head count
 		if(f.track_count > max_tracks || f.head_count > max_heads) {
@@ -504,7 +504,7 @@ void wd177x_format::check_compatibility(floppy_image *image, std::vector<int> &c
 }
 
 // A track specific format is to be supplied.
-void wd177x_format::extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head)
+void wd177x_format::extract_sectors(const floppy_image &image, const format &f, desc_s *sdesc, int track, int head)
 {
 	// Extract the sectors
 	auto bitstream = generate_bitstream_from_track(track, head, f.cell_size, image);

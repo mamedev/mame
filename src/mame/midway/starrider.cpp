@@ -414,7 +414,7 @@ void sr_state::starrider(machine_config &config)
 
 	NVRAM(config, "cpu.u9", nvram_device::DEFAULT_ALL_0);
 
-	ADDRESS_MAP_BANK(config, m_main_banks, 24_MHz_XTAL / 2 / 12);
+	ADDRESS_MAP_BANK(config, m_main_banks);
 	m_main_banks->set_map(&sr_state::main_banks);
 	m_main_banks->set_data_width(8);
 	m_main_banks->set_addr_width(20);

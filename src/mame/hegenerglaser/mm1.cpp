@@ -39,12 +39,13 @@ TODO:
 
 #include "emu.h"
 
+#include "mmboard.h"
+#include "mmdisplay1.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/cosmac/cosmac.h"
-#include "mmboard.h"
 #include "sound/dac.h"
-#include "mmdisplay1.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"

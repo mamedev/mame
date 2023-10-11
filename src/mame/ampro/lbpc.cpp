@@ -21,7 +21,6 @@
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/nec/v5x.h"
-#include "formats/pc_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/ins8250.h"
 #include "machine/ncr5380.h"

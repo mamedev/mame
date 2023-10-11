@@ -623,7 +623,7 @@ Get item horizontal scroll window size
     horizontal window size as a proportion of the associated element’s width,
     and takes no parameters.  A value of 1.0 will display the entire width of
     the element; smaller values will display proportionally smaller parts of the
-    element.  Call with ``nil`` as the argument to to restore the default
+    element.  Call with ``nil`` as the argument to restore the default
     horizontal scroll window size handler (based on the ``xscroll`` child
     element).
 Get item vertical scroll window size
@@ -638,7 +638,7 @@ Get item vertical scroll window size
     vertical window size as a proportion of the associated element’s height, and
     takes no parameters.  A value of 1.0 will display the entire height of the
     element; smaller values will display proportionally smaller parts of the
-    element.  Call with ``nil`` as the argument to to restore the default
+    element.  Call with ``nil`` as the argument to restore the default
     vertical scroll window size handler (based on the ``xscroll`` child
     element).
 Get item horizontal scroll position

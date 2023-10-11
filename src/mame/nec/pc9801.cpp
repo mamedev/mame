@@ -761,7 +761,6 @@ void pc9801vm_state::a20_ctrl_w(offs_t offset, uint8_t data)
 		// TODO: is there any other way that doesn't involve direct r/w of ppi address?
 		por = m_ppi_sys->read(2) & ~0x20;
 		m_ppi_sys->write(2, por);
-		m_maincpu->set_input_line(INPUT_LINE_A20, CLEAR_LINE);
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_gate_a20 = 0;
 	}

@@ -24,8 +24,6 @@
 
 #include "emu.h"
 #include "myb3k_fdc.h"
-#include "formats/pc_dsk.h"
-#include "formats/imd_dsk.h"
 
 #define LOG_READ    (1U << 1)
 #define LOG_CMD     (1U << 2)

@@ -36,6 +36,7 @@
 #include "machine/ins8250.h"
 #include "machine/nvram.h"
 #include "machine/pc_lpt.h"
+#include "machine/pckeybrd.h"
 #include "sound/beep.h"
 #include "emupal.h"
 #include "screen.h"
@@ -417,6 +418,10 @@ void tv990_state::tv990(machine_config &config)
 	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	m_kbdc->input_buffer_full_callback().set_inputline("maincpu", M68K_IRQ_2);
+	m_kbdc->set_keyboard_tag("at_keyboard");
+
+	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));
+	at_keyb.keypress().set(m_kbdc, FUNC(kbdc8042_device::keyboard_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

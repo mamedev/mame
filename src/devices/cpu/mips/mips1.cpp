@@ -1269,6 +1269,9 @@ std::tuple<struct mips1core_device_base::cache::line &, bool> mips1core_device_b
 	// select line within cache based on low address bits
 	struct cache::line &l = c.line[(address & (c.size - 1)) >> 2];
 
+	// clear cache parity error
+	SR &= ~SR_PE;
+
 	// compare cache line tag against upper address bits and line valid bit
 	bool const miss = (l.tag ^ address) & (-c.size | cache::line::INV);
 
@@ -1355,7 +1358,7 @@ template <typename T, bool Aligned, typename U> std::enable_if_t<std::is_convert
 	{
 		// when isolated, loads always hit the cache and the status register
 		// CM flag reflects the actual hit/miss state
-		auto [l, miss] = cache_lookup(address, false);
+		auto [l, miss] = cache_lookup(address & ~0xe000'0000, false);
 
 		if (miss)
 			SR |= SR_CM;
@@ -1429,7 +1432,7 @@ template <typename T, bool Aligned> void mips1core_device_base::store(u32 addres
 	{
 		// when isolated, full word stores update the cache, while partial word
 		// stores invalidate the cache line
-		auto [l, miss] = cache_lookup(address, true);
+		auto [l, miss] = cache_lookup(address & ~0xe000'0000, true);
 
 		if constexpr (Aligned && sizeof(T) == 4)
 			l.update(data, mem_mask);
@@ -1844,7 +1847,15 @@ void mips1_device_base::handle_cop1(u32 const op)
 				set_cop1_reg(FDREG >> 1, f32_to_f64(float32_t{ u32(m_f[FSREG >> 1]) }).v);
 				break;
 			case 0x24: // CVT.W.S
-				set_cop1_reg(FDREG >> 1, f32_to_i32(float32_t{ u32(m_f[FSREG >> 1]) }, softfloat_roundingMode, true));
+				if (BIT(m_f[FSREG >> 1], 23, 8) == 0xff)
+				{
+					// +/- infinity or NaN
+					m_fcr31 &= ~FCR31_CM;
+					m_fcr31 |= FCR31_CE;
+					execute_set_input(m_fpu_irq, ASSERT_LINE);
+				}
+				else
+					set_cop1_reg(FDREG >> 1, f32_to_i32(float32_t{ u32(m_f[FSREG >> 1]) }, softfloat_roundingMode, true));
 				break;
 
 			case 0x30: // C.F.S (false)
@@ -2028,7 +2039,15 @@ void mips1_device_base::handle_cop1(u32 const op)
 				set_cop1_reg(FDREG >> 1, f64_to_f32(float64_t{ m_f[FSREG >> 1] }).v);
 				break;
 			case 0x24: // CVT.W.D
-				set_cop1_reg(FDREG >> 1, f64_to_i32(float64_t{ m_f[FSREG >> 1] }, softfloat_roundingMode, true));
+				if (BIT(m_f[FSREG >> 1], 52, 11) == 0x7ff)
+				{
+					// +/- infinity or NaN
+					m_fcr31 &= ~FCR31_CM;
+					m_fcr31 |= FCR31_CE;
+					execute_set_input(m_fpu_irq, ASSERT_LINE);
+				}
+				else
+					set_cop1_reg(FDREG >> 1, f64_to_i32(float64_t{ m_f[FSREG >> 1] }, softfloat_roundingMode, true));
 				break;
 
 			case 0x30: // C.F.D (false)

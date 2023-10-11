@@ -39,7 +39,7 @@ public:
 
 	void cb1_w(int state);
 	void cb2_w(int state);
-	void vbl_w(int state);
+	template <u8 mask> void slot_irq_w(int state);
 	void scc_irq_w(int state);
 
 protected:
@@ -157,6 +157,8 @@ private:
 	void devsel_w(u8 devsel);
 	u16 swim_r(offs_t offset, u16 mem_mask);
 	void swim_w(offs_t offset, u16 data, u16 mem_mask);
+
+	void bright_contrast_w(offs_t offset, u8 data);
 };
 
 // device type definition

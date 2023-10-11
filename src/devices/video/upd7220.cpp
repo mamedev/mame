@@ -1714,16 +1714,16 @@ void upd7220_device::update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect
 //  draw_graphics_line -
 //-------------------------------------------------
 
-void upd7220_device::draw_graphics_line(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch)
+void upd7220_device::draw_graphics_line(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int mixed)
 {
 	int al = bitmap.cliprect().height();
+	int aw = m_aw >> mixed;
+	int pitch = m_pitch >> mixed;
 
-	for (int sx = 0; sx < pitch; sx++)
+	for (int sx = 0; sx < aw; sx++)
 	{
 		if((sx << 4) < m_aw * 16 && y < al)
-			m_display_cb(bitmap, y, sx << 4, addr);
-
-		addr+= (wd + 1);
+			m_display_cb(bitmap, y, sx << 4, addr + (wd + 1) * (sx % pitch));
 	}
 }
 
@@ -1738,7 +1738,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 	uint16_t len;
 	int im, wd;
 	int y = 0, tsy = 0, bsy = 0;
-	bool mixed = ((m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_MIXED);
+	int mixed = ((m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_MIXED) ? 1 : 0;
 	uint8_t interlace = ((m_mode & UPD7220_MODE_INTERLACE_MASK) == UPD7220_MODE_INTERLACE_ON) ? 0 : 1;
 	uint8_t zoom = m_disp + 1;
 
@@ -1771,12 +1771,12 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 				// pc98 quarth doesn't seem to use pitch here and it definitely wants bsy to be /2 to make scrolling to work.
 				// pc98 xevious wants the pitch to be fixed at 80, and wants bsy to be /1
 				// pc98 dbuster contradicts with Xevious with regards of the pitch tho ...
-				uint32_t const addr = (sad & 0x3ffff) + ((y / (mixed ? 1 : m_lr)) * (m_pitch >> (mixed ? 1 : 0)));
+				uint32_t const addr = (sad & 0x3ffff) + ((y / (mixed ? 1 : m_lr)) * (m_pitch >> mixed));
 				for(int z = 0; z <= m_disp; ++z)
 				{
 					int yval = (y*zoom)+z + (bsy + m_vbp);
 					if(yval <= cliprect.bottom())
-						draw_graphics_line(bitmap, addr, yval, wd, (m_pitch >> (mixed ? 1 : 0)));
+						draw_graphics_line(bitmap, addr, yval, wd, mixed);
 				}
 			}
 		}

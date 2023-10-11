@@ -18,13 +18,14 @@ Hardware notes:
 
 #include "emu.h"
 
+#include "mmdisplay1.h"
+
 #include "cpu/m6502/m65c02.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "mmdisplay1.h"
 #include "video/pwm.h"
 
 #include "speaker.h"

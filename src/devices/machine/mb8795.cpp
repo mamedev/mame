@@ -180,7 +180,7 @@ void mb8795_device::mac_w(offs_t offset, uint8_t data)
 {
 	if(offset < 6) {
 		mac[offset] = data;
-		set_mac((const char *)mac);
+		set_mac(mac);
 	}
 }
 

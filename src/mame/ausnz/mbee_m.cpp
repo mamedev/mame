@@ -214,21 +214,6 @@ u8 mbee_state::speed_r(offs_t offset)
 
 ************************************************************/
 
-void mbee_state::port04_w(u8 data)  // address
-{
-	m_rtc->write(0, data);
-}
-
-void mbee_state::port06_w(u8 data)  // write
-{
-	m_rtc->write(1, data);
-}
-
-u8 mbee_state::port07_r()   // read
-{
-	return m_rtc->read(1);
-}
-
 // See it work: Run mbeett, choose RTC in the config switches, run the F3 test, press Esc.
 void mbee_state::rtc_irq_w(int state)
 {

@@ -121,8 +121,8 @@ uint8_t tanbus_radisc_device::read(offs_t offset, int inhrom, int inhram, int be
 	case 0xbf94:
 		data = status_r();
 		break;
-	case 0xbf98: case 0xbf99:
-		data = m_rtc->read(offset & 0x01);
+	case 0xbf99:
+		data = m_rtc->data_r();
 		break;
 	}
 
@@ -150,8 +150,11 @@ void tanbus_radisc_device::write(offs_t offset, uint8_t data, int inhrom, int in
 		m_beeper_state ^= 1;
 		m_beeper->set_state(m_beeper_state);
 		break;
-	case 0xbf98: case 0xbf99:
-		m_rtc->write(offset & 0x01, data);
+	case 0xbf98:
+		m_rtc->address_w(data);
+		break;
+	case 0xbf99:
+		m_rtc->data_w(data);
 		break;
 	}
 }

@@ -380,20 +380,20 @@ void icecold_state::icecold(machine_config &config)
 	MC6809E(config, m_maincpu, XTAL(6'000'000)/4); // 68A09E
 	m_maincpu->set_addrmap(AS_PROGRAM, &icecold_state::icecold_map);
 
-	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia6821_device &pia0(PIA6821(config, "pia0"));
 	pia0.readpa_handler().set_ioport("JOY");
 	pia0.readpb_handler().set_ioport("DSW3");
 	pia0.irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	pia0.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpa_handler().set(FUNC(icecold_state::ay_r));
 	m_pia1->writepa_handler().set(FUNC(icecold_state::ay_w));
 	m_pia1->writepb_handler().set(FUNC(icecold_state::snd_ctrl_w));
 	m_pia1->irqa_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
 	m_pia1->irqb_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
 
-	pia6821_device &pia2(PIA6821(config, "pia2", 0));
+	pia6821_device &pia2(PIA6821(config, "pia2"));
 	pia2.irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	pia2.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 

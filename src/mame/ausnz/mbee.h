@@ -94,9 +94,6 @@ public:
 	void init_mbee256()  { m_features = 0x2d; }
 
 private:
-	void port04_w(u8 data);
-	void port06_w(u8 data);
-	u8 port07_r();
 	u8 port08_r();
 	void port08_w(u8 data);
 	void port0a_w(u8 data);

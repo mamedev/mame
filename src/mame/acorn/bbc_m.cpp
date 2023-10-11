@@ -857,18 +857,18 @@ void bbc_state::mc146818_set()
 		{
 			if (m_latch->q1_r()) // WR
 			{
-				m_via_system_porta = m_rtc->read(1);
+				m_via_system_porta = m_rtc->data_r();
 			}
 			else
 			{
-				m_rtc->write(1, m_via_system_porta);
+				m_rtc->data_w(m_via_system_porta);
 			}
 		}
 
 		/* if address select is set then set the address in the 146818 */
 		if (m_mc146818_as)
 		{
-			m_rtc->write(0, m_via_system_porta);
+			m_rtc->address_w(m_via_system_porta);
 		}
 	}
 }

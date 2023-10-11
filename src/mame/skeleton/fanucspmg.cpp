@@ -544,8 +544,6 @@ the keypad symbols seem to use a different matrix pattern from the rest?
 
 #include "screen.h"
 
-#include "formats/imd_dsk.h"
-
 
 namespace {
 
@@ -591,8 +589,6 @@ private:
 	required_device<upd765a_device> m_fdc;
 	required_shared_ptr<uint8_t> m_shared;
 	required_memory_region m_chargen;
-
-	static void floppy_formats(format_registration &fr);
 
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
@@ -941,12 +937,6 @@ static void fanuc_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-void fanucspmg_state::floppy_formats(format_registration &fr)
-{
-	fr.add_mfm_containers();
-	fr.add(FLOPPY_IMD_FORMAT);
-}
-
 void fanucspmg_state::fanucspmg(machine_config &config)
 {
 	/* basic machine hardware */
@@ -1000,8 +990,8 @@ void fanucspmg_state::fanucspmg(machine_config &config)
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(m_pic[0], FUNC(pic8259_device::ir3_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq0_w));
-	FLOPPY_CONNECTOR(config, FDC_TAG":0", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, FDC_TAG":1", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC_TAG":0", fanuc_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC_TAG":1", fanuc_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(15'000'000), 640, 0, 512, 390, 0, 384);

@@ -392,7 +392,7 @@ void d6800_state::d6800(machine_config &config)
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(d6800_state::d6800_keyboard_r));
 	m_pia->readpb_handler().set(FUNC(d6800_state::d6800_cassette_r));
 	m_pia->writepa_handler().set(FUNC(d6800_state::d6800_keyboard_w));

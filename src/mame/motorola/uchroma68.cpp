@@ -457,7 +457,7 @@ void uchroma68_state::uchroma68(machine_config &config)
 	m_mc6847->set_screen(m_screen);
 	m_mc6847->input_callback().set(FUNC(uchroma68_state::mc6847_videoram_r));
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(uchroma68_state::pia_pa_r));
 	m_pia->readpb_handler().set(FUNC(uchroma68_state::pia_pb_r));
 

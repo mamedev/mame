@@ -30,7 +30,6 @@
 #include "bus/rs232/terminal.h"
 
 #include "imagedev/floppy.h"
-#include "formats/pc_dsk.h"
 
 // video
 #include "video/hd44780.h"

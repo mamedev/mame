@@ -70,8 +70,6 @@
 #include "sound/spkrdev.h"
 #include "speaker.h"
 #include "imagedev/floppy.h"
-#include "formats/imd_dsk.h"
-#include "formats/pc_dsk.h"
 #include "bus/rs232/rs232.h"
 
 #define LOG_PPI     (1U << 1)

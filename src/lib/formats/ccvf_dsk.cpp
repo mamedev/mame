@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /*********************************************************************
 
-    formats/ccvf_dsk.c
+    formats/ccvf_dsk.cpp
 
     Compucolor Virtual Floppy Disk Image format
 
@@ -24,17 +24,17 @@ ccvf_format::ccvf_format(const format *_formats)
 	formats = _formats;
 }
 
-const char *ccvf_format::name() const
+const char *ccvf_format::name() const noexcept
 {
 	return "ccvf";
 }
 
-const char *ccvf_format::description() const
+const char *ccvf_format::description() const noexcept
 {
 	return "Compucolor Virtual Floppy Disk Image";
 }
 
-const char *ccvf_format::extensions() const
+const char *ccvf_format::extensions() const noexcept
 {
 	return "ccvf";
 }
@@ -88,7 +88,7 @@ floppy_image_format_t::desc_e* ccvf_format::get_desc_8n1(const format &f, int &c
 	return desc;
 }
 
-bool ccvf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool ccvf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	const format &f = formats[0];
 
@@ -146,12 +146,12 @@ bool ccvf_format::load(util::random_read &io, uint32_t form_factor, const std::v
 		generate_track_from_levels(track, 0, buffer, 0, image);
 	}
 
-	image->set_variant(f.variant);
+	image.set_variant(f.variant);
 
 	return true;
 }
 
-bool ccvf_format::supports_save() const
+bool ccvf_format::supports_save() const noexcept
 {
 	return false;
 }

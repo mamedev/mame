@@ -35,7 +35,7 @@ static int scount = 0;
 
   Names we'll use in th rest of the text:
   - reg(y, x) is the register at address 2*(y*0x40 + x)
-  - ch<nn>  is reg(channel, xx) for a given AWG2 channel
+  - ch<nn>  is reg(channel, nn) for a given AWG2 channel
   - sy<nn>  is reg(nn/2, 0xe + (nn % 2))
   - fp<nnn> is reg(nn/6, 0x21 + 2*(nn % 6))
   - of<nn>  is reg(nn/2, 0x30 + (nn % 2))

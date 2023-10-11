@@ -37,6 +37,8 @@
       manufacturers put together and which eventually became the VESA consortium.
       It has incidentally a couple points in common across families but it's otherwise mostly a
       commercial naming rather than a real physical change over the bus slot.
+      In the end we may not even need this extra device but rather move "SVGA mode"
+      responsibility to RAMDACs.
 
     References:
     - http://www.osdever.net/FreeVGA/vga/vga.htm
@@ -1459,19 +1461,27 @@ void vga_device::vga_vh_mono(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	}
 }
 
+void vga_device::palette_update()
+{
+	for (int i = 0; i < 256; i++)
+	{
+		set_pen_color(
+			i,
+			pal6bit(vga.dac.color[3*(i & vga.dac.mask) + 0] & 0x3f),
+			pal6bit(vga.dac.color[3*(i & vga.dac.mask) + 1] & 0x3f),
+			pal6bit(vga.dac.color[3*(i & vga.dac.mask) + 2] & 0x3f)
+		);
+	}
+}
+
+
 uint8_t vga_device::pc_vga_choosevideomode()
 {
 	if (vga.crtc.sync_en)
 	{
 		if (vga.dac.dirty)
 		{
-			for (int i=0; i<256;i++)
-			{
-				/* TODO: color shifters? */
-				set_pen_color(i, (vga.dac.color[3*(i & vga.dac.mask)] & 0x3f) << 2,
-										(vga.dac.color[3*(i & vga.dac.mask) + 1] & 0x3f) << 2,
-										(vga.dac.color[3*(i & vga.dac.mask) + 2] & 0x3f) << 2);
-			}
+			palette_update();
 			vga.dac.dirty = 0;
 		}
 
@@ -1991,13 +2001,7 @@ uint8_t svga_device::pc_vga_choosevideomode()
 	{
 		if (vga.dac.dirty)
 		{
-			for (int i=0; i<256;i++)
-			{
-				/* TODO: color shifters? */
-				set_pen_color(i, (vga.dac.color[3*(i & vga.dac.mask)] & 0x3f) << 2,
-										(vga.dac.color[3*(i & vga.dac.mask) + 1] & 0x3f) << 2,
-										(vga.dac.color[3*(i & vga.dac.mask) + 2] & 0x3f) << 2);
-			}
+			palette_update();
 			vga.dac.dirty = 0;
 		}
 

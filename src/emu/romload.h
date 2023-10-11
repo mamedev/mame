@@ -432,7 +432,7 @@ public:
 	static std::error_condition open_disk_image(const emu_options &options, software_list_device &swlist, const software_info &swinfo, const rom_entry *romp, chd_file &image_chd);
 
 private:
-	void determine_bios_rom(device_t &device, const char *specbios);
+	void determine_bios_rom(device_t &device, std::string_view specbios);
 	void count_roms();
 	void fill_random(u8 *base, u32 length);
 	void handle_missing_file(const rom_entry *romp, const std::vector<std::string> &tried_file_names, std::error_condition chderr);

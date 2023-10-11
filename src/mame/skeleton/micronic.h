@@ -68,9 +68,6 @@ private:
 	void port_2c_w(uint8_t data);
 	void bank_select_w(uint8_t data);
 	void lcd_contrast_w(uint8_t data);
-	void rtc_address_w(uint8_t data);
-	uint8_t rtc_data_r();
-	void rtc_data_w(uint8_t data);
 	void mc146818_irq(int state);
 
 	void micronic_palette(palette_device &palette) const;

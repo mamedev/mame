@@ -565,7 +565,7 @@ u8 sprinter_state::dcp_r(offs_t offset)
 		break;
 
 	case 0x1c:
-		data = m_rtc->read(1);
+		data = m_rtc->data_r();
 		break;
 
 	case 0x20:
@@ -699,8 +699,10 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		break;
 
 	case 0x1d:
+		m_rtc->address_w(data);
+		break;
 	case 0x1e:
-		m_rtc->write(~dcpp & 1, data);
+		m_rtc->data_w(data);
 		break;
 
 	case 0x20:

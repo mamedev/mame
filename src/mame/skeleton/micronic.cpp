@@ -200,25 +200,6 @@ void micronic_state::port_2c_w(uint8_t data)
 
 
 /***************************************************************************
-    RTC-146818
-***************************************************************************/
-
-void micronic_state::rtc_address_w(uint8_t data)
-{
-	m_rtc->write(0, data);
-}
-
-uint8_t micronic_state::rtc_data_r()
-{
-	return m_rtc->read(1);
-}
-
-void micronic_state::rtc_data_w(uint8_t data)
-{
-	m_rtc->write(1, data);
-}
-
-/***************************************************************************
     Machine
 ***************************************************************************/
 
@@ -241,8 +222,8 @@ void micronic_state::micronic_io(address_map &map)
 	map(0x23, 0x23).rw(m_lcdc, FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w));
 
 	/* rtc-146818 */
-	map(0x08, 0x08).w(FUNC(micronic_state::rtc_address_w));
-	map(0x28, 0x28).rw(FUNC(micronic_state::rtc_data_r), FUNC(micronic_state::rtc_data_w));
+	map(0x08, 0x08).w(m_rtc, FUNC(mc146818_device::address_w));
+	map(0x28, 0x28).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w));
 
 	/* sound */
 	map(0x2b, 0x2b).w(FUNC(micronic_state::beep_w));

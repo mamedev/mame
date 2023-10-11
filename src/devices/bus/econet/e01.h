@@ -79,10 +79,6 @@ private:
 	void hdc_data_w(uint8_t data);
 	void hdc_select_w(uint8_t data);
 	void hdc_irq_enable_w(uint8_t data);
-	uint8_t rtc_address_r();
-	void rtc_address_w(uint8_t data);
-	uint8_t rtc_data_r();
-	void rtc_data_w(uint8_t data);
 
 	static void floppy_formats_afs(format_registration &fr);
 

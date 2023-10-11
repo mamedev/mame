@@ -1084,7 +1084,7 @@ void mpu12_base_state::mpu12_base(machine_config &config)
 	TIMER(config, m_nmi_timer).configure_periodic(FUNC(mpu12_base_state::nmi), attotime::from_hz(100)); // From AC zero crossing detector
 	m_nmi_timer->set_start_delay(attotime::from_msec(5)); // Don't go to NMI at reset time
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpa_handler().set_ioport("IN");
 	m_pia1->irqa_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
 	m_pia1->ca1_w(0);
@@ -1093,7 +1093,7 @@ void mpu12_base_state::mpu12_base(machine_config &config)
 	m_pia1->cb1_w(0);
 	m_pia1->cb2_handler().set(FUNC(mpu12_base_state::pia_lamp_update));
 
-	PIA6821(config, m_pia2, 0);
+	PIA6821(config, m_pia2);
 	m_pia2->set_port_a_input_overrides_output_mask(0x80);
 	m_pia2->irqa_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
 	m_pia2->ca1_w(0);
@@ -1172,14 +1172,14 @@ void mpu2_em_state::mpu2_em(machine_config &config)
 
 	m_pia1->writepb_handler().set(FUNC(mpu2_em_state::pia1_portb_w));
 
-	PIA6821(config, m_pia3, 0);
+	PIA6821(config, m_pia3);
 	m_pia3->readpa_handler().set_ioport("IN_PIA3");
 	m_pia3->writepa_handler().set(FUNC(mpu2_em_state::pia3_porta_w));
 	m_pia3->ca2_handler().set(FUNC(mpu2_em_state::pia_lamp_update));
 	m_pia3->writepb_handler().set(FUNC(mpu2_em_state::pia3_portb_disp_w));
 	m_pia3->cb2_handler().set(FUNC(mpu2_em_state::pia_lamp_update));
 
-	PIA6821(config, m_pia4, 0);
+	PIA6821(config, m_pia4);
 	m_pia4->readpa_handler().set_ioport("IN_PIA4");
 	m_pia4->writepa_handler().set_nop();
 	m_pia4->ca2_handler().set(FUNC(mpu2_em_state::pia_lamp_update));
@@ -1243,12 +1243,12 @@ void mpu2_stepper_state::mpu2_stepper(machine_config &config)
 	m_pia2->readpa_handler().set(FUNC(mpu2_stepper_state::pia2_porta_r));
 	m_pia2->writepa_handler().set(FUNC(mpu2_stepper_state::pia2_porta_w));
 
-	PIA6821(config, m_pia3, 0);
+	PIA6821(config, m_pia3);
 	m_pia3->ca2_handler().set(FUNC(mpu2_stepper_state::pia3_ca2_w));
 	m_pia3->writepb_handler().set(FUNC(mpu2_stepper_state::pia_lamp_update));
 	m_pia3->cb2_handler().set(FUNC(mpu2_stepper_state::pia3_cb2_w));
 
-	PIA6821(config, m_pia4, 0);
+	PIA6821(config, m_pia4);
 	m_pia4->readpa_handler().set_ioport("IN_PIA4");
 	m_pia4->ca2_handler().set(FUNC(mpu2_stepper_state::pia4_ca2_w));
 	m_pia4->writepb_handler().set(FUNC(mpu2_stepper_state::pia4_portb_w));

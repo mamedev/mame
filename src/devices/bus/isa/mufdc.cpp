@@ -18,7 +18,6 @@
 #include "mufdc.h"
 
 #include "formats/naslite_dsk.h"
-#include "formats/pc_dsk.h"
 
 
 //**************************************************************************

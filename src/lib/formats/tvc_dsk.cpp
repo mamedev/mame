@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    formats/tvc_dsk.c
+    formats/tvc_dsk.cpp
 
     tvc format
 
@@ -14,17 +14,17 @@ tvc_format::tvc_format() : wd177x_format(formats)
 {
 }
 
-const char *tvc_format::name() const
+const char *tvc_format::name() const noexcept
 {
 	return "tvc";
 }
 
-const char *tvc_format::description() const
+const char *tvc_format::description() const noexcept
 {
 	return "Videoton TVC HBF disk image";
 }
 
-const char *tvc_format::extensions() const
+const char *tvc_format::extensions() const noexcept
 {
 	return "img,dsk";
 }

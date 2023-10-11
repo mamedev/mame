@@ -91,7 +91,7 @@ void spectrum_opus_device::device_add_mconfig(machine_config &config)
 	m_centronics->busy_handler().set(FUNC(spectrum_opus_device::busy_w));
 
 	/* pia */
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(spectrum_opus_device::pia_out_a));
 	m_pia->writepb_handler().set(FUNC(spectrum_opus_device::pia_out_b));
 	m_pia->cb2_handler().set("centronics", FUNC(centronics_device::write_strobe));

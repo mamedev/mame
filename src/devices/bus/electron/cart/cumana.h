@@ -41,12 +41,11 @@ protected:
 	virtual void write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2) override;
 
 private:
-	void wd1793_control_w(uint8_t data);
+	void control_w(uint8_t data);
 	static void floppy_formats(format_registration &fr);
 
 	required_device<fd1793_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<mc146818_device> m_rtc;
 };
 

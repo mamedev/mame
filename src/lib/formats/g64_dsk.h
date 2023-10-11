@@ -13,7 +13,6 @@
 #pragma once
 
 #include "flopimg.h"
-#include "imageutl.h"
 
 class g64_format : public floppy_image_format_t
 {
@@ -21,13 +20,13 @@ public:
 	g64_format();
 
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
-	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const override;
 
-	virtual const char *name() const override;
-	virtual const char *description() const override;
-	virtual const char *extensions() const override;
-	virtual bool supports_save() const override { return true; }
+	virtual const char *name() const noexcept override;
+	virtual const char *description() const noexcept override;
+	virtual const char *extensions() const noexcept override;
+	virtual bool supports_save() const noexcept override { return true; }
 
 protected:
 	enum
@@ -47,7 +46,7 @@ protected:
 
 	static const uint32_t c1541_cell_size[];
 
-	static int generate_bitstream(int track, int head, int speed_zone, std::vector<bool> &trackbuf, floppy_image *image);
+	static int generate_bitstream(int track, int head, int speed_zone, std::vector<bool> &trackbuf, const floppy_image &image);
 };
 
 extern const g64_format FLOPPY_G64_FORMAT;

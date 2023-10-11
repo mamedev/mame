@@ -11,7 +11,6 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
-#include "imagedev/snapquik.h"
 #include "machine/ay31015.h"
 #include "machine/clock.h"
 #include "machine/com8116.h"
@@ -83,7 +82,6 @@ protected:
 	INTERRUPT_GEN_MEMBER(fdc_interrupt);
 	TIMER_CALLBACK_MEMBER(cassette_data_callback);
 	void intrq_w(int state);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	u8 m_irq = 0U;
 	u8 m_mask = 0U;

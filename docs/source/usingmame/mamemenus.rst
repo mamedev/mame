@@ -120,7 +120,7 @@ Crosshair Options
     Shows the Crosshair Options menu, where you can adjust the appearance of
     crosshairs used to show the location of emulated light guns and other
     absolute pointer inputs.  This item is not shown if the emulated system has
-    has no absolute pointer inputs.
+    no absolute pointer inputs.
 Cheat
     Shows the Cheat menu, for controlling the built-in cheat engine.  This item
     is only shown if the built-in chat engine is enabled.  Note that the cheat

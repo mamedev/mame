@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "mtx.h"
 
-#include "formats/imageutl.h"
+#include "multibyte.h"
 
 /***************************************************************************
     READ/WRITE HANDLERS
@@ -446,7 +446,7 @@ SNAPSHOT_LOAD_MEMBER(mtx_state::snapshot_cb)
 	bankswitch(0);
 
 	// start of system variables area
-	uint16_t system_variables_base = pick_integer_le(data.get(), 16, 2);
+	uint16_t system_variables_base = get_u16le(&data[16]);
 
 	// write system variables
 	uint16_t system_variables_size = 0;
@@ -485,8 +485,8 @@ QUICKLOAD_LOAD_MEMBER(mtx_state::quickload_cb)
 	if (image.fread(data.get(), length) != length)
 		return std::make_pair(image_error::UNSPECIFIED, "Error reading file");
 
-	uint16_t const code_base = pick_integer_le(data.get(), 0, 2);
-	uint16_t const code_length = pick_integer_le(data.get(), 2, 2);
+	uint16_t const code_base = get_u16le(&data[0]);
+	uint16_t const code_length = get_u16le(&data[2]);
 
 	if (length < (code_length + 4))
 		return std::make_pair(image_error::INVALIDIMAGE, "File too short for code length in header");

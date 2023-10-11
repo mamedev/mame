@@ -33,8 +33,7 @@
 #include "screen.h"
 #include "softlist.h"
 
-#include "formats/mfi_dsk.h"
-#include "formats/pc_dsk.h"
+#include "formats/flopimg.h"
 
 
 uint32_t next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

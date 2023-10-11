@@ -41,6 +41,10 @@ AC_ARG_WITH(jack,
             AS_HELP_STRING([--with-jack], [Enable support for JACK @<:@autodetect@:>@]),
             [with_jack=$withval])
 
+AC_ARG_WITH(pulseaudio,
+            AS_HELP_STRING([--with-pulseaudio], [Enable support for PulseAudio @<:@autodetect@:>@]),
+            [with_pulseaudio=$withval])
+
 AC_ARG_WITH(oss,
             AS_HELP_STRING([--with-oss], [Enable support for OSS @<:@autodetect@:>@]),
             [with_oss=$withval])
@@ -149,9 +153,16 @@ if test "x$with_oss" != "xno"; then
         AC_CHECK_LIB(ossaudio, _oss_ioctl, have_libossaudio=yes, have_libossaudio=no)
     fi
 fi
+if [[ "x$with_jack" != "xno" ] || [ "x$with_pulseaudio" != "xno" ]]; then
+    PKG_PROG_PKG_CONFIG
+fi
 have_jack=no
 if test "x$with_jack" != "xno"; then
     PKG_CHECK_MODULES(JACK, jack, have_jack=yes, have_jack=no)
+fi
+have_pulse=no
+if test "x$with_pulseaudio" != "xno"; then
+    PKG_CHECK_MODULES(PULSE, libpulse, have_pulse=yes, have_pulse=no)
 fi
 
 
@@ -386,9 +397,24 @@ case "${host_os}" in
         if [[ "$have_jack" = "yes" ] && [ "$with_jack" != "no" ]] ; then
            DLL_LIBS="$DLL_LIBS $JACK_LIBS"
            CFLAGS="$CFLAGS $JACK_CFLAGS"
-           OTHER_OBJS="$OTHER_OBJS src/hostapi/jack/pa_jack.o src/common/pa_ringbuffer.o"
+           OTHER_OBJS="$OTHER_OBJS src/hostapi/jack/pa_jack.o"
            INCLUDES="$INCLUDES pa_jack.h"
            AC_DEFINE(PA_USE_JACK,1)
+        fi
+
+        if [[ "$have_pulse" = "yes" ] || [ "$have_jack" = "yes" ]] ; then
+           OTHER_OBJS="$OTHER_OBJS src/common/pa_ringbuffer.o"
+        fi
+
+        if [[ "$have_pulse" = "yes" ] && [ "$with_pulse" != "no" ]] ; then
+           INCLUDES="$INCLUDES pa_linux_pulseaudio.h"
+           DLL_LIBS="$DLL_LIBS $PULSE_LIBS"
+           CFLAGS="$CFLAGS $PULSE_CFLAGS"
+           OTHER_OBJS="$OTHER_OBJS src/hostapi/pulseaudio/pa_linux_pulseaudio_cb.o"
+           OTHER_OBJS="$OTHER_OBJS src/hostapi/pulseaudio/pa_linux_pulseaudio_block.o"
+           OTHER_OBJS="$OTHER_OBJS src/hostapi/pulseaudio/pa_linux_pulseaudio.o"
+           dnl INCLUDES="$INCLUDES pa_pulseaudio.h src/hostapi/pulseaudio/pa_linux_pulseaudio_internal.h src/hostapi/pulseaudio/pa_linux_pulseaudio_block_internal.h src/hostapi/pulseaudio/pa_linux_pulseaudio_cb_internal.h"
+           AC_DEFINE(PA_USE_PULSEAUDIO,1)
         fi
 
         if [[ "$with_oss" != "no" ]] ; then
@@ -489,6 +515,7 @@ case "$target_os" in
   AudioIO ..................... $have_audioio
   OSS ......................... $have_oss
   JACK ........................ $have_jack
+  PulseAudio .................. $have_pulse
 ])
         ;;
 esac

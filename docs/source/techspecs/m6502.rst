@@ -18,7 +18,7 @@ Point 1 has been ensured through bisimulation with the gate-level simulation per
 The 6502 family
 ---------------
 
-The MOS 6502 family has been large and productive. A large number of variants exist, varying on bus sizes, I/O, and even opcodes. Some offshots (g65c816, hu6280) even exist that live elsewhere in the mame tree. The final class hierarchy is this:
+The MOS 6502 family has been large and productive. A large number of variants exist, varying on bus sizes, I/O, and even opcodes. Some offshoots (g65c816, hu6280) even exist that live elsewhere in the mame tree. The final class hierarchy is this:
 
 ::
 
@@ -38,7 +38,7 @@ The MOS 6502 family has been large and productive. A large number of variants ex
 
 
 
-The 6510 adds an up to 8 bits I/O port, with the 6510t, 7501 and 8502 being software-identical variants with different pin count (hence I/O count), die process (NMOS, HNMOS, etc) and clock support.
+The 6510 adds an up to 8 bits I/O port, with the 6510t, 7501 and 8502 being software-identical variants with different pin count (hence I/O count), die process (NMOS, HNMOS, etc.) and clock support.
 
 The deco16 is a Deco variant with a small number of not really understood additional instructions and some I/O.
 

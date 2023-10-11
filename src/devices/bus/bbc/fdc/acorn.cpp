@@ -10,6 +10,9 @@
 #include "emu.h"
 #include "acorn.h"
 
+#include "formats/acorn_dsk.h"
+#include "formats/fsd_dsk.h"
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS

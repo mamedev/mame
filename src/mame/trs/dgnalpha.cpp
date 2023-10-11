@@ -361,7 +361,7 @@ void dragon_alpha_state::dgnalpha(machine_config &config)
 	m_ay8912->add_route(ALL_OUTPUTS, "speaker", 0.75);
 
 	// pia 2
-	PIA6821(config, m_pia_2, 0);
+	PIA6821(config, m_pia_2);
 	m_pia_2->writepa_handler().set(FUNC(dragon_alpha_state::pia2_pa_w));
 	m_pia_2->irqa_handler().set(m_firqs, FUNC(input_merger_device::in_w<2>));
 	m_pia_2->irqb_handler().set(m_firqs, FUNC(input_merger_device::in_w<3>));

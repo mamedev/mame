@@ -923,7 +923,7 @@ void cs8900a_device::cs8900_sideeffects_write_pp(u16 ppaddress, int odd_address)
 
 		/* the MAC address has been changed */
 		cs8900_ia_mac[ppaddress - CS8900_PP_ADDR_MAC_ADDR + odd_address] = GET_PP_8(ppaddress + odd_address);
-		set_mac((char *)cs8900_ia_mac);
+		set_mac(cs8900_ia_mac);
 
 		if (odd_address && (ppaddress == CS8900_PP_ADDR_MAC_ADDR + 4))
 			LOGMASKED(CS8900_DEBUG, "set MAC address: %02x:%02x:%02x:%02x:%02x:%02x",

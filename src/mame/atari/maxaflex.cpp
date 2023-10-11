@@ -190,7 +190,7 @@ void maxaflex_state::mcu_portc_w(uint8_t data)
 
 	// uses a 7447A, which is equivalent to an LS47/48
 	constexpr static uint8_t ls48_map[16] =
-			{ 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00 };
+		{ 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00 };
 
 	m_digits_pwm->write_mx(ls48_map[m_portc_out]);
 }
@@ -342,7 +342,7 @@ void maxaflex_state::maxaflex(machine_config &config)
 	ATARI_ANTIC(config, m_antic, 0);
 	m_antic->set_gtia_tag(m_gtia);
 
-	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia6821_device &pia(PIA6821(config, "pia"));
 	pia.readpa_handler().set(FUNC(maxaflex_state::pia_pa_r));
 	pia.readpb_handler().set(FUNC(maxaflex_state::pia_pb_r));
 	pia.writepb_handler().set(FUNC(maxaflex_state::pia_pb_w));

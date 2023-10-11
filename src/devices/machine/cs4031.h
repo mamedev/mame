@@ -4,20 +4,6 @@
 
     Chips & Technologies CS4031 chipset
 
-    Chipset for 486 based PC/AT compatible systems. Consists of two
-    individual chips:
-
-    * F84031
-        - DRAM controller
-        - ISA-bus controller
-        - VESA VL-BUS controller
-
-    * F84035 (82C206 IPC core)
-        - 2x 8257 DMA controller
-        - 2x 8259 interrupt controller
-        - 8254 timer
-        - MC14818 RTC
-
 ***************************************************************************/
 
 #ifndef MAME_MACHINE_CS4031_H
@@ -66,7 +52,7 @@ public:
 	void config_data_w(uint8_t data);
 	uint8_t portb_r();
 	void portb_w(uint8_t data);
-	void rtc_w(offs_t offset, uint8_t data);
+	void rtc_nmi_w(uint8_t data);
 	void sysctrl_w(uint8_t data);
 	uint8_t sysctrl_r();
 	uint8_t dma_page_r(offs_t offset) { return m_dma_page[offset]; }

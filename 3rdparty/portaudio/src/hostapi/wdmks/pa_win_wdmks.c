@@ -83,6 +83,7 @@ of a device for the duration of active stream using those devices
 #include "pa_ringbuffer.h"
 #include "pa_trace.h"
 #include "pa_win_waveformat.h"
+#include "pa_win_version.h"
 
 #include "pa_win_wdmks.h"
 
@@ -163,12 +164,17 @@ Default is to use the pin category.
 #define DYNAMIC_GUID(data) {data}
 #define _NTRTL_ /* Turn off default definition of DEFINE_GUIDEX */
 #undef DEFINE_GUID
+#ifdef DECLSPEC_SELECTANY
+#define PA_DECLSPEC_SELECTANY DECLSPEC_SELECTANY
+#else
+#define PA_DECLSPEC_SELECTANY
+#endif
 #if defined(__clang__) || (defined(_MSVC_TRADITIONAL) && !_MSVC_TRADITIONAL) /* clang-cl and new msvc preprocessor: avoid too many arguments error */
-    #define DEFINE_GUID(n, ...) EXTERN_C const GUID n = {__VA_ARGS__}
+    #define DEFINE_GUID(n, ...) EXTERN_C const GUID PA_DECLSPEC_SELECTANY n = {__VA_ARGS__}
     #define DEFINE_GUID_THUNK(n, ...) DEFINE_GUID(n, __VA_ARGS__)
     #define DEFINE_GUIDEX(n) DEFINE_GUID_THUNK(n, STATIC_##n)
 #else
-    #define DEFINE_GUID(n, data) EXTERN_C const GUID n = {data}
+    #define DEFINE_GUID(n, data) EXTERN_C const GUID PA_DECLSPEC_SELECTANY n = {data}
     #define DEFINE_GUID_THUNK(n, data) DEFINE_GUID(n, data)
     #define DEFINE_GUIDEX(n) DEFINE_GUID_THUNK(n, STATIC_##n)
 #endif /* __clang__, !_MSVC_TRADITIONAL */
@@ -649,28 +655,8 @@ static BOOL IsDeviceTheSame(const PaWinWdmDeviceInfo* pDev1,
 
 static BOOL IsEarlierThanVista()
 {
-/*
-NOTE: GetVersionEx() is deprecated as of Windows 8.1 and can not be used to reliably detect
-versions of Windows higher than Windows 8 (due to manifest requirements for reporting higher versions).
-Microsoft recommends switching to VerifyVersionInfo (available on Win 2k and later), however GetVersionEx
-is faster, for now we just disable the deprecation warning.
-See: https://msdn.microsoft.com/en-us/library/windows/desktop/ms724451(v=vs.85).aspx
-See: http://www.codeproject.com/Articles/678606/Part-Overcoming-Windows-s-deprecation-of-GetVe
-*/
-#pragma warning (disable : 4996) /* use of GetVersionEx */
-
-    OSVERSIONINFO osvi;
-    osvi.dwOSVersionInfoSize = sizeof(osvi);
-    if (GetVersionEx(&osvi) && osvi.dwMajorVersion<6)
-    {
-        return TRUE;
-    }
-    return FALSE;
-
-#pragma warning (default : 4996)
+    return (PaWinUtil_GetOsVersion() < paOsVersionWindowsVistaServer2008);
 }
-
-
 
 static void MemoryBarrierDummy(void)
 {

@@ -561,7 +561,8 @@ void southbridge_extended_device::device_start()
 
 	spaceio.install_readwrite_handler(0x0060, 0x0063, read8smo_delegate(*m_keybc, FUNC(at_keyboard_controller_device::data_r)), write8smo_delegate(*m_keybc, FUNC(at_keyboard_controller_device::data_w)), 0x000000ff);
 	spaceio.install_readwrite_handler(0x0064, 0x0067, read8smo_delegate(*m_keybc, FUNC(at_keyboard_controller_device::status_r)), write8smo_delegate(*m_keybc, FUNC(at_keyboard_controller_device::command_w)), 0xffffffff);
-	spaceio.install_readwrite_handler(0x0070, 0x007f, read8sm_delegate(*m_ds12885, FUNC(ds12885_device::read)), write8sm_delegate(*m_ds12885, FUNC(ds12885_device::write)), 0xffffffff);
+	spaceio.install_write_handler(0x0070, 0x007f, write8smo_delegate(*this, FUNC(southbridge_extended_device::rtc_nmi_w)), 0x00ff00ff);
+	spaceio.install_readwrite_handler(0x0070, 0x007f, read8smo_delegate(*m_ds12885, FUNC(ds12885_device::data_r)), write8smo_delegate(*m_ds12885, FUNC(ds12885_device::data_w)), 0xff00ff00);
 }
 
 //-------------------------------------------------
@@ -573,15 +574,10 @@ void southbridge_extended_device::device_reset()
 	southbridge_device::device_reset();
 }
 
-void southbridge_extended_device::write_rtc(offs_t offset, uint8_t data)
+void southbridge_extended_device::rtc_nmi_w(uint8_t data)
 {
-	if (offset==0) {
-		m_nmi_enabled = BIT(data,7);
-		if (!m_nmi_enabled)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		m_ds12885->write(0,data);
-	}
-	else {
-		m_ds12885->write(offset,data);
-	}
+	m_nmi_enabled = BIT(data,7);
+	if (!m_nmi_enabled)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_ds12885->address_w(data);
 }

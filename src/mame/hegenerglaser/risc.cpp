@@ -19,12 +19,13 @@ Hardware notes:
 
 #include "emu.h"
 
+#include "mmboard.h"
+#include "mmdisplay2.h"
+
 #include "cpu/m6502/m65sc02.h"
 #include "machine/74259.h"
-#include "machine/nvram.h"
-#include "mmboard.h"
 #include "machine/chessmachine.h"
-#include "mmdisplay2.h"
+#include "machine/nvram.h"
 
 // internal artwork
 #include "mephisto_risc.lh"

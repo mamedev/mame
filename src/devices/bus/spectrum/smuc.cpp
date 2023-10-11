@@ -90,12 +90,12 @@ void smuc_device::map_io(address_map &map)
 		.lr8(NAME([]() { return 0x28; }));
 	map(0x138a2, 0x138a2).mirror(0x4718) //     7fba | 0x111xxx101xx010 | VirtualFDD
 		.lrw8(NAME([this]() { return m_port_7fba_data | 0x37; })
-			, NAME([this](offs_t offset, u8 data) { m_port_7fba_data = data; }));
+			, NAME([this](u8 data) { m_port_7fba_data = data; }));
 	map(0x138a6, 0x138a6).mirror(0x4718) //  7[ef]be | 0x111xxN101xx110 | i8259 - absent in 2.0
 		.lr8(NAME([]() { return 0x57; })).nopw();
 	map(0x198a2, 0x198a2).mirror(0x4718) //     dfba | 1x011xxx101xx010 | DS1685RTC
-		.lrw8(NAME([this]() { return m_rtc->read(1); })
-			, NAME([this](offs_t offset, u8 data) { m_rtc->write(BIT(m_port_ffba_data, 7), data); }));
+		.lrw8(NAME([this]() { return m_rtc->data_r(); })
+			, NAME([this](u8 data) { if (BIT(m_port_ffba_data, 7)) m_rtc->data_w(data); else m_rtc->address_w(data); }));
 	map(0x198a6, 0x198a6).mirror(0x4718) //     d8be | 1x011xxx101xx110 | IDE-Hi
 		.lrw8(NAME([this]() { return m_ide_hi; }), NAME([this](u8 data) { m_ide_hi = data; }));
 	map(0x1b8a2, 0x1b8a2).mirror(0x4718) //     ffba | 1x111xxx101xx010 | SYS

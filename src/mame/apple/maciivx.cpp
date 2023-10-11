@@ -407,5 +407,5 @@ ROM_END
 
 }   // anonymous namespace
 
-COMP(1993, maciivx, 0,       0, maciivx, maciivx, maciivx_state, empty_init, "Apple Computer", "Macintosh IIvx", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND)
-COMP(1993, maciivi, maciivx, 0, maciivi, maciivx, maciivx_state, empty_init, "Apple Computer", "Macintosh IIvi", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND)
+COMP(1993, maciivx, 0,       0, maciivx, maciivx, maciivx_state, empty_init, "Apple Computer", "Macintosh IIvx", MACHINE_SUPPORTS_SAVE)
+COMP(1993, maciivi, maciivx, 0, maciivi, maciivx, maciivx_state, empty_init, "Apple Computer", "Macintosh IIvi", MACHINE_SUPPORTS_SAVE)

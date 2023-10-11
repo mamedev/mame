@@ -11,8 +11,9 @@ SMSC FDC37C93x Plug and Play Compatible Ultra I/O Controller
 #include "emu.h"
 #include "machine/fdc37c93x.h"
 
+#include "machine/pckeybrd.h"
+
 #include "formats/naslite_dsk.h"
-#include "formats/pc_dsk.h"
 
 DEFINE_DEVICE_TYPE(FDC37C93X, fdc37c93x_device, "fdc37c93x", "SMSC FDC37C93X Super I/O")
 
@@ -288,6 +289,10 @@ void fdc37c93x_device::device_add_mconfig(machine_config &config)
 	m_kbdc->input_buffer_full_mouse_callback().set(FUNC(fdc37c93x_device::irq_mouse_w));
 	m_kbdc->system_reset_callback().set(FUNC(fdc37c93x_device::kbdp20_gp20_reset_w));
 	m_kbdc->gate_a20_callback().set(FUNC(fdc37c93x_device::kbdp21_gp25_gatea20_w));
+	m_kbdc->set_keyboard_tag("at_keyboard");
+
+	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));
+	at_keyb.keypress().set(m_kbdc, FUNC(kbdc8042_device::keyboard_w));
 }
 
 void fdc37c93x_device::irq_floppy_w(int state)
@@ -610,7 +615,8 @@ void fdc37c93x_device::unmap_serial2_addresses()
 
 void fdc37c93x_device::map_rtc(address_map &map)
 {
-	map(0x0, 0xf).rw(ds12885_rtcdev, FUNC(ds12885_device::read), FUNC(ds12885_device::write));
+	map(0x0, 0xf).lr8(NAME([this]() { return ds12885_rtcdev->get_address(); })).w(ds12885_rtcdev, FUNC(ds12885_device::address_w)).umask32(0x00ff00ff); // datasheet implies address might be a R/W register
+	map(0x0, 0xf).rw(ds12885_rtcdev, FUNC(ds12885_device::data_r), FUNC(ds12885_device::data_w)).umask32(0xff00ff00);
 }
 
 void fdc37c93x_device::map_rtc_addresses()

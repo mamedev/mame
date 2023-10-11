@@ -661,6 +661,18 @@ protected:
 	void scsi_data_out(int buf, int size);
 
 	struct sense_data {
+		sense_data()
+		{
+			invalid = false;
+			deferred = false;
+			filemark = false;
+			eom = false;
+			bad_len = false;
+			sense_key = 0;
+			info = 0;
+			sense_key_code = 0;
+		}
+
 		bool invalid;
 		bool deferred;
 		bool filemark;
@@ -670,16 +682,16 @@ protected:
 		s32 info;
 		u16 sense_key_code;
 	};
-	void set_sense_data(const u8 sense_key, const u16 sense_key_code, const sense_data data = {});
+	void set_sense_data(const u8 sense_key, const u16 sense_key_code, const sense_data *data = nullptr);
 	void sense(bool deferred, uint8_t key, uint8_t asc = 0, uint8_t ascq = 0);
-	void report_condition(const u8 sense_key, const u16 sense_key_code, const sense_data data = {});
+	void report_condition(const u8 sense_key, const u16 sense_key_code, const sense_data *data = nullptr);
 	void report_bad_lun(const u8 cmd, const u8 lun);
 	void report_bad_cmd(const u8 cmd);
 	void report_filemark(const s32 info = 0, const bool eom = false);
 	void report_bom(const s32 info = 0);
 	void report_ew(const s32 info = 0);
 	void report_eod(const s32 info = 0, const bool eom = false);
-	void report_eom(const bool write, const s32 info = 0, const bool invalid = 0);
+	void report_eom(const bool write, const s32 info = 0, const bool invalid = false);
 	void report_bad_len(const bool over, const s32 info = 0);
 	void report_bad_cdb_field();
 	void report_bad_pl_field();
@@ -766,7 +778,8 @@ protected:
 	// Command delay (immediate)
 	virtual attotime scsi_data_command_delay();
 
-	uint8_t scsi_cmdbuf[4096], scsi_sense_buffer[18];
+	uint8_t scsi_cmdbuf[4096];
+	uint8_t scsi_sense_buffer[18];
 	int scsi_cmdsize;
 	uint8_t scsi_identify;
 

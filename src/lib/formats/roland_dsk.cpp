@@ -7,17 +7,17 @@ roland_sdisk_format::roland_sdisk_format() : wd177x_format(formats)
 {
 }
 
-const char *roland_sdisk_format::name() const
+const char *roland_sdisk_format::name() const noexcept
 {
 	return "roland_sdisk";
 }
 
-const char *roland_sdisk_format::description() const
+const char *roland_sdisk_format::description() const noexcept
 {
 	return "Roland S-Disk image";
 }
 
-const char *roland_sdisk_format::extensions() const
+const char *roland_sdisk_format::extensions() const noexcept
 {
 	return "out,w30";
 }

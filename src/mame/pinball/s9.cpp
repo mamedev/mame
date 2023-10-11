@@ -365,7 +365,7 @@ void s9_state::s9(machine_config &config)
 	genpin_audio(config);
 
 	/* Devices */
-	PIA6821(config, m_pia21, 0);
+	PIA6821(config, m_pia21);
 	m_pia21->set_port_a_input_overrides_output_mask(0xff);
 	m_pia21->ca1_w(1); // sound busy
 	m_pia21->writepa_handler().set("s9sound", FUNC(williams_s9_sound_device::write));
@@ -375,14 +375,14 @@ void s9_state::s9(machine_config &config)
 	m_pia21->irqa_handler().set(FUNC(s9_state::pia_irq));
 	m_pia21->irqb_handler().set(FUNC(s9_state::pia_irq));
 
-	PIA6821(config, m_pia24, 0);
+	PIA6821(config, m_pia24);
 	m_pia24->writepa_handler().set(FUNC(s9_state::lamp0_w));
 	m_pia24->writepb_handler().set(FUNC(s9_state::lamp1_w));
 	m_pia24->cb2_handler().set(FUNC(s9_state::pia24_cb2_w));
 	m_pia24->irqa_handler().set(FUNC(s9_state::pia_irq));
 	m_pia24->irqb_handler().set(FUNC(s9_state::pia_irq));
 
-	PIA6821(config, m_pia28, 0);
+	PIA6821(config, m_pia28);
 	m_pia28->writepa_handler().set(FUNC(s9_state::dig0_w));
 	m_pia28->writepb_handler().set(FUNC(s9_state::dig1_w));
 	m_pia28->ca2_handler().set(FUNC(s9_state::pia28_ca2_w));
@@ -390,7 +390,7 @@ void s9_state::s9(machine_config &config)
 	m_pia28->irqa_handler().set(FUNC(s9_state::pia_irq));
 	m_pia28->irqb_handler().set(FUNC(s9_state::pia_irq));
 
-	PIA6821(config, m_pia30, 0);
+	PIA6821(config, m_pia30);
 	m_pia30->readpa_handler().set(FUNC(s9_state::switch_r));
 	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s9_state::switch_w));
