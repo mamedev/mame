@@ -138,7 +138,7 @@ hp9895_device::hp9895_device(const machine_config &mconfig, const char *tag, dev
 	  device_ieee488_interface(mconfig, *this),
 	  m_cpu(*this , "cpu"),
 	  m_phi(*this , "phi"),
-	  m_drives{{*this , "floppy0"} , {*this , "floppy1"}},
+	  m_drives(*this , "floppy%u" , 0U),
 	  m_switches{*this , "switches"}
 {
 }

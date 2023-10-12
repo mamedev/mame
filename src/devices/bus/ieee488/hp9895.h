@@ -105,7 +105,7 @@ private:
 
 	required_device<z80_device> m_cpu;
 	required_device<phi_device> m_phi;
-	required_device<floppy_connector> m_drives[ 2 ];
+	required_device_array<floppy_connector, 2> m_drives;
 	required_ioport m_switches;
 
 	bool m_cpu_irq;
