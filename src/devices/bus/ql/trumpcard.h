@@ -14,7 +14,6 @@
 #include "exp.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
-#include "formats/ql_dsk.h"
 
 
 
@@ -50,8 +49,7 @@ private:
 	static void floppy_formats(format_registration &fr);
 
 	required_device<wd1772_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_memory_region m_rom;
 	memory_share_creator<uint8_t> m_ram;
 
