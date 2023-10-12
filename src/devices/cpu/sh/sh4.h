@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /*****************************************************************************
  *
- *   sh4->h
+ *   sh4.h
  *   Portable Hitachi SH-4 (SH7750 family) emulator interface
  *
  *   By R. Belmont, based on sh2.c by Juergen Buchmueller, Mariusz Wojcieszek,
@@ -168,10 +168,10 @@ public:
 
 	void set_mmu_hacktype(int hacktype) { m_mmuhack = hacktype; }
 
-	TIMER_CALLBACK_MEMBER( sh4_refresh_timer_callback );
-	TIMER_CALLBACK_MEMBER( sh4_rtc_timer_callback );
-	TIMER_CALLBACK_MEMBER( sh4_timer_callback );
-	TIMER_CALLBACK_MEMBER( sh4_dmac_callback );
+	TIMER_CALLBACK_MEMBER(sh4_refresh_timer_callback);
+	TIMER_CALLBACK_MEMBER(sh4_rtc_timer_callback);
+	TIMER_CALLBACK_MEMBER(sh4_timer_callback);
+	TIMER_CALLBACK_MEMBER(sh4_dmac_callback);
 
 	virtual void set_frt_input(int state) override;
 	void sh4_set_irln_input(int value);
@@ -387,13 +387,11 @@ protected:
 
 	inline void sh4_check_pending_irq(const char *message) // look for highest priority active exception and handle it
 	{
-		int a,irq,z;
-
 		m_willjump = 0; // for the DRC
 
-		irq = 0;
-		z = -1;
-		for (a=0;a <= SH4_INTC_ROVI;a++)
+		int irq = 0;
+		int z = -1;
+		for (int a = 0; a <= SH4_INTC_ROVI; a++)
 		{
 			if (m_exception_requesting[a])
 			{
@@ -493,12 +491,13 @@ protected:
 	uint32_t sh4_handle_dmaor_addr_r(uint32_t mem_mask) { return m_SH4_DMAOR; }
 
 	// memory handlers
-	virtual uint8_t RB(offs_t A) override;
-	virtual uint16_t RW(offs_t A) override;
-	virtual uint32_t RL(offs_t A) override;
-	virtual void WB(offs_t A, uint8_t V) override;
-	virtual void WW(offs_t A, uint16_t V) override;
-	virtual void WL(offs_t A, uint32_t V) override;
+	virtual uint8_t read_byte(offs_t offset) override;
+	virtual uint16_t read_word(offs_t offset) override;
+	virtual uint32_t read_long(offs_t offset) override;
+	virtual uint16_t decrypted_read_word(offs_t offset) override;
+	virtual void write_byte(offs_t offset, uint8_t data) override;
+	virtual void write_word(offs_t offset, uint16_t data) override;
+	virtual void write_long(offs_t offset, uint32_t data) override;
 
 	// regular handlers for opcodes which need to differ on sh3/4 due to different interrupt / exception handling and register banking
 	virtual void LDCSR(const uint16_t opcode) override;
