@@ -3030,6 +3030,8 @@ if (BUSES["NUBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/nubus/nubus_image.h",
 		MAME_DIR .. "src/devices/bus/nubus/nubus_wsportrait.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/nubus_wsportrait.h",
+		MAME_DIR .. "src/devices/bus/nubus/8lc.cpp",
+		MAME_DIR .. "src/devices/bus/nubus/8lc.h",
 		MAME_DIR .. "src/devices/bus/nubus/bootbug.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/bootbug.h",
 		MAME_DIR .. "src/devices/bus/nubus/quadralink.cpp",
