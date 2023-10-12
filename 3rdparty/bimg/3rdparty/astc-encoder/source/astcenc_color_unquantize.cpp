@@ -40,15 +40,7 @@ static ASTCENC_SIMD_INLINE vint4 uncontract_color(
 	return select(input, bc0, mask);
 }
 
-/**
- * @brief Unpack an LDR RGBA color that uses delta encoding.
- *
- * @param      input0    The packed endpoint 0 color.
- * @param      input1    The packed endpoint 1 color deltas.
- * @param[out] output0   The unpacked endpoint 0 color.
- * @param[out] output1   The unpacked endpoint 1 color.
- */
-static void rgba_delta_unpack(
+void rgba_delta_unpack(
 	vint4 input0,
 	vint4 input1,
 	vint4& output0,
@@ -92,15 +84,7 @@ static void rgb_delta_unpack(
 	output1.set_lane<3>(255);
 }
 
-/**
- * @brief Unpack an LDR RGBA color that uses direct encoding.
- *
- * @param      input0    The packed endpoint 0 color.
- * @param      input1    The packed endpoint 1 color.
- * @param[out] output0   The unpacked endpoint 0 color.
- * @param[out] output1   The unpacked endpoint 1 color.
- */
-static void rgba_unpack(
+void rgba_unpack(
 	vint4 input0,
 	vint4 input1,
 	vint4& output0,

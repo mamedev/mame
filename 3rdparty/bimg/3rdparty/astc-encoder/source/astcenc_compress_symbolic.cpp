@@ -1163,7 +1163,7 @@ static float prepare_block_statistics(
 void compress_block(
 	const astcenc_contexti& ctx,
 	const image_block& blk,
-	physical_compressed_block& pcb,
+	uint8_t pcb[16],
 	compression_working_buffers& tmpbuf)
 {
 	astcenc_profile decode_mode = ctx.config.profile;
@@ -1282,9 +1282,10 @@ void compress_block(
 
 	static const float errorval_overshoot = 1.0f / ctx.config.tune_mse_overshoot;
 
-	// Only enable MODE0 fast path (trial 0) if 2D, and more than 25 texels
+	// Only enable MODE0 fast path if enabled
+	// Never enable for 3D blocks as no "always" block modes are available
 	int start_trial = 1;
-	if ((bsd.texel_count >= TUNE_MIN_TEXELS_MODE0_FASTPATH) && (bsd.zdim == 1))
+ 	if ((ctx.config.tune_search_mode0_enable >= TUNE_MIN_SEARCH_MODE0) && (bsd.zdim == 1))
 	{
 		start_trial = 0;
 	}

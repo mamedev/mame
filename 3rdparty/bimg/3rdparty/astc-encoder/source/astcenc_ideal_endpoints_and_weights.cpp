@@ -1023,7 +1023,7 @@ void compute_quantized_weights_for_decimation(
 	// safe data in compute_ideal_weights_for_decimation and arrays are always 64 elements
 	if (get_quant_level(quant_level) <= 16)
 	{
-		vint4 tab0(reinterpret_cast<const int*>(qat.quant_to_unquant));
+		vint4 tab0 = vint4::load(qat.quant_to_unquant);
 		vint tab0p;
 		vtable_prepare(tab0, tab0p);
 
@@ -1056,8 +1056,8 @@ void compute_quantized_weights_for_decimation(
 	}
 	else
 	{
-		vint4 tab0(reinterpret_cast<const int*>(qat.quant_to_unquant));
-		vint4 tab1(reinterpret_cast<const int*>(qat.quant_to_unquant + 16));
+		vint4 tab0 = vint4::load(qat.quant_to_unquant +  0);
+		vint4 tab1 = vint4::load(qat.quant_to_unquant + 16);
 		vint tab0p, tab1p;
 		vtable_prepare(tab0, tab1, tab0p, tab1p);
 

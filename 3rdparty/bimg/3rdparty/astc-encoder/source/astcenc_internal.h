@@ -79,7 +79,7 @@ static constexpr unsigned int BLOCK_MAX_PARTITIONS { 4 };
 /** @brief The number of partitionings, per partition count, suported by the ASTC format. */
 static constexpr unsigned int BLOCK_MAX_PARTITIONINGS { 1024 };
 
-/** @brief The maximum number of weights used during partition selection for texel clustering. */
+/** @brief The maximum number of texels used during partition selection for texel clustering. */
 static constexpr uint8_t BLOCK_MAX_KMEANS_TEXELS { 64 };
 
 /** @brief The maximum number of weights a block can support. */
@@ -119,11 +119,9 @@ static constexpr unsigned int WEIGHTS_MAX_DECIMATION_MODES { 87 };
 static constexpr float ERROR_CALC_DEFAULT { 1e30f };
 
 /**
- * @brief The minimum texel count for a block to use the one partition fast path.
- *
- * This setting skips 4x4 and 5x4 block sizes.
+ * @brief The minimum tuning setting threshold for the one partition fast path.
  */
-static constexpr unsigned int TUNE_MIN_TEXELS_MODE0_FASTPATH { 24 };
+static constexpr float TUNE_MIN_SEARCH_MODE0 { 0.85f };
 
 /**
  * @brief The maximum number of candidate encodings tested for each encoding mode.
@@ -137,7 +135,7 @@ static constexpr unsigned int TUNE_MAX_TRIAL_CANDIDATES { 8 };
  *
  * This can be dynamically reduced by the compression quality preset.
  */
-static constexpr unsigned int TUNE_MAX_PARTITIONING_CANDIDATES { 32 };
+static constexpr unsigned int TUNE_MAX_PARTITIONING_CANDIDATES { 8 };
 
 /**
  * @brief The maximum quant level using full angular endpoint search method.
@@ -1025,13 +1023,13 @@ struct dt_init_working_buffers
 struct quant_and_transfer_table
 {
 	/** @brief The unscrambled unquantized value. */
-	int8_t quant_to_unquant[32];
+	uint8_t quant_to_unquant[32];
 
 	/** @brief The scrambling order: scrambled_quant = map[unscrambled_quant]. */
-	int8_t scramble_map[32];
+	uint8_t scramble_map[32];
 
 	/** @brief The unscrambling order: unscrambled_unquant = map[scrambled_quant]. */
-	int8_t unscramble_and_unquant_map[32];
+	uint8_t unscramble_and_unquant_map[32];
 
 	/**
 	 * @brief A table of previous-and-next weights, indexed by the current unquantized value.
@@ -1060,7 +1058,7 @@ static constexpr uint8_t SYM_BTYPE_NONCONST { 3 };
  * @brief A symbolic representation of a compressed block.
  *
  * The symbolic representation stores the unpacked content of a single
- * @c physical_compressed_block, in a form which is much easier to access for
+ * physical compressed block, in a form which is much easier to access for
  * the rest of the compressor code.
  */
 struct symbolic_compressed_block
@@ -1121,18 +1119,6 @@ struct symbolic_compressed_block
 		return this->quant_mode;
 	}
 };
-
-/**
- * @brief A physical representation of a compressed block.
- *
- * The physical representation stores the raw bytes of the format in memory.
- */
-struct physical_compressed_block
-{
-	/** @brief The ASTC encoded data for a single block. */
-	uint8_t data[16];
-};
-
 
 /**
  * @brief Parameter structure for @c compute_pixel_region_variance().
@@ -1849,6 +1835,34 @@ void unpack_color_endpoints(
 	vint4& output1);
 
 /**
+ * @brief Unpack an LDR RGBA color that uses delta encoding.
+ *
+ * @param      input0    The packed endpoint 0 color.
+ * @param      input1    The packed endpoint 1 color deltas.
+ * @param[out] output0   The unpacked endpoint 0 color.
+ * @param[out] output1   The unpacked endpoint 1 color.
+ */
+void rgba_delta_unpack(
+	vint4 input0,
+	vint4 input1,
+	vint4& output0,
+	vint4& output1);
+
+/**
+ * @brief Unpack an LDR RGBA color that uses direct encoding.
+ *
+ * @param      input0    The packed endpoint 0 color.
+ * @param      input1    The packed endpoint 1 color.
+ * @param[out] output0   The unpacked endpoint 0 color.
+ * @param[out] output1   The unpacked endpoint 1 color.
+ */
+void rgba_unpack(
+	vint4 input0,
+	vint4 input1,
+	vint4& output0,
+	vint4& output1);
+
+/**
  * @brief Unpack a set of quantized and decimated weights.
  *
  * TODO: Can we skip this for non-decimated weights now that the @c scb is
@@ -2007,7 +2021,7 @@ void compute_angular_endpoints_2planes(
 void compress_block(
 	const astcenc_contexti& ctx,
 	const image_block& blk,
-	physical_compressed_block& pcb,
+	uint8_t pcb[16],
 	compression_working_buffers& tmpbuf);
 
 /**
@@ -2100,12 +2114,12 @@ float compute_symbolic_block_difference_1plane_1partition(
  *
  * @param      bsd   The block size information.
  * @param      scb   The symbolic representation.
- * @param[out] pcb   The binary encoded data.
+ * @param[out] pcb   The physical compressed block output.
  */
 void symbolic_to_physical(
 	const block_size_descriptor& bsd,
 	const symbolic_compressed_block& scb,
-	physical_compressed_block& pcb);
+	uint8_t pcb[16]);
 
 /**
  * @brief Convert a binary physical encoding into a symbolic representation.
@@ -2114,12 +2128,12 @@ void symbolic_to_physical(
  * flagged as an error block if the encoding is invalid.
  *
  * @param      bsd   The block size information.
- * @param      pcb   The binary encoded data.
+ * @param      pcb   The physical compresesd block input.
  * @param[out] scb   The output symbolic representation.
  */
 void physical_to_symbolic(
 	const block_size_descriptor& bsd,
-	const physical_compressed_block& pcb,
+	const uint8_t pcb[16],
 	symbolic_compressed_block& scb);
 
 /* ============================================================================
@@ -2164,9 +2178,9 @@ template<typename T>
 void aligned_free(T* ptr)
 {
 #if defined(_WIN32)
-	_aligned_free(reinterpret_cast<void*>(ptr));
+	_aligned_free(ptr);
 #else
-	free(reinterpret_cast<void*>(ptr));
+	free(ptr);
 #endif
 }
 

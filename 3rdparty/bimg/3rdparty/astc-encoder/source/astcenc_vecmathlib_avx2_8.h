@@ -242,6 +242,14 @@ struct vint8
 	}
 
 	/**
+	 * @brief Factory that returns a vector loaded from unaligned memory.
+	 */
+	static ASTCENC_SIMD_INLINE vint8 load(const uint8_t* p)
+	{
+		return vint8(_mm256_lddqu_si256(reinterpret_cast<const __m256i*>(p)));
+	}
+
+	/**
 	 * @brief Factory that returns a vector loaded from 32B aligned memory.
 	 */
 	static ASTCENC_SIMD_INLINE vint8 loada(const int* p)
@@ -1000,7 +1008,7 @@ ASTCENC_SIMD_INLINE vint8 float_to_int(vfloat8 a)
  */
 ASTCENC_SIMD_INLINE vint8 float_to_int_rtn(vfloat8 a)
 {
-	a = round(a);
+	a = a + vfloat8(0.5f);
 	return vint8(_mm256_cvttps_epi32(a.m));
 }
 
@@ -1152,9 +1160,9 @@ ASTCENC_SIMD_INLINE vint8 interleave_rgba8(vint8 r, vint8 g, vint8 b, vint8 a)
  *
  * All masked lanes must be at the end of vector, after all non-masked lanes.
  */
-ASTCENC_SIMD_INLINE void store_lanes_masked(int* base, vint8 data, vmask8 mask)
+ASTCENC_SIMD_INLINE void store_lanes_masked(uint8_t* base, vint8 data, vmask8 mask)
 {
-	_mm256_maskstore_epi32(base, _mm256_castps_si256(mask.m), data.m);
+	_mm256_maskstore_epi32(reinterpret_cast<int*>(base), _mm256_castps_si256(mask.m), data.m);
 }
 
 /**

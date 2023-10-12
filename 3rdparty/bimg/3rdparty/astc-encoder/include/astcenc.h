@@ -542,6 +542,14 @@ struct astcenc_config
 	 */
 	float tune_2plane_early_out_limit_correlation;
 
+	/**
+	 * @brief The config enable for the mode0 fast-path search.
+	 *
+	 * If this is set to TUNE_MIN_TEXELS_MODE0 or higher then the early-out fast mode0
+	 * search is enabled. This option is ineffective for 3D block sizes.
+	 */
+	float tune_search_mode0_enable;
+
 #if defined(ASTCENC_DIAGNOSTICS)
 	/**
 	 * @brief The path to save the diagnostic trace data to.

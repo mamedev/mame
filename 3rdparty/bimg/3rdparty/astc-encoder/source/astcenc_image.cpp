@@ -433,7 +433,7 @@ void store_image_block(
 
 					vint data_rgbai = interleave_rgba8(data_ri, data_gi, data_bi, data_ai);
 					vmask store_mask = vint::lane_id() < vint(used_texels);
-					store_lanes_masked(reinterpret_cast<int*>(data8_row), data_rgbai, store_mask);
+					store_lanes_masked(data8_row, data_rgbai, store_mask);
 
 					data8_row += ASTCENC_SIMD_WIDTH * 4;
 					idx += used_texels;
