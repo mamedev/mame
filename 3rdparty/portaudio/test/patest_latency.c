@@ -93,7 +93,7 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
 {
     paTestData *data = (paTestData*)userData;
     float *out = (float*)outputBuffer;
-    int i;
+    unsigned long i;
 
     (void) inputBuffer; /* Prevent unused variable warning. */
 

@@ -41,8 +41,6 @@
 
  @brief Conversion function implementations.
 
- If the C9x function lrintf() is available, define PA_USE_C99_LRINTF to use it
-
  @todo Consider whether functions which dither but don't clip should exist,
  V18 automatically enabled clipping whenever dithering was selected. Perhaps
  we should do the same.
@@ -343,13 +341,8 @@ static void Float32_To_Int32(
     while( count-- )
     {
         /* REVIEW */
-#ifdef PA_USE_C99_LRINTF
-        float scaled = *src * 0x7FFFFFFF;
-        *dest = lrintf(scaled-0.5f);
-#else
         double scaled = *src * 0x7FFFFFFF;
         *dest = (PaInt32) scaled;
-#endif
 
         src += sourceStride;
         dest += destinationStride;
@@ -369,17 +362,11 @@ static void Float32_To_Int32_Dither(
     while( count-- )
     {
         /* REVIEW */
-#ifdef PA_USE_C99_LRINTF
-        float dither  = PaUtil_GenerateFloatTriangularDither( ditherGenerator );
-        /* use smaller scaler to prevent overflow when we add the dither */
-        float dithered = ((float)*src * (2147483646.0f)) + dither;
-        *dest = lrintf(dithered - 0.5f);
-#else
         double dither  = PaUtil_GenerateFloatTriangularDither( ditherGenerator );
         /* use smaller scaler to prevent overflow when we add the dither */
         double dithered = ((double)*src * (2147483646.0)) + dither;
         *dest = (PaInt32) dithered;
-#endif
+
         src += sourceStride;
         dest += destinationStride;
     }
@@ -399,15 +386,9 @@ static void Float32_To_Int32_Clip(
     while( count-- )
     {
         /* REVIEW */
-#ifdef PA_USE_C99_LRINTF
-        float scaled = *src * 0x7FFFFFFF;
-        PA_CLIP_( scaled, -2147483648.f, 2147483647.f  );
-        *dest = lrintf(scaled-0.5f);
-#else
         double scaled = *src * 0x7FFFFFFF;
         PA_CLIP_( scaled, -2147483648., 2147483647.  );
         *dest = (PaInt32) scaled;
-#endif
 
         src += sourceStride;
         dest += destinationStride;
@@ -427,19 +408,11 @@ static void Float32_To_Int32_DitherClip(
     while( count-- )
     {
         /* REVIEW */
-#ifdef PA_USE_C99_LRINTF
-        float dither  = PaUtil_GenerateFloatTriangularDither( ditherGenerator );
-        /* use smaller scaler to prevent overflow when we add the dither */
-        float dithered = ((float)*src * (2147483646.0f)) + dither;
-        PA_CLIP_( dithered, -2147483648.f, 2147483647.f  );
-        *dest = lrintf(dithered-0.5f);
-#else
         double dither  = PaUtil_GenerateFloatTriangularDither( ditherGenerator );
         /* use smaller scaler to prevent overflow when we add the dither */
         double dithered = ((double)*src * (2147483646.0)) + dither;
         PA_CLIP_( dithered, -2147483648., 2147483647.  );
         *dest = (PaInt32) dithered;
-#endif
 
         src += sourceStride;
         dest += destinationStride;
@@ -601,13 +574,8 @@ static void Float32_To_Int16(
 
     while( count-- )
     {
-#ifdef PA_USE_C99_LRINTF
-        float tempf = (*src * (32767.0f)) ;
-        *dest = lrintf(tempf-0.5f);
-#else
         short samp = (short) (*src * (32767.0f));
         *dest = samp;
-#endif
 
         src += sourceStride;
         dest += destinationStride;
@@ -631,11 +599,7 @@ static void Float32_To_Int16_Dither(
         /* use smaller scaler to prevent overflow when we add the dither */
         float dithered = (*src * (32766.0f)) + dither;
 
-#ifdef PA_USE_C99_LRINTF
-        *dest = lrintf(dithered-0.5f);
-#else
         *dest = (PaInt16) dithered;
-#endif
 
         src += sourceStride;
         dest += destinationStride;
@@ -655,11 +619,8 @@ static void Float32_To_Int16_Clip(
 
     while( count-- )
     {
-#ifdef PA_USE_C99_LRINTF
-        long samp = lrintf((*src * (32767.0f)) -0.5f);
-#else
         long samp = (PaInt32) (*src * (32767.0f));
-#endif
+
         PA_CLIP_( samp, -0x8000, 0x7FFF );
         *dest = (PaInt16) samp;
 
@@ -687,11 +648,7 @@ static void Float32_To_Int16_DitherClip(
         float dithered = (*src * (32766.0f)) + dither;
         PaInt32 samp = (PaInt32) dithered;
         PA_CLIP_( samp, -0x8000, 0x7FFF );
-#ifdef PA_USE_C99_LRINTF
-        *dest = lrintf(samp-0.5f);
-#else
         *dest = (PaInt16) samp;
-#endif
 
         src += sourceStride;
         dest += destinationStride;

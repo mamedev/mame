@@ -255,7 +255,6 @@
 #include "bus/interpro/keyboard/keyboard.h"
 #include "bus/interpro/mouse/mouse.h"
 
-#include "formats/pc_dsk.h"
 #include "softlist.h"
 
 #include "machine/input_merger.h"
@@ -904,10 +903,8 @@ void interpro_state::interpro_common_map(address_map &map)
 
 	map(0x7f000400, 0x7f00040f).rw(m_scc1, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0x000000ff);
 	map(0x7f000410, 0x7f00041f).rw(m_scc2, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0x000000ff);
-	map(0x7f000500, 0x7f000503).lrw8(
-									 NAME([this] (offs_t offset) { return m_rtc->read(offset^1); }),
-									 NAME([this] (offs_t offset, u8 data) { m_rtc->write(offset^1, data); })).umask32(0x000000ff);
-	map(0x7f000600, 0x7f000600).w(m_rtc, FUNC(mc146818_device::write));
+	map(0x7f000500, 0x7f000500).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w));
+	map(0x7f000600, 0x7f000600).w(m_rtc, FUNC(mc146818_device::address_w));
 
 	// the system board id prom
 	map(0x7f000700, 0x7f00077f).rom().region("idprom", 0);

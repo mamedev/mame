@@ -1,0 +1,5 @@
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/PortAudioCppTargets.cmake")
+
+check_required_components(PortAudioCpp)

@@ -240,6 +240,10 @@ SOURCE=..\..\src\os\win\pa_win_util.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\src\os\win\pa_win_version.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\src\os\win\pa_win_waveformat.c
 # End Source File
 # Begin Source File

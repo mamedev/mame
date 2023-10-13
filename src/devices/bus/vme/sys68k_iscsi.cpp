@@ -150,7 +150,6 @@
 #include "machine/wd_fdc.h"
 #include "machine/hd63450.h" // compatible with MC68450
 #include "machine/clock.h"
-#include "formats/pc_dsk.h"
 
 #define VERBOSE (0) // (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info

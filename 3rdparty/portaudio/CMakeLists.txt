@@ -15,6 +15,33 @@ else()
   set(LIBRARY_BUILD_TYPE STATIC)
 endif()
 
+option(PA_WARNINGS_ARE_ERRORS "Turn compiler warnings into errors" OFF)
+if(PA_WARNINGS_ARE_ERRORS)
+    if(MSVC)
+        add_compile_options(/WX
+            # "Grandfathered" warnings that existed before we started enforcement.
+            # Do *NOT* add warnings to this list. Instead, fix your code so that it doesn't produce the warning.
+            # TODO: fix the offending code so that we don't have to exclude specific warnings anymore.
+            /wd4244 # W2 conversion possible loss of data
+            /wd4267 # W3 conversion possible loss of data
+            /wd4996 # W3 unsafe/deprecated
+        )
+    else()
+        add_compile_options(-Werror
+            # "Grandfathered" warnings that existed before we started enforcement.
+            # Do *NOT* add warnings to this list. Instead, fix your code so that it doesn't produce the warning.
+            # TODO: fix the offending code so that we don't have to exclude specific warnings anymore.
+            -Wno-error=deprecated-declarations  # https://github.com/PortAudio/portaudio/issues/213 https://github.com/PortAudio/portaudio/issues/641
+            -Wno-error=stringop-overflow
+        )
+        if (CMAKE_C_COMPILER_ID MATCHES "Clang")
+             # Don't fail on older clang versions that don't recognize the latest warnings in the list above.
+             # Note that unrecognized warning options are not a fatal error on GCC, and in fact, GCC will choke on this option. Hence the conditional.
+            add_compile_options(-Wno-error=unknown-warning-option)
+        endif()
+    endif()
+endif()
+
 add_library(PortAudio
   ${LIBRARY_BUILD_TYPE}
   src/common/pa_allocation.c
@@ -130,6 +157,8 @@ if(WIN32)
     src/os/win/pa_win_hostapis.c
     src/os/win/pa_win_util.c
     src/os/win/pa_win_util.h
+    src/os/win/pa_win_version.c
+    src/os/win/pa_win_version.h
     src/os/win/pa_win_waveformat.c
     src/os/win/pa_win_wdmks_utils.h
     src/os/win/pa_x86_plain_converters.h
@@ -278,17 +307,13 @@ elseif(UNIX)
     target_include_directories(PortAudio PRIVATE src/hostapi/coreaudio)
     set(PORTAUDIO_PUBLIC_HEADERS "${PORTAUDIO_PUBLIC_HEADERS}" include/pa_mac_core.h)
 
-    find_library(COREAUDIO_LIBRARY CoreAudio REQUIRED)
-    find_library(AUDIOTOOLBOX_LIBRARY AudioToolbox REQUIRED)
-    find_library(AUDIOUNIT_LIBRARY AudioUnit REQUIRED)
-    find_library(COREFOUNDATION_LIBRARY CoreFoundation REQUIRED)
-    find_library(CORESERVICES_LIBRARY CoreServices REQUIRED)
-    target_link_libraries(PortAudio PRIVATE
-      "${COREAUDIO_LIBRARY}"
-      "${AUDIOTOOLBOX_LIBRARY}"
-      "${AUDIOUNIT_LIBRARY}"
-      "${COREFOUNDATION_LIBRARY}"
-      "${CORESERVICES_LIBRARY}"
+    target_link_libraries(PortAudio 
+      PRIVATE
+        -Wl,-framework,CoreAudio
+        -Wl,-framework,AudioToolbox
+        -Wl,-framework,AudioUnit
+        -Wl,-framework,CoreFoundation
+        -Wl,-framework,CoreServices
     )
     target_compile_definitions(PortAudio PUBLIC PA_USE_COREAUDIO=1)
     set(PKGCONFIG_CFLAGS "${PKGCONFIG_CFLAGS} -DPA_USE_COREAUDIO=1")
@@ -340,6 +365,24 @@ elseif(UNIX)
       target_compile_definitions(PortAudio PUBLIC PA_USE_AUDIOIO=1)
       set(PKGCONFIG_CFLAGS "${PKGCONFIG_CFLAGS} -DPA_USE_AUDIOIO=1")
     endif()
+
+    find_package(PulseAudio)
+    cmake_dependent_option(PA_USE_PULSEAUDIO "Enable support for PulseAudio general purpose sound server" ON PulseAudio_FOUND OFF)
+    if(PA_USE_PULSEAUDIO)
+      target_link_libraries(PortAudio PRIVATE PulseAudio::PulseAudio)
+      target_sources(PortAudio PRIVATE
+        src/hostapi/pulseaudio/pa_linux_pulseaudio_block.c
+        src/hostapi/pulseaudio/pa_linux_pulseaudio.c
+        src/hostapi/pulseaudio/pa_linux_pulseaudio_cb.c)
+
+      target_compile_definitions(PortAudio PUBLIC PA_USE_PULSEAUDIO=1)
+      set(PKGCONFIG_CFLAGS "${PKGCONFIG_CFLAGS} -DPA_USE_PULSEAUDIO=1")
+      set(PKGCONFIG_REQUIRES_PRIVATE "${PKGCONFIG_REQUIRES_PRIVATE} libpulse")
+
+      # needed for PortAudioConfig.cmake so `find_package(PortAudio)` works in downstream projects
+      install(FILES cmake/modules/FindPulseAudio.cmake DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/portaudio/modules")
+    endif()
+
   endif()
 endif()
 

@@ -123,16 +123,18 @@ bool swp00_device::fpstep(s32 &value, s32 limit, s32 step)
 	return false;
 }
 
-s16 swp00_device::fpapply(s32 value, s16 sample)
+// sample is signed 24.8
+s32 swp00_device::fpapply(s32 value, s32 sample)
 {
 	if(value >= 0x10000000)
 		return 0;
-	return (sample - ((sample * ((value >> 9) & 0x7fff)) >> 16)) >> (value >> 24);
+	return (s64(sample) - ((s64(sample) * ((value >> 9) & 0x7fff)) >> 16)) >> (value >> 24);
 }
 
-s16 swp00_device::lpffpapply(s32 value, s16 sample)
+// sample is signed 24.8
+s32 swp00_device::lpffpapply(s32 value, s32 sample)
 {
-	return ((((value >> 7) & 0x7fff) | 0x8000) * sample) >> (31 - (value >> 22));
+	return ((((value >> 7) & 0x7fff) | 0x8000) * s64(sample)) >> (31 - (value >> 22));
 }
 
 // Some tables we need.  Maybe they're in roms inside the chip,
@@ -171,8 +173,10 @@ void swp00_device::device_start()
 
 	save_item(NAME(m_waverom_access));
 	save_item(NAME(m_waverom_val));
-	save_item(NAME(m_intreg));
-	save_item(NAME(m_fpreg));
+	save_item(NAME(m_meg_control));
+
+	save_item(NAME(m_off));
+	save_item(NAME(m_fp));
 	save_item(NAME(m_lpf_info));
 	save_item(NAME(m_lpf_speed));
 	save_item(NAME(m_lfo_famod_depth));
@@ -253,9 +257,10 @@ void swp00_device::device_reset()
 {
 	m_waverom_access = 0;
 	m_waverom_val = 0;
+	m_meg_control = 0;
 
-	std::fill(m_intreg.begin(), m_intreg.end(), 0);
-	std::fill(m_fpreg.begin(), m_fpreg.end(), 0);
+	std::fill(m_off.begin(), m_off.end(), 0);
+	std::fill(m_fp.begin(), m_fp.end(), 0);
 	std::fill(m_lpf_info.begin(), m_lpf_info.end(), 0);
 	std::fill(m_lpf_speed.begin(), m_lpf_speed.end(), 0);
 	std::fill(m_lfo_famod_depth.begin(), m_lfo_famod_depth.end(), 0);
@@ -308,8 +313,16 @@ void swp00_device::map(address_map &map)
 {
 	map(0x000, 0x7ff).rw(FUNC(swp00_device::snd_r), FUNC(swp00_device::snd_w));
 
+	// 00-01: control
+
+	rchan(map, 0x08).w(FUNC(swp00_device::slot8_w)); // always 80
+	rchan(map, 0x09).w(FUNC(swp00_device::slot9_w)); // always 00
 	rchan(map, 0x0a).rw(FUNC(swp00_device::sample_start_r<1>), FUNC(swp00_device::sample_start_w<1>));
 	rchan(map, 0x0b).rw(FUNC(swp00_device::sample_start_r<0>), FUNC(swp00_device::sample_start_w<0>));
+
+	// 0c-0f: meg offsets
+	// 10-1b: meg values
+
 	rchan(map, 0x20).rw(FUNC(swp00_device::lpf_info_r<1>), FUNC(swp00_device::lpf_info_w<1>));
 	rchan(map, 0x21).rw(FUNC(swp00_device::lpf_info_r<0>), FUNC(swp00_device::lpf_info_w<0>));
 	rchan(map, 0x22).rw(FUNC(swp00_device::lpf_speed_r), FUNC(swp00_device::lpf_speed_w));
@@ -335,38 +348,39 @@ void swp00_device::map(address_map &map)
 	rchan(map, 0x36).rw(FUNC(swp00_device::sample_end_r<1>), FUNC(swp00_device::sample_end_w<1>));
 	rchan(map, 0x37).rw(FUNC(swp00_device::sample_end_r<0>), FUNC(swp00_device::sample_end_w<0>));
 
-	rany(map, 0x00, 0x02).rw(FUNC(swp00_device::waverom_access_r), FUNC(swp00_device::waverom_access_w));
-	rany(map, 0x00, 0x03).r(FUNC(swp00_device::waverom_val_r));
-	rany(map, 0x00, 0x08).w(FUNC(swp00_device::keyon_w<3>));
-	rany(map, 0x00, 0x09).w(FUNC(swp00_device::keyon_w<2>));
-	rany(map, 0x00, 0x0a).w(FUNC(swp00_device::keyon_w<1>));
-	rany(map, 0x00, 0x0b).w(FUNC(swp00_device::keyon_w<0>));
+	rctrl(map, 0x00); // 01 at startup
+	rctrl(map, 0x01).rw(FUNC(swp00_device::state_r), FUNC(swp00_device::state_adr_w));
+	rctrl(map, 0x02).rw(FUNC(swp00_device::waverom_access_r), FUNC(swp00_device::waverom_access_w));
+	rctrl(map, 0x03).r(FUNC(swp00_device::waverom_val_r));
+	rctrl(map, 0x04).rw(FUNC(swp00_device::meg_control_r), FUNC(swp00_device::meg_control_w));
+	rctrl(map, 0x08).w(FUNC(swp00_device::keyon_w<3>));
+	rctrl(map, 0x09).w(FUNC(swp00_device::keyon_w<2>));
+	rctrl(map, 0x0a).w(FUNC(swp00_device::keyon_w<1>));
+	rctrl(map, 0x0b).w(FUNC(swp00_device::keyon_w<0>));
+	rctrl(map, 0x0c); // 00 at startup
+	rctrl(map, 0x0d); // 00 at startup
+	rctrl(map, 0x0e); // 00 at startup
 
-	map(0x001, 0x001).rw(FUNC(swp00_device::state_r), FUNC(swp00_device::state_adr_w));
-
-	map(0x180, 0x1ff).rw(FUNC(swp00_device::intreg_r), FUNC(swp00_device::intreg_w));
-	map(0x200, 0x3ff).rw(FUNC(swp00_device::fpreg_r), FUNC(swp00_device::fpreg_w));
+	map(0x180, 0x1ff).rw(FUNC(swp00_device::off_r), FUNC(swp00_device::off_w));
+	map(0x200, 0x37f).rw(FUNC(swp00_device::fp_r), FUNC(swp00_device::fp_w));
 }
 
 
 // Voice control
 
-#if 0
-static double exp_mant_to_double(signed int a1)
+void swp00_device::slot8_w(offs_t offset, u8 data)
 {
-  signed int v1; // eax@1
-  a1 >>= 6;
-  v1 = a1;
-  if ( a1 < 0 )
-    v1 = 0;
-  return (double)((unsigned short)v1 | 0x10000u) / ((double)(1 << (24 - (v1 >> 16))) * 256.0);
+	if(data == 0x80)
+		return;
+	logerror("slot8[%02x] = %02x\n", offset >> 1, data);
 }
 
-static double v2f(s32 value)
+void swp00_device::slot9_w(offs_t offset, u8 data)
 {
-	return 1.0 - (1.0 - (value & 0xffffff) / 33554432.0) / (1 << (value >> 24));
+	if(data == 0x00)
+		return;
+	logerror("slot9[%02x] = %02x\n", offset >> 1, data);
 }
-#endif
 
 template<int sel> void swp00_device::lpf_info_w(offs_t offset, u8 data)
 {
@@ -744,46 +758,46 @@ template<int sel> void swp00_device::keyon_w(u8 data)
 			keyon(8*sel+i);
 }
 
-void swp00_device::intreg_w(offs_t offset, u8 data)
+void swp00_device::off_w(offs_t offset, u8 data)
 {
 	m_stream->update();
 
 	if(offset & 1)
-		m_intreg[offset >> 1] = (m_intreg[offset >> 1] & 0xff00) | data;
+		m_off[offset >> 1] = (m_off[offset >> 1] & 0xff00) | data;
 	else
-		m_intreg[offset >> 1] = (m_intreg[offset >> 1] & 0x00ff) | (data << 8);
-	if(0)
+		m_off[offset >> 1] = (m_off[offset >> 1] & 0x00ff) | (data << 8);
+	if(1)
 		if(offset & 1)
-			logerror("intreg[%02x] = %04x\n", offset >> 1, m_intreg[offset >> 1]);
+			logerror("off[%02x] = %04x\n", 3*(offset >> 1), m_off[offset >> 1]);
 }
 
-u8 swp00_device::intreg_r(offs_t offset)
+u8 swp00_device::off_r(offs_t offset)
 {
 	if(offset & 1)
-		return m_intreg[offset >> 1];
+		return m_off[offset >> 1];
 	else
-		return m_intreg[offset >> 1] >> 8;
+		return m_off[offset >> 1] >> 8;
 }
 
-void swp00_device::fpreg_w(offs_t offset, u8 data)
+void swp00_device::fp_w(offs_t offset, u8 data)
 {
 	m_stream->update();
 
 	if(offset & 1)
-		m_fpreg[offset >> 1] = (m_fpreg[offset >> 1] & 0xff00) | data;
+		m_fp[offset >> 1] = (m_fp[offset >> 1] & 0xff00) | data;
 	else
-		m_fpreg[offset >> 1] = (m_fpreg[offset >> 1] & 0x00ff) | (data << 8);
-	if(0)
+		m_fp[offset >> 1] = (m_fp[offset >> 1] & 0x00ff) | (data << 8);
+	if(1)
 		if(offset & 1)
-			logerror("fpreg[%03x] = %04x\n", offset >> 1, m_fpreg[offset >> 1]);
+			logerror("fp[%02x] = %04x\n", offset >> 1, m_fp[offset >> 1]);
 }
 
-u8 swp00_device::fpreg_r(offs_t offset)
+u8 swp00_device::fp_r(offs_t offset)
 {
 	if(offset & 1)
-		return m_fpreg[offset >> 1];
+		return m_fp[offset >> 1];
 	else
-		return m_fpreg[offset >> 1] >> 8;
+		return m_fp[offset >> 1] >> 8;
 }
 
 void swp00_device::waverom_access_w(u8 data)
@@ -802,6 +816,17 @@ u8 swp00_device::waverom_val_r()
 	logerror("waverom read adr=%08x -> %02x\n", m_sample_address[0x1f], val);
 	m_sample_address[0x1f] = (m_sample_address[0x1f] + 1) & 0xffffff;
 	return val;
+}
+
+void swp00_device::meg_control_w(u8 data)
+{
+	m_meg_control = data;
+	logerror("meg_control %02x (variation %x, %s)\n", m_meg_control >> 6, m_meg_control & 2 ? "mute" : "on");
+}
+
+u8 swp00_device::meg_control_r()
+{
+	return m_meg_control;
 }
 
 // Counters state access
@@ -873,8 +898,7 @@ u8 swp00_device::snd_r(offs_t offset)
 		else
 #endif
 			preg = util::string_format("%02x.%02x", chan, slot);
-		if(offset != 1)
-			logerror("snd_r [%03x] %-5s, %02x\n", offset, preg, rr[offset]);
+		logerror("snd_r [%03x] %-5s, %02x\n", offset, preg, rr[offset]);
 	}
 	return rr[offset];
 }
@@ -904,9 +928,6 @@ void swp00_device::snd_w(offs_t offset, u8 data)
 	else
 #endif
 		preg = util::string_format("%02x.%02x", chan, slot);
-
-	if(offset == 1)
-		return;
 
 	logerror("snd_w [%03x] %-5s, %02x\n", offset, preg, data);
 }
@@ -990,7 +1011,7 @@ void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 			}
 
 			s32 mul = m_sample_pos[chan] & 0x7fff;
-			s16 sample = (val1 * mul + val0 * (0x8000 - mul)) >> 15;
+			s32 sample = (val1 * mul + val0 * (0x8000 - mul)) >> 7;
 
 			s32 lpf_value = m_lpf_value[chan] + ((lfo_fa_phase * (m_lfo_famod_depth[chan] >> 5)) << (m_lfo_step[chan] & 0x40 ? 2 : 1));
 
@@ -1051,6 +1072,14 @@ void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 			else
 				m_decay[chan] = istep(m_envelope_level[chan], 0, m_global_step[m_attack_speed[chan]] << 1);
 		}
+
+		dry_l >>= 8;
+		dry_r >>= 8;
+		rev   >>= 8;
+		cho_l >>= 8;
+		cho_r >>= 8;
+		var_l >>= 8;
+		var_r >>= 8;
 
 		outputs[0].put_int(i, dry_l, 32768);
 		outputs[1].put_int(i, dry_r, 32768);

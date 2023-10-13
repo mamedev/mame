@@ -182,7 +182,7 @@ void pcat_dyn_state::pcat_dyn(machine_config &config)
 	vga.set_screen("screen");
 	vga.set_vram_size(0x200000);
 
-	pcat_common(config);
+	pcat_common_nokeyboard(config);
 
 	DS12885(config.replace(), m_mc146818);
 	m_mc146818->irq().set("pic8259_2", FUNC(pic8259_device::ir0_w));
@@ -256,7 +256,7 @@ ROM_START(toursol)
 	ROM_LOAD("sol.u28", 0, 0x2000, CRC(c9374d50) SHA1(49173bc69f70bb2a7e8af9d03e2538b34aa881d8))
 
 	ROM_REGION(128, "rtc", 0)
-	ROM_LOAD("rtc", 0, 128, BAD_DUMP CRC(732f64c8) SHA1(5386eac3afef9b16af8dd7766e577f7ac700d9cc))
+	ROM_LOAD("rtc", 0, 128, BAD_DUMP CRC(b0906127) SHA1(a771b1e6fc4916c319c7d44391af95bb821e3a7b))
 ROM_END
 
 
@@ -279,7 +279,7 @@ ROM_START(toursol1)
 	ROM_LOAD("prom.7", 0, 0x2000, CRC(154c8092) SHA1(4439ee82f36d5d5c334494ba7bb4848e839213a7))
 
 	ROM_REGION(128, "rtc", 0)
-	ROM_LOAD("rtc", 0, 128, BAD_DUMP CRC(732f64c8) SHA1(5386eac3afef9b16af8dd7766e577f7ac700d9cc))
+	ROM_LOAD("rtc", 0, 128, BAD_DUMP CRC(b0906127) SHA1(a771b1e6fc4916c319c7d44391af95bb821e3a7b))
 ROM_END
 
 } // anonymous namespace

@@ -5,7 +5,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 
 ************************************************************
 
-  Interflip Costa Brava.
+  Interflip Costa Brava (77%).
 
   Internal layout artwork by Roberto Fresca & Grull Osgo.
 
@@ -448,7 +448,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 		<text string="I F">         <bounds x="10" y="45" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 		<text string="1-BAR">       <bounds x="10" y="65" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 		<text string="BELL">        <bounds x="10" y="85" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="PLUM">        <bounds x="10" y="105" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="1-BAR">       <bounds x="10" y="105" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 		<text string="BELL">        <bounds x="10" y="125" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 		<text string="SEVEN">       <bounds x="10" y="145" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 		<text string="CHERRY">      <bounds x="10" y="165" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>

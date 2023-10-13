@@ -26,7 +26,6 @@
 /* Devices */
 #include "bus/scsi/scsicd.h"
 #include "bus/scsi/scsihd.h"
-#include "formats/pc_dsk.h"
 #include "machine/8042kbdc.h"
 
 uint8_t bebox_state::at_dma8237_1_r(offs_t offset) { return m_dma8237[1]->read(offset / 2); }
@@ -44,7 +43,8 @@ void bebox_state::main_mem(address_map &map)
 	map(0x80000020, 0x8000003F).rw(m_pic8259[0], FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x80000040, 0x8000005f).rw(m_pit8254, FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x80000060, 0x8000006F).rw("kbdc", FUNC(kbdc8042_device::data_r), FUNC(kbdc8042_device::data_w));
-	map(0x80000070, 0x8000007F).rw("rtc", FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+	map(0x80000070, 0x8000007F).w("rtc", FUNC(mc146818_device::address_w)).umask64(0xff00ff00ff00ff00);
+	map(0x80000070, 0x8000007F).rw("rtc", FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask64(0x00ff00ff00ff00ff);
 	map(0x80000080, 0x8000009F).rw(FUNC(bebox_state::bebox_page_r), FUNC(bebox_state::bebox_page_w));
 	map(0x800000A0, 0x800000BF).rw(m_pic8259[1], FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x800000C0, 0x800000DF).rw(FUNC(bebox_state::at_dma8237_1_r), FUNC(bebox_state::at_dma8237_1_w));
@@ -241,6 +241,10 @@ void bebox_state::bebox_peripherals(machine_config &config)
 	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	kbdc.system_reset_callback().set_inputline(m_ppc[0], INPUT_LINE_RESET);
 	kbdc.input_buffer_full_callback().set(FUNC(bebox_state::bebox_keyboard_interrupt));
+	kbdc.set_keyboard_tag("at_keyboard");
+
+	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));
+	at_keyb.keypress().set("kbdc", FUNC(kbdc8042_device::keyboard_w));
 
 	/* internal ram */
 	RAM(config, m_ram);

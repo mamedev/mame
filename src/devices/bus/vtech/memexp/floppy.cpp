@@ -82,8 +82,8 @@ void vtech_floppy_controller_device::device_add_mconfig(machine_config &config)
 	m_memexp->set_memspace(m_mem, AS_PROGRAM);
 	m_memexp->set_iospace(m_io, AS_PROGRAM);
 
-	FLOPPY_CONNECTOR(config, m_floppy0, laser_floppies, "525", floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, laser_floppies, "525", floppy_formats);
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, laser_floppies, "525", floppy_formats);
 }
 
 
@@ -98,9 +98,8 @@ void vtech_floppy_controller_device::device_add_mconfig(machine_config &config)
 vtech_floppy_controller_device::vtech_floppy_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	vtech_memexp_device(mconfig, VTECH_FLOPPY_CONTROLLER, tag, owner, clock),
 	m_memexp(*this, "mem"),
-	m_floppy0(*this, "0"),
-	m_floppy1(*this, "1"),
-	m_floppy(nullptr), m_latch(0), m_shifter(0), m_latching_inverter(false), m_current_cyl(0), m_write_position(0)
+	m_floppy(*this, "%u", 0U),
+	m_selected_floppy(nullptr), m_latch(0), m_shifter(0), m_latching_inverter(false), m_current_cyl(0), m_write_position(0)
 {
 }
 
@@ -121,7 +120,7 @@ void vtech_floppy_controller_device::device_start()
 	save_item(NAME(m_write_start_time));
 	save_item(NAME(m_write_position));
 
-	// TODO: save m_write_buffer and rebuild m_floppy after load
+	// TODO: save m_write_buffer and rebuild m_selected_floppy after load
 
 	// Obvious bugs... must have worked by sheer luck and very subtle
 	// timings.  Our current z80 is not subtle enough.
@@ -137,7 +136,7 @@ void vtech_floppy_controller_device::device_start()
 void vtech_floppy_controller_device::device_reset()
 {
 	m_latch = 0x00;
-	m_floppy = nullptr;
+	m_selected_floppy = nullptr;
 	m_current_cyl = 0;
 	m_shifter = 0x00;
 	m_latching_inverter = false;
@@ -165,26 +164,26 @@ void vtech_floppy_controller_device::latch_w(uint8_t data)
 
 	floppy_image_device *newflop = nullptr;
 	if(m_latch & 0x10)
-		newflop = m_floppy0->get_device();
+		newflop = m_floppy[0]->get_device();
 	else if(m_latch & 0x80)
-		newflop = m_floppy1->get_device();
+		newflop = m_floppy[1]->get_device();
 
-	if(newflop != m_floppy) {
+	if(newflop != m_selected_floppy) {
 		update_latching_inverter();
 		flush_writes();
-		if(m_floppy) {
-			m_floppy->mon_w(1);
-			m_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
+		if(m_selected_floppy) {
+			m_selected_floppy->mon_w(1);
+			m_selected_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
 		}
 		if(newflop) {
 			newflop->mon_w(0);
 			newflop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&vtech_floppy_controller_device::index_callback, this));
 			m_current_cyl = newflop->get_cyl() << 1;
 		}
-		m_floppy = newflop;
+		m_selected_floppy = newflop;
 	}
 
-	if(m_floppy) {
+	if(m_selected_floppy) {
 		int cph = m_current_cyl & 3;
 		int pcyl = m_current_cyl;
 		if(!(m_latch & (1 << cph))) {
@@ -193,10 +192,10 @@ void vtech_floppy_controller_device::latch_w(uint8_t data)
 			if(m_current_cyl && (m_latch & (1 << ((cph+3) & 3))))
 				m_current_cyl--;
 			if(m_current_cyl != pcyl && !(m_current_cyl & 1)) {
-				m_floppy->dir_w(m_current_cyl < pcyl);
-				m_floppy->stp_w(true);
-				m_floppy->stp_w(false);
-				m_floppy->stp_w(true);
+				m_selected_floppy->dir_w(m_current_cyl < pcyl);
+				m_selected_floppy->stp_w(true);
+				m_selected_floppy->stp_w(false);
+				m_selected_floppy->stp_w(true);
 			}
 		}
 	}
@@ -205,8 +204,8 @@ void vtech_floppy_controller_device::latch_w(uint8_t data)
 		if(!(m_latch & 0x40)) {
 			m_write_start_time = machine().time();
 			m_write_position = 0;
-			if(m_floppy)
-				m_floppy->set_write_splice(m_write_start_time);
+			if(m_selected_floppy)
+				m_selected_floppy->set_write_splice(m_write_start_time);
 
 		} else {
 			update_latching_inverter();
@@ -256,20 +255,20 @@ uint8_t vtech_floppy_controller_device::rd_r()
 // Linked to wp signal on bit 7, rest is floating
 uint8_t vtech_floppy_controller_device::wpt_r()
 {
-	return m_floppy && m_floppy->wpt_r() ? 0x80 : 0x00;
+	return m_selected_floppy && m_selected_floppy->wpt_r() ? 0x80 : 0x00;
 }
 
 void vtech_floppy_controller_device::update_latching_inverter()
 {
 	attotime now = machine().time();
-	if(!m_floppy) {
+	if(!m_selected_floppy) {
 		m_last_latching_inverter_update_time = now;
 		return;
 	}
 
 	attotime when = m_last_latching_inverter_update_time;
 	for(;;) {
-		when = m_floppy->get_next_transition(when);
+		when = m_selected_floppy->get_next_transition(when);
 		if(when == attotime::never || when > now)
 			break;
 		m_latching_inverter = !m_latching_inverter;
@@ -285,7 +284,7 @@ void vtech_floppy_controller_device::index_callback(floppy_image_device *floppy,
 
 void vtech_floppy_controller_device::flush_writes(bool keep_margin)
 {
-	if(!m_floppy || m_write_start_time == attotime::never)
+	if(!m_selected_floppy || m_write_start_time == attotime::never)
 		return;
 
 	// Beware of time travel.  Index pulse callback (which flushes)
@@ -313,7 +312,7 @@ void vtech_floppy_controller_device::flush_writes(bool keep_margin)
 			memmove(m_write_buffer, m_write_buffer+1, sizeof(m_write_buffer[0])*(m_write_position-1));
 		m_write_position--;
 	}
-	m_floppy->write_flux(m_write_start_time, limit, m_write_position, m_write_buffer);
+	m_selected_floppy->write_flux(m_write_start_time, limit, m_write_position, m_write_buffer);
 	m_write_start_time = limit;
 
 	if(kept_count != 0)

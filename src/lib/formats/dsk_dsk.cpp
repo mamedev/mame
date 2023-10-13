@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    formats/dsk_dsk.c
+    formats/dsk_dsk.cpp
 
     DSK disk images
 
@@ -288,22 +288,22 @@ dsk_format::dsk_format() : floppy_image_format_t()
 {
 }
 
-const char *dsk_format::name() const
+const char *dsk_format::name() const noexcept
 {
 	return "dsk";
 }
 
-const char *dsk_format::description() const
+const char *dsk_format::description() const noexcept
 {
 	return "CPC DSK Format";
 }
 
-const char *dsk_format::extensions() const
+const char *dsk_format::extensions() const noexcept
 {
 	return "dsk";
 }
 
-bool dsk_format::supports_save() const
+bool dsk_format::supports_save() const noexcept
 {
 	return false;
 }
@@ -354,7 +354,7 @@ struct sector_header
 
 #pragma pack()
 
-bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	size_t actual;
 
@@ -378,7 +378,7 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	int tracks  = header[0x30];
 
 	int img_tracks, img_heads;
-	image->get_maximal_geometry(img_tracks, img_heads);
+	image.get_maximal_geometry(img_tracks, img_heads);
 	if (tracks > img_tracks)
 	{
 		if (tracks - img_tracks > DUMP_THRESHOLD)

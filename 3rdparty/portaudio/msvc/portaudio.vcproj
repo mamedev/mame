@@ -1820,6 +1820,10 @@
 						</FileConfiguration>
 					</File>
 					<File
+						RelativePath="..\src\os\win\pa_win_version.c"
+						>
+					</File>
+					<File
 						RelativePath="..\src\os\win\pa_win_waveformat.c"
 						>
 					</File>

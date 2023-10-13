@@ -19272,6 +19272,7 @@ modenab                         // 1992 Mephisto Modena
 
 @source:hegenerglaser/modular.cpp
 alm16                           // 1988 Mephisto Almeria 16 Bit
+alm16a                          // 1988 Mephisto Almeria 16 Bit
 alm32                           // 1988 Mephisto Almeria 32 Bit
 port16                          // 1989 Mephisto Portorose 16 Bit
 port32                          // 1989 Mephisto Portorose 32 Bit
@@ -19921,7 +19922,6 @@ igs_ncs                         // (c) 198? IGS
 igs_ncs2                        // (c) 2000 IGS
 igstet341                       // (c) 199? IGS
 igstet342                       // (c) 199? IGS
-kungfu                          // (c) 199? IGS
 kungfua                         // (c) 1992 IGS
 number10                        // (c) IGS (Board labeled Playmark Srl)
 numbr10l                        // (c) IGS (Board labeled Playmark Srl)
@@ -19934,6 +19934,7 @@ iqblock                         // (c) 1993
 
 @source:igs/jackie.cpp
 jackie                          // (c) 1993 IGS
+kungfu                          // (c) 1992 IGS
 
 @source:igs/lordgun.cpp
 aliencha                        // (c) 1994
@@ -23162,7 +23163,8 @@ mgcrystlj                       // (c) 1991 Kaneko + distributed by Atlus (Japan
 mgcrystlo                       // (c) 1991 Kaneko (World)
 oedfight                        // (c) 1994 Kaneko (Bloodshed version)
 oedfighta                       // (c) 1994 Kaneko (Bloodless version)
-packbang                        // (c) 1994 Kaneko (prototype)
+packbang                        // (c) 1994 Kaneko
+packbangp                       // (c) 1994 Kaneko (prototype)
 shogwarr                        // (c) 1992 Kaneko
 shogwarrk                       // (c) 1992 Kaneko
 shogwarru                       // (c) 1992 Kaneko
@@ -30236,8 +30238,18 @@ imolagpo                        // (c) 198? RB Bologna
 
 @source:misc/interflip8035.cpp
 cbrava                          // (c) 1982 InterFlip
+cbravaa                         // (c) 1982 InterFlip
+cbravab                         // (c) 1982 InterFlip
+cbravac                         // (c) 1982 InterFlip
+cbravad                         // (c) 1982 InterFlip
 sevilla                         // (c) 1982 InterFlip
+sevillaa                        // (c) 1982 InterFlip
+sevillab                        // (c) 1982 InterFlip
+sevillac                        // (c) 1982 InterFlip
+sevillad                        // (c) 1982 InterFlip
 toledo                          // (c) 1982 InterFlip
+toledoa                         // (c) 1982 InterFlip
+toledob                         // (c) 1982 InterFlip
 jackuse                         // (c) 1982 InterFlip
 
 @source:misc/intrscti.cpp
@@ -35616,6 +35628,7 @@ t1000hx                         // 1987 Tandy 1000 HX (similiar to PCJr)
 t1000rl                         // 1989 Tandy 1000 RL
 t1000sl2                        // 198? Tandy 1000 SL/2
 t1000sx                         // 1987 Tandy 1000 SX (similiar to PCJr)
+t1000tl                         // 1988 Tandy 1000 TL
 t1000tl2                        // 1989 Tandy 1000 TL/2
 t1000tx                         // 1987 Tandy 1000 TX
 
@@ -40679,6 +40692,7 @@ thunderla                       // (c) 1990 Seta + Romstar or Visco license (DSW
 thunderlbl                      // (c) 1991 Hyogo bootleg with Tetris sound
 thunderlbl2                     // (c) 1990 bootleg with Tetris sound
 triplfun                        // bootleg
+triplfunk                       // bootleg
 umanclub                        // (c) 1992 Tsuburaya Prod. / Banpresto
 utoukond                        // (c) 1993 Banpresto + Tsuburaya Prod.
 wiggie                          // (c) 1994 Promat (not genuine seta hardware, but based on thunderl code)
@@ -42247,6 +42261,8 @@ crsbingo                        // (c) 1991 Subsino
 dinofmly                        // (c) 1994 Subsino
 dinofmlya                       // (c) 1995 Subsino (Tangasoft license or hack?)
 mtrainnv                        // (c) 1996 Subsino
+newhunter                       // (c) 1992 Karam
+newhunterb                      // bootleg
 sharkpy                         // (c) 1996 Subsino
 sharkpya                        // (c) 1996 Subsino
 sharkpye                        // (c) 1996 Subsino (Alpha license)

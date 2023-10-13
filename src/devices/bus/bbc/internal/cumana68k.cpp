@@ -16,12 +16,13 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "cumana68k.h"
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/devices.h"
 #include "softlist_dev.h"
+
+#include "formats/os9_dsk.h"
 
 
 //**************************************************************************
@@ -268,7 +269,7 @@ void bbc_cumana68k_device::mc146818_set(int as, int ds, int rw)
 		/* if address select is set then set the address in the 146818 */
 		if (m_mc146818_as & !as)
 		{
-			m_rtc->write(0, m_mc146818_data);
+			m_rtc->address_w(m_mc146818_data);
 			//logerror("addr_w: %02x\n", m_mc146818_data);
 		}
 
@@ -277,12 +278,12 @@ void bbc_cumana68k_device::mc146818_set(int as, int ds, int rw)
 		{
 			if (m_mc146818_rw)
 			{
-				m_mc146818_data = m_rtc->read(1);
+				m_mc146818_data = m_rtc->data_r();
 				//logerror("data_r: %02x\n", m_mc146818_data);
 			}
 			else
 			{
-				m_rtc->write(1, m_mc146818_data);
+				m_rtc->data_w(m_mc146818_data);
 				//logerror("data_w: %02x\n", m_mc146818_data);
 			}
 		}

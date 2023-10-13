@@ -154,6 +154,12 @@ void PaUtil_InitializeClock( void );
 
 /** Return the system time in seconds. Used to implement CPU load functions
 
+ @note Do not make assumptions about which underlying clock is used to implement
+  PaUtil_GetTime, or use the current implementation as a guide. Do not use this
+  function when a specific clock is required (e.g. when using platform APIs
+  such as pthreads). If you need to use a specific clock, use a native API that
+  returns that clock.
+
  @see PaUtil_InitializeClock
 */
 double PaUtil_GetTime( void );

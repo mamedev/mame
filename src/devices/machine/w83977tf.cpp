@@ -12,9 +12,11 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "machine/w83977tf.h"
+
 #include "bus/isa/isa.h"
 //#include "machine/ds128x.h"
-#include "machine/w83977tf.h"
+#include "machine/pckeybrd.h"
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -84,6 +86,10 @@ void w83977tf_device::device_add_mconfig(machine_config &config)
 	m_kbdc->gate_a20_callback().set(FUNC(w83977tf_device::kbdp21_gp25_gatea20_w));
 	m_kbdc->input_buffer_full_callback().set(FUNC(w83977tf_device::irq_keyboard_w));
 	m_kbdc->input_buffer_full_mouse_callback().set(FUNC(w83977tf_device::irq_mouse_w));
+	m_kbdc->set_keyboard_tag("at_keyboard");
+
+	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));
+	at_keyb.keypress().set(m_kbdc, FUNC(kbdc8042_device::keyboard_w));
 }
 
 
@@ -103,7 +109,7 @@ void w83977tf_device::remap(int space_id, offs_t start, offs_t end)
 		if (m_activate[8] & 1)
 		{
 			// TODO: from port
-			m_isa->install_device(0x70, 0x7f, read8sm_delegate(*m_rtc, FUNC(ds12885_device::read)), write8sm_delegate(*m_rtc, FUNC(ds12885_device::write)));
+			m_isa->install_device(0x70, 0x7f, read8sm_delegate(*this, FUNC(w83977tf_device::rtc_r)), write8sm_delegate(*this, FUNC(w83977tf_device::rtc_w)));
 		}
 	}
 }
@@ -385,6 +391,22 @@ void w83977tf_device::keyb_io_address_w(offs_t offset, u8 data)
 /*
  * Device #8 (RTC)
  */
+
+u8 w83977tf_device::rtc_r(offs_t offset)
+{
+	if (BIT(offset, 0))
+		return m_rtc->data_r();
+	else
+		return m_rtc->get_address();
+}
+
+void w83977tf_device::rtc_w(offs_t offset, u8 data)
+{
+	if (BIT(offset, 0))
+		m_rtc->data_w(data);
+	else
+		m_rtc->address_w(data);
+}
 
 void w83977tf_device::irq_rtc_w(int state)
 {

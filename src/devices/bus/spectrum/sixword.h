@@ -14,7 +14,6 @@
 #include "machine/wd_fdc.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
-#include "formats/swd_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -30,6 +30,8 @@
 #include "emu.h"
 #include "speccydos.h"
 
+#include "formats/sdd_dsk.h"
+
 
 /***************************************************************************
     DEVICE DEFINITIONS

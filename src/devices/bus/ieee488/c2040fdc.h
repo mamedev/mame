@@ -11,10 +11,6 @@
 
 #pragma once
 
-#include "formats/c3040_dsk.h"
-#include "formats/c4040_dsk.h"
-#include "formats/d64_dsk.h"
-#include "formats/g64_dsk.h"
 #include "imagedev/floppy.h"
 
 

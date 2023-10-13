@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    formats/pc98fdi_dsk.h
+    formats/pc98fdi_dsk.cpp
 
     PC98FDI disk images
 
@@ -19,17 +19,17 @@ pc98fdi_format::pc98fdi_format()
 {
 }
 
-const char *pc98fdi_format::name() const
+const char *pc98fdi_format::name() const noexcept
 {
 	return "pc98_fdi";
 }
 
-const char *pc98fdi_format::description() const
+const char *pc98fdi_format::description() const noexcept
 {
 	return "PC98 FDI disk image";
 }
 
-const char *pc98fdi_format::extensions() const
+const char *pc98fdi_format::extensions() const noexcept
 {
 	return "fdi";
 }
@@ -56,7 +56,7 @@ int pc98fdi_format::identify(util::random_read &io, uint32_t form_factor, const 
 	return 0;
 }
 
-bool pc98fdi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool pc98fdi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	size_t actual;
 
@@ -99,7 +99,7 @@ bool pc98fdi_format::load(util::random_read &io, uint32_t form_factor, const std
 	return true;
 }
 
-bool pc98fdi_format::supports_save() const
+bool pc98fdi_format::supports_save() const noexcept
 {
 	return false;
 }

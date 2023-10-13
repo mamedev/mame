@@ -76,22 +76,22 @@ mfi_format::mfi_format() : floppy_image_format_t()
 {
 }
 
-const char *mfi_format::name() const
+const char *mfi_format::name() const noexcept
 {
 	return "mfi";
 }
 
-const char *mfi_format::description() const
+const char *mfi_format::description() const noexcept
 {
 	return "MAME floppy image";
 }
 
-const char *mfi_format::extensions() const
+const char *mfi_format::extensions() const noexcept
 {
 	return "mfi";
 }
 
-bool mfi_format::supports_save() const
+bool mfi_format::supports_save() const noexcept
 {
 	return true;
 }
@@ -111,7 +111,7 @@ int mfi_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool mfi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool mfi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	size_t actual;
 	header h;
@@ -122,7 +122,7 @@ bool mfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 	io.read_at(sizeof(header), &entries, (h.cyl_count << resolution)*h.head_count*sizeof(entry), actual);
 
-	image->set_form_variant(h.form_factor, h.variant);
+	image.set_form_variant(h.form_factor, h.variant);
 
 	if(!h.cyl_count)
 		return true;
@@ -171,11 +171,11 @@ bool mfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	entry *ent = entries;
 	for(unsigned int cyl=0; cyl <= (h.cyl_count - 1) << 2; cyl += 4 >> resolution)
 		for(unsigned int head=0; head != h.head_count; head++) {
-			image->set_write_splice_position(cyl >> 2, head, ent->write_splice, cyl & 3);
+			image.set_write_splice_position(cyl >> 2, head, ent->write_splice, cyl & 3);
 
 			if(ent->uncompressed_size == 0) {
 				// Unformatted track
-				image->get_buffer(cyl >> 2, head, cyl & 3).clear();
+				image.get_buffer(cyl >> 2, head, cyl & 3).clear();
 				ent++;
 				continue;
 			}
@@ -192,7 +192,7 @@ bool mfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				return false;
 			}
 
-			std::vector<uint32_t> &trackbuf = image->get_buffer(cyl >> 2, head, cyl & 3);
+			std::vector<uint32_t> &trackbuf = image.get_buffer(cyl >> 2, head, cyl & 3);
 			trackbuf.clear();
 
 			converter(uncompressed, trackbuf);
@@ -202,16 +202,16 @@ bool mfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool mfi_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool mfi_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	size_t actual;
 	int tracks, heads;
-	image->get_actual_geometry(tracks, heads);
-	int resolution = image->get_resolution();
+	image.get_actual_geometry(tracks, heads);
+	int resolution = image.get_resolution();
 	int max_track_size = 0;
 	for(int track=0; track <= (tracks-1) << 2; track += 4 >> resolution)
 		for(int head=0; head<heads; head++) {
-			int tsize = image->get_buffer(track >> 2, head, track & 3).size();
+			int tsize = image.get_buffer(track >> 2, head, track & 3).size();
 			if(tsize > max_track_size)
 					max_track_size = tsize;
 		}
@@ -221,8 +221,8 @@ bool mfi_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	memcpy(h.sign, sign, 16);
 	h.cyl_count = tracks | (resolution << RESOLUTION_SHIFT);
 	h.head_count = heads;
-	h.form_factor = image->get_form_factor();
-	h.variant = image->get_variant();
+	h.form_factor = image.get_form_factor();
+	h.variant = image.get_variant();
 
 	io.write_at(0, &h, sizeof(header), actual);
 
@@ -235,7 +235,7 @@ bool mfi_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 
 	for(int track=0; track <= (tracks-1) << 2; track += 4 >> resolution)
 		for(int head=0; head<heads; head++) {
-			std::vector<uint32_t> &buffer = image->get_buffer(track >> 2, head, track & 3);
+			const std::vector<uint32_t> &buffer = image.get_buffer(track >> 2, head, track & 3);
 			int tsize = buffer.size();
 			if(!tsize) {
 				epos++;
@@ -255,7 +255,7 @@ bool mfi_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 			entries[epos].offset = pos;
 			entries[epos].uncompressed_size = tsize*4;
 			entries[epos].compressed_size = csize;
-			entries[epos].write_splice = image->get_write_splice_position(track >> 2, head, track & 3);
+			entries[epos].write_splice = image.get_write_splice_position(track >> 2, head, track & 3);
 			epos++;
 
 			io.write_at(pos, postcomp.get(), csize, actual);

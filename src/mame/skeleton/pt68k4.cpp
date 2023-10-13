@@ -77,8 +77,6 @@ TODO: 68230 device
 #include "softlist.h"
 #include "speaker.h"
 
-#include "formats/imd_dsk.h"
-
 
 namespace {
 
@@ -131,8 +129,6 @@ private:
 	void keyboard_clock_w(int state);
 	void keyboard_data_w(int state);
 
-	static void floppy_formats(format_registration &fr);
-
 	void pt68k2_mem(address_map &map);
 	void pt68k4_mem(address_map &map);
 
@@ -157,12 +153,6 @@ private:
 	int m_lastdrive = 0;
 	bool m_irq5_duart1 = false, m_irq5_isa = false;
 };
-
-void pt68k4_state::floppy_formats(format_registration &fr)
-{
-	fr.add_mfm_containers();
-	fr.add(FLOPPY_IMD_FORMAT);
-}
 
 static void pt68k_floppies(device_slot_interface &device)
 {
@@ -430,8 +420,8 @@ void pt68k4_state::pt68k2(machine_config &config)
 	M48T02(config, TIMEKEEPER_TAG, 0);
 
 	WD1772(config, m_wdfdc, 16_MHz_XTAL / 2);
-	FLOPPY_CONNECTOR(config, m_floppy_connector[0], pt68k_floppies, "525dd", pt68k4_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy_connector[1], pt68k_floppies, "525dd", pt68k4_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy_connector[0], pt68k_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy_connector[1], pt68k_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	ISA8(config, m_isa, 0);
 	m_isa->set_custom_spaces();

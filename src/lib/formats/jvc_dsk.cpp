@@ -115,17 +115,17 @@ jvc_format::jvc_format()
 {
 }
 
-const char *jvc_format::name() const
+const char *jvc_format::name() const noexcept
 {
 	return "jvc";
 }
 
-const char *jvc_format::description() const
+const char *jvc_format::description() const noexcept
 {
 	return "JVC disk image";
 }
 
-const char *jvc_format::extensions() const
+const char *jvc_format::extensions() const noexcept
 {
 	return "jvc,dsk";
 }
@@ -181,7 +181,7 @@ int jvc_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return parse_header(io, header_size, tracks, heads, sectors, sector_size, sector_base_id) ? FIFID_STRUCT|FIFID_SIZE : 0;
 }
 
-bool jvc_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool jvc_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	int header_size, track_count, head_count, sector_count, sector_size, sector_base_id;
 	int max_tracks, max_heads;
@@ -196,7 +196,7 @@ bool jvc_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		return false;
 	}
 
-	image->get_maximal_geometry(max_tracks, max_heads);
+	image.get_maximal_geometry(max_tracks, max_heads);
 
 	if (track_count > max_tracks)
 	{
@@ -246,12 +246,12 @@ bool jvc_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool jvc_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool jvc_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	uint64_t file_offset = 0;
 
 	int track_count, head_count;
-	image->get_actual_geometry(track_count, head_count);
+	image.get_actual_geometry(track_count, head_count);
 
 	// we'll write a header if the disk is two-sided
 	if (head_count == 2)
@@ -290,7 +290,7 @@ bool jvc_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	return true;
 }
 
-bool jvc_format::supports_save() const
+bool jvc_format::supports_save() const noexcept
 {
 	return true;
 }

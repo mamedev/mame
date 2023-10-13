@@ -78,17 +78,17 @@ cp68_format::cp68_format() : wd177x_format(cp68_formats::formats)
 {
 }
 
-const char *cp68_format::name() const
+const char *cp68_format::name() const noexcept
 {
 	return "cp68";
 }
 
-const char *cp68_format::description() const
+const char *cp68_format::description() const noexcept
 {
 	return "CP/68 compatible disk image";
 }
 
-const char *cp68_format::extensions() const
+const char *cp68_format::extensions() const noexcept
 {
 	return "dsk";
 }

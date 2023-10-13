@@ -156,7 +156,8 @@ void at_mb_device::map(address_map &map)
 	map(0x0061, 0x0061).rw(FUNC(at_mb_device::portb_r), FUNC(at_mb_device::portb_w));
 	map(0x0060, 0x0060).rw("keybc", FUNC(at_keyboard_controller_device::data_r), FUNC(at_keyboard_controller_device::data_w));
 	map(0x0064, 0x0064).rw("keybc", FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w));
-	map(0x0070, 0x007f).r("rtc", FUNC(mc146818_device::read)).umask16(0xffff).w(FUNC(at_mb_device::write_rtc)).umask16(0xffff);
+	map(0x0070, 0x007f).w(m_mc146818, FUNC(at_mb_device::rtcas_nmi_w)).umask16(0x00ff);
+	map(0x0070, 0x007f).rw(m_mc146818, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask16(0xff00);
 	map(0x0080, 0x009f).rw(FUNC(at_mb_device::page8_r), FUNC(at_mb_device::page8_w)).umask16(0xffff);
 	map(0x00a0, 0x00bf).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0xffff);
 	map(0x00c0, 0x00df).rw("dma8237_2", FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0x00ff);
@@ -360,17 +361,12 @@ void at_mb_device::set_dma_channel(int channel, int state)
 	}
 }
 
-void at_mb_device::write_rtc(offs_t offset, uint8_t data)
+void at_mb_device::rtcas_nmi_w(uint8_t data)
 {
-	if (offset==0) {
-		m_nmi_enabled = BIT(data,7);
-		if (!m_nmi_enabled)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		m_mc146818->write(0,data);
-	}
-	else {
-		m_mc146818->write(offset,data);
-	}
+	m_nmi_enabled = BIT(data,7);
+	if (!m_nmi_enabled)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_mc146818->address_w(data);
 }
 
 uint32_t at_mb_device::a20_286(bool state)

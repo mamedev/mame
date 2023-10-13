@@ -351,7 +351,7 @@ uint16_t iris3000_state::dips_r(offs_t offset, uint16_t mem_mask)
 
 uint8_t iris3000_state::clock_ctrl_r()
 {
-	const uint8_t data = m_rtc->read(1);
+	const uint8_t data = m_rtc->data_r(); // FIXME: really?
 	LOGMASKED(LOG_RTC, "%s: clock_ctrl_r: %02x\n", machine().describe_context(), data);
 	return data;
 }
@@ -359,12 +359,12 @@ uint8_t iris3000_state::clock_ctrl_r()
 void iris3000_state::clock_ctrl_w(uint8_t data)
 {
 	LOGMASKED(LOG_RTC, "%s: clock_ctrl_w: %02x\n", machine().describe_context(), data);
-	m_rtc->write(1, data);
+	m_rtc->data_w(data); // FIXME: really?
 }
 
 uint8_t iris3000_state::clock_data_r()
 {
-	uint8_t data = m_rtc->read(0);
+	uint8_t data = m_rtc->get_address(); // FIXME: really?
 	LOGMASKED(LOG_RTC, "%s: clock_data_r: %02x\n", machine().describe_context(), data);
 	return data;
 }
@@ -372,7 +372,7 @@ uint8_t iris3000_state::clock_data_r()
 void iris3000_state::clock_data_w(uint8_t data)
 {
 	LOGMASKED(LOG_RTC, "%s: clock_data_w: %02x\n", machine().describe_context(), data);
-	m_rtc->write(0, data);
+	m_rtc->address_w(data); // FIXME: really?
 }
 
 uint8_t iris3000_state::kernel_base_r(offs_t offset)

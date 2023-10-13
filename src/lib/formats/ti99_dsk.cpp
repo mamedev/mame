@@ -81,7 +81,7 @@ int ti99_floppy_format::get_encoding(int cell_size)
 /*
     Load the image from disk and convert it into a sequence of flux levels.
 */
-bool ti99_floppy_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool ti99_floppy_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint64_t file_size;
 	if (io.length(file_size))
@@ -101,7 +101,7 @@ bool ti99_floppy_format::load(util::random_read &io, uint32_t form_factor, const
 	// (the track count as defined by the file system)
 	determine_sizes(io, cell_size, sector_count, heads, log_track_count);
 
-	image->get_maximal_geometry(track_count, head_count);
+	image.get_maximal_geometry(track_count, head_count);
 	drive_high_tpi = (track_count > 44);
 
 	// Depends on the image format (SDF or TDF)
@@ -215,7 +215,7 @@ bool ti99_floppy_format::load(util::random_read &io, uint32_t form_factor, const
 /*
     Save all tracks to the image file.
 */
-bool ti99_floppy_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool ti99_floppy_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	uint8_t sectordata[9216];   // max size (36*256)
 
@@ -224,7 +224,7 @@ bool ti99_floppy_format::save(util::random_read_write &io, const std::vector<uin
 	// Do we use double-stepping?
 	// If our image was loaded into a 80-track drive, we will always write 80 tracks.
 	int track_count, head_count;
-	image->get_maximal_geometry(track_count, head_count);
+	image.get_maximal_geometry(track_count, head_count);
 
 	if (track_count > 80) track_count = 80;
 	else
@@ -329,7 +329,7 @@ enum
 /*
     Build a new track from sector contents.
 */
-void ti99_floppy_format::generate_fm_track_from_sectors(floppy_image *image, uint8_t *sectordata, int sector_count, int *sectornmb, int *secoffset, int track, int trackid, int head)
+void ti99_floppy_format::generate_fm_track_from_sectors(floppy_image &image, uint8_t *sectordata, int sector_count, int *sectornmb, int *secoffset, int track, int trackid, int head)
 {
 	std::vector<uint32_t> buffer;
 
@@ -423,7 +423,7 @@ void ti99_floppy_format::generate_fm_track_from_sectors(floppy_image *image, uin
 	generate_track_from_levels(track, head, buffer, 0, image);
 }
 
-void ti99_floppy_format::generate_mfm_track_from_sectors(floppy_image *image, uint8_t *sectordata, int sector_count, int *sectornmb, int *secoffset, int track, int trackid, int head)
+void ti99_floppy_format::generate_mfm_track_from_sectors(floppy_image &image, uint8_t *sectordata, int sector_count, int *sectornmb, int *secoffset, int track, int trackid, int head)
 {
 	// MFM16:  (80,50,22,50,4e,12)
 	// MFM18/36:  (10,30,22,21,4e,12)
@@ -905,17 +905,17 @@ uint8_t ti99_floppy_format::get_data_from_encoding(uint16_t raw)
     bad sector map, we just check whether there are 3 more sectors and ignore
     them.
 */
-const char *ti99_sdf_format::name() const
+const char *ti99_sdf_format::name() const noexcept
 {
 	return "ti99";
 }
 
-const char *ti99_sdf_format::description() const
+const char *ti99_sdf_format::description() const noexcept
 {
 	return "TI99 sector dump floppy disk image";
 }
 
-const char *ti99_sdf_format::extensions() const
+const char *ti99_sdf_format::extensions() const noexcept
 {
 	return "dsk";
 }
@@ -1205,17 +1205,17 @@ const ti99_sdf_format FLOPPY_TI99_SDF_FORMAT;
 
     (Head,Track): (0,0) (0,1) (0,2) ... (0,38) (0,39) (1,0) (1,1) ... (1,39)
 */
-const char *ti99_tdf_format::name() const
+const char *ti99_tdf_format::name() const noexcept
 {
 	return "tdf";
 }
 
-const char *ti99_tdf_format::description() const
+const char *ti99_tdf_format::description() const noexcept
 {
 	return "TI99 track dump floppy disk image";
 }
 
-const char *ti99_tdf_format::extensions() const
+const char *ti99_tdf_format::extensions() const noexcept
 {
 	return "dsk,dtk";
 }

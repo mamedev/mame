@@ -12,9 +12,10 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "cumana.h"
+
+#include "formats/acorn_dsk.h"
 
 
 //**************************************************************************
@@ -99,10 +100,10 @@ uint8_t electron_cumana_device::read(offs_t offset, int infc, int infd, int romq
 			data = m_fdc->read(offset & 0x03);
 			break;
 		case 0x94:
-			break;
 		case 0x98:
+			break;
 		case 0x9c:
-			data = m_rtc->read(BIT(offset, 2));
+			data = m_rtc->data_r();
 			break;
 		}
 	}
@@ -146,8 +147,10 @@ void electron_cumana_device::write(offs_t offset, uint8_t data, int infc, int in
 			control_w(data);
 			break;
 		case 0x98:
+			m_rtc->address_w(data);
+			break;
 		case 0x9c:
-			m_rtc->write(BIT(offset, 2), data);
+			m_rtc->data_w(data);
 			break;
 		}
 	}

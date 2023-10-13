@@ -2,7 +2,7 @@
 // copyright-holders:Wilbert Pol
 /*********************************************************************
 
-    formats/dmk_dsk.h
+    formats/dmk_dsk.cpp
 
     DMK disk images
 
@@ -48,19 +48,19 @@ dmk_format::dmk_format()
 }
 
 
-const char *dmk_format::name() const
+const char *dmk_format::name() const noexcept
 {
 	return "dmk";
 }
 
 
-const char *dmk_format::description() const
+const char *dmk_format::description() const noexcept
 {
 	return "DMK disk image";
 }
 
 
-const char *dmk_format::extensions() const
+const char *dmk_format::extensions() const noexcept
 {
 	return "dmk";
 }
@@ -108,7 +108,7 @@ int dmk_format::identify(util::random_read &io, uint32_t form_factor, const std:
 }
 
 
-bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	size_t actual;
 
@@ -144,7 +144,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			variant = floppy_image::SSDD;
 		}
 	}
-	image->set_variant(variant);
+	image.set_variant(variant);
 
 	int fm_stride = is_sd ? 1 : 2;
 
@@ -330,7 +330,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool dmk_format::supports_save() const
+bool dmk_format::supports_save() const noexcept
 {
 	return false;
 }

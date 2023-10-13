@@ -116,16 +116,16 @@ void mu50_state::mu50_map(address_map &map)
 	map(0x400000, 0x4007ff).m(m_swp00, FUNC(swp00_device::map));
 }
 
-// Analog input right (not sent to the swp)
+// Analog input right (not sent to the swp, mixing is analog)
 u16 mu50_state::adc_ar_r()
 {
-	return 0;
+	return 0x3ff;
 }
 
-// Analog input left (not sent to the swp)
+// Analog input left (not sent to the swp, mixing is analog)
 u16 mu50_state::adc_al_r()
 {
-	return 0;
+	return 0x3ff;
 }
 
 // Put the host switch to pure midi

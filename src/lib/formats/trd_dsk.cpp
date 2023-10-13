@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic
 /*********************************************************************
 
-    formats/trd_dsk.c
+    formats/trd_dsk.cpp
 
     TRD disk images
 
@@ -17,17 +17,17 @@ trd_format::trd_format() : wd177x_format(formats)
 {
 }
 
-const char *trd_format::name() const
+const char *trd_format::name() const noexcept
 {
 	return "trd";
 }
 
-const char *trd_format::description() const
+const char *trd_format::description() const noexcept
 {
 	return "TRD floppy disk image";
 }
 
-const char *trd_format::extensions() const
+const char *trd_format::extensions() const noexcept
 {
 	return "trd";
 }

@@ -62,8 +62,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "formats/pc_dsk.h"
-
 #define LOG_DEBUG   (1U << 1)
 #define LOG_IRQ     (1U << 2)
 
@@ -328,7 +326,8 @@ void nc200_state::io_map(address_map &map)
 	map(0xa0, 0xa0).portr("battery");
 	map(0xb0, 0xb9).r(FUNC(nc200_state::keyboard_r));
 	map(0xc0, 0xc1).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0xd0, 0xd1).rw(m_rtc, FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+	map(0xd0, 0xd0).w(m_rtc, FUNC(mc146818_device::address_w));
+	map(0xd1, 0xd1).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w));
 	map(0xe0, 0xe1).m(m_fdc, FUNC(upd765a_device::map));
 }
 

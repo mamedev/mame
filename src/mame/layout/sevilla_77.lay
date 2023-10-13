@@ -5,7 +5,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 
 ************************************************************
 
-  Interflip Toledo.
+  Interflip Sevilla (77%).
 
   Internal layout artwork by Roberto Fresca & Grull Osgo.
 
@@ -52,7 +52,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 	<element name="statinv" defstate="1">
 		<text string="off" state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
-		</text>
+		</text>	
 		<text string="on" state="0">
 			<color red="0.0" green="1.0" blue="0.0" />
 		</text>
@@ -67,7 +67,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 		</disk>
 	</element>
 
-	<element name="CL1" defstate="1">
+	<element name="L0" defstate="1">
 		<rect state="0">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
@@ -80,7 +80,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 		</text>
 	</element>
 
-	<element name="CL2" defstate="1">
+	<element name="L1" defstate="1">
 		<rect state="0">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
@@ -93,7 +93,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 		</text>
 	</element>
 
-	<element name="CL3" defstate="1">
+	<element name="L2" defstate="1">
 		<rect state="0">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
@@ -101,45 +101,6 @@ copyright-holders: Roberto Fresca, Grull Osgo
 			<color red="0.3" green="0.3" blue="0.3" />
 		</rect>
 		<text string="Coin 3">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
-		</text>
-	</element>
-
-	<element name="CL4" defstate="1">
-		<rect state="0">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</rect>
-		<rect state="1">
-			<color red="0.3" green="0.3" blue="0.3" />
-		</rect>
-		<text string="Coin 4">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
-		</text>
-	</element>
-
-	<element name="CL5" defstate="1">
-		<rect state="0">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</rect>
-		<rect state="1">
-			<color red="0.3" green="0.3" blue="0.3" />
-		</rect>
-		<text string="Coin 5">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
-		</text>
-	</element>
-
-	<element name="CL6" defstate="1">
-		<rect state="0">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</rect>
-		<rect state="1">
-			<color red="0.3" green="0.3" blue="0.3" />
-		</rect>
-		<text string="Coin 6">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
@@ -426,102 +387,80 @@ copyright-holders: Roberto Fresca, Grull Osgo
 		</text>
 	</element>
 
-<!-- Toledo Game Reels -->
 
-	<element name="Reel 1">
-		<rect> <bounds x="0" y="0" width="100" height="400"/> <color alpha="0.0"/> </rect>
-		<text string="ORANGE">      <bounds x="10" y="25" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="PLUM">        <bounds x="10" y="45" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="ORANGE">      <bounds x="10" y="65" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="I F">         <bounds x="10" y="85" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="ORANGE">      <bounds x="10" y="105" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="2-BAR">       <bounds x="10" y="125" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="ORANGE">      <bounds x="10" y="145" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="PLUM">        <bounds x="10" y="165" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="ORANGE">      <bounds x="10" y="185" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="PLUM">        <bounds x="10" y="205" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="ORANGE">      <bounds x="10" y="225" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="CHERRY">      <bounds x="10" y="245" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="ORANGE">      <bounds x="10" y="265" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="1-BAR">       <bounds x="10" y="285" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="ORANGE">      <bounds x="10" y="305" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="PLUM">        <bounds x="10" y="325" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="ORANGE">      <bounds x="10" y="345" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="PLUM">        <bounds x="10" y="365" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="ORANGE">      <bounds x="10" y="385" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="BELL">        <bounds x="10" y="5" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-	</element>
+<!-- Sevilla Game Reels -->
 
 	<element name="Reel 2">
 		<rect> <bounds x="0" y="0" width="100" height="400"/> <color alpha="0.0"/> </rect>
-		<text string="BELL">        <bounds x="10" y="25" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="ORANGE">      <bounds x="10" y="45" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="BELL">        <bounds x="10" y="65" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="CHERRY">      <bounds x="10" y="85" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="ORANGE">      <bounds x="10" y="5" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="BAR">         <bounds x="10" y="25" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="PLUM">        <bounds x="10" y="45" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="CHERRY">      <bounds x="10" y="65" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="I F">         <bounds x="10" y="85" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 		<text string="ORANGE">      <bounds x="10" y="105" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="I F">         <bounds x="10" y="125" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="CHERRY">      <bounds x="10" y="145" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="2-BAR">       <bounds x="10" y="165" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="BELL">        <bounds x="10" y="185" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="CHERRY">      <bounds x="10" y="205" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="BELL">        <bounds x="10" y="225" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="1-BAR">       <bounds x="10" y="245" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="SEVEN">       <bounds x="10" y="125" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="BELL">        <bounds x="10" y="145" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="ORANGE">      <bounds x="10" y="165" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="PLUM">        <bounds x="10" y="185" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="ORANGE">      <bounds x="10" y="205" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="PLUM">        <bounds x="10" y="225" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="SEVEN">       <bounds x="10" y="245" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 		<text string="CHERRY">      <bounds x="10" y="265" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="BELL">        <bounds x="10" y="285" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="ORANGE">      <bounds x="10" y="285" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 		<text string="PLUM">        <bounds x="10" y="305" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="BELL">        <bounds x="10" y="325" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="BELL">        <bounds x="10" y="345" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="CHERRY">      <bounds x="10" y="365" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="ORANGE">      <bounds x="10" y="325" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="2-BAR">       <bounds x="10" y="345" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="PLUM">        <bounds x="10" y="365" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 		<text string="ORANGE">      <bounds x="10" y="385" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="CHERRY">      <bounds x="10" y="5" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+
 	</element>
 
 	<element name="Reel 3">
 		<rect> <bounds x="0" y="0" width="100" height="400"/> <color alpha="0.0"/> </rect>
-		<text string="ORANGE">       <bounds x="10" y="25" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="PLUM">         <bounds x="10" y="45" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="1-BAR">        <bounds x="10" y="65" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="CHERRY">       <bounds x="10" y="85" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="PLUM">         <bounds x="10" y="105" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="I F">          <bounds x="10" y="125" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="BELL">         <bounds x="10" y="145" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="PLUM">         <bounds x="10" y="165" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="CHERRY">       <bounds x="10" y="185" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="PLUM">         <bounds x="10" y="205" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="ORANGE">       <bounds x="10" y="225" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="PLUM">         <bounds x="10" y="245" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="CHERRY">       <bounds x="10" y="265" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="2-BAR">        <bounds x="10" y="285" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="CHERRY">       <bounds x="10" y="305" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="PLUM">         <bounds x="10" y="325" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="CHERRY">       <bounds x="10" y="345" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="PLUM">         <bounds x="10" y="365" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="CHERRY">       <bounds x="10" y="385" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="PLUM">         <bounds x="10" y="5" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="1-BAR">       <bounds x="10" y="5" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="BELL">        <bounds x="10" y="25" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="ORANGE">      <bounds x="10" y="45" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="BELL">        <bounds x="10" y="65" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="I F">         <bounds x="10" y="85" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="1-BAR">       <bounds x="10" y="105" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="BELL">        <bounds x="10" y="125" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="1-BAR">       <bounds x="10" y="145" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="BELL">        <bounds x="10" y="165" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="SEVEN">       <bounds x="10" y="185" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="CHERRY">      <bounds x="10" y="205" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="2-BAR">       <bounds x="10" y="225" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="2-BAR">       <bounds x="10" y="245" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="1-BAR">       <bounds x="10" y="265" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="BELL">        <bounds x="10" y="285" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="CHERRY">      <bounds x="10" y="305" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="2-BAR">       <bounds x="10" y="325" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="PLUM">        <bounds x="10" y="345" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="1-BAR">       <bounds x="10" y="365" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="CHERRY">      <bounds x="10" y="385" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 	</element>
 
 	<element name="Reel 4">
 		<rect> <bounds x="0" y="0" width="100" height="400"/> <color alpha="0.0"/> </rect>
-		<text string="CHERRY">       <bounds x="10" y="25" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="ORANGE">       <bounds x="10" y="45" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="PLUM">         <bounds x="10" y="65" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="ORANGE">       <bounds x="10" y="85" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="ORANGE">       <bounds x="10" y="105" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="I F">          <bounds x="10" y="125" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="2-BAR">        <bounds x="10" y="145" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="ORANGE">       <bounds x="10" y="165" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="BELL">         <bounds x="10" y="185" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="ORANGE">       <bounds x="10" y="205" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="PLUM">         <bounds x="10" y="225" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="CHERRY">       <bounds x="10" y="245" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="ORANGE">       <bounds x="10" y="265" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="BELL">         <bounds x="10" y="285" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="ORANGE">       <bounds x="10" y="305" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="1-BAR">        <bounds x="10" y="325" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="ORANGE">       <bounds x="10" y="345" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="PLUM">         <bounds x="10" y="365" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="ORANGE">       <bounds x="10" y="385" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="BELL">         <bounds x="10" y="5" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="PLUM">        <bounds x="10" y="5" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="ORANGE">      <bounds x="10" y="25" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="PLUM">        <bounds x="10" y="45" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="CHERRY">      <bounds x="10" y="65" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="ORANGE">      <bounds x="10" y="85" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="PLUM">        <bounds x="10" y="105" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="I F">         <bounds x="10" y="125" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="ORANGE">      <bounds x="10" y="145" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="BELL">        <bounds x="10" y="165" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="SEVEN">       <bounds x="10" y="185" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="ORANGE">      <bounds x="10" y="205" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="ORANGE">      <bounds x="10" y="225" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="PLUM">        <bounds x="10" y="245" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="PLUM">        <bounds x="10" y="265" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="CHERRY">      <bounds x="10" y="285" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="SEVEN">       <bounds x="10" y="305" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="ORANGE">      <bounds x="10" y="325" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="2-BAR">       <bounds x="10" y="345" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="ORANGE">      <bounds x="10" y="365" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="1-BAR">       <bounds x="10" y="385" width="80" height="10"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 	</element>
 
 
@@ -531,33 +470,21 @@ copyright-holders: Roberto Fresca, Grull Osgo
 
 		<bounds left="0" top="0" right="640" bottom="480" />
 
-<!-- Coin Lamps -->
+<!-- Coin Lamps -->	
 
-		<element name="outbit0" ref="CL1">
-			<bounds x="10" y="120" width="30" height="20" />
+		<element name="outbit0" ref="L0">
+			<bounds x="10" y="120" width="60" height="20" />
 		</element>
 
-		<element name="outbit1" ref="CL2">
-			<bounds x="45" y="120" width="30" height="20" />
+		<element name="outbit1" ref="L1">
+			<bounds x="80" y="120" width="60" height="20" />
 		</element>
 
-		<element name="outbit2" ref="CL3">
-			<bounds x="80" y="120" width="30" height="20" />
+		<element name="outbit2" ref="L2">
+			<bounds x="150" y="120" width="60" height="20" />
 		</element>
 
-		<element name="outbit3" ref="CL4">
-			<bounds x="115" y="120" width="30" height="20" />
-		</element>
-
-		<element name="outbit4" ref="CL5">
-			<bounds x="150" y="120" width="30" height="20" />
-		</element>
-
-		<element name="outbit5" ref="CL6">
-			<bounds x="185" y="120" width="30" height="20" />
-		</element>
-
-<!-- Game Lamps -->	
+<!-- Game Lamps -->
 
 		<element name="outbit6" ref="L3">
 			<bounds x="220" y="120" width="60" height="20" />
@@ -605,23 +532,19 @@ copyright-holders: Roberto Fresca, Grull Osgo
 
 <!-- Reel Unlock Coils -->
 
-		<element name="outbit10" ref="C1">
+		<element name="outbit11" ref="C2">
 			<bounds x="10" y="180" width="60" height="20" />
 		</element>
 
-		<element name="outbit11" ref="C2">
+		<element name="outbit12" ref="C3">
 			<bounds x="80" y="180" width="60" height="20" />
 		</element>
 
-		<element name="outbit12" ref="C3">
+		<element name="outbit13" ref="C4">
 			<bounds x="150" y="180" width="60" height="20" />
 		</element>
 
-		<element name="outbit13" ref="C4">
-			<bounds x="220" y="180" width="60" height="20" />
-		</element>
-
-<!-- Coin lock, diverter and lever coils -->	
+<!-- Coin lock, diverter and lever coils -->
 
 		<element name="outbit14" ref="C5">
 			<bounds x="290" y="180" width="60" height="20" />
@@ -633,30 +556,12 @@ copyright-holders: Roberto Fresca, Grull Osgo
 
 		<element name="outbit16" ref="C7">
 			<bounds x="430" y="180" width="60" height="20" />
-		</element>	
-
-<!-- Optos A/B Readout -->
-
-		<repeat count="4">
-			<param name="i" start="30" increment="1" />
-			<param name="x" start="20" increment="70" />
-			<element name="outbit~i~" ref="stat">
-				<bounds x="~x~" y="215" width="14" height="15" />
-			</element>
-		</repeat>
-
-		<repeat count="4">
-			<param name="i" start="34" increment="1" />
-			<param name="x" start="41" increment="70" />
-			<element name="outbit~i~" ref="stat">
-				<bounds x="~x~" y="215" width="14" height="15" />
-			</element>
-		</repeat>
+		</element>
 
 <!-- Int Enable Led -->
 
 		<element name="outbit44" ref="IRQ">
-			<bounds x="430" y="150" width="60" height="20"/> 
+			<bounds x="430" y="150" width="60" height="20"/>
 		</element>
 
 <!-- Seven Segment Displays -->
@@ -688,20 +593,56 @@ copyright-holders: Roberto Fresca, Grull Osgo
 				<bounds x="~x~" y="35" width="40" height="50" />
 			</element>
 		</repeat>
+		
+<!-- Optos A/B Readout -->
+
+		<repeat count="3">
+			<param name="i" start="31" increment="1" />
+			<param name="x" start="60" increment="70" />
+			<element name="outbit~i~" ref="stat">
+				<bounds x="~x~" y="215" width="14" height="15" />
+			</element>
+		</repeat>
+
+		<repeat count="3">
+			<param name="i" start="35" increment="1" />
+			<param name="x" start="80" increment="70" />
+			<element name="outbit~i~" ref="stat">
+				<bounds x="~x~" y="215" width="14" height="15" />
+			</element>
+		</repeat>
+
+<!-- Pay Line -->
+
+		<element ref="rect_red">
+			<bounds x="45" y="330" width="200" height="3"/>
+		</element>
+
+		<repeat count="10">
+			<param name="x" start="35" increment="1" />
+			<param name="y" start="320" increment="1" />
+			<param name="l" start="23" increment="-2" />
+			<element ref="rect_red">
+				<bounds x="~x~" y="~y~" width="1" height="~l~"/>
+			</element>
+		</repeat>
+		<element ref="rect_red">
+			<bounds x="15" y="320" width="20" height="23"/>
+		</element>
 
 <!-- Reels control -->
 
-		<repeat count="4">
-			<param name="i" start="1" increment="1" />
-			<param name="r" start="40" increment="1" />
-			<param name="x" start="15" increment="70" />
+		<repeat count="3">
+			<param name="i" start="2" increment="1" />
+			<param name="r" start="41" increment="1" />
+			<param name="x" start="50" increment="70" />
 			<param name="ca" start="16" increment="1" />
 			<element ref="rect_white">
 				<bounds x="~x~" y="240" width="50" height="180"/>
 			</element>
 			<element ref="Reel ~i~" state="0">
 				<bounds x="~x~" y="240" width="50" height="180"/>
-				<yscroll name="outbit~r~" size="0.15" wrap="yes" min="2340" max="1140"/>
+				<yscroll name="outbit~r~" size="0.15" wrap="yes" min="1200" max="0"/>
 			</element>
 			<element name="emreel~i~" ref="debug_stepper_value">
 				<bounds x="~x~" y="425" width="50" height="20"/>
@@ -711,15 +652,11 @@ copyright-holders: Roberto Fresca, Grull Osgo
 			</element>
 		</repeat>
 
-		<element ref="rect_red">
-			<bounds x="10" y="330" width="270" height="2"/>
-		</element>
-
 <!-- Coin -->
 
 		<element name="outbit14" ref="coin" inputtag="IN0" inputmask="0x80">
 			<bounds x="600" y="440" width="30" height="30"/>
-		</element>	
+		</element>
 
 	</view>
 </mamelayout>

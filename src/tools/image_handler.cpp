@@ -247,7 +247,7 @@ std::vector<std::pair<u8, const floppy_format_info *>> image_handler::identify(c
 	return res;
 }
 
-bool image_handler::floppy_load(const floppy_format_info *format)
+bool image_handler::floppy_load(const floppy_format_info &format)
 {
 	std::vector<uint32_t> variants;
 	FILE *f = fopen(m_on_disk_path.c_str(), "rb");
@@ -259,10 +259,10 @@ bool image_handler::floppy_load(const floppy_format_info *format)
 
 	auto io = util::stdio_read(f, 0xff);
 
-	return !format->m_format->load(*io, floppy_image::FF_UNKNOWN, variants, &m_floppy_image);
+	return !format.m_format->load(*io, floppy_image::FF_UNKNOWN, variants, m_floppy_image);
 }
 
-bool image_handler::floppy_save(const floppy_format_info *format)
+bool image_handler::floppy_save(const floppy_format_info &format) const
 {
 	std::vector<uint32_t> variants;
 	FILE *f = fopen(m_on_disk_path.c_str(), "wb");
@@ -274,35 +274,35 @@ bool image_handler::floppy_save(const floppy_format_info *format)
 
 	auto io = util::stdio_read_write(f, 0xff);
 
-	return !format->m_format->save(*io, variants, &m_floppy_image);
+	return !format.m_format->save(*io, variants, m_floppy_image);
 }
 
-void image_handler::floppy_create(const floppy_create_info *format, fs::meta_data meta)
+void image_handler::floppy_create(const floppy_create_info &format, fs::meta_data meta)
 {
-	if(format->m_type) {
+	if(format.m_type) {
 		std::vector<uint32_t> variants;
-		std::vector<u8> img(format->m_image_size);
+		std::vector<u8> img(format.m_image_size);
 		fs::fsblk_vec_t blockdev(img);
-		auto fs = format->m_manager->mount(blockdev);
+		auto fs = format.m_manager->mount(blockdev);
 		fs->format(meta);
 
 		auto io = util::ram_read(img.data(), img.size(), 0xff);
-		format->m_type->load(*io, floppy_image::FF_UNKNOWN, variants, &m_floppy_image);
+		format.m_type->load(*io, floppy_image::FF_UNKNOWN, variants, m_floppy_image);
 	} else {
-		fs::unformatted_image::format(format->m_key, &m_floppy_image);
+		fs::unformatted_image::format(format.m_key, &m_floppy_image);
 	}
 }
 
-bool image_handler::floppy_mount_fs(const filesystem_format *format)
+bool image_handler::floppy_mount_fs(const filesystem_format &format)
 {
 	m_floppy_fs_converter = nullptr;
-	for(const auto &ci : format->m_floppy_create) {
+	for(const auto &ci : format.m_floppy_create) {
 		if(ci->m_type != m_floppy_fs_converter) {
 			std::vector<uint32_t> variants;
 			m_floppy_fs_converter = ci->m_type;
 			m_sector_image.clear();
 			util::random_read_write_fill_wrapper<util::vector_read_write_adapter<u8>, 0xff> io(m_sector_image);
-			m_floppy_fs_converter->save(io, variants, &m_floppy_image);
+			m_floppy_fs_converter->save(io, variants, m_floppy_image);
 		}
 
 		if(ci->m_image_size == m_sector_image.size())
@@ -314,18 +314,18 @@ bool image_handler::floppy_mount_fs(const filesystem_format *format)
 
  success:
 	m_fsblk.reset(new fs::fsblk_vec_t(m_sector_image));
-	m_fsm = format->m_manager;
+	m_fsm = format.m_manager;
 	m_fs = m_fsm->mount(*m_fsblk);
 	return false;
 }
 
-bool image_handler::hd_mount_fs(const filesystem_format *format)
+bool image_handler::hd_mount_fs(const filesystem_format &format)
 {
 	// Should use the chd mechanisms, one thing at a time...
 
 	m_sector_image = fload(m_on_disk_path);
 	m_fsblk.reset(new fs::fsblk_vec_t(m_sector_image));
-	m_fsm = format->m_manager;
+	m_fsm = format.m_manager;
 	m_fs = m_fsm->mount(*m_fsblk);
 	return false;
 }
@@ -334,7 +334,7 @@ void image_handler::fs_to_floppy()
 {
 	std::vector<uint32_t> variants;
 	auto io = util::ram_read(m_sector_image.data(), m_sector_image.size(), 0xff);
-	m_floppy_fs_converter->load(*io, floppy_image::FF_UNKNOWN, variants, &m_floppy_image);
+	m_floppy_fs_converter->load(*io, floppy_image::FF_UNKNOWN, variants, m_floppy_image);
 }
 
 std::vector<std::string> image_handler::path_split(std::string path) const

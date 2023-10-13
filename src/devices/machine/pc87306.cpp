@@ -13,6 +13,7 @@ TODO:
 #include "bus/isa/isa.h"
 //#include "machine/ds128x.h"
 #include "machine/pc87306.h"
+#include "machine/pckeybrd.h"
 
 #define LOG_WARN        (1U << 1) // Show warnings
 
@@ -84,6 +85,10 @@ void pc87306_device::device_add_mconfig(machine_config &config)
 	m_kbdc->input_buffer_full_mouse_callback().set(FUNC(pc87306_device::irq_mouse_w));
 	m_kbdc->system_reset_callback().set(FUNC(pc87306_device::kbdp20_gp20_reset_w));
 	m_kbdc->gate_a20_callback().set(FUNC(pc87306_device::kbdp21_gp25_gatea20_w));
+	m_kbdc->set_keyboard_tag("at_keyboard");
+
+	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));
+	at_keyb.keypress().set(m_kbdc, FUNC(kbdc8042_device::keyboard_w));
 }
 
 void pc87306_device::remap(int space_id, offs_t start, offs_t end)
@@ -101,7 +106,7 @@ void pc87306_device::remap(int space_id, offs_t start, offs_t end)
 		}
 
 		if (BIT(m_krr, 3))
-			m_isa->install_device(0x70, 0x71, read8sm_delegate(*m_rtc, FUNC(ds12885_device::read)), write8sm_delegate(*m_rtc, FUNC(ds12885_device::write)));
+			m_isa->install_device(0x70, 0x71, read8sm_delegate(*this, FUNC(pc87306_device::rtc_r)), write8sm_delegate(*this, FUNC(pc87306_device::rtc_w)));
 	}
 }
 
@@ -198,6 +203,22 @@ u8 pc87306_device::keybc_status_r(offs_t offset)
 void pc87306_device::keybc_command_w(offs_t offset, u8 data)
 {
 	m_kbdc->data_w(4, data);
+}
+
+u8 pc87306_device::rtc_r(offs_t offset)
+{
+	if (BIT(offset, 0))
+		return m_rtc->data_r(); // TODO: SCF0 bit 0 locks addresses 38 to 3F (FF is returned)
+	else
+		return m_rtc->get_address(); // datasheet doesn't clarify whether or not this is actually readable
+}
+
+void pc87306_device::rtc_w(offs_t offset, u8 data)
+{
+	if (BIT(offset, 0))
+		m_rtc->data_w(data); // TODO: SCF0 bit 0 locks addresses 38 to 3F
+	else
+		m_rtc->address_w(data);
 }
 
 /*

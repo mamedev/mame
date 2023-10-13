@@ -15,7 +15,6 @@
 #include "machine/wd_fdc.h"
 #include "machine/i8255.h"
 #include "machine/6850acia.h"
-#include "formats/trd_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

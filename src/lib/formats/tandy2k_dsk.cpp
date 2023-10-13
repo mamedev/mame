@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /*********************************************************************
 
-    formats/tandy2k_dsk.c
+    formats/tandy2k_dsk.cpp
 
     Tandy 2000 disk format
 
@@ -14,17 +14,17 @@ tandy2k_format::tandy2k_format() : upd765_format(formats)
 {
 }
 
-const char *tandy2k_format::name() const
+const char *tandy2k_format::name() const noexcept
 {
 	return "tandy2k";
 }
 
-const char *tandy2k_format::description() const
+const char *tandy2k_format::description() const noexcept
 {
 	return "Tandy 2000 disk image";
 }
 
-const char *tandy2k_format::extensions() const
+const char *tandy2k_format::extensions() const noexcept
 {
 	return "dsk";
 }

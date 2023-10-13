@@ -159,7 +159,7 @@ protected:
 	required_device<pc_kbdc_device> m_pc_kbdc;
 
 private:
-	void write_rtc(offs_t offset, uint8_t data);
+	void rtc_nmi_w(uint8_t data);
 };
 
 #endif  // MAME_BUS_LPCI_SOUTHBRIDGE_H

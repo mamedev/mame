@@ -125,9 +125,8 @@ void ec65k_state::ec65k_mem(address_map &map)
 	map(0x00e400, 0x00e403).rw(m_pia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //  PIA0 porta=keyboard; portb=parallel port
 	map(0x00e410, 0x00e413).rw("uart", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x00e420, 0x00e423).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //  PIA1 porta=centronics control; portb=centronics data
-	map(0x00e430, 0x00e430).lw8(NAME([this] (u8 data) { m_rtc->write(0, data); }));  //  RTC 146818 - has battery backup
-	map(0x00e431, 0x00e431).lr8(NAME([this] () { return m_rtc->read(1); }));
-	map(0x00e431, 0x00e431).lw8(NAME([this] (u8 data) { m_rtc->write(1, data); }));
+	map(0x00e430, 0x00e430).w(m_rtc, FUNC(mc146818_device::address_w));  //  RTC 146818 - has battery backup
+	map(0x00e431, 0x00e431).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w));
 	//map(0x00e500, 0x00e5ff)   universal disk controller (no info)
 	map(0x00e800, 0x00efff).ram().share("videoram");
 	map(0x00f000, 0x00ffff).rom().region("maincpu",0);

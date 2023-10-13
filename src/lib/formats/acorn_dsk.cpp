@@ -22,17 +22,17 @@ acorn_ssd_format::acorn_ssd_format() : wd177x_format(formats)
 {
 }
 
-const char *acorn_ssd_format::name() const
+const char *acorn_ssd_format::name() const noexcept
 {
 	return "ssd";
 }
 
-const char *acorn_ssd_format::description() const
+const char *acorn_ssd_format::description() const noexcept
 {
 	return "Acorn SSD disk image";
 }
 
-const char *acorn_ssd_format::extensions() const
+const char *acorn_ssd_format::extensions() const noexcept
 {
 	return "ssd,bbc,img";
 }
@@ -167,17 +167,17 @@ acorn_dsd_format::acorn_dsd_format() : wd177x_format(formats)
 {
 }
 
-const char *acorn_dsd_format::name() const
+const char *acorn_dsd_format::name() const noexcept
 {
 	return "dsd";
 }
 
-const char *acorn_dsd_format::description() const
+const char *acorn_dsd_format::description() const noexcept
 {
 	return "Acorn DSD disk image";
 }
 
-const char *acorn_dsd_format::extensions() const
+const char *acorn_dsd_format::extensions() const noexcept
 {
 	return "dsd";
 }
@@ -278,17 +278,17 @@ opus_ddos_format::opus_ddos_format() : wd177x_format(formats)
 {
 }
 
-const char *opus_ddos_format::name() const
+const char *opus_ddos_format::name() const noexcept
 {
 	return "ddos";
 }
 
-const char *opus_ddos_format::description() const
+const char *opus_ddos_format::description() const noexcept
 {
 	return "Opus DDOS disk image";
 }
 
-const char *opus_ddos_format::extensions() const
+const char *opus_ddos_format::extensions() const noexcept
 {
 	return "dds";
 }
@@ -376,17 +376,17 @@ acorn_adfs_old_format::acorn_adfs_old_format() : wd177x_format(formats)
 {
 }
 
-const char *acorn_adfs_old_format::name() const
+const char *acorn_adfs_old_format::name() const noexcept
 {
 	return "adfs_o";
 }
 
-const char *acorn_adfs_old_format::description() const
+const char *acorn_adfs_old_format::description() const noexcept
 {
 	return "Acorn ADFS (OldMap) disk image";
 }
 
-const char *acorn_adfs_old_format::extensions() const
+const char *acorn_adfs_old_format::extensions() const noexcept
 {
 	return "adf,ads,adm,adl";
 }
@@ -474,17 +474,17 @@ acorn_adfs_new_format::acorn_adfs_new_format() : wd177x_format(formats)
 {
 }
 
-const char *acorn_adfs_new_format::name() const
+const char *acorn_adfs_new_format::name() const noexcept
 {
 	return "adfs_n";
 }
 
-const char *acorn_adfs_new_format::description() const
+const char *acorn_adfs_new_format::description() const noexcept
 {
 	return "Acorn ADFS (NewMap) disk image";
 }
 
-const char *acorn_adfs_new_format::extensions() const
+const char *acorn_adfs_new_format::extensions() const noexcept
 {
 	return "adf";
 }
@@ -555,17 +555,17 @@ acorn_dos_format::acorn_dos_format() : wd177x_format(formats)
 {
 }
 
-const char *acorn_dos_format::name() const
+const char *acorn_dos_format::name() const noexcept
 {
 	return "dos";
 }
 
-const char *acorn_dos_format::description() const
+const char *acorn_dos_format::description() const noexcept
 {
 	return "Acorn DOS disk image";
 }
 
-const char *acorn_dos_format::extensions() const
+const char *acorn_dos_format::extensions() const noexcept
 {
 	return "img";
 }
@@ -625,22 +625,22 @@ opus_ddcpm_format::opus_ddcpm_format()
 {
 }
 
-const char *opus_ddcpm_format::name() const
+const char *opus_ddcpm_format::name() const noexcept
 {
 	return "ddcpm";
 }
 
-const char *opus_ddcpm_format::description() const
+const char *opus_ddcpm_format::description() const noexcept
 {
 	return "Opus DD CP/M disk image";
 }
 
-const char *opus_ddcpm_format::extensions() const
+const char *opus_ddcpm_format::extensions() const noexcept
 {
 	return "ssd";
 }
 
-bool opus_ddcpm_format::supports_save() const
+bool opus_ddcpm_format::supports_save() const noexcept
 {
 	return false;
 }
@@ -662,7 +662,7 @@ int opus_ddcpm_format::identify(util::random_read &io, uint32_t form_factor, con
 	return 0;
 }
 
-bool opus_ddcpm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool opus_ddcpm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	// Double density discs formatted with DDCPM :
 	//
@@ -711,7 +711,7 @@ bool opus_ddcpm_format::load(util::random_read &io, uint32_t form_factor, const 
 	return true;
 }
 
-bool opus_ddcpm_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool opus_ddcpm_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	return false;
 }
@@ -721,17 +721,17 @@ cumana_dfs_format::cumana_dfs_format() : wd177x_format(formats)
 {
 }
 
-const char *cumana_dfs_format::name() const
+const char *cumana_dfs_format::name() const noexcept
 {
 	return "cdfs";
 }
 
-const char *cumana_dfs_format::description() const
+const char *cumana_dfs_format::description() const noexcept
 {
 	return "Cumana DFS disk image";
 }
 
-const char *cumana_dfs_format::extensions() const
+const char *cumana_dfs_format::extensions() const noexcept
 {
 	return "img";
 }

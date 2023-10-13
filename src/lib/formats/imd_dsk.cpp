@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic
 /*********************************************************************
 
-    formats/imd_dsk.c
+    formats/imd_dsk.cpp
 
     IMD disk images
 
@@ -374,7 +374,7 @@ FLOPPY_CONSTRUCT( imd_dsk_construct )
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    formats/imd_dsk.c
+    formats/imd_dsk.cpp
 
     IMD disk images
 
@@ -384,17 +384,17 @@ imd_format::imd_format()
 {
 }
 
-const char *imd_format::name() const
+const char *imd_format::name() const noexcept
 {
 	return "imd";
 }
 
-const char *imd_format::description() const
+const char *imd_format::description() const noexcept
 {
 	return "IMD disk image";
 }
 
-const char *imd_format::extensions() const
+const char *imd_format::extensions() const noexcept
 {
 	return "imd";
 }
@@ -425,7 +425,7 @@ int imd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	std::vector<uint8_t> comment;
 	std::vector<std::vector<uint8_t> > snum;
@@ -457,7 +457,7 @@ bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		return false;
 
 	int tracks, heads;
-	image->get_maximal_geometry(tracks, heads);
+	image.get_maximal_geometry(tracks, heads);
 
 	mode.clear();
 	track.clear();
@@ -639,7 +639,7 @@ bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool imd_format::supports_save() const
+bool imd_format::supports_save() const noexcept
 {
 	return false;
 }
