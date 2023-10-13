@@ -12,7 +12,6 @@
 #pragma once
 
 #include "bus/rs232/rs232.h"
-#include "formats/ccvf_dsk.h"
 #include "imagedev/floppy.h"
 
 

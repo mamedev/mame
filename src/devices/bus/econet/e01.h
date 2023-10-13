@@ -23,7 +23,6 @@
 #include "machine/mc6854.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
-#include "formats/afs_dsk.h"
 
 class econet_e01_device : public device_t,
 	public device_econet_interface

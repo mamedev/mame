@@ -6,7 +6,6 @@
 
 **********************************************************************/
 
-
 #ifndef MAME_BUS_BBC_FDC_AMS_H
 #define MAME_BUS_BBC_FDC_AMS_H
 
@@ -15,7 +14,6 @@
 #include "fdc.h"
 #include "imagedev/floppy.h"
 #include "machine/i8271.h"
-#include "formats/acorn_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

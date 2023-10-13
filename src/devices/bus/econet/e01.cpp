@@ -53,8 +53,11 @@
 
 #include "emu.h"
 #include "e01.h"
+
 #include "bus/scsi/scsihd.h"
-#include "softlist.h"
+#include "softlist_dev.h"
+
+#include "formats/afs_dsk.h"
 
 
 //**************************************************************************

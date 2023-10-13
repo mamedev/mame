@@ -25,6 +25,9 @@
 #include "emu.h"
 #include "c8050.h"
 
+#include "formats/d80_dsk.h"
+#include "formats/d82_dsk.h"
+
 
 
 //**************************************************************************

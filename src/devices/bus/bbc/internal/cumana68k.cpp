@@ -16,12 +16,13 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "cumana68k.h"
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/devices.h"
 #include "softlist_dev.h"
+
+#include "formats/os9_dsk.h"
 
 
 //**************************************************************************

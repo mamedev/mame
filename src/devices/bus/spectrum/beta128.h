@@ -12,7 +12,6 @@
 #include "softlist.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
-#include "formats/trd_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

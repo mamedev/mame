@@ -60,9 +60,6 @@
 #pragma once
 
 #include "imagedev/floppy.h"
-#include "formats/d64_dsk.h"
-#include "formats/g64_dsk.h"
-#include "formats/d71_dsk.h"
 
 
 
