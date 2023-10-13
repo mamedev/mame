@@ -15,7 +15,6 @@
 #include "machine/wd_fdc.h"
 #include "machine/6821pia.h"
 #include "bus/centronics/ctronics.h"
-#include "formats/opd_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -63,8 +62,7 @@ private:
 	required_memory_region m_rom;
 	required_device<pia6821_device> m_pia;
 	required_device<wd_fdc_device_base> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<centronics_device> m_centronics;
 	required_device<spectrum_expansion_slot_device> m_exp;
 
