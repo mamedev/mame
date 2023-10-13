@@ -71,7 +71,7 @@ Merit Riviera Notes - There are several known versions:
 
 NOTE: Based on tests and observations, the CRT-209 module seems to use the Z80's M1 signal when it fetches
       an opcode to activate and overlay the module's built in 2816 EEPROM. While this prevents a simple
-      memory read of the 2816's memory region, it does limit the usuable instructions to single byte opcodes.
+      memory read of the 2816's memory region, it does limit the usable instructions to single byte opcodes.
 
 
 */
