@@ -100,8 +100,8 @@ private:
 	uint8_t fdc_wait_r();
 	void fdc_dcont_w(uint8_t data);
 	void fdc_dsel_w(uint8_t data);
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 	uint8_t i8255_pc_r();
 	void ctc_z0_w(int state);
@@ -513,7 +513,7 @@ static void xor100_floppies(device_slot_interface &device)
 	device.option_add("8ssdd", FLOPPY_8_SSDD); // Shugart SA-100
 }
 
-void xor100_state::fdc_intrq_w(bool state)
+void xor100_state::fdc_intrq_w(int state)
 {
 	m_fdc_irq = state;
 	m_ctc->trg0(state);
@@ -522,7 +522,7 @@ void xor100_state::fdc_intrq_w(bool state)
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 }
 
-void xor100_state::fdc_drq_w(bool state)
+void xor100_state::fdc_drq_w(int state)
 {
 	m_fdc_drq = state;
 
@@ -622,6 +622,9 @@ void xor100_state::xor100(machine_config &config)
 	m_ctc->zc_callback<2>().set(FUNC(xor100_state::ctc_z2_w));
 
 	FD1795(config, m_fdc, 8_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(FUNC(xor100_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(xor100_state::fdc_drq_w));
+
 	FLOPPY_CONNECTOR(config, m_floppy[0], xor100_floppies, "8ssdd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy[1], xor100_floppies, "8ssdd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy[2], xor100_floppies, nullptr,    floppy_image_device::default_mfm_floppy_formats);
