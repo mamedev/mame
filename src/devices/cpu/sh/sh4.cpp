@@ -2316,7 +2316,7 @@ void sh34_base_device::device_start()
 
 	state_add(STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().noshow();
 	//state_add(STATE_GENPCBASE, "CURPC", m_sh2_state->m_ppc).noshow();
-	state_add( STATE_GENPCBASE, "CURPC", m_sh2_state->pc).callimport().noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_sh2_state->pc).callimport().noshow();
 
 	for (int regnum = 0; regnum < 16; regnum++)
 	{

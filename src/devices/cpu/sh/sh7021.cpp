@@ -571,9 +571,10 @@ void sh7021_device::recalc_irq()
 	// Timer IRQs
 	for (uint32_t i = 0; i < 5; ++i)
 	{
-		int level;
 		if ((m_itu.timer[i].tier & m_itu.timer[i].tsr) & 7)
 		{
+			int level;
+
 			switch (i)
 			{
 				case 0:
@@ -1872,7 +1873,10 @@ uint8_t sh7021_device::sci_ssr_r()
 	LOGMASKED(LOG_SCI_RD, "%s:         Transmit End Flag: %d\n", machine().describe_context(), Channel, BIT(m_sci[Channel].ssr, 2));
 	LOGMASKED(LOG_SCI_RD, "%s:         Multiprocessor Bit Flag: %d\n", machine().describe_context(), Channel, BIT(m_sci[Channel].ssr, 1));
 	LOGMASKED(LOG_SCI_RD, "%s:         Multiprocessor Bit Transfer Flag: %d\n", machine().describe_context(), Channel, BIT(m_sci[Channel].ssr, 0));
-	m_sci[Channel].ssr_read |= m_sci[Channel].ssr & 0xf8;
+
+	if (!machine().side_effects_disabled())
+		m_sci[Channel].ssr_read |= m_sci[Channel].ssr & 0xf8;
+
 	return (m_sci[Channel].ssr & 0xf9) | 0x04;
 }
 
