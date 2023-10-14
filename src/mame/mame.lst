@@ -29674,6 +29674,7 @@ gambl186a                       // EGD
 gambl186b                       // EGD
 gambl186c                       // EGD
 gambl186d                       // EGD
+gambl186e                       // EGD
 
 @source:misc/gamemasters.cpp
 gmsshoot                        // (c) 1989 GameMasters
