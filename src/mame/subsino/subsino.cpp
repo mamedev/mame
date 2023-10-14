@@ -289,9 +289,7 @@ public:
 	void init_crsbingo();
 	void init_victor21();
 	void init_victor5();
-	void init_tisuba();
 	void init_tisubb();
-	void init_newhunter();
 	void init_newhunterb();
 	void init_sharkpye();
 	void init_tisub();
@@ -330,6 +328,7 @@ private:
 	uint8_t flash_r();
 	void flash_w(uint8_t data);
 	uint8_t hwcheck_r();
+	uint8_t out_c_r();
 	void out_c_w(uint8_t data);
 	void reel_scrollattr_w(offs_t offset, uint8_t data);
 	uint8_t reel_scrollattr_r(offs_t offset);
@@ -831,19 +830,20 @@ void subsino_state::dinofmly_map(address_map &map)
 
 void subsino_state::sharkpy_map(address_map &map)
 {
-	map(0x00000, 0x13fff).rom(); //overlap unmapped regions
-	map(0x09800, 0x09fff).ram();
-	map(0x09000, 0x09002).r("ppi1", FUNC(i8255_device::read));
-	map(0x09004, 0x09006).r("ppi2", FUNC(i8255_device::read));
-	map(0x09009, 0x09009).w(FUNC(subsino_state::out_b_w));
-	map(0x0900a, 0x0900a).w(FUNC(subsino_state::out_a_w));
-	map(0x0900c, 0x0900c).portr("INC");
-	map(0x09016, 0x09017).w("ymsnd", FUNC(ym3812_device::write));
-	map(0x09018, 0x09018).w("oki", FUNC(okim6295_device::write));
-	map(0x0901b, 0x0901b).w(FUNC(subsino_state::tiles_offset_w));
-	map(0x07800, 0x07fff).ram();
-	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
-	map(0x08800, 0x08fff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x06000, 0x0d7ff).rom().region("program", 0x6000);
+	map(0x0d800, 0x0dfff).ram();
+	map(0x0e000, 0x0e7ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x0e800, 0x0efff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x0f000, 0x0f002).r("ppi1", FUNC(i8255_device::read));
+	map(0x0f004, 0x0f006).r("ppi2", FUNC(i8255_device::read));
+	map(0x0f009, 0x0f009).w(FUNC(subsino_state::out_b_w));
+	map(0x0f00a, 0x0f00a).w(FUNC(subsino_state::out_a_w));
+	map(0x0f00c, 0x0f00c).portr("INC");
+	map(0x0f016, 0x0f017).w("ymsnd", FUNC(ym3812_device::write));
+	map(0x0f018, 0x0f018).w("oki", FUNC(okim6295_device::write));
+	map(0x0f01b, 0x0f01b).w(FUNC(subsino_state::tiles_offset_w));
+	map(0x0f800, 0x0ffff).ram();
+	map(0x10000, 0x13fff).rom().region("program", 0);
 }
 
 /*
@@ -854,22 +854,22 @@ this event makes the game to reset without any money in the bank.
 
 void subsino_state::victor21_map(address_map &map)
 {
-	map(0x00000, 0x08fff).rom(); //overlap unmapped regions
-	map(0x09800, 0x09fff).ram();
-	map(0x09000, 0x09003).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x09004, 0x09004).portr("INA");
-	map(0x09005, 0x09005).portr("INB");
-	map(0x09006, 0x09006).portr("SW1");
-	map(0x09007, 0x09007).portr("SW2");
-	map(0x09008, 0x09008).portr("SW3");
-	map(0x0900b, 0x0900b).ram(); //protection
-	map(0x0900c, 0x0900c).w("oki", FUNC(okim6295_device::write));
-	map(0x0900e, 0x0900f).w("ymsnd", FUNC(ym2413_device::write));
-	map(0x0900d, 0x0900d).w(FUNC(subsino_state::tiles_offset_w));
-	map(0x07800, 0x07fff).ram();
-	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
-	map(0x08800, 0x08fff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
-	map(0x10000, 0x13fff).rom();
+	map(0x06000, 0x0d7ff).rom().region("program", 0x4000);
+	map(0x0d800, 0x0dfff).ram();
+	map(0x0e000, 0x0e7ff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x0e800, 0x0efff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x0f000, 0x0f003).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0f004, 0x0f004).portr("INA");
+	map(0x0f005, 0x0f005).portr("INB");
+	map(0x0f006, 0x0f006).portr("SW1");
+	map(0x0f007, 0x0f007).portr("SW2");
+	map(0x0f008, 0x0f008).portr("SW3");
+	map(0x0f00b, 0x0f00b).ram(); //protection
+	map(0x0f00c, 0x0f00c).w("oki", FUNC(okim6295_device::write));
+	map(0x0f00e, 0x0f00f).w("ymsnd", FUNC(ym2413_device::write));
+	map(0x0f00d, 0x0f00d).w(FUNC(subsino_state::tiles_offset_w));
+	map(0x0f800, 0x0ffff).ram();
+	map(0x10000, 0x13fff).rom().region("program", 0);
 }
 
 
@@ -927,9 +927,9 @@ void subsino_state::flash_w(uint8_t data)
 void subsino_state::victor5_map(address_map &map)
 {
 	victor21_map(map);
-	map(0x0900a, 0x0900a).rw(FUNC(subsino_state::flash_r), FUNC(subsino_state::flash_w));
-	map(0x0900b, 0x0900b).nopr(); //"flash" status, bit 0
-	map(0x0900c, 0x0900c).w("oki", FUNC(okim6295_device::write));
+	map(0x0f00a, 0x0f00a).rw(FUNC(subsino_state::flash_r), FUNC(subsino_state::flash_w));
+	map(0x0f00b, 0x0f00b).nopr(); //"flash" status, bit 0
+	map(0x0f00c, 0x0f00c).w("oki", FUNC(okim6295_device::write));
 }
 
 
@@ -941,36 +941,41 @@ uint8_t subsino_state::hwcheck_r()
 
 void subsino_state::crsbingo_map(address_map &map)
 {
-	map(0x00000, 0x8fff).rom(); //overlap unmapped regions
+	map(0x06000, 0x0d7ff).rom().region("program", 0x4000);
 
-	map(0x09800, 0x09fff).ram();
+	map(0x0f800, 0x0ffff).ram();
 
-	map(0x09000, 0x09000).portr("SW1");
-	map(0x09001, 0x09001).portr("SW2");
-	map(0x09002, 0x09002).portr("INA");
-	map(0x09003, 0x09003).portr("INB");
-	map(0x09004, 0x09004).portr("INC");
-	map(0x09005, 0x09005).w(FUNC(subsino_state::out_a_w));
+	map(0x0f000, 0x0f000).portr("SW1");
+	map(0x0f001, 0x0f001).portr("SW2");
+	map(0x0f002, 0x0f002).portr("INA");
+	map(0x0f003, 0x0f003).portr("INB");
+	map(0x0f004, 0x0f004).portr("INC");
+	map(0x0f005, 0x0f005).w(FUNC(subsino_state::out_a_w));
 
-	map(0x09008, 0x09008).portr("SW4");
-	map(0x09009, 0x09009).portr("SW3");  // .w(FUNC(subsino_state::out_a_w));
-	map(0x0900a, 0x0900a).rw(FUNC(subsino_state::hwcheck_r), FUNC(subsino_state::out_b_w));
+	map(0x0f008, 0x0f008).portr("SW4");
+	map(0x0f009, 0x0f009).portr("SW3");  // .w(FUNC(subsino_state::out_a_w));
+	map(0x0f00a, 0x0f00a).rw(FUNC(subsino_state::hwcheck_r), FUNC(subsino_state::out_b_w));
 
-	map(0x09010, 0x09010).rw(FUNC(subsino_state::flash_r), FUNC(subsino_state::flash_w));
-//  map(0x09011, 0x09011) //"flash" status, bit 0
-//  map(0x0900c, 0x0900c).portr("INC");
-	map(0x0900c, 0x0900d).w("ymsnd", FUNC(ym2413_device::write));
+	map(0x0f010, 0x0f010).rw(FUNC(subsino_state::flash_r), FUNC(subsino_state::flash_w));
+//  map(0x0f011, 0x0f011) //"flash" status, bit 0
+//  map(0x0f00c, 0x0f00c).portr("INC");
+	map(0x0f00c, 0x0f00d).w("ymsnd", FUNC(ym2413_device::write));
 
-//  map(0x09018, 0x09018).w("oki", FUNC(okim6295_device::write));
+//  map(0x0f018, 0x0f018).w("oki", FUNC(okim6295_device::write));
 
-//  map(0x0900d, 0x0900d).w(FUNC(subsino_state::tiles_offset_w));
+//  map(0x0f00d, 0x0f00d).w(FUNC(subsino_state::tiles_offset_w));
 
-	map(0x07800, 0x07fff).ram();
-	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
-	map(0x08800, 0x08fff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x0d800, 0x0dfff).ram();
+	map(0x0e000, 0x0e7ff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x0e800, 0x0efff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
 
-	map(0x10000, 0x13fff).rom(); //overlap unmapped regions
+	map(0x10000, 0x13fff).rom().region("program", 0); //overlap unmapped regions
 
+}
+
+uint8_t subsino_state::out_c_r()
+{
+	return m_out_c;
 }
 
 void subsino_state::out_c_w(uint8_t data)
@@ -989,42 +994,43 @@ void subsino_state::out_c_w(uint8_t data)
 
 void subsino_state::tisub_base_map(address_map &map)
 {
-	map(0x00000, 0x0bfff).rom(); // overlap unmapped regions
-	map(0x07800, 0x07fff).ram();
-	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
-	map(0x08800, 0x08fff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
-	map(0x09000, 0x09002).r("ppi1", FUNC(i8255_device::read));
-	map(0x09004, 0x09006).r("ppi2", FUNC(i8255_device::read));
-	map(0x09008, 0x09008).w(FUNC(subsino_state::out_c_w));
-	map(0x09009, 0x09009).w(FUNC(subsino_state::out_b_w));
-	map(0x0900a, 0x0900a).w(FUNC(subsino_state::out_a_w));
-	map(0x09800, 0x09fff).ram();
-	map(0x10000, 0x13fff).rom();
-	map(0x150c0, 0x150ff).ram().share("reel_scroll.2");
-	map(0x15140, 0x1517f).ram().share("reel_scroll.1");
-	map(0x15180, 0x151bf).ram().share("reel_scroll.0");
-	map(0x15800, 0x159ff).ram().w(FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
-	map(0x15a00, 0x15bff).ram().w(FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
-	map(0x15c00, 0x15dff).ram().w(FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
+	map(0x0d800, 0x0dfff).ram();
+	map(0x0e000, 0x0e7ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x0e800, 0x0efff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x0f000, 0x0f002).r("ppi1", FUNC(i8255_device::read));
+	map(0x0f004, 0x0f006).r("ppi2", FUNC(i8255_device::read));
+	map(0x0f008, 0x0f008).rw(FUNC(subsino_state::out_c_r), FUNC(subsino_state::out_c_w));
+	map(0x0f009, 0x0f009).w(FUNC(subsino_state::out_b_w));
+	map(0x0f00a, 0x0f00a).w(FUNC(subsino_state::out_a_w));
+	map(0x0f800, 0x0ffff).ram();
+	map(0x10000, 0x13fff).rom().region("program", 0);
+	map(0x1e0c0, 0x1e0ff).ram().share("reel_scroll.2");
+	map(0x1e140, 0x1e17f).ram().share("reel_scroll.1");
+	map(0x1e180, 0x1e1bf).ram().share("reel_scroll.0");
+	map(0x1e800, 0x1e9ff).ram().w(FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
+	map(0x1ea00, 0x1ebff).ram().w(FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
+	map(0x1ec00, 0x1edff).ram().w(FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
 }
 
 void subsino_state::tisub_map(address_map &map)
 {
 	tisub_base_map(map);
 
-	map(0x0900c, 0x0900c).portr("INC");
-	map(0x09016, 0x09017).w("ymsnd", FUNC(ym3812_device::write));
-	map(0x0901b, 0x0901b).w(FUNC(subsino_state::tiles_offset_w));
-	map(0x14000, 0x14fff).rom(); // reads the card face data here (see rom copy in rom loading)
+	map(0x06000, 0x0d7ff).rom().region("program", 0x4000);
+	map(0x0f00c, 0x0f00c).portr("INC");
+	map(0x0f016, 0x0f017).w("ymsnd", FUNC(ym3812_device::write));
+	map(0x0f01b, 0x0f01b).w(FUNC(subsino_state::tiles_offset_w));
+	map(0x1d000, 0x1dfff).rom().region("program", 0xd000); // reads the card face data here
 }
 
 void subsino_state::newhunterb_map(address_map &map)
 {
 	tisub_base_map(map);
 
-	map(0x0900c, 0x0900d).w("ymsnd", FUNC(ym3812_device::write));
-	map(0x0900e, 0x0900e).portr("INC");
-	map(0x0900f, 0x0900f).w(FUNC(subsino_state::tiles_offset_w));
+	map(0x06000, 0x0d7ff).rom().region("program", 0x6000);
+	map(0x0f00c, 0x0f00d).w("ymsnd", FUNC(ym3812_device::write));
+	map(0x0f00e, 0x0f00e).portr("INC");
+	map(0x0f00f, 0x0f00f).w(FUNC(subsino_state::tiles_offset_w));
 }
 
 void subsino_state::ramdac_map(address_map &map)
@@ -3015,6 +3021,16 @@ void subsino_state::mtrainnv(machine_config &config)
 *                               ROMs Loading                               *
 ***************************************************************************/
 
+#define HD647180X_FAKE_INTERNAL_ROM \
+	ROM_FILL( 0x0000, 1, 0x3e ) \
+	ROM_FILL( 0x0001, 1, 0x01 ) \
+	ROM_FILL( 0x0002, 1, 0xed ) \
+	ROM_FILL( 0x0003, 1, 0x39 ) \
+	ROM_FILL( 0x0004, 1, 0x38 ) \
+	ROM_FILL( 0x0005, 1, 0xc3 ) \
+	ROM_FILL( 0x0006, 1, 0x16 ) \
+	ROM_FILL( 0x0007, 1, 0xf0 )
+
 /***************************************************************************
 
   Victor 5
@@ -3028,9 +3044,11 @@ void subsino_state::mtrainnv(machine_config &config)
 ***************************************************************************/
 
 ROM_START( victor5 )
-	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "1.u1", 0x10000, 0x4000, CRC(bc4d6ed6) SHA1(6b2087360ea0ae9e48a623934cb2fb973a80f1ec) )
-	ROM_CONTINUE(0x0000,0xc000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "1.u1", 0x00000, 0x10000, CRC(bc4d6ed6) SHA1(6b2087360ea0ae9e48a623934cb2fb973a80f1ec) )
 
 	ROM_REGION( 0x18000, "tilemap", 0 )
 	ROM_LOAD( "2.u24", 0x10000, 0x8000, CRC(f7026c74) SHA1(75a72839ad6b349563110ed10ad235958d5c0170) )
@@ -3082,9 +3100,11 @@ Info by f205v (26/03/2008)
 ***************************************************************************/
 
 ROM_START( victor5a )
-	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "1.u1", 0x10000, 0x4000, CRC(e3ada2fc) SHA1(eddb460dcb80a29fbbe3ed6c4733c75b892baf52) )
-	ROM_CONTINUE(0x0000,0xc000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "1.u1", 0x00000, 0x10000, CRC(e3ada2fc) SHA1(eddb460dcb80a29fbbe3ed6c4733c75b892baf52) )
 
 	ROM_REGION( 0x18000, "tilemap", 0 )
 	ROM_LOAD( "2.u24", 0x10000, 0x8000, CRC(1229e951) SHA1(1e548625bb60e2d6f52a376a0dea9e5709f94135) )
@@ -3138,9 +3158,18 @@ Info by f205v, Corrado Tomaselli (20/04/2008)
 ***************************************************************************/
 
 ROM_START( victor21 )
-	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "1.u1", 0x10000, 0x4000, CRC(43999b2d) SHA1(7ce26fd332ffe35fd826a1a6166b228d4bc370b8) )
-	ROM_CONTINUE(     0x00000, 0xc000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_FILL( 0x0000, 1, 0x3e )
+	ROM_FILL( 0x0001, 1, 0x01 )
+	ROM_FILL( 0x0002, 1, 0xed )
+	ROM_FILL( 0x0003, 1, 0x39 )
+	ROM_FILL( 0x0004, 1, 0x38 )
+	ROM_FILL( 0x0005, 1, 0xc3 )
+	ROM_FILL( 0x0006, 1, 0x15 ) // entrypoint is slightly different
+	ROM_FILL( 0x0007, 1, 0xf0 )
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "1.u1", 0x00000, 0x10000, CRC(43999b2d) SHA1(7ce26fd332ffe35fd826a1a6166b228d4bc370b8) )
 
 	ROM_REGION( 0x18000, "tilemap", 0 )
 	ROM_LOAD( "2.u24", 0x10000, 0x8000, CRC(f1181b93) SHA1(53cd4d2ce13973495b51d911a4745a69a9784983) )
@@ -3165,10 +3194,11 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( tisub )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "rom_1.bin", 0x10000, 0x4000,  CRC(ed3b4a69) SHA1(c57985e8d19b2b495fc768e52b83cbbd75f027ad) )
-	ROM_CONTINUE(0x0000,0xc000)
-	ROM_COPY( "maincpu", 0x09000, 0x14000, 0x1000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "rom_1.bin", 0x00000, 0x10000, CRC(ed3b4a69) SHA1(c57985e8d19b2b495fc768e52b83cbbd75f027ad) )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "rom_6.bin", 0x00000, 0x10000, CRC(c2c226df) SHA1(39762b390d6b271c3252342e843a181dd152a0cc) )
@@ -3205,10 +3235,11 @@ ROM_END
 */
 
 ROM_START( tisuba )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "01.bin", 0x10000, 0x4000,  CRC(9967dd38) SHA1(63b74bc0c0952114b7321e8f399bd64dc293aade) )
-	ROM_CONTINUE(0x0000,0xc000)
-	ROM_COPY( "maincpu", 0x09000, 0x14000, 0x1000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "01.bin", 0x00000, 0x10000, CRC(9967dd38) SHA1(63b74bc0c0952114b7321e8f399bd64dc293aade) )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "rom_6.bin", 0x00000, 0x10000, CRC(c2c226df) SHA1(39762b390d6b271c3252342e843a181dd152a0cc) )
@@ -3229,10 +3260,11 @@ ROM_START( tisuba )
 ROM_END
 
 ROM_START( tisubb )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "ti alpha rom_1 ver3.0n.u6", 0x10000, 0x4000,  CRC(7f0756cc) SHA1(e383b6abea136b79acabbffd9d247cc51c9aaa85) )
-	ROM_CONTINUE(0x0000, 0xc000)
-	ROM_COPY( "maincpu", 0x09000, 0x14000, 0x1000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "ti alpha rom_1 ver3.0n.u6", 0x00000, 0x10000, CRC(7f0756cc) SHA1(e383b6abea136b79acabbffd9d247cc51c9aaa85) )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "ti alpha rom_6 ver1.1.u43", 0x00000, 0x10000, CRC(e7abd3b6) SHA1(bb22161b6c082d3ea0c80e0ff413bc43edd6e678) )
@@ -3256,13 +3288,12 @@ ROM_END
    modified the New HUNTer set from Mecca, which also shows 1989, and was legally registered on Korea on 1989-8-25. */
 ROM_START( newhunter )
 	// The MCU had its surface scratched out, but almost sure it's an HD647180X0CP8L
-	ROM_REGION( 0x04000, "mcu", 0 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "hd647180.bin", 0x00000, 0x04000, NO_DUMP )
+	HD647180X_FAKE_INTERNAL_ROM
 
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "27c512.u18",   0x10000, 0x04000, CRC(d0d863a7) SHA1(0ee5ee04c3da83320bea8130be30f7fe6446b32f) )
-	ROM_CONTINUE(             0x00000, 0x0c000 )
-	ROM_COPY( "maincpu",      0x09000, 0x14000, 0x1000)
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "27c512.u18",   0x00000, 0x10000, CRC(d0d863a7) SHA1(0ee5ee04c3da83320bea8130be30f7fe6446b32f) )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "d27c010a.u16", 0x00000, 0x08000, CRC(c1daa20f) SHA1(c46278a00b6cbbd79c4184db910bf2770d77d92f) )
@@ -3299,12 +3330,12 @@ ROM_END
     The position for the reset switch was also unpopulated, and there wasn't battery-backed RAM on the PCB
     (present on most games on this hardware). */
 ROM_START( newhunterb )
-	ROM_REGION( 0x04000, "mcu", 0 )
+	ROM_REGION( 0x04000, "maincpu", 0 )
 	ROM_LOAD( "hd647180.bin", 0x00000, 0x04000, NO_DUMP ) // HD647180X0CP8L
+	HD647180X_FAKE_INTERNAL_ROM
 
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "tms27c512.u26", 0x10000, 0x06000, CRC(a155197c) SHA1(01c53b436de14717260c88352b09f1a01b6fd8b2) )
-	ROM_CONTINUE(              0x00000, 0x0a000 )
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "tms27c512.u26", 0x00000, 0x10000, CRC(a155197c) SHA1(01c53b436de14717260c88352b09f1a01b6fd8b2) )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "am27c010.u24", 0x00000, 0x08000, CRC(e712ab8a) SHA1(ddeb92213124c6114951b9b5739eed25efe3c7a6) )
@@ -3372,9 +3403,11 @@ Info by f205v (14/12/2008)
 ***************************************************************************/
 
 ROM_START( crsbingo )
-	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "1.u36", 0x10000, 0x4000, CRC(c5aff4eb) SHA1(74f06d7735975657fca9be5fff9e7d53f38fcd02) )
-	ROM_CONTINUE(0x0000,0xc000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "1.u36", 0x00000, 0x10000, CRC(c5aff4eb) SHA1(74f06d7735975657fca9be5fff9e7d53f38fcd02) )
 
 	ROM_REGION( 0x20000, "tilemap", 0 )
 	ROM_LOAD( "2.u4",  0x00000, 0x10000, CRC(ce527722) SHA1(f3759cefab902259eb25f8d4be2fcafc1afd90b9) )
@@ -3433,9 +3466,11 @@ Info by f205v (25/03/2008)
 ***************************************************************************/
 
 ROM_START( sharkpy )
-	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "shark_n.1.u18", 0x0a000, 0x6000, CRC(25aeac2f) SHA1(d94e3e5cfffd150ac48e1463493a8323f42e7a89) ) // is this mapped correctly? - used during gameplay?
-	ROM_CONTINUE(0x0000, 0xa000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "shark_n.1.u18", 0x00000, 0x10000, CRC(25aeac2f) SHA1(d94e3e5cfffd150ac48e1463493a8323f42e7a89) )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "shark_n.3.u16", 0x00000, 0x08000, CRC(a7a715ce) SHA1(38b93e05377d9cb816688f5070e847480f195c6b) )
@@ -3497,9 +3532,11 @@ Info by f205v (25/03/2008)
 ***************************************************************************/
 
 ROM_START( sharkpya )
-	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "shark1.6.u18", 0x0a000, 0x6000, CRC(365312a0) SHA1(de8370b1f35e8d071185d2e5f2fbd2fdf74c55ac) )
-	ROM_CONTINUE(0x0000, 0xa000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "shark1.6.u18", 0x00000, 0x10000, CRC(365312a0) SHA1(de8370b1f35e8d071185d2e5f2fbd2fdf74c55ac) )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "shark_n.3.u16", 0x00000, 0x08000, CRC(a7a715ce) SHA1(38b93e05377d9cb816688f5070e847480f195c6b) )
@@ -3531,9 +3568,11 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( sharkpye )
-	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "sharkpye.u18", 0x0a000, 0x6000, CRC(12473814) SHA1(9c24ed41781aefee0161add912e730ba0d4f4d3e) )
-	ROM_CONTINUE(0x0000, 0xa000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "sharkpye.u18", 0x00000, 0x10000, CRC(12473814) SHA1(9c24ed41781aefee0161add912e730ba0d4f4d3e) )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "sharkpye.u16", 0x00000, 0x08000, CRC(90862185) SHA1(9d632bfa707d3449a87d7f370eb2b5c36e61aadd) )
@@ -3569,9 +3608,11 @@ ROM_END
 ****************************************************************************/
 
 ROM_START( victor6 )
-	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "victor_6ii-rom_1.ver2.3n.u18", 0x0a000, 0x6000, CRC(d496ecbd) SHA1(1f982b42bc46c09298916a6cb2db0b38c6451ec3) )
-	ROM_CONTINUE(0x0000, 0xa000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "victor_6ii-rom_1.ver2.3n.u18", 0x00000, 0x10000, CRC(d496ecbd) SHA1(1f982b42bc46c09298916a6cb2db0b38c6451ec3) )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "victor_6ii-rom_3_ver1.0.u16", 0x00000, 0x08000, CRC(4e96c30a) SHA1(4989b10a52ba61459864aa44be9ebafe68b4d231) )
@@ -3593,9 +3634,11 @@ ROM_START( victor6 )
 ROM_END
 
 ROM_START( victor6a )
-	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "victor_6ii_alpha_1_ver2.3.u18", 0x0a000, 0x6000, CRC(2a3eaecd) SHA1(18bf2dfec8cd5690d6465f750093942afda66475) )
-	ROM_CONTINUE(0x0000, 0xa000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "victor_6ii_alpha_1_ver2.3.u18", 0x00000, 0x10000, CRC(2a3eaecd) SHA1(18bf2dfec8cd5690d6465f750093942afda66475) )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "victor_6ii-rom_3_ver1.0.u16", 0x00000, 0x08000, CRC(4e96c30a) SHA1(4989b10a52ba61459864aa44be9ebafe68b4d231) )
@@ -3617,9 +3660,11 @@ ROM_START( victor6a )
 ROM_END
 
 ROM_START( victor6b )
-	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "victor_6ii_rom_1_ver1.2.u18", 0x0a000, 0x6000, CRC(309876fc) SHA1(305c4cf347b512607e2c58a580075a34b48bedd5) )
-	ROM_CONTINUE(0x0000, 0xa000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "victor_6ii_rom_1_ver1.2.u18", 0x00000, 0x10000, CRC(309876fc) SHA1(305c4cf347b512607e2c58a580075a34b48bedd5) )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "victor_6ii-rom_3_ver1.0.u16", 0x00000, 0x08000, CRC(4e96c30a) SHA1(4989b10a52ba61459864aa44be9ebafe68b4d231) )
@@ -3998,8 +4043,8 @@ ROM_END
 
 void subsino_state::init_victor5()
 {
-	uint8_t *rom = memregion( "maincpu" )->base();
-	subsino_decrypt(rom, victor5_bitswaps, victor5_xors, 0xc000);
+	uint8_t *rom = memregion( "program" )->base() + 0x4000;
+	subsino_decrypt(rom, victor5_bitswaps, victor5_xors, 0x8000);
 
 	m_flash_packet = 0;
 	m_flash_packet_start = 0;
@@ -4012,14 +4057,14 @@ void subsino_state::init_victor5()
 
 void subsino_state::init_victor21()
 {
-	uint8_t *rom = memregion( "maincpu" )->base();
-	subsino_decrypt(rom, victor21_bitswaps, victor21_xors, 0xc000);
+	uint8_t *rom = memregion( "program" )->base() + 0x4000;
+	subsino_decrypt(rom, victor21_bitswaps, victor21_xors, 0x8000);
 }
 
 void subsino_state::init_crsbingo()
 {
-	uint8_t *rom = memregion( "maincpu" )->base();
-	subsino_decrypt(rom, crsbingo_bitswaps, crsbingo_xors, 0xc000);
+	uint8_t *rom = memregion( "program" )->base() + 0x4000;
+	subsino_decrypt(rom, crsbingo_bitswaps, crsbingo_xors, 0x8000);
 
 	m_flash_packet = 0;
 	m_flash_packet_start = 0;
@@ -4032,14 +4077,14 @@ void subsino_state::init_crsbingo()
 
 void subsino_state::init_sharkpy()
 {
-	uint8_t *rom = memregion( "maincpu" )->base();
-	subsino_decrypt(rom, sharkpy_bitswaps, sharkpy_xors, 0xa000);
+	uint8_t *rom = memregion( "program" )->base() + 0x6000;
+	subsino_decrypt(rom, sharkpy_bitswaps, sharkpy_xors, 0x8000);
 }
 
 void subsino_state::init_sharkpye()
 {
-	uint8_t *rom = memregion( "maincpu" )->base();
-	subsino_decrypt(rom, victor5_bitswaps, victor5_xors, 0xa000);
+	uint8_t *rom = memregion( "program" )->base() + 0x6000;
+	subsino_decrypt(rom, victor5_bitswaps, victor5_xors, 0x8000);
 }
 
 void subsino_state::init_smoto20()
@@ -4056,88 +4101,20 @@ void subsino_state::init_smoto13()
 
 void subsino_state::init_tisub()
 {
-	uint8_t *rom = memregion( "maincpu" )->base();
-	subsino_decrypt(rom, victor5_bitswaps, victor5_xors, 0xc000);
-
-	// this trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region...
-	rom[0x64c8] = 0x00;
-	rom[0x64c9] = 0x00;
-	rom[0x64ca] = 0x00;
-	rom[0x64cd] = 0x00;
-	rom[0x64ce] = 0x00;
-	rom[0x64cf] = 0x00;
-}
-
-void subsino_state::init_tisuba()
-{
-	uint8_t *rom = memregion( "maincpu" )->base();
-	subsino_decrypt(rom, victor5_bitswaps, victor5_xors, 0xc000);
-
-	// this trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region...
-	rom[0x6491] = 0x00;
-	rom[0x6492] = 0x00;
-	rom[0x6493] = 0x00;
-	rom[0x6496] = 0x00;
-	rom[0x6497] = 0x00;
-	rom[0x6498] = 0x00;
+	uint8_t *rom = memregion( "program" )->base() + 0x4000;
+	subsino_decrypt(rom, victor5_bitswaps, victor5_xors, 0x8000);
 }
 
 void subsino_state::init_tisubb()
 {
-	uint8_t *rom = memregion( "maincpu" )->base();
-	subsino_decrypt(rom, tisubb_bitswaps, tisubb_xors, 0xc000);
-
-	// this trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region...
-	rom[0x60da] = 0x00;
-	rom[0x60db] = 0x00;
-	rom[0x60dc] = 0x00;
-	rom[0x60df] = 0x00;
-	rom[0x60e0] = 0x00;
-	rom[0x60e1] = 0x00;
-
-	m_flash_packet = 0;
-	m_flash_packet_start = 0;
-	m_flash_val = 0;
-
-	save_item(NAME(m_flash_packet));
-	save_item(NAME(m_flash_packet_start));
-	save_item(NAME(m_flash_val));
-}
-
-void subsino_state::init_newhunter()
-{
-	uint8_t *rom = memregion( "maincpu" )->base();
-	subsino_decrypt(rom, tisubb_bitswaps, tisubb_xors, 0xc000);
-
-	// This trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region...
-	rom[0x5fe1] = 0x00;
-	rom[0x5fe2] = 0x00;
-	rom[0x5fe3] = 0x00;
-	rom[0x5fe6] = 0x00;
-	rom[0x5fe7] = 0x00;
-	rom[0x5fe8] = 0x00;
-
-	m_flash_packet = 0;
-	m_flash_packet_start = 0;
-	m_flash_val = 0;
-
-	save_item(NAME(m_flash_packet));
-	save_item(NAME(m_flash_packet_start));
-	save_item(NAME(m_flash_val));
+	uint8_t *rom = memregion( "program" )->base() + 0x4000;
+	subsino_decrypt(rom, tisubb_bitswaps, tisubb_xors, 0x8000);
 }
 
 void subsino_state::init_newhunterb()
 {
-	uint8_t *rom = memregion( "maincpu" )->base();
-	subsino_decrypt(rom, tisubb_bitswaps, tisubb_xors, 0xc000);
-
-	// This trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region...
-	rom[0x671c] = 0x00;
-	rom[0x671d] = 0x00;
-	rom[0x671e] = 0x00;
-	rom[0x6721] = 0x00;
-	rom[0x6722] = 0x00;
-	rom[0x6723] = 0x00;
+	uint8_t *rom = memregion( "program" )->base() + 0x6000;
+	subsino_decrypt(rom, tisubb_bitswaps, tisubb_xors, 0x8000);
 }
 
 void subsino_state::init_stbsub()
@@ -4234,9 +4211,9 @@ GAMEL( 1991, victor5,     0,       victor5,    victor5,  subsino_state, init_vic
 GAMEL( 1991, victor5a,    victor5, victor5,    victor5,  subsino_state, init_victor5,     ROT0, "Subsino",         "G.E.A.",                                      0,                   layout_victor5  ) // PCB black-box was marked 'victor 5' - in-game says G.E.A with no manufacturer info?
 
 GAMEL( 1992, tisub,       0,       tisub,      tisub,    subsino_state, init_tisub,       ROT0, "Subsino",         "Treasure Island (Subsino, set 1)",            0,                   layout_tisub    )
-GAMEL( 1992, tisuba,      tisub,   tisub,      tisub,    subsino_state, init_tisuba,      ROT0, "Subsino",         "Treasure Island (Subsino, set 2)",            0,                   layout_tisub    )
+GAMEL( 1992, tisuba,      tisub,   tisub,      tisub,    subsino_state, init_tisub,       ROT0, "Subsino",         "Treasure Island (Subsino, set 2)",            0,                   layout_tisub    )
 GAMEL( 1992, tisubb,      tisub,   tisub,      tisubb,   subsino_state, init_tisubb,      ROT0, "American Alpha",  "Treasure Island (American Alpha, v3.0N)",     0,                   layout_tisubb   )
-GAMEL( 1992, newhunter,   tisub,   tisub,      tisub,    subsino_state, init_newhunter,   ROT0, "Karam",           "New HUNTer",                                  0,                   layout_tisubb   ) // 1989 on screen, but this bootleg is from 1992
+GAMEL( 1992, newhunter,   tisub,   tisub,      tisub,    subsino_state, init_tisubb,      ROT0, "Karam",           "New HUNTer",                                  0,                   layout_tisubb   ) // 1989 on screen, but this bootleg is from 1992
 GAMEL( 1993, newhunterb,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterb,  ROT0, "bootleg",         "New HUNTer (bootleg)",                        0,                   layout_tisubb   )
 
 GAMEL( 1991, crsbingo,    0,       crsbingo,   crsbingo, subsino_state, init_crsbingo,    ROT0, "Subsino",         "Poker Carnival",                              0,                   layout_crsbingo )
