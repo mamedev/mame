@@ -8790,7 +8790,7 @@ void goldstar_state::super9(machine_config &config)
 	aysnd.port_b_read_callback().set_ioport("DSW3");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	OKIM6295(config, "oki", OKI_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* clock frequency & pin 7 not verified */
+	OKIM6295(config, "oki", 1_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* pin 7 not verified */
 }
 
 
@@ -10308,6 +10308,31 @@ ROM_START( super9 )
 	ROM_LOAD( "27c1001.27",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
 ROM_END
 
+// on a very tiny PCB with only PLAYMARK s.r.l. ITALY and no PCB code
+// has Z0840006PSC with 12 MHz XTAL + ACTEL A40MX04 + U6295 1000J resonator + 5x 8-dip banks
+// basically same as above but has strings for Euro instead of Lire and some routine changed, possibly to remove bet limit
+ROM_START( super9a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27e010.30", 0x0000, 0x10000, CRC(986a9439) SHA1(c877379c6d2b283d209ec5abea4a5a542b934436) )
+	ROM_IGNORE(                    0x10000)   /* Discarding 2nd half */
+//  ROM_LOAD( "27e010.30", 0x0000, 0x10000, CRC(986a9439) SHA1(c877379c6d2b283d209ec5abea4a5a542b934436) )
+//  ROM_CONTINUE(          0x0000, 0x10000)   /* Discarding 1st half */
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "27e010.28", 0x00000, 0x20000, CRC(643cff6f) SHA1(305ca9182c3f6d69e09be38b854b3d7bdfa75439) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "27e010.29",      0x00000, 0x08000, CRC(5ea46322) SHA1(147078689f0194affcdcf0e8f8e17fe8a113a377) )
+	ROM_CONTINUE( 0x0000, 0x08000) // Discarding 1nd quarter 0xff filled
+	ROM_CONTINUE( 0x0000, 0x08000) // Discarding 2nd quarter 0xff filled
+	ROM_CONTINUE( 0x0000, 0x08000) // Discarding 3nd quarter 0xff filled
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Audio ADPCM */
+	ROM_LOAD( "27c1001.27", 0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
+
+	ROM_REGION( 0x2dd, "pld", 0 )
+	ROM_LOAD( "palce22v10", 0x000, 0x2dd, NO_DUMP )
+ROM_END
 
 ROM_START( ncb3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -19881,7 +19906,8 @@ GAME(  199?, moonlghtc, goldstar, moonlght, goldstar, goldstar_state, empty_init
 GAMEL( 199?, chrygld,   0,        chrygld,  chrygld,  cb3_state,      init_chrygld,   ROT0, "bootleg",           "Cherry Gold I (set 1)",                       0,                 layout_chrygld )
 GAMEL( 199?, chry10,    0,        chrygld,  chry10,   cb3_state,      init_chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0,                 layout_chrygld )
 GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, goldstar_state, empty_init,     ROT0, "bootleg",           "Gold Fruit",                                  0 )                  // maybe fullname should be 'Gold Fruit (main 40%)'
-GAME(  2001, super9,    goldstar, super9,   goldstar, goldstar_state, init_super9,    ROT0, "Playmark",          "Super Nove (Playmark)",                       MACHINE_NOT_WORKING )   // need to decode gfx and see the program loops/reset...
+GAME(  2001, super9,    goldstar, super9,   goldstar, goldstar_state, init_super9,    ROT0, "Playmark",          "Super Nove (Playmark, Lire currency)",        MACHINE_NOT_WORKING )   // need to decode gfx and see the program loops/reset...
+GAME(  2001, super9a,   goldstar, super9,   goldstar, goldstar_state, init_super9,    ROT0, "Playmark",          "Super Nove (Playmark, Euro currency)",        MACHINE_NOT_WORKING )   // need to decode gfx and see the program loops/reset...
 GAME(  2001, wcherry,   0,        wcherry,  chrygld,  goldstar_state, init_wcherry,   ROT0, "bootleg",           "Win Cherry (ver 0.16 - 19990219)",            MACHINE_NOT_WORKING )
 GAME(  199?, star100,   0,        star100,  star100,  sanghopm_state, empty_init,     ROT0, "Sang Ho",           "Ming Xing 100 (Star 100)",                    MACHINE_IMPERFECT_COLORS )
 
