@@ -1227,8 +1227,6 @@ void subsino2_state::mtrain_base_map(address_map &map)
 	map(0x0f162, 0x0f162).w("ramdac", FUNC(ramdac_device::mask_w));
 	map(0x0f168, 0x0f168).w(FUNC(subsino2_state::mtrain_tilesize_w));
 
-	map(0x0f800, 0x0ffff).ram();
-
 	map(0x10000, 0x180ff).rom().region("program", 0);
 }
 

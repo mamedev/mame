@@ -842,7 +842,6 @@ void subsino_state::sharkpy_map(address_map &map)
 	map(0x0f016, 0x0f017).w("ymsnd", FUNC(ym3812_device::write));
 	map(0x0f018, 0x0f018).w("oki", FUNC(okim6295_device::write));
 	map(0x0f01b, 0x0f01b).w(FUNC(subsino_state::tiles_offset_w));
-	map(0x0f800, 0x0ffff).ram();
 	map(0x10000, 0x13fff).rom().region("program", 0);
 }
 
@@ -868,7 +867,6 @@ void subsino_state::victor21_map(address_map &map)
 	map(0x0f00c, 0x0f00c).w("oki", FUNC(okim6295_device::write));
 	map(0x0f00e, 0x0f00f).w("ymsnd", FUNC(ym2413_device::write));
 	map(0x0f00d, 0x0f00d).w(FUNC(subsino_state::tiles_offset_w));
-	map(0x0f800, 0x0ffff).ram();
 	map(0x10000, 0x13fff).rom().region("program", 0);
 }
 
@@ -942,8 +940,9 @@ uint8_t subsino_state::hwcheck_r()
 void subsino_state::crsbingo_map(address_map &map)
 {
 	map(0x06000, 0x0d7ff).rom().region("program", 0x4000);
-
-	map(0x0f800, 0x0ffff).ram();
+	map(0x0d800, 0x0dfff).ram();
+	map(0x0e000, 0x0e7ff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x0e800, 0x0efff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
 
 	map(0x0f000, 0x0f000).portr("SW1");
 	map(0x0f001, 0x0f001).portr("SW2");
@@ -965,12 +964,7 @@ void subsino_state::crsbingo_map(address_map &map)
 
 //  map(0x0f00d, 0x0f00d).w(FUNC(subsino_state::tiles_offset_w));
 
-	map(0x0d800, 0x0dfff).ram();
-	map(0x0e000, 0x0e7ff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
-	map(0x0e800, 0x0efff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
-
 	map(0x10000, 0x13fff).rom().region("program", 0); //overlap unmapped regions
-
 }
 
 uint8_t subsino_state::out_c_r()
@@ -1002,7 +996,6 @@ void subsino_state::tisub_base_map(address_map &map)
 	map(0x0f008, 0x0f008).rw(FUNC(subsino_state::out_c_r), FUNC(subsino_state::out_c_w));
 	map(0x0f009, 0x0f009).w(FUNC(subsino_state::out_b_w));
 	map(0x0f00a, 0x0f00a).w(FUNC(subsino_state::out_a_w));
-	map(0x0f800, 0x0ffff).ram();
 	map(0x10000, 0x13fff).rom().region("program", 0);
 	map(0x1e0c0, 0x1e0ff).ram().share("reel_scroll.2");
 	map(0x1e140, 0x1e17f).ram().share("reel_scroll.1");
