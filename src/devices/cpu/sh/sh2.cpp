@@ -197,7 +197,7 @@ void sh2_device::check_pending_irq(const char *message)
 				irq = external_irq;
 			}
 		}
-		
+
 		if (irq >= 0)
 		{
 			sh2_exception(message, irq);

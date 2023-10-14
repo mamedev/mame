@@ -384,23 +384,23 @@ void sh3_base_device::sh3_internal_w(offs_t offset, uint32_t data, uint32_t mem_
 
 		switch (offset)
 		{
-			case SH3_SAR0_ADDR: sh4_handle_sar0_addr_w(data, mem_mask);			break;
-			case SH3_SAR1_ADDR: sh4_handle_sar1_addr_w(data, mem_mask);			break;
-			case SH3_SAR2_ADDR: sh4_handle_sar2_addr_w(data, mem_mask);			break;
-			case SH3_SAR3_ADDR: sh4_handle_sar3_addr_w(data, mem_mask);			break;
-			case SH3_DAR0_ADDR: sh4_handle_dar0_addr_w(data, mem_mask);			break;
-			case SH3_DAR1_ADDR: sh4_handle_dar1_addr_w(data, mem_mask);			break;
-			case SH3_DAR2_ADDR: sh4_handle_dar2_addr_w(data, mem_mask);			break;
-			case SH3_DAR3_ADDR: sh4_handle_dar3_addr_w(data, mem_mask);			break;
-			case SH3_DMATCR0_ADDR: sh4_handle_dmatcr0_addr_w(data, mem_mask);	break;
-			case SH3_DMATCR1_ADDR: sh4_handle_dmatcr1_addr_w(data, mem_mask);	break;
-			case SH3_DMATCR2_ADDR: sh4_handle_dmatcr2_addr_w(data, mem_mask);	break;
-			case SH3_DMATCR3_ADDR: sh4_handle_dmatcr3_addr_w(data, mem_mask);	break;
-			case SH3_CHCR0_ADDR: sh4_handle_chcr0_addr_w(data, mem_mask);		break;
-			case SH3_CHCR1_ADDR: sh4_handle_chcr1_addr_w(data, mem_mask);		break;
-			case SH3_CHCR2_ADDR: sh4_handle_chcr2_addr_w(data, mem_mask);		break;
-			case SH3_CHCR3_ADDR: sh4_handle_chcr3_addr_w(data, mem_mask);		break;
-			case SH3_DMAOR_ADDR: sh4_handle_dmaor_addr_w(data >> 16, mem_mask >> 16);	break;
+			case SH3_SAR0_ADDR: sh4_handle_sar0_addr_w(data, mem_mask);         break;
+			case SH3_SAR1_ADDR: sh4_handle_sar1_addr_w(data, mem_mask);         break;
+			case SH3_SAR2_ADDR: sh4_handle_sar2_addr_w(data, mem_mask);         break;
+			case SH3_SAR3_ADDR: sh4_handle_sar3_addr_w(data, mem_mask);         break;
+			case SH3_DAR0_ADDR: sh4_handle_dar0_addr_w(data, mem_mask);         break;
+			case SH3_DAR1_ADDR: sh4_handle_dar1_addr_w(data, mem_mask);         break;
+			case SH3_DAR2_ADDR: sh4_handle_dar2_addr_w(data, mem_mask);         break;
+			case SH3_DAR3_ADDR: sh4_handle_dar3_addr_w(data, mem_mask);         break;
+			case SH3_DMATCR0_ADDR: sh4_handle_dmatcr0_addr_w(data, mem_mask);   break;
+			case SH3_DMATCR1_ADDR: sh4_handle_dmatcr1_addr_w(data, mem_mask);   break;
+			case SH3_DMATCR2_ADDR: sh4_handle_dmatcr2_addr_w(data, mem_mask);   break;
+			case SH3_DMATCR3_ADDR: sh4_handle_dmatcr3_addr_w(data, mem_mask);   break;
+			case SH3_CHCR0_ADDR: sh4_handle_chcr0_addr_w(data, mem_mask);       break;
+			case SH3_CHCR1_ADDR: sh4_handle_chcr1_addr_w(data, mem_mask);       break;
+			case SH3_CHCR2_ADDR: sh4_handle_chcr2_addr_w(data, mem_mask);       break;
+			case SH3_CHCR3_ADDR: sh4_handle_chcr3_addr_w(data, mem_mask);       break;
+			case SH3_DMAOR_ADDR: sh4_handle_dmaor_addr_w(data >> 16, mem_mask >> 16);   break;
 
 
 			case IRR0_IRR1:

@@ -22,31 +22,31 @@ static const int daysmonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 3
 
 
 static const uint32_t exception_priority_default[] = {
-	EXPPRI(1, 1, 0, 0),			/* Power-on Reset */
-	EXPPRI(1, 2, 0, 1),			/* Manual Reset */
-	EXPPRI(1, 1, 0, 2),			/* H-UDI Reset */
-	EXPPRI(1, 3, 0, 3),			/* Inst TLB Multiple Hit */
-	EXPPRI(1, 4, 0, 4),			/* Data TLB Multiple Hit */
+	EXPPRI(1, 1, 0, 0),         /* Power-on Reset */
+	EXPPRI(1, 2, 0, 1),         /* Manual Reset */
+	EXPPRI(1, 1, 0, 2),         /* H-UDI Reset */
+	EXPPRI(1, 3, 0, 3),         /* Inst TLB Multiple Hit */
+	EXPPRI(1, 4, 0, 4),         /* Data TLB Multiple Hit */
 
-	EXPPRI(2, 0, 0, 5),			/* User break Before Instruction */
-	EXPPRI(2, 1, 0, 6),			/* Inst Address Error */
-	EXPPRI(2, 2, 0, 7),			/* Inst TLB Miss */
-	EXPPRI(2, 3, 0, 8),			/* Inst TLB Protection Violation */
-	EXPPRI(2, 4, 0, 9),			/* Illegal Instruction */
-	EXPPRI(2, 4, 0, 10),		/* Slot Illegal Instruction */
-	EXPPRI(2, 4, 0, 11),		/* FPU Disable */
-	EXPPRI(2, 4, 0, 12),		/* Slot FPU Disable */
-	EXPPRI(2, 5, 0, 13),		/* Data Address Error (Read) */
-	EXPPRI(2, 5, 0, 14),		/* Data Address Error (Write) */
-	EXPPRI(2, 6, 0, 15),		/* Data TBL Miss Read */
-	EXPPRI(2, 6, 0, 16),		/* Data TBL Miss Write */
-	EXPPRI(2, 7, 0, 17),		/* Data TBL Protection Violation Read */
-	EXPPRI(2, 7, 0, 18),		/* Data TBL Protection Violation Write */
-	EXPPRI(2, 8, 0, 19),		/* FPU Exception */
-	EXPPRI(2, 9, 0, 20),		/* Initial Page Write exception */
+	EXPPRI(2, 0, 0, 5),         /* User break Before Instruction */
+	EXPPRI(2, 1, 0, 6),         /* Inst Address Error */
+	EXPPRI(2, 2, 0, 7),         /* Inst TLB Miss */
+	EXPPRI(2, 3, 0, 8),         /* Inst TLB Protection Violation */
+	EXPPRI(2, 4, 0, 9),         /* Illegal Instruction */
+	EXPPRI(2, 4, 0, 10),        /* Slot Illegal Instruction */
+	EXPPRI(2, 4, 0, 11),        /* FPU Disable */
+	EXPPRI(2, 4, 0, 12),        /* Slot FPU Disable */
+	EXPPRI(2, 5, 0, 13),        /* Data Address Error (Read) */
+	EXPPRI(2, 5, 0, 14),        /* Data Address Error (Write) */
+	EXPPRI(2, 6, 0, 15),        /* Data TBL Miss Read */
+	EXPPRI(2, 6, 0, 16),        /* Data TBL Miss Write */
+	EXPPRI(2, 7, 0, 17),        /* Data TBL Protection Violation Read */
+	EXPPRI(2, 7, 0, 18),        /* Data TBL Protection Violation Write */
+	EXPPRI(2, 8, 0, 19),        /* FPU Exception */
+	EXPPRI(2, 9, 0, 20),        /* Initial Page Write exception */
 
-	EXPPRI(2, 4, 0, 21),		/* Unconditional TRAP */
-	EXPPRI(2, 10, 0, 22),		/* User break After Instruction */
+	EXPPRI(2, 4, 0, 21),        /* Unconditional TRAP */
+	EXPPRI(2, 10, 0, 22),       /* User break After Instruction */
 
 	EXPPRI(3, 0, 16, SH4_INTC_NMI) /* NMI */
 	/* This is copied to a table, and the IRQ priorities filled in later */
@@ -785,7 +785,7 @@ void sh4_base_device::sh4_internal_w(offs_t offset, uint32_t data, uint32_t mem_
 		if ((old >> 3) & 7)
 			m_m[RTCNT] = compute_ticks_refresh_timer(m_refresh_timer, m_bus_clock, m_refresh_timer_base, rtcnt_div[(old >> 3) & 7]) & 0xff;
 		if ((m_m[RTCSR] >> 3) & 7)
-		{	// activated
+		{   // activated
 			sh4_refresh_timer_recompute();
 		}
 		else
@@ -797,7 +797,7 @@ void sh4_base_device::sh4_internal_w(offs_t offset, uint32_t data, uint32_t mem_
 	case RTCNT:
 		m_m[RTCNT] &= 255;
 		if ((m_m[RTCSR] >> 3) & 7)
-		{	// active
+		{   // active
 			sh4_refresh_timer_recompute();
 		}
 		break;
@@ -805,7 +805,7 @@ void sh4_base_device::sh4_internal_w(offs_t offset, uint32_t data, uint32_t mem_
 	case RTCOR:
 		m_m[RTCOR] &= 255;
 		if ((m_m[RTCSR] >> 3) & 7)
-		{	// active
+		{   // active
 			m_m[RTCNT] = compute_ticks_refresh_timer(m_refresh_timer, m_bus_clock, m_refresh_timer_base, rtcnt_div[(m_m[RTCSR] >> 3) & 7]) & 0xff;
 			sh4_refresh_timer_recompute();
 		}
@@ -835,11 +835,11 @@ void sh4_base_device::sh4_internal_w(offs_t offset, uint32_t data, uint32_t mem_
 			m_m[RSECCNT] = 0;
 		}
 		if ((m_m[RCR2] & 8) && (~old & 8))
-		{	// 0 -> 1
+		{   // 0 -> 1
 			m_rtc_timer->adjust(attotime::from_hz(128));
 		}
 		else if (~m_m[RCR2] & 8)
-		{	// 0
+		{   // 0
 			m_rtc_timer->adjust(attotime::never);
 		}
 		break;
@@ -893,23 +893,23 @@ void sh4_base_device::sh4_internal_w(offs_t offset, uint32_t data, uint32_t mem_
 /*********************************************************************************************************************
         DMAC (DMA Controller)
 *********************************************************************************************************************/
-	case SH4_SAR0_ADDR: sh4_handle_sar0_addr_w(data, mem_mask);			break;
-	case SH4_SAR1_ADDR: sh4_handle_sar1_addr_w(data, mem_mask);			break;
-	case SH4_SAR2_ADDR: sh4_handle_sar2_addr_w(data, mem_mask);			break;
-	case SH4_SAR3_ADDR: sh4_handle_sar3_addr_w(data, mem_mask);			break;
-	case SH4_DAR0_ADDR: sh4_handle_dar0_addr_w(data, mem_mask);			break;
-	case SH4_DAR1_ADDR: sh4_handle_dar1_addr_w(data, mem_mask);			break;
-	case SH4_DAR2_ADDR: sh4_handle_dar2_addr_w(data, mem_mask);			break;
-	case SH4_DAR3_ADDR: sh4_handle_dar3_addr_w(data, mem_mask);			break;
-	case SH4_DMATCR0_ADDR: sh4_handle_dmatcr0_addr_w(data, mem_mask);	break;
-	case SH4_DMATCR1_ADDR: sh4_handle_dmatcr1_addr_w(data, mem_mask);	break;
-	case SH4_DMATCR2_ADDR: sh4_handle_dmatcr2_addr_w(data, mem_mask);	break;
-	case SH4_DMATCR3_ADDR: sh4_handle_dmatcr3_addr_w(data, mem_mask);	break;
-	case SH4_CHCR0_ADDR: sh4_handle_chcr0_addr_w(data, mem_mask);		break;
-	case SH4_CHCR1_ADDR: sh4_handle_chcr1_addr_w(data, mem_mask);		break;
-	case SH4_CHCR2_ADDR: sh4_handle_chcr2_addr_w(data, mem_mask);		break;
-	case SH4_CHCR3_ADDR: sh4_handle_chcr3_addr_w(data, mem_mask);		break;
-	case SH4_DMAOR_ADDR: sh4_handle_dmaor_addr_w(data, mem_mask);		break;
+	case SH4_SAR0_ADDR: sh4_handle_sar0_addr_w(data, mem_mask);         break;
+	case SH4_SAR1_ADDR: sh4_handle_sar1_addr_w(data, mem_mask);         break;
+	case SH4_SAR2_ADDR: sh4_handle_sar2_addr_w(data, mem_mask);         break;
+	case SH4_SAR3_ADDR: sh4_handle_sar3_addr_w(data, mem_mask);         break;
+	case SH4_DAR0_ADDR: sh4_handle_dar0_addr_w(data, mem_mask);         break;
+	case SH4_DAR1_ADDR: sh4_handle_dar1_addr_w(data, mem_mask);         break;
+	case SH4_DAR2_ADDR: sh4_handle_dar2_addr_w(data, mem_mask);         break;
+	case SH4_DAR3_ADDR: sh4_handle_dar3_addr_w(data, mem_mask);         break;
+	case SH4_DMATCR0_ADDR: sh4_handle_dmatcr0_addr_w(data, mem_mask);   break;
+	case SH4_DMATCR1_ADDR: sh4_handle_dmatcr1_addr_w(data, mem_mask);   break;
+	case SH4_DMATCR2_ADDR: sh4_handle_dmatcr2_addr_w(data, mem_mask);   break;
+	case SH4_DMATCR3_ADDR: sh4_handle_dmatcr3_addr_w(data, mem_mask);   break;
+	case SH4_CHCR0_ADDR: sh4_handle_chcr0_addr_w(data, mem_mask);       break;
+	case SH4_CHCR1_ADDR: sh4_handle_chcr1_addr_w(data, mem_mask);       break;
+	case SH4_CHCR2_ADDR: sh4_handle_chcr2_addr_w(data, mem_mask);       break;
+	case SH4_CHCR3_ADDR: sh4_handle_chcr3_addr_w(data, mem_mask);       break;
+	case SH4_DMAOR_ADDR: sh4_handle_dmaor_addr_w(data, mem_mask);       break;
 /*********************************************************************************************************************
         Store Queues
 *********************************************************************************************************************/

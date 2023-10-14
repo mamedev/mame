@@ -11,34 +11,34 @@
 #include "sh7021.h"
 #include "sh_dasm.h"
 
-#define LOG_INTC_RD	(1u << 1)
-#define LOG_INTC_WR	(1u << 2)
-#define LOG_UBC_RD	(1u << 3)
-#define LOG_UBC_WR	(1u << 4)
-#define LOG_BSC_RD	(1u << 5)
-#define LOG_BSC_WR	(1u << 6)
-#define LOG_DMA_RD	(1u << 7)
-#define LOG_DMA_WR	(1u << 8)
-#define LOG_ITU_RD	(1u << 9)
-#define LOG_ITU_WR	(1u << 10)
-#define LOG_TPC_RD	(1u << 11)
-#define LOG_TPC_WR	(1u << 12)
-#define LOG_WDT_RD	(1u << 13)
-#define LOG_WDT_WR	(1u << 14)
-#define LOG_SCI_RD	(1u << 15)
-#define LOG_SCI_WR	(1u << 16)
-#define LOG_PFC_RD	(1u << 17)
-#define LOG_PFC_WR	(1u << 18)
-#define LOG_INTC	(LOG_INTC_RD | LOG_INTC_WR)
-#define LOG_UBC		(LOG_UBC_RD | LOG_UBC_WR)
-#define LOG_BSC		(LOG_BSC_RD | LOG_BSC_WR)
-#define LOG_DMA		(LOG_DMA_RD | LOG_DMA_WR)
-#define LOG_ITU		(LOG_ITU_RD | LOG_ITU_WR)
-#define LOG_TPC		(LOG_TPC_RD | LOG_TPC_WR)
-#define LOG_WDT		(LOG_WDT_RD | LOG_WDT_WR)
-#define LOG_SCI		(LOG_SCI_RD | LOG_SCI_WR)
-#define LOG_PFC		(LOG_PFC_RD | LOG_PFC_WR)
-#define LOG_ALL		(LOG_INTC | LOG_UBC | LOG_BSC | LOG_DMA | LOG_ITU | LOG_TPC | LOG_WDT | LOG_SCI | LOG_PFC)
+#define LOG_INTC_RD (1u << 1)
+#define LOG_INTC_WR (1u << 2)
+#define LOG_UBC_RD  (1u << 3)
+#define LOG_UBC_WR  (1u << 4)
+#define LOG_BSC_RD  (1u << 5)
+#define LOG_BSC_WR  (1u << 6)
+#define LOG_DMA_RD  (1u << 7)
+#define LOG_DMA_WR  (1u << 8)
+#define LOG_ITU_RD  (1u << 9)
+#define LOG_ITU_WR  (1u << 10)
+#define LOG_TPC_RD  (1u << 11)
+#define LOG_TPC_WR  (1u << 12)
+#define LOG_WDT_RD  (1u << 13)
+#define LOG_WDT_WR  (1u << 14)
+#define LOG_SCI_RD  (1u << 15)
+#define LOG_SCI_WR  (1u << 16)
+#define LOG_PFC_RD  (1u << 17)
+#define LOG_PFC_WR  (1u << 18)
+#define LOG_INTC    (LOG_INTC_RD | LOG_INTC_WR)
+#define LOG_UBC     (LOG_UBC_RD | LOG_UBC_WR)
+#define LOG_BSC     (LOG_BSC_RD | LOG_BSC_WR)
+#define LOG_DMA     (LOG_DMA_RD | LOG_DMA_WR)
+#define LOG_ITU     (LOG_ITU_RD | LOG_ITU_WR)
+#define LOG_TPC     (LOG_TPC_RD | LOG_TPC_WR)
+#define LOG_WDT     (LOG_WDT_RD | LOG_WDT_WR)
+#define LOG_SCI     (LOG_SCI_RD | LOG_SCI_WR)
+#define LOG_PFC     (LOG_PFC_RD | LOG_PFC_WR)
+#define LOG_ALL     (LOG_INTC | LOG_UBC | LOG_BSC | LOG_DMA | LOG_ITU | LOG_TPC | LOG_WDT | LOG_SCI | LOG_PFC)
 
 #define VERBOSE (0)
 #include "logmacro.h"
@@ -524,7 +524,7 @@ void sh7021_device::write_word(offs_t offset, uint16_t data)
 	else if (area == 0 || area == 2)
 		m_sh2_state->icount -= ((m_bsc.wcr3 >> 13) & 3) + 1; // Consume cycles specified by A02LW
 
-    m_program->write_word(offset & m_am, data);
+	m_program->write_word(offset & m_am, data);
 }
 
 void sh7021_device::write_long(offs_t offset, uint32_t data)
@@ -1233,8 +1233,8 @@ void sh7021_device::start_timer(int i)
 
 	int prescale = 1 << (m_itu.timer[i].tcr & 3);
 
-//	printf("Starting timer %u: TCNT:%x GR:%x TCR:%x TI:%x TICK:%f\n", i, m_itu.timer[i].tcnt, m_itu.timer[i].gra, m_itu.timer[i].tcr & 7, m_itu.timer[i].tier, (double)clock()/psc);
-//	printf("%d\n", clock());
+//  printf("Starting timer %u: TCNT:%x GR:%x TCR:%x TI:%x TICK:%f\n", i, m_itu.timer[i].tcnt, m_itu.timer[i].gra, m_itu.timer[i].tcr & 7, m_itu.timer[i].tier, (double)clock()/psc);
+//  printf("%d\n", clock());
 	LOGMASKED(LOG_ITU_WR, "Starting Timer %d, prescale %d, clock %d, current count %04x\n", i, prescale, clock(), m_itu.timer[i].tcnt);
 	attotime period = attotime::from_ticks(prescale, clock());
 	m_itu.timer[i].et->adjust(period, i, period);

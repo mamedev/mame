@@ -18,9 +18,9 @@
 #define VERBOSE (0)
 #include "logmacro.h"
 
-#define EXPPRI(pl, po, p, n)	(((4 - (pl)) << 24) | ((15 - (po)) << 16) | ((p) << 8) | (255 - (n)))
-#define NMIPRI()            	EXPPRI(3, 0, 16, SH4_INTC_NMI)
-#define INTPRI(p, n)         	EXPPRI(4, 2, p, n)
+#define EXPPRI(pl, po, p, n)    (((4 - (pl)) << 24) | ((15 - (po)) << 16) | ((p) << 8) | (255 - (n)))
+#define NMIPRI()                EXPPRI(3, 0, 16, SH4_INTC_NMI)
+#define INTPRI(p, n)            EXPPRI(4, 2, p, n)
 
 #define FP_RS(r) m_sh2_state->m_fr[(r)] // binary representation of single precision floating point register r
 #define FP_RFS(r) *( (float  *)(m_sh2_state->m_fr + (r)) ) // single precision floating point register r

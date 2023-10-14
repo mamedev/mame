@@ -233,12 +233,12 @@ protected:
 	// DMA Controller (DMAC)
 	struct
 	{
-		uint32_t sar = 0;	// Source Address Register
-		uint32_t dar = 0;	// Destination Address Register
-		uint16_t tcr = 0;	// Transfer Count Register
-		uint16_t chcr = 0;	// Channel Control Register
+		uint32_t sar = 0;   // Source Address Register
+		uint32_t dar = 0;   // Destination Address Register
+		uint16_t tcr = 0;   // Transfer Count Register
+		uint16_t chcr = 0;  // Channel Control Register
 	} m_dma[4];
-	uint16_t m_dmaor = 0;	// DMA Operation Register (status flags)
+	uint16_t m_dmaor = 0;   // DMA Operation Register (status flags)
 	int m_dma_cycles;
 
 	// 16-Bit Integrated-Timer Pulse Unit (ITU)
