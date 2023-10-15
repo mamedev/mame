@@ -6,7 +6,7 @@ Used for coin pushers
 
 Hardware:
 GSDRA PWB(A2) 0000327125 Cougar (with 378 117 11119970 sticker)
-* 6417751A SH-4 BP240 (7751R with PCI controller) CPU SoC with 20.000 MHz and 32.768 KHz XTALs nearby
+* 6417751R SH-4 BP240 (7751R with PCI controller) CPU SoC with 20.000 MHz and 32.768 KHz XTALs nearby
 * SiS 315 VGA/AGP
 * 2x 48LC8M16A2 128Mb SDRAM (near SH-4)
 * 8x 48LC8M16A2 128Mb SDRAM (near SiS 315)
