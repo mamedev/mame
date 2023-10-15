@@ -378,7 +378,7 @@ ROM_END
 // VTech PCB 35-10100-01
 ROM_START( pcompelr )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD( "hc05_internal.bin", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "hc05_internal.u8", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x2000, "speech", 0 )
 	ROM_LOAD( "speech.u7", 0x0000, 0x2000, NO_DUMP ) // Labeled "930 0AF21FK / VTECH / ©YY 04044"
