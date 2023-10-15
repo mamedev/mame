@@ -19805,6 +19805,7 @@ ss2001                          // bootleg / hack
 star100                         // (c) 199? Sang Ho
 super7                          // bootleg (New Impeuropex?)
 super9                          // (c) 2001 Playmark
+super9a                         // (c) 2001 Playmark
 super972                        // unknown
 tcl                             // (c) 1995 Uniwang
 tonypok                         // (c) 1991 Corsica
@@ -26722,7 +26723,8 @@ trvwz3a                         // (c) 1985 Merit
 trvwz3b                         // (c) 1985 Merit
 trvwz3v                         // (c) 1985 Merit
 trvwz4                          // (c) 1985 Merit
-trvwz4a                         // (c) 1985 Merit
+trvwz4v                         // (c) 1985 Merit
+trvwz4va                        // (c) 1985 Merit
 trvwza                          // (c) 1985 Merit
 trvwzb                          // (c) 1985 Merit
 trvwzv                          // (c) 1985 Merit
@@ -29672,6 +29674,7 @@ gambl186a                       // EGD
 gambl186b                       // EGD
 gambl186c                       // EGD
 gambl186d                       // EGD
+gambl186e                       // EGD
 
 @source:misc/gamemasters.cpp
 gmsshoot                        // (c) 1989 GameMasters
@@ -30277,6 +30280,7 @@ millsun                         // (c) 200? unknown
 mnumitg                         // (c) 200? unknown
 ntcash                          // (c) 1999 unknown
 pirati                          // (c) 2001 Cin
+smcard                          // (c) 200? unknown
 sspac2k1                        // (c) 200? unknown
 sstar                           // (c) 200? unknown
 te0144                          // (c) 2001 unknown

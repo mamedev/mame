@@ -60,7 +60,7 @@ by the otherwise seemingly unnecessary internal ROMs.
 
 #include "cpu/h8/h83048.h"
 #include "cpu/i86/i186.h"
-#include "cpu/z180/z180.h"
+#include "cpu/z180/hd647180x.h"
 #include "machine/ds2430a.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
@@ -1209,39 +1209,37 @@ void subsino2_state::mtrain_tilesize_w(uint8_t data)
 
 void subsino2_state::mtrain_base_map(address_map &map)
 {
-	map(0x00000, 0x077ff).rom();
+	map(0x06000, 0x0d7ff).rom().region("program", 0x8100);
 
-	map(0x07800, 0x07fff).ram().share("nvram");   // battery
+	map(0x0d800, 0x0dfff).ram().share("nvram");   // battery
 
-	map(0x08000, 0x08fff).w(FUNC(subsino2_state::mtrain_videoram_w));
+	map(0x0e000, 0x0efff).w(FUNC(subsino2_state::mtrain_videoram_w));
 
-	map(0x0911f, 0x0911f).w(FUNC(subsino2_state::ss9601_disable_w));
-	map(0x09120, 0x09125).w(FUNC(subsino2_state::ss9601_scroll_w));
+	map(0x0f11f, 0x0f11f).w(FUNC(subsino2_state::ss9601_disable_w));
+	map(0x0f120, 0x0f125).w(FUNC(subsino2_state::ss9601_scroll_w));
 
-	map(0x0912f, 0x0912f).w(FUNC(subsino2_state::ss9601_byte_lo_w));
+	map(0x0f12f, 0x0f12f).w(FUNC(subsino2_state::ss9601_byte_lo_w));
 
-	map(0x09140, 0x0915f).rw("io", FUNC(ss9602_device::read), FUNC(ss9602_device::write));
+	map(0x0f140, 0x0f15f).rw("io", FUNC(ss9602_device::read), FUNC(ss9602_device::write));
 
-	map(0x09160, 0x09160).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x09161, 0x09161).w("ramdac", FUNC(ramdac_device::pal_w));
-	map(0x09162, 0x09162).w("ramdac", FUNC(ramdac_device::mask_w));
-	map(0x09168, 0x09168).w(FUNC(subsino2_state::mtrain_tilesize_w));
+	map(0x0f160, 0x0f160).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x0f161, 0x0f161).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x0f162, 0x0f162).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x0f168, 0x0f168).w(FUNC(subsino2_state::mtrain_tilesize_w));
 
-	map(0x09800, 0x09fff).ram();
-
-	map(0x0a000, 0x0ffff).rom();
+	map(0x10000, 0x180ff).rom().region("program", 0);
 }
 
 void subsino2_state::mtrain_map(address_map &map)
 {
 	mtrain_base_map(map);
-	map(0x09164, 0x09164).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x0f164, 0x0f164).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
 void subsino2_state::tbonusal_map(address_map &map)
 {
 	mtrain_base_map(map);
-	map(0x09166, 0x09167).w("ymsnd", FUNC(ym3812_device::write));
+	map(0x0f166, 0x0f167).w("ymsnd", FUNC(ym3812_device::write));
 }
 
 void subsino2_state::mtrain_io(address_map &map)
@@ -2845,7 +2843,7 @@ void subsino2_state::humlan(machine_config &config)
 
 void subsino2_state::mtrain(machine_config &config)
 {
-	Z80180(config, m_maincpu, XTAL(12'000'000));   /* Unknown clock */
+	HD647180X(config, m_maincpu, XTAL(12'000'000));   /* Unknown clock */
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::mtrain_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino2_state::mtrain_io);
 
@@ -3033,6 +3031,16 @@ void subsino2_state::expcard(machine_config &config)
 /***************************************************************************
                                 ROMs Loading
 ***************************************************************************/
+
+#define HD647180X_FAKE_INTERNAL_ROM \
+	ROM_FILL( 0x0000, 1, 0x3e ) \
+	ROM_FILL( 0x0001, 1, 0x09 ) \
+	ROM_FILL( 0x0002, 1, 0xed ) \
+	ROM_FILL( 0x0003, 1, 0x39 ) \
+	ROM_FILL( 0x0004, 1, 0x38 ) \
+	ROM_FILL( 0x0005, 1, 0xc3 ) \
+	ROM_FILL( 0x0006, 1, 0x16 ) \
+	ROM_FILL( 0x0007, 1, 0xf0 )
 
 /***************************************************************************
 
@@ -3513,11 +3521,12 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( mtrain )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
 	// code starts at 0x8100!
-	ROM_LOAD( "out_1v131.u17", 0x0000, 0x8100, CRC(6761be7f) SHA1(a492f8179d461a454516dde33ff04473d4cfbb27) )
-	ROM_CONTINUE(              0x0000, 0x7f00 )
-	ROM_RELOAD(                0xa000, 0x6000 )
+	ROM_LOAD( "out_1v131.u17", 0x00000, 0x10000, CRC(6761be7f) SHA1(a492f8179d461a454516dde33ff04473d4cfbb27) )
 
 	ROM_REGION( 0x100000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "rom_4.u02", 0x00000, 0x40000, CRC(b7e65d04) SHA1(5eea1b8c1129963b3b83a59410cd0e1de70621e4) )
@@ -3541,11 +3550,12 @@ ROM_START( mtrain )
 ROM_END
 
 ROM_START( strain )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
 	// code starts at 0x8100!
-	ROM_LOAD( "v1.9_27c512_u17.bin", 0x0000, 0x8100, CRC(36379ab2) SHA1(b48374f80ffa107a7ea3e08eb432259e443dc4a6) )
-	ROM_CONTINUE(              0x0000, 0x7f00 )
-	ROM_RELOAD(                0xa000, 0x6000 )
+	ROM_LOAD( "v1.9_27c512_u17.bin", 0x00000, 0x10000, CRC(36379ab2) SHA1(b48374f80ffa107a7ea3e08eb432259e443dc4a6) )
 
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "v1.0_mx27c4000_u2.bin", 0x00000, 0x80000, CRC(0b77b3be) SHA1(daf1180cabce3e1bbb9a8f91c02e0fe4f0fd811e) )
@@ -3583,17 +3593,18 @@ ROM_END
 
 void subsino2_state::init_mtrain()
 {
-	subsino_decrypt(memregion("maincpu")->base(), crsbingo_bitswaps, crsbingo_xors, 0x8000);
+	subsino_decrypt(memregion("program")->base() + 0x8100, crsbingo_bitswaps, crsbingo_xors, 0x7f00);
 }
 
 
 
 ROM_START( tbonusal )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x1a000, "program", 0 )
 	// code starts at 0x8100
-	ROM_LOAD( "n-alpha 1.6-u17.bin", 0x0000, 0x8100, CRC(1bdc1c92) SHA1(2cd7ec5a89865b76df2cfe9d18b2ab42923f8def) )
-	ROM_CONTINUE(              0x0000, 0x7f00 )
-	ROM_RELOAD(                0xa000, 0x6000 )
+	ROM_LOAD( "n-alpha 1.6-u17.bin", 0x00000, 0x10000, CRC(1bdc1c92) SHA1(2cd7ec5a89865b76df2cfe9d18b2ab42923f8def) )
 
 	// there is a clear HD647180X0FS6 on the PCB, but is it operating in external mode? there is a program rom above at least
 	// if the internal ROM is unused / irrelevant then this doesn't need to be marked
@@ -3618,7 +3629,7 @@ ROM_END
 
 void subsino2_state::init_tbonusal()
 {
-	subsino_decrypt(memregion("maincpu")->base(), sharkpy_bitswaps, sharkpy_xors, 0x8000);
+	subsino_decrypt(memregion("program")->base() + 0x8100, sharkpy_bitswaps, sharkpy_xors, 0x7f00);
 }
 
 /***************************************************************************
@@ -3890,11 +3901,12 @@ Same PCB as Magic Train
 ***************************************************************************/
 
 ROM_START( wtrnymph )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
 	// code starts at 0x8100!
-	ROM_LOAD( "ocean-n tetris_1 v1.4.u17", 0x0000, 0x8100, CRC(c7499123) SHA1(39a9ea6d927ee839cfb127747e5e3df3535af098) )
-	ROM_CONTINUE(                          0x0000, 0x7f00 )
-	ROM_RELOAD(                            0xa000, 0x6000 )
+	ROM_LOAD( "ocean-n tetris_1 v1.4.u17", 0x00000, 0x10000, CRC(c7499123) SHA1(39a9ea6d927ee839cfb127747e5e3df3535af098) )
 
 	ROM_REGION( 0x100000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "ocean-n tetris_2 v1.21.u2", 0x00000, 0x40000, CRC(813aac90) SHA1(4555adf8dc363359b10f1d5cfae2dcebed411679) )
@@ -3919,7 +3931,7 @@ ROM_END
 
 void subsino2_state::init_wtrnymph()
 {
-	subsino_decrypt(memregion("maincpu")->base(), victor5_bitswaps, victor5_xors, 0x8000);
+	subsino_decrypt(memregion("program")->base() + 0x8100, victor5_bitswaps, victor5_xors, 0x7f00);
 }
 
 GAME( 1996, mtrain,   0,        mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.31)",               0 )
