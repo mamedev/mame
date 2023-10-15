@@ -512,7 +512,7 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state::cart_load )
 void casloopy_state::casloopy(machine_config &config)
 {
 	/* basic machine hardware */
-	SH2A_SH7021(config, m_maincpu, 8000000);
+	SH7021(config, m_maincpu, 8000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &casloopy_state::casloopy_map);
 
 //  v60_device &subcpu(V60(config, "subcpu", 8000000));
