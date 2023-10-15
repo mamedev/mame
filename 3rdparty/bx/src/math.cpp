@@ -243,8 +243,11 @@ namespace bx
 
 	void mtxLookAt(float* _result, const Vec3& _eye, const Vec3& _at, const Vec3& _up, Handedness::Enum _handedness)
 	{
-		const Vec3 eye  = Handedness::Left == _handedness ? _eye : neg(_eye);
-		const Vec3 view = normalize(sub(_at, eye) );
+		const Vec3 view = normalize(
+			Handedness::Right == _handedness
+			? sub(_eye, _at)
+			: sub(_at, _eye)
+		);
 
 		Vec3 right = bx::InitNone;
 		Vec3 up    = bx::InitNone;
@@ -277,9 +280,9 @@ namespace bx
 		_result[10] = view.z;
 		_result[11] = 0.0f;
 
-		_result[12] = -dot(right, eye);
-		_result[13] = -dot(up,    eye);
-		_result[14] = -dot(view,  eye);
+		_result[12] = -dot(right, _eye);
+		_result[13] = -dot(up,    _eye);
+		_result[14] = -dot(view,  _eye);
 		_result[15] = 1.0f;
 	}
 
