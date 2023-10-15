@@ -10,6 +10,7 @@
 
 DECLARE_DEVICE_TYPE(MSX_CART_KONAMI,           msx_cart_interface)
 DECLARE_DEVICE_TYPE(MSX_CART_KONAMI_SCC,       msx_cart_interface)
+DECLARE_DEVICE_TYPE(MSX_CART_SUNRISE_SCC,      msx_cart_interface)
 DECLARE_DEVICE_TYPE(MSX_CART_GAMEMASTER2,      msx_cart_interface)
 DECLARE_DEVICE_TYPE(MSX_CART_SYNTHESIZER,      msx_cart_interface)
 DECLARE_DEVICE_TYPE(MSX_CART_SOUND_SNATCHER,   msx_cart_interface)
