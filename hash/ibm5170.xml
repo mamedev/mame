@@ -10172,6 +10172,7 @@ The disks have had their OEM IDs modified by Windows
 		<info name="copy_protection" value="Playing cards required" />
 		<info name="developer" value="Infogrames" />
 		<info name="language" value="German" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Alone in the Dark 2 (Germany) [Infogrames] [1993] [3.5HD] [Disk 1 of 9].img" size="1474560" crc="2a5c8e8d" sha1="33c50f3142c806c79845b0d928381ffa807ec186"/>
@@ -10226,6 +10227,7 @@ The disks have had their OEM IDs modified by Windows
 		<info name="copy_protection" value="Playing cards required" />
 		<info name="developer" value="Infogrames" />
 		<info name="language" value="English" />
+		<info name="region" value="USA" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Alone in the Dark 2 (USA) [I-Motion] [1994] [3.5HD] [Disk 1 of 9].img" size="1474560" crc="3b785f3b" sha1="e1a3743725394545fcc06c3e8291968461782c32"/>
@@ -10282,6 +10284,7 @@ This bonus cheat disk "Secret Doors" was included with later floppy releases of 
 This disk contains 6 packages of 6 saved games.
 ]]></notes>
 		<info name="developer" value="Infogrames" />
+		<info name="region" value="USA" />
 		<info name="usage" value="Requires 'Alone in the Dark 2 (USA)' previously installed" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -13268,6 +13271,8 @@ Prompts user to "press fire" but no correlated keyboard bind, requires unemulate
 		<year>1993</year>
 		<publisher>SSI</publisher>
 		<info name="developer" value="Strategic Simulations Inc" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -13481,6 +13486,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<publisher>Virgin Games</publisher>
 		<info name="copy_protection" value="Manual required (two checks during gameplay)" />
 		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="German" />
 		<info name="region" value="Germany" />
 		<info name="version" value="1.8" />
 		<part name="flop1" interface="floppy_3_5">
@@ -13546,6 +13552,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<publisher>Virgin Games</publisher>
 		<info name="copy_protection" value="Manual required (two checks during gameplay)" />
 		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="German" />
 		<info name="region" value="Germany" />
 		<info name="version" value="1.8" />
 		<part name="flop1" interface="floppy_5_25">
@@ -14314,6 +14321,8 @@ Bad Dump: the disks has an accessed file record and a modified OEM id
 		<year>1993</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Coktel Vision" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
 		<info name="version" value="0.50" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -14662,7 +14671,7 @@ Add-on for Harpoon II and update patch to version 2.1.11
 				<rom name="Harpoon II - BattleSet 3 - Cold War [Three-Sixty Pacific] [1995] [Disk 2 of 3].img" size="1474560" crc="67d62ab6" sha1="c9c7938a6e8687d51e119dc88acf7c79eeb2811a"/>
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
+		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Post WestPac Install Pacth" />
 			<dataarea name="flop" size = "1474560">
 				<rom name="Harpoon II - BattleSet 3 - Cold War [Three-Sixty Pacific] [1995] [Disk 3 of 3].img" size="1474560" crc="751cdf28" sha1="6da6c5ada50a348ee18334b4295cf376a1ac4b97"/>
@@ -16300,6 +16309,8 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		<publisher>Sierra On-Line</publisher>
 		<info name="alt_title" value="King's Quest VI: Heute Geerbt und Morgen Verschwunden" />
 		<info name="developer" value="Sierra On-Line" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
 		<info name="version" value="1.000" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -17374,6 +17385,8 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<publisher>LucasArts</publisher>
 		<info name="version" value="1.1" />
 		<info name="developer" value="LucasArts" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Day of the Tentacle (Germany) [LucasArts] [1993] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="2cb5fbef" sha1="7a1f6ec7d03eb1dbb1c675063686316a697db5e1"/>
@@ -17567,6 +17580,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<year>1992</year>
 		<publisher>Ubi Soft</publisher>
 		<info name="developer" value="Sensible Software" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="Mega Lo Mania (Germany) [Ubi Soft] [1992] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="1c61b8e7" sha1="3c932dbf8e30f31c7a23b46647bb3f6f27aaace4"/>
@@ -18049,8 +18063,10 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Monkey Island 2: LeChuck's Revenge (3.5", Germany)</description>
 		<year>1992</year>
 		<publisher>LucasArts</publisher>
-		<info name="version" value="v1.0D 17Feb92" />
 		<info name="developer" value="LucasArts" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
+		<info name="version" value="v1.0D 17Feb92" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Monkey Island 2 (Germany) [LucasArts] [1992] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="972fe32e" sha1="8bcc616fa1c7c10f5907aaed1cd5bd616fdc9023"/>
@@ -18208,6 +18224,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="developer" value="Midway" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Mortal Kombat (Germany) [Acclaim Entertainment] [1993] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="cf28b8bd" sha1="2e3f2b19a7be884bd174a7b11cba2b834863584c"/>
@@ -19722,6 +19739,8 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<year>1992</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Sierra On-Line" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
 		<info name="version" value="1.1" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -19873,6 +19892,8 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<publisher>LucasArts</publisher>
 		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="LucasArts" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
 		<info name="version" value="Version 1.3, 17-12-93" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -20780,6 +20801,8 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		<publisher>Sierra On-Line</publisher>
 		<info name="alt_title" value="Space Quest IV: Roger Wilco und die Zeitspringer" />
 		<info name="developer" value="Sierra On-Line" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
 		<info name="version" value="1.000" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Startup Disk" />
@@ -21340,6 +21363,7 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		<description>Star Wars: X-Wing - Space Combat Simulator (Germany)</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
+		<info name="region" value="Germany" />
 		<info name="version" value="Version 1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -21464,6 +21488,7 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		<description>Star Wars: TIE Fighter (Germany)</description>
 		<year>1994</year>
 		<publisher>LucasArts</publisher>
+		<info name="region" value="Germany" />
 		<info name="version" value="V1.0 06/15/94" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -21796,6 +21821,7 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Bullfrog Productions" />
 		<info name="language" value="German" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Syndicate 1" />
 			<dataarea name="flop" size = "1474560">
@@ -21837,6 +21863,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 ]]></notes>
 		<info name="developer" value="Bullfrog Productions" />
 		<info name="language" value="German" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Syndicate - American Revolt [Bullfrog] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="a5a97355" sha1="d4066839ad8f953084ec9b3ffba1f1514b97f9c1"/>
@@ -21996,6 +22023,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		<publisher>Kellogg's Company</publisher>
 		<info name="developer" value="Rauser Advertainment" />
 		<info name="producer" value="Factor 5" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Tony Friends in Kellogg's Land (Germany) [Kellogg's] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="94d177ee" sha1="e0ea7a5b0154b905801c4421596a5f06fe63e0ea"/>
