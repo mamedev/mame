@@ -406,7 +406,7 @@ int netdev_vmnet_helper::send(uint8_t *buf, int len)
 	if (memcmp(m_mac, m_vmnet_mac, 6) != 0) {
 		// nb - do we need 2 buffers, in case read recv buffer still in use?
 		memcpy(m_buffer, buf, len);
-		fix_outgoing_packet(m_buffer, len, m_vmnet_mac, m_mac);
+		vmnet_common::fix_outgoing_packet(m_buffer, len, m_vmnet_mac, m_mac);
 		buf = m_buffer;
 	}
 
@@ -438,12 +438,12 @@ int netdev_vmnet_helper::recv_dev(uint8_t **buf) {
 	if (ok == 0) return 0;
 
 	if (memcmp(m_mac, m_vmnet_mac, 6) != 0) {
-		fix_incoming_packet(m_buffer, ok, m_vmnet_mac, m_mac);
+		vmnet_common::fix_incoming_packet(m_buffer, ok, m_vmnet_mac, m_mac);
 	}
 
 	*buf = m_buffer;
 
-	return finalize_frame(m_buffer, ok);
+	return vmnet_common::finalize_frame(m_buffer, ok);
 }
 
 

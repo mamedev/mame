@@ -184,7 +184,7 @@ int netdev_vmnet::send(uint8_t *buf, int len)
 	if (memcmp(m_mac, m_vmnet_mac, 6) != 0) {
 		// TODO: do we need 2 buffers, in case read recv buffer still in use?
 		memcpy(m_buffer, buf, len);
-		fix_outgoing_packet(m_buffer, len, m_vmnet_mac, m_mac);
+		vmnet_common::fix_outgoing_packet(m_buffer, len, m_vmnet_mac, m_mac);
 		buf = m_buffer;
 	}
 
@@ -247,7 +247,7 @@ int netdev_vmnet::recv_dev(uint8_t **buf) {
 
 	osd_printf_verbose("MAC is %02x:%02x:%02x:%02x:%02x:%02x\n", m_mac[0], m_mac[1], m_mac[2], m_mac[3], m_mac[4], m_mac[5]);
 	if (memcmp(m_mac, m_vmnet_mac, 6) != 0) {
-		fix_incoming_packet(m_buffer, v.vm_pkt_size, m_vmnet_mac, m_mac);
+		vmnet_common::fix_incoming_packet(m_buffer, v.vm_pkt_size, m_vmnet_mac, m_mac);
 	}
 
 	*buf = m_buffer;
