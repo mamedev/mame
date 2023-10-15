@@ -624,7 +624,8 @@ void sh7021_device::recalc_irq()
 
 uint16_t sh7021_device::intc_ipra_r()
 {
-	LOGMASKED(LOG_INTC_RD, "%s: intc_ipra_r: %04x\n", machine().describe_context(), m_ipra);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_INTC_RD, "%s: intc_ipra_r: %04x\n", machine().describe_context(), m_ipra);
 	return m_ipra;
 }
 
@@ -636,7 +637,8 @@ void sh7021_device::intc_ipra_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::intc_iprb_r()
 {
-	LOGMASKED(LOG_INTC_RD, "%s: intc_iprb_r: %04x\n", machine().describe_context(), m_iprb);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_INTC_RD, "%s: intc_iprb_r: %04x\n", machine().describe_context(), m_iprb);
 	return m_iprb;
 }
 
@@ -648,7 +650,8 @@ void sh7021_device::intc_iprb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::intc_iprc_r()
 {
-	LOGMASKED(LOG_INTC_RD, "%s: intc_iprc_r: %04x\n", machine().describe_context(), m_iprc);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_INTC_RD, "%s: intc_iprc_r: %04x\n", machine().describe_context(), m_iprc);
 	return m_iprc;
 }
 
@@ -660,7 +663,8 @@ void sh7021_device::intc_iprc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::intc_iprd_r()
 {
-	LOGMASKED(LOG_INTC_RD, "%s: intc_iprd_r: %04x\n", machine().describe_context(), m_iprd);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_INTC_RD, "%s: intc_iprd_r: %04x\n", machine().describe_context(), m_iprd);
 	return m_iprd;
 }
 
@@ -672,7 +676,8 @@ void sh7021_device::intc_iprd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::intc_ipre_r()
 {
-	LOGMASKED(LOG_INTC_RD, "%s: intc_ipre_r: %04x\n", machine().describe_context(), m_ipre);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_INTC_RD, "%s: intc_ipre_r: %04x\n", machine().describe_context(), m_ipre);
 	return m_ipre;
 }
 
@@ -684,7 +689,8 @@ void sh7021_device::intc_ipre_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::intc_icr_r()
 {
-	LOGMASKED(LOG_INTC_RD, "%s: intc_icr_r: %04x\n", machine().describe_context(), m_ipre);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_INTC_RD, "%s: intc_icr_r: %04x\n", machine().describe_context(), m_ipre);
 	return m_icr;
 }
 
@@ -699,7 +705,8 @@ void sh7021_device::intc_icr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::ubc_barh_r()
 {
-	LOGMASKED(LOG_UBC_RD, "%s: Break Address Register H, ubc_barh_r: %04x\n", machine().describe_context(), m_ubc.barh);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_UBC_RD, "%s: Break Address Register H, ubc_barh_r: %04x\n", machine().describe_context(), m_ubc.barh);
 	return m_ubc.barh;
 }
 
@@ -711,7 +718,8 @@ void sh7021_device::ubc_barh_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::ubc_barl_r()
 {
-	LOGMASKED(LOG_UBC_RD, "%s: Break Address Register L, ubc_barl_r: %04x\n", machine().describe_context(), m_ubc.barl);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_UBC_RD, "%s: Break Address Register L, ubc_barl_r: %04x\n", machine().describe_context(), m_ubc.barl);
 	return m_ubc.barl;
 }
 
@@ -723,7 +731,8 @@ void sh7021_device::ubc_barl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::ubc_bamrh_r()
 {
-	LOGMASKED(LOG_UBC_RD, "%s: Break Address Mask Register H, ubc_bamrh_r: %04x\n", machine().describe_context(), m_ubc.bamrh);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_UBC_RD, "%s: Break Address Mask Register H, ubc_bamrh_r: %04x\n", machine().describe_context(), m_ubc.bamrh);
 	return m_ubc.bamrh;
 }
 
@@ -735,7 +744,8 @@ void sh7021_device::ubc_bamrh_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::ubc_bamrl_r()
 {
-	LOGMASKED(LOG_UBC_RD, "%s: Break Address Mask Register L, ubc_bamrl_r: %04x\n", machine().describe_context(), m_ubc.bamrl);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_UBC_RD, "%s: Break Address Mask Register L, ubc_bamrl_r: %04x\n", machine().describe_context(), m_ubc.bamrl);
 	return m_ubc.bamrl;
 }
 
@@ -747,7 +757,8 @@ void sh7021_device::ubc_bamrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::ubc_bbr_r()
 {
-	LOGMASKED(LOG_UBC_RD, "%s: Break Bus Cycle Register, ubc_bbr_r: %04x\n", machine().describe_context(), m_ubc.bbr);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_UBC_RD, "%s: Break Bus Cycle Register, ubc_bbr_r: %04x\n", machine().describe_context(), m_ubc.bbr);
 	return m_ubc.bbr;
 }
 
@@ -770,7 +781,8 @@ void sh7021_device::ubc_bbr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::bsc_bcr_r()
 {
-	LOGMASKED(LOG_BSC_RD, "%s: Bus Control Register, bsc_bcr_r: %04x\n", machine().describe_context(), m_bsc.bcr);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_BSC_RD, "%s: Bus Control Register, bsc_bcr_r: %04x\n", machine().describe_context(), m_bsc.bcr);
 	return m_bsc.bcr;
 }
 
@@ -787,7 +799,8 @@ void sh7021_device::bsc_bcr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::bsc_wcr1_r()
 {
-	LOGMASKED(LOG_BSC_RD, "%s: Wait State Control Register 1, bsc_wcr1_r: %04x\n", machine().describe_context(), m_bsc.wcr1);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_BSC_RD, "%s: Wait State Control Register 1, bsc_wcr1_r: %04x\n", machine().describe_context(), m_bsc.wcr1);
 	return m_bsc.wcr1;
 }
 
@@ -799,7 +812,8 @@ void sh7021_device::bsc_wcr1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::bsc_wcr2_r()
 {
-	LOGMASKED(LOG_BSC_RD, "%s: Wait State Control Register 2, bsc_wcr2_r: %04x\n", machine().describe_context(), m_bsc.wcr2);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_BSC_RD, "%s: Wait State Control Register 2, bsc_wcr2_r: %04x\n", machine().describe_context(), m_bsc.wcr2);
 	return m_bsc.wcr2;
 }
 
@@ -811,7 +825,8 @@ void sh7021_device::bsc_wcr2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::bsc_wcr3_r()
 {
-	LOGMASKED(LOG_BSC_RD, "%s: Wait State Control Register 3, bsc_wcr3_r: %04x\n", machine().describe_context(), m_bsc.wcr3);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_BSC_RD, "%s: Wait State Control Register 3, bsc_wcr3_r: %04x\n", machine().describe_context(), m_bsc.wcr3);
 	return m_bsc.wcr3;
 }
 
@@ -823,7 +838,8 @@ void sh7021_device::bsc_wcr3_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::bsc_dcr_r()
 {
-	LOGMASKED(LOG_BSC_RD, "%s: DRAM Control Register, bsc_dcr_r: %04x\n", machine().describe_context(), m_bsc.dcr);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_BSC_RD, "%s: DRAM Control Register, bsc_dcr_r: %04x\n", machine().describe_context(), m_bsc.dcr);
 	return m_bsc.dcr;
 }
 
@@ -842,7 +858,8 @@ void sh7021_device::bsc_dcr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::bsc_pcr_r()
 {
-	LOGMASKED(LOG_BSC_RD, "%s: Parity Control Register, bsc_pcr_r: %04x\n", machine().describe_context(), m_bsc.pcr);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_BSC_RD, "%s: Parity Control Register, bsc_pcr_r: %04x\n", machine().describe_context(), m_bsc.pcr);
 	return m_bsc.pcr;
 }
 
@@ -867,7 +884,8 @@ void sh7021_device::bsc_pcr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::bsc_rcr_r()
 {
-	LOGMASKED(LOG_BSC_RD, "%s: Refresh Control Register, bsc_rcr_r: %04x\n", machine().describe_context(), m_bsc.rcr);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_BSC_RD, "%s: Refresh Control Register, bsc_rcr_r: %04x\n", machine().describe_context(), m_bsc.rcr);
 	return m_bsc.rcr;
 }
 
@@ -885,9 +903,12 @@ void sh7021_device::bsc_rcr_w(uint16_t data)
 
 uint16_t sh7021_device::bsc_rtcsr_r()
 {
-	LOGMASKED(LOG_BSC_RD, "%s: Refresh Timer Control/Status Register, bsc_rtcsr_r: %04x\n", machine().describe_context(), m_bsc.rtcsr);
-	if (BIT(m_bsc.rtcsr, 7))
-		m_bsc.rtcsr_read = true;
+	if (!machine().side_effects_disabled())
+	{
+		LOGMASKED(LOG_BSC_RD, "%s: Refresh Timer Control/Status Register, bsc_rtcsr_r: %04x\n", machine().describe_context(), m_bsc.rtcsr);
+		if (BIT(m_bsc.rtcsr, 7))
+			m_bsc.rtcsr_read = true;
+	}
 	return m_bsc.rtcsr;
 }
 
@@ -915,7 +936,8 @@ void sh7021_device::bsc_rtcsr_w(uint16_t data)
 
 uint16_t sh7021_device::bsc_rtcnt_r()
 {
-	LOGMASKED(LOG_BSC_RD, "%s: Refresh Timer Count, bsc_rtcnt_r: %04x\n", machine().describe_context(), m_bsc.rtcnt);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_BSC_RD, "%s: Refresh Timer Count, bsc_rtcnt_r: %04x\n", machine().describe_context(), m_bsc.rtcnt);
 	return m_bsc.rtcnt;
 }
 
@@ -930,7 +952,8 @@ void sh7021_device::bsc_rtcnt_w(uint16_t data)
 
 uint16_t sh7021_device::bsc_rtcor_r()
 {
-	LOGMASKED(LOG_BSC_RD, "%s: Refresh Time Constant Register, bsc_rtcor_r: %04x\n", machine().describe_context(), m_bsc.rtcor);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_BSC_RD, "%s: Refresh Time Constant Register, bsc_rtcor_r: %04x\n", machine().describe_context(), m_bsc.rtcor);
 	return m_bsc.rtcor;
 }
 
@@ -954,7 +977,8 @@ template uint32_t sh7021_device::dma_sar_r<3>();
 template <int Channel>
 uint32_t sh7021_device::dma_sar_r()
 {
-	LOGMASKED(LOG_DMA_RD, "%s: DMA Source Address Register %d, dma_sar_r: %08x\n", machine().describe_context(), Channel, m_dma[Channel].sar);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_DMA_RD, "%s: DMA Source Address Register %d, dma_sar_r: %08x\n", machine().describe_context(), Channel, m_dma[Channel].sar);
 	return m_dma[Channel].sar;
 }
 
@@ -978,7 +1002,8 @@ template uint32_t sh7021_device::dma_dar_r<3>();
 template <int Channel>
 uint32_t sh7021_device::dma_dar_r()
 {
-	LOGMASKED(LOG_DMA_RD, "%s: DMA Destination Address Register %d, dma_sar_r: %08x\n", machine().describe_context(), Channel, m_dma[Channel].dar);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_DMA_RD, "%s: DMA Destination Address Register %d, dma_sar_r: %08x\n", machine().describe_context(), Channel, m_dma[Channel].dar);
 	return m_dma[Channel].dar;
 }
 
@@ -1002,7 +1027,8 @@ template uint16_t sh7021_device::dma_tcr_r<3>();
 template <int Channel>
 uint16_t sh7021_device::dma_tcr_r()
 {
-	LOGMASKED(LOG_DMA_RD, "%s: DMA Transfer Count Register %d, dma_tcr_r: %04x\n", machine().describe_context(), Channel, m_dma[Channel].tcr);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_DMA_RD, "%s: DMA Transfer Count Register %d, dma_tcr_r: %04x\n", machine().describe_context(), Channel, m_dma[Channel].tcr);
 	return m_dma[Channel].tcr;
 }
 
@@ -1027,7 +1053,8 @@ template uint16_t sh7021_device::dma_chcr_r<3>();
 template <int Channel>
 uint16_t sh7021_device::dma_chcr_r()
 {
-	LOGMASKED(LOG_DMA_RD, "%s: DMA Channel Control Register %d, dma_chcr_r: %04x\n", machine().describe_context(), Channel, m_dma[Channel].chcr);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_DMA_RD, "%s: DMA Channel Control Register %d, dma_chcr_r: %04x\n", machine().describe_context(), Channel, m_dma[Channel].chcr);
 	return m_dma[Channel].chcr;
 }
 
@@ -1081,10 +1108,13 @@ void sh7021_device::dma_chcr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::dmaor_r()
 {
-	LOGMASKED(LOG_DMA_RD, "%s: DMA Operation Register, dmaor_r: %04x\n", machine().describe_context(), m_dmaor);
-	LOGMASKED(LOG_DMA_RD, "%s:         Address Error Flag: %d\n", machine().describe_context(), BIT(m_dmaor, 2));
-	LOGMASKED(LOG_DMA_RD, "%s:         NMI Flag: %d\n", machine().describe_context(), BIT(m_dmaor, 1));
-	LOGMASKED(LOG_DMA_RD, "%s:         DMA Master Enable: %d\n", machine().describe_context(), BIT(m_dmaor, 0));
+	if (!machine().side_effects_disabled())
+	{
+		LOGMASKED(LOG_DMA_RD, "%s: DMA Operation Register, dmaor_r: %04x\n", machine().describe_context(), m_dmaor);
+		LOGMASKED(LOG_DMA_RD, "%s:         Address Error Flag: %d\n", machine().describe_context(), BIT(m_dmaor, 2));
+		LOGMASKED(LOG_DMA_RD, "%s:         NMI Flag: %d\n", machine().describe_context(), BIT(m_dmaor, 1));
+		LOGMASKED(LOG_DMA_RD, "%s:         DMA Master Enable: %d\n", machine().describe_context(), BIT(m_dmaor, 0));
+	}
 	return m_dmaor;
 }
 
@@ -1243,7 +1273,8 @@ void sh7021_device::start_timer(int i)
 
 uint8_t sh7021_device::itu_tstr_r()
 {
-	LOGMASKED(LOG_ITU_RD, "%s: Timer Start Register, itu_tstr_r: %02x\n", machine().describe_context(), m_itu.tstr);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_ITU_RD, "%s: Timer Start Register, itu_tstr_r: %02x\n", machine().describe_context(), m_itu.tstr);
 	return m_itu.tstr | 0x60;
 }
 
@@ -1273,7 +1304,8 @@ void sh7021_device::itu_tstr_w(uint8_t data)
 
 uint8_t sh7021_device::itu_tsnc_r()
 {
-	LOGMASKED(LOG_ITU_RD, "%s: Timer Synchro Register, itu_tsnc_r: %02x\n", machine().describe_context(), m_itu.tsnc);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_ITU_RD, "%s: Timer Synchro Register, itu_tsnc_r: %02x\n", machine().describe_context(), m_itu.tsnc);
 	return m_itu.tsnc;
 }
 
@@ -1285,7 +1317,8 @@ void sh7021_device::itu_tsnc_w(uint8_t data)
 
 uint8_t sh7021_device::itu_tmdr_r()
 {
-	LOGMASKED(LOG_ITU_RD, "%s: Timer Mode Register, itu_tmdr_r: %02x\n", machine().describe_context(), m_itu.tmdr);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_ITU_RD, "%s: Timer Mode Register, itu_tmdr_r: %02x\n", machine().describe_context(), m_itu.tmdr);
 	return m_itu.tmdr;
 }
 
@@ -1304,7 +1337,8 @@ void sh7021_device::itu_tmdr_w(uint8_t data)
 
 uint8_t sh7021_device::itu_tfcr_r()
 {
-	LOGMASKED(LOG_ITU_RD, "%s: Timer Function Control Register, itu_tfcr_r: %02x\n", machine().describe_context(), m_itu.tfcr);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_ITU_RD, "%s: Timer Function Control Register, itu_tfcr_r: %02x\n", machine().describe_context(), m_itu.tfcr);
 	return m_itu.tfcr;
 }
 
@@ -1328,7 +1362,8 @@ void sh7021_device::itu_tfcr_w(uint8_t data)
 
 uint8_t sh7021_device::itu_tocr_r()
 {
-	LOGMASKED(LOG_ITU_RD, "%s: Timer Output Control Register, itu_tfcr_r: %02x\n", machine().describe_context(), m_itu.tocr);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_ITU_RD, "%s: Timer Output Control Register, itu_tfcr_r: %02x\n", machine().describe_context(), m_itu.tocr);
 	return m_itu.tocr | 0x7c;
 }
 
@@ -1349,7 +1384,8 @@ template uint8_t sh7021_device::itu_tcr_r<4>();
 template <int Channel>
 uint8_t sh7021_device::itu_tcr_r()
 {
-	LOGMASKED(LOG_ITU_RD, "%s: Timer Control Register %d, itu_tcr_r: %02x\n", machine().describe_context(), Channel, m_itu.timer[Channel].tcr);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_ITU_RD, "%s: Timer Control Register %d, itu_tcr_r: %02x\n", machine().describe_context(), Channel, m_itu.timer[Channel].tcr);
 	return m_itu.timer[Channel].tcr;
 }
 
@@ -1391,7 +1427,8 @@ template uint8_t sh7021_device::itu_tior_r<4>();
 template <int Channel>
 uint8_t sh7021_device::itu_tior_r()
 {
-	LOGMASKED(LOG_ITU_RD, "%s: Timer I/O Control Register %d, itu_tior_r: %02x\n", machine().describe_context(), Channel, m_itu.timer[Channel].tior);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_ITU_RD, "%s: Timer I/O Control Register %d, itu_tior_r: %02x\n", machine().describe_context(), Channel, m_itu.timer[Channel].tior);
 	return m_itu.timer[Channel].tior;
 }
 
@@ -1442,7 +1479,8 @@ template uint8_t sh7021_device::itu_tier_r<4>();
 template <int Channel>
 uint8_t sh7021_device::itu_tier_r()
 {
-	LOGMASKED(LOG_ITU_RD, "%s: Timer Interrupt Enable Register %d, itu_tier_r: %02x\n", machine().describe_context(), Channel, m_itu.timer[Channel].tier);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_ITU_RD, "%s: Timer Interrupt Enable Register %d, itu_tier_r: %02x\n", machine().describe_context(), Channel, m_itu.timer[Channel].tier);
 	return m_itu.timer[Channel].tier;
 }
 
@@ -1471,10 +1509,13 @@ template uint8_t sh7021_device::itu_tsr_r<4>();
 template <int Channel>
 uint8_t sh7021_device::itu_tsr_r()
 {
-	LOGMASKED(LOG_ITU_RD, "%s: Timer Status Register %d, itu_tsr_r: %02x\n", machine().describe_context(), Channel, m_itu.timer[Channel].tsr);
-	LOGMASKED(LOG_ITU_RD, "%s:         Overflow Flag: %d\n", machine().describe_context(), BIT(m_itu.timer[Channel].tsr, 2));
-	LOGMASKED(LOG_ITU_RD, "%s:         Compare/Capture B Flag: %d\n", machine().describe_context(), BIT(m_itu.timer[Channel].tsr, 1));
-	LOGMASKED(LOG_ITU_RD, "%s:         Compare/Capture A Flag: %d\n", machine().describe_context(), BIT(m_itu.timer[Channel].tsr, 0));
+	if (!machine().side_effects_disabled())
+	{
+		LOGMASKED(LOG_ITU_RD, "%s: Timer Status Register %d, itu_tsr_r: %02x\n", machine().describe_context(), Channel, m_itu.timer[Channel].tsr);
+		LOGMASKED(LOG_ITU_RD, "%s:         Overflow Flag: %d\n", machine().describe_context(), BIT(m_itu.timer[Channel].tsr, 2));
+		LOGMASKED(LOG_ITU_RD, "%s:         Compare/Capture B Flag: %d\n", machine().describe_context(), BIT(m_itu.timer[Channel].tsr, 1));
+		LOGMASKED(LOG_ITU_RD, "%s:         Compare/Capture A Flag: %d\n", machine().describe_context(), BIT(m_itu.timer[Channel].tsr, 0));
+	}
 	return m_itu.timer[Channel].tsr;
 }
 
@@ -1506,7 +1547,8 @@ template uint16_t sh7021_device::itu_tcnt_r<4>();
 template <int Channel>
 uint16_t sh7021_device::itu_tcnt_r()
 {
-	LOGMASKED(LOG_ITU_RD, "%s: Timer Counter %d, itu_tcnt_r: %04x\n", machine().describe_context(), Channel, m_itu.timer[Channel].tcnt);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_ITU_RD, "%s: Timer Counter %d, itu_tcnt_r: %04x\n", machine().describe_context(), Channel, m_itu.timer[Channel].tcnt);
 	return m_itu.timer[Channel].tcnt;
 }
 
@@ -1532,7 +1574,8 @@ template uint16_t sh7021_device::itu_gra_r<4>();
 template <int Channel>
 uint16_t sh7021_device::itu_gra_r()
 {
-	LOGMASKED(LOG_ITU_RD, "%s: General Register A %d, itu_gra_r: %04x\n", machine().describe_context(), Channel, m_itu.timer[Channel].gra);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_ITU_RD, "%s: General Register A %d, itu_gra_r: %04x\n", machine().describe_context(), Channel, m_itu.timer[Channel].gra);
 	return m_itu.timer[Channel].gra;
 }
 
@@ -1558,7 +1601,8 @@ template uint16_t sh7021_device::itu_grb_r<4>();
 template <int Channel>
 uint16_t sh7021_device::itu_grb_r()
 {
-	LOGMASKED(LOG_ITU_RD, "%s: General Register B %d, itu_grb_r: %04x\n", machine().describe_context(), Channel, m_itu.timer[Channel].grb);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_ITU_RD, "%s: General Register B %d, itu_grb_r: %04x\n", machine().describe_context(), Channel, m_itu.timer[Channel].grb);
 	return m_itu.timer[Channel].grb;
 }
 
@@ -1581,7 +1625,8 @@ template uint16_t sh7021_device::itu_bra_r<4>();
 template <int Channel>
 uint16_t sh7021_device::itu_bra_r()
 {
-	LOGMASKED(LOG_ITU_RD, "%s: Buffer Register A %d, itu_bra_r: %04x\n", machine().describe_context(), Channel, m_itu.timer[Channel].bra);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_ITU_RD, "%s: Buffer Register A %d, itu_bra_r: %04x\n", machine().describe_context(), Channel, m_itu.timer[Channel].bra);
 	return m_itu.timer[Channel].bra;
 }
 
@@ -1601,7 +1646,8 @@ template uint16_t sh7021_device::itu_brb_r<4>();
 template <int Channel>
 uint16_t sh7021_device::itu_brb_r()
 {
-	LOGMASKED(LOG_ITU_RD, "%s: Buffer Register B %d, itu_brb_r: %04x\n", machine().describe_context(), Channel, m_itu.timer[Channel].brb);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_ITU_RD, "%s: Buffer Register B %d, itu_brb_r: %04x\n", machine().describe_context(), Channel, m_itu.timer[Channel].brb);
 	return m_itu.timer[Channel].brb;
 }
 
@@ -1620,7 +1666,8 @@ void sh7021_device::itu_brb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint8_t sh7021_device::tpc_tpmr_r()
 {
-	LOGMASKED(LOG_TPC_RD, "%s: TPC Output Mode Register, tpc_tpmr_r: %02x\n", machine().describe_context(), m_tpc.tpmr);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_TPC_RD, "%s: TPC Output Mode Register, tpc_tpmr_r: %02x\n", machine().describe_context(), m_tpc.tpmr);
 	return m_tpc.tpmr;
 }
 
@@ -1636,7 +1683,8 @@ void sh7021_device::tpc_tpmr_w(uint8_t data)
 
 uint8_t sh7021_device::tpc_tpcr_r()
 {
-	LOGMASKED(LOG_TPC_RD, "%s: TPC Output Control Register, tpc_tpcr_r: %02x\n", machine().describe_context(), m_tpc.tpcr);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_TPC_RD, "%s: TPC Output Control Register, tpc_tpcr_r: %02x\n", machine().describe_context(), m_tpc.tpcr);
 	return m_tpc.tpcr;
 }
 
@@ -1652,7 +1700,8 @@ void sh7021_device::tpc_tpcr_w(uint8_t data)
 
 uint8_t sh7021_device::tpc_ndera_r()
 {
-	LOGMASKED(LOG_TPC_RD, "%s: Next Data Enable Register A, tpc_ndera_r (TP7-0): %02x\n", machine().describe_context(), m_tpc.ndera);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_TPC_RD, "%s: Next Data Enable Register A, tpc_ndera_r (TP7-0): %02x\n", machine().describe_context(), m_tpc.ndera);
 	return m_tpc.ndera;
 }
 
@@ -1664,7 +1713,8 @@ void sh7021_device::tpc_ndera_w(uint8_t data)
 
 uint8_t sh7021_device::tpc_nderb_r()
 {
-	LOGMASKED(LOG_TPC_RD, "%s: Next Data Enable Register B, tpc_nderb_r (TP15-8): %02x\n", machine().describe_context(), m_tpc.nderb);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_TPC_RD, "%s: Next Data Enable Register B, tpc_nderb_r (TP15-8): %02x\n", machine().describe_context(), m_tpc.nderb);
 	return m_tpc.nderb;
 }
 
@@ -1676,7 +1726,8 @@ void sh7021_device::tpc_nderb_w(uint8_t data)
 
 uint8_t sh7021_device::tpc_ndra_r()
 {
-	LOGMASKED(LOG_TPC_RD, "%s: Next Data Register A, tpc_ndra_r: %02x\n", machine().describe_context(), 0);//m_tpc.ndra);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_TPC_RD, "%s: Next Data Register A, tpc_ndra_r: %02x\n", machine().describe_context(), 0);//m_tpc.ndra);
 	return 0;//m_tpc.ndra;
 }
 
@@ -1687,7 +1738,8 @@ void sh7021_device::tpc_ndra_w(uint8_t data)
 
 uint8_t sh7021_device::tpc_ndra_alt_r()
 {
-	LOGMASKED(LOG_TPC_RD, "%s: Next Data Register A (alt. address), tpc_ndra_alt_r: %02x\n", machine().describe_context(), 0);//m_tpc.ndra);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_TPC_RD, "%s: Next Data Register A (alt. address), tpc_ndra_alt_r: %02x\n", machine().describe_context(), 0);//m_tpc.ndra);
 	return 0;//m_tpc.ndra;
 }
 
@@ -1698,7 +1750,8 @@ void sh7021_device::tpc_ndra_alt_w(uint8_t data)
 
 uint8_t sh7021_device::tpc_ndrb_r()
 {
-	LOGMASKED(LOG_TPC_RD, "%s: Next Data Register B, tpc_ndrb_r: %02x\n", machine().describe_context(), 0);//m_tpc.ndrb);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_TPC_RD, "%s: Next Data Register B, tpc_ndrb_r: %02x\n", machine().describe_context(), 0);//m_tpc.ndrb);
 	return 0;//m_tpc.ndrb;
 }
 
@@ -1709,7 +1762,8 @@ void sh7021_device::tpc_ndrb_w(uint8_t data)
 
 uint8_t sh7021_device::tpc_ndrb_alt_r()
 {
-	LOGMASKED(LOG_TPC_RD, "%s: Next Data Register B (alt. address), tpc_ndrb_alt_r: %02x\n", machine().describe_context(), 0);//m_tpc.ndrb);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_TPC_RD, "%s: Next Data Register B (alt. address), tpc_ndrb_alt_r: %02x\n", machine().describe_context(), 0);//m_tpc.ndrb);
 	return 0;//m_tpc.ndrb;
 }
 
@@ -1770,7 +1824,8 @@ template uint8_t sh7021_device::sci_smr_r<1>();
 template <int Channel>
 uint8_t sh7021_device::sci_smr_r()
 {
-	LOGMASKED(LOG_SCI_RD, "%s: Serial Mode Register %d, sci_smr_r: %02x\n", machine().describe_context(), Channel, m_sci[Channel].smr);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_SCI_RD, "%s: Serial Mode Register %d, sci_smr_r: %02x\n", machine().describe_context(), Channel, m_sci[Channel].smr);
 	return m_sci[Channel].smr;
 }
 
@@ -1797,7 +1852,8 @@ template uint8_t sh7021_device::sci_brr_r<1>();
 template <int Channel>
 uint8_t sh7021_device::sci_brr_r()
 {
-	LOGMASKED(LOG_SCI_RD, "%s: Bit Rate Register %d, sci_brr_r: %02x\n", machine().describe_context(), Channel, m_sci[Channel].brr);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_SCI_RD, "%s: Bit Rate Register %d, sci_brr_r: %02x\n", machine().describe_context(), Channel, m_sci[Channel].brr);
 	return m_sci[Channel].brr;
 }
 
@@ -1817,7 +1873,8 @@ template uint8_t sh7021_device::sci_scr_r<1>();
 template <int Channel>
 uint8_t sh7021_device::sci_scr_r()
 {
-	LOGMASKED(LOG_SCI_RD, "%s: Serial Control Register %d, sci_scr_r: %02x\n", machine().describe_context(), Channel, m_sci[Channel].scr);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_SCI_RD, "%s: Serial Control Register %d, sci_scr_r: %02x\n", machine().describe_context(), Channel, m_sci[Channel].scr);
 	return m_sci[Channel].scr;
 }
 
@@ -1844,7 +1901,8 @@ template uint8_t sh7021_device::sci_tdr_r<1>();
 template <int Channel>
 uint8_t sh7021_device::sci_tdr_r()
 {
-	LOGMASKED(LOG_SCI_RD, "%s: Transmit Data Register %d, sci_tdr_r: %02x\n", machine().describe_context(), Channel, m_sci[Channel].tdr);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_SCI_RD, "%s: Transmit Data Register %d, sci_tdr_r: %02x\n", machine().describe_context(), Channel, m_sci[Channel].tdr);
 	return m_sci[Channel].tdr;
 }
 
@@ -1864,18 +1922,20 @@ template uint8_t sh7021_device::sci_ssr_r<1>();
 template <int Channel>
 uint8_t sh7021_device::sci_ssr_r()
 {
-	LOGMASKED(LOG_SCI_RD, "%s: Serial Status Register %d, sci_ssr_r: %02x\n", machine().describe_context(), Channel, m_sci[Channel].ssr);
-	LOGMASKED(LOG_SCI_RD, "%s:         Transmit Empty Flag: %d\n", machine().describe_context(), Channel, BIT(m_sci[Channel].ssr, 7));
-	LOGMASKED(LOG_SCI_RD, "%s:         Receiver Full Flag: %d\n", machine().describe_context(), Channel, BIT(m_sci[Channel].ssr, 6));
-	LOGMASKED(LOG_SCI_RD, "%s:         Overrun Error Flag: %d\n", machine().describe_context(), Channel, BIT(m_sci[Channel].ssr, 5));
-	LOGMASKED(LOG_SCI_RD, "%s:         Framing Error Flag: %d\n", machine().describe_context(), Channel, BIT(m_sci[Channel].ssr, 4));
-	LOGMASKED(LOG_SCI_RD, "%s:         Parity Error Flag: %d\n", machine().describe_context(), Channel, BIT(m_sci[Channel].ssr, 3));
-	LOGMASKED(LOG_SCI_RD, "%s:         Transmit End Flag: %d\n", machine().describe_context(), Channel, BIT(m_sci[Channel].ssr, 2));
-	LOGMASKED(LOG_SCI_RD, "%s:         Multiprocessor Bit Flag: %d\n", machine().describe_context(), Channel, BIT(m_sci[Channel].ssr, 1));
-	LOGMASKED(LOG_SCI_RD, "%s:         Multiprocessor Bit Transfer Flag: %d\n", machine().describe_context(), Channel, BIT(m_sci[Channel].ssr, 0));
-
 	if (!machine().side_effects_disabled())
+	{
+		LOGMASKED(LOG_SCI_RD, "%s: Serial Status Register %d, sci_ssr_r: %02x\n", machine().describe_context(), Channel, m_sci[Channel].ssr);
+		LOGMASKED(LOG_SCI_RD, "%s:         Transmit Empty Flag: %d\n", machine().describe_context(), Channel, BIT(m_sci[Channel].ssr, 7));
+		LOGMASKED(LOG_SCI_RD, "%s:         Receiver Full Flag: %d\n", machine().describe_context(), Channel, BIT(m_sci[Channel].ssr, 6));
+		LOGMASKED(LOG_SCI_RD, "%s:         Overrun Error Flag: %d\n", machine().describe_context(), Channel, BIT(m_sci[Channel].ssr, 5));
+		LOGMASKED(LOG_SCI_RD, "%s:         Framing Error Flag: %d\n", machine().describe_context(), Channel, BIT(m_sci[Channel].ssr, 4));
+		LOGMASKED(LOG_SCI_RD, "%s:         Parity Error Flag: %d\n", machine().describe_context(), Channel, BIT(m_sci[Channel].ssr, 3));
+		LOGMASKED(LOG_SCI_RD, "%s:         Transmit End Flag: %d\n", machine().describe_context(), Channel, BIT(m_sci[Channel].ssr, 2));
+		LOGMASKED(LOG_SCI_RD, "%s:         Multiprocessor Bit Flag: %d\n", machine().describe_context(), Channel, BIT(m_sci[Channel].ssr, 1));
+		LOGMASKED(LOG_SCI_RD, "%s:         Multiprocessor Bit Transfer Flag: %d\n", machine().describe_context(), Channel, BIT(m_sci[Channel].ssr, 0));
+
 		m_sci[Channel].ssr_read |= m_sci[Channel].ssr & 0xf8;
+	}
 
 	return (m_sci[Channel].ssr & 0xf9) | 0x04;
 }
@@ -1933,7 +1993,8 @@ template uint8_t sh7021_device::sci_rdr_r<1>();
 template <int Channel>
 uint8_t sh7021_device::sci_rdr_r()
 {
-	LOGMASKED(LOG_SCI_RD, "%s: Receive Data Register %d, sci_rdr_r: %02x\n", machine().describe_context(), Channel, m_sci[Channel].rdr);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_SCI_RD, "%s: Receive Data Register %d, sci_rdr_r: %02x\n", machine().describe_context(), Channel, m_sci[Channel].rdr);
 	return m_sci[Channel].rdr;
 }
 
@@ -2002,7 +2063,8 @@ void sh7021_device::write_pbdr_bit(int state)
 
 uint16_t sh7021_device::pfc_paior_r()
 {
-	LOGMASKED(LOG_PFC_RD, "%s: Port A I/O (Direction) Register, pfc_paior_r: %04x\n", machine().describe_context(), m_pfc.paior);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_PFC_RD, "%s: Port A I/O (Direction) Register, pfc_paior_r: %04x\n", machine().describe_context(), m_pfc.paior);
 	return m_pfc.paior;
 }
 
@@ -2015,7 +2077,8 @@ void sh7021_device::pfc_paior_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 uint16_t sh7021_device::pfc_pacr1_r()
 {
 	static constexpr uint16_t PACR1_R_MASK = 0x0002;
-	LOGMASKED(LOG_PFC_RD, "%s: Port A Control Register 1, pfc_pacr1_r: %04x\n", machine().describe_context(), m_pfc.pacr1);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_PFC_RD, "%s: Port A Control Register 1, pfc_pacr1_r: %04x\n", machine().describe_context(), m_pfc.pacr1);
 	return m_pfc.pacr1 | PACR1_R_MASK;
 }
 
@@ -2035,7 +2098,8 @@ void sh7021_device::pfc_pacr1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 uint16_t sh7021_device::pfc_pacr2_r()
 {
 	static constexpr uint16_t PACR2_R_MASK = 0xaa00;
-	LOGMASKED(LOG_PFC_RD, "%s: Port A Control Register 2, pfc_pacr2_r: %04x\n", machine().describe_context(), m_pfc.pacr2);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_PFC_RD, "%s: Port A Control Register 2, pfc_pacr2_r: %04x\n", machine().describe_context(), m_pfc.pacr2);
 	return m_pfc.pacr2 | PACR2_R_MASK;
 }
 
@@ -2054,7 +2118,8 @@ void sh7021_device::pfc_pacr2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::pfc_pbior_r()
 {
-	LOGMASKED(LOG_PFC_RD, "%s: Port B I/O (Direction) Register, pfc_pbior_r: %04x\n", machine().describe_context(), m_pfc.pbior);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_PFC_RD, "%s: Port B I/O (Direction) Register, pfc_pbior_r: %04x\n", machine().describe_context(), m_pfc.pbior);
 	return m_pfc.pbior;
 }
 
@@ -2066,7 +2131,8 @@ void sh7021_device::pfc_pbior_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::pfc_pbcr1_r()
 {
-	LOGMASKED(LOG_PFC_RD, "%s: Port B Control Register 1, pfc_pbcr1_r: %04x\n", machine().describe_context(), m_pfc.pbcr1);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_PFC_RD, "%s: Port B Control Register 1, pfc_pbcr1_r: %04x\n", machine().describe_context(), m_pfc.pbcr1);
 	return m_pfc.pbcr1;
 }
 
@@ -2083,7 +2149,8 @@ void sh7021_device::pfc_pbcr1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::pfc_pbcr2_r()
 {
-	LOGMASKED(LOG_PFC_RD, "%s: Port B Control Register 2, pfc_pbcr2_r: %04x\n", machine().describe_context(), m_pfc.pbcr2);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_PFC_RD, "%s: Port B Control Register 2, pfc_pbcr2_r: %04x\n", machine().describe_context(), m_pfc.pbcr2);
 	return m_pfc.pbcr2;
 }
 
@@ -2101,7 +2168,8 @@ void sh7021_device::pfc_pbcr2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 uint16_t sh7021_device::pfc_padr_r()
 {
 	const uint16_t data = ((m_pfc.padr_in & ~m_pfc.paior) | (m_pfc.padr & m_pfc.paior)) & m_pfc.pa_gpio_mask;
-	LOGMASKED(LOG_PFC_RD, "%s: Port A Data Register, pfc_padr_r: %04x ((%04x & ~%04x) | (%04x & %04x)) & %04x\n", machine().describe_context(), data, m_pfc.padr_in, m_pfc.paior, m_pfc.padr, m_pfc.paior, m_pfc.pa_gpio_mask);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_PFC_RD, "%s: Port A Data Register, pfc_padr_r: %04x ((%04x & ~%04x) | (%04x & %04x)) & %04x\n", machine().describe_context(), data, m_pfc.padr_in, m_pfc.paior, m_pfc.padr, m_pfc.paior, m_pfc.pa_gpio_mask);
 	return data;
 }
 
@@ -2130,7 +2198,8 @@ void sh7021_device::pfc_padr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 uint16_t sh7021_device::pfc_pbdr_r()
 {
 	const uint16_t data = ((m_pfc.pbdr_in & ~m_pfc.pbior) | (m_pfc.padr & m_pfc.pbior)) & m_pfc.pa_gpio_mask;
-	LOGMASKED(LOG_PFC_RD, "%s: Port B Data Register, pfc_pbdr_r: %04x\n", machine().describe_context(), data);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_PFC_RD, "%s: Port B Data Register, pfc_pbdr_r: %04x\n", machine().describe_context(), data);
 	return data;
 }
 
@@ -2162,7 +2231,8 @@ void sh7021_device::pfc_pbdr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7021_device::pfc_cascr_r()
 {
-	LOGMASKED(LOG_PFC_RD, "%s: Column Address Strobe Pin Control Register, pfc_cascr_r: %04x\n", machine().describe_context(), m_pfc.cascr);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_PFC_RD, "%s: Column Address Strobe Pin Control Register, pfc_cascr_r: %04x\n", machine().describe_context(), m_pfc.cascr);
 	return m_pfc.cascr;
 }
 
