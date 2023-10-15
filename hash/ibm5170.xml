@@ -10034,6 +10034,7 @@ The disks have had their OEM IDs modified by Windows
 		<info name="developer" value="Infogrames" />
 		<info name="distributor" value="Erbe Software" />
 		<info name="language" value="Spanish" />
+		<info name="region" value="Spain" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Alone in the Dark (Spain) [Erbe] [1993] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="a8d09bad" sha1="bdbd4e99b49a1f9f34ff3eaf0f3301d8d2a86c40"/>
@@ -10749,6 +10750,7 @@ This disk contains 6 packages of 6 saved games.
 		<publisher>Proein</publisher>
 		<info name="developer" value="Futura" />
 		<info name="distributed" value="Planeta DeAgostini" />
+		<info name="region" value="Spain" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size = "1474560">
@@ -13985,6 +13987,66 @@ Eye of the Beholder III: Assault on Myth Drannor
 		</part>
 	</software>
 
+	<software name="fpsbas94">
+		<description>Front Page Sports: Baseball '94</description>
+		<year>1994</year>
+		<publisher>Sierra On-Line</publisher>
+		<notes><![CDATA[
+Bad Dump: the disks has an accessed file record
+]]></notes>
+		<info name="copy_protection" value="Manual required" />
+		<info name="developer" value="Dynamix" />
+		<info name="version" value="1.00W" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Front Page Sports - Baseball 94 [Sierra] [1994] [3.5HD] [disk 1 of 4].img" size="1474560" crc="21df8fa1" sha1="4f697050eb3169c77b27022464c05445111641f1" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Front Page Sports - Baseball 94 [Sierra] [1994] [3.5HD] [disk 2 of 4].img" size="1474560" crc="9192a82b" sha1="561ae9281b4d5d2256000a2ae72b17734e6ccc5b" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Front Page Sports - Baseball 94 [Sierra] [1994] [3.5HD] [disk 3 of 4].img" size="1474560" crc="821c2c9a" sha1="c392aed95ae839d261e07aeffe2af8d1e7ef8aad" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Front Page Sports - Baseball 94 [Sierra] [1994] [3.5HD] [disk 4 of 4].img" size="1474560" crc="83c0ee95" sha1="000fe3f30743e026319ace6c2b2044c0fe02bd90" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fpsbas94exp">
+		<description>Front Page Sports: Baseball '94 - Legends and Stadiums expansion</description>
+		<year>1995</year>
+		<publisher>Sierra On-Line</publisher>
+		<notes><![CDATA[
+This patch installs Legends and Stadiums expansion data, and update Front Page Sports: Baseball '94 to version 1.02
+Bad Dump: the disks has an accessed file record and a modified OEM id
+]]></notes>
+		<info name="usage" value="Front Page Sports: Baseball '94 required" />
+		<info name="developer" value="Dynamix" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Front Page Sports - Baseball 94 Legends and Stadiums Expansion [Sierra] [1995] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="daf8de03" sha1="5d5dd7ff76914dca1367f2a676665da08fbf06fc" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Front Page Sports - Baseball 94 Legends and Stadiums Expansion [Sierra] [1995] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="c2aa77dc" sha1="e436c7e7e87ecd874cc48b3b27abf4ab6daf2fc5" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="frontier">
 		<description>Frontier - Elite II</description>
 		<year>1993</year>
@@ -14351,21 +14413,25 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<info name="developer" value="MicroProse" />
 		<info name="version" value="469.02" />
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Gunship 2000 [MicroProse] [1991] [3.5DD] [Disk A].img" size="737280" crc="dd1d35e7" sha1="3444c64b3f8a2d541f0f5cc7b64792c31e9fc472"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Gunship 2000 [MicroProse] [1991] [3.5DD] [Disk B].img" size="737280" crc="f82d1530" sha1="fed8f972ec25cd1661b22ac22960fe0bc23779d8"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Gunship 2000 [MicroProse] [1991] [3.5DD] [Disk C].img" size="737280" crc="f0a2d993" sha1="e3adc0b20defc9769d37c1c4f7bd6ccd9f6cfa67"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Gunship 2000 [MicroProse] [1991] [3.5DD] [Disk D].img" size="737280" crc="3dd3f5a6" sha1="d981a909fa08cf21d0cd975fd80b5b39ec9dcbe2"/>
 			</dataarea>
@@ -14379,21 +14445,25 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<info name="developer" value="MicroProse" />
 		<info name="version" value="469.03" />
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [3.5DD] [Disk A].img" size="737280" crc="ee9da48a" sha1="9e212a805d73776fb5aeaea44786d12c5ec93b86"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [3.5DD] [Disk B].img" size="737280" crc="1811c2ee" sha1="269425fb84c3239e822c36c6c90e352ad4477caf"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [3.5DD] [Disk C].img" size="737280" crc="eb1404e7" sha1="996ccde0b6a0bc5229cc097ef7d198814df2abb6"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [3.5DD] [Disk D].img" size="737280" crc="d48db926" sha1="d19d8c7fd222cdda239d88df28287776fe2f9a9e"/>
 			</dataarea>
@@ -14407,16 +14477,19 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<info name="developer" value="MicroProse" />
 		<info name="version" value="469.03" />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size = "1228800">
 				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [5.25HD] [Disk A].img" size="1228800" crc="ba3487fa" sha1="c3da81754a433793d255a0a193e5c222eed00d49"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size = "1228800">
 				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [5.25HD] [Disk B].img" size="1228800" crc="a764b534" sha1="d7ffd705dd597c2a018a9604a2a56e6ce970c1ca"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size = "1228800">
 				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [5.25HD] [Disk C].img" size="1228800" crc="47d0811e" sha1="5f507635ecef767095356cc0251f9d7585776ec7"/>
 			</dataarea>
@@ -14430,16 +14503,19 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<info name="developer" value="MicroProse" />
 		<info name="version" value="469.02" />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size = "1228800">
 				<rom name="Gunship 2000 (469.02) [MicroProse] [1991] [5.25HD] [Disk A].img" size="1228800" crc="bd4d0ce9" sha1="dd3a13d5ff85a200fa8ab564f522e3e213fa702d"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size = "1228800">
 				<rom name="Gunship 2000 (469.02) [MicroProse] [1991] [5.25HD] [Disk B].img" size="1228800" crc="04c5ed46" sha1="b77dd4395c2933a908748797aba662b273e4ebc8"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size = "1228800">
 				<rom name="Gunship 2000 (469.02) [MicroProse] [1991] [5.25HD] [Disk C].img" size="1228800" crc="14fa3e09" sha1="7b276418c6e6f78e74ea80a22137cc76cbd8576d"/>
 			</dataarea>
@@ -14493,6 +14569,103 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Hardball 3 - MLBPA Players Disk [Accolade] [1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="5fb135da" sha1="493133a9f210b941919aa7ee74491f02ab13314b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harpoon2">
+		<description>Harpoon II</description>
+		<year>1994</year>
+		<publisher>Three-Sixty Pacific</publisher>
+		<info name="developer" value="Three-Sixty Pacific" />
+		<info name="usage" value="VESA driver required" />
+		<info name="version" value="2.0.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II [Three-Sixty Pacific] [1994] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="ba36128d" sha1="87cb1492e3e5f6b78fe5a4f2a4f142c2626c93a0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II [Three-Sixty Pacific] [1994] [3.5HD] [Disk 2 of 6].img" size="1474560" crc="360d7df4" sha1="84e71c19919bcb652bf15cce14dd1174583c8928"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II [Three-Sixty Pacific] [1994] [3.5HD] [Disk 3 of 6].img" size="1474560" crc="90f26813" sha1="d1505b1799251a76b5b3606ba545d738f178fbaa"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II [Three-Sixty Pacific] [1994] [3.5HD] [Disk 4 of 6].img" size="1474560" crc="5802dc0f" sha1="a555f6a690dfca91386df3df35f81c4c2dc00e89"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II [Three-Sixty Pacific] [1994] [3.5HD] [Disk 5 of 6].img" size="1474560" crc="cb996f38" sha1="ef30b81b4ac472d11babb573fb47414f6140fca9"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II [Three-Sixty Pacific] [1994] [3.5HD] [Disk 6 of 6].img" size="1474560" crc="30c9f4a3" sha1="73385dce3418a5a8f183701965a68174db52e4fa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harp2bs2">
+		<description>Harpoon II - BattleSet 2: WestPac</description>
+		<year>1994</year>
+		<publisher>Three-Sixty Pacific</publisher>
+		<notes><![CDATA[
+Add-on for Harpoon II and update patch to version 2.0.2
+]]></notes>
+		<info name="developer" value="Three-Sixty Pacific" />
+		<info name="usage" value="Requires Harpoon II" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II - BattleSet 2 - WestPac [Three-Sixty Pacific] [1994] [Disk 1 of 2].img" size="1474560" crc="98c38020" sha1="9eda5d4ef22c2fd9d7aba9c7d5b7b41fb938271d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II - BattleSet 2 - WestPac [Three-Sixty Pacific] [1994] [Disk 2 of 2].img" size="1474560" crc="a2f42445" sha1="b6ef9b921161f427e37fbb5dfde1dff4e02a5471"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harp2bs3">
+		<description>Harpoon II - BattleSet 3: Cold War</description>
+		<year>1995</year>
+		<publisher>Three-Sixty Pacific</publisher>
+		<notes><![CDATA[
+Add-on for Harpoon II and update patch to version 2.1.11
+]]></notes>
+		<info name="developer" value="Three-Sixty Pacific" />
+		<info name="usage" value="Requires Harpoon II" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II - BattleSet 3 - Cold War [Three-Sixty Pacific] [1995] [Disk 1 of 3].img" size="1474560" crc="9bd2dbd6" sha1="4dfb9af0ac2669bffafed17b13c83f77ee725a73"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II - BattleSet 3 - Cold War [Three-Sixty Pacific] [1995] [Disk 2 of 3].img" size="1474560" crc="67d62ab6" sha1="c9c7938a6e8687d51e119dc88acf7c79eeb2811a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Post WestPac Install Pacth" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II - BattleSet 3 - Cold War [Three-Sixty Pacific] [1995] [Disk 3 of 3].img" size="1474560" crc="751cdf28" sha1="6da6c5ada50a348ee18334b4295cf376a1ac4b97"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14574,6 +14747,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<publisher>MCM Software</publisher>
 		<info name="developer" value="Dynamix" />
 		<info name="distributor" value="MCM Software" />
+		<info name="region" value="Spain" />
 		<info name="version" value="0.100" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -14860,6 +15034,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<info name="copy_protection" value="Manual - Code sheet required" />
 		<info name="developer" value="Imagitec Design" />
 		<info name="distributed" value="Planeta DeAgostini" />
+		<info name="region" value="Spain" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="The Humans 2 (Spain) [Proein] [1995] [3.5DD] [Disk 1 of 4].img" size="1474560" crc="f4764f28" sha1="2bdb2be33871ccc7ddc0b44d3ceb67b0ee355526"/>
@@ -15192,6 +15367,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<description>Indiana Jones and the Fate of Atlantis (3.5")</description>
 		<year>1992</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="LucasArts" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -15224,6 +15400,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<description>Indiana Jones and the Fate of Atlantis (5.25")</description>
 		<year>1992</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="LucasArts" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
@@ -15261,7 +15438,11 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<description>Indiana Jones and the Fate of Atlantis (3.5", Germany)</description>
 		<year>1992</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="LucasArts" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
+		<info name="version" value="V1.0 4-30-92 H407 M32 V10 J19" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Indiana Jones and the Fate of Atlantis (Germany) (Disk 1).img" size="1474560" crc="9fda8591" sha1="4fe99915770ea6a6dadaf02e81d68a831016cda9"/>
@@ -15293,8 +15474,11 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<description>Indiana Jones and the Fate of Atlantis (3.5", Spain, Erbe release)</description>
 		<year>1992</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="LucasArts" />
 		<info name="distributor" value="Erbe Software" />
+		<info name="language" value="Spanish" />
+		<info name="region" value="Spain" />
 		<info name="version" value="V1.0 30-4-92 H410 M32 V10 J19" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -15511,12 +15695,34 @@ Eye of the Beholder III: Assault on Myth Drannor
 		</part>
 	</software>
 
+	<software name="ito">
+		<description>International Tennis Open</description>
+		<year>1995</year>
+		<publisher>Philips Interactive Media / Pathé Interactive</publisher>
+		<info name="developer" value="Infogrames" />
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="International Tennis Open (Fr) [Pathe - Philips] [1995] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="b905a4a2" sha1="46b916331c283d55e98a9b05669b2eb51f2296b5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="International Tennis Open (Fr) [Pathe - Philips] [1995] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="1879b0f1" sha1="91b7fd995b3ed83969ce17202460923771398fe6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ishar2es">
 		<description>Ishar 2: Messengers of Doom (Spain, Proein release)</description>
 		<year>1995</year>
 		<publisher>Silmarils</publisher>
 		<info name="developer" value="Silmarils" />
 		<info name="distributor" value="Proein" />
+		<info name="region" value="Spain" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Ishar 2 (Spain) [Silmarils] [1995] [3.5HD] [Disk 1 of 2] [Disk A].img" size="1474560" crc="27d7b1d9" sha1="d0d263d17f4bae45dd9e9f0a28195c68151aae07"/>
@@ -20193,6 +20399,8 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<year>1994</year>
 		<publisher>Maxis</publisher>
 		<info name="developer" value="Maxis" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="SimCity 2000 (Germany) [Maxis] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="0f6bc7bd" sha1="f8898eac0849688ce1ecf6f21b19fdff31313214"/>
@@ -20210,6 +20418,8 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<year>1994</year>
 		<publisher>Maxis</publisher>
 		<info name="developer" value="Maxis" />
+		<info name="language" value="Spanish" />
+		<info name="region" value="Spain" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="SimCity 2000 (Spain) [Maxis] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="ea003323" sha1="a2000dcc1f93dc4115f45405702ed3d19ef64af9"/>
@@ -20222,11 +20432,13 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		</part>
 	</software>
 
-	<!-- Floppy 2 - Bad Dump Status: Modified OEM ID and modified root -->
 	<software name="simcit2ka" cloneof="simcit2k">
 		<description>SimCity 2000 (Ver 1.01)</description>
 		<year>1993</year>
 		<publisher>Maxis</publisher>
+		<notes><![CDATA[
+Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="smcity2kd1 (a).img" size="1474560" crc="81f95788" sha1="d387dd7356bcf7ec28b356039fdcdb44575325c2"/>
@@ -20258,7 +20470,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 	</software>
 
 	<software name="simcit2kd" cloneof="simcit2k">
-		<description>SimCity 2000 (Interactive demo disk)</description>
+		<description>SimCity 2000 (Interactive Demo Disk)</description>
 		<year>1994</year>
 		<publisher>Maxis</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -21161,6 +21373,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Star Wars: X-Wing - Space Combat Simulator (Spain)</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
+		<info name="region" value="Spain" />
 		<info name="version" value="Version 1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -21284,6 +21497,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Star Wars: TIE Fighter (Spain)</description>
 		<year>1994</year>
 		<publisher>LucasArts</publisher>
+		<info name="region" value="Spain" />
 		<info name="version" value="V1.0 06/15/94" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
