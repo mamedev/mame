@@ -9659,7 +9659,7 @@ Missing [modem] features, assume requiring a connection to a Reuters device such
 		</part>
 	</software>
 
-	<software name="aopacex">
+	<software name="aopacex" cloneof="aopac">
 		<description>Aces of the Pacific Expansion Disk - WWII: 1946</description>
 		<year>1992</year>
 		<publisher>Dynamix</publisher>
@@ -10275,7 +10275,7 @@ The disks have had their OEM IDs modified by Windows
 		</part>
 	</software>
 
-	<software name="aitd2sd">
+	<software name="aitd2sd" cloneof="aitd2">
 		<description>Alone in the Dark 2 - Secret Doors (USA)</description>
 		<year>1994</year>
 		<publisher>I·Motion</publisher>
@@ -14030,7 +14030,7 @@ Bad Dump: the disks has an accessed file record
 		</part>
 	</software>
 
-	<software name="fpsbas94exp">
+	<software name="fpsbas94exp" cloneof="fpsbas94">
 		<description>Front Page Sports: Baseball '94 - Legends and Stadiums expansion</description>
 		<year>1995</year>
 		<publisher>Sierra On-Line</publisher>
@@ -14570,7 +14570,7 @@ Bad Dump: the disks has an accessed file record and a modified OEM id
 		</part>
 	</software>
 
-	<software name="hardbal3pl">
+	<software name="hardbal3pl" cloneof="hardbal3">
 		<description>HardBall 3 - MLBPA Players Disk</description>
 		<year>1992</year>
 		<publisher>Accolade</publisher>
@@ -14627,7 +14627,7 @@ Bad Dump: the disks has an accessed file record and a modified OEM id
 		</part>
 	</software>
 
-	<software name="harp2bs2">
+	<software name="harp2bs2" cloneof="harpoon2">
 		<description>Harpoon II - BattleSet 2: WestPac</description>
 		<year>1994</year>
 		<publisher>Three-Sixty Pacific</publisher>
@@ -14650,7 +14650,7 @@ Add-on for Harpoon II and update patch to version 2.0.2
 		</part>
 	</software>
 
-	<software name="harp2bs3">
+	<software name="harp2bs3" cloneof="harpoon2">
 		<description>Harpoon II - BattleSet 3: Cold War</description>
 		<year>1995</year>
 		<publisher>Three-Sixty Pacific</publisher>
@@ -16953,7 +16953,7 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		</part>
 	</software>
 
-	<software name="linksfcc">
+	<software name="linksfcc" cloneof="links">
 		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 		<description>Links - Championship Course - Firestone Country Club</description>
 		<year>1991</year>
@@ -16992,7 +16992,7 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		</part>
 	</software>
 
-	<software name="links386bnt">
+	<software name="links386bnt" cloneof="links386">
 		<description>Links 386 - Bountiful Golf Club Championship Course</description>
 		<year>1994</year>
 		<publisher>Access Software</publisher>
@@ -18320,7 +18320,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		</part>
 	</software>
 
-	<software name="nascarpck">
+	<software name="nascarpck" cloneof="nascar">
 		<description>NASCAR: Track Pack</description>
 		<year>1995</year>
 		<publisher>Virgin</publisher>
@@ -20989,10 +20989,13 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		</part>
 	</software>
 
-	<software name="spearof2">
-		<description>Spear of Destiny Mission 2: Return to Danger</description>
+	<software name="spearof2" cloneof="spearofd">
+		<description>Spear of Destiny - Mission 2: Return to Danger</description>
 		<year>1994</year>
 		<publisher>FormGen</publisher>
+		<notes><![CDATA[
+Accessory game for Spear of Destiny.
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Spear of Destiny Mission 2 - Return to Danger (World) (Add-on).img" size="1474560" crc="b3ae0ea2" sha1="4526cb173c8715477de759c680c0edeae8625011"/>
@@ -21000,10 +21003,13 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		</part>
 	</software>
 
-	<software name="spearof3">
-		<description>Spear of Destiny Mission 3: Ultimate Challenge</description>
+	<software name="spearof3" cloneof="spearofd">
+		<description>Spear of Destiny - Mission 3: Ultimate Challenge</description>
 		<year>1994</year>
 		<publisher>FormGen</publisher>
+		<notes><![CDATA[
+Accessory game for Spear of Destiny.
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Spear of Destiny Mission 3 - Ultimate Challenge (World) (Add-on).img" size="1474560" crc="6046a918" sha1="42f7969a494f82d20c42343f767239fcfe58417d"/>
@@ -21426,7 +21432,7 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		</part>
 	</software>
 
-	<software name="swxwingbw">
+	<software name="swxwingbw" cloneof="swxwing">
 		<description>Star Wars: X-Wing - B-Wing Expansion</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
@@ -21438,7 +21444,7 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		</part>
 	</software>
 
-	<software name="swxwingip">
+	<software name="swxwingip" cloneof="swxwing">
 		<description>Star Wars: X-Wing - Imperial Pursuit</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
@@ -21621,7 +21627,7 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		</part>
 	</software>
 
-	<software name="speechpk" supported="no">
+	<software name="speechpk" cloneof="strkcomm" supported="no">
 		<description>Strike Commander: Speech Pack</description>
 		<year>1993</year>
 		<publisher>Origin</publisher>
@@ -21643,7 +21649,7 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		</part>
 	</software>
 
-	<software name="tactops" supported="no">
+	<software name="tactops" cloneof="strkcomm" supported="no">
 		<description>Strike Commander: Tactical Operations</description>
 		<year>1993</year>
 		<publisher>Origin</publisher>
@@ -21854,7 +21860,7 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		</part>
 	</software>
 
-	<software name="syndictar">
+	<software name="syndictar" cloneof="syndicate">
 		<description>Syndicate: American Revolt (Germany)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
@@ -22509,7 +22515,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="wngcomsm">
+	<software name="wngcomsm" cloneof="wingcom">
 		<description>Wing Commander: The Secret Missions</description>
 		<year>1990</year>
 		<publisher>ORIGIN Systems</publisher>
@@ -22521,7 +22527,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="wngcomsm2">
+	<software name="wngcomsm2" cloneof="wingcom">
 		<description>Wing Commander: The Secret Missions 2</description>
 		<year>1991</year>
 		<publisher>ORIGIN Systems</publisher>
@@ -22657,7 +22663,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="wngcm2s1">
+	<software name="wngcm2s1" cloneof="wingcom2">
 		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 		<description>Wing Commander II - Vengeance of the Kilrathi - Special Operations 1</description>
 		<year>1991</year>
@@ -22677,7 +22683,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="wngcm2s2">
+	<software name="wngcm2s2" cloneof="wingcom2">
 		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 		<description>Wing Commander II - Vengeance of the Kilrathi - Special Operations 2</description>
 		<year>1992</year>
@@ -22697,7 +22703,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="wngcm2sp">
+	<software name="wngcm2sp" cloneof="wingcom2">
 		<description>Wing Commander II - Vengeance of the Kilrathi - Speech Accessory Pack (3.5")</description>
 		<year>1991</year>
 		<publisher>ORIGIN Systems</publisher>
@@ -22720,7 +22726,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="wngcm2sp525" cloneof="wngcm2sp">
+	<software name="wngcm2sp525" cloneof="wingcom2">
 		<description>Wing Commander II - Vengeance of the Kilrathi - Speech Accessory Pack (5.25")</description>
 		<year>1991</year>
 		<publisher>ORIGIN Systems</publisher>
@@ -22893,7 +22899,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="wolf3dsu">
+	<software name="wolf3dsu" cloneof="wolf3d">
 		<description>Wolfenstein 3-D Super Upgrades!</description>
 		<year>1994</year>
 		<publisher>Apogee Software</publisher>
