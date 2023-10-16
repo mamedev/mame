@@ -407,10 +407,10 @@ uint8_t isa8_sblaster_2_0_lle_device::dsp_wbuf_status_r(offs_t offset)
 uint8_t isa8_sblaster_2_0_lle_device::dsp_data_r(offs_t offset)
 {
 	uint8_t data = m_dsp_to_host_latch;     // PC retrieves the latched byte.
-	LOG("PC reading DSP data latch: D:%02X\n", data);
 
 	if(!machine().side_effects_disabled())
 	{
+		LOG("PC reading DSP data latch: D:%02X\n", data);
 		m_dav_pc = false;                       // Clear the PC has data flag.
 		m_dsp_to_host_latch = 0;                // Clear the latch.
 	}
