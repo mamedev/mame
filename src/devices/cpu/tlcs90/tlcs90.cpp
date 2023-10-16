@@ -16,6 +16,9 @@
 #include "tlcs90.h"
 #include "tlcs90d.h"
 
+#define VERBOSE     1
+#include "logmacro.h"
+
 ALLOW_SAVE_TYPE(tlcs90_device::e_mode); // allow save_item on a non-fundamental type
 
 
@@ -31,11 +34,11 @@ void tlcs90_device::tmp90840_regs(address_map &map)
 {
 	map(0xffc0, 0xffef).rw(FUNC(tlcs90_device::reserved_r), FUNC(tlcs90_device::reserved_w));
 	//map(0xffc0, 0xffc0).rw(FUNC(tlcs90_device::p0_r), FUNC(tlcs90_device::p0_w));
-	//map(0xffc1, 0xffc1).rw(FUNC(tlcs90_device::p1_r), FUNC(tlcs90_device::p1_w));
-	//map(0xffc2, 0xffc2).rw(FUNC(tlcs90_device::irfl_r), FUNC(tlcs90_device::p01cr_w));
+	map(0xffc1, 0xffc1).rw(FUNC(tlcs90_device::p1_r), FUNC(tlcs90_device::p1_w));
+	map(0xffc2, 0xffc2). /*r(FUNC(tlcs90_device::irfl_r)).*/ w(FUNC(tlcs90_device::p01cr_w));
 	map(0xffc3, 0xffc3). /*r(FUNC(tlcs90_device::irfh_r)).*/ w(FUNC(tlcs90_device::irf_clear_w));
-	//map(0xffc4, 0xffc4).rw(FUNC(tlcs90_device::p2_r), FUNC(tlcs90_device::p2_w));
-	//map(0xffc5, 0xffc5).w(FUNC(tlcs90_device::p2cr_w));
+	map(0xffc4, 0xffc4).rw(FUNC(tlcs90_device::p2_r), FUNC(tlcs90_device::p2_w));
+	map(0xffc5, 0xffc5).w(FUNC(tlcs90_device::p2cr_w));
 	map(0xffc6, 0xffc6).rw(FUNC(tlcs90_device::p3_r), FUNC(tlcs90_device::p3_w));
 	//map(0xffc7, 0xffc7).w(FUNC(tlcs90_device::p3cr_w));
 	map(0xffc8, 0xffc8).rw(FUNC(tlcs90_device::p4_r), FUNC(tlcs90_device::p4_w));
@@ -106,8 +109,8 @@ void tlcs90_device::tmp90844_regs(address_map &map)
 	//map(0xffc1, 0xffc1).w(FUNC(tlcs90_device::p0cr_w));
 	//map(0xffc2, 0xffc2).rw(FUNC(tlcs90_device::p1_r), FUNC(tlcs90_device::p1_w));
 	//map(0xffc3, 0xffc3).w(FUNC(tlcs90_device::p1cr_w));
-	//map(0xffc4, 0xffc4).rw(FUNC(tlcs90_device::p2_r), FUNC(tlcs90_device::p2_w));
-	//map(0xffc5, 0xffc5).w(FUNC(tlcs90_device::p2cr_w));
+	map(0xffc4, 0xffc4).rw(FUNC(tlcs90_device::p2_r), FUNC(tlcs90_device::p2_w));
+	map(0xffc5, 0xffc5).w(FUNC(tlcs90_device::p2cr_w));
 	map(0xffc6, 0xffc6).rw(FUNC(tlcs90_device::p3_r), FUNC(tlcs90_device::p3_w));
 	//map(0xffc7, 0xffc7).w(FUNC(tlcs90_device::p3cr_w));
 	map(0xffc8, 0xffc8).rw(FUNC(tlcs90_device::p4_r), FUNC(tlcs90_device::p4_w));
@@ -208,7 +211,7 @@ device_memory_interface::space_config_vector tlcs90_device::memory_space_config(
 enum    {
 		T90_B,  T90_C,  T90_D,  T90_E,  T90_H,  T90_L,  T90_A,
 		T90_BC, T90_DE, T90_HL, T90_XX, T90_IX, T90_IY, T90_SP,
-		T90_AF, T90_PC
+		T90_AF, T90_PC, T90_HA
 };
 
 // Regs
@@ -1343,12 +1346,19 @@ INT2        P82         Rising Edge     -
 
 *************************************************************************************************************/
 
+void tlcs90_device::halt()
+{
+	LOG("%04X: halt\n", m_pc.w.l);
+	m_halt = 1;
+}
+
 void tlcs90_device::leave_halt()
 {
 	if( m_halt )
 	{
+		LOG("%04X: leave_halt\n", m_pc.w.l);
 		m_halt = 0;
-		m_pc.w.l++;
+		//m_pc.w.l++;
 	}
 }
 
@@ -1369,6 +1379,9 @@ void tlcs90_device::take_interrupt(tlcs90_e_irq irq)
 
 	leave_halt();
 
+	if (!(F & IF))
+		return;
+
 	Push( PC );
 	Push( AF );
 
@@ -1384,15 +1397,14 @@ void tlcs90_device::check_interrupts()
 	tlcs90_e_irq irq;
 	int mask;
 
-	if (!(F & IF))
-		return;
-
 	for (irq = INTSWI; irq < INTMAX; ++irq)
 	{
 		mask = (1 << irq);
 		if(irq >= INT0) mask &= m_irq_mask;
+
 		if (m_irq_state & mask)
 		{
+			LOG("%04X: check_interrupts: taking interrupt: %d. Current state: %x. Current mask: %x\n", m_pc.w.l, irq, m_irq_state, mask);
 			take_interrupt( irq );
 			return;
 		}
@@ -1449,14 +1461,21 @@ void tlcs90_device::execute_run()
 
 	do
 	{
-		m_prvpc.d = m_pc.d;
-		debugger_instruction_hook(m_pc.d);
-
 		check_interrupts();
 
-		m_addr = m_pc.d;
-		decode();
-		m_pc.d = m_addr;
+		// when in HALT state, the fetched opcode is not dispatched (aka a NOP)
+		if (m_halt)
+		{
+			m_op = NOP;
+		}
+		else {
+			m_prvpc.d = m_pc.d;
+			debugger_instruction_hook(m_pc.d);
+
+			m_addr = m_pc.d;
+			decode();
+			m_pc.d = m_addr;
+		}
 
 		switch ( m_op )
 		{
@@ -1630,9 +1649,10 @@ void tlcs90_device::execute_run()
 				Cyc();
 				break;
 
-//          case HALT:
-//              Cyc();
-//              break;
+            case HALT:
+				halt();
+                Cyc();
+                break;
 			case DI:
 				m_after_EI = 0;
 				F &= ~IF;
@@ -2078,6 +2098,8 @@ void tlcs90_device::execute_run()
 
 void tlcs90_device::device_reset()
 {
+	leave_halt();
+
 	m_irq_state = 0;
 	m_irq_mask = 0;
 	m_pc.d = 0x0000;
@@ -2091,6 +2113,8 @@ void tlcs90_device::device_reset()
 */
 
 	std::fill(std::begin(m_port_latch), std::end(m_port_latch), 0);
+	m_p01cr = 0;
+	m_p2cr = 0;
 	m_p4cr = 0;
 	m_p67cr = 0;
 	m_p8cr = 0;
@@ -2383,6 +2407,89 @@ FFED    BX      R/W     Reset   Description
  0      BY0     R W     0       IY bank register bit 0
 
 *************************************************************************************************************/
+
+uint8_t tlcs90_device::p1_r()
+{
+	if ((m_p01cr & 0x04) != 0)
+	{
+		if (!machine().side_effects_disabled())
+			logerror("%04X: Read from P1 but it's configured as part of address bus\n", m_pc.w.l);
+
+		return 0;
+	}
+
+	if ((m_p01cr & 0x02) != 0)
+	{
+		if (!machine().side_effects_disabled())
+			logerror("%04X: Read from P1 but it's configured as output\n", m_pc.w.l);
+
+		return 0;
+	}
+
+	return (m_port_latch[1] & 0xf0) | (m_port_read_cb[1]() & 0x0f);
+}
+
+void tlcs90_device::p1_w(uint8_t data)
+{
+	if ((m_p01cr & 0x04) != 0)
+	{
+		if (!machine().side_effects_disabled())
+			logerror("%04X: Read from P1 but it's configured as part of address bus\n", m_pc.w.l);
+
+		return;
+	}
+
+	if ((m_p01cr & 0x02) == 0)
+	{
+		if (!machine().side_effects_disabled())
+			logerror("%04X: Write to P1 but it's configured as input\n", m_pc.w.l);
+
+		return;
+	}
+
+	m_port_write_cb[1](m_port_latch[1]);
+}
+
+void tlcs90_device::p01cr_w(uint8_t data)
+{
+	m_p01cr = data;
+}
+
+uint8_t tlcs90_device::p2_r()
+{
+	if ((m_p01cr & 0x04) != 0)
+	{
+		if (!machine().side_effects_disabled())
+			logerror("%04X: Read from P2 but it's configured as part of address bus\n", m_pc.w.l);
+
+		return 0;
+	}
+
+	return (m_port_latch[2] & 0xf0) | (m_port_read_cb[2]() & 0x0f);
+}
+
+void tlcs90_device::p2_w(uint8_t data)
+{
+	if ((m_p01cr & 0x04) != 0)
+	{
+		if (!machine().side_effects_disabled())
+			logerror("%04X: Read from P1 but it's configured as part of address bus\n", m_pc.w.l);
+
+		return;
+	}
+
+	m_port_latch[2] = data;
+	uint8_t out_mask = m_p2cr;
+	if (out_mask)
+	{
+		m_port_write_cb[2](m_port_latch[2] & out_mask);
+	}
+}
+
+void tlcs90_device::p2cr_w(uint8_t data)
+{
+	m_p2cr = data;
+}
 
 uint8_t tlcs90_device::p3_r()
 {
@@ -2721,7 +2828,7 @@ void tlcs90_device::t90_start_timer(int i)
 
 	m_timer[i]->adjust(period, i, period);
 
-	logerror("%04X: CPU Timer %d started at %f Hz\n", m_pc.w.l, i, 1.0 / period.as_double());
+	LOG("%04X: CPU Timer %d started at %f Hz\n", m_pc.w.l, i, 1.0 / period.as_double());
 }
 
 void tlcs90_device::t90_start_timer4()
@@ -2743,14 +2850,14 @@ void tlcs90_device::t90_start_timer4()
 
 	m_timer[4]->adjust(period, 4, period);
 
-	logerror("%04X: CPU Timer 4 started at %f Hz\n", m_pc.w.l, 1.0 / period.as_double());
+	LOG("%04X: CPU Timer 4 started at %f Hz\n", m_pc.w.l, 1.0 / period.as_double());
 }
 
 
 void tlcs90_device::t90_stop_timer(int i)
 {
 	m_timer[i]->adjust(attotime::never, i);
-	logerror("%04X: CPU Timer %d stopped\n", m_pc.w.l, i);
+	LOG("%04X: CPU Timer %d stopped\n", m_pc.w.l, i);
 }
 
 void tlcs90_device::t90_stop_timer4()
@@ -2871,6 +2978,8 @@ void tlcs90_device::device_start()
 	save_item(NAME(m_extra_cycles));
 
 	save_item(NAME(m_port_latch));
+	save_item(NAME(m_p01cr));
+	save_item(NAME(m_p2cr));
 	save_item(NAME(m_p4cr));
 	save_item(NAME(m_p67cr));
 	save_item(NAME(m_p8cr));
@@ -2966,6 +3075,7 @@ void tlcs90_device::device_start()
 	state_add( T90_HL, "HL", m_hl.w.l).formatstr("%04X");
 	state_add( T90_IX, "IX", m_ix.w.l).formatstr("%04X");
 	state_add( T90_IY, "IY", m_iy.w.l).formatstr("%04X");
+	state_add( T90_HA, "HALT", m_halt).formatstr("%01X");
 
 	state_add(STATE_GENPC, "GENPC", m_pc.w.l).formatstr("%04X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_prvpc.w.l).formatstr("%04X").noshow();
