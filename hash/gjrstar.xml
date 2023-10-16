@@ -51,7 +51,7 @@ license:CC0-1.0
 		<year>????</year>
 		<publisher>Video Technology / DzhiNo</publisher> <!-- VTech / ДжиНо -->
 		<info name="serial" value="80-10126-14" /> <!-- № 14 -->
-		<info name="alt_title" value="B Поисках Духовных Сокровищ"/>
+		<info name="alt_title" value="В Поисках Духовных Сокровищ"/>
 		<part name="rom" interface="genius_rom">
 			<dataarea name="rom" size="0x10000">
 				<rom name="80-10126-14.bin" size="0x10000" crc="87e0ba37" sha1="902d1417d1fcc26216b35d18c685bbcf5b65b96c"/> <!-- 27C512 inside the cart -->
