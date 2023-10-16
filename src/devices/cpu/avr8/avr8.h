@@ -18,9 +18,39 @@
 // ======================> avr8_device
 
 // Used by core CPU interface
+template <int NumTimers>
 class avr8_device : public cpu_device
 {
 public:
+	enum gpio_t : int
+	{
+		GPIOA,
+		GPIOB,
+		GPIOC,
+		GPIOD,
+		GPIOE,
+		GPIOF,
+		GPIOG,
+		GPIOH,
+		GPIOJ,
+		GPIOK,
+		GPIOL,
+
+		GPIO_COUNT
+	};
+
+	enum : uint8_t
+	{
+		ADC0 = 0,
+		ADC1,
+		ADC2,
+		ADC3,
+		ADC4,
+		ADC5,
+		ADC6,
+		ADC7
+	};
+
 	// inline configuration helpers
 	void set_eeprom_tag(const char *tag) { m_eeprom.set_tag(tag); }
 
@@ -33,21 +63,20 @@ public:
 	// public interfaces
 	virtual void update_interrupt(int source);
 
-	// register handling
-	void regs_w(offs_t offset, uint8_t data);
-	uint8_t regs_r(offs_t offset);
-	uint32_t m_shifted_pc;
-
 	// GPIO
-	template<uint8_t Port> auto gpio_out() { return m_gpio_out_cb[Port].bind(); }
-	template<uint8_t Port> auto gpio_in() { return m_gpio_in_cb[Port].bind(); }
+	template <gpio_t Port> auto gpio_out() { return m_gpio_out_cb[Port].bind(); }
+	template <gpio_t Port> auto gpio_in() { return m_gpio_in_cb[Port].bind(); }
+	template <int Port> uint8_t pin_r();
+	template <int Port> void port_w(uint8_t data);
+	template <int Port> uint8_t gpio_r();
 
 	// ADC
 	template<uint8_t Pin> auto adc_in() { return m_adc_in_cb[Pin].bind(); }
 
 protected:
-	avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t address_mask, address_map_constructor internal_map, int32_t num_timers);
+	avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t address_mask, address_map_constructor internal_map);
 
+	typedef void (avr8_device::*timer_func) ();
 	typedef void (avr8_device::*op_func) (uint16_t op);
 
 	op_func m_op_funcs[0x10000];
@@ -81,6 +110,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// address spaces
+	void base_internal_map(address_map &map);
 	const address_space_config m_program_config;
 	const address_space_config m_data_config;
 	required_region_ptr<uint8_t> m_eeprom;
@@ -95,24 +125,127 @@ protected:
 	uint8_t m_lock_bits;
 
 	// CPU registers
+	required_shared_ptr<uint8_t> m_r;
 	uint32_t m_pc;
-	uint8_t m_r[0x200];
 
-	// internal timers
+	void tccr0a_w(uint8_t data);
+	void tccr0b_w(uint8_t data);
+	void ocr0a_w(uint8_t data);
+	void ocr0b_w(uint8_t data);
+	void tifr0_w(uint8_t data);
+	void tifr1_w(uint8_t data);
+	void tifr2_w(uint8_t data);
+	void gtccr_w(uint8_t data);
+	void eecr_w(uint8_t data);
+	void gpior0_w(uint8_t data);
+	void gpior1_w(uint8_t data);
+	void gpior2_w(uint8_t data);
+	void spsr_w(uint8_t data);
+	void spcr_w(uint8_t data);
+	void spdr_w(uint8_t data);
+	void wdtcsr_w(uint8_t data);
+	void clkpr_w(uint8_t data);
+	void prr0_w(uint8_t data);
+	void prr1_w(uint8_t data);
+	void osccal_w(uint8_t data);
+	void pcicr_w(uint8_t data);
+	void eicra_w(uint8_t data);
+	void eicrb_w(uint8_t data);
+	void pcmsk0_w(uint8_t data);
+	void pcmsk1_w(uint8_t data);
+	void pcmsk2_w(uint8_t data);
+	void timsk0_w(uint8_t data);
+	void timsk1_w(uint8_t data);
+	void timsk2_w(uint8_t data);
+	void timsk3_w(uint8_t data);
+	void timsk4_w(uint8_t data);
+	void timsk5_w(uint8_t data);
+	void xmcra_w(uint8_t data);
+	void xmcrb_w(uint8_t data);
+	uint8_t adcl_r();
+	void adcl_w(uint8_t data);
+	uint8_t adch_r();
+	void adch_w(uint8_t data);
+	void adcsra_w(uint8_t data);
+	void adcsrb_w(uint8_t data);
+	void admux_w(uint8_t data);
+	void didr0_w(uint8_t data);
+	void didr1_w(uint8_t data);
+	void didr2_w(uint8_t data);
+	void tccr1a_w(uint8_t data);
+	void tccr1b_w(uint8_t data);
+	void tccr1c_w(uint8_t data);
+	void tcnt1l_w(uint8_t data);
+	void tcnt1h_w(uint8_t data);
+	void icr1l_w(uint8_t data);
+	void icr1h_w(uint8_t data);
+	void ocr1al_w(uint8_t data);
+	void ocr1ah_w(uint8_t data);
+	void ocr1bl_w(uint8_t data);
+	void ocr1bh_w(uint8_t data);
+	void ocr1cl_w(uint8_t data);
+	void ocr1ch_w(uint8_t data);
+	void tccr2a_w(uint8_t data);
+	void tccr2b_w(uint8_t data);
+	void tcnt2_w(uint8_t data);
+	void ocr2a_w(uint8_t data);
+	void ocr2b_w(uint8_t data);
+	void tccr3a_w(uint8_t data);
+	void tccr3b_w(uint8_t data);
+	void tccr3c_w(uint8_t data);
+	void tcnt3l_w(uint8_t data);
+	void tcnt3h_w(uint8_t data);
+	void icr3l_w(uint8_t data);
+	void icr3h_w(uint8_t data);
+	void ocr3al_w(uint8_t data);
+	void ocr3ah_w(uint8_t data);
+	void ocr3bl_w(uint8_t data);
+	void ocr3bh_w(uint8_t data);
+	void ocr3cl_w(uint8_t data);
+	void ocr3ch_w(uint8_t data);
+	void tccr4a_w(uint8_t data);
+	void tccr4b_w(uint8_t data);
+	void tccr4c_w(uint8_t data);
+	void tcnt4l_w(uint8_t data);
+	void tcnt4h_w(uint8_t data);
+	void icr4l_w(uint8_t data);
+	void icr4h_w(uint8_t data);
+	void ocr4al_w(uint8_t data);
+	void ocr4ah_w(uint8_t data);
+	void ocr4bl_w(uint8_t data);
+	void ocr4bh_w(uint8_t data);
+	void ocr4cl_w(uint8_t data);
+	void ocr4ch_w(uint8_t data);
+	void tccr5a_w(uint8_t data);
+	void tccr5b_w(uint8_t data);
+	void assr_w(uint8_t data);
+	void twbr_w(uint8_t data);
+	uint8_t twsr_r();
+	void twsr_w(uint8_t data);
+	void twar_w(uint8_t data);
+	void twdr_w(uint8_t data);
+	void twcr_w(uint8_t data);
+	void twamr_w(uint8_t data);
+	void ucsr0a_w(uint8_t data);
+	void ucsr0b_w(uint8_t data);
+	void ucsr0c_w(uint8_t data);
+
+	timer_func m_timer0_ticks[8*4];
+	timer_func m_timer1_ticks[16*16];
+	timer_func m_timer2_ticks[8];
+	timer_func m_timer0_tick;
+	timer_func m_timer1_tick;
+	timer_func m_timer2_tick;
 	int32_t m_num_timers;
 	int32_t m_timer_top[6];
-	uint8_t m_timer_increment[6];
 	uint16_t m_timer_prescale[6];
 	uint16_t m_timer_prescale_count[6];
 	int32_t m_wgm1;
 	int32_t m_timer1_compare_mode[2];
 	uint16_t m_ocr1[3];
-	uint16_t m_timer1_count;
 	bool m_ocr2_not_reached_yet;
 
 	// GPIO
-	void write_gpio(const uint8_t port, const uint8_t data);
-	uint8_t read_gpio(const uint8_t port);
 	devcb_write8::array<11> m_gpio_out_cb;
 	devcb_read8::array<11> m_gpio_in_cb;
 
@@ -126,8 +259,6 @@ protected:
 	bool m_adc_hold;
 	void adc_start_conversion();
 	TIMER_CALLBACK_MEMBER(adc_conversion_complete);
-	void change_adcsra(uint8_t data);
-	void change_adcsrb(uint8_t data);
 
 	// SPI
 	bool m_spi_active;
@@ -162,54 +293,136 @@ protected:
 	void set_irq_line(uint16_t vector, int state);
 
 	// timers
-	void timer_tick();
-	void update_timer_clock_source(uint8_t timer, uint8_t selection);
+	void spi_tick();
+	template <int Timer> void update_timer_clock_source(uint8_t selection, const uint8_t old_clock_select);
 	void update_timer_waveform_gen_mode(uint8_t timer, uint8_t mode);
 
 	// timer 0
-	void timer0_tick();
-	void changed_tccr0a(uint8_t data);
-	void changed_tccr0b(uint8_t data);
+	void timer0_tick_norm();
+	void timer0_tick_pwm_pc();
+	void timer0_tick_ctc_norm();
+	void timer0_tick_ctc_toggle();
+	void timer0_tick_ctc_clear();
+	void timer0_tick_ctc_set();
+	void timer0_tick_fast_pwm();
+	void timer0_tick_pwm_pc_cmp();
+	void timer0_tick_fast_pwm_cmp();
+	void timer0_tick_default();
+
 	void update_ocr0(uint8_t newval, uint8_t reg);
 	void timer0_force_output_compare(int reg);
 
+	enum ocr_mode_t : uint8_t
+	{
+		OCR_NORM,
+		OCR_TOGGLE,
+		OCR_CLEAR,
+		OCR_SET
+	};
+
+	enum wgm1_mode_t : uint8_t
+	{
+		WGM1_NORMAL = 0,
+		WGM1_PWM_8_PC,
+		WGM1_PWM_9_PC,
+		WGM1_PWM_10_PC,
+		WGM1_CTC_OCR,
+		WGM1_FAST_PWM_8,
+		WGM1_FAST_PWM_9,
+		WGM1_FAST_PWM_10,
+		WGM1_PWM_PFC_ICR,
+		WGM1_PWM_PFC_OCR,
+		WGM1_PWM_PC_ICR,
+		WGM1_PWM_PC_OCR,
+		WGM1_CTC_ICR,
+		WGM1_RESERVED,
+		WGM1_FAST_PWM_ICR,
+		WGM1_FAST_PWM_OCR
+	};
+
 	// timer 1
-	inline void timer1_tick();
-	void changed_tccr1a(uint8_t data);
-	void changed_tccr1b(uint8_t data);
+	template <int TimerMode, int ChannelModeA, int ChannelModeB> void timer1_tick();
+	void timer1_tick_normal() { timer1_tick<WGM1_NORMAL, OCR_NORM, OCR_NORM>(); };
+	void timer1_tick_pwm8_pc() { timer1_tick<WGM1_PWM_8_PC, OCR_NORM, OCR_NORM>(); };
+	void timer1_tick_pwm9_pc() { timer1_tick<WGM1_PWM_9_PC, OCR_NORM, OCR_NORM>(); };
+	void timer1_tick_pwm10_pc() { timer1_tick<WGM1_PWM_10_PC, OCR_NORM, OCR_NORM>(); };
+	void timer1_tick_ctc_ocr_norm_norm() { timer1_tick<WGM1_CTC_OCR, OCR_NORM, OCR_NORM>(); };
+	void timer1_tick_ctc_ocr_norm_toggle() { timer1_tick<WGM1_CTC_OCR, OCR_NORM, OCR_TOGGLE>(); };
+	void timer1_tick_ctc_ocr_norm_clear() { timer1_tick<WGM1_CTC_OCR, OCR_NORM, OCR_CLEAR>(); };
+	void timer1_tick_ctc_ocr_norm_set() { timer1_tick<WGM1_CTC_OCR, OCR_NORM, OCR_SET>(); };
+	void timer1_tick_ctc_ocr_toggle_norm() { timer1_tick<WGM1_CTC_OCR, OCR_TOGGLE, OCR_NORM>(); };
+	void timer1_tick_ctc_ocr_toggle_toggle() { timer1_tick<WGM1_CTC_OCR, OCR_TOGGLE, OCR_TOGGLE>(); };
+	void timer1_tick_ctc_ocr_toggle_clear() { timer1_tick<WGM1_CTC_OCR, OCR_TOGGLE, OCR_CLEAR>(); };
+	void timer1_tick_ctc_ocr_toggle_set() { timer1_tick<WGM1_CTC_OCR, OCR_TOGGLE, OCR_SET>(); };
+	void timer1_tick_ctc_ocr_clear_norm() { timer1_tick<WGM1_CTC_OCR, OCR_CLEAR, OCR_NORM>(); };
+	void timer1_tick_ctc_ocr_clear_toggle() { timer1_tick<WGM1_CTC_OCR, OCR_CLEAR, OCR_TOGGLE>(); };
+	void timer1_tick_ctc_ocr_clear_clear() { timer1_tick<WGM1_CTC_OCR, OCR_CLEAR, OCR_CLEAR>(); };
+	void timer1_tick_ctc_ocr_clear_set() { timer1_tick<WGM1_CTC_OCR, OCR_CLEAR, OCR_SET>(); };
+	void timer1_tick_ctc_ocr_set_norm() { timer1_tick<WGM1_CTC_OCR, OCR_SET, OCR_NORM>(); };
+	void timer1_tick_ctc_ocr_set_toggle() { timer1_tick<WGM1_CTC_OCR, OCR_SET, OCR_TOGGLE>(); };
+	void timer1_tick_ctc_ocr_set_clear() { timer1_tick<WGM1_CTC_OCR, OCR_SET, OCR_CLEAR>(); };
+	void timer1_tick_ctc_ocr_set_set() { timer1_tick<WGM1_CTC_OCR, OCR_SET, OCR_SET>(); };
+	void timer1_tick_fast_pwm8() { timer1_tick<WGM1_FAST_PWM_8, OCR_NORM, OCR_NORM>(); };
+	void timer1_tick_fast_pwm9() { timer1_tick<WGM1_FAST_PWM_9, OCR_NORM, OCR_NORM>(); };
+	void timer1_tick_fast_pwm10() { timer1_tick<WGM1_FAST_PWM_10, OCR_NORM, OCR_NORM>(); };
+	void timer1_tick_pwm_pfc_icr() { timer1_tick<WGM1_PWM_PFC_ICR, OCR_NORM, OCR_NORM>(); };
+	void timer1_tick_pwm_pfc_ocr() { timer1_tick<WGM1_PWM_PFC_OCR, OCR_NORM, OCR_NORM>(); };
+	void timer1_tick_pwm_pc_icr() { timer1_tick<WGM1_PWM_PC_ICR, OCR_NORM, OCR_NORM>(); };
+	void timer1_tick_pwm_pc_ocr() { timer1_tick<WGM1_PWM_PC_OCR, OCR_NORM, OCR_NORM>(); };
+	void timer1_tick_ctc_icr() { timer1_tick<WGM1_CTC_ICR, OCR_NORM, OCR_NORM>(); };
+	void timer1_tick_resv() { timer1_tick<WGM1_RESERVED, OCR_NORM, OCR_NORM>(); };
+	void timer1_tick_fast_pwm_icr_norm_norm() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_NORM, OCR_NORM>(); };
+	void timer1_tick_fast_pwm_icr_norm_toggle() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_NORM, OCR_TOGGLE>(); };
+	void timer1_tick_fast_pwm_icr_norm_clear() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_NORM, OCR_CLEAR>(); };
+	void timer1_tick_fast_pwm_icr_norm_set() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_NORM, OCR_SET>(); };
+	void timer1_tick_fast_pwm_icr_toggle_norm() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_TOGGLE, OCR_NORM>(); };
+	void timer1_tick_fast_pwm_icr_toggle_toggle() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_TOGGLE, OCR_TOGGLE>(); };
+	void timer1_tick_fast_pwm_icr_toggle_clear() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_TOGGLE, OCR_CLEAR>(); };
+	void timer1_tick_fast_pwm_icr_toggle_set() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_TOGGLE, OCR_SET>(); };
+	void timer1_tick_fast_pwm_icr_clear_norm() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_CLEAR, OCR_NORM>(); };
+	void timer1_tick_fast_pwm_icr_clear_toggle() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_CLEAR, OCR_TOGGLE>(); };
+	void timer1_tick_fast_pwm_icr_clear_clear() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_CLEAR, OCR_CLEAR>(); };
+	void timer1_tick_fast_pwm_icr_clear_set() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_CLEAR, OCR_SET>(); };
+	void timer1_tick_fast_pwm_icr_set_norm() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_SET, OCR_NORM>(); };
+	void timer1_tick_fast_pwm_icr_set_toggle() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_SET, OCR_TOGGLE>(); };
+	void timer1_tick_fast_pwm_icr_set_clear() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_SET, OCR_CLEAR>(); };
+	void timer1_tick_fast_pwm_icr_set_set() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_SET, OCR_SET>(); };
+	void timer1_tick_fast_pwm_ocr_norm_norm() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_NORM, OCR_NORM>(); };
+	void timer1_tick_fast_pwm_ocr_norm_toggle() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_NORM, OCR_TOGGLE>(); };
+	void timer1_tick_fast_pwm_ocr_norm_clear() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_NORM, OCR_CLEAR>(); };
+	void timer1_tick_fast_pwm_ocr_norm_set() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_NORM, OCR_SET>(); };
+	void timer1_tick_fast_pwm_ocr_toggle_norm() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_TOGGLE, OCR_NORM>(); };
+	void timer1_tick_fast_pwm_ocr_toggle_toggle() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_TOGGLE, OCR_TOGGLE>(); };
+	void timer1_tick_fast_pwm_ocr_toggle_clear() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_TOGGLE, OCR_CLEAR>(); };
+	void timer1_tick_fast_pwm_ocr_toggle_set() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_TOGGLE, OCR_SET>(); };
+	void timer1_tick_fast_pwm_ocr_clear_norm() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_CLEAR, OCR_NORM>(); };
+	void timer1_tick_fast_pwm_ocr_clear_toggle() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_CLEAR, OCR_TOGGLE>(); };
+	void timer1_tick_fast_pwm_ocr_clear_clear() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_CLEAR, OCR_CLEAR>(); };
+	void timer1_tick_fast_pwm_ocr_clear_set() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_CLEAR, OCR_SET>(); };
+	void timer1_tick_fast_pwm_ocr_set_norm() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_SET, OCR_NORM>(); };
+	void timer1_tick_fast_pwm_ocr_set_toggle() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_SET, OCR_TOGGLE>(); };
+	void timer1_tick_fast_pwm_ocr_set_clear() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_SET, OCR_CLEAR>(); };
+	void timer1_tick_fast_pwm_ocr_set_set() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_SET, OCR_SET>(); };
 	void update_timer1_input_noise_canceler();
 	void update_timer1_input_edge_select();
 	void update_ocr1(uint16_t newval, uint8_t reg);
 
 	// timer 2
-	void timer2_tick();
-	void changed_tccr2a(uint8_t data);
-	void changed_tccr2b(uint8_t data);
+	void timer2_tick_default();
+	void timer2_tick_norm();
+	void timer2_tick_fast_pwm();
+	void timer2_tick_fast_pwm_cmp();
 	void update_ocr2(uint8_t newval, uint8_t reg);
 	void timer2_force_output_compare(int reg);
 
 	// timer 3
 	void timer3_tick();
-	void changed_tccr3a(uint8_t data);
-	void changed_tccr3b(uint8_t data);
-	void changed_tccr3c(uint8_t data);
-//  void update_ocr3(uint8_t newval, uint8_t reg);
-//  void timer3_force_output_compare(int reg);
 
 	// timer 4
 	void timer4_tick();
-	void changed_tccr4a(uint8_t data);
-	void changed_tccr4b(uint8_t data);
-	void changed_tccr4c(uint8_t data);
-	//void update_ocr4(uint8_t newval, uint8_t reg);
-	//void timer4_force_output_compare(int reg);
 
 	// timer 5
 	void timer5_tick();
-	void changed_tccr5a(uint8_t data);
-	void changed_tccr5b(uint8_t data);
-//  void update_ocr5(uint8_t newval, uint8_t reg);
-//  void timer5_force_output_compare(int reg);
 
 	// ops
 	void populate_ops();
@@ -329,7 +542,7 @@ DECLARE_DEVICE_TYPE(ATTINY15,   attiny15_device)
 
 // ======================> atmega88_device
 
-class atmega88_device : public avr8_device
+class atmega88_device : public avr8_device<3>
 {
 public:
 	// construction/destruction
@@ -339,7 +552,7 @@ public:
 
 // ======================> atmega168_device
 
-class atmega168_device : public avr8_device
+class atmega168_device : public avr8_device<3>
 {
 public:
 	// construction/destruction
@@ -351,7 +564,7 @@ public:
 
 // ======================> atmega328_device
 
-class atmega328_device : public avr8_device
+class atmega328_device : public avr8_device<3>
 {
 public:
 	// construction/destruction
@@ -363,7 +576,7 @@ public:
 
 // ======================> atmega644_device
 
-class atmega644_device : public avr8_device
+class atmega644_device : public avr8_device<3>
 {
 public:
 	// construction/destruction
@@ -375,7 +588,7 @@ public:
 
 // ======================> atmega1280_device
 
-class atmega1280_device : public avr8_device
+class atmega1280_device : public avr8_device<6>
 {
 public:
 	// construction/destruction
@@ -387,7 +600,7 @@ public:
 
 // ======================> atmega2560_device
 
-class atmega2560_device : public avr8_device
+class atmega2560_device : public avr8_device<6>
 {
 public:
 	// construction/destruction
@@ -397,9 +610,9 @@ public:
 	void atmega2560_internal_map(address_map &map);
 };
 
-// ======================> atmega88_device
+// ======================> attiny15_device
 
-class attiny15_device : public avr8_device
+class attiny15_device : public avr8_device<2>
 {
 public:
 	// construction/destruction
@@ -517,222 +730,222 @@ enum : uint8_t
 // Used by I/O register handling
 enum : uint16_t
 {
-	AVR8_REGIDX_R0 = 0x00,
-	AVR8_REGIDX_R1,
-	AVR8_REGIDX_R2,
-	AVR8_REGIDX_R3,
-	AVR8_REGIDX_R4,
-	AVR8_REGIDX_R5,
-	AVR8_REGIDX_R6,
-	AVR8_REGIDX_R7,
-	AVR8_REGIDX_R8,
-	AVR8_REGIDX_R9,
-	AVR8_REGIDX_R10,
-	AVR8_REGIDX_R11,
-	AVR8_REGIDX_R12,
-	AVR8_REGIDX_R13,
-	AVR8_REGIDX_R14,
-	AVR8_REGIDX_R15,
-	AVR8_REGIDX_R16,
-	AVR8_REGIDX_R17,
-	AVR8_REGIDX_R18,
-	AVR8_REGIDX_R19,
-	AVR8_REGIDX_R20,
-	AVR8_REGIDX_R21,
-	AVR8_REGIDX_R22,
-	AVR8_REGIDX_R23,
-	AVR8_REGIDX_R24,
-	AVR8_REGIDX_R25,
-	AVR8_REGIDX_R26,
-	AVR8_REGIDX_R27,
-	AVR8_REGIDX_R28,
-	AVR8_REGIDX_R29,
-	AVR8_REGIDX_R30,
-	AVR8_REGIDX_R31,
-	AVR8_REGIDX_PINA = 0x20,
-	AVR8_REGIDX_DDRA,
-	AVR8_REGIDX_PORTA,
-	AVR8_REGIDX_PINB,
-	AVR8_REGIDX_DDRB,
-	AVR8_REGIDX_PORTB,
-	AVR8_REGIDX_PINC,
-	AVR8_REGIDX_DDRC,
-	AVR8_REGIDX_PORTC,
-	AVR8_REGIDX_PIND,
-	AVR8_REGIDX_DDRD,
-	AVR8_REGIDX_PORTD,
-	AVR8_REGIDX_PINE,
-	AVR8_REGIDX_DDRE,
-	AVR8_REGIDX_PORTE,
-	AVR8_REGIDX_PINF,
-	AVR8_REGIDX_DDRF,
-	AVR8_REGIDX_PORTF,
-	AVR8_REGIDX_PING,
-	AVR8_REGIDX_DDRG,
-	AVR8_REGIDX_PORTG,
-	AVR8_REGIDX_TIFR0 = 0x35,
-	AVR8_REGIDX_TIFR1,
-	AVR8_REGIDX_TIFR2,
-	AVR8_REGIDX_TIFR3,
-	AVR8_REGIDX_TIFR4,
-	AVR8_REGIDX_TIFR5,
-	AVR8_REGIDX_PCIFR = 0x3B,
-	AVR8_REGIDX_EIFR,
-	AVR8_REGIDX_EIMSK,
-	AVR8_REGIDX_GPIOR0,
-	AVR8_REGIDX_EECR,
-	AVR8_REGIDX_EEDR,
-	AVR8_REGIDX_EEARL,
-	AVR8_REGIDX_EEARH,
-	AVR8_REGIDX_GTCCR,
-	AVR8_REGIDX_TCCR0A,
-	AVR8_REGIDX_TCCR0B,
-	AVR8_REGIDX_TCNT0,
-	AVR8_REGIDX_OCR0A,
-	AVR8_REGIDX_OCR0B,
+	R0 = 0x00,
+	R1,
+	R2,
+	R3,
+	R4,
+	R5,
+	R6,
+	R7,
+	R8,
+	R9,
+	R10,
+	R11,
+	R12,
+	R13,
+	R14,
+	R15,
+	R16,
+	R17,
+	R18,
+	R19,
+	R20,
+	R21,
+	R22,
+	R23,
+	R24,
+	R25,
+	R26,
+	R27,
+	R28,
+	R29,
+	R30,
+	R31,
+	PINA = 0x20,
+	DDRA,
+	PORTA,
+	PINB,
+	DDRB,
+	PORTB,
+	PINC,
+	DDRC,
+	PORTC,
+	PIND,
+	DDRD,
+	PORTD,
+	PINE,
+	DDRE,
+	PORTE,
+	PINF,
+	DDRF,
+	PORTF,
+	PING,
+	DDRG,
+	PORTG,
+	TIFR0 = 0x35,
+	TIFR1,
+	TIFR2,
+	TIFR3,
+	TIFR4,
+	TIFR5,
+	PCIFR = 0x3B,
+	EIFR,
+	EIMSK,
+	GPIOR0,
+	EECR,
+	EEDR,
+	EEARL,
+	EEARH,
+	GTCCR,
+	TCCR0A,
+	TCCR0B,
+	TCNT0,
+	OCR0A,
+	OCR0B,
 	//0x49: Reserved
-	AVR8_REGIDX_GPIOR1 = 0x4A,
-	AVR8_REGIDX_GPIOR2,
-	AVR8_REGIDX_SPCR,
-	AVR8_REGIDX_SPSR,
-	AVR8_REGIDX_SPDR,
+	GPIOR1 = 0x4A,
+	GPIOR2,
+	SPCR,
+	SPSR,
+	SPDR,
 	//0x4F: Reserved
-	AVR8_REGIDX_ACSR = 0x50,
-	AVR8_REGIDX_OCDR,
+	ACSR = 0x50,
+	OCDR,
 	//0x52: Reserved
-	AVR8_REGIDX_SMCR = 0x53,
-	AVR8_REGIDX_MCUSR,
-	AVR8_REGIDX_MCUCR,
+	SMCR = 0x53,
+	MCUSR,
+	MCUCR,
 	//0x56: Reserved
-	AVR8_REGIDX_SPMCSR = 0x57,
+	SPMCSR = 0x57,
 	//0x58: Reserved
 	//0x59: Reserved
 	//0x5A: Reserved
-	AVR8_REGIDX_RAMPZ = 0x5B,
-	AVR8_REGIDX_EIND,
-	AVR8_REGIDX_SPL,
-	AVR8_REGIDX_SPH,
-	AVR8_REGIDX_SREG,
+	RAMPZ = 0x5B,
+	EIND,
+	SPL,
+	SPH,
+	SREG,
 //--------------------------
-	AVR8_REGIDX_WDTCSR = 0x60,
-	AVR8_REGIDX_CLKPR,
+	WDTCSR = 0x60,
+	CLKPR,
 	//0x62: Reserved
 	//0x63: Reserved
-	AVR8_REGIDX_PRR0 = 0x64,
-	AVR8_REGIDX_PRR1,
-	AVR8_REGIDX_OSCCAL,
+	PRR0 = 0x64,
+	PRR1,
+	OSCCAL,
 	//0x67: Reserved
-	AVR8_REGIDX_PCICR = 0x68,
-	AVR8_REGIDX_EICRA,
-	AVR8_REGIDX_EICRB,
-	AVR8_REGIDX_PCMSK0,
-	AVR8_REGIDX_PCMSK1,
-	AVR8_REGIDX_PCMSK2,
-	AVR8_REGIDX_TIMSK0,
-	AVR8_REGIDX_TIMSK1,
-	AVR8_REGIDX_TIMSK2,
-	AVR8_REGIDX_TIMSK3,
-	AVR8_REGIDX_TIMSK4,
-	AVR8_REGIDX_TIMSK5,
-	AVR8_REGIDX_XMCRA,
-	AVR8_REGIDX_XMCRB,
+	PCICR = 0x68,
+	EICRA,
+	EICRB,
+	PCMSK0,
+	PCMSK1,
+	PCMSK2,
+	TIMSK0,
+	TIMSK1,
+	TIMSK2,
+	TIMSK3,
+	TIMSK4,
+	TIMSK5,
+	XMCRA,
+	XMCRB,
 	//0x76: Reserved
 	//0x77: Reserved
-	AVR8_REGIDX_ADCL = 0x78,
-	AVR8_REGIDX_ADCH,
-	AVR8_REGIDX_ADCSRA,
-	AVR8_REGIDX_ADCSRB,
-	AVR8_REGIDX_ADMUX,
-	AVR8_REGIDX_DIDR2,
-	AVR8_REGIDX_DIDR0,
-	AVR8_REGIDX_DIDR1,
-	AVR8_REGIDX_TCCR1A,
-	AVR8_REGIDX_TCCR1B,
-	AVR8_REGIDX_TCCR1C,
+	ADCL = 0x78,
+	ADCH,
+	ADCSRA,
+	ADCSRB,
+	ADMUX,
+	DIDR2,
+	DIDR0,
+	DIDR1,
+	TCCR1A,
+	TCCR1B,
+	TCCR1C,
 	//0x83: Reserved
-	AVR8_REGIDX_TCNT1L = 0x84,
-	AVR8_REGIDX_TCNT1H,
-	AVR8_REGIDX_ICR1L,
-	AVR8_REGIDX_ICR1H,
-	AVR8_REGIDX_OCR1AL,
-	AVR8_REGIDX_OCR1AH,
-	AVR8_REGIDX_OCR1BL,
-	AVR8_REGIDX_OCR1BH,
-	AVR8_REGIDX_OCR1CL,
-	AVR8_REGIDX_OCR1CH,
+	TCNT1L = 0x84,
+	TCNT1H,
+	ICR1L,
+	ICR1H,
+	OCR1AL,
+	OCR1AH,
+	OCR1BL,
+	OCR1BH,
+	OCR1CL,
+	OCR1CH,
 	//0x8E: Reserved
 	//0x8F: Reserved
-	AVR8_REGIDX_TCCR3A = 0x90,
-	AVR8_REGIDX_TCCR3B,
-	AVR8_REGIDX_TCCR3C,
+	TCCR3A = 0x90,
+	TCCR3B,
+	TCCR3C,
 	//0x93: Reserved
-	AVR8_REGIDX_TCNT3L = 0x94,
-	AVR8_REGIDX_TCNT3H,
-	AVR8_REGIDX_ICR3L,
-	AVR8_REGIDX_ICR3H,
-	AVR8_REGIDX_OCR3AL,
-	AVR8_REGIDX_OCR3AH,
-	AVR8_REGIDX_OCR3BL,
-	AVR8_REGIDX_OCR3BH,
-	AVR8_REGIDX_OCR3CL,
-	AVR8_REGIDX_OCR3CH,
+	TCNT3L = 0x94,
+	TCNT3H,
+	ICR3L,
+	ICR3H,
+	OCR3AL,
+	OCR3AH,
+	OCR3BL,
+	OCR3BH,
+	OCR3CL,
+	OCR3CH,
 	//0x9E: Reserved
 	//0x9F: Reserved
-	AVR8_REGIDX_TCCR4A = 0xA0,
-	AVR8_REGIDX_TCCR4B,
-	AVR8_REGIDX_TCCR4C,
+	TCCR4A = 0xA0,
+	TCCR4B,
+	TCCR4C,
 	//0xA3: Reserved
-	AVR8_REGIDX_TCNT4L = 0xA4,
-	AVR8_REGIDX_TCNT4H,
-	AVR8_REGIDX_ICR4L,
-	AVR8_REGIDX_ICR4H,
-	AVR8_REGIDX_OCR4AL,
-	AVR8_REGIDX_OCR4AH,
-	AVR8_REGIDX_OCR4BL,
-	AVR8_REGIDX_OCR4BH,
-	AVR8_REGIDX_OCR4CL,
-	AVR8_REGIDX_OCR4CH,
+	TCNT4L = 0xA4,
+	TCNT4H,
+	ICR4L,
+	ICR4H,
+	OCR4AL,
+	OCR4AH,
+	OCR4BL,
+	OCR4BH,
+	OCR4CL,
+	OCR4CH,
 	//0xAE: Reserved
 	//0xAF: Reserved
-	AVR8_REGIDX_TCCR2A = 0xB0,
-	AVR8_REGIDX_TCCR2B,
-	AVR8_REGIDX_TCNT2,
-	AVR8_REGIDX_OCR2A,
-	AVR8_REGIDX_OCR2B,
+	TCCR2A = 0xB0,
+	TCCR2B,
+	TCNT2,
+	OCR2A,
+	OCR2B,
 	//0xB5: Reserved
-	AVR8_REGIDX_ASSR = 0xB6,
+	ASSR = 0xB6,
 	//0xB7: Reserved
-	AVR8_REGIDX_TWBR = 0xB8,
-	AVR8_REGIDX_TWSR,
-	AVR8_REGIDX_TWAR,
-	AVR8_REGIDX_TWDR,
-	AVR8_REGIDX_TWCR,
-	AVR8_REGIDX_TWAMR,
+	TWBR = 0xB8,
+	TWSR,
+	TWAR,
+	TWDR,
+	TWCR,
+	TWAMR,
 	//0xBE: Reserved
 	//0xBF: Reserved
-	AVR8_REGIDX_UCSR0A = 0xC0,
-	AVR8_REGIDX_UCSR0B,
-	AVR8_REGIDX_UCSR0C,
+	UCSR0A = 0xC0,
+	UCSR0B,
+	UCSR0C,
 	//0xC3: Reserved
-	AVR8_REGIDX_UBRR0L = 0xC4,
-	AVR8_REGIDX_UBRR0H,
-	AVR8_REGIDX_UDR0,
+	UBRR0L = 0xC4,
+	UBRR0H,
+	UDR0,
 	//0xC7: Reserved
-	AVR8_REGIDX_UCSR1A = 0xC8,
-	AVR8_REGIDX_UCSR1B,
-	AVR8_REGIDX_UCSR1C,
+	UCSR1A = 0xC8,
+	UCSR1B,
+	UCSR1C,
 	//0xCB: Reserved
-	AVR8_REGIDX_UBRR1L = 0xCC,
-	AVR8_REGIDX_UBRR1H,
-	AVR8_REGIDX_UDR1,
+	UBRR1L = 0xCC,
+	UBRR1H,
+	UDR1,
 	//0xCF: Reserved
-	AVR8_REGIDX_UCSR2A = 0xD0,
-	AVR8_REGIDX_UCSR2B,
-	AVR8_REGIDX_UCSR2C,
+	UCSR2A = 0xD0,
+	UCSR2B,
+	UCSR2C,
 	//0xD3: Reserved
-	AVR8_REGIDX_UBRR2L = 0xD4,
-	AVR8_REGIDX_UBRR2H,
-	AVR8_REGIDX_UDR2,
+	UBRR2L = 0xD4,
+	UBRR2H,
+	UDR2,
 	//0xD7: Reserved
 	//0xD8: Reserved
 	//0xD9: Reserved
@@ -774,18 +987,18 @@ enum : uint16_t
 	//0xFD: Reserved
 	//0xFE: Reserved
 	//0xFF: Reserved
-	AVR8_REGIDX_PINH = 0x100,
-	AVR8_REGIDX_DDRH,
-	AVR8_REGIDX_PORTH,
-	AVR8_REGIDX_PINJ,
-	AVR8_REGIDX_DDRJ,
-	AVR8_REGIDX_PORTJ,
-	AVR8_REGIDX_PINK,
-	AVR8_REGIDX_DDRK,
-	AVR8_REGIDX_PORTK,
-	AVR8_REGIDX_PINL,
-	AVR8_REGIDX_DDRL,
-	AVR8_REGIDX_PORTL,
+	PINH = 0x100,
+	DDRH,
+	PORTH,
+	PINJ,
+	DDRJ,
+	PORTJ,
+	PINK,
+	DDRK,
+	PORTK,
+	PINL,
+	DDRL,
+	PORTL,
 	//0x10C: Reserved
 	//0x10D: Reserved
 	//0x10E: Reserved
@@ -806,29 +1019,29 @@ enum : uint16_t
 	//0x11D: Reserved
 	//0x11E: Reserved
 	//0x11F: Reserved
-	AVR8_REGIDX_TCCR5A = 0x120,
-	AVR8_REGIDX_TCCR5B,
-	AVR8_REGIDX_TCCR5C,
+	TCCR5A = 0x120,
+	TCCR5B,
+	TCCR5C,
 	//0x123: Reserved
-	AVR8_REGIDX_TCNT5L = 0x124,
-	AVR8_REGIDX_TCNT5H,
-	AVR8_REGIDX_ICR5L,
-	AVR8_REGIDX_ICR5H,
-	AVR8_REGIDX_OCR5AL,
-	AVR8_REGIDX_OCR5AH,
-	AVR8_REGIDX_OCR5BL,
-	AVR8_REGIDX_OCR5BH,
-	AVR8_REGIDX_OCR5CL,
-	AVR8_REGIDX_OCR5CH,
+	TCNT5L = 0x124,
+	TCNT5H,
+	ICR5L,
+	ICR5H,
+	OCR5AL,
+	OCR5AH,
+	OCR5BL,
+	OCR5BH,
+	OCR5CL,
+	OCR5CH,
 	//0x12E: Reserved
 	//0x12F: Reserved
-	AVR8_REGIDX_UCSR3A = 0x130,
-	AVR8_REGIDX_UCSR3B,
-	AVR8_REGIDX_UCSR3C,
+	UCSR3A = 0x130,
+	UCSR3B,
+	UCSR3C,
 	//0x133: Reserved
-	AVR8_REGIDX_UBRR3L = 0x134,
-	AVR8_REGIDX_UBRR3H,
-	AVR8_REGIDX_UDR3
+	UBRR3L = 0x134,
+	UBRR3H,
+	UDR3
 	//0x137: Reserved
 	//  .
 	//  . up to
@@ -849,18 +1062,6 @@ enum : uint8_t
 	AVR8_IO_PORTJ,
 	AVR8_IO_PORTK,
 	AVR8_IO_PORTL
-};
-
-enum : uint8_t
-{
-	AVR8_ADC_ADC0 = 0,
-	AVR8_ADC_ADC1,
-	AVR8_ADC_ADC2,
-	AVR8_ADC_ADC3,
-	AVR8_ADC_ADC4,
-	AVR8_ADC_ADC5,
-	AVR8_ADC_ADC6,
-	AVR8_ADC_ADC7
 };
 
 enum : uint8_t

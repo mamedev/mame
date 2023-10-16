@@ -8,7 +8,8 @@
 
 ***************************************************************************/
 
-void avr8_device::populate_ops()
+template <int NumTimers>
+void avr8_device<NumTimers>::populate_ops()
 {
 	for (uint32_t op = 0; op < 0x10000; op++)
 	{
@@ -512,7 +513,8 @@ void avr8_device::populate_ops()
 	}
 }
 
-void avr8_device::populate_add_flag_cache()
+template <int NumTimers>
+void avr8_device<NumTimers>::populate_add_flag_cache()
 {
 	for (uint16_t rd = 0; rd < 0x100; rd++)
 	{
@@ -531,7 +533,8 @@ void avr8_device::populate_add_flag_cache()
 	}
 }
 
-void avr8_device::populate_adc_flag_cache()
+template <int NumTimers>
+void avr8_device<NumTimers>::populate_adc_flag_cache()
 {
 	for (uint16_t rd = 0; rd < 0x100; rd++)
 	{
@@ -553,7 +556,8 @@ void avr8_device::populate_adc_flag_cache()
 	}
 }
 
-void avr8_device::populate_sub_flag_cache()
+template <int NumTimers>
+void avr8_device<NumTimers>::populate_sub_flag_cache()
 {
 	for (uint16_t rd = 0; rd < 0x100; rd++)
 	{
@@ -572,7 +576,8 @@ void avr8_device::populate_sub_flag_cache()
 	}
 }
 
-void avr8_device::populate_sbc_flag_cache()
+template <int NumTimers>
+void avr8_device<NumTimers>::populate_sbc_flag_cache()
 {
 	for (uint16_t rd = 0; rd < 0x100; rd++)
 	{
@@ -597,7 +602,8 @@ void avr8_device::populate_sbc_flag_cache()
 	}
 }
 
-void avr8_device::populate_bool_flag_cache()
+template <int NumTimers>
+void avr8_device<NumTimers>::populate_bool_flag_cache()
 {
 	for (uint16_t res = 0; res < 0x100; res++)
 	{
@@ -609,7 +615,8 @@ void avr8_device::populate_bool_flag_cache()
 	}
 }
 
-void avr8_device::populate_shift_flag_cache()
+template <int NumTimers>
+void avr8_device<NumTimers>::populate_shift_flag_cache()
 {
 	for (uint16_t rd = 0; rd < 0x100; rd++)
 	{
@@ -626,17 +633,20 @@ void avr8_device::populate_shift_flag_cache()
 	}
 }
 
-void avr8_device::op_nop(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_nop(uint16_t op)
 {
 }
 
-void avr8_device::op_movw(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_movw(uint16_t op)
 {
 	m_r[(RD4(op) << 1) + 1] = m_r[(RR4(op) << 1) + 1];
 	m_r[RD4(op) << 1] = m_r[RR4(op) << 1];
 }
 
-void avr8_device::op_muls(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_muls(uint16_t op)
 {
 	const int16_t sd = (int8_t)m_r[16 + RD4(op)] * (int8_t)m_r[16 + RR4(op)];
 	m_r[1] = (sd >> 8) & 0x00ff;
@@ -645,7 +655,8 @@ void avr8_device::op_muls(uint16_t op)
 	SREG_W(AVR8_SREG_Z, (sd == 0) ? 1 : 0);
 }
 
-void avr8_device::op_mulsu(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_mulsu(uint16_t op)
 {
 	const int16_t sd = (int8_t)m_r[16 + RD3(op)] * (uint8_t)m_r[16 + RR3(op)];
 	m_r[1] = (sd >> 8) & 0x00ff;
@@ -654,7 +665,8 @@ void avr8_device::op_mulsu(uint16_t op)
 	SREG_W(AVR8_SREG_Z, (sd == 0) ? 1 : 0);
 }
 
-void avr8_device::op_fmul(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_fmul(uint16_t op)
 {
 	const int16_t sd = ((uint8_t)m_r[16 + RD3(op)] * (uint8_t)m_r[16 + RR3(op)]) << 1;
 	m_r[1] = (sd >> 8) & 0x00ff;
@@ -663,7 +675,8 @@ void avr8_device::op_fmul(uint16_t op)
 	SREG_W(AVR8_SREG_Z, (sd == 0) ? 1 : 0);
 }
 
-void avr8_device::op_fmuls(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_fmuls(uint16_t op)
 {
 	const int16_t sd = ((int8_t)m_r[16 + RD3(op)] * (int8_t)m_r[16 + RR3(op)]) << 1;
 	m_r[1] = (sd >> 8) & 0x00ff;
@@ -672,7 +685,8 @@ void avr8_device::op_fmuls(uint16_t op)
 	SREG_W(AVR8_SREG_Z, (sd == 0) ? 1 : 0);
 }
 
-void avr8_device::op_fmulsu(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_fmulsu(uint16_t op)
 {
 	const int16_t sd = ((int8_t)m_r[16 + RD3(op)] * (uint8_t)m_r[16 + RR3(op)]) << 1;
 	m_r[1] = (sd >> 8) & 0x00ff;
@@ -681,183 +695,204 @@ void avr8_device::op_fmulsu(uint16_t op)
 	SREG_W(AVR8_SREG_Z, (sd == 0) ? 1 : 0);
 }
 
-void avr8_device::op_cpc(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_cpc(uint16_t op)
 {
 	const uint8_t rd = m_r[RD5(op)];
 	const uint8_t rr = m_r[RR5(op)];
-	const uint8_t c = SREG & AVR8_SREG_MASK_C;
-	const uint32_t z = (SREG & AVR8_SREG_MASK_Z) ? (1 << 17) : 0;
-	SREG &= ~(AVR8_SREG_MASK_H | AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_C);
-	SREG |= m_sbc_flag_cache[z | (c << 16) | (rd << 8) | rr];
+	const uint8_t c = m_r[SREG] & AVR8_SREG_MASK_C;
+	const uint32_t z = (m_r[SREG] & AVR8_SREG_MASK_Z) ? (1 << 17) : 0;
+	m_r[SREG] &= ~(AVR8_SREG_MASK_H | AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_C);
+	m_r[SREG] |= m_sbc_flag_cache[z | (c << 16) | (rd << 8) | rr];
 }
 
-void avr8_device::op_sbc(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_sbc(uint16_t op)
 {
 	const uint8_t rd = m_r[RD5(op)];
 	const uint8_t rr = m_r[RR5(op)];
-	const uint8_t c = SREG & AVR8_SREG_MASK_C;
+	const uint8_t c = m_r[SREG] & AVR8_SREG_MASK_C;
 	const uint8_t res = rd - (rr + c);
 	m_r[RD5(op)] = res;
-	const uint32_t z = (SREG & AVR8_SREG_MASK_Z) ? (1 << 17) : 0;
-	SREG &= ~(AVR8_SREG_MASK_H | AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_C);
-	SREG |= m_sbc_flag_cache[z | (c << 16) | (rd << 8) | rr];
+	const uint32_t z = (m_r[SREG] & AVR8_SREG_MASK_Z) ? (1 << 17) : 0;
+	m_r[SREG] &= ~(AVR8_SREG_MASK_H | AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_C);
+	m_r[SREG] |= m_sbc_flag_cache[z | (c << 16) | (rd << 8) | rr];
 }
 
-void avr8_device::op_add(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_add(uint16_t op)
 {
 	const uint8_t rd = m_r[RD5(op)];
 	const uint8_t rr = m_r[RR5(op)];
 	const uint8_t res = rd + rr;
 	m_r[RD5(op)] = res;
-	SREG &= ~(AVR8_SREG_MASK_H | AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_C);
-	SREG |= m_add_flag_cache[(rd << 8) | rr];
+	m_r[SREG] &= ~(AVR8_SREG_MASK_H | AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_C);
+	m_r[SREG] |= m_add_flag_cache[(rd << 8) | rr];
 }
 
-void avr8_device::op_cpse(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_cpse(uint16_t op)
 {
 	const uint8_t rd = m_r[RD5(op)];
 	const uint8_t rr = m_r[RR5(op)];
 	if (rd == rr)
 	{
-		const uint16_t data = (uint32_t)m_program->read_word(m_shifted_pc + 2);
+		const uint16_t data = (uint32_t)m_program->read_word(m_pc + 2);
 		m_opcycles += is_long_opcode(data) ? 2 : 1;
-		m_pc += is_long_opcode(data) ? 2 : 1;
+		m_pc += is_long_opcode(data) ? 4 : 2;
 	}
 }
 
-void avr8_device::op_cp(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_cp(uint16_t op)
 {
 	const uint8_t rd = m_r[RD5(op)];
 	const uint8_t rr = m_r[RR5(op)];
-	SREG &= ~(AVR8_SREG_MASK_H | AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_C);
-	SREG |= m_sub_flag_cache[(rd << 8) | rr];
+	m_r[SREG] &= ~(AVR8_SREG_MASK_H | AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_C);
+	m_r[SREG] |= m_sub_flag_cache[(rd << 8) | rr];
 }
 
-void avr8_device::op_sub(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_sub(uint16_t op)
 {
 	const uint8_t rd = m_r[RD5(op)];
 	const uint8_t rr = m_r[RR5(op)];
 	const uint8_t res = rd - rr;
 	m_r[RD5(op)] = res;
-	SREG &= ~(AVR8_SREG_MASK_H | AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_C);
-	SREG |= m_sub_flag_cache[(rd << 8) | rr];
+	m_r[SREG] &= ~(AVR8_SREG_MASK_H | AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_C);
+	m_r[SREG] |= m_sub_flag_cache[(rd << 8) | rr];
 }
 
-void avr8_device::op_adc(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_adc(uint16_t op)
 {
 	const uint8_t rd = m_r[RD5(op)];
 	const uint8_t rr = m_r[RR5(op)];
-	const uint8_t c = SREG & AVR8_SREG_MASK_C;
+	const uint8_t c = m_r[SREG] & AVR8_SREG_MASK_C;
 	const uint8_t res = rd + rr + c;
 	m_r[RD5(op)] = res;
-	SREG &= ~(AVR8_SREG_MASK_H | AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_C);
-	SREG |= m_adc_flag_cache[(c << 16) | (rd << 8) | rr];
+	m_r[SREG] &= ~(AVR8_SREG_MASK_H | AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_C);
+	m_r[SREG] |= m_adc_flag_cache[(c << 16) | (rd << 8) | rr];
 }
 
-void avr8_device::op_and(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_and(uint16_t op)
 {
 	const uint8_t res = m_r[RD5(op)] & m_r[RR5(op)];
 	m_r[RD5(op)] = res;
-	SREG &= ~(AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z);
-	SREG |= m_bool_flag_cache[res];
+	m_r[SREG] &= ~(AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z);
+	m_r[SREG] |= m_bool_flag_cache[res];
 }
 
-void avr8_device::op_eor(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_eor(uint16_t op)
 {
 	const uint8_t res = m_r[RD5(op)] ^ m_r[RR5(op)];
 	m_r[RD5(op)] = res;
-	SREG &= ~(AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z);
-	SREG |= m_bool_flag_cache[res];
+	m_r[SREG] &= ~(AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z);
+	m_r[SREG] |= m_bool_flag_cache[res];
 }
 
-void avr8_device::op_or(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_or(uint16_t op)
 {
 	const uint8_t res = m_r[RD5(op)] | m_r[RR5(op)];
 	m_r[RD5(op)] = res;
-	SREG &= ~(AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z);
-	SREG |= m_bool_flag_cache[res];
+	m_r[SREG] &= ~(AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z);
+	m_r[SREG] |= m_bool_flag_cache[res];
 }
 
-void avr8_device::op_mov(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_mov(uint16_t op)
 {
 	m_r[RD5(op)] = m_r[RR5(op)];
 }
 
-void avr8_device::op_cpi(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_cpi(uint16_t op)
 {
 	const uint8_t rd = m_r[16 + RD4(op)];
 	const uint8_t rr = KCONST8(op);
-	SREG &= ~(AVR8_SREG_MASK_H | AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_C);
-	SREG |= m_sub_flag_cache[(rd << 8) | rr];
+	m_r[SREG] &= ~(AVR8_SREG_MASK_H | AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_C);
+	m_r[SREG] |= m_sub_flag_cache[(rd << 8) | rr];
 }
 
-void avr8_device::op_sbci(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_sbci(uint16_t op)
 {
 	const uint8_t rd = m_r[16 + RD4(op)];
 	const uint8_t rr = KCONST8(op);
-	const uint8_t c = SREG & AVR8_SREG_MASK_C;
+	const uint8_t c = m_r[SREG] & AVR8_SREG_MASK_C;
 	const uint8_t res = rd - (rr + c);
 	m_r[16 + RD4(op)] = res;
-	const uint32_t z = (SREG & AVR8_SREG_MASK_Z) ? (1 << 17) : 0;
-	SREG &= ~(AVR8_SREG_MASK_H | AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_C);
-	SREG |= m_sbc_flag_cache[z | (c << 16) | (rd << 8) | rr];
+	const uint32_t z = (m_r[SREG] & AVR8_SREG_MASK_Z) ? (1 << 17) : 0;
+	m_r[SREG] &= ~(AVR8_SREG_MASK_H | AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_C);
+	m_r[SREG] |= m_sbc_flag_cache[z | (c << 16) | (rd << 8) | rr];
 }
 
-void avr8_device::op_subi(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_subi(uint16_t op)
 {
 	const uint8_t rd = m_r[16 + RD4(op)];
 	const uint8_t rr = KCONST8(op);
 	const uint8_t res = rd - rr;
 	m_r[16 + RD4(op)] = res;
-	SREG &= ~(AVR8_SREG_MASK_H | AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_C);
-	SREG |= m_sub_flag_cache[(rd << 8) | rr];
+	m_r[SREG] &= ~(AVR8_SREG_MASK_H | AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_C);
+	m_r[SREG] |= m_sub_flag_cache[(rd << 8) | rr];
 }
 
-void avr8_device::op_ori(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_ori(uint16_t op)
 {
 	const uint8_t res = m_r[16 + RD4(op)] | KCONST8(op);
 	m_r[16 + RD4(op)] = res;
-	SREG &= ~(AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z);
-	SREG |= m_bool_flag_cache[res];
+	m_r[SREG] &= ~(AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z);
+	m_r[SREG] |= m_bool_flag_cache[res];
 }
 
-void avr8_device::op_andi(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_andi(uint16_t op)
 {
 	const uint8_t res = m_r[16 + RD4(op)] & KCONST8(op);
 	m_r[16 + RD4(op)] = res;
-	SREG &= ~(AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z);
-	SREG |= m_bool_flag_cache[res];
+	m_r[SREG] &= ~(AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z);
+	m_r[SREG] |= m_bool_flag_cache[res];
 }
 
-void avr8_device::op_lddz(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_lddz(uint16_t op)
 {
 	m_r[RD5(op)] = m_data->read_byte(ZREG + QCONST6(op));
 }
 
-void avr8_device::op_lddy(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_lddy(uint16_t op)
 {
 	m_r[RD5(op)] = m_data->read_byte(YREG + QCONST6(op));
 }
 
-void avr8_device::op_stdz(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_stdz(uint16_t op)
 {
 	m_data->write_byte(ZREG + QCONST6(op), m_r[RD5(op)]);
 }
 
-void avr8_device::op_stdy(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_stdy(uint16_t op)
 {
 	m_data->write_byte(YREG + QCONST6(op), m_r[RD5(op)]);
 }
 
-void avr8_device::op_lds(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_lds(uint16_t op)
 {
-	m_pc++;
-	m_shifted_pc += 2;
-	const uint16_t addr = m_program->read_word(m_shifted_pc);
+	m_pc += 2;
+	const uint16_t addr = m_program->read_word(m_pc);
 	m_r[RD5(op)] = m_data->read_byte(addr);
 }
 
-void avr8_device::op_ldzi(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_ldzi(uint16_t op)
 {
 	uint16_t pd = ZREG;
 	m_r[RD5(op)] = m_data->read_byte(pd);
@@ -866,7 +901,8 @@ void avr8_device::op_ldzi(uint16_t op)
 	m_r[30] = pd & 0x00ff;
 }
 
-void avr8_device::op_ldzd(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_ldzd(uint16_t op)
 {
 	const uint16_t pd = ZREG - 1;
 	m_r[RD5(op)] = m_data->read_byte(pd);
@@ -874,12 +910,14 @@ void avr8_device::op_ldzd(uint16_t op)
 	m_r[30] = pd & 0x00ff;
 }
 
-void avr8_device::op_lpmz(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_lpmz(uint16_t op)
 {
 	m_r[RD5(op)] = m_program->read_byte(ZREG);
 }
 
-void avr8_device::op_lpmzi(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_lpmzi(uint16_t op)
 {
 	uint16_t pd = ZREG;
 	m_r[RD5(op)] = m_program->read_byte(pd);
@@ -888,22 +926,25 @@ void avr8_device::op_lpmzi(uint16_t op)
 	m_r[30] = pd & 0x00ff;
 }
 
-void avr8_device::op_elpmz(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_elpmz(uint16_t op)
 {
-	m_r[RD5(op)] = m_program->read_byte((m_r[AVR8_REGIDX_RAMPZ] << 16) | ZREG);
+	m_r[RD5(op)] = m_program->read_byte((m_r[RAMPZ] << 16) | ZREG);
 }
 
-void avr8_device::op_elpmzi(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_elpmzi(uint16_t op)
 {
-	uint32_t pd32 = (m_r[AVR8_REGIDX_RAMPZ] << 16) | ZREG;
+	uint32_t pd32 = (m_r[RAMPZ] << 16) | ZREG;
 	m_r[RD5(op)] = m_program->read_byte(pd32);
 	pd32++;
-	m_r[AVR8_REGIDX_RAMPZ] = (pd32 >> 16) & 0x00ff;
+	m_r[RAMPZ] = (pd32 >> 16) & 0x00ff;
 	m_r[31] = (pd32 >> 8) & 0x00ff;
 	m_r[30] = pd32 & 0x00ff;
 }
 
-void avr8_device::op_ldyi(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_ldyi(uint16_t op)
 {
 	uint16_t pd = YREG;
 	m_r[RD5(op)] = m_data->read_byte(pd);
@@ -912,7 +953,8 @@ void avr8_device::op_ldyi(uint16_t op)
 	m_r[28] = pd & 0x00ff;
 }
 
-void avr8_device::op_ldyd(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_ldyd(uint16_t op)
 {
 	const uint16_t pd = YREG - 1;
 	m_r[RD5(op)] = m_data->read_byte(pd);
@@ -920,12 +962,14 @@ void avr8_device::op_ldyd(uint16_t op)
 	m_r[28] = pd & 0x00ff;
 }
 
-void avr8_device::op_ldx(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_ldx(uint16_t op)
 {
 	m_r[RD5(op)] = m_data->read_byte(XREG);
 }
 
-void avr8_device::op_ldxi(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_ldxi(uint16_t op)
 {
 	uint16_t pd = XREG;
 	m_r[RD5(op)] = m_data->read_byte(pd);
@@ -934,7 +978,8 @@ void avr8_device::op_ldxi(uint16_t op)
 	m_r[26] = pd & 0x00ff;
 }
 
-void avr8_device::op_ldxd(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_ldxd(uint16_t op)
 {
 	const uint16_t pd = XREG - 1;
 	m_r[RD5(op)] = m_data->read_byte(pd);
@@ -942,20 +987,22 @@ void avr8_device::op_ldxd(uint16_t op)
 	m_r[26] = pd & 0x00ff;
 }
 
-void avr8_device::op_pop(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_pop(uint16_t op)
 {
 	m_r[RD5(op)] = pop();
 }
 
-void avr8_device::op_sts(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_sts(uint16_t op)
 {
-	m_pc++;
-	m_shifted_pc += 2;
-	const uint16_t addr = m_program->read_word(m_shifted_pc);
+	m_pc += 2;
+	const uint16_t addr = m_program->read_word(m_pc);
 	m_data->write_byte(addr, m_r[RD5(op)]);
 }
 
-void avr8_device::op_stzi(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_stzi(uint16_t op)
 {
 	uint16_t pd = ZREG;
 	m_data->write_byte(pd, m_r[RD5(op)]);
@@ -964,7 +1011,8 @@ void avr8_device::op_stzi(uint16_t op)
 	m_r[30] = pd & 0x00ff;
 }
 
-void avr8_device::op_stzd(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_stzd(uint16_t op)
 {
 	const uint16_t pd = ZREG - 1;
 	m_data->write_byte(pd, m_r[RD5(op)]);
@@ -972,7 +1020,8 @@ void avr8_device::op_stzd(uint16_t op)
 	m_r[30] = pd & 0x00ff;
 }
 
-void avr8_device::op_styi(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_styi(uint16_t op)
 {
 	uint16_t pd = YREG;
 	m_data->write_byte(pd, m_r[RD5(op)]);
@@ -981,7 +1030,8 @@ void avr8_device::op_styi(uint16_t op)
 	m_r[28] = pd & 0x00ff;
 }
 
-void avr8_device::op_styd(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_styd(uint16_t op)
 {
 	const uint16_t pd = YREG - 1;
 	m_data->write_byte(pd, m_r[RD5(op)]);
@@ -989,12 +1039,14 @@ void avr8_device::op_styd(uint16_t op)
 	m_r[28] = pd & 0x00ff;
 }
 
-void avr8_device::op_stx(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_stx(uint16_t op)
 {
 	m_data->write_byte(XREG, m_r[RD5(op)]);
 }
 
-void avr8_device::op_stxi(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_stxi(uint16_t op)
 {
 	uint16_t pd = XREG;
 	m_data->write_byte(pd, m_r[RD5(op)]);
@@ -1003,7 +1055,8 @@ void avr8_device::op_stxi(uint16_t op)
 	m_r[26] = pd & 0x00ff;
 }
 
-void avr8_device::op_stxd(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_stxd(uint16_t op)
 {
 	const uint16_t pd = XREG - 1;
 	m_data->write_byte(pd, m_r[RD5(op)]);
@@ -1011,12 +1064,14 @@ void avr8_device::op_stxd(uint16_t op)
 	m_r[26] = pd & 0x00ff;
 }
 
-void avr8_device::op_push(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_push(uint16_t op)
 {
 	push(m_r[RD5(op)]);
 }
 
-void avr8_device::op_com(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_com(uint16_t op)
 {
 	const uint8_t res = ~m_r[RD5(op)];
 	SREG_W(AVR8_SREG_C, 1);
@@ -1027,7 +1082,8 @@ void avr8_device::op_com(uint16_t op)
 	m_r[RD5(op)] = res;
 }
 
-void avr8_device::op_neg(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_neg(uint16_t op)
 {
 	const uint8_t rd = m_r[RD5(op)];
 	const uint8_t res = 0 - rd;
@@ -1040,13 +1096,15 @@ void avr8_device::op_neg(uint16_t op)
 	m_r[RD5(op)] = res;
 }
 
-void avr8_device::op_swap(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_swap(uint16_t op)
 {
 	const uint8_t rd = m_r[RD5(op)];
 	m_r[RD5(op)] = (rd >> 4) | (rd << 4);
 }
 
-void avr8_device::op_inc(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_inc(uint16_t op)
 {
 	const uint8_t rd = m_r[RD5(op)];
 	const uint8_t res = rd + 1;
@@ -1057,54 +1115,62 @@ void avr8_device::op_inc(uint16_t op)
 	m_r[RD5(op)] = res;
 }
 
-void avr8_device::op_asr(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_asr(uint16_t op)
 {
 	const uint8_t rd = m_r[RD5(op)];
 	const uint8_t res = (rd & 0x80) | (rd >> 1);
-	SREG &= ~(AVR8_SREG_MASK_C | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_N | AVR8_SREG_MASK_V | AVR8_SREG_MASK_S);
-	SREG |= m_shift_flag_cache[(rd << 8) | res];
+	m_r[SREG] &= ~(AVR8_SREG_MASK_C | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_N | AVR8_SREG_MASK_V | AVR8_SREG_MASK_S);
+	m_r[SREG] |= m_shift_flag_cache[(rd << 8) | res];
 	m_r[RD5(op)] = res;
 }
 
-void avr8_device::op_lsr(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_lsr(uint16_t op)
 {
 	const uint8_t rd = m_r[RD5(op)];
 	const uint8_t res = rd >> 1;
-	SREG &= ~(AVR8_SREG_MASK_C | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_N | AVR8_SREG_MASK_V | AVR8_SREG_MASK_S);
-	SREG |= m_shift_flag_cache[(rd << 8) | res];
+	m_r[SREG] &= ~(AVR8_SREG_MASK_C | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_N | AVR8_SREG_MASK_V | AVR8_SREG_MASK_S);
+	m_r[SREG] |= m_shift_flag_cache[(rd << 8) | res];
 	m_r[RD5(op)] = res;
 }
 
-void avr8_device::op_ror(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_ror(uint16_t op)
 {
 	const uint8_t rd = m_r[RD5(op)];
 	const uint8_t res = (rd >> 1) | (SREG_R(AVR8_SREG_C) << 7);
-	SREG &= ~(AVR8_SREG_MASK_C | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_N | AVR8_SREG_MASK_V | AVR8_SREG_MASK_S);
-	SREG |= m_shift_flag_cache[(rd << 8) | res];
+	m_r[SREG] &= ~(AVR8_SREG_MASK_C | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_N | AVR8_SREG_MASK_V | AVR8_SREG_MASK_S);
+	m_r[SREG] |= m_shift_flag_cache[(rd << 8) | res];
 	m_r[RD5(op)] = res;
 }
 
-void avr8_device::op_setf(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_setf(uint16_t op)
 {
 	SREG_W((op >> 4) & 0x07, 1);
 }
 
-void avr8_device::op_clrf(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_clrf(uint16_t op)
 {
 	SREG_W((op >> 4) & 0x07, 0);
 }
 
-void avr8_device::op_ijmp(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_ijmp(uint16_t op)
 {
-	m_pc = ZREG - 1;
+	m_pc = (ZREG - 1) << 1;
 }
 
-void avr8_device::op_eijmp(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_eijmp(uint16_t op)
 {
-	m_pc = (m_r[AVR8_REGIDX_EIND] << 16 | ZREG) - 1;
+	m_pc = ((m_r[EIND] << 16 | ZREG) << 1) - 2;
 }
 
-void avr8_device::op_dec(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_dec(uint16_t op)
 {
 	const uint8_t rd = m_r[RD5(op)];
 	const uint8_t res = rd - 1;
@@ -1115,93 +1181,105 @@ void avr8_device::op_dec(uint16_t op)
 	m_r[RD5(op)] = res;
 }
 
-void avr8_device::op_jmp(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_jmp(uint16_t op)
 {
 	uint32_t offs = KCONST22(op) << 16;
-	m_pc++;
-	m_shifted_pc += 2;
-	offs |= m_program->read_word(m_shifted_pc);
-	m_pc = offs;
-	m_pc--;
+	m_pc += 2;
+	uint16_t wordval = m_program->read_word(m_pc);
+	offs |= wordval;
+	m_pc = offs << 1;
+	m_pc -= 2;
 }
 
-void avr8_device::op_call(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_call(uint16_t op)
 {
-	push((m_pc + 2) & 0x00ff);
-	push(((m_pc + 2) >> 8) & 0x00ff);
+	push(((m_pc >> 1) + 2) & 0x00ff);
+	push((((m_pc >> 1) + 2) >> 8) & 0x00ff);
 	uint32_t offs = KCONST22(op) << 16;
-	m_pc++;
-	m_shifted_pc += 2;
-	offs |= m_program->read_word(m_shifted_pc);
-	m_pc = offs;
-	m_pc--;
+	m_pc += 2;
+	offs |= m_program->read_word(m_pc);
+	m_pc = offs << 1;
+	m_pc -= 2;
 }
 
-void avr8_device::op_ret(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_ret(uint16_t op)
 {
 	m_pc = pop() << 8;
 	m_pc |= pop();
-	m_pc--;
+	m_pc = (m_pc << 1) - 2;
 }
 
-void avr8_device::op_reti(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_reti(uint16_t op)
 {
 	m_pc = pop() << 8;
 	m_pc |= pop();
-	m_pc--;
+	m_pc = (m_pc << 1) - 2;
 	SREG_W(AVR8_SREG_I, 1);
 }
 
-void avr8_device::op_sleep(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_sleep(uint16_t op)
 {
-	m_pc--;
+	m_pc = (m_pc << 1) - 2;
 }
 
-void avr8_device::op_break(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_break(uint16_t op)
 {
 	op_unimpl(op);
 }
 
-void avr8_device::op_wdr(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_wdr(uint16_t op)
 {
 	LOGMASKED(LOG_WDOG, "%s: Watchdog reset opcode\n", machine().describe_context());
 	//op_unimpl(op);
 }
 
-void avr8_device::op_lpm(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_lpm(uint16_t op)
 {
 	m_r[0] = m_program->read_byte(ZREG);
 }
 
-void avr8_device::op_elpm(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_elpm(uint16_t op)
 {
 	op_unimpl(op);
 }
 
-void avr8_device::op_spm(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_spm(uint16_t op)
 {
 	op_unimpl(op);
 }
 
-void avr8_device::op_spmzi(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_spmzi(uint16_t op)
 {
 	op_unimpl(op);
 }
 
-void avr8_device::op_icall(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_icall(uint16_t op)
 {
-	push((m_pc + 1) & 0x00ff);
-	push(((m_pc + 1) >> 8) & 0x00ff);
-	m_pc = ZREG;
-	m_pc--;
+	push(((m_pc >> 1) + 1) & 0x00ff);
+	push((((m_pc >> 1) + 1) >> 8) & 0x00ff);
+	m_pc = (ZREG << 1) - 2;
 }
 
-void avr8_device::op_eicall(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_eicall(uint16_t op)
 {
 	op_unimpl(op);
 }
 
-void avr8_device::op_adiw(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_adiw(uint16_t op)
 {
 	const uint8_t rd = m_r[24 + (DCONST(op) << 1)];
 	const uint8_t rr = m_r[25 + (DCONST(op) << 1)];
@@ -1215,7 +1293,8 @@ void avr8_device::op_adiw(uint16_t op)
 	m_r[25 + (DCONST(op) << 1)] = (pd >> 8) & 0x00ff;
 }
 
-void avr8_device::op_sbiw(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_sbiw(uint16_t op)
 {
 	const uint8_t rd = m_r[24 + (DCONST(op) << 1)];
 	const uint8_t rr = m_r[25 + (DCONST(op) << 1)];
@@ -1229,37 +1308,42 @@ void avr8_device::op_sbiw(uint16_t op)
 	m_r[25 + (DCONST(op) << 1)] = (pd >> 8) & 0x00ff;
 }
 
-void avr8_device::op_cbi(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_cbi(uint16_t op)
 {
 	m_data->write_byte(32 + ACONST5(op), m_data->read_byte(32 + ACONST5(op)) &~ (1 << RR3(op)));
 }
 
-void avr8_device::op_sbic(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_sbic(uint16_t op)
 {
 	if (!BIT(m_data->read_byte(32 + ACONST5(op)), RR3(op)))
 	{
-		const uint16_t data = (uint32_t)m_program->read_word(m_shifted_pc + 2);
+		const uint16_t data = (uint32_t)m_program->read_word(m_pc + 2);
 		m_opcycles += is_long_opcode(data) ? 2 : 1;
-		m_pc += is_long_opcode(data) ? 2 : 1;
+		m_pc += is_long_opcode(data) ? 4 : 2;
 	}
 }
 
-void avr8_device::op_sbi(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_sbi(uint16_t op)
 {
 	m_data->write_byte(32 + ACONST5(op), m_data->read_byte(32 + ACONST5(op)) | (1 << RR3(op)));
 }
 
-void avr8_device::op_sbis(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_sbis(uint16_t op)
 {
 	if (BIT(m_data->read_byte(32 + ACONST5(op)), RR3(op)))
 	{
-		const uint16_t data = (uint32_t)m_program->read_word(m_shifted_pc + 2);
+		const uint16_t data = (uint32_t)m_program->read_word(m_pc + 2);
 		m_opcycles += is_long_opcode(data) ? 2 : 1;
-		m_pc += is_long_opcode(data) ? 2 : 1;
+		m_pc += is_long_opcode(data) ? 4 : 2;
 	}
 }
 
-void avr8_device::op_mul(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_mul(uint16_t op)
 {
 	const int16_t sd = (uint8_t)m_r[RD5(op)] * (uint8_t)m_r[RR5(op)];
 	m_r[1] = (sd >> 8) & 0x00ff;
@@ -1268,58 +1352,67 @@ void avr8_device::op_mul(uint16_t op)
 	SREG_W(AVR8_SREG_Z, (sd == 0) ? 1 : 0);
 }
 
-void avr8_device::op_out(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_out(uint16_t op)
 {
 	m_data->write_byte(32 + ACONST6(op), m_r[RD5(op)]);
 }
 
-void avr8_device::op_in(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_in(uint16_t op)
 {
 	m_r[RD5(op)] = m_data->read_byte(0x20 + ACONST6(op));
 }
 
-void avr8_device::op_rjmp(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_rjmp(uint16_t op)
 {
-	m_pc += (int32_t)((op & 0x0800) ? ((op & 0x0fff) | 0xfffff000) : (op & 0x0fff));
+	m_pc += (int32_t)((op & 0x0800) ? ((op & 0x0fff) | 0xfffff000) : (op & 0x0fff)) << 1;
 }
 
-void avr8_device::op_rcall(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_rcall(uint16_t op)
 {
-	const int32_t offs = (int32_t)((op & 0x0800) ? ((op & 0x0fff) | 0xfffff000) : (op & 0x0fff));
-	push((m_pc + 1) & 0x00ff);
-	push(((m_pc + 1) >> 8) & 0x00ff);
+	const int32_t offs = (int32_t)((op & 0x0800) ? ((op & 0x0fff) | 0xfffff000) : (op & 0x0fff)) << 1;
+	push(((m_pc >> 1) + 1) & 0x00ff);
+	push((((m_pc >> 1) + 1) >> 8) & 0x00ff);
 	m_pc += offs;
 }
 
-void avr8_device::op_ldi(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_ldi(uint16_t op)
 {
 	m_r[16 + RD4(op)] = KCONST8(op);
 }
 
-void avr8_device::op_brset(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_brset(uint16_t op)
 {
 	if (SREG_R(op & 0x0007))
 	{
-		m_pc += util::sext(KCONST7(op), 7);
+		m_pc += util::sext(KCONST7(op), 7) << 1;
 		m_opcycles++;
 	}
 }
 
-void avr8_device::op_brclr(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_brclr(uint16_t op)
 {
 	if (SREG_R(op & 0x0007) == 0)
 	{
-		m_pc += util::sext(KCONST7(op), 7);
+		m_pc += util::sext(KCONST7(op), 7) << 1;
 		m_opcycles++;
 	}
 }
 
-void avr8_device::op_bst(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_bst(uint16_t op)
 {
 	SREG_W(AVR8_SREG_T, (BIT(m_r[RD5(op)], RR3(op))) ? 1 : 0);
 }
 
-void avr8_device::op_bld(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_bld(uint16_t op)
 {
 	if (SREG_R(AVR8_SREG_T))
 	{
@@ -1331,27 +1424,30 @@ void avr8_device::op_bld(uint16_t op)
 	}
 }
 
-void avr8_device::op_sbrs(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_sbrs(uint16_t op)
 {
 	if (BIT(m_r[RD5(op)], RR3(op)))
 	{
-		const uint16_t data = (uint32_t)m_program->read_word(m_shifted_pc + 2);
+		const uint16_t data = (uint32_t)m_program->read_word(m_pc + 2);
 		m_opcycles += is_long_opcode(data) ? 2 : 1;
-		m_pc += is_long_opcode(data) ? 2 : 1;
+		m_pc += is_long_opcode(data) ? 4 : 2;
 	}
 }
 
-void avr8_device::op_sbrc(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_sbrc(uint16_t op)
 {
 	if (!BIT(m_r[RD5(op)], RR3(op)))
 	{
-		const uint16_t data = (uint32_t)m_program->read_word(m_shifted_pc + 2);
+		const uint16_t data = (uint32_t)m_program->read_word(m_pc + 2);
 		m_opcycles += is_long_opcode(data) ? 2 : 1;
-		m_pc += is_long_opcode(data) ? 2 : 1;
+		m_pc += is_long_opcode(data) ? 4 : 2;
 	}
 }
 
-void avr8_device::op_unimpl(uint16_t op)
+template <int NumTimers>
+void avr8_device<NumTimers>::op_unimpl(uint16_t op)
 {
 	unimplemented_opcode(op);
 }
