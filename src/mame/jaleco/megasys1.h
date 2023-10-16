@@ -14,6 +14,7 @@
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
+#include "cpu/tlcs90/tlcs90.h"
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
 #include "ms1_tmap.h"
@@ -30,6 +31,7 @@ public:
 		m_tmap(*this, "scroll%u", 0),
 		m_ram(*this, "ram"),
 		m_maincpu(*this, "maincpu"),
+		m_iomcu(*this, "iomcu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki%u", 1U),
 		m_ymsnd(*this, "ymsnd"),
@@ -57,6 +59,7 @@ public:
 	void p47b(machine_config &config);
 	void system_D(machine_config &config);
 	void system_C(machine_config &config);
+	void system_C_bigstrik(machine_config &config);
 	void system_Bbl(machine_config &config);
 	void system_A(machine_config &config);
 	void system_A_jitsupro(machine_config &config);
@@ -96,6 +99,7 @@ private:
 	optional_device_array<megasys1_tilemap_device, 3> m_tmap;
 	required_shared_ptr<u16> m_ram;
 	required_device<cpu_device> m_maincpu;
+	optional_device<tlcs90_device> m_iomcu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device_array<okim6295_device, 2> m_oki;
 	optional_device<device_t> m_ymsnd;
@@ -175,6 +179,17 @@ private:
 	template<int Chip> u8 oki_status_r();
 	void ram_w(offs_t offset, u16 data);
 	void p47b_adpcm_w(offs_t offset, u8 data);
+	
+	// MCU related
+	u16 ip_select_bigstrik_r();
+	void ip_select_bigstrik_w(u16 data);
+	u8 mcu_capture_inputs_r(offs_t offset);
+	u8 mcu_port1_r();
+	void mcu_port2_w(u8 data);
+	void mcu_port6_w(u8 data);
+	
+	u8 m_mcu_input_data;
+	u8 m_mcu_io_data;
 
 	DECLARE_MACHINE_RESET(megasys1);
 	DECLARE_VIDEO_START(megasys1);
@@ -188,6 +203,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_iganinju_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1B_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(megasys1C_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(megasys1C_bigstrik_scanline);
 
 	void priority_create();
 	void mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -209,11 +226,13 @@ private:
 	void megasys1B_monkelf_map(address_map &map);
 	void megasys1B_sound_map(address_map &map);
 	void megasys1C_map(address_map &map);
+	void megasys1C_bigstrik_map(address_map &map);
 	void megasys1D_map(address_map &map);
 	void megasys1D_oki_map(address_map &map);
 	void megasys1Z_map(address_map &map);
 	void z80_sound_io_map(address_map &map);
 	void z80_sound_map(address_map &map);
+	void iomcu_map(address_map &map);
 };
 
 #endif // MAME_JALECO_MEGASYS1_H
