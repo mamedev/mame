@@ -10,6 +10,8 @@
 
 #include "imagedev/memcard.h"
 
+#include <vector>
+
 class casio_ra3_device : public device_t, public device_memcard_image_interface
 {
 public:
@@ -33,7 +35,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t m_ram[0x1000];
+	std::vector<u8> m_ram;
 };
 
 // device type definition

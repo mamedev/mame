@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <array>
+
 class upd933_device : public device_t, public device_sound_interface
 {
 public:
@@ -31,10 +33,21 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
+	static constexpr unsigned NOTE_SHIFT = 9;
+	static constexpr unsigned PITCH_SHIFT = 20;
+	static constexpr unsigned PITCH_FINE_SHIFT = 12;
+	static constexpr unsigned VOLUME_SHIFT = 12;
+
+	static constexpr unsigned ENV_DCA_SHIFT = 16;
+	static constexpr unsigned ENV_DCW_SHIFT = 16;
+	static constexpr unsigned ENV_DCO_SHIFT = 11;
+
 	struct env_t
 	{
 		u8 m_direction = 0, m_sustain = 1, m_irq = 0;
 		u32 m_rate = 0, m_target = 0, m_current = 0;
+
+		void update();
 	};
 
 	struct voice_t
@@ -49,7 +62,6 @@ private:
 	};
 
 	s16 update(int vnum);
-	void update(env_t &env);
 	void check_irq();
 
 	u32 env_rate(u8 data) const;
@@ -67,18 +79,9 @@ private:
 	u16 m_pitch_fine[0x200];
 	u16 m_volume[0x200];
 
-	static constexpr unsigned NOTE_SHIFT = 9;
-	static constexpr unsigned PITCH_SHIFT = 20;
-	static constexpr unsigned PITCH_FINE_SHIFT = 12;
-	static constexpr unsigned VOLUME_SHIFT = 12;
-
 	u8 m_sound_data[2];
 	u8 m_sound_data_pos;
 	std::array<u16, 256> m_sound_regs;
-
-	static constexpr unsigned ENV_DCA_SHIFT = 16;
-	static constexpr unsigned ENV_DCW_SHIFT = 16;
-	static constexpr unsigned ENV_DCO_SHIFT = 11;
 
 	u32 m_sample_count;
 	s16 m_last_sample;

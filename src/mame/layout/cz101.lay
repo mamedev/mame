@@ -135,7 +135,7 @@ license:CC0-1.0
 			<data><![CDATA[
 				<?xml version="1.0" standalone="no"?>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" version="1.1">
-					<polygon points="2,2 5,8 8,2" style="fill-opacity:0;stroke:white;stroke-width:0.4" />
+					<polygon points="2,2 5,8 8,2" fill="none" stroke="white" stroke-width="0.4" />
 				</svg>
 			]]></data>
 		</image>
@@ -159,7 +159,7 @@ license:CC0-1.0
 			<data><![CDATA[
 				<?xml version="1.0" standalone="no"?>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" version="1.1">
-					<polygon points="2,8 5,2 8,8" style="fill-opacity:0;stroke:white;stroke-width:0.4" />
+					<polygon points="2,8 5,2 8,8" fill="none" stroke="white" stroke-width="0.4" />
 				</svg>
 			]]></data>
 		</image>
@@ -183,7 +183,7 @@ license:CC0-1.0
 			<data><![CDATA[
 				<?xml version="1.0" standalone="no"?>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" version="1.1">
-					<polygon points="2,5 8,2 8,8" style="fill-opacity:0;stroke:white;stroke-width:0.4" />
+					<polygon points="2,5 8,2 8,8" fill="none" stroke="white" stroke-width="0.4" />
 				</svg>
 			]]></data>
 		</image>
@@ -207,7 +207,7 @@ license:CC0-1.0
 			<data><![CDATA[
 				<?xml version="1.0" standalone="no"?>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" version="1.1">
-					<polygon points="8,5 2,2 2,8" style="fill-opacity:0;stroke:white;stroke-width:0.4" />
+					<polygon points="8,5 2,2 2,8" fill="none" stroke="white" stroke-width="0.4" />
 				</svg>
 			]]></data>
 		</image>

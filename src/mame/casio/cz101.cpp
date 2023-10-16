@@ -6,24 +6,25 @@
 
     Digital Synthesizer
 
-	Misc. notes:
+    Misc. notes:
 
-	To run a (currently undumped) test/diagnostic/debug cartridge:
-	Hold "env step +", "env step -", "initialize", and "write" all at once, then press "load".
-	If a cartridge is inserted that begins with the 8 bytes "5a 96 5a 96 5a 96 5a 96", then
-	the CZ-101 firmware will copy the first 2kb of the cart to $8800-8fff and then call $8810.
-	This works even when the normal "cart detect" signal isn't present.
-	(Note that this will wipe out all patches saved to the internal RAM.)
+    To run a (currently undumped) test/diagnostic/debug cartridge:
+    Hold "env step +", "env step -", "initialize", and "write" all at once, then press "load".
+    If a cartridge is inserted that begins with the 8 bytes "5a 96 5a 96 5a 96 5a 96", then
+    the CZ-101 firmware will copy the first 2kb of the cart to $8800-8fff and then call $8810.
+    This works even when the normal "cart detect" signal isn't present.
+    (Note that this will wipe out all patches saved to the internal RAM.)
 
-	Unused input matrix bits:
-	Bit 7 of KC15 is normally unused, but if pulled low using a diode, then bits 2-5 of KC8
-	(also normally unused) become DIP switches that override the normal MIDI "basic channel"
-	setting from the front panel (possibly planned for use on a screenless MIDI module).
+    Unused input matrix bits:
+    Bit 7 of KC15 is normally unused, but if pulled low using a diode, then bits 2-5 of KC8
+    (also normally unused) become DIP switches that override the normal MIDI "basic channel"
+    setting from the front panel (possibly planned for use on a screenless MIDI module).
 
 ***************************************************************************/
 
 #include "emu.h"
 
+#include "ra3.h"
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "cpu/upd7810/upd7811.h"
@@ -31,7 +32,6 @@
 #include "machine/nvram.h"
 #include "sound/upd933.h"
 #include "video/hd44780.h"
-#include "ra3.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -219,16 +219,14 @@ static INPUT_PORTS_START( cz101 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Compare/Recall")
 
 	PORT_START("kc10")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Solo")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Tone Mix")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Key Transpose")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Write")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("MIDI")
-	PORT_DIPNAME(0x20, 0x20, "Memory Protect")
-	PORT_DIPSETTING(   0x20, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x00, DEF_STR( On ))
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_E)     PORT_NAME("Solo")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_R)     PORT_NAME("Tone Mix")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_T)     PORT_NAME("Key Transpose")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Y)     PORT_NAME("Write")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_U)     PORT_NAME("MIDI")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)  PORT_TOGGLE              PORT_NAME("Memory Protect")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Select")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_MEMORY_RESET) PORT_NAME("P (Reset RAM)")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_MEMORY_RESET)                    PORT_NAME("P (Reset RAM)")
 
 	PORT_START("kc11")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Tone 1")
@@ -277,9 +275,7 @@ static INPUT_PORTS_START( cz101 )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_SLASH)  PORT_NAME("Noise Modulation")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_MINUS)  PORT_NAME(u8"Master Tune \u25bd") // ▽
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_EQUALS) PORT_NAME(u8"Master Tune \u25b3") // △
-	PORT_DIPNAME(0x40, 0x40, "Auto Power Off")
-	PORT_DIPSETTING(   0x40, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x00, DEF_STR( On ))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)  PORT_TOGGLE               PORT_NAME("Auto Power Off")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("PB")
@@ -289,7 +285,7 @@ static INPUT_PORTS_START( cz101 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_NAME("Power") PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, cz101_state, power_w, 0)
 
 	PORT_START("AN1")
-	PORT_BIT(0xff, 0x7f, IPT_PADDLE) PORT_NAME("Pitch Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00, 0xff) PORT_CODE_DEC(KEYCODE_PGDN) PORT_CODE_INC(KEYCODE_PGUP)
+	PORT_BIT(0xff, 0x7f, IPT_PADDLE) PORT_NAME("Pitch Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00, 0xff) PORT_CODE_DEC(JOYCODE_Y_DOWN_SWITCH) PORT_CODE_INC(JOYCODE_Y_UP_SWITCH)
 
 	PORT_START("AN2")
 	PORT_CONFNAME(0xff, 0xff, "Battery Level")

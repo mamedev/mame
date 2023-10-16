@@ -8,6 +8,7 @@
 #include "emu.h"
 #include "upd933.h"
 
+#include <algorithm>
 #include <cmath>
 
 DEFINE_DEVICE_TYPE(UPD933, upd933_device, "upd933", "NEC uPD933")
@@ -90,7 +91,7 @@ void upd933_device::device_start()
 /**************************************************************************/
 void upd933_device::device_reset()
 {
-	m_irq_state = CLEAR_LINE;
+	m_irq_state = 0;
 
 	m_sound_data[0] = m_sound_data[1] = 0;
 	m_sound_data_pos = 0;
@@ -145,7 +146,7 @@ void upd933_device::check_irq()
 	}
 
 	if (m_irq_data)
-		m_irq_cb(m_irq_state = ASSERT_LINE);
+		m_irq_cb(m_irq_state = 1);
 }
 
 /**************************************************************************/
@@ -167,7 +168,7 @@ void upd933_device::write(u8 data)
 		m_stream->update();
 
 		m_irq_data = 0;
-		m_irq_cb(m_irq_state = CLEAR_LINE);
+		m_irq_cb(m_irq_state = 0);
 
 		const u8 reg = m_sound_data[0];
 		const u16 value = m_sound_regs[reg] = (m_sound_data[1] << 8) | data;
@@ -268,7 +269,8 @@ void upd933_device::write(u8 data)
 			break;
 
 		default:
-			logerror("unknown sound reg write: %02x %04x\n", reg, value);
+			logerror("%s: unknown sound reg write: %02x %04x\n",
+				machine().describe_context(), reg, value);
 			break;
 		}
 	}
@@ -296,8 +298,8 @@ void upd933_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		i.e. to match each odd-numbered voice ("line 1") with the corresponding even-numbered one ("line 2").
 		*/
 		static const int voice_map[] = {5, 0, 7, 2, 1, 4, 3, 6};
-		for (int j = 0; j < 8; j++)
-			sample += update(voice_map[j]);
+		for (int j : voice_map)
+			sample += update(j);
 
 		outputs[0].put_int_clamp(i, sample, 1 << 15);
 		m_sample_count++;
@@ -440,9 +442,9 @@ s16 upd933_device::update(int vnum)
 	const u32 old_dco = m_dco[vnum].m_current;
 	const s16 old_pm = voice.m_pm_level;
 
-	update(m_dca[vnum]);
-	update(m_dcw[vnum]);
-	update(m_dco[vnum]);
+	m_dca[vnum].update();
+	m_dcw[vnum].update();
+	m_dco[vnum].update();
 
 	// pitch/noise modulation latches a new pitch multiplier every 8 samples
 	if (!(m_sample_count & 7))
@@ -476,30 +478,30 @@ s16 upd933_device::update(int vnum)
 }
 
 /**************************************************************************/
-void upd933_device::update(env_t &env)
+void upd933_device::env_t::update()
 {
-	if (env.m_current != env.m_target)
+	if (m_current != m_target)
 	{
-		if (!env.m_direction) // increasing
+		if (!m_direction) // increasing
 		{
-			if (env.m_current > env.m_target
-				|| env.m_target - env.m_current <= env.m_rate)
-				env.m_current = env.m_target;
+			if (m_current > m_target
+				|| m_target - m_current <= m_rate)
+				m_current = m_target;
 			else
-				env.m_current += env.m_rate;
+				m_current += m_rate;
 		}
 		else // decreasing
 		{
-			if (env.m_current < env.m_target
-				|| env.m_current - env.m_target <= env.m_rate)
-				env.m_current = env.m_target;
+			if (m_current < m_target
+				|| m_current - m_target <= m_rate)
+				m_current = m_target;
 			else
-				env.m_current -= env.m_rate;
+				m_current -= m_rate;
 		}
 	}
 
-	if (!env.m_sustain && (env.m_current == env.m_target))
-		env.m_irq = true;
+	if (!m_sustain && (m_current == m_target))
+		m_irq = true;
 }
 
 /**************************************************************************/
